@@ -523,6 +523,368 @@ IsInValidList (
   return FALSE;
 }
 
+#pragma pack(1)
+
+///
+/// Describes the format and data of the Tdx Metadata Section.
+/// Refer to tdx-virtual-firmware-design-guid v1.0 11.2.
+///
+typedef struct {
+  UINT32    DataOffset;
+  UINT32    RawDataSize;
+  UINT64    MemoryAddress;
+  UINT64    MemoryDataSize;
+  UINT32    Type;
+  UINT32    Attribute;
+} TDX_METADATA_SECTION;
+
+///
+/// Descriptor of Tdx Metadata.
+/// Refer to tdx-virtual-firmware-design-guid v1.0 11.1.
+///
+typedef struct {
+  UINT32    Signature;
+  UINT32    Length;
+  UINT32    Version;
+  UINT32    NumberOfSectionEntry;
+} TDVF_METADATA_DESCRIPTOR;
+
+#pragma pack()
+
+///
+/// The Chain footer Guid was defined on the Reset Vector.
+///
+#define EFI_CHAIN_FOOTER_GUID \
+  {0x96b582de,0x1fb2,0x45f7,{0xba,0xea,0xa3,0x66,0xc5,0x5a,0x08,0x2d}}
+
+///
+/// The Tdx Metadata Offset Guid was defined on the Reset Vector.
+///
+#define EFI_TDX_METADATA_OFFSET_GUID \
+  {0xe47a6535,0x984a,0x4798,{0x86,0x5e,0x46,0x85,0xa7,0xbf,0x8e,0xc2}}
+
+///
+/// Tdx Metadata type and defaulte version.
+/// Refer to tdx-virtual-firmware-design-guid v1.0 11.2.
+///
+#define TDX_METADATA_SECTION_TYPE_BFV       0
+#define TDX_METADATA_SECTION_TYPE_CFV       1
+#define TDX_METADATA_SECTION_TYPE_TD_HOB    2
+#define TDX_METADATA_SECTION_TYPE_TEMP_MEM  3
+#define TDX_METADATA_VERSION                1
+
+///
+/// The defaulte attributes of Tdx Metadta.
+/// Refer to tdx-virtual-firmware-design-guid v1.0 11.3.
+///
+#define TDX_METADATA_ATTRIBUTES_EXTENDMR  0x00000001
+
+///
+/// The size was the length from start of data to end of guid (2 bytes).
+/// Refer to the definition of chain guid struct on the reset vector.
+///
+#define SIZE_OF_GUID_CHAIN_LENGTH  2
+#define GUID_SIZE                  16
+
+#define TDX_METADATA_SIGNATURE  SIGNATURE_32('T','D','V','F')
+
+/**
+  Check the integrity of TDX Metadata.
+  Refer to tdx-virtual-firmware-design-guid v1.0, 11.1,11.2 and 11.3.
+
+  @param[in]  ResetVectorAddress   The ResetVector address
+  @param[in]  TdxMetadataAddress   A pointer to TDX Metadata
+
+  @retval     TRUE                 The address and the TDX Metadata is valid.
+  @retval     FALSE                The address is not valid or the TDX Metadata is not valid.
+**/
+STATIC
+BOOLEAN
+ValidateTdxMetadata (
+  IN UINT64  ResetVecAddress,
+  IN UINT8   *TdxMetadataAddress
+  )
+{
+  UINTN  NumberOfTdHobSection;
+  UINTN  NumberOfBFVSection;
+
+  UINT8  *Address;
+  UINT8  *EndMetadata;
+
+  TDVF_METADATA_DESCRIPTOR  *TdvfDec;
+  TDX_METADATA_SECTION      *Section;
+
+  NumberOfTdHobSection = 0;
+  NumberOfBFVSection   = 0;
+  EndMetadata          = NULL;
+  TdvfDec              = NULL;
+  Section              = NULL;
+  if (TdxMetadataAddress == NULL) {
+    DEBUG ((DEBUG_ERROR, "TdxMetadata : Tdx Metadata Address should not be NULL\n"));
+    return FALSE;
+  }
+
+  Address = TdxMetadataAddress;
+  // Get the TDVF_METADATA_DESCRIPTOR table
+  TdvfDec = (TDVF_METADATA_DESCRIPTOR *)Address;
+
+  if ((TdvfDec->Version != TDX_METADATA_VERSION) || (TdvfDec->Signature != TDX_METADATA_SIGNATURE)) {
+    DEBUG ((DEBUG_ERROR, "TdxMetadata : TDVF_METADATA_DESCRIPTOR Version must be 1, and the Signature must be T','D','V','F'\n"));
+    return FALSE;
+  }
+
+  // Tdx Metadata shall include at least one BFV and TD HOB,
+  // refer to tdx-virtual-firmware-design-guid v1.0 11.3.
+  if (TdvfDec->NumberOfSectionEntry < 2) {
+    DEBUG ((DEBUG_INFO, "TdxMetadata : The NumberOfSectionEntry of TDVF_METADATA_DESCRIPTOR must not be less than 2\n"));
+    return FALSE;
+  }
+
+  if ((TdvfDec->NumberOfSectionEntry * sizeof (TDX_METADATA_SECTION) + sizeof (TDVF_METADATA_DESCRIPTOR)) != TdvfDec->Length) {
+    DEBUG ((DEBUG_ERROR, "TdxMetadata : The length (%d) of TDVF_METADATA_DESCRIPTOR is invalid\n", TdvfDec->Length));
+    return FALSE;
+  }
+
+  EndMetadata = Address + TdvfDec->Length;
+  if (EndMetadata > (UINT8 *)(UINTN)ResetVecAddress) {
+    DEBUG ((DEBUG_ERROR, "TdxMetadata : The end address (%p) of Tdx Metadata is invalid\n", EndMetadata));
+    return FALSE;
+  }
+
+  // Skip the TDVF Descriptor ,and then can get the Tdx Metadata Section
+  // Refer to tdx-virtual-firmware-design-guid v1.0 11.2,11,3.
+  Address += sizeof (TDVF_METADATA_DESCRIPTOR);
+  while (Address < EndMetadata) {
+    Section = (TDX_METADATA_SECTION *)Address;
+
+    if ((Section->MemoryDataSize == 0) || (Section->MemoryDataSize < Section->RawDataSize)) {
+      DEBUG ((DEBUG_ERROR, "TdxMetadata : The MemoryDataSize should not be zero, and it should not be less than the RawDataSize\n"));
+      return FALSE;
+    }
+
+    if ((Section->MemoryAddress & 0xFFF) || (Section->MemoryDataSize & 0xFFF)) {
+      DEBUG ((DEBUG_ERROR, "TdxMetadata : The MemoryAddress and MemoryDataSize must be 4k aligned\n"));
+      return FALSE;
+    }
+
+    switch (Section->Type) {
+      case TDX_METADATA_SECTION_TYPE_BFV:
+        if ((Section->Attribute & TDX_METADATA_ATTRIBUTES_EXTENDMR) != 1) {
+          DEBUG ((DEBUG_ERROR, "TdxMetadata : The Attribute of BFV Section must be 1\n"));
+          return FALSE;
+        }
+
+        if (Section->RawDataSize == 0) {
+          DEBUG ((DEBUG_ERROR, "TdxMetadata : The RawDataSize of BFV Section must be non-zero\n"));
+          return FALSE;
+        }
+
+        if ((Section->MemoryAddress + Section->MemoryDataSize) < ResetVecAddress) {
+          DEBUG ((DEBUG_ERROR, "TdxMetadata : The ResetVector should be inside of BFV\n"));
+          return FALSE;
+        }
+
+        NumberOfBFVSection++;
+        break;
+
+      case TDX_METADATA_SECTION_TYPE_CFV:
+        if ((Section->Attribute & TDX_METADATA_ATTRIBUTES_EXTENDMR) != 0) {
+          DEBUG ((DEBUG_ERROR, "TdxMetadata : The Attribute of CFV Section must be 0\n"));
+          return FALSE;
+        }
+
+        if (Section->RawDataSize == 0) {
+          DEBUG ((DEBUG_ERROR, "TdxMetadata : The RawDataSize of CFV Section must be non-zero\n"));
+          return FALSE;
+        }
+
+        break;
+
+      case TDX_METADATA_SECTION_TYPE_TD_HOB:
+        if ((Section->Attribute & TDX_METADATA_ATTRIBUTES_EXTENDMR) != 0) {
+          DEBUG ((DEBUG_ERROR, "TdxMetadata : The Attribute of TD HOB Section must be 0\n"));
+          return FALSE;
+        }
+
+        if ((Section->RawDataSize != 0) || (Section->DataOffset != 0)) {
+          DEBUG ((DEBUG_ERROR, "TdxMetadata : The DataOffset and RawDataSize of TD HOB Section must be zero\n"));
+          return FALSE;
+        }
+
+        NumberOfTdHobSection++;
+        break;
+
+      case TDX_METADATA_SECTION_TYPE_TEMP_MEM:
+        if ((Section->Attribute & TDX_METADATA_ATTRIBUTES_EXTENDMR) != 0) {
+          DEBUG ((DEBUG_ERROR, "TdxMetadata : The Attribute of Temp Memory Section must be 0\n"));
+          return FALSE;
+        }
+
+        if ((Section->RawDataSize != 0) || (Section->DataOffset != 0)) {
+          DEBUG ((DEBUG_ERROR, "TdxMetadata : The DataOffset and RawDataSize of Temp Memory Section must be zero\n"));
+          return FALSE;
+        }
+
+        break;
+
+      default:
+        DEBUG ((DEBUG_ERROR, "TdxMetadata : Section type is unknown. Type: 0x%08x\n", Section->Type));
+        return FALSE;
+    }
+
+    Address += sizeof (TDX_METADATA_SECTION);
+    Section  = NULL;
+  }
+
+  if (NumberOfBFVSection == 0) {
+    DEBUG ((DEBUG_ERROR, "TdxMetadata : TDVF Metadata shall inclued at least one BFV Section\n"));
+    return FALSE;
+  }
+
+  if (NumberOfTdHobSection != 1 ) {
+    DEBUG ((DEBUG_ERROR, "TdxMetadata : TDVF Metadata shall have only one TD HOB Section\n"));
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Get the TDX Metadata address by the reset vector address and the Chain footer struct.
+  Chain footer struct was defined on the Reset Vector
+  (OvmfPkg/ResetVector/Ia16/ResetVectorVtf0.asm).
+
+  @param[in]      ResetVectorAddress   The address of the reset vector
+  @param[out]     TdxMetadataAddress   A pointer to TDX Metadata if found
+
+  @retval  EFI_SUCCESS              Address of the Tdx Metadata was found successfully.
+  @retval  Others                   Other error as indicated.
+**/
+STATIC
+EFI_STATUS
+GetTdxMetadataAddress (
+  IN UINT64  ResetVectorAddress,
+  OUT UINT8  **TdxMetadataAddress
+  )
+{
+  UINT16  ChainLen;
+  UINT16  StrcutLen;
+  UINT32  TdxMetadataOffset;
+  UINT8   *Address;
+  UINT8   *EndGuidChain;
+  UINT8   *BFVBaseAddress;
+
+  EFI_STATUS  Status;
+
+  EFI_GUID  *DataGuid;
+  EFI_GUID  FooterGuid;
+  EFI_GUID  TdxMetadataOffsetGuid;
+
+  BFVBaseAddress = (UINT8 *)(UINTN)FixedPcdGet32 (PcdBfvBase);
+  if (BFVBaseAddress == NULL) {
+    DEBUG ((DEBUG_ERROR, "BFV base address should not be NULL\n"));
+    Status = EFI_INVALID_PARAMETER;
+    return Status;
+  }
+
+  ChainLen          = 0;
+  StrcutLen         = 0;
+  TdxMetadataOffset = 0;
+  BFVBaseAddress    = 0;
+  Status            = EFI_SUCCESS;
+  Address           = NULL;
+  EndGuidChain      = NULL;
+  DataGuid          = NULL;
+
+  FooterGuid            = (EFI_GUID)EFI_CHAIN_FOOTER_GUID;
+  TdxMetadataOffsetGuid = (EFI_GUID)EFI_TDX_METADATA_OFFSET_GUID;
+
+  // Chain footer-guid Struct was stored at the end of the BFV , so read it from the hight to low
+  // Get the first 16 bytes
+  Address = (UINT8 *)(UINTN)ResetVectorAddress - GUID_SIZE;
+  while (Address > BFVBaseAddress) {
+    DataGuid = (EFI_GUID *)Address;
+
+    if (CompareGuid (&FooterGuid, DataGuid)) {
+      break;
+    }
+
+    DataGuid = NULL;
+    Address -= GUID_SIZE;
+  }
+
+  if (DataGuid == NULL ) {
+    DEBUG ((DEBUG_ERROR, "The chain-footer-guid was not found\n"));
+    Status = EFI_NOT_FOUND;
+    return Status;
+  }
+
+  Address -= SIZE_OF_GUID_CHAIN_LENGTH;
+  ChainLen = *(UINT16 *)Address;
+
+  if ((ChainLen < (SIZE_OF_GUID_CHAIN_LENGTH + GUID_SIZE))) {
+    DEBUG ((DEBUG_ERROR, "The length(%d) of chain-footer-guid struct(%g) is invalid\n", ChainLen, FooterGuid));
+    Status = EFI_NOT_FOUND;
+    return Status;
+  }
+
+  EndGuidChain = Address + SIZE_OF_GUID_CHAIN_LENGTH + GUID_SIZE - ChainLen;
+  DataGuid     = NULL;
+  while (Address > EndGuidChain) {
+    Address -= GUID_SIZE;
+    DataGuid = (EFI_GUID *)Address;
+
+    if (CompareGuid (&TdxMetadataOffsetGuid, DataGuid)) {
+      break;
+    }
+
+    DataGuid = NULL;
+    // Get the struct length , and skip this chain guid struct.
+    Address  -= SIZE_OF_GUID_CHAIN_LENGTH;
+    StrcutLen = *(UINT16 *)Address;
+
+    if ((StrcutLen < (GUID_SIZE + SIZE_OF_GUID_CHAIN_LENGTH)) || (StrcutLen > ChainLen)) {
+      DEBUG ((DEBUG_ERROR, "The length (%d) of the chain guid struct (%g) is invalid\n", StrcutLen, DataGuid));
+      Status = EFI_NOT_FOUND;
+      return Status;
+    }
+
+    Address -= (StrcutLen - GUID_SIZE - SIZE_OF_GUID_CHAIN_LENGTH);
+  }
+
+  if (DataGuid == NULL) {
+    DEBUG ((DEBUG_ERROR, "The TDX Metadata Offset guid was not found\n"));
+    Status = EFI_NOT_FOUND;
+    return Status;
+  }
+
+  // Found the TDX Metadata Offset
+  Address  -= SIZE_OF_GUID_CHAIN_LENGTH;
+  StrcutLen = *(UINT16 *)Address;
+  if ((StrcutLen < (GUID_SIZE + SIZE_OF_GUID_CHAIN_LENGTH)) || (StrcutLen > ChainLen)) {
+    DEBUG ((DEBUG_ERROR, "The length (%d) of the TDX Metadata Offset guid struct is invalid\n", StrcutLen));
+    Status = EFI_NOT_FOUND;
+    return Status;
+  }
+
+  Address          -= (StrcutLen - GUID_SIZE - SIZE_OF_GUID_CHAIN_LENGTH);
+  TdxMetadataOffset = *(UINT32 *)Address;
+  if (TdxMetadataOffset < ChainLen) {
+    DEBUG ((DEBUG_ERROR, "The TDX Metadata offset (%d) should be greater than the length(%d) of chain-footer-guid struct\n", TdxMetadataOffset, ChainLen));
+    Status = EFI_NOT_FOUND;
+    return Status;
+  }
+
+  *TdxMetadataAddress = (UINT8 *)(UINTN)ResetVectorAddress - TdxMetadataOffset;
+  if ((*TdxMetadataAddress < BFVBaseAddress) || (*TdxMetadataAddress > (UINT8 *)(UINTN)ResetVectorAddress)) {
+    DEBUG ((DEBUG_ERROR, "The TDX Metadata Address (%p) is invalid\n", *TdxMetadataAddress));
+    Status = EFI_NOT_FOUND;
+    return Status;
+  }
+
+  return Status;
+}
+
 /**
   Check the integrity of VMM Hob List.
 
@@ -566,6 +928,11 @@ ValidateHobList (
     BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED
   };
 
+  UINT8   *TdxMetadataAddress;
+  UINT64  ResetVecAddress;
+
+  EFI_STATUS  Status;
+
   UINT32  TotalSize;
   UINT32  TDHobSize;
 
@@ -574,8 +941,24 @@ ValidateHobList (
     return FALSE;
   }
 
-  TotalSize = 0;
-  TDHobSize = (UINT32)FixedPcdGet32 (PcdOvmfSecGhcbSize);
+  TotalSize       = 0;
+  TDHobSize       = (UINT32)FixedPcdGet32 (PcdOvmfSecGhcbSize);
+  ResetVecAddress = (UINT64)FixedPcdGet32 (PcdBfvBase) + (UINT64)FixedPcdGet32 (PcdBfvRawDataSize);
+  if (ResetVecAddress == 0) {
+    DEBUG ((DEBUG_ERROR, "ResetVecAddress Address should not be 0\n"));
+    return FALSE;
+  }
+
+  Status = GetTdxMetadataAddress (ResetVecAddress, &TdxMetadataAddress);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Get Tdx Metadata Address failed. Status = %r\n", Status));
+    return FALSE;
+  }
+
+  if (ValidateTdxMetadata (ResetVecAddress, TdxMetadataAddress) == FALSE) {
+    DEBUG ((DEBUG_ERROR, "Validate Tdx Metadata failed\n"));
+    return FALSE;
+  }
 
   Hob.Raw = (UINT8 *)VmmHobList;
 

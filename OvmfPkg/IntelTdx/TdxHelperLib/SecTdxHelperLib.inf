@@ -49,6 +49,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
   gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvRawDataSize
 
 [Guids]
   gCcEventEntryHobGuid
