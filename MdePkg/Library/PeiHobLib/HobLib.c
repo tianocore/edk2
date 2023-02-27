@@ -846,7 +846,8 @@ BuildMemoryAllocationHob (
 {
   EFI_HOB_MEMORY_ALLOCATION  *Hob;
 
-  ASSERT (
+  ASSERT(Length != 0);
+  ASSERT(
     ((BaseAddress & (EFI_PAGE_SIZE - 1)) == 0) &&
     ((Length & (EFI_PAGE_SIZE - 1)) == 0)
     );
