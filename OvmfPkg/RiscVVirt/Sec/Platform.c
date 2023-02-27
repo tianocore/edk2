@@ -22,6 +22,64 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/FdtHob.h>
 
 /**
+  Build memory map I/O range resource HOB using the
+  base address and size.
+
+  @param  MemoryBase     Memory map I/O base.
+  @param  MemorySize     Memory map I/O size.
+
+**/
+STATIC
+VOID
+AddIoMemoryBaseSizeHob (
+  EFI_PHYSICAL_ADDRESS  MemoryBase,
+  UINT64                MemorySize
+  )
+{
+  /* Align to EFI_PAGE_SIZE */
+  MemorySize = ALIGN_VALUE (MemorySize, EFI_PAGE_SIZE);
+  BuildResourceDescriptorHob (
+    EFI_RESOURCE_MEMORY_MAPPED_IO,
+    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
+    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
+    EFI_RESOURCE_ATTRIBUTE_TESTED,
+    MemoryBase,
+    MemorySize
+    );
+}
+
+/**
+  Populate IO resources from FDT that not added to GCD by its
+  driver in the DXE phase.
+
+  @param  FdtBase       Fdt base address
+  @param  Compatible    Compatible string
+
+**/
+STATIC
+VOID
+PopulateIoResources (
+  VOID         *FdtBase,
+  CONST CHAR8  *Compatible
+  )
+{
+  UINT64  *Reg;
+  INT32   Node, LenP;
+
+  Node = fdt_node_offset_by_compatible (FdtBase, -1, Compatible);
+  while (Node != -FDT_ERR_NOTFOUND) {
+    Reg = (UINT64 *)fdt_getprop (FdtBase, Node, "reg", &LenP);
+    if (Reg) {
+      ASSERT (LenP == (2 * sizeof (UINT64)));
+      AddIoMemoryBaseSizeHob (SwapBytes64 (Reg[0]), SwapBytes64 (Reg[1]));
+    }
+
+    Node = fdt_node_offset_by_compatible (FdtBase, Node, Compatible);
+  }
+}
+
+/**
   @retval EFI_SUCCESS            The address of FDT is passed in HOB.
           EFI_UNSUPPORTED        Can't locate FDT.
 **/
@@ -79,6 +137,10 @@ PlatformPeimInitialization (
   *FdtHobData = (UINTN)NewBase;
 
   BuildFvHob (PcdGet32 (PcdOvmfDxeMemFvBase), PcdGet32 (PcdOvmfDxeMemFvSize));
+
+  PopulateIoResources (Base, "ns16550a");
+  PopulateIoResources (Base, "qemu,fw-cfg-mmio");
+  PopulateIoResources (Base, "virtio,mmio");
 
   return EFI_SUCCESS;
 }
