@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -313,7 +313,7 @@ typedef struct {
 #define AP_RESET_STACK_SIZE  AP_SAFE_STACK_SIZE
 
 #pragma pack(1)
-
+STATIC_ASSERT ((AP_SAFE_STACK_SIZE & (CPU_STACK_ALIGNMENT - 1)) == 0, "AP_SAFE_STACK_SIZE is not aligned with CPU_STACK_ALIGNMENT");
 typedef struct {
   UINT8     InsnBuffer[8];
   UINT16    Rip;
@@ -400,6 +400,12 @@ AsmExchangeRole (
   IN CPU_EXCHANGE_ROLE_INFO  *MyInfo,
   IN CPU_EXCHANGE_ROLE_INFO  *OthersInfo
   );
+
+typedef union {
+  VOID                    *Data;
+  ASM_RELOCATE_AP_LOOP    AmdSevEntry;  // 64-bit AMD Sev processors
+  ASM_RELOCATE_AP_LOOP    GenericEntry; // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or AMD non-Sev processors
+} RELOCATE_AP_LOOP_ENTRY;
 
 /**
   Get the pointer to CPU MP Data structure.
