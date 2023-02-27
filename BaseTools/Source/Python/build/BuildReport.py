@@ -2354,6 +2354,11 @@ class BuildReport(object):
                         module_report_data["IsLibrary"] = module.IsLibrary
                         module_report_data["SourceDir"] = module.SourceDir
                         module_report_data["Files"] = []
+                        module_report_data["LibraryClass"] = module.Module.LibraryClass
+                        module_report_data["ModuleEntryPointList"] = module.Module.ModuleEntryPointList
+                        module_report_data["ConstructorList"] = module.Module.ConstructorList
+                        module_report_data["DestructorList"] = module.Module.DestructorList
+
 
                         # Files used by module
                         for data_file in module.SourceFileList:
