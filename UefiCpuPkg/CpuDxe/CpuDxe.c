@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module to produce CPU ARCH Protocol.
 
-  Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -505,20 +505,18 @@ InitializeMtrrMask (
   VOID
   )
 {
-  UINT32  RegEax;
-  UINT8   PhysicalAddressBits;
+  UINT32                          MaxExtendedFunction;
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX  VirPhyAddressSize;
 
-  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunction, NULL, NULL, NULL);
 
-  if (RegEax >= 0x80000008) {
-    AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-
-    PhysicalAddressBits = (UINT8)RegEax;
+  if (MaxExtendedFunction >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
   } else {
-    PhysicalAddressBits = 36;
+    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
   }
 
-  mValidMtrrBitsMask    = LShiftU64 (1, PhysicalAddressBits) - 1;
+  mValidMtrrBitsMask    = LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits) - 1;
   mValidMtrrAddressMask = mValidMtrrBitsMask & 0xfffffffffffff000ULL;
 }
 
