@@ -1,7 +1,7 @@
 /** @file
   Unit tests of the MtrrLib instance of the MtrrLib class
 
-  Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -122,6 +122,13 @@ UnitTestMtrrLibAsmCpuid (
   )
 {
   switch (Index) {
+    case CPUID_SIGNATURE:
+      if (Eax != NULL) {
+        *Eax = CPUID_VERSION_INFO;
+      }
+
+      return Index;
+      break;
     case CPUID_VERSION_INFO:
       if (Edx != NULL) {
         *Edx = mCpuidVersionInfoEdx.Uint32;
