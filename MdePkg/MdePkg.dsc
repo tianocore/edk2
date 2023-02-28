@@ -192,5 +192,7 @@
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
+  MdePkg/Library/BaseSerialPortLibRiscVSbiLib/BaseSerialPortLibRiscVSbiLib.inf
+  MdePkg/Library/BaseSerialPortLibRiscVSbiLibRam/BaseSerialPortLibRiscVSbiLibRam.inf
 
 [BuildOptions]
