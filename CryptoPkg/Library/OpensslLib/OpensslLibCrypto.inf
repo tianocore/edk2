@@ -163,6 +163,7 @@
   $(OPENSSL_PATH)/crypto/bn/bn_srp.c
   $(OPENSSL_PATH)/crypto/bn/bn_word.c
   $(OPENSSL_PATH)/crypto/bn/bn_x931p.c
+  $(OPENSSL_PATH)/crypto/bn/rsa_sup_mul.c
   $(OPENSSL_PATH)/crypto/buffer/buf_err.c
   $(OPENSSL_PATH)/crypto/buffer/buffer.c
   $(OPENSSL_PATH)/crypto/cmac/cm_ameth.c
