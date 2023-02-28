@@ -526,13 +526,19 @@ CollectProcessorCount (
   //
   // Enable x2APIC mode if
   //  1. Number of CPU is greater than 255; or
-  //  2. There are any logical processors reporting an Initial APIC ID of 255 or greater.
+  //  2. The platform exposed the exact *boot* CPU count to us in advance, and
+  //     more than 255 logical processors are possible later, with hotplug; or
+  //  3. There are any logical processors reporting an Initial APIC ID of 255 or greater.
   //
   X2Apic = FALSE;
   if (CpuMpData->CpuCount > 255) {
     //
     // If there are more than 255 processor found, force to enable X2APIC
     //
+    X2Apic = TRUE;
+  } else if ((PcdGet32 (PcdCpuBootLogicalProcessorNumber) > 0) &&
+             (PcdGet32 (PcdCpuMaxLogicalProcessorNumber) > 255))
+  {
     X2Apic = TRUE;
   } else {
     CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
