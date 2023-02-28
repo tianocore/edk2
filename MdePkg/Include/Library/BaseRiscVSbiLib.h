@@ -2,6 +2,7 @@
   Library to call the RISC-V SBI ecalls
 
   Copyright (c) 2021-2022, Hewlett Packard Development LP. All rights reserved.<BR>
+  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -18,10 +19,28 @@
 #include <Uefi.h>
 
 /* SBI Extension IDs */
-#define SBI_EXT_TIME  0x54494D45
-#define SBI_EXT_SRST  0x53525354
+#define SBI_EXT_0_1_CONSOLE_PUTCHAR  0x1
+#define SBI_EXT_0_1_CONSOLE_GETCHAR  0x2
+#define SBI_EXT_BASE                 0x10
+#define SBI_EXT_DBCN                 0x4442434E
+#define SBI_EXT_TIME                 0x54494D45
+#define SBI_EXT_SRST                 0x53525354
 
-/* SBI function IDs for TIME extension*/
+/* SBI function IDs for base extension */
+#define SBI_EXT_BASE_SPEC_VERSION   0x0
+#define SBI_EXT_BASE_IMPL_ID        0x1
+#define SBI_EXT_BASE_IMPL_VERSION   0x2
+#define SBI_EXT_BASE_PROBE_EXT      0x3
+#define SBI_EXT_BASE_GET_MVENDORID  0x4
+#define SBI_EXT_BASE_GET_MARCHID    0x5
+#define SBI_EXT_BASE_GET_MIMPID     0x6
+
+/* SBI function IDs for DBCN extension */
+#define SBI_EXT_DBCN_WRITE       0x0
+#define SBI_EXT_DBCN_READ        0x1
+#define SBI_EXT_DBCN_WRITE_BYTE  0x2
+
+/* SBI function IDs for TIME extension */
 #define SBI_EXT_TIME_SET_TIMER  0x0
 
 /* SBI function IDs for SRST extension */
@@ -61,6 +80,21 @@ typedef struct {
   UINTN    Error; ///< SBI status code
   UINTN    Value; ///< Value returned
 } SBI_RET;
+
+SBI_RET
+EFIAPI
+SbiCall (
+  IN  UINTN  ExtId,
+  IN  UINTN  FuncId,
+  IN  UINTN  NumArgs,
+  ...
+  );
+
+EFI_STATUS
+EFIAPI
+TranslateError (
+  IN  UINTN  SbiError
+  );
 
 VOID
 EFIAPI
