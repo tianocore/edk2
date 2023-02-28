@@ -1,7 +1,7 @@
 /** @file
   Unit tests of the MtrrLib instance of the MtrrLib class
 
-  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2020 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -30,6 +30,8 @@ STATIC MTRR_LIB_SYSTEM_PARAMETER  mSystemParameters[] = {
   { 48, TRUE, TRUE, CacheWriteThrough,   12 },
   { 48, TRUE, TRUE, CacheWriteProtected, 12 },
   { 48, TRUE, TRUE, CacheWriteCombining, 12 },
+
+  { 48, TRUE, TRUE, CacheWriteBack,      12, 7}, // 7 bits for MKTME
 };
 
 UINT32  mFixedMtrrsIndex[] = {
@@ -219,7 +221,7 @@ UnitTestMtrrSetMemoryAttributesInMtrrSettings (
     &WcCount
     );
   GenerateValidAndConfigurableMtrrPairs (
-    SystemParameter->PhysicalAddressBits,
+    SystemParameter->PhysicalAddressBits - SystemParameter->MkTmeKeyidBits,
     RawMtrrRange,
     UcCount,
     WtCount,
@@ -232,7 +234,7 @@ UnitTestMtrrSetMemoryAttributesInMtrrSettings (
   ExpectedMemoryRangesCount = ARRAY_SIZE (ExpectedMemoryRanges);
   GetEffectiveMemoryRanges (
     SystemParameter->DefaultCacheType,
-    SystemParameter->PhysicalAddressBits,
+    SystemParameter->PhysicalAddressBits - SystemParameter->MkTmeKeyidBits,
     RawMtrrRange,
     ExpectedVariableMtrrUsage,
     ExpectedMemoryRanges,
@@ -278,7 +280,7 @@ UnitTestMtrrSetMemoryAttributesInMtrrSettings (
     ActualMemoryRangesCount = ARRAY_SIZE (ActualMemoryRanges);
     CollectTestResult (
       SystemParameter->DefaultCacheType,
-      SystemParameter->PhysicalAddressBits,
+      SystemParameter->PhysicalAddressBits - SystemParameter->MkTmeKeyidBits,
       SystemParameter->VariableMtrrCount,
       &LocalMtrrs,
       ActualMemoryRanges,
@@ -325,7 +327,7 @@ UnitTestInvalidMemoryLayouts (
   SystemParameter = (MTRR_LIB_SYSTEM_PARAMETER *)Context;
 
   RangeCount = Random32 (1, ARRAY_SIZE (Ranges));
-  MaxAddress = 1ull << SystemParameter->PhysicalAddressBits;
+  MaxAddress = 1ull << (SystemParameter->PhysicalAddressBits - SystemParameter->MkTmeKeyidBits);
 
   for (Index = 0; Index < RangeCount; Index++) {
     do {
@@ -967,7 +969,7 @@ UnitTestMtrrSetMemoryAttributeInMtrrSettings (
     &WcCount
     );
   GenerateValidAndConfigurableMtrrPairs (
-    SystemParameter->PhysicalAddressBits,
+    SystemParameter->PhysicalAddressBits - SystemParameter->MkTmeKeyidBits,
     RawMtrrRange,
     UcCount,
     WtCount,
@@ -980,7 +982,7 @@ UnitTestMtrrSetMemoryAttributeInMtrrSettings (
   ExpectedMemoryRangesCount = ARRAY_SIZE (ExpectedMemoryRanges);
   GetEffectiveMemoryRanges (
     SystemParameter->DefaultCacheType,
-    SystemParameter->PhysicalAddressBits,
+    SystemParameter->PhysicalAddressBits - SystemParameter->MkTmeKeyidBits,
     RawMtrrRange,
     ExpectedVariableMtrrUsage,
     ExpectedMemoryRanges,
@@ -1019,7 +1021,7 @@ UnitTestMtrrSetMemoryAttributeInMtrrSettings (
     ActualMemoryRangesCount = ARRAY_SIZE (ActualMemoryRanges);
     CollectTestResult (
       SystemParameter->DefaultCacheType,
-      SystemParameter->PhysicalAddressBits,
+      SystemParameter->PhysicalAddressBits - SystemParameter->MkTmeKeyidBits,
       SystemParameter->VariableMtrrCount,
       &LocalMtrrs,
       ActualMemoryRanges,

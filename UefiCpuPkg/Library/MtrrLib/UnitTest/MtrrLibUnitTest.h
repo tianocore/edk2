@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2020 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -40,6 +40,7 @@ typedef struct {
   BOOLEAN                   FixedMtrrSupported;
   MTRR_MEMORY_CACHE_TYPE    DefaultCacheType;
   UINT32                    VariableMtrrCount;
+  UINT8                     MkTmeKeyidBits;
 } MTRR_LIB_SYSTEM_PARAMETER;
 
 extern UINT32   mFixedMtrrsIndex[];
