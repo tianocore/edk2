@@ -32,7 +32,7 @@ InternalMemSetMem16 (
   )
 {
   for ( ; Length != 0; Length--) {
-    ((UINT16 *)Buffer)[Length - 1] = Value;
+    ((volatile UINT16 *)Buffer)[Length - 1] = Value;
   }
 
   return Buffer;
@@ -57,7 +57,7 @@ InternalMemSetMem32 (
   )
 {
   for ( ; Length != 0; Length--) {
-    ((UINT32 *)Buffer)[Length - 1] = Value;
+    ((volatile UINT32 *)Buffer)[Length - 1] = Value;
   }
 
   return Buffer;
@@ -82,7 +82,7 @@ InternalMemSetMem64 (
   )
 {
   for ( ; Length != 0; Length--) {
-    ((UINT64 *)Buffer)[Length - 1] = Value;
+    ((volatile UINT64 *)Buffer)[Length - 1] = Value;
   }
 
   return Buffer;
