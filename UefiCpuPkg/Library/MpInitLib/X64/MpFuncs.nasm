@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -448,6 +448,58 @@ BITS 64
 AsmRelocateApLoopEnd:
 
 ;-------------------------------------------------------------------------------------
+;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, TopOfApStack, CountTofinish, Cr3);
+;  This function is called during the finalizaiton of Mp initialization before booting
+;  to OS, and aim to put Aps either in Mwait or HLT.
+;-------------------------------------------------------------------------------------
+; +----------------+
+; | Cr3            |  rsp+40
+; +----------------+
+; | CountTofinish  |  r9
+; +----------------+
+; | TopOfApStack   |  r8
+; +----------------+
+; | ApTargetCState |  rdx
+; +----------------+
+; | MwaitSupport   |  rcx
+; +----------------+
+; | the return     |
+; +----------------+ low address
+
+AsmRelocateApLoopGenericStart:
+    mov        rax, r9           ; CountTofinish
+    lock dec   dword [rax]       ; (*CountTofinish)--
+
+    mov        rax, [rsp + 40]    ; Cr3
+    ; Do not push on old stack, since old stack is not mapped
+    ; in the page table pointed by cr3
+    mov        cr3, rax
+    mov        rsp, r8            ; TopOfApStack
+
+MwaitCheckGeneric:
+    cmp        cl, 1              ; Check mwait-monitor support
+    jnz        HltLoopGeneric
+    mov        rbx, rdx           ; Save C-State to ebx
+
+MwaitLoopGeneric:
+    cli
+    mov        rax, rsp           ; Set Monitor Address
+    xor        ecx, ecx           ; ecx = 0
+    xor        edx, edx           ; edx = 0
+    monitor
+    mov        rax, rbx           ; Mwait Cx, Target C-State per eax[7:4]
+    shl        eax, 4
+    mwait
+    jmp        MwaitLoopGeneric
+
+HltLoopGeneric:
+    cli
+    hlt
+    jmp        HltLoopGeneric
+
+AsmRelocateApLoopGenericEnd:
+
+;-------------------------------------------------------------------------------------
 ;  AsmGetAddressMap (&AddressMap);
 ;-------------------------------------------------------------------------------------
 global ASM_PFX(AsmGetAddressMap)
@@ -456,6 +508,9 @@ ASM_PFX(AsmGetAddressMap):
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelAddress], rax
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.ModeEntryOffset], LongModeStart - RendezvousFunnelProcStart
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelSize], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
+lea        rax, [AsmRelocateApLoopGenericStart]
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddressGeneric], rax
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSizeGeneric], AsmRelocateApLoopGenericEnd - AsmRelocateApLoopGenericStart
     lea        rax, [AsmRelocateApLoopStart]
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddress], rax
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSize], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
