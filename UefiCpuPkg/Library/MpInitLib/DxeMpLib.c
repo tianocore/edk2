@@ -547,8 +547,8 @@ InitMpGlobalData (
     // 64-bit AMD processors with SEV-ES
     //
     Address        = BASE_4GB - 1;
-    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddress;
-    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSize;
+    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddressAmdSev;
+    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeAmdSev;
   } else {
     //
     // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or 64-bit AMD processors without SEV-ES
