@@ -26,8 +26,8 @@ struc MP_ASSEMBLY_ADDRESS_MAP
   .RendezvousFunnelSize               CTYPE_UINTN 1
   .RelocateApLoopFuncAddressGeneric   CTYPE_UINTN 1
   .RelocateApLoopFuncSizeGeneric      CTYPE_UINTN 1
-  .RelocateApLoopFuncAddress          CTYPE_UINTN 1
-  .RelocateApLoopFuncSize             CTYPE_UINTN 1
+  .RelocateApLoopFuncAddressAmdSev    CTYPE_UINTN 1
+  .RelocateApLoopFuncSizeAmdSev       CTYPE_UINTN 1
   .ModeTransitionOffset               CTYPE_UINTN 1
   .SwitchToRealNoNxOffset             CTYPE_UINTN 1
   .SwitchToRealPM16ModeOffset         CTYPE_UINTN 1
