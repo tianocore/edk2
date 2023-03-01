@@ -402,6 +402,12 @@ AsmExchangeRole (
   IN CPU_EXCHANGE_ROLE_INFO  *OthersInfo
   );
 
+typedef union {
+  VOID                    *Data;
+  ASM_RELOCATE_AP_LOOP    AmdSevEntry;  // 64-bit AMD Sev processors
+  ASM_RELOCATE_AP_LOOP    GenericEntry; // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or AMD non-Sev processors
+} RELOCATE_AP_LOOP_ENTRY;
+
 /**
   Get the pointer to CPU MP Data structure.
 
