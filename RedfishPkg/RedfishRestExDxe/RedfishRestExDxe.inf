@@ -4,6 +4,7 @@
 #  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) 2023, American Megatrends International LLC.
+#  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -44,6 +45,7 @@
   PrintLib
   MemoryAllocationLib
   NetLib
+  RedfishDebugLib
   UefiLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
