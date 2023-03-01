@@ -1,7 +1,7 @@
 /** @file
   RISC-V SEC phase module for Qemu Virt.
 
-  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2023, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2022, Ventana Micro Systems Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -56,6 +56,8 @@ SecStartup (
   UINT64                      UefiMemoryBase;
   UINT64                      StackBase;
   UINT32                      StackSize;
+
+  SerialPortInitialize ();
 
   //
   // Report Status Code to indicate entering SEC core
