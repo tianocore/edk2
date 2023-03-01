@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for DXE phase.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -20,14 +20,14 @@
 
 #define  AP_SAFE_STACK_SIZE  128
 
-CPU_MP_DATA       *mCpuMpData                  = NULL;
-EFI_EVENT         mCheckAllApsEvent            = NULL;
-EFI_EVENT         mMpInitExitBootServicesEvent = NULL;
-EFI_EVENT         mLegacyBootEvent             = NULL;
-volatile BOOLEAN  mStopCheckAllApsStatus       = TRUE;
-VOID              *mReservedApLoopFunc         = NULL;
-UINTN             mReservedTopOfApStack;
-volatile UINT32   mNumberToFinish = 0;
+CPU_MP_DATA             *mCpuMpData                  = NULL;
+EFI_EVENT               mCheckAllApsEvent            = NULL;
+EFI_EVENT               mMpInitExitBootServicesEvent = NULL;
+EFI_EVENT               mLegacyBootEvent             = NULL;
+volatile BOOLEAN        mStopCheckAllApsStatus       = TRUE;
+RELOCATE_AP_LOOP_ENTRY  mReservedApLoop;
+UINTN                   mReservedTopOfApStack;
+volatile UINT32         mNumberToFinish = 0;
 
 //
 // Begin wakeup buffer allocation below 0x88000
@@ -378,32 +378,46 @@ RelocateApLoop (
   IN OUT VOID  *Buffer
   )
 {
-  CPU_MP_DATA           *CpuMpData;
-  BOOLEAN               MwaitSupport;
-  ASM_RELOCATE_AP_LOOP  AsmRelocateApLoopFunc;
-  UINTN                 ProcessorNumber;
-  UINTN                 StackStart;
+  CPU_MP_DATA  *CpuMpData;
+  BOOLEAN      MwaitSupport;
+  UINTN        ProcessorNumber;
+  UINTN        StackStart;
 
   MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
   if (CpuMpData->UseSevEsAPMethod) {
+    //
+    // 64-bit AMD processors with SEV-ES
+    //
     StackStart = CpuMpData->SevEsAPResetStackStart;
+    mReservedApLoop.AmdSevEntry (
+                      MwaitSupport,
+                      CpuMpData->ApTargetCState,
+                      CpuMpData->PmCodeSegment,
+                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+                      (UINTN)&mNumberToFinish,
+                      CpuMpData->Pm16CodeSegment,
+                      CpuMpData->SevEsAPBuffer,
+                      CpuMpData->WakeupBuffer
+                      );
   } else {
+    //
+    // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or 64-bit AMD processors without SEV-ES
+    //
     StackStart = mReservedTopOfApStack;
+    mReservedApLoop.GenericEntry (
+                      MwaitSupport,
+                      CpuMpData->ApTargetCState,
+                      CpuMpData->PmCodeSegment,
+                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+                      (UINTN)&mNumberToFinish,
+                      CpuMpData->Pm16CodeSegment,
+                      CpuMpData->SevEsAPBuffer,
+                      CpuMpData->WakeupBuffer
+                      );
   }
 
-  AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP)(UINTN)mReservedApLoopFunc;
-  AsmRelocateApLoopFunc (
-    MwaitSupport,
-    CpuMpData->ApTargetCState,
-    CpuMpData->PmCodeSegment,
-    StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
-    (UINTN)&mNumberToFinish,
-    CpuMpData->Pm16CodeSegment,
-    CpuMpData->SevEsAPBuffer,
-    CpuMpData->WakeupBuffer
-    );
   //
   // It should never reach here
   //
@@ -547,8 +561,8 @@ InitMpGlobalData (
                    );
   ASSERT_EFI_ERROR (Status);
 
-  mReservedApLoopFunc = (VOID *)(UINTN)Address;
-  ASSERT (mReservedApLoopFunc != NULL);
+  mReservedApLoop.Data = (VOID *)(UINTN)Address;
+  ASSERT (mReservedApLoop.Data != NULL);
 
   //
   // Make sure that the buffer memory is executable if NX protection is enabled
@@ -583,7 +597,7 @@ InitMpGlobalData (
   mReservedTopOfApStack = (UINTN)Address + ApSafeBufferSize;
   ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
   CopyMem (
-    mReservedApLoopFunc,
+    mReservedApLoop.Data,
     CpuMpData->AddressMap.RelocateApLoopFuncAddress,
     CpuMpData->AddressMap.RelocateApLoopFuncSize
     );
