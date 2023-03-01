@@ -179,8 +179,8 @@ typedef struct {
   UINTN    RendezvousFunnelSize;
   UINT8    *RelocateApLoopFuncAddressGeneric;
   UINTN    RelocateApLoopFuncSizeGeneric;
-  UINT8    *RelocateApLoopFuncAddress;
-  UINTN    RelocateApLoopFuncSize;
+  UINT8    *RelocateApLoopFuncAddressAmdSev;
+  UINTN    RelocateApLoopFuncSizeAmdSev;
   UINTN    ModeTransitionOffset;
   UINTN    SwitchToRealNoNxOffset;
   UINTN    SwitchToRealPM16ModeOffset;
@@ -388,7 +388,7 @@ typedef
 **/
 typedef
   VOID
-(EFIAPI *ASM_RELOCATE_AP_LOOP)(
+(EFIAPI *ASM_RELOCATE_AP_LOOP_AMDSEV)(
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
   IN UINTN                   PmCodeSegment,
@@ -429,7 +429,7 @@ AsmExchangeRole (
 
 typedef union {
   VOID                            *Data;
-  ASM_RELOCATE_AP_LOOP            AmdSevEntry;  // 64-bit AMD Sev processors
+  ASM_RELOCATE_AP_LOOP_AMDSEV     AmdSevEntry;  // 64-bit AMD Sev processors
   ASM_RELOCATE_AP_LOOP_GENERIC    GenericEntry; // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or AMD non-Sev processors
 } RELOCATE_AP_LOOP_ENTRY;
 
