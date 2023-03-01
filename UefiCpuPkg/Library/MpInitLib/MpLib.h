@@ -177,6 +177,8 @@ typedef struct {
   UINT8    *RendezvousFunnelAddress;
   UINTN    ModeEntryOffset;
   UINTN    RendezvousFunnelSize;
+  UINT8    *RelocateApLoopFuncAddressGeneric;
+  UINTN    RelocateApLoopFuncSizeGeneric;
   UINT8    *RelocateApLoopFuncAddress;
   UINTN    RelocateApLoopFuncSize;
   UINTN    ModeTransitionOffset;
@@ -363,6 +365,29 @@ extern EFI_GUID  mCpuInitMpLibHobGuid;
 **/
 typedef
   VOID
+(EFIAPI *ASM_RELOCATE_AP_LOOP_GENERIC)(
+  IN BOOLEAN                 MwaitSupport,
+  IN UINTN                   ApTargetCState,
+  IN UINTN                   TopOfApStack,
+  IN UINTN                   NumberToFinish,
+  IN UINTN                   Cr3
+  );
+
+/**
+  Assembly code to place AP into safe loop mode for Amd processors
+  with Sev enabled.
+  Place AP into targeted C-State if MONITOR is supported, otherwise
+  place AP into hlt state.
+  Place AP in protected mode if the current is long mode. Due to AP maybe
+  wakeup by some hardware event. It could avoid accessing page table that
+  may not available during booting to OS.
+  @param[in] MwaitSupport    TRUE indicates MONITOR is supported.
+                             FALSE indicates MONITOR is not supported.
+  @param[in] ApTargetCState  Target C-State value.
+  @param[in] PmCodeSegment   Protected mode code segment value.
+**/
+typedef
+  VOID
 (EFIAPI *ASM_RELOCATE_AP_LOOP)(
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
@@ -403,9 +428,9 @@ AsmExchangeRole (
   );
 
 typedef union {
-  VOID                    *Data;
-  ASM_RELOCATE_AP_LOOP    AmdSevEntry;  // 64-bit AMD Sev processors
-  ASM_RELOCATE_AP_LOOP    GenericEntry; // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or AMD non-Sev processors
+  VOID                            *Data;
+  ASM_RELOCATE_AP_LOOP            AmdSevEntry;  // 64-bit AMD Sev processors
+  ASM_RELOCATE_AP_LOOP_GENERIC    GenericEntry; // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or AMD non-Sev processors
 } RELOCATE_AP_LOOP_ENTRY;
 
 /**
@@ -469,6 +494,18 @@ AllocateCodeBuffer (
 UINTN
 GetSevEsAPMemory (
   VOID
+  );
+
+/**
+  Create 1:1 mapping page table in reserved memory to map the specified address range.
+  @param[in]      LinearAddress  The start of the linear address range.
+  @param[in]      Length         The length of the linear address range.
+  @return The page table to be created.
+**/
+UINTN
+CreatePageTable (
+  IN UINTN  Address,
+  IN UINTN  Length
   );
 
 /**
