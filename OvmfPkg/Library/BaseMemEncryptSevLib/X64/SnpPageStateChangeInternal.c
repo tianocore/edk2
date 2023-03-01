@@ -20,7 +20,6 @@
 
 #include "SnpPageStateChange.h"
 
-#define IS_ALIGNED_(x, y)  ((((x) & (y - 1)) == 0))
 #define PAGES_PER_LARGE_ENTRY  512
 
 STATIC
@@ -150,7 +149,7 @@ BuildPageStateBuffer (
     //
     // Is this a 2MB aligned page? Check if we can use the Large RMP entry.
     //
-    if (UseLargeEntry && IS_ALIGNED_ (BaseAddress, SIZE_2MB) &&
+    if (UseLargeEntry && IS_ALIGNED (BaseAddress, SIZE_2MB) &&
         ((EndAddress - BaseAddress) >= SIZE_2MB))
     {
       RmpPageSize = PvalidatePageSize2MB;
