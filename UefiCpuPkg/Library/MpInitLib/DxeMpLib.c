@@ -480,11 +480,12 @@ InitMpGlobalData (
 {
   EFI_STATUS                       Status;
   EFI_PHYSICAL_ADDRESS             Address;
-  UINTN                            ApSafeBufferSize;
   UINTN                            Index;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
   UINTN                            StackBase;
   CPU_INFO_IN_HOB                  *CpuInfoInHob;
+  UINTN                            StackPages;
+  UINTN                            FuncPages;
 
   SaveCpuMpData (CpuMpData);
 
@@ -547,16 +548,23 @@ InitMpGlobalData (
   // Allocating it in advance since memory services are not available in
   // Exit Boot Services callback function.
   //
-  ApSafeBufferSize = EFI_PAGES_TO_SIZE (
-                       EFI_SIZE_TO_PAGES (
-                         CpuMpData->AddressMap.RelocateApLoopFuncSize
-                         )
-                       );
+  // +------------+ (TopOfApStack)
+  // |  Stack * N |
+  // +------------+ (stack base, 4k aligned)
+  // |  Padding   |
+  // +------------+
+  // |  Ap Loop   |
+  // +------------+ ((low address, 4k-aligned)
+  //
+
+  StackPages = EFI_SIZE_TO_PAGES (CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
+  FuncPages  = EFI_SIZE_TO_PAGES (CpuMpData->AddressMap.RelocateApLoopFuncSize);
+
   Address = BASE_4GB - 1;
   Status  = gBS->AllocatePages (
                    AllocateMaxAddress,
                    EfiReservedMemoryType,
-                   EFI_SIZE_TO_PAGES (ApSafeBufferSize),
+                   StackPages + FuncPages,
                    &Address
                    );
   ASSERT_EFI_ERROR (Status);
@@ -575,26 +583,12 @@ InitMpGlobalData (
   if (!EFI_ERROR (Status)) {
     gDS->SetMemorySpaceAttributes (
            Address,
-           ApSafeBufferSize,
+           EFI_PAGES_TO_SIZE (FuncPages),
            MemDesc.Attributes & (~EFI_MEMORY_XP)
            );
   }
 
-  ApSafeBufferSize = EFI_PAGES_TO_SIZE (
-                       EFI_SIZE_TO_PAGES (
-                         CpuMpData->CpuCount * AP_SAFE_STACK_SIZE
-                         )
-                       );
-  Address = BASE_4GB - 1;
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiReservedMemoryType,
-                   EFI_SIZE_TO_PAGES (ApSafeBufferSize),
-                   &Address
-                   );
-  ASSERT_EFI_ERROR (Status);
-
-  mReservedTopOfApStack = (UINTN)Address + ApSafeBufferSize;
+  mReservedTopOfApStack = (UINTN)Address + EFI_PAGES_TO_SIZE (StackPages+FuncPages);
   ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
   CopyMem (
     mReservedApLoop.Data,
