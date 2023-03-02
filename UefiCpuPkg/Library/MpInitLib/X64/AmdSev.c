@@ -45,27 +45,75 @@ SevSnpCreateSaveArea (
   UINT64                    ExitInfo1;
   UINT64                    ExitInfo2;
 
-  //
-  // Allocate a single page for the SEV-ES Save Area and initialize it.
-  // Due to an erratum that prevents a VMSA being on a 2MB boundary,
-  // allocate an extra page to work around the issue.
-  //
-  Pages = AllocateReservedPages (2);
-  if (!Pages) {
-    return;
-  }
+  if (CpuData->SevEsSaveArea == NULL) {
+    //
+    // Allocate a single page for the SEV-ES Save Area and initialize it.
+    // Due to an erratum that prevents a VMSA being on a 2MB boundary,
+    // allocate an extra page to work around the issue.
+    //
+    Pages = AllocateReservedPages (2);
+    if (!Pages) {
+      return;
+    }
 
-  //
-  // If the memory area is 2MB aligned, free the first page and adjust
-  // the save area pointer to the next page. Otherwise, free the extra
-  // page at the end of the allocation.
-  //
-  if (IS_ALIGNED (Pages, SIZE_2MB)) {
-    SaveArea = Pages + EFI_PAGE_SIZE;
-    FreePages (Pages, 1);
+    //
+    // If the memory area is 2MB aligned, free the first page and adjust
+    // the save area pointer to the next page. Otherwise, free the extra
+    // page at the end of the allocation.
+    //
+    if (IS_ALIGNED (Pages, SIZE_2MB)) {
+      SaveArea = Pages + EFI_PAGE_SIZE;
+      FreePages (Pages, 1);
+    } else {
+      SaveArea = Pages;
+      FreePages (Pages + EFI_PAGE_SIZE, 1);
+    }
+
+    CpuData->SevEsSaveArea = SaveArea;
   } else {
-    SaveArea = Pages;
-    FreePages (Pages + EFI_PAGE_SIZE, 1);
+    SaveArea = CpuData->SevEsSaveArea;
+
+    //
+    // Tell the hypervisor to not use the current VMSA
+    //
+    ExitInfo1  = (UINT64)ApicId << 32;
+    ExitInfo1 |= SVM_VMGEXIT_SNP_AP_DESTROY;
+    ExitInfo2  = (UINT64)(UINTN)SaveArea;
+
+    Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+    Ghcb                    = Msr.Ghcb;
+
+    CcExitVmgInit (Ghcb, &InterruptState);
+    VmgExitStatus = CcExitVmgExit (
+                      Ghcb,
+                      SVM_EXIT_SNP_AP_CREATION,
+                      ExitInfo1,
+                      ExitInfo2
+                      );
+    CcExitVmgDone (Ghcb, InterruptState);
+
+    ASSERT (VmgExitStatus == 0);
+    if (VmgExitStatus != 0) {
+      DEBUG ((DEBUG_INFO, "SEV-SNP: AP Destroy failed\n"));
+
+      ASSERT (FALSE);
+      CpuDeadLoop ();
+    }
+
+    //
+    // Make the current VMSA not runnable and accessible to be
+    // reprogrammed.
+    //
+    RmpAdjustStatus = SevSnpRmpAdjust (
+                        (EFI_PHYSICAL_ADDRESS)(UINTN)SaveArea,
+                        TRUE
+                        );
+    if (RmpAdjustStatus != 0) {
+      DEBUG ((DEBUG_INFO, "SEV-SNP: RMPADJUST failed for VMSA reset\n"));
+
+      ASSERT (FALSE);
+      CpuDeadLoop ();
+    }
   }
 
   ZeroMem (SaveArea, EFI_PAGE_SIZE);
@@ -159,7 +207,12 @@ SevSnpCreateSaveArea (
                       (EFI_PHYSICAL_ADDRESS)(UINTN)SaveArea,
                       TRUE
                       );
-  ASSERT (RmpAdjustStatus == 0);
+  if (RmpAdjustStatus != 0) {
+    DEBUG ((DEBUG_INFO, "SEV-SNP: RMPADJUST failed for VMSA creation\n"));
+
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
 
   ExitInfo1  = (UINT64)ApicId << 32;
   ExitInfo1 |= SVM_VMGEXIT_SNP_AP_CREATE;
@@ -179,34 +232,12 @@ SevSnpCreateSaveArea (
                     );
   CcExitVmgDone (Ghcb, InterruptState);
 
-  ASSERT (VmgExitStatus == 0);
   if (VmgExitStatus != 0) {
-    RmpAdjustStatus = SevSnpRmpAdjust (
-                        (EFI_PHYSICAL_ADDRESS)(UINTN)SaveArea,
-                        FALSE
-                        );
-    if (RmpAdjustStatus == 0) {
-      FreePages (SaveArea, 1);
-    } else {
-      DEBUG ((DEBUG_INFO, "SEV-SNP: RMPADJUST failed, leaking VMSA page\n"));
-    }
+    DEBUG ((DEBUG_INFO, "SEV-SNP: AP Create failed\n"));
 
-    SaveArea = NULL;
+    ASSERT (FALSE);
+    CpuDeadLoop ();
   }
-
-  if (CpuData->SevEsSaveArea) {
-    RmpAdjustStatus = SevSnpRmpAdjust (
-                        (EFI_PHYSICAL_ADDRESS)(UINTN)CpuData->SevEsSaveArea,
-                        FALSE
-                        );
-    if (RmpAdjustStatus == 0) {
-      FreePages (CpuData->SevEsSaveArea, 1);
-    } else {
-      DEBUG ((DEBUG_INFO, "SEV-SNP: RMPADJUST failed, leaking VMSA page\n"));
-    }
-  }
-
-  CpuData->SevEsSaveArea = SaveArea;
 }
 
 /**
