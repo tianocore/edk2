@@ -712,11 +712,13 @@ class VfrTree():
                             f.write(ValueIndent + 'varid:  '  + Root.Dict['varid'].Key + ' # Optional Input, Need to assign if None\n')
                         else:
                             f.write(ValueIndent +'varid:  {} # Optional Input, Need to assign if None\n'.format('0x%04x' % (Info.VarStoreId)))
-                    if 'name' in Root.Dict.keys():
-                        for i in range(0, len(Root.Dict['name'])):
-                            f.write(ValueIndent +
-                                'name:  ' + 'STRING_TOKEN(' + Root.Dict['name'][i].Key + ')\n' )
                     f.write(ValueIndent + 'guid:  ' + Root.Dict['guid'].Key + '\n')
+                    if 'name' in Root.Dict.keys():
+                        f.write(ValueIndent +
+                                'nametable: \n')
+                        for i in range(0, len(Root.Dict['name'])):
+                            f.write(ValueIndent + ' - name:  ' +
+                                'STRING_TOKEN(' + Root.Dict['name'][i].Key + ')\n' )
 
                 if Root.OpCode == EFI_IFR_DEFAULTSTORE_OP:
                     gVfrDefaultStore.UpdateDefaultType(Root)
@@ -729,7 +731,7 @@ class VfrTree():
                     if Root.Data.HasAttr:
                         if 'attribute' in Root.Dict.keys():
                             f.write(ValueIndent +
-                                    'attribute:  ' + Root.Dict['attribute'].Key + ') # # Default ID, Optional input\n')
+                                    'attribute:  ' + Root.Dict['attribute'].Key + ') # Default ID, Optional input\n')
                         else:
                             f.write(ValueIndent + 'attribute:  {} # Default ID, Optional input\n'.format('0x%04x' % (Info.DefaultId)))
 
@@ -1241,18 +1243,19 @@ class VfrTree():
             f.write(ValueIndent + 'name:  {}  #  Optional Input\n'.
                                 format(Root.Data.QName))
         if Root.Data.VarIdStr != '':
-            f.write(ValueIndent + 'varid:  {}  #  Optional Input\n'.
+            f.write(ValueIndent + 'varidstr:  {}  #  Optional Input\n'.
                                 format(Root.Data.VarIdStr))
-        if Root.Data.HasQuestionId:
-            f.write(ValueIndent + 'questionid:  {}  # Optional Input, Need to compute if None\n'
-                        .format(Info.Question.QuestionId))
+
+        f.write(ValueIndent + 'questionid:  {}\n'.format(Info.Question.QuestionId))
+        f.write(ValueIndent + 'varstoreid:  {}  #  Optional Input\n'.format(Info.Question.VarStoreId))
+        f.write(ValueIndent + 'varname:  {}  # Question VarName STRING_ID\n'.format(Info.Question.VarStoreInfo.VarName))
+        f.write(ValueIndent + 'varoffset:  {}  # Question VarOffset\n'.format(Info.Question.VarStoreInfo.VarOffset))
+        f.write(ValueIndent + 'questionflags:  {} # Optional Input \n'.format(Info.Question.Flags))
         f.write(ValueIndent + 'prompt:  {}  # Statement Prompt STRING_ID\n'
                         .format('0x%04x' % (Info.Question.Header.Prompt)))
         f.write(ValueIndent + 'help:  {}  # Statement Help STRING_ID\n'.
                         format('0x%04x' % (Info.Question.Header.Help)))
-        f.write(ValueIndent + 'flags:  {}  # Optional input , flags\n'.
-                        format(Root.Data.FlagsStream))
-        f.write(ValueIndent + 'key: {} # Optional input, key \n'.format(Root.Data.HasKey))
+        f.write(ValueIndent + 'opcodeflags:  {}  # optional input\n'.format('0x%x' % (Info.Flags)))
 
     def _DumpYamlDfs(self, Root, f):
         try:
@@ -1297,8 +1300,7 @@ class VfrTree():
                     f.write(KeyIndent + '- varstore:\n')
                     f.write(ValueIndent +
                             'type:  {}\n'.format(Root.Data.Type))
-                    if Root.Data.HasVarStoreId:
-                        f.write(
+                    f.write(
                             ValueIndent +
                             'varid:  {} # Optional Input, Need to assign if None\n'
                             .format('0x%04x' % (Info.VarStoreId)))
@@ -1309,14 +1311,13 @@ class VfrTree():
                     f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
                         '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
-                    # f.write(ValueIndent + 'size:  {} # Need to Compute\n'.format(Info.Size))
+                    f.write(ValueIndent + 'size:  {} # Need to Compute\n'.format(Info.Size))
 
                 if Root.OpCode == EFI_IFR_VARSTORE_EFI_OP:
                     f.write(KeyIndent + '- efivarstore:\n')
                     f.write(ValueIndent +
                             'type:  {}\n'.format(Root.Data.Type))
-                    if Root.Data.HasVarStoreId:
-                        f.write(
+                    f.write(
                             ValueIndent +
                             'varid:  {} # Optional Input, Need to assign if None\n'
                             .format('0x%04x' % (Info.VarStoreId)))
@@ -1331,7 +1332,7 @@ class VfrTree():
                         ValueIndent +
                         'attribute:  {} \n'
                         .format(Root.Data.AttributesText))
-                    # f.write(ValueIndent + 'size:  {} # Need to Compute\n'.format(Info.Size))
+                    f.write(ValueIndent + 'size:  {} # Need to Compute\n'.format(Info.Size))
 
                 if Root.OpCode == EFI_IFR_VARSTORE_NAME_VALUE_OP:
                     f.write(KeyIndent + '- namevaluevarstore:\n')
@@ -1342,9 +1343,11 @@ class VfrTree():
                         ValueIndent +
                         'varid:  {} # Optional Input, Need to assign if None\n'
                         .format('0x%04x' % (Info.VarStoreId)))
+                    f.write(ValueIndent +
+                            'nametable:\n')
                     for NameItem in Root.Data.NameItemList:
                         f.write(ValueIndent +
-                                'name:  {} # NameList STRING_ID\n'.format(
+                                ' - name:  {} # NameList STRING_ID\n'.format(
                                     '0x%04x' % (NameItem)))
                     f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
@@ -1457,7 +1460,6 @@ class VfrTree():
                                 'prompt:  {}  # Question Prompt STRING_ID\n'.
                                 format('0x%04x' %
                                        (Info.Question.Header.Prompt)))
-
                         f.write(
                             ValueIndent +
                             'flags:  {}  # Optional Input, Question Flags\n'
@@ -1473,9 +1475,6 @@ class VfrTree():
                     f.write(KeyIndent + '- action:\n')
 
                     self.DumpQuestionInfos(Root, f, ValueIndent)
-
-                    #f.write('varstoreid:  {}  # Question VarStoreId\n'.format(Info.Question.VarStoreId))
-                    #f.write(ValueIndent + 'questionflags:  {}  # Question Flags\n'.format(Info.Question.Flags))
                     f.write(ValueIndent + 'config:  {}  # QuestionConfig\n'.
                         format(Info.QuestionConfig))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
@@ -1485,9 +1484,6 @@ class VfrTree():
                     f.write(KeyIndent + '- oneof:\n')
 
                     self.DumpQuestionInfos(Root, f, ValueIndent)
-
-                    #f.write(ValueIndent + 'questionflags:  {} # Optional Input \n'.format(Info.Question.Flags))
-                    #f.write(ValueIndent + 'opcodeflags:  {}  # optional input\n'.format('0x%x' % (Info.Flags)))
                     f.write(ValueIndent + 'maximum:  {} # Optional Input\n'.format(
                                 Info.Data.MaxValue))
                     f.write(ValueIndent + 'minimum:  {} # Optional Input\n'.format(

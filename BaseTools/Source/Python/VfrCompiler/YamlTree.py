@@ -41,13 +41,17 @@ class YamlTree():
         #self._GenExpandedHeaderFile()
 
     def Compile(self):
+        gVfrVarDataTypeDB.Clear()
+        gVfrDefaultStore.Clear()
+        gVfrDataStorage.Clear()
         Parser = YamlParser(self.YamlDict, self.Root, self.Options)
         Parser.Parse()
-        #print(self.YamlDict['formset'])
         self.VfrTree.DumpProcessedYaml()
 
     def _PreprocessYaml(self, YamlDict):
         for Key in YamlDict.keys():
+            if Key == 'condition':
+                continue
             Value = YamlDict[Key]
             if isinstance(Value, list): # value is list
                 for Item in Value:
@@ -113,11 +117,13 @@ class YamlParser():
         self.NeedAdjustOpcode = False
 
     def Parse(self):
-        self._ParseExpandedHeader()
+        self.ParseVfrHeader()
         self.ParseVfrFormSetDefinition()
 
     # parse and collect data structures info in the ExpandedHeader.i files
-    def _ParseExpandedHeader(self):
+    def ParseVfrHeader(self):
+        # call C preprocessor
+        #wip
         try:
             InputStream = FileStream(self.Options.ProcessedInFileName) ###
             VfrLexer = SourceVfrSyntaxLexer(InputStream)
@@ -128,7 +134,6 @@ class YamlParser():
                             'File open failed for %s' % self.Options.ProcessedInFileName, None)
 
         self.Visitor = SourceVfrSyntaxVisitor(None, self.Options.OverrideClassGuid)
-        gVfrVarDataTypeDB.Clear()
         self.Visitor.visit(VfrParser.vfrHeader())
         FileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header.txt'
         try:
@@ -142,7 +147,6 @@ class YamlParser():
     def _DeclareStandardDefaultStorage(self):
 
         DSObj = IfrDefaultStore('Standard Defaults')
-        gVfrDefaultStore.Clear()
         gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, 'Standard Defaults', EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_STANDARD)
         DSObj.SetDefaultName (EFI_STRING_ID_INVALID)
         DSObj.SetDefaultId (EFI_HII_DEFAULT_CLASS_STANDARD)
@@ -156,7 +160,9 @@ class YamlParser():
         return DsNode, DsNodeMF
 
     def _ToList(self, Value):
-        if type(Value) == str or type(Value) == int or type(Value) == EFI_GUID:
+        if isinstance(Value, list):
+            return Value
+        else:
             return [Value]
 
     # parse Formset Definition
@@ -245,6 +251,8 @@ class YamlParser():
         if 'component' in Formset.keys():
             self._ParseVfrFormSetComponent(Formset['component'], Node)
 
+        # wip
+
     def ParseClassDefinition(self, ClassList, ParentNode: VfrTreeNode):
         CObj = IfrClass()
         Class = 0
@@ -289,11 +297,176 @@ class YamlParser():
         ParentNode.insertChild(Node)
         return Node
 
-    def _ParseVfrFormSetComponent(self, ComponentList, Node):
+    def _ParseVfrFormSetComponent(self, ComponentList, ParentNode):
         for Component in ComponentList:
-            (key, value), = Component.items()
-            if key == 'form':
-                self.ParseVfrFormDefinition(value, Node)
+            (Key, Value), = Component.items()
+            if Key == 'form':
+                self.ParseVfrFormDefinition(Value, ParentNode)
+                continue
+            elif Key == 'formmap':
+                self.ParseVfrFormmapDefinition(Value, ParentNode)
+            elif Key == 'image':
+                self.ParseVfrStatementImage(Value, ParentNode)
+            elif Key == 'varstore':
+                self.ParseVfrStatementVarStoreLinear(Value, ParentNode)
+            elif Key == 'efivarstore':
+                self.ParseVfrStatementVarStoreEfi(Value, ParentNode)
+            elif Key == 'namevaluevarstore':
+                self.ParseVfrStatementVarStoreNameValue(Value, ParentNode)
+            elif Key == 'defaultstore':
+                self.ParsevfrStatementDefaultStore(Value, ParentNode)
+            elif Key == 'guidop':
+                self.ParseVfrStatementExtension(Value, ParentNode)
+
+    def ParsevfrStatementDefaultStore(self, DefaultStore, ParentNode):
+        RefName = DefaultStore['type']
+        DSObj = IfrDefaultStore(RefName)
+        DefaultStoreNameId = DefaultStore['prompt']
+        DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD
+        if 'attribute' in DefaultStore.keys():
+            DefaultId = DefaultStore['attribute']
+        if gVfrDefaultStore.DefaultIdRegistered(DefaultId) == False:
+            self.ErrorHandler(gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, RefName, DefaultStoreNameId, DefaultId), Line)
+            DSObj.SetDefaultName(DefaultStoreNameId)
+            DSObj.SetDefaultId (DefaultId)
+            Node = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
+            ParentNode.insertChild(Node)
+            Node.Data = DSObj
+            Node.Buffer = gFormPkg.StructToStream(DSObj.GetInfo())
+        else:
+            pNode, ReturnCode = gVfrDefaultStore.ReRegisterDefaultStoreById(DefaultId, RefName, DefaultStoreNameId)
+            self.ErrorHandler(ReturnCode)
+            #ctx.Node.OpCode = EFI_IFR_SHOWN_DEFAULTSTORE_OP # For display in YAML
+            #ctx.Node.Data = DSObj
+
+
+    def ParseVfrStatementVarStoreLinear(self, VarStore, ParentNode):
+        TypeName = VarStore['type']
+        if TypeName == 'CHAR16':
+            TypeName = 'UINT16'
+
+        IsBitVarStore = False
+        if TypeName not in BasicDataTypes:
+            IsBitVarStore = gVfrVarDataTypeDB.DataTypeHasBitField(TypeName)
+
+        VarStoreId = EFI_VARSTORE_ID_INVALID
+        if 'varid' in VarStore.keys():
+            VarStoreId = VarStore['varid']
+            #self.CompareErrorHandler(VarStoreId!=0, True, Tok.line, Tok.text, 'varid 0 is not allowed.')
+        StoreName = VarStore['name']
+        VSObj = IfrVarStore(TypeName, StoreName)
+        Guid = VarStore['guid']
+        self.ErrorHandler(gVfrDataStorage.DeclareBufferVarStore(StoreName, Guid, gVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore))
+        VSObj.SetGuid(Guid)
+        VarStoreId, ReturnCode = gVfrDataStorage.GetVarStoreId(StoreName, Guid)
+        self.ErrorHandler(ReturnCode)
+        VSObj.SetVarStoreId(VarStoreId)
+        Size, ReturnCode = gVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
+        self.ErrorHandler(ReturnCode)
+        Node = VfrTreeNode(EFI_IFR_VARSTORE_OP, VSObj, gFormPkg.StructToStream(VSObj.GetInfo()))
+        Node.Buffer += bytes('\0',encoding='utf-8')
+        ParentNode.insertChild(Node)
+        return Node
+
+
+    def ParseVfrStatementVarStoreEfi(self, VarstoreEfi, ParentNode):
+        print(VarstoreEfi)
+        CustomizedName = False
+        IsBitVarStore = False
+        VarStoreId = EFI_VARSTORE_ID_INVALID
+        IsUEFI23EfiVarstore = True
+        ReturnCode = None
+
+        TypeName = VarstoreEfi['type']
+        if TypeName == 'CHAR16':
+            TypeName = 'UINT16'
+
+        if TypeName not in BasicDataTypes:
+            IsBitVarStore = gVfrVarDataTypeDB.DataTypeHasBitField(TypeName)
+            CustomizedName = True
+        if 'varid' in VarstoreEfi.keys():
+            VarStoreId = VarstoreEfi['varid']
+            #self.CompareErrorHandler(VarStoreId!=0, True, ctx.ID.line, ctx.ID.text, 'varid 0 is not allowed.')
+        StoreName = VarstoreEfi['name']
+        Guid = VarstoreEfi['guid']
+        Attributes = self._ParseVarstoreEfiAttr(VarstoreEfi)
+        self.ErrorHandler(gVfrDataStorage.DeclareBufferVarStore(StoreName, Guid, gVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore, Attributes))
+        VarStoreId, ReturnCode = gVfrDataStorage.GetVarStoreId(StoreName, Guid)
+        self.ErrorHandler(ReturnCode)
+        Size, ReturnCode = gVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
+        self.ErrorHandler(ReturnCode)
+        VSEObj = IfrVarStoreEfi(TypeName, StoreName)
+        VSEObj.SetGuid(Guid)
+        VSEObj.SetVarStoreId (VarStoreId)
+        VSEObj.SetSize(Size)
+        VSEObj.SetAttributes(Attributes)
+        Node = VfrTreeNode(EFI_IFR_VARSTORE_EFI_OP, VSEObj, gFormPkg.StructToStream(VSEObj.GetInfo()))
+        Node.Buffer += bytes('\0',encoding='utf-8')
+        ParentNode.insertChild(Node)
+        return Node
+
+
+    def _ParseVarstoreEfiAttr(self, VarstoreEfi):
+        Attributes = 0
+        if 'attribute' in VarstoreEfi.keys():
+            VarstoreEfiList = self._ToList(VarstoreEfi['attribute'])
+            for Attr in VarstoreEfiList:
+                Attributes |= Attr
+        return Attributes
+
+
+    def ParseVfrStatementVarStoreNameValue(self, NameValue, ParentNode):
+        StoreName = NameValue['type']
+        VSNVObj = IfrVarStoreNameValue(StoreName)
+        Guid = NameValue['guid']
+        VarStoreId = EFI_VARSTORE_ID_INVALID
+        if 'varid' in NameValue.keys():
+            VarStoreId = NameValue['varid']
+            #self.CompareErrorHandler(VarStoreId!=0, True, ctx.ID.line, ctx.ID.text, 'varid 0 is not allowed.')
+
+        Created = False
+        for NameDict in NameValue['nametable']:
+            if Created == False:
+                self.ErrorHandler(gVfrDataStorage.DeclareNameVarStoreBegin(StoreName, VarStoreId))
+                Created = True
+            NameItem = NameDict['name']
+           # print(NameItem)
+            VSNVObj.SetNameItemList(NameItem)
+            gVfrDataStorage.NameTableAddItem(NameItem)
+        gVfrDataStorage.DeclareNameVarStoreEnd(Guid)
+
+        VSNVObj.SetGuid(Guid)
+        VarstoreId, ReturnCode = gVfrDataStorage.GetVarStoreId(StoreName, Guid)
+        self.ErrorHandler(ReturnCode)
+        VSNVObj.SetVarStoreId(VarstoreId)
+        Node = VfrTreeNode(EFI_IFR_VARSTORE_NAME_VALUE_OP, VSNVObj, gFormPkg.StructToStream(VSNVObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        return Node
+
+
+    def ParseVfrFormmapDefinition(self, Formmap, ParentNode):
+        FMapObj = IfrFormMap()
+        FormId = Formmap['formid']
+        FMapObj.SetFormId(FormId)
+        FormMapMethodNumber = len(Formmap['map']) if 'map' in Formmap.keys() else 0
+        if FormMapMethodNumber == 0:
+            self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'No MapMethod is set for FormMap!')
+        else:
+            for MapDict in Formmap['map']:
+                FMapObj.SetFormMapMethod(MapDict['maptitle'], MapDict['mapguid'])
+        FormMap = FMapObj.GetInfo()
+        MethodMapList = FMapObj.GetMethodMapList()
+        for MethodMap in MethodMapList: # Extend Header Size for MethodMapList
+            FormMap.Header.Length += sizeof(EFI_IFR_FORM_MAP_METHOD)
+        Node = VfrTreeNode(EFI_IFR_FORM_MAP_OP, FMapObj, gFormPkg.StructToStream(FormMap))
+        for MethodMap in MethodMapList:
+            Node.Buffer += gFormPkg.StructToStream(MethodMap)
+        if 'component' in Formmap.keys():
+            for Component in Formmap['component']:
+                (Key, Value), = Component.items()
+                self._ParseVfrForm(Key, Value, Node)
+        self.InsertEndNode(Node)
+        return Node
 
     def ParseVfrFormDefinition(self, Form, ParentNode: VfrTreeNode):
         FObj = IfrForm()
@@ -307,28 +480,32 @@ class YamlParser():
         if 'component' in Form.keys():
             for Component in Form['component']:
                 (Key, Value), = Component.items()
-                if Key == 'image':
-                    self.ParseVfrStatementImage(Value, ParentNode)
-                elif Key == 'locked':
-                    self.ParseVfrStatementLocked(Value, ParentNode)
-                elif Key == 'rule':
-                    self.ParseVfrStatementRule(Value, ParentNode)
-                elif Key == 'default':
-                    self.ParseVfrStatementDefault(Value, ParentNode)
-                elif Key in vfrStatementStat:
-                    self.ParseVfrStatementStat(Key, Value, ParentNode)
-                elif Key in vfrStatementQuestions:
-                    self.ParseVfrStatementQuestions(Key, Value, ParentNode)
-                elif Key == 'label':
-                    self.ParseVfrStatementLabel(Value, ParentNode)
-                elif Key == 'banner':
-                    self.ParseVfrStatementbanner(Value, ParentNode)
-                elif Key == 'guidop':
-                    self.ParseVfrStatementExtension(Value, ParentNode)
-                elif Key == 'modal':
-                    self.ParseVfrStatementModal(Value, ParentNode)
-                elif Key == 'refreshguid':
-                    self.ParseVfrStatementRefreshEvent(Value, ParentNode)
+                self._ParseVfrForm(Key, Value, Node)
+        self.InsertEndNode(Node)
+
+    def _ParseVfrForm(self, Key, Value, ParentNode):
+        if Key == 'image':
+            self.ParseVfrStatementImage(Value, ParentNode)
+        elif Key == 'locked':
+            self.ParseVfrStatementLocked(Value, ParentNode)
+        elif Key == 'rule':
+            self.ParseVfrStatementRule(Value, ParentNode)
+        elif Key == 'default':
+            self.ParseVfrStatementDefault(Value, ParentNode)
+        elif Key in vfrStatementStat:
+            self.ParseVfrStatementStat(Key, Value, ParentNode)
+        elif Key in vfrStatementQuestions:
+            self.ParseVfrStatementQuestions(Key, Value, ParentNode)
+        elif Key == 'label':
+            self.ParseVfrStatementLabel(Value, ParentNode)
+        elif Key == 'banner':
+            self.ParseVfrStatementbanner(Value, ParentNode)
+        elif Key == 'guidop':
+            self.ParseVfrStatementExtension(Value, ParentNode)
+        elif Key == 'modal':
+            self.ParseVfrStatementModal(Value, ParentNode)
+        elif Key == 'refreshguid':
+            self.ParseVfrStatementRefreshEvent(Value, ParentNode)
 
     def ParseVfrStatementDefault(self, Default, ParentNode):
         if 'value' in Default.keys():
@@ -363,6 +540,7 @@ class YamlParser():
             Node = VfrTreeNode(EFI_IFR_DEFAULT_OP, DObj)
             DObj.SetScope(1)
             self.ParseVfrStatementValue(Default['value2'], Node)
+            self.InsertEndNode(Node)
 
         if 'defaultstore' in Default.keys():
             DefaultId, ReturnCode = gVfrDefaultStore.GetDefaultId(Default['defaultstore'])
@@ -391,6 +569,7 @@ class YamlParser():
         Node = VfrTreeNode(EFI_IFR_RULE_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
         ParentNode.insertChild(Node)
         # exp
+        self.InsertEndNode(Node)
         return Node
 
     def ParseVfrStatementExtension(self, GuidOp, ParentNode):
@@ -446,9 +625,10 @@ class YamlParser():
         if 'component' in Subtitle.keys():
             for Component in Subtitle['component']:
                 (Key, Value), = Component.items()
-                self._ParseVfrStatementStatTag(Key, Value, ParentNode)
-                self.ParseVfrStatementStat(Key, Value, ParentNode)
-                self.ParseVfrStatementQuestions(Key, Value, ParentNode)
+                self._ParseVfrStatementStatTag(Key, Value, Node)
+                self.ParseVfrStatementStat(Key, Value, Node)
+                self.ParseVfrStatementQuestions(Key, Value, Node)
+        self.InsertEndNode(Node)
         return Node
 
     def _ParseVfrStatementStatTag(self, Key, Value, ParentNode):
@@ -481,7 +661,9 @@ class YamlParser():
         if 'component' in ResetButton.keys():
             for Component in ResetButton['component']:
                 (Key, Value), = Component.items()
-                self._ParseVfrStatementStatTag(Key, Value, ParentNode)
+                self._ParseVfrStatementStatTag(Key, Value, Node)
+        self.InsertEndNode(Node)
+
         return Node
 
     def ParseVfrStatementGoto(self, Goto, ParentNode):
@@ -520,6 +702,7 @@ class YamlParser():
         if 'component' in Goto.keys():
             GObj.SetScope(1)
             self._ParseVfrStatementQuestionOptionList(Goto['component'], Node)
+            self.InsertEndNode(Node)
 
         Node.Buffer = gFormPkg.StructToStream(GObj.GetInfo())
 
@@ -567,6 +750,7 @@ class YamlParser():
         # Expression
         Node = VfrTreeNode(EFI_IFR_WARNING_IF_OP, WIObj, gFormPkg.StructToStream(WIObj.GetInfo()))
         ParentNode.insertChild(Node)
+        self.InsertEndNode(Node)
         return Node
 
     def _ParseVfrStatementQuestionOptionTag(self, Key, Value, ParentNode):
@@ -582,7 +766,7 @@ class YamlParser():
             self.ParseVfrStatementWrite(Value, ParentNode)
 
     def _ParseVfrConstantValueField(self, Value):
-        pass
+        return [0]
 
 
     def ParseVfrStatementOneofOption(self, Option, ParentNode):
@@ -644,6 +828,7 @@ class YamlParser():
                 (Key, Value), = Component.items()
                 if Key == 'image':
                     self.ParseVfrStatementImage(Value, Node)
+                    self.InsertEndNode(Node)
 
         Node.Buffer = gFormPkg.StructToStream(OOOObj.GetInfo())
         return Node
@@ -689,6 +874,7 @@ class YamlParser():
         Node = VfrTreeNode(EFI_IFR_VALUE_OP, VObj, gFormPkg.StructToStream(VObj.GetInfo()))
         ParentNode.insertChild(Node)
         # expression
+        self.InsertEndNode(Node)
         return Node
 
     def ParseVfrStatementRead(self, Read, ParentNode):
@@ -774,6 +960,8 @@ class YamlParser():
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_FATAL_ERROR)
 
         QObj.SetQuestionId(QId)
+        QObj.SetQName(QName)
+        QObj.SetVarIdStr(VarIdStr)
         if BaseInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
             QObj.SetVarStoreInfo(BaseInfo)
 
@@ -781,7 +969,7 @@ class YamlParser():
 
         return BaseInfo
 
-    def _ParseVfrStatementHeader(QObj, QDict):
+    def _ParseVfrStatementHeader(self, QObj, QDict):
         QObj.SetPrompt(QDict['prompt'])
         QObj.SetHelp(QDict['help'])
 
@@ -811,8 +999,16 @@ class YamlParser():
             self.ParseVfrStatementTime(Value, ParentNode)
 
 
-    def ParseVfrStatementTime(self, Time, ParentNode):
-        pass
+    def ParseVfrStatementTime(self, Time, ParentNode): #only support one condition
+        TObj = IfrTime()
+        self._ParseVfrQuestionHeader(TObj, Time, EFI_QUESION_TYPE.QUESTION_TIME)
+        self.ErrorHandler(TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseTimeFlags(Time)))
+        Node = VfrTreeNode(EFI_IFR_TIME_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        if 'component' in Time.keys():
+            self._ParseVfrStatementQuestionOptionList(Time['component'], Node)
+        self.InsertEndNode(Node)
+        return Node
 
     def _ParseTimeFlags(self, FlagsDict):
         LFlags = 0
@@ -864,6 +1060,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         if 'component' in OrderedList.keys():
             self._ParseVfrStatementQuestionOptionList(OrderedList['component'], Node)
+        self.InsertEndNode(Node)
         self.IsOrderedList = False
         return Node
 
@@ -886,18 +1083,22 @@ class YamlParser():
 
     def ParseVfrStatementCheckBox(self, CheckBox, ParentNode):
         CBObj = IfrCheckBox()
+        Node = VfrTreeNode(EFI_IFR_CHECKBOX_OP)
         self.CurrentQuestion = CBObj
         self.IsCheckBoxOp = True
+        HasGuidNode = False
         self._ParseVfrQuestionBaseInfo(CBObj, CheckBox, EFI_QUESION_TYPE.QUESTION_NORMAL)
 
         # Create a GUID opcode to wrap the checkbox opcode, if it refer to bit varstore.
         if self.CurrQestVarInfo.IsBitVar:
+            HasGuidNode = True
             GuidObj = IfrGuid(0)
             GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
             GuidObj.SetScope(1) # position
             GuidNode = VfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
             ParentNode.insertChild(GuidNode)
-            ParentNode = GuidNode
+            GuidNode.insertChild(Node)
+            self.InsertEndNode(GuidNode)
 
         self._ParseVfrStatementHeader(CBObj, CheckBox)
         # check dataType
@@ -940,11 +1141,14 @@ class YamlParser():
         if 'key' in CheckBox.keys():
             self.AssignQuestionKey(CBObj, CheckBox['key'])
 
-        Node = VfrTreeNode(EFI_IFR_CHECKBOX_OP, CBObj, gFormPkg.StructToStream(CBObj.GetInfo()))
-        ParentNode.insertChild(Node)
+        Node.Data = CBObj
+        Node.Buffer = gFormPkg.StructToStream(CBObj.GetInfo())
+        if HasGuidNode == False:
+            ParentNode.insertChild(Node)
         if 'component' in CheckBox.keys():
             self._ParseVfrStatementQuestionOptionList(CheckBox['component'], Node)
         self.IsCheckBoxOp = False
+        self.InsertEndNode(Node)
         return Node
 
     def _ParseCheckBoxFlags(self, FlagsDict):
@@ -978,13 +1182,19 @@ class YamlParser():
             for Component in Action['component']:
                 (Key, Value), = Component.items()
                 self._ParseVfrStatementQuestionTag(Key, Value, Node)
+        self.InsertEndNode(Node)
         return Node
 
     def ParseVfrStatementDate(self, Date, ParentNode):
         DObj = IfrDate()
         self._ParseVfrQuestionHeader(DObj, Date, EFI_QUESION_TYPE.QUESTION_DATE)
         self.ErrorHandler(DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseDateFlags(Date)))
-        #pending
+        Node = VfrTreeNode(EFI_IFR_DATE_OP, DObj, gFormPkg.StructToStream(DObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        if 'component' in Date.keys():
+            self._ParseVfrStatementQuestionOptionList(Date['component'], Node)
+        self.InsertEndNode(Node)
+        return Node
 
     def _ParseDateFlags(self, FlagsDict):
         LFlags = 0
@@ -1012,15 +1222,18 @@ class YamlParser():
         self.CurrentMinMaxData = Node.Data
         UpdateVarType = False
         self._ParseVfrQuestionBaseInfo(NObj, Numeric, EFI_QUESION_TYPE.QUESTION_NORMAL)
+        HasGuidNode = False
 
         # Create a GUID opcode to wrap the numeric opcode, if it refer to bit varstore.
         if self.CurrQestVarInfo.IsBitVar:
+            HasGuidNode = True
             GuidObj = IfrGuid(0)
             GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
             GuidObj.SetScope(1) # pos
             GuidNode = VfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
             ParentNode.insertChild(GuidNode)
-            ParentNode = GuidNode
+            GuidNode.insertChild(Node)
+            self.InsertEndNode(GuidNode)
 
         self._ParseVfrStatementHeader(NObj, Numeric)
         # check data type
@@ -1059,9 +1272,11 @@ class YamlParser():
 
         Node.Data = NObj
         Node.Buffer = gFormPkg.StructToStream(NObj.GetInfo())
-        ParentNode.insertChild(Node)
+        if HasGuidNode == False:
+            ParentNode.insertChild(Node)
         if 'component' in Numeric.keys():
             self._ParseVfrStatementQuestionOptionList(Numeric['component'], Node)
+        self.InsertEndNode(Node)
         return Node
 
     def _ParseNumericFlags(self, FlagsDict):
@@ -1149,7 +1364,7 @@ class YamlParser():
             LFlags |= EDKII_IFR_NUMERIC_SIZE_BIT & self.CurrQestVarInfo.VarTotalSize
 
         if VarType != self.CurrQestVarInfo.VarType:
-                    UpdateVarType = True
+            UpdateVarType = True
 
         return HFlags, LFlags, IsDisplaySpecified, UpdateVarType
 
@@ -1161,10 +1376,132 @@ class YamlParser():
         MinNegative = False
         MaxNegative = False
 
-        Min = QDict['minimum']
-        Max = QDict['maximum']
+        Min = QDict['minimum'] if 'minimum' in QDict.keys() else 0
+        Max = QDict['maximum'] if 'maximum' in QDict.keys() else 0
         Step = QDict['step'] if 'step' in QDict.keys() else 0
-        # wip
+        if Min < 0:
+            MinNegative = True
+            Min = - Min
+
+        if IntDecStyle == False and MinNegative == True:
+            self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, '\'-\' can\'t be used when not in int decimal type.')
+        if self.CurrQestVarInfo.IsBitVar:
+            if (IntDecStyle == False) and (Min > (1 << self.CurrQestVarInfo.VarTotalSize) - 1): #
+                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'BIT type minimum can\'t small than 0, bigger than 2^BitWidth -1')
+            else:
+                Type = self.CurrQestVarInfo.VarType
+                if Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                    if IntDecStyle:
+                        if MinNegative:
+                            if Min > 0x8000000000000000:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                        else:
+                            if Min > 0x7FFFFFFFFFFFFFFF:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                    if MinNegative:
+                        Min = ~Min + 1
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                    if IntDecStyle:
+                        if MinNegative:
+                            if Min > 0x80000000:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                        else:
+                            if Min > 0x7FFFFFFF:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                    if MinNegative:
+                        Min = ~Min + 1
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                    if IntDecStyle:
+                        if MinNegative:
+                            if Min > 0x8000:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                        else:
+                            if Min > 0x7FFF:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                    if MinNegative:
+                        Min = ~Min + 1
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                    if IntDecStyle:
+                        if MinNegative:
+                            if Min > 0x80:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                        else:
+                            if Min > 0x7F:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                    if MinNegative:
+                        Min = ~Min + 1
+        if Max < 0:
+            MaxNegative = True
+            Max = - Max
+
+        if IntDecStyle == False and MaxNegative == True:
+            self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, ' \'-\' can\'t be used when not in int decimal type.')
+        if self.CurrQestVarInfo.IsBitVar:
+            if (IntDecStyle == False) and (Max > (1 << self.CurrQestVarInfo.VarTotalSize) - 1):
+                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'BIT type maximum can\'t be bigger than 2^BitWidth -1')
+            else:
+                Type = self.CurrQestVarInfo.VarType
+                if Type == EFI_IFR_TYPE_NUM_SIZE_64:
+                    if IntDecStyle:
+                        if MaxNegative:
+                            if Max > 0x8000000000000000:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                        else:
+                            if Max > 0x7FFFFFFFFFFFFFFF:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                    if MaxNegative:
+                        Max = ~Max + 1
+
+                    if Max < Min: #
+                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
+
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_32:
+                    if IntDecStyle:
+                        if MaxNegative:
+                            if Max > 0x80000000:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                        else:
+                            if Max > 0x7FFFFFFF:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                    if MaxNegative:
+                        Max = ~Max + 1
+
+                    if Max < Min: #
+                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
+
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_16:
+                    if IntDecStyle:
+                        if MaxNegative:
+                            if Max > 0x8000:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                        else:
+                            if Max > 0x7FFF:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                    if MaxNegative:
+                        Max = ~Max + 1
+
+                    if Max < Min: #
+                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
+
+                if Type == EFI_IFR_TYPE_NUM_SIZE_8:
+                    if IntDecStyle:
+                        if MaxNegative:
+                            if Max > 0x80:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                        else:
+                            if Max > 0x7F:
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                    if MaxNegative:
+                        Max = ~Max + 1
+
+                    if Max < Min: #
+                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
+
         OpObj.SetMinMaxStepData(Min, Max, Step)
 
     def ParseVfrStatementOneof(self, OneOf, ParentNode):
@@ -1174,15 +1511,18 @@ class YamlParser():
         self.CurrentMinMaxData = Node.Data
         UpdateVarType = False
         self._ParseVfrQuestionBaseInfo(OObj, OneOf, EFI_QUESION_TYPE.QUESTION_NORMAL)
+        HasGuidNode = False
 
         # Create a GUID opcode to wrap the numeric opcode, if it refer to bit varstore.
         if self.CurrQestVarInfo.IsBitVar:
+            HasGuidNode = True
             GuidObj = IfrGuid(0)
             GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
             GuidObj.SetScope(1) # pos
             GuidNode = VfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
             ParentNode.insertChild(GuidNode)
-            ParentNode = GuidNode
+            GuidNode.insertChild(Node)
+            self.InsertEndNode(GuidNode)
 
         self._ParseVfrStatementHeader(OObj, OneOf)
 
@@ -1208,6 +1548,8 @@ class YamlParser():
         if (self.CurrQestVarInfo.IsBitVar == False) and (self.CurrQestVarInfo.VarType not in BasicTypes):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
+        print(self.CurrQestVarInfo.VarType)
+
         # modify the data Vartype for NameValue
         if UpdateVarType:
             UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
@@ -1219,9 +1561,11 @@ class YamlParser():
         self._ParseVfrSetMinMaxStep(OObj, OneOf)
         Node.Data = OObj
         Node.Buffer = gFormPkg.StructToStream(OObj.GetInfo())
-        ParentNode.insertChild(Node)
+        if not HasGuidNode:
+            ParentNode.insertChild(Node)
         if 'component' in OneOf.keys():
             self._ParseVfrStatementQuestionOptionList(OneOf['component'], Node)
+        self.InsertEndNode(Node)
         return Node
 
     def ParseVfrStatementString(self, Str, ParentNode):
@@ -1254,8 +1598,9 @@ class YamlParser():
         ParentNode.insertChild(Node)
         if 'component' in Str.keys():
             self._ParseVfrStatementQuestionOptionList(Str['component'], Node)
-
+        self.InsertEndNode(Node)
         self.IsStringOp = False
+        return Node
 
 
     def _ParseStringFlags(self, FlagsDict):
@@ -1301,6 +1646,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         if 'component' in Password.keys():
             self._ParseVfrStatementQuestionOptionList(Password['component'], Node)
+        self.InsertEndNode(Node)
         return Node
 
     def ParseVfrStatementImage(self, Image, ParentNode):
@@ -1371,6 +1717,14 @@ class YamlParser():
                 self.AssignQuestionKey(AObj, Text['key'])
             Node = VfrTreeNode(EFI_IFR_TEXT_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
             ParentNode.insertChild(Node)
+            if 'component' in Text.keys():
+                for Component in Text['component']:
+                    (Key, Value), = Component.items()
+                    if Key == 'image':
+                        self.ParseVfrStatementImage(Value, Node)
+                    elif Key == 'locked':
+                        self.ParseVfrStatementLocked(Value, Node)
+            self.InsertEndNode(Node)
         else:
             TObj = IfrText()
             TObj.SetHelp(Help)
@@ -1378,6 +1732,13 @@ class YamlParser():
             TObj.SetTextTwo(TxtTwo)
             Node = VfrTreeNode(EFI_IFR_TEXT_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
             ParentNode.insertChild(Node)
+            if 'component' in Text.keys():
+                for Component in Text['component']:
+                    (Key, Value), = Component.items()
+                    if Key == 'image':
+                        self.ParseVfrStatementImage(Value, Node)
+                    elif Key == 'locked':
+                        self.ParseVfrStatementLocked(Value, Node)
 
         return Node
 
@@ -1399,3 +1760,8 @@ class YamlParser():
         if ReturnCode != ExpectedCode:
             self.ParserStatus += 1
             gVfrErrorHandle.PrintMsg(LineNum, 'Error', ErrorMsg, TokenValue)
+
+    def InsertEndNode(self, ParentNode):
+        EObj = IfrEnd()
+        ENode = VfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
+        ParentNode.insertChild(ENode)

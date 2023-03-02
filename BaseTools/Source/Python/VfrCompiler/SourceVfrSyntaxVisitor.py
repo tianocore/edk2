@@ -579,7 +579,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             self.CompareErrorHandler(VarStoreId!=0, True, Tok.line, Tok.text, 'varid 0 is not allowed.')
         StoreName = ctx.SN.text
         VSObj = IfrVarStore(TypeName, StoreName)
-        Line = ctx.start.line
+        Line = ctx.start.line   
         VSObj.SetLineNo(Line)
         VSObj.SetHasVarStoreId(ctx.VarId() != None)
         Guid = self.PreProcessDB.Read(ctx.SG.text)

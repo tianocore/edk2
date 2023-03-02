@@ -1103,6 +1103,20 @@ class VfrDataStorage(object):
         #Question ID0 is reserved
         self.FreeVarStoreIdBitMap[0] = 0x80000000
 
+    def Clear(self):
+        self.BufferVarStoreList = None  # SVfrVarStorageNode
+        self.EfiVarStoreList = None
+        self.NameVarStoreList = None
+        self.CurrVarStorageNode = None
+        self.NewVarStorageNode = None
+        self.BufferFieldInfoListHead = None
+        self.mBufferFieldInfoListTail = None
+        self.FreeVarStoreIdBitMap = []
+        for i in range(0, EFI_FREE_VARSTORE_ID_BITMAP_SIZE):
+            self.FreeVarStoreIdBitMap.append(0)
+        #Question ID0 is reserved
+        self.FreeVarStoreIdBitMap[0] = 0x80000000
+
     def GetBufferVarStoreList(self):
         return self.BufferVarStoreList
 

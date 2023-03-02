@@ -464,7 +464,7 @@ def main():
     EdkLogger.SetLevel(WARNING_LOG_LEVEL)
     Compiler = VfrCompiler(Args, Argc)
     Compiler.PreProcess()
-    #Compiler.Compile()
+    Compiler.Compile()
     # Compiler.GenBinaryFiles()
 
     # Extended Features

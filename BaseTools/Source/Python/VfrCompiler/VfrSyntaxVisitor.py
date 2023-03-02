@@ -831,6 +831,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_FATAL_ERROR, ctx.start.line)
 
         self.CurrQestVarInfo = ctx.BaseInfo
+        if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
+            print(self.CurrQestVarInfo.VarType)
 
         if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
             #need to further update the VarType
@@ -850,6 +852,8 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             ctx.Node.Data.SetHasQuestionId(ctx.QuestionId() != None)
             if ctx.BaseInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
                 ctx.Node.Data.SetVarStoreInfo(ctx.BaseInfo)
+        if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
+            print(self.CurrQestVarInfo.VarType)
 
         return ctx.Node
 
@@ -2503,7 +2507,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by VfrSyntaxParser#vfrStatementOneOf.
     def visitVfrStatementOneOf(self, ctx:VfrSyntaxParser.VfrStatementOneOfContext):
-
         self.visitChildren(ctx)
         UpdateVarType = False
         OObj = ctx.Node.Data
@@ -2529,7 +2532,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 if DataTypeSize != 0 and DataTypeSize != self.CurrQestVarInfo.VarTotalSize:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'OneOf varid doesn\'t support array')
                 self.ErrorHandler(OObj.SetFlags(OObj.GetQFlags(), self.CurrQestVarInfo.VarType), Line)
-
         if ctx.FLAGS() != None:
             UpdateVarType = ctx.vfrOneofFlagsField().UpdateVarType
             if self.CurrQestVarInfo.IsBitVar:

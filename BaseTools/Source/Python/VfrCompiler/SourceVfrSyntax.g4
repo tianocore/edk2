@@ -183,8 +183,8 @@ locals[Node=None]
     |   vfrStatementVarStoreEfi
     |   vfrStatementVarStoreNameValue
     |   vfrStatementDefaultStore
-    |   vfrStatementDisableIfFormSet
-    |   vfrStatementSuppressIfFormSet
+    |   vfrStatementDisableIfFormSet //
+    |   vfrStatementSuppressIfFormSet //
     |   vfrStatementExtension
     )
     ;
@@ -216,7 +216,7 @@ locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_OP)]
         'guid' '=' SG=StringIdentifier ';'
     ;
 
-vfrStatementVarStoreEfi
+vfrStatementVarStoreEfi //
 locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_EFI_OP)]
     :   'efivarstore'
         (   TN=StringIdentifier ','

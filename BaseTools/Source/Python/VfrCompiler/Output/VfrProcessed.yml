@@ -1,89 +1,102 @@
 formset:
-  classguid: '{0x93039971, 0x8545, 0x4b04, {0xb4, 0x5e, 0x32, 0xeb, 0x83, 0x26, 0x4,
-    0xe}}'
+  classguid: !!python/object/apply:_ctypes._unpickle
+  - &id001 !!python/name:VfrCtypes.EFI_GUID ''
+  - !!python/tuple
+    - {}
+    - !!binary |
+      cZkDk0WFBEu0XjLrgyYEDg==
   component:
   - varstore:
-      guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
-        0x3d}}'
+      guid: &id002 !!python/object/apply:_ctypes._unpickle
+      - *id001
+      - !!python/tuple
+        - {}
+        - !!binary |
+          9CdKoADfQk21UjlREwIRPQ==
       name: MyIfrNVData
       type: DRIVER_SAMPLE_CONFIGURATION
-      varid: '0x1234'
+      varid: 4660
   - efivarstore:
-      attribute: 0x00000002 | 0x00000001
-      guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
-        0x3d}}'
+      attribute:
+      - 2
+      - 1
+      guid: *id002
       name: MyEfiVar
       type: MY_EFI_VARSTORE_DATA
   - efivarstore:
-      attribute: 0x00000002 | 0x00000001
-      guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
-        0x3d}}'
+      attribute:
+      - 2
+      - 1
+      guid: *id002
       name: MyEfiBitVar
       type: MY_EFI_BITS_VARSTORE_DATA
   - efivarstore:
-      attribute: 0x00000002 | 0x00000001
-      guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
-        0x3d}}'
+      attribute:
+      - 2
+      - 1
+      guid: *id002
       name: MyEfiUnionVar
       type: MY_EFI_UNION_DATA
   - namevaluevarstore:
-      guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11,
-        0x3d}}'
-      name: STRING_TOKEN(0x0094)
+      guid: *id002
+      nametable:
+      - name: 146
+      - name: 147
+      - name: 148
       type: MyNameValueVar
   - defaultstore:
-      prompt: STRING_TOKEN(0x005B)
+      prompt: 91
       type: MyStandardDefault
   - defaultstore:
-      prompt: STRING_TOKEN(0x005D)
+      prompt: 93
       type: MyManufactureDefault
   - form:
       component:
       - subtitle:
-          prompt: STRING_TOKEN(0x001A)
+          prompt: 26
       - subtitle:
-          prompt: STRING_TOKEN(0x001B)
+          prompt: 27
       - text:
-          help: STRING_TOKEN(0x0050)
-          prompt: STRING_TOKEN(0x001C)
-          text: STRING_TOKEN(0x001D)
+          help: 80
+          prompt: 28
+          text: 29
       - text:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0054)
+          help: 84
           key: 4663
-          prompt: STRING_TOKEN(0x0054)
+          prompt: 84
       - text:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0055)
+          help: 85
           key: 4664
-          prompt: STRING_TOKEN(0x0055)
+          prompt: 85
       - text:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0057)
+          help: 87
           key: 4675
-          prompt: STRING_TOKEN(0x0057)
+          prompt: 87
       - text:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0058)
+          help: 88
           key: 4676
-          prompt: STRING_TOKEN(0x0058)
+          prompt: 88
       - oneof:
           component:
           - option:
               flags: 0
-              text: STRING_TOKEN(0x002A)
+              text: 42
               value: 0
           - option:
               flags: 0
-              text: STRING_TOKEN(0x002B)
+              text: 43
               value: 1
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x002C)
+              text: 44
               value: 2
-          help: STRING_TOKEN(0x0026)
+          help: 38
           name: MyOneOf
-          prompt: STRING_TOKEN(0x001F)
+          prompt: 31
           varid: MyIfrNVData.SuppressGrayOutSomething
       - oneof:
           component:
@@ -92,14 +105,14 @@ formset:
                 & 0xF00) == 0x0 + 0x2 ? 0 : 1))'
           - option:
               flags: 0
-              text: STRING_TOKEN(0x002D)
+              text: 45
               value: 0
           - option:
               flags: 0
-              text: STRING_TOKEN(0x002E)
+              text: 46
               value: 1
-          help: STRING_TOKEN(0x0026)
-          prompt: STRING_TOKEN(0x001F)
+          help: 38
+          prompt: 31
           varid: MyIfrNVData.BootOrderLarge
       - checkbox:
           component:
@@ -107,9 +120,11 @@ formset:
               value: true
           condition: grayoutif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
             | suppressif questionref(MyOneOf) == 0x0
-          flags: CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG
-          help: STRING_TOKEN(0x0030)
-          prompt: STRING_TOKEN(0x002F)
+          flags:
+          - CHECKBOX_DEFAULT
+          - CHECKBOX_DEFAULT_MFG
+          help: 48
+          prompt: 47
           varid: MyIfrNVData.ChooseToActivateNuclearWeaponry
       - label:
           condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
@@ -118,42 +133,42 @@ formset:
           component:
           - option:
               flags: 0
-              text: STRING_TOKEN(0x008F)
+              text: 143
               value: 2
           - option:
               flags: 0
-              text: STRING_TOKEN(0x008E)
+              text: 142
               value: 1
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0090)
+              text: 144
               value: 3
           - option:
               condition: suppressif ideqval MyIfrNVData.BootOrderLarge == 0
               flags: 0
-              text: STRING_TOKEN(0x0091)
+              text: 145
               value: 4
           condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
           flags: RESET_REQUIRED
-          help: STRING_TOKEN(0x005A)
-          prompt: STRING_TOKEN(0x008D)
+          help: 90
+          prompt: 141
           varid: MyIfrNVData.BootOrder
       - label:
           condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
-          number: '0x2223'
+          number: 8739
       - orderedlist:
           component:
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0027)
+              text: 39
               value: 3
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0028)
+              text: 40
               value: 2
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0029)
+              text: 41
               value: 1
           - default:
               value:
@@ -162,126 +177,130 @@ formset:
                 3: null
           condition: disableif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2
           flags: RESET_REQUIRED
-          help: STRING_TOKEN(0x0050)
-          prompt: STRING_TOKEN(0x0052)
+          help: 80
+          prompt: 82
           varid: MyIfrNVData.OrderedList
       - label:
           number: 100
       - goto:
           flags: INTERACTIVE
           formid: 4660
-          help: STRING_TOKEN(0x0051)
+          help: 81
           key: 4660
-          prompt: STRING_TOKEN(0x0041)
+          prompt: 65
       - goto:
           flags: INTERACTIVE
           formid: 4660
-          help: STRING_TOKEN(0x0051)
+          help: 81
           key: 4661
-          prompt: STRING_TOKEN(0x0042)
+          prompt: 66
       - oneof:
           component:
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0027)
+              text: 39
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x0028)
+              text: 40
               value: 1
           - warningif:
               expression: ideqval MyIfrNVData.TestLateCheck == 0
-              prompt: STRING_TOKEN(0x00AC)
+              prompt: 172
               timeout: 5
           flags: RESET_REQUIRED
-          help: STRING_TOKEN(0x0026)
-          prompt: STRING_TOKEN(0x0052)
+          help: 38
+          prompt: 82
           varid: MyIfrNVData.TestLateCheck
       - oneof:
           component:
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x0027)
+              text: 39
               value: 0
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0028)
+              text: 40
               value: 1
           - inconsistentif:
               expression: ideqid MyIfrNVData.TestLateCheck == MyIfrNVData.TestLateCheck2
-              prompt: STRING_TOKEN(0x0047)
+              prompt: 71
           flags: RESET_REQUIRED
-          help: STRING_TOKEN(0x0026)
-          prompt: STRING_TOKEN(0x0053)
+          help: 38
+          prompt: 83
           varid: MyIfrNVData.TestLateCheck2
       - oneof:
           component:
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0027)
+              text: 39
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x0028)
+              text: 40
               value: 1
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0029)
+              text: 41
               value: 3
           flags: RESET_REQUIRED
-          help: STRING_TOKEN(0x0026)
-          prompt: STRING_TOKEN(0x0020)
+          help: 38
+          prompt: 32
           varid: MyIfrNVData.QuestionAboutTreeHugging
       - oneof:
           component:
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0027)
+              text: 39
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x0028)
+              text: 40
               value: 1
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0029)
+              text: 41
               value: 3
-          flags: RESET_REQUIRED | REST_STYLE
-          help: STRING_TOKEN(0x0023)
-          prompt: STRING_TOKEN(0x0022)
+          flags:
+          - RESET_REQUIRED
+          - REST_STYLE
+          help: 35
+          prompt: 34
           varid: MyIfrNVData.QuestionXUefiKeywordRestStyle
       - numeric:
           component:
           - default:
               value: 0
-          flags: RESET_REQUIRED | REST_STYLE
-          help: STRING_TOKEN(0x0025)
+          flags:
+          - RESET_REQUIRED
+          - REST_STYLE
+          help: 37
           maximum: 240
           minimum: 0
-          prompt: STRING_TOKEN(0x0024)
+          prompt: 36
           step: 0
           varid: MyIfrNVData.QuestionNonXUefiKeywordRestStyle
       - string:
           component:
           - inconsistentif:
               expression: pushthis != stringref(STRING_TOKEN(STR_STRING_CHECK))
-              prompt: STRING_TOKEN(0x0063)
+              prompt: 99
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0049)
+          help: 73
           key: 4662
           maxsize: 40
           minsize: 6
-          prompt: STRING_TOKEN(0x0048)
+          prompt: 72
           varid: MyIfrNVData.MyStringData
       - numeric:
           component:
           - default:
               value: 21
           flags: READ_ONLY
-          help: STRING_TOKEN(0x0035)
+          help: 53
           maximum: 240
           minimum: 0
-          prompt: STRING_TOKEN(0x0032)
+          prompt: 50
           step: 0
           varid: MyIfrNVData.HowOldAreYouInYearsManual
       - numeric:
@@ -293,11 +312,11 @@ formset:
               expression: ideqval MyIfrNVData.HowOldAreYouInYearsManual == 99       OR       ideqid
                 MyIfrNVData.HowOldAreYouInYearsManual == MyEfiVar.Field8       OR       ideqvallist
                 MyIfrNVData.HowOldAreYouInYearsManual == 1 3 5 7
-              prompt: STRING_TOKEN(0x0047)
-          help: STRING_TOKEN(0x0035)
+              prompt: 71
+          help: 53
           maximum: 240
           minimum: 0
-          prompt: STRING_TOKEN(0x0033)
+          prompt: 51
           step: 0
           varid: MyIfrNVData.HowOldAreYouInYearsManual
       - numeric:
@@ -308,11 +327,13 @@ formset:
           - default:
               defaultstore: MyManufactureDefault
               value: 19
-          flags: DISPLAY_UINT_HEX | INTERACTIVE
-          help: STRING_TOKEN(0x0036)
+          flags:
+          - DISPLAY_UINT_HEX
+          - INTERACTIVE
+          help: 54
           maximum: 250
           minimum: 0
-          prompt: STRING_TOKEN(0x0034)
+          prompt: 52
           questionid: 4369
           varid: MyEfiVar.Field8
       - numeric:
@@ -325,10 +346,10 @@ formset:
               defaultstore: MyManufactureDefault
               value: 17
           flags: NUMERIC_SIZE_1
-          help: STRING_TOKEN(0x005F)
+          help: 95
           maximum: 255
           minimum: 0
-          prompt: STRING_TOKEN(0x0092)
+          prompt: 146
           step: 0
           varid: MyNameValueVar[0]
       - numeric:
@@ -340,30 +361,30 @@ formset:
               defaultstore: MyManufactureDefault
               value: 19
           flags: NUMERIC_SIZE_2
-          help: STRING_TOKEN(0x0060)
+          help: 96
           maximum: 65535
           minimum: 0
-          prompt: STRING_TOKEN(0x0093)
+          prompt: 147
           step: 0
           varid: MyNameValueVar[1]
       - string:
-          help: STRING_TOKEN(0x0061)
+          help: 97
           maxsize: 20
           minsize: 2
-          prompt: STRING_TOKEN(0x0094)
+          prompt: 148
           varid: MyNameValueVar[2]
       - oneof:
           component:
           - option:
               flags: 0
-              text: STRING_TOKEN(0x002D)
+              text: 45
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x002E)
+              text: 46
               value: 1
-          help: STRING_TOKEN(0x001E)
-          prompt: STRING_TOKEN(0x001F)
+          help: 30
+          prompt: 31
           varid: MyEfiVar.Field16
       - label:
           number: LABEL_1_VALUE
@@ -379,21 +400,23 @@ formset:
               value: 19
           condition: grayoutif ideqval MyIfrNVData.HowOldAreYouInYearsManual == 23
             AND ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
-          help: STRING_TOKEN(0x0037)
+          help: 55
           maximum: 243
           minimum: 0
-          prompt: STRING_TOKEN(0x0031)
+          prompt: 49
           step: 1
           varid: MyIfrNVData.HowOldAreYouInYears
       - numeric:
           component:
           - default:
               value: 18
-          flags: DISPLAY_UINT_HEX | INTERACTIVE
-          help: STRING_TOKEN(0x006A)
+          flags:
+          - DISPLAY_UINT_HEX
+          - INTERACTIVE
+          help: 106
           maximum: 255
           minimum: 0
-          prompt: STRING_TOKEN(0x0069)
+          prompt: 105
           questionid: 4665
           step: 1
           varid: MyIfrNVData.GetDefaultValueFromAccess
@@ -401,11 +424,13 @@ formset:
           component:
           - default:
               value: 18
-          flags: DISPLAY_UINT_HEX | INTERACTIVE
-          help: STRING_TOKEN(0x0068)
+          flags:
+          - DISPLAY_UINT_HEX
+          - INTERACTIVE
+          help: 104
           maximum: 255
           minimum: 0
-          prompt: STRING_TOKEN(0x0067)
+          prompt: 103
           questionid: 4672
           step: 1
           varid: MyIfrNVData.GetDefaultValueFromCallBack
@@ -413,75 +438,79 @@ formset:
           component:
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0027)
+              text: 39
               value: 1
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0028)
+              text: 40
               value: 2
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0029)
+              text: 41
               value: 3
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0068)
-          prompt: STRING_TOKEN(0x0067)
+          help: 104
+          prompt: 103
           questionid: 4690
           varid: MyIfrNVData.GetDefaultValueFromCallBackForOrderedList
       - resetbutton:
           defaultstore: MyStandardDefault
-          help: STRING_TOKEN(0x005C)
-          prompt: STRING_TOKEN(0x005B)
+          help: 92
+          prompt: 91
       - resetbutton:
           defaultstore: MyManufactureDefault
-          help: STRING_TOKEN(0x005E)
-          prompt: STRING_TOKEN(0x005D)
+          help: 94
+          prompt: 93
       - text:
           condition: grayoutif NOT security (EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID)
-          help: STRING_TOKEN(0x0039)
-          prompt: STRING_TOKEN(0x0038)
+          help: 57
+          prompt: 56
       - numeric:
           component:
           - default:
               value: 18
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x006F)
+          help: 111
           maximum: 255
           minimum: 0
-          prompt: STRING_TOKEN(0x006E)
+          prompt: 110
           questionid: 4688
           varid: MyEfiVar.SubmittedCallback
       - text:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0071)
+          help: 113
           key: 4912
-          prompt: STRING_TOKEN(0x0070)
+          prompt: 112
       - goto:
           formid: 2
-          help: STRING_TOKEN(0x0051)
-          prompt: STRING_TOKEN(0x003B)
+          help: 81
+          prompt: 59
       - goto:
           formid: 3
-          help: STRING_TOKEN(0x0051)
-          prompt: STRING_TOKEN(0x003C)
+          help: 81
+          prompt: 60
       - goto:
           formid: 4
-          help: STRING_TOKEN(0x0051)
-          prompt: STRING_TOKEN(0x003D)
+          help: 81
+          prompt: 61
       - goto:
           formid: 5
-          help: STRING_TOKEN(0x0040)
-          prompt: STRING_TOKEN(0x003F)
+          help: 64
+          prompt: 63
       - goto:
           formid: 6
-          help: STRING_TOKEN(0x0051)
-          prompt: STRING_TOKEN(0x003E)
+          help: 81
+          prompt: 62
       - goto:
           formid: 1
-          formsetguid: '{0xb3f56470, 0x6141, 0x4621, {0x8f, 0x19, 0x70, 0x4e, 0x57,
-            0x7a, 0xa9, 0xe8}}'
-          help: STRING_TOKEN(0x006C)
-          prompt: STRING_TOKEN(0x006B)
+          formsetguid: !!python/object/apply:_ctypes._unpickle
+          - *id001
+          - !!python/tuple
+            - {}
+            - !!binary |
+              cGT1s0FhIUaPGXBOV3qp6A==
+          help: 108
+          prompt: 107
           question: 1
       - guidop:
           databuffer:
@@ -489,14 +518,13 @@ formset:
             data.Field16: 8481
             data.Field8: 33
             data.OrderedList[0]: 33
-          guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2,
-            0x11, 0x3d}}'
+          guid: *id002
       - goto:
           formid: 7
-          help: STRING_TOKEN(0x0075)
-          prompt: STRING_TOKEN(0x0074)
+          help: 117
+          prompt: 116
       formid: 1
-      title: STRING_TOKEN(0x0015)
+      title: 21
   - form:
       component:
       - date:
@@ -506,86 +534,88 @@ formset:
           - inconsistentif:
               expression: ideqval Date.Day == 31     AND     ideqvallist Date.Month
                 == 2 4 6 9 11
-              prompt: STRING_TOKEN(0x0047)
+              prompt: 71
           - inconsistentif:
               expression: ideqval Date.Day == 30     AND     ideqval Date.Month ==
                 2
-              prompt: STRING_TOKEN(0x0047)
+              prompt: 71
           - inconsistentif:
               expression: ideqval Date.Day == 0x1D     AND     ideqval Date.Month
                 == 2     AND     NOT     ideqvallist Date.Year == 2004 2008 20012
                 20016 2020 2024 2028 2032 2036
-              prompt: STRING_TOKEN(0x0047)
+              prompt: 71
           flags: STORAGE_TIME
-          help: STRING_TOKEN(0x004D)
+          help: 77
           name: Date
-          prompt: STRING_TOKEN(0x004C)
+          prompt: 76
       - text:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0059)
+          help: 89
           key: 4673
-          prompt: STRING_TOKEN(0x0059)
+          prompt: 89
       - text:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0056)
+          help: 86
           key: 4674
-          prompt: STRING_TOKEN(0x0056)
+          prompt: 86
       - time:
           flags: STORAGE_TIME
-          help: STRING_TOKEN(0x004F)
-          prompt: STRING_TOKEN(0x004E)
+          help: 79
+          prompt: 78
       - time:
           component:
           - default:
               value: 56013
-          flags: STORAGE_NORMAL | SECOND_SUPPRESS
-          help: STRING_TOKEN(0x004E)
+          flags:
+          - STORAGE_NORMAL
+          - SECOND_SUPPRESS
+          help: 78
           name: MyTime
-          prompt: STRING_TOKEN(0x004E)
+          prompt: 78
           varid: MyIfrNVData.Time
       - checkbox:
           flags: CHECKBOX_DEFAULT
-          help: STRING_TOKEN(0x0030)
-          prompt: STRING_TOKEN(0x002F)
+          help: 48
+          prompt: 47
           varid: MyIfrNVData.ChooseToActivateNuclearWeaponry
       - text:
-          help: STRING_TOKEN(0x0050)
-          prompt: STRING_TOKEN(0x004A)
+          help: 80
+          prompt: 74
       - text:
-          help: STRING_TOKEN(0x0050)
-          prompt: STRING_TOKEN(0x004A)
-          text: STRING_TOKEN(0x004B)
+          help: 80
+          prompt: 74
+          text: 75
       - goto:
           formid: 1
-          help: STRING_TOKEN(0x0051)
-          prompt: STRING_TOKEN(0x003A)
+          help: 81
+          prompt: 58
       - goto:
           component:
           - default:
-              value: STRING_TOKEN(0x005A)
+              value: 90
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0045)
+          help: 69
           key: 4680
-          prompt: STRING_TOKEN(0x0043)
+          prompt: 67
           varid: MyIfrNVData.RefData
       - goto:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0046)
+          help: 70
           key: 4681
-          prompt: STRING_TOKEN(0x0044)
+          prompt: 68
       condition: suppressif ideqval MyIfrNVData.BootOrderLarge == 0
       formid: 2
-      title: STRING_TOKEN(0x0016)
+      title: 22
   - form:
       component:
       - text:
           condition: suppressif ideqval MyEfiVar.Field8 == 111
-          help: STRING_TOKEN(0x0050)
-          prompt: STRING_TOKEN(0x004A)
+          help: 80
+          prompt: 74
       - goto:
           formid: 1
-          help: STRING_TOKEN(0x0051)
-          prompt: STRING_TOKEN(0x003A)
+          help: 81
+          prompt: 58
       - numeric:
           component:
           - default:
@@ -593,27 +623,27 @@ formset:
           - refresh:
               interval: 3
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0035)
+          help: 53
           key: 22136
           maximum: 255
           minimum: 0
-          prompt: STRING_TOKEN(0x0033)
+          prompt: 51
           step: 0
           varid: MyIfrNVData.DynamicRefresh
       - numeric:
           condition: grayoutif match2 (stringref(STRING_TOKEN(STR_PATTERN)), stringref(STRING_TOKEN(STR_STRING)),
             PERL_GUID)
-          help: STRING_TOKEN(0x00AE)
+          help: 174
           maximum: 243
           minimum: 0
-          prompt: STRING_TOKEN(0x00AD)
+          prompt: 173
           varid: MyIfrNVData.Match2
       - label:
-          number: '0x2234'
+          number: 8756
       - label:
-          number: '0x2223'
+          number: 8739
       formid: 3
-      title: STRING_TOKEN(0x0017)
+      title: 23
   - formmap:
       component:
       - oneof:
@@ -629,159 +659,168 @@ formset:
                 map (pushthis: 1,4; 2,3; 3,4; 4,3;))'
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x0098)
+              text: 152
               value: 0
           - option:
               flags: 0
-              text: STRING_TOKEN(0x0099)
+              text: 153
               value: 1
           - option:
               flags: 0
-              text: STRING_TOKEN(0x009A)
+              text: 154
               value: 2
           - option:
               flags: 0
-              text: STRING_TOKEN(0x009B)
+              text: 155
               value: 3
           - option:
               flags: 0
-              text: STRING_TOKEN(0x009C)
+              text: 156
               value: 4
-          help: STRING_TOKEN(0x0026)
-          prompt: STRING_TOKEN(0x0097)
+          help: 38
+          prompt: 151
           varid: MyIfrNVData.SerialPortNo
       - checkbox:
           condition: grayoutif TRUE
-          help: STRING_TOKEN(0x0030)
-          prompt: STRING_TOKEN(0x009D)
+          help: 48
+          prompt: 157
           varid: MyIfrNVData.SerialPortStatus
       - oneof:
           component:
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x00A0)
+              text: 160
               value: 1016
           - option:
               flags: 0
-              text: STRING_TOKEN(0x00A1)
+              text: 161
               value: 760
           - option:
               flags: 0
-              text: STRING_TOKEN(0x00A2)
+              text: 162
               value: 1000
           - option:
               flags: 0
-              text: STRING_TOKEN(0x00A3)
+              text: 163
               value: 744
           condition: grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus
             == 0
-          help: STRING_TOKEN(0x0026)
-          prompt: STRING_TOKEN(0x009E)
+          help: 38
+          prompt: 158
           varid: MyIfrNVData.SerialPortIo
       - oneof:
           component:
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x00A4)
+              text: 164
               value: 4
           - option:
               flags: 0
-              text: STRING_TOKEN(0x00A5)
+              text: 165
               value: 3
           condition: grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus
             == 0
-          help: STRING_TOKEN(0x0026)
-          prompt: STRING_TOKEN(0x009F)
+          help: 38
+          prompt: 159
           varid: MyIfrNVData.SerialPortIrq
       - goto:
           formid: 1
-          help: STRING_TOKEN(0x0051)
-          prompt: STRING_TOKEN(0x003A)
+          help: 81
+          prompt: 58
       formid: 4
       map:
-      - mapguid: '{0x3bd2f4ec, 0xe524, 0x46e4, {0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42,
-          0x55, 0x62}}'
-        maptitle: STRING_TOKEN(0x0096)
-      - mapguid: '{0x3bd2f4ec, 0xe524, 0x46e4, {0xa9, 0xd8, 0x51, 0x1, 0x17, 0x42,
-          0x55, 0x62}}'
-        maptitle: STRING_TOKEN(0x0096)
+      - mapguid: &id003 !!python/object/apply:_ctypes._unpickle
+        - *id001
+        - !!python/tuple
+          - {}
+          - !!binary |
+            7PTSOyTl5Eap2FEBF0JVYg==
+        maptitle: 150
+      - mapguid: *id003
+        maptitle: 150
   - form:
       component:
       - modal: null
       - text:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0054)
+          help: 84
           key: 4677
-          prompt: STRING_TOKEN(0x0054)
+          prompt: 84
       - text:
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0055)
+          help: 85
           key: 4678
-          prompt: STRING_TOKEN(0x0055)
+          prompt: 85
       formid: 5
-      title: STRING_TOKEN(0x0066)
+      title: 102
   - form:
       component:
       - text:
-          help: STRING_TOKEN(0x0064)
-          prompt: STRING_TOKEN(0x0064)
+          help: 100
+          prompt: 100
       - numeric:
           component:
           - default:
               value: 0
           - refreshguid:
-              guid: '{0xf5e655d9, 0x2a6, 0x46f2, {0x9e, 0x76, 0xb8, 0xbe, 0x8e, 0x60,
-                0xab, 0x22}}'
+              guid: !!python/object/apply:_ctypes._unpickle
+              - *id001
+              - !!python/tuple
+                - {}
+                - !!binary |
+                  2VXm9aYC8kaedri+jmCrIg==
           flags: INTERACTIVE
-          help: STRING_TOKEN(0x0035)
+          help: 53
           key: 4679
           maximum: 255
           minimum: 0
-          prompt: STRING_TOKEN(0x0065)
+          prompt: 101
           step: 0
           varid: MyIfrNVData.RefreshGuidCount
       - label:
-          number: '0x3234'
+          number: 12852
       - label:
-          number: '0x2223'
+          number: 8739
       formid: 6
-      title: STRING_TOKEN(0x0018)
+      title: 24
   - form:
       component:
       - label:
-          number: '0x1234'
+          number: 4660
       - label:
-          number: '0x2223'
+          number: 8739
       formid: 4660
-      title: STRING_TOKEN(0x0019)
+      title: 25
   - form:
       component:
       - subtitle:
-          prompt: STRING_TOKEN(0x0076)
+          prompt: 118
       - checkbox:
           flags: CHECKBOX_DEFAULT
-          help: STRING_TOKEN(0x007C)
-          prompt: STRING_TOKEN(0x007B)
+          help: 124
+          prompt: 123
           varid: MyEfiBitVar.BitsData.NestBitCheckbox
       - oneof:
           component:
           - option:
               flags: MANUFACTURING
-              text: STRING_TOKEN(0x002D)
+              text: 45
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x002E)
+              text: 46
               value: 1
-          help: STRING_TOKEN(0x007E)
-          prompt: STRING_TOKEN(0x007D)
+          help: 126
+          prompt: 125
           varid: MyEfiBitVar.BitsData.NestBitOneof
       - numeric:
-          flags: DISPLAY_UINT_HEX | INTERACTIVE
-          help: STRING_TOKEN(0x0083)
+          flags:
+          - DISPLAY_UINT_HEX
+          - INTERACTIVE
+          help: 131
           maximum: 15
           minimum: 2
-          prompt: STRING_TOKEN(0x007F)
+          prompt: 127
           questionid: 26214
           step: 1
           varid: MyEfiBitVar.BitsData.NestBitNumeric
@@ -789,23 +828,23 @@ formset:
           component:
           - option:
               flags: MANUFACTURING
-              text: STRING_TOKEN(0x002D)
+              text: 45
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x002E)
+              text: 46
               value: 1
-          help: STRING_TOKEN(0x0082)
-          prompt: STRING_TOKEN(0x0081)
+          help: 130
+          prompt: 129
           varid: MyEfiBitVar.BitsData.NestByteField
       - subtitle:
-          prompt: STRING_TOKEN(0x001B)
+          prompt: 27
       - subtitle:
-          prompt: STRING_TOKEN(0x0077)
+          prompt: 119
       - checkbox:
           flags: CHECKBOX_DEFAULT
-          help: STRING_TOKEN(0x0085)
-          prompt: STRING_TOKEN(0x0084)
+          help: 133
+          prompt: 132
           varid: MyEfiBitVar.EfiBitCheckbox
       - numeric:
           component:
@@ -815,47 +854,47 @@ formset:
           - default:
               defaultstore: MyManufactureDefault
               value: 5
-          help: STRING_TOKEN(0x0089)
+          help: 137
           maximum: 7
           minimum: 0
-          prompt: STRING_TOKEN(0x0088)
+          prompt: 136
           step: 0
           varid: MyEfiBitVar.EfiBitNumeric
       - oneof:
           component:
           - option:
               flags: MANUFACTURING
-              text: STRING_TOKEN(0x002D)
+              text: 45
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x002E)
+              text: 46
               value: 1
-          help: STRING_TOKEN(0x0087)
-          prompt: STRING_TOKEN(0x0086)
+          help: 135
+          prompt: 134
           questionid: 39321
           varid: MyEfiBitVar.EfiBitOneof
       - subtitle:
-          prompt: STRING_TOKEN(0x001B)
+          prompt: 27
       - subtitle:
-          prompt: STRING_TOKEN(0x0078)
+          prompt: 120
       - checkbox:
           flags: CHECKBOX_DEFAULT
-          help: STRING_TOKEN(0x007C)
-          prompt: STRING_TOKEN(0x007B)
+          help: 124
+          prompt: 123
           varid: MyIfrNVData.MyBitData.NestBitCheckbox
       - oneof:
           component:
           - option:
               flags: MANUFACTURING
-              text: STRING_TOKEN(0x002D)
+              text: 45
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x002E)
+              text: 46
               value: 1
-          help: STRING_TOKEN(0x007E)
-          prompt: STRING_TOKEN(0x007D)
+          help: 126
+          prompt: 125
           varid: MyIfrNVData.MyBitData.NestBitOneof
       - numeric:
           component:
@@ -865,46 +904,46 @@ formset:
           - default:
               defaultstore: MyManufactureDefault
               value: 7
-          help: STRING_TOKEN(0x0080)
+          help: 128
           maximum: 7
           minimum: 0
-          prompt: STRING_TOKEN(0x007F)
+          prompt: 127
           step: 0
           varid: MyIfrNVData.MyBitData.NestBitNumeric
       - oneof:
           component:
           - option:
               flags: MANUFACTURING
-              text: STRING_TOKEN(0x002D)
+              text: 45
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x002E)
+              text: 46
               value: 1
-          help: STRING_TOKEN(0x0082)
-          prompt: STRING_TOKEN(0x0081)
+          help: 130
+          prompt: 129
           varid: MyIfrNVData.MyBitData.NestByteField
       - subtitle:
-          prompt: STRING_TOKEN(0x001B)
+          prompt: 27
       - subtitle:
-          prompt: STRING_TOKEN(0x0079)
+          prompt: 121
       - oneof:
           component:
           - option:
               flags: MANUFACTURING
-              text: STRING_TOKEN(0x002D)
+              text: 45
               value: 0
           - option:
               flags: DEFAULT
-              text: STRING_TOKEN(0x002E)
+              text: 46
               value: 1
-          help: STRING_TOKEN(0x0087)
-          prompt: STRING_TOKEN(0x0086)
+          help: 135
+          prompt: 134
           varid: MyIfrNVData.BitOneof
       - checkbox:
           flags: CHECKBOX_DEFAULT
-          help: STRING_TOKEN(0x0085)
-          prompt: STRING_TOKEN(0x0084)
+          help: 133
+          prompt: 132
           varid: MyIfrNVData.BitCheckbox
       - numeric:
           component:
@@ -914,16 +953,16 @@ formset:
           - default:
               defaultstore: MyManufactureDefault
               value: 17
-          help: STRING_TOKEN(0x008A)
+          help: 138
           maximum: 20
           minimum: 0
-          prompt: STRING_TOKEN(0x0088)
+          prompt: 136
           step: 0
           varid: MyIfrNVData.BitNumeric
       - subtitle:
-          prompt: STRING_TOKEN(0x001B)
+          prompt: 27
       - subtitle:
-          prompt: STRING_TOKEN(0x007A)
+          prompt: 122
       - numeric:
           component:
           - default:
@@ -932,10 +971,10 @@ formset:
           - default:
               defaultstore: MyManufactureDefault
               value: 8
-          help: STRING_TOKEN(0x008C)
+          help: 140
           maximum: 20
           minimum: 0
-          prompt: STRING_TOKEN(0x008B)
+          prompt: 139
           step: 0
           varid: MyEfiUnionVar.UnionNumeric
       - guidop:
@@ -944,13 +983,12 @@ formset:
             data.EfiBitCheckbox: 1
             data.EfiBitNumeric: 1
             data.EfiBitOneof: 1
-          guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2,
-            0x11, 0x3d}}'
+          guid: *id002
       formid: 7
-      title: STRING_TOKEN(0x0073)
-  guid: '{0xa04a27f4, 0xdf00, 0x4d42, {0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d}}'
-  help: STRING_TOKEN(0x0014)
-  title: STRING_TOKEN(0x0013)
+      title: 115
+  guid: *id002
+  help: 20
+  title: 19
 include:
 - Uefi/UefiMultiPhase.h
 - NVDataStruc.h
