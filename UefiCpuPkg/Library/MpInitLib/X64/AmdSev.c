@@ -13,6 +13,8 @@
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
 
+#define IS_ALIGNED(x, y)  ((((UINTN)(x) & (y - 1)) == 0))
+
 /**
   Create an SEV-SNP AP save area (VMSA) for use in running the vCPU.
 
@@ -27,6 +29,7 @@ SevSnpCreateSaveArea (
   UINT32          ApicId
   )
 {
+  UINT8                     *Pages;
   SEV_ES_SAVE_AREA          *SaveArea;
   IA32_CR0                  ApCr0;
   IA32_CR0                  ResetCr0;
@@ -44,10 +47,27 @@ SevSnpCreateSaveArea (
 
   //
   // Allocate a single page for the SEV-ES Save Area and initialize it.
+  // Due to an erratum that prevents a VMSA being on a 2MB boundary,
+  // allocate an extra page to work around the issue.
   //
-  SaveArea = AllocateReservedPages (1);
-  if (!SaveArea) {
+  Pages = AllocateReservedPages (2);
+  if (!Pages) {
     return;
+  }
+
+  //
+  // Since page allocation works by allocating downward in the address space,
+  // try to always free the first (lower address) page to limit possible holes
+  // in the memory map. So, if the address of the second page is 2MB aligned,
+  // then use the first page and free the second page. Otherwise, free the
+  // first page and use the second page.
+  //
+  if (IS_ALIGNED (Pages + EFI_PAGE_SIZE, SIZE_2MB)) {
+    SaveArea = (SEV_ES_SAVE_AREA *)Pages;
+    FreePages (Pages + EFI_PAGE_SIZE, 1);
+  } else {
+    SaveArea = (SEV_ES_SAVE_AREA *)(Pages + EFI_PAGE_SIZE);
+    FreePages (Pages, 1);
   }
 
   ZeroMem (SaveArea, EFI_PAGE_SIZE);
