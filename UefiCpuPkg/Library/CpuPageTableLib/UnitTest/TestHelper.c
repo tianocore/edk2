@@ -171,6 +171,10 @@ IsPageTableValid (
   UNIT_TEST_STATUS   Status;
   IA32_PAGING_ENTRY  *PagingEntry;
 
+  if (PageTable == 0) {
+    return UNIT_TEST_PASSED;
+  }
+
   if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
     //
     // 32bit paging is never supported.
