@@ -9,10 +9,10 @@
 #include "CpuPageTableLibUnitTest.h"
 
 // ----------------------------------------------------------------------- PageMode--TestCount-TestRangeCount---RandomOptions
-static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging4Level    = { Paging4Level, 100, 20, ONLY_ONE_ONE_MAPPING|USE_RANDOM_ARRAY };
-static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging4Level1GB = { Paging4Level1GB, 100, 20, ONLY_ONE_ONE_MAPPING|USE_RANDOM_ARRAY };
-static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging5Level    = { Paging5Level, 100, 20, ONLY_ONE_ONE_MAPPING|USE_RANDOM_ARRAY };
-static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging5Level1GB = { Paging5Level1GB, 100, 20, ONLY_ONE_ONE_MAPPING|USE_RANDOM_ARRAY };
+static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging4Level    = { Paging4Level, 100, 20, USE_RANDOM_ARRAY };
+static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging4Level1GB = { Paging4Level1GB, 100, 20, USE_RANDOM_ARRAY };
+static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging5Level    = { Paging5Level, 100, 20, USE_RANDOM_ARRAY };
+static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging5Level1GB = { Paging5Level1GB, 100, 20, USE_RANDOM_ARRAY };
 
 /**
   Check if the input parameters are not supported.
