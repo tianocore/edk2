@@ -9,6 +9,7 @@
 # (C) Copyright 2016 - 2021 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 # Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -2341,6 +2342,11 @@
   #  The required memory space is decided by the value of PcdMaximumGuidedExtractHandler.
   # @Prompt Memory Address of GuidedExtractHandler Table.
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|0x1000000|UINT64|0x30001015
+
+  ## This value is the IPMI KCS Interface I/O base address used to transmit IPMI commands.
+  #  The value of 0xca2 is the default I/O base address defined in IPMI specification.
+  # @Prompt IPMI KCS Interface I/O Base Address
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress|0xca2|UINT16|0x00000031
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This value is used to set the base address of PCI express hierarchy.
