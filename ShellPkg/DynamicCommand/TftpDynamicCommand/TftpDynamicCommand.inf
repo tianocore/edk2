@@ -57,4 +57,4 @@
   gEfiShellDynamicCommandProtocolGuid            ## PRODUCES
 
 [DEPEX]
-  TRUE
+  gEfiHiiPackageListProtocolGuid
