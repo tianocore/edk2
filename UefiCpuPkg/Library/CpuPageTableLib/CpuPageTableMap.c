@@ -1,7 +1,7 @@
 /** @file
   This library implements CpuPageTableLib that are generic for IA32 family CPU.
 
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -375,15 +375,6 @@ PageTableLibMapInLevel (
     //            we need to change PDPTE[0].ReadWrite = 1 and let all PDE[0-255].ReadWrite = 0 in this step.
     //       when PDPTE[0].Nx = 1 but caller wants to map [0-2MB] as Nx = 0 (PDT[0].Nx = 0)
     //            we need to change PDPTE[0].Nx = 0 and let all PDE[0-255].Nx = 1 in this step.
-    if ((ParentPagingEntry->Pnle.Bits.Present == 0) && (Mask->Bits.Present == 1) && (Attribute->Bits.Present == 1)) {
-      if (Modify) {
-        ParentPagingEntry->Pnle.Bits.Present = 1;
-      }
-
-      ChildAttribute.Bits.Present = 0;
-      ChildMask.Bits.Present      = 1;
-    }
-
     if ((ParentPagingEntry->Pnle.Bits.ReadWrite == 0) && (Mask->Bits.ReadWrite == 1) && (Attribute->Bits.ReadWrite == 1)) {
       if (Modify) {
         ParentPagingEntry->Pnle.Bits.ReadWrite = 1;
