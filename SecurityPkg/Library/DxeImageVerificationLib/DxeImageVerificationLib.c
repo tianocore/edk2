@@ -1671,7 +1671,8 @@ DxeImageVerificationHandler (
   EFI_IMAGE_EXECUTION_ACTION    Action;
   WIN_CERTIFICATE               *WinCertificate;
   UINT32                        Policy;
-  UINT8                         *SecureBoot;
+  UINT8                         SecureBoot;
+  UINTN                         SecureBootSize;
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
   UINT32                        NumberOfRvaAndSizes;
   WIN_CERTIFICATE_EFI_PKCS      *PkcsCertData;
@@ -1686,6 +1687,8 @@ DxeImageVerificationHandler (
   RETURN_STATUS                 PeCoffStatus;
   EFI_STATUS                    HashStatus;
   EFI_STATUS                    DbStatus;
+  EFI_STATUS                    VarStatus;
+  UINT32                        VarAttr;
   BOOLEAN                       IsFound;
 
   SignatureList     = NULL;
@@ -1742,23 +1745,25 @@ DxeImageVerificationHandler (
     CpuDeadLoop ();
   }
 
-  GetEfiGlobalVariable2 (EFI_SECURE_BOOT_MODE_NAME, (VOID **)&SecureBoot, NULL);
+  SecureBootSize = sizeof (SecureBoot);
+  VarStatus      = gRT->GetVariable (EFI_SECURE_BOOT_MODE_NAME, &gEfiGlobalVariableGuid, &VarAttr, &SecureBootSize, &SecureBoot);
   //
   // Skip verification if SecureBoot variable doesn't exist.
   //
-  if (SecureBoot == NULL) {
+  if (VarStatus == EFI_NOT_FOUND) {
     return EFI_SUCCESS;
   }
 
   //
   // Skip verification if SecureBoot is disabled but not AuditMode
   //
-  if (*SecureBoot == SECURE_BOOT_MODE_DISABLE) {
-    FreePool (SecureBoot);
+  if ((VarStatus == EFI_SUCCESS) &&
+      (VarAttr == (EFI_VARIABLE_BOOTSERVICE_ACCESS |
+                   EFI_VARIABLE_RUNTIME_ACCESS)) &&
+      (SecureBoot == SECURE_BOOT_MODE_DISABLE))
+  {
     return EFI_SUCCESS;
   }
-
-  FreePool (SecureBoot);
 
   //
   // Read the Dos header.
