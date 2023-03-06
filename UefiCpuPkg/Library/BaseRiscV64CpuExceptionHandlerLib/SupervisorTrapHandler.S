@@ -20,14 +20,14 @@ SupervisorModeTrap:
   sd    t0, SMODE_TRAP_REGS_OFFSET(t0)(sp)
 
   csrr  t0, CSR_SSTATUS
-  and   t0, t0, (SSTATUS_SIE | SSTATUS_SPIE)
   sd    t0, SMODE_TRAP_REGS_OFFSET(sstatus)(sp)
   csrr  t0, CSR_SEPC
   sd    t0, SMODE_TRAP_REGS_OFFSET(sepc)(sp)
-  csrr  t0, CSR_SIE
-  sd    t0, SMODE_TRAP_REGS_OFFSET(sie)(sp)
+  csrr  t0, CSR_STVAL
+  sd    t0, SMODE_TRAP_REGS_OFFSET(stval)(sp)
   ld    t0, SMODE_TRAP_REGS_OFFSET(t0)(sp)
 
+  sd    zero, SMODE_TRAP_REGS_OFFSET(zero)(sp)
   sd    ra, SMODE_TRAP_REGS_OFFSET(ra)(sp)
   sd    gp, SMODE_TRAP_REGS_OFFSET(gp)(sp)
   sd    tp, SMODE_TRAP_REGS_OFFSET(tp)(sp)
@@ -59,6 +59,7 @@ SupervisorModeTrap:
   sd    t6, SMODE_TRAP_REGS_OFFSET(t6)(sp)
 
   /* Call to Supervisor mode trap handler in CpuExceptionHandlerLib.c */
+  mv    a0, sp
   call  RiscVSupervisorModeTrapHandler
 
   /* Restore all general regisers except SP */
@@ -66,6 +67,7 @@ SupervisorModeTrap:
   ld    gp, SMODE_TRAP_REGS_OFFSET(gp)(sp)
   ld    tp, SMODE_TRAP_REGS_OFFSET(tp)(sp)
   ld    t2, SMODE_TRAP_REGS_OFFSET(t2)(sp)
+  ld    t1, SMODE_TRAP_REGS_OFFSET(t1)(sp)
   ld    s0, SMODE_TRAP_REGS_OFFSET(s0)(sp)
   ld    s1, SMODE_TRAP_REGS_OFFSET(s1)(sp)
   ld    a0, SMODE_TRAP_REGS_OFFSET(a0)(sp)
@@ -93,13 +95,10 @@ SupervisorModeTrap:
 
   ld    t0, SMODE_TRAP_REGS_OFFSET(sepc)(sp)
   csrw  CSR_SEPC, t0
-  ld    t0, SMODE_TRAP_REGS_OFFSET(sie)(sp)
-  csrw  CSR_SIE, t0
-  csrr  t0, CSR_SSTATUS
-  ld    t1, SMODE_TRAP_REGS_OFFSET(sstatus)(sp)
-  or    t0, t0, t1
+  ld    t0, SMODE_TRAP_REGS_OFFSET(sstatus)(sp)
   csrw  CSR_SSTATUS, t0
-  ld    t1, SMODE_TRAP_REGS_OFFSET(t1)(sp)
+  ld    t0, SMODE_TRAP_REGS_OFFSET(stval)(sp)
+  csrw  CSR_STVAL, t0
   ld    t0, SMODE_TRAP_REGS_OFFSET(t0)(sp)
   addi  sp, sp, SMODE_TRAP_REGS_SIZE
   sret
