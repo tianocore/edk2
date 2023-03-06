@@ -55,6 +55,7 @@ SecStartup (
   EFI_STATUS                  Status;
   UINT64                      UefiMemoryBase;
   UINT64                      StackBase;
+  UINT32                      StackSize;
 
   //
   // Report Status Code to indicate entering SEC core
@@ -72,7 +73,8 @@ SecStartup (
   SetFirmwareContextPointer (&FirmwareContext);
 
   StackBase      = (UINT64)FixedPcdGet32 (PcdOvmfSecPeiTempRamBase);
-  UefiMemoryBase = StackBase +  FixedPcdGet32 (PcdOvmfSecPeiTempRamSize) - SIZE_32MB;
+  StackSize      = FixedPcdGet32 (PcdOvmfSecPeiTempRamSize);
+  UefiMemoryBase = StackBase + StackSize - SIZE_32MB;
 
   // Declare the PI/UEFI memory region
   HobList = HobConstructor (
@@ -84,6 +86,8 @@ SecStartup (
   PrePeiSetHobList (HobList);
 
   SecInitializePlatform ();
+
+  BuildStackHob (StackBase, StackSize);
 
   //
   // Process all libraries constructor function linked to SecMain.
