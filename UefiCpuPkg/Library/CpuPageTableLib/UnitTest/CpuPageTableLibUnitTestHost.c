@@ -422,15 +422,14 @@ TestCaseManualSizeNotMatch (
   UINTN               MapCount;
   IA32_PAGING_ENTRY   *PagingEntry;
 
-  PagingMode                             = Paging4Level;
-  PageTableBufferSize                    = 0;
-  PageTable                              = 0;
-  Buffer                                 = NULL;
-  MapAttribute.Uint64                    = 0;
-  MapMask.Uint64                         = MAX_UINT64;
-  MapAttribute.Bits.Present              = 1;
-  MapAttribute.Bits.ReadWrite            = 1;
-  MapAttribute.Bits.PageTableBaseAddress = (SIZE_2MB - SIZE_4KB) >> 12;
+  PagingMode                  = Paging4Level;
+  PageTableBufferSize         = 0;
+  PageTable                   = 0;
+  Buffer                      = NULL;
+  MapMask.Uint64              = MAX_UINT64;
+  MapAttribute.Uint64         = (SIZE_2MB - SIZE_4KB);
+  MapAttribute.Bits.Present   = 1;
+  MapAttribute.Bits.ReadWrite = 1;
   //
   // Create Page table to cover [2M-4K, 4M], with ReadWrite = 1
   //
@@ -460,9 +459,9 @@ TestCaseManualSizeNotMatch (
   // [2M-4K,2M], R/W = 0
   // [2M   ,4M], R/W = 1
   //
-  PagingEntry         = (IA32_PAGING_ENTRY *)(UINTN)PageTable;                                           // Get 4 level entry
-  PagingEntry         = (IA32_PAGING_ENTRY *)(UINTN)(PagingEntry->Pnle.Bits.PageTableBaseAddress << 12); // Get 3 level entry
-  PagingEntry         = (IA32_PAGING_ENTRY *)(UINTN)(PagingEntry->Pnle.Bits.PageTableBaseAddress << 12); // Get 2 level entry
+  PagingEntry         = (IA32_PAGING_ENTRY *)(UINTN)PageTable;                                       // Get 4 level entry
+  PagingEntry         = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (PagingEntry); // Get 3 level entry
+  PagingEntry         = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (PagingEntry); // Get 2 level entry
   PagingEntry->Uint64 = PagingEntry->Uint64 & (~(UINT64)0x2);
   MapCount            = 0;
   Status              = PageTableParse (PageTable, PagingMode, NULL, &MapCount);
@@ -480,20 +479,19 @@ TestCaseManualSizeNotMatch (
 
   UT_ASSERT_EQUAL (Map[1].LinearAddress, SIZE_2MB);
   UT_ASSERT_EQUAL (Map[1].Length, SIZE_2MB);
-  ExpectedMapAttribute.Uint64                    = MapAttribute.Uint64;
-  ExpectedMapAttribute.Bits.ReadWrite            = 1;
-  ExpectedMapAttribute.Bits.PageTableBaseAddress = SIZE_2MB >> 12;
+  ExpectedMapAttribute.Uint64         = MapAttribute.Uint64 + SIZE_4KB;
+  ExpectedMapAttribute.Bits.ReadWrite = 1;
   UT_ASSERT_EQUAL (Map[1].Attribute.Uint64, ExpectedMapAttribute.Uint64);
 
   //
   // Set Page table [2M-4K, 2M+4K]'s ReadWrite = 1, [2M,2M+4K]'s ReadWrite is already 1
   // Just need to set [2M-4K,2M], won't need extra size, so the status should be success
   //
-  MapAttribute.Bits.Present              = 1;
-  MapAttribute.Bits.ReadWrite            = 1;
-  PageTableBufferSize                    = 0;
-  MapAttribute.Bits.PageTableBaseAddress = (SIZE_2MB - SIZE_4KB) >> 12;
-  Status                                 = PageTableMap (&PageTable, PagingMode, Buffer, &PageTableBufferSize, SIZE_2MB - SIZE_4KB, SIZE_4KB * 2, &MapAttribute, &MapMask, NULL);
+  MapAttribute.Uint64         = SIZE_2MB - SIZE_4KB;
+  MapAttribute.Bits.Present   = 1;
+  MapAttribute.Bits.ReadWrite = 1;
+  PageTableBufferSize         = 0;
+  Status                      = PageTableMap (&PageTable, PagingMode, Buffer, &PageTableBufferSize, SIZE_2MB - SIZE_4KB, SIZE_4KB * 2, &MapAttribute, &MapMask, NULL);
   UT_ASSERT_EQUAL (Status, RETURN_SUCCESS);
   return UNIT_TEST_PASSED;
 }
