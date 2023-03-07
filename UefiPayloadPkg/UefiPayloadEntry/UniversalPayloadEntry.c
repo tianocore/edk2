@@ -470,9 +470,6 @@ _ModuleEntryPoint (
     PrintHob (mHobList);
     );
 
-  // Initialize floating point operating environment to be compliant with UEFI spec.
-  InitializeFloatingPointUnits ();
-
   // Build HOB based on information from Bootloader
   Status = BuildHobs (BootloaderParameter, &DxeFv);
   ASSERT_EFI_ERROR (Status);
