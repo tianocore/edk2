@@ -1,7 +1,7 @@
 /** @file
   UEFI Application to display CPUID leaf information.
 
-  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -217,12 +217,12 @@ CpuidVersionInfo (
 
   DisplayFamily = Eax.Bits.FamilyId;
   if (Eax.Bits.FamilyId == 0x0F) {
-    DisplayFamily |= (Eax.Bits.ExtendedFamilyId << 4);
+    DisplayFamily += Eax.Bits.ExtendedFamilyId;
   }
 
   DisplayModel = Eax.Bits.Model;
   if ((Eax.Bits.FamilyId == 0x06) || (Eax.Bits.FamilyId == 0x0f)) {
-    DisplayModel |= (Eax.Bits.ExtendedModelId << 4);
+    DisplayModel += (Eax.Bits.ExtendedModelId << 4);
   }
 
   Print (L"  Family = %x  Model = %x  Stepping = %x\n", DisplayFamily, DisplayModel, Eax.Bits.SteppingId);
