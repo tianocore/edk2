@@ -140,7 +140,7 @@ IsPageTableEntryValid (
     UT_ASSERT_EQUAL ((PagingEntry->Uint64 & mValidMaskNoLeaf[Level].Uint64), PagingEntry->Uint64);
   }
 
-  ChildPageEntry = (IA32_PAGING_ENTRY  *)(UINTN)(((UINTN)(PagingEntry->Pnle.Bits.PageTableBaseAddress)) << 12);
+  ChildPageEntry = (IA32_PAGING_ENTRY  *)(UINTN)(IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&PagingEntry->Pnle));
   for (Index = 0; Index < 512; Index++) {
     Status = IsPageTableEntryValid (&ChildPageEntry[Index], Level-1, MaxLeafLevel, Address + (Index<<(9*(Level-1) + 3)));
     if (Status != UNIT_TEST_PASSED) {
@@ -232,7 +232,7 @@ GetEntryFromSubPageTable (
   //
   // Not a leaf
   //
-  ChildPageEntry = (IA32_PAGING_ENTRY  *)(UINTN)(((UINTN)(PagingEntry->Pnle.Bits.PageTableBaseAddress)) << 12);
+  ChildPageEntry = (IA32_PAGING_ENTRY  *)(UINTN)(IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&PagingEntry->Pnle));
   *Level         = *Level -1;
   Index          = Address >> (*Level * 9 + 3);
   ASSERT (Index == (Index & ((1<< 9) - 1)));
