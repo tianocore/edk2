@@ -567,6 +567,10 @@ PageTableMap (
   IA32_PAGE_LEVEL     MaxLeafLevel;
   IA32_MAP_ATTRIBUTE  ParentAttribute;
 
+  if (Length == 0) {
+    return RETURN_SUCCESS;
+  }
+
   if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
     //
     // 32bit paging is never supported.
