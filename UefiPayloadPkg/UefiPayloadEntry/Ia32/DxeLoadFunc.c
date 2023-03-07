@@ -272,6 +272,12 @@ HandOffToDxeCore (
   InitializeFloatingPointUnits ();
 
   //
+  // Mask off all legacy 8259 interrupt sources
+  //
+  IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
+  IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0xFF);
+
+  //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
   //
   if (IsNullDetectionEnabled ()) {
