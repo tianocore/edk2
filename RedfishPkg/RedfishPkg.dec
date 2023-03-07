@@ -113,3 +113,13 @@
   # Default is set to not add.
   #
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExAddingExpect|FALSE|BOOLEAN|0x00001004
+  #
+  # Use PCD to declare the Redfish host nmae becasue there is no
+  # specification for that.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishHostName|"Redfish service"|VOID*|0x00001005
+  #
+  # Use PCD to declare the Redfish service UUID becasue there is no
+  # specification for that.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceUuid|L"00000000-0000-0000-0000-000000000000"|VOID*|0x00001006
