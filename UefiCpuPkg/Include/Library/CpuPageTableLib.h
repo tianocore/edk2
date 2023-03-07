@@ -1,7 +1,7 @@
 /** @file
   Public include file for PageTableLib library.
 
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -81,7 +81,7 @@ typedef enum {
   @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for page table creation/updating.
                                     BufferSize is updated to indicate the expected buffer size.
                                     Caller may still get RETURN_BUFFER_TOO_SMALL with the new BufferSize.
-  @retval RETURN_SUCCESS            PageTable is created/updated successfully.
+  @retval RETURN_SUCCESS            PageTable is created/updated successfully or the input Length is 0.
 **/
 RETURN_STATUS
 EFIAPI
