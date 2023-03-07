@@ -14,7 +14,8 @@
 #include <Library/JsonLib.h>
 #include <Library/RedfishLib.h>
 
-#define DEBUG_REDFISH_NETWORK  DEBUG_INFO   ///< Debug error level for Redfish networking function
+#define DEBUG_REDFISH_NETWORK         DEBUG_INFO   ///< Debug error level for Redfish networking function
+#define DEBUG_REDFISH_HOST_INTERFACE  DEBUG_INFO   ///< Debug error level for Redfish networking function
 
 /**
 
