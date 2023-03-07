@@ -636,6 +636,8 @@ SingleMapEntryTest (
   VOID                *Buffer;
   IA32_MAP_ENTRY      *Map;
   UINTN               MapCount;
+  IA32_MAP_ENTRY      *Map2;
+  UINTN               MapCount2;
   UINTN               Index;
   UINTN               KeyPointCount;
   UINTN               NewKeyPointCount;
@@ -647,25 +649,33 @@ SingleMapEntryTest (
   IA32_MAP_ATTRIBUTE  *Attribute;
   UINT64              PreviousAddress;
   BOOLEAN             IsNotPresent;
+  BOOLEAN             IsModified;
 
   MapsIndex       = MapEntrys->Count;
   MapCount        = 0;
   PreviousAddress = 0;
   IsNotPresent    = FALSE;
+  IsModified      = FALSE;
 
   GenerateSingleRandomMapEntry (MaxAddress, MapEntrys);
   Status = PageTableParse (*PageTable, PagingMode, NULL, &MapCount);
+
+  if (MapCount != 0) {
+    //
+    // Allocate memory for Map
+    // Note the memory is only used in this one Single MapEntry Test
+    //
+    UT_ASSERT_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
+    Map = AllocatePages (EFI_SIZE_TO_PAGES (MapCount * sizeof (IA32_MAP_ENTRY)));
+    ASSERT (Map != NULL);
+    Status = PageTableParse (*PageTable, PagingMode, Map, &MapCount);
+  }
 
   //
   // Check if the generated MapEntrys->Maps[MapsIndex] contains not-present range.
   //
   if (MapEntrys->Maps[MapsIndex].Length > 0) {
     if (MapCount != 0) {
-      UT_ASSERT_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
-      Map = AllocatePages (EFI_SIZE_TO_PAGES (MapCount * sizeof (IA32_MAP_ENTRY)));
-      ASSERT (Map != NULL);
-      Status = PageTableParse (*PageTable, PagingMode, Map, &MapCount);
-
       if (Map[MapCount - 1].LinearAddress + Map[MapCount - 1].Length < MapEntrys->Maps[MapsIndex].LinearAddress + MapEntrys->Maps[MapsIndex].Length) {
         IsNotPresent = TRUE;
       } else {
@@ -699,7 +709,7 @@ SingleMapEntryTest (
                           MapEntrys->Maps[MapsIndex].Length,
                           &MapEntrys->Maps[MapsIndex].Attribute,
                           &MapEntrys->Maps[MapsIndex].Mask,
-                          NULL
+                          &IsModified
                           );
 
   //
@@ -738,7 +748,7 @@ SingleMapEntryTest (
                MapEntrys->Maps[MapsIndex].Length,
                &MapEntrys->Maps[MapsIndex].Attribute,
                &MapEntrys->Maps[MapsIndex].Mask,
-               NULL
+               &IsModified
                );
   }
 
@@ -752,18 +762,33 @@ SingleMapEntryTest (
     return TestStatus;
   }
 
-  MapCount = 0;
-  Status   = PageTableParse (*PageTable, PagingMode, NULL, &MapCount);
-  if (MapCount != 0) {
+  MapCount2 = 0;
+  Status    = PageTableParse (*PageTable, PagingMode, NULL, &MapCount2);
+  if (MapCount2 != 0) {
     UT_ASSERT_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
 
     //
-    // Allocate memory for Maps
+    // Allocate memory for Map2
     // Note the memory is only used in this one Single MapEntry Test
     //
-    Map = AllocatePages (EFI_SIZE_TO_PAGES (MapCount * sizeof (IA32_MAP_ENTRY)));
-    ASSERT (Map != NULL);
-    Status = PageTableParse (*PageTable, PagingMode, Map, &MapCount);
+    Map2 = AllocatePages (EFI_SIZE_TO_PAGES (MapCount2 * sizeof (IA32_MAP_ENTRY)));
+    ASSERT (Map2 != NULL);
+    Status = PageTableParse (*PageTable, PagingMode, Map2, &MapCount2);
+  }
+
+  //
+  // Check if PageTable has been modified.
+  //
+  if (MapCount2 != MapCount) {
+    UT_ASSERT_EQUAL (IsModified, TRUE);
+  } else {
+    if (MapCount2 == 0) {
+      UT_ASSERT_EQUAL (IsModified, FALSE);
+    } else if (CompareMem (Map, Map2, MapCount2 * sizeof (IA32_MAP_ENTRY)) != 0) {
+      UT_ASSERT_EQUAL (IsModified, TRUE);
+    } else {
+      UT_ASSERT_EQUAL (IsModified, FALSE);
+    }
   }
 
   UT_ASSERT_EQUAL (Status, RETURN_SUCCESS);
@@ -773,17 +798,17 @@ SingleMapEntryTest (
   // Note the memory is only used in this one Single MapEntry Test
   //
   KeyPointCount = 0;
-  GetKeyPointList (MapEntrys, Map, MapCount, NULL, &KeyPointCount);
+  GetKeyPointList (MapEntrys, Map2, MapCount2, NULL, &KeyPointCount);
   KeyPointBuffer = AllocatePages (EFI_SIZE_TO_PAGES (KeyPointCount * sizeof (UINT64)));
   ASSERT (KeyPointBuffer != NULL);
   NewKeyPointCount = 0;
-  GetKeyPointList (MapEntrys, Map, MapCount, KeyPointBuffer, &NewKeyPointCount);
+  GetKeyPointList (MapEntrys, Map2, MapCount2, KeyPointBuffer, &NewKeyPointCount);
 
   //
   // Compare all key point's attribute
   //
   for (Index = 0; Index < NewKeyPointCount; Index++) {
-    if (!CompareEntrysforOnePoint (KeyPointBuffer[Index], MapEntrys, Map, MapCount, InitMap, InitMapCount)) {
+    if (!CompareEntrysforOnePoint (KeyPointBuffer[Index], MapEntrys, Map2, MapCount2, InitMap, InitMapCount)) {
       DEBUG ((DEBUG_INFO, "Error happens at below key point\n"));
       DEBUG ((DEBUG_INFO, "Index = %d KeyPointBuffer[Index] = 0x%lx\n", Index, KeyPointBuffer[Index]));
       Value = GetEntryFromPageTable (*PageTable, PagingMode, KeyPointBuffer[Index], &Level);
@@ -795,6 +820,10 @@ SingleMapEntryTest (
   FreePages (KeyPointBuffer, EFI_SIZE_TO_PAGES (KeyPointCount * sizeof (UINT64)));
   if (MapCount != 0) {
     FreePages (Map, EFI_SIZE_TO_PAGES (MapCount * sizeof (IA32_MAP_ENTRY)));
+  }
+
+  if (MapCount2 != 0) {
+    FreePages (Map2, EFI_SIZE_TO_PAGES (MapCount2 * sizeof (IA32_MAP_ENTRY)));
   }
 
   return UNIT_TEST_PASSED;
