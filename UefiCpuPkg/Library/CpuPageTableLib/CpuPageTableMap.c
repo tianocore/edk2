@@ -26,7 +26,7 @@ PageTableLibSetPte4K (
   IN IA32_MAP_ATTRIBUTE  *Mask
   )
 {
-  if (Mask->Bits.PageTableBaseAddress) {
+  if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
     Pte4K->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (Pte4K->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_40);
   }
 
@@ -93,7 +93,7 @@ PageTableLibSetPleB (
   IN IA32_MAP_ATTRIBUTE                 *Mask
   )
 {
-  if (Mask->Bits.PageTableBaseAddress) {
+  if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
     PleB->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (PleB->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_39);
   }
 
@@ -238,7 +238,7 @@ IsAttributesAndMaskValidForNonPresentEntry (
     //
     if ((Mask->Bits.ReadWrite == 0) || (Mask->Bits.UserSupervisor == 0) || (Mask->Bits.WriteThrough == 0) || (Mask->Bits.CacheDisabled == 0) ||
         (Mask->Bits.Accessed == 0) || (Mask->Bits.Dirty == 0) || (Mask->Bits.Pat == 0) || (Mask->Bits.Global == 0) ||
-        (Mask->Bits.PageTableBaseAddress == 0) || (Mask->Bits.ProtectionKey == 0) || (Mask->Bits.Nx == 0))
+        ((Mask->Bits.PageTableBaseAddressLow == 0) && (Mask->Bits.PageTableBaseAddressHigh == 0)) || (Mask->Bits.ProtectionKey == 0) || (Mask->Bits.Nx == 0))
     {
       return RETURN_INVALID_PARAMETER;
     }
@@ -399,7 +399,7 @@ PageTableLibMapInLevel (
       // This function is called when the memory length is less than the region length of the parent level.
       // No need to split the page when the attributes equal.
       //
-      if (Mask->Bits.PageTableBaseAddress == 0) {
+      if ((Mask->Bits.PageTableBaseAddressLow == 0) && (Mask->Bits.PageTableBaseAddressHigh == 0)) {
         return RETURN_SUCCESS;
       }
 
@@ -706,7 +706,7 @@ PageTableMap (
     return RETURN_INVALID_PARAMETER;
   }
 
-  if ((LinearAddress % SIZE_4KB != 0) || (Length % SIZE_4KB != 0)) {
+  if (((UINTN)LinearAddress % SIZE_4KB != 0) || ((UINTN)Length % SIZE_4KB != 0)) {
     //
     // LinearAddress and Length should be multiple of 4K.
     //
@@ -749,12 +749,12 @@ PageTableMap (
   }
   *IsModified = FALSE;
 
-  ParentAttribute.Uint64                    = 0;
-  ParentAttribute.Bits.PageTableBaseAddress = 1;
-  ParentAttribute.Bits.Present              = 1;
-  ParentAttribute.Bits.ReadWrite            = 1;
-  ParentAttribute.Bits.UserSupervisor       = 1;
-  ParentAttribute.Bits.Nx                   = 0;
+  ParentAttribute.Uint64                       = 0;
+  ParentAttribute.Bits.PageTableBaseAddressLow = 1;
+  ParentAttribute.Bits.Present                 = 1;
+  ParentAttribute.Bits.ReadWrite               = 1;
+  ParentAttribute.Bits.UserSupervisor          = 1;
+  ParentAttribute.Bits.Nx                      = 0;
 
   //
   // Query the required buffer size without modifying the page table.

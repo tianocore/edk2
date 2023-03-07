@@ -11,22 +11,22 @@
 
 typedef union {
   struct {
-    UINT64    Present              : 1; // 0 = Not present in memory, 1 = Present in memory
-    UINT64    ReadWrite            : 1; // 0 = Read-Only, 1= Read/Write
-    UINT64    UserSupervisor       : 1; // 0 = Supervisor, 1=User
-    UINT64    WriteThrough         : 1; // 0 = Write-Back caching, 1=Write-Through caching
-    UINT64    CacheDisabled        : 1; // 0 = Cached, 1=Non-Cached
-    UINT64    Accessed             : 1; // 0 = Not accessed, 1 = Accessed (set by CPU)
-    UINT64    Dirty                : 1; // 0 = Not dirty, 1 = Dirty (set by CPU)
-    UINT64    Pat                  : 1; // PAT
+    UINT32    Present                  : 1;  // 0 = Not present in memory, 1 = Present in memory
+    UINT32    ReadWrite                : 1;  // 0 = Read-Only, 1= Read/Write
+    UINT32    UserSupervisor           : 1;  // 0 = Supervisor, 1=User
+    UINT32    WriteThrough             : 1;  // 0 = Write-Back caching, 1=Write-Through caching
+    UINT32    CacheDisabled            : 1;  // 0 = Cached, 1=Non-Cached
+    UINT32    Accessed                 : 1;  // 0 = Not accessed, 1 = Accessed (set by CPU)
+    UINT32    Dirty                    : 1;  // 0 = Not dirty, 1 = Dirty (set by CPU)
+    UINT32    Pat                      : 1;  // PAT
+    UINT32    Global                   : 1;  // 0 = Not global, 1 = Global (if CR4.PGE = 1)
+    UINT32    Reserved1                : 3;  // Ignored
+    UINT32    PageTableBaseAddressLow  : 20; // Page Table Base Address Low
 
-    UINT64    Global               : 1; // 0 = Not global, 1 = Global (if CR4.PGE = 1)
-    UINT64    Reserved1            : 3; // Ignored
-
-    UINT64    PageTableBaseAddress : 40; // Page Table Base Address
-    UINT64    Reserved2            : 7;  // Ignored
-    UINT64    ProtectionKey        : 4;  // Protection key
-    UINT64    Nx                   : 1;  // No Execute bit
+    UINT32    PageTableBaseAddressHigh : 20; // Page Table Base Address High
+    UINT32    Reserved2                : 7;  // Ignored
+    UINT32    ProtectionKey            : 4;  // Protection key
+    UINT32    Nx                       : 1;  // No Execute bit
   } Bits;
   UINT64    Uint64;
 } IA32_MAP_ATTRIBUTE;
