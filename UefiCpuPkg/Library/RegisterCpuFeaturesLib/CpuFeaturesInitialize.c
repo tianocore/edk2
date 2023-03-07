@@ -1,7 +1,7 @@
 /** @file
   CPU Features Initialize functions.
 
-  Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -67,12 +67,12 @@ FillProcessorInfo (
 
   DisplayedFamily = Eax.Bits.FamilyId;
   if (Eax.Bits.FamilyId == 0x0F) {
-    DisplayedFamily |= (Eax.Bits.ExtendedFamilyId << 4);
+    DisplayedFamily += Eax.Bits.ExtendedFamilyId;
   }
 
   DisplayedModel = Eax.Bits.Model;
   if ((Eax.Bits.FamilyId == 0x06) || (Eax.Bits.FamilyId == 0x0f)) {
-    DisplayedModel |= (Eax.Bits.ExtendedModelId << 4);
+    DisplayedModel += (Eax.Bits.ExtendedModelId << 4);
   }
 
   CpuInfo->DisplayFamily              = DisplayedFamily;
