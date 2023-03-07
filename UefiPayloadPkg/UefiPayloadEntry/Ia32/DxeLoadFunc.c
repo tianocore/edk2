@@ -268,6 +268,9 @@ HandOffToDxeCore (
   UINT32                   Index;
   X64_IDT_TABLE            *IdtTableForX64;
 
+  // Initialize floating point operating environment to be compliant with UEFI spec.
+  InitializeFloatingPointUnits ();
+
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
   //
