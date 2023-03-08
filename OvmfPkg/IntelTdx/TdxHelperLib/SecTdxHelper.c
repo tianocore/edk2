@@ -886,6 +886,97 @@ GetTdxMetadataAddress (
 }
 
 /**
+  This function would check the unaccepted memory whether in the range of
+  Tdx Metadata Temporay Memory. Before calling this funtion, the validness of
+  TdxMetadata shall be checked by calling ValidateTdxMetadata.
+
+  @param[in]  TdxMetadataAddress      A pointer to TDX Metadata.
+  @param[in]  UnacceptedMemoryStart   Unaccepted memory start address.
+  @param[in]  UnacceptedMemoryLength  The length of the unaccepted memory.
+
+  @retval  EFI_SUCCESS                The unaccepted memory was not in the range of
+                                      Tdx Metadata Temporay Memory.
+  @retval  EFI_INVALID_PARAMETER      TdxMetadataAddress was invalid.
+  @retval  EFI_UNSUPPORTED            We don't support the unaccepted memory address,
+                                      that was in the range of Tdx Metadata Temporay Memory.
+**/
+STATIC
+EFI_STATUS
+CheckUnacceptedMemory (
+  IN UINT8   *TdxMetadataAddress,
+  IN UINT64  UnacceptedMemoryStart,
+  IN UINT64  UnacceptedMemoryLength
+  )
+{
+  UINTN       Index;
+  BOOLEAN     InvalidUnacceptMemoryRegion;
+  UINT64      MemoryOffset;
+  UINT8       *Address;
+  EFI_STATUS  Status;
+
+  TDVF_METADATA_DESCRIPTOR  *TdvfDec;
+  TDX_METADATA_SECTION      *Section;
+
+  MemoryOffset                = 0;
+  InvalidUnacceptMemoryRegion = FALSE;
+  Status                      = EFI_SUCCESS;
+  Address                     = NULL;
+  TdvfDec                     = NULL;
+  Section                     = NULL;
+
+  if (TdxMetadataAddress == NULL) {
+    DEBUG ((DEBUG_ERROR, "TdxMetadataAddress should not be NULL\n"));
+    Status = EFI_INVALID_PARAMETER;
+    return Status;
+  }
+
+  Address = TdxMetadataAddress;
+  TdvfDec = (TDVF_METADATA_DESCRIPTOR *)Address;
+
+  Address += sizeof (TDVF_METADATA_DESCRIPTOR);
+
+  for (Index = 0; Index < TdvfDec->NumberOfSectionEntry; Index++) {
+    Section = (TDX_METADATA_SECTION *)Address;
+
+    if (Section->Type != TDX_METADATA_SECTION_TYPE_TEMP_MEM) {
+      Address += sizeof (TDX_METADATA_SECTION);
+      Section  = NULL;
+      continue;
+    }
+
+    if (UnacceptedMemoryStart == Section->MemoryAddress) {
+      InvalidUnacceptMemoryRegion = TRUE;
+      break;
+    }
+
+    if (UnacceptedMemoryStart > Section->MemoryAddress) {
+      MemoryOffset = UnacceptedMemoryStart - Section->MemoryAddress;
+      if (MemoryOffset < Section->MemoryDataSize) {
+        InvalidUnacceptMemoryRegion = TRUE;
+        break;
+      }
+    } else {
+      MemoryOffset = Section->MemoryAddress - UnacceptedMemoryStart;
+      if (MemoryOffset < UnacceptedMemoryLength) {
+        InvalidUnacceptMemoryRegion = TRUE;
+        break;
+      }
+    }
+
+    Address += sizeof (TDX_METADATA_SECTION);
+    Section  = NULL;
+  }
+
+  if (InvalidUnacceptMemoryRegion) {
+    DEBUG ((DEBUG_ERROR, "Unaccepted Memory should not be in the range of Temporay Memory\n"));
+    Status = EFI_UNSUPPORTED;
+    return Status;
+  }
+
+  return Status;
+}
+
+/**
   Check the integrity of VMM Hob List.
 
   @param[in] VmmHobList   A pointer to Hob List
@@ -1042,6 +1133,14 @@ ValidateHobList (
         {
           DEBUG ((DEBUG_ERROR, "HOB: Unknow ResourceDescriptor ResourceAttribute type. Type: 0x%08x\n", Hob.ResourceDescriptor->ResourceAttribute));
           return FALSE;
+        }
+
+        if (Hob.ResourceDescriptor->ResourceType == BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED) {
+          Status = CheckUnacceptedMemory (TdxMetadataAddress, Hob.ResourceDescriptor->PhysicalStart, Hob.ResourceDescriptor->ResourceLength);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "Check UnacceptedMemory failed. Status = %r\n", Status));
+            return FALSE;
+          }
         }
 
         break;
