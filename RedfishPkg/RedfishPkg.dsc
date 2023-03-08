@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2021 Hewlett-Packard Enterprise Development LP.
+# Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -52,6 +53,7 @@
 [Components]
   RedfishPkg/Library/PlatformHostInterfaceLibNull/PlatformHostInterfaceLibNull.inf
   RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
+  RedfishPkg/Library/RedfishPlatformCredentialIpmi/RedfishPlatformCredentialIpmiLib.inf
   RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
   RedfishPkg/Library/DxeRestExLib/DxeRestExLib.inf
   RedfishPkg/Library/BaseUcs2Utf8Lib/BaseUcs2Utf8Lib.inf
