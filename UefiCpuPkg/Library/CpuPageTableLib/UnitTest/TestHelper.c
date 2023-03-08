@@ -175,10 +175,9 @@ IsPageTableValid (
     return UNIT_TEST_PASSED;
   }
 
-  if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
+  if ((PagingMode == Paging32bit) || (PagingMode >= PagingModeMax)) {
     //
     // 32bit paging is never supported.
-    // PAE paging will be supported later.
     //
     return UNIT_TEST_ERROR_TEST_FAILED;
   }
@@ -264,7 +263,7 @@ GetEntryFromPageTable (
   UINT64             Index;
   IA32_PAGING_ENTRY  *PagingEntry;
 
-  if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
+  if ((PagingMode == Paging32bit) || (PagingMode >= PagingModeMax)) {
     //
     // 32bit paging is never supported.
     // PAE paging will be supported later.

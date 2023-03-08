@@ -9,6 +9,7 @@
 #include "CpuPageTableLibUnitTest.h"
 
 // ----------------------------------------------------------------------- PageMode--TestCount-TestRangeCount---RandomOptions
+static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPagingPae       = { PagingPae, 100, 20, USE_RANDOM_ARRAY };
 static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging4Level    = { Paging4Level, 100, 20, USE_RANDOM_ARRAY };
 static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging4Level1GB = { Paging4Level1GB, 100, 20, USE_RANDOM_ARRAY };
 static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging5Level    = { Paging5Level, 100, 20, USE_RANDOM_ARRAY };
@@ -865,6 +866,7 @@ UefiTestMain (
     goto EXIT;
   }
 
+  AddTestCase (RandomTestCase, "Random Test for PagingPae", "Random Test Case1", TestCaseforRandomTest, NULL, NULL, &mTestContextPagingPae);
   AddTestCase (RandomTestCase, "Random Test for Paging4Level", "Random Test Case1", TestCaseforRandomTest, NULL, NULL, &mTestContextPaging4Level);
   AddTestCase (RandomTestCase, "Random Test for Paging4Level1G", "Random Test Case2", TestCaseforRandomTest, NULL, NULL, &mTestContextPaging4Level1GB);
   AddTestCase (RandomTestCase, "Random Test for Paging5Level", "Random Test Case3", TestCaseforRandomTest, NULL, NULL, &mTestContextPaging5Level);
