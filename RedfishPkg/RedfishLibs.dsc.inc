@@ -19,5 +19,6 @@
   JsonLib|RedfishPkg/Library/JsonLib/JsonLib.inf
   RedfishLib|RedfishPkg/PrivateLibrary/RedfishLib/RedfishLib.inf
   RedfishDebugLib|RedfishPkg/Library/RedfishDebugLib/RedfishDebugLib.inf
+  RedfishPlatformCredentialLib|RedfishPkg/Library/RedfishPlatformCredentialIpmiLib/RedfishPlatformCredentialIpmiLib.inf
 !endif
 
