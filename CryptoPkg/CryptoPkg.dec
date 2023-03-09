@@ -22,6 +22,7 @@
 [Includes.Common.Private]
   Private
   Library/Include
+  Library/OpensslLib/OpensslStub
   Library/OpensslLib/openssl/include
   Library/OpensslLib/openssl/providers/common/include
   Library/OpensslLib/openssl/providers/implementations/include
