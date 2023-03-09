@@ -607,7 +607,7 @@ typedef struct {
 typedef struct {
   UINT16    Command;
   UINT16    Reserved;
-  UINT32    AcpiId;
+  UINT32    ApicId;
   UINT64    WakeupVector;
   UINT8     ReservedForOs[2032];
   UINT8     ReservedForFirmware[2048];
