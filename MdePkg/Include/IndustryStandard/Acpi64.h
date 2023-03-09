@@ -602,6 +602,11 @@ typedef struct {
 } EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_STRUCTURE;
 
 ///
+/// Multiprocessor Wakeup Mailbox Structure Version (as defined in ACPI 6.4 spec.)
+///
+#define EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_MAILBOX_STRUCTURE_VERSION  0x0
+
+///
 /// Multiprocessor Wakeup Mailbox Structure
 ///
 typedef struct {
