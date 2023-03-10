@@ -1388,8 +1388,7 @@
   #  OEM Reserved       0x4000000000000000<BR>
   #  OS Reserved        0x8000000000000000<BR>
   #
-  # NOTE: User must NOT set NX protection for EfiLoaderCode / EfiBootServicesCode / EfiRuntimeServicesCode. <BR>
-  #       User MUST set the same NX protection for EfiBootServicesData and EfiConventionalMemory. <BR>
+  # NOTE: User MUST set the same NX protection for EfiBootServicesData and EfiConventionalMemory. <BR>
   #
   # e.g. 0x7FD5 can be used for all memory except Code. <BR>
   # e.g. 0x7BD4 can be used for all memory except Code and ACPINVS/Reserved. <BR>

@@ -557,6 +557,35 @@ Finish:
 }
 
 /**
+  Return the EFI memory permission attribute associated with memory
+  type 'MemoryType' under the configured DXE memory protection policy.
+
+  @param MemoryType       Memory type.
+**/
+STATIC
+UINT64
+GetPermissionAttributeForMemoryType (
+  IN EFI_MEMORY_TYPE  MemoryType
+  )
+{
+  UINT64  TestBit;
+
+  if ((UINT32)MemoryType >= MEMORY_TYPE_OS_RESERVED_MIN) {
+    TestBit = BIT63;
+  } else if ((UINT32)MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) {
+    TestBit = BIT62;
+  } else {
+    TestBit = LShiftU64 (1, MemoryType);
+  }
+
+  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
+    return EFI_MEMORY_XP;
+  } else {
+    return 0;
+  }
+}
+
+/**
   Unprotect UEFI image.
 
   @param[in]  LoadedImage              The loaded image protocol
@@ -587,7 +616,7 @@ UnprotectUefiImage (
         SetUefiImageMemoryAttributes (
           ImageRecord->ImageBase,
           ImageRecord->ImageSize,
-          0
+          GetPermissionAttributeForMemoryType (LoadedImage->ImageCodeType)
           );
         FreeImageRecord (ImageRecord);
         return;
@@ -597,31 +626,25 @@ UnprotectUefiImage (
 }
 
 /**
-  Return the EFI memory permission attribute associated with memory
-  type 'MemoryType' under the configured DXE memory protection policy.
+  Return the EFI memory permission attribute to be used for regions of type
+  'MemoryType' when performing the initial remap of all active regions. This
+  takes into account that code regions should be disregarded in this case.
 
   @param MemoryType       Memory type.
 **/
 STATIC
 UINT64
-GetPermissionAttributeForMemoryType (
+GetInitialPermissionAttributeForMemoryType (
   IN EFI_MEMORY_TYPE  MemoryType
   )
 {
-  UINT64  TestBit;
-
-  if ((UINT32)MemoryType >= MEMORY_TYPE_OS_RESERVED_MIN) {
-    TestBit = BIT63;
-  } else if ((UINT32)MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) {
-    TestBit = BIT62;
-  } else {
-    TestBit = LShiftU64 (1, MemoryType);
-  }
-
-  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
-    return EFI_MEMORY_XP;
-  } else {
-    return 0;
+  switch (MemoryType) {
+    case EfiBootServicesCode:
+    case EfiRuntimeServicesCode:
+    case EfiLoaderCode:
+      return 0;
+    default:
+      return GetPermissionAttributeForMemoryType (MemoryType);
   }
 }
 
@@ -702,10 +725,10 @@ MergeMemoryMapForProtectionPolicy (
 
     do {
       MemoryBlockLength = (UINT64)(EFI_PAGES_TO_SIZE ((UINTN)MemoryMapEntry->NumberOfPages));
-      Attributes        = GetPermissionAttributeForMemoryType (MemoryMapEntry->Type);
+      Attributes        = GetInitialPermissionAttributeForMemoryType (MemoryMapEntry->Type);
 
-      if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
-          (Attributes == GetPermissionAttributeForMemoryType (NextMemoryMapEntry->Type)) &&
+      if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) && (Attributes != 0) &&
+          (Attributes == GetInitialPermissionAttributeForMemoryType (NextMemoryMapEntry->Type)) &&
           ((MemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart))
       {
         MemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
@@ -832,7 +855,7 @@ InitializeDxeNxMemoryProtectionPolicy (
   MemoryMapEntry = MemoryMap;
   MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + MemoryMapSize);
   while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
-    Attributes = GetPermissionAttributeForMemoryType (MemoryMapEntry->Type);
+    Attributes = GetInitialPermissionAttributeForMemoryType (MemoryMapEntry->Type);
     if (Attributes != 0) {
       SetUefiImageMemoryAttributes (
         MemoryMapEntry->PhysicalStart,
@@ -1130,13 +1153,9 @@ CoreInitializeMemoryProtection (
 
   //
   // Sanity check the PcdDxeNxMemoryProtectionPolicy setting:
-  // - code regions should have no EFI_MEMORY_XP attribute
   // - EfiConventionalMemory and EfiBootServicesData should use the
   //   same attribute
   //
-  ASSERT ((GetPermissionAttributeForMemoryType (EfiBootServicesCode) & EFI_MEMORY_XP) == 0);
-  ASSERT ((GetPermissionAttributeForMemoryType (EfiRuntimeServicesCode) & EFI_MEMORY_XP) == 0);
-  ASSERT ((GetPermissionAttributeForMemoryType (EfiLoaderCode) & EFI_MEMORY_XP) == 0);
   ASSERT (
     GetPermissionAttributeForMemoryType (EfiBootServicesData) ==
     GetPermissionAttributeForMemoryType (EfiConventionalMemory)
