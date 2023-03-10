@@ -76,7 +76,12 @@ InvalidateInstructionCacheRange (
   IN UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __FUNCTION__));
+  DEBUG (
+    (DEBUG_WARN,
+     "%a:RISC-V unsupported function.\n"
+     "Invalidating the whole instruction cache instead.\n", __func__)
+    );
+  InvalidateInstructionCache ();
   return Address;
 }
 
