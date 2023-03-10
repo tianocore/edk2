@@ -879,6 +879,12 @@ PiCpuSmmEntry (
     //
     BufferPages = EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1));
     Buffer      = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
+    if (Buffer == NULL) {
+      DEBUG ((DEBUG_ERROR, "Failed to allocate %d pages.\n", BufferPages));
+      CpuDeadLoop ();
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     ASSERT (Buffer != NULL);
     DEBUG ((DEBUG_INFO, "New Allcoated SMRAM SaveState Buffer (0x%08x, 0x%08x)\n", Buffer, EFI_PAGES_TO_SIZE (BufferPages)));
   }
