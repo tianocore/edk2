@@ -373,11 +373,63 @@ ProtectUefiImage (
   }
 
   ProtectionPolicy = GetUefiImageProtectionPolicy (LoadedImage, LoadedImageDevicePath);
+
+  ImageAddress = LoadedImage->ImageBase;
+
+  PdbPointer = PeCoffLoaderGetPdbPointer ((VOID *)(UINTN)ImageAddress);
+  if (PdbPointer != NULL) {
+    DEBUG ((DEBUG_VERBOSE, "  Image - %a\n", PdbPointer));
+  }
+
   switch (ProtectionPolicy) {
-    case DO_NOT_PROTECT:
-      return EFI_SUCCESS;
     case PROTECT_IF_ALIGNED_ELSE_ALLOW:
-      break;
+      //
+      // Check PE/COFF image
+      //
+      DosHdr             = (EFI_IMAGE_DOS_HEADER *)(UINTN)ImageAddress;
+      PeCoffHeaderOffset = 0;
+      if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+        PeCoffHeaderOffset = DosHdr->e_lfanew;
+      }
+
+      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINT8 *)(UINTN)ImageAddress + PeCoffHeaderOffset);
+      if (Hdr.Pe32->Signature != EFI_IMAGE_NT_SIGNATURE) {
+        DEBUG ((DEBUG_INFO, "Hdr.Pe32->Signature invalid - 0x%x\n", Hdr.Pe32->Signature));
+        // It might be image in SMM.
+      } else {
+        //
+        // Get SectionAlignment
+        //
+        if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+          SectionAlignment = Hdr.Pe32->OptionalHeader.SectionAlignment;
+        } else {
+          SectionAlignment = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
+        }
+
+        if (SectionAlignment >= EFI_PAGE_SIZE) {
+          break;
+        }
+
+        DEBUG ((
+          DEBUG_VERBOSE,
+          "!!!!!!!!  ProtectUefiImageCommon - Section Alignment(0x%x) is incorrect  !!!!!!!!\n",
+          SectionAlignment
+          ));
+      }
+
+    // fall through to unprotect image if needed
+    case DO_NOT_PROTECT:
+      if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) &
+           LShiftU64 (1, LoadedImage->ImageCodeType)) != 0)
+      {
+        SetUefiImageMemoryAttributes (
+          (UINTN)LoadedImage->ImageBase,
+          (LoadedImage->ImageSize + EFI_PAGE_MASK) & ~(UINT64)EFI_PAGE_MASK,
+          0
+          );
+      }
+
+      return EFI_SUCCESS;
     default:
       ASSERT (FALSE);
       return EFI_SUCCESS;
@@ -395,47 +447,6 @@ ProtectUefiImage (
   //
   ImageRecord->ImageBase = (EFI_PHYSICAL_ADDRESS)(UINTN)LoadedImage->ImageBase;
   ImageRecord->ImageSize = LoadedImage->ImageSize;
-
-  ImageAddress = LoadedImage->ImageBase;
-
-  PdbPointer = PeCoffLoaderGetPdbPointer ((VOID *)(UINTN)ImageAddress);
-  if (PdbPointer != NULL) {
-    DEBUG ((DEBUG_VERBOSE, "  Image - %a\n", PdbPointer));
-  }
-
-  //
-  // Check PE/COFF image
-  //
-  DosHdr             = (EFI_IMAGE_DOS_HEADER *)(UINTN)ImageAddress;
-  PeCoffHeaderOffset = 0;
-  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-    PeCoffHeaderOffset = DosHdr->e_lfanew;
-  }
-
-  Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINT8 *)(UINTN)ImageAddress + PeCoffHeaderOffset);
-  if (Hdr.Pe32->Signature != EFI_IMAGE_NT_SIGNATURE) {
-    DEBUG ((DEBUG_VERBOSE, "Hdr.Pe32->Signature invalid - 0x%x\n", Hdr.Pe32->Signature));
-    // It might be image in SMM.
-    goto Finish;
-  }
-
-  //
-  // Get SectionAlignment
-  //
-  if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    SectionAlignment = Hdr.Pe32->OptionalHeader.SectionAlignment;
-  } else {
-    SectionAlignment = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
-  }
-
-  if (SectionAlignment < EFI_PAGE_SIZE) {
-    DEBUG ((
-      DEBUG_VERBOSE,
-      "!!!!!!!!  ProtectUefiImageCommon - Section Alignment(0x%x) is incorrect  !!!!!!!!\n",
-      SectionAlignment
-      ));
-    goto Finish;
-  }
 
   Section = (EFI_IMAGE_SECTION_HEADER *)(
                                          (UINT8 *)(UINTN)ImageAddress +
