@@ -101,7 +101,7 @@
 #string STR_DH_OUTPUT_GUID_HEADER #language en-US "Handle dump by protocol '%g'\r\n"
 #string STR_DH_OUTPUT_NAME_HEADER #language en-US "Handle dump by protocol '%s'\r\n"
 #string STR_DH_OUTPUT_SINGLE_D    #language en-US "%H%02x%N: %s\r\n"
-#string STR_DH_OUTPUT_SINGLE      #language en-US "%H%02x%N: %x\r\n%s"
+#string STR_DH_OUTPUT_SINGLE      #language en-US "%H%02x%N: %p\r\n%s"
 #string STR_DH_OUTPUT_SFO         #language en-US "%s, %s, %s, %H%02x%N, %s, %s\r\n"
 #string STR_DH_OUTPUT_DRIVER1     #language en-US "   Controller Name    : %H%s%N\r\n"
 #string STR_DH_OUTPUT_DRIVER2     #language en-US "   Device Path        : %H%s%N\r\n"
@@ -128,18 +128,6 @@
 #string STR_DEV_TREE_OUTPUT       #language en-US "Ctrl[%H%02x%N] %s\r\n"
 
 #string STR_UNLOAD_CONF           #language en-US "%HUnload%N - Handle [%H%02x%N].  [y/n]?\r\n"
-#string STR_UNLOAD_VERBOSE        #language en-US ""
-"Handle [%H%02x%N] (%08x)\r\n"
-"  Image (%08x)\r\n"
-"    ParentHandle..: %08x\r\n"
-"    SystemTable...: %08x\r\n"
-"    DeviceHandle..: %08x\r\n"
-"    FilePath......: %s\r\n"
-"    PDBFileName...: %a\r\n"
-"    ImageBase.....: %08x\r\n"
-"    ImageSize.....: %Ld\r\n"
-"    CodeType......: %s\r\n"
-"    DataType......: %s\r\n"
 
 #string STR_OPENINFO_HEADER_LINE  #language en-US "Handle %H%02x%N (%H%0p%N)\r\n"
 #string STR_OPENINFO_LINE         #language en-US "  Drv[%H%02x%N] Ctrl[%H%02x%N] Cnt(%H%02x%N) %H%s Image%N(%s)\r\n"
@@ -734,20 +722,3 @@
 "                             violation.\r\n"
 "  SHELL_INVALID_PARAMETER    One of the passed in parameters was incorrectly\r\n"
 "                             formatted or its value was out of bounds.\r\n"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

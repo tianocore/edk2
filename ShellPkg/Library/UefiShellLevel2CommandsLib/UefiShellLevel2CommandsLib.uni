@@ -134,7 +134,7 @@
 
 #string STR_LOAD_NOT_IMAGE        #language en-US "Image '%s' is not an image.\r\n"
 #string STR_LOAD_NOT_DRIVER       #language en-US "Image '%s' is not a driver.\r\n"
-#string STR_LOAD_LOADED           #language en-US "Image '%s' loaded at %x - %r\r\n"
+#string STR_LOAD_LOADED           #language en-US "Image '%s' loaded at %p - %r\r\n"
 #string STR_LOAD_ERROR            #language en-US "Image '%s' error in StartImage: %r\r\n"
 
 #string STR_LS_LINE_START_ALL     #language en-US "%t %5s %1c % ,L11d  "
@@ -1076,4 +1076,3 @@
 "  SHELL_SECURITY_VIOLATION   This function was not performed due to a security\r\n"
 "                             violation.\r\n"
 "  SHELL_NOT_FOUND            The target file-system was not found.\r\n"
-
