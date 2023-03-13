@@ -1356,10 +1356,6 @@
   #    BIT0       - Image from unknown device. <BR>
   #    BIT1       - Image from firmware volume.<BR>
   #  <BR>
-  #  Note: If a bit is cleared, the data section could be still non-executable if
-  #  PcdDxeNxMemoryProtectionPolicy is enabled for EfiLoaderData, EfiBootServicesData
-  #  and/or EfiRuntimeServicesData.<BR>
-  #  <BR>
   # @Prompt Set image protection policy.
   # @ValidRange 0x80000002 | 0x00000000 - 0x0000001F
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000002|UINT32|0x00001047
