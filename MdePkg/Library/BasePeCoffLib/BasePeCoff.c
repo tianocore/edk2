@@ -308,10 +308,11 @@ PeCoffLoaderGetPeHeader (
       //
       // Use PE32 offset
       //
-      ImageContext->ImageType        = Hdr.Pe32->OptionalHeader.Subsystem;
-      ImageContext->ImageSize        = (UINT64)Hdr.Pe32->OptionalHeader.SizeOfImage;
-      ImageContext->SectionAlignment = Hdr.Pe32->OptionalHeader.SectionAlignment;
-      ImageContext->SizeOfHeaders    = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
+      ImageContext->ImageType          = Hdr.Pe32->OptionalHeader.Subsystem;
+      ImageContext->ImageSize          = (UINT64)Hdr.Pe32->OptionalHeader.SizeOfImage;
+      ImageContext->SectionAlignment   = Hdr.Pe32->OptionalHeader.SectionAlignment;
+      ImageContext->SizeOfHeaders      = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
+      ImageContext->DllCharacteristics = Hdr.Pe32->OptionalHeader.DllCharacteristics;
     } else if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
       //
       // 1. Check FileHeader.NumberOfRvaAndSizes filed.
@@ -429,10 +430,11 @@ PeCoffLoaderGetPeHeader (
       //
       // Use PE32+ offset
       //
-      ImageContext->ImageType        = Hdr.Pe32Plus->OptionalHeader.Subsystem;
-      ImageContext->ImageSize        = (UINT64)Hdr.Pe32Plus->OptionalHeader.SizeOfImage;
-      ImageContext->SectionAlignment = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
-      ImageContext->SizeOfHeaders    = Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders;
+      ImageContext->ImageType          = Hdr.Pe32Plus->OptionalHeader.Subsystem;
+      ImageContext->ImageSize          = (UINT64)Hdr.Pe32Plus->OptionalHeader.SizeOfImage;
+      ImageContext->SectionAlignment   = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
+      ImageContext->SizeOfHeaders      = Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders;
+      ImageContext->DllCharacteristics = Hdr.Pe32Plus->OptionalHeader.DllCharacteristics;
     } else {
       ImageContext->ImageError = IMAGE_ERROR_INVALID_MACHINE_TYPE;
       return RETURN_UNSUPPORTED;
@@ -545,8 +547,9 @@ PeCoffLoaderGetPeHeader (
   Retrieves information about a PE/COFF image.
 
   Computes the PeCoffHeaderOffset, IsTeImage, ImageType, ImageAddress, ImageSize,
-  DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and
-  DebugDirectoryEntryRva fields of the ImageContext structure.
+  DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders,
+  DllCharacteristics, and DebugDirectoryEntryRva fields of the ImageContext
+  structure.
   If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.
   If the PE/COFF image accessed through the ImageRead service in the ImageContext
   structure is not a supported PE/COFF image type, then return RETURN_UNSUPPORTED.

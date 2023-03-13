@@ -171,6 +171,10 @@ typedef struct {
   ///
   UINT16                      ImageType;
   ///
+  /// Set by PeCoffLoaderGetImageInfo() to the DLL flags stored in the PE/COFF header.
+  ///
+  UINT16                      DllCharacteristics;
+  ///
   /// Set by PeCoffLoaderGetImageInfo() to TRUE if the PE/COFF image does not contain
   /// relocation information.
   ///
