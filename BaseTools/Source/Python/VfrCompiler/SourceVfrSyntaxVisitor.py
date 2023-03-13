@@ -550,6 +550,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             pNode, ReturnCode = gVfrDefaultStore.ReRegisterDefaultStoreById(DefaultId, RefName, DefaultStoreNameId)
             self.ErrorHandler(ReturnCode, Line)
             ctx.Node.OpCode = EFI_IFR_SHOWN_DEFAULTSTORE_OP # For display in YAML
+            DSObj.SetDefaultId (DefaultId)
             ctx.Node.Data = DSObj
         return ctx.Node
 
@@ -579,7 +580,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             self.CompareErrorHandler(VarStoreId!=0, True, Tok.line, Tok.text, 'varid 0 is not allowed.')
         StoreName = ctx.SN.text
         VSObj = IfrVarStore(TypeName, StoreName)
-        Line = ctx.start.line   
+        Line = ctx.start.line
         VSObj.SetLineNo(Line)
         VSObj.SetHasVarStoreId(ctx.VarId() != None)
         Guid = self.PreProcessDB.Read(ctx.SG.text)
@@ -1534,7 +1535,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             R3Obj.SetFormSetId(FormSetGuid)
             GObj = R3Obj
 
-        elif ctx.FormId() != None:
+        elif ctx.Question() != None:
             if ctx.NF3 != None:
                 FId = self.TransNum(ctx.NF3.text)
             else:

@@ -28,7 +28,6 @@ EFI_BITS_PER_UINT32 = (1 << EFI_BITS_SHIFT_PER_UINT32)
 EFI_FREE_VARSTORE_ID_BITMAP_SIZE = int(
     (EFI_VARSTORE_ID_MAX + 1) / EFI_BITS_PER_UINT32)
 
-
 class SVfrPackStackNode(object):
 
     def __init__(self, Identifier, Number):

@@ -306,6 +306,7 @@ class VfrCompiler():
         if self.Options.VfrBaseFileName == None:
             return -1
         self.Options.ProcessedYAMLFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Processed.yml'
+        self.Options.CompiledYAMLFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Compiled.yml'
         return 0
 
     def SetExpandedHeaderFileName(self):
@@ -436,6 +437,9 @@ class VfrCompiler():
     def CompileYaml(self): # wip
         self.YamlTree.Compile()
 
+    def ConsumeDLT(self):
+        self.YamlTree.ConsumeDLT()
+
     def SET_RUN_STATUS(self, Status):
         self.RunStatus = Status
 
@@ -468,11 +472,12 @@ def main():
     # Compiler.GenBinaryFiles()
 
     # Extended Features
-    #Compiler.DumpYaml()
-    #Compiler.DumpJson()
+    Compiler.DumpYaml()
+    Compiler.DumpJson()
+
     Compiler.PreProcessYaml()
-    #Compiler.UpdateYamlWithDLT()
     Compiler.CompileYaml()
+    Compiler.ConsumeDLT()
 
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:

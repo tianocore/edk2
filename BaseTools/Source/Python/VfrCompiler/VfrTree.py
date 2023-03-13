@@ -16,12 +16,12 @@ BUILD_VERSION = 'Developer Build based on Revision: Unknown'
 
 class VfrTreeNode():
 
-    def __init__(self, OpCode=None, Data=None, Buffer=None, ID=None) -> None:
+    def __init__(self, OpCode=None, Data=None, Buffer=None, Position=None) -> None:
 
         self.OpCode = OpCode
         self.Data = Data
         self.Buffer = Buffer
-        self.ID = None
+        self.Position = Position
         self.Condition = None
         self.Expression = None
         self.Dict = {}
@@ -29,6 +29,7 @@ class VfrTreeNode():
         self.Parent = None
         self.Child = []
         self.Level = -1
+
 
     def hasCondition(self) -> bool:
         if self.Condition == None:
@@ -211,6 +212,9 @@ class VfrTree():
                                 "File write failed for %s" % LstFile, None)
 
     def _GenBinaryFilesDfs(self, Root, Hpk, C, RecordLines):
+        if Root == None:
+            return
+
         if Root.OpCode != None:
 
             if Root.OpCode in ExpOps:
@@ -310,6 +314,9 @@ class VfrTree():
                             "File open failed for %s" % FileName, None)
 
     def _GenBinaryDfs(self, Root, f):
+        if Root == None:
+            return
+
         if Root.OpCode != None:
             if Root.OpCode in ExpOps:
                 # The Data is likely to be modified, so generate buffer here
@@ -362,6 +369,8 @@ class VfrTree():
                             "File open failed for %s" % FileName, None)
 
     def _GenCFileDfs(self, Root, Length, f):
+        if Root == None:
+            return
         if Root.OpCode != None:
             if Root.Buffer != None:
                 try:
@@ -432,6 +441,8 @@ class VfrTree():
                 "VfrCompiler", FILE_WRITE_FAILURE, "File write failed for %s" % FileName)
 
     def _GenRecordListFileDfs(self, Root, RecordLines):
+        if Root == None:
+            return
         if Root.OpCode != None:
             #f.write('{}\n'.format(type(Root.Data)))
             LineBuffer = ''
@@ -587,7 +598,7 @@ class VfrTree():
                             "File open failed for %s" % FileName, None)
 
     def DumpProcessedYaml(self):
-        FileName = self.Options.ProcessedYAMLFileName
+        FileName = self.Options.CompiledYAMLFileName
         try:
             with open(FileName, 'w') as f:
                 f.write('## DO NOT REMOVE -- VFR Mode\n')
@@ -641,6 +652,8 @@ class VfrTree():
 
     def _DumpYamlDfsWithUni(self, Root, f):
         try:
+            if Root == None:
+                return
             if Root.OpCode != None:
                 if Root.Level == 0:
                     KeyIndent = ''
@@ -728,12 +741,11 @@ class VfrTree():
                     f.write(KeyIndent + '- defaultstore:\n')
                     f.write(ValueIndent + 'type:  {}\n'.format(Root.Data.Type))
                     f.write(ValueIndent + 'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n' )
-                    if Root.Data.HasAttr:
-                        if 'attribute' in Root.Dict.keys():
-                            f.write(ValueIndent +
+                    if 'attribute' in Root.Dict.keys():
+                        f.write(ValueIndent +
                                     'attribute:  ' + Root.Dict['attribute'].Key + ') # Default ID, Optional input\n')
-                        else:
-                            f.write(ValueIndent + 'attribute:  {} # Default ID, Optional input\n'.format('0x%04x' % (Info.DefaultId)))
+                    else:
+                        f.write(ValueIndent + 'attribute:  {} # Default ID, Optional input\n'.format('0x%04x' % (Info.DefaultId)))
 
                 if Root.OpCode == EFI_IFR_FORM_OP:
                     f.write(KeyIndent + '- form: \n')
@@ -888,18 +900,23 @@ class VfrTree():
                                 Root.Condition))
 
                     if type(Root.Data) == IfrDefault:
-                        if Root.Data.ValueStream != '':
-                            f.write(ValueIndent + 'value:  {}\n'.format(Root.Data.ValueStream))
-
+                        Str = Root.Data.ValueStream
+                        if Str != '':
+                            Str = Str.replace('{', '[').replace('}', ']')
+                            if Str.find(':') != -1 or Str.find('/') != -1 or Str.find(';') != -1:
+                                Str = '(' + Str + ')'
+                            f.write(ValueIndent + 'value:  {}\n'.format(Str))
+                        '''
                         else:
                             f.write(ValueIndent + 'value:  {')
                             for i in range(0, len(Info.Value) - 1):
                                 f.write('{},'.format(Info.Value[i]))
                             f.write('{}'.format(Info.Value[len(Info.Value) -
                                                            1]) + '}\n')
+                        '''
 
                     elif type(Root.Data) == IfrDefault2:
-                        f.write(ValueIndent + 'value: \'{}\'\n'.format(
+                        f.write(ValueIndent + 'value2: \'{}\'\n'.format(
                             Root.Child[0].Expression))
 
                     if Root.Data.DefaultStore != '':
@@ -1038,6 +1055,7 @@ class VfrTree():
                         #f.write(ValueIndent + 'question:  ' + HeaderDict[Info.Question.QuestionId] + ' #  Optional Input\n')
 
                     self._DumpQuestionInfosWithUni(Root, f, ValueIndent)
+
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1204,6 +1222,26 @@ class VfrTree():
                                 Root.Condition))
                     f.write(KeyIndent + '- locked: null\n')
 
+                if Root.OpCode == EFI_IFR_SUPPRESS_IF_OP:
+                    f.write(KeyIndent + '- suppressif:\n')
+                    f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
+                                Root.Condition))
+
+                if Root.OpCode == EFI_IFR_DISABLE_IF_OP:
+                    f.write(KeyIndent + '- disableif:\n')
+                    f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
+                                Root.Condition))
+
+                if Root.OpCode == EFI_IFR_GRAY_OUT_IF_OP:
+                    f.write(KeyIndent + '- grayoutif:\n')
+                    f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
+                                Root.Condition))
+
+                if Root.OpCode == EFI_IFR_INCONSISTENT_IF_OP:
+                    f.write(KeyIndent + '- inconsistentif:\n')
+                    f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
+                                Root.Condition))
+
             self.LastOp = Root.OpCode
 
         except:
@@ -1255,7 +1293,8 @@ class VfrTree():
                         .format('0x%04x' % (Info.Question.Header.Prompt)))
         f.write(ValueIndent + 'help:  {}  # Statement Help STRING_ID\n'.
                         format('0x%04x' % (Info.Question.Header.Help)))
-        f.write(ValueIndent + 'opcodeflags:  {}  # optional input\n'.format('0x%x' % (Info.Flags)))
+        if Root.OpCode != EFI_IFR_REF_OP:
+            f.write(ValueIndent + 'opcodeflags:  {}  # optional input\n'.format('0x%x' % (Info.Flags)))
 
     def _DumpYamlDfs(self, Root, f):
         try:
@@ -1535,13 +1574,22 @@ class VfrTree():
                     if type(Root.Data) == IfrDefault:
                         if Root.Data.ValueStream != '':
                             f.write(ValueIndent + 'value:  {}\n'.format(Root.Data.ValueStream))
-
+                        '''
+                        #f.write(ValueIndent + 'value:  {}\n' .format(Root.Data.GetInfo().Value))
+                        if len(Info.Value) == 1:
+                            if type(Info.Value) == int:
+                                f.write('{},'.format(Info.Value[0]))
+                            if type(Info.Value) == EFI_HII_TIME:
+                                f.write('{}:{}:{},'.format(Info.Value[0].Hour, Info.Value[0].Minute, Info.Value[0].Second))
+                            if type(Info.Value) == EFI_HII_DATE:
+                                f.write('{}/{}/{},'.format(Info.Value[0].Year, Info.Value[0].Month, Info.Value[0].Day))
                         else:
-                            f.write(ValueIndent + 'value:  {')
+                            f.write(ValueIndent + 'value:  [')
                             for i in range(0, len(Info.Value) - 1):
                                 f.write('{},'.format(Info.Value[i]))
                             f.write('{}'.format(Info.Value[len(Info.Value) -
-                                                           1]) + '}\n')
+                                                            1]) + ']\n')
+                        '''
 
                     elif type(Root.Data) == IfrDefault2:
                         f.write(ValueIndent + 'value2: \'{}\'\n'.format(

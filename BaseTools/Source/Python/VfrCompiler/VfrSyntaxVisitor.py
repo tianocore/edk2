@@ -524,7 +524,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             pNode, ReturnCode = gVfrDefaultStore.ReRegisterDefaultStoreById(DefaultId, RefName, DefaultStoreNameId)
             self.ErrorHandler(ReturnCode, Line)
             ctx.Node = None
-
         return ctx.Node
 
 
@@ -831,8 +830,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_FATAL_ERROR, ctx.start.line)
 
         self.CurrQestVarInfo = ctx.BaseInfo
-        if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
-            print(self.CurrQestVarInfo.VarType)
 
         if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
             #need to further update the VarType
@@ -852,8 +849,6 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             ctx.Node.Data.SetHasQuestionId(ctx.QuestionId() != None)
             if ctx.BaseInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
                 ctx.Node.Data.SetVarStoreInfo(ctx.BaseInfo)
-        if ctx.Node.OpCode == EFI_IFR_ONE_OF_OP:
-            print(self.CurrQestVarInfo.VarType)
 
         return ctx.Node
 
@@ -1433,7 +1428,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             R3Obj.SetQId(QId)
             GObj = R3Obj
 
-        elif ctx.FormId() != None:
+        elif ctx.Question() != None:
             FId = self.TransNum(ctx.Number(0))
             RefType = 2
             if ctx.QN != None:

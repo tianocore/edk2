@@ -36,6 +36,8 @@ class Options():
         self.UniStrDefFileName = None
         self.ExpandedHeaderFileName = None # save header info for yaml
         self.ProcessedYAMLFileName = None
+        self.CompiledYAMLFileName = None
+        self.DeltaFileName = None
         self.CompileYaml = True
 
 

@@ -201,6 +201,8 @@ class FormPkg():
         return PkgHdr
 
     def BuildPkg(self, Root):
+        if Root == None:
+            return
         if Root.OpCode != None and Root.OpCode != EFI_IFR_SHOWN_DEFAULTSTORE_OP:
             self.PkgLength += Root.Data.GetInfo().Header.Length
             Root.Offset = gFormPkg.Offset #
@@ -948,6 +950,12 @@ class IfrFormId():
     FormIdBitMap = []
     for i in range(0, EFI_FREE_FORM_ID_BITMAP_SIZE):
         FormIdBitMap.append(0)
+
+    @classmethod
+    def Clear(cls):
+        cls.FormIdBitMap = []
+        for i in range(0, EFI_FREE_FORM_ID_BITMAP_SIZE):
+            cls.FormIdBitMap.append(0)
 
     @classmethod
     def CheckFormIdFree(cls, FormId):
