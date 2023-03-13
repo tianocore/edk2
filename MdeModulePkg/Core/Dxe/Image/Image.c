@@ -270,7 +270,8 @@ CoreInitializeImageServices (
 
   InitializeListHead (&mAvailableEmulators);
 
-  ProtectUefiImage (&Image->Info, Image->LoadedImageDevicePath);
+  Status = ProtectUefiImage (&Image->Info, Image->LoadedImageDevicePath);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
@@ -1448,7 +1449,10 @@ CoreLoadImageCommon (
     }
   }
 
-  ProtectUefiImage (&Image->Info, Image->LoadedImageDevicePath);
+  Status = ProtectUefiImage (&Image->Info, Image->LoadedImageDevicePath);
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
 
   //
   // Success.  Return the image handle

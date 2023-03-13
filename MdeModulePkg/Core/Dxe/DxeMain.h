@@ -2733,8 +2733,12 @@ RemoveImageRecord (
 
   @param[in]  LoadedImage              The loaded image protocol
   @param[in]  LoadedImageDevicePath    The loaded image device path protocol
+
+  @return EFI_SUCCESS       Image protection was configured according to the
+                            applicable policy.
+  @return other             Image protection could not be applied.
 **/
-VOID
+EFI_STATUS
 ProtectUefiImage (
   IN EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage,
   IN EFI_DEVICE_PATH_PROTOCOL   *LoadedImageDevicePath

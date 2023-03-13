@@ -341,8 +341,12 @@ FreeImageRecord (
 
   @param[in]  LoadedImage              The loaded image protocol
   @param[in]  LoadedImageDevicePath    The loaded image device path protocol
+
+  @return EFI_SUCCESS       Image protection was configured according to the
+                            applicable policy.
+  @return other             Image protection could not be applied.
 **/
-VOID
+EFI_STATUS
 ProtectUefiImage (
   IN EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage,
   IN EFI_DEVICE_PATH_PROTOCOL   *LoadedImageDevicePath
@@ -365,23 +369,23 @@ ProtectUefiImage (
   DEBUG ((DEBUG_INFO, "  - 0x%016lx - 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)LoadedImage->ImageBase, LoadedImage->ImageSize));
 
   if (gCpuSetMemoryAttributes == NULL) {
-    return;
+    return EFI_SUCCESS;
   }
 
   ProtectionPolicy = GetUefiImageProtectionPolicy (LoadedImage, LoadedImageDevicePath);
   switch (ProtectionPolicy) {
     case DO_NOT_PROTECT:
-      return;
+      return EFI_SUCCESS;
     case PROTECT_IF_ALIGNED_ELSE_ALLOW:
       break;
     default:
       ASSERT (FALSE);
-      return;
+      return EFI_SUCCESS;
   }
 
   ImageRecord = AllocateZeroPool (sizeof (*ImageRecord));
   if (ImageRecord == NULL) {
-    return;
+    return EFI_SUCCESS;
   }
 
   ImageRecord->Signature = IMAGE_PROPERTIES_RECORD_SIGNATURE;
@@ -481,7 +485,7 @@ ProtectUefiImage (
       //
       ImageRecordCodeSection = AllocatePool (sizeof (*ImageRecordCodeSection));
       if (ImageRecordCodeSection == NULL) {
-        return;
+        return EFI_SUCCESS;
       }
 
       ImageRecordCodeSection->Signature = IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE;
@@ -538,7 +542,7 @@ ProtectUefiImage (
   InsertTailList (&mProtectedImageRecordList, &ImageRecord->Link);
 
 Finish:
-  return;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -988,7 +992,8 @@ MemoryProtectionCpuArchProtocolNotify (
       LoadedImageDevicePath = NULL;
     }
 
-    ProtectUefiImage (LoadedImage, LoadedImageDevicePath);
+    Status = ProtectUefiImage (LoadedImage, LoadedImageDevicePath);
+    ASSERT_EFI_ERROR (Status);
   }
 
   FreePool (HandleBuffer);
