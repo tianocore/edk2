@@ -1519,8 +1519,8 @@ CoreAllocatePages (
   @return EFI_SUCCESS         -Pages successfully freed.
 
 **/
+STATIC
 EFI_STATUS
-EFIAPI
 CoreInternalFreePages (
   IN EFI_PHYSICAL_ADDRESS  Memory,
   IN UINTN                 NumberOfPages,
@@ -1573,6 +1573,13 @@ CoreInternalFreePages (
 
   NumberOfPages += EFI_SIZE_TO_PAGES (Alignment) - 1;
   NumberOfPages &= ~(EFI_SIZE_TO_PAGES (Alignment) - 1);
+
+  ApplyMemoryProtectionPolicy (
+    Entry->Type,
+    EfiConventionalMemory,
+    Memory,
+    EFI_PAGES_TO_SIZE (NumberOfPages)
+    );
 
   if (MemoryType != NULL) {
     *MemoryType = Entry->Type;
@@ -1628,12 +1635,6 @@ CoreFreePages (
       NULL
       );
     InstallMemoryAttributesTableOnMemoryAllocation (MemoryType);
-    ApplyMemoryProtectionPolicy (
-      MemoryType,
-      EfiConventionalMemory,
-      Memory,
-      EFI_PAGES_TO_SIZE (NumberOfPages)
-      );
   }
 
   return Status;
