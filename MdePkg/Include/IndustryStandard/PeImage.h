@@ -109,6 +109,21 @@ typedef struct {
 #define EFI_IMAGE_FILE_BYTES_REVERSED_HI    BIT15    ///< 0x8000  Bytes of machine word are reversed.
 
 ///
+/// DLL Characteristics
+///
+#define EFI_IMAGE_DLLCHARACTERISTICS_HIGH_ENTROPY_VA        BIT5   ///< 0x0020 Image can handle a high entropy 64-bit VA space.
+#define EFI_IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE           BIT6   ///< 0x0040 DLL can be relocated at load time.
+#define EFI_IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY        BIT7   ///< 0x0080 Code Integrity checks are enforced.
+#define EFI_IMAGE_DLLCHARACTERISTICS_NX_COMPAT              BIT8   ///< 0x0100 Image is NX compatible.
+#define EFI_IMAGE_DLLCHARACTERISTICS_NO_ISOLATION           BIT9   ///< 0x0200 Isolation aware, but do not isolate the image.
+#define EFI_IMAGE_DLLCHARACTERISTICS_NO_SEH                 BIT10  ///< 0x0400 Does not use structured exception (SE) handling.
+#define EFI_IMAGE_DLLCHARACTERISTICS_NO_BIND                BIT11  ///< 0x0800 Do not bind the image.
+#define EFI_IMAGE_DLLCHARACTERISTICS_APPCONTAINER           BIT12  ///< 0x1000 Image must execute in an AppContainer.
+#define EFI_IMAGE_DLLCHARACTERISTICS_WDM_DRIVER             BIT13  ///< 0x2000 A WDM driver.
+#define EFI_IMAGE_DLLCHARACTERISTICS_GUARD_CF               BIT14  ///< 0x4000 Image supports Control Flow Guard.
+#define EFI_IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE  BIT15  ///< 0x8000 Terminal Server aware.
+
+///
 /// Header Data Directories.
 ///
 typedef struct {
