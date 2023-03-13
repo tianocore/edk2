@@ -364,6 +364,7 @@ ProtectUefiImage (
   CHAR8                                 *PdbPointer;
   IMAGE_PROPERTIES_RECORD_CODE_SECTION  *ImageRecordCodeSection;
   UINT32                                ProtectionPolicy;
+  UINT16                                DllCharacteristics;
 
   DEBUG ((DEBUG_INFO, "ProtectUefiImageCommon - 0x%x\n", LoadedImage));
   DEBUG ((DEBUG_INFO, "  - 0x%016lx - 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)LoadedImage->ImageBase, LoadedImage->ImageSize));
@@ -401,9 +402,34 @@ ProtectUefiImage (
         // Get SectionAlignment
         //
         if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-          SectionAlignment = Hdr.Pe32->OptionalHeader.SectionAlignment;
+          SectionAlignment   = Hdr.Pe32->OptionalHeader.SectionAlignment;
+          DllCharacteristics = Hdr.Pe32->OptionalHeader.DllCharacteristics;
         } else {
-          SectionAlignment = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
+          SectionAlignment   = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
+          DllCharacteristics = Hdr.Pe32Plus->OptionalHeader.DllCharacteristics;
+        }
+
+        //
+        // If the NX memory policy applies to the code memory region type used
+        // for this image, ensure that the image has the NX compat flag set,
+        // which means that the program's logic does not assume that memory
+        // allocations are mapped both writable and executable at the same time.
+        // Also ensure that the section alignment is sufficient, as otherwise,
+        // the image's code and data sections might share a page that would
+        // require a mapping that is both writable and executable.
+        //
+        if ((LoadedImage != gDxeCoreLoadedImage) &&
+            (GetImageType (LoadedImageDevicePath) != IMAGE_FROM_FV) &&
+            (((DllCharacteristics & EFI_IMAGE_DLLCHARACTERISTICS_NX_COMPAT) == 0) ||
+             (SectionAlignment < EFI_PAGE_SIZE)) &&
+            ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) &
+              LShiftU64 (1, LoadedImage->ImageCodeType)) != 0))
+        {
+          DEBUG ((
+            DEBUG_VERBOSE,
+            "!!!!!!!!  ProtectUefiImageCommon - Image does not comply with NX policy for code memory region type !!!!!!!!\n"
+            ));
+          return EFI_UNSUPPORTED;
         }
 
         if (SectionAlignment >= EFI_PAGE_SIZE) {
@@ -1155,11 +1181,20 @@ CoreInitializeMemoryProtection (
   // Sanity check the PcdDxeNxMemoryProtectionPolicy setting:
   // - EfiConventionalMemory and EfiBootServicesData should use the
   //   same attribute
+  // - the image protection policy must cover 3rd party images if
+  //   any code memory types are being mapped NX by default
   //
   ASSERT (
     GetPermissionAttributeForMemoryType (EfiBootServicesData) ==
     GetPermissionAttributeForMemoryType (EfiConventionalMemory)
     );
+
+  if (((GetPermissionAttributeForMemoryType (EfiLoaderCode) |
+        GetPermissionAttributeForMemoryType (EfiBootServicesCode) |
+        GetPermissionAttributeForMemoryType (EfiRuntimeServicesCode)) & EFI_MEMORY_XP) != 0)
+  {
+    ASSERT ((mImageProtectionPolicy & BIT0) == BIT0);
+  }
 
   Status = CoreCreateEvent (
              EVT_NOTIFY_SIGNAL,
