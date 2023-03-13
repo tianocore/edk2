@@ -823,19 +823,7 @@ SmmRestoreCpu (
     InitializeCpuBeforeRebase ();
   }
 
-  //
-  // Make sure the gSmmBaseHobGuid existence status is the same between normal and S3 boot.
-  //
-  ASSERT (mSmmRelocated == (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL));
-  if (mSmmRelocated != (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "gSmmBaseHobGuid %a produced in normal boot but %a in S3 boot!",
-      mSmmRelocated ? "is" : "is not",
-      mSmmRelocated ? "is not" : "is"
-      ));
-    CpuDeadLoop ();
-  }
+  DEBUG ((DEBUG_INFO, "SmmRestoreCpu: mSmmRelocated is %d\n", mSmmRelocated));
 
   //
   // Check whether Smm Relocation is done or not.
