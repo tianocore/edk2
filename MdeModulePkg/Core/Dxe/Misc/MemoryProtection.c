@@ -305,51 +305,6 @@ SetUefiImageProtectionAttributes (
 }
 
 /**
-  Return if the PE image section is aligned.
-
-  @param[in]  SectionAlignment    PE/COFF section alignment
-  @param[in]  MemoryType          PE/COFF image memory type
-
-  @retval TRUE  The PE image section is aligned.
-  @retval FALSE The PE image section is not aligned.
-**/
-BOOLEAN
-IsMemoryProtectionSectionAligned (
-  IN UINT32           SectionAlignment,
-  IN EFI_MEMORY_TYPE  MemoryType
-  )
-{
-  UINT32  PageAlignment;
-
-  switch (MemoryType) {
-    case EfiRuntimeServicesCode:
-    case EfiACPIMemoryNVS:
-      PageAlignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
-      break;
-    case EfiRuntimeServicesData:
-    case EfiACPIReclaimMemory:
-      ASSERT (FALSE);
-      PageAlignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
-      break;
-    case EfiBootServicesCode:
-    case EfiLoaderCode:
-    case EfiReservedMemoryType:
-      PageAlignment = EFI_PAGE_SIZE;
-      break;
-    default:
-      ASSERT (FALSE);
-      PageAlignment = EFI_PAGE_SIZE;
-      break;
-  }
-
-  if ((SectionAlignment & (PageAlignment - 1)) != 0) {
-    return FALSE;
-  } else {
-    return TRUE;
-  }
-}
-
-/**
   Free Image record.
 
   @param[in]  ImageRecord    A UEFI image record
@@ -404,7 +359,6 @@ ProtectUefiImage (
   IMAGE_PROPERTIES_RECORD               *ImageRecord;
   CHAR8                                 *PdbPointer;
   IMAGE_PROPERTIES_RECORD_CODE_SECTION  *ImageRecordCodeSection;
-  BOOLEAN                               IsAligned;
   UINT32                                ProtectionPolicy;
 
   DEBUG ((DEBUG_INFO, "ProtectUefiImageCommon - 0x%x\n", LoadedImage));
@@ -470,8 +424,7 @@ ProtectUefiImage (
     SectionAlignment = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
   }
 
-  IsAligned = IsMemoryProtectionSectionAligned (SectionAlignment, LoadedImage->ImageCodeType);
-  if (!IsAligned) {
+  if (SectionAlignment < EFI_PAGE_SIZE) {
     DEBUG ((
       DEBUG_VERBOSE,
       "!!!!!!!!  ProtectUefiImageCommon - Section Alignment(0x%x) is incorrect  !!!!!!!!\n",
