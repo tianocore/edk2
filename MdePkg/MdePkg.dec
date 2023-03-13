@@ -26,6 +26,7 @@
 [Includes]
   Include
   Test/UnitTest/Include
+  Library/MipiSysTLib/mipisyst/library/include
 
 [Includes.IA32]
   Include/Ia32
@@ -283,6 +284,14 @@
   ##  @libraryclass  Provides services to generate Entropy using a TRNG.
   #
   ArmTrngLib|Include/Library/ArmTrngLib.h
+
+  ##  @libraryclass  Provides general mipi sys-T services.
+  #
+  MipiSysTLib|Include/Library/MipiSysTLib.h
+
+  ##  @libraryclass  Provides API to output Trace Hub debug message.
+  #
+  TraceHubDebugSysTLib|Include/Library/TraceHubDebugSysTLib.h
 
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.

@@ -1,0 +1,37 @@
+<CatalogGenerator>
+    <CatalogConfigs>
+        <CatalogConfig option="catalog" value="generated_catalog.xml" />
+        <CatalogConfig option="template" value="template.xml" />
+        <CatalogConfig option="indentation" value="4" />
+        <CatalogConfig option="nolocation"  value="false"/>
+        <CatalogConfig option="src" value="." />
+    </CatalogConfigs>
+    <SrcFilePatterns>
+        <SrcFilePattern Pattern="*.{cpp,c,h}" />
+    </SrcFilePatterns>
+    <CatalogCalls>
+        <Catalog32>
+            <CatalogCall Name="MIPI_SYST_HASH" Algorithm="hash65599" IdParamIdx="2" StringParamIdx="1" />
+
+            <CatalogCall Name="MIPI_SYST_CATPRINTF32" IdParamIdx="3" StringParamIdx="4"    />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF32_0" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF32_1" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF32_2" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF32_3" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF32_4" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF32_5" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF32_6" IdParamIdx="3" StringParamIdx="4"  />
+        </Catalog32>
+
+        <Catalog64>
+            <CatalogCall Name="MIPI_SYST_CATPRINTF64" IdParamIdx="3" StringParamIdx="4" />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF64_0" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF64_1" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF64_2" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF64_3" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF64_4" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF64_5" IdParamIdx="3" StringParamIdx="4"  />
+            <CatalogCall Name="MIPI_SYST_CATPRINTF64_6" IdParamIdx="3" StringParamIdx="4"  />
+        </Catalog64>
+    </CatalogCalls>
+</CatalogGenerator>

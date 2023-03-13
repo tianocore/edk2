@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+ Copyright(c) 2018, MIPI Alliance, Inc.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+
+ * Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in
+   the documentation and/or other materials provided with the
+   distribution.
+
+ * Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived
+   from this software without specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ -->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://www.mipi.org/1.0/sys-t"
+    xmlns="http://www.mipi.org/1.0/sys-t"
+    xmlns:syst="http://www.mipi.org/1.0/sys-t"
+    elementFormDefault="qualified">
+
+  <xs:element name="Collateral">
+    <xs:complexType>
+      <xs:sequence minOccurs="1" maxOccurs="unbounded">
+        <xs:element name ="Client">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name ="Guids">
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="Guid" type="typeGuid"/>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="uniqueGuidIds">
+                  <xs:selector xpath="syst:Guid" />
+                  <xs:field xpath="@ID" />
+                </xs:unique>
+              </xs:element>
+              <xs:element name ="Builds" minOccurs="0" maxOccurs="1" >
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="Build" type="typeBuild"/>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="uniqueBuildIds">
+                  <xs:selector xpath="syst:Build" />
+                  <xs:field xpath="@ID" />
+                </xs:unique>
+              </xs:element>
+              <xs:element name ="Options" minOccurs="0" maxOccurs="1" >
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="Option" type="typeOption"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name ="Modules" minOccurs="0" maxOccurs="1" >
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="Module" type="typeModule"/>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="uniqueModuleIds">
+                  <xs:selector xpath="syst:Module" />
+                  <xs:field xpath="@ID" />
+                </xs:unique>
+              </xs:element>
+              <xs:element name="SourceFiles"  minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="File" type="typeFile"/>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="uniqueSourceIds">
+                  <xs:selector xpath="syst:File" />
+                  <xs:field xpath="@ID" />
+                </xs:unique>
+              </xs:element>
+              <xs:element name="Catalog32" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="Format" type="typeCatalog32"/>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="uniqueCatalog32Ids">
+                  <xs:selector xpath="syst:Format" />
+                  <xs:field xpath="@ID" />
+                </xs:unique>
+              </xs:element>
+              <xs:element name="Catalog64" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="Format" type="typeCatalog64"/>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="uniqueCatalog64Ids">
+                  <xs:selector xpath="syst:Format" />
+                  <xs:field xpath="@ID" />
+                </xs:unique>
+              </xs:element>
+              <xs:element name="Short32" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="Format" type="typeShort32"/>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="uniqueShort32Ids">
+                  <xs:selector xpath="syst:Format" />
+                  <xs:field xpath="@ID" />
+                </xs:unique>
+            </xs:element>
+              <xs:element name="Short64" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="Format" type="typeShort64"/>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="uniqueShort64Ids">
+                  <xs:selector xpath="syst:Format" />
+                  <xs:field xpath="@ID" />
+                </xs:unique>
+              </xs:element>
+              <xs:element name="Write" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                    <xs:element name ="Protocol" type="Write"/>
+                  </xs:sequence>
+                </xs:complexType>
+                <xs:unique name="uniqueWriteIds">
+                  <xs:selector xpath="syst:Protocol" />
+                  <xs:field xpath="@ID" />
+                </xs:unique>
+              </xs:element>
+            </xs:sequence>
+            <xs:attribute name="Name"  type="xs:string" use="required" />
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="typeGuid">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="ID"  type="guidString" use="required" />
+        <xs:attribute name="Mask" type="guidString" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="typeBuild">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="ID" type="unsigned64" use="required" />
+        <xs:attribute name="Mask" type="unsigned64" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Complex SyS-T XML type definitions -->
+
+  <xs:complexType name="typeModule">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="ID" type="unsigned64" use="required" />
+        <xs:attribute name="Mask" type="unsigned64" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  
+  <xs:complexType name="typeOption">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="Name" type="xs:string" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  
+  <xs:complexType name="typeFile">
+    <xs:simpleContent>
+      <xs:extension base="nonEmptyString">
+        <xs:attribute name="ID" type="unsigned32" use="required" />
+        <xs:attribute name="Mask" type="unsigned32" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="typeCatalog32">
+    <xs:simpleContent>
+      <xs:extension base="nonEmptyString">
+        <xs:attribute name="ID" type="unsigned32" use="required" />
+        <xs:attribute name="Mask" type="unsigned32" use="optional" />
+        <xs:attribute name="File" type="unsigned32" use="optional"/>
+        <xs:attribute name="Line" type="unsigned32" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="typeCatalog64">
+    <xs:simpleContent>
+      <xs:extension base="nonEmptyString">
+        <xs:attribute name="ID" type="unsigned64" use="required" />
+        <xs:attribute name="Mask" type="unsigned64" use="optional" />
+        <xs:attribute name="File" type="unsigned32" use="optional"/>
+        <xs:attribute name="Line" type="unsigned32" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="typeShort32">
+    <xs:simpleContent>
+      <xs:extension base="nonEmptyString">
+        <xs:attribute name="ID" type="unsigned32" use="required" />
+        <xs:attribute name="Mask" type="unsigned32" use="optional" />
+        <xs:attribute name="File" type="unsigned32" use="optional"/>
+        <xs:attribute name="Line" type="unsigned32" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="typeShort64">
+    <xs:simpleContent>
+      <xs:extension base="nonEmptyString">
+        <xs:attribute name="ID" type="unsigned64" use="required" />
+        <xs:attribute name="Mask" type="unsigned64" use="optional" />
+        <xs:attribute name="File" type="unsigned32" use="optional"/>
+        <xs:attribute name="Line" type="unsigned32" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="Write">
+    <xs:simpleContent>
+      <xs:extension base="nonEmptyString">
+        <xs:attribute name="ID" type="unsigned6" use="required" />
+        <xs:attribute name="Mask" type="unsigned6" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Simple type definitions -->
+
+  <xs:simpleType name="nonEmptyString">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="unsigned32">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="0x[0-9a-fA-F]{1,8}|0|[1-9][0-9]{1,9}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="unsigned64">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="0x[0-9a-fA-F]{1,16}|0|[1-9][0-9]{1,20}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="unsigned6">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="0x[0-9a-fA-F]{0,2}|0|[1-9][0-9]{1,2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="guidString">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\{[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

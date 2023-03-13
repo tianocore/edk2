@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<syst:Collateral xmlns:syst="http://www.mipi.org/1.0/sys-t"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mipi.org/1.0/sys-t 
+                        https://www.mipi.org/schema/sys-t/sys-t_1-0.xsd">
+
+  <!--
+  A SyS-T collateral file starts with a syst:Collateral element
+  and contains at least one syst:Client child node.
+ -->
+  <syst:Client Name="example">
+
+    <!--
+    List of message GUIDs for this client:
+    A GUID is a 128bit numeric UUID following RFC 4122.
+    Clients that are identified by transport layer properties
+    can use pseudo GUID values to identify their messages. A
+    pseudo GUID is defined as a GUID with bit 71 set to zero.
+    The following encoding might be used for clients identified
+    by MIPI System Trace Protocol (STP) master/channel pairs:
+
+     {00000000-<MasterID>-<ChannelID>-<Origin>00-000000000000}
+
+    A Mask attribute can be added to define which bits of the GUID are
+    used for comparison. Without a mask, all bits need to match.
+    The example below makes the catalog valid for all channels from the
+    STP master value 0x644, or messages with the "494E..." GUID in their
+    payload.
+    -->
+    <syst:Guids>
+      <syst:Guid ID=  "{00000000-0644-0000-0000-000000000000}"
+                 Mask="{00000000-FFFF-0000-8000-000000000000}"><![CDATA[kernel]]></syst:Guid>
+      <syst:Guid ID="{494E5443-8A9C-4014-A65A-2F36A36D96E4}"><![CDATA[user]]></syst:Guid>
+    </syst:Guids>
+
+    <!--
+    Define for which versions of the client this collateral is valid.
+    Versions are expressed as values up to 64-bit and can contain a mask
+    that define which bits need to match with a client version message.
+    -->
+    <syst:Builds>
+      <syst:Build ID="0x0010000" Mask="0xFFFF0000" ><![CDATA[SW Build 1.x]]></syst:Build>
+      <syst:Build ID="0x0020000" Mask="0xFFFF0000" ><![CDATA[SW Build 2.x]]></syst:Build>
+    </syst:Builds>
+
+    <!--
+    Provide ID to name mapping for module header field values.
+    -->
+    <syst:Modules>
+      <syst:Module ID="0x1"><![CDATA[kernel]]></syst:Module>
+      <syst:Module ID="0x2"><![CDATA[user]]></syst:Module>
+    </syst:Modules>
+
+    <!--
+    Define the mapping of the numeric File-ID to source files.
+    This table is optional and only needed if source references are used
+    by the source.
+    -->
+    <syst:SourceFiles>
+        <syst:File ID="1"><![CDATA[./othersource.c]]></syst:File>
+        <syst:File ID="2"><![CDATA[./systclient.c]]></syst:File>
+    </syst:SourceFiles>
+
+
+    <!--
+    Define the mapping of catalog message ID to user visible strings.
+    This table is optional and only needed if catalog messages are used.
+    A message can have optional "File" and "Line" attributes to specify the
+    source position of the instrumentation call. A decoder uses this
+    information if the message payload doesn't provide this information.
+    -->
+    <syst:Catalog32>
+        <syst:Format ID="0xe4876129" File="1" Line="40"><![CDATA[+-------------------------------------------------------+]]></syst:Format>
+        <syst:Format ID="0x16028e9a" File="1" Line="41"><![CDATA[|               ____         _____   _______            |]]></syst:Format>
+        <syst:Format ID="0xc5d41bc9" File="1" Line="42"><![CDATA[|              / ___|       / ____| |__   __|           |]]></syst:Format>
+        <syst:Format ID="0x23f66c1e" File="1" Line="43"><![CDATA[|             | |___  __  _| |___ _____| |              |]]></syst:Format>
+        <syst:Format ID="0x95095f2f" File="1" Line="44"><![CDATA[|              \___ \| | | |\___ \_____| |              |]]></syst:Format>
+        <syst:Format ID="0xc645d04b" File="1" Line="45"><![CDATA[|              ____| | |_| |____| |    | |              |]]></syst:Format>
+        <syst:Format ID="0x54d8b7ff" File="1" Line="46"><![CDATA[|             |_____/ \__| |_____/     |_|              |]]></syst:Format>
+        <syst:Format ID="0xd48907f7" File="1" Line="47"><![CDATA[|                      _/ /                             |]]></syst:Format>
+        <syst:Format ID="0x9e125f25" File="1" Line="48"><![CDATA[|                     |__/                              |]]></syst:Format>
+        <syst:Format ID="0xe487612a" File="1" Line="49"><![CDATA[+-------------------------------------------------------+]]></syst:Format>
+        <syst:Format ID="0xd44fd581" File="1" Line="71"><![CDATA[| '%%*so%%*s           | '%*so%*s ' |]]></syst:Format>
+        <syst:Format ID="0x64f996d9" File="1" Line="124"><![CDATA[in function foo]]></syst:Format>
+        <syst:Format ID="0x62f35566" File="1" Line="129"><![CDATA[in function bar]]></syst:Format>
+        <syst:Format ID="0xcf292f8b" File="1" Line="254"><![CDATA[|    catalog Format  |         Printed Result           |]]></syst:Format>
+        <syst:Format ID="0x886b15e0" File="1" Line="255"><![CDATA[|---------------------------------strings---------------|]]></syst:Format>
+        <syst:Format ID="0xf0e43f1b" File="1" Line="256"><![CDATA[| '%%30s'             | '%30s' |]]></syst:Format>
+        <syst:Format ID="0x8bb1283d" File="1" Line="257"><![CDATA[| '%%-30s'            | '%-30s' |]]></syst:Format>
+        <syst:Format ID="0x237ce64f" File="1" Line="258"><![CDATA[|---------------------------------ASCII-----------------|]]></syst:Format>
+        <syst:Format ID="0x80f4ba3d" File="1" Line="259"><![CDATA[| '%%s'               | '%s'  |]]></syst:Format>
+        <syst:Format ID="0x80f4ba3e" File="1" Line="260"><![CDATA[| '%%s'               | '%s'  |]]></syst:Format>
+        <syst:Format ID="0x80f4ba3f" File="1" Line="261"><![CDATA[| '%%s'               | '%s'  |]]></syst:Format>
+        <syst:Format ID="0x80f4ba40" File="1" Line="262"><![CDATA[| '%%s'               | '%s'  |]]></syst:Format>
+        <syst:Format ID="0xe29131c9" File="1" Line="263"><![CDATA[|---------------------------------decimals--------------|]]></syst:Format>
+        <syst:Format ID="0xddc39ddb" File="1" Line="264"><![CDATA[| '%%30d'             | '%30d' |]]></syst:Format>
+        <syst:Format ID="0xddc39ddc" File="1" Line="265"><![CDATA[| '%%30d'             | '%30d' |]]></syst:Format>
+        <syst:Format ID="0xddc39ddd" File="1" Line="266"><![CDATA[| '%%30d'             | '%30d' |]]></syst:Format>
+        <syst:Format ID="0xddc39dde" File="1" Line="267"><![CDATA[| '%%30d'             | '%30d' |]]></syst:Format>
+        <syst:Format ID="0xddc39ddf" File="1" Line="268"><![CDATA[| '%%30d'             | '%30d' |]]></syst:Format>
+        <syst:Format ID="0xddc39de0" File="1" Line="269"><![CDATA[| '%%30d'             | '%30d' |]]></syst:Format>
+        <syst:Format ID="0x789086fd" File="1" Line="270"><![CDATA[| '%%-30d'            | '%-30d' |]]></syst:Format>
+        <syst:Format ID="0x789086fe" File="1" Line="271"><![CDATA[| '%%-30d'            | '%-30d' |]]></syst:Format>
+        <syst:Format ID="0x789086ff" File="1" Line="272"><![CDATA[| '%%-30d'            | '%-30d' |]]></syst:Format>
+        <syst:Format ID="0x78908700" File="1" Line="273"><![CDATA[| '%%-30d'            | '%-30d' |]]></syst:Format>
+        <syst:Format ID="0x78908701" File="1" Line="274"><![CDATA[| '%%-30d'            | '%-30d' |]]></syst:Format>
+        <syst:Format ID="0x78908702" File="1" Line="275"><![CDATA[| '%%-30d'            | '%-30d' |]]></syst:Format>
+        <syst:Format ID="0x149a8033" File="1" Line="276"><![CDATA[|----------------------------------hexadecimals---------|]]></syst:Format>
+        <syst:Format ID="0xf74474db" File="1" Line="277"><![CDATA[| '%%30x'             | '%30x' |]]></syst:Format>
+        <syst:Format ID="0xf74474dc" File="1" Line="278"><![CDATA[| '%%30x'             | '%30x' |]]></syst:Format>
+        <syst:Format ID="0xf74474dd" File="1" Line="279"><![CDATA[| '%%30x'             | '%30x' |]]></syst:Format>
+        <syst:Format ID="0xf74474de" File="1" Line="280"><![CDATA[| '%%30x'             | '%30x' |]]></syst:Format>
+        <syst:Format ID="0xf74474df" File="1" Line="281"><![CDATA[| '%%30x'             | '%30x' |]]></syst:Format>
+        <syst:Format ID="0xf74474e0" File="1" Line="282"><![CDATA[| '%%30x'             | '%30x' |]]></syst:Format>
+        <syst:Format ID="0x92115dfd" File="1" Line="283"><![CDATA[| '%%-30x'            | '%-30x' |]]></syst:Format>
+        <syst:Format ID="0x92115dfe" File="1" Line="284"><![CDATA[| '%%-30x'            | '%-30x' |]]></syst:Format>
+        <syst:Format ID="0x92115dff" File="1" Line="285"><![CDATA[| '%%-30x'            | '%-30x' |]]></syst:Format>
+        <syst:Format ID="0x92115e00" File="1" Line="286"><![CDATA[| '%%-30x'            | '%-30x' |]]></syst:Format>
+        <syst:Format ID="0x92115e01" File="1" Line="287"><![CDATA[| '%%-30x'            | '%-30x' |]]></syst:Format>
+        <syst:Format ID="0x92115e02" File="1" Line="288"><![CDATA[| '%%-30x'            | '%-30x' |]]></syst:Format>
+        <syst:Format ID="0x9b431cdb" File="1" Line="289"><![CDATA[| '%%30X'             | '%30X' |]]></syst:Format>
+        <syst:Format ID="0x9b431cdc" File="1" Line="290"><![CDATA[| '%%30X'             | '%30X' |]]></syst:Format>
+        <syst:Format ID="0x9b431cdd" File="1" Line="291"><![CDATA[| '%%30X'             | '%30X' |]]></syst:Format>
+        <syst:Format ID="0x9b431cde" File="1" Line="292"><![CDATA[| '%%30X'             | '%30X' |]]></syst:Format>
+        <syst:Format ID="0x9b431cdf" File="1" Line="293"><![CDATA[| '%%30X'             | '%30X' |]]></syst:Format>
+        <syst:Format ID="0x9b431ce0" File="1" Line="294"><![CDATA[| '%%30X'             | '%30X' |]]></syst:Format>
+        <syst:Format ID="0x361005fd" File="1" Line="295"><![CDATA[| '%%-30X'            | '%-30X' |]]></syst:Format>
+        <syst:Format ID="0x361005fe" File="1" Line="296"><![CDATA[| '%%-30X'            | '%-30X' |]]></syst:Format>
+        <syst:Format ID="0x361005ff" File="1" Line="297"><![CDATA[| '%%-30X'            | '%-30X' |]]></syst:Format>
+        <syst:Format ID="0x36100600" File="1" Line="298"><![CDATA[| '%%-30X'            | '%-30X' |]]></syst:Format>
+        <syst:Format ID="0x36100601" File="1" Line="299"><![CDATA[| '%%-30X'            | '%-30X' |]]></syst:Format>
+        <syst:Format ID="0x36100602" File="1" Line="300"><![CDATA[| '%%-30X'            | '%-30X' |]]></syst:Format>
+        <syst:Format ID="0x02408d9a" File="1" Line="301"><![CDATA[|-----------------------------------double--------------|]]></syst:Format>
+        <syst:Format ID="0x1bfd1b9b" File="1" Line="302"><![CDATA[| '%%30.1f'           | '%30.1f' |]]></syst:Format>
+        <syst:Format ID="0x43dfc0db" File="1" Line="303"><![CDATA[| '%%30.2f'           | '%30.2f' |]]></syst:Format>
+        <syst:Format ID="0x6bc2661b" File="1" Line="304"><![CDATA[| '%%30.3f'           | '%30.3f' |]]></syst:Format>
+        <syst:Format ID="0x93a50b5b" File="1" Line="305"><![CDATA[| '%%30.4f'           | '%30.4f' |]]></syst:Format>
+        <syst:Format ID="0xbb87b09b" File="1" Line="306"><![CDATA[| '%%30.5f'           | '%30.5f' |]]></syst:Format>
+        <syst:Format ID="0xe36a55db" File="1" Line="307"><![CDATA[| '%%30.6f'           | '%30.6f' |]]></syst:Format>
+        <syst:Format ID="0x0b4cfb1b" File="1" Line="308"><![CDATA[| '%%30.7f'           | '%30.7f' |]]></syst:Format>
+        <syst:Format ID="0x332fa05b" File="1" Line="309"><![CDATA[| '%%30.8f'           | '%30.8f' |]]></syst:Format>
+        <syst:Format ID="0x5b12459b" File="1" Line="310"><![CDATA[| '%%30.9f'           | '%30.9f' |]]></syst:Format>
+        <syst:Format ID="0x10b5637d" File="1" Line="311"><![CDATA[| '%%30.10f'          | '%30.10f' |]]></syst:Format>
+        <syst:Format ID="0xdda393bd" File="1" Line="312"><![CDATA[| '%%-30.1f'          | '%-30.1f' |]]></syst:Format>
+        <syst:Format ID="0x058638fd" File="1" Line="313"><![CDATA[| '%%-30.2f'          | '%-30.2f' |]]></syst:Format>
+        <syst:Format ID="0x2d68de3d" File="1" Line="314"><![CDATA[| '%%-30.3f'          | '%-30.3f' |]]></syst:Format>
+        <syst:Format ID="0x554b837d" File="1" Line="315"><![CDATA[| '%%-30.4f'          | '%-30.4f' |]]></syst:Format>
+        <syst:Format ID="0x7d2e28bd" File="1" Line="316"><![CDATA[| '%%-30.5f'          | '%-30.5f' |]]></syst:Format>
+        <syst:Format ID="0xa510cdfd" File="1" Line="317"><![CDATA[| '%%-30.6f'          | '%-30.6f' |]]></syst:Format>
+        <syst:Format ID="0xccf3733d" File="1" Line="318"><![CDATA[| '%%-30.7f'          | '%-30.7f' |]]></syst:Format>
+        <syst:Format ID="0xf4d6187d" File="1" Line="319"><![CDATA[| '%%-30.8f'          | '%-30.8f' |]]></syst:Format>
+        <syst:Format ID="0x1cb8bdbd" File="1" Line="320"><![CDATA[| '%%-30.9f'          | '%-30.9f' |]]></syst:Format>
+        <syst:Format ID="0x30cef3db" File="1" Line="321"><![CDATA[| '%%-30.10f'         | '%-30.10f' |]]></syst:Format>
+        <syst:Format ID="0x75ff3462" File="1" Line="322"><![CDATA[|-----------------------------------scientific----------|]]></syst:Format>
+        <syst:Format ID="0x811d10db" File="1" Line="323"><![CDATA[| '%%30.1e'           | '%30.1e' |]]></syst:Format>
+        <syst:Format ID="0xa8ffb61b" File="1" Line="324"><![CDATA[| '%%30.2e'           | '%30.2e' |]]></syst:Format>
+        <syst:Format ID="0xd0e25b5b" File="1" Line="325"><![CDATA[| '%%30.3e'           | '%30.3e' |]]></syst:Format>
+        <syst:Format ID="0xf8c5009b" File="1" Line="326"><![CDATA[| '%%30.4e'           | '%30.4e' |]]></syst:Format>
+        <syst:Format ID="0x20a7a5db" File="1" Line="327"><![CDATA[| '%%30.5e'           | '%30.5e' |]]></syst:Format>
+        <syst:Format ID="0x488a4b1b" File="1" Line="328"><![CDATA[| '%%30.6e'           | '%30.6e' |]]></syst:Format>
+        <syst:Format ID="0x706cf05b" File="1" Line="329"><![CDATA[| '%%30.7e'           | '%30.7e' |]]></syst:Format>
+        <syst:Format ID="0x984f959b" File="1" Line="330"><![CDATA[| '%%30.8e'           | '%30.8e' |]]></syst:Format>
+        <syst:Format ID="0xc0323adb" File="1" Line="331"><![CDATA[| '%%30.9e'           | '%30.9e' |]]></syst:Format>
+        <syst:Format ID="0x75d558bd" File="1" Line="332"><![CDATA[| '%%30.10e'          | '%30.10e' |]]></syst:Format>
+        <syst:Format ID="0x42c388fd" File="1" Line="333"><![CDATA[| '%%-30.1e'          | '%-30.1e' |]]></syst:Format>
+        <syst:Format ID="0x6aa62e3d" File="1" Line="334"><![CDATA[| '%%-30.2e'          | '%-30.2e' |]]></syst:Format>
+        <syst:Format ID="0x9288d37d" File="1" Line="335"><![CDATA[| '%%-30.3e'          | '%-30.3e' |]]></syst:Format>
+        <syst:Format ID="0xba6b78bd" File="1" Line="336"><![CDATA[| '%%-30.4e'          | '%-30.4e' |]]></syst:Format>
+        <syst:Format ID="0xe24e1dfd" File="1" Line="337"><![CDATA[| '%%-30.5e'          | '%-30.5e' |]]></syst:Format>
+        <syst:Format ID="0x0a30c33d" File="1" Line="338"><![CDATA[| '%%-30.6e'          | '%-30.6e' |]]></syst:Format>
+        <syst:Format ID="0x3213687d" File="1" Line="339"><![CDATA[| '%%-30.7e'          | '%-30.7e' |]]></syst:Format>
+        <syst:Format ID="0x59f60dbd" File="1" Line="340"><![CDATA[| '%%-30.8e'          | '%-30.8e' |]]></syst:Format>
+        <syst:Format ID="0x81d8b2fd" File="1" Line="341"><![CDATA[| '%%-30.9e'          | '%-30.9e' |]]></syst:Format>
+        <syst:Format ID="0x95eee91b" File="1" Line="342"><![CDATA[| '%%-30.10e'         | '%-30.10e' |]]></syst:Format>
+        <syst:Format ID="0x66ad3a7f" File="1" Line="343"><![CDATA[|-----------------------------------exotics-------------|]]></syst:Format>
+        <syst:Format ID="0x4e9894fd" File="1" Line="344"><![CDATA[| '%%030hhu'          | '%030hhu' |]]></syst:Format>
+        <syst:Format ID="0x1870c29b" File="1" Line="345"><![CDATA[| '%%030hu'           | '%030hu' |]]></syst:Format>
+        <syst:Format ID="0xb7fb579b" File="1" Line="346"><![CDATA[| '%%030lu'           | '%030lu' |]]></syst:Format>
+        <syst:Format ID="0xc63dd4fd" File="1" Line="347"><![CDATA[| '%%030llu'          | '%030llu' |]]></syst:Format>
+        <syst:Format ID="0xad58547d" File="1" Line="348"><![CDATA[| '%%030hho'          | '%030hho' |]]></syst:Format>
+        <syst:Format ID="0x7730821b" File="1" Line="349"><![CDATA[| '%%030ho'           | '%030ho' |]]></syst:Format>
+        <syst:Format ID="0x16bb171b" File="1" Line="350"><![CDATA[| '%%030lo'           | '%030lo' |]]></syst:Format>
+        <syst:Format ID="0x24fd947d" File="1" Line="351"><![CDATA[| '%%030llo'          | '%030llo' |]]></syst:Format>
+        <syst:Format ID="0x1f38b53d" File="1" Line="352"><![CDATA[| '%%030hhx'          | '%030hhx' |]]></syst:Format>
+        <syst:Format ID="0xe910e2db" File="1" Line="353"><![CDATA[| '%%030hx'           | '%030hx' |]]></syst:Format>
+        <syst:Format ID="0x889b77db" File="1" Line="354"><![CDATA[| '%%030lx'           | '%030lx' |]]></syst:Format>
+        <syst:Format ID="0x96ddf53d" File="1" Line="355"><![CDATA[| '%%030llx'          | '%030llx' |]]></syst:Format>
+        <syst:Format ID="0x3ff8653d" File="1" Line="356"><![CDATA[| '%%-30hhu'          | '%-30hhu' |]]></syst:Format>
+        <syst:Format ID="0x60d8e25b" File="1" Line="357"><![CDATA[| '%%-30hu'           | '%-30hu' |]]></syst:Format>
+        <syst:Format ID="0x2c427ef9" File="1" Line="358"><![CDATA[| '%%#-30lu'          | '%#-30hu' |]]></syst:Format>
+        <syst:Format ID="0xe3d00a1b" File="1" Line="359"><![CDATA[| '%%#-30llu'         | '%#-30llu' |]]></syst:Format>
+        <syst:Format ID="0xcaea899b" File="1" Line="360"><![CDATA[| '%%#-30hho'         | '%#-30hho' |]]></syst:Format>
+        <syst:Format ID="0xfb29257d" File="1" Line="361"><![CDATA[| '%%#-30ho'          | '%#-30ho' |]]></syst:Format>
+        <syst:Format ID="0x9ab3ba7d" File="1" Line="362"><![CDATA[| '%%#-30lo'          | '%#-30lo' |]]></syst:Format>
+        <syst:Format ID="0x428fc99b" File="1" Line="363"><![CDATA[| '%%#-30llo'         | '%#-30llo' |]]></syst:Format>
+        <syst:Format ID="0x3ccaea5b" File="1" Line="364"><![CDATA[| '%%#-30hhx'         | '%#-30hhx' |]]></syst:Format>
+        <syst:Format ID="0x6d09863d" File="1" Line="365"><![CDATA[| '%%#-30hx'          | '%#-30hx' |]]></syst:Format>
+        <syst:Format ID="0x0c941b3d" File="1" Line="366"><![CDATA[| '%%#-30lx'          | '%#-30lx' |]]></syst:Format>
+        <syst:Format ID="0xb4702a5b" File="1" Line="367"><![CDATA[| '%%#-30llx'         | '%#-30llx' |]]></syst:Format>
+        <syst:Format ID="0x32ca5ed8" File="2" Line="64"><![CDATA[SyS-T Library version %d.%d.%d]]></syst:Format>
+        <syst:Format ID="0x00000002" File="2" Line="78"><![CDATA[%s=%d
+]]></syst:Format>
+        <syst:Format ID="0xe054cf5c" File="2" Line="82"><![CDATA[%s=%d
+]]></syst:Format>
+    </syst:Catalog32>
+
+
+    <syst:Catalog64>
+        <syst:Format ID="0x1122334455667788" File="2" Line="77"><![CDATA[Hello world
+]]></syst:Format>
+    </syst:Catalog64>
+
+
+    <!--
+    Define short message mapping from  28-Bit ID to user visible string.
+    -->
+    <syst:Short32>
+      <syst:Format ID="0x01234567" ><![CDATA[Short 32-Bit value (0x01234567)]]></syst:Format>
+      <syst:Format ID="0x0E000000" Mask="0x0F000000"><![CDATA[error with code %d]]></syst:Format>
+      <syst:Format ID="0x0F000000" Mask="0x0F000000"><![CDATA[warning with code %d]]></syst:Format>
+    </syst:Short32>
+
+    <!--
+    Define short message mapping from  60-Bit ID to user visible string.
+    -->
+    <syst:Short64>
+      <syst:Format ID="0x0112233445566778"><![CDATA[Short 64-Bit value (0x0112233445566778)]]]></syst:Format>
+    </syst:Short64>
+
+    <!--
+    Specify write message protocol id assignment
+    -->
+    <syst:Write>
+      <syst:Protocol ID="0x01" Mask="0x00"><![CDATA[Protocol%d]]></syst:Protocol>
+    </syst:Write>
+
+  </syst:Client>
+</syst:Collateral>

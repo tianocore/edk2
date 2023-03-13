@@ -1,0 +1,284 @@
+Decode Status,Payload,Type,Severity,Origin,Unit,Message TimeStamp,Context TimeStamp,Location,Raw Length,Checksum,Collateral
+OK,"0x0000000000010000 version banner string",BUILD:LONG,MAX,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,62,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"SyS-T Library version 1.0.0",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./systclient.c:64,48,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"+-------------------------------------------------------+",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:40,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|               ____         _____   _______            |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:41,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|              / ___|       / ____| |__   __|           |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:42,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|             | |___  __  _| |___ _____| |              |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:43,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|              \___ \| | | |\___ \_____| |              |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:44,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|              ____| | |_| |____| |    | |              |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:45,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|             |_____/ \__| |_____/     |_|              |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:46,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|                      _/ /                             |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:47,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|                     |__/                              |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:48,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"+-------------------------------------------------------+",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:49,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|    catalog Format  |         Printed Result           |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:254,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|---------------------------------strings---------------|",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:255,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30s'             | '               right-justified' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:256,52,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30s'            | 'left-justified                ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:257,51,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|---------------------------------ASCII-----------------|",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:258,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%s'               | '!""#$%&'()*+-./0123456789:;<=>'  |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:259,66,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%s'               | '?@ABCDEFGHIJKLMNOPQRSTUVWXYZ['  |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:260,66,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%s'               | '\]^_`qbcdefghijklmnopqrstuvwx'  |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:261,66,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%s'               | 'yz{|}~                       '  |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:262,66,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|---------------------------------decimals--------------|",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:263,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                             1' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:264,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                            10' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:265,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                           100' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:266,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                          1000' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:267,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                         10000' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:268,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                        100000' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:269,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '1                             ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:270,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '10                            ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:271,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '100                           ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:272,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '1000                          ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:273,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '10000                         ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:274,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '100000                        ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:275,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|----------------------------------hexadecimals---------|",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:276,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                             a' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:277,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                            ab' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:278,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                           abc' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:279,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                          abcd' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:280,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                         abcde' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:281,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                        abcdef' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:282,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'a                             ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:283,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'ab                            ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:284,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'abc                           ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:285,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'abcd                          ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:286,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'abcde                         ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:287,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'abcdef                        ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:288,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                             A' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:289,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                            AB' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:290,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                           ABC' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:291,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                          ABCD' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:292,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                         ABCDE' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:293,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                        ABCDEF' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:294,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'A                             ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:295,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'AB                            ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:296,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'ABC                           ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:297,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'ABCD                          ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:298,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'ABCDE                         ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:299,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'ABCDEF                        ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:300,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|-----------------------------------double--------------|",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:301,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.1f'           | '                           3.1' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:302,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.2f'           | '                          3.14' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:303,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.3f'           | '                         3.142' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:304,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.4f'           | '                        3.1416' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:305,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.5f'           | '                       3.14159' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:306,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.6f'           | '                      3.141593' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:307,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.7f'           | '                     3.1415927' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:308,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.8f'           | '                    3.14159265' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:309,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.9f'           | '                   3.141592654' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:310,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.10f'          | '                  3.1415926536' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:311,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.1f'          | '3.1                           ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:312,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.2f'          | '3.14                          ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:313,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.3f'          | '3.142                         ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:314,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.4f'          | '3.1416                        ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:315,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.5f'          | '3.14159                       ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:316,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.6f'          | '3.141593                      ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:317,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.7f'          | '3.1415927                     ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:318,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.8f'          | '3.14159265                    ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:319,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.9f'          | '3.141592654                   ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:320,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.10f'         | '3.1415926536                  ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:321,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|-----------------------------------scientific----------|",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:322,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.1e'           | '                       1.5e+00' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:323,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.2e'           | '                      1.05e+01' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:324,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.3e'           | '                     1.050e+01' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:325,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.4e'           | '                    1.0050e+02' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:326,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.5e'           | '                   1.00050e+03' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:327,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.6e'           | '                  1.000050e+04' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:328,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.7e'           | '                 1.0000500e+04' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:329,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.8e'           | '                1.00005000e+04' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:330,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.9e'           | '               1.000005000e+05' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:331,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.10e'          | '              1.0000005000e+06' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:332,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.1e'          | '1.5e+00                       ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:333,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.2e'          | '1.05e+01                      ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:334,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.3e'          | '1.050e+01                     ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:335,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.4e'          | '1.0050e+02                    ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:336,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.5e'          | '1.00050e+03                   ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:337,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.6e'          | '1.000050e+04                  ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:338,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.7e'          | '1.0000500e+04                 ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:339,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.8e'          | '1.00005000e+04                ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:340,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.9e'          | '1.000005000e+05               ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:341,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.10e'         | '1.0000005000e+06              ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:342,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|-----------------------------------exotics-------------|",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:343,36,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hhu'          | '000000000000000000000000000255' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:344,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hu'           | '000000000000000000000000065535' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:345,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030lu'           | '000000000018446744073709551615' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:346,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030llu'          | '000000000018446744073709551615' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:347,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hho'          | '000000000000000000000000000377' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:348,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030ho'           | '000000000000000000000000177777' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:349,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030lo'           | '000000001777777777777777777777' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:350,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030llo'          | '000000001777777777777777777777' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:351,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hhx'          | '0000000000000000000000000000ff' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:352,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hx'           | '00000000000000000000000000ffff' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:353,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030lx'           | '00000000000000ffffffffffffffff' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:354,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030llx'          | '00000000000000ffffffffffffffff' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:355,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30hhu'          | '255                           ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:356,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30hu'           | '65535                         ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:357,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30lu'          | '65535                         ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:358,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30llu'         | '18446744073709551615          ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:359,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30hho'         | '0377                          ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:360,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30ho'          | '0177777                       ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:361,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30lo'          | '01777777777777777777777       ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:362,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30llo'         | '01777777777777777777777       ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:363,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30hhx'         | '0xff                          ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:364,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30hx'          | '0xffff                        ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:365,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30lx'          | '0xffffffffffffffff            ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:366,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30llx'         | '0xffffffffffffffff            ' |",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:367,44,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|-------------------------------------------------------|",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|    printf Format   |         printf Result            |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|---------------------------------strings---------------|",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30s'             | '               right-justified' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,81,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30s'            | 'left-justified                ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,81,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|---------------------------------ASCII-----------------|",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%s'               | '!""#$%&'()*+-./0123456789:;<=>'  |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,94,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%s'               | '?@ABCDEFGHIJKLMNOPQRSTUVWXYZ['  |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,94,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%s'               | '\]^_`qbcdefghijklmnopqrstuvwx'  |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,94,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%s'               | 'yz{|}~                       '  |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,94,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|---------------------------------decimals--------------|",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                             1' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                            10' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                           100' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                          1000' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                         10000' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30d'             | '                        100000' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '1                             ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '10                            ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '100                           ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '1000                          ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '10000                         ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30d'            | '100000                        ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|----------------------------------hexadecimals---------|",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                             a' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                            ab' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                           abc' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                          abcd' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                         abcde' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30x'             | '                        abcdef' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'a                             ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'ab                            ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'abc                           ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'abcd                          ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'abcde                         ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30x'            | 'abcdef                        ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                             A' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                            AB' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                           ABC' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                          ABCD' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                         ABCDE' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30X'             | '                        ABCDEF' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,69,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'A                             ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'AB                            ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'ABC                           ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'ABCD                          ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'ABCDE                         ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30X'            | 'ABCDEF                        ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,70,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|-----------------------------------double--------------|",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.1f'           | '                           3.1' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.2f'           | '                          3.14' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.3f'           | '                         3.142' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.4f'           | '                        3.1416' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.5f'           | '                       3.14159' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.6f'           | '                      3.141593' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.7f'           | '                     3.1415927' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.8f'           | '                    3.14159265' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.9f'           | '                   3.141592654' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.10f'          | '                  3.1415926536' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.1f'          | '3.1                           ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.2f'          | '3.14                          ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.3f'          | '3.142                         ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.4f'          | '3.1416                        ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.5f'          | '3.14159                       ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.6f'          | '3.141593                      ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.7f'          | '3.1415927                     ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.8f'          | '3.14159265                    ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.9f'          | '3.141592654                   ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.10f'         | '3.1415926536                  ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,77,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|-----------------------------------scientific----------|",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.1e'           | '                       1.5e+00' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.2e'           | '                      1.05e+01' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.3e'           | '                     1.050e+01' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.4e'           | '                    1.0050e+02' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.5e'           | '                   1.00050e+03' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.6e'           | '                  1.000050e+04' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.7e'           | '                 1.0000500e+04' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.8e'           | '                1.00005000e+04' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.9e'           | '               1.000005000e+05' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%30.10e'          | '              1.0000005000e+06' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.1e'          | '1.5e+00                       ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.2e'          | '1.05e+01                      ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.3e'          | '1.050e+01                     ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.4e'          | '1.0050e+02                    ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.5e'          | '1.00050e+03                   ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.6e'          | '1.000050e+04                  ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.7e'          | '1.0000500e+04                 ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.8e'          | '1.00005000e+04                ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.9e'          | '1.000005000e+05               ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30.10e'         | '1.0000005000e+06              ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,77,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|-----------------------------------exotics-------------|",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hhu'          | '000000000000000000000000000255' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,72,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hu'           | '000000000000000000000000065535' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,71,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030lu'           | '000000000018446744073709551615' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030llu'          | '000000000018446744073709551615' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hho'          | '000000000000000000000000000377' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,72,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030ho'           | '000000000000000000000000177777' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,71,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030lo'           | '000000001777777777777777777777' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030llo'          | '000000001777777777777777777777' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hhx'          | '0000000000000000000000000000ff' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,72,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030hx'           | '00000000000000000000000000ffff' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,71,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030lx'           | '00000000000000ffffffffffffffff' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,75,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%030llx'          | '00000000000000ffffffffffffffff' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30hhu'          | '255                           ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,72,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%-30hu'           | '65535                         ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,71,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30lu'          | '18446744073709551615          ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30llu'         | '18446744073709551615          ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,77,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30hho'         | '0377                          ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,73,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30ho'          | '0177777                       ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,72,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30lo'          | '01777777777777777777777       ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30llo'         | '01777777777777777777777       ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,77,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30hhx'         | '0xff                          ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,73,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30hx'          | '0xffff                        ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,72,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30lx'          | '0xffffffffffffffff            ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,76,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%#-30llx'         | '0xffffffffffffffff            ' |",STRING:PRINTF64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,77,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|-------------------------------------------------------|",STRING:PRINTF64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '              o               ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '            o                 ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '         o                    ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '      o                       ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '    o                         ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '  o                           ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | ' o                            ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | ' o                            ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | ' o                            ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | ' o                            ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '  o                           ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '    o                         ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '      o                       ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '         o                    ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '            o                 ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '              o               ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                o             ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                   o          ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                      o       ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                        o     ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                          o   ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                           o  ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                           o  ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                           o  ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                           o  ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                          o   ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                        o     ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                      o       ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                   o          ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"| '%*so%*s           | '                o             ' |",CATALOG:ID32P64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./othersource.c:71,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"|-------------------------------------------------------|",STRING:PRINTF64,DEBUG,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,90,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"00010203040506070809",RAW:Protocol1,MAX,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,,42,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"Short 32-Bit value (0x01234567)",SHORT32,MAX,,0,,<--UNITTEST-HIDE_TS-->,,4,,collateral.xml
+OK,"Short 64-Bit value (0x0112233445566778)]",SHORT64,MAX,,0,,<--UNITTEST-HIDE_TS-->,,8,,collateral.xml
+OK,"error with code 1",SHORT32,MAX,,0,,<--UNITTEST-HIDE_TS-->,,4,,collateral.xml
+OK,"error with code 2",SHORT32,MAX,,0,,<--UNITTEST-HIDE_TS-->,,4,,collateral.xml
+OK,"warning with code 1",SHORT32,MAX,,0,,<--UNITTEST-HIDE_TS-->,,4,,collateral.xml
+OK,"warning with code 2",SHORT32,MAX,,0,,<--UNITTEST-HIDE_TS-->,,4,,collateral.xml
+OK,"Hello world ",CATALOG:ID64P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./systclient.c:77,40,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"state=10 ",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./systclient.c:78,46,<--UNITTEST-HIDE_CRC-->,collateral.xml
+OK,"state=10 ",CATALOG:ID32P64,INFO,example,1,<--UNITTEST-HIDE_TS-->,<--UNITTEST-HIDE_TS-->,./systclient.c:82,46,<--UNITTEST-HIDE_CRC-->,collateral.xml

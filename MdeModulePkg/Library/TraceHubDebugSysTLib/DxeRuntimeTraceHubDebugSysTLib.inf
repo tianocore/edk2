@@ -1,0 +1,52 @@
+## @file
+#  Debug library to output Trace Hub message.
+#  Support DXE/SMM phase TraceHub debug message based on dynamic settings.
+#
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeRuntimeTraceHubDebugSysTLib
+  FILE_GUID                      = 21451AD8-8C08-4C88-B9E7-12B8CBB2A934
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TraceHubDebugSysTLib|DXE_RUNTIME_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64
+#
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  HobLib
+  BaseMemoryLib
+  MipiSysTLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  DxeRuntimeTraceHubDebugSysTLib.c
+  TraceHubApiCommon.c
+  TraceHubApiCommon.h
+  TraceHubApiInternal.h
+
+[Guids]
+  gTraceHubDebugInfoHobGuid
+  gEfiEventVirtualAddressChangeGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugLevel
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableTraceHubDebugMsg
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugAddress

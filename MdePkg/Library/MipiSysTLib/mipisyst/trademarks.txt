@@ -1,0 +1,5 @@
+MIPI(R), SyS-T(SM) and STP(SM) are trademarks of MIPI Alliance, Inc. 
+No licenses are granted by implication, estoppel or otherwise under
+any trademarks of MIPI Alliance, Inc. Other trademarks, and company,
+product, and service names may be the trademarks or service marks of
+their respective owners.
