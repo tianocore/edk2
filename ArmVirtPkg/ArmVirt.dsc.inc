@@ -148,11 +148,7 @@
   # CryptoPkg libraries needed by multiple firmware features
   #
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-!else
-  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
-!endif
+  OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibAccel.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
