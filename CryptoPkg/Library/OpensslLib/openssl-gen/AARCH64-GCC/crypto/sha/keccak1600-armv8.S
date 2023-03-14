@@ -3,7 +3,7 @@
 .align	8	// strategic alignment and padding that allows to use
 		// address value as loop termination condition...
 .quad	0,0,0,0,0,0,0,0
-
+.type	iotas,%object
 iotas:
 .quad	0x0000000000000001
 .quad	0x0000000000008082
@@ -29,16 +29,16 @@ iotas:
 .quad	0x8000000000008080
 .quad	0x0000000080000001
 .quad	0x8000000080008008
-
-
+.size	iotas,.-iotas
+.type	KeccakF1600_int,%function
 .align	5
 KeccakF1600_int:
 	adr	x28,iotas
-.long	0xd503233f			// paciasp
+.inst	0xd503233f			// paciasp
 	stp	x28,x30,[sp,#16]		// 32 bytes on top are mine
-	b	Loop
+	b	.Loop
 .align	4
-Loop:
+.Loop:
 	////////////////////////////////////////// Theta
 	eor	x26,x0,x5
 	stp	x4,x9,[sp,#0]	// offload pair...
@@ -195,17 +195,17 @@ Loop:
 	eor	x24,x24,x30
 	eor	x22,x22,x26
 
-	bne	Loop
+	bne	.Loop
 
 	ldr	x30,[sp,#24]
-.long	0xd50323bf			// autiasp
+.inst	0xd50323bf			// autiasp
 	ret
+.size	KeccakF1600_int,.-KeccakF1600_int
 
-
-
+.type	KeccakF1600,%function
 .align	5
 KeccakF1600:
-.long	0xd503233f			// paciasp
+.inst	0xd503233f			// paciasp
 	stp	x29,x30,[sp,#-128]!
 	add	x29,sp,#0
 	stp	x19,x20,[sp,#16]
@@ -255,15 +255,15 @@ KeccakF1600:
 	ldp	x25,x26,[x29,#64]
 	ldp	x27,x28,[x29,#80]
 	ldp	x29,x30,[sp],#128
-.long	0xd50323bf			// autiasp
+.inst	0xd50323bf			// autiasp
 	ret
-
+.size	KeccakF1600,.-KeccakF1600
 
 .globl	SHA3_absorb
-
+.type	SHA3_absorb,%function
 .align	5
 SHA3_absorb:
-.long	0xd503233f			// paciasp
+.inst	0xd503233f			// paciasp
 	stp	x29,x30,[sp,#-128]!
 	add	x29,sp,#0
 	stp	x19,x20,[sp,#16]
@@ -293,12 +293,12 @@ SHA3_absorb:
 	ldp	x20,x21,[x26,#16*10]
 	ldp	x22,x23,[x26,#16*11]
 	ldr	x24,[x26,#16*12]
-	b	Loop_absorb
+	b	.Loop_absorb
 
 .align	4
-Loop_absorb:
+.Loop_absorb:
 	subs	x26,x28,x30		// len - bsz
-	blo	Labsorbed
+	blo	.Labsorbed
 
 	str	x26,[sp,#48]			// save len - bsz
 	ldr	x26,[x27],#8		// *inp++
@@ -307,173 +307,173 @@ Loop_absorb:
 #endif
 	eor	x0,x0,x26
 	cmp	x30,#8*(0+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x1,x1,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x2,x2,x26
 	cmp	x30,#8*(2+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x3,x3,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x4,x4,x26
 	cmp	x30,#8*(4+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x5,x5,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x6,x6,x26
 	cmp	x30,#8*(6+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x7,x7,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x8,x8,x26
 	cmp	x30,#8*(8+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x9,x9,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x10,x10,x26
 	cmp	x30,#8*(10+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x11,x11,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x12,x12,x26
 	cmp	x30,#8*(12+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x13,x13,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x14,x14,x26
 	cmp	x30,#8*(14+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x15,x15,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x16,x16,x26
 	cmp	x30,#8*(16+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x17,x17,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x25,x25,x26
 	cmp	x30,#8*(18+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x19,x19,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x20,x20,x26
 	cmp	x30,#8*(20+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x21,x21,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x22,x22,x26
 	cmp	x30,#8*(22+2)
-	blo	Lprocess_block
+	blo	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x23,x23,x26
-	beq	Lprocess_block
+	beq	.Lprocess_block
 	ldr	x26,[x27],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev	x26,x26
 #endif
 	eor	x24,x24,x26
 
-Lprocess_block:
+.Lprocess_block:
 	str	x27,[sp,#40]			// save inp
 
 	bl	KeccakF1600_int
 
 	ldr	x27,[sp,#40]			// restore arguments
 	ldp	x28,x30,[sp,#48]
-	b	Loop_absorb
+	b	.Loop_absorb
 
 .align	4
-Labsorbed:
+.Labsorbed:
 	ldr	x27,[sp,#32]
 	stp	x0,x1,[x27,#16*0]
 	stp	x2,x3,[x27,#16*1]
@@ -497,14 +497,14 @@ Labsorbed:
 	ldp	x25,x26,[x29,#64]
 	ldp	x27,x28,[x29,#80]
 	ldp	x29,x30,[sp],#128
-.long	0xd50323bf			// autiasp
+.inst	0xd50323bf			// autiasp
 	ret
-
+.size	SHA3_absorb,.-SHA3_absorb
 .globl	SHA3_squeeze
-
+.type	SHA3_squeeze,%function
 .align	5
 SHA3_squeeze:
-.long	0xd503233f			// paciasp
+.inst	0xd503233f			// paciasp
 	stp	x29,x30,[sp,#-48]!
 	add	x29,sp,#0
 	stp	x19,x20,[sp,#16]
@@ -515,167 +515,167 @@ SHA3_squeeze:
 	mov	x21,x2
 	mov	x22,x3
 
-Loop_squeeze:
+.Loop_squeeze:
 	ldr	x4,[x0],#8
 	cmp	x21,#8
-	blo	Lsqueeze_tail
+	blo	.Lsqueeze_tail
 #ifdef	__AARCH64EB__
 	rev	x4,x4
 #endif
 	str	x4,[x20],#8
 	subs	x21,x21,#8
-	beq	Lsqueeze_done
+	beq	.Lsqueeze_done
 
 	subs	x3,x3,#8
-	bhi	Loop_squeeze
+	bhi	.Loop_squeeze
 
 	mov	x0,x19
 	bl	KeccakF1600
 	mov	x0,x19
 	mov	x3,x22
-	b	Loop_squeeze
+	b	.Loop_squeeze
 
 .align	4
-Lsqueeze_tail:
+.Lsqueeze_tail:
 	strb	w4,[x20],#1
 	lsr	x4,x4,#8
 	subs	x21,x21,#1
-	beq	Lsqueeze_done
+	beq	.Lsqueeze_done
 	strb	w4,[x20],#1
 	lsr	x4,x4,#8
 	subs	x21,x21,#1
-	beq	Lsqueeze_done
+	beq	.Lsqueeze_done
 	strb	w4,[x20],#1
 	lsr	x4,x4,#8
 	subs	x21,x21,#1
-	beq	Lsqueeze_done
+	beq	.Lsqueeze_done
 	strb	w4,[x20],#1
 	lsr	x4,x4,#8
 	subs	x21,x21,#1
-	beq	Lsqueeze_done
+	beq	.Lsqueeze_done
 	strb	w4,[x20],#1
 	lsr	x4,x4,#8
 	subs	x21,x21,#1
-	beq	Lsqueeze_done
+	beq	.Lsqueeze_done
 	strb	w4,[x20],#1
 	lsr	x4,x4,#8
 	subs	x21,x21,#1
-	beq	Lsqueeze_done
+	beq	.Lsqueeze_done
 	strb	w4,[x20],#1
 
-Lsqueeze_done:
+.Lsqueeze_done:
 	ldp	x19,x20,[sp,#16]
 	ldp	x21,x22,[sp,#32]
 	ldp	x29,x30,[sp],#48
-.long	0xd50323bf			// autiasp
+.inst	0xd50323bf			// autiasp
 	ret
-
-
+.size	SHA3_squeeze,.-SHA3_squeeze
+.type	KeccakF1600_ce,%function
 .align	5
 KeccakF1600_ce:
 	mov	x9,#24
 	adr	x10,iotas
-	b	Loop_ce
+	b	.Loop_ce
 .align	4
-Loop_ce:
+.Loop_ce:
 	////////////////////////////////////////////////// Theta
-.long	0xce0f2a99	//eor3 v25.16b,v20.16b,v15.16b,v10.16b
-.long	0xce102eba	//eor3 v26.16b,v21.16b,v16.16b,v11.16b
-.long	0xce1132db	//eor3 v27.16b,v22.16b,v17.16b,v12.16b
-.long	0xce1236fc	//eor3 v28.16b,v23.16b,v18.16b,v13.16b
-.long	0xce133b1d	//eor3 v29.16b,v24.16b,v19.16b,v14.16b
-.long	0xce050339	//eor3 v25.16b,v25.16b,   v5.16b,v0.16b
-.long	0xce06075a	//eor3 v26.16b,v26.16b,   v6.16b,v1.16b
-.long	0xce070b7b	//eor3 v27.16b,v27.16b,   v7.16b,v2.16b
-.long	0xce080f9c	//eor3 v28.16b,v28.16b,   v8.16b,v3.16b
-.long	0xce0913bd	//eor3 v29.16b,v29.16b,   v9.16b,v4.16b
+.inst	0xce0f2a99	//eor3 v25.16b,v20.16b,v15.16b,v10.16b
+.inst	0xce102eba	//eor3 v26.16b,v21.16b,v16.16b,v11.16b
+.inst	0xce1132db	//eor3 v27.16b,v22.16b,v17.16b,v12.16b
+.inst	0xce1236fc	//eor3 v28.16b,v23.16b,v18.16b,v13.16b
+.inst	0xce133b1d	//eor3 v29.16b,v24.16b,v19.16b,v14.16b
+.inst	0xce050339	//eor3 v25.16b,v25.16b,   v5.16b,v0.16b
+.inst	0xce06075a	//eor3 v26.16b,v26.16b,   v6.16b,v1.16b
+.inst	0xce070b7b	//eor3 v27.16b,v27.16b,   v7.16b,v2.16b
+.inst	0xce080f9c	//eor3 v28.16b,v28.16b,   v8.16b,v3.16b
+.inst	0xce0913bd	//eor3 v29.16b,v29.16b,   v9.16b,v4.16b
 
-.long	0xce7b8f3e	//rax1 v30.16b,v25.16b,v27.16b			// D[1]
-.long	0xce7c8f5f	//rax1 v31.16b,v26.16b,v28.16b			// D[2]
-.long	0xce7d8f7b	//rax1 v27.16b,v27.16b,v29.16b			// D[3]
-.long	0xce798f9c	//rax1 v28.16b,v28.16b,v25.16b			// D[4]
-.long	0xce7a8fbd	//rax1 v29.16b,v29.16b,v26.16b			// D[0]
+.inst	0xce7b8f3e	//rax1 v30.16b,v25.16b,v27.16b			// D[1]
+.inst	0xce7c8f5f	//rax1 v31.16b,v26.16b,v28.16b			// D[2]
+.inst	0xce7d8f7b	//rax1 v27.16b,v27.16b,v29.16b			// D[3]
+.inst	0xce798f9c	//rax1 v28.16b,v28.16b,v25.16b			// D[4]
+.inst	0xce7a8fbd	//rax1 v29.16b,v29.16b,v26.16b			// D[0]
 
 	////////////////////////////////////////////////// Theta+Rho+Pi
-.long	0xce9efc39	//xar v25.16b,   v1.16b,v30.16b,#64-1 // C[0]=A[2][0]
+.inst	0xce9efc39	//xar v25.16b,   v1.16b,v30.16b,#64-1 // C[0]=A[2][0]
 
-.long	0xce9e50c1	//xar v1.16b,v6.16b,v30.16b,#64-44
-.long	0xce9cb126	//xar v6.16b,v9.16b,v28.16b,#64-20
-.long	0xce9f0ec9	//xar v9.16b,v22.16b,v31.16b,#64-61
-.long	0xce9c65d6	//xar v22.16b,v14.16b,v28.16b,#64-39
-.long	0xce9dba8e	//xar v14.16b,v20.16b,v29.16b,#64-18
+.inst	0xce9e50c1	//xar v1.16b,v6.16b,v30.16b,#64-44
+.inst	0xce9cb126	//xar v6.16b,v9.16b,v28.16b,#64-20
+.inst	0xce9f0ec9	//xar v9.16b,v22.16b,v31.16b,#64-61
+.inst	0xce9c65d6	//xar v22.16b,v14.16b,v28.16b,#64-39
+.inst	0xce9dba8e	//xar v14.16b,v20.16b,v29.16b,#64-18
 
-.long	0xce9f085a	//xar v26.16b,   v2.16b,v31.16b,#64-62 // C[1]=A[4][0]
+.inst	0xce9f085a	//xar v26.16b,   v2.16b,v31.16b,#64-62 // C[1]=A[4][0]
 
-.long	0xce9f5582	//xar v2.16b,v12.16b,v31.16b,#64-43
-.long	0xce9b9dac	//xar v12.16b,v13.16b,v27.16b,#64-25
-.long	0xce9ce26d	//xar v13.16b,v19.16b,v28.16b,#64-8
-.long	0xce9b22f3	//xar v19.16b,v23.16b,v27.16b,#64-56
-.long	0xce9d5df7	//xar v23.16b,v15.16b,v29.16b,#64-41
+.inst	0xce9f5582	//xar v2.16b,v12.16b,v31.16b,#64-43
+.inst	0xce9b9dac	//xar v12.16b,v13.16b,v27.16b,#64-25
+.inst	0xce9ce26d	//xar v13.16b,v19.16b,v28.16b,#64-8
+.inst	0xce9b22f3	//xar v19.16b,v23.16b,v27.16b,#64-56
+.inst	0xce9d5df7	//xar v23.16b,v15.16b,v29.16b,#64-41
 
-.long	0xce9c948f	//xar v15.16b,v4.16b,v28.16b,#64-27
+.inst	0xce9c948f	//xar v15.16b,v4.16b,v28.16b,#64-27
 
-.long	0xce9ccb1c	//xar v28.16b,   v24.16b,v28.16b,#64-14 // D[4]=A[0][4]
-.long	0xce9efab8	//xar v24.16b,v21.16b,v30.16b,#64-2
-.long	0xce9b2508	//xar v8.16b,v8.16b,v27.16b,#64-55 // A[1][3]=A[4][1]
-.long	0xce9e4e04	//xar v4.16b,v16.16b,v30.16b,#64-45 // A[0][4]=A[1][3]
-.long	0xce9d70b0	//xar v16.16b,v5.16b,v29.16b,#64-36
+.inst	0xce9ccb1c	//xar v28.16b,   v24.16b,v28.16b,#64-14 // D[4]=A[0][4]
+.inst	0xce9efab8	//xar v24.16b,v21.16b,v30.16b,#64-2
+.inst	0xce9b2508	//xar v8.16b,v8.16b,v27.16b,#64-55 // A[1][3]=A[4][1]
+.inst	0xce9e4e04	//xar v4.16b,v16.16b,v30.16b,#64-45 // A[0][4]=A[1][3]
+.inst	0xce9d70b0	//xar v16.16b,v5.16b,v29.16b,#64-36
 
-.long	0xce9b9065	//xar v5.16b,v3.16b,v27.16b,#64-28
+.inst	0xce9b9065	//xar v5.16b,v3.16b,v27.16b,#64-28
 
 	eor	v0.16b,v0.16b,v29.16b
 
-.long	0xce9bae5b	//xar v27.16b,   v18.16b,v27.16b,#64-21 // D[3]=A[0][3]
-.long	0xce9fc623	//xar v3.16b,v17.16b,v31.16b,#64-15 // A[0][3]=A[3][3]
-.long	0xce9ed97e	//xar v30.16b,   v11.16b,v30.16b,#64-10 // D[1]=A[3][2]
-.long	0xce9fe8ff	//xar v31.16b,   v7.16b,v31.16b,#64-6 // D[2]=A[2][1]
-.long	0xce9df55d	//xar v29.16b,   v10.16b,v29.16b,#64-3 // D[0]=A[1][2]
+.inst	0xce9bae5b	//xar v27.16b,   v18.16b,v27.16b,#64-21 // D[3]=A[0][3]
+.inst	0xce9fc623	//xar v3.16b,v17.16b,v31.16b,#64-15 // A[0][3]=A[3][3]
+.inst	0xce9ed97e	//xar v30.16b,   v11.16b,v30.16b,#64-10 // D[1]=A[3][2]
+.inst	0xce9fe8ff	//xar v31.16b,   v7.16b,v31.16b,#64-6 // D[2]=A[2][1]
+.inst	0xce9df55d	//xar v29.16b,   v10.16b,v29.16b,#64-3 // D[0]=A[1][2]
 
 	////////////////////////////////////////////////// Chi+Iota
-.long	0xce362354	//bcax v20.16b,v26.16b,   v22.16b,v8.16b	// A[1][3]=A[4][1]
-.long	0xce375915	//bcax v21.16b,v8.16b,v23.16b,v22.16b	// A[1][3]=A[4][1]
-.long	0xce385ed6	//bcax v22.16b,v22.16b,v24.16b,v23.16b
-.long	0xce3a62f7	//bcax v23.16b,v23.16b,v26.16b,   v24.16b
-.long	0xce286b18	//bcax v24.16b,v24.16b,v8.16b,v26.16b	// A[1][3]=A[4][1]
+.inst	0xce362354	//bcax v20.16b,v26.16b,   v22.16b,v8.16b	// A[1][3]=A[4][1]
+.inst	0xce375915	//bcax v21.16b,v8.16b,v23.16b,v22.16b	// A[1][3]=A[4][1]
+.inst	0xce385ed6	//bcax v22.16b,v22.16b,v24.16b,v23.16b
+.inst	0xce3a62f7	//bcax v23.16b,v23.16b,v26.16b,   v24.16b
+.inst	0xce286b18	//bcax v24.16b,v24.16b,v8.16b,v26.16b	// A[1][3]=A[4][1]
 
 	ld1r	{v26.2d},[x10],#8
 
-.long	0xce330fd1	//bcax v17.16b,v30.16b,   v19.16b,v3.16b	// A[0][3]=A[3][3]
-.long	0xce2f4c72	//bcax v18.16b,v3.16b,v15.16b,v19.16b	// A[0][3]=A[3][3]
-.long	0xce303e73	//bcax v19.16b,v19.16b,v16.16b,v15.16b
-.long	0xce3e41ef	//bcax v15.16b,v15.16b,v30.16b,   v16.16b
-.long	0xce237a10	//bcax v16.16b,v16.16b,v3.16b,v30.16b	// A[0][3]=A[3][3]
+.inst	0xce330fd1	//bcax v17.16b,v30.16b,   v19.16b,v3.16b	// A[0][3]=A[3][3]
+.inst	0xce2f4c72	//bcax v18.16b,v3.16b,v15.16b,v19.16b	// A[0][3]=A[3][3]
+.inst	0xce303e73	//bcax v19.16b,v19.16b,v16.16b,v15.16b
+.inst	0xce3e41ef	//bcax v15.16b,v15.16b,v30.16b,   v16.16b
+.inst	0xce237a10	//bcax v16.16b,v16.16b,v3.16b,v30.16b	// A[0][3]=A[3][3]
 
-.long	0xce2c7f2a	//bcax v10.16b,v25.16b,   v12.16b,v31.16b
-.long	0xce2d33eb	//bcax v11.16b,v31.16b,   v13.16b,v12.16b
-.long	0xce2e358c	//bcax v12.16b,v12.16b,v14.16b,v13.16b
-.long	0xce3939ad	//bcax v13.16b,v13.16b,v25.16b,   v14.16b
-.long	0xce3f65ce	//bcax v14.16b,v14.16b,v31.16b,   v25.16b
+.inst	0xce2c7f2a	//bcax v10.16b,v25.16b,   v12.16b,v31.16b
+.inst	0xce2d33eb	//bcax v11.16b,v31.16b,   v13.16b,v12.16b
+.inst	0xce2e358c	//bcax v12.16b,v12.16b,v14.16b,v13.16b
+.inst	0xce3939ad	//bcax v13.16b,v13.16b,v25.16b,   v14.16b
+.inst	0xce3f65ce	//bcax v14.16b,v14.16b,v31.16b,   v25.16b
 
-.long	0xce2913a7	//bcax v7.16b,v29.16b,   v9.16b,v4.16b	// A[0][4]=A[1][3]
-.long	0xce252488	//bcax v8.16b,v4.16b,v5.16b,v9.16b	// A[0][4]=A[1][3]
-.long	0xce261529	//bcax v9.16b,v9.16b,v6.16b,v5.16b
-.long	0xce3d18a5	//bcax v5.16b,v5.16b,v29.16b,   v6.16b
-.long	0xce2474c6	//bcax v6.16b,v6.16b,v4.16b,v29.16b	// A[0][4]=A[1][3]
+.inst	0xce2913a7	//bcax v7.16b,v29.16b,   v9.16b,v4.16b	// A[0][4]=A[1][3]
+.inst	0xce252488	//bcax v8.16b,v4.16b,v5.16b,v9.16b	// A[0][4]=A[1][3]
+.inst	0xce261529	//bcax v9.16b,v9.16b,v6.16b,v5.16b
+.inst	0xce3d18a5	//bcax v5.16b,v5.16b,v29.16b,   v6.16b
+.inst	0xce2474c6	//bcax v6.16b,v6.16b,v4.16b,v29.16b	// A[0][4]=A[1][3]
 
-.long	0xce207363	//bcax v3.16b,v27.16b,   v0.16b,v28.16b
-.long	0xce210384	//bcax v4.16b,v28.16b,   v1.16b,v0.16b
-.long	0xce220400	//bcax v0.16b,v0.16b,v2.16b,v1.16b
-.long	0xce3b0821	//bcax v1.16b,v1.16b,v27.16b,   v2.16b
-.long	0xce3c6c42	//bcax v2.16b,v2.16b,v28.16b,   v27.16b
+.inst	0xce207363	//bcax v3.16b,v27.16b,   v0.16b,v28.16b
+.inst	0xce210384	//bcax v4.16b,v28.16b,   v1.16b,v0.16b
+.inst	0xce220400	//bcax v0.16b,v0.16b,v2.16b,v1.16b
+.inst	0xce3b0821	//bcax v1.16b,v1.16b,v27.16b,   v2.16b
+.inst	0xce3c6c42	//bcax v2.16b,v2.16b,v28.16b,   v27.16b
 
 	eor	v0.16b,v0.16b,v26.16b
 
 	subs	x9,x9,#1
-	bne	Loop_ce
+	bne	.Loop_ce
 
 	ret
+.size	KeccakF1600_ce,.-KeccakF1600_ce
 
-
-
+.type	KeccakF1600_cext,%function
 .align	5
 KeccakF1600_cext:
-.long	0xd503233f		// paciasp
+.inst	0xd503233f		// paciasp
 	stp	x29,x30,[sp,#-80]!
 	add	x29,sp,#0
 	stp	d8,d9,[sp,#16]		// per ABI requirement
@@ -716,14 +716,14 @@ KeccakF1600_cext:
 	ldp	d12,d13,[sp,#48]
 	ldp	d14,d15,[sp,#64]
 	ldr	x29,[sp],#80
-.long	0xd50323bf		// autiasp
+.inst	0xd50323bf		// autiasp
 	ret
-
+.size	KeccakF1600_cext,.-KeccakF1600_cext
 .globl	SHA3_absorb_cext
-
+.type	SHA3_absorb_cext,%function
 .align	5
 SHA3_absorb_cext:
-.long	0xd503233f		// paciasp
+.inst	0xd503233f		// paciasp
 	stp	x29,x30,[sp,#-80]!
 	add	x29,sp,#0
 	stp	d8,d9,[sp,#16]		// per ABI requirement
@@ -743,182 +743,182 @@ SHA3_absorb_cext:
 	ldp	d20,d21,[x0,#8*20]
 	ldp	d22,d23,[x0,#8*22]
 	ldr	d24,[x0,#8*24]
-	b	Loop_absorb_ce
+	b	.Loop_absorb_ce
 
 .align	4
-Loop_absorb_ce:
+.Loop_absorb_ce:
 	subs	x2,x2,x3		// len - bsz
-	blo	Labsorbed_ce
+	blo	.Labsorbed_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v0.16b,v0.16b,v31.16b
 	cmp	x3,#8*(0+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v1.16b,v1.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v2.16b,v2.16b,v31.16b
 	cmp	x3,#8*(2+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v3.16b,v3.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v4.16b,v4.16b,v31.16b
 	cmp	x3,#8*(4+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v5.16b,v5.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v6.16b,v6.16b,v31.16b
 	cmp	x3,#8*(6+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v7.16b,v7.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v8.16b,v8.16b,v31.16b
 	cmp	x3,#8*(8+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v9.16b,v9.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v10.16b,v10.16b,v31.16b
 	cmp	x3,#8*(10+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v11.16b,v11.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v12.16b,v12.16b,v31.16b
 	cmp	x3,#8*(12+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v13.16b,v13.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v14.16b,v14.16b,v31.16b
 	cmp	x3,#8*(14+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v15.16b,v15.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v16.16b,v16.16b,v31.16b
 	cmp	x3,#8*(16+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v17.16b,v17.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v18.16b,v18.16b,v31.16b
 	cmp	x3,#8*(18+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v19.16b,v19.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v20.16b,v20.16b,v31.16b
 	cmp	x3,#8*(20+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v21.16b,v21.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v22.16b,v22.16b,v31.16b
 	cmp	x3,#8*(22+2)
-	blo	Lprocess_block_ce
+	blo	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v23.16b,v23.16b,v31.16b
-	beq	Lprocess_block_ce
+	beq	.Lprocess_block_ce
 	ldr	d31,[x1],#8		// *inp++
 #ifdef	__AARCH64EB__
 	rev64	v31.16b,v31.16b
 #endif
 	eor	v24.16b,v24.16b,v31.16b
 
-Lprocess_block_ce:
+.Lprocess_block_ce:
 
 	bl	KeccakF1600_ce
 
-	b	Loop_absorb_ce
+	b	.Loop_absorb_ce
 
 .align	4
-Labsorbed_ce:
+.Labsorbed_ce:
 	stp	d0,d1,[x0,#8*0]
 	stp	d2,d3,[x0,#8*2]
 	stp	d4,d5,[x0,#8*4]
@@ -939,71 +939,71 @@ Labsorbed_ce:
 	ldp	d12,d13,[sp,#48]
 	ldp	d14,d15,[sp,#64]
 	ldp	x29,x30,[sp],#80
-.long	0xd50323bf		// autiasp
+.inst	0xd50323bf		// autiasp
 	ret
-
+.size	SHA3_absorb_cext,.-SHA3_absorb_cext
 .globl	SHA3_squeeze_cext
-
+.type	SHA3_squeeze_cext,%function
 .align	5
 SHA3_squeeze_cext:
-.long	0xd503233f		// paciasp
+.inst	0xd503233f		// paciasp
 	stp	x29,x30,[sp,#-16]!
 	add	x29,sp,#0
 	mov	x9,x0
 	mov	x10,x3
 
-Loop_squeeze_ce:
+.Loop_squeeze_ce:
 	ldr	x4,[x9],#8
 	cmp	x2,#8
-	blo	Lsqueeze_tail_ce
+	blo	.Lsqueeze_tail_ce
 #ifdef	__AARCH64EB__
 	rev	x4,x4
 #endif
 	str	x4,[x1],#8
-	beq	Lsqueeze_done_ce
+	beq	.Lsqueeze_done_ce
 
 	sub	x2,x2,#8
 	subs	x10,x10,#8
-	bhi	Loop_squeeze_ce
+	bhi	.Loop_squeeze_ce
 
 	bl	KeccakF1600_cext
 	ldr	x30,[sp,#8]
 	mov	x9,x0
 	mov	x10,x3
-	b	Loop_squeeze_ce
+	b	.Loop_squeeze_ce
 
 .align	4
-Lsqueeze_tail_ce:
+.Lsqueeze_tail_ce:
 	strb	w4,[x1],#1
 	lsr	x4,x4,#8
 	subs	x2,x2,#1
-	beq	Lsqueeze_done_ce
+	beq	.Lsqueeze_done_ce
 	strb	w4,[x1],#1
 	lsr	x4,x4,#8
 	subs	x2,x2,#1
-	beq	Lsqueeze_done_ce
+	beq	.Lsqueeze_done_ce
 	strb	w4,[x1],#1
 	lsr	x4,x4,#8
 	subs	x2,x2,#1
-	beq	Lsqueeze_done_ce
+	beq	.Lsqueeze_done_ce
 	strb	w4,[x1],#1
 	lsr	x4,x4,#8
 	subs	x2,x2,#1
-	beq	Lsqueeze_done_ce
+	beq	.Lsqueeze_done_ce
 	strb	w4,[x1],#1
 	lsr	x4,x4,#8
 	subs	x2,x2,#1
-	beq	Lsqueeze_done_ce
+	beq	.Lsqueeze_done_ce
 	strb	w4,[x1],#1
 	lsr	x4,x4,#8
 	subs	x2,x2,#1
-	beq	Lsqueeze_done_ce
+	beq	.Lsqueeze_done_ce
 	strb	w4,[x1],#1
 
-Lsqueeze_done_ce:
+.Lsqueeze_done_ce:
 	ldr	x29,[sp],#16
-.long	0xd50323bf		// autiasp
+.inst	0xd50323bf		// autiasp
 	ret
-
+.size	SHA3_squeeze_cext,.-SHA3_squeeze_cext
 .byte	75,101,99,99,97,107,45,49,54,48,48,32,97,98,115,111,114,98,32,97,110,100,32,115,113,117,101,101,122,101,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align	2

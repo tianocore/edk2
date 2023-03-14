@@ -64,16 +64,16 @@
 .text
 
 .globl	sha512_block_data_order
-
+.type	sha512_block_data_order,%function
 .align	6
 sha512_block_data_order:
 #ifndef	__KERNEL__
 	adrp	x16,OPENSSL_armcap_P
 	ldr	w16,[x16,#:lo12:OPENSSL_armcap_P]
 	tst	w16,#ARMV8_SHA512
-	b.ne	Lv8_entry
+	b.ne	.Lv8_entry
 #endif
-.long	0xd503233f				// paciasp
+.inst	0xd503233f				// paciasp
 	stp	x29,x30,[sp,#-128]!
 	add	x29,sp,#0
 
@@ -89,10 +89,10 @@ sha512_block_data_order:
 	ldp	x24,x25,[x0,#4*8]
 	add	x2,x1,x2,lsl#7	// end of input
 	ldp	x26,x27,[x0,#6*8]
-	adr	x30,LK512
+	adr	x30,.LK512
 	stp	x0,x2,[x29,#96]
 
-Loop:
+.Loop:
 	ldp	x3,x4,[x1],#2*8
 	ldr	x19,[x30],#8			// *K++
 	eor	x28,x21,x22				// magic seed
@@ -503,7 +503,7 @@ Loop:
 	add	x3,x3,x9
 	add	x20,x20,x17			// h+=Sigma0(a)
 	add	x3,x3,x8
-Loop_16_xx:
+.Loop_16_xx:
 	ldr	x8,[sp,#8]
 	str	x11,[sp,#0]
 	ror	x16,x24,#14
@@ -1000,7 +1000,7 @@ Loop_16_xx:
 	add	x3,x3,x9
 	add	x20,x20,x17			// h+=Sigma0(a)
 	add	x3,x3,x8
-	cbnz	x19,Loop_16_xx
+	cbnz	x19,.Loop_16_xx
 
 	ldp	x0,x2,[x29,#96]
 	ldr	x1,[x29,#112]
@@ -1024,7 +1024,7 @@ Loop_16_xx:
 	cmp	x1,x2
 	stp	x24,x25,[x0,#4*8]
 	stp	x26,x27,[x0,#6*8]
-	b.ne	Loop
+	b.ne	.Loop
 
 	ldp	x19,x20,[x29,#16]
 	add	sp,sp,#4*8
@@ -1033,13 +1033,13 @@ Loop_16_xx:
 	ldp	x25,x26,[x29,#64]
 	ldp	x27,x28,[x29,#80]
 	ldp	x29,x30,[sp],#128
-.long	0xd50323bf				// autiasp
+.inst	0xd50323bf				// autiasp
 	ret
-
+.size	sha512_block_data_order,.-sha512_block_data_order
 
 .align	6
-
-LK512:
+.type	.LK512,%object
+.LK512:
 .quad	0x428a2f98d728ae22,0x7137449123ef65cd
 .quad	0xb5c0fbcfec4d3b2f,0xe9b5dba58189dbbc
 .quad	0x3956c25bf348b538,0x59f111f1b605d019
@@ -1081,15 +1081,15 @@ LK512:
 .quad	0x4cc5d4becb3e42b6,0x597f299cfc657e2a
 .quad	0x5fcb6fab3ad6faec,0x6c44198c4a475817
 .quad	0	// terminator
-
+.size	.LK512,.-.LK512
 .byte	83,72,65,53,49,50,32,98,108,111,99,107,32,116,114,97,110,115,102,111,114,109,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align	2
 .align	2
 #ifndef	__KERNEL__
-
+.type	sha512_block_armv8,%function
 .align	6
 sha512_block_armv8:
-Lv8_entry:
+.Lv8_entry:
 	stp	x29,x30,[sp,#-16]!
 	add	x29,sp,#0
 
@@ -1097,7 +1097,7 @@ Lv8_entry:
 	ld1	{v20.16b,v21.16b,v22.16b,v23.16b},[x1],#64
 
 	ld1	{v0.2d,v1.2d,v2.2d,v3.2d},[x0]		// load context
-	adr	x3,LK512
+	adr	x3,.LK512
 
 	rev64	v16.16b,v16.16b
 	rev64	v17.16b,v17.16b
@@ -1107,10 +1107,10 @@ Lv8_entry:
 	rev64	v21.16b,v21.16b
 	rev64	v22.16b,v22.16b
 	rev64	v23.16b,v23.16b
-	b	Loop_hw
+	b	.Loop_hw
 
 .align	4
-Loop_hw:
+.Loop_hw:
 	ld1	{v24.2d},[x3],#16
 	subs	x2,x2,#1
 	sub	x4,x1,#128
@@ -1125,384 +1125,384 @@ Loop_hw:
 	ext	v5.16b,v2.16b,v3.16b,#8
 	ext	v6.16b,v1.16b,v2.16b,#8
 	add	v3.2d,v3.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec08230	//sha512su0 v16.16b,v17.16b
+.inst	0xcec08230	//sha512su0 v16.16b,v17.16b
 	ext	v7.16b,v20.16b,v21.16b,#8
-.long	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
-.long	0xce678af0	//sha512su1 v16.16b,v23.16b,v7.16b
+.inst	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
+.inst	0xce678af0	//sha512su1 v16.16b,v23.16b,v7.16b
 	add	v4.2d,v1.2d,v3.2d		// "D + T1"
-.long	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
+.inst	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
 	add	v25.2d,v25.2d,v17.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v4.16b,v2.16b,#8
 	ext	v6.16b,v0.16b,v4.16b,#8
 	add	v2.2d,v2.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08251	//sha512su0 v17.16b,v18.16b
+.inst	0xcec08251	//sha512su0 v17.16b,v18.16b
 	ext	v7.16b,v21.16b,v22.16b,#8
-.long	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
-.long	0xce678a11	//sha512su1 v17.16b,v16.16b,v7.16b
+.inst	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
+.inst	0xce678a11	//sha512su1 v17.16b,v16.16b,v7.16b
 	add	v1.2d,v0.2d,v2.2d		// "D + T1"
-.long	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
+.inst	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
 	add	v24.2d,v24.2d,v18.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v1.16b,v4.16b,#8
 	ext	v6.16b,v3.16b,v1.16b,#8
 	add	v4.2d,v4.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec08272	//sha512su0 v18.16b,v19.16b
+.inst	0xcec08272	//sha512su0 v18.16b,v19.16b
 	ext	v7.16b,v22.16b,v23.16b,#8
-.long	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
-.long	0xce678a32	//sha512su1 v18.16b,v17.16b,v7.16b
+.inst	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
+.inst	0xce678a32	//sha512su1 v18.16b,v17.16b,v7.16b
 	add	v0.2d,v3.2d,v4.2d		// "D + T1"
-.long	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
+.inst	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
 	add	v25.2d,v25.2d,v19.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v0.16b,v1.16b,#8
 	ext	v6.16b,v2.16b,v0.16b,#8
 	add	v1.2d,v1.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08293	//sha512su0 v19.16b,v20.16b
+.inst	0xcec08293	//sha512su0 v19.16b,v20.16b
 	ext	v7.16b,v23.16b,v16.16b,#8
-.long	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
-.long	0xce678a53	//sha512su1 v19.16b,v18.16b,v7.16b
+.inst	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
+.inst	0xce678a53	//sha512su1 v19.16b,v18.16b,v7.16b
 	add	v3.2d,v2.2d,v1.2d		// "D + T1"
-.long	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
+.inst	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
 	add	v24.2d,v24.2d,v20.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v3.16b,v0.16b,#8
 	ext	v6.16b,v4.16b,v3.16b,#8
 	add	v0.2d,v0.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec082b4	//sha512su0 v20.16b,v21.16b
+.inst	0xcec082b4	//sha512su0 v20.16b,v21.16b
 	ext	v7.16b,v16.16b,v17.16b,#8
-.long	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
-.long	0xce678a74	//sha512su1 v20.16b,v19.16b,v7.16b
+.inst	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
+.inst	0xce678a74	//sha512su1 v20.16b,v19.16b,v7.16b
 	add	v2.2d,v4.2d,v0.2d		// "D + T1"
-.long	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
+.inst	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
 	add	v25.2d,v25.2d,v21.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v2.16b,v3.16b,#8
 	ext	v6.16b,v1.16b,v2.16b,#8
 	add	v3.2d,v3.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec082d5	//sha512su0 v21.16b,v22.16b
+.inst	0xcec082d5	//sha512su0 v21.16b,v22.16b
 	ext	v7.16b,v17.16b,v18.16b,#8
-.long	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
-.long	0xce678a95	//sha512su1 v21.16b,v20.16b,v7.16b
+.inst	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
+.inst	0xce678a95	//sha512su1 v21.16b,v20.16b,v7.16b
 	add	v4.2d,v1.2d,v3.2d		// "D + T1"
-.long	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
+.inst	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
 	add	v24.2d,v24.2d,v22.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v4.16b,v2.16b,#8
 	ext	v6.16b,v0.16b,v4.16b,#8
 	add	v2.2d,v2.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec082f6	//sha512su0 v22.16b,v23.16b
+.inst	0xcec082f6	//sha512su0 v22.16b,v23.16b
 	ext	v7.16b,v18.16b,v19.16b,#8
-.long	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
-.long	0xce678ab6	//sha512su1 v22.16b,v21.16b,v7.16b
+.inst	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
+.inst	0xce678ab6	//sha512su1 v22.16b,v21.16b,v7.16b
 	add	v1.2d,v0.2d,v2.2d		// "D + T1"
-.long	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
+.inst	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
 	add	v25.2d,v25.2d,v23.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v1.16b,v4.16b,#8
 	ext	v6.16b,v3.16b,v1.16b,#8
 	add	v4.2d,v4.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08217	//sha512su0 v23.16b,v16.16b
+.inst	0xcec08217	//sha512su0 v23.16b,v16.16b
 	ext	v7.16b,v19.16b,v20.16b,#8
-.long	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
-.long	0xce678ad7	//sha512su1 v23.16b,v22.16b,v7.16b
+.inst	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
+.inst	0xce678ad7	//sha512su1 v23.16b,v22.16b,v7.16b
 	add	v0.2d,v3.2d,v4.2d		// "D + T1"
-.long	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
+.inst	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
 	add	v24.2d,v24.2d,v16.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v0.16b,v1.16b,#8
 	ext	v6.16b,v2.16b,v0.16b,#8
 	add	v1.2d,v1.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec08230	//sha512su0 v16.16b,v17.16b
+.inst	0xcec08230	//sha512su0 v16.16b,v17.16b
 	ext	v7.16b,v20.16b,v21.16b,#8
-.long	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
-.long	0xce678af0	//sha512su1 v16.16b,v23.16b,v7.16b
+.inst	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
+.inst	0xce678af0	//sha512su1 v16.16b,v23.16b,v7.16b
 	add	v3.2d,v2.2d,v1.2d		// "D + T1"
-.long	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
+.inst	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
 	add	v25.2d,v25.2d,v17.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v3.16b,v0.16b,#8
 	ext	v6.16b,v4.16b,v3.16b,#8
 	add	v0.2d,v0.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08251	//sha512su0 v17.16b,v18.16b
+.inst	0xcec08251	//sha512su0 v17.16b,v18.16b
 	ext	v7.16b,v21.16b,v22.16b,#8
-.long	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
-.long	0xce678a11	//sha512su1 v17.16b,v16.16b,v7.16b
+.inst	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
+.inst	0xce678a11	//sha512su1 v17.16b,v16.16b,v7.16b
 	add	v2.2d,v4.2d,v0.2d		// "D + T1"
-.long	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
+.inst	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
 	add	v24.2d,v24.2d,v18.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v2.16b,v3.16b,#8
 	ext	v6.16b,v1.16b,v2.16b,#8
 	add	v3.2d,v3.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec08272	//sha512su0 v18.16b,v19.16b
+.inst	0xcec08272	//sha512su0 v18.16b,v19.16b
 	ext	v7.16b,v22.16b,v23.16b,#8
-.long	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
-.long	0xce678a32	//sha512su1 v18.16b,v17.16b,v7.16b
+.inst	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
+.inst	0xce678a32	//sha512su1 v18.16b,v17.16b,v7.16b
 	add	v4.2d,v1.2d,v3.2d		// "D + T1"
-.long	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
+.inst	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
 	add	v25.2d,v25.2d,v19.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v4.16b,v2.16b,#8
 	ext	v6.16b,v0.16b,v4.16b,#8
 	add	v2.2d,v2.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08293	//sha512su0 v19.16b,v20.16b
+.inst	0xcec08293	//sha512su0 v19.16b,v20.16b
 	ext	v7.16b,v23.16b,v16.16b,#8
-.long	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
-.long	0xce678a53	//sha512su1 v19.16b,v18.16b,v7.16b
+.inst	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
+.inst	0xce678a53	//sha512su1 v19.16b,v18.16b,v7.16b
 	add	v1.2d,v0.2d,v2.2d		// "D + T1"
-.long	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
+.inst	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
 	add	v24.2d,v24.2d,v20.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v1.16b,v4.16b,#8
 	ext	v6.16b,v3.16b,v1.16b,#8
 	add	v4.2d,v4.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec082b4	//sha512su0 v20.16b,v21.16b
+.inst	0xcec082b4	//sha512su0 v20.16b,v21.16b
 	ext	v7.16b,v16.16b,v17.16b,#8
-.long	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
-.long	0xce678a74	//sha512su1 v20.16b,v19.16b,v7.16b
+.inst	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
+.inst	0xce678a74	//sha512su1 v20.16b,v19.16b,v7.16b
 	add	v0.2d,v3.2d,v4.2d		// "D + T1"
-.long	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
+.inst	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
 	add	v25.2d,v25.2d,v21.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v0.16b,v1.16b,#8
 	ext	v6.16b,v2.16b,v0.16b,#8
 	add	v1.2d,v1.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec082d5	//sha512su0 v21.16b,v22.16b
+.inst	0xcec082d5	//sha512su0 v21.16b,v22.16b
 	ext	v7.16b,v17.16b,v18.16b,#8
-.long	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
-.long	0xce678a95	//sha512su1 v21.16b,v20.16b,v7.16b
+.inst	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
+.inst	0xce678a95	//sha512su1 v21.16b,v20.16b,v7.16b
 	add	v3.2d,v2.2d,v1.2d		// "D + T1"
-.long	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
+.inst	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
 	add	v24.2d,v24.2d,v22.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v3.16b,v0.16b,#8
 	ext	v6.16b,v4.16b,v3.16b,#8
 	add	v0.2d,v0.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec082f6	//sha512su0 v22.16b,v23.16b
+.inst	0xcec082f6	//sha512su0 v22.16b,v23.16b
 	ext	v7.16b,v18.16b,v19.16b,#8
-.long	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
-.long	0xce678ab6	//sha512su1 v22.16b,v21.16b,v7.16b
+.inst	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
+.inst	0xce678ab6	//sha512su1 v22.16b,v21.16b,v7.16b
 	add	v2.2d,v4.2d,v0.2d		// "D + T1"
-.long	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
+.inst	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
 	add	v25.2d,v25.2d,v23.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v2.16b,v3.16b,#8
 	ext	v6.16b,v1.16b,v2.16b,#8
 	add	v3.2d,v3.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08217	//sha512su0 v23.16b,v16.16b
+.inst	0xcec08217	//sha512su0 v23.16b,v16.16b
 	ext	v7.16b,v19.16b,v20.16b,#8
-.long	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
-.long	0xce678ad7	//sha512su1 v23.16b,v22.16b,v7.16b
+.inst	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
+.inst	0xce678ad7	//sha512su1 v23.16b,v22.16b,v7.16b
 	add	v4.2d,v1.2d,v3.2d		// "D + T1"
-.long	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
+.inst	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
 	add	v24.2d,v24.2d,v16.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v4.16b,v2.16b,#8
 	ext	v6.16b,v0.16b,v4.16b,#8
 	add	v2.2d,v2.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec08230	//sha512su0 v16.16b,v17.16b
+.inst	0xcec08230	//sha512su0 v16.16b,v17.16b
 	ext	v7.16b,v20.16b,v21.16b,#8
-.long	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
-.long	0xce678af0	//sha512su1 v16.16b,v23.16b,v7.16b
+.inst	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
+.inst	0xce678af0	//sha512su1 v16.16b,v23.16b,v7.16b
 	add	v1.2d,v0.2d,v2.2d		// "D + T1"
-.long	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
+.inst	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
 	add	v25.2d,v25.2d,v17.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v1.16b,v4.16b,#8
 	ext	v6.16b,v3.16b,v1.16b,#8
 	add	v4.2d,v4.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08251	//sha512su0 v17.16b,v18.16b
+.inst	0xcec08251	//sha512su0 v17.16b,v18.16b
 	ext	v7.16b,v21.16b,v22.16b,#8
-.long	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
-.long	0xce678a11	//sha512su1 v17.16b,v16.16b,v7.16b
+.inst	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
+.inst	0xce678a11	//sha512su1 v17.16b,v16.16b,v7.16b
 	add	v0.2d,v3.2d,v4.2d		// "D + T1"
-.long	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
+.inst	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
 	add	v24.2d,v24.2d,v18.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v0.16b,v1.16b,#8
 	ext	v6.16b,v2.16b,v0.16b,#8
 	add	v1.2d,v1.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec08272	//sha512su0 v18.16b,v19.16b
+.inst	0xcec08272	//sha512su0 v18.16b,v19.16b
 	ext	v7.16b,v22.16b,v23.16b,#8
-.long	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
-.long	0xce678a32	//sha512su1 v18.16b,v17.16b,v7.16b
+.inst	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
+.inst	0xce678a32	//sha512su1 v18.16b,v17.16b,v7.16b
 	add	v3.2d,v2.2d,v1.2d		// "D + T1"
-.long	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
+.inst	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
 	add	v25.2d,v25.2d,v19.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v3.16b,v0.16b,#8
 	ext	v6.16b,v4.16b,v3.16b,#8
 	add	v0.2d,v0.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08293	//sha512su0 v19.16b,v20.16b
+.inst	0xcec08293	//sha512su0 v19.16b,v20.16b
 	ext	v7.16b,v23.16b,v16.16b,#8
-.long	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
-.long	0xce678a53	//sha512su1 v19.16b,v18.16b,v7.16b
+.inst	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
+.inst	0xce678a53	//sha512su1 v19.16b,v18.16b,v7.16b
 	add	v2.2d,v4.2d,v0.2d		// "D + T1"
-.long	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
+.inst	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
 	add	v24.2d,v24.2d,v20.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v2.16b,v3.16b,#8
 	ext	v6.16b,v1.16b,v2.16b,#8
 	add	v3.2d,v3.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec082b4	//sha512su0 v20.16b,v21.16b
+.inst	0xcec082b4	//sha512su0 v20.16b,v21.16b
 	ext	v7.16b,v16.16b,v17.16b,#8
-.long	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
-.long	0xce678a74	//sha512su1 v20.16b,v19.16b,v7.16b
+.inst	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
+.inst	0xce678a74	//sha512su1 v20.16b,v19.16b,v7.16b
 	add	v4.2d,v1.2d,v3.2d		// "D + T1"
-.long	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
+.inst	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
 	add	v25.2d,v25.2d,v21.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v4.16b,v2.16b,#8
 	ext	v6.16b,v0.16b,v4.16b,#8
 	add	v2.2d,v2.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec082d5	//sha512su0 v21.16b,v22.16b
+.inst	0xcec082d5	//sha512su0 v21.16b,v22.16b
 	ext	v7.16b,v17.16b,v18.16b,#8
-.long	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
-.long	0xce678a95	//sha512su1 v21.16b,v20.16b,v7.16b
+.inst	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
+.inst	0xce678a95	//sha512su1 v21.16b,v20.16b,v7.16b
 	add	v1.2d,v0.2d,v2.2d		// "D + T1"
-.long	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
+.inst	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
 	add	v24.2d,v24.2d,v22.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v1.16b,v4.16b,#8
 	ext	v6.16b,v3.16b,v1.16b,#8
 	add	v4.2d,v4.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec082f6	//sha512su0 v22.16b,v23.16b
+.inst	0xcec082f6	//sha512su0 v22.16b,v23.16b
 	ext	v7.16b,v18.16b,v19.16b,#8
-.long	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
-.long	0xce678ab6	//sha512su1 v22.16b,v21.16b,v7.16b
+.inst	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
+.inst	0xce678ab6	//sha512su1 v22.16b,v21.16b,v7.16b
 	add	v0.2d,v3.2d,v4.2d		// "D + T1"
-.long	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
+.inst	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
 	add	v25.2d,v25.2d,v23.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v0.16b,v1.16b,#8
 	ext	v6.16b,v2.16b,v0.16b,#8
 	add	v1.2d,v1.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08217	//sha512su0 v23.16b,v16.16b
+.inst	0xcec08217	//sha512su0 v23.16b,v16.16b
 	ext	v7.16b,v19.16b,v20.16b,#8
-.long	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
-.long	0xce678ad7	//sha512su1 v23.16b,v22.16b,v7.16b
+.inst	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
+.inst	0xce678ad7	//sha512su1 v23.16b,v22.16b,v7.16b
 	add	v3.2d,v2.2d,v1.2d		// "D + T1"
-.long	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
+.inst	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
 	add	v24.2d,v24.2d,v16.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v3.16b,v0.16b,#8
 	ext	v6.16b,v4.16b,v3.16b,#8
 	add	v0.2d,v0.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec08230	//sha512su0 v16.16b,v17.16b
+.inst	0xcec08230	//sha512su0 v16.16b,v17.16b
 	ext	v7.16b,v20.16b,v21.16b,#8
-.long	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
-.long	0xce678af0	//sha512su1 v16.16b,v23.16b,v7.16b
+.inst	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
+.inst	0xce678af0	//sha512su1 v16.16b,v23.16b,v7.16b
 	add	v2.2d,v4.2d,v0.2d		// "D + T1"
-.long	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
+.inst	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
 	add	v25.2d,v25.2d,v17.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v2.16b,v3.16b,#8
 	ext	v6.16b,v1.16b,v2.16b,#8
 	add	v3.2d,v3.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08251	//sha512su0 v17.16b,v18.16b
+.inst	0xcec08251	//sha512su0 v17.16b,v18.16b
 	ext	v7.16b,v21.16b,v22.16b,#8
-.long	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
-.long	0xce678a11	//sha512su1 v17.16b,v16.16b,v7.16b
+.inst	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
+.inst	0xce678a11	//sha512su1 v17.16b,v16.16b,v7.16b
 	add	v4.2d,v1.2d,v3.2d		// "D + T1"
-.long	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
+.inst	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
 	add	v24.2d,v24.2d,v18.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v4.16b,v2.16b,#8
 	ext	v6.16b,v0.16b,v4.16b,#8
 	add	v2.2d,v2.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec08272	//sha512su0 v18.16b,v19.16b
+.inst	0xcec08272	//sha512su0 v18.16b,v19.16b
 	ext	v7.16b,v22.16b,v23.16b,#8
-.long	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
-.long	0xce678a32	//sha512su1 v18.16b,v17.16b,v7.16b
+.inst	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
+.inst	0xce678a32	//sha512su1 v18.16b,v17.16b,v7.16b
 	add	v1.2d,v0.2d,v2.2d		// "D + T1"
-.long	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
+.inst	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
 	add	v25.2d,v25.2d,v19.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v1.16b,v4.16b,#8
 	ext	v6.16b,v3.16b,v1.16b,#8
 	add	v4.2d,v4.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08293	//sha512su0 v19.16b,v20.16b
+.inst	0xcec08293	//sha512su0 v19.16b,v20.16b
 	ext	v7.16b,v23.16b,v16.16b,#8
-.long	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
-.long	0xce678a53	//sha512su1 v19.16b,v18.16b,v7.16b
+.inst	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
+.inst	0xce678a53	//sha512su1 v19.16b,v18.16b,v7.16b
 	add	v0.2d,v3.2d,v4.2d		// "D + T1"
-.long	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
+.inst	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
 	add	v24.2d,v24.2d,v20.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v0.16b,v1.16b,#8
 	ext	v6.16b,v2.16b,v0.16b,#8
 	add	v1.2d,v1.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec082b4	//sha512su0 v20.16b,v21.16b
+.inst	0xcec082b4	//sha512su0 v20.16b,v21.16b
 	ext	v7.16b,v16.16b,v17.16b,#8
-.long	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
-.long	0xce678a74	//sha512su1 v20.16b,v19.16b,v7.16b
+.inst	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
+.inst	0xce678a74	//sha512su1 v20.16b,v19.16b,v7.16b
 	add	v3.2d,v2.2d,v1.2d		// "D + T1"
-.long	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
+.inst	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
 	add	v25.2d,v25.2d,v21.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v3.16b,v0.16b,#8
 	ext	v6.16b,v4.16b,v3.16b,#8
 	add	v0.2d,v0.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec082d5	//sha512su0 v21.16b,v22.16b
+.inst	0xcec082d5	//sha512su0 v21.16b,v22.16b
 	ext	v7.16b,v17.16b,v18.16b,#8
-.long	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
-.long	0xce678a95	//sha512su1 v21.16b,v20.16b,v7.16b
+.inst	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
+.inst	0xce678a95	//sha512su1 v21.16b,v20.16b,v7.16b
 	add	v2.2d,v4.2d,v0.2d		// "D + T1"
-.long	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
+.inst	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
 	add	v24.2d,v24.2d,v22.2d
 	ld1	{v25.2d},[x3],#16
 	ext	v24.16b,v24.16b,v24.16b,#8
 	ext	v5.16b,v2.16b,v3.16b,#8
 	ext	v6.16b,v1.16b,v2.16b,#8
 	add	v3.2d,v3.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xcec082f6	//sha512su0 v22.16b,v23.16b
+.inst	0xcec082f6	//sha512su0 v22.16b,v23.16b
 	ext	v7.16b,v18.16b,v19.16b,#8
-.long	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
-.long	0xce678ab6	//sha512su1 v22.16b,v21.16b,v7.16b
+.inst	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
+.inst	0xce678ab6	//sha512su1 v22.16b,v21.16b,v7.16b
 	add	v4.2d,v1.2d,v3.2d		// "D + T1"
-.long	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
+.inst	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
 	add	v25.2d,v25.2d,v23.2d
 	ld1	{v24.2d},[x3],#16
 	ext	v25.16b,v25.16b,v25.16b,#8
 	ext	v5.16b,v4.16b,v2.16b,#8
 	ext	v6.16b,v0.16b,v4.16b,#8
 	add	v2.2d,v2.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xcec08217	//sha512su0 v23.16b,v16.16b
+.inst	0xcec08217	//sha512su0 v23.16b,v16.16b
 	ext	v7.16b,v19.16b,v20.16b,#8
-.long	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
-.long	0xce678ad7	//sha512su1 v23.16b,v22.16b,v7.16b
+.inst	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
+.inst	0xce678ad7	//sha512su1 v23.16b,v22.16b,v7.16b
 	add	v1.2d,v0.2d,v2.2d		// "D + T1"
-.long	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
+.inst	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
 	ld1	{v25.2d},[x3],#16
 	add	v24.2d,v24.2d,v16.2d
 	ld1	{v16.16b},[x1],#16		// load next input
@@ -1510,10 +1510,10 @@ Loop_hw:
 	ext	v5.16b,v1.16b,v4.16b,#8
 	ext	v6.16b,v3.16b,v1.16b,#8
 	add	v4.2d,v4.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
+.inst	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
 	rev64	v16.16b,v16.16b
 	add	v0.2d,v3.2d,v4.2d		// "D + T1"
-.long	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
+.inst	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
 	ld1	{v24.2d},[x3],#16
 	add	v25.2d,v25.2d,v17.2d
 	ld1	{v17.16b},[x1],#16		// load next input
@@ -1521,10 +1521,10 @@ Loop_hw:
 	ext	v5.16b,v0.16b,v1.16b,#8
 	ext	v6.16b,v2.16b,v0.16b,#8
 	add	v1.2d,v1.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
+.inst	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
 	rev64	v17.16b,v17.16b
 	add	v3.2d,v2.2d,v1.2d		// "D + T1"
-.long	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
+.inst	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
 	ld1	{v25.2d},[x3],#16
 	add	v24.2d,v24.2d,v18.2d
 	ld1	{v18.16b},[x1],#16		// load next input
@@ -1532,10 +1532,10 @@ Loop_hw:
 	ext	v5.16b,v3.16b,v0.16b,#8
 	ext	v6.16b,v4.16b,v3.16b,#8
 	add	v0.2d,v0.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
+.inst	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
 	rev64	v18.16b,v18.16b
 	add	v2.2d,v4.2d,v0.2d		// "D + T1"
-.long	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
+.inst	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
 	ld1	{v24.2d},[x3],#16
 	add	v25.2d,v25.2d,v19.2d
 	ld1	{v19.16b},[x1],#16		// load next input
@@ -1543,10 +1543,10 @@ Loop_hw:
 	ext	v5.16b,v2.16b,v3.16b,#8
 	ext	v6.16b,v1.16b,v2.16b,#8
 	add	v3.2d,v3.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
+.inst	0xce6680a3	//sha512h v3.16b,v5.16b,v6.16b
 	rev64	v19.16b,v19.16b
 	add	v4.2d,v1.2d,v3.2d		// "D + T1"
-.long	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
+.inst	0xce608423	//sha512h2 v3.16b,v1.16b,v0.16b
 	ld1	{v25.2d},[x3],#16
 	add	v24.2d,v24.2d,v20.2d
 	ld1	{v20.16b},[x1],#16		// load next input
@@ -1554,10 +1554,10 @@ Loop_hw:
 	ext	v5.16b,v4.16b,v2.16b,#8
 	ext	v6.16b,v0.16b,v4.16b,#8
 	add	v2.2d,v2.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
+.inst	0xce6680a2	//sha512h v2.16b,v5.16b,v6.16b
 	rev64	v20.16b,v20.16b
 	add	v1.2d,v0.2d,v2.2d		// "D + T1"
-.long	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
+.inst	0xce638402	//sha512h2 v2.16b,v0.16b,v3.16b
 	ld1	{v24.2d},[x3],#16
 	add	v25.2d,v25.2d,v21.2d
 	ld1	{v21.16b},[x1],#16		// load next input
@@ -1565,10 +1565,10 @@ Loop_hw:
 	ext	v5.16b,v1.16b,v4.16b,#8
 	ext	v6.16b,v3.16b,v1.16b,#8
 	add	v4.2d,v4.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
+.inst	0xce6680a4	//sha512h v4.16b,v5.16b,v6.16b
 	rev64	v21.16b,v21.16b
 	add	v0.2d,v3.2d,v4.2d		// "D + T1"
-.long	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
+.inst	0xce628464	//sha512h2 v4.16b,v3.16b,v2.16b
 	ld1	{v25.2d},[x3],#16
 	add	v24.2d,v24.2d,v22.2d
 	ld1	{v22.16b},[x1],#16		// load next input
@@ -1576,10 +1576,10 @@ Loop_hw:
 	ext	v5.16b,v0.16b,v1.16b,#8
 	ext	v6.16b,v2.16b,v0.16b,#8
 	add	v1.2d,v1.2d,v24.2d			// "T1 + H + K512[i]"
-.long	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
+.inst	0xce6680a1	//sha512h v1.16b,v5.16b,v6.16b
 	rev64	v22.16b,v22.16b
 	add	v3.2d,v2.2d,v1.2d		// "D + T1"
-.long	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
+.inst	0xce648441	//sha512h2 v1.16b,v2.16b,v4.16b
 	sub	x3,x3,#80*8	// rewind
 	add	v25.2d,v25.2d,v23.2d
 	ld1	{v23.16b},[x1],#16		// load next input
@@ -1587,20 +1587,20 @@ Loop_hw:
 	ext	v5.16b,v3.16b,v0.16b,#8
 	ext	v6.16b,v4.16b,v3.16b,#8
 	add	v0.2d,v0.2d,v25.2d			// "T1 + H + K512[i]"
-.long	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
+.inst	0xce6680a0	//sha512h v0.16b,v5.16b,v6.16b
 	rev64	v23.16b,v23.16b
 	add	v2.2d,v4.2d,v0.2d		// "D + T1"
-.long	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
+.inst	0xce618480	//sha512h2 v0.16b,v4.16b,v1.16b
 	add	v0.2d,v0.2d,v26.2d			// accumulate
 	add	v1.2d,v1.2d,v27.2d
 	add	v2.2d,v2.2d,v28.2d
 	add	v3.2d,v3.2d,v29.2d
 
-	cbnz	x2,Loop_hw
+	cbnz	x2,.Loop_hw
 
 	st1	{v0.2d,v1.2d,v2.2d,v3.2d},[x0]		// store context
 
 	ldr	x29,[sp],#16
 	ret
-
+.size	sha512_block_armv8,.-sha512_block_armv8
 #endif

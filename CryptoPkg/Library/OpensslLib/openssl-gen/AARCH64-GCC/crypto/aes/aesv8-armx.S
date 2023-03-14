@@ -1,1087 +1,3178 @@
 #include "arm_arch.h"
 
 #if __ARM_MAX_ARCH__>=7
-
-
-#ifdef	__thumb2__
-.syntax	unified
-.thumb
-# define INST(a,b,c,d)	.byte	c,d|0xc,a,b
-#else
-.code	32
-# define INST(a,b,c,d)	.byte	a,b,c,d
-#endif
-
+.arch	armv8-a+crypto
 .text
 .align	5
-Lrcon:
+.Lrcon:
 .long	0x01,0x01,0x01,0x01
-.long	0x0c0f0e0d,0x0c0f0e0d,0x0c0f0e0d,0x0c0f0e0d	@ rotate-n-splat
+.long	0x0c0f0e0d,0x0c0f0e0d,0x0c0f0e0d,0x0c0f0e0d	// rotate-n-splat
 .long	0x1b,0x1b,0x1b,0x1b
 
 .globl	aes_v8_set_encrypt_key
-
+.type	aes_v8_set_encrypt_key,%function
 .align	5
 aes_v8_set_encrypt_key:
-Lenc_key:
-	mov	r3,#-1
-	cmp	r0,#0
-	beq	Lenc_key_abort
-	cmp	r2,#0
-	beq	Lenc_key_abort
-	mov	r3,#-2
-	cmp	r1,#128
-	blt	Lenc_key_abort
-	cmp	r1,#256
-	bgt	Lenc_key_abort
-	tst	r1,#0x3f
-	bne	Lenc_key_abort
+.Lenc_key:
+	stp	x29,x30,[sp,#-16]!
+	add	x29,sp,#0
+	mov	x3,#-1
+	cmp	x0,#0
+	b.eq	.Lenc_key_abort
+	cmp	x2,#0
+	b.eq	.Lenc_key_abort
+	mov	x3,#-2
+	cmp	w1,#128
+	b.lt	.Lenc_key_abort
+	cmp	w1,#256
+	b.gt	.Lenc_key_abort
+	tst	w1,#0x3f
+	b.ne	.Lenc_key_abort
 
-	adr	r3,Lrcon
-	cmp	r1,#192
+	adr	x3,.Lrcon
+	cmp	w1,#192
 
-	veor	q0,q0,q0
-	vld1.8	{q3},[r0]!
-	mov	r1,#8		@ reuse r1
-	vld1.32	{q1,q2},[r3]!
+	eor	v0.16b,v0.16b,v0.16b
+	ld1	{v3.16b},[x0],#16
+	mov	w1,#8		// reuse w1
+	ld1	{v1.4s,v2.4s},[x3],#32
 
-	blt	Loop128
-	beq	L192
-	b	L256
-
-.align	4
-Loop128:
-	vtbl.8	d20,{q3},d4
-	vtbl.8	d21,{q3},d5
-	vext.8	q9,q0,q3,#12
-	vst1.32	{q3},[r2]!
-	INST(0x00,0x43,0xf0,0xf3)	@ aese q10,q0
-	subs	r1,r1,#1
-
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q10,q10,q1
-	veor	q3,q3,q9
-	vshl.u8	q1,q1,#1
-	veor	q3,q3,q10
-	bne	Loop128
-
-	vld1.32	{q1},[r3]
-
-	vtbl.8	d20,{q3},d4
-	vtbl.8	d21,{q3},d5
-	vext.8	q9,q0,q3,#12
-	vst1.32	{q3},[r2]!
-	INST(0x00,0x43,0xf0,0xf3)	@ aese q10,q0
-
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q10,q10,q1
-	veor	q3,q3,q9
-	vshl.u8	q1,q1,#1
-	veor	q3,q3,q10
-
-	vtbl.8	d20,{q3},d4
-	vtbl.8	d21,{q3},d5
-	vext.8	q9,q0,q3,#12
-	vst1.32	{q3},[r2]!
-	INST(0x00,0x43,0xf0,0xf3)	@ aese q10,q0
-
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q10,q10,q1
-	veor	q3,q3,q9
-	veor	q3,q3,q10
-	vst1.32	{q3},[r2]
-	add	r2,r2,#0x50
-
-	mov	r12,#10
-	b	Ldone
+	b.lt	.Loop128
+	b.eq	.L192
+	b	.L256
 
 .align	4
-L192:
-	vld1.8	{d16},[r0]!
-	vmov.i8	q10,#8			@ borrow q10
-	vst1.32	{q3},[r2]!
-	vsub.i8	q2,q2,q10	@ adjust the mask
+.Loop128:
+	tbl	v6.16b,{v3.16b},v2.16b
+	ext	v5.16b,v0.16b,v3.16b,#12
+	st1	{v3.4s},[x2],#16
+	aese	v6.16b,v0.16b
+	subs	w1,w1,#1
 
-Loop192:
-	vtbl.8	d20,{q8},d4
-	vtbl.8	d21,{q8},d5
-	vext.8	q9,q0,q3,#12
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v6.16b,v6.16b,v1.16b
+	eor	v3.16b,v3.16b,v5.16b
+	shl	v1.16b,v1.16b,#1
+	eor	v3.16b,v3.16b,v6.16b
+	b.ne	.Loop128
+
+	ld1	{v1.4s},[x3]
+
+	tbl	v6.16b,{v3.16b},v2.16b
+	ext	v5.16b,v0.16b,v3.16b,#12
+	st1	{v3.4s},[x2],#16
+	aese	v6.16b,v0.16b
+
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v6.16b,v6.16b,v1.16b
+	eor	v3.16b,v3.16b,v5.16b
+	shl	v1.16b,v1.16b,#1
+	eor	v3.16b,v3.16b,v6.16b
+
+	tbl	v6.16b,{v3.16b},v2.16b
+	ext	v5.16b,v0.16b,v3.16b,#12
+	st1	{v3.4s},[x2],#16
+	aese	v6.16b,v0.16b
+
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v6.16b,v6.16b,v1.16b
+	eor	v3.16b,v3.16b,v5.16b
+	eor	v3.16b,v3.16b,v6.16b
+	st1	{v3.4s},[x2]
+	add	x2,x2,#0x50
+
+	mov	w12,#10
+	b	.Ldone
+
+.align	4
+.L192:
+	ld1	{v4.8b},[x0],#8
+	movi	v6.16b,#8			// borrow v6.16b
+	st1	{v3.4s},[x2],#16
+	sub	v2.16b,v2.16b,v6.16b	// adjust the mask
+
+.Loop192:
+	tbl	v6.16b,{v4.16b},v2.16b
+	ext	v5.16b,v0.16b,v3.16b,#12
 #ifdef __ARMEB__
-	vst1.32	{q8},[r2]!
-	sub	r2,r2,#8
+	st1	{v4.4s},[x2],#16
+	sub	x2,x2,#8
 #else
-	vst1.32	{d16},[r2]!
+	st1	{v4.8b},[x2],#8
 #endif
-	INST(0x00,0x43,0xf0,0xf3)	@ aese q10,q0
-	subs	r1,r1,#1
+	aese	v6.16b,v0.16b
+	subs	w1,w1,#1
 
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q3,q3,q9
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v3.16b,v3.16b,v5.16b
 
-	vdup.32	q9,d7[1]
-	veor	q9,q9,q8
-	veor	q10,q10,q1
-	vext.8	q8,q0,q8,#12
-	vshl.u8	q1,q1,#1
-	veor	q8,q8,q9
-	veor	q3,q3,q10
-	veor	q8,q8,q10
-	vst1.32	{q3},[r2]!
-	bne	Loop192
+	dup	v5.4s,v3.s[3]
+	eor	v5.16b,v5.16b,v4.16b
+	eor	v6.16b,v6.16b,v1.16b
+	ext	v4.16b,v0.16b,v4.16b,#12
+	shl	v1.16b,v1.16b,#1
+	eor	v4.16b,v4.16b,v5.16b
+	eor	v3.16b,v3.16b,v6.16b
+	eor	v4.16b,v4.16b,v6.16b
+	st1	{v3.4s},[x2],#16
+	b.ne	.Loop192
 
-	mov	r12,#12
-	add	r2,r2,#0x20
-	b	Ldone
+	mov	w12,#12
+	add	x2,x2,#0x20
+	b	.Ldone
 
 .align	4
-L256:
-	vld1.8	{q8},[r0]
-	mov	r1,#7
-	mov	r12,#14
-	vst1.32	{q3},[r2]!
+.L256:
+	ld1	{v4.16b},[x0]
+	mov	w1,#7
+	mov	w12,#14
+	st1	{v3.4s},[x2],#16
 
-Loop256:
-	vtbl.8	d20,{q8},d4
-	vtbl.8	d21,{q8},d5
-	vext.8	q9,q0,q3,#12
-	vst1.32	{q8},[r2]!
-	INST(0x00,0x43,0xf0,0xf3)	@ aese q10,q0
-	subs	r1,r1,#1
+.Loop256:
+	tbl	v6.16b,{v4.16b},v2.16b
+	ext	v5.16b,v0.16b,v3.16b,#12
+	st1	{v4.4s},[x2],#16
+	aese	v6.16b,v0.16b
+	subs	w1,w1,#1
 
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q3,q3,q9
-	vext.8	q9,q0,q9,#12
-	veor	q10,q10,q1
-	veor	q3,q3,q9
-	vshl.u8	q1,q1,#1
-	veor	q3,q3,q10
-	vst1.32	{q3},[r2]!
-	beq	Ldone
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v3.16b,v3.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v6.16b,v6.16b,v1.16b
+	eor	v3.16b,v3.16b,v5.16b
+	shl	v1.16b,v1.16b,#1
+	eor	v3.16b,v3.16b,v6.16b
+	st1	{v3.4s},[x2],#16
+	b.eq	.Ldone
 
-	vdup.32	q10,d7[1]
-	vext.8	q9,q0,q8,#12
-	INST(0x00,0x43,0xf0,0xf3)	@ aese q10,q0
+	dup	v6.4s,v3.s[3]		// just splat
+	ext	v5.16b,v0.16b,v4.16b,#12
+	aese	v6.16b,v0.16b
 
-	veor	q8,q8,q9
-	vext.8	q9,q0,q9,#12
-	veor	q8,q8,q9
-	vext.8	q9,q0,q9,#12
-	veor	q8,q8,q9
+	eor	v4.16b,v4.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v4.16b,v4.16b,v5.16b
+	ext	v5.16b,v0.16b,v5.16b,#12
+	eor	v4.16b,v4.16b,v5.16b
 
-	veor	q8,q8,q10
-	b	Loop256
+	eor	v4.16b,v4.16b,v6.16b
+	b	.Loop256
 
-Ldone:
-	str	r12,[r2]
-	mov	r3,#0
+.Ldone:
+	str	w12,[x2]
+	mov	x3,#0
 
-Lenc_key_abort:
-	mov	r0,r3			@ return value
-
-	bx	lr
-
+.Lenc_key_abort:
+	mov	x0,x3			// return value
+	ldr	x29,[sp],#16
+	ret
+.size	aes_v8_set_encrypt_key,.-aes_v8_set_encrypt_key
 
 .globl	aes_v8_set_decrypt_key
-
+.type	aes_v8_set_decrypt_key,%function
 .align	5
 aes_v8_set_decrypt_key:
-	stmdb	sp!,{r4,lr}
-	bl	Lenc_key
+.inst	0xd503233f		// paciasp
+	stp	x29,x30,[sp,#-16]!
+	add	x29,sp,#0
+	bl	.Lenc_key
 
-	cmp	r0,#0
-	bne	Ldec_key_abort
+	cmp	x0,#0
+	b.ne	.Ldec_key_abort
 
-	sub	r2,r2,#240		@ restore original r2
-	mov	r4,#-16
-	add	r0,r2,r12,lsl#4	@ end of key schedule
+	sub	x2,x2,#240		// restore original x2
+	mov	x4,#-16
+	add	x0,x2,x12,lsl#4	// end of key schedule
 
-	vld1.32	{q0},[r2]
-	vld1.32	{q1},[r0]
-	vst1.32	{q0},[r0],r4
-	vst1.32	{q1},[r2]!
+	ld1	{v0.4s},[x2]
+	ld1	{v1.4s},[x0]
+	st1	{v0.4s},[x0],x4
+	st1	{v1.4s},[x2],#16
 
-Loop_imc:
-	vld1.32	{q0},[r2]
-	vld1.32	{q1},[r0]
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	vst1.32	{q0},[r0],r4
-	vst1.32	{q1},[r2]!
-	cmp	r0,r2
-	bhi	Loop_imc
+.Loop_imc:
+	ld1	{v0.4s},[x2]
+	ld1	{v1.4s},[x0]
+	aesimc	v0.16b,v0.16b
+	aesimc	v1.16b,v1.16b
+	st1	{v0.4s},[x0],x4
+	st1	{v1.4s},[x2],#16
+	cmp	x0,x2
+	b.hi	.Loop_imc
 
-	vld1.32	{q0},[r2]
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	vst1.32	{q0},[r0]
+	ld1	{v0.4s},[x2]
+	aesimc	v0.16b,v0.16b
+	st1	{v0.4s},[x0]
 
-	eor	r0,r0,r0		@ return value
-Ldec_key_abort:
-	ldmia	sp!,{r4,pc}
-
+	eor	x0,x0,x0		// return value
+.Ldec_key_abort:
+	ldp	x29,x30,[sp],#16
+.inst	0xd50323bf		// autiasp
+	ret
+.size	aes_v8_set_decrypt_key,.-aes_v8_set_decrypt_key
 .globl	aes_v8_encrypt
-
+.type	aes_v8_encrypt,%function
 .align	5
 aes_v8_encrypt:
-	ldr	r3,[r2,#240]
-	vld1.32	{q0},[r2]!
-	vld1.8	{q2},[r0]
-	sub	r3,r3,#2
-	vld1.32	{q1},[r2]!
+	ldr	w3,[x2,#240]
+	ld1	{v0.4s},[x2],#16
+	ld1	{v2.16b},[x0]
+	sub	w3,w3,#2
+	ld1	{v1.4s},[x2],#16
 
-Loop_enc:
-	INST(0x00,0x43,0xb0,0xf3)	@ aese q2,q0
-	INST(0x84,0x43,0xb0,0xf3)	@ aesmc q2,q2
-	vld1.32	{q0},[r2]!
-	subs	r3,r3,#2
-	INST(0x02,0x43,0xb0,0xf3)	@ aese q2,q1
-	INST(0x84,0x43,0xb0,0xf3)	@ aesmc q2,q2
-	vld1.32	{q1},[r2]!
-	bgt	Loop_enc
+.Loop_enc:
+	aese	v2.16b,v0.16b
+	aesmc	v2.16b,v2.16b
+	ld1	{v0.4s},[x2],#16
+	subs	w3,w3,#2
+	aese	v2.16b,v1.16b
+	aesmc	v2.16b,v2.16b
+	ld1	{v1.4s},[x2],#16
+	b.gt	.Loop_enc
 
-	INST(0x00,0x43,0xb0,0xf3)	@ aese q2,q0
-	INST(0x84,0x43,0xb0,0xf3)	@ aesmc q2,q2
-	vld1.32	{q0},[r2]
-	INST(0x02,0x43,0xb0,0xf3)	@ aese q2,q1
-	veor	q2,q2,q0
+	aese	v2.16b,v0.16b
+	aesmc	v2.16b,v2.16b
+	ld1	{v0.4s},[x2]
+	aese	v2.16b,v1.16b
+	eor	v2.16b,v2.16b,v0.16b
 
-	vst1.8	{q2},[r1]
-	bx	lr
-
+	st1	{v2.16b},[x1]
+	ret
+.size	aes_v8_encrypt,.-aes_v8_encrypt
 .globl	aes_v8_decrypt
-
+.type	aes_v8_decrypt,%function
 .align	5
 aes_v8_decrypt:
-	ldr	r3,[r2,#240]
-	vld1.32	{q0},[r2]!
-	vld1.8	{q2},[r0]
-	sub	r3,r3,#2
-	vld1.32	{q1},[r2]!
+	ldr	w3,[x2,#240]
+	ld1	{v0.4s},[x2],#16
+	ld1	{v2.16b},[x0]
+	sub	w3,w3,#2
+	ld1	{v1.4s},[x2],#16
 
-Loop_dec:
-	INST(0x40,0x43,0xb0,0xf3)	@ aesd q2,q0
-	INST(0xc4,0x43,0xb0,0xf3)	@ aesimc q2,q2
-	vld1.32	{q0},[r2]!
-	subs	r3,r3,#2
-	INST(0x42,0x43,0xb0,0xf3)	@ aesd q2,q1
-	INST(0xc4,0x43,0xb0,0xf3)	@ aesimc q2,q2
-	vld1.32	{q1},[r2]!
-	bgt	Loop_dec
+.Loop_dec:
+	aesd	v2.16b,v0.16b
+	aesimc	v2.16b,v2.16b
+	ld1	{v0.4s},[x2],#16
+	subs	w3,w3,#2
+	aesd	v2.16b,v1.16b
+	aesimc	v2.16b,v2.16b
+	ld1	{v1.4s},[x2],#16
+	b.gt	.Loop_dec
 
-	INST(0x40,0x43,0xb0,0xf3)	@ aesd q2,q0
-	INST(0xc4,0x43,0xb0,0xf3)	@ aesimc q2,q2
-	vld1.32	{q0},[r2]
-	INST(0x42,0x43,0xb0,0xf3)	@ aesd q2,q1
-	veor	q2,q2,q0
+	aesd	v2.16b,v0.16b
+	aesimc	v2.16b,v2.16b
+	ld1	{v0.4s},[x2]
+	aesd	v2.16b,v1.16b
+	eor	v2.16b,v2.16b,v0.16b
 
-	vst1.8	{q2},[r1]
-	bx	lr
-
+	st1	{v2.16b},[x1]
+	ret
+.size	aes_v8_decrypt,.-aes_v8_decrypt
 .globl	aes_v8_ecb_encrypt
-
+.type	aes_v8_ecb_encrypt,%function
 .align	5
 aes_v8_ecb_encrypt:
-	mov	ip,sp
-	stmdb	sp!,{r4,r5,r6,r7,r8,lr}
-	vstmdb	sp!,{d8,d9,d10,d11,d12,d13,d14,d15}			@ ABI specification says so
-	ldmia	ip,{r4,r5}			@ load remaining args
-	subs	r2,r2,#16
-	mov	r8,#16
-	blo	Lecb_done
-	it	eq
-	moveq	r8,#0
+	subs	x2,x2,#16
+	// Original input data size bigger than 16, jump to big size processing.
+	b.ne	.Lecb_big_size
+	ld1	{v0.16b},[x0]
+	cmp	w4,#0					// en- or decrypting?
+	ldr	w5,[x3,#240]
+	ld1	{v5.4s,v6.4s},[x3],#32			// load key schedule...
 
-	cmp	r4,#0					@ en- or decrypting?
-	ldr	r5,[r3,#240]
-	and	r2,r2,#-16
-	vld1.8	{q0},[r0],r8
+	b.eq	.Lecb_small_dec
+	aese	v0.16b,v5.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v16.4s,v17.4s},[x3],#32			// load key schedule...
+	aese	v0.16b,v6.16b
+	aesmc	v0.16b,v0.16b
+	subs	w5,w5,#10			// if rounds==10, jump to aes-128-ecb processing
+	b.eq	.Lecb_128_enc
+.Lecb_round_loop:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v16.4s},[x3],#16				// load key schedule...
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v17.4s},[x3],#16				// load key schedule...
+	subs	w5,w5,#2			// bias
+	b.gt	.Lecb_round_loop
+.Lecb_128_enc:
+	ld1	{v18.4s,v19.4s},[x3],#32		// load key schedule...
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v20.4s,v21.4s},[x3],#32		// load key schedule...
+	aese	v0.16b,v18.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v19.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v22.4s,v23.4s},[x3],#32		// load key schedule...
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v7.4s},[x3]
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v23.16b
+	eor	v0.16b,v0.16b,v7.16b
+	st1	{v0.16b},[x1]
+	b	.Lecb_Final_abort
+.Lecb_small_dec:
+	aesd	v0.16b,v5.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v16.4s,v17.4s},[x3],#32			// load key schedule...
+	aesd	v0.16b,v6.16b
+	aesimc	v0.16b,v0.16b
+	subs	w5,w5,#10			// bias
+	b.eq	.Lecb_128_dec
+.Lecb_dec_round_loop:
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v16.4s},[x3],#16				// load key schedule...
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v17.4s},[x3],#16				// load key schedule...
+	subs	w5,w5,#2			// bias
+	b.gt	.Lecb_dec_round_loop
+.Lecb_128_dec:
+	ld1	{v18.4s,v19.4s},[x3],#32		// load key schedule...
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v20.4s,v21.4s},[x3],#32		// load key schedule...
+	aesd	v0.16b,v18.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v0.16b,v19.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v22.4s,v23.4s},[x3],#32		// load key schedule...
+	aesd	v0.16b,v20.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v0.16b,v21.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v7.4s},[x3]
+	aesd	v0.16b,v22.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v0.16b,v23.16b
+	eor	v0.16b,v0.16b,v7.16b
+	st1	{v0.16b},[x1]
+	b	.Lecb_Final_abort
+.Lecb_big_size:
+	stp	x29,x30,[sp,#-16]!
+	add	x29,sp,#0
+	mov	x8,#16
+	b.lo	.Lecb_done
+	csel	x8,xzr,x8,eq
 
-	vld1.32	{q8,q9},[r3]				@ load key schedule...
-	sub	r5,r5,#6
-	add	r7,r3,r5,lsl#4				@ pointer to last 7 round keys
-	sub	r5,r5,#2
-	vld1.32	{q10,q11},[r7]!
-	vld1.32	{q12,q13},[r7]!
-	vld1.32	{q14,q15},[r7]!
-	vld1.32	{q7},[r7]
+	cmp	w4,#0					// en- or decrypting?
+	ldr	w5,[x3,#240]
+	and	x2,x2,#-16
+	ld1	{v0.16b},[x0],x8
 
-	add	r7,r3,#32
-	mov	r6,r5
-	beq	Lecb_dec
+	ld1	{v16.4s,v17.4s},[x3]				// load key schedule...
+	sub	w5,w5,#6
+	add	x7,x3,x5,lsl#4				// pointer to last 7 round keys
+	sub	w5,w5,#2
+	ld1	{v18.4s,v19.4s},[x7],#32
+	ld1	{v20.4s,v21.4s},[x7],#32
+	ld1	{v22.4s,v23.4s},[x7],#32
+	ld1	{v7.4s},[x7]
 
-	vld1.8	{q1},[r0]!
-	subs	r2,r2,#32				@ bias
-	add	r6,r5,#2
-	vorr	q3,q1,q1
-	vorr	q10,q1,q1
-	vorr	q1,q0,q0
-	blo	Lecb_enc_tail
+	add	x7,x3,#32
+	mov	w6,w5
+	b.eq	.Lecb_dec
 
-	vorr	q1,q3,q3
-	vld1.8	{q10},[r0]!
-Loop3x_ecb_enc:
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x20,0x23,0xb0,0xf3)	@ aese q1,q8
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x20,0x43,0xf0,0xf3)	@ aese q10,q8
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.32	{q8},[r7]!
-	subs	r6,r6,#2
-	INST(0x22,0x03,0xb0,0xf3)	@ aese q0,q9
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x22,0x23,0xb0,0xf3)	@ aese q1,q9
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x22,0x43,0xf0,0xf3)	@ aese q10,q9
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.32	{q9},[r7]!
-	bgt	Loop3x_ecb_enc
+	ld1	{v1.16b},[x0],#16
+	subs	x2,x2,#32				// bias
+	add	w6,w5,#2
+	orr	v3.16b,v1.16b,v1.16b
+	orr	v24.16b,v1.16b,v1.16b
+	orr	v1.16b,v0.16b,v0.16b
+	b.lo	.Lecb_enc_tail
 
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x20,0x23,0xb0,0xf3)	@ aese q1,q8
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x20,0x43,0xf0,0xf3)	@ aese q10,q8
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	subs	r2,r2,#0x30
-	it	lo
-	movlo	r6,r2				@ r6, r6, is zero at this point
-	INST(0x22,0x03,0xb0,0xf3)	@ aese q0,q9
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x22,0x23,0xb0,0xf3)	@ aese q1,q9
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x22,0x43,0xf0,0xf3)	@ aese q10,q9
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	add	r0,r0,r6			@ r0 is adjusted in such way that
-						@ at exit from the loop q1-q10
-						@ are loaded with last "words"
-	mov	r7,r3
-	INST(0x28,0x03,0xb0,0xf3)	@ aese q0,q12
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x28,0x23,0xb0,0xf3)	@ aese q1,q12
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x28,0x43,0xf0,0xf3)	@ aese q10,q12
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.8	{q2},[r0]!
-	INST(0x2a,0x03,0xb0,0xf3)	@ aese q0,q13
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x2a,0x23,0xb0,0xf3)	@ aese q1,q13
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x2a,0x43,0xf0,0xf3)	@ aese q10,q13
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.8	{q3},[r0]!
-	INST(0x2c,0x03,0xb0,0xf3)	@ aese q0,q14
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x2c,0x23,0xb0,0xf3)	@ aese q1,q14
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x2c,0x43,0xf0,0xf3)	@ aese q10,q14
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.8	{q11},[r0]!
-	INST(0x2e,0x03,0xb0,0xf3)	@ aese q0,q15
-	INST(0x2e,0x23,0xb0,0xf3)	@ aese q1,q15
-	INST(0x2e,0x43,0xf0,0xf3)	@ aese q10,q15
-	vld1.32	{q8},[r7]!		@ re-pre-load rndkey[0]
-	add	r6,r5,#2
-	veor	q4,q7,q0
-	veor	q5,q7,q1
-	veor	q10,q10,q7
-	vld1.32	{q9},[r7]!		@ re-pre-load rndkey[1]
-	vst1.8	{q4},[r1]!
-	vorr	q0,q2,q2
-	vst1.8	{q5},[r1]!
-	vorr	q1,q3,q3
-	vst1.8	{q10},[r1]!
-	vorr	q10,q11,q11
-	bhs	Loop3x_ecb_enc
+	orr	v1.16b,v3.16b,v3.16b
+	ld1	{v24.16b},[x0],#16
+	cmp	x2,#32
+	b.lo	.Loop3x_ecb_enc
 
-	cmn	r2,#0x30
-	beq	Lecb_done
+	ld1	{v25.16b},[x0],#16
+	ld1	{v26.16b},[x0],#16
+	sub	x2,x2,#32				// bias
+	mov	w6,w5
+
+.Loop5x_ecb_enc:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v16.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v16.16b
+	aesmc	v26.16b,v26.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v17.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v17.16b
+	aesmc	v26.16b,v26.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Loop5x_ecb_enc
+
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v16.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v16.16b
+	aesmc	v26.16b,v26.16b
+	cmp	x2,#0x40					// because .Lecb_enc_tail4x
+	sub	x2,x2,#0x50
+
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v17.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v17.16b
+	aesmc	v26.16b,v26.16b
+	csel	x6,xzr,x2,gt			// borrow x6, w6, "gt" is not typo
+	mov	x7,x3
+
+	aese	v0.16b,v18.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v18.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v18.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v18.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v18.16b
+	aesmc	v26.16b,v26.16b
+	add	x0,x0,x6				// x0 is adjusted in such way that
+							// at exit from the loop v1.16b-v26.16b
+							// are loaded with last "words"
+	add	x6,x2,#0x60		    // because .Lecb_enc_tail4x
+
+	aese	v0.16b,v19.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v19.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v19.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v19.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v19.16b
+	aesmc	v26.16b,v26.16b
+
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v20.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v20.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v20.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v20.16b
+	aesmc	v26.16b,v26.16b
+
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v21.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v21.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v21.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v21.16b
+	aesmc	v26.16b,v26.16b
+
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v22.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v22.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v22.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v22.16b
+	aesmc	v26.16b,v26.16b
+
+	aese	v0.16b,v23.16b
+	ld1	{v2.16b},[x0],#16
+	aese	v1.16b,v23.16b
+	ld1	{v3.16b},[x0],#16
+	aese	v24.16b,v23.16b
+	ld1	{v27.16b},[x0],#16
+	aese	v25.16b,v23.16b
+	ld1	{v28.16b},[x0],#16
+	aese	v26.16b,v23.16b
+	ld1	{v29.16b},[x0],#16
+	cbz	x6,.Lecb_enc_tail4x
+	ld1	{v16.4s},[x7],#16			// re-pre-load rndkey[0]
+	eor	v4.16b,v7.16b,v0.16b
+	orr	v0.16b,v2.16b,v2.16b
+	eor	v5.16b,v7.16b,v1.16b
+	orr	v1.16b,v3.16b,v3.16b
+	eor	v17.16b,v7.16b,v24.16b
+	orr	v24.16b,v27.16b,v27.16b
+	eor	v30.16b,v7.16b,v25.16b
+	orr	v25.16b,v28.16b,v28.16b
+	eor	v31.16b,v7.16b,v26.16b
+	st1	{v4.16b},[x1],#16
+	orr	v26.16b,v29.16b,v29.16b
+	st1	{v5.16b},[x1],#16
+	mov	w6,w5
+	st1	{v17.16b},[x1],#16
+	ld1	{v17.4s},[x7],#16			// re-pre-load rndkey[1]
+	st1	{v30.16b},[x1],#16
+	st1	{v31.16b},[x1],#16
+	b.hs	.Loop5x_ecb_enc
+
+	add	x2,x2,#0x50
+	cbz	x2,.Lecb_done
+
+	add	w6,w5,#2
+	subs	x2,x2,#0x30
+	orr	v0.16b,v27.16b,v27.16b
+	orr	v1.16b,v28.16b,v28.16b
+	orr	v24.16b,v29.16b,v29.16b
+	b.lo	.Lecb_enc_tail
+
+	b	.Loop3x_ecb_enc
+
+.align	4
+.Lecb_enc_tail4x:
+	eor	v5.16b,v7.16b,v1.16b
+	eor	v17.16b,v7.16b,v24.16b
+	eor	v30.16b,v7.16b,v25.16b
+	eor	v31.16b,v7.16b,v26.16b
+	st1	{v5.16b},[x1],#16
+	st1	{v17.16b},[x1],#16
+	st1	{v30.16b},[x1],#16
+	st1	{v31.16b},[x1],#16
+
+	b	.Lecb_done
+.align	4
+.Loop3x_ecb_enc:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Loop3x_ecb_enc
+
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	subs	x2,x2,#0x30
+	csel	x6,x2,x6,lo				// x6, w6, is zero at this point
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	add	x0,x0,x6			// x0 is adjusted in such way that
+						// at exit from the loop v1.16b-v24.16b
+						// are loaded with last "words"
+	mov	x7,x3
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v20.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v20.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v2.16b},[x0],#16
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v21.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v21.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v3.16b},[x0],#16
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v22.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v22.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v27.16b},[x0],#16
+	aese	v0.16b,v23.16b
+	aese	v1.16b,v23.16b
+	aese	v24.16b,v23.16b
+	ld1	{v16.4s},[x7],#16		// re-pre-load rndkey[0]
+	add	w6,w5,#2
+	eor	v4.16b,v7.16b,v0.16b
+	eor	v5.16b,v7.16b,v1.16b
+	eor	v24.16b,v24.16b,v7.16b
+	ld1	{v17.4s},[x7],#16		// re-pre-load rndkey[1]
+	st1	{v4.16b},[x1],#16
+	orr	v0.16b,v2.16b,v2.16b
+	st1	{v5.16b},[x1],#16
+	orr	v1.16b,v3.16b,v3.16b
+	st1	{v24.16b},[x1],#16
+	orr	v24.16b,v27.16b,v27.16b
+	b.hs	.Loop3x_ecb_enc
+
+	cmn	x2,#0x30
+	b.eq	.Lecb_done
 	nop
 
-Lecb_enc_tail:
-	INST(0x20,0x23,0xb0,0xf3)	@ aese q1,q8
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x20,0x43,0xf0,0xf3)	@ aese q10,q8
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.32	{q8},[r7]!
-	subs	r6,r6,#2
-	INST(0x22,0x23,0xb0,0xf3)	@ aese q1,q9
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x22,0x43,0xf0,0xf3)	@ aese q10,q9
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.32	{q9},[r7]!
-	bgt	Lecb_enc_tail
+.Lecb_enc_tail:
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Lecb_enc_tail
 
-	INST(0x20,0x23,0xb0,0xf3)	@ aese q1,q8
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x20,0x43,0xf0,0xf3)	@ aese q10,q8
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	INST(0x22,0x23,0xb0,0xf3)	@ aese q1,q9
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x22,0x43,0xf0,0xf3)	@ aese q10,q9
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	INST(0x28,0x23,0xb0,0xf3)	@ aese q1,q12
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x28,0x43,0xf0,0xf3)	@ aese q10,q12
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	cmn	r2,#0x20
-	INST(0x2a,0x23,0xb0,0xf3)	@ aese q1,q13
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x2a,0x43,0xf0,0xf3)	@ aese q10,q13
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	INST(0x2c,0x23,0xb0,0xf3)	@ aese q1,q14
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x2c,0x43,0xf0,0xf3)	@ aese q10,q14
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	INST(0x2e,0x23,0xb0,0xf3)	@ aese q1,q15
-	INST(0x2e,0x43,0xf0,0xf3)	@ aese q10,q15
-	beq	Lecb_enc_one
-	veor	q5,q7,q1
-	veor	q9,q7,q10
-	vst1.8	{q5},[r1]!
-	vst1.8	{q9},[r1]!
-	b	Lecb_done
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	aese	v1.16b,v20.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v20.16b
+	aesmc	v24.16b,v24.16b
+	cmn	x2,#0x20
+	aese	v1.16b,v21.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v21.16b
+	aesmc	v24.16b,v24.16b
+	aese	v1.16b,v22.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v22.16b
+	aesmc	v24.16b,v24.16b
+	aese	v1.16b,v23.16b
+	aese	v24.16b,v23.16b
+	b.eq	.Lecb_enc_one
+	eor	v5.16b,v7.16b,v1.16b
+	eor	v17.16b,v7.16b,v24.16b
+	st1	{v5.16b},[x1],#16
+	st1	{v17.16b},[x1],#16
+	b	.Lecb_done
 
-Lecb_enc_one:
-	veor	q5,q7,q10
-	vst1.8	{q5},[r1]!
-	b	Lecb_done
+.Lecb_enc_one:
+	eor	v5.16b,v7.16b,v24.16b
+	st1	{v5.16b},[x1],#16
+	b	.Lecb_done
 .align	5
-Lecb_dec:
-	vld1.8	{q1},[r0]!
-	subs	r2,r2,#32			@ bias
-	add	r6,r5,#2
-	vorr	q3,q1,q1
-	vorr	q10,q1,q1
-	vorr	q1,q0,q0
-	blo	Lecb_dec_tail
+.Lecb_dec:
+	ld1	{v1.16b},[x0],#16
+	subs	x2,x2,#32			// bias
+	add	w6,w5,#2
+	orr	v3.16b,v1.16b,v1.16b
+	orr	v24.16b,v1.16b,v1.16b
+	orr	v1.16b,v0.16b,v0.16b
+	b.lo	.Lecb_dec_tail
 
-	vorr	q1,q3,q3
-	vld1.8	{q10},[r0]!
-Loop3x_ecb_dec:
-	INST(0x60,0x03,0xb0,0xf3)	@ aesd q0,q8
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x60,0x23,0xb0,0xf3)	@ aesd q1,q8
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x60,0x43,0xf0,0xf3)	@ aesd q10,q8
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.32	{q8},[r7]!
-	subs	r6,r6,#2
-	INST(0x62,0x03,0xb0,0xf3)	@ aesd q0,q9
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x62,0x23,0xb0,0xf3)	@ aesd q1,q9
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x62,0x43,0xf0,0xf3)	@ aesd q10,q9
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.32	{q9},[r7]!
-	bgt	Loop3x_ecb_dec
+	orr	v1.16b,v3.16b,v3.16b
+	ld1	{v24.16b},[x0],#16
+	cmp	x2,#32
+	b.lo	.Loop3x_ecb_dec
 
-	INST(0x60,0x03,0xb0,0xf3)	@ aesd q0,q8
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x60,0x23,0xb0,0xf3)	@ aesd q1,q8
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x60,0x43,0xf0,0xf3)	@ aesd q10,q8
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	subs	r2,r2,#0x30
-	it	lo
-	movlo	r6,r2				@ r6, r6, is zero at this point
-	INST(0x62,0x03,0xb0,0xf3)	@ aesd q0,q9
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x62,0x23,0xb0,0xf3)	@ aesd q1,q9
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x62,0x43,0xf0,0xf3)	@ aesd q10,q9
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	add	r0,r0,r6 			@ r0 is adjusted in such way that
-						@ at exit from the loop q1-q10
-						@ are loaded with last "words"
-	mov	r7,r3
-	INST(0x68,0x03,0xb0,0xf3)	@ aesd q0,q12
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x68,0x23,0xb0,0xf3)	@ aesd q1,q12
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x68,0x43,0xf0,0xf3)	@ aesd q10,q12
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.8	{q2},[r0]!
-	INST(0x6a,0x03,0xb0,0xf3)	@ aesd q0,q13
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x6a,0x23,0xb0,0xf3)	@ aesd q1,q13
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x6a,0x43,0xf0,0xf3)	@ aesd q10,q13
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.8	{q3},[r0]!
-	INST(0x6c,0x03,0xb0,0xf3)	@ aesd q0,q14
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x6c,0x23,0xb0,0xf3)	@ aesd q1,q14
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x6c,0x43,0xf0,0xf3)	@ aesd q10,q14
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.8	{q11},[r0]!
-	INST(0x6e,0x03,0xb0,0xf3)	@ aesd q0,q15
-	INST(0x6e,0x23,0xb0,0xf3)	@ aesd q1,q15
-	INST(0x6e,0x43,0xf0,0xf3)	@ aesd q10,q15
-	vld1.32	{q8},[r7]!			@ re-pre-load rndkey[0]
-	add	r6,r5,#2
-	veor	q4,q7,q0
-	veor	q5,q7,q1
-	veor	q10,q10,q7
-	vld1.32	{q9},[r7]!			@ re-pre-load rndkey[1]
-	vst1.8	{q4},[r1]!
-	vorr	q0,q2,q2
-	vst1.8	{q5},[r1]!
-	vorr	q1,q3,q3
-	vst1.8	{q10},[r1]!
-	vorr	q10,q11,q11
-	bhs	Loop3x_ecb_dec
+	ld1	{v25.16b},[x0],#16
+	ld1	{v26.16b},[x0],#16
+	sub	x2,x2,#32				// bias
+	mov	w6,w5
 
-	cmn	r2,#0x30
-	beq	Lecb_done
+.Loop5x_ecb_dec:
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v16.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v16.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v17.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v17.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Loop5x_ecb_dec
+
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v16.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v16.16b
+	aesimc	v26.16b,v26.16b
+	cmp	x2,#0x40				// because .Lecb_tail4x
+	sub	x2,x2,#0x50
+
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v17.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v17.16b
+	aesimc	v26.16b,v26.16b
+	csel	x6,xzr,x2,gt		// borrow x6, w6, "gt" is not typo
+	mov	x7,x3
+
+	aesd	v0.16b,v18.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v18.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v18.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v18.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v18.16b
+	aesimc	v26.16b,v26.16b
+	add	x0,x0,x6				// x0 is adjusted in such way that
+							// at exit from the loop v1.16b-v26.16b
+							// are loaded with last "words"
+	add	x6,x2,#0x60			// because .Lecb_tail4x
+
+	aesd	v0.16b,v19.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v19.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v19.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v19.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v19.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v20.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v20.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v20.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v20.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v20.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v21.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v21.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v21.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v21.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v21.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v22.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v22.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v22.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v22.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v22.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v23.16b
+	ld1	{v2.16b},[x0],#16
+	aesd	v1.16b,v23.16b
+	ld1	{v3.16b},[x0],#16
+	aesd	v24.16b,v23.16b
+	ld1	{v27.16b},[x0],#16
+	aesd	v25.16b,v23.16b
+	ld1	{v28.16b},[x0],#16
+	aesd	v26.16b,v23.16b
+	ld1	{v29.16b},[x0],#16
+	cbz	x6,.Lecb_tail4x
+	ld1	{v16.4s},[x7],#16			// re-pre-load rndkey[0]
+	eor	v4.16b,v7.16b,v0.16b
+	orr	v0.16b,v2.16b,v2.16b
+	eor	v5.16b,v7.16b,v1.16b
+	orr	v1.16b,v3.16b,v3.16b
+	eor	v17.16b,v7.16b,v24.16b
+	orr	v24.16b,v27.16b,v27.16b
+	eor	v30.16b,v7.16b,v25.16b
+	orr	v25.16b,v28.16b,v28.16b
+	eor	v31.16b,v7.16b,v26.16b
+	st1	{v4.16b},[x1],#16
+	orr	v26.16b,v29.16b,v29.16b
+	st1	{v5.16b},[x1],#16
+	mov	w6,w5
+	st1	{v17.16b},[x1],#16
+	ld1	{v17.4s},[x7],#16			// re-pre-load rndkey[1]
+	st1	{v30.16b},[x1],#16
+	st1	{v31.16b},[x1],#16
+	b.hs	.Loop5x_ecb_dec
+
+	add	x2,x2,#0x50
+	cbz	x2,.Lecb_done
+
+	add	w6,w5,#2
+	subs	x2,x2,#0x30
+	orr	v0.16b,v27.16b,v27.16b
+	orr	v1.16b,v28.16b,v28.16b
+	orr	v24.16b,v29.16b,v29.16b
+	b.lo	.Lecb_dec_tail
+
+	b	.Loop3x_ecb_dec
+
+.align	4
+.Lecb_tail4x:
+	eor	v5.16b,v7.16b,v1.16b
+	eor	v17.16b,v7.16b,v24.16b
+	eor	v30.16b,v7.16b,v25.16b
+	eor	v31.16b,v7.16b,v26.16b
+	st1	{v5.16b},[x1],#16
+	st1	{v17.16b},[x1],#16
+	st1	{v30.16b},[x1],#16
+	st1	{v31.16b},[x1],#16
+
+	b	.Lecb_done
+.align	4
+.Loop3x_ecb_dec:
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Loop3x_ecb_dec
+
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	subs	x2,x2,#0x30
+	csel	x6,x2,x6,lo				// x6, w6, is zero at this point
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	add	x0,x0,x6 			// x0 is adjusted in such way that
+						// at exit from the loop v1.16b-v24.16b
+						// are loaded with last "words"
+	mov	x7,x3
+	aesd	v0.16b,v20.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v20.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v20.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v2.16b},[x0],#16
+	aesd	v0.16b,v21.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v21.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v21.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v3.16b},[x0],#16
+	aesd	v0.16b,v22.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v22.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v22.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v27.16b},[x0],#16
+	aesd	v0.16b,v23.16b
+	aesd	v1.16b,v23.16b
+	aesd	v24.16b,v23.16b
+	ld1	{v16.4s},[x7],#16			// re-pre-load rndkey[0]
+	add	w6,w5,#2
+	eor	v4.16b,v7.16b,v0.16b
+	eor	v5.16b,v7.16b,v1.16b
+	eor	v24.16b,v24.16b,v7.16b
+	ld1	{v17.4s},[x7],#16			// re-pre-load rndkey[1]
+	st1	{v4.16b},[x1],#16
+	orr	v0.16b,v2.16b,v2.16b
+	st1	{v5.16b},[x1],#16
+	orr	v1.16b,v3.16b,v3.16b
+	st1	{v24.16b},[x1],#16
+	orr	v24.16b,v27.16b,v27.16b
+	b.hs	.Loop3x_ecb_dec
+
+	cmn	x2,#0x30
+	b.eq	.Lecb_done
 	nop
 
-Lecb_dec_tail:
-	INST(0x60,0x23,0xb0,0xf3)	@ aesd q1,q8
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x60,0x43,0xf0,0xf3)	@ aesd q10,q8
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.32	{q8},[r7]!
-	subs	r6,r6,#2
-	INST(0x62,0x23,0xb0,0xf3)	@ aesd q1,q9
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x62,0x43,0xf0,0xf3)	@ aesd q10,q9
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.32	{q9},[r7]!
-	bgt	Lecb_dec_tail
+.Lecb_dec_tail:
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Lecb_dec_tail
 
-	INST(0x60,0x23,0xb0,0xf3)	@ aesd q1,q8
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x60,0x43,0xf0,0xf3)	@ aesd q10,q8
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	INST(0x62,0x23,0xb0,0xf3)	@ aesd q1,q9
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x62,0x43,0xf0,0xf3)	@ aesd q10,q9
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	INST(0x68,0x23,0xb0,0xf3)	@ aesd q1,q12
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x68,0x43,0xf0,0xf3)	@ aesd q10,q12
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	cmn	r2,#0x20
-	INST(0x6a,0x23,0xb0,0xf3)	@ aesd q1,q13
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x6a,0x43,0xf0,0xf3)	@ aesd q10,q13
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	INST(0x6c,0x23,0xb0,0xf3)	@ aesd q1,q14
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x6c,0x43,0xf0,0xf3)	@ aesd q10,q14
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	INST(0x6e,0x23,0xb0,0xf3)	@ aesd q1,q15
-	INST(0x6e,0x43,0xf0,0xf3)	@ aesd q10,q15
-	beq	Lecb_dec_one
-	veor	q5,q7,q1
-	veor	q9,q7,q10
-	vst1.8	{q5},[r1]!
-	vst1.8	{q9},[r1]!
-	b	Lecb_done
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v1.16b,v20.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v20.16b
+	aesimc	v24.16b,v24.16b
+	cmn	x2,#0x20
+	aesd	v1.16b,v21.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v21.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v1.16b,v22.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v22.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v1.16b,v23.16b
+	aesd	v24.16b,v23.16b
+	b.eq	.Lecb_dec_one
+	eor	v5.16b,v7.16b,v1.16b
+	eor	v17.16b,v7.16b,v24.16b
+	st1	{v5.16b},[x1],#16
+	st1	{v17.16b},[x1],#16
+	b	.Lecb_done
 
-Lecb_dec_one:
-	veor	q5,q7,q10
-	vst1.8	{q5},[r1]!
+.Lecb_dec_one:
+	eor	v5.16b,v7.16b,v24.16b
+	st1	{v5.16b},[x1],#16
 
-Lecb_done:
-	vldmia	sp!,{d8,d9,d10,d11,d12,d13,d14,d15}
-	ldmia	sp!,{r4,r5,r6,r7,r8,pc}
-
+.Lecb_done:
+	ldr	x29,[sp],#16
+.Lecb_Final_abort:
+	ret
+.size	aes_v8_ecb_encrypt,.-aes_v8_ecb_encrypt
 .globl	aes_v8_cbc_encrypt
-
+.type	aes_v8_cbc_encrypt,%function
 .align	5
 aes_v8_cbc_encrypt:
-	mov	ip,sp
-	stmdb	sp!,{r4,r5,r6,r7,r8,lr}
-	vstmdb	sp!,{d8,d9,d10,d11,d12,d13,d14,d15}            @ ABI specification says so
-	ldmia	ip,{r4,r5}		@ load remaining args
-	subs	r2,r2,#16
-	mov	r8,#16
-	blo	Lcbc_abort
-	it	eq
-	moveq	r8,#0
+	stp	x29,x30,[sp,#-16]!
+	add	x29,sp,#0
+	subs	x2,x2,#16
+	mov	x8,#16
+	b.lo	.Lcbc_abort
+	csel	x8,xzr,x8,eq
 
-	cmp	r5,#0			@ en- or decrypting?
-	ldr	r5,[r3,#240]
-	and	r2,r2,#-16
-	vld1.8	{q6},[r4]
-	vld1.8	{q0},[r0],r8
+	cmp	w5,#0			// en- or decrypting?
+	ldr	w5,[x3,#240]
+	and	x2,x2,#-16
+	ld1	{v6.16b},[x4]
+	ld1	{v0.16b},[x0],x8
 
-	vld1.32	{q8,q9},[r3]		@ load key schedule...
-	sub	r5,r5,#6
-	add	r7,r3,r5,lsl#4	@ pointer to last 7 round keys
-	sub	r5,r5,#2
-	vld1.32	{q10,q11},[r7]!
-	vld1.32	{q12,q13},[r7]!
-	vld1.32	{q14,q15},[r7]!
-	vld1.32	{q7},[r7]
+	ld1	{v16.4s,v17.4s},[x3]		// load key schedule...
+	sub	w5,w5,#6
+	add	x7,x3,x5,lsl#4	// pointer to last 7 round keys
+	sub	w5,w5,#2
+	ld1	{v18.4s,v19.4s},[x7],#32
+	ld1	{v20.4s,v21.4s},[x7],#32
+	ld1	{v22.4s,v23.4s},[x7],#32
+	ld1	{v7.4s},[x7]
 
-	add	r7,r3,#32
-	mov	r6,r5
-	beq	Lcbc_dec
+	add	x7,x3,#32
+	mov	w6,w5
+	b.eq	.Lcbc_dec
 
-	cmp	r5,#2
-	veor	q0,q0,q6
-	veor	q5,q8,q7
-	beq	Lcbc_enc128
+	cmp	w5,#2
+	eor	v0.16b,v0.16b,v6.16b
+	eor	v5.16b,v16.16b,v7.16b
+	b.eq	.Lcbc_enc128
 
-	vld1.32	{q2,q3},[r7]
-	add	r7,r3,#16
-	add	r6,r3,#16*4
-	add	r12,r3,#16*5
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	add	r14,r3,#16*6
-	add	r3,r3,#16*7
-	b	Lenter_cbc_enc
+	ld1	{v2.4s,v3.4s},[x7]
+	add	x7,x3,#16
+	add	x6,x3,#16*4
+	add	x12,x3,#16*5
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	add	x14,x3,#16*6
+	add	x3,x3,#16*7
+	b	.Lenter_cbc_enc
 
 .align	4
-Loop_cbc_enc:
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	vst1.8	{q6},[r1]!
-Lenter_cbc_enc:
-	INST(0x22,0x03,0xb0,0xf3)	@ aese q0,q9
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x04,0x03,0xb0,0xf3)	@ aese q0,q2
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	vld1.32	{q8},[r6]
-	cmp	r5,#4
-	INST(0x06,0x03,0xb0,0xf3)	@ aese q0,q3
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	vld1.32	{q9},[r12]
-	beq	Lcbc_enc192
+.Loop_cbc_enc:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	st1	{v6.16b},[x1],#16
+.Lenter_cbc_enc:
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v2.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v16.4s},[x6]
+	cmp	w5,#4
+	aese	v0.16b,v3.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v17.4s},[x12]
+	b.eq	.Lcbc_enc192
 
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	vld1.32	{q8},[r14]
-	INST(0x22,0x03,0xb0,0xf3)	@ aese q0,q9
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	vld1.32	{q9},[r3]
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v16.4s},[x14]
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v17.4s},[x3]
 	nop
 
-Lcbc_enc192:
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	subs	r2,r2,#16
-	INST(0x22,0x03,0xb0,0xf3)	@ aese q0,q9
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	it	eq
-	moveq	r8,#0
-	INST(0x24,0x03,0xb0,0xf3)	@ aese q0,q10
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x26,0x03,0xb0,0xf3)	@ aese q0,q11
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	vld1.8	{q8},[r0],r8
-	INST(0x28,0x03,0xb0,0xf3)	@ aese q0,q12
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	veor	q8,q8,q5
-	INST(0x2a,0x03,0xb0,0xf3)	@ aese q0,q13
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	vld1.32	{q9},[r7]		@ re-pre-load rndkey[1]
-	INST(0x2c,0x03,0xb0,0xf3)	@ aese q0,q14
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x2e,0x03,0xb0,0xf3)	@ aese q0,q15
-	veor	q6,q0,q7
-	bhs	Loop_cbc_enc
+.Lcbc_enc192:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	subs	x2,x2,#16
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	csel	x8,xzr,x8,eq
+	aese	v0.16b,v18.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v19.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v16.16b},[x0],x8
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	eor	v16.16b,v16.16b,v5.16b
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v17.4s},[x7]		// re-pre-load rndkey[1]
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v23.16b
+	eor	v6.16b,v0.16b,v7.16b
+	b.hs	.Loop_cbc_enc
 
-	vst1.8	{q6},[r1]!
-	b	Lcbc_done
+	st1	{v6.16b},[x1],#16
+	b	.Lcbc_done
 
 .align	5
-Lcbc_enc128:
-	vld1.32	{q2,q3},[r7]
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	b	Lenter_cbc_enc128
-Loop_cbc_enc128:
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	vst1.8	{q6},[r1]!
-Lenter_cbc_enc128:
-	INST(0x22,0x03,0xb0,0xf3)	@ aese q0,q9
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	subs	r2,r2,#16
-	INST(0x04,0x03,0xb0,0xf3)	@ aese q0,q2
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	it	eq
-	moveq	r8,#0
-	INST(0x06,0x03,0xb0,0xf3)	@ aese q0,q3
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x24,0x03,0xb0,0xf3)	@ aese q0,q10
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x26,0x03,0xb0,0xf3)	@ aese q0,q11
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	vld1.8	{q8},[r0],r8
-	INST(0x28,0x03,0xb0,0xf3)	@ aese q0,q12
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x2a,0x03,0xb0,0xf3)	@ aese q0,q13
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x2c,0x03,0xb0,0xf3)	@ aese q0,q14
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	veor	q8,q8,q5
-	INST(0x2e,0x03,0xb0,0xf3)	@ aese q0,q15
-	veor	q6,q0,q7
-	bhs	Loop_cbc_enc128
+.Lcbc_enc128:
+	ld1	{v2.4s,v3.4s},[x7]
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	b	.Lenter_cbc_enc128
+.Loop_cbc_enc128:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	st1	{v6.16b},[x1],#16
+.Lenter_cbc_enc128:
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	subs	x2,x2,#16
+	aese	v0.16b,v2.16b
+	aesmc	v0.16b,v0.16b
+	csel	x8,xzr,x8,eq
+	aese	v0.16b,v3.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v18.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v19.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v16.16b},[x0],x8
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	eor	v16.16b,v16.16b,v5.16b
+	aese	v0.16b,v23.16b
+	eor	v6.16b,v0.16b,v7.16b
+	b.hs	.Loop_cbc_enc128
 
-	vst1.8	{q6},[r1]!
-	b	Lcbc_done
+	st1	{v6.16b},[x1],#16
+	b	.Lcbc_done
 .align	5
-Lcbc_dec:
-	vld1.8	{q10},[r0]!
-	subs	r2,r2,#32		@ bias
-	add	r6,r5,#2
-	vorr	q3,q0,q0
-	vorr	q1,q0,q0
-	vorr	q11,q10,q10
-	blo	Lcbc_dec_tail
+.Lcbc_dec:
+	ld1	{v24.16b},[x0],#16
+	subs	x2,x2,#32		// bias
+	add	w6,w5,#2
+	orr	v3.16b,v0.16b,v0.16b
+	orr	v1.16b,v0.16b,v0.16b
+	orr	v27.16b,v24.16b,v24.16b
+	b.lo	.Lcbc_dec_tail
 
-	vorr	q1,q10,q10
-	vld1.8	{q10},[r0]!
-	vorr	q2,q0,q0
-	vorr	q3,q1,q1
-	vorr	q11,q10,q10
-Loop3x_cbc_dec:
-	INST(0x60,0x03,0xb0,0xf3)	@ aesd q0,q8
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x60,0x23,0xb0,0xf3)	@ aesd q1,q8
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x60,0x43,0xf0,0xf3)	@ aesd q10,q8
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.32	{q8},[r7]!
-	subs	r6,r6,#2
-	INST(0x62,0x03,0xb0,0xf3)	@ aesd q0,q9
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x62,0x23,0xb0,0xf3)	@ aesd q1,q9
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x62,0x43,0xf0,0xf3)	@ aesd q10,q9
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.32	{q9},[r7]!
-	bgt	Loop3x_cbc_dec
+	orr	v1.16b,v24.16b,v24.16b
+	ld1	{v24.16b},[x0],#16
+	orr	v2.16b,v0.16b,v0.16b
+	orr	v3.16b,v1.16b,v1.16b
+	orr	v27.16b,v24.16b,v24.16b
+	cmp	x2,#32
+	b.lo	.Loop3x_cbc_dec
 
-	INST(0x60,0x03,0xb0,0xf3)	@ aesd q0,q8
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x60,0x23,0xb0,0xf3)	@ aesd q1,q8
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x60,0x43,0xf0,0xf3)	@ aesd q10,q8
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	veor	q4,q6,q7
-	subs	r2,r2,#0x30
-	veor	q5,q2,q7
-	it	lo
-	movlo	r6,r2			@ r6, r6, is zero at this point
-	INST(0x62,0x03,0xb0,0xf3)	@ aesd q0,q9
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x62,0x23,0xb0,0xf3)	@ aesd q1,q9
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x62,0x43,0xf0,0xf3)	@ aesd q10,q9
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	veor	q9,q3,q7
-	add	r0,r0,r6		@ r0 is adjusted in such way that
-					@ at exit from the loop q1-q10
-					@ are loaded with last "words"
-	vorr	q6,q11,q11
-	mov	r7,r3
-	INST(0x68,0x03,0xb0,0xf3)	@ aesd q0,q12
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x68,0x23,0xb0,0xf3)	@ aesd q1,q12
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x68,0x43,0xf0,0xf3)	@ aesd q10,q12
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.8	{q2},[r0]!
-	INST(0x6a,0x03,0xb0,0xf3)	@ aesd q0,q13
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x6a,0x23,0xb0,0xf3)	@ aesd q1,q13
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x6a,0x43,0xf0,0xf3)	@ aesd q10,q13
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.8	{q3},[r0]!
-	INST(0x6c,0x03,0xb0,0xf3)	@ aesd q0,q14
-	INST(0xc0,0x03,0xb0,0xf3)	@ aesimc q0,q0
-	INST(0x6c,0x23,0xb0,0xf3)	@ aesd q1,q14
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x6c,0x43,0xf0,0xf3)	@ aesd q10,q14
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.8	{q11},[r0]!
-	INST(0x6e,0x03,0xb0,0xf3)	@ aesd q0,q15
-	INST(0x6e,0x23,0xb0,0xf3)	@ aesd q1,q15
-	INST(0x6e,0x43,0xf0,0xf3)	@ aesd q10,q15
-	vld1.32	{q8},[r7]!	@ re-pre-load rndkey[0]
-	add	r6,r5,#2
-	veor	q4,q4,q0
-	veor	q5,q5,q1
-	veor	q10,q10,q9
-	vld1.32	{q9},[r7]!	@ re-pre-load rndkey[1]
-	vst1.8	{q4},[r1]!
-	vorr	q0,q2,q2
-	vst1.8	{q5},[r1]!
-	vorr	q1,q3,q3
-	vst1.8	{q10},[r1]!
-	vorr	q10,q11,q11
-	bhs	Loop3x_cbc_dec
+	ld1	{v25.16b},[x0],#16
+	ld1	{v26.16b},[x0],#16
+	sub	x2,x2,#32		// bias
+	mov	w6,w5
+	orr	v28.16b,v25.16b,v25.16b
+	orr	v29.16b,v26.16b,v26.16b
 
-	cmn	r2,#0x30
-	beq	Lcbc_done
+.Loop5x_cbc_dec:
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v16.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v16.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v17.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v17.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Loop5x_cbc_dec
+
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v16.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v16.16b
+	aesimc	v26.16b,v26.16b
+	cmp	x2,#0x40		// because .Lcbc_tail4x
+	sub	x2,x2,#0x50
+
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v17.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v17.16b
+	aesimc	v26.16b,v26.16b
+	csel	x6,xzr,x2,gt		// borrow x6, w6, "gt" is not typo
+	mov	x7,x3
+
+	aesd	v0.16b,v18.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v18.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v18.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v18.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v18.16b
+	aesimc	v26.16b,v26.16b
+	add	x0,x0,x6		// x0 is adjusted in such way that
+					// at exit from the loop v1.16b-v26.16b
+					// are loaded with last "words"
+	add	x6,x2,#0x60		// because .Lcbc_tail4x
+
+	aesd	v0.16b,v19.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v19.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v19.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v19.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v19.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v20.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v20.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v20.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v20.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v20.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v21.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v21.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v21.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v21.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v21.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v22.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v22.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v22.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v22.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v22.16b
+	aesimc	v26.16b,v26.16b
+
+	eor	v4.16b,v6.16b,v7.16b
+	aesd	v0.16b,v23.16b
+	eor	v5.16b,v2.16b,v7.16b
+	ld1	{v2.16b},[x0],#16
+	aesd	v1.16b,v23.16b
+	eor	v17.16b,v3.16b,v7.16b
+	ld1	{v3.16b},[x0],#16
+	aesd	v24.16b,v23.16b
+	eor	v30.16b,v27.16b,v7.16b
+	ld1	{v27.16b},[x0],#16
+	aesd	v25.16b,v23.16b
+	eor	v31.16b,v28.16b,v7.16b
+	ld1	{v28.16b},[x0],#16
+	aesd	v26.16b,v23.16b
+	orr	v6.16b,v29.16b,v29.16b
+	ld1	{v29.16b},[x0],#16
+	cbz	x6,.Lcbc_tail4x
+	ld1	{v16.4s},[x7],#16	// re-pre-load rndkey[0]
+	eor	v4.16b,v4.16b,v0.16b
+	orr	v0.16b,v2.16b,v2.16b
+	eor	v5.16b,v5.16b,v1.16b
+	orr	v1.16b,v3.16b,v3.16b
+	eor	v17.16b,v17.16b,v24.16b
+	orr	v24.16b,v27.16b,v27.16b
+	eor	v30.16b,v30.16b,v25.16b
+	orr	v25.16b,v28.16b,v28.16b
+	eor	v31.16b,v31.16b,v26.16b
+	st1	{v4.16b},[x1],#16
+	orr	v26.16b,v29.16b,v29.16b
+	st1	{v5.16b},[x1],#16
+	mov	w6,w5
+	st1	{v17.16b},[x1],#16
+	ld1	{v17.4s},[x7],#16	// re-pre-load rndkey[1]
+	st1	{v30.16b},[x1],#16
+	st1	{v31.16b},[x1],#16
+	b.hs	.Loop5x_cbc_dec
+
+	add	x2,x2,#0x50
+	cbz	x2,.Lcbc_done
+
+	add	w6,w5,#2
+	subs	x2,x2,#0x30
+	orr	v0.16b,v27.16b,v27.16b
+	orr	v2.16b,v27.16b,v27.16b
+	orr	v1.16b,v28.16b,v28.16b
+	orr	v3.16b,v28.16b,v28.16b
+	orr	v24.16b,v29.16b,v29.16b
+	orr	v27.16b,v29.16b,v29.16b
+	b.lo	.Lcbc_dec_tail
+
+	b	.Loop3x_cbc_dec
+
+.align	4
+.Lcbc_tail4x:
+	eor	v5.16b,v4.16b,v1.16b
+	eor	v17.16b,v17.16b,v24.16b
+	eor	v30.16b,v30.16b,v25.16b
+	eor	v31.16b,v31.16b,v26.16b
+	st1	{v5.16b},[x1],#16
+	st1	{v17.16b},[x1],#16
+	st1	{v30.16b},[x1],#16
+	st1	{v31.16b},[x1],#16
+
+	b	.Lcbc_done
+.align	4
+.Loop3x_cbc_dec:
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Loop3x_cbc_dec
+
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	eor	v4.16b,v6.16b,v7.16b
+	subs	x2,x2,#0x30
+	eor	v5.16b,v2.16b,v7.16b
+	csel	x6,x2,x6,lo			// x6, w6, is zero at this point
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	eor	v17.16b,v3.16b,v7.16b
+	add	x0,x0,x6		// x0 is adjusted in such way that
+					// at exit from the loop v1.16b-v24.16b
+					// are loaded with last "words"
+	orr	v6.16b,v27.16b,v27.16b
+	mov	x7,x3
+	aesd	v0.16b,v20.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v20.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v20.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v2.16b},[x0],#16
+	aesd	v0.16b,v21.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v21.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v21.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v3.16b},[x0],#16
+	aesd	v0.16b,v22.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v22.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v22.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v27.16b},[x0],#16
+	aesd	v0.16b,v23.16b
+	aesd	v1.16b,v23.16b
+	aesd	v24.16b,v23.16b
+	ld1	{v16.4s},[x7],#16	// re-pre-load rndkey[0]
+	add	w6,w5,#2
+	eor	v4.16b,v4.16b,v0.16b
+	eor	v5.16b,v5.16b,v1.16b
+	eor	v24.16b,v24.16b,v17.16b
+	ld1	{v17.4s},[x7],#16	// re-pre-load rndkey[1]
+	st1	{v4.16b},[x1],#16
+	orr	v0.16b,v2.16b,v2.16b
+	st1	{v5.16b},[x1],#16
+	orr	v1.16b,v3.16b,v3.16b
+	st1	{v24.16b},[x1],#16
+	orr	v24.16b,v27.16b,v27.16b
+	b.hs	.Loop3x_cbc_dec
+
+	cmn	x2,#0x30
+	b.eq	.Lcbc_done
 	nop
 
-Lcbc_dec_tail:
-	INST(0x60,0x23,0xb0,0xf3)	@ aesd q1,q8
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x60,0x43,0xf0,0xf3)	@ aesd q10,q8
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.32	{q8},[r7]!
-	subs	r6,r6,#2
-	INST(0x62,0x23,0xb0,0xf3)	@ aesd q1,q9
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x62,0x43,0xf0,0xf3)	@ aesd q10,q9
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	vld1.32	{q9},[r7]!
-	bgt	Lcbc_dec_tail
+.Lcbc_dec_tail:
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Lcbc_dec_tail
 
-	INST(0x60,0x23,0xb0,0xf3)	@ aesd q1,q8
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x60,0x43,0xf0,0xf3)	@ aesd q10,q8
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	INST(0x62,0x23,0xb0,0xf3)	@ aesd q1,q9
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x62,0x43,0xf0,0xf3)	@ aesd q10,q9
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	INST(0x68,0x23,0xb0,0xf3)	@ aesd q1,q12
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x68,0x43,0xf0,0xf3)	@ aesd q10,q12
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	cmn	r2,#0x20
-	INST(0x6a,0x23,0xb0,0xf3)	@ aesd q1,q13
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x6a,0x43,0xf0,0xf3)	@ aesd q10,q13
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	veor	q5,q6,q7
-	INST(0x6c,0x23,0xb0,0xf3)	@ aesd q1,q14
-	INST(0xc2,0x23,0xb0,0xf3)	@ aesimc q1,q1
-	INST(0x6c,0x43,0xf0,0xf3)	@ aesd q10,q14
-	INST(0xe4,0x43,0xf0,0xf3)	@ aesimc q10,q10
-	veor	q9,q3,q7
-	INST(0x6e,0x23,0xb0,0xf3)	@ aesd q1,q15
-	INST(0x6e,0x43,0xf0,0xf3)	@ aesd q10,q15
-	beq	Lcbc_dec_one
-	veor	q5,q5,q1
-	veor	q9,q9,q10
-	vorr	q6,q11,q11
-	vst1.8	{q5},[r1]!
-	vst1.8	{q9},[r1]!
-	b	Lcbc_done
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v1.16b,v20.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v20.16b
+	aesimc	v24.16b,v24.16b
+	cmn	x2,#0x20
+	aesd	v1.16b,v21.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v21.16b
+	aesimc	v24.16b,v24.16b
+	eor	v5.16b,v6.16b,v7.16b
+	aesd	v1.16b,v22.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v22.16b
+	aesimc	v24.16b,v24.16b
+	eor	v17.16b,v3.16b,v7.16b
+	aesd	v1.16b,v23.16b
+	aesd	v24.16b,v23.16b
+	b.eq	.Lcbc_dec_one
+	eor	v5.16b,v5.16b,v1.16b
+	eor	v17.16b,v17.16b,v24.16b
+	orr	v6.16b,v27.16b,v27.16b
+	st1	{v5.16b},[x1],#16
+	st1	{v17.16b},[x1],#16
+	b	.Lcbc_done
 
-Lcbc_dec_one:
-	veor	q5,q5,q10
-	vorr	q6,q11,q11
-	vst1.8	{q5},[r1]!
+.Lcbc_dec_one:
+	eor	v5.16b,v5.16b,v24.16b
+	orr	v6.16b,v27.16b,v27.16b
+	st1	{v5.16b},[x1],#16
 
-Lcbc_done:
-	vst1.8	{q6},[r4]
-Lcbc_abort:
-	vldmia	sp!,{d8,d9,d10,d11,d12,d13,d14,d15}
-	ldmia	sp!,{r4,r5,r6,r7,r8,pc}
-
+.Lcbc_done:
+	st1	{v6.16b},[x4]
+.Lcbc_abort:
+	ldr	x29,[sp],#16
+	ret
+.size	aes_v8_cbc_encrypt,.-aes_v8_cbc_encrypt
 .globl	aes_v8_ctr32_encrypt_blocks
-
+.type	aes_v8_ctr32_encrypt_blocks,%function
 .align	5
 aes_v8_ctr32_encrypt_blocks:
-	mov	ip,sp
-	stmdb	sp!,{r4,r5,r6,r7,r8,r9,r10,lr}
-	vstmdb	sp!,{d8,d9,d10,d11,d12,d13,d14,d15}            @ ABI specification says so
-	ldr	r4, [ip]		@ load remaining arg
-	ldr	r5,[r3,#240]
+	stp	x29,x30,[sp,#-16]!
+	add	x29,sp,#0
+	ldr	w5,[x3,#240]
 
-	ldr	r8, [r4, #12]
+	ldr	w8, [x4, #12]
 #ifdef __ARMEB__
-	vld1.8	{q0},[r4]
+	ld1	{v0.16b},[x4]
 #else
-	vld1.32	{q0},[r4]
+	ld1	{v0.4s},[x4]
 #endif
-	vld1.32	{q8,q9},[r3]		@ load key schedule...
-	sub	r5,r5,#4
-	mov	r12,#16
-	cmp	r2,#2
-	add	r7,r3,r5,lsl#4	@ pointer to last 5 round keys
-	sub	r5,r5,#2
-	vld1.32	{q12,q13},[r7]!
-	vld1.32	{q14,q15},[r7]!
-	vld1.32	{q7},[r7]
-	add	r7,r3,#32
-	mov	r6,r5
-	it	lo
-	movlo	r12,#0
+	ld1	{v16.4s,v17.4s},[x3]		// load key schedule...
+	sub	w5,w5,#4
+	mov	x12,#16
+	cmp	x2,#2
+	add	x7,x3,x5,lsl#4	// pointer to last 5 round keys
+	sub	w5,w5,#2
+	ld1	{v20.4s,v21.4s},[x7],#32
+	ld1	{v22.4s,v23.4s},[x7],#32
+	ld1	{v7.4s},[x7]
+	add	x7,x3,#32
+	mov	w6,w5
+	csel	x12,xzr,x12,lo
 #ifndef __ARMEB__
-	rev	r8, r8
+	rev	w8, w8
 #endif
-	add	r10, r8, #1
-	vorr	q6,q0,q0
-	rev	r10, r10
-	vmov.32	d13[1],r10
-	add	r8, r8, #2
-	vorr	q1,q6,q6
-	bls	Lctr32_tail
-	rev	r12, r8
-	vmov.32	d13[1],r12
-	sub	r2,r2,#3		@ bias
-	vorr	q10,q6,q6
-	b	Loop3x_ctr32
+	orr	v1.16b,v0.16b,v0.16b
+	add	w10, w8, #1
+	orr	v18.16b,v0.16b,v0.16b
+	add	w8, w8, #2
+	orr	v6.16b,v0.16b,v0.16b
+	rev	w10, w10
+	mov	v1.s[3],w10
+	b.ls	.Lctr32_tail
+	rev	w12, w8
+	sub	x2,x2,#3		// bias
+	mov	v18.s[3],w12
+	cmp	x2,#32
+	b.lo	.Loop3x_ctr32
+
+	add	w13,w8,#1
+	add	w14,w8,#2
+	orr	v24.16b,v0.16b,v0.16b
+	rev	w13,w13
+	orr	v25.16b,v0.16b,v0.16b
+	rev	w14,w14
+	mov	v24.s[3],w13
+	sub	x2,x2,#2		// bias
+	mov	v25.s[3],w14
+	add	w8,w8,#2
+	b	.Loop5x_ctr32
 
 .align	4
-Loop3x_ctr32:
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x20,0x23,0xb0,0xf3)	@ aese q1,q8
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x20,0x43,0xf0,0xf3)	@ aese q10,q8
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.32	{q8},[r7]!
-	subs	r6,r6,#2
-	INST(0x22,0x03,0xb0,0xf3)	@ aese q0,q9
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x22,0x23,0xb0,0xf3)	@ aese q1,q9
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x22,0x43,0xf0,0xf3)	@ aese q10,q9
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.32	{q9},[r7]!
-	bgt	Loop3x_ctr32
+.Loop5x_ctr32:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v18.16b,v16.16b
+	aesmc	v18.16b,v18.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v16.16b
+	aesmc	v25.16b,v25.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v18.16b,v17.16b
+	aesmc	v18.16b,v18.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v17.16b
+	aesmc	v25.16b,v25.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Loop5x_ctr32
 
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x83,0xb0,0xf3)	@ aesmc q4,q0
-	INST(0x20,0x23,0xb0,0xf3)	@ aese q1,q8
-	INST(0x82,0xa3,0xb0,0xf3)	@ aesmc q5,q1
-	vld1.8	{q2},[r0]!
-	add	r9,r8,#1
-	INST(0x20,0x43,0xf0,0xf3)	@ aese q10,q8
-	INST(0xa4,0x43,0xf0,0xf3)	@ aesmc q10,q10
-	vld1.8	{q3},[r0]!
-	rev	r9,r9
-	INST(0x22,0x83,0xb0,0xf3)	@ aese q4,q9
-	INST(0x88,0x83,0xb0,0xf3)	@ aesmc q4,q4
-	INST(0x22,0xa3,0xb0,0xf3)	@ aese q5,q9
-	INST(0x8a,0xa3,0xb0,0xf3)	@ aesmc q5,q5
-	vld1.8	{q11},[r0]!
-	mov	r7,r3
-	INST(0x22,0x43,0xf0,0xf3)	@ aese q10,q9
-	INST(0xa4,0x23,0xf0,0xf3)	@ aesmc q9,q10
-	INST(0x28,0x83,0xb0,0xf3)	@ aese q4,q12
-	INST(0x88,0x83,0xb0,0xf3)	@ aesmc q4,q4
-	INST(0x28,0xa3,0xb0,0xf3)	@ aese q5,q12
-	INST(0x8a,0xa3,0xb0,0xf3)	@ aesmc q5,q5
-	veor	q2,q2,q7
-	add	r10,r8,#2
-	INST(0x28,0x23,0xf0,0xf3)	@ aese q9,q12
-	INST(0xa2,0x23,0xf0,0xf3)	@ aesmc q9,q9
-	veor	q3,q3,q7
-	add	r8,r8,#3
-	INST(0x2a,0x83,0xb0,0xf3)	@ aese q4,q13
-	INST(0x88,0x83,0xb0,0xf3)	@ aesmc q4,q4
-	INST(0x2a,0xa3,0xb0,0xf3)	@ aese q5,q13
-	INST(0x8a,0xa3,0xb0,0xf3)	@ aesmc q5,q5
-	veor	q11,q11,q7
-	vmov.32	d13[1], r9
-	INST(0x2a,0x23,0xf0,0xf3)	@ aese q9,q13
-	INST(0xa2,0x23,0xf0,0xf3)	@ aesmc q9,q9
-	vorr	q0,q6,q6
-	rev	r10,r10
-	INST(0x2c,0x83,0xb0,0xf3)	@ aese q4,q14
-	INST(0x88,0x83,0xb0,0xf3)	@ aesmc q4,q4
-	vmov.32	d13[1], r10
-	rev	r12,r8
-	INST(0x2c,0xa3,0xb0,0xf3)	@ aese q5,q14
-	INST(0x8a,0xa3,0xb0,0xf3)	@ aesmc q5,q5
-	vorr	q1,q6,q6
-	vmov.32	d13[1], r12
-	INST(0x2c,0x23,0xf0,0xf3)	@ aese q9,q14
-	INST(0xa2,0x23,0xf0,0xf3)	@ aesmc q9,q9
-	vorr	q10,q6,q6
-	subs	r2,r2,#3
-	INST(0x2e,0x83,0xb0,0xf3)	@ aese q4,q15
-	INST(0x2e,0xa3,0xb0,0xf3)	@ aese q5,q15
-	INST(0x2e,0x23,0xf0,0xf3)	@ aese q9,q15
+	mov	x7,x3
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v18.16b,v16.16b
+	aesmc	v18.16b,v18.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v16.16b
+	aesmc	v25.16b,v25.16b
+	ld1	{v16.4s},[x7],#16	// re-pre-load rndkey[0]
 
-	veor	q2,q2,q4
-	vld1.32	{q8},[r7]!	@ re-pre-load rndkey[0]
-	vst1.8	{q2},[r1]!
-	veor	q3,q3,q5
-	mov	r6,r5
-	vst1.8	{q3},[r1]!
-	veor	q11,q11,q9
-	vld1.32	{q9},[r7]!	@ re-pre-load rndkey[1]
-	vst1.8	{q11},[r1]!
-	bhs	Loop3x_ctr32
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v18.16b,v17.16b
+	aesmc	v18.16b,v18.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v17.16b
+	aesmc	v25.16b,v25.16b
+	ld1	{v17.4s},[x7],#16	// re-pre-load rndkey[1]
 
-	adds	r2,r2,#3
-	beq	Lctr32_done
-	cmp	r2,#1
-	mov	r12,#16
-	it	eq
-	moveq	r12,#0
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	add	w9,w8,#1
+	add	w10,w8,#2
+	aese	v1.16b,v20.16b
+	aesmc	v1.16b,v1.16b
+	add	w12,w8,#3
+	add	w13,w8,#4
+	aese	v18.16b,v20.16b
+	aesmc	v18.16b,v18.16b
+	add	w14,w8,#5
+	rev	w9,w9
+	aese	v24.16b,v20.16b
+	aesmc	v24.16b,v24.16b
+	rev	w10,w10
+	rev	w12,w12
+	aese	v25.16b,v20.16b
+	aesmc	v25.16b,v25.16b
+	rev	w13,w13
+	rev	w14,w14
 
-Lctr32_tail:
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x20,0x23,0xb0,0xf3)	@ aese q1,q8
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	vld1.32	{q8},[r7]!
-	subs	r6,r6,#2
-	INST(0x22,0x03,0xb0,0xf3)	@ aese q0,q9
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x22,0x23,0xb0,0xf3)	@ aese q1,q9
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	vld1.32	{q9},[r7]!
-	bgt	Lctr32_tail
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v21.16b
+	aesmc	v1.16b,v1.16b
+	aese	v18.16b,v21.16b
+	aesmc	v18.16b,v18.16b
+	aese	v24.16b,v21.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v21.16b
+	aesmc	v25.16b,v25.16b
 
-	INST(0x20,0x03,0xb0,0xf3)	@ aese q0,q8
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x20,0x23,0xb0,0xf3)	@ aese q1,q8
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	INST(0x22,0x03,0xb0,0xf3)	@ aese q0,q9
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x22,0x23,0xb0,0xf3)	@ aese q1,q9
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	vld1.8	{q2},[r0],r12
-	INST(0x28,0x03,0xb0,0xf3)	@ aese q0,q12
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x28,0x23,0xb0,0xf3)	@ aese q1,q12
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	vld1.8	{q3},[r0]
-	INST(0x2a,0x03,0xb0,0xf3)	@ aese q0,q13
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x2a,0x23,0xb0,0xf3)	@ aese q1,q13
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	veor	q2,q2,q7
-	INST(0x2c,0x03,0xb0,0xf3)	@ aese q0,q14
-	INST(0x80,0x03,0xb0,0xf3)	@ aesmc q0,q0
-	INST(0x2c,0x23,0xb0,0xf3)	@ aese q1,q14
-	INST(0x82,0x23,0xb0,0xf3)	@ aesmc q1,q1
-	veor	q3,q3,q7
-	INST(0x2e,0x03,0xb0,0xf3)	@ aese q0,q15
-	INST(0x2e,0x23,0xb0,0xf3)	@ aese q1,q15
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v2.16b},[x0],#16
+	aese	v1.16b,v22.16b
+	aesmc	v1.16b,v1.16b
+	ld1	{v3.16b},[x0],#16
+	aese	v18.16b,v22.16b
+	aesmc	v18.16b,v18.16b
+	ld1	{v19.16b},[x0],#16
+	aese	v24.16b,v22.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v26.16b},[x0],#16
+	aese	v25.16b,v22.16b
+	aesmc	v25.16b,v25.16b
+	ld1	{v27.16b},[x0],#16
 
-	cmp	r2,#1
-	veor	q2,q2,q0
-	veor	q3,q3,q1
-	vst1.8	{q2},[r1]!
-	beq	Lctr32_done
-	vst1.8	{q3},[r1]
+	aese	v0.16b,v23.16b
+	eor	v2.16b,v2.16b,v7.16b
+	aese	v1.16b,v23.16b
+	eor	v3.16b,v3.16b,v7.16b
+	aese	v18.16b,v23.16b
+	eor	v19.16b,v19.16b,v7.16b
+	aese	v24.16b,v23.16b
+	eor	v26.16b,v26.16b,v7.16b
+	aese	v25.16b,v23.16b
+	eor	v27.16b,v27.16b,v7.16b
 
-Lctr32_done:
-	vldmia	sp!,{d8,d9,d10,d11,d12,d13,d14,d15}
-	ldmia	sp!,{r4,r5,r6,r7,r8,r9,r10,pc}
+	eor	v2.16b,v2.16b,v0.16b
+	orr	v0.16b,v6.16b,v6.16b
+	eor	v3.16b,v3.16b,v1.16b
+	orr	v1.16b,v6.16b,v6.16b
+	eor	v19.16b,v19.16b,v18.16b
+	orr	v18.16b,v6.16b,v6.16b
+	eor	v26.16b,v26.16b,v24.16b
+	orr	v24.16b,v6.16b,v6.16b
+	eor	v27.16b,v27.16b,v25.16b
+	orr	v25.16b,v6.16b,v6.16b
 
+	st1	{v2.16b},[x1],#16
+	mov	v0.s[3],w9
+	st1	{v3.16b},[x1],#16
+	mov	v1.s[3],w10
+	st1	{v19.16b},[x1],#16
+	mov	v18.s[3],w12
+	st1	{v26.16b},[x1],#16
+	mov	v24.s[3],w13
+	st1	{v27.16b},[x1],#16
+	mov	v25.s[3],w14
+
+	mov	w6,w5
+	cbz	x2,.Lctr32_done
+
+	add	w8,w8,#5
+	subs	x2,x2,#5
+	b.hs	.Loop5x_ctr32
+
+	add	x2,x2,#5
+	sub	w8,w8,#5
+
+	cmp	x2,#2
+	mov	x12,#16
+	csel	x12,xzr,x12,lo
+	b.ls	.Lctr32_tail
+
+	sub	x2,x2,#3		// bias
+	add	w8,w8,#3
+	b	.Loop3x_ctr32
+
+.align	4
+.Loop3x_ctr32:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v18.16b,v16.16b
+	aesmc	v18.16b,v18.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v18.16b,v17.16b
+	aesmc	v18.16b,v18.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Loop3x_ctr32
+
+	aese	v0.16b,v16.16b
+	aesmc	v4.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v5.16b,v1.16b
+	ld1	{v2.16b},[x0],#16
+	orr	v0.16b,v6.16b,v6.16b
+	aese	v18.16b,v16.16b
+	aesmc	v18.16b,v18.16b
+	ld1	{v3.16b},[x0],#16
+	orr	v1.16b,v6.16b,v6.16b
+	aese	v4.16b,v17.16b
+	aesmc	v4.16b,v4.16b
+	aese	v5.16b,v17.16b
+	aesmc	v5.16b,v5.16b
+	ld1	{v19.16b},[x0],#16
+	mov	x7,x3
+	aese	v18.16b,v17.16b
+	aesmc	v17.16b,v18.16b
+	orr	v18.16b,v6.16b,v6.16b
+	add	w9,w8,#1
+	aese	v4.16b,v20.16b
+	aesmc	v4.16b,v4.16b
+	aese	v5.16b,v20.16b
+	aesmc	v5.16b,v5.16b
+	eor	v2.16b,v2.16b,v7.16b
+	add	w10,w8,#2
+	aese	v17.16b,v20.16b
+	aesmc	v17.16b,v17.16b
+	eor	v3.16b,v3.16b,v7.16b
+	add	w8,w8,#3
+	aese	v4.16b,v21.16b
+	aesmc	v4.16b,v4.16b
+	aese	v5.16b,v21.16b
+	aesmc	v5.16b,v5.16b
+	eor	v19.16b,v19.16b,v7.16b
+	rev	w9,w9
+	aese	v17.16b,v21.16b
+	aesmc	v17.16b,v17.16b
+	mov	v0.s[3], w9
+	rev	w10,w10
+	aese	v4.16b,v22.16b
+	aesmc	v4.16b,v4.16b
+	aese	v5.16b,v22.16b
+	aesmc	v5.16b,v5.16b
+	mov	v1.s[3], w10
+	rev	w12,w8
+	aese	v17.16b,v22.16b
+	aesmc	v17.16b,v17.16b
+	mov	v18.s[3], w12
+	subs	x2,x2,#3
+	aese	v4.16b,v23.16b
+	aese	v5.16b,v23.16b
+	aese	v17.16b,v23.16b
+
+	eor	v2.16b,v2.16b,v4.16b
+	ld1	{v16.4s},[x7],#16	// re-pre-load rndkey[0]
+	st1	{v2.16b},[x1],#16
+	eor	v3.16b,v3.16b,v5.16b
+	mov	w6,w5
+	st1	{v3.16b},[x1],#16
+	eor	v19.16b,v19.16b,v17.16b
+	ld1	{v17.4s},[x7],#16	// re-pre-load rndkey[1]
+	st1	{v19.16b},[x1],#16
+	b.hs	.Loop3x_ctr32
+
+	adds	x2,x2,#3
+	b.eq	.Lctr32_done
+	cmp	x2,#1
+	mov	x12,#16
+	csel	x12,xzr,x12,eq
+
+.Lctr32_tail:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Lctr32_tail
+
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	ld1	{v2.16b},[x0],x12
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v20.16b
+	aesmc	v1.16b,v1.16b
+	ld1	{v3.16b},[x0]
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v21.16b
+	aesmc	v1.16b,v1.16b
+	eor	v2.16b,v2.16b,v7.16b
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v22.16b
+	aesmc	v1.16b,v1.16b
+	eor	v3.16b,v3.16b,v7.16b
+	aese	v0.16b,v23.16b
+	aese	v1.16b,v23.16b
+
+	cmp	x2,#1
+	eor	v2.16b,v2.16b,v0.16b
+	eor	v3.16b,v3.16b,v1.16b
+	st1	{v2.16b},[x1],#16
+	b.eq	.Lctr32_done
+	st1	{v3.16b},[x1]
+
+.Lctr32_done:
+	ldr	x29,[sp],#16
+	ret
+.size	aes_v8_ctr32_encrypt_blocks,.-aes_v8_ctr32_encrypt_blocks
+.globl	aes_v8_xts_encrypt
+.type	aes_v8_xts_encrypt,%function
+.align	5
+aes_v8_xts_encrypt:
+	cmp	x2,#16
+	// Original input data size bigger than 16, jump to big size processing.
+	b.ne	.Lxts_enc_big_size
+	// Encrypt the iv with key2, as the first XEX iv.
+	ldr	w6,[x4,#240]
+	ld1	{v0.16b},[x4],#16
+	ld1	{v6.16b},[x5]
+	sub	w6,w6,#2
+	ld1	{v1.16b},[x4],#16
+
+.Loop_enc_iv_enc:
+	aese	v6.16b,v0.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v0.4s},[x4],#16
+	subs	w6,w6,#2
+	aese	v6.16b,v1.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v1.4s},[x4],#16
+	b.gt	.Loop_enc_iv_enc
+
+	aese	v6.16b,v0.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v0.4s},[x4]
+	aese	v6.16b,v1.16b
+	eor	v6.16b,v6.16b,v0.16b
+
+	ld1	{v0.16b},[x0]
+	eor	v0.16b,v6.16b,v0.16b
+
+	ldr	w6,[x3,#240]
+	ld1	{v28.4s,v29.4s},[x3],#32		// load key schedule...
+
+	aese	v0.16b,v28.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v16.4s,v17.4s},[x3],#32		// load key schedule...
+	aese	v0.16b,v29.16b
+	aesmc	v0.16b,v0.16b
+	subs	w6,w6,#10		// if rounds==10, jump to aes-128-xts processing
+	b.eq	.Lxts_128_enc
+.Lxts_enc_round_loop:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v16.4s},[x3],#16		// load key schedule...
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v17.4s},[x3],#16		// load key schedule...
+	subs	w6,w6,#2		// bias
+	b.gt	.Lxts_enc_round_loop
+.Lxts_128_enc:
+	ld1	{v18.4s,v19.4s},[x3],#32		// load key schedule...
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v20.4s,v21.4s},[x3],#32		// load key schedule...
+	aese	v0.16b,v18.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v19.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v22.4s,v23.4s},[x3],#32		// load key schedule...
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	ld1	{v7.4s},[x3]
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	aese	v0.16b,v23.16b
+	eor	v0.16b,v0.16b,v7.16b
+	eor	v0.16b,v0.16b,v6.16b
+	st1	{v0.16b},[x1]
+	b	.Lxts_enc_final_abort
+
+.align	4
+.Lxts_enc_big_size:
+	stp	x19,x20,[sp,#-64]!
+	stp	x21,x22,[sp,#48]
+	stp	d8,d9,[sp,#32]
+	stp	d10,d11,[sp,#16]
+
+	// tailcnt store the tail value of length%16.
+	and	x21,x2,#0xf
+	and	x2,x2,#-16
+	subs	x2,x2,#16
+	mov	x8,#16
+	b.lo	.Lxts_abort
+	csel	x8,xzr,x8,eq
+
+	// Firstly, encrypt the iv with key2, as the first iv of XEX.
+	ldr	w6,[x4,#240]
+	ld1	{v0.4s},[x4],#16
+	ld1	{v6.16b},[x5]
+	sub	w6,w6,#2
+	ld1	{v1.4s},[x4],#16
+
+.Loop_iv_enc:
+	aese	v6.16b,v0.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v0.4s},[x4],#16
+	subs	w6,w6,#2
+	aese	v6.16b,v1.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v1.4s},[x4],#16
+	b.gt	.Loop_iv_enc
+
+	aese	v6.16b,v0.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v0.4s},[x4]
+	aese	v6.16b,v1.16b
+	eor	v6.16b,v6.16b,v0.16b
+
+	// The iv for second block
+	// x9- iv(low), x10 - iv(high)
+	// the five ivs stored into, v6.16b,v8.16b,v9.16b,v10.16b,v11.16b
+	fmov	x9,d6
+	fmov	x10,v6.d[1]
+	mov	w19,#0x87
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr#31
+	eor	x9,x11,x9,lsl#1
+	fmov	d8,x9
+	fmov	v8.d[1],x10
+
+	ldr	w5,[x3,#240]		// next starting point
+	ld1	{v0.16b},[x0],x8
+
+	ld1	{v16.4s,v17.4s},[x3]			// load key schedule...
+	sub	w5,w5,#6
+	add	x7,x3,x5,lsl#4		// pointer to last 7 round keys
+	sub	w5,w5,#2
+	ld1	{v18.4s,v19.4s},[x7],#32
+	ld1	{v20.4s,v21.4s},[x7],#32
+	ld1	{v22.4s,v23.4s},[x7],#32
+	ld1	{v7.4s},[x7]
+
+	add	x7,x3,#32
+	mov	w6,w5
+
+	// Encryption
+.Lxts_enc:
+	ld1	{v24.16b},[x0],#16
+	subs	x2,x2,#32			// bias
+	add	w6,w5,#2
+	orr	v3.16b,v0.16b,v0.16b
+	orr	v1.16b,v0.16b,v0.16b
+	orr	v28.16b,v0.16b,v0.16b
+	orr	v27.16b,v24.16b,v24.16b
+	orr	v29.16b,v24.16b,v24.16b
+	b.lo	.Lxts_inner_enc_tail
+	eor	v0.16b,v0.16b,v6.16b			// before encryption, xor with iv
+	eor	v24.16b,v24.16b,v8.16b
+
+	// The iv for third block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr#31
+	eor	x9,x11,x9,lsl#1
+	fmov	d9,x9
+	fmov	v9.d[1],x10
+
+
+	orr	v1.16b,v24.16b,v24.16b
+	ld1	{v24.16b},[x0],#16
+	orr	v2.16b,v0.16b,v0.16b
+	orr	v3.16b,v1.16b,v1.16b
+	eor	v27.16b,v24.16b,v9.16b 		// the third block
+	eor	v24.16b,v24.16b,v9.16b
+	cmp	x2,#32
+	b.lo	.Lxts_outer_enc_tail
+
+	// The iv for fourth block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr#31
+	eor	x9,x11,x9,lsl#1
+	fmov	d10,x9
+	fmov	v10.d[1],x10
+
+	ld1	{v25.16b},[x0],#16
+	// The iv for fifth block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr#31
+	eor	x9,x11,x9,lsl#1
+	fmov	d11,x9
+	fmov	v11.d[1],x10
+
+	ld1	{v26.16b},[x0],#16
+	eor	v25.16b,v25.16b,v10.16b		// the fourth block
+	eor	v26.16b,v26.16b,v11.16b
+	sub	x2,x2,#32			// bias
+	mov	w6,w5
+	b	.Loop5x_xts_enc
+
+.align	4
+.Loop5x_xts_enc:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v16.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v16.16b
+	aesmc	v26.16b,v26.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v17.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v17.16b
+	aesmc	v26.16b,v26.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Loop5x_xts_enc
+
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v16.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v16.16b
+	aesmc	v26.16b,v26.16b
+	subs	x2,x2,#0x50			// because .Lxts_enc_tail4x
+
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v17.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v17.16b
+	aesmc	v26.16b,v26.16b
+	csel	x6,xzr,x2,gt		// borrow x6, w6, "gt" is not typo
+	mov	x7,x3
+
+	aese	v0.16b,v18.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v18.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v18.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v18.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v18.16b
+	aesmc	v26.16b,v26.16b
+	add	x0,x0,x6		// x0 is adjusted in such way that
+						// at exit from the loop v1.16b-v26.16b
+						// are loaded with last "words"
+	add	x6,x2,#0x60		// because .Lxts_enc_tail4x
+
+	aese	v0.16b,v19.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v19.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v19.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v19.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v19.16b
+	aesmc	v26.16b,v26.16b
+
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v20.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v20.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v20.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v20.16b
+	aesmc	v26.16b,v26.16b
+
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v21.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v21.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v21.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v21.16b
+	aesmc	v26.16b,v26.16b
+
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v22.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v22.16b
+	aesmc	v24.16b,v24.16b
+	aese	v25.16b,v22.16b
+	aesmc	v25.16b,v25.16b
+	aese	v26.16b,v22.16b
+	aesmc	v26.16b,v26.16b
+
+	eor	v4.16b,v7.16b,v6.16b
+	aese	v0.16b,v23.16b
+	// The iv for first block of one iteration
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr#31
+	eor	x9,x11,x9,lsl#1
+	fmov	d6,x9
+	fmov	v6.d[1],x10
+	eor	v5.16b,v7.16b,v8.16b
+	ld1	{v2.16b},[x0],#16
+	aese	v1.16b,v23.16b
+	// The iv for second block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr#31
+	eor	x9,x11,x9,lsl#1
+	fmov	d8,x9
+	fmov	v8.d[1],x10
+	eor	v17.16b,v7.16b,v9.16b
+	ld1	{v3.16b},[x0],#16
+	aese	v24.16b,v23.16b
+	// The iv for third block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr#31
+	eor	x9,x11,x9,lsl#1
+	fmov	d9,x9
+	fmov	v9.d[1],x10
+	eor	v30.16b,v7.16b,v10.16b
+	ld1	{v27.16b},[x0],#16
+	aese	v25.16b,v23.16b
+	// The iv for fourth block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr#31
+	eor	x9,x11,x9,lsl#1
+	fmov	d10,x9
+	fmov	v10.d[1],x10
+	eor	v31.16b,v7.16b,v11.16b
+	ld1	{v28.16b},[x0],#16
+	aese	v26.16b,v23.16b
+
+	// The iv for fifth block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d11,x9
+	fmov	v11.d[1],x10
+
+	ld1	{v29.16b},[x0],#16
+	cbz	x6,.Lxts_enc_tail4x
+	ld1	{v16.4s},[x7],#16		// re-pre-load rndkey[0]
+	eor	v4.16b,v4.16b,v0.16b
+	eor	v0.16b,v2.16b,v6.16b
+	eor	v5.16b,v5.16b,v1.16b
+	eor	v1.16b,v3.16b,v8.16b
+	eor	v17.16b,v17.16b,v24.16b
+	eor	v24.16b,v27.16b,v9.16b
+	eor	v30.16b,v30.16b,v25.16b
+	eor	v25.16b,v28.16b,v10.16b
+	eor	v31.16b,v31.16b,v26.16b
+	st1	{v4.16b},[x1],#16
+	eor	v26.16b,v29.16b,v11.16b
+	st1	{v5.16b},[x1],#16
+	mov	w6,w5
+	st1	{v17.16b},[x1],#16
+	ld1	{v17.4s},[x7],#16		// re-pre-load rndkey[1]
+	st1	{v30.16b},[x1],#16
+	st1	{v31.16b},[x1],#16
+	b.hs	.Loop5x_xts_enc
+
+
+	// If left 4 blocks, borrow the five block's processing.
+	cmn	x2,#0x10
+	b.ne	.Loop5x_enc_after
+	orr	v11.16b,v10.16b,v10.16b
+	orr	v10.16b,v9.16b,v9.16b
+	orr	v9.16b,v8.16b,v8.16b
+	orr	v8.16b,v6.16b,v6.16b
+	fmov	x9,d11
+	fmov	x10,v11.d[1]
+	eor	v0.16b,v6.16b,v2.16b
+	eor	v1.16b,v8.16b,v3.16b
+	eor	v24.16b,v27.16b,v9.16b
+	eor	v25.16b,v28.16b,v10.16b
+	eor	v26.16b,v29.16b,v11.16b
+	b.eq	.Loop5x_xts_enc
+
+.Loop5x_enc_after:
+	add	x2,x2,#0x50
+	cbz	x2,.Lxts_enc_done
+
+	add	w6,w5,#2
+	subs	x2,x2,#0x30
+	b.lo	.Lxts_inner_enc_tail
+
+	eor	v0.16b,v6.16b,v27.16b
+	eor	v1.16b,v8.16b,v28.16b
+	eor	v24.16b,v29.16b,v9.16b
+	b	.Lxts_outer_enc_tail
+
+.align	4
+.Lxts_enc_tail4x:
+	add	x0,x0,#16
+	eor	v5.16b,v1.16b,v5.16b
+	st1	{v5.16b},[x1],#16
+	eor	v17.16b,v24.16b,v17.16b
+	st1	{v17.16b},[x1],#16
+	eor	v30.16b,v25.16b,v30.16b
+	eor	v31.16b,v26.16b,v31.16b
+	st1	{v30.16b,v31.16b},[x1],#32
+
+	b	.Lxts_enc_done
+.align	4
+.Lxts_outer_enc_tail:
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Lxts_outer_enc_tail
+
+	aese	v0.16b,v16.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	eor	v4.16b,v6.16b,v7.16b
+	subs	x2,x2,#0x30
+	// The iv for first block
+	fmov	x9,d9
+	fmov	x10,v9.d[1]
+	//mov	w19,#0x87
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr#31
+	eor	x9,x11,x9,lsl#1
+	fmov	d6,x9
+	fmov	v6.d[1],x10
+	eor	v5.16b,v8.16b,v7.16b
+	csel	x6,x2,x6,lo       // x6, w6, is zero at this point
+	aese	v0.16b,v17.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	eor	v17.16b,v9.16b,v7.16b
+
+	add	x6,x6,#0x20
+	add	x0,x0,x6
+	mov	x7,x3
+
+	aese	v0.16b,v20.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v20.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v20.16b
+	aesmc	v24.16b,v24.16b
+	aese	v0.16b,v21.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v21.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v21.16b
+	aesmc	v24.16b,v24.16b
+	aese	v0.16b,v22.16b
+	aesmc	v0.16b,v0.16b
+	aese	v1.16b,v22.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v22.16b
+	aesmc	v24.16b,v24.16b
+	aese	v0.16b,v23.16b
+	aese	v1.16b,v23.16b
+	aese	v24.16b,v23.16b
+	ld1	{v27.16b},[x0],#16
+	add	w6,w5,#2
+	ld1	{v16.4s},[x7],#16                // re-pre-load rndkey[0]
+	eor	v4.16b,v4.16b,v0.16b
+	eor	v5.16b,v5.16b,v1.16b
+	eor	v24.16b,v24.16b,v17.16b
+	ld1	{v17.4s},[x7],#16                // re-pre-load rndkey[1]
+	st1	{v4.16b},[x1],#16
+	st1	{v5.16b},[x1],#16
+	st1	{v24.16b},[x1],#16
+	cmn	x2,#0x30
+	b.eq	.Lxts_enc_done
+.Lxts_encxor_one:
+	orr	v28.16b,v3.16b,v3.16b
+	orr	v29.16b,v27.16b,v27.16b
+	nop
+
+.Lxts_inner_enc_tail:
+	cmn	x2,#0x10
+	eor	v1.16b,v28.16b,v6.16b
+	eor	v24.16b,v29.16b,v8.16b
+	b.eq	.Lxts_enc_tail_loop
+	eor	v24.16b,v29.16b,v6.16b
+.Lxts_enc_tail_loop:
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Lxts_enc_tail_loop
+
+	aese	v1.16b,v16.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v16.16b
+	aesmc	v24.16b,v24.16b
+	aese	v1.16b,v17.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v17.16b
+	aesmc	v24.16b,v24.16b
+	aese	v1.16b,v20.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v20.16b
+	aesmc	v24.16b,v24.16b
+	cmn	x2,#0x20
+	aese	v1.16b,v21.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v21.16b
+	aesmc	v24.16b,v24.16b
+	eor	v5.16b,v6.16b,v7.16b
+	aese	v1.16b,v22.16b
+	aesmc	v1.16b,v1.16b
+	aese	v24.16b,v22.16b
+	aesmc	v24.16b,v24.16b
+	eor	v17.16b,v8.16b,v7.16b
+	aese	v1.16b,v23.16b
+	aese	v24.16b,v23.16b
+	b.eq	.Lxts_enc_one
+	eor	v5.16b,v5.16b,v1.16b
+	st1	{v5.16b},[x1],#16
+	eor	v17.16b,v17.16b,v24.16b
+	orr	v6.16b,v8.16b,v8.16b
+	st1	{v17.16b},[x1],#16
+	fmov	x9,d8
+	fmov	x10,v8.d[1]
+	mov	w19,#0x87
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d6,x9
+	fmov	v6.d[1],x10
+	b	.Lxts_enc_done
+
+.Lxts_enc_one:
+	eor	v5.16b,v5.16b,v24.16b
+	orr	v6.16b,v6.16b,v6.16b
+	st1	{v5.16b},[x1],#16
+	fmov	x9,d6
+	fmov	x10,v6.d[1]
+	mov	w19,#0x87
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d6,x9
+	fmov	v6.d[1],x10
+	b	.Lxts_enc_done
+.align	5
+.Lxts_enc_done:
+	// Process the tail block with cipher stealing.
+	tst	x21,#0xf
+	b.eq	.Lxts_abort
+
+	mov	x20,x0
+	mov	x13,x1
+	sub	x1,x1,#16
+.composite_enc_loop:
+	subs	x21,x21,#1
+	ldrb	w15,[x1,x21]
+	ldrb	w14,[x20,x21]
+	strb	w15,[x13,x21]
+	strb	w14,[x1,x21]
+	b.gt	.composite_enc_loop
+.Lxts_enc_load_done:
+	ld1	{v26.16b},[x1]
+	eor	v26.16b,v26.16b,v6.16b
+
+	// Encrypt the composite block to get the last second encrypted text block
+	ldr	w6,[x3,#240]		// load key schedule...
+	ld1	{v0.16b},[x3],#16
+	sub	w6,w6,#2
+	ld1	{v1.16b},[x3],#16		// load key schedule...
+.Loop_final_enc:
+	aese	v26.16b,v0.16b
+	aesmc	v26.16b,v26.16b
+	ld1	{v0.4s},[x3],#16
+	subs	w6,w6,#2
+	aese	v26.16b,v1.16b
+	aesmc	v26.16b,v26.16b
+	ld1	{v1.4s},[x3],#16
+	b.gt	.Loop_final_enc
+
+	aese	v26.16b,v0.16b
+	aesmc	v26.16b,v26.16b
+	ld1	{v0.4s},[x3]
+	aese	v26.16b,v1.16b
+	eor	v26.16b,v26.16b,v0.16b
+	eor	v26.16b,v26.16b,v6.16b
+	st1	{v26.16b},[x1]
+
+.Lxts_abort:
+	ldp	x21,x22,[sp,#48]
+	ldp	d8,d9,[sp,#32]
+	ldp	d10,d11,[sp,#16]
+	ldp	x19,x20,[sp],#64
+.Lxts_enc_final_abort:
+	ret
+.size	aes_v8_xts_encrypt,.-aes_v8_xts_encrypt
+.globl	aes_v8_xts_decrypt
+.type	aes_v8_xts_decrypt,%function
+.align	5
+aes_v8_xts_decrypt:
+	cmp	x2,#16
+	// Original input data size bigger than 16, jump to big size processing.
+	b.ne	.Lxts_dec_big_size
+	// Encrypt the iv with key2, as the first XEX iv.
+	ldr	w6,[x4,#240]
+	ld1	{v0.16b},[x4],#16
+	ld1	{v6.16b},[x5]
+	sub	w6,w6,#2
+	ld1	{v1.16b},[x4],#16
+
+.Loop_dec_small_iv_enc:
+	aese	v6.16b,v0.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v0.4s},[x4],#16
+	subs	w6,w6,#2
+	aese	v6.16b,v1.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v1.4s},[x4],#16
+	b.gt	.Loop_dec_small_iv_enc
+
+	aese	v6.16b,v0.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v0.4s},[x4]
+	aese	v6.16b,v1.16b
+	eor	v6.16b,v6.16b,v0.16b
+
+	ld1	{v0.16b},[x0]
+	eor	v0.16b,v6.16b,v0.16b
+
+	ldr	w6,[x3,#240]
+	ld1	{v28.4s,v29.4s},[x3],#32			// load key schedule...
+
+	aesd	v0.16b,v28.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v16.4s,v17.4s},[x3],#32			// load key schedule...
+	aesd	v0.16b,v29.16b
+	aesimc	v0.16b,v0.16b
+	subs	w6,w6,#10			// bias
+	b.eq	.Lxts_128_dec
+.Lxts_dec_round_loop:
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v16.4s},[x3],#16			// load key schedule...
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v17.4s},[x3],#16			// load key schedule...
+	subs	w6,w6,#2			// bias
+	b.gt	.Lxts_dec_round_loop
+.Lxts_128_dec:
+	ld1	{v18.4s,v19.4s},[x3],#32			// load key schedule...
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v20.4s,v21.4s},[x3],#32			// load key schedule...
+	aesd	v0.16b,v18.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v0.16b,v19.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v22.4s,v23.4s},[x3],#32			// load key schedule...
+	aesd	v0.16b,v20.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v0.16b,v21.16b
+	aesimc	v0.16b,v0.16b
+	ld1	{v7.4s},[x3]
+	aesd	v0.16b,v22.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v0.16b,v23.16b
+	eor	v0.16b,v0.16b,v7.16b
+	eor	v0.16b,v6.16b,v0.16b
+	st1	{v0.16b},[x1]
+	b	.Lxts_dec_final_abort
+.Lxts_dec_big_size:
+	stp	x19,x20,[sp,#-64]!
+	stp	x21,x22,[sp,#48]
+	stp	d8,d9,[sp,#32]
+	stp	d10,d11,[sp,#16]
+
+	and	x21,x2,#0xf
+	and	x2,x2,#-16
+	subs	x2,x2,#16
+	mov	x8,#16
+	b.lo	.Lxts_dec_abort
+
+	// Encrypt the iv with key2, as the first XEX iv
+	ldr	w6,[x4,#240]
+	ld1	{v0.16b},[x4],#16
+	ld1	{v6.16b},[x5]
+	sub	w6,w6,#2
+	ld1	{v1.16b},[x4],#16
+
+.Loop_dec_iv_enc:
+	aese	v6.16b,v0.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v0.4s},[x4],#16
+	subs	w6,w6,#2
+	aese	v6.16b,v1.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v1.4s},[x4],#16
+	b.gt	.Loop_dec_iv_enc
+
+	aese	v6.16b,v0.16b
+	aesmc	v6.16b,v6.16b
+	ld1	{v0.4s},[x4]
+	aese	v6.16b,v1.16b
+	eor	v6.16b,v6.16b,v0.16b
+
+	// The iv for second block
+	// x9- iv(low), x10 - iv(high)
+	// the five ivs stored into, v6.16b,v8.16b,v9.16b,v10.16b,v11.16b
+	fmov	x9,d6
+	fmov	x10,v6.d[1]
+	mov	w19,#0x87
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d8,x9
+	fmov	v8.d[1],x10
+
+	ldr	w5,[x3,#240]		// load rounds number
+
+	// The iv for third block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d9,x9
+	fmov	v9.d[1],x10
+
+	ld1	{v16.4s,v17.4s},[x3]			// load key schedule...
+	sub	w5,w5,#6
+	add	x7,x3,x5,lsl#4		// pointer to last 7 round keys
+	sub	w5,w5,#2
+	ld1	{v18.4s,v19.4s},[x7],#32		// load key schedule...
+	ld1	{v20.4s,v21.4s},[x7],#32
+	ld1	{v22.4s,v23.4s},[x7],#32
+	ld1	{v7.4s},[x7]
+
+	// The iv for fourth block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d10,x9
+	fmov	v10.d[1],x10
+
+	add	x7,x3,#32
+	mov	w6,w5
+	b	.Lxts_dec
+
+	// Decryption
+.align	5
+.Lxts_dec:
+	tst	x21,#0xf
+	b.eq	.Lxts_dec_begin
+	subs	x2,x2,#16
+	csel	x8,xzr,x8,eq
+	ld1	{v0.16b},[x0],#16
+	b.lo	.Lxts_done
+	sub	x0,x0,#16
+.Lxts_dec_begin:
+	ld1	{v0.16b},[x0],x8
+	subs	x2,x2,#32			// bias
+	add	w6,w5,#2
+	orr	v3.16b,v0.16b,v0.16b
+	orr	v1.16b,v0.16b,v0.16b
+	orr	v28.16b,v0.16b,v0.16b
+	ld1	{v24.16b},[x0],#16
+	orr	v27.16b,v24.16b,v24.16b
+	orr	v29.16b,v24.16b,v24.16b
+	b.lo	.Lxts_inner_dec_tail
+	eor	v0.16b,v0.16b,v6.16b			// before decryt, xor with iv
+	eor	v24.16b,v24.16b,v8.16b
+
+	orr	v1.16b,v24.16b,v24.16b
+	ld1	{v24.16b},[x0],#16
+	orr	v2.16b,v0.16b,v0.16b
+	orr	v3.16b,v1.16b,v1.16b
+	eor	v27.16b,v24.16b,v9.16b			// third block xox with third iv
+	eor	v24.16b,v24.16b,v9.16b
+	cmp	x2,#32
+	b.lo	.Lxts_outer_dec_tail
+
+	ld1	{v25.16b},[x0],#16
+
+	// The iv for fifth block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d11,x9
+	fmov	v11.d[1],x10
+
+	ld1	{v26.16b},[x0],#16
+	eor	v25.16b,v25.16b,v10.16b		// the fourth block
+	eor	v26.16b,v26.16b,v11.16b
+	sub	x2,x2,#32			// bias
+	mov	w6,w5
+	b	.Loop5x_xts_dec
+
+.align	4
+.Loop5x_xts_dec:
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v16.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v16.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v16.4s},[x7],#16		// load key schedule...
+	subs	w6,w6,#2
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v17.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v17.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v17.4s},[x7],#16		// load key schedule...
+	b.gt	.Loop5x_xts_dec
+
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v16.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v16.16b
+	aesimc	v26.16b,v26.16b
+	subs	x2,x2,#0x50			// because .Lxts_dec_tail4x
+
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v17.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v17.16b
+	aesimc	v26.16b,v26.16b
+	csel	x6,xzr,x2,gt		// borrow x6, w6, "gt" is not typo
+	mov	x7,x3
+
+	aesd	v0.16b,v18.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v18.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v18.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v18.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v18.16b
+	aesimc	v26.16b,v26.16b
+	add	x0,x0,x6		// x0 is adjusted in such way that
+						// at exit from the loop v1.16b-v26.16b
+						// are loaded with last "words"
+	add	x6,x2,#0x60		// because .Lxts_dec_tail4x
+
+	aesd	v0.16b,v19.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v19.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v19.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v19.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v19.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v20.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v20.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v20.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v20.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v20.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v21.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v21.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v21.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v21.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v21.16b
+	aesimc	v26.16b,v26.16b
+
+	aesd	v0.16b,v22.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v22.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v22.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v25.16b,v22.16b
+	aesimc	v25.16b,v25.16b
+	aesd	v26.16b,v22.16b
+	aesimc	v26.16b,v26.16b
+
+	eor	v4.16b,v7.16b,v6.16b
+	aesd	v0.16b,v23.16b
+	// The iv for first block of next iteration.
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d6,x9
+	fmov	v6.d[1],x10
+	eor	v5.16b,v7.16b,v8.16b
+	ld1	{v2.16b},[x0],#16
+	aesd	v1.16b,v23.16b
+	// The iv for second block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d8,x9
+	fmov	v8.d[1],x10
+	eor	v17.16b,v7.16b,v9.16b
+	ld1	{v3.16b},[x0],#16
+	aesd	v24.16b,v23.16b
+	// The iv for third block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d9,x9
+	fmov	v9.d[1],x10
+	eor	v30.16b,v7.16b,v10.16b
+	ld1	{v27.16b},[x0],#16
+	aesd	v25.16b,v23.16b
+	// The iv for fourth block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d10,x9
+	fmov	v10.d[1],x10
+	eor	v31.16b,v7.16b,v11.16b
+	ld1	{v28.16b},[x0],#16
+	aesd	v26.16b,v23.16b
+
+	// The iv for fifth block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d11,x9
+	fmov	v11.d[1],x10
+
+	ld1	{v29.16b},[x0],#16
+	cbz	x6,.Lxts_dec_tail4x
+	ld1	{v16.4s},[x7],#16		// re-pre-load rndkey[0]
+	eor	v4.16b,v4.16b,v0.16b
+	eor	v0.16b,v2.16b,v6.16b
+	eor	v5.16b,v5.16b,v1.16b
+	eor	v1.16b,v3.16b,v8.16b
+	eor	v17.16b,v17.16b,v24.16b
+	eor	v24.16b,v27.16b,v9.16b
+	eor	v30.16b,v30.16b,v25.16b
+	eor	v25.16b,v28.16b,v10.16b
+	eor	v31.16b,v31.16b,v26.16b
+	st1	{v4.16b},[x1],#16
+	eor	v26.16b,v29.16b,v11.16b
+	st1	{v5.16b},[x1],#16
+	mov	w6,w5
+	st1	{v17.16b},[x1],#16
+	ld1	{v17.4s},[x7],#16		// re-pre-load rndkey[1]
+	st1	{v30.16b},[x1],#16
+	st1	{v31.16b},[x1],#16
+	b.hs	.Loop5x_xts_dec
+
+	cmn	x2,#0x10
+	b.ne	.Loop5x_dec_after
+	// If x2(x2) equal to -0x10, the left blocks is 4.
+	// After specially processing, utilize the five blocks processing again.
+	// It will use the following IVs: v6.16b,v6.16b,v8.16b,v9.16b,v10.16b.
+	orr	v11.16b,v10.16b,v10.16b
+	orr	v10.16b,v9.16b,v9.16b
+	orr	v9.16b,v8.16b,v8.16b
+	orr	v8.16b,v6.16b,v6.16b
+	fmov	x9,d11
+	fmov	x10,v11.d[1]
+	eor	v0.16b,v6.16b,v2.16b
+	eor	v1.16b,v8.16b,v3.16b
+	eor	v24.16b,v27.16b,v9.16b
+	eor	v25.16b,v28.16b,v10.16b
+	eor	v26.16b,v29.16b,v11.16b
+	b.eq	.Loop5x_xts_dec
+
+.Loop5x_dec_after:
+	add	x2,x2,#0x50
+	cbz	x2,.Lxts_done
+
+	add	w6,w5,#2
+	subs	x2,x2,#0x30
+	b.lo	.Lxts_inner_dec_tail
+
+	eor	v0.16b,v6.16b,v27.16b
+	eor	v1.16b,v8.16b,v28.16b
+	eor	v24.16b,v29.16b,v9.16b
+	b	.Lxts_outer_dec_tail
+
+.align	4
+.Lxts_dec_tail4x:
+	add	x0,x0,#16
+	ld1	{v0.4s},[x0],#16
+	eor	v5.16b,v1.16b,v4.16b
+	st1	{v5.16b},[x1],#16
+	eor	v17.16b,v24.16b,v17.16b
+	st1	{v17.16b},[x1],#16
+	eor	v30.16b,v25.16b,v30.16b
+	eor	v31.16b,v26.16b,v31.16b
+	st1	{v30.16b,v31.16b},[x1],#32
+
+	b	.Lxts_done
+.align	4
+.Lxts_outer_dec_tail:
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Lxts_outer_dec_tail
+
+	aesd	v0.16b,v16.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	eor	v4.16b,v6.16b,v7.16b
+	subs	x2,x2,#0x30
+	// The iv for first block
+	fmov	x9,d9
+	fmov	x10,v9.d[1]
+	mov	w19,#0x87
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d6,x9
+	fmov	v6.d[1],x10
+	eor	v5.16b,v8.16b,v7.16b
+	csel	x6,x2,x6,lo	// x6, w6, is zero at this point
+	aesd	v0.16b,v17.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	eor	v17.16b,v9.16b,v7.16b
+	// The iv for second block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d8,x9
+	fmov	v8.d[1],x10
+
+	add	x6,x6,#0x20
+	add	x0,x0,x6		// x0 is adjusted to the last data
+
+	mov	x7,x3
+
+	// The iv for third block
+	extr	x22,x10,x10,#32
+	extr	x10,x10,x9,#63
+	and	w11,w19,w22,asr #31
+	eor	x9,x11,x9,lsl #1
+	fmov	d9,x9
+	fmov	v9.d[1],x10
+
+	aesd	v0.16b,v20.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v20.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v20.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v0.16b,v21.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v21.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v21.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v0.16b,v22.16b
+	aesimc	v0.16b,v0.16b
+	aesd	v1.16b,v22.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v22.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v27.16b},[x0],#16
+	aesd	v0.16b,v23.16b
+	aesd	v1.16b,v23.16b
+	aesd	v24.16b,v23.16b
+	ld1	{v16.4s},[x7],#16		// re-pre-load rndkey[0]
+	add	w6,w5,#2
+	eor	v4.16b,v4.16b,v0.16b
+	eor	v5.16b,v5.16b,v1.16b
+	eor	v24.16b,v24.16b,v17.16b
+	ld1	{v17.4s},[x7],#16		// re-pre-load rndkey[1]
+	st1	{v4.16b},[x1],#16
+	st1	{v5.16b},[x1],#16
+	st1	{v24.16b},[x1],#16
+
+	cmn	x2,#0x30
+	add	x2,x2,#0x30
+	b.eq	.Lxts_done
+	sub	x2,x2,#0x30
+	orr	v28.16b,v3.16b,v3.16b
+	orr	v29.16b,v27.16b,v27.16b
+	nop
+
+.Lxts_inner_dec_tail:
+	// x2 == -0x10 means two blocks left.
+	cmn	x2,#0x10
+	eor	v1.16b,v28.16b,v6.16b
+	eor	v24.16b,v29.16b,v8.16b
+	b.eq	.Lxts_dec_tail_loop
+	eor	v24.16b,v29.16b,v6.16b
+.Lxts_dec_tail_loop:
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v16.4s},[x7],#16
+	subs	w6,w6,#2
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	ld1	{v17.4s},[x7],#16
+	b.gt	.Lxts_dec_tail_loop
+
+	aesd	v1.16b,v16.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v16.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v1.16b,v17.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v17.16b
+	aesimc	v24.16b,v24.16b
+	aesd	v1.16b,v20.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v20.16b
+	aesimc	v24.16b,v24.16b
+	cmn	x2,#0x20
+	aesd	v1.16b,v21.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v21.16b
+	aesimc	v24.16b,v24.16b
+	eor	v5.16b,v6.16b,v7.16b
+	aesd	v1.16b,v22.16b
+	aesimc	v1.16b,v1.16b
+	aesd	v24.16b,v22.16b
+	aesimc	v24.16b,v24.16b
+	eor	v17.16b,v8.16b,v7.16b
+	aesd	v1.16b,v23.16b
+	aesd	v24.16b,v23.16b
+	b.eq	.Lxts_dec_one
+	eor	v5.16b,v5.16b,v1.16b
+	eor	v17.16b,v17.16b,v24.16b
+	orr	v6.16b,v9.16b,v9.16b
+	orr	v8.16b,v10.16b,v10.16b
+	st1	{v5.16b},[x1],#16
+	st1	{v17.16b},[x1],#16
+	add	x2,x2,#16
+	b	.Lxts_done
+
+.Lxts_dec_one:
+	eor	v5.16b,v5.16b,v24.16b
+	orr	v6.16b,v8.16b,v8.16b
+	orr	v8.16b,v9.16b,v9.16b
+	st1	{v5.16b},[x1],#16
+	add	x2,x2,#32
+
+.Lxts_done:
+	tst	x21,#0xf
+	b.eq	.Lxts_dec_abort
+	// Processing the last two blocks with cipher stealing.
+	mov	x7,x3
+	cbnz	x2,.Lxts_dec_1st_done
+	ld1	{v0.4s},[x0],#16
+
+	// Decrypt the last secod block to get the last plain text block
+.Lxts_dec_1st_done:
+	eor	v26.16b,v0.16b,v8.16b
+	ldr	w6,[x3,#240]
+	ld1	{v0.4s},[x3],#16
+	sub	w6,w6,#2
+	ld1	{v1.4s},[x3],#16
+.Loop_final_2nd_dec:
+	aesd	v26.16b,v0.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v0.4s},[x3],#16		// load key schedule...
+	subs	w6,w6,#2
+	aesd	v26.16b,v1.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v1.4s},[x3],#16		// load key schedule...
+	b.gt	.Loop_final_2nd_dec
+
+	aesd	v26.16b,v0.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v0.4s},[x3]
+	aesd	v26.16b,v1.16b
+	eor	v26.16b,v26.16b,v0.16b
+	eor	v26.16b,v26.16b,v8.16b
+	st1	{v26.16b},[x1]
+
+	mov	x20,x0
+	add	x13,x1,#16
+
+	// Composite the tailcnt "16 byte not aligned block" into the last second plain blocks
+	// to get the last encrypted block.
+.composite_dec_loop:
+	subs	x21,x21,#1
+	ldrb	w15,[x1,x21]
+	ldrb	w14,[x20,x21]
+	strb	w15,[x13,x21]
+	strb	w14,[x1,x21]
+	b.gt	.composite_dec_loop
+.Lxts_dec_load_done:
+	ld1	{v26.16b},[x1]
+	eor	v26.16b,v26.16b,v6.16b
+
+	// Decrypt the composite block to get the last second plain text block
+	ldr	w6,[x7,#240]
+	ld1	{v0.16b},[x7],#16
+	sub	w6,w6,#2
+	ld1	{v1.16b},[x7],#16
+.Loop_final_dec:
+	aesd	v26.16b,v0.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v0.4s},[x7],#16		// load key schedule...
+	subs	w6,w6,#2
+	aesd	v26.16b,v1.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v1.4s},[x7],#16		// load key schedule...
+	b.gt	.Loop_final_dec
+
+	aesd	v26.16b,v0.16b
+	aesimc	v26.16b,v26.16b
+	ld1	{v0.4s},[x7]
+	aesd	v26.16b,v1.16b
+	eor	v26.16b,v26.16b,v0.16b
+	eor	v26.16b,v26.16b,v6.16b
+	st1	{v26.16b},[x1]
+
+.Lxts_dec_abort:
+	ldp	x21,x22,[sp,#48]
+	ldp	d8,d9,[sp,#32]
+	ldp	d10,d11,[sp,#16]
+	ldp	x19,x20,[sp],#64
+
+.Lxts_dec_final_abort:
+	ret
+.size	aes_v8_xts_decrypt,.-aes_v8_xts_decrypt
 #endif

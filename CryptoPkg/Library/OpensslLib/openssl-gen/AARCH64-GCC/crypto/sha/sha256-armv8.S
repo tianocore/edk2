@@ -64,18 +64,18 @@
 .text
 
 .globl	sha256_block_data_order
-
+.type	sha256_block_data_order,%function
 .align	6
 sha256_block_data_order:
 #ifndef	__KERNEL__
 	adrp	x16,OPENSSL_armcap_P
 	ldr	w16,[x16,#:lo12:OPENSSL_armcap_P]
 	tst	w16,#ARMV8_SHA256
-	b.ne	Lv8_entry
+	b.ne	.Lv8_entry
 	tst	w16,#ARMV7_NEON
-	b.ne	Lneon_entry
+	b.ne	.Lneon_entry
 #endif
-.long	0xd503233f				// paciasp
+.inst	0xd503233f				// paciasp
 	stp	x29,x30,[sp,#-128]!
 	add	x29,sp,#0
 
@@ -91,10 +91,10 @@ sha256_block_data_order:
 	ldp	w24,w25,[x0,#4*4]
 	add	x2,x1,x2,lsl#6	// end of input
 	ldp	w26,w27,[x0,#6*4]
-	adr	x30,LK256
+	adr	x30,.LK256
 	stp	x0,x2,[x29,#96]
 
-Loop:
+.Loop:
 	ldp	w3,w4,[x1],#2*4
 	ldr	w19,[x30],#4			// *K++
 	eor	w28,w21,w22				// magic seed
@@ -505,7 +505,7 @@ Loop:
 	add	w3,w3,w9
 	add	w20,w20,w17			// h+=Sigma0(a)
 	add	w3,w3,w8
-Loop_16_xx:
+.Loop_16_xx:
 	ldr	w8,[sp,#4]
 	str	w11,[sp,#0]
 	ror	w16,w24,#6
@@ -1002,7 +1002,7 @@ Loop_16_xx:
 	add	w3,w3,w9
 	add	w20,w20,w17			// h+=Sigma0(a)
 	add	w3,w3,w8
-	cbnz	w19,Loop_16_xx
+	cbnz	w19,.Loop_16_xx
 
 	ldp	x0,x2,[x29,#96]
 	ldr	x1,[x29,#112]
@@ -1026,7 +1026,7 @@ Loop_16_xx:
 	cmp	x1,x2
 	stp	w24,w25,[x0,#4*4]
 	stp	w26,w27,[x0,#6*4]
-	b.ne	Loop
+	b.ne	.Loop
 
 	ldp	x19,x20,[x29,#16]
 	add	sp,sp,#4*4
@@ -1035,13 +1035,13 @@ Loop_16_xx:
 	ldp	x25,x26,[x29,#64]
 	ldp	x27,x28,[x29,#80]
 	ldp	x29,x30,[sp],#128
-.long	0xd50323bf				// autiasp
+.inst	0xd50323bf				// autiasp
 	ret
-
+.size	sha256_block_data_order,.-sha256_block_data_order
 
 .align	6
-
-LK256:
+.type	.LK256,%object
+.LK256:
 .long	0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5
 .long	0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5
 .long	0xd807aa98,0x12835b01,0x243185be,0x550c7dc3
@@ -1059,22 +1059,22 @@ LK256:
 .long	0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208
 .long	0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
 .long	0	//terminator
-
+.size	.LK256,.-.LK256
 .byte	83,72,65,50,53,54,32,98,108,111,99,107,32,116,114,97,110,115,102,111,114,109,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align	2
 .align	2
 #ifndef	__KERNEL__
-
+.type	sha256_block_armv8,%function
 .align	6
 sha256_block_armv8:
-Lv8_entry:
+.Lv8_entry:
 	stp	x29,x30,[sp,#-16]!
 	add	x29,sp,#0
 
 	ld1	{v0.4s,v1.4s},[x0]
-	adr	x3,LK256
+	adr	x3,.LK256
 
-Loop_hw:
+.Loop_hw:
 	ld1	{v4.16b,v5.16b,v6.16b,v7.16b},[x1],#64
 	sub	x2,x2,#1
 	ld1	{v16.4s},[x3],#16
@@ -1086,135 +1086,135 @@ Loop_hw:
 	orr	v19.16b,v1.16b,v1.16b
 	ld1	{v17.4s},[x3],#16
 	add	v16.4s,v16.4s,v4.4s
-.long	0x5e2828a4	//sha256su0 v4.16b,v5.16b
+.inst	0x5e2828a4	//sha256su0 v4.16b,v5.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
-.long	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
-.long	0x5e0760c4	//sha256su1 v4.16b,v6.16b,v7.16b
+.inst	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
+.inst	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
+.inst	0x5e0760c4	//sha256su1 v4.16b,v6.16b,v7.16b
 	ld1	{v16.4s},[x3],#16
 	add	v17.4s,v17.4s,v5.4s
-.long	0x5e2828c5	//sha256su0 v5.16b,v6.16b
+.inst	0x5e2828c5	//sha256su0 v5.16b,v6.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
-.long	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
-.long	0x5e0460e5	//sha256su1 v5.16b,v7.16b,v4.16b
+.inst	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
+.inst	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
+.inst	0x5e0460e5	//sha256su1 v5.16b,v7.16b,v4.16b
 	ld1	{v17.4s},[x3],#16
 	add	v16.4s,v16.4s,v6.4s
-.long	0x5e2828e6	//sha256su0 v6.16b,v7.16b
+.inst	0x5e2828e6	//sha256su0 v6.16b,v7.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
-.long	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
-.long	0x5e056086	//sha256su1 v6.16b,v4.16b,v5.16b
+.inst	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
+.inst	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
+.inst	0x5e056086	//sha256su1 v6.16b,v4.16b,v5.16b
 	ld1	{v16.4s},[x3],#16
 	add	v17.4s,v17.4s,v7.4s
-.long	0x5e282887	//sha256su0 v7.16b,v4.16b
+.inst	0x5e282887	//sha256su0 v7.16b,v4.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
-.long	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
-.long	0x5e0660a7	//sha256su1 v7.16b,v5.16b,v6.16b
+.inst	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
+.inst	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
+.inst	0x5e0660a7	//sha256su1 v7.16b,v5.16b,v6.16b
 	ld1	{v17.4s},[x3],#16
 	add	v16.4s,v16.4s,v4.4s
-.long	0x5e2828a4	//sha256su0 v4.16b,v5.16b
+.inst	0x5e2828a4	//sha256su0 v4.16b,v5.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
-.long	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
-.long	0x5e0760c4	//sha256su1 v4.16b,v6.16b,v7.16b
+.inst	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
+.inst	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
+.inst	0x5e0760c4	//sha256su1 v4.16b,v6.16b,v7.16b
 	ld1	{v16.4s},[x3],#16
 	add	v17.4s,v17.4s,v5.4s
-.long	0x5e2828c5	//sha256su0 v5.16b,v6.16b
+.inst	0x5e2828c5	//sha256su0 v5.16b,v6.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
-.long	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
-.long	0x5e0460e5	//sha256su1 v5.16b,v7.16b,v4.16b
+.inst	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
+.inst	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
+.inst	0x5e0460e5	//sha256su1 v5.16b,v7.16b,v4.16b
 	ld1	{v17.4s},[x3],#16
 	add	v16.4s,v16.4s,v6.4s
-.long	0x5e2828e6	//sha256su0 v6.16b,v7.16b
+.inst	0x5e2828e6	//sha256su0 v6.16b,v7.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
-.long	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
-.long	0x5e056086	//sha256su1 v6.16b,v4.16b,v5.16b
+.inst	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
+.inst	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
+.inst	0x5e056086	//sha256su1 v6.16b,v4.16b,v5.16b
 	ld1	{v16.4s},[x3],#16
 	add	v17.4s,v17.4s,v7.4s
-.long	0x5e282887	//sha256su0 v7.16b,v4.16b
+.inst	0x5e282887	//sha256su0 v7.16b,v4.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
-.long	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
-.long	0x5e0660a7	//sha256su1 v7.16b,v5.16b,v6.16b
+.inst	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
+.inst	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
+.inst	0x5e0660a7	//sha256su1 v7.16b,v5.16b,v6.16b
 	ld1	{v17.4s},[x3],#16
 	add	v16.4s,v16.4s,v4.4s
-.long	0x5e2828a4	//sha256su0 v4.16b,v5.16b
+.inst	0x5e2828a4	//sha256su0 v4.16b,v5.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
-.long	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
-.long	0x5e0760c4	//sha256su1 v4.16b,v6.16b,v7.16b
+.inst	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
+.inst	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
+.inst	0x5e0760c4	//sha256su1 v4.16b,v6.16b,v7.16b
 	ld1	{v16.4s},[x3],#16
 	add	v17.4s,v17.4s,v5.4s
-.long	0x5e2828c5	//sha256su0 v5.16b,v6.16b
+.inst	0x5e2828c5	//sha256su0 v5.16b,v6.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
-.long	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
-.long	0x5e0460e5	//sha256su1 v5.16b,v7.16b,v4.16b
+.inst	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
+.inst	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
+.inst	0x5e0460e5	//sha256su1 v5.16b,v7.16b,v4.16b
 	ld1	{v17.4s},[x3],#16
 	add	v16.4s,v16.4s,v6.4s
-.long	0x5e2828e6	//sha256su0 v6.16b,v7.16b
+.inst	0x5e2828e6	//sha256su0 v6.16b,v7.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
-.long	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
-.long	0x5e056086	//sha256su1 v6.16b,v4.16b,v5.16b
+.inst	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
+.inst	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
+.inst	0x5e056086	//sha256su1 v6.16b,v4.16b,v5.16b
 	ld1	{v16.4s},[x3],#16
 	add	v17.4s,v17.4s,v7.4s
-.long	0x5e282887	//sha256su0 v7.16b,v4.16b
+.inst	0x5e282887	//sha256su0 v7.16b,v4.16b
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
-.long	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
-.long	0x5e0660a7	//sha256su1 v7.16b,v5.16b,v6.16b
+.inst	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
+.inst	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
+.inst	0x5e0660a7	//sha256su1 v7.16b,v5.16b,v6.16b
 	ld1	{v17.4s},[x3],#16
 	add	v16.4s,v16.4s,v4.4s
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
-.long	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
+.inst	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
+.inst	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
 
 	ld1	{v16.4s},[x3],#16
 	add	v17.4s,v17.4s,v5.4s
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
-.long	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
+.inst	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
+.inst	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
 
 	ld1	{v17.4s},[x3]
 	add	v16.4s,v16.4s,v6.4s
 	sub	x3,x3,#64*4-16	// rewind
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
-.long	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
+.inst	0x5e104020	//sha256h v0.16b,v1.16b,v16.4s
+.inst	0x5e105041	//sha256h2 v1.16b,v2.16b,v16.4s
 
 	add	v17.4s,v17.4s,v7.4s
 	orr	v2.16b,v0.16b,v0.16b
-.long	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
-.long	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
+.inst	0x5e114020	//sha256h v0.16b,v1.16b,v17.4s
+.inst	0x5e115041	//sha256h2 v1.16b,v2.16b,v17.4s
 
 	add	v0.4s,v0.4s,v18.4s
 	add	v1.4s,v1.4s,v19.4s
 
-	cbnz	x2,Loop_hw
+	cbnz	x2,.Loop_hw
 
 	st1	{v0.4s,v1.4s},[x0]
 
 	ldr	x29,[sp],#16
 	ret
-
+.size	sha256_block_armv8,.-sha256_block_armv8
 #endif
 #ifdef	__KERNEL__
 .globl	sha256_block_neon
 #endif
-
+.type	sha256_block_neon,%function
 .align	4
 sha256_block_neon:
-Lneon_entry:
+.Lneon_entry:
 	stp	x29, x30, [sp, #-16]!
 	mov	x29, sp
 	sub	sp,sp,#16*4
 
-	adr	x16,LK256
+	adr	x16,.LK256
 	add	x2,x1,x2,lsl#6	// len to point at the end of inp
 
 	ld1	{v0.16b},[x1], #16
@@ -1246,10 +1246,10 @@ Lneon_entry:
 	mov	w13,wzr
 	eor	w14,w4,w5
 	mov	w15,wzr
-	b	L_00_48
+	b	.L_00_48
 
 .align	4
-L_00_48:
+.L_00_48:
 	ext	v4.16b,v0.16b,v1.16b,#4
 	add	w10,w10,w12
 	add	w3,w3,w15
@@ -1689,7 +1689,7 @@ L_00_48:
 	cmp	w12,#0				// check for K256 terminator
 	ldr	w12,[sp,#0]
 	sub	x17,x17,#64
-	bne	L_00_48
+	bne	.L_00_48
 
 	sub	x16,x16,#256		// rewind x16
 	cmp	x1,x2
@@ -2043,9 +2043,9 @@ L_00_48:
 	stp	w9,w10,[x0,#24]
 	mov	w15,wzr
 	mov	x17,sp
-	b.ne	L_00_48
+	b.ne	.L_00_48
 
 	ldr	x29,[x29]
 	add	sp,sp,#16*4+16
 	ret
-
+.size	sha256_block_neon,.-sha256_block_neon

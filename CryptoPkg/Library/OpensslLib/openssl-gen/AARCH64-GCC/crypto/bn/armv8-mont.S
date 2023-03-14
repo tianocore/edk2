@@ -6,27 +6,27 @@
 .text
 
 .globl	bn_mul_mont
-
+.type	bn_mul_mont,%function
 .align	5
 bn_mul_mont:
-Lbn_mul_mont:
+.Lbn_mul_mont:
 	tst	x5,#3
-	b.ne	Lmul_mont
+	b.ne	.Lmul_mont
 	cmp	x5,#32
-	b.le	Lscalar_impl
+	b.le	.Lscalar_impl
 #ifndef	__KERNEL__
 	adrp	x17,OPENSSL_armv8_rsa_neonized
 	ldr	w17,[x17,#:lo12:OPENSSL_armv8_rsa_neonized]
 	cbnz	w17, bn_mul8x_mont_neon
 #endif
 
-Lscalar_impl:
+.Lscalar_impl:
 	tst	x5,#7
 	b.eq	__bn_sqr8x_mont
 	tst	x5,#3
 	b.eq	__bn_mul4x_mont
 
-Lmul_mont:
+.Lmul_mont:
 	stp	x29,x30,[sp,#-64]!
 	add	x29,sp,#0
 	stp	x19,x20,[sp,#16]
@@ -66,9 +66,9 @@ Lmul_mont:
 	subs	xzr,x6,#1		// (*)
 	umulh	x17,x14,x15
 	adc	x13,x13,xzr
-	cbz	x21,L1st_skip
+	cbz	x21,.L1st_skip
 
-L1st:
+.L1st:
 	ldr	x8,[x1],#8
 	adds	x6,x10,x7
 	sub	x21,x21,#8		// j--
@@ -85,9 +85,9 @@ L1st:
 	adc	x13,x13,xzr
 	umulh	x17,x14,x15
 	str	x12,[x22],#8		// tp[j-1]
-	cbnz	x21,L1st
+	cbnz	x21,.L1st
 
-L1st_skip:
+.L1st_skip:
 	adds	x6,x10,x7
 	sub	x1,x1,x5		// rewind x1
 	adc	x7,x11,xzr
@@ -103,7 +103,7 @@ L1st_skip:
 	adc	x19,xzr,xzr		// upmost overflow bit
 	stp	x12,x13,[x22]
 
-Louter:
+.Louter:
 	ldr	x9,[x2],#8		// bp[i]
 	ldp	x7,x8,[x1],#16
 	ldr	x23,[sp]		// tp[0]
@@ -127,9 +127,9 @@ Louter:
 	// (*)	adds	x12,x12,x6
 	subs	xzr,x6,#1		// (*)
 	umulh	x17,x14,x15
-	cbz	x21,Linner_skip
+	cbz	x21,.Linner_skip
 
-Linner:
+.Linner:
 	ldr	x8,[x1],#8
 	adc	x13,x13,xzr
 	ldr	x23,[x22],#8		// tp[j]
@@ -150,9 +150,9 @@ Linner:
 	adds	x12,x12,x6
 	umulh	x17,x14,x15
 	stur	x12,[x22,#-16]		// tp[j-1]
-	cbnz	x21,Linner
+	cbnz	x21,.Linner
 
-Linner_skip:
+.Linner_skip:
 	ldr	x23,[x22],#8		// tp[j]
 	adc	x13,x13,xzr
 	adds	x6,x10,x7
@@ -172,7 +172,7 @@ Linner_skip:
 	adc	x19,x19,xzr		// upmost overflow bit
 	stp	x12,x13,[x22,#-16]
 
-	cbnz	x20,Louter
+	cbnz	x20,.Louter
 
 	// Final step. We see if result is larger than modulus, and
 	// if it is, subtract the modulus. But comparison implies
@@ -183,13 +183,13 @@ Linner_skip:
 	ldr	x14,[x3],#8		// np[0]
 	subs	x21,x5,#8		// j=num-1 and clear borrow
 	mov	x1,x0
-Lsub:
+.Lsub:
 	sbcs	x8,x23,x14		// tp[j]-np[j]
 	ldr	x23,[x22],#8
 	sub	x21,x21,#8		// j--
 	ldr	x14,[x3],#8
 	str	x8,[x1],#8		// rp[j]=tp[j]-np[j]
-	cbnz	x21,Lsub
+	cbnz	x21,.Lsub
 
 	sbcs	x8,x23,x14
 	sbcs	x19,x19,xzr		// did it borrow?
@@ -200,14 +200,14 @@ Lsub:
 	ldr	x8,[x0],#8		// rp[0]
 	sub	x5,x5,#8		// num--
 	nop
-Lcond_copy:
+.Lcond_copy:
 	sub	x5,x5,#8		// num--
 	csel	x14,x23,x8,lo		// did it borrow?
 	ldr	x23,[x22],#8
 	ldr	x8,[x0],#8
 	stur	xzr,[x22,#-16]		// wipe tp
 	stur	x14,[x0,#-16]
-	cbnz	x5,Lcond_copy
+	cbnz	x5,.Lcond_copy
 
 	csel	x14,x23,x8,lo
 	stur	xzr,[x22,#-8]		// wipe tp
@@ -220,8 +220,8 @@ Lcond_copy:
 	ldp	x23,x24,[x29,#48]
 	ldr	x29,[sp],#64
 	ret
-
-
+.size	bn_mul_mont,.-bn_mul_mont
+.type	bn_mul8x_mont_neon,%function
 .align	5
 bn_mul8x_mont_neon:
 	stp	x29,x30,[sp,#-80]!
@@ -234,7 +234,7 @@ bn_mul8x_mont_neon:
 	eor	v14.16b,v14.16b,v14.16b
 
 .align	4
-LNEON_8n:
+.LNEON_8n:
 	eor	v6.16b,v6.16b,v6.16b
 	sub	x7,sp,#128
 	eor	v7.16b,v7.16b,v7.16b
@@ -250,23 +250,23 @@ LNEON_8n:
 	eor	v12.16b,v12.16b,v12.16b
 	eor	v13.16b,v13.16b,v13.16b
 
-LNEON_8n_init:
+.LNEON_8n_init:
 	st1	{v6.2d,v7.2d},[x7],#32
 	subs	x8,x8,#8
 	st1	{v8.2d,v9.2d},[x7],#32
 	st1	{v10.2d,v11.2d},[x7],#32
 	st1	{v12.2d,v13.2d},[x7],#32
-	bne	LNEON_8n_init
+	bne	.LNEON_8n_init
 
 	add	x6,sp,#256
 	ld1	{v0.4s,v1.4s},[x1],#32
 	add	x10,sp,#8
 	ldr	s30,[x4],#4
 	mov	x9,x5
-	b	LNEON_8n_outer
+	b	.LNEON_8n_outer
 
 .align	4
-LNEON_8n_outer:
+.LNEON_8n_outer:
 	ldr	s28,[x2],#4   // *b++
 	uxtl	v28.4s,v28.4h
 	add	x7,sp,#128
@@ -531,10 +531,10 @@ LNEON_8n_outer:
 	st1	{v29.2s},[x10],#8	// put aside smashed m[8*i+7]
 	add	x10,sp,#8		// rewind
 	sub	x8,x5,#8
-	b	LNEON_8n_inner
+	b	.LNEON_8n_inner
 
 .align	4
-LNEON_8n_inner:
+.LNEON_8n_inner:
 	subs	x8,x8,#8
 	umlal	v6.2d,v28.2s,v0.s[0]
 	ld1	{v13.2d},[x6]
@@ -543,9 +543,9 @@ LNEON_8n_inner:
 	umlal	v8.2d,v28.2s,v0.s[2]
 	ld1	{v2.4s,v3.4s},[x3],#32
 	umlal	v9.2d,v28.2s,v0.s[3]
-	b.eq	LInner_jump
+	b.eq	.LInner_jump
 	add	x6,x6,#16	// don't advance in last iteration
-LInner_jump:
+.LInner_jump:
 	umlal	v10.2d,v28.2s,v1.s[0]
 	umlal	v11.2d,v28.2s,v1.s[1]
 	umlal	v12.2d,v28.2s,v1.s[2]
@@ -565,9 +565,9 @@ LInner_jump:
 	umlal	v8.2d,v28.2s,v0.s[1]
 	ld1	{v29.2s},[x10],#8	// pull smashed m[8*i+1]
 	umlal	v9.2d,v28.2s,v0.s[2]
-	b.eq	LInner_jump1
+	b.eq	.LInner_jump1
 	add	x6,x6,#16	// don't advance in last iteration
-LInner_jump1:
+.LInner_jump1:
 	umlal	v10.2d,v28.2s,v0.s[3]
 	umlal	v11.2d,v28.2s,v1.s[0]
 	umlal	v12.2d,v28.2s,v1.s[1]
@@ -588,9 +588,9 @@ LInner_jump1:
 	umlal	v9.2d,v28.2s,v0.s[1]
 	ld1	{v29.2s},[x10],#8	// pull smashed m[8*i+2]
 	umlal	v10.2d,v28.2s,v0.s[2]
-	b.eq	LInner_jump2
+	b.eq	.LInner_jump2
 	add	x6,x6,#16	// don't advance in last iteration
-LInner_jump2:
+.LInner_jump2:
 	umlal	v11.2d,v28.2s,v0.s[3]
 	umlal	v12.2d,v28.2s,v1.s[0]
 	umlal	v13.2d,v28.2s,v1.s[1]
@@ -611,9 +611,9 @@ LInner_jump2:
 	umlal	v10.2d,v28.2s,v0.s[1]
 	ld1	{v29.2s},[x10],#8	// pull smashed m[8*i+3]
 	umlal	v11.2d,v28.2s,v0.s[2]
-	b.eq	LInner_jump3
+	b.eq	.LInner_jump3
 	add	x6,x6,#16	// don't advance in last iteration
-LInner_jump3:
+.LInner_jump3:
 	umlal	v12.2d,v28.2s,v0.s[3]
 	umlal	v13.2d,v28.2s,v1.s[0]
 	umlal	v6.2d,v28.2s,v1.s[1]
@@ -634,9 +634,9 @@ LInner_jump3:
 	umlal	v11.2d,v28.2s,v0.s[1]
 	ld1	{v29.2s},[x10],#8	// pull smashed m[8*i+4]
 	umlal	v12.2d,v28.2s,v0.s[2]
-	b.eq	LInner_jump4
+	b.eq	.LInner_jump4
 	add	x6,x6,#16	// don't advance in last iteration
-LInner_jump4:
+.LInner_jump4:
 	umlal	v13.2d,v28.2s,v0.s[3]
 	umlal	v6.2d,v28.2s,v1.s[0]
 	umlal	v7.2d,v28.2s,v1.s[1]
@@ -657,9 +657,9 @@ LInner_jump4:
 	umlal	v12.2d,v28.2s,v0.s[1]
 	ld1	{v29.2s},[x10],#8	// pull smashed m[8*i+5]
 	umlal	v13.2d,v28.2s,v0.s[2]
-	b.eq	LInner_jump5
+	b.eq	.LInner_jump5
 	add	x6,x6,#16	// don't advance in last iteration
-LInner_jump5:
+.LInner_jump5:
 	umlal	v6.2d,v28.2s,v0.s[3]
 	umlal	v7.2d,v28.2s,v1.s[0]
 	umlal	v8.2d,v28.2s,v1.s[1]
@@ -680,9 +680,9 @@ LInner_jump5:
 	umlal	v13.2d,v28.2s,v0.s[1]
 	ld1	{v29.2s},[x10],#8	// pull smashed m[8*i+6]
 	umlal	v6.2d,v28.2s,v0.s[2]
-	b.eq	LInner_jump6
+	b.eq	.LInner_jump6
 	add	x6,x6,#16	// don't advance in last iteration
-LInner_jump6:
+.LInner_jump6:
 	umlal	v7.2d,v28.2s,v0.s[3]
 	umlal	v8.2d,v28.2s,v1.s[0]
 	umlal	v9.2d,v28.2s,v1.s[1]
@@ -703,17 +703,17 @@ LInner_jump6:
 	umlal	v6.2d,v28.2s,v0.s[1]
 	ld1	{v29.2s},[x10],#8	// pull smashed m[8*i+7]
 	umlal	v7.2d,v28.2s,v0.s[2]
-	b.eq	LInner_jump7
+	b.eq	.LInner_jump7
 	add	x6,x6,#16	// don't advance in last iteration
-LInner_jump7:
+.LInner_jump7:
 	umlal	v8.2d,v28.2s,v0.s[3]
 	umlal	v9.2d,v28.2s,v1.s[0]
 	umlal	v10.2d,v28.2s,v1.s[1]
 	umlal	v11.2d,v28.2s,v1.s[2]
 	umlal	v12.2d,v28.2s,v1.s[3]
-	b.ne	LInner_after_rewind8
+	b.ne	.LInner_after_rewind8
 	sub	x1,x1,x5,lsl#2	// rewind
-LInner_after_rewind8:
+.LInner_after_rewind8:
 	umlal	v13.2d,v29.2s,v2.s[0]
 	ld1	{v28.2s},[sp]		// pull smashed b[8*i+0]
 	umlal	v6.2d,v29.2s,v2.s[1]
@@ -727,7 +727,7 @@ LInner_after_rewind8:
 	st1	{v13.2d},[x7],#16
 	umlal	v12.2d,v29.2s,v3.s[3]
 
-	bne	LNEON_8n_inner
+	bne	.LNEON_8n_inner
 	add	x6,sp,#128
 	st1	{v6.2d,v7.2d},[x7],#32
 	eor	v2.16b,v2.16b,v2.16b	// v2
@@ -742,11 +742,11 @@ LInner_after_rewind8:
 	ld1	{v10.2d,v11.2d},[x6],#32
 	ld1	{v12.2d,v13.2d},[x6],#32
 
-	b.eq	LInner_8n_jump_2steps
+	b.eq	.LInner_8n_jump_2steps
 	sub	x3,x3,x5,lsl#2	// rewind
-	b	LNEON_8n_outer
+	b	.LNEON_8n_outer
 
-LInner_8n_jump_2steps:
+.LInner_8n_jump_2steps:
 	add	x7,sp,#128
 	st1	{v2.2d,v3.2d}, [sp],#32	// start wiping stack frame
 	mov	v5.16b,v6.16b
@@ -761,10 +761,10 @@ LInner_8n_jump_2steps:
 	ins	v15.d[1],v14.d[0]
 
 	mov	x8,x5
-	b	LNEON_tail_entry
+	b	.LNEON_tail_entry
 
 .align	4
-LNEON_tail:
+.LNEON_tail:
 	add	v6.2d,v6.2d,v15.2d
 	mov	v5.16b,v6.16b
 	ushr	v15.2d,v6.2d,#16
@@ -777,7 +777,7 @@ LNEON_tail:
 	zip1	v6.4h,v5.4h,v6.4h
 	ins	v15.d[1],v14.d[0]
 
-LNEON_tail_entry:
+.LNEON_tail_entry:
 	add	v7.2d,v7.2d,v15.2d
 	st1	{v6.s}[0], [x7],#4
 	ushr	v15.2d,v7.2d,#16
@@ -844,14 +844,14 @@ LNEON_tail_entry:
 	ld1	{v6.2d,v7.2d}, [x6],#32
 	subs	x8,x8,#8
 	st1	{v13.s}[0], [x7],#4
-	bne	LNEON_tail
+	bne	.LNEON_tail
 
 	st1	{v15.s}[0], [x7],#4	// top-most bit
 	sub	x3,x3,x5,lsl#2		// rewind x3
 	subs	x1,sp,#0			// clear carry flag
 	add	x2,sp,x5,lsl#2
 
-LNEON_sub:
+.LNEON_sub:
 	ldp	w4,w5,[x1],#8
 	ldp	w6,w7,[x1],#8
 	ldp	w8,w9,[x3],#8
@@ -863,7 +863,7 @@ LNEON_sub:
 	sub	x17,x2,x1
 	stp	w8,w9,[x0],#8
 	stp	w10,w11,[x0],#8
-	cbnz	x17,LNEON_sub
+	cbnz	x17,.LNEON_sub
 
 	ldr	w10, [x1]		// load top-most bit
 	mov	x11,sp
@@ -875,18 +875,18 @@ LNEON_sub:
 	mov	x3,x2		// second 3/4th of frame
 	sbcs	w10,w10,wzr		// result is carry flag
 
-LNEON_copy_n_zap:
+.LNEON_copy_n_zap:
 	ldp	w4,w5,[x1],#8
 	ldp	w6,w7,[x1],#8
 	ldp	w8,w9,[x0],#8
 	ldp	w10,w11,[x0]
 	sub	x0,x0,#8
-	b.cs	LCopy_1
+	b.cs	.LCopy_1
 	mov	w8,w4
 	mov	w9,w5
 	mov	w10,w6
 	mov	w11,w7
-LCopy_1:
+.LCopy_1:
 	st1	{v0.2d,v1.2d}, [x3],#32		// wipe
 	st1	{v0.2d,v1.2d}, [x3],#32		// wipe
 	ldp	w4,w5,[x1],#8
@@ -897,18 +897,18 @@ LCopy_1:
 	ldp	w8,w9,[x0],#8
 	ldp	w10,w11,[x0]
 	sub	x0,x0,#8
-	b.cs	LCopy_2
+	b.cs	.LCopy_2
 	mov	w8, w4
 	mov	w9, w5
 	mov	w10, w6
 	mov	w11, w7
-LCopy_2:
+.LCopy_2:
 	st1	{v0.2d,v1.2d}, [x1],#32		// wipe
 	st1	{v0.2d,v1.2d}, [x3],#32		// wipe
 	sub	x17,x2,x1		// preserves carry
 	stp	w8,w9,[x0],#8
 	stp	w10,w11,[x0],#8
-	cbnz	x17,LNEON_copy_n_zap
+	cbnz	x17,.LNEON_copy_n_zap
 
 	mov	sp,x16
 	ldp	d14,d15,[sp,#64]
@@ -918,14 +918,14 @@ LCopy_2:
 	ldr	x29,[sp],#80
 	ret	// bx lr
 
-
-
+.size	bn_mul8x_mont_neon,.-bn_mul8x_mont_neon
+.type	__bn_sqr8x_mont,%function
 .align	5
 __bn_sqr8x_mont:
 	cmp	x1,x2
 	b.ne	__bn_mul4x_mont
-Lsqr8x_mont:
-.long	0xd503233f		// paciasp
+.Lsqr8x_mont:
+.inst	0xd503233f		// paciasp
 	stp	x29,x30,[sp,#-128]!
 	add	x29,sp,#0
 	stp	x19,x20,[sp,#16]
@@ -945,21 +945,21 @@ Lsqr8x_mont:
 	ldr	x4,[x4]		// *n0
 	mov	sp,x2			// alloca
 	sub	x27,x5,#8*8
-	b	Lsqr8x_zero_start
+	b	.Lsqr8x_zero_start
 
-Lsqr8x_zero:
+.Lsqr8x_zero:
 	sub	x27,x27,#8*8
 	stp	xzr,xzr,[x2,#8*0]
 	stp	xzr,xzr,[x2,#8*2]
 	stp	xzr,xzr,[x2,#8*4]
 	stp	xzr,xzr,[x2,#8*6]
-Lsqr8x_zero_start:
+.Lsqr8x_zero_start:
 	stp	xzr,xzr,[x2,#8*8]
 	stp	xzr,xzr,[x2,#8*10]
 	stp	xzr,xzr,[x2,#8*12]
 	stp	xzr,xzr,[x2,#8*14]
 	add	x2,x2,#8*16
-	cbnz	x27,Lsqr8x_zero
+	cbnz	x27,.Lsqr8x_zero
 
 	add	x3,x1,x5
 	add	x1,x1,#8*8
@@ -976,7 +976,7 @@ Lsqr8x_zero_start:
 
 	// Multiply everything but a[i]*a[i]
 .align	4
-Lsqr8x_outer_loop:
+.Lsqr8x_outer_loop:
         //                                                 a[1]a[0]	(i)
         //                                             a[2]a[0]
         //                                         a[3]a[0]
@@ -1138,7 +1138,7 @@ Lsqr8x_outer_loop:
 	adc	x25,xzr,xzr		// t[14]
 	add	x25,x25,x17
 
-	cbz	x27,Lsqr8x_outer_break
+	cbz	x27,.Lsqr8x_outer_break
 
 	mov	x4,x6
 	ldp	x6,x7,[x2,#8*0]
@@ -1184,7 +1184,7 @@ Lsqr8x_outer_loop:
 	//     a[f]a[6]........................
 	//                             a[8]a[7]
 	// a[f]a[7]........................
-Lsqr8x_mul:
+.Lsqr8x_mul:
 	mul	x14,x6,x4
 	adc	x28,xzr,xzr		// carry bit, modulo-scheduled
 	mul	x15,x7,x4
@@ -1223,11 +1223,11 @@ Lsqr8x_mul:
 	adcs	x25,x26,x16
 	adcs	x26,x28,x17
 	//adc	x28,xzr,xzr		// moved above
-	cbnz	x27,Lsqr8x_mul
+	cbnz	x27,.Lsqr8x_mul
 					// note that carry flag is guaranteed
 					// to be zero at this point
 	cmp	x1,x3		// done yet?
-	b.eq	Lsqr8x_break
+	b.eq	.Lsqr8x_break
 
 	ldp	x6,x7,[x2,#8*0]
 	ldp	x8,x9,[x2,#8*2]
@@ -1249,10 +1249,10 @@ Lsqr8x_mul:
 	ldp	x12,x13,[x1,#8*6]
 	add	x1,x1,#8*8
 	//adc	x28,xzr,xzr		// moved above
-	b	Lsqr8x_mul
+	b	.Lsqr8x_mul
 
 .align	4
-Lsqr8x_break:
+.Lsqr8x_break:
 	ldp	x6,x7,[x0,#8*0]
 	add	x1,x0,#8*8
 	ldp	x8,x9,[x0,#8*2]
@@ -1260,7 +1260,7 @@ Lsqr8x_break:
 	ldp	x10,x11,[x0,#8*4]
 	sub	x15,x2,x14
 	ldp	x12,x13,[x0,#8*6]
-	cbz	x14,Lsqr8x_outer_loop
+	cbz	x14,.Lsqr8x_outer_loop
 
 	stp	x19,x20,[x2,#8*0]
 	ldp	x19,x20,[x15,#8*0]
@@ -1271,10 +1271,10 @@ Lsqr8x_break:
 	stp	x25,x26,[x2,#8*6]
 	mov	x2,x15
 	ldp	x25,x26,[x15,#8*6]
-	b	Lsqr8x_outer_loop
+	b	.Lsqr8x_outer_loop
 
 .align	4
-Lsqr8x_outer_break:
+.Lsqr8x_outer_break:
 	// Now multiply above result by 2 and add a[n-1]*a[n-1]|...|a[0]*a[0]
 	ldp	x7,x9,[x14,#8*0]	// recall that x14 is &a[0]
 	ldp	x15,x16,[sp,#8*1]
@@ -1295,7 +1295,7 @@ Lsqr8x_outer_break:
 	extr	x15,x16,x15,#63
 	sub	x27,x5,#8*4
 
-Lsqr4x_shift_n_add:
+.Lsqr4x_shift_n_add:
 	adcs	x21,x8,x15
 	extr	x16,x17,x16,#63
 	sub	x27,x27,#8*4
@@ -1332,7 +1332,7 @@ Lsqr4x_shift_n_add:
 	adcs	x20,x7,x14
 	ldp	x17,x14,[x2,#8*3]
 	extr	x15,x16,x15,#63
-	cbnz	x27,Lsqr4x_shift_n_add
+	cbnz	x27,.Lsqr4x_shift_n_add
 	ldp	x1,x4,[x29,#104]	// pull np and n0
 
 	adcs	x21,x8,x15
@@ -1372,7 +1372,7 @@ Lsqr4x_shift_n_add:
 	mov	x2,sp
 	mov	x27,#8
 
-Lsqr8x_reduction:
+.Lsqr8x_reduction:
 	// (*)	mul	x14,x6,x28	// lo(n[0-7])*lo(t[0]*n0)
 	mul	x15,x7,x28
 	sub	x27,x27,#1
@@ -1410,7 +1410,7 @@ Lsqr8x_reduction:
 	adcs	x24,x24,x15
 	adcs	x25,x25,x16
 	adc	x26,x26,x17
-	cbnz	x27,Lsqr8x_reduction
+	cbnz	x27,.Lsqr8x_reduction
 
 	ldp	x14,x15,[x2,#8*0]
 	ldp	x16,x17,[x2,#8*2]
@@ -1427,7 +1427,7 @@ Lsqr8x_reduction:
 	adcs	x25,x25,x16
 	adcs	x26,x26,x17
 	//adc	x28,xzr,xzr		// moved below
-	cbz	x27,Lsqr8x8_post_condition
+	cbz	x27,.Lsqr8x8_post_condition
 
 	ldur	x4,[x2,#-8*8]
 	ldp	x6,x7,[x1,#8*0]
@@ -1437,7 +1437,7 @@ Lsqr8x_reduction:
 	ldp	x12,x13,[x1,#8*6]
 	add	x1,x1,#8*8
 
-Lsqr8x_tail:
+.Lsqr8x_tail:
 	mul	x14,x6,x4
 	adc	x28,xzr,xzr		// carry bit, modulo-scheduled
 	mul	x15,x7,x4
@@ -1476,7 +1476,7 @@ Lsqr8x_tail:
 	adcs	x25,x26,x16
 	adcs	x26,x28,x17
 	//adc	x28,xzr,xzr		// moved above
-	cbnz	x27,Lsqr8x_tail
+	cbnz	x27,.Lsqr8x_tail
 					// note that carry flag is guaranteed
 					// to be zero at this point
 	ldp	x6,x7,[x2,#8*0]
@@ -1485,7 +1485,7 @@ Lsqr8x_tail:
 	ldp	x8,x9,[x2,#8*2]
 	ldp	x10,x11,[x2,#8*4]
 	ldp	x12,x13,[x2,#8*6]
-	cbz	x27,Lsqr8x_tail_break
+	cbz	x27,.Lsqr8x_tail_break
 
 	ldur	x4,[x0,#-8*8]
 	adds	x19,x19,x6
@@ -1503,10 +1503,10 @@ Lsqr8x_tail:
 	ldp	x12,x13,[x1,#8*6]
 	add	x1,x1,#8*8
 	//adc	x28,xzr,xzr		// moved above
-	b	Lsqr8x_tail
+	b	.Lsqr8x_tail
 
 .align	4
-Lsqr8x_tail_break:
+.Lsqr8x_tail_break:
 	ldr	x4,[x29,#112]		// pull n0
 	add	x27,x2,#8*8		// end of current t[num] window
 
@@ -1537,7 +1537,7 @@ Lsqr8x_tail_break:
 	mov	x2,x0			// slide the window
 	ldp	x25,x26,[x0,#8*6]
 	mov	x27,#8
-	b.ne	Lsqr8x_reduction
+	b.ne	.Lsqr8x_reduction
 
 	// Final step. We see if result is larger than modulus, and
 	// if it is, subtract the modulus. But comparison implies
@@ -1550,7 +1550,7 @@ Lsqr8x_tail_break:
 	sub	x27,x5,#8*8
 	mov	x3,x0		// x0 copy
 
-Lsqr8x_sub:
+.Lsqr8x_sub:
 	sbcs	x16,x21,x8
 	ldp	x6,x7,[x1,#8*0]
 	sbcs	x17,x22,x9
@@ -1575,7 +1575,7 @@ Lsqr8x_sub:
 	stp	x16,x17,[x0,#8*6]
 	add	x0,x0,#8*8
 	sbcs	x15,x20,x7
-	cbnz	x27,Lsqr8x_sub
+	cbnz	x27,.Lsqr8x_sub
 
 	sbcs	x16,x21,x8
 	mov	x2,sp
@@ -1597,7 +1597,7 @@ Lsqr8x_sub:
 	stp	x16,x17,[x0,#8*6]
 
 	sub	x27,x5,#8*4
-Lsqr4x_cond_copy:
+.Lsqr4x_cond_copy:
 	sub	x27,x27,#8*4
 	csel	x14,x19,x6,lo
 	stp	xzr,xzr,[x2,#8*0]
@@ -1616,7 +1616,7 @@ Lsqr4x_cond_copy:
 	add	x3,x3,#8*4
 	stp	xzr,xzr,[x1,#8*0]
 	stp	xzr,xzr,[x1,#8*2]
-	cbnz	x27,Lsqr4x_cond_copy
+	cbnz	x27,.Lsqr4x_cond_copy
 
 	csel	x14,x19,x6,lo
 	stp	xzr,xzr,[x2,#8*0]
@@ -1627,10 +1627,10 @@ Lsqr4x_cond_copy:
 	stp	x14,x15,[x3,#8*0]
 	stp	x16,x17,[x3,#8*2]
 
-	b	Lsqr8x_done
+	b	.Lsqr8x_done
 
 .align	4
-Lsqr8x8_post_condition:
+.Lsqr8x8_post_condition:
 	adc	x28,xzr,xzr
 	ldr	x30,[x29,#8]		// pull return address
 	// x19-7,x28 hold result, x6-7 hold modulus
@@ -1667,7 +1667,7 @@ Lsqr8x8_post_condition:
 	stp	x10,x11,[x1,#8*4]
 	stp	x12,x13,[x1,#8*6]
 
-Lsqr8x_done:
+.Lsqr8x_done:
 	ldp	x19,x20,[x29,#16]
 	mov	sp,x29
 	ldp	x21,x22,[x29,#32]
@@ -1676,13 +1676,13 @@ Lsqr8x_done:
 	ldp	x25,x26,[x29,#64]
 	ldp	x27,x28,[x29,#80]
 	ldr	x29,[sp],#128
-.long	0xd50323bf		// autiasp
+.inst	0xd50323bf		// autiasp
 	ret
-
-
+.size	__bn_sqr8x_mont,.-__bn_sqr8x_mont
+.type	__bn_mul4x_mont,%function
 .align	5
 __bn_mul4x_mont:
-.long	0xd503233f		// paciasp
+.inst	0xd503233f		// paciasp
 	stp	x29,x30,[sp,#-128]!
 	add	x29,sp,#0
 	stp	x19,x20,[sp,#16]
@@ -1715,7 +1715,7 @@ __bn_mul4x_mont:
 	mov	x28,#0
 	mov	x26,sp
 
-Loop_mul4x_1st_reduction:
+.Loop_mul4x_1st_reduction:
 	mul	x10,x6,x24		// lo(a[0..3]*b[0])
 	adc	x0,x0,xzr	// modulo-scheduled
 	mul	x11,x7,x24
@@ -1760,9 +1760,9 @@ Loop_mul4x_1st_reduction:
 	adcs	x21,x21,x12
 	adcs	x22,x22,x13
 	//adc	x0,x0,xzr
-	cbnz	x28,Loop_mul4x_1st_reduction
+	cbnz	x28,.Loop_mul4x_1st_reduction
 
-	cbz	x10,Lmul4x4_post_condition
+	cbz	x10,.Lmul4x4_post_condition
 
 	ldp	x6,x7,[x1,#8*0]	// a[4..7]
 	ldp	x8,x9,[x1,#8*2]
@@ -1772,7 +1772,7 @@ Loop_mul4x_1st_reduction:
 	ldp	x16,x17,[x3,#8*2]
 	add	x3,x3,#8*4
 
-Loop_mul4x_1st_tail:
+.Loop_mul4x_1st_tail:
 	mul	x10,x6,x24		// lo(a[4..7]*b[i])
 	adc	x0,x0,xzr	// modulo-scheduled
 	mul	x11,x7,x24
@@ -1816,10 +1816,10 @@ Loop_mul4x_1st_tail:
 	adcs	x21,x22,x12
 	adcs	x22,x23,x13
 	//adc	x0,x0,xzr
-	cbnz	x28,Loop_mul4x_1st_tail
+	cbnz	x28,.Loop_mul4x_1st_tail
 
 	sub	x11,x27,x5	// rewinded x1
-	cbz	x10,Lmul4x_proceed
+	cbz	x10,.Lmul4x_proceed
 
 	ldp	x6,x7,[x1,#8*0]
 	ldp	x8,x9,[x1,#8*2]
@@ -1827,10 +1827,10 @@ Loop_mul4x_1st_tail:
 	ldp	x14,x15,[x3,#8*0]
 	ldp	x16,x17,[x3,#8*2]
 	add	x3,x3,#8*4
-	b	Loop_mul4x_1st_tail
+	b	.Loop_mul4x_1st_tail
 
 .align	5
-Lmul4x_proceed:
+.Lmul4x_proceed:
 	ldr	x24,[x2,#8*4]!		// *++b
 	adc	x30,x0,xzr
 	ldp	x6,x7,[x11,#8*0]	// a[0..3]
@@ -1850,7 +1850,7 @@ Lmul4x_proceed:
 	mov	x0,xzr
 
 .align	4
-Loop_mul4x_reduction:
+.Loop_mul4x_reduction:
 	mul	x10,x6,x24		// lo(a[0..3]*b[4])
 	adc	x0,x0,xzr	// modulo-scheduled
 	mul	x11,x7,x24
@@ -1894,7 +1894,7 @@ Loop_mul4x_reduction:
 	adcs	x21,x21,x12
 	adcs	x22,x22,x13
 	//adc	x0,x0,xzr
-	cbnz	x28,Loop_mul4x_reduction
+	cbnz	x28,.Loop_mul4x_reduction
 
 	adc	x0,x0,xzr
 	ldp	x10,x11,[x26,#8*4]	// t[4..7]
@@ -1914,7 +1914,7 @@ Loop_mul4x_reduction:
 	add	x3,x3,#8*4
 
 .align	4
-Loop_mul4x_tail:
+.Loop_mul4x_tail:
 	mul	x10,x6,x24		// lo(a[4..7]*b[4])
 	adc	x0,x0,xzr	// modulo-scheduled
 	mul	x11,x7,x24
@@ -1958,11 +1958,11 @@ Loop_mul4x_tail:
 	adcs	x21,x22,x12
 	adcs	x22,x23,x13
 	//adc	x0,x0,xzr
-	cbnz	x28,Loop_mul4x_tail
+	cbnz	x28,.Loop_mul4x_tail
 
 	sub	x11,x3,x5		// rewinded np?
 	adc	x0,x0,xzr
-	cbz	x10,Loop_mul4x_break
+	cbz	x10,.Loop_mul4x_break
 
 	ldp	x10,x11,[x26,#8*4]
 	ldp	x12,x13,[x26,#8*6]
@@ -1977,10 +1977,10 @@ Loop_mul4x_tail:
 	ldp	x14,x15,[x3,#8*0]
 	ldp	x16,x17,[x3,#8*2]
 	add	x3,x3,#8*4
-	b	Loop_mul4x_tail
+	b	.Loop_mul4x_tail
 
 .align	4
-Loop_mul4x_break:
+.Loop_mul4x_break:
 	ldp	x12,x13,[x29,#96]	// pull rp and &b[num]
 	adds	x19,x19,x30
 	add	x2,x2,#8*4		// bp++
@@ -1997,7 +1997,7 @@ Loop_mul4x_break:
 	ldp	x14,x15,[x11,#8*0]	// n[0..3]
 	ldp	x16,x17,[x11,#8*2]
 	add	x3,x11,#8*4
-	b.eq	Lmul4x_post
+	b.eq	.Lmul4x_post
 
 	ldr	x24,[x2]
 	ldp	x6,x7,[x1,#8*0]	// a[0..3]
@@ -2005,10 +2005,10 @@ Loop_mul4x_break:
 	adds	x1,x1,#8*4		// clear carry bit
 	mov	x0,xzr
 	mov	x26,sp
-	b	Loop_mul4x_reduction
+	b	.Loop_mul4x_reduction
 
 .align	4
-Lmul4x_post:
+.Lmul4x_post:
 	// Final step. We see if result is larger than modulus, and
 	// if it is, subtract the modulus. But comparison implies
 	// subtraction. So we subtract modulus, see if it borrowed,
@@ -2020,7 +2020,7 @@ Lmul4x_post:
 	sbcs	x11,x20,x15
 	sub	x28,x5,#8*4
 
-Lmul4x_sub:
+.Lmul4x_sub:
 	sbcs	x12,x21,x16
 	ldp	x14,x15,[x3,#8*0]
 	sub	x28,x28,#8*4
@@ -2035,7 +2035,7 @@ Lmul4x_sub:
 	stp	x12,x13,[x0,#8*2]
 	add	x0,x0,#8*4
 	sbcs	x11,x20,x15
-	cbnz	x28,Lmul4x_sub
+	cbnz	x28,.Lmul4x_sub
 
 	sbcs	x12,x21,x16
 	mov	x26,sp
@@ -2051,7 +2051,7 @@ Lmul4x_sub:
 	ldr	x30,[x29,#8]		// pull return address
 
 	sub	x28,x5,#8*4
-Lmul4x_cond_copy:
+.Lmul4x_cond_copy:
 	sub	x28,x28,#8*4
 	csel	x10,x19,x6,lo
 	stp	xzr,xzr,[x26,#8*0]
@@ -2068,7 +2068,7 @@ Lmul4x_cond_copy:
 	stp	x10,x11,[x27,#8*0]
 	stp	x12,x13,[x27,#8*2]
 	add	x27,x27,#8*4
-	cbnz	x28,Lmul4x_cond_copy
+	cbnz	x28,.Lmul4x_cond_copy
 
 	csel	x10,x19,x6,lo
 	stp	xzr,xzr,[x26,#8*0]
@@ -2081,10 +2081,10 @@ Lmul4x_cond_copy:
 	stp	x10,x11,[x27,#8*0]
 	stp	x12,x13,[x27,#8*2]
 
-	b	Lmul4x_done
+	b	.Lmul4x_done
 
 .align	4
-Lmul4x4_post_condition:
+.Lmul4x4_post_condition:
 	adc	x0,x0,xzr
 	ldr	x1,[x29,#96]		// pull rp
 	// x19-3,x0 hold result, x14-7 hold modulus
@@ -2107,7 +2107,7 @@ Lmul4x4_post_condition:
 	stp	x6,x7,[x1,#8*0]
 	stp	x8,x9,[x1,#8*2]
 
-Lmul4x_done:
+.Lmul4x_done:
 	ldp	x19,x20,[x29,#16]
 	mov	sp,x29
 	ldp	x21,x22,[x29,#32]
@@ -2116,9 +2116,9 @@ Lmul4x_done:
 	ldp	x25,x26,[x29,#64]
 	ldp	x27,x28,[x29,#80]
 	ldr	x29,[sp],#128
-.long	0xd50323bf		// autiasp
+.inst	0xd50323bf		// autiasp
 	ret
-
+.size	__bn_mul4x_mont,.-__bn_mul4x_mont
 .byte	77,111,110,116,103,111,109,101,114,121,32,77,117,108,116,105,112,108,105,99,97,116,105,111,110,32,102,111,114,32,65,82,77,118,56,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
 .align	2
 .align	4
