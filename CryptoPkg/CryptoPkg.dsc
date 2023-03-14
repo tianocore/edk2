@@ -327,7 +327,7 @@
       MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
   }
 
-[Components.IA32, Components.X64]
+[Components.IA32, Components.X64, Components.AARCH64]
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibShell.inf {
     <Defines>
       FILE_GUID = B91B9A95-4D52-4501-A98F-A1711C14ED93
