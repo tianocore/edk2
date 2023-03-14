@@ -1,14 +1,13 @@
 /** @file
   SMM STM support functions
 
-  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <PiMm.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/HobLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/TpmMeasurementLib.h>

@@ -1,7 +1,7 @@
 ## @file  UefiCpuPkg.dec
 # This Package provides UEFI compatible CPU modules and libraries.
 #
-# Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2023, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -77,6 +77,9 @@
 
   ## Include/Guid/MicrocodePatchHob.h
   gEdkiiMicrocodePatchHobGuid    = { 0xd178f11d, 0x8716, 0x418e, { 0xa1, 0x31, 0x96, 0x7d, 0x2a, 0xc4, 0x28, 0x43 }}
+
+  ## Include/Guid/SmmBaseHob.h
+  gSmmBaseHobGuid      = { 0xc2217ba7, 0x03bb, 0x4f63, {0xa6, 0x47, 0x7c, 0x25, 0xc5, 0xfc, 0x9d, 0x73 }}
 
 [Protocols]
   ## Include/Protocol/SmmCpuService.h

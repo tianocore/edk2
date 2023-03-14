@@ -52,8 +52,6 @@
   #
   gPlatformGOPPolicyGuid                  = { 0xec2e931b, 0x3281, 0x48a5, { 0x81, 0x07, 0xdf, 0x8a, 0x8b, 0xed, 0x3c, 0x5d } }
 
-  gUniversalPayloadPlatformBootManagerOverrideProtocolGuid = { 0xdb3fc2df, 0x7376, 0x4a8d, { 0x82, 0xab, 0x91, 0x54, 0xa1, 0x36, 0xa6, 0x5a } }
-
 ################################################################################
 #
 # PCD Declarations section - list of all PCDs Declared by this Package

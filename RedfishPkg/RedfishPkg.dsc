@@ -58,5 +58,6 @@
   RedfishPkg/PrivateLibrary/RedfishCrtLib/RedfishCrtLib.inf
   RedfishPkg/Library/JsonLib/JsonLib.inf
   RedfishPkg/PrivateLibrary/RedfishLib/RedfishLib.inf
+  RedfishPkg/Library/RedfishDebugLib/RedfishDebugLib.inf
 
   !include RedfishPkg/Redfish.dsc.inc
