@@ -102,6 +102,8 @@ def BuildUniversalPayload(Args, MacroList):
         ObjCopyFlag    = "elf32-i386"
         EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ElfToolChain), os.path.normpath("IA32/UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry/DEBUG/UniversalPayloadEntry.dll"))
 
+    if Args.PreBuildUplBinary is not None:
+        EntryOutputDir = os.path.abspath(Args.PreBuildUplBinary)
     EntryModuleInf = os.path.normpath("UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf")
     DscPath = os.path.normpath("UefiPayloadPkg/UefiPayloadPkg.dsc")
     DxeFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))
@@ -132,18 +134,19 @@ def BuildUniversalPayload(Args, MacroList):
     #
     # Building DXE core and DXE drivers as DXEFV.
     #
-    BuildPayload = "build -p {} -b {} -a X64 -t {} -y {} {}".format (DscPath, BuildTarget, ToolChain, PayloadReportPath, Quiet)
-    BuildPayload += Pcds
-    BuildPayload += Defines
-    RunCommand(BuildPayload)
+    if Args.BuildEntryOnly == False:
+        BuildPayload = "build -p {} -b {} -a X64 -t {} -y {} {}".format (DscPath, BuildTarget, ToolChain, PayloadReportPath, Quiet)
+        BuildPayload += Pcds
+        BuildPayload += Defines
+        RunCommand(BuildPayload)
     #
     # Building Universal Payload entry.
     #
-    BuildModule = "build -p {} -b {} -a {} -m {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, EntryModuleInf, ElfToolChain, ModuleReportPath, Quiet)
-    BuildModule += Pcds
-    BuildModule += Defines
-    RunCommand(BuildModule)
-
+    if Args.PreBuildUplBinary is None:
+        BuildModule = "build -p {} -b {} -a {} -m {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, EntryModuleInf, ElfToolChain, ModuleReportPath, Quiet)
+        BuildModule += Pcds
+        BuildModule += Defines
+        RunCommand(BuildModule)
     #
     # Buid Universal Payload Information Section ".upld_info"
     #
@@ -157,33 +160,34 @@ def BuildUniversalPayload(Args, MacroList):
     fp.write(bytearray(upld_info_hdr))
     fp.close()
 
-    #
-    # Copy the DXEFV as a section in elf format Universal Payload entry.
-    #
-    remove_section = '"{}" -I {} -O {} --remove-section .upld_info --remove-section .upld.uefi_fv --remove-section .upld.bds_fv {}'.format (
-                       LlvmObjcopyPath,
-                       ObjCopyFlag,
-                       ObjCopyFlag,
-                       EntryOutputDir
-                       )
-    add_section    = '"{}" -I {} -O {} --add-section .upld_info={} --add-section .upld.uefi_fv={} --add-section .upld.bds_fv={} {}'.format (
-                       LlvmObjcopyPath,
-                       ObjCopyFlag,
-                       ObjCopyFlag,
-                       UpldInfoFile,
-                       DxeFvOutputDir,
-                       BdsFvOutputDir,
-                       EntryOutputDir
-                       )
-    set_section    = '"{}" -I {} -O {} --set-section-alignment .upld_info=4 --set-section-alignment .upld.uefi_fv=16 --set-section-alignment .upld.bds_fv=16 {}'.format (
-                       LlvmObjcopyPath,
-                       ObjCopyFlag,
-                       ObjCopyFlag,
-                       EntryOutputDir
-                       )
-    RunCommand(remove_section)
-    RunCommand(add_section)
-    RunCommand(set_section)
+    if Args.BuildEntryOnly == False:
+        #
+        # Copy the DXEFV as a section in elf format Universal Payload entry.
+        #
+        remove_section = '"{}" -I {} -O {} --remove-section .upld_info --remove-section .upld.uefi_fv --remove-section .upld.bds_fv {}'.format (
+                           LlvmObjcopyPath,
+                           ObjCopyFlag,
+                           ObjCopyFlag,
+                           EntryOutputDir
+                           )
+        add_section    = '"{}" -I {} -O {} --add-section .upld_info={} --add-section .upld.uefi_fv={} --add-section .upld.bds_fv={} {}'.format (
+                           LlvmObjcopyPath,
+                           ObjCopyFlag,
+                           ObjCopyFlag,
+                           UpldInfoFile,
+                           DxeFvOutputDir,
+                           BdsFvOutputDir,
+                           EntryOutputDir
+                           )
+        set_section    = '"{}" -I {} -O {} --set-section-alignment .upld_info=4 --set-section-alignment .upld.uefi_fv=16 --set-section-alignment .upld.bds_fv=16 {}'.format (
+                           LlvmObjcopyPath,
+                           ObjCopyFlag,
+                           ObjCopyFlag,
+                           EntryOutputDir
+                           )
+        RunCommand(remove_section)
+        RunCommand(add_section)
+        RunCommand(set_section)
 
     shutil.copy (EntryOutputDir, os.path.join(BuildDir, 'UniversalPayload.elf'))
 
@@ -199,6 +203,8 @@ def main():
     parser.add_argument("-s", "--SpecRevision", type=GenSpecRevision, default ='0.7', help='Indicates compliance with a revision of this specification in the BCD format.')
     parser.add_argument("-r", "--Revision", type=Validate32BitInteger, default ='0x0000010105', help='Revision of the Payload binary. Major.Minor.Revision.Build')
     parser.add_argument("-o", "--ProducerId", default ='INTEL', help='A null-terminated OEM-supplied string that identifies the payload producer (16 bytes maximal).')
+    parser.add_argument("-e", "--BuildEntryOnly", action='store_true', help='Build UniversalPayload Entry file')
+    parser.add_argument("-pb", "--PreBuildUplBinary", default=None, help='Specify the UniversalPayload file')
     MacroList = {}
     args = parser.parse_args()
     if args.Macro is not None:
