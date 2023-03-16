@@ -274,6 +274,8 @@ PageTableLibMapInLevel (
   IA32_MAP_ATTRIBUTE  ChildMask;
   IA32_MAP_ATTRIBUTE  CurrentMask;
   IA32_MAP_ATTRIBUTE  LocalParentAttribute;
+  UINT64              PhysicalAddrInEntry;
+  UINT64              PhysicalAddrInAttr;
 
   ASSERT (Level != 0);
   ASSERT ((Attribute != NULL) && (Mask != NULL));
@@ -341,7 +343,15 @@ PageTableLibMapInLevel (
       // This function is called when the memory length is less than the region length of the parent level.
       // No need to split the page when the attributes equal.
       //
-      return RETURN_SUCCESS;
+      if (Mask->Bits.PageTableBaseAddress == 0) {
+        return RETURN_SUCCESS;
+      }
+
+      PhysicalAddrInEntry = IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (&PleBAttribute) + (UINT64)PagingEntryIndex * RegionLength;
+      PhysicalAddrInAttr  = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) & (~RegionMask);
+      if (PhysicalAddrInEntry == PhysicalAddrInAttr) {
+        return RETURN_SUCCESS;
+      }
     }
 
     ASSERT (Buffer == NULL || *BufferSize >= SIZE_4KB);
