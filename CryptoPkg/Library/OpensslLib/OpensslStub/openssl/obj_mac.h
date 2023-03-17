@@ -20,160 +20,160 @@
 
 #define SN_itu_t                "ITU-T"
 #define LN_itu_t                "itu-t"
-#define NID_itu_t               1
+#define NID_itu_t               380
 #define OBJ_itu_t               0L
 
 #define OBJ_ccitt               OBJ_itu_t
 
 #define SN_iso          "ISO"
 #define LN_iso          "iso"
-#define NID_iso         2
+#define NID_iso         178
 #define OBJ_iso         1L
 
 #define SN_joint_iso_itu_t              "JOINT-ISO-ITU-T"
 #define LN_joint_iso_itu_t              "joint-iso-itu-t"
-#define NID_joint_iso_itu_t             3
+#define NID_joint_iso_itu_t             381
 #define OBJ_joint_iso_itu_t             2L
 
 #define OBJ_joint_iso_ccitt             OBJ_joint_iso_itu_t
 
 #define SN_member_body          "member-body"
 #define LN_member_body          "ISO Member Body"
-#define NID_member_body         4
+#define NID_member_body         179
 #define OBJ_member_body         OBJ_iso,2L
 
 #define SN_identified_organization              "identified-organization"
-#define NID_identified_organization             5
+#define NID_identified_organization             411
 #define OBJ_identified_organization             OBJ_iso,3L
 
 #define SN_gmac         "GMAC"
 #define LN_gmac         "gmac"
-#define NID_gmac                6
+#define NID_gmac                661
 #define OBJ_gmac                OBJ_iso,0L,9797L,3L,4L
 
 #define SN_hmac_md5             "HMAC-MD5"
 #define LN_hmac_md5             "hmac-md5"
-#define NID_hmac_md5            7
+#define NID_hmac_md5            432
 #define OBJ_hmac_md5            OBJ_identified_organization,6L,1L,5L,5L,8L,1L,1L
 
 #define SN_hmac_sha1            "HMAC-SHA1"
 #define LN_hmac_sha1            "hmac-sha1"
-#define NID_hmac_sha1           8
+#define NID_hmac_sha1           433
 #define OBJ_hmac_sha1           OBJ_identified_organization,6L,1L,5L,5L,8L,1L,2L
 
 #define SN_x509ExtAdmission             "x509ExtAdmission"
 #define LN_x509ExtAdmission             "Professional Information or basis for Admission"
-#define NID_x509ExtAdmission            9
+#define NID_x509ExtAdmission            615
 #define OBJ_x509ExtAdmission            OBJ_identified_organization,36L,8L,3L,3L
 
 #define SN_certicom_arc         "certicom-arc"
-#define NID_certicom_arc                10
+#define NID_certicom_arc                412
 #define OBJ_certicom_arc                OBJ_identified_organization,132L
 
 #define SN_ieee         "ieee"
-#define NID_ieee                11
+#define NID_ieee                656
 #define OBJ_ieee                OBJ_identified_organization,111L
 
 #define SN_ieee_siswg           "ieee-siswg"
 #define LN_ieee_siswg           "IEEE Security in Storage Working Group"
-#define NID_ieee_siswg          12
+#define NID_ieee_siswg          657
 #define OBJ_ieee_siswg          OBJ_ieee,2L,1619L
 
 #define SN_international_organizations          "international-organizations"
 #define LN_international_organizations          "International Organizations"
-#define NID_international_organizations         13
+#define NID_international_organizations         382
 #define OBJ_international_organizations         OBJ_joint_iso_itu_t,23L
 
 #define SN_wap          "wap"
-#define NID_wap         14
+#define NID_wap         413
 #define OBJ_wap         OBJ_international_organizations,43L
 
 #define SN_wap_wsg              "wap-wsg"
-#define NID_wap_wsg             15
+#define NID_wap_wsg             414
 #define OBJ_wap_wsg             OBJ_wap,1L
 
 #define SN_selected_attribute_types             "selected-attribute-types"
 #define LN_selected_attribute_types             "Selected Attribute Types"
-#define NID_selected_attribute_types            16
+#define NID_selected_attribute_types            335
 #define OBJ_selected_attribute_types            OBJ_joint_iso_itu_t,5L,1L,5L
 
 #define SN_clearance            "clearance"
-#define NID_clearance           17
+#define NID_clearance           336
 #define OBJ_clearance           OBJ_selected_attribute_types,55L
 
 #define SN_ISO_US               "ISO-US"
 #define LN_ISO_US               "ISO US Member Body"
-#define NID_ISO_US              18
+#define NID_ISO_US              180
 #define OBJ_ISO_US              OBJ_member_body,840L
 
 #define SN_X9_57                "X9-57"
 #define LN_X9_57                "X9.57"
-#define NID_X9_57               19
+#define NID_X9_57               181
 #define OBJ_X9_57               OBJ_ISO_US,10040L
 
 #define SN_X9cm         "X9cm"
 #define LN_X9cm         "X9.57 CM ?"
-#define NID_X9cm                20
+#define NID_X9cm                182
 #define OBJ_X9cm                OBJ_X9_57,4L
 
 #define SN_ISO_CN               "ISO-CN"
 #define LN_ISO_CN               "ISO CN Member Body"
-#define NID_ISO_CN              21
+#define NID_ISO_CN              649
 #define OBJ_ISO_CN              OBJ_member_body,156L
 
 #define SN_oscca                "oscca"
-#define NID_oscca               22
+#define NID_oscca               650
 #define OBJ_oscca               OBJ_ISO_CN,10197L
 
 #define SN_sm_scheme            "sm-scheme"
-#define NID_sm_scheme           23
+#define NID_sm_scheme           651
 #define OBJ_sm_scheme           OBJ_oscca,1L
 
 #define SN_dsa          "DSA"
 #define LN_dsa          "dsaEncryption"
-#define NID_dsa         24
+#define NID_dsa         115
 #define OBJ_dsa         OBJ_X9cm,1L
 
 #define SN_dsaWithSHA1          "DSA-SHA1"
 #define LN_dsaWithSHA1          "dsaWithSHA1"
-#define NID_dsaWithSHA1         25
+#define NID_dsaWithSHA1         112
 #define OBJ_dsaWithSHA1         OBJ_X9cm,3L
 
 #define SN_ansi_X9_62           "ansi-X9-62"
 #define LN_ansi_X9_62           "ANSI X9.62"
-#define NID_ansi_X9_62          26
+#define NID_ansi_X9_62          344
 #define OBJ_ansi_X9_62          OBJ_ISO_US,10045L
 
 #define OBJ_X9_62_id_fieldType          OBJ_ansi_X9_62,1L
 
 #define SN_X9_62_prime_field            "prime-field"
-#define NID_X9_62_prime_field           27
+#define NID_X9_62_prime_field           345
 #define OBJ_X9_62_prime_field           OBJ_X9_62_id_fieldType,1L
 
 #define SN_X9_62_characteristic_two_field               "characteristic-two-field"
-#define NID_X9_62_characteristic_two_field              28
+#define NID_X9_62_characteristic_two_field              346
 #define OBJ_X9_62_characteristic_two_field              OBJ_X9_62_id_fieldType,2L
 
 #define SN_X9_62_id_characteristic_two_basis            "id-characteristic-two-basis"
-#define NID_X9_62_id_characteristic_two_basis           29
+#define NID_X9_62_id_characteristic_two_basis           415
 #define OBJ_X9_62_id_characteristic_two_basis           OBJ_X9_62_characteristic_two_field,3L
 
 #define SN_X9_62_onBasis                "onBasis"
-#define NID_X9_62_onBasis               30
+#define NID_X9_62_onBasis               416
 #define OBJ_X9_62_onBasis               OBJ_X9_62_id_characteristic_two_basis,1L
 
 #define SN_X9_62_tpBasis                "tpBasis"
-#define NID_X9_62_tpBasis               31
+#define NID_X9_62_tpBasis               417
 #define OBJ_X9_62_tpBasis               OBJ_X9_62_id_characteristic_two_basis,2L
 
 #define SN_X9_62_ppBasis                "ppBasis"
-#define NID_X9_62_ppBasis               32
+#define NID_X9_62_ppBasis               418
 #define OBJ_X9_62_ppBasis               OBJ_X9_62_id_characteristic_two_basis,3L
 
 #define OBJ_X9_62_id_publicKeyType              OBJ_ansi_X9_62,2L
 
 #define SN_X9_62_id_ecPublicKey         "id-ecPublicKey"
-#define NID_X9_62_id_ecPublicKey                33
+#define NID_X9_62_id_ecPublicKey                347
 #define OBJ_X9_62_id_ecPublicKey                OBJ_X9_62_id_publicKeyType,1L
 
 #define OBJ_X9_62_ellipticCurve         OBJ_ansi_X9_62,3L
@@ -181,661 +181,661 @@
 #define OBJ_X9_62_primeCurve            OBJ_X9_62_ellipticCurve,1L
 
 #define SN_X9_62_prime256v1             "prime256v1"
-#define NID_X9_62_prime256v1            34
+#define NID_X9_62_prime256v1            698
 #define OBJ_X9_62_prime256v1            OBJ_X9_62_primeCurve,7L
 
 #define OBJ_X9_62_id_ecSigType          OBJ_ansi_X9_62,4L
 
 #define SN_ecdsa_with_SHA1              "ecdsa-with-SHA1"
-#define NID_ecdsa_with_SHA1             35
+#define NID_ecdsa_with_SHA1             348
 #define OBJ_ecdsa_with_SHA1             OBJ_X9_62_id_ecSigType,1L
 
 #define SN_ecdsa_with_Recommended               "ecdsa-with-Recommended"
-#define NID_ecdsa_with_Recommended              36
+#define NID_ecdsa_with_Recommended              442
 #define OBJ_ecdsa_with_Recommended              OBJ_X9_62_id_ecSigType,2L
 
 #define SN_ecdsa_with_Specified         "ecdsa-with-Specified"
-#define NID_ecdsa_with_Specified                37
+#define NID_ecdsa_with_Specified                443
 #define OBJ_ecdsa_with_Specified                OBJ_X9_62_id_ecSigType,3L
 
 #define SN_ecdsa_with_SHA224            "ecdsa-with-SHA224"
-#define NID_ecdsa_with_SHA224           38
+#define NID_ecdsa_with_SHA224           444
 #define OBJ_ecdsa_with_SHA224           OBJ_ecdsa_with_Specified,1L
 
 #define SN_ecdsa_with_SHA256            "ecdsa-with-SHA256"
-#define NID_ecdsa_with_SHA256           39
+#define NID_ecdsa_with_SHA256           445
 #define OBJ_ecdsa_with_SHA256           OBJ_ecdsa_with_Specified,2L
 
 #define SN_ecdsa_with_SHA384            "ecdsa-with-SHA384"
-#define NID_ecdsa_with_SHA384           40
+#define NID_ecdsa_with_SHA384           446
 #define OBJ_ecdsa_with_SHA384           OBJ_ecdsa_with_Specified,3L
 
 #define SN_ecdsa_with_SHA512            "ecdsa-with-SHA512"
-#define NID_ecdsa_with_SHA512           41
+#define NID_ecdsa_with_SHA512           447
 #define OBJ_ecdsa_with_SHA512           OBJ_ecdsa_with_Specified,4L
 
 #define OBJ_secg_ellipticCurve          OBJ_certicom_arc,0L
 
 #define SN_secp384r1            "secp384r1"
-#define NID_secp384r1           42
+#define NID_secp384r1           419
 #define OBJ_secp384r1           OBJ_secg_ellipticCurve,34L
 
 #define SN_secp521r1            "secp521r1"
-#define NID_secp521r1           43
+#define NID_secp521r1           420
 #define OBJ_secp521r1           OBJ_secg_ellipticCurve,35L
 
 #define SN_cast5_cbc            "CAST5-CBC"
 #define LN_cast5_cbc            "cast5-cbc"
-#define NID_cast5_cbc           44
+#define NID_cast5_cbc           107
 #define OBJ_cast5_cbc           OBJ_ISO_US,113533L,7L,66L,10L
 
 #define SN_cast5_ecb            "CAST5-ECB"
 #define LN_cast5_ecb            "cast5-ecb"
-#define NID_cast5_ecb           45
+#define NID_cast5_ecb           108
 
 #define SN_cast5_cfb64          "CAST5-CFB"
 #define LN_cast5_cfb64          "cast5-cfb"
-#define NID_cast5_cfb64         46
+#define NID_cast5_cfb64         109
 
 #define SN_cast5_ofb64          "CAST5-OFB"
 #define LN_cast5_ofb64          "cast5-ofb"
-#define NID_cast5_ofb64         47
+#define NID_cast5_ofb64         110
 
 #define LN_pbeWithMD5AndCast5_CBC               "pbeWithMD5AndCast5CBC"
-#define NID_pbeWithMD5AndCast5_CBC              48
+#define NID_pbeWithMD5AndCast5_CBC              111
 #define OBJ_pbeWithMD5AndCast5_CBC              OBJ_ISO_US,113533L,7L,66L,12L
 
 #define SN_id_PasswordBasedMAC          "id-PasswordBasedMAC"
 #define LN_id_PasswordBasedMAC          "password based MAC"
-#define NID_id_PasswordBasedMAC         49
+#define NID_id_PasswordBasedMAC         434
 #define OBJ_id_PasswordBasedMAC         OBJ_ISO_US,113533L,7L,66L,13L
 
 #define SN_id_DHBasedMac                "id-DHBasedMac"
 #define LN_id_DHBasedMac                "Diffie-Hellman based MAC"
-#define NID_id_DHBasedMac               50
+#define NID_id_DHBasedMac               435
 #define OBJ_id_DHBasedMac               OBJ_ISO_US,113533L,7L,66L,30L
 
 #define SN_rsadsi               "rsadsi"
 #define LN_rsadsi               "RSA Data Security, Inc."
-#define NID_rsadsi              51
+#define NID_rsadsi              1
 #define OBJ_rsadsi              OBJ_ISO_US,113549L
 
 #define SN_pkcs         "pkcs"
 #define LN_pkcs         "RSA Data Security, Inc. PKCS"
-#define NID_pkcs                52
+#define NID_pkcs                2
 #define OBJ_pkcs                OBJ_rsadsi,1L
 
 #define SN_pkcs1                "pkcs1"
-#define NID_pkcs1               53
+#define NID_pkcs1               183
 #define OBJ_pkcs1               OBJ_pkcs,1L
 
 #define LN_rsaEncryption                "rsaEncryption"
-#define NID_rsaEncryption               54
+#define NID_rsaEncryption               6
 #define OBJ_rsaEncryption               OBJ_pkcs1,1L
 
 #define SN_md2WithRSAEncryption         "RSA-MD2"
 #define LN_md2WithRSAEncryption         "md2WithRSAEncryption"
-#define NID_md2WithRSAEncryption                55
+#define NID_md2WithRSAEncryption                7
 #define OBJ_md2WithRSAEncryption                OBJ_pkcs1,2L
 
 #define SN_md4WithRSAEncryption         "RSA-MD4"
 #define LN_md4WithRSAEncryption         "md4WithRSAEncryption"
-#define NID_md4WithRSAEncryption                56
+#define NID_md4WithRSAEncryption                337
 #define OBJ_md4WithRSAEncryption                OBJ_pkcs1,3L
 
 #define SN_md5WithRSAEncryption         "RSA-MD5"
 #define LN_md5WithRSAEncryption         "md5WithRSAEncryption"
-#define NID_md5WithRSAEncryption                57
+#define NID_md5WithRSAEncryption                8
 #define OBJ_md5WithRSAEncryption                OBJ_pkcs1,4L
 
 #define SN_sha1WithRSAEncryption                "RSA-SHA1"
 #define LN_sha1WithRSAEncryption                "sha1WithRSAEncryption"
-#define NID_sha1WithRSAEncryption               58
+#define NID_sha1WithRSAEncryption               65
 #define OBJ_sha1WithRSAEncryption               OBJ_pkcs1,5L
 
 #define SN_rsaesOaep            "RSAES-OAEP"
 #define LN_rsaesOaep            "rsaesOaep"
-#define NID_rsaesOaep           59
+#define NID_rsaesOaep           522
 #define OBJ_rsaesOaep           OBJ_pkcs1,7L
 
 #define SN_mgf1         "MGF1"
 #define LN_mgf1         "mgf1"
-#define NID_mgf1                60
+#define NID_mgf1                514
 #define OBJ_mgf1                OBJ_pkcs1,8L
 
 #define SN_pSpecified           "PSPECIFIED"
 #define LN_pSpecified           "pSpecified"
-#define NID_pSpecified          61
+#define NID_pSpecified          524
 #define OBJ_pSpecified          OBJ_pkcs1,9L
 
 #define SN_rsassaPss            "RSASSA-PSS"
 #define LN_rsassaPss            "rsassaPss"
-#define NID_rsassaPss           62
+#define NID_rsassaPss           515
 #define OBJ_rsassaPss           OBJ_pkcs1,10L
 
 #define SN_sha256WithRSAEncryption              "RSA-SHA256"
 #define LN_sha256WithRSAEncryption              "sha256WithRSAEncryption"
-#define NID_sha256WithRSAEncryption             63
+#define NID_sha256WithRSAEncryption             403
 #define OBJ_sha256WithRSAEncryption             OBJ_pkcs1,11L
 
 #define SN_sha384WithRSAEncryption              "RSA-SHA384"
 #define LN_sha384WithRSAEncryption              "sha384WithRSAEncryption"
-#define NID_sha384WithRSAEncryption             64
+#define NID_sha384WithRSAEncryption             404
 #define OBJ_sha384WithRSAEncryption             OBJ_pkcs1,12L
 
 #define SN_sha512WithRSAEncryption              "RSA-SHA512"
 #define LN_sha512WithRSAEncryption              "sha512WithRSAEncryption"
-#define NID_sha512WithRSAEncryption             65
+#define NID_sha512WithRSAEncryption             405
 #define OBJ_sha512WithRSAEncryption             OBJ_pkcs1,13L
 
 #define SN_sha224WithRSAEncryption              "RSA-SHA224"
 #define LN_sha224WithRSAEncryption              "sha224WithRSAEncryption"
-#define NID_sha224WithRSAEncryption             66
+#define NID_sha224WithRSAEncryption             406
 #define OBJ_sha224WithRSAEncryption             OBJ_pkcs1,14L
 
 #define SN_sha512_224WithRSAEncryption          "RSA-SHA512/224"
 #define LN_sha512_224WithRSAEncryption          "sha512-224WithRSAEncryption"
-#define NID_sha512_224WithRSAEncryption         67
+#define NID_sha512_224WithRSAEncryption         654
 #define OBJ_sha512_224WithRSAEncryption         OBJ_pkcs1,15L
 
 #define SN_sha512_256WithRSAEncryption          "RSA-SHA512/256"
 #define LN_sha512_256WithRSAEncryption          "sha512-256WithRSAEncryption"
-#define NID_sha512_256WithRSAEncryption         68
+#define NID_sha512_256WithRSAEncryption         655
 #define OBJ_sha512_256WithRSAEncryption         OBJ_pkcs1,16L
 
 #define SN_pkcs3                "pkcs3"
-#define NID_pkcs3               69
+#define NID_pkcs3               27
 #define OBJ_pkcs3               OBJ_pkcs,3L
 
 #define LN_dhKeyAgreement               "dhKeyAgreement"
-#define NID_dhKeyAgreement              70
+#define NID_dhKeyAgreement              28
 #define OBJ_dhKeyAgreement              OBJ_pkcs3,1L
 
 #define SN_pkcs5                "pkcs5"
-#define NID_pkcs5               71
+#define NID_pkcs5               184
 #define OBJ_pkcs5               OBJ_pkcs,5L
 
 #define SN_pbeWithMD2AndDES_CBC         "PBE-MD2-DES"
 #define LN_pbeWithMD2AndDES_CBC         "pbeWithMD2AndDES-CBC"
-#define NID_pbeWithMD2AndDES_CBC                72
+#define NID_pbeWithMD2AndDES_CBC                9
 #define OBJ_pbeWithMD2AndDES_CBC                OBJ_pkcs5,1L
 
 #define SN_pbeWithMD5AndDES_CBC         "PBE-MD5-DES"
 #define LN_pbeWithMD5AndDES_CBC         "pbeWithMD5AndDES-CBC"
-#define NID_pbeWithMD5AndDES_CBC                73
+#define NID_pbeWithMD5AndDES_CBC                10
 #define OBJ_pbeWithMD5AndDES_CBC                OBJ_pkcs5,3L
 
 #define SN_pbeWithMD2AndRC2_CBC         "PBE-MD2-RC2-64"
 #define LN_pbeWithMD2AndRC2_CBC         "pbeWithMD2AndRC2-CBC"
-#define NID_pbeWithMD2AndRC2_CBC                74
+#define NID_pbeWithMD2AndRC2_CBC                165
 #define OBJ_pbeWithMD2AndRC2_CBC                OBJ_pkcs5,4L
 
 #define SN_pbeWithMD5AndRC2_CBC         "PBE-MD5-RC2-64"
 #define LN_pbeWithMD5AndRC2_CBC         "pbeWithMD5AndRC2-CBC"
-#define NID_pbeWithMD5AndRC2_CBC                75
+#define NID_pbeWithMD5AndRC2_CBC                166
 #define OBJ_pbeWithMD5AndRC2_CBC                OBJ_pkcs5,6L
 
 #define SN_pbeWithSHA1AndDES_CBC                "PBE-SHA1-DES"
 #define LN_pbeWithSHA1AndDES_CBC                "pbeWithSHA1AndDES-CBC"
-#define NID_pbeWithSHA1AndDES_CBC               76
+#define NID_pbeWithSHA1AndDES_CBC               167
 #define OBJ_pbeWithSHA1AndDES_CBC               OBJ_pkcs5,10L
 
 #define SN_pbeWithSHA1AndRC2_CBC                "PBE-SHA1-RC2-64"
 #define LN_pbeWithSHA1AndRC2_CBC                "pbeWithSHA1AndRC2-CBC"
-#define NID_pbeWithSHA1AndRC2_CBC               77
+#define NID_pbeWithSHA1AndRC2_CBC               68
 #define OBJ_pbeWithSHA1AndRC2_CBC               OBJ_pkcs5,11L
 
 #define LN_id_pbkdf2            "PBKDF2"
-#define NID_id_pbkdf2           78
+#define NID_id_pbkdf2           69
 #define OBJ_id_pbkdf2           OBJ_pkcs5,12L
 
 #define LN_pbes2                "PBES2"
-#define NID_pbes2               79
+#define NID_pbes2               158
 #define OBJ_pbes2               OBJ_pkcs5,13L
 
 #define LN_pbmac1               "PBMAC1"
-#define NID_pbmac1              80
+#define NID_pbmac1              159
 #define OBJ_pbmac1              OBJ_pkcs5,14L
 
 #define SN_pkcs7                "pkcs7"
-#define NID_pkcs7               81
+#define NID_pkcs7               20
 #define OBJ_pkcs7               OBJ_pkcs,7L
 
 #define LN_pkcs7_data           "pkcs7-data"
-#define NID_pkcs7_data          82
+#define NID_pkcs7_data          21
 #define OBJ_pkcs7_data          OBJ_pkcs7,1L
 
 #define LN_pkcs7_signed         "pkcs7-signedData"
-#define NID_pkcs7_signed                83
+#define NID_pkcs7_signed                22
 #define OBJ_pkcs7_signed                OBJ_pkcs7,2L
 
 #define LN_pkcs7_enveloped              "pkcs7-envelopedData"
-#define NID_pkcs7_enveloped             84
+#define NID_pkcs7_enveloped             23
 #define OBJ_pkcs7_enveloped             OBJ_pkcs7,3L
 
 #define LN_pkcs7_signedAndEnveloped             "pkcs7-signedAndEnvelopedData"
-#define NID_pkcs7_signedAndEnveloped            85
+#define NID_pkcs7_signedAndEnveloped            24
 #define OBJ_pkcs7_signedAndEnveloped            OBJ_pkcs7,4L
 
 #define LN_pkcs7_digest         "pkcs7-digestData"
-#define NID_pkcs7_digest                86
+#define NID_pkcs7_digest                25
 #define OBJ_pkcs7_digest                OBJ_pkcs7,5L
 
 #define LN_pkcs7_encrypted              "pkcs7-encryptedData"
-#define NID_pkcs7_encrypted             87
+#define NID_pkcs7_encrypted             26
 #define OBJ_pkcs7_encrypted             OBJ_pkcs7,6L
 
 #define SN_pkcs9                "pkcs9"
-#define NID_pkcs9               88
+#define NID_pkcs9               47
 #define OBJ_pkcs9               OBJ_pkcs,9L
 
 #define LN_pkcs9_emailAddress           "emailAddress"
-#define NID_pkcs9_emailAddress          89
+#define NID_pkcs9_emailAddress          48
 #define OBJ_pkcs9_emailAddress          OBJ_pkcs9,1L
 
 #define LN_pkcs9_unstructuredName               "unstructuredName"
-#define NID_pkcs9_unstructuredName              90
+#define NID_pkcs9_unstructuredName              49
 #define OBJ_pkcs9_unstructuredName              OBJ_pkcs9,2L
 
 #define LN_pkcs9_contentType            "contentType"
-#define NID_pkcs9_contentType           91
+#define NID_pkcs9_contentType           50
 #define OBJ_pkcs9_contentType           OBJ_pkcs9,3L
 
 #define LN_pkcs9_messageDigest          "messageDigest"
-#define NID_pkcs9_messageDigest         92
+#define NID_pkcs9_messageDigest         51
 #define OBJ_pkcs9_messageDigest         OBJ_pkcs9,4L
 
 #define LN_pkcs9_signingTime            "signingTime"
-#define NID_pkcs9_signingTime           93
+#define NID_pkcs9_signingTime           52
 #define OBJ_pkcs9_signingTime           OBJ_pkcs9,5L
 
 #define LN_pkcs9_countersignature               "countersignature"
-#define NID_pkcs9_countersignature              94
+#define NID_pkcs9_countersignature              53
 #define OBJ_pkcs9_countersignature              OBJ_pkcs9,6L
 
 #define LN_pkcs9_challengePassword              "challengePassword"
-#define NID_pkcs9_challengePassword             95
+#define NID_pkcs9_challengePassword             54
 #define OBJ_pkcs9_challengePassword             OBJ_pkcs9,7L
 
 #define LN_pkcs9_unstructuredAddress            "unstructuredAddress"
-#define NID_pkcs9_unstructuredAddress           96
+#define NID_pkcs9_unstructuredAddress           55
 #define OBJ_pkcs9_unstructuredAddress           OBJ_pkcs9,8L
 
 #define LN_pkcs9_extCertAttributes              "extendedCertificateAttributes"
-#define NID_pkcs9_extCertAttributes             97
+#define NID_pkcs9_extCertAttributes             56
 #define OBJ_pkcs9_extCertAttributes             OBJ_pkcs9,9L
 
 #define SN_ext_req              "extReq"
 #define LN_ext_req              "Extension Request"
-#define NID_ext_req             98
+#define NID_ext_req             169
 #define OBJ_ext_req             OBJ_pkcs9,14L
 
 #define SN_SMIMECapabilities            "SMIME-CAPS"
 #define LN_SMIMECapabilities            "S/MIME Capabilities"
-#define NID_SMIMECapabilities           99
+#define NID_SMIMECapabilities           164
 #define OBJ_SMIMECapabilities           OBJ_pkcs9,15L
 
 #define SN_SMIME                "SMIME"
 #define LN_SMIME                "S/MIME"
-#define NID_SMIME               100
+#define NID_SMIME               185
 #define OBJ_SMIME               OBJ_pkcs9,16L
 
 #define SN_id_smime_mod         "id-smime-mod"
-#define NID_id_smime_mod                101
+#define NID_id_smime_mod                186
 #define OBJ_id_smime_mod                OBJ_SMIME,0L
 
 #define SN_id_smime_ct          "id-smime-ct"
-#define NID_id_smime_ct         102
+#define NID_id_smime_ct         187
 #define OBJ_id_smime_ct         OBJ_SMIME,1L
 
 #define SN_id_smime_aa          "id-smime-aa"
-#define NID_id_smime_aa         103
+#define NID_id_smime_aa         188
 #define OBJ_id_smime_aa         OBJ_SMIME,2L
 
 #define SN_id_smime_alg         "id-smime-alg"
-#define NID_id_smime_alg                104
+#define NID_id_smime_alg                189
 #define OBJ_id_smime_alg                OBJ_SMIME,3L
 
 #define SN_id_smime_cd          "id-smime-cd"
-#define NID_id_smime_cd         105
+#define NID_id_smime_cd         190
 #define OBJ_id_smime_cd         OBJ_SMIME,4L
 
 #define SN_id_smime_spq         "id-smime-spq"
-#define NID_id_smime_spq                106
+#define NID_id_smime_spq                191
 #define OBJ_id_smime_spq                OBJ_SMIME,5L
 
 #define SN_id_smime_cti         "id-smime-cti"
-#define NID_id_smime_cti                107
+#define NID_id_smime_cti                192
 #define OBJ_id_smime_cti                OBJ_SMIME,6L
 
 #define SN_id_smime_mod_cms             "id-smime-mod-cms"
-#define NID_id_smime_mod_cms            108
+#define NID_id_smime_mod_cms            193
 #define OBJ_id_smime_mod_cms            OBJ_id_smime_mod,1L
 
 #define SN_id_smime_mod_ess             "id-smime-mod-ess"
-#define NID_id_smime_mod_ess            109
+#define NID_id_smime_mod_ess            194
 #define OBJ_id_smime_mod_ess            OBJ_id_smime_mod,2L
 
 #define SN_id_smime_mod_oid             "id-smime-mod-oid"
-#define NID_id_smime_mod_oid            110
+#define NID_id_smime_mod_oid            195
 #define OBJ_id_smime_mod_oid            OBJ_id_smime_mod,3L
 
 #define SN_id_smime_mod_msg_v3          "id-smime-mod-msg-v3"
-#define NID_id_smime_mod_msg_v3         111
+#define NID_id_smime_mod_msg_v3         196
 #define OBJ_id_smime_mod_msg_v3         OBJ_id_smime_mod,4L
 
 #define SN_id_smime_mod_ets_eSignature_88               "id-smime-mod-ets-eSignature-88"
-#define NID_id_smime_mod_ets_eSignature_88              112
+#define NID_id_smime_mod_ets_eSignature_88              197
 #define OBJ_id_smime_mod_ets_eSignature_88              OBJ_id_smime_mod,5L
 
 #define SN_id_smime_mod_ets_eSignature_97               "id-smime-mod-ets-eSignature-97"
-#define NID_id_smime_mod_ets_eSignature_97              113
+#define NID_id_smime_mod_ets_eSignature_97              198
 #define OBJ_id_smime_mod_ets_eSignature_97              OBJ_id_smime_mod,6L
 
 #define SN_id_smime_mod_ets_eSigPolicy_88               "id-smime-mod-ets-eSigPolicy-88"
-#define NID_id_smime_mod_ets_eSigPolicy_88              114
+#define NID_id_smime_mod_ets_eSigPolicy_88              199
 #define OBJ_id_smime_mod_ets_eSigPolicy_88              OBJ_id_smime_mod,7L
 
 #define SN_id_smime_mod_ets_eSigPolicy_97               "id-smime-mod-ets-eSigPolicy-97"
-#define NID_id_smime_mod_ets_eSigPolicy_97              115
+#define NID_id_smime_mod_ets_eSigPolicy_97              200
 #define OBJ_id_smime_mod_ets_eSigPolicy_97              OBJ_id_smime_mod,8L
 
 #define SN_id_smime_ct_receipt          "id-smime-ct-receipt"
-#define NID_id_smime_ct_receipt         116
+#define NID_id_smime_ct_receipt         201
 #define OBJ_id_smime_ct_receipt         OBJ_id_smime_ct,1L
 
 #define SN_id_smime_ct_authData         "id-smime-ct-authData"
-#define NID_id_smime_ct_authData                117
+#define NID_id_smime_ct_authData                202
 #define OBJ_id_smime_ct_authData                OBJ_id_smime_ct,2L
 
 #define SN_id_smime_ct_publishCert              "id-smime-ct-publishCert"
-#define NID_id_smime_ct_publishCert             118
+#define NID_id_smime_ct_publishCert             203
 #define OBJ_id_smime_ct_publishCert             OBJ_id_smime_ct,3L
 
 #define SN_id_smime_ct_TSTInfo          "id-smime-ct-TSTInfo"
-#define NID_id_smime_ct_TSTInfo         119
+#define NID_id_smime_ct_TSTInfo         204
 #define OBJ_id_smime_ct_TSTInfo         OBJ_id_smime_ct,4L
 
 #define SN_id_smime_ct_TDTInfo          "id-smime-ct-TDTInfo"
-#define NID_id_smime_ct_TDTInfo         120
+#define NID_id_smime_ct_TDTInfo         205
 #define OBJ_id_smime_ct_TDTInfo         OBJ_id_smime_ct,5L
 
 #define SN_id_smime_ct_contentInfo              "id-smime-ct-contentInfo"
-#define NID_id_smime_ct_contentInfo             121
+#define NID_id_smime_ct_contentInfo             206
 #define OBJ_id_smime_ct_contentInfo             OBJ_id_smime_ct,6L
 
 #define SN_id_smime_ct_DVCSRequestData          "id-smime-ct-DVCSRequestData"
-#define NID_id_smime_ct_DVCSRequestData         122
+#define NID_id_smime_ct_DVCSRequestData         207
 #define OBJ_id_smime_ct_DVCSRequestData         OBJ_id_smime_ct,7L
 
 #define SN_id_smime_ct_DVCSResponseData         "id-smime-ct-DVCSResponseData"
-#define NID_id_smime_ct_DVCSResponseData                123
+#define NID_id_smime_ct_DVCSResponseData                208
 #define OBJ_id_smime_ct_DVCSResponseData                OBJ_id_smime_ct,8L
 
 #define SN_id_smime_ct_compressedData           "id-smime-ct-compressedData"
-#define NID_id_smime_ct_compressedData          124
+#define NID_id_smime_ct_compressedData          437
 #define OBJ_id_smime_ct_compressedData          OBJ_id_smime_ct,9L
 
 #define SN_id_smime_ct_contentCollection                "id-smime-ct-contentCollection"
-#define NID_id_smime_ct_contentCollection               125
+#define NID_id_smime_ct_contentCollection               601
 #define OBJ_id_smime_ct_contentCollection               OBJ_id_smime_ct,19L
 
 #define SN_id_smime_ct_authEnvelopedData                "id-smime-ct-authEnvelopedData"
-#define NID_id_smime_ct_authEnvelopedData               126
+#define NID_id_smime_ct_authEnvelopedData               602
 #define OBJ_id_smime_ct_authEnvelopedData               OBJ_id_smime_ct,23L
 
 #define SN_id_ct_routeOriginAuthz               "id-ct-routeOriginAuthz"
-#define NID_id_ct_routeOriginAuthz              127
+#define NID_id_ct_routeOriginAuthz              686
 #define OBJ_id_ct_routeOriginAuthz              OBJ_id_smime_ct,24L
 
 #define SN_id_ct_rpkiManifest           "id-ct-rpkiManifest"
-#define NID_id_ct_rpkiManifest          128
+#define NID_id_ct_rpkiManifest          687
 #define OBJ_id_ct_rpkiManifest          OBJ_id_smime_ct,26L
 
 #define SN_id_ct_asciiTextWithCRLF              "id-ct-asciiTextWithCRLF"
-#define NID_id_ct_asciiTextWithCRLF             129
+#define NID_id_ct_asciiTextWithCRLF             438
 #define OBJ_id_ct_asciiTextWithCRLF             OBJ_id_smime_ct,27L
 
 #define SN_id_ct_xml            "id-ct-xml"
-#define NID_id_ct_xml           130
+#define NID_id_ct_xml           603
 #define OBJ_id_ct_xml           OBJ_id_smime_ct,28L
 
 #define SN_id_ct_rpkiGhostbusters               "id-ct-rpkiGhostbusters"
-#define NID_id_ct_rpkiGhostbusters              131
+#define NID_id_ct_rpkiGhostbusters              688
 #define OBJ_id_ct_rpkiGhostbusters              OBJ_id_smime_ct,35L
 
 #define SN_id_ct_resourceTaggedAttest           "id-ct-resourceTaggedAttest"
-#define NID_id_ct_resourceTaggedAttest          132
+#define NID_id_ct_resourceTaggedAttest          689
 #define OBJ_id_ct_resourceTaggedAttest          OBJ_id_smime_ct,36L
 
 #define SN_id_ct_geofeedCSVwithCRLF             "id-ct-geofeedCSVwithCRLF"
-#define NID_id_ct_geofeedCSVwithCRLF            133
+#define NID_id_ct_geofeedCSVwithCRLF            696
 #define OBJ_id_ct_geofeedCSVwithCRLF            OBJ_id_smime_ct,47L
 
 #define SN_id_ct_signedChecklist                "id-ct-signedChecklist"
-#define NID_id_ct_signedChecklist               134
+#define NID_id_ct_signedChecklist               697
 #define OBJ_id_ct_signedChecklist               OBJ_id_smime_ct,48L
 
 #define SN_id_smime_aa_receiptRequest           "id-smime-aa-receiptRequest"
-#define NID_id_smime_aa_receiptRequest          135
+#define NID_id_smime_aa_receiptRequest          209
 #define OBJ_id_smime_aa_receiptRequest          OBJ_id_smime_aa,1L
 
 #define SN_id_smime_aa_securityLabel            "id-smime-aa-securityLabel"
-#define NID_id_smime_aa_securityLabel           136
+#define NID_id_smime_aa_securityLabel           210
 #define OBJ_id_smime_aa_securityLabel           OBJ_id_smime_aa,2L
 
 #define SN_id_smime_aa_mlExpandHistory          "id-smime-aa-mlExpandHistory"
-#define NID_id_smime_aa_mlExpandHistory         137
+#define NID_id_smime_aa_mlExpandHistory         211
 #define OBJ_id_smime_aa_mlExpandHistory         OBJ_id_smime_aa,3L
 
 #define SN_id_smime_aa_contentHint              "id-smime-aa-contentHint"
-#define NID_id_smime_aa_contentHint             138
+#define NID_id_smime_aa_contentHint             212
 #define OBJ_id_smime_aa_contentHint             OBJ_id_smime_aa,4L
 
 #define SN_id_smime_aa_msgSigDigest             "id-smime-aa-msgSigDigest"
-#define NID_id_smime_aa_msgSigDigest            139
+#define NID_id_smime_aa_msgSigDigest            213
 #define OBJ_id_smime_aa_msgSigDigest            OBJ_id_smime_aa,5L
 
 #define SN_id_smime_aa_encapContentType         "id-smime-aa-encapContentType"
-#define NID_id_smime_aa_encapContentType                140
+#define NID_id_smime_aa_encapContentType                214
 #define OBJ_id_smime_aa_encapContentType                OBJ_id_smime_aa,6L
 
 #define SN_id_smime_aa_contentIdentifier                "id-smime-aa-contentIdentifier"
-#define NID_id_smime_aa_contentIdentifier               141
+#define NID_id_smime_aa_contentIdentifier               215
 #define OBJ_id_smime_aa_contentIdentifier               OBJ_id_smime_aa,7L
 
 #define SN_id_smime_aa_macValue         "id-smime-aa-macValue"
-#define NID_id_smime_aa_macValue                142
+#define NID_id_smime_aa_macValue                216
 #define OBJ_id_smime_aa_macValue                OBJ_id_smime_aa,8L
 
 #define SN_id_smime_aa_equivalentLabels         "id-smime-aa-equivalentLabels"
-#define NID_id_smime_aa_equivalentLabels                143
+#define NID_id_smime_aa_equivalentLabels                217
 #define OBJ_id_smime_aa_equivalentLabels                OBJ_id_smime_aa,9L
 
 #define SN_id_smime_aa_contentReference         "id-smime-aa-contentReference"
-#define NID_id_smime_aa_contentReference                144
+#define NID_id_smime_aa_contentReference                218
 #define OBJ_id_smime_aa_contentReference                OBJ_id_smime_aa,10L
 
 #define SN_id_smime_aa_encrypKeyPref            "id-smime-aa-encrypKeyPref"
-#define NID_id_smime_aa_encrypKeyPref           145
+#define NID_id_smime_aa_encrypKeyPref           219
 #define OBJ_id_smime_aa_encrypKeyPref           OBJ_id_smime_aa,11L
 
 #define SN_id_smime_aa_signingCertificate               "id-smime-aa-signingCertificate"
-#define NID_id_smime_aa_signingCertificate              146
+#define NID_id_smime_aa_signingCertificate              220
 #define OBJ_id_smime_aa_signingCertificate              OBJ_id_smime_aa,12L
 
 #define SN_id_smime_aa_smimeEncryptCerts                "id-smime-aa-smimeEncryptCerts"
-#define NID_id_smime_aa_smimeEncryptCerts               147
+#define NID_id_smime_aa_smimeEncryptCerts               221
 #define OBJ_id_smime_aa_smimeEncryptCerts               OBJ_id_smime_aa,13L
 
 #define SN_id_smime_aa_timeStampToken           "id-smime-aa-timeStampToken"
-#define NID_id_smime_aa_timeStampToken          148
+#define NID_id_smime_aa_timeStampToken          222
 #define OBJ_id_smime_aa_timeStampToken          OBJ_id_smime_aa,14L
 
 #define SN_id_smime_aa_ets_sigPolicyId          "id-smime-aa-ets-sigPolicyId"
-#define NID_id_smime_aa_ets_sigPolicyId         149
+#define NID_id_smime_aa_ets_sigPolicyId         223
 #define OBJ_id_smime_aa_ets_sigPolicyId         OBJ_id_smime_aa,15L
 
 #define SN_id_smime_aa_ets_commitmentType               "id-smime-aa-ets-commitmentType"
-#define NID_id_smime_aa_ets_commitmentType              150
+#define NID_id_smime_aa_ets_commitmentType              224
 #define OBJ_id_smime_aa_ets_commitmentType              OBJ_id_smime_aa,16L
 
 #define SN_id_smime_aa_ets_signerLocation               "id-smime-aa-ets-signerLocation"
-#define NID_id_smime_aa_ets_signerLocation              151
+#define NID_id_smime_aa_ets_signerLocation              225
 #define OBJ_id_smime_aa_ets_signerLocation              OBJ_id_smime_aa,17L
 
 #define SN_id_smime_aa_ets_signerAttr           "id-smime-aa-ets-signerAttr"
-#define NID_id_smime_aa_ets_signerAttr          152
+#define NID_id_smime_aa_ets_signerAttr          226
 #define OBJ_id_smime_aa_ets_signerAttr          OBJ_id_smime_aa,18L
 
 #define SN_id_smime_aa_ets_otherSigCert         "id-smime-aa-ets-otherSigCert"
-#define NID_id_smime_aa_ets_otherSigCert                153
+#define NID_id_smime_aa_ets_otherSigCert                227
 #define OBJ_id_smime_aa_ets_otherSigCert                OBJ_id_smime_aa,19L
 
 #define SN_id_smime_aa_ets_contentTimestamp             "id-smime-aa-ets-contentTimestamp"
-#define NID_id_smime_aa_ets_contentTimestamp            154
+#define NID_id_smime_aa_ets_contentTimestamp            228
 #define OBJ_id_smime_aa_ets_contentTimestamp            OBJ_id_smime_aa,20L
 
 #define SN_id_smime_aa_ets_CertificateRefs              "id-smime-aa-ets-CertificateRefs"
-#define NID_id_smime_aa_ets_CertificateRefs             155
+#define NID_id_smime_aa_ets_CertificateRefs             229
 #define OBJ_id_smime_aa_ets_CertificateRefs             OBJ_id_smime_aa,21L
 
 #define SN_id_smime_aa_ets_RevocationRefs               "id-smime-aa-ets-RevocationRefs"
-#define NID_id_smime_aa_ets_RevocationRefs              156
+#define NID_id_smime_aa_ets_RevocationRefs              230
 #define OBJ_id_smime_aa_ets_RevocationRefs              OBJ_id_smime_aa,22L
 
 #define SN_id_smime_aa_ets_certValues           "id-smime-aa-ets-certValues"
-#define NID_id_smime_aa_ets_certValues          157
+#define NID_id_smime_aa_ets_certValues          231
 #define OBJ_id_smime_aa_ets_certValues          OBJ_id_smime_aa,23L
 
 #define SN_id_smime_aa_ets_revocationValues             "id-smime-aa-ets-revocationValues"
-#define NID_id_smime_aa_ets_revocationValues            158
+#define NID_id_smime_aa_ets_revocationValues            232
 #define OBJ_id_smime_aa_ets_revocationValues            OBJ_id_smime_aa,24L
 
 #define SN_id_smime_aa_ets_escTimeStamp         "id-smime-aa-ets-escTimeStamp"
-#define NID_id_smime_aa_ets_escTimeStamp                159
+#define NID_id_smime_aa_ets_escTimeStamp                233
 #define OBJ_id_smime_aa_ets_escTimeStamp                OBJ_id_smime_aa,25L
 
 #define SN_id_smime_aa_ets_certCRLTimestamp             "id-smime-aa-ets-certCRLTimestamp"
-#define NID_id_smime_aa_ets_certCRLTimestamp            160
+#define NID_id_smime_aa_ets_certCRLTimestamp            234
 #define OBJ_id_smime_aa_ets_certCRLTimestamp            OBJ_id_smime_aa,26L
 
 #define SN_id_smime_aa_ets_archiveTimeStamp             "id-smime-aa-ets-archiveTimeStamp"
-#define NID_id_smime_aa_ets_archiveTimeStamp            161
+#define NID_id_smime_aa_ets_archiveTimeStamp            235
 #define OBJ_id_smime_aa_ets_archiveTimeStamp            OBJ_id_smime_aa,27L
 
 #define SN_id_smime_aa_signatureType            "id-smime-aa-signatureType"
-#define NID_id_smime_aa_signatureType           162
+#define NID_id_smime_aa_signatureType           236
 #define OBJ_id_smime_aa_signatureType           OBJ_id_smime_aa,28L
 
 #define SN_id_smime_aa_dvcs_dvc         "id-smime-aa-dvcs-dvc"
-#define NID_id_smime_aa_dvcs_dvc                163
+#define NID_id_smime_aa_dvcs_dvc                237
 #define OBJ_id_smime_aa_dvcs_dvc                OBJ_id_smime_aa,29L
 
 #define SN_id_smime_aa_signingCertificateV2             "id-smime-aa-signingCertificateV2"
-#define NID_id_smime_aa_signingCertificateV2            164
+#define NID_id_smime_aa_signingCertificateV2            608
 #define OBJ_id_smime_aa_signingCertificateV2            OBJ_id_smime_aa,47L
 
 #define SN_id_smime_alg_ESDHwith3DES            "id-smime-alg-ESDHwith3DES"
-#define NID_id_smime_alg_ESDHwith3DES           165
+#define NID_id_smime_alg_ESDHwith3DES           238
 #define OBJ_id_smime_alg_ESDHwith3DES           OBJ_id_smime_alg,1L
 
 #define SN_id_smime_alg_ESDHwithRC2             "id-smime-alg-ESDHwithRC2"
-#define NID_id_smime_alg_ESDHwithRC2            166
+#define NID_id_smime_alg_ESDHwithRC2            239
 #define OBJ_id_smime_alg_ESDHwithRC2            OBJ_id_smime_alg,2L
 
 #define SN_id_smime_alg_3DESwrap                "id-smime-alg-3DESwrap"
-#define NID_id_smime_alg_3DESwrap               167
+#define NID_id_smime_alg_3DESwrap               240
 #define OBJ_id_smime_alg_3DESwrap               OBJ_id_smime_alg,3L
 
 #define SN_id_smime_alg_RC2wrap         "id-smime-alg-RC2wrap"
-#define NID_id_smime_alg_RC2wrap                168
+#define NID_id_smime_alg_RC2wrap                241
 #define OBJ_id_smime_alg_RC2wrap                OBJ_id_smime_alg,4L
 
 #define SN_id_smime_alg_ESDH            "id-smime-alg-ESDH"
-#define NID_id_smime_alg_ESDH           169
+#define NID_id_smime_alg_ESDH           242
 #define OBJ_id_smime_alg_ESDH           OBJ_id_smime_alg,5L
 
 #define SN_id_smime_alg_CMS3DESwrap             "id-smime-alg-CMS3DESwrap"
-#define NID_id_smime_alg_CMS3DESwrap            170
+#define NID_id_smime_alg_CMS3DESwrap            243
 #define OBJ_id_smime_alg_CMS3DESwrap            OBJ_id_smime_alg,6L
 
 #define SN_id_smime_alg_CMSRC2wrap              "id-smime-alg-CMSRC2wrap"
-#define NID_id_smime_alg_CMSRC2wrap             171
+#define NID_id_smime_alg_CMSRC2wrap             244
 #define OBJ_id_smime_alg_CMSRC2wrap             OBJ_id_smime_alg,7L
 
 #define SN_id_alg_PWRI_KEK              "id-alg-PWRI-KEK"
-#define NID_id_alg_PWRI_KEK             172
+#define NID_id_alg_PWRI_KEK             499
 #define OBJ_id_alg_PWRI_KEK             OBJ_id_smime_alg,9L
 
 #define SN_id_smime_cd_ldap             "id-smime-cd-ldap"
-#define NID_id_smime_cd_ldap            173
+#define NID_id_smime_cd_ldap            245
 #define OBJ_id_smime_cd_ldap            OBJ_id_smime_cd,1L
 
 #define SN_id_smime_spq_ets_sqt_uri             "id-smime-spq-ets-sqt-uri"
-#define NID_id_smime_spq_ets_sqt_uri            174
+#define NID_id_smime_spq_ets_sqt_uri            246
 #define OBJ_id_smime_spq_ets_sqt_uri            OBJ_id_smime_spq,1L
 
 #define SN_id_smime_spq_ets_sqt_unotice         "id-smime-spq-ets-sqt-unotice"
-#define NID_id_smime_spq_ets_sqt_unotice                175
+#define NID_id_smime_spq_ets_sqt_unotice                247
 #define OBJ_id_smime_spq_ets_sqt_unotice                OBJ_id_smime_spq,2L
 
 #define SN_id_smime_cti_ets_proofOfOrigin               "id-smime-cti-ets-proofOfOrigin"
-#define NID_id_smime_cti_ets_proofOfOrigin              176
+#define NID_id_smime_cti_ets_proofOfOrigin              248
 #define OBJ_id_smime_cti_ets_proofOfOrigin              OBJ_id_smime_cti,1L
 
 #define SN_id_smime_cti_ets_proofOfReceipt              "id-smime-cti-ets-proofOfReceipt"
-#define NID_id_smime_cti_ets_proofOfReceipt             177
+#define NID_id_smime_cti_ets_proofOfReceipt             249
 #define OBJ_id_smime_cti_ets_proofOfReceipt             OBJ_id_smime_cti,2L
 
 #define SN_id_smime_cti_ets_proofOfDelivery             "id-smime-cti-ets-proofOfDelivery"
-#define NID_id_smime_cti_ets_proofOfDelivery            178
+#define NID_id_smime_cti_ets_proofOfDelivery            250
 #define OBJ_id_smime_cti_ets_proofOfDelivery            OBJ_id_smime_cti,3L
 
 #define SN_id_smime_cti_ets_proofOfSender               "id-smime-cti-ets-proofOfSender"
-#define NID_id_smime_cti_ets_proofOfSender              179
+#define NID_id_smime_cti_ets_proofOfSender              251
 #define OBJ_id_smime_cti_ets_proofOfSender              OBJ_id_smime_cti,4L
 
 #define SN_id_smime_cti_ets_proofOfApproval             "id-smime-cti-ets-proofOfApproval"
-#define NID_id_smime_cti_ets_proofOfApproval            180
+#define NID_id_smime_cti_ets_proofOfApproval            252
 #define OBJ_id_smime_cti_ets_proofOfApproval            OBJ_id_smime_cti,5L
 
 #define SN_id_smime_cti_ets_proofOfCreation             "id-smime-cti-ets-proofOfCreation"
-#define NID_id_smime_cti_ets_proofOfCreation            181
+#define NID_id_smime_cti_ets_proofOfCreation            253
 #define OBJ_id_smime_cti_ets_proofOfCreation            OBJ_id_smime_cti,6L
 
 #define LN_friendlyName         "friendlyName"
-#define NID_friendlyName                182
+#define NID_friendlyName                153
 #define OBJ_friendlyName                OBJ_pkcs9,20L
 
 #define LN_localKeyID           "localKeyID"
-#define NID_localKeyID          183
+#define NID_localKeyID          154
 #define OBJ_localKeyID          OBJ_pkcs9,21L
 
 #define SN_ms_csp_name          "CSPName"
 #define LN_ms_csp_name          "Microsoft CSP Name"
-#define NID_ms_csp_name         184
+#define NID_ms_csp_name         349
 #define OBJ_ms_csp_name         1L,3L,6L,1L,4L,1L,311L,17L,1L
 
 #define SN_LocalKeySet          "LocalKeySet"
 #define LN_LocalKeySet          "Microsoft Local Key set"
-#define NID_LocalKeySet         185
+#define NID_LocalKeySet         462
 #define OBJ_LocalKeySet         1L,3L,6L,1L,4L,1L,311L,17L,2L
 
 #define OBJ_certTypes           OBJ_pkcs9,22L
 
 #define LN_x509Certificate              "x509Certificate"
-#define NID_x509Certificate             186
+#define NID_x509Certificate             155
 #define OBJ_x509Certificate             OBJ_certTypes,1L
 
 #define LN_sdsiCertificate              "sdsiCertificate"
-#define NID_sdsiCertificate             187
+#define NID_sdsiCertificate             156
 #define OBJ_sdsiCertificate             OBJ_certTypes,2L
 
 #define OBJ_crlTypes            OBJ_pkcs9,23L
 
 #define LN_x509Crl              "x509Crl"
-#define NID_x509Crl             188
+#define NID_x509Crl             157
 #define OBJ_x509Crl             OBJ_crlTypes,1L
 
 #define OBJ_pkcs12              OBJ_pkcs,12L
@@ -844,32 +844,32 @@
 
 #define SN_pbe_WithSHA1And128BitRC4             "PBE-SHA1-RC4-128"
 #define LN_pbe_WithSHA1And128BitRC4             "pbeWithSHA1And128BitRC4"
-#define NID_pbe_WithSHA1And128BitRC4            189
+#define NID_pbe_WithSHA1And128BitRC4            141
 #define OBJ_pbe_WithSHA1And128BitRC4            OBJ_pkcs12_pbeids,1L
 
 #define SN_pbe_WithSHA1And40BitRC4              "PBE-SHA1-RC4-40"
 #define LN_pbe_WithSHA1And40BitRC4              "pbeWithSHA1And40BitRC4"
-#define NID_pbe_WithSHA1And40BitRC4             190
+#define NID_pbe_WithSHA1And40BitRC4             142
 #define OBJ_pbe_WithSHA1And40BitRC4             OBJ_pkcs12_pbeids,2L
 
 #define SN_pbe_WithSHA1And3_Key_TripleDES_CBC           "PBE-SHA1-3DES"
 #define LN_pbe_WithSHA1And3_Key_TripleDES_CBC           "pbeWithSHA1And3-KeyTripleDES-CBC"
-#define NID_pbe_WithSHA1And3_Key_TripleDES_CBC          191
+#define NID_pbe_WithSHA1And3_Key_TripleDES_CBC          143
 #define OBJ_pbe_WithSHA1And3_Key_TripleDES_CBC          OBJ_pkcs12_pbeids,3L
 
 #define SN_pbe_WithSHA1And2_Key_TripleDES_CBC           "PBE-SHA1-2DES"
 #define LN_pbe_WithSHA1And2_Key_TripleDES_CBC           "pbeWithSHA1And2-KeyTripleDES-CBC"
-#define NID_pbe_WithSHA1And2_Key_TripleDES_CBC          192
+#define NID_pbe_WithSHA1And2_Key_TripleDES_CBC          144
 #define OBJ_pbe_WithSHA1And2_Key_TripleDES_CBC          OBJ_pkcs12_pbeids,4L
 
 #define SN_pbe_WithSHA1And128BitRC2_CBC         "PBE-SHA1-RC2-128"
 #define LN_pbe_WithSHA1And128BitRC2_CBC         "pbeWithSHA1And128BitRC2-CBC"
-#define NID_pbe_WithSHA1And128BitRC2_CBC                193
+#define NID_pbe_WithSHA1And128BitRC2_CBC                145
 #define OBJ_pbe_WithSHA1And128BitRC2_CBC                OBJ_pkcs12_pbeids,5L
 
 #define SN_pbe_WithSHA1And40BitRC2_CBC          "PBE-SHA1-RC2-40"
 #define LN_pbe_WithSHA1And40BitRC2_CBC          "pbeWithSHA1And40BitRC2-CBC"
-#define NID_pbe_WithSHA1And40BitRC2_CBC         194
+#define NID_pbe_WithSHA1And40BitRC2_CBC         146
 #define OBJ_pbe_WithSHA1And40BitRC2_CBC         OBJ_pkcs12_pbeids,6L
 
 #define OBJ_pkcs12_Version1             OBJ_pkcs12,10L
@@ -877,1447 +877,1447 @@
 #define OBJ_pkcs12_BagIds               OBJ_pkcs12_Version1,1L
 
 #define LN_keyBag               "keyBag"
-#define NID_keyBag              195
+#define NID_keyBag              147
 #define OBJ_keyBag              OBJ_pkcs12_BagIds,1L
 
 #define LN_pkcs8ShroudedKeyBag          "pkcs8ShroudedKeyBag"
-#define NID_pkcs8ShroudedKeyBag         196
+#define NID_pkcs8ShroudedKeyBag         148
 #define OBJ_pkcs8ShroudedKeyBag         OBJ_pkcs12_BagIds,2L
 
 #define LN_certBag              "certBag"
-#define NID_certBag             197
+#define NID_certBag             149
 #define OBJ_certBag             OBJ_pkcs12_BagIds,3L
 
 #define LN_crlBag               "crlBag"
-#define NID_crlBag              198
+#define NID_crlBag              150
 #define OBJ_crlBag              OBJ_pkcs12_BagIds,4L
 
 #define LN_secretBag            "secretBag"
-#define NID_secretBag           199
+#define NID_secretBag           151
 #define OBJ_secretBag           OBJ_pkcs12_BagIds,5L
 
 #define LN_safeContentsBag              "safeContentsBag"
-#define NID_safeContentsBag             200
+#define NID_safeContentsBag             152
 #define OBJ_safeContentsBag             OBJ_pkcs12_BagIds,6L
 
 #define SN_md2          "MD2"
 #define LN_md2          "md2"
-#define NID_md2         201
+#define NID_md2         3
 #define OBJ_md2         OBJ_rsadsi,2L,2L
 
 #define SN_md4          "MD4"
 #define LN_md4          "md4"
-#define NID_md4         202
+#define NID_md4         254
 #define OBJ_md4         OBJ_rsadsi,2L,4L
 
 #define SN_md5          "MD5"
 #define LN_md5          "md5"
-#define NID_md5         203
+#define NID_md5         4
 #define OBJ_md5         OBJ_rsadsi,2L,5L
 
 #define SN_md5_sha1             "MD5-SHA1"
 #define LN_md5_sha1             "md5-sha1"
-#define NID_md5_sha1            204
+#define NID_md5_sha1            113
 
 #define LN_hmacWithMD5          "hmacWithMD5"
-#define NID_hmacWithMD5         205
+#define NID_hmacWithMD5         448
 #define OBJ_hmacWithMD5         OBJ_rsadsi,2L,6L
 
 #define LN_hmacWithSHA1         "hmacWithSHA1"
-#define NID_hmacWithSHA1                206
+#define NID_hmacWithSHA1                160
 #define OBJ_hmacWithSHA1                OBJ_rsadsi,2L,7L
 
 #define SN_sm2          "SM2"
 #define LN_sm2          "sm2"
-#define NID_sm2         207
+#define NID_sm2         658
 #define OBJ_sm2         OBJ_sm_scheme,301L
 
 #define SN_sm3          "SM3"
 #define LN_sm3          "sm3"
-#define NID_sm3         208
+#define NID_sm3         652
 #define OBJ_sm3         OBJ_sm_scheme,401L
 
 #define SN_sm3WithRSAEncryption         "RSA-SM3"
 #define LN_sm3WithRSAEncryption         "sm3WithRSAEncryption"
-#define NID_sm3WithRSAEncryption                209
+#define NID_sm3WithRSAEncryption                653
 #define OBJ_sm3WithRSAEncryption                OBJ_sm_scheme,504L
 
 #define SN_SM2_with_SM3         "SM2-SM3"
 #define LN_SM2_with_SM3         "SM2-with-SM3"
-#define NID_SM2_with_SM3                210
+#define NID_SM2_with_SM3                667
 #define OBJ_SM2_with_SM3                OBJ_sm_scheme,501L
 
 #define LN_hmacWithSHA224               "hmacWithSHA224"
-#define NID_hmacWithSHA224              211
+#define NID_hmacWithSHA224              449
 #define OBJ_hmacWithSHA224              OBJ_rsadsi,2L,8L
 
 #define LN_hmacWithSHA256               "hmacWithSHA256"
-#define NID_hmacWithSHA256              212
+#define NID_hmacWithSHA256              450
 #define OBJ_hmacWithSHA256              OBJ_rsadsi,2L,9L
 
 #define LN_hmacWithSHA384               "hmacWithSHA384"
-#define NID_hmacWithSHA384              213
+#define NID_hmacWithSHA384              451
 #define OBJ_hmacWithSHA384              OBJ_rsadsi,2L,10L
 
 #define LN_hmacWithSHA512               "hmacWithSHA512"
-#define NID_hmacWithSHA512              214
+#define NID_hmacWithSHA512              452
 #define OBJ_hmacWithSHA512              OBJ_rsadsi,2L,11L
 
 #define LN_hmacWithSHA512_224           "hmacWithSHA512-224"
-#define NID_hmacWithSHA512_224          215
+#define NID_hmacWithSHA512_224          659
 #define OBJ_hmacWithSHA512_224          OBJ_rsadsi,2L,12L
 
 #define LN_hmacWithSHA512_256           "hmacWithSHA512-256"
-#define NID_hmacWithSHA512_256          216
+#define NID_hmacWithSHA512_256          660
 #define OBJ_hmacWithSHA512_256          OBJ_rsadsi,2L,13L
 
 #define SN_rc2_cbc              "RC2-CBC"
 #define LN_rc2_cbc              "rc2-cbc"
-#define NID_rc2_cbc             217
+#define NID_rc2_cbc             37
 #define OBJ_rc2_cbc             OBJ_rsadsi,3L,2L
 
 #define SN_rc2_ecb              "RC2-ECB"
 #define LN_rc2_ecb              "rc2-ecb"
-#define NID_rc2_ecb             218
+#define NID_rc2_ecb             38
 
 #define SN_rc2_cfb64            "RC2-CFB"
 #define LN_rc2_cfb64            "rc2-cfb"
-#define NID_rc2_cfb64           219
+#define NID_rc2_cfb64           39
 
 #define SN_rc2_ofb64            "RC2-OFB"
 #define LN_rc2_ofb64            "rc2-ofb"
-#define NID_rc2_ofb64           220
+#define NID_rc2_ofb64           40
 
 #define SN_rc2_40_cbc           "RC2-40-CBC"
 #define LN_rc2_40_cbc           "rc2-40-cbc"
-#define NID_rc2_40_cbc          221
+#define NID_rc2_40_cbc          98
 
 #define SN_rc2_64_cbc           "RC2-64-CBC"
 #define LN_rc2_64_cbc           "rc2-64-cbc"
-#define NID_rc2_64_cbc          222
+#define NID_rc2_64_cbc          163
 
 #define SN_rc4          "RC4"
 #define LN_rc4          "rc4"
-#define NID_rc4         223
+#define NID_rc4         5
 #define OBJ_rc4         OBJ_rsadsi,3L,4L
 
 #define SN_rc4_40               "RC4-40"
 #define LN_rc4_40               "rc4-40"
-#define NID_rc4_40              224
+#define NID_rc4_40              97
 
 #define SN_des_ede3_cbc         "DES-EDE3-CBC"
 #define LN_des_ede3_cbc         "des-ede3-cbc"
-#define NID_des_ede3_cbc                225
+#define NID_des_ede3_cbc                44
 #define OBJ_des_ede3_cbc                OBJ_rsadsi,3L,7L
 
 #define SN_rc5_cbc              "RC5-CBC"
 #define LN_rc5_cbc              "rc5-cbc"
-#define NID_rc5_cbc             226
+#define NID_rc5_cbc             118
 #define OBJ_rc5_cbc             OBJ_rsadsi,3L,8L
 
 #define SN_rc5_ecb              "RC5-ECB"
 #define LN_rc5_ecb              "rc5-ecb"
-#define NID_rc5_ecb             227
+#define NID_rc5_ecb             119
 
 #define SN_rc5_cfb64            "RC5-CFB"
 #define LN_rc5_cfb64            "rc5-cfb"
-#define NID_rc5_cfb64           228
+#define NID_rc5_cfb64           120
 
 #define SN_rc5_ofb64            "RC5-OFB"
 #define LN_rc5_ofb64            "rc5-ofb"
-#define NID_rc5_ofb64           229
+#define NID_rc5_ofb64           121
 
 #define SN_ms_ext_req           "msExtReq"
 #define LN_ms_ext_req           "Microsoft Extension Request"
-#define NID_ms_ext_req          230
+#define NID_ms_ext_req          168
 #define OBJ_ms_ext_req          1L,3L,6L,1L,4L,1L,311L,2L,1L,14L
 
 #define SN_ms_code_ind          "msCodeInd"
 #define LN_ms_code_ind          "Microsoft Individual Code Signing"
-#define NID_ms_code_ind         231
+#define NID_ms_code_ind         131
 #define OBJ_ms_code_ind         1L,3L,6L,1L,4L,1L,311L,2L,1L,21L
 
 #define SN_ms_code_com          "msCodeCom"
 #define LN_ms_code_com          "Microsoft Commercial Code Signing"
-#define NID_ms_code_com         232
+#define NID_ms_code_com         132
 #define OBJ_ms_code_com         1L,3L,6L,1L,4L,1L,311L,2L,1L,22L
 
 #define SN_ms_ctl_sign          "msCTLSign"
 #define LN_ms_ctl_sign          "Microsoft Trust List Signing"
-#define NID_ms_ctl_sign         233
+#define NID_ms_ctl_sign         133
 #define OBJ_ms_ctl_sign         1L,3L,6L,1L,4L,1L,311L,10L,3L,1L
 
 #define SN_ms_sgc               "msSGC"
 #define LN_ms_sgc               "Microsoft Server Gated Crypto"
-#define NID_ms_sgc              234
+#define NID_ms_sgc              134
 #define OBJ_ms_sgc              1L,3L,6L,1L,4L,1L,311L,10L,3L,3L
 
 #define SN_ms_efs               "msEFS"
 #define LN_ms_efs               "Microsoft Encrypted File System"
-#define NID_ms_efs              235
+#define NID_ms_efs              135
 #define OBJ_ms_efs              1L,3L,6L,1L,4L,1L,311L,10L,3L,4L
 
 #define SN_ms_smartcard_login           "msSmartcardLogin"
 #define LN_ms_smartcard_login           "Microsoft Smartcard Login"
-#define NID_ms_smartcard_login          236
+#define NID_ms_smartcard_login          383
 #define OBJ_ms_smartcard_login          1L,3L,6L,1L,4L,1L,311L,20L,2L,2L
 
 #define SN_ms_upn               "msUPN"
 #define LN_ms_upn               "Microsoft User Principal Name"
-#define NID_ms_upn              237
+#define NID_ms_upn              384
 #define OBJ_ms_upn              1L,3L,6L,1L,4L,1L,311L,20L,2L,3L
 
 #define SN_idea_cbc             "IDEA-CBC"
 #define LN_idea_cbc             "idea-cbc"
-#define NID_idea_cbc            238
+#define NID_idea_cbc            34
 #define OBJ_idea_cbc            1L,3L,6L,1L,4L,1L,188L,7L,1L,1L,2L
 
 #define SN_idea_ecb             "IDEA-ECB"
 #define LN_idea_ecb             "idea-ecb"
-#define NID_idea_ecb            239
+#define NID_idea_ecb            36
 
 #define SN_idea_cfb64           "IDEA-CFB"
 #define LN_idea_cfb64           "idea-cfb"
-#define NID_idea_cfb64          240
+#define NID_idea_cfb64          35
 
 #define SN_idea_ofb64           "IDEA-OFB"
 #define LN_idea_ofb64           "idea-ofb"
-#define NID_idea_ofb64          241
+#define NID_idea_ofb64          46
 
 #define SN_bf_cbc               "BF-CBC"
 #define LN_bf_cbc               "bf-cbc"
-#define NID_bf_cbc              242
+#define NID_bf_cbc              91
 #define OBJ_bf_cbc              1L,3L,6L,1L,4L,1L,3029L,1L,2L
 
 #define SN_bf_ecb               "BF-ECB"
 #define LN_bf_ecb               "bf-ecb"
-#define NID_bf_ecb              243
+#define NID_bf_ecb              92
 
 #define SN_bf_cfb64             "BF-CFB"
 #define LN_bf_cfb64             "bf-cfb"
-#define NID_bf_cfb64            244
+#define NID_bf_cfb64            93
 
 #define SN_bf_ofb64             "BF-OFB"
 #define LN_bf_ofb64             "bf-ofb"
-#define NID_bf_ofb64            245
+#define NID_bf_ofb64            94
 
 #define SN_id_pkix              "PKIX"
-#define NID_id_pkix             246
+#define NID_id_pkix             124
 #define OBJ_id_pkix             1L,3L,6L,1L,5L,5L,7L
 
 #define SN_id_pkix_mod          "id-pkix-mod"
-#define NID_id_pkix_mod         247
+#define NID_id_pkix_mod         255
 #define OBJ_id_pkix_mod         OBJ_id_pkix,0L
 
 #define SN_id_pe                "id-pe"
-#define NID_id_pe               248
+#define NID_id_pe               172
 #define OBJ_id_pe               OBJ_id_pkix,1L
 
 #define SN_id_qt                "id-qt"
-#define NID_id_qt               249
+#define NID_id_qt               256
 #define OBJ_id_qt               OBJ_id_pkix,2L
 
 #define SN_id_kp                "id-kp"
-#define NID_id_kp               250
+#define NID_id_kp               125
 #define OBJ_id_kp               OBJ_id_pkix,3L
 
 #define SN_id_it                "id-it"
-#define NID_id_it               251
+#define NID_id_it               257
 #define OBJ_id_it               OBJ_id_pkix,4L
 
 #define SN_id_pkip              "id-pkip"
-#define NID_id_pkip             252
+#define NID_id_pkip             258
 #define OBJ_id_pkip             OBJ_id_pkix,5L
 
 #define SN_id_alg               "id-alg"
-#define NID_id_alg              253
+#define NID_id_alg              259
 #define OBJ_id_alg              OBJ_id_pkix,6L
 
 #define SN_id_cmc               "id-cmc"
-#define NID_id_cmc              254
+#define NID_id_cmc              260
 #define OBJ_id_cmc              OBJ_id_pkix,7L
 
 #define SN_id_on                "id-on"
-#define NID_id_on               255
+#define NID_id_on               261
 #define OBJ_id_on               OBJ_id_pkix,8L
 
 #define SN_id_pda               "id-pda"
-#define NID_id_pda              256
+#define NID_id_pda              262
 #define OBJ_id_pda              OBJ_id_pkix,9L
 
 #define SN_id_aca               "id-aca"
-#define NID_id_aca              257
+#define NID_id_aca              263
 #define OBJ_id_aca              OBJ_id_pkix,10L
 
 #define SN_id_qcs               "id-qcs"
-#define NID_id_qcs              258
+#define NID_id_qcs              264
 #define OBJ_id_qcs              OBJ_id_pkix,11L
 
 #define SN_id_cp                "id-cp"
-#define NID_id_cp               259
+#define NID_id_cp               690
 #define OBJ_id_cp               OBJ_id_pkix,14L
 
 #define SN_id_cct               "id-cct"
-#define NID_id_cct              260
+#define NID_id_cct              265
 #define OBJ_id_cct              OBJ_id_pkix,12L
 
 #define SN_id_ppl               "id-ppl"
-#define NID_id_ppl              261
+#define NID_id_ppl              397
 #define OBJ_id_ppl              OBJ_id_pkix,21L
 
 #define SN_id_ad                "id-ad"
-#define NID_id_ad               262
+#define NID_id_ad               173
 #define OBJ_id_ad               OBJ_id_pkix,48L
 
 #define SN_id_pkix1_explicit_88         "id-pkix1-explicit-88"
-#define NID_id_pkix1_explicit_88                263
+#define NID_id_pkix1_explicit_88                266
 #define OBJ_id_pkix1_explicit_88                OBJ_id_pkix_mod,1L
 
 #define SN_id_pkix1_implicit_88         "id-pkix1-implicit-88"
-#define NID_id_pkix1_implicit_88                264
+#define NID_id_pkix1_implicit_88                267
 #define OBJ_id_pkix1_implicit_88                OBJ_id_pkix_mod,2L
 
 #define SN_id_pkix1_explicit_93         "id-pkix1-explicit-93"
-#define NID_id_pkix1_explicit_93                265
+#define NID_id_pkix1_explicit_93                268
 #define OBJ_id_pkix1_explicit_93                OBJ_id_pkix_mod,3L
 
 #define SN_id_pkix1_implicit_93         "id-pkix1-implicit-93"
-#define NID_id_pkix1_implicit_93                266
+#define NID_id_pkix1_implicit_93                269
 #define OBJ_id_pkix1_implicit_93                OBJ_id_pkix_mod,4L
 
 #define SN_id_mod_crmf          "id-mod-crmf"
-#define NID_id_mod_crmf         267
+#define NID_id_mod_crmf         270
 #define OBJ_id_mod_crmf         OBJ_id_pkix_mod,5L
 
 #define SN_id_mod_cmc           "id-mod-cmc"
-#define NID_id_mod_cmc          268
+#define NID_id_mod_cmc          271
 #define OBJ_id_mod_cmc          OBJ_id_pkix_mod,6L
 
 #define SN_id_mod_kea_profile_88                "id-mod-kea-profile-88"
-#define NID_id_mod_kea_profile_88               269
+#define NID_id_mod_kea_profile_88               272
 #define OBJ_id_mod_kea_profile_88               OBJ_id_pkix_mod,7L
 
 #define SN_id_mod_kea_profile_93                "id-mod-kea-profile-93"
-#define NID_id_mod_kea_profile_93               270
+#define NID_id_mod_kea_profile_93               273
 #define OBJ_id_mod_kea_profile_93               OBJ_id_pkix_mod,8L
 
 #define SN_id_mod_cmp           "id-mod-cmp"
-#define NID_id_mod_cmp          271
+#define NID_id_mod_cmp          274
 #define OBJ_id_mod_cmp          OBJ_id_pkix_mod,9L
 
 #define SN_id_mod_qualified_cert_88             "id-mod-qualified-cert-88"
-#define NID_id_mod_qualified_cert_88            272
+#define NID_id_mod_qualified_cert_88            275
 #define OBJ_id_mod_qualified_cert_88            OBJ_id_pkix_mod,10L
 
 #define SN_id_mod_qualified_cert_93             "id-mod-qualified-cert-93"
-#define NID_id_mod_qualified_cert_93            273
+#define NID_id_mod_qualified_cert_93            276
 #define OBJ_id_mod_qualified_cert_93            OBJ_id_pkix_mod,11L
 
 #define SN_id_mod_attribute_cert                "id-mod-attribute-cert"
-#define NID_id_mod_attribute_cert               274
+#define NID_id_mod_attribute_cert               277
 #define OBJ_id_mod_attribute_cert               OBJ_id_pkix_mod,12L
 
 #define SN_id_mod_timestamp_protocol            "id-mod-timestamp-protocol"
-#define NID_id_mod_timestamp_protocol           275
+#define NID_id_mod_timestamp_protocol           278
 #define OBJ_id_mod_timestamp_protocol           OBJ_id_pkix_mod,13L
 
 #define SN_id_mod_ocsp          "id-mod-ocsp"
-#define NID_id_mod_ocsp         276
+#define NID_id_mod_ocsp         279
 #define OBJ_id_mod_ocsp         OBJ_id_pkix_mod,14L
 
 #define SN_id_mod_dvcs          "id-mod-dvcs"
-#define NID_id_mod_dvcs         277
+#define NID_id_mod_dvcs         280
 #define OBJ_id_mod_dvcs         OBJ_id_pkix_mod,15L
 
 #define SN_id_mod_cmp2000               "id-mod-cmp2000"
-#define NID_id_mod_cmp2000              278
+#define NID_id_mod_cmp2000              281
 #define OBJ_id_mod_cmp2000              OBJ_id_pkix_mod,16L
 
 #define SN_info_access          "authorityInfoAccess"
 #define LN_info_access          "Authority Information Access"
-#define NID_info_access         279
+#define NID_info_access         174
 #define OBJ_info_access         OBJ_id_pe,1L
 
 #define SN_biometricInfo                "biometricInfo"
 #define LN_biometricInfo                "Biometric Info"
-#define NID_biometricInfo               280
+#define NID_biometricInfo               282
 #define OBJ_biometricInfo               OBJ_id_pe,2L
 
 #define SN_qcStatements         "qcStatements"
-#define NID_qcStatements                281
+#define NID_qcStatements                283
 #define OBJ_qcStatements                OBJ_id_pe,3L
 
 #define SN_ac_auditEntity               "ac-auditEntity"
-#define NID_ac_auditEntity              282
+#define NID_ac_auditEntity              284
 #define OBJ_ac_auditEntity              OBJ_id_pe,4L
 
 #define SN_ac_targeting         "ac-targeting"
-#define NID_ac_targeting                283
+#define NID_ac_targeting                285
 #define OBJ_ac_targeting                OBJ_id_pe,5L
 
 #define SN_aaControls           "aaControls"
-#define NID_aaControls          284
+#define NID_aaControls          286
 #define OBJ_aaControls          OBJ_id_pe,6L
 
 #define SN_sbgp_ipAddrBlock             "sbgp-ipAddrBlock"
-#define NID_sbgp_ipAddrBlock            285
+#define NID_sbgp_ipAddrBlock            287
 #define OBJ_sbgp_ipAddrBlock            OBJ_id_pe,7L
 
 #define SN_sbgp_autonomousSysNum                "sbgp-autonomousSysNum"
-#define NID_sbgp_autonomousSysNum               286
+#define NID_sbgp_autonomousSysNum               288
 #define OBJ_sbgp_autonomousSysNum               OBJ_id_pe,8L
 
 #define SN_sbgp_routerIdentifier                "sbgp-routerIdentifier"
-#define NID_sbgp_routerIdentifier               287
+#define NID_sbgp_routerIdentifier               289
 #define OBJ_sbgp_routerIdentifier               OBJ_id_pe,9L
 
 #define SN_ac_proxying          "ac-proxying"
-#define NID_ac_proxying         288
+#define NID_ac_proxying         338
 #define OBJ_ac_proxying         OBJ_id_pe,10L
 
 #define SN_sinfo_access         "subjectInfoAccess"
 #define LN_sinfo_access         "Subject Information Access"
-#define NID_sinfo_access                289
+#define NID_sinfo_access                339
 #define OBJ_sinfo_access                OBJ_id_pe,11L
 
 #define SN_proxyCertInfo                "proxyCertInfo"
 #define LN_proxyCertInfo                "Proxy Certificate Information"
-#define NID_proxyCertInfo               290
+#define NID_proxyCertInfo               398
 #define OBJ_proxyCertInfo               OBJ_id_pe,14L
 
 #define SN_tlsfeature           "tlsfeature"
 #define LN_tlsfeature           "TLS Feature"
-#define NID_tlsfeature          291
+#define NID_tlsfeature          565
 #define OBJ_tlsfeature          OBJ_id_pe,24L
 
 #define SN_sbgp_ipAddrBlockv2           "sbgp-ipAddrBlockv2"
-#define NID_sbgp_ipAddrBlockv2          292
+#define NID_sbgp_ipAddrBlockv2          691
 #define OBJ_sbgp_ipAddrBlockv2          OBJ_id_pe,28L
 
 #define SN_sbgp_autonomousSysNumv2              "sbgp-autonomousSysNumv2"
-#define NID_sbgp_autonomousSysNumv2             293
+#define NID_sbgp_autonomousSysNumv2             692
 #define OBJ_sbgp_autonomousSysNumv2             OBJ_id_pe,29L
 
 #define SN_id_qt_cps            "id-qt-cps"
 #define LN_id_qt_cps            "Policy Qualifier CPS"
-#define NID_id_qt_cps           294
+#define NID_id_qt_cps           161
 #define OBJ_id_qt_cps           OBJ_id_qt,1L
 
 #define SN_id_qt_unotice                "id-qt-unotice"
 #define LN_id_qt_unotice                "Policy Qualifier User Notice"
-#define NID_id_qt_unotice               295
+#define NID_id_qt_unotice               162
 #define OBJ_id_qt_unotice               OBJ_id_qt,2L
 
 #define SN_textNotice           "textNotice"
-#define NID_textNotice          296
+#define NID_textNotice          290
 #define OBJ_textNotice          OBJ_id_qt,3L
 
 #define SN_server_auth          "serverAuth"
 #define LN_server_auth          "TLS Web Server Authentication"
-#define NID_server_auth         297
+#define NID_server_auth         126
 #define OBJ_server_auth         OBJ_id_kp,1L
 
 #define SN_client_auth          "clientAuth"
 #define LN_client_auth          "TLS Web Client Authentication"
-#define NID_client_auth         298
+#define NID_client_auth         127
 #define OBJ_client_auth         OBJ_id_kp,2L
 
 #define SN_code_sign            "codeSigning"
 #define LN_code_sign            "Code Signing"
-#define NID_code_sign           299
+#define NID_code_sign           128
 #define OBJ_code_sign           OBJ_id_kp,3L
 
 #define SN_email_protect                "emailProtection"
 #define LN_email_protect                "E-mail Protection"
-#define NID_email_protect               300
+#define NID_email_protect               129
 #define OBJ_email_protect               OBJ_id_kp,4L
 
 #define SN_ipsecEndSystem               "ipsecEndSystem"
 #define LN_ipsecEndSystem               "IPSec End System"
-#define NID_ipsecEndSystem              301
+#define NID_ipsecEndSystem              291
 #define OBJ_ipsecEndSystem              OBJ_id_kp,5L
 
 #define SN_ipsecTunnel          "ipsecTunnel"
 #define LN_ipsecTunnel          "IPSec Tunnel"
-#define NID_ipsecTunnel         302
+#define NID_ipsecTunnel         292
 #define OBJ_ipsecTunnel         OBJ_id_kp,6L
 
 #define SN_ipsecUser            "ipsecUser"
 #define LN_ipsecUser            "IPSec User"
-#define NID_ipsecUser           303
+#define NID_ipsecUser           293
 #define OBJ_ipsecUser           OBJ_id_kp,7L
 
 #define SN_time_stamp           "timeStamping"
 #define LN_time_stamp           "Time Stamping"
-#define NID_time_stamp          304
+#define NID_time_stamp          130
 #define OBJ_time_stamp          OBJ_id_kp,8L
 
 #define SN_OCSP_sign            "OCSPSigning"
 #define LN_OCSP_sign            "OCSP Signing"
-#define NID_OCSP_sign           305
+#define NID_OCSP_sign           177
 #define OBJ_OCSP_sign           OBJ_id_kp,9L
 
 #define SN_dvcs         "DVCS"
 #define LN_dvcs         "dvcs"
-#define NID_dvcs                306
+#define NID_dvcs                294
 #define OBJ_dvcs                OBJ_id_kp,10L
 
 #define SN_ipsec_IKE            "ipsecIKE"
 #define LN_ipsec_IKE            "ipsec Internet Key Exchange"
-#define NID_ipsec_IKE           307
+#define NID_ipsec_IKE           567
 #define OBJ_ipsec_IKE           OBJ_id_kp,17L
 
 #define SN_capwapAC             "capwapAC"
 #define LN_capwapAC             "Ctrl/provision WAP Access"
-#define NID_capwapAC            308
+#define NID_capwapAC            568
 #define OBJ_capwapAC            OBJ_id_kp,18L
 
 #define SN_capwapWTP            "capwapWTP"
 #define LN_capwapWTP            "Ctrl/Provision WAP Termination"
-#define NID_capwapWTP           309
+#define NID_capwapWTP           569
 #define OBJ_capwapWTP           OBJ_id_kp,19L
 
 #define SN_sshClient            "secureShellClient"
 #define LN_sshClient            "SSH Client"
-#define NID_sshClient           310
+#define NID_sshClient           570
 #define OBJ_sshClient           OBJ_id_kp,21L
 
 #define SN_sshServer            "secureShellServer"
 #define LN_sshServer            "SSH Server"
-#define NID_sshServer           311
+#define NID_sshServer           571
 #define OBJ_sshServer           OBJ_id_kp,22L
 
 #define SN_sendRouter           "sendRouter"
 #define LN_sendRouter           "Send Router"
-#define NID_sendRouter          312
+#define NID_sendRouter          572
 #define OBJ_sendRouter          OBJ_id_kp,23L
 
 #define SN_sendProxiedRouter            "sendProxiedRouter"
 #define LN_sendProxiedRouter            "Send Proxied Router"
-#define NID_sendProxiedRouter           313
+#define NID_sendProxiedRouter           573
 #define OBJ_sendProxiedRouter           OBJ_id_kp,24L
 
 #define SN_sendOwner            "sendOwner"
 #define LN_sendOwner            "Send Owner"
-#define NID_sendOwner           314
+#define NID_sendOwner           574
 #define OBJ_sendOwner           OBJ_id_kp,25L
 
 #define SN_sendProxiedOwner             "sendProxiedOwner"
 #define LN_sendProxiedOwner             "Send Proxied Owner"
-#define NID_sendProxiedOwner            315
+#define NID_sendProxiedOwner            575
 #define OBJ_sendProxiedOwner            OBJ_id_kp,26L
 
 #define SN_cmcCA                "cmcCA"
 #define LN_cmcCA                "CMC Certificate Authority"
-#define NID_cmcCA               316
+#define NID_cmcCA               647
 #define OBJ_cmcCA               OBJ_id_kp,27L
 
 #define SN_cmcRA                "cmcRA"
 #define LN_cmcRA                "CMC Registration Authority"
-#define NID_cmcRA               317
+#define NID_cmcRA               648
 #define OBJ_cmcRA               OBJ_id_kp,28L
 
 #define SN_cmcArchive           "cmcArchive"
 #define LN_cmcArchive           "CMC Archive Server"
-#define NID_cmcArchive          318
+#define NID_cmcArchive          682
 #define OBJ_cmcArchive          OBJ_id_kp,29L
 
 #define SN_id_kp_bgpsec_router          "id-kp-bgpsec-router"
 #define LN_id_kp_bgpsec_router          "BGPsec Router"
-#define NID_id_kp_bgpsec_router         319
+#define NID_id_kp_bgpsec_router         683
 #define OBJ_id_kp_bgpsec_router         OBJ_id_kp,30L
 
 #define SN_id_kp_BrandIndicatorforMessageIdentification         "id-kp-BrandIndicatorforMessageIdentification"
 #define LN_id_kp_BrandIndicatorforMessageIdentification         "Brand Indicator for Message Identification"
-#define NID_id_kp_BrandIndicatorforMessageIdentification                320
+#define NID_id_kp_BrandIndicatorforMessageIdentification                684
 #define OBJ_id_kp_BrandIndicatorforMessageIdentification                OBJ_id_kp,31L
 
 #define SN_cmKGA                "cmKGA"
 #define LN_cmKGA                "Certificate Management Key Generation Authority"
-#define NID_cmKGA               321
+#define NID_cmKGA               685
 #define OBJ_cmKGA               OBJ_id_kp,32L
 
 #define SN_id_regCtrl           "id-regCtrl"
-#define NID_id_regCtrl          322
+#define NID_id_regCtrl          295
 #define OBJ_id_regCtrl          OBJ_id_pkip,1L
 
 #define SN_id_regInfo           "id-regInfo"
-#define NID_id_regInfo          323
+#define NID_id_regInfo          296
 #define OBJ_id_regInfo          OBJ_id_pkip,2L
 
 #define SN_id_regCtrl_regToken          "id-regCtrl-regToken"
-#define NID_id_regCtrl_regToken         324
+#define NID_id_regCtrl_regToken         297
 #define OBJ_id_regCtrl_regToken         OBJ_id_regCtrl,1L
 
 #define SN_id_regCtrl_authenticator             "id-regCtrl-authenticator"
-#define NID_id_regCtrl_authenticator            325
+#define NID_id_regCtrl_authenticator            298
 #define OBJ_id_regCtrl_authenticator            OBJ_id_regCtrl,2L
 
 #define SN_id_regCtrl_pkiPublicationInfo                "id-regCtrl-pkiPublicationInfo"
-#define NID_id_regCtrl_pkiPublicationInfo               326
+#define NID_id_regCtrl_pkiPublicationInfo               299
 #define OBJ_id_regCtrl_pkiPublicationInfo               OBJ_id_regCtrl,3L
 
 #define SN_id_regCtrl_pkiArchiveOptions         "id-regCtrl-pkiArchiveOptions"
-#define NID_id_regCtrl_pkiArchiveOptions                327
+#define NID_id_regCtrl_pkiArchiveOptions                300
 #define OBJ_id_regCtrl_pkiArchiveOptions                OBJ_id_regCtrl,4L
 
 #define SN_id_regCtrl_oldCertID         "id-regCtrl-oldCertID"
-#define NID_id_regCtrl_oldCertID                328
+#define NID_id_regCtrl_oldCertID                301
 #define OBJ_id_regCtrl_oldCertID                OBJ_id_regCtrl,5L
 
 #define SN_id_regCtrl_protocolEncrKey           "id-regCtrl-protocolEncrKey"
-#define NID_id_regCtrl_protocolEncrKey          329
+#define NID_id_regCtrl_protocolEncrKey          302
 #define OBJ_id_regCtrl_protocolEncrKey          OBJ_id_regCtrl,6L
 
 #define SN_id_regInfo_utf8Pairs         "id-regInfo-utf8Pairs"
-#define NID_id_regInfo_utf8Pairs                330
+#define NID_id_regInfo_utf8Pairs                303
 #define OBJ_id_regInfo_utf8Pairs                OBJ_id_regInfo,1L
 
 #define SN_id_regInfo_certReq           "id-regInfo-certReq"
-#define NID_id_regInfo_certReq          331
+#define NID_id_regInfo_certReq          304
 #define OBJ_id_regInfo_certReq          OBJ_id_regInfo,2L
 
 #define SN_id_on_personalData           "id-on-personalData"
-#define NID_id_on_personalData          332
+#define NID_id_on_personalData          305
 #define OBJ_id_on_personalData          OBJ_id_on,1L
 
 #define SN_id_on_permanentIdentifier            "id-on-permanentIdentifier"
 #define LN_id_on_permanentIdentifier            "Permanent Identifier"
-#define NID_id_on_permanentIdentifier           333
+#define NID_id_on_permanentIdentifier           464
 #define OBJ_id_on_permanentIdentifier           OBJ_id_on,3L
 
 #define SN_XmppAddr             "id-on-xmppAddr"
 #define LN_XmppAddr             "XmppAddr"
-#define NID_XmppAddr            334
+#define NID_XmppAddr            672
 #define OBJ_XmppAddr            OBJ_id_on,5L
 
 #define SN_SRVName              "id-on-dnsSRV"
 #define LN_SRVName              "SRVName"
-#define NID_SRVName             335
+#define NID_SRVName             673
 #define OBJ_SRVName             OBJ_id_on,7L
 
 #define SN_NAIRealm             "id-on-NAIRealm"
 #define LN_NAIRealm             "NAIRealm"
-#define NID_NAIRealm            336
+#define NID_NAIRealm            674
 #define OBJ_NAIRealm            OBJ_id_on,8L
 
 #define SN_id_on_SmtpUTF8Mailbox                "id-on-SmtpUTF8Mailbox"
 #define LN_id_on_SmtpUTF8Mailbox                "Smtp UTF8 Mailbox"
-#define NID_id_on_SmtpUTF8Mailbox               337
+#define NID_id_on_SmtpUTF8Mailbox               671
 #define OBJ_id_on_SmtpUTF8Mailbox               OBJ_id_on,9L
 
 #define SN_id_ppl_anyLanguage           "id-ppl-anyLanguage"
 #define LN_id_ppl_anyLanguage           "Any language"
-#define NID_id_ppl_anyLanguage          338
+#define NID_id_ppl_anyLanguage          399
 #define OBJ_id_ppl_anyLanguage          OBJ_id_ppl,0L
 
 #define SN_id_ppl_inheritAll            "id-ppl-inheritAll"
 #define LN_id_ppl_inheritAll            "Inherit all"
-#define NID_id_ppl_inheritAll           339
+#define NID_id_ppl_inheritAll           400
 #define OBJ_id_ppl_inheritAll           OBJ_id_ppl,1L
 
 #define SN_Independent          "id-ppl-independent"
 #define LN_Independent          "Independent"
-#define NID_Independent         340
+#define NID_Independent         402
 #define OBJ_Independent         OBJ_id_ppl,2L
 
 #define SN_ad_OCSP              "OCSP"
 #define LN_ad_OCSP              "OCSP"
-#define NID_ad_OCSP             341
+#define NID_ad_OCSP             175
 #define OBJ_ad_OCSP             OBJ_id_ad,1L
 
 #define SN_ad_ca_issuers                "caIssuers"
 #define LN_ad_ca_issuers                "CA Issuers"
-#define NID_ad_ca_issuers               342
+#define NID_ad_ca_issuers               176
 #define OBJ_ad_ca_issuers               OBJ_id_ad,2L
 
 #define SN_ad_timeStamping              "ad_timestamping"
 #define LN_ad_timeStamping              "AD Time Stamping"
-#define NID_ad_timeStamping             343
+#define NID_ad_timeStamping             306
 #define OBJ_ad_timeStamping             OBJ_id_ad,3L
 
 #define SN_ad_dvcs              "AD_DVCS"
 #define LN_ad_dvcs              "ad dvcs"
-#define NID_ad_dvcs             344
+#define NID_ad_dvcs             307
 #define OBJ_ad_dvcs             OBJ_id_ad,4L
 
 #define SN_caRepository         "caRepository"
 #define LN_caRepository         "CA Repository"
-#define NID_caRepository                345
+#define NID_caRepository                436
 #define OBJ_caRepository                OBJ_id_ad,5L
 
 #define SN_rpkiManifest         "rpkiManifest"
 #define LN_rpkiManifest         "RPKI Manifest"
-#define NID_rpkiManifest                346
+#define NID_rpkiManifest                693
 #define OBJ_rpkiManifest                OBJ_id_ad,10L
 
 #define SN_signedObject         "signedObject"
 #define LN_signedObject         "Signed Object"
-#define NID_signedObject                347
+#define NID_signedObject                694
 #define OBJ_signedObject                OBJ_id_ad,11L
 
 #define SN_rpkiNotify           "rpkiNotify"
 #define LN_rpkiNotify           "RPKI Notify"
-#define NID_rpkiNotify          348
+#define NID_rpkiNotify          695
 #define OBJ_rpkiNotify          OBJ_id_ad,13L
 
 #define OBJ_id_pkix_OCSP                OBJ_ad_OCSP
 
 #define SN_id_pkix_OCSP_basic           "basicOCSPResponse"
 #define LN_id_pkix_OCSP_basic           "Basic OCSP Response"
-#define NID_id_pkix_OCSP_basic          349
+#define NID_id_pkix_OCSP_basic          308
 #define OBJ_id_pkix_OCSP_basic          OBJ_id_pkix_OCSP,1L
 
 #define SN_id_pkix_OCSP_Nonce           "Nonce"
 #define LN_id_pkix_OCSP_Nonce           "OCSP Nonce"
-#define NID_id_pkix_OCSP_Nonce          350
+#define NID_id_pkix_OCSP_Nonce          309
 #define OBJ_id_pkix_OCSP_Nonce          OBJ_id_pkix_OCSP,2L
 
 #define SN_id_pkix_OCSP_CrlID           "CrlID"
 #define LN_id_pkix_OCSP_CrlID           "OCSP CRL ID"
-#define NID_id_pkix_OCSP_CrlID          351
+#define NID_id_pkix_OCSP_CrlID          310
 #define OBJ_id_pkix_OCSP_CrlID          OBJ_id_pkix_OCSP,3L
 
 #define SN_id_pkix_OCSP_acceptableResponses             "acceptableResponses"
 #define LN_id_pkix_OCSP_acceptableResponses             "Acceptable OCSP Responses"
-#define NID_id_pkix_OCSP_acceptableResponses            352
+#define NID_id_pkix_OCSP_acceptableResponses            311
 #define OBJ_id_pkix_OCSP_acceptableResponses            OBJ_id_pkix_OCSP,4L
 
 #define SN_id_pkix_OCSP_noCheck         "noCheck"
 #define LN_id_pkix_OCSP_noCheck         "OCSP No Check"
-#define NID_id_pkix_OCSP_noCheck                353
+#define NID_id_pkix_OCSP_noCheck                312
 #define OBJ_id_pkix_OCSP_noCheck                OBJ_id_pkix_OCSP,5L
 
 #define SN_id_pkix_OCSP_archiveCutoff           "archiveCutoff"
 #define LN_id_pkix_OCSP_archiveCutoff           "OCSP Archive Cutoff"
-#define NID_id_pkix_OCSP_archiveCutoff          354
+#define NID_id_pkix_OCSP_archiveCutoff          313
 #define OBJ_id_pkix_OCSP_archiveCutoff          OBJ_id_pkix_OCSP,6L
 
 #define SN_id_pkix_OCSP_serviceLocator          "serviceLocator"
 #define LN_id_pkix_OCSP_serviceLocator          "OCSP Service Locator"
-#define NID_id_pkix_OCSP_serviceLocator         355
+#define NID_id_pkix_OCSP_serviceLocator         314
 #define OBJ_id_pkix_OCSP_serviceLocator         OBJ_id_pkix_OCSP,7L
 
 #define SN_id_pkix_OCSP_extendedStatus          "extendedStatus"
 #define LN_id_pkix_OCSP_extendedStatus          "Extended OCSP Status"
-#define NID_id_pkix_OCSP_extendedStatus         356
+#define NID_id_pkix_OCSP_extendedStatus         315
 #define OBJ_id_pkix_OCSP_extendedStatus         OBJ_id_pkix_OCSP,8L
 
 #define SN_id_pkix_OCSP_valid           "valid"
-#define NID_id_pkix_OCSP_valid          357
+#define NID_id_pkix_OCSP_valid          316
 #define OBJ_id_pkix_OCSP_valid          OBJ_id_pkix_OCSP,9L
 
 #define SN_id_pkix_OCSP_path            "path"
-#define NID_id_pkix_OCSP_path           358
+#define NID_id_pkix_OCSP_path           317
 #define OBJ_id_pkix_OCSP_path           OBJ_id_pkix_OCSP,10L
 
 #define SN_id_pkix_OCSP_trustRoot               "trustRoot"
 #define LN_id_pkix_OCSP_trustRoot               "Trust Root"
-#define NID_id_pkix_OCSP_trustRoot              359
+#define NID_id_pkix_OCSP_trustRoot              318
 #define OBJ_id_pkix_OCSP_trustRoot              OBJ_id_pkix_OCSP,11L
 
 #define SN_algorithm            "algorithm"
 #define LN_algorithm            "algorithm"
-#define NID_algorithm           360
+#define NID_algorithm           319
 #define OBJ_algorithm           1L,3L,14L,3L,2L
 
 #define SN_md5WithRSA           "RSA-NP-MD5"
 #define LN_md5WithRSA           "md5WithRSA"
-#define NID_md5WithRSA          361
+#define NID_md5WithRSA          103
 #define OBJ_md5WithRSA          OBJ_algorithm,3L
 
 #define SN_des_ecb              "DES-ECB"
 #define LN_des_ecb              "des-ecb"
-#define NID_des_ecb             362
+#define NID_des_ecb             29
 #define OBJ_des_ecb             OBJ_algorithm,6L
 
 #define SN_des_cbc              "DES-CBC"
 #define LN_des_cbc              "des-cbc"
-#define NID_des_cbc             363
+#define NID_des_cbc             31
 #define OBJ_des_cbc             OBJ_algorithm,7L
 
 #define SN_des_ofb64            "DES-OFB"
 #define LN_des_ofb64            "des-ofb"
-#define NID_des_ofb64           364
+#define NID_des_ofb64           45
 #define OBJ_des_ofb64           OBJ_algorithm,8L
 
 #define SN_des_cfb64            "DES-CFB"
 #define LN_des_cfb64            "des-cfb"
-#define NID_des_cfb64           365
+#define NID_des_cfb64           30
 #define OBJ_des_cfb64           OBJ_algorithm,9L
 
 #define SN_rsaSignature         "rsaSignature"
-#define NID_rsaSignature                366
+#define NID_rsaSignature                320
 #define OBJ_rsaSignature                OBJ_algorithm,11L
 
 #define SN_dsa_2                "DSA-old"
 #define LN_dsa_2                "dsaEncryption-old"
-#define NID_dsa_2               367
+#define NID_dsa_2               67
 #define OBJ_dsa_2               OBJ_algorithm,12L
 
 #define SN_dsaWithSHA           "DSA-SHA"
 #define LN_dsaWithSHA           "dsaWithSHA"
-#define NID_dsaWithSHA          368
+#define NID_dsaWithSHA          66
 #define OBJ_dsaWithSHA          OBJ_algorithm,13L
 
 #define SN_shaWithRSAEncryption         "RSA-SHA"
 #define LN_shaWithRSAEncryption         "shaWithRSAEncryption"
-#define NID_shaWithRSAEncryption                369
+#define NID_shaWithRSAEncryption                42
 #define OBJ_shaWithRSAEncryption                OBJ_algorithm,15L
 
 #define SN_des_ede_ecb          "DES-EDE"
 #define LN_des_ede_ecb          "des-ede"
-#define NID_des_ede_ecb         370
+#define NID_des_ede_ecb         32
 #define OBJ_des_ede_ecb         OBJ_algorithm,17L
 
 #define SN_des_ede3_ecb         "DES-EDE3"
 #define LN_des_ede3_ecb         "des-ede3"
-#define NID_des_ede3_ecb                371
+#define NID_des_ede3_ecb                33
 
 #define SN_des_ede_cbc          "DES-EDE-CBC"
 #define LN_des_ede_cbc          "des-ede-cbc"
-#define NID_des_ede_cbc         372
+#define NID_des_ede_cbc         43
 
 #define SN_des_ede_cfb64                "DES-EDE-CFB"
 #define LN_des_ede_cfb64                "des-ede-cfb"
-#define NID_des_ede_cfb64               373
+#define NID_des_ede_cfb64               60
 
 #define SN_des_ede3_cfb64               "DES-EDE3-CFB"
 #define LN_des_ede3_cfb64               "des-ede3-cfb"
-#define NID_des_ede3_cfb64              374
+#define NID_des_ede3_cfb64              61
 
 #define SN_des_ede_ofb64                "DES-EDE-OFB"
 #define LN_des_ede_ofb64                "des-ede-ofb"
-#define NID_des_ede_ofb64               375
+#define NID_des_ede_ofb64               62
 
 #define SN_des_ede3_ofb64               "DES-EDE3-OFB"
 #define LN_des_ede3_ofb64               "des-ede3-ofb"
-#define NID_des_ede3_ofb64              376
+#define NID_des_ede3_ofb64              63
 
 #define SN_desx_cbc             "DESX-CBC"
 #define LN_desx_cbc             "desx-cbc"
-#define NID_desx_cbc            377
+#define NID_desx_cbc            80
 
 #define SN_sha          "SHA"
 #define LN_sha          "sha"
-#define NID_sha         378
+#define NID_sha         41
 #define OBJ_sha         OBJ_algorithm,18L
 
 #define SN_sha1         "SHA1"
 #define LN_sha1         "sha1"
-#define NID_sha1                379
+#define NID_sha1                64
 #define OBJ_sha1                OBJ_algorithm,26L
 
 #define SN_dsaWithSHA1_2                "DSA-SHA1-old"
 #define LN_dsaWithSHA1_2                "dsaWithSHA1-old"
-#define NID_dsaWithSHA1_2               380
+#define NID_dsaWithSHA1_2               70
 #define OBJ_dsaWithSHA1_2               OBJ_algorithm,27L
 
 #define SN_sha1WithRSA          "RSA-SHA1-2"
 #define LN_sha1WithRSA          "sha1WithRSA"
-#define NID_sha1WithRSA         381
+#define NID_sha1WithRSA         114
 #define OBJ_sha1WithRSA         OBJ_algorithm,29L
 
 #define SN_ripemd160            "RIPEMD160"
 #define LN_ripemd160            "ripemd160"
-#define NID_ripemd160           382
+#define NID_ripemd160           116
 #define OBJ_ripemd160           1L,3L,36L,3L,2L,1L
 
 #define SN_ripemd160WithRSA             "RSA-RIPEMD160"
 #define LN_ripemd160WithRSA             "ripemd160WithRSA"
-#define NID_ripemd160WithRSA            383
+#define NID_ripemd160WithRSA            117
 #define OBJ_ripemd160WithRSA            1L,3L,36L,3L,3L,1L,2L
 
 #define SN_blake2bmac           "BLAKE2BMAC"
 #define LN_blake2bmac           "blake2bmac"
-#define NID_blake2bmac          384
+#define NID_blake2bmac          664
 #define OBJ_blake2bmac          1L,3L,6L,1L,4L,1L,1722L,12L,2L,1L
 
 #define SN_blake2smac           "BLAKE2SMAC"
 #define LN_blake2smac           "blake2smac"
-#define NID_blake2smac          385
+#define NID_blake2smac          665
 #define OBJ_blake2smac          1L,3L,6L,1L,4L,1L,1722L,12L,2L,2L
 
 #define SN_blake2b512           "BLAKE2b512"
 #define LN_blake2b512           "blake2b512"
-#define NID_blake2b512          386
+#define NID_blake2b512          599
 #define OBJ_blake2b512          OBJ_blake2bmac,16L
 
 #define SN_blake2s256           "BLAKE2s256"
 #define LN_blake2s256           "blake2s256"
-#define NID_blake2s256          387
+#define NID_blake2s256          600
 #define OBJ_blake2s256          OBJ_blake2smac,8L
 
 #define SN_sxnet                "SXNetID"
 #define LN_sxnet                "Strong Extranet ID"
-#define NID_sxnet               388
+#define NID_sxnet               140
 #define OBJ_sxnet               1L,3L,101L,1L,4L,1L
 
 #define SN_X500         "X500"
 #define LN_X500         "directory services (X.500)"
-#define NID_X500                389
+#define NID_X500                11
 #define OBJ_X500                2L,5L
 
 #define SN_X509         "X509"
-#define NID_X509                390
+#define NID_X509                12
 #define OBJ_X509                OBJ_X500,4L
 
 #define SN_commonName           "CN"
 #define LN_commonName           "commonName"
-#define NID_commonName          391
+#define NID_commonName          13
 #define OBJ_commonName          OBJ_X509,3L
 
 #define SN_surname              "SN"
 #define LN_surname              "surname"
-#define NID_surname             392
+#define NID_surname             100
 #define OBJ_surname             OBJ_X509,4L
 
 #define LN_serialNumber         "serialNumber"
-#define NID_serialNumber                393
+#define NID_serialNumber                104
 #define OBJ_serialNumber                OBJ_X509,5L
 
 #define SN_countryName          "C"
 #define LN_countryName          "countryName"
-#define NID_countryName         394
+#define NID_countryName         14
 #define OBJ_countryName         OBJ_X509,6L
 
 #define SN_localityName         "L"
 #define LN_localityName         "localityName"
-#define NID_localityName                395
+#define NID_localityName                15
 #define OBJ_localityName                OBJ_X509,7L
 
 #define SN_stateOrProvinceName          "ST"
 #define LN_stateOrProvinceName          "stateOrProvinceName"
-#define NID_stateOrProvinceName         396
+#define NID_stateOrProvinceName         16
 #define OBJ_stateOrProvinceName         OBJ_X509,8L
 
 #define SN_streetAddress                "street"
 #define LN_streetAddress                "streetAddress"
-#define NID_streetAddress               397
+#define NID_streetAddress               395
 #define OBJ_streetAddress               OBJ_X509,9L
 
 #define SN_organizationName             "O"
 #define LN_organizationName             "organizationName"
-#define NID_organizationName            398
+#define NID_organizationName            17
 #define OBJ_organizationName            OBJ_X509,10L
 
 #define SN_organizationalUnitName               "OU"
 #define LN_organizationalUnitName               "organizationalUnitName"
-#define NID_organizationalUnitName              399
+#define NID_organizationalUnitName              18
 #define OBJ_organizationalUnitName              OBJ_X509,11L
 
 #define SN_title                "title"
 #define LN_title                "title"
-#define NID_title               400
+#define NID_title               105
 #define OBJ_title               OBJ_X509,12L
 
 #define LN_description          "description"
-#define NID_description         401
+#define NID_description         106
 #define OBJ_description         OBJ_X509,13L
 
 #define LN_searchGuide          "searchGuide"
-#define NID_searchGuide         402
+#define NID_searchGuide         465
 #define OBJ_searchGuide         OBJ_X509,14L
 
 #define LN_businessCategory             "businessCategory"
-#define NID_businessCategory            403
+#define NID_businessCategory            466
 #define OBJ_businessCategory            OBJ_X509,15L
 
 #define LN_postalAddress                "postalAddress"
-#define NID_postalAddress               404
+#define NID_postalAddress               467
 #define OBJ_postalAddress               OBJ_X509,16L
 
 #define LN_postalCode           "postalCode"
-#define NID_postalCode          405
+#define NID_postalCode          396
 #define OBJ_postalCode          OBJ_X509,17L
 
 #define LN_postOfficeBox                "postOfficeBox"
-#define NID_postOfficeBox               406
+#define NID_postOfficeBox               468
 #define OBJ_postOfficeBox               OBJ_X509,18L
 
 #define LN_physicalDeliveryOfficeName           "physicalDeliveryOfficeName"
-#define NID_physicalDeliveryOfficeName          407
+#define NID_physicalDeliveryOfficeName          469
 #define OBJ_physicalDeliveryOfficeName          OBJ_X509,19L
 
 #define LN_telephoneNumber              "telephoneNumber"
-#define NID_telephoneNumber             408
+#define NID_telephoneNumber             470
 #define OBJ_telephoneNumber             OBJ_X509,20L
 
 #define LN_telexNumber          "telexNumber"
-#define NID_telexNumber         409
+#define NID_telexNumber         471
 #define OBJ_telexNumber         OBJ_X509,21L
 
 #define LN_teletexTerminalIdentifier            "teletexTerminalIdentifier"
-#define NID_teletexTerminalIdentifier           410
+#define NID_teletexTerminalIdentifier           472
 #define OBJ_teletexTerminalIdentifier           OBJ_X509,22L
 
 #define LN_facsimileTelephoneNumber             "facsimileTelephoneNumber"
-#define NID_facsimileTelephoneNumber            411
+#define NID_facsimileTelephoneNumber            473
 #define OBJ_facsimileTelephoneNumber            OBJ_X509,23L
 
 #define LN_x121Address          "x121Address"
-#define NID_x121Address         412
+#define NID_x121Address         474
 #define OBJ_x121Address         OBJ_X509,24L
 
 #define LN_internationaliSDNNumber              "internationaliSDNNumber"
-#define NID_internationaliSDNNumber             413
+#define NID_internationaliSDNNumber             475
 #define OBJ_internationaliSDNNumber             OBJ_X509,25L
 
 #define LN_registeredAddress            "registeredAddress"
-#define NID_registeredAddress           414
+#define NID_registeredAddress           476
 #define OBJ_registeredAddress           OBJ_X509,26L
 
 #define LN_destinationIndicator         "destinationIndicator"
-#define NID_destinationIndicator                415
+#define NID_destinationIndicator                477
 #define OBJ_destinationIndicator                OBJ_X509,27L
 
 #define LN_preferredDeliveryMethod              "preferredDeliveryMethod"
-#define NID_preferredDeliveryMethod             416
+#define NID_preferredDeliveryMethod             478
 #define OBJ_preferredDeliveryMethod             OBJ_X509,28L
 
 #define LN_presentationAddress          "presentationAddress"
-#define NID_presentationAddress         417
+#define NID_presentationAddress         479
 #define OBJ_presentationAddress         OBJ_X509,29L
 
 #define LN_supportedApplicationContext          "supportedApplicationContext"
-#define NID_supportedApplicationContext         418
+#define NID_supportedApplicationContext         480
 #define OBJ_supportedApplicationContext         OBJ_X509,30L
 
 #define SN_member               "member"
-#define NID_member              419
+#define NID_member              481
 #define OBJ_member              OBJ_X509,31L
 
 #define SN_owner                "owner"
-#define NID_owner               420
+#define NID_owner               482
 #define OBJ_owner               OBJ_X509,32L
 
 #define LN_roleOccupant         "roleOccupant"
-#define NID_roleOccupant                421
+#define NID_roleOccupant                483
 #define OBJ_roleOccupant                OBJ_X509,33L
 
 #define SN_seeAlso              "seeAlso"
-#define NID_seeAlso             422
+#define NID_seeAlso             484
 #define OBJ_seeAlso             OBJ_X509,34L
 
 #define LN_userPassword         "userPassword"
-#define NID_userPassword                423
+#define NID_userPassword                485
 #define OBJ_userPassword                OBJ_X509,35L
 
 #define LN_userCertificate              "userCertificate"
-#define NID_userCertificate             424
+#define NID_userCertificate             486
 #define OBJ_userCertificate             OBJ_X509,36L
 
 #define LN_cACertificate                "cACertificate"
-#define NID_cACertificate               425
+#define NID_cACertificate               487
 #define OBJ_cACertificate               OBJ_X509,37L
 
 #define LN_authorityRevocationList              "authorityRevocationList"
-#define NID_authorityRevocationList             426
+#define NID_authorityRevocationList             488
 #define OBJ_authorityRevocationList             OBJ_X509,38L
 
 #define LN_certificateRevocationList            "certificateRevocationList"
-#define NID_certificateRevocationList           427
+#define NID_certificateRevocationList           489
 #define OBJ_certificateRevocationList           OBJ_X509,39L
 
 #define LN_crossCertificatePair         "crossCertificatePair"
-#define NID_crossCertificatePair                428
+#define NID_crossCertificatePair                490
 #define OBJ_crossCertificatePair                OBJ_X509,40L
 
 #define SN_name         "name"
 #define LN_name         "name"
-#define NID_name                429
+#define NID_name                170
 #define OBJ_name                OBJ_X509,41L
 
 #define SN_givenName            "GN"
 #define LN_givenName            "givenName"
-#define NID_givenName           430
+#define NID_givenName           99
 #define OBJ_givenName           OBJ_X509,42L
 
 #define SN_initials             "initials"
 #define LN_initials             "initials"
-#define NID_initials            431
+#define NID_initials            101
 #define OBJ_initials            OBJ_X509,43L
 
 #define LN_generationQualifier          "generationQualifier"
-#define NID_generationQualifier         432
+#define NID_generationQualifier         378
 #define OBJ_generationQualifier         OBJ_X509,44L
 
 #define LN_x500UniqueIdentifier         "x500UniqueIdentifier"
-#define NID_x500UniqueIdentifier                433
+#define NID_x500UniqueIdentifier                372
 #define OBJ_x500UniqueIdentifier                OBJ_X509,45L
 
 #define SN_dnQualifier          "dnQualifier"
 #define LN_dnQualifier          "dnQualifier"
-#define NID_dnQualifier         434
+#define NID_dnQualifier         171
 #define OBJ_dnQualifier         OBJ_X509,46L
 
 #define LN_enhancedSearchGuide          "enhancedSearchGuide"
-#define NID_enhancedSearchGuide         435
+#define NID_enhancedSearchGuide         491
 #define OBJ_enhancedSearchGuide         OBJ_X509,47L
 
 #define LN_protocolInformation          "protocolInformation"
-#define NID_protocolInformation         436
+#define NID_protocolInformation         492
 #define OBJ_protocolInformation         OBJ_X509,48L
 
 #define LN_distinguishedName            "distinguishedName"
-#define NID_distinguishedName           437
+#define NID_distinguishedName           493
 #define OBJ_distinguishedName           OBJ_X509,49L
 
 #define LN_uniqueMember         "uniqueMember"
-#define NID_uniqueMember                438
+#define NID_uniqueMember                494
 #define OBJ_uniqueMember                OBJ_X509,50L
 
 #define LN_houseIdentifier              "houseIdentifier"
-#define NID_houseIdentifier             439
+#define NID_houseIdentifier             495
 #define OBJ_houseIdentifier             OBJ_X509,51L
 
 #define LN_supportedAlgorithms          "supportedAlgorithms"
-#define NID_supportedAlgorithms         440
+#define NID_supportedAlgorithms         496
 #define OBJ_supportedAlgorithms         OBJ_X509,52L
 
 #define LN_deltaRevocationList          "deltaRevocationList"
-#define NID_deltaRevocationList         441
+#define NID_deltaRevocationList         497
 #define OBJ_deltaRevocationList         OBJ_X509,53L
 
 #define SN_dmdName              "dmdName"
-#define NID_dmdName             442
+#define NID_dmdName             498
 #define OBJ_dmdName             OBJ_X509,54L
 
 #define LN_pseudonym            "pseudonym"
-#define NID_pseudonym           443
+#define NID_pseudonym           379
 #define OBJ_pseudonym           OBJ_X509,65L
 
 #define SN_role         "role"
 #define LN_role         "role"
-#define NID_role                444
+#define NID_role                340
 #define OBJ_role                OBJ_X509,72L
 
 #define LN_organizationIdentifier               "organizationIdentifier"
-#define NID_organizationIdentifier              445
+#define NID_organizationIdentifier              611
 #define OBJ_organizationIdentifier              OBJ_X509,97L
 
 #define SN_countryCode3c                "c3"
 #define LN_countryCode3c                "countryCode3c"
-#define NID_countryCode3c               446
+#define NID_countryCode3c               612
 #define OBJ_countryCode3c               OBJ_X509,98L
 
 #define SN_countryCode3n                "n3"
 #define LN_countryCode3n                "countryCode3n"
-#define NID_countryCode3n               447
+#define NID_countryCode3n               613
 #define OBJ_countryCode3n               OBJ_X509,99L
 
 #define LN_dnsName              "dnsName"
-#define NID_dnsName             448
+#define NID_dnsName             614
 #define OBJ_dnsName             OBJ_X509,100L
 
 #define SN_X500algorithms               "X500algorithms"
 #define LN_X500algorithms               "directory services - algorithms"
-#define NID_X500algorithms              449
+#define NID_X500algorithms              321
 #define OBJ_X500algorithms              OBJ_X500,8L
 
 #define SN_rsa          "RSA"
 #define LN_rsa          "rsa"
-#define NID_rsa         450
+#define NID_rsa         19
 #define OBJ_rsa         OBJ_X500algorithms,1L,1L
 
 #define SN_mdc2WithRSA          "RSA-MDC2"
 #define LN_mdc2WithRSA          "mdc2WithRSA"
-#define NID_mdc2WithRSA         451
+#define NID_mdc2WithRSA         96
 #define OBJ_mdc2WithRSA         OBJ_X500algorithms,3L,100L
 
 #define SN_mdc2         "MDC2"
 #define LN_mdc2         "mdc2"
-#define NID_mdc2                452
+#define NID_mdc2                95
 #define OBJ_mdc2                OBJ_X500algorithms,3L,101L
 
 #define SN_id_ce                "id-ce"
-#define NID_id_ce               453
+#define NID_id_ce               81
 #define OBJ_id_ce               OBJ_X500,29L
 
 #define SN_subject_directory_attributes         "subjectDirectoryAttributes"
 #define LN_subject_directory_attributes         "X509v3 Subject Directory Attributes"
-#define NID_subject_directory_attributes                454
+#define NID_subject_directory_attributes                424
 #define OBJ_subject_directory_attributes                OBJ_id_ce,9L
 
 #define SN_subject_key_identifier               "subjectKeyIdentifier"
 #define LN_subject_key_identifier               "X509v3 Subject Key Identifier"
-#define NID_subject_key_identifier              455
+#define NID_subject_key_identifier              82
 #define OBJ_subject_key_identifier              OBJ_id_ce,14L
 
 #define SN_key_usage            "keyUsage"
 #define LN_key_usage            "X509v3 Key Usage"
-#define NID_key_usage           456
+#define NID_key_usage           83
 #define OBJ_key_usage           OBJ_id_ce,15L
 
 #define SN_private_key_usage_period             "privateKeyUsagePeriod"
 #define LN_private_key_usage_period             "X509v3 Private Key Usage Period"
-#define NID_private_key_usage_period            457
+#define NID_private_key_usage_period            84
 #define OBJ_private_key_usage_period            OBJ_id_ce,16L
 
 #define SN_subject_alt_name             "subjectAltName"
 #define LN_subject_alt_name             "X509v3 Subject Alternative Name"
-#define NID_subject_alt_name            458
+#define NID_subject_alt_name            85
 #define OBJ_subject_alt_name            OBJ_id_ce,17L
 
 #define SN_issuer_alt_name              "issuerAltName"
 #define LN_issuer_alt_name              "X509v3 Issuer Alternative Name"
-#define NID_issuer_alt_name             459
+#define NID_issuer_alt_name             86
 #define OBJ_issuer_alt_name             OBJ_id_ce,18L
 
 #define SN_basic_constraints            "basicConstraints"
 #define LN_basic_constraints            "X509v3 Basic Constraints"
-#define NID_basic_constraints           460
+#define NID_basic_constraints           87
 #define OBJ_basic_constraints           OBJ_id_ce,19L
 
 #define SN_crl_number           "crlNumber"
 #define LN_crl_number           "X509v3 CRL Number"
-#define NID_crl_number          461
+#define NID_crl_number          88
 #define OBJ_crl_number          OBJ_id_ce,20L
 
 #define SN_crl_reason           "CRLReason"
 #define LN_crl_reason           "X509v3 CRL Reason Code"
-#define NID_crl_reason          462
+#define NID_crl_reason          138
 #define OBJ_crl_reason          OBJ_id_ce,21L
 
 #define SN_invalidity_date              "invalidityDate"
 #define LN_invalidity_date              "Invalidity Date"
-#define NID_invalidity_date             463
+#define NID_invalidity_date             139
 #define OBJ_invalidity_date             OBJ_id_ce,24L
 
 #define SN_delta_crl            "deltaCRL"
 #define LN_delta_crl            "X509v3 Delta CRL Indicator"
-#define NID_delta_crl           464
+#define NID_delta_crl           137
 #define OBJ_delta_crl           OBJ_id_ce,27L
 
 #define SN_issuing_distribution_point           "issuingDistributionPoint"
 #define LN_issuing_distribution_point           "X509v3 Issuing Distribution Point"
-#define NID_issuing_distribution_point          465
+#define NID_issuing_distribution_point          425
 #define OBJ_issuing_distribution_point          OBJ_id_ce,28L
 
 #define SN_certificate_issuer           "certificateIssuer"
 #define LN_certificate_issuer           "X509v3 Certificate Issuer"
-#define NID_certificate_issuer          466
+#define NID_certificate_issuer          426
 #define OBJ_certificate_issuer          OBJ_id_ce,29L
 
 #define SN_name_constraints             "nameConstraints"
 #define LN_name_constraints             "X509v3 Name Constraints"
-#define NID_name_constraints            467
+#define NID_name_constraints            401
 #define OBJ_name_constraints            OBJ_id_ce,30L
 
 #define SN_crl_distribution_points              "crlDistributionPoints"
 #define LN_crl_distribution_points              "X509v3 CRL Distribution Points"
-#define NID_crl_distribution_points             468
+#define NID_crl_distribution_points             102
 #define OBJ_crl_distribution_points             OBJ_id_ce,31L
 
 #define SN_certificate_policies         "certificatePolicies"
 #define LN_certificate_policies         "X509v3 Certificate Policies"
-#define NID_certificate_policies                469
+#define NID_certificate_policies                89
 #define OBJ_certificate_policies                OBJ_id_ce,32L
 
 #define SN_any_policy           "anyPolicy"
 #define LN_any_policy           "X509v3 Any Policy"
-#define NID_any_policy          470
+#define NID_any_policy          421
 #define OBJ_any_policy          OBJ_certificate_policies,0L
 
 #define SN_policy_mappings              "policyMappings"
 #define LN_policy_mappings              "X509v3 Policy Mappings"
-#define NID_policy_mappings             471
+#define NID_policy_mappings             422
 #define OBJ_policy_mappings             OBJ_id_ce,33L
 
 #define SN_authority_key_identifier             "authorityKeyIdentifier"
 #define LN_authority_key_identifier             "X509v3 Authority Key Identifier"
-#define NID_authority_key_identifier            472
+#define NID_authority_key_identifier            90
 #define OBJ_authority_key_identifier            OBJ_id_ce,35L
 
 #define SN_policy_constraints           "policyConstraints"
 #define LN_policy_constraints           "X509v3 Policy Constraints"
-#define NID_policy_constraints          473
+#define NID_policy_constraints          341
 #define OBJ_policy_constraints          OBJ_id_ce,36L
 
 #define SN_ext_key_usage                "extendedKeyUsage"
 #define LN_ext_key_usage                "X509v3 Extended Key Usage"
-#define NID_ext_key_usage               474
+#define NID_ext_key_usage               123
 #define OBJ_ext_key_usage               OBJ_id_ce,37L
 
 #define SN_freshest_crl         "freshestCRL"
 #define LN_freshest_crl         "X509v3 Freshest CRL"
-#define NID_freshest_crl                475
+#define NID_freshest_crl                463
 #define OBJ_freshest_crl                OBJ_id_ce,46L
 
 #define SN_inhibit_any_policy           "inhibitAnyPolicy"
 #define LN_inhibit_any_policy           "X509v3 Inhibit Any Policy"
-#define NID_inhibit_any_policy          476
+#define NID_inhibit_any_policy          423
 #define OBJ_inhibit_any_policy          OBJ_id_ce,54L
 
 #define SN_target_information           "targetInformation"
 #define LN_target_information           "X509v3 AC Targeting"
-#define NID_target_information          477
+#define NID_target_information          342
 #define OBJ_target_information          OBJ_id_ce,55L
 
 #define SN_no_rev_avail         "noRevAvail"
 #define LN_no_rev_avail         "X509v3 No Revocation Available"
-#define NID_no_rev_avail                478
+#define NID_no_rev_avail                343
 #define OBJ_no_rev_avail                OBJ_id_ce,56L
 
 #define SN_anyExtendedKeyUsage          "anyExtendedKeyUsage"
 #define LN_anyExtendedKeyUsage          "Any Extended Key Usage"
-#define NID_anyExtendedKeyUsage         479
+#define NID_anyExtendedKeyUsage         513
 #define OBJ_anyExtendedKeyUsage         OBJ_ext_key_usage,0L
 
 #define SN_netscape             "Netscape"
 #define LN_netscape             "Netscape Communications Corp."
-#define NID_netscape            480
+#define NID_netscape            57
 #define OBJ_netscape            2L,16L,840L,1L,113730L
 
 #define SN_netscape_cert_extension              "nsCertExt"
 #define LN_netscape_cert_extension              "Netscape Certificate Extension"
-#define NID_netscape_cert_extension             481
+#define NID_netscape_cert_extension             58
 #define OBJ_netscape_cert_extension             OBJ_netscape,1L
 
 #define SN_netscape_data_type           "nsDataType"
 #define LN_netscape_data_type           "Netscape Data Type"
-#define NID_netscape_data_type          482
+#define NID_netscape_data_type          59
 #define OBJ_netscape_data_type          OBJ_netscape,2L
 
 #define SN_netscape_cert_type           "nsCertType"
 #define LN_netscape_cert_type           "Netscape Cert Type"
-#define NID_netscape_cert_type          483
+#define NID_netscape_cert_type          71
 #define OBJ_netscape_cert_type          OBJ_netscape_cert_extension,1L
 
 #define SN_netscape_base_url            "nsBaseUrl"
 #define LN_netscape_base_url            "Netscape Base Url"
-#define NID_netscape_base_url           484
+#define NID_netscape_base_url           72
 #define OBJ_netscape_base_url           OBJ_netscape_cert_extension,2L
 
 #define SN_netscape_revocation_url              "nsRevocationUrl"
 #define LN_netscape_revocation_url              "Netscape Revocation Url"
-#define NID_netscape_revocation_url             485
+#define NID_netscape_revocation_url             73
 #define OBJ_netscape_revocation_url             OBJ_netscape_cert_extension,3L
 
 #define SN_netscape_ca_revocation_url           "nsCaRevocationUrl"
 #define LN_netscape_ca_revocation_url           "Netscape CA Revocation Url"
-#define NID_netscape_ca_revocation_url          486
+#define NID_netscape_ca_revocation_url          74
 #define OBJ_netscape_ca_revocation_url          OBJ_netscape_cert_extension,4L
 
 #define SN_netscape_renewal_url         "nsRenewalUrl"
 #define LN_netscape_renewal_url         "Netscape Renewal Url"
-#define NID_netscape_renewal_url                487
+#define NID_netscape_renewal_url                75
 #define OBJ_netscape_renewal_url                OBJ_netscape_cert_extension,7L
 
 #define SN_netscape_ca_policy_url               "nsCaPolicyUrl"
 #define LN_netscape_ca_policy_url               "Netscape CA Policy Url"
-#define NID_netscape_ca_policy_url              488
+#define NID_netscape_ca_policy_url              76
 #define OBJ_netscape_ca_policy_url              OBJ_netscape_cert_extension,8L
 
 #define SN_netscape_ssl_server_name             "nsSslServerName"
 #define LN_netscape_ssl_server_name             "Netscape SSL Server Name"
-#define NID_netscape_ssl_server_name            489
+#define NID_netscape_ssl_server_name            77
 #define OBJ_netscape_ssl_server_name            OBJ_netscape_cert_extension,12L
 
 #define SN_netscape_comment             "nsComment"
 #define LN_netscape_comment             "Netscape Comment"
-#define NID_netscape_comment            490
+#define NID_netscape_comment            78
 #define OBJ_netscape_comment            OBJ_netscape_cert_extension,13L
 
 #define SN_netscape_cert_sequence               "nsCertSequence"
 #define LN_netscape_cert_sequence               "Netscape Certificate Sequence"
-#define NID_netscape_cert_sequence              491
+#define NID_netscape_cert_sequence              79
 #define OBJ_netscape_cert_sequence              OBJ_netscape_data_type,5L
 
 #define SN_ns_sgc               "nsSGC"
 #define LN_ns_sgc               "Netscape Server Gated Crypto"
-#define NID_ns_sgc              492
+#define NID_ns_sgc              136
 #define OBJ_ns_sgc              OBJ_netscape,4L,1L
 
 #define SN_org          "ORG"
 #define LN_org          "org"
-#define NID_org         493
+#define NID_org         322
 #define OBJ_org         OBJ_iso,3L
 
 #define SN_dod          "DOD"
 #define LN_dod          "dod"
-#define NID_dod         494
+#define NID_dod         323
 #define OBJ_dod         OBJ_org,6L
 
 #define SN_iana         "IANA"
 #define LN_iana         "iana"
-#define NID_iana                495
+#define NID_iana                324
 #define OBJ_iana                OBJ_dod,1L
 
 #define OBJ_internet            OBJ_iana
 
 #define SN_Directory            "directory"
 #define LN_Directory            "Directory"
-#define NID_Directory           496
+#define NID_Directory           325
 #define OBJ_Directory           OBJ_internet,1L
 
 #define SN_Management           "mgmt"
 #define LN_Management           "Management"
-#define NID_Management          497
+#define NID_Management          326
 #define OBJ_Management          OBJ_internet,2L
 
 #define SN_Experimental         "experimental"
 #define LN_Experimental         "Experimental"
-#define NID_Experimental                498
+#define NID_Experimental                327
 #define OBJ_Experimental                OBJ_internet,3L
 
 #define SN_Private              "private"
 #define LN_Private              "Private"
-#define NID_Private             499
+#define NID_Private             328
 #define OBJ_Private             OBJ_internet,4L
 
 #define SN_Security             "security"
 #define LN_Security             "Security"
-#define NID_Security            500
+#define NID_Security            329
 #define OBJ_Security            OBJ_internet,5L
 
 #define SN_SNMPv2               "snmpv2"
 #define LN_SNMPv2               "SNMPv2"
-#define NID_SNMPv2              501
+#define NID_SNMPv2              330
 #define OBJ_SNMPv2              OBJ_internet,6L
 
 #define LN_Mail         "Mail"
-#define NID_Mail                502
+#define NID_Mail                331
 #define OBJ_Mail                OBJ_internet,7L
 
 #define SN_Enterprises          "enterprises"
 #define LN_Enterprises          "Enterprises"
-#define NID_Enterprises         503
+#define NID_Enterprises         332
 #define OBJ_Enterprises         OBJ_Private,1L
 
 #define SN_dcObject             "dcobject"
 #define LN_dcObject             "dcObject"
-#define NID_dcObject            504
+#define NID_dcObject            333
 #define OBJ_dcObject            OBJ_Enterprises,1466L,344L
 
 #define SN_mime_mhs             "mime-mhs"
 #define LN_mime_mhs             "MIME MHS"
-#define NID_mime_mhs            505
+#define NID_mime_mhs            373
 #define OBJ_mime_mhs            OBJ_Mail,1L
 
 #define SN_mime_mhs_headings            "mime-mhs-headings"
 #define LN_mime_mhs_headings            "mime-mhs-headings"
-#define NID_mime_mhs_headings           506
+#define NID_mime_mhs_headings           374
 #define OBJ_mime_mhs_headings           OBJ_mime_mhs,1L
 
 #define SN_mime_mhs_bodies              "mime-mhs-bodies"
 #define LN_mime_mhs_bodies              "mime-mhs-bodies"
-#define NID_mime_mhs_bodies             507
+#define NID_mime_mhs_bodies             375
 #define OBJ_mime_mhs_bodies             OBJ_mime_mhs,2L
 
 #define SN_id_hex_partial_message               "id-hex-partial-message"
 #define LN_id_hex_partial_message               "id-hex-partial-message"
-#define NID_id_hex_partial_message              508
+#define NID_id_hex_partial_message              376
 #define OBJ_id_hex_partial_message              OBJ_mime_mhs_headings,1L
 
 #define SN_id_hex_multipart_message             "id-hex-multipart-message"
 #define LN_id_hex_multipart_message             "id-hex-multipart-message"
-#define NID_id_hex_multipart_message            509
+#define NID_id_hex_multipart_message            377
 #define OBJ_id_hex_multipart_message            OBJ_mime_mhs_headings,2L
 
 #define SN_zlib_compression             "ZLIB"
 #define LN_zlib_compression             "zlib compression"
-#define NID_zlib_compression            510
+#define NID_zlib_compression            122
 #define OBJ_zlib_compression            OBJ_id_smime_alg,8L
 
 #define OBJ_csor                2L,16L,840L,1L,101L,3L
@@ -2328,593 +2328,593 @@
 
 #define SN_aes_128_ecb          "AES-128-ECB"
 #define LN_aes_128_ecb          "aes-128-ecb"
-#define NID_aes_128_ecb         511
+#define NID_aes_128_ecb         350
 #define OBJ_aes_128_ecb         OBJ_aes,1L
 
 #define SN_aes_128_cbc          "AES-128-CBC"
 #define LN_aes_128_cbc          "aes-128-cbc"
-#define NID_aes_128_cbc         512
+#define NID_aes_128_cbc         351
 #define OBJ_aes_128_cbc         OBJ_aes,2L
 
 #define SN_aes_128_ofb128               "AES-128-OFB"
 #define LN_aes_128_ofb128               "aes-128-ofb"
-#define NID_aes_128_ofb128              513
+#define NID_aes_128_ofb128              352
 #define OBJ_aes_128_ofb128              OBJ_aes,3L
 
 #define SN_aes_128_cfb128               "AES-128-CFB"
 #define LN_aes_128_cfb128               "aes-128-cfb"
-#define NID_aes_128_cfb128              514
+#define NID_aes_128_cfb128              353
 #define OBJ_aes_128_cfb128              OBJ_aes,4L
 
 #define SN_id_aes128_wrap               "id-aes128-wrap"
-#define NID_id_aes128_wrap              515
+#define NID_id_aes128_wrap              439
 #define OBJ_id_aes128_wrap              OBJ_aes,5L
 
 #define SN_aes_128_gcm          "id-aes128-GCM"
 #define LN_aes_128_gcm          "aes-128-gcm"
-#define NID_aes_128_gcm         516
+#define NID_aes_128_gcm         501
 #define OBJ_aes_128_gcm         OBJ_aes,6L
 
 #define SN_aes_128_ccm          "id-aes128-CCM"
 #define LN_aes_128_ccm          "aes-128-ccm"
-#define NID_aes_128_ccm         517
+#define NID_aes_128_ccm         502
 #define OBJ_aes_128_ccm         OBJ_aes,7L
 
 #define SN_id_aes128_wrap_pad           "id-aes128-wrap-pad"
-#define NID_id_aes128_wrap_pad          518
+#define NID_id_aes128_wrap_pad          503
 #define OBJ_id_aes128_wrap_pad          OBJ_aes,8L
 
 #define SN_aes_192_ecb          "AES-192-ECB"
 #define LN_aes_192_ecb          "aes-192-ecb"
-#define NID_aes_192_ecb         519
+#define NID_aes_192_ecb         354
 #define OBJ_aes_192_ecb         OBJ_aes,21L
 
 #define SN_aes_192_cbc          "AES-192-CBC"
 #define LN_aes_192_cbc          "aes-192-cbc"
-#define NID_aes_192_cbc         520
+#define NID_aes_192_cbc         355
 #define OBJ_aes_192_cbc         OBJ_aes,22L
 
 #define SN_aes_192_ofb128               "AES-192-OFB"
 #define LN_aes_192_ofb128               "aes-192-ofb"
-#define NID_aes_192_ofb128              521
+#define NID_aes_192_ofb128              356
 #define OBJ_aes_192_ofb128              OBJ_aes,23L
 
 #define SN_aes_192_cfb128               "AES-192-CFB"
 #define LN_aes_192_cfb128               "aes-192-cfb"
-#define NID_aes_192_cfb128              522
+#define NID_aes_192_cfb128              357
 #define OBJ_aes_192_cfb128              OBJ_aes,24L
 
 #define SN_id_aes192_wrap               "id-aes192-wrap"
-#define NID_id_aes192_wrap              523
+#define NID_id_aes192_wrap              440
 #define OBJ_id_aes192_wrap              OBJ_aes,25L
 
 #define SN_aes_192_gcm          "id-aes192-GCM"
 #define LN_aes_192_gcm          "aes-192-gcm"
-#define NID_aes_192_gcm         524
+#define NID_aes_192_gcm         504
 #define OBJ_aes_192_gcm         OBJ_aes,26L
 
 #define SN_aes_192_ccm          "id-aes192-CCM"
 #define LN_aes_192_ccm          "aes-192-ccm"
-#define NID_aes_192_ccm         525
+#define NID_aes_192_ccm         505
 #define OBJ_aes_192_ccm         OBJ_aes,27L
 
 #define SN_id_aes192_wrap_pad           "id-aes192-wrap-pad"
-#define NID_id_aes192_wrap_pad          526
+#define NID_id_aes192_wrap_pad          506
 #define OBJ_id_aes192_wrap_pad          OBJ_aes,28L
 
 #define SN_aes_256_ecb          "AES-256-ECB"
 #define LN_aes_256_ecb          "aes-256-ecb"
-#define NID_aes_256_ecb         527
+#define NID_aes_256_ecb         358
 #define OBJ_aes_256_ecb         OBJ_aes,41L
 
 #define SN_aes_256_cbc          "AES-256-CBC"
 #define LN_aes_256_cbc          "aes-256-cbc"
-#define NID_aes_256_cbc         528
+#define NID_aes_256_cbc         359
 #define OBJ_aes_256_cbc         OBJ_aes,42L
 
 #define SN_aes_256_ofb128               "AES-256-OFB"
 #define LN_aes_256_ofb128               "aes-256-ofb"
-#define NID_aes_256_ofb128              529
+#define NID_aes_256_ofb128              360
 #define OBJ_aes_256_ofb128              OBJ_aes,43L
 
 #define SN_aes_256_cfb128               "AES-256-CFB"
 #define LN_aes_256_cfb128               "aes-256-cfb"
-#define NID_aes_256_cfb128              530
+#define NID_aes_256_cfb128              361
 #define OBJ_aes_256_cfb128              OBJ_aes,44L
 
 #define SN_id_aes256_wrap               "id-aes256-wrap"
-#define NID_id_aes256_wrap              531
+#define NID_id_aes256_wrap              441
 #define OBJ_id_aes256_wrap              OBJ_aes,45L
 
 #define SN_aes_256_gcm          "id-aes256-GCM"
 #define LN_aes_256_gcm          "aes-256-gcm"
-#define NID_aes_256_gcm         532
+#define NID_aes_256_gcm         507
 #define OBJ_aes_256_gcm         OBJ_aes,46L
 
 #define SN_aes_256_ccm          "id-aes256-CCM"
 #define LN_aes_256_ccm          "aes-256-ccm"
-#define NID_aes_256_ccm         533
+#define NID_aes_256_ccm         508
 #define OBJ_aes_256_ccm         OBJ_aes,47L
 
 #define SN_id_aes256_wrap_pad           "id-aes256-wrap-pad"
-#define NID_id_aes256_wrap_pad          534
+#define NID_id_aes256_wrap_pad          509
 #define OBJ_id_aes256_wrap_pad          OBJ_aes,48L
 
 #define SN_aes_128_xts          "AES-128-XTS"
 #define LN_aes_128_xts          "aes-128-xts"
-#define NID_aes_128_xts         535
+#define NID_aes_128_xts         516
 #define OBJ_aes_128_xts         OBJ_ieee_siswg,0L,1L,1L
 
 #define SN_aes_256_xts          "AES-256-XTS"
 #define LN_aes_256_xts          "aes-256-xts"
-#define NID_aes_256_xts         536
+#define NID_aes_256_xts         517
 #define OBJ_aes_256_xts         OBJ_ieee_siswg,0L,1L,2L
 
 #define SN_aes_128_cfb1         "AES-128-CFB1"
 #define LN_aes_128_cfb1         "aes-128-cfb1"
-#define NID_aes_128_cfb1                537
+#define NID_aes_128_cfb1                385
 
 #define SN_aes_192_cfb1         "AES-192-CFB1"
 #define LN_aes_192_cfb1         "aes-192-cfb1"
-#define NID_aes_192_cfb1                538
+#define NID_aes_192_cfb1                386
 
 #define SN_aes_256_cfb1         "AES-256-CFB1"
 #define LN_aes_256_cfb1         "aes-256-cfb1"
-#define NID_aes_256_cfb1                539
+#define NID_aes_256_cfb1                387
 
 #define SN_aes_128_cfb8         "AES-128-CFB8"
 #define LN_aes_128_cfb8         "aes-128-cfb8"
-#define NID_aes_128_cfb8                540
+#define NID_aes_128_cfb8                388
 
 #define SN_aes_192_cfb8         "AES-192-CFB8"
 #define LN_aes_192_cfb8         "aes-192-cfb8"
-#define NID_aes_192_cfb8                541
+#define NID_aes_192_cfb8                389
 
 #define SN_aes_256_cfb8         "AES-256-CFB8"
 #define LN_aes_256_cfb8         "aes-256-cfb8"
-#define NID_aes_256_cfb8                542
+#define NID_aes_256_cfb8                390
 
 #define SN_aes_128_ctr          "AES-128-CTR"
 #define LN_aes_128_ctr          "aes-128-ctr"
-#define NID_aes_128_ctr         543
+#define NID_aes_128_ctr         510
 
 #define SN_aes_192_ctr          "AES-192-CTR"
 #define LN_aes_192_ctr          "aes-192-ctr"
-#define NID_aes_192_ctr         544
+#define NID_aes_192_ctr         511
 
 #define SN_aes_256_ctr          "AES-256-CTR"
 #define LN_aes_256_ctr          "aes-256-ctr"
-#define NID_aes_256_ctr         545
+#define NID_aes_256_ctr         512
 
 #define SN_aes_128_ocb          "AES-128-OCB"
 #define LN_aes_128_ocb          "aes-128-ocb"
-#define NID_aes_128_ocb         546
+#define NID_aes_128_ocb         543
 
 #define SN_aes_192_ocb          "AES-192-OCB"
 #define LN_aes_192_ocb          "aes-192-ocb"
-#define NID_aes_192_ocb         547
+#define NID_aes_192_ocb         544
 
 #define SN_aes_256_ocb          "AES-256-OCB"
 #define LN_aes_256_ocb          "aes-256-ocb"
-#define NID_aes_256_ocb         548
+#define NID_aes_256_ocb         545
 
 #define SN_des_cfb1             "DES-CFB1"
 #define LN_des_cfb1             "des-cfb1"
-#define NID_des_cfb1            549
+#define NID_des_cfb1            391
 
 #define SN_des_cfb8             "DES-CFB8"
 #define LN_des_cfb8             "des-cfb8"
-#define NID_des_cfb8            550
+#define NID_des_cfb8            392
 
 #define SN_des_ede3_cfb1                "DES-EDE3-CFB1"
 #define LN_des_ede3_cfb1                "des-ede3-cfb1"
-#define NID_des_ede3_cfb1               551
+#define NID_des_ede3_cfb1               393
 
 #define SN_des_ede3_cfb8                "DES-EDE3-CFB8"
 #define LN_des_ede3_cfb8                "des-ede3-cfb8"
-#define NID_des_ede3_cfb8               552
+#define NID_des_ede3_cfb8               394
 
 #define OBJ_nist_hashalgs               OBJ_nistAlgorithms,2L
 
 #define SN_sha256               "SHA256"
 #define LN_sha256               "sha256"
-#define NID_sha256              553
+#define NID_sha256              407
 #define OBJ_sha256              OBJ_nist_hashalgs,1L
 
 #define SN_sha384               "SHA384"
 #define LN_sha384               "sha384"
-#define NID_sha384              554
+#define NID_sha384              408
 #define OBJ_sha384              OBJ_nist_hashalgs,2L
 
 #define SN_sha512               "SHA512"
 #define LN_sha512               "sha512"
-#define NID_sha512              555
+#define NID_sha512              409
 #define OBJ_sha512              OBJ_nist_hashalgs,3L
 
 #define SN_sha224               "SHA224"
 #define LN_sha224               "sha224"
-#define NID_sha224              556
+#define NID_sha224              410
 #define OBJ_sha224              OBJ_nist_hashalgs,4L
 
 #define SN_sha512_224           "SHA512-224"
 #define LN_sha512_224           "sha512-224"
-#define NID_sha512_224          557
+#define NID_sha512_224          616
 #define OBJ_sha512_224          OBJ_nist_hashalgs,5L
 
 #define SN_sha512_256           "SHA512-256"
 #define LN_sha512_256           "sha512-256"
-#define NID_sha512_256          558
+#define NID_sha512_256          617
 #define OBJ_sha512_256          OBJ_nist_hashalgs,6L
 
 #define SN_sha3_224             "SHA3-224"
 #define LN_sha3_224             "sha3-224"
-#define NID_sha3_224            559
+#define NID_sha3_224            618
 #define OBJ_sha3_224            OBJ_nist_hashalgs,7L
 
 #define SN_sha3_256             "SHA3-256"
 #define LN_sha3_256             "sha3-256"
-#define NID_sha3_256            560
+#define NID_sha3_256            619
 #define OBJ_sha3_256            OBJ_nist_hashalgs,8L
 
 #define SN_sha3_384             "SHA3-384"
 #define LN_sha3_384             "sha3-384"
-#define NID_sha3_384            561
+#define NID_sha3_384            620
 #define OBJ_sha3_384            OBJ_nist_hashalgs,9L
 
 #define SN_sha3_512             "SHA3-512"
 #define LN_sha3_512             "sha3-512"
-#define NID_sha3_512            562
+#define NID_sha3_512            621
 #define OBJ_sha3_512            OBJ_nist_hashalgs,10L
 
 #define SN_shake128             "SHAKE128"
 #define LN_shake128             "shake128"
-#define NID_shake128            563
+#define NID_shake128            622
 #define OBJ_shake128            OBJ_nist_hashalgs,11L
 
 #define SN_shake256             "SHAKE256"
 #define LN_shake256             "shake256"
-#define NID_shake256            564
+#define NID_shake256            623
 #define OBJ_shake256            OBJ_nist_hashalgs,12L
 
 #define SN_hmac_sha3_224                "id-hmacWithSHA3-224"
 #define LN_hmac_sha3_224                "hmac-sha3-224"
-#define NID_hmac_sha3_224               565
+#define NID_hmac_sha3_224               624
 #define OBJ_hmac_sha3_224               OBJ_nist_hashalgs,13L
 
 #define SN_hmac_sha3_256                "id-hmacWithSHA3-256"
 #define LN_hmac_sha3_256                "hmac-sha3-256"
-#define NID_hmac_sha3_256               566
+#define NID_hmac_sha3_256               625
 #define OBJ_hmac_sha3_256               OBJ_nist_hashalgs,14L
 
 #define SN_hmac_sha3_384                "id-hmacWithSHA3-384"
 #define LN_hmac_sha3_384                "hmac-sha3-384"
-#define NID_hmac_sha3_384               567
+#define NID_hmac_sha3_384               626
 #define OBJ_hmac_sha3_384               OBJ_nist_hashalgs,15L
 
 #define SN_hmac_sha3_512                "id-hmacWithSHA3-512"
 #define LN_hmac_sha3_512                "hmac-sha3-512"
-#define NID_hmac_sha3_512               568
+#define NID_hmac_sha3_512               627
 #define OBJ_hmac_sha3_512               OBJ_nist_hashalgs,16L
 
 #define SN_kmac128              "KMAC128"
 #define LN_kmac128              "kmac128"
-#define NID_kmac128             569
+#define NID_kmac128             662
 #define OBJ_kmac128             OBJ_nist_hashalgs,19L
 
 #define SN_kmac256              "KMAC256"
 #define LN_kmac256              "kmac256"
-#define NID_kmac256             570
+#define NID_kmac256             663
 #define OBJ_kmac256             OBJ_nist_hashalgs,20L
 
 #define OBJ_dsa_with_sha2               OBJ_nistAlgorithms,3L
 
 #define SN_dsa_with_SHA224              "dsa_with_SHA224"
-#define NID_dsa_with_SHA224             571
+#define NID_dsa_with_SHA224             453
 #define OBJ_dsa_with_SHA224             OBJ_dsa_with_sha2,1L
 
 #define SN_dsa_with_SHA256              "dsa_with_SHA256"
-#define NID_dsa_with_SHA256             572
+#define NID_dsa_with_SHA256             454
 #define OBJ_dsa_with_SHA256             OBJ_dsa_with_sha2,2L
 
 #define OBJ_sigAlgs             OBJ_nistAlgorithms,3L
 
 #define SN_dsa_with_SHA384              "id-dsa-with-sha384"
 #define LN_dsa_with_SHA384              "dsa_with_SHA384"
-#define NID_dsa_with_SHA384             573
+#define NID_dsa_with_SHA384             628
 #define OBJ_dsa_with_SHA384             OBJ_sigAlgs,3L
 
 #define SN_dsa_with_SHA512              "id-dsa-with-sha512"
 #define LN_dsa_with_SHA512              "dsa_with_SHA512"
-#define NID_dsa_with_SHA512             574
+#define NID_dsa_with_SHA512             629
 #define OBJ_dsa_with_SHA512             OBJ_sigAlgs,4L
 
 #define SN_dsa_with_SHA3_224            "id-dsa-with-sha3-224"
 #define LN_dsa_with_SHA3_224            "dsa_with_SHA3-224"
-#define NID_dsa_with_SHA3_224           575
+#define NID_dsa_with_SHA3_224           630
 #define OBJ_dsa_with_SHA3_224           OBJ_sigAlgs,5L
 
 #define SN_dsa_with_SHA3_256            "id-dsa-with-sha3-256"
 #define LN_dsa_with_SHA3_256            "dsa_with_SHA3-256"
-#define NID_dsa_with_SHA3_256           576
+#define NID_dsa_with_SHA3_256           631
 #define OBJ_dsa_with_SHA3_256           OBJ_sigAlgs,6L
 
 #define SN_dsa_with_SHA3_384            "id-dsa-with-sha3-384"
 #define LN_dsa_with_SHA3_384            "dsa_with_SHA3-384"
-#define NID_dsa_with_SHA3_384           577
+#define NID_dsa_with_SHA3_384           632
 #define OBJ_dsa_with_SHA3_384           OBJ_sigAlgs,7L
 
 #define SN_dsa_with_SHA3_512            "id-dsa-with-sha3-512"
 #define LN_dsa_with_SHA3_512            "dsa_with_SHA3-512"
-#define NID_dsa_with_SHA3_512           578
+#define NID_dsa_with_SHA3_512           633
 #define OBJ_dsa_with_SHA3_512           OBJ_sigAlgs,8L
 
 #define SN_ecdsa_with_SHA3_224          "id-ecdsa-with-sha3-224"
 #define LN_ecdsa_with_SHA3_224          "ecdsa_with_SHA3-224"
-#define NID_ecdsa_with_SHA3_224         579
+#define NID_ecdsa_with_SHA3_224         634
 #define OBJ_ecdsa_with_SHA3_224         OBJ_sigAlgs,9L
 
 #define SN_ecdsa_with_SHA3_256          "id-ecdsa-with-sha3-256"
 #define LN_ecdsa_with_SHA3_256          "ecdsa_with_SHA3-256"
-#define NID_ecdsa_with_SHA3_256         580
+#define NID_ecdsa_with_SHA3_256         635
 #define OBJ_ecdsa_with_SHA3_256         OBJ_sigAlgs,10L
 
 #define SN_ecdsa_with_SHA3_384          "id-ecdsa-with-sha3-384"
 #define LN_ecdsa_with_SHA3_384          "ecdsa_with_SHA3-384"
-#define NID_ecdsa_with_SHA3_384         581
+#define NID_ecdsa_with_SHA3_384         636
 #define OBJ_ecdsa_with_SHA3_384         OBJ_sigAlgs,11L
 
 #define SN_ecdsa_with_SHA3_512          "id-ecdsa-with-sha3-512"
 #define LN_ecdsa_with_SHA3_512          "ecdsa_with_SHA3-512"
-#define NID_ecdsa_with_SHA3_512         582
+#define NID_ecdsa_with_SHA3_512         637
 #define OBJ_ecdsa_with_SHA3_512         OBJ_sigAlgs,12L
 
 #define SN_RSA_SHA3_224         "id-rsassa-pkcs1-v1_5-with-sha3-224"
 #define LN_RSA_SHA3_224         "RSA-SHA3-224"
-#define NID_RSA_SHA3_224                583
+#define NID_RSA_SHA3_224                638
 #define OBJ_RSA_SHA3_224                OBJ_sigAlgs,13L
 
 #define SN_RSA_SHA3_256         "id-rsassa-pkcs1-v1_5-with-sha3-256"
 #define LN_RSA_SHA3_256         "RSA-SHA3-256"
-#define NID_RSA_SHA3_256                584
+#define NID_RSA_SHA3_256                639
 #define OBJ_RSA_SHA3_256                OBJ_sigAlgs,14L
 
 #define SN_RSA_SHA3_384         "id-rsassa-pkcs1-v1_5-with-sha3-384"
 #define LN_RSA_SHA3_384         "RSA-SHA3-384"
-#define NID_RSA_SHA3_384                585
+#define NID_RSA_SHA3_384                640
 #define OBJ_RSA_SHA3_384                OBJ_sigAlgs,15L
 
 #define SN_RSA_SHA3_512         "id-rsassa-pkcs1-v1_5-with-sha3-512"
 #define LN_RSA_SHA3_512         "RSA-SHA3-512"
-#define NID_RSA_SHA3_512                586
+#define NID_RSA_SHA3_512                641
 #define OBJ_RSA_SHA3_512                OBJ_sigAlgs,16L
 
 #define SN_hold_instruction_code                "holdInstructionCode"
 #define LN_hold_instruction_code                "Hold Instruction Code"
-#define NID_hold_instruction_code               587
+#define NID_hold_instruction_code               362
 #define OBJ_hold_instruction_code               OBJ_id_ce,23L
 
 #define OBJ_holdInstruction             OBJ_X9_57,2L
 
 #define SN_hold_instruction_none                "holdInstructionNone"
 #define LN_hold_instruction_none                "Hold Instruction None"
-#define NID_hold_instruction_none               588
+#define NID_hold_instruction_none               363
 #define OBJ_hold_instruction_none               OBJ_holdInstruction,1L
 
 #define SN_hold_instruction_call_issuer         "holdInstructionCallIssuer"
 #define LN_hold_instruction_call_issuer         "Hold Instruction Call Issuer"
-#define NID_hold_instruction_call_issuer                589
+#define NID_hold_instruction_call_issuer                364
 #define OBJ_hold_instruction_call_issuer                OBJ_holdInstruction,2L
 
 #define SN_hold_instruction_reject              "holdInstructionReject"
 #define LN_hold_instruction_reject              "Hold Instruction Reject"
-#define NID_hold_instruction_reject             590
+#define NID_hold_instruction_reject             365
 #define OBJ_hold_instruction_reject             OBJ_holdInstruction,3L
 
 #define SN_data         "data"
-#define NID_data                591
+#define NID_data                366
 #define OBJ_data                OBJ_itu_t,9L
 
 #define SN_pss          "pss"
-#define NID_pss         592
+#define NID_pss         367
 #define OBJ_pss         OBJ_data,2342L
 
 #define SN_ucl          "ucl"
-#define NID_ucl         593
+#define NID_ucl         368
 #define OBJ_ucl         OBJ_pss,19200300L
 
 #define SN_pilot                "pilot"
-#define NID_pilot               594
+#define NID_pilot               369
 #define OBJ_pilot               OBJ_ucl,100L
 
 #define LN_pilotAttributeType           "pilotAttributeType"
-#define NID_pilotAttributeType          595
+#define NID_pilotAttributeType          370
 #define OBJ_pilotAttributeType          OBJ_pilot,1L
 
 #define SN_rfc822Mailbox                "mail"
 #define LN_rfc822Mailbox                "rfc822Mailbox"
-#define NID_rfc822Mailbox               596
+#define NID_rfc822Mailbox               371
 #define OBJ_rfc822Mailbox               OBJ_pilotAttributeType,3L
 
 #define SN_domainComponent              "DC"
 #define LN_domainComponent              "domainComponent"
-#define NID_domainComponent             597
+#define NID_domainComponent             334
 #define OBJ_domainComponent             OBJ_pilotAttributeType,25L
 
 #define SN_cryptopro            "cryptopro"
-#define NID_cryptopro           598
+#define NID_cryptopro           455
 #define OBJ_cryptopro           OBJ_member_body,643L,2L,2L
 
 #define SN_cryptocom            "cryptocom"
-#define NID_cryptocom           599
+#define NID_cryptocom           456
 #define OBJ_cryptocom           OBJ_member_body,643L,2L,9L
 
 #define SN_id_tc26              "id-tc26"
-#define NID_id_tc26             600
+#define NID_id_tc26             547
 #define OBJ_id_tc26             OBJ_member_body,643L,7L,1L
 
 #define SN_id_GostR3411_94              "md_gost94"
 #define LN_id_GostR3411_94              "GOST R 34.11-94"
-#define NID_id_GostR3411_94             601
+#define NID_id_GostR3411_94             457
 #define OBJ_id_GostR3411_94             OBJ_cryptopro,9L
 
 #define SN_id_HMACGostR3411_94          "id-HMACGostR3411-94"
 #define LN_id_HMACGostR3411_94          "HMAC GOST 34.11-94"
-#define NID_id_HMACGostR3411_94         602
+#define NID_id_HMACGostR3411_94         458
 #define OBJ_id_HMACGostR3411_94         OBJ_cryptopro,10L
 
 #define SN_id_GostR3410_2001            "gost2001"
 #define LN_id_GostR3410_2001            "GOST R 34.10-2001"
-#define NID_id_GostR3410_2001           603
+#define NID_id_GostR3410_2001           459
 #define OBJ_id_GostR3410_2001           OBJ_cryptopro,19L
 
 #define SN_id_Gost28147_89              "gost89"
 #define LN_id_Gost28147_89              "GOST 28147-89"
-#define NID_id_Gost28147_89             604
+#define NID_id_Gost28147_89             460
 #define OBJ_id_Gost28147_89             OBJ_cryptopro,21L
 
 #define SN_id_tc26_algorithms           "id-tc26-algorithms"
-#define NID_id_tc26_algorithms          605
+#define NID_id_tc26_algorithms          548
 #define OBJ_id_tc26_algorithms          OBJ_id_tc26,1L
 
 #define SN_id_tc26_sign         "id-tc26-sign"
-#define NID_id_tc26_sign                606
+#define NID_id_tc26_sign                549
 #define OBJ_id_tc26_sign                OBJ_id_tc26_algorithms,1L
 
 #define SN_id_GostR3410_2012_256                "gost2012_256"
 #define LN_id_GostR3410_2012_256                "GOST R 34.10-2012 with 256 bit modulus"
-#define NID_id_GostR3410_2012_256               607
+#define NID_id_GostR3410_2012_256               550
 #define OBJ_id_GostR3410_2012_256               OBJ_id_tc26_sign,1L
 
 #define SN_id_GostR3410_2012_512                "gost2012_512"
 #define LN_id_GostR3410_2012_512                "GOST R 34.10-2012 with 512 bit modulus"
-#define NID_id_GostR3410_2012_512               608
+#define NID_id_GostR3410_2012_512               551
 #define OBJ_id_GostR3410_2012_512               OBJ_id_tc26_sign,2L
 
 #define SN_id_tc26_digest               "id-tc26-digest"
-#define NID_id_tc26_digest              609
+#define NID_id_tc26_digest              552
 #define OBJ_id_tc26_digest              OBJ_id_tc26_algorithms,2L
 
 #define SN_id_GostR3411_2012_256                "md_gost12_256"
 #define LN_id_GostR3411_2012_256                "GOST R 34.11-2012 with 256 bit hash"
-#define NID_id_GostR3411_2012_256               610
+#define NID_id_GostR3411_2012_256               553
 #define OBJ_id_GostR3411_2012_256               OBJ_id_tc26_digest,2L
 
 #define SN_id_GostR3411_2012_512                "md_gost12_512"
 #define LN_id_GostR3411_2012_512                "GOST R 34.11-2012 with 512 bit hash"
-#define NID_id_GostR3411_2012_512               611
+#define NID_id_GostR3411_2012_512               554
 #define OBJ_id_GostR3411_2012_512               OBJ_id_tc26_digest,3L
 
 #define SN_id_tc26_mac          "id-tc26-mac"
-#define NID_id_tc26_mac         612
+#define NID_id_tc26_mac         555
 #define OBJ_id_tc26_mac         OBJ_id_tc26_algorithms,4L
 
 #define SN_id_tc26_hmac_gost_3411_2012_256              "id-tc26-hmac-gost-3411-2012-256"
 #define LN_id_tc26_hmac_gost_3411_2012_256              "HMAC GOST 34.11-2012 256 bit"
-#define NID_id_tc26_hmac_gost_3411_2012_256             613
+#define NID_id_tc26_hmac_gost_3411_2012_256             556
 #define OBJ_id_tc26_hmac_gost_3411_2012_256             OBJ_id_tc26_mac,1L
 
 #define SN_id_tc26_hmac_gost_3411_2012_512              "id-tc26-hmac-gost-3411-2012-512"
 #define LN_id_tc26_hmac_gost_3411_2012_512              "HMAC GOST 34.11-2012 512 bit"
-#define NID_id_tc26_hmac_gost_3411_2012_512             614
+#define NID_id_tc26_hmac_gost_3411_2012_512             557
 #define OBJ_id_tc26_hmac_gost_3411_2012_512             OBJ_id_tc26_mac,2L
 
 #define SN_INN          "INN"
 #define LN_INN          "INN"
-#define NID_INN         615
+#define NID_INN         558
 #define OBJ_INN         OBJ_member_body,643L,3L,131L,1L,1L
 
 #define SN_OGRN         "OGRN"
 #define LN_OGRN         "OGRN"
-#define NID_OGRN                616
+#define NID_OGRN                559
 #define OBJ_OGRN                OBJ_member_body,643L,100L,1L
 
 #define SN_SNILS                "SNILS"
 #define LN_SNILS                "SNILS"
-#define NID_SNILS               617
+#define NID_SNILS               560
 #define OBJ_SNILS               OBJ_member_body,643L,100L,3L
 
 #define SN_subjectSignTool              "subjectSignTool"
 #define LN_subjectSignTool              "Signing Tool of Subject"
-#define NID_subjectSignTool             618
+#define NID_subjectSignTool             561
 #define OBJ_subjectSignTool             OBJ_member_body,643L,100L,111L
 
 #define SN_issuerSignTool               "issuerSignTool"
 #define LN_issuerSignTool               "Signing Tool of Issuer"
-#define NID_issuerSignTool              619
+#define NID_issuerSignTool              562
 #define OBJ_issuerSignTool              OBJ_member_body,643L,100L,112L
 
 #define SN_kisa         "KISA"
 #define LN_kisa         "kisa"
-#define NID_kisa                620
+#define NID_kisa                427
 #define OBJ_kisa                OBJ_member_body,410L,200004L
 
 #define SN_seed_ecb             "SEED-ECB"
 #define LN_seed_ecb             "seed-ecb"
-#define NID_seed_ecb            621
+#define NID_seed_ecb            428
 #define OBJ_seed_ecb            OBJ_kisa,1L,3L
 
 #define SN_seed_cbc             "SEED-CBC"
 #define LN_seed_cbc             "seed-cbc"
-#define NID_seed_cbc            622
+#define NID_seed_cbc            429
 #define OBJ_seed_cbc            OBJ_kisa,1L,4L
 
 #define SN_seed_cfb128          "SEED-CFB"
 #define LN_seed_cfb128          "seed-cfb"
-#define NID_seed_cfb128         623
+#define NID_seed_cfb128         431
 #define OBJ_seed_cfb128         OBJ_kisa,1L,5L
 
 #define SN_seed_ofb128          "SEED-OFB"
 #define LN_seed_ofb128          "seed-ofb"
-#define NID_seed_ofb128         624
+#define NID_seed_ofb128         430
 #define OBJ_seed_ofb128         OBJ_kisa,1L,6L
 
 #define SN_hmac         "HMAC"
 #define LN_hmac         "hmac"
-#define NID_hmac                625
+#define NID_hmac                461
 
 #define SN_cmac         "CMAC"
 #define LN_cmac         "cmac"
-#define NID_cmac                626
+#define NID_cmac                500
 
 #define SN_rc4_hmac_md5         "RC4-HMAC-MD5"
 #define LN_rc4_hmac_md5         "rc4-hmac-md5"
-#define NID_rc4_hmac_md5                627
+#define NID_rc4_hmac_md5                518
 
 #define SN_aes_128_cbc_hmac_sha1                "AES-128-CBC-HMAC-SHA1"
 #define LN_aes_128_cbc_hmac_sha1                "aes-128-cbc-hmac-sha1"
-#define NID_aes_128_cbc_hmac_sha1               628
+#define NID_aes_128_cbc_hmac_sha1               519
 
 #define SN_aes_192_cbc_hmac_sha1                "AES-192-CBC-HMAC-SHA1"
 #define LN_aes_192_cbc_hmac_sha1                "aes-192-cbc-hmac-sha1"
-#define NID_aes_192_cbc_hmac_sha1               629
+#define NID_aes_192_cbc_hmac_sha1               520
 
 #define SN_aes_256_cbc_hmac_sha1                "AES-256-CBC-HMAC-SHA1"
 #define LN_aes_256_cbc_hmac_sha1                "aes-256-cbc-hmac-sha1"
-#define NID_aes_256_cbc_hmac_sha1               630
+#define NID_aes_256_cbc_hmac_sha1               521
 
 #define SN_aes_128_cbc_hmac_sha256              "AES-128-CBC-HMAC-SHA256"
 #define LN_aes_128_cbc_hmac_sha256              "aes-128-cbc-hmac-sha256"
-#define NID_aes_128_cbc_hmac_sha256             631
+#define NID_aes_128_cbc_hmac_sha256             537
 
 #define SN_aes_192_cbc_hmac_sha256              "AES-192-CBC-HMAC-SHA256"
 #define LN_aes_192_cbc_hmac_sha256              "aes-192-cbc-hmac-sha256"
-#define NID_aes_192_cbc_hmac_sha256             632
+#define NID_aes_192_cbc_hmac_sha256             538
 
 #define SN_aes_256_cbc_hmac_sha256              "AES-256-CBC-HMAC-SHA256"
 #define LN_aes_256_cbc_hmac_sha256              "aes-256-cbc-hmac-sha256"
-#define NID_aes_256_cbc_hmac_sha256             633
+#define NID_aes_256_cbc_hmac_sha256             539
 
 #define SN_chacha20_poly1305            "ChaCha20-Poly1305"
 #define LN_chacha20_poly1305            "chacha20-poly1305"
-#define NID_chacha20_poly1305           634
+#define NID_chacha20_poly1305           563
 
 #define SN_chacha20             "ChaCha20"
 #define LN_chacha20             "chacha20"
-#define NID_chacha20            635
+#define NID_chacha20            564
 
 #define SN_dhpublicnumber               "dhpublicnumber"
 #define LN_dhpublicnumber               "X9.42 DH"
-#define NID_dhpublicnumber              636
+#define NID_dhpublicnumber              523
 #define OBJ_dhpublicnumber              OBJ_ISO_US,10046L,2L,1L
 
 #define OBJ_x9_63_scheme                1L,3L,133L,16L,840L,63L,0L
@@ -2922,245 +2922,245 @@
 #define OBJ_secg_scheme         OBJ_certicom_arc,1L
 
 #define SN_dhSinglePass_stdDH_sha1kdf_scheme            "dhSinglePass-stdDH-sha1kdf-scheme"
-#define NID_dhSinglePass_stdDH_sha1kdf_scheme           637
+#define NID_dhSinglePass_stdDH_sha1kdf_scheme           525
 #define OBJ_dhSinglePass_stdDH_sha1kdf_scheme           OBJ_x9_63_scheme,2L
 
 #define SN_dhSinglePass_stdDH_sha224kdf_scheme          "dhSinglePass-stdDH-sha224kdf-scheme"
-#define NID_dhSinglePass_stdDH_sha224kdf_scheme         638
+#define NID_dhSinglePass_stdDH_sha224kdf_scheme         526
 #define OBJ_dhSinglePass_stdDH_sha224kdf_scheme         OBJ_secg_scheme,11L,0L
 
 #define SN_dhSinglePass_stdDH_sha256kdf_scheme          "dhSinglePass-stdDH-sha256kdf-scheme"
-#define NID_dhSinglePass_stdDH_sha256kdf_scheme         639
+#define NID_dhSinglePass_stdDH_sha256kdf_scheme         527
 #define OBJ_dhSinglePass_stdDH_sha256kdf_scheme         OBJ_secg_scheme,11L,1L
 
 #define SN_dhSinglePass_stdDH_sha384kdf_scheme          "dhSinglePass-stdDH-sha384kdf-scheme"
-#define NID_dhSinglePass_stdDH_sha384kdf_scheme         640
+#define NID_dhSinglePass_stdDH_sha384kdf_scheme         528
 #define OBJ_dhSinglePass_stdDH_sha384kdf_scheme         OBJ_secg_scheme,11L,2L
 
 #define SN_dhSinglePass_stdDH_sha512kdf_scheme          "dhSinglePass-stdDH-sha512kdf-scheme"
-#define NID_dhSinglePass_stdDH_sha512kdf_scheme         641
+#define NID_dhSinglePass_stdDH_sha512kdf_scheme         529
 #define OBJ_dhSinglePass_stdDH_sha512kdf_scheme         OBJ_secg_scheme,11L,3L
 
 #define SN_dhSinglePass_cofactorDH_sha1kdf_scheme               "dhSinglePass-cofactorDH-sha1kdf-scheme"
-#define NID_dhSinglePass_cofactorDH_sha1kdf_scheme              642
+#define NID_dhSinglePass_cofactorDH_sha1kdf_scheme              530
 #define OBJ_dhSinglePass_cofactorDH_sha1kdf_scheme              OBJ_x9_63_scheme,3L
 
 #define SN_dhSinglePass_cofactorDH_sha224kdf_scheme             "dhSinglePass-cofactorDH-sha224kdf-scheme"
-#define NID_dhSinglePass_cofactorDH_sha224kdf_scheme            643
+#define NID_dhSinglePass_cofactorDH_sha224kdf_scheme            531
 #define OBJ_dhSinglePass_cofactorDH_sha224kdf_scheme            OBJ_secg_scheme,14L,0L
 
 #define SN_dhSinglePass_cofactorDH_sha256kdf_scheme             "dhSinglePass-cofactorDH-sha256kdf-scheme"
-#define NID_dhSinglePass_cofactorDH_sha256kdf_scheme            644
+#define NID_dhSinglePass_cofactorDH_sha256kdf_scheme            532
 #define OBJ_dhSinglePass_cofactorDH_sha256kdf_scheme            OBJ_secg_scheme,14L,1L
 
 #define SN_dhSinglePass_cofactorDH_sha384kdf_scheme             "dhSinglePass-cofactorDH-sha384kdf-scheme"
-#define NID_dhSinglePass_cofactorDH_sha384kdf_scheme            645
+#define NID_dhSinglePass_cofactorDH_sha384kdf_scheme            533
 #define OBJ_dhSinglePass_cofactorDH_sha384kdf_scheme            OBJ_secg_scheme,14L,2L
 
 #define SN_dhSinglePass_cofactorDH_sha512kdf_scheme             "dhSinglePass-cofactorDH-sha512kdf-scheme"
-#define NID_dhSinglePass_cofactorDH_sha512kdf_scheme            646
+#define NID_dhSinglePass_cofactorDH_sha512kdf_scheme            534
 #define OBJ_dhSinglePass_cofactorDH_sha512kdf_scheme            OBJ_secg_scheme,14L,3L
 
 #define SN_dh_std_kdf           "dh-std-kdf"
-#define NID_dh_std_kdf          647
+#define NID_dh_std_kdf          535
 
 #define SN_dh_cofactor_kdf              "dh-cofactor-kdf"
-#define NID_dh_cofactor_kdf             648
+#define NID_dh_cofactor_kdf             536
 
 #define SN_jurisdictionLocalityName             "jurisdictionL"
 #define LN_jurisdictionLocalityName             "jurisdictionLocalityName"
-#define NID_jurisdictionLocalityName            649
+#define NID_jurisdictionLocalityName            540
 #define OBJ_jurisdictionLocalityName            1L,3L,6L,1L,4L,1L,311L,60L,2L,1L,1L
 
 #define SN_jurisdictionStateOrProvinceName              "jurisdictionST"
 #define LN_jurisdictionStateOrProvinceName              "jurisdictionStateOrProvinceName"
-#define NID_jurisdictionStateOrProvinceName             650
+#define NID_jurisdictionStateOrProvinceName             541
 #define OBJ_jurisdictionStateOrProvinceName             1L,3L,6L,1L,4L,1L,311L,60L,2L,1L,2L
 
 #define SN_jurisdictionCountryName              "jurisdictionC"
 #define LN_jurisdictionCountryName              "jurisdictionCountryName"
-#define NID_jurisdictionCountryName             651
+#define NID_jurisdictionCountryName             542
 #define OBJ_jurisdictionCountryName             1L,3L,6L,1L,4L,1L,311L,60L,2L,1L,3L
 
 #define SN_id_scrypt            "id-scrypt"
 #define LN_id_scrypt            "scrypt"
-#define NID_id_scrypt           652
+#define NID_id_scrypt           546
 #define OBJ_id_scrypt           1L,3L,6L,1L,4L,1L,11591L,4L,11L
 
 #define SN_tls1_prf             "TLS1-PRF"
 #define LN_tls1_prf             "tls1-prf"
-#define NID_tls1_prf            653
+#define NID_tls1_prf            566
 
 #define SN_hkdf         "HKDF"
 #define LN_hkdf         "hkdf"
-#define NID_hkdf                654
+#define NID_hkdf                581
 
 #define SN_sshkdf               "SSHKDF"
 #define LN_sshkdf               "sshkdf"
-#define NID_sshkdf              655
+#define NID_sshkdf              666
 
 #define SN_sskdf                "SSKDF"
 #define LN_sskdf                "sskdf"
-#define NID_sskdf               656
+#define NID_sskdf               668
 
 #define SN_x942kdf              "X942KDF"
 #define LN_x942kdf              "x942kdf"
-#define NID_x942kdf             657
+#define NID_x942kdf             670
 
 #define SN_x963kdf              "X963KDF"
 #define LN_x963kdf              "x963kdf"
-#define NID_x963kdf             658
+#define NID_x963kdf             669
 
 #define SN_id_pkinit            "id-pkinit"
-#define NID_id_pkinit           659
+#define NID_id_pkinit           576
 #define OBJ_id_pkinit           1L,3L,6L,1L,5L,2L,3L
 
 #define SN_pkInitClientAuth             "pkInitClientAuth"
 #define LN_pkInitClientAuth             "PKINIT Client Auth"
-#define NID_pkInitClientAuth            660
+#define NID_pkInitClientAuth            577
 #define OBJ_pkInitClientAuth            OBJ_id_pkinit,4L
 
 #define SN_pkInitKDC            "pkInitKDC"
 #define LN_pkInitKDC            "Signing KDC Response"
-#define NID_pkInitKDC           661
+#define NID_pkInitKDC           578
 #define OBJ_pkInitKDC           OBJ_id_pkinit,5L
 
 #define SN_X25519               "X25519"
-#define NID_X25519              662
+#define NID_X25519              579
 #define OBJ_X25519              1L,3L,101L,110L
 
 #define SN_X448         "X448"
-#define NID_X448                663
+#define NID_X448                580
 #define OBJ_X448                1L,3L,101L,111L
 
 #define SN_ED25519              "ED25519"
-#define NID_ED25519             664
+#define NID_ED25519             609
 #define OBJ_ED25519             1L,3L,101L,112L
 
 #define SN_ED448                "ED448"
-#define NID_ED448               665
+#define NID_ED448               610
 #define OBJ_ED448               1L,3L,101L,113L
 
 #define SN_kx_rsa               "KxRSA"
 #define LN_kx_rsa               "kx-rsa"
-#define NID_kx_rsa              666
+#define NID_kx_rsa              582
 
 #define SN_kx_ecdhe             "KxECDHE"
 #define LN_kx_ecdhe             "kx-ecdhe"
-#define NID_kx_ecdhe            667
+#define NID_kx_ecdhe            583
 
 #define SN_kx_dhe               "KxDHE"
 #define LN_kx_dhe               "kx-dhe"
-#define NID_kx_dhe              668
+#define NID_kx_dhe              584
 
 #define SN_kx_ecdhe_psk         "KxECDHE-PSK"
 #define LN_kx_ecdhe_psk         "kx-ecdhe-psk"
-#define NID_kx_ecdhe_psk                669
+#define NID_kx_ecdhe_psk                585
 
 #define SN_kx_dhe_psk           "KxDHE-PSK"
 #define LN_kx_dhe_psk           "kx-dhe-psk"
-#define NID_kx_dhe_psk          670
+#define NID_kx_dhe_psk          586
 
 #define SN_kx_rsa_psk           "KxRSA_PSK"
 #define LN_kx_rsa_psk           "kx-rsa-psk"
-#define NID_kx_rsa_psk          671
+#define NID_kx_rsa_psk          587
 
 #define SN_kx_psk               "KxPSK"
 #define LN_kx_psk               "kx-psk"
-#define NID_kx_psk              672
+#define NID_kx_psk              588
 
 #define SN_kx_srp               "KxSRP"
 #define LN_kx_srp               "kx-srp"
-#define NID_kx_srp              673
+#define NID_kx_srp              589
 
 #define SN_kx_gost              "KxGOST"
 #define LN_kx_gost              "kx-gost"
-#define NID_kx_gost             674
+#define NID_kx_gost             590
 
 #define SN_kx_gost18            "KxGOST18"
 #define LN_kx_gost18            "kx-gost18"
-#define NID_kx_gost18           675
+#define NID_kx_gost18           681
 
 #define SN_kx_any               "KxANY"
 #define LN_kx_any               "kx-any"
-#define NID_kx_any              676
+#define NID_kx_any              606
 
 #define SN_auth_rsa             "AuthRSA"
 #define LN_auth_rsa             "auth-rsa"
-#define NID_auth_rsa            677
+#define NID_auth_rsa            591
 
 #define SN_auth_ecdsa           "AuthECDSA"
 #define LN_auth_ecdsa           "auth-ecdsa"
-#define NID_auth_ecdsa          678
+#define NID_auth_ecdsa          592
 
 #define SN_auth_psk             "AuthPSK"
 #define LN_auth_psk             "auth-psk"
-#define NID_auth_psk            679
+#define NID_auth_psk            593
 
 #define SN_auth_dss             "AuthDSS"
 #define LN_auth_dss             "auth-dss"
-#define NID_auth_dss            680
+#define NID_auth_dss            594
 
 #define SN_auth_gost01          "AuthGOST01"
 #define LN_auth_gost01          "auth-gost01"
-#define NID_auth_gost01         681
+#define NID_auth_gost01         595
 
 #define SN_auth_gost12          "AuthGOST12"
 #define LN_auth_gost12          "auth-gost12"
-#define NID_auth_gost12         682
+#define NID_auth_gost12         596
 
 #define SN_auth_srp             "AuthSRP"
 #define LN_auth_srp             "auth-srp"
-#define NID_auth_srp            683
+#define NID_auth_srp            597
 
 #define SN_auth_null            "AuthNULL"
 #define LN_auth_null            "auth-null"
-#define NID_auth_null           684
+#define NID_auth_null           598
 
 #define SN_auth_any             "AuthANY"
 #define LN_auth_any             "auth-any"
-#define NID_auth_any            685
+#define NID_auth_any            607
 
 #define SN_poly1305             "Poly1305"
 #define LN_poly1305             "poly1305"
-#define NID_poly1305            686
+#define NID_poly1305            604
 
 #define SN_siphash              "SipHash"
 #define LN_siphash              "siphash"
-#define NID_siphash             687
+#define NID_siphash             605
 
 #define SN_ffdhe2048            "ffdhe2048"
-#define NID_ffdhe2048           688
+#define NID_ffdhe2048           642
 
 #define SN_ffdhe3072            "ffdhe3072"
-#define NID_ffdhe3072           689
+#define NID_ffdhe3072           643
 
 #define SN_ffdhe4096            "ffdhe4096"
-#define NID_ffdhe4096           690
+#define NID_ffdhe4096           644
 
 #define SN_ffdhe6144            "ffdhe6144"
-#define NID_ffdhe6144           691
+#define NID_ffdhe6144           645
 
 #define SN_ffdhe8192            "ffdhe8192"
-#define NID_ffdhe8192           692
+#define NID_ffdhe8192           646
 
 #define SN_modp_1536            "modp_1536"
-#define NID_modp_1536           693
+#define NID_modp_1536           675
 
 #define SN_modp_2048            "modp_2048"
-#define NID_modp_2048           694
+#define NID_modp_2048           676
 
 #define SN_modp_3072            "modp_3072"
-#define NID_modp_3072           695
+#define NID_modp_3072           677
 
 #define SN_modp_4096            "modp_4096"
-#define NID_modp_4096           696
+#define NID_modp_4096           678
 
 #define SN_modp_6144            "modp_6144"
-#define NID_modp_6144           697
+#define NID_modp_6144           679
 
 #define SN_modp_8192            "modp_8192"
-#define NID_modp_8192           698
+#define NID_modp_8192           680
 
 #define		 NID_ccitt 		NID_undef
 #define		 SN_ccitt 		SN_undef
@@ -4242,7 +4242,6 @@
 #define		 SN_aes_192_siv 		SN_undef
 #define		 NID_aes_256_siv 		NID_undef
 #define		 SN_aes_256_siv 		SN_undef
-
 
 #endif /* OPENSSL_OBJ_MAC_H */
 
