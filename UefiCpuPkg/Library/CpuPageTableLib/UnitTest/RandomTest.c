@@ -1,7 +1,7 @@
 /** @file
   Random test case for Unit tests of the CpuPageTableLib instance of the CpuPageTableLib class
 
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -82,22 +82,6 @@ LocalRandomBytes (
 }
 
 /**
-  Return a random boolean.
-
-  @return boolean
-**/
-BOOLEAN
-RandomBoolean (
-  VOID
-  )
-{
-  BOOLEAN  Value;
-
-  LocalRandomBytes ((UINT8 *)&Value, sizeof (BOOLEAN));
-  return Value%2;
-}
-
-/**
   Return a 32bit random number.
 
   @param Start  Start of the random number range.
@@ -140,6 +124,21 @@ Random64 (
 }
 
 /**
+  Returns true with the percentage of input Probability.
+
+  @param[in]   Probability    The percentage to return true.
+
+  @return boolean
+**/
+BOOLEAN
+RandomBoolean (
+  UINT8  Probability
+  )
+{
+  return ((Probability > ((UINT8)Random64 (0, 100))) ? TRUE : FALSE);
+}
+
+/**
   Check if the Page table entry is valid
 
   @param[in]   PagingEntry    The entry in page table to verify
@@ -178,7 +177,7 @@ ValidateAndRandomeModifyPageTablePageTableEntry (
       UT_ASSERT_EQUAL ((PagingEntry->Uint64 & mValidMaskLeaf[Level].Uint64), PagingEntry->Uint64);
     }
 
-    if ((RandomNumber < 100) && RandomBoolean ()) {
+    if ((RandomNumber < 100) && RandomBoolean (50)) {
       RandomNumber++;
       if (Level == 1) {
         TempPhysicalBase = PagingEntry->Pte4K.Bits.PageTableBaseAddress;
@@ -211,7 +210,7 @@ ValidateAndRandomeModifyPageTablePageTableEntry (
     UT_ASSERT_EQUAL ((PagingEntry->Uint64 & mValidMaskNoLeaf[Level].Uint64), PagingEntry->Uint64);
   }
 
-  if ((RandomNumber < 100) && RandomBoolean ()) {
+  if ((RandomNumber < 100) && RandomBoolean (50)) {
     RandomNumber++;
     TempPhysicalBase = PagingEntry->Pnle.Bits.PageTableBaseAddress;
 
@@ -299,7 +298,7 @@ GenerateSingleRandomMapEntry (
   //
   // use AlignedTable to avoid that a random number can be very hard to be 1G or 2M aligned
   //
-  if ((MapsIndex != 0) &&  (RandomBoolean ())) {
+  if ((MapsIndex != 0) &&  (RandomBoolean (50))) {
     FormerLinearAddress = MapEntrys->Maps[Random32 (0, (UINT32)MapsIndex-1)].LinearAddress;
     if (FormerLinearAddress < 2 * (UINT64)SIZE_1GB) {
       FormerLinearAddressBottom = 0;
@@ -323,7 +322,7 @@ GenerateSingleRandomMapEntry (
   //
   MapEntrys->Maps[MapsIndex].Length = Random64 (0, MIN (MaxAddress - MapEntrys->Maps[MapsIndex].LinearAddress, 10 * (UINT64)SIZE_1GB)) & AlignedTable[Random32 (0, ARRAY_SIZE (AlignedTable) -1)];
 
-  if ((MapsIndex != 0)  && (RandomBoolean ())) {
+  if ((MapsIndex != 0)  && (RandomBoolean (50))) {
     MapEntrys->Maps[MapsIndex].Attribute.Uint64 = MapEntrys->Maps[Random32 (0, (UINT32)MapsIndex-1)].Attribute.Uint64;
     MapEntrys->Maps[MapsIndex].Mask.Uint64      = MapEntrys->Maps[Random32 (0, (UINT32)MapsIndex-1)].Mask.Uint64;
   } else {
@@ -344,7 +343,7 @@ GenerateSingleRandomMapEntry (
     //       Need to avoid such case when remove the Random option ONLY_ONE_ONE_MAPPING
     //
     MapEntrys->Maps[MapsIndex].Attribute.Bits.PageTableBaseAddress = (Random64 (0, (((UINT64)1)<<52) - 1) & AlignedTable[Random32 (0, ARRAY_SIZE (AlignedTable) -1)])>> 12;
-    if (RandomBoolean ()) {
+    if (RandomBoolean (50)) {
       MapEntrys->Maps[MapsIndex].Mask.Bits.PageTableBaseAddress = 0;
     }
   }
