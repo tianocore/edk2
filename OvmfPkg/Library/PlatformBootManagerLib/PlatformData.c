@@ -47,7 +47,7 @@ typedef struct {
 ACPI_HID_DEVICE_PATH  gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
 ACPI_HID_DEVICE_PATH  gPnp16550ComPortDeviceNode = gPnp16550ComPort;
 UART_DEVICE_PATH      gUartDeviceNode            = gUart;
-VENDOR_DEVICE_PATH    gTerminalTypeDeviceNode    = gPcAnsiTerminal;
+VENDOR_DEVICE_PATH    gTerminalTypeDeviceNode    = gVtUtf8Terminal;
 
 //
 // Platform specific keyboard device path
@@ -83,7 +83,7 @@ VENDOR_UART_DEVICE_PATH  gDebugAgentUartDevicePath = {
     0,  // Parity   - Default
     0,  // StopBits - Default
   },
-  gPcAnsiTerminal,
+  gVtUtf8Terminal,
   gEndEntire
 };
 
@@ -168,7 +168,7 @@ STATIC VENDOR_UART_DEVICE_PATH  gXenConsoleDevicePath = {
     FixedPcdGet8 (PcdUartDefaultParity),
     FixedPcdGet8 (PcdUartDefaultStopBits),
   },
-  gPcAnsiTerminal,
+  gVtUtf8Terminal,
   gEndEntire
 };
 
