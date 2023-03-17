@@ -1,7 +1,7 @@
 /** @file
   helper file for Unit tests of the CpuPageTableLib instance of the CpuPageTableLib class
 
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -170,6 +170,10 @@ IsPageTableValid (
   UINT64             Index;
   UNIT_TEST_STATUS   Status;
   IA32_PAGING_ENTRY  *PagingEntry;
+
+  if (PageTable == 0) {
+    return UNIT_TEST_PASSED;
+  }
 
   if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
     //
