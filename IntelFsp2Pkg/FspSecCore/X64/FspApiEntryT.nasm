@@ -135,9 +135,9 @@ ASM_PFX(LoadMicrocodeDefault):
    ;
    LOAD_RBP
 
-   cmp    rsp, 0
+   test   rsp, rsp
    jz     ParamError
-   cmp    rcx, 0
+   test   rcx, rcx
    jz     ParamError
    mov    rsp, rcx
 
@@ -151,13 +151,13 @@ ASM_PFX(LoadMicrocodeDefault):
 
    ; UPD structure is compliant with FSP spec 2.4
    mov    rax, qword [rsp + LoadMicrocodeParamsFsp24.MicrocodeCodeSize]
-   cmp    rax, 0
+   test   rax, rax
    jz     Exit2
    cmp    rax, 0800h
    jl     ParamError
 
    mov    rsi, qword [rsp + LoadMicrocodeParamsFsp24.MicrocodeCodeAddr]
-   cmp    rsi, 0
+   test   rsi, rsi
    jnz    CheckMainHeader
 
 ParamError:
@@ -315,9 +315,9 @@ Done:
    mov   ecx, MSR_IA32_BIOS_SIGN_ID
    rdmsr                         ; Get current microcode signature
    xor   eax, eax
-   cmp   edx, 0
+   test  edx, edx
    jnz   Exit2
-   mov   eax, 0800000000000000Eh
+   mov   rax, 0800000000000000Eh
 
 Exit2:
    jmp   rbp
@@ -464,7 +464,7 @@ ParamValid:
   ; Sec Platform Init
   ;
   CALL_YMM  ASM_PFX(SecPlatformInit)
-  cmp       eax, 0
+  test      rax, rax
   jnz       TempRamInitExit
 
   ; Load microcode
@@ -476,12 +476,12 @@ ParamValid:
   ; Call Sec CAR Init
   LOAD_RCX
   CALL_YMM  ASM_PFX(SecCarInit)
-  cmp       rax, 0
+  test      rax, rax
   jnz       TempRamInitExit
 
   LOAD_RCX
   CALL_YMM  ASM_PFX(EstablishStackFsp)
-  cmp       rax, 0
+  test      rax, rax
   jnz       TempRamInitExit
 
   LOAD_UCODE_STATUS rax             ; Restore microcode status if no CAR init error from SLOT 0 in YMM9 (upper 128bits).
