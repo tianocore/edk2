@@ -23,7 +23,6 @@ ASM_PFX(AsmGetFspInfoHeader):
 global ASM_PFX(FspInfoHeaderRelativeOff)
 ASM_PFX(FspInfoHeaderRelativeOff):
    DD    0x12345678               ; This value must be patched by the build script
-   and   rax, 0xffffffff
    ret
 
 global ASM_PFX(AsmGetFspInfoHeaderNoStack)
@@ -32,5 +31,4 @@ ASM_PFX(AsmGetFspInfoHeaderNoStack):
    lea   rcx, [ASM_PFX(FspInfoHeaderRelativeOff)]
    mov   ecx, [rcx]
    sub   rax, rcx
-   and   rax, 0xffffffff
    jmp   rdi
