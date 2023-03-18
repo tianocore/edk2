@@ -39,31 +39,6 @@ BuildMemoryTypeInformationHob (
   );
 
 /**
-  Build reserved memory range resource HOB.
-
-  @param  MemoryBase     Reserved memory range base address.
-  @param  MemorySize     Reserved memory range size.
-
-**/
-STATIC
-VOID
-AddReservedMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  UINT64                MemorySize
-  )
-{
-  BuildResourceDescriptorHob (
-    EFI_RESOURCE_MEMORY_RESERVED,
-    EFI_RESOURCE_ATTRIBUTE_PRESENT     |
-    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-    EFI_RESOURCE_ATTRIBUTE_TESTED,
-    MemoryBase,
-    MemorySize
-    );
-}
-
-/**
   Create memory range resource HOB using the memory base
   address and size.
 
@@ -74,8 +49,8 @@ AddReservedMemoryBaseSizeHob (
 STATIC
 VOID
 AddMemoryBaseSizeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  UINT64                MemorySize
+  IN EFI_PHYSICAL_ADDRESS  MemoryBase,
+  IN UINT64                MemorySize
   )
 {
   BuildResourceDescriptorHob (
@@ -103,8 +78,8 @@ AddMemoryBaseSizeHob (
 STATIC
 VOID
 AddMemoryRangeHob (
-  EFI_PHYSICAL_ADDRESS  MemoryBase,
-  EFI_PHYSICAL_ADDRESS  MemoryLimit
+  IN EFI_PHYSICAL_ADDRESS  MemoryBase,
+  IN EFI_PHYSICAL_ADDRESS  MemoryLimit
   )
 {
   AddMemoryBaseSizeHob (MemoryBase, (UINT64)(MemoryLimit - MemoryBase));
@@ -132,37 +107,150 @@ InitMmu (
 STATIC
 VOID
 InitializeRamRegions (
-  EFI_PHYSICAL_ADDRESS  SystemMemoryBase,
-  UINT64                SystemMemorySize,
-  EFI_PHYSICAL_ADDRESS  MmodeResvBase,
-  UINT64                MmodeResvSize
+  IN EFI_PHYSICAL_ADDRESS  SystemMemoryBase,
+  IN UINT64                SystemMemorySize
   )
 {
-  /*
-   * M-mode FW can be loaded anywhere in memory but should not overlap
-   * with the EDK2. This can happen if some other boot code loads the
-   * M-mode firmware.
-   *
-   * The M-mode firmware memory should be marked as reserved memory
-   * so that OS doesn't use it.
-   */
-  DEBUG ((
-    DEBUG_INFO,
-    "%a: M-mode FW Memory Start:0x%lx End:0x%lx\n",
-    __FUNCTION__,
-    MmodeResvBase,
-    MmodeResvBase + MmodeResvSize
-    ));
-  AddReservedMemoryBaseSizeHob (MmodeResvBase, MmodeResvSize);
-
-  if (MmodeResvBase > SystemMemoryBase) {
-    AddMemoryRangeHob (SystemMemoryBase, MmodeResvBase);
-  }
-
   AddMemoryRangeHob (
-    MmodeResvBase + MmodeResvSize,
+    SystemMemoryBase,
     SystemMemoryBase + SystemMemorySize
     );
+}
+
+/** Get the number of cells for a given property
+
+  @param[in]  Fdt   Pointer to Device Tree (DTB)
+  @param[in]  Node  Node
+  @param[in]  Name  Name of the property
+
+  @return           Number of cells.
+**/
+STATIC
+INT32
+GetNumCells (
+  IN VOID         *Fdt,
+  IN INT32        Node,
+  IN CONST CHAR8  *Name
+  )
+{
+  CONST INT32  *Prop;
+  INT32        Len;
+  UINT32       Val;
+
+  Prop = fdt_getprop (Fdt, Node, Name, &Len);
+  if (Prop == NULL) {
+    return Len;
+  }
+
+  if (Len != sizeof (*Prop)) {
+    return -FDT_ERR_BADNCELLS;
+  }
+
+  Val = fdt32_to_cpu (*Prop);
+  if (Val > FDT_MAX_NCELLS) {
+    return -FDT_ERR_BADNCELLS;
+  }
+
+  return (INT32)Val;
+}
+
+/** Mark reserved memory ranges in the EFI memory map
+
+  The M-mode firmware ranges should not be used by the
+  EDK2/OS. These ranges are passed via device tree using reserved
+  memory nodes. Parse the DT and mark those ranges as of
+  type EfiReservedMemoryType.
+
+  NOTE: Device Tree spec section 3.5.4 says reserved memory regions
+  without no-map property should be installed as EfiBootServicesData.
+  As per UEFI spec, memory of type EfiBootServicesData can be used
+  by the OS after ExitBootServices().
+  This is not an issue for DT since OS can parse the DT also along
+  with EFI memory map and avoid using these ranges. But with ACPI,
+  there is no such mechanisms possible.
+  Since EDK2 needs to support both DT and ACPI, we are deviating
+  from the DT spec and marking all reserved memory ranges as
+  EfiReservedMemoryType itself irrespective of no-map.
+
+  @param FdtPointer Pointer to FDT
+
+**/
+STATIC
+VOID
+AddReservedMemoryMap (
+  IN VOID  *FdtPointer
+  )
+{
+  CONST INT32           *RegProp;
+  INT32                 Node;
+  INT32                 SubNode;
+  INT32                 Len;
+  EFI_PHYSICAL_ADDRESS  Addr;
+  UINT64                Size;
+  INTN                  NumRsv, i;
+  INT32                 NumAddrCells, NumSizeCells;
+
+  NumRsv = fdt_num_mem_rsv (FdtPointer);
+
+  /* Look for an existing entry and add it to the efi mem map. */
+  for (i = 0; i < NumRsv; i++) {
+    if (fdt_get_mem_rsv (FdtPointer, i, &Addr, &Size) != 0) {
+      continue;
+    }
+
+    BuildMemoryAllocationHob (
+      Addr,
+      Size,
+      EfiReservedMemoryType
+      );
+  }
+
+  /* process reserved-memory */
+  Node = fdt_subnode_offset (FdtPointer, 0, "reserved-memory");
+  if (Node >= 0) {
+    NumAddrCells = GetNumCells (FdtPointer, Node, "#address-cells");
+    if (NumAddrCells <= 0) {
+      return;
+    }
+
+    NumSizeCells = GetNumCells (FdtPointer, Node, "#size-cells");
+    if (NumSizeCells <= 0) {
+      return;
+    }
+
+    fdt_for_each_subnode (SubNode, FdtPointer, Node) {
+      RegProp = fdt_getprop (FdtPointer, SubNode, "reg", &Len);
+
+      if ((RegProp != 0) && (Len == ((NumAddrCells + NumSizeCells) * sizeof (INT32)))) {
+        Addr = fdt32_to_cpu (RegProp[0]);
+
+        if (NumAddrCells > 1) {
+          Addr = (Addr << 32) | fdt32_to_cpu (RegProp[1]);
+        }
+
+        RegProp += NumAddrCells;
+        Size     = fdt32_to_cpu (RegProp[0]);
+
+        if (NumSizeCells > 1) {
+          Size = (Size << 32) | fdt32_to_cpu (RegProp[1]);
+        }
+
+        DEBUG ((
+          DEBUG_INFO,
+          "%a: Adding Reserved Memory Addr = 0x%llx, Size = 0x%llx\n",
+          __func__,
+          Addr,
+          Size
+          ));
+
+        BuildMemoryAllocationHob (
+          Addr,
+          Size,
+          EfiReservedMemoryType
+          );
+      }
+    }
+  }
 }
 
 /**
@@ -183,8 +271,6 @@ MemoryPeimInitialization (
   INT32                       Node, Prev;
   INT32                       Len;
   VOID                        *FdtPointer;
-  EFI_PHYSICAL_ADDRESS        MmodeResvBase;
-  UINT64                      MmodeResvSize;
 
   FirmwareContext = NULL;
   GetFirmwareContextPointer (&FirmwareContext);
@@ -198,16 +284,6 @@ MemoryPeimInitialization (
   if (FdtPointer == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: Invalid FDT pointer\n", __FUNCTION__));
     return EFI_UNSUPPORTED;
-  }
-
-  /* try to locate the reserved memory opensbi node */
-  Node = fdt_path_offset (FdtPointer, "/reserved-memory/mmode_resv0");
-  if (Node >= 0) {
-    RegProp = fdt_getprop (FdtPointer, Node, "reg", &Len);
-    if ((RegProp != 0) && (Len == (2 * sizeof (UINT64)))) {
-      MmodeResvBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
-      MmodeResvSize = fdt64_to_cpu (ReadUnaligned64 (RegProp + 1));
-    }
   }
 
   // Look for the lowest memory node
@@ -235,16 +311,10 @@ MemoryPeimInitialization (
           CurBase + CurSize - 1
           ));
 
-        if ((MmodeResvBase >= CurBase) && ((MmodeResvBase + MmodeResvSize) <= (CurBase + CurSize))) {
-          InitializeRamRegions (
-            CurBase,
-            CurSize,
-            MmodeResvBase,
-            MmodeResvSize
-            );
-        } else {
-          AddMemoryBaseSizeHob (CurBase, CurSize);
-        }
+        InitializeRamRegions (
+          CurBase,
+          CurSize
+          );
       } else {
         DEBUG ((
           DEBUG_ERROR,
@@ -254,6 +324,8 @@ MemoryPeimInitialization (
       }
     }
   }
+
+  AddReservedMemoryMap (FdtPointer);
 
   InitMmu ();
 
