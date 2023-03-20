@@ -202,7 +202,8 @@ PageTableLibSetPnle (
     Pnle->Bits.Nx = Attribute->Bits.Nx;
   }
 
-  Pnle->Bits.Accessed = 0;
+  Pnle->Bits.Accessed   = 0;
+  Pnle->Bits.MustBeZero = 0;
 
   //
   // Set the attributes (WT, CD, A) to 0.
