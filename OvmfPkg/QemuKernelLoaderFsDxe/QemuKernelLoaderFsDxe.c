@@ -27,7 +27,8 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadFile2.h>
 #include <Protocol/SimpleFileSystem.h>
-
+#include <IndustryStandard/UefiTcgPlatform.h>
+#include <Library/TpmMeasurementLib.h>
 //
 // Static data that hosts the fw_cfg blobs and serves file requests.
 //
@@ -1061,6 +1062,19 @@ QemuKernelLoaderFsDxeEntrypoint (
   for (BlobType = 0; BlobType < KernelBlobTypeMax; ++BlobType) {
     CurrentBlob = &mKernelBlob[BlobType];
     Status      = FetchBlob (CurrentBlob);
+
+    //
+    // Measure the info which is downloaded from kernel image.
+    //
+    TpmMeasureAndLogData (
+        1,
+        EV_PLATFORM_CONFIG_FLAGS,
+        (VOID *)(CurrentBlob->Name),
+        sizeof (CurrentBlob->Name) - 1,
+        (VOID *)(UINTN)(CurrentBlob->Data),
+        CurrentBlob->Size
+        );
+
     if (EFI_ERROR (Status)) {
       goto FreeBlobs;
     }

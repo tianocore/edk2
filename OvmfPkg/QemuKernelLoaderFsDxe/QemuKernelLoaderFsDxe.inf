@@ -34,6 +34,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
+  TpmMeasurementLib
 
 [Guids]
   gEfiFileInfoGuid
