@@ -362,6 +362,16 @@ PageTableLibMapInLevel (
     }
 
     //
+    // Check the attribute in ParentPagingEntry is equal to attribute calculated by input Attribue and Mask.
+    //
+    PleBAttribute.Uint64 = PageTableLibGetPleBMapAttribute (&ParentPagingEntry->PleB, ParentAttribute);
+    if ((IA32_MAP_ATTRIBUTE_ATTRIBUTES (&PleBAttribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask))
+        == (IA32_MAP_ATTRIBUTE_ATTRIBUTES (Attribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask)))
+    {
+      return RETURN_SUCCESS;
+    }
+
+    //
     // The parent entry is CR3 or PML5E/PML4E/PDPTE/PDE.
     // It does NOT point to an existing page directory.
     //
