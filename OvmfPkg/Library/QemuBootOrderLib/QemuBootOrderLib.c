@@ -46,6 +46,9 @@
 #define EV_POSTCODE_INFO_BOOTMENU_WAIT_TIME  "BOOTMENU WAIT TIME"
 #define BOOTMENU_WAIT_DATA_LEN               (sizeof(EV_POSTCODE_INFO_BOOTMENU_WAIT_TIME) - 1)
 
+#define EV_POSTCODE_INFO_QEMU_BOOT_ORDER  "QEMU BOOT ORDER DATA"
+#define BOOTORDER_DATA_LEN                (sizeof(EV_POSTCODE_INFO_QEMU_BOOT_ORDER) - 1)
+
 /**
   Simple character classification routines, corresponding to POSIX class names
   and ASCII encoding.
@@ -1604,6 +1607,20 @@ ConnectDevicesFromQemu (
 
   QemuFwCfgSelectItem (FwCfgItem);
   QemuFwCfgReadBytes (FwCfgSize, FwCfg);
+
+  //
+  // Measure the "bootorder" which is downloaded from QEMU.
+  // It has to be done before it is consumed.
+  //
+  TpmMeasureAndLogData (
+      1,
+      EV_PLATFORM_CONFIG_FLAGS,
+      EV_POSTCODE_INFO_QEMU_BOOT_ORDER,
+      BOOTORDER_DATA_LEN,
+      (VOID *)(UINTN)FwCfg,
+      FwCfgSize
+      );
+
   if (FwCfg[FwCfgSize - 1] != '\0') {
     Status = RETURN_INVALID_PARAMETER;
     goto FreeFwCfg;
@@ -1750,6 +1767,16 @@ StoreQemuBootOrder (
 
   QemuFwCfgSelectItem (FwCfgItem);
   QemuFwCfgReadBytes (FwCfgSize, FwCfg);
+
+  TpmMeasureAndLogData (
+      1,
+      EV_PLATFORM_CONFIG_FLAGS,
+      EV_POSTCODE_INFO_QEMU_BOOT_ORDER,
+      BOOTORDER_DATA_LEN,
+      (VOID *)(UINTN)FwCfg,
+      FwCfgSize
+      );
+
   if (FwCfg[FwCfgSize - 1] != '\0') {
     Status = RETURN_INVALID_PARAMETER;
     goto FreeFwCfg;
@@ -2211,6 +2238,16 @@ SetBootOrderFromQemu (
 
   QemuFwCfgSelectItem (FwCfgItem);
   QemuFwCfgReadBytes (FwCfgSize, FwCfg);
+
+  TpmMeasureAndLogData (
+      1,
+      EV_PLATFORM_CONFIG_FLAGS,
+      EV_POSTCODE_INFO_QEMU_BOOT_ORDER,
+      BOOTORDER_DATA_LEN,
+      (VOID *)(UINTN)FwCfg,
+      FwCfgSize
+      );
+
   if (FwCfg[FwCfgSize - 1] != '\0') {
     Status = RETURN_INVALID_PARAMETER;
     goto ErrorFreeFwCfg;
