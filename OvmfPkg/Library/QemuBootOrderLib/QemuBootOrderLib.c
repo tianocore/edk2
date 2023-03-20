@@ -20,6 +20,8 @@
 #include <Library/BaseMemoryLib.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/VirtioMmioTransport.h>
+#include <IndustryStandard/UefiTcgPlatform.h>
+#include <Library/TpmMeasurementLib.h>
 
 #include "ExtraRootBusMap.h"
 
@@ -40,6 +42,9 @@
 #define REQUIRED_PCI_OFW_NODES   2
 #define REQUIRED_MMIO_OFW_NODES  1
 #define EXAMINED_OFW_NODES       6
+
+#define EV_POSTCODE_INFO_BOOTMENU_WAIT_TIME  "BOOTMENU WAIT TIME"
+#define BOOTMENU_WAIT_DATA_LEN               (sizeof(EV_POSTCODE_INFO_BOOTMENU_WAIT_TIME) - 1)
 
 /**
   Simple character classification routines, corresponding to POSIX class names
@@ -2377,6 +2382,7 @@ GetFrontPageTimeoutFromQemu (
   FIRMWARE_CONFIG_ITEM  BootMenuWaitItem;
   UINTN                 BootMenuWaitSize;
   UINT16                Timeout = PcdGet16 (PcdPlatformBootTimeOut);
+  UINT16                BootMenuWaitTime;
 
   if (!QemuFwCfgIsAvailable ()) {
     return Timeout;
@@ -2418,5 +2424,20 @@ GetFrontPageTimeoutFromQemu (
   // seconds, round N up.
   //
   QemuFwCfgSelectItem (BootMenuWaitItem);
-  return (UINT16)((QemuFwCfgRead16 () + 999) / 1000);
+  BootMenuWaitTime = QemuFwCfgRead16 ();
+
+  //
+  // Measure the BootMenuWaitTime which is downloaded from QEMU.
+  // It has to be done before it is consumed.
+  //
+  TpmMeasureAndLogData (
+      1,
+      EV_PLATFORM_CONFIG_FLAGS,
+      EV_POSTCODE_INFO_BOOTMENU_WAIT_TIME,
+      BOOTMENU_WAIT_DATA_LEN,
+      (VOID *)(UINTN)BootMenuWaitTime,
+      BootMenuWaitSize
+      );
+
+  return (UINT16)((BootMenuWaitTime + 999) / 1000);
 }
