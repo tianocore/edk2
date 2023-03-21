@@ -53,18 +53,6 @@ DEFINE RC_PATH    = ENV(WINSDK_PATH_FOR_RC_EXE)\rc.exe
 DEFINE WINSDK_BIN           = ENV(WINSDK_PREFIX)
 DEFINE WINSDKx86_BIN        = ENV(WINSDKx86_PREFIX)
 
-# Microsoft Visual Studio 2010
-DEFINE WINSDK7_BIN          = ENV(WINSDK7_PREFIX)
-DEFINE WINSDK7x86_BIN       = ENV(WINSDK7x86_PREFIX)
-
-# Microsoft Visual Studio 2012 Update 1 (required for rc.exe that was not included in the initial release)
-DEFINE WINSDK71_BIN         = ENV(WINSDK71_PREFIX)
-DEFINE WINSDK71x86_BIN      = ENV(WINSDK71x86_PREFIX)
-
-# Microsoft Visual Studio 2013 Professional Edition
-DEFINE WINSDK8_BIN          = ENV(WINSDK8_PREFIX)x86\
-DEFINE WINSDK8x86_BIN       = ENV(WINSDK8x86_PREFIX)x64
-
 # Microsoft Visual Studio 2015 Professional Edition
 DEFINE WINSDK81_BIN         = ENV(WINSDK81_PREFIX)x86\
 DEFINE WINSDK81x86_BIN      = ENV(WINSDK81x86_PREFIX)x64
