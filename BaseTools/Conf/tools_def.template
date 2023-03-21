@@ -102,10 +102,6 @@ DEFINE MSFT_ASLPP_FLAGS        = /nologo /E /C /FIAutoGen.h
 DEFINE MSFT_ASLCC_FLAGS        = /nologo /c /FIAutoGen.h /TC /Dmain=ReferenceAcpiTable
 DEFINE MSFT_ASLDLINK_FLAGS     = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE
 
-DEFINE IPHONE_TOOLS            = /Developer/Platforms/iPhoneOS.platform/Developer
-
-DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G++ Lite/bin
-
 DEFINE DTCPP_BIN               = ENV(DTCPP_PREFIX)cpp
 DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 
