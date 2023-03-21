@@ -67,10 +67,6 @@ DEFINE WINSDK10_BIN         = ENV(WINSDK10_PREFIX)DEF(VS_HOST)
 DEFINE WINDDK_BIN16     = ENV(WINDDK3790_PREFIX)bin16
 DEFINE WINDDK_BINX64    = ENV(WINDDK3790_PREFIX)win64\x86\amd64
 
-DEFINE EBC_BIN          = C:\Program Files\Intel\EBC\Bin
-DEFINE EBC_BINx86       = C:\Program Files (x86)\Intel\EBC\Bin
-
-
 DEFINE CYGWIN_BIN              = c:/cygwin/bin
 DEFINE CYGWIN_BINIA32          = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/
 DEFINE CYGWIN_BINX64           = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
@@ -135,16 +131,12 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Microsoft Visual Studio 2015 Professional Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
-#                             Required to build EBC drivers:
-#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
 #                               https://acpica.org/downloads
 #   VS2017      -win32-  Requires:
 #                             Microsoft Visual Studio 2017 version 15.2 (15.4 for ARM64) or later
 #                        Optional:
-#                             Required to build EBC drivers:
-#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
 #                               https://acpica.org/downloads
@@ -154,8 +146,6 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #   VS2019      -win32-  Requires:
 #                             Microsoft Visual Studio 2019 version 16.2 or later
 #                        Optional:
-#                             Required to build EBC drivers:
-#                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
 #                               https://acpica.org/downloads
@@ -222,22 +212,6 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #   - NASM 2.15.05 or later for use with all other toolchain families
 #
 ####################################################################################
-####################################################################################
-#
-# Intel EFI Byte Code Compiler (Template)
-#
-####################################################################################
-# *_*_EBC_*_FAMILY                   = INTEL
-#
-# *_*_EBC_PP_PATH                    = C:\Program Files\Intel\EBC\Bin\iec.exe
-# *_*_EBC_CC_PATH                    = C:\Program Files\Intel\EBC\Bin\iec.exe
-# *_*_EBC_SLINK_PATH                 = C:\Program Files\Intel\EBC\Bin\link.exe
-#
-# *_*_EBC_SLINK_FLAGS                = /lib /NOLOGO /MACHINE:EBC
-# *_*_EBC_PP_FLAGS                   = /nologo /E /TC /FIAutoGen.h
-# *_*_EBC_CC_FLAGS                   = /nologo /FAcs /c /W3 /WX /FIAutoGen.h
-# *_*_EBC_DLINK_FLAGS                = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /MACHINE:EBC /OPT:REF /NODEFAULTLIB /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /ALIGN:32 /DRIVER
-#
 ####################################################################################
 #
 # Intel ACPI Source Language Compiler (Template)
@@ -354,25 +328,6 @@ NOOPT_VS2015_X64_NASM_FLAGS     = -O0 -f win64 -g
 RELEASE_VS2015_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
 NOOPT_VS2015_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 
-##################
-# EBC definitions
-##################
-*_VS2015_EBC_*_FAMILY            = INTEL
-*_VS2015_EBC_*_DLL               = DEF(VS2015_DLL)
-
-*_VS2015_EBC_PP_PATH             = DEF(EBC_BIN)\iec.exe
-*_VS2015_EBC_VFRPP_PATH          = DEF(EBC_BIN)\iec.exe
-*_VS2015_EBC_CC_PATH             = DEF(EBC_BIN)\iec.exe
-*_VS2015_EBC_SLINK_PATH          = DEF(VS2015_BIN)\link.exe
-*_VS2015_EBC_DLINK_PATH          = DEF(VS2015_BIN)\link.exe
-
-*_VS2015_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
-*_VS2015_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
-*_VS2015_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
-*_VS2015_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
-*_VS2015_EBC_DLINK_FLAGS         = "C:\Program Files\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
-
-
 ####################################################################################
 #   VS2015x86       - Microsoft Visual Studio 2015 (x86) professional with Intel ASL
 #   ASL  - Intel ACPI Source Language Compiler (iasl.exe)
@@ -465,25 +420,6 @@ NOOPT_VS2015x86_X64_NASM_FLAGS     = -O0 -f win64 -g
   DEBUG_VS2015x86_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 RELEASE_VS2015x86_X64_DLINK_FLAGS  = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
 NOOPT_VS2015x86_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
-
-##################
-# EBC definitions
-##################
-*_VS2015x86_EBC_*_FAMILY            = INTEL
-*_VS2015x86_EBC_*_DLL               = DEF(VS2015x86_DLL)
-
-*_VS2015x86_EBC_PP_PATH             = DEF(EBC_BINx86)\iec.exe
-*_VS2015x86_EBC_VFRPP_PATH          = DEF(EBC_BINx86)\iec.exe
-*_VS2015x86_EBC_CC_PATH             = DEF(EBC_BINx86)\iec.exe
-*_VS2015x86_EBC_SLINK_PATH          = DEF(VS2015x86_BIN)\link.exe
-*_VS2015x86_EBC_DLINK_PATH          = DEF(VS2015x86_BIN)\link.exe
-
-*_VS2015x86_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
-*_VS2015x86_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
-*_VS2015x86_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
-*_VS2015x86_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
-*_VS2015x86_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
-
 
 ####################################################################################
 #   VS2017       - Microsoft Visual Studio 2017 with Intel ASL
@@ -626,23 +562,6 @@ NOOPT_VS2017_AARCH64_ASM_FLAGS     = /nologo
 RELEASE_VS2017_AARCH64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:ARM64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /DRIVER /MERGE:.rdata=.data
 NOOPT_VS2017_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:ARM64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /DRIVER /DEBUG
 
-##################
-# EBC definitions
-##################
-*_VS2017_EBC_*_FAMILY            = INTEL
-
-*_VS2017_EBC_PP_PATH             = DEF(EBC_BINx86)\iec.exe
-*_VS2017_EBC_VFRPP_PATH          = DEF(EBC_BINx86)\iec.exe
-*_VS2017_EBC_CC_PATH             = DEF(EBC_BINx86)\iec.exe
-*_VS2017_EBC_SLINK_PATH          = DEF(VS2017_BIN_IA32)\link.exe
-*_VS2017_EBC_DLINK_PATH          = DEF(VS2017_BIN_IA32)\link.exe
-
-*_VS2017_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
-*_VS2017_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
-*_VS2017_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
-*_VS2017_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
-*_VS2017_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
-
 ####################################################################################
 #   VS2019       - Microsoft Visual Studio 2019 with Intel ASL
 #   ASL          - Intel ACPI Source Language Compiler (iasl.exe)
@@ -783,23 +702,6 @@ NOOPT_VS2019_AARCH64_ASM_FLAGS     = /nologo
   DEBUG_VS2019_AARCH64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:ARM64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /DRIVER /DEBUG
 RELEASE_VS2019_AARCH64_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:ARM64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /DRIVER /MERGE:.rdata=.data
 NOOPT_VS2019_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:ARM64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /DRIVER /DEBUG
-
-##################
-# EBC definitions
-##################
-*_VS2019_EBC_*_FAMILY            = INTEL
-
-*_VS2019_EBC_PP_PATH             = DEF(EBC_BINx86)\iec.exe
-*_VS2019_EBC_VFRPP_PATH          = DEF(EBC_BINx86)\iec.exe
-*_VS2019_EBC_CC_PATH             = DEF(EBC_BINx86)\iec.exe
-*_VS2019_EBC_SLINK_PATH          = DEF(VS2019_BIN_IA32)\link.exe
-*_VS2019_EBC_DLINK_PATH          = DEF(VS2019_BIN_IA32)\link.exe
-
-*_VS2019_EBC_PP_FLAGS            = /nologo /E /TC /FIAutoGen.h
-*_VS2019_EBC_CC_FLAGS            = /nologo /c /WX /W3 /FIAutoGen.h /D$(MODULE_ENTRY_POINT)=$(ARCH_ENTRY_POINT)
-*_VS2019_EBC_VFRPP_FLAGS         = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h
-*_VS2019_EBC_SLINK_FLAGS         = /lib /NOLOGO /MACHINE:EBC
-*_VS2019_EBC_DLINK_FLAGS         = "C:\Program Files (x86)\Intel\EBC\Lib\EbcLib.lib" /NOLOGO /NODEFAULTLIB /MACHINE:EBC /OPT:REF /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /MAP /ALIGN:32 /DRIVER
 
 ####################################################################################
 # GCC Common
