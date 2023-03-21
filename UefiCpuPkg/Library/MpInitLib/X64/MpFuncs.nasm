@@ -315,6 +315,7 @@ MwaitCheckGeneric:
 MwaitLoopGeneric:
     cli
     mov        rax, rsp           ; Set Monitor Address
+    sub        eax, 8             ; To ensure the monitor address is in the page table
     xor        ecx, ecx           ; ecx = 0
     xor        edx, edx           ; edx = 0
     monitor
