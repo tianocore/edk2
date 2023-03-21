@@ -13,8 +13,6 @@ if "%1"=="" goto main
 if /I "%1"=="VS2019" goto VS2019Vars
 if /I "%1"=="VS2017" goto VS2017Vars
 if /I "%1"=="VS2015" goto VS2015Vars
-if /I "%1"=="VS2013" goto VS2013Vars
-if /I "%1"=="VS2012" goto VS2012Vars
 
 :set_vsvars
 if defined VCINSTALLDIR goto :EOF
@@ -84,17 +82,6 @@ if defined VCINSTALLDIR goto :done
 
   :VS2015Vars
   if defined VS140COMNTOOLS (call :read_vsvars  "%VS140COMNTOOLS%") else (if /I "%1"=="VS2015" goto ToolNotInstall)
-
-  :VS2013Vars
-  if defined VS120COMNTOOLS ( call :read_vsvars  "%VS120COMNTOOLS%") else (if /I "%1"=="VS2013" goto ToolNotInstall)
-
-  :VS2012Vars
-  if defined VS110COMNTOOLS (call :read_vsvars  "%VS110COMNTOOLS%") else (if /I "%1"=="VS2012" goto ToolNotInstall)
-
-  if defined VS100COMNTOOLS  call :read_vsvars  "%VS100COMNTOOLS%"
-  if defined VS90COMNTOOLS   call :read_vsvars  "%VS90COMNTOOLS%"
-  if defined VS80COMNTOOLS   call :read_vsvars  "%VS80COMNTOOLS%"
-  if defined VS71COMNTOOLS   call :read_vsvars  "%VS71COMNTOOLS%"
 
 :done
 set GET_VSVARS_BAT_CHECK_DIR=

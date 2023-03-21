@@ -21,76 +21,12 @@ goto :EOF
 if /I "%1"=="VS2019" goto SetVS2019
 if /I "%1"=="VS2017" goto SetVS2017
 if /I "%1"=="VS2015" goto SetVS2015
-if /I "%1"=="VS2013" goto SetVS2013
-if /I "%1"=="VS2012" goto SetVS2012
 
 if defined VS71COMNTOOLS (
   if not defined VS2003_PREFIX (
     set "VS2003_PREFIX=%VS71COMNTOOLS:~0,-14%"
   )
 )
-
-if defined VS80COMNTOOLS (
-  if not defined VS2005_PREFIX (
-    set "VS2005_PREFIX=%VS80COMNTOOLS:~0,-14%"
-  )
-)
-
-if defined VS90COMNTOOLS (
-  if not defined VS2008_PREFIX (
-    set "VS2008_PREFIX=%VS90COMNTOOLS:~0,-14%"
-  )
-  if not defined WINSDK_PREFIX (
-    set "WINSDK_PREFIX=c:\Program Files\Microsoft SDKs\Windows\v6.0A\bin\"
-  )
-  if not defined WINSDKx86_PREFIX (
-    set "WINSDKx86_PREFIX=c:\Program Files (x86)\Microsoft SDKs\Windows\v6.0A\bin\"
-  )
-)
-
-if defined VS100COMNTOOLS (
-  if not defined VS2010_PREFIX (
-    set "VS2010_PREFIX=%VS100COMNTOOLS:~0,-14%"
-  )
-  if not defined WINSDK7_PREFIX (
-    set "WINSDK7_PREFIX=c:\Program Files\Microsoft SDKs\Windows\v7.0A\Bin\"
-  )
-  if not defined WINSDK7x86_PREFIX (
-    set "WINSDK7x86_PREFIX=c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\"
-  )
-)
-
-:SetVS2012
-if defined VS110COMNTOOLS (
-  if not defined VS2012_PREFIX (
-    set "VS2012_PREFIX=%VS110COMNTOOLS:~0,-14%"
-  )
-  if not defined WINSDK71_PREFIX (
-    set "WINSDK71_PREFIX=c:\Program Files\Microsoft SDKs\Windows\v7.1A\Bin\"
-  )
-  if not defined WINSDK71x86_PREFIX (
-    set "WINSDK71x86_PREFIX=c:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\"
-  )
-) else (
-  if /I "%1"=="VS2012" goto ToolNotInstall
-)
-if /I "%1"=="VS2012" goto SetWinDDK
-
-:SetVS2013
-if defined VS120COMNTOOLS (
-  if not defined VS2013_PREFIX (
-    set "VS2013_PREFIX=%VS120COMNTOOLS:~0,-14%"
-  )
-  if not defined WINSDK8_PREFIX (
-    set "WINSDK8_PREFIX=c:\Program Files\Windows Kits\8.0\bin\"
-  )
-  if not defined WINSDK8x86_PREFIX (
-    set "WINSDK8x86_PREFIX=c:\Program Files (x86)\Windows Kits\8.0\bin\"
-  )
-) else (
-  if /I "%1"=="VS2013" goto ToolNotInstall
-)
-if /I "%1"=="VS2013" goto SetWinDDK
 
 :SetVS2015
 if defined VS140COMNTOOLS (

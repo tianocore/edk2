@@ -60,18 +60,6 @@ if /I "%1"=="/?" goto Usage
     set VSTool=VS2015
     goto loop
   )
-  if /I "%1"=="VS2013" (
-    shift
-    set VS2013=TRUE
-    set VSTool=VS2013
-    goto loop
-  )
-  if /I "%1"=="VS2012" (
-    shift
-    set VS2012=TRUE
-    set VSTool=VS2012
-    goto loop
-  )
   if "%1"=="" goto setup_workspace
   if exist %1 (
     if not defined BASE_TOOLS_PATH (
@@ -189,12 +177,6 @@ if defined VS2019 (
 ) else if defined VS2015 (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2015
   call %EDK_TOOLS_PATH%\get_vsvars.bat VS2015
-) else if defined VS2013 (
-  call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2013
-  call %EDK_TOOLS_PATH%\get_vsvars.bat VS2013
-) else if defined VS2012 (
-  call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2012
-  call %EDK_TOOLS_PATH%\get_vsvars.bat VS2012
 ) else (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat
   call %EDK_TOOLS_PATH%\get_vsvars.bat
@@ -472,7 +454,7 @@ goto end
 
 :Usage
   @echo.
-  echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [base_tools_path [edk_tools_path]] [VS2019] [VS2017] [VS2015] [VS2013] [VS2012]"
+  echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [base_tools_path [edk_tools_path]] [VS2019] [VS2017] [VS2015]"
   @echo.
   @echo         base_tools_path   BaseTools project path, BASE_TOOLS_PATH will be set to this path.
   @echo         edk_tools_path    EDK_TOOLS_PATH will be set to this path.
@@ -481,8 +463,6 @@ goto end
   @echo         ForceRebuild      If sources are available, rebuild all tools regardless of
   @echo                           whether they have been updated or not.
   @echo         Reconfig          Reinstall target.txt, tools_def.txt and build_rule.txt.
-  @echo         VS2012            Set the env for VS2012 build.
-  @echo         VS2013            Set the env for VS2013 build.
   @echo         VS2015            Set the env for VS2015 build.
   @echo         VS2017            Set the env for VS2017 build.
   @echo         VS2019            Set the env for VS2019 build.
@@ -495,8 +475,6 @@ set RECONFIG=
 set VS2019=
 set VS2017=
 set VS2015=
-set VS2013=
-set VS2012=
 set VSTool=
 popd
 

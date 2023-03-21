@@ -80,50 +80,6 @@ if defined SRC_CONF @goto SetEnv
 @goto End
 
 :CheckVsVer
-@set "TEST_VS=C:\Program Files (x86)\Microsoft Visual Studio 9.0\"
-@if "%VSINSTALLDIR%"=="%TEST_VS%" (
-    @echo     TOOL_CHAIN_TAG       = VS2008x86
-    @goto :EOF
-)
-@set "TEST_VS=C:\Program Files\Microsoft Visual Studio 9.0\"
-@if "%VSINSTALLDIR%"=="%TEST_VS%" (
-    @echo     TOOL_CHAIN_TAG       = VS2008
-    @goto :EOF
-)
-
-@set "TEST_VS=C:\Program Files (x86)\Microsoft Visual Studio 10.0\"
-@if "%VSINSTALLDIR%"=="%TEST_VS%" (
-    @echo     TOOL_CHAIN_TAG       = VS2010x86
-    @goto :EOF
-)
-@set "TEST_VS=C:\Program Files\Microsoft Visual Studio 10.0\"
-@if "%VSINSTALLDIR%"=="%TEST_VS%" (
-    @echo     TOOL_CHAIN_TAG       = VS2010
-    @goto :EOF
-)
-
-@set "TEST_VS=C:\Program Files (x86)\Microsoft Visual Studio 11.0\"
-@if "%VSINSTALLDIR%"=="%TEST_VS%" (
-    @echo     TOOL_CHAIN_TAG       = VS2012x86
-    @goto :EOF
-)
-@set "TEST_VS=C:\Program Files\Microsoft Visual Studio 11.0\"
-@if "%VSINSTALLDIR%"=="%TEST_VS%" (
-    @echo     TOOL_CHAIN_TAG       = VS2012
-    @goto :EOF
-)
-
-@set "TEST_VS=C:\Program Files (x86)\Microsoft Visual Studio 12.0\"
-@if "%VSINSTALLDIR%"=="%TEST_VS%" (
-    @echo     TOOL_CHAIN_TAG       = VS2013x86
-    @goto :EOF
-)
-@set "TEST_VS=C:\Program Files\Microsoft Visual Studio 12.0\"
-@if "%VSINSTALLDIR%"=="%TEST_VS%" (
-    @echo     TOOL_CHAIN_TAG       = VS2013
-    @goto :EOF
-)
-
 @set "TEST_VS=C:\Program Files (x86)\Microsoft Visual Studio 14.0\"
 @if "%VSINSTALLDIR%"=="%TEST_VS%" (
     @echo     TOOL_CHAIN_TAG       = VS2015x86
