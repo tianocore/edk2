@@ -89,18 +89,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   #if defined (_MSC_VER) && _MSC_VER >= 1800
 
 //
-// Disable these warnings for VS2013.
-//
-
-//
 // This warning is for potentially uninitialized local variable, and it may cause false
-// positive issues in VS2013 and VS2015 build
+// positive issues in VS2015 build
 //
     #pragma warning ( disable : 4701 )
 
 //
 // This warning is for potentially uninitialized local pointer variable, and it may cause
-// false positive issues in VS2013 and VS2015 build
+// false positive issues in VS2015 build
 //
     #pragma warning ( disable : 4703 )
 
