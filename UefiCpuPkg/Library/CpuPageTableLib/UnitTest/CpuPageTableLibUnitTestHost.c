@@ -13,6 +13,7 @@ static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging4Level    = { P
 static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging4Level1GB = { Paging4Level1GB, 100, 20, USE_RANDOM_ARRAY };
 static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging5Level    = { Paging5Level, 100, 20, USE_RANDOM_ARRAY };
 static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPaging5Level1GB = { Paging5Level1GB, 100, 20, USE_RANDOM_ARRAY };
+static CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT  mTestContextPagingPae       = { PagingPae, 100, 20, USE_RANDOM_ARRAY };
 
 /**
   Check if the input parameters are not supported.
@@ -884,6 +885,7 @@ UefiTestMain (
   AddTestCase (RandomTestCase, "Random Test for Paging4Level1G", "Random Test Case2", TestCaseforRandomTest, NULL, NULL, &mTestContextPaging4Level1GB);
   AddTestCase (RandomTestCase, "Random Test for Paging5Level", "Random Test Case3", TestCaseforRandomTest, NULL, NULL, &mTestContextPaging5Level);
   AddTestCase (RandomTestCase, "Random Test for Paging5Level1G", "Random Test Case4", TestCaseforRandomTest, NULL, NULL, &mTestContextPaging5Level1GB);
+  AddTestCase (RandomTestCase, "Random Test for PagingPae", "Random Test Case5", TestCaseforRandomTest, NULL, NULL, &mTestContextPagingPae);
 
   //
   // Execute the tests.
