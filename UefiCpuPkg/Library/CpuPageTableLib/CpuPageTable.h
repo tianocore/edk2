@@ -20,6 +20,8 @@
 
 #define REGION_LENGTH(l)  LShiftU64 (1, (l) * 9 + 3)
 
+#define MAX_PAE_PDPTE_NUM  4
+
 typedef enum {
   Pte   = 1,
   Pde   = 2,
