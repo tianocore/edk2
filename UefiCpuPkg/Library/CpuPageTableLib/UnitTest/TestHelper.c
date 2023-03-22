@@ -175,10 +175,9 @@ IsPageTableValid (
     return UNIT_TEST_PASSED;
   }
 
-  if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
+  if ((PagingMode == Paging32bit) || (PagingMode >= PagingModeMax)) {
     //
     // 32bit paging is never supported.
-    // PAE paging will be supported later.
     //
     return UNIT_TEST_ERROR_TEST_FAILED;
   }
@@ -187,7 +186,12 @@ IsPageTableValid (
   MaxLevel     = (UINT8)(PagingMode >> 8);
 
   PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)PageTable;
-  for (Index = 0; Index < 512; Index++) {
+  for (Index = 0; Index < ((PagingMode == PagingPae) ? 4 : 512); Index++) {
+    if (PagingMode == PagingPae) {
+      UT_ASSERT_EQUAL (PagingEntry[Index].PdptePae.Bits.MustBeZero, 0);
+      UT_ASSERT_EQUAL (PagingEntry[Index].PdptePae.Bits.MustBeZero2, 0);
+    }
+
     Status = IsPageTableEntryValid (&PagingEntry[Index], MaxLevel, MaxLeafLevel, Index << (9 * MaxLevel + 3));
     if (Status != UNIT_TEST_PASSED) {
       return Status;
@@ -264,7 +268,7 @@ GetEntryFromPageTable (
   UINT64             Index;
   IA32_PAGING_ENTRY  *PagingEntry;
 
-  if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
+  if ((PagingMode == Paging32bit) || (PagingMode >= PagingModeMax)) {
     //
     // 32bit paging is never supported.
     // PAE paging will be supported later.
