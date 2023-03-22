@@ -44,7 +44,7 @@ STATIC BOOLEAN  mAcceptAllMemoryAtEBS = TRUE;
 
 STATIC EFI_EVENT  mAcceptAllMemoryEvent = NULL;
 
-#define IS_ALIGNED(x, y)  ((((x) & ((y) - 1)) == 0))
+#define IS_ALIGNED_(x, y)  ((((x) & ((y) - 1)) == 0))
 
 STATIC
 EFI_STATUS
@@ -60,8 +60,8 @@ AmdSevMemoryAccept (
   // multiple of SIZE_4KB. Use an assert instead of returning an erros since
   // this is an EDK2-internal protocol.
   //
-  ASSERT (IS_ALIGNED (StartAddress, SIZE_4KB));
-  ASSERT (IS_ALIGNED (Size, SIZE_4KB));
+  ASSERT (IS_ALIGNED_ (StartAddress, SIZE_4KB));
+  ASSERT (IS_ALIGNED_ (Size, SIZE_4KB));
   ASSERT (Size != 0);
 
   MemEncryptSevSnpPreValidateSystemRam (
