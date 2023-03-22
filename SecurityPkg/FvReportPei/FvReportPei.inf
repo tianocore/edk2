@@ -46,6 +46,7 @@
 [Ppis]
   gEdkiiPeiFirmwareVolumeInfoPrehashedFvPpiGuid   ## PRODUCES
   gEdkiiPeiFirmwareVolumeInfoStoredHashFvPpiGuid  ## CONSUMES
+  gEdkiiPeiFirmwareVolumeShadowPpiGuid            ## CONSUMES
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationPass

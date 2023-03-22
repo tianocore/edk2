@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Tpm20.h>
 
 #include <Ppi/FirmwareVolumeInfoStoredHashFv.h>
+#include <Ppi/FirmwareVolumeShadowPpi.h>
 
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
