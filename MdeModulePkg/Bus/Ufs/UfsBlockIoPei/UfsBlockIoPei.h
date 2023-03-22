@@ -133,7 +133,7 @@ typedef struct _UFS_PEIM_HC_PRIVATE_DATA {
 
 #define ROUNDUP8(x)  (((x) % 8 == 0) ? (x) : ((x) / 8 + 1) * 8)
 
-#define IS_ALIGNED(addr, size)  (((UINTN) (addr) & (size - 1)) == 0)
+#define ADDRESS_IS_ALIGNED_(addr, size)  (((UINTN) (addr) & (size - 1)) == 0)
 
 #define GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS(a)         CR (a, UFS_PEIM_HC_PRIVATE_DATA, BlkIoPpi, UFS_PEIM_HC_SIG)
 #define GET_UFS_PEIM_HC_PRIVATE_DATA_FROM_THIS2(a)        CR (a, UFS_PEIM_HC_PRIVATE_DATA, BlkIo2Ppi, UFS_PEIM_HC_SIG)
