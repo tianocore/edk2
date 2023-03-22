@@ -1,7 +1,7 @@
 /** @file
   Internal header for CpuPageTableLib.
 
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -19,6 +19,8 @@
 #define IA32_PE_BASE_ADDRESS_MASK_39  0xFFFFFFFFFE000ull
 
 #define REGION_LENGTH(l)  LShiftU64 (1, (l) * 9 + 3)
+
+#define MAX_PAE_PDPTE_NUM  4
 
 typedef enum {
   Pte   = 1,

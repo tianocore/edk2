@@ -671,15 +671,17 @@ PageTableMap (
   IA32_PAGE_LEVEL     MaxLeafLevel;
   IA32_MAP_ATTRIBUTE  ParentAttribute;
   BOOLEAN             LocalIsModified;
+  UINTN               Index;
+  IA32_PAGING_ENTRY   *PagingEntry;
+  UINT8               BufferInStack[SIZE_4KB - 1 + MAX_PAE_PDPTE_NUM * sizeof (IA32_PAGING_ENTRY)];
 
   if (Length == 0) {
     return RETURN_SUCCESS;
   }
 
-  if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
+  if ((PagingMode == Paging32bit) || (PagingMode >= PagingModeMax)) {
     //
     // 32bit paging is never supported.
-    // PAE paging will be supported later.
     //
     return RETURN_UNSUPPORTED;
   }
@@ -716,17 +718,32 @@ PageTableMap (
 
   MaxLeafLevel     = (IA32_PAGE_LEVEL)(UINT8)PagingMode;
   MaxLevel         = (IA32_PAGE_LEVEL)(UINT8)(PagingMode >> 8);
-  MaxLinearAddress = LShiftU64 (1, 12 + MaxLevel * 9);
+  MaxLinearAddress = (PagingMode == PagingPae) ? LShiftU64 (1, 32) : LShiftU64 (1, 12 + MaxLevel * 9);
 
   if ((LinearAddress > MaxLinearAddress) || (Length > MaxLinearAddress - LinearAddress)) {
     //
-    // Maximum linear address is (1 << 48) or (1 << 57)
+    // Maximum linear address is (1 << 32), (1 << 48) or (1 << 57)
     //
     return RETURN_INVALID_PARAMETER;
   }
 
   TopPagingEntry.Uintn = *PageTable;
   if (TopPagingEntry.Uintn != 0) {
+    if (PagingMode == PagingPae) {
+      //
+      // Create 4 temporary PDPTE at a 4k-aligned address.
+      // Copy the original PDPTE content and set ReadWrite, UserSupervisor to 1, set Nx to 0.
+      //
+      TopPagingEntry.Uintn = ALIGN_VALUE ((UINTN)BufferInStack, BASE_4KB);
+      PagingEntry          = (IA32_PAGING_ENTRY *)(TopPagingEntry.Uintn);
+      CopyMem (PagingEntry, (VOID *)(*PageTable), MAX_PAE_PDPTE_NUM * sizeof (IA32_PAGING_ENTRY));
+      for (Index = 0; Index < MAX_PAE_PDPTE_NUM; Index++) {
+        PagingEntry[Index].Pnle.Bits.ReadWrite      = 1;
+        PagingEntry[Index].Pnle.Bits.UserSupervisor = 1;
+        PagingEntry[Index].Pnle.Bits.Nx             = 0;
+      }
+    }
+
     TopPagingEntry.Pce.Present        = 1;
     TopPagingEntry.Pce.ReadWrite      = 1;
     TopPagingEntry.Pce.UserSupervisor = 1;
@@ -801,7 +818,33 @@ PageTableMap (
              );
 
   if (!RETURN_ERROR (Status)) {
-    *PageTable = (UINTN)(TopPagingEntry.Uintn & IA32_PE_BASE_ADDRESS_MASK_40);
+    PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)(TopPagingEntry.Uintn & IA32_PE_BASE_ADDRESS_MASK_40);
+
+    if (PagingMode == PagingPae) {
+      //
+      // These MustBeZero fields are treated as RW and other attributes by the common map logic. So they might be set to 1.
+      //
+      for (Index = 0; Index < MAX_PAE_PDPTE_NUM; Index++) {
+        PagingEntry[Index].PdptePae.Bits.MustBeZero  = 0;
+        PagingEntry[Index].PdptePae.Bits.MustBeZero2 = 0;
+        PagingEntry[Index].PdptePae.Bits.MustBeZero3 = 0;
+      }
+
+      if (*PageTable != 0) {
+        //
+        // Copy temp PDPTE to original PDPTE.
+        //
+        CopyMem ((VOID *)(*PageTable), PagingEntry, MAX_PAE_PDPTE_NUM * sizeof (IA32_PAGING_ENTRY));
+      }
+    }
+
+    if (*PageTable == 0) {
+      //
+      // Do not assign the *PageTable when it's an existing page table.
+      // If it's an existing PAE page table, PagingEntry is the temp buffer in stack.
+      //
+      *PageTable = (UINTN)PagingEntry;
+    }
   }
 
   return Status;

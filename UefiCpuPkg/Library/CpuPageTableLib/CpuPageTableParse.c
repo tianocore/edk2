@@ -1,7 +1,7 @@
 /** @file
   This library implements CpuPageTableLib that are generic for IA32 family CPU.
 
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -158,6 +158,7 @@ VOID
 PageTableLibParsePnle (
   IN     UINT64              PageTableBaseAddress,
   IN     UINTN               Level,
+  IN     UINTN               MaxLevel,
   IN     UINT64              RegionStart,
   IN     IA32_MAP_ATTRIBUTE  *ParentMapAttribute,
   IN OUT IA32_MAP_ENTRY      *Map,
@@ -171,13 +172,15 @@ PageTableLibParsePnle (
   UINTN               Index;
   IA32_MAP_ATTRIBUTE  MapAttribute;
   UINT64              RegionLength;
+  UINTN               PagingEntryNumber;
 
   ASSERT (OneEntry != NULL);
 
-  PagingEntry  = (IA32_PAGING_ENTRY *)(UINTN)PageTableBaseAddress;
-  RegionLength = REGION_LENGTH (Level);
+  PagingEntry       = (IA32_PAGING_ENTRY *)(UINTN)PageTableBaseAddress;
+  RegionLength      = REGION_LENGTH (Level);
+  PagingEntryNumber = ((MaxLevel == 3) && (Level == 3)) ? MAX_PAE_PDPTE_NUM : 512;
 
-  for (Index = 0; Index < 512; Index++, RegionStart += RegionLength) {
+  for (Index = 0; Index < PagingEntryNumber; Index++, RegionStart += RegionLength) {
     if (PagingEntry[Index].Pce.Present == 0) {
       continue;
     }
@@ -228,6 +231,7 @@ PageTableLibParsePnle (
       PageTableLibParsePnle (
         IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&PagingEntry[Index].Pnle),
         Level - 1,
+        MaxLevel,
         RegionStart,
         &MapAttribute,
         Map,
@@ -269,6 +273,8 @@ PageTableParse (
   IA32_MAP_ENTRY      *LastEntry;
   IA32_MAP_ENTRY      OneEntry;
   UINTN               MaxLevel;
+  UINTN               Index;
+  IA32_PAGING_ENTRY   BufferInStack[MAX_PAE_PDPTE_NUM];
 
   if ((PagingMode == Paging32bit) || (PagingMode >= PagingModeMax)) {
     //
@@ -288,6 +294,17 @@ PageTableParse (
   if (PageTable == 0) {
     *MapCount = 0;
     return RETURN_SUCCESS;
+  }
+
+  if (PagingMode == PagingPae) {
+    CopyMem (BufferInStack, (VOID *)PageTable, sizeof (BufferInStack));
+    for (Index = 0; Index < MAX_PAE_PDPTE_NUM; Index++) {
+      BufferInStack[Index].Pnle.Bits.ReadWrite      = 1;
+      BufferInStack[Index].Pnle.Bits.UserSupervisor = 1;
+      BufferInStack[Index].Pnle.Bits.Nx             = 0;
+    }
+
+    PageTable = (UINTN)BufferInStack;
   }
 
   //
@@ -319,7 +336,7 @@ PageTableParse (
   MapCapacity = *MapCount;
   *MapCount   = 0;
   LastEntry   = NULL;
-  PageTableLibParsePnle ((UINT64)PageTable, MaxLevel, 0, &NopAttribute, Map, MapCount, MapCapacity, &LastEntry, &OneEntry);
+  PageTableLibParsePnle ((UINT64)PageTable, MaxLevel, MaxLevel, 0, &NopAttribute, Map, MapCount, MapCapacity, &LastEntry, &OneEntry);
 
   if (*MapCount > MapCapacity) {
     return RETURN_BUFFER_TOO_SMALL;
