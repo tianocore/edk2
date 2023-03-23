@@ -339,7 +339,9 @@ SmbiosPrintStructure (
       PRINT_PENDING_STRING (Struct, Type0, BiosVersion);
       PRINT_STRUCT_VALUE_H (Struct, Type0, BiosSegment);
       PRINT_PENDING_STRING (Struct, Type0, BiosReleaseDate);
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE), gShellDebug1HiiHandle, 64 * (Struct->Type0->BiosSize + 1));
+      if ((Struct->Type0->BiosSize != 0xFF) || !(AE_SMBIOS_VERSION (0x3, 0x1))) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE), gShellDebug1HiiHandle, 64 * (Struct->Type0->BiosSize + 1));
+      }
 
       DisplayBiosCharacteristics (ReadUnaligned64 ((UINT64 *)(UINTN)&(Struct->Type0->BiosCharacteristics)), Option);
 
