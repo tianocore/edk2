@@ -16,8 +16,9 @@ SetCr3ForPageTables64:
 
     ;
     ; These pages are built into the ROM image in X64/PageTables.asm
+    ; Highest level PageTable is at the highest address
     ;
-    mov     eax, ADDR_OF(TopLevelPageDirectory)
+    mov     eax, ADDR_OF(EndOfPageTables) - 0x1000
     mov     cr3, eax
 
     OneTimeCallRet SetCr3ForPageTables64

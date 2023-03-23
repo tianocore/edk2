@@ -2,7 +2,7 @@
 ; @file
 ; Emits Page Tables for 1:1 mapping of the addresses 0 - 0x100000000 (4GB)
 ;
-; Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2008 - 2023, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;------------------------------------------------------------------------------
@@ -30,31 +30,24 @@ BITS    64
 
 TopLevelPageDirectory:
 
-    ;
-    ; Top level Page Directory Pointers (1 * 512GB entry)
-    ;
-    DQ      PDP(0x1000)
-
-
-    ;
-    ; Next level Page Directory Pointers (4 * 1GB entries => 4GB)
-    ;
-    TIMES 0x1000-PGTBLS_OFFSET($) DB 0
-
-    DQ      PDP(0x2000)
-    DQ      PDP(0x3000)
-    DQ      PDP(0x4000)
-    DQ      PDP(0x5000)
-
-    ;
-    ; Page Table Entries (2048 * 2MB entries => 4GB)
-    ;
-    TIMES 0x2000-PGTBLS_OFFSET($) DB 0
-
 %assign i 0
 %rep    0x800
     DQ      PTE_2MB(i)
     %assign i i+1
 %endrep
 
-EndOfPageTables:
+    ;
+    ; Page-directory pointer table Pointers (4 * 1GB entries => 4GB)
+    ;
+    DQ      PDP(0)
+    DQ      PDP(0x1000)
+    DQ      PDP(0x2000)
+    DQ      PDP(0x3000)
+    TIMES   0x4000-PGTBLS_OFFSET($) DB 0
+
+    ;
+    ; PML4 table Pointers (1 * 512GB entry)
+    ;
+    DQ      PDP(0x4000)
+
+    TIMES   0x5000-PGTBLS_OFFSET($) DB 0
