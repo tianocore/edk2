@@ -46,6 +46,9 @@ StartOfPageTables:
     %include "X64/PageTables2M.asm"
   %endif
 %endif
+%ifdef USE_5_LEVEL_PAGE_TABLE
+  %include "X64/PageTables5L.asm"
+%endif
 EndOfPageTables:
 
 %ifdef DEBUG_PORT80
