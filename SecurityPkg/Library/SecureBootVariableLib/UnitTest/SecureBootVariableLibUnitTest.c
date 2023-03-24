@@ -163,7 +163,7 @@ MockGetVariable (
     return EFI_BUFFER_TOO_SMALL;
   } else {
     assert_non_null (Data);
-    CopyMem (Data, (VOID *)mock (), TargetSize);
+    CopyMem (Data, (VOID *)(UINTN)mock (), TargetSize);
   }
 
   return EFI_SUCCESS;
