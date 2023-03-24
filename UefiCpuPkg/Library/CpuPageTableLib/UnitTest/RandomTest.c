@@ -621,10 +621,12 @@ SingleMapEntryTest (
   UINTN             Level;
   UINT64            Value;
   UNIT_TEST_STATUS  TestStatus;
+  MAP_ENTRY         *LastMapEntry;
 
   MapsIndex = MapEntrys->Count;
 
   GenerateSingleRandomMapEntry (MaxAddress, MapEntrys);
+  LastMapEntry = &MapEntrys->Maps[MapsIndex];
 
   PageTableBufferSize = 0;
   Status              = PageTableMap (
@@ -632,10 +634,10 @@ SingleMapEntryTest (
                           PagingMode,
                           NULL,
                           &PageTableBufferSize,
-                          MapEntrys->Maps[MapsIndex].LinearAddress,
-                          MapEntrys->Maps[MapsIndex].Length,
-                          &MapEntrys->Maps[MapsIndex].Attribute,
-                          &MapEntrys->Maps[MapsIndex].Mask
+                          LastMapEntry->LinearAddress,
+                          LastMapEntry->Length,
+                          &LastMapEntry->Attribute,
+                          &LastMapEntry->Mask
                           );
   if (PageTableBufferSize != 0) {
     UT_ASSERT_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
@@ -651,10 +653,10 @@ SingleMapEntryTest (
                PagingMode,
                Buffer,
                &PageTableBufferSize,
-               MapEntrys->Maps[MapsIndex].LinearAddress,
-               MapEntrys->Maps[MapsIndex].Length,
-               &MapEntrys->Maps[MapsIndex].Attribute,
-               &MapEntrys->Maps[MapsIndex].Mask
+               LastMapEntry->LinearAddress,
+               LastMapEntry->Length,
+               &LastMapEntry->Attribute,
+               &LastMapEntry->Mask
                );
   }
 
