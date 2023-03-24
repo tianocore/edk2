@@ -27,6 +27,7 @@
 [Includes]
   Include
   Test/UnitTest/Include
+  Test/Mock/Include
 
 [Includes.IA32]
   Include/Ia32
