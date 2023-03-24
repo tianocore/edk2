@@ -23,7 +23,7 @@
   LIBRARY_CLASS                  = UefiLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
