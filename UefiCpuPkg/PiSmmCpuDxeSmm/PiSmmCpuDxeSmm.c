@@ -871,22 +871,18 @@ PiCpuSmmEntry (
     //
     DEBUG ((DEBUG_INFO, "PiCpuSmmEntry: gSmmBaseHobGuid not found!\n"));
     //
+    // very old processors (i486 + pentium) need 32k not 4k alignment, exclude them.
+    //
+    ASSERT (FamilyId >= 6);
+    //
     // Allocate buffer for all of the tiles.
     //
-    // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
-    // Volume 3C, Section 34.11 SMBASE Relocation
-    //   For Pentium and Intel486 processors, the SMBASE values must be
-    //   aligned on a 32-KByte boundary or the processor will enter shutdown
-    //   state during the execution of a RSM instruction.
-    //
-    // Intel486 processors: FamilyId is 4
-    // Pentium processors : FamilyId is 5
-    //
     BufferPages = EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1));
-    if ((FamilyId == 4) || (FamilyId == 5)) {
-      Buffer = AllocateAlignedCodePages (BufferPages, SIZE_32KB);
-    } else {
-      Buffer = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
+    Buffer      = AllocateAlignedCodePages (BufferPages, SIZE_4KB);
+    if (Buffer == NULL) {
+      DEBUG ((DEBUG_ERROR, "Failed to allocate %d pages.\n", BufferPages));
+      CpuDeadLoop ();
+      return EFI_OUT_OF_RESOURCES;
     }
 
     ASSERT (Buffer != NULL);

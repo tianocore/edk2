@@ -35,6 +35,15 @@ typedef struct {
 PCD_ENTRY  *PcdList;
 UINT32     PcdListLength;
 
+/**
+  Record new token information
+
+  @param FileBuffer    File Buffer to be record
+  @param PcdIndex      Index of PCD in database
+  @param TokenIndex    Index of Token
+  @param TokenStart    Start of Token
+  @param TokenEnd      End of Token
+**/
 VOID
 STATIC
 RecordToken (
@@ -44,24 +53,7 @@ RecordToken (
   UINT32  TokenStart,
   UINT32  TokenEnd
   )
-/*++
 
-Routine Description:
-
-  Record new token information
-
-Arguments:
-
-  FileBuffer    File Buffer to be record
-  PcdIndex      Index of PCD in database
-  TokenIndex    Index of Token
-  TokenStart    Start of Token
-  TokenEnd      End of Token
-
-Returns:
-
-  None
---*/
 {
   CHAR8  *Token;
 
@@ -109,6 +101,16 @@ Returns:
   }
 }
 
+/**
+  Get PCD index in Pcd database
+
+  @param SkuName               SkuName String
+  @param DefaultValueName      DefaultValueName String
+  @param TokenSpaceGuidName    TokenSpaceGuidName String
+  @param TokenName             TokenName String
+
+  @return Index of PCD in Pcd database
+**/
 int
 STATIC
 LookupPcdIndex (
@@ -117,23 +119,6 @@ LookupPcdIndex (
   CHAR8  *TokenSpaceGuidName,
   CHAR8  *TokenName
   )
-/*++
-
-Routine Description:
-
-  Get PCD index in Pcd database
-
-Arguments:
-
-  SkuName               SkuName String
-  DefaultValueName      DefaultValueName String
-  TokenSpaceGuidName    TokenSpaceGuidName String
-  TokenName             TokenName String
-
-Returns:
-
-  Index of PCD in Pcd database
---*/
 {
   UINT32  Index;
 
@@ -161,6 +146,16 @@ Returns:
   return -1;
 }
 
+/**
+  Get PCD value
+
+  @param SkuName               SkuName String
+  @param DefaultValueName      DefaultValueName String
+  @param TokenSpaceGuidName    TokenSpaceGuidName String
+  @param TokenName             TokenName String
+
+  @return PCD value
+**/
 UINT64
 __PcdGet (
   CHAR8  *SkuName             OPTIONAL,
@@ -168,23 +163,6 @@ __PcdGet (
   CHAR8  *TokenSpaceGuidName,
   CHAR8  *TokenName
   )
-/*++
-
-Routine Description:
-
-  Get PCD value
-
-Arguments:
-
-  SkuName               SkuName String
-  DefaultValueName      DefaultValueName String
-  TokenSpaceGuidName    TokenSpaceGuidName String
-  TokenName             TokenName String
-
-Returns:
-
-  PCD value
---*/
 {
   int    Index;
   CHAR8  *End;
@@ -212,6 +190,15 @@ Returns:
   return 0;
 }
 
+/**
+  Set PCD value
+
+  @param SkuName               SkuName String
+  @param DefaultValueName      DefaultValueName String
+  @param TokenSpaceGuidName    TokenSpaceGuidName String
+  @param TokenName             TokenName String
+  @param Value                 PCD value to be set
+**/
 VOID
 __PcdSet (
   CHAR8   *SkuName             OPTIONAL,
@@ -220,24 +207,6 @@ __PcdSet (
   CHAR8   *TokenName,
   UINT64  Value
   )
-/*++
-
-Routine Description:
-
-  Set PCD value
-
-Arguments:
-
-  SkuName               SkuName String
-  DefaultValueName      DefaultValueName String
-  TokenSpaceGuidName    TokenSpaceGuidName String
-  TokenName             TokenName String
-  Value                 PCD value to be set
-
-Returns:
-
-  None
---*/
 {
   int    Index;
 
@@ -275,6 +244,17 @@ Returns:
   }
 }
 
+/**
+  Get PCD value buffer
+
+  @param SkuName               SkuName String
+  @param DefaultValueName      DefaultValueName String
+  @param TokenSpaceGuidName    TokenSpaceGuidName String
+  @param TokenName             TokenName String
+  @param Size                  Size of PCD value buffer
+
+  @return PCD value buffer
+**/
 VOID *
 __PcdGetPtr (
   CHAR8   *SkuName             OPTIONAL,
@@ -283,24 +263,6 @@ __PcdGetPtr (
   CHAR8   *TokenName,
   UINT32  *Size
   )
-/*++
-
-Routine Description:
-
-  Get PCD value buffer
-
-Arguments:
-
-  SkuName               SkuName String
-  DefaultValueName      DefaultValueName String
-  TokenSpaceGuidName    TokenSpaceGuidName String
-  TokenName             TokenName String
-  Size                  Size of PCD value buffer
-
-Returns:
-
-  PCD value buffer
---*/
 {
   int    Index;
   CHAR8   *Value;
@@ -341,6 +303,16 @@ Returns:
   return 0;
 }
 
+/**
+  Set PCD value buffer
+
+  @param SkuName               SkuName String
+  @param DefaultValueName      DefaultValueName String
+  @param TokenSpaceGuidName    TokenSpaceGuidName String
+  @param TokenName             TokenName String
+  @param Size                  Size of PCD value
+  @param Value                 Pointer to the updated PCD value buffer
+**/
 VOID
 __PcdSetPtr (
   CHAR8   *SkuName             OPTIONAL,
@@ -350,25 +322,6 @@ __PcdSetPtr (
   UINT32  Size,
   UINT8   *Value
   )
-/*++
-
-Routine Description:
-
-  Set PCD value buffer
-
-Arguments:
-
-  SkuName               SkuName String
-  DefaultValueName      DefaultValueName String
-  TokenSpaceGuidName    TokenSpaceGuidName String
-  TokenName             TokenName String
-  Size                  Size of PCD value
-  Value                 Pointer to the updated PCD value buffer
-
-Returns:
-
-  None
---*/
 {
   int    Index;
   UINT32  ValueIndex;
@@ -400,6 +353,13 @@ Returns:
   }
 }
 
+/**
+  Read the file buffer from the input file.
+
+  @param InputFileName Point to the input file name.
+  @param FileBuffer    Point to the input file buffer.
+  @param FileSize      Size of the file buffer.
+**/
 VOID
 STATIC
 ReadInputFile (
@@ -407,22 +367,6 @@ ReadInputFile (
   UINT8   **FileBuffer,
   UINT32  *FileSize
   )
-/*++
-
-Routine Description:
-
-  Read the file buffer from the input file.
-
-Arguments:
-
-  InputFileName Point to the input file name.
-  FileBuffer    Point to the input file buffer.
-  FileSize      Size of the file buffer.
-
-Returns:
-
-  None
---*/
 {
   FILE    *InputFile;
   UINT32  BytesRead;
@@ -492,27 +436,18 @@ Returns:
   fclose (InputFile);
 }
 
+/**
+  Read the initial PCD value from the input file buffer.
+
+  @param FileBuffer  Point to the input file buffer.
+  @param FileSize    Size of the file buffer.
+**/
 VOID
 STATIC
 ParseFile (
   UINT8   *FileBuffer,
   UINT32  FileSize
   )
-/*++
-
-Routine Description:
-
-  Read the initial PCD value from the input file buffer.
-
-Arguments:
-
-  FileBuffer  Point to the input file buffer.
-  FileSize    Size of the file buffer.
-
-Returns:
-
-  None
---*/
 {
   UINT32  Index;
   UINT32  NumLines;
@@ -552,25 +487,16 @@ Returns:
   }
 }
 
+/**
+  Write the updated PCD value into the output file name.
+
+  @param OutputFileName  Point to the output file name.
+**/
 VOID
 STATIC
 WriteOutputFile (
   CHAR8   *OutputFileName
   )
-/*++
-
-Routine Description:
-
-  Write the updated PCD value into the output file name.
-
-Arguments:
-
-  OutputFileName  Point to the output file name.
-
-Returns:
-
-  None
---*/
 {
   FILE    *OutputFile;
   UINT32  Index;
@@ -605,26 +531,14 @@ Returns:
   }
 }
 
+/**
+  Displays the utility usage syntax to STDOUT
+**/
 VOID
 STATIC
 Usage (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Displays the utility usage syntax to STDOUT
-
-Arguments:
-
-  None
-
-Returns:
-
-  None
-
---*/
 {
   fprintf (stdout, "Usage: -i <input_file> -o <output_file>\n\n");
   fprintf (stdout, "optional arguments:\n");
@@ -635,6 +549,14 @@ Returns:
                         PCD Database Output file name\n");
 }
 
+/**
+ Parse the input parameters to get the input/output file name.
+
+ @param argc            Number of command line parameters.
+ @param argv            Array of pointers to parameter strings.
+ @param InputFileName   Point to the input file name.
+ @param OutputFileName  Point to the output file name.
+**/
 VOID
 STATIC
 ParseArguments (
@@ -643,23 +565,6 @@ ParseArguments (
   CHAR8  **InputFileName,
   CHAR8  **OutputFileName
   )
-/*++
-
-Routine Description:
-
-  Parse the input parameters to get the input/output file name.
-
-Arguments:
-
-  argc            Number of command line parameters.
-  argv            Array of pointers to parameter strings.
-  InputFileName   Point to the input file name.
-  OutputFileName  Point to the output file name.
-
-Returns:
-
-  None
---*/
 {
   if (argc == 1) {
     fprintf (stderr, "Missing options\n");
@@ -722,25 +627,19 @@ Returns:
   }
 }
 
+/**
+ Main function updates PCD values.
+
+ @param argc            Number of command line parameters.
+ @param argv            Array of pointers to parameter strings.
+
+ @retval EXIT_SUCCESS
+**/
 int
 PcdValueMain (
   int   argc,
   char  *argv[]
   )
-/*++
-
-Routine Description:
-
-  Main function updates PCD values.
-
-Arguments:
-
-  argc            Number of command line parameters.
-  argv            Array of pointers to parameter strings.
-
-Returns:
-  EXIT_SUCCESS
---*/
 {
   CHAR8   *InputFileName;
   CHAR8   *OutputFileName;

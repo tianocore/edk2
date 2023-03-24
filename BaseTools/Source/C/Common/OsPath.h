@@ -16,15 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Functions declarations
 //
 
-CHAR8*
-OsPathDirName (
-  IN CHAR8    *FilePath
-  )
-;
 /**
-
-Routine Description:
-
   This function returns the directory path which contains the particular path.
   Some examples:
     "a/b/c"  -> "a/b"
@@ -37,26 +29,17 @@ Routine Description:
 
   The caller must free the string returned.
 
-Arguments:
+  @param FilePath     Path name of file to get the parent directory for.
 
-  FilePath     Path name of file to get the parent directory for.
-
-Returns:
-
-  NULL if error
-
+  @return NULL if error
 **/
-
-
-VOID
-OsPathNormPathInPlace (
-  IN CHAR8    *Path
+CHAR8*
+OsPathDirName (
+  IN CHAR8    *FilePath
   )
 ;
+
 /**
-
-Routine Description:
-
   This function returns the directory path which contains the particular path.
   Some examples:
     "a/b/../c" -> "a/c"
@@ -65,27 +48,17 @@ Routine Description:
 
   This function does not check for the existence of the file.
 
-Arguments:
+  @param Path     Path name of file to normalize
 
-  Path     Path name of file to normalize
-
-Returns:
-
-  The string is altered in place.
-
+  @return The string is altered in place.
 **/
-
-
-CHAR8*
-OsPathPeerFilePath (
-  IN CHAR8    *OldPath,
-  IN CHAR8    *Peer
+VOID
+OsPathNormPathInPlace (
+  IN CHAR8    *Path
   )
 ;
+
 /**
-
-Routine Description:
-
   This function replaces the final portion of a path with an alternative
   'peer' filename.  For example:
     "a/b/../c", "peer" -> "a/b/../peer"
@@ -95,39 +68,30 @@ Routine Description:
 
   This function does not check for the existence of the file.
 
-Arguments:
+  @param OldPath     Path name of replace the final segment
+  @param Peer        The new path name to concatenate to become the peer path
 
-  OldPath     Path name of replace the final segment
-  Peer        The new path name to concatenate to become the peer path
-
-Returns:
-
-  A CHAR8* string, which must be freed by the caller
-
+  @return A CHAR8* string, which must be freed by the caller
 **/
+CHAR8*
+OsPathPeerFilePath (
+  IN CHAR8    *OldPath,
+  IN CHAR8    *Peer
+  )
+;
 
+/**
+  Checks if a file exists
 
+  @param InputFileName     The name of the file to check for existence
+
+  @retval TRUE              The file exists
+  @retval FALSE             The file does not exist
+**/
 BOOLEAN
 OsPathExists (
   IN CHAR8    *InputFileName
   )
 ;
-/**
-
-Routine Description:
-
-  Checks if a file exists
-
-Arguments:
-
-  InputFileName     The name of the file to check for existence
-
-Returns:
-
-  TRUE              The file exists
-  FALSE             The file does not exist
-
-**/
-
 
 #endif

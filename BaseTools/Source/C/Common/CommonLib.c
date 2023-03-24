@@ -26,28 +26,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
     } \
   } while (FALSE)
 
+/**
+  Set Buffer to zero for Size bytes.
+
+  @param Buffer  Memory to set.
+  @param Size    Number of bytes to set
+**/
 VOID
 PeiZeroMem (
   IN VOID   *Buffer,
   IN UINTN  Size
   )
-/*++
-
-Routine Description:
-
-  Set Buffer to zero for Size bytes.
-
-Arguments:
-
-  Buffer  - Memory to set.
-
-  Size    - Number of bytes to set
-
-Returns:
-
-  None
-
---*/
 {
   INT8  *Ptr;
 
@@ -57,31 +46,19 @@ Returns:
   }
 }
 
+/**
+  Copy Length bytes from Source to Destination.
+
+  @param Destination Target of copy
+  @param Source      Place to copy from
+  @param Length      Number of bytes to copy
+**/
 VOID
 PeiCopyMem (
   IN VOID   *Destination,
   IN VOID   *Source,
   IN UINTN  Length
   )
-/*++
-
-Routine Description:
-
-  Copy Length bytes from Source to Destination.
-
-Arguments:
-
-  Destination - Target of copy
-
-  Source      - Place to copy from
-
-  Length      - Number of bytes to copy
-
-Returns:
-
-  None
-
---*/
 {
   CHAR8 *Destination8;
   CHAR8 *Source8;
@@ -112,27 +89,20 @@ CopyMem (
   PeiCopyMem (Destination, Source, Length);
 }
 
+/**
+  Compares to GUIDs
+
+  @param Guid1 guid to compare
+  @param Guid2 guid to compare
+
+  @retval =  0  if Guid1 == Guid2
+  @retval != 0  if Guid1 != Guid2
+**/
 INTN
 CompareGuid (
   IN EFI_GUID     *Guid1,
   IN EFI_GUID     *Guid2
   )
-/*++
-
-Routine Description:
-
-  Compares to GUIDs
-
-Arguments:
-
-  Guid1 - guid to compare
-  Guid2 - guid to compare
-
-Returns:
-  =  0  if Guid1 == Guid2
-  != 0  if Guid1 != Guid2
-
---*/
 {
   INT32 *g1;
   INT32 *g2;
@@ -152,34 +122,25 @@ Returns:
   return r;
 }
 
+/**
+  This function opens a file and reads it into a memory buffer.  The function
+  will allocate the memory buffer and returns the size of the buffer.
 
+  @param InputFileName     The name of the file to read.
+  @param InputFileImage    A pointer to the memory buffer.
+  @param BytesRead         The size of the memory buffer.
+
+  @retval EFI_SUCCESS              The function completed successfully.
+  @retval EFI_INVALID_PARAMETER    One of the input parameters was invalid.
+  @retval EFI_ABORTED              An error occurred.
+  @retval EFI_OUT_OF_RESOURCES     No resource to complete operations.
+**/
 EFI_STATUS
 GetFileImage (
   IN CHAR8    *InputFileName,
   OUT CHAR8   **InputFileImage,
   OUT UINT32  *BytesRead
   )
-/*++
-
-Routine Description:
-
-  This function opens a file and reads it into a memory buffer.  The function
-  will allocate the memory buffer and returns the size of the buffer.
-
-Arguments:
-
-  InputFileName     The name of the file to read.
-  InputFileImage    A pointer to the memory buffer.
-  BytesRead         The size of the memory buffer.
-
-Returns:
-
-  EFI_SUCCESS              The function completed successfully.
-  EFI_INVALID_PARAMETER    One of the input parameters was invalid.
-  EFI_ABORTED              An error occurred.
-  EFI_OUT_OF_RESOURCES     No resource to complete operations.
-
---*/
 {
   FILE    *InputFile;
   UINT32  FileSize;
@@ -255,32 +216,24 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function opens a file and writes OutputFileImage into the file.
+
+  @param OutputFileName     The name of the file to write.
+  @param OutputFileImage    A pointer to the memory buffer.
+  @param BytesToWrite       The size of the memory buffer.
+
+  @retval EFI_SUCCESS              The function completed successfully.
+  @retval EFI_INVALID_PARAMETER    One of the input parameters was invalid.
+  @retval EFI_ABORTED              An error occurred.
+  @retval EFI_OUT_OF_RESOURCES     No resource to complete operations.
+**/
 EFI_STATUS
 PutFileImage (
   IN CHAR8    *OutputFileName,
   IN CHAR8    *OutputFileImage,
   IN UINT32   BytesToWrite
   )
-/*++
-
-Routine Description:
-
-  This function opens a file and writes OutputFileImage into the file.
-
-Arguments:
-
-  OutputFileName     The name of the file to write.
-  OutputFileImage    A pointer to the memory buffer.
-  BytesToWrite       The size of the memory buffer.
-
-Returns:
-
-  EFI_SUCCESS              The function completed successfully.
-  EFI_INVALID_PARAMETER    One of the input parameters was invalid.
-  EFI_ABORTED              An error occurred.
-  EFI_OUT_OF_RESOURCES     No resource to complete operations.
-
---*/
 {
   FILE    *OutputFile;
   UINT32  BytesWrote;
@@ -320,52 +273,36 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function calculates the value needed for a valid UINT8 checksum
+
+  @param Buffer      Pointer to buffer containing byte data of component.
+  @param Size        Size of the buffer
+
+  @return The 8 bit checksum value needed.
+**/
 UINT8
 CalculateChecksum8 (
   IN UINT8        *Buffer,
   IN UINTN        Size
   )
-/*++
-
-Routine Description:
-
-  This function calculates the value needed for a valid UINT8 checksum
-
-Arguments:
-
-  Buffer      Pointer to buffer containing byte data of component.
-  Size        Size of the buffer
-
-Returns:
-
-  The 8 bit checksum value needed.
-
---*/
 {
   return (UINT8) (0x100 - CalculateSum8 (Buffer, Size));
 }
 
+/**
+  This function calculates the UINT8 sum for the requested region.
+
+  @param Buffer      Pointer to buffer containing byte data of component.
+  @param Size      Size of the buffer
+
+  @return The 8 bit checksum value needed.
+**/
 UINT8
 CalculateSum8 (
   IN UINT8  *Buffer,
   IN UINTN  Size
   )
-/*++
-
-Routine Description::
-
-  This function calculates the UINT8 sum for the requested region.
-
-Arguments:
-
-  Buffer      Pointer to buffer containing byte data of component.
-  Size        Size of the buffer
-
-Returns:
-
-  The 8 bit checksum value needed.
-
---*/
 {
   UINTN Index;
   UINT8 Sum;
@@ -382,52 +319,36 @@ Returns:
   return Sum;
 }
 
+/**
+  This function calculates the value needed for a valid UINT16 checksum
+
+  @param Buffer      Pointer to buffer containing byte data of component.
+  @param Size        Size of the buffer
+
+  @return The 16 bit checksum value needed.
+**/
 UINT16
 CalculateChecksum16 (
   IN UINT16       *Buffer,
   IN UINTN        Size
   )
-/*++
-
-Routine Description::
-
-  This function calculates the value needed for a valid UINT16 checksum
-
-Arguments:
-
-  Buffer      Pointer to buffer containing byte data of component.
-  Size        Size of the buffer
-
-Returns:
-
-  The 16 bit checksum value needed.
-
---*/
 {
   return (UINT16) (0x10000 - CalculateSum16 (Buffer, Size));
 }
 
+/**
+  This function calculates the UINT16 sum for the requested region.
+
+  @param Buffer      Pointer to buffer containing byte data of component.
+  @param Size        Size of the buffer
+
+  @return The 16 bit checksum
+**/
 UINT16
 CalculateSum16 (
   IN UINT16       *Buffer,
   IN UINTN        Size
   )
-/*++
-
-Routine Description:
-
-  This function calculates the UINT16 sum for the requested region.
-
-Arguments:
-
-  Buffer      Pointer to buffer containing byte data of component.
-  Size        Size of the buffer
-
-Returns:
-
-  The 16 bit checksum
-
---*/
 {
   UINTN   Index;
   UINT16  Sum;
@@ -444,26 +365,18 @@ Returns:
   return (UINT16) Sum;
 }
 
+/**
+  This function prints a GUID to STDOUT.
+
+  @param Guid    Pointer to a GUID to print.
+
+  @retval EFI_SUCCESS             The GUID was printed.
+  @retval EFI_INVALID_PARAMETER   The input was NULL.
+**/
 EFI_STATUS
 PrintGuid (
   IN EFI_GUID *Guid
   )
-/*++
-
-Routine Description:
-
-  This function prints a GUID to STDOUT.
-
-Arguments:
-
-  Guid    Pointer to a GUID to print.
-
-Returns:
-
-  EFI_SUCCESS             The GUID was printed.
-  EFI_INVALID_PARAMETER   The input was NULL.
-
---*/
 {
   if (Guid == NULL) {
     Error (NULL, 0, 2000, "Invalid parameter", "PrintGuidToBuffer() called with a NULL value");
@@ -487,6 +400,18 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function prints a GUID to a buffer
+
+  @param Guid      Pointer to a GUID to print.
+  @param Buffer    Pointer to a user-provided buffer to print to
+  @param BufferLen Size of the Buffer
+  @param Uppercase If use upper case.
+
+  @retval EFI_SUCCESS             The GUID was printed.
+  @retval EFI_INVALID_PARAMETER   The input was NULL.
+  @retval EFI_BUFFER_TOO_SMALL    The input buffer was not big enough
+**/
 EFI_STATUS
 PrintGuidToBuffer (
   IN EFI_GUID     *Guid,
@@ -494,26 +419,6 @@ PrintGuidToBuffer (
   IN UINT32       BufferLen,
   IN BOOLEAN      Uppercase
   )
-/*++
-
-Routine Description:
-
-  This function prints a GUID to a buffer
-
-Arguments:
-
-  Guid      - Pointer to a GUID to print.
-  Buffer    - Pointer to a user-provided buffer to print to
-  BufferLen - Size of the Buffer
-  Uppercase - If use upper case.
-
-Returns:
-
-  EFI_SUCCESS             The GUID was printed.
-  EFI_INVALID_PARAMETER   The input was NULL.
-  EFI_BUFFER_TOO_SMALL    The input buffer was not big enough
-
---*/
 {
   if (Guid == NULL) {
     Error (NULL, 0, 2000, "Invalid parameter", "PrintGuidToBuffer() called with a NULL value");
@@ -591,22 +496,17 @@ char *strlwr(char *s)
 //
 CHAR8 mCommonLibFullPath[MAX_LONG_FILE_PATH];
 
+/**
+  Convert FileName to the long file path, which can support larger than 260 length.
+
+  @param FileName         FileName.
+
+  @return LongFilePath      A pointer to the converted long file path.
+**/
 CHAR8 *
 LongFilePath (
  IN CHAR8 *FileName
  )
-/*++
-
-Routine Description:
-  Convert FileName to the long file path, which can support larger than 260 length.
-
-Arguments:
-  FileName         - FileName.
-
-Returns:
-  LongFilePath      A pointer to the converted long file path.
-
---*/
 {
 #ifdef __GNUC__
   //
@@ -2188,4 +2088,3 @@ SplitStr (
   *List = Str;
   return ReturnStr;
 }
-
