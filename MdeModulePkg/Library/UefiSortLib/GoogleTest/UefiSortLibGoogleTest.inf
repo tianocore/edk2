@@ -1,0 +1,31 @@
+## @file
+# Unit test suite for the UefiSortLib using Google Test
+#
+# Copyright (c) 2022, Intel Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = UefiSortLibGoogleTest
+  FILE_GUID           = 78FB0BEE-D0EA-4E1A-BD38-67458C8ECDEF
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = HOST_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UefiSortLibGoogleTest.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  UefiSortLib
