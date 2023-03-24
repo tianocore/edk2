@@ -398,6 +398,7 @@
   RiscV64/MemoryFence.S             | GCC
   RiscV64/RiscVSetJumpLongJump.S    | GCC
   RiscV64/RiscVCpuBreakpoint.S      | GCC
+  RiscV64/RiscVCpuCache.S           | GCC
   RiscV64/RiscVCpuPause.S           | GCC
   RiscV64/RiscVInterrupt.S          | GCC
   RiscV64/FlushCache.S              | GCC

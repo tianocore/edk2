@@ -11,8 +11,110 @@
 #include <Library/DebugLib.h>
 
 /**
-  RISC-V invalidate instruction cache.
+  Use runtime discovery mechanism in future when avalable
+  through https://lists.riscv.org/g/tech-privileged/topic/83853282
+**/
+#define RV64_CACHE_BLOCK_SIZE   64
 
+typedef enum{
+  cln,
+  flsh,
+  invd,
+}CACHE_OP;
+
+/* Ideally we should do this through BaseLib.h by adding
+   Asm*CacheLine functions. This can be done after Initial
+   RV refactoring is complete. For now call functions directly
+*/
+VOID
+EFIAPI RiscVCpuCacheFlush (
+  UINTN
+  );
+
+VOID
+EFIAPI RiscVCpuCacheClean (
+  UINTN
+  );
+
+VOID
+EFIAPI RiscVCpuCacheInval (
+  UINTN
+  );
+
+/**
+  Performs required opeartion on cache lines in the cache coherency domain
+  of the calling CPU. If Address is not aligned on a cache line boundary,
+  then entire cache line containing Address is operated. If Address + Length
+  is not aligned on a cache line boundary, then the entire cache line
+  containing Address + Length -1 is operated.
+
+  If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
+
+  @param  Address The base address of the cache lines to
+                  invalidate. If the CPU is in a physical addressing mode, then
+                  Address is a physical address. If the CPU is in a virtual
+                  addressing mode, then Address is a virtual address.
+
+  @param  Length  The number of bytes to invalidate from the instruction cache.
+
+  @return Address.
+
+**/
+
+VOID *
+EFIAPI
+CacheOpCacheRange (
+  IN VOID   *Address,
+  IN UINTN  Length,
+  IN CACHE_OP op
+  )
+{
+  UINTN   CacheLineSize;
+  UINTN   Start;
+  UINTN   End;
+
+  if (Length == 0) {
+    return Address;
+  }
+
+  ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Address));
+
+  //
+  // Cache line size is 8 * Bits 15-08 of EBX returned from CPUID 01H
+  //
+  CacheLineSize = RV64_CACHE_BLOCK_SIZE;
+
+  Start = (UINTN)Address;
+  //
+  // Calculate the cache line alignment
+  //
+  End    = (Start + Length + (CacheLineSize - 1)) & ~(CacheLineSize - 1);
+  Start &= ~((UINTN)CacheLineSize - 1);
+
+  do {
+    switch (op) {
+      case invd:
+        RiscVCpuCacheInval(Start);
+        break;
+      case flsh:
+        RiscVCpuCacheFlush(Start);
+        break;
+      case cln:
+        RiscVCpuCacheClean(Start);
+        break;
+      default:
+        DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported operation\n"));
+        break;
+    }
+
+    Start = Start + CacheLineSize;
+  } while (Start != End);
+
+  return Address;
+}
+
+/**
+  RISC-V invalidate instruction cache.
 **/
 VOID
 EFIAPI
@@ -22,7 +124,6 @@ RiscVInvalidateInstCacheAsm (
 
 /**
   RISC-V invalidate data cache.
-
 **/
 VOID
 EFIAPI
@@ -32,7 +133,9 @@ RiscVInvalidateDataCacheAsm (
 
 /**
   Invalidates the entire instruction cache in cache coherency domain of the
-  calling CPU.
+  calling CPU. This may not clear $IC on all RV implementations.
+  RV CMO only offers block operations as per spec. Entire cache invd will be
+  platform dependent implementation.
 
 **/
 VOID
@@ -77,11 +180,13 @@ InvalidateInstructionCacheRange (
   )
 {
   DEBUG (
-    (DEBUG_WARN,
+    (DEBUG_ERROR,
      "%a:RISC-V unsupported function.\n"
      "Invalidating the whole instruction cache instead.\n", __func__)
     );
   InvalidateInstructionCache ();
+  //RV does not support $I specific operation.
+  CacheOpCacheRange(Address, Length, invd);
   return Address;
 }
 
@@ -93,6 +198,8 @@ InvalidateInstructionCacheRange (
   of the calling CPU. This function guarantees that all dirty cache lines are
   written back to system memory, and also invalidates all the data cache lines
   in the cache coherency domain of the calling CPU.
+  RV CMO only offers block operations as per spec. Entire cache invd will be
+  platform dependent implementation.
 
 **/
 VOID
@@ -137,7 +244,7 @@ WriteBackInvalidateDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  CacheOpCacheRange(Address, Length, flsh);
   return Address;
 }
 
@@ -149,6 +256,8 @@ WriteBackInvalidateDataCacheRange (
   CPU. This function guarantees that all dirty cache lines are written back to
   system memory. This function may also invalidate all the data cache lines in
   the cache coherency domain of the calling CPU.
+  RV CMO only offers block operations as per spec. Entire cache invd will be
+  platform dependent implementation.
 
 **/
 VOID
@@ -192,7 +301,7 @@ WriteBackDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  CacheOpCacheRange(Address, Length, cln);
   return Address;
 }
 
@@ -205,6 +314,8 @@ WriteBackDataCacheRange (
   written back to system memory. It is typically used for cache diagnostics. If
   the CPU does not support invalidation of the entire data cache, then a write
   back and invalidate operation should be performed on the entire data cache.
+  RV CMO only offers block operations as per spec. Entire cache invd will be
+  platform dependent implementation.
 
 **/
 VOID
@@ -250,6 +361,7 @@ InvalidateDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  //RV does not support $D specific operation.
+  CacheOpCacheRange(Address, Length, invd);
   return Address;
 }
