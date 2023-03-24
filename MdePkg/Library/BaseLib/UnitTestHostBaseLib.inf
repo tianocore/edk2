@@ -23,7 +23,7 @@
   LIBRARY_CLASS                  = UnitTestHostBaseLib|HOST_APPLICATION
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64 RISCV64
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
