@@ -7,30 +7,27 @@
 ##
 
 [Defines]
-  INF_VERSION     = 0x00010005
+  INF_VERSION     = 0x00010018
   BASE_NAME       = GoogleTestLib
   MODULE_UNI_FILE = GoogleTestLib.uni
   FILE_GUID       = A90E4751-AD30-43CC-980B-01E356B49ADF
-  MODULE_TYPE     = BASE
+  MODULE_TYPE     = HOST_APPLICATION
   VERSION_STRING  = 0.1
-  LIBRARY_CLASS   = GoogleTestLib|HOST_APPLICATION
+  LIBRARY_CLASS   = GoogleTestLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
   googletest/googletest/src/gtest-all.cc
+  googletest/googlemock/src/gmock-all.cc
 
 [Packages]
+  MdePkg/MdePkg.dec
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS     == /c /EHsc /Zi
-  MSFT:NOOPT_*_*_CC_FLAGS =  /Od
-
-  GCC:*_*_*_CC_FLAGS     == -g -c
-
-  GCC:NOOPT_*_*_CC_FLAGS =  -O0
-  GCC:*_*_IA32_CC_FLAGS  =  -m32
-  GCC:*_*_X64_CC_FLAGS   =  -m64
+  MSFT:*_*_*_CC_FLAGS   == /c /EHsc /Zi /Od
+  GCC:*_*_IA32_CC_FLAGS == -g -c -fshort-wchar -O0 -m32
+  GCC:*_*_X64_CC_FLAGS  == -g -c -fshort-wchar -O0 -m64
