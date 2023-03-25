@@ -615,7 +615,8 @@ typedef struct {
 ///
 /// Debug Format
 ///
-#define EFI_IMAGE_DEBUG_TYPE_CODEVIEW 2
+#define EFI_IMAGE_DEBUG_TYPE_CODEVIEW               2
+#define EFI_IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS  20
 
 typedef struct {
   UINT32  Characteristics;
@@ -663,6 +664,16 @@ typedef struct {
   //  Filename of .DLL (Mach-O with debug info) goes here
   //
 } EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY;
+
+///
+/// Extended DLL Characteristics
+///
+#define EFI_IMAGE_DLLCHARACTERISTICS_EX_CET_COMPAT          0x0001
+#define EFI_IMAGE_DLLCHARACTERISTICS_EX_FORWARD_CFI_COMPAT  0x0040
+
+typedef struct {
+  UINT32  DllCharacteristicsEx;
+} EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY;
 
 //
 // .pdata entries for X64

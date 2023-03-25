@@ -2932,7 +2932,8 @@ Returns:
       if (mIsConvertXip) {
         DebugEntry->FileOffset = DebugEntry->RVA;
       }
-      if (ZeroDebugFlag || DebugEntry->Type != EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
+      if ((ZeroDebugFlag || DebugEntry->Type != EFI_IMAGE_DEBUG_TYPE_CODEVIEW) &&
+          (DebugEntry->Type != EFI_IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS)) {
         memset (FileBuffer + DebugEntry->FileOffset, 0, DebugEntry->SizeOfData);
         memset (DebugEntry, 0, sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
       }
