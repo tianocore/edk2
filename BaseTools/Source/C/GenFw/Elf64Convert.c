@@ -992,6 +992,16 @@ ScanSections64 (
                 sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
                 strlen(mInImageName) + 1;
 
+  //
+  // Add more space in the .debug data region for the DllCharacteristicsEx
+  // field.
+  //
+  if (mDllCharacteristicsEx != 0) {
+    mCoffOffset = DebugRvaAlign(mCoffOffset) +
+                  sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
+                  sizeof (EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY);
+  }
+
   mCoffOffset = CoffAlign(mCoffOffset);
   if (SectionCount == 0) {
     mDataOffset = mCoffOffset;
@@ -2244,29 +2254,47 @@ WriteDebug64 (
   VOID
   )
 {
-  UINT32                              Len;
-  EFI_IMAGE_OPTIONAL_HEADER_UNION     *NtHdr;
-  EFI_IMAGE_DATA_DIRECTORY            *DataDir;
-  EFI_IMAGE_DEBUG_DIRECTORY_ENTRY     *Dir;
-  EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY *Nb10;
+  UINT32                                      Len;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION             *NtHdr;
+  EFI_IMAGE_DATA_DIRECTORY                    *DataDir;
+  EFI_IMAGE_DEBUG_DIRECTORY_ENTRY             *Dir;
+  EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY         *Nb10;
+  EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY *DllEntry;
 
   Len = strlen(mInImageName) + 1;
-
-  Dir = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY*)(mCoffFile + mDebugOffset);
-  Dir->Type = EFI_IMAGE_DEBUG_TYPE_CODEVIEW;
-  Dir->SizeOfData = sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) + Len;
-  Dir->RVA = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
-  Dir->FileOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
-
-  Nb10 = (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY*)(Dir + 1);
-  Nb10->Signature = CODEVIEW_SIGNATURE_NB10;
-  strcpy ((char *)(Nb10 + 1), mInImageName);
-
 
   NtHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)(mCoffFile + mNtHdrOffset);
   DataDir = &NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG];
   DataDir->VirtualAddress = mDebugOffset;
-  DataDir->Size = sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+  DataDir->Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+
+  Dir = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY*)(mCoffFile + mDebugOffset);
+
+  if (mDllCharacteristicsEx != 0) {
+    DataDir->Size  += sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+
+    Dir->Type       = EFI_IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS;
+    Dir->SizeOfData = sizeof (EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY);
+    Dir->FileOffset = mDebugOffset + DataDir->Size +
+                      sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
+                      DebugRvaAlign(Len);
+    Dir->RVA        = Dir->FileOffset;
+
+    DllEntry = (VOID *)(mCoffFile + Dir->FileOffset);
+
+    DllEntry->DllCharacteristicsEx = mDllCharacteristicsEx;
+
+    Dir++;
+  }
+
+  Dir->Type = EFI_IMAGE_DEBUG_TYPE_CODEVIEW;
+  Dir->SizeOfData = sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) + Len;
+  Dir->RVA = mDebugOffset + DataDir->Size;
+  Dir->FileOffset = mDebugOffset + DataDir->Size;
+
+  Nb10 = (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY*)(Dir + 1);
+  Nb10->Signature = CODEVIEW_SIGNATURE_NB10;
+  strcpy ((char *)(Nb10 + 1), mInImageName);
 }
 
 STATIC
