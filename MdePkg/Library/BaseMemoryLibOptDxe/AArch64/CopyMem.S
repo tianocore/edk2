@@ -178,6 +178,7 @@ L(copy_long):
 
 ASM_GLOBAL ASM_PFX(InternalMemCopyMem)
 ASM_PFX(InternalMemCopyMem):
+    AARCH64_BTI(c)
     sub     tmp2, dstin, src
     cmp     count, 96
     ccmp    tmp2, count, 2, hi

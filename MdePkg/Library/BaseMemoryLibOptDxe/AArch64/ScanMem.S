@@ -45,6 +45,7 @@
 
 ASM_GLOBAL ASM_PFX(InternalMemScanMem8)
 ASM_PFX(InternalMemScanMem8):
+    AARCH64_BTI(c)
     // Do not dereference srcin if no bytes to compare.
     cbz  cntin, .Lzero_length
     //

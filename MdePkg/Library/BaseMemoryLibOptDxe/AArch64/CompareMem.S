@@ -32,6 +32,7 @@
     .p2align 6
 ASM_GLOBAL ASM_PFX(InternalMemCompareMem)
 ASM_PFX(InternalMemCompareMem):
+    AARCH64_BTI(c)
     eor     tmp1, src1, src2
     tst     tmp1, #7
     b.ne    .Lmisaligned8
