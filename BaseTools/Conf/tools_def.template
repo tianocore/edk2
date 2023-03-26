@@ -67,10 +67,6 @@ DEFINE WINSDK10_BIN         = ENV(WINSDK10_PREFIX)DEF(VS_HOST)
 DEFINE WINDDK_BIN16     = ENV(WINDDK3790_PREFIX)bin16
 DEFINE WINDDK_BINX64    = ENV(WINDDK3790_PREFIX)win64\x86\amd64
 
-DEFINE CYGWIN_BIN              = c:/cygwin/bin
-DEFINE CYGWIN_BINIA32          = c:/cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin/
-DEFINE CYGWIN_BINX64           = c:/cygwin/opt/tiano/x86_64-pc-mingw64/x86_64-pc-mingw64/bin/
-
 DEFINE GCC_IA32_PREFIX        = ENV(GCC_BIN)
 DEFINE GCC_X64_PREFIX         = ENV(GCC_BIN)
 DEFINE GCC_HOST_PREFIX         = ENV(GCC_HOST_BIN)
