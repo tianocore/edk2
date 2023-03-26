@@ -79,6 +79,10 @@
 
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdMaximalValidYear_HELP    #language en-US "This PCD specifies the maximal valid year in RTC."
 
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcDefaultYear_PROMPT  #language en-US "Default year in RTC"
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcDefaultYear_HELP    #language en-US "This PCD specifies the RTC default year when the RTC is in an invalid state."
+
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPortBaseAddressMask_PROMPT   #language en-US  "ACPI IO Port Base Address Mask"
 
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdAcpiIoPortBaseAddressMask_HELP     #language en-US  "Defines the bit mask to retrieve ACPI IO Port Base Address."

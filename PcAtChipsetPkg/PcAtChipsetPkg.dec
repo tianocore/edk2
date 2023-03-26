@@ -76,6 +76,12 @@
   # @Expression 0x80000001 | gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear < gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear + 100
   gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear|2097|UINT16|0x0000000E
 
+  ## This PCD specifies the RTC default year when the RTC is in an invalid state.
+  # @Prompt Default year in RTC.
+  # @Expression 0x80000001 | gPcAtChipsetPkgTokenSpaceGuid.PcdRtcDefaultYear >= gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear
+  # @Expression 0x80000001 | gPcAtChipsetPkgTokenSpaceGuid.PcdRtcDefaultYear <= gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcDefaultYear|gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear|UINT16|0x0000000F
+
   ## Specifies RTC Index Register address in MMIO space.
   # @Prompt RTC Index Register address
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64|0x0|UINT64|0x00000022
