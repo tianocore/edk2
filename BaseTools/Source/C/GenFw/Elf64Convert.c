@@ -770,6 +770,49 @@ WriteSectionRiscV64 (
   }
 }
 
+STATIC UINT16 mDllCharacteristicsEx;
+
+STATIC
+VOID
+ParseNoteSection (
+  CONST Elf_Shdr  *Shdr
+  )
+{
+  CONST Elf_Note *Note;
+  CONST UINT32   *Prop;
+  UINT32         Prop0;
+  UINT32         Prop2;
+
+  Note = (Elf_Note *)((UINT8 *)mEhdr + Shdr->sh_offset);
+
+  if ((Note->n_type == NT_GNU_PROPERTY_TYPE_0) &&
+      (Note->n_namesz == sizeof ("GNU")) &&
+      (strcmp ((CHAR8 *)(Note + 1), "GNU") == 0) &&
+      (Note->n_descsz > sizeof (UINT32[2]))) {
+    Prop = (UINT32 *)((UINT8 *)(Note + 1) + sizeof("GNU"));
+
+    switch (mEhdr->e_machine) {
+    case EM_AARCH64:
+      Prop0 = GNU_PROPERTY_AARCH64_FEATURE_1_AND;
+      Prop2 = GNU_PROPERTY_AARCH64_FEATURE_1_BTI;
+      break;
+
+    case EM_X86_64:
+      Prop0 = GNU_PROPERTY_X86_FEATURE_1_AND;
+      Prop2 = GNU_PROPERTY_X86_FEATURE_1_IBT;
+      break;
+
+    default:
+      return;
+    }
+    if ((Prop[0] == Prop0) &&
+        (Prop[1] >= sizeof (UINT32)) &&
+        ((Prop[2] & Prop2) != 0)) {
+      mDllCharacteristicsEx |= EFI_IMAGE_DLLCHARACTERISTICS_EX_FORWARD_CFI_COMPAT;
+    }
+  }
+}
+
 //
 // Elf functions interface implementation
 //
@@ -823,6 +866,13 @@ ScanSections64 (
     }
     if (IsTextShdr(shdr) || IsDataShdr(shdr) || IsHiiRsrcShdr(shdr)) {
       mCoffAlignment = (UINT32)shdr->sh_addralign;
+    }
+  }
+
+  for (i = 0; i < mEhdr->e_shnum; i++) {
+    Elf_Shdr *shdr = GetShdrByIndex(i);
+    if (shdr->sh_type == SHT_NOTE) {
+      ParseNoteSection (shdr);
     }
   }
 
