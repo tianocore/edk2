@@ -117,8 +117,8 @@ $ OvmfPkg/build.sh -a X64 qemu
 And to run a 64-bit UEFI bootable ISO image:
 $ OvmfPkg/build.sh -a X64 qemu -cdrom /path/to/disk-image.iso
 
-To build a 32-bit OVMF without debug messages using GCC 4.8:
-$ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC48
+To build a 32-bit OVMF without debug messages using GCC:
+$ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC
 
 === SMM support ===
 

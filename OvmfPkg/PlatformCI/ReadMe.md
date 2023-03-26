@@ -6,7 +6,7 @@ to use the same Pytools based build infrastructure locally.
 ## Supported Configuration Details
 
 This solution for building and running OvmfPkg has only been validated with Windows 10
-with VS2019 and Ubuntu 18.04 with GCC5 toolchain. Four different firmware builds are
+with VS2019 and Ubuntu 18.04 with GCC toolchain. Four different firmware builds are
 supported and are described below.
 
 | Configuration name      | Architectures      | DSC File            |Additional Flags |

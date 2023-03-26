@@ -24,7 +24,7 @@ jobs:
   #Use matrix to speed up the build process
   strategy:
     matrix:
-      ${{ if eq(parameters.tool_chain_tag, 'GCC5') }}:
+      ${{ if eq(parameters.tool_chain_tag, 'GCC') }}:
         TARGET_GCC_ONLY:
           Build.Pkgs: 'EmbeddedPkg'
           Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'

@@ -194,12 +194,12 @@ parameter to the edk2 build system.
 Example:
 
 >build -a AARCH64 -p Platform\ARM\JunoPkg\ArmJuno.dsc
-   -t GCC5 **-D DYNAMIC_TABLES_FRAMEWORK**
+   -t GCC **-D DYNAMIC_TABLES_FRAMEWORK**
 
 or
 
 >build -a AARCH64 -p Platform\ARM\VExpressPkg\ArmVExpress-FVP-AArch64.dsc
-   -t GCC5 **-D DYNAMIC_TABLES_FRAMEWORK**
+   -t GCC **-D DYNAMIC_TABLES_FRAMEWORK**
 
 # Prerequisites
 
@@ -248,7 +248,7 @@ The instructions to setup the CI environment are in *'edk2\\.pytool\\Readme.md'*
     ```
         stuart_setup -c .pytool/CISettings.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
 
-        e.g. stuart_setup -c .pytool/CISettings.py TOOL_CHAIN_TAG=GCC5
+        e.g. stuart_setup -c .pytool/CISettings.py TOOL_CHAIN_TAG=GCC
     ```
 
 5. Initialize & Update Dependencies - only as needed when ext_deps change
@@ -256,7 +256,7 @@ The instructions to setup the CI environment are in *'edk2\\.pytool\\Readme.md'*
     ```
         stuart_update -c .pytool/CISettings.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
 
-        e.g. stuart_update -c .pytool/CISettings.py TOOL_CHAIN_TAG=GCC5
+        e.g. stuart_update -c .pytool/CISettings.py TOOL_CHAIN_TAG=GCC
     ```
 
 6. Compile the basetools if necessary - only when basetools C source files change
@@ -270,7 +270,7 @@ The instructions to setup the CI environment are in *'edk2\\.pytool\\Readme.md'*
     ```
         stuart_build-c .pytool/CISettings.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
 
-        e.g. stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=GCC5 -p DynamicTablesPkg -a AARCH64 --verbose
+        e.g. stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=GCC -p DynamicTablesPkg -a AARCH64 --verbose
     ```
 
     - use `stuart_build -c .pytool/CISettings.py -h` option to see help on additional options.

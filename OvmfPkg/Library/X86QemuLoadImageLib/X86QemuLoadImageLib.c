@@ -341,11 +341,6 @@ QemuLoadKernelImage (
   UINTN                      InitrdSize;
 
   //
-  // Redundant assignment to work around GCC48/GCC49 limitations.
-  //
-  CommandLine = NULL;
-
-  //
   // Load the image. This should call back into the QEMU EFI loader file system.
   //
   Status = gBS->LoadImage (

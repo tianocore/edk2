@@ -69,10 +69,10 @@ The PrmPkg can be built targetting the IA32/X64 and AArch64 architectures.
 > later in this document and dump the PRMT table in the OS to check if your PRM module is represented as expected.
 
  - AArch64
-    ``build -p PrmPkg/PrmPkg.dsc -a AARCH64 -t GCC5``
+    ``build -p PrmPkg/PrmPkg.dsc -a AARCH64 -t GCC``
 
-   > ***Note***: Only builds with the GCC5 toolchain have been tested.
-   > ***Note***: For builds with the GCC5 toolchain, the PrmModuleExportDescriptor and any other handler entry points symbols, to be listed in the PRMT, must be explicitly preserved by enumerating these in the AARCH64 linker flags. The --require-defined linker flag must be used for each symbol to be preserved.
+   > ***Note***: Only builds with the GCC toolchain have been tested.
+   > ***Note***: For builds with the GCC toolchain, the PrmModuleExportDescriptor and any other handler entry points symbols, to be listed in the PRMT, must be explicitly preserved by enumerating these in the AARCH64 linker flags. The --require-defined linker flag must be used for each symbol to be preserved.
 
 ### PRM Platform GUID
 

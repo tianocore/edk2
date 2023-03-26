@@ -77,18 +77,12 @@ case `uname` in
   Linux*)
     gcc_version=$(gcc -v 2>&1 | tail -1 | awk '{print $3}')
     case $gcc_version in
-      [1-3].*|4.[0-7].*)
-        echo OvmfPkg requires GCC4.8 or later
+      [1-4].*)
+        echo OvmfPkg requires GCC 5 or later
         exit 1
         ;;
-      4.8.*)
-        TARGET_TOOLS=GCC48
-        ;;
-      4.9.*|6.[0-2].*)
-        TARGET_TOOLS=GCC49
-        ;;
       *)
-        TARGET_TOOLS=GCC5
+        TARGET_TOOLS=GCC
         ;;
     esac
 esac

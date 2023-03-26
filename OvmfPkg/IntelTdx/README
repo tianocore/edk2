@@ -55,13 +55,13 @@ Build
 - Build the TDVF (Config-A) target:
 `cd /path/to/edk2`
 `source edksetup.sh`
-`build.sh -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t GCC5`
+`build.sh -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t GCC`
 
 - Build the TDVF (Config-B) target:
 `cd /path/to/edk2`
 `set PACKAGES_PATH=/path/to/edk2/OvmfPkg`
 `source edksetup.sh`
-`build.sh -p OvmfPkg/IntelTdx/IntelTdxX64.dsc -a X64 -t GCC5`
+`build.sh -p OvmfPkg/IntelTdx/IntelTdxX64.dsc -a X64 -t GCC`
 
 Usage
 -----
