@@ -59,6 +59,15 @@ typedef struct {
   UINT32  n_type;    /* Type of this note. */
 } Elf_Note;
 
+#define NT_GNU_PROPERTY_TYPE_0  5
+
+#define GNU_PROPERTY_X86_FEATURE_1_AND  0xc0000002
+#define GNU_PROPERTY_X86_FEATURE_1_IBT  0x1
+
+#define GNU_PROPERTY_AARCH64_FEATURE_1_AND  0xc0000000
+#define GNU_PROPERTY_AARCH64_FEATURE_1_BTI  0x1
+#define GNU_PROPERTY_AARCH64_FEATURE_1_PAC  0x2
+
 /* Indexes into the e_ident array.  Keep synced with
    http://www.sco.com/developers/gabi/latest/ch4.eheader.html */
 #define EI_MAG0    0  /* Magic number, byte 0. */
