@@ -737,10 +737,66 @@ AhciRecoverPortError (
     Status = AhciResetPort (PciIo, Port);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failed to reset the port %d\n", Port));
+      return EFI_DEVICE_ERROR;
     }
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  This function will check if the failed command should be retired. Only error
+  conditions which are a result of transient conditions on a link(either to system or to device).
+
+  @param[in] PciIo    Pointer to AHCI controller PciIo.
+  @param[in] Port     SATA port index on which to check.
+
+  @retval TRUE   Command failure was caused by transient condition and should be retried
+  @retval FALSE  Command should not be retried
+**/
+BOOLEAN
+AhciShouldCmdBeRetried (
+  IN EFI_PCI_IO_PROTOCOL  *PciIo,
+  IN UINT8                Port
+  )
+{
+  UINT32  Offset;
+  UINT32  PortInterrupt;
+  UINT32  Serr;
+  UINT32  Tfd;
+
+  Offset        = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_IS;
+  PortInterrupt = AhciReadReg (PciIo, Offset);
+  Offset        = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SERR;
+  Serr          = AhciReadReg (PciIo, Offset);
+  Offset        = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
+  Tfd           = AhciReadReg (PciIo, Offset);
+
+  //
+  // This can occur if there was a CRC error on a path from system memory to
+  // host controller.
+  //
+  if (PortInterrupt & EFI_AHCI_PORT_IS_HBDS) {
+    return TRUE;
+    //
+    // This can occur if there was a CRC error detected by host during communication
+    // with the device
+    //
+  } else if ((PortInterrupt & (EFI_AHCI_PORT_IS_IFS | EFI_AHCI_PORT_IS_INFS)) &&
+             (Serr & EFI_AHCI_PORT_SERR_CRCE))
+  {
+    return TRUE;
+    //
+    // This can occur if there was a CRC error detected by device during communication
+    // with the host. Device returns error status to host with D2H FIS.
+    //
+  } else if ((PortInterrupt & EFI_AHCI_PORT_IS_TFES) &&
+             (Tfd & EFI_AHCI_PORT_TFD_ERR_INT_CRC))
+  {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**
@@ -950,6 +1006,7 @@ AhciPioTransfer (
   UINT32                         PrdCount;
   UINT32                         Retry;
   EFI_STATUS                     RecoveryStatus;
+  BOOLEAN                        DoRetry;
 
   if (Read) {
     Flag = EfiPciIoOperationBusMasterWrite;
@@ -1027,8 +1084,9 @@ AhciPioTransfer (
 
     if (Status == EFI_DEVICE_ERROR) {
       DEBUG ((DEBUG_ERROR, "PIO command failed at retry %d\n", Retry));
+      DoRetry        = AhciShouldCmdBeRetried (PciIo, Port); // needs to be called before error recovery
       RecoveryStatus = AhciRecoverPortError (PciIo, Port);
-      if (EFI_ERROR (RecoveryStatus)) {
+      if (!DoRetry || EFI_ERROR (RecoveryStatus)) {
         break;
       }
     } else {
@@ -1124,6 +1182,7 @@ AhciDmaTransfer (
   EFI_TPL                        OldTpl;
   UINT32                         Retry;
   EFI_STATUS                     RecoveryStatus;
+  BOOLEAN                        DoRetry;
 
   Map   = NULL;
   PciIo = Instance->PciIo;
@@ -1222,8 +1281,9 @@ AhciDmaTransfer (
       Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
       if (Status == EFI_DEVICE_ERROR) {
         DEBUG ((DEBUG_ERROR, "DMA command failed at retry: %d\n", Retry));
+        DoRetry        = AhciShouldCmdBeRetried (PciIo, Port); // needs to be called before error recovery
         RecoveryStatus = AhciRecoverPortError (PciIo, Port);
-        if (EFI_ERROR (RecoveryStatus)) {
+        if (!DoRetry || EFI_ERROR (RecoveryStatus)) {
           break;
         }
       } else {
@@ -1263,6 +1323,7 @@ AhciDmaTransfer (
       Status = AhciCheckFisReceived (PciIo, Port, SataFisD2H);
       if (Status == EFI_DEVICE_ERROR) {
         DEBUG ((DEBUG_ERROR, "DMA command failed at retry: %d\n", Task->RetryTimes));
+        DoRetry        = AhciShouldCmdBeRetried (PciIo, Port); // call this before error recovery
         RecoveryStatus = AhciRecoverPortError (PciIo, Port);
         //
         // If recovery passed mark the Task as not started and change the status
@@ -1270,7 +1331,7 @@ AhciDmaTransfer (
         // and on next call the command will be re-issued due to IsStart being FALSE.
         // This also makes the next condition decrement the RetryTimes.
         //
-        if (RecoveryStatus == EFI_SUCCESS) {
+        if (DoRetry && (RecoveryStatus == EFI_SUCCESS)) {
           Task->IsStart = FALSE;
           Status        = EFI_NOT_READY;
         }
@@ -1378,6 +1439,7 @@ AhciNonDataTransfer (
   EFI_AHCI_COMMAND_LIST  CmdList;
   UINT32                 Retry;
   EFI_STATUS             RecoveryStatus;
+  BOOLEAN                DoRetry;
 
   //
   // Package read needed
@@ -1418,8 +1480,9 @@ AhciNonDataTransfer (
     Status = AhciWaitUntilFisReceived (PciIo, Port, Timeout, SataFisD2H);
     if (Status == EFI_DEVICE_ERROR) {
       DEBUG ((DEBUG_ERROR, "Non data transfer failed at retry %d\n", Retry));
+      DoRetry        = AhciShouldCmdBeRetried (PciIo, Port); // call this before error recovery
       RecoveryStatus = AhciRecoverPortError (PciIo, Port);
-      if (EFI_ERROR (RecoveryStatus)) {
+      if (!DoRetry || EFI_ERROR (RecoveryStatus)) {
         break;
       }
     } else {
