@@ -4,6 +4,7 @@
   Discover Redfish SMBIOS Host Interface.
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,7 +23,7 @@ SMBIOS_TABLE_TYPE42  *mType42Record;
   @param[out] DeviceDescriptor Pointer to REDFISH_INTERFACE_DATA.
   @param[out] ProtocolData     Pointer to REDFISH_OVER_IP_PROTOCOL_DATA.
 
-  @retval EFI_SUCCESS    Get host interface succesfully.
+  @retval EFI_SUCCESS    Get host interface successfully.
   @retval Otherwise      Fail to tet host interface.
 
 **/
@@ -69,9 +70,15 @@ RedfishGetHostInterfaceProtocolData (
         //
         if ((*RecordTmp == REDFISH_HOST_INTERFACE_DEVICE_TYPE_PCI_PCIE_V2) || (*RecordTmp == REDFISH_HOST_INTERFACE_DEVICE_TYPE_USB_V2)) {
           if (*RecordTmp == REDFISH_HOST_INTERFACE_DEVICE_TYPE_PCI_PCIE_V2) {
-            ASSERT (SpecificDataLen == sizeof (PCI_OR_PCIE_INTERFACE_DEVICE_DESCRIPTOR_V2) + 1);
+            if (SpecificDataLen != sizeof (PCI_OR_PCIE_INTERFACE_DEVICE_DESCRIPTOR_V2) + 1) {
+              ASSERT (SpecificDataLen == sizeof (PCI_OR_PCIE_INTERFACE_DEVICE_DESCRIPTOR_V2) + 1);
+              return EFI_VOLUME_CORRUPTED;
+            }
           } else {
-            ASSERT (SpecificDataLen > sizeof (REDFISH_HOST_INTERFACE_DEVICE_TYPE_USB_V2) + 1);
+            if (SpecificDataLen != sizeof (USB_INTERFACE_DEVICE_DESCRIPTOR_V2) + 1) {
+              ASSERT (SpecificDataLen == sizeof (USB_INTERFACE_DEVICE_DESCRIPTOR_V2) + 1);
+              return EFI_VOLUME_CORRUPTED;
+            }
           }
 
           *DeviceDescriptor = (REDFISH_INTERFACE_DATA *)RecordTmp;
