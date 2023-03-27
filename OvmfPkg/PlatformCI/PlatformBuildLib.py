@@ -195,6 +195,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args  = "-debugcon stdio"                                           # write messages to stdio
         args += " -global isa-debugcon.iobase=0x402"                        # debug messages out thru virtual io port
         args += " -net none"                                                # turn off network
+        args += " -smp 4"
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk" # Mount disk with startup.nsh
 
         if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
