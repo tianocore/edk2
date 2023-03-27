@@ -7,6 +7,7 @@
   Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
  Copyright (c) 2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
     SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -1112,5 +1113,5 @@ JsonGetType (
   IN EDKII_JSON_VALUE  JsonValue
   )
 {
-  return ((json_t *)JsonValue)->type;
+  return (EDKII_JSON_TYPE)(((json_t *)JsonValue)->type);
 }
