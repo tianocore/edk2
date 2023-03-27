@@ -322,9 +322,6 @@ HandOffToDxeCore (
     BuildPageTablesIa32Pae = ToBuildPageTable ();
     if (BuildPageTablesIa32Pae) {
       PageTables = CreateIdentityMappingPageTables (FALSE, BaseOfStack, STACK_SIZE, 0, 0);
-      if (IsEnableNonExecNeeded ()) {
-        EnableExecuteDisableBit ();
-      }
     }
 
     //
