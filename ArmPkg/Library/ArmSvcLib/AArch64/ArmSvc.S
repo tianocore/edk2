@@ -5,12 +5,12 @@
 //
 //
 
+#include <AsmMacroIoLibV8.h>
+
 .text
 .align 3
 
-GCC_ASM_EXPORT(ArmCallSvc)
-
-ASM_PFX(ArmCallSvc):
+ASM_FUNC(ArmCallSvc)
   // Push frame pointer and return address on the stack
   stp   x29, x30, [sp, #-32]!
   mov   x29, sp
