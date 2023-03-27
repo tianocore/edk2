@@ -2,7 +2,7 @@
   Master header file for DxeIpl PEIM. All source files in this module should
   include this file for common definitions.
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -42,6 +42,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugAgentLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PerformanceLib.h>
+#include <Library/CpuPageTableLib.h>
 
 #define STACK_SIZE      0x20000
 #define BSP_STORE_SIZE  0x4000

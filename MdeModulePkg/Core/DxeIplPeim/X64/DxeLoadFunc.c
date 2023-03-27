@@ -1,7 +1,7 @@
 /** @file
   x64-specifc functionality for DxeLoad.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -91,9 +91,10 @@ HandOffToDxeCore (
   PageTables = 0;
   if (FeaturePcdGet (PcdDxeIplBuildPageTables)) {
     //
-    // Create page table and save PageMapLevel4 to CR3
+    // Create page table and save PageMapLevel4 or PageMapLevel5 to CR3
     //
     PageTables = CreateIdentityMappingPageTables (
+                   TRUE,
                    (EFI_PHYSICAL_ADDRESS)(UINTN)BaseOfStack,
                    STACK_SIZE,
                    (EFI_PHYSICAL_ADDRESS)(UINTN)GhcbBase,

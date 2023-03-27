@@ -15,7 +15,7 @@
     2) IA-32 Intel(R) Architecture Software Developer's Manual Volume 2:Instruction Set Reference, Intel
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
 
-Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -187,55 +187,6 @@ EnableExecuteDisableBit (
 }
 
 /**
-  The function will check if page table entry should be splitted to smaller
-  granularity.
-
-  @param Address      Physical memory address.
-  @param Size         Size of the given physical memory.
-  @param StackBase    Base address of stack.
-  @param StackSize    Size of stack.
-  @param GhcbBase     Base address of GHCB pages.
-  @param GhcbSize     Size of GHCB area.
-
-  @retval TRUE      Page table should be split.
-  @retval FALSE     Page table should not be split.
-**/
-BOOLEAN
-ToSplitPageTable (
-  IN EFI_PHYSICAL_ADDRESS  Address,
-  IN UINTN                 Size,
-  IN EFI_PHYSICAL_ADDRESS  StackBase,
-  IN UINTN                 StackSize,
-  IN EFI_PHYSICAL_ADDRESS  GhcbBase,
-  IN UINTN                 GhcbSize
-  )
-{
-  if (IsNullDetectionEnabled () && (Address == 0)) {
-    return TRUE;
-  }
-
-  if (PcdGetBool (PcdCpuStackGuard)) {
-    if ((StackBase >= Address) && (StackBase < (Address + Size))) {
-      return TRUE;
-    }
-  }
-
-  if (PcdGetBool (PcdSetNxForStack)) {
-    if ((Address < StackBase + StackSize) && ((Address + Size) > StackBase)) {
-      return TRUE;
-    }
-  }
-
-  if (GhcbBase != 0) {
-    if ((Address < GhcbBase + GhcbSize) && ((Address + Size) > GhcbBase)) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-/**
   Initialize a buffer pool for page table use only.
 
   To reduce the potential split operation on page table, the pages reserved for
@@ -341,143 +292,42 @@ AllocatePageTableMemory (
 }
 
 /**
-  Split 2M page to 4K.
+  This function creates a new page table or modifies the page MapAttribute for the memory region
+  specified by BaseAddress and Length from their current attributes to the attributes specified
+  by MapAttribute and Mask.
 
-  @param[in]      PhysicalAddress       Start physical address the 2M page covered.
-  @param[in, out] PageEntry2M           Pointer to 2M page entry.
-  @param[in]      StackBase             Stack base address.
-  @param[in]      StackSize             Stack size.
-  @param[in]      GhcbBase              GHCB page area base address.
-  @param[in]      GhcbSize              GHCB page area size.
-
+  @param[in] PageTable        Pointer to Page table address.
+  @param[in] PagingMode       The paging mode.
+  @param[in] BaseAddress      The start of the linear address range.
+  @param[in] Length           The length of the linear address range.
+  @param[in] MapAttribute     The attribute of the linear address range.
+  @param[in] MapMask          The mask used for attribute.
 **/
 VOID
-Split2MPageTo4K (
-  IN EFI_PHYSICAL_ADDRESS  PhysicalAddress,
-  IN OUT UINT64            *PageEntry2M,
-  IN EFI_PHYSICAL_ADDRESS  StackBase,
-  IN UINTN                 StackSize,
-  IN EFI_PHYSICAL_ADDRESS  GhcbBase,
-  IN UINTN                 GhcbSize
+CreateOrUpdatePageTable (
+  IN  UINTN               *PageTable,
+  IN  PAGING_MODE         PagingMode,
+  IN  PHYSICAL_ADDRESS    BaseAddress,
+  IN  UINT64              Length,
+  IN  IA32_MAP_ATTRIBUTE  *MapAttribute,
+  IN  IA32_MAP_ATTRIBUTE  *MapMask
   )
 {
-  EFI_PHYSICAL_ADDRESS  PhysicalAddress4K;
-  UINTN                 IndexOfPageTableEntries;
-  PAGE_TABLE_4K_ENTRY   *PageTableEntry;
-  UINT64                AddressEncMask;
+  RETURN_STATUS  Status;
+  UINTN          PageTableBufferSize;
+  VOID           *PageTableBuffer;
 
-  //
-  // Make sure AddressEncMask is contained to smallest supported address field
-  //
-  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
-
-  PageTableEntry = AllocatePageTableMemory (1);
-  ASSERT (PageTableEntry != NULL);
-
-  //
-  // Fill in 2M page entry.
-  //
-  *PageEntry2M = (UINT64)(UINTN)PageTableEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
-
-  PhysicalAddress4K = PhysicalAddress;
-  for (IndexOfPageTableEntries = 0; IndexOfPageTableEntries < 512; IndexOfPageTableEntries++, PageTableEntry++, PhysicalAddress4K += SIZE_4KB) {
-    //
-    // Fill in the Page Table entries
-    //
-    PageTableEntry->Uint64 = (UINT64)PhysicalAddress4K;
-
-    //
-    // The GHCB range consists of two pages per CPU, the GHCB and a
-    // per-CPU variable page. The GHCB page needs to be mapped as an
-    // unencrypted page while the per-CPU variable page needs to be
-    // mapped encrypted. These pages alternate in assignment.
-    //
-    if (  (GhcbBase == 0)
-       || (PhysicalAddress4K < GhcbBase)
-       || (PhysicalAddress4K >= GhcbBase + GhcbSize)
-       || (((PhysicalAddress4K - GhcbBase) & SIZE_4KB) != 0))
-    {
-      PageTableEntry->Uint64 |= AddressEncMask;
-    }
-
-    PageTableEntry->Bits.ReadWrite = 1;
-
-    if ((IsNullDetectionEnabled () && (PhysicalAddress4K == 0)) ||
-        (PcdGetBool (PcdCpuStackGuard) && (PhysicalAddress4K == StackBase)))
-    {
-      PageTableEntry->Bits.Present = 0;
-    } else {
-      PageTableEntry->Bits.Present = 1;
-    }
-
-    if (  PcdGetBool (PcdSetNxForStack)
-       && (PhysicalAddress4K >= StackBase)
-       && (PhysicalAddress4K < StackBase + StackSize))
-    {
-      //
-      // Set Nx bit for stack.
-      //
-      PageTableEntry->Bits.Nx = 1;
-    }
+  PageTableBufferSize = 0;
+  Status              = PageTableMap (PageTable, PagingMode, NULL, &PageTableBufferSize, BaseAddress, Length, MapAttribute, MapMask, NULL);
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    PageTableBuffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (PageTableBufferSize));
+    DEBUG ((DEBUG_INFO, "DxeIpl: 0x%x bytes needed for page table\n", PageTableBufferSize));
+    ASSERT (PageTableBuffer != NULL);
+    Status = PageTableMap (PageTable, PagingMode, PageTableBuffer, &PageTableBufferSize, BaseAddress, Length, MapAttribute, MapMask, NULL);
   }
-}
 
-/**
-  Split 1G page to 2M.
-
-  @param[in]      PhysicalAddress       Start physical address the 1G page covered.
-  @param[in, out] PageEntry1G           Pointer to 1G page entry.
-  @param[in]      StackBase             Stack base address.
-  @param[in]      StackSize             Stack size.
-  @param[in]      GhcbBase              GHCB page area base address.
-  @param[in]      GhcbSize              GHCB page area size.
-
-**/
-VOID
-Split1GPageTo2M (
-  IN EFI_PHYSICAL_ADDRESS  PhysicalAddress,
-  IN OUT UINT64            *PageEntry1G,
-  IN EFI_PHYSICAL_ADDRESS  StackBase,
-  IN UINTN                 StackSize,
-  IN EFI_PHYSICAL_ADDRESS  GhcbBase,
-  IN UINTN                 GhcbSize
-  )
-{
-  EFI_PHYSICAL_ADDRESS  PhysicalAddress2M;
-  UINTN                 IndexOfPageDirectoryEntries;
-  PAGE_TABLE_ENTRY      *PageDirectoryEntry;
-  UINT64                AddressEncMask;
-
-  //
-  // Make sure AddressEncMask is contained to smallest supported address field
-  //
-  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
-
-  PageDirectoryEntry = AllocatePageTableMemory (1);
-  ASSERT (PageDirectoryEntry != NULL);
-
-  //
-  // Fill in 1G page entry.
-  //
-  *PageEntry1G = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask | IA32_PG_P | IA32_PG_RW;
-
-  PhysicalAddress2M = PhysicalAddress;
-  for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress2M += SIZE_2MB) {
-    if (ToSplitPageTable (PhysicalAddress2M, SIZE_2MB, StackBase, StackSize, GhcbBase, GhcbSize)) {
-      //
-      // Need to split this 2M page that covers NULL or stack range.
-      //
-      Split2MPageTo4K (PhysicalAddress2M, (UINT64 *)PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
-    } else {
-      //
-      // Fill in the Page Directory entries
-      //
-      PageDirectoryEntry->Uint64         = (UINT64)PhysicalAddress2M | AddressEncMask;
-      PageDirectoryEntry->Bits.ReadWrite = 1;
-      PageDirectoryEntry->Bits.Present   = 1;
-      PageDirectoryEntry->Bits.MustBe1   = 1;
-    }
-  }
+  ASSERT_RETURN_ERROR (Status);
+  ASSERT (PageTableBufferSize == 0);
 }
 
 /**
@@ -657,19 +507,20 @@ EnablePageTableProtection (
 }
 
 /**
-  Allocates and fills in the Page Directory and Page Table Entries to
+  Create IA32 PAE paging or 4-level/5-level paging for long mode to
   establish a 1:1 Virtual to Physical mapping.
 
-  @param[in] StackBase  Stack base address.
-  @param[in] StackSize  Stack size.
-  @param[in] GhcbBase   GHCB base address.
-  @param[in] GhcbSize   GHCB size.
+  @param[in] Is64BitPageTable     Whether to create 64-bit page table.
+  @param[in] StackBase            Stack base address.
+  @param[in] StackSize            Stack size.
+  @param[in] GhcbBase             GHCB base address.
+  @param[in] GhcbSize             GHCB size.
 
-  @return The address of 4 level page map.
-
+  @return  PageTable Address
 **/
 UINTN
 CreateIdentityMappingPageTables (
+  IN BOOLEAN               Is64BitPageTable,
   IN EFI_PHYSICAL_ADDRESS  StackBase,
   IN UINTN                 StackSize,
   IN EFI_PHYSICAL_ADDRESS  GhcbBase,
@@ -680,274 +531,164 @@ CreateIdentityMappingPageTables (
   CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  EcxFlags;
   UINT32                                       RegEdx;
   UINT8                                        PhysicalAddressBits;
-  EFI_PHYSICAL_ADDRESS                         PageAddress;
-  UINTN                                        IndexOfPml5Entries;
-  UINTN                                        IndexOfPml4Entries;
-  UINTN                                        IndexOfPdpEntries;
-  UINTN                                        IndexOfPageDirectoryEntries;
-  UINT32                                       NumberOfPml5EntriesNeeded;
-  UINT32                                       NumberOfPml4EntriesNeeded;
-  UINT32                                       NumberOfPdpEntriesNeeded;
-  PAGE_MAP_AND_DIRECTORY_POINTER               *PageMapLevel5Entry;
-  PAGE_MAP_AND_DIRECTORY_POINTER               *PageMapLevel4Entry;
-  PAGE_MAP_AND_DIRECTORY_POINTER               *PageMap;
-  PAGE_MAP_AND_DIRECTORY_POINTER               *PageDirectoryPointerEntry;
-  PAGE_TABLE_ENTRY                             *PageDirectoryEntry;
-  UINTN                                        TotalPagesNum;
-  UINTN                                        BigPageAddress;
   VOID                                         *Hob;
   BOOLEAN                                      Page5LevelSupport;
   BOOLEAN                                      Page1GSupport;
-  PAGE_TABLE_1G_ENTRY                          *PageDirectory1GEntry;
   UINT64                                       AddressEncMask;
   IA32_CR4                                     Cr4;
-
-  //
-  // Set PageMapLevel5Entry to suppress incorrect compiler/analyzer warnings
-  //
-  PageMapLevel5Entry = NULL;
+  PAGING_MODE                                  PagingMode;
+  UINTN                                        PageTable;
+  IA32_MAP_ATTRIBUTE                           MapAttribute;
+  IA32_MAP_ATTRIBUTE                           MapMask;
+  EFI_PHYSICAL_ADDRESS                         GhcbBase4K;
+  EFI_PHYSICAL_ADDRESS                         GhcbBaseEnd;
 
   //
   // Make sure AddressEncMask is contained to smallest supported address field
   //
-  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
+  AddressEncMask    = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
+  Page5LevelSupport = FALSE;
+  Page1GSupport     = FALSE;
 
-  Page1GSupport = FALSE;
-  if (PcdGetBool (PcdUse1GPageTable)) {
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000001) {
-      AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
-      if ((RegEdx & BIT26) != 0) {
-        Page1GSupport = TRUE;
+  if (!Is64BitPageTable) {
+    PagingMode          = PagingPae;
+    PhysicalAddressBits = 32;
+  } else {
+    if (PcdGetBool (PcdUse1GPageTable)) {
+      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+      if (RegEax >= 0x80000001) {
+        AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+        if ((RegEdx & BIT26) != 0) {
+          Page1GSupport = TRUE;
+        }
       }
     }
-  }
 
-  //
-  // Get physical address bits supported.
-  //
-  Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
-  if (Hob != NULL) {
-    PhysicalAddressBits = ((EFI_HOB_CPU *)Hob)->SizeOfMemorySpace;
-  } else {
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax >= 0x80000008) {
-      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-      PhysicalAddressBits = (UINT8)RegEax;
+    //
+    // Get physical address bits supported.
+    //
+    Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+    if (Hob != NULL) {
+      PhysicalAddressBits = ((EFI_HOB_CPU *)Hob)->SizeOfMemorySpace;
     } else {
-      PhysicalAddressBits = 36;
+      AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+      if (RegEax >= 0x80000008) {
+        AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+        PhysicalAddressBits = (UINT8)RegEax;
+      } else {
+        PhysicalAddressBits = 36;
+      }
     }
-  }
 
-  Page5LevelSupport = FALSE;
-  if (PcdGetBool (PcdUse5LevelPageTable)) {
-    AsmCpuidEx (
-      CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
-      CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
-      NULL,
-      NULL,
-      &EcxFlags.Uint32,
-      NULL
-      );
-    if (EcxFlags.Bits.FiveLevelPage != 0) {
-      Page5LevelSupport = TRUE;
+    if (PcdGetBool (PcdUse5LevelPageTable)) {
+      AsmCpuidEx (
+        CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
+        CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
+        NULL,
+        NULL,
+        &EcxFlags.Uint32,
+        NULL
+        );
+      if (EcxFlags.Bits.FiveLevelPage != 0) {
+        Page5LevelSupport = TRUE;
+      }
     }
-  }
-
-  DEBUG ((DEBUG_INFO, "AddressBits=%u 5LevelPaging=%u 1GPage=%u\n", PhysicalAddressBits, Page5LevelSupport, Page1GSupport));
-
-  //
-  // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses
-  //  when 5-Level Paging is disabled,
-  //  due to either unsupported by HW, or disabled by PCD.
-  //
-  ASSERT (PhysicalAddressBits <= 52);
-  if (!Page5LevelSupport && (PhysicalAddressBits > 48)) {
-    PhysicalAddressBits = 48;
-  }
-
-  //
-  // Calculate the table entries needed.
-  //
-  NumberOfPml5EntriesNeeded = 1;
-  if (PhysicalAddressBits > 48) {
-    NumberOfPml5EntriesNeeded = (UINT32)LShiftU64 (1, PhysicalAddressBits - 48);
-    PhysicalAddressBits       = 48;
-  }
-
-  NumberOfPml4EntriesNeeded = 1;
-  if (PhysicalAddressBits > 39) {
-    NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, PhysicalAddressBits - 39);
-    PhysicalAddressBits       = 39;
-  }
-
-  NumberOfPdpEntriesNeeded = 1;
-  ASSERT (PhysicalAddressBits > 30);
-  NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, PhysicalAddressBits - 30);
-
-  //
-  // Pre-allocate big pages to avoid later allocations.
-  //
-  if (!Page1GSupport) {
-    TotalPagesNum = ((NumberOfPdpEntriesNeeded + 1) * NumberOfPml4EntriesNeeded + 1) * NumberOfPml5EntriesNeeded + 1;
-  } else {
-    TotalPagesNum = (NumberOfPml4EntriesNeeded + 1) * NumberOfPml5EntriesNeeded + 1;
-  }
-
-  //
-  // Substract the one page occupied by PML5 entries if 5-Level Paging is disabled.
-  //
-  if (!Page5LevelSupport) {
-    TotalPagesNum--;
-  }
-
-  DEBUG ((
-    DEBUG_INFO,
-    "Pml5=%u Pml4=%u Pdp=%u TotalPage=%Lu\n",
-    NumberOfPml5EntriesNeeded,
-    NumberOfPml4EntriesNeeded,
-    NumberOfPdpEntriesNeeded,
-    (UINT64)TotalPagesNum
-    ));
-
-  BigPageAddress = (UINTN)AllocatePageTableMemory (TotalPagesNum);
-  ASSERT (BigPageAddress != 0);
-
-  //
-  // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
-  //
-  PageMap = (VOID *)BigPageAddress;
-  if (Page5LevelSupport) {
-    //
-    // By architecture only one PageMapLevel5 exists - so lets allocate storage for it.
-    //
-    PageMapLevel5Entry = PageMap;
-    BigPageAddress    += SIZE_4KB;
-  }
-
-  PageAddress = 0;
-
-  for ( IndexOfPml5Entries = 0
-        ; IndexOfPml5Entries < NumberOfPml5EntriesNeeded
-        ; IndexOfPml5Entries++)
-  {
-    //
-    // Each PML5 entry points to a page of PML4 entires.
-    // So lets allocate space for them and fill them in in the IndexOfPml4Entries loop.
-    // When 5-Level Paging is disabled, below allocation happens only once.
-    //
-    PageMapLevel4Entry = (VOID *)BigPageAddress;
-    BigPageAddress    += SIZE_4KB;
 
     if (Page5LevelSupport) {
-      //
-      // Make a PML5 Entry
-      //
-      PageMapLevel5Entry->Uint64         = (UINT64)(UINTN)PageMapLevel4Entry | AddressEncMask;
-      PageMapLevel5Entry->Bits.ReadWrite = 1;
-      PageMapLevel5Entry->Bits.Present   = 1;
-      PageMapLevel5Entry++;
-    }
-
-    for ( IndexOfPml4Entries = 0
-          ; IndexOfPml4Entries < (NumberOfPml5EntriesNeeded == 1 ? NumberOfPml4EntriesNeeded : 512)
-          ; IndexOfPml4Entries++, PageMapLevel4Entry++)
-    {
-      //
-      // Each PML4 entry points to a page of Page Directory Pointer entires.
-      // So lets allocate space for them and fill them in in the IndexOfPdpEntries loop.
-      //
-      PageDirectoryPointerEntry = (VOID *)BigPageAddress;
-      BigPageAddress           += SIZE_4KB;
-
-      //
-      // Make a PML4 Entry
-      //
-      PageMapLevel4Entry->Uint64         = (UINT64)(UINTN)PageDirectoryPointerEntry | AddressEncMask;
-      PageMapLevel4Entry->Bits.ReadWrite = 1;
-      PageMapLevel4Entry->Bits.Present   = 1;
-
       if (Page1GSupport) {
-        PageDirectory1GEntry = (VOID *)PageDirectoryPointerEntry;
-
-        for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
-          if (ToSplitPageTable (PageAddress, SIZE_1GB, StackBase, StackSize, GhcbBase, GhcbSize)) {
-            Split1GPageTo2M (PageAddress, (UINT64 *)PageDirectory1GEntry, StackBase, StackSize, GhcbBase, GhcbSize);
-          } else {
-            //
-            // Fill in the Page Directory entries
-            //
-            PageDirectory1GEntry->Uint64         = (UINT64)PageAddress | AddressEncMask;
-            PageDirectory1GEntry->Bits.ReadWrite = 1;
-            PageDirectory1GEntry->Bits.Present   = 1;
-            PageDirectory1GEntry->Bits.MustBe1   = 1;
-          }
-        }
+        PagingMode = Paging5Level1GB;
       } else {
-        for ( IndexOfPdpEntries = 0
-              ; IndexOfPdpEntries < (NumberOfPml4EntriesNeeded == 1 ? NumberOfPdpEntriesNeeded : 512)
-              ; IndexOfPdpEntries++, PageDirectoryPointerEntry++)
-        {
-          //
-          // Each Directory Pointer entries points to a page of Page Directory entires.
-          // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-          //
-          PageDirectoryEntry = (VOID *)BigPageAddress;
-          BigPageAddress    += SIZE_4KB;
-
-          //
-          // Fill in a Page Directory Pointer Entries
-          //
-          PageDirectoryPointerEntry->Uint64         = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
-          PageDirectoryPointerEntry->Bits.ReadWrite = 1;
-          PageDirectoryPointerEntry->Bits.Present   = 1;
-
-          for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
-            if (ToSplitPageTable (PageAddress, SIZE_2MB, StackBase, StackSize, GhcbBase, GhcbSize)) {
-              //
-              // Need to split this 2M page that covers NULL or stack range.
-              //
-              Split2MPageTo4K (PageAddress, (UINT64 *)PageDirectoryEntry, StackBase, StackSize, GhcbBase, GhcbSize);
-            } else {
-              //
-              // Fill in the Page Directory entries
-              //
-              PageDirectoryEntry->Uint64         = (UINT64)PageAddress | AddressEncMask;
-              PageDirectoryEntry->Bits.ReadWrite = 1;
-              PageDirectoryEntry->Bits.Present   = 1;
-              PageDirectoryEntry->Bits.MustBe1   = 1;
-            }
-          }
-        }
-
-        //
-        // Fill with null entry for unused PDPTE
-        //
-        ZeroMem (PageDirectoryPointerEntry, (512 - IndexOfPdpEntries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
+        PagingMode = Paging5Level;
+      }
+    } else {
+      if (Page1GSupport) {
+        PagingMode = Paging4Level1GB;
+      } else {
+        PagingMode = Paging4Level;
       }
     }
 
+    DEBUG ((DEBUG_INFO, "AddressBits=%u 5LevelPaging=%u 1GPage=%u\n", PhysicalAddressBits, Page5LevelSupport, Page1GSupport));
     //
-    // For the PML4 entries we are not using fill in a null entry.
+    // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses
+    // when 5-Level Paging is disabled, due to either unsupported by HW, or disabled by PCD.
     //
-    ZeroMem (PageMapLevel4Entry, (512 - IndexOfPml4Entries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
+    ASSERT (PhysicalAddressBits <= 52);
+    if (!Page5LevelSupport && (PhysicalAddressBits > 48)) {
+      PhysicalAddressBits = 48;
+    }
+  }
+
+  PageTable                   = 0;
+  MapAttribute.Uint64         = AddressEncMask;
+  MapAttribute.Bits.Present   = 1;
+  MapAttribute.Bits.ReadWrite = 1;
+  MapMask.Uint64              = MAX_UINT64;
+  CreateOrUpdatePageTable (&PageTable, PagingMode, 0, LShiftU64 (1, PhysicalAddressBits), &MapAttribute, &MapMask);
+
+  if ((GhcbBase > 0) && (GhcbSize > 0) && (AddressEncMask != 0)) {
+    //
+    // The GHCB range consists of two pages per CPU, the GHCB and a
+    // per-CPU variable page. The GHCB page needs to be mapped as an
+    // unencrypted page while the per-CPU variable page needs to be
+    // mapped encrypted. These pages alternate in assignment.
+    //
+    ASSERT (Is64BitPageTable == TRUE);
+    GhcbBase4K                           = ALIGN_VALUE (GhcbBase, SIZE_4KB);
+    GhcbBaseEnd                          = ALIGN_VALUE (GhcbBase + GhcbSize, SIZE_4KB);
+    MapMask.Uint64                       = 0;
+    MapMask.Bits.PageTableBaseAddressLow = 1;
+    //
+    // Loop through the GHCB range, remapping the GHCB page unencrypted
+    // and skipping over the per-CPU variable page.
+    //
+    while (GhcbBase4K < GhcbBaseEnd) {
+      MapAttribute.Uint64 = GhcbBase4K;
+      CreateOrUpdatePageTable (&PageTable, PagingMode, GhcbBase4K, SIZE_4KB, &MapAttribute, &MapMask);
+      GhcbBase4K += (SIZE_4KB * 2);
+    }
+  }
+
+  if (PcdGetBool (PcdSetNxForStack)) {
+    //
+    // Set the stack as Nx in page table.
+    //
+    MapAttribute.Uint64  = 0;
+    MapAttribute.Bits.Nx = 1;
+    MapMask.Uint64       = 0;
+    MapMask.Bits.Nx      = 1;
+    CreateOrUpdatePageTable (&PageTable, PagingMode, StackBase, StackSize, &MapAttribute, &MapMask);
+  }
+
+  MapAttribute.Uint64       = 0;
+  MapAttribute.Bits.Present = 0;
+  MapMask.Uint64            = 0;
+  MapMask.Bits.Present      = 1;
+  if (IsNullDetectionEnabled ()) {
+    //
+    // Set [0, 4KB] as non-present in page table.
+    //
+    CreateOrUpdatePageTable (&PageTable, PagingMode, 0, SIZE_4KB, &MapAttribute, &MapMask);
+  }
+
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    //
+    // Set the the last 4KB of stack as non-present in page table.
+    //
+    CreateOrUpdatePageTable (&PageTable, PagingMode, StackBase, SIZE_4KB, &MapAttribute, &MapMask);
   }
 
   if (Page5LevelSupport) {
     Cr4.UintN     = AsmReadCr4 ();
     Cr4.Bits.LA57 = 1;
     AsmWriteCr4 (Cr4.UintN);
-    //
-    // For the PML5 entries we are not using fill in a null entry.
-    //
-    ZeroMem (PageMapLevel5Entry, (512 - IndexOfPml5Entries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
   }
 
   //
   // Protect the page table by marking the memory used for page table to be
   // read-only.
   //
-  EnablePageTableProtection ((UINTN)PageMap, TRUE);
+  EnablePageTableProtection ((UINTN)PageTable, TRUE);
 
   //
   // Set IA32_EFER.NXE if necessary.
@@ -956,5 +697,5 @@ CreateIdentityMappingPageTables (
     EnableExecuteDisableBit ();
   }
 
-  return (UINTN)PageMap;
+  return PageTable;
 }

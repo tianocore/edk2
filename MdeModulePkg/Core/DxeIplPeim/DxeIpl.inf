@@ -5,7 +5,7 @@
 #  PPI to discover and dispatch the DXE Foundation and components that are
 #  needed to run the DXE Foundation.
 #
-#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
@@ -79,6 +79,9 @@
   DebugAgentLib
   PeiServicesTablePointerLib
   PerformanceLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  CpuPageTableLib
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmMmuLib

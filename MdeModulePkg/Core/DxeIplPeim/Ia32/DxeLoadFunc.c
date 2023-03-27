@@ -1,7 +1,7 @@
 /** @file
   Ia32-specific functionality for DxeLoad.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -69,107 +69,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED  IA32_DESCRIPTOR  gLidtDescriptor = {
   sizeof (X64_IDT_GATE_DESCRIPTOR) * IDT_ENTRY_COUNT - 1,
   0
 };
-
-/**
-  Allocates and fills in the Page Directory and Page Table Entries to
-  establish a 4G page table.
-
-  @param[in] StackBase  Stack base address.
-  @param[in] StackSize  Stack size.
-
-  @return The address of page table.
-
-**/
-UINTN
-Create4GPageTablesIa32Pae (
-  IN EFI_PHYSICAL_ADDRESS  StackBase,
-  IN UINTN                 StackSize
-  )
-{
-  UINT8                           PhysicalAddressBits;
-  EFI_PHYSICAL_ADDRESS            PhysicalAddress;
-  UINTN                           IndexOfPdpEntries;
-  UINTN                           IndexOfPageDirectoryEntries;
-  UINT32                          NumberOfPdpEntriesNeeded;
-  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMap;
-  PAGE_MAP_AND_DIRECTORY_POINTER  *PageDirectoryPointerEntry;
-  PAGE_TABLE_ENTRY                *PageDirectoryEntry;
-  UINTN                           TotalPagesNum;
-  UINTN                           PageAddress;
-  UINT64                          AddressEncMask;
-
-  //
-  // Make sure AddressEncMask is contained to smallest supported address field
-  //
-  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
-
-  PhysicalAddressBits = 32;
-
-  //
-  // Calculate the table entries needed.
-  //
-  NumberOfPdpEntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 30));
-
-  TotalPagesNum = NumberOfPdpEntriesNeeded + 1;
-  PageAddress   = (UINTN)AllocatePageTableMemory (TotalPagesNum);
-  ASSERT (PageAddress != 0);
-
-  PageMap      = (VOID *)PageAddress;
-  PageAddress += SIZE_4KB;
-
-  PageDirectoryPointerEntry = PageMap;
-  PhysicalAddress           = 0;
-
-  for (IndexOfPdpEntries = 0; IndexOfPdpEntries < NumberOfPdpEntriesNeeded; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
-    //
-    // Each Directory Pointer entries points to a page of Page Directory entires.
-    // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-    //
-    PageDirectoryEntry = (VOID *)PageAddress;
-    PageAddress       += SIZE_4KB;
-
-    //
-    // Fill in a Page Directory Pointer Entries
-    //
-    PageDirectoryPointerEntry->Uint64       = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
-    PageDirectoryPointerEntry->Bits.Present = 1;
-
-    for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress += SIZE_2MB) {
-      if (  (IsNullDetectionEnabled () && (PhysicalAddress == 0))
-         || (  (PhysicalAddress < StackBase + StackSize)
-            && ((PhysicalAddress + SIZE_2MB) > StackBase)))
-      {
-        //
-        // Need to split this 2M page that covers stack range.
-        //
-        Split2MPageTo4K (PhysicalAddress, (UINT64 *)PageDirectoryEntry, StackBase, StackSize, 0, 0);
-      } else {
-        //
-        // Fill in the Page Directory entries
-        //
-        PageDirectoryEntry->Uint64         = (UINT64)PhysicalAddress | AddressEncMask;
-        PageDirectoryEntry->Bits.ReadWrite = 1;
-        PageDirectoryEntry->Bits.Present   = 1;
-        PageDirectoryEntry->Bits.MustBe1   = 1;
-      }
-    }
-  }
-
-  for ( ; IndexOfPdpEntries < 512; IndexOfPdpEntries++, PageDirectoryPointerEntry++) {
-    ZeroMem (
-      PageDirectoryPointerEntry,
-      sizeof (PAGE_MAP_AND_DIRECTORY_POINTER)
-      );
-  }
-
-  //
-  // Protect the page table by marking the memory used for page table to be
-  // read-only.
-  //
-  EnablePageTableProtection ((UINTN)PageMap, FALSE);
-
-  return (UINTN)PageMap;
-}
 
 /**
   The function will check if IA32 PAE is supported.
@@ -299,9 +198,9 @@ HandOffToDxeCore (
     //
     AsmWriteGdtr (&gGdt);
     //
-    // Create page table and save PageMapLevel4 to CR3
+    // Create page table and save PageMapLevel4 or PageMapLevel5 to CR3
     //
-    PageTables = CreateIdentityMappingPageTables (BaseOfStack, STACK_SIZE, 0, 0);
+    PageTables = CreateIdentityMappingPageTables (TRUE, BaseOfStack, STACK_SIZE, 0, 0);
 
     //
     // End of PEI phase signal
@@ -422,7 +321,7 @@ HandOffToDxeCore (
     PageTables             = 0;
     BuildPageTablesIa32Pae = ToBuildPageTable ();
     if (BuildPageTablesIa32Pae) {
-      PageTables = Create4GPageTablesIa32Pae (BaseOfStack, STACK_SIZE);
+      PageTables = CreateIdentityMappingPageTables (FALSE, BaseOfStack, STACK_SIZE, 0, 0);
       if (IsEnableNonExecNeeded ()) {
         EnableExecuteDisableBit ();
       }
