@@ -1,7 +1,7 @@
 ## @file
 #  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
 #
-#  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) Microsoft Corporation.
 #
@@ -193,6 +193,7 @@
   MemEncryptTdxLib|OvmfPkg/Library/BaseMemEncryptTdxLib/BaseMemEncryptTdxLibNull.inf
   PeiHardwareInfoLib|OvmfPkg/Library/HardwareInfoLib/PeiHardwareInfoLib.inf
   DxeHardwareInfoLib|OvmfPkg/Library/HardwareInfoLib/DxeHardwareInfoLib.inf
+  CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
 !if $(SMM_REQUIRE) == FALSE
   LockBoxLib|OvmfPkg/Library/LockBoxLib/LockBoxBaseLib.inf
 !endif
