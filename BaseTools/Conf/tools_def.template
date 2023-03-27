@@ -13,10 +13,11 @@
 # Increase this version tag any time you want user to get warning about updating this
 # file in the Conf dir.  By default it does not do update existing conf dirs.
 #
+# 3.00 - Updated toolchains
 # 2.00 - Initial version with changes for CI
 #      - Change RC path to use plugin
 #
-#!VERSION=2.00
+#!VERSION=3.00
 
 IDENTIFIER = Default TOOL_CHAIN_CONF
 
