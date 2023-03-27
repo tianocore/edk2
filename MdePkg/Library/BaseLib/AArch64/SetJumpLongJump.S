@@ -85,7 +85,6 @@ ASM_PFX(InternalLongJump):
         cmp     w1, #0
         mov     w0, #1
         csel    w0, w1, w0, ne
-        // use br not ret, as ret is guaranteed to mispredict
-        br      x30
+        ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
