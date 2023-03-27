@@ -3,7 +3,7 @@
 
   This local APIC library instance supports xAPIC mode only.
 
-  Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2023, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017 - 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -498,6 +498,33 @@ SendInitIpiAllExcludingSelf (
 }
 
 /**
+  Send a Start-up IPI to all processors excluding self.
+  This function returns after the IPI has been accepted by the target processors.
+  if StartupRoutine >= 1M, then ASSERT.
+  if StartupRoutine is not multiple of 4K, then ASSERT.
+  @param  StartupRoutine  Points to a start-up routine which is below 1M physical
+                          address and 4K aligned.
+**/
+VOID
+EFIAPI
+SendStartupIpiAllExcludingSelf (
+  IN UINT32  StartupRoutine
+  )
+{
+  LOCAL_APIC_ICR_LOW  IcrLow;
+
+  ASSERT (StartupRoutine < 0x100000);
+  ASSERT ((StartupRoutine & 0xfff) == 0);
+
+  IcrLow.Uint32                    = 0;
+  IcrLow.Bits.Vector               = (StartupRoutine >> 12);
+  IcrLow.Bits.DeliveryMode         = LOCAL_APIC_DELIVERY_MODE_STARTUP;
+  IcrLow.Bits.Level                = 1;
+  IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
+  SendIpi (IcrLow.Uint32, 0);
+}
+
+/**
   Send an INIT-Start-up-Start-up IPI sequence to a specified target processor.
 
   This function returns after the IPI has been accepted by the target processor.
@@ -551,22 +578,12 @@ SendInitSipiSipiAllExcludingSelf (
   IN UINT32  StartupRoutine
   )
 {
-  LOCAL_APIC_ICR_LOW  IcrLow;
-
-  ASSERT (StartupRoutine < 0x100000);
-  ASSERT ((StartupRoutine & 0xfff) == 0);
-
   SendInitIpiAllExcludingSelf ();
   MicroSecondDelay (PcdGet32 (PcdCpuInitIpiDelayInMicroSeconds));
-  IcrLow.Uint32                    = 0;
-  IcrLow.Bits.Vector               = (StartupRoutine >> 12);
-  IcrLow.Bits.DeliveryMode         = LOCAL_APIC_DELIVERY_MODE_STARTUP;
-  IcrLow.Bits.Level                = 1;
-  IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
-  SendIpi (IcrLow.Uint32, 0);
+  SendStartupIpiAllExcludingSelf (StartupRoutine);
   if (!StandardSignatureIsAuthenticAMD ()) {
     MicroSecondDelay (200);
-    SendIpi (IcrLow.Uint32, 0);
+    SendStartupIpiAllExcludingSelf (StartupRoutine);
   }
 }
 
