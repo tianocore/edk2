@@ -38,7 +38,8 @@
   .global   Name                  ; \
   .section  #Section, "ax"        ; \
   .type     Name, %function       ; \
-  Name:
+  Name:                           ; \
+  AARCH64_BTI(c)
 
 #define ASM_FUNC(Name)  _ASM_FUNC(ASM_PFX(Name), .text. ## Name)
 
