@@ -4,7 +4,7 @@
   Local APIC library assumes local APIC is enabled. It does not
   handles cases where local APIC is disabled.
 
-  Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -183,6 +183,21 @@ VOID
 EFIAPI
 SendInitIpiAllExcludingSelf (
   VOID
+  );
+
+/**
+  Send a Start-up IPI to all processors excluding self.
+  This function returns after the IPI has been accepted by the target processors.
+  if StartupRoutine >= 1M, then ASSERT.
+  if StartupRoutine is not multiple of 4K, then ASSERT.
+  @param  StartupRoutine  Points to a start-up routine which is below 1M physical
+                          address and 4K aligned.
+**/
+
+VOID
+EFIAPI
+SendStartupIpiAllExcludingSelf (
+  IN UINT32  StartupRoutine
   );
 
 /**
