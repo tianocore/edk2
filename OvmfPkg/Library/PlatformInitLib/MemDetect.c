@@ -61,33 +61,20 @@ PlatformQemuUc32BaseInitialization (
     return;
   }
 
+  ASSERT (
+    PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID ||
+    PlatformInfoHob->HostBridgeDevId == INTEL_82441_DEVICE_ID
+    );
+
   PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
 
   if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
     ASSERT (PcdGet64 (PcdPciExpressBaseAddress) <= MAX_UINT32);
     ASSERT (PcdGet64 (PcdPciExpressBaseAddress) >= PlatformInfoHob->LowMemory);
-
-    if (PlatformInfoHob->LowMemory <= BASE_2GB) {
-      // Newer qemu with gigabyte aligned memory,
-      // 32-bit pci mmio window is 2G -> 4G then.
-      PlatformInfoHob->Uc32Base = BASE_2GB;
-    } else {
-      //
-      // On q35, the 32-bit area that we'll mark as UC, through variable MTRRs,
-      // starts at PcdPciExpressBaseAddress. The platform DSC is responsible for
-      // setting PcdPciExpressBaseAddress such that describing the
-      // [PcdPciExpressBaseAddress, 4GB) range require a very small number of
-      // variable MTRRs (preferably 1 or 2).
-      //
-      PlatformInfoHob->Uc32Base = (UINT32)PcdGet64 (PcdPciExpressBaseAddress);
-    }
-
-    return;
   }
 
-  ASSERT (PlatformInfoHob->HostBridgeDevId == INTEL_82441_DEVICE_ID);
   //
-  // On i440fx, start with the [LowerMemorySize, 4GB) range. Make sure one
+  // Start with the [LowerMemorySize, 4GB) range. Make sure one
   // variable MTRR suffices by truncating the size to a whole power of two,
   // while keeping the end affixed to 4GB. This will round the base up.
   //
@@ -1027,6 +1014,13 @@ PlatformQemuInitializeRam (
   // practically any alignment, and we may not have enough variable MTRRs to
   // cover it exactly.
   //
+  // Because of that PlatformQemuUc32BaseInitialization() will round
+  // up PlatformInfoHob->LowMemory to make sure a single mtrr register
+  // is enough.  The the result will be stored in
+  // PlatformInfoHob->Uc32Base.  On a typical qemu configuration with
+  // gigabyte-alignment being used LowMemory will be 2 or 3 GB and no
+  // rounding is needed, so LowMemory and Uc32Base will be identical.
+  //
   if (IsMtrrSupported () && (PlatformInfoHob->HostBridgeDevId != CLOUDHV_DEVICE_ID)) {
     MtrrGetAllMtrrs (&MtrrSettings);
 
@@ -1056,8 +1050,8 @@ PlatformQemuInitializeRam (
     ASSERT_EFI_ERROR (Status);
 
     //
-    // Set the memory range from the start of the 32-bit MMIO area (32-bit PCI
-    // MMIO aperture on i440fx, PCIEXBAR on q35) to 4GB as uncacheable.
+    // Set the memory range from the start of the 32-bit PCI MMIO
+    // aperture to 4GB as uncacheable.
     //
     Status = MtrrSetMemoryAttribute (
                PlatformInfoHob->Uc32Base,
