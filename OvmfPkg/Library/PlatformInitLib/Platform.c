@@ -152,6 +152,21 @@ PlatformMemMapInitialization (
     return;
   }
 
+  //
+  // address       purpose   size
+  // ------------  --------  -------------------------
+  // max(top, 2g)  PCI MMIO  0xFC000000 - max(top, 2g)  (pc)
+  // 0xB0000000    MMCONFIG                     256 MB  (q35)
+  // 0xC0000000    PCI MMIO                     960 MB  (q35)
+  // 0xFC000000    gap                           44 MB
+  // 0xFEC00000    IO-APIC                        4 KB
+  // 0xFEC01000    gap                         1020 KB
+  // 0xFED00000    HPET                           1 KB
+  // 0xFED00400    gap                          111 KB
+  // 0xFED1C000    gap (PIIX4) / RCRB (ICH9)     16 KB
+  // 0xFED20000    gap                          896 KB
+  // 0xFEE00000    LAPIC                          1 MB
+  //
   PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
   PciExBarBase = 0;
   if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
@@ -168,19 +183,6 @@ PlatformMemMapInitialization (
     PciBase = PlatformInfoHob->Uc32Base;
   }
 
-  //
-  // address       purpose   size
-  // ------------  --------  -------------------------
-  // max(top, 2g)  PCI MMIO  0xFC000000 - max(top, 2g)
-  // 0xFC000000    gap                           44 MB
-  // 0xFEC00000    IO-APIC                        4 KB
-  // 0xFEC01000    gap                         1020 KB
-  // 0xFED00000    HPET                           1 KB
-  // 0xFED00400    gap                          111 KB
-  // 0xFED1C000    gap (PIIX4) / RCRB (ICH9)     16 KB
-  // 0xFED20000    gap                          896 KB
-  // 0xFEE00000    LAPIC                          1 MB
-  //
   PciSize = 0xFC000000 - PciBase;
   PlatformAddIoMemoryBaseSizeHob (PciBase, PciSize);
 
