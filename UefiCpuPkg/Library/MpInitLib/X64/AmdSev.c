@@ -13,6 +13,8 @@
 #include <Register/Amd/Fam17Msr.h>
 #include <Register/Amd/Ghcb.h>
 
+#define _IS_ALIGNED(x, y)  (ALIGN_POINTER((x), (y)) == (x))
+
 /**
   Perform the requested AP Creation action.
 
@@ -121,6 +123,7 @@ SevSnpCreateSaveArea (
   UINT32          ApicId
   )
 {
+  UINT8             *Pages;
   SEV_ES_SAVE_AREA  *SaveArea;
   IA32_CR0          ApCr0;
   IA32_CR0          ResetCr0;
@@ -131,11 +134,28 @@ SevSnpCreateSaveArea (
 
   if (CpuData->SevEsSaveArea == NULL) {
     //
-    // Allocate a single page for the SEV-ES Save Area and initialize it.
+    // Allocate a page for the SEV-ES Save Area and initialize it. Due to AMD
+    // erratum #1467 (VMSA cannot be on a 2MB boundary), allocate an extra page
+    // to choose from to work around the issue.
     //
-    SaveArea = AllocateReservedPages (1);
-    if (!SaveArea) {
+    Pages = AllocateReservedPages (2);
+    if (!Pages) {
       return;
+    }
+
+    //
+    // Since page allocation works by allocating downward in the address space,
+    // try to always free the first (lower address) page to limit possible holes
+    // in the memory map. So, if the address of the second page is 2MB aligned,
+    // then use the first page and free the second page. Otherwise, free the
+    // first page and use the second page.
+    //
+    if (_IS_ALIGNED (Pages + EFI_PAGE_SIZE, SIZE_2MB)) {
+      SaveArea = (SEV_ES_SAVE_AREA *)Pages;
+      FreePages (Pages + EFI_PAGE_SIZE, 1);
+    } else {
+      SaveArea = (SEV_ES_SAVE_AREA *)(Pages + EFI_PAGE_SIZE);
+      FreePages (Pages, 1);
     }
 
     CpuData->SevEsSaveArea = SaveArea;
