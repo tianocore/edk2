@@ -595,9 +595,11 @@ PlatformAddressWidthFromCpuid (
 {
   UINT32   RegEax, RegEbx, RegEcx, RegEdx, Max;
   UINT8    PhysBits;
-  CHAR8    Signature[13] = { 0 };
+  CHAR8    Signature[13];
   BOOLEAN  Valid         = FALSE;
   BOOLEAN  Page1GSupport = FALSE;
+
+  ZeroMem (Signature, sizeof (Signature));
 
   AsmCpuid (0x80000000, &RegEax, &RegEbx, &RegEcx, &RegEdx);
   *(UINT32 *)(Signature + 0) = RegEbx;
