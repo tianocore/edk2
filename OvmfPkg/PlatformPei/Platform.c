@@ -223,7 +223,20 @@ ReserveEmuVariableNvStore (
   PcdStatus     = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
 
  #ifdef SECURE_BOOT_FEATURE_ENABLED
-  PlatformInitEmuVariableNvStore ((VOID *)(UINTN)VariableStore);
+  //
+  // PlatformInitEmuVariableNvStore is called to initialize the EmuVariableNvStore
+  // with the content pointed by PcdOvmfFlashNvStorageVariableBase. This is because
+  // when OVMF is launched with -bios parameter, UEFI variables will be partially emulated,
+  // and non-volatile variables may lose their contents after a reboot. This makes the secure
+  // boot feature not working.
+  // But in SEV guest, this design doesn't work. Because at this point the variable store
+  // mapping is still private/encrypted, OVMF will see ciphertext. So we skip the call
+  // of PlatformInitEmuVariableNvStore in SEV guest.
+  //
+  if (!MemEncryptSevIsEnabled ()) {
+    PlatformInitEmuVariableNvStore ((VOID *)(UINTN)VariableStore);
+  }
+
  #endif
 
   ASSERT_RETURN_ERROR (PcdStatus);
