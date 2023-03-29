@@ -317,7 +317,8 @@ PcRtcInit (
     Time.Hour       = RTC_INIT_HOUR;
     Time.Day        = RTC_INIT_DAY;
     Time.Month      = RTC_INIT_MONTH;
-    Time.Year       = PcdGet16 (PcdRtcDefaultYear);
+    Time.Year       = MAX (PcdGet16 (PcdRtcDefaultYear), PcdGet16 (PcdMinimalValidYear));
+    Time.Year       = MIN (Time.Year, PcdGet16 (PcdMaximalValidYear));
     Time.Nanosecond = 0;
     Time.TimeZone   = EFI_UNSPECIFIED_TIMEZONE;
     Time.Daylight   = 0;
@@ -357,7 +358,8 @@ PcRtcInit (
   Time.Hour       = RTC_INIT_HOUR;
   Time.Day        = RTC_INIT_DAY;
   Time.Month      = RTC_INIT_MONTH;
-  Time.Year       = PcdGet16 (PcdRtcDefaultYear);
+  Time.Year       = MAX (PcdGet16 (PcdRtcDefaultYear), PcdGet16 (PcdMinimalValidYear));
+  Time.Year       = MIN (Time.Year, PcdGet16 (PcdMaximalValidYear));
   Time.Nanosecond = 0;
   Time.TimeZone   = Global->SavedTimeZone;
   Time.Daylight   = Global->Daylight;
