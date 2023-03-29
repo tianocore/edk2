@@ -4000,6 +4000,21 @@ EcGenerateKey (
   );
 
 /**
+  Sets the public key component for the established EC context.
+  The Ec context should be correctly initialized by EcNewByNid.
+  @param[in, out]  EcContext      Pointer to EC context being set.
+  @param[in]       EcPoint        Pointer to Qx/Qy EcPoint public key.
+  @retval  TRUE   EC key component was set successfully.
+  @retval  FALSE  Invalid EC key component.
+**/
+BOOLEAN
+EFIAPI
+EcSetPubKey (
+  IN OUT VOID    *EcContext,
+  IN CONST VOID  *EcPoint
+  );
+
+/**
   Gets the public key component from the established EC context.
   The Ec context should be correctly initialized by EcNewByNid, and successfully
   generate key pair from EcGenerateKey().
