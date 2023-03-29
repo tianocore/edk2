@@ -177,8 +177,9 @@ R: Julien Grall <julien@xen.org> [jgrall]
 BaseTools
 F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
-M: Bob Feng <bob.c.feng@intel.com> [BobCF]
+M: Rebecca Cran <rebecca@bsdio.com> [bcran]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
+R: Bob Feng <bob.c.feng@intel.com> [BobCF]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
 
 CryptoPkg
