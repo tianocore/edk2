@@ -27,7 +27,9 @@ extern ASM_PFX(CommonExceptionHandler)
 SECTION .data
 
 DEFAULT REL
+%ifndef NO_ABSOLUTE_RELOCS_IN_TEXT
 SECTION .text
+%endif
 
 ALIGN   8
 
@@ -51,6 +53,9 @@ HookAfterStubHeaderBegin:
     push    rax
     mov     rax, HookAfterStubHeaderEnd
     jmp     rax
+
+SECTION .text
+
 HookAfterStubHeaderEnd:
     mov     rax, rsp
     and     sp,  0xfff0        ; make sure 16-byte aligned for exception context
@@ -276,8 +281,7 @@ DrFinish:
     ; and make sure RSP is 16-byte aligned
     ;
     sub     rsp, 4 * 8 + 8
-    mov     rax, ASM_PFX(CommonExceptionHandler)
-    call    rax
+    call    ASM_PFX(CommonExceptionHandler)
     add     rsp, 4 * 8 + 8
 
     cli
@@ -384,10 +388,10 @@ DoIret:
 ; comments here for definition of address map
 global ASM_PFX(AsmGetTemplateAddressMap)
 ASM_PFX(AsmGetTemplateAddressMap):
-    mov     rax, AsmIdtVectorBegin
+    lea     rax, [AsmIdtVectorBegin]
     mov     qword [rcx], rax
     mov     qword [rcx + 0x8],  (AsmIdtVectorEnd - AsmIdtVectorBegin) / 32
-    mov     rax, HookAfterStubHeaderBegin
+    lea     rax, [HookAfterStubHeaderBegin]
     mov     qword [rcx + 0x10], rax
     ret
 
