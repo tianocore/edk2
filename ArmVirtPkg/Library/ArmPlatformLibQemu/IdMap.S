@@ -57,3 +57,5 @@ idmap:      /* level 0 */
   .quad     PAGE_XIP | (idx << 12)        // 2044 KiB of R-X flash mappings
   .set      idx, idx + 1
   .endr
+
+AARCH64_BTI_NOTE()
