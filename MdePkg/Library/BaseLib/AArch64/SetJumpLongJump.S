@@ -46,6 +46,7 @@ GCC_ASM_EXPORT(InternalLongJump)
 #  );
 #
 ASM_PFX(SetJump):
+        AARCH64_BTI(c)
         mov     x16, sp // use IP0 so save SP
 #define REG_PAIR(REG1, REG2, OFFS)      stp REG1, REG2, [x0, OFFS]
 #define REG_ONE(REG1, OFFS)             str REG1, [x0, OFFS]
@@ -75,6 +76,7 @@ ASM_PFX(SetJump):
 #  );
 #
 ASM_PFX(InternalLongJump):
+        AARCH64_BTI(c)
 #define REG_PAIR(REG1, REG2, OFFS)      ldp REG1, REG2, [x0, OFFS]
 #define REG_ONE(REG1, OFFS)             ldr REG1, [x0, OFFS]
         GPR_LAYOUT
@@ -85,7 +87,6 @@ ASM_PFX(InternalLongJump):
         cmp     w1, #0
         mov     w0, #1
         csel    w0, w1, w0, ne
-        // use br not ret, as ret is guaranteed to mispredict
-        br      x30
+        ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
