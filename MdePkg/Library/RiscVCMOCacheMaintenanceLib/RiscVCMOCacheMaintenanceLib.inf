@@ -1,0 +1,30 @@
+## @file
+#  RISCV64 CMO Cache Maintenance Library implementation.
+#
+#  Copyright (c) 2023, Rivos Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RVCMOCacheMaintenanceLib
+  MODULE_UNI_FILE                = RVCMOCacheMaintenanceLib.uni
+  FILE_GUID                      = 6F651f1F-CAD5-4059-B1CE-7E60BC624757
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = RVCMOCacheMaintenanceLib
+
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+  RiscVCMOCache.c
+  RiscVCpuCMOCache.S           | GCC
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
