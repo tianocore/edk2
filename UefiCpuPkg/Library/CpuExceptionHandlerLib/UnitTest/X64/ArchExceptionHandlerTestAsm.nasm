@@ -236,7 +236,7 @@ ASM_PFX(TriggerINTnException):
     push rax
     push rdx
     push rcx
-    lea  rax, [AsmTriggerException1 - AsmTriggerException0]
+    mov  rax, AsmTriggerException1 - AsmTriggerException0
     mul  rcx
     mov  rcx, AsmTriggerException0
     add  rax, rcx
