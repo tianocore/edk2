@@ -56,7 +56,7 @@ ASM_PFX(InternalMemSetMem64):
     test    ebx, ebx
     jz .3
     mov     ecx, ebx
-.2
+.2:
     movq    qword [edx], xmm0
     lea     edx, [edx + 8]
     loop    .2
