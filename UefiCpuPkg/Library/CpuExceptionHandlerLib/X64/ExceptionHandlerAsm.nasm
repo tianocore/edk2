@@ -59,7 +59,11 @@ AsmIdtVectorBegin:
 %rep  256
     push    strict dword %[Vector] ; This instruction pushes sign-extended 8-byte value on stack
     push    rax
+%ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
     mov     rax, strict qword 0    ; mov     rax, ASM_PFX(CommonInterruptEntry)
+%else
+    mov     rax, ASM_PFX(CommonInterruptEntry)
+%endif
     jmp     rax
 %assign Vector Vector+1
 %endrep
@@ -69,8 +73,12 @@ HookAfterStubHeaderBegin:
     push    strict dword 0      ; 0 will be fixed
 VectorNum:
     push    rax
+%ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
     mov     rax, strict qword 0 ;     mov     rax, HookAfterStubHeaderEnd
 JmpAbsoluteAddress:
+%else
+    mov     rax, HookAfterStubHeaderEnd
+%endif
     jmp     rax
 HookAfterStubHeaderEnd:
     mov     rax, rsp
@@ -457,6 +465,7 @@ ASM_PFX(AsmGetTemplateAddressMap):
     lea     rax, [HookAfterStubHeaderBegin]
     mov     qword [rcx + 0x10], rax
 
+%ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
 ; Fix up CommonInterruptEntry address
     lea    rax, [ASM_PFX(CommonInterruptEntry)]
     lea    rcx, [AsmIdtVectorBegin]
@@ -468,6 +477,7 @@ ASM_PFX(AsmGetTemplateAddressMap):
     lea    rax, [HookAfterStubHeaderEnd]
     lea    rcx, [JmpAbsoluteAddress]
     mov    qword [rcx - 8], rax
+%endif
 
     ret
 
