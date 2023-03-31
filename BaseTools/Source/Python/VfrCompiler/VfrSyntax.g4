@@ -357,7 +357,7 @@ locals[Node]
     :
     (   vfrStatementImage
     |   vfrStatementLocked
-    |   vfrStatementRules //
+    |   vfrStatementRules
     |   vfrStatementDefault
     |   vfrStatementStat
     |   vfrStatementQuestions
@@ -624,7 +624,7 @@ locals[Node=VfrTreeNode(EFI_IFR_DEFAULT_OP)]
         )
     ;
 
-vfrStatementValue //
+vfrStatementValue 
 locals[Node=VfrTreeNode(EFI_IFR_VALUE_OP)]
     :   'value' '=' vfrStatementExpression[localctx.Node]
     ;

@@ -50,7 +50,7 @@ class YamlTree():
         IfrFormId.Clear()
         self.Parser = YamlParser(self.Root, self.Options, self.PreProcessDB, self.YamlDict, self.GuidID)
         self.Parser.Parse()
-        #self.VfrTree.DumpProcessedYaml()
+        self.VfrTree.DumpCompiledYaml()
 
     def ConsumeDLT(self):
         self.Options.DeltaFileName = self.Options.OutputDirectory + 'Delta.yml' #
@@ -117,7 +117,7 @@ class YamlTree():
 QuestionheaderFlagsField = ['READ_ONLY', 'INTERACTIVE', 'RESET_REQUIRED', 'REST_STYLE', 'RECONNECT_REQUIRED', 'OPTIONS_ONLY', 'NV_ACCESS', 'LATE_CHECK']
 vfrStatementStat = ['subtitle', 'text', 'goto', 'resetbutton']
 vfrStatementQuestions = ['checkbox', 'action', 'date','numeric', 'oneof', 'string', 'password', 'orderedlist', 'time']
-
+vfrStatementConditional = ['disableif', 'supressif', 'grayoutif', 'inconsistentif']
 class ModifiedNode():
     def __init__(self, Node, Operation) -> None:
         self.Node = Node
@@ -409,11 +409,39 @@ class YamlParser():
             elif Key == 'namevaluevarstore':
                 self.ParseVfrStatementVarStoreNameValue(Value, ParentNode)
             elif Key == 'defaultstore':
-                self.ParsevfrStatementDefaultStore(Value, ParentNode)
+                self.ParseVfrStatementDefaultStore(Value, ParentNode)
+            elif Key == 'disableif':
+                self.ParseVfrStatementDisableIfFormSet(Value, ParentNode)
+            elif Key == 'suppressif':
+                self.ParseVfrStatementSuppressIfFormSet(Value, ParentNode)
             elif Key == 'guidop':
                 self.ParseVfrStatementExtension(Value, ParentNode)
 
-    def ParsevfrStatementDefaultStore(self, DefaultStore, ParentNode):
+    def ParseVfrStatementDisableIfFormSet(self, DisableIf, ParentNode):
+        DIObj = IfrDisableIf()
+        Node = VfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(DisableIf['expression'], Node)
+        Node.Expression = DisableIf['expression']
+        if 'component' in DisableIf.keys():
+            self._ParseVfrFormSetComponent(DisableIf['component'], Node)
+        self.InsertEndNode(Node)
+
+    def ParseVfrStatementSuppressIfFormSet(self, SuppressIf, ParentNode):
+        SIObj = IfrSuppressIf()
+        Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(SuppressIf['expression'], Node)
+        Node.Expression = SuppressIf['expression']
+        if 'component' in SuppressIf.keys():
+            self._ParseVfrFormSetComponent(SuppressIf['component'], Node)
+        self.InsertEndNode(Node)
+
+    def ParserVfrStatementExpression(self, Condition, ParentNode):
+        pass
+
+
+    def ParseVfrStatementDefaultStore(self, DefaultStore, ParentNode):
         RefName = DefaultStore['type']
         DSObj = IfrDefaultStore(RefName)
         DefaultStoreNameId = DefaultStore['prompt']
@@ -426,8 +454,8 @@ class YamlParser():
             DSObj.SetDefaultId (DefaultId)
             Node = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
             ParentNode.insertChild(Node)
-            Node.Data = DSObj
-            Node.Buffer = gFormPkg.StructToStream(DSObj.GetInfo())
+            # Node.Data = DSObj
+            # Node.Buffer = gFormPkg.StructToStream(DSObj.GetInfo())
         else:
             pNode, ReturnCode = gVfrDefaultStore.ReRegisterDefaultStoreById(DefaultId, RefName, DefaultStoreNameId)
             self.ErrorHandler(ReturnCode)
@@ -601,6 +629,8 @@ class YamlParser():
             self.ParseVfrStatementStat(Key, Value, ParentNode, Position)
         elif Key in vfrStatementQuestions:
             self.ParseVfrStatementQuestions(Key, Value, ParentNode, Position)
+        elif Key in vfrStatementConditional:
+            self.ParseVfrStatementConditional(Key, Value, ParentNode, Position)
         elif Key == 'label':
             self.ParseVfrStatementLabel(Value, ParentNode)
         elif Key == 'banner':
@@ -611,6 +641,7 @@ class YamlParser():
             self.ParseVfrStatementModal(Value, ParentNode)
         elif Key == 'refreshguid':
             self.ParseVfrStatementRefreshEvent(Value, ParentNode)
+
 
     def ParseVfrStatementDefault(self, Default, ParentNode):
         IsExp = False
@@ -642,12 +673,12 @@ class YamlParser():
                         DObj.SetType(self.CurrQestVarInfo.VarType)
             else:
                 DObj.SetType(EFI_IFR_TYPE_BUFFER)
-        elif 'value2' in Default.keys():
+        elif 'value_exp' in Default.keys():
             IsExp = True
             DObj = IfrDefault2()
             Node = VfrTreeNode(EFI_IFR_DEFAULT_OP, DObj)
             DObj.SetScope(1)
-            self.ParseVfrStatementValue(Default['value2'], Node)
+            self.ParseVfrStatementValue(Default['value_exp'], Node)
             self.InsertEndNode(Node)
 
         if 'defaultstore' in Default.keys():
@@ -676,7 +707,9 @@ class YamlParser():
         RObj.SetRuleId(self.VfrRulesDB.GetRuleId(RuleName))
         Node = VfrTreeNode(EFI_IFR_RULE_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
         ParentNode.insertChild(Node)
-        # exp
+        self.ParserVfrStatementExpression(Rule['expression'], Node)
+        Node.Expression = Rule['expression']
+
         self.InsertEndNode(Node)
         return Node
 
@@ -827,6 +860,12 @@ class YamlParser():
             self.ParseVfrStatementImage(Value, ParentNode)
         elif Key == 'locked':
             self.ParseVfrStatementLocked(Value, ParentNode)
+        elif Key == 'inconsistentif':
+            self.ParseVfrStatementInconsistentIf(Value, ParentNode)
+        elif Key == 'nosubmitif':
+            self.ParseVfrStatementNoSubmitIf(Value, ParentNode)
+        elif Key == 'disableif':
+            self.ParseVfrStatementDisableIfQuest(Value, ParentNode)
         elif Key == 'refresh':
             self.ParseVfrStatementRefresh(Value, ParentNode)
         elif Key == 'varstoredevice':
@@ -837,6 +876,37 @@ class YamlParser():
             self.ParseVfrStatementRefreshEvent(Value, ParentNode)
         elif Key == 'warningif':
             self.ParseVfrStatementWarningIf(Value, ParentNode)
+
+    def ParseVfrStatementInconsistentIf(self, InconsistentIf, ParentNode):
+        IIObj = IfrInconsistentIf()
+        IIObj.SetError(InconsistentIf['prompt'])
+        Node = VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP, IIObj, gFormPkg.StructToStream(IIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(InconsistentIf['expression'], Node)
+        Node.Expression = InconsistentIf['expression']
+        self.InsertEndNode(Node)
+
+
+    def ParseVfrStatementNoSubmitIf(self, NoSubmitIf, ParentNode):
+        NSIObj = IfrNoSubmitIf()
+        NSIObj.SetError(NoSubmitIf['prompt'])
+        Node = VfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP, NSIObj, gFormPkg.StructToStream(NSIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(NoSubmitIf['expression'], Node)
+        Node.Expression = NoSubmitIf['expression']
+        self.InsertEndNode(Node)
+
+
+    def ParseVfrStatementDisableIfQuest(self, DisableIfQuest, ParentNode):
+        DIObj = IfrDisableIf()
+        Node = VfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(DisableIfQuest['expression'], Node)
+        Node.Expression = DisableIfQuest['expression']
+        if 'component' in DisableIfQuest.keys():
+            self._ParseVfrStatementQuestionOptionList(DisableIfQuest['component'], Node)
+        self.InsertEndNode(Node)
+
 
     def ParseVfrStatementRefresh(self, Refresh, ParentNode):
         RObj = IfrRefresh()
@@ -857,13 +927,18 @@ class YamlParser():
         WIObj.SetWarning(WarningIf['prompt'])
         if 'timeout' in WarningIf.keys():
             WIObj.SetTimeOut(WarningIf['timeout'])
-        # Expression
         Node = VfrTreeNode(EFI_IFR_WARNING_IF_OP, WIObj, gFormPkg.StructToStream(WIObj.GetInfo()))
         ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(WarningIf['expression'], Node)
+        Node.Expression = WarningIf['expression']
         self.InsertEndNode(Node)
         return Node
 
     def _ParseVfrStatementQuestionOptionTag(self, Key, Value, ParentNode):
+        if Key == 'suppressif':
+            self.ParseVfrStatementSuppressIfQuest(Value, ParentNode)
+        elif Key == 'grayoutif':
+            self.ParseVfrStatementGrayOutIfQuest(Value, ParentNode)
         if Key == 'value':
             self.ParseVfrStatementValue(Value, ParentNode)
         elif Key == 'default':
@@ -874,6 +949,28 @@ class YamlParser():
             self.ParseVfrStatementRead(Value, ParentNode)
         elif Key == 'write':
             self.ParseVfrStatementWrite(Value, ParentNode)
+
+    def ParseVfrStatementSuppressIfQuest(self, SuppressIfQuest, ParentNode):
+        SIObj = IfrSuppressIf()
+        Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(SuppressIfQuest['expression'], Node)
+        Node.Expression = SuppressIfQuest['expression']
+        if 'component' in SuppressIfQuest.keys():
+            self._ParseVfrStatementQuestionOptionList(SuppressIfQuest['component'], Node)
+        self.InsertEndNode(Node)
+
+
+    def ParseVfrStatementGrayOutIfQuest(self, GrayOutIfQuest, ParentNode):
+        GOIObj = IfrGrayOutIf()
+        Node = VfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP, GOIObj, gFormPkg.StructToStream(GOIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(GrayOutIfQuest['expression'], Node)
+        Node.Expression = GrayOutIfQuest['expression']
+        if 'component' in GrayOutIfQuest.keys():
+            self._ParseVfrStatementQuestionOptionList(GrayOutIfQuest['component'], Node)
+        self.InsertEndNode(Node)
+
 
     def _ParseVfrConstantValueField(self, Value): #########
 
@@ -1040,7 +1137,12 @@ class YamlParser():
         VObj = IfrValue()
         Node = VfrTreeNode(EFI_IFR_VALUE_OP, VObj, gFormPkg.StructToStream(VObj.GetInfo()))
         ParentNode.insertChild(Node)
-        # expression
+        if type(Value) == str:
+            self.ParserVfrStatementExpression(Value, Node)
+            Node.Expression = Value
+        else:
+            self.ParserVfrStatementExpression(Value['expression'], Node)
+            Node.Expression = Value['expression']
         self.InsertEndNode(Node)
         return Node
 
@@ -1048,14 +1150,16 @@ class YamlParser():
         RObj = IfrRead()
         Node = VfrTreeNode(EFI_IFR_READ_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
         ParentNode.insertChild(Node)
-        # expression
+        self.ParserVfrStatementExpression(Read['expression'], Node)
+        Node.Expression = Read['expression']
         return Node
 
     def ParseVfrStatementWrite(self, Write, ParentNode):
         WObj = IfrWrite()
         Node = VfrTreeNode(EFI_IFR_WRITE_OP, WObj, gFormPkg.StructToStream(WObj.GetInfo()))
         ParentNode.insertChild(Node)
-        # expression
+        self.ParserVfrStatementExpression(Write['expression'], Node)
+        Node.Expression = Write['expression']
         return Node
 
     def _ParseStatementStatFlags(self, StatFlagsDict):
@@ -1216,6 +1320,84 @@ class YamlParser():
         if Key == 'time':
             Node = self.ParseVfrStatementTime(Value, ParentNode, Position)
         return Node
+
+
+    def ParseVfrStatementConditional(self, Key, Value, ParentNode, Position):
+        if Key == 'disableif':
+            self.ParseVfrStatementDisableIfStat(Value, ParentNode, Position)
+        if Key == 'suppressif':
+            self.ParseVfrStatementSuppressIfStat(Value, ParentNode, Position)
+        if Key == 'grayoutif':
+            self.ParseVfrStatementGrayOutIfStat(Value, ParentNode, Position) #
+        if Key == 'inconsistentif':
+            self.ParseVfrStatementInconsistentIfStat(Value, ParentNode, Position)
+
+
+    def ParseVfrStatementDisableIfStat(self, DisableIf, ParentNode, Position):
+        DIObj = IfrDisableIf()
+        Node = VfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(DisableIf['expression'], Node)
+        Node.Expression = DisableIf['expression']
+        if 'component' in DisableIf.keys():
+            for Component in DisableIf['component']:
+                (Key, Value), = Component.items()
+                self._ParseVfrStatementStatList(Key, Value, Node, Position)
+        self.InsertEndNode(Node)
+
+
+    def ParseVfrStatementSuppressIfStat(self, SuppressIf, ParentNode, Position):
+        SIObj = IfrSuppressIf()
+        Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(SuppressIf['expression'], Node)
+        Node.Expression = SuppressIf['expression']
+        if 'component' in SuppressIf.keys():
+            for Component in SuppressIf['component']:
+                (Key, Value), = Component.items()
+                self._ParseVfrStatementStatList(Key, Value, Node, Position)
+        self.InsertEndNode(Node)
+
+
+    def ParseVfrStatementGrayOutIfStat(self, GrayOutIf, ParentNode, Position):
+        GOIObj = IfrGrayOutIf()
+        Node = VfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP, GOIObj, gFormPkg.StructToStream(GOIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(GrayOutIf['expression'], Node)
+        Node.Expression = GrayOutIf['expression']
+        if 'component' in GrayOutIf.keys():
+            for Component in GrayOutIf['component']:
+                (Key, Value), = Component.items()
+                self._ParseVfrStatementStatList(Key, Value, Node, Position)
+        self.InsertEndNode(Node)
+
+    def ParseVfrStatementInconsistentIfStat(self, InconsistentIf, ParentNode, Position):
+        IIObj = IfrInconsistentIf()
+        IIObj.SetError(InconsistentIf['prompt'])
+        Node = VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP, IIObj, gFormPkg.StructToStream(IIObj.GetInfo()))
+        ParentNode.insertChild(Node)
+        self.ParserVfrStatementExpression(InconsistentIf['expression'], Node)
+        Node.Expression = InconsistentIf['expression']
+        if 'component' in InconsistentIf.keys():
+            for Component in InconsistentIf['component']:
+                (Key, Value), = Component.items()
+                self._ParseVfrStatementStatList(Key, Value, Node, Position)
+        self.InsertEndNode(Node)
+
+
+    def _ParseVfrStatementStatList(self, Key, Value, ParentNode, Position):
+        if Key in vfrStatementStat:
+            self.ParseVfrStatementStat(Key, Value, ParentNode, Position)
+        elif Key in vfrStatementQuestions:
+            self.ParseVfrStatementQuestions(Key, Value, ParentNode, Position)
+        elif Key in vfrStatementConditional:
+            self.ParseVfrStatementConditional(Key, Value, ParentNode, Position)
+        elif Key == 'label':
+            self.ParseVfrStatementLabel(Value, ParentNode)
+        elif Key == 'guidop':
+            self.ParseVfrStatementExtension(Value, ParentNode)
+        # vfrStatementInvalid
+
 
     def ParseVfrStatementTime(self, Time, ParentNode, Position): #only support one condition
         TObj = IfrTime()

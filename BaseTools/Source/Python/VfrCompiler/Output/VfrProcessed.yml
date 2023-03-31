@@ -103,8 +103,8 @@ formset:
       - oneof:
           component:
           - default:
-              value2: 'cond (pushthis == 0 ? 0 : cond ((questionref(MyOneOf) >> 0x4
-                & 0xF00) == 0x0 + 0x2 ? 0 : 1))'
+              value_exp: 'cond (pushthis == 0 ? 0 : cond ((questionref(MyOneOf) >>
+                0x4 & 0xF00) == 0x0 + 0x2 ? 0 : 1))'
           - option:
               flags: 0
               text: 45
@@ -117,82 +117,79 @@ formset:
           prompt: 31
           varid: MyIfrNVData.BootOrderLarge
       - grayoutif:
-          condition: grayoutif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
-      - suppressif:
-          condition: grayoutif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
-            | suppressif questionref(MyOneOf) == 0x0
-      - checkbox:
           component:
-          - default:
-              value: true
-          condition: grayoutif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
-            | suppressif questionref(MyOneOf) == 0x0
-          flags:
-          - CHECKBOX_DEFAULT
-          - CHECKBOX_DEFAULT_MFG
-          help: 48
-          prompt: 47
-          varid: MyIfrNVData.ChooseToActivateNuclearWeaponry
-      - suppressif:
-          condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
-      - label:
-          condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
-          number: 8738
-      - orderedlist:
-          component:
-          - option:
-              flags: 0
-              text: 143
-              value: 2
-          - option:
-              flags: 0
-              text: 142
-              value: 1
-          - option:
-              flags: 0
-              text: 144
-              value: 3
           - suppressif:
-              condition: suppressif ideqval MyIfrNVData.BootOrderLarge == 0
-          - option:
-              condition: suppressif ideqval MyIfrNVData.BootOrderLarge == 0
-              flags: 0
-              text: 145
-              value: 4
-          condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
-          flags: RESET_REQUIRED
-          help: 90
-          prompt: 141
-          varid: MyIfrNVData.BootOrder
-      - label:
-          condition: suppressif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
-          number: 8739
-      - disableif:
-          condition: disableif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2
-      - orderedlist:
+              component:
+              - checkbox:
+                  component:
+                  - default:
+                      value: true
+                  flags:
+                  - CHECKBOX_DEFAULT
+                  - CHECKBOX_DEFAULT_MFG
+                  help: 48
+                  prompt: 47
+                  varid: MyIfrNVData.ChooseToActivateNuclearWeaponry
+              expression: questionref(MyOneOf) == 0x0
+          expression: ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
+      - suppressif:
           component:
-          - option:
-              flags: 0
-              text: 39
-              value: 3
-          - option:
-              flags: 0
-              text: 40
-              value: 2
-          - option:
-              flags: 0
-              text: 41
-              value: 1
-          - default:
-              value:
-              - 1
-              - 2
-              - 3
-          condition: disableif ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2
-          flags: RESET_REQUIRED
-          help: 80
-          prompt: 82
-          varid: MyIfrNVData.OrderedList
+          - label:
+              number: 8738
+          - orderedlist:
+              component:
+              - option:
+                  flags: 0
+                  text: 143
+                  value: 2
+              - option:
+                  flags: 0
+                  text: 142
+                  value: 1
+              - option:
+                  flags: 0
+                  text: 144
+                  value: 3
+              - suppressif:
+                  component:
+                  - option:
+                      flags: 0
+                      text: 145
+                      value: 4
+                  expression: ideqval MyIfrNVData.BootOrderLarge == 0
+              flags: RESET_REQUIRED
+              help: 90
+              prompt: 141
+              varid: MyIfrNVData.BootOrder
+          - label:
+              number: 8739
+          expression: ideqval MyIfrNVData.SuppressGrayOutSomething == 0x0
+      - disableif:
+          component:
+          - orderedlist:
+              component:
+              - option:
+                  flags: 0
+                  text: 39
+                  value: 3
+              - option:
+                  flags: 0
+                  text: 40
+                  value: 2
+              - option:
+                  flags: 0
+                  text: 41
+                  value: 1
+              - default:
+                  value:
+                  - 1
+                  - 2
+                  - 3
+              flags: RESET_REQUIRED
+              help: 80
+              prompt: 82
+              varid: MyIfrNVData.OrderedList
+          expression: ideqval MyIfrNVData.SuppressGrayOutSomething == 0x2
       - label:
           number: 100
       - goto:
@@ -238,8 +235,6 @@ formset:
           - inconsistentif:
               expression: ideqid MyIfrNVData.TestLateCheck == MyIfrNVData.TestLateCheck2
               prompt: 71
-          - inconsistentif:
-              condition: None
           flags: RESET_REQUIRED
           help: 38
           prompt: 83
@@ -300,8 +295,6 @@ formset:
           - inconsistentif:
               expression: pushthis != stringref(STRING_TOKEN(STR_STRING_CHECK))
               prompt: 99
-          - inconsistentif:
-              condition: None
           flags: INTERACTIVE
           help: 73
           key: 4662
@@ -323,15 +316,13 @@ formset:
       - numeric:
           component:
           - default:
-              value2: questionrefval(devicepath = STRING_TOKEN (STR_DEVICE_PATH),
+              value_exp: questionrefval(devicepath = STRING_TOKEN (STR_DEVICE_PATH),
                 guid = DRIVER_SAMPLE_FORMSET_GUID, 0x1111)
           - inconsistentif:
               expression: ideqval MyIfrNVData.HowOldAreYouInYearsManual == 99       OR       ideqid
                 MyIfrNVData.HowOldAreYouInYearsManual == MyEfiVar.Field8       OR       ideqvallist
                 MyIfrNVData.HowOldAreYouInYearsManual == 1 3 5 7
               prompt: 71
-          - inconsistentif:
-              condition: None
           help: 53
           maximum: 240
           minimum: 0
@@ -410,24 +401,23 @@ formset:
       - label:
           number: 4096
       - grayoutif:
-          condition: grayoutif ideqval MyIfrNVData.HowOldAreYouInYearsManual == 23
-            AND ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
-      - numeric:
           component:
-          - default:
-              defaultstore: MyStandardDefault
-              value: 18
-          - default:
-              defaultstore: MyManufactureDefault
-              value: 19
-          condition: grayoutif ideqval MyIfrNVData.HowOldAreYouInYearsManual == 23
-            AND ideqval MyIfrNVData.SuppressGrayOutSomething == 0x1
-          help: 55
-          maximum: 243
-          minimum: 0
-          prompt: 49
-          step: 1
-          varid: MyIfrNVData.HowOldAreYouInYears
+          - numeric:
+              component:
+              - default:
+                  defaultstore: MyStandardDefault
+                  value: 18
+              - default:
+                  defaultstore: MyManufactureDefault
+                  value: 19
+              help: 55
+              maximum: 243
+              minimum: 0
+              prompt: 49
+              step: 1
+              varid: MyIfrNVData.HowOldAreYouInYears
+          expression: ideqval MyIfrNVData.HowOldAreYouInYearsManual == 23 AND ideqval
+            MyIfrNVData.SuppressGrayOutSomething == 0x1
       - numeric:
           component:
           - default:
@@ -484,11 +474,11 @@ formset:
           help: 94
           prompt: 93
       - grayoutif:
-          condition: grayoutif NOT security (EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID)
-      - text:
-          condition: grayoutif NOT security (EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID)
-          help: 57
-          prompt: 56
+          component:
+          - text:
+              help: 57
+              prompt: 56
+          expression: NOT security (EFI_USER_INFO_ACCESS_SETUP_ADMIN_GUID)
       - numeric:
           component:
           - default:
@@ -550,102 +540,96 @@ formset:
       formid: 1
       title: 21
   - suppressif:
-      condition: suppressif ideqval MyIfrNVData.BootOrderLarge == 0
-  - form:
       component:
-      - date:
+      - form:
           component:
-          - default:
-              value: (2004/1/1)
-          - inconsistentif:
-              expression: ideqval Date.Day == 31     AND     ideqvallist Date.Month
-                == 2 4 6 9 11
-              prompt: 71
-          - inconsistentif:
-              condition: None
-          - inconsistentif:
-              expression: ideqval Date.Day == 30     AND     ideqval Date.Month ==
-                2
-              prompt: 71
-          - inconsistentif:
-              condition: None
-          - inconsistentif:
-              expression: ideqval Date.Day == 0x1D     AND     ideqval Date.Month
-                == 2     AND     NOT     ideqvallist Date.Year == 2004 2008 20012
-                20016 2020 2024 2028 2032 2036
-              prompt: 71
-          - inconsistentif:
-              condition: None
-          flags: STORAGE_TIME
-          help: 77
-          name: Date
-          prompt: 76
-      - text:
-          flags: INTERACTIVE
-          help: 89
-          key: 4673
-          prompt: 89
-      - text:
-          flags: INTERACTIVE
-          help: 86
-          key: 4674
-          prompt: 86
-      - time:
-          flags: STORAGE_TIME
-          help: 79
-          prompt: 78
-      - time:
-          component:
-          - default:
-              value: (15:33:33)
-          flags:
-          - STORAGE_NORMAL
-          - SECOND_SUPPRESS
-          help: 78
-          name: MyTime
-          prompt: 78
-          varid: MyIfrNVData.Time
-      - checkbox:
-          flags: CHECKBOX_DEFAULT
-          help: 48
-          prompt: 47
-          varid: MyIfrNVData.ChooseToActivateNuclearWeaponry
-      - text:
-          help: 80
-          prompt: 74
-      - text:
-          help: 80
-          prompt: 74
-          text: 75
-      - goto:
-          formid: 1
-          help: 81
-          prompt: 58
-      - goto:
-          component:
-          - default:
-              value: (0;0;ZERO_GUID;STRING_TOKEN(STR_NULL_STRING))
-          flags: INTERACTIVE
-          help: 69
-          key: 4680
-          prompt: 67
-          varid: MyIfrNVData.RefData
-      - goto:
-          flags: INTERACTIVE
-          help: 70
-          key: 4681
-          prompt: 68
-      condition: suppressif ideqval MyIfrNVData.BootOrderLarge == 0
-      formid: 2
-      title: 22
+          - date:
+              component:
+              - default:
+                  value: (2004/1/1)
+              - inconsistentif:
+                  expression: ideqval Date.Day == 31     AND     ideqvallist Date.Month
+                    == 2 4 6 9 11
+                  prompt: 71
+              - inconsistentif:
+                  expression: ideqval Date.Day == 30     AND     ideqval Date.Month
+                    == 2
+                  prompt: 71
+              - inconsistentif:
+                  expression: ideqval Date.Day == 0x1D     AND     ideqval Date.Month
+                    == 2     AND     NOT     ideqvallist Date.Year == 2004 2008 20012
+                    20016 2020 2024 2028 2032 2036
+                  prompt: 71
+              flags: STORAGE_TIME
+              help: 77
+              name: Date
+              prompt: 76
+          - text:
+              flags: INTERACTIVE
+              help: 89
+              key: 4673
+              prompt: 89
+          - text:
+              flags: INTERACTIVE
+              help: 86
+              key: 4674
+              prompt: 86
+          - time:
+              flags: STORAGE_TIME
+              help: 79
+              prompt: 78
+          - time:
+              component:
+              - default:
+                  value: (15:33:33)
+              flags:
+              - STORAGE_NORMAL
+              - SECOND_SUPPRESS
+              help: 78
+              name: MyTime
+              prompt: 78
+              varid: MyIfrNVData.Time
+          - checkbox:
+              flags: CHECKBOX_DEFAULT
+              help: 48
+              prompt: 47
+              varid: MyIfrNVData.ChooseToActivateNuclearWeaponry
+          - text:
+              help: 80
+              prompt: 74
+          - text:
+              help: 80
+              prompt: 74
+              text: 75
+          - goto:
+              formid: 1
+              help: 81
+              prompt: 58
+          - goto:
+              component:
+              - default:
+                  value: (0;0;ZERO_GUID;STRING_TOKEN(STR_NULL_STRING))
+              flags: INTERACTIVE
+              help: 69
+              key: 4680
+              prompt: 67
+              varid: MyIfrNVData.RefData
+          - goto:
+              flags: INTERACTIVE
+              help: 70
+              key: 4681
+              prompt: 68
+          formid: 2
+          title: 22
+      expression: ideqval MyIfrNVData.BootOrderLarge == 0
   - form:
       component:
       - suppressif:
-          condition: suppressif ideqval MyEfiVar.Field8 == 111
-      - text:
-          condition: suppressif ideqval MyEfiVar.Field8 == 111
-          help: 80
-          prompt: 74
+          component:
+          - text:
+              help: 80
+              prompt: 74
+          expression: ideqval MyEfiVar.Field8 == 111
       - goto:
           formid: 1
           help: 81
@@ -665,16 +649,15 @@ formset:
           step: 0
           varid: MyIfrNVData.DynamicRefresh
       - grayoutif:
-          condition: grayoutif match2 (stringref(STRING_TOKEN(STR_PATTERN)), stringref(STRING_TOKEN(STR_STRING)),
+          component:
+          - numeric:
+              help: 174
+              maximum: 243
+              minimum: 0
+              prompt: 173
+              varid: MyIfrNVData.Match2
+          expression: match2 (stringref(STRING_TOKEN(STR_PATTERN)), stringref(STRING_TOKEN(STR_STRING)),
             PERL_GUID)
-      - numeric:
-          condition: grayoutif match2 (stringref(STRING_TOKEN(STR_PATTERN)), stringref(STRING_TOKEN(STR_STRING)),
-            PERL_GUID)
-          help: 174
-          maximum: 243
-          minimum: 0
-          prompt: 173
-          varid: MyIfrNVData.Match2
       - label:
           number: 8756
       - label:
@@ -718,60 +701,58 @@ formset:
           prompt: 151
           varid: MyIfrNVData.SerialPortNo
       - grayoutif:
-          condition: grayoutif TRUE
-      - checkbox:
-          condition: grayoutif TRUE
-          help: 48
-          prompt: 157
-          varid: MyIfrNVData.SerialPortStatus
-      - grayoutif:
-          condition: grayoutif TRUE
-      - suppressif:
-          condition: grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus
-            == 0
-      - oneof:
           component:
-          - option:
-              flags: DEFAULT
-              text: 160
-              value: 1016
-          - option:
-              flags: 0
-              text: 161
-              value: 760
-          - option:
-              flags: 0
-              text: 162
-              value: 1000
-          - option:
-              flags: 0
-              text: 163
-              value: 744
-          condition: grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus
-            == 0
-          help: 38
-          prompt: 158
-          varid: MyIfrNVData.SerialPortIo
+          - checkbox:
+              help: 48
+              prompt: 157
+              varid: MyIfrNVData.SerialPortStatus
+          expression: 'TRUE'
       - grayoutif:
-          condition: grayoutif TRUE
-      - suppressif:
-          condition: grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus
-            == 0
-      - oneof:
           component:
-          - option:
-              flags: DEFAULT
-              text: 164
-              value: 4
-          - option:
-              flags: 0
-              text: 165
-              value: 3
-          condition: grayoutif TRUE | suppressif ideqval MyIfrNVData.SerialPortStatus
-            == 0
-          help: 38
-          prompt: 159
-          varid: MyIfrNVData.SerialPortIrq
+          - suppressif:
+              component:
+              - oneof:
+                  component:
+                  - option:
+                      flags: DEFAULT
+                      text: 160
+                      value: 1016
+                  - option:
+                      flags: 0
+                      text: 161
+                      value: 760
+                  - option:
+                      flags: 0
+                      text: 162
+                      value: 1000
+                  - option:
+                      flags: 0
+                      text: 163
+                      value: 744
+                  help: 38
+                  prompt: 158
+                  varid: MyIfrNVData.SerialPortIo
+              expression: ideqval MyIfrNVData.SerialPortStatus == 0
+          expression: 'TRUE'
+      - grayoutif:
+          component:
+          - suppressif:
+              component:
+              - oneof:
+                  component:
+                  - option:
+                      flags: DEFAULT
+                      text: 164
+                      value: 4
+                  - option:
+                      flags: 0
+                      text: 165
+                      value: 3
+                  help: 38
+                  prompt: 159
+                  varid: MyIfrNVData.SerialPortIrq
+              expression: ideqval MyIfrNVData.SerialPortStatus == 0
+          expression: 'TRUE'
       - goto:
           formid: 1
           help: 81
@@ -896,21 +877,22 @@ formset:
           prompt: 132
           varid: MyEfiBitVar.EfiBitCheckbox
       - grayoutif:
-          condition: grayoutif ideqval MyEfiBitVar.EfiBitGrayoutTest == 0
-      - numeric:
           component:
-          - default:
-              defaultstore: MyStandardDefault
-              value: 4
-          - default:
-              defaultstore: MyManufactureDefault
-              value: 5
-          help: 137
-          maximum: 7
-          minimum: 0
-          prompt: 136
-          step: 0
-          varid: MyEfiBitVar.EfiBitNumeric
+          - numeric:
+              component:
+              - default:
+                  defaultstore: MyStandardDefault
+                  value: 4
+              - default:
+                  defaultstore: MyManufactureDefault
+                  value: 5
+              help: 137
+              maximum: 7
+              minimum: 0
+              prompt: 136
+              step: 0
+              varid: MyEfiBitVar.EfiBitNumeric
+          expression: ideqval MyEfiBitVar.EfiBitGrayoutTest == 0
       - oneof:
           component:
           - option:
@@ -1036,7 +1018,7 @@ formset:
             data.EfiBitOneof: 1
           guid: *id002
       - disableif:
-          condition: None
+          expression: None
       formid: 7
       title: 115
   guid: *id002
