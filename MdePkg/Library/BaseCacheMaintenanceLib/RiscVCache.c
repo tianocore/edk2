@@ -1,7 +1,8 @@
 /** @file
-  RISC-V specific functionality for cache.
+  Implement Risc-V Cache Management Operations
 
   Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2023, Rivos Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -10,13 +11,21 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 
+#define RV64_CACHE_BLOCK_SIZE  64
+
+typedef enum {
+  Clean,
+  Flush,
+  Invld,
+} CACHE_OP;
+
 /**
   RISC-V invalidate instruction cache.
 
 **/
 VOID
 EFIAPI
-RiscVInvalidateInstCacheAsm (
+RiscVInvalidateInstCacheAsm_Fence (
   VOID
   );
 
@@ -26,13 +35,138 @@ RiscVInvalidateInstCacheAsm (
 **/
 VOID
 EFIAPI
-RiscVInvalidateDataCacheAsm (
+RiscVInvalidateDataCacheAsm_Fence (
   VOID
   );
 
 /**
+  RISC-V flush cache block. Atomically perform a clean operation
+  followed by an invalidate operation
+
+**/
+VOID
+EFIAPI
+RiscVCpuCacheFlushAsm_Cbo (
+  UINTN
+  );
+
+/**
+Perform a write transfer to another cache or to memory if the
+data in the copy of the cache block have been modified by a store
+operation
+
+**/
+VOID
+EFIAPI
+RiscVCpuCacheCleanAsm_Cbo (
+  UINTN
+  );
+
+/**
+Deallocate the copy of the cache block
+
+**/
+VOID
+EFIAPI
+RiscVCpuCacheInvalAsm_Cbo (
+  UINTN
+  );
+
+/**
+Verify CBOs are supported by this HW
+CBCFE == Cache Block Clean and Flush instruction Enable
+CBIE == Cache Block Invalidate instruction Enable
+
+**/
+UINTN RiscvIsCbcfeEnabledAsm(VOID);
+UINTN RiscvIsCbiEnabledAsm(VOID);
+
+/**
+  Performs required opeartion on cache lines in the cache coherency domain
+  of the calling CPU. If Address is not aligned on a cache line boundary,
+  then entire cache line containing Address is operated. If Address + Length
+  is not aligned on a cache line boundary, then the entire cache line
+  containing Address + Length -1 is operated.
+
+  If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
+
+  @param  Address The base address of the cache lines to
+          invalidate. If the CPU is in a physical addressing mode,
+          then Address is a physical address. If the CPU is in a virtual
+          addressing mode, then Address is a virtual address.
+
+  @param  Length  The number of bytes to invalidate from the instruction
+          cache.
+
+  @param  Op  Type of CMO operation to be performed
+
+  @return Address.
+
+**/
+VOID *
+EFIAPI
+CacheOpCacheRange (
+  IN VOID      *Address,
+  IN UINTN     Length,
+  IN CACHE_OP  Op
+  )
+{
+  UINTN  CacheLineSize;
+  UINTN  Start;
+  UINTN  End;
+
+  if (Length == 0) {
+    return Address;
+  }
+
+  ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Address));
+
+  //
+  // Cache line size is 8 * Bits 15-08 of EBX returned from CPUID 01H
+  //
+  CacheLineSize = RV64_CACHE_BLOCK_SIZE;
+
+  Start = (UINTN)Address;
+  //
+  // Calculate the cache line alignment
+  //
+  End    = (Start + Length + (CacheLineSize - 1)) & ~(CacheLineSize - 1);
+  Start &= ~((UINTN)CacheLineSize - 1);
+
+  DEBUG (
+    (DEBUG_INFO,
+     "%a Performing Cache Management Operation %d \n", __func__, Op)
+    );
+
+  do {
+    switch (Op) {
+      case Invld:
+        RiscVCpuCacheInvalAsm_Cbo (Start);
+        break;
+      case Flush:
+        RiscVCpuCacheFlushAsm_Cbo (Start);
+        break;
+      case Clean:
+        RiscVCpuCacheCleanAsm_Cbo (Start);
+        break;
+      default:
+        DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported operation\n"));
+        break;
+    }
+
+    Start = Start + CacheLineSize;
+  } while (Start != End);
+
+  return Address;
+}
+
+
+/**
   Invalidates the entire instruction cache in cache coherency domain of the
-  calling CPU.
+  calling CPU. Risc-V does not have currently an CBO implementation which can
+  invalidate entire I-cache. Hence using Fence instruction for now. P.S. Fence
+  instruction may or may not implement full I-cache invd functionality on all
+  implementations.
 
 **/
 VOID
@@ -41,7 +175,7 @@ InvalidateInstructionCache (
   VOID
   )
 {
-  RiscVInvalidateInstCacheAsm ();
+  RiscVInvalidateInstCacheAsm_Fence ();
 }
 
 /**
@@ -76,12 +210,17 @@ InvalidateInstructionCacheRange (
   IN UINTN  Length
   )
 {
-  DEBUG (
-    (DEBUG_WARN,
-     "%a:RISC-V unsupported function.\n"
-     "Invalidating the whole instruction cache instead.\n", __func__)
-    );
-  InvalidateInstructionCache ();
+  if (RiscvIsCbiEnabledAsm() == RETURN_SUCCESS) {
+    CacheOpCacheRange (Address, Length, Invld);
+  } else {
+    DEBUG (
+      (DEBUG_WARN,
+       "%a:RISC-V unsupported function.\n"
+       "Invalidating the whole instruction cache instead.\n", __func__)
+      );
+    InvalidateInstructionCache ();
+  }
+
   return Address;
 }
 
@@ -137,7 +276,10 @@ WriteBackInvalidateDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  if (RiscvIsCbcfeEnabledAsm() == RETURN_SUCCESS)
+    CacheOpCacheRange (Address, Length, Flush);
+  else
+    DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
   return Address;
 }
 
@@ -192,7 +334,11 @@ WriteBackDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  if (RiscvIsCbcfeEnabledAsm() == RETURN_SUCCESS)
+    CacheOpCacheRange (Address, Length, Clean);
+  else
+    DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+
   return Address;
 }
 
@@ -213,7 +359,12 @@ InvalidateDataCache (
   VOID
   )
 {
-  RiscVInvalidateDataCacheAsm ();
+  DEBUG (
+  (DEBUG_WARN,
+   "%a:RISC-V unsupported function.\n"
+   "Invalidating the whole instruction cache instead.\n", __func__)
+  );
+  RiscVInvalidateDataCacheAsm_Fence ();
 }
 
 /**
@@ -250,6 +401,15 @@ InvalidateDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  if (RiscvIsCbiEnabledAsm() == RETURN_SUCCESS) {
+    CacheOpCacheRange (Address, Length, Invld);
+  } else {
+    DEBUG (
+      (DEBUG_WARN,
+       "%a:RISC-V unsupported function.\n"
+       "Invalidating the whole instruction cache instead.\n", __func__)
+      );
+    InvalidateDataCache ();
+  }
   return Address;
 }
