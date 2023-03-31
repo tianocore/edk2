@@ -192,5 +192,6 @@
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
+  MdePkg/Library/RiscVCMOCacheMaintenanceLib/RiscVCMOCacheMaintenanceLib.inf
 
 [BuildOptions]

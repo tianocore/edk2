@@ -1,0 +1,11 @@
+// /** @file
+// RiscV Cache Maintenance Library implementation.
+//
+// Copyright (c) 2023, Rivos Inc. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "instance of RiscV Cache Maintenance Library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "instance of Riscv Cache Maintenance Library."
