@@ -82,9 +82,6 @@ gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000|UINT32|0x
 
 gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile|{ 0x57, 0x72, 0xcf, 0x80, 0xab, 0x87, 0xf9, 0x47, 0xa3, 0xfe, 0xD5, 0x0B, 0x76, 0xd8, 0x95, 0x41 }|VOID*|0x00000018
 
-# Above 4G Memory
-gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory|TRUE|BOOLEAN|0x00000019
-
 # Boot Manager Key
 gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|FALSE|BOOLEAN|0x00000020
 
