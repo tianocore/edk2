@@ -157,6 +157,9 @@ NextAddress:
             ; Use CpuId instruction (CPUID.01H:EDX.SSE[bit 25] = 1) to test
             ; whether the processor supports SSE instruction.
             ;
+            ; Save EBX to MM2
+            ;
+            movd    mm2, ebx
             mov     eax, 1
             cpuid
             bt      edx, 25
@@ -169,6 +172,10 @@ NextAddress:
             bt      ecx, 19
             jnc     SseError
 %endif
+            ;
+            ; Restore EBX from MM2
+            ;
+            movd    ebx, mm2
 
             ;
             ; Set OSFXSR bit (bit #9) & OSXMMEXCPT bit (bit #10)
