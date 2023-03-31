@@ -46,6 +46,12 @@
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS = TRUE
   DEFINE NETWORK_ISCSI_ENABLE           = FALSE
 
+#
+# CMO support for RV. It depends on 2 factors. First support in compiler
+# GCC:Binutils 2.39 (GCC12.2+) is required.
+#
+  DEFINE RV_CMO_FEATURE_AVAILABLE = FALSE
+
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
 !endif
@@ -112,6 +118,9 @@
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 !endif
 
+!if $(RV_CMO_FEATURE_AVAILABLE) == TRUE
+   CacheMaintenanceLib|MdePkg/Library/RiscVCMOCacheMaintenanceLib/RiscVCMOCacheMaintenanceLib.inf
+!endif
 [LibraryClasses.common.DXE_DRIVER]
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   PciExpressLib|OvmfPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
