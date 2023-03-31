@@ -85,6 +85,10 @@
 /* Supervisor Configuration */
 #define CSR_SENVCFG  0x10a
 
+/* Defined CBO bits*/
+#define SENVCFG_CBCFE  0x40UL
+#define SENVCFG_CBIE   0x30UL
+
 /* Supervisor Trap Handling */
 #define CSR_SSCRATCH  0x140
 #define CSR_SEPC      0x141
