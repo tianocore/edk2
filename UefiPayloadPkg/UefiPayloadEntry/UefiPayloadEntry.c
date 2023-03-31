@@ -20,30 +20,6 @@ EFI_MEMORY_TYPE_INFORMATION  mDefaultMemoryTypeInformation[] = {
 };
 
 /**
-   Function to reserve memory below 4GB for EDKII Modules.
-
-   This causes the DXE to dispatch everything under 4GB and allows Operating
-   System's that require EFI_LOADED_IMAGE to be under 4GB to start.
-   e.g. Xen hypervisor used in Qubes.
-**/
-VOID
-ForceModulesBelow4G (
-  VOID
-  )
-{
-  DEBUG ((DEBUG_INFO, "Building hob to restrict memory resorces to below 4G.\n"));
-
-  //
-  // Create Memory Type Information HOB
-  //
-  BuildGuidDataHob (
-    &gEfiMemoryTypeInformationGuid,
-    mDefaultMemoryTypeInformation,
-    sizeof (mDefaultMemoryTypeInformation)
-    );
-}
-
-/**
    Callback function to build resource descriptor HOB
 
    This function build a HOB based on the memory map entry info.
@@ -472,10 +448,14 @@ _ModuleEntryPoint (
   // Build other HOBs required by DXE
   BuildGenericHob ();
 
-  // Create a HOB to make resources for EDKII modules below 4G
-  if (!FixedPcdGetBool (PcdDispatchModuleAbove4GMemory)) {
-    ForceModulesBelow4G ();
-  }
+  //
+  // Create Memory Type Information HOB
+  //
+  BuildGuidDataHob (
+    &gEfiMemoryTypeInformationGuid,
+    mDefaultMemoryTypeInformation,
+    sizeof (mDefaultMemoryTypeInformation)
+    );
 
   // Load the DXE Core
   Status = LoadDxeCore (&DxeCoreEntryPoint);
