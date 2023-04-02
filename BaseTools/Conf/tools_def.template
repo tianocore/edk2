@@ -128,8 +128,7 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 # Supported Tool Chains
 # =====================
 #   VS2015      -win32-  Requires:
-#                             Microsoft Visual Studio 2015 Professional Edition
-#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
+#                             Microsoft Visual Studio 2015 Professional Edition, Update 3
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
@@ -197,13 +196,11 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                               nasm compiler from
 #                               NASM -- http://www.nasm.us/
 #   VS2015x86   -win64-  Requires:
-#                             Microsoft Visual Studio 2015 (x86) Update 2 or above
-#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
+#                             Microsoft Visual Studio 2015 (x86) Update 3 or above
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
 #                               https://acpica.org/downloads
-# * Commented out - All versions of VS2005 use the same standard install directory
 #
 ####################################################################################
 ####################################################################################
