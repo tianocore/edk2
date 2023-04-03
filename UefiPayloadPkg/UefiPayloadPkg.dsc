@@ -377,7 +377,7 @@
 !endif
 
 [LibraryClasses.common.DXE_SMM_DRIVER]
-!if $(SMM_SUPPORT) == TRUE
+!if $(SMM_SUPPORT) == TRUE || $(VARIABLE_SUPPORT) == "SPI"
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
 
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
