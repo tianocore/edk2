@@ -36,13 +36,7 @@ SECTIONS {
     *:AutoGen.obj(.data.g*Guid)
   }
 
-  /*
-   * The alignment of the .data section should be less than or equal to the
-   * alignment of the .text section. This ensures that the relative offset
-   * between these sections is the same in the ELF and the PE/COFF versions of
-   * this binary.
-   */
-  .data ALIGN(ALIGNOF(.text)) : ALIGN(CONSTANT(MAXPAGESIZE)) {
+  .data : ALIGN(CONSTANT(MAXPAGESIZE)) {
     *(.data .data.* .gnu.linkonce.d.*)
     *(.bss .bss.*)
   }
@@ -73,6 +67,5 @@ SECTIONS {
     *(.dynstr)
     *(.hash .gnu.hash)
     *(.comment)
-    *(COMMON)
   }
 }
