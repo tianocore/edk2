@@ -9,6 +9,8 @@
 #include "CpuPageTableLibUnitTest.h"
 #include "RandomTest.h"
 
+#define MAX_ENTRY_COUNT  100
+
 UINTN                     RandomNumber = 0;
 extern IA32_PAGING_ENTRY  mValidMaskNoLeaf[6];
 extern IA32_PAGING_ENTRY  mValidMaskLeaf[6];
@@ -345,9 +347,9 @@ GenerateSingleRandomMapEntry (
   }
 
   //
-  // To have better performance, limit the size less than 10G
+  // To have better performance, limit the size less than 1G
   //
-  MapEntrys->Maps[MapsIndex].Length = Random64 (0, MIN (MaxAddress - MapEntrys->Maps[MapsIndex].LinearAddress, 10 * (UINT64)SIZE_1GB)) & AlignedTable[Random32 (0, ARRAY_SIZE (AlignedTable) -1)];
+  MapEntrys->Maps[MapsIndex].Length = Random64 (0, MIN (MaxAddress - MapEntrys->Maps[MapsIndex].LinearAddress, 2*(UINT64)SIZE_1GB)) & AlignedTable[Random32 (0, ARRAY_SIZE (AlignedTable) -1)];
 
   if ((MapsIndex != 0)  && (RandomBoolean (50))) {
     MapEntrys->Maps[MapsIndex].Attribute.Uint64 = MapEntrys->Maps[Random32 (0, (UINT32)MapsIndex-1)].Attribute.Uint64;
@@ -672,9 +674,12 @@ SingleMapEntryTest (
 
   GenerateSingleRandomMapEntry (MaxAddress, MapEntrys);
   LastMapEntry = &MapEntrys->Maps[MapsIndex];
-  Status       = PageTableParse (*PageTable, PagingMode, NULL, &MapCount);
 
-  if (MapCount != 0) {
+  MapCount = MAX_ENTRY_COUNT;
+  Map      = AllocatePages (EFI_SIZE_TO_PAGES (MAX_ENTRY_COUNT * sizeof (IA32_MAP_ENTRY)));
+  Status   = PageTableParse (*PageTable, PagingMode, Map, &MapCount);
+
+  if ((MapCount != 0) && (Status == RETURN_BUFFER_TOO_SMALL)) {
     UT_ASSERT_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
     Map = AllocatePages (EFI_SIZE_TO_PAGES (MapCount * sizeof (IA32_MAP_ENTRY)));
     ASSERT (Map != NULL);
@@ -791,9 +796,10 @@ SingleMapEntryTest (
     return TestStatus;
   }
 
-  MapCount2 = 0;
-  Status    = PageTableParse (*PageTable, PagingMode, NULL, &MapCount2);
-  if (MapCount2 != 0) {
+  MapCount2 = MAX_ENTRY_COUNT;
+  Map2      = AllocatePages (EFI_SIZE_TO_PAGES (MAX_ENTRY_COUNT * sizeof (IA32_MAP_ENTRY)));
+  Status    = PageTableParse (*PageTable, PagingMode, Map2, &MapCount2);
+  if ((MapCount2 != 0) && (Status == RETURN_BUFFER_TOO_SMALL)) {
     UT_ASSERT_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
 
     //
@@ -950,9 +956,10 @@ MultipleMapEntryTest (
       return TestStatus;
     }
 
-    InitMapCount = 0;
-    Status       = PageTableParse (PageTable, PagingMode, NULL, &InitMapCount);
-    if (InitMapCount != 0) {
+    InitMapCount = MAX_ENTRY_COUNT;
+    InitMap      = AllocatePages (EFI_SIZE_TO_PAGES (MAX_ENTRY_COUNT * sizeof (IA32_MAP_ENTRY)));
+    Status       = PageTableParse (PageTable, PagingMode, InitMap, &InitMapCount);
+    if ((InitMapCount != 0) && (Status == RETURN_BUFFER_TOO_SMALL)) {
       UT_ASSERT_EQUAL (Status, RETURN_BUFFER_TOO_SMALL);
 
       //
@@ -1022,6 +1029,7 @@ TestCaseforRandomTest (
 {
   UNIT_TEST_STATUS  Status;
   UINTN             Index;
+  UINTN             StartTimeTotal;
 
   UT_ASSERT_EQUAL (RandomSeed (NULL, 0), TRUE);
   UT_ASSERT_EQUAL (Random32 (100, 100), 100);
@@ -1044,7 +1052,10 @@ TestCaseforRandomTest (
   mRandomOption = ((CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT *)Context)->RandomOption;
   mNumberIndex  = 0;
 
+  StartTimeTotal = (UINTN)time (NULL);
+
   for (Index = 0; Index < ((CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT *)Context)->TestCount; Index++) {
+    DEBUG ((DEBUG_INFO, "  %d/%d\r", Index, ((CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT *)Context)->TestCount));
     Status = MultipleMapEntryTest (
                ((CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT *)Context)->TestRangeCount,
                ((CPU_PAGE_TABLE_LIB_RANDOM_TEST_CONTEXT *)Context)->PagingMode
@@ -1052,11 +1063,9 @@ TestCaseforRandomTest (
     if (Status != UNIT_TEST_PASSED) {
       return Status;
     }
-
-    DEBUG ((DEBUG_INFO, "."));
   }
 
-  DEBUG ((DEBUG_INFO, "\n"));
+  DEBUG ((DEBUG_INFO, "Total time: %ds\n", (UINTN)time (NULL) -  StartTimeTotal));
 
   return UNIT_TEST_PASSED;
 }
