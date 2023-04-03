@@ -49,9 +49,12 @@ jobs:
       TARGET_FMP_FAT_TEST:
         Build.Pkgs: 'FmpDevicePkg,FatPkg,UnitTestFrameworkPkg,DynamicTablesPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
-      TARGET_CRYPTO:
+      TARGET_CRYPTO_DEBUG:
         Build.Pkgs: 'CryptoPkg'
-        Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
+        Build.Targets: 'DEBUG,NOOPT'
+      TARGET_CRYPTO_RELEASE:
+        Build.Pkgs: 'CryptoPkg'
+        Build.Targets: 'RELEASE,NO-TARGET'
       TARGET_FSP:
         Build.Pkgs: 'IntelFsp2Pkg,IntelFsp2WrapperPkg'
         Build.Targets: 'DEBUG,RELEASE,NO-TARGET,NOOPT'
