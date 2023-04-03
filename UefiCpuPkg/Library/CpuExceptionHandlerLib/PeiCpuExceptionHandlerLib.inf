@@ -28,7 +28,7 @@
   Ia32/ArchInterruptDefs.h
 
 [Sources.X64]
-  X64/Xcode5ExceptionHandlerAsm.nasm
+  X64/SecPeiExceptionHandlerAsm.nasm
   X64/ArchExceptionHandler.c
   X64/ArchInterruptDefs.h
 
@@ -62,3 +62,5 @@
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
 
+[BuildOptions]
+  XCODE:*_*_X64_NASM_FLAGS = -D NO_ABSOLUTE_RELOCS_IN_TEXT
