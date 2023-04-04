@@ -10,9 +10,15 @@
 
 #include "UefiShellDebug1CommandsLib.h"
 #include <Protocol/PciRootBridgeIo.h>
+#include <Protocol/HiiDatabase.h>
 #include <Guid/Acpi.h>
 #include <Guid/Mps.h>
 #include <Guid/SmBios.h>
+#include <Guid/MemoryAttributesTable.h>
+#include <Guid/RtPropertiesTable.h>
+#include <Guid/SystemResourceTable.h>
+#include <Guid/DebugImageInfoTable.h>
+#include <Guid/ImageAuthentication.h>
 
 /**
   Make a printable character.
@@ -108,6 +114,18 @@ ShellCommandRunDmem (
   UINT64        SalTableAddress;
   UINT64        SmbiosTableAddress;
   UINT64        MpsTableAddress;
+  UINT64        DtbTableAddress;
+  UINT64        MemoryAttributesTableAddress;
+  UINT64        RtPropertiesTableAddress;
+  UINT64        SystemResourceTableAddress;
+  UINT64        DebugImageInfoTableAddress;
+  UINT64        ImageExecutionTableAddress;
+  UINT64        JsonConfigDataTableAddress;
+  UINT64        JsonCapsuleDataTableAddress;
+  UINT64        JsonCapsuleResultTableAddress;
+  UINT64        MemoryRangeCapsuleAddress;
+  UINT64        HiiDatabaseExportBufferAddress;
+  UINT64        ConformanceProfileTableAddress;
   UINTN         TableWalker;
 
   ShellStatus = SHELL_SUCCESS;
@@ -168,11 +186,23 @@ ShellCommandRunDmem (
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
         DumpHex (2, (UINTN)Address, (UINTN)Size, Address);
         if (Address == (VOID *)gST) {
-          Acpi20TableAddress = 0;
-          AcpiTableAddress   = 0;
-          SalTableAddress    = 0;
-          SmbiosTableAddress = 0;
-          MpsTableAddress    = 0;
+          Acpi20TableAddress             = 0;
+          AcpiTableAddress               = 0;
+          SalTableAddress                = 0;
+          SmbiosTableAddress             = 0;
+          MpsTableAddress                = 0;
+          DtbTableAddress                = 0;
+          MemoryAttributesTableAddress   = 0;
+          RtPropertiesTableAddress       = 0;
+          SystemResourceTableAddress     = 0;
+          DebugImageInfoTableAddress     = 0;
+          ImageExecutionTableAddress     = 0;
+          JsonConfigDataTableAddress     = 0;
+          JsonCapsuleDataTableAddress    = 0;
+          JsonCapsuleResultTableAddress  = 0;
+          MemoryRangeCapsuleAddress      = 0;
+          HiiDatabaseExportBufferAddress = 0;
+          ConformanceProfileTableAddress = 0;
           for (TableWalker = 0; TableWalker < gST->NumberOfTableEntries; TableWalker++) {
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi20TableGuid)) {
               Acpi20TableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
@@ -198,6 +228,51 @@ ShellCommandRunDmem (
               MpsTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
+
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMemoryAttributesTableGuid)) {
+              MemoryAttributesTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiRtPropertiesTableGuid)) {
+              RtPropertiesTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSystemResourceTableGuid)) {
+              SystemResourceTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiDebugImageInfoTableGuid)) {
+              DebugImageInfoTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiImageSecurityDatabaseGuid)) {
+              ImageExecutionTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonConfigDataTableGuid)) {
+              JsonConfigDataTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonCapsuleDataTableGuid)) {
+              JsonCapsuleDataTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonCapsuleResultTableGuid)) {
+              JsonCapsuleResultTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
+
+            if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiHiiDatabaseProtocolGuid)) {
+              HiiDatabaseExportBufferAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              continue;
+            }
           }
 
           ShellPrintHiiEx (
@@ -218,7 +293,19 @@ ShellCommandRunDmem (
             AcpiTableAddress,
             Acpi20TableAddress,
             MpsTableAddress,
-            SmbiosTableAddress
+            SmbiosTableAddress,
+            DtbTableAddress,
+            MemoryAttributesTableAddress,
+            RtPropertiesTableAddress,
+            SystemResourceTableAddress,
+            DebugImageInfoTableAddress,
+            ImageExecutionTableAddress,
+            JsonConfigDataTableAddress,
+            JsonCapsuleDataTableAddress,
+            JsonCapsuleResultTableAddress,
+            MemoryRangeCapsuleAddress,
+            HiiDatabaseExportBufferAddress,
+            ConformanceProfileTableAddress
             );
         }
       } else {
