@@ -71,11 +71,11 @@ gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter|0|UINT64|0x10000004
 gUefiPayloadPkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1c, 0x4f, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }|VOID*|0x10000005
 
 ## Used to help reduce fragmentation in the EFI memory map
-gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x08|UINT32|0x10000012
+gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x19|UINT32|0x10000012
 gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x04|UINT32|0x10000013
-gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x04|UINT32|0x00000014
-gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0xC0|UINT32|0x00000015
-gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x80|UINT32|0x00000016
+gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x08|UINT32|0x00000014
+gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x100|UINT32|0x00000015
+gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x100|UINT32|0x00000016
 
 # Size of the region used by UEFI in permanent memory
 gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000|UINT32|0x00000017
