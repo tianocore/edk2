@@ -64,6 +64,10 @@ PageAttributeToGcdAttribute (
   }
 
   // Determine protection attributes
+  if ((PageAttributes & TT_AF) == 0) {
+    GcdAttributes |= EFI_MEMORY_RP;
+  }
+
   if (((PageAttributes & TT_AP_MASK) == TT_AP_NO_RO) ||
       ((PageAttributes & TT_AP_MASK) == TT_AP_RO_RO))
   {
@@ -77,6 +81,23 @@ PageAttributeToGcdAttribute (
   }
 
   return GcdAttributes;
+}
+
+/**
+  Convert an arch specific set of page attributes into a mask
+  of EFI_MEMORY_xx constants.
+
+  @param  PageAttributes  The set of page attributes.
+
+  @retval The mask of EFI_MEMORY_xx constants.
+
+**/
+UINT64
+RegionAttributeToGcdAttribute (
+  IN UINTN  PageAttributes
+  )
+{
+  return PageAttributeToGcdAttribute (PageAttributes);
 }
 
 STATIC
@@ -301,7 +322,9 @@ EfiAttributeToArmAttribute (
   }
 
   // Set the access flag to match the block attributes
-  ArmAttributes |= TT_AF;
+  if ((EfiAttributes & EFI_MEMORY_RP) == 0) {
+    ArmAttributes |= TT_AF;
+  }
 
   // Determine protection attributes
   if ((EfiAttributes & EFI_MEMORY_RO) != 0) {

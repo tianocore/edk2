@@ -1,9 +1,10 @@
 /** @file
 
-  The implementation of EFI Redfidh Discover Protocol.
+  The implementation of EFI Redfish Discover Protocol.
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -270,10 +271,13 @@ Tcp6GetSubnetInfo (
 
   if (IpModedata.AddressCount == 0) {
     DEBUG ((DEBUG_INFO, "%a: No IPv6 address configured.\n", __FUNCTION__));
+    Instance->SubnetAddrInfoIPv6Number = 0;
+    return EFI_SUCCESS;
   }
 
   if (Instance->SubnetAddrInfoIPv6 != NULL) {
     FreePool (Instance->SubnetAddrInfoIPv6);
+    Instance->SubnetAddrInfoIPv6 = NULL;
   }
 
   Instance->SubnetAddrInfoIPv6 = AllocateZeroPool (IpModedata.AddressCount * sizeof (EFI_IP6_ADDRESS_INFO));
@@ -447,7 +451,7 @@ NumberOfNetworkInterface (
 
 /**
   This function checks the  IP version supported on this
-  netwoek interface.
+  network interface.
 
   @param[in]    ThisNetworkInterface   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL
 
@@ -472,7 +476,7 @@ CheckIsIpVersion6 (
   @param[in]    Instance     EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE
 
   @retval EFI_SUCCESS        Redfish service is discovered through SMBIOS Host interface.
-  @retval Others             Fail to discover Redfish service throught SMBIOS host interface
+  @retval Others             Fail to discover Redfish service through SMBIOS host interface
 
 **/
 EFI_STATUS
@@ -487,7 +491,7 @@ DiscoverRedfishHostInterface (
   CHAR16                         Ipv6Str[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff" + 1];
   CHAR8                          RedfishServiceLocateStr[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff" + 1];
   UINTN                          StrSize;
-  UINTN                          MacCompareStstus;
+  UINTN                          MacCompareStatus;
   BOOLEAN                        IsHttps;
 
   Data             = NULL;
@@ -503,24 +507,52 @@ DiscoverRedfishHostInterface (
   Status = RedfishGetHostInterfaceProtocolData (mSmbios, &DeviceDescriptor, &Data); // Search for SMBIOS type 42h
   if (!EFI_ERROR (Status) && (Data != NULL) && (DeviceDescriptor != NULL)) {
     //
-    // Chceck if we can reach out Redfish service using this network interface.
-    // Check with MAC address using Device Descroptor Data Device Type 04 and Type 05.
+    // Check if we can reach out Redfish service using this network interface.
+    // Check with MAC address using Device Descriptor Data Device Type 04 and Type 05.
     // Those two types of Redfish host interface device has MAC information.
     //
     if (DeviceDescriptor->DeviceType == REDFISH_HOST_INTERFACE_DEVICE_TYPE_PCI_PCIE_V2) {
-      MacCompareStstus = CompareMem (&Instance->NetworkInterface->MacAddress, &DeviceDescriptor->DeviceDescriptor.PciPcieDeviceV2.MacAddress, 6);
+      MacCompareStatus = CompareMem (&Instance->NetworkInterface->MacAddress, &DeviceDescriptor->DeviceDescriptor.PciPcieDeviceV2.MacAddress, 6);
     } else if (DeviceDescriptor->DeviceType == REDFISH_HOST_INTERFACE_DEVICE_TYPE_USB_V2) {
-      MacCompareStstus = CompareMem (&Instance->NetworkInterface->MacAddress, &DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress, 6);
+      MacCompareStatus = CompareMem (&Instance->NetworkInterface->MacAddress, &DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress, 6);
     } else {
       return EFI_UNSUPPORTED;
     }
 
-    if (MacCompareStstus != 0) {
+    if (MacCompareStatus != 0) {
       return EFI_UNSUPPORTED;
     }
 
-    if (Data->RedfishServiceIpAddressFormat == 1) {
+    Instance->HostAddrFormat = Data->HostIpAddressFormat;
+    if (Data->HostIpAddressFormat == REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_IP4) {
+      IP4_COPY_ADDRESS ((VOID *)&Instance->HostIpAddress.v4, (VOID *)Data->HostIpAddress);
+      IP4_COPY_ADDRESS ((VOID *)&Instance->HostSubnetMask.v4, (VOID *)Data->HostIpMask);
+
+      if (EFI_IP4_EQUAL (&Instance->HostIpAddress.v4, &mZeroIp4Addr)) {
+        DEBUG ((DEBUG_ERROR, "%a: invalid host IP address: zero address\n", __FUNCTION__));
+        //
+        // Invalid IP address detected. Change address format to Unknown and use system default address.
+        //
+        Instance->HostAddrFormat = REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_UNKNOWN;
+      }
+
+      if (!IP4_IS_VALID_NETMASK (EFI_IP4 (Instance->HostSubnetMask.v4))) {
+        DEBUG ((DEBUG_ERROR, "%a: invalid subnet mask address\n", __FUNCTION__));
+        //
+        // Invalid subnet mast address detected. Change address format to Unknown and use system default address.
+        //
+        Instance->HostAddrFormat = REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_UNKNOWN;
+      }
+    } else if (Data->HostIpAddressFormat == REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_IP6) {
+      IP6_COPY_ADDRESS ((VOID *)&Instance->HostIpAddress.v6, (VOID *)Data->HostIpAddress);
+    }
+
+    if (Data->RedfishServiceIpAddressFormat == REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_IP4) {
       IP4_COPY_ADDRESS ((VOID *)&Instance->TargetIpAddress.v4, (VOID *)Data->RedfishServiceIpAddress);
+
+      if (EFI_IP4_EQUAL (&Instance->TargetIpAddress.v4, &mZeroIp4Addr)) {
+        DEBUG ((DEBUG_ERROR, "%a: invalid service IP address: zero address\n", __FUNCTION__));
+      }
     } else {
       IP6_COPY_ADDRESS ((VOID *)&Instance->TargetIpAddress.v6, (VOID *)Data->RedfishServiceIpAddress);
     }
@@ -530,7 +562,7 @@ DiscoverRedfishHostInterface (
       Status = EFI_UNSUPPORTED;
     } else {
       //
-      // Add this istance to list without detial information of Redfish
+      // Add this instance to list without detail information of Redfish
       // service.
       //
       IsHttps = FALSE;
@@ -614,7 +646,7 @@ DiscoverRedfishHostInterface (
   @param[in]  Os                    OS string.
   @param[in]  OsVer                 OS version string.
   @param[in]  Product               Product string.
-  @param[in]  ProductVer            Product verison string.
+  @param[in]  ProductVer            Product version string.
   @param[in]  UseHttps              Redfish service requires secured connection.
   @retval EFI_SUCCESS               Redfish service is added to list successfully.
 
@@ -671,7 +703,7 @@ AddAndSignalNewRedfishService (
     do {
       if ((Char16Uuid == NULL) || (DiscoveredList->Instance->Information.Uuid == NULL)) {
         //
-        // Check if this Redfish instance already found using IP addrress.
+        // Check if this Redfish instance already found using IP address.
         //
         if (!CheckIsIpVersion6 (NetworkInterface)) {
           if (CompareMem (
@@ -849,6 +881,10 @@ AddAndSignalNewRedfishService (
           Status = EFI_OUT_OF_RESOURCES;
           goto EXIT_FREE_CONFIG_DATA;
         }
+
+        if (Instance->HostAddrFormat == REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_IP6) {
+          IP6_COPY_ADDRESS (&RestExHttpConfigData->HttpConfigData.AccessPoint.IPv6Node->LocalAddress, &Instance->HostIpAddress.v6);
+        }
       } else {
         RestExHttpConfigData->HttpConfigData.AccessPoint.IPv4Node = AllocateZeroPool (sizeof (EFI_HTTPv4_ACCESS_POINT));
         if (RestExHttpConfigData->HttpConfigData.AccessPoint.IPv4Node == NULL) {
@@ -856,7 +892,13 @@ AddAndSignalNewRedfishService (
           goto EXIT_FREE_CONFIG_DATA;
         }
 
-        RestExHttpConfigData->HttpConfigData.AccessPoint.IPv4Node->UseDefaultAddress = TRUE;
+        if (Instance->HostAddrFormat == REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_IP4) {
+          RestExHttpConfigData->HttpConfigData.AccessPoint.IPv4Node->UseDefaultAddress = FALSE;
+          IP4_COPY_ADDRESS (&RestExHttpConfigData->HttpConfigData.AccessPoint.IPv4Node->LocalAddress, &Instance->HostIpAddress.v4);
+          IP4_COPY_ADDRESS (&RestExHttpConfigData->HttpConfigData.AccessPoint.IPv4Node->LocalSubnet, &Instance->HostSubnetMask.v4);
+        } else {
+          RestExHttpConfigData->HttpConfigData.AccessPoint.IPv4Node->UseDefaultAddress = TRUE;
+        }
       }
 
       Status = RestEx->Configure (
@@ -955,7 +997,7 @@ NetworkInterfaceGetSubnetInfo (
                                                Instance
                                                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a:Faile to get Subnet infomation.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a:Failed to get Subnet infomation.\n", __FUNCTION__));
       return Status;
     } else {
       DEBUG ((DEBUG_INFO, "%a:MAC address: %s\n", __FUNCTION__, Instance->StrMacAddr));
@@ -982,7 +1024,7 @@ NetworkInterfaceGetSubnetInfo (
         ThisSubnetAddrInfoIPv6++;
         for (IPv6InfoIndex = 0; IPv6InfoIndex < Instance->SubnetAddrInfoIPv6Number - 1; IPv6InfoIndex++) {
           //
-          // Build up addtional EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL instances.
+          // Build up additional EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL instances.
           //
           NewNetworkInterface = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)AllocateZeroPool (sizeof (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL));
           if (NewNetworkInterface != NULL) {
@@ -1103,9 +1145,9 @@ RedfishServiceGetNetworkInterface (
 /**
   This function acquires Redfish services by discovering static Redfish setting
   according to Redfish Host Interface or through SSDP. Returns a list of EFI
-  handles in EFI_REDFISH_DISCOVERED_LIST. Each of EFI handle has cooresponding
-  EFI REST EX instance installed on it. Each REST EX isntance is a child instance which
-  created through EFI REST EX serivce protoocl for communicating with specific
+  handles in EFI_REDFISH_DISCOVERED_LIST. Each of EFI handle has corresponding
+  EFI REST EX instance installed on it. Each REST EX instance is a child instance which
+  created through EFI REST EX service protocol for communicating with specific
   Redfish service.
 
   @param[in]    This                    EFI_REDFISH_DISCOVER_PROTOCOL instance.
@@ -1255,7 +1297,7 @@ RedfishServiceAbortAcquire (
   )
 {
   // This function is used to abort Redfish service discovery through SSDP
-  // on the network interface. SSDP is optionally supprted by EFI_REDFISH_DISCOVER_PROTOCOL,
+  // on the network interface. SSDP is optionally suppoted by EFI_REDFISH_DISCOVER_PROTOCOL,
   // we dont have implementation for SSDP now.
 
   return EFI_UNSUPPORTED;
@@ -1425,7 +1467,7 @@ CreateRedfishDiscoverNetworkInterface (
 }
 
 /**
-  This function destory network interface
+  This function destroy network interface
 
 
   @param[in]  ThisNetworkInterface EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL instance.
@@ -1433,7 +1475,7 @@ CreateRedfishDiscoverNetworkInterface (
   @retval EFI_STATUS
 **/
 EFI_STATUS
-DestroyRedfishNetwrokInterface (
+DestroyRedfishNetworkInterface (
   IN EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *ThisNetworkInterface
   )
 {
@@ -1467,11 +1509,13 @@ TestForRequiredProtocols (
   IN EFI_HANDLE                   ControllerHandle
   )
 {
-  UINT32      Id;
+  UINT32      *Id;
   UINTN       Index;
   EFI_STATUS  Status;
+  UINTN       ListCount;
 
-  for (Index = 0; Index < (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL)); Index++) {
+  ListCount = (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL));
+  for (Index = 0; Index < ListCount; Index++) {
     Status = gBS->OpenProtocol (
                     ControllerHandle,
                     gRequiredProtocol[Index].RequiredServiceBindingProtocolGuid,
@@ -1490,8 +1534,10 @@ TestForRequiredProtocols (
                       EFI_OPEN_PROTOCOL_GET_PROTOCOL
                       );
       if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "%a: %s is found on this controller handle.\n", __FUNCTION__, gRequiredProtocol[Index].ProtocolName));
-        return EFI_SUCCESS;
+        if (Index == ListCount - 1) {
+          DEBUG ((DEBUG_ERROR, "%a: all required protocols are found on this controller handle: %p.\n", __FUNCTION__, ControllerHandle));
+          return EFI_SUCCESS;
+        }
       }
     }
   }
@@ -1517,7 +1563,7 @@ BuildupNetworkInterface (
   IN EFI_HANDLE                   ControllerHandle
   )
 {
-  UINT32                                           Id;
+  UINT32                                           *Id;
   UINT32                                           Index;
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *NetworkInterface;
   BOOLEAN                                          IsNew;
@@ -1578,13 +1624,11 @@ BuildupNetworkInterface (
         return Status;
       }
 
-      NetworkInterface->NetworkProtocolType                       = gRequiredProtocol[Index].ProtocolType;
-      NetworkInterface->OpenDriverAgentHandle                     = This->DriverBindingHandle;
-      NetworkInterface->OpenDriverControllerHandle                = ControllerHandle;
-      NetworkInterface->NetworkInterfaceProtocolInfo.ProtocolGuid = \
-        *gRequiredProtocol[Index].RequiredProtocolGuid;
-      NetworkInterface->NetworkInterfaceProtocolInfo.ProtocolServiceGuid = \
-        *gRequiredProtocol[Index].RequiredServiceBindingProtocolGuid;
+      NetworkInterface->NetworkProtocolType        = gRequiredProtocol[Index].ProtocolType;
+      NetworkInterface->OpenDriverAgentHandle      = This->DriverBindingHandle;
+      NetworkInterface->OpenDriverControllerHandle = ControllerHandle;
+      CopyGuid (&NetworkInterface->NetworkInterfaceProtocolInfo.ProtocolGuid, gRequiredProtocol[Index].RequiredProtocolGuid);
+      CopyGuid (&NetworkInterface->NetworkInterfaceProtocolInfo.ProtocolServiceGuid, gRequiredProtocol[Index].RequiredServiceBindingProtocolGuid);
       ProtocolDiscoverIdPtr        = &NetworkInterface->NetworkInterfaceProtocolInfo.ProtocolDiscoverId;
       OpenDriverAgentHandle        = NetworkInterface->OpenDriverAgentHandle;
       OpenDriverControllerHandle   = NetworkInterface->OpenDriverControllerHandle;
@@ -1598,7 +1642,7 @@ BuildupNetworkInterface (
 
       gBS->RestoreTPL (OldTpl);
     } else {
-      // Record REST_EX instance. REST_EX is created when clinet asks for Redfish service discovery.
+      // Record REST_EX instance. REST_EX is created when client asks for Redfish service discovery.
       // Redfish Service Discover protocol will match REST EX to the corresponding EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL
       // when discovery.
 
@@ -1655,9 +1699,9 @@ BuildupNetworkInterface (
                       );
       if (!EFI_ERROR (Status)) {
         if ((gRequiredProtocol[Index].ProtocolType == ProtocolTypeRestEx)) {
-          // Install Redfish Discover Protocol when EFI REST EX protcol is discovered.
+          // Install Redfish Discover Protocol when EFI REST EX protocol is discovered.
           // This ensures EFI REST EX is ready while the consumer of EFI_REDFISH_DISCOVER_PROTOCOL
-          // acquires Redfish serivce over network interface.
+          // acquires Redfish service over network interface.
 
           if (!NewNetworkInterfaceInstalled) {
             NetworkInterface = GetTargetNetworkInterfaceInternalByController (ControllerHandle);
@@ -1678,6 +1722,14 @@ BuildupNetworkInterface (
           if (EFI_ERROR (Status)) {
             DEBUG ((DEBUG_ERROR, "%a: Fail to install EFI_REDFISH_DISCOVER_PROTOCOL\n", __FUNCTION__));
           }
+        } else {
+          DEBUG ((DEBUG_INFO, "%a: Not REST EX, continue with next\n", __FUNCTION__));
+          Index++;
+          if (Index == (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL))) {
+            break;
+          }
+
+          continue;
         }
       }
 
@@ -1692,11 +1744,11 @@ BuildupNetworkInterface (
     }
   } while (Index < (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL)));
 
-  return EFI_UNSUPPORTED;
+  return EFI_DEVICE_ERROR;
 }
 
 /**
-  Close the protocol opened for Redfish discovery. This function also destories
+  Close the protocol opened for Redfish discovery. This function also destroy
   the network services.
 
   @param[in]  ThisBindingProtocol     A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
@@ -1707,8 +1759,8 @@ BuildupNetworkInterface (
   @param[in]  DriverAgentHandle      Driver agent handle which used to open protocol earlier.
   @param[in]  DriverControllerHandle Driver controller handle which used to open protocol earlier.
 
-  @retval EFI_SUCCESS                Prorocol is closed successfully.
-  @retval Others                     Prorocol is closed unsuccessfully.
+  @retval EFI_SUCCESS                Protocol is closed successfully.
+  @retval Others                     Protocol is closed unsuccessfully.
 
 **/
 EFI_STATUS
@@ -1748,7 +1800,7 @@ CloseProtocolService (
                                    must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
   @retval EFI_SUCCESS              One of required protocol is found.
-  @retval Others                   Faile to stop the services on network interface.
+  @retval Others                   Failed to stop the services on network interface.
 **/
 EFI_STATUS
 StopServiceOnNetworkInterface (
@@ -1792,14 +1844,14 @@ StopServiceOnNetworkInterface (
                        ThisNetworkInterface->OpenDriverControllerHandle
                        );
             if (!EFI_ERROR (Status)) {
-              Status = DestroyRedfishNetwrokInterface (ThisNetworkInterface);
+              Status = DestroyRedfishNetworkInterface (ThisNetworkInterface);
             }
 
             gBS->RestoreTPL (OldTpl);
 
             //
             // Disconnect EFI Redfish discover driver controller to notify the
-            // clinet which uses .EFI Redfish discover protocol.
+            // client which uses .EFI Redfish discover protocol.
             //
             if (DiscoverProtocolHandle != NULL) {
               gBS->DisconnectController (DiscoverProtocolHandle, NULL, NULL);
@@ -1945,7 +1997,7 @@ RedfishDiscoverDriverBindingSupported (
   @retval EFI_SUCCESS              The device was started.
   @retval EFI_DEVICE_ERROR         The device could not be started due to a device error.Currently not implemented.
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
-  @retval Others                   The driver failded to start the device.
+  @retval Others                   The driver failed to start the device.
 
 **/
 EFI_STATUS
@@ -2030,7 +2082,7 @@ RedfishDiscoverEntryPoint (
   InitializeListHead (&mEfiRedfishDiscoverNetworkInterface);
   InitializeListHead (&mEfiRedfishDiscoverRestExInstance);
   //
-  // Install binding protoocl to obtain UDP and REST EX protocol.
+  // Install binding protocol to obtain UDP and REST EX protocol.
   //
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,

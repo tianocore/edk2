@@ -1608,9 +1608,7 @@ ParseAndAddExistingSmbiosTable (
     //
     // Make sure not to access memory beyond SmbiosEnd
     //
-    if ((Smbios.Raw + sizeof (SMBIOS_STRUCTURE) > SmbiosEnd.Raw) ||
-        (Smbios.Raw + sizeof (SMBIOS_STRUCTURE) < Smbios.Raw))
-    {
+    if ((UINTN)(SmbiosEnd.Raw - Smbios.Raw) < sizeof (SMBIOS_STRUCTURE)) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -1625,9 +1623,7 @@ ParseAndAddExistingSmbiosTable (
     // Make sure not to access memory beyond SmbiosEnd
     // Each structure shall be terminated by a double-null (0000h).
     //
-    if ((Smbios.Raw + Smbios.Hdr->Length + 2 * sizeof (UINT8) > SmbiosEnd.Raw) ||
-        (Smbios.Raw + Smbios.Hdr->Length + 2 * sizeof (UINT8) < Smbios.Raw))
-    {
+    if ((UINTN)(SmbiosEnd.Raw - Smbios.Raw) < (Smbios.Hdr->Length + 2U)) {
       return EFI_INVALID_PARAMETER;
     }
 

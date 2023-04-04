@@ -1,7 +1,7 @@
 /** @file
   This library implements CpuPageTableLib that are generic for IA32 family CPU.
 
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -26,7 +26,7 @@ PageTableLibSetPte4K (
   IN IA32_MAP_ATTRIBUTE  *Mask
   )
 {
-  if (Mask->Bits.PageTableBaseAddress) {
+  if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
     Pte4K->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (Pte4K->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_40);
   }
 
@@ -93,7 +93,7 @@ PageTableLibSetPleB (
   IN IA32_MAP_ATTRIBUTE                 *Mask
   )
 {
-  if (Mask->Bits.PageTableBaseAddress) {
+  if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
     PleB->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (PleB->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_39);
   }
 
@@ -202,7 +202,8 @@ PageTableLibSetPnle (
     Pnle->Bits.Nx = Attribute->Bits.Nx;
   }
 
-  Pnle->Bits.Accessed = 0;
+  Pnle->Bits.Accessed   = 0;
+  Pnle->Bits.MustBeZero = 0;
 
   //
   // Set the attributes (WT, CD, A) to 0.
@@ -212,6 +213,44 @@ PageTableLibSetPnle (
   //
   Pnle->Bits.WriteThrough  = 0;
   Pnle->Bits.CacheDisabled = 0;
+}
+
+/**
+  Check if the combination for Attribute and Mask is valid for non-present entry.
+  1.Mask.Present is 0 but some other attributes is provided. This case should be invalid.
+  2.Map non-present range to present. In this case, all attributes should be provided.
+
+  @param[in] Attribute    The attribute of the linear address range.
+  @param[in] Mask         The mask used for attribute to check.
+
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 1 but some other attributes are not provided.
+  @retval RETURN_SUCCESS            The combination for Attribute and Mask is valid.
+**/
+RETURN_STATUS
+IsAttributesAndMaskValidForNonPresentEntry (
+  IN     IA32_MAP_ATTRIBUTE  *Attribute,
+  IN     IA32_MAP_ATTRIBUTE  *Mask
+  )
+{
+  if ((Mask->Bits.Present == 1) && (Attribute->Bits.Present == 1)) {
+    //
+    // Creating new page table or remapping non-present range to present.
+    //
+    if ((Mask->Bits.ReadWrite == 0) || (Mask->Bits.UserSupervisor == 0) || (Mask->Bits.WriteThrough == 0) || (Mask->Bits.CacheDisabled == 0) ||
+        (Mask->Bits.Accessed == 0) || (Mask->Bits.Dirty == 0) || (Mask->Bits.Pat == 0) || (Mask->Bits.Global == 0) ||
+        ((Mask->Bits.PageTableBaseAddressLow == 0) && (Mask->Bits.PageTableBaseAddressHigh == 0)) || (Mask->Bits.ProtectionKey == 0) || (Mask->Bits.Nx == 0))
+    {
+      return RETURN_INVALID_PARAMETER;
+    }
+  } else if ((Mask->Bits.Present == 0) && (Mask->Uint64 > 1)) {
+    //
+    // Only change other attributes for non-present range is not permitted.
+    //
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -235,7 +274,10 @@ PageTableLibSetPnle (
                                     Page table entries that map the linear address range are reset to 0 before set to the new attribute
                                     when a new physical base address is set.
   @param[in]      Mask              The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
+  @param[out]     IsModified        TRUE means page table is modified. FALSE means page table is not modified.
 
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 1 but some other attributes are not provided.
   @retval RETURN_SUCCESS            PageTable is created/updated successfully.
 **/
 RETURN_STATUS
@@ -251,13 +293,16 @@ PageTableLibMapInLevel (
   IN     UINT64              Length,
   IN     UINT64              Offset,
   IN     IA32_MAP_ATTRIBUTE  *Attribute,
-  IN     IA32_MAP_ATTRIBUTE  *Mask
+  IN     IA32_MAP_ATTRIBUTE  *Mask,
+  OUT    BOOLEAN             *IsModified
   )
 {
   RETURN_STATUS       Status;
   UINTN               BitStart;
   UINTN               Index;
   IA32_PAGING_ENTRY   *PagingEntry;
+  UINTN               PagingEntryIndex;
+  UINTN               PagingEntryIndexEnd;
   IA32_PAGING_ENTRY   *CurrentPagingEntry;
   UINT64              RegionLength;
   UINT64              SubLength;
@@ -273,6 +318,10 @@ PageTableLibMapInLevel (
   IA32_MAP_ATTRIBUTE  ChildMask;
   IA32_MAP_ATTRIBUTE  CurrentMask;
   IA32_MAP_ATTRIBUTE  LocalParentAttribute;
+  UINT64              PhysicalAddrInEntry;
+  UINT64              PhysicalAddrInAttr;
+  IA32_PAGING_ENTRY   OriginalParentPagingEntry;
+  IA32_PAGING_ENTRY   OriginalCurrentPagingEntry;
 
   ASSERT (Level != 0);
   ASSERT ((Attribute != NULL) && (Mask != NULL));
@@ -288,79 +337,117 @@ PageTableLibMapInLevel (
   LocalParentAttribute.Uint64 = ParentAttribute->Uint64;
   ParentAttribute             = &LocalParentAttribute;
 
+  OriginalParentPagingEntry.Uint64 = ParentPagingEntry->Uint64;
+
+  //
+  // RegionLength: 256T (1 << 48) 512G (1 << 39), 1G (1 << 30), 2M (1 << 21) or 4K (1 << 12).
+  //
+  BitStart         = 12 + (Level - 1) * 9;
+  PagingEntryIndex = (UINTN)BitFieldRead64 (LinearAddress + Offset, BitStart, BitStart + 9 - 1);
+  RegionLength     = REGION_LENGTH (Level);
+  RegionMask       = RegionLength - 1;
+
   //
   // ParentPagingEntry ONLY is deferenced for checking Present and MustBeOne bits
   // when Modify is FALSE.
   //
-
-  if (ParentPagingEntry->Pce.Present == 0) {
+  if ((ParentPagingEntry->Pce.Present == 0) || IsPle (ParentPagingEntry, Level + 1)) {
     //
-    // The parent entry is CR3 or PML5E/PML4E/PDPTE/PDE.
+    // When ParentPagingEntry is non-present, parent entry is CR3 or PML5E/PML4E/PDPTE/PDE.
     // It does NOT point to an existing page directory.
-    //
-    ASSERT (Buffer == NULL || *BufferSize >= SIZE_4KB);
-    CreateNew    = TRUE;
-    *BufferSize -= SIZE_4KB;
-
-    if (Modify) {
-      ParentPagingEntry->Uintn = (UINTN)Buffer + *BufferSize;
-      ZeroMem ((VOID *)ParentPagingEntry->Uintn, SIZE_4KB);
-      //
-      // Set default attribute bits for PML5E/PML4E/PDPTE/PDE.
-      //
-      PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute, &AllOneMask);
-    } else {
-      //
-      // Just make sure Present and MustBeZero (PageSize) bits are accurate.
-      //
-      OneOfPagingEntry.Pnle.Uint64 = 0;
-    }
-  } else if (IsPle (ParentPagingEntry, Level + 1)) {
-    //
-    // The parent entry is a PDPTE_1G or PDE_2M. Split to 2M or 4K pages.
+    // When ParentPagingEntry is present, parent entry is leaf PDPTE_1G or PDE_2M. Split to 2M or 4K pages.
     // Note: it's impossible the parent entry is a PTE_4K.
     //
-    //
-    // Use NOP attributes as the attribute of grand-parents because CPU will consider
-    // the actual attributes of grand-parents when determing the memory type.
-    //
     PleBAttribute.Uint64 = PageTableLibGetPleBMapAttribute (&ParentPagingEntry->PleB, ParentAttribute);
+    if (ParentPagingEntry->Pce.Present == 0) {
+      //
+      // [LinearAddress, LinearAddress + Length] contains non-present range.
+      //
+      Status = IsAttributesAndMaskValidForNonPresentEntry (Attribute, Mask);
+      if (RETURN_ERROR (Status)) {
+        return Status;
+      }
+
+      OneOfPagingEntry.Pnle.Uint64 = 0;
+    } else {
+      PageTableLibSetPle (Level, &OneOfPagingEntry, 0, &PleBAttribute, &AllOneMask);
+    }
+
+    //
+    // Check if the attribute, the physical address calculated by ParentPagingEntry is equal to
+    // the attribute, the physical address calculated by input Attribue and Mask.
+    //
     if ((IA32_MAP_ATTRIBUTE_ATTRIBUTES (&PleBAttribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask))
         == (IA32_MAP_ATTRIBUTE_ATTRIBUTES (Attribute) & IA32_MAP_ATTRIBUTE_ATTRIBUTES (Mask)))
     {
+      if ((Mask->Bits.PageTableBaseAddressLow == 0) && (Mask->Bits.PageTableBaseAddressHigh == 0)) {
+        return RETURN_SUCCESS;
+      }
+
       //
-      // This function is called when the memory length is less than the region length of the parent level.
-      // No need to split the page when the attributes equal.
+      // Non-present entry won't reach there since:
+      // 1.When map non-present entry to present, the attribute must be different.
+      // 2.When still map non-present entry to non-present, PageTableBaseAddressLow and High in Mask must be 0.
       //
-      return RETURN_SUCCESS;
+      ASSERT (ParentPagingEntry->Pce.Present == 1);
+      PhysicalAddrInEntry = IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (&PleBAttribute) + MultU64x32 (RegionLength, (UINT32)PagingEntryIndex);
+      PhysicalAddrInAttr  = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) & (~RegionMask);
+      if (PhysicalAddrInEntry == PhysicalAddrInAttr) {
+        return RETURN_SUCCESS;
+      }
     }
 
     ASSERT (Buffer == NULL || *BufferSize >= SIZE_4KB);
     CreateNew    = TRUE;
     *BufferSize -= SIZE_4KB;
-    PageTableLibSetPle (Level, &OneOfPagingEntry, 0, &PleBAttribute, &AllOneMask);
+
     if (Modify) {
-      //
-      // Create 512 child-level entries that map to 2M/4K.
-      //
-      ParentPagingEntry->Uintn = (UINTN)Buffer + *BufferSize;
-      ZeroMem ((VOID *)ParentPagingEntry->Uintn, SIZE_4KB);
+      PagingEntry = (IA32_PAGING_ENTRY *)((UINTN)Buffer + *BufferSize);
+      ZeroMem (PagingEntry, SIZE_4KB);
+
+      if (ParentPagingEntry->Pce.Present) {
+        //
+        // Create 512 child-level entries that map to 2M/4K.
+        //
+        for (SubOffset = 0, Index = 0; Index < 512; Index++) {
+          PagingEntry[Index].Uint64 = OneOfPagingEntry.Uint64 + SubOffset;
+          SubOffset                += RegionLength;
+        }
+      }
 
       //
       // Set NOP attributes
       // Note: Should NOT inherit the attributes from the original entry because a zero RW bit
       //       will make the entire region read-only even the child entries set the RW bit.
       //
+      // Non-leaf entry doesn't have PAT bit. So use ~IA32_PE_BASE_ADDRESS_MASK_40 is to make sure PAT bit
+      // (bit12) in original big-leaf entry is not assigned to PageTableBaseAddress field of non-leaf entry.
+      //
       PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute, &AllOneMask);
-
-      RegionLength = REGION_LENGTH (Level);
-      PagingEntry  = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
-      for (SubOffset = 0, Index = 0; Index < 512; Index++) {
-        PagingEntry[Index].Uint64 = OneOfPagingEntry.Uint64 + SubOffset;
-        SubOffset                += RegionLength;
-      }
+      ParentPagingEntry->Uint64 = ((UINTN)(VOID *)PagingEntry) | (ParentPagingEntry->Uint64 & (~IA32_PE_BASE_ADDRESS_MASK_40));
     }
   } else {
+    //
+    // If (LinearAddress + Length - 1) is not in the same ParentPagingEntry with (LinearAddress + Offset), then the remaining child PagingEntry
+    // starting from PagingEntryIndex of ParentPagingEntry is all covered by [LinearAddress + Offset, LinearAddress + Length - 1].
+    //
+    PagingEntryIndexEnd = (BitFieldRead64 (LinearAddress + Length - 1, BitStart + 9, 63) != BitFieldRead64 (LinearAddress + Offset, BitStart + 9, 63)) ? 511 :
+                          (UINTN)BitFieldRead64 (LinearAddress + Length - 1, BitStart, BitStart + 9 - 1);
+    PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
+    for (Index = PagingEntryIndex; Index <= PagingEntryIndexEnd; Index++) {
+      if (PagingEntry[Index].Pce.Present == 0) {
+        //
+        // [LinearAddress, LinearAddress + Length] contains non-present range.
+        //
+        Status = IsAttributesAndMaskValidForNonPresentEntry (Attribute, Mask);
+        if (RETURN_ERROR (Status)) {
+          return Status;
+        }
+
+        break;
+      }
+    }
+
     //
     // It's a non-leaf entry
     //
@@ -375,15 +462,6 @@ PageTableLibMapInLevel (
     //            we need to change PDPTE[0].ReadWrite = 1 and let all PDE[0-255].ReadWrite = 0 in this step.
     //       when PDPTE[0].Nx = 1 but caller wants to map [0-2MB] as Nx = 0 (PDT[0].Nx = 0)
     //            we need to change PDPTE[0].Nx = 0 and let all PDE[0-255].Nx = 1 in this step.
-    if ((ParentPagingEntry->Pnle.Bits.Present == 0) && (Mask->Bits.Present == 1) && (Attribute->Bits.Present == 1)) {
-      if (Modify) {
-        ParentPagingEntry->Pnle.Bits.Present = 1;
-      }
-
-      ChildAttribute.Bits.Present = 0;
-      ChildMask.Bits.Present      = 1;
-    }
-
     if ((ParentPagingEntry->Pnle.Bits.ReadWrite == 0) && (Mask->Bits.ReadWrite == 1) && (Attribute->Bits.ReadWrite == 1)) {
       if (Modify) {
         ParentPagingEntry->Pnle.Bits.ReadWrite = 1;
@@ -417,7 +495,6 @@ PageTableLibMapInLevel (
         // Update child entries to use restrictive attribute inherited from parent.
         // e.g.: Set PDE[0-255].ReadWrite = 0
         //
-        PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&ParentPagingEntry->Pnle);
         for (Index = 0; Index < 512; Index++) {
           if (PagingEntry[Index].Pce.Present == 0) {
             continue;
@@ -434,15 +511,10 @@ PageTableLibMapInLevel (
   }
 
   //
-  // RegionLength: 256T (1 << 48) 512G (1 << 39), 1G (1 << 30), 2M (1 << 21) or 4K (1 << 12).
   // RegionStart:  points to the linear address that's aligned on RegionLength and lower than (LinearAddress + Offset).
   //
-  BitStart     = 12 + (Level - 1) * 9;
-  Index        = (UINTN)BitFieldRead64 (LinearAddress + Offset, BitStart, BitStart + 9 - 1);
-  RegionLength = LShiftU64 (1, BitStart);
-  RegionMask   = RegionLength - 1;
-  RegionStart  = (LinearAddress + Offset) & ~RegionMask;
-
+  Index                   = PagingEntryIndex;
+  RegionStart             = (LinearAddress + Offset) & ~RegionMask;
   ParentAttribute->Uint64 = PageTableLibGetPnleMapAttribute (&ParentPagingEntry->Pnle, ParentAttribute);
 
   //
@@ -491,7 +563,15 @@ PageTableLibMapInLevel (
           ASSERT (CreateNew || (Mask->Bits.Nx == 0) || (Attribute->Bits.Nx == 1));
         }
 
+        //
+        // Check if any leaf PagingEntry is modified.
+        //
+        OriginalCurrentPagingEntry.Uint64 = CurrentPagingEntry->Uint64;
         PageTableLibSetPle (Level, CurrentPagingEntry, Offset, Attribute, &CurrentMask);
+
+        if (OriginalCurrentPagingEntry.Uint64 != CurrentPagingEntry->Uint64) {
+          *IsModified = TRUE;
+        }
       }
     } else {
       //
@@ -514,7 +594,8 @@ PageTableLibMapInLevel (
                  Length,
                  Offset,
                  Attribute,
-                 Mask
+                 Mask,
+                 IsModified
                  );
       if (RETURN_ERROR (Status)) {
         return Status;
@@ -524,6 +605,14 @@ PageTableLibMapInLevel (
     Offset      += SubLength;
     RegionStart += RegionLength;
     Index++;
+  }
+
+  //
+  // Check if ParentPagingEntry entry is modified here is enough. Except the changes happen in leaf PagingEntry during
+  // the while loop, if there is any other change happens in page table, the ParentPagingEntry must has been modified.
+  //
+  if (OriginalParentPagingEntry.Uint64 != ParentPagingEntry->Uint64) {
+    *IsModified = TRUE;
   }
 
   return RETURN_SUCCESS;
@@ -546,14 +635,19 @@ PageTableLibMapInLevel (
                                  Page table entries that map the linear address range are reset to 0 before set to the new attribute
                                  when a new physical base address is set.
   @param[in]      Mask           The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
+  @param[out]     IsModified     TRUE means page table is modified. FALSE means page table is not modified.
 
   @retval RETURN_UNSUPPORTED        PagingMode is not supported.
   @retval RETURN_INVALID_PARAMETER  PageTable, BufferSize, Attribute or Mask is NULL.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 1 but some other attributes are not provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 0 but some other attributes are provided.
   @retval RETURN_INVALID_PARAMETER  *BufferSize is not multiple of 4KB.
   @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for page table creation/updating.
                                     BufferSize is updated to indicate the expected buffer size.
                                     Caller may still get RETURN_BUFFER_TOO_SMALL with the new BufferSize.
-  @retval RETURN_SUCCESS            PageTable is created/updated successfully.
+  @retval RETURN_SUCCESS            PageTable is created/updated successfully or the input Length is 0.
 **/
 RETURN_STATUS
 EFIAPI
@@ -565,7 +659,8 @@ PageTableMap (
   IN     UINT64              LinearAddress,
   IN     UINT64              Length,
   IN     IA32_MAP_ATTRIBUTE  *Attribute,
-  IN     IA32_MAP_ATTRIBUTE  *Mask
+  IN     IA32_MAP_ATTRIBUTE  *Mask,
+  OUT    BOOLEAN             *IsModified   OPTIONAL
   )
 {
   RETURN_STATUS       Status;
@@ -575,11 +670,18 @@ PageTableMap (
   IA32_PAGE_LEVEL     MaxLevel;
   IA32_PAGE_LEVEL     MaxLeafLevel;
   IA32_MAP_ATTRIBUTE  ParentAttribute;
+  BOOLEAN             LocalIsModified;
+  UINTN               Index;
+  IA32_PAGING_ENTRY   *PagingEntry;
+  UINT8               BufferInStack[SIZE_4KB - 1 + MAX_PAE_PDPTE_NUM * sizeof (IA32_PAGING_ENTRY)];
 
-  if ((PagingMode == Paging32bit) || (PagingMode == PagingPae) || (PagingMode >= PagingModeMax)) {
+  if (Length == 0) {
+    return RETURN_SUCCESS;
+  }
+
+  if ((PagingMode == Paging32bit) || (PagingMode >= PagingModeMax)) {
     //
     // 32bit paging is never supported.
-    // PAE paging will be supported later.
     //
     return RETURN_UNSUPPORTED;
   }
@@ -595,7 +697,7 @@ PageTableMap (
     return RETURN_INVALID_PARAMETER;
   }
 
-  if ((LinearAddress % SIZE_4KB != 0) || (Length % SIZE_4KB != 0)) {
+  if (((UINTN)LinearAddress % SIZE_4KB != 0) || ((UINTN)Length % SIZE_4KB != 0)) {
     //
     // LinearAddress and Length should be multiple of 4K.
     //
@@ -606,31 +708,60 @@ PageTableMap (
     return RETURN_INVALID_PARAMETER;
   }
 
+  //
+  // If to map [LinearAddress, LinearAddress + Length] as non-present,
+  // all attributes except Present should not be provided.
+  //
+  if ((Attribute->Bits.Present == 0) && (Mask->Bits.Present == 1) && (Mask->Uint64 > 1)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
   MaxLeafLevel     = (IA32_PAGE_LEVEL)(UINT8)PagingMode;
   MaxLevel         = (IA32_PAGE_LEVEL)(UINT8)(PagingMode >> 8);
-  MaxLinearAddress = LShiftU64 (1, 12 + MaxLevel * 9);
+  MaxLinearAddress = (PagingMode == PagingPae) ? LShiftU64 (1, 32) : LShiftU64 (1, 12 + MaxLevel * 9);
 
   if ((LinearAddress > MaxLinearAddress) || (Length > MaxLinearAddress - LinearAddress)) {
     //
-    // Maximum linear address is (1 << 48) or (1 << 57)
+    // Maximum linear address is (1 << 32), (1 << 48) or (1 << 57)
     //
     return RETURN_INVALID_PARAMETER;
   }
 
   TopPagingEntry.Uintn = *PageTable;
   if (TopPagingEntry.Uintn != 0) {
+    if (PagingMode == PagingPae) {
+      //
+      // Create 4 temporary PDPTE at a 4k-aligned address.
+      // Copy the original PDPTE content and set ReadWrite, UserSupervisor to 1, set Nx to 0.
+      //
+      TopPagingEntry.Uintn = ALIGN_VALUE ((UINTN)BufferInStack, BASE_4KB);
+      PagingEntry          = (IA32_PAGING_ENTRY *)(TopPagingEntry.Uintn);
+      CopyMem (PagingEntry, (VOID *)(*PageTable), MAX_PAE_PDPTE_NUM * sizeof (IA32_PAGING_ENTRY));
+      for (Index = 0; Index < MAX_PAE_PDPTE_NUM; Index++) {
+        PagingEntry[Index].Pnle.Bits.ReadWrite      = 1;
+        PagingEntry[Index].Pnle.Bits.UserSupervisor = 1;
+        PagingEntry[Index].Pnle.Bits.Nx             = 0;
+      }
+    }
+
     TopPagingEntry.Pce.Present        = 1;
     TopPagingEntry.Pce.ReadWrite      = 1;
     TopPagingEntry.Pce.UserSupervisor = 1;
     TopPagingEntry.Pce.Nx             = 0;
   }
 
-  ParentAttribute.Uint64                    = 0;
-  ParentAttribute.Bits.PageTableBaseAddress = 1;
-  ParentAttribute.Bits.Present              = 1;
-  ParentAttribute.Bits.ReadWrite            = 1;
-  ParentAttribute.Bits.UserSupervisor       = 1;
-  ParentAttribute.Bits.Nx                   = 0;
+  if (IsModified == NULL) {
+    IsModified = &LocalIsModified;
+  }
+
+  *IsModified = FALSE;
+
+  ParentAttribute.Uint64                       = 0;
+  ParentAttribute.Bits.PageTableBaseAddressLow = 1;
+  ParentAttribute.Bits.Present                 = 1;
+  ParentAttribute.Bits.ReadWrite               = 1;
+  ParentAttribute.Bits.UserSupervisor          = 1;
+  ParentAttribute.Bits.Nx                      = 0;
 
   //
   // Query the required buffer size without modifying the page table.
@@ -648,8 +779,10 @@ PageTableMap (
                    Length,
                    0,
                    Attribute,
-                   Mask
+                   Mask,
+                   IsModified
                    );
+  ASSERT (*IsModified == FALSE);
   if (RETURN_ERROR (Status)) {
     return Status;
   }
@@ -680,10 +813,38 @@ PageTableMap (
              Length,
              0,
              Attribute,
-             Mask
+             Mask,
+             IsModified
              );
+
   if (!RETURN_ERROR (Status)) {
-    *PageTable = (UINTN)(TopPagingEntry.Uintn & IA32_PE_BASE_ADDRESS_MASK_40);
+    PagingEntry = (IA32_PAGING_ENTRY *)(UINTN)(TopPagingEntry.Uintn & IA32_PE_BASE_ADDRESS_MASK_40);
+
+    if (PagingMode == PagingPae) {
+      //
+      // These MustBeZero fields are treated as RW and other attributes by the common map logic. So they might be set to 1.
+      //
+      for (Index = 0; Index < MAX_PAE_PDPTE_NUM; Index++) {
+        PagingEntry[Index].PdptePae.Bits.MustBeZero  = 0;
+        PagingEntry[Index].PdptePae.Bits.MustBeZero2 = 0;
+        PagingEntry[Index].PdptePae.Bits.MustBeZero3 = 0;
+      }
+
+      if (*PageTable != 0) {
+        //
+        // Copy temp PDPTE to original PDPTE.
+        //
+        CopyMem ((VOID *)(*PageTable), PagingEntry, MAX_PAE_PDPTE_NUM * sizeof (IA32_PAGING_ENTRY));
+      }
+    }
+
+    if (*PageTable == 0) {
+      //
+      // Do not assign the *PageTable when it's an existing page table.
+      // If it's an existing PAE page table, PagingEntry is the temp buffer in stack.
+      //
+      *PageTable = (UINTN)PagingEntry;
+    }
   }
 
   return Status;

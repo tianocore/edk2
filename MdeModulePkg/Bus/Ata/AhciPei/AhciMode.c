@@ -2126,7 +2126,7 @@ TrustTransferAtaDevice (
     // ATA PassThru PPI.
     //
     if ((AtaPassThru->Mode->IoAlign > 1) &&
-        !IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign))
+        !ADDRESS_IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign))
     {
       NewBuffer = AllocateAlignedPages (
                     EFI_SIZE_TO_PAGES (TransferLength),

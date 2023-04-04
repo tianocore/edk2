@@ -194,15 +194,15 @@ AhciAtaPassThruPassThru (
   }
 
   IoAlign = This->Mode->IoAlign;
-  if ((IoAlign > 1) && !IS_ALIGNED (Packet->InDataBuffer, IoAlign)) {
+  if ((IoAlign > 1) && !ADDRESS_IS_ALIGNED (Packet->InDataBuffer, IoAlign)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((IoAlign > 1) && !IS_ALIGNED (Packet->OutDataBuffer, IoAlign)) {
+  if ((IoAlign > 1) && !ADDRESS_IS_ALIGNED (Packet->OutDataBuffer, IoAlign)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((IoAlign > 1) && !IS_ALIGNED (Packet->Asb, IoAlign)) {
+  if ((IoAlign > 1) && !ADDRESS_IS_ALIGNED (Packet->Asb, IoAlign)) {
     return EFI_INVALID_PARAMETER;
   }
 

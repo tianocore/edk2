@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -27,7 +27,6 @@
 #include <Library/DebugLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/CpuLib.h>
-#include <Library/UefiCpuLib.h>
 #include <Library/TimerLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/MtrrLib.h>
@@ -177,8 +176,10 @@ typedef struct {
   UINT8    *RendezvousFunnelAddress;
   UINTN    ModeEntryOffset;
   UINTN    RendezvousFunnelSize;
-  UINT8    *RelocateApLoopFuncAddress;
-  UINTN    RelocateApLoopFuncSize;
+  UINT8    *RelocateApLoopFuncAddressGeneric;
+  UINTN    RelocateApLoopFuncSizeGeneric;
+  UINT8    *RelocateApLoopFuncAddressAmdSev;
+  UINTN    RelocateApLoopFuncSizeAmdSev;
   UINTN    ModeTransitionOffset;
   UINTN    SwitchToRealNoNxOffset;
   UINTN    SwitchToRealPM16ModeOffset;
@@ -311,6 +312,7 @@ typedef struct {
 
 #define AP_SAFE_STACK_SIZE   128
 #define AP_RESET_STACK_SIZE  AP_SAFE_STACK_SIZE
+STATIC_ASSERT ((AP_SAFE_STACK_SIZE & (CPU_STACK_ALIGNMENT - 1)) == 0, "AP_SAFE_STACK_SIZE is not aligned with CPU_STACK_ALIGNMENT");
 
 #pragma pack(1)
 
@@ -362,7 +364,30 @@ extern EFI_GUID  mCpuInitMpLibHobGuid;
 **/
 typedef
   VOID
-(EFIAPI *ASM_RELOCATE_AP_LOOP)(
+(EFIAPI *ASM_RELOCATE_AP_LOOP_GENERIC)(
+  IN BOOLEAN                 MwaitSupport,
+  IN UINTN                   ApTargetCState,
+  IN UINTN                   TopOfApStack,
+  IN UINTN                   NumberToFinish,
+  IN UINTN                   Cr3
+  );
+
+/**
+  Assembly code to place AP into safe loop mode for Amd processors
+  with Sev enabled.
+  Place AP into targeted C-State if MONITOR is supported, otherwise
+  place AP into hlt state.
+  Place AP in protected mode if the current is long mode. Due to AP maybe
+  wakeup by some hardware event. It could avoid accessing page table that
+  may not available during booting to OS.
+  @param[in] MwaitSupport    TRUE indicates MONITOR is supported.
+                             FALSE indicates MONITOR is not supported.
+  @param[in] ApTargetCState  Target C-State value.
+  @param[in] PmCodeSegment   Protected mode code segment value.
+**/
+typedef
+  VOID
+(EFIAPI *ASM_RELOCATE_AP_LOOP_AMDSEV)(
   IN BOOLEAN                 MwaitSupport,
   IN UINTN                   ApTargetCState,
   IN UINTN                   PmCodeSegment,
@@ -400,6 +425,12 @@ AsmExchangeRole (
   IN CPU_EXCHANGE_ROLE_INFO  *MyInfo,
   IN CPU_EXCHANGE_ROLE_INFO  *OthersInfo
   );
+
+typedef union {
+  VOID                            *Data;
+  ASM_RELOCATE_AP_LOOP_AMDSEV     AmdSevEntry;  // 64-bit AMD Sev processors
+  ASM_RELOCATE_AP_LOOP_GENERIC    GenericEntry; // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or AMD non-Sev processors
+} RELOCATE_AP_LOOP_ENTRY;
 
 /**
   Get the pointer to CPU MP Data structure.
@@ -462,6 +493,18 @@ AllocateCodeBuffer (
 UINTN
 GetSevEsAPMemory (
   VOID
+  );
+
+/**
+  Create 1:1 mapping page table in reserved memory to map the specified address range.
+  @param[in]      LinearAddress  The start of the linear address range.
+  @param[in]      Length         The length of the linear address range.
+  @return The page table to be created.
+**/
+UINTN
+CreatePageTable (
+  IN UINTN  Address,
+  IN UINTN  Length
   );
 
 /**

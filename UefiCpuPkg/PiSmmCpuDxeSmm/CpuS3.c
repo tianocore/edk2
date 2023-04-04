@@ -1,7 +1,7 @@
 /** @file
 Code for Processor S3 restoration
 
-Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -823,10 +823,23 @@ SmmRestoreCpu (
     InitializeCpuBeforeRebase ();
   }
 
+  DEBUG ((DEBUG_INFO, "SmmRestoreCpu: mSmmRelocated is %d\n", mSmmRelocated));
+
   //
-  // Restore SMBASE for BSP and all APs
+  // Check whether Smm Relocation is done or not.
+  // If not, will do the SmmBases Relocation here!!!
   //
-  SmmRelocateBases ();
+  if (!mSmmRelocated) {
+    //
+    // Restore SMBASE for BSP and all APs
+    //
+    SmmRelocateBases ();
+  } else {
+    //
+    // Issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
+    //
+    ExecuteFirstSmiInit ();
+  }
 
   //
   // Skip initialization if mAcpiCpuData is not valid

@@ -838,7 +838,7 @@ UsbIoPortReset (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "UsbIoPortReset: failed to reset hub port %d@hub  %d, %r \n",
+      "UsbIoPortReset: failed to reset hub port %d@hub  %d - %r\n",
       Dev->ParentPort,
       Dev->ParentAddr,
       Status
@@ -945,7 +945,7 @@ UsbBusBuildProtocol (
                   );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to open device path %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to open device path - %r\n", Status));
 
     FreePool (UsbBus);
     return Status;
@@ -978,7 +978,7 @@ UsbBusBuildProtocol (
                    );
 
   if (EFI_ERROR (Status) && EFI_ERROR (Status2)) {
-    DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to open USB_HC/USB2_HC %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to open USB_HC/USB2_HC - %r\n", Status));
 
     Status = EFI_DEVICE_ERROR;
     goto CLOSE_HC;
@@ -1006,7 +1006,7 @@ UsbBusBuildProtocol (
                   );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to install bus protocol %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to install bus protocol - %r\n", Status));
     goto CLOSE_HC;
   }
 
@@ -1054,7 +1054,7 @@ UsbBusBuildProtocol (
   Status = mUsbRootHubApi.Init (RootIf);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to init root hub %r\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to init root hub - %r\n", Status));
     goto FREE_ROOTHUB;
   }
 
@@ -1102,7 +1102,7 @@ CLOSE_HC:
          );
   FreePool (UsbBus);
 
-  DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to start bus driver %r\n", Status));
+  DEBUG ((DEBUG_ERROR, "UsbBusStart: Failed to start bus driver - %r\n", Status));
   return Status;
 }
 

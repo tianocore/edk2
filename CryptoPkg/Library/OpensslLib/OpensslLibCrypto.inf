@@ -163,6 +163,7 @@
   $(OPENSSL_PATH)/crypto/bn/bn_srp.c
   $(OPENSSL_PATH)/crypto/bn/bn_word.c
   $(OPENSSL_PATH)/crypto/bn/bn_x931p.c
+  $(OPENSSL_PATH)/crypto/bn/rsa_sup_mul.c
   $(OPENSSL_PATH)/crypto/buffer/buf_err.c
   $(OPENSSL_PATH)/crypto/buffer/buffer.c
   $(OPENSSL_PATH)/crypto/cmac/cm_ameth.c
@@ -591,6 +592,8 @@
   GCC:*_CLANG35_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized
   GCC:*_CLANG38_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized
   GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize
+  # Revisit after switching to 3.0 branch
+  GCC:*_GCC5_*_CC_FLAGS    = -Wno-unused-but-set-variable
 
   # suppress the following warnings in openssl so we don't break the build with warnings-as-errors:
   # 1295: Deprecated declaration <entity> - give arg types

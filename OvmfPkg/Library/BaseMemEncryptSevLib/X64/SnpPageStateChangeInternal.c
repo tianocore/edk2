@@ -20,7 +20,6 @@
 
 #include "SnpPageStateChange.h"
 
-#define IS_ALIGNED(x, y)  ((((x) & (y - 1)) == 0))
 #define PAGES_PER_LARGE_ENTRY  512
 
 STATIC

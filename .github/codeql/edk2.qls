@@ -9,6 +9,16 @@
 # Enable individual queries below.
 
 - include:
+    id: cpp/conditionallyuninitializedvariable
+- include:
     id: cpp/infinite-loop-with-unsatisfiable-exit-condition
 - include:
     id: cpp/overflow-buffer
+- include:
+    id: cpp/overrunning-write
+- include:
+    id: cpp/overrunning-write-with-float
+- include:
+    id: cpp/pointer-overflow-check
+- include:
+    id: cpp/very-likely-overrunning-write

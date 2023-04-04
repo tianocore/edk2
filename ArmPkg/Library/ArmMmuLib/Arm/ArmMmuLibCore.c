@@ -100,24 +100,27 @@ PopulateLevel2PageTable (
 
   switch (Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK:
       PageAttributes = TT_DESCRIPTOR_PAGE_WRITE_BACK;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK_NONSHAREABLE:
       PageAttributes  = TT_DESCRIPTOR_PAGE_WRITE_BACK;
       PageAttributes &= ~TT_DESCRIPTOR_PAGE_S_SHARED;
       break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
+      PageAttributes  = TT_DESCRIPTOR_PAGE_WRITE_BACK;
+      PageAttributes |= TT_DESCRIPTOR_PAGE_AP_NO_RO;
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
+      PageAttributes  = TT_DESCRIPTOR_PAGE_WRITE_BACK;
+      PageAttributes |= TT_DESCRIPTOR_PAGE_XN_MASK;
+      break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH:
       PageAttributes = TT_DESCRIPTOR_PAGE_WRITE_THROUGH;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE:
       PageAttributes = TT_DESCRIPTOR_PAGE_DEVICE;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED:
       PageAttributes = TT_DESCRIPTOR_PAGE_UNCACHED;
       break;
     default:
@@ -145,7 +148,7 @@ PopulateLevel2PageTable (
                                   );
 
       // Translate the Section Descriptor into Page Descriptor
-      SectionDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (*SectionEntry, FALSE);
+      SectionDescriptor = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (*SectionEntry);
 
       BaseSectionAddress = TT_DESCRIPTOR_SECTION_BASE_ADDRESS (*SectionEntry);
 
@@ -239,39 +242,31 @@ FillTranslationTable (
 
   switch (MemoryRegion->Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK (0);
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
-      Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK (0);
+      Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK;
       Attributes &= ~TT_DESCRIPTOR_SECTION_S_SHARED;
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
+      Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK;
+      Attributes |= TT_DESCRIPTOR_SECTION_AP_NO_RO;
+      break;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
+      Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK;
+      Attributes |= TT_DESCRIPTOR_SECTION_XN_MASK;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH (0);
+      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
-      Attributes = TT_DESCRIPTOR_SECTION_DEVICE (0);
+      Attributes = TT_DESCRIPTOR_SECTION_DEVICE;
       break;
     case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED (0);
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_BACK (1);
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK_NONSHAREABLE:
-      Attributes  = TT_DESCRIPTOR_SECTION_WRITE_BACK (1);
-      Attributes &= ~TT_DESCRIPTOR_SECTION_S_SHARED;
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH:
-      Attributes = TT_DESCRIPTOR_SECTION_WRITE_THROUGH (1);
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE:
-      Attributes = TT_DESCRIPTOR_SECTION_DEVICE (1);
-      break;
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED (1);
+      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED;
       break;
     default:
-      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED (0);
+      Attributes = TT_DESCRIPTOR_SECTION_UNCACHED;
       break;
   }
 

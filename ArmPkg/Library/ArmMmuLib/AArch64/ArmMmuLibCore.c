@@ -37,33 +37,47 @@ ArmMemoryAttributeToPageAttribute (
   IN ARM_MEMORY_REGION_ATTRIBUTES  Attributes
   )
 {
+  UINT64  Permissions;
+
+  switch (Attributes) {
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
+      Permissions = TT_AP_NO_RO;
+      break;
+
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
+    case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
+      if (ArmReadCurrentEL () == AARCH64_EL2) {
+        Permissions = TT_XN_MASK;
+      } else {
+        Permissions = TT_UXN_MASK | TT_PXN_MASK;
+      }
+
+      break;
+    default:
+      Permissions = 0;
+      break;
+  }
+
   switch (Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK_NONSHAREABLE:
       return TT_ATTR_INDX_MEMORY_WRITE_BACK;
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK:
-      return TT_ATTR_INDX_MEMORY_WRITE_BACK | TT_SH_INNER_SHAREABLE;
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
+    case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
+      return TT_ATTR_INDX_MEMORY_WRITE_BACK | TT_SH_INNER_SHAREABLE | Permissions;
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH:
       return TT_ATTR_INDX_MEMORY_WRITE_THROUGH | TT_SH_INNER_SHAREABLE;
 
     // Uncached and device mappings are treated as outer shareable by default,
     case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED:
       return TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
 
     default:
       ASSERT (0);
     case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
-    case ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE:
-      if (ArmReadCurrentEL () == AARCH64_EL2) {
-        return TT_ATTR_INDX_DEVICE_MEMORY | TT_XN_MASK;
-      } else {
-        return TT_ATTR_INDX_DEVICE_MEMORY | TT_UXN_MASK | TT_PXN_MASK;
-      }
+      return TT_ATTR_INDX_DEVICE_MEMORY | Permissions;
   }
 }
 
@@ -252,6 +266,16 @@ UpdateRegionMappingRecursive (
 
       if (!IsTableEntry (*Entry, Level)) {
         //
+        // If the region we are trying to map is already covered by a block
+        // entry with the right attributes, don't bother splitting it up.
+        //
+        if (IsBlockEntry (*Entry, Level) &&
+            ((*Entry & TT_ATTRIBUTES_MASK & ~AttributeClearMask) == AttributeSetMask))
+        {
+          continue;
+        }
+
+        //
         // No table entry exists yet, so we need to allocate a page table
         // for the next level.
         //
@@ -438,7 +462,11 @@ GcdAttributeToPageAttribute (
     PageAttributes |= TT_AP_NO_RO;
   }
 
-  return PageAttributes | TT_AF;
+  if ((GcdAttributes & EFI_MEMORY_RP) == 0) {
+    PageAttributes |= TT_AF;
+  }
+
+  return PageAttributes;
 }
 
 EFI_STATUS
@@ -459,9 +487,9 @@ ArmSetMemoryAttributes (
     // No memory type was set in Attributes, so we are going to update the
     // permissions only.
     //
-    PageAttributes   &= TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK;
+    PageAttributes   &= TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK | TT_AF;
     PageAttributeMask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK |
-                          TT_PXN_MASK | TT_XN_MASK);
+                          TT_PXN_MASK | TT_XN_MASK | TT_AF);
   }
 
   return UpdateRegionMapping (
@@ -531,6 +559,54 @@ ArmClearMemoryRegionNoExec (
            Length,
            0,
            Mask
+           );
+}
+
+/**
+  Convert a region of memory to read-protected, by clearing the access flag.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+ArmSetMemoryRegionNoAccess (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  )
+{
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           0,
+           ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AF)
+           );
+}
+
+/**
+  Convert a region of memory to read-enabled, by setting the access flag.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+ArmClearMemoryRegionNoAccess (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  )
+{
+  return SetMemoryRegionAttribute (
+           BaseAddress,
+           Length,
+           TT_AF,
+           ~TT_ADDRESS_MASK_BLOCK_ENTRY
            );
 }
 

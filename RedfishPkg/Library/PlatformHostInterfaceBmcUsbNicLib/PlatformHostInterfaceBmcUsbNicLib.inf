@@ -1,0 +1,48 @@
+## @file
+#  Module to provide the platform Redfish Host Interface information
+#  of USB NIC Device exposed by BMC.
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001000b
+  BASE_NAME                      = PlatformHostInterfaceBmcUsbNicLib
+  FILE_GUID                      = C4837B58-225E-4352-8FDC-4C52A5D65891
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformHostInterfaceBmcUsbNicLib
+
+[Sources]
+  PlatformHostInterfaceBmcUsbNicLib.c
+  PlatformHostInterfaceBmcUsbNicLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  IpmiLib
+  IpmiCommandLib
+  MemoryAllocationLib
+  UefiLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gEfiSimpleNetworkProtocolGuid                 ## CONSUMED
+  gEfiUsbIoProtocolGuid                         ## CONSUMED
+  gEfiDevicePathProtocolGuid                    ## CONSUMED
+
+[Pcd]
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishHostName     ## CONSUMED
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceUuid  ## CONSUMED
+
+[Depex]
+  gIpmiProtocolGuid

@@ -1040,7 +1040,7 @@ TrustTransferAtaDevice (
     // Check the alignment of the incoming buffer prior to invoking underlying ATA PassThru
     //
     AtaPassThru = AtaDevice->AtaBusDriverData->AtaPassThru;
-    if ((AtaPassThru->Mode->IoAlign > 1) && !IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign)) {
+    if ((AtaPassThru->Mode->IoAlign > 1) && !ADDRESS_IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign)) {
       NewBuffer = AllocateAlignedBuffer (AtaDevice, TransferLength);
       if (NewBuffer == NULL) {
         return EFI_OUT_OF_RESOURCES;

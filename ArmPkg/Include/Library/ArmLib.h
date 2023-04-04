@@ -25,29 +25,24 @@
                                      EFI_MEMORY_WT | EFI_MEMORY_WB | \
                                      EFI_MEMORY_UCE)
 
-/**
- * The UEFI firmware must not use the ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_* attributes.
- *
- * The Non Secure memory attribute (ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_*) should only
- * be used in Secure World to distinguished Secure to Non-Secure memory.
- */
 typedef enum {
   ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED = 0,
-  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED,
   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK,
-  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK,
 
   // On some platforms, memory mapped flash region is designed as not supporting
   // shareable attribute, so WRITE_BACK_NONSHAREABLE is added for such special
   // need.
   // Do NOT use below two attributes if you are not sure.
   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE,
-  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK_NONSHAREABLE,
+
+  // Special region types for memory that must be mapped with read-only or
+  // non-execute permissions from the very start, e.g., to support the use
+  // of the WXN virtual memory control.
+  ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO,
+  ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP,
 
   ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH,
-  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH,
   ARM_MEMORY_REGION_ATTRIBUTE_DEVICE,
-  ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_DEVICE
 } ARM_MEMORY_REGION_ATTRIBUTES;
 
 #define IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(attr)  ((UINT32)(attr) & 1)

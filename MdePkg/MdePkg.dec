@@ -9,6 +9,7 @@
 # (C) Copyright 2016 - 2021 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 # Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -1922,6 +1923,9 @@
   ## Include/Protocol/RedfishDiscover.h
   gEfiRedfishDiscoverProtocolGuid      = { 0x5db12509, 0x4550, 0x4347, { 0x96, 0xb3, 0x73, 0xc0, 0xff, 0x6e, 0x86, 0x9f }}
 
+  ## Include/Protocol/MemoryAttribute.h
+  gEfiMemoryAttributeProtocolGuid = { 0xf4560cf6, 0x40ec, 0x4b4a, { 0xa1, 0x92, 0xbf, 0x1d, 0x57, 0xd0, 0xb1, 0x89 }}
+
   #
   # Protocols defined in Shell2.0
   #
@@ -2338,6 +2342,11 @@
   #  The required memory space is decided by the value of PcdMaximumGuidedExtractHandler.
   # @Prompt Memory Address of GuidedExtractHandler Table.
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|0x1000000|UINT64|0x30001015
+
+  ## This value is the IPMI KCS Interface I/O base address used to transmit IPMI commands.
+  #  The value of 0xca2 is the default I/O base address defined in IPMI specification.
+  # @Prompt IPMI KCS Interface I/O Base Address
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress|0xca2|UINT16|0x00000031
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This value is used to set the base address of PCI express hierarchy.

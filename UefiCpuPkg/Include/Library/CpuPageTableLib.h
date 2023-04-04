@@ -1,7 +1,7 @@
 /** @file
   Public include file for PageTableLib library.
 
-  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -11,22 +11,22 @@
 
 typedef union {
   struct {
-    UINT64    Present              : 1; // 0 = Not present in memory, 1 = Present in memory
-    UINT64    ReadWrite            : 1; // 0 = Read-Only, 1= Read/Write
-    UINT64    UserSupervisor       : 1; // 0 = Supervisor, 1=User
-    UINT64    WriteThrough         : 1; // 0 = Write-Back caching, 1=Write-Through caching
-    UINT64    CacheDisabled        : 1; // 0 = Cached, 1=Non-Cached
-    UINT64    Accessed             : 1; // 0 = Not accessed, 1 = Accessed (set by CPU)
-    UINT64    Dirty                : 1; // 0 = Not dirty, 1 = Dirty (set by CPU)
-    UINT64    Pat                  : 1; // PAT
+    UINT32    Present                  : 1;  // 0 = Not present in memory, 1 = Present in memory
+    UINT32    ReadWrite                : 1;  // 0 = Read-Only, 1= Read/Write
+    UINT32    UserSupervisor           : 1;  // 0 = Supervisor, 1=User
+    UINT32    WriteThrough             : 1;  // 0 = Write-Back caching, 1=Write-Through caching
+    UINT32    CacheDisabled            : 1;  // 0 = Cached, 1=Non-Cached
+    UINT32    Accessed                 : 1;  // 0 = Not accessed, 1 = Accessed (set by CPU)
+    UINT32    Dirty                    : 1;  // 0 = Not dirty, 1 = Dirty (set by CPU)
+    UINT32    Pat                      : 1;  // PAT
+    UINT32    Global                   : 1;  // 0 = Not global, 1 = Global (if CR4.PGE = 1)
+    UINT32    Reserved1                : 3;  // Ignored
+    UINT32    PageTableBaseAddressLow  : 20; // Page Table Base Address Low
 
-    UINT64    Global               : 1; // 0 = Not global, 1 = Global (if CR4.PGE = 1)
-    UINT64    Reserved1            : 3; // Ignored
-
-    UINT64    PageTableBaseAddress : 40; // Page Table Base Address
-    UINT64    Reserved2            : 7;  // Ignored
-    UINT64    ProtectionKey        : 4;  // Protection key
-    UINT64    Nx                   : 1;  // No Execute bit
+    UINT32    PageTableBaseAddressHigh : 20; // Page Table Base Address High
+    UINT32    Reserved2                : 7;  // Ignored
+    UINT32    ProtectionKey            : 4;  // Protection key
+    UINT32    Nx                       : 1;  // No Execute bit
   } Bits;
   UINT64    Uint64;
 } IA32_MAP_ATTRIBUTE;
@@ -74,14 +74,19 @@ typedef enum {
                                  Page table entries that map the linear address range are reset to 0 before set to the new attribute
                                  when a new physical base address is set.
   @param[in]      Mask           The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
+  @param[out]     IsModified     TRUE means page table is modified. FALSE means page table is not modified.
 
   @retval RETURN_UNSUPPORTED        PagingMode is not supported.
   @retval RETURN_INVALID_PARAMETER  PageTable, BufferSize, Attribute or Mask is NULL.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 1 but some other attributes are not provided.
+  @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 0 but some other attributes are provided.
+  @retval RETURN_INVALID_PARAMETER  For present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 0 but some other attributes are provided.
   @retval RETURN_INVALID_PARAMETER  *BufferSize is not multiple of 4KB.
   @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for page table creation/updating.
                                     BufferSize is updated to indicate the expected buffer size.
                                     Caller may still get RETURN_BUFFER_TOO_SMALL with the new BufferSize.
-  @retval RETURN_SUCCESS            PageTable is created/updated successfully.
+  @retval RETURN_SUCCESS            PageTable is created/updated successfully or the input Length is 0.
 **/
 RETURN_STATUS
 EFIAPI
@@ -93,7 +98,8 @@ PageTableMap (
   IN     UINT64              LinearAddress,
   IN     UINT64              Length,
   IN     IA32_MAP_ATTRIBUTE  *Attribute,
-  IN     IA32_MAP_ATTRIBUTE  *Mask
+  IN     IA32_MAP_ATTRIBUTE  *Mask,
+  OUT    BOOLEAN             *IsModified   OPTIONAL
   );
 
 typedef struct {

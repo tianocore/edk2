@@ -204,7 +204,6 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         if (self.env.GetBuildValue("SMM_REQUIRE") == "1"):
             args += " -machine q35,smm=on" #,accel=(tcg|kvm)"
             #args += " -m ..."
-            #args += " -smp ..."
             args += " -global driver=cfi.pflash01,property=secure,value=on"
             args += " -drive if=pflash,format=raw,unit=0,file=" + os.path.join(OutputPath_FV, "OVMF_CODE.fd") + ",readonly=on"
             args += " -drive if=pflash,format=raw,unit=1,file=" + os.path.join(OutputPath_FV, "OVMF_VARS.fd")

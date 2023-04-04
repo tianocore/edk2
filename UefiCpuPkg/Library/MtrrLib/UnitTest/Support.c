@@ -1,7 +1,7 @@
 /** @file
   Unit tests of the MtrrLib instance of the MtrrLib class
 
-  Copyright (c) 2018 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -12,13 +12,15 @@ MTRR_MEMORY_CACHE_TYPE  mMemoryCacheTypes[] = {
   CacheUncacheable, CacheWriteCombining, CacheWriteThrough, CacheWriteProtected, CacheWriteBack
 };
 
-UINT64                           mFixedMtrrsValue[MTRR_NUMBER_OF_FIXED_MTRR];
-MSR_IA32_MTRR_PHYSBASE_REGISTER  mVariableMtrrsPhysBase[MTRR_NUMBER_OF_VARIABLE_MTRR];
-MSR_IA32_MTRR_PHYSMASK_REGISTER  mVariableMtrrsPhysMask[MTRR_NUMBER_OF_VARIABLE_MTRR];
-MSR_IA32_MTRR_DEF_TYPE_REGISTER  mDefTypeMsr;
-MSR_IA32_MTRRCAP_REGISTER        mMtrrCapMsr;
-CPUID_VERSION_INFO_EDX           mCpuidVersionInfoEdx;
-CPUID_VIR_PHY_ADDRESS_SIZE_EAX   mCpuidVirPhyAddressSizeEax;
+UINT64                                       mFixedMtrrsValue[MTRR_NUMBER_OF_FIXED_MTRR];
+MSR_IA32_MTRR_PHYSBASE_REGISTER              mVariableMtrrsPhysBase[MTRR_NUMBER_OF_VARIABLE_MTRR];
+MSR_IA32_MTRR_PHYSMASK_REGISTER              mVariableMtrrsPhysMask[MTRR_NUMBER_OF_VARIABLE_MTRR];
+MSR_IA32_MTRR_DEF_TYPE_REGISTER              mDefTypeMsr;
+MSR_IA32_MTRRCAP_REGISTER                    mMtrrCapMsr;
+MSR_IA32_TME_ACTIVATE_REGISTER               mTmeActivateMsr;
+CPUID_VERSION_INFO_EDX                       mCpuidVersionInfoEdx;
+CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  mCpuidExtendedFeatureFlagsEcx;
+CPUID_VIR_PHY_ADDRESS_SIZE_EAX               mCpuidVirPhyAddressSizeEax;
 
 BOOLEAN       mRandomInput;
 UINTN         mNumberIndex = 0;
@@ -87,6 +89,94 @@ GenerateRandomNumbers (
 }
 
 /**
+  Retrieves CPUID information using an extended leaf identifier.
+
+  Executes the CPUID instruction with EAX set to the value specified by Index
+  and ECX set to the value specified by SubIndex. This function always returns
+  Index. This function is only available on IA-32 and x64.
+
+  If Eax is not NULL, then the value of EAX after CPUID is returned in Eax.
+  If Ebx is not NULL, then the value of EBX after CPUID is returned in Ebx.
+  If Ecx is not NULL, then the value of ECX after CPUID is returned in Ecx.
+  If Edx is not NULL, then the value of EDX after CPUID is returned in Edx.
+
+  @param  Index     The 32-bit value to load into EAX prior to invoking the
+                    CPUID instruction.
+  @param  SubIndex  The 32-bit value to load into ECX prior to invoking the
+                    CPUID instruction.
+  @param  Eax       The pointer to the 32-bit EAX value returned by the CPUID
+                    instruction. This is an optional parameter that may be
+                    NULL.
+  @param  Ebx       The pointer to the 32-bit EBX value returned by the CPUID
+                    instruction. This is an optional parameter that may be
+                    NULL.
+  @param  Ecx       The pointer to the 32-bit ECX value returned by the CPUID
+                    instruction. This is an optional parameter that may be
+                    NULL.
+  @param  Edx       The pointer to the 32-bit EDX value returned by the CPUID
+                    instruction. This is an optional parameter that may be
+                    NULL.
+
+  @return Index.
+
+**/
+UINT32
+EFIAPI
+UnitTestMtrrLibAsmCpuidEx (
+  IN      UINT32  Index,
+  IN      UINT32  SubIndex,
+  OUT     UINT32  *Eax   OPTIONAL,
+  OUT     UINT32  *Ebx   OPTIONAL,
+  OUT     UINT32  *Ecx   OPTIONAL,
+  OUT     UINT32  *Edx   OPTIONAL
+  )
+{
+  switch (Index) {
+    case CPUID_SIGNATURE:
+      if (Eax != NULL) {
+        *Eax = CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS;
+      }
+
+      return Index;
+      break;
+    case CPUID_VERSION_INFO:
+      if (Edx != NULL) {
+        *Edx = mCpuidVersionInfoEdx.Uint32;
+      }
+
+      return Index;
+      break;
+    case CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS:
+      if (Ecx != NULL) {
+        *Ecx = mCpuidExtendedFeatureFlagsEcx.Uint32;
+      }
+
+      return Index;
+      break;
+    case CPUID_EXTENDED_FUNCTION:
+      if (Eax != NULL) {
+        *Eax = CPUID_VIR_PHY_ADDRESS_SIZE;
+      }
+
+      return Index;
+      break;
+    case CPUID_VIR_PHY_ADDRESS_SIZE:
+      if (Eax != NULL) {
+        *Eax = mCpuidVirPhyAddressSizeEax.Uint32;
+      }
+
+      return Index;
+      break;
+  }
+
+  //
+  // Should never fall through to here
+  //
+  ASSERT (FALSE);
+  return Index;
+}
+
+/**
   Retrieves CPUID information.
 
   Executes the CPUID instruction with EAX set to the value specified by Index.
@@ -121,35 +211,7 @@ UnitTestMtrrLibAsmCpuid (
   OUT     UINT32  *Edx   OPTIONAL
   )
 {
-  switch (Index) {
-    case CPUID_VERSION_INFO:
-      if (Edx != NULL) {
-        *Edx = mCpuidVersionInfoEdx.Uint32;
-      }
-
-      return Index;
-      break;
-    case CPUID_EXTENDED_FUNCTION:
-      if (Eax != NULL) {
-        *Eax = CPUID_VIR_PHY_ADDRESS_SIZE;
-      }
-
-      return Index;
-      break;
-    case CPUID_VIR_PHY_ADDRESS_SIZE:
-      if (Eax != NULL) {
-        *Eax = mCpuidVirPhyAddressSizeEax.Uint32;
-      }
-
-      return Index;
-      break;
-  }
-
-  //
-  // Should never fall through to here
-  //
-  ASSERT (FALSE);
-  return Index;
+  return UnitTestMtrrLibAsmCpuidEx (Index, 0, Eax, Ebx, Ecx, Edx);
 }
 
 /**
@@ -198,6 +260,10 @@ UnitTestMtrrLibAsmReadMsr64 (
 
   if (MsrIndex == MSR_IA32_MTRRCAP) {
     return mMtrrCapMsr.Uint64;
+  }
+
+  if (MsrIndex == MSR_IA32_TME_ACTIVATE) {
+    return mTmeActivateMsr.Uint64;
   }
 
   //
@@ -317,9 +383,21 @@ InitializeMtrrRegs (
   //
   // Hook BaseLib functions used by MtrrLib that require some emulation.
   //
-  gUnitTestHostBaseLib.X86->AsmCpuid      = UnitTestMtrrLibAsmCpuid;
+  gUnitTestHostBaseLib.X86->AsmCpuid   = UnitTestMtrrLibAsmCpuid;
+  gUnitTestHostBaseLib.X86->AsmCpuidEx = UnitTestMtrrLibAsmCpuidEx;
+
   gUnitTestHostBaseLib.X86->AsmReadMsr64  = UnitTestMtrrLibAsmReadMsr64;
   gUnitTestHostBaseLib.X86->AsmWriteMsr64 = UnitTestMtrrLibAsmWriteMsr64;
+
+  if (SystemParameter->MkTmeKeyidBits != 0) {
+    mCpuidExtendedFeatureFlagsEcx.Bits.TME_EN = 1;
+    mTmeActivateMsr.Bits.TmeEnable            = 1;
+    mTmeActivateMsr.Bits.MkTmeKeyidBits       = SystemParameter->MkTmeKeyidBits;
+  } else {
+    mCpuidExtendedFeatureFlagsEcx.Bits.TME_EN = 0;
+    mTmeActivateMsr.Bits.TmeEnable            = 0;
+    mTmeActivateMsr.Bits.MkTmeKeyidBits       = 0;
+  }
 
   return UNIT_TEST_PASSED;
 }

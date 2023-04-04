@@ -44,14 +44,6 @@ InternalSwitchStack (
 {
   BASE_LIBRARY_JUMP_BUFFER  JumpBuffer;
 
-  DEBUG ((
-    DEBUG_INFO,
-    "RISC-V InternalSwitchStack Entry:%x Context1:%x Context2:%x NewStack%x\n", \
-    EntryPoint,
-    Context1,
-    Context2,
-    NewStack
-    ));
   JumpBuffer.RA = (UINTN)EntryPoint;
   JumpBuffer.SP = (UINTN)NewStack - sizeof (VOID *);
   JumpBuffer.S0 = (UINT64)(UINTN)Context1;

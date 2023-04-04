@@ -427,6 +427,13 @@
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 
   #
+  # SATA
+  #
+  MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
+  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+
+  #
   # NVME Driver
   #
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf

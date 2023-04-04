@@ -2218,6 +2218,15 @@ BmEnumerateBootOptions (
         continue;
       }
 
+      //
+      // Skip removable media if not present
+      //
+      if ((BlkIo->Media->RemovableMedia == TRUE) &&
+          (BlkIo->Media->MediaPresent == FALSE))
+      {
+        continue;
+      }
+
       Description = BmGetBootDescription (Handles[Index]);
       BootOptions = ReallocatePool (
                       sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * (*BootOptionCount),

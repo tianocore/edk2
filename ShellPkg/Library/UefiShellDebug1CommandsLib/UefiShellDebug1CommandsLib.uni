@@ -103,7 +103,6 @@
 
 #string STR_DMEM_HEADER_ROW       #language en-US "Memory Address %016LX %X Bytes\r\n"
 #string STR_DMEM_MMIO_HEADER_ROW  #language en-US "Memory Mapped IO Address %016LX %X Bytes\r\n"
-#string STR_DMEM_DATA_ROW         #language en-US "%08X: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x *%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c*\r\n"
 #string STR_DMEM_SYSTEM_TABLE     #language en-US "\r\nValid EFI Header at Address %016Lx\r\n"
                                                   "---------------------------------------------\r\n"
                                                   "System: Table Structure size %08x revision %08x\r\n"
@@ -1185,4 +1184,3 @@
 " \r\n"
 "  * To edit memory region starting at address 0x00000000 with size of 2 bytes:\r\n"
 "    fs0:\> hexedit -m 0 2\r\n"
-

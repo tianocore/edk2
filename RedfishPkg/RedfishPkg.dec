@@ -4,6 +4,7 @@
 # Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2023, American Megatrends International LLC.
+# Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -55,6 +56,10 @@
   #
   RedfishContentCodingLib|Include/Library/RedfishContentCodingLib.h
 
+  ##  @libraryclass Redfish Debug Library
+  #   Library provides Redfish debug functions.
+  RedfishDebugLib|Include/Library/RedfishDebugLib.h
+
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides the private C runtime library functions.
   #   CRT library is currently used by edk2 JsonLib (open source
@@ -75,6 +80,9 @@
 
 [Guids]
   gEfiRedfishPkgTokenSpaceGuid      = { 0x4fdbccb7, 0xe829, 0x4b4c, { 0x88, 0x87, 0xb2, 0x3f, 0xd7, 0x25, 0x4b, 0x85 }}
+
+  # Redfish variable guid
+  gEfiRedfishVariableGuid           = { 0x85ef8dd3, 0xe606, 0x4b89, { 0x8b, 0xbd, 0x93, 0xbf, 0x5c, 0xbe, 0x1c, 0x18 } }
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   #
@@ -108,3 +116,17 @@
   # Default is set to not add.
   #
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExAddingExpect|FALSE|BOOLEAN|0x00001004
+  #
+  # Use PCD to declare the Redfish host nmae becasue there is no
+  # specification for that.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishHostName|"Redfish service"|VOID*|0x00001005
+  #
+  # Use PCD to declare the Redfish service UUID becasue there is no
+  # specification for that.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceUuid|L"00000000-0000-0000-0000-000000000000"|VOID*|0x00001006
+  #
+  # This PCD indicates that if BMC bootstrap credential service will be disabled by BIOS or not.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDisableBootstrapCredentialService|FALSE|BOOLEAN|0x00001007

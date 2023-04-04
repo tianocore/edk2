@@ -756,8 +756,11 @@ MtrrLibInitializeMtrrMask (
   OUT UINT64  *MtrrValidAddressMask
   )
 {
-  UINT32                          MaxExtendedFunction;
-  CPUID_VIR_PHY_ADDRESS_SIZE_EAX  VirPhyAddressSize;
+  UINT32                                       MaxExtendedFunction;
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX               VirPhyAddressSize;
+  UINT32                                       MaxFunction;
+  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  ExtendedFeatureFlagsEcx;
+  MSR_IA32_TME_ACTIVATE_REGISTER               TmeActivate;
 
   AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunction, NULL, NULL, NULL);
 
@@ -765,6 +768,23 @@ MtrrLibInitializeMtrrMask (
     AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
   } else {
     VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+  }
+
+  //
+  // CPUID enumeration of MAX_PA is unaffected by TME-MK activation and will continue
+  // to report the maximum physical address bits available for software to use,
+  // irrespective of the number of KeyID bits.
+  // So, we need to check if TME is enabled and adjust the PA size accordingly.
+  //
+  AsmCpuid (CPUID_SIGNATURE, &MaxFunction, NULL, NULL, NULL);
+  if (MaxFunction >= CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
+    AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, 0, NULL, NULL, &ExtendedFeatureFlagsEcx.Uint32, NULL);
+    if (ExtendedFeatureFlagsEcx.Bits.TME_EN == 1) {
+      TmeActivate.Uint64 = AsmReadMsr64 (MSR_IA32_TME_ACTIVATE);
+      if (TmeActivate.Bits.TmeEnable == 1) {
+        VirPhyAddressSize.Bits.PhysicalAddressBits -= TmeActivate.Bits.MkTmeKeyidBits;
+      }
+    }
   }
 
   *MtrrValidBitsMask    = LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits) - 1;
@@ -1254,21 +1274,6 @@ MtrrLibLowestType (
 }
 
 /**
-  Return TRUE when the Operand is exactly power of 2.
-
-  @retval TRUE  Operand is exactly power of 2.
-  @retval FALSE Operand is not power of 2.
-**/
-BOOLEAN
-MtrrLibIsPowerOfTwo (
-  IN     UINT64  Operand
-  )
-{
-  ASSERT (Operand != 0);
-  return (BOOLEAN)((Operand & (Operand - 1)) == 0);
-}
-
-/**
   Calculate the subtractive path from vertex Start to Stop.
 
   @param DefaultType  Default memory type.
@@ -1638,7 +1643,7 @@ MtrrLibCalculateMtrrs (
           break;
         }
 
-        if ((Weight[M (Start, Stop)] == MAX_WEIGHT) && MtrrLibIsPowerOfTwo (Length)) {
+        if ((Weight[M (Start, Stop)] == MAX_WEIGHT) && IS_POW2 (Length)) {
           if (MtrrLibGetNumberOfTypes (
                 Ranges,
                 RangeCount,

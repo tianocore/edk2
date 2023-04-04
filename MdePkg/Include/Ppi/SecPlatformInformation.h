@@ -84,57 +84,16 @@ typedef union {
 
 typedef EFI_HEALTH_FLAGS X64_HANDOFF_STATUS;
 typedef EFI_HEALTH_FLAGS IA32_HANDOFF_STATUS;
-///
-/// The hand-off status structure for Itanium architecture.
-///
-typedef struct {
-  ///
-  /// SALE_ENTRY state : 3 = Recovery_Check
-  /// and 0 = RESET or Normal_Boot phase.
-  ///
-  UINT8     BootPhase;
-  ///
-  /// Firmware status on entry to SALE.
-  ///
-  UINT8     FWStatus;
-  UINT16    Reserved1;
-  UINT32    Reserved2;
-  ///
-  /// Geographically significant unique processor ID assigned by PAL.
-  ///
-  UINT16    ProcId;
-  UINT16    Reserved3;
-  UINT8     IdMask;
-  UINT8     EidMask;
-  UINT16    Reserved4;
-  ///
-  /// Address to make PAL calls.
-  ///
-  UINT64    PalCallAddress;
-  ///
-  /// If the entry state is RECOVERY_CHECK, this contains the PAL_RESET
-  /// return address, and if entry state is RESET, this contains
-  /// address for PAL_authentication call.
-  ///
-  UINT64    PalSpecialAddress;
-  ///
-  /// GR35 from PALE_EXIT state.
-  ///
-  UINT64    SelfTestStatus;
-  ///
-  /// GR37 from PALE_EXIT state.
-  ///
-  UINT64    SelfTestControl;
-  UINT64    MemoryBufferRequired;
-} ITANIUM_HANDOFF_STATUS;
 
 ///
 /// EFI_SEC_PLATFORM_INFORMATION_RECORD.
+/// ItaniumHealthFlags has been removed from this union due to Itanium support
+/// being deprecated. The union has now diverged from the definition
+/// in the PI Specification.
 ///
 typedef union {
-  IA32_HANDOFF_STATUS       IA32HealthFlags;
-  X64_HANDOFF_STATUS        x64HealthFlags;
-  ITANIUM_HANDOFF_STATUS    ItaniumHealthFlags;
+  IA32_HANDOFF_STATUS    IA32HealthFlags;
+  X64_HANDOFF_STATUS     x64HealthFlags;
 } EFI_SEC_PLATFORM_INFORMATION_RECORD;
 
 /**

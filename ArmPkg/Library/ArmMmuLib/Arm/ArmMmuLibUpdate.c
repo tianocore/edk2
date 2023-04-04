@@ -53,7 +53,7 @@ ConvertSectionToPages (
 
   // Get section attributes and convert to page attributes
   SectionDescriptor = FirstLevelTable[FirstLevelIdx];
-  PageDescriptor    = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (SectionDescriptor, FALSE);
+  PageDescriptor    = TT_DESCRIPTOR_PAGE_TYPE_PAGE | ConvertSectionAttributesToPageAttributes (SectionDescriptor);
 
   // Allocate a page table for the 4KB entries (we use up a full page even though we only need 1KB)
   PageTable = (volatile ARM_PAGE_TABLE_ENTRY *)AllocatePages (1);
@@ -81,12 +81,12 @@ UpdatePageEntries (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length,
   IN  UINT64                Attributes,
+  IN  UINT32                EntryMask,
   OUT BOOLEAN               *FlushTlbs OPTIONAL
   )
 {
   EFI_STATUS  Status;
   UINT32      EntryValue;
-  UINT32      EntryMask;
   UINT32      FirstLevelIdx;
   UINT32      Offset;
   UINT32      NumPageEntries;
@@ -104,12 +104,7 @@ UpdatePageEntries (
 
   // EntryMask: bitmask of values to change (1 = change this value, 0 = leave alone)
   // EntryValue: values at bit positions specified by EntryMask
-  EntryMask = TT_DESCRIPTOR_PAGE_TYPE_MASK | TT_DESCRIPTOR_PAGE_AP_MASK;
-  if ((Attributes & EFI_MEMORY_XP) != 0) {
-    EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE_XN;
-  } else {
-    EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
-  }
+  EntryValue = TT_DESCRIPTOR_PAGE_TYPE_PAGE;
 
   // Although the PI spec is unclear on this, the GCD guarantees that only
   // one Attribute bit is set at a time, so the order of the conditionals below
@@ -142,10 +137,18 @@ UpdatePageEntries (
     return EFI_UNSUPPORTED;
   }
 
+  if ((Attributes & EFI_MEMORY_RP) == 0) {
+    EntryValue |= TT_DESCRIPTOR_PAGE_AF;
+  }
+
   if ((Attributes & EFI_MEMORY_RO) != 0) {
     EntryValue |= TT_DESCRIPTOR_PAGE_AP_RO_RO;
   } else {
     EntryValue |= TT_DESCRIPTOR_PAGE_AP_RW_RW;
+  }
+
+  if ((Attributes & EFI_MEMORY_XP) != 0) {
+    EntryValue |= TT_DESCRIPTOR_PAGE_XN_MASK;
   }
 
   // Obtain page table base
@@ -167,6 +170,17 @@ UpdatePageEntries (
 
     // Does this descriptor need to be converted from section entry to 4K pages?
     if (!TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE (Descriptor)) {
+      //
+      // If the section mapping covers the requested region with the expected
+      // attributes, splitting it is unnecessary, and should be avoided as it
+      // may result in unbounded recursion when using a strict NX policy.
+      //
+      if ((EntryValue & ~TT_DESCRIPTOR_PAGE_TYPE_MASK & EntryMask) ==
+          (ConvertSectionAttributesToPageAttributes (Descriptor) & EntryMask))
+      {
+        continue;
+      }
+
       Status = ConvertSectionToPages (FirstLevelIdx << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
       if (EFI_ERROR (Status)) {
         // Exit for loop
@@ -216,11 +230,11 @@ EFI_STATUS
 UpdateSectionEntries (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
-  IN UINT64                Attributes
+  IN UINT64                Attributes,
+  IN UINT32                EntryMask
   )
 {
   EFI_STATUS                           Status;
-  UINT32                               EntryMask;
   UINT32                               EntryValue;
   UINT32                               FirstLevelIdx;
   UINT32                               NumSections;
@@ -236,8 +250,6 @@ UpdateSectionEntries (
   // EntryValue: values at bit positions specified by EntryMask
 
   // Make sure we handle a section range that is unmapped
-  EntryMask = TT_DESCRIPTOR_SECTION_TYPE_MASK | TT_DESCRIPTOR_SECTION_XN_MASK |
-              TT_DESCRIPTOR_SECTION_AP_MASK;
   EntryValue = TT_DESCRIPTOR_SECTION_TYPE_SECTION;
 
   // Although the PI spec is unclear on this, the GCD guarantees that only
@@ -281,6 +293,10 @@ UpdateSectionEntries (
     EntryValue |= TT_DESCRIPTOR_SECTION_XN_MASK;
   }
 
+  if ((Attributes & EFI_MEMORY_RP) == 0) {
+    EntryValue |= TT_DESCRIPTOR_SECTION_AF;
+  }
+
   // obtain page table base
   FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)ArmGetTTBR0BaseAddress ();
 
@@ -302,6 +318,7 @@ UpdateSectionEntries (
                  (FirstLevelIdx + i) << TT_DESCRIPTOR_SECTION_BASE_SHIFT,
                  TT_DESCRIPTOR_SECTION_SIZE,
                  Attributes,
+                 ConvertSectionAttributesToPageAttributes (EntryMask),
                  NULL
                  );
     } else {
@@ -332,11 +349,26 @@ UpdateSectionEntries (
   return Status;
 }
 
+/**
+  Update the permission or memory type attributes on a range of memory.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+  @param  Attributes            A mask of EFI_MEMORY_xx constants.
+  @param  SectionMask           A mask of short descriptor section attributes
+                                describing which descriptor bits to update.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+STATIC
 EFI_STATUS
-ArmSetMemoryAttributes (
+SetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
-  IN UINT64                Attributes
+  IN UINT64                Attributes,
+  IN UINT32                SectionMask
   )
 {
   EFI_STATUS  Status;
@@ -367,7 +399,12 @@ ArmSetMemoryAttributes (
         Attributes
         ));
 
-      Status = UpdateSectionEntries (BaseAddress, ChunkLength, Attributes);
+      Status = UpdateSectionEntries (
+                 BaseAddress,
+                 ChunkLength,
+                 Attributes,
+                 SectionMask
+                 );
 
       FlushTlbs = TRUE;
     } else {
@@ -393,6 +430,7 @@ ArmSetMemoryAttributes (
                  BaseAddress,
                  ChunkLength,
                  Attributes,
+                 ConvertSectionAttributesToPageAttributes (SectionMask),
                  &FlushTlbs
                  );
     }
@@ -412,13 +450,47 @@ ArmSetMemoryAttributes (
   return Status;
 }
 
+/**
+  Update the permission or memory type attributes on a range of memory.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+  @param  Attributes            A mask of EFI_MEMORY_xx constants.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+ArmSetMemoryAttributes (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT64                Length,
+  IN UINT64                Attributes
+  )
+{
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           Attributes,
+           TT_DESCRIPTOR_SECTION_TYPE_MASK |
+           TT_DESCRIPTOR_SECTION_XN_MASK |
+           TT_DESCRIPTOR_SECTION_AP_MASK |
+           TT_DESCRIPTOR_SECTION_AF
+           );
+}
+
 EFI_STATUS
 ArmSetMemoryRegionNoExec (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length
   )
 {
-  return ArmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_XP);
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           EFI_MEMORY_XP,
+           TT_DESCRIPTOR_SECTION_XN_MASK
+           );
 }
 
 EFI_STATUS
@@ -427,7 +499,12 @@ ArmClearMemoryRegionNoExec (
   IN  UINT64                Length
   )
 {
-  return ArmSetMemoryAttributes (BaseAddress, Length, __EFI_MEMORY_RWX);
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           0,
+           TT_DESCRIPTOR_SECTION_XN_MASK
+           );
 }
 
 EFI_STATUS
@@ -436,7 +513,12 @@ ArmSetMemoryRegionReadOnly (
   IN  UINT64                Length
   )
 {
-  return ArmSetMemoryAttributes (BaseAddress, Length, EFI_MEMORY_RO);
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           EFI_MEMORY_RO,
+           TT_DESCRIPTOR_SECTION_AP_MASK
+           );
 }
 
 EFI_STATUS
@@ -445,5 +527,58 @@ ArmClearMemoryRegionReadOnly (
   IN  UINT64                Length
   )
 {
-  return ArmSetMemoryAttributes (BaseAddress, Length, __EFI_MEMORY_RWX);
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           0,
+           TT_DESCRIPTOR_SECTION_AP_MASK
+           );
+}
+
+/**
+  Convert a region of memory to read-protected, by clearing the access flag.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+ArmSetMemoryRegionNoAccess (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  )
+{
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           EFI_MEMORY_RP,
+           TT_DESCRIPTOR_SECTION_AF
+           );
+}
+
+/**
+  Convert a region of memory to read-enabled, by setting the access flag.
+
+  @param  BaseAddress           The start of the region.
+  @param  Length                The size of the region.
+
+  @retval EFI_SUCCESS           The attributes were set successfully.
+  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+
+**/
+EFI_STATUS
+ArmClearMemoryRegionNoAccess (
+  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64                Length
+  )
+{
+  return SetMemoryAttributes (
+           BaseAddress,
+           Length,
+           0,
+           TT_DESCRIPTOR_SECTION_AF
+           );
 }

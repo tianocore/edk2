@@ -574,7 +574,7 @@ ExtendFile (
   }
 
   Remaining = Size;
-  SetMem (WriteBuffer, 0, sizeof (WriteBuffer));
+  ZeroMem (WriteBuffer, sizeof (WriteBuffer));
   while (Remaining > 0) {
     WriteNb   = MIN (Remaining, sizeof (WriteBuffer));
     WriteSize = WriteNb;

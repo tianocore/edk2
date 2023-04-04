@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -21,15 +21,17 @@ CPU_SWITCH_STATE_LOADED       equ        2
 ; Equivalent NASM structure of MP_ASSEMBLY_ADDRESS_MAP
 ;
 struc MP_ASSEMBLY_ADDRESS_MAP
-  .RendezvousFunnelAddress       CTYPE_UINTN 1
-  .ModeEntryOffset               CTYPE_UINTN 1
-  .RendezvousFunnelSize          CTYPE_UINTN 1
-  .RelocateApLoopFuncAddress     CTYPE_UINTN 1
-  .RelocateApLoopFuncSize        CTYPE_UINTN 1
-  .ModeTransitionOffset          CTYPE_UINTN 1
-  .SwitchToRealNoNxOffset        CTYPE_UINTN 1
-  .SwitchToRealPM16ModeOffset    CTYPE_UINTN 1
-  .SwitchToRealPM16ModeSize      CTYPE_UINTN 1
+  .RendezvousFunnelAddress            CTYPE_UINTN 1
+  .ModeEntryOffset                    CTYPE_UINTN 1
+  .RendezvousFunnelSize               CTYPE_UINTN 1
+  .RelocateApLoopFuncAddressGeneric   CTYPE_UINTN 1
+  .RelocateApLoopFuncSizeGeneric      CTYPE_UINTN 1
+  .RelocateApLoopFuncAddressAmdSev    CTYPE_UINTN 1
+  .RelocateApLoopFuncSizeAmdSev       CTYPE_UINTN 1
+  .ModeTransitionOffset               CTYPE_UINTN 1
+  .SwitchToRealNoNxOffset             CTYPE_UINTN 1
+  .SwitchToRealPM16ModeOffset         CTYPE_UINTN 1
+  .SwitchToRealPM16ModeSize           CTYPE_UINTN 1
 endstruc
 
 ;

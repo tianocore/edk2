@@ -325,7 +325,7 @@ GetProtocolInfoString (
         Status = gBS->HandleProtocol (TheHandle, ProtocolGuidArray[ProtocolIndex], &Instance);
         if (!EFI_ERROR (Status)) {
           StrnCatGrow (&RetVal, &Size, L"(%H", 0);
-          UnicodeSPrint (InstanceStr, sizeof (InstanceStr), L"%x", Instance);
+          UnicodeSPrint (InstanceStr, sizeof (InstanceStr), L"%p", Instance);
           StrnCatGrow (&RetVal, &Size, InstanceStr, 0);
           StrnCatGrow (&RetVal, &Size, L"%N)", 0);
         }

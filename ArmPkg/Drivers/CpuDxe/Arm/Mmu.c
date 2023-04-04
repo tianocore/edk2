@@ -13,6 +13,15 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include "CpuDxe.h"
 
+/**
+  Convert a set of ARM short descriptor section attributes into a mask
+  of EFI_MEMORY_xx constants.
+
+  @param  SectionAttributes   The set of page attributes.
+  @param  GcdAttributes       Pointer to the return value.
+
+**/
+STATIC
 EFI_STATUS
 SectionToGcdAttributes (
   IN  UINT32  SectionAttributes,
@@ -50,33 +59,59 @@ SectionToGcdAttributes (
 
   // determine protection attributes
   switch (SectionAttributes & TT_DESCRIPTOR_SECTION_AP_MASK) {
-    case TT_DESCRIPTOR_SECTION_AP_NO_NO: // no read, no write
-      // *GcdAttributes |= EFI_MEMORY_RO | EFI_MEMORY_RP;
-      break;
-
-    case TT_DESCRIPTOR_SECTION_AP_RW_NO:
+    case TT_DESCRIPTOR_SECTION_AP_NO_RW:
     case TT_DESCRIPTOR_SECTION_AP_RW_RW:
       // normal read/write access, do not add additional attributes
       break;
 
     // read only cases map to write-protect
-    case TT_DESCRIPTOR_SECTION_AP_RO_NO:
+    case TT_DESCRIPTOR_SECTION_AP_NO_RO:
     case TT_DESCRIPTOR_SECTION_AP_RO_RO:
       *GcdAttributes |= EFI_MEMORY_RO;
       break;
-
-    default:
-      return EFI_UNSUPPORTED;
   }
 
   // now process eXectue Never attribute
-  if ((SectionAttributes & TT_DESCRIPTOR_SECTION_XN_MASK) != 0 ) {
+  if ((SectionAttributes & TT_DESCRIPTOR_SECTION_XN_MASK) != 0) {
     *GcdAttributes |= EFI_MEMORY_XP;
+  }
+
+  if ((SectionAttributes & TT_DESCRIPTOR_SECTION_AF) == 0) {
+    *GcdAttributes |= EFI_MEMORY_RP;
   }
 
   return EFI_SUCCESS;
 }
 
+/**
+  Convert an arch specific set of page attributes into a mask
+  of EFI_MEMORY_xx constants.
+
+  @param  PageAttributes  The set of page attributes.
+
+  @retval The mask of EFI_MEMORY_xx constants.
+
+**/
+UINT64
+RegionAttributeToGcdAttribute (
+  IN UINTN  PageAttributes
+  )
+{
+  UINT64  Result;
+
+  SectionToGcdAttributes (PageAttributes, &Result);
+  return Result;
+}
+
+/**
+  Convert a set of ARM short descriptor page attributes into a mask
+  of EFI_MEMORY_xx constants.
+
+  @param  PageAttributes      The set of page attributes.
+  @param  GcdAttributes       Pointer to the return value.
+
+**/
+STATIC
 EFI_STATUS
 PageToGcdAttributes (
   IN  UINT32  PageAttributes,
@@ -114,28 +149,25 @@ PageToGcdAttributes (
 
   // determine protection attributes
   switch (PageAttributes & TT_DESCRIPTOR_PAGE_AP_MASK) {
-    case TT_DESCRIPTOR_PAGE_AP_NO_NO: // no read, no write
-      // *GcdAttributes |= EFI_MEMORY_RO | EFI_MEMORY_RP;
-      break;
-
-    case TT_DESCRIPTOR_PAGE_AP_RW_NO:
+    case TT_DESCRIPTOR_PAGE_AP_NO_RW:
     case TT_DESCRIPTOR_PAGE_AP_RW_RW:
       // normal read/write access, do not add additional attributes
       break;
 
     // read only cases map to write-protect
-    case TT_DESCRIPTOR_PAGE_AP_RO_NO:
+    case TT_DESCRIPTOR_PAGE_AP_NO_RO:
     case TT_DESCRIPTOR_PAGE_AP_RO_RO:
       *GcdAttributes |= EFI_MEMORY_RO;
       break;
-
-    default:
-      return EFI_UNSUPPORTED;
   }
 
   // now process eXectue Never attribute
-  if ((PageAttributes & TT_DESCRIPTOR_PAGE_XN_MASK) != 0 ) {
+  if ((PageAttributes & TT_DESCRIPTOR_PAGE_XN_MASK) != 0) {
     *GcdAttributes |= EFI_MEMORY_XP;
+  }
+
+  if ((PageAttributes & TT_DESCRIPTOR_PAGE_AF) == 0) {
+    *GcdAttributes |= EFI_MEMORY_RP;
   }
 
   return EFI_SUCCESS;
@@ -165,7 +197,8 @@ SyncCacheConfigPage (
 
   // Convert SectionAttributes into PageAttributes
   NextPageAttributes =
-    TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY (*NextSectionAttributes, 0) |
+    TT_DESCRIPTOR_CONVERT_TO_PAGE_CACHE_POLICY (*NextSectionAttributes) |
+    TT_DESCRIPTOR_CONVERT_TO_PAGE_AF (*NextSectionAttributes) |
     TT_DESCRIPTOR_CONVERT_TO_PAGE_AP (*NextSectionAttributes);
 
   // obtain page table base
@@ -174,7 +207,7 @@ SyncCacheConfigPage (
   for (i = 0; i < TRANSLATION_TABLE_PAGE_COUNT; i++) {
     if ((SecondLevelTable[i] & TT_DESCRIPTOR_PAGE_TYPE_MASK) == TT_DESCRIPTOR_PAGE_TYPE_PAGE) {
       // extract attributes (cacheability and permissions)
-      PageAttributes = SecondLevelTable[i] & (TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK | TT_DESCRIPTOR_PAGE_AP_MASK);
+      PageAttributes = SecondLevelTable[i] & (TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK | TT_DESCRIPTOR_PAGE_AP_MASK | TT_DESCRIPTOR_PAGE_AF);
 
       if (NextPageAttributes == 0) {
         // start on a new region
@@ -212,7 +245,8 @@ SyncCacheConfigPage (
 
   // Convert back PageAttributes into SectionAttributes
   *NextSectionAttributes =
-    TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (NextPageAttributes, 0) |
+    TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (NextPageAttributes) |
+    TT_DESCRIPTOR_CONVERT_TO_SECTION_AF (NextPageAttributes) |
     TT_DESCRIPTOR_CONVERT_TO_SECTION_AP (NextPageAttributes);
 
   return EFI_SUCCESS;
@@ -256,14 +290,14 @@ SyncCacheConfig (
   FirstLevelTable = (ARM_FIRST_LEVEL_DESCRIPTOR *)(ArmGetTTBR0BaseAddress ());
 
   // Get the first region
-  NextSectionAttributes = FirstLevelTable[0] & (TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK | TT_DESCRIPTOR_SECTION_AP_MASK);
+  NextSectionAttributes = FirstLevelTable[0] & (TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK | TT_DESCRIPTOR_SECTION_AP_MASK | TT_DESCRIPTOR_SECTION_AF);
 
   // iterate through each 1MB descriptor
   NextRegionBase = NextRegionLength = 0;
   for (i = 0; i < TRANSLATION_TABLE_SECTION_COUNT; i++) {
     if ((FirstLevelTable[i] & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) {
       // extract attributes (cacheability and permissions)
-      SectionAttributes = FirstLevelTable[i] & (TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK | TT_DESCRIPTOR_SECTION_AP_MASK);
+      SectionAttributes = FirstLevelTable[i] & (TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK | TT_DESCRIPTOR_SECTION_AP_MASK | TT_DESCRIPTOR_SECTION_AF);
 
       if (NextSectionAttributes == 0) {
         // start on a new region
@@ -383,6 +417,10 @@ EfiAttributeToArmAttribute (
     ArmAttributes |= TT_DESCRIPTOR_SECTION_XN_MASK;
   }
 
+  if ((EfiAttributes & EFI_MEMORY_RP) == 0) {
+    ArmAttributes |= TT_DESCRIPTOR_SECTION_AF;
+  }
+
   return ArmAttributes;
 }
 
@@ -399,7 +437,7 @@ GetMemoryRegionPage (
   UINT32  PageDescriptor;
 
   // Convert the section attributes into page attributes
-  PageAttributes = ConvertSectionAttributesToPageAttributes (*RegionAttributes, 0);
+  PageAttributes = ConvertSectionAttributesToPageAttributes (*RegionAttributes);
 
   // Calculate index into first level translation table for start of modification
   TableIndex = ((*BaseAddress) & TT_DESCRIPTOR_PAGE_INDEX_MASK)  >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
@@ -479,7 +517,10 @@ GetMemoryRegion (
     ASSERT (PageTableIndex < TRANSLATION_TABLE_PAGE_COUNT);
 
     PageAttributes    = PageTable[PageTableIndex] & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK;
-    *RegionAttributes = TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (PageAttributes, 0) |
+    *RegionAttributes = TT_DESCRIPTOR_CONVERT_TO_SECTION_CACHE_POLICY (PageAttributes) |
+                        TT_DESCRIPTOR_CONVERT_TO_SECTION_S (PageAttributes) |
+                        TT_DESCRIPTOR_CONVERT_TO_SECTION_XN (PageAttributes) |
+                        TT_DESCRIPTOR_CONVERT_TO_SECTION_AF (PageAttributes) |
                         TT_DESCRIPTOR_CONVERT_TO_SECTION_AP (PageAttributes);
   }
 
@@ -494,6 +535,7 @@ GetMemoryRegion (
 
       // Scan the page table to find the end of the region.
       Status = GetMemoryRegionPage (PageTable, BaseAddress, RegionLength, RegionAttributes);
+      ASSERT (*RegionLength > 0);
 
       // If we have found the end of the region (Status == EFI_SUCCESS) then we exit the for-loop
       if (Status == EFI_SUCCESS) {

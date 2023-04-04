@@ -44,8 +44,6 @@ STATIC BOOLEAN  mAcceptAllMemoryAtEBS = TRUE;
 
 STATIC EFI_EVENT  mAcceptAllMemoryEvent = NULL;
 
-#define IS_ALIGNED(x, y)  ((((x) & ((y) - 1)) == 0))
-
 STATIC
 EFI_STATUS
 EFIAPI
