@@ -164,11 +164,6 @@ PCCTS_H=../h
 #
 #   UNIX  (default)
 #
-ifneq ($(CLANG),)
-CC?=$(CLANG_BIN)clang
-else ifeq ($(origin CC),default)
-CC=gcc
-endif
 COPT=-O
 ANTLR=${BIN_DIR}/antlr
 DLG=${BIN_DIR}/dlg
