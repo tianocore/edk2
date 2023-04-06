@@ -543,7 +543,7 @@ ParseOfwNode (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: DriverName=\"%.*a\" UnitAddress=\"%.*a\" DeviceArguments=\"%.*a\"\n",
-    __FUNCTION__,
+    __func__,
     OfwNode->DriverName.Len,
     OfwNode->DriverName.Ptr,
     OfwNode->UnitAddress.Len,
@@ -1477,7 +1477,7 @@ TranslateOfwPath (
   }
 
   if (Status == RETURN_NOT_FOUND) {
-    DEBUG ((DEBUG_VERBOSE, "%a: no more nodes\n", __FUNCTION__));
+    DEBUG ((DEBUG_VERBOSE, "%a: no more nodes\n", __func__));
     return RETURN_NOT_FOUND;
   }
 
@@ -1496,7 +1496,7 @@ TranslateOfwPath (
       break;
 
     case RETURN_INVALID_PARAMETER:
-      DEBUG ((DEBUG_VERBOSE, "%a: parse error\n", __FUNCTION__));
+      DEBUG ((DEBUG_VERBOSE, "%a: parse error\n", __func__));
       return RETURN_INVALID_PARAMETER;
 
     default:
@@ -1512,22 +1512,22 @@ TranslateOfwPath (
              );
   switch (Status) {
     case RETURN_SUCCESS:
-      DEBUG ((DEBUG_VERBOSE, "%a: success: \"%s\"\n", __FUNCTION__, Translated));
+      DEBUG ((DEBUG_VERBOSE, "%a: success: \"%s\"\n", __func__, Translated));
       break;
 
     case RETURN_BUFFER_TOO_SMALL:
-      DEBUG ((DEBUG_VERBOSE, "%a: buffer too small\n", __FUNCTION__));
+      DEBUG ((DEBUG_VERBOSE, "%a: buffer too small\n", __func__));
       break;
 
     case RETURN_UNSUPPORTED:
-      DEBUG ((DEBUG_VERBOSE, "%a: unsupported\n", __FUNCTION__));
+      DEBUG ((DEBUG_VERBOSE, "%a: unsupported\n", __func__));
       break;
 
     case RETURN_PROTOCOL_ERROR:
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: logic error / system state mismatch\n",
-        __FUNCTION__
+        __func__
         ));
       break;
 
@@ -1604,9 +1604,9 @@ ConnectDevicesFromQemu (
     goto FreeFwCfg;
   }
 
-  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg:\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg:\n", __func__));
   DEBUG ((DEBUG_VERBOSE, "%a\n", FwCfg));
-  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg: <end>\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg: <end>\n", __func__));
 
   if (FeaturePcdGet (PcdQemuBootOrderPciTranslation)) {
     EfiStatus = CreateExtraRootBusMap (&ExtraPciRoots);
@@ -1686,7 +1686,7 @@ ConnectDevicesFromQemu (
     DEBUG ((
       DEBUG_INFO,
       "%a: %Lu OpenFirmware device path(s) connected\n",
-      __FUNCTION__,
+      __func__,
       (UINT64)NumConnected
       ));
     Status = RETURN_SUCCESS;
@@ -1750,9 +1750,9 @@ StoreQemuBootOrder (
     goto FreeFwCfg;
   }
 
-  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg:\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg:\n", __func__));
   DEBUG ((DEBUG_VERBOSE, "%a\n", FwCfg));
-  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg: <end>\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg: <end>\n", __func__));
 
   if (FeaturePcdGet (PcdQemuBootOrderPciTranslation)) {
     EfiStatus = CreateExtraRootBusMap (&ExtraPciRoots);
@@ -1797,7 +1797,7 @@ StoreQemuBootOrder (
         L"VMMBootOrder%04x",
         VariableIndex++
         );
-      DEBUG ((DEBUG_INFO, "%a: %s = %s\n", __FUNCTION__, VariableName, Translated));
+      DEBUG ((DEBUG_INFO, "%a: %s = %s\n", __func__, VariableName, Translated));
       gRT->SetVariable (
              VariableName,
              &gVMMBootOrderGuid,
@@ -1944,7 +1944,7 @@ Match (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: expanded relative device path \"%s\" for prefix matching\n",
-      __FUNCTION__,
+      __func__,
       Converted
       ));
     FreePool (Converted);
@@ -1958,7 +1958,7 @@ Match (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: against \"%s\": %a\n",
-    __FUNCTION__,
+    __func__,
     Converted,
     Result ? "match" : "no match"
     ));
@@ -2068,7 +2068,7 @@ BootOrderComplete (
             DEBUG ((
               DEBUG_VERBOSE,
               "%a: keeping \"%s\"\n",
-              __FUNCTION__,
+              __func__,
               Converted
               ));
           }
@@ -2076,7 +2076,7 @@ BootOrderComplete (
           DEBUG ((
             DEBUG_VERBOSE,
             "%a: dropping \"%s\"\n",
-            __FUNCTION__,
+            __func__,
             Converted
             ));
         }
@@ -2211,9 +2211,9 @@ SetBootOrderFromQemu (
     goto ErrorFreeFwCfg;
   }
 
-  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg:\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg:\n", __func__));
   DEBUG ((DEBUG_VERBOSE, "%a\n", FwCfg));
-  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg: <end>\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg: <end>\n", __func__));
   FwCfgPtr = FwCfg;
 
   BootOrder.Produced  = 0;
@@ -2332,13 +2332,13 @@ SetBootOrderFromQemu (
       DEBUG ((
         DEBUG_ERROR,
         "%a: setting BootOrder: %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       goto ErrorFreeExtraPciRoots;
     }
 
-    DEBUG ((DEBUG_INFO, "%a: setting BootOrder: success\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: setting BootOrder: success\n", __func__));
     PruneBootVariables (ActiveOption, ActiveCount);
   }
 

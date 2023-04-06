@@ -205,7 +205,7 @@ SmmControl2DxeEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: this Q35 implementation lacks SMI\n",
-      __FUNCTION__
+      __func__
       ));
     goto FatalError;
   }
@@ -234,7 +234,7 @@ SmmControl2DxeEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: failed to lock down GBL_SMI_EN\n",
-      __FUNCTION__
+      __func__
       ));
     goto FatalError;
   }
@@ -260,7 +260,7 @@ SmmControl2DxeEntryPoint (
                     &mS3SaveStateInstalled
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: CreateEvent: %r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: CreateEvent: %r\n", __func__, Status));
       goto FatalError;
     }
 
@@ -273,7 +273,7 @@ SmmControl2DxeEntryPoint (
       DEBUG ((
         DEBUG_ERROR,
         "%a: RegisterProtocolNotify: %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       goto ReleaseEvent;
@@ -284,7 +284,7 @@ SmmControl2DxeEntryPoint (
     //
     Status = gBS->SignalEvent (mS3SaveStateInstalled);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: SignalEvent: %r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: SignalEvent: %r\n", __func__, Status));
       goto ReleaseEvent;
     }
   }
@@ -303,7 +303,7 @@ SmmControl2DxeEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: InstallMultipleProtocolInterfaces: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto ReleaseEvent;
@@ -376,7 +376,7 @@ OnS3SaveStateInstalled (
     DEBUG ((
       DEBUG_ERROR,
       "%a: EFI_BOOT_SCRIPT_IO_READ_WRITE_OPCODE: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     ASSERT (FALSE);
@@ -400,14 +400,14 @@ OnS3SaveStateInstalled (
     DEBUG ((
       DEBUG_ERROR,
       "%a: EFI_BOOT_SCRIPT_PCI_CONFIG_READ_WRITE_OPCODE: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
 
-  DEBUG ((DEBUG_VERBOSE, "%a: chipset boot script saved\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: chipset boot script saved\n", __func__));
 
   //
   // Append a boot script fragment that re-selects the negotiated SMI features.

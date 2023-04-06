@@ -1235,7 +1235,7 @@ VirtioScsiExitBoot (
 {
   VSCSI_DEV  *Dev;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __func__, Context));
   //
   // Reset the device. This causes the hypervisor to forget about the virtio
   // ring.

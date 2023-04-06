@@ -38,7 +38,7 @@ TpmMmioSevDecryptPeimEntryPoint (
   RETURN_STATUS  DecryptStatus;
   EFI_STATUS     Status;
 
-  DEBUG ((DEBUG_INFO, "%a\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a\n", __func__));
 
   //
   // If SEV is active, MMIO succeeds against an encrypted physical address
@@ -60,7 +60,7 @@ TpmMmioSevDecryptPeimEntryPoint (
     DEBUG ((
       DEBUG_INFO,
       "%a: mapping TPM MMIO address range unencrypted\n",
-      __FUNCTION__
+      __func__
       ));
 
     DecryptStatus = MemEncryptSevClearMmioPageEncMask (
@@ -73,7 +73,7 @@ TpmMmioSevDecryptPeimEntryPoint (
       DEBUG ((
         DEBUG_ERROR,
         "%a: failed to map TPM MMIO address range unencrypted\n",
-        __FUNCTION__
+        __func__
         ));
       ASSERT_RETURN_ERROR (DecryptStatus);
     }

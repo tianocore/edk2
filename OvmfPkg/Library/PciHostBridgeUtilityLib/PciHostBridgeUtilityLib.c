@@ -156,7 +156,7 @@ PciHostBridgeUtilityInitRootBridge (
                  &mRootBridgeDevicePathTemplate
                  );
   if (DevicePath == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, EFI_OUT_OF_RESOURCES));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -166,7 +166,7 @@ PciHostBridgeUtilityInitRootBridge (
   DEBUG ((
     DEBUG_INFO,
     "%a: populated root bus %d, with room for %d subordinate bus(es)\n",
-    __FUNCTION__,
+    __func__,
     RootBusNumber,
     MaxSubBusNumber - RootBusNumber
     ));
@@ -253,7 +253,7 @@ PciHostBridgeUtilityGetRootBridgesBusScan (
       DEBUG_ERROR,
       "%a: invalid bus range with BusMin %Lu and BusMax "
       "%Lu\n",
-      __FUNCTION__,
+      __func__,
       (UINT64)BusMin,
       (UINT64)BusMax
       ));
@@ -283,7 +283,7 @@ PciHostBridgeUtilityGetRootBridgesBusScan (
         DEBUG_ERROR,
         "%a: invalid count of extra root buses (%Lu) "
         "reported by QEMU\n",
-        __FUNCTION__,
+        __func__,
         ExtraRootBridges
         ));
       return NULL;
@@ -292,7 +292,7 @@ PciHostBridgeUtilityGetRootBridgesBusScan (
     DEBUG ((
       DEBUG_INFO,
       "%a: %Lu extra root buses reported by QEMU\n",
-      __FUNCTION__,
+      __func__,
       ExtraRootBridges
       ));
   }
@@ -302,7 +302,7 @@ PciHostBridgeUtilityGetRootBridgesBusScan (
   //
   Bridges = AllocatePool ((1 + (UINTN)ExtraRootBridges) * sizeof *Bridges);
   if (Bridges == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, EFI_OUT_OF_RESOURCES));
     return NULL;
   }
 
@@ -471,7 +471,7 @@ PciHostBridgeUtilityGetRootBridgesHostProvided (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Failed to allocate memory for hardware resources info\n",
-      __FUNCTION__
+      __func__
       ));
     return NULL;
   }
@@ -495,7 +495,7 @@ PciHostBridgeUtilityGetRootBridgesHostProvided (
       DEBUG_ERROR,
       "%a: Failed to create hardware info list to retrieve host "
       "bridges information from fw-cfg\n",
-      __FUNCTION__
+      __func__
       ));
 
     goto FreeBridges;
@@ -514,7 +514,7 @@ PciHostBridgeUtilityGetRootBridgesHostProvided (
   DEBUG ((
     DEBUG_INFO,
     "%a: Host provided description for %Lu root bridges\n",
-    __FUNCTION__,
+    __func__,
     PciHostBridgeCount
     ));
 
@@ -523,7 +523,7 @@ PciHostBridgeUtilityGetRootBridgesHostProvided (
   //
   Bridges = AllocatePool (((UINTN)PciHostBridgeCount) * sizeof *Bridges);
   if (Bridges == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, EFI_OUT_OF_RESOURCES));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, EFI_OUT_OF_RESOURCES));
     goto FreeBridges;
   }
 
@@ -567,7 +567,7 @@ PciHostBridgeUtilityGetRootBridgesHostProvided (
         DEBUG_ERROR,
         "%a: invalid bus range with BusMin %Lu and BusMax "
         "%Lu\n",
-        __FUNCTION__,
+        __func__,
         (UINT64)RootBridgeNumber,
         (UINT64)LastRootBridgeNumber
         ));

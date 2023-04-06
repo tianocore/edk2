@@ -239,7 +239,7 @@ ExtractConfig (
   UINTN            Size;
   BOOLEAN          AllocatedRequest;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Request=\"%s\"\n", __FUNCTION__, Request));
+  DEBUG ((DEBUG_VERBOSE, "%a: Request=\"%s\"\n", __func__, Request));
 
   if ((Progress == NULL) || (Results == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -321,12 +321,12 @@ ExtractConfig (
     DEBUG ((
       DEBUG_ERROR,
       "%a: BlockToConfig(): %r, Progress=\"%s\"\n",
-      __FUNCTION__,
+      __func__,
       Status,
       (Status == EFI_DEVICE_ERROR) ? NULL : *Progress
       ));
   } else {
-    DEBUG ((DEBUG_VERBOSE, "%a: Results=\"%s\"\n", __FUNCTION__, *Results));
+    DEBUG ((DEBUG_VERBOSE, "%a: Results=\"%s\"\n", __func__, *Results));
   }
 
   //
@@ -431,7 +431,7 @@ RouteConfig (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Configuration=\"%s\"\n",
-    __FUNCTION__,
+    __func__,
     Configuration
     ));
 
@@ -481,7 +481,7 @@ RouteConfig (
     DEBUG ((
       DEBUG_ERROR,
       "%a: ConfigToBlock(): %r, Progress=\"%s\"\n",
-      __FUNCTION__,
+      __func__,
       Status,
       (Status == EFI_BUFFER_TOO_SMALL) ? NULL : *Progress
       ));
@@ -514,7 +514,7 @@ Callback (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Action=0x%Lx QuestionId=%d Type=%d\n",
-    __FUNCTION__,
+    __func__,
     (UINT64)Action,
     QuestionId,
     Type
@@ -835,7 +835,7 @@ ExecutePlatformConfig (
     DEBUG ((
       (Status == EFI_NOT_FOUND) ? DEBUG_VERBOSE : DEBUG_ERROR,
       "%a: failed to load platform config: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return Status;

@@ -36,7 +36,7 @@ QemuCpuhpReadCommandData2 (
                                &CommandData2
                                );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
@@ -61,7 +61,7 @@ QemuCpuhpReadCpuStatus (
                             &CpuStatus
                             );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
@@ -86,7 +86,7 @@ QemuCpuhpReadCommandData (
                               &CommandData
                               );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
@@ -110,7 +110,7 @@ QemuCpuhpWriteCpuSelector (
                          &Selector
                          );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
@@ -132,7 +132,7 @@ QemuCpuhpWriteCpuStatus (
                          &CpuStatus
                          );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
@@ -154,7 +154,7 @@ QemuCpuhpWriteCommand (
                          &Command
                          );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %r\n", __func__, Status));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }
@@ -266,7 +266,7 @@ QemuCpuhpCollectApicIds (
         DEBUG_VERBOSE,
         "%a: CurrentSelector=%u PendingSelector=%u: "
         "wrap-around\n",
-        __FUNCTION__,
+        __func__,
         CurrentSelector,
         PendingSelector
         ));
@@ -291,7 +291,7 @@ QemuCpuhpCollectApicIds (
           DEBUG_ERROR,
           "%a: CurrentSelector=%u CpuStatus=0x%x: "
           "inconsistent CPU status\n",
-          __FUNCTION__,
+          __func__,
           CurrentSelector,
           CpuStatus
           ));
@@ -301,7 +301,7 @@ QemuCpuhpCollectApicIds (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: CurrentSelector=%u: insert\n",
-        __FUNCTION__,
+        __func__,
         CurrentSelector
         ));
 
@@ -317,7 +317,7 @@ QemuCpuhpCollectApicIds (
           DEBUG_ERROR,
           "%a: CurrentSelector=%u CpuStatus=0x%x: "
           "inconsistent CPU status\n",
-          __FUNCTION__,
+          __func__,
           CurrentSelector,
           CpuStatus
           ));
@@ -327,7 +327,7 @@ QemuCpuhpCollectApicIds (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: CurrentSelector=%u: fw_remove\n",
-        __FUNCTION__,
+        __func__,
         CurrentSelector
         ));
 
@@ -341,7 +341,7 @@ QemuCpuhpCollectApicIds (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: CurrentSelector=%u: remove (ignored)\n",
-        __FUNCTION__,
+        __func__,
         CurrentSelector
         ));
 
@@ -352,7 +352,7 @@ QemuCpuhpCollectApicIds (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: CurrentSelector=%u: no event\n",
-        __FUNCTION__,
+        __func__,
         CurrentSelector
         ));
       break;
@@ -368,7 +368,7 @@ QemuCpuhpCollectApicIds (
       // For unplug events, also save the CurrentSelector.
       //
       if (*ExtendCount == ApicIdCount) {
-        DEBUG ((DEBUG_ERROR, "%a: APIC ID array too small\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a: APIC ID array too small\n", __func__));
         return EFI_BUFFER_TOO_SMALL;
       }
 
@@ -377,7 +377,7 @@ QemuCpuhpCollectApicIds (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: ApicId=" FMT_APIC_ID "\n",
-        __FUNCTION__,
+        __func__,
         NewApicId
         ));
       if (ExtendSels != NULL) {
@@ -399,7 +399,7 @@ QemuCpuhpCollectApicIds (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: PluggedCount=%u ToUnplugCount=%u\n",
-    __FUNCTION__,
+    __func__,
     *PluggedCount,
     *ToUnplugCount
     ));

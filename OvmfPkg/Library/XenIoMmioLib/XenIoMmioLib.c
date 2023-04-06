@@ -91,7 +91,7 @@ XenIoMmioInstall (
                        &mXenBusRootDevicePathTemplate
                        );
   if (!XenBusDevicePath) {
-    DEBUG ((DEBUG_ERROR, "%a: Out of memory\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Out of memory\n", __func__));
     Status = EFI_OUT_OF_RESOURCES;
     goto FreeXenIo;
   }
@@ -115,7 +115,7 @@ XenIoMmioInstall (
     DEBUG_ERROR,
     "%a: Failed to install the EFI_DEVICE_PATH and "
     "XENIO_PROTOCOL protocols on handle %p (Status == %r)\n",
-    __FUNCTION__,
+    __func__,
     OutHandle,
     Status
     ));

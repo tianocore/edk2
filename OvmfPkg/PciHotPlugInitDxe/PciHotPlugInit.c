@@ -572,7 +572,7 @@ GetResourcePadding (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Address=%02x:%02x.%x DevicePath=%s\n",
-    __FUNCTION__,
+    __func__,
     Address->Bus,
     Address->Device,
     Address->Function,
@@ -613,11 +613,11 @@ GetResourcePadding (
       DEBUG_VERBOSE,
       "%a: BusNumbers=0x%x Io=0x%Lx NonPrefetchable32BitMmio=0x%x\n"
       "%a: Prefetchable32BitMmio=0x%x Prefetchable64BitMmio=0x%Lx\n",
-      __FUNCTION__,
+      __func__,
       ReservationHint.BusNumbers,
       ReservationHint.Io,
       ReservationHint.NonPrefetchable32BitMmio,
-      __FUNCTION__,
+      __func__,
       ReservationHint.Prefetchable32BitMmio,
       ReservationHint.Prefetchable64BitMmio
       ));

@@ -122,7 +122,7 @@ HandleStatusCode (
       DEBUG_ERROR,
       "%a:%a: malformed Data\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     return EFI_INVALID_PARAMETER;
   }
@@ -143,7 +143,7 @@ HandleStatusCode (
       DEBUG_ERROR,
       "%a:%a: failed to get %g:\"%s\": %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       &gEfiGlobalVariableGuid,
       EFI_BOOT_CURRENT_VARIABLE_NAME,
       Status
@@ -156,7 +156,7 @@ HandleStatusCode (
       DEBUG_ERROR,
       "%a:%a: got %Lu bytes for %g:\"%s\", expected %Lu\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       (UINT64)VariableSize,
       &gEfiGlobalVariableGuid,
       EFI_BOOT_CURRENT_VARIABLE_NAME,
@@ -180,7 +180,7 @@ HandleStatusCode (
       DEBUG_ERROR,
       "%a:%a: EfiBootManagerVariableToLoadOption(\"%s\"): %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       BootOptionName,
       Status
       ));
@@ -309,7 +309,7 @@ PlatformBmPrintScRegisterHandler (
       DEBUG_ERROR,
       "%a:%a: failed to register status code handler: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return Status;
@@ -337,7 +337,7 @@ PlatformBmPrintScRegisterHandler (
       "%a:%a: failed to create ExitBootServices() event: "
       "%r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     StatusCodeRouter->Unregister (HandleStatusCode);

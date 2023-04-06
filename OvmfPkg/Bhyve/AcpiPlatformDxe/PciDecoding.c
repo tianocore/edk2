@@ -76,7 +76,7 @@ EnablePciDecoding (
     DEBUG ((
       DEBUG_WARN,
       "%a: LocateHandleBuffer(): %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return;
@@ -87,7 +87,7 @@ EnablePciDecoding (
     DEBUG ((
       DEBUG_WARN,
       "%a: AllocatePool(): out of resources\n",
-      __FUNCTION__
+      __func__
       ));
     goto FreeHandles;
   }
@@ -120,7 +120,7 @@ EnablePciDecoding (
       DEBUG ((
         DEBUG_WARN,
         "%a: EfiPciIoAttributeOperationGet: %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       goto RestoreAttributes;
@@ -139,7 +139,7 @@ EnablePciDecoding (
       DEBUG ((
         DEBUG_WARN,
         "%a: EfiPciIoAttributeOperationSupported: %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       goto RestoreAttributes;
@@ -159,7 +159,7 @@ EnablePciDecoding (
       DEBUG ((
         DEBUG_WARN,
         "%a: EfiPciIoAttributeOperationEnable: %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       goto RestoreAttributes;
