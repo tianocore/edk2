@@ -137,7 +137,7 @@ CpuArchEventProtocolNotify (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Cpu->RegisterInterruptHandler() - %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return;
@@ -153,7 +153,7 @@ CpuArchEventProtocolNotify (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Cpu->RegisterInterruptHandler() - %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
   }
