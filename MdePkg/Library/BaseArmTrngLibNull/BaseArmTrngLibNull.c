@@ -41,7 +41,6 @@ GetArmTrngVersion (
   OUT UINT16  *MinorRevision
   )
 {
-  ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }
 
@@ -67,7 +66,6 @@ GetArmTrngUuid (
   OUT GUID  *Guid
   )
 {
-  ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }
 
@@ -83,7 +81,6 @@ GetArmTrngMaxSupportedEntropyBits (
   VOID
   )
 {
-  ASSERT (FALSE);
   return 0;
 }
 
@@ -116,6 +113,5 @@ GetArmTrngEntropy (
   OUT UINT8  *Buffer
   )
 {
-  ASSERT (FALSE);
   return RETURN_UNSUPPORTED;
 }
