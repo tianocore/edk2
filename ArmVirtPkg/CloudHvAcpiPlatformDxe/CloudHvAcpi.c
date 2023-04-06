@@ -106,7 +106,7 @@ InstallCloudHvAcpiTables (
   } // while
 
   if (DsdtPtr == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: no DSDT found\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: no DSDT found\n", __func__));
     return EFI_NOT_FOUND;
   }
 
@@ -151,7 +151,7 @@ CloudHvAcpiPlatformEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Fail to install Acpi table: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     CpuDeadLoop ();

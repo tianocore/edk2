@@ -98,7 +98,7 @@ CloudHvVirtMemInfoPeiLibConstructor (
         DEBUG ((
           DEBUG_INFO,
           "%a: System RAM @ 0x%lx - 0x%lx\n",
-          __FUNCTION__,
+          __func__,
           CurBase,
           CurBase + CurSize - 1
           ));
@@ -124,7 +124,7 @@ CloudHvVirtMemInfoPeiLibConstructor (
           DEBUG ((
             DEBUG_WARN,
             "%a: memory node larger than %d will not be included into Memory System\n",
-            __FUNCTION__,
+            __func__,
             CLOUDHV_MAX_MEM_NODE_NUM
             ));
           break;
@@ -133,7 +133,7 @@ CloudHvVirtMemInfoPeiLibConstructor (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Failed to parse FDT memory node\n",
-          __FUNCTION__
+          __func__
           ));
       }
     }
@@ -186,7 +186,7 @@ ArmVirtGetMemoryMap (
                          );
 
   if (VirtualMemoryTable == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Error: Failed AllocatePool()\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Error: Failed AllocatePool()\n", __func__));
     return;
   }
 
@@ -205,7 +205,7 @@ ArmVirtGetMemoryMap (
       "\tPhysicalBase: 0x%lX\n"
       "\tVirtualBase: 0x%lX\n"
       "\tLength: 0x%lX\n",
-      __FUNCTION__,
+      __func__,
       MemNodeIndex,
       VirtualMemoryTable[Index].PhysicalBase,
       VirtualMemoryTable[Index].VirtualBase,

@@ -265,7 +265,7 @@ NorFlashPlatformLibConstructor (
       DEBUG ((
         DEBUG_ERROR,
         "%a: GetNodeProperty ('label') failed (Status == %r)\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
     } else if (AsciiStrCmp (Label, LABEL_UEFI_VAR_STORE) == 0) {
@@ -284,7 +284,7 @@ NorFlashPlatformLibConstructor (
       DEBUG ((
         DEBUG_ERROR,
         "%a: GetNodeProperty () failed (Status == %r)\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       continue;

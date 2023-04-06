@@ -147,7 +147,7 @@ KvmtoolRtcFdtClientLibConstructor (
     DEBUG ((
       DEBUG_ERROR,
       "%a: No 'motorola,mc146818' compatible DT node found\n",
-      __FUNCTION__
+      __func__
       ));
     return Status;
   }
@@ -163,7 +163,7 @@ KvmtoolRtcFdtClientLibConstructor (
     DEBUG ((
       DEBUG_ERROR,
       "%a: No 'reg' property found in 'motorola,mc146818' compatible DT node\n",
-      __FUNCTION__
+      __func__
       ));
     return Status;
   }

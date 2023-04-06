@@ -83,7 +83,7 @@ ArmVirtGetMemoryMap (
                          );
 
   if (VirtualMemoryTable == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Error: Failed AllocatePool()\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Error: Failed AllocatePool()\n", __func__));
     return;
   }
 
@@ -99,7 +99,7 @@ ArmVirtGetMemoryMap (
     "\tPhysicalBase: 0x%lX\n"
     "\tVirtualBase: 0x%lX\n"
     "\tLength: 0x%lX\n",
-    __FUNCTION__,
+    __func__,
     VirtualMemoryTable[0].PhysicalBase,
     VirtualMemoryTable[0].VirtualBase,
     VirtualMemoryTable[0].Length
