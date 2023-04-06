@@ -167,7 +167,7 @@ GetCurrentTime (
     DEBUG ((
       DEBUG_ERROR,
       "%a(), GetTime() failed, status = '%r'\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return Status;

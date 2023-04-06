@@ -205,7 +205,7 @@ DisableTpmPlatformHierarchy (
   // Make sure that we have use of the TPM.
   Status = Tpm2RequestUseTpm ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a:%a() - Tpm2RequestUseTpm Failed! %r\n", gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a:%a() - Tpm2RequestUseTpm Failed! %r\n", gEfiCallerBaseName, __func__, Status));
     ASSERT_EFI_ERROR (Status);
     return Status;
   }
@@ -224,9 +224,9 @@ DisableTpmPlatformHierarchy (
               TPM_RH_PLATFORM,     // Hierarchy
               NO                   // State
               );
-  DEBUG ((DEBUG_VERBOSE, "%a:%a() -  Disable PH = %r\n", gEfiCallerBaseName, __FUNCTION__, Status));
+  DEBUG ((DEBUG_VERBOSE, "%a:%a() -  Disable PH = %r\n", gEfiCallerBaseName, __func__, Status));
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a:%a() -  Disable PH Failed! %r\n", gEfiCallerBaseName, __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a:%a() -  Disable PH Failed! %r\n", gEfiCallerBaseName, __func__, Status));
     ASSERT_EFI_ERROR (Status);
   }
 

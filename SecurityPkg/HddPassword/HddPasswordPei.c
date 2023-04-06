@@ -103,7 +103,7 @@ UnlockDevice (
 
   ZeroMem (Buffer, sizeof (Buffer));
 
-  DEBUG ((DEBUG_INFO, "%a() - %r\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_INFO, "%a() - %r\n", __func__, Status));
   return Status;
 }
 
@@ -186,7 +186,7 @@ FreezeLockDevice (
 
   FreeAlignedPages (Asb, EFI_SIZE_TO_PAGES (sizeof (EFI_ATA_STATUS_BLOCK)));
 
-  DEBUG ((DEBUG_INFO, "%a() - %r\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_INFO, "%a() - %r\n", __func__, Status));
   return Status;
 }
 
@@ -321,11 +321,11 @@ HddPasswordAtaPassThruNotify (
   IN VOID                       *Ppi
   )
 {
-  DEBUG ((DEBUG_INFO, "%a() - enter at S3 resume\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - enter at S3 resume\n", __func__));
 
   UnlockHddPassword ((EDKII_PEI_ATA_PASS_THRU_PPI *)Ppi);
 
-  DEBUG ((DEBUG_INFO, "%a() - exit at S3 resume\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - exit at S3 resume\n", __func__));
 
   return EFI_SUCCESS;
 }
@@ -360,7 +360,7 @@ HddPasswordPeiInit (
     return EFI_UNSUPPORTED;
   }
 
-  DEBUG ((DEBUG_INFO, "%a: Enters in S3 path.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Enters in S3 path.\n", __func__));
 
   Status = PeiServicesNotifyPpi (&mHddPasswordAtaPassThruPpiNotifyDesc);
   ASSERT_EFI_ERROR (Status);

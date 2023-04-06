@@ -81,7 +81,7 @@ SecureBootFetchData (
     if (Status == EFI_SUCCESS) {
       RsaPubKey = NULL;
       if (RsaGetPublicKeyFromX509 (Buffer, Size, &RsaPubKey) == FALSE) {
-        DEBUG ((DEBUG_ERROR, "%a: Invalid key format: %d\n", __FUNCTION__, KeyIndex));
+        DEBUG ((DEBUG_ERROR, "%a: Invalid key format: %d\n", __func__, KeyIndex));
         if (EfiSig != NULL) {
           FreePool (EfiSig);
         }

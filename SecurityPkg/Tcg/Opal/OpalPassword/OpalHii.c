@@ -95,7 +95,7 @@ GetSavedOpalRequest (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   UINTN                     DevicePathSize;
 
-  DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - enter\n", __func__));
 
   Variable     = NULL;
   VariableSize = 0;
@@ -141,7 +141,7 @@ GetSavedOpalRequest (
 
   FreePool (Variable);
 
-  DEBUG ((DEBUG_INFO, "%a() - exit\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - exit\n", __func__));
 }
 
 /**
@@ -169,7 +169,7 @@ SaveOpalRequest (
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
   UINTN                     DevicePathSize;
 
-  DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - enter\n", __func__));
 
   DEBUG ((
     DEBUG_INFO,
@@ -264,7 +264,7 @@ SaveOpalRequest (
     FreePool (Variable);
   }
 
-  DEBUG ((DEBUG_INFO, "%a() - exit\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - exit\n", __func__));
 }
 
 /**
