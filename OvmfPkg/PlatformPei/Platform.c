@@ -222,10 +222,6 @@ ReserveEmuVariableNvStore (
   VariableStore = (EFI_PHYSICAL_ADDRESS)(UINTN)PlatformReserveEmuVariableNvStore ();
   PcdStatus     = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
 
- #ifdef SECURE_BOOT_FEATURE_ENABLED
-  PlatformInitEmuVariableNvStore ((VOID *)(UINTN)VariableStore);
- #endif
-
   ASSERT_RETURN_ERROR (PcdStatus);
 }
 

@@ -97,8 +97,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
 
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
-  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
-  gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
+  # gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
+  # gUefiOvmfPkgTokenSpaceGuid.PcdCfvRawDataSize
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
