@@ -320,7 +320,7 @@ VirtioFsExitBoot (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: VirtioFs=0x%p Label=\"%s\"\n",
-    __FUNCTION__,
+    __func__,
     VirtioFsAsVoid,
     VirtioFs->Label
     ));

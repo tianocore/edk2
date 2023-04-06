@@ -128,7 +128,7 @@ VirtioFsFuseLookup (
          DEBUG_VERBOSE :
          DEBUG_ERROR),
         "%a: Label=\"%s\" DirNodeId=%Lu Name=\"%a\" Errno=%d\n",
-        __FUNCTION__,
+        __func__,
         VirtioFs->Label,
         DirNodeId,
         Name,

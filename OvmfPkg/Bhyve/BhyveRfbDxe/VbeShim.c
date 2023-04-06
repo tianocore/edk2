@@ -147,7 +147,7 @@ InstallVbeShim (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: Video BIOS handler found at %04x:%04x\n",
-        __FUNCTION__,
+        __func__,
         Int0x10->Segment,
         Int0x10->Offset
         ));
@@ -161,7 +161,7 @@ InstallVbeShim (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: failed to allocate page at zero: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
   } else {
@@ -271,7 +271,7 @@ InstallVbeShim (
   DEBUG ((
     DEBUG_INFO,
     "%a: VBE shim installed to %x:%x\n",
-    __FUNCTION__,
+    __func__,
     Int0x10->Segment,
     Int0x10->Offset
     ));

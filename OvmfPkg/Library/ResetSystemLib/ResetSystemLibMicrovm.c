@@ -25,9 +25,9 @@ MicrovmGedBase (
 
   if (EfiGoneVirtual ()) {
     EfiConvertPointer (0, &Address);
-    DEBUG ((DEBUG_INFO, "%a: virtual -> 0x%x\n", __FUNCTION__, Address));
+    DEBUG ((DEBUG_INFO, "%a: virtual -> 0x%x\n", __func__, Address));
   } else {
-    DEBUG ((DEBUG_INFO, "%a: physical -> 0x%x\n", __FUNCTION__, Address));
+    DEBUG ((DEBUG_INFO, "%a: physical -> 0x%x\n", __func__, Address));
   }
 
   return (UINTN)Address;
@@ -40,7 +40,7 @@ MicrovmReset (
 {
   UINTN  Address = MicrovmGedBase ();
 
-  DEBUG ((DEBUG_INFO, "%a: microvm reset via ged\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: microvm reset via ged\n", __func__));
   MmioWrite8 (
     Address + MICROVM_ACPI_GED_REG_RESET,
     MICROVM_ACPI_GED_RESET_VALUE
@@ -55,7 +55,7 @@ MicrovmShutdown (
 {
   UINTN  Address = MicrovmGedBase ();
 
-  DEBUG ((DEBUG_INFO, "%a: microvm poweroff via ged\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: microvm poweroff via ged\n", __func__));
   MmioWrite8 (
     Address + MICROVM_ACPI_GED_REG_SLEEP_CTL,
     (1 << 5) /* enable bit */ |

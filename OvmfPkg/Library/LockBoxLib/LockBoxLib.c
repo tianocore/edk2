@@ -125,7 +125,7 @@ SaveLockBox (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Guid=%g Buffer=%p Length=0x%x\n",
-    __FUNCTION__,
+    __func__,
     Guid,
     Buffer,
     (UINT32)Length
@@ -196,7 +196,7 @@ SetLockBoxAttributes (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Guid=%g Attributes=0x%Lx\n",
-    __FUNCTION__,
+    __func__,
     Guid,
     Attributes
     ));
@@ -253,7 +253,7 @@ UpdateLockBox (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Guid=%g Offset=0x%x Length=0x%x\n",
-    __FUNCTION__,
+    __func__,
     Guid,
     (UINT32)Offset,
     (UINT32)Length
@@ -315,7 +315,7 @@ RestoreLockBox (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Guid=%g Buffer=%p\n",
-    __FUNCTION__,
+    __func__,
     Guid,
     Buffer
     ));
@@ -397,7 +397,7 @@ RestoreAllLockBoxInPlace (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: Guid=%g Buffer=%p\n",
-        __FUNCTION__,
+        __func__,
         &Header->Guid,
         Buffer
         ));

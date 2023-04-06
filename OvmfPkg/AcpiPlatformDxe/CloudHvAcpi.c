@@ -69,7 +69,7 @@ InstallCloudHvTablesTdx (
   // then we're out of sync with the hypervisor, and cannot continue.
   //
   if (DsdtTable == NULL) {
-    DEBUG ((DEBUG_INFO, "%a: no DSDT found\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: no DSDT found\n", __func__));
     ASSERT (FALSE);
   }
 
@@ -201,7 +201,7 @@ InstallCloudHvTables (
   // then we're out of sync with the hypervisor, and cannot continue.
   //
   if (DsdtTable == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: no DSDT found\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: no DSDT found\n", __func__));
     ASSERT (FALSE);
     CpuDeadLoop ();
   }

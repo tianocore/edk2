@@ -394,7 +394,7 @@ QemuLoadKernelImage (
         DEBUG ((
           DEBUG_ERROR,
           "%a: QemuLoadLegacyImage(): %r\n",
-          __FUNCTION__,
+          __func__,
           Status
           ));
         return Status;
@@ -404,7 +404,7 @@ QemuLoadKernelImage (
       return EFI_SUCCESS;
 
     default:
-      DEBUG ((DEBUG_ERROR, "%a: LoadImage(): %r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: LoadImage(): %r\n", __func__, Status));
       return Status;
   }
 
@@ -443,7 +443,7 @@ QemuLoadKernelImage (
       DEBUG ((
         DEBUG_ERROR,
         "%a: kernel command line is not NUL-terminated\n",
-        __FUNCTION__
+        __func__
         ));
       Status = EFI_PROTOCOL_ERROR;
       goto FreeCommandLine;
@@ -492,7 +492,7 @@ QemuLoadKernelImage (
     DEBUG ((
       DEBUG_INFO,
       "%a: command line: \"%s\"\n",
-      __FUNCTION__,
+      __func__,
       (CHAR16 *)KernelLoadedImage->LoadOptions
       ));
   }

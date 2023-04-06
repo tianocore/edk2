@@ -146,7 +146,7 @@ VirtioFsFuseOpenOrCreate (
         DEBUG_ERROR,
         "%a: Label=\"%s\" ParentNodeId=%Lu Name=\"%a\" "
         "Errno=%d\n",
-        __FUNCTION__,
+        __func__,
         VirtioFs->Label,
         ParentNodeId,
         Name,

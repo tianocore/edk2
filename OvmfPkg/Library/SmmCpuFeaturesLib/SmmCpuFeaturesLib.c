@@ -220,7 +220,7 @@ InitCpuHotEjectData (
       RETURN_ERROR (SafeUintnAdd (Size, sizeof (*mCpuHotEjectData), &Size)) ||
       RETURN_ERROR (SafeUintnAdd (Size, sizeof (UINT64) - 1, &Size)))
   {
-    DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_EJECT_DATA\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_EJECT_DATA\n", __func__));
     goto Fatal;
   }
 
@@ -303,7 +303,7 @@ SmmCpuFeaturesSmmRelocationComplete (
     DEBUG ((
       DEBUG_ERROR,
       "%a: MemEncryptSevSetPageEncMask(): %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     ASSERT (FALSE);

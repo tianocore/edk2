@@ -354,7 +354,7 @@ VirtioGpuExitBoot (
 {
   VGPU_DEV  *VgpuDev;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __func__, Context));
   VgpuDev = Context;
   VgpuDev->VirtIo->SetDeviceStatus (VgpuDev->VirtIo, 0);
 }
@@ -516,7 +516,7 @@ VirtioGpuSendCommandWithReply (
     DEBUG ((
       DEBUG_ERROR,
       "%a: malformed response to Request=0x%x\n",
-      __FUNCTION__,
+      __func__,
       (UINT32)RequestType
       ));
     Status = EFI_PROTOCOL_ERROR;
@@ -548,7 +548,7 @@ VirtioGpuSendCommandWithReply (
   DEBUG ((
     DEBUG_ERROR,
     "%a: Request=0x%x Response=0x%x (expected 0x%x)\n",
-    __FUNCTION__,
+    __func__,
     (UINT32)RequestType,
     Response->Type,
     ResponseType

@@ -175,7 +175,7 @@ AlterAcpiTable (
       NewMadtTableLength = Table->Length + sizeof (EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_STRUCTURE);
       NewMadtTable       = AllocatePool (NewMadtTableLength);
       if (NewMadtTable == NULL) {
-        DEBUG ((DEBUG_ERROR, "%a: OUT_OF_SOURCES error.\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a: OUT_OF_SOURCES error.\n", __func__));
         break;
       }
 

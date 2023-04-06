@@ -175,7 +175,7 @@ SaveCondensedWritePointerToS3Context (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: 0x%04x/[0x%08x+%d] := 0x%Lx (%Lu)\n",
-    __FUNCTION__,
+    __func__,
     PointerItem,
     PointerOffset,
     PointerSize,
@@ -225,7 +225,7 @@ AppendFwCfgBootScript (
     }
   }
 
-  DEBUG ((DEBUG_VERBOSE, "%a: boot script fragment saved\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: boot script fragment saved\n", __func__));
 
   ReleaseS3Context (S3Context);
   return;

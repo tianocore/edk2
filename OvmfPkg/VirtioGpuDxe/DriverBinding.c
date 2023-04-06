@@ -816,7 +816,7 @@ VirtioGpuDriverBindingStart (
       DEBUG ((
         DEBUG_INFO,
         "%a: bound VirtIo=%p without producing GOP\n",
-        __FUNCTION__,
+        __func__,
         (VOID *)VgpuDev->VirtIo
         ));
       return EFI_SUCCESS;
@@ -848,7 +848,7 @@ VirtioGpuDriverBindingStart (
   DEBUG ((
     DEBUG_INFO,
     "%a: produced GOP %a VirtIo=%p\n",
-    __FUNCTION__,
+    __func__,
     VirtIoBoundJustNow ? "while binding" : "for pre-bound",
     (VOID *)VgpuDev->VirtIo
     ));
@@ -952,7 +952,7 @@ VirtioGpuDriverBindingStop (
       DEBUG ((
         DEBUG_INFO,
         "%a: unbinding GOP-less VirtIo=%p\n",
-        __FUNCTION__,
+        __func__,
         (VOID *)VgpuDev->VirtIo
         ));
 
@@ -1010,7 +1010,7 @@ VirtioGpuDriverBindingStop (
       DEBUG ((
         DEBUG_INFO,
         "%a: destroying GOP under VirtIo=%p\n",
-        __FUNCTION__,
+        __func__,
         (VOID *)VgpuDev->VirtIo
         ));
       UninitVgpuGop (VgpuDev, ControllerHandle, This->DriverBindingHandle);

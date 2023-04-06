@@ -130,7 +130,7 @@ VirtioFsFuseRename (
       DEBUG_ERROR,
       "%a: Label=\"%s\" OldParentNodeId=%Lu OldName=\"%a\" "
       "NewParentNodeId=%Lu NewName=\"%a\" Errno=%d\n",
-      __FUNCTION__,
+      __func__,
       VirtioFs->Label,
       OldParentNodeId,
       OldName,

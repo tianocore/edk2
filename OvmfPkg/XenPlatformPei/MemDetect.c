@@ -54,7 +54,7 @@ Q35TsegMbytesInitialization (
       DEBUG_ERROR,
       "%a: no TSEG (SMRAM) on host bridge DID=0x%04x; "
       "only DID=0x%04x (Q35) is supported\n",
-      __FUNCTION__,
+      __func__,
       mHostBridgeDevId,
       INTEL_Q35_MCH_DEVICE_ID
       ));
@@ -88,7 +88,7 @@ Q35TsegMbytesInitialization (
   DEBUG ((
     DEBUG_INFO,
     "%a: QEMU offers an extended TSEG (%d MB)\n",
-    __FUNCTION__,
+    __func__,
     ExtendedTsegMbytes
     ));
   PcdStatus = PcdSet16S (PcdQ35TsegMbytes, ExtendedTsegMbytes);
@@ -291,7 +291,7 @@ PublishPeiMemory (
     DEBUG ((
       DEBUG_INFO,
       "%a: mPhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
-      __FUNCTION__,
+      __func__,
       mPhysMemAddressWidth,
       PeiMemoryCap >> 10
       ));

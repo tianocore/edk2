@@ -31,7 +31,7 @@ PrePeiGetHobList (
   GetFirmwareContextPointer (&FirmwareContext);
 
   if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __func__));
     return NULL;
   }
 
@@ -56,7 +56,7 @@ PrePeiSetHobList (
   GetFirmwareContextPointer (&FirmwareContext);
 
   if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __func__));
     return EFI_NOT_READY;
   }
 

@@ -73,12 +73,12 @@ InstallVbeShim (
     DEBUG ((
       DEBUG_WARN,
       "%a: page 0 protected, not installing VBE shim\n",
-      __FUNCTION__
+      __func__
       ));
     DEBUG ((
       DEBUG_WARN,
       "%a: page 0 protection prevents Windows 7 from booting anyway\n",
-      __FUNCTION__
+      __func__
       ));
     return;
   }
@@ -117,7 +117,7 @@ InstallVbeShim (
       DEBUG ((
         DEBUG_INFO,
         "%a: Video BIOS handler found at %04x:%04x\n",
-        __FUNCTION__,
+        __func__,
         Int0x10->Segment,
         Int0x10->Offset
         ));
@@ -131,7 +131,7 @@ InstallVbeShim (
     DEBUG ((
       DEBUG_INFO,
       "%a: failed to allocate page at zero: %r\n",
-      __FUNCTION__,
+      __func__,
       Segment0AllocationStatus
       ));
   } else {
@@ -162,7 +162,7 @@ InstallVbeShim (
       DEBUG ((
         DEBUG_ERROR,
         "%a: unknown host bridge device ID: 0x%04x\n",
-        __FUNCTION__,
+        __func__,
         HostBridgeDevId
         ));
       ASSERT (FALSE);
@@ -324,5 +324,5 @@ InstallVbeShim (
   Int0x10->Segment = (UINT16)((UINT32)SegmentC >> 4);
   Int0x10->Offset  = (UINT16)((UINTN)(VbeModeInfo + 1) - SegmentC);
 
-  DEBUG ((DEBUG_INFO, "%a: VBE shim installed\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: VBE shim installed\n", __func__));
 }

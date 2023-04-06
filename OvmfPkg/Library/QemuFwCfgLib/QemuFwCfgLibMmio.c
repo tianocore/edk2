@@ -134,7 +134,7 @@ QemuFwCfgInitialize (
     DEBUG ((
       DEBUG_WARN,
       "%a: No 'qemu,fw-cfg-mmio' compatible DT node found (Status == %r)\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return EFI_SUCCESS;

@@ -153,7 +153,7 @@ IoMmuInitReservedSharedMem (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: ReservedMem (%d pages) address = 0x%llx\n",
-    __FUNCTION__,
+    __func__,
     TotalPages,
     PhysicalAddress
     ));
@@ -330,7 +330,7 @@ InternalAllocateBuffer (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: range-size: %lx, start-address=0x%llx, pages=0x%llx, bits=0x%lx, bitmap: %lx => %lx\n",
-    __FUNCTION__,
+    __func__,
     MemRange->DataSize,
     *PhysicalAddress,
     Pages,
@@ -401,7 +401,7 @@ IoMmuFreeBounceBuffer (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: PlainTextAddress=0x%Lx, bits=0x%Lx, bitmap: %Lx => %Lx\n",
-      __FUNCTION__,
+      __func__,
       MapInfo->PlainTextAddress,
       MapInfo->ReservedMemBitmap,
       mReservedMemBitmap,
@@ -480,7 +480,7 @@ IoMmuFreeCommonBuffer (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: CommonBuffer=0x%Lx, bits=0x%Lx, bitmap: %Lx => %Lx\n",
-    __FUNCTION__,
+    __func__,
     (UINT64)(UINTN)CommonBufferHeader + SIZE_4KB,
     CommonBufferHeader->ReservedMemBitmap,
     mReservedMemBitmap,

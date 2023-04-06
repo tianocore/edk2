@@ -29,11 +29,11 @@ DxeResetSystemLibMicrovmConstructor (
   EFI_STATUS                       Status;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  Descriptor;
 
-  DEBUG ((DEBUG_INFO, "%a: start\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: start\n", __func__));
 
   Status = gDS->GetMemorySpaceDescriptor (Address, &Descriptor);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "%a: GetMemorySpaceDescriptor failed\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: GetMemorySpaceDescriptor failed\n", __func__));
     return RETURN_UNSUPPORTED;
   }
 
@@ -43,10 +43,10 @@ DxeResetSystemLibMicrovmConstructor (
                   Descriptor.Attributes | EFI_MEMORY_RUNTIME
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "%a: SetMemorySpaceAttributes failed\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: SetMemorySpaceAttributes failed\n", __func__));
     return RETURN_UNSUPPORTED;
   }
 
-  DEBUG ((DEBUG_INFO, "%a: done\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: done\n", __func__));
   return EFI_SUCCESS;
 }

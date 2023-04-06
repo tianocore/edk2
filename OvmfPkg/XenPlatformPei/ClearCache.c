@@ -60,7 +60,7 @@ ClearCacheOnMpServicesAvailable (
   EFI_PEI_MP_SERVICES_PPI  *MpServices;
   EFI_STATUS               Status;
 
-  DEBUG ((DEBUG_INFO, "%a: %a\n", gEfiCallerBaseName, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: %a\n", gEfiCallerBaseName, __func__));
 
   //
   // Clear cache on all the APs in parallel.
@@ -75,7 +75,7 @@ ClearCacheOnMpServicesAvailable (
                              NULL             // ProcedureArgument
                              );
   if (EFI_ERROR (Status) && (Status != EFI_NOT_STARTED)) {
-    DEBUG ((DEBUG_ERROR, "%a: StartupAllAps(): %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: StartupAllAps(): %r\n", __func__, Status));
     return Status;
   }
 
@@ -109,7 +109,7 @@ InstallClearCacheCallback (
     DEBUG ((
       DEBUG_ERROR,
       "%a: failed to set up MP Services callback: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
   }

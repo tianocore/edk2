@@ -190,7 +190,7 @@ LegacyInterruptInstall (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__,
+        __func__,
         HostBridgeDevId
         ));
       ASSERT (FALSE);

@@ -92,7 +92,7 @@ IoMmuMap (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Operation=%a Host=0x%p Bytes=0x%Lx\n",
-    __FUNCTION__,
+    __func__,
     ((Operation >= 0 &&
       Operation < ARRAY_SIZE (mBusMasterOperationName)) ?
      mBusMasterOperationName[Operation] :
@@ -289,7 +289,7 @@ IoMmuMap (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Mapping=0x%p Device(PlainText)=0x%Lx Crypted=0x%Lx Pages=0x%Lx, ReservedMemBitmap=0x%Lx\n",
-    __FUNCTION__,
+    __func__,
     MapInfo,
     MapInfo->PlainTextAddress,
     MapInfo->CryptedAddress,
@@ -342,7 +342,7 @@ IoMmuUnmapWorker (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Mapping=0x%p MemoryMapLocked=%d\n",
-    __FUNCTION__,
+    __func__,
     Mapping,
     MemoryMapLocked
     ));
@@ -537,7 +537,7 @@ IoMmuAllocateBuffer (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: MemoryType=%u Pages=0x%Lx Attributes=0x%Lx\n",
-    __FUNCTION__,
+    __func__,
     (UINT32)MemoryType,
     (UINT64)Pages,
     Attributes
@@ -625,7 +625,7 @@ IoMmuAllocateBuffer (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Host=0x%Lx Stash=0x%p\n",
-    __FUNCTION__,
+    __func__,
     PhysicalAddress,
     StashBuffer
     ));
@@ -663,7 +663,7 @@ IoMmuFreeBuffer (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Host=0x%p Pages=0x%Lx\n",
-    __FUNCTION__,
+    __func__,
     HostAddress,
     (UINT64)Pages
     ));
@@ -818,7 +818,7 @@ IoMmuExitBoot (
   //   queue EventToSignal's NotifyFunction after the NotifyFunctions of *all*
   //   events in EFI_EVENT_GROUP_EXIT_BOOT_SERVICES.
   //
-  DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a\n", __func__));
   gBS->SignalEvent (EventToSignal);
 }
 
@@ -847,7 +847,7 @@ IoMmuUnmapAllMappings (
   LIST_ENTRY  *NextNode;
   MAP_INFO    *MapInfo;
 
-  DEBUG ((DEBUG_VERBOSE, "%a\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a\n", __func__));
 
   //
   // All drivers that had set up IOMMU mappings have halted their respective
@@ -933,7 +933,7 @@ InstallIoMmuProtocol (
   if (EFI_ERROR (Status)) {
     mReservedSharedMemSupported = FALSE;
   } else {
-    DEBUG ((DEBUG_INFO, "%a: Feature of reserved memory for DMA is supported.\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: Feature of reserved memory for DMA is supported.\n", __func__));
   }
 
   return EFI_SUCCESS;

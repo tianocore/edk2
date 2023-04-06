@@ -187,13 +187,13 @@ XenPvBlockFrontInitialization (
   if (Dev->MediaInfo.CdRom) {
     Status = XenBusIo->XsBackendRead (XenBusIo, XST_NIL, "params", (VOID **)&Params);
     if (Status != XENSTORE_STATUS_SUCCESS) {
-      DEBUG ((DEBUG_ERROR, "%a: Failed to read params (%d)\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: Failed to read params (%d)\n", __func__, Status));
       goto Error;
     }
 
     if ((AsciiStrLen (Params) == 0) || (AsciiStrCmp (Params, "aio:") == 0)) {
       FreePool (Params);
-      DEBUG ((DEBUG_INFO, "%a: Empty cdrom\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a: Empty cdrom\n", __func__));
       goto Error;
     }
 

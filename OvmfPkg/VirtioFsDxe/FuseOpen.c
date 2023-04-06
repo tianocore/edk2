@@ -119,7 +119,7 @@ VirtioFsFuseOpen (
         DEBUG_ERROR,
         "%a: Label=\"%s\" NodeId=%Lu ReadWrite=%d "
         "Errno=%d\n",
-        __FUNCTION__,
+        __func__,
         VirtioFs->Label,
         NodeId,
         ReadWrite,

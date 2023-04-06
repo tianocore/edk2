@@ -378,7 +378,7 @@ VirtioFsSimpleFileOpen (
         ("%a: Label=\"%s\" CanonicalPathname=\"%a\" FileName=\"%s\" "
          "OpenMode=0x%Lx Attributes=0x%Lx: nonsensical request to possibly "
          "create a file marked read-only, for read-write access\n"),
-        __FUNCTION__,
+        __func__,
         VirtioFs->Label,
         VirtioFsFile->CanonicalPathname,
         FileName,
@@ -403,7 +403,7 @@ VirtioFsSimpleFileOpen (
       ("%a: Label=\"%s\" CanonicalPathname=\"%a\" FileName=\"%s\": "
        "nonsensical request to open a file or directory relative to a regular "
        "file\n"),
-      __FUNCTION__,
+      __func__,
       VirtioFs->Label,
       VirtioFsFile->CanonicalPathname,
       FileName

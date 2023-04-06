@@ -275,7 +275,7 @@ CheckDevice (
     DEBUG ((
       DEBUG_WARN,
       "%a: 64-bit MMIO BARs may be degraded for PCI 0x%04x:0x%04x (rev %d)\n",
-      __FUNCTION__,
+      __func__,
       (UINT32)VendorId,
       (UINT32)DeviceId,
       (UINT8)RevisionId

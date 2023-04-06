@@ -51,7 +51,7 @@ SetCaCerts (
       DEBUG_VERBOSE,
       "%a:%a: not touching CA cert list\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     return;
   }
@@ -83,7 +83,7 @@ SetCaCerts (
       DEBUG_ERROR,
       "%a:%a: failed to delete %g:\"%s\"\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       &gEfiTlsCaCertificateGuid,
       EFI_TLS_CA_CERTIFICATE_VARIABLE
       ));
@@ -96,7 +96,7 @@ SetCaCerts (
       DEBUG_VERBOSE,
       "%a:%a: applied empty CA cert list\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     return;
   }
@@ -107,7 +107,7 @@ SetCaCerts (
       DEBUG_ERROR,
       "%a:%a: failed to allocate HttpsCaCerts\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     return;
   }
@@ -127,7 +127,7 @@ SetCaCerts (
       DEBUG_ERROR,
       "%a:%a: failed to set %g:\"%s\": %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       &gEfiTlsCaCertificateGuid,
       EFI_TLS_CA_CERTIFICATE_VARIABLE,
       Status
@@ -139,7 +139,7 @@ SetCaCerts (
     DEBUG_VERBOSE,
     "%a:%a: stored CA cert list (%Lu byte(s))\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     (UINT64)HttpsCaCertsSize
     ));
 
@@ -176,7 +176,7 @@ SetCipherSuites (
       DEBUG_VERBOSE,
       "%a:%a: not touching cipher suites\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     return;
   }
@@ -204,7 +204,7 @@ SetCipherSuites (
       DEBUG_ERROR,
       "%a:%a: failed to delete %g:\"%s\"\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       &gEdkiiHttpTlsCipherListGuid,
       EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE
       ));
@@ -216,7 +216,7 @@ SetCipherSuites (
       DEBUG_ERROR,
       "%a:%a: list of cipher suites must not be empty\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     Status = EFI_INVALID_PARAMETER;
     goto Done;
@@ -228,7 +228,7 @@ SetCipherSuites (
       DEBUG_ERROR,
       "%a:%a: failed to allocate HttpsCiphers\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
@@ -249,7 +249,7 @@ SetCipherSuites (
       DEBUG_ERROR,
       "%a:%a: failed to set %g:\"%s\"\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       &gEdkiiHttpTlsCipherListGuid,
       EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE
       ));
@@ -260,7 +260,7 @@ SetCipherSuites (
     DEBUG_VERBOSE,
     "%a:%a: stored list of cipher suites (%Lu byte(s))\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     (UINT64)HttpsCiphersSize
     ));
 

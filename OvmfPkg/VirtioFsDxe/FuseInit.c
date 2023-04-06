@@ -125,7 +125,7 @@ VirtioFsFuseInitSession (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Label=\"%s\" Errno=%d\n",
-        __FUNCTION__,
+        __func__,
         VirtioFs->Label,
         CommonResp.Error
         ));

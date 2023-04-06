@@ -265,7 +265,7 @@ TdxMmioReadWrite (
   UINT64  TdStatus;
 
   if ((MmioSize != 1) && (MmioSize != 2) && (MmioSize != 4) && (MmioSize != 8)) {
-    DEBUG ((DEBUG_ERROR, "%a: Invalid MmioSize - %d\n", __FUNCTION__, MmioSize));
+    DEBUG ((DEBUG_ERROR, "%a: Invalid MmioSize - %d\n", __func__, MmioSize));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -283,7 +283,7 @@ TdxMmioReadWrite (
   }
 
   if (TdStatus != 0) {
-    DEBUG ((DEBUG_ERROR, "%a: TdVmcall failed with %llx\n", __FUNCTION__, TdStatus));
+    DEBUG ((DEBUG_ERROR, "%a: TdVmcall failed with %llx\n", __func__, TdStatus));
     return EFI_ABORTED;
   }
 
@@ -334,7 +334,7 @@ ParseMmioExitInstructions (
 
   Status = CcInitInstructionData (InstructionData, NULL, Regs);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Initialize InstructionData failed! (%r)\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Initialize InstructionData failed! (%r)\n", __func__, Status));
     return Status;
   }
 
@@ -361,7 +361,7 @@ ParseMmioExitInstructions (
                0);
 
       if (InstructionData->Ext.ModRm.Mod == 3) {
-        DEBUG ((DEBUG_ERROR, "%a: Parse Ext.ModRm.Mod error! (OpCode: 0x%x)\n", __FUNCTION__, OpCode));
+        DEBUG ((DEBUG_ERROR, "%a: Parse Ext.ModRm.Mod error! (OpCode: 0x%x)\n", __func__, OpCode));
         return EFI_UNSUPPORTED;
       }
 
@@ -440,7 +440,7 @@ ParseMmioExitInstructions (
         //
         // NPF on two register operands???
         //
-        DEBUG ((DEBUG_ERROR, "%a: Parse Ext.ModRm.Mod error! (OpCode: 0x%x)\n", __FUNCTION__, OpCode));
+        DEBUG ((DEBUG_ERROR, "%a: Parse Ext.ModRm.Mod error! (OpCode: 0x%x)\n", __func__, OpCode));
         return EFI_UNSUPPORTED;
       }
 
@@ -558,7 +558,7 @@ ParseMmioExitInstructions (
       break;
 
     default:
-      DEBUG ((DEBUG_ERROR, "%a: Invalid MMIO opcode (%x)\n", __FUNCTION__, OpCode));
+      DEBUG ((DEBUG_ERROR, "%a: Invalid MMIO opcode (%x)\n", __func__, OpCode));
       Status = EFI_UNSUPPORTED;
   }
 
@@ -606,12 +606,12 @@ MmioExit (
     Gpaw             = (UINT8)(TdReturnData.TdInfo.Gpaw & 0x3f);
     TdSharedPageMask = 1ULL << (Gpaw - 1);
   } else {
-    DEBUG ((DEBUG_ERROR, "%a: TDCALL failed with status=%llx\n", __FUNCTION__, TdStatus));
+    DEBUG ((DEBUG_ERROR, "%a: TDCALL failed with status=%llx\n", __func__, TdStatus));
     goto FatalError;
   }
 
   if ((Veinfo->GuestPA & TdSharedPageMask) == 0) {
-    DEBUG ((DEBUG_ERROR, "%a: EPT-violation #VE on private memory is not allowed!", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: EPT-violation #VE on private memory is not allowed!", __func__));
     goto FatalError;
   }
 
@@ -624,7 +624,7 @@ MmioExit (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Address is not correct! (%d: 0x%llx != 0x%llx)\n",
-      __FUNCTION__,
+      __func__,
       ParsedInstruction.OpCode,
       Veinfo->GuestPA,
       ParsedInstruction.Address

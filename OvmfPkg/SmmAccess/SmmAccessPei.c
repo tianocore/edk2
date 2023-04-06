@@ -263,7 +263,7 @@ SmmAccessPeiEntryPoint (
       DEBUG_ERROR,
       "%a: no SMRAM with host bridge DID=0x%04x; only "
       "DID=0x%04x (Q35) is supported\n",
-      __FUNCTION__,
+      __func__,
       HostBridgeDevId,
       INTEL_Q35_MCH_DEVICE_ID
       ));
@@ -283,7 +283,7 @@ SmmAccessPeiEntryPoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: this Q35 implementation lacks SMRAM\n",
-      __FUNCTION__
+      __func__
       ));
     goto WrongConfig;
   }
@@ -378,7 +378,7 @@ SmmAccessPeiEntryPoint (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: SMRAM map follows, %d entries\n",
-      __FUNCTION__,
+      __func__,
       (INT32)Count
       ));
     DEBUG ((

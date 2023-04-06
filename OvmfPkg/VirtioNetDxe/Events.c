@@ -77,7 +77,7 @@ VirtioNetExitBoot (
   //
   VNET_DEV  *Dev;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __func__, Context));
   Dev = Context;
   if (Dev->Snm.State == EfiSimpleNetworkInitialized) {
     Dev->VirtIo->SetDeviceStatus (Dev->VirtIo, 0);
