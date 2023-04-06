@@ -196,13 +196,13 @@ Tcp4GetSubnetInfo (
   Tcp4Option.EnableNagle       = TRUE;
   Status                       = Tcp4->Configure (Tcp4, &Tcp4CfgData);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Can't get subnet information\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Can't get subnet information\n", __func__));
     return Status;
   }
 
   Status = Tcp4->GetModeData (Tcp4, NULL, NULL, &IpModedata, NULL, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Can't get IP mode data information\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Can't get IP mode data information\n", __func__));
     return Status;
   }
 
@@ -265,12 +265,12 @@ Tcp6GetSubnetInfo (
   ZeroMem ((VOID *)&IpModedata, sizeof (EFI_IP6_MODE_DATA));
   Status = Tcp6->GetModeData (Tcp6, NULL, NULL, &IpModedata, NULL, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Can't get IP mode data information\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Can't get IP mode data information\n", __func__));
     return Status;
   }
 
   if (IpModedata.AddressCount == 0) {
-    DEBUG ((DEBUG_INFO, "%a: No IPv6 address configured.\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: No IPv6 address configured.\n", __func__));
     Instance->SubnetAddrInfoIPv6Number = 0;
     return EFI_SUCCESS;
   }
@@ -282,7 +282,7 @@ Tcp6GetSubnetInfo (
 
   Instance->SubnetAddrInfoIPv6 = AllocateZeroPool (IpModedata.AddressCount * sizeof (EFI_IP6_ADDRESS_INFO));
   if (Instance->SubnetAddrInfoIPv6 == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate memory for IPv6 subnet address information\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate memory for IPv6 subnet address information\n", __func__));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -529,7 +529,7 @@ DiscoverRedfishHostInterface (
       IP4_COPY_ADDRESS ((VOID *)&Instance->HostSubnetMask.v4, (VOID *)Data->HostIpMask);
 
       if (EFI_IP4_EQUAL (&Instance->HostIpAddress.v4, &mZeroIp4Addr)) {
-        DEBUG ((DEBUG_ERROR, "%a: invalid host IP address: zero address\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a: invalid host IP address: zero address\n", __func__));
         //
         // Invalid IP address detected. Change address format to Unknown and use system default address.
         //
@@ -537,7 +537,7 @@ DiscoverRedfishHostInterface (
       }
 
       if (!IP4_IS_VALID_NETMASK (EFI_IP4 (Instance->HostSubnetMask.v4))) {
-        DEBUG ((DEBUG_ERROR, "%a: invalid subnet mask address\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a: invalid subnet mask address\n", __func__));
         //
         // Invalid subnet mast address detected. Change address format to Unknown and use system default address.
         //
@@ -551,14 +551,14 @@ DiscoverRedfishHostInterface (
       IP4_COPY_ADDRESS ((VOID *)&Instance->TargetIpAddress.v4, (VOID *)Data->RedfishServiceIpAddress);
 
       if (EFI_IP4_EQUAL (&Instance->TargetIpAddress.v4, &mZeroIp4Addr)) {
-        DEBUG ((DEBUG_ERROR, "%a: invalid service IP address: zero address\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a: invalid service IP address: zero address\n", __func__));
       }
     } else {
       IP6_COPY_ADDRESS ((VOID *)&Instance->TargetIpAddress.v6, (VOID *)Data->RedfishServiceIpAddress);
     }
 
     if (Instance->HostIntfValidation) {
-      DEBUG ((DEBUG_ERROR, "%a:Send UPnP unicast SSDP to validate this Redfish Host Interface is not supported.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a:Send UPnP unicast SSDP to validate this Redfish Host Interface is not supported.\n", __func__));
       Status = EFI_UNSUPPORTED;
     } else {
       //
@@ -682,7 +682,7 @@ AddAndSignalNewRedfishService (
   RestExOpened = FALSE;
   DeleteRestEx = FALSE;
 
-  DEBUG ((DEBUG_INFO, "%a:Add this instance to Redfish instance list.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a:Add this instance to Redfish instance list.\n", __func__));
 
   if (Uuid != NULL) {
     Char16Uuid = (CHAR16 *)AllocateZeroPool (AsciiStrSize ((const CHAR8 *)Uuid) * sizeof (CHAR16));
@@ -846,7 +846,7 @@ AddAndSignalNewRedfishService (
     if (!InfoRefresh) {
       Status = CreateRestExInstance (Instance, Instance->DiscoverToken); // Create REST EX child.
       if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "%a:Can't create REST EX child instance.\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a:Can't create REST EX child instance.\n", __func__));
         goto ON_EXIT;
       }
 
@@ -906,7 +906,7 @@ AddAndSignalNewRedfishService (
                          (EFI_REST_EX_CONFIG_DATA)(UINT8 *)RestExHttpConfigData
                          );
       if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "%a:REST EX configured..\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a:REST EX configured..\n", __func__));
         DeleteRestEx = TRUE;
         goto EXIT_FREE_ALL;
       }
@@ -927,7 +927,7 @@ AddAndSignalNewRedfishService (
 
     Status = gBS->SignalEvent (Instance->DiscoverToken->Event);
     if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a:No event to signal!\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a:No event to signal!\n", __func__));
     }
   }
 
@@ -997,13 +997,13 @@ NetworkInterfaceGetSubnetInfo (
                                                Instance
                                                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a:Failed to get Subnet infomation.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a:Failed to get Subnet infomation.\n", __func__));
       return Status;
     } else {
-      DEBUG ((DEBUG_INFO, "%a:MAC address: %s\n", __FUNCTION__, Instance->StrMacAddr));
+      DEBUG ((DEBUG_INFO, "%a:MAC address: %s\n", __func__, Instance->StrMacAddr));
       if (CheckIsIpVersion6 (Instance)) {
         if (Instance->SubnetAddrInfoIPv6Number == 0) {
-          DEBUG ((DEBUG_ERROR, "%a: There is no Subnet infomation for IPv6 network interface.\n", __FUNCTION__));
+          DEBUG ((DEBUG_ERROR, "%a: There is no Subnet infomation for IPv6 network interface.\n", __func__));
           return EFI_NOT_FOUND;
         }
 
@@ -1184,13 +1184,13 @@ RedfishServiceAcquireService (
   UINTN                                            NetworkInterfacesIndex;
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *TargetNetworkInterfaceInternal;
 
-  DEBUG ((DEBUG_INFO, "%a:Entry.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a:Entry.\n", __func__));
 
   //
   // Validate parameters.
   //
   if ((ImageHandle == NULL) || (Token == NULL) || ((Flags & ~EFI_REDFISH_DISCOVER_VALIDATION) == 0)) {
-    DEBUG ((DEBUG_ERROR, "%a:Invalid parameters.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a:Invalid parameters.\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1208,7 +1208,7 @@ RedfishServiceAcquireService (
     TargetNetworkInterfaceInternal = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
     NumNetworkInterfaces           = NumberOfNetworkInterface ();
     if (NumNetworkInterfaces == 0) {
-      DEBUG ((DEBUG_ERROR, "%a:No network interface on platform.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a:No network interface on platform.\n", __func__));
       return EFI_UNSUPPORTED;
     }
   }
@@ -1219,10 +1219,10 @@ RedfishServiceAcquireService (
     NewInstance = FALSE;
     Instance    = GetInstanceByOwner (ImageHandle, TargetNetworkInterfaceInternal, Flags & ~EFI_REDFISH_DISCOVER_VALIDATION); // Check if we can re-use previous instance.
     if (Instance == NULL) {
-      DEBUG ((DEBUG_INFO, "%a:Create new EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE.\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a:Create new EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE.\n", __func__));
       Instance = (EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE *)AllocateZeroPool (sizeof (EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE));
       if (Instance == NULL) {
-        DEBUG ((DEBUG_ERROR, "%a:Memory allocation fail.\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a:Memory allocation fail.\n", __func__));
       }
 
       InitializeListHead (&Instance->Entry);
@@ -1238,14 +1238,14 @@ RedfishServiceAcquireService (
     }
 
     if (TargetNetworkInterfaceInternal->StrMacAddr != NULL) {
-      DEBUG ((DEBUG_INFO, "%a:Acquire Redfish service on network interface MAC address:%s.\n", __FUNCTION__, TargetNetworkInterfaceInternal->StrMacAddr));
+      DEBUG ((DEBUG_INFO, "%a:Acquire Redfish service on network interface MAC address:%s.\n", __func__, TargetNetworkInterfaceInternal->StrMacAddr));
     } else {
-      DEBUG ((DEBUG_INFO, "%a:WARNING: No MAC address on this network interface.\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a:WARNING: No MAC address on this network interface.\n", __func__));
     }
 
     Instance->DiscoverToken = Token; // Always use the latest Token passed by caller.
     if ((Flags & EFI_REDFISH_DISCOVER_HOST_INTERFACE) != 0) {
-      DEBUG ((DEBUG_INFO, "%a:Redfish HOST interface discovery.\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a:Redfish HOST interface discovery.\n", __func__));
       Instance->HostIntfValidation = FALSE;
       if ((Flags & EFI_REDFISH_DISCOVER_VALIDATION) != 0) {
         Instance->HostIntfValidation = TRUE;
@@ -1255,12 +1255,12 @@ RedfishServiceAcquireService (
     }
 
     if ((Flags & EFI_REDFISH_DISCOVER_SSDP) != 0) {
-      DEBUG ((DEBUG_ERROR, "%a:Redfish service discovery through SSDP is not supported\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a:Redfish service discovery through SSDP is not supported\n", __func__));
       return EFI_UNSUPPORTED;
     } else {
       if (EFI_ERROR (Status1) && EFI_ERROR (Status2)) {
         FreePool ((VOID *)Instance);
-        DEBUG ((DEBUG_ERROR, "%a:Something wrong on Redfish service discovery Status1=%x, Status2=%x.\n", __FUNCTION__, Status1, Status2));
+        DEBUG ((DEBUG_ERROR, "%a:Something wrong on Redfish service discovery Status1=%x, Status2=%x.\n", __func__, Status1, Status2));
       } else {
         if (NewInstance) {
           InsertTailList (&mRedfishDiscoverList, &Instance->Entry);
@@ -1326,7 +1326,7 @@ RedfishServiceReleaseService (
   EFI_REDFISH_DISCOVERED_INTERNAL_LIST  *DiscoveredRedfishInstance;
 
   if (IsListEmpty (&mRedfishInstanceList)) {
-    DEBUG ((DEBUG_ERROR, "%a:No any discovered Redfish service.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a:No any discovered Redfish service.\n", __func__));
     return EFI_NOT_FOUND;
   }
 
@@ -1535,7 +1535,7 @@ TestForRequiredProtocols (
                       );
       if (EFI_ERROR (Status)) {
         if (Index == ListCount - 1) {
-          DEBUG ((DEBUG_ERROR, "%a: all required protocols are found on this controller handle: %p.\n", __FUNCTION__, ControllerHandle));
+          DEBUG ((DEBUG_ERROR, "%a: all required protocols are found on this controller handle: %p.\n", __func__, ControllerHandle));
           return EFI_SUCCESS;
         }
       }
@@ -1706,7 +1706,7 @@ BuildupNetworkInterface (
           if (!NewNetworkInterfaceInstalled) {
             NetworkInterface = GetTargetNetworkInterfaceInternalByController (ControllerHandle);
             if (NetworkInterface == NULL) {
-              DEBUG ((DEBUG_ERROR, "%a: Can't find network interface by ControllerHandle\n", __FUNCTION__));
+              DEBUG ((DEBUG_ERROR, "%a: Can't find network interface by ControllerHandle\n", __func__));
               return Status;
             }
           }
@@ -1720,10 +1720,10 @@ BuildupNetworkInterface (
                                                                       (VOID *)&mRedfishDiscover
                                                                       );
           if (EFI_ERROR (Status)) {
-            DEBUG ((DEBUG_ERROR, "%a: Fail to install EFI_REDFISH_DISCOVER_PROTOCOL\n", __FUNCTION__));
+            DEBUG ((DEBUG_ERROR, "%a: Fail to install EFI_REDFISH_DISCOVER_PROTOCOL\n", __func__));
           }
         } else {
-          DEBUG ((DEBUG_INFO, "%a: Not REST EX, continue with next\n", __FUNCTION__));
+          DEBUG ((DEBUG_INFO, "%a: Not REST EX, continue with next\n", __func__));
           Index++;
           if (Index == (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL))) {
             break;

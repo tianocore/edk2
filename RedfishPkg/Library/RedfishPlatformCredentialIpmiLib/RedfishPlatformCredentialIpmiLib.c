@@ -63,10 +63,10 @@ LibStopRedfishService (
   //
   Status = SetBootstrapAccountCredentialsToVariable (NULL, NULL, TRUE);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: fail to remove bootstrap credential: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: fail to remove bootstrap credential: %r\n", __func__, Status));
   }
 
-  DEBUG ((DEBUG_INFO, "%a: bootstrap credential service stopped\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: bootstrap credential service stopped\n", __func__));
 
   return EFI_SUCCESS;
 }
@@ -153,7 +153,7 @@ GetBootstrapAccountCredentials (
     return EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Disable bootstrap control: 0x%x\n", __FUNCTION__, DisableBootstrapControl));
+  DEBUG ((DEBUG_VERBOSE, "%a: Disable bootstrap control: 0x%x\n", __func__, DisableBootstrapControl));
 
   //
   // IPMI callout to NetFn 2C, command 02
@@ -183,19 +183,19 @@ GetBootstrapAccountCredentials (
              );
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: IPMI transaction failure. Returning\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: IPMI transaction failure. Returning\n", __func__));
     return Status;
   } else {
     if (ResponseData.CompletionCode != IPMI_COMP_CODE_NORMAL) {
       if (ResponseData.CompletionCode == REDFISH_IPMI_COMP_CODE_BOOTSTRAP_CREDENTIAL_DISABLED) {
-        DEBUG ((DEBUG_ERROR, "%a: bootstrap credential support was disabled\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a: bootstrap credential support was disabled\n", __func__));
         return EFI_ACCESS_DENIED;
       }
 
-      DEBUG ((DEBUG_ERROR, "%a: Completion code = 0x%x. Returning\n", __FUNCTION__, ResponseData.CompletionCode));
+      DEBUG ((DEBUG_ERROR, "%a: Completion code = 0x%x. Returning\n", __func__, ResponseData.CompletionCode));
       return EFI_PROTOCOL_ERROR;
     } else if (ResponseData.GroupExtensionId != REDFISH_IPMI_GROUP_EXTENSION) {
-      DEBUG ((DEBUG_ERROR, "%a: Group Extension Response = 0x%x. Returning\n", __FUNCTION__, ResponseData.GroupExtensionId));
+      DEBUG ((DEBUG_ERROR, "%a: Group Extension Response = 0x%x. Returning\n", __func__, ResponseData.GroupExtensionId));
       return EFI_DEVICE_ERROR;
     } else {
       if (BootstrapUsername != NULL) {
@@ -216,7 +216,7 @@ GetBootstrapAccountCredentials (
     }
   }
 
-  DEBUG ((DEBUG_INFO, "%a: get bootstrap credential via IPMI: %r\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_INFO, "%a: get bootstrap credential via IPMI: %r\n", __func__, Status));
 
   return Status;
 }
@@ -269,7 +269,7 @@ GetBootstrapAccountCredentialsFromVariable (
   }
 
   if (DataSize != sizeof (BOOTSTRAP_CREDENTIALS_VARIABLE)) {
-    DEBUG ((DEBUG_ERROR, "%a: data corruption. returned size: %d != structure size: %d\n", __FUNCTION__, DataSize, sizeof (BOOTSTRAP_CREDENTIALS_VARIABLE)));
+    DEBUG ((DEBUG_ERROR, "%a: data corruption. returned size: %d != structure size: %d\n", __func__, DataSize, sizeof (BOOTSTRAP_CREDENTIALS_VARIABLE)));
     FreePool (Data);
     return EFI_NOT_FOUND;
   }
@@ -284,7 +284,7 @@ GetBootstrapAccountCredentialsFromVariable (
 
   FreePool (Data);
 
-  DEBUG ((DEBUG_INFO, "%a: get bootstrap credential from variable\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: get bootstrap credential from variable\n", __func__));
 
   return EFI_SUCCESS;
 }
@@ -412,7 +412,7 @@ LibCredentialGetAuthInfo (
   DisableCredentialService = PcdGetBool (PcdRedfishDisableBootstrapCredentialService);
 
   if (mRedfishServiceStopped) {
-    DEBUG ((DEBUG_ERROR, "%a: credential service is stopped due to security reason\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: credential service is stopped due to security reason\n", __func__));
     return EFI_ACCESS_DENIED;
   }
 
@@ -441,17 +441,17 @@ LibCredentialGetAuthInfo (
   //
   Status = GetBootstrapAccountCredentials (DisableCredentialService, *UserId, USERNAME_MAX_SIZE, *Password, PASSWORD_MAX_SIZE);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: fail to get bootstrap credential: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: fail to get bootstrap credential: %r\n", __func__, Status));
     return Status;
   }
 
   if (DisableCredentialService) {
-    DEBUG ((DEBUG_INFO, "%a: credential bootstrapping control disabled\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: credential bootstrapping control disabled\n", __func__));
   }
 
   Status = SetBootstrapAccountCredentialsToVariable (*UserId, *Password, FALSE);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: fail to cache bootstrap credential: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: fail to cache bootstrap credential: %r\n", __func__, Status));
   }
 
   return EFI_SUCCESS;

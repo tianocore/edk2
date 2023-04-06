@@ -59,11 +59,11 @@ RedfishCreateSmbiosTable42 (
   Status = RedfishPlatformHostInterfaceDeviceDescriptor (&DeviceType, &DeviceDescriptor);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_NOT_FOUND) {
-      DEBUG ((DEBUG_ERROR, "%a: No Redfish host interface descriptor is provided on this platform.", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: No Redfish host interface descriptor is provided on this platform.", __func__));
       return EFI_NOT_FOUND;
     }
 
-    DEBUG ((DEBUG_ERROR, "%a: Fail to get device descriptor, %r.", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to get device descriptor, %r.", __func__, Status));
     return Status;
   }
 
@@ -71,7 +71,7 @@ RedfishCreateSmbiosTable42 (
       (DeviceType != REDFISH_HOST_INTERFACE_DEVICE_TYPE_PCI_PCIE_V2)
       )
   {
-    DEBUG ((DEBUG_ERROR, "%a: Only support either protocol type 04h or 05h as Redfish host interface.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Only support either protocol type 04h or 05h as Redfish host interface.", __func__));
     return EFI_UNSUPPORTED;
   }
 
@@ -98,7 +98,7 @@ RedfishCreateSmbiosTable42 (
     }
 
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Fail to get Redfish host interafce protocol type data.", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: Fail to get Redfish host interafce protocol type data.", __func__));
       if (ProtocolRecords != NULL) {
         FreePool (ProtocolRecords);
       }
@@ -124,7 +124,7 @@ RedfishCreateSmbiosTable42 (
     } else {
       NewProtocolRecords = ReallocatePool (CurrentProtocolsDataLength, NewProtocolsDataLength, (VOID *)ProtocolRecords);
       if (NewProtocolRecords == NULL) {
-        DEBUG ((DEBUG_ERROR, "%a: Fail to allocate memory for Redfish host interface protocol data.", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a: Fail to allocate memory for Redfish host interface protocol data.", __func__));
         FreePool (ProtocolRecords);
         FreePool (ProtocolRecord);
         return EFI_OUT_OF_RESOURCES;
@@ -258,7 +258,7 @@ PlatformHostInterfaceInformationReady (
   IN  VOID       *Context
   )
 {
-  DEBUG ((DEBUG_INFO, "%a: Platform Redfish Host Interface informtion is ready\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Platform Redfish Host Interface informtion is ready\n", __func__));
 
   RedfishCreateSmbiosTable42 ();
 
@@ -290,7 +290,7 @@ RedfishHostInterfaceDxeEntryPoint (
   EFI_STATUS  Status;
   EFI_GUID    *ReadyGuid;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n.", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry\n.", __func__));
 
   //
   // Check if the Redfish Host Interface depends on

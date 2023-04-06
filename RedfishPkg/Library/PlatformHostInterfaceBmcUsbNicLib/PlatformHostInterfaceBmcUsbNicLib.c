@@ -37,7 +37,7 @@ ProbeRedfishCredentialBootstrap (
   UINT32                                      ResponseSize;
   BOOLEAN                                     ReturnBool;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
 
   //
   // IPMI callout to NetFn 2C, command 02
@@ -65,10 +65,10 @@ ProbeRedfishCredentialBootstrap (
        (ResponseData.CompletionCode == REDFISH_IPMI_COMP_CODE_BOOTSTRAP_CREDENTIAL_DISABLED)
       ))
   {
-    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credentail Bootstrapping is supported\n", __FUNCTION__));
+    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credentail Bootstrapping is supported\n", __func__));
     ReturnBool = TRUE;
   } else {
-    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credentail Bootstrapping is not supported\n", __FUNCTION__));
+    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credentail Bootstrapping is not supported\n", __func__));
     ReturnBool = FALSE;
   }
 
@@ -94,7 +94,7 @@ RedfishPlatformHostInterfaceDeviceDescriptor (
   HOST_INTERFACE_BMC_USB_NIC_INFO  *ThisInstance;
   REDFISH_INTERFACE_DATA           *InterfaceData;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
 
   if (IsListEmpty (&mBmcUsbNic)) {
     return EFI_NOT_FOUND;
@@ -166,7 +166,7 @@ RedfishPlatformHostInterfaceProtocolData (
   UINT8                              HostNameLength;
   CHAR8                              *HostNameString;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
 
   if (IsListEmpty (&mBmcUsbNic) || (IndexOfProtocolData > 0)) {
     return EFI_NOT_FOUND;
@@ -300,7 +300,7 @@ RetrievedBmcUsbNicInfo (
   IPMI_LAN_VLAN_ID                                *LanVlanId;
   EFI_USB_DEVICE_DESCRIPTOR                       UsbDeviceDescriptor;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
 
   if (IsListEmpty (&mBmcUsbNic)) {
     return EFI_NOT_FOUND;
@@ -605,7 +605,7 @@ HostInterfaceIpmiCheckMacAddress (
   EFI_MAC_ADDRESS                                 IpmiLanChannelMacAddress;
   BOOLEAN                                         AlreadyCached;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __func__));
 
   GetLanConfigReps = NULL;
   AlreadyCached    = FALSE;
@@ -823,7 +823,7 @@ UsbNicSearchUsbIo (
   EFI_DEVICE_PATH_PROTOCOL  *ThisUsbDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *ThisUsbDevicePathEnd;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __func__));
   DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "Device path on the EFI handle which has UsbIo and SNP instaleld on it.\n"));
   DevicePathStr = ConvertDevicePathToText (UsbDevicePath, FALSE, FALSE);
   if (DevicePathStr != NULL) {
@@ -987,7 +987,7 @@ IdentifyUsbNicBmcChannel (
   EFI_USB_IO_PROTOCOL              *UsbIo;
   HOST_INTERFACE_BMC_USB_NIC_INFO  *BmcUsbNic;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __func__));
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiSimpleNetworkProtocolGuid,
@@ -1074,7 +1074,7 @@ CheckBmcUsbNicOnHandles (
     return EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((DEBUG_INFO, "%a: Entry, #%d SNP handle\n", __FUNCTION__, HandleNumer));
+  DEBUG ((DEBUG_INFO, "%a: Entry, #%d SNP handle\n", __func__, HandleNumer));
 
   GotOneUsbNIc = FALSE;
   for (Index = 0; Index < HandleNumer; Index++) {
@@ -1084,7 +1084,7 @@ CheckBmcUsbNicOnHandles (
                     (VOID **)&DevicePath
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "    Failed to locate SNP on %d handle.\n", __FUNCTION__, Index));
+      DEBUG ((DEBUG_ERROR, "    Failed to locate SNP on %d handle.\n", __func__, Index));
       continue;
     }
 
@@ -1137,7 +1137,7 @@ CheckBmcUsbNic (
   UINTN       BufferSize;
   EFI_HANDLE  *HandleBuffer;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry, the registration key - 0x%08x.\n", __FUNCTION__, Registration));
+  DEBUG ((DEBUG_INFO, "%a: Entry, the registration key - 0x%08x.\n", __func__, Registration));
 
   Handle     = NULL;
   Status     = EFI_SUCCESS;
@@ -1213,7 +1213,7 @@ PlatformHostInterfaceSnpCallback (
   IN  VOID       *Context
   )
 {
-  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __func__));
 
   CheckBmcUsbNic (mPlatformHostInterfaceSnpRegistration);
   return;
@@ -1241,7 +1241,7 @@ RedfishPlatformHostInterfaceNotification (
 {
   EFI_STATUS  Status;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
 
   *InformationReadinessGuid = NULL;
   InitializeListHead (&mBmcUsbNic);
@@ -1257,7 +1257,7 @@ RedfishPlatformHostInterfaceNotification (
   }
 
   if (Status == EFI_NOT_FOUND) {
-    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "%a: BMC USB NIC is not found. Register the notification.\n", __FUNCTION__));
+    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "%a: BMC USB NIC is not found. Register the notification.\n", __func__));
 
     // Register the notification of SNP installation.
     Status = gBS->CreateEvent (
@@ -1268,7 +1268,7 @@ RedfishPlatformHostInterfaceNotification (
                     &mPlatformHostInterfaceSnpEvent
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Fail to create event for the installation of SNP protocol.", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: Fail to create event for the installation of SNP protocol.", __func__));
       return Status;
     }
 
@@ -1278,7 +1278,7 @@ RedfishPlatformHostInterfaceNotification (
                     &mPlatformHostInterfaceSnpRegistration
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Fail to register event for the installation of SNP protocol.", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: Fail to register event for the installation of SNP protocol.", __func__));
       return Status;
     }
 
@@ -1286,6 +1286,6 @@ RedfishPlatformHostInterfaceNotification (
     return EFI_SUCCESS;
   }
 
-  DEBUG ((DEBUG_ERROR, "%a: Something wrong when look for BMC USB NIC.\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a: Something wrong when look for BMC USB NIC.\n", __func__));
   return Status;
 }
