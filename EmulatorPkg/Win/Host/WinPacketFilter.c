@@ -966,7 +966,7 @@ WintNtInitializeNetUtilityData (
     goto ErrorReturn;
   }
 
-  DEBUG ((DEBUG_INFO, "%a, total %d interface(s) found\n", __FUNCTION__, InterfaceCount));
+  DEBUG ((DEBUG_INFO, "%a, total %d interface(s) found\n", __func__, InterfaceCount));
   //
   // Active interface index is set to first interface if given instance does
   // not exist.
