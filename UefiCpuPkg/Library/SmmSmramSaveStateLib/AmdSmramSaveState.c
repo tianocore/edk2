@@ -11,20 +11,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Register/Amd/SmramSaveStateMap.h>
 #include <Library/BaseLib.h>
 
-#define EFER_ADDRESS                            0XC0000080ul
 #define SMM_SAVE_STATE_REGISTER_SMMREVID_INDEX  1
 
 // Macro used to simplify the lookup table entries of type CPU_SMM_SAVE_STATE_LOOKUP_ENTRY
 #define SMM_CPU_OFFSET(Field)  OFFSET_OF (AMD_SMRAM_SAVE_STATE_MAP, Field)
-
-// Table used by SmramSaveStateGetRegisterIndex() to convert an EFI_SMM_SAVE_STATE_REGISTER
-// value to an index into a table of type CPU_SMM_SAVE_STATE_LOOKUP_ENTRY
-CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE  mSmmSmramCpuRegisterRanges[] = {
-  SMM_REGISTER_RANGE (EFI_SMM_SAVE_STATE_REGISTER_GDTBASE, EFI_SMM_SAVE_STATE_REGISTER_LDTINFO),
-  SMM_REGISTER_RANGE (EFI_SMM_SAVE_STATE_REGISTER_ES,      EFI_SMM_SAVE_STATE_REGISTER_RIP),
-  SMM_REGISTER_RANGE (EFI_SMM_SAVE_STATE_REGISTER_RFLAGS,  EFI_SMM_SAVE_STATE_REGISTER_CR4),
-  { (EFI_SMM_SAVE_STATE_REGISTER)0,                        (EFI_SMM_SAVE_STATE_REGISTER)0,      0}
-};
 
 // Lookup table used to retrieve the widths and offsets associated with each
 // supported EFI_SMM_SAVE_STATE_REGISTER value
@@ -293,26 +283,4 @@ SmramSaveStateWriteRegister (
   }
 
   return EFI_SUCCESS;
-}
-
-/**
-  Returns LMA value of the Processor.
-
-  @param[in]  VOID
-
-  @retval     UINT8 returns LMA bit value.
-**/
-UINT8
-SmramSaveStateGetRegisterLma (
-  VOID
-  )
-{
-  UINT32  LMAValue;
-
-  LMAValue = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
-  if (LMAValue) {
-    return EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
-  }
-
-  return EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT;
 }

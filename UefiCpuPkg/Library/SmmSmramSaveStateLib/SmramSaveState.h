@@ -90,7 +90,6 @@ SmramSaveStateGetRegisterIndex (
 
 **/
 EFI_STATUS
-EFIAPI
 SmramSaveStateReadRegisterByIndex (
   IN UINTN  CpuIndex,
   IN UINTN  RegisterIndex,

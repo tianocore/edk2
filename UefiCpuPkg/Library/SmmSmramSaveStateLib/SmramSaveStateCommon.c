@@ -9,9 +9,24 @@
 **/
 
 #include "SmramSaveState.h"
+#include <Library/BaseLib.h>
+#include <Library/CpuLib.h>
 
-extern CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE  mSmmSmramCpuRegisterRanges[];
-extern CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY    mSmmSmramCpuWidthOffset[];
+#define CPUID_VERSION_INFO       0x01
+#define CPUID_EXTENDED_FUNCTION  0x80000000
+#define CPUID_EXTENDED_CPU_SIG   0x80000001
+#define EFER_ADDRESS             0XC0000080ul
+
+// Table used by SmramSaveStateGetRegisterIndex() to convert an EFI_SMM_SAVE_STATE_REGISTER
+// value to an index into a table of type CPU_SMM_SAVE_STATE_LOOKUP_ENTRY
+CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE  mSmmSmramCpuRegisterRanges[] = {
+  SMM_REGISTER_RANGE (EFI_SMM_SAVE_STATE_REGISTER_GDTBASE, EFI_SMM_SAVE_STATE_REGISTER_LDTINFO),
+  SMM_REGISTER_RANGE (EFI_SMM_SAVE_STATE_REGISTER_ES,      EFI_SMM_SAVE_STATE_REGISTER_RIP),
+  SMM_REGISTER_RANGE (EFI_SMM_SAVE_STATE_REGISTER_RFLAGS,  EFI_SMM_SAVE_STATE_REGISTER_CR4),
+  { (EFI_SMM_SAVE_STATE_REGISTER)0,                        (EFI_SMM_SAVE_STATE_REGISTER)0,      0}
+};
+
+extern CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY  mSmmSmramCpuWidthOffset[];
 
 /**
   Read information from the CPU save state.
@@ -61,7 +76,6 @@ SmramSaveStateGetRegisterIndex (
 
 **/
 EFI_STATUS
-EFIAPI
 SmramSaveStateReadRegisterByIndex (
   IN UINTN  CpuIndex,
   IN UINTN  RegisterIndex,
@@ -112,7 +126,7 @@ SmramSaveStateReadRegisterByIndex (
     // Write lower 32-bits of return buffer
     //
     CopyMem (Buffer, (UINT8 *)gSmst->CpuSaveState[CpuIndex] + mSmmSmramCpuWidthOffset[RegisterIndex].Offset64Lo, MIN (4, Width));
-    if (Width >= 4) {
+    if (Width > 4) {
       //
       // Write upper 32-bits of return buffer
       //
@@ -121,4 +135,98 @@ SmramSaveStateReadRegisterByIndex (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Returns LMA value of the Processor.
+
+  @param[in]  VOID
+
+  @retval     UINT8 returns LMA bit value.
+**/
+UINT8
+IntelSmramSaveStateGetRegisterLma (
+  VOID
+  )
+{
+  UINT32  RegEax;
+  UINT32  RegEdx;
+  UINTN   FamilyId;
+  UINTN   ModelId;
+  UINT8   SmmSaveStateRegisterLma;
+
+  //
+  // Retrieve CPU Family
+  //
+  AsmCpuid (CPUID_VERSION_INFO, &RegEax, NULL, NULL, NULL);
+  FamilyId = (RegEax >> 8) & 0xf;
+  ModelId  = (RegEax >> 4) & 0xf;
+  if ((FamilyId == 0x06) || (FamilyId == 0x0f)) {
+    ModelId = ModelId | ((RegEax >> 12) & 0xf0);
+  }
+
+  RegEdx = 0;
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= CPUID_EXTENDED_CPU_SIG) {
+    AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
+  }
+
+  //
+  // Determine the mode of the CPU at the time an SMI occurs
+  //   Intel(R) 64 and IA-32 Architectures Software Developer's Manual
+  //   Volume 3C, Section 34.4.1.1
+  //
+  SmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT;
+  if ((RegEdx & BIT29) != 0) {
+    SmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
+  }
+
+  if (FamilyId == 0x06) {
+    if ((ModelId == 0x17) || (ModelId == 0x0f) || (ModelId == 0x1c)) {
+      SmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
+    }
+  }
+
+  return SmmSaveStateRegisterLma;
+}
+
+/**
+  Returns LMA value of the Processor.
+
+  @param[in]  VOID
+
+  @retval     UINT8 returns LMA bit value.
+**/
+UINT8
+AmdSmramSaveStateGetRegisterLma (
+  VOID
+  )
+{
+  UINT32  LMAValue;
+
+  LMAValue = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
+  if (LMAValue) {
+    return EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
+  }
+
+  return EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT;
+}
+
+/**
+  Returns LMA value of the Processor.
+
+  @param[in]  VOID
+
+  @retval     UINT8 returns LMA bit value.
+**/
+UINT8
+SmramSaveStateGetRegisterLma (
+  VOID
+  )
+{
+  if (StandardSignatureIsAuthenticAMD ()) {
+    return AmdSmramSaveStateGetRegisterLma ();
+  }
+
+  return IntelSmramSaveStateGetRegisterLma ();
 }
