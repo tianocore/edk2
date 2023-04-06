@@ -30,6 +30,9 @@
 [Packages]
   MdePkg/MdePkg.dec
 
+[Guids]
+  gEfiRngAlgorithmUnSafe
+
 [LibraryClasses]
   BaseLib
   DebugLib
