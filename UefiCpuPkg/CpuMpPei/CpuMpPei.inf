@@ -46,6 +46,7 @@
   BaseMemoryLib
   CpuLib
   MemoryAllocationLib
+  CpuPageTableLib
 
 [Guids]
   gEdkiiMigratedFvInfoGuid                                             ## SOMETIMES_CONSUMES     ## HOB
