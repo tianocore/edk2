@@ -72,6 +72,155 @@ MigrateGdt (
   return EFI_SUCCESS;
 }
 
+/**
+  Migrate page table to permanent memory mapping entire physical address space.
+
+  @retval   EFI_SUCCESS           The PageTable was migrated successfully.
+  @retval   EFI_UNSUPPORTED       Unsupport to migrate page table to permanent memory if IA-32e Mode not actived.
+  @retval   EFI_OUT_OF_RESOURCES  The PageTable could not be migrated due to lack of available memory.
+
+**/
+EFI_STATUS
+MigratePageTable (
+  VOID
+  )
+{
+  EFI_STATUS                      Status;
+  IA32_CR4                        Cr4;
+  BOOLEAN                         Page5LevelSupport;
+  UINT32                          RegEax;
+  UINT32                          RegEdx;
+  BOOLEAN                         Page1GSupport;
+  PAGING_MODE                     PagingMode;
+
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX  VirPhyAddressSize;
+  UINT32                          MaxExtendedFunctionId;
+
+  UINTN                           PageTable;
+  VOID                            *Buffer;
+  UINTN                           BufferSize;
+  IA32_MAP_ATTRIBUTE              MapAttribute;
+  IA32_MAP_ATTRIBUTE              MapMask;
+
+  VirPhyAddressSize.Uint32     = 0;
+  PageTable                    = 0;
+  Buffer                       = NULL;
+  BufferSize                   = 0;
+  MapAttribute.Uint64          = 0;
+  MapMask.Uint64               = MAX_UINT64;
+  MapAttribute.Bits.Present    = 1;
+  MapAttribute.Bits.ReadWrite  = 1;
+
+  //
+  // Check CPU runs in 64bit mode or 32bit mode
+  //
+  if (sizeof (UINTN) == sizeof (UINT32)) {
+    DEBUG ((DEBUG_WARN, "MigratePageTable: CPU runs in 32bit mode, unsupport to migrate page table to permanent memory.\n"));
+    ASSERT (TRUE);
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Check Page5Level Support or not.
+  //
+  Cr4.UintN = AsmReadCr4 ();
+  Page5LevelSupport = (Cr4.Bits.LA57 ? TRUE : FALSE);
+
+  //
+  // Check Page1G Support or not.
+  //
+  Page1GSupport = FALSE;
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= CPUID_EXTENDED_CPU_SIG) {
+    AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
+    if ((RegEdx & BIT26) != 0) {
+      Page1GSupport = TRUE;
+    }
+  }
+
+  //
+  // Decide Paging Mode according Page5LevelSupport & Page1GSupport.
+  //
+  PagingMode = Paging5Level1GB;
+  if (Page5LevelSupport && !Page1GSupport) {
+    PagingMode = Paging5Level;
+  } else if (!Page5LevelSupport && Page1GSupport) {
+    PagingMode = Paging4Level1GB;
+  } else if (!Page5LevelSupport && !Page1GSupport) {
+    PagingMode = Paging4Level;
+  }
+
+  DEBUG ((DEBUG_INFO, "MigratePageTable: PagingMode = 0x%lx\n", (UINTN) PagingMode));
+
+  //
+  // Get Maximum Physical Address Bits
+  // Get the number of address lines; Maximum Physical Address is 2^PhysicalAddressBits - 1.
+  // If CPUID does not supported, then use a max value of 36 as per SDM 3A, 4.1.4.
+  //
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunctionId, NULL, NULL, NULL);
+  if (MaxExtendedFunctionId >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
+  } else {
+    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+  }
+
+  if (PagingMode == Paging4Level1GB || PagingMode == Paging4Level) {
+    //
+    // The max lineaddress bits is 48 for 4 level page table.
+    //
+    VirPhyAddressSize.Bits.PhysicalAddressBits = MIN (VirPhyAddressSize.Bits.PhysicalAddressBits, 48);
+  }
+
+  DEBUG ((DEBUG_INFO, "MigratePageTable: Maximum Physical Address Bits = %d\n", VirPhyAddressSize.Bits.PhysicalAddressBits));
+
+  //
+  // Get required buffer size for the pagetable that will be created.
+  //
+  Status = PageTableMap (&PageTable, PagingMode, 0, &BufferSize, 0, LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits), &MapAttribute, &MapMask, NULL);
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    DEBUG ((DEBUG_ERROR, "MigratePageTable: Failed to get PageTable required BufferSize, Status = %r\n", Status));
+    return Status;
+  }
+
+  DEBUG ((DEBUG_INFO, "MigratePageTable: Get PageTable required BufferSize = %x\n", BufferSize));
+
+  //
+  // Allocate required Buffer.
+  //
+  Status = PeiServicesAllocatePages (
+             EfiBootServicesData,
+             EFI_SIZE_TO_PAGES (BufferSize),
+             &((EFI_PHYSICAL_ADDRESS) Buffer)
+             );
+  ASSERT (Buffer != NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "MigratePageTable: Failed to allocate PageTable required BufferSize, Status = %r\n", Status));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Create PageTable in permanent memory.
+  //
+  Status = PageTableMap (&PageTable, PagingMode, Buffer, &BufferSize, 0, LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits), &MapAttribute, &MapMask, NULL);
+  ASSERT (!EFI_ERROR (Status) && PageTable != 0);
+  if (EFI_ERROR (Status) || PageTable == 0) {
+    DEBUG ((DEBUG_ERROR, "MigratePageTable: Failed to create PageTable, Status = %r, PageTable = 0x%lx\n", Status, PageTable));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  DEBUG ((DEBUG_INFO, "MigratePageTable: Create PageTable = 0x%lx\n", PageTable));
+
+  //
+  // Write the Pagetable to CR3.
+  //
+  AsmWriteCr3 (PageTable);
+
+  DEBUG ((DEBUG_INFO, "MigratePageTable: Write the Pagetable to CR3 Sucessfully.\n"));
+
+  return Status;
+}
+
 //
 // These are IDT entries pointing to 10:FFFFFFE4h.
 //
@@ -492,6 +641,21 @@ SecTemporaryRamDone (
   if (PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes)) {
     Status = MigrateGdt ();
     ASSERT_EFI_ERROR (Status);
+  }
+
+  //
+  // Migrate page table to permanent memory mapping entire physical address space if CR0.PG is set.
+  //
+  if ((AsmReadCr0 () & BIT31) != 0) {
+    //
+    // CR4.PAE must be enabled.
+    //
+    ASSERT ((AsmReadCr4 () & BIT5) != 0);
+    Status = MigratePageTable ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "SecTemporaryRamDone: Failed to migrate page table to permanent memory: %r.\n", Status));
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 
   //
