@@ -581,7 +581,7 @@ BmRepairAllControllers (
       DEBUG ((
         DEBUG_ERROR,
         "[%a:%d] Repair failed after %d retries.\n",
-        __FUNCTION__,
+        __func__,
         DEBUG_LINE_NUMBER,
         ReconnectRepairCount
         ));

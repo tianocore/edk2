@@ -1632,7 +1632,7 @@ GetExPcdTokenNumber (
     }
   }
 
-  DEBUG ((DEBUG_ERROR, "%a: Failed to find PCD with GUID: %g and token number: %d\n", __FUNCTION__, Guid, ExTokenNumber));
+  DEBUG ((DEBUG_ERROR, "%a: Failed to find PCD with GUID: %g and token number: %d\n", __func__, Guid, ExTokenNumber));
   ASSERT (FALSE);
 
   return 0;

@@ -521,7 +521,7 @@ ValidateSetVariable (
         DEBUG ((
           DEBUG_VERBOSE,
           "%a - Bad Size. 0x%X <> 0x%X-0x%X\n",
-          __FUNCTION__,
+          __func__,
           DataSize,
           ActivePolicy->MinSize,
           ActivePolicy->MaxSize
@@ -537,7 +537,7 @@ ValidateSetVariable (
         DEBUG ((
           DEBUG_VERBOSE,
           "%a - Bad Attributes. 0x%X <> 0x%X:0x%X\n",
-          __FUNCTION__,
+          __func__,
           Attributes,
           ActivePolicy->AttributesMustHave,
           ActivePolicy->AttributesCantHave
@@ -598,7 +598,7 @@ ValidateSetVariable (
   }
 
 Exit:
-  DEBUG ((DEBUG_VERBOSE, "%a - Variable (%g:%s) returning %r.\n", __FUNCTION__, VendorGuid, VariableName, ReturnStatus));
+  DEBUG ((DEBUG_VERBOSE, "%a - Variable (%g:%s) returning %r.\n", __func__, VendorGuid, VariableName, ReturnStatus));
   return ReturnStatus;
 }
 

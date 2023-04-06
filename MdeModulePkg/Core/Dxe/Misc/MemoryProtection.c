@@ -838,7 +838,7 @@ InitializeDxeNxMemoryProtectionPolicy (
         DEBUG ((
           DEBUG_INFO,
           "%a: StackBase = 0x%016lx  StackSize = 0x%016lx\n",
-          __FUNCTION__,
+          __func__,
           MemoryHob->AllocDescriptor.MemoryBaseAddress,
           MemoryHob->AllocDescriptor.MemoryLength
           ));
@@ -864,7 +864,7 @@ InitializeDxeNxMemoryProtectionPolicy (
   DEBUG ((
     DEBUG_INFO,
     "%a: applying strict permissions to active memory regions\n",
-    __FUNCTION__
+    __func__
     ));
 
   MergeMemoryMapForProtectionPolicy (MemoryMap, &MemoryMapSize, DescriptorSize);
@@ -926,7 +926,7 @@ InitializeDxeNxMemoryProtectionPolicy (
     DEBUG ((
       DEBUG_INFO,
       "%a: applying strict permissions to inactive memory regions\n",
-      __FUNCTION__
+      __func__
       ));
 
     CoreAcquireGcdMemoryLock ();

@@ -315,7 +315,7 @@ DxeMain (
   DEBUG ((
     DEBUG_INFO,
     "%a: MemoryBaseAddress=0x%Lx MemoryLength=0x%Lx\n",
-    __FUNCTION__,
+    __func__,
     MemoryBaseAddress,
     MemoryLength
     ));

@@ -237,7 +237,7 @@ LocatePciExpressCapabilityRegBlock (
       DEBUG ((
         DEBUG_WARN,
         "%a: [%02x|%02x|%02x] failed to access config space at offset 0x%x\n",
-        __FUNCTION__,
+        __func__,
         PciIoDevice->BusNumber,
         PciIoDevice->DeviceNumber,
         PciIoDevice->FunctionNumber,

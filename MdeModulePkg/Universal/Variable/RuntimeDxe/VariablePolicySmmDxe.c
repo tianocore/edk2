@@ -95,7 +95,7 @@ ProtocolDisableVariablePolicy (
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_DISABLE;
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __func__, Status));
 
   ReleaseLockOnlyAtBootTime (&mMmCommunicationLock);
 
@@ -144,7 +144,7 @@ ProtocolIsVariablePolicyEnabled (
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_IS_ENABLED;
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __func__, Status));
 
   if (!EFI_ERROR (Status)) {
     Status = PolicyHeader->Result;
@@ -197,7 +197,7 @@ ProtocolRegisterVariablePolicy (
     DEBUG ((
       DEBUG_ERROR,
       "%a - Policy too large for buffer! %r, %d > %d \n",
-      __FUNCTION__,
+      __func__,
       Status,
       RequiredSize,
       mMmCommunicationBufferSize
@@ -222,7 +222,7 @@ ProtocolRegisterVariablePolicy (
   CopyMem (PolicyBuffer, NewPolicy, NewPolicy->Size);
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __func__, Status));
 
   ReleaseLockOnlyAtBootTime (&mMmCommunicationLock);
 
@@ -278,7 +278,7 @@ DumpVariablePolicyHelper (
   CommandParams->PageRequested = PageRequested;
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __func__, Status));
 
   if (!EFI_ERROR (Status)) {
     Status     = PolicyHeader->Result;
@@ -403,7 +403,7 @@ ProtocolLockVariablePolicy (
   PolicyHeader->Command     = VAR_CHECK_POLICY_COMMAND_LOCK;
 
   Status = InternalMmCommunicate (CommHeader, &BufferSize);
-  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_VERBOSE, "%a - MmCommunication returned %r.\n", __func__, Status));
 
   ReleaseLockOnlyAtBootTime (&mMmCommunicationLock);
 
@@ -500,7 +500,7 @@ VariablePolicySmmDxeMain (
   // Locate the shared comm buffer to use for sending MM commands.
   Status = InitMmCommonCommBuffer (&mMmCommunicationBufferSize, &mMmCommunicationBuffer);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to locate a viable MM comm buffer! %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to locate a viable MM comm buffer! %r\n", __func__, Status));
     ASSERT_EFI_ERROR (Status);
     return Status;
   }
@@ -508,7 +508,7 @@ VariablePolicySmmDxeMain (
   // Locate the MmCommunication protocol.
   Status = gBS->LocateProtocol (&gEfiMmCommunication2ProtocolGuid, NULL, (VOID **)&mMmCommunication);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to locate MmCommunication protocol! %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to locate MmCommunication protocol! %r\n", __func__, Status));
     ASSERT_EFI_ERROR (Status);
     return Status;
   }
@@ -529,7 +529,7 @@ VariablePolicySmmDxeMain (
                   NULL
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to install protocol! %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to install protocol! %r\n", __func__, Status));
     goto Exit;
   } else {
     ProtocolInstalled = TRUE;
@@ -551,7 +551,7 @@ VariablePolicySmmDxeMain (
                   &VirtualAddressChangeEvent
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to create VirtualAddressChange event! %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to create VirtualAddressChange event! %r\n", __func__, Status));
     goto Exit;
   } else {
     VirtualAddressChangeRegistered = TRUE;

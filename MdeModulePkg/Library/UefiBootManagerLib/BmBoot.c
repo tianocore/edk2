@@ -1448,7 +1448,7 @@ BmExpandLoadFile (
       "%a:%a: failed to allocate reserved pages: "
       "BufferSize=%Lu LoadFile=\"%s\" FilePath=\"%s\"\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       (UINT64)BufferSize,
       LoadFileText,
       FileText
