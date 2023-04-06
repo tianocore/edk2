@@ -771,7 +771,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         self.ConstantOnlyInExpression = True
         ctx.Node.Data = DIObj
         ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
-        ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
+        # ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         self.InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -783,8 +783,8 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         SIObj = IfrSuppressIf()
         SIObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = SIObj
-        Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
-        ctx.Node.Condition = Condition
+        # ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
+        ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         self.InsertEndNode(ctx.Node, ctx.stop.line)
         return ctx.Node
@@ -1706,7 +1706,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
         ctx.Node.Data = IIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(IIObj.GetInfo())
-        ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
+        # ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -1748,7 +1748,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         DIObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = DIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(DIObj.GetInfo())
-        ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
+        # ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -1865,7 +1865,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         SIObj = IfrSuppressIf()
         SIObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = SIObj
-        ctx.Node.Condition =  self.ExtractOriginalText(ctx.vfrStatementExpression())
+        # ctx.Node.Condition =  self.ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         ctx.Node.Buffer = gFormPkg.StructToStream(SIObj.GetInfo())
@@ -1878,7 +1878,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         GOIObj = IfrGrayOutIf()
         GOIObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = GOIObj
-        ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
+        # ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         ctx.Node.Buffer = gFormPkg.StructToStream(GOIObj.GetInfo())
@@ -3385,7 +3385,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         DIObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = DIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(DIObj.GetInfo())
-        ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
+        # ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatList():
@@ -3402,7 +3402,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         SIObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = SIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(SIObj.GetInfo())
-        ctx.Node.Condition =  self.ExtractOriginalText(ctx.vfrStatementExpression())
+        # ctx.Node.Condition =  self.ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatList():
@@ -3419,7 +3419,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         GOIObj.SetLineNo(ctx.start.line)
         ctx.Node.Data = GOIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(GOIObj.GetInfo())
-        ctx.Node.Condition =  self.ExtractOriginalText(ctx.vfrStatementExpression())
+        # ctx.Node.Condition =  self.ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.visitChildren(ctx)
         for Ctx in ctx.vfrStatementStatList():
@@ -3442,7 +3442,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         IIObj.SetError(Prompt)
         ctx.Node.Data = IIObj
         ctx.Node.Buffer = gFormPkg.StructToStream(IIObj.GetInfo())
-        ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
+        # ctx.Node.Condition = self.ExtractOriginalText(ctx.vfrStatementExpression())
         ctx.Node.Expression = self.ExtractOriginalText(ctx.vfrStatementExpression())
         self.InsertEndNode(ctx.Node, ctx.stop.line)
 
@@ -4058,6 +4058,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         CastType = 0xFF
         for ChildCtx in ctx.castTermSub():
             CastType = ChildCtx.CastType
+        #print(ctx)
 
         ctx.Nodes.extend(ctx.atomTerm().Nodes)
         if CastType == 0:
@@ -4246,8 +4247,6 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
         elif ctx.Greater() != None:
             ctx.Node = self.IdEqValDoSpecial(ctx.ExpInfo, Line, QId, VarIdStr, Mask, ConstVal, EFI_COMPARE_TYPE.GREATER_THAN)
-
-
         return ctx.Node
 
 

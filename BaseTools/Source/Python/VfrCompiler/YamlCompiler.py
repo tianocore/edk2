@@ -440,6 +440,10 @@ class VfrCompiler():
     def ConsumeDLT(self):
         self.YamlTree.ConsumeDLT()
 
+    def YamlGenBinaryFiles(self):
+        self.Options.CreateRecordListFile = False
+        self.YamlTree.GenBinaryFiles()
+
     def SET_RUN_STATUS(self, Status):
         self.RunStatus = Status
 
@@ -473,11 +477,12 @@ def main():
 
     # Extended Features
     Compiler.DumpYaml()
-    Compiler.DumpJson()
+    # Compiler.DumpJson()
 
     Compiler.PreProcessYaml()
     Compiler.CompileYaml()
-    # Compiler.ConsumeDLT()
+    # # Compiler.ConsumeDLT()
+    Compiler.YamlGenBinaryFiles()
 
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:

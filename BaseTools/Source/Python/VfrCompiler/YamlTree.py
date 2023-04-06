@@ -52,6 +52,9 @@ class YamlTree():
         self.Parser.Parse()
         self.VfrTree.DumpCompiledYaml()
 
+    def GenBinaryFiles(self):
+        self.VfrTree.GenBinaryFiles()
+
     def ConsumeDLT(self):
         self.Options.DeltaFileName = self.Options.OutputDirectory + 'Delta.yml' #
         f = open(self.Options.DeltaFileName , 'r')
@@ -68,7 +71,7 @@ class YamlTree():
                     self.Modifier.DeleteQuestionNode(QuestionNode)
                 else:
                     self.Modifier.ModifyQuestionNode(QuestionType, QuestionDict, QuestionNode, self.Parser)
-        self.VfrTree.DumpProcessedYaml()
+        # self.VfrTree.DumpProcessedYaml()
 
 
     def PreProcessYamlDict(self, YamlDict):
@@ -438,8 +441,11 @@ class YamlParser():
         self.InsertEndNode(Node)
 
     def ParserVfrStatementExpression(self, Condition, ParentNode):
-        pass
-
+        VfrLexer = SourceVfrSyntaxLexer(InputStream(Condition))
+        VfrStream = CommonTokenStream(VfrLexer)
+        VfrParser = SourceVfrSyntaxParser(VfrStream)
+        Visitor = SourceVfrSyntaxVisitor(self.PreProcessDB)
+        Visitor.visit(VfrParser.vfrStatementExpression(ParentNode))
 
     def ParseVfrStatementDefaultStore(self, DefaultStore, ParentNode):
         RefName = DefaultStore['type']
@@ -449,7 +455,7 @@ class YamlParser():
         if 'attribute' in DefaultStore.keys():
             DefaultId = DefaultStore['attribute']
         if gVfrDefaultStore.DefaultIdRegistered(DefaultId) == False:
-            self.ErrorHandler(gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, RefName, DefaultStoreNameId, DefaultId), Line)
+            self.ErrorHandler(gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, RefName, DefaultStoreNameId, DefaultId))
             DSObj.SetDefaultName(DefaultStoreNameId)
             DSObj.SetDefaultId (DefaultId)
             Node = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
@@ -811,27 +817,34 @@ class YamlParser():
         R5Obj = IfrRef5()
         GObj = R5Obj
 
+        # get formid
+        if 'formid' in Goto.keys():
+            if isinstance(Goto['formid'], list):
+                FormId = Goto['formid'][1]
+            else:
+                FormId =Goto['formid']
+
         if 'devicepath' in Goto.keys():
             R4Obj = IfrRef4()
             R4Obj.SetDevicePath(Goto['devicepath'])
-            R4Obj.SetFormId(Goto['formid'])
+            R4Obj.SetFormId(FormId)
             R4Obj.SetQId(Goto['question'])
             R4Obj.SetFormSetId(Goto['formsetguid'])
             GObj = R4Obj
         elif 'formsetguid' in Goto.keys():
             R3Obj = IfrRef3()
-            R3Obj.SetFormId(Goto['formid'])
+            R3Obj.SetFormId(FormId)
             R3Obj.SetQId(Goto['question'])
             R3Obj.SetFormSetId(Goto['formsetguid'])
             GObj = R3Obj
         elif 'question' in Goto.keys():
             R2Obj = IfrRef2()
-            R2Obj.SetFormId(Goto['formid'])
+            R2Obj.SetFormId(FormId)
             R2Obj.SetQId(Goto['question'])
             GObj = R2Obj
         elif 'formid' in Goto.keys():
             RObj = IfrRef()
-            RObj.SetFormId(Goto['formid'])
+            RObj.SetFormId(FormId)
             GObj = RObj
 
         self._ParseVfrQuestionHeader(GObj, Goto, EFI_QUESION_TYPE.QUESTION_REF)
@@ -1946,6 +1959,7 @@ class YamlParser():
 
         if 'flags' in OneOf.keys():
             HFlags, LFlags, _, UpdateVarType = self._ParseNumericFlags(OneOf)
+
             if self.CurrQestVarInfo.IsBitVar:
                 self.ErrorHandler(OObj.SetFlagsForBitField(HFlags, LFlags))
             else:

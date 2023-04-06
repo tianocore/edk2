@@ -441,7 +441,7 @@ class VfrCompiler():
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
             if self.Options.CreateYamlFile:
-                self.VfrTree.DumpSourceYaml()
+                self.VfrTree.DumpCompiledYaml()
 
     def DumpJson(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_COMPILEED):
@@ -549,7 +549,8 @@ def main():
     Compiler.PreProcess()
     Compiler.Compile()
     Compiler.GenBinaryFiles()
-    # Compiler.DumpYaml()
+    Compiler.Options.CompiledYAMLFileName = "processed.yml"
+    Compiler.DumpYaml()
     # Compiler.DumpJson()
 
     Status = Compiler.RunStatus
