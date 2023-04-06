@@ -122,7 +122,7 @@ DtPlatformDxeEntryPoint (
     DEBUG ((
       DEBUG_WARN,
       "%a: no DTB blob could be loaded, defaulting to ACPI (Status == %r)\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     DtAcpiPref.Pref = DT_ACPI_SELECT_ACPI;
@@ -142,7 +142,7 @@ DtPlatformDxeEntryPoint (
       DEBUG ((
         DEBUG_WARN,
         "%a: no DT/ACPI preference found, defaulting to %a\n",
-        __FUNCTION__,
+        __func__,
         PcdGetBool (PcdDefaultDtPref) ? "DT" : "ACPI"
         ));
       DtAcpiPref.Pref = PcdGetBool (PcdDefaultDtPref) ? DT_ACPI_SELECT_DT
@@ -157,7 +157,7 @@ DtPlatformDxeEntryPoint (
     DEBUG ((
       DEBUG_WARN,
       "%a: invalid value for %s, defaulting to %a\n",
-      __FUNCTION__,
+      __func__,
       DT_ACPI_VARIABLE_NAME,
       PcdGetBool (PcdDefaultDtPref) ? "DT" : "ACPI"
       ));
@@ -197,7 +197,7 @@ DtPlatformDxeEntryPoint (
       DEBUG ((
         DEBUG_ERROR,
         "%a: failed to install gEdkiiPlatformHasAcpiGuid as a protocol\n",
-        __FUNCTION__
+        __func__
         ));
       goto FreeDtb;
     }
@@ -211,7 +211,7 @@ DtPlatformDxeEntryPoint (
       DEBUG ((
         DEBUG_ERROR,
         "%a: failed to install FDT configuration table\n",
-        __FUNCTION__
+        __func__
         ));
       goto FreeDtb;
     }
