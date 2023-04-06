@@ -344,7 +344,7 @@ Thunk32To64 (
     DEBUG ((
       DEBUG_INFO,
       "%a() Stack Base: 0x%lx, Stack Size: 0x%lx\n",
-      __FUNCTION__,
+      __func__,
       Context->StackBufferBase,
       Context->StackBufferLength
       ));
@@ -917,7 +917,7 @@ GetScatterGatherHeadEntries (
   CapsuleDataPtr64  = 0;
 
   if ((ListLength == NULL) || (HeadList == NULL)) {
-    DEBUG ((DEBUG_ERROR, "%a Invalid parameters.  Inputs can't be NULL\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a Invalid parameters.  Inputs can't be NULL\n", __func__));
     ASSERT (ListLength != NULL);
     ASSERT (HeadList != NULL);
     return EFI_INVALID_PARAMETER;
@@ -1022,7 +1022,7 @@ GetScatterGatherHeadEntries (
   }
 
   if (ValidIndex == 0) {
-    DEBUG ((DEBUG_ERROR, "%a didn't find any SG lists in variables\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a didn't find any SG lists in variables\n", __func__));
     return EFI_NOT_FOUND;
   }
 
@@ -1101,7 +1101,7 @@ CapsuleCoalesce (
   //
   Status = GetScatterGatherHeadEntries (&ListLength, &VariableArrayAddress);
   if (EFI_ERROR (Status) || (VariableArrayAddress == NULL)) {
-    DEBUG ((DEBUG_ERROR, "%a failed to get Scatter Gather List Head Entries.  Status = %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a failed to get Scatter Gather List Head Entries.  Status = %r\n", __func__, Status));
     goto Done;
   }
 

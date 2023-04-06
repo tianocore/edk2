@@ -91,7 +91,7 @@ EnumerateNvmeDevNamespace (
              NamespaceData
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: NvmeIdentifyNamespace fail, Status - %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: NvmeIdentifyNamespace fail, Status - %r\n", __func__, Status));
     goto Exit;
   }
 
@@ -99,7 +99,7 @@ EnumerateNvmeDevNamespace (
   // Validate Namespace
   //
   if (NamespaceData->Ncap == 0) {
-    DEBUG ((DEBUG_INFO, "%a: Namespace ID %d is an inactive one.\n", __FUNCTION__, NamespaceId));
+    DEBUG ((DEBUG_INFO, "%a: Namespace ID %d is an inactive one.\n", __func__, NamespaceId));
     Status = EFI_DEVICE_ERROR;
     goto Exit;
   }
@@ -142,7 +142,7 @@ EnumerateNvmeDevNamespace (
   DEBUG ((
     DEBUG_INFO,
     "%a: Namespace ID %d - BlockSize = 0x%x, LastBlock = 0x%lx\n",
-    __FUNCTION__,
+    __func__,
     NamespaceId,
     NamespaceInfo->Media.BlockSize,
     NamespaceInfo->Media.LastBlock
@@ -246,14 +246,14 @@ NvmeInitPrivateData (
   PEI_NVME_CONTROLLER_PRIVATE_DATA  *Private;
   EFI_PHYSICAL_ADDRESS              DeviceAddress;
 
-  DEBUG ((DEBUG_INFO, "%a: Enters.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Enters.\n", __func__));
 
   //
   // Get the current boot mode.
   //
   Status = PeiServicesGetBootMode (&BootMode);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Fail to get the current boot mode.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to get the current boot mode.\n", __func__));
     return Status;
   }
 
@@ -265,7 +265,7 @@ NvmeInitPrivateData (
     DEBUG ((
       DEBUG_ERROR,
       "%a: The device path is invalid.\n",
-      __FUNCTION__
+      __func__
       ));
     return Status;
   }
@@ -282,7 +282,7 @@ NvmeInitPrivateData (
     DEBUG ((
       DEBUG_ERROR,
       "%a: skipped during S3.\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_SUCCESS;
   }
@@ -295,7 +295,7 @@ NvmeInitPrivateData (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Fail to allocate private data.\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_OUT_OF_RESOURCES;
   }
@@ -313,13 +313,13 @@ NvmeInitPrivateData (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Fail to allocate DMA buffers.\n",
-      __FUNCTION__
+      __func__
       ));
     return Status;
   }
 
   ASSERT (DeviceAddress == ((EFI_PHYSICAL_ADDRESS)(UINTN)Private->Buffer));
-  DEBUG ((DEBUG_INFO, "%a: DMA buffer base at 0x%x\n", __FUNCTION__, Private->Buffer));
+  DEBUG ((DEBUG_INFO, "%a: DMA buffer base at 0x%x\n", __func__, Private->Buffer));
 
   //
   // Initialize controller private data
@@ -337,7 +337,7 @@ NvmeInitPrivateData (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Controller initialization fail with Status - %r.\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     NvmeFreeDmaResource (Private);
@@ -355,7 +355,7 @@ NvmeInitPrivateData (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Namespaces discovery fail with Status - %r.\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     NvmeFreeDmaResource (Private);
@@ -414,7 +414,7 @@ NvmeInitPrivateData (
     DEBUG ((
       DEBUG_INFO,
       "%a: Security Security Command PPI will be produced.\n",
-      __FUNCTION__
+      __func__
       ));
     Private->StorageSecurityPpi.Revision           = EDKII_STORAGE_SECURITY_PPI_REVISION;
     Private->StorageSecurityPpi.GetNumberofDevices = NvmeStorageSecurityGetDeviceNo;
@@ -557,7 +557,7 @@ NvmeInitControllerDataFromPciDevice (
     DEBUG ((
       DEBUG_INFO,
       "%a: Failed to init controller, with Status - %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
   }
@@ -635,7 +635,7 @@ NvmeInitControllerFromHostControllerPpi (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Fail to allocate get the device path for Controller %d.\n",
-        __FUNCTION__,
+        __func__,
         Controller
         ));
       return Status;
@@ -646,7 +646,7 @@ NvmeInitControllerFromHostControllerPpi (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Controller initialization fail for Controller %d with Status - %r.\n",
-        __FUNCTION__,
+        __func__,
         Controller,
         Status
         ));
@@ -654,7 +654,7 @@ NvmeInitControllerFromHostControllerPpi (
       DEBUG ((
         DEBUG_INFO,
         "%a: Controller %d has been successfully initialized.\n",
-        __FUNCTION__,
+        __func__,
         Controller
         ));
     }
@@ -712,7 +712,7 @@ NvmExpressPeimEntry (
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  DEBUG ((DEBUG_INFO, "%a: Enters.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Enters.\n", __func__));
 
   PeiServicesNotifyPpi (&mNvmeHostControllerNotify);
 

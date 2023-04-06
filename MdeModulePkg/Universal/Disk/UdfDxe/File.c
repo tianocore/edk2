@@ -262,7 +262,7 @@ UdfOpen (
     DEBUG ((
       DEBUG_ERROR,
       "%a: GetFileSize() fails with status - %r.\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto Error_Get_File_Size;
