@@ -274,7 +274,7 @@ InitUnitTestFramework (
       //
       // Don't actually report it as an error, but emit a warning.
       //
-      DEBUG ((DEBUG_ERROR, "%a - Cache was detected, but failed to load.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a - Cache was detected, but failed to load.\n", __func__));
       Status = EFI_SUCCESS;
     }
   }
@@ -856,7 +856,7 @@ SaveFrameworkState (
   //
   Status = SaveUnitTestCache (FrameworkHandle, Header, Header->SaveStateSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Could not save state! %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Could not save state! %r\n", __func__, Status));
     Status = EFI_DEVICE_ERROR;
   }
 

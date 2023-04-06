@@ -61,7 +61,7 @@ SetBootNextDevice (
 
   DpEnd = AppendDevicePathNode (NULL, NULL);
   if (DpEnd == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Unable to create device path.  DpEnd is NULL.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Unable to create device path.  DpEnd is NULL.\n", __func__));
     Status = EFI_OUT_OF_RESOURCES;
     goto CLEANUP;
   }
@@ -72,7 +72,7 @@ SetBootNextDevice (
          (EFI_DEVICE_PATH_PROTOCOL *)&UsbDp
          );
   if (Dp == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Unable to create device path.  Dp is NULL.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Unable to create device path.  Dp is NULL.\n", __func__));
     Status = EFI_OUT_OF_RESOURCES;
     goto CLEANUP;
   }
@@ -88,15 +88,15 @@ SetBootNextDevice (
              OptionalDataSize
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Error creating load option.  Status = %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Error creating load option.  Status = %r\n", __func__, Status));
     goto CLEANUP;
   }
 
   NewOptionValid = TRUE;
-  DEBUG ((DEBUG_VERBOSE, "%a: Generic USB Class Device boot option created.\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a: Generic USB Class Device boot option created.\n", __func__));
   Status = EfiBootManagerLoadOptionToVariable (&NewOption);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Error Saving boot option NV variable. Status = %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Error Saving boot option NV variable. Status = %r\n", __func__, Status));
     goto CLEANUP;
   }
 
@@ -111,7 +111,7 @@ SetBootNextDevice (
                   &(BootNextValue)
                   );
 
-  DEBUG ((DEBUG_VERBOSE, "%a - Set BootNext Status (%r)\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_VERBOSE, "%a - Set BootNext Status (%r)\n", __func__, Status));
 
 CLEANUP:
   if (Dp != NULL) {

@@ -102,7 +102,7 @@ GetStringForFailureType (
   //
   // Return last entry if no match found.
   //
-  DEBUG ((DEBUG_INFO, "%a Failure Type does not have string defined 0x%X\n", __FUNCTION__, (UINT32)Failure));
+  DEBUG ((DEBUG_INFO, "%a Failure Type does not have string defined 0x%X\n", __func__, (UINT32)Failure));
   return mFailureTypeStrings[Index].String;
 }
 
