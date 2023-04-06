@@ -491,6 +491,12 @@ class GitDiffCheck:
                                   'but DEBUG_' + mo.group(1) +
                                   ' is now recommended', line)
 
+        rp_file = os.path.realpath(self.filename)
+        rp_script = os.path.realpath(__file__)
+        if line.find('__FUNCTION__') != -1 and rp_file != rp_script:
+            self.added_line_error('__FUNCTION__ was used, but __func__ '
+                                  'is now recommended', line)
+
     split_diff_re = re.compile(r'''
                                    (?P<cmd>
                                        ^ diff \s+ --git \s+ a/.+ \s+ b/.+ $
