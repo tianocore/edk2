@@ -219,7 +219,7 @@ InitializeRealTimeClock (
     DEBUG ((
       DEBUG_WARN,
       "%a: using default timezone/daylight settings\n",
-      __FUNCTION__
+      __func__
       ));
 
     mTimeSettings.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
