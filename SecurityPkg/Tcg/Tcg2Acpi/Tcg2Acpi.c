@@ -188,14 +188,14 @@ ExchangeCommonBuffer (
 
   // Step 0: Sanity check for input argument
   if (TcgNvs == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a - Input argument is NULL!\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a - Input argument is NULL!\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
   // Step 1: Grab the common buffer header
   Status = EfiGetSystemConfigurationTable (&gEdkiiPiSmmCommunicationRegionTableGuid, (VOID **)&PiSmmCommunicationRegionTable);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to locate SMM communciation common buffer - %r!\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to locate SMM communciation common buffer - %r!\n", __func__, Status));
     return Status;
   }
 
@@ -215,7 +215,7 @@ ExchangeCommonBuffer (
 
   if (Index >= PiSmmCommunicationRegionTable->NumberOfEntries) {
     // Could not find one that meets our goal...
-    DEBUG ((DEBUG_ERROR, "%a - Could not find a common buffer that is big enough for NVS!\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a - Could not find a common buffer that is big enough for NVS!\n", __func__));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -236,9 +236,9 @@ ExchangeCommonBuffer (
   Status = gBS->LocateProtocol (&gEfiMmCommunicationProtocolGuid, NULL, (VOID **)&MmCommunication);
   if (!EFI_ERROR (Status)) {
     Status = MmCommunication->Communicate (MmCommunication, CommHeader, &CommBufferSize);
-    DEBUG ((DEBUG_INFO, "%a - Communicate() = %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_INFO, "%a - Communicate() = %r\n", __func__, Status));
   } else {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to locate MmCommunication protocol - %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to locate MmCommunication protocol - %r\n", __func__, Status));
     return Status;
   }
 
@@ -250,7 +250,7 @@ ExchangeCommonBuffer (
     DEBUG ((
       DEBUG_INFO,
       "%a Communication returned software SMI value. PP: 0x%x; MC: 0x%x.\n",
-      __FUNCTION__,
+      __func__,
       TcgNvs->PhysicalPresence.SoftwareSmi,
       TcgNvs->MemoryClear.SoftwareSmi
       ));

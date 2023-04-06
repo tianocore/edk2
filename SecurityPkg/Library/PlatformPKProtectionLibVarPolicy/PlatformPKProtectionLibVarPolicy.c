@@ -33,7 +33,7 @@ DisablePKProtection (
   EFI_STATUS                      Status;
   EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy;
 
-  DEBUG ((DEBUG_INFO, "%a() Entry...\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() Entry...\n", __func__));
 
   // IMPORTANT NOTE: This operation is sticky and leaves variable protections disabled.
   //                  The system *MUST* be reset after performing this operation.
