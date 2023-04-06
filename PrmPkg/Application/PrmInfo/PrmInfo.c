@@ -493,7 +493,7 @@ ExecutePrmHandlerByGuid (
         DEBUG_ERROR,
         "%a - %a: An error occurred creating a context buffer for handler %g\n",
         gEfiCallerBaseName,
-        __FUNCTION__,
+        __func__,
         HandlerContext->Guid
         ));
     }
@@ -628,7 +628,7 @@ ParseParameterList (
       DEBUG_ERROR,
       "%a - %a: An error occurred during PRM module discovery (%r)\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     ReturnStatus = Status;
@@ -719,7 +719,7 @@ UefiMain (
       DEBUG_ERROR,
       "%a - %a: An error occurred parsing user-provided arguments (%r)\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
   }

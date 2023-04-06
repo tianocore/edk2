@@ -384,7 +384,7 @@ VerifyGetModuleContextBuffers (
     UT_ASSERT_TRUE (CompareGuid (TestContext->ExpectedModuleGuid, &ContextBuffers->ModuleGuid));
     UT_LOG_INFO (
       "%a: Searching by %a GUID ({%g}) returned ContextBuffers at 0x%x\n",
-      __FUNCTION__,
+      __func__,
       ((TestContext->GuidSearchType == ByModuleGuid) ? "module" : "handler"),
       TestContext->Guid,
       (UINTN)ContextBuffers

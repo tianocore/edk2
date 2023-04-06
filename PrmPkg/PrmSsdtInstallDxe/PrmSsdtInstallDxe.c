@@ -42,7 +42,7 @@ InstallPrmSsdt (
   EFI_ACPI_TABLE_PROTOCOL      *AcpiTableProtocol;
   EFI_ACPI_DESCRIPTION_HEADER  *Ssdt;
 
-  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __func__));
 
   if (OemId == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -61,7 +61,7 @@ InstallPrmSsdt (
                 &SsdtSize
                 );
     ASSERT_EFI_ERROR (Status);
-    DEBUG ((DEBUG_INFO, "%a %a: SSDT loaded...\n", _DBGMSGID_, __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a %a: SSDT loaded...\n", _DBGMSGID_, __func__));
 
     //
     // Update OEM ID in the SSDT

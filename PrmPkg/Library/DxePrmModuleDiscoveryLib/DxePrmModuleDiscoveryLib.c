@@ -48,7 +48,7 @@ GetNextPrmModuleEntry (
   PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *CurrentListEntry;
   PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *ForwardListEntry;
 
-  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __func__));
 
   if (ModuleImageContext == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -94,7 +94,7 @@ CreateNewPrmModuleImageContextListEntry (
 {
   PRM_MODULE_IMAGE_CONTEXT_LIST_ENTRY  *PrmModuleImageContextListEntry;
 
-  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __func__));
 
   PrmModuleImageContextListEntry = AllocateZeroPool (sizeof (*PrmModuleImageContextListEntry));
   if (PrmModuleImageContextListEntry == NULL) {
@@ -105,7 +105,7 @@ CreateNewPrmModuleImageContextListEntry (
     DEBUG_INFO,
     "  %a %a: Allocated PrmModuleImageContextListEntry at 0x%x of size 0x%x bytes.\n",
     _DBGMSGID_,
-    __FUNCTION__,
+    __func__,
     (UINTN)PrmModuleImageContextListEntry,
     sizeof (*PrmModuleImageContextListEntry)
     ));
@@ -186,7 +186,7 @@ DiscoverPrmModules (
   EFI_MMRAM_DESCRIPTOR                 *MmramRanges;
   UINTN                                MmramRangeCount;
 
-  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __func__));
 
   PrmHandlerCount = 0;
   PrmModuleCount  = 0;
@@ -203,7 +203,7 @@ DiscoverPrmModules (
                   &HandleBuffer
                   );
   if (EFI_ERROR (Status) && (HandleCount == 0)) {
-    DEBUG ((DEBUG_ERROR, "%a %a: No LoadedImageProtocol instances found!\n", _DBGMSGID_, __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a %a: No LoadedImageProtocol instances found!\n", _DBGMSGID_, __func__));
     return EFI_NOT_FOUND;
   }
 
@@ -255,7 +255,7 @@ DiscoverPrmModules (
         DEBUG_WARN,
         "%a %a: ImageHandle 0x%016lx is not a valid PE/COFF image. It cannot be considered a PRM module.\n",
         _DBGMSGID_,
-        __FUNCTION__,
+        __func__,
         (EFI_PHYSICAL_ADDRESS)(UINTN)LoadedImageProtocol->ImageBase
         ));
       continue;
@@ -304,7 +304,7 @@ DiscoverPrmModules (
     InsertTailList (&mPrmModuleList, &PrmModuleImageContextListEntry->Link);
     PrmHandlerCount += TempPrmModuleImageContext.ExportDescriptor->Header.NumberPrmHandlers;
     PrmModuleCount++;
-    DEBUG ((DEBUG_INFO, "%a %a: New PRM Module inserted into list to be processed.\n", _DBGMSGID_, __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a %a: New PRM Module inserted into list to be processed.\n", _DBGMSGID_, __func__));
   }
 
   if (HandlerCount != NULL) {
