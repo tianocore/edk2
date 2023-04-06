@@ -51,7 +51,7 @@ GetPrmModuleExportDescriptorTable (
   UINT32                               *ExportAddressTable;
   PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT  *TempExportDescriptor;
 
-  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __func__));
 
   if ((ImageExportDirectory == NULL) ||
       (PeCoffLoaderImageContext == NULL) ||
@@ -67,7 +67,7 @@ GetPrmModuleExportDescriptorTable (
     DEBUG_INFO,
     "  %a %a: %d exported names found in this image.\n",
     _DBGMSGID_,
-    __FUNCTION__,
+    __func__,
     ImageExportDirectory->NumberOfNames
     ));
 
@@ -85,7 +85,7 @@ GetPrmModuleExportDescriptorTable (
       DEBUG_INFO,
       "  %a %a: Export Name[0x%x] - %a.\n",
       _DBGMSGID_,
-      __FUNCTION__,
+      __func__,
       Index,
       CurrentExportName
       ));
@@ -101,29 +101,29 @@ GetPrmModuleExportDescriptorTable (
         DEBUG_INFO,
         "  %a %a: PRM Module Export Descriptor found. Ordinal = %d.\n",
         _DBGMSGID_,
-        __FUNCTION__,
+        __func__,
         PrmModuleExportDescriptorOrdinal
         ));
       if (PrmModuleExportDescriptorOrdinal >= ImageExportDirectory->NumberOfFunctions) {
-        DEBUG ((DEBUG_ERROR, "%a %a: The PRM Module Export Descriptor ordinal value is invalid.\n", _DBGMSGID_, __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a %a: The PRM Module Export Descriptor ordinal value is invalid.\n", _DBGMSGID_, __func__));
         return EFI_NOT_FOUND;
       }
 
       TempExportDescriptor = (PRM_MODULE_EXPORT_DESCRIPTOR_STRUCT *)((UINTN)CurrentImageAddress + ExportAddressTable[PrmModuleExportDescriptorOrdinal]);
       if (TempExportDescriptor->Header.Signature == PRM_MODULE_EXPORT_DESCRIPTOR_SIGNATURE) {
         *ExportDescriptor = TempExportDescriptor;
-        DEBUG ((DEBUG_INFO, "  %a %a: PRM Module Export Descriptor found at 0x%x.\n", _DBGMSGID_, __FUNCTION__, (UINTN)ExportDescriptor));
+        DEBUG ((DEBUG_INFO, "  %a %a: PRM Module Export Descriptor found at 0x%x.\n", _DBGMSGID_, __func__, (UINTN)ExportDescriptor));
       } else {
         DEBUG ((
           DEBUG_INFO,
           "  %a %a: PRM Module Export Descriptor found at 0x%x but signature check failed.\n",
           _DBGMSGID_,
-          __FUNCTION__,
+          __func__,
           (UINTN)TempExportDescriptor
           ));
       }
 
-      DEBUG ((DEBUG_INFO, "  %a %a: Exiting export iteration since export descriptor found.\n", _DBGMSGID_, __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "  %a %a: Exiting export iteration since export descriptor found.\n", _DBGMSGID_, __func__));
       return EFI_SUCCESS;
     }
   }
@@ -194,7 +194,7 @@ GetExportDirectoryInPeCoffImage (
         DEBUG_WARN,
         "%a %a: The machine type for this image is not valid for a PRM module.\n",
         _DBGMSGID_,
-        __FUNCTION__
+        __func__
         ));
       return EFI_UNSUPPORTED;
   }
@@ -208,7 +208,7 @@ GetExportDirectoryInPeCoffImage (
   // Check the PE/COFF Header Signature. Determine if the image is valid and/or a TE image.
   //
   if (OptionalHeaderPtrUnion.Pe32->Signature != EFI_IMAGE_NT_SIGNATURE) {
-    DEBUG ((DEBUG_ERROR, "%a %a: The PE signature is not valid for the current image.\n", _DBGMSGID_, __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a %a: The PE signature is not valid for the current image.\n", _DBGMSGID_, __func__));
     return EFI_UNSUPPORTED;
   }
 
@@ -237,18 +237,18 @@ GetExportDirectoryInPeCoffImage (
     //
     // The directory address overflows
     //
-    DEBUG ((DEBUG_ERROR, "%a %a: The export directory entry in this image results in overflow.\n", _DBGMSGID_, __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a %a: The export directory entry in this image results in overflow.\n", _DBGMSGID_, __func__));
     return EFI_UNSUPPORTED;
   } else {
-    DEBUG ((DEBUG_INFO, "%a %a: Export Directory Entry found in the image at 0x%x.\n", _DBGMSGID_, __FUNCTION__, (UINTN)OptionalHeaderPtrUnion.Pe32));
-    DEBUG ((DEBUG_INFO, "  %a %a: Directory Entry Virtual Address = 0x%x.\n", _DBGMSGID_, __FUNCTION__, DirectoryEntry->VirtualAddress));
+    DEBUG ((DEBUG_INFO, "%a %a: Export Directory Entry found in the image at 0x%x.\n", _DBGMSGID_, __func__, (UINTN)OptionalHeaderPtrUnion.Pe32));
+    DEBUG ((DEBUG_INFO, "  %a %a: Directory Entry Virtual Address = 0x%x.\n", _DBGMSGID_, __func__, DirectoryEntry->VirtualAddress));
 
     ExportDirectory = (EFI_IMAGE_EXPORT_DIRECTORY *)((UINTN)Image + DirectoryEntry->VirtualAddress);
     DEBUG ((
       DEBUG_INFO,
       "  %a %a: Export Directory Table found successfully at 0x%x. Name address = 0x%x. Name = %a.\n",
       _DBGMSGID_,
-      __FUNCTION__,
+      __func__,
       (UINTN)ExportDirectory,
       ((UINTN)Image + ExportDirectory->Name),
       (CHAR8 *)((UINTN)Image + ExportDirectory->Name)
@@ -287,7 +287,7 @@ GetImageVersionInPeCoffImage (
   EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  OptionalHeaderPtrUnion;
   UINT16                               Magic;
 
-  DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __func__));
 
   if ((Image == NULL) || (PeCoffLoaderImageContext == NULL) || (ImageMajorVersion == NULL) || (ImageMinorVersion == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -320,7 +320,7 @@ GetImageVersionInPeCoffImage (
         DEBUG_WARN,
         "%a %a: The machine type for this image is not valid for a PRM module.\n",
         _DBGMSGID_,
-        __FUNCTION__
+        __func__
         ));
       return EFI_UNSUPPORTED;
   }
@@ -333,7 +333,7 @@ GetImageVersionInPeCoffImage (
   // Check the PE/COFF Header Signature. Determine if the image is valid and/or a TE image.
   //
   if (OptionalHeaderPtrUnion.Pe32->Signature != EFI_IMAGE_NT_SIGNATURE) {
-    DEBUG ((DEBUG_ERROR, "%a %a: The PE signature is not valid for the current image.\n", _DBGMSGID_, __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a %a: The PE signature is not valid for the current image.\n", _DBGMSGID_, __func__));
     return EFI_UNSUPPORTED;
   }
 
@@ -351,8 +351,8 @@ GetImageVersionInPeCoffImage (
     *ImageMinorVersion = OptionalHeaderPtrUnion.Pe32Plus->OptionalHeader.MinorImageVersion;
   }
 
-  DEBUG ((DEBUG_INFO, "      %a %a - Image Major Version: 0x%02x.\n", _DBGMSGID_, __FUNCTION__, *ImageMajorVersion));
-  DEBUG ((DEBUG_INFO, "      %a %a - Image Minor Version: 0x%02x.\n", _DBGMSGID_, __FUNCTION__, *ImageMinorVersion));
+  DEBUG ((DEBUG_INFO, "      %a %a - Image Major Version: 0x%02x.\n", _DBGMSGID_, __func__, *ImageMajorVersion));
+  DEBUG ((DEBUG_INFO, "      %a %a - Image Minor Version: 0x%02x.\n", _DBGMSGID_, __func__, *ImageMinorVersion));
 
   return EFI_SUCCESS;
 }
@@ -404,7 +404,7 @@ GetExportEntryAddress (
 
       ASSERT (CurrentExportOrdinal < ImageExportDirectory->NumberOfFunctions);
       if (CurrentExportOrdinal >= ImageExportDirectory->NumberOfFunctions) {
-        DEBUG ((DEBUG_ERROR, "  %a %a: The export ordinal value is invalid.\n", _DBGMSGID_, __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "  %a %a: The export ordinal value is invalid.\n", _DBGMSGID_, __func__));
         break;
       }
 
