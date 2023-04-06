@@ -80,7 +80,7 @@ UpdateMmFoundationPeCoffPermissions (
       DEBUG ((
         DEBUG_ERROR,
         "%a: ImageContext->ImageRead () failed (Status = %r)\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       return Status;
@@ -89,7 +89,7 @@ UpdateMmFoundationPeCoffPermissions (
     DEBUG ((
       DEBUG_INFO,
       "%a: Section %d of image at 0x%lx has 0x%x permissions\n",
-      __FUNCTION__,
+      __func__,
       Index,
       ImageContext->ImageAddress,
       SectionHeader.Characteristics
@@ -97,7 +97,7 @@ UpdateMmFoundationPeCoffPermissions (
     DEBUG ((
       DEBUG_INFO,
       "%a: Section %d of image at 0x%lx has %a name\n",
-      __FUNCTION__,
+      __func__,
       Index,
       ImageContext->ImageAddress,
       SectionHeader.Name
@@ -105,7 +105,7 @@ UpdateMmFoundationPeCoffPermissions (
     DEBUG ((
       DEBUG_INFO,
       "%a: Section %d of image at 0x%lx has 0x%x address\n",
-      __FUNCTION__,
+      __func__,
       Index,
       ImageContext->ImageAddress,
       ImageContext->ImageAddress + SectionHeader.VirtualAddress
@@ -113,7 +113,7 @@ UpdateMmFoundationPeCoffPermissions (
     DEBUG ((
       DEBUG_INFO,
       "%a: Section %d of image at 0x%lx has 0x%x data\n",
-      __FUNCTION__,
+      __func__,
       Index,
       ImageContext->ImageAddress,
       SectionHeader.PointerToRawData
@@ -133,7 +133,7 @@ UpdateMmFoundationPeCoffPermissions (
         DEBUG ((
           DEBUG_INFO,
           "%a: Mapping section %d of image at 0x%lx with RW-XN permissions\n",
-          __FUNCTION__,
+          __func__,
           Index,
           ImageContext->ImageAddress
           ));
@@ -141,7 +141,7 @@ UpdateMmFoundationPeCoffPermissions (
         DEBUG ((
           DEBUG_INFO,
           "%a: Mapping section %d of image at 0x%lx with RO-XN permissions\n",
-          __FUNCTION__,
+          __func__,
           Index,
           ImageContext->ImageAddress
           ));
@@ -150,7 +150,7 @@ UpdateMmFoundationPeCoffPermissions (
       DEBUG ((
         DEBUG_INFO,
         "%a: Ignoring section %d of image at 0x%lx with 0x%x permissions\n",
-        __FUNCTION__,
+        __func__,
         Index,
         ImageContext->ImageAddress,
         SectionHeader.Characteristics
@@ -251,7 +251,7 @@ GetPeCoffSectionInformation (
     DEBUG ((
       DEBUG_ERROR,
       "%a: PeCoffLoaderGetImageInfo () failed (Status == %r)\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return Status;
@@ -266,7 +266,7 @@ GetPeCoffSectionInformation (
       DEBUG ((
         DEBUG_WARN,
         "%a: non-TE Image at 0x%lx has SectionAlignment < 4 KB (%lu)\n",
-        __FUNCTION__,
+        __func__,
         ImageContext->ImageAddress,
         ImageContext->SectionAlignment
         ));
@@ -296,7 +296,7 @@ GetPeCoffSectionInformation (
     DEBUG ((
       DEBUG_ERROR,
       "%a: TmpContext->ImageRead () failed (Status = %r)\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return Status;
