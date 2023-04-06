@@ -331,7 +331,7 @@ TlsSetCipherList (
         DEBUG_VERBOSE,
         "%a:%a: skipping CipherId=0x%04x\n",
         gEfiCallerBaseName,
-        __FUNCTION__,
+        __func__,
         CipherId[Index]
         ));
       //
@@ -380,7 +380,7 @@ TlsSetCipherList (
       DEBUG_ERROR,
       "%a:%a: no CipherId could be mapped\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     Status = EFI_UNSUPPORTED;
     goto FreeMappedCipher;
@@ -441,7 +441,7 @@ TlsSetCipherList (
     DEBUG_VERBOSE,
     "%a:%a: CipherString={\n",
     gEfiCallerBaseName,
-    __FUNCTION__
+    __func__
     ));
   for (CipherStringPosition = CipherString;
        CipherStringPosition < CipherString + FullLength;
@@ -610,7 +610,7 @@ TlsSetVerifyHost (
       "%a:%a: parsed \"%a\" as an IPv%c address "
       "literal\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       HostName,
       (UINTN)((BinaryAddressSize == NS_IN6ADDRSZ) ? '6' : '4')
       ));

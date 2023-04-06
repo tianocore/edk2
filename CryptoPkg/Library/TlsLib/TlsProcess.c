@@ -127,7 +127,7 @@ TlsDoHandshake (
       DEBUG ((
         DEBUG_ERROR,
         "%a SSL_HANDSHAKE_ERROR State=0x%x SSL_ERROR_%a\n",
-        __FUNCTION__,
+        __func__,
         SSL_get_state (TlsConn->Ssl),
         Ret == SSL_ERROR_SSL ? "SSL" : Ret == SSL_ERROR_SYSCALL ? "SYSCALL" : "ZERO_RETURN"
         ));
@@ -141,7 +141,7 @@ TlsDoHandshake (
         DEBUG ((
           DEBUG_ERROR,
           "%a ERROR 0x%x=L%x:F%x:R%x\n",
-          __FUNCTION__,
+          __func__,
           ErrorCode,
           ERR_GET_LIB (ErrorCode),
           ERR_GET_FUNC (ErrorCode),
