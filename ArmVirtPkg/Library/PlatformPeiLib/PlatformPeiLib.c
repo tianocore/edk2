@@ -111,7 +111,7 @@ PlatformPeim (
 
         UartBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
 
-        DEBUG ((DEBUG_INFO, "%a: PL011 UART @ 0x%lx\n", __FUNCTION__, UartBase));
+        DEBUG ((DEBUG_INFO, "%a: PL011 UART @ 0x%lx\n", __func__, UartBase));
 
         *UartHobData = UartBase;
         break;
@@ -148,7 +148,7 @@ PlatformPeim (
               DEBUG ((
                 DEBUG_WARN,
                 "%a: 'ranges' property has unexpected size %d\n",
-                __FUNCTION__,
+                __func__,
                 RangesLen
                 ));
               break;
@@ -175,7 +175,7 @@ PlatformPeim (
 
   if (FeaturePcdGet (PcdTpm2SupportEnabled)) {
     if (TpmBase != 0) {
-      DEBUG ((DEBUG_INFO, "%a: TPM @ 0x%lx\n", __FUNCTION__, TpmBase));
+      DEBUG ((DEBUG_INFO, "%a: TPM @ 0x%lx\n", __func__, TpmBase));
 
       Status = (EFI_STATUS)PcdSet64S (PcdTpmBaseAddress, TpmBase);
       ASSERT_EFI_ERROR (Status);
