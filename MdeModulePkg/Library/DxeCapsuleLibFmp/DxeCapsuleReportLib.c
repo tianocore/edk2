@@ -502,7 +502,7 @@ InitCapsuleVariable (
   // Locate the VariablePolicy protocol
   Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "DxeCapsuleReportLib %a - Could not locate VariablePolicy protocol! %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "DxeCapsuleReportLib %a - Could not locate VariablePolicy protocol! %r\n", __func__, Status));
     ASSERT_EFI_ERROR (Status);
   }
 

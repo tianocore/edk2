@@ -95,7 +95,7 @@ VarCheckPolicyLibMmiHandler (
   //
   // If either of the pointers are NULL, we can't proceed.
   if ((CommBuffer == NULL) || (CommBufferSize == NULL)) {
-    DEBUG ((DEBUG_INFO, "%a - Invalid comm buffer pointers!\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a - Invalid comm buffer pointers!\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -105,14 +105,14 @@ VarCheckPolicyLibMmiHandler (
   if ((InternalCommBufferSize > VAR_CHECK_POLICY_MM_COMM_BUFFER_SIZE) ||
       !VarCheckPolicyIsBufferOutsideValid ((UINTN)CommBuffer, (UINT64)InternalCommBufferSize))
   {
-    DEBUG ((DEBUG_ERROR, "%a - Invalid CommBuffer supplied! 0x%016lX[0x%016lX]\n", __FUNCTION__, CommBuffer, InternalCommBufferSize));
+    DEBUG ((DEBUG_ERROR, "%a - Invalid CommBuffer supplied! 0x%016lX[0x%016lX]\n", __func__, CommBuffer, InternalCommBufferSize));
     return EFI_INVALID_PARAMETER;
   }
 
   // If the size does not meet a minimum threshold, we cannot proceed.
   ExpectedSize = sizeof (VAR_CHECK_POLICY_COMM_HEADER);
   if (InternalCommBufferSize < ExpectedSize) {
-    DEBUG ((DEBUG_INFO, "%a - Bad comm buffer size! %d < %d\n", __FUNCTION__, InternalCommBufferSize, ExpectedSize));
+    DEBUG ((DEBUG_INFO, "%a - Bad comm buffer size! %d < %d\n", __func__, InternalCommBufferSize, ExpectedSize));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -128,7 +128,7 @@ VarCheckPolicyLibMmiHandler (
   if ((InternalPolicyCommmHeader->Signature != VAR_CHECK_POLICY_COMM_SIG) ||
       (InternalPolicyCommmHeader->Revision != VAR_CHECK_POLICY_COMM_REVISION))
   {
-    DEBUG ((DEBUG_INFO, "%a - Signature or revision are incorrect!\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a - Signature or revision are incorrect!\n", __func__));
     // We have verified the buffer is not null and have enough size to hold Result field.
     PolicyCommmHeader->Result = EFI_INVALID_PARAMETER;
     return EFI_SUCCESS;
@@ -157,7 +157,7 @@ VarCheckPolicyLibMmiHandler (
       // This add should be safe because these are fixed sizes so far.
       ExpectedSize += sizeof (VAR_CHECK_POLICY_COMM_IS_ENABLED_PARAMS);
       if (InternalCommBufferSize < ExpectedSize) {
-        DEBUG ((DEBUG_INFO, "%a - Bad comm buffer size! %d < %d\n", __FUNCTION__, InternalCommBufferSize, ExpectedSize));
+        DEBUG ((DEBUG_INFO, "%a - Bad comm buffer size! %d < %d\n", __func__, InternalCommBufferSize, ExpectedSize));
         PolicyCommmHeader->Result = EFI_INVALID_PARAMETER;
         break;
       }
@@ -173,7 +173,7 @@ VarCheckPolicyLibMmiHandler (
       // This add should be safe because these are fixed sizes so far.
       ExpectedSize += sizeof (VARIABLE_POLICY_ENTRY);
       if (InternalCommBufferSize < ExpectedSize) {
-        DEBUG ((DEBUG_INFO, "%a - Bad comm buffer size! %d < %d\n", __FUNCTION__, InternalCommBufferSize, ExpectedSize));
+        DEBUG ((DEBUG_INFO, "%a - Bad comm buffer size! %d < %d\n", __func__, InternalCommBufferSize, ExpectedSize));
         PolicyCommmHeader->Result = EFI_INVALID_PARAMETER;
         break;
       }
@@ -186,7 +186,7 @@ VarCheckPolicyLibMmiHandler (
           EFI_ERROR (SafeUintnAdd (sizeof (VAR_CHECK_POLICY_COMM_HEADER), PolicyEntry->Size, &ExpectedSize)) ||
           (InternalCommBufferSize < ExpectedSize))
       {
-        DEBUG ((DEBUG_INFO, "%a - Bad policy entry contents!\n", __FUNCTION__));
+        DEBUG ((DEBUG_INFO, "%a - Bad policy entry contents!\n", __func__));
         PolicyCommmHeader->Result = EFI_INVALID_PARAMETER;
         break;
       }
@@ -199,7 +199,7 @@ VarCheckPolicyLibMmiHandler (
       // This add should be safe because these are fixed sizes so far.
       ExpectedSize += sizeof (VAR_CHECK_POLICY_COMM_DUMP_PARAMS) + VAR_CHECK_POLICY_MM_DUMP_BUFFER_SIZE;
       if (InternalCommBufferSize < ExpectedSize) {
-        DEBUG ((DEBUG_INFO, "%a - Bad comm buffer size! %d < %d\n", __FUNCTION__, InternalCommBufferSize, ExpectedSize));
+        DEBUG ((DEBUG_INFO, "%a - Bad comm buffer size! %d < %d\n", __func__, InternalCommBufferSize, ExpectedSize));
         PolicyCommmHeader->Result = EFI_INVALID_PARAMETER;
         break;
       }
@@ -298,7 +298,7 @@ VarCheckPolicyLibMmiHandler (
 
     default:
       // Mark unknown requested command as EFI_UNSUPPORTED.
-      DEBUG ((DEBUG_INFO, "%a - Invalid command requested! %d\n", __FUNCTION__, PolicyCommmHeader->Command));
+      DEBUG ((DEBUG_INFO, "%a - Invalid command requested! %d\n", __func__, PolicyCommmHeader->Command));
       PolicyCommmHeader->Result = EFI_UNSUPPORTED;
       break;
   }
@@ -306,7 +306,7 @@ VarCheckPolicyLibMmiHandler (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a - Command %d returning %r.\n",
-    __FUNCTION__,
+    __func__,
     PolicyCommmHeader->Command,
     PolicyCommmHeader->Result
     ));
@@ -349,7 +349,7 @@ VarCheckPolicyLibCommonConstructor (
   }
   // Otherwise, there's not much we can do.
   else {
-    DEBUG ((DEBUG_ERROR, "%a - Cannot Initialize VariablePolicyLib! %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Cannot Initialize VariablePolicyLib! %r\n", __func__, Status));
     ASSERT_EFI_ERROR (Status);
   }
 

@@ -2770,7 +2770,7 @@ VariableServiceSetVariable (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Failed to set variable '%s' with Guid %g\n",
-          __FUNCTION__,
+          __func__,
           VariableName,
           VendorGuid
           ));
@@ -2792,7 +2792,7 @@ VariableServiceSetVariable (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Failed to set variable '%s' with Guid %g\n",
-          __FUNCTION__,
+          __func__,
           VariableName,
           VendorGuid
           ));
@@ -2814,7 +2814,7 @@ VariableServiceSetVariable (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Failed to set variable '%s' with Guid %g\n",
-          __FUNCTION__,
+          __func__,
           VariableName,
           VendorGuid
           ));

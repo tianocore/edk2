@@ -2593,7 +2593,7 @@ ScsiDiskInquiryDevice (
           DEBUG ((
             DEBUG_WARN,
             "%a: invalid PageLength (%u) in Supported VPD Pages page\n",
-            __FUNCTION__,
+            __func__,
             (UINT32)PageLength
             ));
           PageLength = 0;
@@ -2606,7 +2606,7 @@ ScsiDiskInquiryDevice (
           DEBUG ((
             DEBUG_WARN,
             "%a: Supported VPD Pages page doesn't start with code 0x%02x\n",
-            __FUNCTION__,
+            __func__,
             EFI_SCSI_PAGE_CODE_SUPPORTED_VPD
             ));
           PageLength = 0;
@@ -2626,7 +2626,7 @@ ScsiDiskInquiryDevice (
             DEBUG ((
               DEBUG_WARN,
               "%a: non-ascending code in Supported VPD Pages page @ %u\n",
-              __FUNCTION__,
+              __func__,
               Index
               ));
             Index      = 0;
