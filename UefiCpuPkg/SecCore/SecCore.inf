@@ -55,6 +55,7 @@
   PeiServicesLib
   PeiServicesTablePointerLib
   HobLib
+  CpuPageTableLib
 
 [Ppis]
   ## SOMETIMES_CONSUMES
