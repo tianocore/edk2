@@ -29,6 +29,10 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Guids]
+  gEdkiiRngAlgorithmUnSafe
 
 [LibraryClasses]
   BaseLib

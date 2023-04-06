@@ -212,3 +212,26 @@ GetRandomNumber128 (
   // Read second 64 bits
   return GetRandomNumber64 (++Rand);
 }
+
+/**
+  Get a GUID identifying the RNG algorithm implementation.
+
+  @param [out] RngGuid  If success, contains the GUID identifying
+                        the RNG algorithm implementation.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_UNSUPPORTED         Not supported.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+RETURN_STATUS
+EFIAPI
+GetRngGuid (
+  GUID  *RngGuid
+  )
+{
+  /* This implementation is to be replaced by its MdeModulePkg copy.
+   * The cause being that some GUIDs (gEdkiiRngAlgorithmUnSafe) cannot
+   * be defined in the MdePkg.
+   */
+  return RETURN_UNSUPPORTED;
+}
