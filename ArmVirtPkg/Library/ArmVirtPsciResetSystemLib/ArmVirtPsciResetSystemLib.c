@@ -65,7 +65,7 @@ ArmPsciResetSystemLibConstructor (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Unknown PSCI method \"%a\"\n",
-      __FUNCTION__,
+      __func__,
       Prop
       ));
     return EFI_NOT_FOUND;
@@ -105,7 +105,7 @@ ResetCold (
       break;
 
     default:
-      DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __func__));
   }
 }
 
@@ -154,7 +154,7 @@ ResetShutdown (
       break;
 
     default:
-      DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __func__));
   }
 }
 

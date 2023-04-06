@@ -75,7 +75,7 @@ VirtNorFlashPlatformGetDevices (
       DEBUG ((
         DEBUG_ERROR,
         "%a: GetNodeProperty () failed (Status == %r)\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       continue;
