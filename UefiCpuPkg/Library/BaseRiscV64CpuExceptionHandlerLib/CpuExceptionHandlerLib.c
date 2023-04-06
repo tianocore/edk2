@@ -230,7 +230,7 @@ RegisterCpuInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER  InterruptHandler
   )
 {
-  DEBUG ((DEBUG_INFO, "%a: Type:%x Handler: %x\n", __FUNCTION__, ExceptionType, InterruptHandler));
+  DEBUG ((DEBUG_INFO, "%a: Type:%x Handler: %x\n", __func__, ExceptionType, InterruptHandler));
   if (EXCEPT_RISCV_IS_IRQ (ExceptionType)) {
     if (EXCEPT_RISCV_IRQ_INDEX (ExceptionType) > EXCEPT_RISCV_MAX_IRQS) {
       return EFI_UNSUPPORTED;

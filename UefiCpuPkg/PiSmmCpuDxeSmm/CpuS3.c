@@ -932,7 +932,7 @@ InitSmmS3ResumeState (
     DEBUG ((
       DEBUG_ERROR,
       "ERROR:%a(): HOB(gEfiAcpiVariableGuid=%g) needed by S3 resume doesn't exist!\n",
-      __FUNCTION__,
+      __func__,
       &gEfiAcpiVariableGuid
       ));
     CpuDeadLoop ();

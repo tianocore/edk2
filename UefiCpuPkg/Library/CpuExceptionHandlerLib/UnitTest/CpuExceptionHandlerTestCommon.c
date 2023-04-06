@@ -292,7 +292,7 @@ GetBspStackBase (
       DEBUG ((
         DEBUG_INFO,
         "%a: Bsp StackBase = 0x%016lx  StackSize = 0x%016lx\n",
-        __FUNCTION__,
+        __func__,
         MemoryHob->AllocDescriptor.MemoryBaseAddress,
         MemoryHob->AllocDescriptor.MemoryLength
         ));

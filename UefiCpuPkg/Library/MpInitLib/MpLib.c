@@ -1537,7 +1537,7 @@ TimedWaitForApFinish (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: reached FinishedApLimit=%u in %Lu microseconds\n",
-      __FUNCTION__,
+      __func__,
       FinishedApLimit,
       DivU64x64Remainder (
         MultU64x32 (CpuMpData->TotalTime, 1000000),

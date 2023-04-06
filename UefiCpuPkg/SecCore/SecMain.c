@@ -170,7 +170,7 @@ SecStartup (
   DEBUG ((
     DEBUG_INFO,
     "%a() TempRAM Base: 0x%x, TempRAM Size: 0x%x, BootFirmwareVolume 0x%x\n",
-    __FUNCTION__,
+    __func__,
     TempRamBase,
     SizeOfRam,
     BootFirmwareVolume
@@ -242,7 +242,7 @@ SecStartup (
   DEBUG ((
     DEBUG_INFO,
     "%a() BFV Base: 0x%x, BFV Size: 0x%x, TempRAM Base: 0x%x, TempRAM Size: 0x%x, PeiTempRamBase: 0x%x, PeiTempRamSize: 0x%x, StackBase: 0x%x, StackSize: 0x%x\n",
-    __FUNCTION__,
+    __func__,
     SecCoreData.BootFirmwareVolumeBase,
     SecCoreData.BootFirmwareVolumeSize,
     SecCoreData.TemporaryRamBase,
@@ -345,7 +345,7 @@ SecStartupPhase2 (
   DEBUG ((
     DEBUG_INFO,
     "%a() PeiCoreEntryPoint: 0x%x\n",
-    __FUNCTION__,
+    __func__,
     PeiCoreEntryPoint
     ));
 
@@ -394,7 +394,7 @@ SecStartupPhase2 (
     DEBUG ((
       DEBUG_INFO,
       "%a() PeiTemporaryRamBase: 0x%x, PeiTemporaryRamSize: 0x%x\n",
-      __FUNCTION__,
+      __func__,
       SecCoreData->PeiTemporaryRamBase,
       SecCoreData->PeiTemporaryRamSize
       ));
@@ -408,7 +408,7 @@ SecStartupPhase2 (
   DEBUG ((
     DEBUG_INFO,
     "%a() Stack Base: 0x%p, Stack Size: 0x%x\n",
-    __FUNCTION__,
+    __func__,
     SecCoreData->StackBase,
     (UINT32)SecCoreData->StackSize
     ));

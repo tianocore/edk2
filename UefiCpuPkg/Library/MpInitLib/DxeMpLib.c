@@ -463,7 +463,7 @@ MpInitChangeApLoopCallback (
       );
   }
 
-  DEBUG ((DEBUG_INFO, "%a() done!\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() done!\n", __func__));
 }
 
 /**
