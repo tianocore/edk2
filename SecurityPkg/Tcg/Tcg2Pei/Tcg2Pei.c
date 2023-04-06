@@ -312,10 +312,10 @@ SyncPcrAllocationsAndPcrMask (
     NewTpmActivePcrBanks &= BiosHashAlgorithmBitmap;
     DEBUG ((DEBUG_INFO, "NewTpmActivePcrBanks 0x%08x\n", NewTpmActivePcrBanks));
 
-    DEBUG ((DEBUG_INFO, "%a - Reallocating PCR banks from 0x%X to 0x%X.\n", __FUNCTION__, TpmActivePcrBanks, NewTpmActivePcrBanks));
+    DEBUG ((DEBUG_INFO, "%a - Reallocating PCR banks from 0x%X to 0x%X.\n", __func__, TpmActivePcrBanks, NewTpmActivePcrBanks));
 
     if (NewTpmActivePcrBanks == 0) {
-      DEBUG ((DEBUG_ERROR, "%a - No viable PCRs active! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a - No viable PCRs active! Please set a less restrictive value for PcdTpm2HashMask!\n", __func__));
       ASSERT (FALSE);
     } else {
       DEBUG ((DEBUG_ERROR, "Tpm2PcrAllocateBanks (TpmHashAlgorithmBitmap: 0x%08x, NewTpmActivePcrBanks: 0x%08x)\n", TpmHashAlgorithmBitmap, NewTpmActivePcrBanks));
@@ -324,7 +324,7 @@ SyncPcrAllocationsAndPcrMask (
         //
         // We can't do much here, but we hope that this doesn't happen.
         //
-        DEBUG ((DEBUG_ERROR, "%a - Failed to reallocate PCRs!\n", __FUNCTION__));
+        DEBUG ((DEBUG_ERROR, "%a - Failed to reallocate PCRs!\n", __func__));
         ASSERT_EFI_ERROR (Status);
       }
 
@@ -342,9 +342,9 @@ SyncPcrAllocationsAndPcrMask (
   if ((Tpm2PcrMask & TpmHashAlgorithmBitmap) != Tpm2PcrMask) {
     NewTpm2PcrMask = Tpm2PcrMask & TpmHashAlgorithmBitmap;
 
-    DEBUG ((DEBUG_INFO, "%a - Updating PcdTpm2HashMask from 0x%X to 0x%X.\n", __FUNCTION__, Tpm2PcrMask, NewTpm2PcrMask));
+    DEBUG ((DEBUG_INFO, "%a - Updating PcdTpm2HashMask from 0x%X to 0x%X.\n", __func__, Tpm2PcrMask, NewTpm2PcrMask));
     if (NewTpm2PcrMask == 0) {
-      DEBUG ((DEBUG_ERROR, "%a - No viable PCRs supported! Please set a less restrictive value for PcdTpm2HashMask!\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a - No viable PCRs supported! Please set a less restrictive value for PcdTpm2HashMask!\n", __func__));
       ASSERT (FALSE);
     }
 
