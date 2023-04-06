@@ -30,6 +30,9 @@
 [Packages]
   MdePkg/MdePkg.dec
 
+[Guids]
+  gEdkiiRngAlgorithmUnSafe
+
 [LibraryClasses]
   BaseLib
   DebugLib
