@@ -372,7 +372,7 @@ RedfishDiscoverProtocolInstalled (
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE  *ThisNetworkInterface;
   EFI_REDFISH_DISCOVERED_TOKEN            *ThisRedfishDiscoveredToken;
 
-  DEBUG ((DEBUG_INFO, "%a: New network interface is installed on system by EFI Redfish discover driver.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: New network interface is installed on system by EFI Redfish discover driver.\n", __func__));
 
   BufferSize = sizeof (EFI_HANDLE);
   Status     = gBS->LocateHandle (
@@ -383,7 +383,7 @@ RedfishDiscoverProtocolInstalled (
                       &HandleBuffer
                       );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Can't locate handle with EFI_REDFISH_DISCOVER_PROTOCOL installed.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Can't locate handle with EFI_REDFISH_DISCOVER_PROTOCOL installed.\n", __func__));
   }
 
   gRedfishDiscoverActivated = TRUE;
@@ -403,7 +403,7 @@ RedfishDiscoverProtocolInstalled (
     if (EFI_ERROR (Status)) {
       gEfiRedfishDiscoverProtocol = NULL;
       gRedfishDiscoverActivated   = FALSE;
-      DEBUG ((DEBUG_ERROR, "%a: Can't locate EFI_REDFISH_DISCOVER_PROTOCOL.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: Can't locate EFI_REDFISH_DISCOVER_PROTOCOL.\n", __func__));
       return;
     }
   }
@@ -422,13 +422,13 @@ RedfishDiscoverProtocolInstalled (
                                           &gNetworkInterfaceInstances
                                           );
   if (EFI_ERROR (Status) || (gNumberOfNetworkInterfaces == 0)) {
-    DEBUG ((DEBUG_ERROR, "%a: No network interfaces found on the handle.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: No network interfaces found on the handle.\n", __func__));
     return;
   }
 
   gRedfishDiscoveredToken = AllocateZeroPool (gNumberOfNetworkInterfaces * sizeof (EFI_REDFISH_DISCOVERED_TOKEN));
   if (gRedfishDiscoveredToken == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Not enough memory for EFI_REDFISH_DISCOVERED_TOKEN.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Not enough memory for EFI_REDFISH_DISCOVERED_TOKEN.\n", __func__));
     return;
   }
 
@@ -449,7 +449,7 @@ RedfishDiscoverProtocolInstalled (
                     &ThisRedfishDiscoveredToken->Event
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Failed to create event for Redfish discovered token.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: Failed to create event for Redfish discovered token.\n", __func__));
       goto ErrorReturn;
     }
 
@@ -472,7 +472,7 @@ RedfishDiscoverProtocolInstalled (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Acquire Redfish service fail.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Acquire Redfish service fail.\n", __func__));
     goto ErrorReturn;
   }
 
@@ -556,7 +556,7 @@ RedfishConfigHandlerDriverEntryPoint (
                   &gEfiRedfishDiscoverProtocolEvent
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Fail to create event for the installation of EFI_REDFISH_DISCOVER_PROTOCOL.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to create event for the installation of EFI_REDFISH_DISCOVER_PROTOCOL.", __func__));
     return Status;
   }
 
@@ -566,7 +566,7 @@ RedfishConfigHandlerDriverEntryPoint (
                   &gEfiRedfishDiscoverRegistration
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Fail to register event for the installation of EFI_REDFISH_DISCOVER_PROTOCOL.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to register event for the installation of EFI_REDFISH_DISCOVER_PROTOCOL.", __func__));
     return Status;
   }
 
@@ -593,7 +593,7 @@ RedfishConfigHandlerDriverEntryPoint (
     gExitBootServiceEvent = NULL;
     gBS->CloseEvent (gEfiRedfishDiscoverProtocolEvent);
     gEfiRedfishDiscoverProtocolEvent = NULL;
-    DEBUG ((DEBUG_ERROR, "%a: Fail to install EFI Binding Protocol of EFI Redfish Config driver.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to install EFI Binding Protocol of EFI Redfish Config driver.", __func__));
     return Status;
   }
 
