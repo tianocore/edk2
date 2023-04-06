@@ -111,7 +111,7 @@ VirtioFsFuseFlush (
       DEBUG_ERROR,
       "%a: Label=\"%s\" NodeId=%Lu FuseHandle=%Lu "
       "Errno=%d\n",
-      __FUNCTION__,
+      __func__,
       VirtioFs->Label,
       NodeId,
       FuseHandle,

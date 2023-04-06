@@ -43,20 +43,20 @@ PlatformPeimInitialization (
   GetFirmwareContextPointer (&FirmwareContext);
 
   if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Firmware Context is NULL\n", __func__));
     return EFI_UNSUPPORTED;
   }
 
   FdtPointer = (VOID *)FirmwareContext->FlattenedDeviceTree;
   if (FdtPointer == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Invalid FDT pointer\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Invalid FDT pointer\n", __func__));
     return EFI_UNSUPPORTED;
   }
 
-  DEBUG ((DEBUG_INFO, "%a: Build FDT HOB - FDT at address: 0x%x \n", __FUNCTION__, FdtPointer));
+  DEBUG ((DEBUG_INFO, "%a: Build FDT HOB - FDT at address: 0x%x \n", __func__, FdtPointer));
   Base = FdtPointer;
   if (fdt_check_header (Base) != 0) {
-    DEBUG ((DEBUG_ERROR, "%a: Corrupted DTB\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Corrupted DTB\n", __func__));
     return EFI_UNSUPPORTED;
   }
 
@@ -64,7 +64,7 @@ PlatformPeimInitialization (
   FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
   NewBase  = AllocatePages (FdtPages);
   if (NewBase == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Could not allocate memory for DTB\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Could not allocate memory for DTB\n", __func__));
     return EFI_UNSUPPORTED;
   }
 
@@ -72,7 +72,7 @@ PlatformPeimInitialization (
 
   FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof *FdtHobData);
   if (FdtHobData == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Could not build FDT Hob\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Could not build FDT Hob\n", __func__));
     return EFI_UNSUPPORTED;
   }
 

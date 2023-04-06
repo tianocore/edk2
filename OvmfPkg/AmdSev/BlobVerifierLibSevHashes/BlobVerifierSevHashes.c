@@ -101,7 +101,7 @@ VerifyBlob (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Verifier called but no hashes table discoverd in MEMFD\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_ACCESS_DENIED;
   }
@@ -111,7 +111,7 @@ VerifyBlob (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Unknown blob name \"%s\"\n",
-      __FUNCTION__,
+      __func__,
       BlobName
       ));
     return EFI_ACCESS_DENIED;
@@ -134,14 +134,14 @@ VerifyBlob (
       continue;
     }
 
-    DEBUG ((DEBUG_INFO, "%a: Found GUID %g in table\n", __FUNCTION__, Guid));
+    DEBUG ((DEBUG_INFO, "%a: Found GUID %g in table\n", __func__, Guid));
 
     EntrySize = Entry->Len - sizeof Entry->Guid - sizeof Entry->Len;
     if (EntrySize != SHA256_DIGEST_SIZE) {
       DEBUG ((
         DEBUG_ERROR,
         "%a: Hash has the wrong size %d != %d\n",
-        __FUNCTION__,
+        __func__,
         EntrySize,
         SHA256_DIGEST_SIZE
         ));
@@ -159,7 +159,7 @@ VerifyBlob (
       DEBUG ((
         DEBUG_INFO,
         "%a: Hash comparison succeeded for \"%s\"\n",
-        __FUNCTION__,
+        __func__,
         BlobName
         ));
     } else {
@@ -167,7 +167,7 @@ VerifyBlob (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Hash comparison failed for \"%s\"\n",
-        __FUNCTION__,
+        __func__,
         BlobName
         ));
     }
@@ -178,7 +178,7 @@ VerifyBlob (
   DEBUG ((
     DEBUG_ERROR,
     "%a: Hash GUID %g not found in table\n",
-    __FUNCTION__,
+    __func__,
     Guid
     ));
   return EFI_ACCESS_DENIED;
@@ -218,7 +218,7 @@ BlobVerifierLibSevHashesConstructor (
   DEBUG ((
     DEBUG_INFO,
     "%a: Found injected hashes table in secure location\n",
-    __FUNCTION__
+    __func__
     ));
 
   mHashesTable     = (HASH_TABLE *)Ptr->Data;
@@ -227,7 +227,7 @@ BlobVerifierLibSevHashesConstructor (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: mHashesTable=0x%p, Size=%u\n",
-    __FUNCTION__,
+    __func__,
     mHashesTable,
     mHashesTableSize
     ));

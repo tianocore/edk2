@@ -968,7 +968,7 @@ FetchBlob (
     DEBUG ((
       DEBUG_ERROR,
       "%a: failed to allocate %Ld bytes for \"%s\"\n",
-      __FUNCTION__,
+      __func__,
       (INT64)Blob->Size,
       Blob->Name
       ));
@@ -978,7 +978,7 @@ FetchBlob (
   DEBUG ((
     DEBUG_INFO,
     "%a: loading %Ld bytes for \"%s\"\n",
-    __FUNCTION__,
+    __func__,
     (INT64)Blob->Size,
     Blob->Name
     ));
@@ -1001,7 +1001,7 @@ FetchBlob (
       DEBUG ((
         DEBUG_VERBOSE,
         "%a: %Ld bytes remaining for \"%s\" (%d)\n",
-        __FUNCTION__,
+        __func__,
         (INT64)Left,
         Blob->Name,
         (INT32)Idx
@@ -1051,7 +1051,7 @@ QemuKernelLoaderFsDxeEntrypoint (
 
   Status = gRT->GetTime (&mInitTime, NULL /* Capabilities */);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: GetTime(): %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: GetTime(): %r\n", __func__, Status));
     return Status;
   }
 
@@ -1101,7 +1101,7 @@ QemuKernelLoaderFsDxeEntrypoint (
     DEBUG ((
       DEBUG_ERROR,
       "%a: InstallMultipleProtocolInterfaces(): %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto FreeBlobs;
@@ -1121,7 +1121,7 @@ QemuKernelLoaderFsDxeEntrypoint (
       DEBUG ((
         DEBUG_ERROR,
         "%a: InstallMultipleProtocolInterfaces(): %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       goto UninstallFileSystemHandle;

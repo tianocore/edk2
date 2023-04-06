@@ -49,11 +49,11 @@ Tcg2ConfigPeimEntryPoint (
   UINTN       Size;
   EFI_STATUS  Status;
 
-  DEBUG ((DEBUG_INFO, "%a\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a\n", __func__));
 
   Status = InternalTpm12Detect ();
   if (!EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "%a: TPM1.2 detected\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: TPM1.2 detected\n", __func__));
     Size   = sizeof (gEfiTpmDeviceInstanceTpm12Guid);
     Status = PcdSetPtrS (
                PcdTpmInstanceGuid,
@@ -64,7 +64,7 @@ Tcg2ConfigPeimEntryPoint (
   } else {
     Status = Tpm2RequestUseTpm ();
     if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a: TPM2 detected\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a: TPM2 detected\n", __func__));
       Size   = sizeof (gEfiTpmDeviceInstanceTpm20DtpmGuid);
       Status = PcdSetPtrS (
                  PcdTpmInstanceGuid,
@@ -73,7 +73,7 @@ Tcg2ConfigPeimEntryPoint (
                  );
       ASSERT_EFI_ERROR (Status);
     } else {
-      DEBUG ((DEBUG_INFO, "%a: no TPM detected\n", __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a: no TPM detected\n", __func__));
       //
       // If no TPM2 was detected, we still need to install
       // TpmInitializationDonePpi. Namely, Tcg2Pei will exit early upon seeing
