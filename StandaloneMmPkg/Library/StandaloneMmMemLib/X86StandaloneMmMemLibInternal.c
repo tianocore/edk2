@@ -95,7 +95,7 @@ MmMemLibInternalPopulateMmramRanges (
   EFI_MMRAM_DESCRIPTOR            *MmramDescriptors;
 
   HobStart = GetHobList ();
-  DEBUG ((DEBUG_INFO, "%a - 0x%x\n", __FUNCTION__, HobStart));
+  DEBUG ((DEBUG_INFO, "%a - 0x%x\n", __func__, HobStart));
 
   //
   // Extract MM Core Private context from the Hob. If absent search for
