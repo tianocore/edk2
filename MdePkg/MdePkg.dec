@@ -2357,6 +2357,11 @@
   # @Prompt IPMI KCS Interface I/O Base Address
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress|0xca2|UINT16|0x00000031
 
+[PcdsFixedAtBuild.AARCH64, PcdsPatchableInModule.AARCH64]
+  ## GUID identifying the Rng algorithm implemented by CPU instruction.
+  # @Prompt CPU Rng algorithm's GUID.
+  gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00000032
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This value is used to set the base address of PCI express hierarchy.
   # @Prompt PCI Express Base Address.
