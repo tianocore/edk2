@@ -3,6 +3,7 @@ Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
 Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -276,10 +277,7 @@ SmmReadSaveState (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = SmmCpuFeaturesReadSaveStateRegister (CpuIndex, Register, Width, Buffer);
-  if (Status == EFI_UNSUPPORTED) {
-    Status = ReadSaveStateRegister (CpuIndex, Register, Width, Buffer);
-  }
+  Status = MmSaveStateReadRegister (CpuIndex, Register, Width, Buffer);
 
   return Status;
 }
@@ -328,10 +326,7 @@ SmmWriteSaveState (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = SmmCpuFeaturesWriteSaveStateRegister (CpuIndex, Register, Width, Buffer);
-  if (Status == EFI_UNSUPPORTED) {
-    Status = WriteSaveStateRegister (CpuIndex, Register, Width, Buffer);
-  }
+  Status = MmSaveStateWriteRegister (CpuIndex, Register, Width, Buffer);
 
   return Status;
 }
