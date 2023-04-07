@@ -1095,10 +1095,14 @@ PiCpuSmmEntry (
         mSmmShadowStackSize
         );
       if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-        SetNotPresentPage (
+        ConvertMemoryPageAttributes (
           Cr3,
+          mPagingMode,
           (EFI_PHYSICAL_ADDRESS)(UINTN)Stacks + mSmmStackSize + EFI_PAGES_TO_SIZE (1) + (mSmmStackSize + mSmmShadowStackSize) * Index,
-          EFI_PAGES_TO_SIZE (1)
+          EFI_PAGES_TO_SIZE (1),
+          EFI_MEMORY_RP,
+          TRUE,
+          NULL
           );
       }
     }

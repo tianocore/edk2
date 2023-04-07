@@ -769,28 +769,6 @@ SetShadowStack (
 }
 
 /**
-  Set not present memory.
-
-  @param[in]  Cr3              The page table base address.
-  @param[in]  BaseAddress      The physical address that is the start address of a memory region.
-  @param[in]  Length           The size in bytes of the memory region.
-
-  @retval EFI_SUCCESS           The not present memory is set.
-**/
-EFI_STATUS
-SetNotPresentPage (
-  IN  UINTN                 Cr3,
-  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN  UINT64                Length
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = SmmSetMemoryAttributesEx (Cr3, mPagingMode, BaseAddress, Length, EFI_MEMORY_RP);
-  return Status;
-}
-
-/**
   Retrieves a pointer to the system configuration table from the SMM System Table
   based on a specified GUID.
 
