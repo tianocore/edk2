@@ -78,6 +78,7 @@ RngGetRNG (
 {
   EFI_STATUS  Status;
   UINTN       Index;
+  GUID        RngGuid;
 
   if ((This == NULL) || (RNGValueLength == 0) || (RNGValue == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -102,7 +103,10 @@ RngGetRNG (
   }
 
 FoundAlgo:
-  if (CompareGuid (RNGAlgorithm, PcdGetPtr (PcdCpuRngSupportedAlgorithm))) {
+  Status = GetRngGuid (&RngGuid);
+  if (!EFI_ERROR (Status) &&
+      CompareGuid (RNGAlgorithm, &RngGuid))
+  {
     Status = RngGetBytes (RNGValueLength, RNGValue);
     return Status;
   }
