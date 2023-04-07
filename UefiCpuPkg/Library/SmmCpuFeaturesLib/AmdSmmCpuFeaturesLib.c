@@ -28,64 +28,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 STATIC UINT8  mSmmSaveStateRegisterLma;
 
 /**
-  Read an SMM Save State register on the target processor.  If this function
-  returns EFI_UNSUPPORTED, then the caller is responsible for reading the
-  SMM Save Sate register.
-
-  @param[in]  CpuIndex  The index of the CPU to read the SMM Save State.  The
-                        value must be between 0 and the NumberOfCpus field in
-                        the System Management System Table (SMST).
-  @param[in]  Register  The SMM Save State register to read.
-  @param[in]  Width     The number of bytes to read from the CPU save state.
-  @param[out] Buffer    Upon return, this holds the CPU register value read
-                        from the save state.
-
-  @retval EFI_SUCCESS           The register was read from Save State.
-  @retval EFI_INVALID_PARAMTER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED       This function does not support reading Register.
-
-**/
-EFI_STATUS
-EFIAPI
-SmmCpuFeaturesReadSaveStateRegister (
-  IN  UINTN                        CpuIndex,
-  IN  EFI_SMM_SAVE_STATE_REGISTER  Register,
-  IN  UINTN                        Width,
-  OUT VOID                         *Buffer
-  )
-{
-  return MmSaveStateReadRegister (CpuIndex, Register, Width, Buffer);
-}
-
-/**
-  Writes an SMM Save State register on the target processor.  If this function
-  returns EFI_UNSUPPORTED, then the caller is responsible for writing the
-  SMM Save Sate register.
-
-  @param[in] CpuIndex  The index of the CPU to write the SMM Save State.  The
-                       value must be between 0 and the NumberOfCpus field in
-                       the System Management System Table (SMST).
-  @param[in] Register  The SMM Save State register to write.
-  @param[in] Width     The number of bytes to write to the CPU save state.
-  @param[in] Buffer    Upon entry, this holds the new CPU register value.
-
-  @retval EFI_SUCCESS           The register was written to Save State.
-  @retval EFI_INVALID_PARAMTER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED       This function does not support writing Register.
-**/
-EFI_STATUS
-EFIAPI
-SmmCpuFeaturesWriteSaveStateRegister (
-  IN UINTN                        CpuIndex,
-  IN EFI_SMM_SAVE_STATE_REGISTER  Register,
-  IN UINTN                        Width,
-  IN CONST VOID                   *Buffer
-  )
-{
-  return MmSaveStateWriteRegister (CpuIndex, Register, Width, Buffer);
-}
-
-/**
   Performs library initialization.
 
   This initialization function contains common functionality shared betwen all
