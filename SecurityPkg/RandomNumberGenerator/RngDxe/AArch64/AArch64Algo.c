@@ -17,6 +17,50 @@
 // Maximum number of Rng algorithms.
 #define RNG_AVAILABLE_ALGO_MAX  2
 
+/** mAvailableAlgoArray[0] should contain the default Rng algorithm.
+    The Rng algorithm at the first index might be unsafe.
+    If a safe algorithm is available, choose it as the default one.
+**/
+VOID
+EFIAPI
+RngFindDefaultAlgo (
+  VOID
+  )
+{
+  EFI_RNG_ALGORITHM  *CurAlgo;
+  EFI_RNG_ALGORITHM  TmpGuid;
+  UINTN              Index;
+
+  CurAlgo = &mAvailableAlgoArray[0];
+
+  if (IsZeroGuid (CurAlgo) ||
+      !CompareGuid (CurAlgo, &gEfiRngAlgorithmUnSafe))
+  {
+    // mAvailableAlgoArray[0] is a valid Rng algorithm.
+    return;
+  }
+
+  for (Index = 1; Index < mAvailableAlgoArrayCount; Index++) {
+    CurAlgo = &mAvailableAlgoArray[Index];
+    if (!IsZeroGuid (CurAlgo) ||
+        CompareGuid (CurAlgo, &gEfiRngAlgorithmUnSafe))
+    {
+      break;
+    }
+  }
+
+  if (Index == mAvailableAlgoArrayCount) {
+    // No valid Rng algorithm available.
+    return;
+  }
+
+  CopyMem (&TmpGuid, CurAlgo, sizeof (EFI_RNG_ALGORITHM));
+  CopyMem (CurAlgo, &mAvailableAlgoArray[0], sizeof (EFI_RNG_ALGORITHM));
+  CopyMem (&mAvailableAlgoArray[0], &TmpGuid, sizeof (EFI_RNG_ALGORITHM));
+
+  return;
+}
+
 /** Allocate and initialize mAvailableAlgoArray with the available
     Rng algorithms. Also update mAvailableAlgoArrayCount.
 
@@ -45,7 +89,7 @@ GetAvailableAlgorithms (
   if (!EFI_ERROR (Status)) {
     CopyMem (
       &mAvailableAlgoArray[mAvailableAlgoArrayCount],
-      RngGuid,
+      &RngGuid,
       sizeof (RngGuid)
       );
     mAvailableAlgoArrayCount++;
@@ -67,6 +111,8 @@ GetAvailableAlgorithms (
       );
     mAvailableAlgoArrayCount++;
   }
+
+  RngFindDefaultAlgo ();
 
   return EFI_SUCCESS;
 }
