@@ -3,6 +3,7 @@ Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
 Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -51,6 +52,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/RegisterCpuFeaturesLib.h>
 #include <Library/PerformanceLib.h>
+#include <Library/MmSaveStateLib.h>
 
 #include <AcpiCpuData.h>
 #include <CpuHotPlugData.h>
@@ -367,60 +369,6 @@ SmmInitHandler (
 VOID
 ExecuteFirstSmiInit (
   VOID
-  );
-
-/**
-Read a CPU Save State register on the target processor.
-
-This function abstracts the differences that whether the CPU Save State register is in the
-IA32 CPU Save State Map or X64 CPU Save State Map.
-
-This function supports reading a CPU Save State register in SMBase relocation handler.
-
-@param[in]  CpuIndex       Specifies the zero-based index of the CPU save state.
-@param[in]  RegisterIndex  Index into mSmmCpuWidthOffset[] look up table.
-@param[in]  Width          The number of bytes to read from the CPU save state.
-@param[out] Buffer         Upon return, this holds the CPU register value read from the save state.
-
-@retval EFI_SUCCESS           The register was read from Save State.
-@retval EFI_NOT_FOUND         The register is not defined for the Save State of Processor.
-@retval EFI_INVALID_PARAMETER Buffer is NULL, or Width does not meet requirement per Register type.
-
-**/
-EFI_STATUS
-EFIAPI
-ReadSaveStateRegister (
-  IN UINTN                        CpuIndex,
-  IN EFI_SMM_SAVE_STATE_REGISTER  Register,
-  IN UINTN                        Width,
-  OUT VOID                        *Buffer
-  );
-
-/**
-Write value to a CPU Save State register on the target processor.
-
-This function abstracts the differences that whether the CPU Save State register is in the
-IA32 CPU Save State Map or X64 CPU Save State Map.
-
-This function supports writing a CPU Save State register in SMBase relocation handler.
-
-@param[in] CpuIndex       Specifies the zero-based index of the CPU save state.
-@param[in] RegisterIndex  Index into mSmmCpuWidthOffset[] look up table.
-@param[in] Width          The number of bytes to read from the CPU save state.
-@param[in] Buffer         Upon entry, this holds the new CPU register value.
-
-@retval EFI_SUCCESS           The register was written to Save State.
-@retval EFI_NOT_FOUND         The register is not defined for the Save State of Processor.
-@retval EFI_INVALID_PARAMETER  ProcessorIndex or Width is not correct.
-
-**/
-EFI_STATUS
-EFIAPI
-WriteSaveStateRegister (
-  IN UINTN                        CpuIndex,
-  IN EFI_SMM_SAVE_STATE_REGISTER  Register,
-  IN UINTN                        Width,
-  IN CONST VOID                   *Buffer
   );
 
 extern BOOLEAN            mSmmRelocated;
