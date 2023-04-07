@@ -919,6 +919,70 @@ PatchGdtIdtMap (
 }
 
 /**
+  This function set [Base, Limit] to the input MemoryAttribute.
+
+  @param  Base        Start address of range.
+  @param  Limit       Limit address of range.
+  @param  Attribute   The bit mask of attributes to modify for the memory region.
+  @param  Map         Pointer to the array of Cr3 IA32_MAP_ENTRY.
+  @param  Count       Count of IA32_MAP_ENTRY in Map.
+**/
+VOID
+SetMemMapWithNonPresentRange (
+  UINT64          Base,
+  UINT64          Limit,
+  UINT64          Attribute,
+  IA32_MAP_ENTRY  *Map,
+  UINTN           Count
+  )
+{
+  UINTN   Index;
+  UINT64  NonPresentRangeStart;
+
+  NonPresentRangeStart = 0;
+  for (Index = 0; Index < Count; Index++) {
+    if ((Map[Index].LinearAddress > NonPresentRangeStart) &&
+        (Base < Map[Index].LinearAddress) && (Limit > NonPresentRangeStart))
+    {
+      //
+      // We should NOT set attributes for non-present ragne.
+      //
+      //
+      // There is a non-present ( [NonPresentStart, Map[Index].LinearAddress] ) range before current Map[Index]
+      // and it is overlapped with [Base, Limit].
+      //
+      if (Base < NonPresentRangeStart) {
+        SmmSetMemoryAttributes (
+          Base,
+          NonPresentRangeStart - Base,
+          Attribute
+          );
+      }
+
+      Base = Map[Index].LinearAddress;
+    }
+
+    NonPresentRangeStart = Map[Index].LinearAddress + Map[Index].Length;
+    if (NonPresentRangeStart >= Limit) {
+      break;
+    }
+  }
+
+  Limit = MIN (NonPresentRangeStart, Limit);
+
+  if (Base < Limit) {
+    //
+    // There is no non-present range in current [Base, Limit] anymore.
+    //
+    SmmSetMemoryAttributes (
+      Base,
+      Limit - Base,
+      Attribute
+      );
+  }
+}
+
+/**
   This function sets memory attribute according to MemoryAttributesTable.
 **/
 VOID
@@ -932,6 +996,11 @@ SetMemMapAttributes (
   UINTN                                 DescriptorSize;
   UINTN                                 Index;
   EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
+  UINTN                                 PageTable;
+  EFI_STATUS                            Status;
+  IA32_MAP_ENTRY                        *Map;
+  UINTN                                 Count;
+  UINT64                                MemoryAttribute;
 
   SmmGetSystemConfigurationTable (&gEdkiiPiSmmMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
   if (MemoryAttributesTable == NULL) {
@@ -960,35 +1029,51 @@ SetMemMapAttributes (
     MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, DescriptorSize);
   }
 
+  Count     = 0;
+  Map       = NULL;
+  PageTable = AsmReadCr3 ();
+  Status    = PageTableParse (PageTable, mPagingMode, NULL, &Count);
+  while (Status == RETURN_BUFFER_TOO_SMALL) {
+    if (Map != NULL) {
+      FreePool (Map);
+    }
+
+    Map = AllocatePool (Count * sizeof (IA32_MAP_ENTRY));
+    ASSERT (Map != NULL);
+    Status = PageTableParse (PageTable, mPagingMode, Map, &Count);
+  }
+
+  ASSERT_RETURN_ERROR (Status);
+
   MemoryMap = MemoryMapStart;
   for (Index = 0; Index < MemoryMapEntryCount; Index++) {
     DEBUG ((DEBUG_VERBOSE, "SetAttribute: Memory Entry - 0x%lx, 0x%x\n", MemoryMap->PhysicalStart, MemoryMap->NumberOfPages));
-    switch (MemoryMap->Type) {
-      case EfiRuntimeServicesCode:
-        SmmSetMemoryAttributes (
-          MemoryMap->PhysicalStart,
-          EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
-          EFI_MEMORY_RO
-          );
-        break;
-      case EfiRuntimeServicesData:
-        SmmSetMemoryAttributes (
-          MemoryMap->PhysicalStart,
-          EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
-          EFI_MEMORY_XP
-          );
-        break;
-      default:
-        SmmSetMemoryAttributes (
-          MemoryMap->PhysicalStart,
-          EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
-          EFI_MEMORY_XP
-          );
-        break;
+    if (MemoryMap->Type == EfiRuntimeServicesCode) {
+      MemoryAttribute = EFI_MEMORY_RO;
+    } else {
+      ASSERT ((MemoryMap->Type == EfiRuntimeServicesData) || (MemoryMap->Type == EfiConventionalMemory));
+      //
+      // Set other type memory as NX.
+      //
+      MemoryAttribute = EFI_MEMORY_XP;
     }
+
+    //
+    // There may exist non-present range overlaps with the MemoryMap range.
+    // Do not change other attributes of non-present range while still remaining it as non-present
+    //
+    SetMemMapWithNonPresentRange (
+      MemoryMap->PhysicalStart,
+      MemoryMap->PhysicalStart + EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
+      MemoryAttribute,
+      Map,
+      Count
+      );
 
     MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, DescriptorSize);
   }
+
+  FreePool (Map);
 
   PatchSmmSaveStateMap ();
   PatchGdtIdtMap ();
