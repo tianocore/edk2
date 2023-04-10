@@ -262,6 +262,7 @@ extern EFI_SMM_CPU_PROTOCOL  mSmmCpu;
 extern EFI_MM_MP_PROTOCOL    mSmmMp;
 extern BOOLEAN               m5LevelPagingNeeded;
 extern PAGING_MODE           mPagingMode;
+extern UINTN                 mSmmShadowStackSize;
 
 ///
 /// The mode of the CPU at the time an SMI occurs
