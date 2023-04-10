@@ -7,6 +7,7 @@
 # "RedfishDefines.dsc.inc".
 #
 # (C) Copyright 2020-2021 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -19,4 +20,6 @@
   RedfishPkg/RedfishCredentialDxe/RedfishCredentialDxe.inf
   RedfishPkg/RedfishDiscoverDxe/RedfishDiscoverDxe.inf
   RedfishPkg/RedfishConfigHandler/RedfishConfigHandlerDriver.inf
+  RedfishPkg/RedfishPlatformConfigDxe/RedfishPlatformConfigDxe.inf
+  MdeModulePkg/Universal/RegularExpressionDxe/RegularExpressionDxe.inf
 !endif
