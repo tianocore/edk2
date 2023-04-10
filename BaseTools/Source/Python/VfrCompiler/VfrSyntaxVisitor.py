@@ -10,10 +10,10 @@ from re import T
 from sre_parse import FLAGS
 from tokenize import Number
 from antlr4 import *
-from VfrCtypes import *
-from VfrFormPkg import *
-from VfrUtility import *
-from VfrTree import *
+from IfrCtypes import *
+from IfrFormPkg import *
+from IfrUtility import *
+from IfrTree import *
 import ctypes
 import struct
 
@@ -28,7 +28,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
     def __init__(self, Root=None, OverrideClassGuid=None):
         if Root == None:
-            self.Root = VfrTreeNode()
+            self.Root = IfrTreeNode()
         else:
             self.Root = Root
         self.OverrideClassGuid = OverrideClassGuid
@@ -277,14 +277,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         DSObj.SetLineNo (LineNo)
         DSObj.SetDefaultName (EFI_STRING_ID_INVALID)
         DSObj.SetDefaultId (EFI_HII_DEFAULT_CLASS_STANDARD)
-        DsNode = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
+        DsNode = IfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
 
         DSObjMF = IfrDefaultStore("Standard ManuFacturing")
         gVfrDefaultStore.RegisterDefaultStore(DSObjMF.DefaultStore, "Standard ManuFacturing", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_MANUFACTURING)
         DSObjMF.SetLineNo (LineNo)
         DSObjMF.SetDefaultName (EFI_STRING_ID_INVALID)
         DSObjMF.SetDefaultId (EFI_HII_DEFAULT_CLASS_MANUFACTURING)
-        DsNodeMF = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObjMF, gFormPkg.StructToStream(DSObjMF.GetInfo()))
+        DsNodeMF = IfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObjMF, gFormPkg.StructToStream(DSObjMF.GetInfo()))
 
         return DsNode, DsNodeMF
 
@@ -384,7 +384,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if self.NeedAdjustOpcode:
             self.LastFormNode.Child.pop()
             for InsertOpCode in InsertOpCodeList:
-                InsertNode = VfrTreeNode(InsertOpCode.OpCode, InsertOpCode.Data, gFormPkg.StructToStream(InsertOpCode.Data.GetInfo()))
+                InsertNode = IfrTreeNode(InsertOpCode.OpCode, InsertOpCode.Data, gFormPkg.StructToStream(InsertOpCode.Data.GetInfo()))
                 self.LastFormNode.insertChild(InsertNode)
 
         return ctx.Node
@@ -1883,7 +1883,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             #　Guid Option Key
             OOOObj.SetIfrOptionKey(self.TransNum(ctx.KN.text))
             gIfrOptionKey = IfrOptionKey(self.CurrentQuestion.GetQuestionId(), Type, Value, self.TransNum(ctx.KN.text))
-            Node = VfrTreeNode(EFI_IFR_GUID_OP, gIfrOptionKey, gFormPkg.StructToStream(gIfrOptionKey.GetInfo()))
+            Node = IfrTreeNode(EFI_IFR_GUID_OP, gIfrOptionKey, gFormPkg.StructToStream(gIfrOptionKey.GetInfo()))
             gIfrOptionKey.SetLineNo()
             ctx.Node.insertChild(Node)
 
@@ -2904,7 +2904,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
             DefaultObj = IfrDefault(EFI_IFR_TYPE_DATE, [ctx.Val], EFI_HII_DEFAULT_CLASS_STANDARD, ctx.Val, EFI_IFR_TYPE_DATE)
             DefaultObj.SetLineNo(Line)
-            DefaultNode = VfrTreeNode(EFI_IFR_DEFAULT_OP, DefaultObj, gFormPkg.StructToStream(DefaultObj.GetInfo()))
+            DefaultNode = IfrTreeNode(EFI_IFR_DEFAULT_OP, DefaultObj, gFormPkg.StructToStream(DefaultObj.GetInfo()))
             ctx.Node.insertChild(DefaultNode)
 
         ctx.Node.Buffer = gFormPkg.StructToStream(DObj.GetInfo())
@@ -3013,7 +3013,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
             DefaultObj = IfrDefault(EFI_IFR_TYPE_TIME, [ctx.Val], EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_TIME)
             DefaultObj.SetLineNo(Line)
-            DefaultNode = VfrTreeNode(EFI_IFR_DEFAULT_OP, DefaultObj, gFormPkg.StructToStream(DefaultObj.GetInfo()))
+            DefaultNode = IfrTreeNode(EFI_IFR_DEFAULT_OP, DefaultObj, gFormPkg.StructToStream(DefaultObj.GetInfo()))
             ctx.Node.insertChild(DefaultNode)
 
         ctx.Node.Buffer = gFormPkg.StructToStream(TObj.GetInfo())
@@ -3254,7 +3254,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             TObj = IfrTimeout()
             TObj.SetLineNo(ctx.start.line)
             TObj.SetTimeout(self.TransNum(ctx.Number(2)))
-            Node = VfrTreeNode(EFI_IFR_GUID_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
+            Node = IfrTreeNode(EFI_IFR_GUID_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
             ctx.Node.insertChild(Node)
 
         return ctx.Node
@@ -3495,7 +3495,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if i != 0:
                 ctx.ExpInfo.ExpOpCount += 1
                 OObj = IfrOr(ctx.andTerm(i).Line)
-                Node = VfrTreeNode(EFI_IFR_OR_OP, OObj, gFormPkg.StructToStream(OObj.GetInfo()))
+                Node = IfrTreeNode(EFI_IFR_OR_OP, OObj, gFormPkg.StructToStream(OObj.GetInfo()))
                 ctx.Nodes.append(Node)
 
         # Extend OpCode Scope only for the root expression.
@@ -3506,7 +3506,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                     EObj.SetLineNo(self.IfrOpHdrLineNo[self.IfrOpHdrIndex])
                 else:
                     EObj.SetLineNo(ctx.stop.line)
-                Node = VfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
+                Node = IfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
                 ctx.Nodes.append(Node)
 
         if ctx.ExpInfo.RootLevel == 0:
@@ -3535,7 +3535,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if i != 0:
                 ctx.ExpInfo.ExpOpCount += 1
                 OObj = IfrOr(ctx.andTerm(i).Line)
-                Node = VfrTreeNode(EFI_IFR_OR_OP, OObj, gFormPkg.StructToStream(OObj.GetInfo()))
+                Node = IfrTreeNode(EFI_IFR_OR_OP, OObj, gFormPkg.StructToStream(OObj.GetInfo()))
                 ctx.Nodes.append(Node)
 
         ctx.ParentNodes.extend(ctx.Nodes) ######
@@ -3554,7 +3554,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if i != 0:
                 ctx.ExpInfo.ExpOpCount += 1
                 AObj = IfrAnd(ctx.bitwiseorTerm(i).Line)
-                Node = VfrTreeNode(EFI_IFR_AND_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
+                Node = IfrTreeNode(EFI_IFR_AND_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
                 ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3568,7 +3568,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if i != 0:
                 ctx.ExpInfo.ExpOpCount += 1
                 BWOObj = IfrBitWiseOr(ctx.bitwiseandTerm(i).Line)
-                Node = VfrTreeNode(EFI_IFR_BITWISE_OR_OP, BWOObj, gFormPkg.StructToStream(BWOObj.GetInfo()))
+                Node = IfrTreeNode(EFI_IFR_BITWISE_OR_OP, BWOObj, gFormPkg.StructToStream(BWOObj.GetInfo()))
                 ctx.Nodes.append(Node)
 
         return ctx.Nodes
@@ -3583,7 +3583,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if i != 0:
                 ctx.ExpInfo.ExpOpCount += 1
                 BWAObj = IfrBitWiseAnd(ctx.equalTerm(i).Line)
-                Node = VfrTreeNode(EFI_IFR_BITWISE_AND_OP, BWAObj, gFormPkg.StructToStream(BWAObj.GetInfo()))
+                Node = IfrTreeNode(EFI_IFR_BITWISE_AND_OP, BWAObj, gFormPkg.StructToStream(BWAObj.GetInfo()))
                 ctx.Nodes.append(Node)
 
         return ctx.Nodes
@@ -3607,7 +3607,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.compareTerm().Nodes)
         EObj = IfrEqual(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_EQUAL_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_EQUAL_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3617,7 +3617,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.compareTerm().Nodes)
         NEObj = IfrNotEqual(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_NOT_EQUAL_OP, NEObj, gFormPkg.StructToStream(NEObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_NOT_EQUAL_OP, NEObj, gFormPkg.StructToStream(NEObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3640,7 +3640,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.shiftTerm().Nodes)
         LTObj = IfrLessThan(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_LESS_THAN_OP, LTObj, gFormPkg.StructToStream(LTObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_LESS_THAN_OP, LTObj, gFormPkg.StructToStream(LTObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3650,7 +3650,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.shiftTerm().Nodes)
         LEObj = IfrLessEqual(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_LESS_EQUAL_OP, LEObj, gFormPkg.StructToStream(LEObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_LESS_EQUAL_OP, LEObj, gFormPkg.StructToStream(LEObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3660,7 +3660,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.shiftTerm().Nodes)
         GTObj = IfrGreaterThan(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_GREATER_THAN_OP, GTObj, gFormPkg.StructToStream(GTObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_GREATER_THAN_OP, GTObj, gFormPkg.StructToStream(GTObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3670,7 +3670,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.shiftTerm().Nodes)
         GEObj = IfrGreaterEqual(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_GREATER_EQUAL_OP, GEObj, gFormPkg.StructToStream(GEObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_GREATER_EQUAL_OP, GEObj, gFormPkg.StructToStream(GEObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3690,7 +3690,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.addMinusTerm().Nodes)
         SLObj = IfrShiftLeft(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_SHIFT_LEFT_OP, SLObj, gFormPkg.StructToStream(SLObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_SHIFT_LEFT_OP, SLObj, gFormPkg.StructToStream(SLObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3700,7 +3700,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.addMinusTerm().Nodes)
         SRObj = IfrShiftRight(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_SHIFT_RIGHT_OP, SRObj, gFormPkg.StructToStream(SRObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_SHIFT_RIGHT_OP, SRObj, gFormPkg.StructToStream(SRObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3722,7 +3722,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.multdivmodTerm().Nodes)
         AObj = IfrAdd(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_ADD_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_ADD_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3732,7 +3732,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.multdivmodTerm().Nodes)
         SObj = IfrSubtract(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_SUBTRACT_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_SUBTRACT_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3753,7 +3753,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.castTerm().Nodes)
         MObj = IfrMultiply(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_MULTIPLY_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_MULTIPLY_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3763,7 +3763,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.castTerm().Nodes)
         DObj = IfrDivide(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_DIVIDE_OP, DObj, gFormPkg.StructToStream(DObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_DIVIDE_OP, DObj, gFormPkg.StructToStream(DObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3773,7 +3773,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         self.visitChildren(ctx)
         ctx.Nodes.extend(ctx.castTerm().Nodes)
         MObj = IfrModulo(ctx.start.line)
-        Node = VfrTreeNode(EFI_IFR_MODULO_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_MODULO_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
         ctx.Nodes.append(Node)
         return ctx.Nodes
 
@@ -3788,13 +3788,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         ctx.Nodes.extend(ctx.atomTerm().Nodes)
         if CastType == 0:
             TBObj = IfrToBoolean(ctx.start.line)
-            Node = VfrTreeNode(EFI_IFR_TO_BOOLEAN_OP, TBObj, gFormPkg.StructToStream(TBObj.GetInfo()))
+            Node = IfrTreeNode(EFI_IFR_TO_BOOLEAN_OP, TBObj, gFormPkg.StructToStream(TBObj.GetInfo()))
             ctx.Nodes.append(Node)
             ctx.ExpInfo.ExpOpCount += 1
 
         elif CastType == 1:
             TUObj = IfrToUint(ctx.start.line)
-            Node = VfrTreeNode(EFI_IFR_TO_UINT_OP, TUObj, gFormPkg.StructToStream(TUObj.GetInfo()))
+            Node = IfrTreeNode(EFI_IFR_TO_UINT_OP, TUObj, gFormPkg.StructToStream(TUObj.GetInfo()))
             ctx.Nodes.append(Node)
             ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -3839,7 +3839,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if ctx.atomTerm() != None:
             ctx.Nodes = ctx.atomTerm().Nodes
             NObj = IfrNot(ctx.start.line)
-            Node = VfrTreeNode(EFI_IFR_NOT_OP, NObj, gFormPkg.StructToStream(NObj.GetInfo()))
+            Node = IfrTreeNode(EFI_IFR_NOT_OP, NObj, gFormPkg.StructToStream(NObj.GetInfo()))
             ctx.Nodes.append(Node)
             ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -3851,7 +3851,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         Line = ctx.start.line
         CObj = IfrCatenate(Line)
-        Node = VfrTreeNode(EFI_IFR_CATENATE_OP, CObj, gFormPkg.StructToStream(CObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_CATENATE_OP, CObj, gFormPkg.StructToStream(CObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
 
@@ -3865,7 +3865,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         Line = ctx.start.line
         MObj = IfrMatch(Line)
-        Node = VfrTreeNode(EFI_IFR_MATCH_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_MATCH_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
 
@@ -3879,7 +3879,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         Guid = ctx.guidDefinition().Guid
         M2Obj = IfrMatch2(Line, Guid)
-        Node = VfrTreeNode(EFI_IFR_MATCH2_OP, M2Obj, gFormPkg.StructToStream(M2Obj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_MATCH2_OP, M2Obj, gFormPkg.StructToStream(M2Obj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
 
@@ -3956,7 +3956,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.SaveOpHdrCond(EIVObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
                 EIVObj.SetQuestionId(QId, VarIdStr, ctx.VN.line)
                 EIVObj.SetValue(ConstVal)
-                ctx.Node = VfrTreeNode(EFI_IFR_EQ_ID_VAL_OP, EIVObj)
+                ctx.Node = IfrTreeNode(EFI_IFR_EQ_ID_VAL_OP, EIVObj)
                 ctx.ExpInfo.ExpOpCount += 1
             else:
                 ctx.Node = self.IdEqValDoSpecial(ctx.ExpInfo, Line, QId, VarIdStr, Mask, ConstVal, EFI_COMPARE_TYPE.EQUAL)
@@ -3980,15 +3980,15 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         QR1Obj = IfrQuestionRef1(LineNo)
         QR1Obj.SetQuestionId(QId, VarIdStr, LineNo)
-        Node = VfrTreeNode(EFI_IFR_QUESTION_REF1_OP, QR1Obj)
+        Node = IfrTreeNode(EFI_IFR_QUESTION_REF1_OP, QR1Obj)
         self.SaveOpHdrCond(QR1Obj.GetHeader(), (ExpInfo.ExpOpCount == 0))
         if BitMask != 0:
             U32Obj = IfrUint32(LineNo)
             U32Obj.SetValue(BitMask)
-            Node.insertChild(VfrTreeNode(EFI_IFR_UINT32_OP, U32Obj, gFormPkg.StructToStream(U32Obj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_UINT32_OP, U32Obj, gFormPkg.StructToStream(U32Obj.GetInfo())))
 
             BWAObj = IfrBitWiseAnd(LineNo)
-            Node.insertChild(VfrTreeNode(EFI_IFR_BITWISE_AND_OP, BWAObj, gFormPkg.StructToStream(BWAObj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_BITWISE_AND_OP, BWAObj, gFormPkg.StructToStream(BWAObj.GetInfo())))
 
             U8Obj = IfrUint8(LineNo)
             if BitMask == DATE_YEAR_BITMASK:
@@ -4001,10 +4001,10 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 U8Obj.SetValue (0)
             elif BitMask == TIME_MINUTE_BITMASK:
                 U8Obj.SetValue (0x8)
-            Node.insertChild(VfrTreeNode(EFI_IFR_UINT8_OP, U8Obj, gFormPkg.StructToStream(U8Obj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_UINT8_OP, U8Obj, gFormPkg.StructToStream(U8Obj.GetInfo())))
 
             SRObj = IfrShiftRight(LineNo)
-            Node.insertChild(VfrTreeNode(EFI_IFR_SHIFT_RIGHT_OP, SRObj, gFormPkg.StructToStream(SRObj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_SHIFT_RIGHT_OP, SRObj, gFormPkg.StructToStream(SRObj.GetInfo())))
 
         ExpInfo.ExpOpCount += 4
         return Node
@@ -4016,32 +4016,32 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if ConstVal > 0xFF:
             U16Obj = IfrUint16(LineNo)
             U16Obj.SetValue(ConstVal)
-            Node.insertChild(VfrTreeNode(EFI_IFR_UINT16_OP, U16Obj, gFormPkg.StructToStream(U16Obj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_UINT16_OP, U16Obj, gFormPkg.StructToStream(U16Obj.GetInfo())))
         else:
             U8Obj = IfrUint8(LineNo)
             U8Obj.SetValue(ConstVal)
-            Node.insertChild(VfrTreeNode(EFI_IFR_UINT8_OP, U8Obj, gFormPkg.StructToStream(U8Obj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_UINT8_OP, U8Obj, gFormPkg.StructToStream(U8Obj.GetInfo())))
 
         if CompareType == EFI_COMPARE_TYPE.EQUAL:
             EObj = IfrEqual(LineNo)
-            Node.insertChild(VfrTreeNode(EFI_IFR_EQUAL_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_EQUAL_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo())))
 
 
         if CompareType == EFI_COMPARE_TYPE.LESS_EQUAL:
             LEObj = IfrLessEqual(LineNo)
-            Node.insertChild(VfrTreeNode(EFI_IFR_LESS_EQUAL_OP, LEObj, gFormPkg.StructToStream(LEObj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_LESS_EQUAL_OP, LEObj, gFormPkg.StructToStream(LEObj.GetInfo())))
 
         if CompareType == EFI_COMPARE_TYPE.LESS_THAN:
             LTObj = IfrLessThan(LineNo)
-            Node.insertChild(VfrTreeNode(EFI_IFR_LESS_THAN_OP, LTObj, gFormPkg.StructToStream(LTObj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_LESS_THAN_OP, LTObj, gFormPkg.StructToStream(LTObj.GetInfo())))
 
         if CompareType == EFI_COMPARE_TYPE.GREATER_EQUAL:
             GEObj = IfrGreaterEqual(LineNo)
-            Node.insertChild(VfrTreeNode(EFI_IFR_GREATER_EQUAL_OP, GEObj, gFormPkg.StructToStream(GEObj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_GREATER_EQUAL_OP, GEObj, gFormPkg.StructToStream(GEObj.GetInfo())))
 
         if CompareType == EFI_COMPARE_TYPE.GREATER_THAN:
             GTObj = IfrGreaterThan(LineNo)
-            Node.insertChild(VfrTreeNode(EFI_IFR_GREATER_THAN_OP, GTObj, gFormPkg.StructToStream(GTObj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_GREATER_THAN_OP, GTObj, gFormPkg.StructToStream(GTObj.GetInfo())))
 
         ExpInfo.ExpOpCount += 2
         return Node
@@ -4062,7 +4062,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.SaveOpHdrCond(EIVObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
                 EIVObj.SetQuestionId(QId, VarIdStr, LineNo)
                 EIVObj.SetValue(ConstVal)
-                ctx.Node = VfrTreeNode(EFI_IFR_EQ_ID_VAL_OP, EIVObj)
+                ctx.Node = IfrTreeNode(EFI_IFR_EQ_ID_VAL_OP, EIVObj)
                 ctx.ExpInfo.ExpOpCount += 1
             else:
                 ctx.Node = self.IdEqValDoSpecial(ctx.ExpInfo, Line, QId, VarIdStr, Mask, ConstVal, EFI_COMPARE_TYPE.EQUAL)
@@ -4090,24 +4090,24 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         if CompareType == EFI_COMPARE_TYPE.EQUAL:
             EObj = IfrEqual(LineNo)
-            Node1.insertChild(VfrTreeNode(EFI_IFR_EQUAL_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo())))
+            Node1.insertChild(IfrTreeNode(EFI_IFR_EQUAL_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo())))
 
         if CompareType == EFI_COMPARE_TYPE.LESS_EQUAL:
             LEObj = IfrLessEqual(LineNo)
-            Node1.insertChild(VfrTreeNode(EFI_IFR_LESS_EQUAL_OP, LEObj, gFormPkg.StructToStream(LEObj.GetInfo())))
+            Node1.insertChild(IfrTreeNode(EFI_IFR_LESS_EQUAL_OP, LEObj, gFormPkg.StructToStream(LEObj.GetInfo())))
 
         if CompareType == EFI_COMPARE_TYPE.LESS_THAN:
             LTObj = IfrLessThan(LineNo)
-            Node1.insertChild(VfrTreeNode(EFI_IFR_LESS_THAN_OP, LTObj, gFormPkg.StructToStream(LTObj.GetInfo())))
+            Node1.insertChild(IfrTreeNode(EFI_IFR_LESS_THAN_OP, LTObj, gFormPkg.StructToStream(LTObj.GetInfo())))
 
 
         if CompareType == EFI_COMPARE_TYPE.GREATER_EQUAL:
             GEObj = IfrGreaterEqual(LineNo)
-            Node1.insertChild(VfrTreeNode(EFI_IFR_GREATER_EQUAL_OP, GEObj, gFormPkg.StructToStream(GEObj.GetInfo())))
+            Node1.insertChild(IfrTreeNode(EFI_IFR_GREATER_EQUAL_OP, GEObj, gFormPkg.StructToStream(GEObj.GetInfo())))
 
         if CompareType == EFI_COMPARE_TYPE.GREATER_THAN:
             GTObj = IfrGreaterThan(LineNo)
-            Node1.insertChild(VfrTreeNode(EFI_IFR_GREATER_THAN_OP, GTObj, gFormPkg.StructToStream(GTObj.GetInfo())))
+            Node1.insertChild(IfrTreeNode(EFI_IFR_GREATER_THAN_OP, GTObj, gFormPkg.StructToStream(GTObj.GetInfo())))
 
         ExpInfo.ExpOpCount += 1
         return Node1
@@ -4135,7 +4135,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
                 self.SaveOpHdrCond(EIIObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
                 EIIObj.SetQuestionId1(QId1, VarIdStr1, LineNo1)
                 EIIObj.SetQuestionId2(QId2, VarIdStr2, LineNo2)
-                ctx.Node = VfrTreeNode(EFI_IFR_EQ_ID_ID_OP, EIIObj)
+                ctx.Node = IfrTreeNode(EFI_IFR_EQ_ID_ID_OP, EIIObj)
                 ctx.ExpInfo.ExpOpCount += 1
 
         elif ctx.LessEqual() != None:
@@ -4160,7 +4160,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         for i in range(1, ListLen):
             Node.insertChild(self.IdEqValDoSpecial(ExpInfo, LineNo, QId, VarIdStr, Mask, ValueList[i], EFI_COMPARE_TYPE.EQUAL))
             OObj = IfrOr(LineNo)
-            Node.insertChild(VfrTreeNode(EFI_IFR_OR_OP, OObj, gFormPkg.StructToStream(OObj.GetInfo())))
+            Node.insertChild(IfrTreeNode(EFI_IFR_OR_OP, OObj, gFormPkg.StructToStream(OObj.GetInfo())))
             ExpInfo.ExpOpCount += 1
 
         return Node
@@ -4192,7 +4192,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             if QId == EFI_QUESTION_ID_INVALID:
                 EILObj.SetQuestionId(QId, VarIdStr, LineNo)
 
-            ctx.Node = VfrTreeNode(EFI_IFR_EQ_ID_VAL_LIST_OP, EILObj)
+            ctx.Node = IfrTreeNode(EFI_IFR_EQ_ID_VAL_LIST_OP, EILObj)
             ctx.ExpInfo.ExpOpCount += 1
         return ctx.Node
 
@@ -4398,50 +4398,50 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if ctx.TrueSymbol() != None:
             TObj = IfrTrue(Line)
             self.SaveOpHdrCond(TObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-            ctx.Node = VfrTreeNode(EFI_IFR_TRUE_OP, TObj)
+            ctx.Node = IfrTreeNode(EFI_IFR_TRUE_OP, TObj)
             ctx.ExpInfo.ExpOpCount += 1
 
         if ctx.FalseSymbol() != None:
             FObj = IfrFalse(Line)
             self.SaveOpHdrCond(FObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-            ctx.Node = VfrTreeNode(EFI_IFR_FALSE_OP, FObj)
+            ctx.Node = IfrTreeNode(EFI_IFR_FALSE_OP, FObj)
             ctx.ExpInfo.ExpOpCount += 1
 
         if ctx.One() != None:
             OObj = IfrOne(Line)
             self.SaveOpHdrCond(OObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-            ctx.Node = VfrTreeNode(EFI_IFR_ONE_OP, OObj)
+            ctx.Node = IfrTreeNode(EFI_IFR_ONE_OP, OObj)
             ctx.ExpInfo.ExpOpCount += 1
 
         if ctx.Ones() != None:
             OObj = IfrOnes(Line)
             self.SaveOpHdrCond(OObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-            ctx.Node = VfrTreeNode(EFI_IFR_ONES_OP, OObj)
+            ctx.Node = IfrTreeNode(EFI_IFR_ONES_OP, OObj)
             ctx.ExpInfo.ExpOpCount += 1
 
         if ctx.Zero() != None:
             ZObj = IfrZero(Line)
             self.SaveOpHdrCond(ZObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-            ctx.Node = VfrTreeNode(EFI_IFR_ZERO_OP, ZObj)
+            ctx.Node = IfrTreeNode(EFI_IFR_ZERO_OP, ZObj)
             ctx.ExpInfo.ExpOpCount += 1
 
         if ctx.Undefined() != None:
             UObj = IfrUndefined(Line)
             self.SaveOpHdrCond(UObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-            ctx.Node = VfrTreeNode(EFI_IFR_UNDEFINED_OP, UObj)
+            ctx.Node = IfrTreeNode(EFI_IFR_UNDEFINED_OP, UObj)
             ctx.ExpInfo.ExpOpCount += 1
 
         if ctx.Version() != None:
             VObj = IfrVersion(Line)
             self.SaveOpHdrCond(VObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-            ctx.Node = VfrTreeNode(EFI_IFR_VERSION_OP, VObj)
+            ctx.Node = IfrTreeNode(EFI_IFR_VERSION_OP, VObj)
             ctx.ExpInfo.ExpOpCount += 1
 
         if ctx.Number() != None:
             U64Obj = IfrUint64(Line)
             U64Obj.SetValue(self.TransNum(ctx.Number()))
             self.SaveOpHdrCond(U64Obj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-            ctx.Node = VfrTreeNode(EFI_IFR_UINT64_OP, U64Obj)
+            ctx.Node = IfrTreeNode(EFI_IFR_UINT64_OP, U64Obj)
             ctx.ExpInfo.ExpOpCount += 1
 
         return ctx.Node
@@ -4478,7 +4478,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         LObj = IfrLength(Line)
-        Node = VfrTreeNode(EFI_IFR_LENGTH_OP, LObj, gFormPkg.StructToStream(LObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_LENGTH_OP, LObj, gFormPkg.StructToStream(LObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4488,7 +4488,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         BWNObj = IfrBitWiseNot(Line)
-        Node = VfrTreeNode(EFI_IFR_BITWISE_NOT_OP, BWNObj, gFormPkg.StructToStream(BWNObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_BITWISE_NOT_OP, BWNObj, gFormPkg.StructToStream(BWNObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4510,14 +4510,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         if Type == 0x1:
             QR2Obj = IfrQuestionRef2(Line)
             self.SaveOpHdrCond(QR2Obj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
-            Node = VfrTreeNode(EFI_IFR_QUESTION_REF2_OP, QR2Obj)
+            Node = IfrTreeNode(EFI_IFR_QUESTION_REF2_OP, QR2Obj)
             ctx.Nodes.append(Node)
 
         if Type == 0x2:
             QR3_2Obj = IfrQuestionRef3_2(Line)
             self.SaveOpHdrCond(QR3_2Obj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
             QR3_2Obj.SetDevicePath(DevicePath)
-            Node = VfrTreeNode(EFI_IFR_QUESTION_REF3_OP, QR3_2Obj)
+            Node = IfrTreeNode(EFI_IFR_QUESTION_REF3_OP, QR3_2Obj)
             ctx.Nodes.append(Node)
 
         if Type == 0x3:
@@ -4525,7 +4525,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.SaveOpHdrCond(QR3_3Obj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
             QR3_3Obj.SetDevicePath(DevicePath)
             QR3_3Obj.SetGuid(ctx.guidDefinition().Guid)
-            Node = VfrTreeNode(EFI_IFR_QUESTION_REF3_OP, QR3_3Obj)
+            Node = IfrTreeNode(EFI_IFR_QUESTION_REF3_OP, QR3_3Obj)
             ctx.Nodes.append(Node)
 
         ctx.ExpInfo.ExpOpCount += 1
@@ -4539,7 +4539,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         SR2Obj = IfrStringRef2(Line)
-        Node = VfrTreeNode(EFI_IFR_STRING_REF2_OP, SR2Obj, gFormPkg.StructToStream(SR2Obj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_STRING_REF2_OP, SR2Obj, gFormPkg.StructToStream(SR2Obj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4550,7 +4550,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         TBObj = IfrToBoolean(Line)
-        Node = VfrTreeNode(EFI_IFR_TO_BOOLEAN_OP, TBObj, gFormPkg.StructToStream(TBObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_TO_BOOLEAN_OP, TBObj, gFormPkg.StructToStream(TBObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4562,7 +4562,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         TSObj = IfrToString(Line)
         Fmt = self.TransNum(ctx.Number())
         TSObj.SetFormat(Fmt)
-        Node = VfrTreeNode(EFI_IFR_TO_STRING_OP, TSObj, gFormPkg.StructToStream(TSObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_TO_STRING_OP, TSObj, gFormPkg.StructToStream(TSObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4572,7 +4572,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         TUObj = IfrToUint(Line)
-        Node = VfrTreeNode(EFI_IFR_TO_UINT_OP, TUObj, gFormPkg.StructToStream(TUObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_TO_UINT_OP, TUObj, gFormPkg.StructToStream(TUObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4583,7 +4583,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         TUObj = IfrToUpper(Line)
-        Node = VfrTreeNode(EFI_IFR_TO_UPPER_OP, TUObj, gFormPkg.StructToStream(TUObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_TO_UPPER_OP, TUObj, gFormPkg.StructToStream(TUObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4594,7 +4594,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         TLObj = IfrToLower(Line)
-        Node = VfrTreeNode(EFI_IFR_TO_LOWER_OP, TLObj, gFormPkg.StructToStream(TLObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_TO_LOWER_OP, TLObj, gFormPkg.StructToStream(TLObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4651,7 +4651,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         TSObj = IfrSet(Line)
         self.SaveOpHdrCond(TSObj.GetHeader(), (ctx.ExpInfo.ExpOpCount == 0), Line)
         TSObj.SetVarInfo(ctx.BaseInfo)
-        Node = VfrTreeNode(EFI_IFR_SET_OP, TSObj)
+        Node = IfrTreeNode(EFI_IFR_SET_OP, TSObj)
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4677,7 +4677,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         CObj = IfrConditional(Line)
-        Node = VfrTreeNode(EFI_IFR_CONDITIONAL_OP, CObj, gFormPkg.StructToStream(CObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_CONDITIONAL_OP, CObj, gFormPkg.StructToStream(CObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4690,7 +4690,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         for i in range(0, len(ctx.findFormat())):
             Format = ctx.findFormat(i).Format
             FObj.SetFormat(Format)
-        Node = VfrTreeNode(EFI_IFR_FIND_OP, FObj, gFormPkg.StructToStream(FObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_FIND_OP, FObj, gFormPkg.StructToStream(FObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4711,7 +4711,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         MObj = IfrMid(Line)
-        Node = VfrTreeNode(EFI_IFR_MID_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_MID_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4721,7 +4721,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         TObj = IfrToken(Line)
-        Node = VfrTreeNode(EFI_IFR_TOKEN_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_TOKEN_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4736,7 +4736,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             Flags |= FlagsCtx.Flag
         SObj = IfrSpan(Line)
         SObj.SetFlags(Flags)
-        Node = VfrTreeNode(EFI_IFR_SPAN_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_SPAN_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4759,13 +4759,13 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
         Line = ctx.start.line
         self.visitChildren(ctx)
         MObj = IfrMap(Line)
-        Node = VfrTreeNode(EFI_IFR_MAP_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_MAP_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
         ctx.Nodes.append(Node)
         for Node in ctx.Node.Child:
             ctx.Nodes.append(Node)
         EObj = IfrEnd()
         EObj.SetLineNo(ctx.stop.line)
-        Node = VfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
         ctx.Nodes.append(Node)
         ctx.ExpInfo.ExpOpCount += 1
         return ctx.Nodes
@@ -4830,14 +4830,14 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.ParserStatus += 1
             gVfrErrorHandle.PrintMsg(LineNum, 'Error', ErrorMsg, TokenValue)
 
-    def InsertChild(self, ParentNode: VfrTreeNode, ChildCtx):
+    def InsertChild(self, ParentNode: IfrTreeNode, ChildCtx):
         if ChildCtx != None and ChildCtx.Node != None:
             ParentNode.insertChild(ChildCtx.Node)
 
     def InsertEndNode(self, ParentNode, Line):
         EObj = IfrEnd()
         EObj.SetLineNo(Line)
-        ENode = VfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
+        ENode = IfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
         ParentNode.insertChild(ENode)
 
     def GetCurArraySize(self):

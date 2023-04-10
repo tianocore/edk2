@@ -7,11 +7,11 @@ import sys
 
 
 
-from VfrCtypes import *
-from VfrFormPkg import *
-from VfrUtility import *
-from VfrTree import *
-from VfrPreProcess import *
+from IfrCtypes import *
+from IfrFormPkg import *
+from IfrUtility import *
+from IfrTree import *
+from IfrPreProcess import *
 
 
 def serializedATN():
@@ -4152,7 +4152,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_FORM_SET_OP)
+            self.Node = IfrTreeNode(EFI_IFR_FORM_SET_OP)
             self.S1 = None # Token
             self.S2 = None # Token
             self.S3 = None # Token
@@ -4430,7 +4430,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_GUID_OP)
+            self.Node = IfrTreeNode(EFI_IFR_GUID_OP)
 
         def validClassNames(self, i:int=None):
             if i is None:
@@ -4604,7 +4604,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_GUID_OP)
+            self.Node = IfrTreeNode(EFI_IFR_GUID_OP)
             self.S = None # Token
 
         def SubclassSetupApplication(self):
@@ -4865,7 +4865,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_DEFAULTSTORE_OP)
             self.D = None # Token
             self.P = None # Token
             self.A = None # Token
@@ -4986,7 +4986,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_VARSTORE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_VARSTORE_OP)
             self.TN = None # Token
             self.ID = None # Token
             self.S = None # Token
@@ -5175,7 +5175,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_VARSTORE_EFI_OP)
+            self.Node = IfrTreeNode(EFI_IFR_VARSTORE_EFI_OP)
             self.TN = None # Token
             self.ID = None # Token
             self.S1 = None # Token
@@ -5519,7 +5519,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_VARSTORE_NAME_VALUE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_VARSTORE_NAME_VALUE_OP)
             self.SN = None # Token
             self.ID = None # Token
             self.SID = None # Token
@@ -5674,7 +5674,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_DISABLE_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_DISABLE_IF_OP)
 
         def DisableIf(self):
             return self.getToken(SourceVfrSyntaxParser.DisableIf, 0)
@@ -5740,7 +5740,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)
 
         def SuppressIf(self):
             return self.getToken(SourceVfrSyntaxParser.SuppressIf, 0)
@@ -6617,7 +6617,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_IMAGE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_IMAGE_OP)
 
         def Image(self):
             return self.getToken(SourceVfrSyntaxParser.Image, 0)
@@ -6675,7 +6675,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_LOCKED_OP)
+            self.Node = IfrTreeNode(EFI_IFR_LOCKED_OP)
 
         def Locked(self):
             return self.getToken(SourceVfrSyntaxParser.Locked, 0)
@@ -6834,7 +6834,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_FORM_OP)
+            self.Node = IfrTreeNode(EFI_IFR_FORM_OP)
             self.N = None # Token
             self.S = None # Token
             self.ST = None # Token
@@ -7117,7 +7117,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_FORM_MAP_OP)
+            self.Node = IfrTreeNode(EFI_IFR_FORM_MAP_OP)
             self.N = None # Token
             self.S = None # Token
             self.SM = None # Token
@@ -7376,7 +7376,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_RULE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_RULE_OP)
 
         def Rule(self):
             return self.getToken(SourceVfrSyntaxParser.Rule, 0)
@@ -7507,7 +7507,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_SUBTITLE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_SUBTITLE_OP)
             self.S = None # Token
 
         def Subtitle(self):
@@ -7857,7 +7857,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_TEXT_OP)
+            self.Node = IfrTreeNode(EFI_IFR_TEXT_OP)
             self.S1 = None # Token
             self.S2 = None # Token
             self.S3 = None # Token
@@ -8195,7 +8195,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_REF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_REF_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_REF
             self.S = None # Token
             self.SG1 = None # Token
@@ -8681,7 +8681,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_RESET_BUTTON_OP)
+            self.Node = IfrTreeNode(EFI_IFR_RESET_BUTTON_OP)
             self.N = None # Token
 
         def ResetButton(self):
@@ -8992,7 +8992,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)
             self.S = None # Token
             self.F = None # Token
 
@@ -9133,7 +9133,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP)
             self.S = None # Token
             self.F = None # Token
 
@@ -9274,7 +9274,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_DISABLE_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_DISABLE_IF_OP)
 
         def DisableIf(self):
             return self.getToken(SourceVfrSyntaxParser.DisableIf, 0)
@@ -9346,7 +9346,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_REFRESH_OP)
+            self.Node = IfrTreeNode(EFI_IFR_REFRESH_OP)
             self.N = None # Token
             self.S = None # Token
 
@@ -9415,7 +9415,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_VARSTORE_DEVICE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_VARSTORE_DEVICE_OP)
             self.S = None # Token
 
         def VarstoreDevice(self):
@@ -9482,7 +9482,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_REFRESH_ID_OP)
+            self.Node = IfrTreeNode(EFI_IFR_REFRESH_ID_OP)
             self.S = None # Token
 
         def RefreshGuid(self):
@@ -9534,7 +9534,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_WARNING_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_WARNING_IF_OP)
             self.S = None # Token
             self.N = None # Token
             self.ST = None # Token
@@ -9937,7 +9937,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)
             self.F = None # Token
 
         def SuppressIf(self):
@@ -10056,7 +10056,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)
             self.F = None # Token
 
         def GrayOutIf(self):
@@ -10175,7 +10175,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_DEFAULT_OP)
+            self.Node = IfrTreeNode(EFI_IFR_DEFAULT_OP)
             self.D = None # Token
             self.V = None # VfrStatementValueContext
             self.SN = None # Token
@@ -10273,7 +10273,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_VALUE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_VALUE_OP)
 
         def Value(self):
             return self.getToken(SourceVfrSyntaxParser.Value, 0)
@@ -10360,7 +10360,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_ONE_OF_OPTION_OP)
+            self.Node = IfrTreeNode(EFI_IFR_ONE_OF_OPTION_OP)
             self.S = None # Token
             self.F = None # Token
             self.KN = None # Token
@@ -10729,7 +10729,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_READ_OP)
+            self.Node = IfrTreeNode(EFI_IFR_READ_OP)
 
         def Read(self):
             return self.getToken(SourceVfrSyntaxParser.Read, 0)
@@ -10779,7 +10779,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_WRITE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_WRITE_OP)
 
         def Write(self):
             return self.getToken(SourceVfrSyntaxParser.Write, 0)
@@ -10996,8 +10996,8 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_CHECKBOX_OP)
-            self.GuidNode = VfrTreeNode(EFI_IFR_GUID_OP)
+            self.Node = IfrTreeNode(EFI_IFR_CHECKBOX_OP)
+            self.GuidNode = IfrTreeNode(EFI_IFR_GUID_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.L = None # Token
             self.F = None # Token
@@ -11297,7 +11297,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_ACTION_OP)
+            self.Node = IfrTreeNode(EFI_IFR_ACTION_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.S = None # Token
 
@@ -11604,8 +11604,8 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_NUMERIC_OP)
-            self.GuidNode = VfrTreeNode(EFI_IFR_GUID_OP)
+            self.Node = IfrTreeNode(EFI_IFR_NUMERIC_OP)
+            self.GuidNode = IfrTreeNode(EFI_IFR_GUID_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.F = None # Token
             self.N = None # Token
@@ -12052,8 +12052,8 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_ONE_OF_OP)
-            self.GuidNode = VfrTreeNode(EFI_IFR_GUID_OP)
+            self.Node = IfrTreeNode(EFI_IFR_ONE_OF_OP)
+            self.GuidNode = IfrTreeNode(EFI_IFR_GUID_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.F = None # Token
 
@@ -12285,7 +12285,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_STRING_OP)
+            self.Node = IfrTreeNode(EFI_IFR_STRING_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.F = None # Token
             self.N = None # Token
@@ -12609,7 +12609,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_PASSWORD_OP)
+            self.Node = IfrTreeNode(EFI_IFR_PASSWORD_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.F = None # Token
             self.N = None # Token
@@ -12950,7 +12950,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_ORDERED_LIST_OP)
+            self.Node = IfrTreeNode(EFI_IFR_ORDERED_LIST_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_NORMAL
             self.M = None # Token
             self.N = None # Token
@@ -13226,7 +13226,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_DATE_OP)
+            self.Node = IfrTreeNode(EFI_IFR_DATE_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_DATE
             self.Val = EFI_HII_DATE()
             self.F1 = None # Token
@@ -13843,7 +13843,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_TIME_OP)
+            self.Node = IfrTreeNode(EFI_IFR_TIME_OP)
             self.QType = EFI_QUESION_TYPE.QUESTION_TIME
             self.Val = EFI_HII_TIME()
             self.F1 = None # Token
@@ -14840,7 +14840,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_DISABLE_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_DISABLE_IF_OP)
 
         def DisableIf(self):
             return self.getToken(SourceVfrSyntaxParser.DisableIf, 0)
@@ -15110,7 +15110,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)
 
         def SuppressIf(self):
             return self.getToken(SourceVfrSyntaxParser.SuppressIf, 0)
@@ -15233,7 +15233,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP)
 
         def GrayOutIf(self):
             return self.getToken(SourceVfrSyntaxParser.GrayOutIf, 0)
@@ -15356,7 +15356,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)
             self.S = None # Token
 
         def InconsistentIf(self):
@@ -16017,7 +16017,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_GUID_OP)
+            self.Node = IfrTreeNode(EFI_IFR_GUID_OP)
             self.N = None # Token
             self.S = None # Token
 
@@ -16083,7 +16083,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_GUID_OP)
+            self.Node = IfrTreeNode(EFI_IFR_GUID_OP)
             self.S = None # Token
             self.NL = None # Token
             self.SL = None # Token
@@ -16257,7 +16257,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_GUID_OP)
+            self.Node = IfrTreeNode(EFI_IFR_GUID_OP)
             self.Buffer = None
             self.Size = 0
             self.TypeName = ''
@@ -16743,7 +16743,7 @@ class SourceVfrSyntaxParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.Node = VfrTreeNode(EFI_IFR_MODAL_TAG_OP)
+            self.Node = IfrTreeNode(EFI_IFR_MODAL_TAG_OP)
 
         def Modal(self):
             return self.getToken(SourceVfrSyntaxParser.Modal, 0)
@@ -18631,7 +18631,7 @@ class SourceVfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.ExpInfo = None
-            self.Node = VfrTreeNode(EFI_IFR_DUP_OP)
+            self.Node = IfrTreeNode(EFI_IFR_DUP_OP)
             self.ExpInfo = ExpInfo
 
         def Dup(self):
@@ -19259,7 +19259,7 @@ class SourceVfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.ExpInfo = None
-            self.Node = VfrTreeNode(EFI_IFR_QUESTION_REF1_OP)
+            self.Node = IfrTreeNode(EFI_IFR_QUESTION_REF1_OP)
             self.ExpInfo = ExpInfo
 
         def QuestionRef(self):
@@ -19324,7 +19324,7 @@ class SourceVfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.ExpInfo = None
-            self.Node = VfrTreeNode(EFI_IFR_RULE_REF_OP)
+            self.Node = IfrTreeNode(EFI_IFR_RULE_REF_OP)
             self.ExpInfo = ExpInfo
 
         def RuleRef(self):
@@ -19380,7 +19380,7 @@ class SourceVfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.ExpInfo = None
-            self.Node = VfrTreeNode(EFI_IFR_STRING_REF1_OP)
+            self.Node = IfrTreeNode(EFI_IFR_STRING_REF1_OP)
             self.S = None # Token
             self.ExpInfo = ExpInfo
 
@@ -19467,7 +19467,7 @@ class SourceVfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.ExpInfo = None
-            self.Node = VfrTreeNode(EFI_IFR_THIS_OP)
+            self.Node = IfrTreeNode(EFI_IFR_THIS_OP)
             self.ExpInfo = ExpInfo
 
         def PushThis(self):
@@ -19508,7 +19508,7 @@ class SourceVfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.ExpInfo = None
-            self.Node = VfrTreeNode(EFI_IFR_SECURITY_OP)
+            self.Node = IfrTreeNode(EFI_IFR_SECURITY_OP)
             self.S = None # Token
             self.ExpInfo = ExpInfo
 
@@ -19620,7 +19620,7 @@ class SourceVfrSyntaxParser ( Parser ):
             self.parser = parser
             self.ExpInfo = None
             self.BaseInfo = EFI_VARSTORE_INFO()
-            self.Node = VfrTreeNode(EFI_IFR_GET_OP)
+            self.Node = IfrTreeNode(EFI_IFR_GET_OP)
             self.ExpInfo = ExpInfo
 
         def Get(self):
@@ -21215,7 +21215,7 @@ class SourceVfrSyntaxParser ( Parser ):
             self.parser = parser
             self.ExpInfo = None
             self.Nodes = []
-            self.Node = VfrTreeNode()
+            self.Node = IfrTreeNode()
             self.ExpInfo = ExpInfo
 
         def Map(self):
@@ -21305,8 +21305,3 @@ class SourceVfrSyntaxParser ( Parser ):
         finally:
             self.exitRule()
         return localctx
-
-
-
-
-

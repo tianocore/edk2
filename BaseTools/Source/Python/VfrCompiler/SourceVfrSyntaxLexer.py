@@ -6,11 +6,11 @@ import sys
 
 
 
-from VfrCtypes import *
-from VfrFormPkg import *
-from VfrUtility import *
-from VfrTree import *
-from VfrPreProcess import *
+from IfrCtypes import *
+from IfrFormPkg import *
+from IfrUtility import *
+from IfrTree import *
+from IfrPreProcess import *
 
 
 
@@ -1755,6 +1755,3 @@ class SourceVfrSyntaxLexer(Lexer):
         self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
-
-
- 

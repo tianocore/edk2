@@ -16,9 +16,9 @@ from VfrSyntaxParser import *
 from SourceVfrSyntaxParser import SourceVfrSyntaxParser
 from SourceVfrSyntaxVisitor import SourceVfrSyntaxVisitor
 from SourceVfrSyntaxLexer import SourceVfrSyntaxLexer
-from VfrCommon import *
+from IfrCommon import *
 from YamlTree import *
-from VfrPreProcess import *
+from IfrPreProcess import *
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from VfrError import *
 from Common.LongFilePathSupport import LongFilePath
@@ -56,7 +56,7 @@ UTILITY_NAME  = 'VfrCompiler'
 parser=argparse.ArgumentParser(description="VfrCompiler", epilog= "VfrCompile version {} \
                                Build {} Copyright (c) 2004-2016 Intel Corporation.\
                                All rights reserved.".format(VFR_COMPILER_VERSION, BUILD_VERSION))
-parser.add_argument("VfrFileName", help = "Input Vfr file name")
+parser.add_argument("InputFileName", help = "Input Vfr file name")
 parser.add_argument("--version", action="version", version="VfrCompile version {} Build {}".format(VFR_COMPILER_VERSION, BUILD_VERSION), help="prints version info")
 parser.add_argument("-l", dest ="CreateRecordListFile",help = "create an output IFR listing file")
 parser.add_argument("-y", dest ="CreateYamlFile",help = "create Yaml file")
@@ -86,10 +86,10 @@ class VfrCompiler():
         self.PreProcessOpt = PREPROCESSOR_OPTIONS
         self.OptionIntialization(Args, Argc)
         self.CopyFileToOutputDir() # for development and testing
-        self.VfrRoot = VfrTreeNode()
+        self.VfrRoot = IfrTreeNode()
         self.PreProcessDB = PreProcessDB(self.Options)
-        self.VfrTree = VfrTree(self.VfrRoot, self.PreProcessDB, self.Options)
-        self.YamlRoot = VfrTreeNode()
+        self.VfrTree = IfrTree(self.VfrRoot, self.PreProcessDB, self.Options)
+        self.YamlRoot = IfrTreeNode()
         self.YamlTree = YamlTree(self.YamlRoot, self.PreProcessDB, self.Options)
         if (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)) and (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)):
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED)
@@ -198,9 +198,9 @@ class VfrCompiler():
         if Args.CheckDefault:
             self.Options.CheckDefault = True
 
-        if Args.VfrFileName:
-            self.Options.VfrFileName = Args.VfrFileName
-            if self.Options.VfrFileName == None:
+        if Args.InputFileName:
+            self.Options.InputFileName = Args.InputFileName
+            if self.Options.InputFileName == None:
                 EdkLogger.error("VfrCompiler", OPTION_MISSING,"VFR file name is not specified.")
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
                 return
@@ -245,9 +245,9 @@ class VfrCompiler():
             return
 
     def SetBaseFileName(self):
-        if self.Options.VfrFileName == None:
+        if self.Options.InputFileName == None:
             return -1
-        pFileName = self.Options.VfrFileName
+        pFileName = self.Options.InputFileName
         while (pFileName.find('\\') != -1) or (pFileName.find('/') != -1):
 
             if pFileName.find('\\') != -1:
@@ -263,55 +263,55 @@ class VfrCompiler():
         if pFileName == '' or pFileName.find('.') == -1:
             return -1
 
-        self.Options.VfrBaseFileName = pFileName[:pFileName.find('.')]
+        self.Options.BaseFileName = pFileName[:pFileName.find('.')]
         return 0
 
     def SetPkgOutputFileName(self):
-        if self.Options.VfrBaseFileName == None:
+        if self.Options.BaseFileName == None:
             return -1
-        self.Options.PkgOutputFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_PACKAGE_FILENAME_EXTENSION
+        self.Options.PkgOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_PACKAGE_FILENAME_EXTENSION
         return 0
 
     def SetCOutputFileName(self):
-        if self.Options.VfrBaseFileName == None:
+        if self.Options.BaseFileName == None:
             return -1
-        self.Options.COutputFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + ".c"
+        self.Options.COutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + ".c"
         return 0
 
     def SetPreprocessorOutputFileName(self):
-        if self.Options.VfrBaseFileName == None:
+        if self.Options.BaseFileName == None:
             return -1
-        self.Options.PreprocessorOutputFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
+        self.Options.PreprocessorOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
         return 0
 
     def SetRecordListFileName(self):
-        if self.Options.VfrBaseFileName == None:
+        if self.Options.BaseFileName == None:
             return -1
-        self.Options.RecordListFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_RECORDLIST_FILENAME_EXTENSION
+        self.Options.RecordListFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_RECORDLIST_FILENAME_EXTENSION
         return 0
 
     def SetYamlFileName(self):
-        if self.Options.VfrBaseFileName == None:
+        if self.Options.BaseFileName == None:
             return -1
-        self.Options.YamlFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_YAML_FILENAME_EXTENSION
+        self.Options.YamlFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_YAML_FILENAME_EXTENSION
         return 0
 
     def SetJsonFileName(self):
-        if self.Options.VfrBaseFileName == None:
+        if self.Options.BaseFileName == None:
             return -1
-        self.Options.JsonFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + VFR_JSON_FILENAME_EXTENSION
+        self.Options.JsonFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_JSON_FILENAME_EXTENSION
         return 0
 
     def SetProcessedYAMLFileName(self):
-        if self.Options.VfrBaseFileName == None:
+        if self.Options.BaseFileName == None:
             return -1
-        self.Options.ProcessedYAMLFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Processed.yml'
+        self.Options.ProcessedYAMLFileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Processed.yml'
         return 0
 
     def SetExpandedHeaderFileName(self):
-        if self.Options.VfrBaseFileName == None:
+        if self.Options.BaseFileName == None:
             return -1
-        self.Options.ExpandedHeaderFileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
+        self.Options.ExpandedHeaderFileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
         return 0
 
     # Parse and collect data structures info in the ExpandedHeader.i files
@@ -339,7 +339,7 @@ class VfrCompiler():
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
             else:
                 try:
-                    fFile = open(LongFilePath(self.Options.VfrFileName), mode='r')
+                    fFile = open(LongFilePath(self.Options.InputFileName), mode='r')
                     fFile.close()
                 except:
                     EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "Error opening the input VFR file")
@@ -352,7 +352,7 @@ class VfrCompiler():
                     PreProcessCmd += self.Options.IncludePaths + " "
                 if self.Options.CPreprocessorOptions != None:
                     PreProcessCmd += self.Options.CPreprocessorOptions  + " "
-                PreProcessCmd += self.Options.VfrFileName + " > "
+                PreProcessCmd += self.Options.InputFileName + " > "
                 PreProcessCmd += self.Options.PreprocessorOutputFileName
 
                 #PreProcessCmd = '/showIncludes /nologo /E /TC /DVFRCOMPILE /FIRamDiskDxeStrDefs.h  test/test.vfr > test/test.i'
@@ -365,7 +365,7 @@ class VfrCompiler():
                     self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
 
     def Compile(self):
-        InFileName = self.Options.VfrFileName if self.Options.SkipCPreprocessor == True\
+        InFileName = self.Options.InputFileName if self.Options.SkipCPreprocessor == True\
                 else self.Options.PreprocessorOutputFileName #
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED):
             EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "compile error in file %s" % InFileName, InFileName)
@@ -534,12 +534,12 @@ class VfrCompiler():
         return FileList
 
     def CopyFileToOutputDir(self): ############
-        self.Options.ProcessedInFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
+        self.Options.ProcessedInFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
         if self.Options.ProcessedInFileName == None:
             EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                                "File/directory %s not found in workspace" % (self.Options.VfrBaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
-        shutil.copyfile(self.Options.VfrFileName, self.Options.OutputDirectory + self.Options.VfrBaseFileName + '.vfr')
-        shutil.copyfile(self.Options.ProcessedInFileName, self.Options.OutputDirectory + self.Options.VfrBaseFileName + '.i')
+                                "File/directory %s not found in workspace" % (self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
+        shutil.copyfile(self.Options.InputFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.vfr')
+        shutil.copyfile(self.Options.ProcessedInFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.i')
 
 def main():
     Args = parser.parse_args()
@@ -549,7 +549,7 @@ def main():
     Compiler.PreProcess()
     Compiler.Compile()
     Compiler.GenBinaryFiles()
-    Compiler.Options.CompiledYAMLFileName = "processed.yml"
+    Compiler.Options.YamlOutputFileName = "Vfrprocessed.yml"
     Compiler.DumpYaml()
     # Compiler.DumpJson()
 

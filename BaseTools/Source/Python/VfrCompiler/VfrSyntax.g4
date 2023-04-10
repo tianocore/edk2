@@ -4,10 +4,10 @@ options {
 }
 @header{
 
-from VfrCtypes import *
-from VfrFormPkg import *
-from VfrUtility import *
-from VfrTree import *
+from IfrCtypes import *
+from IfrFormPkg import *
+from IfrUtility import *
+from IfrTree import *
 }
 
 vfrProgram
@@ -117,7 +117,7 @@ dataStructBitField8[FieldInUnion]
 
 // VFR FormSet Definition
 vfrFormSetDefinition
-locals[Node=VfrTreeNode(EFI_IFR_FORM_SET_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_FORM_SET_OP)]
     :   'formset'
         'guid' '=' guidDefinition ','
         'title' '=' 'STRING_TOKEN' '(' Number ')' ','
@@ -135,7 +135,7 @@ locals[GuidList=[]]
     ;
 
 classDefinition
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_GUID_OP)]
     :   validClassNames ('|' validClassNames)*
     ;
 
@@ -152,7 +152,7 @@ locals[ClassName=0]
     ;
 
 subclassDefinition
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_GUID_OP)]
     :   SubclassSetupApplication
     |   SubclassGeneralApplication
     |   SubclassFrontPage
@@ -185,7 +185,7 @@ locals[Node=None]
 
 //2.6 VFR Default Stores Definition
 vfrStatementDefaultStore
-locals[Node=VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_DEFAULTSTORE_OP)]
     :   'defaultstore' N=StringIdentifier ','
         'prompt' '=' 'STRING_TOKEN' '(' S=Number ')'
         (',' 'attribute' '=' A=Number)? ';'
@@ -193,7 +193,7 @@ locals[Node=VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP)]
 
 //2.7 VFR Variable Store Definition
 vfrStatementVarStoreLinear
-locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_VARSTORE_OP)]
     :   'varstore'
         (   TN=StringIdentifier ','
         |   'UINT8' ','
@@ -210,7 +210,7 @@ locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_OP)]
     ;
 
 vfrStatementVarStoreEfi
-locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_EFI_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_VARSTORE_EFI_OP)]
     :   'efivarstore'
         (   TN=StringIdentifier ','
         |   'UINT8' ','
@@ -234,7 +234,7 @@ locals[Attr=0]
     :   Number;
 
 vfrStatementVarStoreNameValue
-locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_NAME_VALUE_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_VARSTORE_NAME_VALUE_OP)]
     :   'namevaluevarstore' SN=StringIdentifier ','
         ('varid' '=' ID=Number ',')?
         ('name' '=' 'STRING_TOKEN' '(' Number ')' ',')+
@@ -242,14 +242,14 @@ locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_NAME_VALUE_OP)]
     ;
 
 vfrStatementDisableIfFormSet
-locals[Node=VfrTreeNode(EFI_IFR_DISABLE_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_DISABLE_IF_OP)]
     :   'disableif' vfrStatementExpression[localctx.Node] ';'
         vfrFormSetList[localctx.Node]
         'endif' ';'
     ;
 
 vfrStatementSuppressIfFormSet
-locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
     :   'suppressif' vfrStatementExpression[localctx.Node] ';'
         vfrFormSetList[localctx.Node]
         'endif' ';'
@@ -261,7 +261,7 @@ guidSubDefinition[Guid]
     ;
 
 guidDefinition
-locals[Node=VfrTreeNode(), Guid=EFI_GUID()]
+locals[Node=IfrTreeNode(), Guid=EFI_GUID()]
     :   '{'
         Number ',' Number ',' Number ','
         (   '{' guidSubDefinition[localctx.Guid] '}'
@@ -326,12 +326,12 @@ locals[ValueList=[], ListType=False]
     ;
 
 vfrImageTag
-locals[Node=VfrTreeNode(EFI_IFR_IMAGE_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_IMAGE_OP)]
     :   'image' '=' 'IMAGE_TOKEN' '(' Number ')'
     ;
 
 vfrLockedTag
-locals[Node=VfrTreeNode(EFI_IFR_LOCKED_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_LOCKED_OP)]
     :   'locked'
     ;
 
@@ -345,7 +345,7 @@ vfrStatementStatTagList[Node]
     ;
 
 vfrFormDefinition
-locals[Node=VfrTreeNode(EFI_IFR_FORM_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_FORM_OP)]
     :   'form' 'formid' '=' Number ','
         'title' '=' 'STRING_TOKEN' '(' Number ')' ';'
         (vfrForm)*
@@ -372,7 +372,7 @@ locals[Node]
     ;
 
 vfrFormMapDefinition
-locals[Node=VfrTreeNode(EFI_IFR_FORM_MAP_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_FORM_MAP_OP)]
     :   'formmap' 'formid' '=' S1=Number ','
         (   'maptitle' '=' 'STRING_TOKEN' '(' Number ')' ';'
             'mapguid' '=' guidDefinition ';'
@@ -392,7 +392,7 @@ locals[Node]
     ;
 
 vfrStatementRules
-locals[Node=VfrTreeNode(EFI_IFR_RULE_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_RULE_OP)]
     :   'rule' StringIdentifier ','
         vfrStatementExpression[localctx.Node]
         'endrule' ';'
@@ -406,7 +406,7 @@ locals[Node]
     ;
 
 vfrStatementSubTitle
-locals[Node=VfrTreeNode(EFI_IFR_SUBTITLE_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_SUBTITLE_OP)]
     :   'subtitle'
 
         'text' '=' 'STRING_TOKEN' '(' Number ')'
@@ -434,7 +434,7 @@ locals[Flag=0]
     ;
 
 vfrStatementStaticText
-locals[Node=VfrTreeNode(EFI_IFR_TEXT_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_TEXT_OP)]
     :   'text'
         'help' '=' 'STRING_TOKEN' '(' S1=Number ')' ','
         'text' '=' 'STRING_TOKEN' '(' S2=Number ')'
@@ -454,7 +454,7 @@ locals[Node]
     ;
 
 vfrStatementGoto
-locals[Node=VfrTreeNode(EFI_IFR_REF_OP), QType=EFI_QUESION_TYPE.QUESTION_REF]
+locals[Node=IfrTreeNode(EFI_IFR_REF_OP), QType=EFI_QUESION_TYPE.QUESTION_REF]
     :   'goto'
         (   (   DevicePath '=' 'STRING_TOKEN' '(' Number ')' ','
                 FormSetGuid '=' guidDefinition ','
@@ -490,7 +490,7 @@ locals[Flag=0]
     ;
 
 vfrStatementResetButton
-locals[Node=VfrTreeNode(EFI_IFR_RESET_BUTTON_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_RESET_BUTTON_OP)]
     :  'resetbutton'
        'defaultstore' '=' N=StringIdentifier ','
        vfrStatementHeader[localctx.Node] ','
@@ -522,7 +522,7 @@ locals[Node]
     ;
 
 vfrStatementInconsistentIf //
-locals[Node=VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)]
     :   'inconsistentif'
         'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
         ('flags' '=' flagsField ('|' flagsField)* ',')?
@@ -531,7 +531,7 @@ locals[Node=VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)]
     ;
 
 vfrStatementNoSubmitIf //
-locals[Node=VfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP)]
     :   'nosubmitif'
         'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
         ('flags' '=' flagsField ('|' flagsField)* ',')?
@@ -540,29 +540,29 @@ locals[Node=VfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP)]
     ;
 
 vfrStatementDisableIfQuest
-locals[Node=VfrTreeNode(EFI_IFR_DISABLE_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_DISABLE_IF_OP)]
     :   'disableif' vfrStatementExpression[localctx.Node] ';'
         vfrStatementQuestionOptionList[localctx.Node]
         'endif' (';')?
     ;
 
 vfrStatementRefresh
-locals[Node=VfrTreeNode(EFI_IFR_REFRESH_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_REFRESH_OP)]
     :   'refresh' 'interval' '=' Number
     ;
 
 vfrStatementVarstoreDevice
-locals[Node=VfrTreeNode(EFI_IFR_VARSTORE_DEVICE_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_VARSTORE_DEVICE_OP)]
     :   'varstoredevice' '=' 'STRING_TOKEN' '(' Number ')' ','
     ;
 
 vfrStatementRefreshEvent
-locals[Node=VfrTreeNode(EFI_IFR_REFRESH_ID_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_REFRESH_ID_OP)]
     :   'refreshguid' '=' guidDefinition ','
     ;
 
 vfrStatementWarningIf //
-locals[Node=VfrTreeNode(EFI_IFR_WARNING_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_WARNING_IF_OP)]
     :   'warningif'
         'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
         ('timeout' '=' Number ',')?
@@ -597,7 +597,7 @@ flagsField
     ;
 
 vfrStatementSuppressIfQuest
-locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
     :   'suppressif' vfrStatementExpression[localctx.Node] ';'
         ('flags' '=' flagsField ('|' flagsField )* ',')?
         vfrStatementQuestionOptionList[localctx.Node]
@@ -605,7 +605,7 @@ locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
     ;
 
 vfrStatementGrayOutIfQuest
-locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
     :   'grayoutif' vfrStatementExpression[localctx.Node] ';'
         ('flags' '=' flagsField ('|' flagsField )* ',')?
         vfrStatementQuestionOptionList[localctx.Node]
@@ -614,7 +614,7 @@ locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
 
 
 vfrStatementDefault
-locals[Node=VfrTreeNode(EFI_IFR_DEFAULT_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_DEFAULT_OP)]
     :   D='default'
         (   (   V=vfrStatementValue ','
             |   '=' vfrConstantValueField ','
@@ -624,8 +624,8 @@ locals[Node=VfrTreeNode(EFI_IFR_DEFAULT_OP)]
         )
     ;
 
-vfrStatementValue 
-locals[Node=VfrTreeNode(EFI_IFR_VALUE_OP)]
+vfrStatementValue
+locals[Node=IfrTreeNode(EFI_IFR_VALUE_OP)]
     :   'value' '=' vfrStatementExpression[localctx.Node]
     ;
 
@@ -635,7 +635,7 @@ locals[Node]
     ;
 
 vfrStatementOneOfOption
-locals[Node=VfrTreeNode(EFI_IFR_ONE_OF_OPTION_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_ONE_OF_OPTION_OP)]
     :   'option'
         'text' '=' 'STRING_TOKEN' '(' Number ')' ','
         'value' '=' vfrConstantValueField ','
@@ -662,12 +662,12 @@ oneofoptionFlagsField
     ;
 
 vfrStatementRead
-locals[Node=VfrTreeNode(EFI_IFR_READ_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_READ_OP)]
     :   'read' vfrStatementExpression[localctx.Node] ';'
     ;
 
 vfrStatementWrite
-locals[Node=VfrTreeNode(EFI_IFR_WRITE_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_WRITE_OP)]
     :   'write' vfrStatementExpression[localctx.Node] ';'
     ;
 
@@ -688,7 +688,7 @@ locals[Node]
     ;
 
 vfrStatementCheckBox
-locals[Node=VfrTreeNode(EFI_IFR_CHECKBOX_OP),GuidNode=VfrTreeNode(EFI_IFR_GUID_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
+locals[Node=IfrTreeNode(EFI_IFR_CHECKBOX_OP),GuidNode=IfrTreeNode(EFI_IFR_GUID_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   L='checkbox'
         vfrQuestionBaseInfo[localctx.Node, localctx.QType]
         vfrStatementHeader[localctx.Node] ','
@@ -714,7 +714,7 @@ locals[LFlag=0, HFlag=0]
     ;
 
 vfrStatementAction
-locals[Node=VfrTreeNode(EFI_IFR_ACTION_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
+locals[Node=IfrTreeNode(EFI_IFR_ACTION_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'action'
         vfrQuestionHeader[localctx.Node, localctx.QType] ','
         ('flags' '=' vfrActionFlags ',')?
@@ -738,7 +738,7 @@ locals[Node]
     ;
 
 vfrStatementNumeric
-locals[Node=VfrTreeNode(EFI_IFR_NUMERIC_OP), GuidNode=VfrTreeNode(EFI_IFR_GUID_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
+locals[Node=IfrTreeNode(EFI_IFR_NUMERIC_OP), GuidNode=IfrTreeNode(EFI_IFR_GUID_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'numeric'
         vfrQuestionBaseInfo[localctx.Node, localctx.QType]
         vfrStatementHeader[localctx.Node] ','
@@ -774,7 +774,7 @@ locals[HFlag=0,IsSetType=False,IsDisplaySpecified=False]
     ;
 
 vfrStatementOneOf
-locals[Node=VfrTreeNode(EFI_IFR_ONE_OF_OP), GuidNode=VfrTreeNode(EFI_IFR_GUID_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
+locals[Node=IfrTreeNode(EFI_IFR_ONE_OF_OP), GuidNode=IfrTreeNode(EFI_IFR_GUID_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'oneof'
         vfrQuestionBaseInfo[localctx.Node, localctx.QType]
         vfrStatementHeader[localctx.Node] ','
@@ -795,7 +795,7 @@ locals[Node]
     ;
 
 vfrStatementString
-locals[Node=VfrTreeNode(EFI_IFR_STRING_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
+locals[Node=IfrTreeNode(EFI_IFR_STRING_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'string'
         vfrQuestionHeader[localctx.Node, localctx.QType] ','
         (F='flags' '=' vfrStringFlagsField ',')?
@@ -819,7 +819,7 @@ locals[HFlag=0, LFlag=0]
     ;
 
 vfrStatementPassword
-locals[Node=VfrTreeNode(EFI_IFR_PASSWORD_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
+locals[Node=IfrTreeNode(EFI_IFR_PASSWORD_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'password'
         vfrQuestionHeader[localctx.Node, localctx.QType]','
         (F='flags' '=' vfrPasswordFlagsField ',')?
@@ -843,7 +843,7 @@ locals[HFlag=0]
     ;
 
 vfrStatementOrderedList
-locals[Node=VfrTreeNode(EFI_IFR_ORDERED_LIST_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
+locals[Node=IfrTreeNode(EFI_IFR_ORDERED_LIST_OP), QType=EFI_QUESION_TYPE.QUESTION_NORMAL]
     :   'orderedlist'
         vfrQuestionHeader[localctx.Node, localctx.QType] ','
         (M='maxcontainers' '=' Number ',')?
@@ -866,7 +866,7 @@ locals[HFlag=0, LFlag=0]
     ;
 
 vfrStatementDate
-locals[Node=VfrTreeNode(EFI_IFR_DATE_OP), QType=EFI_QUESION_TYPE.QUESTION_DATE, Val=EFI_HII_DATE()]
+locals[Node=IfrTreeNode(EFI_IFR_DATE_OP), QType=EFI_QUESION_TYPE.QUESTION_DATE, Val=EFI_HII_DATE()]
     :   'date'
         (   (   vfrQuestionHeader[localctx.Node, localctx.QType] ','
                 (F1='flags' '=' vfrDateFlags ',')?
@@ -915,7 +915,7 @@ locals[LFlag=0]
     ;
 
 vfrStatementTime
-locals[Node=VfrTreeNode(EFI_IFR_TIME_OP), QType=EFI_QUESION_TYPE.QUESTION_TIME,  Val=EFI_HII_TIME()]
+locals[Node=IfrTreeNode(EFI_IFR_TIME_OP), QType=EFI_QUESION_TYPE.QUESTION_TIME,  Val=EFI_HII_TIME()]
     :   'time'
         (   (   vfrQuestionHeader[localctx.Node, localctx.QType] ','
                 (F1='flags' '=' vfrTimeFlags ',')?
@@ -1011,7 +1011,7 @@ vfrStatementStatListOld
     ;
 
 vfrStatementDisableIfStat
-locals[Node=VfrTreeNode(EFI_IFR_DISABLE_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_DISABLE_IF_OP)]
     :   'disableif' vfrStatementExpression[localctx.Node] ';'
         (vfrStatementStatList)*
         'endif' ';'
@@ -1035,7 +1035,7 @@ locals[Node]
     ;
 
 vfrStatementSuppressIfStatNew
-locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
     :   'suppressif'
         ('flags' '=' flagsField ('|' flagsField)* ',')?
         vfrStatementExpression[localctx.Node] ';'
@@ -1044,7 +1044,7 @@ locals[Node=VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP)]
     ;
 
 vfrStatementGrayOutIfStatNew
-locals[Node=VfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP)]
     :   'grayoutif'
         ('flags' '=' flagsField ('|' flagsField)* ',')?
         vfrStatementExpression[localctx.Node] ';'
@@ -1053,7 +1053,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP)]
     ;
 
 vfrStatementInconsistentIfStat
-locals[Node=VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP)]
     :   'inconsistentif'
         'prompt' '=' 'STRING_TOKEN' '(' Number ')' ','
         ('flags' '=' flagsField ('|' flagsField)* ',')?
@@ -1094,12 +1094,12 @@ vfrStatementInvalidSaveRestoreDefaults
         ';'
     ;
 vfrStatementLabel
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_GUID_OP)]
     :   'label' Number ';'
     ;
 
 vfrStatementBanner // Is TimeOut needed
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_GUID_OP)]
     :   'banner' (',')?
         'title' '=' 'STRING_TOKEN' '(' Number ')' ','
         (   (   'line' Number ','
@@ -1112,7 +1112,7 @@ locals[Node=VfrTreeNode(EFI_IFR_GUID_OP)]
     ;
 
 vfrStatementExtension
-locals[Node=VfrTreeNode(EFI_IFR_GUID_OP), Buffer=None, Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
+locals[Node=IfrTreeNode(EFI_IFR_GUID_OP), Buffer=None, Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
     :   'guidop'
         'guid' '=' guidDefinition
         (   ',' D='datatype' '='
@@ -1150,7 +1150,7 @@ locals[Node]
     ;
 
 vfrModalTag
-locals[Node=VfrTreeNode(EFI_IFR_MODAL_TAG_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_MODAL_TAG_OP)]
     :   'modal'
     ;
 
@@ -1327,7 +1327,7 @@ locals[Node]
     ;
 
 dupExp[ExpInfo]
-locals[Node=VfrTreeNode(EFI_IFR_DUP_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_DUP_OP)]
     :   'dup'
     ;
 
@@ -1383,18 +1383,18 @@ locals[SubStr='', SubStrZ='']
     ;
 
 questionref1Exp[ExpInfo]
-locals[Node=VfrTreeNode(EFI_IFR_QUESTION_REF1_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_QUESTION_REF1_OP)]
     :   'questionref'
         '(' ( StringIdentifier | Number ) ')'
     ;
 
 rulerefExp[ExpInfo]
-locals[Node=VfrTreeNode(EFI_IFR_RULE_REF_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_RULE_REF_OP)]
     :   'ruleref' '(' StringIdentifier ')'
     ;
 
 stringref1Exp[ExpInfo]
-locals[Node=VfrTreeNode(EFI_IFR_STRING_REF1_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_STRING_REF1_OP)]
     :   'stringref' '('
         (
             'STRING_TOKEN' '(' Number ')'
@@ -1406,12 +1406,12 @@ locals[Node=VfrTreeNode(EFI_IFR_STRING_REF1_OP)]
     ;
 
 pushthisExp[ExpInfo]
-locals[Node=VfrTreeNode(EFI_IFR_THIS_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_THIS_OP)]
     :   'pushthis'
     ;
 
 securityExp[ExpInfo]
-locals[Node=VfrTreeNode(EFI_IFR_SECURITY_OP)]
+locals[Node=IfrTreeNode(EFI_IFR_SECURITY_OP)]
     :   'security' '(' guidDefinition ')'
     ;
 
@@ -1424,7 +1424,7 @@ locals[VarType]
     ;
 
 getExp[ExpInfo]
-locals[BaseInfo=EFI_VARSTORE_INFO(), Node=VfrTreeNode(EFI_IFR_GET_OP)]
+locals[BaseInfo=EFI_VARSTORE_INFO(), Node=IfrTreeNode(EFI_IFR_GET_OP)]
     :   'get' '(' vfrStorageVarId[localctx.BaseInfo, False]('|' 'flags' '=' numericVarStoreType)? ')'
     ;
 
@@ -1600,7 +1600,7 @@ locals[Flag=0]
     ;
 
 vfrExpressionMap[ExpInfo]
-locals[Nodes=[], Node=VfrTreeNode()]
+locals[Nodes=[], Node=IfrTreeNode()]
     :   'map'
         '('
         vfrStatementExpressionSub[localctx.Nodes]

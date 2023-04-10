@@ -1,8 +1,8 @@
 import yaml
 import CppHeaderParser
-from VfrFormPkg import *
+from IfrFormPkg import *
 from antlr4 import *
-from VfrCtypes import *
+from IfrCtypes import *
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from Common.LongFilePathSupport import LongFilePath
@@ -10,8 +10,12 @@ from Common.LongFilePathSupport import LongFilePath
 class Options():
 
     def __init__(self):
-        self.VfrFileName = None
-        self.VfrBaseFileName = None
+        # open/close Vfr/Yamlcompiler
+        self.LanuchVfrCompiler = False
+        self.LanuchYamlCompiler = False
+
+        self.InputFileName = None
+        self.BaseFileName = None
         self.IncludePaths = None
         self.OutputDirectory = None
         self.CreateRecordListFile = True
@@ -19,10 +23,6 @@ class Options():
         self.CreateIfrPkgFile = True
         self.PkgOutputFileName = None
         self.COutputFileName = None
-        self.CreateYamlFile = True
-        self.YamlFileName = None
-        self.CreateJsonFile = True
-        self.JsonFileName = None
         self.SkipCPreprocessor = True
         self.CPreprocessorOptions = None
         self.PreprocessorOutputFileName = None
@@ -32,13 +32,20 @@ class Options():
         self.AutoDefault = False
         self.CheckDefault = False
 
-        self.ProcessedInFileName = None
-        self.UniStrDefFileName = None
-        self.ExpandedHeaderFileName = None # save header info for yaml
-        self.ProcessedYAMLFileName = None
-        self.CompiledYAMLFileName = None
+        self.CreateYamlFile = True
+        self.YamlFileName = None
+        self.CreateJsonFile = True
+        self.JsonFileName = None
+
+        self.UniStrDefFileName = None # Uni file name
         self.DeltaFileName = None
-        self.CompileYaml = True
+        self.YamlOutputFileName = None #
+
+        # for test
+        self.ProcessedInFileName = None # for test
+        self.ExpandedHeaderFileName = None # save header info for yaml
+        self.ProcessedYAMLFileName = None # for test
+
 
 
 class KV():
@@ -50,13 +57,15 @@ class PreProcessDB():
     def __init__(self, Options: Options) -> None:
         self.Options = Options
         self.VfrVarDataTypeDB = VfrVarDataTypeDB()
+        self.Preprocessed = False
 
     def Preprocess(self):
         self.HeaderFiles = self._ExtractHeaderFiles()
         self.HeaderDict = self._GetHeaderDicts(self.HeaderFiles)
         self.UniDict = self._GetUniDicts()
         self.VfrDict = self._GetVfrDicts()
-        self._GenExpandedHeaderFile()
+        self.Preprocessed = True
+        # self._GenExpandedHeaderFile()
 
     def TransValue(self, Value):
         if type(Value) == EFI_GUID:
@@ -97,7 +106,7 @@ class PreProcessDB():
             print('error')
 
     def _ExtractHeaderFiles(self):
-        FileName = self.Options.VfrFileName
+        FileName = self.Options.InputFileName
         try:
             fFile = open(LongFilePath(FileName), mode='r')
             line = fFile.readline()
@@ -220,7 +229,7 @@ class PreProcessDB():
 
     def _GetVfrDicts(self):
         VfrDict = {}
-        File = open(self.Options.VfrFileName, 'r')
+        File = open(self.Options.InputFileName, 'r')
         Defines = []
         Wrap = False
         IncompleteLine = ''

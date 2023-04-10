@@ -2,9 +2,9 @@ from ast import For
 from re import L
 from sre_parse import FLAGS
 from stat import FILE_ATTRIBUTE_SPARSE_FILE
-from VfrCtypes import *
+from IfrCtypes import *
 from VfrError import VfrReturnCode
-from VfrUtility import *
+from IfrUtility import *
 
 from ctypes import *
 
@@ -194,6 +194,11 @@ class FormPkg():
         self.Offset = 0
         self.PendingAssignList = None
 
+    def Clear(self):
+        self.PkgLength = 0
+        self.Offset = 0
+        self.PendingAssignList = None
+
     def BuildPkgHdr(self):
         PkgHdr = EFI_HII_PACKAGE_HEADER()
         PkgHdr.Type = EFI_HII_PACKAGE_FORM
@@ -251,7 +256,7 @@ class FormPkg():
                 gVfrErrorHandle.PrintMsg(pNode.LineNo, 'Error', pNode.Msg, pNode.Key)
             pNode = pNode.Next
 
-    def DeclarePendingQuestion(self, lVfrVarDataTypeDB: VfrVarDataTypeDB, lVfrDataStorage: VfrDataStorage, lVfrQuestionDB: VfrQuestionDB, LineNo):
+    def DeclarePendingQuestion(self, lVfrVarDataTypeDB: VfrVarDataTypeDB, lVfrDataStorage: VfrDataStorage, lVfrQuestionDB: VfrQuestionDB, LineNo=None):
         # Declare all questions as Numeric in DisableIf True
         ReturnList  = []
         GuidObj = None

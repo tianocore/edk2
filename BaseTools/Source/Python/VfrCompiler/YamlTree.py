@@ -1,17 +1,17 @@
 from SourceVfrSyntaxVisitor import *
 from SourceVfrSyntaxLexer import *
 from SourceVfrSyntaxParser import *
-from VfrFormPkg import *
+from IfrFormPkg import *
 from VfrError import *
-from VfrPreProcess import *
+from IfrPreProcess import *
 import re
 
 class YamlTree():
-    def __init__(self, Root: VfrTreeNode, PreProcessDB: PreProcessDB, Options: Options):
+    def __init__(self, Root: IfrTreeNode, PreProcessDB: PreProcessDB, Options: Options):
         self.Options = Options
         self.Root = Root
         self.PreProcessDB = PreProcessDB
-        self.VfrTree = VfrTree(Root, PreProcessDB, Options)
+        self.IfrTree = IfrTree(Root, PreProcessDB, Options)
         self.Modifier = DLTModifier(Root)
         self.YamlDict = None
         self.Visitor = None
@@ -47,13 +47,14 @@ class YamlTree():
         gVfrVarDataTypeDB.Clear()
         gVfrDefaultStore.Clear()
         gVfrDataStorage.Clear()
+        gFormPkg.Clear()
         IfrFormId.Clear()
         self.Parser = YamlParser(self.Root, self.Options, self.PreProcessDB, self.YamlDict, self.GuidID)
         self.Parser.Parse()
-        self.VfrTree.DumpCompiledYaml()
+        self.IfrTree.DumpCompiledYaml()
 
     def GenBinaryFiles(self):
-        self.VfrTree.GenBinaryFiles()
+        self.IfrTree.GenBinaryFiles()
 
     def ConsumeDLT(self):
         self.Options.DeltaFileName = self.Options.OutputDirectory + 'Delta.yml' #
@@ -71,7 +72,7 @@ class YamlTree():
                     self.Modifier.DeleteQuestionNode(QuestionNode)
                 else:
                     self.Modifier.ModifyQuestionNode(QuestionType, QuestionDict, QuestionNode, self.Parser)
-        # self.VfrTree.DumpProcessedYaml()
+        # self.IfrTree.DumpProcessedYaml()
 
 
     def PreProcessYamlDict(self, YamlDict):
@@ -174,7 +175,7 @@ class DLTModifier():
                 return NewNode
         return NewNode
 
-    def DeleteQuestionNode(self, OperatedNode: VfrTreeNode):
+    def DeleteQuestionNode(self, OperatedNode: IfrTreeNode):
         # or directly delete the Node itself
         if OperatedNode.Condition == None:
             OperatedNode.Condition = 'suppressif true'
@@ -185,7 +186,7 @@ class DLTModifier():
         return OperatedNode
 
 class YamlParser():
-    def __init__(self, Root: VfrTreeNode, Options: Options, PreProcessDB: PreProcessDB, YamlDict, GuidID):
+    def __init__(self, Root: IfrTreeNode, Options: Options, PreProcessDB: PreProcessDB, YamlDict, GuidID):
 
         self.Root = Root
         self.Options = Options
@@ -233,7 +234,7 @@ class YamlParser():
 
         self.Visitor = SourceVfrSyntaxVisitor(None, self.Options.OverrideClassGuid)
         self.Visitor.visit(self.VfrParser.vfrHeader())
-        FileName = self.Options.OutputDirectory + self.Options.VfrBaseFileName + 'Header.txt'
+        FileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Header.txt'
         try:
             f = open(FileName, 'w')
             gVfrVarDataTypeDB.Dump(f)
@@ -248,12 +249,12 @@ class YamlParser():
         gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, 'Standard Defaults', EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_STANDARD)
         DSObj.SetDefaultName (EFI_STRING_ID_INVALID)
         DSObj.SetDefaultId (EFI_HII_DEFAULT_CLASS_STANDARD)
-        DsNode = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
+        DsNode = IfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
         DSObjMF = IfrDefaultStore('Standard ManuFacturing')
         gVfrDefaultStore.RegisterDefaultStore(DSObjMF.DefaultStore, 'Standard ManuFacturing', EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_MANUFACTURING)
         DSObjMF.SetDefaultName (EFI_STRING_ID_INVALID)
         DSObjMF.SetDefaultId (EFI_HII_DEFAULT_CLASS_MANUFACTURING)
-        DsNodeMF = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObjMF, gFormPkg.StructToStream(DSObjMF.GetInfo()))
+        DsNodeMF = IfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObjMF, gFormPkg.StructToStream(DSObjMF.GetInfo()))
 
         return DsNode, DsNodeMF
 
@@ -330,7 +331,7 @@ class YamlParser():
         FSObj.SetFormSetTitle(Formset['title'])
         FSObj.SetHelp(Formset['help'])
 
-        Node = VfrTreeNode(EFI_IFR_FORM_SET_OP, FSObj, gFormPkg.StructToStream(FSObj.GetInfo()), '')
+        Node = IfrTreeNode(EFI_IFR_FORM_SET_OP, FSObj, gFormPkg.StructToStream(FSObj.GetInfo()), '')
         for i in range(0, len(GuidList)):
             Node.Buffer += gFormPkg.StructToStream(GuidList[i])
 
@@ -349,9 +350,27 @@ class YamlParser():
         if 'component' in Formset.keys():
             self._ParseVfrFormSetComponent(Formset['component'], Node)
 
-        # wip
+        # Declare undefined Question so that they can be used in expression.
+        InsertOpCodeList = None
+        if gFormPkg.HavePendingUnassigned():
+            InsertOpCodeList, ReturnCode = gFormPkg.DeclarePendingQuestion(
+                gVfrVarDataTypeDB, gVfrDataStorage, self.VfrQuestionDB)
+            Status = 0 if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS else 1
+            self.ParserStatus += Status ###
+            self.NeedAdjustOpcode = True
 
-    def ParseClassDefinition(self, ClassList, ParentNode: VfrTreeNode):
+        self.InsertEndNode(Node)
+
+        if self.NeedAdjustOpcode:
+            self.LastFormNode.Child.pop()
+            for InsertOpCode in InsertOpCodeList:
+                InsertNode = IfrTreeNode(InsertOpCode.OpCode, InsertOpCode.Data, gFormPkg.StructToStream(InsertOpCode.Data.GetInfo()))
+                self.LastFormNode.insertChild(InsertNode)
+
+        gFormPkg.BuildPkg(self.Root)
+        return Node
+
+    def ParseClassDefinition(self, ClassList, ParentNode: IfrTreeNode):
         CObj = IfrClass()
         Class = 0
         for ClassName in ClassList:
@@ -372,11 +391,11 @@ class YamlParser():
             else:
                 Class |= ClassName
         CObj.SetClass(Class)
-        Node = VfrTreeNode(EFI_IFR_GUID_OP, CObj, gFormPkg.StructToStream(CObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_GUID_OP, CObj, gFormPkg.StructToStream(CObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
-    def ParseSubClassDefinition(self, SubClassVar, ParentNode: VfrTreeNode):
+    def ParseSubClassDefinition(self, SubClassVar, ParentNode: IfrTreeNode):
         SubObj = IfrSubClass()
         SubClass = 0
         if SubClassVar == 'SETUP_APPLICATION':
@@ -391,7 +410,7 @@ class YamlParser():
             SubClass |= SubClassVar
 
         SubObj.SetSubClass(SubClass)
-        Node = VfrTreeNode(EFI_IFR_GUID_OP, SubObj, gFormPkg.StructToStream(SubObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_GUID_OP, SubObj, gFormPkg.StructToStream(SubObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
@@ -422,7 +441,7 @@ class YamlParser():
 
     def ParseVfrStatementDisableIfFormSet(self, DisableIf, ParentNode):
         DIObj = IfrDisableIf()
-        Node = VfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(DisableIf['expression'], Node)
         Node.Expression = DisableIf['expression']
@@ -432,7 +451,7 @@ class YamlParser():
 
     def ParseVfrStatementSuppressIfFormSet(self, SuppressIf, ParentNode):
         SIObj = IfrSuppressIf()
-        Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(SuppressIf['expression'], Node)
         Node.Expression = SuppressIf['expression']
@@ -458,7 +477,7 @@ class YamlParser():
             self.ErrorHandler(gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, RefName, DefaultStoreNameId, DefaultId))
             DSObj.SetDefaultName(DefaultStoreNameId)
             DSObj.SetDefaultId (DefaultId)
-            Node = VfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
+            Node = IfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
             ParentNode.insertChild(Node)
             # Node.Data = DSObj
             # Node.Buffer = gFormPkg.StructToStream(DSObj.GetInfo())
@@ -492,7 +511,7 @@ class YamlParser():
         VSObj.SetVarStoreId(VarStoreId)
         Size, ReturnCode = gVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
         self.ErrorHandler(ReturnCode)
-        Node = VfrTreeNode(EFI_IFR_VARSTORE_OP, VSObj, gFormPkg.StructToStream(VSObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_VARSTORE_OP, VSObj, gFormPkg.StructToStream(VSObj.GetInfo()))
         Node.Buffer += bytes('\0',encoding='utf-8')
         ParentNode.insertChild(Node)
         return Node
@@ -528,7 +547,7 @@ class YamlParser():
         VSEObj.SetVarStoreId (VarStoreId)
         VSEObj.SetSize(Size)
         VSEObj.SetAttributes(Attributes)
-        Node = VfrTreeNode(EFI_IFR_VARSTORE_EFI_OP, VSEObj, gFormPkg.StructToStream(VSEObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_VARSTORE_EFI_OP, VSEObj, gFormPkg.StructToStream(VSEObj.GetInfo()))
         Node.Buffer += bytes('\0',encoding='utf-8')
         ParentNode.insertChild(Node)
         return Node
@@ -567,7 +586,7 @@ class YamlParser():
         VarstoreId, ReturnCode = gVfrDataStorage.GetVarStoreId(StoreName, Guid)
         self.ErrorHandler(ReturnCode)
         VSNVObj.SetVarStoreId(VarstoreId)
-        Node = VfrTreeNode(EFI_IFR_VARSTORE_NAME_VALUE_OP, VSNVObj, gFormPkg.StructToStream(VSNVObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_VARSTORE_NAME_VALUE_OP, VSNVObj, gFormPkg.StructToStream(VSNVObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
@@ -591,7 +610,7 @@ class YamlParser():
         MethodMapList = FMapObj.GetMethodMapList()
         for MethodMap in MethodMapList: # Extend Header Size for MethodMapList
             FormMap.Header.Length += sizeof(EFI_IFR_FORM_MAP_METHOD)
-        Node = VfrTreeNode(EFI_IFR_FORM_MAP_OP, FMapObj, gFormPkg.StructToStream(FormMap), Pos)
+        Node = IfrTreeNode(EFI_IFR_FORM_MAP_OP, FMapObj, gFormPkg.StructToStream(FormMap), Pos)
         ParentNode.insertChild(Node)
         for MethodMap in MethodMapList:
             Node.Buffer += gFormPkg.StructToStream(MethodMap)
@@ -602,7 +621,7 @@ class YamlParser():
         self.InsertEndNode(Node)
         return Node
 
-    def ParseVfrFormDefinition(self, Form, ParentNode: VfrTreeNode):
+    def ParseVfrFormDefinition(self, Form, ParentNode: IfrTreeNode):
         FObj = IfrForm()
         if isinstance(Form['formid'], list):
             Pos = self.GuidID + '.' + Form['formid'][0]
@@ -614,13 +633,15 @@ class YamlParser():
             Pos = self.GuidID + '.' + str(Form['formid'])
         FormTitle = Form['title']
         FObj.SetFormTitle(FormTitle)
-        Node = VfrTreeNode(EFI_IFR_FORM_OP, FObj, gFormPkg.StructToStream(FObj.GetInfo()), Pos)
+        Node = IfrTreeNode(EFI_IFR_FORM_OP, FObj, gFormPkg.StructToStream(FObj.GetInfo()), Pos)
         ParentNode.insertChild(Node)
         if 'component' in Form.keys():
             for Component in Form['component']:
                 (Key, Value), = Component.items()
                 self._ParseVfrForm(Key, Value, Node, Pos)
         self.InsertEndNode(Node)
+        self.LastFormNode = Node
+        return Node
 
     def _ParseVfrForm(self, Key, Value, ParentNode, Position):
         if Key == 'image':
@@ -668,7 +689,7 @@ class YamlParser():
                 self.ErrorHandler(VfrReturnCode.VFR_RETURN_FATAL_ERROR, "Default data type error.")
             DObj = IfrDefault(Type, ValueList)
             DObj.ValueStream = str(Default['value'])
-            Node = VfrTreeNode(EFI_IFR_DEFAULT_OP, DObj)
+            Node = IfrTreeNode(EFI_IFR_DEFAULT_OP, DObj)
             if len(ValueList) == 1:
                 if self.IsStringOp:
                     DObj.SetType(EFI_IFR_TYPE_STRING)
@@ -682,7 +703,7 @@ class YamlParser():
         elif 'value_exp' in Default.keys():
             IsExp = True
             DObj = IfrDefault2()
-            Node = VfrTreeNode(EFI_IFR_DEFAULT_OP, DObj)
+            Node = IfrTreeNode(EFI_IFR_DEFAULT_OP, DObj)
             DObj.SetScope(1)
             self.ParseVfrStatementValue(Default['value_exp'], Node)
             self.InsertEndNode(Node)
@@ -711,7 +732,7 @@ class YamlParser():
         RObj.SetRuleName(RuleName)
         self.VfrRulesDB.RegisterRule(RuleName)
         RObj.SetRuleId(self.VfrRulesDB.GetRuleId(RuleName))
-        Node = VfrTreeNode(EFI_IFR_RULE_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_RULE_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(Rule['expression'], Node)
         Node.Expression = Rule['expression']
@@ -733,7 +754,7 @@ class YamlParser():
             BObj.SetAlign(1)
         if 'right' in Banner.keys():
             BObj.SetAlign(2)
-        Node = VfrTreeNode(EFI_IFR_GUID_OP, BObj, gFormPkg.StructToStream(BObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_GUID_OP, BObj, gFormPkg.StructToStream(BObj.GetInfo()))
         ParentNode.insertChild(Node)
         ########　timeout
         return Node
@@ -741,14 +762,14 @@ class YamlParser():
 
     def ParseVfrStatementModal(self, Modal, ParentNode):
         MObj = IfrModal()
-        Node = VfrTreeNode(EFI_IFR_MODAL_TAG_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_MODAL_TAG_OP, MObj, gFormPkg.StructToStream(MObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
     def ParseVfrStatementRefreshEvent(self, RefreshEvent, ParentNode):
         RiObj = IfrRefreshId()
         RiObj.SetRefreshEventGroutId(RefreshEvent['guid'])
-        Node = VfrTreeNode(EFI_IFR_REFRESH_ID_OP, RiObj, gFormPkg.StructToStream(RiObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_REFRESH_ID_OP, RiObj, gFormPkg.StructToStream(RiObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
@@ -767,7 +788,7 @@ class YamlParser():
         Prompt = Subtitle['prompt']
         SObj.SetPrompt(Prompt)
         SObj.SetFlags(self._ParseSubtitleFlags(Subtitle))
-        Node = VfrTreeNode(EFI_IFR_SUBTITLE_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_SUBTITLE_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
         ParentNode.insertChild(Node)
         if 'component' in Subtitle.keys():
             for Component in Subtitle['component']:
@@ -803,7 +824,7 @@ class YamlParser():
         RBObj.SetDefaultId(DefaultId)
 
         self._ParseVfrStatementHeader(RBObj, ResetButton)
-        Node = VfrTreeNode(EFI_IFR_RESET_BUTTON_OP, RBObj, gFormPkg.StructToStream(RBObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_RESET_BUTTON_OP, RBObj, gFormPkg.StructToStream(RBObj.GetInfo()))
         ParentNode.insertChild(Node)
         if 'component' in ResetButton.keys():
             for Component in ResetButton['component']:
@@ -851,7 +872,7 @@ class YamlParser():
         GObj.SetFlags(self._ParseStatementStatFlags(Goto))
         if 'key' in Goto.keys():
             self.AssignQuestionKey(GObj, Goto['key'])
-        Node = VfrTreeNode(EFI_IFR_REF_OP, GObj)
+        Node = IfrTreeNode(EFI_IFR_REF_OP, GObj)
         self.SetPosition(Node, Position)
         ParentNode.insertChild(Node)
         if 'component' in Goto.keys():
@@ -893,7 +914,7 @@ class YamlParser():
     def ParseVfrStatementInconsistentIf(self, InconsistentIf, ParentNode):
         IIObj = IfrInconsistentIf()
         IIObj.SetError(InconsistentIf['prompt'])
-        Node = VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP, IIObj, gFormPkg.StructToStream(IIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP, IIObj, gFormPkg.StructToStream(IIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(InconsistentIf['expression'], Node)
         Node.Expression = InconsistentIf['expression']
@@ -903,7 +924,7 @@ class YamlParser():
     def ParseVfrStatementNoSubmitIf(self, NoSubmitIf, ParentNode):
         NSIObj = IfrNoSubmitIf()
         NSIObj.SetError(NoSubmitIf['prompt'])
-        Node = VfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP, NSIObj, gFormPkg.StructToStream(NSIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP, NSIObj, gFormPkg.StructToStream(NSIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(NoSubmitIf['expression'], Node)
         Node.Expression = NoSubmitIf['expression']
@@ -912,7 +933,7 @@ class YamlParser():
 
     def ParseVfrStatementDisableIfQuest(self, DisableIfQuest, ParentNode):
         DIObj = IfrDisableIf()
-        Node = VfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(DisableIfQuest['expression'], Node)
         Node.Expression = DisableIfQuest['expression']
@@ -924,14 +945,14 @@ class YamlParser():
     def ParseVfrStatementRefresh(self, Refresh, ParentNode):
         RObj = IfrRefresh()
         RObj.SetRefreshInterval(Refresh['interval'])
-        Node = VfrTreeNode(EFI_IFR_REFRESH_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_REFRESH_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
     def ParseVfrStatementVarstoreDevice(self, VarStoreDevice, ParentNode):
         VDObj = IfrVarStoreDevice()
         VDObj.SetDevicePath(VarStoreDevice['devicepath'])
-        Node = VfrTreeNode(EFI_IFR_VARSTORE_DEVICE_OP, VDObj, gFormPkg.StructToStream(VDObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_VARSTORE_DEVICE_OP, VDObj, gFormPkg.StructToStream(VDObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
@@ -940,7 +961,7 @@ class YamlParser():
         WIObj.SetWarning(WarningIf['prompt'])
         if 'timeout' in WarningIf.keys():
             WIObj.SetTimeOut(WarningIf['timeout'])
-        Node = VfrTreeNode(EFI_IFR_WARNING_IF_OP, WIObj, gFormPkg.StructToStream(WIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_WARNING_IF_OP, WIObj, gFormPkg.StructToStream(WIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(WarningIf['expression'], Node)
         Node.Expression = WarningIf['expression']
@@ -965,7 +986,7 @@ class YamlParser():
 
     def ParseVfrStatementSuppressIfQuest(self, SuppressIfQuest, ParentNode):
         SIObj = IfrSuppressIf()
-        Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(SuppressIfQuest['expression'], Node)
         Node.Expression = SuppressIfQuest['expression']
@@ -976,7 +997,7 @@ class YamlParser():
 
     def ParseVfrStatementGrayOutIfQuest(self, GrayOutIfQuest, ParentNode):
         GOIObj = IfrGrayOutIf()
-        Node = VfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP, GOIObj, gFormPkg.StructToStream(GOIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP, GOIObj, gFormPkg.StructToStream(GOIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(GrayOutIfQuest['expression'], Node)
         Node.Expression = GrayOutIfQuest['expression']
@@ -1082,7 +1103,7 @@ class YamlParser():
                 self._CheckDuplicateDefaultValue(EFI_HII_DEFAULT_CLASS_MANUFACTURING)
                 self.ErrorHandler(gVfrDefaultStore.BufferVarStoreAltConfigAdd(EFI_HII_DEFAULT_CLASS_MANUFACTURING, self.CurrQestVarInfo, VarStoreName, VarStoreGuid, self.CurrQestVarInfo.VarType, Value))
 
-        Node = VfrTreeNode(EFI_IFR_ONE_OF_OPTION_OP, OOOObj)
+        Node = IfrTreeNode(EFI_IFR_ONE_OF_OPTION_OP, OOOObj)
         Index = 0
         if ParentNode.Position != None:
             for ChildNode in ParentNode.Child:
@@ -1096,7 +1117,7 @@ class YamlParser():
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED)
             OOOObj.SetIfrOptionKey(Option['key'])
             gIfrOptionKey = IfrOptionKey(self.CurrentQuestion.GetQuestionId(), Type, Value, Option['key'])
-            ChildNode = VfrTreeNode(EFI_IFR_GUID_OP, gIfrOptionKey, gFormPkg.StructToStream(gIfrOptionKey.GetInfo()))
+            ChildNode = IfrTreeNode(EFI_IFR_GUID_OP, gIfrOptionKey, gFormPkg.StructToStream(gIfrOptionKey.GetInfo()))
             Node.insertChild(ChildNode)
 
         if 'component' in Option.keys():
@@ -1148,7 +1169,7 @@ class YamlParser():
 
     def ParseVfrStatementValue(self, Value, ParentNode):
         VObj = IfrValue()
-        Node = VfrTreeNode(EFI_IFR_VALUE_OP, VObj, gFormPkg.StructToStream(VObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_VALUE_OP, VObj, gFormPkg.StructToStream(VObj.GetInfo()))
         ParentNode.insertChild(Node)
         if type(Value) == str:
             self.ParserVfrStatementExpression(Value, Node)
@@ -1161,7 +1182,7 @@ class YamlParser():
 
     def ParseVfrStatementRead(self, Read, ParentNode):
         RObj = IfrRead()
-        Node = VfrTreeNode(EFI_IFR_READ_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_READ_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(Read['expression'], Node)
         Node.Expression = Read['expression']
@@ -1169,7 +1190,7 @@ class YamlParser():
 
     def ParseVfrStatementWrite(self, Write, ParentNode):
         WObj = IfrWrite()
-        Node = VfrTreeNode(EFI_IFR_WRITE_OP, WObj, gFormPkg.StructToStream(WObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_WRITE_OP, WObj, gFormPkg.StructToStream(WObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(Write['expression'], Node)
         Node.Expression = Write['expression']
@@ -1348,7 +1369,7 @@ class YamlParser():
 
     def ParseVfrStatementDisableIfStat(self, DisableIf, ParentNode, Position):
         DIObj = IfrDisableIf()
-        Node = VfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(DisableIf['expression'], Node)
         Node.Expression = DisableIf['expression']
@@ -1361,7 +1382,7 @@ class YamlParser():
 
     def ParseVfrStatementSuppressIfStat(self, SuppressIf, ParentNode, Position):
         SIObj = IfrSuppressIf()
-        Node = VfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(SuppressIf['expression'], Node)
         Node.Expression = SuppressIf['expression']
@@ -1374,7 +1395,7 @@ class YamlParser():
 
     def ParseVfrStatementGrayOutIfStat(self, GrayOutIf, ParentNode, Position):
         GOIObj = IfrGrayOutIf()
-        Node = VfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP, GOIObj, gFormPkg.StructToStream(GOIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP, GOIObj, gFormPkg.StructToStream(GOIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(GrayOutIf['expression'], Node)
         Node.Expression = GrayOutIf['expression']
@@ -1387,7 +1408,7 @@ class YamlParser():
     def ParseVfrStatementInconsistentIfStat(self, InconsistentIf, ParentNode, Position):
         IIObj = IfrInconsistentIf()
         IIObj.SetError(InconsistentIf['prompt'])
-        Node = VfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP, IIObj, gFormPkg.StructToStream(IIObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP, IIObj, gFormPkg.StructToStream(IIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(InconsistentIf['expression'], Node)
         Node.Expression = InconsistentIf['expression']
@@ -1416,7 +1437,7 @@ class YamlParser():
         TObj = IfrTime()
         self._ParseVfrQuestionHeader(TObj, Time, EFI_QUESION_TYPE.QUESTION_TIME)
         self.ErrorHandler(TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseTimeFlags(Time)))
-        Node = VfrTreeNode(EFI_IFR_TIME_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_TIME_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
         self.SetPosition(Node, Position)
         ParentNode.insertChild(Node)
         if 'component' in Time.keys():
@@ -1470,7 +1491,7 @@ class YamlParser():
             OLObj.SetMaxContainers(MaxContainers)
 
         self._ParseOrderedListFlags(OrderedList)
-        Node = VfrTreeNode(EFI_IFR_ORDERED_LIST_OP, OLObj, gFormPkg.StructToStream(OLObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_ORDERED_LIST_OP, OLObj, gFormPkg.StructToStream(OLObj.GetInfo()))
         self.SetPosition(Node, Position)
         ParentNode.insertChild(Node)
         if 'component' in OrderedList.keys():
@@ -1498,7 +1519,7 @@ class YamlParser():
 
     def ParseVfrStatementCheckBox(self, CheckBox, ParentNode, Position):
         CBObj = IfrCheckBox()
-        Node = VfrTreeNode(EFI_IFR_CHECKBOX_OP)
+        Node = IfrTreeNode(EFI_IFR_CHECKBOX_OP)
         self.CurrentQuestion = CBObj
         self.IsCheckBoxOp = True
         HasGuidNode = False
@@ -1510,7 +1531,7 @@ class YamlParser():
             GuidObj = IfrGuid(0)
             GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
             GuidObj.SetScope(1) # position
-            GuidNode = VfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
+            GuidNode = IfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
             ParentNode.insertChild(GuidNode)
             GuidNode.insertChild(Node)
             self.InsertEndNode(GuidNode)
@@ -1592,7 +1613,7 @@ class YamlParser():
         Config = Action['config']
         AObj.SetQuestionConfig(Config)
         # No handler for Flags
-        Node = VfrTreeNode(EFI_IFR_ACTION_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_ACTION_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
         self.SetPosition(Node, Position)
         ParentNode.insertChild(Node)
         if 'component' in Action.keys():
@@ -1606,7 +1627,7 @@ class YamlParser():
         DObj = IfrDate()
         self._ParseVfrQuestionHeader(DObj, Date, EFI_QUESION_TYPE.QUESTION_DATE)
         self.ErrorHandler(DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseDateFlags(Date)))
-        Node = VfrTreeNode(EFI_IFR_DATE_OP, DObj, gFormPkg.StructToStream(DObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_DATE_OP, DObj, gFormPkg.StructToStream(DObj.GetInfo()))
         self.SetPosition(Node, Position)
         ParentNode.insertChild(Node)
         if 'component' in Date.keys():
@@ -1635,7 +1656,7 @@ class YamlParser():
 
     def ParseVfrStatementNumeric(self, Numeric, ParentNode, Position):
         NObj = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_64)
-        Node = VfrTreeNode(EFI_IFR_NUMERIC_OP, NObj)
+        Node = IfrTreeNode(EFI_IFR_NUMERIC_OP, NObj)
         self.CurrentQuestion = Node.Data
         self.CurrentMinMaxData = Node.Data
         UpdateVarType = False
@@ -1648,7 +1669,7 @@ class YamlParser():
             GuidObj = IfrGuid(0)
             GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
             GuidObj.SetScope(1) # pos
-            GuidNode = VfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
+            GuidNode = IfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
             ParentNode.insertChild(GuidNode)
             GuidNode.insertChild(Node)
             self.InsertEndNode(GuidNode)
@@ -1685,16 +1706,19 @@ class YamlParser():
             UpdatedNObj.GetInfo().Question = NObj.GetInfo().Question
             UpdatedNObj.GetInfo().Flags = NObj.GetInfo().Flags
             NObj = UpdatedNObj
+            Node.Data = NObj
+            self.CurrentQuestion = Node.Data
+            self.CurrentMinMaxData = Node.Data
 
         self._ParseVfrSetMinMaxStep(NObj, Numeric)
 
-        Node.Data = NObj
-        Node.Buffer = gFormPkg.StructToStream(NObj.GetInfo())
-        self.SetPosition(Node, Position)
         if HasGuidNode == False:
             ParentNode.insertChild(Node)
         if 'component' in Numeric.keys():
             self._ParseVfrStatementQuestionOptionList(Numeric['component'], Node)
+
+        self.SetPosition(Node, Position)
+        Node.Buffer = gFormPkg.StructToStream(NObj.GetInfo())
         self.InsertEndNode(Node)
         return Node
 
@@ -1925,7 +1949,7 @@ class YamlParser():
 
     def ParseVfrStatementOneof(self, OneOf, ParentNode, Position):
         OObj = IfrOneOf(EFI_IFR_TYPE_NUM_SIZE_64)
-        Node = VfrTreeNode(EFI_IFR_ONE_OF_OP, OObj)
+        Node = IfrTreeNode(EFI_IFR_ONE_OF_OP, OObj)
         self.CurrentQuestion = Node.Data
         self.CurrentMinMaxData = Node.Data
         UpdateVarType = False
@@ -1938,7 +1962,7 @@ class YamlParser():
             GuidObj = IfrGuid(0)
             GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
             GuidObj.SetScope(1) # pos
-            GuidNode = VfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
+            GuidNode = IfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
             ParentNode.insertChild(GuidNode)
             GuidNode.insertChild(Node)
             self.InsertEndNode(GuidNode)
@@ -1975,15 +1999,18 @@ class YamlParser():
             UpdatedOObj.GetInfo().Flags = OObj.GetInfo().Flags
             OObj = UpdatedOObj
 
+            Node.Data = OObj
+            self.CurrentQuestion = Node.Data
+            self.CurrentMinMaxData = Node.Data
+
 
         self._ParseVfrSetMinMaxStep(OObj, OneOf)
-        Node.Data = OObj
-        Node.Buffer = gFormPkg.StructToStream(OObj.GetInfo())
-        self.SetPosition(Node, Position)
         if not HasGuidNode:
             ParentNode.insertChild(Node)
         if 'component' in OneOf.keys():
             self._ParseVfrStatementQuestionOptionList(OneOf['component'], Node)
+        self.SetPosition(Node, Position)
+        Node.Buffer = gFormPkg.StructToStream(OObj.GetInfo())
         self.InsertEndNode(Node)
         return Node
 
@@ -2013,7 +2040,7 @@ class YamlParser():
         elif StringMaxSize < StringMinSize:
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "String MaxSize can't be less than String MinSize.")
         SObj.SetMaxSize(StringMaxSize)
-        Node = VfrTreeNode(EFI_IFR_STRING_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_STRING_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
         self.SetPosition(Node, Position)
         ParentNode.insertChild(Node)
         if 'component' in Str.keys():
@@ -2062,7 +2089,7 @@ class YamlParser():
         elif PasswordMaxSize < PassWordMinSize:
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "String MaxSize can't be less than String MinSize.")
         PObj.SetMaxSize(PasswordMaxSize)
-        Node = VfrTreeNode(EFI_IFR_PASSWORD_OP, PObj, gFormPkg.StructToStream(PObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_PASSWORD_OP, PObj, gFormPkg.StructToStream(PObj.GetInfo()))
         self.SetPosition(Node, Position)
         ParentNode.insertChild(Node)
         if 'component' in Password.keys():
@@ -2074,14 +2101,14 @@ class YamlParser():
         IObj = IfrImage()
         ImageId = Image['id']
         IObj.SetImageId(ImageId)
-        Node = VfrTreeNode(EFI_IFR_IMAGE_OP, IObj, gFormPkg.StructToStream(IObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_IMAGE_OP, IObj, gFormPkg.StructToStream(IObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
 
     def ParseVfrStatementLocked(self, Image, ParentNode):
         LObj = IfrLocked()
-        Node = VfrTreeNode(EFI_IFR_LOCKED_OP, LObj, gFormPkg.StructToStream(LObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_LOCKED_OP, LObj, gFormPkg.StructToStream(LObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
@@ -2089,7 +2116,7 @@ class YamlParser():
         LObj = IfrLabel()
         Number = Label['number']
         LObj.SetNumber(Number)
-        Node = VfrTreeNode(EFI_IFR_GUID_OP, LObj, gFormPkg.StructToStream(LObj.GetInfo()))
+        Node = IfrTreeNode(EFI_IFR_GUID_OP, LObj, gFormPkg.StructToStream(LObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
@@ -2136,7 +2163,7 @@ class YamlParser():
             self.ErrorHandler(AObj.SetFlags(TextFlags))
             if 'key' in Text.keys():
                 self.AssignQuestionKey(AObj, Text['key'])
-            Node = VfrTreeNode(EFI_IFR_TEXT_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
+            Node = IfrTreeNode(EFI_IFR_TEXT_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
             ParentNode.insertChild(Node)
             if 'component' in Text.keys():
                 for Component in Text['component']:
@@ -2151,7 +2178,7 @@ class YamlParser():
             TObj.SetHelp(Help)
             TObj.SetPrompt(Prompt)
             TObj.SetTextTwo(TxtTwo)
-            Node = VfrTreeNode(EFI_IFR_TEXT_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
+            Node = IfrTreeNode(EFI_IFR_TEXT_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
             ParentNode.insertChild(Node)
             if 'component' in Text.keys():
                 for Component in Text['component']:
@@ -2184,7 +2211,7 @@ class YamlParser():
 
     def InsertEndNode(self, ParentNode):
         EObj = IfrEnd()
-        ENode = VfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
+        ENode = IfrTreeNode(EFI_IFR_END_OP, EObj, gFormPkg.StructToStream(EObj.GetInfo()))
         ParentNode.insertChild(ENode)
 
     def GetCurArraySize(self):

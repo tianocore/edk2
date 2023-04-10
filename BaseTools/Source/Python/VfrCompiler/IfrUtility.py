@@ -8,7 +8,7 @@ from typing import List
 from unittest.mock import NonCallableMagicMock
 from xmlrpc.client import boolean
 from VfrError import *
-from VfrCtypes import *
+from IfrCtypes import *
 from abc import ABCMeta, abstractmethod
 import ctypes
 
