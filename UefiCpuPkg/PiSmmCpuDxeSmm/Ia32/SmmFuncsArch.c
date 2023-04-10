@@ -1,7 +1,7 @@
 /** @file
   SMM CPU misc functions for Ia32 arch specific.
 
-Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -14,7 +14,6 @@ EFI_PHYSICAL_ADDRESS  mGdtBuffer;
 UINTN                 mGdtBufferSize;
 
 extern BOOLEAN  mCetSupported;
-extern UINTN    mSmmShadowStackSize;
 
 X86_ASSEMBLY_PATCH_LABEL  mPatchCetPl0Ssp;
 X86_ASSEMBLY_PATCH_LABEL  mPatchCetInterruptSsp;

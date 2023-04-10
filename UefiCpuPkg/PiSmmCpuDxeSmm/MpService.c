@@ -29,8 +29,6 @@ MM_COMPLETION                mSmmStartupThisApToken;
 //
 UINT32  *mPackageFirstThreadIndex = NULL;
 
-extern UINTN  mSmmShadowStackSize;
-
 /**
   Performs an atomic compare exchange operation to get semaphore.
   The compare exchange operation must be performed using
