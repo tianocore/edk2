@@ -491,7 +491,7 @@ OpalEndOfDxeEventNotify (
 {
   OPAL_DRIVER_DEVICE  *TmpDev;
 
-  DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - enter\n", __func__));
 
   mOpalEndOfDxe = TRUE;
 
@@ -529,7 +529,7 @@ OpalEndOfDxeEventNotify (
   //
   SendBlockSidCommand ();
 
-  DEBUG ((DEBUG_INFO, "%a() - exit\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - exit\n", __func__));
 
   gBS->CloseEvent (Event);
 }
@@ -888,7 +888,7 @@ OpalDriverRequestPassword (
     return;
   }
 
-  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a()\n", __func__));
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
@@ -1074,7 +1074,7 @@ ProcessOpalRequestEnableFeature (
     return;
   }
 
-  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a()\n", __func__));
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
@@ -1223,7 +1223,7 @@ ProcessOpalRequestDisableUser (
     return;
   }
 
-  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a()\n", __func__));
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
@@ -1339,7 +1339,7 @@ ProcessOpalRequestPsidRevert (
     return;
   }
 
-  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a()\n", __func__));
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
@@ -1478,7 +1478,7 @@ ProcessOpalRequestRevert (
     return;
   }
 
-  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a()\n", __func__));
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
@@ -1646,7 +1646,7 @@ ProcessOpalRequestSecureErase (
     return;
   }
 
-  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a()\n", __func__));
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
@@ -1784,7 +1784,7 @@ ProcessOpalRequestSetUserPwd (
     return;
   }
 
-  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a()\n", __func__));
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
@@ -1990,7 +1990,7 @@ ProcessOpalRequestSetAdminPwd (
     return;
   }
 
-  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a()\n", __func__));
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
@@ -2182,7 +2182,7 @@ ProcessOpalRequest (
   UINTN                     DevicePathSize;
   BOOLEAN                   KeepUserData;
 
-  DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - enter\n", __func__));
 
   if (mOpalRequestVariable == NULL) {
     Status = GetVariable2 (
@@ -2278,7 +2278,7 @@ ProcessOpalRequest (
     TempVariable  = (OPAL_REQUEST_VARIABLE *)((UINTN)TempVariable + TempVariable->Length);
   }
 
-  DEBUG ((DEBUG_INFO, "%a() - exit\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() - exit\n", __func__));
 }
 
 /**

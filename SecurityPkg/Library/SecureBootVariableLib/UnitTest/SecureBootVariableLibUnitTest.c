@@ -82,7 +82,7 @@ MockSetVariable (
   DEBUG ((
     DEBUG_INFO,
     "%a %s %g %x %x %p\n",
-    __FUNCTION__,
+    __func__,
     VariableName,
     VendorGuid,
     Attributes,
@@ -139,7 +139,7 @@ MockGetVariable (
   DEBUG ((
     DEBUG_INFO,
     "%a %s %g %p %x %p\n",
-    __FUNCTION__,
+    __func__,
     VariableName,
     VendorGuid,
     Attributes,

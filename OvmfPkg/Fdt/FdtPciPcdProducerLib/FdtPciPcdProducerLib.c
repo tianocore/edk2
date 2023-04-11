@@ -58,7 +58,7 @@ GetPciIoTranslation (
   if (EFI_ERROR (Status) || (Len == 0) ||
       (Len % sizeof (DTB_PCI_HOST_RANGE_RECORD) != 0))
   {
-    DEBUG ((DEBUG_ERROR, "%a: 'ranges' not found or invalid\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: 'ranges' not found or invalid\n", __func__));
     return RETURN_PROTOCOL_ERROR;
   }
 
@@ -152,7 +152,7 @@ FdtPciPcdProducerLibConstructor (
         DEBUG ((
           DEBUG_WARN,
           "%a: 'pci-host-ecam-generic' device encountered with no I/O range\n",
-          __FUNCTION__
+          __func__
           ));
       }
     }

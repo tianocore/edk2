@@ -37,7 +37,7 @@ QemuVideoCompleteModeInfo (
     Info->PixelInformation.BlueMask     = 0;
     Info->PixelInformation.ReservedMask = 0;
   } else {
-    DEBUG ((DEBUG_ERROR, "%a: Invalid ColorDepth %u", __FUNCTION__, ModeData->ColorDepth));
+    DEBUG ((DEBUG_ERROR, "%a: Invalid ColorDepth %u", __func__, ModeData->ColorDepth));
     ASSERT (FALSE);
   }
 

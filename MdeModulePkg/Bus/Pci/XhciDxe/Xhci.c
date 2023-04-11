@@ -2059,7 +2059,7 @@ XhcDriverBindingStart (
       DEBUG ((
         DEBUG_WARN,
         "%a: failed to enable 64-bit DMA on 64-bit capable controller @ %p (%r)\n",
-        __FUNCTION__,
+        __func__,
         Controller,
         Status
         ));

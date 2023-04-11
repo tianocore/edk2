@@ -296,7 +296,7 @@ CpuSetMemoryAttributes (
   IN UINT64                 Attributes
   )
 {
-  DEBUG ((DEBUG_INFO, "%a: Set memory attributes not supported yet\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Set memory attributes not supported yet\n", __func__));
   return EFI_SUCCESS;
 }
 
@@ -328,10 +328,10 @@ InitializeCpu (
     return EFI_NOT_FOUND;
   }
 
-  DEBUG ((DEBUG_INFO, " %a: Firmware Context is at 0x%x.\n", __FUNCTION__, FirmwareContext));
+  DEBUG ((DEBUG_INFO, " %a: Firmware Context is at 0x%x.\n", __func__, FirmwareContext));
 
   mBootHartId = FirmwareContext->BootHartId;
-  DEBUG ((DEBUG_INFO, " %a: mBootHartId = 0x%x.\n", __FUNCTION__, mBootHartId));
+  DEBUG ((DEBUG_INFO, " %a: mBootHartId = 0x%x.\n", __func__, mBootHartId));
 
   InitializeCpuExceptionHandlers (NULL);
 

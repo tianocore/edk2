@@ -103,7 +103,7 @@ QemuFwCfgInitialize (
         DEBUG_ERROR,
         "QemuFwCfgDma %a:%a Failed to locate IOMMU protocol.\n",
         gEfiCallerBaseName,
-        __FUNCTION__
+        __func__
         ));
       ASSERT (FALSE);
       CpuDeadLoop ();
@@ -186,7 +186,7 @@ AllocFwCfgDmaAccessBuffer (
       DEBUG_ERROR,
       "%a:%a failed to allocate FW_CFG_DMA_ACCESS\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     ASSERT (FALSE);
     CpuDeadLoop ();
@@ -215,7 +215,7 @@ AllocFwCfgDmaAccessBuffer (
       DEBUG_ERROR,
       "%a:%a failed to Map() FW_CFG_DMA_ACCESS\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     ASSERT (FALSE);
     CpuDeadLoop ();
@@ -228,7 +228,7 @@ AllocFwCfgDmaAccessBuffer (
       DEBUG_ERROR,
       "%a:%a failed to Map() - requested 0x%Lx got 0x%Lx\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       (UINT64)sizeof (FW_CFG_DMA_ACCESS),
       (UINT64)Size
       ));
@@ -263,7 +263,7 @@ FreeFwCfgDmaAccessBuffer (
       DEBUG_ERROR,
       "%a:%a failed to UnMap() Mapping 0x%Lx\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       (UINT64)(UINTN)Mapping
       ));
     ASSERT (FALSE);
@@ -276,7 +276,7 @@ FreeFwCfgDmaAccessBuffer (
       DEBUG_ERROR,
       "%a:%a failed to Free() 0x%Lx\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       (UINT64)(UINTN)Access
       ));
     ASSERT (FALSE);
@@ -320,7 +320,7 @@ MapFwCfgDmaDataBuffer (
       DEBUG_ERROR,
       "%a:%a failed to Map() Address 0x%Lx Size 0x%Lx\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       (UINT64)(UINTN)HostAddress,
       (UINT64)Size
       ));
@@ -334,7 +334,7 @@ MapFwCfgDmaDataBuffer (
       DEBUG_ERROR,
       "%a:%a failed to Map() - requested 0x%x got 0x%Lx\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Size,
       (UINT64)NumberOfBytes
       ));
@@ -360,7 +360,7 @@ UnmapFwCfgDmaDataBuffer (
       DEBUG_ERROR,
       "%a:%a failed to UnMap() Mapping 0x%Lx\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       (UINT64)(UINTN)Mapping
       ));
     ASSERT (FALSE);

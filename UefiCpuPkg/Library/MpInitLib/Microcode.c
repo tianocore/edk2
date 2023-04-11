@@ -170,7 +170,7 @@ ShadowMicrocodePatchWorker (
   DEBUG ((
     DEBUG_INFO,
     "%a: Required microcode patches have been loaded at 0x%lx, with size 0x%lx.\n",
-    __FUNCTION__,
+    __func__,
     CpuMpData->MicrocodePatchAddress,
     CpuMpData->MicrocodePatchRegionSize
     ));
@@ -305,7 +305,7 @@ ShadowMicrocodePatchByPcd (
     DEBUG ((
       DEBUG_INFO,
       "%a: 0x%x microcode patches will be loaded into memory, with size 0x%x.\n",
-      __FUNCTION__,
+      __func__,
       PatchCount,
       TotalLoadSize
       ));
@@ -365,7 +365,7 @@ GetMicrocodePatchInfoFromHob (
 
   GuidHob = GetFirstGuidHob (&gEdkiiMicrocodePatchHobGuid);
   if (GuidHob == NULL) {
-    DEBUG ((DEBUG_INFO, "%a: Microcode patch cache HOB is not found.\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: Microcode patch cache HOB is not found.\n", __func__));
     return FALSE;
   }
 
@@ -377,7 +377,7 @@ GetMicrocodePatchInfoFromHob (
   DEBUG ((
     DEBUG_INFO,
     "%a: MicrocodeBase = 0x%lx, MicrocodeSize = 0x%lx\n",
-    __FUNCTION__,
+    __func__,
     *Address,
     *RegionSize
     ));

@@ -139,7 +139,7 @@ ReplaceTableEntry (
         (((RegionStart ^ (UINTN)Entry) & ~BlockMask) == 0))
     {
       DisableMmu = TRUE;
-      DEBUG ((DEBUG_WARN, "%a: splitting block entry with MMU disabled\n", __FUNCTION__));
+      DEBUG ((DEBUG_WARN, "%a: splitting block entry with MMU disabled\n", __func__));
     }
 
     mReplaceLiveEntryFunc (Entry, Value, RegionStart, DisableMmu);
@@ -233,7 +233,7 @@ UpdateRegionMappingRecursive (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a(%d): %llx - %llx set %lx clr %lx\n",
-    __FUNCTION__,
+    __func__,
     Level,
     RegionStart,
     RegionEnd,

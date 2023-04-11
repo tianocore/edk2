@@ -371,7 +371,7 @@ AllocatePageTableMemory (
     DEBUG_INFO,
     "%a:%a: Buffer=0x%Lx Pages=%ld, PageTablePool=%p\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     Buffer,
     Pages,
     *PageTablePool

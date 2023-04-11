@@ -427,7 +427,7 @@ DebugDumpPciCapList (
       DEBUG_VERBOSE,
       "%a:%a: %a 0x%04x %03u/%03u v0x%x @0x%03x+0x%03x\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       (Info.Domain == PciCapNormal ? "Norm" : "Extd"),
       Info.CapId,
       Info.Instance,
@@ -753,7 +753,7 @@ FreeOutCapList:
     DEBUG_ERROR,
     "%a:%a: %r\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     Status
     ));
   return Status;
