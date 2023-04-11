@@ -1126,7 +1126,7 @@ CalculatePrivAuthVarSignChainSHA256Digest (
   //
   Status = X509GetCommonName (SignerCert, SignerCertSize, CertCommonName, &CertCommonNameSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "%a Get SignerCert CommonName failed with status %x\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_INFO, "%a Get SignerCert CommonName failed with status %x\n", __func__, Status));
     return EFI_ABORTED;
   }
 
@@ -1134,7 +1134,7 @@ CalculatePrivAuthVarSignChainSHA256Digest (
   // Get TopLevelCert tbsCertificate
   //
   if (!X509GetTBSCert (TopLevelCert, TopLevelCertSize, &TbsCert, &TbsCertSize)) {
-    DEBUG ((DEBUG_INFO, "%a Get Top-level Cert tbsCertificate failed!\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a Get Top-level Cert tbsCertificate failed!\n", __func__));
     return EFI_ABORTED;
   }
 

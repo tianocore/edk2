@@ -758,7 +758,7 @@ PlatformShadowMicrocode (
   DEBUG ((
     DEBUG_INFO,
     "%a: Required microcode patches have been loaded at 0x%lx, with size 0x%lx.\n",
-    __FUNCTION__,
+    __func__,
     CpuMpData->MicrocodePatchAddress,
     CpuMpData->MicrocodePatchRegionSize
     ));

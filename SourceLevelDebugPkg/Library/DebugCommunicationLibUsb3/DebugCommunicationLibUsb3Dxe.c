@@ -186,7 +186,7 @@ Usb3DxeSmmReadyToLockNotify (
 {
   USB3_DEBUG_PORT_HANDLE  *Instance;
 
-  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a()\n", __func__));
 
   Instance = GetUsb3DebugPortInstance ();
   ASSERT (Instance != NULL);
@@ -290,7 +290,7 @@ Usb3PciIoNotify (
         //
         // Found the PciIo for USB3 debug port.
         //
-        DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+        DEBUG ((DEBUG_INFO, "%a()\n", __func__));
         if (Usb3GetIoMmu () != NULL) {
           Instance = GetUsb3DebugPortInstance ();
           ASSERT (Instance != NULL);

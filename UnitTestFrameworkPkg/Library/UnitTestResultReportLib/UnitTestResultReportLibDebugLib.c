@@ -24,7 +24,7 @@ ReportPrint (
   VA_START (Marker, Format);
   Length = AsciiVSPrint (String, sizeof (String), Format, Marker);
   if (Length == 0) {
-    DEBUG ((DEBUG_ERROR, "%a formatted string is too long\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a formatted string is too long\n", __func__));
   } else {
     DEBUG ((DEBUG_INFO, String));
   }

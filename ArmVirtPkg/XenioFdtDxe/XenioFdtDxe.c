@@ -49,7 +49,7 @@ InitializeXenioFdtDxe (
     DEBUG ((
       DEBUG_WARN,
       "%a: No 'xen,xen' compatible DT node found\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_UNSUPPORTED;
   }
@@ -70,7 +70,7 @@ InitializeXenioFdtDxe (
       DEBUG_ERROR,
       "%a: XenIoMmioInstall () failed on a new handle "
       "(Status == %r)\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return Status;

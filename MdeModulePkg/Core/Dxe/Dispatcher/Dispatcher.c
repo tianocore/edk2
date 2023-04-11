@@ -1095,7 +1095,7 @@ CoreProcessFvImageFile (
         DEBUG ((
           DEBUG_INFO,
           "%a() FV at 0x%x, FvAlignment required is 0x%x\n",
-          __FUNCTION__,
+          __func__,
           FvHeader,
           FvAlignment
           ));

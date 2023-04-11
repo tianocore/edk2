@@ -10,12 +10,12 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = MockUefiRuntimeServicesTableLib
   FILE_GUID                      = 4EA215EE-85C1-4A0A-847F-D2A8DE20805F
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = HOST_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiRuntimeServicesTableLib|HOST_APPLICATION
+  LIBRARY_CLASS                  = UefiRuntimeServicesTableLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]

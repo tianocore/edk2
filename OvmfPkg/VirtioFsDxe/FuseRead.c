@@ -178,7 +178,7 @@ VirtioFsFuseReadFileOrDir (
         DEBUG_ERROR,
         "%a: Label=\"%s\" NodeId=%Lu FuseHandle=%Lu "
         "IsDir=%d Offset=0x%Lx Size=0x%x Data@%p Errno=%d\n",
-        __FUNCTION__,
+        __func__,
         VirtioFs->Label,
         NodeId,
         FuseHandle,

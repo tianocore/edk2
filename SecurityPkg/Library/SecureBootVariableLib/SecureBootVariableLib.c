@@ -276,7 +276,7 @@ CreateTimeBasedPayload (
   UINTN                          DescriptorSize;
 
   if ((Data == NULL) || (DataSize == NULL) || (Time == NULL)) {
-    DEBUG ((DEBUG_ERROR, "%a(), invalid arg\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a(), invalid arg\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -292,7 +292,7 @@ CreateTimeBasedPayload (
   DescriptorSize = OFFSET_OF (EFI_VARIABLE_AUTHENTICATION_2, AuthInfo) + OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData);
   NewData        = (UINT8 *)AllocateZeroPool (DescriptorSize + PayloadSize);
   if (NewData == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a() Out of resources.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a() Out of resources.\n", __func__));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -603,13 +603,13 @@ DeleteSecureBootVariables (
 {
   EFI_STATUS  Status, TempStatus;
 
-  DEBUG ((DEBUG_INFO, "%a - Attempting to delete the Secure Boot variables.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a - Attempting to delete the Secure Boot variables.\n", __func__));
 
   //
   // Step 1: Notify that a PK update is coming shortly...
   Status = DisablePKProtection ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to signal PK update start! %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to signal PK update start! %r\n", __func__, Status));
     // Classify this as a PK deletion error.
     Status = EFI_ABORTED;
   }
@@ -619,7 +619,7 @@ DeleteSecureBootVariables (
   // Let's try to nuke the PK, why not...
   if (!EFI_ERROR (Status)) {
     Status = DeletePlatformKey ();
-    DEBUG ((DEBUG_INFO, "%a - PK Delete = %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_INFO, "%a - PK Delete = %r\n", __func__, Status));
     // If the PK is not found, then our work here is done.
     if (Status == EFI_NOT_FOUND) {
       Status = EFI_SUCCESS;
@@ -646,25 +646,25 @@ DeleteSecureBootVariables (
     // the variables anyway.
     //
     TempStatus = DeleteKEK ();
-    DEBUG ((DEBUG_INFO, "%a - KEK Delete = %r\n", __FUNCTION__, TempStatus));
+    DEBUG ((DEBUG_INFO, "%a - KEK Delete = %r\n", __func__, TempStatus));
     if (EFI_ERROR (TempStatus) && (TempStatus != EFI_NOT_FOUND)) {
       Status = EFI_ACCESS_DENIED;
     }
 
     TempStatus = DeleteDb ();
-    DEBUG ((DEBUG_INFO, "%a - db Delete = %r\n", __FUNCTION__, TempStatus));
+    DEBUG ((DEBUG_INFO, "%a - db Delete = %r\n", __func__, TempStatus));
     if (EFI_ERROR (TempStatus) && (TempStatus != EFI_NOT_FOUND)) {
       Status = EFI_ACCESS_DENIED;
     }
 
     TempStatus = DeleteDbx ();
-    DEBUG ((DEBUG_INFO, "%a - dbx Delete = %r\n", __FUNCTION__, TempStatus));
+    DEBUG ((DEBUG_INFO, "%a - dbx Delete = %r\n", __func__, TempStatus));
     if (EFI_ERROR (TempStatus) && (TempStatus != EFI_NOT_FOUND)) {
       Status = EFI_ACCESS_DENIED;
     }
 
     TempStatus = DeleteDbt ();
-    DEBUG ((DEBUG_INFO, "%a - dbt Delete = %r\n", __FUNCTION__, TempStatus));
+    DEBUG ((DEBUG_INFO, "%a - dbt Delete = %r\n", __func__, TempStatus));
     if (EFI_ERROR (TempStatus) && (TempStatus != EFI_NOT_FOUND)) {
       Status = EFI_ACCESS_DENIED;
     }
@@ -752,7 +752,7 @@ EnrollFromInput (
     DEBUG ((
       DEBUG_ERROR,
       "error: %a (\"%s\", %g): %r\n",
-      __FUNCTION__,
+      __func__,
       VariableName,
       VendorGuid,
       Status
@@ -795,21 +795,21 @@ SetSecureBootVariablesToDefault (
   UINT8       *Data;
   UINTN       DataSize;
 
-  DEBUG ((DEBUG_INFO, "%a() Entry\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a() Entry\n", __func__));
 
   if (SecureBootPayload == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a - Invalid SecureBoot payload is supplied!\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a - Invalid SecureBoot payload is supplied!\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
   //
   // Right off the bat, if SecureBoot is currently enabled, bail.
   if (IsSecureBootEnabled ()) {
-    DEBUG ((DEBUG_ERROR, "%a - Cannot set default keys while SecureBoot is enabled!\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a - Cannot set default keys while SecureBoot is enabled!\n", __func__));
     return EFI_ABORTED;
   }
 
-  DEBUG ((DEBUG_INFO, "%a - Setting up key %s!\n", __FUNCTION__, SecureBootPayload->SecureBootKeyName));
+  DEBUG ((DEBUG_INFO, "%a - Setting up key %s!\n", __func__, SecureBootPayload->SecureBootKeyName));
 
   //
   // Start running down the list, creating variables in our wake.
@@ -834,10 +834,10 @@ SetSecureBootVariablesToDefault (
                  Data
                  );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DB %r!\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DB %r!\n", __func__, Status));
     }
   } else {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBX %r!\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBX %r!\n", __func__, Status));
   }
 
   // Keep it going. Keep it going. dbt if supplied...
@@ -851,7 +851,7 @@ SetSecureBootVariablesToDefault (
                  Data
                  );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBT %r!\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll DBT %r!\n", __func__, Status));
     }
   }
 
@@ -866,7 +866,7 @@ SetSecureBootVariablesToDefault (
                  Data
                  );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll KEK %r!\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a - Failed to enroll KEK %r!\n", __func__, Status));
     }
   }
 
@@ -889,7 +889,7 @@ SetSecureBootVariablesToDefault (
     //
     // Report PK creation errors.
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a - Failed to update the PK! - %r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a - Failed to update the PK! - %r\n", __func__, Status));
       Status = EFI_SECURITY_VIOLATION;
     }
   }

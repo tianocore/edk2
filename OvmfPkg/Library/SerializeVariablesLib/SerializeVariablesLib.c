@@ -294,7 +294,7 @@ IterateVariablesCallbackSetSystemVariable (
       DEBUG_WARN,
       "%a: setting authenticated variable \"%s\" "
       "failed with EFI_SECURITY_VIOLATION, ignoring\n",
-      __FUNCTION__,
+      __func__,
       VariableName
       ));
     Status = EFI_SUCCESS;
@@ -303,7 +303,7 @@ IterateVariablesCallbackSetSystemVariable (
       DEBUG_WARN,
       "%a: setting ReadOnly variable \"%s\" "
       "failed with EFI_WRITE_PROTECTED, ignoring\n",
-      __FUNCTION__,
+      __func__,
       VariableName
       ));
     Status = EFI_SUCCESS;

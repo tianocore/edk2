@@ -436,7 +436,7 @@ TlsConfigCertificate (
       DEBUG ((
         DEBUG_ERROR,
         "%a: truncated EFI_SIGNATURE_LIST header\n",
-        __FUNCTION__
+        __func__
         ));
       goto FreeCACert;
     }
@@ -447,7 +447,7 @@ TlsConfigCertificate (
       DEBUG ((
         DEBUG_ERROR,
         "%a: SignatureListSize too small for EFI_SIGNATURE_LIST\n",
-        __FUNCTION__
+        __func__
         ));
       goto FreeCACert;
     }
@@ -456,7 +456,7 @@ TlsConfigCertificate (
       DEBUG ((
         DEBUG_ERROR,
         "%a: truncated EFI_SIGNATURE_LIST body\n",
-        __FUNCTION__
+        __func__
         ));
       goto FreeCACert;
     }
@@ -465,7 +465,7 @@ TlsConfigCertificate (
       DEBUG ((
         DEBUG_ERROR,
         "%a: only X509 certificates are supported\n",
-        __FUNCTION__
+        __func__
         ));
       Status = EFI_UNSUPPORTED;
       goto FreeCACert;
@@ -475,7 +475,7 @@ TlsConfigCertificate (
       DEBUG ((
         DEBUG_ERROR,
         "%a: SignatureHeaderSize must be 0 for X509\n",
-        __FUNCTION__
+        __func__
         ));
       goto FreeCACert;
     }
@@ -484,7 +484,7 @@ TlsConfigCertificate (
       DEBUG ((
         DEBUG_ERROR,
         "%a: SignatureSize too small for EFI_SIGNATURE_DATA\n",
-        __FUNCTION__
+        __func__
         ));
       goto FreeCACert;
     }
@@ -495,7 +495,7 @@ TlsConfigCertificate (
       DEBUG ((
         DEBUG_ERROR,
         "%a: EFI_SIGNATURE_DATA array not a multiple of SignatureSize\n",
-        __FUNCTION__
+        __func__
         ));
       goto FreeCACert;
     }
@@ -505,7 +505,7 @@ TlsConfigCertificate (
   }
 
   if (CertCount == 0) {
-    DEBUG ((DEBUG_ERROR, "%a: no X509 certificates provided\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: no X509 certificates provided\n", __func__));
     goto FreeCACert;
   }
 

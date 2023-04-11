@@ -538,7 +538,7 @@ RedfishPlatformHostInterfaceConstructor (
   EFI_STATUS  Status;
 
   Status = GetRedfishRecordFromVariable (&mRedfishOverIpProtocolData, &mRedfishProtocolDataSize);
-  DEBUG ((DEBUG_INFO, "%a: GetRedfishRecordFromVariable() - %r\n", __FUNCTION__, Status));
+  DEBUG ((DEBUG_INFO, "%a: GetRedfishRecordFromVariable() - %r\n", __func__, Status));
   if (!EFI_ERROR (Status)) {
     DumpRedfishIpProtocolData (mRedfishOverIpProtocolData, mRedfishProtocolDataSize);
   }

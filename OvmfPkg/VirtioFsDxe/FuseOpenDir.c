@@ -113,7 +113,7 @@ VirtioFsFuseOpenDir (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Label=\"%s\" NodeId=%Lu Errno=%d\n",
-        __FUNCTION__,
+        __func__,
         VirtioFs->Label,
         NodeId,
         CommonResp.Error

@@ -222,7 +222,7 @@ GopNativeResolution (
     DEBUG ((
       DEBUG_INFO,
       "%a: #%d: %dx%d\n",
-      __FUNCTION__,
+      __func__,
       Index,
       DisplayInfo.Pmodes[Index].Rectangle.Width,
       DisplayInfo.Pmodes[Index].Rectangle.Height
