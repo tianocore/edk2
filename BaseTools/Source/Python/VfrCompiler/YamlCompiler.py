@@ -535,7 +535,8 @@ def main():
         Compiler = YamlCompiler(Cmd)
         Compiler.PreProcess()
         Compiler.Compile()
-        Compiler.GenBinaryFiles()
+        #Compiler.ConsumeDLT()
+        # Compiler.GenBinaryFiles()
 
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:

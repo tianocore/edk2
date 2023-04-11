@@ -1275,8 +1275,10 @@ class IfrTree():
     def DumpQuestionInfos(self, Root, f,  ValueIndent):
 
         Info = Root.Data.GetInfo()
-        if Root.Condition != None: # hard code here, do not need to show condition any more
-            f.write(ValueIndent + 'condition:  \'{}\'\n'.format(Root.Condition))
+        if Root.Condition != None:
+            f.write(ValueIndent + 'condition:  \'{}\' # for reference\n'.format(Root.Condition))
+        if Root.Position != None:
+            f.write(ValueIndent + 'position:  \'{}\' # for reference\n'.format(Root.Position))
         if Root.Data.QName != None:
             f.write(ValueIndent + 'name:  {}  #  Optional Input\n'.
                                 format(Root.Data.QName))
@@ -1541,6 +1543,8 @@ class IfrTree():
                             format('0x%04x' % (Info.Option)))
 
                     if type(Root.Data) == IfrOneOfOption:
+                        if Root.Position != None:
+                            f.write(ValueIndent + 'position:  \'{}\' # for reference\n'.format(Root.Position))
                         if Root.Data.ValueStream != '':
                             f.write(ValueIndent + 'value:  {}\n'.format(Root.Data.ValueStream))
                         '''
@@ -1912,38 +1916,46 @@ class IfrTree():
                                 Root.Condition))
                     f.write(KeyIndent + '- locked: tag\n')
 
-                if Root.OpCode == EFI_IFR_SUPPRESS_IF_OP:
-                    f.write(KeyIndent + '- suppressif:\n')
-                    f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
-                                Root.Expression))
-                    if len(Root.Child) > 2 and Root.Child[len(Root.Child) - 2].OpCode not in ExpOps:
-                        f.write(ValueIndent + 'component:  \n')
+                # if Root.OpCode == EFI_IFR_SUPPRESS_IF_OP:
+                #     f.write(KeyIndent + '- suppressif:\n')
+                #     if Root.Position != None:
+                #             f.write(ValueIndent + 'position:  \'{}\' # for reference\n'.format(Root.Position))
+                #     f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
+                #                 Root.Expression))
+                #     if len(Root.Child) > 2 and Root.Child[len(Root.Child) - 2].OpCode not in ExpOps:
+                #         f.write(ValueIndent + 'component:  \n')
 
-                if Root.OpCode == EFI_IFR_DISABLE_IF_OP:
-                    # If the disable node is inserted after the formset ends, do not show it in source yml
-                    # use the expression content to tell if the  disable node is inserted after the formset ends
-                    if Root.Expression != None:
-                        f.write(KeyIndent + '- disableif:\n')
-                        f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
-                                    Root.Expression))
-                        if len(Root.Child) > 2 and Root.Child[len(Root.Child) - 2].OpCode not in ExpOps:
-                            f.write(ValueIndent + 'component:  \n')
+                # if Root.OpCode == EFI_IFR_DISABLE_IF_OP:
+                #     if Root.Position != None:
+                #             f.write(ValueIndent + 'position:  \'{}\' # for reference\n'.format(Root.Position))
+                #     # If the disable node is inserted after the formset ends, do not show it in source yml
+                #     # use the expression content to tell if the  disable node is inserted after the formset ends
+                #     if Root.Expression != None:
+                #         f.write(KeyIndent + '- disableif:\n')
+                #         f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
+                #                     Root.Expression))
+                #         if len(Root.Child) > 2 and Root.Child[len(Root.Child) - 2].OpCode not in ExpOps:
+                #             f.write(ValueIndent + 'component:  \n')
 
-                if Root.OpCode == EFI_IFR_GRAY_OUT_IF_OP:
-                    f.write(KeyIndent + '- grayoutif:\n')
-                    f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
-                                Root.Expression))
-                    if len(Root.Child) > 2 and Root.Child[len(Root.Child) - 2].OpCode not in ExpOps:
-                        f.write(ValueIndent + 'component:  \n')
+                # if Root.OpCode == EFI_IFR_GRAY_OUT_IF_OP:
+                #     f.write(KeyIndent + '- grayoutif:\n')
+                #     if Root.Position != None:
+                #             f.write(ValueIndent + 'position:  \'{}\' # for reference\n'.format(Root.Position))
+                #     f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
+                #                 Root.Expression))
+                #     if len(Root.Child) > 2 and Root.Child[len(Root.Child) - 2].OpCode not in ExpOps:
+                #         f.write(ValueIndent + 'component:  \n')
 
-                if Root.OpCode == EFI_IFR_INCONSISTENT_IF_OP:
-                    f.write(KeyIndent + '- inconsistentif:\n')
-                    f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
-                            Root.Expression))
-                    f.write(ValueIndent + 'prompt:  {} # STRING_ID\n'.format(
-                            '0x%04x' % (Info.Error)))
-                    # if 'flags' in Root.Dict.keys():
-                    #     f.write(ValueIndent + 'flags:  ' + Root.Dict['flags'].Key + '\n')
+                # if Root.OpCode == EFI_IFR_INCONSISTENT_IF_OP:
+                #     f.write(KeyIndent + '- inconsistentif:\n')
+                #     if Root.Position != None:
+                #             f.write(ValueIndent + 'position:  \'{}\' # for reference\n'.format(Root.Position))
+                #     f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
+                #             Root.Expression))
+                #     f.write(ValueIndent + 'prompt:  {} # STRING_ID\n'.format(
+                #             '0x%04x' % (Info.Error)))
+                #     # if 'flags' in Root.Dict.keys():
+                #     #     f.write(ValueIndent + 'flags:  ' + Root.Dict['flags'].Key + '\n')
 
             self.LastOp = Root.OpCode
 
@@ -1955,11 +1967,14 @@ class IfrTree():
         if Root.Child != []:
             for ChildNode in Root.Child:
                 if Root.OpCode in ConditionOps:
-                    # if ChildNode.OpCode in ConditionOps:
-                    #     ChildNode.Condition = Root.Condition + ' | ' + ChildNode.Condition
-                    # else:
-                    #     ChildNode.Condition = Root.Condition
-                    ChildNode.Level = Root.Level + 1
+                    if ChildNode.OpCode in ConditionOps:
+                        ChildNode.Condition = Root.Condition + ' | ' + ChildNode.Condition
+                    else:
+                        ChildNode.Condition = Root.Condition
+
+                    ChildNode.Level = Root.Level
+
+                    #ChildNode.Level = Root.Level + 1
 
                     # if type(ChildNode.Data) == IfrInconsistentIf2:
                     #     ChildNode.Level = Root.Level + 1

@@ -12,7 +12,7 @@ class YamlTree():
         self.Root = Root
         self.PreProcessDB = PreProcessDB
         self.IfrTree = IfrTree(Root, PreProcessDB, Options)
-        self.Modifier = DLTModifier(Root)
+        self.Modifier = DLTParser(Root)
         self.YamlDict = None
         self.Visitor = None
         self.Parser = None
@@ -57,22 +57,58 @@ class YamlTree():
         self.IfrTree.GenBinaryFiles()
 
     def ConsumeDLT(self):
-        self.Options.DeltaFileName = self.Options.OutputDirectory + 'Delta.yml' #
-        f = open(self.Options.DeltaFileName , 'r')
-        DeltaDict = yaml.safe_load(f)
-        f.close()
-        for Question in DeltaDict['questions']:
-            (QuestionType, QuestionDict), = Question.items()
-            QuestionDict['position'] = re.sub(r'0x[0-9a-fA-F]+|\d+', lambda x: str(int(x.group(), 0)), QuestionDict['position'])
-            QuestionNode = self.Modifier.FindQuestionNode(self.Root, QuestionDict['position'])
-            if QuestionNode == None:
-                self.Modifier.AddQuestionNode(QuestionType, QuestionDict, self.Parser)
+        self.Options.DeltaFileName = self.Options.OutputDirectory + 'Vfr.dlt' #
+        FileLines = open(self.Options.DeltaFileName , 'r')
+        LastPos = None
+        CurPos = None
+        Dict = {}
+        QuestionNode = None
+        for Line in FileLines:
+            Parts = Line.split(" | ")
+            CurPos = ".".join(Parts[0].split(".")[:-1])
+            #Unify Position Guid Format
+            re.sub(r'0x[0-9a-fA-F]+|\d+', lambda x: str(int(x.group(), 0)), CurPos)
+            Key = Parts[0].split(".")[-1].lower()
+            Value = Parts[1].replace("\n", "").strip()
+            # tranfer str to int
+            if Value.isdigit() or Value.startswith("0x") or Value.startswith("0X"):
+                Value = int(Value, 0)
+
+            if CurPos == LastPos:
+                # add {key, Value} to Dict for Position/LastPos Question
+                Dict[Key] = Value
+                continue
             else:
-                if 'condition' in QuestionDict.keys() and QuestionDict['condition'] == 'suppressif true':
+                # LastPos Question ends,
+                # do insert/delete/modify operation for last Position Question
+                QuestionNode = self.Modifier.FindQuestionNode(self.Root, LastPos)
+                if QuestionNode == None:
+                    self.Modifier.AddQuestionNode(LastPos, Dict, self.Parser)
+                elif 'condition' in Dict.keys() and Dict['condition'] == 'suppressif true':
                     self.Modifier.DeleteQuestionNode(QuestionNode)
                 else:
-                    self.Modifier.ModifyQuestionNode(QuestionType, QuestionDict, QuestionNode, self.Parser)
-        # self.IfrTree.DumpProcessedYaml()
+                    self.Modifier.ModifyQuestionNode(QuestionNode, LastPos, Dict, self.Parser)
+
+                # clear Dict
+                Dict = {}
+                Dict[Key] = Value
+                LastPos = CurPos
+
+
+
+        FileLines.close()
+        # for Question in DeltaDict['questions']:
+        #     (QuestionType, QuestionDict), = Question.items()
+        #     QuestionDict['Position'] = re.sub(r'0x[0-9a-fA-F]+|\d+', lambda x: str(int(x.group(), 0)), QuestionDict['Position'])
+        #     QuestionNode = self.Modifier.FindQuestionNode(self.Root, QuestionDict['Position'])
+        #     if QuestionNode == None:
+        #         self.Modifier.AddQuestionNode(QuestionType, QuestionDict, self.Parser)
+        #     else:
+        #         if 'condition' in QuestionDict.keys() and QuestionDict['condition'] == 'suppressif true':
+        #             self.Modifier.DeleteQuestionNode(QuestionNode)
+        #         else:
+        #             self.Modifier.ModifyQuestionNode(QuestionType, QuestionDict, QuestionNode, self.Parser)
+        # # self.IfrTree.DumpProcessedYaml()
 
 
     def PreProcessYamlDict(self, YamlDict):
@@ -121,69 +157,7 @@ class YamlTree():
 QuestionheaderFlagsField = ['READ_ONLY', 'INTERACTIVE', 'RESET_REQUIRED', 'REST_STYLE', 'RECONNECT_REQUIRED', 'OPTIONS_ONLY', 'NV_ACCESS', 'LATE_CHECK']
 vfrStatementStat = ['subtitle', 'text', 'goto', 'resetbutton']
 vfrStatementQuestions = ['checkbox', 'action', 'date','numeric', 'oneof', 'string', 'password', 'orderedlist', 'time']
-vfrStatementConditional = ['disableif', 'supressif', 'grayoutif', 'inconsistentif']
-class ModifiedNode():
-    def __init__(self, Node, Operation) -> None:
-        self.Node = Node
-        self.Operation = Operation
-class DLTModifier():
-    def __init__(self, Root) -> None:
-        self.Root = Root
-        self.ModifiedNodeList = []
-
-    def FindQuestionNode(self, Root, Position):
-        if Root == None:
-            return None
-
-        if Root.Position == Position:
-            return Root
-
-        if Root.Child != None:
-            for ChildNode in Root.Child:
-                Node = self.FindQuestionNode(ChildNode, Position)
-                if Node != None:
-                    return Node
-        return None
-
-    def AddQuestionNode(self, QuestionType, QuestionDict, Parser, ParentNode=None):
-        if ParentNode == None:
-            InsertedPos = '.'.join(QuestionDict['position'].split('.')[:2])
-            # if digit is in position, turn to decimal integer
-            InsertedPos = re.sub(r'0x[0-9a-fA-F]+|\d+', lambda x: str(int(x.group(), 0)), InsertedPos)
-            ParentNode = self.FindQuestionNode(self.Root, self.HandlePosition(InsertedPos))
-            if ParentNode == None:
-                print('error') # raise error
-
-        QuestionDict['varid'] = '.'.join(QuestionDict['position'].split('.')[2:])
-
-        #print(QuestionDict['varid'])
-        if QuestionType == 'goto':
-            Node = Parser.ParseVfrStatementGoto(QuestionDict, ParentNode, QuestionDict['position'])
-        else:
-            Node = Parser.ParseVfrStatementQuestions(QuestionType, QuestionDict, ParentNode, QuestionDict['position'])
-        self.ModifiedNodeList.append(ModifiedNode(Node, 'ADD'))
-
-        return Node
-
-    def ModifyQuestionNode(self, QuestionType, QuestionDict, OperatedNode, Parser):
-        NewNode = self.AddQuestionNode(QuestionType, QuestionDict, Parser, OperatedNode.Parent)
-        for i in range(0, len(OperatedNode.Parent.Child) - 1):
-            if OperatedNode == OperatedNode.Parent.Child[i]:
-                OperatedNode.Parent.Child[i] = NewNode
-                NewNode.Parent.Child.pop()
-                self.ModifiedNodeList.append(ModifiedNode(NewNode, 'Modify'))
-                return NewNode
-        return NewNode
-
-    def DeleteQuestionNode(self, OperatedNode: IfrTreeNode):
-        # or directly delete the Node itself
-        if OperatedNode.Condition == None:
-            OperatedNode.Condition = 'suppressif true'
-        else:
-            OperatedNode.Condition += ' | ' + 'suppressif true'
-
-        self.ModifiedNodeList.append(ModifiedNode(OperatedNode, 'Delete'))
-        return OperatedNode
+vfrStatementConditional = ['disableif', 'suppressif', 'grayoutif', 'inconsistentif']
 
 class YamlParser():
     def __init__(self, Root: IfrTreeNode, Options: Options, PreProcessDB: PreProcessDB, YamlDict, GuidID):
@@ -350,22 +324,22 @@ class YamlParser():
         if 'component' in Formset.keys():
             self._ParseVfrFormSetComponent(Formset['component'], Node)
 
-        # Declare undefined Question so that they can be used in expression.
-        InsertOpCodeList = None
-        if gFormPkg.HavePendingUnassigned():
-            InsertOpCodeList, ReturnCode = gFormPkg.DeclarePendingQuestion(
-                gVfrVarDataTypeDB, gVfrDataStorage, self.VfrQuestionDB)
-            Status = 0 if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS else 1
-            self.ParserStatus += Status ###
-            self.NeedAdjustOpcode = True
+        # # Declare undefined Question so that they can be used in expression.
+        # InsertOpCodeList = None
+        # if gFormPkg.HavePendingUnassigned():
+        #     InsertOpCodeList, ReturnCode = gFormPkg.DeclarePendingQuestion(
+        #         gVfrVarDataTypeDB, gVfrDataStorage, self.VfrQuestionDB)
+        #     Status = 0 if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS else 1
+        #     self.ParserStatus += Status ###
+        #     self.NeedAdjustOpcode = True
 
-        self.InsertEndNode(Node)
+        # self.InsertEndNode(Node)
 
-        if self.NeedAdjustOpcode:
-            self.LastFormNode.Child.pop()
-            for InsertOpCode in InsertOpCodeList:
-                InsertNode = IfrTreeNode(InsertOpCode.OpCode, InsertOpCode.Data, gFormPkg.StructToStream(InsertOpCode.Data.GetInfo()))
-                self.LastFormNode.insertChild(InsertNode)
+        # if self.NeedAdjustOpcode:
+        #     self.LastFormNode.Child.pop()
+        #     for InsertOpCode in InsertOpCodeList:
+        #         InsertNode = IfrTreeNode(InsertOpCode.OpCode, InsertOpCode.Data, gFormPkg.StructToStream(InsertOpCode.Data.GetInfo()))
+        #         self.LastFormNode.insertChild(InsertNode)
 
         gFormPkg.BuildPkg(self.Root)
         return Node
@@ -445,6 +419,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(DisableIf['expression'], Node)
         Node.Expression = DisableIf['expression']
+        Node.Condition = 'disableif ' + Node.Expression
         if 'component' in DisableIf.keys():
             self._ParseVfrFormSetComponent(DisableIf['component'], Node)
         self.InsertEndNode(Node)
@@ -455,6 +430,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(SuppressIf['expression'], Node)
         Node.Expression = SuppressIf['expression']
+        Node.Condition = 'suppressif ' + Node.Expression
         if 'component' in SuppressIf.keys():
             self._ParseVfrFormSetComponent(SuppressIf['component'], Node)
         self.InsertEndNode(Node)
@@ -918,6 +894,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(InconsistentIf['expression'], Node)
         Node.Expression = InconsistentIf['expression']
+        Node.Condition = 'inconsistentif ' + Node.Expression
         self.InsertEndNode(Node)
 
 
@@ -937,6 +914,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(DisableIfQuest['expression'], Node)
         Node.Expression = DisableIfQuest['expression']
+        Node.Condition = 'disableif ' + Node.Expression
         if 'component' in DisableIfQuest.keys():
             self._ParseVfrStatementQuestionOptionList(DisableIfQuest['component'], Node)
         self.InsertEndNode(Node)
@@ -990,6 +968,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(SuppressIfQuest['expression'], Node)
         Node.Expression = SuppressIfQuest['expression']
+        Node.Condition = 'suppressif ' + Node.Expression
         if 'component' in SuppressIfQuest.keys():
             self._ParseVfrStatementQuestionOptionList(SuppressIfQuest['component'], Node)
         self.InsertEndNode(Node)
@@ -1001,6 +980,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(GrayOutIfQuest['expression'], Node)
         Node.Expression = GrayOutIfQuest['expression']
+        Node.Condition = 'grayoutif ' + Node.Expression
         if 'component' in GrayOutIfQuest.keys():
             self._ParseVfrStatementQuestionOptionList(GrayOutIfQuest['component'], Node)
         self.InsertEndNode(Node)
@@ -1373,6 +1353,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(DisableIf['expression'], Node)
         Node.Expression = DisableIf['expression']
+        Node.Condition = 'disableif ' + Node.Expression
         if 'component' in DisableIf.keys():
             for Component in DisableIf['component']:
                 (Key, Value), = Component.items()
@@ -1386,6 +1367,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(SuppressIf['expression'], Node)
         Node.Expression = SuppressIf['expression']
+        Node.Condition = 'suppressif ' + Node.Expression
         if 'component' in SuppressIf.keys():
             for Component in SuppressIf['component']:
                 (Key, Value), = Component.items()
@@ -1399,6 +1381,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(GrayOutIf['expression'], Node)
         Node.Expression = GrayOutIf['expression']
+        Node.Condition = 'grayoutif ' + Node.Expression
         if 'component' in GrayOutIf.keys():
             for Component in GrayOutIf['component']:
                 (Key, Value), = Component.items()
@@ -1412,6 +1395,7 @@ class YamlParser():
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(InconsistentIf['expression'], Node)
         Node.Expression = InconsistentIf['expression']
+        Node.Condition = 'inconsistentif ' + Node.Expression
         if 'component' in InconsistentIf.keys():
             for Component in InconsistentIf['component']:
                 (Key, Value), = Component.items()
@@ -1420,6 +1404,7 @@ class YamlParser():
 
 
     def _ParseVfrStatementStatList(self, Key, Value, ParentNode, Position):
+        # print(Key)
         if Key in vfrStatementStat:
             self.ParseVfrStatementStat(Key, Value, ParentNode, Position)
         elif Key in vfrStatementQuestions:
@@ -1530,7 +1515,7 @@ class YamlParser():
             HasGuidNode = True
             GuidObj = IfrGuid(0)
             GuidObj.SetGuid(EDKII_IFR_BIT_VARSTORE_GUID)
-            GuidObj.SetScope(1) # position
+            GuidObj.SetScope(1) # Position
             GuidNode = IfrTreeNode(EFI_IFR_GUID_OP, GuidObj, gFormPkg.StructToStream(GuidObj.GetInfo()))
             ParentNode.insertChild(GuidNode)
             GuidNode.insertChild(Node)
@@ -2231,3 +2216,126 @@ class YamlParser():
     def SetPosition(self, Node, Position):
         if Node.Data.VarIdStr != '' and Position != None:
             Node.Position = Position + '.' + Node.Data.VarIdStr
+
+
+class ModifiedNode():
+    def __init__(self, Node, Operation) -> None:
+        self.Node = Node
+        self.Operation = Operation
+class DLTParser():
+    def __init__(self, Root) -> None:
+        self.Root = Root
+        self.ModifiedNodeList = []
+
+    def FindQuestionNode(self, Root, Position):
+        if Root == None:
+            return None
+
+        if Root.Position == Position:
+            return Root
+
+        if Root.Child != None:
+            for ChildNode in Root.Child:
+                Node = self.FindQuestionNode(ChildNode, Position)
+                if Node != None:
+                    return Node
+        return None
+
+    def AddQuestionNode(self, Position, QuestionDict, Parser: YamlParser, ParentNode=None):
+        # find parentNode
+        if ParentNode == None:
+            parts = Position.split('.')
+            if parts[-1].startswith('option'): # for option Opcode
+                InsertedPos = '.'.join(parts[:-1])
+            else: # for question opcode
+                InsertedPos = '.'.join(parts[:2])
+            print(InsertedPos)
+            # if digit is in position, turn to decimal integer
+            InsertedPos = re.sub(r'0x[0-9a-fA-F]+|\d+', lambda x: str(int(x.group(), 0)), InsertedPos)
+            ParentNode = self.FindQuestionNode(self.Root, InsertedPos)
+            if ParentNode == None:
+                print('error') # raise error
+
+        QuestionObj = None
+        QuestionNode = None
+
+        if QuestionDict['opcode'] == 'CheckBox':
+
+            QuestionObj = IfrCheckBox()
+            QuestionNode = IfrTreeNode(EFI_IFR_CHECKBOX_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+
+        if QuestionDict['opcode'] == 'Numeric':
+            QuestionObj = IfrNumeric()
+            QuestionNode = IfrTreeNode(EFI_IFR_NUMERIC_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+
+        if QuestionDict['opcode'] == 'OneOf':
+            QuestionObj = IfrOneOf()
+            QuestionNode = IfrTreeNode(EFI_IFR_ONE_OF_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+
+        if QuestionDict['opcode'] == 'String':
+            QuestionObj = IfrString()
+            QuestionNode = IfrTreeNode(EFI_IFR_STRING_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+
+        if QuestionDict['opcode'] == 'Password':
+            QuestionObj = IfrPassword()
+            QuestionNode = IfrTreeNode(EFI_IFR_PASSWORD_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+
+        if QuestionDict['opcode'] == 'OrderedList':
+            QuestionObj = IfrOrderedList()
+            QuestionNode = IfrTreeNode(EFI_IFR_ORDERED_LIST_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+
+        if QuestionDict['opcode'] == 'Time':
+            QObj = IfrTime()
+            QuestionNode = IfrTreeNode(EFI_IFR_TIME_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+
+        if QuestionObj['opcode'] == 'Date':
+            QuestionObj = IfrDate()
+            QuestionNode = IfrTreeNode(EFI_IFR_DATE_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+
+        if QuestionDict['opcode'] == 'Action':
+            QuestionObj = IfrAction()
+            QuestionNode = IfrTreeNode(EFI_IFR_ACTION_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+
+        self.SetQuestionInfo(QuestionObj, QuestionDict)
+        ParentNode.insertChild(QuestionNode)
+        self.ModifiedNodeList.append(ModifiedNode(QuestionNode, 'ADD'))
+
+        return QuestionNode
+
+    def ModifyQuestionNode(self, OperatedNode, Position, QuestionDict, Parser):
+        NewNode = self.AddQuestionNode(Position, QuestionDict, Parser, OperatedNode.Parent)
+        for i in range(0, len(OperatedNode.Parent.Child) - 1):
+            if OperatedNode == OperatedNode.Parent.Child[i]:
+                OperatedNode.Parent.Child[i] = NewNode
+                NewNode.Parent.Child.pop()
+                self.ModifiedNodeList.append(ModifiedNode(NewNode, 'Modify'))
+                return NewNode
+        return NewNode
+
+    def DeleteQuestionNode(self, OperatedNode: IfrTreeNode):
+        # or directly delete the Node itself
+        if OperatedNode.Condition == None:
+            OperatedNode.Condition = 'suppressif true'
+        else:
+            OperatedNode.Condition += ' | ' + 'suppressif true'
+
+        self.ModifiedNodeList.append(ModifiedNode(OperatedNode, 'Delete'))
+        return OperatedNode
+
+    def SetQuestionInfo(self, OpCode, Dict):
+        if 'questionid' in Dict.keys():
+            OpCode.Obj.Question.QuestionId = Dict['questionid']
+        if 'varstoreid' in Dict.keys():
+            OpCode.Obj.Question.VarStoreId = Dict['varstoreid']
+        if 'varname' in Dict.keys():
+            OpCode.Obj.Question.VarStoreInfo.VarName = Dict['varname']
+        if 'varoffset' in Dict.keys():
+            OpCode.Obj.Question.VarStoreInfo.VarOffset = Dict['varoffset']
+        if 'questionflags' in Dict.keys():
+            OpCode.Obj.Question.Flags = Dict['questionflags']
+        if 'opcodeflags' in Dict.keys():
+            OpCode.Obj.Flags = Dict['opcodeflags']
+        if 'prompt' in Dict.keys():
+            OpCode.Obj.Question.Header.Prompt = Dict['prompt']
+        if 'help' in Dict.keys():
+            OpCode.Obj.Question.Header.Help = Dict['help']

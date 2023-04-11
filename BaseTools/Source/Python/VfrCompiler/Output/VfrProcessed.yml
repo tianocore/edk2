@@ -1,6 +1,6 @@
 formset:
   classguid: !!python/object/apply:_ctypes._unpickle
-  - &id001 !!python/name:VfrCtypes.EFI_GUID ''
+  - &id001 !!python/name:IfrCtypes.EFI_GUID ''
   - !!python/tuple
     - {}
     - !!binary |
@@ -1017,8 +1017,6 @@ formset:
             data.EfiBitNumeric: 1
             data.EfiBitOneof: 1
           guid: *id002
-      - disableif:
-          expression: None
       formid: 7
       title: 115
   guid: *id002
