@@ -312,6 +312,11 @@ SetVariableCheckHandlerMorLock (
       mMorLockState    = MorLockStateLocked;
       mMorLockKeyEmpty = TRUE;
       ZeroMem (mMorLockKey, sizeof (mMorLockKey));
+      //
+      // Update value to reflect locked without key
+      //
+      Status = SetMorLockVariable (MOR_LOCK_DATA_LOCKED_WITHOUT_KEY);
+      ASSERT_EFI_ERROR (Status);
       return EFI_ACCESS_DENIED;
     }
   }
