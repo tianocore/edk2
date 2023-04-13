@@ -61,7 +61,8 @@ class YamlTree():
         FileLines = open(self.Options.DeltaFileName , 'r')
         LastPos = None
         CurPos = None
-        Dict = {}
+        # index is used to mark condition numbers
+        Dict = {'index': 0}
         QuestionNode = None
         for Line in FileLines:
             Parts = Line.split(" | ")
@@ -76,6 +77,12 @@ class YamlTree():
 
             if CurPos == LastPos:
                 # add {key, Value} to Dict for Position/LastPos Question
+                if Key == 'condition':
+                    Key = 'condition1'
+
+                if Key.startswith('condition'):
+                    Dict['index'] += 1
+
                 Dict[Key] = Value
                 continue
             else:
@@ -90,7 +97,7 @@ class YamlTree():
                     self.Modifier.ModifyQuestionNode(QuestionNode, LastPos, Dict, self.Parser)
 
                 # clear Dict
-                Dict = {}
+                Dict = {'index': 0}
                 Dict[Key] = Value
                 LastPos = CurPos
 
@@ -993,6 +1000,7 @@ class YamlParser():
             NumericQst = IfrNumeric(self.CurrentQuestion) #
             IntDecStyle = True if (NumericQst.GetNumericFlags() & EFI_IFR_DISPLAY) == 0 else False #
         ValueList = []
+        print(Value)
         if Value == True:
             ValueList.append(1)
 
@@ -2242,7 +2250,7 @@ class DLTParser():
         return None
 
     def AddQuestionNode(self, Position, QuestionDict, Parser: YamlParser, ParentNode=None):
-        # find parentNode
+        # find parentNode to insert
         if ParentNode == None:
             parts = Position.split('.')
             if parts[-1].startswith('option'): # for option Opcode
@@ -2256,47 +2264,86 @@ class DLTParser():
             if ParentNode == None:
                 print('error') # raise error
 
+        # QuestionDict['index'] records the number of conditional opcodes
+        # add conditional opcode if condition is not none
+        if QuestionDict['index'] > 0:
+            for i in range(1, QuestionDict['index'] + 1):
+                Condition = QuestionDict['condition' + str(i)]
+                pattern = r'(.+?)\s+(.+)'
+                match = re.match(pattern, Condition)
+                if match:
+                    Key = match.group(1)
+                    Value = {}
+                    Value['expression'] = match.group(2)
+                    Parser.ParseVfrStatementConditional(Key, Value, ParentNode, Position)
+                else:
+                    print("error")
+
         QuestionObj = None
         QuestionNode = None
+        # add question opcode
 
         if QuestionDict['opcode'] == 'CheckBox':
 
             QuestionObj = IfrCheckBox()
-            QuestionNode = IfrTreeNode(EFI_IFR_CHECKBOX_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+            QuestionNode = IfrTreeNode(EFI_IFR_CHECKBOX_OP, QuestionObj)
 
         if QuestionDict['opcode'] == 'Numeric':
             QuestionObj = IfrNumeric()
-            QuestionNode = IfrTreeNode(EFI_IFR_NUMERIC_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+            QuestionNode = IfrTreeNode(EFI_IFR_NUMERIC_OP, QuestionObj)
 
         if QuestionDict['opcode'] == 'OneOf':
             QuestionObj = IfrOneOf()
-            QuestionNode = IfrTreeNode(EFI_IFR_ONE_OF_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+            QuestionNode = IfrTreeNode(EFI_IFR_ONE_OF_OP, QuestionObj)
 
         if QuestionDict['opcode'] == 'String':
             QuestionObj = IfrString()
-            QuestionNode = IfrTreeNode(EFI_IFR_STRING_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+            QuestionNode = IfrTreeNode(EFI_IFR_STRING_OP, QuestionObj)
 
         if QuestionDict['opcode'] == 'Password':
             QuestionObj = IfrPassword()
-            QuestionNode = IfrTreeNode(EFI_IFR_PASSWORD_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+            QuestionNode = IfrTreeNode(EFI_IFR_PASSWORD_OP, QuestionObj)
 
         if QuestionDict['opcode'] == 'OrderedList':
             QuestionObj = IfrOrderedList()
-            QuestionNode = IfrTreeNode(EFI_IFR_ORDERED_LIST_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+            QuestionNode = IfrTreeNode(EFI_IFR_ORDERED_LIST_OP, QuestionObj)
 
         if QuestionDict['opcode'] == 'Time':
-            QObj = IfrTime()
-            QuestionNode = IfrTreeNode(EFI_IFR_TIME_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+            QuestionObj = IfrTime()
+            QuestionNode = IfrTreeNode(EFI_IFR_TIME_OP, QuestionObj)
 
         if QuestionObj['opcode'] == 'Date':
             QuestionObj = IfrDate()
-            QuestionNode = IfrTreeNode(EFI_IFR_DATE_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+            QuestionNode = IfrTreeNode(EFI_IFR_DATE_OP, QuestionObj)
 
         if QuestionDict['opcode'] == 'Action':
             QuestionObj = IfrAction()
-            QuestionNode = IfrTreeNode(EFI_IFR_ACTION_OP, QuestionObj, gFormPkg.StructToStream(QuestionObj), Position)
+            QuestionNode = IfrTreeNode(EFI_IFR_ACTION_OP, QuestionObj)
+
+        if QuestionDict['opcode'] == 'Ref':
+            QuestionObj = IfrRef()
+            QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
+
+        if QuestionDict['opcode'] == 'Ref2':
+            QuestionObj = IfrRef2()
+            QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
+
+        if QuestionDict['opcode'] == 'Ref3':
+            QuestionObj = IfrRef3()
+            QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
+
+        if QuestionDict['opcode'] == 'Ref4':
+            QuestionObj = IfrRef4()
+            QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
+
+        if QuestionDict['opcode'] == 'Ref5':
+            QuestionObj = IfrRef5()
+            QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
 
         self.SetQuestionInfo(QuestionObj, QuestionDict)
+        QuestionNode.Buffer = gFormPkg.StructToStream(QuestionObj)
+        QuestionNode.Position = Position
+
         ParentNode.insertChild(QuestionNode)
         self.ModifiedNodeList.append(ModifiedNode(QuestionNode, 'ADD'))
 

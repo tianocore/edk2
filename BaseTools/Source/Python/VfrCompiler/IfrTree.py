@@ -623,7 +623,7 @@ class IfrTree():
     def _DumpQuestionInfosWithUni(self, Root, f, ValueIndent):
 
         Info = Root.Data.GetInfo()
-        if Root.Condition != None: # hard code here, do not need to show condition any more
+        if Root.Condition != None:
             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(Root.Condition))
         if Root.Data.QName != None:
             f.write(ValueIndent + 'name:  {}  #  Optional Input\n'.
@@ -749,14 +749,14 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_FORM_OP:
                     f.write(KeyIndent + '- form: \n')
+                    if Root.Condition != None:
+                        f.write(ValueIndent +
+                                'condition:  \'{}\'\n'.format(Root.Condition))
                     if 'formid' in Root.Dict.keys():
                         f.write(ValueIndent + 'formid:  ' + Root.Dict['formid'].Key + '\n')
                     else:
                         f.write(ValueIndent + 'formid:  {} \n'.format("0x%x" % Info.FormId))
 
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
-                        f.write(ValueIndent +
-                                'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent +
                             'title:  ' + 'STRING_TOKEN(' + Root.Dict['title'].Key + ')\n')
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
@@ -771,7 +771,7 @@ class IfrTree():
                     else:
                         f.write(ValueIndent + 'formid:  {} \n'.format("0x%x" % Info.FormId))
 
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     if MethodMapList != []:
@@ -786,7 +786,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_IMAGE_OP:
                     f.write(KeyIndent + '- image:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent +
@@ -794,7 +794,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_RULE_OP:  #
                     f.write(KeyIndent + '- rule:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent +
@@ -804,7 +804,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_SUBTITLE_OP:
                     f.write(KeyIndent + '- subtitle:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent +
@@ -818,10 +818,11 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_TEXT_OP:
                     f.write(KeyIndent + '- text:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     if type(Info) == EFI_IFR_TEXT:
+
                         f.write(ValueIndent +
                                 'help:  ' + 'STRING_TOKEN(' + Root.Dict['help'].Key + ')\n')
                         f.write(ValueIndent +
@@ -873,7 +874,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_ONE_OF_OPTION_OP:
                     f.write(KeyIndent + '- option:  \n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'text:  ' + 'STRING_TOKEN(' + Root.Dict['text'].Key + ')\n')
@@ -895,7 +896,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_DEFAULT_OP:
                     f.write(KeyIndent + '- default:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
 
@@ -997,7 +998,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_RESET_BUTTON_OP:
                     f.write(KeyIndent + '- resetbutton:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent + 'defaultstore:  {}\n'.format(
@@ -1010,7 +1011,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_REF_OP:
                     f.write(KeyIndent + '- goto:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
 
@@ -1061,7 +1062,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_REFRESH_OP:
                     f.write(KeyIndent + '- refresh:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     if 'interval' in Root.Dict.keys():
@@ -1072,7 +1073,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_VARSTORE_DEVICE_OP:
                     f.write(KeyIndent + '- varstoredevice:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     if 'devicepath' in Root.Dict.keys():
@@ -1083,14 +1084,14 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_REFRESH_ID_OP:
                     f.write(KeyIndent + '- refreshguid:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'guid:  ' + Root.Dict['refreshguid'].Key + '\n')
 
                 if Root.OpCode == EFI_IFR_WARNING_IF_OP:
                     f.write(KeyIndent + '- warningif:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n')
@@ -1107,7 +1108,7 @@ class IfrTree():
                     if type(Root.Data
                             ) == IfrLabel:  # type(Info) == EFI_IFR_GUID_LABEL
                         f.write(KeyIndent + '- label:\n')
-                        if Root.Condition != None: # hard code here, do not need to show condition any more
+                        if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                         if 'label' in Root.Dict.keys():
@@ -1119,7 +1120,7 @@ class IfrTree():
 
                     if type(Root.Data) == IfrBanner:
                         f.write(KeyIndent + '- banner:\n')
-                        if Root.Condition != None: # hard code here, do not need to show condition any more
+                        if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                         f.write(ValueIndent + 'title:  ' + 'STRING_TOKEN(' + Root.Dict['title'].Key + ')\n')
@@ -1133,7 +1134,7 @@ class IfrTree():
 
                     if type(Root.Data) == IfrTimeout: #################
                         f.write(KeyIndent + '- timeout:\n')
-                        if Root.Condition != None: # hard code here, do not need to show condition any more
+                        if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                         if 'timeout' in Root.Dict.keys():
@@ -1156,7 +1157,7 @@ class IfrTree():
                             KeyIndent = ' ' *((Root.Level *2 - 1) * 2)
                             ValueIndent = ' ' * ((Root.Level*2 + 1) * 2)
                         f.write(KeyIndent + '- guidop:\n')
-                        if Root.Condition != None: # hard code here, do not need to show condition any more
+                        if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                         f.write(ValueIndent + 'guid:  ' + Root.Dict['guid'].Key + '\n')
@@ -1168,7 +1169,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_NO_SUBMIT_IF_OP:
                     f.write(KeyIndent + '- nosubmitif:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n')
@@ -1179,7 +1180,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_READ_OP:
                     f.write(KeyIndent + '- read:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
@@ -1187,7 +1188,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_WRITE_OP:
                     f.write(KeyIndent + '- write:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
@@ -1199,13 +1200,13 @@ class IfrTree():
                         Root.Expression))
 
                 if Root.OpCode == EFI_IFR_MODAL_TAG_OP:
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(KeyIndent + '- modal: null\n')
 
                 if Root.OpCode == EFI_IFR_LOCKED_OP:
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(KeyIndent + '- locked: null\n')
@@ -1413,7 +1414,7 @@ class IfrTree():
                     f.write(
                         ValueIndent +
                         'formid:  {} \n'.format(Info.FormId))
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent +
@@ -1429,7 +1430,7 @@ class IfrTree():
                     f.write(
                         ValueIndent +
                         'formid:  {} # FormId STRING_ID\n'.format(Info.FormId))
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     if MethodMapList != []:
@@ -1446,7 +1447,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_IMAGE_OP:
                     f.write(KeyIndent + '- image:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent +
@@ -1454,7 +1455,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_RULE_OP:  #
                     f.write(KeyIndent + '- rule:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent +
@@ -1464,7 +1465,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_SUBTITLE_OP:
                     f.write(KeyIndent + '- subtitle:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent +
@@ -1479,7 +1480,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_TEXT_OP:
                     f.write(KeyIndent + '- text:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     if type(Info) == EFI_IFR_TEXT:
@@ -1536,7 +1537,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_ONE_OF_OPTION_OP:
                     f.write(KeyIndent + '- option:  \n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'text:  {} # Option STRING_ID\n'.
@@ -1570,7 +1571,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_DEFAULT_OP:
                     f.write(KeyIndent + '- default:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     # f.write(ValueIndent + 'defaultId:  {}\n'.format(Info.DefaultId))
@@ -1713,7 +1714,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_RESET_BUTTON_OP:
                     f.write(KeyIndent + '- resetbutton:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
                     # f.write(ValueIndent + 'defaultstore:  {}\n'.format(
@@ -1728,7 +1729,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_REF_OP:
                     f.write(KeyIndent + '- goto:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
 
@@ -1767,7 +1768,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_REFRESH_OP:
                     f.write(KeyIndent + '- refresh:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'interval:  {}  # RefreshInterval\n'.
@@ -1775,7 +1776,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_VARSTORE_DEVICE_OP:
                     f.write(KeyIndent + '- varstoredevice:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'devicepath:  {}  # DevicePath\n'.
@@ -1783,7 +1784,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_REFRESH_ID_OP:
                     f.write(KeyIndent + '- refreshguid:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.RefreshEventGroupId.Data1),'0x%x'%(Info.RefreshEventGroupId.Data2), '0x%x'%(Info.RefreshEventGroupId.Data3)) \
@@ -1792,7 +1793,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_WARNING_IF_OP:
                     f.write(KeyIndent + '- warningif:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'warning:  {}\n'.format(
@@ -1807,7 +1808,7 @@ class IfrTree():
                     if type(Root.Data
                             ) == IfrLabel:  # type(Info) == EFI_IFR_GUID_LABEL
                         f.write(KeyIndent + '- label:\n')
-                        if Root.Condition != None: # hard code here, do not need to show condition any more
+                        if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
 
@@ -1816,7 +1817,7 @@ class IfrTree():
 
                     if type(Root.Data) == IfrBanner:
                         f.write(KeyIndent + '- banner:\n')
-                        if Root.Condition != None: # hard code here, do not need to show condition any more
+                        if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
 
@@ -1828,7 +1829,7 @@ class IfrTree():
 
                     if type(Root.Data) == IfrTimeout:
                         f.write(KeyIndent + '- banner:\n')
-                        if Root.Condition != None: # hard code here, do not need to show condition any more
+                        if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
 
@@ -1849,7 +1850,7 @@ class IfrTree():
                             KeyIndent = ' ' *((Root.Level *2 - 1) * 2)
                             ValueIndent = ' ' * ((Root.Level*2 + 1) * 2)
                         f.write(KeyIndent + '- guidop:\n')
-                        if Root.Condition != None: # hard code here, do not need to show condition any more
+                        if Root.Condition != None:
                             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                         f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
@@ -1865,7 +1866,7 @@ class IfrTree():
                 # if Root.OpCode == EFI_IFR_INCONSISTENT_IF_OP:
                 #     if type(Root.Data) == IfrInconsistentIf2:  #
                 #         f.write(KeyIndent + '- inconsistentif:\n')
-                #         if Root.Condition != None: # hard code here, do not need to show condition any more
+                #         if Root.Condition != None:
                 #             f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                 #                 Root.Condition))
                 #         f.write(ValueIndent + 'prompt:  {} # STRING_ID\n'.format(
@@ -1875,7 +1876,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_NO_SUBMIT_IF_OP:
                     f.write(KeyIndent + '- nosubmitif:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'prompt:  {} # STRING_ID\n'.format(
@@ -1885,7 +1886,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_READ_OP:
                     f.write(KeyIndent + '- read:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
@@ -1893,7 +1894,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_WRITE_OP:
                     f.write(KeyIndent + '- write:\n')
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
                     f.write(ValueIndent + 'expression:  \'{}\'\n'.format(
@@ -1905,16 +1906,16 @@ class IfrTree():
                         Root.Expression))
 
                 if Root.OpCode == EFI_IFR_MODAL_TAG_OP:
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
-                    f.write(KeyIndent + '- modal: tag\n')
+                    f.write(KeyIndent + '- modal: null\n')
 
                 if Root.OpCode == EFI_IFR_LOCKED_OP:
-                    if Root.Condition != None: # hard code here, do not need to show condition any more
+                    if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
-                    f.write(KeyIndent + '- locked: tag\n')
+                    f.write(KeyIndent + '- locked: null\n')
 
                 # if Root.OpCode == EFI_IFR_SUPPRESS_IF_OP:
                 #     f.write(KeyIndent + '- suppressif:\n')
