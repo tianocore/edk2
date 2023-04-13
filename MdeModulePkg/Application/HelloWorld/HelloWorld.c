@@ -11,6 +11,7 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiApplicationEntryPoint.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 //
 // String token ID of help message text.
@@ -53,6 +54,7 @@ UefiMain (
       // Use UefiLib Print API to print string to UEFI console
       //
       Print ((CHAR16 *)PcdGetPtr (PcdHelloWorldPrintString));
+      gBS->Stall (10000000);
     }
   }
 
