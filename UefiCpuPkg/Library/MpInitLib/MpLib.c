@@ -695,6 +695,12 @@ ApWakeupFunction (
       BistData     = (UINT32)ApStackData->Bist;
 
       //
+      // Synchronize APIC mode with BSP in the first time AP wakeup ONLY.
+      //
+      SetApicMode (CpuMpData->InitialBspApicMode);
+      CurrentApicMode = CpuMpData->InitialBspApicMode;
+
+      //
       // CpuMpData->CpuData[0].VolatileRegisters is initialized based on BSP environment,
       //   to initialize AP in InitConfig path.
       // NOTE: IDTR.BASE stored in CpuMpData->CpuData[0].VolatileRegisters points to a different IDT shared by all APs.
@@ -1976,6 +1982,11 @@ MpInitLibInitialize (
   // Enable the local APIC for Virtual Wire Mode.
   //
   ProgramVirtualWireMode ();
+
+  //
+  // Save APIC mode for AP to sync
+  //
+  CpuMpData->InitialBspApicMode = GetApicMode ();
 
   if (OldCpuMpData == NULL) {
     if (MaxLogicalProcessorNumber > 1) {
