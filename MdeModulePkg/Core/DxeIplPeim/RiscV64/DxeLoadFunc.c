@@ -36,7 +36,7 @@ HandOffToDxeCore (
   //
   BaseOfStack = AllocatePages (EFI_SIZE_TO_PAGES (STACK_SIZE));
   if (BaseOfStack == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Can't allocate memory for stack.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Can't allocate memory for stack.", __func__));
     ASSERT (FALSE);
   }
 
@@ -52,7 +52,7 @@ HandOffToDxeCore (
   //
   Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Fail to signal End of PEI event.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to signal End of PEI event.", __func__));
     ASSERT (FALSE);
   }
 

@@ -42,7 +42,7 @@ ArmVirtPL031FdtClientLibConstructor (
     DEBUG ((
       DEBUG_WARN,
       "%a: No 'arm,pl031' compatible DT node found\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_SUCCESS;
   }
@@ -58,7 +58,7 @@ ArmVirtPL031FdtClientLibConstructor (
     DEBUG ((
       DEBUG_WARN,
       "%a: No 'reg' property found in 'arm,pl031' compatible DT node\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_SUCCESS;
   }

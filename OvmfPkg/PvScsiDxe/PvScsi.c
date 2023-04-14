@@ -904,7 +904,7 @@ PvScsiSetPciAttributes (
     DEBUG ((
       DEBUG_WARN,
       "%a: failed to enable 64-bit DMA addresses\n",
-      __FUNCTION__
+      __func__
       ));
   }
 
@@ -1279,7 +1279,7 @@ PvScsiExitBoot (
   PVSCSI_DEV  *Dev;
 
   Dev = Context;
-  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __func__, Context));
 
   //
   // Reset the device to stop device usage of the rings.

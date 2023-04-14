@@ -943,7 +943,7 @@ VirtioBlkInit (
   DEBUG ((
     DEBUG_INFO,
     "%a: LbaSize=0x%x[B] NumBlocks=0x%Lx[Lba]\n",
-    __FUNCTION__,
+    __func__,
     Dev->BlockIoMedia.BlockSize,
     Dev->BlockIoMedia.LastBlock + 1
     ));
@@ -958,14 +958,14 @@ VirtioBlkInit (
     DEBUG ((
       DEBUG_INFO,
       "%a: FirstAligned=0x%Lx[Lba] PhysBlkSize=0x%x[Lba]\n",
-      __FUNCTION__,
+      __func__,
       Dev->BlockIoMedia.LowestAlignedLba,
       Dev->BlockIoMedia.LogicalBlocksPerPhysicalBlock
       ));
     DEBUG ((
       DEBUG_INFO,
       "%a: OptimalTransferLengthGranularity=0x%x[Lba]\n",
-      __FUNCTION__,
+      __func__,
       Dev->BlockIoMedia.OptimalTransferLengthGranularity
       ));
   }
@@ -1037,7 +1037,7 @@ VirtioBlkExitBoot (
 {
   VBLK_DEV  *Dev;
 
-  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __func__, Context));
   //
   // Reset the device. This causes the hypervisor to forget about the virtio
   // ring.

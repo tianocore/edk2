@@ -509,7 +509,7 @@ S3ResumeBootOs (
     DEBUG ((
       DEBUG_INFO,
       "%a() Stack Base: 0x%x, Stack Size: 0x%x\n",
-      __FUNCTION__,
+      __func__,
       TempStackTop,
       sizeof (TempStack)
       ));

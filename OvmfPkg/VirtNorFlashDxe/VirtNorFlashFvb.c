@@ -74,7 +74,7 @@ InitializeFvAndVariableStoreHeaders (
     DEBUG ((
       DEBUG_ERROR,
       "%a: NvStorageFtwWorkingBase is not contiguous with NvStorageVariableBase region\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_INVALID_PARAMETER;
   }
@@ -83,7 +83,7 @@ InitializeFvAndVariableStoreHeaders (
     DEBUG ((
       DEBUG_ERROR,
       "%a: NvStorageFtwSpareBase is not contiguous with NvStorageFtwWorkingBase region\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_INVALID_PARAMETER;
   }
@@ -93,7 +93,7 @@ InitializeFvAndVariableStoreHeaders (
     DEBUG ((
       DEBUG_ERROR,
       "%a: NvStorageVariableSize is 0x%x, should be atleast one block size\n",
-      __FUNCTION__,
+      __func__,
       NvStorageVariableSize
       ));
     return EFI_INVALID_PARAMETER;
@@ -103,7 +103,7 @@ InitializeFvAndVariableStoreHeaders (
     DEBUG ((
       DEBUG_ERROR,
       "%a: NvStorageFtwWorkingSize is 0x%x, should be atleast one block size\n",
-      __FUNCTION__,
+      __func__,
       NvStorageFtwWorkingSize
       ));
     return EFI_INVALID_PARAMETER;
@@ -113,7 +113,7 @@ InitializeFvAndVariableStoreHeaders (
     DEBUG ((
       DEBUG_ERROR,
       "%a: NvStorageFtwSpareSize is 0x%x, should be atleast one block size\n",
-      __FUNCTION__,
+      __func__,
       NvStorageFtwSpareSize
       ));
     return EFI_INVALID_PARAMETER;
@@ -124,7 +124,7 @@ InitializeFvAndVariableStoreHeaders (
       (NvStorageFtwWorkingBase % Instance->BlockSize != 0) ||
       (NvStorageFtwSpareBase % Instance->BlockSize != 0))
   {
-    DEBUG ((DEBUG_ERROR, "%a: NvStorage Base addresses must be aligned to block size boundaries", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: NvStorage Base addresses must be aligned to block size boundaries", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -209,7 +209,7 @@ ValidateFvHeader (
     DEBUG ((
       DEBUG_INFO,
       "%a: No Firmware Volume header present\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_NOT_FOUND;
   }
@@ -219,7 +219,7 @@ ValidateFvHeader (
     DEBUG ((
       DEBUG_INFO,
       "%a: Firmware Volume Guid non-compatible\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_NOT_FOUND;
   }
@@ -230,7 +230,7 @@ ValidateFvHeader (
     DEBUG ((
       DEBUG_INFO,
       "%a: FV checksum is invalid (Checksum:0x%X)\n",
-      __FUNCTION__,
+      __func__,
       Checksum
       ));
     return EFI_NOT_FOUND;
@@ -245,7 +245,7 @@ ValidateFvHeader (
     DEBUG ((
       DEBUG_INFO,
       "%a: Variable Store Guid non-compatible\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_NOT_FOUND;
   }
@@ -255,7 +255,7 @@ ValidateFvHeader (
     DEBUG ((
       DEBUG_INFO,
       "%a: Variable Store Length does not match\n",
-      __FUNCTION__
+      __func__
       ));
     return EFI_NOT_FOUND;
   }

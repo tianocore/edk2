@@ -21,6 +21,7 @@
 
 [Includes]
   Include
+  Test/Mock/Include
 
 [LibraryClasses]
   ##  @libraryclass  Provides hash interfaces from different implementations.

@@ -71,7 +71,7 @@ S3SaveStateInstalledNotify (
     DEBUG_INFO,
     "%a: %a: DmaAccess@0x%Lx ScratchBuffer@[0x%Lx+0x%Lx]\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     (UINT64)(UINTN)mDmaAccess,
     (UINT64)(UINTN)mScratchBuffer,
     (UINT64)mScratchBufferSize
@@ -161,7 +161,7 @@ QemuFwCfgS3CallWhenBootScriptReady (
       DEBUG_ERROR,
       "%a: %a: fw_cfg DMA unavailable\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     return RETURN_NOT_FOUND;
   }
@@ -177,7 +177,7 @@ QemuFwCfgS3CallWhenBootScriptReady (
       DEBUG_ERROR,
       "%a: %a: ScratchBufferSize too big: %Lu\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       (UINT64)ScratchBufferSize
       ));
     return RETURN_BAD_BUFFER_SIZE;
@@ -192,7 +192,7 @@ QemuFwCfgS3CallWhenBootScriptReady (
       DEBUG_ERROR,
       "%a: %a: AllocateReservedPool(): out of resources\n",
       gEfiCallerBaseName,
-      __FUNCTION__
+      __func__
       ));
     return RETURN_OUT_OF_RESOURCES;
   }
@@ -215,7 +215,7 @@ QemuFwCfgS3CallWhenBootScriptReady (
       DEBUG_ERROR,
       "%a: %a: CreateEvent(): %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto FreeDmaAccess;
@@ -231,7 +231,7 @@ QemuFwCfgS3CallWhenBootScriptReady (
       DEBUG_ERROR,
       "%a: %a: RegisterProtocolNotify(): %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto CloseEvent;
@@ -256,7 +256,7 @@ QemuFwCfgS3CallWhenBootScriptReady (
       DEBUG_ERROR,
       "%a: %a: SignalEvent(): %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto NullGlobals;
@@ -383,7 +383,7 @@ QemuFwCfgS3ScriptWriteBytes (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;
@@ -409,7 +409,7 @@ QemuFwCfgS3ScriptWriteBytes (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;
@@ -436,7 +436,7 @@ QemuFwCfgS3ScriptWriteBytes (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;
@@ -544,7 +544,7 @@ QemuFwCfgS3ScriptReadBytes (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;
@@ -570,7 +570,7 @@ QemuFwCfgS3ScriptReadBytes (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;
@@ -597,7 +597,7 @@ QemuFwCfgS3ScriptReadBytes (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;
@@ -692,7 +692,7 @@ QemuFwCfgS3ScriptSkipBytes (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;
@@ -718,7 +718,7 @@ QemuFwCfgS3ScriptSkipBytes (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_IO_WRITE_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;
@@ -745,7 +745,7 @@ QemuFwCfgS3ScriptSkipBytes (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;
@@ -877,7 +877,7 @@ QemuFwCfgS3ScriptCheckValue (
       DEBUG_ERROR,
       "%a: %a: EFI_BOOT_SCRIPT_MEM_POLL_OPCODE: %r\n",
       gEfiCallerBaseName,
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return (RETURN_STATUS)Status;

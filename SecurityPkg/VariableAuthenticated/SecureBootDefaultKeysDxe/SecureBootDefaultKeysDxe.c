@@ -42,35 +42,35 @@ SecureBootDefaultKeysEntryPoint (
 
   Status = SecureBootInitPKDefault ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize PKDefault: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize PKDefault: %r\n", __func__, Status));
     return Status;
   }
 
   Status = SecureBootInitKEKDefault ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize KEKDefault: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize KEKDefault: %r\n", __func__, Status));
     return Status;
   }
 
   Status = SecureBootInitDbDefault ();
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize dbDefault: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize dbDefault: %r\n", __func__, Status));
     return Status;
   }
 
   Status = SecureBootInitDbtDefault ();
   if (Status == EFI_NOT_FOUND) {
-    DEBUG ((DEBUG_INFO, "%a: dbtDefault not initialized\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: dbtDefault not initialized\n", __func__));
   } else if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize dbtDefault: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize dbtDefault: %r\n", __func__, Status));
     return Status;
   }
 
   Status = SecureBootInitDbxDefault ();
   if (Status == EFI_NOT_FOUND) {
-    DEBUG ((DEBUG_INFO, "%a: dbxDefault not initialized\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: dbxDefault not initialized\n", __func__));
   } else if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize dbxDefault: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Cannot initialize dbxDefault: %r\n", __func__, Status));
     return Status;
   }
 

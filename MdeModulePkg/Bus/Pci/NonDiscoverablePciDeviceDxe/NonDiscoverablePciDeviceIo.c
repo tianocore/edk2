@@ -1843,7 +1843,7 @@ InitializePciIoProtocol (
       DEBUG ((
         DEBUG_ERROR,
         "%a: resource count exceeds number of emulated BARs\n",
-        __FUNCTION__
+        __func__
         ));
       ASSERT (FALSE);
       break;

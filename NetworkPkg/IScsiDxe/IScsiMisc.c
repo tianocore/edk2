@@ -875,7 +875,7 @@ IScsiCreateAttempts (
         DEBUG_ERROR,
         "%a: Failed to set 'InitialAttemptOrder' with Guid (%g): "
         "%r\n",
-        __FUNCTION__,
+        __func__,
         &gIScsiConfigGuid,
         Status
         ));
@@ -926,7 +926,7 @@ IScsiCreateAttempts (
         DEBUG_ERROR,
         "%a: Failed to set variable (mPrivate->PortString) with Guid (%g): "
         "%r\n",
-        __FUNCTION__,
+        __func__,
         &gEfiIScsiInitiatorNameProtocolGuid,
         Status
         ));

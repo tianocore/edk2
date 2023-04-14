@@ -1157,7 +1157,7 @@ SmbiosCreateTable (
     DEBUG ((
       DEBUG_INFO,
       "%a() re-allocate SMBIOS 32-bit table\n",
-      __FUNCTION__
+      __func__
       ));
     if (EntryPointStructure->TableAddress != 0) {
       //
@@ -1329,7 +1329,7 @@ SmbiosCreate64BitTable (
     DEBUG ((
       DEBUG_INFO,
       "%a() re-allocate SMBIOS 64-bit table\n",
-      __FUNCTION__
+      __func__
       ));
     if (Smbios30EntryPointStructure->TableAddress != 0) {
       //

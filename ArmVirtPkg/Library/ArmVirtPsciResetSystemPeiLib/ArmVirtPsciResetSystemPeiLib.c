@@ -73,7 +73,7 @@ DiscoverPsciMethod (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Missing PSCI method property\n",
-          __FUNCTION__
+          __func__
           ));
         return PsciMethodUnknown;
       }
@@ -86,7 +86,7 @@ DiscoverPsciMethod (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Unknown PSCI method \"%a\"\n",
-          __FUNCTION__,
+          __func__,
           Prop
           ));
         return PsciMethodUnknown;
@@ -119,7 +119,7 @@ PerformPsciAction (
       break;
 
     default:
-      DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: no PSCI method defined\n", __func__));
       ASSERT (FALSE);
   }
 }

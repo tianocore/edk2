@@ -164,7 +164,7 @@ AllocatePageTableMemory (
     DEBUG_VERBOSE,
     "%a:%a: Buffer=0x%Lx Pages=%ld\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     Buffer,
     Pages
     ));
@@ -561,7 +561,7 @@ InternalMemEncryptSevCreateIdentityMap1G (
     DEBUG_VERBOSE,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     Cr3BaseAddress,
     PhysicalAddress,
     (UINT64)Length
@@ -606,7 +606,7 @@ InternalMemEncryptSevCreateIdentityMap1G (
         DEBUG_ERROR,
         "%a:%a: bad PML4 for Physical=0x%Lx\n",
         gEfiCallerBaseName,
-        __FUNCTION__,
+        __func__,
         PhysicalAddress
         ));
       Status = RETURN_NO_MAPPING;
@@ -713,7 +713,7 @@ SetMemoryEncDec (
     DEBUG_VERBOSE,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u Mmio=%u\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     Cr3BaseAddress,
     PhysicalAddress,
     (UINT64)Length,
@@ -786,7 +786,7 @@ SetMemoryEncDec (
         DEBUG_ERROR,
         "%a:%a: bad PML4 for Physical=0x%Lx\n",
         gEfiCallerBaseName,
-        __FUNCTION__,
+        __func__,
         PhysicalAddress
         ));
       Status = RETURN_NO_MAPPING;
@@ -803,7 +803,7 @@ SetMemoryEncDec (
         DEBUG_ERROR,
         "%a:%a: bad PDPE for Physical=0x%Lx\n",
         gEfiCallerBaseName,
-        __FUNCTION__,
+        __func__,
         PhysicalAddress
         ));
       Status = RETURN_NO_MAPPING;
@@ -824,7 +824,7 @@ SetMemoryEncDec (
           DEBUG_VERBOSE,
           "%a:%a: updated 1GB entry for Physical=0x%Lx\n",
           gEfiCallerBaseName,
-          __FUNCTION__,
+          __func__,
           PhysicalAddress
           ));
         PhysicalAddress += BIT30;
@@ -837,7 +837,7 @@ SetMemoryEncDec (
           DEBUG_VERBOSE,
           "%a:%a: splitting 1GB page for Physical=0x%Lx\n",
           gEfiCallerBaseName,
-          __FUNCTION__,
+          __func__,
           PhysicalAddress
           ));
         Split1GPageTo2M (
@@ -865,7 +865,7 @@ SetMemoryEncDec (
           DEBUG_ERROR,
           "%a:%a: bad PDE for Physical=0x%Lx\n",
           gEfiCallerBaseName,
-          __FUNCTION__,
+          __func__,
           PhysicalAddress
           ));
         Status = RETURN_NO_MAPPING;
@@ -892,7 +892,7 @@ SetMemoryEncDec (
             DEBUG_VERBOSE,
             "%a:%a: splitting 2MB page for Physical=0x%Lx\n",
             gEfiCallerBaseName,
-            __FUNCTION__,
+            __func__,
             PhysicalAddress
             ));
           Split2MPageTo4K (
@@ -917,7 +917,7 @@ SetMemoryEncDec (
             DEBUG_ERROR,
             "%a:%a: bad PTE for Physical=0x%Lx\n",
             gEfiCallerBaseName,
-            __FUNCTION__,
+            __func__,
             PhysicalAddress
             ));
           Status = RETURN_NO_MAPPING;

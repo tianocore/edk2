@@ -75,7 +75,7 @@ InitializeVirtioFdtDxe (
       DEBUG ((
         DEBUG_ERROR,
         "%a: GetNodeProperty () failed (Status == %r)\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       continue;
@@ -93,7 +93,7 @@ InitializeVirtioFdtDxe (
                                                    sizeof (VIRTIO_TRANSPORT_DEVICE_PATH)
                                                    );
     if (DevicePath == NULL) {
-      DEBUG ((DEBUG_ERROR, "%a: Out of memory\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: Out of memory\n", __func__));
       continue;
     }
 
@@ -117,7 +117,7 @@ InitializeVirtioFdtDxe (
         DEBUG_ERROR,
         "%a: Failed to install the EFI_DEVICE_PATH "
         "protocol on a new handle (Status == %r)\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       FreePool (DevicePath);
@@ -130,7 +130,7 @@ InitializeVirtioFdtDxe (
         DEBUG_ERROR,
         "%a: Failed to install VirtIO transport @ 0x%Lx "
         "on handle %p (Status == %r)\n",
-        __FUNCTION__,
+        __func__,
         RegBase,
         Handle,
         Status
@@ -152,7 +152,7 @@ InitializeVirtioFdtDxe (
       DEBUG_ERROR,
       "%a: Error occurred while iterating DT nodes "
       "(FindNodeStatus == %r)\n",
-      __FUNCTION__,
+      __func__,
       FindNodeStatus
       ));
   }

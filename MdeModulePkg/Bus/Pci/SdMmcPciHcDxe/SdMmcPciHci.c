@@ -498,7 +498,7 @@ SdMmcHcReset (
       DEBUG ((
         DEBUG_WARN,
         "%a: SD/MMC pre reset notifier callback failed - %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       return Status;
@@ -556,7 +556,7 @@ SdMmcHcReset (
       DEBUG ((
         DEBUG_WARN,
         "%a: SD/MMC post reset notifier callback failed - %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
     }
@@ -942,7 +942,7 @@ SdMmcHcClockSupply (
       DEBUG ((
         DEBUG_ERROR,
         "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       return Status;
@@ -1234,7 +1234,7 @@ SdMmcHcInitHost (
       DEBUG ((
         DEBUG_WARN,
         "%a: SD/MMC pre init notifier callback failed - %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       return Status;
@@ -1286,7 +1286,7 @@ SdMmcHcInitHost (
       DEBUG ((
         DEBUG_WARN,
         "%a: SD/MMC post init notifier callback failed - %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
     }
@@ -1375,7 +1375,7 @@ SdMmcHcUhsSignaling (
       DEBUG ((
         DEBUG_ERROR,
         "%a: SD/MMC uhs signaling notifier callback failed - %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       return Status;

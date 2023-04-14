@@ -63,7 +63,7 @@ SecStartup (
   DEBUG ((
     DEBUG_INFO,
     "%a() BootHartId: 0x%x, DeviceTreeAddress=0x%x\n",
-    __FUNCTION__,
+    __func__,
     BootHartId,
     DeviceTreeAddress
     ));

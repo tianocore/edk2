@@ -125,14 +125,14 @@ NvmeRead (
       MaxTransferBlocks = MaxTransferBlocks >> 1;
 
       if ((Retries > NVME_READ_MAX_RETRY) || (MaxTransferBlocks < 1)) {
-        DEBUG ((DEBUG_ERROR, "%a: ReadSectors fail, Status - %r\n", __FUNCTION__, Status));
+        DEBUG ((DEBUG_ERROR, "%a: ReadSectors fail, Status - %r\n", __func__, Status));
         break;
       }
 
       DEBUG ((
         DEBUG_BLKIO,
         "%a: ReadSectors fail, retry with smaller transfer block number - 0x%x\n",
-        __FUNCTION__,
+        __func__,
         MaxTransferBlocks
         ));
       continue;
@@ -151,7 +151,7 @@ NvmeRead (
     DEBUG_BLKIO,
     "%a: Lba = 0x%08Lx, Original = 0x%08Lx, "
     "Remaining = 0x%08Lx, BlockSize = 0x%x, Status = %r\n",
-    __FUNCTION__,
+    __func__,
     Lba,
     (UINT64)OrginalBlocks,
     (UINT64)Blocks,

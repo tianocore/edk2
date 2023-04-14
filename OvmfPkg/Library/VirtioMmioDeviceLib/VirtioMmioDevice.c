@@ -85,7 +85,7 @@ VirtioMmioInit (
       DEBUG ((
         DEBUG_INFO,
         "%a virtio 0.9.5, id %d\n",
-        __FUNCTION__,
+        __func__,
         Device->VirtioDevice.SubSystemDeviceId
         ));
       Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (0, 9, 5);
@@ -94,7 +94,7 @@ VirtioMmioInit (
       DEBUG ((
         DEBUG_INFO,
         "%a virtio 1.0, id %d\n",
-        __FUNCTION__,
+        __func__,
         Device->VirtioDevice.SubSystemDeviceId
         ));
       Device->VirtioDevice.Revision = VIRTIO_SPEC_REVISION (1, 0, 0);

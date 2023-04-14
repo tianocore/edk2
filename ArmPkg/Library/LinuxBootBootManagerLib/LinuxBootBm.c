@@ -151,7 +151,7 @@ PlatformBootManagerAfterConsole (
       LOAD_OPTION_ACTIVE
       );
   } else {
-    DEBUG ((DEBUG_ERROR, "%a: PcdLinuxBootFileGuid was not set!\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: PcdLinuxBootFileGuid was not set!\n", __func__));
   }
 }
 
