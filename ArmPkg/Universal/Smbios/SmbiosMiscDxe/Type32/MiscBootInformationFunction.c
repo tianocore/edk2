@@ -69,7 +69,7 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscBootInformation) {
     DEBUG ((
       DEBUG_ERROR,
       "[%a]:[%dL] Smbios Type32 Table Log Failed! %r \n",
-      __FUNCTION__,
+      __func__,
       DEBUG_LINE_NUMBER,
       Status
       ));

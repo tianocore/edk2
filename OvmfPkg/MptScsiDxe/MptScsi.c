@@ -278,7 +278,7 @@ ReportHostAdapterError (
   OUT EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET  *Packet
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a: fatal error in scsi request\n", __FUNCTION__));
+  DEBUG ((DEBUG_ERROR, "%a: fatal error in scsi request\n", __func__));
   Packet->InTransferLength  = 0;
   Packet->OutTransferLength = 0;
   Packet->SenseDataLength   = 0;
@@ -509,7 +509,7 @@ MptScsiHandleReply (
     Packet->HostAdapterStatus = EFI_EXT_SCSI_STATUS_HOST_ADAPTER_OK;
     Packet->TargetStatus      = EFI_EXT_SCSI_STATUS_TARGET_GOOD;
   } else if ((Reply & BIT31) != 0) {
-    DEBUG ((DEBUG_INFO, "%a: Full reply returned\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: Full reply returned\n", __func__));
     //
     // When reply MSB is set, we got a full reply. Since we submitted only one
     // reply frame, we know it's IoReply.
@@ -549,7 +549,7 @@ MptScsiHandleReply (
         return EFI_DEVICE_ERROR;
     }
   } else {
-    DEBUG ((DEBUG_ERROR, "%a: unexpected reply (%x)\n", __FUNCTION__, Reply));
+    DEBUG ((DEBUG_ERROR, "%a: unexpected reply (%x)\n", __func__, Reply));
     return ReportHostAdapterError (Packet);
   }
 
@@ -785,7 +785,7 @@ MptScsiExitBoot (
   MPT_SCSI_DEV  *Dev;
 
   Dev = Context;
-  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __FUNCTION__, Context));
+  DEBUG ((DEBUG_VERBOSE, "%a: Context=0x%p\n", __func__, Context));
   MptScsiReset (Dev);
 }
 
@@ -940,7 +940,7 @@ MptScsiControllerStart (
     DEBUG ((
       DEBUG_WARN,
       "%a: failed to enable 64-bit DMA addresses\n",
-      __FUNCTION__
+      __func__
       ));
   }
 

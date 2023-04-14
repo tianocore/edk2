@@ -73,7 +73,7 @@ ProcessPrmModules (
 
   UINT64  HandlerPhysicalAddress;
 
-  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __func__));
 
   if (PrmAcpiDescriptionTable == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -89,19 +89,19 @@ ProcessPrmModules (
       DEBUG_ERROR,
       "  %a %a: The Platform GUID in the DSC file must be set to a unique non-zero value.\n",
       _DBGMSGID_,
-      __FUNCTION__
+      __func__
       ));
     ASSERT (!CompareGuid (&gEdkiiDscPlatformGuid, &gZeroGuid));
   }
 
-  DEBUG ((DEBUG_INFO, "  %a %a: %d total PRM modules to process.\n", _DBGMSGID_, __FUNCTION__, mPrmModuleCount));
-  DEBUG ((DEBUG_INFO, "  %a %a: %d total PRM handlers to process.\n", _DBGMSGID_, __FUNCTION__, mPrmHandlerCount));
+  DEBUG ((DEBUG_INFO, "  %a %a: %d total PRM modules to process.\n", _DBGMSGID_, __func__, mPrmModuleCount));
+  DEBUG ((DEBUG_INFO, "  %a %a: %d total PRM handlers to process.\n", _DBGMSGID_, __func__, mPrmHandlerCount));
 
   PrmAcpiDescriptionTableBufferSize = (UINT32)(OFFSET_OF (PRM_ACPI_DESCRIPTION_TABLE, PrmModuleInfoStructure) +
                                                (OFFSET_OF (PRM_MODULE_INFORMATION_STRUCT, HandlerInfoStructure) *  mPrmModuleCount) +
                                                (sizeof (PRM_HANDLER_INFORMATION_STRUCT) * mPrmHandlerCount)
                                                );
-  DEBUG ((DEBUG_INFO, "  %a %a: Total PRM ACPI table size: 0x%x.\n", _DBGMSGID_, __FUNCTION__, PrmAcpiDescriptionTableBufferSize));
+  DEBUG ((DEBUG_INFO, "  %a %a: Total PRM ACPI table size: 0x%x.\n", _DBGMSGID_, __func__, PrmAcpiDescriptionTableBufferSize));
 
   PrmAcpiTable = AllocateZeroPool ((UINTN)PrmAcpiDescriptionTableBufferSize);
   if (PrmAcpiTable == NULL) {
@@ -139,7 +139,7 @@ ProcessPrmModules (
       DEBUG_INFO,
       "  %a %a: PRM Module - %a with %d handlers.\n",
       _DBGMSGID_,
-      __FUNCTION__,
+      __func__,
       (CHAR8 *)((UINTN)CurrentImageAddress + CurrentImageExportDirectory->Name),
       CurrentExportDescriptorStruct->Header.NumberPrmHandlers
       ));
@@ -212,7 +212,7 @@ ProcessPrmModules (
           DEBUG_INFO,
           "    %a %a: Found %a handler physical address at 0x%016x.\n",
           _DBGMSGID_,
-          __FUNCTION__,
+          __func__,
           CurrentExportDescriptorHandlerName,
           CurrentHandlerInfoStruct->PhysicalAddress
           ));
@@ -279,7 +279,7 @@ PublishPrmAcpiTable (
                                   &TableKey
                                   );
     if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a %a: The PRMT ACPI table was installed successfully.\n", _DBGMSGID_, __FUNCTION__));
+      DEBUG ((DEBUG_INFO, "%a %a: The PRMT ACPI table was installed successfully.\n", _DBGMSGID_, __func__));
     }
   }
 
@@ -316,7 +316,7 @@ PrmLoaderEndOfDxeNotification (
   EFI_STATUS                  Status;
   PRM_ACPI_DESCRIPTION_TABLE  *PrmAcpiDescriptionTable;
 
-  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __func__));
 
   Status = DiscoverPrmModules (&mPrmModuleCount, &mPrmHandlerCount);
   ASSERT_EFI_ERROR (Status);
@@ -354,7 +354,7 @@ PrmLoaderEntryPoint (
   EFI_STATUS  Status;
   EFI_EVENT   EndOfDxeEvent;
 
-  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a %a - Entry.\n", _DBGMSGID_, __func__));
 
   //
   // Discover and process installed PRM modules at the End of DXE
@@ -369,7 +369,7 @@ PrmLoaderEntryPoint (
                   &EndOfDxeEvent
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a %a: EndOfDxe callback registration failed! %r.\n", _DBGMSGID_, __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a %a: EndOfDxe callback registration failed! %r.\n", _DBGMSGID_, __func__, Status));
     ASSERT_EFI_ERROR (Status);
   }
 

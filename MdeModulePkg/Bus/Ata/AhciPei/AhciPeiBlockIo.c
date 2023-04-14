@@ -101,7 +101,7 @@ AccessAtaDevice (
     DEBUG ((
       DEBUG_BLKIO,
       "%a: Blocking AccessAtaDevice, TransferBlockNumber = %x; StartLba = %x\n",
-      __FUNCTION__,
+      __func__,
       TransferBlockNumber,
       StartLba
       ));

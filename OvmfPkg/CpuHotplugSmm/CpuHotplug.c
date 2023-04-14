@@ -135,7 +135,7 @@ ProcessHotAddedCpus (
         DEBUG_VERBOSE,
         "%a: APIC ID " FMT_APIC_ID " was hot-plugged "
                                    "before; ignoring it\n",
-        __FUNCTION__,
+        __func__,
         NewApicId
         ));
       PluggedIdx++;
@@ -155,7 +155,7 @@ ProcessHotAddedCpus (
       DEBUG ((
         DEBUG_ERROR,
         "%a: no room for APIC ID " FMT_APIC_ID "\n",
-        __FUNCTION__,
+        __func__,
         NewApicId
         ));
       return EFI_OUT_OF_RESOURCES;
@@ -190,7 +190,7 @@ ProcessHotAddedCpus (
       DEBUG ((
         DEBUG_ERROR,
         "%a: AddProcessor(" FMT_APIC_ID "): %r\n",
-        __FUNCTION__,
+        __func__,
         NewApicId,
         Status
         ));
@@ -201,7 +201,7 @@ ProcessHotAddedCpus (
       DEBUG_INFO,
       "%a: hot-added APIC ID " FMT_APIC_ID ", SMBASE 0x%Lx, "
                                            "EFI_SMM_CPU_SERVICE_PROTOCOL assigned number %Lu\n",
-      __FUNCTION__,
+      __func__,
       NewApicId,
       (UINT64)mCpuHotPlugData->SmBase[NewSlot],
       (UINT64)NewProcessorNumberByProtocol
@@ -310,7 +310,7 @@ EjectCpu (
           DEBUG_INFO,
           "%a: Unplugged ProcessorNum %u, "
           "QemuSelector %Lu\n",
-          __FUNCTION__,
+          __func__,
           Idx,
           QemuSelector
           ));
@@ -454,7 +454,7 @@ UnplugCpus (
         DEBUG_VERBOSE,
         "%a: did not find APIC ID " FMT_APIC_ID
         " to unplug\n",
-        __FUNCTION__,
+        __func__,
         RemoveApicId
         ));
       ToUnplugIdx++;
@@ -469,7 +469,7 @@ UnplugCpus (
       DEBUG ((
         DEBUG_ERROR,
         "%a: RemoveProcessor(" FMT_APIC_ID "): %r\n",
-        __FUNCTION__,
+        __func__,
         RemoveApicId,
         Status
         ));
@@ -493,7 +493,7 @@ UnplugCpus (
         DEBUG_ERROR,
         "%a: ProcessorNum %Lu maps to QemuSelector %Lu, "
         "cannot also map to %u\n",
-        __FUNCTION__,
+        __func__,
         (UINT64)ProcessorNum,
         mCpuHotEjectData->QemuSelectorMap[ProcessorNum],
         QemuSelector
@@ -511,7 +511,7 @@ UnplugCpus (
       DEBUG_INFO,
       "%a: Started hot-unplug on ProcessorNum %Lu, APIC ID "
       FMT_APIC_ID ", QemuSelector %u\n",
-      __FUNCTION__,
+      __func__,
       (UINT64)ProcessorNum,
       RemoveApicId,
       QemuSelector
@@ -635,7 +635,7 @@ CpuHotplugMmi (
     DEBUG ((
       DEBUG_ERROR,
       "%a: failed to read ICH9_APM_CNT: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     //
@@ -736,7 +736,7 @@ CpuHotplugEntry (
                     (VOID **)&mMmCpuIo
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: locate MmCpuIo: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: locate MmCpuIo: %r\n", __func__, Status));
     goto Fatal;
   }
 
@@ -749,7 +749,7 @@ CpuHotplugEntry (
     DEBUG ((
       DEBUG_ERROR,
       "%a: locate MmCpuService: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto Fatal;
@@ -767,7 +767,7 @@ CpuHotplugEntry (
 
   if (mCpuHotPlugData == NULL) {
     Status = EFI_NOT_FOUND;
-    DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_PLUG_DATA: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_PLUG_DATA: %r\n", __func__, Status));
     goto Fatal;
   }
 
@@ -787,7 +787,7 @@ CpuHotplugEntry (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_EJECT_DATA: %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: CPU_HOT_EJECT_DATA: %r\n", __func__, Status));
     goto Fatal;
   }
 
@@ -799,7 +799,7 @@ CpuHotplugEntry (
       RETURN_ERROR (SafeUintnMult (sizeof (UINT32), Len, &SizeSel)))
   {
     Status = EFI_ABORTED;
-    DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_PLUG_DATA\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: invalid CPU_HOT_PLUG_DATA\n", __func__));
     goto Fatal;
   }
 
@@ -809,7 +809,7 @@ CpuHotplugEntry (
                     (VOID **)&mPluggedApicIds
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __func__, Status));
     goto Fatal;
   }
 
@@ -819,7 +819,7 @@ CpuHotplugEntry (
                     (VOID **)&mToUnplugApicIds
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __func__, Status));
     goto ReleasePluggedApicIds;
   }
 
@@ -829,7 +829,7 @@ CpuHotplugEntry (
                     (VOID **)&mToUnplugSelectors
                     );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: MmAllocatePool(): %r\n", __func__, Status));
     goto ReleaseToUnplugApicIds;
   }
 
@@ -874,7 +874,7 @@ CpuHotplugEntry (
     DEBUG ((
       DEBUG_ERROR,
       "%a: modern CPU hotplug interface: %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto ReleasePostSmmPen;
@@ -892,7 +892,7 @@ CpuHotplugEntry (
     DEBUG ((
       DEBUG_ERROR,
       "%a: MmiHandlerRegister(): %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto ReleasePostSmmPen;

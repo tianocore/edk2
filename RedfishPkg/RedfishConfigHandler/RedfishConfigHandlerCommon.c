@@ -122,7 +122,7 @@ RedfishConfigCommonInit (
   //
   Status = gBS->LocateProtocol (&gEdkIIRedfishCredentialProtocolGuid, NULL, (VOID **)&gCredential);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "%a: No Redfish Credential Protocol is installed on system.", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: No Redfish Credential Protocol is installed on system.", __func__));
     return Status;
   }
 
@@ -138,7 +138,7 @@ RedfishConfigCommonInit (
                   &gEndOfDxeEvent
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Fail to register End Of DXE event.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to register End Of DXE event.", __func__));
     return Status;
   }
 
@@ -156,7 +156,7 @@ RedfishConfigCommonInit (
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (gEndOfDxeEvent);
     gEndOfDxeEvent = NULL;
-    DEBUG ((DEBUG_ERROR, "%a: Fail to register Exit Boot Service event.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to register Exit Boot Service event.", __func__));
     return Status;
   }
 

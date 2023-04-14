@@ -23,3 +23,6 @@
 [submodule "UnitTestFrameworkPkg/Library/GoogleTestLib/googletest"]
 	path = UnitTestFrameworkPkg/Library/GoogleTestLib/googletest
 	url = https://github.com/google/googletest.git
+[submodule "UnitTestFrameworkPkg/Library/SubhookLib/subhook"]
+	path = UnitTestFrameworkPkg/Library/SubhookLib/subhook
+	url = https://github.com/Zeex/subhook.git

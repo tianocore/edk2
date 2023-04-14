@@ -277,7 +277,7 @@ _ModuleEntryPoint (
   DEBUG ((
     DEBUG_INFO,
     "%a() Stack Base: 0x%lx, Stack Size: 0x%lx\n",
-    __FUNCTION__,
+    __func__,
     EntrypointContext->StackBufferBase,
     EntrypointContext->StackBufferLength
     ));

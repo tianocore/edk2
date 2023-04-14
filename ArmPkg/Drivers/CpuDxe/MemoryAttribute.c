@@ -92,7 +92,7 @@ GetMemoryAttributes (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: BaseAddress == 0x%lx, Length == 0x%lx\n",
-    __FUNCTION__,
+    __func__,
     BaseAddress,
     Length
     ));
@@ -113,7 +113,7 @@ GetMemoryAttributes (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: RegionAddress == 0x%lx, RegionLength == 0x%lx, RegionAttributes == 0x%lx\n",
-      __FUNCTION__,
+      __func__,
       (UINT64)RegionAddress,
       (UINT64)RegionLength,
       (UINT64)RegionAttributes
@@ -130,7 +130,7 @@ GetMemoryAttributes (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: Union == %lx, Intersection == %lx\n",
-    __FUNCTION__,
+    __func__,
     (UINT64)Union,
     (UINT64)Intersection
     ));
@@ -188,7 +188,7 @@ SetMemoryAttributes (
   DEBUG ((
     DEBUG_INFO,
     "%a: BaseAddress == 0x%lx, Length == 0x%lx, Attributes == 0x%lx\n",
-    __FUNCTION__,
+    __func__,
     (UINTN)BaseAddress,
     (UINTN)Length,
     (UINTN)Attributes
@@ -272,7 +272,7 @@ ClearMemoryAttributes (
   DEBUG ((
     DEBUG_INFO,
     "%a: BaseAddress == 0x%lx, Length == 0x%lx, Attributes == 0x%lx\n",
-    __FUNCTION__,
+    __func__,
     (UINTN)BaseAddress,
     (UINTN)Length,
     (UINTN)Attributes

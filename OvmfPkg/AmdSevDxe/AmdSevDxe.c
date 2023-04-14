@@ -276,7 +276,7 @@ AmdSevDxeEntryPoint (
       DEBUG ((
         DEBUG_ERROR,
         "%a: MemEncryptSevClearPageEncMask(): %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       ASSERT (FALSE);

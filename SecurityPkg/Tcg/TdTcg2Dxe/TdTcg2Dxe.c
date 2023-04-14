@@ -1353,12 +1353,12 @@ TdHashLogExtendEvent (
   }
 
   if (CcEvent->Header.MrIndex == CC_MR_INDEX_0_MRTD) {
-    DEBUG ((DEBUG_ERROR, "%a: MRTD cannot be extended in TDVF.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: MRTD cannot be extended in TDVF.\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
   if (CcEvent->Header.MrIndex >= CC_MR_INDEX_INVALID) {
-    DEBUG ((DEBUG_ERROR, "%a: MrIndex is invalid. (%d)\n", __FUNCTION__, CcEvent->Header.MrIndex));
+    DEBUG ((DEBUG_ERROR, "%a: MrIndex is invalid. (%d)\n", __func__, CcEvent->Header.MrIndex));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2514,7 +2514,7 @@ DriverEntry (
     //
     // Cc measurement feature is crucial to a td-guest and it shall stop running immediately
     // when it is failed to be installed.
-    DEBUG ((DEBUG_ERROR, "%a: CcMeasurement protocol failed to be installed - %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: CcMeasurement protocol failed to be installed - %r\n", __func__, Status));
     CpuDeadLoop ();
   }
 

@@ -93,7 +93,7 @@ InitializeHighMemDxe (
         DEBUG ((
           DEBUG_WARN,
           "%a: Region 0x%lx - 0x%lx not found in the GCD memory space map\n",
-          __FUNCTION__,
+          __func__,
           CurBase,
           CurBase + CurSize - 1
           ));
@@ -112,7 +112,7 @@ InitializeHighMemDxe (
           DEBUG ((
             DEBUG_ERROR,
             "%a: Failed to add System RAM @ 0x%lx - 0x%lx (%r)\n",
-            __FUNCTION__,
+            __func__,
             CurBase,
             CurBase + CurSize - 1,
             Status
@@ -129,7 +129,7 @@ InitializeHighMemDxe (
           DEBUG ((
             DEBUG_WARN,
             "%a: gDS->SetMemorySpaceAttributes() failed on region 0x%lx - 0x%lx (%r)\n",
-            __FUNCTION__,
+            __func__,
             CurBase,
             CurBase + CurSize - 1,
             Status
@@ -160,7 +160,7 @@ InitializeHighMemDxe (
           DEBUG ((
             DEBUG_ERROR,
             "%a: Failed to set System RAM @ 0x%lx - 0x%lx attribute (%r)\n",
-            __FUNCTION__,
+            __func__,
             CurBase,
             CurBase + CurSize - 1,
             Status
@@ -169,7 +169,7 @@ InitializeHighMemDxe (
           DEBUG ((
             DEBUG_INFO,
             "%a: Add System RAM @ 0x%lx - 0x%lx\n",
-            __FUNCTION__,
+            __func__,
             CurBase,
             CurBase + CurSize - 1
             ));

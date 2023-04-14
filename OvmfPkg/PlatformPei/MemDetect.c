@@ -75,7 +75,7 @@ Q35TsegMbytesInitialization (
   DEBUG ((
     DEBUG_INFO,
     "%a: QEMU offers an extended TSEG (%d MB)\n",
-    __FUNCTION__,
+    __func__,
     ExtendedTsegMbytes
     ));
   PcdStatus = PcdSet16S (PcdQ35TsegMbytes, ExtendedTsegMbytes);
@@ -97,7 +97,7 @@ Q35SmramAtDefaultSmbaseInitialization (
     DEBUG ((
       DEBUG_INFO,
       "%a: SMRAM at default SMBASE not checked due to CSM\n",
-      __FUNCTION__
+      __func__
       ));
   } else {
     UINTN  CtlReg;
@@ -111,7 +111,7 @@ Q35SmramAtDefaultSmbaseInitialization (
     DEBUG ((
       DEBUG_INFO,
       "%a: SMRAM at default SMBASE %a\n",
-      __FUNCTION__,
+      __func__,
       PlatformInfoHob->Q35SmramAtDefaultSmbase ? "found" : "not found"
       ));
   }
@@ -152,7 +152,7 @@ AddressWidthInitialization (
       DEBUG ((
         DEBUG_INFO,
         "%a: disabling 64-bit PCI host aperture\n",
-        __FUNCTION__
+        __func__
         ));
       PcdStatus = PcdSet64S (PcdPciMmio64Size, 0);
       ASSERT_RETURN_ERROR (PcdStatus);
@@ -175,7 +175,7 @@ AddressWidthInitialization (
     DEBUG ((
       DEBUG_INFO,
       "%a: Pci64Base=0x%Lx Pci64Size=0x%Lx\n",
-      __FUNCTION__,
+      __func__,
       PlatformInfoHob->PcdPciMmio64Base,
       PlatformInfoHob->PcdPciMmio64Size
       ));
@@ -307,7 +307,7 @@ PublishPeiMemory (
     DEBUG ((
       DEBUG_INFO,
       "%a: PhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
-      __FUNCTION__,
+      __func__,
       PlatformInfoHob->PhysMemAddressWidth,
       PeiMemoryCap >> 10
       ));

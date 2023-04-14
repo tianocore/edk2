@@ -397,7 +397,7 @@ SP805Initialize (
       DEBUG ((
         DEBUG_ERROR,
         "%a: failed to register watchdog interrupt - %r\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       return Status;
@@ -406,7 +406,7 @@ SP805Initialize (
     DEBUG ((
       DEBUG_WARN,
       "%a: no interrupt specified, running in RESET mode only\n",
-      __FUNCTION__
+      __func__
       ));
   }
 

@@ -10,14 +10,14 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = MockPlatformPKProtectionLib
   FILE_GUID                      = 5FCD74D3-3965-4D56-AB83-000B9B4806A0
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = HOST_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatformPKProtectionLib|HOST_APPLICATION
+  LIBRARY_CLASS                  = PlatformPKProtectionLib
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]

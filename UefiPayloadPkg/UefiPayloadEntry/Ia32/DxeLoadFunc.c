@@ -355,7 +355,7 @@ HandOffToDxeCore (
     DEBUG ((
       DEBUG_INFO,
       "%a() Stack Base: 0x%lx, Stack Size: 0x%x\n",
-      __FUNCTION__,
+      __func__,
       BaseOfStack,
       STACK_SIZE
       ));
