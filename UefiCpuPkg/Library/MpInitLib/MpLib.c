@@ -758,6 +758,12 @@ ApWakeupFunction (
   CurrentApicMode = GetApicMode ();
   while (TRUE) {
     if (CpuMpData->InitFlag == ApInitConfig) {
+      //
+      // Synchronize APIC mode with BSP in the first time AP wakeup ONLY.
+      //
+      SetApicMode (CpuMpData->InitialBspApicMode);
+      CurrentApicMode = CpuMpData->InitialBspApicMode;
+
       ProcessorNumber = ApIndex;
       //
       // This is first time AP wakeup, get BIST information from AP stack
@@ -2220,6 +2226,11 @@ MpInitLibInitialize (
     ApResetVectorSizeAbove1Mb
     );
   DEBUG ((DEBUG_INFO, "AP Vector: non-16-bit = %p/%x\n", CpuMpData->WakeupBufferHigh, ApResetVectorSizeAbove1Mb));
+
+  //
+  // Save APIC mode for AP to sync
+  //
+  CpuMpData->InitialBspApicMode = GetApicMode ();
 
   //
   // Enable the local APIC for Virtual Wire Mode.
