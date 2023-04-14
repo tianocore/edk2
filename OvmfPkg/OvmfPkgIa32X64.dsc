@@ -77,6 +77,8 @@
 !endif
 !endif
 
+!include OvmfPkg/Include/Dsc/OvmfPkg.dsc.inc
+
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS             = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS           = /D MDEPKG_NDEBUG
