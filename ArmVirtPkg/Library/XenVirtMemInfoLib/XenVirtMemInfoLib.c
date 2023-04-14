@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2014-2017, Linaro Limited. All rights reserved.
+  Copyright (c) 2023, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -54,4 +55,24 @@ ArmVirtGetMemoryMap (
   mVirtualMemoryTable[1].Attributes   = 0x0;
 
   *VirtualMemoryMap = mVirtualMemoryTable;
+}
+
+/**
+  Configure the MMIO regions as shared with the VMM.
+
+  Set the protection attribute for the MMIO regions as Unprotected IPA.
+
+  @param[in]    IpaWidth  IPA width of the Realm.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_UNSUPPORTED        The execution context is not in a Realm.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaConfigureMmio (
+  IN UINT64  IpaWidth
+  )
+{
+  return RETURN_UNSUPPORTED;
 }
