@@ -2,7 +2,7 @@
   This library registers CPU features defined in Intel(R) 64 and IA-32
   Architectures Software Developer's Manual.
 
-  Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -187,18 +187,6 @@ CpuCommonFeaturesLibConstructor (
                C1eSupport,
                C1eInitialize,
                CPU_FEATURE_C1E,
-               CPU_FEATURE_END
-               );
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  if (IsCpuFeatureSupported (CPU_FEATURE_X2APIC)) {
-    Status = RegisterCpuFeature (
-               "X2Apic",
-               X2ApicGetConfigData,
-               X2ApicSupport,
-               X2ApicInitialize,
-               CPU_FEATURE_X2APIC,
                CPU_FEATURE_END
                );
     ASSERT_EFI_ERROR (Status);

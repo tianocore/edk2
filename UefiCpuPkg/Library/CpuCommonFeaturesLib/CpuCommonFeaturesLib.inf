@@ -40,7 +40,6 @@
   MachineCheck.c
   MonitorMwait.c
   PendingBreak.c
-  X2Apic.c
   Ppin.c
   ProcTrace.c
 

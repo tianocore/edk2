@@ -44,7 +44,7 @@
 #define CPU_FEATURE_C_STATE                        21
 #define CPU_FEATURE_TM                             22
 #define CPU_FEATURE_TM2                            23
-#define CPU_FEATURE_X2APIC                         24
+#define CPU_FEATURE_X2APIC                         24  ///< deprecated, do not use it to enable X2 APIC.
 #define CPU_FEATURE_RESERVED_25                    25
 #define CPU_FEATURE_RESERVED_26                    26
 #define CPU_FEATURE_RESERVED_27                    27

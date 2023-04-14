@@ -1,7 +1,7 @@
 /** @file
   CPU Common features library header file.
 
-  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2013, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -775,73 +775,6 @@ C1eSupport (
 RETURN_STATUS
 EFIAPI
 C1eInitialize (
-  IN UINTN                             ProcessorNumber,
-  IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData   OPTIONAL,
-  IN BOOLEAN                           State
-  );
-
-/**
-  Prepares for the data used by CPU feature detection and initialization.
-
-  @param[in]  NumberOfProcessors  The number of CPUs in the platform.
-
-  @return  Pointer to a buffer of CPU related configuration data.
-
-  @note This service could be called by BSP only.
-**/
-VOID *
-EFIAPI
-X2ApicGetConfigData (
-  IN UINTN  NumberOfProcessors
-  );
-
-/**
-  Detects if X2Apci feature supported on current processor.
-
-  Detect if X2Apci has been already enabled.
-
-  @param[in]  ProcessorNumber  The index of the CPU executing this function.
-  @param[in]  CpuInfo          A pointer to the REGISTER_CPU_FEATURE_INFORMATION
-                               structure for the CPU executing this function.
-  @param[in]  ConfigData       A pointer to the configuration buffer returned
-                               by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
-                               CPU_FEATURE_GET_CONFIG_DATA was not provided in
-                               RegisterCpuFeature().
-
-  @retval TRUE     X2Apci feature is supported.
-  @retval FALSE    X2Apci feature is not supported.
-
-  @note This service could be called by BSP/APs.
-**/
-BOOLEAN
-EFIAPI
-X2ApicSupport (
-  IN UINTN                             ProcessorNumber,
-  IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
-  IN VOID                              *ConfigData  OPTIONAL
-  );
-
-/**
-  Initializes X2Apci feature to specific state.
-
-  @param[in]  ProcessorNumber  The index of the CPU executing this function.
-  @param[in]  CpuInfo          A pointer to the REGISTER_CPU_FEATURE_INFORMATION
-                               structure for the CPU executing this function.
-  @param[in]  ConfigData       A pointer to the configuration buffer returned
-                               by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
-                               CPU_FEATURE_GET_CONFIG_DATA was not provided in
-                               RegisterCpuFeature().
-  @param[in]  State            If TRUE, then the X2Apci feature must be enabled.
-                               If FALSE, then the X2Apci feature must be disabled.
-
-  @retval RETURN_SUCCESS       X2Apci feature is initialized.
-
-  @note This service could be called by BSP only.
-**/
-RETURN_STATUS
-EFIAPI
-X2ApicInitialize (
   IN UINTN                             ProcessorNumber,
   IN REGISTER_CPU_FEATURE_INFORMATION  *CpuInfo,
   IN VOID                              *ConfigData   OPTIONAL,
