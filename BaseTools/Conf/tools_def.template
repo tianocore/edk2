@@ -15,8 +15,13 @@
 #
 # 2.00 - Initial version with changes for CI
 #      - Change RC path to use plugin
+# 3.00 - Update toolchains
+#      - Add support for ARM and AARCH64 to CLANGDWARF
+#      - Remove VS2008, VS2010, VS2012, VS2013, CLANG35, CLANG38, EBC
+#      - Add GCC and GCCNOLTO
+#      - Deprecate GCC48, GCC49 and GCC5.
 #
-#!VERSION=2.00
+#!VERSION=3.00
 
 IDENTIFIER = Default TOOL_CHAIN_CONF
 
