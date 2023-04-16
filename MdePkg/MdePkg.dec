@@ -2282,6 +2282,7 @@
   #  BIT20 - Global Coherency Database changes message.<BR>
   #  BIT21 - Memory range cachability changes message.<BR>
   #  BIT22 - Detailed debug message.<BR>
+  #  BIT23 - Manageability messages.<BR>
   #  BIT31 - Error message.<BR>
   # @Prompt Debug Message Print Level.
   # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel & 0x7F84AA00) == 0
