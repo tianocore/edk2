@@ -156,19 +156,13 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                        Note:
 #                             Building of XIP firmware images for ARM/ARM64 is not currently supported (only applications).
 #                             /FILEALIGN:4096 and other changes are needed for ARM firmware builds.
-#   GCC48       -Linux,Windows-  Requires:
-#                             GCC 4.8 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
-#                        Optional:
-#                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler from
-#                               https://acpica.org/downloads
-#   GCC49       -Linux,Windows-  Requires:
+#   GCCNOLTO    -Linux,Windows-  Requires:
 #                             GCC 4.9 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler from
 #                               https://acpica.org/downloads
-#   GCC5        -Linux,Windows-  Requires:
+#   GCC         -Linux,Windows-  Requires:
 #                             GCC 5 with LTO support, targeting x86_64-linux-gnu, aarch64-linux-gnu, arm-linux-gnueabi, riscv64-linux-gnu or loongarch64-linux-gnu
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
@@ -205,6 +199,27 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
+#                               https://acpica.org/downloads
+#
+# Deprecated Tool Chains
+# ======================
+#   GCC48       -Linux,Windows-  Requires:
+#                             GCC 4.8 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
+#   GCC49       -Linux,Windows-  Requires:
+#                             GCC 4.9 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler from
+#                               https://acpica.org/downloads
+#   GCC5        -Linux,Windows-  Requires:
+#                             GCC 5 with LTO support, targeting x86_64-linux-gnu, aarch64-linux-gnu, arm-linux-gnueabi, riscv64-linux-gnu or loongarch64-linux-gnu
+#                        Optional:
+#                             Required to build platforms or ACPI tables:
+#                               Intel(r) ACPI Compiler from
 #                               https://acpica.org/downloads
 #
 ####################################################################################
