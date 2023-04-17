@@ -90,6 +90,7 @@
 [LibraryClasses.AARCH64]
   ArmCcaLib|ArmVirtPkg/Library/ArmCcaLib/ArmCcaLib.inf
   ArmCcaRsiLib|ArmVirtPkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
