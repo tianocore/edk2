@@ -289,6 +289,10 @@
   #
   ArmTrngLib|Include/Library/ArmTrngLib.h
 
+  ##  @libraryclass  Provides APIs for third-party library libfdt.
+  #
+  FdtLib|Include/Library/FdtLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
