@@ -45,7 +45,14 @@ BaseRngLibConstructor (
   // MSR. A non-zero value indicates that the processor supports the RNDR instruction.
   //
   Isar0          = ArmReadIdAA64Isar0Reg ();
-  mRndrSupported = !!((Isar0 >> ARM_ID_AA64ISAR0_EL1_RNDR_SHIFT) & ARM_ID_AA64ISAR0_EL1_RNDR_MASK);
+  mRndrSupported = (((Isar0 >> ARM_ID_AA64ISAR0_EL1_RNDR_SHIFT) &
+                     ARM_ID_AA64ISAR0_EL1_RNDR_MASK) != 0);
+  if (!mRndrSupported) {
+    DEBUG ((
+      DEBUG_WARN,
+      "WARNING: BaseRngLib: RNDR instruction not supported by the processor.\n"
+      ));
+  }
 
   return EFI_SUCCESS;
 }
