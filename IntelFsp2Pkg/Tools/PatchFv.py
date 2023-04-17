@@ -166,6 +166,17 @@ class Symbols:
             raise Exception ("'%s' is not a valid directory!" % fvDir)
 
         #
+        # if user provided fd name as a input, skip rest of the flow to
+        # patch fd directly
+        #
+        fdFile =  os.path.join(fvDir,fvNames + ".fd")
+        if os.path.exists(fdFile):
+            print("Tool identified Fd file as a input to patch '%s'" %fdFile)
+            self.fdFile = fdFile
+            self.fdSize = os.path.getsize(fdFile)
+            return 0
+
+        #
         # If the Guid.xref is not existing in fvDir, then raise an exception
         #
         xrefFile = os.path.join(fvDir, "Guid.xref")
@@ -848,8 +859,9 @@ class Symbols:
 #  Print out the usage
 #
 def Usage():
-    print ("PatchFv Version 0.50")
+    print ("PatchFv Version 0.60")
     print ("Usage: \n\tPatchFv FvBuildDir [FvFileBaseNames:]FdFileBaseNameToPatch \"Offset, Value\"")
+    print ("\tPatchFv FdFileDir FdFileName \"Offset, Value\"")
 
 def main():
     #
