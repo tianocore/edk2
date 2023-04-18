@@ -10,9 +10,10 @@
 [Defines]
 DEFINE BLOCK_SIZE                  = 0x1000
 
+DEFINE PFLASH0_BASE                = 0x20000000
 DEFINE PFLASH1_BASE                = 0x22000000
 
-DEFINE FW_BASE_ADDRESS             = $(PFLASH1_BASE)
+DEFINE FW_BASE_ADDRESS             = $(PFLASH0_BASE)
 DEFINE FW_SIZE                     = 0x00800000
 DEFINE FW_BLOCKS                   = 0x800
 
@@ -20,6 +21,7 @@ DEFINE CODE_BASE_ADDRESS           = $(FW_BASE_ADDRESS)
 DEFINE CODE_SIZE                   = 0x00740000
 DEFINE CODE_BLOCKS                 = 0x740
 
+DEFINE VARS_BASE_ADDRESS            = $(PFLASH1_BASE)
 DEFINE VARS_SIZE                    = 0x000C0000
 DEFINE VARS_BLOCK_SIZE              = 0x40000
 DEFINE VARS_BLOCKS                  = 0x3

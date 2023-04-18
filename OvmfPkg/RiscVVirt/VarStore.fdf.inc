@@ -10,7 +10,14 @@
 #
 ##
 
-$(VARS_OFFSET)|$(VARS_LIVE_SIZE)
+[FD.RISCV_VIRT_VARS]
+BaseAddress   = $(VARS_BASE_ADDRESS)
+Size          = $(VARS_SIZE)
+ErasePolarity = 1
+BlockSize     = $(VARS_BLOCK_SIZE)
+NumBlocks     = $(VARS_BLOCKS)
+
+0x00000000|$(VARS_LIVE_SIZE)
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 #
 # NV_VARIABLE_STORE
@@ -57,7 +64,7 @@ DATA = {
   0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-$(VARS_FTW_WORKING_OFFSET)|$(VARS_FTW_WORKING_SIZE)
+0x00040000|$(VARS_FTW_WORKING_SIZE)
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 #
 #NV_FTW_WORK
@@ -73,7 +80,7 @@ DATA = {
   0xE0, 0xFF, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-$(VARS_FTW_SPARE_OFFSET)|$(VARS_FTW_SPARE_SIZE)
+0x00080000|$(VARS_FTW_SPARE_SIZE)
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 #
 #NV_FTW_SPARE

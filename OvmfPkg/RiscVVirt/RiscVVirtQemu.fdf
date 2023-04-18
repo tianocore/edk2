@@ -12,7 +12,7 @@
 !include RiscVVirt.fdf.inc
 
 ################################################################################
-[FD.RISCV_VIRT]
+[FD.RISCV_VIRT_CODE]
 BaseAddress   = $(FW_BASE_ADDRESS)|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
 Size          = $(FW_SIZE)|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
 ErasePolarity = 1
@@ -23,6 +23,7 @@ NumBlocks     = $(FW_BLOCKS)
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
 FV = FVMAIN_COMPACT
 
+################################################################################
 !include VarStore.fdf.inc
 ################################################################################
 
