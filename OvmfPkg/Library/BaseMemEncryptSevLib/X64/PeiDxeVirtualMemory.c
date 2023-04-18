@@ -232,8 +232,14 @@ Split2MPageTo4K (
   //
   // Fill in 2M page entry.
   //
+  // AddressEncMask is not set for non-leaf entries since CpuPageTableLib doesn't consume
+  // encryption mask PCD. The encryption mask is overlapped with the PageTableBaseAddress
+  // field of non-leaf page table entries. If encryption mask is set for non-leaf entries,
+  // issue happens when CpuPageTableLib code use the non-leaf entry PageTableBaseAddress
+  // field with the encryption mask set to find the next level page table.
+  //
   *PageEntry2M = ((UINT64)(UINTN)PageTableEntry1 |
-                  IA32_PG_P | IA32_PG_RW | AddressEncMask);
+                  IA32_PG_P | IA32_PG_RW);
 }
 
 /**
@@ -352,7 +358,10 @@ SetPageTablePoolReadOnly (
         PhysicalAddress += LevelSize[Level - 1];
       }
 
-      PageTable[Index] = (UINT64)(UINTN)NewPageTable | AddressEncMask |
+      //
+      // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
+      //
+      PageTable[Index] = (UINT64)(UINTN)NewPageTable |
                          IA32_PG_P | IA32_PG_RW;
       PageTable = NewPageTable;
     }
@@ -439,8 +448,10 @@ Split1GPageTo2M (
   //
   // Fill in 1G page entry.
   //
+  // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
+  //
   *PageEntry1G = ((UINT64)(UINTN)PageDirectoryEntry |
-                  IA32_PG_P | IA32_PG_RW | AddressEncMask);
+                  IA32_PG_P | IA32_PG_RW);
 
   PhysicalAddress2M = PhysicalAddress;
   for (IndexOfPageDirectoryEntries = 0;
@@ -616,7 +627,11 @@ InternalMemEncryptSevCreateIdentityMap1G (
       }
 
       SetMem (NewPageTable, EFI_PAGE_SIZE, 0);
-      PageMapLevel4Entry->Uint64          = (UINT64)(UINTN)NewPageTable | AddressEncMask;
+
+      //
+      // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
+      //
+      PageMapLevel4Entry->Uint64          = (UINT64)(UINTN)NewPageTable;
       PageMapLevel4Entry->Bits.MustBeZero = 0;
       PageMapLevel4Entry->Bits.ReadWrite  = 1;
       PageMapLevel4Entry->Bits.Present    = 1;
