@@ -233,7 +233,7 @@ Split2MPageTo4K (
   // Fill in 2M page entry.
   //
   *PageEntry2M = ((UINT64)(UINTN)PageTableEntry1 |
-                  IA32_PG_P | IA32_PG_RW | AddressEncMask);
+                  IA32_PG_P | IA32_PG_RW);
 }
 
 /**
@@ -352,7 +352,7 @@ SetPageTablePoolReadOnly (
         PhysicalAddress += LevelSize[Level - 1];
       }
 
-      PageTable[Index] = (UINT64)(UINTN)NewPageTable | AddressEncMask |
+      PageTable[Index] = (UINT64)(UINTN)NewPageTable |
                          IA32_PG_P | IA32_PG_RW;
       PageTable = NewPageTable;
     }
@@ -440,7 +440,7 @@ Split1GPageTo2M (
   // Fill in 1G page entry.
   //
   *PageEntry1G = ((UINT64)(UINTN)PageDirectoryEntry |
-                  IA32_PG_P | IA32_PG_RW | AddressEncMask);
+                  IA32_PG_P | IA32_PG_RW);
 
   PhysicalAddress2M = PhysicalAddress;
   for (IndexOfPageDirectoryEntries = 0;
