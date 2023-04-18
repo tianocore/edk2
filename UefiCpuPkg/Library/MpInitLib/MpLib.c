@@ -1998,7 +1998,9 @@ MpInitLibInitialize (
       //
       // Enable X2APIC if needed.
       //
-      AutoEnableX2Apic (CpuMpData);
+      if (CpuMpData->InitialBspApicMode == LOCAL_APIC_MODE_XAPIC) {
+        AutoEnableX2Apic (CpuMpData);
+      }
 
       //
       // Sort BSP/Aps by CPU APIC ID in ascending order
