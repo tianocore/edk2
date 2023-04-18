@@ -1,4 +1,5 @@
 import yaml
+import json
 import CppHeaderParser
 from IfrFormPkg import *
 from antlr4 import *
@@ -37,7 +38,8 @@ class Options():
         self.CreateJsonFile = True
         self.JsonFileName = None
 
-        self.UniStrDefFileName = None # Uni file name
+        self.UniStrDefFileName = None # {String Token : String Token ID} Uni file name
+        self.UniStrDisplayFile = None # {String Token : DisPlay String}
         self.DeltaFileName = None
         self.YamlOutputFileName = None #
 
@@ -62,7 +64,7 @@ class PreProcessDB():
     def Preprocess(self):
         self.HeaderFiles = self._ExtractHeaderFiles()
         self.HeaderDict = self._GetHeaderDicts(self.HeaderFiles)
-        self.UniDict = self._GetUniDicts()
+        self.UniDict, self.UniDisPlayDict = self._GetUniDicts()
         self.VfrDict = self._GetVfrDicts()
         self.Preprocessed = True
         # self._GenExpandedHeaderFile()
@@ -181,19 +183,31 @@ class PreProcessDB():
         self.Options.UniStrDefFileName = FileList[0]
 
     def _GetUniDicts(self):
-        # key: STR_FORM_SET_TITLE_HELP, value: 0x1234
-        # type: str
         if self.Options.UniStrDefFileName == None:
             self._SetUniStrDefFileName()
         # find UniFile
         FileName = self.Options.UniStrDefFileName
         CppHeader = CppHeaderParser.CppHeader(self.Options.UniStrDefFileName)
-        UniDict = {}
+        UniDict = {} # {String Token : String Token ID}
         for Define in CppHeader.defines:
             Items = Define.split()
             if len(Items) == 2:
-                UniDict[Items[0]] = Items[1] #
-        return UniDict
+                # key: STR_FORM_SET_TITLE_HELP, value: 0x1234, type: str
+                UniDict[Items[0]] = Items[1]
+
+        if self.Options.UniStrDisplayFile == None:
+            self.Options.UniStrDisplayFile = self.Options.OutputDirectory + self.Options.BaseFileName + 'Uni.json'
+        f = open(self.Options.UniStrDisplayFile, encoding='utf-8')
+        Dict = json.load(f)
+        f.close()
+        Dict = Dict[1]["en-US"]
+        DisPlayUniDict = {} # {String Token : DisPlay String}
+        for Key in Dict.keys():
+            if Key in UniDict.keys():
+                NewKey = '{}'.format('0x%04x' % (int(UniDict[Key],0)))
+                DisPlayUniDict[NewKey] = Dict[Key]
+
+        return UniDict, DisPlayUniDict
 
     def _GetHeaderDicts(self, HeaderFiles):
         HeaderDict = {}

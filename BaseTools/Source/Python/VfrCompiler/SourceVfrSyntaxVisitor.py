@@ -26,11 +26,13 @@ else:
 # This class defines a complete generic visitor for a parse tree produced by SourceVfrSyntaxParser.
 class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
-    def __init__(self, PreProcessDB: PreProcessDB = None, Root=None, OverrideClassGuid=None):
+    def __init__(self, PreProcessDB: PreProcessDB = None, Root=None, OverrideClassGuid=None, QuestionDB : VfrQuestionDB = None):
 
         self.Root = Root if Root != None else IfrTreeNode()
         self.PreProcessDB = PreProcessDB
         self.OverrideClassGuid = OverrideClassGuid
+        self.VfrQuestionDB = QuestionDB if QuestionDB != None else VfrQuestionDB()
+        
         self.ParserStatus = 0
 
         self.Value = None
@@ -44,7 +46,6 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         self.VfrRulesDB = VfrRulesDB()
         self.CurrQestVarInfo = EFI_VARSTORE_INFO()
 
-        self.VfrQuestionDB = VfrQuestionDB()
         self.CurrentQuestion = None
         self.CurrentMinMaxData = None
 

@@ -331,22 +331,22 @@ class YamlParser():
         if 'component' in Formset.keys():
             self._ParseVfrFormSetComponent(Formset['component'], Node)
 
-        # # Declare undefined Question so that they can be used in expression.
-        # InsertOpCodeList = None
-        # if gFormPkg.HavePendingUnassigned():
-        #     InsertOpCodeList, ReturnCode = gFormPkg.DeclarePendingQuestion(
-        #         gVfrVarDataTypeDB, gVfrDataStorage, self.VfrQuestionDB)
-        #     Status = 0 if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS else 1
-        #     self.ParserStatus += Status ###
-        #     self.NeedAdjustOpcode = True
+        # Declare undefined Question so that they can be used in expression.
+        InsertOpCodeList = None
+        if gFormPkg.HavePendingUnassigned():
+            InsertOpCodeList, ReturnCode = gFormPkg.DeclarePendingQuestion(
+                gVfrVarDataTypeDB, gVfrDataStorage, self.VfrQuestionDB)
+            Status = 0 if ReturnCode == VfrReturnCode.VFR_RETURN_SUCCESS else 1
+            self.ParserStatus += Status ###
+            self.NeedAdjustOpcode = True
 
-        # self.InsertEndNode(Node)
+        self.InsertEndNode(Node)
 
-        # if self.NeedAdjustOpcode:
-        #     self.LastFormNode.Child.pop()
-        #     for InsertOpCode in InsertOpCodeList:
-        #         InsertNode = IfrTreeNode(InsertOpCode.OpCode, InsertOpCode.Data, gFormPkg.StructToStream(InsertOpCode.Data.GetInfo()))
-        #         self.LastFormNode.insertChild(InsertNode)
+        if self.NeedAdjustOpcode:
+            self.LastFormNode.Child.pop()
+            for InsertOpCode in InsertOpCodeList:
+                InsertNode = IfrTreeNode(InsertOpCode.OpCode, InsertOpCode.Data, gFormPkg.StructToStream(InsertOpCode.Data.GetInfo()))
+                self.LastFormNode.insertChild(InsertNode)
 
         gFormPkg.BuildPkg(self.Root)
         return Node
@@ -446,7 +446,7 @@ class YamlParser():
         VfrLexer = SourceVfrSyntaxLexer(InputStream(Condition))
         VfrStream = CommonTokenStream(VfrLexer)
         VfrParser = SourceVfrSyntaxParser(VfrStream)
-        Visitor = SourceVfrSyntaxVisitor(self.PreProcessDB)
+        Visitor = SourceVfrSyntaxVisitor(self.PreProcessDB, None, None, self.VfrQuestionDB)
         Visitor.visit(VfrParser.vfrStatementExpression(ParentNode))
 
     def ParseVfrStatementDefaultStore(self, DefaultStore, ParentNode):
@@ -895,13 +895,13 @@ class YamlParser():
             self.ParseVfrStatementWarningIf(Value, ParentNode)
 
     def ParseVfrStatementInconsistentIf(self, InconsistentIf, ParentNode):
-        IIObj = IfrInconsistentIf()
+        IIObj = IfrInconsistentIf2()
         IIObj.SetError(InconsistentIf['prompt'])
         Node = IfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP, IIObj, gFormPkg.StructToStream(IIObj.GetInfo()))
         ParentNode.insertChild(Node)
         self.ParserVfrStatementExpression(InconsistentIf['expression'], Node)
         Node.Expression = InconsistentIf['expression']
-        Node.Condition = 'inconsistentif ' + Node.Expression
+        # Node.Condition = 'inconsistentif ' + Node.Expression
         self.InsertEndNode(Node)
 
 
@@ -1000,7 +1000,6 @@ class YamlParser():
             NumericQst = IfrNumeric(self.CurrentQuestion) #
             IntDecStyle = True if (NumericQst.GetNumericFlags() & EFI_IFR_DISPLAY) == 0 else False #
         ValueList = []
-        print(Value)
         if Value == True:
             ValueList.append(1)
 
@@ -1707,10 +1706,10 @@ class YamlParser():
 
         if HasGuidNode == False:
             ParentNode.insertChild(Node)
+        self.SetPosition(Node, Position)
         if 'component' in Numeric.keys():
             self._ParseVfrStatementQuestionOptionList(Numeric['component'], Node)
 
-        self.SetPosition(Node, Position)
         Node.Buffer = gFormPkg.StructToStream(NObj.GetInfo())
         self.InsertEndNode(Node)
         return Node
@@ -2000,9 +1999,9 @@ class YamlParser():
         self._ParseVfrSetMinMaxStep(OObj, OneOf)
         if not HasGuidNode:
             ParentNode.insertChild(Node)
+        self.SetPosition(Node, Position)
         if 'component' in OneOf.keys():
             self._ParseVfrStatementQuestionOptionList(OneOf['component'], Node)
-        self.SetPosition(Node, Position)
         Node.Buffer = gFormPkg.StructToStream(OObj.GetInfo())
         self.InsertEndNode(Node)
         return Node
