@@ -16,6 +16,7 @@ import edk2toollib.windows.locate_tools as locate_tools
 from edk2toolext.environment import shell_environment
 from edk2toollib.utility_functions import RunCmd
 from edk2toollib.utility_functions import GetHostInfo
+from textwrap import dedent
 
 
 class HostBasedUnitTestRunner(IUefiBuildPlugin):
@@ -83,6 +84,18 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 testList = glob.glob(os.path.join(cp, "*Test*.exe"))
             else:
                 raise NotImplementedError("Unsupported Operating System")
+
+            if not testList:
+                logging.warning(dedent("""
+                    UnitTest Coverage:
+                      No unit tests discovered. Test coverage will not be generated.
+
+                      Prevent this message by:
+                      1. Adding host-based unit tests to this package
+                      2. Ensuring tests have the word "Test" in their name
+                      3. Disabling HostUnitTestCompilerPlugin in the package CI YAML file
+                    """).strip())
+                return 0
 
             for test in testList:
                 # Configure output name if test uses cmocka.
