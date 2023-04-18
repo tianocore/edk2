@@ -10,16 +10,14 @@
 [Defines]
 DEFINE BLOCK_SIZE                  = 0x1000
 
+DEFINE PFLASH0_BASE                = 0x20000000
 DEFINE PFLASH1_BASE                = 0x22000000
 
-DEFINE FW_BASE_ADDRESS             = $(PFLASH1_BASE)
-DEFINE FW_SIZE                     = 0x00800000
-DEFINE FW_BLOCKS                   = 0x800
+DEFINE CODE_BASE_ADDRESS           = $(PFLASH0_BASE)
+DEFINE CODE_SIZE                   = 0x00800000
+DEFINE CODE_BLOCKS                 = 0x800
 
-DEFINE CODE_BASE_ADDRESS           = $(FW_BASE_ADDRESS)
-DEFINE CODE_SIZE                   = 0x00740000
-DEFINE CODE_BLOCKS                 = 0x740
-
+DEFINE VARS_BASE_ADDRESS            = $(PFLASH1_BASE)
 DEFINE VARS_SIZE                    = 0x000C0000
 DEFINE VARS_BLOCK_SIZE              = 0x40000
 DEFINE VARS_BLOCKS                  = 0x3
@@ -29,7 +27,7 @@ DEFINE VARS_BLOCKS                  = 0x3
 # The total size of EFI Variable FD must include
 # all of sub regions of EFI Variable
 #
-DEFINE VARS_OFFSET                   = $(CODE_SIZE)
+DEFINE VARS_OFFSET                   = 0x00000000
 DEFINE VARS_LIVE_SIZE                = 0x00040000
 DEFINE VARS_FTW_WORKING_OFFSET       = $(VARS_OFFSET) + $(VARS_LIVE_SIZE)
 DEFINE VARS_FTW_WORKING_SIZE         = 0x00040000
