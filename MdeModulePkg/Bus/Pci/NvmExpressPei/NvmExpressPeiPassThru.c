@@ -115,7 +115,7 @@ NvmeCreatePrpList (
 **/
 EFI_STATUS
 NvmeCheckCqStatus (
-  IN NVME_CQ  *Cq
+  IN volatile NVME_CQ  *Cq
   )
 {
   if ((Cq->Sct == 0x0) && (Cq->Sc == 0x0)) {
@@ -344,7 +344,7 @@ NvmePassThruExecute (
 {
   EFI_STATUS             Status;
   NVME_SQ                *Sq;
-  NVME_CQ                *Cq;
+  volatile NVME_CQ       *Cq;
   UINT8                  QueueId;
   UINTN                  SqSize;
   UINTN                  CqSize;
@@ -617,7 +617,7 @@ NvmePassThruExecute (
   //
   // Copy the Respose Queue entry for this command to the callers response buffer
   //
-  CopyMem (Packet->NvmeCompletion, Cq, sizeof (EFI_NVM_EXPRESS_COMPLETION));
+  CopyMem (Packet->NvmeCompletion, (VOID *)Cq, sizeof (EFI_NVM_EXPRESS_COMPLETION));
 
   //
   // Check the NVMe cmd execution result
