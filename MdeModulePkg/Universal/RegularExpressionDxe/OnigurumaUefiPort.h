@@ -4,7 +4,7 @@
 
   (C) Copyright 2014-2021 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -107,6 +107,7 @@ realloc (
   size_t  size
   );
 
+#if !defined (MDE_CPU_ARM)
 void *
 memcpy (
   void          *dest,
@@ -120,6 +121,8 @@ memset (
   char          ch,
   unsigned int  count
   );
+
+#endif
 
 void
 free (
