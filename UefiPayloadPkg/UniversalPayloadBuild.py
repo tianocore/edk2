@@ -108,6 +108,7 @@ def BuildUniversalPayload(Args, MacroList):
     DscPath = os.path.normpath("UefiPayloadPkg/UefiPayloadPkg.dsc")
     DxeFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))
     BdsFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/BDSFV.Fv"))
+    NetworkFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/NETWORKFV.Fv"))
     PayloadReportPath = os.path.join(BuildDir, "UefiUniversalPayload.txt")
     ModuleReportPath = os.path.join(BuildDir, "UefiUniversalPayloadEntry.txt")
     UpldInfoFile = os.path.join(BuildDir, "UniversalPayloadInfo.bin")
@@ -185,6 +186,17 @@ def BuildUniversalPayload(Args, MacroList):
                            ObjCopyFlag,
                            EntryOutputDir
                            )
+        #
+        # Append network fv to sections if exists
+        #
+        if os.path.isfile(NetworkFvOutputDir):
+            index = remove_section.find(EntryOutputDir)
+            remove_section = remove_section[:index] + '--remove-section .upld.network_fv ' + remove_section[index:]
+            index = add_section.find(EntryOutputDir)
+            add_section = add_section[:index] + '--add-section .upld.network_fv=' + NetworkFvOutputDir + ' ' + add_section[index:]
+            index = set_section.find(EntryOutputDir)
+            set_section = set_section[:index] + '--set-section-alignment .upld.network_fv=16 ' + set_section[index:]
+
         RunCommand(remove_section)
         RunCommand(add_section)
         RunCommand(set_section)
