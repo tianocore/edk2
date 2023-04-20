@@ -41,6 +41,64 @@ PAGE_TABLE_POOL  *mPageTablePool = NULL;
 BOOLEAN  mIsReadOnlyPageTable = FALSE;
 
 /**
+  Disable Write Protect on pages marked as read-only if Cr0.Bits.WP is 1.
+
+  @param[out]  WpEnabled      If Cr0.WP is enabled.
+  @param[out]  CetEnabled     If CET is enabled.
+**/
+VOID
+DisableReadOnlyPageWriteProtect (
+  OUT BOOLEAN  *WpEnabled,
+  OUT BOOLEAN  *CetEnabled
+  )
+{
+  IA32_CR0  Cr0;
+
+  *CetEnabled = ((AsmReadCr4 () & CR4_CET_ENABLE) != 0) ? TRUE : FALSE;
+  Cr0.UintN   = AsmReadCr0 ();
+  *WpEnabled  = (Cr0.Bits.WP != 0) ? TRUE : FALSE;
+  if (*WpEnabled) {
+    if (*CetEnabled) {
+      //
+      // CET must be disabled if WP is disabled. Disable CET before clearing CR0.WP.
+      //
+      DisableCet ();
+    }
+
+    Cr0.Bits.WP = 0;
+    AsmWriteCr0 (Cr0.UintN);
+  }
+}
+
+/**
+  Enable Write Protect on pages marked as read-only.
+
+  @param[out]  WpEnabled      If Cr0.WP should be enabled.
+  @param[out]  CetEnabled     If CET should be enabled.
+**/
+VOID
+EnableReadOnlyPageWriteProtect (
+  BOOLEAN  WpEnabled,
+  BOOLEAN  CetEnabled
+  )
+{
+  IA32_CR0  Cr0;
+
+  if (WpEnabled) {
+    Cr0.UintN   = AsmReadCr0 ();
+    Cr0.Bits.WP = 1;
+    AsmWriteCr0 (Cr0.UintN);
+
+    if (CetEnabled) {
+      //
+      // re-enable CET.
+      //
+      EnableCet ();
+    }
+  }
+}
+
+/**
   Initialize a buffer pool for page table use only.
 
   To reduce the potential split operation on page table, the pages reserved for
@@ -62,10 +120,9 @@ InitializePageTablePool (
   IN UINTN  PoolPages
   )
 {
-  VOID      *Buffer;
-  BOOLEAN   CetEnabled;
-  BOOLEAN   WpEnabled;
-  IA32_CR0  Cr0;
+  VOID     *Buffer;
+  BOOLEAN  WpEnabled;
+  BOOLEAN  CetEnabled;
 
   //
   // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
@@ -102,34 +159,9 @@ InitializePageTablePool (
   // If page table memory has been marked as RO, mark the new pool pages as read-only.
   //
   if (mIsReadOnlyPageTable) {
-    CetEnabled = ((AsmReadCr4 () & CR4_CET_ENABLE) != 0) ? TRUE : FALSE;
-    Cr0.UintN  = AsmReadCr0 ();
-    WpEnabled  = (Cr0.Bits.WP != 0) ? TRUE : FALSE;
-    if (WpEnabled) {
-      if (CetEnabled) {
-        //
-        // CET must be disabled if WP is disabled. Disable CET before clearing CR0.WP.
-        //
-        DisableCet ();
-      }
-
-      Cr0.Bits.WP = 0;
-      AsmWriteCr0 (Cr0.UintN);
-    }
-
+    DisableReadOnlyPageWriteProtect (&WpEnabled, &CetEnabled);
     SmmSetMemoryAttributes ((EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, EFI_PAGES_TO_SIZE (PoolPages), EFI_MEMORY_RO);
-    if (WpEnabled) {
-      Cr0.UintN   = AsmReadCr0 ();
-      Cr0.Bits.WP = 1;
-      AsmWriteCr0 (Cr0.UintN);
-
-      if (CetEnabled) {
-        //
-        // re-enable CET.
-        //
-        EnableCet ();
-      }
-    }
+    EnableReadOnlyPageWriteProtect (WpEnabled, CetEnabled);
   }
 
   return TRUE;
@@ -1782,6 +1814,7 @@ SetPageTableAttributes (
   VOID
   )
 {
+  BOOLEAN  WpEnabled;
   BOOLEAN  CetEnabled;
 
   if (!IfReadOnlyPageTableNeeded ()) {
@@ -1794,15 +1827,7 @@ SetPageTableAttributes (
   // Disable write protection, because we need mark page table to be write protected.
   // We need *write* page table memory, to mark itself to be *read only*.
   //
-  CetEnabled = ((AsmReadCr4 () & CR4_CET_ENABLE) != 0) ? TRUE : FALSE;
-  if (CetEnabled) {
-    //
-    // CET must be disabled if WP is disabled.
-    //
-    DisableCet ();
-  }
-
-  AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
+  DisableReadOnlyPageWriteProtect (&WpEnabled, &CetEnabled);
 
   // Set memory used by page table as Read Only.
   DEBUG ((DEBUG_INFO, "Start...\n"));
@@ -1811,20 +1836,12 @@ SetPageTableAttributes (
   //
   // Enable write protection, after page table attribute updated.
   //
-  AsmWriteCr0 (AsmReadCr0 () | CR0_WP);
+  EnableReadOnlyPageWriteProtect (TRUE, CetEnabled);
   mIsReadOnlyPageTable = TRUE;
 
   //
   // Flush TLB after mark all page table pool as read only.
   //
   FlushTlbForAll ();
-
-  if (CetEnabled) {
-    //
-    // re-enable CET.
-    //
-    EnableCet ();
-  }
-
   return;
 }
