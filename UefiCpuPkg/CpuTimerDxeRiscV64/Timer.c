@@ -80,8 +80,15 @@ TimerInterruptHandler (
     return;
   }
 
-  mLastPeriodStart          = PeriodStart;
-  SbiSetTimer (PeriodStart += mTimerPeriod);
+  mLastPeriodStart = PeriodStart;
+  PeriodStart     += DivU64x32 (
+                       MultU64x32 (
+                         mTimerPeriod,
+                         PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+                         ),
+                       1000000u
+                       );  // convert to tick
+  SbiSetTimer (PeriodStart);
   RiscVEnableTimerInterrupt (); // enable SMode timer int
   gBS->RestoreTPL (OriginalTPL);
 }
@@ -163,6 +170,8 @@ TimerDriverSetTimerPeriod (
   IN UINT64                   TimerPeriod
   )
 {
+  UINT64  PeriodStart;
+
   DEBUG ((DEBUG_INFO, "TimerDriverSetTimerPeriod(0x%lx)\n", TimerPeriod));
 
   if (TimerPeriod == 0) {
@@ -171,9 +180,18 @@ TimerDriverSetTimerPeriod (
     return EFI_SUCCESS;
   }
 
-  mTimerPeriod     = TimerPeriod / 10; // convert unit from 100ns to 1us
+  mTimerPeriod = TimerPeriod / 10;     // convert unit from 100ns to 1us
+
   mLastPeriodStart = RiscVReadTimer ();
-  SbiSetTimer (mLastPeriodStart + mTimerPeriod);
+  PeriodStart      = mLastPeriodStart;
+  PeriodStart     += DivU64x32 (
+                       MultU64x32 (
+                         mTimerPeriod,
+                         PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+                         ),
+                       1000000u
+                       ); // convert to tick
+  SbiSetTimer (PeriodStart);
 
   mCpu->EnableInterrupt (mCpu);
   RiscVEnableTimerInterrupt (); // enable SMode timer int
