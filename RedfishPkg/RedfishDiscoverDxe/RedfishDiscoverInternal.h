@@ -118,16 +118,30 @@ typedef struct {
 } EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL;
 
 //
+// Redfish Discover Instance signature
+//
+
+#define EFI_REDFISH_DISCOVER_DATA_SIGNATURE  SIGNATURE_32 ('E', 'R', 'D', 'D')
+
+#define EFI_REDFISH_DISOVER_DATA_FROM_DISCOVER_PROTOCOL(a) \
+  CR (a, EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL, RedfishDiscoverProtocol, EFI_REDFISH_DISCOVER_DATA_SIGNATURE)
+
+//
 // Internal structure used to maintain REST EX properties.
 //
 typedef struct {
-  LIST_ENTRY              Entry;                      ///< Link list entry.
-  EFI_HANDLE              OpenDriverAgentHandle;      ///< The agent to open network protocol.
-  EFI_HANDLE              OpenDriverControllerHandle; ///< The controller handle to open network protocol.
-  EFI_HANDLE              RestExChildHandle;          ///< The child handle created through REST EX Service Protocol.
-  EFI_HANDLE              RestExControllerHandle;     ///< The controller handle which provide REST EX protocol.
-  EFI_REST_EX_PROTOCOL    *RestExProtocolInterface;   ///< Pointer to EFI_REST_EX_PROTOCOL.
-  UINT32                  RestExId;                   ///< The identifier installed on REST EX controller handle.
+  LIST_ENTRY                                Entry;                      ///< Link list entry.
+  UINT32                                    Signature;                  ///< Instance signature.
+  EFI_HANDLE                                OpenDriverAgentHandle;      ///< The agent to open network protocol.
+  EFI_HANDLE                                OpenDriverControllerHandle; ///< The controller handle to open network protocol.
+  EFI_HANDLE                                RestExChildHandle;          ///< The child handle created through REST EX Service Protocol.
+  EFI_HANDLE                                RestExControllerHandle;     ///< The controller handle which provide REST EX protocol.
+  EFI_REST_EX_PROTOCOL                      *RestExProtocolInterface;   ///< Pointer to EFI_REST_EX_PROTOCOL.
+  UINT32                                    RestExId;                   ///< The identifier installed on REST EX controller handle.
+  UINTN                                     NumberOfNetworkInterfaces;  ///< Number of network interfaces can do Redfish service discovery.
+  EFI_REDFISH_DISCOVER_NETWORK_INTERFACE    *NetworkInterfaceInstances; ///< Network interface instances. It's an array of instances. The number of entries
+                                                                        ///< in array is indicated by NumberOfNetworkInterfaces.
+  EFI_REDFISH_DISCOVER_PROTOCOL             RedfishDiscoverProtocol;    ///< EFI_REDFISH_DISCOVER_PROTOCOL protocol.
 } EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL;
 
 /**
