@@ -60,6 +60,35 @@ FILE FV_IMAGE = 4E35FD93-9C72-4c15-8C4B-E77F1DB2D793 {
     SECTION FV_IMAGE = DXEFV
 }
 
+!if $(NETWORK_DRIVER_ENABLE) == TRUE
+################################################################################
+[FV.NETWORKFV]
+FvNameGuid         = 3CF5CB69-C439-4B84-AF11-8167B22D7221
+BlockSize          = $(FD_BLOCK_SIZE)
+FvForceRebase      = FALSE
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+#
+# UEFI network modules
+#
+!include NetworkPkg/Network.fdf.inc
+!endif
+
 ################################################################################
 [FV.BDSFV]
 FvNameGuid         = CA5590AF-9558-4822-B5EA-BE2E876CD3EC
@@ -276,13 +305,12 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 
 !if $(UNIVERSAL_PAYLOAD) == FALSE
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
-!endif
-
 #
 # UEFI network modules
 #
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
   !include NetworkPkg/Network.fdf.inc
+!endif
 !endif
 
 #
