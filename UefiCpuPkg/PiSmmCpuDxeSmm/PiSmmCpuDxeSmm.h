@@ -1567,4 +1567,28 @@ SmmWaitForApArrival (
   VOID
   );
 
+/**
+  Disable Write Protect on pages marked as read-only if Cr0.Bits.WP is 1.
+
+  @param[out]  WpEnabled      If Cr0.WP is enabled.
+  @param[out]  CetEnabled     If CET is enabled.
+**/
+VOID
+DisableReadOnlyPageWriteProtect (
+  OUT BOOLEAN  *WpEnabled,
+  OUT BOOLEAN  *CetEnabled
+  );
+
+/**
+  Enable Write Protect on pages marked as read-only.
+
+  @param[out]  WpEnabled      If Cr0.WP should be enabled.
+  @param[out]  CetEnabled     If CET should be enabled.
+**/
+VOID
+EnableReadOnlyPageWriteProtect (
+  BOOLEAN  WpEnabled,
+  BOOLEAN  CetEnabled
+  );
+
 #endif
