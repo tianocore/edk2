@@ -1036,6 +1036,8 @@ SetMemMapAttributes (
   IA32_MAP_ENTRY                        *Map;
   UINTN                                 Count;
   UINT64                                MemoryAttribute;
+  BOOLEAN                               WpEnabled;
+  BOOLEAN                               CetEnabled;
 
   SmmGetSystemConfigurationTable (&gEdkiiPiSmmMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
   if (MemoryAttributesTable == NULL) {
@@ -1078,6 +1080,8 @@ SetMemMapAttributes (
 
   ASSERT_RETURN_ERROR (Status);
 
+  DisableReadOnlyPageWriteProtect (&WpEnabled, &CetEnabled);
+
   MemoryMap = MemoryMapStart;
   for (Index = 0; Index < MemoryMapEntryCount; Index++) {
     DEBUG ((DEBUG_VERBOSE, "SetAttribute: Memory Entry - 0x%lx, 0x%x\n", MemoryMap->PhysicalStart, MemoryMap->NumberOfPages));
@@ -1105,6 +1109,7 @@ SetMemMapAttributes (
     MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, DescriptorSize);
   }
 
+  EnableReadOnlyPageWriteProtect (WpEnabled, CetEnabled);
   FreePool (Map);
 
   PatchSmmSaveStateMap ();
@@ -1411,8 +1416,12 @@ SetUefiMemMapAttributes (
   UINTN                  MemoryMapEntryCount;
   UINTN                  Index;
   EFI_MEMORY_DESCRIPTOR  *Entry;
+  BOOLEAN                WpEnabled;
+  BOOLEAN                CetEnabled;
 
   DEBUG ((DEBUG_INFO, "SetUefiMemMapAttributes\n"));
+
+  DisableReadOnlyPageWriteProtect (&WpEnabled, &CetEnabled);
 
   if (mUefiMemoryMap != NULL) {
     MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
@@ -1491,6 +1500,8 @@ SetUefiMemMapAttributes (
       Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mUefiMemoryAttributesTable->DescriptorSize);
     }
   }
+
+  EnableReadOnlyPageWriteProtect (WpEnabled, CetEnabled);
 
   //
   // Do not free mUefiMemoryAttributesTable, it will be checked in IsSmmCommBufferForbiddenAddress().
