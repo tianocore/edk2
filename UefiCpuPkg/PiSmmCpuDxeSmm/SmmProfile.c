@@ -574,6 +574,8 @@ InitPaging (
   BOOLEAN   Nx;
   IA32_CR4  Cr4;
   BOOLEAN   Enable5LevelPaging;
+  BOOLEAN   WpEnabled;
+  BOOLEAN   CetEnabled;
 
   PERF_FUNCTION_BEGIN ();
 
@@ -622,6 +624,7 @@ InitPaging (
     NumberOfPdptEntries = 4;
   }
 
+  DisableReadOnlyPageWriteProtect (&WpEnabled, &CetEnabled);
   //
   // Go through page table and change 2MB-page into 4KB-page.
   //
@@ -801,6 +804,8 @@ InitPaging (
       } // end for PDPT
     } // end for PML4
   } // end for PML5
+
+  EnableReadOnlyPageWriteProtect (WpEnabled, CetEnabled);
 
   //
   // Flush TLB
