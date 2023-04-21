@@ -222,10 +222,13 @@ ReserveEmuVariableNvStore (
   VariableStore = (EFI_PHYSICAL_ADDRESS)(UINTN)PlatformReserveEmuVariableNvStore ();
   PcdStatus     = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
 
+ #if 0
   if (FeaturePcdGet (PcdSecureBootSupported)) {
     // restore emulated VarStore from pristine ROM copy
     PlatformInitEmuVariableNvStore ((VOID *)(UINTN)VariableStore);
   }
+
+ #endif
 
   ASSERT_RETURN_ERROR (PcdStatus);
 }

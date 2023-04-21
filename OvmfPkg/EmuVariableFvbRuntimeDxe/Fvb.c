@@ -712,6 +712,7 @@ FvbInitialize (
 {
   EFI_STATUS            Status;
   VOID                  *Ptr;
+  VOID                  *RomPtr;
   VOID                  *SubPtr;
   BOOLEAN               Initialize;
   EFI_HANDLE            Handle;
@@ -770,6 +771,19 @@ FvbInitialize (
     }
   } else {
     Ptr = AllocateRuntimePages (EFI_SIZE_TO_PAGES (EMU_FVB_SIZE));
+  }
+
+  if (FeaturePcdGet (PcdSecureBootSupported)) {
+    DEBUG ((DEBUG_INFO, "EMU Variable FVB: SecureBoot: restore FV from ROM\n"));
+    RomPtr = (UINT8 *)(UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
+    Status = ValidateFvHeader (RomPtr);
+    if (EFI_ERROR (Status)) {
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    CopyMem (Ptr, RomPtr, EMU_FVB_SIZE);
+    Initialize = FALSE;
   }
 
   mEmuVarsFvb.BufferPtr = Ptr;

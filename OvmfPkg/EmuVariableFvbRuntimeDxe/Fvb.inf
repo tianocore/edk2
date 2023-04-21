@@ -56,12 +56,14 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported
 
 [Depex]
   TRUE
