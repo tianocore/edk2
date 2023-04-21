@@ -1,0 +1,62 @@
+##  @file
+# A UEFI variable policy application that displays information
+# about UEFI variable policy configuration on the system.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                 = 0x00010006
+  BASE_NAME                   = varpolicy
+  FILE_GUID                   = CA3D995F-3291-45AF-B50A-7C8AE584D857
+  MODULE_TYPE                 = UEFI_APPLICATION
+  VERSION_STRING              = 1.0
+  ENTRY_POINT                 = VariablePolicyAppInitialize
+  # Note: GetHelpText() in the EFI shell protocol will associate the help text
+  #       for the app if the app name (command) matches the .TH section name in
+  #       the Unicode help text. That name is "varpolicy".
+  UEFI_HII_RESOURCE_SECTION   = TRUE
+
+[Sources.common]
+  VariablePolicy.uni
+  VariablePolicy.h
+  VariablePolicy.c
+  VariablePolicyApp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HiiLib
+  MemoryAllocationLib
+  PrintLib
+  ShellLib
+  UefiApplicationEntryPoint
+  UefiBootServicesTableLib
+  UefiHiiServicesLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEdkiiVariablePolicyProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiHiiPackageListProtocolGuid              ## CONSUMES
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## Variables in Vendor Namespace
+  gEfiCapsuleReportGuid
+  gEfiCapsuleVendorGuid
+  gEfiGlobalVariableGuid
+  gEfiMemoryOverwriteRequestControlLockGuid
+  gEfiMemoryTypeInformationGuid
+  gMtcVendorGuid
+  gShellAliasGuid
+  gShellVariableGuid
+
+[DEPEX]
+  TRUE
