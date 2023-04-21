@@ -257,6 +257,7 @@
     <Command>
         "$(VFRPP)" $(DEPS_FLAGS) $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_base}.i
         "$(VFR)" $(VFR_FLAGS) --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_base}.i
+        "$(PYVFR)" ${src} -o $(OUTPUT_DIR) --vfr
 
 [Object-File]
     <InputFile>
@@ -629,6 +630,7 @@
     <Command>
         "$(VFRPP)" $(DEPS_FLAGS) $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
         "$(VFR)" $(VFR_FLAGS) --create-ifr-package --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory $(OUTPUT_DIR)(+)${s_dir} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        "$(PYVFR)" ${src} -i $(INC) -m $(MODULE_NAME) -o $(OUTPUT_DIR) --vfr 
 
 [Hii-Binary-Package.UEFI_HII]
     <InputFile>

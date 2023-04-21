@@ -3004,6 +3004,7 @@ RELEASE_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c    -Os       -W
 ##################
 *_*_*_VFR_PATH                      = VfrCompile
 *_*_*_VFR_FLAGS                     = -l -n
+*_*_*_PYVFR_PATH                    = PyVfrCompile
 
 ##################
 # OptionRom tool definitions
