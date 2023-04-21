@@ -115,6 +115,9 @@ READ_LOCK_STATUS   = TRUE
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
 INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
+!if $(CFR_SETUP_MENU_ENABLE) == TRUE
+INF UefiPayloadPkg/CfrSetupMenuDxe/CfrSetupMenuDxe.inf
+!endif
 !endif
 
 [FV.DXEFV]
@@ -348,6 +351,9 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 
 !if $(UNIVERSAL_PAYLOAD) == FALSE
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+!if $(CFR_SETUP_MENU_ENABLE) == TRUE
+INF UefiPayloadPkg/CfrSetupMenuDxe/CfrSetupMenuDxe.inf
+!endif
 INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
 INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 #

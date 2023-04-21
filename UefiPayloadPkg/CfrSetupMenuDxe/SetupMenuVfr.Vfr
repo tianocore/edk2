@@ -1,0 +1,31 @@
+/** @file
+  Setup Menu formset.
+
+  Copyright (c) 2023, 9elements GmbH.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <Uefi/UefiMultiPhase.h>
+#include <Guid/HiiPlatformSetupFormset.h>
+#include "SetupMenuNVDataStruc.h"
+
+formset
+  guid      = SETUP_MENU_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_CFR_MENU_TITLE),
+  help      = STRING_TOKEN(STR_CFR_MENU_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  form formid = SETUP_MENU_FORM_ID,
+    title = STRING_TOKEN(STR_CFR_MENU_TITLE);
+
+    /**
+      Sections for runtime components
+
+    **/
+    label LABEL_RT_COMP_START;
+    label LABEL_RT_COMP_END;
+
+  endform;
+
+endformset;

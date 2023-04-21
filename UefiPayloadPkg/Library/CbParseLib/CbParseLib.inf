@@ -33,8 +33,12 @@
   BaseMemoryLib
   IoLib
   DebugLib
+  HobLib
   PcdLib
   PrintLib
+
+[Guids]
+  gEfiCfrSetupMenuFormGuid
 
 [Pcd]
   gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter

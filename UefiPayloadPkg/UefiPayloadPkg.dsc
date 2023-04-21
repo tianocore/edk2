@@ -83,6 +83,8 @@
   #
   DEFINE   BOOTLOADER                 = SBL
 
+  DEFINE CFR_SETUP_MENU_ENABLE        = FALSE
+
   #
   # CPU options
   #
@@ -402,6 +404,10 @@
   SmmCpuSyncLib|UefiCpuPkg/Library/SmmCpuSyncLib/SmmCpuSyncLib.inf
 
 [LibraryClasses.common]
+!if $(CFR_SETUP_MENU_ENABLE) == TRUE
+  CfrHelpersLib|UefiPayloadPkg/Library/CfrHelpersLib/CfrHelpersLib.inf
+!endif
+
 !if $(BOOTSPLASH_IMAGE)
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
@@ -1008,6 +1014,10 @@
 !endif
   }
   MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+!endif
+
+!if $(CFR_SETUP_MENU_ENABLE) == TRUE
+  UefiPayloadPkg/CfrSetupMenuDxe/CfrSetupMenuDxe.inf
 !endif
 
 
