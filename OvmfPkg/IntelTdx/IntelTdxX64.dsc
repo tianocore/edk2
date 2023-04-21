@@ -90,15 +90,6 @@
   INTEL:*_*_*_CC_FLAGS = /D TDX_PEI_LESS_BOOT
   GCC:*_*_*_CC_FLAGS = -D TDX_PEI_LESS_BOOT
 
-  #
-  # SECURE_BOOT_FEATURE_ENABLED
-  #
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  MSFT:*_*_*_CC_FLAGS = /D SECURE_BOOT_FEATURE_ENABLED
-  INTEL:*_*_*_CC_FLAGS = /D SECURE_BOOT_FEATURE_ENABLED
-  GCC:*_*_*_CC_FLAGS = -D SECURE_BOOT_FEATURE_ENABLED
-!endif
-
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
   XCODE:*_*_*_DLINK_FLAGS = -seg1addr 0x1000 -segalign 0x1000
@@ -387,6 +378,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable|TRUE
 !endif
 !if $(SECURE_BOOT_ENABLE) == TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|TRUE
 !endif
 

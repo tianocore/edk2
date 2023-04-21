@@ -28,13 +28,11 @@ ConnectNvVarsToFileSystem (
   IN EFI_HANDLE  FsHandle
   )
 {
- #ifdef SECURE_BOOT_FEATURE_ENABLED
-
-  return EFI_UNSUPPORTED;
-
- #else
-
   EFI_STATUS  Status;
+
+  if (FeaturePcdGet (PcdSecureBootSupported)) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // We might fail to load the variable, since the file system initially
@@ -52,7 +50,6 @@ ConnectNvVarsToFileSystem (
   }
 
   return Status;
- #endif
 }
 
 /**
