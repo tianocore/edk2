@@ -91,7 +91,7 @@ class CmdParser():
         self.PreProcessCmd = PREPROCESSOR_COMMAND
         self.PreProcessOpt = PREPROCESSOR_OPTIONS
         self.OptionIntialization(Args, Argc)
-        #self.CopyFileToOutputDir() # for development and testing
+        self.CopyFileToOutputDir() # for development and testing
 
     def OptionIntialization(self, Args, Argc):
         Status = EFI_SUCCESS
@@ -328,12 +328,14 @@ class CmdParser():
         return FileList
 
     def CopyFileToOutputDir(self): ############
-        self.Options.ProcessedInFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
-        if self.Options.ProcessedInFileName == None:
-            EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                                "File/directory %s not found in workspace" % (self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
-        shutil.copyfile(self.Options.InputFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.vfr')
-        shutil.copyfile(self.Options.ProcessedInFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.i')
+        self.Options.InputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + '.vfr'
+        # self.Options.ProcessedInFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
+        self.Options.ProcessedInFileName = self.Options.OutputDirectory + self.Options.BaseFileName + '.i'
+        # if self.Options.ProcessedInFileName == None:
+        #     EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+        #                         "File/directory %s not found in workspace" % (self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
+        # shutil.copyfile(self.Options.InputFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.vfr')
+        # shutil.copyfile(self.Options.ProcessedInFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.i')
 
     def SET_RUN_STATUS(self, Status):
         self.RunStatus = Status
