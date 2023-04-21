@@ -4,6 +4,7 @@
 
   (C) Copyright 2014-2021 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -109,6 +110,7 @@ realloc (
   return NULL;
 }
 
+#if !defined (MDE_CPU_ARM)
 void *
 memcpy (
   void          *dest,
@@ -119,14 +121,16 @@ memcpy (
   return CopyMem (dest, src, (UINTN)count);
 }
 
+#endif
+
 void *
 memset (
   void          *dest,
-  char          ch,
+  int           ch,
   unsigned int  count
   )
 {
-  return SetMem (dest, count, ch);
+  return SetMem (dest, (UINTN)count, (UINT8)ch);
 }
 
 void
