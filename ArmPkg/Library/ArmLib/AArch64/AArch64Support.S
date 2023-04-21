@@ -425,10 +425,6 @@ ASM_FUNC(ArmCallWFI)
   wfi
   ret
 
-ASM_FUNC(ArmReadIdAA64Mmfr2)
-  mrs   x0, ID_AA64MMFR2_EL1           // read EL1 MMFR2
-  ret
-
 ASM_FUNC(ArmReadMpidr)
   mrs   x0, mpidr_el1           // read EL1 MPIDR
   ret
@@ -451,10 +447,6 @@ ASM_FUNC(ArmIsArchTimerImplemented)
   mov   x0, #1
   ret
 
-
-ASM_FUNC(ArmReadIdAA64Pfr0)
-  mrs   x0, id_aa64pfr0_el1   // Read ID_AA64PFR0 Register
-  ret
 
 
 // VOID ArmWriteHcr(UINTN Hcr)
@@ -480,6 +472,56 @@ ASM_FUNC(ArmReadCntHctl)
 // VOID ArmWriteCntHctl(UINT32 CntHctl)
 ASM_FUNC(ArmWriteCntHctl)
   msr   cnthctl_el2, x0
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Dfr0)
+  mrs   x0, ID_AA64DFR0_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Dfr1)
+  mrs   x0, ID_AA64DFR1_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Isar0)
+  mrs   x0, ID_AA64ISAR0_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Isar1)
+  mrs   x0, ID_AA64ISAR1_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Isar2)
+  mrs   x0, ID_AA64ISAR2_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Mmfr0)
+  mrs   x0, ID_AA64MMFR0_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Mmfr1)
+  mrs   x0, ID_AA64MMFR1_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Mmfr2)
+  mrs   x0, ID_AA64MMFR2_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Pfr0)
+  mrs   x0, ID_AA64PFR0_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Pfr1)
+  mrs   x0, ID_AA64PFR1_EL1
   ret
 
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
