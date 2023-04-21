@@ -337,7 +337,7 @@ class VfrCompiler():
         else:
             if self.Options.SkipCPreprocessor == False:  ##### wip
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
-            else:
+            if True:
                 try:
                     fFile = open(LongFilePath(self.Options.InputFileName), mode='r')
                     fFile.close()
@@ -346,7 +346,6 @@ class VfrCompiler():
                     if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                         self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
                     return
-
                 PreProcessCmd = self.PreProcessCmd + " " + self.PreProcessOpt + " "
                 if self.Options.IncludePaths != None:
                     PreProcessCmd += self.Options.IncludePaths + " "
@@ -355,9 +354,10 @@ class VfrCompiler():
                 PreProcessCmd += self.Options.InputFileName + " > "
                 PreProcessCmd += self.Options.PreprocessorOutputFileName
 
-                #PreProcessCmd = '/showIncludes /nologo /E /TC /DVFRCOMPILE /FIRamDiskDxeStrDefs.h  test/test.vfr > test/test.i'
-                print(PreProcessCmd)
-                if self.ExecuteCmd(PreProcessCmd) != 0:
+                #PreProcessCmd = "\"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\cl.exe\" /showIncludes /nologo /E /TC /DVFRCOMPILE /C:\edk2\Build\Ovmf3264\DEBUG_VS2015x86\X64\NetworkPkg\IScsiDxe\IScsiDxe\DEBUG\IScsiDxeStrDefs.h /C:\edk2\NetworkPkg\IScsiDxe /C:\edk2\MdePkg /C:\edk2\MdePkg\Include /C:\edk2\MdePkg\Test\UnitTest\Include /C:\edk2\MdePkg\Test\Mock\Include /C:\edk2\MdePkg\Include\X64 /C:\edk2\MdeModulePkg /C:\edk2\MdeModulePkg\Include /C:\edk2\CryptoPkg /C:\edk2\CryptoPkg\Include /C:\edk2\NetworkPkg /C:\edk2\NetworkPkg\Include c:\edk2\NetworkPkg\IScsiDxe\IScsiConfigVfr.vfr > c:\IScsiConfigVfr.i"
+                #"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\cl.exe" /showIncludes /nologo /E /TC /DVFRCOMPILE /FIC:\edk2\Build\Ovmf3264\DEBUG_VS2015x86\X64\NetworkPkg\IScsiDxe\IScsiDxe\DEBUG\IScsiDxeStrDefs.h /IC:\edk2\NetworkPkg\IScsiDxe /IC:\edk2\MdePkg /IC:\edk2\MdePkg\Include /IC:\edk2\MdePkg\Test\UnitTest\Include /IC:\edk2\MdePkg\Test\Mock\Include /IC:\edk2\MdePkg\Include\X64 /IC:\edk2\MdeModulePkg /IC:\edk2\MdeModulePkg\Include /IC:\edk2\CryptoPkg /IC:\edk2\CryptoPkg\Include /IC:\edk2\NetworkPkg /IC:\edk2\NetworkPkg\Include c:\edk2\NetworkPkg\IScsiDxe\IScsiConfigVfr.vfr > c:\edk2\IScsiConfigVfr.i
+                # print(PreProcessCmd)
+                if os.system(PreProcessCmd) != 0:
                     EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "failed to spawn C preprocessor on VFR file {}".format(PreProcessCmd))
                     if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                         self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
@@ -467,64 +467,6 @@ class VfrCompiler():
     def IS_RUN_STATUS(self, Status):
         return self.RunStatus == Status
 
-    def ExecuteCmd(self,cmd,work_dir=None):
-        reError = '(^b"Error)'  #This will match if str(line) starts with the word "Error"
-        # self.build_log.log(Log.LOG_DBG, "%s" % cmd)
-        failed = False
-        if cmd.strip().startswith('None '):
-            failed = True
-        try:
-            start = int(round(time.time() * 1000))
-            try:
-                if work_dir:
-                    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,cwd=work_dir)
-                else:
-                    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-
-                while True:
-                    line = p.stdout.readline()
-                    if not line:
-                        break
-                    #self.build_log.log(Log.LOG_DBG, line.strip().decode('ascii', errors='ignore'))
-                    tmp_str = line.split()
-                    error = re.search(reError, str(line)) #Need to do str(line) due to line being a byte object.
-                    if line.strip().startswith('- Failed -'.encode(encoding='ascii')) or \
-                            (len(tmp_str) >= 2 and tmp_str[0].endswith(':'.encode(encoding='ascii')) \
-                            and tmp_str[1] == 'ERROR') or (len(tmp_str) >= 3 \
-                            and tmp_str[0] == 'Error' and tmp_str[2] == '-') or \
-                            ((len(tmp_str) >= 3) and ('error:'.encode(encoding='ascii') in tmp_str[2])):
-                        failed = True
-                    if error:
-                        #self.build_log.log(Log.LOG_ERR, "Failed, please check log file for more details!")
-                        failed = True
-
-                p.communicate()
-
-            except subprocess.CalledProcessError as  e:
-                ret = e.returncode
-            else:
-                ret = 0
-            finally:
-                pass
-                 #self.build_log.log(Log.LOG_DBG, '[cmd=%s]' % cmd)
-            end = int(round(time.time() * 1000))
-
-        except Exception as e:
-            #self.build_log.log(Log.LOG_ERR, e)
-            raise RuntimeError
-        else:
-            if failed:
-                ret = -1
-            if ret == 0:
-                ret_str = 'SUCCESS'
-            else:
-                ret_str = 'FAIL'
-            #self.build_log.log(Log.LOG_DBG, "\t - %s : %d ms\n" % (ret_str, end - start))
-            if ret:
-                #self.clean_up_temp_files()
-                os._exit(ret)
-        return ret
-
     def FindIncludeHeaderFile(self, Start, Name): ##########
         FileList = []
         for Relpath, Dirs, Files in os.walk(Start):
@@ -549,8 +491,8 @@ def main():
     Compiler.PreProcess()
     Compiler.Compile()
     Compiler.GenBinaryFiles()
-    Compiler.Options.YamlOutputFileName = "Vfrprocessed.yml"
-    Compiler.DumpYaml()
+    # Compiler.Options.YamlOutputFileName = "Vfrprocessed.yml"
+    # Compiler.DumpYaml()
     # Compiler.DumpJson()
 
     Status = Compiler.RunStatus

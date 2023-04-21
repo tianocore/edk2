@@ -98,7 +98,7 @@ CVfrCompiler::OptionInitialization (
     } else if (stricmp(Argv[Index], "-l") == 0) {
       mOptions.CreateRecordListFile = TRUE;
       gCIfrRecordInfoDB.TurnOn ();
-    } else if (stricmp(Argv[Index], "-i") == 0) { 
+    } else if (stricmp(Argv[Index], "-i") == 0) {
       Index++;
       if ((Index >= Argc) || (Argv[Index][0] == '-')) {
         DebugError (NULL, 0, 1001, "Missing option", "-i missing path argument");
@@ -636,6 +636,7 @@ CVfrCompiler::PreProcess (
   }
   strcat (PreProcessCmd, mOptions.VfrFileName), strcat (PreProcessCmd, " > ");
   strcat (PreProcessCmd, mOptions.PreprocessorOutputFileName);
+  PreProcessCmd = "/showIncludes /nologo /E /TC /DVFRCOMPILE /FIRamDiskDxeStrDefs.h  test/test.vfr > test/test.i";
 
   if (system (PreProcessCmd) != 0) {
     DebugError (NULL, 0, 0003, "Error parsing file", "failed to spawn C preprocessor on VFR file %s\n", PreProcessCmd);

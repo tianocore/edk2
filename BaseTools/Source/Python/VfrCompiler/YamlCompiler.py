@@ -91,7 +91,7 @@ class CmdParser():
         self.PreProcessCmd = PREPROCESSOR_COMMAND
         self.PreProcessOpt = PREPROCESSOR_OPTIONS
         self.OptionIntialization(Args, Argc)
-        self.CopyFileToOutputDir() # for development and testing
+        #self.CopyFileToOutputDir() # for development and testing
 
     def OptionIntialization(self, Args, Argc):
         Status = EFI_SUCCESS
@@ -374,7 +374,7 @@ class YamlCompiler(CmdParser):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
-            self.YamlTree.ConsumeDLT()
+            # self.YamlTree.ConsumeDLT()
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_YAML_DLT_CONSUMED)
 
     def GenBinaryFiles(self):
@@ -535,8 +535,8 @@ def main():
         Compiler = YamlCompiler(Cmd)
         Compiler.PreProcess()
         Compiler.Compile()
-        #Compiler.ConsumeDLT()
-        # Compiler.GenBinaryFiles()
+        Compiler.ConsumeDLT()
+        Compiler.GenBinaryFiles()
 
     Status = Compiler.RunStatus
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:

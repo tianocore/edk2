@@ -333,7 +333,7 @@ class FormPkg():
                 ReturnList.append(InsertOpNode(CNObj, EFI_IFR_GUID_OP))
 
                 if Info.IsBitVar:
-                    MaxValue = 1 << Info.VarTotalSize - 1
+                    MaxValue = (1 << Info.VarTotalSize) - 1
                     CNObj.SetMinMaxStepData(0, MaxValue, 0)
                     LFlags = (EDKII_IFR_NUMERIC_SIZE_BIT & Info.VarTotalSize)
                     CNObj.SetFlagsForBitField(0, LFlags)

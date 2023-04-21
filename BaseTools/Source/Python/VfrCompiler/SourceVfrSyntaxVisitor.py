@@ -32,7 +32,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         self.PreProcessDB = PreProcessDB
         self.OverrideClassGuid = OverrideClassGuid
         self.VfrQuestionDB = QuestionDB if QuestionDB != None else VfrQuestionDB()
-        
+
         self.ParserStatus = 0
 
         self.Value = None
@@ -552,6 +552,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(ReturnCode, Line)
             ctx.Node.OpCode = EFI_IFR_SHOWN_DEFAULTSTORE_OP # For display in YAML
             DSObj.SetDefaultId (DefaultId)
+            DSObj.SetDefaultName(DefaultStoreNameId)
             ctx.Node.Data = DSObj
         return ctx.Node
 
@@ -1257,12 +1258,14 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         if FormMapMethodNumber == 0:
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'No MapMethod is set for FormMap!')
         else:
+            Index = 0
             for i in range(SIndex, SIndex + FormMapMethodNumber*2, 2):
                 MapTitle = self.PreProcessDB.Read(self.TransId(ctx.StringIdentifier(i)))
-                ctx.Node.Dict['maptitle'] = KV(self.TransId(ctx.StringIdentifier(i)), MapTitle)
+                ctx.Node.Dict['maptitle' + str(Index)] = KV(self.TransId(ctx.StringIdentifier(i)), MapTitle)
                 MapGuid = self.PreProcessDB.Read(self.TransId(ctx.StringIdentifier(i + 1)))
-                ctx.Node.Dict['mapguid'] = KV(self.TransId(ctx.StringIdentifier(i + 1)), MapGuid)
+                ctx.Node.Dict['mapguid'  + str(Index)] = KV(self.TransId(ctx.StringIdentifier(i + 1)), MapGuid)
                 FMapObj.SetFormMapMethod(MapTitle, MapGuid)
+                Index = Index + 1
         FormMap = FMapObj.GetInfo()
         MethodMapList = FMapObj.GetMethodMapList()
         for MethodMap in MethodMapList: # Extend Header Size for MethodMapList
@@ -2403,8 +2406,11 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data for namevalue
-        if UpdateVarType:
-            UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
+        if self.CurrQestVarInfo.VarType != EFI_IFR_TYPE_NUM_SIZE_64:
+            if self.CurrQestVarInfo.IsBitVar:
+                UpdatedNObj = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_32)
+            else:
+                UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
             UpdatedNObj.QName = NObj.QName
             UpdatedNObj.VarIdStr = NObj.VarIdStr
             UpdatedNObj.HasQuestionId = NObj.HasQuestionId
@@ -2731,8 +2737,11 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data Vartype for NameValue
-        if UpdateVarType:
-            UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
+        if self.CurrQestVarInfo.VarType != EFI_IFR_TYPE_NUM_SIZE_64:
+            if self.CurrQestVarInfo.IsBitVar:
+                UpdatedOObj = IfrOneOf(EFI_IFR_TYPE_NUM_SIZE_32)
+            else:
+                UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
             UpdatedOObj.QName = OObj.QName
             UpdatedOObj.VarIdStr = OObj.VarIdStr
             UpdatedOObj.HasQuestionId = OObj.HasQuestionId
@@ -3048,7 +3057,6 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             LFlags = ctx.vfrOrderedListFlags().LFlags
             self.ErrorHandler(OLObj.SetFlags(HFlags, LFlags), ctx.F.line)
             OLObj.SetFlagsStream(self.ExtractOriginalText(ctx.vfrOrderedListFlags()))
-
         ctx.Node.Buffer = gFormPkg.StructToStream(OLObj.GetInfo())
         self.InsertEndNode(ctx.Node, ctx.stop.line)
         self.IsOrderedList = False

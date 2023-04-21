@@ -51,10 +51,11 @@ class YamlTree():
         IfrFormId.Clear()
         self.Parser = YamlParser(self.Root, self.Options, self.PreProcessDB, self.YamlDict, self.GuidID)
         self.Parser.Parse()
-        self.IfrTree.DumpCompiledYaml()
 
     def GenBinaryFiles(self):
         self.IfrTree.GenBinaryFiles()
+        self.IfrTree.DumpCompiledYaml()
+        self.IfrTree.GenRecordListFile()
 
     def ConsumeDLT(self):
         self.Options.DeltaFileName = self.Options.OutputDirectory + 'Vfr.dlt' #
@@ -462,8 +463,6 @@ class YamlParser():
             DSObj.SetDefaultId (DefaultId)
             Node = IfrTreeNode(EFI_IFR_DEFAULTSTORE_OP, DSObj, gFormPkg.StructToStream(DSObj.GetInfo()))
             ParentNode.insertChild(Node)
-            # Node.Data = DSObj
-            # Node.Buffer = gFormPkg.StructToStream(DSObj.GetInfo())
         else:
             pNode, ReturnCode = gVfrDefaultStore.ReRegisterDefaultStoreById(DefaultId, RefName, DefaultStoreNameId)
             self.ErrorHandler(ReturnCode)
@@ -494,6 +493,7 @@ class YamlParser():
         VSObj.SetVarStoreId(VarStoreId)
         Size, ReturnCode = gVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
         self.ErrorHandler(ReturnCode)
+        VSObj.SetSize(Size)
         Node = IfrTreeNode(EFI_IFR_VARSTORE_OP, VSObj, gFormPkg.StructToStream(VSObj.GetInfo()))
         Node.Buffer += bytes('\0',encoding='utf-8')
         ParentNode.insertChild(Node)
@@ -589,18 +589,23 @@ class YamlParser():
         else:
             for MapDict in Formmap['map']:
                 FMapObj.SetFormMapMethod(MapDict['maptitle'], MapDict['mapguid'])
-        FormMap = FMapObj.GetInfo()
-        MethodMapList = FMapObj.GetMethodMapList()
-        for MethodMap in MethodMapList: # Extend Header Size for MethodMapList
-            FormMap.Header.Length += sizeof(EFI_IFR_FORM_MAP_METHOD)
-        Node = IfrTreeNode(EFI_IFR_FORM_MAP_OP, FMapObj, gFormPkg.StructToStream(FormMap), Pos)
+
+
+        Node = IfrTreeNode(EFI_IFR_FORM_MAP_OP, FMapObj)
         ParentNode.insertChild(Node)
-        for MethodMap in MethodMapList:
-            Node.Buffer += gFormPkg.StructToStream(MethodMap)
+
         if 'component' in Formmap.keys():
             for Component in Formmap['component']:
                 (Key, Value), = Component.items()
                 self._ParseVfrForm(Key, Value, Node, Pos)
+        FormMap = FMapObj.GetInfo()
+        MethodMapList = FMapObj.GetMethodMapList()
+        for MethodMap in MethodMapList: # Extend Header Size for MethodMapList
+            FormMap.Header.Length += sizeof(EFI_IFR_FORM_MAP_METHOD)
+        Node.Buffer = gFormPkg.StructToStream(FormMap)
+        Node.Position = Pos
+        for MethodMap in MethodMapList:
+            Node.Buffer += gFormPkg.StructToStream(MethodMap)
         self.InsertEndNode(Node)
         return Node
 
@@ -1482,7 +1487,8 @@ class YamlParser():
                 self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "OrderedList MaxContainers can't be larger than the max number of elements in array.")
             OLObj.SetMaxContainers(MaxContainers)
 
-        self._ParseOrderedListFlags(OrderedList)
+        HFlags, LFlags = self._ParseOrderedListFlags(OrderedList)
+        self.ErrorHandler(OLObj.SetFlags(HFlags, LFlags))
         Node = IfrTreeNode(EFI_IFR_ORDERED_LIST_OP, OLObj, gFormPkg.StructToStream(OLObj.GetInfo()))
         self.SetPosition(Node, Position)
         ParentNode.insertChild(Node)
@@ -1693,8 +1699,11 @@ class YamlParser():
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data for namevalue
-        if UpdateVarType:
-            UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
+        if self.CurrQestVarInfo.VarType != EFI_IFR_TYPE_NUM_SIZE_64:
+            if self.CurrQestVarInfo.IsBitVar:
+                UpdatedNObj = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_32)
+            else:
+                UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
             UpdatedNObj.GetInfo().Question = NObj.GetInfo().Question
             UpdatedNObj.GetInfo().Flags = NObj.GetInfo().Flags
             NObj = UpdatedNObj
@@ -1985,16 +1994,17 @@ class YamlParser():
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data Vartype for NameValue
-        if UpdateVarType:
-            UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
+        if self.CurrQestVarInfo.VarType != EFI_IFR_TYPE_NUM_SIZE_64:
+            if self.CurrQestVarInfo.IsBitVar:
+                UpdatedOObj = IfrOneOf(EFI_IFR_TYPE_NUM_SIZE_32)
+            else:
+                UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
             UpdatedOObj.GetInfo().Question = OObj.GetInfo().Question
             UpdatedOObj.GetInfo().Flags = OObj.GetInfo().Flags
             OObj = UpdatedOObj
-
             Node.Data = OObj
             self.CurrentQuestion = Node.Data
             self.CurrentMinMaxData = Node.Data
-
 
         self._ParseVfrSetMinMaxStep(OObj, OneOf)
         if not HasGuidNode:

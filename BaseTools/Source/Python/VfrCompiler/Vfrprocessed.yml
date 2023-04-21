@@ -1,0 +1,5 @@
+## DO NOT REMOVE -- VFR Mode
+formset:
+  buffer:  '< 00000000: 0E A7 F4 27 4A A0 00 DF 42 4D B5 52 39 51 13 02 11 3D 13 00 14 00 01 71 99 03 93 45 85 04 4B B4 5E 32 EB 83 26 04 0E >'
+  guid:  '{0xa04a27f4, 0xdf00, 0x4d42, { 0xb5, 0x52, 0x39, 0x51, 0x13, 0x2, 0x11, 0x3d }}'
+  help:  0x0014  # Help STRING_ID

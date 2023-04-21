@@ -2218,8 +2218,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data for namevalue
-        if UpdateVarType:
-            UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
+        if self.CurrQestVarInfo.VarType != EFI_IFR_TYPE_NUM_SIZE_64:
+            if self.CurrQestVarInfo.IsBitVar:
+                UpdatedNObj = IfrNumeric(EFI_IFR_TYPE_NUM_SIZE_32)
+            else:
+                UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
             UpdatedNObj.FlagsStream = NObj.FlagsStream
             UpdatedNObj.HasKey = NObj.HasKey
             UpdatedNObj.HasStep = NObj.HasStep
@@ -2538,8 +2541,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data Vartype for NameValue
-        if UpdateVarType:
-            UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
+        if self.CurrQestVarInfo.VarType != EFI_IFR_TYPE_NUM_SIZE_64:
+            if self.CurrQestVarInfo.IsBitVar:
+                UpdatedOObj = IfrOneOf(EFI_IFR_TYPE_NUM_SIZE_32)
+            else:
+                UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
             UpdatedOObj.GetInfo().Question = OObj.GetInfo().Question
             UpdatedOObj.GetInfo().Flags = OObj.GetInfo().Flags
             UpdatedOObj.GetInfo().Data.MinValue = OObj.GetInfo().Data.MinValue
