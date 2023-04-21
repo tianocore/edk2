@@ -1,0 +1,31 @@
+## @file
+#  Application to present AArch64 cpu information.
+#
+#  Based on HelloWorld:
+#  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2023, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = ArmCpuInfo
+  FILE_GUID                      = b3134491-6502-4faf-a9da-007184e32163
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UefiMain
+
+[Sources]
+  ArmCpuInfo.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  UefiApplicationEntryPoint
+  UefiLib
