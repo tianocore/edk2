@@ -86,6 +86,7 @@ if exist %EDK_TOOLS_PATH%\Source set BASE_TOOLS_PATH=%EDK_TOOLS_PATH%
 :checkBaseTools
 IF NOT EXIST "%EDK_TOOLS_PATH%\toolsetup.bat" goto BadBaseTools
 call %EDK_TOOLS_PATH%\toolsetup.bat %*
+if %ERRORLEVEL% NEQ 0 goto end
 if /I "%1"=="Reconfig" shift
 goto check_NASM
 goto check_cygwin
