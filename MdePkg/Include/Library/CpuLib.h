@@ -87,6 +87,31 @@ GetCpuSteppingId (
   VOID
   );
 
+/**
+  Get the max platform addressable bits.
+  Max physical address bits can be get from CPUID. When TME-MK feature
+  is enabled, the upper bits of the max physical address bits are
+  repurposed for usage as a KeyID.
+  Therefore, the max platform addressable bits is the max physical
+  address bits minus the upper bits used for KeyID if TME-MK is enable.
+
+  @param[out] ValidAddressMask          Bitmask with valid address bits set to
+                                        one; other bits are clear. Optional
+                                        parameter.
+
+  @param[out] ValidPageBaseAddressMask  Bitmask with valid page base address
+                                        bits set to one; other bits are clear.
+                                        Optional parameter.
+
+  @return  The max platform addressable bits.
+**/
+UINT8
+EFIAPI
+GetMaxPlatformAddressBits (
+  OUT UINT64  *ValidAddressMask         OPTIONAL,
+  OUT UINT64  *ValidPageBaseAddressMask OPTIONAL
+  );
+
 #endif
 
 #endif
