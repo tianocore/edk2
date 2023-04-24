@@ -321,6 +321,9 @@
   ##  @libraryclass  Provides function to support TDX processing.
   TdxLib|Include/Library/TdxLib.h
 
+  ##  @libraryclass  Provides function for manipulating x86 paging structures.
+  CpuPageTableLib|Include/Library/CpuPageTableLib.h
+
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides function to make ecalls to SBI
   BaseRiscVSbiLib|Include/Library/BaseRiscVSbiLib.h
