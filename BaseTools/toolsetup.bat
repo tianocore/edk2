@@ -250,24 +250,6 @@ if NOT exist %CONF_PATH%\build_rule.txt (
   if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\build_rule.template %CONF_PATH%\build_rule.txt > nul
 )
 
-echo           PATH      = %PATH%
-echo.
-if defined WORKSPACE (
-  echo      WORKSPACE      = %WORKSPACE%
-)
-if defined PACKAGES_PATH (
-  echo  PACKAGES_PATH      = %PACKAGES_PATH%
-)
-echo EDK_TOOLS_PATH      = %EDK_TOOLS_PATH%
-if defined BASE_TOOLS_PATH (
-  echo BASE_TOOLS_PATH     = %BASE_TOOLS_PATH%
-)
-if defined EDK_TOOLS_BIN (
-  echo  EDK_TOOLS_BIN      = %EDK_TOOLS_BIN%
-)
-echo      CONF_PATH      = %CONF_PATH%
-echo.
-
 :skip_reconfig
 
 @REM
@@ -381,7 +363,22 @@ if %ERRORLEVEL% EQU 0 (
   goto print_python_info
 
 :print_python_info
-  echo                PATH = %PATH%
+  echo           PATH      = %PATH%
+  echo.
+  if defined WORKSPACE (
+    echo      WORKSPACE      = %WORKSPACE%
+  )
+  if defined PACKAGES_PATH (
+    echo  PACKAGES_PATH      = %PACKAGES_PATH%
+  )
+  echo EDK_TOOLS_PATH      = %EDK_TOOLS_PATH%
+  if defined BASE_TOOLS_PATH (
+    echo BASE_TOOLS_PATH     = %BASE_TOOLS_PATH%
+  )
+  if defined EDK_TOOLS_BIN (
+    echo  EDK_TOOLS_BIN      = %EDK_TOOLS_BIN%
+  )
+  echo      CONF_PATH      = %CONF_PATH%
   echo      PYTHON_COMMAND = %PYTHON_COMMAND%
   echo          PYTHONPATH = %PYTHONPATH%
   echo.
