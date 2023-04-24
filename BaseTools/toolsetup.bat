@@ -371,14 +371,13 @@ if %ERRORLEVEL% EQU 0 (
   @echo Using EDK2 in-source Basetools
   if defined BASETOOLS_PYTHON_SOURCE goto print_python_info
   set "PATH=%BASE_TOOLS_PATH%\BinWrappers\WindowsLike;%PATH%"
-  set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
-  set PYTHONPATH=%BASETOOLS_PYTHON_SOURCE%;%PYTHONPATH%
+  set PYTHONPATH=%BASE_TOOLS_PATH%\Source\Python;%PYTHONPATH%
   goto print_python_info
 
 :use_pip_basetools
   @echo Using Pip Basetools
   set "PATH=%BASE_TOOLS_PATH%\BinPipWrappers\WindowsLike;%PATH%"
-  set BASETOOLS_PYTHON_SOURCE=edk2basetools
+  set PYTHONPATH=%BASE_TOOLS_PATH%\Source\Python;%PYTHONPATH%
   goto print_python_info
 
 :print_python_info
