@@ -178,6 +178,15 @@
       SmmCpuFeaturesLib|UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdSmmCpuFeaturesLib.inf
       MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/AmdMmSaveStateLib.inf
   }
+
+  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf {
+    <Defines>
+      FILE_GUID = 8734325E-DEAD-4742-A582-EC6E0E1CDE2B
+    <LibraryClasses>
+      SmmCpuPlatformHookLib|UefiCpuPkg/Library/SmmCpuPlatformHookLibNull/SmmCpuPlatformHookLibNull.inf
+      MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/OvmfMmSaveStateLib.inf
+  }
+
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
   UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
   UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
@@ -195,6 +204,7 @@
   }
   UefiCpuPkg/Library/MmSaveStateLib/AmdMmSaveStateLib.inf
   UefiCpuPkg/Library/MmSaveStateLib/IntelMmSaveStateLib.inf
+  UefiCpuPkg/Library/MmSaveStateLib/OvmfMmSaveStateLib.inf
   UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdSmmCpuFeaturesLib.inf
 
 [Components.X64]
