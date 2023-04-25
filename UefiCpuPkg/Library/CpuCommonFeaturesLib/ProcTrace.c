@@ -33,6 +33,7 @@ typedef struct  {
   MSR_IA32_RTIT_CTL_REGISTER                 RtitCtrl;
   MSR_IA32_RTIT_OUTPUT_BASE_REGISTER         RtitOutputBase;
   MSR_IA32_RTIT_OUTPUT_MASK_PTRS_REGISTER    RtitOutputMaskPtrs;
+  BOOLEAN                                    CycPacketSupported;
 } PROC_TRACE_PROCESSOR_DATA;
 
 typedef struct  {
@@ -47,6 +48,7 @@ typedef struct  {
   UINTN                        *TopaMemArray;
 
   BOOLEAN                      EnableOnBspOnly;
+  BOOLEAN                      EnablePerformanceCollecting;
 
   PROC_TRACE_PROCESSOR_DATA    *ProcessorData;
 } PROC_TRACE_DATA;
@@ -76,10 +78,11 @@ ProcTraceGetConfigData (
   ASSERT (ConfigData != NULL);
   ConfigData->ProcessorData = (PROC_TRACE_PROCESSOR_DATA *)((UINT8 *)ConfigData + sizeof (PROC_TRACE_DATA));
 
-  ConfigData->NumberOfProcessors    = (UINT32)NumberOfProcessors;
-  ConfigData->ProcTraceMemSize      = PcdGet32 (PcdCpuProcTraceMemSize);
-  ConfigData->ProcTraceOutputScheme = PcdGet8 (PcdCpuProcTraceOutputScheme);
-  ConfigData->EnableOnBspOnly       = PcdGetBool (PcdCpuProcTraceBspOnly);
+  ConfigData->NumberOfProcessors          = (UINT32)NumberOfProcessors;
+  ConfigData->ProcTraceMemSize            = PcdGet32 (PcdCpuProcTraceMemSize);
+  ConfigData->ProcTraceOutputScheme       = PcdGet8 (PcdCpuProcTraceOutputScheme);
+  ConfigData->EnableOnBspOnly             = PcdGetBool (PcdCpuProcTraceBspOnly);
+  ConfigData->EnablePerformanceCollecting = PcdGetBool (PcdCpuProcTracePerformanceCollecting);
 
   return ConfigData;
 }
@@ -111,7 +114,8 @@ ProcTraceSupport (
 {
   PROC_TRACE_DATA                              *ProcTraceData;
   CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_EBX  Ebx;
-  CPUID_INTEL_PROCESSOR_TRACE_MAIN_LEAF_ECX    Ecx;
+  CPUID_INTEL_PROCESSOR_TRACE_MAIN_LEAF_ECX    ProcTraceEcx;
+  CPUID_INTEL_PROCESSOR_TRACE_MAIN_LEAF_EBX    ProcTraceEbx;
 
   //
   // Check if ProcTraceMemorySize option is enabled (0xFF means disable by user)
@@ -132,15 +136,17 @@ ProcTraceSupport (
     return FALSE;
   }
 
-  AsmCpuidEx (CPUID_INTEL_PROCESSOR_TRACE, CPUID_INTEL_PROCESSOR_TRACE_MAIN_LEAF, NULL, NULL, &Ecx.Uint32, NULL);
-  ProcTraceData->ProcessorData[ProcessorNumber].TopaSupported        = (BOOLEAN)(Ecx.Bits.RTIT == 1);
-  ProcTraceData->ProcessorData[ProcessorNumber].SingleRangeSupported = (BOOLEAN)(Ecx.Bits.SingleRangeOutput == 1);
+  AsmCpuidEx (CPUID_INTEL_PROCESSOR_TRACE, CPUID_INTEL_PROCESSOR_TRACE_MAIN_LEAF, NULL, &ProcTraceEbx.Uint32, &ProcTraceEcx.Uint32, NULL);
+  ProcTraceData->ProcessorData[ProcessorNumber].TopaSupported        = (BOOLEAN)(ProcTraceEcx.Bits.RTIT == 1);
+  ProcTraceData->ProcessorData[ProcessorNumber].SingleRangeSupported = (BOOLEAN)(ProcTraceEcx.Bits.SingleRangeOutput == 1);
   if ((ProcTraceData->ProcessorData[ProcessorNumber].TopaSupported && (ProcTraceData->ProcTraceOutputScheme == RtitOutputSchemeToPA)) ||
       (ProcTraceData->ProcessorData[ProcessorNumber].SingleRangeSupported && (ProcTraceData->ProcTraceOutputScheme == RtitOutputSchemeSingleRange)))
   {
     ProcTraceData->ProcessorData[ProcessorNumber].RtitCtrl.Uint64           = AsmReadMsr64 (MSR_IA32_RTIT_CTL);
     ProcTraceData->ProcessorData[ProcessorNumber].RtitOutputBase.Uint64     = AsmReadMsr64 (MSR_IA32_RTIT_OUTPUT_BASE);
     ProcTraceData->ProcessorData[ProcessorNumber].RtitOutputMaskPtrs.Uint64 = AsmReadMsr64 (MSR_IA32_RTIT_OUTPUT_MASK_PTRS);
+    ProcTraceData->ProcessorData[ProcessorNumber].CycPacketSupported        = (BOOLEAN)(ProcTraceEbx.Bits.ConfigurablePsb == 1);
+
     return TRUE;
   }
 
@@ -517,6 +523,22 @@ ProcTraceInitialize (
   CtrlReg.Bits.User     = 1;
   CtrlReg.Bits.BranchEn = 1;
   CtrlReg.Bits.TraceEn  = 1;
+
+  //
+  // Generate CYC/TSC timing packets to collect performance data.
+  //
+  if (ProcTraceData->EnablePerformanceCollecting) {
+    if (ProcTraceData->ProcessorData[ProcessorNumber].CycPacketSupported) {
+      CtrlReg.Bits.CYCEn     = 1;
+      CtrlReg.Bits.CYCThresh = 5;
+    }
+
+    //
+    // Write to TSCEn is always supported
+    //
+    CtrlReg.Bits.TSCEn = 1;
+  }
+
   CPU_REGISTER_TABLE_WRITE64 (
     ProcessorNumber,
     Msr,
