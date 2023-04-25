@@ -1145,9 +1145,7 @@ GetCpuidXSaveSize (
   for (Idx = 0; Idx < CpuidInfo->Count; Idx++) {
     SEV_SNP_CPUID_FUNCTION  *CpuidFn = &CpuidInfo->function[Idx];
 
-    if (!((CpuidFn->EaxIn == 0xD) &&
-          ((CpuidFn->EcxIn == 0) || (CpuidFn->EcxIn == 1))))
-    {
+    if (!((CpuidFn->EaxIn == 0xD) && (CpuidFn->EcxIn > 1))) {
       continue;
     }
 
