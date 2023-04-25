@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -1441,6 +1441,14 @@ PerformRemainingTasks (
   )
 {
   if (mSmmReadyToLock) {
+    //
+    // Check if all Aps enter SMM. In Relaxed-AP Sync Mode, BSP will not wait for
+    // all Aps arrive. Howawever, SmmReadyToLock needs all Aps to arrive.
+    //
+    if (EFI_ERROR (SmmCpuRendezvous (NULL, TRUE))) {
+      DEBUG ((DEBUG_ERROR, "PerformRemainingTasks: fail to wait for all AP check in SMM!\n"));
+    }
+
     //
     // Start SMM Profile feature
     //
