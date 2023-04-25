@@ -48,11 +48,13 @@ AllocateConfidentialComputingBlob (
 
   CcBlob->Header                 = SIGNATURE_32 ('A', 'M', 'D', 'E');
   CcBlob->Version                = 1;
-  CcBlob->Reserved1              = 0;
+  CcBlob->Reserved               = 0;
   CcBlob->SecretsPhysicalAddress = (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfSnpSecretsBase);
   CcBlob->SecretsSize            = FixedPcdGet32 (PcdOvmfSnpSecretsSize);
+  CcBlob->Reserved1              = 0;
   CcBlob->CpuidPhysicalAddress   = (UINT64)(UINTN)FixedPcdGet32 (PcdOvmfCpuidBase);
   CcBlob->CpuidLSize             = FixedPcdGet32 (PcdOvmfCpuidSize);
+  CcBlob->Reserved2              = 0;
 
   *CcBlobPtr = CcBlob;
 
