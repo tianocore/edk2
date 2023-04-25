@@ -54,11 +54,11 @@ AS ?= $(CLANG_BIN)clang
 AR ?= $(CLANG_BIN)llvm-ar
 LD ?= $(CLANG_BIN)llvm-ld
 else ifeq ($(origin CC),default)
-CC = gcc
-CXX = g++
-AS = gcc
-AR = ar
-LD = ld
+CC = $(GCC_PREFIX)gcc
+CXX = $(GCC_PREFIX)g++
+AS = $(GCC_PREFIX)gcc
+AR = $(GCC_PREFIX)ar
+LD = $(GCC_PREFIX)ld
 endif
 LINKER ?= $(CC)
 ifeq ($(HOST_ARCH), IA32)
