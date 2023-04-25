@@ -1,7 +1,7 @@
 /** @file
   Intel Processor Trace feature.
 
-  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -46,6 +46,8 @@ typedef struct  {
 
   UINTN                        *TopaMemArray;
 
+  BOOLEAN                      EnableOnBspOnly;
+
   PROC_TRACE_PROCESSOR_DATA    *ProcessorData;
 } PROC_TRACE_DATA;
 
@@ -77,6 +79,7 @@ ProcTraceGetConfigData (
   ConfigData->NumberOfProcessors    = (UINT32)NumberOfProcessors;
   ConfigData->ProcTraceMemSize      = PcdGet32 (PcdCpuProcTraceMemSize);
   ConfigData->ProcTraceOutputScheme = PcdGet8 (PcdCpuProcTraceOutputScheme);
+  ConfigData->EnableOnBspOnly       = PcdGetBool (PcdCpuProcTraceBspOnly);
 
   return ConfigData;
 }
@@ -188,6 +191,7 @@ ProcTraceInitialize (
   MSR_IA32_RTIT_OUTPUT_BASE_REGISTER       OutputBaseReg;
   MSR_IA32_RTIT_OUTPUT_MASK_PTRS_REGISTER  OutputMaskPtrsReg;
   RTIT_TOPA_TABLE_ENTRY                    *TopaEntryPtr;
+  BOOLEAN                                  IsBsp;
 
   //
   // The scope of the MSR_IA32_RTIT_* is core for below processor type, only program
@@ -236,6 +240,12 @@ ProcTraceInitialize (
     return RETURN_SUCCESS;
   }
 
+  IsBsp = (CpuInfo->ProcessorInfo.StatusFlag & PROCESSOR_AS_BSP_BIT) ? TRUE : FALSE;
+
+  if (ProcTraceData->EnableOnBspOnly && !IsBsp) {
+    return RETURN_SUCCESS;
+  }
+
   MemRegionBaseAddr = 0;
   FirstIn           = FALSE;
 
@@ -260,43 +270,62 @@ ProcTraceInitialize (
     //   address base in MSR, IA32_RTIT_OUTPUT_BASE (560h) bits 47:12. Note that all regions must be
     //   aligned based on their size, not just 4K. Thus a 2M region must have bits 20:12 cleared.
     //
-    ThreadMemRegionTable = (UINTN *)AllocatePool (ProcTraceData->NumberOfProcessors * sizeof (UINTN *));
-    if (ThreadMemRegionTable == NULL) {
-      DEBUG ((DEBUG_ERROR, "Allocate ProcTrace ThreadMemRegionTable Failed\n"));
-      return RETURN_OUT_OF_RESOURCES;
-    }
 
-    ProcTraceData->ThreadMemRegionTable = ThreadMemRegionTable;
-
-    for (Index = 0; Index < ProcTraceData->NumberOfProcessors; Index++, ProcTraceData->AllocatedThreads++) {
-      Pages          = EFI_SIZE_TO_PAGES (MemRegionSize);
-      Alignment      = MemRegionSize;
-      AlignedAddress = (UINTN)AllocateAlignedReservedPages (Pages, Alignment);
-      if (AlignedAddress == 0) {
-        DEBUG ((DEBUG_ERROR, "ProcTrace: Out of mem, allocated only for %d threads\n", ProcTraceData->AllocatedThreads));
-        if (Index == 0) {
-          //
-          // Could not allocate for BSP even
-          //
-          FreePool ((VOID *)ThreadMemRegionTable);
-          ThreadMemRegionTable = NULL;
-          return RETURN_OUT_OF_RESOURCES;
-        }
-
-        break;
+    Pages     = EFI_SIZE_TO_PAGES (MemRegionSize);
+    Alignment = MemRegionSize;
+    if (ProcTraceData->EnableOnBspOnly) {
+      //
+      // When only enable ProcTrace on BSP, this is the first and only time ProcTraceInitialize() runs.
+      //
+      MemRegionBaseAddr = (UINTN)AllocateAlignedReservedPages (Pages, Alignment);
+      if (MemRegionBaseAddr == 0) {
+        //
+        // Could not allocate for BSP even
+        //
+        DEBUG ((DEBUG_ERROR, "ProcTrace: Out of mem, failed to allocate buffer for BSP\n"));
+        return RETURN_OUT_OF_RESOURCES;
       }
 
-      ThreadMemRegionTable[Index] = AlignedAddress;
-      DEBUG ((DEBUG_INFO, "ProcTrace: PT MemRegionBaseAddr(aligned) for thread %d: 0x%llX \n", Index, (UINT64)ThreadMemRegionTable[Index]));
-    }
+      DEBUG ((DEBUG_INFO, "ProcTrace: Allocated PT MemRegionBaseAddr(aligned) for BSP only: 0x%llX.\n", (UINT64)MemRegionBaseAddr));
+    } else {
+      ThreadMemRegionTable = (UINTN *)AllocatePool (ProcTraceData->NumberOfProcessors * sizeof (UINTN *));
+      if (ThreadMemRegionTable == NULL) {
+        DEBUG ((DEBUG_ERROR, "Allocate ProcTrace ThreadMemRegionTable Failed\n"));
+        return RETURN_OUT_OF_RESOURCES;
+      }
 
-    DEBUG ((DEBUG_INFO, "ProcTrace: Allocated PT mem for %d thread \n", ProcTraceData->AllocatedThreads));
+      ProcTraceData->ThreadMemRegionTable = ThreadMemRegionTable;
+
+      for (Index = 0; Index < ProcTraceData->NumberOfProcessors; Index++, ProcTraceData->AllocatedThreads++) {
+        AlignedAddress = (UINTN)AllocateAlignedReservedPages (Pages, Alignment);
+        if (AlignedAddress == 0) {
+          DEBUG ((DEBUG_ERROR, "ProcTrace: Out of mem, allocated only for %d threads\n", ProcTraceData->AllocatedThreads));
+          if (Index == 0) {
+            //
+            // Could not allocate for BSP even
+            //
+            FreePool ((VOID *)ThreadMemRegionTable);
+            ThreadMemRegionTable = NULL;
+            return RETURN_OUT_OF_RESOURCES;
+          }
+
+          break;
+        }
+
+        ThreadMemRegionTable[Index] = AlignedAddress;
+        DEBUG ((DEBUG_INFO, "ProcTrace: PT MemRegionBaseAddr(aligned) for thread %d: 0x%llX \n", Index, (UINT64)ThreadMemRegionTable[Index]));
+      }
+
+      DEBUG ((DEBUG_INFO, "ProcTrace: Allocated PT mem for %d thread \n", ProcTraceData->AllocatedThreads));
+    }
   }
 
-  if (ProcessorNumber < ProcTraceData->AllocatedThreads) {
-    MemRegionBaseAddr = ProcTraceData->ThreadMemRegionTable[ProcessorNumber];
-  } else {
-    return RETURN_SUCCESS;
+  if (!ProcTraceData->EnableOnBspOnly) {
+    if (ProcessorNumber < ProcTraceData->AllocatedThreads) {
+      MemRegionBaseAddr = ProcTraceData->ThreadMemRegionTable[ProcessorNumber];
+    } else {
+      return RETURN_SUCCESS;
+    }
   }
 
   ///
@@ -367,50 +396,67 @@ ProcTraceInitialize (
     //
     if (FirstIn) {
       DEBUG ((DEBUG_INFO, "ProcTrace: Enabling ToPA scheme \n"));
-      //
-      // Let BSP allocate ToPA table mem for all threads
-      //
-      TopaMemArray = (UINTN *)AllocatePool (ProcTraceData->AllocatedThreads * sizeof (UINTN *));
-      if (TopaMemArray == NULL) {
-        DEBUG ((DEBUG_ERROR, "ProcTrace: Allocate mem for ToPA Failed\n"));
-        return RETURN_OUT_OF_RESOURCES;
-      }
 
-      ProcTraceData->TopaMemArray = TopaMemArray;
+      Pages     = EFI_SIZE_TO_PAGES (sizeof (PROC_TRACE_TOPA_TABLE));
+      Alignment = 0x1000;
 
-      for (Index = 0; Index < ProcTraceData->AllocatedThreads; Index++) {
-        Pages          = EFI_SIZE_TO_PAGES (sizeof (PROC_TRACE_TOPA_TABLE));
-        Alignment      = 0x1000;
-        AlignedAddress = (UINTN)AllocateAlignedReservedPages (Pages, Alignment);
-        if (AlignedAddress == 0) {
-          if (Index < ProcTraceData->AllocatedThreads) {
-            ProcTraceData->AllocatedThreads = Index;
-          }
-
-          DEBUG ((DEBUG_ERROR, "ProcTrace:  Out of mem, allocated ToPA mem only for %d threads\n", ProcTraceData->AllocatedThreads));
-          if (Index == 0) {
-            //
-            // Could not allocate for BSP even
-            //
-            FreePool ((VOID *)TopaMemArray);
-            TopaMemArray = NULL;
-            return RETURN_OUT_OF_RESOURCES;
-          }
-
-          break;
+      if (ProcTraceData->EnableOnBspOnly) {
+        //
+        // When only enable ProcTrace on BSP, this is the first and only time ProcTraceInitialize() runs.
+        //
+        TopaTableBaseAddr = (UINTN)AllocateAlignedReservedPages (Pages, Alignment);
+        if (TopaTableBaseAddr == 0) {
+          DEBUG ((DEBUG_ERROR, "ProcTrace: Out of mem, failed to allocate ToPA mem for BSP"));
+          return RETURN_OUT_OF_RESOURCES;
         }
 
-        TopaMemArray[Index] = AlignedAddress;
-        DEBUG ((DEBUG_INFO, "ProcTrace: Topa table address(aligned) for thread %d is 0x%llX \n", Index, (UINT64)TopaMemArray[Index]));
-      }
+        DEBUG ((DEBUG_INFO, "ProcTrace: Topa table address(aligned) for BSP only: 0x%llX \n", (UINT64)TopaTableBaseAddr));
+      } else {
+        //
+        // Let BSP allocate ToPA table mem for all threads
+        //
+        TopaMemArray = (UINTN *)AllocatePool (ProcTraceData->AllocatedThreads * sizeof (UINTN *));
+        if (TopaMemArray == NULL) {
+          DEBUG ((DEBUG_ERROR, "ProcTrace: Allocate mem for ToPA Failed\n"));
+          return RETURN_OUT_OF_RESOURCES;
+        }
 
-      DEBUG ((DEBUG_INFO, "ProcTrace: Allocated ToPA mem for %d thread \n", ProcTraceData->AllocatedThreads));
+        ProcTraceData->TopaMemArray = TopaMemArray;
+
+        for (Index = 0; Index < ProcTraceData->AllocatedThreads; Index++) {
+          AlignedAddress = (UINTN)AllocateAlignedReservedPages (Pages, Alignment);
+          if (AlignedAddress == 0) {
+            if (Index < ProcTraceData->AllocatedThreads) {
+              ProcTraceData->AllocatedThreads = Index;
+            }
+
+            DEBUG ((DEBUG_ERROR, "ProcTrace:  Out of mem, allocated ToPA mem only for %d threads\n", ProcTraceData->AllocatedThreads));
+            if (Index == 0) {
+              //
+              // Could not allocate for BSP even
+              //
+              FreePool ((VOID *)TopaMemArray);
+              TopaMemArray = NULL;
+              return RETURN_OUT_OF_RESOURCES;
+            }
+
+            break;
+          }
+
+          TopaMemArray[Index] = AlignedAddress;
+          DEBUG ((DEBUG_INFO, "ProcTrace: Topa table address(aligned) for thread %d is 0x%llX \n", Index, (UINT64)TopaMemArray[Index]));
+        }
+
+        DEBUG ((DEBUG_INFO, "ProcTrace: Allocated ToPA mem for %d thread \n", ProcTraceData->AllocatedThreads));
+      }
     }
 
-    if (ProcessorNumber < ProcTraceData->AllocatedThreads) {
-      TopaTableBaseAddr = ProcTraceData->TopaMemArray[ProcessorNumber];
-    } else {
-      return RETURN_SUCCESS;
+    if (!ProcTraceData->EnableOnBspOnly) {
+      if (ProcessorNumber < ProcTraceData->AllocatedThreads) {
+        TopaTableBaseAddr = ProcTraceData->TopaMemArray[ProcessorNumber];
+      } else {
+        return RETURN_SUCCESS;
+      }
     }
 
     TopaTable                 = (PROC_TRACE_TOPA_TABLE *)TopaTableBaseAddr;
