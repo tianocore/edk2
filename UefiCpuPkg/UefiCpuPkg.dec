@@ -338,6 +338,13 @@
   # @Prompt Current boot is a power-on reset.
   gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset|FALSE|BOOLEAN|0x0000001B
 
+  ## This PCD indicates whether CPU processor trace is enabled on BSP only when CPU processor trace is enabled.<BR><BR>
+  #  This PCD is ignored if CPU processor trace is disabled.<BR><BR>
+  #  TRUE  - CPU processor trace is enabled on BSP only.<BR>
+  #  FASLE - CPU processor trace is enabled on all CPU.<BR>
+  # @Prompt Enable CPU processor trace only on BSP.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceBspOnly|FALSE|BOOLEAN|0x60000019
+
 [PcdsFixedAtBuild.X64, PcdsPatchableInModule.X64, PcdsDynamic.X64, PcdsDynamicEx.X64]
   ## Indicate access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.
   #  MMIO access is always allowed regardless of the value of this PCD.
