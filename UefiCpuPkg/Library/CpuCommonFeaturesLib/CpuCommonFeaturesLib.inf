@@ -58,8 +58,9 @@
   LocalApicLib
 
 [Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuClockModulationDutyCycle   ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset                ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceOutputScheme      ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceMemSize           ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceBspOnly           ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuClockModulationDutyCycle       ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset                    ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceOutputScheme          ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceMemSize               ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceBspOnly               ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTracePerformanceCollecting ## SOMETIMES_CONSUMES
