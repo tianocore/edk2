@@ -464,7 +464,11 @@ Tpm2GetPtpInterface (
     return Tpm2PtpInterfaceFifo;
   }
 
-  return Tpm2PtpInterfaceTis;
+  if (InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) {
+    return Tpm2PtpInterfaceTis;
+  }
+
+  return Tpm2PtpInterfaceMax;
 }
 
 /**
