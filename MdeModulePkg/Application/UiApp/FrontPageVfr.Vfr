@@ -49,7 +49,7 @@ formset
       align right;
 
     banner
-      title = STRING_TOKEN(STR_CUSTOMIZE_BANNER_LINE4_LEFT),
+      title = STRING_TOKEN(STR_FRONT_PAGE_EC_VERSION),
       line  4,
       align left;
 

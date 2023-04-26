@@ -1738,6 +1738,14 @@
   # @Prompt Firmware version string.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L""|VOID*|0x00010052
 
+  ## Null-terminated Unicode string that describes the major EC firmware version.
+  # @Prompt EC Firmware version string.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEcMajorFirmwareVersion|0x00|UINT8|0x0001007a
+
+  ## Null-terminated Unicode string that describes the minor EC firmware version.
+  # @Prompt EC Firmware version string.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEcMinorFirmwareVersion|0x00|UINT8|0x0001007b
+
   ## Null-terminated Unicode string that contains the date the firmware was released
   # @Prompt Firmware release data string.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareReleaseDateString|L""|VOID*|0x00010053

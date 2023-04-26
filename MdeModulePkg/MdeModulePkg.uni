@@ -432,9 +432,17 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFirmwareVersionString_HELP  #language en-US "Null-terminated Unicode string that describes the firmware version."
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFirmwareReleaseDateString_PROMPT  #language en-US "Firmware release data string"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEcMajorFirmwareVersionString_PROMPT  #language en-US "EC Firmware major version string"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFirmwareReleaseDateString_HELP  #language en-US "Null-terminated Unicode string that contains the date the firmware was released"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEcMajorFirmwareVersionString_HELP  #language en-US "Null-terminated Unicode string that describes the EC major firmware version."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEcMinorFirmwareVersion_PROMPT  #language en-US "EC Firmware minor version string"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEcMinorFirmwareVersion_HELP  #language en-US "Null-terminated Unicode string that describes the EC minor firmware version."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFirmwareReleaseDate_PROMPT  #language en-US "Firmware release data string"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFirmwareReleaseDate_HELP  #language en-US "Null-terminated Unicode string that contains the date the firmware was released"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdStatusCodeMemorySize_PROMPT  #language en-US "StatusCode memory size"
 

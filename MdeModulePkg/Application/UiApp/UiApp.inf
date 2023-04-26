@@ -76,6 +76,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution  ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEcMajorFirmwareVersion          ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEcMinorFirmwareVersion          ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                     ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
