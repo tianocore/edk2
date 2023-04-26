@@ -1111,6 +1111,8 @@ NonCoherentPciIoAllocateBuffer (
   NON_DISCOVERABLE_DEVICE_UNCACHED_ALLOCATION  *Alloc;
   VOID                                         *AllocAddress;
 
+  MemType = EFI_MEMORY_XP;
+
   if (HostAddress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1152,9 +1154,9 @@ NonCoherentPciIoAllocateBuffer (
     // Use write combining if it was requested, or if it is the only
     // type supported by the region.
     //
-    MemType = EFI_MEMORY_WC;
+    MemType |= EFI_MEMORY_WC;
   } else {
-    MemType = EFI_MEMORY_UC;
+    MemType |= EFI_MEMORY_UC;
   }
 
   Alloc = AllocatePool (sizeof *Alloc);
@@ -1171,6 +1173,34 @@ NonCoherentPciIoAllocateBuffer (
   // can restore the memory space attributes later
   //
   InsertHeadList (&Dev->UncachedAllocationList, &Alloc->List);
+
+  //
+  // Ensure that EFI_MEMORY_XP is in the capability set
+  //
+  if ((GcdDescriptor.Capabilities & EFI_MEMORY_XP) != EFI_MEMORY_XP) {
+    Status = gDS->SetMemorySpaceCapabilities (
+                    (PHYSICAL_ADDRESS)(UINTN)AllocAddress,
+                    EFI_PAGES_TO_SIZE (Pages),
+                    GcdDescriptor.Capabilities | EFI_MEMORY_XP
+                    );
+
+    // if we were to fail setting the capability, this would indicate an internal failure of the GCD code. We should
+    // assert here to let a platform know something went crazy, but for a release build we can let the allocation occur
+    // without the EFI_MEMORY_XP bit set, as that was the existing behavior
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a failed to set EFI_MEMORY_XP capability on 0x%llx for length 0x%llx. Attempting to allocate without XP set.\n",
+        __func__,
+        AllocAddress,
+        EFI_PAGES_TO_SIZE (Pages)
+        ));
+
+      ASSERT_EFI_ERROR (Status);
+
+      MemType &= ~EFI_MEMORY_XP;
+    }
+  }
 
   Status = gDS->SetMemorySpaceAttributes (
                   (EFI_PHYSICAL_ADDRESS)(UINTN)AllocAddress,
