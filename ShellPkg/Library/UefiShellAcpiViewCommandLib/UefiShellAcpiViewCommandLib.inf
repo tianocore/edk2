@@ -45,6 +45,7 @@
   Parsers/Madt/MadtParser.c
   Parsers/Madt/MadtParser.h
   Parsers/Mcfg/McfgParser.c
+  Parsers/Mpam/MpamParser.c
   Parsers/Pcct/PcctParser.c
   Parsers/Pcct/PcctParser.h
   Parsers/Pptt/PpttParser.c
