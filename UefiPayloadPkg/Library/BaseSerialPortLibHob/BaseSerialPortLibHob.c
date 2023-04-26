@@ -52,7 +52,8 @@ typedef struct {
 } UART_INFO;
 
 UART_INFO  mUartInfo[MAX_SIZE];
-UINT8      mUartCount = 0;
+UINT8      mUartCount                     = 0;
+BOOLEAN    mBaseSerialPortLibHobAtRuntime = FALSE;
 
 /**
   Reads an 8-bit register. If UseMmio is TRUE, then the value is read from
@@ -285,6 +286,11 @@ SerialPortWrite (
     UseMmio     = mUartInfo[Count].UseMmio;
     Stride      = mUartInfo[Count].RegisterStride;
 
+    if (UseMmio && mBaseSerialPortLibHobAtRuntime) {
+      Count++;
+      continue;
+    }
+
     if (BaseAddress == 0) {
       Count++;
       continue;
@@ -294,6 +300,13 @@ SerialPortWrite (
     BytesLeft  = NumberOfBytes;
 
     while (BytesLeft != 0) {
+      //
+      // Wait for the serial port to be ready, to make sure both the transmit FIFO
+      // and shift register empty.
+      //
+      while ((SerialPortReadRegister (BaseAddress, R_UART_LSR, UseMmio, Stride) & B_UART_LSR_TXRDY) == 0) {
+      }
+
       //
       // Fill the entire Tx FIFO
       //

@@ -256,7 +256,11 @@
   SerialPortLib|UefiPayloadPkg/Library/CbSerialPortLib/CbSerialPortLib.inf
   PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
 !else
-  SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
+  !if $(MULTIPLE_DEBUG_PORT_SUPPORT) == TRUE
+    SerialPortLib|UefiPayloadPkg/Library/BaseSerialPortLibHob/DxeBaseSerialPortLibHob.inf
+  !else
+    SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
+  !endif
   PlatformHookLib|UefiPayloadPkg/Library/PlatformHookLib/PlatformHookLib.inf
 !endif
   PlatformBootManagerLib|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
@@ -313,6 +317,9 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   DxeHobListLib|UefiPayloadPkg/Library/DxeHobListLibNull/DxeHobListLibNull.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+!if $(MULTIPLE_DEBUG_PORT_SUPPORT) == TRUE
+  SerialPortLib|UefiPayloadPkg/Library/BaseSerialPortLibHob/BaseSerialPortLibHob.inf
+!endif
 
 [LibraryClasses.common.DXE_CORE]
   DxeHobListLib|UefiPayloadPkg/Library/DxeHobListLibNull/DxeHobListLibNull.inf
@@ -617,7 +624,7 @@
     <LibraryClasses>
       !if $(MULTIPLE_DEBUG_PORT_SUPPORT) == TRUE
         DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-        SerialPortLib|UefiPayloadPkg/Library/BaseSerialPortLibHob/BaseSerialPortLibHob.inf
+        SerialPortLib|UefiPayloadPkg/Library/BaseSerialPortLibHob/DxeBaseSerialPortLibHob.inf
       !endif
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   }
