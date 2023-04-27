@@ -2,7 +2,7 @@
   Header file for ACPI parser
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
-  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2023, Arm Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -200,6 +200,22 @@ EFIAPI
 Dump12Chars (
   IN CONST CHAR16  *Format OPTIONAL,
   IN       UINT8   *Ptr
+  );
+
+/**
+  This function traces 16 characters which can be optionally
+  formated using the format string if specified.
+
+  If no format string is specified the Format must be NULL.
+
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+**/
+VOID
+EFIAPI
+Dump16Chars (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr
   );
 
 /**
