@@ -53,9 +53,9 @@ ASM_PFX(AsmInternalSyncCompareExchange32):
 1:
   ll.w  $t0, $a0, 0x0
   bne   $t0, $a1, 2f
-  move  $t0, $a2
-  sc.w  $t0, $a0, 0x0
-  beqz  $t0, 1b
+  move  $t1, $a2
+  sc.w  $t1, $a0, 0x0
+  beqz  $t1, 1b
   b     3f
 2:
   dbar  0
@@ -76,9 +76,9 @@ ASM_PFX(AsmInternalSyncCompareExchange64):
 1:
   ll.d  $t0, $a0, 0x0
   bne   $t0, $a1, 2f
-  move  $t0, $a2
-  sc.d  $t0, $a0, 0x0
-  beqz  $t0, 1b
+  move  $t1, $a2
+  sc.d  $t1, $a0, 0x0
+  beqz  $t1, 1b
   b     3f
 2:
   dbar  0
@@ -94,13 +94,10 @@ AsmInternalSyncIncrement (
   )
 **/
 ASM_PFX(AsmInternalSyncIncrement):
-  move     $t0, $a0
-  dbar     0
-  ld.w     $t1, $t0, 0x0
-  li.w     $t2, 1
-  amadd.w  $t1, $t2, $t0
+  li.w     $t0, 1
+  amadd.w  $zero, $t0, $a0
 
-  ld.w     $a0, $t0, 0x0
+  ld.w     $a0, $a0, 0
   jirl     $zero, $ra, 0
 
 /**
@@ -111,12 +108,9 @@ AsmInternalSyncDecrement (
   )
 **/
 ASM_PFX(AsmInternalSyncDecrement):
-  move     $t0, $a0
-  dbar     0
-  ld.w     $t1, $t0, 0x0
-  li.w     $t2, -1
-  amadd.w  $t1, $t2, $t0
+  li.w     $t0, -1
+  amadd.w  $zero, $t0, $a0
 
-  ld.w     $a0, $t0, 0x0
+  ld.w     $a0, $a0, 0
   jirl     $zero, $ra, 0
 .end
