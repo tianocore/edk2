@@ -39,7 +39,9 @@ NestedInterruptRaiseTPL (
   //
   ASSERT (GetInterruptState () == FALSE);
   InterruptedTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  ASSERT (InterruptedTPL < TPL_HIGH_LEVEL);
+  if (InterruptedTPL >= TPL_HIGH_LEVEL) {
+    DEBUG ((DEBUG_WARN, "%a: Called at IPL %d\n", __func__, InterruptedTPL));
+  }
 
   return InterruptedTPL;
 }
