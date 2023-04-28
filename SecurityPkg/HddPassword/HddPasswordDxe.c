@@ -2819,11 +2819,11 @@ HddPasswordDxeInit (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                     Status;
-  HDD_PASSWORD_DXE_PRIVATE_DATA  *Private;
-  VOID                           *Registration;
-  EFI_EVENT                      EndOfDxeEvent;
-  EDKII_VARIABLE_POLICY_PROTOCOL *VariablePolicy;
+  EFI_STATUS                      Status;
+  HDD_PASSWORD_DXE_PRIVATE_DATA   *Private;
+  VOID                            *Registration;
+  EFI_EVENT                       EndOfDxeEvent;
+  EDKII_VARIABLE_POLICY_PROTOCOL  *VariablePolicy;
 
   Private = NULL;
 
@@ -2862,15 +2862,15 @@ HddPasswordDxeInit (
   Status = gBS->LocateProtocol (&gEdkiiVariablePolicyProtocolGuid, NULL, (VOID **)&VariablePolicy);
   if (!EFI_ERROR (Status)) {
     Status = RegisterBasicVariablePolicy (
-                 VariablePolicy,
-                 &mHddPasswordVendorGuid,
-                 HDD_PASSWORD_VARIABLE_NAME,
-                 VARIABLE_POLICY_NO_MIN_SIZE,
-                 VARIABLE_POLICY_NO_MAX_SIZE,
-                 VARIABLE_POLICY_NO_MUST_ATTR,
-                 VARIABLE_POLICY_NO_CANT_ATTR,
-                 VARIABLE_POLICY_TYPE_LOCK_NOW
-                 );
+               VariablePolicy,
+               &mHddPasswordVendorGuid,
+               HDD_PASSWORD_VARIABLE_NAME,
+               VARIABLE_POLICY_NO_MIN_SIZE,
+               VARIABLE_POLICY_NO_MAX_SIZE,
+               VARIABLE_POLICY_NO_MUST_ATTR,
+               VARIABLE_POLICY_NO_CANT_ATTR,
+               VARIABLE_POLICY_TYPE_LOCK_NOW
+               );
     DEBUG ((DEBUG_INFO, "%a(): Lock %s variable (%r)\n", __func__, HDD_PASSWORD_VARIABLE_NAME, Status));
     ASSERT_EFI_ERROR (Status);
   }
