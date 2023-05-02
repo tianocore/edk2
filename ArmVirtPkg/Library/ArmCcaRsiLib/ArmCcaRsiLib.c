@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-bet2
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac0
      (https://developer.arm.com/documentation/den0137/)
 
 **/
@@ -351,7 +351,7 @@ RsiSetIpaState (
     ZeroMem (&SmcCmd, sizeof (SmcCmd));
     SmcCmd.Arg0 = FID_RSI_IPA_STATE_SET;
     SmcCmd.Arg1 = (UINTN)BaseAddress;
-    SmcCmd.Arg2 = (UINTN)Size;
+    SmcCmd.Arg2 = (UINTN)EndAddress;
     SmcCmd.Arg3 = (UINTN)State;
 
     ArmCallSmc (&SmcCmd);
