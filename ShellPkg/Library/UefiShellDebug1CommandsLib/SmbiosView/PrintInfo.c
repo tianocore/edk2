@@ -6,6 +6,8 @@
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2023 Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -306,9 +308,10 @@ SmbiosPrintStructure (
   IN  UINT8                     Option
   )
 {
-  UINT8  Index;
-  UINT8  Index2;
-  UINT8  *Buffer;
+  UINT8       Index;
+  UINT8       Index2;
+  UINT8       *Buffer;
+  EFI_STRING  String;
 
   if (Struct == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1304,6 +1307,109 @@ SmbiosPrintStructure (
       DisplayProcessorArchitectureType (Struct->Type44->ProcessorSpecificBlock.ProcessorArchType, Option);
       break;
 
+    //
+    // Firmware Inventory (Type 45)
+    //
+    case 45:
+      PRINT_PENDING_STRING (Struct, Type45, FirmwareComponentName);
+      PRINT_PENDING_STRING (Struct, Type45, FirmwareVersion);
+      if (Struct->Type45->FirmwareVersionFormat == VersionFormatTypeFreeForm) {
+        String = L"Free-form string";
+      } else if (Struct->Type45->FirmwareVersionFormat == VersionFormatTypeMajorMinor) {
+        String = L"MAJOR.MINOR";
+      } else if (Struct->Type45->FirmwareVersionFormat == VersionFormatType32BitHex) {
+        String = L"32-bit hexadecimal string";
+      } else if (Struct->Type45->FirmwareVersionFormat == VersionFormatTypeMajorMinor) {
+        String = L"64-bit hexadecimal string";
+      } else if (Struct->Type45->FirmwareVersionFormat >= 0x80) {
+        String = L"BIOS Vendor/OEM-specific";
+      } else {
+        String = L"Reserved";
+      }
+
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_FIRMWARE_VERSION_FORMAT),
+        gShellDebug1HiiHandle,
+        String
+        );
+      PRINT_PENDING_STRING (Struct, Type45, FirmwareId);
+      if (Struct->Type45->FirmwareIdFormat == FirmwareIdFormatTypeFreeForm) {
+        String = L"Free-form string";
+      } else if (Struct->Type45->FirmwareIdFormat == FirmwareIdFormatTypeUuid) {
+        String = L"RFC4122 UUID string";
+      } else if (Struct->Type45->FirmwareIdFormat >= 0x80) {
+        String = L"BIOS Vendor/OEM-specific";
+      } else {
+        String = L"Reserved";
+      }
+
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_FIRMWARE_ID_FORMAT),
+        gShellDebug1HiiHandle,
+        String
+        );
+      PRINT_PENDING_STRING (Struct, Type45, ReleaseDate);
+      PRINT_PENDING_STRING (Struct, Type45, Manufacturer);
+      PRINT_PENDING_STRING (Struct, Type45, LowestSupportedVersion);
+      if (Struct->Type45->ImageSize != MAX_UINT64) {
+        PRINT_STRUCT_VALUE_H (Struct, Type45, ImageSize);
+      } else {
+        ShellPrintHiiEx (
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_IMAGE_SIZE_UNKNOWN),
+          gShellDebug1HiiHandle
+          );
+      }
+
+      DisplayFirmwareCharacteristics (ReadUnaligned16 ((UINT16 *)(UINTN)&(Struct->Type45->Characteristics)), Option);
+      DisplayFirmwareState (*(UINT8 *)(UINTN)&(Struct->Type45->State), Option);
+
+      PRINT_STRUCT_VALUE_H (Struct, Type45, AssociatedComponentCount);
+      if (Struct->Hdr->Length > sizeof (*Struct->Type45)) {
+        for (Index = 0; Index < Struct->Type45->AssociatedComponentCount; Index++) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_FIRMWARE_INVENTORY_ASSOCIATED), gShellDebug1HiiHandle);
+          Print (L"    0x%04X ", Buffer[sizeof (*Struct->Type45) + (Index * sizeof (SMBIOS_HANDLE))]);
+          Print (L"\n");
+        }
+      }
+
+      break;
+
+    //
+    // String Property (Type 46)
+    //
+    case 46:
+      if (Struct->Type46->StringPropertyId == StringPropertyIdDevicePath) {
+        String = L"UEFI device path";
+      } else if ((Struct->Type46->StringPropertyId >= StringPropertyIdBiosVendor) &&
+                 (Struct->Type46->StringPropertyId < StringPropertyIdOem))
+      {
+        String = L"BIOS vendor defined";
+      } else if (Struct->Type46->StringPropertyId >= StringPropertyIdOem) {
+        String = L"OEM defined";
+      } else {
+        String = L"Reserved";
+      }
+
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_STRING_PROPERTY_ID),
+        gShellDebug1HiiHandle,
+        String
+        );
+      PRINT_PENDING_STRING (Struct, Type46, StringPropertyValue);
+      PRINT_STRUCT_VALUE_H (Struct, Type46, ParentHandle);
+      break;
     //
     // Inactive (Type 126)
     //
