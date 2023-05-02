@@ -1993,6 +1993,7 @@ DxeImageVerificationHandler (
       if (!EFI_ERROR (DbStatus) && IsFound) {
         IsVerified = TRUE;
       } else {
+        Action = EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND;
         DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is signed but signature is not allowed by DB and %s hash of image is not found in DB/DBX.\n", mHashTypeStr));
       }
     }
