@@ -213,6 +213,12 @@ STATIC CONST ACPI_PARSER  LocalApicFlags[] = {
   { L"Reserved",       30, 2, L"%d", NULL, NULL, NULL, NULL }
 };
 
+STATIC CONST ACPI_PARSER  MpsIntiFlags[] = {
+  { L"Polarity",       2,  0, L"%d", NULL, NULL, NULL, NULL },
+  { L"Trigger Mode",   2,  2, L"%d", NULL, NULL, NULL, NULL },
+  { L"Reserved",       12, 4, L"%d", NULL, NULL, NULL, NULL }
+};
+
 /**
   This function traces Bit Flags fields.
   If no format string is specified the Format must be NULL.
@@ -244,6 +250,36 @@ DumpLocalApicBitFlags (
 }
 
 /**
+  This function traces Bit Flags fields.
+  If no format string is specified the Format must be NULL.
+
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+**/
+VOID
+EFIAPI
+DumpMpsIntiBitFlags (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr
+  )
+{
+  if (Format != NULL) {
+    Print (Format, *(UINT32 *)Ptr);
+    return;
+  }
+
+  Print (L"0x%X\n", *(UINT32 *)Ptr);
+  ParseAcpiBitFields (
+    TRUE,
+    2,
+    NULL,
+    Ptr,
+    4,
+    PARSER_PARAMS (MpsIntiFlags)
+    );
+}
+
+/**
    An ACPI_PARSER array describing the Processor Local APIC Structure.
  **/
 STATIC CONST ACPI_PARSER  ProcessorLocalApic[] = {
@@ -253,6 +289,18 @@ STATIC CONST ACPI_PARSER  ProcessorLocalApic[] = {
   { L"ACPI Processor UID", 1, 2, L"0x%x", NULL,                  NULL, NULL, NULL },
   { L"APIC ID",            1, 3, L"0x%x", NULL,                  NULL, NULL, NULL },
   { L"Flags",              4, 4, NULL,    DumpLocalApicBitFlags, NULL, NULL, NULL }
+};
+
+/**
+   An ACPI_PARSER array describing the Local APIC NMI Structure.
+ **/
+STATIC CONST ACPI_PARSER  LocalApicNmi[] = {
+  { L"Type",               1, 0, L"0x%x", NULL,                  NULL, NULL, NULL },
+  { L"Length",             1, 1, L"%d",   NULL,                  NULL, NULL, NULL },
+
+  { L"ACPI Processor UID", 1, 2, L"0x%x", NULL,                  NULL, NULL, NULL },
+  { L"Flags",              2, 3, NULL,    DumpMpsIntiBitFlags,   NULL, NULL, NULL },
+  { L"Local APIC LINT#",   1, 5, L"%d",   NULL,                  NULL, NULL, NULL }
 };
 
 /**
@@ -501,6 +549,18 @@ ParseAcpiMadt (
           PARSER_PARAMS (ProcessorLocalApic)
           );
         break;
+      }
+      case EFI_ACPI_6_3_LOCAL_APIC_NMI:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "LOCAL APIC NMI",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (LocalApicNmi)
+          );
+          break;
       }
       case EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC:
       {
