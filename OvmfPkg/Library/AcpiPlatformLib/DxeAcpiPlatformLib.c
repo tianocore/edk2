@@ -65,3 +65,188 @@ GetAcpiRsdpFromMemory (
 
   return EFI_NOT_FOUND;
 }
+
+EFI_STATUS
+EFIAPI
+InstallAcpiTablesFromRsdp (
+  IN EFI_ACPI_TABLE_PROTOCOL                       *AcpiProtocol,
+  IN EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       TableHandle;
+
+  EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
+  EFI_ACPI_DESCRIPTION_HEADER                   *Xsdt;
+  VOID                                          *CurrentTableEntry;
+  UINTN                                         CurrentTablePointer;
+  EFI_ACPI_DESCRIPTION_HEADER                   *CurrentTable;
+  UINTN                                         Index;
+  UINTN                                         NumberOfTableEntries;
+  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt2Table;
+  EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt1Table;
+  EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs2Table;
+  EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs1Table;
+  EFI_ACPI_DESCRIPTION_HEADER                   *DsdtTable;
+
+  Fadt2Table           = NULL;
+  Fadt1Table           = NULL;
+  Facs2Table           = NULL;
+  Facs1Table           = NULL;
+  DsdtTable            = NULL;
+  TableHandle          = 0;
+  NumberOfTableEntries = 0;
+
+  //
+  // If XSDT table is find, just install its tables.
+  // Otherwise, try to find and install the RSDT tables.
+  //
+  if (Rsdp->XsdtAddress) {
+    //
+    // Retrieve the addresses of XSDT and
+    // calculate the number of its table entries.
+    //
+    Xsdt                 = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)Rsdp->XsdtAddress;
+    NumberOfTableEntries =
+      (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof (UINT64);
+
+    //
+    // Install ACPI tables found in XSDT.
+    //
+    for (Index = 0; Index < NumberOfTableEntries; Index++) {
+      //
+      // Get the table entry from XSDT
+      //
+      CurrentTableEntry =
+        (VOID *)((UINT8 *)Xsdt + sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
+                 Index * sizeof (UINT64));
+      CurrentTablePointer = (UINTN)*(UINT64 *)CurrentTableEntry;
+      CurrentTable        = (EFI_ACPI_DESCRIPTION_HEADER *)CurrentTablePointer;
+
+      //
+      // Install the XSDT tables
+      //
+      Status = AcpiProtocol->InstallAcpiTable (
+                               AcpiProtocol,
+                               CurrentTable,
+                               CurrentTable->Length,
+                               &TableHandle
+                               );
+
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      //
+      // Get the FACS and DSDT table address from the table FADT
+      //
+      if (!AsciiStrnCmp ((CHAR8 *)&CurrentTable->Signature, "FACP", 4)) {
+        Fadt2Table = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *)(UINTN)
+                     CurrentTablePointer;
+        Facs2Table = (EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)
+                     Fadt2Table->FirmwareCtrl;
+        DsdtTable = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)Fadt2Table->Dsdt;
+      }
+    }
+  } else if (Rsdp->RsdtAddress) {
+    //
+    // Retrieve the addresses of RSDT and
+    // calculate the number of its table entries.
+    //
+    Rsdt                 = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)Rsdp->RsdtAddress;
+    NumberOfTableEntries =
+      (Rsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof (UINT32);
+
+    //
+    // Install ACPI tables found in XSDT.
+    //
+    for (Index = 0; Index < NumberOfTableEntries; Index++) {
+      //
+      // Get the table entry from RSDT
+      //
+      CurrentTableEntry =
+        (UINT32 *)((UINT8 *)Rsdt + sizeof (EFI_ACPI_DESCRIPTION_HEADER) +
+                   Index * sizeof (UINT32));
+      CurrentTablePointer = *(UINT32 *)CurrentTableEntry;
+      CurrentTable        = (EFI_ACPI_DESCRIPTION_HEADER *)CurrentTablePointer;
+
+      //
+      // Install the RSDT tables
+      //
+      Status = AcpiProtocol->InstallAcpiTable (
+                               AcpiProtocol,
+                               CurrentTable,
+                               CurrentTable->Length,
+                               &TableHandle
+                               );
+
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+
+      //
+      // Get the FACS and DSDT table address from the table FADT
+      //
+      if (!AsciiStrnCmp ((CHAR8 *)&CurrentTable->Signature, "FACP", 4)) {
+        Fadt1Table = (EFI_ACPI_1_0_FIXED_ACPI_DESCRIPTION_TABLE *)(UINTN)
+                     CurrentTablePointer;
+        Facs1Table = (EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *)(UINTN)
+                     Fadt1Table->FirmwareCtrl;
+        DsdtTable = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN)Fadt1Table->Dsdt;
+      }
+    }
+  }
+
+  //
+  // Install the FACS table.
+  //
+  if (Fadt2Table) {
+    //
+    // FACS 2.0
+    //
+    Status = AcpiProtocol->InstallAcpiTable (
+                             AcpiProtocol,
+                             Facs2Table,
+                             Facs2Table->Length,
+                             &TableHandle
+                             );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  } else if (Fadt1Table) {
+    //
+    // FACS 1.0
+    //
+    Status = AcpiProtocol->InstallAcpiTable (
+                             AcpiProtocol,
+                             Facs1Table,
+                             Facs1Table->Length,
+                             &TableHandle
+                             );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Install DSDT table. If we reached this point without finding the DSDT,
+  // then we're out of sync with the hypervisor, and cannot continue.
+  //
+  if (DsdtTable == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: no DSDT found\n", __func__));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  Status = AcpiProtocol->InstallAcpiTable (
+                           AcpiProtocol,
+                           DsdtTable,
+                           DsdtTable->Length,
+                           &TableHandle
+                           );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
