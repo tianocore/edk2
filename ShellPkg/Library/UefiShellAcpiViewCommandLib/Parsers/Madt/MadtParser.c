@@ -214,9 +214,9 @@ STATIC CONST ACPI_PARSER  LocalApicFlags[] = {
 };
 
 STATIC CONST ACPI_PARSER  MpsIntiFlags[] = {
-  { L"Polarity",       2,  0, L"%d", NULL, NULL, NULL, NULL },
-  { L"Trigger Mode",   2,  2, L"%d", NULL, NULL, NULL, NULL },
-  { L"Reserved",       12, 4, L"%d", NULL, NULL, NULL, NULL }
+  { L"Polarity",     2,  0, L"%d", NULL, NULL, NULL, NULL },
+  { L"Trigger Mode", 2,  2, L"%d", NULL, NULL, NULL, NULL },
+  { L"Reserved",     12, 4, L"%d", NULL, NULL, NULL, NULL }
 };
 
 /**
@@ -295,12 +295,12 @@ STATIC CONST ACPI_PARSER  ProcessorLocalApic[] = {
    An ACPI_PARSER array describing the Local APIC NMI Structure.
  **/
 STATIC CONST ACPI_PARSER  LocalApicNmi[] = {
-  { L"Type",               1, 0, L"0x%x", NULL,                  NULL, NULL, NULL },
-  { L"Length",             1, 1, L"%d",   NULL,                  NULL, NULL, NULL },
+  { L"Type",               1, 0, L"0x%x", NULL,                NULL, NULL, NULL },
+  { L"Length",             1, 1, L"%d",   NULL,                NULL, NULL, NULL },
 
-  { L"ACPI Processor UID", 1, 2, L"0x%x", NULL,                  NULL, NULL, NULL },
-  { L"Flags",              2, 3, NULL,    DumpMpsIntiBitFlags,   NULL, NULL, NULL },
-  { L"Local APIC LINT#",   1, 5, L"%d",   NULL,                  NULL, NULL, NULL }
+  { L"ACPI Processor UID", 1, 2, L"0x%x", NULL,                NULL, NULL, NULL },
+  { L"Flags",              2, 3, NULL,    DumpMpsIntiBitFlags, NULL, NULL, NULL },
+  { L"Local APIC LINT#",   1, 5, L"%d",   NULL,                NULL, NULL, NULL }
 };
 
 /**
@@ -379,7 +379,7 @@ ParseAcpiMadt (
   )
 {
   UINT32  Offset;
-  UINT8   *InterruptContollerPtr;
+  UINT8   *InterruptControllerPtr;
   UINT32  GICDCount;
 
   GICDCount = 0;
@@ -396,7 +396,7 @@ ParseAcpiMadt (
              AcpiTableLength,
              PARSER_PARAMS (MadtParser)
              );
-  InterruptContollerPtr = Ptr + Offset;
+  InterruptControllerPtr = Ptr + Offset;
 
   while (Offset < AcpiTableLength) {
     // Parse Interrupt Controller Structure to obtain Length.
@@ -404,7 +404,7 @@ ParseAcpiMadt (
       FALSE,
       0,
       NULL,
-      InterruptContollerPtr,
+      InterruptControllerPtr,
       AcpiTableLength - Offset,
       PARSER_PARAMS (MadtInterruptControllerHeaderParser)
       );
@@ -445,7 +445,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "GICC",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (GicCParser)
           );
@@ -467,7 +467,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "GICD",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (GicDParser)
           );
@@ -480,7 +480,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "GIC MSI Frame",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (GicMSIFrameParser)
           );
@@ -493,7 +493,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "GICR",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (GicRParser)
           );
@@ -506,7 +506,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "GIC ITS",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (GicITSParser)
           );
@@ -519,7 +519,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "IO APIC",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (IoApic)
           );
@@ -532,7 +532,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "INTERRUPT SOURCE OVERRIDE",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (InterruptSourceOverride)
           );
@@ -544,7 +544,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "PROCESSOR LOCAL APIC",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (ProcessorLocalApic)
           );
@@ -556,11 +556,11 @@ ParseAcpiMadt (
           TRUE,
           2,
           "LOCAL APIC NMI",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (LocalApicNmi)
           );
-          break;
+        break;
       }
       case EFI_ACPI_6_3_PROCESSOR_LOCAL_X2APIC:
       {
@@ -568,7 +568,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "PROCESSOR LOCAL X2APIC",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (ProcessorLocalX2Apic)
           );
@@ -581,7 +581,7 @@ ParseAcpiMadt (
           TRUE,
           2,
           "LOCAL x2APIC NMI",
-          InterruptContollerPtr,
+          InterruptControllerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (LocalX2ApicNmi)
           );
@@ -600,7 +600,7 @@ ParseAcpiMadt (
       }
     } // switch
 
-    InterruptContollerPtr += *MadtInterruptControllerLength;
-    Offset                += *MadtInterruptControllerLength;
+    InterruptControllerPtr += *MadtInterruptControllerLength;
+    Offset                 += *MadtInterruptControllerLength;
   } // while
 }
