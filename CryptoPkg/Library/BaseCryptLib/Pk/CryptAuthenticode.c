@@ -136,7 +136,7 @@ AuthenticodeVerify (
     //
     ContentSize = (UINTN)(Asn1Byte & 0x7F);
     //
-    // Skip the SEQUENCE Tag;
+    // Skip the SEQUENCE Tag and the Length;
     //
     SpcIndirectDataContent += 2;
   } else if ((Asn1Byte & 0x81) == 0x81) {
@@ -145,7 +145,7 @@ AuthenticodeVerify (
     //
     ContentSize = (UINTN)(*(UINT8 *)(SpcIndirectDataContent + 2));
     //
-    // Skip the SEQUENCE Tag;
+    // Skip the SEQUENCE Tag and the Length;
     //
     SpcIndirectDataContent += 3;
   } else if ((Asn1Byte & 0x82) == 0x82) {
@@ -155,7 +155,7 @@ AuthenticodeVerify (
     ContentSize = (UINTN)(*(UINT8 *)(SpcIndirectDataContent + 2));
     ContentSize = (ContentSize << 8) + (UINTN)(*(UINT8 *)(SpcIndirectDataContent + 3));
     //
-    // Skip the SEQUENCE Tag;
+    // Skip the SEQUENCE Tag and the Length;
     //
     SpcIndirectDataContent += 4;
   } else {
