@@ -107,7 +107,7 @@ HandleAa64Dfr0 (
   CONST CHAR8         *Bits;
 
   Bits  = "3:0 ";
-  Value = (Aa64Dfr0 >>  4) & 0xf;
+  Value = Aa64Dfr0 & 0xf;
   switch (Value) {
     case b0110:
       Description = "Armv8 debug architecture";
@@ -637,7 +637,7 @@ HandleAa64Isar1 (
   CONST CHAR8         *Bits;
 
   Bits  = "3:0 ";
-  Value = (Aa64Isar1 >>  4) & 0xf;
+  Value = Aa64Isar1 & 0xf;
   switch (Value) {
     case b0000:
       Description = "DC CVAP not implemented.";
@@ -954,7 +954,7 @@ HandleAa64Isar2 (
   CONST CHAR8         *Bits;
 
   Bits  = "3:0 ";
-  Value = (Aa64Isar2 >>  4) & 0xf;
+  Value = Aa64Isar2 & 0xf;
   switch (Value) {
     case b0000:
       Description = "FEAT_WFxT not implemented.";
@@ -1637,7 +1637,7 @@ HandleAa64Mmfr2 (
   CONST CHAR8         *Bits;
 
   Bits  = "3:0 ";
-  Value = (Aa64Mmfr2)       & 0xf;
+  Value = Aa64Mmfr2 & 0xf;
   switch (Value) {
     case b0000:
       Description = "FEAT_TTCNP not implemented.";
@@ -1906,7 +1906,7 @@ HandleAa64Pfr0 (
   CONST CHAR8         *Bits;
 
   Bits  = "3:0 ";
-  Value = (Aa64Pfr0)       & 0xf;
+  Value = Aa64Pfr0 & 0xf;
   switch (Value) {
     case b0001:
       Description = "EL0 in AArch64 only";
