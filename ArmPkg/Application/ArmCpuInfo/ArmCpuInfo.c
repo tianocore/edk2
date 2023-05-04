@@ -659,7 +659,7 @@ HandleAa64Isar1 (
   Value = (Aa64Isar1 >>  4) & 0xf;
   switch (Value) {
     case b0000:
-      Description = "Address Authentication  (APA) not implemented.";
+      Description = "Address Authentication (APA) not implemented.";
       break;
     case b0001:
       Description = "FEAT_PAuth implemented.";
@@ -690,7 +690,7 @@ HandleAa64Isar1 (
   Value = (Aa64Isar1 >>  8) & 0xf;
   switch (Value) {
     case b0000:
-      Description = "Address Authentication  (API) not implemented.";
+      Description = "Address Authentication (API) not implemented.";
       break;
     case b0001:
       Description = "FEAT_PAuth implemented.";
@@ -1005,7 +1005,7 @@ HandleAa64Isar2 (
   Value = (Aa64Isar2 >> 12) & 0xf;
   switch (Value) {
     case b0000:
-      Description = "Address Authentication  (APA3) not implemented.";
+      Description = "Address Authentication (APA3) not implemented.";
       break;
     case b0001:
       Description = "FEAT_PAuth implemented.";
@@ -1099,25 +1099,25 @@ HandleAa64Mmfr0 (
   Value = Aa64Mmfr0 & 0xf;
   switch (Value) {
     case b0000:
-      Description = "32 Bits  (4GB) of physical address range supported.";
+      Description = "32 Bits (4GB) of physical address range supported.";
       break;
     case b0001:
-      Description = "36 Bits  (64GB) of physical address range supported.";
+      Description = "36 Bits (64GB) of physical address range supported.";
       break;
     case b0010:
-      Description = "40 Bits  (1TB) of physical address range supported.";
+      Description = "40 Bits (1TB) of physical address range supported.";
       break;
     case b0011:
-      Description = "42 Bits  (4TB) of physical address range supported.";
+      Description = "42 Bits (4TB) of physical address range supported.";
       break;
     case b0100:
-      Description = "44 Bits  (16TB) of physical address range supported.";
+      Description = "44 Bits (16TB) of physical address range supported.";
       break;
     case b0101:
-      Description = "48 Bits  (256TB) of physical address range supported.";
+      Description = "48 Bits (256TB) of physical address range supported.";
       break;
     case b0110:
-      Description = "52 Bits  (4PB) of physical address range supported.";
+      Description = "52 Bits (4PB) of physical address range supported.";
       break;
     default:
       Description = "unknown";
@@ -1982,7 +1982,7 @@ HandleAa64Pfr0 (
       Description = "Floating-point implemented.";
       break;
     case b0001:
-      Description = "Floating-point with half-precision support  (FEAT_FP16).";
+      Description = "Floating-point with half-precision support (FEAT_FP16).";
       break;
     case b1111:
       Description = "Floating-point not implemented.";
@@ -2001,7 +2001,7 @@ HandleAa64Pfr0 (
       Description = "Advanced SIMD implemented.";
       break;
     case b0001:
-      Description = "Advanced SIMD with half precision support  (FEAT_FP16).";
+      Description = "Advanced SIMD with half precision support (FEAT_FP16).";
       break;
     case b1111:
       Description = "Advanced SIMD not implemented.";
