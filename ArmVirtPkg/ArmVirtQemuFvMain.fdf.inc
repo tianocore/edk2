@@ -155,6 +155,16 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
 
   #
+  # Realm Aperture Management
+  #
+  INF ArmVirtPkg/RealmApertureManagementProtocolDxe/RealmApertureManagementProtocolDxe.inf
+
+  #
+  # IoMMU support for Arm CCA
+  #
+  INF ArmVirtPkg/ArmCcaIoMmuDxe/ArmCcaIoMmuDxe.inf
+
+  #
   # PCI support
   #
   INF UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
