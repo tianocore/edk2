@@ -1,0 +1,40 @@
+## @file
+# This driver produces FIXME instances for virtio-serial devices.
+#
+# Copyright (C) 2016, Linaro Ltd.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtioSerialDxe
+  FILE_GUID                      = 23CACE14-EBA4-49F6-9681-C697FF0B649E
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VirtioSerialEntryPoint
+
+[Sources]
+  VirtioSerial.h
+  VirtioSerial.c
+  VirtioSerialPort.c
+  VirtioSerialRing.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  VirtioLib
+
+[Protocols]
+  gVirtioDeviceProtocolGuid        ## TO_START
+  gEfiSerialIoProtocolGuid
