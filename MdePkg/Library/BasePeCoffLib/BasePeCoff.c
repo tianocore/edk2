@@ -585,6 +585,7 @@ PeCoffLoaderGetImageInfo (
   UINTN                                Size;
   UINTN                                ReadSize;
   UINTN                                Index;
+  UINTN                                NextIndex;
   UINTN                                DebugDirectoryEntryRva;
   UINTN                                DebugDirectoryEntryFileOffset;
   UINTN                                SectionHeaderOffset;
@@ -753,6 +754,20 @@ PeCoffLoaderGetImageInfo (
             ImageContext->DebugDirectoryEntryRva = (UINT32)(DebugDirectoryEntryRva + Index);
             if ((DebugEntry.RVA == 0) && (DebugEntry.FileOffset != 0)) {
               ImageContext->ImageSize += DebugEntry.SizeOfData;
+            }
+
+            //
+            // Implementations of GenFw before commit 60e85a39fe49071 will
+            // concatenate the debug directory entry and the codeview entry,
+            // and erroneously put the combined size into the debug directory's
+            // size field. If this is the case, no other relevant directory
+            // entries can exist, and we can terminate here.
+            //
+            NextIndex = Index + sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+            if ((NextIndex < DebugDirectoryEntry->Size) &&
+                (DebugEntry.FileOffset == (DebugDirectoryEntryFileOffset + NextIndex)))
+            {
+              break;
             }
 
             continue;
