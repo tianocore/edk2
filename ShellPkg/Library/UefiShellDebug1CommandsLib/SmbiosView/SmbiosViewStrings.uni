@@ -4,6 +4,7 @@
 // Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
 // (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
+// Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
@@ -511,4 +512,10 @@
 #string STR_SMBIOSVIEW_PRINTINFO_IPMI_SPECIFICATION_REVISION    #language en-US "IPMISpecificationRevision: %d.%d\n"
 #string STR_SMBIOSVIEW_PRINTINFO_NV_STORAGE_DEVICE_NOT_PRESENT  #language en-US "NVStorageDevice: Not Present\n"
 #string STR_SMBIOSVIEW_PRINTINFO_BASE_ADDRESS                   #language en-US "BaseAddress: 0x%x\n"
-
+#string STR_SMBIOSVIEW_PRINTINFO_FIRMWARE_VERSION_FORMAT        #language en-US "FirmwareVersionFormat: %s\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_FIRMWARE_ID_FORMAT             #language en-US "FirmwareIdFormat: %s\r\n"
+#string STR_SMBIOSVIEW_QUERYTABLE_FIRMWARE_INVENTORY_CHAR       #language en-US "Characteristics:\r\n"
+#string STR_SMBIOSVIEW_QUERYTABLE_FIRMWARE_INVENTORY_STATE      #language en-US "State:\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_FIRMWARE_INVENTORY_ASSOCIATED  #language en-US "  Associated handle:\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_IMAGE_SIZE_UNKNOWN             #language en-US "ImageSize: Unknown\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_STRING_PROPERTY_ID             #language en-US "String Property ID: %s\r\n"
