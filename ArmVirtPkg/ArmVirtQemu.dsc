@@ -103,6 +103,8 @@
 !endif
 
   ArmPlatformLib|ArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.inf
+  ArmCcaLib|MdeModulePkg/Library/ArmCcaLib/ArmCcaLib.inf
+  ArmCcaRsiLib|MdeModulePkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
 
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
@@ -118,6 +120,9 @@
 
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuPeiLibCca.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+
+[LibraryClasses.AARCH64.SEC, LibraryClasses.AARCH64.PEI_CORE, LibraryClasses.AARCH64.PEIM]
+  ArmCcaInitPeiLib|ArmVirtPkg/Library/ArmCcaInitPeiLib/ArmCcaInitPeiLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   AcpiPlatformLib|OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
