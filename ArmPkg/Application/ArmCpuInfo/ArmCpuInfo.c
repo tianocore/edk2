@@ -2407,23 +2407,38 @@ UefiMain (
 
   HandleAa64Mmfr0 (Aa64Mmfr0);
   PrintSpacer ();
-  HandleAa64Mmfr1 (Aa64Mmfr1, Aa64Pfr0);
-  PrintSpacer ();
-  HandleAa64Mmfr2 (Aa64Mmfr2);
 
-  PrintSpacer ();
+  if (Aa64Mmfr1) {
+    HandleAa64Mmfr1 (Aa64Mmfr1, Aa64Pfr0);
+    PrintSpacer ();
+  }
+
+  if (Aa64Mmfr2) {
+    HandleAa64Mmfr2 (Aa64Mmfr2);
+    PrintSpacer ();
+  }
+
   HandleAa64Pfr0 (Aa64Pfr0, Aa64Pfr1);
   PrintSpacer ();
-  HandleAa64Pfr1 (Aa64Pfr1);
 
-  PrintSpacer ();
+  if (Aa64Pfr1) {
+    HandleAa64Pfr1 (Aa64Pfr1);
+    PrintSpacer ();
+  }
+
   HandleAa64Isar0 (Aa64Isar0);
   PrintSpacer ();
-  HandleAa64Isar1 (Aa64Isar1);
-  PrintSpacer ();
-  HandleAa64Isar2 (Aa64Isar2);
 
-  PrintSpacer ();
+  if (Aa64Isar1) {
+    HandleAa64Isar1 (Aa64Isar1);
+    PrintSpacer ();
+  }
+
+  if (Aa64Isar2) {
+    HandleAa64Isar2 (Aa64Isar2);
+    PrintSpacer ();
+  }
+
   HandleAa64Dfr0 (Aa64Dfr0);
 
   return EFI_SUCCESS;
