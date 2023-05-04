@@ -668,20 +668,43 @@ ArmSetMemoryAttributes (
   IN UINT64                AttributeMask
   )
 {
-  UINT64  PageAttributes;
-  UINT64  PageAttributeMask;
+  EFI_STATUS  Status;
+  UINT64      PageAttributes;
+  UINT64      PageAttributeMask;
+  UINT64      CcaProtectionAttribute;
 
-  PageAttributes    = GcdAttributeToPageAttribute (Attributes);
-  PageAttributeMask = 0;
+  PageAttributes = GcdAttributeToPageAttribute (Attributes);
+
+  Status = ArmCcaGetMemoryProtectionAttribute (&CcaProtectionAttribute);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Full memory type updates replace the normal descriptor attributes, but must
+  // not change the Realm protected/unprotected state. UpdateRegionMapping()
+  // preserves bits that are set in PageAttributeMask by copying them from the
+  // existing descriptor, i.e. (*Entry & AttributeClearMask) | AttributeSetMask
+  // which is something equivalent to:
+  //   NewEntry = (OldEntry & PageAttributeMask) | PageAttributes;
+  // Therefore, clear the CCA protection bit from PageAttributes so that
+  // the new value cannot force it, then add the bit to PageAttributeMask so
+  // the old descriptor keeps supplying the protected/unprotected state.
+  //
+  PageAttributes   &= ~CcaProtectionAttribute;
+  PageAttributeMask = CcaProtectionAttribute;
 
   if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {
     //
     // No memory type was set in Attributes, so we are going to update the
     // permissions only.
     //
+    // Permission-only updates preserve everything except the permission bits
+    // being changed. This keeps the output address, memory type/shareability,
+    // and the CCA protection bit intact.
+    //
     PageAttributes   &= TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK | TT_AF;
-    PageAttributeMask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK |
-                          TT_PXN_MASK | TT_XN_MASK | TT_AF);
+    PageAttributeMask = ~(TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK | TT_AF);
     if (AttributeMask != 0) {
       if (((AttributeMask & ~(UINT64)(EFI_MEMORY_RP|EFI_MEMORY_RO|EFI_MEMORY_XP)) != 0) ||
           ((Attributes & ~AttributeMask) != 0))
@@ -689,11 +712,19 @@ ArmSetMemoryAttributes (
         return EFI_INVALID_PARAMETER;
       }
 
-      // Add attributes omitted from AttributeMask to the set of attributes to preserve
+      //
+      // Add permission attributes omitted from AttributeMask to the preserve
+      // mask, so callers can update only the selected permissions.
+      //
       PageAttributeMask |= GcdAttributeToPageAttribute (~AttributeMask) &
                            (TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK | TT_AF);
     }
   } else {
+    //
+    // Full memory type update, this means update the
+    // cacheability/shareability/permission bits from PageAttributes,
+    // but preserve the CCA protection bit from the old descriptor.
+    //
     ASSERT (AttributeMask == 0);
     if (AttributeMask != 0) {
       return EFI_INVALID_PARAMETER;
@@ -708,7 +739,7 @@ ArmSetMemoryAttributes (
            ArmGetTTBR0BaseAddress (),
            TRUE,
            ArmLpa2Enabled (),
-           0
+           CcaProtectionAttribute
            );
 }
 
