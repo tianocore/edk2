@@ -13,6 +13,7 @@ import sys
 from   ctypes import *
 from Tools.ElfFv import ReplaceFv
 sys.dont_write_bytecode = True
+import yaml
 
 class UPLD_INFO_HEADER(LittleEndianStructure):
     _pack_ = 1
@@ -71,15 +72,29 @@ def BuildUniversalPayload(Args):
     ModuleReportPath = os.path.join(BuildDir, "UefiUniversalPayloadEntry.txt")
     UpldInfoFile = os.path.join(BuildDir, "UniversalPayloadInfo.bin")
 
-    Pcds = ""
+    PcdCustoms= dict()
     if (Args.pcd != None):
         for PcdItem in Args.pcd:
-            Pcds += " --pcd {}".format (PcdItem)
+            SplitValue = str(PcdItem).split("=")
+            PcdCustoms[SplitValue[0]] = SplitValue[1]
 
-    Defines = ""
+    DefineCustoms= dict()
     if (Args.Macro != None):
         for MacroItem in Args.Macro:
-            Defines += " -D {}".format (MacroItem)
+            SplitValue = str(MacroItem).split("=")
+            DefineCustoms[SplitValue[0]] = SplitValue[1]
+
+    Pcds = ""
+    if Args.Settings['PcdSetting'] != "":
+        PcdCustoms.update(Args.Settings['PcdSetting'])
+    for Item in PcdCustoms:
+        Pcds += " -p {0}={1}".format (Item, PcdCustoms[Item])
+
+    Defines = ""
+    if Args.Settings['Macro'] != "":
+        DefineCustoms.update(Args.Settings['Macro'])
+    for Item in DefineCustoms:
+        Defines += " -D {0}={1}".format (Item, DefineCustoms[Item])
 
     #
     # Building DXE core and DXE drivers as DXEFV.
@@ -103,10 +118,11 @@ def BuildUniversalPayload(Args):
     # Buid Universal Payload Information Section ".upld_info"
     #
     upld_info_hdr              = UPLD_INFO_HEADER()
-    upld_info_hdr.SpecRevision = Args.SpecRevision
-    upld_info_hdr.Revision     = Args.Revision
-    upld_info_hdr.ProducerId   = Args.ProducerId.encode()[:16]
-    upld_info_hdr.ImageId      = Args.ImageId.encode()[:16]
+
+    upld_info_hdr.SpecRevision = Args.SpecRevision if Args.SpecRevision is not None else Args.Settings['SpecRevision']
+    upld_info_hdr.Revision     = Args.Revision if Args.Revision is not None else Args.Settings['Revision']
+    upld_info_hdr.ProducerId   = Args.ProducerId.encode()[:16] if Args.ProducerId is not None else str(Args.Settings['ProducerId']).encode()[:16]
+    upld_info_hdr.ImageId      = Args.ImageId.encode()[:16] if Args.ImageId is not None else str(Args.Settings['ImageId']).encode()[:16]
     upld_info_hdr.Attribute   |= 1 if BuildTarget == "DEBUG" else 0
     fp = open(UpldInfoFile, 'wb')
     fp.write(bytearray(upld_info_hdr))
@@ -153,6 +169,11 @@ def main():
 
         return int('0x{0:02x}{1:02x}'.format(Major, Minor), 0)
 
+    def GetUplVerFile(Argument):
+      with open(Argument, 'r') as inFile:
+        jsonData = yaml.safe_load(inFile)
+      return jsonData
+
     def Validate32BitInteger (Argument):
         try:
             Value = int (Argument, 0)
@@ -181,12 +202,17 @@ def main():
     parser.add_argument('-b', '--Target', default='DEBUG')
     parser.add_argument('-a', '--Arch', choices=['IA32', 'X64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
     parser.add_argument("-D", "--Macro", action="append", default=["UNIVERSAL_PAYLOAD=TRUE"])
-    parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default ='UEFI')
+    parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default =None)
     parser.add_argument('-q', '--Quiet', action='store_true', help='Disable all build messages except FATAL ERRORS.')
     parser.add_argument("-p", "--pcd", action="append")
-    parser.add_argument("-s", "--SpecRevision", type=ValidateSpecRevision, default ='0.7', help='Indicates compliance with a revision of this specification in the BCD format.')
-    parser.add_argument("-r", "--Revision", type=Validate32BitInteger, default ='0x0000010105', help='Revision of the Payload binary. Major.Minor.Revision.Build')
-    parser.add_argument("-o", "--ProducerId", default ='INTEL', help='A null-terminated OEM-supplied string that identifies the payload producer (16 bytes maximal).')
+    group1 = parser.add_mutually_exclusive_group()
+    arg_a = group1.add_argument('-st',"--Settings",type=GetUplVerFile, default=os.path.abspath('UefiPayloadPkg//Settings//UplSettings_NULL.yaml'), help='Get the UplSettings.yaml')
+    group1.add_argument('-s', "--SpecRevision", type=ValidateSpecRevision, default =None, help='Indicates compliance with a revision of this specification in the BCD format.')
+    group2 = parser.add_mutually_exclusive_group()
+    group2.add_argument('-r', "--Revision", type=Validate32BitInteger, default =None, help='Revision of the Payload binary. Major.Minor.Revision.Build')
+    group2._group_actions.append(arg_a)
+
+    parser.add_argument("-o", "--ProducerId", default =None, help='A null-terminated OEM-supplied string that identifies the payload producer (16 bytes maximal).')
     parser.add_argument("-e", "--BuildEntryOnly", action='store_true', help='Build UniversalPayload Entry file')
     parser.add_argument("-pb", "--PreBuildUplBinary", default=None, help='Specify the UniversalPayload file')
     parser.add_argument("-sk", "--SkipBuild", action='store_true', help='Skip UniversalPayload build')

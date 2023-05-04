@@ -1,0 +1,15 @@
+## @file
+# Set shell variable EDK_TOOL_PATH to this folder
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+{
+    "SpecRevision": 0x0070,
+    "Revision": 0x0000010105,
+    "ImageId": "UEFI",
+    "ProducerId": "Intel",
+    "Macro": "",
+    "PcdSetting": ""
+}
