@@ -4,6 +4,7 @@
 
   Copyright (c) 2005 - 2021, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016-2019 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -3622,6 +3623,52 @@ TABLE_ITEM  ProcessorArchitectureTypesTable[] = {
   }
 };
 
+TABLE_ITEM  FirmwareInventoryCharTable[] = {
+  {
+    0,
+    L"Updatable"
+  },
+  {
+    1,
+    L"Write-Protect"
+  }
+};
+
+TABLE_ITEM  FirmwareInventoryStateTable[] = {
+  {
+    1,
+    L"  Other"
+  },
+  {
+    2,
+    L"  Unknown "
+  },
+  {
+    3,
+    L"  Disabled: This firmware component is disabled. "
+  },
+  {
+    4,
+    L"  Enabled: This firmware component is enabled. "
+  },
+  {
+    5,
+    L"  Absent: This firmware component is either not present or not detected "
+  },
+  {
+    6,
+    L"  StandbyOffline: This firmware is enabled but awaits an external action to activate it. "
+  },
+  {
+    7,
+    L"  StandbySpare: This firmware is part of a redundancy set and awaits a failover or other external action to activate it. "
+  },
+  {
+    8,
+    L"  UnavailableOffline: This firmware component is present but cannot be used. "
+  },
+};
+
 TABLE_ITEM  StructureTypeInfoTable[] = {
   {
     0,
@@ -5124,6 +5171,40 @@ DisplayProcessorArchitectureType (
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_PROCESSOR_ARCH_TYPE), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Key, Option);
   PRINT_TABLE_ITEM (ProcessorArchitectureTypesTable, Key);
+}
+
+/**
+  Display Firmware Characteristics (Type 45) details.
+
+  @param[in] Chara    The information bits.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayFirmwareCharacteristics (
+  IN UINT16  Chara,
+  IN UINT8   Option
+  )
+{
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_FIRMWARE_INVENTORY_CHAR), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Chara, Option);
+  PRINT_BITS_INFO (FirmwareInventoryCharTable, Chara);
+}
+
+/**
+  Display Firmware state (Type 45) details.
+
+  @param[in] Key            The key of the structure.
+  @param[in] Option         The optional information.
+**/
+VOID
+DisplayFirmwareState (
+  IN UINT8  Key,
+  IN UINT8  Option
+  )
+{
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_FIRMWARE_INVENTORY_STATE), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Key, Option);
+  PRINT_TABLE_ITEM (FirmwareInventoryStateTable, Key);
 }
 
 /**
