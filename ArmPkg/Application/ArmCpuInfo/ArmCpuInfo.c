@@ -2354,6 +2354,333 @@ HandleAa64Pfr1 (
 }
 
 /**
+  Handle ID_AA64SMFR0_EL1 system register.
+
+  @param[in] Aa64Smfr0,  value of ID_AA64SMFR0_EL1 system register
+**/
+VOID
+HandleAa64Smfr0 (
+  CONST UINT64  Aa64Smfr0
+  )
+{
+  UINT64              Value;
+  STATIC CONST CHAR8  RegName[] = "SMFR0";
+  CONST CHAR8         *Description;
+  CONST CHAR8         *Bits;
+
+  // 31:0 reserved
+
+  Bits  = "   32";
+  Value = (Aa64Smfr0 >> 32) & 0x1;
+  switch (Value) {
+    case 0:
+      Description = "SME F32F32 not implemented.";
+      break;
+    case 1:
+      Description = "SME F32F32 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  // 33 reserved
+
+  Bits  = "   34";
+  Value = (Aa64Smfr0 >> 34) & 0x1;
+  switch (Value) {
+    case 0:
+      Description = "SME B16F32 not implemented.";
+      break;
+    case 1:
+      Description = "SME B16F32 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  Bits  = "   35";
+  Value = (Aa64Smfr0 >> 35) & 0x1;
+  switch (Value) {
+    case 0:
+      Description = "SME F16F32 not implemented.";
+      break;
+    case 1:
+      Description = "SME F16F32 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  Bits  = "39:36";
+  Value = (Aa64Smfr0 >> 36) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "SME I8I32 not implemented.";
+      break;
+    case b1111:
+      Description = "SME I8I32 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  // 47:40 reserved
+
+  Bits  = "   48";
+  Value = (Aa64Smfr0 >> 48) & 0x1;
+  switch (Value) {
+    case 0:
+      Description = "SME F64F64 not implemented.";
+      break;
+    case 1:
+      Description = "SME F64F64 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  // 51:49 reserved
+
+  Bits  = "55:52";
+  Value = (Aa64Smfr0 >> 52) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "SME I16I64 not implemented";
+      break;
+    case b1111:
+      Description = "SME I16I64 implemented";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  Bits  = "59:56";
+  Value = (Aa64Smfr0 >> 56) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "Mandatory SME instructions are implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  // 62:60 reserved
+
+  Bits  = "   63";
+  Value = (Aa64Smfr0 >> 63) & 0x1;
+  switch (Value) {
+    case 0:
+      Description = "SME_FA64 not implemented.";
+      break;
+    case 1:
+      Description = "SME_FA64 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+}
+
+/**
+  Handle ID_AA64ZFR0_EL1 system register.
+
+  @param[in] Aa64Zfr0,  value of ID_AA64ZFR0_EL1 system register
+**/
+VOID
+HandleAa64Zfr0 (
+  CONST UINT64  Aa64Zfr0
+  )
+{
+  UINT64              Value;
+  STATIC CONST CHAR8  RegName[] = "ZFR0";
+  CONST CHAR8         *Description;
+  CONST CHAR8         *Bits;
+
+  Bits  = "3:0 ";
+  Value = Aa64Zfr0 & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "FEAT_SVE implemented.";
+      break;
+    case b0001:
+      Description = "FEAT_SVE2 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  Bits  = "7:4 ";
+  Value = (Aa64Zfr0 >>  4) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "FEAT_SVE_AES not implemented.";
+      break;
+    case b0001:
+      Description = "FEAT_SVE_AES implemented.";
+      break;
+    case b0010:
+      Description = "FEAT_SVE_AES and FEAT_SVE_PMULL128 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  // 15:8 reserved
+
+  Bits  = "19:16";
+  Value = (Aa64Zfr0 >> 16) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "FEAT_SVE_BitPerm not implemented.";
+      break;
+    case b0001:
+      Description = "FEAT_SVE_BitPerm implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  Bits  = "23:20";
+  Value = (Aa64Zfr0 >> 20) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "SVE BFloat16 not implemented.";
+      break;
+    case b0001:
+      Description = "FEAT_BF16 SVE implemented.";
+      break;
+    case b0010:
+      Description = "FEAT_EBF16 SVE implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  // 31:24 reserved
+
+  Bits  = "35:32";
+  Value = (Aa64Zfr0 >> 32) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "FEAT_SVE_SHA3 not implemented.";
+      break;
+    case b0001:
+      Description = "FEAT_SVE_SHA3 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  // 39:36 reserved
+
+  Bits  = "43:40";
+  Value = (Aa64Zfr0 >> 40) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "FEAT_SVE_SM4 not implemented.";
+      break;
+    case b0001:
+      Description = "FEAT_SVE_SM4 implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  Bits  = "47:44";
+  Value = (Aa64Zfr0 >> 44) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "FEAT_I8MM SVE not implemented.";
+      break;
+    case b0001:
+      Description = "FEAT_I8MM SVE implemented.";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  // 51:48 reserved
+
+  Bits  = "55:52";
+  Value = (Aa64Zfr0 >> 52) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "FEAT_F32MM SVE not implemented";
+      break;
+    case b0001:
+      Description = "FEAT_F32MM SVE implemented";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  Bits  = "59:56";
+  Value = (Aa64Zfr0 >> 56) & 0xf;
+  switch (Value) {
+    case b0000:
+      Description = "FEAT_F64MM SVE not implemented";
+      break;
+    case b0001:
+      Description = "FEAT_F64MM SVE implemented";
+      break;
+    default:
+      Description = "unknown";
+      break;
+  }
+
+  PrintValues (RegName, Bits, Value, Description);
+
+  // 63:60 reserved
+}
+
+/**
   The user Entry Point for Application. The user code starts with this function
   as the real entry point for the application.
 
@@ -2380,6 +2707,8 @@ UefiMain (
   UINT64  Aa64Mmfr2;
   UINT64  Aa64Pfr0;
   UINT64  Aa64Pfr1;
+  UINT64  Aa64Smfr0;
+  UINT64  Aa64Zfr0;
 
   Aa64Dfr0  = ArmReadIdAA64Dfr0 ();
   Aa64Isar0 = ArmReadIdAA64Isar0 ();
@@ -2390,6 +2719,8 @@ UefiMain (
   Aa64Mmfr2 = ArmReadIdAA64Mmfr2 ();
   Aa64Pfr0  = ArmReadIdAA64Pfr0 ();
   Aa64Pfr1  = ArmReadIdAA64Pfr1 ();
+  Aa64Smfr0 = ArmReadIdAA64Smfr0 ();
+  Aa64Zfr0  = ArmReadIdAA64Zfr0 ();
 
   AsciiPrint ("ID_AA64MMFR0_EL1 = 0x%016lx\n", Aa64Mmfr0);
   AsciiPrint ("ID_AA64MMFR1_EL1 = 0x%016lx\n", Aa64Mmfr1);
@@ -2400,6 +2731,8 @@ UefiMain (
   AsciiPrint ("ID_AA64ISAR1_EL1 = 0x%016lx\n", Aa64Isar1);
   AsciiPrint ("ID_AA64ISAR2_EL1 = 0x%016lx\n", Aa64Isar2);
   AsciiPrint ("ID_AA64DFR0_EL1  = 0x%016lx\n", Aa64Dfr0);
+  AsciiPrint ("ID_AA64SMFR0_EL1 = 0x%016lx\n", Aa64Smfr0);
+  AsciiPrint ("ID_AA64ZFR0_EL1  = 0x%016lx\n", Aa64Zfr0);
   AsciiPrint ("\n");
 
   PrintText ("Register", "Bits", "Value", "Feature");
@@ -2440,6 +2773,17 @@ UefiMain (
   }
 
   HandleAa64Dfr0 (Aa64Dfr0);
+  PrintSpacer ();
+
+  if (Aa64Smfr0) {
+    HandleAa64Smfr0 (Aa64Smfr0);
+    PrintSpacer ();
+  }
+
+  if (Aa64Zfr0) {
+    HandleAa64Zfr0 (Aa64Zfr0);
+    PrintSpacer ();
+  }
 
   return EFI_SUCCESS;
 }
