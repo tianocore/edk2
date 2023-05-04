@@ -77,7 +77,7 @@ PrintValues (
     "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"
   };
 
-  AsciiPrint (" %-16a | %5a | %5a | %a\n", Field, Bits, Nibbles[Value & 0xf], Description);
+  PrintText (Field, Bits, Nibbles[Value & 0xf], Description);
 }
 
 /**
