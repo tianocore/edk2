@@ -53,7 +53,7 @@ PrintText (
   CONST CHAR8  *Description
   )
 {
-  AsciiPrint (" %-16a | %5a | %5a | %a\n", Field, Bits, Value, Description);
+  AsciiPrint ("%-5a | %5a | %5a | %a\n", Field, Bits, Value, Description);
 }
 
 /**
@@ -88,7 +88,7 @@ PrintSpacer (
   VOID
   )
 {
-  AsciiPrint ("------------------|-------|-------|----------------------------------------------\n");
+  AsciiPrint ("------|-------|-------|----------------------------------------------\n");
 }
 
 /**
@@ -102,7 +102,7 @@ HandleAa64Dfr0 (
   )
 {
   UINT64              Value;
-  STATIC CONST CHAR8  RegName[] = "ID_AA64DFR0";
+  STATIC CONST CHAR8  RegName[] = "DFR0";
   CONST CHAR8         *Description;
   CONST CHAR8         *Bits;
 
@@ -362,7 +362,7 @@ HandleAa64Isar0 (
   )
 {
   UINT64              Value;
-  STATIC CONST CHAR8  RegName[] = "ID_AA64ISAR0";
+  STATIC CONST CHAR8  RegName[] = "ISAR0";
   CONST CHAR8         *Description;
   CONST CHAR8         *Bits;
 
@@ -632,7 +632,7 @@ HandleAa64Isar1 (
   )
 {
   UINT64              Value;
-  STATIC CONST CHAR8  RegName[] = "ID_AA64ISAR1";
+  STATIC CONST CHAR8  RegName[] = "ISAR1";
   CONST CHAR8         *Description;
   CONST CHAR8         *Bits;
 
@@ -949,7 +949,7 @@ HandleAa64Isar2 (
   )
 {
   UINT64              Value;
-  STATIC CONST CHAR8  RegName[] = "ID_AA64ISAR2";
+  STATIC CONST CHAR8  RegName[] = "ISAR2";
   CONST CHAR8         *Description;
   CONST CHAR8         *Bits;
 
@@ -1091,7 +1091,7 @@ HandleAa64Mmfr0 (
   )
 {
   UINT64              Value;
-  STATIC CONST CHAR8  RegName[] = "ID_AA64MMFR0";
+  STATIC CONST CHAR8  RegName[] = "MMFR0";
   CONST CHAR8         *Description;
   CONST CHAR8         *Bits;
 
@@ -1164,11 +1164,11 @@ HandleAa64Mmfr0 (
   // If mixed-endian is present, check whether supported at EL0
   if (((Aa64Mmfr0 >>  8) & 0xf) != b0000 ) {
     if (((Aa64Mmfr0 >> 16) & 0xf) == b0000 ) {
-      PrintValues ("ID_AA64MMFR0", "19:16", b0000, "No mixed-endian support at EL0.");
+      PrintValues ("MMFR0", "19:16", b0000, "No mixed-endian support at EL0.");
     }
 
     if (((Aa64Mmfr0 >> 16) & 0xf) == b0001 ) {
-      PrintValues ("ID_AA64MMFR0", "19:16", b0001, "Mixed-endian support at EL0.");
+      PrintValues ("MMFR0", "19:16", b0001, "Mixed-endian support at EL0.");
     }
   }
 
@@ -1363,7 +1363,7 @@ HandleAa64Mmfr1 (
   )
 {
   UINT64              Value;
-  STATIC CONST CHAR8  RegName[] = "ID_AA64MMFR1";
+  STATIC CONST CHAR8  RegName[] = "MMFR1";
   CONST CHAR8         *Description;
   CONST CHAR8         *Bits;
 
@@ -1480,12 +1480,12 @@ HandleAa64Mmfr1 (
       (((Aa64Pfr0 >> 28) & 0xf) == b0010))
   {
     if (((Aa64Mmfr1 >> 24) & 0xf) == b0000 ) {
-      PrintValues ("ID_AA64MMFR1", "27:24", b0000, "The PE never generates an SError interrupt due to");
+      PrintValues ("MMFR1", "27:24", b0000, "The PE never generates an SError interrupt due to");
       PrintText ("", "", "", "an External abort on a speculative read.");
     }
 
     if (((Aa64Mmfr1 >> 24) & 0xf) == b0001 ) {
-      PrintValues ("ID_AA64MMFR1", "27:24", b0001, "The PE might generate an SError interrupt due to");
+      PrintValues ("MMFR1", "27:24", b0001, "The PE might generate an SError interrupt due to");
       PrintText ("", "", "", "an External abort on a speculative read.");
     }
   }
@@ -1632,7 +1632,7 @@ HandleAa64Mmfr2 (
   )
 {
   UINT64              Value;
-  STATIC CONST CHAR8  RegName[] = "ID_AA64MMFR2";
+  STATIC CONST CHAR8  RegName[] = "MMFR2";
   CONST CHAR8         *Description;
   CONST CHAR8         *Bits;
 
@@ -1901,7 +1901,7 @@ HandleAa64Pfr0 (
   )
 {
   UINT64              Value;
-  STATIC CONST CHAR8  RegName[] = "ID_AA64PFR0";
+  STATIC CONST CHAR8  RegName[] = "PFR0";
   CONST CHAR8         *Description;
   CONST CHAR8         *Bits;
 
@@ -2059,7 +2059,7 @@ HandleAa64Pfr0 (
   PrintValues (RegName, Bits, Value, Description);
   if (Value == b0001) {
     if (((Aa64Pfr1 >> 12) & 0xf) == b0001 ) {
-      PrintValues ("ID_AA64PRF1", "15:12", b0001, "FEAT_RASv1p1 implemented.");
+      PrintValues ("PRF1", "15:12", b0001, "FEAT_RASv1p1 implemented.");
     }
   }
 
@@ -2199,11 +2199,11 @@ HandleAa64Pfr0 (
   PrintValues (RegName, Bits, Value, Description);
   if (Value == b0001) {
     if (((Aa64Pfr1 >> 32) & 0xf) == b0001 ) {
-      PrintValues ("ID_AA64PRF1", "35:32", b0001, "FEAT_CSV2_1p1 implemented.");
+      PrintValues ("PRF1", "35:32", b0001, "FEAT_CSV2_1p1 implemented.");
     }
 
     if (((Aa64Pfr1 >> 32) & 0xf) == b0010 ) {
-      PrintValues ("ID_AA64PRF1", "35:32", b0010, "FEAT_CSV2_1p2 implemented.");
+      PrintValues ("PRF1", "35:32", b0010, "FEAT_CSV2_1p2 implemented.");
     }
   }
 
@@ -2235,7 +2235,7 @@ HandleAa64Pfr1 (
   )
 {
   UINT64              Value;
-  STATIC CONST CHAR8  RegName[] = "ID_AA64PFR1";
+  STATIC CONST CHAR8  RegName[] = "PFR1";
   CONST CHAR8         *Description;
   CONST CHAR8         *Bits;
 
