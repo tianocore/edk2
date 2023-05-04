@@ -102,4 +102,16 @@ ArmReadIdAA64Pfr1 (
   VOID
   );
 
+UINTN
+EFIAPI
+ArmReadIdAA64Smfr0 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdAA64Zfr0 (
+  VOID
+  );
+
 #endif // AARCH64_LIB_H_

@@ -48,3 +48,8 @@
 
 [FeaturePcd.ARM]
   gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
+
+# to access ID_AA64ZFR0_EL1 and ID_AA64SMFR0_EL1 system registers
+# we need to enable SME
+[BuildOptions]
+  GCC:*_*_AARCH64_ASM_FLAGS = -march=armv8-a+sme

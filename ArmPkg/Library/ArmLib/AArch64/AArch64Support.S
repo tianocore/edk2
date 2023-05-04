@@ -524,4 +524,14 @@ ASM_FUNC(ArmReadIdAA64Pfr1)
   mrs   x0, ID_AA64PFR1_EL1
   ret
 
+
+ASM_FUNC(ArmReadIdAA64Smfr0)
+  mrs   x0, ID_AA64SMFR0_EL1
+  ret
+
+
+ASM_FUNC(ArmReadIdAA64Zfr0)
+  mrs   x0, ID_AA64ZFR0_EL1
+  ret
+
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
