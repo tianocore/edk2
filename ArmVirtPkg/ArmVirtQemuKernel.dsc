@@ -58,6 +58,7 @@
   ArmMmuLib|UefiCpuPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmCcaLib|ArmVirtPkg/Library/ArmCcaLib/ArmCcaLib.inf
   ArmCcaRsiLib|ArmVirtPkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
+  BlobVerifierLib|ArmVirtPkg/Library/BlobVerifierLibArmCca/BlobVerifierLibArmCca.inf
 
   # Virtio Support
   VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
@@ -427,7 +428,11 @@
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
   OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
     <LibraryClasses>
+!if $(ARCH) == AARCH64
+      NULL|ArmVirtPkg/Library/BlobVerifierLibArmCca/BlobVerifierLibArmCca.inf
+!else
       NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+!endif
   }
 
   #
