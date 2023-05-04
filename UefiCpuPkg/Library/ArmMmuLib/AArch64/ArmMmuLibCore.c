@@ -612,8 +612,9 @@ ArmSetMemoryAttributes (
   UINT64  PageAttributes;
   UINT64  PageAttributeMask;
 
-  PageAttributes    = GcdAttributeToPageAttribute (Attributes);
-  PageAttributeMask = 0;
+  PageAttributes = GcdAttributeToPageAttribute (Attributes);
+  /* Don't clear the address bits, which may contain NS attribute for a Realm */
+  PageAttributeMask = TT_ADDRESS_MASK_BLOCK_ENTRY;
 
   if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {
     //
@@ -621,8 +622,7 @@ ArmSetMemoryAttributes (
     // permissions only.
     //
     PageAttributes   &= TT_AP_MASK | TT_UXN_MASK | TT_PXN_MASK | TT_AF;
-    PageAttributeMask = ~(TT_ADDRESS_MASK_BLOCK_ENTRY | TT_AP_MASK |
-                          TT_PXN_MASK | TT_XN_MASK | TT_AF);
+    PageAttributeMask = ~(TT_AP_MASK | TT_PXN_MASK | TT_XN_MASK | TT_AF);
     if (AttributeMask != 0) {
       if (((AttributeMask & ~(UINT64)(EFI_MEMORY_RP|EFI_MEMORY_RO|EFI_MEMORY_XP)) != 0) ||
           ((Attributes & ~AttributeMask) != 0))
