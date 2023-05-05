@@ -30,7 +30,9 @@ ConnectNvVarsToFileSystem (
 {
   EFI_STATUS  Status;
 
-  if (FeaturePcdGet (PcdSecureBootSupported)) {
+  if (FeaturePcdGet (PcdSecureBootSupported) ||
+      FeaturePcdGet (PcdBootRestrictToFirmware))
+  {
     return EFI_UNSUPPORTED;
   }
 
