@@ -48,6 +48,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define SMBIOS_3_0_TABLE_MAX_LENGTH  0xFFFFFFFF
 
+///
+/// Reference SMBIOS 3.4, chapter 5.2.1 SMBIOS 2.1 (32-bit) Entry Point
+/// Table 1 - SMBIOS 2.1 (32-bit) Entry Point structure, offset 00h
+/// _SM_, specified as four ASCII characters (5F 53 4D 5F).
+///@{
+#define SMBIOS_ANCHOR_STRING         "_SM_"
+#define SMBIOS_ANCHOR_STRING_LENGTH  4
+///@}
+
+///
+/// Reference SMBIOS 3.4, chapter 5.2.2 SMBIOS 3.0 (64-bit) Entry Point
+/// Table 2 - SMBIOS 3.0 (64-bit) Entry Point structure, offset 00h
+/// _SM3_, specified as five ASCII characters (5F 53 4D 33 5F).
+///@{
+#define SMBIOS_3_0_ANCHOR_STRING         "_SM3_"
+#define SMBIOS_3_0_ANCHOR_STRING_LENGTH  5
+///@}
+
 //
 // SMBIOS type macros which is according to SMBIOS 3.3.0 specification.
 //
@@ -138,7 +156,7 @@ typedef UINT16 SMBIOS_HANDLE;
 ///
 #pragma pack(1)
 typedef struct {
-  UINT8     AnchorString[4];
+  UINT8     AnchorString[SMBIOS_ANCHOR_STRING_LENGTH];
   UINT8     EntryPointStructureChecksum;
   UINT8     EntryPointLength;
   UINT8     MajorVersion;
@@ -155,7 +173,7 @@ typedef struct {
 } SMBIOS_TABLE_ENTRY_POINT;
 
 typedef struct {
-  UINT8     AnchorString[5];
+  UINT8     AnchorString[SMBIOS_3_0_ANCHOR_STRING_LENGTH];
   UINT8     EntryPointStructureChecksum;
   UINT8     EntryPointLength;
   UINT8     MajorVersion;
