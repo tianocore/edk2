@@ -10,6 +10,11 @@
 
 #include "AcpiPlatform.h"
 
+#include <Library/AcpiPlatformLib.h> // InstallAcpiTablesFromMemory()
+
+#define BHYVE_ACPI_PHYSICAL_ADDRESS  ((UINTN)0x000F2400)
+#define BHYVE_BIOS_PHYSICAL_END      ((UINTN)0x00100000)
+
 EFI_STATUS
 EFIAPI
 InstallAcpiTable (
@@ -242,6 +247,27 @@ InstallAcpiTables (
   )
 {
   EFI_STATUS  Status;
+
+  Status = InstallAcpiTablesFromMemory (
+             AcpiTable,
+             BHYVE_ACPI_PHYSICAL_ADDRESS,
+             BHYVE_BIOS_PHYSICAL_END
+             );
+  if (!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  }
+
+  if (Status != EFI_NOT_FOUND) {
+    DEBUG (
+      (
+       DEBUG_WARN,
+       "%a: unable to install bhyve's ACPI tables (%r)\n",
+       __func__,
+       Status
+      )
+      );
+    return Status;
+  }
 
   Status = InstallOvmfFvTables (AcpiTable);
 
