@@ -49,6 +49,7 @@
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported
+  gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware
 
 [Guids]
   gEfiFileInfoGuid
