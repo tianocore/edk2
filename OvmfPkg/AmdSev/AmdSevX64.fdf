@@ -162,7 +162,7 @@ INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 INF  OvmfPkg/AmdSev/SecretPei/SecretPei.inf
 
-!include OvmfPkg/OvmfTpmPei.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfTpmPei.fdf.inc
 
 ################################################################################
 
