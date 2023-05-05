@@ -422,6 +422,9 @@
   #  check to decide whether to abort dispatch of the driver it is linked into.
   gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|""|VOID*|0x68
 
+  ## Restrict boot to EFI applications in firmware volumes.
+  gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware|FALSE|BOOLEAN|0x6c
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
