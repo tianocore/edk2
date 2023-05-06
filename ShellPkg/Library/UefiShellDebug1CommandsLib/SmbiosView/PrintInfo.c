@@ -5,6 +5,7 @@
   Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023 Apple Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -135,7 +136,7 @@ SmbiosPrintEPSInfo (
   IN  UINT8                     Option
   )
 {
-  UINT8  Anchor[5];
+  UINT8  Anchor[SMBIOS_ANCHOR_STRING_LENGTH + 1]; // Including terminating NULL character
   UINT8  InAnchor[6];
 
   if (SmbiosTable == NULL) {
@@ -149,7 +150,7 @@ SmbiosPrintEPSInfo (
 
   if (Option >= SHOW_NORMAL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ENTRY_POINT_SIGN), gShellDebug1HiiHandle);
-    MemToString (Anchor, SmbiosTable->AnchorString, 4);
+    MemToString (Anchor, SmbiosTable->AnchorString, SMBIOS_ANCHOR_STRING_LENGTH);
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ANCHOR_STR), gShellDebug1HiiHandle, Anchor);
     ShellPrintHiiEx (
       -1,
@@ -220,7 +221,7 @@ Smbios64BitPrintEPSInfo (
   IN  UINT8                         Option
   )
 {
-  UINT8  Anchor[5];
+  UINT8  Anchor[SMBIOS_3_0_ANCHOR_STRING_LENGTH + 1]; // Including terminating NULL character
 
   if (SmbiosTable == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_SMBIOSTABLE_NULL), gShellDebug1HiiHandle);
@@ -234,7 +235,7 @@ Smbios64BitPrintEPSInfo (
   if (Option >= SHOW_NORMAL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_64_BIT_ENTRY_POINT_SIGN), gShellDebug1HiiHandle);
 
-    MemToString (Anchor, SmbiosTable->AnchorString, 5);
+    MemToString (Anchor, SmbiosTable->AnchorString, SMBIOS_3_0_ANCHOR_STRING_LENGTH);
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ANCHOR_STR), gShellDebug1HiiHandle, Anchor);
 
     ShellPrintHiiEx (
