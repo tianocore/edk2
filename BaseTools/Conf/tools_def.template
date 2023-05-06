@@ -731,9 +731,9 @@ NOOPT_VS2019_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_*_*_OBJCOPY_FLAGS             = objcopy not needed for
 *_*_*_SYMRENAME_PATH            = echo
 *_*_*_SYMRENAME_FLAGS           = Symbol renaming not needed for
-DEBUG_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
+DEBUG_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink="$(DEBUG_DIR)/$(MODULE_NAME).debug"
 RELEASE_*_*_OBJCOPY_ADDDEBUGFLAG   =
-NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
+NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink="$(DEBUG_DIR)/$(MODULE_NAME).debug"
 *_*_*_OBJCOPY_STRIPFLAG            = --strip-unneeded -R .eh_frame
 *_*_*_DTC_FLAGS                    = -H epapr
 *_*_*_DTCPP_PATH                   = DEF(DTCPP_BIN)
