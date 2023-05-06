@@ -168,7 +168,7 @@ INF  OvmfPkg/SmmAccess/SmmAccessPei.inf
 !endif
 INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
 
-!include OvmfPkg/OvmfTpmPei.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfTpmPei.fdf.inc
 
 ################################################################################
 
@@ -343,7 +343,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 #
 # TPM support
 #
-!include OvmfPkg/OvmfTpmDxe.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfTpmDxe.fdf.inc
 
 ################################################################################
 
