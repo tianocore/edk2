@@ -13,6 +13,7 @@
 
   Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -1045,6 +1046,51 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get System Interface Capabilities" command to follow here
 //
+
+#define IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_INTERFACE_TYPE_SSIF  0x0
+#define IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_INTERFACE_TYPE_KCS   0x1
+#define IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_INTERFACE_TYPE_SMIC  0x2
+
+typedef union {
+  struct {
+    UINT8    InterfaceType : 4;
+    UINT8    Reserved      : 4;
+  } Bits;
+  UINT8    Uint8;
+} IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_REQUEST;
+
+typedef union {
+  struct {
+    UINT8    Version            : 3;
+    UINT8    PecSupport         : 1;
+    UINT8    Reserved           : 2;
+    UINT8    TransactionSupport : 2;
+  } Bits;
+  UINT8    Uint8;
+} IPMI_SYSTEM_INTERFACE_SSIF_CAPABILITIES;
+
+typedef union {
+  struct {
+    UINT8    SystemInterfaceVersion : 3;
+    UINT8    Reserved               : 5;
+  } Bits;
+  UINT8    Uint8;
+} IPMI_SYSTEM_INTERFACE_KCS_SMIC_CAPABILITIES;
+
+typedef struct {
+  UINT8                                      CompletionCode;
+  UINT8                                      Reserved;
+  IPMI_SYSTEM_INTERFACE_SSIF_CAPABILITIES    InterfaceCap;
+  UINT8                                      InputMsgSize;
+  UINT8                                      OutputMsgSize;
+} IPMI_GET_SYSTEM_INTERFACE_SSIF_CAPABILITIES_RESPONSE;
+
+typedef struct {
+  UINT8                                          CompletionCode;
+  UINT8                                          Reserved;
+  IPMI_SYSTEM_INTERFACE_KCS_SMIC_CAPABILITIES    InterfaceCap;
+  UINT8                                          InputMaxMsgSize;
+} IPMI_GET_SYSTEM_INTERFACE_KCS_SMIC_CAPABILITIES_RESPONSE;
 
 //
 //  Definitions for Get System Interface Capabilities command SSIF transaction support
