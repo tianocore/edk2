@@ -41,13 +41,6 @@ BITS    64
 
 ALIGN 16
 
-Pml4:
-    ;
-    ; PML4 (1 * 512GB entry)
-    ;
-    DQ      PAGE_NLE(Pdp)
-    TIMES   0x1000 - ($ - Pml4) DB 0
-
 %ifdef PAGE_TABLE_1G
 Pdp:
     ;
@@ -59,15 +52,6 @@ Pdp:
         %assign i i+1
     %endrep
 %else
-Pdp:
-    ;
-    ; Page-directory pointer table (4 * 1GB entries => 4GB)
-    ;
-    DQ      PAGE_NLE(Pd)
-    DQ      PAGE_NLE(Pd + 0x1000)
-    DQ      PAGE_NLE(Pd + 0x2000)
-    DQ      PAGE_NLE(Pd + 0x3000)
-    TIMES   0x1000 - ($ - Pdp) DB 0
 
 Pd:
     ;
@@ -79,5 +63,22 @@ Pd:
         DQ      PAGE_PDE_2MB(i)
         %assign i i+1
     %endrep
+Pdp:
+    ;
+    ; Page-directory pointer table (4 * 1GB entries => 4GB)
+    ;
+    DQ      PAGE_NLE(Pd)
+    DQ      PAGE_NLE(Pd + 0x1000)
+    DQ      PAGE_NLE(Pd + 0x2000)
+    DQ      PAGE_NLE(Pd + 0x3000)
+    TIMES   0x1000 - ($ - Pdp) DB 0
+
 %endif
+
+Pml4:
+    ;
+    ; PML4 (1 * 512GB entry)
+    ;
+    DQ      PAGE_NLE(Pdp)
+    TIMES   0x1000 - ($ - Pml4) DB 0
 EndOfPageTables:
