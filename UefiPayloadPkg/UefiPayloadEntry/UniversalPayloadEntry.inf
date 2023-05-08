@@ -55,6 +55,7 @@
   HobLib
   PeCoffLib
   CpuLib
+  UplFdtParserLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid

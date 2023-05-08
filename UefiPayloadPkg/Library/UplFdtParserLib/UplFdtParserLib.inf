@@ -1,0 +1,62 @@
+## @file
+#  Coreboot Table Parse Library.
+#
+#  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UplFdtParserLib
+  FILE_GUID                      = E61BDFD8-97A2-4B68-80F2-EF92295FF6BE
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UplFdtParserLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  UplFdtParserLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+  gEfiFirmwareFileSystem2Guid
+  gEfiGraphicsInfoHobGuid
+  gEfiGraphicsDeviceInfoHobGuid
+  gUefiAcpiBoardInfoGuid
+  gEfiSmbiosTableGuid
+  gUefiSerialPortInfoGuid
+  gUniversalPayloadExtraDataGuid
+  gPcdDataBaseHobGuid
+  gUniversalPayloadSmbiosTableGuid
+  gEfiHobMemoryAllocBspStoreGuid
+  gUniversalPayloadAcpiTableGuid
+  gUniversalPayloadPciRootBridgeInfoGuid
+  gUniversalPayloadSmbios3TableGuid
+  gEdkiiBootManagerMenuFileGuid
+  gFdtHobGuid
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  IoLib
+  DebugLib
+  PcdLib
+  HobLib
+  FdtLib
+
+[Pcd]
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
+  gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize

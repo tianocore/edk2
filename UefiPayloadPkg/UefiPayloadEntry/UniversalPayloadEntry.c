@@ -440,6 +440,12 @@ BuildHobs (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+BuildBlHobs (
+  IN  UINTN              Param1,
+  IN  UINTN              Param2,
+  OUT EFI_FIRMWARE_VOLUME_HEADER  **DxeFv
+  );
 /**
   Entry point to the C language phase of UEFI payload.
 
@@ -459,6 +465,7 @@ _ModuleEntryPoint (
   EFI_PEI_HOB_POINTERS        Hob;
   EFI_FIRMWARE_VOLUME_HEADER  *DxeFv = NULL;
 
+  BuildBlHobs(Param1, Param2, &DxeFv);
   // Call constructor for all libraries
   ProcessLibraryConstructorList ();
 
