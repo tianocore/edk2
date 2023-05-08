@@ -54,7 +54,6 @@
 
 %ifdef ARCH_X64
 %include "Ia32/Flat32ToFlat64.asm"
-%include "Ia32/PageTables64.asm"
 %endif
 
 %include "Ia16/Real16ToFlat32.asm"
