@@ -81,7 +81,7 @@ InternalSyncCompareExchange16 (
   volatile UINT32  *Ptr32;
 
   /* Check that ptr is naturally aligned */
-  ASSERT (!((UINT64)Value & (sizeof (Value) - 1)));
+  ASSERT (!((UINT64)Value & (sizeof (UINT16) - 1)));
 
   /* Mask inputs to the correct size. */
   Mask               = (((~0UL) - (1UL << (0)) + 1) & (~0UL >> (64 - 1 - ((sizeof (UINT16) * 8) - 1))));
