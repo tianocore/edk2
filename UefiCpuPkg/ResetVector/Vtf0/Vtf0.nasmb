@@ -2,7 +2,7 @@
 ; @file
 ; This file includes all other code files to assemble the reset vector code
 ;
-; Copyright (c) 2008 - 2013, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2008 - 2023, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ;------------------------------------------------------------------------------
@@ -38,11 +38,7 @@
 %include "PageTables.inc"
 
 %ifdef ARCH_X64
-  %ifdef PAGE_TABLE_1G
-    %include "X64/PageTables1G.asm"
-  %else
-    %include "X64/PageTables2M.asm"
-  %endif
+  %include "X64/PageTables.asm"
 %endif
 
 %ifdef DEBUG_PORT80
