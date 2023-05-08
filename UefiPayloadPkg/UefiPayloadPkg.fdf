@@ -161,7 +161,7 @@ INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
 INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
-INF MdeModulePkg/Universal/Metronome/Metronome.inf
+# INF MdeModulePkg/Universal/Metronome/Metronome.inf  #timerlib issue for qemu
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -224,7 +224,7 @@ INF MdeModulePkg/Logo/LogoDxe.inf
 # PCI Support
 #
 INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
-INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+# INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf #pci resourse
 
 #
 # ISA Support
@@ -263,7 +263,7 @@ INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 INF MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
 INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 !endif
-INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+# INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf #timerlib issue for qemu
 INF MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
 INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 !if $(NVME_ENABLE) == TRUE

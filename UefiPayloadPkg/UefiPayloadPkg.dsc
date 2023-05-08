@@ -651,7 +651,7 @@
       NULL|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   }
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
-  MdeModulePkg/Universal/Metronome/Metronome.inf
+  # MdeModulePkg/Universal/Metronome/Metronome.inf #timerlib issue for qemu
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -706,10 +706,10 @@
   # PCI Support
   #
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
-  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
-    <LibraryClasses>
-      PciHostBridgeLib|UefiPayloadPkg/Library/PciHostBridgeLib/PciHostBridgeLib.inf
-  }
+  # MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
+  #   <LibraryClasses>
+  #     PciHostBridgeLib|UefiPayloadPkg/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  # } #pci resourse
 
   #
   # SCSI/ATA/IDE/DISK Support
@@ -722,7 +722,7 @@
   MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 !endif
-  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  # MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf #timerlib issue for qemu
   MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
   MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
 !if $(NVME_ENABLE) == TRUE
