@@ -29,35 +29,31 @@ BITS    64
                         PAGE_PRESENT + \
                         PAGE_SIZE)
 
-%define PGTBLS_OFFSET(x) ((x) - TopLevelPageDirectory)
-%define PGTBLS_ADDR(x) (ADDR_OF(TopLevelPageDirectory) + (x))
-
 ;
 ; Page table non-leaf entry
 ;
-%define PAGE_NLE(offset) (ADDR_OF(TopLevelPageDirectory) + (offset) + \
+%define PAGE_NLE(address) (ADDR_OF(address) + \
                     PAGE_NLE_ATTR)
 
 %define PAGE_PDPTE_1GB(x) ((x << 30) + PAGE_BLE_ATTR)
 
 ALIGN 16
 
-TopLevelPageDirectory:
+Pml4:
+    ;
+    ; PML4 (1 * 512GB entry)
+    ;
+    DQ      PAGE_NLE(Pdp)
+    TIMES   0x1000 - ($ - Pml4) DB 0
 
+Pdp:
     ;
-    ; Top level Page Directory Pointers (1 * 512GB entry)
-    ;
-    DQ      PAGE_NLE(0x1000)
-
-    TIMES 0x1000-PGTBLS_OFFSET($) DB 0
-    ;
-    ; Next level Page Directory Pointers (512 * 1GB entries => 512GB)
+    ; Page-directory pointer table (512 * 1GB entries => 512GB)
     ;
 %assign i 0
 %rep      512
     DQ    PAGE_PDPTE_1GB(i)
     %assign i i+1
 %endrep
-    TIMES 0x2000-PGTBLS_OFFSET($) DB 0
 
 EndOfPageTables:
