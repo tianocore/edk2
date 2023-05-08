@@ -147,7 +147,6 @@
   Ia32/DivU64x32.c | MSFT
   Ia32/DisablePaging32.c | MSFT
   Ia32/DisableInterrupts.c | MSFT
-  Ia32/CpuPause.c | MSFT
   Ia32/CpuIdEx.c | MSFT
   Ia32/CpuId.c | MSFT
   Ia32/CpuBreakpoint.c | MSFT
@@ -193,6 +192,7 @@
   Ia32/InternalSwitchStack.nasm | GCC
   Ia32/Non-existing.c
   Unaligned.c
+  X86CpuPause.c | MSFT
   X86WriteIdtr.c
   X86WriteGdtr.c
   X86Thunk.c
@@ -227,7 +227,6 @@
   X64/CpuBreakpoint.c | MSFT
   X64/WriteMsr64.c | MSFT
   X64/ReadMsr64.c | MSFT
-  X64/CpuPause.nasm| MSFT
   X64/DisableInterrupts.nasm| MSFT
   X64/EnableInterrupts.nasm| MSFT
   X64/FlushCacheLine.nasm| MSFT
@@ -301,6 +300,7 @@
   X64/Non-existing.c
   Math64.c
   Unaligned.c
+  X86CpuPause.c | MSFT
   X86WriteIdtr.c
   X86WriteGdtr.c
   X86Thunk.c

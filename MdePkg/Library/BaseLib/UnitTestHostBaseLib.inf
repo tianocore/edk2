@@ -98,7 +98,6 @@
   Ia32/FxSave.c | MSFT
   Ia32/DivU64x32Remainder.c | MSFT
   Ia32/DivU64x32.c | MSFT
-  Ia32/CpuPause.c | MSFT
   Ia32/CpuBreakpoint.c | MSFT
   Ia32/ARShiftU64.c | MSFT
   Ia32/GccInline.c | GCC
@@ -122,6 +121,7 @@
   Ia32/InternalSwitchStack.nasm | GCC
   Ia32/Non-existing.c
   Unaligned.c
+  X86CpuPause.c | MSFT
   X86MemoryFence.c | MSFT
   X86FxSave.c
   X86FxRestore.c
@@ -136,7 +136,6 @@
   X64/SetJump.nasm
   X64/SwitchStack.nasm
   X64/CpuBreakpoint.c | MSFT
-  X64/CpuPause.nasm| MSFT
   X64/ReadTsc.nasm| MSFT
   X64/WriteMm7.nasm| MSFT
   X64/WriteMm6.nasm| MSFT
@@ -160,6 +159,7 @@
   X64/Non-existing.c
   Math64.c
   Unaligned.c
+  X86CpuPause.c | MSFT
   X86MemoryFence.c | MSFT
   X86FxSave.c
   X86FxRestore.c
