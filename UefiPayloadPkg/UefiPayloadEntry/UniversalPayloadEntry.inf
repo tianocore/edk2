@@ -38,6 +38,8 @@
   X64/VirtualMemory.c
   X64/DxeLoadFunc.c
 
+[Sources.RISCV64]
+  RiscV64/DxeLoadFunc.c
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -78,7 +80,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
 
 
-[Pcd.IA32,Pcd.X64]
+[Pcd.IA32,Pcd.X64,Pcd.RISCV64]
   gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
