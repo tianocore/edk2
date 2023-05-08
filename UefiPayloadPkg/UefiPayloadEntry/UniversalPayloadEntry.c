@@ -450,16 +450,15 @@ BuildHobs (
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
-  IN UINTN  BootloaderParameter
+  IN UINTN  Param1,
+  IN UINTN  Param2
   )
 {
   EFI_STATUS                  Status;
   PHYSICAL_ADDRESS            DxeCoreEntryPoint;
   EFI_PEI_HOB_POINTERS        Hob;
-  EFI_FIRMWARE_VOLUME_HEADER  *DxeFv;
+  EFI_FIRMWARE_VOLUME_HEADER  *DxeFv = NULL;
 
-  mHobList = (VOID *)BootloaderParameter;
-  DxeFv    = NULL;
   // Call constructor for all libraries
   ProcessLibraryConstructorList ();
 
@@ -472,10 +471,6 @@ _ModuleEntryPoint (
     //
     PrintHob (mHobList);
     );
-
-  // Build HOB based on information from Bootloader
-  Status = BuildHobs (BootloaderParameter, &DxeFv);
-  ASSERT_EFI_ERROR (Status);
 
   FixUpPcdDatabase (DxeFv);
   Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);
