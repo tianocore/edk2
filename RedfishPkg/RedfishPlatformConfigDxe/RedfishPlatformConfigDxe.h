@@ -78,4 +78,18 @@ typedef struct {
 #define REDFISH_PLATFORM_CONFIG_DEBUG    DEBUG_VERBOSE
 #define REDFISH_MENU_PATH_SIZE           8
 
+/**
+  Convert input unicode string to ascii string. It's caller's
+  responsibility to free returned buffer using FreePool().
+
+  @param[in]  UnicodeString     Unicode string to be converted.
+
+  @retval CHAR8 *               Ascii string on return.
+
+**/
+CHAR8 *
+StrToAsciiStr (
+  IN  EFI_STRING  UnicodeString
+  );
+
 #endif

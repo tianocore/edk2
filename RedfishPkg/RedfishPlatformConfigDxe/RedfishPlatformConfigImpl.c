@@ -144,6 +144,34 @@ DumpFormsetList (
 }
 
 /**
+  Delete a string from HII Package List by given HiiHandle.
+
+  @param[in]  StringId           Id of the string in HII database.
+  @param[in]  HiiHandle          The HII package list handle.
+
+  @retval EFI_SUCCESS            The string was deleted successfully.
+  @retval EFI_INVALID_PARAMETER  StringId is zero.
+
+**/
+EFI_STATUS
+HiiDeleteString (
+  IN  EFI_STRING_ID   StringId,
+  IN  EFI_HII_HANDLE  HiiHandle
+  )
+{
+  CHAR16  NullChar;
+
+  if (StringId == 0x00) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  NullChar = CHAR_NULL;
+  HiiSetString (HiiHandle, StringId, &NullChar, NULL);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Retrieves a unicode string from a string package in a given language. The
   returned string is allocated using AllocatePool().  The caller is responsible
   for freeing the allocated buffer using FreePool().
@@ -259,7 +287,6 @@ HiiGetRedfishAsciiString (
   )
 {
   EFI_STRING  HiiString;
-  UINTN       StringSize;
   CHAR8       *AsciiString;
 
   HiiString = HiiGetRedfishString (HiiHandle, Language, StringId);
@@ -268,15 +295,9 @@ HiiGetRedfishAsciiString (
     return NULL;
   }
 
-  StringSize  = (StrLen (HiiString) + 1) * sizeof (CHAR8);
-  AsciiString = AllocatePool (StringSize);
-  if (AsciiString == NULL) {
-    return NULL;
-  }
-
-  UnicodeStrToAsciiStrS (HiiString, AsciiString, StringSize);
-
+  AsciiString = StrToAsciiStr (HiiString);
   FreePool (HiiString);
+
   return AsciiString;
 }
 
@@ -322,7 +343,6 @@ HiiGetEnglishAsciiString (
   )
 {
   EFI_STRING  HiiString;
-  UINTN       StringSize;
   CHAR8       *AsciiString;
 
   HiiString = HiiGetRedfishString (HiiHandle, ENGLISH_LANGUAGE_CODE, StringId);
@@ -331,15 +351,9 @@ HiiGetEnglishAsciiString (
     return NULL;
   }
 
-  StringSize  = (StrLen (HiiString) + 1) * sizeof (CHAR8);
-  AsciiString = AllocatePool (StringSize);
-  if (AsciiString == NULL) {
-    return NULL;
-  }
-
-  UnicodeStrToAsciiStrS (HiiString, AsciiString, StringSize);
-
+  AsciiString = StrToAsciiStr (HiiString);
   FreePool (HiiString);
+
   return AsciiString;
 }
 

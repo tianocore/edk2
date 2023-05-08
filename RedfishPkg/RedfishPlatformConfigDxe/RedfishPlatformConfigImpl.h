@@ -251,6 +251,22 @@ ProcessPendingList (
   );
 
 /**
+  Delete a string from HII Package List by given HiiHandle.
+
+  @param[in]  StringId           Id of the string in HII database.
+  @param[in]  HiiHandle          The HII package list handle.
+
+  @retval EFI_SUCCESS            The string was deleted successfully.
+  @retval EFI_INVALID_PARAMETER  StringId is zero.
+
+**/
+EFI_STATUS
+HiiDeleteString (
+  IN  EFI_STRING_ID   StringId,
+  IN  EFI_HII_HANDLE  HiiHandle
+  );
+
+/**
   Retrieves a unicode string from a string package in a given language. The
   returned string is allocated using AllocatePool().  The caller is responsible
   for freeing the allocated buffer using FreePool().
