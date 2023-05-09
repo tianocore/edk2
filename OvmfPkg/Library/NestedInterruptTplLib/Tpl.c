@@ -104,6 +104,7 @@ NestedInterruptRestoreTPL (
   // defer our call to RestoreTPL() to the in-progress outer instance
   // of the same interrupt handler.
   //
+  ASSERT (GetInterruptState () == FALSE);
   if (InterruptedTPL == IsrState->InProgressRestoreTPL) {
     //
     // Trigger outer instance of this interrupt handler to perform the
@@ -153,6 +154,7 @@ NestedInterruptRestoreTPL (
     //
     // Check shared state loop invariants.
     //
+    ASSERT (GetInterruptState () == FALSE);
     ASSERT (IsrState->InProgressRestoreTPL < InterruptedTPL);
     ASSERT (IsrState->DeferredRestoreTPL == FALSE);
 
@@ -167,13 +169,17 @@ NestedInterruptRestoreTPL (
 
     //
     // Call RestoreTPL() to allow event notifications to be
-    // dispatched.  This will implicitly re-enable interrupts.
+    // dispatched.  This will implicitly re-enable interrupts (if
+    // InterruptedTPL is below TPL_HIGH_LEVEL), even though we are
+    // still inside the interrupt handler.
     //
     gBS->RestoreTPL (InterruptedTPL);
 
     //
     // Re-disable interrupts after the call to RestoreTPL() to ensure
-    // that we have exclusive access to the shared state.
+    // that we have exclusive access to the shared state.  Interrupts
+    // will be re-enabled by the IRET or equivalent instruction when
+    // we subsequently return from the interrupt handler.
     //
     DisableInterrupts ();
 
