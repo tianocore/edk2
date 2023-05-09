@@ -34,12 +34,27 @@ NestedInterruptRaiseTPL (
 
   //
   // Raise TPL and assert that we were called from within an interrupt
-  // handler (i.e. with TPL below TPL_HIGH_LEVEL but with interrupts
-  // disabled).
+  // handler (i.e. with interrupts already disabled before raising the
+  // TPL).
   //
   ASSERT (GetInterruptState () == FALSE);
   InterruptedTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  ASSERT (InterruptedTPL < TPL_HIGH_LEVEL);
+
+  //
+  // At TPL_HIGH_LEVEL, CPU interrupts are disabled (as per the UEFI
+  // specification) and so we should never encounter a situation in
+  // which InterruptedTPL==TPL_HIGH_LEVEL.  The specification also
+  // restricts usage of TPL_HIGH_LEVEL to the firmware itself.
+  //
+  // However, nothing actually prevents a UEFI application from
+  // invalidly calling gBS->RaiseTPL(TPL_HIGH_LEVEL) and then
+  // violating the invariant by enabling interrupts via the STI or
+  // equivalent instruction.  Some versions of the Microsoft Windows
+  // bootloader are known to do this.
+  //
+  if (InterruptedTPL >= TPL_HIGH_LEVEL) {
+    DEBUG ((DEBUG_ERROR, "ERROR: Interrupts enabled at TPL_HIGH_LEVEL!\n"));
+  }
 
   return InterruptedTPL;
 }
