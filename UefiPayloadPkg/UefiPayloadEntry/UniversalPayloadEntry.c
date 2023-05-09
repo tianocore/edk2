@@ -440,10 +440,18 @@ BuildHobs (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+BuildBlHobs (
+  IN  UINTN                       Param1,
+  IN  UINTN                       Param2,
+  OUT EFI_FIRMWARE_VOLUME_HEADER  **DxeFv
+  );
+
 /**
   Entry point to the C language phase of UEFI payload.
 
-  @param[in]   BootloaderParameter    The starting address of bootloader parameter block.
+  @param[in]   Param1    First parameter from the stack
+  @param[in]   Param2    Second parameter from the stack
 
   @retval      It will not return if SUCCESS, and return error when passing bootloader parameter.
 **/
@@ -457,8 +465,9 @@ _ModuleEntryPoint (
   EFI_STATUS                  Status;
   PHYSICAL_ADDRESS            DxeCoreEntryPoint;
   EFI_PEI_HOB_POINTERS        Hob;
-  EFI_FIRMWARE_VOLUME_HEADER  *DxeFv = NULL;
+  EFI_FIRMWARE_VOLUME_HEADER  *DxeFv;
 
+  BuildBlHobs (Param1, Param2, &DxeFv);
   // Call constructor for all libraries
   ProcessLibraryConstructorList ();
 

@@ -32,19 +32,23 @@
   X64/VirtualMemory.c
   Ia32/DxeLoadFunc.c
   Ia32/IdtVectorAsm.nasm
+  Ia32/Ia32FdtParserLib.c
 
 [Sources.X64]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
   X64/DxeLoadFunc.c
+  X64/X64FdtParserLib.c
 
 [Sources.RISCV64]
   RiscV64/DxeLoadFunc.c
+  RiscV64/Rv64FdtParserLib.c
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
   UefiPayloadPkg/UefiPayloadPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -55,6 +59,7 @@
   HobLib
   PeCoffLib
   CpuLib
+  FdtLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -72,6 +77,7 @@
   gUniversalPayloadPciRootBridgeInfoGuid
   gUniversalPayloadSmbios3TableGuid
   gEdkiiBootManagerMenuFileGuid
+  gFdtHobGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
