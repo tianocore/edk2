@@ -14,7 +14,7 @@
 
 edk2-pytool-library==0.14.0
 edk2-pytool-extensions~=0.21.8
-edk2-basetools==0.1.43
+edk2-basetools==0.1.45
 antlr4-python3-runtime==4.7.1
 lcov-cobertura==2.0.2
 
