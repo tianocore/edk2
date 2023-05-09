@@ -476,12 +476,12 @@ class VfrCompiler():
         return FileList
 
     def CopyFileToOutputDir(self): ############
-        self.Options.ProcessedInFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
-        if self.Options.ProcessedInFileName == None:
+        self.Options.ProcessedVfrFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
+        if self.Options.ProcessedVfrFileName == None:
             EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
                                 "File/directory %s not found in workspace" % (self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
         shutil.copyfile(self.Options.InputFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.vfr')
-        shutil.copyfile(self.Options.ProcessedInFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.i')
+        shutil.copyfile(self.Options.ProcessedVfrFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.i')
 
 def main():
     Args = parser.parse_args()

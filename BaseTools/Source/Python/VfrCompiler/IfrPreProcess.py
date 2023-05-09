@@ -15,9 +15,10 @@ class Options():
         self.LanuchVfrCompiler = False
         self.LanuchYamlCompiler = False
 
+        self.ModuleName = None
         self.InputFileName = None
         self.BaseFileName = None
-        self.IncludePaths = None
+        self.IncludePaths = []
         self.OutputDirectory = None
         self.CreateRecordListFile = True
         self.RecordListFileName = None
@@ -44,8 +45,8 @@ class Options():
         self.YamlOutputFileName = None #
 
         # for test
-        self.ProcessedInFileName = None # for test
-        self.ExpandedHeaderFileName = None # save header info for yaml
+        self.ProcessedVfrFileName = None # for test
+        #self.ExpandedHeaderFileName = None # save header info for yaml
         self.ProcessedYAMLFileName = None # for test
 
 
@@ -169,24 +170,27 @@ class PreProcessDB():
             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
                             "File open failed for %s" % FileName, None)
 
-    def _SetUniStrDefFileName(self):
-        if self.Options.ProcessedInFileName.find('/') == -1:
-            self.Options.ProcessedInFileName = self.Options.ProcessedInFileName.replace('\\', '/')
-        FileList = []
-        if self.Options.ProcessedInFileName.find('DriverSample') != -1:
-            FileList = self._FindIncludeHeaderFile('/edk2/', self.Options.ProcessedInFileName.split('/')[-3][:-3] + 'StrDefs.h')
-        else:
-            FileList = self._FindIncludeHeaderFile('/edk2/', self.Options.ProcessedInFileName.split('/')[-3] + 'StrDefs.h')
-        if self.Options.UniStrDefFileName == []:
-            EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                            "File/directory %s not found in workspace" % (self.Options.ProcessedInFileName.split('/')[-3] + 'StrDefs.h'), None)
-        self.Options.UniStrDefFileName = FileList[0]
+    # def _SetUniStrDefFileName(self):
+    #     if self.Options.ProcessedVfrFileName.find('/') == -1:
+    #         self.Options.ProcessedVfrFileName = self.Options.ProcessedVfrFileName.replace('\\', '/')
+    #     FileList = []
+    #     if self.Options.ProcessedVfrFileName.find('DriverSample') != -1:
+    #         FileList = self._FindIncludeHeaderFile('/edk2/', self.Options.ProcessedVfrFileName.split('/')[-3][:-3] + 'StrDefs.h')
+    #     else:
+    #         FileList = self._FindIncludeHeaderFile('/edk2/', self.Options.ProcessedVfrFileName.split('/')[-3] + 'StrDefs.h')
+    #     if self.Options.UniStrDefFileName == []:
+    #         EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+    #                         "File/directory %s not found in workspace" % (self.Options.ProcessedVfrFileName.split('/')[-3] + 'StrDefs.h'), None)
+    #     self.Options.UniStrDefFileName = FileList[0]
 
     def _GetUniDicts(self):
+
         if self.Options.UniStrDefFileName == None:
-            self._SetUniStrDefFileName()
-        # find UniFile
-        FileName = self.Options.UniStrDefFileName
+            if self.Options.OutputDirectory.find('/') == -1:
+                self.Options.OutputDirectory = self.Options.OutputDirectory.replace('\\', '/')
+                DebugPath = "/".join(self.Options.OutputDirectory.split('/'))[:-1] + '/DEBUG/'
+                self.Options.UniStrDefFileName = DebugPath + self.Options.ModuleName + 'StrDefs.h'
+
         CppHeader = CppHeaderParser.CppHeader(self.Options.UniStrDefFileName)
         UniDict = {} # {String Token : String Token ID}
         for Define in CppHeader.defines:
@@ -195,17 +199,18 @@ class PreProcessDB():
                 # key: STR_FORM_SET_TITLE_HELP, value: 0x1234, type: str
                 UniDict[Items[0]] = Items[1]
 
-        if self.Options.UniStrDisplayFile == None:
-            self.Options.UniStrDisplayFile = self.Options.OutputDirectory + self.Options.BaseFileName + 'Uni.json'
-        f = open(self.Options.UniStrDisplayFile, encoding='utf-8')
-        Dict = json.load(f)
-        f.close()
-        Dict = Dict[1]["en-US"]
         DisPlayUniDict = {} # {String Token : DisPlay String}
-        for Key in Dict.keys():
-            if Key in UniDict.keys():
-                NewKey = '{}'.format('0x%04x' % (int(UniDict[Key],0)))
-                DisPlayUniDict[NewKey] = Dict[Key]
+        if self.Options.LanuchYamlCompiler:
+            if self.Options.UniStrDisplayFile == None:
+                self.Options.UniStrDisplayFile = self.Options.OutputDirectory + self.Options.BaseFileName + 'Uni.json'
+            f = open(self.Options.UniStrDisplayFile, encoding='utf-8')
+            Dict = json.load(f)
+            f.close()
+            Dict = Dict[1]["en-US"]
+            for Key in Dict.keys():
+                if Key in UniDict.keys():
+                    NewKey = '{}'.format('0x%04x' % (int(UniDict[Key],0)))
+                    DisPlayUniDict[NewKey] = Dict[Key]
 
         return UniDict, DisPlayUniDict
 
@@ -213,7 +218,8 @@ class PreProcessDB():
         HeaderDict = {}
         for HeaderFile in HeaderFiles:
             FileName = HeaderFile.split('/')[-1]
-            FileList = self._FindIncludeHeaderFile("/edk2/", FileName)
+            # FileList = self._FindIncludeHeaderFile("/edk2/", FileName)
+            FileList = self._FindIncludeHeaderFile(self.Options.IncludePaths, FileName)
             CppHeader = None
             for File in FileList:
                 if File.find(HeaderFile.replace('/','\\')) != -1:
@@ -227,7 +233,7 @@ class PreProcessDB():
             for Include in CppHeader.includes:
                 Include = Include[1:-1]
                 IncludeFileName = Include.split('/')[1]
-                IncludeHeaderFileList = self._FindIncludeHeaderFile("/edk2/", IncludeFileName)
+                IncludeHeaderFileList = self._FindIncludeHeaderFile(self.Options.IncludePaths, IncludeFileName)
                 Flag = False
                 for File in IncludeHeaderFileList:
                     if File.find(Include.replace('/','\\')) != -1:
@@ -293,10 +299,11 @@ class PreProcessDB():
                 #Value = Guid.to_string()
                 HeaderDict[Key] = Guid
 
-    def _FindIncludeHeaderFile(self, Start, Name):
+    def _FindIncludeHeaderFile(self, IncludePaths, Name):
         FileList = []
-        for Relpath, Dirs, Files in os.walk(Start):
-            if Name in Files:
-                FullPath = os.path.join(Start, Relpath, Name)
-                FileList.append(os.path.normpath(os.path.abspath(FullPath)))
+        for Start in IncludePaths:
+            for Relpath, Dirs, Files in os.walk(Start):
+                if Name in Files:
+                    FullPath = os.path.join(Start, Relpath, Name)
+                    FileList.append(os.path.normpath(os.path.abspath(FullPath)))
         return FileList

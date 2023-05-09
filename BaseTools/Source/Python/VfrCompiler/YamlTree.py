@@ -206,13 +206,13 @@ class YamlParser():
         # call C preprocessor
         #wip
         try:
-            InputStream = FileStream(self.Options.ProcessedInFileName) ###
+            InputStream = FileStream(self.Options.ProcessedVfrFileName) ###
             VfrLexer = SourceVfrSyntaxLexer(InputStream)
             VfrStream = CommonTokenStream(VfrLexer)
             self.VfrParser = SourceVfrSyntaxParser(VfrStream)
         except:
             EdkLogger.error('VfrCompiler', FILE_OPEN_FAILURE,
-                            'File open failed for %s' % self.Options.ProcessedInFileName, None)
+                            'File open failed for %s' % self.Options.ProcessedVfrFileName, None)
 
         self.Visitor = SourceVfrSyntaxVisitor(None, self.Options.OverrideClassGuid)
         self.Visitor.visit(self.VfrParser.vfrHeader())

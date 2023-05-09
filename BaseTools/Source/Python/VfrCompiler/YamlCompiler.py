@@ -62,14 +62,14 @@ parser=argparse.ArgumentParser(description="VfrCompiler", epilog= "VfrCompile ve
                                Build {} Copyright (c) 2004-2016 Intel Corporation.\
                                All rights reserved.".format(VFR_COMPILER_VERSION, BUILD_VERSION))
 parser.add_argument("InputFileName", help = "Input source file name")
-parser.add_argument("-vfr", "--vfr", dest ="LanuchVfrCompiler", action="store_true", help = "lanuch VfrCompiler")
-parser.add_argument("-yml","--yml","-yaml","--yaml", dest ="LanuchYamlCompiler", action="store_true", help = "lanuch YamlCompiler")
+parser.add_argument("--vfr", dest ="LanuchVfrCompiler", action="store_true", help = "lanuch VfrCompiler")
+parser.add_argument("--yml","--yaml", dest ="LanuchYamlCompiler", action="store_true", help = "lanuch YamlCompiler")
 parser.add_argument("--version", action="version", version="VfrCompile version {} Build {}".format(VFR_COMPILER_VERSION, BUILD_VERSION), help="prints version info")
 parser.add_argument("-l", dest ="CreateRecordListFile",help = "create an output IFR listing file")
 parser.add_argument("-c", dest ="CreateYamlFile",help = "create Yaml file")
 parser.add_argument("-j", dest ="CreateJsonFile",help = "create Json file")
 # parser.add_argument("-c", dest ="LanuchYamlCompiler",help = "lanuch yaml compiler")
-parser.add_argument("-i", dest = "IncludePaths", help= "add path argument") #
+parser.add_argument("-i", dest = "IncludePaths", nargs='+', help= "add path argument") #
 parser.add_argument("-o", "--output-directory", "-od", dest = "OutputDirectory", help= "deposit all output files to directory OutputDir, \
                     default is current directory")
 parser.add_argument("-oo", "--old-output-directory", "-ood", dest = "OldOutputDirectory", help= "Former directory OutputDir of output files, \
@@ -83,7 +83,7 @@ parser.add_argument("-g", "--guid", dest = "OverrideClassGuid", help = "override
 parser.add_argument("-w", "--warning-as-error", dest = "WarningAsError", help = "treat warning as an error")
 parser.add_argument("-a", "--autodefault", dest = "AutoDefault", help = "generate default value for question opcode if some default is missing")
 parser.add_argument("-d", "--checkdefault", dest = "CheckDefault", help  = "check the default information in a question opcode")
-
+parser.add_argument("-m", "--modulename", dest = "ModuleName", help  = "Module name")
 class CmdParser():
     def __init__(self, Args, Argc):
         self.Options = Options()
@@ -91,7 +91,6 @@ class CmdParser():
         self.PreProcessCmd = PREPROCESSOR_COMMAND
         self.PreProcessOpt = PREPROCESSOR_OPTIONS
         self.OptionIntialization(Args, Argc)
-        self.CopyFileToOutputDir() # for development and testing
 
     def OptionIntialization(self, Args, Argc):
         Status = EFI_SUCCESS
@@ -115,14 +114,17 @@ class CmdParser():
         if Args.CreateRecordListFile:
             self.Options.CreateRecordListFile = True
 
+        if Args.ModuleName:
+            self.Options.ModuleName = True
+
         if Args.IncludePaths:
-            Path = Args.IncludePaths
-            if Path == None:
+            Paths = Args.IncludePaths
+            if Paths == None:
                 EdkLogger.error("VfrCompiler", OPTION_MISSING, "-i missing path argument")
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
                 return
-            self.Options.IncludePaths = ''
-            self.Options.IncludePaths += " -I " + Path
+            for Path in Paths:
+                self.Options.IncludePaths.append(Path.replace("Ic:", "")[1:])
 
         if Args.OutputDirectory:
             self.Options.OutputDirectory = Args.OutputDirectory
@@ -231,7 +233,7 @@ class CmdParser():
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
             return
 
-        if self.SetYamlFileName() != 0:
+        if self.SetSourceYamlFileName() != 0:
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
             return
 
@@ -240,10 +242,6 @@ class CmdParser():
             return
 
         if self.SetYamlOutputFileName() != 0:
-            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
-            return
-
-        if self.SetExpandedHeaderFileName() != 0:
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)
             return
 
@@ -285,6 +283,7 @@ class CmdParser():
         if self.Options.BaseFileName == None:
             return -1
         self.Options.PreprocessorOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
+        self.Options.ProcessedVfrFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
         return 0
 
     def SetRecordListFileName(self):
@@ -293,7 +292,7 @@ class CmdParser():
         self.Options.RecordListFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_RECORDLIST_FILENAME_EXTENSION
         return 0
 
-    def SetYamlFileName(self):
+    def SetSourceYamlFileName(self):
         if self.Options.BaseFileName == None:
             return -1
         self.Options.YamlFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_YAML_FILENAME_EXTENSION
@@ -313,12 +312,6 @@ class CmdParser():
         self.Options.YamlOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Compiled.yml'
         return 0
 
-    def SetExpandedHeaderFileName(self):
-        if self.Options.BaseFileName == None:
-            return -1
-        self.Options.ExpandedHeaderFileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
-        return 0
-
     def FindIncludeHeaderFile(self, Start, Name): ##########
         FileList = []
         for Relpath, Dirs, Files in os.walk(Start):
@@ -327,15 +320,14 @@ class CmdParser():
                 FileList.append(os.path.normpath(os.path.abspath(FullPath)))
         return FileList
 
-    def CopyFileToOutputDir(self): ############
-        self.Options.InputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + '.vfr'
-        # self.Options.ProcessedInFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
-        self.Options.ProcessedInFileName = self.Options.OutputDirectory + self.Options.BaseFileName + '.i'
-        # if self.Options.ProcessedInFileName == None:
+    # def CopyFileToOutputDir(self): ############
+        # self.Options.InputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + '.vfr'
+        # self.Options.ProcessedVfrFileName = self.FindIncludeHeaderFile('/edk2/', self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION)[0]
+        # if self.Options.ProcessedVfrFileName == None:
         #     EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
         #                         "File/directory %s not found in workspace" % (self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION), None)
         # shutil.copyfile(self.Options.InputFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.vfr')
-        # shutil.copyfile(self.Options.ProcessedInFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.i')
+        # shutil.copyfile(self.Options.ProcessedVfrFileName, self.Options.OutputDirectory + self.Options.BaseFileName + '.i')
 
     def SET_RUN_STATUS(self, Status):
         self.RunStatus = Status
@@ -409,7 +401,7 @@ class VfrCompiler():
     # Parse and collect data structures info in the ExpandedHeader.i files
     def ParseHeader(self):
         try:
-            InputStream = FileStream(self.Options.ProcessedInFileName)
+            InputStream = FileStream(self.Options.ProcessedVfrFileName)
             VfrLexer = SourceVfrSyntaxLexer(InputStream)
             VfrStream = CommonTokenStream(VfrLexer)
             VfrParser = SourceVfrSyntaxParser(VfrStream)
@@ -427,10 +419,11 @@ class VfrCompiler():
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
-            if self.Options.SkipCPreprocessor == False:  ##### wip
+            if self.Options.SkipCPreprocessor == False:
                 # call C precessor first
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_VFR_PREPROCESSED)
             else:
+                # makefile will calls commands to generate .i file
                 self.PreProcessDB.Preprocess()
                 self.ParseHeader()
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_VFR_PREPROCESSED)
