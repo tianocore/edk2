@@ -30,6 +30,7 @@
 #include <UniversalPayload/ExtraData.h>
 #include <UniversalPayload/SerialPortInfo.h>
 #include <Guid/PcdDataBaseSignatureGuid.h>
+#include <Library/BaseRiscVSbiLib.h>
 #include <libfdt.h>
 
 #define E820_RAM        1
@@ -376,6 +377,14 @@ BuildBlHobs (
   UINTN                               FdtPages;
   UINT64                              *FdtHobData;
   CONST VOID                          *Fdt;
+  EFI_FFS_FILE_HEADER                 *FileHeader;
+  EFI_FIRMWARE_VOLUME_HEADER          *DxeCoreFv;
+  EFI_STATUS                          Status;
+  EFI_RISCV_FIRMWARE_CONTEXT          FirmwareContext;
+
+  FirmwareContext.BootHartId          = Param1;
+  FirmwareContext.FlattenedDeviceTree = Param2;
+  SetFirmwareContextPointer (&FirmwareContext);
 
   Fdt               = (VOID *)Param2;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);

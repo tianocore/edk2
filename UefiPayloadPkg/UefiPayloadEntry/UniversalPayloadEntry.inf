@@ -61,6 +61,8 @@
   CpuLib
   FdtLib
 
+[LibraryClasses.RISCV64]
+  RiscVSbiLib
 [Guids]
   gEfiMemoryTypeInformationGuid
   gEfiFirmwareFileSystem2Guid
