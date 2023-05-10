@@ -81,4 +81,13 @@ Pml4:
     ;
     DQ      PAGE_NLE(Pdp)
     TIMES   0x1000 - ($ - Pml4) DB 0
+
+%ifdef USE_5_LEVEL_PAGE_TABLE
+Pml5:
+    ;
+    ; Pml5 table (only first entry is present, pointing to Pml4)
+    ;
+    DQ      PAGE_NLE(Pml4)
+    TIMES   0x1000 - ($ - Pml5) DB 0
+%endif
 EndOfPageTables:
