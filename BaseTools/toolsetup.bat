@@ -12,6 +12,8 @@
 @echo off
 pushd .
 set SCRIPT_ERROR=0
+set PYTHON_VER_MAJOR=3
+set PYTHON_VER_MINOR=6
 
 @REM ##############################################################
 @REM # You should not have to modify anything below this line
@@ -304,89 +306,66 @@ goto check_build_environment
      )
   )
 
-:defined_python
-if defined PYTHON_COMMAND if not defined PYTHON3_ENABLE (
-  goto check_python_available
-)
-if defined PYTHON3_ENABLE (
-  if "%PYTHON3_ENABLE%" EQU "TRUE" (
-    set PYTHON_COMMAND=py -3
-    goto check_python_available
-  ) else (
-    goto check_python2
-  )
-)
-if not defined PYTHON_COMMAND if not defined PYTHON3_ENABLE (
+@REM Check Python environment
+
+if not defined PYTHON_COMMAND (
   set PYTHON_COMMAND=py -3
-  py -3 %BASE_TOOLS_PATH%\Tests\PythonTest.py >PythonCheck.txt 2>&1
-  setlocal enabledelayedexpansion
-  set /p PythonCheck=<"PythonCheck.txt"
-  del PythonCheck.txt
-  if "!PythonCheck!" NEQ "TRUE" (
+  py -3 %BASE_TOOLS_PATH%\Tests\PythonTest.py %PYTHON_VER_MAJOR% %PYTHON_VER_MINOR% >NUL 2>NUL
+  if %ERRORLEVEL% EQU 1 (
+    echo.
+    echo !!! ERROR !!! Python %PYTHON_VER_MAJOR%.%PYTHON_VER_MINOR% or newer is required.
+    echo.
+    goto end
+  )
+  if %ERRORLEVEL% NEQ 0 (
     if not defined PYTHON_HOME if not defined PYTHONHOME (
-      endlocal
       set PYTHON_COMMAND=
       echo.
       echo !!! ERROR !!! Binary python tools are missing.
-      echo PYTHON_COMMAND, PYTHON3_ENABLE or PYTHON_HOME
-      echo Environment variable is not set successfully.
-      echo They is required to build or execute the python tools.
+      echo PYTHON_COMMAND or PYTHON_HOME
+      echo Environment variable is not set correctly.
+      echo They are required to build or execute the python tools.
       echo.
       goto end
-    ) else (
-      goto check_python2
     )
-  ) else (
-    goto check_freezer_path
   )
 )
 
-:check_python2
-endlocal
 if defined PYTHON_HOME (
   if EXIST "%PYTHON_HOME%" (
     set PYTHON_COMMAND=%PYTHON_HOME%\python.exe
-    goto check_python_available
-  )
-)
-if defined PYTHONHOME (
-  if EXIST "%PYTHONHOME%" (
-    set PYTHON_HOME=%PYTHONHOME%
-    set PYTHON_COMMAND=%PYTHON_HOME%\python.exe
-    goto check_python_available
-  )
-)
-echo.
-echo !!! ERROR !!!  PYTHON_HOME is not defined or The value of this variable does not exist
-echo.
-goto end
-:check_python_available
-%PYTHON_COMMAND% %BASE_TOOLS_PATH%\Tests\PythonTest.py >PythonCheck.txt 2>&1
-  setlocal enabledelayedexpansion
-  set /p PythonCheck=<"PythonCheck.txt"
-  del PythonCheck.txt
-  if "!PythonCheck!" NEQ "TRUE" (
-    echo.
-    echo ! ERROR !  "%PYTHON_COMMAND%" is not installed or added to environment variables
-    echo.
+  ) else (
+    echo .
+    echo !!! ERROR !!!  PYTHON_HOME="%PYTHON_HOME%" does not exist.
+    echo .
     goto end
-  ) else (
-    goto check_freezer_path
   )
+)
 
+%PYTHON_COMMAND% %BASE_TOOLS_PATH%\Tests\PythonTest.py %PYTHON_VER_MAJOR% %PYTHON_VER_MINOR% >NUL 2>NUL
+if %ERRORLEVEL% EQU 1 (
+  echo.
+  echo !!! ERROR !!! Python %PYTHON_VER_MAJOR%.%PYTHON_VER_MINOR% or newer is required.
+  echo.
+  goto end
+)
+if %ERRORLEVEL% NEQ 0 (
+  echo.
+  echo !!! ERROR !!!  PYTHON_COMMAND="%PYTHON_COMMAND%" does not exist or is not a Python interpreter.
+  echo.
+  goto end
+)
 
+endlocal
 
-:check_freezer_path
-  endlocal
-
-  %PYTHON_COMMAND% -c "import edk2basetools" >NUL 2>NUL
-  if %ERRORLEVEL% EQU 0 (
-    goto use_pip_basetools
-  ) else (
-    REM reset ERRORLEVEL
-    type nul>nul
-    goto use_builtin_basetools
-  )
+%PYTHON_COMMAND% -c "import edk2basetools" >NUL 2>NUL
+if %ERRORLEVEL% EQU 0 (
+  goto use_pip_basetools
+) else (
+  REM reset ERRORLEVEL
+  type nul>nul
+  goto use_builtin_basetools
+)
 
 :use_builtin_basetools
   @echo Using EDK2 in-source Basetools
@@ -404,13 +383,7 @@ goto end
 
 :print_python_info
   echo                PATH = %PATH%
-  if defined PYTHON3_ENABLE if "%PYTHON3_ENABLE%" EQU "TRUE" (
-    echo      PYTHON3_ENABLE = %PYTHON3_ENABLE%
-    echo             PYTHON3 = %PYTHON_COMMAND%
-  ) else (
-    echo      PYTHON3_ENABLE = FALSE
-    echo      PYTHON_COMMAND = %PYTHON_COMMAND%
-  )
+  echo      PYTHON_COMMAND = %PYTHON_COMMAND%
   echo          PYTHONPATH = %PYTHONPATH%
   echo.
 
@@ -476,5 +449,7 @@ set VS2019=
 set VS2017=
 set VS2015=
 set VSTool=
+set PYTHON_VER_MAJOR=
+set PYTHON_VER_MINOR=
+set SCRIPT_ERROR=
 popd
-
