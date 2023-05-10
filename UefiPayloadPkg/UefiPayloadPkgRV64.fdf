@@ -104,34 +104,13 @@ INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntime
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
 INF CryptoPkg/Driver/CryptoDxe.inf
 !endif
-!if $(SECURITY_STUB_ENABLE) == TRUE
-INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
-!endif
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
 INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
-INF EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
-INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
-
-!if $(DISABLE_RESET_SYSTEM) == FALSE
-INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
-!endif
-
-!if $(VARIABLE_SUPPORT) == "EMU"
-  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-!elseif $(VARIABLE_SUPPORT) == "SPI"
-  INF UefiPayloadPkg/FvbRuntimeDxe/FvbSmm.inf
-  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
-  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
-  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
-!endif
 
 INF UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
-INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
 
@@ -161,7 +140,6 @@ INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
 # RISC-V Core Drivers
 INF  UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
-INF  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
 
 #
 # ISA Support
@@ -221,7 +199,36 @@ INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 INF ShellPkg/Application/Shell/Shell.inf
 !endif
 
+#
+# PI DXE Drivers producing Architectural Protocols (EFI Services)
+#
+INF  UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 
+!if $(SECURITY_STUB_ENABLE) == TRUE
+INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+!endif
+
+INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+
+!if $(VARIABLE_SUPPORT) == "EMU"
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!elseif $(VARIABLE_SUPPORT) == "SPI"
+  INF UefiPayloadPkg/FvbRuntimeDxe/FvbSmm.inf
+  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+!endif
+
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+!endif
+
+INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+INF  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+INF  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
+INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 ################################################################################
 #
 # Rules are use with the [FV] section's module INF type to define

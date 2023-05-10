@@ -211,7 +211,7 @@
   CpuExceptionHandlerLib|UefiCpuPkg/Library/BaseRiscV64CpuExceptionHandlerLib/BaseRiscV64CpuExceptionHandlerLib.inf
   RiscVSbiLib|MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
   ResetSystemLib|OvmfPkg/RiscVVirt/Library/ResetSystemLib/BaseResetSystemLib.inf
-
+  TimeBaseLib|EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
 
 [LibraryClasses.common.SEC]
   HobLib|UefiPayloadPkg/Library/PayloadEntryHobLib/HobLib.inf
@@ -252,7 +252,6 @@
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
 !endif
-  ResetSystemLib|OvmfPkg/Library/ResetSystemLib/DxeResetSystemLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
 !ifdef $(DEBUG_ON_SERIAL_PORT)
@@ -466,11 +465,25 @@
   #
   # RISC-V Platform module
   #
-   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
-   UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
   #
   # Components that produce the architectural protocols
   #
+  UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+  UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
+  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
+  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+
+!if $(DISABLE_RESET_SYSTEM) == FALSE
+  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+!endif
+!if $(EMU_VARIABLE_ENABLE) == TRUE
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
+
 !if $(SECURITY_STUB_ENABLE) == TRUE
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
@@ -488,17 +501,6 @@
     <LibraryClasses>
       NULL|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   }
-  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
-  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
-  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
-!if $(DISABLE_RESET_SYSTEM) == FALSE
-  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
-!endif
-!if $(EMU_VARIABLE_ENABLE) == TRUE
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-!endif
   #
   # Following are the DXE drivers
   #
@@ -593,7 +595,6 @@
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   !include NetworkPkg/NetworkLibs.dsc.inc
-  TimeBaseLib|EmbeddedPkg//Library/TimeBaseLib/TimeBaseLib.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
 
 [Components]
