@@ -2,7 +2,7 @@
   This file include all platform action which can be customized
   by IBV/OEM.
 
-Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PlatformConsole.h"
 #include <Guid/BootManagerMenu.h>
 #include <Library/HobLib.h>
+#include <Protocol/FirmwareVolume2.h>
 
 /**
   Signal EndOfDxe event and install SMM Ready to lock protocol.
@@ -90,6 +91,77 @@ PlatformFindLoadOption (
 }
 
 /**
+  Get the FV device path for the shell file.
+
+  @return   A pointer to device path structure.
+**/
+EFI_DEVICE_PATH_PROTOCOL *
+BdsGetShellFvDevicePath (
+  VOID
+  )
+{
+  UINTN                          FvHandleCount;
+  EFI_HANDLE                     *FvHandleBuffer;
+  UINTN                          Index;
+  EFI_STATUS                     Status;
+  EFI_FIRMWARE_VOLUME2_PROTOCOL  *Fv;
+  UINTN                          Size;
+  UINT32                         AuthenticationStatus;
+  EFI_DEVICE_PATH_PROTOCOL       *DevicePath;
+  EFI_FV_FILETYPE                FoundType;
+  EFI_FV_FILE_ATTRIBUTES         FileAttributes;
+
+  Status = EFI_SUCCESS;
+  gBS->LocateHandleBuffer (
+         ByProtocol,
+         &gEfiFirmwareVolume2ProtocolGuid,
+         NULL,
+         &FvHandleCount,
+         &FvHandleBuffer
+         );
+
+  for (Index = 0; Index < FvHandleCount; Index++) {
+    Size = 0;
+    gBS->HandleProtocol (
+           FvHandleBuffer[Index],
+           &gEfiFirmwareVolume2ProtocolGuid,
+           (VOID **)&Fv
+           );
+    Status = Fv->ReadFile (
+                   Fv,
+                   &gUefiShellFileGuid,
+                   NULL,
+                   &Size,
+                   &FoundType,
+                   &FileAttributes,
+                   &AuthenticationStatus
+                   );
+    if (!EFI_ERROR (Status)) {
+      //
+      // Found the shell file
+      //
+      break;
+    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    if (FvHandleCount) {
+      FreePool (FvHandleBuffer);
+    }
+
+    return NULL;
+  }
+
+  DevicePath = DevicePathFromHandle (FvHandleBuffer[Index]);
+
+  if (FvHandleCount) {
+    FreePool (FvHandleBuffer);
+  }
+
+  return DevicePath;
+}
+
+/**
   Register a boot option using a file GUID in the FV.
 
   @param FileGuid     The file GUID name in FV.
@@ -109,15 +181,11 @@ PlatformRegisterFvBootOption (
   EFI_BOOT_MANAGER_LOAD_OPTION       *BootOptions;
   UINTN                              BootOptionCount;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
-  EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
   EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
-
-  Status = gBS->HandleProtocol (gImageHandle, &gEfiLoadedImageProtocolGuid, (VOID **)&LoadedImage);
-  ASSERT_EFI_ERROR (Status);
 
   EfiInitializeFwVolDevicepathNode (&FileNode, FileGuid);
   DevicePath = AppendDevicePathNode (
-                 DevicePathFromHandle (LoadedImage->DeviceHandle),
+                 BdsGetShellFvDevicePath (),
                  (EFI_DEVICE_PATH_PROTOCOL *)&FileNode
                  );
 
@@ -248,7 +316,7 @@ PlatformBootManagerAfterConsole (
   //
   // Register UEFI Shell
   //
-  PlatformRegisterFvBootOption (PcdGetPtr (PcdShellFile), L"UEFI Shell", LOAD_OPTION_ACTIVE);
+  PlatformRegisterFvBootOption (&gUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE);
 
   if (FixedPcdGetBool (PcdBootManagerEscape)) {
     Print (
