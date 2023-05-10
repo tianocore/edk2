@@ -41,6 +41,8 @@
 #define E820_DISABLED   6
 #define E820_PMEM       7
 #define E820_UNDEFINED  8
+#define GET_OCCUPIED_SIZE(ActualSize, Alignment) \
+  ((ActualSize) + (((Alignment) - ((ActualSize) & ((Alignment) - 1))) & ((Alignment) - 1)))
 
 /**
   Auto-generated function that calls the library constructors for all of the module's
@@ -341,6 +343,138 @@ BuildSerialHobFromFDT (
   return TRUE;
 }
 
+/**
+  This function searchs a given file type with a given Guid within a valid FV.
+  If input Guid is NULL, will locate the first section having the given file type
+
+  @param FvHeader        A pointer to firmware volume header that contains the set of files
+                         to be searched.
+  @param FileType        File type to be searched.
+  @param Guid            Will ignore if it is NULL.
+  @param FileHeader      A pointer to the discovered file, if successful.
+
+  @retval EFI_SUCCESS    Successfully found FileType
+  @retval EFI_NOT_FOUND  File type can't be found.
+**/
+STATIC EFI_STATUS
+FvFindFileByTypeGuid (
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *FvHeader,
+  IN  EFI_FV_FILETYPE             FileType,
+  IN  EFI_GUID                    *Guid  OPTIONAL,
+  OUT EFI_FFS_FILE_HEADER         **FileHeader
+  )
+{
+  EFI_PHYSICAL_ADDRESS  CurrentAddress;
+  EFI_PHYSICAL_ADDRESS  EndOfFirmwareVolume;
+  EFI_FFS_FILE_HEADER   *File;
+  UINT32                Size;
+  EFI_PHYSICAL_ADDRESS  EndOfFile;
+
+  CurrentAddress      = (EFI_PHYSICAL_ADDRESS)(UINTN)FvHeader;
+  EndOfFirmwareVolume = CurrentAddress + FvHeader->FvLength;
+
+  //
+  // Loop through the FFS files
+  //
+  for (EndOfFile = CurrentAddress + FvHeader->HeaderLength; ; ) {
+    CurrentAddress = (EndOfFile + 7) & 0xfffffffffffffff8ULL;
+    if (CurrentAddress > EndOfFirmwareVolume) {
+      break;
+    }
+
+    File = (EFI_FFS_FILE_HEADER *)(UINTN)CurrentAddress;
+    if (IS_FFS_FILE2 (File)) {
+      Size = FFS_FILE2_SIZE (File);
+      if (Size <= 0x00FFFFFF) {
+        break;
+      }
+    } else {
+      Size = FFS_FILE_SIZE (File);
+      if (Size < sizeof (EFI_FFS_FILE_HEADER)) {
+        break;
+      }
+    }
+
+    EndOfFile = CurrentAddress + Size;
+    if (EndOfFile > EndOfFirmwareVolume) {
+      break;
+    }
+
+    //
+    // Look for file type
+    //
+    if (File->Type == FileType) {
+      if ((Guid == NULL) || CompareGuid (&File->Name, Guid)) {
+        *FileHeader = File;
+        return EFI_SUCCESS;
+      }
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+  This function searchs a given section type within a valid FFS file.
+
+  @param  FileHeader            A pointer to the file header that contains the set of sections to
+                                be searched.
+  @param  SectionType            The value of the section type to search.
+  @param  SectionData           A pointer to the discovered section, if successful.
+
+  @retval EFI_SUCCESS           The section was found.
+  @retval EFI_NOT_FOUND         The section was not found.
+
+**/
+STATIC EFI_STATUS
+FileFindSection (
+  IN EFI_FFS_FILE_HEADER  *FileHeader,
+  IN EFI_SECTION_TYPE     SectionType,
+  OUT VOID                **SectionData
+  )
+{
+  UINT32                     FileSize;
+  EFI_COMMON_SECTION_HEADER  *Section;
+  UINT32                     SectionSize;
+  UINT32                     Index;
+
+  if (IS_FFS_FILE2 (FileHeader)) {
+    FileSize = FFS_FILE2_SIZE (FileHeader);
+  } else {
+    FileSize = FFS_FILE_SIZE (FileHeader);
+  }
+
+  FileSize -= sizeof (EFI_FFS_FILE_HEADER);
+
+  Section = (EFI_COMMON_SECTION_HEADER *)(FileHeader + 1);
+  Index   = 0;
+  while (Index < FileSize) {
+    if (Section->Type == SectionType) {
+      if (IS_SECTION2 (Section)) {
+        *SectionData = (VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER2));
+      } else {
+        *SectionData = (VOID *)((UINT8 *)Section + sizeof (EFI_COMMON_SECTION_HEADER));
+      }
+
+      return EFI_SUCCESS;
+    }
+
+    if (IS_SECTION2 (Section)) {
+      SectionSize = SECTION2_SIZE (Section);
+    } else {
+      SectionSize = SECTION_SIZE (Section);
+    }
+
+    SectionSize = GET_OCCUPIED_SIZE (SectionSize, 4);
+    ASSERT (SectionSize != 0);
+    Index += SectionSize;
+
+    Section = (EFI_COMMON_SECTION_HEADER *)((UINT8 *)Section + SectionSize);
+  }
+
+  return EFI_NOT_FOUND;
+}
+
 EFI_STATUS
 BuildBlHobs (
   IN  UINTN                       Param1,
@@ -437,7 +571,20 @@ BuildBlHobs (
     ASSERT (AcpiBoardInfo != NULL);
   }
 
-  *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdPayloadFdMemBase);
+  DxeCoreFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdPayloadFdMemBase);
+
+  Status = FvFindFileByTypeGuid (DxeCoreFv, 0x0B, ((void *)0), &FileHeader);
+  if ((((INTN)(RETURN_STATUS)(Status)) < 0)) {
+    return Status;
+  }
+
+  Status = FileFindSection (FileHeader, 0x17, (void **)DxeFv);
+  if ((((INTN)(RETURN_STATUS)(Status)) < 0)) {
+    return Status;
+  }
+
+  BuildFvHob ((EFI_PHYSICAL_ADDRESS)(UINTN)DxeCoreFv, DxeCoreFv->FvLength);
+
   return EFI_SUCCESS;
 }
 
