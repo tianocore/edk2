@@ -437,12 +437,30 @@ R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 
+MdeModulePkg: Trace Hub debug message related library instance
+F: MdeModulePkg/Library/TraceHubDebugSysTLib/
+F: MdeModulePkg/Include/Guid/TraceHubDebugInfoHob.h
+M: Gua Guo <gua.guo@intel.com> [gguo11837463]
+M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakashan@intel.com> [kprakas2]
+R: Chan Laura <laura.chan@intel.com> [lauracha]
+R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
+
+MdePkg: Trace Hub debug message related library instance
+F: MdePkg/Library/TraceHubDebugSysTLibNull/
+F: MdePkg/Library/MipiSysTLib/
+F: MdePkg/Include/Library/TraceHubDebugSysTLib.h
+F: MdePkg/Include/Library/MipiSysTLib.h
+M: Gua Guo <gua.guo@intel.com> [gguo11837463]
+M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakashan@intel.com> [kprakas2]
+R: Chan Laura <laura.chan@intel.com> [lauracha]
+R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
 
 NetworkPkg
 F: NetworkPkg/
