@@ -460,7 +460,7 @@ NvmExpressPassThru (
   EFI_STATUS                     PreviousStatus;
   EFI_PCI_IO_PROTOCOL            *PciIo;
   NVME_SQ                        *Sq;
-  NVME_CQ                        *Cq;
+  volatile NVME_CQ               *Cq;
   UINT16                         QueueId;
   UINT16                         QueueSize;
   UINT32                         Bytes;
@@ -815,14 +815,14 @@ NvmExpressPassThru (
       // Dump every completion entry status for debugging.
       //
       DEBUG_CODE_BEGIN ();
-      NvmeDumpStatus (Cq);
+      NvmeDumpStatus ((NVME_CQ *)Cq);
       DEBUG_CODE_END ();
     }
 
     //
     // Copy the Respose Queue entry for this command to the callers response buffer
     //
-    CopyMem (Packet->NvmeCompletion, Cq, sizeof (EFI_NVM_EXPRESS_COMPLETION));
+    CopyMem (Packet->NvmeCompletion, (VOID *)Cq, sizeof (EFI_NVM_EXPRESS_COMPLETION));
   } else {
     //
     // Timeout occurs for an NVMe command. Reset the controller to abort the

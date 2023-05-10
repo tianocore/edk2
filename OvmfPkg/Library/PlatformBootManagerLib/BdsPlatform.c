@@ -977,6 +977,45 @@ PreparePciSerialDevicePath (
 }
 
 EFI_STATUS
+PrepareVirtioSerialDevicePath (
+  IN EFI_HANDLE  DeviceHandle
+  )
+{
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+
+  DevicePath = NULL;
+  Status     = gBS->HandleProtocol (
+                      DeviceHandle,
+                      &gEfiDevicePathProtocolGuid,
+                      (VOID *)&DevicePath
+                      );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  gPnp16550ComPortDeviceNode.UID = 0;
+  DevicePath                     = AppendDevicePathNode (
+                                     DevicePath,
+                                     (EFI_DEVICE_PATH_PROTOCOL *)&gPnp16550ComPortDeviceNode
+                                     );
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode
+                 );
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode
+                 );
+
+  EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
 VisitAllInstancesOfProtocol (
   IN EFI_GUID                    *Id,
   IN PROTOCOL_INSTANCE_CALLBACK  CallBackFunction,
@@ -1141,6 +1180,14 @@ DetectAndPreparePlatformPciDevicePath (
     //
     DEBUG ((DEBUG_INFO, "Found PCI display device\n"));
     PreparePciDisplayDevicePath (Handle);
+    return EFI_SUCCESS;
+  }
+
+  if (((Pci->Hdr.VendorId == 0x1af4) && (Pci->Hdr.DeviceId == 0x1003)) ||
+      ((Pci->Hdr.VendorId == 0x1af4) && (Pci->Hdr.DeviceId == 0x1043)))
+  {
+    DEBUG ((DEBUG_INFO, "Found virtio serial device\n"));
+    PrepareVirtioSerialDevicePath (Handle);
     return EFI_SUCCESS;
   }
 

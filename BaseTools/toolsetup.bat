@@ -12,6 +12,8 @@
 @echo off
 pushd .
 set SCRIPT_ERROR=0
+set PYTHON_VER_MAJOR=3
+set PYTHON_VER_MINOR=6
 
 @REM ##############################################################
 @REM # You should not have to modify anything below this line
@@ -58,18 +60,6 @@ if /I "%1"=="/?" goto Usage
     shift
     set VS2015=TRUE
     set VSTool=VS2015
-    goto loop
-  )
-  if /I "%1"=="VS2013" (
-    shift
-    set VS2013=TRUE
-    set VSTool=VS2013
-    goto loop
-  )
-  if /I "%1"=="VS2012" (
-    shift
-    set VS2012=TRUE
-    set VSTool=VS2012
     goto loop
   )
   if "%1"=="" goto setup_workspace
@@ -189,12 +179,6 @@ if defined VS2019 (
 ) else if defined VS2015 (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2015
   call %EDK_TOOLS_PATH%\get_vsvars.bat VS2015
-) else if defined VS2013 (
-  call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2013
-  call %EDK_TOOLS_PATH%\get_vsvars.bat VS2013
-) else if defined VS2012 (
-  call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2012
-  call %EDK_TOOLS_PATH%\get_vsvars.bat VS2012
 ) else (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat
   call %EDK_TOOLS_PATH%\get_vsvars.bat
@@ -322,89 +306,66 @@ goto check_build_environment
      )
   )
 
-:defined_python
-if defined PYTHON_COMMAND if not defined PYTHON3_ENABLE (
-  goto check_python_available
-)
-if defined PYTHON3_ENABLE (
-  if "%PYTHON3_ENABLE%" EQU "TRUE" (
-    set PYTHON_COMMAND=py -3
-    goto check_python_available
-  ) else (
-    goto check_python2
-  )
-)
-if not defined PYTHON_COMMAND if not defined PYTHON3_ENABLE (
+@REM Check Python environment
+
+if not defined PYTHON_COMMAND (
   set PYTHON_COMMAND=py -3
-  py -3 %BASE_TOOLS_PATH%\Tests\PythonTest.py >PythonCheck.txt 2>&1
-  setlocal enabledelayedexpansion
-  set /p PythonCheck=<"PythonCheck.txt"
-  del PythonCheck.txt
-  if "!PythonCheck!" NEQ "TRUE" (
+  py -3 %BASE_TOOLS_PATH%\Tests\PythonTest.py %PYTHON_VER_MAJOR% %PYTHON_VER_MINOR% >NUL 2>NUL
+  if %ERRORLEVEL% EQU 1 (
+    echo.
+    echo !!! ERROR !!! Python %PYTHON_VER_MAJOR%.%PYTHON_VER_MINOR% or newer is required.
+    echo.
+    goto end
+  )
+  if %ERRORLEVEL% NEQ 0 (
     if not defined PYTHON_HOME if not defined PYTHONHOME (
-      endlocal
       set PYTHON_COMMAND=
       echo.
       echo !!! ERROR !!! Binary python tools are missing.
-      echo PYTHON_COMMAND, PYTHON3_ENABLE or PYTHON_HOME
-      echo Environment variable is not set successfully.
-      echo They is required to build or execute the python tools.
+      echo PYTHON_COMMAND or PYTHON_HOME
+      echo Environment variable is not set correctly.
+      echo They are required to build or execute the python tools.
       echo.
       goto end
-    ) else (
-      goto check_python2
     )
-  ) else (
-    goto check_freezer_path
   )
 )
 
-:check_python2
-endlocal
 if defined PYTHON_HOME (
   if EXIST "%PYTHON_HOME%" (
     set PYTHON_COMMAND=%PYTHON_HOME%\python.exe
-    goto check_python_available
-  )
-)
-if defined PYTHONHOME (
-  if EXIST "%PYTHONHOME%" (
-    set PYTHON_HOME=%PYTHONHOME%
-    set PYTHON_COMMAND=%PYTHON_HOME%\python.exe
-    goto check_python_available
-  )
-)
-echo.
-echo !!! ERROR !!!  PYTHON_HOME is not defined or The value of this variable does not exist
-echo.
-goto end
-:check_python_available
-%PYTHON_COMMAND% %BASE_TOOLS_PATH%\Tests\PythonTest.py >PythonCheck.txt 2>&1
-  setlocal enabledelayedexpansion
-  set /p PythonCheck=<"PythonCheck.txt"
-  del PythonCheck.txt
-  if "!PythonCheck!" NEQ "TRUE" (
-    echo.
-    echo ! ERROR !  "%PYTHON_COMMAND%" is not installed or added to environment variables
-    echo.
+  ) else (
+    echo .
+    echo !!! ERROR !!!  PYTHON_HOME="%PYTHON_HOME%" does not exist.
+    echo .
     goto end
-  ) else (
-    goto check_freezer_path
   )
+)
 
+%PYTHON_COMMAND% %BASE_TOOLS_PATH%\Tests\PythonTest.py %PYTHON_VER_MAJOR% %PYTHON_VER_MINOR% >NUL 2>NUL
+if %ERRORLEVEL% EQU 1 (
+  echo.
+  echo !!! ERROR !!! Python %PYTHON_VER_MAJOR%.%PYTHON_VER_MINOR% or newer is required.
+  echo.
+  goto end
+)
+if %ERRORLEVEL% NEQ 0 (
+  echo.
+  echo !!! ERROR !!!  PYTHON_COMMAND="%PYTHON_COMMAND%" does not exist or is not a Python interpreter.
+  echo.
+  goto end
+)
 
+endlocal
 
-:check_freezer_path
-  endlocal
-
-  %PYTHON_COMMAND% -c "import edk2basetools" >NUL 2>NUL
-  if %ERRORLEVEL% EQU 0 (
-    goto use_pip_basetools
-  ) else (
-    REM reset ERRORLEVEL
-    type nul>nul
-    goto use_builtin_basetools
-  )
+%PYTHON_COMMAND% -c "import edk2basetools" >NUL 2>NUL
+if %ERRORLEVEL% EQU 0 (
+  goto use_pip_basetools
+) else (
+  REM reset ERRORLEVEL
+  type nul>nul
+  goto use_builtin_basetools
+)
 
 :use_builtin_basetools
   @echo Using EDK2 in-source Basetools
@@ -422,13 +383,7 @@ goto end
 
 :print_python_info
   echo                PATH = %PATH%
-  if defined PYTHON3_ENABLE if "%PYTHON3_ENABLE%" EQU "TRUE" (
-    echo      PYTHON3_ENABLE = %PYTHON3_ENABLE%
-    echo             PYTHON3 = %PYTHON_COMMAND%
-  ) else (
-    echo      PYTHON3_ENABLE = FALSE
-    echo      PYTHON_COMMAND = %PYTHON_COMMAND%
-  )
+  echo      PYTHON_COMMAND = %PYTHON_COMMAND%
   echo          PYTHONPATH = %PYTHONPATH%
   echo.
 
@@ -472,7 +427,7 @@ goto end
 
 :Usage
   @echo.
-  echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [base_tools_path [edk_tools_path]] [VS2019] [VS2017] [VS2015] [VS2013] [VS2012]"
+  echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [base_tools_path [edk_tools_path]] [VS2019] [VS2017] [VS2015]"
   @echo.
   @echo         base_tools_path   BaseTools project path, BASE_TOOLS_PATH will be set to this path.
   @echo         edk_tools_path    EDK_TOOLS_PATH will be set to this path.
@@ -481,8 +436,6 @@ goto end
   @echo         ForceRebuild      If sources are available, rebuild all tools regardless of
   @echo                           whether they have been updated or not.
   @echo         Reconfig          Reinstall target.txt, tools_def.txt and build_rule.txt.
-  @echo         VS2012            Set the env for VS2012 build.
-  @echo         VS2013            Set the env for VS2013 build.
   @echo         VS2015            Set the env for VS2015 build.
   @echo         VS2017            Set the env for VS2017 build.
   @echo         VS2019            Set the env for VS2019 build.
@@ -495,8 +448,8 @@ set RECONFIG=
 set VS2019=
 set VS2017=
 set VS2015=
-set VS2013=
-set VS2012=
 set VSTool=
+set PYTHON_VER_MAJOR=
+set PYTHON_VER_MINOR=
+set SCRIPT_ERROR=
 popd
-

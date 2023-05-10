@@ -5,6 +5,7 @@
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -86,6 +87,7 @@ CreateRestExInstance (
   EFI_STATUS  Status;
 
   Status = RestExLibCreateChild (
+             Instance->NetworkInterface->OpenDriverControllerHandle,
              Instance->Owner,
              FixedPcdGetBool (PcdRedfishDiscoverAccessModeInBand) ? EfiRestExServiceInBandAccess : EfiRestExServiceOutOfBandAccess,
              EfiRestExConfigHttp,
@@ -926,7 +928,7 @@ AddAndSignalNewRedfishService (
     }
 
     Status = gBS->SignalEvent (Instance->DiscoverToken->Event);
-    if (!EFI_ERROR (Status)) {
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a:No event to signal!\n", __func__));
     }
   }
@@ -1095,8 +1097,11 @@ RedfishServiceGetNetworkInterface (
 {
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *ThisNetworkInterfaceIntn;
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE           *ThisNetworkInterface;
+  EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL   *RestExInstance;
 
-  if ((NetworkIntfInstances == NULL) || (NumberOfNetworkIntfs == NULL) || (ImageHandle == NULL)) {
+  if ((This == NULL) || (NetworkIntfInstances == NULL) || (NumberOfNetworkIntfs == NULL) ||
+      (ImageHandle == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1107,12 +1112,26 @@ RedfishServiceGetNetworkInterface (
     return EFI_NOT_FOUND;
   }
 
+  RestExInstance = EFI_REDFISH_DISOVER_DATA_FROM_DISCOVER_PROTOCOL (This);
+
+  //
+  // Check the new found network interface.
+  //
+  if (RestExInstance->NetworkInterfaceInstances != NULL) {
+    FreePool (RestExInstance->NetworkInterfaceInstances);
+    RestExInstance->NetworkInterfaceInstances = NULL;
+  }
+
   ThisNetworkInterface = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE *)AllocateZeroPool (sizeof (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE) * mNumNetworkInterface);
   if (ThisNetworkInterface == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  *NetworkIntfInstances    = ThisNetworkInterface;
+  *NetworkIntfInstances = ThisNetworkInterface;
+
+  RestExInstance->NetworkInterfaceInstances = ThisNetworkInterface;
+  RestExInstance->NumberOfNetworkInterfaces = 0;
+
   ThisNetworkInterfaceIntn = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
   while (TRUE) {
     ThisNetworkInterface->IsIpv6 = FALSE;
@@ -1130,7 +1149,7 @@ RedfishServiceGetNetworkInterface (
 
     ThisNetworkInterface->SubnetPrefixLength = ThisNetworkInterfaceIntn->SubnetPrefixLength;
     ThisNetworkInterface->VlanId             = ThisNetworkInterfaceIntn->VlanId;
-    (*NumberOfNetworkIntfs)++;
+    RestExInstance->NumberOfNetworkInterfaces++;
     if (IsNodeAtEnd (&mEfiRedfishDiscoverNetworkInterface, &ThisNetworkInterfaceIntn->Entry)) {
       break;
     }
@@ -1138,6 +1157,8 @@ RedfishServiceGetNetworkInterface (
     ThisNetworkInterfaceIntn = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetNextNode (&mEfiRedfishDiscoverNetworkInterface, &ThisNetworkInterfaceIntn->Entry);
     ThisNetworkInterface++;
   }
+
+  *NumberOfNetworkIntfs = RestExInstance->NumberOfNetworkInterfaces;
 
   return EFI_SUCCESS;
 }
@@ -1178,7 +1199,6 @@ RedfishServiceAcquireService (
 {
   EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE         *Instance;
   EFI_STATUS                                       Status1;
-  EFI_STATUS                                       Status2;
   BOOLEAN                                          NewInstance;
   UINTN                                            NumNetworkInterfaces;
   UINTN                                            NetworkInterfacesIndex;
@@ -1215,7 +1235,6 @@ RedfishServiceAcquireService (
 
   for (NetworkInterfacesIndex = 0; NetworkInterfacesIndex < NumNetworkInterfaces; NetworkInterfacesIndex++) {
     Status1     = EFI_SUCCESS;
-    Status2     = EFI_SUCCESS;
     NewInstance = FALSE;
     Instance    = GetInstanceByOwner (ImageHandle, TargetNetworkInterfaceInternal, Flags & ~EFI_REDFISH_DISCOVER_VALIDATION); // Check if we can re-use previous instance.
     if (Instance == NULL) {
@@ -1223,6 +1242,7 @@ RedfishServiceAcquireService (
       Instance = (EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE *)AllocateZeroPool (sizeof (EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE));
       if (Instance == NULL) {
         DEBUG ((DEBUG_ERROR, "%a:Memory allocation fail.\n", __func__));
+        return EFI_OUT_OF_RESOURCES;
       }
 
       InitializeListHead (&Instance->Entry);
@@ -1258,9 +1278,12 @@ RedfishServiceAcquireService (
       DEBUG ((DEBUG_ERROR, "%a:Redfish service discovery through SSDP is not supported\n", __func__));
       return EFI_UNSUPPORTED;
     } else {
-      if (EFI_ERROR (Status1) && EFI_ERROR (Status2)) {
-        FreePool ((VOID *)Instance);
-        DEBUG ((DEBUG_ERROR, "%a:Something wrong on Redfish service discovery Status1=%x, Status2=%x.\n", __func__, Status1, Status2));
+      if (EFI_ERROR (Status1)) {
+        if (NewInstance) {
+          FreePool ((VOID *)Instance);
+        }
+
+        DEBUG ((DEBUG_ERROR, "%a:Something wrong on Redfish service discovery Status1=%r.\n", __func__, Status1));
       } else {
         if (NewInstance) {
           InsertTailList (&mRedfishDiscoverList, &Instance->Entry);
@@ -1386,13 +1409,6 @@ ReleaseNext:;
     return EFI_SUCCESS;
   }
 }
-
-EFI_REDFISH_DISCOVER_PROTOCOL  mRedfishDiscover = {
-  RedfishServiceGetNetworkInterface,
-  RedfishServiceAcquireService,
-  RedfishServiceAbortAcquire,
-  RedfishServiceReleaseService
-};
 
 /**
   This function create an EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL for the
@@ -1713,12 +1729,20 @@ BuildupNetworkInterface (
 
           NewNetworkInterfaceInstalled                       = FALSE;
           NetworkInterface->EfiRedfishDiscoverProtocolHandle = NULL;
-          Status                                             = gBS->InstallProtocolInterface (
-                                                                      &NetworkInterface->EfiRedfishDiscoverProtocolHandle,
-                                                                      &gEfiRedfishDiscoverProtocolGuid,
-                                                                      EFI_NATIVE_INTERFACE,
-                                                                      (VOID *)&mRedfishDiscover
-                                                                      );
+
+          RestExInstance->Signature = EFI_REDFISH_DISCOVER_DATA_SIGNATURE;
+
+          RestExInstance->RedfishDiscoverProtocol.GetNetworkInterfaceList    = RedfishServiceGetNetworkInterface;
+          RestExInstance->RedfishDiscoverProtocol.AcquireRedfishService      = RedfishServiceAcquireService;
+          RestExInstance->RedfishDiscoverProtocol.AbortAcquireRedfishService = RedfishServiceAbortAcquire;
+          RestExInstance->RedfishDiscoverProtocol.ReleaseRedfishService      = RedfishServiceReleaseService;
+
+          Status = gBS->InstallProtocolInterface (
+                          &NetworkInterface->EfiRedfishDiscoverProtocolHandle,
+                          &gEfiRedfishDiscoverProtocolGuid,
+                          EFI_NATIVE_INTERFACE,
+                          (VOID *)&RestExInstance->RedfishDiscoverProtocol
+                          );
           if (EFI_ERROR (Status)) {
             DEBUG ((DEBUG_ERROR, "%a: Fail to install EFI_REDFISH_DISCOVER_PROTOCOL\n", __func__));
           }
@@ -1815,6 +1839,7 @@ StopServiceOnNetworkInterface (
   EFI_HANDLE                                       DiscoverProtocolHandle;
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *ThisNetworkInterface;
   EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL   *RestExInstance;
+  EFI_REDFISH_DISCOVER_PROTOCOL                    *RedfishDiscoverProtocol;
 
   for (Index = 0; Index < (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL)); Index++) {
     Status = gBS->HandleProtocol (
@@ -1854,12 +1879,28 @@ StopServiceOnNetworkInterface (
             // client which uses .EFI Redfish discover protocol.
             //
             if (DiscoverProtocolHandle != NULL) {
-              gBS->DisconnectController (DiscoverProtocolHandle, NULL, NULL);
-              Status = gBS->UninstallProtocolInterface (
+              Status = gBS->HandleProtocol (
                               DiscoverProtocolHandle,
                               &gEfiRedfishDiscoverProtocolGuid,
-                              (VOID *)&mRedfishDiscover
+                              (VOID **)&RedfishDiscoverProtocol
                               );
+              if (!EFI_ERROR (Status)) {
+                RestExInstance = EFI_REDFISH_DISOVER_DATA_FROM_DISCOVER_PROTOCOL (RedfishDiscoverProtocol);
+                //
+                // Stop Redfish service discovery.
+                //
+                RedfishDiscoverProtocol->AbortAcquireRedfishService (
+                                           RedfishDiscoverProtocol,
+                                           RestExInstance->NetworkInterfaceInstances
+                                           );
+
+                gBS->DisconnectController (DiscoverProtocolHandle, NULL, NULL);
+                Status = gBS->UninstallProtocolInterface (
+                                DiscoverProtocolHandle,
+                                &gEfiRedfishDiscoverProtocolGuid,
+                                (VOID *)&RestExInstance->RedfishDiscoverProtocol
+                                );
+              }
             }
 
             return Status;
