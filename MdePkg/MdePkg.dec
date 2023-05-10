@@ -28,6 +28,7 @@
   Include
   Test/UnitTest/Include
   Test/Mock/Include
+  Library/MipiSysTLib/mipisyst/library/include
 
 [Includes.IA32]
   Include/Ia32
@@ -292,6 +293,14 @@
   ##  @libraryclass  Provides APIs for third-party library libfdt.
   #
   FdtLib|Include/Library/FdtLib.h
+
+  ##  @libraryclass  Provides general mipi sys-T services.
+  #
+  MipiSysTLib|Include/Library/MipiSysTLib.h
+
+  ##  @libraryclass  Provides API to output Trace Hub debug message.
+  #
+  TraceHubDebugSysTLib|Include/Library/TraceHubDebugSysTLib.h
 
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
