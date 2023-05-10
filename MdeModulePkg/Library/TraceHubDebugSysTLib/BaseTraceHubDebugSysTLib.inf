@@ -1,0 +1,44 @@
+## @file
+#  Debug library to output Trace Hub message.
+#  Support SEC/PEI/DXE/SMM phase TraceHub debug message based on fixed settings.
+#
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseTraceHubDebugSysTLib
+  FILE_GUID                      = 336DA571-AD65-423C-9A43-E0056E5B2D8D
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TraceHubDebugSysTLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64
+#
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  BaseMemoryLib
+  MipiSysTLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  BaseTraceHubDebugSysTLib.c
+  InternalTraceHubApiCommon.c
+  InternalTraceHubApiCommon.h
+  InternalTraceHubApi.h
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugLevel
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableTraceHubDebugMsg
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugMmioAddress
