@@ -25,6 +25,7 @@
 
 STATIC LIST_ENTRY  mVirtioSerialList;
 
+#if !defined (MDEPKG_NDEBUG)
 STATIC CONST CHAR8  *EventNames[] = {
   [VIRTIO_SERIAL_DEVICE_READY]  = "device-ready",
   [VIRTIO_SERIAL_DEVICE_ADD]    = "device-add",
@@ -35,6 +36,7 @@ STATIC CONST CHAR8  *EventNames[] = {
   [VIRTIO_SERIAL_PORT_OPEN]     = "port-open",
   [VIRTIO_SERIAL_PORT_NAME]     = "port-name",
 };
+#endif
 
 VOID
 EFIAPI
