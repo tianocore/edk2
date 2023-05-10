@@ -197,6 +197,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
             "UnitTestFrameworkPkg/Library/SubhookLib/subhook", False))
         rs.append(RequiredSubmodule(
             "MdePkg/Library/BaseFdtLib/libfdt", False))
+        rs.append(RequiredSubmodule(
+            "MdePkg/Library/MipiSysTLib/mipisyst", False))
         return rs
 
     def GetName(self):

@@ -29,3 +29,6 @@
 [submodule "MdePkg/Library/BaseFdtLib/libfdt"]
 	path = MdePkg/Library/BaseFdtLib/libfdt
 	url = https://github.com/devicetree-org/pylibfdt.git
+[submodule "MdePkg/Library/MipiSysTLib/mipisyst"]
+	path = MdePkg/Library/MipiSysTLib/mipisyst
+	url = https://github.com/MIPI-Alliance/public-mipi-sys-t.git
