@@ -185,6 +185,7 @@
   MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   MdePkg/Library/TdxLib/TdxLib.inf
   MdePkg/Library/MipiSysTLib/MipiSysTLib.inf
+  MdePkg/Library/TraceHubDebugSysTLibNull/TraceHubDebugSysTLibNull.inf
 
 [Components.EBC]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
