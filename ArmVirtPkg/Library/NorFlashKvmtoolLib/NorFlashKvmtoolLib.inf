@@ -1,7 +1,7 @@
 ## @file
 #  Nor Flash library for Kvmtool.
 #
-#  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2023, Arm Ltd. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -39,6 +39,7 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase
