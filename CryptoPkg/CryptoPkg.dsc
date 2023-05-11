@@ -70,6 +70,7 @@
   DEFINE  PEI_CRYPTO_GUID     = C693A250-6B36-49B9-B7F3-7283F8136A72
   DEFINE  PEI_STD_GUID        = EBD49F5C-6D8B-40D1-A56D-9AFA485A8661
   DEFINE  PEI_FULL_GUID       = D51FCE59-6860-49C0-9B35-984470735D17
+  DEFINE  PEI_MIN_GUID        = 2475EA67-537B-4424-B2FB-DF34F40E224C
   DEFINE  PEI_STD_ACCEL_GUID  = DCC9CB49-7BE2-47C6-864E-6DCC932360F9
   DEFINE  PEI_FULL_ACCEL_GUID = A10827AD-7598-4955-B661-52EE2B62B057
   DEFINE  DXE_CRYPTO_GUID     = 31C17C54-325D-47D5-8622-888098F10E44
@@ -371,6 +372,7 @@
   CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
   CryptoPkg/Library/OpensslLib/OpensslLib.inf
   CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
+  CryptoPkg/Library/OpensslLib/OpensslLibMin.inf
   CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
@@ -419,6 +421,16 @@
       FILE_GUID = $(PEI_STD_GUID)
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
+  }
+  #
+  # CryptoPei with OpensslLib instance with: Hash, Hmac, Hkdf,
+  # Aes(without GCM), RsaBasic(RSA + Pkcs1Verify).
+  #
+  CryptoPkg/Driver/CryptoPei.inf {
+    <Defines>
+      FILE_GUID = $(PEI_MIN_GUID)
+    <LibraryClasses>
+      OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibMin.inf
   }
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
