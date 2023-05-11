@@ -57,7 +57,6 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdUefiShellDefaultBootEnable
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
@@ -68,6 +67,7 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootDiscoveryPolicy
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
 
 [Guids]
   gBootDiscoveryPolicyMgrFormsetGuid
