@@ -366,8 +366,11 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         ctx.Node.Data = FSObj
         ctx.Node.Buffer = gFormPkg.StructToStream(FSObj.GetInfo())
-        for i in range(0, len(GuidList)):
-            ctx.Node.Buffer += gFormPkg.StructToStream(GuidList[i])
+        if len(GuidList) == 0 :
+            ctx.Node.Buffer += gFormPkg.StructToStream(DefaultClassGuid)
+        else:
+            for i in range(0, len(GuidList)):
+                ctx.Node.Buffer += gFormPkg.StructToStream(GuidList[i])
 
         # Declare undefined Question so that they can be used in expression.
         InsertOpCodeList = None

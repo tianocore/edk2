@@ -715,7 +715,7 @@ class VfrVarDataTypeDB(object):
 
     def Dump(self, f):
         f.write("\n\n***************************************************************\n")
-        f.write("PackAlign = " + str(self.PackAlign) + '\n')
+        f.write("\t\tPackAlign = " + str(self.PackAlign) + '\n')
         pNode = self.DataTypeList
         while pNode != None:
             f.write('\t\tstruct {} : Align : [{}]  TotalSize : [{:#x}]\n\n'.format(pNode.TypeName, pNode.Align, pNode.TotalSize))

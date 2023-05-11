@@ -10,9 +10,9 @@ import re
 import argparse
 from tkinter.ttk import Treeview
 from antlr4 import *
-from VfrSyntaxVisitor import *
-from VfrSyntaxLexer import *
-from VfrSyntaxParser import *
+# from VfrSyntaxVisitor import *
+# from VfrSyntaxLexer import *
+# from VfrSyntaxParser import *
 from SourceVfrSyntaxParser import SourceVfrSyntaxParser
 from SourceVfrSyntaxVisitor import SourceVfrSyntaxVisitor
 from SourceVfrSyntaxLexer import SourceVfrSyntaxLexer
@@ -115,7 +115,7 @@ class CmdParser():
             self.Options.CreateRecordListFile = True
 
         if Args.ModuleName:
-            self.Options.ModuleName = True
+            self.Options.ModuleName = Args.ModuleName
 
         if Args.IncludePaths:
             Paths = Args.IncludePaths
@@ -136,8 +136,10 @@ class CmdParser():
             if LastChar != '/' and LastChar != '\\':
                 if self.Options.OutputDirectory.find('/') != -1:
                     self.Options.OutputDirectory += '/'
+                    self.Options.DebugDirectory = os.path.dirname(os.path.dirname(self.Options.OutputDirectory)) + '/DEBUG/'
                 else:
                     self.Options.OutputDirectory += '\\'
+                    self.Options.DebugDirectory = os.path.dirname(os.path.dirname(self.Options.OutputDirectory)) + '\\DEBUG\\'
             EdkLogger.debug(9, "Output Directory {}".format(self.Options.OutputDirectory))
 
         if Args.OldOutputDirectory:
@@ -270,13 +272,13 @@ class CmdParser():
     def SetPkgOutputFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.PkgOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_PACKAGE_FILENAME_EXTENSION
+        self.Options.PkgOutputFileName = self.Options.DebugDirectory + self.Options.BaseFileName + "_py" + VFR_PACKAGE_FILENAME_EXTENSION
         return 0
 
     def SetCOutputFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.COutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + ".c"
+        self.Options.COutputFileName = self.Options.DebugDirectory + self.Options.BaseFileName  + "_py" + ".c"
         return 0
 
     def SetPreprocessorOutputFileName(self):
@@ -289,27 +291,27 @@ class CmdParser():
     def SetRecordListFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.RecordListFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_RECORDLIST_FILENAME_EXTENSION
+        self.Options.RecordListFileName = self.Options.DebugDirectory + self.Options.BaseFileName + "_py" + VFR_RECORDLIST_FILENAME_EXTENSION
         return 0
 
     def SetSourceYamlFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.YamlFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_YAML_FILENAME_EXTENSION
+        self.Options.YamlFileName = self.Options.DebugDirectory + self.Options.BaseFileName + VFR_YAML_FILENAME_EXTENSION
         return 0
 
     def SetJsonFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.JsonFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_JSON_FILENAME_EXTENSION
+        self.Options.JsonFileName = self.Options.DebugDirectory + self.Options.BaseFileName + VFR_JSON_FILENAME_EXTENSION
         return 0
 
     def SetYamlOutputFileName(self):
         if self.Options.BaseFileName == None:
             return -1
         # for test
-        self.Options.ProcessedYAMLFileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Processed.yml'
-        self.Options.YamlOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Compiled.yml'
+        self.Options.ProcessedYAMLFileName = self.Options.DebugDirectory + self.Options.BaseFileName + 'Processed.yml'
+        self.Options.YamlOutputFileName = self.Options.DebugDirectory + self.Options.BaseFileName + 'Compiled.yml'
         return 0
 
     def FindIncludeHeaderFile(self, Start, Name): ##########
@@ -498,15 +500,17 @@ class VfrCompiler():
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
             self.VfrTree.GenBinaryFiles()
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
     def DumpYaml(self):
-        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_VFR_COMPILEED):
+        if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_VFR_COMPILEED) and not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
             if self.Options.CreateYamlFile:
                 self.VfrTree.DumpSourceYaml()
-            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_YAML_GENERATED)
+                # self.VfrTree.DumpCompiledYaml()
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
     def SET_RUN_STATUS(self, Status):
         self.RunStatus = Status
@@ -537,7 +541,7 @@ def main():
     if Status == COMPILER_RUN_STATUS.STATUS_DEAD or Status == COMPILER_RUN_STATUS.STATUS_FAILED:
         return 2
 
-    return Status
+    return EFI_SUCCESS
 
 if __name__=="__main__":
     exit(main())

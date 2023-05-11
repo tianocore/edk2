@@ -846,7 +846,7 @@ class EFI_IFR_OR(Structure):
     _pack_ = 1
     _fields_ = [
         ('Header', EFI_IFR_OP_HEADER),
-        ('Extend', c_ubyte) #########
+        # ('Extend', c_ubyte)
 
     ]
 

@@ -26,12 +26,17 @@ from Common.LongFilePathSupport import LongFilePath
 class COMPILER_RUN_STATUS(Enum):
     STATUS_STARTED = 0
     STATUS_INITIALIZED = 1
-    STATUS_PREPROCESSED = 2
-    STATUS_COMPILEED = 3
-    STATUS_GENBINARY = 4
-    STATUS_FINISHED = 5
-    STATUS_FAILED = 6
-    STATUS_DEAD = 7
+    STATUS_VFR_PREPROCESSED = 2
+    STATUS_VFR_COMPILEED = 3
+    STATUS_VFR_GENBINARY = 4
+    STATUS_YAML_GENERATED = 5
+    STATUS_YAML_PREPROCESSED = 6
+    STATUS_YAML_COMPILED = 7
+    STATUS_YAML_DLT_CONSUMED = 8
+    STATUS_YAML_GENBINARY = 9
+    STATUS_FINISHED = 10
+    STATUS_FAILED = 11
+    STATUS_DEAD = 12
 
 '''
  This is how we invoke the C preprocessor on the VFR source file
@@ -85,7 +90,7 @@ class VfrCompiler():
         self.PreProcessCmd = PREPROCESSOR_COMMAND
         self.PreProcessOpt = PREPROCESSOR_OPTIONS
         self.OptionIntialization(Args, Argc)
-        self.CopyFileToOutputDir() # for development and testing
+        # self.CopyFileToOutputDir() # for development and testing
         self.VfrRoot = IfrTreeNode()
         self.PreProcessDB = PreProcessDB(self.Options)
         self.VfrTree = IfrTree(self.VfrRoot, self.PreProcessDB, self.Options)
@@ -330,43 +335,57 @@ class VfrCompiler():
         Visitor.visit(VfrParser.vfrProgram())
 
     def PreProcess(self):
-        self.Options.SkipCPreprocessor = False
+
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
         else:
-            if self.Options.SkipCPreprocessor == False:  ##### wip
-                self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
-            if True:
-                try:
-                    fFile = open(LongFilePath(self.Options.InputFileName), mode='r')
-                    fFile.close()
-                except:
-                    EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "Error opening the input VFR file")
-                    if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
-                        self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
-                    return
-                PreProcessCmd = self.PreProcessCmd + " " + self.PreProcessOpt + " "
-                if self.Options.IncludePaths != None:
-                    PreProcessCmd += self.Options.IncludePaths + " "
-                if self.Options.CPreprocessorOptions != None:
-                    PreProcessCmd += self.Options.CPreprocessorOptions  + " "
-                PreProcessCmd += self.Options.InputFileName + " > "
-                PreProcessCmd += self.Options.PreprocessorOutputFileName
+            # if self.Options.SkipCPreprocessor == False:
+            #     # call C precessor first
+            #     self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_VFR_PREPROCESSED)
+            # else:
+            #     # makefile will calls commands to generate .i file
+            #     # self.PreProcessDB.Preprocess()
+            #     # self.ParseHeader()
+            self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_VFR_PREPROCESSED)
+        # self.Options.SkipCPreprocessor = False
+        # if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED):
+        #     if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+        #         self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        # else:
+        #     if self.Options.SkipCPreprocessor == False:  ##### wip
+        #         self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
+        #     if True:
+        #         try:
+        #             fFile = open(LongFilePath(self.Options.InputFileName), mode='r')
+        #             fFile.close()
+        #         except:
+        #             EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE, "Error opening the input VFR file")
+        #             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+        #                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        #             return
+        #         PreProcessCmd = self.PreProcessCmd + " " + self.PreProcessOpt + " "
+        #         if self.Options.IncludePaths != None:
+        #             PreProcessCmd += self.Options.IncludePaths + " "
+        #         if self.Options.CPreprocessorOptions != None:
+        #             PreProcessCmd += self.Options.CPreprocessorOptions  + " "
+        #         PreProcessCmd += self.Options.InputFileName + " > "
+        #         PreProcessCmd += self.Options.PreprocessorOutputFileName
 
-                #PreProcessCmd = "\"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\cl.exe\" /showIncludes /nologo /E /TC /DVFRCOMPILE /C:\edk2\Build\Ovmf3264\DEBUG_VS2015x86\X64\NetworkPkg\IScsiDxe\IScsiDxe\DEBUG\IScsiDxeStrDefs.h /C:\edk2\NetworkPkg\IScsiDxe /C:\edk2\MdePkg /C:\edk2\MdePkg\Include /C:\edk2\MdePkg\Test\UnitTest\Include /C:\edk2\MdePkg\Test\Mock\Include /C:\edk2\MdePkg\Include\X64 /C:\edk2\MdeModulePkg /C:\edk2\MdeModulePkg\Include /C:\edk2\CryptoPkg /C:\edk2\CryptoPkg\Include /C:\edk2\NetworkPkg /C:\edk2\NetworkPkg\Include c:\edk2\NetworkPkg\IScsiDxe\IScsiConfigVfr.vfr > c:\IScsiConfigVfr.i"
-                #"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\cl.exe" /showIncludes /nologo /E /TC /DVFRCOMPILE /FIC:\edk2\Build\Ovmf3264\DEBUG_VS2015x86\X64\NetworkPkg\IScsiDxe\IScsiDxe\DEBUG\IScsiDxeStrDefs.h /IC:\edk2\NetworkPkg\IScsiDxe /IC:\edk2\MdePkg /IC:\edk2\MdePkg\Include /IC:\edk2\MdePkg\Test\UnitTest\Include /IC:\edk2\MdePkg\Test\Mock\Include /IC:\edk2\MdePkg\Include\X64 /IC:\edk2\MdeModulePkg /IC:\edk2\MdeModulePkg\Include /IC:\edk2\CryptoPkg /IC:\edk2\CryptoPkg\Include /IC:\edk2\NetworkPkg /IC:\edk2\NetworkPkg\Include c:\edk2\NetworkPkg\IScsiDxe\IScsiConfigVfr.vfr > c:\edk2\IScsiConfigVfr.i
-                # print(PreProcessCmd)
-                if os.system(PreProcessCmd) != 0:
-                    EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "failed to spawn C preprocessor on VFR file {}".format(PreProcessCmd))
-                    if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
-                        self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
-                else:
-                    self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
+        #         #PreProcessCmd = "\"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\cl.exe\" /showIncludes /nologo /E /TC /DVFRCOMPILE /C:\edk2\Build\Ovmf3264\DEBUG_VS2015x86\X64\NetworkPkg\IScsiDxe\IScsiDxe\DEBUG\IScsiDxeStrDefs.h /C:\edk2\NetworkPkg\IScsiDxe /C:\edk2\MdePkg /C:\edk2\MdePkg\Include /C:\edk2\MdePkg\Test\UnitTest\Include /C:\edk2\MdePkg\Test\Mock\Include /C:\edk2\MdePkg\Include\X64 /C:\edk2\MdeModulePkg /C:\edk2\MdeModulePkg\Include /C:\edk2\CryptoPkg /C:\edk2\CryptoPkg\Include /C:\edk2\NetworkPkg /C:\edk2\NetworkPkg\Include c:\edk2\NetworkPkg\IScsiDxe\IScsiConfigVfr.vfr > c:\IScsiConfigVfr.i"
+        #         #"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Vc\bin\x86_amd64\cl.exe" /showIncludes /nologo /E /TC /DVFRCOMPILE /FIC:\edk2\Build\Ovmf3264\DEBUG_VS2015x86\X64\NetworkPkg\IScsiDxe\IScsiDxe\DEBUG\IScsiDxeStrDefs.h /IC:\edk2\NetworkPkg\IScsiDxe /IC:\edk2\MdePkg /IC:\edk2\MdePkg\Include /IC:\edk2\MdePkg\Test\UnitTest\Include /IC:\edk2\MdePkg\Test\Mock\Include /IC:\edk2\MdePkg\Include\X64 /IC:\edk2\MdeModulePkg /IC:\edk2\MdeModulePkg\Include /IC:\edk2\CryptoPkg /IC:\edk2\CryptoPkg\Include /IC:\edk2\NetworkPkg /IC:\edk2\NetworkPkg\Include c:\edk2\NetworkPkg\IScsiDxe\IScsiConfigVfr.vfr > c:\edk2\IScsiConfigVfr.i
+        #         # print(PreProcessCmd)
+        #         if os.system(PreProcessCmd) != 0:
+        #             EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "failed to spawn C preprocessor on VFR file {}".format(PreProcessCmd))
+        #             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
+        #                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
+        #         else:
+        #             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED)
 
     def Compile(self):
-        InFileName = self.Options.InputFileName if self.Options.SkipCPreprocessor == True\
-                else self.Options.PreprocessorOutputFileName #
+        # InFileName = self.Options.InputFileName if self.Options.SkipCPreprocessor == True\
+        #         else self.Options.PreprocessorOutputFileName #
+        InFileName = self.Options.OutputDirectory + self.Options.BaseFileName + '.i'
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_PREPROCESSED):
             EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE, "compile error in file %s" % InFileName, InFileName)
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
@@ -492,7 +511,7 @@ def main():
     Compiler.Compile()
     Compiler.GenBinaryFiles()
     # Compiler.Options.YamlOutputFileName = "Vfrprocessed.yml"
-    # Compiler.DumpYaml()
+    Compiler.DumpYaml()
     # Compiler.DumpJson()
 
     Status = Compiler.RunStatus

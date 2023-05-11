@@ -20,6 +20,7 @@ class Options():
         self.BaseFileName = None
         self.IncludePaths = []
         self.OutputDirectory = None
+        self.DebugDirectory = None
         self.CreateRecordListFile = True
         self.RecordListFileName = None
         self.CreateIfrPkgFile = True
@@ -186,10 +187,10 @@ class PreProcessDB():
     def _GetUniDicts(self):
 
         if self.Options.UniStrDefFileName == None:
-            if self.Options.OutputDirectory.find('/') == -1:
-                self.Options.OutputDirectory = self.Options.OutputDirectory.replace('\\', '/')
-                DebugPath = "/".join(self.Options.OutputDirectory.split('/'))[:-1] + '/DEBUG/'
-                self.Options.UniStrDefFileName = DebugPath + self.Options.ModuleName + 'StrDefs.h'
+            # if self.Options.OutputDirectory.find('/') == -1:
+            #     self.Options.OutputDirectory = self.Options.OutputDirectory.replace('\\', '/')
+            #     DebugPath = "/".join(self.Options.OutputDirectory.split('/'))[:-1] + '/DEBUG/'
+            self.Options.UniStrDefFileName = self.Options.DebugDirectory + self.Options.ModuleName + 'StrDefs.h'
 
         CppHeader = CppHeaderParser.CppHeader(self.Options.UniStrDefFileName)
         UniDict = {} # {String Token : String Token ID}
@@ -229,7 +230,6 @@ class PreProcessDB():
             if CppHeader == None:
                 EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
                             "File/directory %s not found in workspace" % (HeaderFile), None)
-
             for Include in CppHeader.includes:
                 Include = Include[1:-1]
                 IncludeFileName = Include.split('/')[1]

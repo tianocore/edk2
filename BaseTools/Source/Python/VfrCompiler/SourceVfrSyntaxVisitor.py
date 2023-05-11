@@ -373,8 +373,11 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
         ctx.Node.Data = FSObj
         ctx.Node.Buffer = gFormPkg.StructToStream(FSObj.GetInfo())
-        for i in range(0, len(GuidList)):
-            ctx.Node.Buffer += gFormPkg.StructToStream(GuidList[i])
+        if len(GuidList) == 0 :
+            ctx.Node.Buffer += gFormPkg.StructToStream(DefaultClassGuid)
+        else:
+            for i in range(0, len(GuidList)):
+                ctx.Node.Buffer += gFormPkg.StructToStream(GuidList[i])
 
         # Declare undefined Question so that they can be used in expression.
         InsertOpCodeList = None
@@ -2443,9 +2446,33 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         MaxNegative = False
 
         self.visitChildren(ctx)
-        Min = self.TransNum(ctx.I.text)
-        Max = self.TransNum(ctx.A.text)
-        Step = self.TransNum(ctx.S.text) if ctx.Step() != None else 0
+        if ctx.I != None:
+            Min = self.TransNum(ctx.I.text)
+        else:
+            Min = self.PreProcessDB.Read(ctx.S1.text)
+            ctx.Node.Dict['min'] = KV(ctx.S1.text, Min)
+            if Min < 0:
+                MinNegative = True
+                Min = - Min #####
+
+        if ctx.A != None:
+            Max = self.TransNum(ctx.A.text)
+        else:
+            Max = self.PreProcessDB.Read(ctx.S2.text)
+            ctx.Node.Dict['max'] = KV(ctx.S2.text, Max)
+            if Max < 0:
+                MaxNegative = True
+                Max = - Max #####
+
+        if ctx.S != None:
+            Step = self.TransNum(ctx.S.text)
+
+        elif ctx.S3 != None:
+            Step = self.PreProcessDB.Read(ctx.S3.text)
+            ctx.Node.Dict['step'] = KV(ctx.S3.text, Step)
+        else:
+            Step = 0
+
 
         if ctx.N1 !=None:
             MinNegative = True
@@ -3159,22 +3186,39 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by SourceVfrSyntaxParser#minMaxDateStepDefault.
     def visitMinMaxDateStepDefault(self, ctx:SourceVfrSyntaxParser.MinMaxDateStepDefaultContext):
+        if ctx.N1 != None:
+            Minimum = self.TransNum(ctx.N1.text)
+        else:
+            Minimum = self.PreProcessDB.Read(ctx.S1.text)
+            #  ctx.Node.Dict['min'] = KV(ctx.S1.text, Minimum)
+
+        if ctx.N2 != None:
+            Maximum = self.TransNum(ctx.N2.text)
+        else:
+            Maximum = self.PreProcessDB.Read(ctx.S2.text)
+            # ctx.Node.Dict['max'] = KV(ctx.S2.text, Maximum)
 
         if ctx.Default() != None:
-            Minimum = self.TransNum(ctx.Number(0))
-            Maximum = self.TransNum(ctx.Number(1))
+            if ctx.N4 != None:
+                Default = self.TransNum(ctx.N4.text)
+                Line = ctx.N4.line
+            else:
+                Default = self.PreProcessDB.Read(ctx.S4.text)
+                # ctx.Node.Dict['default'] = KV(ctx.S4.text, Default)
+                Line = ctx.S4.line
+
             if ctx.KeyValue == 0:
-                ctx.Date.Year = self.TransNum(ctx.N.text)
+                ctx.Date.Year = Default
                 if ctx.Date.Year < Minimum or ctx.Date.Year > Maximum:
-                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.N.line, "Year default value must be between Min year and Max year.")
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Year default value must be between Min year and Max year.")
             if ctx.KeyValue == 1:
-                ctx.Date.Month = self.TransNum(ctx.N.text)
+                ctx.Date.Month = Default
                 if ctx.Date.Month < 1 or ctx.Date.Month > 12:
-                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.D.line, "Month default value must be between Min 1 and Max 12.")
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Month default value must be between Min 1 and Max 12.")
             if ctx.KeyValue == 2:
-                ctx.Date.Day = self.TransNum(ctx.N.text)
+                ctx.Date.Day = Default
                 if ctx.Date.Day < 1 or ctx.Date.Day > 31:
-                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.D.line, "Day default value must be between Min 1 and Max 31.")
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Day default value must be between Min 1 and Max 31.")
         return self.visitChildren(ctx)
 
 
@@ -3275,21 +3319,39 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
     # Visit a parse tree produced by SourceVfrSyntaxParser#minMaxTimeStepDefault.
     def visitMinMaxTimeStepDefault(self, ctx:SourceVfrSyntaxParser.MinMaxTimeStepDefaultContext):
 
-        if ctx.Default() != None:
-            Minimum = self.TransNum(ctx.Number(0))
-            Maximum = self.TransNum(ctx.Number(1))
+        if ctx.N1 != None:
+            Minimum = self.TransNum(ctx.N1.text)
+        else:
+            Minimum = self.PreProcessDB.Read(ctx.S1.text)
+            # ctx.Node.Dict['min'] = KV(ctx.S1.text, Minimum)
+
+        if ctx.N2 != None:
+            Maximum = self.TransNum(ctx.N2.text)
+        else:
+            Maximum = self.PreProcessDB.Read(ctx.S2.text)
+            # ctx.Node.Dict['max'] = KV(ctx.S2.text, Maximum)
+
+        if ctx.D != None:
+            if ctx.N4 != None:
+                Default = self.TransNum(ctx.N4.text)
+                Line = ctx.N4.line
+            else:
+                Default = self.PreProcessDB.Read(ctx.S4.text)
+                # ctx.Node.Dict['default'] = KV(ctx.S4.text, Default)
+                Line = ctx.S4.line
+
             if ctx.KeyValue == 0:
-                ctx.Time.Hour = self.TransNum(ctx.Number(len(ctx.Number())-1))
+                ctx.Time.Hour = Default
                 if ctx.Time.Hour > 23:
-                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.N.line, "Hour default value must be between 0 and 23.")
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Hour default value must be between 0 and 23.")
             if ctx.KeyValue == 1:
-                ctx.Time.Minute = self.TransNum(ctx.Number(len(ctx.Number())-1))
+                ctx.Time.Minute = Default
                 if ctx.Time.Minute > 59:
-                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.N.line, "Minute default value must be between 0 and 59.")
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Minute default value must be between 0 and 59.")
             if ctx.KeyValue == 2:
-                ctx.Time.Second = self.TransNum(ctx.Number(len(ctx.Number())-1))
+                ctx.Time.Second = Default
                 if ctx.Time.Second > 59:
-                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.N.line, "Second default value must be between 0 and 59.")
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Second default value must be between 0 and 59.")
         return self.visitChildren(ctx)
 
 
@@ -4234,7 +4296,13 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         else:
             self.ErrorHandler(ReturnCode, ctx.VN.line)
         QId, Mask, _ = self.VfrQuestionDB.GetQuestionId(None, VarIdStr)
-        ConstVal = self.TransNum(ctx.Number(1))
+
+        if len(ctx.Number()) == 1:
+            ConstVal = self.PreProcessDB.Read(self.TransId(ctx.StringIdentifier()))
+            # ctx.Node.Dict['constval'] = KV(self.TransId(ctx.StringIdentifier()), ConstVal)
+        else:
+            ConstVal = self.TransNum(ctx.Number(1))
+
         if ctx.Equal() != None:
             if Mask == 0:
                 EIVObj = IfrEqIdVal(Line)
@@ -4338,7 +4406,11 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         QId = ctx.vfrQuestionDataFieldName().QId
         VarIdStr = ctx.vfrQuestionDataFieldName().VarIdStr
         LineNo = ctx.vfrQuestionDataFieldName().Line
-        ConstVal = self.TransNum(ctx.Number())
+        if ctx.Number() == None:
+            ConstVal = self.PreProcessDB.Read(self.TransId(ctx.StringIdentifier()))
+            # ctx.Node.Dict['constval'] = KV(self.TransId(ctx.StringIdentifier()), ConstVal)
+        else:
+            ConstVal = self.TransNum(ctx.Number())
         if ctx.Equal() != None:
             if Mask == 0:
                 EIVObj = IfrEqIdVal(Line)
@@ -4460,6 +4532,10 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         ValueList = []
         for i in range(0, len(ctx.Number())):
             ValueList.append(self.TransNum(ctx.Number(i)))
+
+        for i in range(0, len(ctx.StringIdentifer())):
+            Number = self.PreProcessDB.Read(self.TransId(ctx.StringIdentifier(i)))
+            ValueList.append(Number)
 
         ListLen = len(ValueList)
 

@@ -314,8 +314,12 @@ class YamlParser():
         FSObj.SetHelp(Formset['help'])
 
         Node = IfrTreeNode(EFI_IFR_FORM_SET_OP, FSObj, gFormPkg.StructToStream(FSObj.GetInfo()), '')
-        for i in range(0, len(GuidList)):
-            Node.Buffer += gFormPkg.StructToStream(GuidList[i])
+
+        if len(GuidList) == 0 :
+            Node.Buffer += gFormPkg.StructToStream(DefaultClassGuid)
+        else:
+            for i in range(0, len(GuidList)):
+                Node.Buffer += gFormPkg.StructToStream(GuidList[i])
 
         self.Root.insertChild(Node)
 
