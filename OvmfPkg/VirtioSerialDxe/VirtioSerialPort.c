@@ -158,7 +158,7 @@ VirtioSerialIoWrite (
 
   VirtioSerialRingClearTx (SerialIo->Dev, PortTx (SerialIo->PortId));
 
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   if (SerialIo->WriteOffset &&
       (SerialIo->WriteOffset + *BufferSize > PORT_TX_BUFSIZE))
   {
@@ -201,7 +201,7 @@ VirtioSerialIoRead (
     goto NoData;
   }
 
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   if (SerialIo->WriteOffset) {
     DEBUG ((DEBUG_VERBOSE, "%a:%d: WriteFlush %d\n", __func__, __LINE__, SerialIo->WriteOffset));
     VirtioSerialRingSendBuffer (
