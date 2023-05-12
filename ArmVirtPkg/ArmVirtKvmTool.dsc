@@ -311,7 +311,10 @@
   #
   # Platform Driver
   #
-  ArmVirtPkg/KvmtoolPlatformDxe/KvmtoolPlatformDxe.inf
+  ArmVirtPkg/KvmtoolPlatformDxe/KvmtoolPlatformDxe.inf {
+    <LibraryClasses>
+    NULL|ArmVirtPkg/Library/NorFlashKvmtoolLib/NorFlashKvmtoolLib.inf
+  }
   OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
