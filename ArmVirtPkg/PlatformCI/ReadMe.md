@@ -6,7 +6,7 @@ to use the same Pytools based build infrastructure locally.
 ## Supported Configuration Details
 
 This solution for building and running ArmVirtPkg has only been validated with Ubuntu
-18.04 and the GCC5 toolchain. Two different firmware builds are supported and are
+18.04 and the GCC toolchain. Two different firmware builds are supported and are
 described below.
 
 | Configuration name      | Architecture       | DSC File         |Additional Flags |
