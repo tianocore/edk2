@@ -3,7 +3,7 @@
 #
 # Platform: EmulatorPkg
 # OS: Ubuntu
-# Toolchain: GCC5
+# Toolchain: GCC
 #
 # Copyright (c) Microsoft Corporation.
 # Copyright (c) 2020, Intel Corporation. All rights reserved.
@@ -84,7 +84,7 @@ jobs:
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: GCC5
+        tool_chain_tag: GCC
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)
