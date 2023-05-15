@@ -105,7 +105,7 @@ are listed in `Maintainers.txt <Maintainers.txt>`__.
 Resources
 ---------
 
--  `TianoCore <http://www.tianocore.org>`__
+-  `TianoCore <https://www.tianocore.org>`__
 -  `EDK
    II <https://github.com/tianocore/tianocore.github.io/wiki/EDK-II>`__
 -  `Getting Started with EDK
