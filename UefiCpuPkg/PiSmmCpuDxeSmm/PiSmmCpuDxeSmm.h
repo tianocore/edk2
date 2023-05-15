@@ -726,6 +726,43 @@ SmmBlockingStartupThisAp (
   );
 
 /**
+  This function modifies the page attributes for the memory region specified by BaseAddress and
+  Length from their current attributes to the attributes specified by Attributes.
+
+  Caller should make sure BaseAddress and Length is at page boundary.
+
+  @param[in]   PageTableBase    The page table base.
+  @param[in]   BaseAddress      The physical address that is the start address of a memory region.
+  @param[in]   Length           The size in bytes of the memory region.
+  @param[in]   Attributes       The bit mask of attributes to modify for the memory region.
+  @param[in]   IsSet            TRUE means to set attributes. FALSE means to clear attributes.
+  @param[out]  IsModified       TRUE means page table modified. FALSE means page table not modified.
+
+  @retval RETURN_SUCCESS           The attributes were modified for the memory region.
+  @retval RETURN_ACCESS_DENIED     The attributes for the memory resource range specified by
+                                   BaseAddress and Length cannot be modified.
+  @retval RETURN_INVALID_PARAMETER Length is zero.
+                                   Attributes specified an illegal combination of attributes that
+                                   cannot be set together.
+  @retval RETURN_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
+                                   the memory resource range.
+  @retval RETURN_UNSUPPORTED       The processor does not support one or more bytes of the memory
+                                   resource range specified by BaseAddress and Length.
+                                   The bit mask of attributes is not support for the memory resource
+                                   range specified by BaseAddress and Length.
+**/
+RETURN_STATUS
+ConvertMemoryPageAttributes (
+  IN  UINTN             PageTableBase,
+  IN  PAGING_MODE       PagingMode,
+  IN  PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64            Length,
+  IN  UINT64            Attributes,
+  IN  BOOLEAN           IsSet,
+  OUT BOOLEAN           *IsModified   OPTIONAL
+  );
+
+/**
   This function sets the attributes for the memory region specified by BaseAddress and
   Length from their current attributes to the attributes specified by Attributes.
 
