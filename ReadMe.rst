@@ -251,6 +251,12 @@ as much as possible. Currently EDK II contains the following submodules
 -  MdeModulePkg/Universal/RegularExpressionDxe/oniguruma
 -  MdeModulePkg/Library/BrotliCustomDecompressLib/brotli
 -  BaseTools/Source/C/BrotliCompress/brotli
+-  MdePkg/Library/BaseFdtLib/libfdt
+-  MdePkg/Library/MipiSysTLib/mipisyst
+-  RedfishPkg/Library/JsonLib/jansson
+-  UnitTestFrameworkPkg/Library/CmockaLib/cmocka
+-  UnitTestFrameworkPkg/Library/GoogleTestLib/googletest
+-  UnitTestFrameworkPkg/Library/SubhookLib/subhook
 
 ArmSoftFloatLib is actually required by OpensslLib. It's inevitable
 in openssl-1.1.1 (since stable201905) for floating point parameter
