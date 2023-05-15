@@ -680,7 +680,9 @@ CoreLoadPeImage (
                    );
       }
     } else {
-      if ((Image->ImageContext.ImageAddress >= 0x100000) || Image->ImageContext.RelocationsStripped) {
+      if ((PcdGetBool (PcdImageLargeAddressLoad) && ((Image->ImageContext.ImageAddress) >= 0x100000)) ||
+          Image->ImageContext.RelocationsStripped)
+      {
         Status = CoreAllocatePages (
                    AllocateAddress,
                    (EFI_MEMORY_TYPE)(Image->ImageContext.ImageCodeMemoryType),

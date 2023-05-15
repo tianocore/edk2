@@ -1125,6 +1125,13 @@
   # @Prompt Output MMIO address of Trace Hub message.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugMmioAddress|0|UINT64|0x30001058
 
+  ## Indicates if images with large load address (>0x100000) should attempted to load at specified location.
+  #  If enabled, attempt to allocate at specfied location will be attempted with a fall back to any address.
+  #   TRUE  - UEFI will attempt to load at specified location.<BR>
+  #   FALSE - UEFI will load at any address<BR>
+  # @Prompt Enable large address image loading.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdImageLargeAddressLoad|TRUE|BOOLEAN|0x30001059
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
