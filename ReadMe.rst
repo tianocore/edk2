@@ -243,8 +243,8 @@ Definitions for sample patch email
 Submodules
 ----------
 
-Submodule in EDK II is allowed but submodule chain should be avoided
-as possible as we can. Currently EDK II contains the following submodules
+Submodules in EDK II are allowed but submodule chains should be avoided
+as much as possible. Currently EDK II contains the following submodules
 
 -  CryptoPkg/Library/OpensslLib/openssl
 -  ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
@@ -257,8 +257,8 @@ in openssl-1.1.1 (since stable201905) for floating point parameter
 conversion, but should be dropped once there's no such need in future
 release of openssl.
 
-To get a full, buildable EDK II repository, use following steps of git
-command
+To get a full, buildable EDK II repository, use the following git
+commands
 
 .. code-block:: bash
 
@@ -267,7 +267,7 @@ command
   git submodule update --init
   cd ..
 
-If there's update for submodules, use following git commands to get
+If there's an update for submodules, use the following git commands to get
 the latest submodules code.
 
 .. code-block:: bash
