@@ -1647,6 +1647,71 @@ EdkiiSmmClearMemoryAttributes (
 }
 
 /**
+  Create page table based on input PagingMode and PhysicalAddressBits in smm.
+
+  @param[in]      PagingMode           The paging mode.
+  @param[in]      PhysicalAddressBits  The bits of physical address to map.
+
+  @retval         PageTable Address
+
+**/
+UINTN
+GenSmmPageTable (
+  IN PAGING_MODE  PagingMode,
+  IN UINT8        PhysicalAddressBits
+  )
+{
+  UINTN               PageTableBufferSize;
+  UINTN               PageTable;
+  VOID                *PageTableBuffer;
+  IA32_MAP_ATTRIBUTE  MapAttribute;
+  IA32_MAP_ATTRIBUTE  MapMask;
+  RETURN_STATUS       Status;
+  UINTN               GuardPage;
+  UINTN               Index;
+  UINT64              Length;
+
+  Length                           = LShiftU64 (1, PhysicalAddressBits);
+  PageTable                        = 0;
+  PageTableBufferSize              = 0;
+  MapMask.Uint64                   = MAX_UINT64;
+  MapAttribute.Uint64              = mAddressEncMask;
+  MapAttribute.Bits.Present        = 1;
+  MapAttribute.Bits.ReadWrite      = 1;
+  MapAttribute.Bits.UserSupervisor = 1;
+  MapAttribute.Bits.Accessed       = 1;
+  MapAttribute.Bits.Dirty          = 1;
+
+  Status = PageTableMap (&PageTable, PagingMode, NULL, &PageTableBufferSize, 0, Length, &MapAttribute, &MapMask, NULL);
+  ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
+  DEBUG ((DEBUG_INFO, "GenSMMPageTable: 0x%x bytes needed for initial SMM page table\n", PageTableBufferSize));
+  PageTableBuffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (PageTableBufferSize));
+  ASSERT (PageTableBuffer != NULL);
+  Status = PageTableMap (&PageTable, PagingMode, PageTableBuffer, &PageTableBufferSize, 0, Length, &MapAttribute, &MapMask, NULL);
+  ASSERT (Status == RETURN_SUCCESS);
+  ASSERT (PageTableBufferSize == 0);
+
+  if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
+    //
+    // Mark the 4KB guard page between known good stack and smm stack as non-present
+    //
+    for (Index = 0; Index < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; Index++) {
+      GuardPage = mSmmStackArrayBase + EFI_PAGE_SIZE + Index * (mSmmStackSize + mSmmShadowStackSize);
+      Status    = ConvertMemoryPageAttributes (PageTable, PagingMode, GuardPage, SIZE_4KB, EFI_MEMORY_RP, TRUE, NULL);
+    }
+  }
+
+  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) {
+    //
+    // Mark [0, 4k] as non-present
+    //
+    Status = ConvertMemoryPageAttributes (PageTable, PagingMode, 0, SIZE_4KB, EFI_MEMORY_RP, TRUE, NULL);
+  }
+
+  return (UINTN)PageTable;
+}
+
+/**
   This function retrieves the attributes of the memory region specified by
   BaseAddress and Length. If different attributes are got from different part
   of the memory region, EFI_NO_MAPPING will be returned.

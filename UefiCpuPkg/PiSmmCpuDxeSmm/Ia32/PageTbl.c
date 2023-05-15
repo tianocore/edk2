@@ -63,7 +63,7 @@ SmmInitPageTable (
     InitializeIDTSmmStackGuard ();
   }
 
-  return Gen4GPageTable (TRUE);
+  return GenSmmPageTable (PagingPae, mPhysicalAddressBits);
 }
 
 /**
