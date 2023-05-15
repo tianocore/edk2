@@ -456,8 +456,8 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
     <BuildOptions>
-      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
-      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
   }
 !endif
 
@@ -522,8 +522,8 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
     <BuildOptions>
-      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
-      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
   }
   #
   # CryptoSmm with OpensslLib instance with no SSL or EC services
@@ -575,8 +575,8 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
     <BuildOptions>
-      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
-      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
   }
 !endif
 
