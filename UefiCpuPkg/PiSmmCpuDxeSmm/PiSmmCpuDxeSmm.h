@@ -554,6 +554,21 @@ Gen4GPageTable (
   );
 
 /**
+  Create page table based on input PagingMode and PhysicalAddressBits in smm.
+
+  @param[in]      PagingMode           The paging mode.
+  @param[in]      PhysicalAddressBits  The bits of physical address to map.
+
+  @retval         PageTable Address
+
+**/
+UINTN
+GenSmmPageTable (
+  IN PAGING_MODE  PagingMode,
+  IN UINT8        PhysicalAddressBits
+  );
+
+/**
   Initialize global data for MP synchronization.
 
   @param Stacks             Base address of SMI stack buffer for all processors.
