@@ -376,6 +376,32 @@ IsAddressSplit (
 }
 
 /**
+  Function to compare 2 MEMORY_PROTECTION_RANGE based on range base.
+
+  @param[in] Buffer1            pointer to Device Path poiner to compare
+  @param[in] Buffer2            pointer to second DevicePath pointer to compare
+
+  @retval 0                     Buffer1 equal to Buffer2
+  @retval <0                    Buffer1 is less than Buffer2
+  @retval >0                    Buffer1 is greater than Buffer2
+**/
+INTN
+EFIAPI
+ProtectionRangeCompare (
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
+  )
+{
+  if (((MEMORY_PROTECTION_RANGE *)Buffer1)->Range.Base > ((MEMORY_PROTECTION_RANGE *)Buffer2)->Range.Base) {
+    return 1;
+  } else if (((MEMORY_PROTECTION_RANGE *)Buffer1)->Range.Base < ((MEMORY_PROTECTION_RANGE *)Buffer2)->Range.Base) {
+    return -1;
+  }
+
+  return 0;
+}
+
+/**
   Initialize the protected memory ranges and the 4KB-page mapped memory ranges.
 
 **/
@@ -397,6 +423,7 @@ InitProtectedMemRange (
   EFI_PHYSICAL_ADDRESS             Base2MBAlignedAddress;
   UINT64                           High4KBPageSize;
   UINT64                           Low4KBPageSize;
+  VOID                             *Buffer;
 
   NumberOfDescriptors      = 0;
   NumberOfAddedDescriptors = mSmmCpuSmramRangeCount;
@@ -532,6 +559,14 @@ InitProtectedMemRange (
   }
 
   mSplitMemRangeCount = NumberOfSpliteRange;
+
+  //
+  // Sort the mProtectionMemRange
+  //
+  Buffer = AllocateZeroPool (sizeof (MEMORY_PROTECTION_RANGE));
+  ASSERT (Buffer != NULL);
+  QuickSort (mProtectionMemRange, mProtectionMemRangeCount, sizeof (MEMORY_PROTECTION_RANGE), (BASE_SORT_COMPARE)ProtectionRangeCompare, Buffer);
+  FreePool (Buffer);
 
   DEBUG ((DEBUG_INFO, "SMM Profile Memory Ranges:\n"));
   for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
