@@ -137,7 +137,7 @@ To make a contribution to a TianoCore project, follow these steps.
 -  BSD (2-clause): http://opensource.org/licenses/BSD-2-Clause
 -  BSD (3-clause): http://opensource.org/licenses/BSD-3-Clause
 -  MIT: http://opensource.org/licenses/MIT
--  Python-2.0: http://opensource.org/licenses/Python-2.0
+-  Python-2.0: https://opensource.org/license/pythonsoftfoundation-php
 -  Zlib: http://opensource.org/licenses/Zlib
 
 For documentation:
