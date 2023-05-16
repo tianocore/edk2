@@ -785,34 +785,27 @@ class IfrTree():
                         f.write(ValueIndent + 'component:  \n')
 
                 if Root.OpCode == EFI_IFR_DEFAULT_OP:
-                    f.write(KeyIndent + '- default:\n')
-                    if Root.Condition != None:
-                        f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
-                                Root.Condition))
+                    if Root.Position != 'Do not display': ##　specific condition here
+                        f.write(KeyIndent + '- default:\n')
+                        if Root.Condition != None:
+                            f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
+                                    Root.Condition))
 
-                    if type(Root.Data) == IfrDefault:
-                        Str = Root.Data.ValueStream
-                        if Str != '':
-                            Str = Str.replace('{', '[').replace('}', ']')
-                            if Str.find(':') != -1 or Str.find('/') != -1 or Str.find(';') != -1:
-                                Str = '(' + Str + ')'
-                            f.write(ValueIndent + 'value:  {}\n'.format(Str))
-                        '''
-                        else:
-                            f.write(ValueIndent + 'value:  {')
-                            for i in range(0, len(Info.Value) - 1):
-                                f.write('{},'.format(Info.Value[i]))
-                            f.write('{}'.format(Info.Value[len(Info.Value) -
-                                                           1]) + '}\n')
-                        '''
+                        if type(Root.Data) == IfrDefault:
+                            Str = Root.Data.ValueStream
+                            if Str != '':
+                                Str = Str.replace('{', '[').replace('}', ']')
+                                if Str.find(':') != -1 or Str.find('/') != -1 or Str.find(';') != -1:
+                                    Str = '(' + Str + ')'
+                                f.write(ValueIndent + 'value:  {}\n'.format(Str))
 
-                    elif type(Root.Data) == IfrDefault2:
-                        f.write(ValueIndent + 'value_exp: \'{}\'\n'.format(
-                            Root.Child[0].Expression))
+                        elif type(Root.Data) == IfrDefault2:
+                            f.write(ValueIndent + 'value_exp: \'{}\'\n'.format(
+                                Root.Child[0].Expression))
 
-                    if Root.Data.DefaultStore != '':
-                        f.write(ValueIndent + 'defaultstore: {}\n'.format(
-                            Root.Data.DefaultStore))
+                        if Root.Data.DefaultStore != '':
+                            f.write(ValueIndent + 'defaultstore: {}\n'.format(
+                                Root.Data.DefaultStore))
                 #pending here
                 if Root.OpCode == EFI_IFR_ORDERED_LIST_OP:
                     f.write(KeyIndent + '- orderedlist:\n')
@@ -854,16 +847,51 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_TIME_OP:
                     f.write(KeyIndent + '- time:\n')
-                    self._DumpQuestionInfosWithUni(Root, f, ValueIndent)
-
-                    if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
-                        f.write(ValueIndent + 'component:  \n')
+                    if 'hour' not in Root.dict.keys():
+                        self._DumpQuestionInfosWithUni(Root, f, ValueIndent)
+                        if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
+                            f.write(ValueIndent + 'component:  \n')
+                    else:
+                        f.write(ValueIndent + 'hour:  ' + Root.Dict['hour'] + '\n')
+                        if 'default_hour' in Root.dict.keys():
+                            f.write(ValueIndent + 'default_hour:  ' + Root.Dict['default_hour'].Key + '\n')
+                        f.write(ValueIndent + 'minute:  ' + Root.Dict['minute'] + '\n')
+                        if 'default_minute' in Root.dict.keys():
+                            f.write(ValueIndent + 'default_minute:  ' + Root.Dict['default_minute'].Key + '\n')
+                        f.write(ValueIndent + 'second:  ' + Root.Dict['second'] + '\n')
+                        if 'default_second' in Root.dict.keys():
+                            f.write(ValueIndent + 'default_second:  ' + Root.Dict['default_second'].Key + '\n')
+                        f.write(ValueIndent + 'prompt:  ' + Root.Dict['prompt'].Key + '\n')
+                        f.write(ValueIndent + 'help:  ' + Root.Dict['help'].Key + '\n')
+                        if Root.Data.FlagsStream != '':
+                            f.write(ValueIndent + 'flags:  {}  # Optional input , flags\n'.format(Root.Data.FlagsStream))
+                        if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_DEFAULT_OP:
+                            f.write(ValueIndent + 'component:  \n')
 
                 if Root.OpCode == EFI_IFR_DATE_OP:
                     f.write(KeyIndent + '- date:\n')
-                    self._DumpQuestionInfosWithUni(Root, f, ValueIndent)
-                    if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
-                        f.write(ValueIndent + 'component:  \n')
+                    if 'year' not in Root.dict.keys():
+                        self._DumpQuestionInfosWithUni(Root, f, ValueIndent)
+                        if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
+                            f.write(ValueIndent + 'component:  \n')
+                    else:
+                        f.write(ValueIndent + 'year:  ' + Root.Dict['year'] + '\n')
+                        f.write(ValueIndent + 'min_year:  ' + Root.Dict['min_year'].Key + '\n')
+                        f.write(ValueIndent + 'max_year:  ' + Root.Dict['max_year'].Key + '\n')
+                        if 'default_year' in Root.dict.keys():
+                            f.write(ValueIndent + 'default_year:  ' + Root.Dict['default_year'].Key + '\n')
+                        f.write(ValueIndent + 'month:  ' + Root.Dict['month'] + '\n')
+                        if 'default_month' in Root.dict.keys():
+                            f.write(ValueIndent + 'default_month:  ' + Root.Dict['default_month'].Key + '\n')
+                        f.write(ValueIndent + 'day:  ' + Root.Dict['day'] + '\n')
+                        if 'default_day' in Root.dict.keys():
+                            f.write(ValueIndent + 'default_day:  ' + Root.Dict['default_day'].Key + '\n')
+                        f.write(ValueIndent + 'prompt:  ' + Root.Dict['prompt'].Key + '\n')
+                        f.write(ValueIndent + 'help:  ' + Root.Dict['help'].Key + '\n')
+                        if Root.Data.FlagsStream != '':
+                            f.write(ValueIndent + 'flags:  {}  # Optional input , flags\n'.format(Root.Data.FlagsStream))
+                        if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_DEFAULT_OP:
+                            f.write(ValueIndent + 'component:  \n')
 
                 if Root.OpCode == EFI_IFR_STRING_OP:
                     f.write(KeyIndent + '- string:\n')
@@ -1454,18 +1482,7 @@ class IfrTree():
                             f.write(ValueIndent + 'position:  \'{}\' # for reference\n'.format(Root.Position))
                         if Root.Data.ValueStream != '':
                             f.write(ValueIndent + 'value:  {}\n'.format(Root.Data.ValueStream))
-                        '''
-                        if len(Info.Value) == 1:
-                            f.write(ValueIndent + 'value:  {}\n'.format(
-                                '0x%x' % (Info.Value[0])))
-                        else:
-                            f.write(ValueIndent + 'value:  {')
-                            ValueType = Root.Data.ValueType
-                            for i in range(0, len(Info.Value) - 1):
-                                f.write('{},'.format(Info.Value[i]))
-                            f.write('{}'.format(Info.Value[len(Info.Value) -
-                                                           1]) + '}\n')
-                        '''
+
                     if Root.Data.FlagsStream != '':
                         f.write(ValueIndent + 'flags:  {} # Optional Input\n'.
                             format(Root.Data.FlagsStream))
@@ -1483,25 +1500,15 @@ class IfrTree():
                                 Root.Condition))
                     # f.write(ValueIndent + 'defaultId:  {}\n'.format(Info.DefaultId))
                     # f.write(ValueIndent + 'type:  {}\n'.format(Info.Type))
-                    if type(Root.Data) == IfrDefault:
+                    if type(Root.Data) == IfrDefault: # vfrConstantValueField[Node]
                         if Root.Data.ValueStream != '':
+                            if 'formsetguid' in Root.Dict.keys():
+                                Root.Data.ValueStream.replace = Root.Data.ValueStream.replace(Root.Dict['formsetguid'].Key, self.PreProcessDB.RevertValue(Root.Dict['formsetguid'].Value))
+                            if 'devicepath' in Root.Dict.keys():
+                                Root.Data.ValueStream.replace = Root.Data.ValueStream.replace(Root.Dict['devicepath'].Key, self.PreProcessDB.RevertValue(Root.Dict['devicepath'].Value))
+                            if 'string' in Root.Dict.keys():
+                                Root.Data.ValueStream.replace = Root.Data.ValueStream.replace(Root.Dict['string'].Key, self.PreProcessDB.RevertValue(Root.Dict['string'].Value))
                             f.write(ValueIndent + 'value:  {}\n'.format(Root.Data.ValueStream))
-                        '''
-                        #f.write(ValueIndent + 'value:  {}\n' .format(Root.Data.GetInfo().Value))
-                        if len(Info.Value) == 1:
-                            if type(Info.Value) == int:
-                                f.write('{},'.format(Info.Value[0]))
-                            if type(Info.Value) == EFI_HII_TIME:
-                                f.write('{}:{}:{},'.format(Info.Value[0].Hour, Info.Value[0].Minute, Info.Value[0].Second))
-                            if type(Info.Value) == EFI_HII_DATE:
-                                f.write('{}/{}/{},'.format(Info.Value[0].Year, Info.Value[0].Month, Info.Value[0].Day))
-                        else:
-                            f.write(ValueIndent + 'value:  [')
-                            for i in range(0, len(Info.Value) - 1):
-                                f.write('{},'.format(Info.Value[i]))
-                            f.write('{}'.format(Info.Value[len(Info.Value) -
-                                                            1]) + ']\n')
-                        '''
 
                     elif type(Root.Data) == IfrDefault2:
                         f.write(ValueIndent + 'value_exp: \'{}\'\n'.format(

@@ -83,6 +83,16 @@ class PreProcessDB():
         # error handle , value is too large to store
         return Value
 
+    def RevertValue(self, Value) -> str:
+        if type(Value) == EFI_GUID:
+            return Value.to_string()
+        else:
+            if ('0x' in Value) or ('0X' in Value):
+                StrValue = hex(Value)
+            else:
+                StrValue = str(Value)
+        return  StrValue
+
     def Read(self, Key):
         if Key in self.UniDict.keys():
             return self.TransValue(self.UniDict[Key])

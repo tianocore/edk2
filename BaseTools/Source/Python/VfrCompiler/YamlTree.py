@@ -1436,14 +1436,47 @@ class YamlParser():
 
     def ParseVfrStatementTime(self, Time, ParentNode, Position): #only support one condition
         TObj = IfrTime()
-        self._ParseVfrQuestionHeader(TObj, Time, EFI_QUESION_TYPE.QUESTION_TIME)
-        self.ErrorHandler(TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseTimeFlags(Time)))
-        Node = IfrTreeNode(EFI_IFR_TIME_OP, TObj, gFormPkg.StructToStream(TObj.GetInfo()))
-        self.SetPosition(Node, Position)
-        ParentNode.insertChild(Node)
-        if 'component' in Time.keys():
-            self._ParseVfrStatementQuestionOptionList(Time['component'], Node)
+        Node = IfrTreeNode(EFI_IFR_TIME_OP, TObj)
+        if 'hour' not in Time.keys():
+            self._ParseVfrQuestionHeader(TObj, Time, EFI_QUESION_TYPE.QUESTION_TIME)
+            self.ErrorHandler(TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseTimeFlags(Time)))
+            Node.Buffer = gFormPkg.StructToStream(TObj.GetInfo())
+            self.SetPosition(Node, Position)
+            ParentNode.insertChild(Node)
+            if 'component' in Time.keys():
+                self._ParseVfrStatementQuestionOptionList(Time['component'], Node)
+        else:
+            self.ErrorHandler(TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseTimeFlags(Time)))
+            QId, _ = self.VfrQuestionDB.RegisterOldTimeQuestion(Time['hour'], Time['minute'], Time['second'], EFI_QUESTION_ID_INVALID, gFormPkg)
+            TObj.SetQuestionId(QId)
+            TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, QF_TIME_STORAGE_TIME)
+            TObj.SetPrompt(Time['prompt'])
+            TObj.SetHelp(Time['help'])
+            Node.Buffer = gFormPkg.StructToStream(TObj.GetInfo())
+            self.SetPosition(Node, Position)
+            ParentNode.insertChild(Node)
+            DefaultTime =EFI_HII_TIME()
+            if 'default_hour' in Time.keys():
+                DefaultTime.Hour = Time['default_hour']
+                if DefaultTime.Hour > 23:
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Hour default value must be between 0 and 23.")
+            if 'default_minute' in Time.keys():
+                DefaultTime.Minute = Time['default_minute']
+                if DefaultTime.Minute > 59:
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Minute default value must be between 0 and 59.")
+            if 'default_second' in Time.keys():
+                DefaultTime.Second = Time['default_second']
+                if DefaultTime.Second > 59:
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Second default value must be between 0 and 59.")
+            DefaultObj = IfrDefault(EFI_IFR_TYPE_TIME, [DefaultTime], EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_TIME)
+            DefaultNode = IfrTreeNode(EFI_IFR_DEFAULT_OP, DefaultObj, gFormPkg.StructToStream(DefaultObj.GetInfo()))
+            Node.insertChild(DefaultNode)
+            if 'component' in Time.keys():
+                for Component in Time['component']:
+                    (_, Value), = Component.items()
+                    self.ParseVfrStatementInconsistentIf(Value, Node)
         self.InsertEndNode(Node)
+
         return Node
 
     def _ParseTimeFlags(self, FlagsDict):
@@ -1627,13 +1660,45 @@ class YamlParser():
 
     def ParseVfrStatementDate(self, Date, ParentNode, Position):
         DObj = IfrDate()
-        self._ParseVfrQuestionHeader(DObj, Date, EFI_QUESION_TYPE.QUESTION_DATE)
-        self.ErrorHandler(DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseDateFlags(Date)))
-        Node = IfrTreeNode(EFI_IFR_DATE_OP, DObj, gFormPkg.StructToStream(DObj.GetInfo()))
-        self.SetPosition(Node, Position)
-        ParentNode.insertChild(Node)
-        if 'component' in Date.keys():
-            self._ParseVfrStatementQuestionOptionList(Date['component'], Node)
+        Node = IfrTreeNode(EFI_IFR_DATE_OP, DObj)
+        if 'year' not in Date.keys():
+            self._ParseVfrQuestionHeader(DObj, Date, EFI_QUESION_TYPE.QUESTION_DATE)
+            self.ErrorHandler(DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseDateFlags(Date)))
+            Node.Buffer = gFormPkg.StructToStream(DObj.GetInfo())
+            self.SetPosition(Node, Position)
+            ParentNode.insertChild(Node)
+            if 'component' in Date.keys():
+                self._ParseVfrStatementQuestionOptionList(Date['component'], Node)
+        else:
+            self.ErrorHandler(DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseDateFlags(Date)))
+            QId, _ = self.VfrQuestionDB.RegisterOldDateQuestion(Date['year'], Date['month'], Date['day'], EFI_QUESTION_ID_INVALID, gFormPkg)
+            DObj.SetQuestionId(QId)
+            DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, QF_DATE_STORAGE_TIME)
+            DObj.SetPrompt(Date['prompt'])
+            DObj.SetHelp(Date['help'])
+            Node.Buffer = gFormPkg.StructToStream(DObj.GetInfo())
+            self.SetPosition(Node, Position)
+            ParentNode.insertChild(Node)
+            DefaultTDate =EFI_HII_DATE()
+            if 'default_year' in Date.keys():
+                DefaultTDate.Year = Date['default_year']
+                if DefaultTDate.Year > Date['max_year'] or DefaultTDate.Year < Date['min_year'] :
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Hour default value must be between {} and {}.".format(Date['min_year'], Date['max_year']))
+            if 'default_month' in Date.keys():
+                DefaultTDate.Month = Date['default_month']
+                if DefaultTDate.Month < 1 or DefaultTDate.Month > 12:
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Minute default value must be between 1 and 12.")
+            if 'default_day' in Date.keys():
+                DefaultTDate.Day = Date['default_day']
+                if DefaultTDate.Day < 1 or DefaultTDate.Day > 31:
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Second default value must be between 1 and 31.")
+            DefaultObj = IfrDefault(EFI_IFR_TYPE_DATE, [DefaultTDate], EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_DATE)
+            DefaultNode = IfrTreeNode(EFI_IFR_DEFAULT_OP, DefaultObj, gFormPkg.StructToStream(DefaultObj.GetInfo()))
+            Node.insertChild(DefaultNode)
+            if 'component' in Date.keys():
+                for Component in Date['component']:
+                    (_, Value), = Component.items()
+                    self.ParseVfrStatementInconsistentIf(Value, Node)
         self.InsertEndNode(Node)
         return Node
 

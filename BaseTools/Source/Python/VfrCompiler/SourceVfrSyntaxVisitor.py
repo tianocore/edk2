@@ -687,6 +687,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             Size, ReturnCode = gVfrVarDataTypeDB.GetDataTypeSizeByTypeName(TypeName)
             self.ErrorHandler(ReturnCode, Line)
         else:
+            # seems to be a bug here
             self.ErrorHandler(gVfrDataStorage.DeclareBufferVarStore(self.GetText(ctx.TN), Guid, gVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore, Attributes), Line) #
             VarStoreId, ReturnCode = gVfrDataStorage.GetVarStoreId(self.GetText(ctx.TN), Guid)
             self.ErrorHandler(ReturnCode, ctx.VN.line, ctx.VN.text)
@@ -3148,14 +3149,17 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             Year = self.TransId(ctx.S1.text)
             Year += '.'
             Year += self.TransId(ctx.S2.text)
+            ctx.Node.Dict['year'] = Year
 
             Month = self.TransId(ctx.S5.text)
             Month += '.'
             Month += self.TransId(ctx.S6.text)
+            ctx.Node.Dict['Month'] = Month
 
             Day = self.TransId(ctx.S9.text)
             Day += '.'
             Day += self.TransId(ctx.S10.text)
+            ctx.Node.Dict['day'] = Day
 
             Prompt = self.PreProcessDB.Read(ctx.S3.text)
             ctx.Node.Dict['prompt'] = KV(ctx.S3.text, Prompt)
@@ -3171,10 +3175,10 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, QF_DATE_STORAGE_TIME)
             DObj.SetPrompt(Prompt)
             DObj.SetHelp(Help)
-
             DefaultObj = IfrDefault(EFI_IFR_TYPE_DATE, [ctx.Val], EFI_HII_DEFAULT_CLASS_STANDARD, ctx.Val, EFI_IFR_TYPE_DATE)
             DefaultObj.SetLineNo(Line)
             DefaultNode = IfrTreeNode(EFI_IFR_DEFAULT_OP, DefaultObj, gFormPkg.StructToStream(DefaultObj.GetInfo()))
+            DefaultNode.Position = 'Do not display'
             ctx.Node.insertChild(DefaultNode)
 
         ctx.Node.Buffer = gFormPkg.StructToStream(DObj.GetInfo())
@@ -3188,15 +3192,17 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
     def visitMinMaxDateStepDefault(self, ctx:SourceVfrSyntaxParser.MinMaxDateStepDefaultContext):
         if ctx.N1 != None:
             Minimum = self.TransNum(ctx.N1.text)
+            ctx.Node.Dict['min'] = KV(Minimum, Minimum)
         else:
             Minimum = self.PreProcessDB.Read(ctx.S1.text)
-            #  ctx.Node.Dict['min'] = KV(ctx.S1.text, Minimum)
+            ctx.Node.Dict['min'] = KV(ctx.S1.text, Minimum)
 
         if ctx.N2 != None:
             Maximum = self.TransNum(ctx.N2.text)
+            ctx.Node.Dict['max'] = KV(Maximum, Maximum)
         else:
             Maximum = self.PreProcessDB.Read(ctx.S2.text)
-            # ctx.Node.Dict['max'] = KV(ctx.S2.text, Maximum)
+            ctx.Node.Dict['max'] = KV(ctx.S2.text, Maximum)
 
         if ctx.Default() != None:
             if ctx.N4 != None:
@@ -3209,14 +3215,46 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
 
             if ctx.KeyValue == 0:
                 ctx.Date.Year = Default
+                ctx.Node.Dict['max_year'] = ctx.Node.Dict['max']
+                ctx.Node.Dict['min_year'] = ctx.Node.Dict['min']
+                if ctx.N4 != None:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_year'] = [KV(Default, Default)]
+                    else:
+                        ctx.Node.Dict['default_year'].append(KV(Default, Default))
+                else:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_year'] = [KV(ctx.S4.text, Default)]
+                    else:
+                        ctx.Node.Dict['default_year'].append(KV(ctx.S4.text, Default))
                 if ctx.Date.Year < Minimum or ctx.Date.Year > Maximum:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Year default value must be between Min year and Max year.")
             if ctx.KeyValue == 1:
                 ctx.Date.Month = Default
+                if ctx.N4 != None:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_month'] = [KV(Default, Default)]
+                    else:
+                        ctx.Node.Dict['default_month'].append(KV(Default, Default))
+                else:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_month'] = [KV(ctx.S4.text, Default)]
+                    else:
+                        ctx.Node.Dict['default_month'].append(KV(ctx.S4.text, Default))
                 if ctx.Date.Month < 1 or ctx.Date.Month > 12:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Month default value must be between Min 1 and Max 12.")
             if ctx.KeyValue == 2:
                 ctx.Date.Day = Default
+                if ctx.N4 != None:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_day'] = [KV(Default, Default)]
+                    else:
+                        ctx.Node.Dict['default_day'].append(KV(Default, Default))
+                else:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_day'] = [KV(ctx.S4.text, Default)]
+                    else:
+                        ctx.Node.Dict['default_day'].append(KV(ctx.S4.text, Default))
                 if ctx.Date.Day < 1 or ctx.Date.Day > 31:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Day default value must be between Min 1 and Max 31.")
         return self.visitChildren(ctx)
@@ -3281,13 +3319,17 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             Hour += '.'
             Hour += self.TransId(ctx.S2.text)
 
+            ctx.Node.Dict['hour'] = Hour
+
             Minute = self.TransId(ctx.S5.text)
             Minute += '.'
             Minute += self.TransId(ctx.S6.text)
+            ctx.Node.Dict['minute'] = Minute
 
             Second = self.TransId(ctx.S9.text)
             Second += '.'
             Second += self.TransId(ctx.S10.text)
+            ctx.Node.Dict['second'] = Second
 
             Prompt = self.PreProcessDB.Read(ctx.S3.text)
             ctx.Node.Dict['prompt'] = KV(ctx.S3.text, Prompt)
@@ -3335,21 +3377,52 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             if ctx.N4 != None:
                 Default = self.TransNum(ctx.N4.text)
                 Line = ctx.N4.line
+
             else:
                 Default = self.PreProcessDB.Read(ctx.S4.text)
-                # ctx.Node.Dict['default'] = KV(ctx.S4.text, Default)
                 Line = ctx.S4.line
 
             if ctx.KeyValue == 0:
                 ctx.Time.Hour = Default
+                if ctx.N4 != None:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_hour'] = [KV(Default, Default)]
+                    else:
+                        ctx.Node.Dict['default_hour'].append(KV(Default, Default))
+                else:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_hour'] = [KV(ctx.S4.text, Default)]
+                    else:
+                        ctx.Node.Dict['default_hour'].append(KV(ctx.S4.text, Default))
                 if ctx.Time.Hour > 23:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Hour default value must be between 0 and 23.")
             if ctx.KeyValue == 1:
                 ctx.Time.Minute = Default
+                if ctx.N4 != None:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_minute'] = [KV(Default, Default)]
+                    else:
+                        ctx.Node.Dict['default_minute'].append(KV(Default, Default))
+                else:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_minute'] = [KV(ctx.S4.text, Default)]
+                    else:
+                        ctx.Node.Dict['default_minute'].append(KV(ctx.S4.text, Default))
                 if ctx.Time.Minute > 59:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Minute default value must be between 0 and 59.")
             if ctx.KeyValue == 2:
                 ctx.Time.Second = Default
+                if ctx.N4 != None:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_second'] = [KV(Default, Default)]
+                    else:
+                        ctx.Node.Dict['default_second'].append(KV(Default, Default))
+                else:
+                    if 'default' not in ctx.Node.dict.keys():
+                        ctx.Node.Dict['default_second'] = [KV(ctx.S4.text, Default)]
+                    else:
+                        ctx.Node.Dict['default_second'].append(KV(ctx.S4.text, Default))
+
                 if ctx.Time.Second > 59:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, "Second default value must be between 0 and 59.")
         return self.visitChildren(ctx)

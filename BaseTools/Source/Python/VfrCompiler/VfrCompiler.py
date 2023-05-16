@@ -10,9 +10,9 @@ import re
 import argparse
 from tkinter.ttk import Treeview
 from antlr4 import *
-from VfrSyntaxVisitor import *
-from VfrSyntaxLexer import *
-from VfrSyntaxParser import *
+from VfrSyntaxVisitor import VfrSyntaxVisitor
+from VfrSyntaxLexer import VfrSyntaxLexer
+from VfrSyntaxParser import VfrSyntaxParser
 from SourceVfrSyntaxParser import SourceVfrSyntaxParser
 from SourceVfrSyntaxVisitor import SourceVfrSyntaxVisitor
 from SourceVfrSyntaxLexer import SourceVfrSyntaxLexer

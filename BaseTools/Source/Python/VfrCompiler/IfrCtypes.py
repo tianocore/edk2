@@ -89,6 +89,23 @@ EDKII_IFR_NUMERIC_SIZE_BIT = 0x3F
 
 EFI_IFR_MAX_DEFAULT_TYPE = 0x10
 
+EFI_HII_SIBT_END = 0x00
+EFI_HII_SIBT_STRING_SCSU = 0x10
+EFI_HII_SIBT_STRING_SCSU_FONT = 0x11
+EFI_HII_SIBT_STRINGS_SCSU = 0x12
+EFI_HII_SIBT_STRINGS_SCSU_FONT = 0x13
+EFI_HII_SIBT_STRING_UCS2 = 0x14
+EFI_HII_SIBT_STRING_UCS2_FONT = 0x15
+EFI_HII_SIBT_STRINGS_UCS2 = 0x16
+EFI_HII_SIBT_STRINGS_UCS2_FONT = 0x17
+EFI_HII_SIBT_DUPLICATE = 0x20
+EFI_HII_SIBT_SKIP2 = 0x21
+EFI_HII_SIBT_SKIP1 = 0x22
+EFI_HII_SIBT_EXT1 = 0x30
+EFI_HII_SIBT_EXT2 = 0x31
+EFI_HII_SIBT_EXT4 = 0x32
+EFI_HII_SIBT_FONT = 0x40
+
 BasicTypes = [EFI_IFR_TYPE_NUM_SIZE_8, EFI_IFR_TYPE_NUM_SIZE_16, EFI_IFR_TYPE_NUM_SIZE_32, EFI_IFR_TYPE_NUM_SIZE_64]
 class EFI_GUID(Structure):
     _pack_ = 1
@@ -1465,6 +1482,115 @@ class EFI_IFR_MATCH2(Structure):
         ('Header', EFI_IFR_OP_HEADER),
         ('SyntaxType', EFI_GUID),
     ]
+
+class EFI_HII_STRING_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('BlockType', c_uint8),
+    ]
+
+class EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('FontIdentifier', c_uint8),
+        ('StringText', ARRAY(c_uint8, 2)),
+    ]
+
+class EFI_HII_SIBT_STRINGS_SCSU_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('StringCount', c_uint16),
+        ('StringText', ARRAY(c_uint8, 2)),
+    ]
+
+class EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('FontIdentifier', c_uint8),
+        ('StringCount', c_uint16),
+        ('StringText', ARRAY(c_uint8, 2)),
+    ]
+
+class EFI_HII_SIBT_STRING_UCS2_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('StringText', ARRAY(c_ushort, 2)),
+    ]
+
+class EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('FontIdentifier', c_uint8),
+        ('StringText', ARRAY(c_ushort, 2)),
+    ]
+
+class EFI_HII_SIBT_STRINGS_UCS2_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('StringCount', c_uint16),
+        ('StringText', ARRAY(c_ushort, 2)),
+    ]
+
+class EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('FontIdentifier', c_uint8),
+        ('StringCount', c_uint16),
+        ('StringText', ARRAY(c_ushort, 2)),
+    ]
+
+class EFI_HII_SIBT_DUPLICATE_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('StringId', c_uint16),
+    ]
+
+class EFI_HII_SIBT_EXT1_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('BlockType2', c_uint8),
+        ('Length', c_uint8),
+    ]
+
+class EFI_HII_SIBT_EXT2_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('BlockType2', c_uint8),
+        ('Length', c_uint16),
+    ]
+
+class EFI_HII_SIBT_EXT4_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('BlockType2', c_uint8),
+        ('Length', c_uint32),
+    ]
+
+class EFI_HII_SIBT_SKIP1_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('SkipCount', c_uint8),
+    ]
+
+class EFI_HII_SIBT_SKIP2_BLOCK(Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('Header', EFI_HII_STRING_BLOCK),
+        ('SkipCount', c_uint16),
+    ]
+
 
 
 EFI_IFR_FORM_OP = 0x01

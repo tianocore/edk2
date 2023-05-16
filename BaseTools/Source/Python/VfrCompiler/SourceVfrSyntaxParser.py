@@ -13492,7 +13492,7 @@ class SourceVfrSyntaxParser ( Parser ):
                 self.state = 1994
                 self.match(SourceVfrSyntaxParser.Comma)
                 self.state = 1995
-                self.minMaxDateStepDefault(localctx.Val, 0)
+                self.minMaxDateStepDefault(localctx.Node, localctx.Val, 0)
                 self.state = 1996
                 self.match(SourceVfrSyntaxParser.Month)
                 self.state = 1997
@@ -13536,7 +13536,7 @@ class SourceVfrSyntaxParser ( Parser ):
                 self.state = 2016
                 self.match(SourceVfrSyntaxParser.Comma)
                 self.state = 2017
-                self.minMaxDateStepDefault(localctx.Val, 1)
+                self.minMaxDateStepDefault(localctx.Node, localctx.Val, 1)
                 self.state = 2018
                 self.match(SourceVfrSyntaxParser.Day)
                 self.state = 2019
@@ -13580,7 +13580,7 @@ class SourceVfrSyntaxParser ( Parser ):
                 self.state = 2038
                 self.match(SourceVfrSyntaxParser.Comma)
                 self.state = 2039
-                self.minMaxDateStepDefault(localctx.Val, 2)
+                self.minMaxDateStepDefault(localctx.Node, localctx.Val, 2)
                 self.state = 2045
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -13624,9 +13624,10 @@ class SourceVfrSyntaxParser ( Parser ):
 
     class MinMaxDateStepDefaultContext(ParserRuleContext):
 
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, Date=None, KeyValue=None):
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, Node=None, Date=None, KeyValue=None):
             super().__init__(parent, invokingState)
             self.parser = parser
+            self.Node = None
             self.Date = None
             self.KeyValue = None
             self.N1 = None # Token
@@ -13638,6 +13639,7 @@ class SourceVfrSyntaxParser ( Parser ):
             self.D = None # Token
             self.N4 = None # Token
             self.S4 = None # Token
+            self.Node = Node
             self.Date = Date
             self.KeyValue = KeyValue
 
@@ -13683,9 +13685,9 @@ class SourceVfrSyntaxParser ( Parser ):
 
 
 
-    def minMaxDateStepDefault(self, Date, KeyValue):
+    def minMaxDateStepDefault(self, Node, Date, KeyValue):
 
-        localctx = SourceVfrSyntaxParser.MinMaxDateStepDefaultContext(self, self._ctx, self.state, Date, KeyValue)
+        localctx = SourceVfrSyntaxParser.MinMaxDateStepDefaultContext(self, self._ctx, self.state, Node, Date, KeyValue)
         self.enterRule(localctx, 230, self.RULE_minMaxDateStepDefault)
         try:
             self.state = 2082
@@ -14152,7 +14154,7 @@ class SourceVfrSyntaxParser ( Parser ):
                 self.state = 2134
                 self.match(SourceVfrSyntaxParser.Comma)
                 self.state = 2135
-                self.minMaxTimeStepDefault(localctx.Val, 0)
+                self.minMaxTimeStepDefault(localctx.Node. localctx.Val, 0)
                 self.state = 2136
                 self.match(SourceVfrSyntaxParser.Minute)
                 self.state = 2137
@@ -14196,7 +14198,7 @@ class SourceVfrSyntaxParser ( Parser ):
                 self.state = 2156
                 self.match(SourceVfrSyntaxParser.Comma)
                 self.state = 2157
-                self.minMaxTimeStepDefault(localctx.Val, 1)
+                self.minMaxTimeStepDefault(localctx.Node, localctx.Val, 1)
                 self.state = 2158
                 self.match(SourceVfrSyntaxParser.Second)
                 self.state = 2159
@@ -14240,7 +14242,7 @@ class SourceVfrSyntaxParser ( Parser ):
                 self.state = 2178
                 self.match(SourceVfrSyntaxParser.Comma)
                 self.state = 2179
-                self.minMaxTimeStepDefault(localctx.Val, 2)
+                self.minMaxTimeStepDefault(localctx.Node, localctx.Val, 2)
                 self.state = 2185
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -14284,9 +14286,10 @@ class SourceVfrSyntaxParser ( Parser ):
 
     class MinMaxTimeStepDefaultContext(ParserRuleContext):
 
-        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, Time=None, KeyValue=None):
+        def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1, Node=None, Time=None, KeyValue=None):
             super().__init__(parent, invokingState)
             self.parser = parser
+            self.Node = None
             self.Time = None
             self.KeyValue = None
             self.N1 = None # Token
@@ -14298,6 +14301,7 @@ class SourceVfrSyntaxParser ( Parser ):
             self.D = None # Token
             self.N4 = None # Token
             self.S4 = None # Token
+            self.Node = Node
             self.Time = Time
             self.KeyValue = KeyValue
 
@@ -14343,9 +14347,9 @@ class SourceVfrSyntaxParser ( Parser ):
 
 
 
-    def minMaxTimeStepDefault(self, Time, KeyValue):
+    def minMaxTimeStepDefault(self, Node, Time, KeyValue):
 
-        localctx = SourceVfrSyntaxParser.MinMaxTimeStepDefaultContext(self, self._ctx, self.state, Time, KeyValue)
+        localctx = SourceVfrSyntaxParser.MinMaxTimeStepDefaultContext(self, self._ctx, self.state, Node, Time, KeyValue)
         self.enterRule(localctx, 238, self.RULE_minMaxTimeStepDefault)
         try:
             self.state = 2222

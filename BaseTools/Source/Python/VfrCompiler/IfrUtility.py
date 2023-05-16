@@ -11,8 +11,10 @@ from VfrError import *
 from IfrCtypes import *
 from abc import ABCMeta, abstractmethod
 import ctypes
-
+from IfrCommon import *
+from Common.LongFilePathSupport import LongFilePath
 import sys
+import struct
 
 VFR_PACK_SHOW = 0x02
 VFR_PACK_ASSIGN = 0x01
@@ -1011,7 +1013,7 @@ class VfrBufferConfig(object):
                 self.ItemListPos = pItem
 
             else:
-                # tranverse the list to find out if there's already the value for the same offset
+                # tranverse the list to find out if there's already the value for the same Offset
                 pInfo = self.ItemListPos.InfoStrList
                 while pInfo != None:
                     if pInfo.Offset == Offset:
@@ -1478,24 +1480,294 @@ class VfrDataStorage(object):
 
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
-
 class VfrStringDB(object):
 
     def __init__(self):
-        self.StringFileName = ''
+        self.StringFileName = None
 
     def SetStringFileName(self, StringFileName):
         self.StringFileName = StringFileName
 
-    def GetVarStoreNameFromStringId(self, StringId):
-        if self.StringFileName == '':
+    def GetBestLanguage(self, SupportedLanguages, Language):
+        if SupportedLanguages is None or Language is None:
+            return False
+
+        LanguageLength = 0
+        # Determine the length of the first RFC 4646 language code in Language
+        while LanguageLength < len(Language) and Language[LanguageLength] != 0 and Language[LanguageLength] != ';':
+            LanguageLength += 1
+
+        Supported = SupportedLanguages
+        # Trim back the length of Language used until it is empty
+        while LanguageLength > 0:
+            # Loop through all language codes in SupportedLanguages
+            while len(Supported) > 0:
+                # Skip ';' characters in Supported
+                while len(Supported) > 0 and Supported[0] == ';':
+                    Supported = Supported[1:]
+
+                CompareLength = 0
+                # Determine the length of the next language code in Supported
+                while CompareLength < len(Supported) and Supported[CompareLength] != 0 and Supported[CompareLength] != ';':
+                    CompareLength += 1
+
+                # If Language is longer than the Supported, then skip to the next language
+                if LanguageLength > CompareLength:
+                    continue
+
+                # See if the first LanguageLength characters in Supported match Language
+                if Supported[:LanguageLength] == Language:
+                    return True
+
+                Supported = Supported[CompareLength:]
+
+            # Trim Language from the right to the next '-' character
+            LanguageLength -= 1
+            while LanguageLength > 0 and Language[LanguageLength] != '-':
+                LanguageLength -= 1
+
+        # No matches were found
+        return False
+
+
+    def GetUnicodeStringTextSize(self, StringSrc):
+        StringSize = sizeof(ctypes.c_ushort)
+        StringStr = cast(StringSrc, POINTER(ctypes.c_ushort))
+
+        while StringStr.contents.value != '\0':
+            StringSize += sizeof(ctypes.c_ushort)
+            StringStr = cast(addressof(StringStr.contents) + sizeof(ctypes.c_ushort), POINTER(ctypes.c_ushort))
+
+        return StringSize
+
+
+    def FindStringBlock(self, string_data, string_id):
+        current_string_id = 1
+        block_hdr = string_data
+        block_size = 0
+        offset = 0
+
+        while block_hdr[0] != EFI_HII_SIBT_END:
+            block_type = block_hdr[0]
+
+            if block_type == EFI_HII_SIBT_STRING_SCSU:
+                offset = sizeof(EFI_HII_STRING_BLOCK)
+                string_text_ptr = block_hdr + offset
+                block_size += offset + len(str(string_text_ptr)) + 1
+                current_string_id += 1
+
+            elif block_type == EFI_HII_SIBT_STRING_SCSU_FONT:
+                offset = sizeof(EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK) - sizeof(ctypes.c_uint8)
+                string_text_ptr = block_hdr + offset
+                block_size += offset + len(str(string_text_ptr)) + 1
+                current_string_id += 1
+
+            elif block_type == EFI_HII_SIBT_STRINGS_SCSU:
+                string_count = int.from_bytes(block_hdr[sizeof(EFI_HII_STRING_BLOCK):sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint16)], byteorder='little')
+                string_text_ptr = block_hdr + sizeof(EFI_HII_SIBT_STRINGS_SCSU_BLOCK) - sizeof(ctypes.c_uint8)
+                block_size += string_text_ptr - block_hdr
+
+                for index in range(string_count):
+                    block_size += len(str(string_text_ptr)) + 1
+
+                    if current_string_id == string_id:
+                        block_type = block_hdr[0]
+                        string_text_offset = string_text_ptr - string_data
+                        return EFI_SUCCESS
+
+                    string_text_ptr = string_text_ptr + len(str(string_text_ptr)) + 1
+                    current_string_id += 1
+
+            elif block_type == EFI_HII_SIBT_STRINGS_SCSU_FONT:
+                string_count = int.from_bytes(block_hdr[sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint8):sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint8)+sizeof(ctypes.c_uint16)], byteorder='little')
+                string_text_ptr = block_hdr + sizeof(EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK) - sizeof(ctypes.c_uint8)
+                block_size += string_text_ptr - block_hdr
+
+                for index in range(string_count):
+                    block_size += len(str(string_text_ptr)) + 1
+
+                    if current_string_id == string_id:
+                        block_type = block_hdr[0]
+                        string_text_offset = string_text_ptr - string_data
+                        return EFI_SUCCESS
+
+                    string_text_ptr = string_text_ptr + len(str(string_text_ptr)) + 1
+                    current_string_id += 1
+
+            elif block_type == EFI_HII_SIBT_STRING_UCS2:
+                offset = sizeof(EFI_HII_STRING_BLOCK)
+                string_text_ptr = block_hdr + offset
+                string_size = self.GetUnicodeStringTextSize(string_text_ptr)
+                block_size += offset + string_size
+                current_string_id += 1
+
+            elif block_type == EFI_HII_SIBT_STRING_UCS2_FONT:
+                offset = sizeof(EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK) - sizeof(ctypes.c_ushort)
+                string_text_ptr = block_hdr + offset
+                string_size = self.GetUnicodeStringTextSize(string_text_ptr)
+                block_size += offset + string_size
+                current_string_id += 1
+
+            elif block_type == EFI_HII_SIBT_STRINGS_UCS2:
+                offset = len(EFI_HII_SIBT_STRINGS_UCS2_BLOCK) - len(ctypes.c_ushort)
+                string_text_ptr = block_hdr + offset
+                block_size += offset
+                string_count = int.from_bytes(block_hdr[sizeof(EFI_HII_STRING_BLOCK):sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint16)], byteorder='little')
+
+                for index in range(string_count):
+                    string_size = self.GetUnicodeStringTextSize(string_text_ptr)
+                    block_size += string_size
+
+                    if current_string_id == string_id:
+                        block_type = block_hdr[0]
+                        string_text_offset = string_text_ptr - string_data
+                        return EFI_SUCCESS
+
+                    string_text_ptr = string_text_ptr + string_size
+                    current_string_id += 1
+
+            elif block_type == EFI_HII_SIBT_STRINGS_UCS2_FONT:
+                offset = len(EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK) - len(ctypes.c_ushort)
+                string_text_ptr = block_hdr + offset
+                block_size += offset
+                string_count = int.from_bytes(block_hdr[sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint8):sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint8)+sizeof(ctypes.c_uint16)], byteorder='little')
+
+                for index in range(string_count):
+                    string_size = self.GetUnicodeStringTextSize(string_text_ptr)
+                    block_size += string_size
+
+                    if current_string_id == string_id:
+                        block_type = block_hdr[0]
+                        string_text_offset = string_text_ptr - string_data
+                        return EFI_SUCCESS
+
+                    string_text_ptr = string_text_ptr + string_size
+                    current_string_id += 1
+
+            elif block_type == EFI_HII_SIBT_DUPLICATE:
+                if current_string_id == string_id:
+                    string_id = int.from_bytes(block_hdr[sizeof(EFI_HII_STRING_BLOCK):sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint16)], byteorder='little')
+                    current_string_id = 1
+                    block_size = 0
+                else:
+                    block_size += sizeof(EFI_HII_SIBT_DUPLICATE_BLOCK)
+                    current_string_id += 1
+
+            elif block_type == EFI_HII_SIBT_SKIP1:
+                skip_count = int.from_bytes(block_hdr[sizeof(EFI_HII_STRING_BLOCK)], byteorder='little')
+                current_string_id += skip_count
+                block_size += sizeof(EFI_HII_SIBT_SKIP1_BLOCK)
+
+            elif block_type == EFI_HII_SIBT_SKIP2:
+                skip_count = int.from_bytes(block_hdr[sizeof(EFI_HII_STRING_BLOCK):sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint16)], byteorder='little')
+                current_string_id += skip_count
+                block_size += sizeof(EFI_HII_SIBT_SKIP2_BLOCK)
+
+            elif block_type == EFI_HII_SIBT_EXT1:
+                length8 = int.from_bytes(block_hdr[sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint8):sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint8)+sizeof(ctypes.c_uint8)], byteorder='little')
+                block_size += length8
+
+            elif block_type == EFI_HII_SIBT_EXT2:
+                ext2 = EFI_HII_SIBT_EXT2
+                length32 = int.from_bytes(block_hdr[sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint8):sizeof(EFI_HII_STRING_BLOCK)+sizeof(ctypes.c_uint8)+sizeof(ctypes.c_uint32)], byteorder='little')
+                block_size += length32
+
+            if string_id > 0 and string_id != (ctypes.c_uint16)(-1):
+                string_text_offset = block_hdr - string_data + offset
+                block_type = block_hdr[0]
+
+                if string_id == current_string_id - 1:
+                    if block_type == EFI_HII_SIBT_SKIP2 or block_type == EFI_HII_SIBT_SKIP1:
+                        return EFI_NOT_FOUND
+                    else:
+                        return EFI_SUCCESS
+
+                if string_id < current_string_id - 1:
+                    return EFI_NOT_FOUND
+
+            block_hdr = string_data + block_size
+
+        return EFI_NOT_FOUND
+
+
+    def GetVarStoreNameFormStringId(self, StringId):
+        pInFile = None
+        NameOffset = 0
+        Length = 0
+        StringPtr = None
+        StringName = None
+        UnicodeString = None
+        VarStoreName = None
+        DestTmp = None
+        Current = None
+        Status = None
+        LineBuf = [0] * EFI_IFR_MAX_LENGTH
+        BlockType = 0
+        PkgHeader = None
+
+        if self.StringFileName is None:
             return None
+
         try:
-            f = open(self.StringFileName)
-            StringPtr = f.read()
-            f.close()
-        except IOError:
-            print('Error')
+            pInFile = open(LongFilePath(self.StringFileName), "rb")
+            # Get file length
+            pInFile.seek(0, os.SEEK_END)
+            Length = pInFile.tell()
+            pInFile.seek(0, os.SEEK_SET)
+
+            # Get file data
+            StringPtr = bytearray(pInFile.read())
+        except:
+            if pInFile is not None:
+                pInFile.close()
+            return None
+
+        PkgHeader = EFI_HII_STRING_PACKAGE_HDR.from_buffer(StringPtr)
+
+        # Check the String package
+        if PkgHeader.Header.Type != EFI_HII_PACKAGE_STRINGS:
+            return None
+
+        # Search the language, get best language based on RFC 4647 matching algorithm
+        Current = StringPtr
+        while not self.GetBestLanguage("en", PkgHeader.Language):
+            Current += PkgHeader.Header.Length
+            PkgHeader = EFI_HII_STRING_PACKAGE_HDR.from_buffer(Current)
+
+            # If can't find string package based on language, just return the first string package
+            if Current - StringPtr >= Length:
+                Current = StringPtr
+                PkgHeader = EFI_HII_STRING_PACKAGE_HDR.from_buffer(StringPtr)
+                break
+
+        Current += PkgHeader.HdrSize
+
+        # Find the string block according to the stringId
+        Status, NameOffset, BlockType = self.FindStringBlock(Current, StringId)
+        if Status != RETURN_SUCCESS:
+            return None
+
+        # Get varstore name according to the string type
+        if BlockType in [EFI_HII_SIBT_STRING_SCSU, EFI_HII_SIBT_STRING_SCSU_FONT, EFI_HII_SIBT_STRINGS_SCSU,
+                        EFI_HII_SIBT_STRINGS_SCSU_FONT]:
+            StringName = Current + NameOffset
+            VarStoreName = StringName.decode('utf-8')
+        elif BlockType in [EFI_HII_SIBT_STRING_UCS2, EFI_HII_SIBT_STRING_UCS2_FONT, EFI_HII_SIBT_STRINGS_UCS2,
+                        EFI_HII_SIBT_STRINGS_UCS2_FONT]:
+            UnicodeString = Current + NameOffset
+            Length = self.GetUnicodeStringTextSize(UnicodeString)
+            DestTmp = bytearray(Length // 2 + 1)
+            VarStoreName = DestTmp
+            index = 0
+            while UnicodeString[index] != '\0':
+                DestTmp[index] = ord(UnicodeString[index])
+                index += 1
+            DestTmp[index] = '\0'
+        else:
+            return None
+
+        return VarStoreName
+
 
 gVfrStringDB = VfrStringDB()
 
