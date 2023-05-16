@@ -62,7 +62,7 @@ FV = SECFV
 
 [FD.MEMFD]
 BaseAddress   = $(MEMFD_BASE_ADDRESS)
-Size          = 0xE00000
+Size          = 0xF00000
 ErasePolarity = 1
 BlockSize     = 0x10000
 NumBlocks     = 0xE0
@@ -101,7 +101,7 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.P
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvSize
 FV = PEIFV
 
-0x100000|0xD00000
+0x100000|0xE00000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
 FV = DXEFV
 
