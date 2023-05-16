@@ -372,6 +372,7 @@
   CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
   CryptoPkg/Library/OpensslLib/OpensslLib.inf
   CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
+  CryptoPkg/Library/OpensslLib/OpensslLibMin.inf
   CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
