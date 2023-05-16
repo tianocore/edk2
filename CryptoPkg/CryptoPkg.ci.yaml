@@ -91,7 +91,11 @@
     # options defined in .pytool/Plugin/UncrustifyCheck
     "UncrustifyCheck": {
         "IgnoreFiles": [
-            "Library/OpensslLib/OpensslGen",
+            "Library/OpensslLib/OpensslGen/",
+            "Library/OpensslLib/OpensslGen/include/crypto/",
+            "Library/OpensslLib/OpensslGen/include/openssl/",
+            "Library/OpensslLib/OpensslGen/providers/common/der/",
+            "Library/OpensslLib/OpensslGen/providers/common/include/",
             "Library/OpensslLib/OpensslStub/uefiprov.c",
             "Library/OpensslLib/OpensslStub/minprov.c"
         ]
