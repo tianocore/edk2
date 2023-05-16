@@ -60,6 +60,7 @@ FILE FV_IMAGE = 4E35FD93-9C72-4c15-8C4B-E77F1DB2D793 {
     SECTION FV_IMAGE = DXEFV
 }
 
+
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
 ################################################################################
 [FV.NETWORKFV]
@@ -201,10 +202,6 @@ INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 !endif
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
-  INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
-!endif
-
 INF UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 !if $(MEMORY_TEST) == "GENERIC"
@@ -307,6 +304,7 @@ INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
 INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 !endif
 
+
 !if $(UNIVERSAL_PAYLOAD) == FALSE
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
 #
@@ -326,6 +324,29 @@ INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 !endif
 INF ShellPkg/Application/Shell/Shell.inf
+!endif
+
+!if $(UNIVERSAL_PAYLOAD) == FALSE
+
+!if $(SECURE_BOOT_ENABLE) == TRUE
+INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+!endif
+
+!if $(MEASURED_BOOT_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
+!if $(SMM_SUPPORT) == TRUE
+  INF SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
+!endif
+  INF SecurityPkg/Tcg/TcgConfigDxe/TcgConfigDxe.inf
+  INF SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+  INF RuleOverride = DRIVER_ACPITABLE SecurityPkg/Tcg/Tcg2Acpi/Tcg2Acpi.inf
+  INF SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+!if $(SMM_SUPPORT) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Smm/Tcg2Smm.inf
+!endif
+  INF SecurityPkg/Tcg/Tcg2PlatformDxe/Tcg2PlatformDxe.inf
+!endif #MEASURED_BOOT_ENABLE
+
 !endif
 
 [FV.SECFV]
@@ -353,6 +374,20 @@ READ_LOCK_STATUS   = TRUE
 INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
 !endif
 
+!if $(MEASURED_BOOT_ENABLE) == TRUE
+  INF SecurityPkg/Tcg/TcgDxe/TcgDxe.inf
+!if $(SMM_SUPPORT) == TRUE
+  INF SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
+!endif
+  INF SecurityPkg/Tcg/TcgConfigDxe/TcgConfigDxe.inf
+  INF SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf
+  INF RuleOverride = DRIVER_ACPITABLE SecurityPkg/Tcg/Tcg2Acpi/Tcg2Acpi.inf
+  INF SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf
+!if $(SMM_SUPPORT) == TRUE
+  INF SecurityPkg/Tcg/Tcg2Smm/Tcg2Smm.inf
+!endif
+  INF SecurityPkg/Tcg/Tcg2PlatformDxe/Tcg2PlatformDxe.inf
+!endif #MEASURED_BOOT_ENABLE
 
 ################################################################################
 #
@@ -470,5 +505,15 @@ INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.in
   FILE APPLICATION = $(NAMED_GUID) {
     PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
     UI        STRING="Enter Setup"
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+[Rule.Common.DXE_DRIVER.DRIVER_ACPITABLE]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    RAW ACPI  Optional                |.acpi
+    RAW ASL   Optional                |.aml
+    UI        STRING="$(MODULE_NAME)" Optional
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
