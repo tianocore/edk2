@@ -2,11 +2,14 @@
   This driver will report some MMIO/IO resources to dxe core, extract smbios and acpi
   tables from bootloader.
 
-  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include "BlSupportDxe.h"
+#include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+#include <Include/UniversalPayload/SecureBootInfoGuid.h>
 
 /**
   Reserve MMIO/IO resource in GCD
@@ -87,6 +90,73 @@ ReserveResourceInGcd (
 }
 
 /**
+Sync the Secure boot hob info and TPM PCD as per the information passed from Bootloader.
+**/
+EFI_STATUS
+BlSupportSecurityPcdSync (
+  VOID
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_HOB_GUID_TYPE           *GuidHob;
+  UNIVERSAL_SECURE_BOOT_INFO  *SecurebootInfoHob;
+  UINTN                       Size;
+
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadSecureBootInfoGuid);
+  if (GuidHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "gUniversalPayloadSecureBootInfoGuid Not Found!\n"));
+    return EFI_UNSUPPORTED;
+  }
+
+  SecurebootInfoHob = (UNIVERSAL_SECURE_BOOT_INFO *)GET_GUID_HOB_DATA (GuidHob);
+
+  // Sync the Hash mask for TPM 2.0 as per active PCR banks.
+  // Make sure that the current PCR allocations, the TPM supported PCRs,
+  // and the PcdTpm2HashMask are all in agreement.
+  Status = PcdSet32S (PcdTpm2HashMask, SecurebootInfoHob->TpmPcrActivePcrBanks);
+  ASSERT_EFI_ERROR (Status);
+  DEBUG ((DEBUG_INFO, "TpmPcrActivePcrBanks 0x%x \n", SecurebootInfoHob->TpmPcrActivePcrBanks));
+
+  // Set the Firmware debugger PCD
+  Status = PcdSetBoolS (PcdFirmwareDebuggerInitialized, SecurebootInfoHob->FirmwareDebuggerInitialized);
+  ASSERT_EFI_ERROR (Status);
+  DEBUG ((DEBUG_INFO, " FirmwareDebugger Initialized 0x%x \n", SecurebootInfoHob->FirmwareDebuggerInitialized));
+
+  // Set the TPM Type instance GUID
+  if (SecurebootInfoHob->MeasuredBootEnabled) {
+    if (SecurebootInfoHob->TpmType == TPM_TYPE_20) {
+      DEBUG ((DEBUG_INFO, "%a: TPM2 detected\n", __func__));
+      Size   = sizeof (gEfiTpmDeviceInstanceTpm20DtpmGuid);
+      Status = PcdSetPtrS (
+                 PcdTpmInstanceGuid,
+                 &Size,
+                 &gEfiTpmDeviceInstanceTpm20DtpmGuid
+                 );
+    } else if (SecurebootInfoHob->TpmType == TPM_TYPE_12) {
+      DEBUG ((DEBUG_INFO, "%a: TPM1.2 detected\n", __func__));
+      Size   = sizeof (gEfiTpmDeviceInstanceTpm12Guid);
+      Status = PcdSetPtrS (
+                 PcdTpmInstanceGuid,
+                 &Size,
+                 &gEfiTpmDeviceInstanceTpm12Guid
+                 );
+    } else {
+      DEBUG ((DEBUG_INFO, "%a: No TPM detected\n", __func__));
+      Size   = sizeof (gEfiTpmDeviceInstanceNoneGuid);
+      Status = PcdSetPtrS (
+                 PcdTpmInstanceGuid,
+                 &Size,
+                 &gEfiTpmDeviceInstanceNoneGuid
+                 );
+    }
+
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return Status;
+}
+
+/**
   Main entry for the bootloader support DXE module.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
@@ -143,6 +213,11 @@ BlDxeEntryPoint (
     Status = PcdSet64S (PcdPciExpressBaseSize, AcpiBoardInfo->PcieBaseSize);
     ASSERT_EFI_ERROR (Status);
   }
+
+  //
+  // Sync Bootloader info for TPM
+  //
+  BlSupportSecurityPcdSync ();
 
   return EFI_SUCCESS;
 }
