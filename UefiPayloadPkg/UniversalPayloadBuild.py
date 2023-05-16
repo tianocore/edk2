@@ -118,6 +118,7 @@ def BuildUniversalPayload(Args):
             ['uefi_fv',    os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))    ],
             ['bds_fv',     os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/BDSFV.Fv"))    ],
             ['network_fv', os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/NETWORKFV.Fv"))    ],
+            ['security_fv', os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/SECFV.Fv"))    ],
         ]
         AddSectionName = '.upld_info'
         ReplaceFv (EntryOutputDir, UpldInfoFile, AddSectionName, Alignment = 4)
