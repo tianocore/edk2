@@ -553,7 +553,7 @@ UnsetGuardPage (
                                          mSmmMemoryAttribute,
                                          BaseAddress,
                                          EFI_PAGE_SIZE,
-                                         EFI_MEMORY_RP
+                                         EFI_MEMORY_RP|EFI_MEMORY_RO|EFI_MEMORY_XP
                                          );
     ASSERT_EFI_ERROR (Status);
     mOnGuarding = FALSE;
