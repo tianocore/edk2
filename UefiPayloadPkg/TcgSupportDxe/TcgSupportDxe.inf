@@ -1,0 +1,54 @@
+## @file
+# Bootloader Support DXE Module
+#
+# Report some MMIO/IO resources to dxe core, extract smbios and acpi tables
+#
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TcgSupportDxe
+  FILE_GUID                      = E0E7E6A4-DD57-11ED-B5EA-0242AC120002
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TcgSupportEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  TcgSupportDxe.c
+  TcgSupportDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  BaseMemoryLib
+  UefiLib
+  IoLib
+  HobLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                                     ## CONSUMES
+  gEfiMmCommunicationProtocolGuid                               ## CONSUMES
+  gEfiAcpiSdtProtocolGuid                                       ## CONSUMES
+
+[Guids]
+  gEfiAcpiTableGuid
+
+[Depex]
+  gEfiAcpiTableProtocolGuid
