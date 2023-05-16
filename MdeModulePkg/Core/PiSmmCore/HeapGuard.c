@@ -553,9 +553,23 @@ UnsetGuardPage (
                                          mSmmMemoryAttribute,
                                          BaseAddress,
                                          EFI_PAGE_SIZE,
-                                         EFI_MEMORY_RP
+                                         EFI_MEMORY_RP|EFI_MEMORY_RO|EFI_MEMORY_XP
                                          );
     ASSERT_EFI_ERROR (Status);
+
+    if (gST == NULL) {
+      //
+      // Make sure EfiConventionalMemory is NX after SmmReadyToLock
+      //
+      Status = mSmmMemoryAttribute->SetMemoryAttributes (
+                                      mSmmMemoryAttribute,
+                                      BaseAddress,
+                                      EFI_PAGE_SIZE,
+                                      EFI_MEMORY_XP
+                                      );
+      ASSERT_EFI_ERROR (Status);
+    }
+
     mOnGuarding = FALSE;
   }
 }
