@@ -3,6 +3,7 @@
     Usb Bus Driver Binding and Bus IO Protocol.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -821,6 +822,7 @@ UsbIoPortReset (
   EFI_TPL        OldTpl;
   EFI_STATUS     Status;
   UINT8          DevAddress;
+  UINT8          Config;
 
   OldTpl = gBS->RaiseTPL (USB_BUS_TPL);
 
@@ -882,8 +884,26 @@ UsbIoPortReset (
   // is in CONFIGURED state.
   //
   if (Dev->ActiveConfig != NULL) {
-    Status = UsbSetConfig (Dev, Dev->ActiveConfig->Desc.ConfigurationValue);
+    UsbFreeDevDesc (Dev->DevDesc);
 
+    Status = UsbRemoveConfig (Dev);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "UsbIoPortReset: Failed to remove configuration - %r\n", Status));
+    }
+
+    Status = UsbGetMaxPacketSize0 (Dev);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "UsbIoPortReset: Failed to get max packet size - %r\n", Status));
+    }
+
+    Status = UsbBuildDescTable (Dev);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "UsbIoPortReset: Failed to build descriptor table - %r\n", Status));
+    }
+
+    Config = Dev->DevDesc->Configs[0]->Desc.ConfigurationValue;
+
+    Status = UsbSetConfig (Dev, Config);
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
@@ -891,6 +911,11 @@ UsbIoPortReset (
         Dev->Address,
         Status
         ));
+    }
+
+    Status = UsbSelectConfig (Dev, Config);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "UsbIoPortReset: Failed to set configuration - %r\n", Status));
     }
   }
 
