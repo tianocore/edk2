@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2021, Arm Limited. All rights reserved.
+*  Copyright (c) 2011-2023, Arm Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -148,7 +148,9 @@ ArmGicSendSgiTo (
 {
   MmioWrite32 (
     GicDistributorBase + ARM_GIC_ICDSGIR,
-    ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16) | SgiId
+    ((TargetListFilter & 0x3) << 24) |
+    ((CPUTargetList & 0xFF) << 16)   |
+    (SgiId & 0xF)
     );
 }
 
