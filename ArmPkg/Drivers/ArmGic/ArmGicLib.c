@@ -148,7 +148,9 @@ ArmGicSendSgiTo (
 {
   MmioWrite32 (
     GicDistributorBase + ARM_GIC_ICDSGIR,
-    ((TargetListFilter & 0x3) << 24) | ((CPUTargetList & 0xFF) << 16) | SgiId
+    ((TargetListFilter & 0x3) << 24) |
+    ((CPUTargetList & 0xFF) << 16)   |
+    (SgiId & 0xF)
     );
 }
 
