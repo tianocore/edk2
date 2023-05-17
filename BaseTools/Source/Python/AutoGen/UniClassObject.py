@@ -20,6 +20,8 @@ from Common.StringUtils import GetLineNo
 from Common.Misc import PathClass
 from Common.LongFilePathSupport import LongFilePath
 from Common.GlobalData import *
+import json
+import argparse
 ##
 # Static definitions
 #
@@ -221,8 +223,10 @@ class UniFileClassObject(object):
         self.FileList = FileList
         self.Token = 2
         self.LanguageDef = []                   #[ [u'LanguageIdentifier', u'PrintableName'], ... ]
+        self.LanguageDefDict = {}
         self.OrderedStringList = {}             #{ u'LanguageIdentifier' : [StringDefClassObject]  }
         self.OrderedStringDict = {}             #{ u'LanguageIdentifier' : {StringName:(IndexInList)}  }
+        self.OrderedStringTestDict = {}
         self.OrderedStringListByToken = {}      #{ u'LanguageIdentifier' : {Token: StringDefClassObject} }
         self.IsCompatibleMode = IsCompatibleMode
         self.IncludePathList = IncludePathList
@@ -256,6 +260,7 @@ class UniFileClassObject(object):
 
         if not IsLangInDef:
             self.LanguageDef.append([LangName, LangPrintName])
+            self.LanguageDefDict[LangName] = LangPrintName
 
         #
         # Add language string
@@ -278,6 +283,7 @@ class UniFileClassObject(object):
                         OtherLang = FirstLangName
                     self.OrderedStringList[LangName].append (StringDefClassObject(Item.StringName, '', Item.Referenced, Item.Token, OtherLang))
                     self.OrderedStringDict[LangName][Item.StringName] = len(self.OrderedStringList[LangName]) - 1
+                    self.OrderedStringTestDict[LangName][Item.StringName] = Item.Value
         return True
 
     @staticmethod
@@ -555,6 +561,7 @@ class UniFileClassObject(object):
         if Language not in self.OrderedStringList:
             self.OrderedStringList[Language] = []
             self.OrderedStringDict[Language] = {}
+            self.OrderedStringTestDict[Language] = {}
 
         IsAdded = True
         if Name in self.OrderedStringDict[Language]:
@@ -570,6 +577,7 @@ class UniFileClassObject(object):
             if Index == -1:
                 self.OrderedStringList[Language].append(StringDefClassObject(Name, Value, Referenced, Token, UseOtherLangDef))
                 self.OrderedStringDict[Language][Name] = Token
+                self.OrderedStringTestDict[Language][Name] = Value
                 for LangName in self.LanguageDef:
                     #
                     # New STRING token will be added into all language string lists.
@@ -582,9 +590,11 @@ class UniFileClassObject(object):
                             OtherLangDef = Language
                         self.OrderedStringList[LangName[0]].append(StringDefClassObject(Name, '', Referenced, Token, OtherLangDef))
                         self.OrderedStringDict[LangName[0]][Name] = len(self.OrderedStringList[LangName[0]]) - 1
+                        self.OrderedStringTestDict[Language][Name] = Value
             else:
                 self.OrderedStringList[Language].insert(Index, StringDefClassObject(Name, Value, Referenced, Token, UseOtherLangDef))
                 self.OrderedStringDict[Language][Name] = Index
+                self.OrderedStringTestDict[Language][Name] = Value
 
     #
     # Set the string as referenced
@@ -665,9 +675,12 @@ class UniFileClassObject(object):
     #
     # Show the instance itself
     #
-    def ShowMe(self):
-        print(self.LanguageDef)
-        #print self.OrderedStringList
+    def ShowMe(self, outputdictfile):
+        with open(outputdictfile, 'w') as outputfile:
+            outputdict = {}
+            outputdict['LanguageDef'] = self.LanguageDef
+            outputdict['UniString'] = self.OrderedStringTestDict
+            json.dump(outputdict, outputfile, indent=4)
         for Item in self.OrderedStringList:
             print(Item)
             for Member in self.OrderedStringList[Item]:
