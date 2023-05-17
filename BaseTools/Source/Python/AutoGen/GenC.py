@@ -1704,6 +1704,7 @@ def CreateUnicodeStringCode(Info, AutoGenC, AutoGenH, UniGenCFlag, UniGenBinBuff
     else:
         FilterInfo = [EDK2Module] + [Info.PlatformInfo.Platform.ISOLanguages]
     Header, Code = GetStringFiles(Info.UnicodeFileList, SrcList, IncList, Info.IncludePathList, ['.uni', '.inf'], Info.Name, CompatibleMode, ShellMode, UniGenCFlag, UniGenBinBuffer, FilterInfo)
+    GetUniJsonFiles(Info)
     if CompatibleMode or UniGenCFlag:
         AutoGenC.Append("\n//\n//Unicode String Pack Definition\n//\n")
         AutoGenC.Append(Code)

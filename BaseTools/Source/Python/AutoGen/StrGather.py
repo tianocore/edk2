@@ -571,6 +571,13 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, Ski
 
     return HFile, CFile
 
+def GetUniJsonFiles(Info):
+    for UniFile in Info.UnicodeFileList:
+        OutputJsonFile = os.path.join(Info.OutputDir, Info.Name+'Uni.json')
+        CurUni = UniFileClassObject([PathClass(UniFile)])
+        CurUni.ReToken()
+        CurUni.ShowMe(OutputJsonFile)
+
 #
 # Write an item
 #
