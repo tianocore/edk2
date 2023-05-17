@@ -33,14 +33,14 @@ class YamlTree():
         self.GuidID = self.YamlDict['formset']['guid']
         # Tranfer Strings into Specfic Values by PreprocessDB
         self.PreProcessYamlDict(self.YamlDict)
-        try:
-            FileName =  self.Options.ProcessedYAMLFileName
-            f = open(FileName, 'w')
-            f.write(yaml.dump(self.YamlDict, allow_unicode=True, default_flow_style=False))
-            f.close()
-        except:
-            EdkLogger.error('VfrCompiler', FILE_CREATE_FAILURE,
-                            'File create failed for %s' % FileName, None)
+        # try:
+        #     FileName =  self.Options.ProcessedYAMLFileName
+        #     f = open(FileName, 'w')
+        #     f.write(yaml.dump(self.YamlDict, allow_unicode=True, default_flow_style=False))
+        #     f.close()
+        # except:
+        #     EdkLogger.error('VfrCompiler', FILE_CREATE_FAILURE,
+        #                     'File create failed for %s' % FileName, None)
 
 
     def Compile(self):
@@ -252,6 +252,7 @@ class YamlParser():
         Formset = self.YamlDict['formset']
 
         ClassGuidNum = 0
+        GuidList = []
         if 'classguid' in Formset.keys():
             GuidList = self._ToList(Formset['classguid'])
             ClassGuidNum = len(GuidList)

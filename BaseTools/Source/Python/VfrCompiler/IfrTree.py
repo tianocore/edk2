@@ -302,9 +302,7 @@ class IfrTree():
 
 
     def GenRecordListFile(self):
-        # FileName = self.Options.RecordListFileName
-        FileName = 'test.lst'
-
+        FileName = self.Options.RecordListFileName
         RecordLines = []
         self._GenRecordListFileDfs(self.Root, RecordLines)
 

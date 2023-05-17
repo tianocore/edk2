@@ -213,11 +213,11 @@ class PreProcessDB():
         DisPlayUniDict = {} # {String Token : DisPlay String}
         if self.Options.LanuchYamlCompiler:
             if self.Options.UniStrDisplayFile == None:
-                self.Options.UniStrDisplayFile = self.Options.OutputDirectory + self.Options.BaseFileName + 'Uni.json'
+                self.Options.UniStrDisplayFile = self.Options.OutputDirectory + self.Options.ModuleName + 'Uni.json'
             f = open(self.Options.UniStrDisplayFile, encoding='utf-8')
             Dict = json.load(f)
             f.close()
-            Dict = Dict[1]["en-US"]
+            Dict = Dict["UniString"]["en-US"]
             for Key in Dict.keys():
                 if Key in UniDict.keys():
                     NewKey = '{}'.format('0x%04x' % (int(UniDict[Key],0)))

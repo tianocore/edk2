@@ -272,13 +272,21 @@ class CmdParser():
     def SetPkgOutputFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.PkgOutputFileName = self.Options.DebugDirectory + self.Options.BaseFileName + "_py" + VFR_PACKAGE_FILENAME_EXTENSION
+        if self.Options.LanuchVfrCompiler:
+            self.Options.PkgOutputFileName = self.Options.OutputDirectory + 'PyVfr_' + self.Options.BaseFileName  + VFR_PACKAGE_FILENAME_EXTENSION
+        else:
+            self.Options.PkgOutputFileName = self.Options.OutputDirectory + 'PyYml_' + self.Options.BaseFileName + VFR_PACKAGE_FILENAME_EXTENSION
+
         return 0
 
     def SetCOutputFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.COutputFileName = self.Options.DebugDirectory + self.Options.BaseFileName  + "_py" + ".c"
+        if self.Options.LanuchVfrCompiler:
+            self.Options.COutputFileName = self.Options.DebugDirectory + 'PyVfr_' + self.Options.BaseFileName  + ".c"
+        else:
+            self.Options.COutputFileName = self.Options.DebugDirectory + 'PyYml_' + self.Options.BaseFileName  + ".c"
+
         return 0
 
     def SetPreprocessorOutputFileName(self):
@@ -291,7 +299,10 @@ class CmdParser():
     def SetRecordListFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.RecordListFileName = self.Options.DebugDirectory + self.Options.BaseFileName + "_py" + VFR_RECORDLIST_FILENAME_EXTENSION
+        if self.Options.LanuchVfrCompiler:
+            self.Options.RecordListFileName = self.Options.DebugDirectory + 'PyVfr_' + self.Options.BaseFileName + VFR_RECORDLIST_FILENAME_EXTENSION
+        else:
+            self.Options.RecordListFileName = self.Options.DebugDirectory + 'PyYml_' + self.Options.BaseFileName + VFR_RECORDLIST_FILENAME_EXTENSION
         return 0
 
     def SetSourceYamlFileName(self):
@@ -502,7 +513,7 @@ class VfrCompiler():
             self.VfrTree.GenBinaryFiles()
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED)
 
-    def DumpYaml(self):
+    def DumpSourceYaml(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_VFR_COMPILEED) and not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FINISHED):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)
@@ -528,7 +539,7 @@ def main():
         Compiler.PreProcess()
         Compiler.Compile()
         Compiler.GenBinaryFiles()
-        Compiler.DumpYaml()
+        Compiler.DumpSourceYaml()
 
     if Cmd.Options.LanuchYamlCompiler:
         Compiler = YamlCompiler(Cmd)
