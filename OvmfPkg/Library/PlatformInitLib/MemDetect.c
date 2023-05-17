@@ -663,6 +663,11 @@ PlatformAddressWidthFromCpuid (
       PhysBits = 40;
     }
 
+    if (!FixedPcdGetBool (PcdUse1GPageTable) && (PhysBits > 40)) {
+      DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 40 (PcdUse1GPageTable is false)\n", __func__));
+      PhysBits = 40;
+    }
+
     PlatformInfoHob->PhysMemAddressWidth = PhysBits;
     PlatformInfoHob->FirstNonAddress     = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
   }
