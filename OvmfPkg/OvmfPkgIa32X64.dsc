@@ -557,6 +557,9 @@
   # never lets the RAM below 4 GB exceed 2816 MB.
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
 
+  # use 1G pages
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
+
 !if $(SOURCE_DEBUG_ENABLE) == TRUE
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|0x2
 !endif
