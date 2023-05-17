@@ -43,7 +43,10 @@
 
   Ia32/MathLShiftS64.nasm   | GCC
   Ia32/MathRShiftU64.nasm   | GCC
-
+  Ia32/MathDivModU64x64.c   | GCC
+  Ia32/MathDivS64x64.c      | GCC
+  Ia32/MathDivU64x64.c      | GCC
+  Ia32/MathModU64x64.c      | GCC
 [Sources.X64]
   CopyMem.c
 [Sources.RISCV64]
