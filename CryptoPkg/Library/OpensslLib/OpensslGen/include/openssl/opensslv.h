@@ -11,12 +11,12 @@
  */
 
 #ifndef OPENSSL_OPENSSLV_H
-# define OPENSSL_OPENSSLV_H
-# pragma once
+#define OPENSSL_OPENSSLV_H
+#pragma once
 
-# ifdef  __cplusplus
+#ifdef  __cplusplus
 extern "C" {
-# endif
+#endif
 
 /*
  * SECTION 1: VERSION DATA.  These will change for each release
@@ -27,9 +27,9 @@ extern "C" {
  *
  * These macros express version number MAJOR.MINOR.PATCH exactly
  */
-# define OPENSSL_VERSION_MAJOR  3
-# define OPENSSL_VERSION_MINOR  0
-# define OPENSSL_VERSION_PATCH  8
+#define OPENSSL_VERSION_MAJOR  3
+#define OPENSSL_VERSION_MINOR  0
+#define OPENSSL_VERSION_PATCH  8
 
 /*
  * Additional version information
@@ -39,10 +39,10 @@ extern "C" {
  */
 
 /* Could be: #define OPENSSL_VERSION_PRE_RELEASE "-alpha.1" */
-# define OPENSSL_VERSION_PRE_RELEASE ""
+#define OPENSSL_VERSION_PRE_RELEASE  ""
 /* Could be: #define OPENSSL_VERSION_BUILD_METADATA "+fips" */
 /* Could be: #define OPENSSL_VERSION_BUILD_METADATA "+vendor.1" */
-# define OPENSSL_VERSION_BUILD_METADATA ""
+#define OPENSSL_VERSION_BUILD_METADATA  ""
 
 /*
  * Note: The OpenSSL Project will never define OPENSSL_VERSION_BUILD_METADATA
@@ -57,14 +57,14 @@ extern "C" {
  * be related to the API version expressed with the macros above.
  * This is defined in free form.
  */
-# define OPENSSL_SHLIB_VERSION 3
+#define OPENSSL_SHLIB_VERSION  3
 
 /*
  * SECTION 2: USEFUL MACROS
  */
 
 /* For checking general API compatibility when preprocessing */
-# define OPENSSL_VERSION_PREREQ(maj,min)                                \
+#define OPENSSL_VERSION_PREREQ(maj, min)                                \
     ((OPENSSL_VERSION_MAJOR << 16) + OPENSSL_VERSION_MINOR >= ((maj) << 16) + (min))
 
 /*
@@ -74,41 +74,41 @@ extern "C" {
  * longer variant with OPENSSL_VERSION_PRE_RELEASE_STR and
  * OPENSSL_VERSION_BUILD_METADATA_STR appended.
  */
-# define OPENSSL_VERSION_STR "3.0.8"
-# define OPENSSL_FULL_VERSION_STR "3.0.8"
+#define OPENSSL_VERSION_STR       "3.0.8"
+#define OPENSSL_FULL_VERSION_STR  "3.0.8"
 
 /*
  * SECTION 3: ADDITIONAL METADATA
  *
  * These strings are defined separately to allow them to be parsable.
  */
-# define OPENSSL_RELEASE_DATE "7 Feb 2023"
+#define OPENSSL_RELEASE_DATE  "7 Feb 2023"
 
 /*
  * SECTION 4: BACKWARD COMPATIBILITY
  */
 
-# define OPENSSL_VERSION_TEXT "OpenSSL 3.0.8 7 Feb 2023"
+#define OPENSSL_VERSION_TEXT  "OpenSSL 3.0.8 7 Feb 2023"
 
 /* Synthesize OPENSSL_VERSION_NUMBER with the layout 0xMNN00PPSL */
-# ifdef OPENSSL_VERSION_PRE_RELEASE
-#  define _OPENSSL_VERSION_PRE_RELEASE 0x0L
-# else
-#  define _OPENSSL_VERSION_PRE_RELEASE 0xfL
-# endif
-# define OPENSSL_VERSION_NUMBER          \
+#ifdef OPENSSL_VERSION_PRE_RELEASE
+#define _OPENSSL_VERSION_PRE_RELEASE  0x0L
+#else
+#define _OPENSSL_VERSION_PRE_RELEASE  0xfL
+#endif
+#define OPENSSL_VERSION_NUMBER           \
     ( (OPENSSL_VERSION_MAJOR<<28)        \
       |(OPENSSL_VERSION_MINOR<<20)       \
       |(OPENSSL_VERSION_PATCH<<4)        \
       |_OPENSSL_VERSION_PRE_RELEASE )
 
-# ifdef  __cplusplus
+#ifdef  __cplusplus
 }
-# endif
+#endif
 
-# include <openssl/macros.h>
-# ifndef OPENSSL_NO_DEPRECATED_3_0
-#  define HEADER_OPENSSLV_H
-# endif
+#include <openssl/macros.h>
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#define HEADER_OPENSSLV_H
+#endif
 
-#endif                          /* OPENSSL_OPENSSLV_H */
+#endif /* OPENSSL_OPENSSLV_H */
