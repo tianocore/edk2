@@ -228,13 +228,13 @@ ArmGicSetInterruptPriority (
   )
 {
   UINT32                 RegOffset;
-  UINTN                  RegShift;
+  UINT8                  RegShift;
   ARM_GIC_ARCH_REVISION  Revision;
   UINTN                  GicCpuRedistributorBase;
 
   // Calculate register offset and bit position
-  RegOffset = Source / 4;
-  RegShift  = (Source % 4) * 8;
+  RegOffset = (UINT32)(Source / 4);
+  RegShift  = (UINT8)((Source % 4) * 8);
 
   Revision = ArmGicGetSupportedArchRevision ();
   if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
@@ -272,13 +272,13 @@ ArmGicEnableInterrupt (
   )
 {
   UINT32                 RegOffset;
-  UINTN                  RegShift;
+  UINT8                  RegShift;
   ARM_GIC_ARCH_REVISION  Revision;
   UINTN                  GicCpuRedistributorBase;
 
   // Calculate enable register offset and bit position
-  RegOffset = Source / 32;
-  RegShift  = Source % 32;
+  RegOffset = (UINT32)(Source / 32);
+  RegShift  = (UINT8)(Source % 32);
 
   Revision = ArmGicGetSupportedArchRevision ();
   if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
@@ -317,13 +317,13 @@ ArmGicDisableInterrupt (
   )
 {
   UINT32                 RegOffset;
-  UINTN                  RegShift;
+  UINT8                  RegShift;
   ARM_GIC_ARCH_REVISION  Revision;
   UINTN                  GicCpuRedistributorBase;
 
   // Calculate enable register offset and bit position
-  RegOffset = Source / 32;
-  RegShift  = Source % 32;
+  RegOffset = (UINT32)(Source / 32);
+  RegShift  = (UINT8)(Source % 32);
 
   Revision = ArmGicGetSupportedArchRevision ();
   if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
@@ -361,14 +361,14 @@ ArmGicIsInterruptEnabled (
   )
 {
   UINT32                 RegOffset;
-  UINTN                  RegShift;
+  UINT8                  RegShift;
   ARM_GIC_ARCH_REVISION  Revision;
   UINTN                  GicCpuRedistributorBase;
   UINT32                 Interrupts;
 
   // Calculate enable register offset and bit position
-  RegOffset = Source / 32;
-  RegShift  = Source % 32;
+  RegOffset = (UINT32)(Source / 32);
+  RegShift  = (UINT8)(Source % 32);
 
   Revision = ArmGicGetSupportedArchRevision ();
   if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
