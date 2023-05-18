@@ -2,7 +2,7 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2021, Arm Ltd. All rights reserved.<BR>
+Portions copyright (c) 2011-2023, Arm Ltd. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -393,7 +393,7 @@ GicV2DxeInitialize (
   EFI_STATUS  Status;
   UINTN       Index;
   UINT32      RegOffset;
-  UINTN       RegShift;
+  UINT8       RegShift;
   UINT32      CpuTarget;
 
   // Make sure the Interrupt Controller Protocol is not already installed in
@@ -408,8 +408,8 @@ GicV2DxeInitialize (
     GicV2DisableInterruptSource (&gHardwareInterruptV2Protocol, Index);
 
     // Set Priority
-    RegOffset = Index / 4;
-    RegShift  = (Index % 4) * 8;
+    RegOffset = (UINT32)(Index / 4);
+    RegShift  = (UINT8)((Index % 4) * 8);
     MmioAndThenOr32 (
       mGicDistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
       ~(0xff << RegShift),
