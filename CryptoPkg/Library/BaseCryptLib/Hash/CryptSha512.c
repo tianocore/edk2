@@ -24,6 +24,7 @@ Sha384GetContextSize (
   //
   // Retrieves OpenSSL SHA-384 Context Size
   //
+  DEBUG ((DEBUG_INFO, "Trying to trigger CryptoPkg CI here."));
   return (UINTN)(sizeof (SHA512_CTX));
 }
 
