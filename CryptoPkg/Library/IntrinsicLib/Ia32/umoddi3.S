@@ -19,6 +19,8 @@
 #   Divides a 64-bit unsigned value by another 64-bit unsigned value and returns
 #   the 64-bit unsigned remainder
 #
+#       Copyright (c) Microsoft Corporation. All rights reserved.
+#       SPDX-License-Identifier: BSD-2-Clause-Patent
 #------------------------------------------------------------------------------
 
     .686:
