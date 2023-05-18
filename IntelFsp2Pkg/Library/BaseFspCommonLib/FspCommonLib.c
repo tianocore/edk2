@@ -377,7 +377,8 @@ GetFspSiliconInitUpdDataPointer (
 
   @param[in] Id       Measurement point ID.
 
-  @return performance timestamp.
+  @return performance timestamp if current PerfIdx is valid,
+          else return 0 as invalid performance timestamp
 **/
 UINT64
 EFIAPI
@@ -395,9 +396,10 @@ SetFspMeasurePoint (
   if (FspData->PerfIdx < sizeof (FspData->PerfData) / sizeof (FspData->PerfData[0])) {
     FspData->PerfData[FspData->PerfIdx]                  = AsmReadTsc ();
     ((UINT8 *)(&FspData->PerfData[FspData->PerfIdx]))[7] = Id;
+    return FspData->PerfData[(FspData->PerfIdx)++];
   }
 
-  return FspData->PerfData[(FspData->PerfIdx)++];
+  return 0;
 }
 
 /**
