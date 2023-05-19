@@ -13,6 +13,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Module Globals
 //
 LOADED_IMAGE_PRIVATE_DATA  *mCurrentImage = NULL;
+EFI_DEVICE_PATH_PROTOCOL *gFilePathCache = NULL;
+EFI_DEVICE_PATH_PROTOCOL *gOutgoingDevicePathCache = NULL;
+EFI_HANDLE                gDeviceHandleCache = NULL;
 
 typedef struct {
   LIST_ENTRY                              Link;
@@ -1220,6 +1223,9 @@ CoreLoadImageCommon (
     Status = CoreLocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid, &HandleFilePath, &DeviceHandle);
     if (!EFI_ERROR (Status)) {
       ImageIsFromFv = TRUE;
+      gFilePathCache = FilePath;
+      gOutgoingDevicePathCache = HandleFilePath;
+      gDeviceHandleCache = DeviceHandle;
     } else {
       HandleFilePath = FilePath;
       Status         = CoreLocateDevicePath (&gEfiSimpleFileSystemProtocolGuid, &HandleFilePath, &DeviceHandle);
@@ -1496,6 +1502,11 @@ Done:
   if (Image != NULL) {
     Image->LoadImageStatus = Status;
   }
+
+  // Clear cache
+  gFilePathCache = NULL;
+  gOutgoingDevicePathCache = NULL;
+  gDeviceHandleCache = NULL;
 
   return Status;
 }
