@@ -6,6 +6,7 @@ from VfrError import *
 from IfrPreProcess import *
 import re
 
+
 class YamlTree():
     def __init__(self, Root: IfrTreeNode, PreProcessDB: PreProcessDB, Options: Options):
         self.Options = Options
@@ -14,6 +15,7 @@ class YamlTree():
         self.IfrTree = IfrTree(Root, PreProcessDB, Options)
         self.Modifier = DLTParser(Root)
         self.YamlDict = None
+        self.Lines = []
         self.Visitor = None
         self.Parser = None
         self.GuidID = None
@@ -22,15 +24,19 @@ class YamlTree():
     def PreProcess(self):
         try:
             FileName = self.Options.YamlFileName
-            f = open(FileName, 'r')
+            File = open(FileName, 'r')
             #self.YamlDict = yaml.load(f.read(), Loader=yaml.FullLoader)
-            self.YamlDict = yaml.safe_load(f)
-            f.close()
+            self.YamlDict = yaml.safe_load(File)
+            File.seek(0)
+            self.Lines = File.readlines()
+            File.close()
         except:
-            EdkLogger.error('VfrCompiler', FILE_OPEN_FAILURE,
-                            'File open failed for %s' % FileName, None)
+            EdkLogger.error('VfrCompiler', FILE_READ_FAILURE,
+                            'File read failed for %s' % FileName, None)
         # Get Yaml GuidId
         self.GuidID = self.YamlDict['formset']['guid']
+        if 'defines' in self.YamlDict.keys():
+            self.PreProcessDB.VfrDict = self.YamlDict['defines']
         # Tranfer Strings into Specfic Values by PreprocessDB
         self.PreProcessYamlDict(self.YamlDict)
         # try:
@@ -41,7 +47,6 @@ class YamlTree():
         # except:
         #     EdkLogger.error('VfrCompiler', FILE_CREATE_FAILURE,
         #                     'File create failed for %s' % FileName, None)
-
 
     def Compile(self):
         gVfrVarDataTypeDB.Clear()
@@ -137,16 +142,16 @@ class YamlTree():
                 Start = Value.find('(') + 1
                 End = Value.find(')')
                 if Value[Start:End] in self.PreProcessDB.UniDict.keys():
-                    YamlDict[Key] = self.PreProcessDB.TransValue(self.PreProcessDB.UniDict[Value[Start:End]])
+                    YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.UniDict[Value[Start:End]]))
                     #YamlDict[Key] = 'STRING_TOKEN' + '(' +  self.PreProcessDB.UniDict[Value[Start:End]] + ')'
                 # get {key:value} dicts from header files
                 elif Value in self.PreProcessDB.HeaderDict.keys():
                     if Key == 'formid':
-                        YamlDict[Key] = [Value, self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value])]
+                        YamlDict[Key] = ValueDB(Value, [Value, self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value])])
                     else:
-                        YamlDict[Key] = self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value])
+                        YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value]))
                 elif Value in self.PreProcessDB.VfrDict.keys():
-                    YamlDict[Key] = self.PreProcessDB.TransValue(self.PreProcessDB.VfrDict[Value])
+                    YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.VfrDict[Value]))
                 elif '|' in Value:
                     Items = Value.split('|')
                     ValueList = []
@@ -158,8 +163,13 @@ class YamlTree():
                             ValueList.append(self.PreProcessDB.TransValue(Items[i].strip()))
                         else:
                             ValueList.append(Items[i].strip())
+                    YamlDict[Key] = ValueDB(Value, ValueList)
+                else:
+                    YamlDict[Key] = ValueDB(Value, Value)
+            else:
+                YamlDict[Key] = ValueDB(Value, Value)
 
-                    YamlDict[Key] = ValueList
+
         return
 
 QuestionheaderFlagsField = ['READ_ONLY', 'INTERACTIVE', 'RESET_REQUIRED', 'REST_STYLE', 'RECONNECT_REQUIRED', 'OPTIONS_ONLY', 'NV_ACCESS', 'LATE_CHECK']
@@ -203,8 +213,8 @@ class YamlParser():
 
     # parse and collect data structures info in the ExpandedHeader.i files
     def ParseVfrHeader(self):
-        # call C preprocessor
-        #wip
+        # call C preprocessor, need to modify in the future
+        # wip
         try:
             InputStream = FileStream(self.Options.ProcessedVfrFileName) ###
             VfrLexer = SourceVfrSyntaxLexer(InputStream)
@@ -216,14 +226,14 @@ class YamlParser():
 
         self.Visitor = SourceVfrSyntaxVisitor(None, self.Options.OverrideClassGuid)
         self.Visitor.visit(self.VfrParser.vfrHeader())
-        FileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Header.txt'
-        try:
-            f = open(FileName, 'w')
-            gVfrVarDataTypeDB.Dump(f)
-            f.close()
-        except:
-            EdkLogger.error('VfrCompiler', FILE_OPEN_FAILURE,
-                            'File open failed for %s' % FileName, None)
+        # FileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Header.txt'
+        # try:
+        #     f = open(FileName, 'w')
+        #     gVfrVarDataTypeDB.Dump(f)
+        #     f.close()
+        # except:
+        #     EdkLogger.error('VfrCompiler', FILE_OPEN_FAILURE,
+        #                     'File open failed for %s' % FileName, None)
 
     def _DeclareStandardDefaultStorage(self):
 
@@ -246,22 +256,26 @@ class YamlParser():
         else:
             return [Value]
 
+    def _GetLineNumber(self, Target):
+        for Line_Num, Line in enumerate(self.Lines, start=1):
+            if Target in Line:
+                return Line_Num
+        return None
+
     # parse Formset Definition
     def ParseVfrFormSetDefinition(self):
 
         Formset = self.YamlDict['formset']
-
         ClassGuidNum = 0
         GuidList = []
         if 'classguid' in Formset.keys():
-            GuidList = self._ToList(Formset['classguid'])
+            GuidList = self._ToList(Formset['classguid'].PostVal)
             ClassGuidNum = len(GuidList)
 
         DefaultClassGuid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID
 
         if (self.Options.OverrideClassGuid != None and ClassGuidNum >= 4):
-            pass
-            #self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, None, 'Already has 4 class guids, can not add extra class guid!')
+            self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'Already has 4 class guids, can not add extra class guid!')
 
         if ClassGuidNum == 0:
             if self.Options.OverrideClassGuid != None:
@@ -309,10 +323,9 @@ class YamlParser():
             FSObj.SetClassGuid(GuidList[2])
             FSObj.SetClassGuid(GuidList[3])
 
-        #FSObj.SetLineN)
-        FSObj.SetGuid(Formset['guid'])
-        FSObj.SetFormSetTitle(Formset['title'])
-        FSObj.SetHelp(Formset['help'])
+        FSObj.SetGuid(Formset['guid'].PostVal)
+        FSObj.SetFormSetTitle(Formset['title'].PostVal)
+        FSObj.SetHelp(Formset['help'].PostVal)
 
         Node = IfrTreeNode(EFI_IFR_FORM_SET_OP, FSObj, gFormPkg.StructToStream(FSObj.GetInfo()), '')
 
@@ -325,10 +338,10 @@ class YamlParser():
         self.Root.insertChild(Node)
 
         if 'class' in Formset.keys():
-            self.ParseClassDefinition(self._ToList(Formset['class']), Node)
+            self.ParseClassDefinition(self._ToList(Formset['class'].PostVal), Node)
 
         if 'subclass' in Formset.keys():
-            self.ParseSubClassDefinition(Formset['subclass'], Node)
+            self.ParseSubClassDefinition(Formset['subclass'].PostVal, Node)
 
         DsNode, DsNodeMF = self._DeclareStandardDefaultStorage()
         Node.insertChild(DsNode)
@@ -430,8 +443,8 @@ class YamlParser():
         DIObj = IfrDisableIf()
         Node = IfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(DisableIf['expression'], Node)
-        Node.Expression = DisableIf['expression']
+        self.ParserVfrStatementExpression(DisableIf['expression'].PostVal, Node)
+        Node.Expression = DisableIf['expression'].PostVal
         Node.Condition = 'disableif ' + Node.Expression
         if 'component' in DisableIf.keys():
             self._ParseVfrFormSetComponent(DisableIf['component'], Node)
@@ -441,8 +454,8 @@ class YamlParser():
         SIObj = IfrSuppressIf()
         Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(SuppressIf['expression'], Node)
-        Node.Expression = SuppressIf['expression']
+        self.ParserVfrStatementExpression(SuppressIf['expression'].PostVal, Node)
+        Node.Expression = SuppressIf['expression'].PostVal
         Node.Condition = 'suppressif ' + Node.Expression
         if 'component' in SuppressIf.keys():
             self._ParseVfrFormSetComponent(SuppressIf['component'], Node)
@@ -456,13 +469,14 @@ class YamlParser():
         Visitor.visit(VfrParser.vfrStatementExpression(ParentNode))
 
     def ParseVfrStatementDefaultStore(self, DefaultStore, ParentNode):
-        RefName = DefaultStore['type']
+        RefName = DefaultStore['type'].PostVal
         DSObj = IfrDefaultStore(RefName)
-        DefaultStoreNameId = DefaultStore['prompt']
+        DefaultStoreNameId = DefaultStore['prompt'].PostVal
         DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD
         if 'attribute' in DefaultStore.keys():
-            DefaultId = DefaultStore['attribute']
+            DefaultId = DefaultStore['attribute'].PostVal
         if gVfrDefaultStore.DefaultIdRegistered(DefaultId) == False:
+            # f'" wrong value comes from Opcode defaultstore with value {DefaultStore['attribute'].PreVal}"
             self.ErrorHandler(gVfrDefaultStore.RegisterDefaultStore(DSObj.DefaultStore, RefName, DefaultStoreNameId, DefaultId))
             DSObj.SetDefaultName(DefaultStoreNameId)
             DSObj.SetDefaultId (DefaultId)
@@ -470,13 +484,13 @@ class YamlParser():
             ParentNode.insertChild(Node)
         else:
             pNode, ReturnCode = gVfrDefaultStore.ReRegisterDefaultStoreById(DefaultId, RefName, DefaultStoreNameId)
-            self.ErrorHandler(ReturnCode)
+            self.ErrorHandler(ReturnCode, f"{DefaultStore['attribute'].PreVal}")
             #ctx.Node.OpCode = EFI_IFR_SHOWN_DEFAULTSTORE_OP # For display in YAML
             #ctx.Node.Data = DSObj
 
 
     def ParseVfrStatementVarStoreLinear(self, VarStore, ParentNode):
-        TypeName = VarStore['type']
+        TypeName = VarStore['type'].PostVal
         if TypeName == 'CHAR16':
             TypeName = 'UINT16'
 
@@ -486,11 +500,11 @@ class YamlParser():
 
         VarStoreId = EFI_VARSTORE_ID_INVALID
         if 'varid' in VarStore.keys():
-            VarStoreId = VarStore['varid']
+            VarStoreId = VarStore['varid'].PostVal
             #self.CompareErrorHandler(VarStoreId!=0, True, Tok.line, Tok.text, 'varid 0 is not allowed.')
-        StoreName = VarStore['name']
+        StoreName = VarStore['name'].PostVal
         VSObj = IfrVarStore(TypeName, StoreName)
-        Guid = VarStore['guid']
+        Guid = VarStore['guid'].PostVal
         self.ErrorHandler(gVfrDataStorage.DeclareBufferVarStore(StoreName, Guid, gVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore))
         VSObj.SetGuid(Guid)
         VarStoreId, ReturnCode = gVfrDataStorage.GetVarStoreId(StoreName, Guid)
@@ -512,7 +526,7 @@ class YamlParser():
         IsUEFI23EfiVarstore = True
         ReturnCode = None
 
-        TypeName = VarstoreEfi['type']
+        TypeName = VarstoreEfi['type'].PostVal
         if TypeName == 'CHAR16':
             TypeName = 'UINT16'
 
@@ -520,10 +534,10 @@ class YamlParser():
             IsBitVarStore = gVfrVarDataTypeDB.DataTypeHasBitField(TypeName)
             CustomizedName = True
         if 'varid' in VarstoreEfi.keys():
-            VarStoreId = VarstoreEfi['varid']
+            VarStoreId = VarstoreEfi['varid'].PostVal
             #self.CompareErrorHandler(VarStoreId!=0, True, ctx.ID.line, ctx.ID.text, 'varid 0 is not allowed.')
-        StoreName = VarstoreEfi['name']
-        Guid = VarstoreEfi['guid']
+        StoreName = VarstoreEfi['name'].PostVal
+        Guid = VarstoreEfi['guid'].PostVal
         Attributes = self._ParseVarstoreEfiAttr(VarstoreEfi)
         self.ErrorHandler(gVfrDataStorage.DeclareBufferVarStore(StoreName, Guid, gVfrVarDataTypeDB, TypeName, VarStoreId, IsBitVarStore, Attributes))
         VarStoreId, ReturnCode = gVfrDataStorage.GetVarStoreId(StoreName, Guid)
@@ -544,27 +558,27 @@ class YamlParser():
     def _ParseVarstoreEfiAttr(self, VarstoreEfi):
         Attributes = 0
         if 'attribute' in VarstoreEfi.keys():
-            VarstoreEfiList = self._ToList(VarstoreEfi['attribute'])
+            VarstoreEfiList = self._ToList(VarstoreEfi['attribute'].PostVal)
             for Attr in VarstoreEfiList:
                 Attributes |= Attr
         return Attributes
 
 
     def ParseVfrStatementVarStoreNameValue(self, NameValue, ParentNode):
-        StoreName = NameValue['type']
+        StoreName = NameValue['type'].PostVal
         VSNVObj = IfrVarStoreNameValue(StoreName)
-        Guid = NameValue['guid']
+        Guid = NameValue['guid'].PostVal
         VarStoreId = EFI_VARSTORE_ID_INVALID
         if 'varid' in NameValue.keys():
-            VarStoreId = NameValue['varid']
+            VarStoreId = NameValue['varid'].PostVal
             #self.CompareErrorHandler(VarStoreId!=0, True, ctx.ID.line, ctx.ID.text, 'varid 0 is not allowed.')
 
         Created = False
-        for NameDict in NameValue['nametable']:
+        for NameDict in NameValue['nametable'].PostVal:
             if Created == False:
                 self.ErrorHandler(gVfrDataStorage.DeclareNameVarStoreBegin(StoreName, VarStoreId))
                 Created = True
-            NameItem = NameDict['name']
+            NameItem = NameDict['name'].PostVal
            # print(NameItem)
             VSNVObj.SetNameItemList(NameItem)
             gVfrDataStorage.NameTableAddItem(NameItem)
@@ -581,19 +595,19 @@ class YamlParser():
 
     def ParseVfrFormmapDefinition(self, Formmap, ParentNode):
         FMapObj = IfrFormMap()
-        if isinstance(Formmap['formid'], list):
-            Pos = self.GuidID + '.' + Formmap['formid'][0]
-            FMapObj.SetFormId(Formmap['formid'][1])
+        if isinstance(Formmap['formid'].PostVal, list):
+            Pos = self.GuidID + '.' + Formmap['formid'].PostVal[0]
+            FMapObj.SetFormId(Formmap['formid'].PostVal[1])
         else:
-            FMapObj.SetFormId(Formmap['formid'])
-            Pos = self.GuidID + '.' + str(Formmap['formid'])
+            FMapObj.SetFormId(Formmap['formid'].PostVal)
+            Pos = self.GuidID + '.' + str(Formmap['formid'].PostVal)
 
-        FormMapMethodNumber = len(Formmap['map']) if 'map' in Formmap.keys() else 0
+        FormMapMethodNumber = len(Formmap['map'].PostVal) if 'map' in Formmap.keys() else 0
         if FormMapMethodNumber == 0:
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'No MapMethod is set for FormMap!')
         else:
-            for MapDict in Formmap['map']:
-                FMapObj.SetFormMapMethod(MapDict['maptitle'], MapDict['mapguid'])
+            for MapDict in Formmap['map'].PostVal:
+                FMapObj.SetFormMapMethod(MapDict['maptitle'].PostVal, MapDict['mapguid'].PostVal)
 
 
         Node = IfrTreeNode(EFI_IFR_FORM_MAP_OP, FMapObj)
@@ -616,15 +630,15 @@ class YamlParser():
 
     def ParseVfrFormDefinition(self, Form, ParentNode: IfrTreeNode):
         FObj = IfrForm()
-        if isinstance(Form['formid'], list):
-            Pos = self.GuidID + '.' + Form['formid'][0]
-            ReturnCode = FObj.SetFormId(Form['formid'][1])
+        if isinstance(Form['formid'].PostVal, list):
+            Pos = self.GuidID + '.' + Form['formid'].PostVal[0]
+            ReturnCode = FObj.SetFormId(Form['formid'].PostVal[1])
         else:
-            ReturnCode = FObj.SetFormId(Form['formid'])
+            ReturnCode = FObj.SetFormId(Form['formid'].PostVal)
             if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
                 print(ReturnCode)
-            Pos = self.GuidID + '.' + str(Form['formid'])
-        FormTitle = Form['title']
+            Pos = self.GuidID + '.' + str(Form['formid'].PostVal)
+        FormTitle = Form['title'].PostVal
         FObj.SetFormTitle(FormTitle)
         Node = IfrTreeNode(EFI_IFR_FORM_OP, FObj, gFormPkg.StructToStream(FObj.GetInfo()), Pos)
         ParentNode.insertChild(Node)
@@ -667,7 +681,7 @@ class YamlParser():
         IsExp = False
         DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD
         if 'value' in Default.keys():
-            ValueList = self._ParseVfrConstantValueField(Default['value'])
+            ValueList = self._ParseVfrConstantValueField(Default['value'].PostVal)
             Value = ValueList[0]
             Type = self.CurrQestVarInfo.VarType
             if self.CurrentMinMaxData != None and self.CurrentMinMaxData.IsNumericOpcode():
@@ -681,7 +695,7 @@ class YamlParser():
             if Type == EFI_IFR_TYPE_OTHER:
                 self.ErrorHandler(VfrReturnCode.VFR_RETURN_FATAL_ERROR, "Default data type error.")
             DObj = IfrDefault(Type, ValueList)
-            DObj.ValueStream = str(Default['value'])
+            DObj.ValueStream = str(Default['value'].PostVal)
             Node = IfrTreeNode(EFI_IFR_DEFAULT_OP, DObj)
             if len(ValueList) == 1:
                 if self.IsStringOp:
@@ -698,11 +712,11 @@ class YamlParser():
             DObj = IfrDefault2()
             Node = IfrTreeNode(EFI_IFR_DEFAULT_OP, DObj)
             DObj.SetScope(1)
-            self.ParseVfrStatementValue(Default['value_exp'], Node)
+            self.ParseVfrStatementValue(Default['value_exp'].PostVal, Node)
             self.InsertEndNode(Node)
 
         if 'defaultstore' in Default.keys():
-            DefaultId, ReturnCode = gVfrDefaultStore.GetDefaultId(Default['defaultstore'])
+            DefaultId, ReturnCode = gVfrDefaultStore.GetDefaultId(Default['defaultstore'].PostVal)
             self.ErrorHandler(ReturnCode)
             DObj.SetDefaultId(DefaultId)
 
@@ -721,14 +735,14 @@ class YamlParser():
 
     def ParseVfrStatementRule(self, Rule, ParentNode):
         RObj = IfrRule()
-        RuleName = Rule['rulename']
+        RuleName = Rule['rulename'].PostVal
         RObj.SetRuleName(RuleName)
         self.VfrRulesDB.RegisterRule(RuleName)
         RObj.SetRuleId(self.VfrRulesDB.GetRuleId(RuleName))
         Node = IfrTreeNode(EFI_IFR_RULE_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(Rule['expression'], Node)
-        Node.Expression = Rule['expression']
+        self.ParserVfrStatementExpression(Rule['expression'].PostVal, Node)
+        Node.Expression = Rule['expression'].PostVal
 
         self.InsertEndNode(Node)
         return Node
@@ -738,9 +752,9 @@ class YamlParser():
 
     def ParseVfrStatementbanner(self, Banner, ParentNode):
         BObj = IfrBanner()
-        BObj.SetTitle(Banner['title'])
+        BObj.SetTitle(Banner['title'].PostVal)
         if 'line' in Banner.keys():
-            BObj.SetLine(Banner['line'])
+            BObj.SetLine(Banner['line'].PostVal)
         if 'left' in Banner.keys():
             BObj.SetAlign(0)
         if 'center' in Banner.keys():
@@ -761,7 +775,7 @@ class YamlParser():
 
     def ParseVfrStatementRefreshEvent(self, RefreshEvent, ParentNode):
         RiObj = IfrRefreshId()
-        RiObj.SetRefreshEventGroutId(RefreshEvent['guid'])
+        RiObj.SetRefreshEventGroutId(RefreshEvent['guid'].PostVal)
         Node = IfrTreeNode(EFI_IFR_REFRESH_ID_OP, RiObj, gFormPkg.StructToStream(RiObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
@@ -778,7 +792,7 @@ class YamlParser():
 
     def ParseVfrStatementSubtitle(self, Subtitle, ParentNode):
         SObj = IfrSubtitle()
-        Prompt = Subtitle['prompt']
+        Prompt = Subtitle['prompt'].PostVal
         SObj.SetPrompt(Prompt)
         SObj.SetFlags(self._ParseSubtitleFlags(Subtitle))
         Node = IfrTreeNode(EFI_IFR_SUBTITLE_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
@@ -801,7 +815,7 @@ class YamlParser():
     def _ParseSubtitleFlags(self, Subtitle):
         SubFlags = 0
         if 'flags' in Subtitle.keys():
-            FlagList = self._ToList(Subtitle['flags'])
+            FlagList = self._ToList(Subtitle['flags'].PostVal)
             for Flag in FlagList:
                 if Flag == 'HORIZONTAL':
                     SubFlags |= 0x01
@@ -810,7 +824,7 @@ class YamlParser():
         return SubFlags
 
     def ParseVfrStatementResetButton(self, ResetButton, ParentNode):
-        Defaultstore = ResetButton['defaultstore']
+        Defaultstore = ResetButton['defaultstore'].PostVal
         RBObj = IfrResetButton()
         DefaultId, ReturnCode = gVfrDefaultStore.GetDefaultId(Defaultstore)
         self.ErrorHandler(ReturnCode)
@@ -833,28 +847,28 @@ class YamlParser():
 
         # get formid
         if 'formid' in Goto.keys():
-            if isinstance(Goto['formid'], list):
-                FormId = Goto['formid'][1]
+            if isinstance(Goto['formid'].PostVal, list):
+                FormId = Goto['formid'].PostVal[1]
             else:
-                FormId =Goto['formid']
+                FormId =Goto['formid'].PostVal
 
         if 'devicepath' in Goto.keys():
             R4Obj = IfrRef4()
-            R4Obj.SetDevicePath(Goto['devicepath'])
+            R4Obj.SetDevicePath(Goto['devicepath'].PostVal)
             R4Obj.SetFormId(FormId)
-            R4Obj.SetQId(Goto['question'])
-            R4Obj.SetFormSetId(Goto['formsetguid'])
+            R4Obj.SetQId(Goto['question'].PostVal)
+            R4Obj.SetFormSetId(Goto['formsetguid'].PostVal)
             GObj = R4Obj
         elif 'formsetguid' in Goto.keys():
             R3Obj = IfrRef3()
             R3Obj.SetFormId(FormId)
-            R3Obj.SetQId(Goto['question'])
-            R3Obj.SetFormSetId(Goto['formsetguid'])
+            R3Obj.SetQId(Goto['question'].PostVal)
+            R3Obj.SetFormSetId(Goto['formsetguid'].PostVal)
             GObj = R3Obj
         elif 'question' in Goto.keys():
             R2Obj = IfrRef2()
             R2Obj.SetFormId(FormId)
-            R2Obj.SetQId(Goto['question'])
+            R2Obj.SetQId(Goto['question'].PostVal)
             GObj = R2Obj
         elif 'formid' in Goto.keys():
             RObj = IfrRef()
@@ -864,7 +878,7 @@ class YamlParser():
         self._ParseVfrQuestionHeader(GObj, Goto, EFI_QUESION_TYPE.QUESTION_REF)
         GObj.SetFlags(self._ParseStatementStatFlags(Goto))
         if 'key' in Goto.keys():
-            self.AssignQuestionKey(GObj, Goto['key'])
+            self.AssignQuestionKey(GObj, Goto['key'].PostVal)
         Node = IfrTreeNode(EFI_IFR_REF_OP, GObj)
         self.SetPosition(Node, Position)
         ParentNode.insertChild(Node)
@@ -906,22 +920,22 @@ class YamlParser():
 
     def ParseVfrStatementInconsistentIf(self, InconsistentIf, ParentNode):
         IIObj = IfrInconsistentIf2()
-        IIObj.SetError(InconsistentIf['prompt'])
+        IIObj.SetError(InconsistentIf['prompt'].PostVal)
         Node = IfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP, IIObj, gFormPkg.StructToStream(IIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(InconsistentIf['expression'], Node)
-        Node.Expression = InconsistentIf['expression']
+        self.ParserVfrStatementExpression(InconsistentIf['expression'].PostVal, Node)
+        Node.Expression = InconsistentIf['expression'].PostVal
         # Node.Condition = 'inconsistentif ' + Node.Expression
         self.InsertEndNode(Node)
 
 
     def ParseVfrStatementNoSubmitIf(self, NoSubmitIf, ParentNode):
         NSIObj = IfrNoSubmitIf()
-        NSIObj.SetError(NoSubmitIf['prompt'])
+        NSIObj.SetError(NoSubmitIf['prompt'].PostVal)
         Node = IfrTreeNode(EFI_IFR_NO_SUBMIT_IF_OP, NSIObj, gFormPkg.StructToStream(NSIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(NoSubmitIf['expression'], Node)
-        Node.Expression = NoSubmitIf['expression']
+        self.ParserVfrStatementExpression(NoSubmitIf['expression'].PostVal, Node)
+        Node.Expression = NoSubmitIf['expression'].PostVal
         self.InsertEndNode(Node)
 
 
@@ -929,8 +943,8 @@ class YamlParser():
         DIObj = IfrDisableIf()
         Node = IfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(DisableIfQuest['expression'], Node)
-        Node.Expression = DisableIfQuest['expression']
+        self.ParserVfrStatementExpression(DisableIfQuest['expression'].PostVal, Node)
+        Node.Expression = DisableIfQuest['expression'].PostVal
         Node.Condition = 'disableif ' + Node.Expression
         if 'component' in DisableIfQuest.keys():
             self._ParseVfrStatementQuestionOptionList(DisableIfQuest['component'], Node)
@@ -939,27 +953,27 @@ class YamlParser():
 
     def ParseVfrStatementRefresh(self, Refresh, ParentNode):
         RObj = IfrRefresh()
-        RObj.SetRefreshInterval(Refresh['interval'])
+        RObj.SetRefreshInterval(Refresh['interval'].PostVal)
         Node = IfrTreeNode(EFI_IFR_REFRESH_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
     def ParseVfrStatementVarstoreDevice(self, VarStoreDevice, ParentNode):
         VDObj = IfrVarStoreDevice()
-        VDObj.SetDevicePath(VarStoreDevice['devicepath'])
+        VDObj.SetDevicePath(VarStoreDevice['devicepath'].PostVal)
         Node = IfrTreeNode(EFI_IFR_VARSTORE_DEVICE_OP, VDObj, gFormPkg.StructToStream(VDObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
     def ParseVfrStatementWarningIf(self, WarningIf, ParentNode):
         WIObj = IfrWarningIf()
-        WIObj.SetWarning(WarningIf['prompt'])
+        WIObj.SetWarning(WarningIf['prompt'].PostVal)
         if 'timeout' in WarningIf.keys():
-            WIObj.SetTimeOut(WarningIf['timeout'])
+            WIObj.SetTimeOut(WarningIf['timeout'].PostVal)
         Node = IfrTreeNode(EFI_IFR_WARNING_IF_OP, WIObj, gFormPkg.StructToStream(WIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(WarningIf['expression'], Node)
-        Node.Expression = WarningIf['expression']
+        self.ParserVfrStatementExpression(WarningIf['expression'].PostVal, Node)
+        Node.Expression = WarningIf['expression'].PostVal
         self.InsertEndNode(Node)
         return Node
 
@@ -983,8 +997,8 @@ class YamlParser():
         SIObj = IfrSuppressIf()
         Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(SuppressIfQuest['expression'], Node)
-        Node.Expression = SuppressIfQuest['expression']
+        self.ParserVfrStatementExpression(SuppressIfQuest['expression'].PostVal, Node)
+        Node.Expression = SuppressIfQuest['expression'].PostVal
         Node.Condition = 'suppressif ' + Node.Expression
         if 'component' in SuppressIfQuest.keys():
             self._ParseVfrStatementQuestionOptionList(SuppressIfQuest['component'], Node)
@@ -995,8 +1009,8 @@ class YamlParser():
         GOIObj = IfrGrayOutIf()
         Node = IfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP, GOIObj, gFormPkg.StructToStream(GOIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(GrayOutIfQuest['expression'], Node)
-        Node.Expression = GrayOutIfQuest['expression']
+        self.ParserVfrStatementExpression(GrayOutIfQuest['expression'].PostVal, Node)
+        Node.Expression = GrayOutIfQuest['expression'].PostVal
         Node.Condition = 'grayoutif ' + Node.Expression
         if 'component' in GrayOutIfQuest.keys():
             self._ParseVfrStatementQuestionOptionList(GrayOutIfQuest['component'], Node)
@@ -1059,9 +1073,8 @@ class YamlParser():
 
     def ParseVfrStatementOneofOption(self, Option, ParentNode):
         if self.CurrQestVarInfo.VarType == EFI_IFR_TYPE_OTHER:
-            print("Get data type error.")
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_FATAL_ERROR, "Get data type error.")
-        ValueList = self._ParseVfrConstantValueField(Option['value'])
+        ValueList = self._ParseVfrConstantValueField(Option['value'].PostVal)
         Value = ValueList[0]
         Type = self.CurrQestVarInfo.VarType
         if self.CurrentMinMaxData != None:
@@ -1076,7 +1089,7 @@ class YamlParser():
         else:
             OOOObj.SetType(EFI_IFR_TYPE_BUFFER)
 
-        OOOObj.SetOption(Option['text'])
+        OOOObj.SetOption(Option['text'].PostVal)
         HFlags, LFlags = self._ParseVfrStatementOneofOptionFlags(Option)
         self.ErrorHandler(OOOObj.SetFlags(LFlags))
         self.ErrorHandler(self.CurrentQuestion.SetQHeaderFlags(HFlags))
@@ -1112,8 +1125,8 @@ class YamlParser():
 
         if 'key' in Option.keys():
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_UNSUPPORTED)
-            OOOObj.SetIfrOptionKey(Option['key'])
-            gIfrOptionKey = IfrOptionKey(self.CurrentQuestion.GetQuestionId(), Type, Value, Option['key'])
+            OOOObj.SetIfrOptionKey(Option['key'].PostVal)
+            gIfrOptionKey = IfrOptionKey(self.CurrentQuestion.GetQuestionId(), Type, Value, Option['key'].PostVal)
             ChildNode = IfrTreeNode(EFI_IFR_GUID_OP, gIfrOptionKey, gFormPkg.StructToStream(gIfrOptionKey.GetInfo()))
             Node.insertChild(ChildNode)
 
@@ -1140,7 +1153,7 @@ class YamlParser():
         HFlags = 0
         LFlags = self.CurrQestVarInfo.VarType
         if 'flags' in Option.keys():
-            FlagList = self._ToList(Option['flags'])
+            FlagList = self._ToList(Option['flags'].PostVal)
             for Flag in FlagList:
                 if Flag == 'OPTION_DEFAULT':
                     LFlags |= 0x10
@@ -1172,8 +1185,8 @@ class YamlParser():
             self.ParserVfrStatementExpression(Value, Node)
             Node.Expression = Value
         else:
-            self.ParserVfrStatementExpression(Value['expression'], Node)
-            Node.Expression = Value['expression']
+            self.ParserVfrStatementExpression(Value['expression'].PostVal, Node)
+            Node.Expression = Value['expression'].PostVal
         self.InsertEndNode(Node)
         return Node
 
@@ -1181,22 +1194,22 @@ class YamlParser():
         RObj = IfrRead()
         Node = IfrTreeNode(EFI_IFR_READ_OP, RObj, gFormPkg.StructToStream(RObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(Read['expression'], Node)
-        Node.Expression = Read['expression']
+        self.ParserVfrStatementExpression(Read['expression'].PostVal, Node)
+        Node.Expression = Read['expression'].PostVal
         return Node
 
     def ParseVfrStatementWrite(self, Write, ParentNode):
         WObj = IfrWrite()
         Node = IfrTreeNode(EFI_IFR_WRITE_OP, WObj, gFormPkg.StructToStream(WObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(Write['expression'], Node)
-        Node.Expression = Write['expression']
+        self.ParserVfrStatementExpression(Write['expression'].PostVal, Node)
+        Node.Expression = Write['expression'].PostVal
         return Node
 
     def _ParseStatementStatFlags(self, StatFlagsDict):
         Flags = 0
         if 'flags' in StatFlagsDict.keys():
-            FlagList = self._ToList(StatFlagsDict['flags'])
+            FlagList = self._ToList(StatFlagsDict['flags'].PostVal)
             for Flag in FlagList:
                 if Flag in QuestionheaderFlagsField:
                     Flags |= self._ParseQuestionheaderFlagsField(Flag)
@@ -1225,14 +1238,14 @@ class YamlParser():
 
         ReturnCode = None
         if 'name' in QDict.keys():
-            QName = QDict['name']
+            QName = QDict['name'].PostVal
             ReturnCode = self.VfrQuestionDB.FindQuestionByName(QName)
             self.CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_UNDEFINED, QName, 'has already been used please used anther name')
         if 'varid' in QDict.keys():
-            VarIdStr = QDict['varid']
+            VarIdStr = QDict['varid'].PostVal
             self._VfrStorageVarId(BaseInfo, VarIdStr)
         if 'questionid' in QDict.keys():
-            QId = QDict['questionid']
+            QId = QDict['questionid'].PostVal
             ReturnCode = self.VfrQuestionDB.FindQuestionById(QId)
             self.CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_UNDEFINED, QId, 'has already been used please used anther number')
         if  QType == EFI_QUESION_TYPE.QUESTION_NORMAL:
@@ -1273,12 +1286,12 @@ class YamlParser():
         return BaseInfo
 
     def _ParseVfrStatementHeader(self, QObj, QDict):
-        QObj.SetPrompt(QDict['prompt'])
-        QObj.SetHelp(QDict['help'])
+        QObj.SetPrompt(QDict['prompt'].PostVal)
+        QObj.SetHelp(QDict['help'].PostVal)
 
 
     def _VfrStorageVarId(self, BaseInfo, VarId):
-        if '[' in VarId and ']' in VarId and  '.' not in VarId:
+        if '[' in VarId and '].PostVal' in VarId and  '.' not in VarId:
             SName = VarId[:VarId.find('[')]
             Idx = int(VarId[VarId.find('[') + 1])
             BaseInfo.VarStoreId, ReturnCode = gVfrDataStorage.GetVarStoreId(SName)
@@ -1368,8 +1381,8 @@ class YamlParser():
         DIObj = IfrDisableIf()
         Node = IfrTreeNode(EFI_IFR_DISABLE_IF_OP, DIObj, gFormPkg.StructToStream(DIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(DisableIf['expression'], Node)
-        Node.Expression = DisableIf['expression']
+        self.ParserVfrStatementExpression(DisableIf['expression'].PostVal, Node)
+        Node.Expression = DisableIf['expression'].PostVal
         Node.Condition = 'disableif ' + Node.Expression
         if 'component' in DisableIf.keys():
             for Component in DisableIf['component']:
@@ -1382,8 +1395,8 @@ class YamlParser():
         SIObj = IfrSuppressIf()
         Node = IfrTreeNode(EFI_IFR_SUPPRESS_IF_OP, SIObj, gFormPkg.StructToStream(SIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(SuppressIf['expression'], Node)
-        Node.Expression = SuppressIf['expression']
+        self.ParserVfrStatementExpression(SuppressIf['expression'].PostVal, Node)
+        Node.Expression = SuppressIf['expression'].PostVal
         Node.Condition = 'suppressif ' + Node.Expression
         if 'component' in SuppressIf.keys():
             for Component in SuppressIf['component']:
@@ -1396,8 +1409,8 @@ class YamlParser():
         GOIObj = IfrGrayOutIf()
         Node = IfrTreeNode(EFI_IFR_GRAY_OUT_IF_OP, GOIObj, gFormPkg.StructToStream(GOIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(GrayOutIf['expression'], Node)
-        Node.Expression = GrayOutIf['expression']
+        self.ParserVfrStatementExpression(GrayOutIf['expression'].PostVal, Node)
+        Node.Expression = GrayOutIf['expression'].PostVal
         Node.Condition = 'grayoutif ' + Node.Expression
         if 'component' in GrayOutIf.keys():
             for Component in GrayOutIf['component']:
@@ -1407,11 +1420,11 @@ class YamlParser():
 
     def ParseVfrStatementInconsistentIfStat(self, InconsistentIf, ParentNode, Position):
         IIObj = IfrInconsistentIf()
-        IIObj.SetError(InconsistentIf['prompt'])
+        IIObj.SetError(InconsistentIf['prompt'].PostVal)
         Node = IfrTreeNode(EFI_IFR_INCONSISTENT_IF_OP, IIObj, gFormPkg.StructToStream(IIObj.GetInfo()))
         ParentNode.insertChild(Node)
-        self.ParserVfrStatementExpression(InconsistentIf['expression'], Node)
-        Node.Expression = InconsistentIf['expression']
+        self.ParserVfrStatementExpression(InconsistentIf['expression'].PostVal, Node)
+        Node.Expression = InconsistentIf['expression'].PostVal
         Node.Condition = 'inconsistentif ' + Node.Expression
         if 'component' in InconsistentIf.keys():
             for Component in InconsistentIf['component']:
@@ -1448,25 +1461,25 @@ class YamlParser():
                 self._ParseVfrStatementQuestionOptionList(Time['component'], Node)
         else:
             self.ErrorHandler(TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseTimeFlags(Time)))
-            QId, _ = self.VfrQuestionDB.RegisterOldTimeQuestion(Time['hour'], Time['minute'], Time['second'], EFI_QUESTION_ID_INVALID, gFormPkg)
+            QId, _ = self.VfrQuestionDB.RegisterOldTimeQuestion(Time['hour'].PostVal, Time['minute'].PostVal, Time['second'].PostVal, EFI_QUESTION_ID_INVALID, gFormPkg)
             TObj.SetQuestionId(QId)
             TObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, QF_TIME_STORAGE_TIME)
-            TObj.SetPrompt(Time['prompt'])
-            TObj.SetHelp(Time['help'])
+            TObj.SetPrompt(Time['prompt'].PostVal)
+            TObj.SetHelp(Time['help'].PostVal)
             Node.Buffer = gFormPkg.StructToStream(TObj.GetInfo())
             self.SetPosition(Node, Position)
             ParentNode.insertChild(Node)
             DefaultTime =EFI_HII_TIME()
             if 'default_hour' in Time.keys():
-                DefaultTime.Hour = Time['default_hour']
+                DefaultTime.Hour = Time['default_hour'].PostVal
                 if DefaultTime.Hour > 23:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Hour default value must be between 0 and 23.")
             if 'default_minute' in Time.keys():
-                DefaultTime.Minute = Time['default_minute']
+                DefaultTime.Minute = Time['default_minute'].PostVal
                 if DefaultTime.Minute > 59:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Minute default value must be between 0 and 59.")
             if 'default_second' in Time.keys():
-                DefaultTime.Second = Time['default_second']
+                DefaultTime.Second = Time['default_second'].PostVal
                 if DefaultTime.Second > 59:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Second default value must be between 0 and 59.")
             DefaultObj = IfrDefault(EFI_IFR_TYPE_TIME, [DefaultTime], EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_TIME)
@@ -1483,7 +1496,7 @@ class YamlParser():
     def _ParseTimeFlags(self, FlagsDict):
         LFlags = 0
         if 'flags' in FlagsDict.keys():
-            FlagList = self._ToList(FlagsDict['flags'])
+            FlagList = self._ToList(FlagsDict['flags'].PostVal)
             for Flag in FlagList:
                 if Flag == 'HOUR_SUPPRESS':
                     LFlags |= 0x01
@@ -1518,7 +1531,7 @@ class YamlParser():
             OLObj.SetMaxContainers(VarArraySize)
 
         if 'maxcontainers' in OrderedList.keys():
-            MaxContainers = OrderedList['maxcontainers']
+            MaxContainers = OrderedList['maxcontainers'].PostVal
             if MaxContainers > 0xFF:
                 self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "OrderedList MaxContainers takes only one byte, which can't be larger than 0xFF.")
             elif VarArraySize != 0 and MaxContainers > VarArraySize:
@@ -1540,7 +1553,7 @@ class YamlParser():
         LFlags = 0
         HFlags = 0
         if 'flags' in FlagsDict.keys():
-            FlagList = self._ToList(FlagsDict['flags'])
+            FlagList = self._ToList(FlagsDict['flags'].PostVal)
             for Flag in FlagList:
                 if Flag in QuestionheaderFlagsField:
                     HFlags |= self._ParseQuestionheaderFlagsField(Flag)
@@ -1611,7 +1624,7 @@ class YamlParser():
                     #self.CompareErrorHandler(ReturnCode, VfrReturnCode.VFR_RETURN_SUCCESS, Line, ctx.L.text, "No manufacturing default storage found")
 
         if 'key' in CheckBox.keys():
-            self.AssignQuestionKey(CBObj, CheckBox['key'])
+            self.AssignQuestionKey(CBObj, CheckBox['key'].PostVal)
 
         Node.Data = CBObj
         Node.Buffer = gFormPkg.StructToStream(CBObj.GetInfo())
@@ -1628,7 +1641,7 @@ class YamlParser():
         LFlags = 0
         HFlags = 0
         if 'flags' in FlagsDict.keys():
-            FlagList = self._ToList(FlagsDict['flags'])
+            FlagList = self._ToList(FlagsDict['flags'].PostVal)
             for Flag in FlagList:
                 if Flag in QuestionheaderFlagsField:
                     HFlags |= self._ParseQuestionheaderFlagsField(Flag)
@@ -1646,7 +1659,7 @@ class YamlParser():
 
     def ParseVfrStatementAction(self, Action, ParentNode, Position):
         AObj = IfrAction()
-        Config = Action['config']
+        Config = Action['config'].PostVal
         AObj.SetQuestionConfig(Config)
         # No handler for Flags
         Node = IfrTreeNode(EFI_IFR_ACTION_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
@@ -1672,25 +1685,25 @@ class YamlParser():
                 self._ParseVfrStatementQuestionOptionList(Date['component'], Node)
         else:
             self.ErrorHandler(DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, self._ParseDateFlags(Date)))
-            QId, _ = self.VfrQuestionDB.RegisterOldDateQuestion(Date['year'], Date['month'], Date['day'], EFI_QUESTION_ID_INVALID, gFormPkg)
+            QId, _ = self.VfrQuestionDB.RegisterOldDateQuestion(Date['year'].PostVal, Date['month'].PostVal, Date['day'].PostVal, EFI_QUESTION_ID_INVALID, gFormPkg)
             DObj.SetQuestionId(QId)
             DObj.SetFlags(EFI_IFR_QUESTION_FLAG_DEFAULT, QF_DATE_STORAGE_TIME)
-            DObj.SetPrompt(Date['prompt'])
-            DObj.SetHelp(Date['help'])
+            DObj.SetPrompt(Date['prompt'].PostVal)
+            DObj.SetHelp(Date['help'].PostVal)
             Node.Buffer = gFormPkg.StructToStream(DObj.GetInfo())
             self.SetPosition(Node, Position)
             ParentNode.insertChild(Node)
             DefaultTDate =EFI_HII_DATE()
             if 'default_year' in Date.keys():
-                DefaultTDate.Year = Date['default_year']
-                if DefaultTDate.Year > Date['max_year'] or DefaultTDate.Year < Date['min_year'] :
-                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Hour default value must be between {} and {}.".format(Date['min_year'], Date['max_year']))
+                DefaultTDate.Year = Date['default_year'].PostVal
+                if DefaultTDate.Year > Date['max_year'].PostVal or DefaultTDate.Year < Date['min_year'].PostVal :
+                    self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Hour default value must be between {} and {}.".format(Date['min_year'].PostVal, Date['max_year'].PostVal))
             if 'default_month' in Date.keys():
-                DefaultTDate.Month = Date['default_month']
+                DefaultTDate.Month = Date['default_month'].PostVal
                 if DefaultTDate.Month < 1 or DefaultTDate.Month > 12:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Minute default value must be between 1 and 12.")
             if 'default_day' in Date.keys():
-                DefaultTDate.Day = Date['default_day']
+                DefaultTDate.Day = Date['default_day'].PostVal
                 if DefaultTDate.Day < 1 or DefaultTDate.Day > 31:
                     self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "Second default value must be between 1 and 31.")
             DefaultObj = IfrDefault(EFI_IFR_TYPE_DATE, [DefaultTDate], EFI_HII_DEFAULT_CLASS_STANDARD, EFI_IFR_TYPE_DATE)
@@ -1706,7 +1719,7 @@ class YamlParser():
     def _ParseDateFlags(self, FlagsDict):
         LFlags = 0
         if 'flags' in FlagsDict.keys():
-            FlagList = self._ToList(FlagsDict['flags'])
+            FlagList = self._ToList(FlagsDict['flags'].PostVal)
             for Flag in FlagList:
                 if Flag == 'YEAR_SUPPRESS':
                     LFlags |= 0x01
@@ -1763,9 +1776,9 @@ class YamlParser():
                 self.ErrorHandler(NObj.SetFlags(HFlags, LFlags, IsDisplaySpecified))
 
         if 'key' in Numeric.keys():
-            self.AssignQuestionKey(NObj, Numeric['key'])
+            self.AssignQuestionKey(NObj, Numeric['key'].PostVal)
 
-        if self.CurrQestVarInfo.IsBitVar == False:
+        if (self.CurrQestVarInfo.IsBitVar == False) and (self.CurrQestVarInfo.VarType not in BasicTypes):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data for namevalue
@@ -1802,7 +1815,7 @@ class YamlParser():
         UpdateVarType = False
         if 'flags' in FlagsDict.keys():
             LFlags = self.CurrQestVarInfo.VarType & EFI_IFR_NUMERIC_SIZE
-            FlagList = self._ToList(FlagsDict['flags'])
+            FlagList = self._ToList(FlagsDict['flags'].PostVal)
             for Flag in FlagList:
                 if Flag == 'NUMERIC_SIZE_1':
                     if self.CurrQestVarInfo.IsBitVar == False:
@@ -1890,9 +1903,9 @@ class YamlParser():
         MinNegative = False
         MaxNegative = False
 
-        Min = QDict['minimum'] if 'minimum' in QDict.keys() else 0
-        Max = QDict['maximum'] if 'maximum' in QDict.keys() else 0
-        Step = QDict['step'] if 'step' in QDict.keys() else 0
+        Min = QDict['minimum'].PostVal if 'minimum' in QDict.keys() else 0
+        Max = QDict['maximum'].PostVal if 'maximum' in QDict.keys() else 0
+        Step = QDict['step'].PostVal if 'step' in QDict.keys() else 0
         if Min < 0:
             MinNegative = True
             Min = - Min
@@ -2094,10 +2107,10 @@ class YamlParser():
         HFlags, LFlags = self._ParseStringFlags(Str)
         self.ErrorHandler(SObj.SetFlags(HFlags, LFlags))
         if 'key' in Str.keys():
-            self.AssignQuestionKey(SObj, Str['key'])
+            self.AssignQuestionKey(SObj, Str['key'].PostVal)
 
-        StringMinSize = Str['minsize']
-        StringMaxSize = Str['maxsize']
+        StringMinSize = Str['minsize'].PostVal
+        StringMaxSize = Str['maxsize'].PostVal
         VarArraySize = self.GetCurArraySize()
         if StringMinSize > 0xFF:
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "String MinSize takes only one byte, which can't be larger than 0xFF.")
@@ -2126,7 +2139,7 @@ class YamlParser():
         HFlags = 0
         LFlags = 0
         if 'flags' in FlagsDict.keys():
-            FlagList = self._ToList(FlagsDict['flags'])
+            FlagList = self._ToList(FlagsDict['flags'].PostVal)
             for Flag in FlagList:
                 if Flag in QuestionheaderFlagsField:
                     HFlags |= self._ParseQuestionheaderFlagsField(Flag)
@@ -2144,10 +2157,10 @@ class YamlParser():
         self.ErrorHandler(PObj.SetFlags(self._ParseStatementStatFlags(Password)))
 
         if 'key' in Password.keys():
-            self.AssignQuestionKey(PObj, Password['key'])
+            self.AssignQuestionKey(PObj, Password['key'].PostVal)
 
-        PassWordMinSize = Password['minsize']
-        PasswordMaxSize = Password['maxsize']
+        PassWordMinSize = Password['minsize'].PostVal
+        PasswordMaxSize = Password['maxsize'].PostVal
         VarArraySize = self.GetCurArraySize()
         if PassWordMinSize > 0xFF:
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, "String MinSize takes only one byte, which can't be larger than 0xFF.")
@@ -2171,7 +2184,7 @@ class YamlParser():
 
     def ParseVfrStatementImage(self, Image, ParentNode):
         IObj = IfrImage()
-        ImageId = Image['id']
+        ImageId = Image['id'].PostVal
         IObj.SetImageId(ImageId)
         Node = IfrTreeNode(EFI_IFR_IMAGE_OP, IObj, gFormPkg.StructToStream(IObj.GetInfo()))
         ParentNode.insertChild(Node)
@@ -2186,7 +2199,7 @@ class YamlParser():
 
     def ParseVfrStatementLabel(self, Label, ParentNode):
         LObj = IfrLabel()
-        Number = Label['number']
+        Number = Label['number'].PostVal
         LObj.SetNumber(Number)
         Node = IfrTreeNode(EFI_IFR_GUID_OP, LObj, gFormPkg.StructToStream(LObj.GetInfo()))
         ParentNode.insertChild(Node)
@@ -2214,13 +2227,13 @@ class YamlParser():
         return QHFlag
 
     def ParseVfrStatementStaticText(self, Text, ParentNode):
-        Help = Text['help']
-        Prompt = Text['prompt']
+        Help = Text['help'].PostVal
+        Prompt = Text['prompt'].PostVal
 
         QId = EFI_QUESTION_ID_INVALID
         TxtTwo = EFI_STRING_ID_INVALID
         if 'text' in Text.keys():
-            TxtTwo = Text['text']
+            TxtTwo = Text['text'].PostVal
 
         TextFlags = self._ParseStatementStatFlags(Text)
 
@@ -2234,7 +2247,7 @@ class YamlParser():
             AObj.SetPrompt(Prompt)
             self.ErrorHandler(AObj.SetFlags(TextFlags))
             if 'key' in Text.keys():
-                self.AssignQuestionKey(AObj, Text['key'])
+                self.AssignQuestionKey(AObj, Text['key'].PostVal)
             Node = IfrTreeNode(EFI_IFR_TEXT_OP, AObj, gFormPkg.StructToStream(AObj.GetInfo()))
             ParentNode.insertChild(Node)
             if 'component' in Text.keys():
@@ -2343,17 +2356,17 @@ class DLTParser():
             if ParentNode == None:
                 print('error') # raise error
 
-        # QuestionDict['index'] records the number of conditional opcodes
+        # QuestionDict['index'].PostVal records the number of conditional opcodes
         # add conditional opcode if condition is not none
-        if QuestionDict['index'] > 0:
-            for i in range(1, QuestionDict['index'] + 1):
+        if QuestionDict['index'].PostVal > 0:
+            for i in range(1, QuestionDict['index'].PostVal + 1):
                 Condition = QuestionDict['condition' + str(i)]
                 pattern = r'(.+?)\s+(.+)'
                 match = re.match(pattern, Condition)
                 if match:
                     Key = match.group(1)
                     Value = {}
-                    Value['expression'] = match.group(2)
+                    Value['expression'].PostVal = match.group(2)
                     Parser.ParseVfrStatementConditional(Key, Value, ParentNode, Position)
                 else:
                     print("error")
@@ -2362,60 +2375,60 @@ class DLTParser():
         QuestionNode = None
         # add question opcode
 
-        if QuestionDict['opcode'] == 'CheckBox':
+        if QuestionDict['opcode'].PostVal == 'CheckBox':
 
             QuestionObj = IfrCheckBox()
             QuestionNode = IfrTreeNode(EFI_IFR_CHECKBOX_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'Numeric':
+        if QuestionDict['opcode'].PostVal == 'Numeric':
             QuestionObj = IfrNumeric()
             QuestionNode = IfrTreeNode(EFI_IFR_NUMERIC_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'OneOf':
+        if QuestionDict['opcode'].PostVal == 'OneOf':
             QuestionObj = IfrOneOf()
             QuestionNode = IfrTreeNode(EFI_IFR_ONE_OF_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'String':
+        if QuestionDict['opcode'].PostVal == 'String':
             QuestionObj = IfrString()
             QuestionNode = IfrTreeNode(EFI_IFR_STRING_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'Password':
+        if QuestionDict['opcode'].PostVal == 'Password':
             QuestionObj = IfrPassword()
             QuestionNode = IfrTreeNode(EFI_IFR_PASSWORD_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'OrderedList':
+        if QuestionDict['opcode'].PostVal == 'OrderedList':
             QuestionObj = IfrOrderedList()
             QuestionNode = IfrTreeNode(EFI_IFR_ORDERED_LIST_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'Time':
+        if QuestionDict['opcode'].PostVal == 'Time':
             QuestionObj = IfrTime()
             QuestionNode = IfrTreeNode(EFI_IFR_TIME_OP, QuestionObj)
 
-        if QuestionObj['opcode'] == 'Date':
+        if QuestionObj['opcode'].PostVal == 'Date':
             QuestionObj = IfrDate()
             QuestionNode = IfrTreeNode(EFI_IFR_DATE_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'Action':
+        if QuestionDict['opcode'].PostVal == 'Action':
             QuestionObj = IfrAction()
             QuestionNode = IfrTreeNode(EFI_IFR_ACTION_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'Ref':
+        if QuestionDict['opcode'].PostVal == 'Ref':
             QuestionObj = IfrRef()
             QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'Ref2':
+        if QuestionDict['opcode'].PostVal == 'Ref2':
             QuestionObj = IfrRef2()
             QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'Ref3':
+        if QuestionDict['opcode'].PostVal == 'Ref3':
             QuestionObj = IfrRef3()
             QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'Ref4':
+        if QuestionDict['opcode'].PostVal == 'Ref4':
             QuestionObj = IfrRef4()
             QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
 
-        if QuestionDict['opcode'] == 'Ref5':
+        if QuestionDict['opcode'].PostVal == 'Ref5':
             QuestionObj = IfrRef5()
             QuestionNode = IfrTreeNode(EFI_IFR_REF_OP, QuestionObj)
 
@@ -2450,18 +2463,18 @@ class DLTParser():
 
     def SetQuestionInfo(self, OpCode, Dict):
         if 'questionid' in Dict.keys():
-            OpCode.Obj.Question.QuestionId = Dict['questionid']
+            OpCode.Obj.Question.QuestionId = Dict['questionid'].PostVal
         if 'varstoreid' in Dict.keys():
-            OpCode.Obj.Question.VarStoreId = Dict['varstoreid']
+            OpCode.Obj.Question.VarStoreId = Dict['varstoreid'].PostVal
         if 'varname' in Dict.keys():
-            OpCode.Obj.Question.VarStoreInfo.VarName = Dict['varname']
+            OpCode.Obj.Question.VarStoreInfo.VarName = Dict['varname'].PostVal
         if 'varoffset' in Dict.keys():
-            OpCode.Obj.Question.VarStoreInfo.VarOffset = Dict['varoffset']
+            OpCode.Obj.Question.VarStoreInfo.VarOffset = Dict['varoffset'].PostVal
         if 'questionflags' in Dict.keys():
-            OpCode.Obj.Question.Flags = Dict['questionflags']
+            OpCode.Obj.Question.Flags = Dict['questionflags'].PostVal
         if 'opcodeflags' in Dict.keys():
-            OpCode.Obj.Flags = Dict['opcodeflags']
+            OpCode.Obj.Flags = Dict['opcodeflags'].PostVal
         if 'prompt' in Dict.keys():
-            OpCode.Obj.Question.Header.Prompt = Dict['prompt']
+            OpCode.Obj.Question.Header.Prompt = Dict['prompt'].PostVal
         if 'help' in Dict.keys():
-            OpCode.Obj.Question.Header.Help = Dict['help']
+            OpCode.Obj.Question.Header.Help = Dict['help'].PostVal

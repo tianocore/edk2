@@ -367,6 +367,8 @@ class YamlCompiler(CmdParser):
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_YAML_PREPROCESSED)
 
     def Compile(self):
+        gVfrErrorHandle.SetInputFile(self.Options.YamlFileName)
+        gVfrErrorHandle.SetWarningAsError(self.Options.WarningAsError)
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_YAML_PREPROCESSED):
             if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD):
                 self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)

@@ -2217,7 +2217,7 @@ class VfrSyntaxVisitor(ParseTreeVisitor):
 
         NObj.SetHasStep(ctx.vfrSetMinMaxStep().Step() != None)
 
-        if self.CurrQestVarInfo.IsBitVar == False:
+        if (self.CurrQestVarInfo.IsBitVar == False) and (self.CurrQestVarInfo.VarType not in BasicTypes):
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, Line, 'Numeric question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data for namevalue

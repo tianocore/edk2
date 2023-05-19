@@ -141,12 +141,12 @@ class IfrTree():
                 C.write('  //' + ' ' + 'ARRAY LENGTH\n\n')
                 PkgLength = PkgHdr.Length + sizeof(ctypes.c_uint32)
                 for B in PkgLength.to_bytes(4, byteorder='little', signed=True):
-                    C.write('  0x%02x,' % B)
+                    C.write('  0x%02X,' % B)
                 C.write('\n\n')
                 C.write('  //' + ' ' + 'PACKAGE HEADER\n\n')
                 HeaderBuffer = gFormPkg.StructToStream(PkgHdr)
                 for B in HeaderBuffer:
-                    C.write('  0x%02x,' % B)
+                    C.write('  0x%02X,' % B)
                 C.write('\n\n')
                 C.write('  //' + ' ' + 'PACKAGE DATA\n\n')
                 self.Index = 0
@@ -237,13 +237,13 @@ class IfrTree():
                             self.Index += 1
                             Data = Root.Buffer[i]
                             if self.Index == gFormPkg.PkgLength:
-                                C.write('0x%02x' % Data)
+                                C.write('0x%02X' % Data)
                             elif self.Index % BYTES_PRE_LINE == 1:
-                                C.write('  0x%02x,  ' % Data)
+                                C.write('  0x%02X,  ' % Data)
                             elif self.Index % BYTES_PRE_LINE == 0:
-                                C.write('0x%02x,\n' % Data)
+                                C.write('0x%02X,\n' % Data)
                             else:
-                                C.write('0x%02x,  ' % Data)
+                                C.write('0x%02X,  ' % Data)
 
                             LineBuffer += '{:0>2X} '.format(Root.Buffer[i])
 
@@ -272,13 +272,13 @@ class IfrTree():
                             self.Index += 1
                             Data = Root.Buffer[i]
                             if self.Index == gFormPkg.PkgLength:
-                                C.write('0x%02x' % Data)
+                                C.write('0x%02X' % Data)
                             elif self.Index % BYTES_PRE_LINE == 1:
-                                C.write('  0x%02x,  ' % Data)
+                                C.write('  0x%02X,  ' % Data)
                             elif self.Index % BYTES_PRE_LINE == 0:
-                                C.write('0x%02x,\n' % Data)
+                                C.write('0x%02X,\n' % Data)
                             else:
-                                C.write('0x%02x,  ' % Data)
+                                C.write('0x%02X,  ' % Data)
                     except:
                         EdkLogger.error(
                             "VfrCompiler", FILE_WRITE_FAILURE,
@@ -471,9 +471,19 @@ class IfrTree():
         try:
             with open(FileName, 'w') as f:
                 f.write('## DO NOT REMOVE -- YAML Mode\n')
-                f.write('include:\n')
-                for HeaderFile in self.PreProcessDB.HeaderFiles:
-                    f.write('- ' + HeaderFile + '\n')
+                if self.PreProcessDB.HeaderFiles != []:
+                    f.write('include:\n')
+                    for HeaderFile in self.PreProcessDB.HeaderFiles:
+                        f.write(' - ' + HeaderFile + '\n')
+                f.write('\n')
+                if self.PreProcessDB.VfrDict != []:
+                    f.write('defines:\n')
+                    for Key in self.PreProcessDB.VfrDict.keys():
+                        if type(self.PreProcessDB.VfrDict[Key]) == EFI_GUID:
+                            f.write(f"  {Key}:  {self.PreProcessDB.VfrDict[Key].to_string()}\n")
+                        else:
+                            f.write(f"  {Key}:  {self.PreProcessDB.VfrDict[Key]}\n")
+                f.write('\n')
                 self._DumpYamlDfsWithUni(self.Root, f)
             f.close()
         except:

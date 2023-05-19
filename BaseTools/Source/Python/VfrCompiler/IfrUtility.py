@@ -1123,7 +1123,7 @@ class VfrDataStorage(object):
 
     def CheckGuidField(self, pNode, StoreGuid, HasFoundOne, ReturnCode):
         if StoreGuid != None:
-            #　If has guid info, compare the guid filed.
+            #　If has guid info, compare the guid field.
             if pNode.Guid.__cmp__(StoreGuid):
                 self.CurrVarStorageNode = pNode
                 ReturnCode = VfrReturnCode.VFR_RETURN_SUCCESS

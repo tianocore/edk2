@@ -138,9 +138,9 @@ class VfrErrorHandle():
         if self.vfrErrorMessage == None:
             return 1
         ErrorMsg = ''
-        for key in self.vfrErrorMessage.keys():
-            if ErrorCode == self.vfrErrorMessage[key]:
-                ErrorMsg = self.vfrErrorMessage[key]
+        for Key in self.vfrErrorMessage.keys():
+            if ErrorCode == Key:
+                ErrorMsg = self.vfrErrorMessage[Key]
                 break
         if ErrorMsg != '':
             EdkLogger.error('VfrCompiler', ErrorCode, ErrorMsg, self.InputFileName, LineNum, TokenValue)

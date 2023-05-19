@@ -4,6 +4,7 @@ import CppHeaderParser
 from IfrFormPkg import *
 from antlr4 import *
 from IfrCtypes import *
+import re
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from Common.LongFilePathSupport import LongFilePath
@@ -57,6 +58,11 @@ class KV():
         self.Key = Key
         self.Value = Value
 
+class ValueDB():
+    def __init__(self, PreVal, PostVal) -> None:
+        self.PreVal = PreVal
+        self.PostVal = PostVal
+
 class PreProcessDB():
     def __init__(self, Options: Options) -> None:
         self.Options = Options
@@ -65,9 +71,9 @@ class PreProcessDB():
 
     def Preprocess(self):
         self.HeaderFiles = self._ExtractHeaderFiles()
-        self.HeaderDict = self._GetHeaderDicts(self.HeaderFiles)
-        self.UniDict, self.UniDisPlayDict = self._GetUniDicts()
-        self.VfrDict = self._GetVfrDicts()
+        self.HeaderDict = self._GetHeaderDicts(self.HeaderFiles) # Read Guid definitions in Header files
+        self.UniDict, self.UniDisPlayDict = self._GetUniDicts() # Read Uni string token/id definitions in StrDef.h file
+        self.VfrDict = self._GetVfrDicts() # Read definitions in source file
         self.Preprocessed = True
         # self._GenExpandedHeaderFile()
 
@@ -116,8 +122,8 @@ class PreProcessDB():
                     NewValue += ' | '
             return NewValue
         else:
-            # error
-            print('error')
+            EdkLogger.error("VfrCompiler", PARAMETER_INVALID,
+                            "Invalid parameter:  %s" % Key, None)
 
     def _ExtractHeaderFiles(self):
         FileName = self.Options.InputFileName
@@ -142,82 +148,65 @@ class PreProcessDB():
                     break
             fFile.close()
         except:
-            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
-                            "File open failed for %s" % FileName, None)
+            EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE,
+                            "File parse failed for %s" % FileName, None)
         return HeaderFiles
 
-    def _GenExpandedHeaderFile(self):
-        try:
-            FileName = self.Options.ExpandedHeaderFileName
-            Output = open(FileName, 'w')
-            for HeaderFile in self.HeaderFiles:
-                FileName = HeaderFile.split('/')[-1]
-                FileList = self._FindIncludeHeaderFile("/edk2/", FileName)
-                CppHeader = None
-                for File in FileList:
-                    if File.find(HeaderFile.replace('/','\\')) != -1:
-                        Output.write(open(File, 'r').read())
-                        CppHeader = CppHeaderParser.CppHeader(File)
-                        break
-                if CppHeader == None:
-                    EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                                "File/directory %s not found in workspace" % (HeaderFile), None)
+    # def _GenExpandedHeaderFile(self):
+    #     try:
+    #         FileName = self.Options.ExpandedHeaderFileName
+    #         Output = open(FileName, 'w')
+    #         for HeaderFile in self.HeaderFiles:
+    #             FileName = HeaderFile.split('/')[-1]
+    #             FileList = self._FindIncludeHeaderFile("/edk2/", FileName)
+    #             CppHeader = None
+    #             for File in FileList:
+    #                 if File.find(HeaderFile.replace('/','\\')) != -1:
+    #                     Output.write(open(File, 'r').read())
+    #                     CppHeader = CppHeaderParser.CppHeader(File)
+    #                     break
+    #             if CppHeader == None:
+    #                 EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+    #                             "File/directory %s not found in workspace" % (HeaderFile), None)
 
-                for Include in CppHeader.includes:
-                    Include = Include[1:-1]
-                    IncludeFileName = Include.split('/')[1]
-                    IncludeHeaderFileList = self._FindIncludeHeaderFile("/edk2/", IncludeFileName)
-                    Flag = False
-                    for File in IncludeHeaderFileList:
-                        if File.find(Include.replace('/','\\')) != -1:
-                            Output.write(open(File, 'r').read())
-                            Flag = True
-                            break
-                    if Flag == False:
-                        EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                                        "File/directory %s not found in workspace" % IncludeFileName, None)
-            Output.close()
-        except:
-            EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
-                            "File open failed for %s" % FileName, None)
+    #             for Include in CppHeader.includes:
+    #                 Include = Include[1:-1]
+    #                 IncludeFileName = Include.split('/')[1]
+    #                 IncludeHeaderFileList = self._FindIncludeHeaderFile("/edk2/", IncludeFileName)
+    #                 Flag = False
+    #                 for File in IncludeHeaderFileList:
+    #                     if File.find(Include.replace('/','\\')) != -1:
+    #                         Output.write(open(File, 'r').read())
+    #                         Flag = True
+    #                         break
+    #                 if Flag == False:
+    #                     EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
+    #                                     "File/directory %s not found in workspace" % IncludeFileName, None)
+    #         Output.close()
+    #     except:
+    #         EdkLogger.error("VfrCompiler", FILE_OPEN_FAILURE,
+    #                         "File open failed for %s" % FileName, None)
 
-    # def _SetUniStrDefFileName(self):
-    #     if self.Options.ProcessedVfrFileName.find('/') == -1:
-    #         self.Options.ProcessedVfrFileName = self.Options.ProcessedVfrFileName.replace('\\', '/')
-    #     FileList = []
-    #     if self.Options.ProcessedVfrFileName.find('DriverSample') != -1:
-    #         FileList = self._FindIncludeHeaderFile('/edk2/', self.Options.ProcessedVfrFileName.split('/')[-3][:-3] + 'StrDefs.h')
-    #     else:
-    #         FileList = self._FindIncludeHeaderFile('/edk2/', self.Options.ProcessedVfrFileName.split('/')[-3] + 'StrDefs.h')
-    #     if self.Options.UniStrDefFileName == []:
-    #         EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-    #                         "File/directory %s not found in workspace" % (self.Options.ProcessedVfrFileName.split('/')[-3] + 'StrDefs.h'), None)
-    #     self.Options.UniStrDefFileName = FileList[0]
 
     def _GetUniDicts(self):
-
         if self.Options.UniStrDefFileName == None:
-            # if self.Options.OutputDirectory.find('/') == -1:
-            #     self.Options.OutputDirectory = self.Options.OutputDirectory.replace('\\', '/')
-            #     DebugPath = "/".join(self.Options.OutputDirectory.split('/'))[:-1] + '/DEBUG/'
             self.Options.UniStrDefFileName = self.Options.DebugDirectory + self.Options.ModuleName + 'StrDefs.h'
-
-        CppHeader = CppHeaderParser.CppHeader(self.Options.UniStrDefFileName)
+        # find UniFile
+        FileName = self.Options.UniStrDefFileName
+        with open(FileName, "r") as File:
+            Content = File.read()
         UniDict = {} # {String Token : String Token ID}
-        for Define in CppHeader.defines:
-            Items = Define.split()
-            if len(Items) == 2:
-                # key: STR_FORM_SET_TITLE_HELP, value: 0x1234, type: str
-                UniDict[Items[0]] = Items[1]
+        self._ParseDefines(FileName, UniDict)
+
+        if self.Options.UniStrDisplayFile == None:
+            self.Options.UniStrDisplayFile = self.Options.OutputDirectory + self.Options.BaseFileName + 'Uni.json'
 
         DisPlayUniDict = {} # {String Token : DisPlay String}
         if self.Options.LanuchYamlCompiler:
-            if self.Options.UniStrDisplayFile == None:
-                self.Options.UniStrDisplayFile = self.Options.OutputDirectory + self.Options.ModuleName + 'Uni.json'
             f = open(self.Options.UniStrDisplayFile, encoding='utf-8')
             Dict = json.load(f)
             f.close()
-            Dict = Dict["UniString"]["en-US"]
+            Dict = Dict[1]["en-US"]
             for Key in Dict.keys():
                 if Key in UniDict.keys():
                     NewKey = '{}'.format('0x%04x' % (int(UniDict[Key],0)))
@@ -229,17 +218,16 @@ class PreProcessDB():
         HeaderDict = {}
         for HeaderFile in HeaderFiles:
             FileName = HeaderFile.split('/')[-1]
-            # FileList = self._FindIncludeHeaderFile("/edk2/", FileName)
             FileList = self._FindIncludeHeaderFile(self.Options.IncludePaths, FileName)
             CppHeader = None
             for File in FileList:
                 if File.find(HeaderFile.replace('/','\\')) != -1:
-                    CppHeader = CppHeaderParser.CppHeader(File)
-                    self._ParseDefines(CppHeader.defines, HeaderDict)
+                    self._ParseDefines(File, HeaderDict)
                     break
             if CppHeader == None:
                 EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
                             "File/directory %s not found in workspace" % (HeaderFile), None)
+
             for Include in CppHeader.includes:
                 Include = Include[1:-1]
                 IncludeFileName = Include.split('/')[1]
@@ -247,67 +235,55 @@ class PreProcessDB():
                 Flag = False
                 for File in IncludeHeaderFileList:
                     if File.find(Include.replace('/','\\')) != -1:
-                        CppHeader = CppHeaderParser.CppHeader(File)
-                        self._ParseDefines(CppHeader.defines, HeaderDict)
+                        self._ParseDefines(File, HeaderDict)
                         Flag = True
                         break
                 if Flag == False:
                     EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
                                     "File/directory %s not found in workspace" % IncludeFileName, None)
-        #print(HeaderDict)
         return HeaderDict
 
     def _GetVfrDicts(self):
         VfrDict = {}
-        File = open(self.Options.InputFileName, 'r')
-        Defines = []
-        Wrap = False
-        IncompleteLine = ''
-        for Line in File:
-            if Wrap == True:
-                Defines.append(IncompleteLine + Line.replace('\n', ''))
-                Wrap = False
-                continue
-            if "#define" in Line:
-                if Line.find('\\') != -1:
-                    Wrap = True
-                    IncompleteLine = Line.split(" ", 1)[1].replace('\\\n', '')
-                else:
-                    Defines.append(Line.split(" ", 1)[1].replace('\n', ''))
-        self._ParseDefines(Defines, VfrDict)
+        if self.Options.LanuchVfrCompiler:
+            FileName = self.Options.InputFileName
+            self._ParseDefines(FileName, VfrDict)
         return VfrDict
 
-    def _ParseDefines(self, Defines, HeaderDict):
-        for Define in Defines:
-            #print(Define)
-            Items = Define.split()
-            if len(Items) == 2:
-                # key->str, Value->int
-                HeaderDict[Items[0]] = Items[1]
-                # HeaderDict[Items[0]] = int(Items[1], 16)
-            elif len(Items) > 2 and Items[0].find('GUID') != -1:
-                 # key->str, Value->str
-                GuidStr = ''
-                for i in range(1, len(Items)):
-                    if Items[i] != '{' and Items[i] != '}' and Items[i] != '{{' and Items[i] !='}}' and Items[i] != '\\':
-                        if ('{' in Items[i]):
-                            Items[i] = Items[i][1:]
-                        if '}' in Items[i]:
-                            Items[i] = Items[i][:-1]
+    def _ParseDefines(self, FileName, Dict):
+        Pattern = r"#define\s+(\w+)\s+(.*?)(?:(?<!\\)\n|$)"
+        with open(FileName, "r") as File:
+            Content = File.read()
 
-                        GuidStr += Items[i]
-                GuidItems = GuidStr.split(',')
-                Guid = EFI_GUID()
-                Guid.Data1 = int(GuidItems[0], 16)
-                Guid.Data2 = int(GuidItems[1], 16)
-                Guid.Data3 = int(GuidItems[2], 16)
-                for i in range(0, 8):
-                    Guid.Data4[i] = int(GuidItems[i+3], 16)
-                if Items[0].find('\\') != -1:
-                    Items[0] = Items[0][:-1]
-                Key = Items[0]
-                #Value = Guid.to_string()
-                HeaderDict[Key] = Guid
+        Matches = re.findall(Pattern, Content, re.DOTALL)
+        for Match in Matches:
+            Key = Match[0]
+            Value = re.sub(r"\s+", " ", Match[1].replace("\\\n", "").strip())
+            SubDefineMatches = re.findall(r"#define\s+(\w+)\s+(.*?)(?:(?<!\\)\n|$)", Value, re.DOTALL)
+            if SubDefineMatches:
+                for SubMatch in SubDefineMatches:
+                    SubKey = SubMatch[0]
+                    SubValue = re.sub(r"\s+", " ", SubMatch[1].replace("\\\n", "").strip())
+                    if SubValue.find("//") != -1:
+                        SubValue = SubValue.split("//")[0].strip()
+
+                    if SubValue.find('{') != -1:
+                        GuidList = re.findall(r"0x[0-9a-fA-F]+", SubValue)
+                        GuidList = [int(num, 16) for num in GuidList]
+                        SubValue = EFI_GUID()
+                        SubValue.from_list(GuidList)
+                        # SubValue = SubValue.to_string()
+                    Dict[SubKey] = SubValue
+            else:
+                if Value.find("//") != -1:
+                    Value = Value.split("//")[0].strip()
+                if Value.find('{') != -1:
+                    GuidList = re.findall(r"0x[0-9a-fA-F]+", Value)
+                    GuidList = [int(num, 16) for num in GuidList]
+                    Value = EFI_GUID()
+                    Value.from_list(GuidList)
+                    # Value =  Value.to_string()
+                Dict[Key] = Value
 
     def _FindIncludeHeaderFile(self, IncludePaths, Name):
         FileList = []
