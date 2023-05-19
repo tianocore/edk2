@@ -14,6 +14,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 UINTN  mEfiLocateHandleRequest = 0;
 
+extern EFI_DEVICE_PATH_PROTOCOL  *gFilePathCache;
+extern EFI_HANDLE                gDeviceHandleCache;
+extern EFI_DEVICE_PATH_PROTOCOL  *gOutgoingDevicePathCache;
+
 //
 // Internal prototypes
 //
@@ -467,8 +471,19 @@ CoreLocateDevicePath (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((DevicePath == NULL) || (*DevicePath == NULL)) {
+  if ((DevicePath == NULL) || (*DevicePath == NULL) || (Device == NULL)) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if (gFilePathCache != NULL) {
+    Size       = GetDevicePathSize (gFilePathCache) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
+    SourceSize = GetDevicePathSize (*DevicePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
+
+    if ((Size == SourceSize) && (CompareMem (gFilePathCache, *DevicePath, (UINTN)Size) == 0)) {
+      *Device     = gDeviceHandleCache;
+      *DevicePath = gOutgoingDevicePathCache;
+      return EFI_SUCCESS;
+    }
   }
 
   Handles       = NULL;
@@ -539,10 +554,6 @@ CoreLocateDevicePath (
   //
   if (BestMatch == -1) {
     return EFI_NOT_FOUND;
-  }
-
-  if (Device == NULL) {
-    return EFI_INVALID_PARAMETER;
   }
 
   *Device = BestDevice;
