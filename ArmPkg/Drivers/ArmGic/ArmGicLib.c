@@ -176,24 +176,28 @@ ArmGicAcknowledgeInterrupt (
   )
 {
   UINTN                  Value;
+  UINTN                  IntId;
   ARM_GIC_ARCH_REVISION  Revision;
 
+  ASSERT (InterruptId != NULL);
   Revision = ArmGicGetSupportedArchRevision ();
   if (Revision == ARM_GIC_ARCH_REVISION_2) {
     Value = ArmGicV2AcknowledgeInterrupt (GicInterruptInterfaceBase);
-    // InterruptId is required for the caller to know if a valid or spurious
-    // interrupt has been read
-    ASSERT (InterruptId != NULL);
-    if (InterruptId != NULL) {
-      *InterruptId = Value & ARM_GIC_ICCIAR_ACKINTID;
-    }
+    IntId = Value & ARM_GIC_ICCIAR_ACKINTID;
   } else if (Revision == ARM_GIC_ARCH_REVISION_3) {
     Value = ArmGicV3AcknowledgeInterrupt ();
+    IntId = Value;
   } else {
     ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
     // Report Spurious interrupt which is what the above controllers would
     // return if no interrupt was available
     Value = 1023;
+  }
+
+  if (InterruptId != NULL) {
+    // InterruptId is required for the caller to know if a valid or spurious
+    // interrupt has been read
+    *InterruptId = IntId;
   }
 
   return Value;
