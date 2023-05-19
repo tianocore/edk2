@@ -250,24 +250,6 @@ if NOT exist %CONF_PATH%\build_rule.txt (
   if defined RECONFIG copy /Y %EDK_TOOLS_PATH%\Conf\build_rule.template %CONF_PATH%\build_rule.txt > nul
 )
 
-echo           PATH      = %PATH%
-echo.
-if defined WORKSPACE (
-  echo      WORKSPACE      = %WORKSPACE%
-)
-if defined PACKAGES_PATH (
-  echo  PACKAGES_PATH      = %PACKAGES_PATH%
-)
-echo EDK_TOOLS_PATH      = %EDK_TOOLS_PATH%
-if defined BASE_TOOLS_PATH (
-  echo BASE_TOOLS_PATH     = %BASE_TOOLS_PATH%
-)
-if defined EDK_TOOLS_BIN (
-  echo  EDK_TOOLS_BIN      = %EDK_TOOLS_BIN%
-)
-echo      CONF_PATH      = %CONF_PATH%
-echo.
-
 :skip_reconfig
 
 @REM
@@ -371,18 +353,32 @@ if %ERRORLEVEL% EQU 0 (
   @echo Using EDK2 in-source Basetools
   if defined BASETOOLS_PYTHON_SOURCE goto print_python_info
   set "PATH=%BASE_TOOLS_PATH%\BinWrappers\WindowsLike;%PATH%"
-  set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
-  set PYTHONPATH=%BASETOOLS_PYTHON_SOURCE%;%PYTHONPATH%
+  set PYTHONPATH=%BASE_TOOLS_PATH%\Source\Python;%PYTHONPATH%
   goto print_python_info
 
 :use_pip_basetools
   @echo Using Pip Basetools
   set "PATH=%BASE_TOOLS_PATH%\BinPipWrappers\WindowsLike;%PATH%"
-  set BASETOOLS_PYTHON_SOURCE=edk2basetools
+  set PYTHONPATH=%BASE_TOOLS_PATH%\Source\Python;%PYTHONPATH%
   goto print_python_info
 
 :print_python_info
-  echo                PATH = %PATH%
+  echo           PATH      = %PATH%
+  echo.
+  if defined WORKSPACE (
+    echo      WORKSPACE      = %WORKSPACE%
+  )
+  if defined PACKAGES_PATH (
+    echo  PACKAGES_PATH      = %PACKAGES_PATH%
+  )
+  echo EDK_TOOLS_PATH      = %EDK_TOOLS_PATH%
+  if defined BASE_TOOLS_PATH (
+    echo BASE_TOOLS_PATH     = %BASE_TOOLS_PATH%
+  )
+  if defined EDK_TOOLS_BIN (
+    echo  EDK_TOOLS_BIN      = %EDK_TOOLS_BIN%
+  )
+  echo      CONF_PATH      = %CONF_PATH%
   echo      PYTHON_COMMAND = %PYTHON_COMMAND%
   echo          PYTHONPATH = %PYTHONPATH%
   echo.

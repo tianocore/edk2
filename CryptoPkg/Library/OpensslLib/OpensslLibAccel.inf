@@ -687,8 +687,7 @@
   #
   GCC:*_*_IA32_CC_FLAGS    = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_CONFIG) -Wno-error=maybe-uninitialized -Wno-error=unused-but-set-variable
   GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) $(OPENSSL_FLAGS_CONFIG) -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable -DNO_MSABI_VA_FUNCS
-  GCC:*_CLANG35_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized
-  GCC:*_CLANG38_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized
+  GCC:*_CLANGDWARF_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize
   GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize
   # Revisit after switching to 3.0 branch
   GCC:*_GCC5_*_CC_FLAGS    = -Wno-unused-but-set-variable
