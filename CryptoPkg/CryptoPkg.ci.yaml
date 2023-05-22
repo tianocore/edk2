@@ -9,7 +9,9 @@
     "LicenseCheck": {
         "IgnoreFiles": [
             # These directories contain auto-generated OpenSSL content
-            "Library/OpensslLib/OpensslGen"
+            "Library/OpensslLib/OpensslGen",
+            "Library/OpensslLib/OpensslStub/crypto/objects",
+            "Library/OpensslLib/OpensslStub/openssl"
         ]
     },
     "EccCheck": {
@@ -131,7 +133,12 @@
             "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_rsa.h",
             "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_wrap.h",
             "Library/OpensslLib/OpensslStub/uefiprov.c",
-            "Library/OpensslLib/OpensslStub/minprov.c"
+            "Library/OpensslLib/OpensslStub/minprov.c",
+            "Library/OpensslLib/OpensslStub/crypto/objects/obj_xref.h",
+            "Library/OpensslLib/OpensslStub/crypto/objects/obj_dat.h",
+            "Library/OpensslLib/OpensslStub/crypto/objects/obj_xref.c",
+            "Library/OpensslLib/OpensslStub/crypto/objects/obj_dat.c",
+            "Library/OpensslLib/OpensslStub/openssl/obj_mac.h"
         ]
     }
 }
