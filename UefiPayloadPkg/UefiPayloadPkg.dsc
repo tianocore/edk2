@@ -305,6 +305,7 @@
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+  FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
 
 [LibraryClasses.common]
 !if $(BOOTSPLASH_IMAGE)
@@ -602,6 +603,16 @@
   [Components.X64]
   !if $(UNIVERSAL_PAYLOAD) == TRUE
     UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
+    UefiPayloadPkg/PayloadLoaderPeim/FitPayloadLoaderPeim.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
+      MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+      PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+      HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+      PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+      PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
+      DebugLib|MdeModulePkg/Library/PeiDebugLibDebugPpi/PeiDebugLibDebugPpi.inf
+    }
   !else
     UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
   !endif

@@ -6,6 +6,7 @@
 **/
 
 #include "UefiPayloadEntry.h"
+#include <Library/FdtLib.h>
 
 #define MEMORY_ATTRIBUTE_MASK  (EFI_RESOURCE_ATTRIBUTE_PRESENT             |        \
                                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED         | \
@@ -25,6 +26,8 @@
 
 extern VOID  *mHobList;
 
+CHAR8  *mLineBuffer  = NULL;
+
 /**
   Print all HOBs info from the HOB list.
 
@@ -34,6 +37,113 @@ VOID
 PrintHob (
   IN CONST VOID  *HobStart
   );
+
+/**
+
+  Find the first substring.
+
+  @param  String    Point to the string where to find the substring.
+  @param  CharSet   Point to the string to be found.
+
+**/
+UINTN
+EFIAPI
+AsciiStrSpn (
+  IN CHAR8  *String,
+  IN CHAR8  *CharSet
+  )
+{
+  UINTN  Count;
+  CHAR8  *Str1;
+  CHAR8  *Str2;
+
+  Count = 0;
+
+  for (Str1 = String; *Str1 != L'\0'; Str1++) {
+    for (Str2 = CharSet; *Str2 != L'\0'; Str2++) {
+      if (*Str1 == *Str2) {
+        break;
+      }
+    }
+
+    if (*Str2 == L'\0') {
+      return Count;
+    }
+
+    Count++;
+  }
+
+  return Count;
+}
+
+/**
+
+  Searches a string for the first occurrence of a character contained in a
+  specified buffer.
+
+  @param  String    Point to the string where to find the substring.
+  @param  CharSet   Point to the string to be found.
+
+**/
+CHAR8 *
+EFIAPI
+AsciiStrBrk (
+  IN CHAR8  *String,
+  IN CHAR8  *CharSet
+  )
+{
+  CHAR8  *Str1;
+  CHAR8  *Str2;
+
+  for (Str1 = String; *Str1 != L'\0'; Str1++) {
+    for (Str2 = CharSet; *Str2 != L'\0'; Str2++) {
+      if (*Str1 == *Str2) {
+        return (CHAR8 *)Str1;
+      }
+    }
+  }
+
+  return NULL;
+}
+
+/**
+
+  Find the next token after one or more specified characters.
+
+  @param  String    Point to the string where to find the substring.
+  @param  CharSet   Point to the string to be found.
+
+**/
+CHAR8 *
+EFIAPI
+AsciiStrTokenLine (
+  IN CHAR8  *String OPTIONAL,
+  IN CHAR8  *CharSet
+  )
+{
+  CHAR8  *Begin;
+  CHAR8  *End;
+
+  Begin = (String == NULL) ? mLineBuffer : String;
+  if (Begin == NULL) {
+    return NULL;
+  }
+
+  Begin += AsciiStrSpn (Begin, CharSet);
+  if (*Begin == L'\0') {
+    mLineBuffer = NULL;
+    return NULL;
+  }
+
+  End = AsciiStrBrk (Begin, CharSet);
+  if ((End != NULL) && (*End != L'\0')) {
+    *End = L'\0';
+    End++;
+  }
+
+  mLineBuffer = End;
+  return Begin;
+}
 
 /**
   Some bootloader may pass a pcd database, and UPL also contain a PCD database.
@@ -282,6 +392,100 @@ IsHobNeed (
 }
 
 /**
+  It will build Fv HOBs based on information from bootloaders.
+
+  @param[out] DxeFv          The pointer to the DXE FV in memory.
+
+  @retval EFI_SUCCESS        If it completed successfully.
+  @retval EFI_NOT_FOUND      If it failed to find node in fit image.
+  @retval Others             If it failed to build required HOBs.
+**/
+EFI_STATUS
+BuildFitLoadablesFvHob (
+  OUT EFI_FIRMWARE_VOLUME_HEADER  **DxeFv
+  )
+{
+  EFI_STATUS               Status;
+  VOID                     *Fdt;
+  UINT8                    *GuidHob;
+  UNIVERSAL_PAYLOAD_BASE   *PayloadBase;
+  INT32                    ConfigNode;
+  INT32                    Config1Node;
+  INT32                    ImageNode;
+  INT32                    FvNode;
+  CONST FDT_PROPERTY       *PropertyPtr;
+  INT32                    TempLen;
+  CHAR8                    *Loadables;
+  CHAR8                    *FvToken;
+  UINT32                   DataOffset;
+  UINT32                   DataSize;
+  UINT32                   *Data32;
+
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadBaseGuid);
+  if (GuidHob != NULL) {
+    PayloadBase = (UNIVERSAL_PAYLOAD_BASE *)GET_GUID_HOB_DATA (GuidHob);
+    Fdt         = (VOID *)(UINTN)PayloadBase->Entry;
+    DEBUG ((DEBUG_INFO, "PayloadBase Entry = 0x%08x\n", PayloadBase->Entry));
+  }
+
+  Status = FdtCheckHeader (Fdt);
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  ConfigNode = FdtSubnodeOffsetNameLen(Fdt, 0, "configurations", (INT32)AsciiStrLen("configurations"));
+  if (ConfigNode <= 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  Config1Node = FdtSubnodeOffsetNameLen(Fdt, ConfigNode, "conf-1", (INT32)AsciiStrLen("conf-1"));
+  if (Config1Node <= 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  PropertyPtr = FdtGetProperty (Fdt, Config1Node,"loadables", &TempLen);
+  Loadables   = (CHAR8 *)(PropertyPtr->Data);
+  FvToken = AsciiStrTokenLine (Loadables, ",");
+  ImageNode = FdtSubnodeOffsetNameLen(Fdt, 0, "images", (INT32)AsciiStrLen("images"));
+  if (ImageNode <= 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  while (FvToken != NULL) {
+    FvNode = FdtSubnodeOffsetNameLen(Fdt, ImageNode, FvToken, (INT32)AsciiStrLen(FvToken));
+    if (FvNode <= 0) {
+      return EFI_NOT_FOUND;
+    }
+
+    PropertyPtr = FdtGetProperty (Fdt, FvNode, "data-offset", &TempLen);
+    Data32      = (UINT32 *)(PropertyPtr->Data);
+    DataOffset  = SwapBytes32 (*Data32);
+
+    PropertyPtr = FdtGetProperty (Fdt, FvNode, "data-size", &TempLen);
+    Data32      = (UINT32 *)(PropertyPtr->Data);
+    DataSize    = SwapBytes32 (*Data32);
+
+    if (AsciiStrCmp (FvToken, "uefi-fv") == 0) {
+      *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)PayloadBase->Entry + (UINTN)DataOffset);
+      ASSERT ((*DxeFv)->FvLength == DataSize);
+    } else {
+      BuildFvHob (((UINTN)PayloadBase->Entry + (UINTN)DataOffset), DataSize);
+    }
+
+    DEBUG ((
+      DEBUG_INFO,
+      "UPL Multiple fv[%a], Base=0x%08x, size=0x%08x\n",
+      FvToken,
+      ((UINTN)PayloadBase->Entry + (UINTN)DataOffset),
+      DataSize,
+      DataOffset
+      ));
+    FvToken = AsciiStrTokenLine (NULL, ",");
+  }
+  return EFI_SUCCESS;
+}
+
+/**
   It will build HOBs based on information from bootloaders.
 
   @param[in]  BootloaderParameter   The starting memory address of bootloader parameter block.
@@ -304,13 +508,11 @@ BuildHobs (
   EFI_PHYSICAL_ADDRESS          MemoryTop;
   EFI_HOB_RESOURCE_DESCRIPTOR   *PhitResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceHob;
-  UNIVERSAL_PAYLOAD_EXTRA_DATA  *ExtraData;
   UINT8                         *GuidHob;
   EFI_HOB_FIRMWARE_VOLUME       *FvHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE  *AcpiTable;
   ACPI_BOARD_INFO               *AcpiBoardInfo;
   EFI_HOB_HANDOFF_INFO_TABLE    *HobInfo;
-  UINT8                         Idx;
 
   Hob.Raw           = (UINT8 *)BootloaderParameter;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
@@ -392,30 +594,7 @@ BuildHobs (
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
-  //
-  // Get DXE FV location
-  //
-  GuidHob = GetFirstGuidHob (&gUniversalPayloadExtraDataGuid);
-  ASSERT (GuidHob != NULL);
-  ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *)GET_GUID_HOB_DATA (GuidHob);
-  DEBUG ((DEBUG_INFO, "Multiple Fv Count=%d\n", ExtraData->Count));
-  ASSERT (AsciiStrCmp (ExtraData->Entry[0].Identifier, "uefi_fv") == 0);
-
-  *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)ExtraData->Entry[0].Base;
-  ASSERT ((*DxeFv)->FvLength == ExtraData->Entry[0].Size);
-  //
-  // support multiple FVs provided by UPL
-  //
-  for (Idx = 1; Idx < ExtraData->Count; Idx++) {
-    BuildFvHob (ExtraData->Entry[Idx].Base, ExtraData->Entry[Idx].Size);
-    DEBUG ((
-      DEBUG_INFO,
-      "UPL Multiple fv[%d], Base=0x%x, size=0x%x\n",
-      Idx,
-      ExtraData->Entry[Idx].Base,
-      ExtraData->Entry[Idx].Size
-      ));
-  }
+  BuildFitLoadablesFvHob (DxeFv);
 
   //
   // Create guid hob for acpi board information

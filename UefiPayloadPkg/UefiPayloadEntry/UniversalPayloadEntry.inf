@@ -53,6 +53,7 @@
   HobLib
   PeCoffLib
   CpuLib
+  FdtLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -63,6 +64,7 @@
   gEfiSmbiosTableGuid
   gUefiSerialPortInfoGuid
   gUniversalPayloadExtraDataGuid
+  gUniversalPayloadBaseGuid
   gPcdDataBaseHobGuid
   gUniversalPayloadSmbiosTableGuid
   gEfiHobMemoryAllocBspStoreGuid
