@@ -92,6 +92,10 @@
     "UncrustifyCheck": {
         "IgnoreFiles": [
             "Library/OpensslLib/OpensslGen/",
+            "Library/OpensslLib/OpensslGen/providers/common/der/",
+            "Library/OpensslLib/OpensslGen/providers/common/include/prov/",
+            "Library/OpensslLib/OpensslGen/include/crypto/",
+            "Library/OpensslLib/OpensslGen/include/openssl/",
             "Library/OpensslLib/OpensslStub/uefiprov.c",
             "Library/OpensslLib/OpensslStub/minprov.c"
         ]
