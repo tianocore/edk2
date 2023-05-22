@@ -743,6 +743,7 @@ Tpm2TestParms (
           return EFI_INVALID_PARAMETER;
       }
 
+      break;
     case TPM_ALG_SYMCIPHER:
       WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.algorithm));
       Buffer += sizeof (UINT16);

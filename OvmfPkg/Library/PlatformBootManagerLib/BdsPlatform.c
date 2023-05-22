@@ -291,6 +291,46 @@ RemoveStaleFvFileOptions (
 }
 
 VOID
+RestrictBootOptionsToFirmware (
+  VOID
+  )
+{
+  EFI_BOOT_MANAGER_LOAD_OPTION  *BootOptions;
+  UINTN                         BootOptionCount;
+  UINTN                         Index;
+
+  BootOptions = EfiBootManagerGetLoadOptions (
+                  &BootOptionCount,
+                  LoadOptionTypeBoot
+                  );
+
+  for (Index = 0; Index < BootOptionCount; ++Index) {
+    EFI_DEVICE_PATH_PROTOCOL  *Node1;
+
+    //
+    // If the device path starts with Fv(...),
+    // then keep the boot option.
+    //
+    Node1 = BootOptions[Index].FilePath;
+    if (((DevicePathType (Node1) == MEDIA_DEVICE_PATH) &&
+         (DevicePathSubType (Node1) == MEDIA_PIWG_FW_VOL_DP)))
+    {
+      continue;
+    }
+
+    //
+    // Delete the boot option.
+    //
+    EfiBootManagerDeleteLoadOptionVariable (
+      BootOptions[Index].OptionNumber,
+      LoadOptionTypeBoot
+      );
+  }
+
+  EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
+}
+
+VOID
 PlatformRegisterOptionsAndKeys (
   VOID
   )
@@ -485,7 +525,9 @@ PlatformBootManagerBeforeConsole (
     Status
     ));
 
-  PlatformRegisterOptionsAndKeys ();
+  if (!FeaturePcdGet (PcdBootRestrictToFirmware)) {
+    PlatformRegisterOptionsAndKeys ();
+  }
 
   //
   // Install both VIRTIO_DEVICE_PROTOCOL and (dependent) EFI_RNG_PROTOCOL
@@ -1754,9 +1796,12 @@ PlatformBootManagerAfterConsole (
   //
   // Perform some platform specific connect sequence
   //
-  PlatformBdsConnectSequence ();
-
-  EfiBootManagerRefreshAllBootOption ();
+  if (FeaturePcdGet (PcdBootRestrictToFirmware)) {
+    RestrictBootOptionsToFirmware ();
+  } else {
+    PlatformBdsConnectSequence ();
+    EfiBootManagerRefreshAllBootOption ();
+  }
 
   //
   // Register UEFI Shell
@@ -1764,6 +1809,15 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (
     &gUefiShellFileGuid,
     L"EFI Internal Shell",
+    LOAD_OPTION_ACTIVE
+    );
+
+  //
+  // Register Grub
+  //
+  PlatformRegisterFvBootOption (
+    &gGrubFileGuid,
+    L"Grub Bootloader",
     LOAD_OPTION_ACTIVE
     );
 
@@ -1934,6 +1988,14 @@ PlatformBootManagerUnableToBoot (
   EFI_INPUT_KEY                 Key;
   EFI_BOOT_MANAGER_LOAD_OPTION  BootManagerMenu;
   UINTN                         Index;
+
+  if (FeaturePcdGet (PcdBootRestrictToFirmware)) {
+    AsciiPrint (
+      "%a: No bootable option was found.\n",
+      gEfiCallerBaseName
+      );
+    CpuDeadLoop ();
+  }
 
   //
   // BootManagerMenu doesn't contain the correct information when return status

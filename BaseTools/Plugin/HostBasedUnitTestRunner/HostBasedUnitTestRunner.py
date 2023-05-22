@@ -205,28 +205,64 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         testList = glob.glob(os.path.join(buildOutputBase, "**","*Test*.exe"), recursive=True)
         workspace = thebuilder.env.GetValue("WORKSPACE")
         workspace = (workspace + os.sep) if workspace[-1] != os.sep else workspace
+        workspaceBuild = os.path.join(workspace, 'Build')
         # Generate coverage file
         coverageFile = ""
         for testFile in testList:
             ret = RunCmd("OpenCppCoverage", f"--source {workspace} --export_type binary:{testFile}.cov -- {testFile}")
-            coverageFile += " --input_coverage=" + testFile + ".cov"
+            if ret != 0:
+                logging.error("UnitTest Coverage: Failed to collect coverage data.")
+                return 1
+
+            coverageFile  = f" --input_coverage={testFile}.cov"
+            totalCoverageFile = os.path.join(buildOutputBase, 'coverage.cov')
+            if os.path.isfile(totalCoverageFile):
+                coverageFile += f" --input_coverage={totalCoverageFile}"
+            ret = RunCmd(
+                "OpenCppCoverage",
+                f"--export_type binary:{totalCoverageFile} " +
+                f"--working_dir={workspaceBuild} " +
+                f"{coverageFile}"
+                )
             if ret != 0:
                 logging.error("UnitTest Coverage: Failed to collect coverage data.")
                 return 1
 
         # Generate and XML file if requested.by each package
-        ret = RunCmd("OpenCppCoverage", f"--export_type cobertura:{os.path.join(buildOutputBase, 'coverage.xml')} --working_dir={workspace}Build {coverageFile}")
+        ret = RunCmd(
+            "OpenCppCoverage",
+            f"--export_type cobertura:{os.path.join(buildOutputBase, 'coverage.xml')} " +
+            f"--working_dir={workspaceBuild} " +
+            f"--input_coverage={totalCoverageFile} "
+            )
         if ret != 0:
             logging.error("UnitTest Coverage: Failed to generate cobertura format xml in single package.")
             return 1
 
         # Generate total report XML file for all package
-        testCoverageList = glob.glob(os.path.join(workspace, "Build", "**","*Test*.exe.cov"), recursive=True)
+        testCoverageList = glob.glob(os.path.join(workspace, "Build", "**", "*Test*.exe.cov"), recursive=True)
         coverageFile = ""
+        totalCoverageFile = os.path.join(workspaceBuild, 'coverage.cov')
         for testCoverage in testCoverageList:
-            coverageFile += " --input_coverage=" + testCoverage
+            coverageFile  = f" --input_coverage={testCoverage}"
+            if os.path.isfile(totalCoverageFile):
+                coverageFile += f" --input_coverage={totalCoverageFile}"
+            ret = RunCmd(
+                "OpenCppCoverage",
+                f"--export_type binary:{totalCoverageFile} " +
+                f"--working_dir={workspaceBuild} " +
+                f"{coverageFile}"
+                )
+            if ret != 0:
+                logging.error("UnitTest Coverage: Failed to collect coverage data.")
+                return 1
 
-        ret = RunCmd("OpenCppCoverage", f"--export_type cobertura:{workspace}Build/coverage.xml --working_dir={workspace}Build {coverageFile}")
+        ret = RunCmd(
+            "OpenCppCoverage",
+            f"--export_type cobertura:{os.path.join(workspaceBuild, 'coverage.xml')} " +
+            f"--working_dir={workspaceBuild} " +
+            f"--input_coverage={totalCoverageFile}"
+            )
         if ret != 0:
             logging.error("UnitTest Coverage: Failed to generate cobertura format xml.")
             return 1
