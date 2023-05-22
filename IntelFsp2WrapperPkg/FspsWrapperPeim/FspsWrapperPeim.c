@@ -438,7 +438,7 @@ FspsWrapperInitDispatchMode (
   // FSP-S Wrapper running in Dispatch mode and reports FSP-S FV to PEI dispatcher.
   //
   PeiServicesInstallFvInfoPpi (
-    NULL,
+    &((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspsBaseAddress))->FileSystemGuid,
     (VOID *)(UINTN)PcdGet32 (PcdFspsBaseAddress),
     (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspsBaseAddress))->FvLength,
     NULL,

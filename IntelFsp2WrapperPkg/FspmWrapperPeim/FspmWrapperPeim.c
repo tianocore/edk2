@@ -217,7 +217,7 @@ FspmWrapperInit (
     ASSERT_EFI_ERROR (Status);
 
     PeiServicesInstallFvInfoPpi (
-      NULL,
+      &((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspmBaseAddress))->FileSystemGuid,
       (VOID *)(UINTN)PcdGet32 (PcdFspmBaseAddress),
       (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspmBaseAddress))->FvLength,
       NULL,
