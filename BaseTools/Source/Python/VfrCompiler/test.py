@@ -1,9 +1,8 @@
 import yaml
-path = 'C:\\edk2\\Build\\OvmfX64\\DEBUG_VS2019\\X64\\NetworkPkg\\IScsiDxe\\IScsiDxe\\DEBUG\\IScsiConfigVfr.yml'
-FileName = path
-File = open(FileName, 'r')
+File = open("C:\\edk2\\BaseTools\\Source\\Python\\VfrCompiler\\test.yml", 'r')
 #self.YamlDict = yaml.load(f.read(), Loader=yaml.FullLoader)
 print(yaml.safe_load(File))
+
 # import yaml
 
 # def load_yaml_file(file_path):

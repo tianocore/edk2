@@ -475,15 +475,15 @@ class IfrTree():
                     f.write('include:\n')
                     for HeaderFile in self.PreProcessDB.HeaderFiles:
                         f.write(' - ' + HeaderFile + '\n')
-                f.write('\n')
-                if self.PreProcessDB.VfrDict != []:
+                    f.write('\n')
+                if self.PreProcessDB.VfrDict != {}:
                     f.write('defines:\n')
                     for Key in self.PreProcessDB.VfrDict.keys():
                         if type(self.PreProcessDB.VfrDict[Key]) == EFI_GUID:
-                            f.write(f"  {Key}:  {self.PreProcessDB.VfrDict[Key].to_string()}\n")
+                            f.write(f"  {Key}:  \'{self.PreProcessDB.VfrDict[Key].to_string()}\'\n")
                         else:
                             f.write(f"  {Key}:  {self.PreProcessDB.VfrDict[Key]}\n")
-                f.write('\n')
+                    f.write('\n')
                 self._DumpYamlDfsWithUni(self.Root, f)
             f.close()
         except:
@@ -568,8 +568,11 @@ class IfrTree():
                     if 'classguid' in Root.Dict.keys():
                         for i in range(0, len(Root.Data.GetClassGuid())):
                             f.write(ValueIndent + 'classguid:  '  + Root.Dict['classguid'][i].Key + '\n')
-                    if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
+                    if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP and type(Root.Child[0].Data) != IfrSubClass and type(Root.Child[0].Data) != IfrClass:
                         f.write(ValueIndent + 'component:  \n')
+                    elif type(Root.Child[0].Data) == IfrClass and type(Root.Child[1].Data) == IfrSubClass:
+                        Root.Child[0].Data.HasSubClass = True
+
 
                 if Root.OpCode == EFI_IFR_VARSTORE_OP:
                     f.write(KeyIndent + '- varstore:\n')
@@ -1078,11 +1081,14 @@ class IfrTree():
 
                     if type(Root.Data) == IfrClass:
                         ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
-                        f.write(ValueIndent + 'class:  ' + Root.Dict['class'].Key + '\n')
+                        f.write(ValueIndent + '  class:  ' + Root.Dict['class'].Key + '\n')
+                        if not Root.Data.HasSubClass:
+                            f.write(ValueIndent + '  component:  \n')
 
                     if type(Root.Data) == IfrSubClass:
                         ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
-                        f.write(ValueIndent + 'subclass:  ' + Root.Dict['subclass'].Key + '\n')
+                        f.write(ValueIndent + '  subclass:  ' + Root.Dict['subclass'].Key + '\n')
+                        f.write(ValueIndent + '  component:  \n')
 
                     if type(Root.Data) == IfrExtensionGuid:
                         if type(Root.Parent.Data) == IfrExtensionGuid:
@@ -1286,8 +1292,10 @@ class IfrTree():
                         f.write(ValueIndent + 'classguid{}:  '.format(i+1) + '\'{'  + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
                         '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\'\n')
-                    if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
+                    if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP and type(Root.Child[0].Data) != IfrSubClass and type(Root.Child[0].Data) != IfrClass:
                         f.write(ValueIndent + 'component:  \n')
+                    elif type(Root.Child[0].Data) == IfrClass and type(Root.Child[1].Data) == IfrSubClass:
+                        Root.Child[0].Data.HasSubClass = True
 
                 if Root.OpCode == EFI_IFR_VARSTORE_OP:
                     f.write(KeyIndent + '- varstore:\n')
@@ -1713,12 +1721,15 @@ class IfrTree():
 
                     if type(Root.Data) == IfrClass:
                         ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
-                        f.write(ValueIndent + 'class:  {}\n'.format(Info.Class))
+                        f.write(ValueIndent + '  class:  {}\n'.format(Info.Class))
                         # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
+                        if not Root.Data.HasSubClass:
+                            f.write(ValueIndent + '  component:  \n')
 
                     if type(Root.Data) == IfrSubClass:
                         ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
-                        f.write(ValueIndent + 'subclass:  {}\n'.format(Info.SubClass))
+                        f.write(ValueIndent + '  subclass:  {}\n'.format(Info.SubClass))
+                        f.write(ValueIndent + '  component:  \n')
                         # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
 
                     if type(Root.Data) == IfrExtensionGuid:

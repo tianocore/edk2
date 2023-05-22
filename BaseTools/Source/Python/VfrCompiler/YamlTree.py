@@ -5,6 +5,7 @@ from IfrFormPkg import *
 from VfrError import *
 from IfrPreProcess import *
 import re
+import copy
 
 
 class YamlTree():
@@ -36,7 +37,7 @@ class YamlTree():
         # Get Yaml GuidId
         self.GuidID = self.YamlDict['formset']['guid']
         if 'defines' in self.YamlDict.keys():
-            self.PreProcessDB.VfrDict = self.YamlDict['defines']
+            self.PreProcessDB.VfrDict = copy.deepcopy(self.YamlDict['defines'])
         # Tranfer Strings into Specfic Values by PreprocessDB
         self.PreProcessYamlDict(self.YamlDict)
         # try:
@@ -141,28 +142,30 @@ class YamlTree():
                 # get the specific value of string token
                 Start = Value.find('(') + 1
                 End = Value.find(')')
-                if Value[Start:End] in self.PreProcessDB.UniDict.keys():
+                if self.PreProcessDB.UniDict and Value[Start:End] in self.PreProcessDB.UniDict.keys():
                     YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.UniDict[Value[Start:End]]))
                     #YamlDict[Key] = 'STRING_TOKEN' + '(' +  self.PreProcessDB.UniDict[Value[Start:End]] + ')'
                 # get {key:value} dicts from header files
-                elif Value in self.PreProcessDB.HeaderDict.keys():
+                elif self.PreProcessDB.HeaderDict and Value in self.PreProcessDB.HeaderDict.keys():
                     if Key == 'formid':
                         YamlDict[Key] = ValueDB(Value, [Value, self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value])])
                     else:
                         YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value]))
-                elif Value in self.PreProcessDB.VfrDict.keys():
+                elif self.PreProcessDB.VfrDict and Value in self.PreProcessDB.VfrDict.keys():
                     YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.VfrDict[Value]))
                 elif '|' in Value:
                     Items = Value.split('|')
                     ValueList = []
                     for i in range(0, len(Items)):
                         # get {key:value} dicts from header files
-                        if Items[i].strip() in self.PreProcessDB.HeaderDict.keys():
+                        if self.PreProcessDB.HeaderDict and Items[i].strip() in self.PreProcessDB.HeaderDict.keys():
                             ValueList.append(self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Items[i].strip()]))
-                        elif ('0x' in Items[i].strip()) or ('0X' in Items[i].strip()):
+                        if self.PreProcessDB.VfrDict and Items[i].strip() in self.PreProcessDB.VfrDict.keys():
+                            ValueList.append(self.PreProcessDB.TransValue(self.PreProcessDB.VfrDict[Items[i].strip()]))
+                        if self.PreProcessDB.UniDict and Items[i].strip() in self.PreProcessDB.UniDict.keys():
+                            ValueList.append(self.PreProcessDB.TransValue(self.PreProcessDB.UniDict[Items[i].strip()]))
+                        elif (Items[i].strip().startswith('0x')) or (Items[i].strip().startswith('0X')) or (Items[i].strip().isdigit()):
                             ValueList.append(self.PreProcessDB.TransValue(Items[i].strip()))
-                        else:
-                            ValueList.append(Items[i].strip())
                     YamlDict[Key] = ValueDB(Value, ValueList)
                 else:
                     YamlDict[Key] = ValueDB(Value, Value)

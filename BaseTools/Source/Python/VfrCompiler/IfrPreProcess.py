@@ -82,12 +82,15 @@ class PreProcessDB():
             return Value
         else:
             StrValue = str(Value)
-            if ('0x' in StrValue) or ('0X' in StrValue):
-                Value = int(StrValue, 0)
+            if StrValue.isdigit() or StrValue.startswith("0x") or StrValue.startswith("0X"):
+                return int(StrValue, 0)
             else:
-                Value = int(StrValue)
+                GuidList = re.findall(r"0x[0-9a-fA-F]+", StrValue)
+                GuidList = [int(num, 16) for num in GuidList]
+                Guid = EFI_GUID()
+                Guid.from_list(GuidList)
+                return Guid
         # error handle , value is too large to store
-        return Value
 
     def RevertValue(self, Value) -> str:
         if type(Value) == EFI_GUID:
@@ -199,14 +202,14 @@ class PreProcessDB():
         self._ParseDefines(FileName, UniDict)
 
         if self.Options.UniStrDisplayFile == None:
-            self.Options.UniStrDisplayFile = self.Options.OutputDirectory + self.Options.BaseFileName + 'Uni.json'
+            self.Options.UniStrDisplayFile = self.Options.OutputDirectory + self.Options.ModuleName + 'Uni.json'
 
         DisPlayUniDict = {} # {String Token : DisPlay String}
         if self.Options.LanuchYamlCompiler:
             f = open(self.Options.UniStrDisplayFile, encoding='utf-8')
             Dict = json.load(f)
             f.close()
-            Dict = Dict[1]["en-US"]
+            Dict = Dict["UniString"]["en-US"]
             for Key in Dict.keys():
                 if Key in UniDict.keys():
                     NewKey = '{}'.format('0x%04x' % (int(UniDict[Key],0)))
@@ -222,6 +225,7 @@ class PreProcessDB():
             CppHeader = None
             for File in FileList:
                 if File.find(HeaderFile.replace('/','\\')) != -1:
+                    CppHeader = CppHeaderParser.CppHeader(File)
                     self._ParseDefines(File, HeaderDict)
                     break
             if CppHeader == None:
@@ -235,6 +239,7 @@ class PreProcessDB():
                 Flag = False
                 for File in IncludeHeaderFileList:
                     if File.find(Include.replace('/','\\')) != -1:
+                        CppHeader = CppHeaderParser.CppHeader(File)
                         self._ParseDefines(File, HeaderDict)
                         Flag = True
                         break

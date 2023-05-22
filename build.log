@@ -1,0 +1,15 @@
+Build environment: Windows-10-10.0.22000-SP0
+Build start time: 17:53:05, May.22 2023
+
+WORKSPACE        = c:\edk2
+EDK_TOOLS_PATH   = c:\edk2\basetools
+EDK_TOOLS_BIN    = c:\edk2\basetools\bin\win32
+CONF_PATH        = c:\edk2\conf
+PYTHON_COMMAND   = py -3
+
+
+Architecture(s)  = IA32 X64
+Build target     = DEBUG
+Toolchain        = VS2019
+
+Active Platform          = c:\edk2\OvmfPkg\OvmfPkgIa32X64.dsc

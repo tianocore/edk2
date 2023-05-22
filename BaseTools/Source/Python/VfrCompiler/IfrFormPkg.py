@@ -783,6 +783,8 @@ class IfrClass(IfrLine, IfrOpHeader):
         self.Class.Guid = EFI_IFR_TIANO_GUID
         self.Class.Class = EFI_NON_DEVICE_CLASS
 
+        self.HasSubClass = False
+
     def SetClass(self, Class):
         self.Class.Class = Class
 
