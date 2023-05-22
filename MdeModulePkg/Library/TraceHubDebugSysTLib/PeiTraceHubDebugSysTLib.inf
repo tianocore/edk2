@@ -48,3 +48,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugLevel
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableTraceHubDebugMsg
   gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugMmioAddress
+
+[BuildOptions]
+  *_*_*_CC_FLAGS  = -I$(WORKSPACE)/MdePkg/Library/MipiSysTLib/mipisyst/library/include

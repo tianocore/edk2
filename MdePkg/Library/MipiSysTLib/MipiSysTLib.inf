@@ -15,7 +15,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MipiSysTLib
 
-  DEFINE MIPI_HEADER_PATH        = mipisyst/library/include/mipi_syst
   DEFINE MIPI_SOURCE_PATH        = mipisyst/library/src
 
 #
@@ -36,11 +35,6 @@
   mipi_syst.h
   Platform.c
   Platform.h
-  $(MIPI_HEADER_PATH)/api.h
-  $(MIPI_HEADER_PATH)/crc32.h
-  $(MIPI_HEADER_PATH)/compiler.h
-  $(MIPI_HEADER_PATH)/message.h
-  $(MIPI_HEADER_PATH)/inline.h
   $(MIPI_SOURCE_PATH)/mipi_syst_init.c
   $(MIPI_SOURCE_PATH)/mipi_syst_api.c
   $(MIPI_SOURCE_PATH)/mipi_syst_crc32.c
@@ -49,4 +43,4 @@
   $(MIPI_SOURCE_PATH)/mipi_syst_compiler.c
 
 [BuildOptions]
-  *_*_*_CC_FLAGS  = -DMIPI_SYST_STATIC
+  *_*_*_CC_FLAGS  = -DMIPI_SYST_STATIC -I$(WORKSPACE)/MdePkg/Library/MipiSysTLib/mipisyst/library/include
