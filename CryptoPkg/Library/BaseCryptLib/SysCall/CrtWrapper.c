@@ -275,6 +275,15 @@ strcpy (
   return strDest;
 }
 
+int
+strcmp (
+  const char  *s1,
+  const char  *s2
+  )
+{
+  return (int)AsciiStrCmp (s1, s2);
+}
+
 //
 // -- Character Classification Routines --
 //
