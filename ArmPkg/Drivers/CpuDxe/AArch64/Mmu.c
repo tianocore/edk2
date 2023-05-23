@@ -120,7 +120,7 @@ GetFirstPageAttribute (
   } else if (((FirstEntry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY) ||
              ((TableLevel == 3) && ((FirstEntry & TT_TYPE_MASK) == TT_TYPE_BLOCK_ENTRY_LEVEL3)))
   {
-    return FirstEntry & TT_ATTR_INDX_MASK;
+    return FirstEntry & TT_ATTRIBUTES_MASK;
   } else {
     return INVALID_ENTRY;
   }
@@ -158,7 +158,7 @@ GetNextEntryAttribute (
   for (Index = 0; Index < EntryCount; Index++) {
     Entry          = TableAddress[Index];
     EntryType      = Entry & TT_TYPE_MASK;
-    EntryAttribute = Entry  & TT_ATTR_INDX_MASK;
+    EntryAttribute = Entry & TT_ATTRIBUTES_MASK;
 
     // If Entry is a Table Descriptor type entry then go through the sub-level table
     if ((EntryType == TT_TYPE_BLOCK_ENTRY) ||
