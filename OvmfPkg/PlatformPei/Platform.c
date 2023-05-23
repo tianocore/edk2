@@ -232,36 +232,6 @@ ReserveEmuVariableNvStore (
 
 STATIC
 VOID
-S3Verification (
-  IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
-  )
-{
- #if defined (MDE_CPU_X64)
-  if (PlatformInfoHob->SmmSmramRequire && PlatformInfoHob->S3Supported) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n",
-      __func__
-      ));
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Please disable S3 on the QEMU command line (see the README),\n",
-      __func__
-      ));
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: or build OVMF with \"OvmfPkgIa32X64.dsc\".\n",
-      __func__
-      ));
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-  }
-
- #endif
-}
-
-STATIC
-VOID
 Q35BoardVerification (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
@@ -354,7 +324,6 @@ InitializePlatform (
     ASSERT_EFI_ERROR (Status);
   }
 
-  S3Verification (PlatformInfoHob);
   BootModeInitialization (PlatformInfoHob);
 
   //
