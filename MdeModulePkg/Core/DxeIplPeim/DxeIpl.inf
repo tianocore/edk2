@@ -45,18 +45,12 @@
   X64/VirtualMemory.c
   X64/DxeLoadFunc.c
 
-[Sources.ARM, Sources.AARCH64]
-  Arm/DxeLoadFunc.c
-
-[Sources.LOONGARCH64,Sources.RISCV64,Sources.EBC]
+[Sources.LOONGARCH64,Sources.RISCV64,Sources.EBC,Sources.ARM,Sources.AARCH64]
   DxeHandoff.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-
-[Packages.ARM, Packages.AARCH64]
-  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -73,9 +67,6 @@
   DebugAgentLib
   PeiServicesTablePointerLib
   PerformanceLib
-
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
-  ArmMmuLib
 
 [Ppis]
   gEfiDxeIplPpiGuid                      ## PRODUCES
