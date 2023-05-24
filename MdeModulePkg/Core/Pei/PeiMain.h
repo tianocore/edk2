@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Ppi/TemporaryRamDone.h>
 #include <Ppi/SecHobData.h>
 #include <Ppi/PeiCoreFvLocation.h>
+#include <Ppi/MemoryAttribute.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiCoreEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -301,6 +302,11 @@ struct _PEI_CORE_INSTANCE {
   // Pointer to the temp buffer with the TempPeimCount number of entries.
   //
   EFI_GUID                          *TempFileGuid;
+
+  //
+  // Pointer to the memory attribute PPI
+  //
+  EDKII_MEMORY_ATTRIBUTE_PPI        *MemoryAttributePpi;
 
   //
   // Temp Memory Range is not covered by PeiTempMem and Stack.

@@ -19,6 +19,50 @@ EFI_PEI_PPI_DESCRIPTOR  gPpiLoadFilePpiList = {
 };
 
 /**
+  Provide a callback for when the memory attributes PPI is installed.
+
+  @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table
+                            published by the PEI Foundation.
+  @param NotifyDescriptor   The descriptor for the notification event.
+  @param Ppi                Pointer to the PPI in question.
+
+  @return Always success
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+MemoryAttributePpiNotifyCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  PEI_CORE_INSTANCE  *PrivateData;
+
+  //
+  // Get PEI Core private data
+  //
+  PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
+
+  //
+  // If there isn't a memory attribute PPI installed, use the one from
+  // notification
+  //
+  if (PrivateData->MemoryAttributePpi == NULL) {
+    PrivateData->MemoryAttributePpi = (EDKII_MEMORY_ATTRIBUTE_PPI *)Ppi;
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mNotifyList = {
+  EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+  &gEdkiiMemoryAttributePpiGuid,
+  MemoryAttributePpiNotifyCallback
+};
+
+/**
 
   Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file.
   The function is used for XIP code to have optimized memory copy.
@@ -244,6 +288,106 @@ GetPeCoffImageFixLoadingAssignedAddress (
 }
 
 /**
+  Remap the memory region covering a loaded image so it can be executed.
+
+  @param ImageContext    Pointer to the image context structure that describes the
+                         PE/COFF image that needs to be examined by this function.
+  @param FileType        The FFS file type of the image
+  @param ImageAddress    The start of the memory region covering the image
+  @param ImageSize       The size of the memory region covering the image
+
+  @retval EFI_SUCCESS           The image is ready to be executed
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory available to update the memory
+                                mapping
+
+**/
+STATIC
+EFI_STATUS
+RemapLoadedImageForExecution (
+  IN  CONST PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext,
+  IN  EFI_FV_FILETYPE                     FileType,
+  IN  PHYSICAL_ADDRESS                    ImageAddress,
+  IN  UINT64                              ImageSize
+  )
+{
+  PEI_CORE_INSTANCE                    *Private;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
+  EFI_IMAGE_SECTION_HEADER             *Section;
+  PHYSICAL_ADDRESS                     SectionAddress;
+  EFI_STATUS                           Status;
+  UINT64                               Permissions;
+  UINTN                                Index;
+
+  Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
+
+  if (Private->MemoryAttributePpi == NULL) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // PEI phase executables must be able to execute in place from read-only NOR
+  // flash, and so they can be mapped read-only in their entirety.
+  //
+  if ((FileType == EFI_FV_FILETYPE_PEI_CORE) ||
+      (FileType == EFI_FV_FILETYPE_PEIM) ||
+      (FileType == EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER))
+  {
+    return Private->MemoryAttributePpi->SetPermissions (
+                                          Private->MemoryAttributePpi,
+                                          ImageAddress,
+                                          ImageSize,
+                                          EFI_MEMORY_RO,
+                                          EFI_MEMORY_XP
+                                          );
+  }
+
+  //
+  // Only PE images with minimum 4k section alignment can be remapped with
+  // restricted permissions.
+  //
+  if (ImageContext->IsTeImage ||
+      (ImageContext->SectionAlignment < EFI_PAGE_SIZE))
+  {
+    return EFI_UNSUPPORTED;
+  }
+
+  Hdr.Union = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((UINT8 *)ImageContext->Handle +
+                                                  ImageContext->PeCoffHeaderOffset);
+  ASSERT (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE);
+
+  Section = (EFI_IMAGE_SECTION_HEADER *)((UINT8 *)Hdr.Union + sizeof (UINT32) +
+                                         sizeof (EFI_IMAGE_FILE_HEADER) +
+                                         Hdr.Pe32->FileHeader.SizeOfOptionalHeader
+                                         );
+
+  for (Index = 0; Index < Hdr.Pe32->FileHeader.NumberOfSections; Index++) {
+    SectionAddress = ImageContext->ImageAddress + Section[Index].VirtualAddress;
+    Permissions    = 0;
+
+    if ((Section[Index].Characteristics & EFI_IMAGE_SCN_MEM_WRITE) == 0) {
+      Permissions |= EFI_MEMORY_RO;
+    }
+
+    if ((Section[Index].Characteristics & EFI_IMAGE_SCN_MEM_EXECUTE) == 0) {
+      Permissions |= EFI_MEMORY_XP;
+    }
+
+    Status = Private->MemoryAttributePpi->SetPermissions (
+                                            Private->MemoryAttributePpi,
+                                            SectionAddress,
+                                            Section[Index].Misc.VirtualSize,
+                                            Permissions,
+                                            Permissions ^ EFI_MEMORY_RO ^ EFI_MEMORY_XP
+                                            );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
 
   Loads and relocates a PE/COFF image into memory.
   If the image is not relocatable, it will not be loaded into memory and be loaded as XIP image.
@@ -456,9 +600,24 @@ LoadAndRelocatePeCoffImage (
 
   //
   // Flush the instruction cache so the image data is written before we execute it
+  // Also ensure that the pages are mapped for execution
   //
   if (ImageContext.ImageAddress != (EFI_PHYSICAL_ADDRESS)(UINTN)Pe32Data) {
     InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
+
+    Status = RemapLoadedImageForExecution (
+               &ImageContext,
+               FileInfo.FileType,
+               ImageContext.ImageAddress & ~(UINT64)EFI_PAGE_MASK,
+               ALIGN_VALUE (
+                 AlignImageSize + (ImageContext.ImageAddress & EFI_PAGE_MASK),
+                 EFI_PAGE_SIZE
+                 )
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
   }
 
   *ImageAddress = ImageContext.ImageAddress;
@@ -972,6 +1131,7 @@ InitializeImageServices (
     //
     PrivateData->XipLoadFile = &gPpiLoadFilePpiList;
     PeiServicesInstallPpi (PrivateData->XipLoadFile);
+    PeiServicesNotifyPpi (&mNotifyList);
   } else {
     //
     // 2nd time we are running from memory so replace the XIP version with the
