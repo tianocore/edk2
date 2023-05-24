@@ -516,8 +516,8 @@ class IfrBaseInfo():
     def GetInfo(self):
         return self.Obj
 
-class IfrOpHeader():
 
+class IfrOpHeader():
     def __init__(self, OpHeader: EFI_IFR_OP_HEADER, OpCode=None, Length=0):
         self.OpHeader = OpHeader
         if OpCode != None:

@@ -1249,7 +1249,7 @@ class IfrTree():
         f.write(ValueIndent + 'prompt:  \'{}\'\n'.format(self._DisplayUniStr(Info.Question.Header.Prompt)))
         f.write(ValueIndent + 'help:  \'{}\'\n'.format(self._DisplayUniStr(Info.Question.Header.Help)))
 
-        if Root.OpCode != EFI_IFR_REF_OP:
+        if Root.OpCode != EFI_IFR_REF_OP and Root.OpCode != EFI_IFR_ACTION_OP and Root.OpCode != EFI_IFR_PASSWORD_OP:
             f.write(ValueIndent + 'opcodeflags:  {}  # optional input\n'.format('0x%x' % (Info.Flags)))
 
     def DumpBuffer(self, Root):
@@ -1553,8 +1553,7 @@ class IfrTree():
                             Info.Data.MaxValue))
                     f.write(ValueIndent + 'minimum:  {} # Optional Input\n'.format(
                             Info.Data.MinValue))
-                    if Root.Data.HasStep:
-                        f.write(ValueIndent + 'step:  {} # Optional Input\n'.format(
+                    f.write(ValueIndent + 'step:  {} # Optional Input\n'.format(
                         Info.Data.Step))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
@@ -1609,9 +1608,7 @@ class IfrTree():
 
                 if Root.OpCode == EFI_IFR_REF_OP:
                     f.write(KeyIndent + '- goto:\n')
-                    if Root.Condition != None:
-                        f.write(ValueIndent +
-                                'condition:  \'{}\'\n'.format(Root.Condition))
+                    self.DumpQuestionInfos(Root, f, ValueIndent)
 
                     if type(Root.Data) == IfrRef4:
                         f.write(ValueIndent + 'formid:  {}\n'.format(
@@ -1641,7 +1638,6 @@ class IfrTree():
                             '0x%x' % (Info.FormId)))
                         f.write(ValueIndent + 'question:  {} #  Optional Input\n'.format('0x%04x' % (Info.Question.QuestionId)))
 
-                    self.DumpQuestionInfos(Root, f, ValueIndent)
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 

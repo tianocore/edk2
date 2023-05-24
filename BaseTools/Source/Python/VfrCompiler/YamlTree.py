@@ -647,9 +647,9 @@ class YamlParser():
             ReturnCode = FObj.SetFormId(Form['formid'].PostVal[1])
         else:
             ReturnCode = FObj.SetFormId(Form['formid'].PostVal)
-            if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
-                print(ReturnCode)
             Pos = self.GuidID + '.' + str(Form['formid'].PostVal)
+        if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+            self.ErrorHandler(ReturnCode, 'FormId wrong!')
         FormTitle = Form['title'].PostVal
         FObj.SetFormTitle(FormTitle)
         Node = IfrTreeNode(EFI_IFR_FORM_OP, FObj, gFormPkg.StructToStream(FObj.GetInfo()), Pos)
@@ -1671,6 +1671,7 @@ class YamlParser():
 
     def ParseVfrStatementAction(self, Action, ParentNode, Position):
         AObj = IfrAction()
+        self._ParseVfrQuestionHeader(AObj, Action, EFI_QUESION_TYPE.QUESTION_NORMAL)
         Config = Action['config'].PostVal
         AObj.SetQuestionConfig(Config)
         # No handler for Flags
@@ -1801,6 +1802,8 @@ class YamlParser():
                 UpdatedNObj = IfrNumeric(self.CurrQestVarInfo.VarType)
             UpdatedNObj.GetInfo().Question = NObj.GetInfo().Question
             UpdatedNObj.GetInfo().Flags = NObj.GetInfo().Flags
+            UpdatedNObj.VarIdStr = NObj.VarIdStr
+            UpdatedNObj.QName = NObj.QName
             NObj = UpdatedNObj
             Node.Data = NObj
             self.CurrentQuestion = Node.Data
@@ -1977,69 +1980,69 @@ class YamlParser():
             Max = - Max
 
         if IntDecStyle == False and MaxNegative == True:
-            self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, ' \'-\' can\'t be used when not in int decimal type.')
+            self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ' \'-\' can\'t be used when not in int decimal type.')
         if self.CurrQestVarInfo.IsBitVar:
             if (IntDecStyle == False) and (Max > (1 << self.CurrQestVarInfo.VarTotalSize) - 1):
-                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'BIT type maximum can\'t be bigger than 2^BitWidth -1')
+                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'BIT type maximum can\'t be bigger than 2^BitWidth -1')
             else:
                 Type = self.CurrQestVarInfo.VarType
                 if Type == EFI_IFR_TYPE_NUM_SIZE_64:
                     if IntDecStyle:
                         if MaxNegative:
                             if Max > 0x8000000000000000:
-                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
                         else:
                             if Max > 0x7FFFFFFFFFFFFFFF:
-                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT64 type minimum can\'t small than -0x8000000000000000, big than 0x7FFFFFFFFFFFFFFF')
                     if MaxNegative:
                         Max = ~Max + 1
 
                     if Max < Min: #
-                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
+                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'Maximum can\'t be less than Minimum')
 
 
                 if Type == EFI_IFR_TYPE_NUM_SIZE_32:
                     if IntDecStyle:
                         if MaxNegative:
                             if Max > 0x80000000:
-                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
                         else:
                             if Max > 0x7FFFFFFF:
-                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT32 type minimum can\'t small than -0x80000000, big than 0x7FFFFFFF')
                     if MaxNegative:
                         Max = ~Max + 1
 
                     if Max < Min: #
-                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
+                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'Maximum can\'t be less than Minimum')
 
 
                 if Type == EFI_IFR_TYPE_NUM_SIZE_16:
                     if IntDecStyle:
                         if MaxNegative:
                             if Max > 0x8000:
-                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
                         else:
                             if Max > 0x7FFF:
-                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT16 type minimum can\'t small than -0x8000, big than 0x7FFF')
                     if MaxNegative:
                         Max = ~Max + 1
 
                     if Max < Min: #
-                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
+                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'Maximum can\'t be less than Minimum')
 
                 if Type == EFI_IFR_TYPE_NUM_SIZE_8:
                     if IntDecStyle:
                         if MaxNegative:
                             if Max > 0x80:
-                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
                         else:
                             if Max > 0x7F:
-                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
+                                self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'INT8 type minimum can\'t small than -0x80, big than 0x7F')
                     if MaxNegative:
                         Max = ~Max + 1
 
                     if Max < Min: #
-                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, ctx.A.line, 'Maximum can\'t be less than Minimum')
+                        self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'Maximum can\'t be less than Minimum')
 
         OpObj.SetMinMaxStepData(Min, Max, Step)
 
@@ -2098,6 +2101,8 @@ class YamlParser():
                 UpdatedOObj = IfrOneOf(self.CurrQestVarInfo.VarType)
             UpdatedOObj.GetInfo().Question = OObj.GetInfo().Question
             UpdatedOObj.GetInfo().Flags = OObj.GetInfo().Flags
+            UpdatedOObj.VarIdStr = OObj.VarIdStr
+            UpdatedOObj.QName = OObj.QName
             OObj = UpdatedOObj
             Node.Data = OObj
             self.CurrentQuestion = Node.Data
@@ -2167,6 +2172,7 @@ class YamlParser():
     def ParseVfrStatementPassword(self, Password, ParentNode, Position):
         PObj = IfrPassword()
         self.CurrentQuestion = PObj
+        self._ParseVfrQuestionHeader(PObj, Password, EFI_QUESION_TYPE.QUESTION_NORMAL)
 
         self.ErrorHandler(PObj.SetFlags(self._ParseStatementStatFlags(Password)))
 

@@ -234,7 +234,11 @@ class PreProcessDB():
 
             for Include in CppHeader.includes:
                 Include = Include[1:-1]
-                IncludeFileName = Include.split('/')[1]
+                print(self.Options.InputFileName) ######### for test
+                if Include.find('/') != -1:
+                    IncludeFileName = Include.split('/')[1]
+                else:
+                    IncludeFileName = Include
                 IncludeHeaderFileList = self._FindIncludeHeaderFile(self.Options.IncludePaths, IncludeFileName)
                 Flag = False
                 for File in IncludeHeaderFileList:

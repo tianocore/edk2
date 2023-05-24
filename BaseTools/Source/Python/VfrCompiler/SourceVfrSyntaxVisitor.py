@@ -1195,7 +1195,10 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         else:
             FormId = self.PreProcessDB.Read(ctx.S.text)
             ctx.Node.Dict['formid'] = KV(ctx.S.text, FormId)
-        FObj.SetFormId(FormId)
+        ReturnCode = FObj.SetFormId(FormId)
+        if ReturnCode != VfrReturnCode.VFR_RETURN_SUCCESS:
+            self.ErrorHandler(ReturnCode, ctx.start.line, 'FormId wrong!')
+
         FormTitle  = self.PreProcessDB.Read(ctx.ST.text)
         ctx.Node.Dict['title'] = KV(ctx.ST.text, FormTitle)
         FObj.SetFormTitle(FormTitle)
@@ -4606,7 +4609,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         for i in range(0, len(ctx.Number())):
             ValueList.append(self.TransNum(ctx.Number(i)))
 
-        for i in range(0, len(ctx.StringIdentifer())):
+        for i in range(0, len(ctx.StringIdentifier())):
             Number = self.PreProcessDB.Read(self.TransId(ctx.StringIdentifier(i)))
             ValueList.append(Number)
 

@@ -826,7 +826,7 @@ locals[Node=IfrTreeNode(EFI_IFR_PASSWORD_OP), QType=EFI_QUESION_TYPE.QUESTION_NO
     :   'password'
         vfrQuestionHeader[localctx.Node, localctx.QType]','
         (F='flags' '=' vfrPasswordFlagsField ',')?
-        ('key' '=' N=Number | S=StringIdentifier ',')?
+        ('key' '=' (N=Number | S=StringIdentifier) ',')?
         Min='minsize' '=' (N1=Number | S1=StringIdentifier) ','
         Max='maxsize' '=' (N2=Number | S2=StringIdentifier) ','
         ('encoding' '=' (EN=Number | ES=StringIdentifier) ',')?
