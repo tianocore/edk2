@@ -1,0 +1,27 @@
+## @file
+#  RISC-V MMU library.
+#
+#  Copyright (c) 2023, Ventana Micro Systems Inc. All Rights Reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x0001001b
+  BASE_NAME           = BaseRiscVMmuLib
+  FILE_GUID           = d3bc42ee-c9eb-4339-ba11-06747083d3ae
+  MODULE_TYPE         = BASE
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = RiscVMmuLib
+
+[Sources]
+  BaseRiscVMmuLib.c
+  RiscVMmuCore.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
