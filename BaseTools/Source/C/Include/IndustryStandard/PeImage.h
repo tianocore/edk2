@@ -42,6 +42,7 @@
 #define IMAGE_FILE_MACHINE_X64         0x8664
 #define IMAGE_FILE_MACHINE_ARM         0x01c0  // Thumb only
 #define IMAGE_FILE_MACHINE_ARMT        0x01c2  // 32bit Mixed ARM and Thumb/Thumb 2  Little Endian
+#define IMAGE_FILE_MACHINE_ARMTHUMB_MIXED IMAGE_FILE_MACHINE_ARMT
 #define IMAGE_FILE_MACHINE_ARM64       0xAA64  // 64bit ARM Architecture, Little Endian
 #define IMAGE_FILE_MACHINE_RISCV64     0x5064  // 64bit RISC-V ISA
 #define IMAGE_FILE_MACHINE_LOONGARCH64 0x6264  // 64bit LoongArch Architecture
