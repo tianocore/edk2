@@ -176,25 +176,10 @@ PeCoffLoaderCheckImageType (
       ImageContext->Machine != EFI_IMAGE_MACHINE_AARCH64 && \
       ImageContext->Machine != EFI_IMAGE_MACHINE_RISCV64 && \
       ImageContext->Machine != EFI_IMAGE_MACHINE_LOONGARCH64) {
-    if (ImageContext->Machine == IMAGE_FILE_MACHINE_ARM) {
-      //
-      // There are two types of ARM images. Pure ARM and ARM/Thumb.
-      // If we see the ARM say it is the ARM/Thumb so there is only
-      // a single machine type we need to check for ARM.
-      //
-      ImageContext->Machine = EFI_IMAGE_MACHINE_ARMT;
-      if (ImageContext->IsTeImage == FALSE) {
-        PeHdr->Pe32.FileHeader.Machine = ImageContext->Machine;
-      } else {
-        TeHdr->Machine = ImageContext->Machine;
-      }
-
-    } else {
-      //
-      // unsupported PeImage machine type
-      //
-      return RETURN_UNSUPPORTED;
-    }
+    //
+    // unsupported PeImage machine type
+    //
+    return RETURN_UNSUPPORTED;
   }
 
   //
