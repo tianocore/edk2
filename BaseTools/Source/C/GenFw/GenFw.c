@@ -26,9 +26,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Acpi Table definition
 //
 #include <IndustryStandard/Acpi.h>
-#include <IndustryStandard/Acpi1_0.h>
-#include <IndustryStandard/Acpi2_0.h>
-#include <IndustryStandard/Acpi3_0.h>
+#include <IndustryStandard/Acpi10.h>
+#include <IndustryStandard/Acpi20.h>
+#include <IndustryStandard/Acpi30.h>
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
 
 #include "CommonLib.h"
@@ -368,7 +368,7 @@ Returns:
     if (Facs->Version > EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) {
       break;
     }
-    if ((Facs->Version != EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
+    if ((Facs->Version != 0 /* field is reserved in ACPI 1.0 */) &&
         (Facs->Version != EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         (Facs->Version != EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION)){
       Error (NULL, 0, 3000, "Invalid", "FACS version check failed.");
