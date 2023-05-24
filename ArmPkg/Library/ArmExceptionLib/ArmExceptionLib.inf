@@ -50,7 +50,6 @@
   CacheMaintenanceLib
   DebugLib
   DefaultExceptionHandlerLib
-  MemoryAllocationLib
 
 [Pcd]
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
