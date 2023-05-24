@@ -16,8 +16,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Common/UefiBaseTypes.h>
 #include <IndustryStandard/PeImage.h> // for PE32 structure definitions
 
-#include <IndustryStandard/pci22.h>  // for option ROM header structures
-#include <IndustryStandard/pci30.h>
+#include <IndustryStandard/Pci22.h>  // for option ROM header structures
+#include <IndustryStandard/Pci30.h>
 
 #include "Compress.h"
 #include "CommonLib.h"
