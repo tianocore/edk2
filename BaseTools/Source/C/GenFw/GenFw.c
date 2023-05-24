@@ -2197,12 +2197,6 @@ Returns:
     }
   }
 
-  if (PeHdr->Pe32.FileHeader.Machine == IMAGE_FILE_MACHINE_ARM) {
-    // Some tools kick out IMAGE_FILE_MACHINE_ARM (0x1c0) vs IMAGE_FILE_MACHINE_ARMT (0x1c2)
-    // so patch back to the official UEFI value.
-    PeHdr->Pe32.FileHeader.Machine = IMAGE_FILE_MACHINE_ARMT;
-  }
-
   //
   // Set new base address into image
   //
@@ -3117,7 +3111,7 @@ Returns:
   // Get Debug, Export and Resource EntryTable RVA address.
   // Resource Directory entry need to review.
   //
-  if (FileHdr->Machine == EFI_IMAGE_MACHINE_IA32) {
+  if (FileHdr->Machine == IMAGE_FILE_MACHINE_I386) {
     Optional32Hdr = (EFI_IMAGE_OPTIONAL_HEADER32 *) ((UINT8*) FileHdr + sizeof (EFI_IMAGE_FILE_HEADER));
     SectionHeader = (EFI_IMAGE_SECTION_HEADER *) ((UINT8 *) Optional32Hdr +  FileHdr->SizeOfOptionalHeader);
     if (Optional32Hdr->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_EXPORT && \
