@@ -212,7 +212,7 @@ class PreProcessDB():
             Dict = Dict["UniString"]["en-US"]
             for Key in Dict.keys():
                 if Key in UniDict.keys():
-                    NewKey = '{}'.format('0x%04x' % (int(UniDict[Key],0)))
+                    NewKey = '{}'.format('0x%04x' % (int(UniDict[Key], 0)))
                     DisPlayUniDict[NewKey] = Dict[Key]
 
         return UniDict, DisPlayUniDict

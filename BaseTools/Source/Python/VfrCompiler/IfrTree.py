@@ -493,11 +493,13 @@ class IfrTree():
     def DumpCompiledYaml(self):
         FileName = self.Options.YamlOutputFileName
         try:
-            with open(FileName, 'w') as f:
+            with open(FileName, 'w', encoding='utf-8') as f:
                 f.write('## DO NOT REMOVE -- YAML Mode\n')
-                f.write('include:\n')
-                for HeaderFile in self.PreProcessDB.HeaderFiles:
-                    f.write('- ' + HeaderFile + '\n')
+                if self.PreProcessDB.HeaderFiles != []:
+                    f.write('include:\n')
+                    for HeaderFile in self.PreProcessDB.HeaderFiles:
+                        f.write('- ' + HeaderFile + '\n')
+                    f.write('\n')
                 self._DumpYamlDfs(self.Root, f)
             f.close()
         except:
@@ -1080,15 +1082,15 @@ class IfrTree():
                             Info.TimeOut))
 
                     if type(Root.Data) == IfrClass:
-                        ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
-                        f.write(ValueIndent + '  class:  ' + Root.Dict['class'].Key + '\n')
+                        # ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
+                        f.write(KeyIndent + 'class:  ' + Root.Dict['class'].Key + '\n')
                         if not Root.Data.HasSubClass:
-                            f.write(ValueIndent + '  component:  \n')
+                            f.write(KeyIndent + 'component:  \n')
 
                     if type(Root.Data) == IfrSubClass:
-                        ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
-                        f.write(ValueIndent + '  subclass:  ' + Root.Dict['subclass'].Key + '\n')
-                        f.write(ValueIndent + '  component:  \n')
+                        # ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
+                        f.write(KeyIndent + 'subclass:  ' + Root.Dict['subclass'].Key + '\n')
+                        f.write(KeyIndent + 'component:  \n')
 
                     if type(Root.Data) == IfrExtensionGuid:
                         if type(Root.Parent.Data) == IfrExtensionGuid:
@@ -1721,15 +1723,15 @@ class IfrTree():
 
                     if type(Root.Data) == IfrClass:
                         ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
-                        f.write(ValueIndent + '  class:  {}\n'.format(Info.Class))
+                        f.write(ValueIndent + 'class:  {}\n'.format(Info.Class))
                         # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
                         if not Root.Data.HasSubClass:
-                            f.write(ValueIndent + '  component:  \n')
+                            f.write(ValueIndent + 'component:  \n')
 
                     if type(Root.Data) == IfrSubClass:
                         ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
-                        f.write(ValueIndent + '  subclass:  {}\n'.format(Info.SubClass))
-                        f.write(ValueIndent + '  component:  \n')
+                        f.write(ValueIndent + 'subclass:  {}\n'.format(Info.SubClass))
+                        f.write(ValueIndent + 'component:  \n')
                         # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
 
                     if type(Root.Data) == IfrExtensionGuid:

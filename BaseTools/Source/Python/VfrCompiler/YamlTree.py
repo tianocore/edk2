@@ -140,35 +140,42 @@ class YamlTree():
 
             elif isinstance(Value, str):# value is str
                 # get the specific value of string token
-                Start = Value.find('(') + 1
-                End = Value.find(')')
-                if self.PreProcessDB.UniDict and Value[Start:End] in self.PreProcessDB.UniDict.keys():
-                    YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.UniDict[Value[Start:End]]))
-                    #YamlDict[Key] = 'STRING_TOKEN' + '(' +  self.PreProcessDB.UniDict[Value[Start:End]] + ')'
-                # get {key:value} dicts from header files
-                elif self.PreProcessDB.HeaderDict and Value in self.PreProcessDB.HeaderDict.keys():
-                    if Key == 'formid':
-                        YamlDict[Key] = ValueDB(Value, [Value, self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value])])
-                    else:
-                        YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value]))
-                elif self.PreProcessDB.VfrDict and Value in self.PreProcessDB.VfrDict.keys():
-                    YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.VfrDict[Value]))
-                elif '|' in Value:
-                    Items = Value.split('|')
-                    ValueList = []
-                    for i in range(0, len(Items)):
-                        # get {key:value} dicts from header files
-                        if self.PreProcessDB.HeaderDict and Items[i].strip() in self.PreProcessDB.HeaderDict.keys():
-                            ValueList.append(self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Items[i].strip()]))
-                        if self.PreProcessDB.VfrDict and Items[i].strip() in self.PreProcessDB.VfrDict.keys():
-                            ValueList.append(self.PreProcessDB.TransValue(self.PreProcessDB.VfrDict[Items[i].strip()]))
-                        if self.PreProcessDB.UniDict and Items[i].strip() in self.PreProcessDB.UniDict.keys():
-                            ValueList.append(self.PreProcessDB.TransValue(self.PreProcessDB.UniDict[Items[i].strip()]))
-                        elif (Items[i].strip().startswith('0x')) or (Items[i].strip().startswith('0X')) or (Items[i].strip().isdigit()):
-                            ValueList.append(self.PreProcessDB.TransValue(Items[i].strip()))
-                    YamlDict[Key] = ValueDB(Value, ValueList)
+                Match = re.search(r'STRING_TOKEN\((.*?)\)', Value)
+                if Match:
+                    if self.PreProcessDB.UniDict and Match.group(1) in self.PreProcessDB.UniDict.keys():
+                        YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.UniDict[Match.group(1)]))
+                        #YamlDict[Key] = 'STRING_TOKEN' + '(' +  self.PreProcessDB.UniDict[Value[Start:End]] + ')'
                 else:
-                    YamlDict[Key] = ValueDB(Value, Value)
+                    if self.PreProcessDB.UniDict and Value in self.PreProcessDB.UniDict.keys():
+                        YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.UniDict[Value]))
+                    # get {key:value} dicts from header files
+                    elif self.PreProcessDB.HeaderDict and Value in self.PreProcessDB.HeaderDict.keys():
+                        if Key == 'formid':
+                            YamlDict[Key] = ValueDB(Value, [Value, self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value])])
+                        else:
+                            YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Value]))
+
+                    elif self.PreProcessDB.VfrDict and Value in self.PreProcessDB.VfrDict.keys():
+                        YamlDict[Key] = ValueDB(Value, self.PreProcessDB.TransValue(self.PreProcessDB.VfrDict[Value]))
+                    elif '|' in Value:
+                        Items = Value.split('|')
+                        ValueList = []
+                        for i in range(0, len(Items)):
+                            # get {key:value} dicts from header files
+                            if self.PreProcessDB.HeaderDict and Items[i].strip() in self.PreProcessDB.HeaderDict.keys():
+                                ValueList.append(self.PreProcessDB.TransValue(self.PreProcessDB.HeaderDict[Items[i].strip()]))
+                            elif self.PreProcessDB.VfrDict and Items[i].strip() in self.PreProcessDB.VfrDict.keys():
+                                ValueList.append(self.PreProcessDB.TransValue(self.PreProcessDB.VfrDict[Items[i].strip()]))
+                            elif self.PreProcessDB.UniDict and Items[i].strip() in self.PreProcessDB.UniDict.keys():
+                                ValueList.append(self.PreProcessDB.TransValue(self.PreProcessDB.UniDict[Items[i].strip()]))
+                            elif (Items[i].strip().startswith('0x')) or (Items[i].strip().startswith('0X')) or (Items[i].strip().isdigit()):
+                                ValueList.append(self.PreProcessDB.TransValue(Items[i].strip()))
+                            else:
+                                ValueList.append(Items[i].strip())
+
+                        YamlDict[Key] = ValueDB(Value, ValueList)
+                    else:
+                        YamlDict[Key] = ValueDB(Value, Value)
             else:
                 YamlDict[Key] = ValueDB(Value, Value)
 
@@ -336,6 +343,8 @@ class YamlParser():
             Node.Buffer += gFormPkg.StructToStream(DefaultClassGuid)
         else:
             for i in range(0, len(GuidList)):
+                # EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE,
+                #             f"{GuidList[i]}", None)
                 Node.Buffer += gFormPkg.StructToStream(GuidList[i])
 
         self.Root.insertChild(Node)
@@ -1889,7 +1898,7 @@ class YamlParser():
             elif IsSetType:
                 self.CurrQestVarInfo.VarType = LFlags & EFI_IFR_NUMERIC_SIZE
 
-        elif self.CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID and self.CurrQestVarInfo.IsBitVar:
+        elif self.CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
             LFlags &= EDKII_IFR_DISPLAY_BIT
             LFlags |= EDKII_IFR_NUMERIC_SIZE_BIT & self.CurrQestVarInfo.VarTotalSize
 
@@ -2077,6 +2086,8 @@ class YamlParser():
                 self.ErrorHandler(OObj.SetFlags(HFlags, LFlags))
 
         if (self.CurrQestVarInfo.IsBitVar == False) and (self.CurrQestVarInfo.VarType not in BasicTypes):
+            print(f"wrong error {self.Options.InputFileName}: {self.Options.YamlOutputFileName}")
+            self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, f"wrong error {self.Options.InputFileName}: {self.Options.YamlOutputFileName}")
             self.ErrorHandler(VfrReturnCode.VFR_RETURN_INVALID_PARAMETER, 'OneOf question only support UINT8, UINT16, UINT32 and UINT64 data type.')
 
         # modify the data Vartype for NameValue

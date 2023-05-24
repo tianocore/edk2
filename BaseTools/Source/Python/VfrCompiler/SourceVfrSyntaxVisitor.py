@@ -2662,7 +2662,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             elif IsSetType:
                 self.CurrQestVarInfo.VarType = ctx.LFlags & EFI_IFR_NUMERIC_SIZE
 
-        elif self.CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID and self.CurrQestVarInfo.IsBitVar:
+        elif self.CurrQestVarInfo.VarStoreId != EFI_VARSTORE_ID_INVALID:
             ctx.LFlags &= EDKII_IFR_DISPLAY_BIT
             ctx.LFlags |= EDKII_IFR_NUMERIC_SIZE_BIT & self.CurrQestVarInfo.VarTotalSize
 
