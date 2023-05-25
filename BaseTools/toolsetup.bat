@@ -313,14 +313,16 @@ if not defined PYTHON_COMMAND (
   )
 )
 
-if defined PYTHON_HOME (
-  if EXIST "%PYTHON_HOME%" (
-    set PYTHON_COMMAND=%PYTHON_HOME%\python.exe
-  ) else (
-    echo .
-    echo !!! ERROR !!!  PYTHON_HOME="%PYTHON_HOME%" does not exist.
-    echo .
-    goto end
+if not defined PYTHON_COMMAND (
+  if defined PYTHON_HOME (
+    if EXIST "%PYTHON_HOME%" (
+      set PYTHON_COMMAND=%PYTHON_HOME%\python.exe
+    ) else (
+      echo .
+      echo !!! ERROR !!!  PYTHON_HOME="%PYTHON_HOME%" does not exist.
+      echo .
+      goto end
+    )
   )
 )
 
@@ -447,5 +449,4 @@ set VS2015=
 set VSTool=
 set PYTHON_VER_MAJOR=
 set PYTHON_VER_MINOR=
-set SCRIPT_ERROR=
 popd
