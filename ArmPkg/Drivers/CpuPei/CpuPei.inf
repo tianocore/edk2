@@ -48,5 +48,4 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
 
 [Depex]
-  gEfiPeiMemoryDiscoveredPpiGuid
-
+  TRUE
