@@ -42,6 +42,8 @@
   SmmCpuMemoryManagement.c
   SmmMp.h
   SmmMp.c
+  SmmMpPerf.h
+  SmmMpPerf.c
 
 [Sources.Ia32]
   Ia32/Semaphore.c
