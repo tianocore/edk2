@@ -60,6 +60,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "CpuService.h"
 #include "SmmProfile.h"
+#include "SmmMpPerf.h"
 
 //
 // CET definition
