@@ -362,6 +362,9 @@ SmmInitHandler (
 
   for (Index = 0; Index < mNumberOfCpus; Index++) {
     if (ApicId == (UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId) {
+      PERF_CODE (
+        MpPerfBegin (Index, SMM_MP_PERF_PROCEDURE_ID (SmmInitHandler));
+        );
       //
       // Initialize SMM specific features on the currently executing CPU
       //
@@ -391,6 +394,10 @@ SmmInitHandler (
         //
         SemaphoreHook (Index, &mRebased[Index]);
       }
+
+      PERF_CODE (
+        MpPerfEnd (Index, SMM_MP_PERF_PROCEDURE_ID (SmmInitHandler));
+        );
 
       return;
     }
@@ -698,6 +705,10 @@ PiCpuSmmEntry (
   }
 
   gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus = mMaxNumberOfCpus;
+
+  PERF_CODE (
+    InitializeMpPerf (gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
+    );
 
   //
   // The CPU save state and code for the SMI entry point are tiled within an SMRAM
