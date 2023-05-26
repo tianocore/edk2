@@ -410,12 +410,15 @@ ExecuteFirstSmiInit (
 {
   UINTN  Index;
 
+  PERF_FUNCTION_BEGIN ();
+
   if (mSmmInitialized == NULL) {
     mSmmInitialized = (BOOLEAN *)AllocatePool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
   }
 
   ASSERT (mSmmInitialized != NULL);
   if (mSmmInitialized == NULL) {
+    PERF_FUNCTION_END ();
     return;
   }
 
@@ -442,6 +445,8 @@ ExecuteFirstSmiInit (
     while (!(BOOLEAN)mSmmInitialized[Index]) {
     }
   }
+
+  PERF_FUNCTION_END ();
 }
 
 /**
@@ -462,6 +467,8 @@ SmmRelocateBases (
   UINT8                 *U8Ptr;
   UINTN                 Index;
   UINTN                 BspIndex;
+
+  PERF_FUNCTION_BEGIN ();
 
   //
   // Make sure the reserved size is large enough for procedure SmmInitTemplate.
@@ -540,6 +547,7 @@ SmmRelocateBases (
   //
   CopyMem (CpuStatePtr, &BakBuf2, sizeof (BakBuf2));
   CopyMem (U8Ptr, BakBuf, sizeof (BakBuf));
+  PERF_FUNCTION_END ();
 }
 
 /**
@@ -616,6 +624,8 @@ PiCpuSmmEntry (
 
   GuidHob        = NULL;
   SmmBaseHobData = NULL;
+
+  PERF_FUNCTION_BEGIN ();
 
   //
   // Initialize address fixup
@@ -1194,6 +1204,7 @@ PiCpuSmmEntry (
 
   DEBUG ((DEBUG_INFO, "SMM CPU Module exit from SMRAM with EFI_SUCCESS\n"));
 
+  PERF_FUNCTION_END ();
   return EFI_SUCCESS;
 }
 
@@ -1348,12 +1359,15 @@ ConfigSmmCodeAccessCheck (
   UINTN       Index;
   EFI_STATUS  Status;
 
+  PERF_FUNCTION_BEGIN ();
+
   //
   // Check to see if the Feature Control MSR is supported on this CPU
   //
   Index = gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu;
   if (!SmmCpuFeaturesIsSmmRegisterSupported (Index, SmmRegFeatureControl)) {
     mSmmCodeAccessCheckEnable = FALSE;
+    PERF_FUNCTION_END ();
     return;
   }
 
@@ -1363,6 +1377,7 @@ ConfigSmmCodeAccessCheck (
   //
   if ((AsmReadMsr64 (EFI_MSR_SMM_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) == 0) {
     mSmmCodeAccessCheckEnable = FALSE;
+    PERF_FUNCTION_END ();
     return;
   }
 
@@ -1419,6 +1434,8 @@ ConfigSmmCodeAccessCheck (
       ReleaseSpinLock (mConfigSmmCodeAccessCheckLock);
     }
   }
+
+  PERF_FUNCTION_END ();
 }
 
 /**
@@ -1540,6 +1557,8 @@ PerformRemainingTasks (
   )
 {
   if (mSmmReadyToLock) {
+    PERF_FUNCTION_BEGIN ();
+
     //
     // Check if all Aps enter SMM. In Relaxed-AP Sync Mode, BSP will not wait for
     // all Aps arrive. However,PerformRemainingTasks() needs to wait all Aps arrive before calling
@@ -1587,12 +1606,20 @@ PerformRemainingTasks (
     //
     ConfigSmmCodeAccessCheck ();
 
+    //
+    // Measure performance of SmmCpuFeaturesCompleteSmmReadyToLock() from caller side
+    // as the implementation is provided by platform.
+    //
+    PERF_START (NULL, "SmmCompleteReadyToLock", NULL, 0);
     SmmCpuFeaturesCompleteSmmReadyToLock ();
+    PERF_END (NULL, "SmmCompleteReadyToLock", NULL, 0);
 
     //
     // Clean SMM ready to lock flag
     //
     mSmmReadyToLock = FALSE;
+
+    PERF_FUNCTION_END ();
   }
 }
 

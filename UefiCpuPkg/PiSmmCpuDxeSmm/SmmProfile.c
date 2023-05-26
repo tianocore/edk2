@@ -575,6 +575,8 @@ InitPaging (
   IA32_CR4  Cr4;
   BOOLEAN   Enable5LevelPaging;
 
+  PERF_FUNCTION_BEGIN ();
+
   Cr4.UintN          = AsmReadCr4 ();
   Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 == 1);
 
@@ -810,7 +812,7 @@ InitPaging (
   //
   mXdEnabled = TRUE;
 
-  return;
+  PERF_FUNCTION_END ();
 }
 
 /**

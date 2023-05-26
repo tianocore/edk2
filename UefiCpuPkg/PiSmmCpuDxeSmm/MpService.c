@@ -351,6 +351,8 @@ SmmWaitForApArrival (
   UINT32   DelayedCount;
   UINT32   BlockedCount;
 
+  PERF_FUNCTION_BEGIN ();
+
   DelayedCount = 0;
   BlockedCount = 0;
 
@@ -439,7 +441,7 @@ SmmWaitForApArrival (
     DEBUG ((DEBUG_INFO, "SmmWaitForApArrival: Delayed AP Count = %d, Blocked AP Count = %d\n", DelayedCount, BlockedCount));
   }
 
-  return;
+  PERF_FUNCTION_END ();
 }
 
 /**
@@ -576,6 +578,8 @@ BSPHandler (
 
   ASSERT (CpuIndex == mSmmMpSyncData->BspIndex);
   ApCount = 0;
+
+  PERF_FUNCTION_BEGIN ();
 
   //
   // Flag BSP's presence
@@ -792,6 +796,8 @@ BSPHandler (
   *mSmmMpSyncData->Counter                  = 0;
   *mSmmMpSyncData->AllCpusInSync            = FALSE;
   mSmmMpSyncData->AllApArrivedWithException = FALSE;
+
+  PERF_FUNCTION_END ();
 }
 
 /**
