@@ -27,6 +27,15 @@ EFI_DRIVER_BINDING_PROTOCOL  gConPlatformTextOutDriverBinding = {
   NULL
 };
 
+//
+// Values from Usb Inteface Association Descriptor Device
+//  Class Code and Usage Model specification (iadclasscode_r10.pdf)
+//  from Usb.org
+//
+#define USB_BASE_CLASS_MISCELLANEOUS       0xEF
+#define USB_MISCELLANEOUS_SUBCLASS_COMMON  0x02
+#define USB_MISCELLANEOUS_PROTOCOL_IAD     0x01
+
 /**
   Entrypoint of this module.
 
@@ -808,10 +817,16 @@ MatchUsbClass (
   DeviceClass    = DevDesc.DeviceClass;
   DeviceSubClass = DevDesc.DeviceSubClass;
   DeviceProtocol = DevDesc.DeviceProtocol;
-  if (DeviceClass == 0) {
+
+  if ((DeviceClass == 0) ||
+      ((DeviceClass == USB_BASE_CLASS_MISCELLANEOUS) &&
+       (DeviceSubClass == USB_MISCELLANEOUS_SUBCLASS_COMMON) &&
+       (DeviceProtocol == USB_MISCELLANEOUS_PROTOCOL_IAD)))
+  {
     //
-    // If Class in Device Descriptor is set to 0, use the Class, SubClass and
-    // Protocol in Interface Descriptor instead.
+    // If Class in Device Descriptor is set to 0 (Device), or
+    // Class/SubClass/Protocol is 0xEF/0x02/0x01 (IAD), use the Class, SubClass
+    // and Protocol in Interface Descriptor instead.
     //
     Status = UsbIo->UsbGetInterfaceDescriptor (UsbIo, &IfDesc);
     if (EFI_ERROR (Status)) {
