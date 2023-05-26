@@ -66,11 +66,11 @@ VirtioSerialTxControl (
   IN     UINT16             Value
   )
 {
-  VIRTIO_SERIAL_CONTROL  Control = {
-    .Id    = Id,
-    .Event = Event,
-    .Value = Value,
-  };
+  VIRTIO_SERIAL_CONTROL  Control;
+
+  Control.Id    = Id;
+  Control.Event = Event;
+  Control.Value = Value;
 
   DEBUG ((
     DEBUG_INFO,
