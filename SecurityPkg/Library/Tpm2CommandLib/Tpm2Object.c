@@ -169,9 +169,9 @@ Tpm2ReadPublic (
           Buffer                                                                      += sizeof (UINT16);
           break;
         case TPM_ALG_XOR:
-          OutPublic->publicArea.parameters.keyedHashDetail.scheme.details.xor.hashAlg = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+          OutPublic->publicArea.parameters.keyedHashDetail.scheme.details.Xor.hashAlg = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
           Buffer                                                                     += sizeof (UINT16);
-          OutPublic->publicArea.parameters.keyedHashDetail.scheme.details.xor.kdf     = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+          OutPublic->publicArea.parameters.keyedHashDetail.scheme.details.Xor.kdf     = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
           Buffer                                                                     += sizeof (UINT16);
           break;
         default:
@@ -195,7 +195,7 @@ Tpm2ReadPublic (
           Buffer                                                += sizeof (UINT16);
           break;
         case TPM_ALG_XOR:
-          OutPublic->publicArea.parameters.symDetail.keyBits.xor = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
+          OutPublic->publicArea.parameters.symDetail.keyBits.Xor = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
           Buffer                                                += sizeof (UINT16);
           break;
         case TPM_ALG_NULL:
