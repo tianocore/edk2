@@ -10,6 +10,14 @@
 #define _TPM12_H_
 
 ///
+/// Temporary disable 4201 to support anonymous unions
+///
+#if defined (_MSC_EXTENSIONS)
+#pragma warning( push )
+#pragma warning ( disable : 4201 )
+#endif
+
+///
 /// The start of TPM return codes
 ///
 #define TPM_BASE  0
@@ -744,8 +752,11 @@ typedef struct tdTPM_PERMANENT_FLAGS {
   BOOLEAN              TPMpost;
   BOOLEAN              TPMpostLock;
   BOOLEAN              FIPS;
-  BOOLEAN                           operator;
-  BOOLEAN                           enableRevokeEK;
+  union {
+    BOOLEAN            operator;
+    BOOLEAN            Operator;
+  };
+  BOOLEAN              enableRevokeEK;
   BOOLEAN              nvLocked;
   BOOLEAN              readSRKPub;
   BOOLEAN              tpmEstablished;
@@ -2161,5 +2172,12 @@ typedef struct tdTPM_RSP_COMMAND_HDR {
 } TPM_RSP_COMMAND_HDR;
 
 #pragma pack ()
+
+///
+/// Temporary disable 4201 to support anonymous unions
+///
+#if defined (_MSC_EXTENSIONS)
+#pragma warning( pop )
+#endif
 
 #endif

@@ -15,6 +15,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/Tpm12.h>
 
+///
+/// Temporary disable 4201 to support anonymous unions
+///
+#if defined (_MSC_EXTENSIONS)
+#pragma warning( push )
+#pragma warning ( disable : 4201 )
+#endif
+
 #pragma pack (1)
 
 // Annex A Algorithm Constants
@@ -1247,7 +1255,10 @@ typedef union {
   TPMI_AES_KEY_BITS    aes;
   TPMI_SM4_KEY_BITS    SM4;
   TPM_KEY_BITS         sym;
-  TPMI_ALG_HASH     xor;
+  union {
+    TPMI_ALG_HASH      xor;
+    TPMI_ALG_HASH      Xor;
+  };
 } TPMU_SYM_KEY_BITS;
 
 // Table 123 - TPMU_SYM_MODE Union
@@ -1320,7 +1331,10 @@ typedef struct {
 // Table 136 - TPMU_SCHEME_KEYEDHASH Union
 typedef union {
   TPMS_SCHEME_HMAC    hmac;
-  TPMS_SCHEME_XOR  xor;
+  union {
+    TPMS_SCHEME_XOR   xor;
+    TPMS_SCHEME_XOR   Xor;
+  };
 } TPMU_SCHEME_KEYEDHASH;
 
 // Table 137 - TPMT_KEYEDHASH_SCHEME Structure
@@ -1808,5 +1822,12 @@ typedef struct {
 #define HASH_ALG_SHA384   0x00000004
 #define HASH_ALG_SHA512   0x00000008
 #define HASH_ALG_SM3_256  0x00000010
+
+///
+/// Temporary disable 4201 to support anonymous unions
+///
+#if defined (_MSC_EXTENSIONS)
+#pragma warning( pop )
+#endif
 
 #endif
