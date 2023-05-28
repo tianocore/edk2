@@ -119,7 +119,7 @@ Tpm2StartAuthSession (
       Buffer += sizeof (UINT16);
       break;
     case TPM_ALG_XOR:
-      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->keyBits.xor));
+      WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Symmetric->keyBits.xor_));
       Buffer += sizeof (UINT16);
       break;
     default:
