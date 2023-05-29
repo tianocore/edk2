@@ -10,6 +10,7 @@
 # Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 # Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 # Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -28,6 +29,7 @@
   Include
   Test/UnitTest/Include
   Test/Mock/Include
+  Library/MipiSysTLib/mipisyst/library/include
 
 [Includes.IA32]
   Include/Ia32
@@ -292,6 +294,14 @@
   ##  @libraryclass  Provides APIs for third-party library libfdt.
   #
   FdtLib|Include/Library/FdtLib.h
+
+  ##  @libraryclass  Provides general mipi sys-T services.
+  #
+  MipiSysTLib|Include/Library/MipiSysTLib.h
+
+  ##  @libraryclass  Provides API to output Trace Hub debug message.
+  #
+  TraceHubDebugSysTLib|Include/Library/TraceHubDebugSysTLib.h
 
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
@@ -2356,6 +2366,32 @@
   #  The value of 0xca2 is the default I/O base address defined in IPMI specification.
   # @Prompt IPMI KCS Interface I/O Base Address
   gEfiMdePkgTokenSpaceGuid.PcdIpmiKcsIoBaseAddress|0xca2|UINT16|0x00000031
+
+  ## This is SMBus slave address for the SSIF to the BMC.
+  #  The recommended value defined by IPMI specification is 0x20 (section 12.12).
+  # @Prompt IPMI SSIF SMBus slave address
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifSmbusSlaveAddr|0x20|UINT8|0x00000032
+
+  ## This is the maximum number of IPMI SSIF request retries.
+  #  The IPMI specification specified min value is 5 (section 12.17).
+  # @Prompt Number of IPMI SSIF request retries.
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifRequestRetryCount|0x05|UINT8|0x00000033
+
+  ## This is the required interval for each IPMI request retry.
+  #  The IPMI specification specified a time range of 60ms to 250ms (section 12.17).
+  #  The default setting is min.
+  # @Prompt Time between IPMI SSIF request retries.
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifRequestRetryIntervalMicrosecond|60000|UINT32|0x00000034
+
+  ## This value is the maximum retries of an IPMI SSIF response
+  #  The default value is the same as the Linux Kernel ipmi_ssif driver.
+  # @Prompt Number of IPMI SSIF response retries.
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifResponseRetryCount|250|UINT8|0x00000035
+
+  ## This is the required interval for each IPMI response retry.
+  #  The IPMI specification specified min value is 60ms (section 12.17).
+  # @Prompt Time-out for a response, internal
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifResponseRetryIntervalMicrosecond|60000|UINT32|0x00000036
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This value is used to set the base address of PCI express hierarchy.

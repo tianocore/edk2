@@ -65,6 +65,7 @@
   // write updated entry
   str   x1, [x0]
   dsb   nshst
+  isb
 
 .L2_\@:
   .endm

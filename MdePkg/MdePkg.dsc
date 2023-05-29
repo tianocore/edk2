@@ -184,6 +184,8 @@
   MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   MdePkg/Library/TdxLib/TdxLib.inf
+  MdePkg/Library/MipiSysTLib/MipiSysTLib.inf
+  MdePkg/Library/TraceHubDebugSysTLibNull/TraceHubDebugSysTLibNull.inf
 
 [Components.EBC]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
@@ -195,5 +197,7 @@
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
+  MdePkg/Library/BaseSerialPortLibRiscVSbiLib/BaseSerialPortLibRiscVSbiLib.inf
+  MdePkg/Library/BaseSerialPortLibRiscVSbiLib/BaseSerialPortLibRiscVSbiLibRam.inf
 
 [BuildOptions]

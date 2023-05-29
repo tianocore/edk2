@@ -1834,7 +1834,7 @@ NOOPT_CLANGPDB_X64_GENFW_FLAGS      = --keepexceptiontable
 #
 ####################################################################################
 *_CLANGDWARF_*_*_FAMILY             = GCC
-*_CLANGDWARF_*_*_BUILDRULEFAMILY    = CLANGGCC
+
 *_CLANGDWARF_*_MAKE_PATH            = ENV(CLANG_HOST_BIN)make
 *_CLANGDWARF_*_*_DLL                = ENV(CLANGDWARF_DLL)
 *_CLANGDWARF_*_ASL_PATH             = DEF(UNIX_IASL_BIN)
@@ -1858,7 +1858,7 @@ DEFINE CLANGDWARF_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x22
 DEFINE CLANGDWARF_IA32_TARGET             = -target i686-pc-linux-gnu
 DEFINE CLANGDWARF_X64_TARGET              = -target x86_64-pc-linux-gnu
 
-DEFINE CLANGDWARF_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-unaligned-access
+DEFINE CLANGDWARF_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-unaligned-access -Wno-unneeded-internal-declaration
 DEFINE CLANGDWARF_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGDWARF_WARNING_OVERRIDES) -fno-stack-protector -mms-bitfields -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -msoft-float -mno-implicit-float  -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -funsigned-char -fno-ms-extensions -Wno-null-dereference
 
 ###########################
@@ -1873,7 +1873,7 @@ DEFINE CLANGDWARF_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGDWARF_
 *_CLANGDWARF_IA32_VFRPP_PATH           = DEF(CLANGDWARF_IA32_PREFIX)clang
 *_CLANGDWARF_IA32_ASLCC_PATH           = DEF(CLANGDWARF_IA32_PREFIX)clang
 *_CLANGDWARF_IA32_ASLPP_PATH           = DEF(CLANGDWARF_IA32_PREFIX)clang
-*_CLANGDWARF_IA32_RC_PATH              = DEF(CLANGDWARF_IA32_PREFIX)llvm-rc
+*_CLANGDWARF_IA32_RC_PATH              = DEF(CLANGDWARF_IA32_PREFIX)llvm-objcopy
 
 *_CLANGDWARF_IA32_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m32 -fno-lto DEF(CLANGDWARF_IA32_TARGET)
 *_CLANGDWARF_IA32_ASLDLINK_FLAGS       = DEF(CLANGDWARF_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_i386 -fuse-ld=lld -no-pie
@@ -1909,7 +1909,7 @@ NOOPT_CLANGDWARF_IA32_DLINK2_FLAGS     = DEF(CLANGDWARF_IA32_DLINK2_FLAGS) -O0 -
 *_CLANGDWARF_X64_VFRPP_PATH           = DEF(CLANGDWARF_X64_PREFIX)clang
 *_CLANGDWARF_X64_ASLCC_PATH           = DEF(CLANGDWARF_X64_PREFIX)clang
 *_CLANGDWARF_X64_ASLPP_PATH           = DEF(CLANGDWARF_X64_PREFIX)clang
-*_CLANGDWARF_X64_RC_PATH              = DEF(CLANGDWARF_X64_PREFIX)llvm-rc
+*_CLANGDWARF_X64_RC_PATH              = DEF(CLANGDWARF_X64_PREFIX)llvm-objcopy
 
 *_CLANGDWARF_X64_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS) -m64 -fno-lto DEF(CLANGDWARF_X64_TARGET)
 *_CLANGDWARF_X64_ASLDLINK_FLAGS       = DEF(CLANGDWARF_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_x86_64 -fuse-ld=lld
@@ -1957,7 +1957,7 @@ DEFINE CLANGDWARF_ARM_DLINK_FLAGS   = DEF(CLANGDWARF_ARM_TARGET) DEF(GCC_ARM_DLI
 *_CLANGDWARF_ARM_ASLDLINK_PATH      = ENV(CLANGDWARF_BIN)clang
 
 *_CLANGDWARF_ARM_SLINK_PATH         = ENV(CLANGDWARF_BIN)llvm-ar
-*_CLANGDWARF_ARM_RC_PATH            = ENV(CLANGDWARF_ARM_PREFIX)objcopy
+*_CLANGDWARF_ARM_RC_PATH            = ENV(CLANGDWARF_BIN)llvm-objcopy
 
 *_CLANGDWARF_ARM_ASLCC_FLAGS        = DEF(GCC_ASLCC_FLAGS) -fno-lto
 *_CLANGDWARF_ARM_ASLDLINK_FLAGS     = DEF(CLANGDWARF_ARM_TARGET) DEF(GCC_ARM_ASLDLINK_FLAGS)
@@ -2001,7 +2001,7 @@ DEFINE CLANGDWARF_AARCH64_DLINK_FLAGS  = DEF(CLANGDWARF_AARCH64_TARGET) DEF(GCC_
 *_CLANGDWARF_AARCH64_ASLDLINK_PATH  = ENV(CLANGDWARF_BIN)clang
 
 *_CLANGDWARF_AARCH64_SLINK_PATH     = ENV(CLANGDWARF_BIN)llvm-ar
-*_CLANGDWARF_AARCH64_RC_PATH        = ENV(CLANGDWARF_AARCH64_PREFIX)objcopy
+*_CLANGDWARF_AARCH64_RC_PATH        = ENV(CLANGDWARF_BIN)llvm-objcopy
 
 *_CLANGDWARF_AARCH64_ASLCC_FLAGS    = DEF(GCC_ASLCC_FLAGS) -fno-lto
 *_CLANGDWARF_AARCH64_ASLDLINK_FLAGS = DEF(CLANGDWARF_AARCH64_TARGET) DEF(GCC_AARCH64_ASLDLINK_FLAGS)
