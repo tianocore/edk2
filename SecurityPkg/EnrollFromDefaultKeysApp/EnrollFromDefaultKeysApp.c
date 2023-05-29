@@ -66,12 +66,12 @@ UefiMain (
 
   Status = EnrollDbxFromDefault ();
   if (EFI_ERROR (Status)) {
-    AsciiPrint ("EnrollFromDefaultKeysApp: Cannot enroll dbt: %r\n", Status);
+    AsciiPrint ("EnrollFromDefaultKeysApp: Cannot enroll dbx: %r\n", Status);
   }
 
   Status = EnrollDbtFromDefault ();
   if (EFI_ERROR (Status)) {
-    AsciiPrint ("EnrollFromDefaultKeysApp: Cannot enroll dbx: %r\n", Status);
+    AsciiPrint ("EnrollFromDefaultKeysApp: Cannot enroll dbt: %r\n", Status);
   }
 
   Status = EnrollKEKFromDefault ();
