@@ -945,7 +945,7 @@ PiCpuSmmEntry (
     gSmmCpuPrivate->Operation[Index]        = SmmCpuNone;
 
     if (Index < mNumberOfCpus) {
-      Status = MpServices->GetProcessorInfo (MpServices, Index, &gSmmCpuPrivate->ProcessorInfo[Index]);
+      Status = MpServices->GetProcessorInfo (MpServices, Index | CPU_V2_EXTENDED_TOPOLOGY, &gSmmCpuPrivate->ProcessorInfo[Index]);
       ASSERT_EFI_ERROR (Status);
       mCpuHotPlugData.ApicId[Index] = gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId;
 
