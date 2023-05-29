@@ -236,14 +236,14 @@ class IfrTree():
                         for i in range(0, len(Root.Buffer)):
                             self.Index += 1
                             Data = Root.Buffer[i]
-                            if self.Index == gFormPkg.PkgLength:
-                                C.write('0x%02X' % Data)
-                            elif self.Index % BYTES_PRE_LINE == 1:
-                                C.write('  0x%02X,  ' % Data)
-                            elif self.Index % BYTES_PRE_LINE == 0:
-                                C.write('0x%02X,\n' % Data)
-                            else:
-                                C.write('0x%02X,  ' % Data)
+                            if  self.Index % BYTES_PRE_LINE == 1: # the first value of current line
+                                C.write('  ')
+                            C.write('0x%02X' % Data)
+                            if self.Index != gFormPkg.PkgLength:
+                                if self.Index % BYTES_PRE_LINE == 0: # the last value of current line
+                                    C.write(',\n')
+                                else:
+                                    C.write(',  ')
 
                             LineBuffer += '{:0>2X} '.format(Root.Buffer[i])
 
@@ -271,14 +271,14 @@ class IfrTree():
                         for i in range(0, len(Root.Buffer)):
                             self.Index += 1
                             Data = Root.Buffer[i]
-                            if self.Index == gFormPkg.PkgLength:
-                                C.write('0x%02X' % Data)
-                            elif self.Index % BYTES_PRE_LINE == 1:
-                                C.write('  0x%02X,  ' % Data)
-                            elif self.Index % BYTES_PRE_LINE == 0:
-                                C.write('0x%02X,\n' % Data)
-                            else:
-                                C.write('0x%02X,  ' % Data)
+                            if  self.Index % BYTES_PRE_LINE == 1: # the first value of current line
+                                C.write('  ')
+                            C.write('0x%02X' % Data)
+                            if self.Index != gFormPkg.PkgLength:
+                                if self.Index % BYTES_PRE_LINE == 0: # the last value of current line
+                                    C.write(',\n')
+                                else:
+                                    C.write(',  ')
                     except:
                         EdkLogger.error(
                             "VfrCompiler", FILE_WRITE_FAILURE,
@@ -568,8 +568,13 @@ class IfrTree():
                     f.write(
                         ValueIndent + 'help:  ' + 'STRING_TOKEN(' + Root.Dict['help'].Key + ')\n')
                     if 'classguid' in Root.Dict.keys():
-                        for i in range(0, len(Root.Data.GetClassGuid())):
-                            f.write(ValueIndent + 'classguid:  '  + Root.Dict['classguid'][i].Key + '\n')
+                        f.write(ValueIndent + 'classguid:  ')
+                        for i in range(0, len(Root.Dict['classguid'])):
+                            if i != len(Root.Dict['classguid']) - 1:
+                                f.write(Root.Dict['classguid'][i].Key + ' | ')
+                            else:
+                                f.write(Root.Dict['classguid'][i].Key + ' # Optional Input \n')
+
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP and type(Root.Child[0].Data) != IfrSubClass and type(Root.Child[0].Data) != IfrClass:
                         f.write(ValueIndent + 'component:  \n')
                     elif type(Root.Child[0].Data) == IfrClass and type(Root.Child[1].Data) == IfrSubClass:
@@ -600,6 +605,7 @@ class IfrTree():
                             f.write(ValueIndent + 'varid:  '  + Root.Dict['varid'].Key + ' # Optional Input, Need to assign if None\n')
                         else:
                             f.write(ValueIndent +'varid:  {} # Optional Input, Need to assign if None\n'.format('0x%04x' % (Info.VarStoreId)))
+                    f.write(ValueIndent + 'attribute:  {} \n'.format(Root.Data.AttributesText))
                     if 'name' in Root.Dict.keys():
                         f.write(ValueIndent + 'name:  '  + Root.Dict['name'].Key + '\n')
                         f.write(ValueIndent + 'varsize:  '  + Root.Dict['varsize'].Key + '\n')
@@ -609,7 +615,6 @@ class IfrTree():
                             Name += chr(Info.Name[i])
                         f.write(ValueIndent + 'name:  {}\n'.format(Name))
                     f.write(ValueIndent + 'guid:  ' + Root.Dict['guid'].Key + '\n')
-                    f.write(ValueIndent + 'attribute:  {} \n'.format(Root.Data.AttributesText))
 
                 if Root.OpCode == EFI_IFR_VARSTORE_NAME_VALUE_OP:
                     f.write(KeyIndent + '- namevaluevarstore:\n')
@@ -680,34 +685,24 @@ class IfrTree():
                         f.write(ValueIndent + 'component:  \n')
 
                 if Root.OpCode == EFI_IFR_IMAGE_OP:
-                    f.write(KeyIndent + '- image:\n')
-                    if Root.Condition != None:
-                        f.write(ValueIndent +
-                                'condition:  \'{}\'\n'.format(Root.Condition))
-                    f.write(ValueIndent +
-                            'id:  ' + 'IMAGE_TOKEN(' + Root.Dict['imageid'].Key + ')\n')
+                    f.write(KeyIndent + '- image: IMAGE_TOKEN(' + Root.Dict['imageid'].Key + ')\n')
 
                 if Root.OpCode == EFI_IFR_RULE_OP:  #
                     f.write(KeyIndent + '- rule:\n')
                     if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
-                    f.write(ValueIndent +
-                            'rulename:  {} \n'.format(Root.Data.GetRuleName()))
-                    f.write(ValueIndent +
-                            'expression:  {} \n'.format(Root.Expression))
+                    f.write(ValueIndent + 'name:  {}\n'.format(Root.Data.GetRuleName()))
+                    f.write(ValueIndent + 'expression:  {} \n'.format(Root.Expression))
 
                 if Root.OpCode == EFI_IFR_SUBTITLE_OP:
                     f.write(KeyIndent + '- subtitle:\n')
                     if Root.Condition != None:
                         f.write(ValueIndent +
                                 'condition:  \'{}\'\n'.format(Root.Condition))
-                    f.write(ValueIndent +
-                            'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n')
+                    f.write(ValueIndent + 'text:  ' + 'STRING_TOKEN(' + Root.Dict['text'].Key + ')\n')
                     if Root.Data.FlagsStream != '':
-                        f.write(
-                            ValueIndent +
-                            'flags:  {}  # Optional Input\n'.format(Root.Data.FlagsStream))
+                        f.write(ValueIndent + 'flags:  {}  # Optional Input\n'.format(Root.Data.FlagsStream))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -723,19 +718,14 @@ class IfrTree():
                         f.write(ValueIndent +
                                 'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n')
                         if 'text' in Root.Dict.keys():
-                            f.write(
-                                ValueIndent +
-                                'text:  ' + 'STRING_TOKEN(' + Root.Dict['text'].Key + ') # Optional Input\n')
+                            f.write(ValueIndent + 'text:  ' + 'STRING_TOKEN(' + Root.Dict['text'].Key + ') # Optional Input\n')
                     if type(Info) == EFI_IFR_ACTION:
                         f.write(ValueIndent +
                                 'help:  ' + 'STRING_TOKEN(' + Root.Dict['help'].Key + ')\n')
                         f.write(ValueIndent +
                                 'prompt:  ' + 'STRING_TOKEN(' + Root.Dict['prompt'].Key + ')\n')
                         if Root.Data.FlagsStream != '':
-                            f.write(
-                            ValueIndent +
-                            'flags:  {}  # Optional Input, Question Flags\n'
-                            .format(Root.Data.FlagsStream))
+                            f.write(ValueIndent + 'flags:  {}  # Optional Input, Question Flags\n'.format(Root.Data.FlagsStream))
                         if Root.Data.HasKey:
                             if 'key' in Root.Dict.keys():
                                 f.write(ValueIndent + 'key:  ' + Root.Dict['key'].Key + ' # Optional Input, Question QuestionId\n')
@@ -826,8 +816,8 @@ class IfrTree():
                     if Root.Data.HasMaxContainers:
                         if 'maxcontainers' in Root.Dict.keys():
                             f.write(ValueIndent + 'maxcontainers:  ' + Root.Dict['maxcontainers'].Key + ') # Optional Input, Need to compute if None\n')
-                        f.write(ValueIndent + 'maxcontainers:  {} # Optional Input, Need to compute if None\n'
-                        .format(Info.MaxContainers))
+                        else:
+                            f.write(ValueIndent + 'maxcontainers:  {} # Optional Input, Need to compute if None\n'.format(Info.MaxContainers))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1222,21 +1212,20 @@ class IfrTree():
     def DumpStatementInfos(self, Root, f,  ValueIndent):
         Info = Root.Data.GetInfo()
         if Root.Condition != None:
-            f.write(ValueIndent + 'condition:  \'{}\' # for reference\n'.format(Root.Condition))
+            f.write(ValueIndent + 'condition:  \'{}\' \n'.format(Root.Condition))
 
     def DumpQuestionInfos(self, Root, f,  ValueIndent):
 
         Info = Root.Data.GetInfo()
         # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
         if Root.Condition != None:
-            f.write(ValueIndent + 'condition:  \'{}\' # for reference\n'.format(Root.Condition))
+            f.write(ValueIndent + 'condition:  \'{}\'\n'.format(Root.Condition))
         if Root.Position != None:
             f.write(ValueIndent + 'position:  \'{}\' # for reference\n'.format(Root.Position))
-        if Root.Data.QName != None:
-            f.write(ValueIndent + 'name:  {}  #  Optional Input\n'.
-                                format(Root.Data.QName))
-        if Root.Data.VarIdStr != '':
-            f.write(ValueIndent + 'varidstr:  {}  #  for reference\n'.format(Root.Data.VarIdStr))
+        # if Root.Data.QName != None:
+        #     f.write(ValueIndent + 'name:  {}  #  Optional Input\n'.format(Root.Data.QName))
+        # if Root.Data.VarIdStr != '':
+        #     f.write(ValueIndent + 'varidstr:  {}  #  for reference\n'.format(Root.Data.VarIdStr))
 
         f.write(ValueIndent + 'questionid:  {}\n'.format(Info.Question.QuestionId))
         f.write(ValueIndent + 'varstoreid:  {}  #  Optional Input\n'.format(Info.Question.VarStoreId))
@@ -1278,22 +1267,16 @@ class IfrTree():
                     f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
                         '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
-                    # f.write(ValueIndent + 'title:  {}  # Title STRING_ID\n'.format('0x%04x' % (Info.FormSetTitle)))
                     # f.write(ValueIndent + 'help:  \'{}\'\n'.format(self._DisplayUniStr(Info.Help)))  BUG HERE
                     f.write(ValueIndent + 'help:  {}  # Help STRING_ID\n'.format('0x%04x' % (Info.Help)))
                     f.write(ValueIndent + 'title:  \'{}\'\n'.format(self._DisplayUniStr(Info.FormSetTitle)))
 
-                    # if len(Root.Data.GetClassGuid()) == 1:
-                    #     Guid = Root.Data.GetClassGuid()[0]
-                    #     f.write(ValueIndent + 'classguid:  \'{'  + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
-                    #     + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
-                    #     '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\'\n')
-                    # else:
                     for i in range(0, len(Root.Data.GetClassGuid())):
                         Guid = Root.Data.GetClassGuid()[i]
-                        f.write(ValueIndent + 'classguid{}:  '.format(i+1) + '\'{'  + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
-                        '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\'\n')
+                        if Guid != EFI_HII_PLATFORM_SETUP_FORMSET_GUID:
+                            f.write(ValueIndent + 'classguid{}:  '.format(i+1) + '\'{'  + '{}, {}, {},'.format('0x%x'%(Guid.Data1),'0x%x'%(Guid.Data2), '0x%x'%(Guid.Data3)) \
+                            + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Guid.Data4[0]), '0x%x'%(Guid.Data4[1]), '0x%x'%(Guid.Data4[2]), '0x%x'%(Guid.Data4[3]), \
+                            '0x%x'%(Guid.Data4[4]), '0x%x'%(Guid.Data4[5]), '0x%x'%(Guid.Data4[6]), '0x%x'%(Guid.Data4[7])) + ' }}\'\n')
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP and type(Root.Child[0].Data) != IfrSubClass and type(Root.Child[0].Data) != IfrClass:
                         f.write(ValueIndent + 'component:  \n')
                     elif type(Root.Child[0].Data) == IfrClass and type(Root.Child[1].Data) == IfrSubClass:
@@ -1302,60 +1285,43 @@ class IfrTree():
                 if Root.OpCode == EFI_IFR_VARSTORE_OP:
                     f.write(KeyIndent + '- varstore:\n')
                     # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
-                    f.write(ValueIndent + 'type:  {}\n'.format(Root.Data.Type))
-                    f.write(
-                            ValueIndent +
-                            'varid:  {} # Optional Input, Need to assign if None\n'
-                            .format('0x%04x' % (Info.VarStoreId)))
+                    # f.write(ValueIndent + 'type:  {} # for reference\n'.format(Root.Data.Type))
+                    f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
+                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
+                        '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
+                    f.write(ValueIndent + 'varid:  {} # Optional Input, Need to assign if None\n'.format('0x%04x' % (Info.VarStoreId)))
+                    f.write(ValueIndent + 'size:  {} # Need to Compute\n'.format(Info.Size))
                     Name = ''
                     for i in range(0, len(Info.Name)):
                         Name += chr(Info.Name[i])
                     f.write(ValueIndent + 'name:  {}\n'.format(Name))
-                    f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                        '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
-                    f.write(ValueIndent + 'size:  {} # Need to Compute\n'.format(Info.Size))
 
                 if Root.OpCode == EFI_IFR_VARSTORE_EFI_OP:
                     f.write(KeyIndent + '- efivarstore:\n')
                     # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
-                    f.write(ValueIndent +
-                            'type:  {}\n'.format(Root.Data.Type))
-                    f.write(
-                            ValueIndent +
-                            'varid:  {} # Optional Input, Need to assign if None\n'
-                            .format('0x%04x' % (Info.VarStoreId)))
+                    # f.write(ValueIndent + 'type:  {}# for reference\n'.format(Root.Data.Type))
+                    f.write(ValueIndent + 'varid:  {} # Optional Input, Need to assign if None\n'.format('0x%04x' % (Info.VarStoreId)))
+                    f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
+                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
+                        '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
+                    f.write(ValueIndent +'attribute:  {} \n'.format(Info.Attributes))
+                    f.write(ValueIndent + 'size:  {} # Need to Compute\n'.format(Info.Size))
                     Name = ''
                     for i in range(0, len(Info.Name)):
                         Name += chr(Info.Name[i])
                     f.write(ValueIndent + 'name:  {}\n'.format(Name))
-                    f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
-                        + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
-                        '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
-                    f.write(
-                        ValueIndent +
-                        'attribute:  {} \n'
-                        .format(Info.Attributes))
-                    f.write(ValueIndent + 'size:  {} # Need to Compute\n'.format(Info.Size))
 
                 if Root.OpCode == EFI_IFR_VARSTORE_NAME_VALUE_OP:
                     f.write(KeyIndent + '- namevaluevarstore:\n')
                     # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
-                    f.write(ValueIndent +
-                            'type:  {}\n'.format(Root.Data.Type))
-                    if Root.Data.HasVarStoreId:
-                        f.write(
-                        ValueIndent +
-                        'varid:  {} # Optional Input, Need to assign if None\n'
-                        .format('0x%04x' % (Info.VarStoreId)))
-                    f.write(ValueIndent +
-                            'nametable:\n')
-                    for NameItem in Root.Data.NameItemList:
-                        # f.write(ValueIndent + ' - name:  {} # NameList STRING_ID\n'.format('0x%04x' % (NameItem)))
-                        f.write(ValueIndent + ' - name:  \'{}\'\n'.format(self._DisplayUniStr(NameItem)))
+                    # f.write(ValueIndent + 'type:  {} # for reference\n'.format(Root.Data.Type))
+                    f.write(ValueIndent +'varid:  {} # Optional Input, Need to assign if None\n'.format('0x%04x' % (Info.VarStoreId)))
                     f.write(ValueIndent + 'guid:  \'{' + '{}, {}, {},'.format('0x%x'%(Info.Guid.Data1),'0x%x'%(Info.Guid.Data2), '0x%x'%(Info.Guid.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(Info.Guid.Data4[0]), '0x%x'%(Info.Guid.Data4[1]), '0x%x'%(Info.Guid.Data4[2]), '0x%x'%(Info.Guid.Data4[3]), \
                         '0x%x'%(Info.Guid.Data4[4]), '0x%x'%(Info.Guid.Data4[5]), '0x%x'%(Info.Guid.Data4[6]), '0x%x'%(Info.Guid.Data4[7])) + ' }}\'\n')
+                    f.write(ValueIndent + 'nametable: # for reference\n')
+                    for NameItem in Root.Data.NameItemList:
+                        f.write(ValueIndent + ' - name:  \'{}\'\n'.format(self._DisplayUniStr(NameItem)))
 
                 if Root.OpCode == EFI_IFR_DEFAULTSTORE_OP:
                     gVfrDefaultStore.UpdateDefaultType(Root)
@@ -1364,23 +1330,16 @@ class IfrTree():
                     if Type != 'Standard Defaults' and Type != 'Standard ManuFacturing':
                         f.write(KeyIndent + '- defaultstore:\n')
                         # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
-                        f.write(ValueIndent + 'type:  {}\n'.format(Type))
-                        # f.write(ValueIndent + 'prompt:  {} # DefaultName STRING_ID\n'.format('0x%04x' % (Info.DefaultName)))
+                        # f.write(ValueIndent + 'type:  {} # for reference\n'.format(Type))
                         f.write(ValueIndent + 'prompt:  \'{}\'\n'.format(self._DisplayUniStr(Info.DefaultName)))
-                        f.write(ValueIndent +
-                                'attribute:  {} # Default ID\n'.format(
-                                    '0x%04x' % (Info.DefaultId)))
+                        f.write(ValueIndent + 'attribute:  {} # Default ID\n'.format('0x%04x' % (Info.DefaultId)))
 
                 if Root.OpCode == EFI_IFR_FORM_OP:
                     f.write(KeyIndent + '- form: \n')
                     # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
-                    f.write(
-                        ValueIndent +
-                        'formid:  {} \n'.format(Info.FormId))
+                    f.write(ValueIndent + 'formid:  {} \n'.format(Info.FormId))
                     if Root.Condition != None:
-                        f.write(ValueIndent +
-                                'condition:  \'{}\'\n'.format(Root.Condition))
-                    # f.write(ValueIndent + 'title:  {}  # FormTitle STRING_ID\n'.format('0x%04x' % (Info.FormTitle)))
+                        f.write(ValueIndent + 'condition:  \'{}\'\n'.format(Root.Condition))
                     f.write(ValueIndent + 'title:  \'{}\'\n'.format(self._DisplayUniStr(Info.FormTitle)))
 
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
@@ -1391,18 +1350,13 @@ class IfrTree():
                     MethodMapList = Root.Data.GetMethodMapList()
                     f.write(KeyIndent + '- formmap: \n')
                     # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
-                    f.write(
-                        ValueIndent +
-                        'formid:  {} # FormId STRING_ID\n'.format(Info.FormId))
+                    f.write(ValueIndent + 'formid:  {} # FormId STRING_ID\n'.format(Info.FormId))
                     if Root.Condition != None:
-                        f.write(ValueIndent +
-                                'condition:  \'{}\'\n'.format(Root.Condition))
+                        f.write(ValueIndent + 'condition:  \'{}\'\n'.format(Root.Condition))
                     if MethodMapList != []:
-                        f.write(ValueIndent + 'map: # optional input\n')
+                        f.write(ValueIndent + 'map: # optional input, for reference\n')
                     for MethodMap in MethodMapList:
-                        f.write(
-                            ValueIndent +
-                            '- maptitle:  {}\n'.format(MethodMap.MethodTitle))
+                        f.write(ValueIndent + '- maptitle:  {}\n'.format(MethodMap.MethodTitle))
                         f.write(ValueIndent + '  mapguid:  \'{' + '{}, {}, {},'.format('0x%x'%(MethodMap.MethodIdentifier.Data1),'0x%x'%(MethodMap.MethodIdentifier.Data2), '0x%x'%(MethodMap.MethodIdentifier.Data3)) \
                         + ' { ' +  '{}, {}, {}, {}, {}, {}, {}, {}'.format('0x%x'%(MethodMap.MethodIdentifier.Data4[0]), '0x%x'%(MethodMap.MethodIdentifier.Data4[1]), '0x%x'%(MethodMap.MethodIdentifier.Data4[2]), '0x%x'%(MethodMap.MethodIdentifier.Data4[3]), \
                         '0x%x'%(MethodMap.MethodIdentifier.Data4[4]), '0x%x'%(MethodMap.MethodIdentifier.Data4[5]), '0x%x'%(MethodMap.MethodIdentifier.Data4[6]), '0x%x'%(MethodMap.MethodIdentifier.Data4[7])) + ' }}\'\n')
@@ -1413,21 +1367,17 @@ class IfrTree():
                     f.write(KeyIndent + '- image:\n')
                     # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
                     if Root.Condition != None:
-                        f.write(ValueIndent +
-                                'condition:  \'{}\'\n'.format(Root.Condition))
-                    f.write(ValueIndent +
-                            'id:  {} # ImageId\n'.format(Info.Id))
+                        f.write(ValueIndent + 'condition:  \'{}\'\n'.format(Root.Condition))
+                    f.write(ValueIndent + 'id:  {}\n'.format(Info.Id))
 
                 if Root.OpCode == EFI_IFR_RULE_OP:  #
                     f.write(KeyIndent + '- rule:\n')
                     # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
                     if Root.Condition != None:
-                        f.write(ValueIndent +
-                                'condition:  \'{}\'\n'.format(Root.Condition))
-                    f.write(ValueIndent +
-                            'rulename:  {} \n'.format(Root.Data.GetRuleName()))
-                    f.write(ValueIndent +
-                            'expression:  {} \n'.format(Root.Expression))
+                        f.write(ValueIndent + 'condition:  \'{}\'\n'.format(Root.Condition))
+                    f.write(ValueIndent + 'name:  {} # for reference \n'.format(Root.Data.GetRuleName()))
+                    f.write(ValueIndent + 'ruleid:  {} \n'.format(Info.RuleId))
+                    f.write(ValueIndent + 'expression:  {} \n'.format(Root.Expression))
 
                 if Root.OpCode == EFI_IFR_SUBTITLE_OP:
                     f.write(KeyIndent + '- subtitle:\n')
@@ -1468,8 +1418,7 @@ class IfrTree():
                 if Root.OpCode == EFI_IFR_ACTION_OP:
                     f.write(KeyIndent + '- action:\n')
                     self.DumpQuestionInfos(Root, f, ValueIndent)
-                    f.write(ValueIndent + 'config:  {}  # QuestionConfig\n'.
-                        format(Info.QuestionConfig))
+                    f.write(ValueIndent + 'config:  {}  # QuestionConfig\n'.format(Info.QuestionConfig))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1493,20 +1442,14 @@ class IfrTree():
                                 Root.Condition))
                     # f.write(ValueIndent + 'text:  {} # Option STRING_ID\n'.format('0x%04x' % (Info.Option)))
                     f.write(ValueIndent + 'text:  \'{}\'\n'.format(self._DisplayUniStr(Info.Option)))
-
+                    f.write(ValueIndent + 'flags:  {} # Optional Input\n'.format(Info.Flags))
+                    f.write(ValueIndent + 'type:  {} # Optional Input\n'.format('0x%04x' % (Info.Type)))
 
                     if type(Root.Data) == IfrOneOfOption:
                         if Root.Position != None:
                             f.write(ValueIndent + 'position:  \'{}\' # for reference\n'.format(Root.Position))
-                        if Root.Data.ValueStream != '':
-                            f.write(ValueIndent + 'value:  {}\n'.format(Root.Data.ValueStream))
+                        f.write(ValueIndent + 'value:  {}\n'.format(Info.Value))
 
-                    if Root.Data.FlagsStream != '':
-                        f.write(ValueIndent + 'flags:  {} # Optional Input\n'.
-                            format(Root.Data.FlagsStream))
-                    if Root.Data.IfrOptionKey != None:
-                        f.write(ValueIndent + 'key:  {} # Optional Input\n'.
-                            format('0x%04x' % (Root.Data.GetIfrOptionKey())))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1516,8 +1459,8 @@ class IfrTree():
                     if Root.Condition != None:
                         f.write(ValueIndent + 'condition:  \'{}\'\n'.format(
                                 Root.Condition))
-                    # f.write(ValueIndent + 'defaultId:  {}\n'.format(Info.DefaultId))
-                    # f.write(ValueIndent + 'type:  {}\n'.format(Info.Type))
+                    f.write(ValueIndent + 'defaultId:  {}\n'.format(Info.DefaultId))
+                    f.write(ValueIndent + 'type:  {}\n'.format(Info.Type))
                     if type(Root.Data) == IfrDefault: # vfrConstantValueField[Node]
                         if Root.Data.ValueStream != '':
                             if 'formsetguid' in Root.Dict.keys():
@@ -1529,19 +1472,16 @@ class IfrTree():
                             f.write(ValueIndent + 'value:  {}\n'.format(Root.Data.ValueStream))
 
                     elif type(Root.Data) == IfrDefault2:
-                        f.write(ValueIndent + 'value_exp: \'{}\'\n'.format(
-                            Root.Child[0].Expression))
+                        f.write(ValueIndent + 'value_exp: \'{}\'\n'.format(Root.Child[0].Expression))
 
-                    if Root.Data.DefaultStore != '':
-                        f.write(ValueIndent + 'defaultstore: {}\n'.format(
-                            Root.Data.DefaultStore))
+                    # if Root.Data.DefaultStore != '':
+                    #     f.write(ValueIndent + 'defaultstore: {} # for reference\n'.format(Root.Data.DefaultStore))
 
 
                 if Root.OpCode == EFI_IFR_ORDERED_LIST_OP:
                     f.write(KeyIndent + '- orderedlist:\n')
                     self.DumpQuestionInfos(Root, f, ValueIndent)
-                    f.write(ValueIndent + 'maxcontainers:  {} ## Optional Input, Need to compute if None\n'
-                        .format(Info.MaxContainers))
+                    f.write(ValueIndent + 'maxcontainers:  {} ## Optional Input, Need to compute if None\n'.format(Info.MaxContainers))
                     if Root.Child != [] and Root.Child[0].OpCode != EFI_IFR_END_OP:
                         f.write(ValueIndent + 'component:  \n')
 
@@ -1718,16 +1658,14 @@ class IfrTree():
                             Info.TimeOut))
 
                     if type(Root.Data) == IfrClass:
-                        ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
                         f.write(ValueIndent + 'class:  {}\n'.format(Info.Class))
                         # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
                         if not Root.Data.HasSubClass:
                             f.write(ValueIndent + 'component:  \n')
 
                     if type(Root.Data) == IfrSubClass:
-                        ValueIndent = ' ' * ((Root.Level-1) * 2 + 1)
-                        f.write(ValueIndent + 'subclass:  {}\n'.format(Info.SubClass))
-                        f.write(ValueIndent + 'component:  \n')
+                        f.write(KeyIndent + 'subclass:  {}\n'.format(Info.SubClass))
+                        f.write(KeyIndent + 'component:  \n')
                         # f.write(ValueIndent + 'buffer:  {}\n'.format(self.DumpBuffer(Root)))
 
                     if type(Root.Data) == IfrExtensionGuid:

@@ -343,8 +343,6 @@ class YamlParser():
             Node.Buffer += gFormPkg.StructToStream(DefaultClassGuid)
         else:
             for i in range(0, len(GuidList)):
-                # EdkLogger.error("VfrCompiler", FILE_PARSE_FAILURE,
-                #             f"{GuidList[i]}", None)
                 Node.Buffer += gFormPkg.StructToStream(GuidList[i])
 
         self.Root.insertChild(Node)
@@ -747,7 +745,7 @@ class YamlParser():
 
     def ParseVfrStatementRule(self, Rule, ParentNode):
         RObj = IfrRule()
-        RuleName = Rule['rulename'].PostVal
+        RuleName = Rule['name'].PostVal
         RObj.SetRuleName(RuleName)
         self.VfrRulesDB.RegisterRule(RuleName)
         RObj.SetRuleId(self.VfrRulesDB.GetRuleId(RuleName))
@@ -804,7 +802,7 @@ class YamlParser():
 
     def ParseVfrStatementSubtitle(self, Subtitle, ParentNode):
         SObj = IfrSubtitle()
-        Prompt = Subtitle['prompt'].PostVal
+        Prompt = Subtitle['text'].PostVal
         SObj.SetPrompt(Prompt)
         SObj.SetFlags(self._ParseSubtitleFlags(Subtitle))
         Node = IfrTreeNode(EFI_IFR_SUBTITLE_OP, SObj, gFormPkg.StructToStream(SObj.GetInfo()))
@@ -2204,14 +2202,14 @@ class YamlParser():
 
     def ParseVfrStatementImage(self, Image, ParentNode):
         IObj = IfrImage()
-        ImageId = Image['id'].PostVal
+        ImageId = Image.PostVal
         IObj.SetImageId(ImageId)
         Node = IfrTreeNode(EFI_IFR_IMAGE_OP, IObj, gFormPkg.StructToStream(IObj.GetInfo()))
         ParentNode.insertChild(Node)
         return Node
 
 
-    def ParseVfrStatementLocked(self, Image, ParentNode):
+    def ParseVfrStatementLocked(self, Locked, ParentNode):
         LObj = IfrLocked()
         Node = IfrTreeNode(EFI_IFR_LOCKED_OP, LObj, gFormPkg.StructToStream(LObj.GetInfo()))
         ParentNode.insertChild(Node)

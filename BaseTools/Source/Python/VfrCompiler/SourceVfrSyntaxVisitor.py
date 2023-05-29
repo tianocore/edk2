@@ -1345,7 +1345,7 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         SObj.SetLineNo(Line)
 
         Prompt = self.PreProcessDB.Read(ctx.S.text)
-        ctx.Node.Dict['prompt'] = KV(ctx.S.text, Prompt)
+        ctx.Node.Dict['text'] = KV(ctx.S.text, Prompt)
         SObj.SetPrompt(Prompt)
 
         self.visitChildren(ctx)

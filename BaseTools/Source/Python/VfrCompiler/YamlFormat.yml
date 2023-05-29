@@ -1,0 +1,75 @@
+
+# // FormSetDefinition :
+# //    'formset: '
+# //    'guid:' StringIdentifier
+# //    'title:' 'STRING_TOKEN' '(':StringIdentifier ')'
+# //    'help:' 'STRING_TOKEN' '(':StringIdentifier ')'
+# //    ('classguid:' classguidDefinition[localctx.Node])?
+# //    ('class:' classDefinition)?
+# //    ('subclass:' subclassDefinition)?
+# //    vfrFormSetList
+
+StringIdentifier: [A-Za-z_][A-Za-z_0-9]*
+
+yamlFormSetDefinition ::=
+formset:
+   guid:   StringIdentifier
+   title:  STRING_TOKEN(StringIdentifier)
+   help:  STRING_TOKEN(StringIdentifier)
+   {classguid: classguidDefinition}   # Optional
+   {class:  classDefinition}          # Optional
+   {subclass:  subclassDefinition}    # Optional
+   {component:}                       # Optional
+      {FormSetList}
+
+StringIdentifier: [A-Za-z_][A-Za-z_0-9]*
+classguidDefinition: StringIdentifier ('|' StringIdentifier)? ('|' StringIdentifier)?('|' StringIdentifier)?
+classDefinition: null
+subclassDefinition: null
+
+FormSetList ::= (FormSet)*
+FormSet ::= FormDefinition
+       | FormapDefinition
+       | ImageDefinition
+       | VarstoreDefinition
+       | EfivarstoreDefinition
+       | NamevaluevarstoreDefinition
+       | DefaultstoreDefinition
+       | DisableifDefinition
+       | SuppressifDefinition
+       | ExtensionDefinition
+
+FormDefinition ::=
+- form:
+   formid: StringIdentifier | NumberaoqinBia
+   title: STRING_TOKEN(StringIdentifier)
+   component:  # Optional
+      FormList
+
+FormList ::= (Form)*
+Form ::= ImageDefinition
+   |  LockedDefinition
+   |  RulesDefinition
+   |  DefaultDefinition
+   |  StatDefinition
+   |  QuestionsDefinition
+   |  ConditionalDefinition
+   |  LabelDefinition
+   |  BannerDefinition
+   |  InvalidDefinition #
+   |  ExtensionDefinition
+   |  ModalDefinition
+   |  RefreshEventDefinition
+
+FormapDefinition ::=
+- formmap:
+   formid: StringIdentifier | Number
+   map:        #Optional
+     MapList
+   component:  # Optional
+      FormList
+
+MapList  ::= (Map)*
+Map  ::=
+- maptitle: STRING_TOKEN(StringIdentifier)
+  mapguid:  StringIdentifier
