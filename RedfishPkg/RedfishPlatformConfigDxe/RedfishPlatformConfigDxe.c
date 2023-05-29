@@ -1221,6 +1221,16 @@ HiiValueToRedfishValue (
       RedfishValue->Type = RedfishValueTypeString;
       break;
     case EFI_IFR_CHECKBOX_OP:
+      //
+      // There is case where HII driver defines UINT8 for checked-box opcode storage.
+      // IFR compiler will assign EFI_IFR_TYPE_NUM_SIZE_8 to its value type instead of
+      // EFI_IFR_TYPE_BOOLEAN. We do a patch here and use boolean value type for this
+      // case.
+      //
+      if (Value->Type != EFI_IFR_TYPE_BOOLEAN) {
+        Value->Type = EFI_IFR_TYPE_BOOLEAN;
+      }
+
     case EFI_IFR_NUMERIC_OP:
       Status = HiiValueToRedfishNumeric (Value, RedfishValue);
       if (EFI_ERROR (Status)) {
