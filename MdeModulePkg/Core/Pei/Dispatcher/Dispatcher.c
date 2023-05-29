@@ -1630,6 +1630,7 @@ PeiDispatcher (
       Private->CurrentFileHandle    = NULL;
       Private->CurrentPeimCount     = 0;
       Private->CurrentFvFileHandles = NULL;
+      Private->AprioriCount         = 0;
     }
 
     //
