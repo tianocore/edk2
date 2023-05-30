@@ -30,7 +30,7 @@ DumpCapabilityReg (
   //
   // Dump Capability Data
   //
-  DEBUG ((DEBUG_INFO, " == Slot [%d] Capability is 0x%x ==\n", Slot, Capability));
+  DEBUG ((DEBUG_INFO, " == Slot [%d] Capability is 0x%llx ==\n", Slot, *(UINT64 *)Capability));
   DEBUG ((DEBUG_INFO, "   Timeout Clk Freq  %d%a\n", Capability->TimeoutFreq, (Capability->TimeoutUnit) ? "MHz" : "KHz"));
   DEBUG ((DEBUG_INFO, "   Base Clk Freq     %dMHz\n", Capability->BaseClkFreq));
   DEBUG ((DEBUG_INFO, "   Max Blk Len       %dbytes\n", 512 * (1 << Capability->MaxBlkLen)));
