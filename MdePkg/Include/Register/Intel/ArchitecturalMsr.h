@@ -5680,6 +5680,80 @@ typedef union {
 #define MSR_IA32_X2APIC_SELF_IPI  0x0000083F
 
 /**
+  Memory Encryption Capability MSR. If CPUID.07H:ECX.[13] = 1.
+
+  @param  ECX  MSR_IA32_TME_CAPABILITY (0x00000981)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_IA32_TME_CAPABILITY_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_IA32_TME_CAPABILITY_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_IA32_TME_CAPABILITY_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_TME_CAPABILITY);
+  AsmWriteMsr64 (MSR_IA32_TME_CAPABILITY, Msr.Uint64);
+  @endcode
+  @note MSR_IA32_TME_CAPABILITY is defined as IA32_TME_CAPABILITY in SDM.
+**/
+#define MSR_IA32_TME_CAPABILITY  0x00000981
+
+/**
+  MSR information returned for MSR index #MSR_IA32_TME_CAPABILITY
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] AES XTS 128:
+    /// Enumerate support for AES-XTS
+    ///
+    UINT32    AesXts128              : 1;
+    ///
+    /// [Bit 1] AesXts128WithIntegrity:
+    /// Enumerate support for AES-XTS 128-bit encryption with integrity algorithm.
+    ///
+    UINT32    AesXts128WithIntegrity : 1;
+    ///
+    /// [Bit 2] AesXts256:
+    /// Enumerate support for AES-XTS 256-bit encryption algorithm
+    ///
+    UINT32    AesXts256              : 1;
+    UINT32    Rsvd                   : 28;
+    ///
+    /// [Bit 31] TmeBypassMode:
+    /// Enumerate support for TME encryption bypass
+    ///
+    UINT32    TmeBypassMode          : 1;
+    ///
+    /// [Bit 35:32] MK_TME_MAX_KEYID_BITS:
+    /// Number of bits which can be allocated for usage as key identifiers for
+    /// multi-key memory encryption. Zero if TME-MK is not supported
+    ///
+    UINT32    MkTmeMaxKeyidBits      : 4;
+    ///
+    /// [Bit 50:36]  MK_TME_MAX_KEYS:
+    /// Indicates the maximum number of keys which are available for usage.
+    /// This value may not be a power of 2.
+    /// KeyID 0 is specially reserved and is not accounted for in this field.
+    ///
+    UINT32    MkTmeMaxKeys           : 15;
+    UINT32    Rsvd2                  : 13;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32    Uint32[2];
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64    Uint64;
+} MSR_IA32_TME_CAPABILITY_REGISTER;
+
+/**
   Memory Encryption Activation MSR. If CPUID.07H:ECX.[13] = 1.
 
   @param  ECX  MSR_IA32_TME_ACTIVATE (0x00000982)
