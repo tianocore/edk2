@@ -525,6 +525,7 @@ typedef struct {
   UINT8     ProcessorPowerEfficiencyClass;
   UINT8     Reserved2;
   UINT16    SpeOverflowInterrupt;
+  UINT16    TrbeInterrupt;
 } EFI_ACPI_6_5_GIC_STRUCTURE;
 
 ///
