@@ -221,7 +221,7 @@ RedfishCreateSmbiosTable42 (
                                              &MemArrayMappedAddrSmbiosHandle,
                                              (EFI_SMBIOS_TABLE_HEADER *)Type42Record
                                              );
-  DEBUG ((DEBUG_INFO, "RedfishPlatformDxe: Smbios->Add() - %r\n", Status));
+  DEBUG ((DEBUG_MANAGEABILITY, "RedfishPlatformDxe: Smbios->Add() - %r\n", Status));
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
@@ -259,7 +259,7 @@ PlatformHostInterfaceInformationReady (
   IN  VOID       *Context
   )
 {
-  DEBUG ((DEBUG_INFO, "%a: Platform Redfish Host Interface informtion is ready\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Platform Redfish Host Interface informtion is ready\n", __func__));
 
   RedfishCreateSmbiosTable42 ();
 
@@ -291,7 +291,7 @@ RedfishHostInterfaceDxeEntryPoint (
   EFI_STATUS  Status;
   EFI_GUID    *ReadyGuid;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n.", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry\n.", __func__));
 
   //
   // Check if the Redfish Host Interface depends on
@@ -299,8 +299,8 @@ RedfishHostInterfaceDxeEntryPoint (
   //
   Status = RedfishPlatformHostInterfaceNotification (&ReadyGuid);
   if (Status == EFI_SUCCESS) {
-    DEBUG ((DEBUG_INFO, "    Create protocol install notification to know the installation of platform Redfish host interface readiness\n"));
-    DEBUG ((DEBUG_INFO, "    Protocol GUID: %g\n", ReadyGuid));
+    DEBUG ((DEBUG_MANAGEABILITY, "    Create protocol install notification to know the installation of platform Redfish host interface readiness\n"));
+    DEBUG ((DEBUG_MANAGEABILITY, "    Protocol GUID: %g\n", ReadyGuid));
     //
     // Register event for ReadyGuid protocol installed by
     // platform Redfish host interface library.

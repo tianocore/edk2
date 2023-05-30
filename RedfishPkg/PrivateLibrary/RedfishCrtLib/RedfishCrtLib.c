@@ -548,7 +548,7 @@ strtod (
   char **__restrict       endptr
   )
 {
-  DEBUG ((DEBUG_INFO, "We don't supprot double type on edk2 yet!"));
+  DEBUG ((DEBUG_ERROR, "We don't supprot double type on edk2 yet!"));
   ASSERT (FALSE);
   return (double)0;
 }

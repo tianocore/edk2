@@ -122,7 +122,7 @@ RedfishConfigCommonInit (
   //
   Status = gBS->LocateProtocol (&gEdkIIRedfishCredentialProtocolGuid, NULL, (VOID **)&gCredential);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "%a: No Redfish Credential Protocol is installed on system.", __func__));
+    DEBUG ((DEBUG_ERROR, "%a: No Redfish Credential Protocol is installed on system.", __func__));
     return Status;
   }
 

@@ -37,7 +37,7 @@ ProbeRedfishCredentialBootstrap (
   UINT32                                      ResponseSize;
   BOOLEAN                                     ReturnBool;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry\n", __func__));
 
   //
   // IPMI callout to NetFn 2C, command 02
@@ -94,7 +94,7 @@ RedfishPlatformHostInterfaceDeviceDescriptor (
   HOST_INTERFACE_BMC_USB_NIC_INFO  *ThisInstance;
   REDFISH_INTERFACE_DATA           *InterfaceData;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry\n", __func__));
 
   if (IsListEmpty (&mBmcUsbNic)) {
     return EFI_NOT_FOUND;
@@ -166,7 +166,7 @@ RedfishPlatformHostInterfaceProtocolData (
   UINT8                              HostNameLength;
   CHAR8                              *HostNameString;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry\n", __func__));
 
   if (IsListEmpty (&mBmcUsbNic) || (IndexOfProtocolData > 0)) {
     return EFI_NOT_FOUND;
@@ -300,7 +300,7 @@ RetrievedBmcUsbNicInfo (
   IPMI_LAN_VLAN_ID                                *LanVlanId;
   EFI_USB_DEVICE_DESCRIPTOR                       UsbDeviceDescriptor;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry\n", __func__));
 
   if (IsListEmpty (&mBmcUsbNic)) {
     return EFI_NOT_FOUND;
@@ -605,7 +605,7 @@ HostInterfaceIpmiCheckMacAddress (
   EFI_MAC_ADDRESS                                 IpmiLanChannelMacAddress;
   BOOLEAN                                         AlreadyCached;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry.\n", __func__));
 
   GetLanConfigReps = NULL;
   AlreadyCached    = FALSE;
@@ -823,7 +823,7 @@ UsbNicSearchUsbIo (
   EFI_DEVICE_PATH_PROTOCOL  *ThisUsbDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *ThisUsbDevicePathEnd;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry.\n", __func__));
   DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "Device path on the EFI handle which has UsbIo and SNP instaleld on it.\n"));
   DevicePathStr = ConvertDevicePathToText (UsbDevicePath, FALSE, FALSE);
   if (DevicePathStr != NULL) {
@@ -987,7 +987,7 @@ IdentifyUsbNicBmcChannel (
   EFI_USB_IO_PROTOCOL              *UsbIo;
   HOST_INTERFACE_BMC_USB_NIC_INFO  *BmcUsbNic;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry.\n", __func__));
   Status = gBS->HandleProtocol (
                   Handle,
                   &gEfiSimpleNetworkProtocolGuid,
@@ -1074,7 +1074,7 @@ CheckBmcUsbNicOnHandles (
     return EFI_INVALID_PARAMETER;
   }
 
-  DEBUG ((DEBUG_INFO, "%a: Entry, #%d SNP handle\n", __func__, HandleNumer));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry, #%d SNP handle\n", __func__, HandleNumer));
 
   GotOneUsbNIc = FALSE;
   for (Index = 0; Index < HandleNumer; Index++) {
@@ -1137,7 +1137,7 @@ CheckBmcUsbNic (
   UINTN       BufferSize;
   EFI_HANDLE  *HandleBuffer;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry, the registration key - 0x%08x.\n", __func__, Registration));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry, the registration key - 0x%08x.\n", __func__, Registration));
 
   Handle     = NULL;
   Status     = EFI_SUCCESS;
@@ -1213,7 +1213,7 @@ PlatformHostInterfaceSnpCallback (
   IN  VOID       *Context
   )
 {
-  DEBUG ((DEBUG_INFO, "%a: Entry.\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry.\n", __func__));
 
   CheckBmcUsbNic (mPlatformHostInterfaceSnpRegistration);
   return;
@@ -1241,7 +1241,7 @@ RedfishPlatformHostInterfaceNotification (
 {
   EFI_STATUS  Status;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry\n", __func__));
 
   *InformationReadinessGuid = NULL;
   InitializeListHead (&mBmcUsbNic);

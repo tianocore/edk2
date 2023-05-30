@@ -362,7 +362,7 @@ RedfishDiscoverProtocolInstalled (
   EFI_REDFISH_DISCOVERED_TOKEN            *ThisRedfishDiscoveredToken;
   UINTN                                   NumberOfNetworkInterfaces;
 
-  DEBUG ((DEBUG_INFO, "%a: New network interface is installed on system by EFI Redfish discover driver.\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: New network interface is installed on system by EFI Redfish discover driver.\n", __func__));
 
   BufferSize = sizeof (EFI_HANDLE);
   Status     = gBS->LocateHandle (

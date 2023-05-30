@@ -66,7 +66,7 @@ LibStopRedfishService (
     DEBUG ((DEBUG_ERROR, "%a: fail to remove bootstrap credential: %r\n", __func__, Status));
   }
 
-  DEBUG ((DEBUG_INFO, "%a: bootstrap credential service stopped\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: bootstrap credential service stopped\n", __func__));
 
   return EFI_SUCCESS;
 }
@@ -216,7 +216,7 @@ GetBootstrapAccountCredentials (
     }
   }
 
-  DEBUG ((DEBUG_INFO, "%a: get bootstrap credential via IPMI: %r\n", __func__, Status));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: get bootstrap credential via IPMI: %r\n", __func__, Status));
 
   return Status;
 }
@@ -284,7 +284,7 @@ GetBootstrapAccountCredentialsFromVariable (
 
   FreePool (Data);
 
-  DEBUG ((DEBUG_INFO, "%a: get bootstrap credential from variable\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: get bootstrap credential from variable\n", __func__));
 
   return EFI_SUCCESS;
 }
@@ -446,7 +446,7 @@ LibCredentialGetAuthInfo (
   }
 
   if (DisableCredentialService) {
-    DEBUG ((DEBUG_INFO, "%a: credential bootstrapping control disabled\n", __func__));
+    DEBUG ((DEBUG_MANAGEABILITY, "%a: credential bootstrapping control disabled\n", __func__));
   }
 
   Status = SetBootstrapAccountCredentialsToVariable (*UserId, *Password, FALSE);
