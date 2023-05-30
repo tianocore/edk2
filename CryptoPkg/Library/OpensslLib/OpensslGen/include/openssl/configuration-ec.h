@@ -52,6 +52,9 @@ extern "C" {
 # ifndef OPENSSL_NO_ASYNC
 #  define OPENSSL_NO_ASYNC
 # endif
+# ifndef OPENSSL_NO_AUTOALGINIT
+#  define OPENSSL_NO_AUTOALGINIT
+# endif
 # ifndef OPENSSL_NO_AUTOERRINIT
 #  define OPENSSL_NO_AUTOERRINIT
 # endif

@@ -222,7 +222,7 @@
   $(OPENSSL_PATH)/crypto/evp/ctrl_params_translate.c
   $(OPENSSL_PATH)/crypto/evp/dh_ctrl.c
   $(OPENSSL_PATH)/crypto/evp/dh_support.c
-  $(OPENSSL_PATH)/crypto/evp/digest.c
+  OpensslStub/crypto/evp/digest.c
   $(OPENSSL_PATH)/crypto/evp/dsa_ctrl.c
   $(OPENSSL_PATH)/crypto/evp/e_aes.c
   $(OPENSSL_PATH)/crypto/evp/e_aes_cbc_hmac_sha1.c

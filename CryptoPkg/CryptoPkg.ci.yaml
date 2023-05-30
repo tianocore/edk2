@@ -140,7 +140,8 @@
             "Library/OpensslLib/OpensslStub/crypto/objects/obj_dat.c",
             "Library/OpensslLib/OpensslStub/openssl/obj_mac.h",
             "Library/OpensslLib/OpensslStub/crypto/evp/pmeth_lib.c",
-            "Library/OpensslLib/OpensslStub/crypto/x509/x_pubkey.c"
+            "Library/OpensslLib/OpensslStub/crypto/x509/x_pubkey.c",
+            "Library/OpensslLib/OpensslStub/crypto/evp/digest.c"
         ]
     }
 }

@@ -20,6 +20,7 @@ def openssl_configure(openssldir, target, ec = True):
         'no-afalgeng',
         'no-aria',
         'no-async',
+        'no-autoalginit',
         'no-autoerrinit',
         'no-autoload-config',
         'no-bf',
