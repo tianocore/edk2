@@ -28,7 +28,7 @@
   Depex - Dependency Expression.
 
   Copyright (c) 2014, Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1322,6 +1322,8 @@ SmmDriverDispatchHandler (
     return EFI_NOT_FOUND;
   }
 
+  PERF_CALLBACK_BEGIN (&gEfiEventDxeDispatchGuid);
+
   for (HandleIndex = 0; HandleIndex < HandleCount; HandleIndex++) {
     FvHandle = HandleBuffer[HandleIndex];
 
@@ -1511,6 +1513,7 @@ SmmDriverDispatchHandler (
     }
   }
 
+  PERF_CALLBACK_END (&gEfiEventDxeDispatchGuid);
   return EFI_SUCCESS;
 }
 
