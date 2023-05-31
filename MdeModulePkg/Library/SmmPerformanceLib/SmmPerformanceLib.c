@@ -6,7 +6,7 @@
   to log performance data. If both SMM PerformanceEx and Performance Protocol are not available, it does not log any
   performance information.
 
-  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -23,6 +23,36 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // The cached SMM Performance Protocol and SMM PerformanceEx Protocol interface.
 EDKII_PERFORMANCE_MEASUREMENT_PROTOCOL  *mPerformanceMeasurement = NULL;
 BOOLEAN                                 mPerformanceMeasurementEnabled;
+VOID                                    *mPerformanceLibExitBootServicesRegistration;
+
+/**
+  This is the Event call back function is triggered in SMM to notify the Library
+  the system is entering runtime phase.
+
+  @param[in] Protocol   Points to the protocol's unique identifier
+  @param[in] Interface  Points to the interface instance
+  @param[in] Handle     The handle on which the interface was installed
+
+  @retval EFI_SUCCESS SmmAtRuntimeCallBack runs successfully
+ **/
+EFI_STATUS
+EFIAPI
+SmmPerformanceLibExitBootServicesCallback (
+  IN CONST EFI_GUID  *Protocol,
+  IN VOID            *Interface,
+  IN EFI_HANDLE      Handle
+  )
+{
+  //
+  // Disable performance measurement after ExitBootServices because
+  // 1. Performance measurement might impact SMI latency at runtime;
+  // 2. Performance log is copied to non SMRAM at ReadyToBoot so runtime performance
+  //    log is not useful.
+  //
+  mPerformanceMeasurementEnabled = FALSE;
+
+  return EFI_SUCCESS;
+}
 
 /**
   The constructor function initializes the Performance Measurement Enable flag
@@ -40,9 +70,48 @@ SmmPerformanceLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_STATUS  Status;
+
   mPerformanceMeasurementEnabled =  (BOOLEAN)((PcdGet8 (PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
 
-  return EFI_SUCCESS;
+  Status = gSmst->SmmRegisterProtocolNotify (
+                    &gEdkiiSmmExitBootServicesProtocolGuid,
+                    SmmPerformanceLibExitBootServicesCallback,
+                    &mPerformanceLibExitBootServicesRegistration
+                    );
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
+}
+
+/**
+  The destructor function frees resources allocated by constructor.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS   The destructor always returns EFI_SUCCESS.
+**/
+EFI_STATUS
+EFIAPI
+SmmPerformanceLibDestructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // Unregister SmmExitBootServices notification.
+  //
+  Status = gSmst->SmmRegisterProtocolNotify (
+                    &gEdkiiSmmExitBootServicesProtocolGuid,
+                    NULL,
+                    &mPerformanceLibExitBootServicesRegistration
+                    );
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
 }
 
 /**

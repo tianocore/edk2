@@ -21,6 +21,7 @@
   LIBRARY_CLASS                  = PerformanceLib|DXE_SMM_DRIVER
 
   CONSTRUCTOR                    = SmmPerformanceLibConstructor
+  DESTRUCTOR                     = SmmPerformanceLibDestructor
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -45,6 +46,9 @@
 
 [Guids]
   gEdkiiSmmPerformanceMeasurementProtocolGuid          ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
+
+[Protocols]
+  gEdkiiSmmExitBootServicesProtocolGuid                ## CONSUMES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES
