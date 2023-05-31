@@ -57,7 +57,7 @@ SerialStatusCodeReportWorker (
     CharCount = AsciiSPrint (
                   Buffer,
                   sizeof (Buffer),
-                  "\n\rDXE_ASSERT!: %a (%d): %a\n\r",
+                  "\n\rSMM_ASSERT!: %a (%d): %a\n\r",
                   Filename,
                   LineNumber,
                   Description
