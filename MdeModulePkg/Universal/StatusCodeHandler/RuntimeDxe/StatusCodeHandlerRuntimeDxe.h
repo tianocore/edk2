@@ -38,17 +38,6 @@
 extern RUNTIME_MEMORY_STATUSCODE_HEADER  *mRtMemoryStatusCodeTable;
 
 /**
-  Locates Serial I/O Protocol as initialization for serial status code worker.
-
-  @retval EFI_SUCCESS  Serial I/O Protocol is successfully located.
-
-**/
-EFI_STATUS
-EfiSerialStatusCodeInitializeWorker (
-  VOID
-  );
-
-/**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.
 
   @param  CodeType         Indicates the type of status code being reported.
