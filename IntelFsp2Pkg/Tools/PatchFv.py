@@ -432,7 +432,8 @@ class Symbols:
         if reportLine.strip().find("Archive member included") != -1:
             #GCC
             #                0x0000000000001d55                IoRead8
-            patchMapFileMatchString = "\s+(0x[0-9a-fA-F]{16})\s+([^\s][^0x][_a-zA-Z0-9\-]+)\s"
+            #                0x00001d55                IoRead8
+            patchMapFileMatchString = "\s+(0x[0-9a-fA-F]{8,16})\s+([^\s][^0x][_a-zA-Z0-9\-]+)\s"
             matchKeyGroupIndex = 2
             matchSymbolGroupIndex  = 1
             prefix = '_'
@@ -458,7 +459,7 @@ class Symbols:
                 if handleNext:
                     handleNext = False
                     pcdName = match.group(1)
-                    match   = re.match("\s+(0x[0-9a-fA-F]{16})\s+", reportLine)
+                    match   = re.match("\s+(0x[0-9a-fA-F]{8,16})\s+", reportLine)
                     if match is not None:
                         modSymbols[prefix + pcdName] = match.group(1)
                 else:
