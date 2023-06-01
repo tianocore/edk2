@@ -626,33 +626,31 @@ SataControllerStop (
     return Status;
   }
 
-  if (Private != NULL) {
-    if (Private->DisqualifiedModes != NULL) {
-      FreePool (Private->DisqualifiedModes);
-    }
-
-    if (Private->IdentifyData != NULL) {
-      FreePool (Private->IdentifyData);
-    }
-
-    if (Private->IdentifyValid != NULL) {
-      FreePool (Private->IdentifyValid);
-    }
-
-    if (Private->PciAttributesChanged) {
-      //
-      // Restore original PCI attributes
-      //
-      Private->PciIo->Attributes (
-                        Private->PciIo,
-                        EfiPciIoAttributeOperationSet,
-                        Private->OriginalPciAttributes,
-                        NULL
-                        );
-    }
-
-    FreePool (Private);
+  if (Private->DisqualifiedModes != NULL) {
+    FreePool (Private->DisqualifiedModes);
   }
+
+  if (Private->IdentifyData != NULL) {
+    FreePool (Private->IdentifyData);
+  }
+
+  if (Private->IdentifyValid != NULL) {
+    FreePool (Private->IdentifyValid);
+  }
+
+  if (Private->PciAttributesChanged) {
+    //
+    // Restore original PCI attributes
+    //
+    Private->PciIo->Attributes (
+                      Private->PciIo,
+                      EfiPciIoAttributeOperationSet,
+                      Private->OriginalPciAttributes,
+                      NULL
+                      );
+  }
+
+  FreePool (Private);
 
   //
   // Close protocols opened by Sata Controller driver
