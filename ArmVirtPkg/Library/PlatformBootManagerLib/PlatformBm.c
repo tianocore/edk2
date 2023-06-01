@@ -269,15 +269,16 @@ IsPciDisplay (
 }
 
 /**
-  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
-  the VIRTIO_DEVICE_PROTOCOL level.
+  This function checks if a handle corresponds to the Virtio Device ID given
+  at the VIRTIO_DEVICE_PROTOCOL level.
 **/
 STATIC
 BOOLEAN
 EFIAPI
-IsVirtioRng (
+IsVirtio (
   IN EFI_HANDLE    Handle,
-  IN CONST CHAR16  *ReportText
+  IN CONST CHAR16  *ReportText,
+  IN UINT16        VirtIoDeviceId
   )
 {
   EFI_STATUS              Status;
@@ -293,7 +294,22 @@ IsVirtioRng (
   }
 
   return (BOOLEAN)(VirtIo->SubSystemDeviceId ==
-                   VIRTIO_SUBSYSTEM_ENTROPY_SOURCE);
+                   VirtIoDeviceId);
+}
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
+  the VIRTIO_DEVICE_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioRng (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtio (Handle, ReportText, VIRTIO_SUBSYSTEM_ENTROPY_SOURCE);
 }
 
 /**
