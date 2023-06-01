@@ -611,7 +611,6 @@ SataControllerStop (
   }
 
   Private = SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS (IdeInit);
-  ASSERT (Private != NULL);
 
   //
   // Uninstall the IDE Controller Init Protocol from this instance
@@ -745,8 +744,8 @@ IdeInitGetChannelInfo (
 {
   EFI_SATA_CONTROLLER_PRIVATE_DATA  *Private;
 
+  ASSERT (This != NULL);
   Private = SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS (This);
-  ASSERT (Private != NULL);
 
   if (Channel < This->ChannelCount) {
     *Enabled    = TRUE;
@@ -845,8 +844,8 @@ IdeInitSubmitData (
   EFI_SATA_CONTROLLER_PRIVATE_DATA  *Private;
   UINTN                             DeviceIndex;
 
+  ASSERT (This != NULL);
   Private = SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS (This);
-  ASSERT (Private != NULL);
 
   if ((Channel >= This->ChannelCount) || (Device >= Private->DeviceCount)) {
     return EFI_INVALID_PARAMETER;
@@ -924,8 +923,8 @@ IdeInitDisqualifyMode (
   EFI_SATA_CONTROLLER_PRIVATE_DATA  *Private;
   UINTN                             DeviceIndex;
 
+  ASSERT (This != NULL);
   Private = SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS (This);
-  ASSERT (Private != NULL);
 
   if ((Channel >= This->ChannelCount) || (BadModes == NULL) || (Device >= Private->DeviceCount)) {
     return EFI_INVALID_PARAMETER;
@@ -1017,8 +1016,8 @@ IdeInitCalculateMode (
   EFI_STATUS                        Status;
   UINTN                             DeviceIndex;
 
+  ASSERT (This != NULL);
   Private = SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS (This);
-  ASSERT (Private != NULL);
 
   if ((Channel >= This->ChannelCount) || (SupportedModes == NULL) || (Device >= Private->DeviceCount)) {
     return EFI_INVALID_PARAMETER;
