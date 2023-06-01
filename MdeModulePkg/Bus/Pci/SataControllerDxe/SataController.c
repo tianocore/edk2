@@ -358,10 +358,12 @@ SataControllerStart (
   UINTN                             TotalCount;
   UINT64                            Supports;
   UINT8                             MaxPortNumber;
+  UINTN                             BailLogMask;
 
   DEBUG ((DEBUG_INFO, "SataControllerStart start\n"));
 
-  Private = NULL;
+  Private     = NULL;
+  BailLogMask = DEBUG_ERROR;
 
   //
   // Now test and open PCI I/O Protocol
@@ -375,6 +377,15 @@ SataControllerStart (
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
+    if (Status == EFI_ALREADY_STARTED) {
+      //
+      // This is an expected condition for OpenProtocol() / BY_DRIVER, in a
+      // DriverBindingStart() member function; degrade the log mask to
+      // DEBUG_INFO in order to reduce log pollution.
+      //
+      BailLogMask = DEBUG_INFO;
+    }
+
     goto Bail;
   }
 
@@ -555,7 +566,7 @@ FreeSataPrivate:
 ClosePciIo:
   gBS->CloseProtocol (Controller, &gEfiPciIoProtocolGuid, This->DriverBindingHandle, Controller);
 Bail:
-  DEBUG ((DEBUG_ERROR, "SataControllerStart error return status = %r\n", Status));
+  DEBUG ((BailLogMask, "SataControllerStart error return status = %r\n", Status));
   return Status;
 }
 
