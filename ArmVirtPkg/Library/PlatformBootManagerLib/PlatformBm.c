@@ -313,6 +313,21 @@ IsVirtioRng (
 }
 
 /**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio serial device at
+  the VIRTIO_DEVICE_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioSerial (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtio (Handle, ReportText, VIRTIO_SUBSYSTEM_CONSOLE);
+}
+
+/**
   This function checks if a handle corresponds to the Virtio Device ID given
   at the EFI_PCI_IO_PROTOCOL level.
 **/
@@ -447,6 +462,21 @@ IsVirtioPciRng (
 }
 
 /**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio serial device at
+  the EFI_PCI_IO_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioPciSerial (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtioPci (Handle, ReportText, VIRTIO_SUBSYSTEM_CONSOLE);
+}
+
+/**
   This CALLBACK_FUNCTION attempts to connect a handle non-recursively, asking
   the matching driver to produce all first-level child handles.
 **/
@@ -529,6 +559,142 @@ AddOutput (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: %s: added to ConOut and ErrOut\n",
+    __func__,
+    ReportText
+    ));
+}
+
+/**
+  This CALLBACK_FUNCTION retrieves the EFI_DEVICE_PATH_PROTOCOL from
+  the handle, appends serial, uart and terminal nodes, finally updates
+  ConIn, ConOut and ErrOut.
+**/
+STATIC
+VOID
+EFIAPI
+SetupVirtioSerial (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  STATIC CONST ACPI_HID_DEVICE_PATH  SerialNode = {
+    {
+      ACPI_DEVICE_PATH,
+      ACPI_DP,
+      {
+        (UINT8)(sizeof (ACPI_HID_DEVICE_PATH)),
+        (UINT8)((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)
+      },
+    },
+    EISA_PNP_ID (0x0501),
+    0
+  };
+
+  STATIC CONST UART_DEVICE_PATH  UartNode = {
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_UART_DP,
+      {
+        (UINT8)(sizeof (UART_DEVICE_PATH)),
+        (UINT8)((sizeof (UART_DEVICE_PATH)) >> 8)
+      },
+    },
+    0,
+    115200,
+    8,
+    1,
+    1
+  };
+
+  STATIC CONST VENDOR_DEVICE_PATH  TerminalNode = {
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_VENDOR_DP,
+      {
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      },
+    },
+    DEVICE_PATH_MESSAGING_VT_UTF8
+  };
+
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath, *OldDevicePath;
+
+  DevicePath = DevicePathFromHandle (Handle);
+
+  if (DevicePath == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %s: handle %p: device path not found\n",
+      __func__,
+      ReportText,
+      Handle
+      ));
+    return;
+  }
+
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 &SerialNode.Header
+                 );
+
+  OldDevicePath = DevicePath;
+  DevicePath    = AppendDevicePathNode (
+                    DevicePath,
+                    &UartNode.Header
+                    );
+  FreePool (OldDevicePath);
+
+  OldDevicePath = DevicePath;
+  DevicePath    = AppendDevicePathNode (
+                    DevicePath,
+                    &TerminalNode.Header
+                    );
+  FreePool (OldDevicePath);
+
+  Status = EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %s: adding to ConIn: %r\n",
+      __func__,
+      ReportText,
+      Status
+      ));
+    return;
+  }
+
+  Status = EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+
+      "%a: %s: adding to ConOut: %r\n",
+      __func__,
+      ReportText,
+      Status
+      ));
+    return;
+  }
+
+  Status = EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %s: adding to ErrOut: %r\n",
+      __func__,
+      ReportText,
+      Status
+      ));
+    return;
+  }
+
+  FreePool (DevicePath);
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: %s: added to ConIn, ConOut and ErrOut\n",
     __func__,
     ReportText
     ));
@@ -932,6 +1098,12 @@ PlatformBootManagerBeforeConsole (
   // instances on Virtio PCI RNG devices.
   //
   FilterAndProcess (&gEfiPciIoProtocolGuid, IsVirtioPciRng, Connect);
+
+  //
+  // Register Virtio serial devices as console.
+  //
+  FilterAndProcess (&gVirtioDeviceProtocolGuid, IsVirtioSerial, SetupVirtioSerial);
+  FilterAndProcess (&gEfiPciIoProtocolGuid, IsVirtioPciSerial, SetupVirtioSerial);
 }
 
 /**
