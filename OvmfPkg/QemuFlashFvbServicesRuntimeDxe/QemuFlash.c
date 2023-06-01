@@ -114,9 +114,17 @@ QemuFlashDetected (
       DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as RAM\n"));
       *Ptr = OriginalUint8;
     } else if (ProbeUint8 == CLEARED_ARRAY_STATUS) {
-      DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as FLASH\n"));
-      FlashDetected = TRUE;
-      *Ptr          = READ_ARRAY_CMD;
+      *Ptr       = WRITE_BYTE_CMD;
+      *Ptr       = OriginalUint8;
+      *Ptr       = READ_STATUS_CMD;
+      ProbeUint8 = *Ptr;
+      *Ptr       = READ_ARRAY_CMD;
+      if (ProbeUint8 & 0x10 /* programming error */) {
+        DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as FLASH, write-protected\n"));
+      } else {
+        DEBUG ((DEBUG_INFO, "QemuFlashDetected => FD behaves as FLASH, writable\n"));
+        FlashDetected = TRUE;
+      }
     }
   }
 
