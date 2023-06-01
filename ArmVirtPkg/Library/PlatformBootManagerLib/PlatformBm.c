@@ -313,15 +313,16 @@ IsVirtioRng (
 }
 
 /**
-  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
-  the EFI_PCI_IO_PROTOCOL level.
+  This function checks if a handle corresponds to the Virtio Device ID given
+  at the EFI_PCI_IO_PROTOCOL level.
 **/
 STATIC
 BOOLEAN
 EFIAPI
-IsVirtioPciRng (
+IsVirtioPci (
   IN EFI_HANDLE    Handle,
-  IN CONST CHAR16  *ReportText
+  IN CONST CHAR16  *ReportText,
+  IN UINT16        VirtIoDeviceId
   )
 {
   EFI_STATUS           Status;
@@ -387,11 +388,11 @@ IsVirtioPciRng (
   //
   // From DeviceId and RevisionId, determine whether the device is a
   // modern-only Virtio 1.0 device. In case of Virtio 1.0, DeviceId can
-  // immediately be restricted to VIRTIO_SUBSYSTEM_ENTROPY_SOURCE, and
+  // immediately be restricted to VirtIoDeviceId, and
   // SubsystemId will only play a sanity-check role. Otherwise, DeviceId can
   // only be sanity-checked, and SubsystemId will decide.
   //
-  if ((DeviceId == 0x1040 + VIRTIO_SUBSYSTEM_ENTROPY_SOURCE) &&
+  if ((DeviceId == 0x1040 + VirtIoDeviceId) &&
       (RevisionId >= 0x01))
   {
     Virtio10 = TRUE;
@@ -419,7 +420,7 @@ IsVirtioPciRng (
     return TRUE;
   }
 
-  if (!Virtio10 && (SubsystemId == VIRTIO_SUBSYSTEM_ENTROPY_SOURCE)) {
+  if (!Virtio10 && (SubsystemId == VirtIoDeviceId)) {
     return TRUE;
   }
 
@@ -428,6 +429,21 @@ IsVirtioPciRng (
 PciError:
   DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __func__, ReportText, Status));
   return FALSE;
+}
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
+  the EFI_PCI_IO_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioPciRng (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtioPci (Handle, ReportText, VIRTIO_SUBSYSTEM_ENTROPY_SOURCE);
 }
 
 /**
