@@ -25,8 +25,8 @@ Abstract:
 extern EFI_HARDWARE_INTERRUPT_PROTOCOL   gHardwareInterruptV2Protocol;
 extern EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol;
 
-STATIC UINT32  mGicInterruptInterfaceBase;
-STATIC UINT32  mGicDistributorBase;
+STATIC UINTN  mGicInterruptInterfaceBase;
+STATIC UINTN  mGicDistributorBase;
 
 /**
   Enable interrupt source Source.
