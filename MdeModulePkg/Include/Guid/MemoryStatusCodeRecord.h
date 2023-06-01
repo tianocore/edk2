@@ -56,7 +56,7 @@ typedef struct {
 ///
 typedef struct {
   ///
-  /// The index pointing to the last recored being stored.
+  /// The index pointing to the last record being stored.
   ///
   UINT32    RecordIndex;
   ///

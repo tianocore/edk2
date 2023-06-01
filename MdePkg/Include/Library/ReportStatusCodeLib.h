@@ -20,6 +20,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED     0x00000002
 #define REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED     0x00000004
 
+//
+// Helpers for parsing status codes
+//
+#define IS_ERROR_STATUS_CODE(Type)     (((Type) & EFI_STATUS_CODE_TYPE_MASK)      == EFI_ERROR_CODE)
+#define IS_PROGRESS_STATUS_CODE(Type)  (((Type) & EFI_STATUS_CODE_TYPE_MASK)      == EFI_PROGRESS_CODE)
+#define IS_DEBUG_STATUS_CODE(Type)     (((Type) & EFI_STATUS_CODE_TYPE_MASK)      == EFI_DEBUG_CODE)
+
 /**
   Converts a status code to an 8-bit POST code value.
 
@@ -363,13 +370,13 @@ ReportDebugCodeEnabled (
   @retval  EFI_UNSUPPORTED   Report status code is not supported.
 
 **/
-#define REPORT_STATUS_CODE(Type, Value)                                                          \
-  (ReportProgressCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) ?  \
-  ReportStatusCode(Type,Value)                                                               :  \
-  (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE)       ?  \
-  ReportStatusCode(Type,Value)                                                               :  \
-  (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)       ?  \
-  ReportStatusCode(Type,Value)                                                               :  \
+#define REPORT_STATUS_CODE(Type, Value)                               \
+  (ReportProgressCodeEnabled () && IS_PROGRESS_STATUS_CODE (Type))  ? \
+  ReportStatusCode (Type, Value)                                    : \
+  (ReportErrorCodeEnabled () && IS_ERROR_STATUS_CODE (Type))        ? \
+  ReportStatusCode (Type, Value)                                    : \
+  (ReportDebugCodeEnabled () && IS_DEBUG_STATUS_CODE (Type))        ? \
+  ReportStatusCode (Type, Value)                                    : \
   EFI_UNSUPPORTED
 
 /**
@@ -393,13 +400,13 @@ ReportDebugCodeEnabled (
                                  is already in progress.
 
 **/
-#define REPORT_STATUS_CODE_WITH_DEVICE_PATH(Type, Value, DevicePathParameter)                     \
-  (ReportProgressCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) ?  \
-  ReportStatusCodeWithDevicePath(Type,Value,DevicePathParameter)                             :  \
-  (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE)       ?  \
-  ReportStatusCodeWithDevicePath(Type,Value,DevicePathParameter)                             :  \
-  (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)       ?  \
-  ReportStatusCodeWithDevicePath(Type,Value,DevicePathParameter)                             :  \
+#define REPORT_STATUS_CODE_WITH_DEVICE_PATH(Type, Value, DevicePathParameter) \
+  (ReportProgressCodeEnabled () && IS_PROGRESS_STATUS_CODE (Type))          ? \
+  ReportStatusCodeWithDevicePath (Type, Value, DevicePathParameter)         : \
+  (ReportErrorCodeEnabled () && IS_ERROR_STATUS_CODE (Type))                ? \
+  ReportStatusCodeWithDevicePath (Type, Value, DevicePathParameter)         : \
+  (ReportDebugCodeEnabled () && IS_DEBUG_STATUS_CODE (Type))                ? \
+  ReportStatusCodeWithDevicePath (Type, Value, DevicePathParameter)         : \
   EFI_UNSUPPORTED
 
 /**
@@ -425,13 +432,13 @@ ReportDebugCodeEnabled (
                                  is already in progress.
 
 **/
-#define REPORT_STATUS_CODE_WITH_EXTENDED_DATA(Type, Value, ExtendedData, ExtendedDataSize)         \
-  (ReportProgressCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) ?  \
-  ReportStatusCodeWithExtendedData(Type,Value,ExtendedData,ExtendedDataSize)                 :  \
-  (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE)       ?  \
-  ReportStatusCodeWithExtendedData(Type,Value,ExtendedData,ExtendedDataSize)                 :  \
-  (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)       ?  \
-  ReportStatusCodeWithExtendedData(Type,Value,ExtendedData,ExtendedDataSize)                 :  \
+#define REPORT_STATUS_CODE_WITH_EXTENDED_DATA(Type, Value, ExtendedData, ExtendedDataSize)  \
+  (ReportProgressCodeEnabled () && IS_PROGRESS_STATUS_CODE (Type))                        ? \
+  ReportStatusCodeWithExtendedData (Type, Value, ExtendedData, ExtendedDataSize)          : \
+  (ReportErrorCodeEnabled () && IS_ERROR_STATUS_CODE (Type))                              ? \
+  ReportStatusCodeWithExtendedData (Type, Value, ExtendedData, ExtendedDataSize)          : \
+  (ReportDebugCodeEnabled () && IS_DEBUG_STATUS_CODE (Type))                              ? \
+  ReportStatusCodeWithExtendedData (Type, Value, ExtendedData, ExtendedDataSize)          : \
   EFI_UNSUPPORTED
 
 /**
@@ -463,12 +470,12 @@ ReportDebugCodeEnabled (
 
 **/
 #define REPORT_STATUS_CODE_EX(Type, Value, Instance, CallerId, ExtendedDataGuid, ExtendedData, ExtendedDataSize)  \
-  (ReportProgressCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE)             ?  \
-  ReportStatusCodeEx(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)        :  \
-  (ReportErrorCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE)                   ?  \
-  ReportStatusCodeEx(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)        :  \
-  (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)                   ?  \
-  ReportStatusCodeEx(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)        :  \
+  (ReportProgressCodeEnabled () && IS_PROGRESS_STATUS_CODE (Type))                                              ? \
+  ReportStatusCodeEx (Type, Value, Instance, CallerId, ExtendedDataGuid, ExtendedData, ExtendedDataSize)        : \
+  (ReportErrorCodeEnabled () && IS_ERROR_STATUS_CODE (Type))                                                    ? \
+  ReportStatusCodeEx (Type, Value, Instance, CallerId, ExtendedDataGuid, ExtendedData, ExtendedDataSize)        : \
+  (ReportDebugCodeEnabled () && IS_DEBUG_STATUS_CODE (Type))                                                    ? \
+  ReportStatusCodeEx (Type, Value, Instance, CallerId, ExtendedDataGuid, ExtendedData, ExtendedDataSize)        : \
   EFI_UNSUPPORTED
 
 #endif
