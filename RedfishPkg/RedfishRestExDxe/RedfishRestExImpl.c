@@ -28,7 +28,7 @@ ResetHttpTslSession (
 {
   EFI_STATUS  Status;
 
-  DEBUG ((DEBUG_INFO, "%a: TCP connection is finished. Could be TSL session closure, reset HTTP instance for the new TLS session.\n", __func__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: TCP connection is finished. Could be TSL session closure, reset HTTP instance for the new TLS session.\n", __func__));
 
   Status = Instance->HttpIo.Http->Configure (Instance->HttpIo.Http, NULL);
   if (EFI_ERROR (Status)) {

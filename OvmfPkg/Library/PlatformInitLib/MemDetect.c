@@ -646,20 +646,28 @@ PlatformAddressWidthFromCpuid (
     ));
 
   if (Valid) {
-    if (PhysBits > 47) {
+    if (PhysBits > 46) {
       /*
        * Avoid 5-level paging altogether for now, which limits
        * PhysBits to 48.  Also avoid using address bit 48, due to sign
        * extension we can't identity-map these addresses (and lots of
        * places in edk2 assume we have everything identity-mapped).
        * So the actual limit is 47.
+       *
+       * Also some older linux kernels apparently have problems handling
+       * phys-bits > 46 correctly, so use that as limit.
        */
-      DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 47 (avoid 5-level paging)\n", __func__));
-      PhysBits = 47;
+      DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 46 (avoid 5-level paging)\n", __func__));
+      PhysBits = 46;
     }
 
     if (!Page1GSupport && (PhysBits > 40)) {
       DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 40 (no 1G pages available)\n", __func__));
+      PhysBits = 40;
+    }
+
+    if (!FixedPcdGetBool (PcdUse1GPageTable) && (PhysBits > 40)) {
+      DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 40 (PcdUse1GPageTable is false)\n", __func__));
       PhysBits = 40;
     }
 
