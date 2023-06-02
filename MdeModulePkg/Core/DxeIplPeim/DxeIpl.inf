@@ -91,6 +91,7 @@
   gEfiPeiMemoryDiscoveredPpiGuid         ## SOMETIMES_CONSUMES
   gEdkiiPeiBootInCapsuleOnDiskModePpiGuid  ## SOMETIMES_CONSUMES
   gEdkiiPeiCapsuleOnDiskPpiGuid            ## SOMETIMES_CONSUMES # Consumed on firmware update boot path
+  gEdkiiMemoryAttributePpiGuid             ## SOMETIMES_CONSUMES
 
 [Guids]
   ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
@@ -117,9 +118,11 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
 
 [Pcd.IA32,Pcd.X64,Pcd.ARM,Pcd.AARCH64]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid
