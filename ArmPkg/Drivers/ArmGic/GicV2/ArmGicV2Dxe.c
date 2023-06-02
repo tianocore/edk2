@@ -2,7 +2,7 @@
 
 Copyright (c) 2009, Hewlett-Packard Company. All rights reserved.<BR>
 Portions copyright (c) 2010, Apple Inc. All rights reserved.<BR>
-Portions copyright (c) 2011-2017, ARM Ltd. All rights reserved.<BR>
+Portions copyright (c) 2011-2023, Arm Ltd. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -25,8 +25,8 @@ Abstract:
 extern EFI_HARDWARE_INTERRUPT_PROTOCOL   gHardwareInterruptV2Protocol;
 extern EFI_HARDWARE_INTERRUPT2_PROTOCOL  gHardwareInterrupt2V2Protocol;
 
-STATIC UINT32  mGicInterruptInterfaceBase;
-STATIC UINT32  mGicDistributorBase;
+STATIC UINTN  mGicInterruptInterfaceBase;
+STATIC UINTN  mGicDistributorBase;
 
 /**
   Enable interrupt source Source.
@@ -162,7 +162,7 @@ GicV2IrqInterruptHandler (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  UINT32                      GicInterrupt;
+  UINTN                       GicInterrupt;
   HARDWARE_INTERRUPT_HANDLER  InterruptHandler;
 
   GicInterrupt = ArmGicV2AcknowledgeInterrupt (mGicInterruptInterfaceBase);
@@ -179,7 +179,7 @@ GicV2IrqInterruptHandler (
     // Call the registered interrupt handler.
     InterruptHandler (GicInterrupt, SystemContext);
   } else {
-    DEBUG ((DEBUG_ERROR, "Spurious GIC interrupt: 0x%x\n", GicInterrupt));
+    DEBUG ((DEBUG_ERROR, "Spurious GIC interrupt: 0x%x\n", (UINT32)GicInterrupt));
     GicV2EndOfInterrupt (&gHardwareInterruptV2Protocol, GicInterrupt);
   }
 }
@@ -349,8 +349,8 @@ GicV2ExitBootServicesEvent (
   IN VOID       *Context
   )
 {
-  UINTN   Index;
-  UINT32  GicInterrupt;
+  UINTN  Index;
+  UINTN  GicInterrupt;
 
   // Disable all the interrupts
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
@@ -393,23 +393,26 @@ GicV2DxeInitialize (
   EFI_STATUS  Status;
   UINTN       Index;
   UINT32      RegOffset;
-  UINTN       RegShift;
+  UINT8       RegShift;
   UINT32      CpuTarget;
 
   // Make sure the Interrupt Controller Protocol is not already installed in
   // the system.
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gHardwareInterruptProtocolGuid);
 
-  mGicInterruptInterfaceBase = PcdGet64 (PcdGicInterruptInterfaceBase);
-  mGicDistributorBase        = PcdGet64 (PcdGicDistributorBase);
+  ASSERT (PcdGet64 (PcdGicInterruptInterfaceBase) <= MAX_UINTN);
+  ASSERT (PcdGet64 (PcdGicDistributorBase) <= MAX_UINTN);
+
+  mGicInterruptInterfaceBase = (UINTN)PcdGet64 (PcdGicInterruptInterfaceBase);
+  mGicDistributorBase        = (UINTN)PcdGet64 (PcdGicDistributorBase);
   mGicNumInterrupts          = ArmGicGetMaxNumInterrupts (mGicDistributorBase);
 
   for (Index = 0; Index < mGicNumInterrupts; Index++) {
     GicV2DisableInterruptSource (&gHardwareInterruptV2Protocol, Index);
 
     // Set Priority
-    RegOffset = Index / 4;
-    RegShift  = (Index % 4) * 8;
+    RegOffset = (UINT32)(Index / 4);
+    RegShift  = (UINT8)((Index % 4) * 8);
     MmioAndThenOr32 (
       mGicDistributorBase + ARM_GIC_ICDIPR + (4 * RegOffset),
       ~(0xff << RegShift),

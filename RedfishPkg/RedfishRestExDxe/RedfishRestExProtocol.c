@@ -250,17 +250,17 @@ ReSendRequest:;
       goto ReSendRequest;
     }
   } else if (ResponseData->Response.StatusCode == HTTP_STATUS_204_NO_CONTENT) {
-    DEBUG ((DEBUG_INFO, "HTTP_STATUS_204_NO_CONTENT\n"));
+    DEBUG ((DEBUG_MANAGEABILITY, "HTTP_STATUS_204_NO_CONTENT\n"));
 
     if (FixedPcdGetBool (PcdRedfishRestExChunkRequestMode) && (SendChunkProcess == HttpIoSendChunkHeaderZeroContent)) {
-      DEBUG ((DEBUG_INFO, "This is chunk transfer, start to send all chunks - %d.", ResponseData->Response.StatusCode));
+      DEBUG ((DEBUG_MANAGEABILITY, "This is chunk transfer, start to send all chunks - %d.", ResponseData->Response.StatusCode));
       SendChunkProcess++;
       goto ReSendRequest;
     }
   } else if (ResponseData->Response.StatusCode == HTTP_STATUS_201_CREATED) {
-    DEBUG ((DEBUG_INFO, "HTTP_STATUS_201_CREATED\n"));
+    DEBUG ((DEBUG_MANAGEABILITY, "HTTP_STATUS_201_CREATED\n"));
   } else if (ResponseData->Response.StatusCode == HTTP_STATUS_202_ACCEPTED) {
-    DEBUG ((DEBUG_INFO, "HTTP_STATUS_202_ACCEPTED\n"));
+    DEBUG ((DEBUG_MANAGEABILITY, "HTTP_STATUS_202_ACCEPTED\n"));
   } else if (ResponseData->Response.StatusCode == HTTP_STATUS_413_REQUEST_ENTITY_TOO_LARGE) {
     DEBUG ((DEBUG_REDFISH_NETWORK, "HTTP_STATUS_413_REQUEST_ENTITY_TOO_LARGE\n"));
 

@@ -1541,6 +1541,19 @@ PerformRemainingTasks (
 {
   if (mSmmReadyToLock) {
     //
+    // Check if all Aps enter SMM. In Relaxed-AP Sync Mode, BSP will not wait for
+    // all Aps arrive. However,PerformRemainingTasks() needs to wait all Aps arrive before calling
+    // SetMemMapAttributes() and ConfigSmmCodeAccessCheck() when mSmmReadyToLock
+    // is true. In SetMemMapAttributes(), SmmSetMemoryAttributesEx() will call
+    // FlushTlbForAll() that need to start up the aps. So it need to let all
+    // aps arrive. Same as SetMemMapAttributes(), ConfigSmmCodeAccessCheck()
+    // also will start up the aps.
+    //
+    if (EFI_ERROR (SmmCpuRendezvous (NULL, TRUE))) {
+      DEBUG ((DEBUG_ERROR, "PerformRemainingTasks: fail to wait for all AP check in SMM!\n"));
+    }
+
+    //
     // Start SMM Profile feature
     //
     if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
