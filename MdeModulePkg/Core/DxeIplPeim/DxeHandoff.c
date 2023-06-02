@@ -2,11 +2,14 @@
   Generic version of arch-specific functionality for DxeLoad.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2023, Google, LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "DxeIpl.h"
+
+#include <Ppi/MemoryAttribute.h>
 
 /**
    Transfers control to DxeCore.
@@ -25,15 +28,35 @@ HandOffToDxeCore (
   IN EFI_PEI_HOB_POINTERS  HobList
   )
 {
-  VOID        *BaseOfStack;
-  VOID        *TopOfStack;
-  EFI_STATUS  Status;
+  VOID                        *BaseOfStack;
+  VOID                        *TopOfStack;
+  EFI_STATUS                  Status;
+  EDKII_MEMORY_ATTRIBUTE_PPI  *MemoryPpi;
 
   //
   // Allocate 128KB for the Stack
   //
   BaseOfStack = AllocatePages (EFI_SIZE_TO_PAGES (STACK_SIZE));
   ASSERT (BaseOfStack != NULL);
+
+  if (PcdGetBool (PcdSetNxForStack)) {
+    Status = PeiServicesLocatePpi (
+               &gEdkiiMemoryAttributePpiGuid,
+               0,
+               NULL,
+               (VOID **)&MemoryPpi
+               );
+    ASSERT_EFI_ERROR (Status);
+
+    Status = MemoryPpi->SetPermissions (
+                          MemoryPpi,
+                          (UINTN)BaseOfStack,
+                          STACK_SIZE,
+                          EFI_MEMORY_XP,
+                          EFI_MEMORY_XP
+                          );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Compute the top of the stack we were allocated. Pre-allocate a UINTN
