@@ -3,6 +3,7 @@
 #
 # This module provides platform specific function to detect boot mode.
 # Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2023, Google, LLC. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -28,6 +29,7 @@
   CpuPei.c
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
@@ -37,9 +39,11 @@
   DebugLib
   HobLib
   ArmLib
+  ArmMmuLib
 
 [Ppis]
   gArmMpCoreInfoPpiGuid
+  gEdkiiMemoryAttributePpiGuid
 
 [Guids]
   gArmMpCoreInfoGuid
