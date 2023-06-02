@@ -858,7 +858,7 @@ DEFINE GCC5_RISCV_OPENSBI_TYPES                   = -DOPENSBI_EXTERNAL_SBI_TYPES
 
 DEFINE GCC5_RISCV64_ARCH                   = rv64gc
 DEFINE GCC5_RISCV32_RISCV64_ASLDLINK_FLAGS = DEF(GCC5_RISCV_ALL_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
-DEFINE GCC5_RISCV64_CC_FLAGS               = DEF(GCC5_RISCV_ALL_CC_FLAGS) DEF(GCC5_RISCV_ALL_CC_FLAGS_WARNING_DISABLE) DEF(GCC5_RISCV_OPENSBI_TYPES) -march=DEF(GCC5_RISCV64_ARCH) -fno-builtin -fno-builtin-memcpy -fno-stack-protector -Wno-address -fno-asynchronous-unwind-tables -Wno-unused-but-set-variable -fpack-struct=8 -mcmodel=medany -mabi=lp64 -mno-relax
+DEFINE GCC5_RISCV64_CC_FLAGS               = DEF(GCC5_RISCV_ALL_CC_FLAGS) DEF(GCC5_RISCV_ALL_CC_FLAGS_WARNING_DISABLE) DEF(GCC5_RISCV_OPENSBI_TYPES) -march=DEF(GCC5_RISCV64_ARCH) -fno-builtin -fno-builtin-memcpy -fno-stack-protector -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -Wno-unused-but-set-variable -fpack-struct=8 -mcmodel=medany -mabi=lp64 -mno-relax
 DEFINE GCC5_RISCV64_DLINK_FLAGS            = DEF(GCC5_RISCV_ALL_DLINK_FLAGS) -Wl,-melf64lriscv,--oformat=elf64-littleriscv,--no-relax
 DEFINE GCC5_RISCV64_DLINK2_FLAGS           = DEF(GCC5_RISCV_ALL_DLINK2_FLAGS)
 DEFINE GCC5_RISCV64_ASM_FLAGS              = DEF(GCC5_RISCV_ALL_ASM_FLAGS) -march=DEF(GCC5_RISCV64_ARCH) -mcmodel=medany -mabi=lp64
