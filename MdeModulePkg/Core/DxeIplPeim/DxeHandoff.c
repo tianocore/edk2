@@ -1,9 +1,8 @@
 /** @file
-  LoongArch specifc functionality for DxeLoad.
+  Generic version of arch-specific functionality for DxeLoad.
 
-  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
-
-  SPDX-License-Identifier: BSD-2-Clause-Patent
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -16,8 +15,8 @@
    the entry point of DxeCore with the parameters of HobList.
    It also installs EFI_END_OF_PEI_PPI to signal the end of PEI phase.
 
-   @param[in] DxeCoreEntryPoint         The entry point of DxeCore.
-   @param[in] HobList                   The start of HobList passed to DxeCore.
+   @param DxeCoreEntryPoint         The entry point of DxeCore.
+   @param HobList                   The start of HobList passed to DxeCore.
 
 **/
 VOID
@@ -54,6 +53,9 @@ HandOffToDxeCore (
   //
   UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN)BaseOfStack, STACK_SIZE);
 
+  //
+  // Transfer the control to the entry point of DxeCore.
+  //
   SwitchStack (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
     HobList.Raw,
