@@ -1,7 +1,7 @@
 #  @file
 #  Workspace file for KVMTool virtual platform.
 #
-#  Copyright (c) 2018 - 2022, ARM Limited. All rights reserved.
+#  Copyright (c) 2018 - 2023, Arm Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -219,6 +219,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize|0x40000
 
+  # Define PCD for emulating Runtime Variable storage when
+  # CFI flash is absent.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
+
   ## RTC Register address in MMIO space.
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64|0x0
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister64|0x0
@@ -307,7 +311,10 @@
   #
   # Platform Driver
   #
-  ArmVirtPkg/KvmtoolPlatformDxe/KvmtoolPlatformDxe.inf
+  ArmVirtPkg/KvmtoolPlatformDxe/KvmtoolPlatformDxe.inf {
+    <LibraryClasses>
+    NULL|ArmVirtPkg/Library/NorFlashKvmtoolLib/NorFlashKvmtoolLib.inf
+  }
   OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf

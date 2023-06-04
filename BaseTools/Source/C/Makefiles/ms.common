@@ -17,6 +17,14 @@
 HOST_ARCH = IA32
 !ENDIF
 
+!IFNDEF MAKEROOT
+MAKEROOT = $(SOURCE_PATH)
+!ENDIF
+
+!IFNDEF EDK2_PATH
+EDK2_PATH = $(MAKEROOT)\..\..\..
+!ENDIF
+
 MAKE        = nmake -nologo
 
 # DOS del command doesn't support ":\\" in the file path, such as j:\\BaseTools. Convert ":\\" to ":\"
@@ -31,14 +39,14 @@ SYS_BIN_PATH=$(EDK_TOOLS_PATH)\Bin
 SYS_LIB_PATH=$(EDK_TOOLS_PATH)\Lib
 
 !IF "$(HOST_ARCH)"=="IA32"
-ARCH_INCLUDE = $(SOURCE_PATH)\Include\Ia32
+ARCH_INCLUDE = $(EDK2_PATH)\MdePkg\Include\Ia32
 BIN_PATH     = $(BASE_TOOLS_PATH)\Bin\Win32
 LIB_PATH     = $(BASE_TOOLS_PATH)\Lib\Win32
 SYS_BIN_PATH = $(EDK_TOOLS_PATH)\Bin\Win32
 SYS_LIB_PATH = $(EDK_TOOLS_PATH)\Lib\Win32
 
 !ELSEIF "$(HOST_ARCH)"=="X64"
-ARCH_INCLUDE = $(SOURCE_PATH)\Include\X64
+ARCH_INCLUDE = $(EDK2_PATH)\MdePkg\Include\X64
 BIN_PATH     = $(BASE_TOOLS_PATH)\Bin\Win64
 LIB_PATH     = $(BASE_TOOLS_PATH)\Lib\Win64
 SYS_BIN_PATH = $(EDK_TOOLS_PATH)\Bin\Win64
@@ -56,6 +64,7 @@ LD = link.exe
 LINKER = $(LD)
 
 INC = $(INC) -I . -I $(SOURCE_PATH)\Include -I $(ARCH_INCLUDE) -I $(SOURCE_PATH)\Common
+INC = $(INC) -I $(EDK2_PATH)\MdePkg\Include
 
 CFLAGS = $(CFLAGS) /nologo /Z7 /c /O2 /MT /W4 /WX /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE
 CPPFLAGS = $(CPPFLAGS) /EHsc /nologo /Z7 /c /O2 /MT /D _CRT_SECURE_NO_DEPRECATE /D _CRT_NONSTDC_NO_DEPRECATE

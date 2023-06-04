@@ -589,7 +589,7 @@ GetResourcePadding (
     return EFI_INVALID_PARAMETER;
   }
 
-  DefaultIo       = TRUE;
+  DefaultIo       = FALSE;
   DefaultMmio     = TRUE;
   DefaultPrefMmio = TRUE;
 

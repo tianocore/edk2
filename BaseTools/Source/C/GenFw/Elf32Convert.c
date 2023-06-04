@@ -9,8 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "WinNtInclude.h"
-
 #ifndef __GNUC__
 #include <windows.h>
 #include <io.h>
@@ -555,16 +553,16 @@ ScanSections32 (
 
   switch (mEhdr->e_machine) {
   case EM_386:
-    NtHdr->Pe32.FileHeader.Machine = EFI_IMAGE_MACHINE_IA32;
+    NtHdr->Pe32.FileHeader.Machine = IMAGE_FILE_MACHINE_I386;
     NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
     break;
   case EM_ARM:
-    NtHdr->Pe32.FileHeader.Machine = EFI_IMAGE_MACHINE_ARMT;
+    NtHdr->Pe32.FileHeader.Machine = IMAGE_FILE_MACHINE_ARMTHUMB_MIXED;
     NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
     break;
   default:
     VerboseMsg ("%s unknown e_machine type %hu. Assume IA-32", mInImageName, mEhdr->e_machine);
-    NtHdr->Pe32.FileHeader.Machine = EFI_IMAGE_MACHINE_IA32;
+    NtHdr->Pe32.FileHeader.Machine = IMAGE_FILE_MACHINE_I386;
     NtHdr->Pe32.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
   }
 

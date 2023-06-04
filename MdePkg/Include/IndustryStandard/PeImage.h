@@ -101,6 +101,7 @@ typedef struct {
 #define EFI_IMAGE_FILE_EXECUTABLE_IMAGE     BIT1     ///< 0x0002  File is executable  (i.e. no unresolved externel references).
 #define EFI_IMAGE_FILE_LINE_NUMS_STRIPPED   BIT2     ///< 0x0004  Line numbers stripped from file.
 #define EFI_IMAGE_FILE_LOCAL_SYMS_STRIPPED  BIT3     ///< 0x0008  Local symbols stripped from file.
+#define EFI_IMAGE_FILE_LARGE_ADDRESS_AWARE  BIT5     ///< 0x0020  Supports addresses > 2-GB
 #define EFI_IMAGE_FILE_BYTES_REVERSED_LO    BIT7     ///< 0x0080  Bytes of machine word are reversed.
 #define EFI_IMAGE_FILE_32BIT_MACHINE        BIT8     ///< 0x0100  32 bit word machine.
 #define EFI_IMAGE_FILE_DEBUG_STRIPPED       BIT9     ///< 0x0200  Debugging info stripped from file in .DBG file.
@@ -577,6 +578,13 @@ typedef struct {
   UINT32    AddressOfNameOrdinals;
 } EFI_IMAGE_EXPORT_DIRECTORY;
 
+//
+// Based export types.
+//
+#define EFI_IMAGE_EXPORT_ORDINAL_BASE  1
+#define EFI_IMAGE_EXPORT_ADDR_SIZE     4
+#define EFI_IMAGE_EXPORT_ORDINAL_SIZE  2
+
 ///
 /// Hint/Name Table.
 ///
@@ -669,6 +677,29 @@ typedef struct {
   //  Filename of .DLL (Mach-O with debug info) goes here
   //
 } EFI_IMAGE_DEBUG_CODEVIEW_MTOC_ENTRY;
+
+// avoid conflict with windows header files
+#ifndef RUNTIME_FUNCTION_INDIRECT
+
+//
+// .pdata entries for X64
+//
+typedef struct {
+  UINT32    FunctionStartAddress;
+  UINT32    FunctionEndAddress;
+  UINT32    UnwindInfoAddress;
+} RUNTIME_FUNCTION;
+
+#endif
+
+typedef struct {
+  UINT8    Version             : 3;
+  UINT8    Flags               : 5;
+  UINT8    SizeOfProlog;
+  UINT8    CountOfUnwindCodes;
+  UINT8    FrameRegister       : 4;
+  UINT8    FrameRegisterOffset : 4;
+} UNWIND_INFO;
 
 ///
 /// Extended DLL Characteristics

@@ -4,7 +4,7 @@
   - It decides if the firmware should expose ACPI or Device Tree-based
     hardware description to the operating system.
 
-  Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2018 - 2023, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -74,6 +74,17 @@ KvmtoolPlatformDxeEntryPoint (
   )
 {
   EFI_STATUS  Status;
+
+  if (PcdGetBool (PcdEmuVariableNvModeEnable)) {
+    // The driver implementing the variable service can now be dispatched.
+    Status = gBS->InstallProtocolInterface (
+                    &gImageHandle,
+                    &gEdkiiNvVarStoreFormattedGuid,
+                    EFI_NATIVE_INTERFACE,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   Status = PlatformHasAcpiDt (ImageHandle);
   ASSERT_EFI_ERROR (Status);
