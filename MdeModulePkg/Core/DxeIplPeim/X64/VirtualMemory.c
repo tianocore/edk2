@@ -739,18 +739,30 @@ CreateIdentityMappingPageTables (
     }
   }
 
-  Page5LevelSupport = FALSE;
-  if (PcdGetBool (PcdUse5LevelPageTable)) {
-    AsmCpuidEx (
-      CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
-      CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
-      NULL,
-      NULL,
-      &EcxFlags.Uint32,
-      NULL
-      );
-    if (EcxFlags.Bits.FiveLevelPage != 0) {
-      Page5LevelSupport = TRUE;
+  if (sizeof (UINTN) == sizeof (UINT64)) {
+    //
+    // If cpu has already run in 64bit long mode PEI, Page table Level in DXE must align with previous level.
+    //
+    Cr4.UintN         = AsmReadCr4 ();
+    Page5LevelSupport = (Cr4.Bits.LA57 != 0);
+    ASSERT (PcdGetBool (PcdUse5LevelPageTable) == Page5LevelSupport);
+  } else {
+    //
+    // If cpu runs in 32bit protected mode PEI, Page table Level in DXE is decided by PCD and feature capability.
+    //
+    Page5LevelSupport = FALSE;
+    if (PcdGetBool (PcdUse5LevelPageTable)) {
+      AsmCpuidEx (
+        CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
+        CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
+        NULL,
+        NULL,
+        &EcxFlags.Uint32,
+        NULL
+        );
+      if (EcxFlags.Bits.FiveLevelPage != 0) {
+        Page5LevelSupport = TRUE;
+      }
     }
   }
 

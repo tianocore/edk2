@@ -1172,6 +1172,7 @@ HiiValueToRedfishValue (
   UINTN          Index;
   UINTN          Count;
   EFI_STRING_ID  *StringIdArray;
+  CHAR8          NullChar;
 
   if ((HiiHandle == NULL) || (HiiStatement == NULL) || (Value == NULL) || (RedfishValue == NULL) || IS_EMPTY_STRING (FullSchema)) {
     return EFI_INVALID_PARAMETER;
@@ -1180,6 +1181,7 @@ HiiValueToRedfishValue (
   StringIdArray = NULL;
   Count         = 0;
   Status        = EFI_SUCCESS;
+  NullChar      = '\0';
 
   switch (HiiStatement->Operand) {
     case EFI_IFR_ONE_OF_OP:
@@ -1205,11 +1207,30 @@ HiiValueToRedfishValue (
         break;
       }
 
-      RedfishValue->Type         = RedfishValueTypeString;
-      RedfishValue->Value.Buffer = AllocatePool (StrLen ((CHAR16 *)Value->Buffer) + 1);
-      UnicodeStrToAsciiStrS ((CHAR16 *)Value->Buffer, RedfishValue->Value.Buffer, StrLen ((CHAR16 *)Value->Buffer) + 1);
+      if (Value->Buffer == NULL) {
+        RedfishValue->Value.Buffer = AllocateCopyPool (sizeof (NullChar), &NullChar);
+      } else {
+        RedfishValue->Value.Buffer = StrToAsciiStr ((EFI_STRING)Value->Buffer);
+      }
+
+      if (RedfishValue->Value.Buffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
+      }
+
+      RedfishValue->Type = RedfishValueTypeString;
       break;
     case EFI_IFR_CHECKBOX_OP:
+      //
+      // There is case where HII driver defines UINT8 for checked-box opcode storage.
+      // IFR compiler will assign EFI_IFR_TYPE_NUM_SIZE_8 to its value type instead of
+      // EFI_IFR_TYPE_BOOLEAN. We do a patch here and use boolean value type for this
+      // case.
+      //
+      if (Value->Type != EFI_IFR_TYPE_BOOLEAN) {
+        Value->Type = EFI_IFR_TYPE_BOOLEAN;
+      }
+
     case EFI_IFR_NUMERIC_OP:
       Status = HiiValueToRedfishNumeric (Value, RedfishValue);
       if (EFI_ERROR (Status)) {
@@ -1256,6 +1277,30 @@ HiiValueToRedfishValue (
 
       FreePool (StringIdArray);
       break;
+    case EFI_IFR_TEXT_OP:
+      //
+      // Use text two as the value
+      //
+      if (HiiStatement->ExtraData.TextTwo == 0x00) {
+        Status = EFI_NOT_FOUND;
+        break;
+      }
+
+      RedfishValue->Value.Buffer = HiiGetRedfishAsciiString (HiiHandle, FullSchema, HiiStatement->ExtraData.TextTwo);
+      if (RedfishValue->Value.Buffer == NULL) {
+        //
+        // No x-uefi-redfish string defined. Try to get string in English.
+        //
+        RedfishValue->Value.Buffer = HiiGetEnglishAsciiString (HiiHandle, HiiStatement->ExtraData.TextTwo);
+      }
+
+      if (RedfishValue->Value.Buffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
+      }
+
+      RedfishValue->Type = RedfishValueTypeString;
+      break;
     default:
       DEBUG ((DEBUG_ERROR, "%a: catch unsupported type: 0x%x! Please contact with author if we need to support this type.\n", __func__, HiiStatement->Operand));
       ASSERT (FALSE);
@@ -1284,7 +1329,7 @@ StrToUnicodeStr (
   EFI_STRING  Buffer;
   EFI_STATUS  Status;
 
-  if ((AsciiString == NULL) || (AsciiString[0] == '\0')) {
+  if (AsciiString == NULL) {
     return NULL;
   }
 
@@ -1295,6 +1340,43 @@ StrToUnicodeStr (
   }
 
   Status = AsciiStrToUnicodeStrS (AsciiString, Buffer, StringLen);
+  if (EFI_ERROR (Status)) {
+    FreePool (Buffer);
+    return NULL;
+  }
+
+  return Buffer;
+}
+
+/**
+  Convert input unicode string to ascii string. It's caller's
+  responsibility to free returned buffer using FreePool().
+
+  @param[in]  UnicodeString     Unicode string to be converted.
+
+  @retval CHAR8 *               Ascii string on return.
+
+**/
+CHAR8 *
+StrToAsciiStr (
+  IN  EFI_STRING  UnicodeString
+  )
+{
+  UINTN       StringLen;
+  CHAR8       *Buffer;
+  EFI_STATUS  Status;
+
+  if (UnicodeString == NULL) {
+    return NULL;
+  }
+
+  StringLen = StrLen (UnicodeString) + 1;
+  Buffer    = AllocatePool (StringLen * sizeof (CHAR8));
+  if (Buffer == NULL) {
+    return NULL;
+  }
+
+  Status = UnicodeStrToAsciiStrS (UnicodeString, Buffer, StringLen);
   if (EFI_ERROR (Status)) {
     FreePool (Buffer);
     return NULL;
@@ -1641,6 +1723,17 @@ RedfishPlatformConfigSetStatementCommon (
     }
   }
 
+  if ((TargetStatement->HiiStatement->Operand == EFI_IFR_STRING_OP) && (StatementValue->Type == EFI_IFR_TYPE_STRING)) {
+    //
+    // Create string ID for new string.
+    //
+    StatementValue->Value.string = HiiSetString (TargetStatement->ParentForm->ParentFormset->HiiHandle, 0x00, (EFI_STRING)StatementValue->Buffer, NULL);
+    if (StatementValue->Value.string == 0) {
+      DEBUG ((DEBUG_ERROR, "%a: can not create string id\n", __func__));
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+
   Status = RedfishPlatformConfigSaveQuestionValue (
              TargetStatement->ParentForm->ParentFormset->HiiFormSet,
              TargetStatement->ParentForm->HiiForm,
@@ -1649,10 +1742,13 @@ RedfishPlatformConfigSetStatementCommon (
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: failed to save question value: %r\n", __func__, Status));
-    return Status;
   }
 
-  return EFI_SUCCESS;
+  if (StatementValue->Value.string != 0) {
+    HiiDeleteString (StatementValue->Value.string, TargetStatement->ParentForm->ParentFormset->HiiHandle);
+  }
+
+  return Status;
 }
 
 /**
@@ -1712,9 +1808,14 @@ RedfishPlatformConfigProtocolSetValue (
 
       break;
     case RedfishValueTypeString:
+      if (Value.Value.Buffer == NULL) {
+        Status = EFI_INVALID_PARAMETER;
+        goto RELEASE_RESOURCE;
+      }
+
       NewValue.Type      = EFI_IFR_TYPE_STRING;
-      NewValue.BufferLen = (UINT16)AsciiStrSize (Value.Value.Buffer);
-      NewValue.Buffer    = AllocateCopyPool (NewValue.BufferLen, Value.Value.Buffer);
+      NewValue.BufferLen = (UINT16)(AsciiStrSize (Value.Value.Buffer) * sizeof (CHAR16));
+      NewValue.Buffer    = (UINT8 *)StrToUnicodeStr (Value.Value.Buffer);
       if (NewValue.Buffer == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         goto RELEASE_RESOURCE;
@@ -1740,6 +1841,10 @@ RELEASE_RESOURCE:
 
   if (FullSchema != NULL) {
     FreePool (FullSchema);
+  }
+
+  if ((Value.Type == RedfishValueTypeString) && (NewValue.Buffer != NULL)) {
+    FreePool (NewValue.Buffer);
   }
 
   return Status;
@@ -1784,6 +1889,7 @@ RedfishPlatformConfigProtocolGetConfigureLang (
     return EFI_INVALID_PARAMETER;
   }
 
+  ZeroMem (&StatementList, sizeof (StatementList));
   *Count                       = 0;
   *ConfigureLangList           = NULL;
   FullSchema                   = NULL;
@@ -1849,7 +1955,9 @@ RELEASE_RESOURCE:
     FreePool (FullSchema);
   }
 
-  ReleaseStatementList (&StatementList);
+  if (StatementList.Count > 0) {
+    ReleaseStatementList (&StatementList);
+  }
 
   return Status;
 }

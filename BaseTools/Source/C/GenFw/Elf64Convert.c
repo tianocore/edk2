@@ -10,8 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "WinNtInclude.h"
-
 #ifndef __GNUC__
 #include <windows.h>
 #include <io.h>
@@ -1139,25 +1137,25 @@ ScanSections64 (
 
   switch (mEhdr->e_machine) {
   case EM_X86_64:
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_X64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_X64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
   case EM_AARCH64:
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_AARCH64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_ARM64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
   case EM_RISCV64:
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_RISCV64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_RISCV64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
   case EM_LOONGARCH:
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_LOONGARCH64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_LOONGARCH64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
 
   default:
     VerboseMsg ("%u unknown e_machine type. Assume X64", (UINTN)mEhdr->e_machine);
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_X64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_X64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
   }
 

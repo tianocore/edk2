@@ -491,35 +491,6 @@ DebugDumpCmos (
   }
 }
 
-VOID
-S3Verification (
-  VOID
-  )
-{
- #if defined (MDE_CPU_X64)
-  if (FeaturePcdGet (PcdSmmSmramRequire) && mS3Supported) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: S3Resume2Pei doesn't support X64 PEI + SMM yet.\n",
-      __func__
-      ));
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Please disable S3 on the QEMU command line (see the README),\n",
-      __func__
-      ));
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: or build OVMF with \"OvmfPkgIa32X64.dsc\".\n",
-      __func__
-      ));
-    ASSERT (FALSE);
-    CpuDeadLoop ();
-  }
-
- #endif
-}
-
 /**
   Fetch the number of boot CPUs from QEMU and expose it to UefiCpuPkg modules.
   Set the mMaxCpuCount variable.

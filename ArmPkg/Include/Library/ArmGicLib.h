@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2021, Arm Limited. All rights reserved.<BR>
+*  Copyright (c) 2011-2023, Arm Limited. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -110,10 +110,10 @@
 // Bit Mask for
 #define ARM_GIC_ICCIAR_ACKINTID  0x3FF
 
-UINTN
+UINT32
 EFIAPI
 ArmGicGetInterfaceIdentification (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 // GIC Secure interfaces
@@ -121,8 +121,8 @@ VOID
 EFIAPI
 ArmGicSetupNonSecure (
   IN  UINTN  MpId,
-  IN  INTN   GicDistributorBase,
-  IN  INTN   GicInterruptInterfaceBase
+  IN  UINTN  GicDistributorBase,
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
@@ -136,40 +136,40 @@ ArmGicSetSecureInterrupts (
 VOID
 EFIAPI
 ArmGicEnableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicDisableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicEnableDistributor (
-  IN  INTN  GicDistributorBase
+  IN  UINTN  GicDistributorBase
   );
 
 VOID
 EFIAPI
 ArmGicDisableDistributor (
-  IN  INTN  GicDistributorBase
+  IN  UINTN  GicDistributorBase
   );
 
 UINTN
 EFIAPI
 ArmGicGetMaxNumInterrupts (
-  IN  INTN  GicDistributorBase
+  IN  UINTN  GicDistributorBase
   );
 
 VOID
 EFIAPI
 ArmGicSendSgiTo (
-  IN  INTN  GicDistributorBase,
-  IN  INTN  TargetListFilter,
-  IN  INTN  CPUTargetList,
-  IN  INTN  SgiId
+  IN  UINTN  GicDistributorBase,
+  IN  UINT8  TargetListFilter,
+  IN  UINT8  CPUTargetList,
+  IN  UINT8  SgiId
   );
 
 /*
@@ -203,8 +203,8 @@ ArmGicEndOfInterrupt (
 UINTN
 EFIAPI
 ArmGicSetPriorityMask (
-  IN  INTN  GicInterruptInterfaceBase,
-  IN  INTN  PriorityMask
+  IN  UINTN  GicInterruptInterfaceBase,
+  IN  INTN   PriorityMask
   );
 
 VOID
@@ -251,20 +251,20 @@ VOID
 EFIAPI
 ArmGicV2SetupNonSecure (
   IN  UINTN  MpId,
-  IN  INTN   GicDistributorBase,
-  IN  INTN   GicInterruptInterfaceBase
+  IN  UINTN  GicDistributorBase,
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicV2EnableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 VOID
 EFIAPI
 ArmGicV2DisableInterruptInterface (
-  IN  INTN  GicInterruptInterfaceBase
+  IN  UINTN  GicInterruptInterfaceBase
   );
 
 UINTN
