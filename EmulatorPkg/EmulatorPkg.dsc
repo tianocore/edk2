@@ -482,6 +482,7 @@
 !if $(REDFISH_ENABLE) == TRUE
   EmulatorPkg/Hii2RedfishMemoryDxe/Hii2RedfishMemoryDxe.inf
   EmulatorPkg/Hii2RedfishBootDxe/Hii2RedfishBootDxe.inf
+  EmulatorPkg/Hii2RedfishBiosDxe/Hii2RedfishBiosDxe.inf
 !endif
 !include RedfishPkg/Redfish.dsc.inc
 

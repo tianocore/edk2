@@ -1,0 +1,67 @@
+/** @file
+  HII-to-Redfish BIOS example driver VFR file.
+
+  (C) Copyright 2022 Hewlett Packard Enterprise Development LP<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+
+#include "Hii2RedfishBiosData.h"
+
+formset
+  guid      = HII_2_REDFISH_BIOS_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  //
+  // Define a EFI variable Storage (EFI_IFR_VARSTORE_EFI)
+  //
+  efivarstore HII_2_REDFISH_BIOS_EFI_VARSTORE_DATA,
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
+    name  = Hii2RedfishBiosEfiVar,
+    guid  = HII_2_REDFISH_BIOS_FORMSET_GUID;
+
+  //
+  // Define a Form (EFI_IFR_FORM)
+  //
+  form formid = FORM_ID,                          // Form ID
+       title  = STRING_TOKEN(STR_FORM_TITLE);     // Form title
+
+    oneof varid = Hii2RedfishBiosEfiVar.RefishBiosOption1Data,
+          questionid = FROM_ID_BIOS_OPTION_1,
+          prompt = STRING_TOKEN(STR_BIOS_OPTION_1_PROMPT),
+          help   = STRING_TOKEN(STR_BIOS_OPTION_1_HELP),
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
+          option text = STRING_TOKEN(STR_BIOS_OPTION_1_ITEM_1),       value = STR_BIOS_OPTION_1_ITEM_1, flags = DEFAULT;
+          option text = STRING_TOKEN(STR_BIOS_OPTION_1_ITEM_2),       value = STR_BIOS_OPTION_1_ITEM_2,   flags = 0;
+          option text = STRING_TOKEN(STR_BIOS_OPTION_1_ITEM_3),       value = STR_BIOS_OPTION_1_ITEM_3,   flags = 0;
+    endoneof;
+
+    string varid = Hii2RedfishBiosEfiVar.RefishBiosOption2Data,
+        prompt = STRING_TOKEN(STR_BIOS_OPTION_2_PROMPT),
+        help = STRING_TOKEN(STR_BIOS_OPTION_2_HELP),
+        flags = READ_ONLY,
+        minsize = ID_STRING_MIN,
+        maxsize = ID_STRING_MAX,
+    endstring;
+
+    numeric varid   = Hii2RedfishBiosEfiVar.RefishBiosOption3Data,
+            prompt  = STRING_TOKEN(STR_BIOS_OPTION_3_PROMPT),
+            help    = STRING_TOKEN(STR_BIOS_OPTION_3_HELP),
+            minimum = 0,
+            maximum = 0xff,
+            step    = 1,
+            default = 20,
+    endnumeric;
+
+    checkbox varid   = Hii2RedfishBiosEfiVar.RefishBiosOption4Data,
+             prompt   = STRING_TOKEN(STR_BIOS_OPTION_4_PROMPT),
+             help     = STRING_TOKEN(STR_BIOS_OPTION_4_PROMPT),
+             flags    = CHECKBOX_DEFAULT,
+             default  = TRUE,
+    endcheckbox;
+  endform;
+endformset;

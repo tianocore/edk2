@@ -215,6 +215,7 @@ INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
 !if $(REDFISH_ENABLE) == TRUE
   INF EmulatorPkg/Hii2RedfishMemoryDxe/Hii2RedfishMemoryDxe.inf
   INF EmulatorPkg/Hii2RedfishBootDxe/Hii2RedfishBootDxe.inf
+  INF EmulatorPkg/Hii2RedfishBiosDxe/Hii2RedfishBiosDxe.inf
 !endif
 !include RedfishPkg/Redfish.fdf.inc
 

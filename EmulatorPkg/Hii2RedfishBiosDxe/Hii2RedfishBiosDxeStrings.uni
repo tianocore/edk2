@@ -1,0 +1,30 @@
+#string /** @file
+  HII-to-Redfish BIOS example driver.
+
+  (C) Copyright 2022 Hewlett Packard Enterprise Development LP<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+/=#
+#langdef   en-US "English"
+
+#string STR_FORM_SET_TITLE                     #language en-US    "HII to Redfish (BIOS)"
+#string STR_FORM_SET_TITLE_HELP                #language en-US    "HII to Redfish (BIOS)"
+#string STR_FORM_TITLE                         #language en-US    "HII to Redfish BIOS properties"
+
+#string STR_BIOS_OPTION_1_PROMPT               #language en-US    "HII Redfish BIOS Option 1"
+#string STR_BIOS_OPTION_2_PROMPT               #language en-US    "HII Redfish BIOS Option 2"
+#string STR_BIOS_OPTION_3_PROMPT               #language en-US    "HII Redfish BIOS Option 3"
+#string STR_BIOS_OPTION_4_PROMPT               #language en-US    "HII Redfish BIOS Option 4"
+
+#string STR_BIOS_OPTION_1_HELP                 #language en-US    "HII Redfish BIOS Option 1"
+#string STR_BIOS_OPTION_2_HELP                 #language en-US    "HII Redfish BIOS Option 2"
+#string STR_BIOS_OPTION_3_HELP                 #language en-US    "HII Redfish BIOS Option 3"
+#string STR_BIOS_OPTION_4_HELP                 #language en-US    "HII Redfish BIOS Option 4"
+
+#string STR_BIOS_OPTION_1_ITEM_1               #language en-US    "Item #1"
+#string STR_BIOS_OPTION_1_ITEM_2               #language en-US    "Item #2"
+#string STR_BIOS_OPTION_1_ITEM_3               #language en-US    "Item #3"
+

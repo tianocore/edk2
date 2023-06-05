@@ -1,0 +1,55 @@
+## @file
+#  HII-to-Redfish BIOS Example driver.
+#
+#  (C) Copyright 2022 Hewlett Packard Enterprise Development LP<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Hii2RedfishBiosDxe
+  FILE_GUID                      = 9A7FA287-4038-CB66-DC70-92AE8C0FCF73
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Hii2RedfishBiosDxeDriverEntryPoint
+  UNLOAD_IMAGE                   = Hii2RedfishBiosDxeDriverUnload
+
+[Sources]
+  Hii2RedfishBiosDxe.c
+  Hii2RedfishBiosDxe.h
+  Hii2RedfishBiosData.h
+  Hii2RedfishBiosVfr.vfr
+  Hii2RedfishBiosDxeStrings.uni
+  Hii2RedfishBiosDxeMap.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  PrintLib
+  HiiLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiHiiConfigAccessProtocolGuid
+
+
+[Guids]
+  gHii2RedfishBiosFormsetGuid
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid
+
