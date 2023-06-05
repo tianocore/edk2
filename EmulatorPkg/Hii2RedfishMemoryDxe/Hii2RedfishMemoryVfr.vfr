@@ -1,0 +1,219 @@
+/** @file
+  HII-to-Redfish memory driver VFR file.
+
+  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+
+#include "Hii2RedfishMemoryData.h"
+
+formset
+  guid      = HII_2_REDFISH_MEMORY_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  //
+  // Define a EFI variable Storage (EFI_IFR_VARSTORE_EFI)
+  //
+  efivarstore HII_2_REDFISH_MEMORY_EFI_VARSTORE_DATA,
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
+    name  = Hii2RedfishMemoryEfiVar,
+    guid  = HII_2_REDFISH_MEMORY_FORMSET_GUID;
+
+  //
+  // Define a Form (EFI_IFR_FORM)
+  //
+  form formid = FORM_ID,                          // Form ID
+       title  = STRING_TOKEN(STR_FORM_TITLE);     // Form title
+
+    goto FROM_ID_MEMORY_1,                              // Destination Form ID
+      prompt  = STRING_TOKEN(STR_FORM_TITLE_MEMORY_1),  // Prompt string
+      help    = STRING_TOKEN(STR_FORM_HELP_MEMORY_1);   // Help string
+
+    goto FROM_ID_MEMORY_2,                              // Destination Form ID
+      prompt  = STRING_TOKEN(STR_FORM_TITLE_MEMORY_2),  // Prompt string
+      help    = STRING_TOKEN(STR_FORM_HELP_MEMORY_2);   // Help string
+
+    goto FROM_ID_MEMORY_3,                              // Destination Form ID
+      prompt  = STRING_TOKEN(STR_FORM_TITLE_MEMORY_3),  // Prompt string
+      help    = STRING_TOKEN(STR_FORM_HELP_MEMORY_3);   // Help string
+
+    goto FROM_ID_MEMORY_4,                              // Destination Form ID
+      prompt  = STRING_TOKEN(STR_FORM_TITLE_MEMORY_4),  // Prompt string
+      help    = STRING_TOKEN(STR_FORM_HELP_MEMORY_4);   // Help string
+
+  endform;
+
+  form formid = FROM_ID_MEMORY_1,                          // Form ID
+       title  = STRING_TOKEN(STR_FORM_TITLE_MEMORY_1);     // Form title
+
+    oneof varid = Hii2RedfishMemoryEfiVar.Memory[0].BaseModuleType,
+          questionid = QUESTION_ID_MEMORY_1_BASE_MODULE_TYPE,
+          prompt = STRING_TOKEN(STR_MEMORY_1_BASE_MODULE_TYPE_PROMPT),
+          help   = STRING_TOKEN(STR_MEMORY_1_BASE_MODULE_TYPE_HELP),
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
+          option text = STRING_TOKEN(STR_MEMORY_RDIMM_PROMPT),         value = STR_MEMORY_RDIMM_PROMPT, flags = DEFAULT;
+          option text = STRING_TOKEN(STR_MEMORY_UDIMM_PROMPT),         value = STR_MEMORY_UDIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_SO_DIMM_PROMPT),       value = STR_MEMORY_SO_DIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_LRDIMM_PROMPT),        value = STR_MEMORY_LRDIMM_PROMPT, flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_MINI_RDIMM_PROMPT),    value = STR_MEMORY_MINI_RDIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_MINI_UDIMM_PROMPT),    value = STR_MEMORY_MINI_UDIMM_PROMPT,   flags = 0;
+    endoneof;
+
+    string varid = Hii2RedfishMemoryEfiVar.Memory[0].ModuleProductId,
+        prompt = STRING_TOKEN(STR_MEMORY_1_MODULE_PRODUCT_ID_PROMPT),
+        help = STRING_TOKEN(STR_MEMORY_1_MODULE_PRODUCT_ID_HELP),
+        flags = READ_ONLY,
+        minsize = ID_STRING_MIN,
+        maxsize = ID_STRING_MAX,
+    endstring;
+
+    numeric varid   = Hii2RedfishMemoryEfiVar.Memory[0].BusWidthBits,
+            prompt  = STRING_TOKEN(STR_MEMORY_1_BUS_WIDTH_BITS_PROMPT),
+            help    = STRING_TOKEN(STR_MEMORY_1_BUS_WIDTH_BITS_HELP),
+            minimum = 0,
+            maximum = 0xff,
+            step    = 1,
+            default = 20,
+    endnumeric;
+
+    checkbox varid   = Hii2RedfishMemoryEfiVar.Memory[0].ConfigurationLocked,
+             prompt   = STRING_TOKEN(STR_MEMORY_1_CONFIGURATION_LOCKED_PROMPT),
+             help     = STRING_TOKEN(STR_MEMORY_1_CONFIGURATION_LOCKED_HELP),
+             flags    = CHECKBOX_DEFAULT,
+             default  = TRUE,
+    endcheckbox;
+
+  endform;
+
+  form formid = FROM_ID_MEMORY_2,                          // Form ID
+       title  = STRING_TOKEN(STR_FORM_TITLE_MEMORY_2);     // Form title
+
+    oneof varid = Hii2RedfishMemoryEfiVar.Memory[1].BaseModuleType,
+          questionid = QUESTION_ID_MEMORY_2_BASE_MODULE_TYPE,
+          prompt = STRING_TOKEN(STR_MEMORY_2_BASE_MODULE_TYPE_PROMPT),
+          help   = STRING_TOKEN(STR_MEMORY_2_BASE_MODULE_TYPE_HELP),
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
+          option text = STRING_TOKEN(STR_MEMORY_RDIMM_PROMPT),         value = STR_MEMORY_RDIMM_PROMPT, flags = DEFAULT;
+          option text = STRING_TOKEN(STR_MEMORY_UDIMM_PROMPT),         value = STR_MEMORY_UDIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_SO_DIMM_PROMPT),       value = STR_MEMORY_SO_DIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_LRDIMM_PROMPT),        value = STR_MEMORY_LRDIMM_PROMPT, flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_MINI_RDIMM_PROMPT),    value = STR_MEMORY_MINI_RDIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_MINI_UDIMM_PROMPT),    value = STR_MEMORY_MINI_UDIMM_PROMPT,   flags = 0;
+    endoneof;
+
+    string varid = Hii2RedfishMemoryEfiVar.Memory[1].ModuleProductId,
+        prompt = STRING_TOKEN(STR_MEMORY_2_MODULE_PRODUCT_ID_PROMPT),
+        help = STRING_TOKEN(STR_MEMORY_2_MODULE_PRODUCT_ID_HELP),
+        flags = READ_ONLY,
+        minsize = ID_STRING_MIN,
+        maxsize = ID_STRING_MAX,
+    endstring;
+
+    numeric varid   = Hii2RedfishMemoryEfiVar.Memory[1].BusWidthBits,
+            prompt  = STRING_TOKEN(STR_MEMORY_2_BUS_WIDTH_BITS_PROMPT),
+            help    = STRING_TOKEN(STR_MEMORY_2_BUS_WIDTH_BITS_HELP),
+            minimum = 0,
+            maximum = 0xff,
+            step    = 1,
+            default = 20,
+    endnumeric;
+
+    checkbox varid   = Hii2RedfishMemoryEfiVar.Memory[1].ConfigurationLocked,
+             prompt   = STRING_TOKEN(STR_MEMORY_2_CONFIGURATION_LOCKED_PROMPT),
+             help     = STRING_TOKEN(STR_MEMORY_2_CONFIGURATION_LOCKED_HELP),
+             flags    = CHECKBOX_DEFAULT,
+             default  = TRUE,
+    endcheckbox;
+
+  endform;
+
+  form formid = FROM_ID_MEMORY_3,                          // Form ID
+       title  = STRING_TOKEN(STR_FORM_TITLE_MEMORY_3);     // Form title
+
+    oneof varid = Hii2RedfishMemoryEfiVar.Memory[2].BaseModuleType,
+          questionid = QUESTION_ID_MEMORY_3_BASE_MODULE_TYPE,
+          prompt = STRING_TOKEN(STR_MEMORY_3_BASE_MODULE_TYPE_PROMPT),
+          help   = STRING_TOKEN(STR_MEMORY_3_BASE_MODULE_TYPE_HELP),
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
+          option text = STRING_TOKEN(STR_MEMORY_RDIMM_PROMPT),         value = STR_MEMORY_RDIMM_PROMPT, flags = DEFAULT;
+          option text = STRING_TOKEN(STR_MEMORY_UDIMM_PROMPT),         value = STR_MEMORY_UDIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_SO_DIMM_PROMPT),       value = STR_MEMORY_SO_DIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_LRDIMM_PROMPT),        value = STR_MEMORY_LRDIMM_PROMPT, flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_MINI_RDIMM_PROMPT),    value = STR_MEMORY_MINI_RDIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_MINI_UDIMM_PROMPT),    value = STR_MEMORY_MINI_UDIMM_PROMPT,   flags = 0;
+    endoneof;
+
+    string varid = Hii2RedfishMemoryEfiVar.Memory[2].ModuleProductId,
+        prompt = STRING_TOKEN(STR_MEMORY_3_MODULE_PRODUCT_ID_PROMPT),
+        help = STRING_TOKEN(STR_MEMORY_3_MODULE_PRODUCT_ID_HELP),
+        flags = READ_ONLY,
+        minsize = ID_STRING_MIN,
+        maxsize = ID_STRING_MAX,
+    endstring;
+
+    numeric varid   = Hii2RedfishMemoryEfiVar.Memory[2].BusWidthBits,
+            prompt  = STRING_TOKEN(STR_MEMORY_3_BUS_WIDTH_BITS_PROMPT),
+            help    = STRING_TOKEN(STR_MEMORY_3_BUS_WIDTH_BITS_HELP),
+            minimum = 0,
+            maximum = 0xff,
+            step    = 1,
+            default = 20,
+    endnumeric;
+
+    checkbox varid   = Hii2RedfishMemoryEfiVar.Memory[2].ConfigurationLocked,
+             prompt   = STRING_TOKEN(STR_MEMORY_3_CONFIGURATION_LOCKED_PROMPT),
+             help     = STRING_TOKEN(STR_MEMORY_3_CONFIGURATION_LOCKED_HELP),
+             flags    = CHECKBOX_DEFAULT,
+             default  = TRUE,
+    endcheckbox;
+
+  endform;
+
+  form formid = FROM_ID_MEMORY_4,                          // Form ID
+       title  = STRING_TOKEN(STR_FORM_TITLE_MEMORY_3);     // Form title
+
+    oneof varid = Hii2RedfishMemoryEfiVar.Memory[3].BaseModuleType,
+          questionid = QUESTION_ID_MEMORY_4_BASE_MODULE_TYPE,
+          prompt = STRING_TOKEN(STR_MEMORY_4_BASE_MODULE_TYPE_PROMPT),
+          help   = STRING_TOKEN(STR_MEMORY_4_BASE_MODULE_TYPE_HELP),
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
+          option text = STRING_TOKEN(STR_MEMORY_RDIMM_PROMPT),         value = STR_MEMORY_RDIMM_PROMPT, flags = DEFAULT;
+          option text = STRING_TOKEN(STR_MEMORY_UDIMM_PROMPT),         value = STR_MEMORY_UDIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_SO_DIMM_PROMPT),       value = STR_MEMORY_SO_DIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_LRDIMM_PROMPT),        value = STR_MEMORY_LRDIMM_PROMPT, flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_MINI_RDIMM_PROMPT),    value = STR_MEMORY_MINI_RDIMM_PROMPT,   flags = 0;
+          option text = STRING_TOKEN(STR_MEMORY_MINI_UDIMM_PROMPT),    value = STR_MEMORY_MINI_UDIMM_PROMPT,   flags = 0;
+    endoneof;
+
+    string varid = Hii2RedfishMemoryEfiVar.Memory[3].ModuleProductId,
+        prompt = STRING_TOKEN(STR_MEMORY_4_MODULE_PRODUCT_ID_PROMPT),
+        help = STRING_TOKEN(STR_MEMORY_4_MODULE_PRODUCT_ID_HELP),
+        flags = READ_ONLY,
+        minsize = ID_STRING_MIN,
+        maxsize = ID_STRING_MAX,
+    endstring;
+
+    numeric varid   = Hii2RedfishMemoryEfiVar.Memory[3].BusWidthBits,
+            prompt  = STRING_TOKEN(STR_MEMORY_4_BUS_WIDTH_BITS_PROMPT),
+            help    = STRING_TOKEN(STR_MEMORY_4_BUS_WIDTH_BITS_HELP),
+            minimum = 0,
+            maximum = 0xff,
+            step    = 1,
+            default = 20,
+    endnumeric;
+
+    checkbox varid   = Hii2RedfishMemoryEfiVar.Memory[3].ConfigurationLocked,
+             prompt   = STRING_TOKEN(STR_MEMORY_4_CONFIGURATION_LOCKED_PROMPT),
+             help     = STRING_TOKEN(STR_MEMORY_4_CONFIGURATION_LOCKED_HELP),
+             flags    = CHECKBOX_DEFAULT,
+             default  = TRUE,
+    endcheckbox;
+
+  endform;
+
+endformset;

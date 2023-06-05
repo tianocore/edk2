@@ -4,7 +4,7 @@
 #
 # Copyright (c) 2008 - 2022, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2011, Apple Inc. All rights reserved.
-# (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2020-2021 Hewlett Packard Enterprise Development LP<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -47,6 +47,7 @@
   gEmuVirtualDisksGuid       = { 0xf2ba331a, 0x8985, 0x11db, { 0xa4, 0x06, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } }
   gEmuPhysicalDisksGuid      = { 0xf2bdcc96, 0x8985, 0x11db, { 0x87, 0x19, 0x00, 0x40, 0xd0, 0x2b, 0x18, 0x35 } }
   gEmuRedfishServiceGuid     = { 0x3fb208ac, 0x2185, 0x498c, { 0xbf, 0x46, 0xdc, 0x23, 0xda, 0x58, 0x7b, 0x55 } }
+  gHii2RedfishMemoryFormsetGuid  = { 0XC2BE579E, 0X3C57, 0X499C, { 0XA9, 0XDF, 0XE6, 0X23, 0X8A, 0X49, 0X64, 0XF8 }}
 
 [PcdsFeatureFlag]
   ## If TRUE, if symbols only load on breakpoints and gdb entry

@@ -1,0 +1,68 @@
+/** @file
+  HII-to-Redfish memory driver.
+
+  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+/=#
+#langdef   en-US "English"
+
+#string STR_FORM_SET_TITLE                     #language en-US    "HII to Redfish (Memory)"
+#string STR_FORM_SET_TITLE_HELP                #language en-US    "HII to Redfish (Memory)"
+#string STR_FORM_TITLE                         #language en-US    "HII to Redfish Memory properties"
+
+#string STR_FORM_TITLE_MEMORY_1                #language en-US    "Memory 1"
+#string STR_FORM_HELP_MEMORY_1                 #language en-US    "Memory 1"
+#string STR_FORM_TITLE_MEMORY_2                #language en-US    "Memory 2"
+#string STR_FORM_HELP_MEMORY_2                 #language en-US    "Memory 2"
+#string STR_FORM_TITLE_MEMORY_3                #language en-US    "Memory 3"
+#string STR_FORM_HELP_MEMORY_3                 #language en-US    "Memory 3"
+#string STR_FORM_TITLE_MEMORY_4                #language en-US    "Memory 5"
+#string STR_FORM_HELP_MEMORY_4                 #language en-US    "Memory 5"
+
+
+#string STR_MEMORY_1_BASE_MODULE_TYPE_PROMPT     #language en-US   "Base module type"
+#string STR_MEMORY_1_BASE_MODULE_TYPE_HELP       #language en-US   "The value of this property shall be the base module type of Memory"
+#string STR_MEMORY_1_BUS_WIDTH_BITS_PROMPT       #language en-US   "Bus Width in bits"
+#string STR_MEMORY_1_BUS_WIDTH_BITS_HELP         #language en-US   "The value of this property shall be the bus width in bits"
+#string STR_MEMORY_1_CONFIGURATION_LOCKED_PROMPT #language en-US   "Configuration Locked"
+#string STR_MEMORY_1_CONFIGURATION_LOCKED_HELP   #language en-US   "The value of this property shall be the current configuration lock state of this memory. True shall indicate that the configuration is locked and cannot be altered. False shall indicate that the configuration is not locked and may be altered"
+#string STR_MEMORY_1_MODULE_PRODUCT_ID_PROMPT    #language en-US   "Module Product ID"
+#string STR_MEMORY_1_MODULE_PRODUCT_ID_HELP      #language en-US   "The product ID of this memory module."
+
+#string STR_MEMORY_2_BASE_MODULE_TYPE_PROMPT     #language en-US   "Base module type"
+#string STR_MEMORY_2_BASE_MODULE_TYPE_HELP       #language en-US   "The value of this property shall be the base module type of Memory"
+#string STR_MEMORY_2_BUS_WIDTH_BITS_PROMPT       #language en-US   "Bus Width in bits"
+#string STR_MEMORY_2_BUS_WIDTH_BITS_HELP         #language en-US   "The value of this property shall be the bus width in bits"
+#string STR_MEMORY_2_CONFIGURATION_LOCKED_PROMPT #language en-US   "Configuration Locked"
+#string STR_MEMORY_2_CONFIGURATION_LOCKED_HELP   #language en-US   "The value of this property shall be the current configuration lock state of this memory. True shall indicate that the configuration is locked and cannot be altered. False shall indicate that the configuration is not locked and may be altered"
+#string STR_MEMORY_2_MODULE_PRODUCT_ID_PROMPT    #language en-US   "Module Product ID"
+#string STR_MEMORY_2_MODULE_PRODUCT_ID_HELP      #language en-US   "The product ID of this memory module."
+
+#string STR_MEMORY_3_BASE_MODULE_TYPE_PROMPT     #language en-US   "Base module type"
+#string STR_MEMORY_3_BASE_MODULE_TYPE_HELP       #language en-US   "The value of this property shall be the base module type of Memory"
+#string STR_MEMORY_3_BUS_WIDTH_BITS_PROMPT       #language en-US   "Bus Width in bits"
+#string STR_MEMORY_3_BUS_WIDTH_BITS_HELP         #language en-US   "The value of this property shall be the bus width in bits"
+#string STR_MEMORY_3_CONFIGURATION_LOCKED_PROMPT #language en-US   "Configuration Locked"
+#string STR_MEMORY_3_CONFIGURATION_LOCKED_HELP   #language en-US   "The value of this property shall be the current configuration lock state of this memory. True shall indicate that the configuration is locked and cannot be altered. False shall indicate that the configuration is not locked and may be altered"
+#string STR_MEMORY_3_MODULE_PRODUCT_ID_PROMPT    #language en-US   "Module Product ID"
+#string STR_MEMORY_3_MODULE_PRODUCT_ID_HELP      #language en-US   "The product ID of this memory module."
+
+#string STR_MEMORY_4_BASE_MODULE_TYPE_PROMPT     #language en-US   "Base module type"
+#string STR_MEMORY_4_BASE_MODULE_TYPE_HELP       #language en-US   "The value of this property shall be the base module type of Memory"
+#string STR_MEMORY_4_BUS_WIDTH_BITS_PROMPT       #language en-US   "Bus Width in bits"
+#string STR_MEMORY_4_BUS_WIDTH_BITS_HELP         #language en-US   "The value of this property shall be the bus width in bits"
+#string STR_MEMORY_4_CONFIGURATION_LOCKED_PROMPT #language en-US   "Configuration Locked"
+#string STR_MEMORY_4_CONFIGURATION_LOCKED_HELP   #language en-US   "The value of this property shall be the current configuration lock state of this memory. True shall indicate that the configuration is locked and cannot be altered. False shall indicate that the configuration is not locked and may be altered"
+#string STR_MEMORY_4_MODULE_PRODUCT_ID_PROMPT    #language en-US   "Module Product ID"
+#string STR_MEMORY_4_MODULE_PRODUCT_ID_HELP      #language en-US   "The product ID of this memory module."
+
+#string STR_MEMORY_RDIMM_PROMPT                  #language en-US   "RDIMM"
+#string STR_MEMORY_UDIMM_PROMPT                  #language en-US   "UDIMM"
+#string STR_MEMORY_SO_DIMM_PROMPT                #language en-US   "SO_DIMM"
+#string STR_MEMORY_LRDIMM_PROMPT                 #language en-US   "LRDIMM"
+#string STR_MEMORY_MINI_RDIMM_PROMPT             #language en-US   "Mini_RDIMM"
+#string STR_MEMORY_MINI_UDIMM_PROMPT             #language en-US   "Mini_UDIMM"

@@ -1,0 +1,55 @@
+## @file
+#  HII-to-Redfish memory driver.
+#
+#  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Hii2RedfishMemoryDxe
+  FILE_GUID                      = 58134796-EB3A-4635-9664-6B7F68A8A9A1
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Hii2RedfishMemoryDxeDriverEntryPoint
+  UNLOAD_IMAGE                   = Hii2RedfishMemoryDxeDriverUnload
+
+[Sources]
+  Hii2RedfishMemoryDxe.c
+  Hii2RedfishMemoryDxe.h
+  Hii2RedfishMemoryData.h
+  Hii2RedfishMemoryVfr.vfr
+  Hii2RedfishMemoryDxeStrings.uni
+  Hii2RedfishMemoryDxeMap.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  PrintLib
+  HiiLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid
+  gEfiHiiConfigAccessProtocolGuid
+
+
+[Guids]
+  gHii2RedfishMemoryFormsetGuid
+
+[Depex]
+  gEfiHiiDatabaseProtocolGuid
+

@@ -1,0 +1,38 @@
+/** @file
+  HII-to-Redfish memory driver.
+
+  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+/=#
+#langdef   x-uefi-redfish-Memory.v1_7_1 "Memory.v1_7_1"
+
+#string STR_MEMORY_1_BASE_MODULE_TYPE_PROMPT         #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{1}/BaseModuleType"
+#string STR_MEMORY_1_BUS_WIDTH_BITS_PROMPT           #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{1}/BusWidthBits"
+#string STR_MEMORY_1_CONFIGURATION_LOCKED_PROMPT     #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{1}/ConfigurationLocked"
+#string STR_MEMORY_1_MODULE_PRODUCT_ID_PROMPT        #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{1}/ModuleProductID"
+
+#string STR_MEMORY_2_BASE_MODULE_TYPE_PROMPT         #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{2}/BaseModuleType"
+#string STR_MEMORY_2_BUS_WIDTH_BITS_PROMPT           #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{2}/BusWidthBits"
+#string STR_MEMORY_2_CONFIGURATION_LOCKED_PROMPT     #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{2}/ConfigurationLocked"
+#string STR_MEMORY_2_MODULE_PRODUCT_ID_PROMPT        #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{2}/ModuleProductID"
+
+#string STR_MEMORY_3_BASE_MODULE_TYPE_PROMPT         #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{3}/BaseModuleType"
+#string STR_MEMORY_3_BUS_WIDTH_BITS_PROMPT           #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{3}/BusWidthBits"
+#string STR_MEMORY_3_CONFIGURATION_LOCKED_PROMPT     #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{3}/ConfigurationLocked"
+#string STR_MEMORY_3_MODULE_PRODUCT_ID_PROMPT        #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{3}/ModuleProductID"
+
+#string STR_MEMORY_4_BASE_MODULE_TYPE_PROMPT         #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{5}/BaseModuleType"
+#string STR_MEMORY_4_BUS_WIDTH_BITS_PROMPT           #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{5}/BusWidthBits"
+#string STR_MEMORY_4_CONFIGURATION_LOCKED_PROMPT     #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{5}/ConfigurationLocked"
+#string STR_MEMORY_4_MODULE_PRODUCT_ID_PROMPT        #language x-uefi-redfish-Memory.v1_7_1   "/Memory/{5}/ModuleProductID"
+
+#string STR_MEMORY_RDIMM_PROMPT                     #language x-uefi-redfish-Memory.v1_7_1   "RDIMM"
+#string STR_MEMORY_UDIMM_PROMPT                     #language x-uefi-redfish-Memory.v1_7_1   "UDIMM"
+#string STR_MEMORY_SO_DIMM_PROMPT                   #language x-uefi-redfish-Memory.v1_7_1   "SO_DIMM"
+#string STR_MEMORY_LRDIMM_PROMPT                    #language x-uefi-redfish-Memory.v1_7_1   "LRDIMM"
+#string STR_MEMORY_MINI_RDIMM_PROMPT                #language x-uefi-redfish-Memory.v1_7_1   "Mini_RDIMM"
+#string STR_MEMORY_MINI_UDIMM_PROMPT                #language x-uefi-redfish-Memory.v1_7_1   "Mini_UDIMM"
