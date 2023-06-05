@@ -1,0 +1,41 @@
+/** @file
+  HII-to-Redfish memory driver.
+
+  (C) Copyright 2022 Hewlett Packard Enterprise Development LP<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+/=#
+#langdef   en-US "English"
+
+#string STR_FORM_SET_TITLE                     #language en-US    "HII to Redfish (Boot)"
+#string STR_FORM_SET_TITLE_HELP                #language en-US    "HII to Redfish (Boot)"
+#string STR_FORM_TITLE                         #language en-US    "HII to Redfish Boot properties"
+
+#string STR_BOOT_ORDER                         #language en-US    "Boot Order"
+#string STR_BOOT_ORDER_LIST                    #language en-US    "Boot Order List"
+#string STR_BOOT_ORDER_LIST_HELP               #language en-US    "Boot Order List"
+
+#string STR_BOOT_SOURCE_OVERRIDE_ENABLED       #language en-US   "Boot Source Override Enabled"
+#string STR_BOOT_SOURCE_OVERRIDE_ENABLED_HELP  #language en-US   "Describes the state of the Boot Source Override feature."
+
+#string STR_BOOT_SOURCE_OVERRIDE_MODE          #language en-US   "Boot Source Override Mode"
+#string STR_BOOT_SOURCE_OVERRIDE_MODE_HELP     #language en-US   "The BIOS Boot Mode (either Legacy or UEFI) to be used when BootSourceOverrideTarget boot source is booted from."
+
+#string STR_BOOT_SOURCE_OVERRIDE_TARGET        #language en-US   "Boot Source Override Target"
+#string STR_BOOT_SOURCE_OVERRIDE_TARGET_HELP   #language en-US   "The current boot source to be used at next boot instead of the normal boot device, if BootSourceOverrideEnabled is true."
+
+#string STR_DISABLED                           #language en-US   "Disabled"
+#string STR_ONCE                               #language en-US   "Once"
+#string STR_CONTINUOUS                         #language en-US   "Continuous"
+#string STR_UEFI                               #language en-US   "UEFI"
+#string STR_LEGACY                             #language en-US   "Legacy"
+#string STR_TARGET_NONE                        #language en-US   "None"
+#string STR_TARGET_PXE                         #language en-US   "Pxe"
+#string STR_TARGET_USB                         #language en-US   "Usb"
+#string STR_TARGET_HDD                         #language en-US   "Hdd"
+#string STR_TARGET_BIOS_SETUP                  #language en-US   "Bios Setup Menu"
+#string STR_TARGET_UEFI                        #language en-US   "Uefi Target"
+#string STR_TARGET_UEFI_HTTP                   #language en-US   "Uefi Http"

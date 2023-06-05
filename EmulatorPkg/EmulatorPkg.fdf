@@ -3,7 +3,7 @@
 #
 # Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2009 - 2011, Apple Inc. All rights reserved.<BR>
-# (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -214,6 +214,7 @@ INF  EmulatorPkg/EmuSnpDxe/EmuSnpDxe.inf
 #
 !if $(REDFISH_ENABLE) == TRUE
   INF EmulatorPkg/Hii2RedfishMemoryDxe/Hii2RedfishMemoryDxe.inf
+  INF EmulatorPkg/Hii2RedfishBootDxe/Hii2RedfishBootDxe.inf
 !endif
 !include RedfishPkg/Redfish.fdf.inc
 

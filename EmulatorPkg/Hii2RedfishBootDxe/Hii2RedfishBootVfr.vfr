@@ -1,0 +1,83 @@
+/** @file
+  HII-to-Redfish boot driver VFR file.
+
+  (C) Copyright 2022 Hewlett Packard Enterprise Development LP<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+
+#include "Hii2RedfishBootData.h"
+
+formset
+  guid      = HII_2_REDFISH_BOOT_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  //
+  // Define a EFI variable Storage (EFI_IFR_VARSTORE_EFI)
+  //
+  efivarstore HII_2_REDFISH_BOOT_EFI_VARSTORE_DATA,
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
+    name  = Hii2RedfishBootEfiVar,
+    guid  = HII_2_REDFISH_BOOT_FORMSET_GUID;
+
+  //
+  // Define a variable Storage for boot order
+  //
+  varstore HII_2_REDFISH_BOOT_OPTION_VARSTORE_DATA,
+    varid = BOOT_OPTION_VAR_STORE_ID,
+    name = Hii2RedfishBootOptionVar,
+    guid = HII_2_REDFISH_BOOT_FORMSET_GUID;
+
+  //
+  // Define a Form (EFI_IFR_FORM)
+  //
+  form formid = FORM_ID,                          // Form ID
+       title  = STRING_TOKEN(STR_FORM_TITLE);     // Form title
+
+    oneof varid = Hii2RedfishBootEfiVar.BootSourceOverrideEnabled,
+          questionid = QUESTION_ID_BOOT_SOURCE_OVERRIDE_ENABLED,
+          prompt = STRING_TOKEN(STR_BOOT_SOURCE_OVERRIDE_ENABLED),
+          help   = STRING_TOKEN(STR_BOOT_SOURCE_OVERRIDE_ENABLED_HELP),
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
+          option text = STRING_TOKEN(STR_DISABLED),         value = STR_DISABLED,   flags = DEFAULT;
+          option text = STRING_TOKEN(STR_ONCE),             value = STR_ONCE,       flags = 0;
+          option text = STRING_TOKEN(STR_CONTINUOUS),       value = STR_CONTINUOUS, flags = 0;
+    endoneof;
+
+    oneof varid = Hii2RedfishBootEfiVar.BootSourceOverrideMode,
+          questionid = QUESTION_ID_BOOT_SOURCE_OVERRIDE_MODE,
+          prompt = STRING_TOKEN(STR_BOOT_SOURCE_OVERRIDE_MODE),
+          help   = STRING_TOKEN(STR_BOOT_SOURCE_OVERRIDE_MODE_HELP),
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
+          option text = STRING_TOKEN(STR_UEFI),             value = STR_UEFI,   flags = DEFAULT;
+          option text = STRING_TOKEN(STR_LEGACY),           value = STR_LEGACY, flags = 0;
+    endoneof;
+
+    oneof varid = Hii2RedfishBootEfiVar.BootSourceOverrideTarget,
+          questionid = QUESTION_ID_BOOT_SOURCE_OVERRIDE_TARGET,
+          prompt = STRING_TOKEN(STR_BOOT_SOURCE_OVERRIDE_TARGET),
+          help   = STRING_TOKEN(STR_BOOT_SOURCE_OVERRIDE_TARGET_HELP),
+          flags  = INTERACTIVE | NUMERIC_SIZE_1,
+          option text = STRING_TOKEN(STR_TARGET_NONE),          value = STR_TARGET_NONE,        flags = DEFAULT;
+          option text = STRING_TOKEN(STR_TARGET_PXE),           value = STR_TARGET_PXE,         flags = 0;
+          option text = STRING_TOKEN(STR_TARGET_USB),           value = STR_TARGET_USB,         flags = 0;
+          option text = STRING_TOKEN(STR_TARGET_HDD),           value = STR_TARGET_HDD,         flags = 0;
+          option text = STRING_TOKEN(STR_TARGET_BIOS_SETUP),    value = STR_TARGET_BIOS_SETUP,  flags = 0;
+          option text = STRING_TOKEN(STR_TARGET_UEFI),          value = STR_TARGET_UEFI,        flags = 0;
+          option text = STRING_TOKEN(STR_TARGET_UEFI_HTTP),     value = STR_TARGET_UEFI_HTTP,   flags = 0;
+    endoneof;
+
+    subtitle text = STRING_TOKEN(STR_BOOT_ORDER);
+
+    //
+    // This is where we will dynamically add choices for the Boot Manager
+    //
+    label LABEL_BOOT_OPTION;
+    label LABEL_BOOT_OPTION_END;
+
+  endform;
+endformset;

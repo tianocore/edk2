@@ -1,0 +1,28 @@
+/** @file
+  HII-to-Redfish memory driver.
+
+  (C) Copyright 2022 Hewlett Packard Enterprise Development LP<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+/=#
+#langdef   x-uefi-redfish-ComputerSystem.v1_5_0 "ComputerSystem.v1_5_0"
+
+#string STR_BOOT_SOURCE_OVERRIDE_ENABLED       #language x-uefi-redfish-ComputerSystem.v1_5_0   "/Systems/{1}/Boot/BootSourceOverrideEnabled"
+#string STR_BOOT_SOURCE_OVERRIDE_MODE          #language x-uefi-redfish-ComputerSystem.v1_5_0   "/Systems/{1}/Boot/BootSourceOverrideMode"
+#string STR_BOOT_SOURCE_OVERRIDE_TARGET        #language x-uefi-redfish-ComputerSystem.v1_5_0   "/Systems/{1}/Boot/BootSourceOverrideTarget"
+
+#string STR_DISABLED                           #language x-uefi-redfish-ComputerSystem.v1_5_0   "Disabled"
+#string STR_ONCE                               #language x-uefi-redfish-ComputerSystem.v1_5_0   "Once"
+#string STR_CONTINUOUS                         #language x-uefi-redfish-ComputerSystem.v1_5_0   "Continuous"
+#string STR_UEFI                               #language x-uefi-redfish-ComputerSystem.v1_5_0   "UEFI"
+#string STR_LEGACY                             #language x-uefi-redfish-ComputerSystem.v1_5_0   "Legacy"
+#string STR_TARGET_NONE                        #language x-uefi-redfish-ComputerSystem.v1_5_0   "None"
+#string STR_TARGET_PXE                         #language x-uefi-redfish-ComputerSystem.v1_5_0   "Pxe"
+#string STR_TARGET_USB                         #language x-uefi-redfish-ComputerSystem.v1_5_0   "Usb"
+#string STR_TARGET_HDD                         #language x-uefi-redfish-ComputerSystem.v1_5_0   "Hdd"
+#string STR_TARGET_BIOS_SETUP                  #language x-uefi-redfish-ComputerSystem.v1_5_0   "BiosSetup"
+#string STR_TARGET_UEFI                        #language x-uefi-redfish-ComputerSystem.v1_5_0   "UefiTarget"
+#string STR_TARGET_UEFI_HTTP                   #language x-uefi-redfish-ComputerSystem.v1_5_0   "UefiHttp"
