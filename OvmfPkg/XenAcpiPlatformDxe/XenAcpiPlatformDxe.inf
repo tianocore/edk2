@@ -32,6 +32,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  AcpiPlatformLib
   BaseLib
   DebugLib
   UefiBootServicesTableLib
