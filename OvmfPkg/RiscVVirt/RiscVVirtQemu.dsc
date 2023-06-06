@@ -52,6 +52,7 @@
 
 
 !include MdePkg/MdeLibs.dsc.inc
+!include NetworkPkg/Network.dsc.inc
 
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
@@ -68,8 +69,6 @@
 # Library Class section - list of all Library Classes needed by this Platform.
 #
 ################################################################################
-
-!include NetworkPkg/NetworkDefines.dsc.inc
 
 !include OvmfPkg/RiscVVirt/RiscVVirt.dsc.inc
 
@@ -124,8 +123,6 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   PciExpressLib|OvmfPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
 
-#!include NetworkPkg/NetworkBuildOptions.dsc.inc
-
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform.
@@ -163,11 +160,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|3686400
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
-
-  #
-  # Network Pcds
-  #
-!include NetworkPkg/NetworkPcds.dsc.inc
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
@@ -396,11 +388,6 @@
     <LibraryClasses>
       NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
   }
-
-  #
-  # Networking stack
-  #
-!include NetworkPkg/NetworkComponents.dsc.inc
 
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
     <LibraryClasses>
