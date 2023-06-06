@@ -9,6 +9,7 @@
 
 **/
 
+#include <Library/AcpiPlatformLib.h>
 #include <Library/BaseLib.h>        // CpuDeadLoop()
 #include <Library/DebugLib.h>       // DEBUG()
 #include <Library/XenPlatformLib.h> // XenGetInfoHOB()
@@ -19,92 +20,6 @@
 #define XEN_BIOS_PHYSICAL_END      0x000FFFFF
 
 EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *XenAcpiRsdpStructurePtr = NULL;
-
-/**
-  Get the address of Xen ACPI Root System Description Pointer (RSDP)
-  structure.
-
-  @param  RsdpStructurePtr   Return pointer to RSDP structure
-
-  @return EFI_SUCCESS        Find Xen RSDP structure successfully.
-  @return EFI_NOT_FOUND      Don't find Xen RSDP structure.
-  @return EFI_ABORTED        Find Xen RSDP structure, but it's not integrated.
-
-**/
-EFI_STATUS
-EFIAPI
-GetXenAcpiRsdp (
-  OUT   EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  **RsdpPtr
-  )
-{
-  EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *RsdpStructurePtr;
-  UINT8                                         *XenAcpiPtr;
-  UINT8                                         Sum;
-  EFI_XEN_INFO                                  *XenInfo;
-
-  //
-  // Detect the RSDP structure
-  //
-
-  //
-  // First look for PVH one
-  //
-  XenInfo = XenGetInfoHOB ();
-  ASSERT (XenInfo != NULL);
-  if (XenInfo->RsdpPvh != NULL) {
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: Use ACPI RSDP table at 0x%p\n",
-      gEfiCallerBaseName,
-      XenInfo->RsdpPvh
-      ));
-    *RsdpPtr = XenInfo->RsdpPvh;
-    return EFI_SUCCESS;
-  }
-
-  //
-  // Otherwise, look for the HVM one
-  //
-  for (XenAcpiPtr = (UINT8 *)(UINTN)XEN_ACPI_PHYSICAL_ADDRESS;
-       XenAcpiPtr < (UINT8 *)(UINTN)XEN_BIOS_PHYSICAL_END;
-       XenAcpiPtr += 0x10)
-  {
-    RsdpStructurePtr = (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)
-                       (UINTN)XenAcpiPtr;
-
-    if (!AsciiStrnCmp ((CHAR8 *)&RsdpStructurePtr->Signature, "RSD PTR ", 8)) {
-      //
-      // RSDP ACPI 1.0 checksum for 1.0/2.0/3.0 table.
-      // This is only the first 20 bytes of the structure
-      //
-      Sum = CalculateSum8 (
-              (CONST UINT8 *)RsdpStructurePtr,
-              sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER)
-              );
-      if (Sum != 0) {
-        return EFI_ABORTED;
-      }
-
-      if (RsdpStructurePtr->Revision >= 2) {
-        //
-        // RSDP ACPI 2.0/3.0 checksum, this is the entire table
-        //
-        Sum = CalculateSum8 (
-                (CONST UINT8 *)RsdpStructurePtr,
-                sizeof (EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER)
-                );
-        if (Sum != 0) {
-          return EFI_ABORTED;
-        }
-      }
-
-      *RsdpPtr = RsdpStructurePtr;
-      return EFI_SUCCESS;
-    }
-  }
-
-  return EFI_NOT_FOUND;
-}
 
 /**
   Get Xen Acpi tables from the RSDP structure. And installs Xen ACPI tables
@@ -142,6 +57,7 @@ InstallXenTables (
   EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs2Table;
   EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *Facs1Table;
   EFI_ACPI_DESCRIPTION_HEADER                   *DsdtTable;
+  EFI_XEN_INFO                                  *XenInfo;
 
   Fadt2Table           = NULL;
   Fadt1Table           = NULL;
@@ -152,11 +68,34 @@ InstallXenTables (
   NumberOfTableEntries = 0;
 
   //
-  // Try to find Xen ACPI tables
+  // Detect the RSDP structure
   //
-  Status = GetXenAcpiRsdp (&XenAcpiRsdpStructurePtr);
-  if (EFI_ERROR (Status)) {
-    return Status;
+
+  //
+  // First look for PVH one
+  //
+  XenInfo = XenGetInfoHOB ();
+  ASSERT (XenInfo != NULL);
+  if (XenInfo->RsdpPvh != NULL) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Use ACPI RSDP table at 0x%p\n",
+      gEfiCallerBaseName,
+      XenInfo->RsdpPvh
+      ));
+    XenAcpiRsdpStructurePtr = XenInfo->RsdpPvh;
+  } else {
+    //
+    // Otherwise, look for the HVM one
+    //
+    Status = GetAcpiRsdpFromMemory (
+               XEN_ACPI_PHYSICAL_ADDRESS,
+               XEN_BIOS_PHYSICAL_END,
+               &XenAcpiRsdpStructurePtr
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   //
