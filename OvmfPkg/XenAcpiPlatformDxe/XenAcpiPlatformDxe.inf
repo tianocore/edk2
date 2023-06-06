@@ -25,7 +25,6 @@
   AcpiPlatform.c
   AcpiPlatform.h
   EntryPoint.c
-  Xen.c
 
 [Packages]
   MdePkg/MdePkg.dec
