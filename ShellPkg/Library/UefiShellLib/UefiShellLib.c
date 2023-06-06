@@ -4,8 +4,9 @@
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright 2016-2018 Dell Technologies.<BR>
   Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
-  SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (C) 2023, Apple Inc. All rights reserved.<BR>
 
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "UefiShellLib.h"
@@ -2952,8 +2953,8 @@ InternalShellPrintWorker (
   CHAR16      *mPostReplaceFormat;
   CHAR16      *mPostReplaceFormat2;
 
-  mPostReplaceFormat  = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
-  mPostReplaceFormat2 = AllocateZeroPool (PcdGet16 (PcdShellPrintBufferSize));
+  mPostReplaceFormat  = AllocateZeroPool (PcdGet32 (PcdShellPrintBufferSize));
+  mPostReplaceFormat2 = AllocateZeroPool (PcdGet32 (PcdShellPrintBufferSize));
 
   if ((mPostReplaceFormat == NULL) || (mPostReplaceFormat2 == NULL)) {
     SHELL_FREE_NON_NULL (mPostReplaceFormat);
@@ -2967,21 +2968,21 @@ InternalShellPrintWorker (
   //
   // Back and forth each time fixing up 1 of our flags...
   //
-  Status = ShellCopySearchAndReplace (Format, mPostReplaceFormat, PcdGet16 (PcdShellPrintBufferSize), L"%N", L"%%N", FALSE, FALSE);
+  Status = ShellCopySearchAndReplace (Format, mPostReplaceFormat, PcdGet32 (PcdShellPrintBufferSize), L"%N", L"%%N", FALSE, FALSE);
   ASSERT_EFI_ERROR (Status);
-  Status = ShellCopySearchAndReplace (mPostReplaceFormat, mPostReplaceFormat2, PcdGet16 (PcdShellPrintBufferSize), L"%E", L"%%E", FALSE, FALSE);
+  Status = ShellCopySearchAndReplace (mPostReplaceFormat, mPostReplaceFormat2, PcdGet32 (PcdShellPrintBufferSize), L"%E", L"%%E", FALSE, FALSE);
   ASSERT_EFI_ERROR (Status);
-  Status = ShellCopySearchAndReplace (mPostReplaceFormat2, mPostReplaceFormat, PcdGet16 (PcdShellPrintBufferSize), L"%H", L"%%H", FALSE, FALSE);
+  Status = ShellCopySearchAndReplace (mPostReplaceFormat2, mPostReplaceFormat, PcdGet32 (PcdShellPrintBufferSize), L"%H", L"%%H", FALSE, FALSE);
   ASSERT_EFI_ERROR (Status);
-  Status = ShellCopySearchAndReplace (mPostReplaceFormat, mPostReplaceFormat2, PcdGet16 (PcdShellPrintBufferSize), L"%B", L"%%B", FALSE, FALSE);
+  Status = ShellCopySearchAndReplace (mPostReplaceFormat, mPostReplaceFormat2, PcdGet32 (PcdShellPrintBufferSize), L"%B", L"%%B", FALSE, FALSE);
   ASSERT_EFI_ERROR (Status);
-  Status = ShellCopySearchAndReplace (mPostReplaceFormat2, mPostReplaceFormat, PcdGet16 (PcdShellPrintBufferSize), L"%V", L"%%V", FALSE, FALSE);
+  Status = ShellCopySearchAndReplace (mPostReplaceFormat2, mPostReplaceFormat, PcdGet32 (PcdShellPrintBufferSize), L"%V", L"%%V", FALSE, FALSE);
   ASSERT_EFI_ERROR (Status);
 
   //
   // Use the last buffer from replacing to print from...
   //
-  UnicodeVSPrint (mPostReplaceFormat2, PcdGet16 (PcdShellPrintBufferSize), mPostReplaceFormat, Marker);
+  UnicodeVSPrint (mPostReplaceFormat2, PcdGet32 (PcdShellPrintBufferSize), mPostReplaceFormat, Marker);
 
   if ((Col != -1) && (Row != -1)) {
     Status = gST->ConOut->SetCursorPosition (gST->ConOut, Col, Row);

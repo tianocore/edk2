@@ -4,9 +4,9 @@
 # (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
 # Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+# Copyright (C) 2023, Apple Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
-#
 ##
 
 [Defines]
@@ -84,7 +84,7 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|TRUE|BOOLEAN|0x00000005
 
   ## This is the max buffer for ShellLib and internal Shell printings.
-  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize|16000|UINT16|0x0000000C
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize|16000|UINT32|0x0000000C
 
   ## This flag is used to control the commands available in the shell
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel|3|UINT8|0x00000001
