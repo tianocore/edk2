@@ -16,6 +16,7 @@ from IfrUtility import *
 from IfrTree import *
 from IfrPreProcess import *
 import ctypes
+import bitarray
 import struct
 
 if __name__ is not None and "." in __name__:
@@ -1181,6 +1182,8 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             self.InsertChild(ctx.Node, Ctx)
 
         return ctx.Node
+    # ctrl shift p
+    # python
 
 
     # Visit a parse tree produced by SourceVfrSyntaxParser#vfrFormDefinition.
@@ -3706,15 +3709,16 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
                 ctx.TypeName = 'EFI_HII_REF'
                 ctx.IsStruct = True
             else:
-                ctx.TypeName = self.TransId(ctx.D.text)
+                ctx.TypeName = ctx.ST.text
                 ctx.IsStruct = True
             ctx.ArrayNum = self.TransNum(ctx.Number())
             ctx.TypeSize, ReturnCode = gVfrVarDataTypeDB.GetDataTypeSizeByTypeName(ctx.TypeName)
             self.ErrorHandler(ReturnCode, ctx.D.line)
             ctx.Size = ctx.TypeSize * ctx.ArrayNum if ctx.ArrayNum > 0 else ctx.TypeSize
-        ctx.Buffer = Refine_EFI_IFR_BUFFER(ctx.Size)
+            ctx.Buffer = bytearray(ctx.Size)
 
         self.visitChildren(ctx)
+
         Line = ctx.start.line
         GuidObj = IfrExtensionGuid(ctx.Size, ctx.TypeName, ctx.ArrayNum)
         for Ctx in ctx.vfrExtensionData():
@@ -3729,8 +3733,8 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
         GuidObj.SetScope(1)
         ctx.Node.Data = GuidObj
         ctx.Node.Buffer = gFormPkg.StructToStream(GuidObj.GetInfo())
-        ctx.Node.Buffer += gFormPkg.StructToStream(ctx.Buffer)
-
+        if ctx.DataType() != None:
+            ctx.Node.Buffer += ctx.Buffer
         for Ctx in ctx.vfrStatementExtension():
             self.InsertChild(ctx.Node, Ctx)
 
@@ -3741,9 +3745,11 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
     def visitVfrExtensionData(self, ctx:SourceVfrSyntaxParser.VfrExtensionDataContext):
 
         IsArray = False if ctx.I == None else True
+        if IsArray:
+            Index = self.TransNum(ctx.I.text)
+        else:
+            Index = 0
         IsStruct = ctx.parentCtx.IsStruct
-        Buffer = ctx.parentCtx.Buffer
-
         self.visitChildren(ctx)
         ctx.TFValue = self.TransNum(ctx.N.text)
         Data = self.TransNum(ctx.N.text)
@@ -3751,114 +3757,37 @@ class SourceVfrSyntaxVisitor(ParseTreeVisitor):
             ctx.FName += 'data' +'[' + ctx.I.text + ']'
         else:
             ctx.FName += 'data'
-        if IsStruct == False:
-           # Buffer.Data = Data
-            pass
-        else:
-            ctx.TFName += ctx.parentCtx.TypeName
+
+        ctx.TFName += ctx.parentCtx.TypeName
+
+        if IsStruct:
             for i in range(0, len(ctx.arrayName())):
                 ctx.TFName += '.'
                 ctx.TFName += ctx.arrayName(i).SubStrZ
                 ctx.FName += '.'
                 ctx.FName += ctx.arrayName(i).SubStrZ
 
-            FieldOffset, FieldType, FieldSize, BitField, _ = gVfrVarDataTypeDB.GetDataFieldInfo(ctx.TFName)
-        '''
-            if not BitField:
-                if IsArray:
-                    ArrayIndex = ctx.I.text
-                    FieldOffset += ArrayIndex* ctx.parentCtx.TypeSize
+        FieldOffset, FieldType, FieldSize, BitField, _ = gVfrVarDataTypeDB.GetDataFieldInfo(ctx.TFName)
 
-                if FieldType == EFI_IFR_TYPE_NUM_SIZE_8 or FieldType == EFI_IFR_TYPE_BOOLEAN:
-                    Buffer.Data[FieldOffset] = Data
+        if not BitField:
+            Buffer = ctx.parentCtx.Buffer
+            Offset = ctx.parentCtx.TypeSize * Index + FieldOffset
+            for i in range(FieldSize):
+                Shift = (FieldSize - i - 1) * 8
+                ByteVal = (ctx.TFValue >> Shift) & 0xFF
+                Buffer[Offset + i] = ByteVal
+        else:
+            Buffer = bitarray.bitarray()
+            Buffer.frombytes(ctx.parentCtx.Buffer)
+            Length = len(Buffer)
+            Binary = bitarray.bitarray(bin(ctx.TFValue)[2:].zfill(FieldSize))
+            Binary = Binary[-FieldSize:]
+            for i, bit in enumerate(Binary):
+                BitValue = bool(int(bit))
+                Buffer[ctx.parentCtx.TypeSize * Index*8 + FieldOffset + i] = BitValue
+            ctx.parentCtx.Buffer = Buffer.tobytes()
 
-                if FieldType == EFI_IFR_TYPE_NUM_SIZE_16 or FieldType == EFI_IFR_TYPE_STRING:
-                        Bytes = Data.to_bytes(2, byteorder="little", signed=True)
-                        for i in range(0, 2):
-                            Buffer.Data[FieldOffset + i] = Bytes[i]
-
-                if FieldType == EFI_IFR_TYPE_NUM_SIZE_32:
-                        Bytes = Data.to_bytes(4, byteorder="little", signed=True)
-                        for i in range(0, 4):
-                            Buffer.Data[FieldOffset + i] = Bytes[i]
-
-                if FieldType == EFI_IFR_TYPE_NUM_SIZE_64:
-                        Bytes = Data.to_bytes(8, byteorder="little", signed=True)
-                        for i in range(0, 8):
-                            Buffer.Data[FieldOffset + i] = Bytes[i]
-            else:
-                Mask = 1 << FieldSize - 1
-                Offset = int(FieldOffset / 8)
-                PreBits = FieldOffset % 8
-                Mask <= PreBits
-                if FieldType == EFI_IFR_TYPE_NUM_SIZE_32:
-                    Bytes = Data.to_bytes(2, byteorder="little", signed=True)
-                    Data <<= PreBits
-                    Data = (Data & ~Mask) | Data
-                    for i in range(0, 2):
-                        Buffer.Data[Offset + i] = Bytes[i]
-
-
-
-                print('Offset')
-                print(FieldOffset)
-                print('Size')
-                print(FieldSize)
-
-                Begin = int(FieldOffset / 8)
-                print('Begin')
-                print(Begin)
-
-                End = int((FieldOffset + FieldSize) / 8)
-                print('End')
-                print(End)
-                PreBits = FieldOffset % 8
-                Data <<= (End - Begin + 1) * 8 - PreBits - FieldSize
-
-                if IsArray:
-                    ArrayIndex = ctx.I.Text
-                    for i in range(End, Begin - 1, -1):
-                        Buffer.Data[ArrayIndex* ctx.parentCtx.TypeSize + i] |= (Data & 0xff)
-                        Data >= 8
-                        print('{:016b}'.format(Data))
-
-                else:
-                    for i in range(Begin, End + 1):
-                        print("----------------------")
-                        print("i: " + str(i))
-                        print('{:08b}'.format(Buffer.Data[i]))
-                        Buffer.Data[i + End - Begin] |= (Data & 0xff)
-                        Data = Data >> 8
-                        print('{:08b}'.format(Buffer.Data[i]))
-                        print("----------------------")
-
-
-                4          5       6        7
-                00100000  00000010 00000100 00000000
-
-
-                00000000  00000000 00000000 00000000
-
-                00 00000001
-                0000 0000
-                37 % 8 = 5
-                0000 0001
-                左移三位
-                0000 1000 41
-                第四个字节和第五个字节 16 - prefix - size 左移的位数
-                0000 0000 0000 0001 <- 左移七位 9 + 7 = 16
-
-                0000 0000 0000 0000 0000 0000 0000 0000
-                0000 0000 0000 0001
-                41 / 8 = 5
-                41%8 = 1
-                41 + 10 = 51 /8 = 6
-                第5个字节 和 第六个字节 16 - 1 - 10 = 5 左移的位数
-                0000 0000
-                          1000 0000 001 00000
-            '''
-
-        return self.visitChildren(ctx)
+        return Buffer
 
     # Visit a parse tree produced by SourceVfrSyntaxParser#vfrStatementModal.
     def visitVfrStatementModal(self, ctx:SourceVfrSyntaxParser.VfrStatementModalContext):

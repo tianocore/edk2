@@ -92,6 +92,25 @@ class PreProcessDB():
                 return Guid
         # error handle , value is too large to store
 
+    def DisplayValue(self, Value, Flag = False):
+        if type(Value) == EFI_GUID:
+            return Value.to_string()
+        else:
+            StrValue = str(Value)
+            if StrValue.isdigit() or StrValue.startswith("0x") or StrValue.startswith("0X"):
+                if Flag:
+                    return 'STRING_TOKEN' + '(' + StrValue + ')'
+                else:
+                    return int(StrValue, 0)
+
+            return StrValue
+            # else:
+            #     GuidList = re.findall(r"0x[0-9a-fA-F]+", StrValue)
+            #     GuidList = [int(num, 16) for num in GuidList]
+            #     Guid = EFI_GUID()
+            #     Guid.from_list(GuidList)
+            #     return Guid.to_string()
+
     def RevertValue(self, Value) -> str:
         if type(Value) == EFI_GUID:
             return Value.to_string()
@@ -220,36 +239,28 @@ class PreProcessDB():
     def _GetHeaderDicts(self, HeaderFiles):
         HeaderDict = {}
         for HeaderFile in HeaderFiles:
-            FileName = HeaderFile.split('/')[-1]
-            FileList = self._FindIncludeHeaderFile(self.Options.IncludePaths, FileName)
+            FileList = self._FindIncludeHeaderFile(self.Options.IncludePaths, HeaderFile)
             CppHeader = None
             for File in FileList:
                 if File.find(HeaderFile.replace('/','\\')) != -1:
                     CppHeader = CppHeaderParser.CppHeader(File)
                     self._ParseDefines(File, HeaderDict)
-                    break
             if CppHeader == None:
                 EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
                             "File/directory %s not found in workspace" % (HeaderFile), None)
 
             for Include in CppHeader.includes:
                 Include = Include[1:-1]
-                print(self.Options.InputFileName) ######### for test
-                if Include.find('/') != -1:
-                    IncludeFileName = Include.split('/')[1]
-                else:
-                    IncludeFileName = Include
-                IncludeHeaderFileList = self._FindIncludeHeaderFile(self.Options.IncludePaths, IncludeFileName)
+                IncludeHeaderFileList = self._FindIncludeHeaderFile(self.Options.IncludePaths, Include)
                 Flag = False
                 for File in IncludeHeaderFileList:
                     if File.find(Include.replace('/','\\')) != -1:
                         CppHeader = CppHeaderParser.CppHeader(File)
                         self._ParseDefines(File, HeaderDict)
                         Flag = True
-                        break
                 if Flag == False:
                     EdkLogger.error("VfrCompiler", FILE_NOT_FOUND,
-                                    "File/directory %s not found in workspace" % IncludeFileName, None)
+                                    "File/directory %s not found in workspace" % Include, None)
         return HeaderDict
 
     def _GetVfrDicts(self):
@@ -290,15 +301,19 @@ class PreProcessDB():
                     GuidList = re.findall(r"0x[0-9a-fA-F]+", Value)
                     GuidList = [int(num, 16) for num in GuidList]
                     Value = EFI_GUID()
-                    Value.from_list(GuidList)
-                    # Value =  Value.to_string()
+                    if len(GuidList) == 11:
+                        Value.from_list(GuidList)
                 Dict[Key] = Value
 
-    def _FindIncludeHeaderFile(self, IncludePaths, Name):
+    def _FindIncludeHeaderFile(self, IncludePaths, File):
+        Name = File.split('/')[-1]
         FileList = []
         for Start in IncludePaths:
             for Relpath, Dirs, Files in os.walk(Start):
                 if Name in Files:
                     FullPath = os.path.join(Start, Relpath, Name)
-                    FileList.append(os.path.normpath(os.path.abspath(FullPath)))
-        return FileList
+                    FullPath = FullPath.replace('\\', '/')
+                    if FullPath.find(File) != -1:
+                        FileList.append(os.path.normpath(os.path.abspath(FullPath)))
+
+        return list(set(FileList))

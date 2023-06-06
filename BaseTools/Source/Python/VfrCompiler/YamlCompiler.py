@@ -349,6 +349,7 @@ class CmdParser():
         return self.RunStatus == Status
 class YamlCompiler(CmdParser):
     def __init__(self, Cmd: CmdParser):
+        self.Clear()
         self.Options = Cmd.Options
         self.RunStatus = Cmd.RunStatus
         self.YamlRoot = IfrTreeNode()
@@ -356,6 +357,13 @@ class YamlCompiler(CmdParser):
         self.YamlTree = YamlTree(self.YamlRoot, self.PreProcessDB, self.Options)
         if (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)) and (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)):
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED)
+
+    def Clear(self):
+        gVfrVarDataTypeDB.Clear()
+        gVfrDefaultStore.Clear()
+        gVfrDataStorage.Clear()
+        gFormPkg.Clear()
+        gIfrFormId.Clear()
 
     def PreProcess(self):
         if not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED):
@@ -405,6 +413,7 @@ class YamlCompiler(CmdParser):
 class VfrCompiler():
 
     def __init__(self, Cmd: CmdParser):
+        self.Clear()
         self.Options = Cmd.Options
         self.RunStatus = Cmd.RunStatus
         self.VfrRoot = IfrTreeNode()
@@ -412,6 +421,13 @@ class VfrCompiler():
         self.VfrTree = IfrTree(self.VfrRoot, self.PreProcessDB, self.Options)
         if (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_FAILED)) and (not self.IS_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_DEAD)):
             self.SET_RUN_STATUS(COMPILER_RUN_STATUS.STATUS_INITIALIZED)
+
+    def Clear(self):
+        gVfrVarDataTypeDB.Clear()
+        gVfrDefaultStore.Clear()
+        gVfrDataStorage.Clear()
+        gFormPkg.Clear()
+        gIfrFormId.Clear()
 
     # Parse and collect data structures info in the ExpandedHeader.i files
     def ParseHeader(self):

@@ -1,6 +1,7 @@
 from SourceVfrSyntaxVisitor import *
 from SourceVfrSyntaxLexer import *
 from SourceVfrSyntaxParser import *
+from collections import OrderedDict
 from IfrFormPkg import *
 from VfrError import *
 from IfrPreProcess import *
@@ -29,7 +30,8 @@ class YamlTree():
             #self.YamlDict = yaml.load(f.read(), Loader=yaml.FullLoader)
             self.YamlDict = yaml.safe_load(File)
             File.seek(0)
-            self.Lines = File.readlines()
+            # self.Lines = File.readlines()
+            self.YamlDictDisplay = yaml.safe_load(File)
             File.close()
         except:
             EdkLogger.error('VfrCompiler', FILE_READ_FAILURE,
@@ -40,21 +42,21 @@ class YamlTree():
             self.PreProcessDB.VfrDict = copy.deepcopy(self.YamlDict['defines'])
         # Tranfer Strings into Specfic Values by PreprocessDB
         self.PreProcessYamlDict(self.YamlDict)
-        # try:
-        #     FileName =  self.Options.ProcessedYAMLFileName
-        #     f = open(FileName, 'w')
-        #     f.write(yaml.dump(self.YamlDict, allow_unicode=True, default_flow_style=False))
-        #     f.close()
-        # except:
-        #     EdkLogger.error('VfrCompiler', FILE_CREATE_FAILURE,
-        #                     'File create failed for %s' % FileName, None)
+        self.PreProcessDisplayDict(self.YamlDictDisplay)
+        try:
+            FileName =  self.Options.ProcessedYAMLFileName
+            with open(FileName, 'w') as f:
+                f.write(yaml.dump(self.YamlDictDisplay, width=float('inf'), allow_unicode=True, default_flow_style=False))
+        except:
+            EdkLogger.error('VfrCompiler', FILE_CREATE_FAILURE,
+                            'File create failed for %s' % FileName, None)
 
     def Compile(self):
         gVfrVarDataTypeDB.Clear()
         gVfrDefaultStore.Clear()
         gVfrDataStorage.Clear()
         gFormPkg.Clear()
-        IfrFormId.Clear()
+        gIfrFormId.Clear()
         self.Parser = YamlParser(self.Root, self.Options, self.PreProcessDB, self.YamlDict, self.GuidID)
         self.Parser.Parse()
 
@@ -62,6 +64,53 @@ class YamlTree():
         self.IfrTree.GenBinaryFiles()
         self.IfrTree.DumpCompiledYaml()
         self.IfrTree.GenRecordListFile()
+
+    def PreProcessDisplayDict(self, YamlDict):
+        for Key in YamlDict.keys():
+            if Key == 'condition':
+                continue
+            Value = YamlDict[Key]
+            if isinstance(Value, list): # value is list
+                for Item in Value:
+                    if isinstance(Item, dict):
+                        self.PreProcessDisplayDict(Item)
+
+            elif isinstance(Value, dict): # value is dict
+                self.PreProcessDisplayDict(Value)
+
+            elif isinstance(Value, str):# value is str
+                # get the specific value of string token
+                Match = re.search(r'STRING_TOKEN\((.*?)\)', Value)
+                if Match:
+                    if self.PreProcessDB.UniDict and Match.group(1) in self.PreProcessDB.UniDict.keys():
+                        YamlDict[Key] = self.PreProcessDB.DisplayValue(self.PreProcessDB.UniDict[Match.group(1)], True)
+                        #YamlDict[Key] = 'STRING_TOKEN' + '(' +  self.PreProcessDB.UniDict[Value[Start:End]] + ')'
+                else:
+                    if self.PreProcessDB.UniDict and Value in self.PreProcessDB.UniDict.keys():
+                        YamlDict[Key] = self.PreProcessDB.DisplayValue(self.PreProcessDB.UniDict[Value])
+                    # get {key:value} dicts from header files
+                    elif self.PreProcessDB.HeaderDict and Value in self.PreProcessDB.HeaderDict.keys():
+                            YamlDict[Key] = self.PreProcessDB.DisplayValue(self.PreProcessDB.HeaderDict[Value])
+
+                    elif self.PreProcessDB.VfrDict and Value in self.PreProcessDB.VfrDict.keys():
+                        YamlDict[Key] = self.PreProcessDB.DisplayValue(self.PreProcessDB.VfrDict[Value])
+                    elif '|' in Value:
+                        Items = Value.split('|')
+                        ValueList = []
+                        for i in range(0, len(Items)):
+                            # get {key:value} dicts from header files
+                            if self.PreProcessDB.HeaderDict and Items[i].strip() in self.PreProcessDB.HeaderDict.keys():
+                                ValueList.append(self.PreProcessDB.DisplayValue(self.PreProcessDB.HeaderDict[Items[i].strip()]))
+                            elif self.PreProcessDB.VfrDict and Items[i].strip() in self.PreProcessDB.VfrDict.keys():
+                                ValueList.append(self.PreProcessDB.DisplayValue(self.PreProcessDB.VfrDict[Items[i].strip()]))
+                            elif self.PreProcessDB.UniDict and Items[i].strip() in self.PreProcessDB.UniDict.keys():
+                                ValueList.append(self.PreProcessDB.DisplayValue(self.PreProcessDB.UniDict[Items[i].strip()]))
+                            elif (Items[i].strip().startswith('0x')) or (Items[i].strip().startswith('0X')) or (Items[i].strip().isdigit()):
+                                ValueList.append(self.PreProcessDB.DisplayValue(Items[i].strip()))
+                            else:
+                                ValueList.append(Items[i].strip())
+
+                        YamlDict[Key] = ValueList
 
     def ConsumeDLT(self):
         self.Options.DeltaFileName = self.Options.OutputDirectory + 'Vfr.dlt' #

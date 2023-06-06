@@ -1119,7 +1119,7 @@ locals[Node=IfrTreeNode(EFI_IFR_GUID_OP)]
     ;
 
 vfrStatementExtension
-locals[Node=IfrTreeNode(EFI_IFR_GUID_OP), Buffer=None, Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
+locals[Node=IfrTreeNode(EFI_IFR_GUID_OP), Buffer=[], Size=0, TypeName='', TypeSize=0, IsStruct=False, ArrayNum=0]
     :   'guidop'
         'guid' '=' S=StringIdentifier
         (   ',' D='datatype' '='
@@ -1132,7 +1132,7 @@ locals[Node=IfrTreeNode(EFI_IFR_GUID_OP), Buffer=None, Size=0, TypeName='', Type
             |   'EFI_HII_DATE' ('[' Number ']')?
             |   'EFI_HII_TIME' ('[' Number ']')?
             |   'EFI_HII_REF' ('[' Number ']')?
-            |   D=StringIdentifier ('[' Number ']')?
+            |   ST=StringIdentifier ('[' Number ']')?
             )
             (vfrExtensionData)*
         )?

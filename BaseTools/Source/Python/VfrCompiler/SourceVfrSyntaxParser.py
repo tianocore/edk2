@@ -16411,7 +16411,7 @@ class SourceVfrSyntaxParser ( Parser ):
             super().__init__(parent, invokingState)
             self.parser = parser
             self.Node = IfrTreeNode(EFI_IFR_GUID_OP)
-            self.Buffer = None
+            self.Buffer = []
             self.Size = 0
             self.TypeName = ''
             self.TypeSize = 0
@@ -16419,6 +16419,7 @@ class SourceVfrSyntaxParser ( Parser ):
             self.ArrayNum = 0
             self.S = None # Token
             self.D = None # Token
+            self.ST = None # Token
 
         def GuidOp(self):
             return self.getToken(SourceVfrSyntaxParser.GuidOp, 0)
@@ -16683,7 +16684,7 @@ class SourceVfrSyntaxParser ( Parser ):
                     pass
                 elif token in [SourceVfrSyntaxParser.StringIdentifier]:
                     self.state = 2589
-                    localctx.D = self.match(SourceVfrSyntaxParser.StringIdentifier)
+                    localctx.ST = self.match(SourceVfrSyntaxParser.StringIdentifier)
                     self.state = 2593
                     self._errHandler.sync(self)
                     _la = self._input.LA(1)

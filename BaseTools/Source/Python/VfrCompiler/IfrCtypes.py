@@ -5,6 +5,7 @@ from tkinter import YView
 import uuid
 from VfrError import *
 from struct import *
+import ctypes
 
 
 EFI_STRING_ID_INVALID = 0x0
@@ -107,6 +108,7 @@ EFI_HII_SIBT_EXT4 = 0x32
 EFI_HII_SIBT_FONT = 0x40
 
 BasicTypes = [EFI_IFR_TYPE_NUM_SIZE_8, EFI_IFR_TYPE_NUM_SIZE_16, EFI_IFR_TYPE_NUM_SIZE_32, EFI_IFR_TYPE_NUM_SIZE_64]
+BasicCInts = [c_uint64, c_uint32, c_uint16, c_uint8, c_ubyte, c_ushort]
 class EFI_GUID(Structure):
     _pack_ = 1
     _fields_ = [

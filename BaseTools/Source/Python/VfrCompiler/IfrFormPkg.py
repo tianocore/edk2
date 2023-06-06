@@ -952,33 +952,32 @@ EFI_FORM_ID_MAX = 0xFFFF
 EFI_FREE_FORM_ID_BITMAP_SIZE = int((EFI_FORM_ID_MAX + 1) / EFI_BITS_PER_UINT32)
 
 
+
 class IfrFormId():
-
-    FormIdBitMap = []
-    for i in range(0, EFI_FREE_FORM_ID_BITMAP_SIZE):
-        FormIdBitMap.append(0)
-
-    @classmethod
-    def Clear(cls):
-        cls.FormIdBitMap = []
+    def __init__(self):
+        self.FormIdBitMap = []
         for i in range(0, EFI_FREE_FORM_ID_BITMAP_SIZE):
-            cls.FormIdBitMap.append(0)
+            self.FormIdBitMap.append(0)
 
-    @classmethod
-    def CheckFormIdFree(cls, FormId):
+    def Clear(self):
+        self.FormIdBitMap = []
+        for i in range(0, EFI_FREE_FORM_ID_BITMAP_SIZE):
+            self.FormIdBitMap.append(0)
 
-        Index = int(FormId / EFI_BITS_PER_UINT32)
-        Offset = FormId % EFI_BITS_PER_UINT32
-
-        return (cls.FormIdBitMap[Index] & (0x80000000 >> Offset)) == 0
-
-    @classmethod
-    def MarkFormIdUsed(cls, FormId):
+    def CheckFormIdFree(self, FormId):
 
         Index = int(FormId / EFI_BITS_PER_UINT32)
         Offset = FormId % EFI_BITS_PER_UINT32
-        cls.FormIdBitMap[Index] |= (0x80000000 >> Offset)
 
+        return (self.FormIdBitMap[Index] & (0x80000000 >> Offset)) == 0
+
+    def MarkFormIdUsed(self, FormId):
+
+        Index = int(FormId / EFI_BITS_PER_UINT32)
+        Offset = FormId % EFI_BITS_PER_UINT32
+        self.FormIdBitMap[Index] |= (0x80000000 >> Offset)
+
+gIfrFormId = IfrFormId()
 
 class IfrForm(IfrLine, IfrOpHeader):
 
@@ -992,10 +991,10 @@ class IfrForm(IfrLine, IfrOpHeader):
         # FormId can't be 0.
         if FormId == 0:
             return VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
-        if IfrFormId.CheckFormIdFree(FormId) == False:
+        if gIfrFormId.CheckFormIdFree(FormId) == False:
             return VfrReturnCode.VFR_RETURN_FORMID_REDEFINED
         self.Form.FormId = FormId
-        IfrFormId.MarkFormIdUsed(FormId)
+        gIfrFormId.MarkFormIdUsed(FormId)
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
     def SetFormTitle(self, FormTitle):
@@ -1017,10 +1016,10 @@ class IfrFormMap(IfrLine, IfrOpHeader):
         if FormId == 0:
             return VfrReturnCode.VFR_RETURN_INVALID_PARAMETER
 
-        if IfrFormId.CheckFormIdFree(FormId) == False:
+        if gIfrFormId.CheckFormIdFree(FormId) == False:
             return VfrReturnCode.VFR_RETURN_FORMID_REDEFINED
         self.FormMap.FormId = FormId
-        IfrFormId.MarkFormIdUsed(FormId)
+        gIfrFormId.MarkFormIdUsed(FormId)
         return VfrReturnCode.VFR_RETURN_SUCCESS
 
     def SetFormMapMethod(self, MethodTitle, MethodGuid: EFI_GUID):
