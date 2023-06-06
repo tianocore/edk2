@@ -35,6 +35,7 @@
   UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
+  AcpiPlatformLib
   BaseLib
   BaseMemoryLib
   BhyveFwCtlLib
