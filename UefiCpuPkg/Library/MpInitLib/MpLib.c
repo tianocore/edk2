@@ -894,6 +894,31 @@ ApWakeupFunction (
 }
 
 /**
+  This function serves as the entry point for APs when
+  they are awakened by the stores in the memory address
+  indicated by the MP_HANDOFF_INFO structure.
+
+  @param[in] CpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+EFIAPI
+DxeApEntryPoint (
+  CPU_MP_DATA  *CpuMpData
+  )
+{
+  UINTN  ProcessorNumber;
+
+  GetProcessorNumber (CpuMpData, &ProcessorNumber);
+  InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
+  RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+  PlaceAPInMwaitLoopOrRunLoop (
+    CpuMpData->ApLoopMode,
+    CpuMpData->CpuData[ProcessorNumber].StartupApSignal,
+    CpuMpData->ApTargetCState
+    );
+}
+
+/**
   Wait for AP wakeup and write AP start-up signal till AP is waken up.
 
   @param[in] ApStartupSignalBuffer  Pointer to AP wakeup signal
