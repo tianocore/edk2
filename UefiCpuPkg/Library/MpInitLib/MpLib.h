@@ -41,6 +41,14 @@
 #include <Guid/MicrocodePatchHob.h>
 
 #define WAKEUP_AP_SIGNAL  SIGNATURE_32 ('S', 'T', 'A', 'P')
+//
+// To trigger the start-up signal, BSP writes the specified
+// StartupSignalValue to the StartupSignalAddress of each processor.
+// This address is monitored by the APs, and as soon as they receive
+// the value that matches the MP_HAND_OFF_SIGNAL, they will wake up
+// and switch the context from PEI to DXE phase.
+//
+#define MP_HAND_OFF_SIGNAL  SIGNATURE_32 ('M', 'P', 'H', 'O')
 
 #define CPU_INIT_MP_LIB_HOB_GUID \
   { \
@@ -383,6 +391,7 @@ typedef
   );
 
 extern EFI_GUID  mCpuInitMpLibHobGuid;
+extern EFI_GUID  mMpHandOffGuid;
 
 /**
   Assembly code to place AP into safe loop mode.
