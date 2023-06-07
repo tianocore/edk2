@@ -19,8 +19,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#define MAX_IO_PORT_ADDRESS  0xFFFF
-
 //
 // Handle for the CPU I/O 2 Protocol
 //
@@ -143,16 +141,16 @@ CpuIoCheckParameter (
   // Address + Size * Count.  If the following condition is met, then the transfer
   // is not supported.
   //
-  //    Address + Size * Count > (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS) + 1
+  //    Address + Size * Count > MAX_ADDRESS + 1
   //
   // Since MAX_ADDRESS can be the maximum integer value supported by the CPU and Count
   // can also be the maximum integer value supported by the CPU, this range
   // check must be adjusted to avoid all overflow conditions.
   //
   // The following form of the range check is equivalent but assumes that
-  // MAX_ADDRESS and MAX_IO_PORT_ADDRESS are of the form (2^n - 1).
+  // MAX_ADDRESS is of the form (2^n - 1).
   //
-  Limit = (MmioOperation ? MAX_ADDRESS : MAX_IO_PORT_ADDRESS);
+  Limit = MAX_ADDRESS;
   if (Count == 0) {
     if (Address > Limit) {
       return EFI_UNSUPPORTED;
