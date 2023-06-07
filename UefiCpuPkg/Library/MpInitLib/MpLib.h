@@ -709,6 +709,16 @@ EnableDisableApWorker (
   );
 
 /**
+  Get pointer to MP_HAND_OFF GUIDed HOB.
+
+  @return  The pointer to MP_HAND_OFF structure.
+**/
+MP_HAND_OFF *
+GetMpHandOffHob (
+  VOID
+  );
+
+/**
   Get pointer to CPU MP Data structure from GUIDed HOB.
 
   @return  The pointer to CPU MP Data structure.

@@ -2796,6 +2796,28 @@ StartupThisAPWorker (
 }
 
 /**
+  Get pointer to MP_HAND_OFF GUIDed HOB.
+
+  @return  The pointer to MP_HAND_OFF structure.
+**/
+MP_HAND_OFF *
+GetMpHandOffHob (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  MP_HAND_OFF        *MpHandOff;
+
+  MpHandOff = NULL;
+  GuidHob   = GetFirstGuidHob (&mMpHandOffGuid);
+  if (GuidHob != NULL) {
+    MpHandOff = (MP_HAND_OFF *)GET_GUID_HOB_DATA (GuidHob);
+  }
+
+  return MpHandOff;
+}
+
+/**
   Get pointer to CPU MP Data structure from GUIDed HOB.
 
   @return  The pointer to CPU MP Data structure.
