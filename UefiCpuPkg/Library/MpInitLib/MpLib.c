@@ -730,6 +730,7 @@ ApWakeupFunction (
   UINT64            ApTopOfStack;
   UINTN             CurrentApicMode;
   AP_STACK_DATA     *ApStackData;
+  UINT32            OriginalValue;
 
   //
   // AP finished assembly code and begin to execute C code
@@ -775,6 +776,15 @@ ApWakeupFunction (
       // Clear AP start-up signal when AP waken up
       //
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
+      OriginalValue         = InterlockedCompareExchange32 (
+                                (UINT32 *)ApStartupSignalBuffer,
+                                MP_HAND_OFF_SIGNAL,
+                                0
+                                );
+      if (OriginalValue == MP_HAND_OFF_SIGNAL) {
+        SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateReady);
+      }
+
       InterlockedCompareExchange32 (
         (UINT32 *)ApStartupSignalBuffer,
         WAKEUP_AP_SIGNAL,
