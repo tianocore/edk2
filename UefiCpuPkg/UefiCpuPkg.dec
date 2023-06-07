@@ -175,6 +175,12 @@
   # @Prompt Support SmmFeatureControl.
   gUefiCpuPkgTokenSpaceGuid.PcdSmmFeatureControlEnable|TRUE|BOOLEAN|0x32132110
 
+  ## Indicates if SMM perf logging in APs will be enabled.<BR><BR>
+  #   TRUE  - SMM perf logging in APs will be enabled.<BR>
+  #   FALSE - SMM perf logging in APs will not be enabled.<BR>
+  # @Prompt Enable SMM perf logging in APs.
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmApPerfLogEnable|TRUE|BOOLEAN|0x32132114
+
 [PcdsFixedAtBuild]
   ## List of exception vectors which need switching stack.
   #  This PCD will only take into effect if PcdCpuStackGuard is enabled.

@@ -784,7 +784,7 @@ BSPHandler (
   // Any SMM MP performance logging after this point will be migrated in next SMI.
   //
   PERF_CODE (
-    MigrateMpPerf (gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
+    MigrateMpPerf (gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus, CpuIndex);
     );
 
   //
