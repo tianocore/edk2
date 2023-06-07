@@ -187,10 +187,11 @@ def main():
     parser.add_argument("-s", "--SpecRevision", type=ValidateSpecRevision, default ='0.7', help='Indicates compliance with a revision of this specification in the BCD format.')
     parser.add_argument("-r", "--Revision", type=Validate32BitInteger, default ='0x0000010105', help='Revision of the Payload binary. Major.Minor.Revision.Build')
     parser.add_argument("-o", "--ProducerId", default ='INTEL', help='A null-terminated OEM-supplied string that identifies the payload producer (16 bytes maximal).')
-    parser.add_argument("-e", "--BuildEntryOnly", action='store_true', help='Build UniversalPayload Entry file')
-    parser.add_argument("-pb", "--PreBuildUplBinary", default=None, help='Specify the UniversalPayload file')
     parser.add_argument("-sk", "--SkipBuild", action='store_true', help='Skip UniversalPayload build')
     parser.add_argument("-af", "--AddFv", type=ValidateAddFv, action='append', help='Add or replace specific FV into payload, Ex: uefi_fv=XXX.fv')
+    command_group = parser.add_mutually_exclusive_group()
+    command_group.add_argument("-e", "--BuildEntryOnly", action='store_true', help='Build UniversalPayload Entry file')
+    command_group.add_argument("-pb", "--PreBuildUplBinary", default=None, help='Specify the UniversalPayload file')
     args = parser.parse_args()
 
     MultiFvList = []
