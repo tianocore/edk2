@@ -399,6 +399,11 @@
   ## Include/Guid/EndofS3Resume.h
   gEdkiiEndOfS3ResumeGuid = { 0x96f5296d, 0x05f7, 0x4f3c, {0x84, 0x67, 0xe4, 0x56, 0x89, 0x0e, 0x0c, 0xb5 } }
 
+  ## Memory Protection Settings Guid. Used to create and fetch the memory protection settings HOB entry.
+  #
+  # Include/Guid/MemoryProtectionSettings
+  gMemoryProtectionSettingsGuid = { 0x9ABFD639, 0xD1D0, 0x4EFF, { 0xBD, 0xB6, 0x7E, 0xC4, 0x19, 0x0D, 0x17, 0xD5 }}
+
   ## Used (similar to Variable Services) to communicate policies to the enforcement engine.
   # {DA1B0D11-D1A7-46C4-9DC9-F3714875C6EB}
   gVarCheckPolicyLibMmiHandlerGuid = { 0xda1b0d11, 0xd1a7, 0x46c4, { 0x9d, 0xc9, 0xf3, 0x71, 0x48, 0x75, 0xc6, 0xeb }}
