@@ -349,6 +349,8 @@ ConvertMemoryPageAttributes (
   IA32_MAP_ENTRY        *Map;
   UINTN                 Count;
   UINTN                 Index;
+  UINT64                OverlappedRangeBase;
+  UINT64                OverlappedRangeLimit;
 
   ASSERT (Attributes != 0);
   ASSERT ((Attributes & ~EFI_MEMORY_ATTRIBUTE_MASK) == 0);
@@ -430,6 +432,52 @@ ConvertMemoryPageAttributes (
       // By default memory is Ring 3 accessble.
       //
       PagingAttribute.Bits.UserSupervisor = 1;
+
+      DEBUG_CODE_BEGIN ();
+      if (((Attributes & EFI_MEMORY_RO) == 0) || (((Attributes & EFI_MEMORY_XP) == 0) && (mXdSupported))) {
+        //
+        // When mapping a range to present and EFI_MEMORY_RO or EFI_MEMORY_XP is not specificed,
+        // check if [BaseAddress, BaseAddress + Length] contains present range.
+        // Existing Present range in [BaseAddress, BaseAddress + Length] is set to NX disable or ReadOnly.
+        //
+        Count  = 0;
+        Map    = NULL;
+        Status = PageTableParse (PageTableBase, mPagingMode, NULL, &Count);
+
+        while (Status == RETURN_BUFFER_TOO_SMALL) {
+          if (Map != NULL) {
+            FreePool (Map);
+          }
+
+          Map = AllocatePool (Count * sizeof (IA32_MAP_ENTRY));
+          ASSERT (Map != NULL);
+          Status = PageTableParse (PageTableBase, mPagingMode, Map, &Count);
+        }
+
+        ASSERT_RETURN_ERROR (Status);
+        for (Index = 0; Index < Count; Index++) {
+          if (Map[Index].LinearAddress >= BaseAddress + Length) {
+            break;
+          }
+
+          if ((BaseAddress < Map[Index].LinearAddress + Map[Index].Length) && (BaseAddress + Length > Map[Index].LinearAddress)) {
+            OverlappedRangeBase  = MAX (BaseAddress, Map[Index].LinearAddress);
+            OverlappedRangeLimit = MIN (BaseAddress + Length, Map[Index].LinearAddress + Map[Index].Length);
+
+            if (((Attributes & EFI_MEMORY_RO) == 0) && (Map[Index].Attribute.Bits.ReadWrite == 1)) {
+              DEBUG ((DEBUG_ERROR, "SMM ConvertMemoryPageAttributes: [0x%lx, 0x%lx] is set from ReadWrite to ReadOnly\n", OverlappedRangeBase, OverlappedRangeLimit));
+            }
+
+            if (((Attributes & EFI_MEMORY_XP) == 0) && (mXdSupported) && (Map[Index].Attribute.Bits.Nx == 1)) {
+              DEBUG ((DEBUG_ERROR, "SMM ConvertMemoryPageAttributes: [0x%lx, 0x%lx] is set from NX enabled to NX disabled\n", OverlappedRangeBase, OverlappedRangeLimit));
+            }
+          }
+        }
+
+        FreePool (Map);
+      }
+
+      DEBUG_CODE_END ();
     }
   }
 
