@@ -1,0 +1,36 @@
+## @file
+# SMM library instance to support platform-specific global controls for all memory protections.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StandaloneMmMemoryProtectionHobLib
+  FILE_GUID                      = C0A0D9C4-A249-483A-86EA-D73146D397B3
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MmMemoryProtectionHobLib|MM_CORE_STANDALONE MM_STANDALONE
+  CONSTRUCTOR                    = StandaloneMmMemoryProtectionHobLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  MmCommonMemoryProtectionHobLib.c
+  StandaloneMmMemoryProtectionHobLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  HobLib
+  DebugLib
+  BaseMemoryLib
+
+[Guids]
+  gMmMemoryProtectionSettingsGuid
