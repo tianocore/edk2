@@ -81,14 +81,6 @@ EDK II Releases:
 W: https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
-UEFI Shell Binaries (ShellBinPkg.zip) from EDK II Releases:
------------------------------------------------------------
-W: https://github.com/tianocore/edk2/releases/
-M: Ray Ni <ray.ni@intel.com> [niruiyu]                        (Ia32/X64)
-M: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]           (Ia32/X64)
-M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]           (ARM/AArch64)
-M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel] (ARM/AArch64)
-
 EDK II Architectures:
 ---------------------
 ARM, AARCH64
