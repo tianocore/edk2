@@ -1499,6 +1499,72 @@ CalculateTimeout (
 }
 
 /**
+  Switch Context for each AP.
+
+**/
+VOID
+EFIAPI
+SwitchContextPerAp (
+  VOID
+  )
+{
+  UINTN            ProcessorNumber;
+  UINTN            StackBase;
+  CPU_MP_DATA      *CpuMpData;
+  CPU_INFO_IN_HOB  *CpuInfoInHob;
+
+  CpuMpData    = GetCpuMpData ();
+  CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+  GetProcessorNumber (CpuMpData, &ProcessorNumber);
+
+  StackBase = CpuMpData->Buffer + ProcessorNumber * (CpuMpData->CpuApStackSize);
+  SwitchStack (
+    (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeApEntryPoint,
+    (VOID *)(UINTN)CpuMpData,
+    NULL,
+    (VOID *)((UINTN)CpuInfoInHob[ProcessorNumber].ApTopOfStack)
+    );
+}
+
+/**
+  This function is intended to be invoked by the BSP in order
+  to wake up the AP. The BSP accomplishes this by triggering a
+  start-up signal, which in turn causes any APs that are
+  currently in a loop on the PEI-prepared memory to awaken and
+  begin running the procedure called SwitchContextPerAp.
+  This procedure allows the AP to switch to another section of
+  memory and continue its loop there.
+
+  @param[in] MpHandOff  Pointer to MP hand-off data structure.
+**/
+VOID
+SwitchApContext (
+  IN MP_HAND_OFF  *MpHandOff
+  )
+{
+  UINTN   Index;
+  UINT32  BspNumber;
+
+  BspNumber = GetBspNumber (MpHandOff);
+
+  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+    if (Index != BspNumber) {
+      *(UINTN *)(UINTN)MpHandOff->Info[Index].StartupProcedureAddress = (UINTN)SwitchContextPerAp;
+      *(UINT32 *)(UINTN)MpHandOff->Info[Index].StartupSignalAddress   = MpHandOff->StartupSignalValue;
+    }
+  }
+
+  //
+  // Wait all APs waken up if this is not the 1st broadcast of SIPI
+  //
+  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+    if (Index != BspNumber) {
+      WaitApWakeup ((UINT32 *)(UINTN)(MpHandOff->Info[Index].StartupSignalAddress));
+    }
+  }
+}
+
+/**
   Checks whether timeout expires.
 
   Check whether the number of elapsed performance counter ticks required for

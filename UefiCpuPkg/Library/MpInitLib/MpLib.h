@@ -293,6 +293,7 @@ struct _CPU_MP_DATA {
   UINTN                            WakeupBufferHigh;
   UINTN                            BackupBuffer;
   UINTN                            BackupBufferSize;
+  MP_HAND_OFF                      *MpHandOff;
 
   volatile UINT32                  FinishedCount;
   UINT32                           RunningCount;
@@ -519,6 +520,15 @@ GetBspNumber (
 UINTN
 GetWakeupBuffer (
   IN UINTN  WakeupBufferSize
+  );
+
+/**
+  Switch Context for each AP.
+
+**/
+VOID
+SwitchApContext (
+  IN MP_HAND_OFF  *MpHandOff
   );
 
 /**
