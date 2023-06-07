@@ -13,6 +13,7 @@
 #include <Library/BaseLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/UefiLib.h>
+#include <Library/CpuLib.h>
 
 #include <Register/Intel/ArchitecturalMsr.h>
 #include <Register/Intel/Cpuid.h>
@@ -36,21 +37,6 @@
 // BEGIN: MtrrLib internal library globals and function prototypes here for testing
 //
 extern CONST CHAR8  *mMtrrMemoryCacheTypeShortName[];
-
-/**
-  Initializes the valid bits mask and valid address mask for MTRRs.
-
-  This function initializes the valid bits mask and valid address mask for MTRRs.
-
-  @param[out]  MtrrValidBitsMask     The mask for the valid bit of the MTRR
-  @param[out]  MtrrValidAddressMask  The valid address mask for the MTRR
-
-**/
-VOID
-MtrrLibInitializeMtrrMask (
-  OUT UINT64  *MtrrValidBitsMask,
-  OUT UINT64  *MtrrValidAddressMask
-  );
 
 /**
   Convert variable MTRRs to a RAW MTRR_MEMORY_RANGE array.
@@ -151,7 +137,7 @@ AccessAllMtrrs (
   MtrrGetAllMtrrs (&LocalMtrrs);
   Mtrrs = &LocalMtrrs;
 
-  MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
+  GetMaxPlatformAddressBits (&MtrrValidBitsMask, &MtrrValidAddressMask);
   Ranges[0].BaseAddress = 0;
   Ranges[0].Length      = MtrrValidBitsMask + 1;
   Ranges[0].Type        = MtrrGetDefaultMemoryType ();

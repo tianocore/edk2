@@ -34,6 +34,7 @@
   MtrrLib
   UefiDriverEntryPoint
   UefiLib
+  CpuLib
 
 [Depex]
   TRUE
