@@ -51,6 +51,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/RegisterCpuFeaturesLib.h>
 #include <Library/PerformanceLib.h>
+#include <Library/CpuPageTableLib.h>
 
 #include <AcpiCpuData.h>
 #include <CpuHotPlugData.h>
@@ -262,6 +263,7 @@ extern UINTN                 mNumberOfCpus;
 extern EFI_SMM_CPU_PROTOCOL  mSmmCpu;
 extern EFI_MM_MP_PROTOCOL    mSmmMp;
 extern BOOLEAN               m5LevelPagingNeeded;
+extern PAGING_MODE           mPagingMode;
 
 ///
 /// The mode of the CPU at the time an SMI occurs
@@ -1010,11 +1012,10 @@ SetPageTableAttributes (
   Length from their current attributes to the attributes specified by Attributes.
 
   @param[in]   PageTableBase    The page table base.
-  @param[in]   EnablePML5Paging If PML5 paging is enabled.
+  @param[in]   PagingMode       The paging mode.
   @param[in]   BaseAddress      The physical address that is the start address of a memory region.
   @param[in]   Length           The size in bytes of the memory region.
   @param[in]   Attributes       The bit mask of attributes to set for the memory region.
-  @param[out]  IsSplitted       TRUE means page table splitted. FALSE means page table not splitted.
 
   @retval EFI_SUCCESS           The attributes were set for the memory region.
   @retval EFI_ACCESS_DENIED     The attributes for the memory resource range specified by
@@ -1032,12 +1033,11 @@ SetPageTableAttributes (
 **/
 EFI_STATUS
 SmmSetMemoryAttributesEx (
-  IN  UINTN                 PageTableBase,
-  IN  BOOLEAN               EnablePML5Paging,
-  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN  UINT64                Length,
-  IN  UINT64                Attributes,
-  OUT BOOLEAN               *IsSplitted  OPTIONAL
+  IN  UINTN             PageTableBase,
+  IN  PAGING_MODE       PagingMode,
+  IN  PHYSICAL_ADDRESS  BaseAddress,
+  IN  UINT64            Length,
+  IN  UINT64            Attributes
   );
 
 /**
@@ -1045,34 +1045,32 @@ SmmSetMemoryAttributesEx (
   Length from their current attributes to the attributes specified by Attributes.
 
   @param[in]   PageTableBase    The page table base.
-  @param[in]   EnablePML5Paging If PML5 paging is enabled.
+  @param[in]   PagingMode       The paging mode.
   @param[in]   BaseAddress      The physical address that is the start address of a memory region.
   @param[in]   Length           The size in bytes of the memory region.
   @param[in]   Attributes       The bit mask of attributes to clear for the memory region.
-  @param[out]  IsSplitted       TRUE means page table splitted. FALSE means page table not splitted.
 
   @retval EFI_SUCCESS           The attributes were cleared for the memory region.
   @retval EFI_ACCESS_DENIED     The attributes for the memory resource range specified by
                                 BaseAddress and Length cannot be modified.
   @retval EFI_INVALID_PARAMETER Length is zero.
                                 Attributes specified an illegal combination of attributes that
-                                cannot be set together.
+                                cannot be cleared together.
   @retval EFI_OUT_OF_RESOURCES  There are not enough system resources to modify the attributes of
                                 the memory resource range.
   @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
                                 resource range specified by BaseAddress and Length.
-                                The bit mask of attributes is not support for the memory resource
+                                The bit mask of attributes is not supported for the memory resource
                                 range specified by BaseAddress and Length.
 
 **/
 EFI_STATUS
 SmmClearMemoryAttributesEx (
   IN  UINTN                 PageTableBase,
-  IN  BOOLEAN               EnablePML5Paging,
+  IN  PAGING_MODE           PagingMode,
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length,
-  IN  UINT64                Attributes,
-  OUT BOOLEAN               *IsSplitted  OPTIONAL
+  IN  UINT64                Attributes
   );
 
 /**
