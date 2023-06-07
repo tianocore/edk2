@@ -618,7 +618,6 @@ R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 ShellPkg
 F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 
 SignedCapsulePkg
@@ -655,7 +654,6 @@ UefiPayloadPkg
 F: UefiPayloadPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Guo Dong <guo.dong@intel.com> [gdong1]
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
