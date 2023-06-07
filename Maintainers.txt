@@ -644,7 +644,6 @@ F: StandaloneMmPkg/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-R: Supreeth Venkatesh <supreeth.venkatesh@arm.com> [supven01]
 
 UefiCpuPkg
 F: UefiCpuPkg/
