@@ -22,26 +22,19 @@
   @param  Delay     A period of time to delay in ticks.
 
 **/
+STATIC
 VOID
 InternalRiscVTimerDelay (
-  IN UINT32  Delay
+  IN UINT64  Delay
   )
 {
-  UINT32  Ticks;
-  UINT32  Times;
+  UINT64  Ticks;
 
-  Times  = Delay >> (RISCV_TIMER_COMPARE_BITS - 2);
-  Delay &= ((1 << (RISCV_TIMER_COMPARE_BITS - 2)) - 1);
-  do {
-    //
-    // The target timer count is calculated here
-    //
-    Ticks = RiscVReadTimer () + Delay;
-    Delay = 1 << (RISCV_TIMER_COMPARE_BITS - 2);
-    while (((Ticks - RiscVReadTimer ()) & (1 << (RISCV_TIMER_COMPARE_BITS - 1))) == 0) {
-      CpuPause ();
-    }
-  } while (Times-- > 0);
+  Ticks = RiscVReadTimer () + Delay;
+
+  while (RiscVReadTimer () <= Ticks) {
+    CpuPause ();
+  }
 }
 
 /**
@@ -61,13 +54,13 @@ MicroSecondDelay (
   )
 {
   InternalRiscVTimerDelay (
-    (UINT32)DivU64x32 (
-              MultU64x32 (
-                MicroSeconds,
-                PcdGet64 (PcdCpuCoreCrystalClockFrequency)
-                ),
-              1000000u
-              )
+    DivU64x32 (
+      MultU64x32 (
+        MicroSeconds,
+        PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+        ),
+      1000000u
+      )
     );
   return MicroSeconds;
 }
@@ -89,13 +82,13 @@ NanoSecondDelay (
   )
 {
   InternalRiscVTimerDelay (
-    (UINT32)DivU64x32 (
-              MultU64x32 (
-                NanoSeconds,
-                PcdGet64 (PcdCpuCoreCrystalClockFrequency)
-                ),
-              1000000000u
-              )
+    DivU64x32 (
+      MultU64x32 (
+        NanoSeconds,
+        PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+        ),
+      1000000000u
+      )
     );
   return NanoSeconds;
 }
