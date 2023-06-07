@@ -14,6 +14,7 @@
 #include <Register/Amd/Ghcb.h>
 
 EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
+EFI_GUID  mMpHandOffGuid       = MP_HANDOFF_GUID;
 
 /**
   Save the volatile registers required to be restored following INIT IPI.
@@ -1815,6 +1816,59 @@ CheckAllAPs (
 }
 
 /**
+  This function Get BspNumber.
+
+  @param[in] MpHandOff        Pointer to MpHandOff
+  @return                     BspNumber
+**/
+UINT32
+GetBspNumber (
+  IN CONST MP_HAND_OFF  *MpHandOff
+  )
+{
+  UINT32  ApicId;
+  UINT32  BspNumber;
+  UINT32  Index;
+
+  //
+  // Get the processor number for the BSP
+  //
+  BspNumber = MAX_UINT32;
+  ApicId    = GetInitialApicId ();
+  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+    if (MpHandOff->Info[Index].ApicId == ApicId) {
+      BspNumber = Index;
+    }
+  }
+
+  ASSERT (BspNumber != MAX_UINT32);
+
+  return BspNumber;
+}
+
+/**
+  Get pointer to MP_HAND_OFF GUIDed HOB.
+
+  @return  The pointer to MP_HAND_OFF structure.
+**/
+MP_HAND_OFF *
+GetMpHandOffHob (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  MP_HAND_OFF        *MpHandOff;
+
+  MpHandOff = NULL;
+  GuidHob   = GetFirstGuidHob (&mMpHandOffGuid);
+  if (GuidHob != NULL) {
+    MpHandOff = (MP_HAND_OFF *)GET_GUID_HOB_DATA (GuidHob);
+  }
+
+  return MpHandOff;
+}
+
+/**
   MP Initialize Library initialization.
 
   This service will allocate AP reset vector and wakeup all APs to do APs
@@ -1833,7 +1887,7 @@ MpInitLibInitialize (
   VOID
   )
 {
-  CPU_MP_DATA              *OldCpuMpData;
+  MP_HAND_OFF              *MpHandOff;
   CPU_INFO_IN_HOB          *CpuInfoInHob;
   UINT32                   MaxLogicalProcessorNumber;
   UINT32                   ApStackSize;
@@ -1852,11 +1906,11 @@ MpInitLibInitialize (
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
 
-  OldCpuMpData = GetCpuMpDataFromGuidedHob ();
-  if (OldCpuMpData == NULL) {
+  MpHandOff = GetMpHandOffHob ();
+  if (MpHandOff == NULL) {
     MaxLogicalProcessorNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
   } else {
-    MaxLogicalProcessorNumber = OldCpuMpData->CpuCount;
+    MaxLogicalProcessorNumber = MpHandOff->CpuCount;
   }
 
   ASSERT (MaxLogicalProcessorNumber != 0);
@@ -2000,7 +2054,7 @@ MpInitLibInitialize (
   //
   ProgramVirtualWireMode ();
 
-  if (OldCpuMpData == NULL) {
+  if (MpHandOff == NULL) {
     if (MaxLogicalProcessorNumber > 1) {
       //
       // Wakeup all APs and calculate the processor count in system
@@ -2012,15 +2066,18 @@ MpInitLibInitialize (
     // APs have been wakeup before, just get the CPU Information
     // from HOB
     //
-    OldCpuMpData->NewCpuMpData = CpuMpData;
-    CpuMpData->CpuCount        = OldCpuMpData->CpuCount;
-    CpuMpData->BspNumber       = OldCpuMpData->BspNumber;
-    CpuMpData->CpuInfoInHob    = OldCpuMpData->CpuInfoInHob;
-    CpuInfoInHob               = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+    AmdSevUpdateCpuMpData (CpuMpData);
+    CpuMpData->CpuCount  = MpHandOff->CpuCount;
+    CpuMpData->BspNumber = GetBspNumber (MpHandOff);
+    CpuInfoInHob         = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
     for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
       InitializeSpinLock (&CpuMpData->CpuData[Index].ApLock);
-      CpuMpData->CpuData[Index].CpuHealthy = (CpuInfoInHob[Index].Health == 0) ? TRUE : FALSE;
+      CpuMpData->CpuData[Index].CpuHealthy = (MpHandOff->Info[Index].Health == 0) ? TRUE : FALSE;
       CpuMpData->CpuData[Index].ApFunction = 0;
+      CpuInfoInHob[Index].InitialApicId    = MpHandOff->Info[Index].ApicId;
+      CpuInfoInHob[Index].ApTopOfStack     = CpuMpData->Buffer + (Index + 1) * CpuMpData->CpuApStackSize;
+      CpuInfoInHob[Index].ApicId           = MpHandOff->Info[Index].ApicId;
+      CpuInfoInHob[Index].Health           = MpHandOff->Info[Index].Health;
     }
   }
 
@@ -2049,7 +2106,7 @@ MpInitLibInitialize (
   // Wakeup APs to do some AP initialize sync (Microcode & MTRR)
   //
   if (CpuMpData->CpuCount > 1) {
-    if (OldCpuMpData != NULL) {
+    if (MpHandOff != NULL) {
       //
       // Only needs to use this flag for DXE phase to update the wake up
       // buffer. Wakeup buffer allocated in PEI phase is no longer valid
@@ -2066,7 +2123,7 @@ MpInitLibInitialize (
       CpuPause ();
     }
 
-    if (OldCpuMpData != NULL) {
+    if (MpHandOff != NULL) {
       CpuMpData->InitFlag = ApInitDone;
     }
 
