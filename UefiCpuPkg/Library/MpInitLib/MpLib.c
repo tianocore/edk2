@@ -660,6 +660,54 @@ PlaceAPInHltLoop (
 }
 
 /**
+  This function place APs in Mwait or Run loop.
+
+  @param[in] ApLoopMode                   Ap Loop Mode
+  @param[in] ApStartupSignalBuffer        Pointer to Ap Startup Signal Buffer
+  @param[in] ApTargetCState               Ap Target CState
+**/
+VOID
+PlaceAPInMwaitLoopOrRunLoop (
+  IN UINT8            ApLoopMode,
+  IN volatile UINT32  *ApStartupSignalBuffer,
+  IN UINT8            ApTargetCState
+  )
+{
+  while (TRUE) {
+    DisableInterrupts ();
+    if (ApLoopMode == ApInMwaitLoop) {
+      //
+      // Place AP in MWAIT-loop
+      //
+      AsmMonitor ((UINTN)ApStartupSignalBuffer, 0, 0);
+      if ((*ApStartupSignalBuffer != WAKEUP_AP_SIGNAL) && (*ApStartupSignalBuffer != MP_HAND_OFF_SIGNAL)) {
+        //
+        // Check AP start-up signal again.
+        // If AP start-up signal is not set, place AP into
+        // the specified C-state
+        //
+        AsmMwait (ApTargetCState << 4, 0);
+      }
+    } else if (ApLoopMode == ApInRunLoop) {
+      //
+      // Place AP in Run-loop
+      //
+      CpuPause ();
+    } else {
+      ASSERT (FALSE);
+    }
+
+    //
+    // If AP start-up signal is written, AP is waken up
+    // otherwise place AP in loop again
+    //
+    if ((*ApStartupSignalBuffer == WAKEUP_AP_SIGNAL) || (*ApStartupSignalBuffer == MP_HAND_OFF_SIGNAL)) {
+      break;
+    }
+  }
+}
+
+/**
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
   @param[in] ExchangeInfo     Pointer to the MP exchange info buffer
@@ -839,39 +887,8 @@ ApWakeupFunction (
       //
       // Never run here
       //
-    }
-
-    while (TRUE) {
-      DisableInterrupts ();
-      if (CpuMpData->ApLoopMode == ApInMwaitLoop) {
-        //
-        // Place AP in MWAIT-loop
-        //
-        AsmMonitor ((UINTN)ApStartupSignalBuffer, 0, 0);
-        if (*ApStartupSignalBuffer != WAKEUP_AP_SIGNAL) {
-          //
-          // Check AP start-up signal again.
-          // If AP start-up signal is not set, place AP into
-          // the specified C-state
-          //
-          AsmMwait (CpuMpData->ApTargetCState << 4, 0);
-        }
-      } else if (CpuMpData->ApLoopMode == ApInRunLoop) {
-        //
-        // Place AP in Run-loop
-        //
-        CpuPause ();
-      } else {
-        ASSERT (FALSE);
-      }
-
-      //
-      // If AP start-up signal is written, AP is waken up
-      // otherwise place AP in loop again
-      //
-      if (*ApStartupSignalBuffer == WAKEUP_AP_SIGNAL) {
-        break;
-      }
+    } else {
+      PlaceAPInMwaitLoopOrRunLoop (CpuMpData->ApLoopMode, ApStartupSignalBuffer, CpuMpData->ApTargetCState);
     }
   }
 }
