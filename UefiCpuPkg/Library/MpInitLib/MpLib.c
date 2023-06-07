@@ -729,6 +729,7 @@ ApWakeupFunction (
   UINT64            ApTopOfStack;
   UINTN             CurrentApicMode;
   AP_STACK_DATA     *ApStackData;
+  UINT32            OriginalValue;
 
   //
   // AP's local APIC settings will be lost after received INIT IPI
@@ -769,6 +770,15 @@ ApWakeupFunction (
       // Clear AP start-up signal when AP waken up
       //
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
+      OriginalValue         = InterlockedCompareExchange32 (
+                                (UINT32 *)ApStartupSignalBuffer,
+                                MP_HAND_OFF_SIGNAL,
+                                0
+                                );
+      if (OriginalValue == MP_HAND_OFF_SIGNAL) {
+        SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateReady);
+      }
+
       InterlockedCompareExchange32 (
         (UINT32 *)ApStartupSignalBuffer,
         WAKEUP_AP_SIGNAL,
@@ -885,6 +895,32 @@ ApWakeupFunction (
       PlaceAPInMwaitLoopOrRunLoop (CpuMpData->ApLoopMode, ApStartupSignalBuffer, CpuMpData->ApTargetCState);
     }
   }
+}
+
+/**
+  This function serves as the entry point for APs when
+  they are awakened by the stores in the memory address
+  indicated by the MP_HANDOFF_INFO structure.
+
+  @param[in] CpuMpData        Pointer to PEI CPU MP Data
+**/
+VOID
+EFIAPI
+DxeApEntryPoint (
+  CPU_MP_DATA  *CpuMpData
+  )
+{
+  UINTN  ProcessorNumber;
+
+  GetProcessorNumber (CpuMpData, &ProcessorNumber);
+  InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
+  RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+  PlaceAPInMwaitLoopOrRunLoop (
+    CpuMpData->ApLoopMode,
+    CpuMpData->CpuData[ProcessorNumber].StartupApSignal,
+    CpuMpData->ApTargetCState
+    );
+  ApWakeupFunction (CpuMpData, ProcessorNumber);
 }
 
 /**
@@ -1454,6 +1490,70 @@ CalculateTimeout (
                ),
              1000000
              );
+  }
+}
+
+/**
+  Switch Context for each AP.
+
+**/
+VOID
+EFIAPI
+SwitchContextPerAp (
+  VOID
+  )
+{
+  UINTN            ProcessorNumber;
+  CPU_MP_DATA      *CpuMpData;
+  CPU_INFO_IN_HOB  *CpuInfoInHob;
+
+  CpuMpData    = GetCpuMpData ();
+  CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+  GetProcessorNumber (CpuMpData, &ProcessorNumber);
+
+  SwitchStack (
+    (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeApEntryPoint,
+    (VOID *)(UINTN)CpuMpData,
+    NULL,
+    (VOID *)((UINTN)CpuInfoInHob[ProcessorNumber].ApTopOfStack)
+    );
+}
+
+/**
+  This function is intended to be invoked by the BSP in order
+  to wake up the AP. The BSP accomplishes this by triggering a
+  start-up signal, which in turn causes any APs that are
+  currently in a loop on the PEI-prepared memory to awaken and
+  begin running the procedure called SwitchContextPerAp.
+  This procedure allows the AP to switch to another section of
+  memory and continue its loop there.
+
+  @param[in] MpHandOff  Pointer to MP hand-off data structure.
+**/
+VOID
+SwitchApContext (
+  IN MP_HAND_OFF  *MpHandOff
+  )
+{
+  UINTN   Index;
+  UINT32  BspNumber;
+
+  BspNumber = GetBspNumber (MpHandOff);
+
+  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+    if (Index != BspNumber) {
+      *(UINTN *)(UINTN)MpHandOff->Info[Index].StartupProcedureAddress = (UINTN)SwitchContextPerAp;
+      *(UINT32 *)(UINTN)MpHandOff->Info[Index].StartupSignalAddress   = MpHandOff->StartupSignalValue;
+    }
+  }
+
+  //
+  // Wait all APs waken up if this is not the 1st broadcast of SIPI
+  //
+  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+    if (Index != BspNumber) {
+      WaitApWakeup ((UINT32 *)(UINTN)(MpHandOff->Info[Index].StartupSignalAddress));
+    }
   }
 }
 
@@ -2067,6 +2167,38 @@ MpInitLibInitialize (
       CpuInfoInHob[Index].ApTopOfStack     = CpuMpData->Buffer + (Index + 1) * CpuMpData->CpuApStackSize;
       CpuInfoInHob[Index].ApicId           = MpHandOff->Info[Index].ApicId;
       CpuInfoInHob[Index].Health           = MpHandOff->Info[Index].Health;
+    }
+
+    DEBUG ((DEBUG_INFO, "MpHandOff->WaitLoopExecutionMode: %04d, sizeof (VOID *): %04d\n", MpHandOff->WaitLoopExecutionMode, sizeof (VOID *)));
+    if (MpHandOff->WaitLoopExecutionMode == sizeof (VOID *)) {
+      //
+      // In scenarios where both the PEI and DXE phases run in the same
+      // execution mode (32bit or 64bit), the BSP triggers
+      // a start-up signal during the DXE phase to wake up the APs. This causes any
+      // APs that are currently in a loop on the memory prepared during the PEI
+      // phase to awaken and run the SwitchContextPerAp procedure. This procedure
+      // enables the APs to switch to a different memory section and continue their
+      // looping process there.
+      //
+      CpuMpData->FinishedCount = 0;
+      CpuMpData->InitFlag      = ApInitDone;
+      SaveCpuMpData (CpuMpData);
+      SwitchApContext (MpHandOff);
+      ASSERT (CpuMpData->FinishedCount == (CpuMpData->CpuCount - 1));
+
+      //
+      // Set Apstate as Idle, otherwise Aps cannot be waken-up again.
+      // If any enabled AP is not idle, return EFI_NOT_READY during waken-up.
+      //
+      for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+        SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
+      }
+
+      //
+      // Initialize global data for MP support
+      //
+      InitMpGlobalData (CpuMpData);
+      return EFI_SUCCESS;
     }
   }
 
