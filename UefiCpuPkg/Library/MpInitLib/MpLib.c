@@ -638,6 +638,28 @@ InitializeApData (
 }
 
 /**
+  This function place APs in Halt loop.
+
+  @param[in] CpuMpData        Pointer to CPU MP Data
+**/
+VOID
+PlaceAPInHltLoop (
+  IN CPU_MP_DATA  *CpuMpData
+  )
+{
+  while (TRUE) {
+    DisableInterrupts ();
+    if (CpuMpData->UseSevEsAPMethod) {
+      SevEsPlaceApHlt (CpuMpData);
+    } else {
+      CpuSleep ();
+    }
+
+    CpuPause ();
+  }
+}
+
+/**
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
   @param[in] ExchangeInfo     Pointer to the MP exchange info buffer
@@ -813,19 +835,10 @@ ApWakeupFunction (
     // Place AP is specified loop mode
     //
     if (CpuMpData->ApLoopMode == ApInHltLoop) {
+      PlaceAPInHltLoop (CpuMpData);
       //
-      // Place AP in HLT-loop
+      // Never run here
       //
-      while (TRUE) {
-        DisableInterrupts ();
-        if (CpuMpData->UseSevEsAPMethod) {
-          SevEsPlaceApHlt (CpuMpData);
-        } else {
-          CpuSleep ();
-        }
-
-        CpuPause ();
-      }
     }
 
     while (TRUE) {
