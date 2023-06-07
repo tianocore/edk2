@@ -41,10 +41,23 @@
 #include <Guid/MicrocodePatchHob.h>
 
 #define WAKEUP_AP_SIGNAL  SIGNATURE_32 ('S', 'T', 'A', 'P')
+//
+// To trigger the start-up signal, BSP writes the specified
+// StartupSignalValue to the StartupSignalAddress of each processor.
+// This address is monitored by the APs, and as soon as they receive
+// the value that matches the MP_HAND_OFF_SIGNAL, they will wake up
+// and switch the context from PEI to DXE phase.
+//
+#define MP_HAND_OFF_SIGNAL  SIGNATURE_32 ('M', 'P', 'H', 'O')
 
 #define CPU_INIT_MP_LIB_HOB_GUID \
   { \
     0x58eb6a19, 0x3699, 0x4c68, { 0xa8, 0x36, 0xda, 0xcd, 0x8e, 0xdc, 0xad, 0x4a } \
+  }
+
+#define MP_HANDOFF_GUID \
+  { \
+    0x11e2bd88, 0xed38, 0x4abd, {0xa3, 0x99, 0x21, 0xf2, 0x5f, 0xd0, 0x7a, 0x60 } \
   }
 
 //
@@ -58,6 +71,37 @@
 // Default maximum number of entries to store the microcode patches information
 //
 #define DEFAULT_MAX_MICROCODE_PATCH_NUM  8
+
+//
+// The information required to transfer from the PEI phase to the
+// DXE phase is contained within the MP_HAND_OFF and PROCESSOR_HAND_OFF.
+// If the SizeOfPointer (WaitLoopExecutionMode) of both phases are equal,
+// and the APs is not in halt mode,
+// then the APs can be awakened by triggering the start-up
+// signal, rather than using INIT-SIPI-SIPI.
+// To trigger the start-up signal, BSP writes the specified
+// StartupSignalValue to the StartupSignalAddress of each processor.
+// This address is monitored by the APs.
+//
+typedef struct {
+  UINT32    ApicId;
+  UINT32    Health;
+  UINT64    StartupSignalAddress;
+  UINT64    StartupProcedureAddress;
+} PROCESSOR_HAND_OFF;
+
+typedef struct {
+  //
+  // The ProcessorIndex indicates the range of processors. If it is set to 0, it signifies
+  // processors from 0 to CpuCount - 1. Multiple instances in the HOB list describe
+  // processors from ProcessorIndex to ProcessorIndex + CpuCount - 1.
+  //
+  UINT32                ProcessorIndex;
+  UINT32                CpuCount;
+  UINT32                WaitLoopExecutionMode;
+  UINT32                StartupSignalValue;
+  PROCESSOR_HAND_OFF    Info[];
+} MP_HAND_OFF;
 
 //
 // Data structure for microcode patch information
@@ -347,6 +391,7 @@ typedef
   );
 
 extern EFI_GUID  mCpuInitMpLibHobGuid;
+extern EFI_GUID  mMpHandOffGuid;
 
 /**
   Assembly code to place AP into safe loop mode.
@@ -450,6 +495,17 @@ GetCpuMpData (
 VOID
 SaveCpuMpData (
   IN CPU_MP_DATA  *CpuMpData
+  );
+
+/**
+  This function Get BspNumber.
+
+  @param[in] MpHandOff        Pointer to MpHandOff
+  @return                     BspNumber
+**/
+UINT32
+GetBspNumber (
+  IN CONST MP_HAND_OFF  *MpHandOff
   );
 
 /**
@@ -650,6 +706,16 @@ EnableDisableApWorker (
   IN  UINTN    ProcessorNumber,
   IN  BOOLEAN  EnableAP,
   IN  UINT32   *HealthFlag OPTIONAL
+  );
+
+/**
+  Get pointer to MP_HAND_OFF GUIDed HOB.
+
+  @return  The pointer to MP_HAND_OFF structure.
+**/
+MP_HAND_OFF *
+GetMpHandOffHob (
+  VOID
   );
 
 /**
