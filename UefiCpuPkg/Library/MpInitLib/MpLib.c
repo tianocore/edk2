@@ -2175,6 +2175,33 @@ MpInitLibInitialize (
       CpuInfoInHob[Index].ApicId           = MpHandOff->Info[Index].ApicId;
       CpuInfoInHob[Index].Health           = MpHandOff->Info[Index].Health;
     }
+
+    DEBUG ((DEBUG_INFO, "MpHandOff->WaitLoopExecutionMode: %04d, sizeof (VOID *): %04d\n", MpHandOff->WaitLoopExecutionMode, sizeof (VOID *)));
+    if (MpHandOff->WaitLoopExecutionMode == sizeof (VOID *)) {
+      //
+      // In scenarios where both the PEI and DXE phases run in the same
+      // execution mode (32bit or 64bit), the BSP triggers
+      // a start-up signal during the DXE phase to wake up the APs. This causes any
+      // APs that are currently in a loop on the memory prepared during the PEI
+      // phase to awaken and run the SwitchContextPerAp procedure. This procedure
+      // enables the APs to switch to a different memory section and continue their
+      // looping process there.
+      //
+      CpuMpData->FinishedCount = 0;
+      CpuMpData->InitFlag      = ApInitDone;
+      CpuMpData->MpHandOff     = MpHandOff;
+      SaveCpuMpData (CpuMpData);
+      SwitchApContext (MpHandOff);
+      ASSERT (CpuMpData->FinishedCount == (CpuMpData->CpuCount - 1));
+
+      //
+      // Set Apstate as Idle, otherwise Aps cannot be waken-up again.
+      // If any enabled AP is not idle, return EFI_NOT_READY during waken-up.
+      //
+      for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+        SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
+      }
+    }
   }
 
   if (!GetMicrocodePatchInfoFromHob (
