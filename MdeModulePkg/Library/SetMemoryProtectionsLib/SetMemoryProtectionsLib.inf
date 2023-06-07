@@ -1,0 +1,48 @@
+## @file
+# Library for setting the memory protection settings for DXE.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SetMemoryProtectionsLib
+  FILE_GUID                      = DDA7DD34-0D3E-48FC-B4AE-A25581A40317
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SetMemoryProtectionsLib|SEC PEI_CORE PEIM
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  SetMemoryProtectionsLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  BaseLib
+  HobLib
+  DebugLib
+  PcdLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
+  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy
+
+[Guids]
+  gMemoryProtectionSettingsGuid
+
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -Wno-missing-braces
