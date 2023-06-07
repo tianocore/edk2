@@ -20,6 +20,10 @@
   Csm/Include
 
 [LibraryClasses]
+  ##  @libraryclass  Search and install ACPI tables.
+  #
+  AcpiPlatformLib|Include/Library/AcpiPlatformLib.h
+
   ##  @libraryclass  Access bhyve's firmware control interface.
   BhyveFwCtlLib|Include/Library/BhyveFwCtlLib.h
 

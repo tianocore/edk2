@@ -25,13 +25,13 @@
   AcpiPlatform.c
   AcpiPlatform.h
   EntryPoint.c
-  Xen.c
 
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  AcpiPlatformLib
   BaseLib
   DebugLib
   UefiBootServicesTableLib
