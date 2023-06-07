@@ -47,6 +47,11 @@
     0x58eb6a19, 0x3699, 0x4c68, { 0xa8, 0x36, 0xda, 0xcd, 0x8e, 0xdc, 0xad, 0x4a } \
   }
 
+#define MP_HANDOFF_GUID \
+  { \
+    0x11e2bd88, 0xed38, 0x4abd, {0xa3, 0x99, 0x21, 0xf2, 0x5f, 0xd0, 0x7a, 0x60 } \
+  }
+
 //
 //  The MP data for switch BSP
 //
@@ -58,6 +63,37 @@
 // Default maximum number of entries to store the microcode patches information
 //
 #define DEFAULT_MAX_MICROCODE_PATCH_NUM  8
+
+//
+// The information required to transfer from the PEI phase to the
+// DXE phase is contained within the MP_HAND_OFF and PROCESSOR_HAND_OFF.
+// If the SizeOfPointer (WaitLoopExecutionMode) of both phases are equal,
+// and the APs is not in halt mode,
+// then the APs can be awakened by triggering the start-up
+// signal, rather than using INIT-SIPI-SIPI.
+// To trigger the start-up signal, BSP writes the specified
+// StartupSignalValue to the StartupSignalAddress of each processor.
+// This address is monitored by the APs.
+//
+typedef struct {
+  UINT32    ApicId;
+  UINT32    Health;
+  UINT64    StartupSignalAddress;
+  UINT64    StartupProcedureAddress;
+} PROCESSOR_HAND_OFF;
+
+typedef struct {
+  //
+  // The ProcessorIndex indicates the range of processors. If it is set to 0, it signifies
+  // processors from 0 to CpuCount - 1. Multiple instances in the HOB list describe
+  // processors from ProcessorIndex to ProcessorIndex + CpuCount - 1.
+  //
+  UINT32                ProcessorIndex;
+  UINT32                CpuCount;
+  UINT32                WaitLoopExecutionMode;
+  UINT32                StartupSignalValue;
+  PROCESSOR_HAND_OFF    Info[];
+} MP_HAND_OFF;
 
 //
 // Data structure for microcode patch information

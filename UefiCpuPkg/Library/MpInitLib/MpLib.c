@@ -14,6 +14,7 @@
 #include <Register/Amd/Ghcb.h>
 
 EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
+EFI_GUID  mMpHandOffGuid       = MP_HANDOFF_GUID;
 
 /**
   Save the volatile registers required to be restored following INIT IPI.
