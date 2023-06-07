@@ -18,6 +18,7 @@ MSR_IA32_MTRR_PHYSMASK_REGISTER              mVariableMtrrsPhysMask[MTRR_NUMBER_
 MSR_IA32_MTRR_DEF_TYPE_REGISTER              mDefTypeMsr;
 MSR_IA32_MTRRCAP_REGISTER                    mMtrrCapMsr;
 MSR_IA32_TME_ACTIVATE_REGISTER               mTmeActivateMsr;
+MSR_IA32_TME_CAPABILITY_REGISTER             mTmeCapabilityMsr;
 CPUID_VERSION_INFO_EDX                       mCpuidVersionInfoEdx;
 CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  mCpuidExtendedFeatureFlagsEcx;
 CPUID_VIR_PHY_ADDRESS_SIZE_EAX               mCpuidVirPhyAddressSizeEax;
@@ -266,6 +267,10 @@ UnitTestMtrrLibAsmReadMsr64 (
     return mTmeActivateMsr.Uint64;
   }
 
+  if (MsrIndex == MSR_IA32_TME_CAPABILITY) {
+    return mTmeCapabilityMsr.Uint64;
+  }
+
   //
   // Should never fall through to here
   //
@@ -393,10 +398,12 @@ InitializeMtrrRegs (
     mCpuidExtendedFeatureFlagsEcx.Bits.TME_EN = 1;
     mTmeActivateMsr.Bits.TmeEnable            = 1;
     mTmeActivateMsr.Bits.MkTmeKeyidBits       = SystemParameter->MkTmeKeyidBits;
+    mTmeCapabilityMsr.Bits.MkTmeMaxKeyidBits  = SystemParameter->MkTmeKeyidBits;
   } else {
     mCpuidExtendedFeatureFlagsEcx.Bits.TME_EN = 0;
     mTmeActivateMsr.Bits.TmeEnable            = 0;
     mTmeActivateMsr.Bits.MkTmeKeyidBits       = 0;
+    mTmeCapabilityMsr.Bits.MkTmeMaxKeyidBits  = 0;
   }
 
   return UNIT_TEST_PASSED;

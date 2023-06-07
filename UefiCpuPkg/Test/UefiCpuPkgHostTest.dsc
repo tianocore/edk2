@@ -32,7 +32,10 @@
   #
   # Build HOST_APPLICATION that tests the MtrrLib
   #
-  UefiCpuPkg/Library/MtrrLib/UnitTest/MtrrLibUnitTestHost.inf
+  UefiCpuPkg/Library/MtrrLib/UnitTest/MtrrLibUnitTestHost.inf {
+    <LibraryClasses>
+      CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
+  }
 
   #
   # Build HOST_APPLICATION that tests the CpuPageTableLib
