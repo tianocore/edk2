@@ -1,7 +1,7 @@
 /** @file
 Page Fault (#PF) handler for X64 processors
 
-Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -354,6 +354,11 @@ SmmInitPageTable (
   m5LevelPagingNeeded           = Is5LevelPagingNeeded ();
   mPhysicalAddressBits          = CalculateMaximumSupportAddress ();
   PatchInstructionX86 (gPatch5LevelPagingNeeded, m5LevelPagingNeeded, 1);
+  if (m5LevelPagingNeeded) {
+    mPagingMode = m1GPageTableSupport ? Paging5Level1GB : Paging5Level;
+  } else {
+    mPagingMode = m1GPageTableSupport ? Paging4Level1GB : Paging4Level;
+  }
   DEBUG ((DEBUG_INFO, "5LevelPaging Needed             - %d\n", m5LevelPagingNeeded));
   DEBUG ((DEBUG_INFO, "1GPageTable Support             - %d\n", m1GPageTableSupport));
   DEBUG ((DEBUG_INFO, "PcdCpuSmmRestrictedMemoryAccess - %d\n", mCpuSmmRestrictedMemoryAccess));
