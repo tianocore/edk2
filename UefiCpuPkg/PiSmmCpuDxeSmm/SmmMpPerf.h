@@ -48,10 +48,12 @@ InitializeMpPerf (
   Migrate MP performance data to standardized performance database.
 
   @param NumberofCpus    Number of processors in the platform.
+  @param BspIndex        The index of the BSP.
 **/
 VOID
 MigrateMpPerf (
-  UINTN  NumberofCpus
+  UINTN  NumberofCpus,
+  UINTN  BspIndex
   );
 
 /**

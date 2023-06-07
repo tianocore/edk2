@@ -38,16 +38,25 @@ InitializeMpPerf (
   Migrate MP performance data to standardized performance database.
 
   @param NumberofCpus    Number of processors in the platform.
+  @param BspIndex        The index of the BSP.
 **/
 VOID
 MigrateMpPerf (
-  UINTN  NumberofCpus
+  UINTN  NumberofCpus,
+  UINTN  BspIndex
   )
 {
   UINTN  CpuIndex;
   UINTN  MpProcecureId;
 
   for (CpuIndex = 0; CpuIndex < NumberofCpus; CpuIndex++) {
+    if ((CpuIndex != BspIndex) && !FeaturePcdGet (PcdSmmApPerfLogEnable)) {
+      //
+      // Skip migrating AP performance data if AP perf-logging is disabled.
+      //
+      continue;
+    }
+
     for (MpProcecureId = 0; MpProcecureId < SMM_MP_PERF_PROCEDURE_ID (SmmMpProcedureMax); MpProcecureId++) {
       if (mSmmMpProcedurePerformance[CpuIndex].Begin[MpProcecureId] != 0) {
         PERF_START (NULL, gSmmMpPerfProcedureName[MpProcecureId], NULL, mSmmMpProcedurePerformance[CpuIndex].Begin[MpProcecureId]);
