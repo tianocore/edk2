@@ -164,6 +164,14 @@
   #
   VariableFlashInfoLib|Include/Library/VariableFlashInfoLib.h
 
+  ## @libraryclass Provides a way to toggle DXE memory protection settings
+  #
+  DxeMemoryProtectionHobLib|Include/Library/DxeMemoryProtectionHobLib.h
+
+  ## @libraryclass Provides a way to toggle SMM memory protection settings
+  #
+  MmMemoryProtectionHobLib|Include/Library/MmMemoryProtectionHobLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h

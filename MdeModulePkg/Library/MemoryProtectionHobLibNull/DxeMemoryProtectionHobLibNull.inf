@@ -1,0 +1,25 @@
+## @file
+# NULL library which defines gDxeMps
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeMemoryProtectionHobLibNull
+  FILE_GUID                      = a35c1dc1-0769-421b-a8bc-9db69fae4334
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DxeMemoryProtectionHobLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  DxeMemoryProtectionHobLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
