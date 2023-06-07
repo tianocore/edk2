@@ -1817,6 +1817,23 @@ GetBspNumber (
 }
 
 /**
+  Get pointer to CPU MP Data structure from GUIDed HOB.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+AmdSevUpdateCpuMpData (
+  IN CPU_MP_DATA  *CpuMpData
+  )
+{
+  CPU_MP_DATA  *OldCpuMpData;
+
+  OldCpuMpData = GetCpuMpDataFromGuidedHob ();
+
+  OldCpuMpData->NewCpuMpData = CpuMpData;
+}
+
+/**
   MP Initialize Library initialization.
 
   This service will allocate AP reset vector and wakeup all APs to do APs
