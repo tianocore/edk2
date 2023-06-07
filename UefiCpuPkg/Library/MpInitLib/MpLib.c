@@ -710,17 +710,16 @@ PlaceAPInMwaitLoopOrRunLoop (
 /**
   This function will be called from AP reset code if BSP uses WakeUpAP.
 
-  @param[in] ExchangeInfo     Pointer to the MP exchange info buffer
+  @param[in] CpuMpData        Pointer to CPU MP Data
   @param[in] ApIndex          Number of current executing AP
 **/
 VOID
 EFIAPI
 ApWakeupFunction (
-  IN MP_CPU_EXCHANGE_INFO  *ExchangeInfo,
-  IN UINTN                 ApIndex
+  IN CPU_MP_DATA  *CpuMpData,
+  IN UINTN        ApIndex
   )
 {
-  CPU_MP_DATA       *CpuMpData;
   UINTN             ProcessorNumber;
   EFI_AP_PROCEDURE  Procedure;
   VOID              *Parameter;
@@ -731,11 +730,6 @@ ApWakeupFunction (
   UINTN             CurrentApicMode;
   AP_STACK_DATA     *ApStackData;
   UINT32            OriginalValue;
-
-  //
-  // AP finished assembly code and begin to execute C code
-  //
-  CpuMpData = ExchangeInfo->CpuMpData;
 
   //
   // AP's local APIC settings will be lost after received INIT IPI
@@ -926,6 +920,7 @@ DxeApEntryPoint (
     CpuMpData->CpuData[ProcessorNumber].StartupApSignal,
     CpuMpData->ApTargetCState
     );
+  ApWakeupFunction (CpuMpData, ProcessorNumber);
 }
 
 /**

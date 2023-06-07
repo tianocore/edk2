@@ -197,7 +197,7 @@ CProcedureInvoke:
 
     push       ebx               ; Push ApIndex
     mov        eax, esi
-    add        eax, MP_CPU_EXCHANGE_INFO_OFFSET
+    add        eax, MP_CPU_EXCHANGE_INFO_FIELD (CpuMpData)
     push       eax               ; push address of exchange info data buffer
 
     mov        edi, esi
