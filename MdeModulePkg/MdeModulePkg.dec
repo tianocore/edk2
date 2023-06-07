@@ -169,6 +169,14 @@
   #
   ImagePropertiesRecordLib|Include/Library/ImagePropertiesRecordLib.h
 
+  ## @libraryclass Provides a global for consuming memory protection settings
+  #
+  GetMemoryProtectionsLib|Include/Library/GetMemoryProtectionsLib.h
+
+  ## @libraryclass Library for creating the memory protection settings HOB
+  #
+  SetMemoryProtectionsLib|Include/Library/SetMemoryProtectionsLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
