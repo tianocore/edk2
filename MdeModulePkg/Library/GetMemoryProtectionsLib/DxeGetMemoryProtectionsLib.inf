@@ -1,0 +1,34 @@
+## @file
+# Library fills out gMps global for accessing the platform memory protection settings
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeGetMemoryProtectionsLib
+  FILE_GUID                      = 723A3FA5-1B77-4E83-8978-C768829F7BE4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = GetMemoryProtectionsLib|DXE_CORE DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = GetDxeMemoryProtectionSettingsConstructor
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  DxeGetMemoryProtectionsLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  HobLib
+  DebugLib
+  BaseMemoryLib
+
+[Guids]
+  gMemoryProtectionSettingsGuid
