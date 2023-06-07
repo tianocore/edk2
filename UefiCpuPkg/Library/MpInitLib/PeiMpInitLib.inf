@@ -36,6 +36,7 @@
   MpLib.c
   MpLib.h
   Microcode.c
+  MpHandOff.h
 
 [Packages]
   MdePkg/MdePkg.dec

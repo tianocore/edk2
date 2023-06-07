@@ -40,6 +40,8 @@
 
 #include <Guid/MicrocodePatchHob.h>
 
+#include "MpHandOff.h"
+
 #define WAKEUP_AP_SIGNAL  SIGNATURE_32 ('S', 'T', 'A', 'P')
 
 #define CPU_INIT_MP_LIB_HOB_GUID \
