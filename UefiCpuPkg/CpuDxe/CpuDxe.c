@@ -495,52 +495,6 @@ CpuSetMemoryAttributes (
 }
 
 /**
-  Initializes the valid bits mask and valid address mask for MTRRs.
-
-  This function initializes the valid bits mask and valid address mask for MTRRs.
-
-**/
-VOID
-InitializeMtrrMask (
-  VOID
-  )
-{
-  UINT32                                       MaxExtendedFunction;
-  CPUID_VIR_PHY_ADDRESS_SIZE_EAX               VirPhyAddressSize;
-  UINT32                                       MaxFunction;
-  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  ExtendedFeatureFlagsEcx;
-  MSR_IA32_TME_ACTIVATE_REGISTER               TmeActivate;
-
-  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunction, NULL, NULL, NULL);
-
-  if (MaxExtendedFunction >= CPUID_VIR_PHY_ADDRESS_SIZE) {
-    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
-  } else {
-    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
-  }
-
-  //
-  // CPUID enumeration of MAX_PA is unaffected by TME-MK activation and will continue
-  // to report the maximum physical address bits available for software to use,
-  // irrespective of the number of KeyID bits.
-  // So, we need to check if TME is enabled and adjust the PA size accordingly.
-  //
-  AsmCpuid (CPUID_SIGNATURE, &MaxFunction, NULL, NULL, NULL);
-  if (MaxFunction >= CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
-    AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, 0, NULL, NULL, &ExtendedFeatureFlagsEcx.Uint32, NULL);
-    if (ExtendedFeatureFlagsEcx.Bits.TME_EN == 1) {
-      TmeActivate.Uint64 = AsmReadMsr64 (MSR_IA32_TME_ACTIVATE);
-      if (TmeActivate.Bits.TmeEnable == 1) {
-        VirPhyAddressSize.Bits.PhysicalAddressBits -= TmeActivate.Bits.MkTmeKeyidBits;
-      }
-    }
-  }
-
-  mValidMtrrBitsMask    = LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits) - 1;
-  mValidMtrrAddressMask = mValidMtrrBitsMask & 0xfffffffffffff000ULL;
-}
-
-/**
   Gets GCD Mem Space type from MTRR Type.
 
   This function gets GCD Mem Space type from MTRR Type.
@@ -740,8 +694,7 @@ RefreshMemoryAttributesFromMtrr (
   //
   // Initialize the valid bits mask and valid address mask for MTRRs
   //
-  InitializeMtrrMask ();
-
+  GetMaxPlatformAddressBits (&mValidMtrrBitsMask, &mValidMtrrAddressMask);
   //
   // Get the memory attribute of variable MTRRs
   //
