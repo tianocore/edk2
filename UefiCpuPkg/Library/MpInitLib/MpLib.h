@@ -489,6 +489,17 @@ SaveCpuMpData (
   );
 
 /**
+  This function Get BspNumber.
+
+  @param[in] MpHandOff        Pointer to MpHandOff
+  @return                     BspNumber
+**/
+UINT32
+GetBspNumber (
+  IN CONST MP_HAND_OFF  *MpHandOff
+  );
+
+/**
   Get available system memory below 1MB by specified size.
 
   @param[in] WakeupBufferSize   Wakeup buffer size required

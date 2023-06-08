@@ -1786,6 +1786,37 @@ CheckAllAPs (
 }
 
 /**
+  This function Get BspNumber.
+
+  @param[in] MpHandOff        Pointer to MpHandOff
+  @return                     BspNumber
+**/
+UINT32
+GetBspNumber (
+  IN CONST MP_HAND_OFF  *MpHandOff
+  )
+{
+  UINT32  ApicId;
+  UINT32  BspNumber;
+  UINT32  Index;
+
+  //
+  // Get the processor number for the BSP
+  //
+  BspNumber = MAX_UINT32;
+  ApicId    = GetInitialApicId ();
+  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+    if (MpHandOff->Info[Index].ApicId == ApicId) {
+      BspNumber = Index;
+    }
+  }
+
+  ASSERT (BspNumber != MAX_UINT32);
+
+  return BspNumber;
+}
+
+/**
   MP Initialize Library initialization.
 
   This service will allocate AP reset vector and wakeup all APs to do APs
