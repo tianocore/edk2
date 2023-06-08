@@ -112,6 +112,7 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 
 [FV.DXEFV]
 FvNameGuid         = 8063C21A-8E58-4576-95CE-089E87975D23
@@ -164,7 +165,6 @@ INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
 INF MdeModulePkg/Universal/Metronome/Metronome.inf
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
-INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
 INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
 
 !if $(DISABLE_RESET_SYSTEM) == FALSE
