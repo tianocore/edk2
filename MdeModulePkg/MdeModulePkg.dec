@@ -689,6 +689,9 @@
   ## Include/Protocol/VariablePolicy.h
   gEdkiiVariablePolicyProtocolGuid = { 0x81D1675C, 0x86F6, 0x48DF, { 0xBD, 0x95, 0x9A, 0x6E, 0x4F, 0x09, 0x25, 0xC3 } }
 
+  ## Include/Protocol/UsbEthernetProtocol.h
+  gEdkIIUsbEthProtocolGuid =3D { 0x8d8969cc, 0xfeb0, 0x4303, { 0xb2, 0x1a, 0x1f, 0x11, 0x6f, 0x38, 0x56, 0x43 } }
+
 [PcdsFeatureFlag]
   ## Indicates if the platform can support update capsule across a system reset.<BR><BR>
   #   TRUE  - Supports update capsule across a system reset.<BR>
@@ -2129,6 +2132,21 @@
   ## This PCD holds the shared bit mask for page table entries when Tdx is enabled.
   # @Prompt The shared bit mask when Intel Tdx is enabled.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask|0x0|UINT64|0x10000025
+
+  ## Indicates if the Usb Network rate limiting Supported.<BR><BR>
+  #   TRUE  - Usb Network rate limiting is supported.<BR>
+  #   FALSE - Usb Network rate limiting is not supported.<BR>
+  # @Prompt Enable Usb Network rate limiting support.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableUsbNetworkRateLimiting|FALSE|BOOLEAN|0x10000026
+
+  ## The rate limiting Credit value is check in rate limiter event.
+  #  It is to control the RateLimitingCreditCount max value.
+  # @Prompt The value is use for Usb Network rate limiting supported.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingCredit|10|UINT32|0x10000027
+
+  ## The value of rate limiter event for timeout check. Default value is 100(unit 1ms).
+  # @Prompt The value is use for Usb Network rate limiting supported.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor|100|UINT32|0x10000028
 
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
