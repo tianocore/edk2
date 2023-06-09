@@ -2549,13 +2549,18 @@ DetectAndConfigIdeDevice (
     //
     if (DeviceType == EfiIdeHarddisk) {
       //
-      // Init driver parameters
+      // Init drive parameters
       //
       DriveParameters.Sector         = (UINT8)((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->sectors_per_track;
       DriveParameters.Heads          = (UINT8)(((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->heads - 1);
       DriveParameters.MultipleSector = (UINT8)((ATA5_IDENTIFY_DATA *)(&Buffer.AtaData))->multi_sector_cmd_max_sct_cnt;
 
       Status = SetDriveParameters (Instance, IdeChannel, IdeDevice, &DriveParameters, NULL);
+
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Set Drive Parameters Fail, Status = %r\n", Status));
+        continue;
+      }
     }
 
     //
