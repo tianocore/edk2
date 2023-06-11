@@ -1,4 +1,4 @@
-from IfrCtypes import *
+from VfrCompiler.IfrCtypes import *
 
 #Enumeration of EFI_STATUS.
 RETURN_SUCCESS = EFI_SUCCESS = 0

@@ -19,8 +19,7 @@ from SourceVfrSyntaxLexer import SourceVfrSyntaxLexer
 from IfrCommon import *
 from YamlTree import *
 from IfrPreProcess import *
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from VfrError import *
+from IfrError import *
 from Common.LongFilePathSupport import LongFilePath
 
 class COMPILER_RUN_STATUS(Enum):
@@ -274,7 +273,7 @@ class VfrCompiler():
     def SetPkgOutputFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.PkgOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_PACKAGE_FILENAME_EXTENSION
+        self.Options.PkgOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + ".hpk"
         return 0
 
     def SetCOutputFileName(self):
@@ -286,37 +285,31 @@ class VfrCompiler():
     def SetPreprocessorOutputFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.PreprocessorOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_PREPROCESS_FILENAME_EXTENSION
+        self.Options.PreprocessorOutputFileName = self.Options.OutputDirectory + self.Options.BaseFileName + ".i"
         return 0
 
     def SetRecordListFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.RecordListFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_RECORDLIST_FILENAME_EXTENSION
+        self.Options.RecordListFileName = self.Options.OutputDirectory + self.Options.BaseFileName + ".lst"
         return 0
 
     def SetYamlFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.YamlFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_YAML_FILENAME_EXTENSION
+        self.Options.YamlFileName = self.Options.OutputDirectory + self.Options.BaseFileName + ".yml"
         return 0
 
     def SetJsonFileName(self):
         if self.Options.BaseFileName == None:
             return -1
-        self.Options.JsonFileName = self.Options.OutputDirectory + self.Options.BaseFileName + VFR_JSON_FILENAME_EXTENSION
+        self.Options.JsonFileName = self.Options.OutputDirectory + self.Options.BaseFileName + ".json"
         return 0
 
     def SetProcessedYAMLFileName(self):
         if self.Options.BaseFileName == None:
             return -1
         self.Options.ProcessedYAMLFileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Processed.yml'
-        return 0
-
-    def SetExpandedHeaderFileName(self):
-        if self.Options.BaseFileName == None:
-            return -1
-        self.Options.ExpandedHeaderFileName = self.Options.OutputDirectory + self.Options.BaseFileName + 'Header' + VFR_PREPROCESS_FILENAME_EXTENSION
         return 0
 
     # Parse and collect data structures info in the ExpandedHeader.i files

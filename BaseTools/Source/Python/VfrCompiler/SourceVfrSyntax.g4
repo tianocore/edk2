@@ -4,11 +4,11 @@ options {
 }
 @header{
 
-from IfrCtypes import *
-from IfrFormPkg import *
-from IfrUtility import *
-from IfrTree import *
-from IfrPreProcess import *
+from VfrCompiler.IfrCtypes import *
+from VfrCompiler.IfrFormPkg import *
+from VfrCompiler.IfrUtility import *
+from VfrCompiler.IfrTree import *
+from VfrCompiler.IfrPreProcess import *
 }
 
 vfrProgram
