@@ -8,6 +8,12 @@
 #define ACPI_PLATFORM_LIB_H_
 
 #include <Protocol/AcpiTable.h>
+#include <Protocol/PciIo.h>
+
+typedef struct {
+  EFI_PCI_IO_PROTOCOL    *PciIo;
+  UINT64                 PciAttributes;
+} ORIGINAL_ATTRIBUTES;
 
 /**
   Searches and returns the address of the ACPI Root System Description Pointer (RSDP) in system memory.
@@ -49,6 +55,18 @@ EFIAPI
 InstallAcpiTablesFromRsdp (
   IN EFI_ACPI_TABLE_PROTOCOL                       *AcpiProtocol,
   IN EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp
+  );
+
+VOID
+EnablePciDecoding (
+  OUT ORIGINAL_ATTRIBUTES  **OriginalAttributes,
+  OUT UINTN                *Count
+  );
+
+VOID
+RestorePciDecoding (
+  IN ORIGINAL_ATTRIBUTES  *OriginalAttributes,
+  IN UINTN                Count
   );
 
 #endif
