@@ -336,6 +336,14 @@ PeiMemoryDiscoveredNotify (
 
   DEBUG ((DEBUG_INFO, "FspSiliconInit status: %r\n", Status));
 
+  //
+  // Get FspHobList
+  //
+  GuidHob = GetFirstGuidHob (&gFspHobGuid);
+  ASSERT (GuidHob != NULL);
+  FspHobListPtr = *(VOID **)GET_GUID_HOB_DATA (GuidHob);
+  DEBUG ((DEBUG_INFO, "FspHobListPtr - 0x%x\n", FspHobListPtr));
+
   if (Status == FSP_STATUS_VARIABLE_REQUEST) {
     //
     // call to Variable request handler
@@ -356,13 +364,6 @@ PeiMemoryDiscoveredNotify (
     DEBUG ((DEBUG_ERROR, "ERROR - TestFspSiliconInitApiOutput () fail, Status = %r\n", Status));
   }
 
-  //
-  // Now FspHobList complete, process it
-  //
-  GuidHob = GetFirstGuidHob (&gFspHobGuid);
-  ASSERT (GuidHob != NULL);
-  FspHobListPtr = *(VOID **)GET_GUID_HOB_DATA (GuidHob);
-  DEBUG ((DEBUG_INFO, "FspHobListPtr - 0x%x\n", FspHobListPtr));
   PostFspsHobProcess (FspHobListPtr);
 
   //
