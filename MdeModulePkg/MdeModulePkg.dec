@@ -1007,118 +1007,11 @@
   # @ValidList  0x80000006 | 0x03058002
   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable|0x03058002|UINT32|0x30001040
 
-  ## Mask to control the NULL address detection in code for different phases.
-  #  If enabled, accessing NULL address in UEFI or SMM code can be caught.<BR><BR>
-  #    BIT0    - Enable NULL pointer detection for UEFI.<BR>
-  #    BIT1    - Enable NULL pointer detection for SMM.<BR>
-  #    BIT2..5 - Reserved for future uses.<BR>
-  #    BIT6    - Enable non-stop mode.<BR>
-  #    BIT7    - Disable NULL pointer detection just after EndOfDxe. <BR>
-  #              This is a workaround for those unsolvable NULL access issues in
-  #              OptionROM, boot loader, etc. It can also help to avoid unnecessary
-  #              exception caused by legacy memory (0-4095) access after EndOfDxe,
-  #              such as Windows 7 boot on Qemu.<BR>
-  # @Prompt Enable NULL address detection.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask|0x0|UINT8|0x30001050
-
   ## Init Value in Temp Stack to be shared between SEC and PEI_CORE
   # SEC fills the full temp stack with this values. When switch stack, PeiCore can check
   # this value in the temp stack to know how many stack has been used.
   # @Prompt Init Value in Temp Stack
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack|0x5AA55AA5|UINT32|0x30001051
-
-  ## Indicates which type allocation need guard page.
-  #
-  # If a bit is set, a head guard page and a tail guard page will be added just
-  # before and after corresponding type of pages allocated if there's enough
-  # free pages for all of them. The page allocation for the type related to
-  # cleared bits keeps the same as ususal.
-  #
-  # This PCD is only valid if BIT0 and/or BIT2 are set in PcdHeapGuardPropertyMask.
-  #
-  # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
-  #  EfiReservedMemoryType             0x0000000000000001<BR>
-  #  EfiLoaderCode                     0x0000000000000002<BR>
-  #  EfiLoaderData                     0x0000000000000004<BR>
-  #  EfiBootServicesCode               0x0000000000000008<BR>
-  #  EfiBootServicesData               0x0000000000000010<BR>
-  #  EfiRuntimeServicesCode            0x0000000000000020<BR>
-  #  EfiRuntimeServicesData            0x0000000000000040<BR>
-  #  EfiConventionalMemory             0x0000000000000080<BR>
-  #  EfiUnusableMemory                 0x0000000000000100<BR>
-  #  EfiACPIReclaimMemory              0x0000000000000200<BR>
-  #  EfiACPIMemoryNVS                  0x0000000000000400<BR>
-  #  EfiMemoryMappedIO                 0x0000000000000800<BR>
-  #  EfiMemoryMappedIOPortSpace        0x0000000000001000<BR>
-  #  EfiPalCode                        0x0000000000002000<BR>
-  #  EfiPersistentMemory               0x0000000000004000<BR>
-  #  OEM Reserved                      0x4000000000000000<BR>
-  #  OS Reserved                       0x8000000000000000<BR>
-  # e.g. LoaderCode+LoaderData+BootServicesCode+BootServicesData are needed, 0x1E should be used.<BR>
-  # @Prompt The memory type mask for Page Guard.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType|0x0|UINT64|0x30001052
-
-  ## Indicates which type allocation need guard page.
-  #
-  # If a bit is set, a head guard page and a tail guard page will be added just
-  # before and after corresponding type of pages which the allocated pool occupies,
-  # if there's enough free memory for all of them. The pool allocation for the
-  # type related to cleared bits keeps the same as ususal.
-  #
-  # This PCD is only valid if BIT1 and/or BIT3 are set in PcdHeapGuardPropertyMask.
-  #
-  # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
-  #  EfiReservedMemoryType             0x0000000000000001<BR>
-  #  EfiLoaderCode                     0x0000000000000002<BR>
-  #  EfiLoaderData                     0x0000000000000004<BR>
-  #  EfiBootServicesCode               0x0000000000000008<BR>
-  #  EfiBootServicesData               0x0000000000000010<BR>
-  #  EfiRuntimeServicesCode            0x0000000000000020<BR>
-  #  EfiRuntimeServicesData            0x0000000000000040<BR>
-  #  EfiConventionalMemory             0x0000000000000080<BR>
-  #  EfiUnusableMemory                 0x0000000000000100<BR>
-  #  EfiACPIReclaimMemory              0x0000000000000200<BR>
-  #  EfiACPIMemoryNVS                  0x0000000000000400<BR>
-  #  EfiMemoryMappedIO                 0x0000000000000800<BR>
-  #  EfiMemoryMappedIOPortSpace        0x0000000000001000<BR>
-  #  EfiPalCode                        0x0000000000002000<BR>
-  #  EfiPersistentMemory               0x0000000000004000<BR>
-  #  OEM Reserved                      0x4000000000000000<BR>
-  #  OS Reserved                       0x8000000000000000<BR>
-  # e.g. LoaderCode+LoaderData+BootServicesCode+BootServicesData are needed, 0x1E should be used.<BR>
-  # @Prompt The memory type mask for Pool Guard.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType|0x0|UINT64|0x30001053
-
-  ## This mask is to control Heap Guard behavior.
-  #
-  # Note:
-  #   a) Heap Guard is for debug purpose and should not be enabled in product
-  #      BIOS.
-  #   b) Due to the limit of pool memory implementation and the alignment
-  #      requirement of UEFI spec, BIT7 is a try-best setting which cannot
-  #      guarantee that the returned pool is exactly adjacent to head guard
-  #      page or tail guard page.
-  #   c) UEFI freed-memory guard and UEFI pool/page guard cannot be enabled
-  #      at the same time.
-  #
-  #   BIT0 - Enable UEFI page guard.<BR>
-  #   BIT1 - Enable UEFI pool guard.<BR>
-  #   BIT2 - Enable SMM page guard.<BR>
-  #   BIT3 - Enable SMM pool guard.<BR>
-  #   BIT4 - Enable UEFI freed-memory guard (Use-After-Free memory detection).<BR>
-  #   BIT6 - Enable non-stop mode.<BR>
-  #   BIT7 - The direction of Guard Page for Pool Guard.
-  #          0 - The returned pool is near the tail guard page.<BR>
-  #          1 - The returned pool is near the head guard page.<BR>
-  # @Prompt The Heap Guard feature mask
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask|0x0|UINT8|0x30001054
-
-  ## Indicates if UEFI Stack Guard will be enabled.
-  #  If enabled, stack overflow in UEFI can be caught, preventing chaotic consequences.<BR><BR>
-  #   TRUE  - UEFI Stack Guard will be enabled.<BR>
-  #   FALSE - UEFI Stack Guard will be disabled.<BR>
-  # @Prompt Enable UEFI Stack Guard.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|FALSE|BOOLEAN|0x30001055
 
   ## Indicate debug level of Trace Hub.
   #   0x0 - TraceHubDebugLevelError.<BR>
@@ -1395,54 +1288,6 @@
   #      0x7F, 0xFF, 0x04, 0x00}<BR>
   # @Prompt Memory profile driver path.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileDriverPath|{0x0}|VOID*|0x00001043
-
-  ## Set image protection policy. The policy is bitwise.
-  #  If a bit is set, the image will be protected by DxeCore if it is aligned.
-  #   The code section becomes read-only, and the data section becomes non-executable.
-  #  If a bit is clear, nothing will be done to image code/data sections.<BR><BR>
-  #    BIT0       - Image from unknown device. <BR>
-  #    BIT1       - Image from firmware volume.<BR>
-  #  <BR>
-  #  Note: If a bit is cleared, the data section could be still non-executable if
-  #  PcdDxeNxMemoryProtectionPolicy is enabled for EfiLoaderData, EfiBootServicesData
-  #  and/or EfiRuntimeServicesData.<BR>
-  #  <BR>
-  # @Prompt Set image protection policy.
-  # @ValidRange 0x80000002 | 0x00000000 - 0x0000001F
-  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000002|UINT32|0x00001047
-
-  ## Set DXE memory protection policy. The policy is bitwise.
-  #  If a bit is set, memory regions of the associated type will be mapped
-  #  non-executable.<BR>
-  #  If a bit is cleared, nothing will be done to associated type of memory.<BR>
-  #  <BR>
-  # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
-  #  EfiReservedMemoryType          0x0001<BR>
-  #  EfiLoaderCode                  0x0002<BR>
-  #  EfiLoaderData                  0x0004<BR>
-  #  EfiBootServicesCode            0x0008<BR>
-  #  EfiBootServicesData            0x0010<BR>
-  #  EfiRuntimeServicesCode         0x0020<BR>
-  #  EfiRuntimeServicesData         0x0040<BR>
-  #  EfiConventionalMemory          0x0080<BR>
-  #  EfiUnusableMemory              0x0100<BR>
-  #  EfiACPIReclaimMemory           0x0200<BR>
-  #  EfiACPIMemoryNVS               0x0400<BR>
-  #  EfiMemoryMappedIO              0x0800<BR>
-  #  EfiMemoryMappedIOPortSpace     0x1000<BR>
-  #  EfiPalCode                     0x2000<BR>
-  #  EfiPersistentMemory            0x4000<BR>
-  #  OEM Reserved       0x4000000000000000<BR>
-  #  OS Reserved        0x8000000000000000<BR>
-  #
-  # NOTE: User must NOT set NX protection for EfiLoaderCode / EfiBootServicesCode / EfiRuntimeServicesCode. <BR>
-  #       User MUST set the same NX protection for EfiBootServicesData and EfiConventionalMemory. <BR>
-  #
-  # e.g. 0x7FD5 can be used for all memory except Code. <BR>
-  # e.g. 0x7BD4 can be used for all memory except Code and ACPINVS/Reserved. <BR>
-  #
-  # @Prompt Set DXE memory protection policy.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0x0000000|UINT64|0x00001048
 
   ## PCI Serial Device Info. It is an array of Device, Function, and Power Management
   #  information that describes the path that contains zero or more PCI to PCI bridges
@@ -2031,20 +1876,6 @@
   #  This PCD is ignored for definition block.
   # @Prompt Default Creator Revision for ACPI table creation.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision|0x01000013|UINT32|0x30001038
-
-  ## Indicates if to set NX for stack.<BR><BR>
-  #  For the DxeIpl and the DxeCore are both X64, set NX for stack feature also require PcdDxeIplBuildPageTables be TRUE.<BR>
-  #  For the DxeIpl and the DxeCore are both IA32 (PcdDxeIplSwitchToLongMode is FALSE), set NX for stack feature also require
-  #  IA32 PAE is supported and Execute Disable Bit is available.<BR>
-  #  <BR>
-  #   TRUE  - Set NX for stack.<BR>
-  #   FALSE - Do nothing for stack.<BR>
-  #  <BR>
-  #  Note: If this PCD is set to FALSE, NX could be still applied to stack due to PcdDxeNxMemoryProtectionPolicy enabled for
-  #  EfiBootServicesData.<BR>
-  #  <BR>
-  # @Prompt Set NX for stack.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE|BOOLEAN|0x0001006f
 
   ## This PCD specifies the PCI-based SD/MMC host controller mmio base address.
   # Define the mmio base address of the pci-based SD/MMC host controller. If there are multiple SD/MMC
