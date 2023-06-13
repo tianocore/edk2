@@ -51,7 +51,7 @@ for unit test execution.
 ],
 ```
 
-If a component can be tested with host-based unit tests, then GoogleTest is recommended. The MdePkg
+If a component can be tested with host-based unit tests, then *GoogleTest is recommended*. The MdePkg
 contains a port of the BaseSafeIntLib unit tests in the GoogleTest style so the differences between
 GoogleTest and Framework unit tests can be reviewed. The paths to the BaseSafeIntLib unit tests are:
 
@@ -415,7 +415,7 @@ Host-Based Mocks and Stubs  | Mock and Stub libraries should live in the `UefiTe
 
 ### If still in doubt...
 
-Hop on GitHub and ask @corthon, @mdkinney, or @spbrogan. ;)
+Ask a question in [edk2 discussions](https://github.com/tianocore/edk2/discussions) or reach out on the [EDK II development mailing list \<`devel@edk2.groups.io`\>](mailto:devel@edk2.groups.io).
 
 ## Copyright
 

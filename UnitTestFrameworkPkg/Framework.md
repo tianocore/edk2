@@ -1,3 +1,15 @@
+# Framework - Unit Testing Framework
+
+## About
+
+This unit test framework, called **Framework** is implemented as a set of EDK II libraries. It is one of two unit test frameworks supported by EDK II. Please refer to [the ReadMe](./ReadMe.md) for a comparison of the two.
+
+The Framework supports both host-based unit tests and target-based unit tests that share the same
+source style, macros, and APIs. In some scenarios, the same unit test case sources can be built
+for both host-based unit test execution and target-based unit test execution. Host-based unit tests
+that require mocked interfaces can use the mocking infrastructure provided by
+[cmocka](https://api.cmocka.org/) that is included in the UnitTestFrameworkPkg as a submodule.
+
 ## Framework Libraries
 
 ### UnitTestLib
@@ -52,7 +64,7 @@ you should be good to go.
 
 See this example in `SampleUnitTestUefiShell.inf`...
 
-```
+```inf
 [Packages]
   MdePkg/MdePkg.dec
 
@@ -67,7 +79,7 @@ See this example in `SampleUnitTestUefiShell.inf`...
 Also, if you want your test to automatically be picked up by the Test Runner plugin, you will need
 to make sure that the module `BASE_NAME` contains the word `Test`...
 
-```
+```inf
 [Defines]
   BASE_NAME      = SampleUnitTestUefiShell
 ```
@@ -79,7 +91,7 @@ section so that the unit tests will be built.
 
 See this example in `UnitTestFrameworkPkg.dsc`...
 
-```
+```inf
 [Components]
   UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTest/SampleUnitTestUefiShell.inf
 ```
@@ -88,7 +100,7 @@ Also, based on the type of tests that are being created, the associated DSC incl
 UnitTestFrameworkPkg for Host or Target based tests should also be included at the top of the DSC
 file.
 
-```
+```inf
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgTarget.dsc.inc
 ```
 
@@ -98,7 +110,7 @@ they should be added in the \<LibraryClasses\> sub-section for the INF file in t
 
 See this example in `SecurityPkgHostTest.dsc`...
 
-```
+```inf
 [Components]
   SecurityPkg/Library/SecureBootVariableLib/UnitTest/SecureBootVariableLibUnitTest.inf {
     <LibraryClasses>
@@ -209,6 +221,43 @@ Once all the suites and cases are added, it's time to run the Framework.
 Status = RunAllTestSuites( Framework );
 ```
 
+### Hooking BaseLib
+
+Most unit test mocking can be performed by the functions provided in the UnitTestFrameworkPkg libraries, but since
+BaseLib is consumed by the Framework itself, it requires different techniques to substitute parts of the
+functionality.
+
+To solve some of this, the UnitTestFrameworkPkg consumes a special implementation of BaseLib for host-based tests.
+This implementation contains a [hook table](https://github.com/tianocore/edk2/blob/e188ecc8b4aed8fdd26b731d43883861f5e5e7b4/MdePkg/Test/UnitTest/Include/Library/UnitTestHostBaseLib.h#L507)
+that can be used to substitute test functionality for any of the BaseLib functions. By default, this implementation
+will use the underlying BaseLib implementation, so the unit test writer only has to supply minimal code to test a
+particular case.
+
+### Debugging the Framework Itself
+
+While most of the tests that are produced by the UnitTestFrameworkPkg are easy to step through in a debugger, the Framework
+itself consumes code (mostly Cmocka) that sets its own build flags. These flags cause parts of the Framework to not
+export symbols and capture exceptions, and as such are harder to debug. We have provided a Stuart parameter to force
+symbolic debugging to be enabled.
+
+You can run a build by adding the `BLD_*_UNIT_TESTING_DEBUG=TRUE` parameter to enable this build option.
+
+```bash
+stuart_ci_build -c .pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -p MdePkg -t NOOPT BLD_*_UNIT_TESTING_DEBUG=TRUE
+```
+
+### Host-Based Support vs Other Tests
+
+The host-based test framework is powered internally by the Cmocka framework. As such, it has abilities
+that the target-based tests don't (yet). It would be awesome if this meant that it was a super set of
+the target-based tests, and it worked just like the target-based tests but with more features. Unfortunately,
+this is not the case. While care has been taken to keep them as close as possible, there are a few known
+inconsistencies that we're still ironing out. For example, the logging messages in the target-based tests
+are cached internally and associated with the running test case. They can be saved later as part of the
+reporting lib. This isn't currently possible with host-based. Only the assertion failures are logged.
+
+We will continue trying to make these as similar as possible.
+
 ### Framework - A Simple Test Case
 
 We'll take a look at the below test case from 'SampleUnitTestApp'...
@@ -253,8 +302,7 @@ To write more advanced tests, first look at all the Assertion and Logging macros
 Beyond that, if you're writing host-based tests and want to take a dependency on the UnitTestFrameworkPkg, you can
 leverage the `cmocka.h` interface and write tests with all the features of the Cmocka framework.
 
-Documentation for Cmocka can be found here:
-https://api.cmocka.org/
+Documentation for Cmocka can be found [here](https://api.cmocka.org/).
 
 ## Developing
 
@@ -304,9 +352,9 @@ reporting lib. This isn't currently possible with host-based. Only the assertion
 
 We will continue trying to make these as similar as possible.
 
-### If still in doubt...
+### If still in doubt
 
-Hop on GitHub and ask @corthon, @mdkinney, or @spbrogan. ;)
+Ask a question in [edk2 discussions](https://github.com/tianocore/edk2/discussions) or reach out on the [EDK II development mailing list \<`devel@edk2.groups.io`\>](mailto:devel@edk2.groups.io).
 
 ## Copyright
 
