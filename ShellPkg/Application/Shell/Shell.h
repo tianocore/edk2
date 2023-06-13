@@ -14,6 +14,8 @@
 
 #include <Guid/ShellVariableGuid.h>
 #include <Guid/ShellAliasGuid.h>
+#include <Guid/GlobalVariable.h>
+#include <Guid/ImageAuthentication.h>
 
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SimpleTextOut.h>
