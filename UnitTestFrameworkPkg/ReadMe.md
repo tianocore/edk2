@@ -51,7 +51,7 @@ for unit test execution.
 ],
 ```
 
-If a component can be tested with host-based unit tests, then GoogleTest is recommended. The MdePkg
+If a component can be tested with host-based unit tests, then *GoogleTest is recommended*. The MdePkg
 contains a port of the BaseSafeIntLib unit tests in the GoogleTest style so the differences between
 GoogleTest and Framework unit tests can be reviewed. The paths to the BaseSafeIntLib unit tests are:
 
@@ -87,7 +87,11 @@ reviewed. The paths to the SecureBootVariableLib unit tests are:
 | Address Sanitizer           |   Cmocka  |    YES     |
 
 
+Please see our separate documents for detailed instructions and sample usage of both frameworks:
 
+=======
+[Framework](./Framework.md)
+[GoogleTest](./GoogleTest.md)
 
 ## Development
 
@@ -411,7 +415,7 @@ Host-Based Mocks and Stubs  | Mock and Stub libraries should live in the `UefiTe
 
 ### If still in doubt...
 
-Hop on GitHub and ask @corthon, @mdkinney, or @spbrogan. ;)
+Hop on GitHub and ask @mdkinney or @spbrogan.
 
 ## Copyright
 
