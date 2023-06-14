@@ -126,6 +126,8 @@
   SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
+  GetMemoryProtectionsLib|MdeModulePkg/Library/GetMemoryProtectionsLib/GetMemoryProtectionsLibNull.inf
+  SetMemoryProtectionsLib|MdeModulePkg/Library/SetMemoryProtectionsLib/SetMemoryProtectionsLibNull.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
@@ -216,7 +218,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables|FALSE
 
 [PcdsFixedAtBuild]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000000
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000040
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x0f
