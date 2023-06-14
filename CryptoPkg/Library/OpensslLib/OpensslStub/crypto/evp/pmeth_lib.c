@@ -256,7 +256,11 @@ static EVP_PKEY_CTX *int_ctx_new(OSSL_LIB_CTX *libctx,
     else
 # endif
 # ifdef OPENSSL_SYS_UEFI
-        app_pmeth = pmeth = EVP_PKEY_meth_find(id);
+        if (id == 581) { /* HKDF(582) doesn`t have legacy meth, skip here. */
+            app_pmeth = pmeth = evp_pkey_meth_find_added_by_application(id);
+        } else {
+            app_pmeth = pmeth = EVP_PKEY_meth_find(id);
+        }
 # else
         app_pmeth = pmeth = evp_pkey_meth_find_added_by_application(id);
 # endif
