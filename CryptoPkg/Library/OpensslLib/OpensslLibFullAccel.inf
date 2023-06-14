@@ -52,6 +52,7 @@
   OpensslStub/SslStatServNull.c
   OpensslStub/SslExtServNull.c
   OpensslStub/Pkcs12Null.c
+  OpensslStub/EcxNull.c
   OpensslStub/crypto/objects/obj_dat.c
   OpensslStub/crypto/objects/obj_xref.c
   OpensslStub/crypto/evp/pmeth_lib.c
@@ -264,7 +265,6 @@
   $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c
   $(OPENSSL_PATH)/crypto/ec/ecx_backend.c
   $(OPENSSL_PATH)/crypto/ec/ecx_key.c
-  $(OPENSSL_PATH)/crypto/ec/ecx_meth.c
   $(OPENSSL_PATH)/crypto/err/err.c
   $(OPENSSL_PATH)/crypto/err/err_all.c
   $(OPENSSL_PATH)/crypto/err/err_all_legacy.c
@@ -943,7 +943,6 @@
   $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c
   $(OPENSSL_PATH)/crypto/ec/ecx_backend.c
   $(OPENSSL_PATH)/crypto/ec/ecx_key.c
-  $(OPENSSL_PATH)/crypto/ec/ecx_meth.c
   $(OPENSSL_PATH)/crypto/err/err.c
   $(OPENSSL_PATH)/crypto/err/err_all.c
   $(OPENSSL_PATH)/crypto/err/err_all_legacy.c
