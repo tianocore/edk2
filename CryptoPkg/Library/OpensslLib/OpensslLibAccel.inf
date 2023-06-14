@@ -44,6 +44,7 @@
   OpensslStub/uefiprov.c
   OpensslStub/EncoderNull.c
   OpensslStub/DecoderNull.c
+  OpensslStub/PemNull.c
   OpensslStub/SslStatServNull.c
   OpensslStub/SslExtServNull.c
   OpensslStub/Pkcs12Null.c
@@ -376,17 +377,6 @@
   $(OPENSSL_PATH)/crypto/objects/o_names.c
   $(OPENSSL_PATH)/crypto/objects/obj_err.c
   $(OPENSSL_PATH)/crypto/objects/obj_lib.c
-  $(OPENSSL_PATH)/crypto/pem/pem_all.c
-  $(OPENSSL_PATH)/crypto/pem/pem_err.c
-  $(OPENSSL_PATH)/crypto/pem/pem_info.c
-  $(OPENSSL_PATH)/crypto/pem/pem_lib.c
-  $(OPENSSL_PATH)/crypto/pem/pem_oth.c
-  $(OPENSSL_PATH)/crypto/pem/pem_pk8.c
-  $(OPENSSL_PATH)/crypto/pem/pem_pkey.c
-  $(OPENSSL_PATH)/crypto/pem/pem_sign.c
-  $(OPENSSL_PATH)/crypto/pem/pem_x509.c
-  $(OPENSSL_PATH)/crypto/pem/pem_xaux.c
-  $(OPENSSL_PATH)/crypto/pem/pvkfmt.c
   $(OPENSSL_PATH)/crypto/pkcs7/bio_pk7.c
   $(OPENSSL_PATH)/crypto/pkcs7/pk7_asn1.c
   $(OPENSSL_PATH)/crypto/pkcs7/pk7_attr.c

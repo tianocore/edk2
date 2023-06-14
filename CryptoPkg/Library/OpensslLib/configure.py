@@ -236,13 +236,14 @@ def sources_filter_fn(filename):
         'randfile.c',
         '/store/',
         '/storemgmt/',
-        '/encode_decode/encode',
+        '/encode_decode/',
         '/pkcs12/',
         'statem_srvr.c',
         'extensions_srvr.c',
         'defltprov.c',
         'baseprov.c',
         'provider_predefined.c',
+        '/pem/',
     ]
     for item in exclude:
         if item in filename:
@@ -260,6 +261,12 @@ def sources_minimal_filter_fn(filename):
         'dh_kmgmt',
         '/pem/',
         '/encode_decode/',
+        's3_cbc.c',
+        's3_enc.c',
+        'x509_r2x.c',
+        '/digests/md5',
+        '/md5/',
+        '/evp/legacy_md5',
     ]
     for item in exclude:
         if item in filename:
@@ -396,7 +403,7 @@ def main():
     openssl_run_make(openssldir, 'distclean')
 
     update_inf('OpensslLibCrypto.inf',
-               libcrypto_sources(cfg),
+               libcrypto_sources(cfg, None, True),
                None, defines)
     update_inf('OpensslLib.inf',
                libcrypto_sources(cfg) + libssl_sources(cfg),
