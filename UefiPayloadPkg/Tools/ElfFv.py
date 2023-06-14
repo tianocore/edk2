@@ -267,7 +267,7 @@ def AddSectionHeader64(SHentry, NewUPLEntrylen, SectionHeaderEntrySize, Index, R
         # if RemoveNameOffset != 0 that is remove function.
         if (RemoveNameOffset != 0):
             if (unpacked_header.sh_name > RemoveNameOffset):
-                unpacked_header.sh_name -= RemoveNameOffset
+                unpacked_header.sh_name -= len (SectionName)
             # Modify size of name string section entry in section entry.
             if (Index == StringIndexNumber):
                 unpacked_header.sh_size -= len (SectionName)
@@ -298,7 +298,7 @@ def AddSectionHeader32(SHentry, NewUPLEntrylen, SectionHeaderEntrySize, Index, R
         # if RemoveNameOffset != 0 that is remove function.
         if (RemoveNameOffset != 0):
             if (unpacked_header.sh_name > RemoveNameOffset):
-                unpacked_header.sh_name -= RemoveNameOffset
+                unpacked_header.sh_name -= len (SectionName)
             # Modify size of name string section entry in section entry.
             if (Index == StringIndexNumber):
                 unpacked_header.sh_size -= len (SectionName)
@@ -710,7 +710,7 @@ def AddSection32(UniversalPayloadEntry, AddSectionName, ElfHeaderOffset, Section
         ElfHeaderSize = 52
         ElfHandPH = ElfHeaderSize + (elf_header.e_phnum * elf_header.e_phentsize)
         NewUPLEntry = UPLEntry[:ElfHandPH]
-        # Keep Section header and program header table, AddSection64() only recombined section and section header.
+        # Keep Section header and program header table, AddSection32() only recombined section and section header.
         NewUPLEntry = bytearray(NewUPLEntry)
         # Sections is recombined.
         # 1. name of added section is added in name string section.
