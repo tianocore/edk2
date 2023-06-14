@@ -465,8 +465,8 @@ R: James Lu <james.lu@intel.com> [jameslu8]
 NetworkPkg
 F: NetworkPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
-M: Maciej Rabeda <maciej.rabeda@linux.intel.com> [mrabeda]
-R: Siyuan Fu <siyuan.fu@intel.com> [sfu5]
+R: Saloni Kasbekar <saloni.kasbekar@intel.com> [SaloniKasbekar]
+R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
 
 OvmfPkg
 F: OvmfPkg/
