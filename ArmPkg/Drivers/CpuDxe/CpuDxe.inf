@@ -46,6 +46,7 @@
   CpuExceptionHandlerLib
   DebugLib
   DefaultExceptionHandlerLib
+  GetMemoryProtectionsLib
   DxeServicesTableLib
   HobLib
   MemoryAllocationLib
@@ -65,7 +66,6 @@
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdVFPEnabled
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [FeaturePcd.common]
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
