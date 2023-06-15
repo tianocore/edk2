@@ -61,6 +61,7 @@
   HobLib
   SmmMemLib
   SafeIntLib
+  GetMemoryProtectionsLib
 
 [Protocols]
   gEfiDxeSmmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
@@ -94,9 +95,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileDriverPath             ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmiHandlerProfilePropertyMask       ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType                   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType                   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                        ## CONSUMES
 
 [Guids]

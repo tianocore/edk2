@@ -592,36 +592,29 @@ IsMemoryTypeToGuard (
   IN UINT8              PageOrPool
   )
 {
-  UINT64  TestBit;
   UINT64  ConfigBit;
 
-  if (  ((PcdGet8 (PcdHeapGuardPropertyMask) & PageOrPool) == 0)
+  ConfigBit  = gMps.Mm.HeapGuard.PageGuardEnabled ? GUARD_HEAP_TYPE_PAGE : 0;
+  ConfigBit |= gMps.Mm.HeapGuard.PoolGuardEnabled ? GUARD_HEAP_TYPE_POOL : 0;
+
+  if (  ((ConfigBit & PageOrPool) == 0)
      || mOnGuarding
      || (AllocateType == AllocateAddress))
   {
     return FALSE;
   }
 
-  ConfigBit = 0;
-  if ((PageOrPool & GUARD_HEAP_TYPE_POOL) != 0) {
-    ConfigBit |= PcdGet64 (PcdHeapGuardPoolType);
-  }
-
-  if ((PageOrPool & GUARD_HEAP_TYPE_PAGE) != 0) {
-    ConfigBit |= PcdGet64 (PcdHeapGuardPageType);
-  }
-
   if ((MemoryType == EfiRuntimeServicesData) ||
       (MemoryType == EfiRuntimeServicesCode))
   {
-    TestBit = LShiftU64 (1, MemoryType);
+    return (((PageOrPool & GUARD_HEAP_TYPE_PAGE) != 0) && gMps.Mm.PageGuard.EnabledForType[MemoryType]) ||
+           (((PageOrPool & GUARD_HEAP_TYPE_POOL) != 0) && gMps.Mm.PoolGuard.EnabledForType[MemoryType]);
   } else if (MemoryType == EfiMaxMemoryType) {
-    TestBit = (UINT64)-1;
-  } else {
-    TestBit = 0;
+    return (((PageOrPool & GUARD_HEAP_TYPE_PAGE) != 0) && IS_MM_PAGE_GUARD_ACTIVE) ||
+           (((PageOrPool & GUARD_HEAP_TYPE_POOL) != 0) && IS_MM_POOL_GUARD_ACTIVE);
   }
 
-  return ((ConfigBit & TestBit) != 0);
+  return FALSE;
 }
 
 /**
@@ -951,7 +944,7 @@ AdjustPoolHeadA (
   IN UINTN                 Size
   )
 {
-  if ((Memory == 0) || ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0)) {
+  if ((Memory == 0) || (!gMps.Mm.HeapGuard.GuardAlignedToTail)) {
     //
     // Pool head is put near the head Guard
     //
@@ -977,7 +970,7 @@ AdjustPoolHeadF (
   IN EFI_PHYSICAL_ADDRESS  Memory
   )
 {
-  if ((Memory == 0) || ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0)) {
+  if ((Memory == 0) || (!gMps.Mm.HeapGuard.GuardAlignedToTail)) {
     //
     // Pool head is put near the head Guard
     //

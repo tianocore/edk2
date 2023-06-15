@@ -256,10 +256,12 @@ DxeMain (
   Status = InitializeCpuExceptionHandlers (VectorInfoList);
   ASSERT_EFI_ERROR (Status);
 
+  PopulateMpsGlobal ();
+
   //
   // Setup Stack Guard
   //
-  if (PcdGetBool (PcdCpuStackGuard)) {
+  if (gMps.Dxe.CpuStackGuardEnabled) {
     Status = InitializeSeparateExceptionStacks (NULL, NULL);
     ASSERT_EFI_ERROR (Status);
   }
