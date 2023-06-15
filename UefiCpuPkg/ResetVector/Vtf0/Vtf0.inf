@@ -46,3 +46,12 @@
 
 [UserExtensions.TianoCore."ExtraFiles"]
   ResetVectorExtra.uni
+
+[BuildOptions]
+# Different build options can be specified:
+#   * for different architectures:
+#       -DARCH_X64, -DARCH_IA32
+#   * for using 1G page table:
+#       -DPAGE_TABLE_1G
+#   * for different debug channels:
+#       -DDEBUG_SERIAL, -DDEBUG_PORT80, or not specify any debug channel
