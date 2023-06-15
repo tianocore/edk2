@@ -1,7 +1,7 @@
 ## @file
 #  UefiCpuPkg Package
 #
-#  Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2023, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -168,7 +168,7 @@
       SmmCpuFeaturesLib|UefiCpuPkg/Library/SmmCpuFeaturesLib/SmmCpuFeaturesLibStm.inf
   }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
-  UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
+  UefiCpuPkg/ResetVector/Vtf0/Vtf0.inf
   UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
   UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/PeiCpuExceptionHandlerLibUnitTest.inf
