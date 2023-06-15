@@ -1668,7 +1668,7 @@ GenSmmPageTable (
     }
   }
 
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) {
+  if (gMps.Mm.NullPointerDetection.Enabled) {
     //
     // Mark [0, 4k] as non-present
     //
@@ -1823,13 +1823,13 @@ IfReadOnlyPageTableNeeded (
   //
   // Don't mark page table memory as read-only if
   //  - no restriction on access to non-SMRAM memory; or
-  //  - SMM heap guard feature enabled; or
-  //      BIT2: SMM page guard enabled
-  //      BIT3: SMM pool guard enabled
+  //  - SMM page guard enabled
+  //  - SMM pool guard enabled
   //  - SMM profile feature enabled
   //
   if (!IsRestrictedMemoryAccess () ||
-      ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
+      IS_MM_PAGE_GUARD_ACTIVE ||
+      IS_MM_POOL_GUARD_ACTIVE ||
       FeaturePcdGet (PcdCpuSmmProfileEnable))
   {
     if (sizeof (UINTN) == sizeof (UINT64)) {
@@ -1838,7 +1838,8 @@ IfReadOnlyPageTableNeeded (
       //
       ASSERT (
         !(IsRestrictedMemoryAccess () &&
-          (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0)
+          (IS_MM_PAGE_GUARD_ACTIVE ||
+           IS_MM_POOL_GUARD_ACTIVE))
         );
 
       //

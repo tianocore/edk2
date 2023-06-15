@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DxeServicesTableLib.h>
 #include <Library/CpuLib.h>
 #include <IndustryStandard/Acpi.h>
+#include <Library/GetMemoryProtectionsLib.h>
 
 #include "SmmProfileArch.h"
 
@@ -57,11 +58,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define   MSR_DEBUG_CTL_BTINT  0x100
 #define MSR_DS_AREA            0x600
 
-#define HEAP_GUARD_NONSTOP_MODE      \
-        ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT6|BIT3|BIT2)) > BIT6)
+#define HEAP_GUARD_NONSTOP_MODE  (gMps.Mm.HeapGuard.NonstopModeEnabled                  &&  \
+                                 (IS_MM_PAGE_GUARD_ACTIVE ||  IS_MM_POOL_GUARD_ACTIVE))
 
-#define NULL_DETECTION_NONSTOP_MODE  \
-        ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT6|BIT1)) > BIT6)
+#define NULL_DETECTION_NONSTOP_MODE  (gMps.Mm.NullPointerDetection.NonstopModeEnabled   &&  \
+                                      gMps.Mm.NullPointerDetection.Enabled)
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS    Base;

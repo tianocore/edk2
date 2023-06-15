@@ -611,7 +611,7 @@ InitPaging (
   //
   // [0, 4k] may be non-present.
   //
-  PreviousAddress = ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
+  PreviousAddress = (gMps.Mm.NullPointerDetection.Enabled) ? BASE_4KB : 0;
 
   DEBUG ((DEBUG_INFO, "Patch page table start ...\n"));
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
