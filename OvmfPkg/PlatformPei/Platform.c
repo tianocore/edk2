@@ -38,6 +38,7 @@
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <Library/MemEncryptSevLib.h>
 #include <OvmfPlatforms.h>
+#include <Library/SetMemoryProtectionsLib.h>
 
 #include "Platform.h"
 
@@ -304,8 +305,10 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob;
-  EFI_STATUS             Status;
+  EFI_HOB_PLATFORM_INFO           *PlatformInfoHob;
+  EFI_STATUS                      Status;
+  DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
+  MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
   PlatformInfoHob = BuildPlatformInfoHob ();
@@ -341,6 +344,14 @@ InitializePlatform (
   }
 
   PublishPeiMemory (PlatformInfoHob);
+
+  DxeSettings                                 = DxeMemoryProtectionProfiles[DxeMemoryProtectionSettingsPcd].Settings;
+  MmSettings                                  = MmMemoryProtectionProfiles[MmMemoryProtectionSettingsPcd].Settings;
+  DxeSettings.StackExecutionProtectionEnabled = PcdGetBool (PcdSetNxForStack);
+  QemuFwCfgParseBool ("opt/ovmf/PcdSetNxForStack", &DxeSettings.StackExecutionProtectionEnabled);
+
+  SetDxeMemoryProtectionSettings (&DxeSettings, DxeMemoryProtectionSettingsPcd);
+  SetMmMemoryProtectionSettings (&MmSettings, MmMemoryProtectionSettingsPcd);
 
   PlatformQemuUc32BaseInitialization (PlatformInfoHob);
 

@@ -65,6 +65,7 @@
   PcdLib
   CcExitLib
   PlatformInitLib
+  SetMemoryProtectionsLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase

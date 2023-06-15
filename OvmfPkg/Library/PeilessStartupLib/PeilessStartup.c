@@ -14,10 +14,13 @@
 #include <Protocol/DebugSupport.h>
 #include <Library/TdxLib.h>
 #include <IndustryStandard/Tdx.h>
+#include <Library/PcdLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/PeilessStartupLib.h>
 #include <Library/PlatformInitLib.h>
 #include <Library/TdxHelperLib.h>
+#include <Library/SetMemoryProtectionsLib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <OvmfPlatforms.h>
@@ -42,7 +45,9 @@ InitializePlatform (
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  VOID  *VariableStore;
+  VOID                            *VariableStore;
+  DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
+  MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
 
   DEBUG ((DEBUG_INFO, "InitializePlatform in Pei-less boot\n"));
   PlatformDebugDumpCmos ();
@@ -104,7 +109,13 @@ InitializePlatform (
 
   PlatformMemMapInitialization (PlatformInfoHob);
 
-  PlatformNoexecDxeInitialization (PlatformInfoHob);
+  DxeSettings                                 = DxeMemoryProtectionProfiles[DxeMemoryProtectionSettingsPcd].Settings;
+  MmSettings                                  = MmMemoryProtectionProfiles[MmMemoryProtectionSettingsPcd].Settings;
+  DxeSettings.StackExecutionProtectionEnabled = PcdGetBool (PcdSetNxForStack);
+  QemuFwCfgParseBool ("opt/ovmf/PcdSetNxForStack", &DxeSettings.StackExecutionProtectionEnabled);
+
+  SetDxeMemoryProtectionSettings (&DxeSettings, DxeMemoryProtectionSettingsPcd);
+  SetMmMemoryProtectionSettings (&MmSettings, MmMemoryProtectionSettingsPcd);
 
   if (TdIsEnabled ()) {
     PlatformInfoHob->PcdConfidentialComputingGuestAttr = CCAttrIntelTdx;
