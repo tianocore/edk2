@@ -55,6 +55,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
+  GetMemoryProtectionsLib
 
 [Protocols]
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
@@ -64,6 +65,5 @@
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiOvmfPkgTokenSpaceGuid.PcdVideoResolutionSource
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
