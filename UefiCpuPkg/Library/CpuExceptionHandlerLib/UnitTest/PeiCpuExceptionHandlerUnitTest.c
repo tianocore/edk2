@@ -10,6 +10,7 @@
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include <Library/SetMemoryProtectionsLib.h>
 
 /**
   Initialize Bsp Idt with a new Idt table and return the IA32_DESCRIPTOR buffer.
@@ -150,6 +151,26 @@ GetMpServices (
   )
 {
   return PeiServicesLocatePpi (&gEdkiiPeiMpServices2PpiGuid, 0, NULL, (VOID **)&MpServices->Ppi);
+}
+
+/**
+  Checks if stack guard is enabled.
+
+  @param[in] Context The unit test context
+**/
+UNIT_TEST_STATUS
+EFIAPI
+IsStackGuardEnabled (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  MEMORY_PROTECTION_SETTINGS  Mps;
+
+  if (!EFI_ERROR (GetCurrentMemoryProtectionSettings (&Mps))) {
+    return Mps.Dxe.CpuStackGuardEnabled;
+  }
+
+  return FALSE;
 }
 
 /**

@@ -734,7 +734,7 @@ InitializeMpExceptionHandlers (
   //
   // Setup stack switch for Stack Guard feature.
   //
-  if (PcdGetBool (PcdCpuStackGuard)) {
+  if (gMps.Dxe.CpuStackGuardEnabled) {
     InitializeMpExceptionStackSwitchHandlers ();
   }
 }

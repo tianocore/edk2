@@ -103,6 +103,7 @@
   PerformanceLib
   CpuPageTableLib
   MmSaveStateLib
+  GetMemoryProtectionsLib
 
 [Protocols]
   gEfiSmmAccess2ProtocolGuid               ## CONSUMES
@@ -146,8 +147,6 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask        ## CONSUMES
 
 [FixedPcd]
