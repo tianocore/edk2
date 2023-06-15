@@ -1,15 +1,16 @@
 
 === HOW TO USE VTF0 ===
+Add this line to your DSC [Components.IA32] or [Components.X64] section:
+  UefiCpuPkg/ResetVector/Vtf0/ResetVector.inf
 
 Add this line to your FDF FV section:
-INF  RuleOverride=RESET_VECTOR USE = IA32 UefiCpuPkg/ResetVector/Vtf0/Bin/ResetVector.inf
-(For X64 SEC/PEI change IA32 to X64 => 'USE = X64')
+  INF  RuleOverride=RESET_VECTOR UefiCpuPkg/ResetVector/Vtf0/ResetVector.inf
 
 In your FDF FFS file rules sections add:
-[Rule.Common.SEC.RESET_VECTOR]
-  FILE RAW = $(NAMED_GUID) {
-    RAW RAW                |.raw
-  }
+  [Rule.Common.SEC.RESET_VECTOR]
+    FILE RAW = $(NAMED_GUID) {
+      RAW BIN   |.bin
+    }
 
 === VTF0 Boot Flow ===
 
@@ -25,17 +26,3 @@ All inputs to SEC image are register based:
 EAX/RAX - Initial value of the EAX register (BIST: Built-in Self Test)
 DI      - 'BP': boot-strap processor, or 'AP': application processor
 EBP/RBP - Pointer to the start of the Boot Firmware Volume
-
-=== HOW TO BUILD VTF0 ===
-
-Dependencies:
-* Python 3 or newer
-* Nasm 2.03 or newer
-
-To rebuild the VTF0 binaries:
-1. Change to VTF0 source dir: UefiCpuPkg/ResetVector/Vtf0
-2. nasm and python should be in executable path
-3. Run this command:
-   python Build.py
-4. Binaries output will be in UefiCpuPkg/ResetVector/Vtf0/Bin
-
