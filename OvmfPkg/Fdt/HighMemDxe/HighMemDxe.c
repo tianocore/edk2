@@ -13,6 +13,7 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/GetMemoryProtectionsLib.h>
 
 #include <Protocol/Cpu.h>
 #include <Protocol/FdtClient.h>
@@ -148,9 +149,7 @@ InitializeHighMemDxe (
         // on the page table mappings by going through the cpu arch protocol.
         //
         Attributes = EFI_MEMORY_WB;
-        if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) &
-             (1U << (UINT32)EfiConventionalMemory)) != 0)
-        {
+        if (gMps.Dxe.ExecutionProtection.EnabledForType[EfiConventionalMemory]) {
           Attributes |= EFI_MEMORY_XP;
         }
 
