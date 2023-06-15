@@ -9,7 +9,7 @@
   2) This policy is applied only if the UEFI image meets the page alignment
      requirement.
   3) This policy is applied only if the Source UEFI image matches the
-     PcdImageProtectionPolicy definition.
+     Image Protection Policy definition.
   4) This policy is not applied to the non-PE image region.
 
   The DxeCore calls CpuArchProtocol->SetMemoryAttributes() to protect
@@ -61,7 +61,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
 
-UINT32  mImageProtectionPolicy;
+STATIC BOOLEAN  mIsExecutionProtectionActive = FALSE;
+
+STATIC BOOLEAN  mIsPageOrPoolGuardActive = FALSE;
 
 extern LIST_ENTRY  mGcdMemorySpaceMap;
 
@@ -127,11 +129,13 @@ GetProtectionPolicyFromImageType (
   IN UINT32  ImageType
   )
 {
-  if ((ImageType & mImageProtectionPolicy) == 0) {
-    return DO_NOT_PROTECT;
-  } else {
+  if (((ImageType == IMAGE_UNKNOWN) && gMps.Dxe.ImageProtection.ProtectImageFromUnknown) ||
+      ((ImageType == IMAGE_FROM_FV) && gMps.Dxe.ImageProtection.ProtectImageFromFv))
+  {
     return PROTECT_IF_ALIGNED_ELSE_ALLOW;
   }
+
+  return DO_NOT_PROTECT;
 }
 
 /**
@@ -589,7 +593,7 @@ UnprotectUefiImage (
   IMAGE_PROPERTIES_RECORD  *ImageRecord;
   LIST_ENTRY               *ImageRecordLink;
 
-  if (PcdGet32 (PcdImageProtectionPolicy) != 0) {
+  if (IS_DXE_IMAGE_PROTECTION_ACTIVE) {
     for (ImageRecordLink = mProtectedImageRecordList.ForwardLink;
          ImageRecordLink != &mProtectedImageRecordList;
          ImageRecordLink = ImageRecordLink->ForwardLink)
@@ -626,21 +630,23 @@ GetPermissionAttributeForMemoryType (
   IN EFI_MEMORY_TYPE  MemoryType
   )
 {
-  UINT64  TestBit;
+  UINT32  TestMemoryType;
 
   if ((UINT32)MemoryType >= MEMORY_TYPE_OS_RESERVED_MIN) {
-    TestBit = BIT63;
+    TestMemoryType = OS_RESERVED_MPS_MEMORY_TYPE;
   } else if ((UINT32)MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) {
-    TestBit = BIT62;
-  } else {
-    TestBit = LShiftU64 (1, MemoryType);
-  }
-
-  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) != 0) {
+    TestMemoryType = OEM_RESERVED_MPS_MEMORY_TYPE;
+  } else if (MemoryType >= EfiMaxMemoryType) {
     return EFI_MEMORY_XP;
   } else {
-    return 0;
+    TestMemoryType = MemoryType;
   }
+
+  if (gMps.Dxe.ExecutionProtection.EnabledForType[TestMemoryType]) {
+    return EFI_MEMORY_XP;
+  }
+
+  return 0;
 }
 
 /**
@@ -750,7 +756,7 @@ MergeMemoryMapForProtectionPolicy (
 
 /**
   Remove exec permissions from all regions whose type is identified by
-  PcdDxeNxMemoryProtectionPolicy.
+  the DXE Execution Protection Policy.
 **/
 STATIC
 VOID
@@ -805,7 +811,7 @@ InitializeDxeNxMemoryProtectionPolicy (
   ASSERT_EFI_ERROR (Status);
 
   StackBase = 0;
-  if (PcdGetBool (PcdCpuStackGuard)) {
+  if (gMps.Dxe.CpuStackGuardEnabled) {
     //
     // Get the base of stack from Hob.
     //
@@ -863,7 +869,7 @@ InitializeDxeNxMemoryProtectionPolicy (
       // enabled.
       //
       if ((MemoryMapEntry->PhysicalStart == 0) &&
-          (PcdGet8 (PcdNullPointerDetectionPropertyMask) != 0))
+          (gMps.Dxe.NullPointerDetection.Enabled))
       {
         ASSERT (MemoryMapEntry->NumberOfPages > 0);
         SetUefiImageMemoryAttributes (
@@ -881,7 +887,7 @@ InitializeDxeNxMemoryProtectionPolicy (
           ((StackBase >= MemoryMapEntry->PhysicalStart) &&
            (StackBase <  MemoryMapEntry->PhysicalStart +
             LShiftU64 (MemoryMapEntry->NumberOfPages, EFI_PAGE_SHIFT))) &&
-          PcdGetBool (PcdCpuStackGuard))
+          gMps.Dxe.CpuStackGuardEnabled)
       {
         SetUefiImageMemoryAttributes (
           StackBase,
@@ -1002,7 +1008,7 @@ MemoryProtectionCpuArchProtocolNotify (
   //
   // Apply the memory protection policy on non-BScode/RTcode regions.
   //
-  if (PcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0) {
+  if (IS_DXE_EXECUTION_PROTECTION_ACTIVE) {
     InitializeDxeNxMemoryProtectionPolicy ();
   }
 
@@ -1014,7 +1020,7 @@ MemoryProtectionCpuArchProtocolNotify (
   // Mark the HOB list XP and RO.
   ProtectHobList ();
 
-  if (mImageProtectionPolicy == 0) {
+  if (!IS_DXE_IMAGE_PROTECTION_ACTIVE) {
     goto Done;
   }
 
@@ -1077,7 +1083,7 @@ MemoryProtectionExitBootServicesCallback (
   // delay setting protections on RT code pages until after SetVirtualAddressMap().
   // OS may set protection on RT based upon EFI_MEMORY_ATTRIBUTES_TABLE later.
   //
-  if (mImageProtectionPolicy != 0) {
+  if (IS_DXE_IMAGE_PROTECTION_ACTIVE) {
     for (Link = gRuntime->ImageHead.ForwardLink; Link != &gRuntime->ImageHead; Link = Link->ForwardLink) {
       RuntimeImage = BASE_CR (Link, EFI_RUNTIME_IMAGE_ENTRY, Link);
       SetUefiImageMemoryAttributes ((UINT64)(UINTN)RuntimeImage->ImageBase, ALIGN_VALUE (RuntimeImage->ImageSize, EFI_PAGE_SIZE), 0);
@@ -1151,19 +1157,20 @@ CoreInitializeMemoryProtection (
   EFI_EVENT   EndOfDxeEvent;
   VOID        *Registration;
 
-  mImageProtectionPolicy = PcdGet32 (PcdImageProtectionPolicy);
+  mIsExecutionProtectionActive = IS_DXE_EXECUTION_PROTECTION_ACTIVE;
+  mIsPageOrPoolGuardActive     = IS_DXE_PAGE_GUARD_ACTIVE || IS_DXE_POOL_GUARD_ACTIVE;
 
   InitializeListHead (&mProtectedImageRecordList);
 
   //
-  // Sanity check the PcdDxeNxMemoryProtectionPolicy setting:
+  // Sanity check the DXE NX protection policy setting:
   // - code regions should have no EFI_MEMORY_XP attribute
   // - EfiConventionalMemory and EfiBootServicesData should use the
   //   same attribute
   //
-  ASSERT ((GetPermissionAttributeForMemoryType (EfiBootServicesCode) & EFI_MEMORY_XP) == 0);
-  ASSERT ((GetPermissionAttributeForMemoryType (EfiRuntimeServicesCode) & EFI_MEMORY_XP) == 0);
-  ASSERT ((GetPermissionAttributeForMemoryType (EfiLoaderCode) & EFI_MEMORY_XP) == 0);
+  ASSERT (!gMps.Dxe.ExecutionProtection.EnabledForType[EfiLoaderCode]);
+  ASSERT (!gMps.Dxe.ExecutionProtection.EnabledForType[EfiBootServicesCode]);
+  ASSERT (!gMps.Dxe.ExecutionProtection.EnabledForType[EfiRuntimeServicesCode]);
   ASSERT (
     GetPermissionAttributeForMemoryType (EfiBootServicesData) ==
     GetPermissionAttributeForMemoryType (EfiConventionalMemory)
@@ -1191,9 +1198,7 @@ CoreInitializeMemoryProtection (
   //
   // Register a callback to disable NULL pointer detection at EndOfDxe
   //
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7))
-      == (BIT0|BIT7))
-  {
+  if (gMps.Dxe.NullPointerDetection.Enabled && gMps.Dxe.NullPointerDetection.DisableEndOfDxe) {
     Status = CoreCreateEventEx (
                EVT_NOTIFY_SIGNAL,
                TPL_NOTIFY,
@@ -1257,7 +1262,7 @@ ApplyMemoryProtectionPolicy (
   UINT64  NewAttributes;
 
   //
-  // The policy configured in PcdDxeNxMemoryProtectionPolicy
+  // The policy configured in DXE Execution Protection Policy
   // does not apply to allocations performed in SMM mode.
   //
   if (IsInSmm ()) {
@@ -1276,7 +1281,7 @@ ApplyMemoryProtectionPolicy (
   //
   // Check if a DXE memory protection policy has been configured
   //
-  if (PcdGet64 (PcdDxeNxMemoryProtectionPolicy) == 0) {
+  if (!mIsExecutionProtectionActive) {
     return EFI_SUCCESS;
   }
 
@@ -1284,7 +1289,7 @@ ApplyMemoryProtectionPolicy (
   // Don't overwrite Guard pages, which should be the first and/or last page,
   // if any.
   //
-  if (IsHeapGuardEnabled (GUARD_HEAP_TYPE_PAGE|GUARD_HEAP_TYPE_POOL)) {
+  if (mIsPageOrPoolGuardActive) {
     if (IsGuardPage (Memory)) {
       Memory += EFI_PAGE_SIZE;
       Length -= EFI_PAGE_SIZE;

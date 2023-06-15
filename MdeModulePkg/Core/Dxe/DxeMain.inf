@@ -95,6 +95,7 @@
   CpuExceptionHandlerLib
   PcdLib
   ImagePropertiesRecordLib
+  GetMemoryProtectionsLib
 
 [Guids]
   gEfiEventMemoryMapChangeGuid                  ## PRODUCES             ## Event
@@ -180,13 +181,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileMemoryType                 ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfilePropertyMask               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryProfileDriverPath                 ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy                   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy             ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask        ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType                       ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType                       ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask                   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFwVolDxeMaxEncapsulationDepth           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageLargeAddressLoad                   ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel                          ## CONSUMES
