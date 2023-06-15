@@ -56,6 +56,8 @@
   PrePiLib
   QemuFwCfgLib
   PlatformInitLib
+  SetMemoryProtectionsLib
+  QemuFwCfgSimpleParserLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid
@@ -81,6 +83,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack                       ## CONSUMES
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported
