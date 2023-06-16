@@ -178,7 +178,7 @@ CryptoPkg
 F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-M: Jian J Wang <jian.j.wang@intel.com> [jwang36]
+M: Yi Li <yi1.li@intel.com> [liyi77]
 R: Xiaoyu Lu <xiaoyu1.lu@intel.com> [xiaoyuxlu]
 R: Guomin Jiang <guomin.jiang@intel.com> [guominjia]
 
