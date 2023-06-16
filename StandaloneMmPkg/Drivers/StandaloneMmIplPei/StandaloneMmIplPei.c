@@ -7,8 +7,12 @@
 **/
 
 #include <PiPei.h>
+#include <PiSmm.h>
+#include <StandaloneMm.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/PeCoffLib.h>
+#include <Library/CacheMaintenanceLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
@@ -39,7 +43,7 @@ MM_CORE_PRIVATE_DATA  mMmCorePrivateData = {
 };
 
 //
-// Global pointer used to access mMmCorePrivateData from outside and inside SMM
+// Global pointer used to access mMmCorePrivateData from outside and inside SMM.
 //
 MM_CORE_PRIVATE_DATA  *gMmCorePrivate;
 
@@ -92,6 +96,329 @@ GetSmramCacheRange (
       }
     }
   } while (FoundAdjacentRange);
+}
+
+/**
+  Load SMM core to dispatch other Standalone MM drivers.
+
+  @param  Entry                     Entry of Standalone MM Foundation.
+  @param  Context1                  A pointer to the context to pass into the EntryPoint
+                                    function.
+  @retval EFI_SUCCESS               Successfully loaded SMM core.
+  @retval Others                    Failed to load SMM core.
+**/
+EFI_STATUS
+LoadSmmCore (
+  IN EFI_PHYSICAL_ADDRESS  Entry,
+  IN VOID                  *Context1
+  )
+{
+  STANDALONE_MM_FOUNDATION_ENTRY_POINT  EntryPoint;
+
+  EntryPoint = (STANDALONE_MM_FOUNDATION_ENTRY_POINT)(UINTN)Entry;
+  return EntryPoint (Context1);
+}
+
+/**
+  Get the fixed loading address from image header assigned by build tool. This function only be called
+  when Loading module at Fixed address feature enabled.
+
+  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
+                                    image that needs to be examined by this function.
+  @retval EFI_SUCCESS               An fixed loading address is assigned to this image by build tools .
+  @retval EFI_NOT_FOUND             The image has no assigned fixed loading address.
+**/
+EFI_STATUS
+GetPeCoffImageFixLoadingAssignedAddress (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  )
+{
+  UINTN                            SectionHeaderOffset;
+  EFI_STATUS                       Status;
+  EFI_IMAGE_SECTION_HEADER         SectionHeader;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION  *ImgHdr;
+  EFI_PHYSICAL_ADDRESS             FixLoadingAddress;
+  UINT16                           Index;
+  UINTN                            Size;
+  UINT16                           NumberOfSections;
+  EFI_PHYSICAL_ADDRESS             SmramBase;
+  UINT64                           ValueInSectionHeader;
+
+  FixLoadingAddress = 0;
+  Status            = EFI_NOT_FOUND;
+  SmramBase         = mCurrentSmramRange->CpuStart;
+  //
+  // Get PeHeader pointer
+  //
+  ImgHdr              = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8 *)ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
+  SectionHeaderOffset = (UINTN)(
+                                ImageContext->PeCoffHeaderOffset +
+                                sizeof (UINT32) +
+                                sizeof (EFI_IMAGE_FILE_HEADER) +
+                                ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader
+                                );
+  NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
+
+  //
+  // Get base address from the first section header that doesn't point to code section.
+  //
+  for (Index = 0; Index < NumberOfSections; Index++) {
+    //
+    // Read section header from file
+    //
+    Size   = sizeof (EFI_IMAGE_SECTION_HEADER);
+    Status = ImageContext->ImageRead (
+                             ImageContext->Handle,
+                             SectionHeaderOffset,
+                             &Size,
+                             &SectionHeader
+                             );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Status = EFI_NOT_FOUND;
+
+    if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
+      //
+      // Build tool saves the offset to SMRAM base as image base in PointerToRelocations & PointerToLineNumbers fields in the
+      // first section header that doesn't point to code section in image header. And there is an assumption that when the
+      // feature is enabled, if a module is assigned a loading address by tools, PointerToRelocations & PointerToLineNumbers
+      // fields should NOT be Zero, or else, these 2 fields should be set to Zero
+      //
+      ValueInSectionHeader = ReadUnaligned64 ((UINT64 *)&SectionHeader.PointerToRelocations);
+      if (ValueInSectionHeader != 0) {
+        //
+        // Found first section header that doesn't point to code section in which build tool saves the
+        // offset to SMRAM base as image base in PointerToRelocations & PointerToLineNumbers fields
+        //
+        FixLoadingAddress = (EFI_PHYSICAL_ADDRESS)(SmramBase + (INT64)ValueInSectionHeader);
+
+        if ((SmramBase > FixLoadingAddress) && (SmramBase <= FixLoadingAddress)) {
+          //
+          // The assigned address is valid. Return the specified loading address
+          //
+          ImageContext->ImageAddress = FixLoadingAddress;
+          Status                     = EFI_SUCCESS;
+        }
+      }
+
+      break;
+    }
+
+    SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
+  }
+
+  DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x, Status = %r \n", FixLoadingAddress, Status));
+  return Status;
+}
+
+/**
+  Search all the available firmware volumes for SMM Core driver.
+
+  @param  MmFvBaseAddress      Base address of FV which included SMM Core driver.
+  @param  MmCoreImageAddress   Image address of SMM Core driver.
+
+  @retval EFI_SUCCESS          The specified FFS section was returned.
+  @retval EFI_NOT_FOUND        The specified FFS section could not be found.
+
+**/
+EFI_STATUS
+LocateMmFvForMmCore (
+  OUT EFI_PHYSICAL_ADDRESS  *MmFvBaseAddress,
+  OUT VOID                  **MmCoreImageAddress
+  )
+{
+  EFI_STATUS           Status;
+  UINTN                FvIndex;
+  EFI_PEI_FV_HANDLE    VolumeHandle;
+  EFI_PEI_FILE_HANDLE  FileHandle;
+  EFI_PE32_SECTION     *SectionData;
+  EFI_FV_INFO          VolumeInfo;
+
+  //
+  // Search all FV
+  //
+  VolumeHandle = NULL;
+  for (FvIndex = 0; ; FvIndex++) {
+    Status = PeiServicesFfsFindNextVolume (FvIndex, &VolumeHandle);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    //
+    // Search PEIM FFS
+    //
+    FileHandle = NULL;
+    Status     = PeiServicesFfsFindNextFile (EFI_FV_FILETYPE_MM_CORE_STANDALONE, VolumeHandle, &FileHandle);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    //
+    // Search Section
+    //
+    Status = PeiServicesFfsFindSectionData (EFI_SECTION_PE32, FileHandle, MmCoreImageAddress);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    //
+    // Great!
+    //
+    SectionData = (EFI_PE32_SECTION *)((UINT8 *)*MmCoreImageAddress - sizeof (EFI_PE32_SECTION));
+    ASSERT (SectionData->Type == EFI_SECTION_PE32);
+
+    //
+    // This is SMM BFV
+    //
+    Status = PeiServicesFfsGetVolumeInfo (VolumeHandle, &VolumeInfo);
+    if (!EFI_ERROR (Status)) {
+      *MmFvBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)VolumeInfo.FvStart;
+    }
+
+    return EFI_SUCCESS;
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Load the SMM Core image into SMRAM and executes the SMM Core from SMRAM.
+
+  @param[in, out] SmramRange            Descriptor for the range of SMRAM to reload the
+                                        currently executing image, the rang of SMRAM to
+                                        hold SMM Core will be excluded.
+  @param[in, out] SmramRangeSmmCore     Descriptor for the range of SMRAM to hold SMM Core.
+
+  @param[in]      Context               Context to pass into SMM Core
+
+  @return  EFI_STATUS
+
+**/
+EFI_STATUS
+ExecuteSmmCoreFromSmram (
+  IN OUT EFI_SMRAM_DESCRIPTOR  *SmramRange,
+  IN OUT EFI_SMRAM_DESCRIPTOR  *SmramRangeSmmCore,
+  IN     VOID                  *Context
+  )
+{
+  EFI_STATUS                    Status;
+  VOID                          *SourceBuffer;
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+  UINTN                         PageCount;
+  VOID                          *HobList;
+  EFI_PHYSICAL_ADDRESS          SourceFvBaseAddress;
+
+  Status = PeiServicesGetHobList (&HobList);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Search all Firmware Volumes for a PE/COFF image in a file of type SMM_CORE.
+  //
+  Status = LocateMmFvForMmCore (&SourceFvBaseAddress, &SourceBuffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  gMmCorePrivate->StandaloneBfvAddress = SourceFvBaseAddress;
+
+  //
+  // Initialize ImageContext
+  //
+  ImageContext.Handle    = SourceBuffer;
+  ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
+
+  //
+  // Get information about the image being loaded
+  //
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Allocate memory for the image being loaded from the EFI_SRAM_DESCRIPTOR
+  // specified by SmramRange
+  //
+  PageCount = (UINTN)EFI_SIZE_TO_PAGES ((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
+
+  ASSERT ((SmramRange->PhysicalSize & EFI_PAGE_MASK) == 0);
+  ASSERT (SmramRange->PhysicalSize > EFI_PAGES_TO_SIZE (PageCount));
+
+  SmramRange->PhysicalSize        -= EFI_PAGES_TO_SIZE (PageCount);
+  SmramRangeSmmCore->CpuStart      = SmramRange->CpuStart + SmramRange->PhysicalSize;
+  SmramRangeSmmCore->PhysicalStart = SmramRange->PhysicalStart + SmramRange->PhysicalSize;
+  SmramRangeSmmCore->RegionState   = SmramRange->RegionState | EFI_ALLOCATED;
+  SmramRangeSmmCore->PhysicalSize  = EFI_PAGES_TO_SIZE (PageCount);
+
+  //
+  // Align buffer on section boundary
+  //
+  ImageContext.ImageAddress = SmramRangeSmmCore->CpuStart;
+
+  ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
+  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
+
+  //
+  // Print debug message showing SMM Core load address.
+  //
+  DEBUG ((DEBUG_INFO, "SMM IPL loading SMM Core at SMRAM address %p\n", (VOID *)(UINTN)ImageContext.ImageAddress));
+
+  //
+  // Load the image to our new buffer
+  //
+  Status = PeCoffLoaderLoadImage (&ImageContext);
+  if (!EFI_ERROR (Status)) {
+    //
+    // Relocate the image in our new buffer
+    //
+    Status = PeCoffLoaderRelocateImage (&ImageContext);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Flush the instruction cache so the image data are written before we execute it
+      //
+      InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
+
+      //
+      // Print debug message showing SMM Core entry point address.
+      //
+      DEBUG ((DEBUG_INFO, "SMM IPL calling SMM Core at SMRAM address %p\n", (VOID *)(UINTN)ImageContext.EntryPoint));
+
+      gMmCorePrivate->MmCoreImageBase = ImageContext.ImageAddress;
+      gMmCorePrivate->MmCoreImageSize = ImageContext.ImageSize;
+      DEBUG ((DEBUG_INFO, "SmmCoreImageBase - 0x%016lx\n", gMmCorePrivate->MmCoreImageBase));
+      DEBUG ((DEBUG_INFO, "SmmCoreImageSize - 0x%016lx\n", gMmCorePrivate->MmCoreImageSize));
+
+      gMmCorePrivate->MmCoreEntryPoint = ImageContext.EntryPoint;
+
+      //
+      // Print debug message showing Standalone MM Core entry point address.
+      //
+      DEBUG ((DEBUG_INFO, "SMM IPL calling Standalone MM Core at SMRAM address - 0x%016lx\n", gMmCorePrivate->MmCoreEntryPoint));
+
+      //
+      // Execute image
+      //
+      LoadSmmCore (ImageContext.EntryPoint, HobList);
+    }
+  }
+
+  //
+  // If the load operation, relocate operation, or the image execution return an
+  // error, then free memory allocated from the EFI_SRAM_DESCRIPTOR specified by
+  // SmramRange
+  //
+  if (EFI_ERROR (Status)) {
+    SmramRange->PhysicalSize += EFI_PAGES_TO_SIZE (PageCount);
+  }
+
+  //
+  // Always free memory allocated by GetFileBufferByFilePath ()
+  //
+  FreePool (SourceBuffer);
+
+  return Status;
 }
 
 /**
@@ -178,6 +505,7 @@ StandaloneMmIplPeiEntry (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_STATUS             Status;
   UINTN                  Index;
   UINT64                 MaxSize;
   MM_CORE_DATA_HOB_DATA  SmmCoreDataHobData;
@@ -252,6 +580,22 @@ StandaloneMmIplPeiEntry (
       ));
 
     GetSmramCacheRange (mCurrentSmramRange, &mSmramCacheBase, &mSmramCacheSize);
+
+    //
+    // Load SMM Core into SMRAM and execute it from SMRAM
+    // Note: SmramRanges specific for SMM Core will put in the gMmCorePrivate->MmramRangeCount - 1.
+    //
+    Status = ExecuteSmmCoreFromSmram (
+               mCurrentSmramRange,
+               &(((EFI_MMRAM_DESCRIPTOR *)(UINTN)gMmCorePrivate->MmramRanges)[gMmCorePrivate->MmramRangeCount - 1]),
+               gMmCorePrivate
+               );
+    if (EFI_ERROR (Status)) {
+      //
+      // Print error message that the SMM Core failed to be loaded and executed.
+      //
+      DEBUG ((DEBUG_ERROR, "SMM IPL could not load and execute SMM Core from SMRAM\n"));
+    }
   } else {
     //
     // Print error message that there are not enough SMRAM resources to load the SMM Core.

@@ -36,6 +36,8 @@
   PeiServicesLib
   BaseLib
   BaseMemoryLib
+  PeCoffLib
+  CacheMaintenanceLib
   MemoryAllocationLib
   DebugLib
   HobLib
