@@ -11,6 +11,7 @@
 #include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
+#include <Library/SetMemoryProtectionsLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
@@ -99,6 +100,12 @@ InitializeMemory (
              FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)
              );
   ASSERT_EFI_ERROR (Status);
+
+  ASSERT (FixedPcdGet8 (PcdDxeMemoryProtectionProfile) < DxeMemoryProtectionSettingsMax);
+  SetDxeMemoryProtectionSettings (
+    NULL,
+    (DXE_MEMORY_PROTECTION_PROFILE_INDEX)FixedPcdGet8 (PcdDxeMemoryProtectionProfile)
+    );
 
   return Status;
 }

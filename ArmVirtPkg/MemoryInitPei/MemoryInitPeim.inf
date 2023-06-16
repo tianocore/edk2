@@ -26,6 +26,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
@@ -34,6 +35,7 @@
   ArmLib
   ArmPlatformLib
   MemoryInitPeiLib
+  SetMemoryProtectionsLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -44,6 +46,7 @@
 [FixedPcd]
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+  gArmVirtTokenSpaceGuid.PcdDxeMemoryProtectionProfile
 
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
