@@ -373,21 +373,6 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|20
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
 
-  #
-  # Enable strict image permissions for all images. (This applies
-  # only to images that were built with >= 4 KB section alignment.)
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x3
-
-  #
-  # Enable NX memory protection for all non-code regions, including OEM and OS
-  # reserved ones, with the exception of LoaderData regions, of which OS loaders
-  # (i.e., GRUB) may assume that its contents are executable.
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD5
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|TRUE
-
 [Components.common]
   #
   # Ramdisk support
