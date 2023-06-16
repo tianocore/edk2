@@ -34,6 +34,7 @@
   ArmLib
   ArmPlatformLib
   MemoryInitPeiLib
+  SetMemoryProtectionsLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
