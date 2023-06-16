@@ -506,9 +506,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
-  # Noexec settings for DXE.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE
-
   # Set memory encryption mask
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask|0x0
 

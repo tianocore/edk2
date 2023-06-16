@@ -68,6 +68,5 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
