@@ -1,0 +1,13 @@
+// /** @file
+// SPI NOR Flash SFDP Localized Strings and Content.
+//
+// Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "EDK2 SPI NOR FLASH SFDP SMM driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This driver provides SPI NOR FLASH Serial Flash Discoverable Parameter (SFDP) compatible flash device capability discovery."
+

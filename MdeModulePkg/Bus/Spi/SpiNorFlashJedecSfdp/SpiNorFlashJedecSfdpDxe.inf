@@ -1,0 +1,64 @@
+## @file
+#  The SPI NOR Flash JEDEC Serial Flash Discoverable Parameters (SFDP)
+#  DXE driver INF file.
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# @par Revision Reference:
+#   - JEDEC Standard, JESD216F.02
+#     https://www.jedec.org/document_search?search_api_views_fulltext=JESD216
+#
+# @par Glossary:
+#   - SFDP - Serial Flash Discoverable Parameters
+#   - PTP  - Parameter Table Pointer
+##
+
+[Defines]
+  INF_VERSION               = 1.25
+  BASE_NAME                 = SpiNorFlashJedecSfdpDxe
+  FILE_GUID                 = 0DC9C2C7-D450-41BA-9CF7-D2090C35A797
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 0.1
+  PI_SPECIFICATION_VERSION  = 1.10
+  ENTRY_POINT               = SpiNorFlashJedecSfdpDxeEntry
+  MODULE_UNI_FILE           = SpiNorFlashJedecSfdpDxe.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  TimerLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+
+[Sources]
+  SpiNorFlashJedecSfdpDxe.c
+  SpiNorFlash.c
+  SpiNorFlashJedecSfdp.c
+  SpiNorFlashJedecSfdpInternal.h
+  SpiNorFlash.h
+
+[Protocols]
+  gEfiSpiNorFlashProtocolGuid  ## PROCUDES
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashOperationRetryCount
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashFixedTimeoutRetryCount
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashOperationDelayMicroseconds
+
+[Guids]
+  gEdk2JedecSfdpSpiDxeDriverGuid
+
+[Depex]
+  gEdk2JedecSfdpSpiDxeDriverGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SpiNorFlashJedecSfdpExtra.uni
