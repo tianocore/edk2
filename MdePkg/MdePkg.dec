@@ -875,6 +875,12 @@
   ## Include/Protocol/CcMeasurement.h
   gEfiCcFinalEventsTableGuid     = { 0xdd4a4648, 0x2de7, 0x4665, { 0x96, 0x4d, 0x21, 0xd9, 0xef, 0x5f, 0xb4, 0x46 }}
 
+  #
+  # SPI NOR flash JEDEC Serial Flash Discoverable Parameters (SFDP) driver GUID
+  #
+  gEdk2JedecSfdpSpiDxeDriverGuid  = { 0xBE71701E, 0xB63C, 0x4574, { 0x9C, 0x5C, 0x36, 0x29, 0xE8, 0xEA, 0xC4, 0x14 }}
+  gEdk2JedecSfdpSpiSmmDriverGuid  = { 0x95A1E915, 0x195C, 0x477C, { 0x92, 0x6F, 0x7E, 0x24, 0x67, 0xC1, 0xB3, 0x1F }}
+
 [Guids.IA32, Guids.X64]
   ## Include/Guid/Cper.h
   gEfiIa32X64ErrorTypeCacheCheckGuid = { 0xA55701F5, 0xE3EF, 0x43de, { 0xAC, 0x72, 0x24, 0x9B, 0x57, 0x3F, 0xAD, 0x2C }}
@@ -2231,6 +2237,19 @@
   #   Other - reserved
   # @Prompt Speculation Barrier Type.
   gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType|0x01|UINT8|0x30001018
+
+  ## SPI NOR Flash operation retry counts
+  #  0x00000000:  No retry
+  #  0xFFFFFFFF:  Maximum retry value
+  #
+  # @Prompt SPI NOR Flash Operation Retry Value
+  gEfiMdePkgTokenSpaceGuid.PcdSpiNorFlashOperationRetryCount|0xFFFFFFFF|UINT32|0x30001019
+
+  ## SPI NOR Flash operation delay in microseconds
+  #  Deafult is set to 0x0000000f microseconds
+  #
+  # @Prompt SPI NOR Flash Operation Delay in Microseconds
+  gEfiMdePkgTokenSpaceGuid.PcdSpiNorFlashOperationDelayMicroseconds|0x0000000F|UINT32|0x3000101A
 
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Indicates the maximum length of unicode string used in the following
