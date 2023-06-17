@@ -2,6 +2,7 @@
   This file defines the SPI Configuration Protocol.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
@@ -167,6 +168,13 @@ typedef struct _EFI_SPI_BUS {
   ///
   VOID    *ClockParameter;
 } EFI_SPI_BUS;
+
+///
+/// Definitions of SPI Part Attributes.
+///
+#define SPI_PART_SUPPORTS_2_BIT_DATA_BUS_WIDTH  BIT0
+#define SPl_PART_SUPPORTS_4_B1T_DATA_BUS_WIDTH  BIT1
+#define SPl_PART_SUPPORTS_8_B1T_DATA_BUS_WIDTH  BIT2
 
 ///
 /// The EFI_SPI_PERIPHERAL data structure describes how a specific block of
