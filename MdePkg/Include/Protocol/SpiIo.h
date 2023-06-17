@@ -2,10 +2,11 @@
   This file defines the SPI I/O Protocol.
 
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
-    This Protocol was introduced in UEFI PI Specification 1.6.
+    This Protocol was introduced in UEFI PI Specification 1.8 A.
 
 **/
 
@@ -222,6 +223,15 @@ typedef struct _EFI_SPI_BUS_TRANSACTION {
   ///
   UINT8                       *ReadBuffer;
 } EFI_SPI_BUS_TRANSACTION;
+
+///
+/// Definitions of SPI I/O Attributes.
+///
+#define SPI_IO_SUPPORTS_2_BIT_DATA_BUS_WIDTH   BIT0
+#define SPI_IO_SUPPORTS_4_BIT_DATA_BUS_WIDTH   BIT1
+#define SPI_IO_SUPPORTS_8_BIT_DATA_BUS_WIDTH   BIT2
+#define SPI_IO_TRANSFER_SIZE_INCLUDES_OPCODE   BIT3
+#define SPI_IO_TRANSFER_SIZE_INCLUDES_ADDRESS  BIT4
 
 ///
 /// Support managed SPI data transactions between the SPI controller and a SPI
