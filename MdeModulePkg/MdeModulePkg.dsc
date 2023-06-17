@@ -4,7 +4,7 @@
 # (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
 # Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
-# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -285,6 +285,8 @@
   MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
   MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
+  MdeModulePkg/Bus/Spi/SpiNorFlashJedecSfdp/SpiNorFlashJedecSfdpDxe.inf
+  MdeModulePkg/Bus/Spi/SpiNorFlashJedecSfdp/SpiNorFlashJedecSfdpSmm.inf
 
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
