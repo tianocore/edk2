@@ -1,0 +1,33 @@
+## @file
+# Google Test mocks for UefiBootServicesTableLib
+#
+# Copyright (c) 2023, Intel Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MockUefiBootServicesTableLib
+  FILE_GUID                      = 9C6D2161-61B2-4094-BC8D-92F70C5E3C06
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MockUefiBootServicesTableLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MockUefiBootServicesTableLib.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc
