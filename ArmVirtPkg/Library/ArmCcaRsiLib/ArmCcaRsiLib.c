@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-bet1
+   - Realm Management Monitor (RMM) Specification, version 1.0-bet2
      (https://developer.arm.com/documentation/den0137/)
 
 **/
@@ -522,7 +522,6 @@ RsiHostCall (
 
   // Clear the reserved fields
   ZeroMem (&Args->Reserved1, sizeof (Args->Reserved1));
-  ZeroMem (&Args->Reserved, sizeof (Args->Reserved));
 
   ZeroMem (&SmcCmd, sizeof (SmcCmd));
   SmcCmd.Arg0 = FID_RSI_HOST_CALL;
