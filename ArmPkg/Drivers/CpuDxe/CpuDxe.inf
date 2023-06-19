@@ -66,6 +66,7 @@
 [Pcd.common]
   gArmTokenSpaceGuid.PcdVFPEnabled
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
+  gArmTokenSpaceGuid.PcdEnableEfiMemoryAttributeProtocol
 
 [FeaturePcd.common]
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport

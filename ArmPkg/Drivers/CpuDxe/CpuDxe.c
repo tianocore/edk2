@@ -329,10 +329,19 @@ CpuDxeInitialize (
                   &mCpuHandle,
                   &gEfiCpuArchProtocolGuid,
                   &mCpu,
-                  &gEfiMemoryAttributeProtocolGuid,
-                  &mMemoryAttribute,
                   NULL
                   );
+  ASSERT_EFI_ERROR (Status);
+
+  if (PcdGetBool (PcdEnableEfiMemoryAttributeProtocol)) {
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mCpuHandle,
+                    &gEfiMemoryAttributeProtocolGuid,
+                    &mMemoryAttribute,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   //
   // Make sure GCD and MMU settings match. This API calls gDS->SetMemorySpaceAttributes ()
