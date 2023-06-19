@@ -692,7 +692,9 @@ SmmEntryPoint (
   //
   // Call platform hook before Smm Dispatch
   //
+  PERF_START (NULL, "PlatformHookBeforeSmmDispatch", NULL, 0);
   PlatformHookBeforeSmmDispatch ();
+  PERF_END (NULL, "PlatformHookBeforeSmmDispatch", NULL, 0);
 
   //
   // Call memory management hook function
@@ -769,7 +771,9 @@ SmmEntryPoint (
   //
   // Call platform hook after Smm Dispatch
   //
+  PERF_START (NULL, "PlatformHookAfterSmmDispatch", NULL, 0);
   PlatformHookAfterSmmDispatch ();
+  PERF_END (NULL, "PlatformHookAfterSmmDispatch", NULL, 0);
 
   //
   // If a legacy boot has occurred, then make sure gSmmCorePrivate is not accessed
