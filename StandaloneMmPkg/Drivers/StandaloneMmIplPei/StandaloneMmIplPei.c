@@ -306,6 +306,15 @@ ExecuteSmmCoreFromSmram (
       DEBUG ((DEBUG_INFO, "SMM IPL calling Standalone MM Core at SMRAM address - 0x%016lx\n", gMmCorePrivate->MmCoreEntryPoint));
 
       //
+      // If StandaloneMmIpl driver is X64 image, but Standalone MM core is IA32 image,
+      // this case is not supported.
+      //
+      if ((sizeof (UINTN) == sizeof (UINT64)) && (ImageContext.Machine == EFI_IMAGE_MACHINE_IA32)) {
+        DEBUG ((DEBUG_ERROR, "X64 SMM IPL call IA32 MM core is not supported !\n"));
+        CpuDeadLoop ();
+      }
+
+      //
       // If StandaloneMmIpl driver is IA32 image, but Standalone MM core is X64 image
       // Switch 32 bit protect mode to X64 mode and load SMM core
       //
