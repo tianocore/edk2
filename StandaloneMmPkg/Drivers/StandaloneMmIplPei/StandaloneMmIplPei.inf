@@ -23,7 +23,15 @@
 #
 
 [Sources]
+  StandaloneMmIplPei.h
   StandaloneMmIplPei.c
+
+[Sources.Ia32]
+  Ia32/LoadSmmCore.c
+  Ia32/Thunk32To64.nasm
+
+[Sources.X64]
+  X64/LoadSmmCore.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -48,6 +56,9 @@
 
 [Ppis]
   gPeiSmmAccessPpiGuid                     ## CONSUMES
+
+[Pcd.IA32]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable              ## SOMETIMES_CONSUMES
 
 [Pcd]
 

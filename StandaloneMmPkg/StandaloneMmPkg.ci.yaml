@@ -78,7 +78,9 @@
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
         "AuditOnly": False,
-        "IgnoreFiles": [],           # use gitignore syntax to ignore errors
+        "IgnoreFiles": [
+            "Drivers/StandaloneMmIplPei/Ia32/Thunk32To64.nasm"
+        ],           # use gitignore syntax to ignore errors
                                      # in matching files
         "ExtendWords": [
             "Bsymbolic",

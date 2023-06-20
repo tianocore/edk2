@@ -20,6 +20,7 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/HobLib.h>
 #include <Guid/MmCoreData.h>
+#include <StandaloneMmIplPei.h>
 
 //
 // MM Core Private Data structure that contains the data shared between
@@ -305,9 +306,20 @@ ExecuteSmmCoreFromSmram (
       DEBUG ((DEBUG_INFO, "SMM IPL calling Standalone MM Core at SMRAM address - 0x%016lx\n", gMmCorePrivate->MmCoreEntryPoint));
 
       //
-      // Execute image
+      // If StandaloneMmIpl driver is IA32 image, but Standalone MM core is X64 image
+      // Switch 32 bit protect mode to X64 mode and load SMM core
       //
-      LoadSmmCore (ImageContext.EntryPoint, HobList);
+      if ((sizeof (UINTN) == sizeof (UINT32)) && (ImageContext.Machine == EFI_IMAGE_MACHINE_X64)) {
+        //
+        // Switch to X64 mode and load SMM core
+        //
+        LoadSmmCoreIA32ToX64 (ImageContext.EntryPoint, HobList);
+      } else {
+        //
+        // Execute image
+        //
+        LoadSmmCore (ImageContext.EntryPoint, HobList);
+      }
     }
   }
 
