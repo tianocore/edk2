@@ -532,5 +532,16 @@ StandaloneMmIplPeiEntry (
     DEBUG ((DEBUG_ERROR, "SMM IPL could not find a large enough SMRAM region to load SMM Core\n"));
   }
 
+  //
+  // Close and lock all SMRAM ranges
+  //
+  for (Index = 0; Index < mSmramRangeCount; Index++) {
+    Status = mSmmAccess->Close ((EFI_PEI_SERVICES **)PeiServices, mSmmAccess, Index);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = mSmmAccess->Lock ((EFI_PEI_SERVICES **)PeiServices, mSmmAccess, Index);
+    ASSERT_EFI_ERROR (Status);
+  }
+
   return EFI_SUCCESS;
 }
