@@ -26,7 +26,6 @@
   BootScript.c
   CloudHvAcpi.c
   EntryPoint.c
-  PciDecoding.c
   QemuFwCfgAcpi.c
 
 [Packages]
@@ -35,15 +34,13 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  AcpiPlatformLib
   BaseLib
   BaseMemoryLib
-  DebugLib
   MemoryAllocationLib
   OrderedCollectionLib
-  PcdLib
   QemuFwCfgLib
   QemuFwCfgS3Lib
-  UefiBootServicesTableLib
   UefiDriverEntryPoint
   HobLib
   TpmMeasurementLib
