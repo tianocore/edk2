@@ -15,6 +15,7 @@
   LIBRARY_CLASS  = AcpiPlatformLib
 
 [Sources]
+  BootScript.c
   DxeAcpiPlatformLib.c
   PciDecoding.c
 
@@ -27,6 +28,7 @@
   BaseLib
   DebugLib
   PcdLib
+  QemuFwCfgS3Lib
   UefiBootServicesTableLib
 
 [Pcd]
