@@ -20,8 +20,8 @@
 EFI_STATUS
 EFIAPI
 GetAcpiRsdpFromMemory (
-  IN UINT64                                         StartAddress,
-  IN UINT64                                         EndAddress,
+  IN UINTN                                          StartAddress,
+  IN UINTN                                          EndAddress,
   OUT EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  **RsdpPtr
   );
 
