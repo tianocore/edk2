@@ -11,6 +11,7 @@
 #include <IndustryStandard/Acpi.h>            // EFI_ACPI_DESCRIPTION_HEADER
 #include <IndustryStandard/QemuLoader.h>      // QEMU_LOADER_FNAME_SIZE
 #include <IndustryStandard/UefiTcgPlatform.h>
+#include <Library/AcpiPlatformLib.h>
 #include <Library/BaseLib.h>                  // AsciiStrCmp()
 #include <Library/BaseMemoryLib.h>            // CopyMem()
 #include <Library/DebugLib.h>                 // DEBUG()

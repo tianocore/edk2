@@ -16,11 +16,18 @@
 
 [Sources]
   DxeAcpiPlatformLib.c
+  PciDecoding.c
 
 [Packages]
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib
   DebugLib
+  PcdLib
+  UefiBootServicesTableLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
