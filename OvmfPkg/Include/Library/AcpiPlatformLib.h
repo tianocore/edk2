@@ -15,6 +15,8 @@ typedef struct {
   UINT64                 PciAttributes;
 } ORIGINAL_ATTRIBUTES;
 
+typedef struct S3_CONTEXT S3_CONTEXT;
+
 /**
   Searches and returns the address of the ACPI Root System Description Pointer (RSDP) in system memory.
 
@@ -67,6 +69,31 @@ VOID
 RestorePciDecoding (
   IN ORIGINAL_ATTRIBUTES  *OriginalAttributes,
   IN UINTN                Count
+  );
+
+EFI_STATUS
+AllocateS3Context (
+  OUT S3_CONTEXT  **S3Context,
+  IN  UINTN       WritePointerCount
+  );
+
+VOID
+ReleaseS3Context (
+  IN S3_CONTEXT  *S3Context
+  );
+
+EFI_STATUS
+SaveCondensedWritePointerToS3Context (
+  IN OUT S3_CONTEXT  *S3Context,
+  IN     UINT16      PointerItem,
+  IN     UINT8       PointerSize,
+  IN     UINT32      PointerOffset,
+  IN     UINT64      PointerValue
+  );
+
+EFI_STATUS
+TransferS3ContextToBootScript (
+  IN S3_CONTEXT  *S3Context
   );
 
 #endif
