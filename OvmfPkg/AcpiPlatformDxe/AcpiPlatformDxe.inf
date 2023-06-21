@@ -25,7 +25,6 @@
   AcpiPlatform.h
   CloudHvAcpi.c
   EntryPoint.c
-  QemuFwCfgAcpi.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
@@ -41,12 +40,10 @@
   QemuFwCfgLib
   UefiDriverEntryPoint
   HobLib
-  TpmMeasurementLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
-  gQemuAcpiTableNotifyProtocolGuid              # PROTOCOL PRODUCES
 
 [Guids]
   gRootBridgesConnectedEventGroupGuid
