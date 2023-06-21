@@ -10,12 +10,6 @@
 #define ACPI_PLATFORM_H_
 
 #include <Protocol/AcpiTable.h> // EFI_ACPI_TABLE_PROTOCOL
-#include <Protocol/PciIo.h>     // EFI_PCI_IO_PROTOCOL
-
-typedef struct {
-  EFI_PCI_IO_PROTOCOL    *PciIo;
-  UINT64                 PciAttributes;
-} ORIGINAL_ATTRIBUTES;
 
 typedef struct S3_CONTEXT S3_CONTEXT;
 
@@ -41,18 +35,6 @@ EFI_STATUS
 EFIAPI
 InstallAcpiTables (
   IN   EFI_ACPI_TABLE_PROTOCOL  *AcpiTable
-  );
-
-VOID
-EnablePciDecoding (
-  OUT ORIGINAL_ATTRIBUTES  **OriginalAttributes,
-  OUT UINTN                *Count
-  );
-
-VOID
-RestorePciDecoding (
-  IN ORIGINAL_ATTRIBUTES  *OriginalAttributes,
-  IN UINTN                Count
   );
 
 EFI_STATUS
