@@ -22,8 +22,6 @@
 #include <Library/UefiBootServicesTableLib.h> // gBS
 #include <Library/TpmMeasurementLib.h>
 
-#include "AcpiPlatform.h"
-
 //
 // The user structure for the ordered collection that will track the fw_cfg
 // blobs under processing.

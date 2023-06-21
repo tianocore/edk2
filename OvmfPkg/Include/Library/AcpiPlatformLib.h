@@ -59,6 +59,12 @@ InstallAcpiTablesFromRsdp (
   IN EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp
   );
 
+EFI_STATUS
+EFIAPI
+InstallQemuFwCfgTables (
+  IN   EFI_ACPI_TABLE_PROTOCOL  *AcpiProtocol
+  );
+
 VOID
 EnablePciDecoding (
   OUT ORIGINAL_ATTRIBUTES  **OriginalAttributes,

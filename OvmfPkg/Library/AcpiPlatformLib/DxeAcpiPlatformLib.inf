@@ -18,6 +18,7 @@
   BootScript.c
   DxeAcpiPlatformLib.c
   PciDecoding.c
+  QemuFwCfgAcpi.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
@@ -30,6 +31,10 @@
   PcdLib
   QemuFwCfgS3Lib
   UefiBootServicesTableLib
+  TpmMeasurementLib
+
+[Protocols]
+  gQemuAcpiTableNotifyProtocolGuid              # PROTOCOL PRODUCES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration
