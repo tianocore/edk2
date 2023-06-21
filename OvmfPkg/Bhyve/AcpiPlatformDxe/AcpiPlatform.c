@@ -249,6 +249,11 @@ InstallAcpiTables (
   EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
   EFI_STATUS                                    Status;
 
+  Status = InstallQemuFwCfgTables (AcpiTable);
+  if (!EFI_ERROR (Status)) {
+    return EFI_SUCCESS;
+  }
+
   Status = GetAcpiRsdpFromMemory (
              BHYVE_ACPI_PHYSICAL_ADDRESS,
              BHYVE_BIOS_PHYSICAL_END,
