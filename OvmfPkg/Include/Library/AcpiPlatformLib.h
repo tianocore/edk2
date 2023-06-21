@@ -4,6 +4,9 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#ifndef ACPI_PLATFORM_LIB_H_
+#define ACPI_PLATFORM_LIB_H_
+
 #include <Protocol/AcpiTable.h>
 
 /**
@@ -47,3 +50,5 @@ InstallAcpiTablesFromRsdp (
   IN EFI_ACPI_TABLE_PROTOCOL                       *AcpiProtocol,
   IN EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp
   );
+
+#endif
