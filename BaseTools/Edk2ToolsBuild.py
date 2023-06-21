@@ -133,8 +133,13 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
             shell_env.insert_path(self.OutputDir)
 
             # Actually build the tools.
+            output_stream = edk2_logging.create_output_stream()
             ret = RunCmd('nmake.exe', None,
                          workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
+            edk2_logging.remove_output_stream(output_stream)
+            problems = edk2_logging.scan_compiler_output(output_stream)
+            for level, problem in problems:
+                logging.log(level, problem)
             if ret != 0:
                 raise Exception("Failed to build.")
 
@@ -143,7 +148,13 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
 
         elif self.tool_chain_tag.lower().startswith("gcc"):
             cpu_count = self.GetCpuThreads()
+
+            output_stream = edk2_logging.create_output_stream()
             ret = RunCmd("make", f"-C .  -j {cpu_count}", workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
+            edk2_logging.remove_output_stream(output_stream)
+            problems = edk2_logging.scan_compiler_output(output_stream)
+            for level, problem in problems:
+                logging.log(level, problem)
             if ret != 0:
                 raise Exception("Failed to build.")
 
