@@ -367,7 +367,9 @@ IoMmuAllocateBounceBuffer (
 {
   EFI_STATUS  Status;
   UINT32      ReservedMemBitmap;
+  EFI_TPL     OldTpl;
 
+  OldTpl            = gBS->RaiseTPL (TPL_NOTIFY);
   ReservedMemBitmap = 0;
   Status            = InternalAllocateBuffer (
                         Type,
@@ -378,6 +380,7 @@ IoMmuAllocateBounceBuffer (
                         );
   MapInfo->ReservedMemBitmap = ReservedMemBitmap;
   mReservedMemBitmap        |= ReservedMemBitmap;
+  gBS->RestoreTPL (OldTpl);
 
   ASSERT (Status == EFI_SUCCESS);
 
