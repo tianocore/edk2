@@ -44,6 +44,45 @@ STATIC EFI_TIMER_NOTIFY  mTimerNotifyFunction;
 STATIC UINT64  mTimerPeriod     = 0;
 STATIC UINT64  mLastPeriodStart = 0;
 
+//
+// Sstc support
+//
+STATIC BOOLEAN  mSstcEnabled = FALSE;
+
+/**
+  Program the timer.
+
+  Program either using stimecmp (when Sstc extension is enabled) or using SBI
+  TIME call.
+
+  @param NextValue             Core tick value the timer should expire.
+**/
+STATIC
+VOID
+RiscVProgramTimer (
+  UINT64  NextValue
+  )
+{
+  if (mSstcEnabled) {
+    RiscVSetSupervisorTimeCompareRegister (NextValue);
+  } else {
+    SbiSetTimer (NextValue);
+  }
+}
+
+/**
+  Check whether Sstc is enabled in PCD.
+
+**/
+STATIC
+BOOLEAN
+RiscVIsSstcEnabled (
+  VOID
+  )
+{
+  return ((PcdGet64 (PcdRiscVFeatureOverride) & RISCV_CPU_FEATURE_SSTC_BITMASK) != 0);
+}
+
 /**
   Timer Interrupt Handler.
 
@@ -94,7 +133,7 @@ TimerInterruptHandler (
                          ),
                        1000000u
                        );  // convert to tick
-  SbiSetTimer (PeriodStart);
+  RiscVProgramTimer (PeriodStart);
   RiscVEnableTimerInterrupt (); // enable SMode timer int
   gBS->RestoreTPL (OriginalTPL);
 }
@@ -197,8 +236,7 @@ TimerDriverSetTimerPeriod (
                          ),
                        1000000u
                        ); // convert to tick
-  SbiSetTimer (PeriodStart);
-
+  RiscVProgramTimer (PeriodStart);
   mCpu->EnableInterrupt (mCpu);
   RiscVEnableTimerInterrupt (); // enable SMode timer int
   return EFI_SUCCESS;
@@ -281,6 +319,11 @@ TimerDriverInitialize (
   // Initialize the pointer to our notify function.
   //
   mTimerNotifyFunction = NULL;
+
+  if (RiscVIsSstcEnabled ()) {
+    mSstcEnabled = TRUE;
+    DEBUG ((DEBUG_INFO, "TimerDriverInitialize: Timer interrupt is via Sstc extension\n"));
+  }
 
   //
   // Make sure the Timer Architectural Protocol is not already installed in the system

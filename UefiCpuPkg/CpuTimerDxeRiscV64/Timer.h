@@ -26,6 +26,8 @@
 //
 #define DEFAULT_TIMER_TICK_DURATION  100000
 
+#define RISCV_CPU_FEATURE_SSTC_BITMASK  BIT1
+
 extern VOID
 RiscvSetTimerPeriod (
   UINT32  TimerPeriod
