@@ -32,6 +32,7 @@
   CpuLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  RiscVExtDiscoveryLib
 
 [LibraryClasses.RISCV64]
   RiscVSbiLib
