@@ -45,6 +45,19 @@ STATIC UINT64  mTimerPeriod     = 0;
 STATIC UINT64  mLastPeriodStart = 0;
 
 /**
+  Check whether Sstc is enabled in PCD.
+
+**/
+STATIC
+BOOLEAN
+RiscVIsSstcEnabled (
+  VOID
+  )
+{
+  return ((PcdGet64 (PcdRiscVFeatureOverride) & RISCV_CPU_FEATURE_SSTC_BITMASK) != 0);
+}
+
+/**
   Timer Interrupt Handler.
 
   @param InterruptType    The type of interrupt that occured
@@ -94,7 +107,12 @@ TimerInterruptHandler (
                          ),
                        1000000u
                        );  // convert to tick
-  SbiSetTimer (PeriodStart);
+  if (RiscVIsSstcEnabled ()) {
+    RiscVSetSupervisorTimeCompareRegister (PeriodStart);
+  } else {
+    SbiSetTimer (PeriodStart);
+  }
+
   RiscVEnableTimerInterrupt (); // enable SMode timer int
   gBS->RestoreTPL (OriginalTPL);
 }
@@ -197,7 +215,11 @@ TimerDriverSetTimerPeriod (
                          ),
                        1000000u
                        ); // convert to tick
-  SbiSetTimer (PeriodStart);
+  if (RiscVIsSstcEnabled ()) {
+    RiscVSetSupervisorTimeCompareRegister (PeriodStart);
+  } else {
+    SbiSetTimer (PeriodStart);
+  }
 
   mCpu->EnableInterrupt (mCpu);
   RiscVEnableTimerInterrupt (); // enable SMode timer int
@@ -281,6 +303,10 @@ TimerDriverInitialize (
   // Initialize the pointer to our notify function.
   //
   mTimerNotifyFunction = NULL;
+
+  if (RiscVIsSstcEnabled ()) {
+    DEBUG ((DEBUG_INFO, "%a: Timer interrupt is via Sstc extension\n", __func__));
+  }
 
   //
   // Make sure the Timer Architectural Protocol is not already installed in the system
