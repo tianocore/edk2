@@ -1,0 +1,27 @@
+## @file
+# RISC-V Library to discover the extensions
+#
+#  Copyright (c) 2023, Ventana Micro Systems Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x0001001b
+  BASE_NAME           = BaseRiscVExtDiscoveryLib
+  FILE_GUID           = 136C36CE-103C-4BE6-9836-B38DF458CB80
+  MODULE_TYPE         = BASE
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = RiscVExtDiscoveryLib
+
+[Sources]
+  BaseRiscVExtDiscoveryLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  FdtLib
+  RiscVSbiLib
