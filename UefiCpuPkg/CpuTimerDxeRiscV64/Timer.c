@@ -10,6 +10,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseRiscVSbiLib.h>
 #include <Library/UefiLib.h>
+#include <Library/BaseRiscVExtDiscoveryLib.h>
 #include "Timer.h"
 
 //
@@ -43,6 +44,8 @@ STATIC EFI_TIMER_NOTIFY  mTimerNotifyFunction;
 //
 STATIC UINT64  mTimerPeriod     = 0;
 STATIC UINT64  mLastPeriodStart = 0;
+
+STATIC BOOLEAN  mSstcExtPresent = FALSE;
 
 /**
   Timer Interrupt Handler.
@@ -94,7 +97,12 @@ TimerInterruptHandler (
                          ),
                        1000000u
                        );  // convert to tick
-  SbiSetTimer (PeriodStart);
+  if (mSstcExtPresent) {
+    SbiSetTimer (PeriodStart);
+  } else {
+    RiscVSetSupervisorTimeCompareRegister (PeriodStart);
+  }
+
   RiscVEnableTimerInterrupt (); // enable SMode timer int
   gBS->RestoreTPL (OriginalTPL);
 }
@@ -197,7 +205,11 @@ TimerDriverSetTimerPeriod (
                          ),
                        1000000u
                        ); // convert to tick
-  SbiSetTimer (PeriodStart);
+  if (mSstcExtPresent) {
+    SbiSetTimer (PeriodStart);
+  } else {
+    RiscVSetSupervisorTimeCompareRegister (PeriodStart);
+  }
 
   mCpu->EnableInterrupt (mCpu);
   RiscVEnableTimerInterrupt (); // enable SMode timer int
@@ -281,6 +293,11 @@ TimerDriverInitialize (
   // Initialize the pointer to our notify function.
   //
   mTimerNotifyFunction = NULL;
+
+  mSstcExtPresent = IsRiscVExtSupported ("Sstc");
+  if (mSstcExtPresent) {
+    DEBUG ((DEBUG_INFO, "%a: Timer interrupt is via Sstc extension\n", __func__));
+  }
 
   //
   // Make sure the Timer Architectural Protocol is not already installed in the system
