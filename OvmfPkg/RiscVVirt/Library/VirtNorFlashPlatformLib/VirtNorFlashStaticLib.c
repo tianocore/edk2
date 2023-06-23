@@ -24,7 +24,8 @@ VIRT_NOR_FLASH_DESCRIPTION  mNorFlashDevice =
 {
   FixedPcdGet32 (PcdOvmfFdBaseAddress),
   FixedPcdGet64 (PcdFlashNvStorageVariableBase),
-  FixedPcdGet32 (PcdOvmfFirmwareFdSize),
+  FixedPcdGet32 (PcdOvmfFirmwareFdSize) -
+  (FixedPcdGet64 (PcdFlashNvStorageVariableBase) - FixedPcdGet32 (PcdOvmfFdBaseAddress)),
   QEMU_NOR_BLOCK_SIZE
 };
 
