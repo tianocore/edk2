@@ -199,5 +199,6 @@
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
   MdePkg/Library/BaseSerialPortLibRiscVSbiLib/BaseSerialPortLibRiscVSbiLib.inf
   MdePkg/Library/BaseSerialPortLibRiscVSbiLib/BaseSerialPortLibRiscVSbiLibRam.inf
+  MdePkg/Library/BaseRiscVExtDiscoveryLib/BaseRiscVExtDiscoveryLib.inf
 
 [BuildOptions]

@@ -339,6 +339,9 @@
   ##  @libraryclass  Provides function to make ecalls to SBI
   BaseRiscVSbiLib|Include/Library/BaseRiscVSbiLib.h
 
+  ##  @libraryclass  Provides function to discover the extensions
+  BaseRiscVExtDiscoveryLib|Include/Library/BaseRiscVExtDiscoveryLib.h
+
 [Guids]
   #
   # GUID defined in UEFI2.1/UEFI2.0/EFI1.1
