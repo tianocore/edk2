@@ -398,4 +398,20 @@ FdtSetProp (
   IN UINT32       Length
   );
 
+INT32
+EFIAPI
+FdtPathOffset (
+  IN CONST VOID   *Fdt,
+  IN CONST CHAR8  *Path
+  );
+
+CONST VOID *
+EFIAPI
+FdtGetProp (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Lenp
+  );
+
 #endif /* FDT_LIB_H_ */

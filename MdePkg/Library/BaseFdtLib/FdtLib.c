@@ -402,3 +402,25 @@ FdtSetProp (
 {
   return fdt_setprop (Fdt, NodeOffset, Name, Value, (int)Length);
 }
+
+INT32
+EFIAPI
+FdtPathOffset (
+  IN CONST VOID   *Fdt,
+  IN CONST CHAR8  *Path
+  )
+{
+  return fdt_path_offset (Fdt, Path);
+}
+
+CONST VOID *
+EFIAPI
+FdtGetProp (
+  IN CONST VOID   *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN INT32        *Lenp
+  )
+{
+  return fdt_getprop (Fdt, NodeOffset, Name, Lenp);
+}
