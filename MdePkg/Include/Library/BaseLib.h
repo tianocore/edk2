@@ -192,6 +192,11 @@ RiscVReadTimer (
   );
 
 VOID
+RiscVSetSupervisorTimeCompareRegister (
+  IN UINT64
+  );
+
+VOID
 RiscVEnableTimerInterrupt (
   VOID
   );
