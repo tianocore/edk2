@@ -41,6 +41,7 @@
   Timer.c
 
 [Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdRiscVFeatureOverride           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES
 
 [Protocols]
