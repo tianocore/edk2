@@ -53,6 +53,16 @@ READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
+APRIORI DXE {
+  INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+  INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
+  INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+  INF  UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
+  INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
+}
+
 #
 # DXE Phase modules
 #
