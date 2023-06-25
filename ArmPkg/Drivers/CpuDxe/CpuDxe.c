@@ -288,9 +288,11 @@ RemapUnusedMemoryNx (
   MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + MemoryMapSize);
   while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
     if (MemoryMapEntry->Type == EfiConventionalMemory) {
-      ArmSetMemoryRegionNoExec (
+      ArmSetMemoryAttributes (
         MemoryMapEntry->PhysicalStart,
-        EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages)
+        EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages),
+        EFI_MEMORY_XP,
+        EFI_MEMORY_XP
         );
     }
 
