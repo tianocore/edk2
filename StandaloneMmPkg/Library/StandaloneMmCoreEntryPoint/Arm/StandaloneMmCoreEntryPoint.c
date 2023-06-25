@@ -15,13 +15,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MmramMemoryReserve.h>
 #include <Guid/MpInformation.h>
 
-#include <Library/ArmMmuLib.h>
 #include <Library/ArmSvcLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/StandaloneMmMmuLib.h>
 #include <Library/PcdLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
