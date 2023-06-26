@@ -437,6 +437,12 @@ M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakasha
 R: Chan Laura <laura.chan@intel.com> [lauracha]
 R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
 
+MdeModulePkg: USB Network modules
+F: MdeModulePkg/Bus/Usb/UsbNetwork
+F: MdeModulePkg/Include/Protocol/UsbEthernetProtocol.h
+M: Richard Ho <richardho@ami.com> [richardho]
+R: Rebecca Cran <rebecca@bsdio.com> [bcran]
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
