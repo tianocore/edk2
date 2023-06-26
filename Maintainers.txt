@@ -431,7 +431,6 @@ R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 
 MdeModulePkg: Trace Hub debug message related library instance
 F: MdeModulePkg/Library/TraceHubDebugSysTLib/
-F: MdeModulePkg/Include/Guid/TraceHubDebugInfoHob.h
 M: Gua Guo <gua.guo@intel.com> [gguo11837463]
 M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakashan@intel.com> [kprakas2]
 R: Chan Laura <laura.chan@intel.com> [lauracha]
@@ -449,6 +448,7 @@ F: MdePkg/Library/TraceHubDebugSysTLibNull/
 F: MdePkg/Library/MipiSysTLib/
 F: MdePkg/Include/Library/TraceHubDebugSysTLib.h
 F: MdePkg/Include/Library/MipiSysTLib.h
+F: MdePkg/Include/Guid/TraceHubDebugInfoHob.h
 M: Gua Guo <gua.guo@intel.com> [gguo11837463]
 M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakashan@intel.com> [kprakas2]
 R: Chan Laura <laura.chan@intel.com> [lauracha]
