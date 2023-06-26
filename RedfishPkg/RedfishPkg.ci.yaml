@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "PrEval": {
+        "DscPath": "RedfishPkg.dsc",
+    },
     "LicenseCheck": {
         "IgnoreFiles": []
     },
