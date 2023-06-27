@@ -510,8 +510,6 @@ VirtioSerialDriverBindingSupported (
     Status = EFI_UNSUPPORTED;
   }
 
-  DEBUG ((DEBUG_INFO, "%a:%d: subsystem %d -> %r\n", __func__, __LINE__, VirtIo->SubSystemDeviceId, Status));
-
   //
   // We needed VirtIo access only transitorily, to see whether we support the
   // device or not.
