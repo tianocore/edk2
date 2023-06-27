@@ -1,7 +1,24 @@
 ## @file
 #  Reset Vector
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Note:
+#    Conf/build_rule.txt contains the build rule [Nasm-to-Binary-Code-File]
+#    to generate .bin file from .nasmb source.
+#
+#    The platform FDF MUST have a FDF rule as follows to build the .bin
+#    file as ResetVector .ffs file:
+#
+#          [Rule.Common.SEC.RESET_VECTOR]
+#            FILE RAW = $(NAMED_GUID) {
+#              RAW BIN   |.bin
+#            }
+#
+#    Following line in FDF forces to use the above rule for the ResetVector:
+#
+#      INF  RuleOverride=RESET_VECTOR UefiCpuPkg/ResetVector/Vtf0/Vtf0.inf
+#
+#
+#  Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -29,3 +46,12 @@
 
 [UserExtensions.TianoCore."ExtraFiles"]
   ResetVectorExtra.uni
+
+[BuildOptions]
+# Different build options can be specified:
+#   * for different architectures:
+#       -DARCH_X64, -DARCH_IA32
+#   * for using 1G page table:
+#       -DPAGE_TABLE_1G
+#   * for different debug channels:
+#       -DDEBUG_SERIAL, -DDEBUG_PORT80, or not specify any debug channel
