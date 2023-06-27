@@ -14,6 +14,9 @@ import sys
 import argparse
 import re
 import xdrlib
+import io
+import struct
+import math
 
 #
 # Globals for help information
@@ -46,16 +49,24 @@ if __name__ == '__main__':
             raise argparse.ArgumentTypeError (Message)
         return Argument
 
+    def XdrPackBuffer (buffer):
+        packed_bytes = io.BytesIO()
+        for unpacked_bytes in buffer:
+            n = len(unpacked_bytes)
+            packed_bytes.write(struct.pack('>L',n))
+            data = unpacked_bytes[:n]
+            n = math.ceil(n/4)*4
+            data = data + (n - len(data)) * b'\0'
+            packed_bytes.write(data)
+        return packed_bytes.getvalue()
+
     def ByteArray (Buffer, Xdr = False):
         if Xdr:
             #
             # If Xdr flag is set then encode data using the Variable-Length Opaque
             # Data format of RFC 4506 External Data Representation Standard (XDR).
             #
-            XdrEncoder = xdrlib.Packer ()
-            for Item in Buffer:
-                XdrEncoder.pack_bytes (Item)
-            Buffer = bytearray (XdrEncoder.get_buffer ())
+            Buffer = bytearray (XdrPackBuffer (Buffer))
         else:
             #
             # If Xdr flag is not set, then concatenate all the data
