@@ -1,0 +1,40 @@
+## @file -- MmVariablePei.inf
+# Provides interface for reading Secure System Variables during PEI.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MmVariablePei
+  FILE_GUID                      = CD660A87-454B-4346-A35C-3D89BF8ECFAF
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeiMmVariableInitialize
+
+[Sources]
+  MmVariablePei.c
+  MmVariablePei.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  PeiServicesLib
+  PeimEntryPoint
+  MemoryAllocationLib
+  HobLib
+
+[Protocols]
+  gEfiSmmVariableProtocolGuid             ## CONSUMES
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid         ## PRODUCES
+  gEfiPeiMmCommunicationPpiGuid           ## CONSUMES
+
+[Depex]
+  gEfiPeiMmCommunicationPpiGuid
