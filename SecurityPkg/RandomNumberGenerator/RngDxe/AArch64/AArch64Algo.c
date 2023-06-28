@@ -47,15 +47,16 @@ GetAvailableAlgorithms (
       );
     mAvailableAlgoArrayCount++;
 
-    DEBUG_CODE_BEGIN ();
     if (IsZeroGuid (PcdGetPtr (PcdCpuRngSupportedAlgorithm))) {
+      DEBUG_CODE_BEGIN ();
       DEBUG ((
         DEBUG_WARN,
         "PcdCpuRngSupportedAlgorithm should be a non-zero GUID\n"
         ));
-    }
 
-    DEBUG_CODE_END ();
+      DEBUG_CODE_END ();
+      mAvailableAlgoArrayCount--;
+    }
   }
 
   // Raw algorithm (Trng)
