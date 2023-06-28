@@ -9,6 +9,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/BaseRiscVSbiLib.h>
+#include <Library/UefiLib.h>
 #include "Timer.h"
 
 //
@@ -71,7 +72,12 @@ TimerInterruptHandler (
     // time to increment slower. So when we take an interrupt,
     // account for the actual time passed.
     //
-    mTimerNotifyFunction (PeriodStart - mLastPeriodStart);
+    mTimerNotifyFunction (
+      DivU64x32 (
+        EFI_TIMER_PERIOD_SECONDS (PeriodStart - mLastPeriodStart),
+        PcdGet64 (PcdCpuCoreCrystalClockFrequency)
+        )
+      );
   }
 
   if (mTimerPeriod == 0) {
