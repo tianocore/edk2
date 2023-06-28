@@ -259,8 +259,7 @@ CProcedureInvoke:
     add        rsp, 20h
 
     mov        edx, ebx          ; edx is ApIndex
-    mov        ecx, esi
-    add        ecx, MP_CPU_EXCHANGE_INFO_OFFSET ; rcx is address of exchange info data buffer
+    mov        rcx, qword [esi + MP_CPU_EXCHANGE_INFO_FIELD (CpuMpData)]
 
     mov        edi, esi
     add        edi, MP_CPU_EXCHANGE_INFO_FIELD (CFunction)
