@@ -260,3 +260,20 @@ FillExchangeInfoDataSevEs (
     ExchangeInfo->ExtTopoAvail = !!ExtTopoEbx.Bits.LogicalProcessors;
   }
 }
+
+/**
+  Get pointer to CPU MP Data structure from GUIDed HOB.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+AmdSevUpdateCpuMpData (
+  IN CPU_MP_DATA  *CpuMpData
+  )
+{
+  CPU_MP_DATA  *OldCpuMpData;
+
+  OldCpuMpData = GetCpuMpDataFromGuidedHob ();
+
+  OldCpuMpData->NewCpuMpData = CpuMpData;
+}
