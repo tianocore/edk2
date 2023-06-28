@@ -778,6 +778,7 @@ SecCoreStartupWithStack (
     // memory will trigger tripple fault.
     //
     if (TdxHelperProcessTdHob () != EFI_SUCCESS) {
+      DEBUG ((DEBUG_INFO, "Deadloop!\n"));
       CpuDeadLoop ();
     }
   }
