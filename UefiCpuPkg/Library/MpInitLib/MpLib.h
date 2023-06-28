@@ -475,6 +475,15 @@ GetWakeupBuffer (
   );
 
 /**
+  Switch Context for each AP.
+
+**/
+VOID
+SwitchApContext (
+  IN MP_HAND_OFF  *MpHandOff
+  );
+
+/**
   Get available EfiBootServicesCode memory below 4GB by specified size.
 
   This buffer is required to safely transfer AP from real address mode to
