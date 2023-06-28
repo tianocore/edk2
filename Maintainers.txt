@@ -186,8 +186,7 @@ DynamicTablesPkg
 F: DynamicTablesPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/DynamicTablesPkg
 M: Sami Mujawar <Sami.Mujawar@arm.com> [samimujawar]
-M: Alexei Fedorov <Alexei.Fedorov@arm.com> [AlexeiFedorov]
-R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
+M: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 EmbeddedPkg
 F: EmbeddedPkg/
