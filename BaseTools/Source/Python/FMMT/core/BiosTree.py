@@ -56,7 +56,7 @@ class BIOSTREE:
         if len(self.Child) == 0:
             self.Child.append(newNode)
         else:
-            if not pos:
+            if not pos or pos == len(self.Child):
                 LastTree = self.Child[-1]
                 self.Child.append(newNode)
                 LastTree.NextRel = newNode
@@ -195,4 +195,4 @@ class BIOSTREE:
         for item in self.Child:
             TreeInfo[key].setdefault('Files',[]).append( item.ExportTree())
 
-        return TreeInfo
+        return TreeInfo
