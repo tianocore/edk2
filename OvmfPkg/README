@@ -120,6 +120,46 @@ $ OvmfPkg/build.sh -a X64 qemu -cdrom /path/to/disk-image.iso
 To build a 32-bit OVMF without debug messages using GCC 4.8:
 $ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC48
 
+=== Secure Boot ===
+
+Secure Boot is a security feature that ensures only trusted and digitally
+signed software is allowed to run during the boot process. This is achieved
+by storing Secure Boot keys in UEFI Variables, as result it can be easily
+bypassed by writing directly to the flash varstore. To avoid this situation,
+it's necessary to make the varstore with SB keys read-only and/or provide an
+isolated execution environment for flash access (such as SMM).
+
+* In order to support Secure Boot, OVMF must be built with the
+  "-D SECURE_BOOT_ENABLE" option.
+
+* By default, OVMF is not shipped with any SecureBoot keys installed. The user
+  need to install them with "Secure Boot Configuration" utility in the firmware
+  UI, or enroll the default UEFI keys using the OvmfPkg/EnrollDefaultKeys app.
+
+  For the EnrollDefaultKeys application, the hypervisor is expected to add a
+  string entry to the "OEM Strings" (Type 11) SMBIOS table. The string should
+  have the following format:
+
+    4e32566d-8e9e-4f52-81d3-5bb9715f9727:<Base64 X509 cert for PK and first KEK>
+
+  Such string can be generated with the following script, for example:
+
+    sed \
+      -e 's/^-----BEGIN CERTIFICATE-----$/4e32566d-8e9e-4f52-81d3-5bb9715f9727:/' \
+      -e '/^-----END CERTIFICATE-----$/d' \
+      PkKek1.pem \
+    | tr -d '\n' \
+    > PkKek1.oemstr
+
+  - Using QEMU 5.2 or later, the SMBIOS type 11 field can be specified from a
+    file:
+
+    -smbios type=11,path=PkKek1.oemstr \
+
+  - Using QEMU 5.1 or earlier, the string has to be passed as a value:
+
+    -smbios type=11,value="$(< PkKek1.oemstr)"
+
 === SMM support ===
 
 Requirements:
