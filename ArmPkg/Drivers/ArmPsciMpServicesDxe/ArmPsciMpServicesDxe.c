@@ -103,7 +103,9 @@ DispatchCpu (
 
   ArmCallSmc (&Args);
 
-  if (Args.Arg0 != ARM_SMC_PSCI_RET_SUCCESS) {
+  if (Args.Arg0 == ARM_SMC_PSCI_RET_ALREADY_ON) {
+    Status = EFI_NOT_READY;
+  } else if (Args.Arg0 != ARM_SMC_PSCI_RET_SUCCESS) {
     DEBUG ((DEBUG_ERROR, "PSCI_CPU_ON call failed: %d\n", Args.Arg0));
     Status = EFI_DEVICE_ERROR;
   }
