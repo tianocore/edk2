@@ -188,7 +188,7 @@ def ExtractFfs(inputfile: str, Ffs_name: str, outputfile: str, Fv_name: str=None
                 FmmtParser.WholeFvTree.Findlist.remove(FmmtParser.WholeFvTree.Findlist[index])
     if FmmtParser.WholeFvTree.Findlist != []:
         TargetNode = FmmtParser.WholeFvTree.Findlist[0]
-        if TargetNode.type == FV_TREE or SEC_FV_TREE or DATA_FV_TREE:
+        if TargetNode.type == FV_TREE or TargetNode.type == SEC_FV_TREE or TargetNode.type == DATA_FV_TREE:
             FinalData = struct2stream(TargetNode.Data.Header) + TargetNode.Data.Data
             with open(outputfile, "wb") as f:
                 f.write(FinalData)
