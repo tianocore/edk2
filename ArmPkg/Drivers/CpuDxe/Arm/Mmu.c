@@ -217,7 +217,10 @@ SyncCacheConfigPage (
       } else if (PageAttributes != NextPageAttributes) {
         // Convert Section Attributes into GCD Attributes
         Status = PageToGcdAttributes (NextPageAttributes, &GcdAttributes);
-        ASSERT_EFI_ERROR (Status);
+        if (EFI_ERROR (Status)) {
+          ASSERT_EFI_ERROR (Status);
+          GcdAttributes = 0;
+        }
 
         // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
         SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, *NextRegionBase, *NextRegionLength, GcdAttributes);
@@ -230,7 +233,10 @@ SyncCacheConfigPage (
     } else if (NextPageAttributes != 0) {
       // Convert Page Attributes into GCD Attributes
       Status = PageToGcdAttributes (NextPageAttributes, &GcdAttributes);
-      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        GcdAttributes = 0;
+      }
 
       // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
       SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, *NextRegionBase, *NextRegionLength, GcdAttributes);
@@ -278,7 +284,12 @@ SyncCacheConfig (
   //
   MemorySpaceMap = NULL;
   Status         = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
-  ASSERT_EFI_ERROR (Status);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "SyncCacheConfig - GetMemorySpaceMap() failed! Status: %r\n", Status));
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   // The GCD implementation maintains its own copy of the state of memory space attributes.  GCD needs
   // to know what the initial memory space attributes are.  The CPU Arch. Protocol does not provide a
@@ -307,7 +318,12 @@ SyncCacheConfig (
       } else if (SectionAttributes != NextSectionAttributes) {
         // Convert Section Attributes into GCD Attributes
         Status = SectionToGcdAttributes (NextSectionAttributes, &GcdAttributes);
-        ASSERT_EFI_ERROR (Status);
+
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "SyncCacheConfig - SectionToGcdAttributes() failed! Status: %r\n", Status));
+          ASSERT_EFI_ERROR (Status);
+          GcdAttributes = 0;
+        }
 
         // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
         SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, NextRegionBase, NextRegionLength, GcdAttributes);
@@ -343,7 +359,11 @@ SyncCacheConfig (
       if (NextSectionAttributes != 0) {
         // Convert Section Attributes into GCD Attributes
         Status = SectionToGcdAttributes (NextSectionAttributes, &GcdAttributes);
-        ASSERT_EFI_ERROR (Status);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "SyncCacheConfig - SectionToGcdAttributes() failed! Status: %r\n", Status));
+          ASSERT_EFI_ERROR (Status);
+          GcdAttributes = 0;
+        }
 
         // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
         SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, NextRegionBase, NextRegionLength, GcdAttributes);
@@ -360,7 +380,11 @@ SyncCacheConfig (
   if (NextSectionAttributes != 0) {
     // Convert Section Attributes into GCD Attributes
     Status = SectionToGcdAttributes (NextSectionAttributes, &GcdAttributes);
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "SyncCacheConfig - SectionToGcdAttributes() failed! Status: %r\n", Status));
+      ASSERT_EFI_ERROR (Status);
+      GcdAttributes = 0;
+    }
 
     // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
     SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, NextRegionBase, NextRegionLength, GcdAttributes);
