@@ -159,8 +159,8 @@ MmCommunicationPeim (
       }
 
       CopyMem (CommBuffer, CommunicateHeader, BufferSize);
-      *CommSize  = BufferSize;
-      Status     = EFI_SUCCESS;
+      *CommSize = BufferSize;
+      Status    = EFI_SUCCESS;
       break;
 
     case ARM_SMC_MM_RET_INVALID_PARAMS:
@@ -197,7 +197,7 @@ STATIC CONST EFI_PEI_MM_COMMUNICATION_PPI  mPeiMmCommunication = {
 STATIC CONST EFI_PEI_PPI_DESCRIPTOR  mPeiMmCommunicationPpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiMmCommunicationPpiGuid,
-  (VOID*)&mPeiMmCommunication
+  (VOID *)&mPeiMmCommunication
 };
 
 /**
