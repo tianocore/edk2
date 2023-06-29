@@ -387,7 +387,21 @@ class FvHandler:
         if self.NewFfs.Data.Size >= self.TargetFfs.Data.Size:
             Needed_Space = self.NewFfs.Data.Size + len(self.NewFfs.Data.PadData) - self.TargetFfs.Data.Size - len(self.TargetFfs.Data.PadData)
             # If TargetFv have enough free space, just move part of the free space to NewFfs.
-            if TargetFv.Data.Free_Space >= Needed_Space:
+            if Needed_Space == 0:
+                Target_index = TargetFv.Child.index(self.TargetFfs)
+                TargetFv.Child.remove(self.TargetFfs)
+                TargetFv.insertChild(self.NewFfs, Target_index)
+                # Modify TargetFv Header and ExtHeader info.
+                TargetFv.Data.ModFvExt()
+                TargetFv.Data.ModFvSize()
+                TargetFv.Data.ModExtHeaderData()
+                ModifyFvExtData(TargetFv)
+                TargetFv.Data.ModCheckSum()
+                # Recompress from the Fv node to update all the related node data.
+                self.CompressData(TargetFv)
+                # return the Status
+                self.Status = True
+            elif TargetFv.Data.Free_Space >= Needed_Space:
                 # Modify TargetFv Child info and BiosTree.
                 TargetFv.Child[-1].Data.Data = b'\xff' * (TargetFv.Data.Free_Space - Needed_Space)
                 TargetFv.Data.Free_Space -= Needed_Space
@@ -450,7 +464,6 @@ class FvHandler:
                 Target_index = TargetFv.Child.index(self.TargetFfs)
                 TargetFv.Child.remove(self.TargetFfs)
                 TargetFv.insertChild(self.NewFfs, Target_index)
-                self.Status = True
             # If TargetFv do not have free space, create free space for Fv.
             else:
                 New_Free_Space_Tree = BIOSTREE('FREE_SPACE')
@@ -461,7 +474,6 @@ class FvHandler:
                 Target_index = TargetFv.Child.index(self.TargetFfs)
                 TargetFv.Child.remove(self.TargetFfs)
                 TargetFv.insertChild(self.NewFfs, Target_index)
-                self.Status = True
             # Modify TargetFv Header and ExtHeader info.
             TargetFv.Data.ModFvExt()
             TargetFv.Data.ModFvSize()
@@ -470,6 +482,7 @@ class FvHandler:
             TargetFv.Data.ModCheckSum()
             # Recompress from the Fv node to update all the related node data.
             self.CompressData(TargetFv)
+            self.Status = True
         logger.debug('Done!')
         return self.Status
 
