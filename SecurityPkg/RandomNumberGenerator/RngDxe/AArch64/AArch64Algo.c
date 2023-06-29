@@ -39,7 +39,7 @@ GetAvailableAlgorithms (
   UnSafeAlgo = FALSE;
 
   // Rng algorithms 2 times, one for the allocation, one to populate.
-  mAvailableAlgoArray = AllocateZeroPool (RNG_AVAILABLE_ALGO_MAX);
+  mAvailableAlgoArray = AllocateZeroPool (RNG_AVAILABLE_ALGO_MAX * sizeof (EFI_RNG_ALGORITHM));
   if (mAvailableAlgoArray == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
