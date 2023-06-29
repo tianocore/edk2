@@ -279,7 +279,7 @@ class FvHandler:
                             ParTree.Child.remove(ParTree.Child[-1])
                             ParTree.Data.Free_Space = 0
                         ParTree.Data.Size += Needed_Space
-                        ParTree.Data.Header.Fvlength = ParTree.Data.Size
+                        ParTree.Data.Header.FvLength = ParTree.Data.Size
                 ModifyFvSystemGuid(ParTree)
                 for item in ParTree.Child:
                     if item.type == FFS_FREE_SPACE:
@@ -650,8 +650,12 @@ class FvHandler:
             Removed_Space = TargetFv.Data.Free_Space - New_Free_Space
             TargetFv.Child[-1].Data.Data = b'\xff' * New_Free_Space
             TargetFv.Data.Size -= Removed_Space
-            TargetFv.Data.Header.Fvlength = TargetFv.Data.Size
-            ModifyFvSystemGuid(TargetFv)
+            TargetFv.Data.Header.FvLength = TargetFv.Data.Size
+            if struct2stream(TargetFv.Data.Header.FileSystemGuid) == EFI_FIRMWARE_FILE_SYSTEM3_GUID_BYTE:
+                if TargetFv.Data.Size <= 0xFFFFFF:
+                    TargetFv.Data.Header.FileSystemGuid = ModifyGuidFormat(
+                        "8c8ce578-8a3d-4f1c-9935-896185c32dd3")
+
             for item in TargetFv.Child:
                 if item.type == FFS_FREE_SPACE:
                     TargetFv.Data.Data += item.Data.Data + item.Data.PadData
