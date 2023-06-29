@@ -18,6 +18,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
 
+/**
+  Parses T0SZ to determine the level and number of entries at the root
+  of the translation table.
+
+  @param T0SZ                 The T0SZ value to be parsed.
+  @param RootTableLevel       The level of the root table.
+  @param RootTableEntryCount  The number of entries in the root table.
+**/
 STATIC
 VOID
 GetRootTranslationTableInfo (
@@ -30,6 +38,13 @@ GetRootTranslationTableInfo (
   *RootTableEntryCount = TT_ENTRY_COUNT >> (T0SZ - MIN_T0SZ) % BITS_PER_LEVEL;
 }
 
+/**
+  Converts ARM translation table attributes to GCD attributes.
+
+  @param PageAttributes The translation table attributes to be converted.
+
+  @retval The analogous GCD attributes.
+**/
 STATIC
 UINT64
 PageAttributeToGcdAttribute (
@@ -100,6 +115,14 @@ RegionAttributeToGcdAttribute (
   return PageAttributeToGcdAttribute (PageAttributes);
 }
 
+/**
+  Retrieves the attribute of the first page entry in the translation table.
+
+  @param[in] FirstLevelTableAddress   The base address of the translation table.
+  @param[in] TableLevel               The current level being traversed.
+
+  @retval The attributes of the first page entry found, or INVALID_ENTRY.
+**/
 STATIC
 UINT64
 GetFirstPageAttribute (
@@ -126,6 +149,19 @@ GetFirstPageAttribute (
   }
 }
 
+/**
+  This function recursively traverses the translation table heirarchy to
+  synchronise the GCD with the translation table.
+
+  @param[in]        TableAddress        The address of the table being processed.
+  @param[in]        EntryCount          The number of entries in the current level of the table.
+  @param[in]        TableLevel          The current level of the memory table being processed.
+  @param[in]        BaseAddress         The starting address of the region.
+  @param[in, out]   PrevEntryAttribute  The attributes of the previous region.
+  @param[in, out]   StartGcdRegion      The start of the GCD region.
+
+  @retval The address at the end of the last region processed.
+**/
 STATIC
 UINT64
 GetNextEntryAttribute (
@@ -220,6 +256,15 @@ GetNextEntryAttribute (
   return BaseAddress + (EntryCount * TT_ADDRESS_AT_LEVEL (TableLevel));
 }
 
+/**
+  Sync the GCD memory space attributes with the translation table.
+
+  @param[in]  CpuProtocol The CPU architectural protocol instance.
+
+  @retval EFI_SUCCESS The GCD memory space attributes are synced with
+                      the MMU page table.
+  @retval Others      The return value of GetMemorySpaceMap().
+**/
 EFI_STATUS
 SyncCacheConfig (
   IN  EFI_CPU_ARCH_PROTOCOL  *CpuProtocol
@@ -298,6 +343,13 @@ SyncCacheConfig (
   return EFI_SUCCESS;
 }
 
+/**
+  Convert EFI memory attributes to ARM translation table attributes.
+
+  @param[in]  EfiAttributes  EFI memory attributes.
+
+  @retval The analogous translation table attributes.
+**/
 UINT64
 EfiAttributeToArmAttribute (
   IN UINT64  EfiAttributes
@@ -345,8 +397,25 @@ EfiAttributeToArmAttribute (
   return ArmAttributes;
 }
 
-// This function will recursively go down the page table to find the first block address linked to 'BaseAddress'.
-// And then the function will identify the size of the region that has the same page table attribute.
+/**
+  This function returns the attributes of the memory region containing the
+  specified address.
+
+  RegionLength and RegionAttributes are only valid if the result is EFI_SUCCESS.
+
+  @param[in]        TranslationTable  The translation table base address.
+  @param[in]        TableLevel        The level of the translation table.
+  @param[in]        LastBlockEntry    The last block address of the table level.
+  @param[in, out]   BaseAddress       The base address of the memory region.
+  @param[out]       RegionLength      The length of the memory region.
+  @param[out]       RegionAttributes  The attributes of the memory region.
+
+  @retval EFI_SUCCESS     The attributes of the memory region were
+                          returned successfully.
+  @retval EFI_NOT_FOUND   The memory region was not found.
+  @retval EFI_NO_MAPPING  The translation table entry associated with
+                          BaseAddress is invalid.
+**/
 EFI_STATUS
 GetMemoryRegionRec (
   IN     UINT64  *TranslationTable,
@@ -423,6 +492,25 @@ GetMemoryRegionRec (
   return EFI_NOT_FOUND;
 }
 
+/**
+  Retrieves a memory region from a given base address.
+
+  This function retrieves a memory region starting from a given base address.
+
+  @param[in, out] BaseAddress       The base address from which to retrieve
+                                    the memory region. On successful return, this is
+                                    updated to the end address of the retrieved region.
+  @param[out]     RegionLength      The length of the retrieved memory region.
+  @param[out]     RegionAttributes  The attributes of the retrieved memory region.
+
+  @retval EFI_STATUS              Returns EFI_SUCCESS if the memory region is
+                                  retrieved successfully, or the status of the
+                                  recursive call to GetMemoryRegionRec.
+  @retval EFI_NOT_FOUND           The memory region was not found.
+  @retval EFI_NO_MAPPING          The translation table entry associated with
+                                  BaseAddress is invalid.
+  @retval EFI_INVALID_PARAMETER   One of the input parameters was NULL.
+**/
 EFI_STATUS
 GetMemoryRegion (
   IN OUT UINTN  *BaseAddress,
