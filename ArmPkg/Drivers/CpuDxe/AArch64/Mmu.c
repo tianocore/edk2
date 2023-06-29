@@ -148,10 +148,12 @@ GetNextEntryAttribute (
   // Get the memory space map from GCD
   MemorySpaceMap = NULL;
   Status         = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
-  ASSERT_EFI_ERROR (Status);
 
-  // We cannot get more than 3-level page table
-  ASSERT (TableLevel <= 3);
+  if (EFI_ERROR (Status) || (TableLevel > 3)) {
+    ASSERT_EFI_ERROR (Status);
+    ASSERT (TableLevel <= 3);
+    return 0;
+  }
 
   // While the top level table might not contain TT_ENTRY_COUNT entries;
   // the subsequent ones should be filled up
@@ -243,7 +245,11 @@ SyncCacheConfig (
   //
   MemorySpaceMap = NULL;
   Status         = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
-  ASSERT_EFI_ERROR (Status);
+
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   // The GCD implementation maintains its own copy of the state of memory space attributes.  GCD needs
   // to know what the initial memory space attributes are.  The CPU Arch. Protocol does not provide a
@@ -277,7 +283,7 @@ SyncCacheConfig (
                            );
 
   // Update GCD with the last region if valid
-  if (PageAttribute != INVALID_ENTRY) {
+  if ((PageAttribute != INVALID_ENTRY) && (EndAddressGcdRegion > BaseAddressGcdRegion)) {
     SetGcdMemorySpaceAttributes (
       MemorySpaceMap,
       NumberOfDescriptors,
@@ -430,7 +436,10 @@ GetMemoryRegion (
   UINTN       EntryCount;
   UINTN       T0SZ;
 
-  ASSERT ((BaseAddress != NULL) && (RegionLength != NULL) && (RegionAttributes != NULL));
+  if ((BaseAddress == NULL) || (RegionLength == NULL) || (RegionAttributes == NULL)) {
+    ASSERT ((BaseAddress != NULL) && (RegionLength != NULL) && (RegionAttributes != NULL));
+    return EFI_INVALID_PARAMETER;
+  }
 
   TranslationTable = ArmGetTTBR0BaseAddress ();
 
