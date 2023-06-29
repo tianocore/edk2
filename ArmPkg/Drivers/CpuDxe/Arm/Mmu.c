@@ -427,17 +427,20 @@ EfiAttributeToArmAttribute (
 EFI_STATUS
 GetMemoryRegionPage (
   IN     UINT32  *PageTable,
-  IN OUT UINTN   *BaseAddress,
-  OUT    UINTN   *RegionLength,
-  OUT    UINTN   *RegionAttributes
+  IN     UINTN   *BaseAddress,
+  IN     UINTN   *RegionAttributes,
+  OUT    UINTN   *RegionLength
   )
 {
-  UINT32  PageAttributes;
-  UINT32  TableIndex;
-  UINT32  PageDescriptor;
+  UINT32      PageAttributes;
+  UINT32      TableIndex;
+  UINT32      PageDescriptor;
+  EFI_STATUS  Status;
 
   // Convert the section attributes into page attributes
   PageAttributes = ConvertSectionAttributesToPageAttributes (*RegionAttributes);
+  Status         = EFI_NOT_FOUND;
+  *RegionLength  = 0;
 
   // Calculate index into first level translation table for start of modification
   TableIndex = ((*BaseAddress) & TT_DESCRIPTOR_PAGE_INDEX_MASK)  >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
@@ -449,23 +452,24 @@ GetMemoryRegionPage (
     PageDescriptor = PageTable[TableIndex];
 
     if ((PageDescriptor & TT_DESCRIPTOR_PAGE_TYPE_MASK) == TT_DESCRIPTOR_PAGE_TYPE_FAULT) {
-      // Case: End of the boundary of the region
-      return EFI_SUCCESS;
+      Status = (*RegionLength > 0) ? EFI_SUCCESS : EFI_NO_MAPPING;
+      break;
     } else if ((PageDescriptor & TT_DESCRIPTOR_PAGE_TYPE_PAGE) == TT_DESCRIPTOR_PAGE_TYPE_PAGE) {
-      if ((PageDescriptor & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK) == PageAttributes) {
-        *RegionLength = *RegionLength + TT_DESCRIPTOR_PAGE_SIZE;
-      } else {
-        // Case: End of the boundary of the region
-        return EFI_SUCCESS;
+      if ((PageDescriptor & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK) != PageAttributes) {
+        Status = EFI_SUCCESS;
+        break;
       }
+
+      *RegionLength += TT_DESCRIPTOR_PAGE_SIZE;
     } else {
-      // We do not support Large Page yet. We return EFI_SUCCESS that means end of the region.
+      // Large pages are unsupported.
+      Status = EFI_UNSUPPORTED;
       ASSERT (0);
-      return EFI_SUCCESS;
+      break;
     }
   }
 
-  return EFI_NOT_FOUND;
+  return Status;
 }
 
 EFI_STATUS
@@ -482,6 +486,7 @@ GetMemoryRegion (
   UINT32                      SectionDescriptor;
   ARM_FIRST_LEVEL_DESCRIPTOR  *FirstLevelTable;
   UINT32                      *PageTable;
+  UINTN                       Length;
 
   // Initialize the arguments
   *RegionLength = 0;
@@ -491,7 +496,11 @@ GetMemoryRegion (
 
   // Calculate index into first level translation table for start of modification
   TableIndex = TT_DESCRIPTOR_SECTION_BASE_ADDRESS (*BaseAddress) >> TT_DESCRIPTOR_SECTION_BASE_SHIFT;
-  ASSERT (TableIndex < TRANSLATION_TABLE_SECTION_COUNT);
+
+  if (TableIndex >= TRANSLATION_TABLE_SECTION_COUNT) {
+    ASSERT (TableIndex < TRANSLATION_TABLE_SECTION_COUNT);
+    return EFI_INVALID_PARAMETER;
+  }
 
   // Get the section at the given index
   SectionDescriptor = FirstLevelTable[TableIndex];
@@ -524,6 +533,8 @@ GetMemoryRegion (
                         TT_DESCRIPTOR_CONVERT_TO_SECTION_AP (PageAttributes);
   }
 
+  Status = EFI_NOT_FOUND;
+
   for ( ; TableIndex < TRANSLATION_TABLE_SECTION_COUNT; TableIndex++) {
     // Get the section at the given index
     SectionDescriptor = FirstLevelTable[TableIndex];
@@ -532,15 +543,18 @@ GetMemoryRegion (
     if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE (SectionDescriptor)) {
       // Extract the page table location from the descriptor
       PageTable = (UINT32 *)(SectionDescriptor & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK);
+      Length    = 0;
 
       // Scan the page table to find the end of the region.
-      Status = GetMemoryRegionPage (PageTable, BaseAddress, RegionLength, RegionAttributes);
-      ASSERT (*RegionLength > 0);
+      Status         = GetMemoryRegionPage (PageTable, BaseAddress, RegionAttributes, &Length);
+      *RegionLength += Length;
 
-      // If we have found the end of the region (Status == EFI_SUCCESS) then we exit the for-loop
-      if (Status == EFI_SUCCESS) {
-        break;
+      // Status == EFI_NOT_FOUND implies we have not reached the end of the region.
+      if ((Status == EFI_NOT_FOUND) && (Length > 0)) {
+        continue;
       }
+
+      break;
     } else if (((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) ||
                ((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SUPERSECTION))
     {
@@ -556,5 +570,10 @@ GetMemoryRegion (
     }
   }
 
-  return EFI_SUCCESS;
+  // Check if the region length was updated.
+  if (*RegionLength > 0) {
+    Status = EFI_SUCCESS;
+  }
+
+  return Status;
 }

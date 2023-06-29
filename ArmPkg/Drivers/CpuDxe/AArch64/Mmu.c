@@ -380,10 +380,10 @@ GetMemoryRegionRec (
                RegionAttributes
                );
 
-    // In case of 'Success', it means the end of the block region has been found into the upper
-    // level translation table
-    if (!EFI_ERROR (Status)) {
-      return EFI_SUCCESS;
+    // EFI_SUCCESS:     The end of the end of the region was found.
+    // EFI_NO_MAPPING:  The translation entry associated with BaseAddress is invalid.
+    if (Status != EFI_NOT_FOUND) {
+      return Status;
     }
 
     // Now we processed the table move to the next entry
@@ -395,12 +395,13 @@ GetMemoryRegionRec (
     *RegionLength     = 0;
     *RegionAttributes = *BlockEntry & TT_ATTRIBUTES_MASK;
   } else {
-    // We have an 'Invalid' entry
-    return EFI_UNSUPPORTED;
+    return EFI_NO_MAPPING;
   }
 
   while (BlockEntry <= LastBlockEntry) {
-    if ((*BlockEntry & TT_ATTRIBUTES_MASK) == *RegionAttributes) {
+    if (((*BlockEntry & TT_TYPE_MASK) == BlockEntryType) &&
+        ((*BlockEntry & TT_ATTRIBUTES_MASK) == *RegionAttributes))
+    {
       *RegionLength = *RegionLength + TT_BLOCK_ENTRY_SIZE_AT_LEVEL (TableLevel);
     } else {
       // In case we have found the end of the region we return success
@@ -412,7 +413,7 @@ GetMemoryRegionRec (
 
   // If we have reached the end of the TranslationTable and we have not found the end of the region then
   // we return EFI_NOT_FOUND.
-  // The caller will continue to look for the memory region at its level
+  // The caller will continue to look for the memory region at its level.
   return EFI_NOT_FOUND;
 }
 
@@ -433,6 +434,11 @@ GetMemoryRegion (
 
   TranslationTable = ArmGetTTBR0BaseAddress ();
 
+  // Initialize the output parameters. These paramaters are only valid if the
+  // result is EFI_SUCCESS.
+  *RegionLength     = 0;
+  *RegionAttributes = 0;
+
   T0SZ = ArmGetTCR () & TCR_T0SZ_MASK;
   // Get the Table info from T0SZ
   GetRootTranslationTableInfo (T0SZ, &TableLevel, &EntryCount);
@@ -447,10 +453,10 @@ GetMemoryRegion (
              );
 
   // If the region continues up to the end of the root table then GetMemoryRegionRec()
-  // will return EFI_NOT_FOUND
-  if (Status == EFI_NOT_FOUND) {
+  // will return EFI_NOT_FOUND. Check if the region length was updated.
+  if ((Status == EFI_NOT_FOUND) && (*RegionLength > 0)) {
     return EFI_SUCCESS;
-  } else {
-    return Status;
   }
+
+  return Status;
 }
