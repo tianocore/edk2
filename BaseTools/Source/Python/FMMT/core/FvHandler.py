@@ -442,7 +442,7 @@ class FvHandler:
                     # Start free space calculating and moving process.
                     self.ModifyTest(TargetFv.Parent, Needed_Space)
         else:
-            New_Free_Space = self.TargetFfs.Data.Size - self.NewFfs.Data.Size
+            New_Free_Space = self.TargetFfs.Data.Size + len(self.TargetFfs.Data.PadData) - self.NewFfs.Data.Size - len(self.NewFfs.Data.PadData)
             # If TargetFv already have free space, move the new free space into it.
             if TargetFv.Data.Free_Space:
                 TargetFv.Child[-1].Data.Data += b'\xff' * New_Free_Space
