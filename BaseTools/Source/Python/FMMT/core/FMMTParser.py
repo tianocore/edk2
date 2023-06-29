@@ -20,7 +20,7 @@ class FMMTParser:
 
     ## Parser the nodes in WholeTree.
     def ParserFromRoot(self, WholeFvTree=None, whole_data: bytes=b'', Reloffset: int=0) -> None:
-        if WholeFvTree.type == ROOT_TREE or WholeFvTree.type == ROOT_FV_TREE:
+        if WholeFvTree.type == ROOT_TREE or WholeFvTree.type == ROOT_FV_TREE or WholeFvTree.type == ROOT_ELF_TREE:
             ParserEntry().DataParser(self.WholeFvTree, whole_data, Reloffset)
         else:
             ParserEntry().DataParser(WholeFvTree, whole_data, Reloffset)
