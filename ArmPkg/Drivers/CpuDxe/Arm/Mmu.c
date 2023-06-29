@@ -17,9 +17,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   Convert a set of ARM short descriptor section attributes into a mask
   of EFI_MEMORY_xx constants.
 
-  @param  SectionAttributes   The set of page attributes.
-  @param  GcdAttributes       Pointer to the return value.
+  @param[in]    SectionAttributes   The set of page attributes.
+  @param[out]   GcdAttributes       Pointer to the return value.
 
+  @retval EFI_SUCCESS       The attributes were converted successfully.
+  @retval EFI_UNSUPPORTED   The section attributes did not have a
+                            GCD transation.
 **/
 STATIC
 EFI_STATUS
@@ -87,10 +90,11 @@ SectionToGcdAttributes (
   Convert an arch specific set of page attributes into a mask
   of EFI_MEMORY_xx constants.
 
-  @param  PageAttributes  The set of page attributes.
+  @param[in] PageAttributes  The set of page attributes.
 
-  @retval The mask of EFI_MEMORY_xx constants.
-
+  @retval EFI_SUCCESS       The attributes were converted successfully.
+  @retval EFI_UNSUPPORTED   The section attributes did not have a
+                            GCD transation.
 **/
 UINT64
 RegionAttributeToGcdAttribute (
@@ -107,9 +111,11 @@ RegionAttributeToGcdAttribute (
   Convert a set of ARM short descriptor page attributes into a mask
   of EFI_MEMORY_xx constants.
 
-  @param  PageAttributes      The set of page attributes.
-  @param  GcdAttributes       Pointer to the return value.
+  @param[in]    PageAttributes  The set of page attributes.
+  @param[out]   GcdAttributes   Pointer to the return value.
 
+  @retval EFI_SUCCESS       The attributes were converted successfully.
+  @retval EFI_UNSUPPORTED   The page attributes did not have a GCD transation.
 **/
 STATIC
 EFI_STATUS
@@ -173,6 +179,23 @@ PageToGcdAttributes (
   return EFI_SUCCESS;
 }
 
+/**
+  Synchronizes the GCD with the translation table for a specified page.
+
+  This function synchronizes cache configuration for a given page based on its section index
+  and the first level descriptor. It traverses the second level table entries of the page and
+  updates the GCD attributes accordingly for each entry.
+
+  @param[in]        SectionIndex            The index of the section where the page resides.
+  @param[in]        FirstLevelDescriptor    The first translation table level of the page.
+  @param[in]        NumberOfDescriptors     The number of descriptors in the GCD memory space map.
+  @param[in]        MemorySpaceMap          The GCD memory space descriptor.
+  @param[in, out]   NextRegionBase          The next region base address.
+  @param[in, out]   NextRegionLength        The next region length.
+  @param[in, out]   NextSectionAttributes   The next section attributes.
+
+  @retval EFI_STATUS Always return success
+**/
 EFI_STATUS
 SyncCacheConfigPage (
   IN     UINT32                           SectionIndex,
@@ -258,6 +281,14 @@ SyncCacheConfigPage (
   return EFI_SUCCESS;
 }
 
+/**
+  Sync the GCD memory space attributes with the translation table.
+
+  @param[in]  CpuProtocol  The CPU architectural protocol instance.
+
+  @retval EFI_SUCCESS   The GCD memory space attributes are synced with the MMU page table.
+  @retval Others        The return value of GetMemorySpaceMap().
+**/
 EFI_STATUS
 SyncCacheConfig (
   IN  EFI_CPU_ARCH_PROTOCOL  *CpuProtocol
@@ -395,6 +426,13 @@ SyncCacheConfig (
   return EFI_SUCCESS;
 }
 
+/**
+  Convert EFI memory attributes to ARM translation table attributes.
+
+  @param[in]  EfiAttributes  EFI memory attributes.
+
+  @retval The analogous translation table attributes.
+**/
 UINT64
 EfiAttributeToArmAttribute (
   IN UINT64  EfiAttributes
@@ -448,6 +486,22 @@ EfiAttributeToArmAttribute (
   return ArmAttributes;
 }
 
+/**
+  This function finds the end of a memory region in a translation table. A
+  memory region is defined as a contiguous set of pages with the same attributes.
+
+  @param[in]    PageTable         The translation table to traverse.
+  @param[in]    BaseAddress       The address from which to start the search
+  @param[in]    RegionAttributes  The attributes of the start of the region.
+  @param[out]   RegionLength      The length of the region found.
+
+  @retval EFI_SUCCESS       The region was found.
+  @retval EFI_NOT_FOUND     The end of the region was not found.
+  @retval EFI_NO_MAPPING    The region specified by BaseAddress is not mapped
+                            in the input translation table.
+  @retval EFI_UNSUPPORTED   Large pages are not supported.
+**/
+STATIC
 EFI_STATUS
 GetMemoryRegionPage (
   IN     UINT32  *PageTable,
@@ -496,6 +550,24 @@ GetMemoryRegionPage (
   return Status;
 }
 
+/**
+  Get the memory region that contains the specified address. A memory region is defined
+  as a contiguous set of pages with the same attributes.
+
+  RegionLength and RegionAttributes are only valid if EFI_SUCCESS is returned.
+
+  @param[in, out]   BaseAddress       On input, the address to search for.
+                                      On output, the base address of the region found.
+  @param[out]       RegionLength      The length of the region found.
+  @param[out]       RegionAttributes  The attributes of the region found.
+
+  @retval   EFI_SUCCESS             Region found
+  @retval   EFI_NOT_FOUND           Region not found
+  @retval   EFI_UNSUPPORTED         Large pages are unsupported
+  @retval   EFI_NO_MAPPING          The page specified by BaseAddress is unmapped
+  @retval   EFI_INVALID_PARAMETER   The BaseAddress exceeds the addressable range of
+                                    the translation table.
+**/
 EFI_STATUS
 GetMemoryRegion (
   IN OUT UINTN  *BaseAddress,
