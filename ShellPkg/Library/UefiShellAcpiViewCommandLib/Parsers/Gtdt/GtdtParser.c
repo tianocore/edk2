@@ -84,33 +84,102 @@ ValidateGtFrameNumber (
   }
 }
 
+STATIC
+VOID
+EFIAPI
+PrintTimerInterruptMode (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr
+  )
+{
+  UINT8  TriggerMode = (*(UINT8 *)Ptr);
+
+  Print (
+    L"%s(%d)",
+    ((TriggerMode) ? L"Edge Trigger" : L"Level Trigger"),
+    TriggerMode
+    );
+}
+
+STATIC
+VOID
+EFIAPI
+PrintTimerInterruptPolarity (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr
+  )
+{
+  UINT8  Polarity = (*(UINT8 *)Ptr);
+
+  Print (
+    L"%s(%d)",
+    ((Polarity) ? L"Active Low" : L"Active High"),
+    Polarity
+    );
+}
+
+/**
+  An ACPI_PARSER array describing the Timer Flags Field in GTDT Table.
+**/
+STATIC CONST ACPI_PARSER  TimerFlagsParser[] = {
+  { L"Timer Interrupt Mode",     1,  0, NULL,  PrintTimerInterruptMode,     NULL, NULL, NULL },
+  { L"Timer Interrupt Polarity", 1,  1, NULL,  PrintTimerInterruptPolarity, NULL, NULL, NULL },
+  { L"Always-on Capability",     1,  2, L"%d", NULL,                        NULL, NULL, NULL },
+  { L"Reserved",                 29, 3, L"%d", NULL,                        NULL, NULL, NULL },
+};
+
+/**
+  This function parses the Timer Flags
+
+  @param [in]   Format  Print format
+  @param [in]   Ptr     Pointer to the start of the Timer flags
+ **/
+STATIC
+VOID
+EFIAPI
+DumpTimerFlags (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr
+  )
+{
+  DumpUint32 (L"0x%x\n", Ptr);
+  ParseAcpiBitFields (
+    TRUE,
+    2,
+    NULL,
+    Ptr,
+    4,
+    PARSER_PARAMS (TimerFlagsParser)
+    );
+}
+
 /**
   An ACPI_PARSER array describing the ACPI GTDT Table.
 **/
 STATIC CONST ACPI_PARSER  GtdtParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
-  { L"CntControlBase Physical Address",8,      36,  L"0x%lx", NULL, NULL,
+  { L"CntControlBase Physical Address",8,      36,  L"0x%lx", NULL,           NULL,
     NULL,                             NULL },
-  { L"Reserved",                      4,      44,  L"0x%x",  NULL, NULL,NULL,  NULL },
-  { L"Secure EL1 timer GSIV",         4,      48,  L"0x%x",  NULL, NULL,NULL,  NULL },
-  { L"Secure EL1 timer FLAGS",        4,      52,  L"0x%x",  NULL, NULL,NULL,  NULL },
+  { L"Reserved",                      4,      44,  L"0x%x",  NULL,           NULL,NULL,  NULL },
+  { L"Secure EL1 timer GSIV",         4,      48,  L"0x%x",  NULL,           NULL,NULL,  NULL },
+  { L"Secure EL1 timer FLAGS",        4,      52,  NULL,     DumpTimerFlags, NULL,NULL,  NULL },
 
-  { L"Non-Secure EL1 timer GSIV",     4,      56,  L"0x%x",  NULL, NULL,NULL,  NULL },
-  { L"Non-Secure EL1 timer FLAGS",    4,      60,  L"0x%x",  NULL, NULL,NULL,  NULL },
+  { L"Non-Secure EL1 timer GSIV",     4,      56,  L"0x%x",  NULL,           NULL,NULL,  NULL },
+  { L"Non-Secure EL1 timer FLAGS",    4,      60,  NULL,     DumpTimerFlags, NULL,NULL,  NULL },
 
-  { L"Virtual timer GSIV",            4,      64,  L"0x%x",  NULL, NULL,NULL,  NULL },
-  { L"Virtual timer FLAGS",           4,      68,  L"0x%x",  NULL, NULL,NULL,  NULL },
+  { L"Virtual timer GSIV",            4,      64,  L"0x%x",  NULL,           NULL,NULL,  NULL },
+  { L"Virtual timer FLAGS",           4,      68,  L"0x%x",  DumpTimerFlags, NULL,NULL,  NULL },
 
-  { L"Non-Secure EL2 timer GSIV",     4,      72,  L"0x%x",  NULL, NULL,NULL,  NULL },
-  { L"Non-Secure EL2 timer FLAGS",    4,      76,  L"0x%x",  NULL, NULL,NULL,  NULL },
+  { L"Non-Secure EL2 timer GSIV",     4,      72,  L"0x%x",  NULL,           NULL,NULL,  NULL },
+  { L"Non-Secure EL2 timer FLAGS",    4,      76,  L"0x%x",  DumpTimerFlags, NULL,NULL,  NULL },
 
-  { L"CntReadBase Physical address",  8,      80,  L"0x%lx", NULL, NULL,NULL,  NULL },
+  { L"CntReadBase Physical address",  8,      80,  L"0x%lx", NULL,           NULL,NULL,  NULL },
   { L"Platform Timer Count",          4,      88,  L"%d",    NULL,
     (VOID **)&GtdtPlatformTimerCount, NULL,   NULL },
   { L"Platform Timer Offset",         4,      92,  L"0x%x",  NULL,
     (VOID **)&GtdtPlatformTimerOffset,NULL,   NULL },
-  { L"Virtual EL2 Timer GSIV",        4,      96,  L"0x%x",  NULL, NULL,NULL,  NULL },
-  { L"Virtual EL2 Timer Flags",       4,      100, L"0x%x",  NULL, NULL,NULL,  NULL }
+  { L"Virtual EL2 Timer GSIV",        4,      96,  L"0x%x",  NULL,           NULL,NULL,  NULL },
+  { L"Virtual EL2 Timer Flags",       4,      100, L"0x%x",  NULL,           NULL,NULL,  NULL }
 };
 
 /**
