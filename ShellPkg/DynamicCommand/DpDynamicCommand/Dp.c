@@ -129,17 +129,22 @@ EFI_STATUS
 GetBootPerformanceTable (
   )
 {
+  EFI_STATUS                  Status;
   FIRMWARE_PERFORMANCE_TABLE  *FirmwarePerformanceTable;
 
   FirmwarePerformanceTable = (FIRMWARE_PERFORMANCE_TABLE *)EfiLocateFirstAcpiTable (
                                                              EFI_ACPI_5_0_FIRMWARE_PERFORMANCE_DATA_TABLE_SIGNATURE
                                                              );
   if (FirmwarePerformanceTable == NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GET_ACPI_FPDT_FAIL), mDpHiiHandle);
-    return EFI_NOT_FOUND;
+    Status = EfiGetSystemConfigurationTable (&gEdkiiFpdtExtendedFirmwarePerformanceGuid, (VOID **)&mBootPerformanceTable);
+    if (EFI_ERROR (Status)) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GET_ACPI_FPDT_FAIL), mDpHiiHandle);
+      return EFI_NOT_FOUND;
+    }
+  } else {
+    mBootPerformanceTable = (UINT8 *)(UINTN)FirmwarePerformanceTable->BootPointerRecord.BootPerformanceTablePointer;
   }
 
-  mBootPerformanceTable     = (UINT8 *)(UINTN)FirmwarePerformanceTable->BootPointerRecord.BootPerformanceTablePointer;
   mBootPerformanceTableSize = ((BOOT_PERFORMANCE_TABLE *)mBootPerformanceTable)->Header.Length;
 
   return EFI_SUCCESS;
