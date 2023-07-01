@@ -101,6 +101,7 @@
   SmmCpuFeaturesLib
   PeCoffGetEntryPointLib
   PerformanceLib
+  CpuPageTableLib
   MmSaveStateLib
 
 [Protocols]

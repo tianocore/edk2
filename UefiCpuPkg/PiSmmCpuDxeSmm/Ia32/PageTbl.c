@@ -1,7 +1,7 @@
 /** @file
 Page table manipulation functions for IA-32 processors
 
-Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -31,6 +31,7 @@ SmmInitPageTable (
   InitializeSpinLock (mPFLock);
 
   mPhysicalAddressBits = 32;
+  mPagingMode          = PagingPae;
 
   if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
       HEAP_GUARD_NONSTOP_MODE ||
@@ -62,7 +63,7 @@ SmmInitPageTable (
     InitializeIDTSmmStackGuard ();
   }
 
-  return Gen4GPageTable (TRUE);
+  return GenSmmPageTable (PagingPae, mPhysicalAddressBits);
 }
 
 /**
