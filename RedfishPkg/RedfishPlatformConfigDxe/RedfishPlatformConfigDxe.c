@@ -955,12 +955,12 @@ DumpOrderedListValue (
     return;
   }
 
-  DEBUG ((DEBUG_ERROR, "Value.Type= 0x%x\n", OrderedListStatement->Value.Type));
-  DEBUG ((DEBUG_ERROR, "Value.BufferValueType= 0x%x\n", OrderedListStatement->Value.BufferValueType));
-  DEBUG ((DEBUG_ERROR, "Value.BufferLen= 0x%x\n", OrderedListStatement->Value.BufferLen));
-  DEBUG ((DEBUG_ERROR, "Value.Buffer= 0x%x\n", OrderedListStatement->Value.Buffer));
-  DEBUG ((DEBUG_ERROR, "Value.MaxContainers= 0x%x\n", OrderedListStatement->ExtraData.OrderListData.MaxContainers));
-  DEBUG ((DEBUG_ERROR, "StorageWidth= 0x%x\n", OrderedListStatement->StorageWidth));
+  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.Type= 0x%x\n", OrderedListStatement->Value.Type));
+  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.BufferValueType= 0x%x\n", OrderedListStatement->Value.BufferValueType));
+  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.BufferLen= 0x%x\n", OrderedListStatement->Value.BufferLen));
+  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.Buffer= 0x%x\n", OrderedListStatement->Value.Buffer));
+  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.MaxContainers= 0x%x\n", OrderedListStatement->ExtraData.OrderListData.MaxContainers));
+  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "StorageWidth= 0x%x\n", OrderedListStatement->StorageWidth));
 
   if (OrderedListStatement->Value.Buffer == NULL) {
     return;
@@ -977,7 +977,7 @@ DumpOrderedListValue (
       Value8 = (UINT8 *)OrderedListStatement->Value.Buffer;
       Count  = OrderedListStatement->StorageWidth / sizeof (UINT8);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((DEBUG_ERROR, "%d ", Value8[Index]));
+        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value8[Index]));
       }
 
       break;
@@ -985,7 +985,7 @@ DumpOrderedListValue (
       Value16 = (UINT16 *)OrderedListStatement->Value.Buffer;
       Count   = OrderedListStatement->StorageWidth / sizeof (UINT16);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((DEBUG_ERROR, "%d ", Value16[Index]));
+        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value16[Index]));
       }
 
       break;
@@ -993,7 +993,7 @@ DumpOrderedListValue (
       Value32 = (UINT32 *)OrderedListStatement->Value.Buffer;
       Count   = OrderedListStatement->StorageWidth / sizeof (UINT32);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((DEBUG_ERROR, "%d ", Value32[Index]));
+        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value32[Index]));
       }
 
       break;
@@ -1001,7 +1001,7 @@ DumpOrderedListValue (
       Value64 = (UINT64 *)OrderedListStatement->Value.Buffer;
       Count   = OrderedListStatement->StorageWidth / sizeof (UINT64);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((DEBUG_ERROR, "%d ", Value64[Index]));
+        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value64[Index]));
       }
 
       break;
@@ -1009,13 +1009,13 @@ DumpOrderedListValue (
       Value8 = (UINT8 *)OrderedListStatement->Value.Buffer;
       Count  = OrderedListStatement->StorageWidth / sizeof (UINT8);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((DEBUG_ERROR, "%d ", Value8[Index]));
+        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value8[Index]));
       }
 
       break;
   }
 
-  DEBUG ((DEBUG_ERROR, "\n"));
+  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "\n"));
 }
 
 /**
