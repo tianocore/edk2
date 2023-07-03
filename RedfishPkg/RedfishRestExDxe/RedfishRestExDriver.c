@@ -3,6 +3,7 @@
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -57,6 +58,7 @@ RestExDestroyChildEntryInHandleBuffer (
   ChildHandleBuffer = ((RESTEX_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT *)Context)->ChildHandleBuffer;
 
   if (!NetIsInHandleBuffer (Instance->ChildHandle, NumberOfChildren, ChildHandleBuffer)) {
+    RemoveEntryList (&Instance->Link);
     return EFI_SUCCESS;
   }
 
@@ -563,7 +565,7 @@ RedfishRestExDriverBindingStop (
                                   );
   }
 
-  if ((NumberOfChildren == 0) && IsListEmpty (&RestExSb->RestExChildrenList)) {
+  if (IsListEmpty (&RestExSb->RestExChildrenList)) {
     gBS->UninstallProtocolInterface (
            NicHandle,
            &gEfiRestExServiceBindingProtocolGuid,
