@@ -20,8 +20,7 @@
 #include <Library/HobLib.h>
 #include <Pcd/CpuHotEjectData.h>
 #include <PiSmm.h>
-#include <Register/Intel/SmramSaveStateMap.h>
-#include <Register/QemuSmramSaveStateMap.h>
+#include <Register/Amd/SmramSaveStateMap.h>
 #include <Guid/SmmBaseHob.h>
 
 //
@@ -90,15 +89,15 @@ SmmCpuFeaturesInitializeProcessor (
   IN CPU_HOT_PLUG_DATA          *CpuHotPlugData
   )
 {
-  QEMU_SMRAM_SAVE_STATE_MAP  *CpuState;
+  AMD_SMRAM_SAVE_STATE_MAP  *CpuState;
 
   //
   // Configure SMBASE.
   //
-  CpuState = (QEMU_SMRAM_SAVE_STATE_MAP *)(UINTN)(
-                                                  SMM_DEFAULT_SMBASE +
-                                                  SMRAM_SAVE_STATE_MAP_OFFSET
-                                                  );
+  CpuState = (AMD_SMRAM_SAVE_STATE_MAP *)(UINTN)(
+                                                 SMM_DEFAULT_SMBASE +
+                                                 SMRAM_SAVE_STATE_MAP_OFFSET
+                                                 );
   if ((CpuState->x86.SMMRevId & 0xFFFF) == 0) {
     CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
   } else {
@@ -150,10 +149,10 @@ SmmCpuFeaturesHookReturnFromSmm (
   IN UINT64                NewInstructionPointer
   )
 {
-  UINT64                     OriginalInstructionPointer;
-  QEMU_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
+  UINT64                    OriginalInstructionPointer;
+  AMD_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
-  CpuSaveState = (QEMU_SMRAM_SAVE_STATE_MAP *)CpuState;
+  CpuSaveState = (AMD_SMRAM_SAVE_STATE_MAP *)CpuState;
   if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
     OriginalInstructionPointer = (UINT64)CpuSaveState->x86._EIP;
     CpuSaveState->x86._EIP     = (UINT32)NewInstructionPointer;
@@ -166,7 +165,7 @@ SmmCpuFeaturesHookReturnFromSmm (
     }
   } else {
     OriginalInstructionPointer = CpuSaveState->x64._RIP;
-    if ((CpuSaveState->x64.IA32_EFER & LMA) == 0) {
+    if ((CpuSaveState->x64.EFER & LMA) == 0) {
       CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer32;
     } else {
       CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer;

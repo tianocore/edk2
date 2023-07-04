@@ -12,7 +12,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/PcdLib.h>
-#include <Register/QemuSmramSaveStateMap.h>
+#include <Register/Amd/SmramSaveStateMap.h>
 #include <Register/SmramSaveStateMap.h>
 #include <Uefi/UefiBaseType.h>
 
@@ -49,7 +49,7 @@ MemEncryptSevLocateInitialSmramSaveStateMapPages (
   }
 
   MapStart      = SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET;
-  MapEnd        = MapStart + sizeof (QEMU_SMRAM_SAVE_STATE_MAP);
+  MapEnd        = MapStart + sizeof (AMD_SMRAM_SAVE_STATE_MAP);
   MapPagesStart = MapStart & ~(UINTN)EFI_PAGE_MASK;
   MapPagesEnd   = ALIGN_VALUE (MapEnd, EFI_PAGE_SIZE);
   MapPagesSize  = MapPagesEnd - MapPagesStart;
