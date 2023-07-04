@@ -650,6 +650,19 @@ UnitTestMtrrGetFixedMtrr (
   UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&FixedSettings);
   UT_ASSERT_MEM_EQUAL (&ExpectedFixedSettings, &FixedSettings, sizeof (ExpectedFixedSettings));
 
+  //
+  // Negative test case when Fixed MTRRs are not supported
+  //
+  SystemParameter.MtrrSupported      = TRUE;
+  SystemParameter.FixedMtrrSupported = FALSE;
+  InitializeMtrrRegs (&SystemParameter);
+
+  ZeroMem (&FixedSettings, sizeof (FixedSettings));
+  ZeroMem (&ExpectedFixedSettings, sizeof (ExpectedFixedSettings));
+  Result = MtrrGetFixedMtrr (&FixedSettings);
+  UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&FixedSettings);
+  UT_ASSERT_MEM_EQUAL (&ExpectedFixedSettings, &FixedSettings, sizeof (ExpectedFixedSettings));
+
   return UNIT_TEST_PASSED;
 }
 
