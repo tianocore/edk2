@@ -468,7 +468,11 @@ MtrrGetFixedMtrr (
   OUT MTRR_FIXED_SETTINGS  *FixedSettings
   )
 {
-  if (!IsMtrrSupported ()) {
+  BOOLEAN  FixedMtrrSupported;
+
+  MtrrLibIsMtrrSupported (&FixedMtrrSupported, NULL);
+
+  if (!FixedMtrrSupported) {
     return FixedSettings;
   }
 
