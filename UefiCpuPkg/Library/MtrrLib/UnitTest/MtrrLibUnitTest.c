@@ -654,6 +654,52 @@ UnitTestMtrrGetFixedMtrr (
 }
 
 /**
+  Set Random Variable and Fixed MTRRs Settings for
+  unit test of UnitTestMtrrGetAllMtrrs.
+
+  @param SystemParameter      System parameter that controls the MTRR registers initialization.
+  @param ExpectedMtrrs        Expected Fixed and Variable MTRRs.
+**/
+VOID
+SetRandomlyGeneratedMtrrSettings (
+  IN MTRR_LIB_SYSTEM_PARAMETER  *SystemParameter,
+  IN MTRR_SETTINGS              *ExpectedMtrrs
+  )
+{
+  UINT32                           Index;
+  UINTN                            MsrIndex;
+  UINTN                            ByteIndex;
+  UINT64                           MsrValue;
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER  Default;
+
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, ExpectedMtrrs->MtrrDefType);
+  //
+  // Randomly generate Variable MTRR BASE/MASK for a specified type and write to MSR.
+  //
+  for (Index = 0; Index < SystemParameter->VariableMtrrCount; Index++) {
+    GenerateRandomMtrrPair (SystemParameter->PhysicalAddressBits, GenerateRandomCacheType (), &ExpectedMtrrs->Variables.Mtrr[Index], NULL);
+    AsmWriteMsr64 (MSR_IA32_MTRR_PHYSBASE0 + (Index << 1), ExpectedMtrrs->Variables.Mtrr[Index].Base);
+    AsmWriteMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1), ExpectedMtrrs->Variables.Mtrr[Index].Mask);
+  }
+
+  //
+  // Set Fixed MTRRs when the Fixed MTRRs is enabled and the MTRRs is supported.
+  //
+  Default.Uint64 = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
+  if ((Default.Bits.FE == 1) && (SystemParameter->MtrrSupported == TRUE)) {
+    for (MsrIndex = 0; MsrIndex < ARRAY_SIZE (mFixedMtrrsIndex); MsrIndex++) {
+      MsrValue = 0;
+      for (ByteIndex = 0; ByteIndex < sizeof (UINT64); ByteIndex++) {
+        MsrValue = MsrValue | LShiftU64 (GenerateRandomCacheType (), ByteIndex * 8);
+      }
+
+      ExpectedMtrrs->Fixed.Mtrr[MsrIndex] = MsrValue;
+      AsmWriteMsr64 (mFixedMtrrsIndex[MsrIndex], MsrValue);
+    }
+  }
+}
+
+/**
   Unit test of MtrrLib service MtrrGetAllMtrrs()
 
   @param[in]  Context    Ignored
@@ -669,28 +715,51 @@ UnitTestMtrrGetAllMtrrs (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
-  MTRR_SETTINGS              *Result;
-  MTRR_SETTINGS              Mtrrs;
-  MTRR_SETTINGS              ExpectedMtrrs;
-  MTRR_VARIABLE_SETTING      VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
-  UINT32                     Index;
-  MTRR_LIB_SYSTEM_PARAMETER  SystemParameter;
-  MTRR_LIB_TEST_CONTEXT      *LocalContext;
+  MTRR_SETTINGS                    *Result;
+  MTRR_SETTINGS                    Mtrrs;
+  MTRR_SETTINGS                    ExpectedMtrrs;
+  MTRR_LIB_SYSTEM_PARAMETER        SystemParameter;
+  MTRR_LIB_TEST_CONTEXT            *LocalContext;
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER  Default;
 
   LocalContext = (MTRR_LIB_TEST_CONTEXT *)Context;
 
   CopyMem (&SystemParameter, LocalContext->SystemParameter, sizeof (SystemParameter));
+
+  //
+  // For the case that Fixed MTRRs is NOT enabled
+  //
+  SystemParameter.MtrrSupported      = TRUE;
+  SystemParameter.FixedMtrrSupported = FALSE;
   InitializeMtrrRegs (&SystemParameter);
-
-  for (Index = 0; Index < SystemParameter.VariableMtrrCount; Index++) {
-    GenerateRandomMtrrPair (SystemParameter.PhysicalAddressBits, GenerateRandomCacheType (), &VariableMtrr[Index], NULL);
-    AsmWriteMsr64 (MSR_IA32_MTRR_PHYSBASE0 + (Index << 1), VariableMtrr[Index].Base);
-    AsmWriteMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1), VariableMtrr[Index].Mask);
-  }
-
+  Default.Uint64  = 0;
+  Default.Bits.E  = 1;
+  Default.Bits.FE = 0;
+  ZeroMem (&ExpectedMtrrs, sizeof (ExpectedMtrrs));
+  ExpectedMtrrs.MtrrDefType = Default.Uint64;
+  //
+  // Randomly generate expected MtrrSettings and set to MSR.
+  //
+  SetRandomlyGeneratedMtrrSettings (&SystemParameter, &ExpectedMtrrs);
   Result = MtrrGetAllMtrrs (&Mtrrs);
-  UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&Mtrrs);
-  UT_ASSERT_MEM_EQUAL (Mtrrs.Variables.Mtrr, VariableMtrr, sizeof (MTRR_VARIABLE_SETTING) * SystemParameter.VariableMtrrCount);
+  UT_ASSERT_MEM_EQUAL (&ExpectedMtrrs.Fixed, &Mtrrs.Fixed, sizeof (MTRR_FIXED_SETTINGS));
+  UT_ASSERT_MEM_EQUAL (Mtrrs.Variables.Mtrr, ExpectedMtrrs.Variables.Mtrr, sizeof (MTRR_VARIABLE_SETTING) * (SystemParameter.VariableMtrrCount));
+
+  //
+  // For the case that Fixed MTRRs is enabled
+  //
+  SystemParameter.MtrrSupported      = TRUE;
+  SystemParameter.FixedMtrrSupported = TRUE;
+  InitializeMtrrRegs (&SystemParameter);
+  Default.Uint64  = 0;
+  Default.Bits.E  = 1;
+  Default.Bits.FE = 1;
+  ZeroMem (&ExpectedMtrrs, sizeof (ExpectedMtrrs));
+  ExpectedMtrrs.MtrrDefType = Default.Uint64;
+  SetRandomlyGeneratedMtrrSettings (&SystemParameter, &ExpectedMtrrs);
+  Result = MtrrGetAllMtrrs (&Mtrrs);
+  UT_ASSERT_MEM_EQUAL (&ExpectedMtrrs.Fixed, &Mtrrs.Fixed, sizeof (MTRR_FIXED_SETTINGS));
+  UT_ASSERT_MEM_EQUAL (Mtrrs.Variables.Mtrr, ExpectedMtrrs.Variables.Mtrr, sizeof (MTRR_VARIABLE_SETTING) * (SystemParameter.VariableMtrrCount));
 
   //
   // Negative test case when MTRRs are not supported
