@@ -11,11 +11,44 @@
 #define REDFISH_DEBUG_LIB_H_
 
 #include <Uefi.h>
+#include <Library/HiiUtilityLib.h>
 #include <Library/JsonLib.h>
 #include <Library/RedfishLib.h>
 
+#include <Protocol/EdkIIRedfishPlatformConfig.h>
+
 #define DEBUG_REDFISH_NETWORK         DEBUG_MANAGEABILITY   ///< Debug error level for Redfish networking function
 #define DEBUG_REDFISH_HOST_INTERFACE  DEBUG_MANAGEABILITY   ///< Debug error level for Redfish networking function
+
+/**
+  Debug print the value of StatementValue.
+
+  @param[in]  ErrorLevel     DEBUG macro error level.
+  @param[in]  StatementValue The statement value to print.
+
+  @retval     EFI_SUCCESS            StatementValue is printed.
+  @retval     EFI_INVALID_PARAMETER  StatementValue is NULL.
+**/
+EFI_STATUS
+DumpHiiStatementValue (
+  IN UINTN                ErrorLevel,
+  IN HII_STATEMENT_VALUE  *StatementValue
+  );
+
+/**
+  Debug print the value of RedfishValue.
+
+  @param[in]  ErrorLevel     DEBUG macro error level.
+  @param[in]  RedfishValue   The statement value to print.
+
+  @retval     EFI_SUCCESS            RedfishValue is printed.
+  @retval     EFI_INVALID_PARAMETER  RedfishValue is NULL.
+**/
+EFI_STATUS
+DumpRedfishValue (
+  IN UINTN                ErrorLevel,
+  IN EDKII_REDFISH_VALUE  *RedfishValue
+  );
 
 /**
 

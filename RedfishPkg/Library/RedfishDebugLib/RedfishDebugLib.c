@@ -23,6 +23,119 @@
 #define REDFISH_JSON_OUTPUT_FORMAT  (EDKII_JSON_COMPACT | EDKII_JSON_INDENT(2))
 
 /**
+  Debug print the value of StatementValue.
+
+  @param[in]  ErrorLevel     DEBUG macro error level.
+  @param[in]  StatementValue The statement value to print.
+
+  @retval     EFI_SUCCESS            StatementValue is printed.
+  @retval     EFI_INVALID_PARAMETER  StatementValue is NULL.
+**/
+EFI_STATUS
+DumpHiiStatementValue (
+  IN UINTN                ErrorLevel,
+  IN HII_STATEMENT_VALUE  *StatementValue
+  )
+{
+  if (StatementValue == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DEBUG ((ErrorLevel, "BufferValueType: 0x%x\n", StatementValue->BufferValueType));
+  DEBUG ((ErrorLevel, "BufferLen: 0x%x\n", StatementValue->BufferLen));
+  DEBUG ((ErrorLevel, "Buffer:    0x%p\n", StatementValue->Buffer));
+  DEBUG ((ErrorLevel, "Type:      0x%p\n", StatementValue->Type));
+
+  switch (StatementValue->Type) {
+    case EFI_IFR_TYPE_NUM_SIZE_8:
+      DEBUG ((ErrorLevel, "Value:     0x%x\n", StatementValue->Value.u8));
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_16:
+      DEBUG ((ErrorLevel, "Value:     0x%x\n", StatementValue->Value.u16));
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_32:
+      DEBUG ((ErrorLevel, "Value:     0x%x\n", StatementValue->Value.u32));
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_64:
+      DEBUG ((ErrorLevel, "Value:     0x%lx\n", StatementValue->Value.u64));
+      break;
+    case EFI_IFR_TYPE_BOOLEAN:
+      DEBUG ((ErrorLevel, "Value:     %a\n", (StatementValue->Value.b ? "true" : "false")));
+      break;
+    case EFI_IFR_TYPE_STRING:
+      DEBUG ((ErrorLevel, "Value:     0x%x\n", StatementValue->Value.string));
+      break;
+    case EFI_IFR_TYPE_TIME:
+    case EFI_IFR_TYPE_DATE:
+    default:
+      break;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Debug print the value of RedfishValue.
+
+  @param[in]  ErrorLevel     DEBUG macro error level.
+  @param[in]  RedfishValue   The statement value to print.
+
+  @retval     EFI_SUCCESS            RedfishValue is printed.
+  @retval     EFI_INVALID_PARAMETER  RedfishValue is NULL.
+**/
+EFI_STATUS
+DumpRedfishValue (
+  IN UINTN                ErrorLevel,
+  IN EDKII_REDFISH_VALUE  *RedfishValue
+  )
+{
+  UINTN  Index;
+
+  if (RedfishValue == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DEBUG ((ErrorLevel, "Type:       0x%x\n", RedfishValue->Type));
+  DEBUG ((ErrorLevel, "ArrayCount: 0x%x\n", RedfishValue->ArrayCount));
+
+  switch (RedfishValue->Type) {
+    case RedfishValueTypeInteger:
+      DEBUG ((ErrorLevel, "Value:      0x%x\n", RedfishValue->Value.Integer));
+      break;
+    case RedfishValueTypeBoolean:
+      DEBUG ((ErrorLevel, "Value:      %a\n", (RedfishValue->Value.Boolean ? "true" : "false")));
+      break;
+    case RedfishValueTypeString:
+      DEBUG ((ErrorLevel, "Value:      %a\n", RedfishValue->Value.Buffer));
+      break;
+    case RedfishValueTypeStringArray:
+      for (Index = 0; Index < RedfishValue->ArrayCount; Index++) {
+        DEBUG ((ErrorLevel, "Value[%d]:      %a\n", Index, RedfishValue->Value.StringArray[Index]));
+      }
+
+      break;
+    case RedfishValueTypeIntegerArray:
+      for (Index = 0; Index < RedfishValue->ArrayCount; Index++) {
+        DEBUG ((ErrorLevel, "Value[%d]:      0x%x\n", Index, RedfishValue->Value.IntegerArray[Index]));
+      }
+
+      break;
+    case RedfishValueTypeBooleanArray:
+      for (Index = 0; Index < RedfishValue->ArrayCount; Index++) {
+        DEBUG ((ErrorLevel, "Value[%d]:      %a\n", Index, (RedfishValue->Value.BooleanArray[Index] ? "true" : "false")));
+      }
+
+      break;
+    case RedfishValueTypeUnknown:
+    case RedfishValueTypeMax:
+    default:
+      break;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
 
   This function dump the Json string in given error level.
 
