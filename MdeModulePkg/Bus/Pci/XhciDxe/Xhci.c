@@ -1,6 +1,7 @@
 /** @file
   The XHCI controller driver.
 
+(C) Copyright 2023 Hewlett Packard Enterprise Development LP<BR>
 Copyright (c) 2011 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -2293,4 +2294,59 @@ XhcDriverBindingStop (
   FreePool (Xhc);
 
   return EFI_SUCCESS;
+}
+
+/**
+  Computes and returns the elapsed time in nanoseconds since
+  PreviousTick. The value of PreviousTick is overwritten with the
+  current performance counter value.
+
+  @param  PreviousTick    Pointer to PreviousTick count.
+  @return The elapsed time in nanoseconds since PreviousCount.
+          PreviousCount is overwritten with the current performance
+          counter value.
+**/
+UINT64
+XhcGetElapsedTime (
+  IN OUT UINT64  *PreviousTick
+  )
+{
+  UINT64  StartValue;
+  UINT64  EndValue;
+  UINT64  CurrentTick;
+  UINT64  Delta;
+
+  GetPerformanceCounterProperties (&StartValue, &EndValue);
+
+  CurrentTick = GetPerformanceCounter ();
+
+  //
+  // Determine if the counter is counting up or down
+  //
+  if (StartValue < EndValue) {
+    //
+    // Counter counts upwards, check for an overflow condition
+    //
+    if (*PreviousTick > CurrentTick) {
+      Delta = (EndValue - *PreviousTick) + CurrentTick;
+    } else {
+      Delta = CurrentTick - *PreviousTick;
+    }
+  } else {
+    //
+    // Counter counts downwards, check for an underflow condition
+    //
+    if (*PreviousTick < CurrentTick) {
+      Delta = (StartValue - CurrentTick) + *PreviousTick;
+    } else {
+      Delta = *PreviousTick - CurrentTick;
+    }
+  }
+
+  //
+  // Set PreviousTick to CurrentTick
+  //
+  *PreviousTick = CurrentTick;
+
+  return GetTimeInNanoSecond (Delta);
 }
