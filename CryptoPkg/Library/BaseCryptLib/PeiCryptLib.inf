@@ -45,11 +45,11 @@
   Hash/CryptCShake256.c
   Hash/CryptParallelHash.c
   Hash/CryptDispatchApPei.c
-  Hmac/CryptHmac.c
-  Kdf/CryptHkdf.c
+  Hmac/CryptHmacNull.c
+  Kdf/CryptHkdfNull.c
   Cipher/CryptAes.c
   Cipher/CryptAeadAesGcmNull.c
-  Pk/CryptRsaBasic.c
+  Pk/CryptRsaBasicNull.c
   Pk/CryptRsaExtNull.c
   Pk/CryptPkcs1OaepNull.c
   Pk/CryptPkcs5Pbkdf2Null.c
