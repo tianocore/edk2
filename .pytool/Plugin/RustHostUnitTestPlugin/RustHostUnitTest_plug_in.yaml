@@ -1,0 +1,13 @@
+## @file
+# A CI plugin used to compile and run any rust unit tests and calculate code coverage.
+#
+# Note the scope required for the plugin to activate.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "rust-ci",
+  "name": "Rust Host-Based Unit Test Runner",
+  "module": "RustHostUnitTestPlugin"
+}

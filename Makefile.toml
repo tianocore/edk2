@@ -10,7 +10,7 @@ PACKAGE_TARGET = {value = "-p ${CARGO_MAKE_TASK_ARGS}",condition = { env_true = 
 
 BUILD_FLAGS = "--profile ${RUSTC_PROFILE} --target ${TARGET_TRIPLE} -Zbuild-std=core,compiler_builtins,alloc -Zbuild-std-features=compiler-builtins-mem -Zunstable-options --timings=html"
 TEST_FLAGS = { value = "", condition = { env_not_set = ["TEST_FLAGS"] } }
-COV_FLAGS = { value = "--out Html", condition = { env_not_set = ["COV_FLAGS"] } }
+COV_FLAGS = { value = "--out Html --exclude-files **/tests/*", condition = { env_not_set = ["COV_FLAGS"] } }
 
 [env.development]
 RUSTC_PROFILE = "dev"
@@ -43,10 +43,7 @@ command = "cargo"
 args = ["test", "@@split(PACKAGE_TARGET, )", "@@split(TEST_FLAGS, )"]
 
 [tasks.coverage]
-disabled = true
-
-[tasks.cov]
 description = "Build and run all tests and calculate coverage."
 clear = true
 command = "cargo"
-args = ["tarpaulin", "@@split(PACKAGE_TARGET, )", "@@split(COV_FLAGS, )", "--exclude-files", "**/tests/*", "--output-dir", "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/target"]
+args = ["tarpaulin", "@@split(PACKAGE_TARGET, )", "@@split(COV_FLAGS, )", "--output-dir", "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/target"]
