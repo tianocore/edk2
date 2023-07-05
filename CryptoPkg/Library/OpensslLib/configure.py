@@ -210,6 +210,23 @@ def get_source_list(cfg, obj, gen):
             srclist += [ obj, ]
     return srclist
 
+def asm_filter_fn(filename):
+    """
+    Filter asm source and define lists.  Drops files we don't want include.
+    """
+    exclude = [
+        '/bn/',
+        'OPENSSL_BN_ASM',
+        'OPENSSL_IA32_SSE2',
+        '/ec/',
+        'ECP_NISTZ256_ASM',
+        'X25519_ASM',
+    ]
+    for item in exclude:
+        if item in filename:
+            return False
+    return True
+
 def get_sources(cfg, obj, asm):
     """
     Get the list of all sources files.  Will fetch both generated
@@ -224,6 +241,7 @@ def get_sources(cfg, obj, asm):
                       filter(lambda x: not is_asm(x), genlist)))
     asm_list = list(map(lambda x: f'$(OPENSSL_GEN_PATH)/{asm}/{x}',
                         filter(is_asm, genlist)))
+    asm_list = list(filter(asm_filter_fn, asm_list))
     return srclist + c_list + asm_list
 
 def sources_filter_fn(filename):
@@ -242,6 +260,8 @@ def sources_filter_fn(filename):
         'defltprov.c',
         'baseprov.c',
         'provider_predefined.c',
+        'ecp_nistz256.c',
+        'x86_64-gcc.c',
     ]
     for item in exclude:
         if item in filename:
@@ -349,6 +369,7 @@ def main():
             update_MSFT_asm_format(archcc, sources[archcc])
             sources[arch] = list(filter(lambda x: not is_asm(x), srclist))
             defines[arch] = cfg['unified_info']['defines']['libcrypto']
+            defines[arch] = list(filter(asm_filter_fn, defines[arch]))
 
         ia32accel = sources['IA32'] + sources['IA32-MSFT'] + sources['IA32-GCC']
         x64accel = sources['X64'] + sources['X64-MSFT'] + sources['X64-GCC']
