@@ -24,6 +24,12 @@ typedef enum {
   TypeMax
 } PCI_RESOURCE_TYPE;
 
+#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+#define PCI_RESOURCE_TYPE_ENUM_START  TypeIo
+#else
+#define PCI_RESOURCE_TYPE_ENUM_START  TypeMem32
+#endif
+
 typedef enum {
   ResNone,
   ResSubmitted,
