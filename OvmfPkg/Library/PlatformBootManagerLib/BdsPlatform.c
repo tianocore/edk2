@@ -10,6 +10,7 @@
 #include <Guid/RootBridgesConnectedEventGroup.h>
 #include <Guid/SerialPortLibVendor.h>
 #include <Protocol/FirmwareVolume2.h>
+#include <Protocol/VirtioDevice.h>
 #include <Library/PlatformBmPrintScLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
 #include <Library/XenPlatformLib.h>
@@ -1236,6 +1237,30 @@ DetectAndPreparePlatformPciDevicePath (
   return Status;
 }
 
+EFI_STATUS
+EFIAPI
+DetectAndPreparePlatformVirtioDevicePath (
+  IN EFI_HANDLE  Handle,
+  IN VOID        *Instance,
+  IN VOID        *Context
+  )
+{
+  VIRTIO_DEVICE_PROTOCOL  *VirtIo = (VIRTIO_DEVICE_PROTOCOL *)Instance;
+
+  DEBUG ((DEBUG_INFO, "%a:%d: id %d\n", __func__, __LINE__, VirtIo->SubSystemDeviceId));
+
+  switch (VirtIo->SubSystemDeviceId) {
+    case 3:
+      PrepareVirtioSerialDevicePath (Handle);
+      break;
+    default:
+      /* nothing */
+      break;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /**
   Connect the predefined platform default console device.
 
@@ -1255,6 +1280,12 @@ PlatformInitializeConsole (
   // ErrOut
   //
   VisitAllPciInstances (DetectAndPreparePlatformPciDevicePath);
+
+  VisitAllInstancesOfProtocol (
+    &gVirtioDeviceProtocolGuid,
+    DetectAndPreparePlatformVirtioDevicePath,
+    NULL
+    );
 
   PrepareMicrovmDevicePath ();
 
