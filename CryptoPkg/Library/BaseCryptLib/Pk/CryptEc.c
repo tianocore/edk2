@@ -497,13 +497,13 @@ EcGenerateKey (
   Group    = EC_KEY_get0_group (EcKey);
   HalfSize = (EC_GROUP_get_degree (Group) + 7) / 8;
 
-  // Assume RAND_seed was called
-  if (EC_KEY_generate_key (EcKey) != 1) {
+  if (*PublicKeySize < HalfSize * 2) {
+    *PublicKeySize = HalfSize * 2;
     return FALSE;
   }
 
-  if (*PublicKeySize < HalfSize * 2) {
-    *PublicKeySize = HalfSize * 2;
+  // Assume RAND_seed was called
+  if (EC_KEY_generate_key (EcKey) != 1) {
     return FALSE;
   }
 
