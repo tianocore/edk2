@@ -495,7 +495,8 @@ R: Corvin Köhne <corvink@freebsd.org> [corvink]
 OvmfPkg: cloudhv-related modules
 F: OvmfPkg/CloudHv/
 F: OvmfPkg/Include/IndustryStandard/CloudHv.h
-R: Sebastien Boeuf <sebastien.boeuf@intel.com> [sboeuf]
+R: Jianyong Wu <jianyong.wu@arm.com> [jongwu]
+R: Anatol Belski <anbelski@linux.microsoft.com> [weltling]
 
 OvmfPkg: microvm-related modules
 F: OvmfPkg/Microvm/
