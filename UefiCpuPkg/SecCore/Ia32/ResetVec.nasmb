@@ -25,18 +25,6 @@ USE16
     ORG     0h
 
 ;
-; 0xFFFFF000
-;
-; We enter here with CS:IP = 0xFF00:0x0000. Do a far-jump to change CS to 0xF000
-; and IP to ApStartup.
-;
-ApVector:
-    mov     di, "AP"
-    jmp     0xF000:0xF000+ApStartup
-
-    TIMES 0xFC0-($-$$) nop
-
-;
 ; This should be at 0xFFFFFFC0
 ;
 
@@ -45,14 +33,7 @@ ApVector:
 ;
 ReservedData:            DD 0eeeeeeeeh, 0eeeeeeeeh
 
-    TIMES 0xFD0-($-$$) nop
-;
-; This is located at 0xFFFFFFD0
-;
-    mov     di, "PA"
-    jmp     ApStartup
-
-    TIMES 0xFE0-($-$$) nop
+    TIMES 0x20-($-$$) nop
 ;
 ; Pointer to the entry point of the PEI core
 ; It is located at 0xFFFFFFE0, and is fixed up by some build tool
@@ -70,7 +51,7 @@ ASM_PFX(InterruptHandler):
     jmp     $
     iret
 
-    TIMES 0xFF0-($-$$) nop
+    TIMES 0x30-($-$$) nop
 ;
 ; For IA32, the reset vector must be at 0xFFFFFFF0, i.e., 4G-16 byte
 ; Execution starts here upon power-on/platform-reset.
@@ -78,7 +59,6 @@ ASM_PFX(InterruptHandler):
 ResetHandler:
     nop
     nop
-ApStartup:
     ;
     ; Jmp Rel16 instruction
     ; Use machine code directly in case of the assembler optimization
@@ -90,17 +70,7 @@ ApStartup:
     DB      0e9h
     DW      -3
 
-
-    TIMES 0xFF8-($-$$) nop
-;
-; Ap reset vector segment address is at 0xFFFFFFF8
-; This will be fixed up by some build tool,
-; so if the value 1..8 appears in the final FD image,
-; tool failure occurs
-;
-ApSegAddress:    dd      12345678h
-
-    TIMES 0xFFC-($-$$) nop
+    TIMES 0x3C-($-$$) nop
 ;
 ; BFV Base is at 0xFFFFFFFC
 ; This will be fixed up by some build tool,
