@@ -9,8 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PlatformBootManager.h"
 #include "PlatformConsole.h"
-#include <Guid/BootManagerMenu.h>
-#include <Library/HobLib.h>
 #include <Protocol/FirmwareVolume2.h>
 
 /**
@@ -363,57 +361,4 @@ PlatformBootManagerUnableToBoot (
   )
 {
   return;
-}
-
-/**
-  Get/update PcdBootManagerMenuFile from GUID HOB which will be assigned in bootloader.
-
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS       The entry point is executed successfully.
-  @retval other             Some error occurs.
-
-**/
-EFI_STATUS
-EFIAPI
-PlatformBootManagerLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  EFI_STATUS                           Status;
-  UINTN                                Size;
-  VOID                                 *GuidHob;
-  UNIVERSAL_PAYLOAD_GENERIC_HEADER     *GenericHeader;
-  UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU  *BootManagerMenuFile;
-
-  GuidHob = GetFirstGuidHob (&gEdkiiBootManagerMenuFileGuid);
-
-  if (GuidHob == NULL) {
-    //
-    // If the HOB is not create, the default value of PcdBootManagerMenuFile will be used.
-    //
-    return EFI_SUCCESS;
-  }
-
-  GenericHeader = (UNIVERSAL_PAYLOAD_GENERIC_HEADER *)GET_GUID_HOB_DATA (GuidHob);
-  if ((sizeof (UNIVERSAL_PAYLOAD_GENERIC_HEADER) > GET_GUID_HOB_DATA_SIZE (GuidHob)) || (GenericHeader->Length > GET_GUID_HOB_DATA_SIZE (GuidHob))) {
-    return EFI_NOT_FOUND;
-  }
-
-  if (GenericHeader->Revision == UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU_REVISION) {
-    BootManagerMenuFile = (UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU *)GET_GUID_HOB_DATA (GuidHob);
-    if (BootManagerMenuFile->Header.Length < UNIVERSAL_PAYLOAD_SIZEOF_THROUGH_FIELD (UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU, FileName)) {
-      return EFI_NOT_FOUND;
-    }
-
-    Size   = sizeof (BootManagerMenuFile->FileName);
-    Status = PcdSetPtrS (PcdBootManagerMenuFile, &Size, &BootManagerMenuFile->FileName);
-    ASSERT_EFI_ERROR (Status);
-  } else {
-    return EFI_NOT_FOUND;
-  }
-
-  return EFI_SUCCESS;
 }
