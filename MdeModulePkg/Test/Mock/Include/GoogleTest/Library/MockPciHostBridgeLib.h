@@ -11,8 +11,8 @@
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
 extern "C" {
-#include <Uefi.h>
-#include <Library/PciHostBridgeLib.h>
+  #include <Uefi.h>
+  #include <Library/PciHostBridgeLib.h>
 }
 
 struct MockPciHostBridgeLib {
