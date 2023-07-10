@@ -13,7 +13,6 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
-  CONSTRUCTOR                    = PlatformBootManagerLibConstructor
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -48,11 +47,9 @@
   HiiLib
   PrintLib
   PlatformHookLib
-  HobLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
-  gEdkiiBootManagerMenuFileGuid
   gUefiShellFileGuid
 
 [Protocols]
@@ -75,5 +72,4 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
-  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile
   gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape

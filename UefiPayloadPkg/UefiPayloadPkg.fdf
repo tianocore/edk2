@@ -59,7 +59,7 @@ INF UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
 FILE FV_IMAGE = 4E35FD93-9C72-4c15-8C4B-E77F1DB2D793 {
     SECTION FV_IMAGE = DXEFV
 }
-
+!if $(UNIVERSAL_PAYLOAD) == TRUE
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
 ################################################################################
 [FV.NETWORKFV]
@@ -112,6 +112,9 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
+INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
+!endif
 
 [FV.DXEFV]
 FvNameGuid         = 8063C21A-8E58-4576-95CE-089E87975D23
@@ -158,8 +161,6 @@ INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
 INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 
-INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
-INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
 INF MdeModulePkg/Universal/Metronome/Metronome.inf
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
@@ -305,6 +306,8 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 
 !if $(UNIVERSAL_PAYLOAD) == FALSE
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
+INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 #
 # UEFI network modules
 #
