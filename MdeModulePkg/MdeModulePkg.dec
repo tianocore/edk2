@@ -24,6 +24,7 @@
 
 [Includes]
   Include
+  Test/Mock/Include
 
 [Includes.Common.Private]
   Library/BrotliCustomDecompressLib/brotli/c/include
@@ -438,6 +439,9 @@
   ## Include/UniversalPayload/SerialPortInfo.h
   gUniversalPayloadSerialPortInfoGuid = { 0xaa7e190d, 0xbe21, 0x4409, { 0x8e, 0x67, 0xa2, 0xcd, 0xf, 0x61, 0xe1, 0x70 } }
 
+  ## Include/Guid/TraceHubDebugInfoHob.h
+  gTraceHubDebugInfoHobGuid = { 0xf88c9c23, 0x646c, 0x4f6c, { 0x8e, 0x3d, 0x36, 0xa9, 0x43, 0xc1, 0x08, 0x35 } }
+
   ## GUID used for Boot Discovery Policy FormSet guid and related variables.
   gBootDiscoveryPolicyMgrFormsetGuid = { 0x5b6f7107, 0xbb3c, 0x4660, { 0x92, 0xcd, 0x54, 0x26, 0x90, 0x28, 0x0b, 0xbd } }
 
@@ -523,6 +527,9 @@
   ## Include/Ppi/CapsuleOnDisk.h
   gEdkiiPeiCapsuleOnDiskPpiGuid             = { 0x71a9ea61, 0x5a35, 0x4a5d, { 0xac, 0xef, 0x9c, 0xf8, 0x6d, 0x6d, 0x67, 0xe0 } }
   gEdkiiPeiBootInCapsuleOnDiskModePpiGuid   = { 0xb08a11e4, 0xe2b7, 0x4b75, { 0xb5, 0x15, 0xaf, 0x61, 0x6, 0x68, 0xbf, 0xd1  } }
+
+  ## Include/Ppi/MemoryAttribute.h
+  gEdkiiMemoryAttributePpiGuid              = { 0x1be840de, 0x2d92, 0x41ec, { 0xb6, 0xd3, 0x19, 0x64, 0x13, 0x50, 0x51, 0xfb } }
 
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
@@ -1093,6 +1100,24 @@
   #   FALSE - UEFI Stack Guard will be disabled.<BR>
   # @Prompt Enable UEFI Stack Guard.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|FALSE|BOOLEAN|0x30001055
+
+  ## Indicate debug level of Trace Hub.
+  #   0x0 - TraceHubDebugLevelError.<BR>
+  #   0x1 - TraceHubDebugLevelErrorWarning.<BR>
+  #   0x2 - TraceHubDebugLevelErrorWarningInfo.<BR>
+  #   0x3 - TraceHubDebugLevelErrorWarningInfoVerbose.<BR>
+  # @Prompt Debug level of Trace Hub.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugLevel|0|UINT8|0x30001056
+
+  ## Flag to enable or disable Trace Hub message.
+  #   FALSE - Disable Trace Hub debug message.<BR>
+  #   TRUE  - Enable Trace Hub debug message.<BR>
+  # @Prompt Enable or Disable Trace Hub message.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableTraceHubDebugMsg|0|BOOLEAN|0x30001057
+
+  ## Indicate MMIO address where Trace Hub message output to.
+  # @Prompt Output MMIO address of Trace Hub message.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTraceHubDebugMmioAddress|0|UINT64|0x30001058
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.

@@ -81,8 +81,7 @@
   #
   # suppress the following warnings so we do not break the build with warnings-as-errors:
   #
-  GCC:*_CLANG35_*_CC_FLAGS = -std=c99
-  GCC:*_CLANG38_*_CC_FLAGS = -std=c99
+  GCC:*_CLANGDWARF_*_CC_FLAGS = -std=c99 -Wno-error=incompatible-pointer-types
   GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=incompatible-pointer-types
 
   XCODE:*_*_*_CC_FLAGS = -std=c99

@@ -3,6 +3,7 @@ Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
 Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -276,10 +277,7 @@ SmmReadSaveState (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = SmmCpuFeaturesReadSaveStateRegister (CpuIndex, Register, Width, Buffer);
-  if (Status == EFI_UNSUPPORTED) {
-    Status = ReadSaveStateRegister (CpuIndex, Register, Width, Buffer);
-  }
+  Status = MmSaveStateReadRegister (CpuIndex, Register, Width, Buffer);
 
   return Status;
 }
@@ -328,10 +326,7 @@ SmmWriteSaveState (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = SmmCpuFeaturesWriteSaveStateRegister (CpuIndex, Register, Width, Buffer);
-  if (Status == EFI_UNSUPPORTED) {
-    Status = WriteSaveStateRegister (CpuIndex, Register, Width, Buffer);
-  }
+  Status = MmSaveStateWriteRegister (CpuIndex, Register, Width, Buffer);
 
   return Status;
 }
@@ -362,6 +357,9 @@ SmmInitHandler (
 
   for (Index = 0; Index < mNumberOfCpus; Index++) {
     if (ApicId == (UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId) {
+      PERF_CODE (
+        MpPerfBegin (Index, SMM_MP_PERF_PROCEDURE_ID (SmmInitHandler));
+        );
       //
       // Initialize SMM specific features on the currently executing CPU
       //
@@ -392,6 +390,10 @@ SmmInitHandler (
         SemaphoreHook (Index, &mRebased[Index]);
       }
 
+      PERF_CODE (
+        MpPerfEnd (Index, SMM_MP_PERF_PROCEDURE_ID (SmmInitHandler));
+        );
+
       return;
     }
   }
@@ -410,12 +412,15 @@ ExecuteFirstSmiInit (
 {
   UINTN  Index;
 
+  PERF_FUNCTION_BEGIN ();
+
   if (mSmmInitialized == NULL) {
     mSmmInitialized = (BOOLEAN *)AllocatePool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
   }
 
   ASSERT (mSmmInitialized != NULL);
   if (mSmmInitialized == NULL) {
+    PERF_FUNCTION_END ();
     return;
   }
 
@@ -442,6 +447,8 @@ ExecuteFirstSmiInit (
     while (!(BOOLEAN)mSmmInitialized[Index]) {
     }
   }
+
+  PERF_FUNCTION_END ();
 }
 
 /**
@@ -462,6 +469,8 @@ SmmRelocateBases (
   UINT8                 *U8Ptr;
   UINTN                 Index;
   UINTN                 BspIndex;
+
+  PERF_FUNCTION_BEGIN ();
 
   //
   // Make sure the reserved size is large enough for procedure SmmInitTemplate.
@@ -540,6 +549,7 @@ SmmRelocateBases (
   //
   CopyMem (CpuStatePtr, &BakBuf2, sizeof (BakBuf2));
   CopyMem (U8Ptr, BakBuf, sizeof (BakBuf));
+  PERF_FUNCTION_END ();
 }
 
 /**
@@ -617,6 +627,8 @@ PiCpuSmmEntry (
   GuidHob        = NULL;
   SmmBaseHobData = NULL;
 
+  PERF_FUNCTION_BEGIN ();
+
   //
   // Initialize address fixup
   //
@@ -688,6 +700,10 @@ PiCpuSmmEntry (
   }
 
   gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus = mMaxNumberOfCpus;
+
+  PERF_CODE (
+    InitializeMpPerf (gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus);
+    );
 
   //
   // The CPU save state and code for the SMI entry point are tiled within an SMRAM
@@ -929,7 +945,7 @@ PiCpuSmmEntry (
     gSmmCpuPrivate->Operation[Index]        = SmmCpuNone;
 
     if (Index < mNumberOfCpus) {
-      Status = MpServices->GetProcessorInfo (MpServices, Index, &gSmmCpuPrivate->ProcessorInfo[Index]);
+      Status = MpServices->GetProcessorInfo (MpServices, Index | CPU_V2_EXTENDED_TOPOLOGY, &gSmmCpuPrivate->ProcessorInfo[Index]);
       ASSERT_EFI_ERROR (Status);
       mCpuHotPlugData.ApicId[Index] = gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId;
 
@@ -1074,10 +1090,14 @@ PiCpuSmmEntry (
         mSmmShadowStackSize
         );
       if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-        SetNotPresentPage (
+        ConvertMemoryPageAttributes (
           Cr3,
+          mPagingMode,
           (EFI_PHYSICAL_ADDRESS)(UINTN)Stacks + mSmmStackSize + EFI_PAGES_TO_SIZE (1) + (mSmmStackSize + mSmmShadowStackSize) * Index,
-          EFI_PAGES_TO_SIZE (1)
+          EFI_PAGES_TO_SIZE (1),
+          EFI_MEMORY_RP,
+          TRUE,
+          NULL
           );
       }
     }
@@ -1194,7 +1214,34 @@ PiCpuSmmEntry (
 
   DEBUG ((DEBUG_INFO, "SMM CPU Module exit from SMRAM with EFI_SUCCESS\n"));
 
+  PERF_FUNCTION_END ();
   return EFI_SUCCESS;
+}
+
+/**
+  Function to compare 2 EFI_SMRAM_DESCRIPTOR based on CpuStart.
+
+  @param[in] Buffer1            pointer to Device Path poiner to compare
+  @param[in] Buffer2            pointer to second DevicePath pointer to compare
+
+  @retval 0                     Buffer1 equal to Buffer2
+  @retval <0                    Buffer1 is less than Buffer2
+  @retval >0                    Buffer1 is greater than Buffer2
+**/
+INTN
+EFIAPI
+CpuSmramRangeCompare (
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
+  )
+{
+  if (((EFI_SMRAM_DESCRIPTOR *)Buffer1)->CpuStart > ((EFI_SMRAM_DESCRIPTOR *)Buffer2)->CpuStart) {
+    return 1;
+  } else if (((EFI_SMRAM_DESCRIPTOR *)Buffer1)->CpuStart < ((EFI_SMRAM_DESCRIPTOR *)Buffer2)->CpuStart) {
+    return -1;
+  }
+
+  return 0;
 }
 
 /**
@@ -1218,6 +1265,7 @@ FindSmramInfo (
   UINTN                     Index;
   UINT64                    MaxSize;
   BOOLEAN                   Found;
+  EFI_SMRAM_DESCRIPTOR      SmramDescriptor;
 
   //
   // Get SMM Access Protocol
@@ -1239,6 +1287,11 @@ FindSmramInfo (
   ASSERT_EFI_ERROR (Status);
 
   mSmmCpuSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
+
+  //
+  // Sort the mSmmCpuSmramRanges
+  //
+  QuickSort (mSmmCpuSmramRanges, mSmmCpuSmramRangeCount, sizeof (EFI_SMRAM_DESCRIPTOR), (BASE_SORT_COMPARE)CpuSmramRangeCompare, &SmramDescriptor);
 
   //
   // Find the largest SMRAM range between 1MB and 4GB that is at least 256K - 4K in size
@@ -1348,12 +1401,15 @@ ConfigSmmCodeAccessCheck (
   UINTN       Index;
   EFI_STATUS  Status;
 
+  PERF_FUNCTION_BEGIN ();
+
   //
   // Check to see if the Feature Control MSR is supported on this CPU
   //
   Index = gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu;
   if (!SmmCpuFeaturesIsSmmRegisterSupported (Index, SmmRegFeatureControl)) {
     mSmmCodeAccessCheckEnable = FALSE;
+    PERF_FUNCTION_END ();
     return;
   }
 
@@ -1363,6 +1419,7 @@ ConfigSmmCodeAccessCheck (
   //
   if ((AsmReadMsr64 (EFI_MSR_SMM_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) == 0) {
     mSmmCodeAccessCheckEnable = FALSE;
+    PERF_FUNCTION_END ();
     return;
   }
 
@@ -1419,6 +1476,8 @@ ConfigSmmCodeAccessCheck (
       ReleaseSpinLock (mConfigSmmCodeAccessCheckLock);
     }
   }
+
+  PERF_FUNCTION_END ();
 }
 
 /**
@@ -1540,6 +1599,21 @@ PerformRemainingTasks (
   )
 {
   if (mSmmReadyToLock) {
+    PERF_FUNCTION_BEGIN ();
+
+    //
+    // Check if all Aps enter SMM. In Relaxed-AP Sync Mode, BSP will not wait for
+    // all Aps arrive. However,PerformRemainingTasks() needs to wait all Aps arrive before calling
+    // SetMemMapAttributes() and ConfigSmmCodeAccessCheck() when mSmmReadyToLock
+    // is true. In SetMemMapAttributes(), SmmSetMemoryAttributesEx() will call
+    // FlushTlbForAll() that need to start up the aps. So it need to let all
+    // aps arrive. Same as SetMemMapAttributes(), ConfigSmmCodeAccessCheck()
+    // also will start up the aps.
+    //
+    if (EFI_ERROR (SmmCpuRendezvous (NULL, TRUE))) {
+      DEBUG ((DEBUG_ERROR, "PerformRemainingTasks: fail to wait for all AP check in SMM!\n"));
+    }
+
     //
     // Start SMM Profile feature
     //
@@ -1574,12 +1648,20 @@ PerformRemainingTasks (
     //
     ConfigSmmCodeAccessCheck ();
 
+    //
+    // Measure performance of SmmCpuFeaturesCompleteSmmReadyToLock() from caller side
+    // as the implementation is provided by platform.
+    //
+    PERF_START (NULL, "SmmCompleteReadyToLock", NULL, 0);
     SmmCpuFeaturesCompleteSmmReadyToLock ();
+    PERF_END (NULL, "SmmCompleteReadyToLock", NULL, 0);
 
     //
     // Clean SMM ready to lock flag
     //
     mSmmReadyToLock = FALSE;
+
+    PERF_FUNCTION_END ();
   }
 }
 

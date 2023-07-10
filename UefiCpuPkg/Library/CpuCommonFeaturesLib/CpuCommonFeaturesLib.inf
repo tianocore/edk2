@@ -4,7 +4,7 @@
 #  This library registers CPU features defined in Intel(R) 64 and IA-32
 #  Architectures Software Developer's Manual.
 #
-# Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017 - 2023, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -58,7 +58,9 @@
   LocalApicLib
 
 [Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuClockModulationDutyCycle   ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset                ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceOutputScheme      ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceMemSize           ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuClockModulationDutyCycle       ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdIsPowerOnReset                    ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceOutputScheme          ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceMemSize               ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTraceBspOnly               ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuProcTracePerformanceCollecting ## SOMETIMES_CONSUMES

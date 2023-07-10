@@ -1,0 +1,55 @@
+## @file
+#  Implementation of EDKII_REDFISH_PLATFORM_CONFIG_PROTOCOL interfaces.
+#
+#  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+#  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 0x00010005
+  BASE_NAME                 = RedfishPlatformConfigDxe
+  FILE_GUID                 = BEAEFFE1-0633-41B5-913C-9389339C2927
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 1.0
+  ENTRY_POINT               = RedfishPlatformConfigDxeEntryPoint
+  UNLOAD_IMAGE              = RedfishPlatformConfigDxeUnload
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[Sources]
+  RedfishPlatformConfigDxe.h
+  RedfishPlatformConfigDxe.c
+  RedfishPlatformConfigImpl.h
+  RedfishPlatformConfigImpl.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  HiiLib
+  HiiUtilityLib
+  MemoryAllocationLib
+  PrintLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEdkIIRedfishPlatformConfigProtocolGuid ## PRODUCED
+  gEfiHiiDatabaseProtocolGuid             ## CONSUMED
+  gEfiHiiStringProtocolGuid               ## CONSUMED
+  gEfiRegularExpressionProtocolGuid       ## CONSUMED
+
+[Guids]
+  gEfiRegexSyntaxTypePerlGuid             ## CONSUMED
+
+[Depex]
+  TRUE

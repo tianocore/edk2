@@ -805,6 +805,57 @@ CreateAmlProcessorContainer (
   return Status;
 }
 
+/** Check flags and topology of a ProcNode.
+
+  @param [in]  NodeFlags        Flags of the ProcNode to check.
+  @param [in]  IsLeaf           The ProcNode is a leaf.
+  @param [in]  NodeToken        NodeToken of the ProcNode.
+  @param [in]  ParentNodeToken  Parent NodeToken of the ProcNode.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CheckProcNode (
+  UINT32           NodeFlags,
+  BOOLEAN          IsLeaf,
+  CM_OBJECT_TOKEN  NodeToken,
+  CM_OBJECT_TOKEN  ParentNodeToken
+  )
+{
+  BOOLEAN  InvalidFlags;
+  BOOLEAN  HasPhysicalPackageBit;
+  BOOLEAN  IsTopLevelNode;
+
+  HasPhysicalPackageBit = (NodeFlags & EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL) ==
+                          EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL;
+  IsTopLevelNode = (ParentNodeToken == CM_NULL_TOKEN);
+
+  // A top-level node is a Physical Package and conversely.
+  InvalidFlags = HasPhysicalPackageBit ^ IsTopLevelNode;
+
+  // Check Leaf specific flags.
+  if (IsLeaf) {
+    InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != PPTT_LEAF_MASK);
+  } else {
+    InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != 0);
+  }
+
+  if (InvalidFlags) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: SSDT-CPU-TOPOLOGY: Invalid flags for ProcNode: 0x%p.\n",
+      (VOID *)NodeToken
+      ));
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Create an AML representation of the Cpu topology.
 
   A processor container is by extension any non-leave device in the cpu topology.
@@ -814,7 +865,6 @@ CreateAmlProcessorContainer (
                                       Protocol Interface.
   @param [in] NodeToken               Token of the CM_ARM_PROC_HIERARCHY_INFO
                                       currently handled.
-                                      Cannot be CM_NULL_TOKEN.
   @param [in] ParentNode              Parent node to attach the created
                                       node to.
   @param [in,out] ProcContainerIndex  Pointer to the current processor container
@@ -838,6 +888,7 @@ CreateAmlCpuTopologyTree (
   EFI_STATUS              Status;
   UINT32                  Index;
   UINT32                  CpuIndex;
+  UINT32                  ProcContainerName;
   AML_OBJECT_NODE_HANDLE  ProcContainerNode;
   UINT32                  Uid;
   UINT16                  Name;
@@ -846,11 +897,11 @@ CreateAmlCpuTopologyTree (
   ASSERT (Generator->ProcNodeList != NULL);
   ASSERT (Generator->ProcNodeCount != 0);
   ASSERT (CfgMgrProtocol != NULL);
-  ASSERT (NodeToken != CM_NULL_TOKEN);
   ASSERT (ParentNode != NULL);
   ASSERT (ProcContainerIndex != NULL);
 
-  CpuIndex = 0;
+  CpuIndex          = 0;
+  ProcContainerName = 0;
 
   for (Index = 0; Index < Generator->ProcNodeCount; Index++) {
     // Find the children of the CM_ARM_PROC_HIERARCHY_INFO
@@ -859,16 +910,15 @@ CreateAmlCpuTopologyTree (
       // Only Cpus (leaf nodes in this tree) have a GicCToken.
       // Create a Cpu node.
       if (Generator->ProcNodeList[Index].GicCToken != CM_NULL_TOKEN) {
-        if ((Generator->ProcNodeList[Index].Flags & PPTT_PROCESSOR_MASK) !=
-            PPTT_CPU_PROCESSOR_MASK)
-        {
-          DEBUG ((
-            DEBUG_ERROR,
-            "ERROR: SSDT-CPU-TOPOLOGY: Invalid flags for cpu: 0x%x.\n",
-            Generator->ProcNodeList[Index].Flags
-            ));
+        Status = CheckProcNode (
+                   Generator->ProcNodeList[Index].Flags,
+                   TRUE,
+                   Generator->ProcNodeList[Index].Token,
+                   NodeToken
+                   );
+        if (EFI_ERROR (Status)) {
           ASSERT (0);
-          return EFI_INVALID_PARAMETER;
+          return Status;
         }
 
         if (Generator->ProcNodeList[Index].OverrideNameUidEnabled) {
@@ -893,24 +943,22 @@ CreateAmlCpuTopologyTree (
       } else {
         // If this is not a Cpu, then this is a processor container.
 
-        // Acpi processor Id for clusters is not handled.
-        if ((Generator->ProcNodeList[Index].Flags & PPTT_PROCESSOR_MASK) !=
-            PPTT_CLUSTER_PROCESSOR_MASK)
-        {
-          DEBUG ((
-            DEBUG_ERROR,
-            "ERROR: SSDT-CPU-TOPOLOGY: Invalid flags for cluster: 0x%x.\n",
-            Generator->ProcNodeList[Index].Flags
-            ));
+        Status = CheckProcNode (
+                   Generator->ProcNodeList[Index].Flags,
+                   FALSE,
+                   Generator->ProcNodeList[Index].Token,
+                   NodeToken
+                   );
+        if (EFI_ERROR (Status)) {
           ASSERT (0);
-          return EFI_INVALID_PARAMETER;
+          return Status;
         }
 
         if (Generator->ProcNodeList[Index].OverrideNameUidEnabled) {
           Name = Generator->ProcNodeList[Index].OverrideName;
           Uid  = Generator->ProcNodeList[Index].OverrideUid;
         } else {
-          Name = *ProcContainerIndex;
+          Name = ProcContainerName;
           Uid  = *ProcContainerIndex;
         }
 
@@ -932,6 +980,13 @@ CreateAmlCpuTopologyTree (
         // Reset the Cpu index whenever we create a new processor container.
         (*ProcContainerIndex)++;
         CpuIndex = 0;
+
+        // And reset the cluster name whenever there is a package.
+        if (NodeToken == CM_NULL_TOKEN) {
+          ProcContainerName = 0;
+        } else {
+          ProcContainerName++;
+        }
 
         // Recursively continue creating an AML tree.
         Status = CreateAmlCpuTopologyTree (
@@ -974,8 +1029,6 @@ CreateTopologyFromProcHierarchy (
   )
 {
   EFI_STATUS  Status;
-  UINT32      Index;
-  UINT32      TopLevelProcNodeIndex;
   UINT32      ProcContainerIndex;
 
   ASSERT (Generator != NULL);
@@ -984,8 +1037,7 @@ CreateTopologyFromProcHierarchy (
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (ScopeNode != NULL);
 
-  TopLevelProcNodeIndex = MAX_UINT32;
-  ProcContainerIndex    = 0;
+  ProcContainerIndex = 0;
 
   Status = TokenTableInitialize (Generator, Generator->ProcNodeCount);
   if (EFI_ERROR (Status)) {
@@ -993,33 +1045,10 @@ CreateTopologyFromProcHierarchy (
     return Status;
   }
 
-  // It is assumed that there is one unique CM_ARM_PROC_HIERARCHY_INFO
-  // structure with no ParentToken and the EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL
-  // flag set. All other CM_ARM_PROC_HIERARCHY_INFO are non-physical and
-  // have a ParentToken.
-  for (Index = 0; Index < Generator->ProcNodeCount; Index++) {
-    if ((Generator->ProcNodeList[Index].ParentToken == CM_NULL_TOKEN) &&
-        (Generator->ProcNodeList[Index].Flags &
-         EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL))
-    {
-      if (TopLevelProcNodeIndex != MAX_UINT32) {
-        DEBUG ((
-          DEBUG_ERROR,
-          "ERROR: SSDT-CPU-TOPOLOGY: Top level CM_ARM_PROC_HIERARCHY_INFO "
-          "must be unique\n"
-          ));
-        ASSERT (0);
-        goto exit_handler;
-      }
-
-      TopLevelProcNodeIndex = Index;
-    }
-  } // for
-
   Status = CreateAmlCpuTopologyTree (
              Generator,
              CfgMgrProtocol,
-             Generator->ProcNodeList[TopLevelProcNodeIndex].Token,
+             CM_NULL_TOKEN,
              ScopeNode,
              &ProcContainerIndex
              );

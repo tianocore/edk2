@@ -60,6 +60,15 @@
   #   Library provides Redfish debug functions.
   RedfishDebugLib|Include/Library/RedfishDebugLib.h
 
+  ##  @libraryclass  Provides the library functions to parse IFR binary data.
+  #
+  HiiUtilityLib|Include/Library/HiiUtilityLib.h
+
+  ##  @libraryclass  Provides the library functions to access Redfish Platform
+  #   Config protocol.
+  #
+  RedfishPlatformConfigLib|Include/Library/RedfishPlatformConfigLib.h
+
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides the private C runtime library functions.
   #   CRT library is currently used by edk2 JsonLib (open source
@@ -77,6 +86,9 @@
 
   ## Include/Protocol/Edk2RedfishConfigHandler.h
   gEdkIIRedfishConfigHandlerProtocolGuid = { 0xbc0fe6bb, 0x2cc9, 0x463e, { 0x90, 0x82, 0xfa, 0x11, 0x76, 0xfc, 0x67, 0xde } }
+
+  ## Include/Protocol/EdkIIRedfishPlatformConfig.h
+  gEdkIIRedfishPlatformConfigProtocolGuid = { 0X4D94A7C7, 0X4CE4, 0X4A84, { 0X88, 0XC1, 0X33, 0X0C, 0XD4, 0XA3, 0X47, 0X67 } }
 
 [Guids]
   gEfiRedfishPkgTokenSpaceGuid      = { 0x4fdbccb7, 0xe829, 0x4b4c, { 0x88, 0x87, 0xb2, 0x3f, 0xd7, 0x25, 0x4b, 0x85 }}

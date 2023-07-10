@@ -17,9 +17,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   Convert a set of ARM short descriptor section attributes into a mask
   of EFI_MEMORY_xx constants.
 
-  @param  SectionAttributes   The set of page attributes.
-  @param  GcdAttributes       Pointer to the return value.
+  @param[in]    SectionAttributes   The set of page attributes.
+  @param[out]   GcdAttributes       Pointer to the return value.
 
+  @retval EFI_SUCCESS       The attributes were converted successfully.
+  @retval EFI_UNSUPPORTED   The section attributes did not have a
+                            GCD transation.
 **/
 STATIC
 EFI_STATUS
@@ -87,10 +90,11 @@ SectionToGcdAttributes (
   Convert an arch specific set of page attributes into a mask
   of EFI_MEMORY_xx constants.
 
-  @param  PageAttributes  The set of page attributes.
+  @param[in] PageAttributes  The set of page attributes.
 
-  @retval The mask of EFI_MEMORY_xx constants.
-
+  @retval EFI_SUCCESS       The attributes were converted successfully.
+  @retval EFI_UNSUPPORTED   The section attributes did not have a
+                            GCD transation.
 **/
 UINT64
 RegionAttributeToGcdAttribute (
@@ -107,9 +111,11 @@ RegionAttributeToGcdAttribute (
   Convert a set of ARM short descriptor page attributes into a mask
   of EFI_MEMORY_xx constants.
 
-  @param  PageAttributes      The set of page attributes.
-  @param  GcdAttributes       Pointer to the return value.
+  @param[in]    PageAttributes  The set of page attributes.
+  @param[out]   GcdAttributes   Pointer to the return value.
 
+  @retval EFI_SUCCESS       The attributes were converted successfully.
+  @retval EFI_UNSUPPORTED   The page attributes did not have a GCD transation.
 **/
 STATIC
 EFI_STATUS
@@ -173,6 +179,23 @@ PageToGcdAttributes (
   return EFI_SUCCESS;
 }
 
+/**
+  Synchronizes the GCD with the translation table for a specified page.
+
+  This function synchronizes cache configuration for a given page based on its section index
+  and the first level descriptor. It traverses the second level table entries of the page and
+  updates the GCD attributes accordingly for each entry.
+
+  @param[in]        SectionIndex            The index of the section where the page resides.
+  @param[in]        FirstLevelDescriptor    The first translation table level of the page.
+  @param[in]        NumberOfDescriptors     The number of descriptors in the GCD memory space map.
+  @param[in]        MemorySpaceMap          The GCD memory space descriptor.
+  @param[in, out]   NextRegionBase          The next region base address.
+  @param[in, out]   NextRegionLength        The next region length.
+  @param[in, out]   NextSectionAttributes   The next section attributes.
+
+  @retval EFI_STATUS Always return success
+**/
 EFI_STATUS
 SyncCacheConfigPage (
   IN     UINT32                           SectionIndex,
@@ -217,7 +240,10 @@ SyncCacheConfigPage (
       } else if (PageAttributes != NextPageAttributes) {
         // Convert Section Attributes into GCD Attributes
         Status = PageToGcdAttributes (NextPageAttributes, &GcdAttributes);
-        ASSERT_EFI_ERROR (Status);
+        if (EFI_ERROR (Status)) {
+          ASSERT_EFI_ERROR (Status);
+          GcdAttributes = 0;
+        }
 
         // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
         SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, *NextRegionBase, *NextRegionLength, GcdAttributes);
@@ -230,7 +256,10 @@ SyncCacheConfigPage (
     } else if (NextPageAttributes != 0) {
       // Convert Page Attributes into GCD Attributes
       Status = PageToGcdAttributes (NextPageAttributes, &GcdAttributes);
-      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        GcdAttributes = 0;
+      }
 
       // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
       SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, *NextRegionBase, *NextRegionLength, GcdAttributes);
@@ -252,6 +281,14 @@ SyncCacheConfigPage (
   return EFI_SUCCESS;
 }
 
+/**
+  Sync the GCD memory space attributes with the translation table.
+
+  @param[in]  CpuProtocol  The CPU architectural protocol instance.
+
+  @retval EFI_SUCCESS   The GCD memory space attributes are synced with the MMU page table.
+  @retval Others        The return value of GetMemorySpaceMap().
+**/
 EFI_STATUS
 SyncCacheConfig (
   IN  EFI_CPU_ARCH_PROTOCOL  *CpuProtocol
@@ -278,7 +315,12 @@ SyncCacheConfig (
   //
   MemorySpaceMap = NULL;
   Status         = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
-  ASSERT_EFI_ERROR (Status);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "SyncCacheConfig - GetMemorySpaceMap() failed! Status: %r\n", Status));
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   // The GCD implementation maintains its own copy of the state of memory space attributes.  GCD needs
   // to know what the initial memory space attributes are.  The CPU Arch. Protocol does not provide a
@@ -307,7 +349,12 @@ SyncCacheConfig (
       } else if (SectionAttributes != NextSectionAttributes) {
         // Convert Section Attributes into GCD Attributes
         Status = SectionToGcdAttributes (NextSectionAttributes, &GcdAttributes);
-        ASSERT_EFI_ERROR (Status);
+
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "SyncCacheConfig - SectionToGcdAttributes() failed! Status: %r\n", Status));
+          ASSERT_EFI_ERROR (Status);
+          GcdAttributes = 0;
+        }
 
         // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
         SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, NextRegionBase, NextRegionLength, GcdAttributes);
@@ -343,7 +390,11 @@ SyncCacheConfig (
       if (NextSectionAttributes != 0) {
         // Convert Section Attributes into GCD Attributes
         Status = SectionToGcdAttributes (NextSectionAttributes, &GcdAttributes);
-        ASSERT_EFI_ERROR (Status);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "SyncCacheConfig - SectionToGcdAttributes() failed! Status: %r\n", Status));
+          ASSERT_EFI_ERROR (Status);
+          GcdAttributes = 0;
+        }
 
         // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
         SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, NextRegionBase, NextRegionLength, GcdAttributes);
@@ -360,7 +411,11 @@ SyncCacheConfig (
   if (NextSectionAttributes != 0) {
     // Convert Section Attributes into GCD Attributes
     Status = SectionToGcdAttributes (NextSectionAttributes, &GcdAttributes);
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "SyncCacheConfig - SectionToGcdAttributes() failed! Status: %r\n", Status));
+      ASSERT_EFI_ERROR (Status);
+      GcdAttributes = 0;
+    }
 
     // update GCD with these changes (this will recurse into our own CpuSetMemoryAttributes below which is OK)
     SetGcdMemorySpaceAttributes (MemorySpaceMap, NumberOfDescriptors, NextRegionBase, NextRegionLength, GcdAttributes);
@@ -371,6 +426,13 @@ SyncCacheConfig (
   return EFI_SUCCESS;
 }
 
+/**
+  Convert EFI memory attributes to ARM translation table attributes.
+
+  @param[in]  EfiAttributes  EFI memory attributes.
+
+  @retval The analogous translation table attributes.
+**/
 UINT64
 EfiAttributeToArmAttribute (
   IN UINT64  EfiAttributes
@@ -424,20 +486,39 @@ EfiAttributeToArmAttribute (
   return ArmAttributes;
 }
 
+/**
+  This function finds the end of a memory region in a translation table. A
+  memory region is defined as a contiguous set of pages with the same attributes.
+
+  @param[in]    PageTable         The translation table to traverse.
+  @param[in]    BaseAddress       The address from which to start the search
+  @param[in]    RegionAttributes  The attributes of the start of the region.
+  @param[out]   RegionLength      The length of the region found.
+
+  @retval EFI_SUCCESS       The region was found.
+  @retval EFI_NOT_FOUND     The end of the region was not found.
+  @retval EFI_NO_MAPPING    The region specified by BaseAddress is not mapped
+                            in the input translation table.
+  @retval EFI_UNSUPPORTED   Large pages are not supported.
+**/
+STATIC
 EFI_STATUS
 GetMemoryRegionPage (
   IN     UINT32  *PageTable,
-  IN OUT UINTN   *BaseAddress,
-  OUT    UINTN   *RegionLength,
-  OUT    UINTN   *RegionAttributes
+  IN     UINTN   *BaseAddress,
+  IN     UINTN   *RegionAttributes,
+  OUT    UINTN   *RegionLength
   )
 {
-  UINT32  PageAttributes;
-  UINT32  TableIndex;
-  UINT32  PageDescriptor;
+  UINT32      PageAttributes;
+  UINT32      TableIndex;
+  UINT32      PageDescriptor;
+  EFI_STATUS  Status;
 
   // Convert the section attributes into page attributes
   PageAttributes = ConvertSectionAttributesToPageAttributes (*RegionAttributes);
+  Status         = EFI_NOT_FOUND;
+  *RegionLength  = 0;
 
   // Calculate index into first level translation table for start of modification
   TableIndex = ((*BaseAddress) & TT_DESCRIPTOR_PAGE_INDEX_MASK)  >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
@@ -449,25 +530,44 @@ GetMemoryRegionPage (
     PageDescriptor = PageTable[TableIndex];
 
     if ((PageDescriptor & TT_DESCRIPTOR_PAGE_TYPE_MASK) == TT_DESCRIPTOR_PAGE_TYPE_FAULT) {
-      // Case: End of the boundary of the region
-      return EFI_SUCCESS;
+      Status = (*RegionLength > 0) ? EFI_SUCCESS : EFI_NO_MAPPING;
+      break;
     } else if ((PageDescriptor & TT_DESCRIPTOR_PAGE_TYPE_PAGE) == TT_DESCRIPTOR_PAGE_TYPE_PAGE) {
-      if ((PageDescriptor & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK) == PageAttributes) {
-        *RegionLength = *RegionLength + TT_DESCRIPTOR_PAGE_SIZE;
-      } else {
-        // Case: End of the boundary of the region
-        return EFI_SUCCESS;
+      if ((PageDescriptor & TT_DESCRIPTOR_PAGE_ATTRIBUTE_MASK) != PageAttributes) {
+        Status = EFI_SUCCESS;
+        break;
       }
+
+      *RegionLength += TT_DESCRIPTOR_PAGE_SIZE;
     } else {
-      // We do not support Large Page yet. We return EFI_SUCCESS that means end of the region.
+      // Large pages are unsupported.
+      Status = EFI_UNSUPPORTED;
       ASSERT (0);
-      return EFI_SUCCESS;
+      break;
     }
   }
 
-  return EFI_NOT_FOUND;
+  return Status;
 }
 
+/**
+  Get the memory region that contains the specified address. A memory region is defined
+  as a contiguous set of pages with the same attributes.
+
+  RegionLength and RegionAttributes are only valid if EFI_SUCCESS is returned.
+
+  @param[in, out]   BaseAddress       On input, the address to search for.
+                                      On output, the base address of the region found.
+  @param[out]       RegionLength      The length of the region found.
+  @param[out]       RegionAttributes  The attributes of the region found.
+
+  @retval   EFI_SUCCESS             Region found
+  @retval   EFI_NOT_FOUND           Region not found
+  @retval   EFI_UNSUPPORTED         Large pages are unsupported
+  @retval   EFI_NO_MAPPING          The page specified by BaseAddress is unmapped
+  @retval   EFI_INVALID_PARAMETER   The BaseAddress exceeds the addressable range of
+                                    the translation table.
+**/
 EFI_STATUS
 GetMemoryRegion (
   IN OUT UINTN  *BaseAddress,
@@ -482,6 +582,7 @@ GetMemoryRegion (
   UINT32                      SectionDescriptor;
   ARM_FIRST_LEVEL_DESCRIPTOR  *FirstLevelTable;
   UINT32                      *PageTable;
+  UINTN                       Length;
 
   // Initialize the arguments
   *RegionLength = 0;
@@ -491,7 +592,11 @@ GetMemoryRegion (
 
   // Calculate index into first level translation table for start of modification
   TableIndex = TT_DESCRIPTOR_SECTION_BASE_ADDRESS (*BaseAddress) >> TT_DESCRIPTOR_SECTION_BASE_SHIFT;
-  ASSERT (TableIndex < TRANSLATION_TABLE_SECTION_COUNT);
+
+  if (TableIndex >= TRANSLATION_TABLE_SECTION_COUNT) {
+    ASSERT (TableIndex < TRANSLATION_TABLE_SECTION_COUNT);
+    return EFI_INVALID_PARAMETER;
+  }
 
   // Get the section at the given index
   SectionDescriptor = FirstLevelTable[TableIndex];
@@ -524,6 +629,8 @@ GetMemoryRegion (
                         TT_DESCRIPTOR_CONVERT_TO_SECTION_AP (PageAttributes);
   }
 
+  Status = EFI_NOT_FOUND;
+
   for ( ; TableIndex < TRANSLATION_TABLE_SECTION_COUNT; TableIndex++) {
     // Get the section at the given index
     SectionDescriptor = FirstLevelTable[TableIndex];
@@ -532,15 +639,18 @@ GetMemoryRegion (
     if (TT_DESCRIPTOR_SECTION_TYPE_IS_PAGE_TABLE (SectionDescriptor)) {
       // Extract the page table location from the descriptor
       PageTable = (UINT32 *)(SectionDescriptor & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK);
+      Length    = 0;
 
       // Scan the page table to find the end of the region.
-      Status = GetMemoryRegionPage (PageTable, BaseAddress, RegionLength, RegionAttributes);
-      ASSERT (*RegionLength > 0);
+      Status         = GetMemoryRegionPage (PageTable, BaseAddress, RegionAttributes, &Length);
+      *RegionLength += Length;
 
-      // If we have found the end of the region (Status == EFI_SUCCESS) then we exit the for-loop
-      if (Status == EFI_SUCCESS) {
-        break;
+      // Status == EFI_NOT_FOUND implies we have not reached the end of the region.
+      if ((Status == EFI_NOT_FOUND) && (Length > 0)) {
+        continue;
       }
+
+      break;
     } else if (((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) ||
                ((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SUPERSECTION))
     {
@@ -556,5 +666,10 @@ GetMemoryRegion (
     }
   }
 
-  return EFI_SUCCESS;
+  // Check if the region length was updated.
+  if (*RegionLength > 0) {
+    Status = EFI_SUCCESS;
+  }
+
+  return Status;
 }

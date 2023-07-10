@@ -29,8 +29,6 @@ MM_COMPLETION                mSmmStartupThisApToken;
 //
 UINT32  *mPackageFirstThreadIndex = NULL;
 
-extern UINTN  mSmmShadowStackSize;
-
 /**
   Performs an atomic compare exchange operation to get semaphore.
   The compare exchange operation must be performed using
@@ -351,6 +349,8 @@ SmmWaitForApArrival (
   UINT32   DelayedCount;
   UINT32   BlockedCount;
 
+  PERF_FUNCTION_BEGIN ();
+
   DelayedCount = 0;
   BlockedCount = 0;
 
@@ -439,7 +439,7 @@ SmmWaitForApArrival (
     DEBUG ((DEBUG_INFO, "SmmWaitForApArrival: Delayed AP Count = %d, Blocked AP Count = %d\n", DelayedCount, BlockedCount));
   }
 
-  return;
+  PERF_FUNCTION_END ();
 }
 
 /**
@@ -576,6 +576,8 @@ BSPHandler (
 
   ASSERT (CpuIndex == mSmmMpSyncData->BspIndex);
   ApCount = 0;
+
+  PERF_FUNCTION_BEGIN ();
 
   //
   // Flag BSP's presence
@@ -775,6 +777,15 @@ BSPHandler (
   WaitForAllAPs (ApCount);
 
   //
+  // At this point, all APs should have exited from APHandler().
+  // Migrate the SMM MP performance logging to standard SMM performance logging.
+  // Any SMM MP performance logging after this point will be migrated in next SMI.
+  //
+  PERF_CODE (
+    MigrateMpPerf (gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus, CpuIndex);
+    );
+
+  //
   // Reset the tokens buffer.
   //
   ResetTokens ();
@@ -792,6 +803,8 @@ BSPHandler (
   *mSmmMpSyncData->Counter                  = 0;
   *mSmmMpSyncData->AllCpusInSync            = FALSE;
   mSmmMpSyncData->AllApArrivedWithException = FALSE;
+
+  PERF_FUNCTION_END ();
 }
 
 /**
@@ -999,136 +1012,6 @@ APHandler (
   // Notify BSP the readiness of this AP to exit SMM
   //
   ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
-}
-
-/**
-  Create 4G PageTable in SMRAM.
-
-  @param[in]      Is32BitPageTable Whether the page table is 32-bit PAE
-  @return         PageTable Address
-
-**/
-UINT32
-Gen4GPageTable (
-  IN      BOOLEAN  Is32BitPageTable
-  )
-{
-  VOID    *PageTable;
-  UINTN   Index;
-  UINT64  *Pte;
-  UINTN   PagesNeeded;
-  UINTN   Low2MBoundary;
-  UINTN   High2MBoundary;
-  UINTN   Pages;
-  UINTN   GuardPage;
-  UINT64  *Pdpte;
-  UINTN   PageIndex;
-  UINTN   PageAddress;
-
-  Low2MBoundary  = 0;
-  High2MBoundary = 0;
-  PagesNeeded    = 0;
-  if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-    //
-    // Add one more page for known good stack, then find the lower 2MB aligned address.
-    //
-    Low2MBoundary = (mSmmStackArrayBase + EFI_PAGE_SIZE) & ~(SIZE_2MB-1);
-    //
-    // Add two more pages for known good stack and stack guard page,
-    // then find the lower 2MB aligned address.
-    //
-    High2MBoundary = (mSmmStackArrayEnd - mSmmStackSize - mSmmShadowStackSize + EFI_PAGE_SIZE * 2) & ~(SIZE_2MB-1);
-    PagesNeeded    = ((High2MBoundary - Low2MBoundary) / SIZE_2MB) + 1;
-  }
-
-  //
-  // Allocate the page table
-  //
-  PageTable = AllocatePageTableMemory (5 + PagesNeeded);
-  ASSERT (PageTable != NULL);
-
-  PageTable = (VOID *)((UINTN)PageTable);
-  Pte       = (UINT64 *)PageTable;
-
-  //
-  // Zero out all page table entries first
-  //
-  ZeroMem (Pte, EFI_PAGES_TO_SIZE (1));
-
-  //
-  // Set Page Directory Pointers
-  //
-  for (Index = 0; Index < 4; Index++) {
-    Pte[Index] = ((UINTN)PageTable + EFI_PAGE_SIZE * (Index + 1)) | mAddressEncMask |
-                 (Is32BitPageTable ? IA32_PAE_PDPTE_ATTRIBUTE_BITS : PAGE_ATTRIBUTE_BITS);
-  }
-
-  Pte += EFI_PAGE_SIZE / sizeof (*Pte);
-
-  //
-  // Fill in Page Directory Entries
-  //
-  for (Index = 0; Index < EFI_PAGE_SIZE * 4 / sizeof (*Pte); Index++) {
-    Pte[Index] = (Index << 21) | mAddressEncMask | IA32_PG_PS | PAGE_ATTRIBUTE_BITS;
-  }
-
-  Pdpte = (UINT64 *)PageTable;
-  if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
-    Pages     = (UINTN)PageTable + EFI_PAGES_TO_SIZE (5);
-    GuardPage = mSmmStackArrayBase + EFI_PAGE_SIZE;
-    for (PageIndex = Low2MBoundary; PageIndex <= High2MBoundary; PageIndex += SIZE_2MB) {
-      Pte                                             = (UINT64 *)(UINTN)(Pdpte[BitFieldRead32 ((UINT32)PageIndex, 30, 31)] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
-      Pte[BitFieldRead32 ((UINT32)PageIndex, 21, 29)] = (UINT64)Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
-      //
-      // Fill in Page Table Entries
-      //
-      Pte         = (UINT64 *)Pages;
-      PageAddress = PageIndex;
-      for (Index = 0; Index < EFI_PAGE_SIZE / sizeof (*Pte); Index++) {
-        if (PageAddress == GuardPage) {
-          //
-          // Mark the guard page as non-present
-          //
-          Pte[Index] = PageAddress | mAddressEncMask;
-          GuardPage += (mSmmStackSize + mSmmShadowStackSize);
-          if (GuardPage > mSmmStackArrayEnd) {
-            GuardPage = 0;
-          }
-        } else {
-          Pte[Index] = PageAddress | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
-        }
-
-        PageAddress += EFI_PAGE_SIZE;
-      }
-
-      Pages += EFI_PAGE_SIZE;
-    }
-  }
-
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) {
-    Pte = (UINT64 *)(UINTN)(Pdpte[0] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
-    if ((Pte[0] & IA32_PG_PS) == 0) {
-      // 4K-page entries are already mapped. Just hide the first one anyway.
-      Pte     = (UINT64 *)(UINTN)(Pte[0] & ~mAddressEncMask & ~(EFI_PAGE_SIZE - 1));
-      Pte[0] &= ~(UINT64)IA32_PG_P; // Hide page 0
-    } else {
-      // Create 4K-page entries
-      Pages = (UINTN)AllocatePageTableMemory (1);
-      ASSERT (Pages != 0);
-
-      Pte[0] = (UINT64)(Pages | mAddressEncMask | PAGE_ATTRIBUTE_BITS);
-
-      Pte         = (UINT64 *)Pages;
-      PageAddress = 0;
-      Pte[0]      = PageAddress | mAddressEncMask; // Hide page 0 but present left
-      for (Index = 1; Index < EFI_PAGE_SIZE / sizeof (*Pte); Index++) {
-        PageAddress += EFI_PAGE_SIZE;
-        Pte[Index]   = PageAddress | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
-      }
-    }
-  }
-
-  return (UINT32)(UINTN)PageTable;
 }
 
 /**
@@ -1763,12 +1646,24 @@ SmiRendezvous (
   //
   // Perform CPU specific entry hooks
   //
+  PERF_CODE (
+    MpPerfBegin (CpuIndex, SMM_MP_PERF_PROCEDURE_ID (SmmRendezvousEntry));
+    );
   SmmCpuFeaturesRendezvousEntry (CpuIndex);
+  PERF_CODE (
+    MpPerfEnd (CpuIndex, SMM_MP_PERF_PROCEDURE_ID (SmmRendezvousEntry));
+    );
 
   //
   // Determine if this is a valid SMI
   //
+  PERF_CODE (
+    MpPerfBegin (CpuIndex, SMM_MP_PERF_PROCEDURE_ID (PlatformValidSmi));
+    );
   ValidSmi = PlatformValidSmi ();
+  PERF_CODE (
+    MpPerfEnd (CpuIndex, SMM_MP_PERF_PROCEDURE_ID (PlatformValidSmi));
+    );
 
   //
   // Determine if BSP has been already in progress. Note this must be checked after
@@ -1898,7 +1793,20 @@ SmiRendezvous (
   }
 
 Exit:
+  //
+  // Note: SmmRendezvousExit perf-logging entry is the only one that will be
+  //       migrated to standard perf-logging database in next SMI by BSPHandler().
+  //       Hence, the number of SmmRendezvousEntry entries will be larger than
+  //       the number of SmmRendezvousExit entries. Delta equals to the number
+  //       of CPU threads.
+  //
+  PERF_CODE (
+    MpPerfBegin (CpuIndex, SMM_MP_PERF_PROCEDURE_ID (SmmRendezvousExit));
+    );
   SmmCpuFeaturesRendezvousExit (CpuIndex);
+  PERF_CODE (
+    MpPerfEnd (CpuIndex, SMM_MP_PERF_PROCEDURE_ID (SmmRendezvousExit));
+    );
 
   //
   // Restore Cr2

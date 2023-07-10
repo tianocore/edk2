@@ -322,7 +322,7 @@ InternalAllocateAlignedPages (
     // Calculate the total number of pages since alignment is larger than page size.
     //
     AlignmentMask = Alignment - 1;
-    RealPages     = Pages + EFI_SIZE_TO_PAGES (Alignment);
+    RealPages     = Pages + EFI_SIZE_TO_PAGES (Alignment) - 1;
     //
     // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
     //

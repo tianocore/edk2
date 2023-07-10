@@ -293,7 +293,7 @@ typedef struct {
 ///
 /// MADT Revision (as defined in ACPI 6.5 spec.)
 ///
-#define EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION  0x05
+#define EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION  0x06
 
 ///
 /// Multiple APIC Flags

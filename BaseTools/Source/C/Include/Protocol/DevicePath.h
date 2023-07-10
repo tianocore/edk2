@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define __EFI_DEVICE_PATH_H__
 
 #include <Guid/PcAnsi.h>
-#include <IndustryStandard/Acpi3_0.h>
+#include <IndustryStandard/Acpi30.h>
 #include <IndustryStandard/Bluetooth.h>
 
 ///

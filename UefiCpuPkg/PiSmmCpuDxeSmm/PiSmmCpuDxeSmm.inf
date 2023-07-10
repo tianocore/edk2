@@ -6,6 +6,7 @@
 #
 # Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -42,6 +43,8 @@
   SmmCpuMemoryManagement.c
   SmmMp.h
   SmmMp.c
+  SmmMpPerf.h
+  SmmMpPerf.c
 
 [Sources.Ia32]
   Ia32/Semaphore.c
@@ -97,6 +100,9 @@
   ReportStatusCodeLib
   SmmCpuFeaturesLib
   PeCoffGetEntryPointLib
+  PerformanceLib
+  CpuPageTableLib
+  MmSaveStateLib
 
 [Protocols]
   gEfiSmmAccess2ProtocolGuid               ## CONSUMES
@@ -125,6 +131,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileRingBuffer             ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode         ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmApPerfLogEnable                  ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES

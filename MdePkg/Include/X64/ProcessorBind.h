@@ -21,20 +21,6 @@
   #pragma pack()
 #endif
 
-#if defined (__GNUC__) && defined (__pic__) && !defined (USING_LTO)  && !defined (__APPLE__)
-//
-// Mark all symbol declarations and references as hidden, meaning they will
-// not be subject to symbol preemption. This allows the compiler to refer to
-// symbols directly using relative references rather than via the GOT, which
-// contains absolute symbol addresses that are subject to runtime relocation.
-//
-// The LTO linker will not emit GOT based relocations when all symbol
-// references can be resolved locally, and so there is no need to set the
-// pragma in that case (and doing so will cause other issues).
-//
-  #pragma GCC visibility push (hidden)
-#endif
-
 #if defined (__INTEL_COMPILER)
 //
 // Disable ICC's remark #869: "Parameter" was never referenced warning.
@@ -103,18 +89,14 @@
   #if defined (_MSC_VER) && _MSC_VER >= 1800
 
 //
-// Disable these warnings for VS2013.
-//
-
-//
 // This warning is for potentially uninitialized local variable, and it may cause false
-// positive issues in VS2013 and VS2015 build
+// positive issues in VS2015 build
 //
     #pragma warning ( disable : 4701 )
 
 //
 // This warning is for potentially uninitialized local pointer variable, and it may cause
-// false positive issues in VS2013 and VS2015 build
+// false positive issues in VS2015 build
 //
     #pragma warning ( disable : 4703 )
 

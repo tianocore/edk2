@@ -10,6 +10,7 @@
 #include <Uefi.h>
 
 #include <Library/ArmLib.h>
+#include <Library/ArmMmuLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -451,134 +452,95 @@ SetMemoryAttributes (
 }
 
 /**
-  Update the permission or memory type attributes on a range of memory.
+  Set the requested memory permission attributes on a region of memory.
 
-  @param  BaseAddress           The start of the region.
-  @param  Length                The size of the region.
-  @param  Attributes            A mask of EFI_MEMORY_xx constants.
+  BaseAddress and Length must be aligned to EFI_PAGE_SIZE.
 
-  @retval EFI_SUCCESS           The attributes were set successfully.
-  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
+  If Attributes contains a memory type attribute (EFI_MEMORY_UC/WC/WT/WB), the
+  region is mapped according to this memory type, and additional memory
+  permission attributes (EFI_MEMORY_RP/RO/XP) are taken into account as well,
+  discarding any permission attributes that are currently set for the region.
+  AttributeMask is ignored in this case, and must be set to 0x0.
+
+  If Attributes contains only a combination of memory permission attributes
+  (EFI_MEMORY_RP/RO/XP), each page in the region will retain its existing
+  memory type, even if it is not uniformly set across the region. In this case,
+  AttributesMask may be set to a mask of permission attributes, and memory
+  permissions omitted from this mask will not be updated for any page in the
+  region. All attributes appearing in Attributes must appear in AttributeMask
+  as well. (Attributes & ~AttributeMask must produce 0x0)
+
+  @param[in]  BaseAddress     The physical address that is the start address of
+                              a memory region.
+  @param[in]  Length          The size in bytes of the memory region.
+  @param[in]  Attributes      Mask of memory attributes to set.
+  @param[in]  AttributeMask   Mask of memory attributes to take into account.
+
+  @retval EFI_SUCCESS           The attributes were set for the memory region.
+  @retval EFI_INVALID_PARAMETER BaseAddress or Length is not suitably aligned.
+                                Invalid combination of Attributes and
+                                AttributeMask.
+  @retval EFI_OUT_OF_RESOURCES  Requested attributes cannot be applied due to
+                                lack of system resources.
 
 **/
 EFI_STATUS
 ArmSetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
-  IN UINT64                Attributes
+  IN UINT64                Attributes,
+  IN UINT64                AttributeMask
   )
 {
+  UINT32  TtEntryMask;
+
+  if (((BaseAddress | Length) & EFI_PAGE_MASK) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {
+    //
+    // No memory type was set in Attributes, so we are going to update the
+    // permissions only.
+    //
+    if (AttributeMask != 0) {
+      if (((AttributeMask & ~(UINT64)(EFI_MEMORY_RP|EFI_MEMORY_RO|EFI_MEMORY_XP)) != 0) ||
+          ((Attributes & ~AttributeMask) != 0))
+      {
+        return EFI_INVALID_PARAMETER;
+      }
+    } else {
+      AttributeMask = EFI_MEMORY_RP | EFI_MEMORY_RO | EFI_MEMORY_XP;
+    }
+
+    TtEntryMask = 0;
+    if ((AttributeMask & EFI_MEMORY_RP) != 0) {
+      TtEntryMask |= TT_DESCRIPTOR_SECTION_AF;
+    }
+
+    if ((AttributeMask & EFI_MEMORY_RO) != 0) {
+      TtEntryMask |= TT_DESCRIPTOR_SECTION_AP_MASK;
+    }
+
+    if ((AttributeMask & EFI_MEMORY_XP) != 0) {
+      TtEntryMask |= TT_DESCRIPTOR_SECTION_XN_MASK;
+    }
+  } else {
+    ASSERT (AttributeMask == 0);
+    if (AttributeMask != 0) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    TtEntryMask = TT_DESCRIPTOR_SECTION_TYPE_MASK |
+                  TT_DESCRIPTOR_SECTION_XN_MASK |
+                  TT_DESCRIPTOR_SECTION_AP_MASK |
+                  TT_DESCRIPTOR_SECTION_AF;
+  }
+
   return SetMemoryAttributes (
            BaseAddress,
            Length,
            Attributes,
-           TT_DESCRIPTOR_SECTION_TYPE_MASK |
-           TT_DESCRIPTOR_SECTION_XN_MASK |
-           TT_DESCRIPTOR_SECTION_AP_MASK |
-           TT_DESCRIPTOR_SECTION_AF
-           );
-}
-
-EFI_STATUS
-ArmSetMemoryRegionNoExec (
-  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN  UINT64                Length
-  )
-{
-  return SetMemoryAttributes (
-           BaseAddress,
-           Length,
-           EFI_MEMORY_XP,
-           TT_DESCRIPTOR_SECTION_XN_MASK
-           );
-}
-
-EFI_STATUS
-ArmClearMemoryRegionNoExec (
-  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN  UINT64                Length
-  )
-{
-  return SetMemoryAttributes (
-           BaseAddress,
-           Length,
-           0,
-           TT_DESCRIPTOR_SECTION_XN_MASK
-           );
-}
-
-EFI_STATUS
-ArmSetMemoryRegionReadOnly (
-  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN  UINT64                Length
-  )
-{
-  return SetMemoryAttributes (
-           BaseAddress,
-           Length,
-           EFI_MEMORY_RO,
-           TT_DESCRIPTOR_SECTION_AP_MASK
-           );
-}
-
-EFI_STATUS
-ArmClearMemoryRegionReadOnly (
-  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN  UINT64                Length
-  )
-{
-  return SetMemoryAttributes (
-           BaseAddress,
-           Length,
-           0,
-           TT_DESCRIPTOR_SECTION_AP_MASK
-           );
-}
-
-/**
-  Convert a region of memory to read-protected, by clearing the access flag.
-
-  @param  BaseAddress           The start of the region.
-  @param  Length                The size of the region.
-
-  @retval EFI_SUCCESS           The attributes were set successfully.
-  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
-
-**/
-EFI_STATUS
-ArmSetMemoryRegionNoAccess (
-  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN  UINT64                Length
-  )
-{
-  return SetMemoryAttributes (
-           BaseAddress,
-           Length,
-           EFI_MEMORY_RP,
-           TT_DESCRIPTOR_SECTION_AF
-           );
-}
-
-/**
-  Convert a region of memory to read-enabled, by setting the access flag.
-
-  @param  BaseAddress           The start of the region.
-  @param  Length                The size of the region.
-
-  @retval EFI_SUCCESS           The attributes were set successfully.
-  @retval EFI_OUT_OF_RESOURCES  The operation failed due to insufficient memory.
-
-**/
-EFI_STATUS
-ArmClearMemoryRegionNoAccess (
-  IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN  UINT64                Length
-  )
-{
-  return SetMemoryAttributes (
-           BaseAddress,
-           Length,
-           0,
-           TT_DESCRIPTOR_SECTION_AF
+           TtEntryMask
            );
 }

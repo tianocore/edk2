@@ -47,6 +47,9 @@
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
 
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported
+  gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware
 
 [Guids]
   gEfiFileInfoGuid

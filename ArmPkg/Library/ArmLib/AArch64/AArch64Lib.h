@@ -40,7 +40,43 @@ ArmCleanInvalidateDataCacheEntryBySetWay (
 
 UINTN
 EFIAPI
-ArmReadIdAA64Pfr0 (
+ArmReadIdAA64Dfr0 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdAA64Dfr1 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdAA64Isar0 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdAA64Isar1 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdAA64Isar2 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdAA64Mmfr0 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdAA64Mmfr1 (
   VOID
   );
 
@@ -51,6 +87,18 @@ ArmReadIdAA64Pfr0 (
 UINTN
 EFIAPI
 ArmReadIdAA64Mmfr2 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdAA64Pfr0 (
+  VOID
+  );
+
+UINTN
+EFIAPI
+ArmReadIdAA64Pfr1 (
   VOID
   );
 

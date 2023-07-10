@@ -16,8 +16,11 @@ EFI_HANDLE  mHandle = NULL;
 
 STATIC EFI_EVENT  mVirtualAddrChangeEvent;
 
-UINTN  mRtcIndexRegister;
-UINTN  mRtcTargetRegister;
+UINTN   mRtcIndexRegister;
+UINTN   mRtcTargetRegister;
+UINT16  mRtcDefaultYear;
+UINT16  mMinimalValidYear;
+UINT16  mMaximalValidYear;
 
 /**
   Returns the current time and date information, and the time-keeping capabilities
@@ -164,7 +167,14 @@ InitializePcRtc (
   if (FeaturePcdGet (PcdRtcUseMmio)) {
     mRtcIndexRegister  = (UINTN)PcdGet64 (PcdRtcIndexRegister64);
     mRtcTargetRegister = (UINTN)PcdGet64 (PcdRtcTargetRegister64);
+  } else {
+    mRtcIndexRegister  = (UINTN)PcdGet8 (PcdRtcIndexRegister);
+    mRtcTargetRegister = (UINTN)PcdGet8 (PcdRtcTargetRegister);
   }
+
+  mRtcDefaultYear   = PcdGet16 (PcdRtcDefaultYear);
+  mMinimalValidYear = PcdGet16 (PcdMinimalValidYear);
+  mMaximalValidYear = PcdGet16 (PcdMaximalValidYear);
 
   Status = PcRtcInit (&mModuleGlobal);
   ASSERT_EFI_ERROR (Status);

@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2022, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2023, ARM Limited. All rights reserved.
 # Copyright (c) 2021, Ampere Computing LLC. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -144,6 +144,11 @@
   # If PcdMonitorConduitHvc = TRUE, conduit = HVC
   gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
 
+  # Whether to remap all unused memory NX before installing the CPU arch
+  # protocol driver. This is needed on platforms that map all DRAM with RWX
+  # attributes initially, and can be disabled otherwise.
+  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000048
+
 [PcdsFeatureFlag.ARM]
   # Whether to map normal memory as non-shareable. FALSE is the safe choice, but
   # TRUE may be appropriate to fix performance problems if you don't care about
@@ -220,6 +225,13 @@
   # offsets.
   #
   gArmTokenSpaceGuid.PcdArmDmaDeviceOffset|0x0|UINT64|0x0000044
+
+  #
+  # Boot the Uefi Shell instead of UiApp when no valid boot option is found.
+  # This is useful in CI environment so that startup.nsh can be launched.
+  # The default value is FALSE.
+  #
+  gArmTokenSpaceGuid.PcdUefiShellDefaultBootEnable|FALSE|BOOLEAN|0x0000052
 
 [PcdsFixedAtBuild.common, PcdsPatchableInModule.common]
   gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B

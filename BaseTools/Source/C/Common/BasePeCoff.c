@@ -169,32 +169,17 @@ PeCoffLoaderCheckImageType (
     ImageContext->Machine = TeHdr->Machine;
   }
 
-  if (ImageContext->Machine != EFI_IMAGE_MACHINE_IA32 && \
-      ImageContext->Machine != EFI_IMAGE_MACHINE_X64  && \
-      ImageContext->Machine != EFI_IMAGE_MACHINE_ARMT && \
-      ImageContext->Machine != EFI_IMAGE_MACHINE_EBC  && \
-      ImageContext->Machine != EFI_IMAGE_MACHINE_AARCH64 && \
-      ImageContext->Machine != EFI_IMAGE_MACHINE_RISCV64 && \
-      ImageContext->Machine != EFI_IMAGE_MACHINE_LOONGARCH64) {
-    if (ImageContext->Machine == IMAGE_FILE_MACHINE_ARM) {
-      //
-      // There are two types of ARM images. Pure ARM and ARM/Thumb.
-      // If we see the ARM say it is the ARM/Thumb so there is only
-      // a single machine type we need to check for ARM.
-      //
-      ImageContext->Machine = EFI_IMAGE_MACHINE_ARMT;
-      if (ImageContext->IsTeImage == FALSE) {
-        PeHdr->Pe32.FileHeader.Machine = ImageContext->Machine;
-      } else {
-        TeHdr->Machine = ImageContext->Machine;
-      }
-
-    } else {
-      //
-      // unsupported PeImage machine type
-      //
-      return RETURN_UNSUPPORTED;
-    }
+  if (ImageContext->Machine != IMAGE_FILE_MACHINE_I386 && \
+      ImageContext->Machine != IMAGE_FILE_MACHINE_X64  && \
+      ImageContext->Machine != IMAGE_FILE_MACHINE_ARMTHUMB_MIXED && \
+      ImageContext->Machine != IMAGE_FILE_MACHINE_EBC  && \
+      ImageContext->Machine != IMAGE_FILE_MACHINE_ARM64 && \
+      ImageContext->Machine != IMAGE_FILE_MACHINE_RISCV64 && \
+      ImageContext->Machine != IMAGE_FILE_MACHINE_LOONGARCH64) {
+    //
+    // unsupported PeImage machine type
+    //
+    return RETURN_UNSUPPORTED;
   }
 
   //
@@ -774,16 +759,16 @@ PeCoffLoaderRelocateImage (
 
       default:
         switch (MachineType) {
-        case EFI_IMAGE_MACHINE_IA32:
+        case IMAGE_FILE_MACHINE_I386:
           Status = PeCoffLoaderRelocateIa32Image (Reloc, Fixup, &FixupData, Adjust);
           break;
-        case EFI_IMAGE_MACHINE_ARMT:
+        case IMAGE_FILE_MACHINE_ARMTHUMB_MIXED:
           Status = PeCoffLoaderRelocateArmImage (&Reloc, Fixup, &FixupData, Adjust);
           break;
-        case EFI_IMAGE_MACHINE_RISCV64:
+        case IMAGE_FILE_MACHINE_RISCV64:
           Status = PeCoffLoaderRelocateRiscVImage (Reloc, Fixup, &FixupData, Adjust);
           break;
-        case EFI_IMAGE_MACHINE_LOONGARCH64:
+        case IMAGE_FILE_MACHINE_LOONGARCH64:
           Status = PeCoffLoaderRelocateLoongArch64Image (Reloc, Fixup, &FixupData, Adjust);
           break;
         default:
@@ -1270,14 +1255,14 @@ PeCoffLoaderGetPdbPointer (
     //       generate PE32+ image with PE32 Magic.
     //
     switch (Hdr.Pe32->FileHeader.Machine) {
-    case EFI_IMAGE_MACHINE_IA32:
-    case EFI_IMAGE_MACHINE_ARMT:
+    case IMAGE_FILE_MACHINE_I386:
+    case IMAGE_FILE_MACHINE_ARMTHUMB_MIXED:
       //
       // Assume PE32 image with IA32 Machine field.
       //
       Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
       break;
-    case EFI_IMAGE_MACHINE_X64:
+    case IMAGE_FILE_MACHINE_X64:
       //
       // Assume PE32+ image with X64 Machine field
       //

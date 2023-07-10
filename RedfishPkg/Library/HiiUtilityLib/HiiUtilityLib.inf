@@ -1,0 +1,62 @@
+## @file
+#  Library to handle HII IFR data.
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+#  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HiiUtilityLib
+  FILE_GUID                      = D00DA028-F19A-47AF-B22A-6EE9E8BD7335
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HiiUtilityLib|DXE_DRIVER UEFI_DRIVER UEFI_APPLICATION
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  HiiUtilityLib.c
+  HiiExpression.c
+  HiiUtilityInternal.c
+  HiiIfrParse.c
+  HiiInternal.h
+  HiiExpression.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses]
+  PrintLib
+  DebugLib
+  BaseMemoryLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  HiiLib
+
+[Guids]
+  gZeroGuid
+  gEdkiiIfrBitVarstoreGuid
+  gEfiHiiPlatformSetupFormsetGuid
+  gEfiHiiStandardFormGuid
+
+[Protocols]
+  gEfiHiiDatabaseProtocolGuid
+  gEfiHiiConfigRoutingProtocolGuid
+  gEfiHiiConfigAccessProtocolGuid
+  gEfiDevicePathFromTextProtocolGuid
+  gEfiUnicodeCollation2ProtocolGuid
+  gEfiRegularExpressionProtocolGuid
+  gEfiUserManagerProtocolGuid
+
+[Depex]
+  TRUE

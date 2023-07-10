@@ -1,0 +1,40 @@
+## @file
+#  ACPI Platform Library Instance.
+#
+#  Copyright (C) 2023, Corvin Köhne <corvink@FreeBSD.org>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = DxeAcpiPlatformLib
+  FILE_GUID      = 578F441A-4A4C-4D24-B9BE-F783152B46F6
+  MODULE_TYPE    = DXE_DRIVER
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = AcpiPlatformLib
+
+[Sources]
+  BootScript.c
+  DxeAcpiPlatformLib.c
+  PciDecoding.c
+  QemuFwCfgAcpi.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PcdLib
+  QemuFwCfgS3Lib
+  UefiBootServicesTableLib
+  TpmMeasurementLib
+
+[Protocols]
+  gQemuAcpiTableNotifyProtocolGuid              # PROTOCOL PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration

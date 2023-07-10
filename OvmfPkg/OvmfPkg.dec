@@ -20,6 +20,10 @@
   Csm/Include
 
 [LibraryClasses]
+  ##  @libraryclass  Search and install ACPI tables.
+  #
+  AcpiPlatformLib|Include/Library/AcpiPlatformLib.h
+
   ##  @libraryclass  Access bhyve's firmware control interface.
   BhyveFwCtlLib|Include/Library/BhyveFwCtlLib.h
 
@@ -422,6 +426,9 @@
   #  check to decide whether to abort dispatch of the driver it is linked into.
   gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|""|VOID*|0x68
 
+  ## Restrict boot to EFI applications in firmware volumes.
+  gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware|FALSE|BOOLEAN|0x6c
+
 [PcdsDynamic, PcdsDynamicEx]
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|2
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
@@ -487,6 +494,9 @@
   #  runtime OS from tampering with firmware structures (special memory ranges
   #  used by OVMF, the varstore pflash chip, LockBox etc).
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire|FALSE|BOOLEAN|0x1e
+
+  ## This feature flag indicates the firmware build supports secure boot.
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|FALSE|BOOLEAN|0x6d
 
   ## Informs modules (including pre-DXE-phase modules) whether the platform
   #  firmware contains a CSM (Compatibility Support Module).

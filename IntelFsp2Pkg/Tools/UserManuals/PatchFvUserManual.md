@@ -1,11 +1,18 @@
 #Name
 **_PatchFv.py_** - The python script that patches the firmware volumes (**FV**)
 with in the flash device (**FD**) file post FSP build.
+From version 0.60, script is capable of patching flash device (**FD**) directly.
 
 #Synopsis
 
 ```
 PatchFv FvBuildDir [FvFileBaseNames:]FdFileBaseNameToPatch ["Offset, Value"]+
+  | ["Offset, Value, @Comment"]+
+  | ["Offset, Value, $Command"]+
+  | ["Offset, Value, $Command, @Comment"]+
+```
+```
+PatchFv FdFileDir FdFileName ["Offset, Value"]+
   | ["Offset, Value, @Comment"]+
   | ["Offset, Value, $Command"]+
   | ["Offset, Value, $Command, @Comment"]+
@@ -101,6 +108,19 @@ ModuleGuid:Offset
   { } Convert an offset {expr} into an absolute address (FSP_BASE + expr)
   < > Convert absolute address <expr> into an image offset (expr & FSP_SIZE)
 
+```
+From version 0.60 tool allows to pass flash device file path as Argument 1 and
+flash device name as Argument 2 and rules for passing offset & value are same
+as explained in the previous sections.
+
+####Example usage:
+Argument 1
+```
+ YouPlatformFspBinPkg\
+```
+Argument 2
+```
+ Fsp_Rebased_T
 ```
 
 ###Special Commands:

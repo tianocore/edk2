@@ -5,6 +5,8 @@
   Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023 Apple Inc. All rights reserved.<BR>
+  Copyright (c) 2023 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -135,7 +137,7 @@ SmbiosPrintEPSInfo (
   IN  UINT8                     Option
   )
 {
-  UINT8  Anchor[5];
+  UINT8  Anchor[SMBIOS_ANCHOR_STRING_LENGTH + 1]; // Including terminating NULL character
   UINT8  InAnchor[6];
 
   if (SmbiosTable == NULL) {
@@ -149,7 +151,7 @@ SmbiosPrintEPSInfo (
 
   if (Option >= SHOW_NORMAL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ENTRY_POINT_SIGN), gShellDebug1HiiHandle);
-    MemToString (Anchor, SmbiosTable->AnchorString, 4);
+    MemToString (Anchor, SmbiosTable->AnchorString, SMBIOS_ANCHOR_STRING_LENGTH);
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ANCHOR_STR), gShellDebug1HiiHandle, Anchor);
     ShellPrintHiiEx (
       -1,
@@ -220,7 +222,7 @@ Smbios64BitPrintEPSInfo (
   IN  UINT8                         Option
   )
 {
-  UINT8  Anchor[5];
+  UINT8  Anchor[SMBIOS_3_0_ANCHOR_STRING_LENGTH + 1]; // Including terminating NULL character
 
   if (SmbiosTable == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_SMBIOSTABLE_NULL), gShellDebug1HiiHandle);
@@ -234,7 +236,7 @@ Smbios64BitPrintEPSInfo (
   if (Option >= SHOW_NORMAL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_64_BIT_ENTRY_POINT_SIGN), gShellDebug1HiiHandle);
 
-    MemToString (Anchor, SmbiosTable->AnchorString, 5);
+    MemToString (Anchor, SmbiosTable->AnchorString, SMBIOS_3_0_ANCHOR_STRING_LENGTH);
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ANCHOR_STR), gShellDebug1HiiHandle, Anchor);
 
     ShellPrintHiiEx (
@@ -305,9 +307,10 @@ SmbiosPrintStructure (
   IN  UINT8                     Option
   )
 {
-  UINT8  Index;
-  UINT8  Index2;
-  UINT8  *Buffer;
+  UINT8       Index;
+  UINT8       Index2;
+  UINT8       *Buffer;
+  EFI_STRING  String;
 
   if (Struct == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -339,7 +342,9 @@ SmbiosPrintStructure (
       ShellPrintEx (-1, -1, L"BIOS Version: %a\n", LibGetSmbiosString (Struct, Struct->Type0->BiosVersion));
       ShellPrintEx (-1, -1, L"BIOS Starting Address Segment: 0x%x\n", Struct->Type0->BiosSegment);
       ShellPrintEx (-1, -1, L"BIOS Release Date: %a\n", LibGetSmbiosString (Struct, Struct->Type0->BiosReleaseDate));
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE), gShellDebug1HiiHandle, 64 * (Struct->Type0->BiosSize + 1));
+      if ((Struct->Type0->BiosSize != 0xFF) || !(AE_SMBIOS_VERSION (0x3, 0x1))) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BIOS_SIZE), gShellDebug1HiiHandle, 64 * (Struct->Type0->BiosSize + 1));
+      }
 
       DisplayBiosCharacteristics (ReadUnaligned64 ((UINT64 *)(UINTN)&(Struct->Type0->BiosCharacteristics)), Option);
 
@@ -1301,6 +1306,109 @@ SmbiosPrintStructure (
       DisplayProcessorArchitectureType (Struct->Type44->ProcessorSpecificBlock.ProcessorArchType, Option);
       break;
 
+    //
+    // Firmware Inventory (Type 45)
+    //
+    case 45:
+      PRINT_PENDING_STRING (Struct, Type45, FirmwareComponentName);
+      PRINT_PENDING_STRING (Struct, Type45, FirmwareVersion);
+      if (Struct->Type45->FirmwareVersionFormat == VersionFormatTypeFreeForm) {
+        String = L"Free-form string";
+      } else if (Struct->Type45->FirmwareVersionFormat == VersionFormatTypeMajorMinor) {
+        String = L"MAJOR.MINOR";
+      } else if (Struct->Type45->FirmwareVersionFormat == VersionFormatType32BitHex) {
+        String = L"32-bit hexadecimal string";
+      } else if (Struct->Type45->FirmwareVersionFormat == VersionFormatTypeMajorMinor) {
+        String = L"64-bit hexadecimal string";
+      } else if (Struct->Type45->FirmwareVersionFormat >= 0x80) {
+        String = L"BIOS Vendor/OEM-specific";
+      } else {
+        String = L"Reserved";
+      }
+
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_FIRMWARE_VERSION_FORMAT),
+        gShellDebug1HiiHandle,
+        String
+        );
+      PRINT_PENDING_STRING (Struct, Type45, FirmwareId);
+      if (Struct->Type45->FirmwareIdFormat == FirmwareIdFormatTypeFreeForm) {
+        String = L"Free-form string";
+      } else if (Struct->Type45->FirmwareIdFormat == FirmwareIdFormatTypeUuid) {
+        String = L"RFC4122 UUID string";
+      } else if (Struct->Type45->FirmwareIdFormat >= 0x80) {
+        String = L"BIOS Vendor/OEM-specific";
+      } else {
+        String = L"Reserved";
+      }
+
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_FIRMWARE_ID_FORMAT),
+        gShellDebug1HiiHandle,
+        String
+        );
+      PRINT_PENDING_STRING (Struct, Type45, ReleaseDate);
+      PRINT_PENDING_STRING (Struct, Type45, Manufacturer);
+      PRINT_PENDING_STRING (Struct, Type45, LowestSupportedVersion);
+      if (Struct->Type45->ImageSize != MAX_UINT64) {
+        PRINT_STRUCT_VALUE_H (Struct, Type45, ImageSize);
+      } else {
+        ShellPrintHiiEx (
+          -1,
+          -1,
+          NULL,
+          STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_IMAGE_SIZE_UNKNOWN),
+          gShellDebug1HiiHandle
+          );
+      }
+
+      DisplayFirmwareCharacteristics (ReadUnaligned16 ((UINT16 *)(UINTN)&(Struct->Type45->Characteristics)), Option);
+      DisplayFirmwareState (*(UINT8 *)(UINTN)&(Struct->Type45->State), Option);
+
+      PRINT_STRUCT_VALUE_H (Struct, Type45, AssociatedComponentCount);
+      if (Struct->Hdr->Length > sizeof (*Struct->Type45)) {
+        for (Index = 0; Index < Struct->Type45->AssociatedComponentCount; Index++) {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_FIRMWARE_INVENTORY_ASSOCIATED), gShellDebug1HiiHandle);
+          Print (L"    0x%04X ", Buffer[sizeof (*Struct->Type45) + (Index * sizeof (SMBIOS_HANDLE))]);
+          Print (L"\n");
+        }
+      }
+
+      break;
+
+    //
+    // String Property (Type 46)
+    //
+    case 46:
+      if (Struct->Type46->StringPropertyId == StringPropertyIdDevicePath) {
+        String = L"UEFI device path";
+      } else if ((Struct->Type46->StringPropertyId >= StringPropertyIdBiosVendor) &&
+                 (Struct->Type46->StringPropertyId < StringPropertyIdOem))
+      {
+        String = L"BIOS vendor defined";
+      } else if (Struct->Type46->StringPropertyId >= StringPropertyIdOem) {
+        String = L"OEM defined";
+      } else {
+        String = L"Reserved";
+      }
+
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_STRING_PROPERTY_ID),
+        gShellDebug1HiiHandle,
+        String
+        );
+      PRINT_PENDING_STRING (Struct, Type46, StringPropertyValue);
+      PRINT_STRUCT_VALUE_H (Struct, Type46, ParentHandle);
+      break;
     //
     // Inactive (Type 126)
     //

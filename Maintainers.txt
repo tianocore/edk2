@@ -81,14 +81,6 @@ EDK II Releases:
 W: https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
-UEFI Shell Binaries (ShellBinPkg.zip) from EDK II Releases:
------------------------------------------------------------
-W: https://github.com/tianocore/edk2/releases/
-M: Ray Ni <ray.ni@intel.com> [niruiyu]                        (Ia32/X64)
-M: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]           (Ia32/X64)
-M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]           (ARM/AArch64)
-M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel] (ARM/AArch64)
-
 EDK II Architectures:
 ---------------------
 ARM, AARCH64
@@ -186,7 +178,7 @@ CryptoPkg
 F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-M: Jian J Wang <jian.j.wang@intel.com> [jwang36]
+M: Yi Li <yi1.li@intel.com> [liyi77]
 R: Xiaoyu Lu <xiaoyu1.lu@intel.com> [xiaoyuxlu]
 R: Guomin Jiang <guomin.jiang@intel.com> [guominjia]
 
@@ -237,14 +229,24 @@ F: IntelFsp2Pkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Duggapu Chinni B <chinni.b.duggapu@intel.com> [cbduggap]
+M: Ray Han Lim Ng <ray.han.lim.ng@intel.com> [rayhanlimng]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
+R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
+R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
+R: Susovan Mohapatra <susovan.mohapatra@intel.com> [susovanmohapatra]
 
 IntelFsp2WrapperPkg
 F: IntelFsp2WrapperPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2WrapperPkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
+M: Duggapu Chinni B <chinni.b.duggapu@intel.com> [cbduggap]
+M: Chen Gang C <gang.c.chen@intel.com> [chengangc]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
+R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
+R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
+R: Susovan Mohapatra <susovan.mohapatra@intel.com> [susovanmohapatra]
 
 MdeModulePkg
 F: MdeModulePkg/
@@ -427,6 +429,14 @@ R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 
+MdeModulePkg: Trace Hub debug message related library instance
+F: MdeModulePkg/Library/TraceHubDebugSysTLib/
+F: MdeModulePkg/Include/Guid/TraceHubDebugInfoHob.h
+M: Gua Guo <gua.guo@intel.com> [gguo11837463]
+M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakashan@intel.com> [kprakas2]
+R: Chan Laura <laura.chan@intel.com> [lauracha]
+R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
@@ -434,11 +444,29 @@ M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 
+MdePkg: Trace Hub debug message related library instance
+F: MdePkg/Library/TraceHubDebugSysTLibNull/
+F: MdePkg/Library/MipiSysTLib/
+F: MdePkg/Include/Library/TraceHubDebugSysTLib.h
+F: MdePkg/Include/Library/MipiSysTLib.h
+M: Gua Guo <gua.guo@intel.com> [gguo11837463]
+M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakashan@intel.com> [kprakas2]
+R: Chan Laura <laura.chan@intel.com> [lauracha]
+R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
+
+MdePkg: FDT related library instance
+F: MdePkg/Library/BaseFdtLib/FdtLib.c
+F: MdePkg/Include/Library/FdtLib.h
+M: Benny Lin <benny.lin@intel.com> [Benny3345678]
+R: Gua Guo <gua.guo@intel.com> [gguo11837463]
+R: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
+R: James Lu <james.lu@intel.com> [jameslu8]
+
 NetworkPkg
 F: NetworkPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
-M: Maciej Rabeda <maciej.rabeda@linux.intel.com> [mrabeda]
-R: Siyuan Fu <siyuan.fu@intel.com> [sfu5]
+R: Saloni Kasbekar <saloni.kasbekar@intel.com> [SaloniKasbekar]
+R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
 
 OvmfPkg
 F: OvmfPkg/
@@ -462,6 +490,7 @@ F: OvmfPkg/Library/ResetSystemLib/BaseResetShutdownBhyve.c
 F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
 R: Rebecca Cran <rebecca@bsdio.com> [bcran]
 R: Peter Grehan <grehan@freebsd.org> [grehan-freebsd]
+R: Corvin Köhne <corvink@freebsd.org> [corvink]
 
 OvmfPkg: cloudhv-related modules
 F: OvmfPkg/CloudHv/
@@ -589,7 +618,6 @@ R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 ShellPkg
 F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 
 SignedCapsulePkg
@@ -606,8 +634,7 @@ StandaloneMmPkg
 F: StandaloneMmPkg/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
-M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-R: Supreeth Venkatesh <supreeth.venkatesh@arm.com> [supven01]
+M: Ray Ni <ray.ni@intel.com> [niruiyu]
 
 UefiCpuPkg
 F: UefiCpuPkg/
@@ -627,7 +654,6 @@ UefiPayloadPkg
 F: UefiPayloadPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Guo Dong <guo.dong@intel.com> [gdong1]
-M: Ray Ni <ray.ni@intel.com> [niruiyu]
 M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]

@@ -34,12 +34,27 @@ NestedInterruptRaiseTPL (
 
   //
   // Raise TPL and assert that we were called from within an interrupt
-  // handler (i.e. with TPL below TPL_HIGH_LEVEL but with interrupts
-  // disabled).
+  // handler (i.e. with interrupts already disabled before raising the
+  // TPL).
   //
   ASSERT (GetInterruptState () == FALSE);
   InterruptedTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  ASSERT (InterruptedTPL < TPL_HIGH_LEVEL);
+
+  //
+  // At TPL_HIGH_LEVEL, CPU interrupts are disabled (as per the UEFI
+  // specification) and so we should never encounter a situation in
+  // which InterruptedTPL==TPL_HIGH_LEVEL.  The specification also
+  // restricts usage of TPL_HIGH_LEVEL to the firmware itself.
+  //
+  // However, nothing actually prevents a UEFI application from
+  // invalidly calling gBS->RaiseTPL(TPL_HIGH_LEVEL) and then
+  // violating the invariant by enabling interrupts via the STI or
+  // equivalent instruction.  Some versions of the Microsoft Windows
+  // bootloader are known to do this.
+  //
+  if (InterruptedTPL >= TPL_HIGH_LEVEL) {
+    DEBUG ((DEBUG_ERROR, "ERROR: Interrupts enabled at TPL_HIGH_LEVEL!\n"));
+  }
 
   return InterruptedTPL;
 }
@@ -104,6 +119,7 @@ NestedInterruptRestoreTPL (
   // defer our call to RestoreTPL() to the in-progress outer instance
   // of the same interrupt handler.
   //
+  ASSERT (GetInterruptState () == FALSE);
   if (InterruptedTPL == IsrState->InProgressRestoreTPL) {
     //
     // Trigger outer instance of this interrupt handler to perform the
@@ -153,6 +169,7 @@ NestedInterruptRestoreTPL (
     //
     // Check shared state loop invariants.
     //
+    ASSERT (GetInterruptState () == FALSE);
     ASSERT (IsrState->InProgressRestoreTPL < InterruptedTPL);
     ASSERT (IsrState->DeferredRestoreTPL == FALSE);
 
@@ -167,13 +184,17 @@ NestedInterruptRestoreTPL (
 
     //
     // Call RestoreTPL() to allow event notifications to be
-    // dispatched.  This will implicitly re-enable interrupts.
+    // dispatched.  This will implicitly re-enable interrupts (if
+    // InterruptedTPL is below TPL_HIGH_LEVEL), even though we are
+    // still inside the interrupt handler.
     //
     gBS->RestoreTPL (InterruptedTPL);
 
     //
     // Re-disable interrupts after the call to RestoreTPL() to ensure
-    // that we have exclusive access to the shared state.
+    // that we have exclusive access to the shared state.  Interrupts
+    // will be re-enabled by the IRET or equivalent instruction when
+    // we subsequently return from the interrupt handler.
     //
     DisableInterrupts ();
 
