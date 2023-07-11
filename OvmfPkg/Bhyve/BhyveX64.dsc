@@ -196,7 +196,7 @@
 !else
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
 !endif
-  RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   PlatformSecureLib|OvmfPkg/Library/PlatformSecureLib/PlatformSecureLib.inf
