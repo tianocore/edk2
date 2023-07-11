@@ -59,7 +59,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicCInfoParser[] = {
   { "ProximityDomain",               4,                        "0x%x",   NULL },
   { "ClockDomain",                   4,                        "0x%x",   NULL },
   { "AffinityFlags",                 4,                        "0x%x",   NULL },
-  { "CpcToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
+  { "CpcToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "TRBEInterrupt",                 2,                        "0x%x",   NULL }
 };
 
 /** A parser for EArmObjGicDInfo.
