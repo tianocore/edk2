@@ -12,24 +12,46 @@ The minimum QEMU version required is
 [7efd65423a](https://github.com/qemu/qemu/commit/7efd65423ab22e6f5890ca08ae40c84d6660242f)
 which supports separate pflash devices for EDK2 code and variable storage.
 
+## Get edk2 sources
+
+    git clone --recurse-submodule git@github.com:tianocore/edk2.git
+
 ## Build
+
+### Using GCC toolchain
+**Prerequisite**: RISC-V GNU compiler toolchain should be installed.
+
     export WORKSPACE=`pwd`
     export GCC5_RISCV64_PREFIX=riscv64-linux-gnu-
     export PACKAGES_PATH=$WORKSPACE/edk2
     export EDK_TOOLS_PATH=$WORKSPACE/edk2/BaseTools
-    source edk2/edksetup.sh
+    source edk2/edksetup.sh --reconfig
     make -C edk2/BaseTools
     source edk2/edksetup.sh BaseTools
     build -a RISCV64 --buildtarget RELEASE -p OvmfPkg/RiscVVirt/RiscVVirtQemu.dsc -t GCC5
+
+### Using CLANGDWARF toolchain (clang + lld)
+**Prerequisite**: LLVM toolchain with clang and lld should be installed.
+
+    export WORKSPACE=`pwd`
+    export CLANGDWARF_BIN=/usr/bin/
+    export PACKAGES_PATH=$WORKSPACE/edk2
+    export EDK_TOOLS_PATH=$WORKSPACE/edk2/BaseTools
+    source edk2/edksetup.sh --reconfig
+    make -C edk2/BaseTools
+    source edk2/edksetup.sh BaseTools
+    build -a RISCV64 --buildtarget RELEASE -p OvmfPkg/RiscVVirt/RiscVVirtQemu.dsc -t CLANGDWARF
+
+After a successful build, two files namely **RISCV_VIRT_CODE.fd** and **RISCV_VIRT_VARS.fd** are created.
 
 ## Test
 Below example shows how to boot openSUSE Tumbleweed E20.
 
 1) RISC-V QEMU pflash devices should be of of size 32MiB.
 
-    `truncate -s 32M Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT_CODE.fd`
+    `truncate -s 32M RISCV_VIRT_CODE.fd`
 
-    `truncate -s 32M Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT_VARS.fd`
+    `truncate -s 32M RISCV_VIRT_VARS.fd`
 
 2) Running QEMU
 
