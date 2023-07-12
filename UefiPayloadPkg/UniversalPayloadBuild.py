@@ -10,9 +10,21 @@ import subprocess
 import os
 import shutil
 import sys
+import pathlib
 from   ctypes import *
-from Tools.ElfFv import ReplaceFv
+
 sys.dont_write_bytecode = True
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 class UPLD_INFO_HEADER(LittleEndianStructure):
     _pack_ = 1
@@ -36,40 +48,115 @@ class UPLD_INFO_HEADER(LittleEndianStructure):
         self.ImageId        = b'UEFI'
         self.ProducerId     = b'INTEL'
 
+def ValidateSpecRevision (Argument):
+    try:
+        (MajorStr, MinorStr) = Argument.split('.')
+    except:
+        raise argparse.ArgumentTypeError ('{} is not a valid SpecRevision format (Major[8-bits].Minor[8-bits]).'.format (Argument))
+    #
+    # Spec Revision Bits 15 : 8 - Major Version. Bits 7 : 0 - Minor Version.
+    #
+    if len(MinorStr) > 0 and len(MinorStr) < 3:
+        try:
+            Minor = int(MinorStr, 16) if len(MinorStr) == 2 else (int(MinorStr, 16) << 4)
+        except:
+            raise argparse.ArgumentTypeError ('{} Minor version of SpecRevision is not a valid integer value.'.format (Argument))
+    else:
+        raise argparse.ArgumentTypeError ('{} is not a valid SpecRevision format (Major[8-bits].Minor[8-bits]).'.format (Argument))
+
+    if len(MajorStr) > 0 and len(MajorStr) < 3:
+        try:
+            Major = int(MajorStr, 16)
+        except:
+            raise argparse.ArgumentTypeError ('{} Major version of SpecRevision is not a valid integer value.'.format (Argument))
+    else:
+        raise argparse.ArgumentTypeError ('{} is not a valid SpecRevision format (Major[8-bits].Minor[8-bits]).'.format (Argument))
+
+    return int('0x{0:02x}{1:02x}'.format(Major, Minor), 0)
+
+def Validate32BitInteger (Argument):
+    try:
+        Value = int (Argument, 0)
+    except:
+        raise argparse.ArgumentTypeError ('{} is not a valid integer value.'.format (Argument))
+    if Value < 0:
+        raise argparse.ArgumentTypeError ('{} is a negative value.'.format (Argument))
+    if Value > 0xffffffff:
+        raise argparse.ArgumentTypeError ('{} is larger than 32-bits.'.format (Argument))
+    return Value
+
+def ValidateAddFv (Argument):
+    Value = Argument.split ("=")
+    if len (Value) != 2:
+        raise argparse.ArgumentTypeError ('{} is incorrect format with "xxx_fv=xxx.fv"'.format (Argument))
+    if Value[0][-3:] != "_fv":
+        raise argparse.ArgumentTypeError ('{} is incorrect format with "xxx_fv=xxx.fv"'.format (Argument))
+    if Value[1][-3:].lower () != ".fv":
+        raise argparse.ArgumentTypeError ('{} is incorrect format with "xxx_fv=xxx.fv"'.format (Argument))
+    if os.path.exists (Value[1]) == False:
+        raise argparse.ArgumentTypeError ('File {} is not found.'.format (Value[1]))
+    return Value
+
+def RunCommand(cmd):
+    print(cmd)
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,cwd=os.environ['WORKSPACE'])
+    while True:
+        line = p.stdout.readline()
+        if not line:
+            break
+        print(line.strip().decode(errors='ignore'))
+
+    p.communicate()
+    if p.returncode != 0:
+        print("- Failed - error happened when run command: %s"%cmd)
+        raise Exception("ERROR: when run command: %s"%cmd)
+
 def BuildUniversalPayload(Args):
-    def RunCommand(cmd):
-        print(cmd)
-        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,cwd=os.environ['WORKSPACE'])
-        while True:
-            line = p.stdout.readline()
-            if not line:
-                break
-            print(line.strip().decode(errors='ignore'))
-
-        p.communicate()
-        if p.returncode != 0:
-            print("- Failed - error happened when run command: %s"%cmd)
-            raise Exception("ERROR: when run command: %s"%cmd)
-
     BuildTarget = Args.Target
     ToolChain = Args.ToolChain
     Quiet     = "--quiet"  if Args.Quiet else ""
-    ElfToolChain = 'CLANGDWARF'
+
+    if Args.PayloadEntryFormat == "pecoff":
+        PayloadEntryToolChain = ToolChain
+        Args.Macro.append("UNIVERSAL_PAYLOAD_FORMAT=FIT")
+        UpldEntryFile = "FitUniversalPayloadEntry"
+    else:
+        PayloadEntryToolChain = 'CLANGDWARF'
+        Args.Macro.append("UNIVERSAL_PAYLOAD_FORMAT=ELF")
+        UpldEntryFile = "UniversalPayloadEntry"
+
     BuildDir     = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkgX64"))
-    BuildModule = ""
-    BuildArch = ""
     if Args.Arch == 'X64':
         BuildArch      = "X64"
-        EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ElfToolChain), os.path.normpath("X64/UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry/DEBUG/UniversalPayloadEntry.dll"))
+        FitArch        = "x86_64"
+        ObjCopyFlag    = "elf64-x86-64"
+        EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, PayloadEntryToolChain), os.path.normpath("X64/UefiPayloadPkg/UefiPayloadEntry/{}/DEBUG/{}.dll".format (UpldEntryFile, UpldEntryFile)))
     else:
         BuildArch      = "IA32 -a X64"
-        EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ElfToolChain), os.path.normpath("IA32/UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry/DEBUG/UniversalPayloadEntry.dll"))
+        FitArch        = "x86"
+        ObjCopyFlag    = "elf32-i386"
+        EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, PayloadEntryToolChain), os.path.normpath("IA32/UefiPayloadPkg/UefiPayloadEntry/{}/DEBUG/{}.dll".format (UpldEntryFile, UpldEntryFile)))
 
     if Args.PreBuildUplBinary is not None:
         EntryOutputDir = os.path.abspath(Args.PreBuildUplBinary)
+    EntryModuleInf = os.path.normpath("UefiPayloadPkg/UefiPayloadEntry/{}.inf".format (UpldEntryFile))
     DscPath = os.path.normpath("UefiPayloadPkg/UefiPayloadPkg.dsc")
+    DxeFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))
+    BdsFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/BDSFV.Fv"))
+    NetworkFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/NETWORKFV.Fv"))
+    PayloadReportPath = os.path.join(BuildDir, "UefiUniversalPayload.txt")
     ModuleReportPath = os.path.join(BuildDir, "UefiUniversalPayloadEntry.txt")
     UpldInfoFile = os.path.join(BuildDir, "UniversalPayloadInfo.bin")
+
+    if "CLANG_BIN" in os.environ:
+        LlvmObjcopyPath = os.path.join(os.environ["CLANG_BIN"], "llvm-objcopy")
+    else:
+        LlvmObjcopyPath = "llvm-objcopy"
+    try:
+        RunCommand('"%s" --version'%LlvmObjcopyPath)
+    except:
+        print("- Failed - Please check if LLVM is installed or if CLANG_BIN is set correctly")
+        sys.exit(1)
 
     Pcds = ""
     if (Args.pcd != None):
@@ -85,7 +172,6 @@ def BuildUniversalPayload(Args):
     # Building DXE core and DXE drivers as DXEFV.
     #
     if Args.BuildEntryOnly == False:
-        PayloadReportPath = os.path.join(BuildDir, "UefiUniversalPayload.txt")
         BuildPayload = "build -p {} -b {} -a X64 -t {} -y {} {}".format (DscPath, BuildTarget, ToolChain, PayloadReportPath, Quiet)
         BuildPayload += Pcds
         BuildPayload += Defines
@@ -94,88 +180,126 @@ def BuildUniversalPayload(Args):
     # Building Universal Payload entry.
     #
     if Args.PreBuildUplBinary is None:
-        EntryModuleInf = os.path.normpath("UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf")
-        BuildModule = "build -p {} -b {} -a {} -m {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, EntryModuleInf, ElfToolChain, ModuleReportPath, Quiet)
+        BuildModule = "build -p {} -b {} -a {} -m {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, EntryModuleInf, PayloadEntryToolChain, ModuleReportPath, Quiet)
         BuildModule += Pcds
         BuildModule += Defines
         RunCommand(BuildModule)
     #
     # Buid Universal Payload Information Section ".upld_info"
     #
-    upld_info_hdr              = UPLD_INFO_HEADER()
-    upld_info_hdr.SpecRevision = Args.SpecRevision
-    upld_info_hdr.Revision     = Args.Revision
-    upld_info_hdr.ProducerId   = Args.ProducerId.encode()[:16]
-    upld_info_hdr.ImageId      = Args.ImageId.encode()[:16]
-    upld_info_hdr.Attribute   |= 1 if BuildTarget == "DEBUG" else 0
-    fp = open(UpldInfoFile, 'wb')
-    fp.write(bytearray(upld_info_hdr))
-    fp.close()
+    if Args.SpecRevision < 0x0100:
+        upld_info_hdr = UPLD_INFO_HEADER()
+        upld_info_hdr.SpecRevision = Args.SpecRevision
+        upld_info_hdr.Revision = Args.Revision
+        upld_info_hdr.ProducerId = Args.ProducerId.encode()[:16]
+        upld_info_hdr.ImageId = Args.ImageId.encode()[:16]
+        upld_info_hdr.Attribute |= 1 if BuildTarget == "DEBUG" else 0
+        fp = open(UpldInfoFile, 'wb')
+        fp.write(bytearray(upld_info_hdr))
+        fp.close()
+
+        if Args.BuildEntryOnly == False:
+            import Tools.ElfFv as ElfFv
+            ElfFv.ReplaceFv (EntryOutputDir, UpldInfoFile, '.upld_info', Alignment = 4)
+    shutil.copy (EntryOutputDir, os.path.join(BuildDir, 'UniversalPayload.{}'.format (Args.PayloadEntryFormat)))
 
     MultiFvList = []
     if Args.BuildEntryOnly == False:
         MultiFvList = [
-            ['uefi_fv',    os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))    ],
-            ['bds_fv',     os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/BDSFV.Fv"))    ],
-            ['network_fv', os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/NETWORKFV.Fv"))    ],
+            ['uefi_fv',        os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))    ],
+            ['bds_fv',         os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/BDSFV.Fv"))    ],
+            ['network_fv',     os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/NETWORKFV.Fv"))],
         ]
-        AddSectionName = '.upld_info'
-        ReplaceFv (EntryOutputDir, UpldInfoFile, AddSectionName, Alignment = 4)
 
-    shutil.copy (EntryOutputDir, os.path.join(BuildDir, 'UniversalPayload.elf'))
 
-    return MultiFvList, os.path.join(BuildDir, 'UniversalPayload.elf')
+    if Args.SpecRevision >= 0x0100:
+        import Tools.MkFitImage as MkFitImage
+        import pefile
+        fit_image_info_header               = MkFitImage.FIT_IMAGE_INFO_HEADER()
+        fit_image_info_header.Description   = 'Uefi Universal Payload'
+        fit_image_info_header.UplVersion    = Args.SpecRevision
+        fit_image_info_header.Type          = 'flat-binary'
+        fit_image_info_header.Arch          = FitArch
+        fit_image_info_header.Compression   = 'none'
+        fit_image_info_header.Revision      = Args.Revision
+        fit_image_info_header.BuildType     = Args.Target.lower()
+        fit_image_info_header.Capabilities  = None
+        fit_image_info_header.Producer      = Args.ProducerId.lower()
+        fit_image_info_header.ImageId       = Args.ImageId.lower()
+        fit_image_info_header.Binary        = os.path.join(BuildDir, 'UniversalPayload.{}'.format (Args.PayloadEntryFormat))
+        fit_image_info_header.TargetPath    = os.path.join(BuildDir, 'UniversalPayload.fit')
+        fit_image_info_header.UefifvPath    = DxeFvOutputDir
+        fit_image_info_header.BdsfvPath     = BdsFvOutputDir
+        fit_image_info_header.NetworkfvPath = NetworkFvOutputDir
+        fit_image_info_header.DataOffset    = 0x1000
+        fit_image_info_header.LoadAddr      = Args.LoadAddress
+        fit_image_info_header.Project       = 'tianocore'
+
+        TargetRebaseFile = fit_image_info_header.Binary.replace (pathlib.Path(fit_image_info_header.Binary).suffix, ".pecoff")
+        TargetRebaseEntryFile = fit_image_info_header.Binary.replace (pathlib.Path(fit_image_info_header.Binary).suffix, ".entry")
+
+
+        #
+        # Rebase PECOFF to load address
+        #
+        RunCommand (
+            "GenFw -e SEC -o {} {}".format (
+              TargetRebaseFile,
+              fit_image_info_header.Binary
+            ))
+        RunCommand (
+            "GenFw --rebase 0x{:02X} -o {} {} ".format (
+              fit_image_info_header.LoadAddr + fit_image_info_header.DataOffset,
+              TargetRebaseFile,
+              TargetRebaseFile,
+            ))
+
+        #
+        # Open PECOFF relocation table binary.
+        #
+        RelocBinary     = b''
+        PeCoff = pefile.PE (TargetRebaseFile)
+        for reloc in PeCoff.DIRECTORY_ENTRY_BASERELOC:
+            for entry in reloc.entries:
+                if (entry.type == 0):
+                    continue
+                Type = entry.type
+                Offset = entry.rva + fit_image_info_header.DataOffset
+                RelocBinary += Type.to_bytes (8, 'little') + Offset.to_bytes (8, 'little')
+        RelocBinary += b'\x00' * (0x1000 - (len(RelocBinary) % 0x1000))
+
+        #
+        # Output UniversalPayload.entry
+        #
+        TempBinary = open (TargetRebaseFile, 'rb')
+        TianoBinary = TempBinary.read ()
+        TempBinary.close ()
+
+        TianoEntryBinary = TianoBinary + RelocBinary
+        TianoEntryBinary += (b'\x00' * (0x1000 - (len(TianoBinary) % 0x1000)))
+        TianoEntryBinarySize = len (TianoEntryBinary)
+
+        TempBinary = open(TargetRebaseEntryFile, "wb")
+        TempBinary.truncate()
+        TempBinary.write(TianoEntryBinary)
+        TempBinary.close()
+
+        #
+        # Calculate entry and update relocation table start address and data-size.
+        #
+        fit_image_info_header.Entry      = PeCoff.OPTIONAL_HEADER.ImageBase + PeCoff.OPTIONAL_HEADER.AddressOfEntryPoint
+        fit_image_info_header.RelocStart = fit_image_info_header.DataOffset + len(TianoBinary)
+        fit_image_info_header.DataSize   = TianoEntryBinarySize
+        fit_image_info_header.Binary     = TargetRebaseEntryFile
+
+        if MkFitImage.MakeFitImage(fit_image_info_header) is True:
+            print('\nSuccessfully build Fit Image')
+        else:
+            sys.exit(1)
+        Args.PayloadEntryFormat = 'fit'
+    return MultiFvList, os.path.join(BuildDir, 'UniversalPayload.{}'.format (Args.PayloadEntryFormat))
 
 def main():
-    def ValidateSpecRevision (Argument):
-        try:
-            (MajorStr, MinorStr) = Argument.split('.')
-        except:
-            raise argparse.ArgumentTypeError ('{} is not a valid SpecRevision format (Major[8-bits].Minor[8-bits]).'.format (Argument))
-        #
-        # Spec Revision Bits 15 : 8 - Major Version. Bits 7 : 0 - Minor Version.
-        #
-        if len(MinorStr) > 0 and len(MinorStr) < 3:
-            try:
-                Minor = int(MinorStr, 16) if len(MinorStr) == 2 else (int(MinorStr, 16) << 4)
-            except:
-                raise argparse.ArgumentTypeError ('{} Minor version of SpecRevision is not a valid integer value.'.format (Argument))
-        else:
-            raise argparse.ArgumentTypeError ('{} is not a valid SpecRevision format (Major[8-bits].Minor[8-bits]).'.format (Argument))
-
-        if len(MajorStr) > 0 and len(MajorStr) < 3:
-            try:
-                Major = int(MajorStr, 16)
-            except:
-                raise argparse.ArgumentTypeError ('{} Major version of SpecRevision is not a valid integer value.'.format (Argument))
-        else:
-            raise argparse.ArgumentTypeError ('{} is not a valid SpecRevision format (Major[8-bits].Minor[8-bits]).'.format (Argument))
-
-        return int('0x{0:02x}{1:02x}'.format(Major, Minor), 0)
-
-    def Validate32BitInteger (Argument):
-        try:
-            Value = int (Argument, 0)
-        except:
-            raise argparse.ArgumentTypeError ('{} is not a valid integer value.'.format (Argument))
-        if Value < 0:
-            raise argparse.ArgumentTypeError ('{} is a negative value.'.format (Argument))
-        if Value > 0xffffffff:
-            raise argparse.ArgumentTypeError ('{} is larger than 32-bits.'.format (Argument))
-        return Value
-
-    def ValidateAddFv (Argument):
-        Value = Argument.split ("=")
-        if len (Value) != 2:
-            raise argparse.ArgumentTypeError ('{} is incorrect format with "xxx_fv=xxx.fv"'.format (Argument))
-        if Value[0][-3:] != "_fv":
-            raise argparse.ArgumentTypeError ('{} is incorrect format with "xxx_fv=xxx.fv"'.format (Argument))
-        if Value[1][-3:].lower () != ".fv":
-            raise argparse.ArgumentTypeError ('{} is incorrect format with "xxx_fv=xxx.fv"'.format (Argument))
-        if os.path.exists (Value[1]) == False:
-            raise argparse.ArgumentTypeError ('File {} is not found.'.format (Value[1]))
-        return Value
-
     parser = argparse.ArgumentParser(description='For building Universal Payload')
     parser.add_argument('-t', '--ToolChain')
     parser.add_argument('-b', '--Target', default='DEBUG')
@@ -187,12 +311,20 @@ def main():
     parser.add_argument("-s", "--SpecRevision", type=ValidateSpecRevision, default ='0.7', help='Indicates compliance with a revision of this specification in the BCD format.')
     parser.add_argument("-r", "--Revision", type=Validate32BitInteger, default ='0x0000010105', help='Revision of the Payload binary. Major.Minor.Revision.Build')
     parser.add_argument("-o", "--ProducerId", default ='INTEL', help='A null-terminated OEM-supplied string that identifies the payload producer (16 bytes maximal).')
+    parser.add_argument("-e", "--BuildEntryOnly", action='store_true', help='Build UniversalPayload Entry file')
+    parser.add_argument("-pb", "--PreBuildUplBinary", default=None, help='Specify the UniversalPayload file')
     parser.add_argument("-sk", "--SkipBuild", action='store_true', help='Skip UniversalPayload build')
     parser.add_argument("-af", "--AddFv", type=ValidateAddFv, action='append', help='Add or replace specific FV into payload, Ex: uefi_fv=XXX.fv')
-    command_group = parser.add_mutually_exclusive_group()
-    command_group.add_argument("-e", "--BuildEntryOnly", action='store_true', help='Build UniversalPayload Entry file')
-    command_group.add_argument("-pb", "--PreBuildUplBinary", default=None, help='Specify the UniversalPayload file')
+    known_args, _ = parser.parse_known_args()
+    if (known_args.SpecRevision >= 0x0100):
+        parser.add_argument('--pecoff', dest='PayloadEntryFormat', action='store_true', default=True)
+        parser.add_argument('-l', "--LoadAddress", type=int, help='Specify payload load address', default =0x000800000)
+
     args = parser.parse_args()
+    if (hasattr (args, 'PayloadEntryFormat') == False):
+        args.PayloadEntryFormat = 'elf'
+    else:
+        args.PayloadEntryFormat = "pecoff" if args.PayloadEntryFormat == True else "elf"
 
     MultiFvList = []
     UniversalPayloadBinary = args.PreBuildUplBinary
@@ -203,12 +335,24 @@ def main():
         for (SectionName, SectionFvFile) in args.AddFv:
             MultiFvList.append ([SectionName, SectionFvFile])
 
+    def ReplaceFv (UplBinary, SectionFvFile, SectionName):
+        print (bcolors.OKGREEN + "Patch {}={} into {}".format (SectionName, SectionFvFile, UplBinary) + bcolors.ENDC)
+        if (args.SpecRevision < 0x0100):
+            import Tools.ElfFv as ElfFv
+            return ElfFv.ReplaceFv (UplBinary, SectionFvFile, '.upld.{}'.format (SectionName))
+        else:
+            import Tools.MkFitImage as MkFitImage
+            return MkFitImage.ReplaceFv (UplBinary, SectionFvFile, SectionName)
+
     if (UniversalPayloadBinary != None):
         for (SectionName, SectionFvFile) in MultiFvList:
             if os.path.exists (SectionFvFile) == False:
                 continue
-            print ("Patch {}={} into {}".format (SectionName, SectionFvFile, UniversalPayloadBinary))
-            ReplaceFv (UniversalPayloadBinary, SectionFvFile, '.upld.{}'.format (SectionName))
+
+            status = ReplaceFv (UniversalPayloadBinary, SectionFvFile, SectionName.replace ("_", "-"))
+            if status != 0:
+                print (bcolors.FAIL + "[Fail] Patch {}={}".format (SectionName, SectionFvFile) + bcolors.ENDC)
+                return status
 
     print ("\nSuccessfully build Universal Payload")
 
