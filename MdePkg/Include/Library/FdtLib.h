@@ -398,4 +398,21 @@ FdtSetProp (
   IN UINT32       Length
   );
 
+/**
+  Returns the name of a given node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] StrOffset      structure block offset of the starting node.
+  @param[in] Length         The pointer to an integer variable (will be overwritten) or NULL
+
+  @return The pointer to the node's name.
+
+**/
+CONST CHAR8 *
+EFIAPI
+FdtGetName (
+  IN VOID         *Fdt,
+  IN INT32        NodeOffset,
+  IN UINT32       *Length
+  );
 #endif /* FDT_LIB_H_ */
