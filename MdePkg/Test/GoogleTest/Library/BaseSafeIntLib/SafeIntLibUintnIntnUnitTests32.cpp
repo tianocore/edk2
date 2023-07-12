@@ -14,10 +14,10 @@ extern "C" {
   #include <Library/SafeIntLib.h>
 }
 
-TEST(ConversionTestSuite, TestSafeInt32ToUintn) {
+TEST (ConversionTestSuite, TestSafeInt32ToUintn) {
   RETURN_STATUS  Status;
-  INT32       Operand;
-  UINTN       Result;
+  INT32          Operand;
+  UINTN          Result;
 
   //
   // If Operand is non-negative, then it's a cast
@@ -36,10 +36,10 @@ TEST(ConversionTestSuite, TestSafeInt32ToUintn) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(ConversionTestSuite, TestSafeUint32ToIntn) {
+TEST (ConversionTestSuite, TestSafeUint32ToIntn) {
   RETURN_STATUS  Status;
-  UINT32      Operand;
-  INTN        Result;
+  UINT32         Operand;
+  INTN           Result;
 
   //
   // If Operand is <= MAX_INTN, then it's a cast
@@ -58,10 +58,10 @@ TEST(ConversionTestSuite, TestSafeUint32ToIntn) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(ConversionTestSuite, TestSafeIntnToInt32) {
+TEST (ConversionTestSuite, TestSafeIntnToInt32) {
   RETURN_STATUS  Status;
-  INTN        Operand;
-  INT32       Result;
+  INTN           Operand;
+  INT32          Result;
 
   //
   // INTN is same as INT32 in IA32, so this is just a cast
@@ -73,10 +73,10 @@ TEST(ConversionTestSuite, TestSafeIntnToInt32) {
   ASSERT_EQ (0x5bababab, Result);
 }
 
-TEST(ConversionTestSuite, TestSafeIntnToUint32) {
+TEST (ConversionTestSuite, TestSafeIntnToUint32) {
   RETURN_STATUS  Status;
-  INTN        Operand;
-  UINT32      Result;
+  INTN           Operand;
+  UINT32         Result;
 
   //
   // If Operand is non-negative, then it's a cast
@@ -95,10 +95,10 @@ TEST(ConversionTestSuite, TestSafeIntnToUint32) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(ConversionTestSuite, TestSafeUintnToUint32) {
+TEST (ConversionTestSuite, TestSafeUintnToUint32) {
   RETURN_STATUS  Status;
-  UINTN       Operand;
-  UINT32      Result;
+  UINTN          Operand;
+  UINT32         Result;
 
   //
   // UINTN is same as UINT32 in IA32, so this is just a cast
@@ -110,10 +110,10 @@ TEST(ConversionTestSuite, TestSafeUintnToUint32) {
   ASSERT_EQ (0xabababab, Result);
 }
 
-TEST(ConversionTestSuite, TestSafeUintnToIntn) {
+TEST (ConversionTestSuite, TestSafeUintnToIntn) {
   RETURN_STATUS  Status;
-  UINTN       Operand;
-  INTN        Result;
+  UINTN          Operand;
+  INTN           Result;
 
   //
   // If Operand is <= MAX_INTN, then it's a cast
@@ -132,10 +132,10 @@ TEST(ConversionTestSuite, TestSafeUintnToIntn) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(ConversionTestSuite, TestSafeUintnToInt64) {
+TEST (ConversionTestSuite, TestSafeUintnToInt64) {
   RETURN_STATUS  Status;
-  UINTN       Operand;
-  INT64       Result;
+  UINTN          Operand;
+  INT64          Result;
 
   //
   // UINTN is same as UINT32 in IA32, and UINT32 is a subset of
@@ -148,10 +148,10 @@ TEST(ConversionTestSuite, TestSafeUintnToInt64) {
   ASSERT_EQ (0xabababab, Result);
 }
 
-TEST(ConversionTestSuite, TestSafeInt64ToIntn) {
+TEST (ConversionTestSuite, TestSafeInt64ToIntn) {
   RETURN_STATUS  Status;
-  INT64       Operand;
-  INTN        Result;
+  INT64          Operand;
+  INTN           Result;
 
   //
   // If Operand is between MIN_INTN and  MAX_INTN2 inclusive, then it's a cast
@@ -179,10 +179,10 @@ TEST(ConversionTestSuite, TestSafeInt64ToIntn) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(ConversionTestSuite, TestSafeInt64ToUintn) {
+TEST (ConversionTestSuite, TestSafeInt64ToUintn) {
   RETURN_STATUS  Status;
-  INT64       Operand;
-  UINTN       Result;
+  INT64          Operand;
+  UINTN          Result;
 
   //
   // If Operand is between 0 and  MAX_UINTN inclusive, then it's a cast
@@ -205,10 +205,10 @@ TEST(ConversionTestSuite, TestSafeInt64ToUintn) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(ConversionTestSuite, TestSafeUint64ToIntn) {
+TEST (ConversionTestSuite, TestSafeUint64ToIntn) {
   RETURN_STATUS  Status;
-  UINT64      Operand;
-  INTN        Result;
+  UINT64         Operand;
+  INTN           Result;
 
   //
   // If Operand is <= MAX_INTN, then it's a cast
@@ -227,10 +227,10 @@ TEST(ConversionTestSuite, TestSafeUint64ToIntn) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(ConversionTestSuite, TestSafeUint64ToUintn) {
+TEST (ConversionTestSuite, TestSafeUint64ToUintn) {
   RETURN_STATUS  Status;
-  UINT64      Operand;
-  UINTN       Result;
+  UINT64         Operand;
+  UINTN          Result;
 
   //
   // If Operand is <= MAX_UINTN, then it's a cast
@@ -249,11 +249,11 @@ TEST(ConversionTestSuite, TestSafeUint64ToUintn) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(AdditionSubtractionTestSuite, TestSafeUintnAdd) {
+TEST (AdditionSubtractionTestSuite, TestSafeUintnAdd) {
   RETURN_STATUS  Status;
-  UINTN       Augend;
-  UINTN       Addend;
-  UINTN       Result;
+  UINTN          Augend;
+  UINTN          Addend;
+  UINTN          Result;
 
   //
   // If the result of addition doesn't overflow MAX_UINTN, then it's addition
@@ -274,11 +274,11 @@ TEST(AdditionSubtractionTestSuite, TestSafeUintnAdd) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(AdditionSubtractionTestSuite, TestSafeIntnAdd) {
+TEST (AdditionSubtractionTestSuite, TestSafeIntnAdd) {
   RETURN_STATUS  Status;
-  INTN        Augend;
-  INTN        Addend;
-  INTN        Result;
+  INTN           Augend;
+  INTN           Addend;
+  INTN           Result;
 
   //
   // If the result of addition doesn't overflow MAX_INTN
@@ -311,11 +311,11 @@ TEST(AdditionSubtractionTestSuite, TestSafeIntnAdd) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(AdditionSubtractionTestSuite, TestSafeUintnSub) {
+TEST (AdditionSubtractionTestSuite, TestSafeUintnSub) {
   RETURN_STATUS  Status;
-  UINTN       Minuend;
-  UINTN       Subtrahend;
-  UINTN       Result;
+  UINTN          Minuend;
+  UINTN          Subtrahend;
+  UINTN          Result;
 
   //
   // If Minuend >= Subtrahend, then it's subtraction
@@ -336,11 +336,11 @@ TEST(AdditionSubtractionTestSuite, TestSafeUintnSub) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(AdditionSubtractionTestSuite, TestSafeIntnSub) {
+TEST (AdditionSubtractionTestSuite, TestSafeIntnSub) {
   RETURN_STATUS  Status;
-  INTN        Minuend;
-  INTN        Subtrahend;
-  INTN        Result;
+  INTN           Minuend;
+  INTN           Subtrahend;
+  INTN           Result;
 
   //
   // If the result of subtractions doesn't overflow MAX_INTN or
@@ -373,11 +373,11 @@ TEST(AdditionSubtractionTestSuite, TestSafeIntnSub) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(MultiplicationTestSuite, TestSafeUintnMult) {
+TEST (MultiplicationTestSuite, TestSafeUintnMult) {
   RETURN_STATUS  Status;
-  UINTN       Multiplicand;
-  UINTN       Multiplier;
-  UINTN       Result;
+  UINTN          Multiplicand;
+  UINTN          Multiplier;
+  UINTN          Result;
 
   //
   // If the result of multiplication doesn't overflow MAX_UINTN, it will succeed
@@ -398,11 +398,11 @@ TEST(MultiplicationTestSuite, TestSafeUintnMult) {
   ASSERT_EQ (RETURN_BUFFER_TOO_SMALL, Status);
 }
 
-TEST(MultiplicationTestSuite, TestSafeIntnMult) {
+TEST (MultiplicationTestSuite, TestSafeIntnMult) {
   RETURN_STATUS  Status;
-  INTN        Multiplicand;
-  INTN        Multiplier;
-  INTN        Result;
+  INTN           Multiplicand;
+  INTN           Multiplier;
+  INTN           Result;
 
   //
   // If the result of multiplication doesn't overflow MAX_INTN and doesn't
