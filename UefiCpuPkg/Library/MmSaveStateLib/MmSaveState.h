@@ -14,7 +14,7 @@
 #include <Protocol/MmCpu.h>
 #include <Library/DebugLib.h>
 #include <Library/MmSaveStateLib.h>
-#include <Library/SmmServicesTableLib.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/BaseMemoryLib.h>
 
 // Macro used to simplify the lookup table entries of type CPU_MM_SAVE_STATE_REGISTER_RANGE
