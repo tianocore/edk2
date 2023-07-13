@@ -188,6 +188,10 @@ ReSendRequest:;
   }
 
   if (EFI_ERROR (Status)) {
+    //
+    // Communication failure happens. Reset the session.
+    //
+    ResetHttpTslSession (Instance);
     goto ON_EXIT;
   }
 
