@@ -402,8 +402,8 @@ FdtSetProp (
   Returns the name of a given node.
 
   @param[in] Fdt            The pointer to FDT blob.
-  @param[in] StrOffset      structure block offset of the starting node.
-  @param[in] Length         The pointer to an integer variable (will be overwritten) or NULL
+  @param[in] NodeOffset     The offset to the node offset which want to find its name.
+  @param[in] Length         The pointer to an integer variable (will be overwritten) or NULL.
 
   @return The pointer to the node's name.
 
