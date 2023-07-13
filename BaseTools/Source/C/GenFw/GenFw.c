@@ -86,6 +86,7 @@ UINT32 mImageSize = 0;
 UINT32 mOutImageType = FW_DUMMY_IMAGE;
 BOOLEAN mIsConvertXip = FALSE;
 BOOLEAN mExportFlag = FALSE;
+BOOLEAN mNoNxCompat = FALSE;
 
 STATIC
 EFI_STATUS
@@ -281,6 +282,9 @@ Returns:
                         write export table into PE-COFF.\n\
                         This option can be used together with -e.\n\
                         It doesn't work for other options.\n");
+  fprintf (stdout, "  --nonxcompat          Do not set the IMAGE_DLLCHARACTERISTICS_NX_COMPAT bit \n\
+                        of the optional header in the PE header even if the \n\
+                        requirements are met.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
   fprintf (stdout, "  -d, --debug level     Enable debug messages, at input debug level.\n");
@@ -439,6 +443,59 @@ Returns:
   }
 
   return STATUS_SUCCESS;
+}
+
+/**
+
+  Checks if the Pe image is nxcompat compliant.
+
+  Must meet the following conditions:
+  1. The PE is 64bit
+  2. The section alignment is evenly divisible by 4k
+  3. No section is writable and executable.
+
+  @param  PeHdr     - The PE header
+
+  @retval TRUE      - The PE is nx compat compliant
+  @retval FALSE     - The PE is not nx compat compliant
+
+**/
+STATIC
+BOOLEAN
+IsNxCompatCompliant (
+  EFI_IMAGE_OPTIONAL_HEADER_UNION  *PeHdr
+  )
+{
+  EFI_IMAGE_SECTION_HEADER     *SectionHeader;
+  UINT32                       Index;
+  UINT32                       Mask;
+
+  // Must have an optional header to perform verification
+  if (PeHdr->Pe32.FileHeader.SizeOfOptionalHeader == 0) {
+    return FALSE;
+  }
+
+  // Verify PE is 64 bit
+  if (!(PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC)) {
+    return FALSE;
+  }
+
+  // Verify Section Alignment is divisible by 4K
+  if (!((PeHdr->Pe32Plus.OptionalHeader.SectionAlignment % EFI_PAGE_SIZE) == 0)) {
+    return FALSE;
+  }
+
+  // Verify sections are not Write & Execute
+  Mask = EFI_IMAGE_SCN_MEM_EXECUTE | EFI_IMAGE_SCN_MEM_WRITE;
+  SectionHeader = (EFI_IMAGE_SECTION_HEADER *) ((UINT8 *) &(PeHdr->Pe32Plus.OptionalHeader) + PeHdr->Pe32Plus.FileHeader.SizeOfOptionalHeader);
+  for (Index = 0; Index < PeHdr->Pe32Plus.FileHeader.NumberOfSections; Index ++, SectionHeader ++) {
+    if ((SectionHeader->Characteristics & Mask) == Mask) {
+      return FALSE;
+    }
+  }
+
+  // Passed all requirements, return TRUE
+  return TRUE;
 }
 
 VOID
@@ -1452,6 +1509,13 @@ Returns:
       continue;
     }
 
+    if (stricmp (argv[0], "--nonxcompat") == 0) {
+      mNoNxCompat = TRUE;
+      argc --;
+      argv ++;
+      continue;
+    }
+
     if (argv[0][0] == '-') {
       Error (NULL, 0, 1000, "Unknown option", argv[0]);
       goto Finish;
@@ -2457,6 +2521,11 @@ Returns:
     TEImageHeader.AddressOfEntryPoint = Optional64->AddressOfEntryPoint;
     TEImageHeader.BaseOfCode          = Optional64->BaseOfCode;
     TEImageHeader.ImageBase           = (UINT64) (Optional64->ImageBase);
+
+    // Set NxCompat flag
+    if (IsNxCompatCompliant (PeHdr) && !mNoNxCompat) {
+      Optional64->DllCharacteristics |= IMAGE_DLLCHARACTERISTICS_NX_COMPAT;
+    }
 
     if (Optional64->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
       TEImageHeader.DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = Optional64->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
