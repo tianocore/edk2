@@ -86,21 +86,6 @@ AddMemoryRangeHob (
 }
 
 /**
-  Configure MMU
-**/
-STATIC
-VOID
-InitMmu (
-  )
-{
-  //
-  // Set supervisor translation mode to Bare mode
-  //
-  RiscVSetSupervisorAddressTranslationRegister ((UINT64)SATP_MODE_OFF << 60);
-  DEBUG ((DEBUG_INFO, "%a: Set Supervisor address mode to bare-metal mode.\n", __func__));
-}
-
-/**
   Publish system RAM and reserve memory regions.
 
 **/
@@ -327,7 +312,8 @@ MemoryPeimInitialization (
 
   AddReservedMemoryMap (FdtPointer);
 
-  InitMmu ();
+  /* Make sure SEC is booting with bare mode */
+  ASSERT ((RiscVGetSupervisorAddressTranslationRegister () & SATP64_MODE) == (SATP_MODE_OFF << SATP64_MODE_SHIFT));
 
   BuildMemoryTypeInformationHob ();
 
