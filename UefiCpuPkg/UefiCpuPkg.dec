@@ -64,6 +64,11 @@
   ## @libraryclass   Provides functions for manipulating smram savestate registers.
   MmSaveStateLib|Include/Library/MmSaveStateLib.h
 
+[LibraryClasses.RISCV64]
+  ##  @libraryclass  Provides functions to manage MMU features on RISCV64 CPUs.
+  ##
+  RiscVMmuLib|Include/Library/BaseRiscVMmuLib.h
+
 [Guids]
   gUefiCpuPkgTokenSpaceGuid      = { 0xac05bf33, 0x995a, 0x4ed4, { 0xaa, 0xb8, 0xef, 0x7a, 0xe8, 0xf, 0x5c, 0xb0 }}
   gMsegSmramGuid                 = { 0x5802bce4, 0xeeee, 0x4e33, { 0xa1, 0x30, 0xeb, 0xad, 0x27, 0xf0, 0xe4, 0x39 }}
