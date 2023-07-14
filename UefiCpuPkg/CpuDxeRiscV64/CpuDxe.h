@@ -15,11 +15,13 @@
 #include <Protocol/Cpu.h>
 #include <Protocol/RiscVBootProtocol.h>
 #include <Library/BaseRiscVSbiLib.h>
+#include <Library/BaseRiscVMmuLib.h>
 #include <Library/BaseLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiDriverEntryPoint.h>
+#include <Register/RiscV64/RiscVEncoding.h>
 
 /**
   Flush CPU data cache. If the instruction cache is fully coherent
