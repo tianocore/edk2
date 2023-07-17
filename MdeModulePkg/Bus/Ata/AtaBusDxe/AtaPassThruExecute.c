@@ -362,7 +362,7 @@ IdentifyAtaDevice (
     // Check logical block size
     //
     if ((PhyLogicSectorSupport & BIT12) != 0) {
-      BlockMedia->BlockSize = (UINT32)(((IdentifyData->logic_sector_size_hi << 16) | IdentifyData->logic_sector_size_lo) * sizeof (UINT16));
+      BlockMedia->BlockSize = (UINT32)(((UINT32)(IdentifyData->logic_sector_size_hi << 16) | IdentifyData->logic_sector_size_lo) * sizeof (UINT16));
     }
 
     AtaDevice->BlockIo.Revision = EFI_BLOCK_IO_PROTOCOL_REVISION2;
