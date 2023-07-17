@@ -62,10 +62,6 @@ NvmeS3SkipThisController (
     }
   }
 
-  if (S3InitDevices == NULL) {
-    return Skip;
-  }
-
   //
   // Only need to initialize the controllers that exist in the device list.
   //
