@@ -255,7 +255,6 @@
   $(OPENSSL_PATH)/crypto/ec/eck_prn.c
   $(OPENSSL_PATH)/crypto/ec/ecp_mont.c
   $(OPENSSL_PATH)/crypto/ec/ecp_nist.c
-  $(OPENSSL_PATH)/crypto/ec/ecp_nistz256.c
   $(OPENSSL_PATH)/crypto/ec/ecp_oct.c
   $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c
   $(OPENSSL_PATH)/crypto/ec/ecx_backend.c
@@ -948,7 +947,6 @@
   $(OPENSSL_PATH)/crypto/ec/eck_prn.c
   $(OPENSSL_PATH)/crypto/ec/ecp_mont.c
   $(OPENSSL_PATH)/crypto/ec/ecp_nist.c
-  $(OPENSSL_PATH)/crypto/ec/ecp_nistz256.c
   $(OPENSSL_PATH)/crypto/ec/ecp_oct.c
   $(OPENSSL_PATH)/crypto/ec/ecp_smpl.c
   $(OPENSSL_PATH)/crypto/ec/ecx_backend.c
