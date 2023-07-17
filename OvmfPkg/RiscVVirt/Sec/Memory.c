@@ -141,21 +141,10 @@ GetNumCells (
 
 /** Mark reserved memory ranges in the EFI memory map
 
-  The M-mode firmware ranges should not be used by the
-  EDK2/OS. These ranges are passed via device tree using reserved
-  memory nodes. Parse the DT and mark those ranges as of
-  type EfiReservedMemoryType.
-
-  NOTE: Device Tree spec section 3.5.4 says reserved memory regions
-  without no-map property should be installed as EfiBootServicesData.
-  As per UEFI spec, memory of type EfiBootServicesData can be used
-  by the OS after ExitBootServices().
-  This is not an issue for DT since OS can parse the DT also along
-  with EFI memory map and avoid using these ranges. But with ACPI,
-  there is no such mechanisms possible.
-  Since EDK2 needs to support both DT and ACPI, we are deviating
-  from the DT spec and marking all reserved memory ranges as
-  EfiReservedMemoryType itself irrespective of no-map.
+ * As per DT spec v0.4 Section 3.5.4,
+ * "Reserved regions with the no-map property must be listed in the
+ * memory map with type EfiReservedMemoryType. All other reserved
+ * regions must be listed with type EfiBootServicesData."
 
   @param FdtPointer Pointer to FDT
 
@@ -228,11 +217,19 @@ AddReservedMemoryMap (
           Size
           ));
 
-        BuildMemoryAllocationHob (
-          Addr,
-          Size,
-          EfiReservedMemoryType
-          );
+        if (fdt_getprop (FdtPointer, SubNode, "no-map", &Len)) {
+          BuildMemoryAllocationHob (
+            Addr,
+            Size,
+            EfiReservedMemoryType
+            );
+        } else {
+          BuildMemoryAllocationHob (
+            Addr,
+            Size,
+            EfiBootServicesData
+            );
+        }
       }
     }
   }
