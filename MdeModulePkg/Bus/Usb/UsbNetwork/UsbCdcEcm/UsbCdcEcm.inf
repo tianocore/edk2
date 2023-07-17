@@ -1,0 +1,42 @@
+## @file
+#   This is Usb Cdc Ecm driver for DXE phase.
+#
+# Copyright (c) 2023, American Megatrends International LLC. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UsbCdcEcm
+  FILE_GUID                      = 07a84945-685d-48ec-a6a1-1b397579fa76
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UsbEcmEntry
+
+[Sources]
+  UsbCdcEcm.c
+  UsbCdcEcm.h
+  UsbEcmFunction.c
+  ComponentName.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiLib
+  DebugLib
+  UefiUsbLib
+  MemoryAllocationLib
+  BaseMemoryLib
+
+[Protocols]
+  gEfiUsbIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiDriverBindingProtocolGuid
+  gEdkIIUsbEthProtocolGuid
+
+[Depex]
+  TRUE
