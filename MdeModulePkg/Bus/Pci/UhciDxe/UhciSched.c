@@ -214,6 +214,10 @@ UhciConvertPollRate (
 
   ASSERT (Interval != 0);
 
+  if (Interval == 0) {
+    return 0;
+  }
+
   //
   // Find the index (1 based) of the highest non-zero bit
   //
