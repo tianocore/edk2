@@ -1345,7 +1345,7 @@ AtaPassThruPassThru (
     // Check logical block size
     //
     if ((IdentifyData->AtaData.phy_logic_sector_support & BIT12) != 0) {
-      BlockSize = (UINT32)(((IdentifyData->AtaData.logic_sector_size_hi << 16) | IdentifyData->AtaData.logic_sector_size_lo) * sizeof (UINT16));
+      BlockSize = (UINT32)(((UINT32)(IdentifyData->AtaData.logic_sector_size_hi << 16) | IdentifyData->AtaData.logic_sector_size_lo) * sizeof (UINT16));
     }
   }
 
