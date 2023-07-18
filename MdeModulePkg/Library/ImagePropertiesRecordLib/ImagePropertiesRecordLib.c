@@ -277,7 +277,7 @@ GetMaxSplitRecordCount (
       break;
     }
 
-    SplitRecordCount += (2 * ImageRecord->CodeSegmentCount + 1);
+    SplitRecordCount += (2 * ImageRecord->CodeSegmentCount + 3);
     PhysicalStart     = ImageRecord->ImageBase + ImageRecord->ImageSize;
   } while ((ImageRecord != NULL) && (PhysicalStart < PhysicalEnd));
 
@@ -323,7 +323,6 @@ SplitRecord (
   UINT64                   PhysicalEnd;
   UINTN                    NewRecordCount;
   UINTN                    TotalNewRecordCount;
-  BOOLEAN                  IsLastRecordData;
 
   if (MaxSplitRecordCount == 0) {
     CopyMem (NewRecord, OldRecord, DescriptorSize);
@@ -344,41 +343,40 @@ SplitRecord (
     NewImageRecord = GetImageRecordByAddress (PhysicalStart, PhysicalEnd - PhysicalStart, ImageRecordList);
     if (NewImageRecord == NULL) {
       //
-      // No more image covered by this range, stop
+      // No more images cover this range, check if we've reached the end of the old descriptor. If not,
+      // add the remaining range to the new descriptor list.
       //
-      if ((PhysicalEnd > PhysicalStart) && (ImageRecord != NULL)) {
-        //
-        // If this is still address in this record, need record.
-        //
-        NewRecord        = PREVIOUS_MEMORY_DESCRIPTOR (NewRecord, DescriptorSize);
-        IsLastRecordData = FALSE;
-        if ((NewRecord->Attribute & EFI_MEMORY_XP) != 0) {
-          IsLastRecordData = TRUE;
-        }
-
-        if (IsLastRecordData) {
-          //
-          // Last record is DATA, just merge it.
-          //
-          NewRecord->NumberOfPages = EfiSizeToPages (PhysicalEnd - NewRecord->PhysicalStart);
-        } else {
-          //
-          // Last record is CODE, create a new DATA entry.
-          //
-          NewRecord                = NEXT_MEMORY_DESCRIPTOR (NewRecord, DescriptorSize);
-          NewRecord->Type          = TempRecord.Type;
-          NewRecord->PhysicalStart = TempRecord.PhysicalStart;
-          NewRecord->VirtualStart  = 0;
-          NewRecord->NumberOfPages = TempRecord.NumberOfPages;
-          NewRecord->Attribute     = TempRecord.Attribute | EFI_MEMORY_XP;
-          TotalNewRecordCount++;
-        }
+      if (PhysicalEnd > PhysicalStart) {
+        NewRecord->Type          = TempRecord.Type;
+        NewRecord->PhysicalStart = PhysicalStart;
+        NewRecord->VirtualStart  = 0;
+        NewRecord->NumberOfPages = EfiSizeToPages (PhysicalEnd - PhysicalStart);
+        NewRecord->Attribute     = TempRecord.Attribute;
+        TotalNewRecordCount++;
       }
 
       break;
     }
 
     ImageRecord = NewImageRecord;
+
+    //
+    // Update PhysicalStart to exclude the portion before the image buffer
+    //
+    if (TempRecord.PhysicalStart < ImageRecord->ImageBase) {
+      NewRecord->Type          = TempRecord.Type;
+      NewRecord->PhysicalStart = TempRecord.PhysicalStart;
+      NewRecord->VirtualStart  = 0;
+      NewRecord->NumberOfPages = EfiSizeToPages (ImageRecord->ImageBase - TempRecord.PhysicalStart);
+      NewRecord->Attribute     = TempRecord.Attribute;
+      TotalNewRecordCount++;
+
+      PhysicalStart            = ImageRecord->ImageBase;
+      TempRecord.PhysicalStart = PhysicalStart;
+      TempRecord.NumberOfPages = EfiSizeToPages (PhysicalEnd - PhysicalStart);
+
+      NewRecord = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)NewRecord + DescriptorSize);
+    }
 
     //
     // Set new record
@@ -465,11 +463,12 @@ SplitTable (
 {
   INTN   IndexOld;
   INTN   IndexNew;
+  INTN   IndexNewStarting;
   UINTN  MaxSplitRecordCount;
   UINTN  RealSplitRecordCount;
-  UINTN  TotalSplitRecordCount;
+  UINTN  TotalSkippedRecords;
 
-  TotalSplitRecordCount = 0;
+  TotalSkippedRecords = 0;
   //
   // Let old record point to end of valid MemoryMap buffer.
   //
@@ -477,7 +476,8 @@ SplitTable (
   //
   // Let new record point to end of full MemoryMap buffer.
   //
-  IndexNew = ((*MemoryMapSize) / DescriptorSize) - 1 + NumberOfAdditionalDescriptors;
+  IndexNew         = ((*MemoryMapSize) / DescriptorSize) - 1 + NumberOfAdditionalDescriptors;
+  IndexNewStarting = IndexNew;
   for ( ; IndexOld >= 0; IndexOld--) {
     MaxSplitRecordCount = GetMaxSplitRecordCount ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + IndexOld * DescriptorSize), ImageRecordList);
     //
@@ -491,16 +491,14 @@ SplitTable (
                              DescriptorSize,
                              ImageRecordList
                              );
-    //
-    // Adjust IndexNew according to real split.
-    //
-    CopyMem (
-      ((UINT8 *)MemoryMap + (IndexNew + MaxSplitRecordCount - RealSplitRecordCount) * DescriptorSize),
-      ((UINT8 *)MemoryMap + IndexNew * DescriptorSize),
-      RealSplitRecordCount * DescriptorSize
-      );
-    IndexNew               = IndexNew + MaxSplitRecordCount - RealSplitRecordCount;
-    TotalSplitRecordCount += RealSplitRecordCount;
+
+    // If we didn't utilize all the extra allocated descriptor slots, set the physical address of the unused slots
+    // to MAX_ADDRESS so they are moved to the bottom of the list when sorting.
+    for ( ; RealSplitRecordCount < MaxSplitRecordCount; RealSplitRecordCount++) {
+      ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + ((IndexNew + RealSplitRecordCount + 1) * DescriptorSize)))->PhysicalStart = MAX_ADDRESS;
+      TotalSkippedRecords++;
+    }
+
     IndexNew--;
   }
 
@@ -509,16 +507,16 @@ SplitTable (
   //
   CopyMem (
     MemoryMap,
-    (UINT8 *)MemoryMap + (NumberOfAdditionalDescriptors - TotalSplitRecordCount) * DescriptorSize,
-    (*MemoryMapSize) + TotalSplitRecordCount * DescriptorSize
+    (UINT8 *)MemoryMap + ((IndexNew + 1) * DescriptorSize),
+    (IndexNewStarting - IndexNew) * DescriptorSize
     );
 
-  *MemoryMapSize = (*MemoryMapSize) + DescriptorSize * TotalSplitRecordCount;
+  //
+  // Sort from low to high to filter out the MAX_ADDRESS records.
+  //
+  SortMemoryMap (MemoryMap, (IndexNewStarting - IndexNew) * DescriptorSize, DescriptorSize);
 
-  //
-  // Sort from low to high (Just in case)
-  //
-  SortMemoryMap (MemoryMap, *MemoryMapSize, DescriptorSize);
+  *MemoryMapSize = (IndexNewStarting - IndexNew - TotalSkippedRecords) * DescriptorSize;
 
   return;
 }
