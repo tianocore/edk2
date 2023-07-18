@@ -214,6 +214,17 @@
   # @Prompt Configure the SEV-ES work area base
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize|0x0|UINT32|0x30002006
 
+  ## INIT is now triggered before BIOS by ucode/hardware. In the OVMF
+  # environment, QEMU lacks a simulation for the INIT process.
+  # To address this, PcdFirstTimeWakeUpAPsBySipi is to indicate
+  # whether to broadcast INIT-SIPI-SIPI or SIPI.
+  #
+  #   TRUE  - Broadcast SIPI in the OVMF environment.
+  #   FALSE - Broadcast INIT-SIPI-SIPI.
+  #
+  # @Prompt Ovmf environement Check.
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|TRUE|BOOLEAN|0x30002007
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
   # @Prompt Configure base address of CPU Local APIC
