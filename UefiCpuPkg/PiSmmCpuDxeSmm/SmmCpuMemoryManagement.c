@@ -1062,14 +1062,17 @@ SetMemMapAttributes (
   MemoryMap = MemoryMapStart;
   for (Index = 0; Index < MemoryMapEntryCount; Index++) {
     DEBUG ((DEBUG_VERBOSE, "SetAttribute: Memory Entry - 0x%lx, 0x%x\n", MemoryMap->PhysicalStart, MemoryMap->NumberOfPages));
-    if (MemoryMap->Type == EfiRuntimeServicesCode) {
-      MemoryAttribute = EFI_MEMORY_RO;
-    } else {
-      ASSERT ((MemoryMap->Type == EfiRuntimeServicesData) || (MemoryMap->Type == EfiConventionalMemory));
-      //
-      // Set other type memory as NX.
-      //
-      MemoryAttribute = EFI_MEMORY_XP;
+    MemoryAttribute = MemoryMap->Attribute & EFI_MEMORY_ACCESS_MASK;
+    if (MemoryAttribute == 0) {
+      if (MemoryMap->Type == EfiRuntimeServicesCode) {
+        MemoryAttribute = EFI_MEMORY_RO;
+      } else {
+        ASSERT ((MemoryMap->Type == EfiRuntimeServicesData) || (MemoryMap->Type == EfiConventionalMemory));
+        //
+        // Set other type memory as NX.
+        //
+        MemoryAttribute = EFI_MEMORY_XP;
+      }
     }
 
     //
