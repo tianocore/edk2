@@ -164,6 +164,11 @@
   #
   VariableFlashInfoLib|Include/Library/VariableFlashInfoLib.h
 
+  ##  @libraryclass   Memory Attribute Table support logic for tracking and reporting
+  #                   runtime images
+  #
+  ImagePropertiesRecordLib|Include/Library/ImagePropertiesRecordLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
