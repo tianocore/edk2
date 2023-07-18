@@ -214,6 +214,17 @@
   # @Prompt Configure the SEV-ES work area base
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaSize|0x0|UINT32|0x30002006
 
+  ## Determining APs' first-time wakeup by SIPI or INIT-SIPI-SIPI.
+  # Following a power-up or RESET of an MP system, The APs complete a
+  # minimal self-configuration, then wait for a startup signal (a SIPI
+  # message) from the BSP processor.
+  #
+  #   TRUE  - Broadcast SIPI.
+  #   FALSE - Broadcast INIT-SIPI-SIPI.
+  #
+  # @Prompt BSP Broadcast Method for the first-time wakeup of APs
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|TRUE|BOOLEAN|0x30002007
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
   # @Prompt Configure base address of CPU Local APIC
