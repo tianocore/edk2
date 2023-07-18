@@ -1294,7 +1294,14 @@ WakeUpAP (
       if (CpuMpData->SevSnpIsEnabled && (CpuMpData->InitFlag != ApInitConfig)) {
         SevSnpCreateAP (CpuMpData, -1);
       } else {
-        SendInitSipiSipiAllExcludingSelf ((UINT32)ExchangeInfo->BufferStart);
+        if ((CpuMpData->InitFlag == ApInitConfig) && FixedPcdGetBool (PcdFirstTimeWakeUpAPsBySipi)) {
+          //
+          // SIPI can be used for the first time wake up after reset to reduce boot time.
+          //
+          SendStartupIpiAllExcludingSelf ((UINT32)ExchangeInfo->BufferStart);
+        } else {
+          SendInitSipiSipiAllExcludingSelf ((UINT32)ExchangeInfo->BufferStart);
+        }
       }
     }
 
