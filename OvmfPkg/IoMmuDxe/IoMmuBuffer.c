@@ -367,7 +367,9 @@ IoMmuAllocateBounceBuffer (
 {
   EFI_STATUS  Status;
   UINT32      ReservedMemBitmap;
+  EFI_TPL     OldTpl;
 
+  OldTpl            = gBS->RaiseTPL (TPL_NOTIFY);
   ReservedMemBitmap = 0;
   Status            = InternalAllocateBuffer (
                         Type,
@@ -378,6 +380,7 @@ IoMmuAllocateBounceBuffer (
                         );
   MapInfo->ReservedMemBitmap = ReservedMemBitmap;
   mReservedMemBitmap        |= ReservedMemBitmap;
+  gBS->RestoreTPL (OldTpl);
 
   ASSERT (Status == EFI_SUCCESS);
 
@@ -395,6 +398,8 @@ IoMmuFreeBounceBuffer (
   IN OUT     MAP_INFO  *MapInfo
   )
 {
+  EFI_TPL  OldTpl;
+
   if (MapInfo->ReservedMemBitmap == 0) {
     gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
   } else {
@@ -407,9 +412,11 @@ IoMmuFreeBounceBuffer (
       mReservedMemBitmap,
       mReservedMemBitmap & ((UINT32)(~MapInfo->ReservedMemBitmap))
       ));
+    OldTpl                     = gBS->RaiseTPL (TPL_NOTIFY);
     MapInfo->PlainTextAddress  = 0;
     mReservedMemBitmap        &= (UINT32)(~MapInfo->ReservedMemBitmap);
     MapInfo->ReservedMemBitmap = 0;
+    gBS->RestoreTPL (OldTpl);
   }
 
   return EFI_SUCCESS;
