@@ -546,7 +546,7 @@ TerminalConOutSetAttribute (
   //
   //  only the bit0..6 of the Attribute is valid
   //
-  if ((Attribute | 0x7f) != 0x7f) {
+  if ((Attribute | 0xff) != 0xff) {
     return EFI_UNSUPPORTED;
   }
 

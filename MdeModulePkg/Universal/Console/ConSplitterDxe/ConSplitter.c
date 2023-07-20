@@ -4933,7 +4933,7 @@ ConSplitterTextOutSetAttribute (
   //
   // Check whether param Attribute is valid.
   //
-  if ((Attribute | 0x7F) != 0x7F) {
+  if ((Attribute | 0xFF) != 0xFF) {
     return EFI_UNSUPPORTED;
   }
 
