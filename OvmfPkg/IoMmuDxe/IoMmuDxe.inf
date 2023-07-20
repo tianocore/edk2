@@ -35,6 +35,7 @@
   MemEncryptSevLib
   MemEncryptTdxLib
   MemoryAllocationLib
+  SynchronizationLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
