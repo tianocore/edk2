@@ -469,6 +469,7 @@ class FirmwareVolume:
         else:
             self.FvExtHdr = None
         self.FfsList  = []
+        self.ChildFvList  = []
 
     def ParseFv(self):
         fvsize = len(self.FvData)
@@ -483,8 +484,30 @@ class FirmwareVolume:
                 offset = fvsize
             else:
                 ffs = FirmwareFile (offset, self.FvData[offset:offset + int(ffshdr.Size)])
-                ffs.ParseFfs()
-                self.FfsList.append(ffs)
+                # check if there is child fv
+                childfvfound = 0
+                if (ffs.FfsHdr.Type == EFI_FV_FILETYPE.FIRMWARE_VOLUME_IMAGE):
+                    csoffset = offset + sizeof (EFI_FFS_FILE_HEADER)
+                    csoffset = AlignPtr(csoffset, 4)
+                    # find fv section
+                    while csoffset < (offset + int(ffs.FfsHdr.Size)):
+                        cshdr = EFI_COMMON_SECTION_HEADER.from_buffer (self.FvData, csoffset)
+                        if (cshdr.Type == EFI_SECTION_TYPE.FIRMWARE_VOLUME_IMAGE):
+                            childfvfound = 1
+                            break
+                        else:
+                            # check next section
+                            csoffset += int(cshdr.Size)
+                            csoffset = AlignPtr(csoffset, 4)
+                if (childfvfound):
+                    childfvoffset = csoffset + sizeof (EFI_COMMON_SECTION_HEADER)
+                    childfvhdr = EFI_FIRMWARE_VOLUME_HEADER.from_buffer (self.FvData, childfvoffset)
+                    childfv = FirmwareVolume (childfvoffset, self.FvData[childfvoffset:childfvoffset + int(childfvhdr.FvLength)])
+                    childfv.ParseFv ()
+                    self.ChildFvList.append(childfv)
+                else:
+                    ffs.ParseFfs()
+                    self.FfsList.append(ffs)
                 offset += int(ffshdr.Size)
                 offset = AlignPtr(offset)
 
@@ -789,6 +812,13 @@ def SplitFspBin (fspfile, outdir, nametemplate):
             hfsp.write(fv.FvData)
         hfsp.close()
 
+def GetImageFromFv (fd, parentfvoffset, fv, imglist):
+    for ffs in fv.FfsList:
+        for sec in ffs.SecList:
+            if sec.SecHdr.Type in [EFI_SECTION_TYPE.TE, EFI_SECTION_TYPE.PE32]:   # TE or PE32
+                offset = fd.Offset + parentfvoffset + fv.Offset + ffs.Offset + sec.Offset + sizeof(sec.SecHdr)
+                imglist.append ((offset, len(sec.SecData) - sizeof(sec.SecHdr)))
+
 def RebaseFspBin (FspBinary, FspComponent, FspBase, OutputDir, OutputFile):
     fd = FirmwareDevice(0, FspBinary)
     fd.ParseFd  ()
@@ -832,11 +862,11 @@ def RebaseFspBin (FspBinary, FspComponent, FspBase, OutputDir, OutputFile):
         imglist = []
         for fvidx in fsp.FvIdxList:
             fv = fd.FvList[fvidx]
-            for ffs in fv.FfsList:
-                for sec in ffs.SecList:
-                    if sec.SecHdr.Type in [EFI_SECTION_TYPE.TE, EFI_SECTION_TYPE.PE32]:   # TE or PE32
-                        offset = fd.Offset + fv.Offset + ffs.Offset + sec.Offset + sizeof(sec.SecHdr)
-                        imglist.append ((offset, len(sec.SecData) - sizeof(sec.SecHdr)))
+            GetImageFromFv (fd, 0, fv, imglist)
+            # get image from child fv
+            for childfv in fv.ChildFvList:
+                print ("Get image from child fv of fv%d, parent fv offset: 0x%x" % (fvidx, fv.Offset))
+                GetImageFromFv (fd, fv.Offset, childfv, imglist)
 
         fcount  = 0
         pcount  = 0
