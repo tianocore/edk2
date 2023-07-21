@@ -29,7 +29,8 @@ EFI_REST_EX_PROTOCOL  mRedfishRestExProtocol = {
   response when the data is retrieved from the service. RequestMessage contains the HTTP
   request to the REST resource identified by RequestMessage.Request.Url. The
   ResponseMessage is the returned HTTP response for that request, including any HTTP
-  status.
+  status. It's caller's responsibility to free this ResponseMessage using FreePool().
+  RestConfigFreeHttpMessage() in RedfishLib is an example to release ResponseMessage structure.
 
   @param[in]  This                Pointer to EFI_REST_EX_PROTOCOL instance for a particular
                                   REST service.
@@ -320,6 +321,18 @@ ReSendRequest:;
     DEBUG ((DEBUG_ERROR, "This HTTP Status is not handled!\n"));
     DumpHttpStatusCode (DEBUG_REDFISH_NETWORK, ResponseData->Response.StatusCode);
     Status = EFI_UNSUPPORTED;
+
+    //
+    // Deliver status code back to caller so caller can handle it.
+    //
+    ResponseMessage->Data.Response = AllocateZeroPool (sizeof (EFI_HTTP_RESPONSE_DATA));
+    if (ResponseMessage->Data.Response == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
+
+    ResponseMessage->Data.Response->StatusCode = ResponseData->Response.StatusCode;
+
     goto ON_EXIT;
   }
 
@@ -441,18 +454,6 @@ ON_EXIT:
 
   if (ResponseData != NULL) {
     FreePool (ResponseData);
-  }
-
-  if (EFI_ERROR (Status)) {
-    if (ResponseMessage->Data.Response != NULL) {
-      FreePool (ResponseMessage->Data.Response);
-      ResponseMessage->Data.Response = NULL;
-    }
-
-    if (ResponseMessage->Body != NULL) {
-      FreePool (ResponseMessage->Body);
-      ResponseMessage->Body = NULL;
-    }
   }
 
   return Status;
