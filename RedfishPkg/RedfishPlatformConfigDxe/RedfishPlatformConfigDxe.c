@@ -1660,12 +1660,11 @@ RedfishPlatformConfigSetStatementCommon (
     // in string format from HII point of view. Do a patch here.
     //
     if ((TargetStatement->HiiStatement->Operand == EFI_IFR_ONE_OF_OP) && (StatementValue->Type == EFI_IFR_TYPE_STRING)) {
-      TempBuffer = StrToUnicodeStr ((CHAR8 *)StatementValue->Buffer);
-      if (TempBuffer == NULL) {
-        return EFI_OUT_OF_RESOURCES;
-      }
-
-      FreePool (StatementValue->Buffer);
+      //
+      // Keep input buffer to TempBuffer because StatementValue will be
+      // assigned in HiiStringToOneOfOptionValue().
+      //
+      TempBuffer                = (EFI_STRING)StatementValue->Buffer;
       StatementValue->Buffer    = NULL;
       StatementValue->BufferLen = 0;
 
