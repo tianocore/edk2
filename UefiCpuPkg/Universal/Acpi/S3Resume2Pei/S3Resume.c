@@ -1107,6 +1107,13 @@ S3RestoreConfig2 (
     DEBUG ((DEBUG_INFO, "SMM S3 Smst                     = %x\n", SmmS3ResumeState->Smst));
 
     //
+    // 64bit PEI and 32bit DXE is not a supported combination.
+    //
+    if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) {
+      ASSERT (sizeof (UINTN) == sizeof (UINT32));
+    }
+
+    //
     // Directly do the switch stack when PEI and SMM env run in the same execution mode.
     //
     if (((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) && (sizeof (UINTN) == sizeof (UINT32))) ||
