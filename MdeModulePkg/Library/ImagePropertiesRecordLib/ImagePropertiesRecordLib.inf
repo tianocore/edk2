@@ -19,6 +19,10 @@
 [Sources.common]
   ImagePropertiesRecordLib.c
 
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
 
 [Packages]
   MdePkg/MdePkg.dec
