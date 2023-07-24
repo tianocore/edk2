@@ -33,6 +33,12 @@
 #define IPRIORITY_ADDRESS(base, offset)  ((base) +\
           ARM_GICR_CTLR_FRAME_SIZE + ARM_GIC_ICDIPR + 4 * (offset))
 
+#define ISPENDR_ADDRESS(base, offset)  ((base) +\
+          ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_ISPENDR + 4 * (offset))
+
+#define ICPENDR_ADDRESS(base, offset)  ((base) +\
+          ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_ICPENDR + 4 * (offset))
+
 /**
  *
  * Return whether the Source interrupt index refers to a shared interrupt (SPI)
@@ -434,6 +440,59 @@ ArmGicIsInterruptEnabled (
     // Read set-enable register
     Interrupts = MmioRead32 (
                    ISENABLER_ADDRESS (GicCpuRedistributorBase, RegOffset)
+                   );
+  }
+
+  return ((Interrupts & (1 << RegShift)) != 0);
+}
+
+/**
+  Check if an interrupt is pending in GIC.
+
+  @param GicDistributorBase    Base address of platform GIC Distributor.
+  @param GicRedistributorBase  Base address of platform GIC Redistributor.
+  @param Source                Interrupt source ID.
+
+  @return BOOLEAN   TRUE if the interrupt is pending, FALSE otherwise.
+**/
+BOOLEAN
+EFIAPI
+ArmGicIsInterruptPending (
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
+  )
+{
+  UINT32                 RegOffset;
+  UINTN                  RegShift;
+  ARM_GIC_ARCH_REVISION  Revision;
+  UINTN                  GicCpuRedistributorBase;
+  UINT32                 Interrupts;
+
+  // Calculate enable register offset and bit position
+  RegOffset = (UINT32)(Source / 32);
+  RegShift  = Source % 32;
+
+  Revision = ArmGicGetSupportedArchRevision ();
+  if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
+      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
+      SourceIsSpi (Source))
+  {
+    Interrupts = MmioRead32 (
+                   GicDistributorBase + ARM_GIC_ICDSPR + (4 * RegOffset)
+                   );
+  } else {
+    GicCpuRedistributorBase = GicGetCpuRedistributorBase (
+                                GicRedistributorBase,
+                                Revision
+                                );
+    if (GicCpuRedistributorBase == 0) {
+      return 0;
+    }
+
+    // Read set-enable register
+    Interrupts = MmioRead32 (
+                   ISPENDR_ADDRESS (GicCpuRedistributorBase, RegOffset)
                    );
   }
 
