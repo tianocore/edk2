@@ -78,6 +78,8 @@
 // GIC SGI & PPI Redistributor frame
 #define ARM_GICR_ISENABLER  0x0100      // Interrupt Set-Enable Registers
 #define ARM_GICR_ICENABLER  0x0180      // Interrupt Clear-Enable Registers
+#define ARM_GICR_ISPENDR    0x0200      // Interrupt Set-Pending Registers
+#define ARM_GICR_ICPENDR    0x0280      // Interrupt Clear-Pending Registers
 
 // GIC Cpu interface
 #define ARM_GIC_ICCICR   0x00         // CPU Interface Control Register
@@ -165,6 +167,53 @@ VOID
 EFIAPI
 ArmGicDisableInterruptInterface (
   IN  UINTN  GicInterruptInterfaceBase
+  );
+
+/**
+  Set an interrupt to pending state from GIC.
+
+  @param GicDistributorBase    Base address of platform GIC Distributor.
+  @param GicRedistributorBase  Base address of platform GIC Redistributor.
+  @param Source                Interrupt source ID.
+**/
+VOID
+EFIAPI
+ArmGicSetPendingInterrupt (
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
+  );
+
+/**
+  Clear a pending interrupt from GIC.
+
+  @param GicDistributorBase    Base address of platform GIC Distributor.
+  @param GicRedistributorBase  Base address of platform GIC Redistributor.
+  @param Source                Interrupt source ID.
+**/
+VOID
+EFIAPI
+ArmGicClearPendingInterrupt (
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
+  );
+
+/**
+  Check if an interrupt is pending in GIC.
+
+  @param GicDistributorBase    Base address of platform GIC Distributor.
+  @param GicRedistributorBase  Base address of platform GIC Redistributor.
+  @param Source                Interrupt source ID.
+
+  @return BOOLEAN   TRUE if the interrupt is pending, FALSE otherwise.
+**/
+BOOLEAN
+EFIAPI
+ArmGicIsInterruptPending (
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
   );
 
 VOID
