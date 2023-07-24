@@ -121,4 +121,21 @@ DumpHttpStatusCode (
   IN EFI_HTTP_STATUS_CODE  HttpStatusCode
   );
 
+/**
+
+  This function dump the IPv4 address in given error level.
+
+  @param[in]  ErrorLevel  DEBUG macro error level
+  @param[in]  Ipv4Address IPv4 address to dump
+
+  @retval     EFI_SUCCESS         IPv4 address string is printed.
+  @retval     Others              Errors occur.
+
+**/
+EFI_STATUS
+DumpIpv4Address (
+  IN UINTN             ErrorLevel,
+  IN EFI_IPv4_ADDRESS  *Ipv4Address
+  );
+
 #endif
