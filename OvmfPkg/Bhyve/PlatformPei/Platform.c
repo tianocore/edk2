@@ -17,6 +17,7 @@
 //
 // The Library classes this module consumes
 //
+#include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
@@ -27,6 +28,7 @@
 #include <Library/PciLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/PlatformInitLib.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Ppi/MasterBootMode.h>
@@ -535,6 +537,24 @@ MaxCpuCountInitialization (
 }
 
 /**
+ * @brief Builds PlatformInfo Hob
+ */
+STATIC
+EFI_HOB_PLATFORM_INFO *
+BuildPlatformInfoHob (
+  VOID
+  )
+{
+  EFI_HOB_PLATFORM_INFO  PlatformInfoHob;
+  EFI_HOB_GUID_TYPE      *GuidHob;
+
+  ZeroMem (&PlatformInfoHob, sizeof PlatformInfoHob);
+  BuildGuidDataHob (&gUefiOvmfPkgPlatformInfoGuid, &PlatformInfoHob, sizeof (EFI_HOB_PLATFORM_INFO));
+  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
+  return (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
+}
+
+/**
   Perform Platform PEI initialization.
 
   @param  FileHandle      Handle of the file being invoked.
@@ -551,6 +571,7 @@ InitializePlatform (
   )
 {
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
+  BuildPlatformInfoHob ();
 
   //
   // Initialize Local APIC Timer hardware and disable Local APIC Timer
