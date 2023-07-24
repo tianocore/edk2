@@ -182,13 +182,13 @@ FindImageRecord (
   );
 
 /**
-  Dump image record.
+  Debug dumps the input list of IMAGE_PROPERTIES_RECORD structs.
 
-  @param[in]  ImageRecordList  A list of IMAGE_PROPERTIES_RECORD entries
+  @param[in]  ImageRecordList   Head of the IMAGE_PROPERTIES_RECORD list
 **/
 VOID
 EFIAPI
-DumpImageRecord (
+DumpImageRecords (
   IN LIST_ENTRY  *ImageRecordList
   );
 
