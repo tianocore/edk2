@@ -531,15 +531,17 @@ DiscoverRedfishHostInterface (
       IP4_COPY_ADDRESS ((VOID *)&Instance->HostSubnetMask.v4, (VOID *)Data->HostIpMask);
 
       if (EFI_IP4_EQUAL (&Instance->HostIpAddress.v4, &mZeroIp4Addr)) {
-        DEBUG ((DEBUG_ERROR, "%a: invalid host IP address: zero address\n", __func__));
+        DEBUG ((DEBUG_ERROR, "%a: invalid host IP address: ", __func__));
+        DumpIpv4Address (DEBUG_ERROR, &Instance->HostIpAddress.v4);
         //
         // Invalid IP address detected. Change address format to Unknown and use system default address.
         //
         Instance->HostAddrFormat = REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_UNKNOWN;
       }
 
-      if (!IP4_IS_VALID_NETMASK (EFI_IP4 (Instance->HostSubnetMask.v4))) {
-        DEBUG ((DEBUG_ERROR, "%a: invalid subnet mask address\n", __func__));
+      if (!IP4_IS_VALID_NETMASK (NTOHL (EFI_IP4 (Instance->HostSubnetMask.v4)))) {
+        DEBUG ((DEBUG_ERROR, "%a: invalid subnet mask address: ", __func__));
+        DumpIpv4Address (DEBUG_ERROR, &Instance->HostSubnetMask.v4);
         //
         // Invalid subnet mast address detected. Change address format to Unknown and use system default address.
         //
@@ -553,7 +555,8 @@ DiscoverRedfishHostInterface (
       IP4_COPY_ADDRESS ((VOID *)&Instance->TargetIpAddress.v4, (VOID *)Data->RedfishServiceIpAddress);
 
       if (EFI_IP4_EQUAL (&Instance->TargetIpAddress.v4, &mZeroIp4Addr)) {
-        DEBUG ((DEBUG_ERROR, "%a: invalid service IP address: zero address\n", __func__));
+        DEBUG ((DEBUG_ERROR, "%a: invalid service IP address: ", __func__));
+        DumpIpv4Address (DEBUG_ERROR, &Instance->TargetIpAddress.v4);
       }
     } else {
       IP6_COPY_ADDRESS ((VOID *)&Instance->TargetIpAddress.v6, (VOID *)Data->RedfishServiceIpAddress);
