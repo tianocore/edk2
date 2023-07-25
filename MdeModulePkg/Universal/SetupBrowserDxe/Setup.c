@@ -5634,32 +5634,42 @@ LoadStorage (
     ConfigRequest = Storage->ConfigRequest;
   }
 
-  //
-  // Request current settings from Configuration Driver
-  //
-  Status = mHiiConfigRouting->ExtractConfig (
-                                mHiiConfigRouting,
-                                ConfigRequest,
-                                &Progress,
-                                &Result
-                                );
-
-  //
-  // If get value fail, extract default from IFR binary
-  //
-  if (EFI_ERROR (Status)) {
-    ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForStorage, Storage->BrowserStorage, TRUE, TRUE);
+  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
+    //
+    // Call GetVariable directly for EfiVarStore
+    //
+    Status = gRT->GetVariable (Storage->BrowserStorage->Name, &(Storage->BrowserStorage->Guid), NULL, (UINTN *)(&(Storage->BrowserStorage->Size)), Storage->BrowserStorage->EditBuffer);
+    if (EFI_ERROR (Status)) {
+      ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForStorage, Storage->BrowserStorage, TRUE, TRUE);
+    }
   } else {
     //
-    // Convert Result from <ConfigAltResp> to <ConfigResp>
+    // Request current settings from Configuration Driver
     //
-    StrPtr = StrStr (Result, L"&GUID=");
-    if (StrPtr != NULL) {
-      *StrPtr = L'\0';
-    }
+    Status = mHiiConfigRouting->ExtractConfig (
+                                  mHiiConfigRouting,
+                                  ConfigRequest,
+                                  &Progress,
+                                  &Result
+                                  );
 
-    Status = ConfigRespToStorage (Storage->BrowserStorage, Result);
-    FreePool (Result);
+    //
+    // If get value fail, extract default from IFR binary
+    //
+    if (EFI_ERROR (Status)) {
+      ExtractDefault (FormSet, NULL, EFI_HII_DEFAULT_CLASS_STANDARD, FormSetLevel, GetDefaultForStorage, Storage->BrowserStorage, TRUE, TRUE);
+    } else {
+      //
+      // Convert Result from <ConfigAltResp> to <ConfigResp>
+      //
+      StrPtr = StrStr (Result, L"&GUID=");
+      if (StrPtr != NULL) {
+        *StrPtr = L'\0';
+      }
+
+      Status = ConfigRespToStorage (Storage->BrowserStorage, Result);
+      FreePool (Result);
+    }
   }
 
   Storage->BrowserStorage->ConfigRequest = AllocateCopyPool (StrSize (Storage->ConfigRequest), Storage->ConfigRequest);
