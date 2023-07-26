@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "PiSmmCpuDxeSmm.h"
+#include <PiPei.h>
+#include <Ppi/MpServices2.h>
 
 #pragma pack(1)
 typedef struct {
@@ -594,18 +596,21 @@ InitializeCpuAfterRebase (
   UINT8  Stack[128];
 
   SetRegister (FALSE);
-  if (IsBsp) {
-    while (mNumberToFinish > 0) {
-      CpuPause ();
+
+  if (mSmmS3ResumeState->MpService2Ppi == 0) {
+    if (IsBsp) {
+      while (mNumberToFinish > 0) {
+        CpuPause ();
+      }
+    } else {
+      //
+      // Place AP into the safe code, count down the number with lock mechanism in the safe code.
+      //
+      TopOfStack  = (UINTN)Stack + sizeof (Stack);
+      TopOfStack &= ~(UINTN)(CPU_STACK_ALIGNMENT - 1);
+      CopyMem ((VOID *)(UINTN)mApHltLoopCode, mApHltLoopCodeTemplate, sizeof (mApHltLoopCodeTemplate));
+      TransferApToSafeState ((UINTN)mApHltLoopCode, TopOfStack, (UINTN)&mNumberToFinish);
     }
-  } else {
-    //
-    // Place AP into the safe code, count down the number with lock mechanism in the safe code.
-    //
-    TopOfStack  = (UINTN)Stack + sizeof (Stack);
-    TopOfStack &= ~(UINTN)(CPU_STACK_ALIGNMENT - 1);
-    CopyMem ((VOID *)(UINTN)mApHltLoopCode, mApHltLoopCodeTemplate, sizeof (mApHltLoopCodeTemplate));
-    TransferApToSafeState ((UINTN)mApHltLoopCode, TopOfStack, (UINTN)&mNumberToFinish);
   }
 }
 
@@ -783,11 +788,12 @@ SmmRestoreCpu (
   VOID
   )
 {
-  SMM_S3_RESUME_STATE       *SmmS3ResumeState;
-  IA32_DESCRIPTOR           Ia32Idtr;
-  IA32_DESCRIPTOR           X64Idtr;
-  IA32_IDT_GATE_DESCRIPTOR  IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
-  EFI_STATUS                Status;
+  SMM_S3_RESUME_STATE         *SmmS3ResumeState;
+  IA32_DESCRIPTOR             Ia32Idtr;
+  IA32_DESCRIPTOR             X64Idtr;
+  IA32_IDT_GATE_DESCRIPTOR    IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
+  EFI_STATUS                  Status;
+  EDKII_PEI_MP_SERVICES2_PPI  *Mp2ServicePpi;
 
   DEBUG ((DEBUG_INFO, "SmmRestoreCpu()\n"));
 
@@ -852,14 +858,20 @@ SmmRestoreCpu (
     //
     mInitApsAfterSmmBaseReloc = FALSE;
 
-    PrepareApStartupVector (mAcpiCpuData.StartupVector);
-    //
-    // Send INIT IPI - SIPI to all APs
-    //
-    SendInitSipiSipiAllExcludingSelf ((UINT32)mAcpiCpuData.StartupVector);
+    if (mSmmS3ResumeState->MpService2Ppi != 0) {
+      Mp2ServicePpi = (EDKII_PEI_MP_SERVICES2_PPI *)(UINTN)mSmmS3ResumeState->MpService2Ppi;
+      Mp2ServicePpi->StartupAllCPUs (Mp2ServicePpi, InitializeCpuProcedure, 0, NULL);
+    } else {
+      PrepareApStartupVector (mAcpiCpuData.StartupVector);
+      //
+      // Send INIT IPI - SIPI to all APs
+      //
+      SendInitSipiSipiAllExcludingSelf ((UINT32)mAcpiCpuData.StartupVector);
+      InitializeCpuProcedure (NULL);
+    }
+  } else {
+    InitializeCpuProcedure (NULL);
   }
-
-  InitializeCpuProcedure (NULL);
 
   //
   // Set a flag to restore SMM configuration in S3 path.
