@@ -2160,7 +2160,10 @@ MpInitLibInitialize (
     // APs have been wakeup before, just get the CPU Information
     // from HOB
     //
-    AmdSevUpdateCpuMpData (CpuMpData);
+    if (CpuMpData->UseSevEsAPMethod) {
+      AmdSevUpdateCpuMpData (CpuMpData);
+    }
+
     CpuMpData->CpuCount  = MpHandOff->CpuCount;
     CpuMpData->BspNumber = GetBspNumber (MpHandOff);
     CpuInfoInHob         = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
