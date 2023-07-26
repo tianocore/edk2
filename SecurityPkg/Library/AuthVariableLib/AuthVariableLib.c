@@ -26,12 +26,14 @@ UINT32  mMaxCertDbSize;
 UINT32  mPlatformMode;
 UINT8   mVendorKeyState;
 
-EFI_GUID  mSignatureSupport[] = { EFI_CERT_SHA1_GUID, EFI_CERT_SHA256_GUID, EFI_CERT_RSA2048_GUID, EFI_CERT_X509_GUID };
+EFI_GUID  mSignatureSupport[] = { EFI_CERT_SHA1_GUID, EFI_CERT_SHA256_GUID, EFI_CERT_SHA384_GUID, EFI_CERT_SHA512_GUID, EFI_CERT_RSA2048_GUID, EFI_CERT_X509_GUID };
 
 //
 // Hash context pointer
 //
-VOID  *mHashCtx = NULL;
+VOID  *mHashSha256Ctx = NULL;
+VOID  *mHashSha384Ctx = NULL;
+VOID  *mHashSha512Ctx = NULL;
 
 VARIABLE_ENTRY_PROPERTY  mAuthVarEntry[] = {
   {
@@ -91,7 +93,7 @@ VARIABLE_ENTRY_PROPERTY  mAuthVarEntry[] = {
   },
 };
 
-VOID  **mAuthVarAddressPointer[9];
+VOID  **mAuthVarAddressPointer[11];
 
 AUTH_VAR_LIB_CONTEXT_IN  *mAuthVarLibContextIn = NULL;
 
@@ -120,7 +122,6 @@ AuthVariableLibInitialize (
   UINT32      VarAttr;
   UINT8       *Data;
   UINTN       DataSize;
-  UINTN       CtxSize;
   UINT8       SecureBootMode;
   UINT8       SecureBootEnable;
   UINT8       CustomMode;
@@ -135,9 +136,18 @@ AuthVariableLibInitialize (
   //
   // Initialize hash context.
   //
-  CtxSize  = Sha256GetContextSize ();
-  mHashCtx = AllocateRuntimePool (CtxSize);
-  if (mHashCtx == NULL) {
+  mHashSha256Ctx = AllocateRuntimePool (Sha256GetContextSize ());
+  if (mHashSha256Ctx == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  mHashSha384Ctx = AllocateRuntimePool (Sha384GetContextSize ());
+  if (mHashSha384Ctx == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  mHashSha512Ctx = AllocateRuntimePool (Sha512GetContextSize ());
+  if (mHashSha512Ctx == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -356,14 +366,16 @@ AuthVariableLibInitialize (
   AuthVarLibContextOut->AuthVarEntry        = mAuthVarEntry;
   AuthVarLibContextOut->AuthVarEntryCount   = ARRAY_SIZE (mAuthVarEntry);
   mAuthVarAddressPointer[0]                 = (VOID **)&mCertDbStore;
-  mAuthVarAddressPointer[1]                 = (VOID **)&mHashCtx;
-  mAuthVarAddressPointer[2]                 = (VOID **)&mAuthVarLibContextIn;
-  mAuthVarAddressPointer[3]                 = (VOID **)&(mAuthVarLibContextIn->FindVariable),
-  mAuthVarAddressPointer[4]                 = (VOID **)&(mAuthVarLibContextIn->FindNextVariable),
-  mAuthVarAddressPointer[5]                 = (VOID **)&(mAuthVarLibContextIn->UpdateVariable),
-  mAuthVarAddressPointer[6]                 = (VOID **)&(mAuthVarLibContextIn->GetScratchBuffer),
-  mAuthVarAddressPointer[7]                 = (VOID **)&(mAuthVarLibContextIn->CheckRemainingSpaceForConsistency),
-  mAuthVarAddressPointer[8]                 = (VOID **)&(mAuthVarLibContextIn->AtRuntime),
+  mAuthVarAddressPointer[1]                 = (VOID **)&mHashSha256Ctx;
+  mAuthVarAddressPointer[2]                 = (VOID **)&mHashSha384Ctx;
+  mAuthVarAddressPointer[3]                 = (VOID **)&mHashSha512Ctx;
+  mAuthVarAddressPointer[4]                 = (VOID **)&mAuthVarLibContextIn;
+  mAuthVarAddressPointer[5]                 = (VOID **)&(mAuthVarLibContextIn->FindVariable),
+  mAuthVarAddressPointer[6]                 = (VOID **)&(mAuthVarLibContextIn->FindNextVariable),
+  mAuthVarAddressPointer[7]                 = (VOID **)&(mAuthVarLibContextIn->UpdateVariable),
+  mAuthVarAddressPointer[8]                 = (VOID **)&(mAuthVarLibContextIn->GetScratchBuffer),
+  mAuthVarAddressPointer[9]                 = (VOID **)&(mAuthVarLibContextIn->CheckRemainingSpaceForConsistency),
+  mAuthVarAddressPointer[10]                = (VOID **)&(mAuthVarLibContextIn->AtRuntime),
   AuthVarLibContextOut->AddressPointer      = mAuthVarAddressPointer;
   AuthVarLibContextOut->AddressPointerCount = ARRAY_SIZE (mAuthVarAddressPointer);
 
