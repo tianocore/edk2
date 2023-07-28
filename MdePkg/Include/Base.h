@@ -1230,6 +1230,11 @@ typedef UINTN RETURN_STATUS;
 #define RETURN_COMPROMISED_DATA  ENCODE_ERROR (33)
 
 ///
+/// There is an address conflict address allocation.
+///
+#define RETURN_IP_ADDRESS_CONFLICT  ENCODE_ERROR (34)
+
+///
 /// A HTTP error occurred during the network operation.
 ///
 #define RETURN_HTTP_ERROR  ENCODE_ERROR (35)
@@ -1267,6 +1272,11 @@ typedef UINTN RETURN_STATUS;
 /// The resulting buffer contains UEFI-compliant file system.
 ///
 #define RETURN_WARN_FILE_SYSTEM  ENCODE_WARNING (6)
+
+///
+/// The operation will be processed across a system reset.
+///
+#define RETURN_WARN_RESET_REQUIRED  ENCODE_WARNING (7)
 
 /**
   Returns a 16-bit signature built from 2 ASCII characters.
