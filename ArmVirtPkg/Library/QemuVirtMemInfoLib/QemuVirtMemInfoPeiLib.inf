@@ -38,11 +38,13 @@
 [Guids]
   gArmVirtSystemMemorySizeGuid
 
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFdBaseAddress
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdSystemMemoryBase
-  gArmTokenSpaceGuid.PcdSystemMemorySize
   gArmTokenSpaceGuid.PcdFdSize
   gArmTokenSpaceGuid.PcdFvSize
   gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
