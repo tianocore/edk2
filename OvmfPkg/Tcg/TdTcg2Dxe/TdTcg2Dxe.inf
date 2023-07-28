@@ -73,7 +73,6 @@
   gEfiCcMeasurementProtocolGuid                      ## PRODUCES
   gEfiMpServiceProtocolGuid                          ## SOMETIMES_CONSUMES
   gEfiVariableWriteArchProtocolGuid                  ## NOTIFY
-  gEfiResetNotificationProtocolGuid                  ## CONSUMES
   gEfiAcpiTableProtocolGuid                          ## NOTIFY
 
 [Pcd]
