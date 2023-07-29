@@ -1943,6 +1943,7 @@ UpdateVariable (
           // Existing data size + new data size exceed maximum variable size limitation.
           //
           Status = EFI_INVALID_PARAMETER;
+          DEBUG ((DEBUG_ERROR, "ERROR: The variable store exceed maximum variable size limitation.\n"));
           goto Done;
         }
 
