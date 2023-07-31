@@ -19,6 +19,7 @@ typedef struct {
   BOOLEAN                             UseMmio;
   UINT8                               RegisterStride;
   UINT32                              BaudRate;
+  UINT32                              ClockRate;
   EFI_PHYSICAL_ADDRESS                RegisterBase;
 } UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO;
 #pragma pack()
