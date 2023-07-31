@@ -431,6 +431,7 @@ _ModuleEntryPoint (
     UniversalSerialPort->UseMmio         = (SerialPortInfo.Type == 1) ? FALSE : TRUE;
     UniversalSerialPort->RegisterBase    = SerialPortInfo.BaseAddr;
     UniversalSerialPort->BaudRate        = SerialPortInfo.Baud;
+    UniversalSerialPort->ClockRate       = SerialPortInfo.InputHertz;
     UniversalSerialPort->RegisterStride  = (UINT8)SerialPortInfo.RegWidth;
   }
 
