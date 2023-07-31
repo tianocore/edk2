@@ -24,6 +24,11 @@
 #include <Library/DefaultExceptionHandlerLib.h>
 
 //
+// Maximum number of characters to print to serial (UINT8s) and to console if available (as UINT16s)
+//
+#define MAX_PRINT_CHARS  100
+
+//
 // The number of elements in a CHAR8 array, including the terminating NUL, that
 // is meant to hold the string rendering of the CPSR.
 //
@@ -198,7 +203,8 @@ DefaultExceptionHandler (
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  CHAR8    Buffer[100];
+  CHAR8    Buffer[MAX_PRINT_CHARS];
+  CHAR16   UnicodeBuffer[MAX_PRINT_CHARS];
   UINTN    CharCount;
   UINT32   DfsrStatus;
   UINT32   IfsrStatus;
@@ -217,7 +223,8 @@ DefaultExceptionHandler (
                 );
   SerialPortWrite ((UINT8 *)Buffer, CharCount);
   if (gST->ConOut != NULL) {
-    AsciiPrint (Buffer);
+    UnicodeSPrintAsciiFormat (UnicodeBuffer, MAX_PRINT_CHARS, Buffer);
+    gST->ConOut->OutputString (gST->ConOut, UnicodeBuffer);
   }
 
   DEBUG_CODE_BEGIN ();
