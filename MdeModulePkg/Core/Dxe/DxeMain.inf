@@ -189,6 +189,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFwVolDxeMaxEncapsulationDepth           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageLargeAddressLoad                   ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel                          ## CONSUMES
 
 # [Hob]
 # RESOURCE_DESCRIPTOR   ## CONSUMES
