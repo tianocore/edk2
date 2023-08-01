@@ -111,6 +111,12 @@ FpdtStatusCodeListenerPei (
   // Calculate average S3 resume time.
   //
   S3ResumeTotal = MultU64x32 (AcpiS3ResumeRecord->AverageResume, AcpiS3ResumeRecord->ResumeCount);
+
+  if (AcpiS3ResumeRecord->ResumeCount == MAX_UINT32) {
+    DEBUG ((DEBUG_ERROR, "ResumeCount cannot be equal to MAX_UINT32 because of subsequent incrementing\n"));
+    return EFI_ABORTED;
+  }
+
   AcpiS3ResumeRecord->ResumeCount++;
   AcpiS3ResumeRecord->AverageResume = DivU64x32 (S3ResumeTotal + AcpiS3ResumeRecord->FullResume, AcpiS3ResumeRecord->ResumeCount);
 
