@@ -443,6 +443,11 @@ F: MdeModulePkg/Include/Protocol/UsbEthernetProtocol.h
 M: Richard Ho <richardho@ami.com> [richardho]
 R: Rebecca Cran <rebecca@bsdio.com> [bcran]
 
+MdeModulePkg: SPI Bus modules
+F: MdeModulePkg/Bus/Spi
+M: Abner Chang <abner.chang@amd.com> [changab]
+R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
