@@ -2764,21 +2764,21 @@ CoreInitializeGcdServices (
   }
 
   //
-  // Relocate HOB List to an allocated pool buffer.
+  // Relocate HOB List to allocated pages.
   // The relocation should be at after all the tested memory resources added
   // (except the memory space that covers HOB List) to the memory services,
   // because the memory resource found in CoreInitializeMemoryServices()
   // may have not enough remaining resource for HOB List.
   //
-  NewHobList = AllocateCopyPool (
-                 (UINTN)PhitHob->EfiFreeMemoryBottom - (UINTN)(*HobStart),
-                 *HobStart
-                 );
-  ASSERT (NewHobList != NULL);
+  NewHobList = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)PhitHob->EfiFreeMemoryBottom - (UINTN)(*HobStart)));
+  if (NewHobList != NULL) {
+    CopyMem (NewHobList, *HobStart, (UINTN)PhitHob->EfiFreeMemoryBottom - (UINTN)(*HobStart));
+    *HobStart = NewHobList;
+  } else {
+    ASSERT (NewHobList != NULL);
+  }
 
-  *HobStart = NewHobList;
-  gHobList  = NewHobList;
-
+  gHobList = *HobStart;
   if (MemorySpaceMapHobList != NULL) {
     //
     // Add and allocate the memory space that covers HOB List to the memory services

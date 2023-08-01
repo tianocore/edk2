@@ -946,6 +946,32 @@ InitializeDxeNxMemoryProtectionPolicy (
 }
 
 /**
+  Mark the HOB list as read-only and non-executable.
+**/
+STATIC
+VOID
+ProtectHobList (
+  VOID
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  Hob.Raw = GetHobList ();
+
+  // Find the end of the HOB list.
+  while (!END_OF_HOB_LIST (Hob)) {
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  // Protect the HOB list.
+  SetUefiImageMemoryAttributes (
+    (UINTN)gHobList,
+    ALIGN_VALUE (((UINTN)Hob.Raw + GET_HOB_LENGTH (Hob)) - (UINTN)GetHobList (), EFI_PAGE_SIZE),
+    EFI_MEMORY_XP | EFI_MEMORY_RO
+    );
+}
+
+/**
   A notification for CPU_ARCH protocol.
 
   @param[in]  Event                 Event whose notification function is being invoked.
@@ -984,6 +1010,9 @@ MemoryProtectionCpuArchProtocolNotify (
   // Call notify function meant for Heap Guard.
   //
   HeapGuardCpuArchProtocolNotify ();
+
+  // Mark the HOB list XP and RO.
+  ProtectHobList ();
 
   if (mImageProtectionPolicy == 0) {
     goto Done;
