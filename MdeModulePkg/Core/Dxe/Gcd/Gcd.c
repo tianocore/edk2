@@ -150,6 +150,10 @@ CoreDumpGcdMemorySpaceMap (
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
   UINTN                            Index;
 
+  if ((PcdGet32 (PcdDebugPrintErrorLevel) & DEBUG_GCD) == 0) {
+    return;
+  }
+
   Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
   ASSERT (Status == EFI_SUCCESS && MemorySpaceMap != NULL);
 
