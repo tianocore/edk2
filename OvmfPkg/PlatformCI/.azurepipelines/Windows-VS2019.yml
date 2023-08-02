@@ -24,7 +24,7 @@ jobs:
       package: 'OvmfPkg'
       vm_image: 'windows-2019'
       should_run: true
-      run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE QEMU_CPUHP_QUIRK=TRUE"
+      run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE"
 
     #Use matrix to speed up the build process
     strategy:
