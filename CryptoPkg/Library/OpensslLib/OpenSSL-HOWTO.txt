@@ -28,9 +28,9 @@ on the cryptography.
 refer to edk2/Readme.md for how to clone the code.
 
 =============================================================================
-                      About process_files.pl
+                      About configure.py
 =============================================================================
-  "process_files.pl" is one Perl script which runs the OpenSSL Configure,
+  "configure.py" is one python script which runs the OpenSSL Configure,
 then processes the resulting file list into our local OpensslLib.inf and
 OpensslLibCrypto.inf.
   This only needs to be done once by the maintainer / developer when
