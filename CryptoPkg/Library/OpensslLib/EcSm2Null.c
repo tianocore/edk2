@@ -9,8 +9,9 @@
 #include <Base.h>
 #include <Library/DebugLib.h>
 
-#undef OPENSSL_NO_EC
+#undef EDK2_OPENSSL_NOEC
 
+#include <openssl/types.h>
 #include <openssl/objects.h>
 #include <openssl/bn.h>
 #include <openssl/ec.h>
@@ -300,9 +301,9 @@ ECDH_compute_key (
   return 0;
 }
 
-struct ec_key_st *
+const struct ec_key_st *
 EVP_PKEY_get0_EC_KEY (
-  EVP_PKEY  *pkey
+  const EVP_PKEY  *pkey
   )
 {
   ASSERT (FALSE);
