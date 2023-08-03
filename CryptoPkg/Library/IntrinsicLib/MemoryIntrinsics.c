@@ -63,12 +63,3 @@ memcmp (
 {
   return (int)CompareMem (buf1, buf2, count);
 }
-
-int
-strcmp (
-  const char  *s1,
-  const char  *s2
-  )
-{
-  return (int)AsciiStrCmp (s1, s2);
-}
