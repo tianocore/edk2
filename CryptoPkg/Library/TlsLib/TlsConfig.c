@@ -701,7 +701,6 @@ TlsSetCaCertificate (
   TLS_CONNECTION  *TlsConn;
   SSL_CTX         *SslCtx;
   INTN            Ret;
-  UINTN           ErrorCode;
 
   BioCert   = NULL;
   Cert      = NULL;
@@ -753,6 +752,8 @@ TlsSetCaCertificate (
   //
   Ret = X509_STORE_add_cert (X509Store, Cert);
   if (Ret != 1) {
+    unsigned long  ErrorCode;
+
     ErrorCode = ERR_peek_last_error ();
     //
     // Ignore "already in table" errors
