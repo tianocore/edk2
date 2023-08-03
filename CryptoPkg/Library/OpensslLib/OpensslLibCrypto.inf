@@ -40,6 +40,7 @@
   OpensslStub/rand_pool.c
   OpensslStub/SslNull.c
   OpensslStub/EcSm2Null.c
+  OpensslStub/uefiprov.c
 
 [Packages]
   MdePkg/MdePkg.dec
