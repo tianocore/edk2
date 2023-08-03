@@ -757,7 +757,7 @@ TlsSetCaCertificate (
     //
     // Ignore "already in table" errors
     //
-    if (!((ERR_GET_FUNC (ErrorCode) == X509_F_X509_STORE_ADD_CERT) &&
+    if (!((ERR_GET_LIB (ErrorCode) == ERR_LIB_X509) &&
           (ERR_GET_REASON (ErrorCode) == X509_R_CERT_ALREADY_IN_HASH_TABLE)))
     {
       Status = EFI_ABORTED;
