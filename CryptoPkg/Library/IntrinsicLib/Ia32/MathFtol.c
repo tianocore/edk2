@@ -23,3 +23,15 @@ _ftol2 (
     ret
   }
 }
+
+__declspec(naked) void
+_ftol2_sse (
+  void
+  )
+{
+  _asm {
+    fistp dword ptr [esp-4]
+    mov   eax,[esp-4]
+    ret
+  }
+}
