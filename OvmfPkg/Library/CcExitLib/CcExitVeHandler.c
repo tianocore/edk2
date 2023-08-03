@@ -568,7 +568,10 @@ ParseMmioExitInstructions (
     ParsedInstruction->Bytes       = Bytes;
     ParsedInstruction->Register    = Register;
     ParsedInstruction->Val         = Val;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     ParsedInstruction->ReadOrWrite = ReadOrWrite;
+#pragma GCC diagnostic pop
   }
 
   return Status;

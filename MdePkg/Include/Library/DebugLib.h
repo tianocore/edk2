@@ -368,6 +368,8 @@ UnitTestDebugAssert (
 
 **/
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #if !defined (MDE_CPU_EBC) && (!defined (_MSC_VER) || _MSC_VER > 1400)
 #define _DEBUG_PRINT(PrintLevel, ...)              \
     do {                                             \
@@ -379,6 +381,7 @@ UnitTestDebugAssert (
 #else
 #define _DEBUG(Expression)  DebugPrint Expression
 #endif
+#pragma GCC diagnostic pop
 
 /**
   Macro that calls DebugAssert() if an expression evaluates to FALSE.

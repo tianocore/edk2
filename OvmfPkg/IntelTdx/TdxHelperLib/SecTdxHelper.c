@@ -745,7 +745,10 @@ ProcessHobList (
   if (CpusNum > 1) {
     Status = AcceptMemoryForAPsStack (VmmHobList, APS_STACK_SIZE (CpusNum), &PhysicalEnd);
     ASSERT (Status == EFI_SUCCESS);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     APsStackStartAddress = PhysicalEnd - APS_STACK_SIZE (CpusNum);
+#pragma GCC diagnostic pop
   } else {
     PhysicalEnd          = 0;
     APsStackStartAddress = 0;

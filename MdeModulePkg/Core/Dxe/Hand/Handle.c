@@ -1180,7 +1180,10 @@ Done:
       // EFI_ALREADY_STARTED is not an error for bus driver.
       // Return the corresponding protocol interface.
       //
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
       *Interface = Prot->Interface;
+#pragma GCC diagnostic pop
     } else if (Status == EFI_UNSUPPORTED) {
       //
       // Return NULL Interface if Unsupported Protocol.

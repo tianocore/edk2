@@ -355,10 +355,13 @@ AmdSevDxeEntryPoint (
     // If its SEV-SNP active guest then install the CONFIDENTIAL_COMPUTING_SEV_SNP_BLOB.
     // It contains the location for both the Secrets and CPUID page.
     //
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     return gBS->InstallConfigurationTable (
                   &gConfidentialComputingSevSnpBlobGuid,
                   SnpBootDxeTable
                   );
+#pragma GCC diagnostic pop
   }
 
   return EFI_SUCCESS;

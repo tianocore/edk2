@@ -1044,7 +1044,10 @@ ConvertRtcTimeToEfiTime (
   // If time is in 12 hour format, convert it to 24 hour format
   //
   if (RegisterB.Bits.Mil == 0) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     if (IsPM && (Time->Hour < 12)) {
+#pragma GCC diagnostic pop
       Time->Hour = (UINT8)(Time->Hour + 12);
     }
 

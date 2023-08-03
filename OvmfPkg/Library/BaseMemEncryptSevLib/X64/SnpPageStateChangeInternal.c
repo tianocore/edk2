@@ -162,7 +162,10 @@ BuildPageStateBuffer (
     Info->Entry[i].GuestFrameNumber = BaseAddress >> EFI_PAGE_SHIFT;
     Info->Entry[i].PageSize         = RmpPageSize;
     Info->Entry[i].Operation        = MemoryStateToGhcbOp (State);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     Info->Entry[i].CurrentPage      = 0;
+#pragma GCC diagnostic pop
     Info->Header.EndEntry           = (UINT16)i;
 
     BaseAddress = NextAddress;

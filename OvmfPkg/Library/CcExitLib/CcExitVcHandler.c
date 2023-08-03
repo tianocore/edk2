@@ -1353,6 +1353,8 @@ GetCpuidFw (
       XssMsr.Uint64 = AsmReadMsr64 (MSR_IA32_XSS);
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
     if (!GetCpuidXSaveSize (
            XCr0 | XssMsr.Uint64,
            &XSaveSize,
@@ -1361,6 +1363,7 @@ GetCpuidFw (
     {
       return FALSE;
     }
+#pragma GCC diagnostic pop
 
     *Ebx = XSaveSize;
   } else if (EaxIn == 0x8000001E) {
