@@ -9,11 +9,7 @@
     "LicenseCheck": {
         "IgnoreFiles": [
             # These directories contain auto-generated OpenSSL content
-            "Library/OpensslLib/IA32",
-            "Library/OpensslLib/IA32Gcc",
-            "Library/OpensslLib/X64",
-            "Library/OpensslLib/X64Gcc",
-            "Library/Include/openssl"
+            "Library/OpensslLib/OpensslGen"
         ]
     },
     "EccCheck": {
@@ -30,14 +26,13 @@
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
             "Library/OpensslLib/openssl",
-            "Library/Include/openssl",
-            "Library/Include/crypto",
+            "Library/OpensslLib/OpensslGen",
             # The unit testing folder is not to be checked
             "Test/UnitTest",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/BaseCryptLib/SysCall",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
-            "Library/OpensslLib/rand_pool.c",
+            "Library/OpensslLib/OpensslStub",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/Include/CrtLibSupport.h",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
@@ -96,9 +91,46 @@
     # options defined in .pytool/Plugin/UncrustifyCheck
     "UncrustifyCheck": {
         "IgnoreFiles": [
-            "opensslconf.h",
-            "dso_conf.h",
-            "opensslconf_generated.h"
+            "Library/OpensslLib/OpensslGen/include/crypto/bn_conf.h",
+            "Library/OpensslLib/OpensslGen/include/crypto/dso_conf.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/asn1.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/asn1t.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/bio.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/cmp.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/cms.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/conf.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/configuration-ec.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/configuration-noec.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/configuration.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/crmf.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/crypto.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/ct.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/err.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/ess.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/fipskey.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/lhash.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/ocsp.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/opensslv.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/pkcs12.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/pkcs7.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/safestack.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/srp.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/ssl.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/ui.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/x509.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/x509v3.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/x509_vfy.h",
+            "Library/OpensslLib/OpensslGen/providers/common/der/der_digests_gen.c",
+            "Library/OpensslLib/OpensslGen/providers/common/der/der_ecx_gen.c",
+            "Library/OpensslLib/OpensslGen/providers/common/der/der_ec_gen.c",
+            "Library/OpensslLib/OpensslGen/providers/common/der/der_rsa_gen.c",
+            "Library/OpensslLib/OpensslGen/providers/common/der/der_wrap_gen.c",
+            "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_digests.h",
+            "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_ec.h",
+            "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_ecx.h",
+            "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_rsa.h",
+            "Library/OpensslLib/OpensslGen/providers/common/include/prov/der_wrap.h",
+            "Library/OpensslLib/OpensslStub/uefiprov.c"
         ]
     }
 }
