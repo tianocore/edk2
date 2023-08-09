@@ -30,8 +30,8 @@ UINTN  mNvmeControllerNumber = 0;
 **/
 EFI_STATUS
 ReadNvmeControllerCapabilities (
-  IN NVME_CONTROLLER_PRIVATE_DATA  *Private,
-  IN NVME_CAP                      *Cap
+  IN  NVME_CONTROLLER_PRIVATE_DATA  *Private,
+  OUT NVME_CAP                      *Cap
   )
 {
   EFI_PCI_IO_PROTOCOL  *PciIo;
