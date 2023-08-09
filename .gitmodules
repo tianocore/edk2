@@ -32,3 +32,6 @@
 [submodule "MdePkg/Library/MipiSysTLib/mipisyst"]
 	path = MdePkg/Library/MipiSysTLib/mipisyst
 	url = https://github.com/MIPI-Alliance/public-mipi-sys-t.git
+[submodule "CryptoPkg/Library/MbedTlsLib/mbedtls"]
+	path = CryptoPkg/Library/MbedTlsLib/mbedtls
+	url = https://github.com/ARMmbed/mbedtls
