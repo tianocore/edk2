@@ -1,0 +1,171 @@
+## @file
+#  library for the MbedTls.
+#
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MbedTlsLib
+  FILE_GUID                      = BB8E7D92-3E14-4907-A890-B28C7A0A1931
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MbedTlsLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  Include/mbedtls/mbedtls_config.h
+  mbedtls/library/aes.c
+  mbedtls/library/asn1parse.c
+  mbedtls/library/asn1write.c
+  mbedtls/library/base64.c
+  mbedtls/library/bignum.c
+  mbedtls/library/ccm.c
+  mbedtls/library/chacha20.c
+  mbedtls/library/chachapoly.c
+  mbedtls/library/cipher.c
+  mbedtls/library/cipher_wrap.c
+  mbedtls/library/cmac.c
+  mbedtls/library/ctr_drbg.c
+  mbedtls/library/debug.c
+  mbedtls/library/des.c
+  mbedtls/library/dhm.c
+  EcSm2Null.c
+  mbedtls/library/error.c
+  mbedtls/library/gcm.c
+  mbedtls/library/hkdf.c
+  mbedtls/library/hmac_drbg.c
+  mbedtls/library/md.c
+  mbedtls/library/md5.c
+  mbedtls/library/ssl_msg.c
+  mbedtls/library/ssl_tls12_client.c
+  mbedtls/library/ssl_tls12_server.c
+  mbedtls/library/ssl_client.c
+  mbedtls/library/ssl_debug_helpers_generated.c
+  mbedtls/library/rsa_alt_helpers.c
+  mbedtls/library/hash_info.c
+  mbedtls/library/bignum_core.c
+  mbedtls/library/constant_time.c
+  mbedtls/library/memory_buffer_alloc.c
+  mbedtls/library/nist_kw.c
+  mbedtls/library/oid.c
+  mbedtls/library/padlock.c
+  mbedtls/library/pem.c
+  mbedtls/library/pk.c
+  mbedtls/library/pkcs12.c
+  mbedtls/library/pkcs5.c
+  mbedtls/library/pkparse.c
+  mbedtls/library/pkwrite.c
+  mbedtls/library/pk_wrap.c
+  mbedtls/library/poly1305.c
+  mbedtls/library/ripemd160.c
+  mbedtls/library/rsa.c
+  mbedtls/library/sha1.c
+  mbedtls/library/sha256.c
+  mbedtls/library/sha512.c
+  mbedtls/library/ssl_cache.c
+  mbedtls/library/ssl_ciphersuites.c
+  mbedtls/library/ssl_cookie.c
+  mbedtls/library/ssl_ticket.c
+  mbedtls/library/ssl_tls.c
+  mbedtls/library/threading.c
+  mbedtls/library/version.c
+  mbedtls/library/version_features.c
+  mbedtls/library/x509.c
+  mbedtls/library/x509write_crt.c
+  mbedtls/library/x509write_csr.c
+  mbedtls/library/x509_create.c
+  mbedtls/library/x509_crl.c
+  mbedtls/library/x509_crt.c
+  mbedtls/library/x509_csr.c
+  mbedtls/library/pkcs7.c
+  mbedtls/library/platform_util.c
+  CrtWrapper.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+
+[BuildOptions]
+  #
+  # Disables the following Visual Studio compiler warnings brought by Mbedtls source,
+  # warning C4244: '=': conversion from 'int' to 'unsigned char', possible loss of data
+  # warning C4132: 'S': const object should be initialized
+  # warning C4245: '=': conversion from 'int' to 'mbedtls_mpi_uint', signed/unsigned mismatch
+  # warning C4310: cast truncates constant value
+  # warning C4204: nonstandard extension used
+  #
+  MSFT:*_*_IA32_CC_FLAGS   =  /DEFI32 /wd4244 /wd4132 /wd4245 /wd4310 /wd4204
+  MSFT:*_*_X64_CC_FLAGS   =  /DEFI32 /wd4244 /wd4132 /wd4245 /wd4310 /wd4204
+
+  #
+  # Disable following Visual Studio 2015 compiler warnings brought by mbedtls source,
+  # so we do not break the build with /WX option:
+  #   C4718: recursive call has no side effects, deleting
+  #
+  MSFT:*_VS2015x86_IA32_CC_FLAGS = /wd4718
+  MSFT:*_VS2015x86_X64_CC_FLAGS  = /wd4718
+
+  INTEL:*_*_IA32_CC_FLAGS  = -U_WIN32 -U_WIN64  /w
+  INTEL:*_*_X64_CC_FLAGS   = -U_WIN32 -U_WIN64  /w
+
+  #
+  # Suppress the following build warnings in mbedtls so we don't break the build with -Werror
+  #   -Werror=maybe-uninitialized: there exist some other paths for which the variable is not initialized.
+  #   -Werror=format: Check calls to printf and scanf, etc., to make sure that the arguments supplied have
+  #                   types appropriate to the format string specified.
+  #   -Werror=unused-but-set-variable: Warn whenever a local variable is assigned to, but otherwise unused (aside from its declaration).
+  #
+  GCC:*_*_IA32_CC_FLAGS    = -U_WIN32 -U_WIN64 -Wno-error=maybe-uninitialized -Wno-error=unused-but-set-variable
+  GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -U_WIN64 -Wno-error=maybe-uninitialized -Wno-error=format -Wno-format -Wno-error=unused-but-set-variable -DNO_MSABI_VA_FUNCS
+  GCC:*_*_ARM_CC_FLAGS     =  -Wno-error=maybe-uninitialized -Wno-error=unused-but-set-variable
+  GCC:*_*_AARCH64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable -Wno-error=format
+  GCC:*_*_RISCV64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable
+  GCC:*_*_LOONGARCH64_CC_FLAGS =  -Wno-error=maybe-uninitialized -Wno-format -Wno-error=unused-but-set-variable
+  GCC:*_CLANG35_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized
+  GCC:*_CLANG38_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized
+  GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=uninitialized -Wno-error=incompatible-pointer-types -Wno-error=pointer-sign -Wno-error=implicit-function-declaration -Wno-error=ignored-pragma-optimize
+
+  # suppress the following warnings in mbedtls so we don't break the build with warnings-as-errors:
+  # 1295: Deprecated declaration <entity> - give arg types
+  #  550: <entity> was set but never used
+  # 1293: assignment in condition
+  #  111: statement is unreachable (invariably "break;" after "return X;" in case statement)
+  #   68: integer conversion resulted in a change of sign ("if (Status == -1)")
+  #  177: <entity> was declared but never referenced
+  #  223: function <entity> declared implicitly
+  #  144: a value of type <type> cannot be used to initialize an entity of type <type>
+  #  513: a value of type <type> cannot be assigned to an entity of type <type>
+  #  188: enumerated type mixed with another type (i.e. passing an integer as an enum without a cast)
+  # 1296: Extended constant initialiser used
+  #  128: loop is not reachable - may be emitted inappropriately if code follows a conditional return
+  #       from the function that evaluates to true at compile time
+  #  546: transfer of control bypasses initialization - may be emitted inappropriately if the uninitialized
+  #       variable is never referenced after the jump
+  #    1: ignore "#1-D: last line of file ends without a newline"
+  XCODE:*_*_IA32_CC_FLAGS   = -mmmx -msse -U_WIN32 -U_WIN64   -w -std=c99 -Wno-error=uninitialized
+  XCODE:*_*_X64_CC_FLAGS    = -mmmx -msse -U_WIN32 -U_WIN64   -w -std=c99 -Wno-error=uninitialized
+
+  #
+  # AARCH64 uses strict alignment and avoids SIMD registers for code that may execute
+  # with the MMU off. This involves SEC, PEI_CORE and PEIM modules as well as BASE
+  # libraries, given that they may be included into such modules.
+  # This library, even though of the BASE type, is never used in such cases, and
+  # avoiding the SIMD register file (which is shared with the FPU) prevents the
+  # compiler from successfully building some of the mbedtls source files that
+  # use floating point types, so clear the flags here.
+  #
+  GCC:*_*_AARCH64_CC_XIPFLAGS ==
