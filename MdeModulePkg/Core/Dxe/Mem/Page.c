@@ -1210,7 +1210,7 @@ FindFreePages (
               );
     if (Start != 0) {
       if (Start < mDefaultBaseAddress) {
-        mDefaultBaseAddress = Start;
+        mDefaultBaseAddress = NeedGuard ? Start - EFI_PAGE_SIZE : Start;
       }
 
       return Start;
