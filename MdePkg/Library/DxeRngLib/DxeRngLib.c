@@ -65,9 +65,15 @@ GenerateRandomNumberViaNist800Algorithm (
     return Status;
   }
 
+  Status = RngProtocol->GetRNG (RngProtocol, &gEfiRngAlgorithmRaw, BufferSize, Buffer);
+  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm Raw - Status = %r\n", __func__, Status));
+  if (!EFI_ERROR (Status)) {
+    return Status;
+  }
+
   // If all the other methods have failed, use the default method from the RngProtocol
   Status = RngProtocol->GetRNG (RngProtocol, NULL, BufferSize, Buffer);
-  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm Hash-256 - Status = %r\n", __func__, Status));
+  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm default - Status = %r\n", __func__, Status));
   if (!EFI_ERROR (Status)) {
     return Status;
   }
