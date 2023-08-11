@@ -2,6 +2,7 @@
   Random number generator services that uses RdRand instruction access
   to provide high-quality random numbers.
 
+Copyright (c) 2023, Arm Limited. All rights reserved.<BR>
 Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 
@@ -11,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 
 #include "BaseRngLibInternals.h"
@@ -127,4 +129,28 @@ ArchIsRngSupported (
      return mRdRandSupported;
   */
   return TRUE;
+}
+
+/**
+  Get a GUID identifying the RNG algorithm implementation.
+
+  @param [out] RngGuid  If success, contains the GUID identifying
+                        the RNG algorithm implementation.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_UNSUPPORTED         Not supported.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+GetRngGuid (
+  GUID  *RngGuid
+  )
+{
+  if (RngGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem (RngGuid, &gEfiRngAlgorithmSp80090Ctr256Guid, sizeof (*RngGuid));
+  return EFI_SUCCESS;
 }

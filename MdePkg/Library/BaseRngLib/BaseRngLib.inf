@@ -4,6 +4,7 @@
 #  BaseRng Library that uses CPU RNG instructions (e.g. RdRand) to
 #  provide random numbers.
 #
+#  Copyright (c) 2023, Arm Limited. All rights reserved.<BR>
 #  Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
 #  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 #
@@ -43,8 +44,17 @@
   AArch64/ArmReadIdIsar0.asm | MSFT
   AArch64/ArmRng.asm         | MSFT
 
+[Guids.AARCH64]
+  gEfiRngAlgorithmArmRndr
+
+[Guids.Ia32, Guids.X64]
+  gEfiRngAlgorithmSp80090Ctr256Guid
+
 [Packages]
   MdePkg/MdePkg.dec
+
+[Pcd.AARCH64]
+  gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm
 
 [LibraryClasses]
   BaseLib

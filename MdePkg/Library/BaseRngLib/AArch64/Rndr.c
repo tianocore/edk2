@@ -2,6 +2,7 @@
   Random number generator service that uses the RNDR instruction
   to provide pseudorandom numbers.
 
+  Copyright (c) 2023, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2021, NUVIA Inc. All rights reserved.<BR>
   Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 
@@ -11,6 +12,7 @@
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/RngLib.h>
 
@@ -137,4 +139,44 @@ ArchIsRngSupported (
   )
 {
   return mRndrSupported;
+}
+
+/**
+  Get a GUID identifying the RNG algorithm implementation.
+
+  @param [out] RngGuid  If success, contains the GUID identifying
+                        the RNG algorithm implementation.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_UNSUPPORTED         Not supported.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+GetRngGuid (
+  GUID  *RngGuid
+  )
+{
+  GUID  *RngLibGuid;
+
+  if (RngGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!mRndrSupported) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // If the platform advertises the algorithm behind RNDR instruction,
+  // use it. Otherwise use gEfiRngAlgorithmArmRndr.
+  //
+  RngLibGuid = PcdGetPtr (PcdCpuRngSupportedAlgorithm);
+  if (!IsZeroGuid (RngLibGuid)) {
+    CopyMem (RngGuid, RngLibGuid, sizeof (*RngGuid));
+  } else {
+    CopyMem (RngGuid, &gEfiRngAlgorithmArmRndr, sizeof (*RngGuid));
+  }
+
+  return EFI_SUCCESS;
 }
