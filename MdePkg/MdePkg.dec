@@ -2393,6 +2393,11 @@
   # @Prompt Time-out for a response, internal
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifResponseRetryIntervalMicrosecond|60000|UINT32|0x00000036
 
+[PcdsFixedAtBuild.AARCH64, PcdsPatchableInModule.AARCH64]
+  ## GUID identifying the Rng algorithm implemented by CPU instruction.
+  # @Prompt CPU Rng algorithm's GUID.
+  gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00000037
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This value is used to set the base address of PCI express hierarchy.
   # @Prompt PCI Express Base Address.

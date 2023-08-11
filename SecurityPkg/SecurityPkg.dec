@@ -325,8 +325,6 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationPass|0x0303100A|UINT32|0x00010030
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationFail|0x0303100B|UINT32|0x00010031
 
-  gEfiSecurityPkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00010032
-
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Image verification policy for OptionRom. Only following values are valid:<BR><BR>
   #  NOTE: Do NOT use 0x5 and 0x2 since it violates the UEFI specification and has been removed.<BR>
