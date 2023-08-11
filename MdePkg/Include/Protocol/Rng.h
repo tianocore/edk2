@@ -67,6 +67,15 @@ typedef EFI_GUID EFI_RNG_ALGORITHM;
   { \
     0xe43176d7, 0xb6e8, 0x4827, {0xb7, 0x84, 0x7f, 0xfd, 0xc4, 0xb6, 0x85, 0x61 } \
   }
+///
+/// The Arm Architecture states the RNDR that the DRBG algorithm should be compliant
+/// with NIST SP800-90A, while not mandating a particular algorithm, so as to be
+/// inclusive of different geographies.
+///
+#define EFI_RNG_ALGORITHM_ARM_RNDR \
+  { \
+    0x43d2fde3, 0x9d4e, 0x4d79,  {0x02, 0x96, 0xa8, 0x9b, 0xca, 0x78, 0x08, 0x41} \
+  }
 
 /**
   Returns information about the random number generation implementation.
@@ -146,5 +155,6 @@ extern EFI_GUID  gEfiRngAlgorithmSp80090Ctr256Guid;
 extern EFI_GUID  gEfiRngAlgorithmX9313DesGuid;
 extern EFI_GUID  gEfiRngAlgorithmX931AesGuid;
 extern EFI_GUID  gEfiRngAlgorithmRaw;
+extern EFI_GUID  gEfiRngAlgorithmArmRndr;
 
 #endif
