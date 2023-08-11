@@ -65,10 +65,10 @@ ProbeRedfishCredentialBootstrap (
        (ResponseData.CompletionCode == REDFISH_IPMI_COMP_CODE_BOOTSTRAP_CREDENTIAL_DISABLED)
       ))
   {
-    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credentail Bootstrapping is supported\n", __func__));
+    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credential Bootstrapping is supported\n"));
     ReturnBool = TRUE;
   } else {
-    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credentail Bootstrapping is not supported\n", __func__));
+    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credential Bootstrapping is not supported\n"));
     ReturnBool = FALSE;
   }
 
@@ -645,7 +645,7 @@ HostInterfaceIpmiCheckMacAddress (
                                                             &ResponseDataSize
                                                             );
       if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "    - Fails to send command.\n", ChannelNum));
+        DEBUG ((DEBUG_ERROR, "    - Channel %d fails to send command.\n", ChannelNum));
         continue;
       }
 
@@ -1084,7 +1084,7 @@ CheckBmcUsbNicOnHandles (
                     (VOID **)&DevicePath
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "    Failed to locate SNP on %d handle.\n", __func__, Index));
+      DEBUG ((DEBUG_ERROR, "    Failed to locate SNP on %d handle.\n", Index));
       continue;
     }
 
