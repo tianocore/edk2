@@ -14,6 +14,28 @@
 #define DEFAULT_DELAY_TIME_IN_MICROSECONDS  10
 
 /**
+  This implementation is to be replaced by its MdeModulePkg copy.
+  The cause being that some GUIDs (gEdkiiRngAlgorithmUnSafe) cannot
+  be defined in the MdePkg.
+
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+**/
+RETURN_STATUS
+EFIAPI
+BaseRngLibTimerConstructor (
+  VOID
+  )
+{
+  DEBUG ((
+    DEBUG_WARN,
+    "Warning: This BaseRngTimerLib implementation will be deprecated. "
+    "Please use the MdeModulePkg implementation equivalent.\n"
+    ));
+
+  return RETURN_SUCCESS;
+}
+
+/**
  Using the TimerLib GetPerformanceCounterProperties() we delay
  for enough time for the PerformanceCounter to increment.
 
