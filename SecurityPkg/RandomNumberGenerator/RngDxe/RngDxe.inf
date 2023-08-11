@@ -79,8 +79,8 @@
 [Protocols]
   gEfiRngProtocolGuid                ## PRODUCES
 
-[Pcd]
-  gEfiSecurityPkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm      ## CONSUMES
+[Pcd.AARCH64]
+  gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm      ## CONSUMES
 
 [Depex]
   TRUE
