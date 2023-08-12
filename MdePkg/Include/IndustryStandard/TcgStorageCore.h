@@ -38,7 +38,7 @@ typedef struct {
   UINT32    OutstandingDataBE;
   UINT32    MinTransferBE;
   UINT32    LengthBE;
-  UINT8     Payload[0];
+  UINT8     Payload[];
 } TCG_COM_PACKET;
 
 typedef struct {
@@ -49,7 +49,7 @@ typedef struct {
   UINT16    AckTypeBE;
   UINT32    AcknowledgementBE;
   UINT32    LengthBE;
-  UINT8     Payload[0];
+  UINT8     Payload[];
 } TCG_PACKET;
 
 #define TCG_SUBPACKET_ALIGNMENT  4// 4-byte alignment per spec
@@ -58,7 +58,7 @@ typedef struct {
   UINT8     ReservedBE[6];
   UINT16    KindBE;
   UINT32    LengthBE;
-  UINT8     Payload[0];
+  UINT8     Payload[];
 } TCG_SUB_PACKET;
 
 #define SUBPACKET_KIND_DATA            0x0000

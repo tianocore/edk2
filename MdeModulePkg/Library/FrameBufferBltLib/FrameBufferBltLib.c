@@ -24,7 +24,7 @@ struct FRAME_BUFFER_CONFIGURE {
   EFI_PIXEL_BITMASK            PixelMasks;
   INT8                         PixelShl[4];    // R-G-B-Rsvd
   INT8                         PixelShr[4];    // R-G-B-Rsvd
-  UINT8                        LineBuffer[0];
+  UINT8                        LineBuffer[];
 };
 
 CONST EFI_PIXEL_BITMASK  mRgbPixelMasks = {

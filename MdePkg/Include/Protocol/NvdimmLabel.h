@@ -244,7 +244,7 @@ typedef struct {
   ///
   /// Array size is 1 if EFI_NVDIMM_LABEL_FLAGS_LOCAL is set indicating a Local Namespaces.
   ///
-  EFI_NVDIMM_LABEL_SET_COOKIE_MAP    Mapping[0];
+  EFI_NVDIMM_LABEL_SET_COOKIE_MAP    Mapping[];
 } EFI_NVDIMM_LABEL_SET_COOKIE_INFO;
 
 /**

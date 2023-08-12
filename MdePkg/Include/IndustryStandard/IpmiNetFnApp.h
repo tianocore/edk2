@@ -433,7 +433,7 @@ typedef union {
 typedef struct {
   UINT8                              CompletionCode;
   IPMI_GET_MESSAGE_CHANNEL_NUMBER    ChannelNumber;
-  UINT8                              MessageData[0];
+  UINT8                              MessageData[];
 } IPMI_GET_MESSAGE_RESPONSE;
 
 //
@@ -457,12 +457,12 @@ typedef union {
 typedef struct {
   UINT8                               CompletionCode;
   IPMI_SEND_MESSAGE_CHANNEL_NUMBER    ChannelNumber;
-  UINT8                               MessageData[0];
+  UINT8                               MessageData[];
 } IPMI_SEND_MESSAGE_REQUEST;
 
 typedef struct {
   UINT8    CompletionCode;
-  UINT8    ResponseData[0];
+  UINT8    ResponseData[];
 } IPMI_SEND_MESSAGE_RESPONSE;
 
 //
@@ -906,7 +906,7 @@ typedef union {
 typedef struct {
   IPMI_SET_USER_PASSWORD_USER_ID      UserId;
   IPMI_SET_USER_PASSWORD_OPERATION    Operation;
-  UINT8                               PasswordData[0]; // 16 or 20 bytes, depending on the 'PasswordSize' field
+  UINT8                               PasswordData[]; // 16 or 20 bytes, depending on the 'PasswordSize' field
 } IPMI_SET_USER_PASSWORD_REQUEST;
 
 //

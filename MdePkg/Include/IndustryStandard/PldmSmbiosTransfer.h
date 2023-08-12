@@ -92,7 +92,7 @@ typedef struct {
 typedef struct {
   UINT32    NextDataTransferHandle;
   UINT8     TransferFlag;
-  UINT8     Table[0];
+  UINT8     Table[];
 } PLDM_GET_SMBIOS_STRUCTURE_TABLE_RESPONSE;
 
 typedef struct {
@@ -106,7 +106,7 @@ typedef struct {
 typedef struct {
   UINT32    DataTransferHandle;
   UINT8     TransferFlag;
-  UINT8     Table[0];
+  UINT8     Table[];
 } PLDM_SET_SMBIOS_STRUCTURE_TABLE_REQUEST;
 
 typedef struct {
@@ -143,7 +143,7 @@ typedef struct {
 typedef struct {
   UINT32    NextDataTransferHandle;
   UINT8     TransferFlag;
-  UINT8     Table[0];
+  UINT8     Table[];
 } PLDM_GET_SMBIOS_STRUCTURE_BY_TYPE_RESPONSE;
 
 typedef struct {
@@ -171,7 +171,7 @@ typedef struct {
 typedef struct {
   UINT32    NextDataTransferHandle;
   UINT8     TransferFlag;
-  UINT8     Table[0];
+  UINT8     Table[];
 } PLDM_GET_SMBIOS_STRUCTURE_BY_HANDLE_RESPONSE;
 
 typedef struct {
