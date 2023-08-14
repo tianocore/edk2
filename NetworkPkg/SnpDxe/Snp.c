@@ -32,6 +32,10 @@ SnpNotifyExitBootServices (
   //
   PxeShutdown (Snp);
   PxeStop (Snp);
+
+  // Since BeforeExitBootServices is run on each call, close event
+  // to prevent reentry.
+  gBS->CloseEvent (Event);
 }
 
 /**
@@ -655,7 +659,7 @@ SimpleNetworkDriverStart (
                     TPL_CALLBACK,
                     SnpNotifyExitBootServices,
                     Snp,
-                    &gEfiEventExitBootServicesGuid,
+                    &gEfiEventBeforeExitBootServicesGuid,
                     &Snp->ExitBootServicesEvent
                     );
     if (EFI_ERROR (Status)) {
