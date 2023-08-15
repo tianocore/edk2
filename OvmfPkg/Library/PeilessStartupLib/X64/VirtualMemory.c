@@ -53,18 +53,7 @@ IsSetNxForStack (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE      *GuidHob;
-  EFI_HOB_PLATFORM_INFO  *PlatformInfo;
-
-  GuidHob = GetFirstGuidHob (&gUefiOvmfPkgPlatformInfoGuid);
-  if (GuidHob == NULL) {
-    ASSERT (FALSE);
-    return FALSE;
-  }
-
-  PlatformInfo = (EFI_HOB_PLATFORM_INFO *)GET_GUID_HOB_DATA (GuidHob);
-
-  return PlatformInfo->PcdSetNxForStack;
+  return mMps.Dxe.StackExecutionProtectionEnabled;
 }
 
 /**
