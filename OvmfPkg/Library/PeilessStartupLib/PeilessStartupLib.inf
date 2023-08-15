@@ -57,7 +57,7 @@
   QemuFwCfgLib
   PlatformInitLib
   SetMemoryProtectionsLib
-  QemuFwCfgSimpleParserLib
+  MemoryProtectionConfigLib
 
 [Guids]
   gEfiHobMemoryAllocModuleGuid

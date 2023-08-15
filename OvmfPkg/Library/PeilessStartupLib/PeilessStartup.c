@@ -20,7 +20,7 @@
 #include <Library/PlatformInitLib.h>
 #include <Library/TdxHelperLib.h>
 #include <Library/SetMemoryProtectionsLib.h>
-#include <Library/QemuFwCfgSimpleParserLib.h>
+#include <Library/MemoryProtectionConfigLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <OvmfPlatforms.h>
@@ -109,18 +109,23 @@ InitializePlatform (
 
   PlatformMemMapInitialization (PlatformInfoHob);
 
-  DxeSettings                                 = DxeMemoryProtectionProfiles[DxeMemoryProtectionSettingsPcd].Settings;
-  MmSettings                                  = MmMemoryProtectionProfiles[MmMemoryProtectionSettingsPcd].Settings;
-  DxeSettings.StackExecutionProtectionEnabled = PcdGetBool (PcdSetNxForStack);
-  QemuFwCfgParseBool ("opt/ovmf/PcdSetNxForStack", &DxeSettings.StackExecutionProtectionEnabled);
+  if (EFI_ERROR (ParseFwCfgDxeMemoryProtectionSettings (&DxeSettings))) {
+    DxeSettings = DxeMemoryProtectionProfiles[DxeMemoryProtectionSettingsRelease].Settings;
+  }
 
-  SetDxeMemoryProtectionSettings (&DxeSettings, DxeMemoryProtectionSettingsPcd);
-  SetMmMemoryProtectionSettings (&MmSettings, MmMemoryProtectionSettingsPcd);
+  if (EFI_ERROR (ParseFwCfgMmMemoryProtectionSettings (&MmSettings))) {
+    MmSettings = MmMemoryProtectionProfiles[MmMemoryProtectionSettingsOff].Settings;
+  }
+
+  // Always disable NullPointerDetection in EndOfDxe phase for shim compatability
+  DxeSettings.NullPointerDetection.DisableEndOfDxe = TRUE;
+
+  SetDxeMemoryProtectionSettings (&DxeSettings, DxeMemoryProtectionSettingsRelease);
+  SetMmMemoryProtectionSettings (&MmSettings, MmMemoryProtectionSettingsOff);
 
   if (TdIsEnabled ()) {
     PlatformInfoHob->PcdConfidentialComputingGuestAttr = CCAttrIntelTdx;
     PlatformInfoHob->PcdTdxSharedBitMask               = TdSharedPageMask ();
-    PlatformInfoHob->PcdSetNxForStack                  = TRUE;
   }
 
   PlatformMiscInitialization (PlatformInfoHob);
