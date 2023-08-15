@@ -469,6 +469,14 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand|TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware|TRUE
 
+  #
+  # INIT is now triggered before BIOS by ucode/hardware. In the OVMF
+  # environment, QEMU lacks a simulation for the INIT process.
+  # To address this, PcdFirstTimeWakeUpAPsBySipi set to FALSE to
+  # broadcast INIT-SIPI-SIPI for the first time.
+  #
+  gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|FALSE
+
 ################################################################################
 #
 # Pcd Dynamic Section - list of all EDK II PCD Entries defined by this Platform
