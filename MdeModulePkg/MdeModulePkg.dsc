@@ -107,6 +107,8 @@
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   IpmiCommandLib|MdeModulePkg/Library/BaseIpmiCommandLibNull/BaseIpmiCommandLibNull.inf
+  GetMemoryProtectionsLib|MdeModulePkg/Library/GetMemoryProtectionsLib/GetMemoryProtectionsLibNull.inf
+  SetMemoryProtectionsLib|MdeModulePkg/Library/SetMemoryProtectionsLib/SetMemoryProtectionsLibNull.inf
 
 [LibraryClasses.EBC.PEIM]
   IoLib|MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
@@ -232,6 +234,8 @@
   MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
   MdeModulePkg/Library/DeviceManagerUiLib/DeviceManagerUiLib.inf
   MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
+  MdeModulePkg/Library/GetMemoryProtectionsLib/GetMemoryProtectionsLibNull.inf
+  MdeModulePkg/Library/SetMemoryProtectionsLib/SetMemoryProtectionsLibNull.inf
   MdeModulePkg/Library/PciHostBridgeLibNull/PciHostBridgeLibNull.inf
   MdeModulePkg/Library/PiSmmCoreSmmServicesTableLib/PiSmmCoreSmmServicesTableLib.inf
   MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
