@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Tcg2Protocol.h>
 #include <IndustryStandard/Tpm20.h>
 
-EFI_TCG2_PROTOCOL  *mTcg2Protocol = NULL;
+STATIC  EFI_TCG2_PROTOCOL  *mTcg2Protocol = NULL;
 
 /**
   This service enables the sending of commands to the TPM2.
