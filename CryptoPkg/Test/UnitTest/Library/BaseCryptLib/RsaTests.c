@@ -194,12 +194,22 @@ TestVerifyRsaGenerateKeyComponents (
   BOOLEAN  Status;
   UINTN    KeySize;
   UINT8    *KeyBuffer;
+  UINT8    TestPublicExponent1[] = { 0x03 };
+  UINT8    TestPublicExponent2[] = { 0x01, 0x01 };
+  UINT8    TestPublicExponent3[] = { 0x01, 0x00, 0x01 };
 
   //
   // Generate RSA Key Components
   //
 
   Status = RsaGenerateKey (mRsa, RSA_MODULUS_LENGTH, NULL, 0);
+  UT_ASSERT_TRUE (Status);
+
+  Status = RsaGenerateKey (mRsa, RSA_MODULUS_LENGTH, TestPublicExponent1, sizeof (TestPublicExponent1));
+  UT_ASSERT_TRUE (Status);
+  Status = RsaGenerateKey (mRsa, RSA_MODULUS_LENGTH, TestPublicExponent2, sizeof (TestPublicExponent2));
+  UT_ASSERT_TRUE (Status);
+  Status = RsaGenerateKey (mRsa, RSA_MODULUS_LENGTH, TestPublicExponent3, sizeof (TestPublicExponent3));
   UT_ASSERT_TRUE (Status);
 
   KeySize   = RSA_MODULUS_LENGTH / 8;
