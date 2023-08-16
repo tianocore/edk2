@@ -82,19 +82,19 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  HmacSha384Digest[] = {
 };
 
 typedef
-VOID *
+  VOID *
 (EFIAPI *EFI_HMAC_NEW)(
   VOID
   );
 
 typedef
-VOID
+  VOID
 (EFIAPI *EFI_HMAC_FREE)(
   IN VOID  *HashContext
   );
 
 typedef
-BOOLEAN
+  BOOLEAN
 (EFIAPI *EFI_HMAC_INIT)(
   IN OUT  VOID        *HashContext,
   IN   CONST UINT8    *Key,
@@ -102,7 +102,14 @@ BOOLEAN
   );
 
 typedef
-BOOLEAN
+  BOOLEAN
+(EFIAPI *EFI_HMAC_DUP)(
+  IN   CONST  VOID    *HashContext,
+  OUT  VOID           *NewHashContext
+  );
+
+typedef
+  BOOLEAN
 (EFIAPI *EFI_HMAC_UPDATE)(
   IN OUT  VOID        *HashContext,
   IN      CONST VOID  *Data,
@@ -110,10 +117,20 @@ BOOLEAN
   );
 
 typedef
-BOOLEAN
+  BOOLEAN
 (EFIAPI *EFI_HMAC_FINAL)(
   IN OUT  VOID   *HashContext,
   OUT     UINT8  *HashValue
+  );
+
+typedef
+  BOOLEAN
+(EFIAPI *EFI_HMAC_ALL)(
+  IN   CONST VOID     *Data,
+  IN   UINTN          DataSize,
+  IN   CONST UINT8    *Key,
+  IN   UINTN          KeySize,
+  OUT  UINT8          *HashValue
   );
 
 typedef struct {
@@ -121,19 +138,18 @@ typedef struct {
   EFI_HMAC_NEW       HmacNew;
   EFI_HMAC_FREE      HmacFree;
   EFI_HMAC_INIT      HmacInit;
+  EFI_HMAC_DUP       HmacDup;
   EFI_HMAC_UPDATE    HmacUpdate;
   EFI_HMAC_FINAL     HmacFinal;
+  EFI_HMAC_ALL       HmacAll;
   CONST UINT8        *Key;
   UINTN              KeySize;
   CONST UINT8        *Digest;
   VOID               *HmacCtx;
 } HMAC_TEST_CONTEXT;
 
-// These functions have been deprecated but they've been left commented out for future reference
-// HMAC_TEST_CONTEXT       mHmacMd5TestCtx    = {MD5_DIGEST_SIZE,    HmacMd5New,    HmacMd5Free,  HmacMd5SetKey,    HmacMd5Update,    HmacMd5Final,    HmacMd5Key,    sizeof(HmacMd5Key),    HmacMd5Digest};
-// HMAC_TEST_CONTEXT       mHmacSha1TestCtx   = {SHA1_DIGEST_SIZE,   HmacSha1New,   HmacSha1Free, HmacSha1SetKey,   HmacSha1Update,   HmacSha1Final,   HmacSha1Key,   sizeof(HmacSha1Key),   HmacSha1Digest};
-HMAC_TEST_CONTEXT  mHmacSha256TestCtx = { SHA256_DIGEST_SIZE, HmacSha256New, HmacSha256Free, HmacSha256SetKey, HmacSha256Update, HmacSha256Final, HmacSha256Key, sizeof (HmacSha256Key), HmacSha256Digest };
-HMAC_TEST_CONTEXT  mHmacSha384TestCtx = { SHA384_DIGEST_SIZE, HmacSha384New, HmacSha384Free, HmacSha384SetKey, HmacSha384Update, HmacSha384Final, HmacSha384Key, sizeof (HmacSha384Key), HmacSha384Digest };
+HMAC_TEST_CONTEXT  mHmacSha256TestCtx = { SHA256_DIGEST_SIZE, HmacSha256New, HmacSha256Free, HmacSha256SetKey, HmacSha256Duplicate, HmacSha256Update, HmacSha256Final, HmacSha256All, HmacSha256Key, sizeof (HmacSha256Key), HmacSha256Digest };
+HMAC_TEST_CONTEXT  mHmacSha384TestCtx = { SHA384_DIGEST_SIZE, HmacSha384New, HmacSha384Free, HmacSha384SetKey, HmacSha384Duplicate, HmacSha384Update, HmacSha384Final, HmacSha384All, HmacSha384Key, sizeof (HmacSha384Key), HmacSha384Digest };
 
 UNIT_TEST_STATUS
 EFIAPI
@@ -173,23 +189,44 @@ TestVerifyHmac (
   )
 {
   UINT8              Digest[MAX_DIGEST_SIZE];
+  UINT8              DigestCopy[MAX_DIGEST_SIZE];
+  UINT8              DigestByAll[MAX_DIGEST_SIZE];
+  VOID               *HmacCopyContext;
   BOOLEAN            Status;
   HMAC_TEST_CONTEXT  *HmacTestContext;
 
   HmacTestContext = Context;
 
   ZeroMem (Digest, MAX_DIGEST_SIZE);
+  ZeroMem (DigestCopy, MAX_DIGEST_SIZE);
+  ZeroMem (DigestByAll, MAX_DIGEST_SIZE);
+
+  HmacCopyContext = HmacTestContext->HmacNew ();
 
   Status = HmacTestContext->HmacInit (HmacTestContext->HmacCtx, HmacTestContext->Key, HmacTestContext->KeySize);
+  UT_ASSERT_TRUE (Status);
+
+  Status = HmacTestContext->HmacInit (HmacCopyContext, HmacTestContext->Key, HmacTestContext->KeySize);
   UT_ASSERT_TRUE (Status);
 
   Status = HmacTestContext->HmacUpdate (HmacTestContext->HmacCtx, HmacData, 8);
   UT_ASSERT_TRUE (Status);
 
+  Status = HmacTestContext->HmacDup (HmacTestContext->HmacCtx, HmacCopyContext);
+  UT_ASSERT_TRUE (Status);
+
   Status = HmacTestContext->HmacFinal (HmacTestContext->HmacCtx, Digest);
   UT_ASSERT_TRUE (Status);
 
+  Status = HmacTestContext->HmacFinal (HmacCopyContext, DigestCopy);
+  UT_ASSERT_TRUE (Status);
+
+  Status = HmacTestContext->HmacAll (HmacData, 8, HmacTestContext->Key, HmacTestContext->KeySize, DigestByAll);
+  UT_ASSERT_TRUE (Status);
+
   UT_ASSERT_MEM_EQUAL (Digest, HmacTestContext->Digest, HmacTestContext->DigestSize);
+  UT_ASSERT_MEM_EQUAL (Digest, DigestCopy, HmacTestContext->DigestSize);
+  UT_ASSERT_MEM_EQUAL (Digest, DigestByAll, HmacTestContext->DigestSize);
 
   return UNIT_TEST_PASSED;
 }
@@ -200,9 +237,6 @@ TEST_DESC  mHmacTest[] = {
   //
   { "TestVerifyHmacSha256()", "CryptoPkg.BaseCryptLib.Hmac", TestVerifyHmac, TestVerifyHmacPreReq, TestVerifyHmacCleanUp, &mHmacSha256TestCtx },
   { "TestVerifyHmacSha384()", "CryptoPkg.BaseCryptLib.Hmac", TestVerifyHmac, TestVerifyHmacPreReq, TestVerifyHmacCleanUp, &mHmacSha384TestCtx },
-  // These functions have been deprecated but they've been left commented out for future reference
-  // {"TestVerifyHmacMd5()",    "CryptoPkg.BaseCryptLib.Hmac",   TestVerifyHmac, TestVerifyHmacPreReq, TestVerifyHmacCleanUp, &mHmacMd5TestCtx},
-  // {"TestVerifyHmacSha1()",   "CryptoPkg.BaseCryptLib.Hmac",   TestVerifyHmac, TestVerifyHmacPreReq, TestVerifyHmacCleanUp, &mHmacSha1TestCtx},
 };
 
 UINTN  mHmacTestNum = ARRAY_SIZE (mHmacTest);
