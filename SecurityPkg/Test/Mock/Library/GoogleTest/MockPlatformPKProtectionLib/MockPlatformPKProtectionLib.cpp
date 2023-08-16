@@ -6,6 +6,6 @@
 **/
 #include <GoogleTest/Library/MockPlatformPKProtectionLib.h>
 
-MOCK_INTERFACE_DEFINITION(MockPlatformPKProtectionLib);
+MOCK_INTERFACE_DEFINITION (MockPlatformPKProtectionLib);
 
-MOCK_FUNCTION_DEFINITION(MockPlatformPKProtectionLib, DisablePKProtection, 0, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockPlatformPKProtectionLib, DisablePKProtection, 0, EFIAPI);
