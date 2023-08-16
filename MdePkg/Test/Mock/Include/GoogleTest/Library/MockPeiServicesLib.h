@@ -11,9 +11,9 @@
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
 extern "C" {
-#include <PiPei.h>
-#include <Uefi.h>
-#include <Library/PeiServicesLib.h>
+  #include <PiPei.h>
+  #include <Uefi.h>
+  #include <Library/PeiServicesLib.h>
 }
 
 struct MockPeiServicesLib {
