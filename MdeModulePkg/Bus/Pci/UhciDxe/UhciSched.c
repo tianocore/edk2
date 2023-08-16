@@ -197,7 +197,7 @@ UhciDestoryFrameList (
 }
 
 /**
-  Convert the poll rate to the maxium 2^n that is smaller
+  Convert the poll rate to the maximum 2^n that is smaller
   than Interval.
 
   @param  Interval               The poll rate to convert.
@@ -213,6 +213,14 @@ UhciConvertPollRate (
   UINTN  BitCount;
 
   ASSERT (Interval != 0);
+
+  //
+  // To safeguard RELEASE mode wherein ASSERT is effectively not there,
+  // if inadvertently Interval is still 0 here, treat it the same as 1.
+  //
+  if (Interval == 0) {
+    Interval = 1;
+  }
 
   //
   // Find the index (1 based) of the highest non-zero bit
