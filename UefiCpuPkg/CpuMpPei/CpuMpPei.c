@@ -469,10 +469,6 @@ InitializeMpExceptionStackSwitchHandlers (
   EFI_STATUS                      Status;
   UINT8                           *Buffer;
 
-  if (!PcdGetBool (PcdCpuStackGuard)) {
-    return;
-  }
-
   Status = MpInitLibGetNumberOfProcessors (&NumberOfProcessors, NULL);
   ASSERT_EFI_ERROR (Status);
 
@@ -730,7 +726,9 @@ InitializeCpuMpWorker (
   //
   // Special initialization for the sake of Stack Guard
   //
-  InitializeMpExceptionStackSwitchHandlers ();
+  if (mInitStackGuard) {
+    InitializeMpExceptionStackSwitchHandlers ();
+  }
 
   //
   // Update and publish CPU BIST information
