@@ -671,7 +671,8 @@ GetStatementPrivateByConfigureLang (
 
         DEBUG_CODE (
           STATIC UINTN Index = 0;
-          DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: [%d] search %s in QID: 0x%x form: 0x%x formset: %g\n", __func__, ++Index, ConfigureLang, HiiStatementPrivate->QuestionId, HiiFormPrivate->Id, &HiiFormsetPrivate->Guid));
+          Index++;
+          DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: [%d] search %s in QID: 0x%x form: 0x%x formset: %g\n", __func__, Index, ConfigureLang, HiiStatementPrivate->QuestionId, HiiFormPrivate->Id, &HiiFormsetPrivate->Guid));
           );
 
         if (HiiStatementPrivate->Description != 0) {
