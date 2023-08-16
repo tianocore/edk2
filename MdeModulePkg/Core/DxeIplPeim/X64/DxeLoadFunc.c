@@ -36,6 +36,8 @@ HandOffToDxeCore (
   VOID                             *GhcbBase;
   UINTN                            GhcbSize;
 
+  GetCurrentMemoryProtectionSettings (&mMps);
+
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
   //
@@ -104,8 +106,8 @@ HandOffToDxeCore (
     // Set NX for stack feature also require PcdDxeIplBuildPageTables be TRUE
     // for the DxeIpl and the DxeCore are both X64.
     //
-    ASSERT (PcdGetBool (PcdSetNxForStack) == FALSE);
-    ASSERT (PcdGetBool (PcdCpuStackGuard) == FALSE);
+    ASSERT (!mMps.Dxe.StackExecutionProtectionEnabled);
+    ASSERT (!mMps.Dxe.CpuStackGuardEnabled);
   }
 
   //

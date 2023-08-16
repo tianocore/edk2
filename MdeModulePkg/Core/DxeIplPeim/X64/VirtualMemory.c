@@ -109,7 +109,7 @@ IsNullDetectionEnabled (
   VOID
   )
 {
-  return ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) != 0);
+  return mMps.Dxe.NullPointerDetection.Enabled;
 }
 
 /**
@@ -163,9 +163,9 @@ IsEnableNonExecNeeded (
   // XD flag (BIT63) in page table entry is only valid if IA32_EFER.NXE is set.
   // Features controlled by Following PCDs need this feature to be enabled.
   //
-  return (PcdGetBool (PcdSetNxForStack) ||
-          PcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0 ||
-          PcdGet32 (PcdImageProtectionPolicy) != 0);
+  return (mMps.Dxe.StackExecutionProtectionEnabled ||
+          !IsZeroBuffer (&mMps.Dxe.ExecutionProtection.EnabledForType, MPS_MEMORY_TYPE_BUFFER_SIZE) ||
+          mMps.Dxe.ImageProtection.ProtectImageFromFv || mMps.Dxe.ImageProtection.ProtectImageFromUnknown);
 }
 
 /**
@@ -214,13 +214,13 @@ ToSplitPageTable (
     return TRUE;
   }
 
-  if (PcdGetBool (PcdCpuStackGuard)) {
+  if (mMps.Dxe.CpuStackGuardEnabled) {
     if ((StackBase >= Address) && (StackBase < (Address + Size))) {
       return TRUE;
     }
   }
 
-  if (PcdGetBool (PcdSetNxForStack)) {
+  if (mMps.Dxe.StackExecutionProtectionEnabled) {
     if ((Address < StackBase + StackSize) && ((Address + Size) > StackBase)) {
       return TRUE;
     }
@@ -403,14 +403,14 @@ Split2MPageTo4K (
     PageTableEntry->Bits.ReadWrite = 1;
 
     if ((IsNullDetectionEnabled () && (PhysicalAddress4K == 0)) ||
-        (PcdGetBool (PcdCpuStackGuard) && (PhysicalAddress4K == StackBase)))
+        (mMps.Dxe.CpuStackGuardEnabled && (PhysicalAddress4K == StackBase)))
     {
       PageTableEntry->Bits.Present = 0;
     } else {
       PageTableEntry->Bits.Present = 1;
     }
 
-    if (  PcdGetBool (PcdSetNxForStack)
+    if (  mMps.Dxe.StackExecutionProtectionEnabled
        && (PhysicalAddress4K >= StackBase)
        && (PhysicalAddress4K < StackBase + StackSize))
     {
