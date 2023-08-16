@@ -530,7 +530,7 @@ class UncrustifyCheck(ICiBuildPlugin):
         """
         Initializes options that influence test case output.
         """
-        self._audit_only_mode = True
+        self._audit_only_mode = False
         self._output_file_diffs = True
 
         if "AuditOnly" in self._package_config and self._package_config["AuditOnly"]:
