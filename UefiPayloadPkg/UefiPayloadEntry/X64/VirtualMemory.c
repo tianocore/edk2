@@ -27,10 +27,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/SetMemoryProtectionsLib.h>
 #include <Library/PcdLib.h>
 #include <Library/HobLib.h>
 #include <Register/Intel/Cpuid.h>
 #include "VirtualMemory.h"
+
+extern MEMORY_PROTECTION_SETTINGS  mMps;
 
 //
 // Global variable to keep track current available memory used as page table.
@@ -115,7 +118,7 @@ IsNullDetectionEnabled (
   VOID
   )
 {
-  return ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) != 0);
+  return mMps.Dxe.NullPointerDetection.Enabled;
 }
 
 /**
@@ -169,9 +172,9 @@ IsEnableNonExecNeeded (
   // XD flag (BIT63) in page table entry is only valid if IA32_EFER.NXE is set.
   // Features controlled by Following PCDs need this feature to be enabled.
   //
-  return (PcdGetBool (PcdSetNxForStack) ||
-          PcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0 ||
-          PcdGet32 (PcdImageProtectionPolicy) != 0);
+  return (mMps.Dxe.StackExecutionProtectionEnabled ||
+          !IsZeroBuffer (&mMps.Dxe.ExecutionProtection.EnabledForType, MPS_MEMORY_TYPE_BUFFER_SIZE) ||
+          (mMps.Dxe.ImageProtection.ProtectImageFromFv || mMps.Dxe.ImageProtection.ProtectImageFromUnknown));
 }
 
 /**
@@ -399,14 +402,14 @@ Split2MPageTo4K (
     PageTableEntry->Bits.ReadWrite = 1;
 
     if ((IsNullDetectionEnabled () && (PhysicalAddress4K == 0)) ||
-        (PcdGetBool (PcdCpuStackGuard) && (PhysicalAddress4K == StackBase)))
+        (mMps.Dxe.CpuStackGuardEnabled && (PhysicalAddress4K == StackBase)))
     {
       PageTableEntry->Bits.Present = 0;
     } else {
       PageTableEntry->Bits.Present = 1;
     }
 
-    if (  PcdGetBool (PcdSetNxForStack)
+    if (  mMps.Dxe.StackExecutionProtectionEnabled
        && (PhysicalAddress4K >= StackBase)
        && (PhysicalAddress4K < StackBase + StackSize))
     {
