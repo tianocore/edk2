@@ -33,13 +33,15 @@ HandOffToDxeCore (
   EFI_STATUS                  Status;
   EDKII_MEMORY_ATTRIBUTE_PPI  *MemoryPpi;
 
+  GetCurrentMemoryProtectionSettings (&mMps);
+
   //
   // Allocate 128KB for the Stack
   //
   BaseOfStack = AllocatePages (EFI_SIZE_TO_PAGES (STACK_SIZE));
   ASSERT (BaseOfStack != NULL);
 
-  if (PcdGetBool (PcdSetNxForStack)) {
+  if (mMps.Dxe.StackExecutionProtectionEnabled) {
     Status = PeiServicesLocatePpi (
                &gEdkiiMemoryAttributePpiGuid,
                0,

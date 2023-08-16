@@ -37,6 +37,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiDecompressLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/SetMemoryProtectionsLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/DebugAgentLib.h>
@@ -45,6 +46,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define STACK_SIZE      0x20000
 #define BSP_STORE_SIZE  0x4000
+
+extern MEMORY_PROTECTION_SETTINGS  mMps;
 
 //
 // This PPI is installed to indicate the end of the PEI usage of memory
