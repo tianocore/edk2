@@ -31,6 +31,7 @@
 #include <Library/CpuPageTableLib.h>
 
 extern EFI_PEI_PPI_DESCRIPTOR  mPeiCpuMpPpiDesc;
+extern BOOLEAN                 mInitStackGuard;
 
 /**
   This service retrieves the number of logical processor in the platform
@@ -426,7 +427,7 @@ InitializeCpuMpWorker (
   );
 
 /**
-  Enable/setup stack guard for each processor if PcdCpuStackGuard is set to TRUE.
+  Enable/setup stack guard for each processor.
 
   Doing this in the memory-discovered callback is to make sure the Stack Guard
   feature to cover as most PEI code as possible.

@@ -68,6 +68,8 @@ EFI_PEI_NOTIFY_DESCRIPTOR  mPostMemNotifyList[] = {
   }
 };
 
+BOOLEAN  mInitStackGuard = FALSE;
+
 /**
   The function will check if IA32 PAE is supported.
 
@@ -532,7 +534,7 @@ SetupStackGuardPage (
 }
 
 /**
-  Enable/setup stack guard for each processor if PcdCpuStackGuard is set to TRUE.
+  Enable/setup stack guard for each processor.
 
   Doing this in the memory-discovered callback is to make sure the Stack Guard
   feature to cover as most PEI code as possible.
@@ -553,7 +555,6 @@ MemoryDiscoveredPpiNotifyCallback (
   )
 {
   EFI_STATUS              Status;
-  BOOLEAN                 InitStackGuard;
   EDKII_MIGRATED_FV_INFO  *MigratedFvInfo;
   EFI_PEI_HOB_POINTERS    Hob;
   IA32_CR0                Cr0;
@@ -563,11 +564,10 @@ MemoryDiscoveredPpiNotifyCallback (
   // initialization later will not contain paging information and then fail
   // the task switch (for the sake of stack switch).
   //
-  InitStackGuard = FALSE;
-  Hob.Raw        = NULL;
+  Hob.Raw = NULL;
   if (IsIa32PaeSupported ()) {
-    Hob.Raw        = GetFirstGuidHob (&gEdkiiMigratedFvInfoGuid);
-    InitStackGuard = PcdGetBool (PcdCpuStackGuard);
+    Hob.Raw         = GetFirstGuidHob (&gEdkiiMigratedFvInfoGuid);
+    mInitStackGuard = TRUE;
   }
 
   //
@@ -575,7 +575,7 @@ MemoryDiscoveredPpiNotifyCallback (
   // is to enable paging if it is not enabled (only in 32bit mode).
   //
   Cr0.UintN = AsmReadCr0 ();
-  if ((Cr0.Bits.PG == 0) && (InitStackGuard || (Hob.Raw != NULL))) {
+  if ((Cr0.Bits.PG == 0) && (mInitStackGuard || (Hob.Raw != NULL))) {
     ASSERT (sizeof (UINTN) == sizeof (UINT32));
 
     Status = EnablePaePageTable ();
@@ -588,7 +588,7 @@ MemoryDiscoveredPpiNotifyCallback (
   Status = InitializeCpuMpWorker ((CONST EFI_PEI_SERVICES **)PeiServices);
   ASSERT_EFI_ERROR (Status);
 
-  if (InitStackGuard) {
+  if (mInitStackGuard) {
     SetupStackGuardPage ();
   }
 
