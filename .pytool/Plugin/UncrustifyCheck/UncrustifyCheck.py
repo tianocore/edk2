@@ -110,7 +110,7 @@ class UncrustifyCheck(ICiBuildPlugin):
     # A package can add any additional paths with "AdditionalIncludePaths"
     # A package can remove any of these paths with "IgnoreStandardPaths"
     #
-    STANDARD_PLUGIN_DEFINED_PATHS = ("*.c", "*.h")
+    STANDARD_PLUGIN_DEFINED_PATHS = ("*.c", "*.h", "*.cpp")
 
     #
     # The Uncrustify application path should set in this environment variable
