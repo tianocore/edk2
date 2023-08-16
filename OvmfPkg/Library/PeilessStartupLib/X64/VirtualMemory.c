@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/MemoryAllocationHob.h>
+#include <Library/SetMemoryProtectionsLib.h>
 #include <Register/Intel/Cpuid.h>
 #include <Library/PlatformInitLib.h>
 #include "PageTables.h"
@@ -44,6 +45,8 @@ UINT64  mLevelSize[5] = {
   SIZE_1GB,
   SIZE_512GB
 };
+
+extern MEMORY_PROTECTION_SETTINGS  mMps;
 
 BOOLEAN
 IsSetNxForStack (
@@ -142,7 +145,7 @@ IsNullDetectionEnabled (
   VOID
   )
 {
-  return ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) != 0);
+  return mMps.Dxe.NullPointerDetection.Enabled;
 }
 
 /**
@@ -197,8 +200,8 @@ IsEnableNonExecNeeded (
   // Features controlled by Following PCDs need this feature to be enabled.
   //
   return (IsSetNxForStack () ||
-          FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0 ||
-          PcdGet32 (PcdImageProtectionPolicy) != 0);
+          !IsZeroBuffer (&mMps.Dxe.ExecutionProtection.EnabledForType, MPS_MEMORY_TYPE_BUFFER_SIZE) ||
+          (mMps.Dxe.ImageProtection.ProtectImageFromFv || mMps.Dxe.ImageProtection.ProtectImageFromUnknown));
 }
 
 /**
@@ -241,7 +244,7 @@ ToSplitPageTable (
     return TRUE;
   }
 
-  if (FixedPcdGetBool (PcdCpuStackGuard)) {
+  if (mMps.Dxe.CpuStackGuardEnabled) {
     if ((StackBase >= Address) && (StackBase < (Address + Size))) {
       return TRUE;
     }
@@ -427,7 +430,7 @@ Split2MPageTo4K (
     PageTableEntry->Bits.ReadWrite = 1;
 
     if ((IsNullDetectionEnabled () && (PhysicalAddress4K == 0)) ||
-        (FixedPcdGetBool (PcdCpuStackGuard) && (PhysicalAddress4K == StackBase)))
+        (mMps.Dxe.CpuStackGuardEnabled && (PhysicalAddress4K == StackBase)))
     {
       PageTableEntry->Bits.Present = 0;
     } else {
