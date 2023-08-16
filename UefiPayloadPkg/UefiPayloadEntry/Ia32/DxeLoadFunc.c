@@ -78,6 +78,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED  IA32_DESCRIPTOR  gLidtDescriptor = {
   0
 };
 
+extern MEMORY_PROTECTION_SETTINGS  mMps;
+
 /**
   Allocates and fills in the Page Directory and Page Table Entries to
   establish a 4G page table.
@@ -227,11 +229,14 @@ ToBuildPageTable (
     return TRUE;
   }
 
-  if (PcdGet8 (PcdHeapGuardPropertyMask) != 0) {
+  if (mMps.Dxe.HeapGuard.PageGuardEnabled ||
+      mMps.Dxe.HeapGuard.PageGuardEnabled ||
+      mMps.Dxe.HeapGuard.FreedMemoryGuardEnabled)
+  {
     return TRUE;
   }
 
-  if (PcdGetBool (PcdCpuStackGuard)) {
+  if (mMps.Dxe.CpuStackGuardEnabled) {
     return TRUE;
   }
 
@@ -267,6 +272,8 @@ HandOffToDxeCore (
   EFI_PHYSICAL_ADDRESS     VectorAddress;
   UINT32                   Index;
   X64_IDT_TABLE            *IdtTableForX64;
+
+  GetCurrentMemoryProtectionSettings (&mMps);
 
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.

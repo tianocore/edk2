@@ -17,6 +17,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "UefiPayloadEntry.h"
 #define STACK_SIZE  0x20000
 
+extern MEMORY_PROTECTION_SETTINGS  mMps;
+
 /**
    Transfers control to DxeCore.
 
@@ -39,6 +41,8 @@ HandOffToDxeCore (
   UINTN  PageTables;
   VOID   *GhcbBase;
   UINTN  GhcbSize;
+
+  GetCurrentMemoryProtectionSettings (&mMps);
 
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
@@ -83,8 +87,8 @@ HandOffToDxeCore (
     // Set NX for stack feature also require PcdDxeIplBuildPageTables be TRUE
     // for the DxeIpl and the DxeCore are both X64.
     //
-    ASSERT (PcdGetBool (PcdSetNxForStack) == FALSE);
-    ASSERT (PcdGetBool (PcdCpuStackGuard) == FALSE);
+    ASSERT (!mMps.Dxe.StackExecutionProtectionEnabled);
+    ASSERT (!mMps.Dxe.CpuStackGuardEnabled);
   }
 
   if (FeaturePcdGet (PcdDxeIplBuildPageTables)) {
