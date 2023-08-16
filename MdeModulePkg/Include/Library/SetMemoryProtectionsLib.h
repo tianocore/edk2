@@ -17,6 +17,11 @@ typedef struct {
 } DXE_MEMORY_PROTECTION_PROFILES;
 
 typedef enum {
+  DxeMemoryProtectionSettingsDebug = 0,
+  DxeMemoryProtectionSettingsRelease,
+  DxeMemoryProtectionSettingsReleaseNoPageGuards,
+  DxeMemoryProtectionSettingsGrubCompat,
+  DxeMemoryProtectionSettingsOff,
   DxeMemoryProtectionSettingsPcd,
   DxeMemoryProtectionSettingsMax
 } DXE_MEMORY_PROTECTION_PROFILE_INDEX;
@@ -28,6 +33,9 @@ typedef struct {
 } MM_MEMORY_PROTECTION_PROFILES;
 
 typedef enum {
+  MmMemoryProtectionSettingsDebug = 0,
+  MmMemoryProtectionSettingsRelease,
+  MmMemoryProtectionSettingsOff,
   MmMemoryProtectionSettingsPcd,
   MmMemoryProtectionSettingsMax
 } MM_MEMORY_PROTECTION_PROFILE_INDEX;
