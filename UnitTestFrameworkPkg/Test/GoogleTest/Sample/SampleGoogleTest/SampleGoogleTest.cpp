@@ -18,7 +18,7 @@ extern "C" {
   Sample unit test that verifies the expected result of an unsigned integer
   addition operation.
 **/
-TEST(SimpleMathTests, OnePlusOneShouldEqualTwo) {
+TEST (SimpleMathTests, OnePlusOneShouldEqualTwo) {
   UINTN  A;
   UINTN  B;
   UINTN  C;
@@ -34,11 +34,11 @@ TEST(SimpleMathTests, OnePlusOneShouldEqualTwo) {
   Sample unit test that verifies that a global BOOLEAN is updatable.
 **/
 class GlobalBooleanVarTests : public ::testing::Test {
-  public:
-    BOOLEAN  SampleGlobalTestBoolean  = FALSE;
+public:
+  BOOLEAN SampleGlobalTestBoolean = FALSE;
 };
 
-TEST_F(GlobalBooleanVarTests, GlobalBooleanShouldBeChangeable) {
+TEST_F (GlobalBooleanVarTests, GlobalBooleanShouldBeChangeable) {
   SampleGlobalTestBoolean = TRUE;
   ASSERT_TRUE (SampleGlobalTestBoolean);
 
@@ -51,37 +51,46 @@ TEST_F(GlobalBooleanVarTests, GlobalBooleanShouldBeChangeable) {
   pointer is updatable.
 **/
 class GlobalVarTests : public ::testing::Test {
-  public:
-    VOID  *SampleGlobalTestPointer = NULL;
+public:
+  VOID *SampleGlobalTestPointer = NULL;
 
-  protected:
-  void SetUp() override {
+protected:
+  void
+  SetUp (
+    ) override
+  {
     ASSERT_EQ ((UINTN)SampleGlobalTestPointer, (UINTN)NULL);
   }
-  void TearDown() {
+
+  void
+  TearDown (
+    )
+  {
     SampleGlobalTestPointer = NULL;
   }
 };
 
-TEST_F(GlobalVarTests, GlobalPointerShouldBeChangeable) {
+TEST_F (GlobalVarTests, GlobalPointerShouldBeChangeable) {
   SampleGlobalTestPointer = (VOID *)-1;
   ASSERT_EQ ((UINTN)SampleGlobalTestPointer, (UINTN)((VOID *)-1));
 }
-
 
 /**
   Set PcdDebugPropertyMask for each MacroTestsAssertsEnabledDisabled test
 **/
 class MacroTestsAssertsEnabledDisabled : public testing::TestWithParam<UINT8> {
-  void SetUp() {
-    PatchPcdSet8 (PcdDebugPropertyMask, GetParam());
+  void
+  SetUp (
+    )
+  {
+    PatchPcdSet8 (PcdDebugPropertyMask, GetParam ());
   }
 };
 
 /**
   Sample unit test using the ASSERT_TRUE() macro.
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertTrue) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroAssertTrue) {
   UINT64  Result;
 
   //
@@ -99,7 +108,7 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertTrue) {
 /**
   Sample unit test using the ASSERT_FALSE() macro.
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertFalse) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroAssertFalse) {
   UINT64  Result;
 
   //
@@ -117,7 +126,7 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertFalse) {
 /**
   Sample unit test using the ASSERT_EQ() macro.
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertEqual) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroAssertEqual) {
   UINT64  Result;
 
   //
@@ -135,7 +144,7 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertEqual) {
 /**
   Sample unit test using the ASSERT_STREQ() macro.
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertMemEqual) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroAssertMemEqual) {
   CHAR8  *String1;
   CHAR8  *String2;
 
@@ -150,7 +159,7 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertMemEqual) {
 /**
   Sample unit test using the ASSERT_NE() macro.
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertNotEqual) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroAssertNotEqual) {
   UINT64  Result;
 
   //
@@ -169,7 +178,7 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertNotEqual) {
   Sample unit test using the ASSERT_TRUE() and ASSERT(FALSE)
   and EFI_EFFOR() macros to check status
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertNotEfiError) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroAssertNotEfiError) {
   //
   // This test passes because the status is not an EFI error.
   //
@@ -184,7 +193,7 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertNotEfiError) {
 /**
   Sample unit test using the ASSERT_EQ() macro to compare EFI_STATUS values.
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertStatusEqual) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroAssertStatusEqual) {
   //
   // This test passes because the status value are always equal.
   //
@@ -194,7 +203,7 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertStatusEqual) {
 /**
   Sample unit test using ASSERT_NE() macro to make sure a pointer is not NULL.
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertNotNull) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroAssertNotNull) {
   UINT64  Result;
 
   //
@@ -206,7 +215,7 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroAssertNotNull) {
 /**
   Sample unit test using that should not generate any ASSERTs()
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroExpectNoAssertFailure) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroExpectNoAssertFailure) {
   //
   // This test passes because it never triggers an ASSERT().
   //
@@ -222,7 +231,7 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroExpectNoAssertFailure) {
 /**
   Sample unit test using the ASSERT_DEATH() macro to test expected ASSERT()s.
 **/
-TEST_P(MacroTestsAssertsEnabledDisabled, MacroExpectAssertFailure) {
+TEST_P (MacroTestsAssertsEnabledDisabled, MacroExpectAssertFailure) {
   //
   // Skip tests that verify an ASSERT() is triggered if ASSERT()s are disabled.
   //
@@ -243,21 +252,28 @@ TEST_P(MacroTestsAssertsEnabledDisabled, MacroExpectAssertFailure) {
   ASSERT_DEATH (DecimalToBcd8 (101), "");
 }
 
-INSTANTIATE_TEST_SUITE_P(ValidInput,
-                         MacroTestsAssertsEnabledDisabled,
-                         ::testing::Values(PcdGet8 (PcdDebugPropertyMask) | BIT0, PcdGet8 (PcdDebugPropertyMask) & (~BIT0)));
+INSTANTIATE_TEST_SUITE_P (
+  ValidInput,
+  MacroTestsAssertsEnabledDisabled,
+  ::testing::Values (PcdGet8 (PcdDebugPropertyMask) | BIT0, PcdGet8 (PcdDebugPropertyMask) & (~BIT0))
+  );
 
 /**
   Sample unit test using the SCOPED_TRACE() macro for trace messages.
 **/
-TEST(MacroTestsMessages, MacroTraceMessage) {
+TEST (MacroTestsMessages, MacroTraceMessage) {
   //
   // Example of logging.
   //
   SCOPED_TRACE ("SCOPED_TRACE message\n");
 }
 
-int main(int argc, char* argv[]) {
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
+int
+main (
+  int   argc,
+  char  *argv[]
+  )
+{
+  testing::InitGoogleTest (&argc, argv);
+  return RUN_ALL_TESTS ();
 }
