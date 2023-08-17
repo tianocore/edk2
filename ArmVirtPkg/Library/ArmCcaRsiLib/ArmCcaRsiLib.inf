@@ -27,3 +27,4 @@
 [LibraryClasses]
   ArmLib
   ArmSmcLib
+  MemoryAllocationLib
