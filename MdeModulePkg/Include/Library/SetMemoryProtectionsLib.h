@@ -22,7 +22,6 @@ typedef enum {
   DxeMemoryProtectionSettingsReleaseNoPageGuards,
   DxeMemoryProtectionSettingsGrubCompat,
   DxeMemoryProtectionSettingsOff,
-  DxeMemoryProtectionSettingsPcd,
   DxeMemoryProtectionSettingsMax
 } DXE_MEMORY_PROTECTION_PROFILE_INDEX;
 
@@ -36,7 +35,6 @@ typedef enum {
   MmMemoryProtectionSettingsDebug = 0,
   MmMemoryProtectionSettingsRelease,
   MmMemoryProtectionSettingsOff,
-  MmMemoryProtectionSettingsPcd,
   MmMemoryProtectionSettingsMax
 } MM_MEMORY_PROTECTION_PROFILE_INDEX;
 

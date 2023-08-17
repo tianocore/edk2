@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/PcdLib.h>
 #include <Library/SetMemoryProtectionsLib.h>
 
 #pragma pack(1)
@@ -249,99 +248,6 @@ typedef struct {
   }                                                               \
 }
 
-//
-//  A memory profile which uses the fixed at build PCDs defined in MdeModulePkg.dec
-//
-#define DXE_MEMORY_PROTECTION_SETTINGS_PCD                                                                                            \
-{                                                                                                                                     \
-  DXE_MEMORY_PROTECTION_SIGNATURE,                                                                                                    \
-  DXE_MEMORY_PROTECTION_SETTINGS_CURRENT_VERSION,                                                                                     \
-  FixedPcdGetBool (PcdCpuStackGuard), /* Stack Guard */                                                                               \
-  TRUE,                               /* Stack Execution Protection (MUST BE POPULATED) */                                            \
-  {                                   /* NULL Pointer Detection */                                                                    \
-    .Enabled            = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) != 0),                                         \
-    .DisableEndOfDxe    = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT7) != 0),                                         \
-    .NonstopModeEnabled = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT6) != 0)                                          \
-  },                                                                                                                                  \
-  { /* Image Protection */                                                                                                            \
-    .ProtectImageFromUnknown = ((FixedPcdGet32 (PcdImageProtectionPolicy) & BIT0) != 0),                                              \
-    .ProtectImageFromFv      = ((FixedPcdGet32 (PcdImageProtectionPolicy) & BIT1) != 0)                                               \
-  },                                                                                                                                  \
-  { /* Execution Protection */                                                                                                        \
-    .EnabledForType = {                                                                                                               \
-      [EfiReservedMemoryType]               = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiReservedMemoryType) != 0),        \
-      [EfiLoaderCode]                       = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiLoaderCode) != 0),                \
-      [EfiLoaderData]                       = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiLoaderData) != 0),                \
-      [EfiBootServicesCode]                 = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiBootServicesCode) != 0),          \
-      [EfiBootServicesData]                 = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiBootServicesData) != 0),          \
-      [EfiRuntimeServicesCode]              = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiRuntimeServicesCode) != 0),       \
-      [EfiRuntimeServicesData]              = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiRuntimeServicesData) != 0),       \
-      [EfiConventionalMemory]               = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiConventionalMemory) != 0),        \
-      [EfiUnusableMemory]                   = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiUnusableMemory) != 0),            \
-      [EfiACPIReclaimMemory]                = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiACPIReclaimMemory) != 0),         \
-      [EfiACPIMemoryNVS]                    = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiACPIMemoryNVS) != 0),             \
-      [EfiMemoryMappedIO]                   = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiMemoryMappedIO) != 0),            \
-      [EfiMemoryMappedIOPortSpace]          = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiMemoryMappedIOPortSpace) != 0),   \
-      [EfiPalCode]                          = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiPalCode) != 0),                   \
-      [EfiPersistentMemory]                 = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiPersistentMemory) != 0),          \
-      [EfiUnacceptedMemoryType]             = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & EfiUnacceptedMemoryType) != 0),      \
-      [OEM_RESERVED_MPS_MEMORY_TYPE]        = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & BIT62) != 0),                        \
-      [OS_RESERVED_MPS_MEMORY_TYPE]         = ((FixedPcdGet64 (PcdDxeNxMemoryProtectionPolicy) & BIT63) != 0)                         \
-    }                                                                                                                                 \
-  },                                                                                                                                  \
-  { /* Heap Guard */                                                                                                                  \
-    .PageGuardEnabled                       = ((FixedPcdGet8 (PcdHeapGuardPropertyMask) & BIT0) != 0),                                \
-    .PoolGuardEnabled                       = ((FixedPcdGet8 (PcdHeapGuardPropertyMask) & BIT1) != 0),                                \
-    .FreedMemoryGuardEnabled                = ((FixedPcdGet8 (PcdHeapGuardPropertyMask) & BIT4) != 0),                                \
-    .NonstopModeEnabled                     = ((FixedPcdGet8 (PcdHeapGuardPropertyMask) & BIT6) != 0),                                \
-    .GuardAlignedToTail                     = ((FixedPcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0)                                 \
-  },                                                                                                                                  \
-  { /* Pool Guard */                                                                                                                  \
-    .EnabledForType = {                                                                                                               \
-      [EfiReservedMemoryType]               = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiReservedMemoryType) != 0),                  \
-      [EfiLoaderCode]                       = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiLoaderCode) != 0),                          \
-      [EfiLoaderData]                       = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiLoaderData) != 0),                          \
-      [EfiBootServicesCode]                 = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiBootServicesCode) != 0),                    \
-      [EfiBootServicesData]                 = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiBootServicesData) != 0),                    \
-      [EfiRuntimeServicesCode]              = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiRuntimeServicesCode) != 0),                 \
-      [EfiRuntimeServicesData]              = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiRuntimeServicesData) != 0),                 \
-      [EfiConventionalMemory]               = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiConventionalMemory) != 0),                  \
-      [EfiUnusableMemory]                   = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiUnusableMemory) != 0),                      \
-      [EfiACPIReclaimMemory]                = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiACPIReclaimMemory) != 0),                   \
-      [EfiACPIMemoryNVS]                    = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiACPIMemoryNVS) != 0),                       \
-      [EfiMemoryMappedIO]                   = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiMemoryMappedIO) != 0),                      \
-      [EfiMemoryMappedIOPortSpace]          = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiMemoryMappedIOPortSpace) != 0),             \
-      [EfiPalCode]                          = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiPalCode) != 0),                             \
-      [EfiPersistentMemory]                 = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiPersistentMemory) != 0),                    \
-      [EfiUnacceptedMemoryType]             = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiUnacceptedMemoryType) != 0),                \
-      [OEM_RESERVED_MPS_MEMORY_TYPE]        = ((FixedPcdGet64 (PcdHeapGuardPoolType) & BIT62) != 0),                                  \
-      [OS_RESERVED_MPS_MEMORY_TYPE]         = ((FixedPcdGet64 (PcdHeapGuardPoolType) & BIT63) != 0)                                   \
-    }                                                                                                                                 \
-  },                                                                                                                                  \
-  { /* Page Guard */                                                                                                                  \
-    .EnabledForType = {                                                                                                               \
-      [EfiReservedMemoryType]               = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiReservedMemoryType) != 0),                  \
-      [EfiLoaderCode]                       = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiLoaderCode) != 0),                          \
-      [EfiLoaderData]                       = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiLoaderData) != 0),                          \
-      [EfiBootServicesCode]                 = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiBootServicesCode) != 0),                    \
-      [EfiBootServicesData]                 = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiBootServicesData) != 0),                    \
-      [EfiRuntimeServicesCode]              = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiRuntimeServicesCode) != 0),                 \
-      [EfiRuntimeServicesData]              = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiRuntimeServicesData) != 0),                 \
-      [EfiConventionalMemory]               = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiConventionalMemory) != 0),                  \
-      [EfiUnusableMemory]                   = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiUnusableMemory) != 0),                      \
-      [EfiACPIReclaimMemory]                = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiACPIReclaimMemory) != 0),                   \
-      [EfiACPIMemoryNVS]                    = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiACPIMemoryNVS) != 0),                       \
-      [EfiMemoryMappedIO]                   = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiMemoryMappedIO) != 0),                      \
-      [EfiMemoryMappedIOPortSpace]          = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiMemoryMappedIOPortSpace) != 0),             \
-      [EfiPalCode]                          = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiPalCode) != 0),                             \
-      [EfiPersistentMemory]                 = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiPersistentMemory) != 0),                    \
-      [EfiUnacceptedMemoryType]             = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiUnacceptedMemoryType) != 0),                \
-      [OEM_RESERVED_MPS_MEMORY_TYPE]        = ((FixedPcdGet64 (PcdHeapGuardPageType) & BIT62) != 0),                                  \
-      [OS_RESERVED_MPS_MEMORY_TYPE]         = ((FixedPcdGet64 (PcdHeapGuardPageType) & BIT63) != 0)                                   \
-    }                                                                                                                                 \
-  }                                                                                                                                   \
-}
-
 //  A memory profile recommended for compatibility with older
 //  versions of Grub.
 //
@@ -557,69 +463,6 @@ typedef struct {
 }
 
 //
-//  A memory profile which uses the fixed at build PCDs defined in MdeModulePkg.dec
-//
-#define MM_MEMORY_PROTECTION_SETTINGS_PCD                                                                                 \
-{                                                                                                                         \
-  MM_MEMORY_PROTECTION_SIGNATURE,                                                                                         \
-  MM_MEMORY_PROTECTION_SETTINGS_CURRENT_VERSION,                                                                          \
-  { /* NULL Pointer Detection */                                                                                          \
-    .Enabled            = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0),                             \
-    .NonstopModeEnabled = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT6) != 0)                              \
-  },                                                                                                                      \
-  { /* Heap Guard */                                                                                                      \
-    .PageGuardEnabled                       = ((FixedPcdGet8(PcdHeapGuardPropertyMask) & BIT2) != 0),                     \
-    .PoolGuardEnabled                       = ((FixedPcdGet8(PcdHeapGuardPropertyMask) & BIT3) != 0),                     \
-    .NonstopModeEnabled                     = ((FixedPcdGet8(PcdHeapGuardPropertyMask) & BIT6) != 0),                     \
-    .GuardAlignedToTail                     = ((FixedPcdGet8(PcdHeapGuardPropertyMask) & BIT7) == 0)                      \
-  },                                                                                                                      \
-  { /* Pool Guard */                                                                                                      \
-    .EnabledForType = {                                                                                                   \
-      [EfiReservedMemoryType]               = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiReservedMemoryType) != 0),      \
-      [EfiLoaderCode]                       = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiLoaderCode) != 0),              \
-      [EfiLoaderData]                       = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiLoaderData) != 0),              \
-      [EfiBootServicesCode]                 = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiBootServicesCode) != 0),        \
-      [EfiBootServicesData]                 = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiBootServicesData) != 0),        \
-      [EfiRuntimeServicesCode]              = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiRuntimeServicesCode) != 0),     \
-      [EfiRuntimeServicesData]              = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiRuntimeServicesData) != 0),     \
-      [EfiConventionalMemory]               = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiConventionalMemory) != 0),      \
-      [EfiUnusableMemory]                   = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiUnusableMemory) != 0),          \
-      [EfiACPIReclaimMemory]                = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiACPIReclaimMemory) != 0),       \
-      [EfiACPIMemoryNVS]                    = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiACPIMemoryNVS) != 0),           \
-      [EfiMemoryMappedIO]                   = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiMemoryMappedIO) != 0),          \
-      [EfiMemoryMappedIOPortSpace]          = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiMemoryMappedIOPortSpace) != 0), \
-      [EfiPalCode]                          = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiPalCode) != 0),                 \
-      [EfiPersistentMemory]                 = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiPersistentMemory) != 0),        \
-      [EfiUnacceptedMemoryType]             = ((FixedPcdGet64 (PcdHeapGuardPoolType) & EfiUnacceptedMemoryType) != 0),    \
-      [OEM_RESERVED_MPS_MEMORY_TYPE]        = ((FixedPcdGet64 (PcdHeapGuardPoolType) & BIT62) != 0),                      \
-      [OS_RESERVED_MPS_MEMORY_TYPE]         = ((FixedPcdGet64 (PcdHeapGuardPoolType) & BIT63) != 0)                       \
-    }                                                                                                                     \
-  },                                                                                                                      \
-  { /* Page Guard */                                                                                                      \
-    .EnabledForType = {                                                                                                   \
-      [EfiReservedMemoryType]               = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiReservedMemoryType) != 0),      \
-      [EfiLoaderCode]                       = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiLoaderCode) != 0),              \
-      [EfiLoaderData]                       = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiLoaderData) != 0),              \
-      [EfiBootServicesCode]                 = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiBootServicesCode) != 0),        \
-      [EfiBootServicesData]                 = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiBootServicesData) != 0),        \
-      [EfiRuntimeServicesCode]              = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiRuntimeServicesCode) != 0),     \
-      [EfiRuntimeServicesData]              = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiRuntimeServicesData) != 0),     \
-      [EfiConventionalMemory]               = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiConventionalMemory) != 0),      \
-      [EfiUnusableMemory]                   = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiUnusableMemory) != 0),          \
-      [EfiACPIReclaimMemory]                = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiACPIReclaimMemory) != 0),       \
-      [EfiACPIMemoryNVS]                    = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiACPIMemoryNVS) != 0),           \
-      [EfiMemoryMappedIO]                   = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiMemoryMappedIO) != 0),          \
-      [EfiMemoryMappedIOPortSpace]          = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiMemoryMappedIOPortSpace) != 0), \
-      [EfiPalCode]                          = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiPalCode) != 0),                 \
-      [EfiPersistentMemory]                 = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiPersistentMemory) != 0),        \
-      [EfiUnacceptedMemoryType]             = ((FixedPcdGet64 (PcdHeapGuardPageType) & EfiUnacceptedMemoryType) != 0),    \
-      [OEM_RESERVED_MPS_MEMORY_TYPE]        = ((FixedPcdGet64 (PcdHeapGuardPageType) & BIT62) != 0),                      \
-      [OS_RESERVED_MPS_MEMORY_TYPE]         = ((FixedPcdGet64 (PcdHeapGuardPageType) & BIT63) != 0)                       \
-    }                                                                                                                     \
-  }                                                                                                                       \
-}
-
-//
 //  A memory profile which disables all MM memory protection settings.
 //
 #define MM_MEMORY_PROTECTION_SETTINGS_OFF           \
@@ -660,11 +503,6 @@ DXE_MEMORY_PROTECTION_PROFILES  DxeMemoryProtectionProfiles[DxeMemoryProtectionS
     .Description = "Release profile without page guards recommended for performance sensitive production scenarios",
     .Settings    = DXE_MEMORY_PROTECTION_SETTINGS_PROD_MODE_NO_PAGE_GUARDS
   },
-  [DxeMemoryProtectionSettingsPcd] =                 {
-    .Name        = "Pcd",
-    .Description = "Memory protection settings from PCDs",
-    .Settings    = DXE_MEMORY_PROTECTION_SETTINGS_PCD
-  },
   [DxeMemoryProtectionSettingsGrubCompat] =          {
     .Name        = "GrubCompat",
     .Description = "DXE_MEMORY_PROTECTION_SETTINGS_PROD_MODE with some protections disabled for legacy Grub compatibility",
@@ -687,11 +525,6 @@ MM_MEMORY_PROTECTION_PROFILES  MmMemoryProtectionProfiles[MmMemoryProtectionSett
     .Name        = "Release",
     .Description = "Release profile recommended for production scenarios",
     .Settings    = MM_MEMORY_PROTECTION_SETTINGS_PROD_MODE
-  },
-  [MmMemoryProtectionSettingsPcd] =     {
-    .Name        = "Pcd",
-    .Description = "Memory protection settings from PCDs",
-    .Settings    = MM_MEMORY_PROTECTION_SETTINGS_PCD
   },
   [MmMemoryProtectionSettingsOff] =     {
     .Name        = "Off",
@@ -727,9 +560,10 @@ GetOrCreateMemoryProtectionSettings (
   }
 
   ZeroMem (&Mpsp, sizeof (Mpsp));
-  Mpsp.Mps.Dxe                                 = DxeMemoryProtectionProfiles[DxeMemoryProtectionSettingsPcd].Settings;
-  Mpsp.Mps.Mm                                  = MmMemoryProtectionProfiles[MmMemoryProtectionSettingsPcd].Settings;
-  Mpsp.Mps.Dxe.StackExecutionProtectionEnabled = PcdGetBool (PcdSetNxForStack);
+  Mpsp.Mps.Dxe.StructVersion = DXE_MEMORY_PROTECTION_SETTINGS_CURRENT_VERSION;
+  Mpsp.Mps.Dxe.Signature     = DXE_MEMORY_PROTECTION_SIGNATURE;
+  Mpsp.Mps.Mm.StructVersion  = MM_MEMORY_PROTECTION_SETTINGS_CURRENT_VERSION;
+  Mpsp.Mps.Mm.Signature      = MM_MEMORY_PROTECTION_SIGNATURE;
 
   Ptr = BuildGuidDataHob (
           &gMemoryProtectionSettingsGuid,
