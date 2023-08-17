@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac4
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac5
      (https://developer.arm.com/documentation/den0137/)
 
 **/
@@ -22,6 +22,7 @@
 #include <Library/ArmSmcLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include "ArmCcaRsi.h"
 
 /**
@@ -88,6 +89,8 @@ AddrIsGranuleAligned (
 
   @param [out]     TokenBuffer      Pointer to a buffer to store the
                                     retrieved attestation token.
+  @param [in]      Offset           Offset within Token buffer granule
+                                    to start of buffer in bytes.
   @param [in,out]  TokenSize        On input size of the token buffer,
                                     and on output size of the token
                                     returned if operation is successful,
@@ -106,6 +109,7 @@ RETURN_STATUS
 EFIAPI
 RsiAttestationTokenContinue (
   OUT           UINT8   *CONST  TokenBuffer,
+  IN            UINT64   CONST  Offset,
   IN OUT        UINT64  *CONST  TokenSize
   )
 {
@@ -116,6 +120,10 @@ RsiAttestationTokenContinue (
   SmcCmd.Arg0 = FID_RSI_ATTESTATION_TOKEN_CONTINUE;
   // Set the IPA of the Granule to which the token will be written.
   SmcCmd.Arg1 = (UINTN)TokenBuffer;
+  // Set the Offset within Granule to start of buffer in bytes
+  SmcCmd.Arg2 = (UINTN)Offset;
+  // Set the size of the buffer in bytes
+  SmcCmd.Arg3 = (UINTN)*TokenSize;
 
   ArmCallSmc (&SmcCmd);
   Status = RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
@@ -137,8 +145,8 @@ RsiAttestationTokenContinue (
   @param [in]       ChallengeData         Pointer to the challenge data to be
                                           included in the attestation token.
   @param [in]       ChallengeDataSizeBits Size of the challenge data in bits.
-  @param [in]       TokenBuffer           Pointer to a buffer to store the
-                                          retrieved attestation token.
+  @param [out]      MaxTokenSize          Pointer to an integer to retrieve
+                                          the maximum attestation token size.
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
@@ -149,14 +157,15 @@ EFIAPI
 RsiAttestationTokenInit (
   IN      CONST UINT8   *CONST  ChallengeData,
   IN            UINT64          ChallengeDataSizeBits,
-  IN            UINT8   *CONST  TokenBuffer
+  OUT           UINT64  *CONST  MaxTokenSize
   )
 {
-  ARM_SMC_ARGS  SmcCmd;
-  UINT8         *Buffer8;
-  CONST UINT8   *Data8;
-  UINT64        Count;
-  UINT8         TailBits;
+  RETURN_STATUS  Status;
+  ARM_SMC_ARGS   SmcCmd;
+  UINT8          *Buffer8;
+  CONST UINT8    *Data8;
+  UINT64         Count;
+  UINT8          TailBits;
 
   /* See A7.2.2 Attestation token generation, RMM Specification, version A-bet0
      IWTKDD - If the size of the challenge provided by the relying party is less
@@ -168,11 +177,8 @@ RsiAttestationTokenInit (
   */
   ZeroMem (&SmcCmd, sizeof (SmcCmd));
   SmcCmd.Arg0 = FID_RSI_ATTESTATION_TOKEN_INIT;
-  // Set the IPA of the Granule to which the token will be written.
-  SmcCmd.Arg1 = (UINTN)TokenBuffer;
-
   // Copy challenge data.
-  Buffer8 = (UINT8 *)&SmcCmd.Arg2;
+  Buffer8 = (UINT8 *)&SmcCmd.Arg1;
   Data8   = ChallengeData;
 
   // First copy whole bytes
@@ -194,7 +200,38 @@ RsiAttestationTokenInit (
   }
 
   ArmCallSmc (&SmcCmd);
-  return RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
+  Status = RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
+  if (RETURN_ERROR (Status)) {
+    // Set the max token size to zero
+    *MaxTokenSize = 0;
+  } else {
+    *MaxTokenSize = SmcCmd.Arg1;
+  }
+
+  return Status;
+}
+
+/**
+  Free the attestation token buffer.
+
+  @param [in]      TokenBuffer           Pointer to the retrieved
+                                         attestation token.
+  @param [in]      TokenBufferSize       Size of the token buffer.
+**/
+VOID
+RsiFreeAttestationToken (
+  IN           UINT8  *CONST  TokenBuffer,
+  IN           UINT64  CONST  TokenBufferSize
+  )
+{
+  if (TokenBuffer != NULL) {
+    if (TokenBufferSize > 0) {
+      // Scrub the token buffer
+      ZeroMem (TokenBuffer, TokenBufferSize);
+    }
+
+    FreePool (TokenBuffer);
+  }
 }
 
 /**
@@ -205,9 +242,10 @@ RsiAttestationTokenInit (
   @param [in]       ChallengeDataSizeBits Size of the challenge data in bits.
   @param [out]      TokenBuffer           Pointer to a buffer to store the
                                           retrieved attestation token.
-  @param [in, out]  TokenBufferSize       Size of the token buffer on input and
-                                          number of bytes stored in token buffer
-                                          on return.
+  @param [out]      TokenBufferSize       Length of token data returned.
+
+  Note: The TokenBuffer allocated must be freed by the caller
+  using RsiFreeAttestationToken().
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
@@ -222,26 +260,22 @@ EFIAPI
 RsiGetAttestationToken (
   IN      CONST UINT8   *CONST  ChallengeData,
   IN            UINT64          ChallengeDataSizeBits,
-  OUT           UINT8   *CONST  TokenBuffer,
-  IN OUT        UINT64  *CONST  TokenBufferSize
+  OUT           UINT8  **CONST  TokenBuffer,
+  OUT           UINT64  *CONST  TokenBufferSize
   )
 {
   RETURN_STATUS  Status;
+  UINT8          *Granule;
+  UINT64         GranuleSize;
+  UINT64         Offset;
+  UINT8          *Token;
+  UINT64         TokenSize;
+  UINT64         MaxTokenSize;
 
   if ((TokenBuffer == NULL) ||
       (TokenBufferSize == NULL) ||
       (ChallengeData == NULL))
   {
-    return RETURN_INVALID_PARAMETER;
-  }
-
-  if (*TokenBufferSize < MAX_ATTESTATION_TOKEN_SIZE) {
-    *TokenBufferSize = MAX_ATTESTATION_TOKEN_SIZE;
-    return RETURN_BAD_BUFFER_SIZE;
-  }
-
-  if (!AddrIsGranuleAligned ((UINT64 *)TokenBuffer)) {
-    DEBUG ((DEBUG_ERROR, "ERROR : Token buffer not granule aligned\n"));
     return RETURN_INVALID_PARAMETER;
   }
 
@@ -260,18 +294,76 @@ RsiGetAttestationToken (
   Status = RsiAttestationTokenInit (
              ChallengeData,
              ChallengeDataSizeBits,
-             TokenBuffer
+             &MaxTokenSize
              );
   if (RETURN_ERROR (Status)) {
     ASSERT (0);
     return Status;
   }
 
-  /* Loop until the token is ready or there is an error.
-  */
+  // Allocate a granule to retrieve the attestation token chunk.
+  Granule = (UINT8 *)AllocateAlignedPages (
+                       EFI_SIZE_TO_PAGES (REALM_GRANULE_SIZE),
+                       REALM_GRANULE_SIZE
+                       );
+  if (Granule == NULL) {
+    ASSERT (0);
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  // Alloate a buffer to store the retrieved attestation token.
+  Token = AllocateZeroPool (MaxTokenSize);
+  if (Token == NULL) {
+    ASSERT (0);
+    Status = RETURN_OUT_OF_RESOURCES;
+    goto exit_handler;
+  }
+
+  TokenSize = 0;
   do {
-    Status = RsiAttestationTokenContinue (TokenBuffer, TokenBufferSize);
-  } while (Status == RETURN_NOT_READY);
+    // Retrieve one Granule of data per loop iteration
+    ZeroMem (Granule, REALM_GRANULE_SIZE);
+    Offset = 0;
+    do {
+      // Retrieve sub-Granule chunk of data per loop iteration
+      GranuleSize = REALM_GRANULE_SIZE - Offset;
+      Status      = RsiAttestationTokenContinue (
+                      Granule,
+                      Offset,
+                      &GranuleSize
+                      );
+      Offset += GranuleSize;
+    } while ((Status == RETURN_NOT_READY) && (Offset < REALM_GRANULE_SIZE));
+
+    if (RETURN_ERROR (Status) && (Status != RETURN_NOT_READY)) {
+      ASSERT (0);
+      goto exit_handler1;
+    }
+
+    // "Offset" bytes of data are now ready for consumption from "Granule"
+    // Copy the new token data from the Granule.
+    CopyMem (&Token[TokenSize], Granule, Offset);
+    TokenSize += Offset;
+  } while ((Status == RETURN_NOT_READY) && (TokenSize < MaxTokenSize));
+
+  *TokenBuffer     = Token;
+  *TokenBufferSize = TokenSize;
+  goto exit_handler;
+
+exit_handler1:
+  if (Token != NULL) {
+    // Scrub the old Token
+    ZeroMem (Token, TokenSize);
+    FreePool (Token);
+  }
+
+  *TokenBuffer     = NULL;
+  *TokenBufferSize = 0;
+
+exit_handler:
+  // Scrub the Granule buffer
+  ZeroMem (Granule, REALM_GRANULE_SIZE);
+  FreePages (Granule, EFI_SIZE_TO_PAGES (REALM_GRANULE_SIZE));
 
   return Status;
 }

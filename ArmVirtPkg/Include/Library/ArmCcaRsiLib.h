@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac4
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac5
      (https://developer.arm.com/documentation/den0137/)
 **/
 
@@ -32,11 +32,6 @@
   See Section B4.4.5 RsiRipas type, RMM Specification, version A-bet0.
 */
 #define RIPAS_TYPE_MASK  0xFF
-
-/* Maximum attestation token size
-  RBXKKY The size of an attestation token is no larger than 4KB.
-*/
-#define MAX_ATTESTATION_TOKEN_SIZE  SIZE_4KB
 
 /* Maximum challenge data size in bits.
 */
@@ -185,9 +180,10 @@ typedef struct HostCallArgs {
   @param [in]       ChallengeDataSizeBits Size of the challenge data in bits.
   @param [out]      TokenBuffer           Pointer to a buffer to store the
                                           retrieved attestation token.
-  @param [in, out]  TokenBufferSize       Size of the token buffer on input and
-                                          number of bytes stored in token buffer
-                                          on return.
+  @param [out]      TokenBufferSize       Length of token data returned.
+
+  Note: The TokenBuffer allocated must be freed by the caller
+  using RsiFreeAttestationToken().
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
@@ -202,8 +198,21 @@ EFIAPI
 RsiGetAttestationToken (
   IN      CONST UINT8   *CONST  ChallengeData,
   IN            UINT64          ChallengeDataSizeBits,
-  OUT           UINT8   *CONST  TokenBuffer,
-  IN OUT        UINT64  *CONST  TokenBufferSize
+  OUT           UINT8  **CONST  TokenBuffer,
+  OUT           UINT64  *CONST  TokenBufferSize
+  );
+
+/**
+  Free the attestation token buffer.
+
+  @param [in]      TokenBuffer           Pointer to the retrieved
+                                         attestation token.
+  @param [in]      TokenBufferSize       Size of the token buffer.
+**/
+VOID
+RsiFreeAttestationToken (
+  IN           UINT8  *CONST  TokenBuffer,
+  IN           UINT64  CONST  TokenBufferSize
   );
 
 /**
