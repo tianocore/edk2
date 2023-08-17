@@ -29,17 +29,6 @@
   BaseLib
   HobLib
   DebugLib
-  PcdLib
-
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
-  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy
 
 [Guids]
   gMemoryProtectionSettingsGuid
