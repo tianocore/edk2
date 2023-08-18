@@ -1,0 +1,92 @@
+## @file
+#  Cryptographic Library Instance for DXE_RUNTIME_DRIVER.
+#
+#  Caution: This module requires additional review when modified.
+#  This library will have external input - signature.
+#  This external input must be validated carefully to avoid security issues such as
+#  buffer overflow or integer overflow.
+#
+#  Note: SHA-384 Digest functions, SHA-512 Digest functions,
+#  HMAC-SHA256 functions, AES functions, RSA external
+#  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and
+#  authenticode signature verification functions are not supported in this instance.
+#
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RuntimeCryptLib
+  MODULE_UNI_FILE                = RuntimeCryptLib.uni
+  FILE_GUID                      = D263B580-D9FC-4DC4-B445-578AAEFF530E
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BaseCryptLib|DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = RuntimeCryptLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  InternalCryptLib.h
+  Hash/CryptMd5.c
+  Hash/CryptSha1.c
+  Hash/CryptSha256.c
+  Hash/CryptSm3Null.c
+  Hash/CryptSha512.c
+  Hash/CryptParallelHashNull.c
+  Hmac/CryptHmac.c
+  Kdf/CryptHkdf.c
+  Cipher/CryptAes.c
+  Cipher/CryptAeadAesGcmNull.c
+  Pk/CryptRsaBasic.c
+  Pk/CryptRsaExtNull.c
+  Pk/CryptRsaPssNull.c
+  Pk/CryptRsaPssSignNull.c
+  Bn/CryptBnNull.c
+  Pem/CryptPemNull.c
+  Pk/CryptDhNull.c
+  Pk/CryptEcNull.c
+  Pk/CryptPkcs1OaepNull.c
+  Pk/CryptPkcs5Pbkdf2Null.c
+  Pk/CryptPkcs7SignNull.c
+  Pk/CryptPkcs7VerifyNull.c
+  Pk/CryptPkcs7VerifyEkuNull.c
+  Pk/CryptX509Null.c
+  Pk/CryptAuthenticodeNull.c
+  Pk/CryptTsNull.c
+  Rand/CryptRandNull.c
+  SysCall/CrtWrapper.c
+  SysCall/TimerWrapper.c
+  SysCall/RuntimeMemAllocation.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  UefiRuntimeServicesTableLib
+  DebugLib
+  MbedTlsLib
+  IntrinsicLib
+  PrintLib
+
+#
+# Remove these [BuildOptions] after this library is cleaned up
+#
+[BuildOptions]
+  #
+  # suppress the following warnings so we do not break the build with warnings-as-errors:
+  #
+  GCC:*_CLANG35_*_CC_FLAGS = -std=c99
+  GCC:*_CLANG38_*_CC_FLAGS = -std=c99
+  GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=incompatible-pointer-types
+
+  XCODE:*_*_*_CC_FLAGS = -std=c99

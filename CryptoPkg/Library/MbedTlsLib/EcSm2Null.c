@@ -12,7 +12,7 @@
 #include <mbedtls/ecdh.h>
 #include <mbedtls/ecdsa.h>
 #include <mbedtls/bignum.h>
-#include <library/bignum_core.h>
+#include <bignum_core.h>
 
 /*
  * Get the curve info for the internal identifier
