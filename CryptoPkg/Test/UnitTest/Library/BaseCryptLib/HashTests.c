@@ -84,6 +84,13 @@ BOOLEAN
 
 typedef
 BOOLEAN
+(EFIAPI *EFI_HASH_DUP)(
+  IN      CONST VOID  *HashContext,
+  OUT     VOID        *NewHashContext
+  );
+
+typedef
+BOOLEAN
 (EFIAPI *EFI_HASH_FINAL)(
   IN OUT  VOID   *HashContext,
   OUT     UINT8  *HashValue
@@ -102,6 +109,7 @@ typedef struct {
   EFI_HASH_GET_CONTEXT_SIZE    GetContextSize;
   EFI_HASH_INIT                HashInit;
   EFI_HASH_UPDATE              HashUpdate;
+  EFI_HASH_DUP                 HashDup;
   EFI_HASH_FINAL               HashFinal;
   EFI_HASH_ALL                 HashAll;
   CONST UINT8                  *Digest;
@@ -109,12 +117,12 @@ typedef struct {
 } HASH_TEST_CONTEXT;
 
 #ifdef ENABLE_MD5_DEPRECATED_INTERFACES
-HASH_TEST_CONTEXT  mMd5TestCtx = { MD5_DIGEST_SIZE, Md5GetContextSize, Md5Init, Md5Update, Md5Final, Md5HashAll, Md5Digest };
+HASH_TEST_CONTEXT  mMd5TestCtx = { MD5_DIGEST_SIZE, Md5GetContextSize, Md5Init, Md5Update, Md5Duplicate, Md5Final, Md5HashAll, Md5Digest };
 #endif
-HASH_TEST_CONTEXT  mSha1TestCtx   = { SHA1_DIGEST_SIZE, Sha1GetContextSize, Sha1Init, Sha1Update, Sha1Final, Sha1HashAll, Sha1Digest };
-HASH_TEST_CONTEXT  mSha256TestCtx = { SHA256_DIGEST_SIZE, Sha256GetContextSize, Sha256Init, Sha256Update, Sha256Final, Sha256HashAll, Sha256Digest };
-HASH_TEST_CONTEXT  mSha384TestCtx = { SHA384_DIGEST_SIZE, Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Final, Sha384HashAll, Sha384Digest };
-HASH_TEST_CONTEXT  mSha512TestCtx = { SHA512_DIGEST_SIZE, Sha512GetContextSize, Sha512Init, Sha512Update, Sha512Final, Sha512HashAll, Sha512Digest };
+HASH_TEST_CONTEXT  mSha1TestCtx   = { SHA1_DIGEST_SIZE, Sha1GetContextSize, Sha1Init, Sha1Update, Sha1Duplicate, Sha1Final, Sha1HashAll, Sha1Digest };
+HASH_TEST_CONTEXT  mSha256TestCtx = { SHA256_DIGEST_SIZE, Sha256GetContextSize, Sha256Init, Sha256Update, Sha256Duplicate, Sha256Final, Sha256HashAll, Sha256Digest };
+HASH_TEST_CONTEXT  mSha384TestCtx = { SHA384_DIGEST_SIZE, Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Duplicate, Sha384Final, Sha384HashAll, Sha384Digest };
+HASH_TEST_CONTEXT  mSha512TestCtx = { SHA512_DIGEST_SIZE, Sha512GetContextSize, Sha512Init, Sha512Update, Sha512Duplicate, Sha512Final, Sha512HashAll, Sha512Digest };
 
 UNIT_TEST_STATUS
 EFIAPI
@@ -157,25 +165,40 @@ TestVerifyHash (
 {
   UINTN              DataSize;
   UINT8              Digest[MAX_DIGEST_SIZE];
+  UINT8              DigestCopy[MAX_DIGEST_SIZE];
   BOOLEAN            Status;
   HASH_TEST_CONTEXT  *HashTestContext;
+  VOID               *HashCopyContext;
 
   HashTestContext = Context;
 
   DataSize = AsciiStrLen (HashData);
 
   ZeroMem (Digest, MAX_DIGEST_SIZE);
+  ZeroMem (DigestCopy, MAX_DIGEST_SIZE);
+
+  HashCopyContext = AllocatePool (HashTestContext->GetContextSize ());
 
   Status = HashTestContext->HashInit (HashTestContext->HashCtx);
+  UT_ASSERT_TRUE (Status);
+
+  Status = HashTestContext->HashInit (HashCopyContext);
   UT_ASSERT_TRUE (Status);
 
   Status = HashTestContext->HashUpdate (HashTestContext->HashCtx, HashData, DataSize);
   UT_ASSERT_TRUE (Status);
 
+  Status = HashTestContext->HashDup (HashTestContext->HashCtx, HashCopyContext);
+  UT_ASSERT_TRUE (Status);
+
   Status = HashTestContext->HashFinal (HashTestContext->HashCtx, Digest);
   UT_ASSERT_TRUE (Status);
 
+  Status = HashTestContext->HashFinal (HashCopyContext, DigestCopy);
+  UT_ASSERT_TRUE (Status);
+
   UT_ASSERT_MEM_EQUAL (Digest, HashTestContext->Digest, HashTestContext->DigestSize);
+  UT_ASSERT_MEM_EQUAL (Digest, DigestCopy, HashTestContext->DigestSize);
 
   ZeroMem (Digest, MAX_DIGEST_SIZE);
   Status = HashTestContext->HashAll (HashData, DataSize, Digest);
