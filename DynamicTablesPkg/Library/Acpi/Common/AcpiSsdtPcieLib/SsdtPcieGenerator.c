@@ -546,7 +546,7 @@ GenerateRootPortDevices (
       goto exit_handler;
     }
 
-    if (RpInfo[Index].Sun != MAX_UINT64) {
+    if (RpInfo[Index].Sun != MAX_UINT32) {
       // ASL: Name (_SUN, <Sun value>)
       Status = AmlCodeGenNameInteger (
                  "_SUN",
