@@ -199,6 +199,8 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
             "MdePkg/Library/BaseFdtLib/libfdt", False))
         rs.append(RequiredSubmodule(
             "MdePkg/Library/MipiSysTLib/mipisyst", False))
+        rs.append(RequiredSubmodule(
+            "CryptoPkg/Library/MbedTlsLib/mbedtls", False))
         return rs
 
     def GetName(self):
