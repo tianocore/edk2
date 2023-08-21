@@ -294,7 +294,6 @@ F: MdeModulePkg/Library/BaseBmpSupportLib/
 F: MdeModulePkg/Library/FrameBufferBltLib/
 F: MdeModulePkg/Universal/Console/
 R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
 F: MdeModulePkg/*Mem*/
@@ -398,12 +397,10 @@ MdeModulePkg: Reset modules
 F: MdeModulePkg/*Reset*/
 F: MdeModulePkg/Include/*Reset*.h
 R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
 
 MdeModulePkg: Serial modules
 F: MdeModulePkg/*Serial*/
 F: MdeModulePkg/Include/*SerialPort*.h
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 
 MdeModulePkg: SMBIOS modules
@@ -426,7 +423,6 @@ R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 MdeModulePkg: Universal Payload definitions
 F: MdeModulePkg/Include/UniversalPayload/
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
-R: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 
 MdeModulePkg: Trace Hub debug message related library instance
