@@ -186,7 +186,7 @@ AlterAcpiTable (
       MadtMpWk                 = (EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_STRUCTURE *)(NewMadtTable + Table->Length);
       MadtMpWk->Type           = EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP;
       MadtMpWk->Length         = sizeof (EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_STRUCTURE);
-      MadtMpWk->MailBoxVersion = 1;
+      MadtMpWk->MailBoxVersion = 0;
       MadtMpWk->Reserved       = 0;
       MadtMpWk->MailBoxAddress = RelocateMailboxAddress;
 
