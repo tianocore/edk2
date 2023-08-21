@@ -506,13 +506,13 @@ LoadOpRomImage (
     Indicator    = RomPcir->Indicator;
     RomImageSize = RomImageSize + RomPcir->ImageLength * 512;
     RomBarOffset = RomBarOffset + RomPcir->ImageLength * 512;
-  } while (((Indicator & 0x80) == 0x00) && ((RomBarOffset - RomBar) < RomSize));
+  } while (((Indicator & 0x80) == 0x00) && ((RomBarOffset - RomBar) < RomSize) && (RomImageSize > 0));
 
   //
   // Some Legacy Cards do not report the correct ImageLength so used the maximum
   // of the legacy length and the PCIR Image Length
   //
-  if (CodeType == PCI_CODE_TYPE_PCAT_IMAGE) {
+  if ((RomImageSize > 0) && (CodeType == PCI_CODE_TYPE_PCAT_IMAGE)) {
     RomImageSize = MAX (RomImageSize, LegacyImageLength);
   }
 
