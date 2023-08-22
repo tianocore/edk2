@@ -97,7 +97,8 @@ VOID
 EFIAPI
 DumpWsmtProtectionFlag (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
