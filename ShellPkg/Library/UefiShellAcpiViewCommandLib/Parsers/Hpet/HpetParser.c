@@ -25,7 +25,8 @@ VOID
 EFIAPI
 DumpHpetPageProtectionFlag (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
@@ -72,7 +73,8 @@ VOID
 EFIAPI
 DumpHpetFlag (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
@@ -102,7 +104,8 @@ VOID
 EFIAPI
 DumpCounterSize (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
@@ -166,7 +169,8 @@ VOID
 EFIAPI
 DumpHpetEventTimerBlockId (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
