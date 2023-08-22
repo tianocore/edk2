@@ -319,12 +319,14 @@ DumpUint64 (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump3Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -343,12 +345,14 @@ Dump3Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump4Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -368,12 +372,14 @@ Dump4Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump6Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -395,12 +401,14 @@ Dump6Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump8Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -424,12 +432,14 @@ Dump8Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump12Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN       UINT8   *Ptr
+  IN       UINT8   *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -587,7 +597,7 @@ ParseAcpi (
       // the Format for printing
       PrintFieldName (2, Parser[Index].NameStr);
       if (Parser[Index].PrintFormatter != NULL) {
-        Parser[Index].PrintFormatter (Parser[Index].Format, Ptr);
+        Parser[Index].PrintFormatter (Parser[Index].Format, Ptr, Parser[Index].Length);
       } else if (Parser[Index].Format != NULL) {
         switch (Parser[Index].Length) {
           case 1:
@@ -681,12 +691,14 @@ DumpGasStruct (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 DumpGas (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   DumpGasStruct (Ptr, 2, sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE));
@@ -892,7 +904,7 @@ ParseAcpiBitFields (
       // the Format for printing
       PrintFieldName (2, Parser[Index].NameStr);
       if (Parser[Index].PrintFormatter != NULL) {
-        Parser[Index].PrintFormatter (Parser[Index].Format, (UINT8 *)&Data);
+        Parser[Index].PrintFormatter (Parser[Index].Format, (UINT8 *)&Data, Parser[Index].Length);
       } else if (Parser[Index].Format != NULL) {
         // convert bit length to byte length
         switch ((Parser[Index].Length + 7) >> 3) {

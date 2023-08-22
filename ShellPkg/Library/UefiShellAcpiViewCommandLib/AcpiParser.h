@@ -130,12 +130,14 @@ DumpUint64 (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump3Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -146,12 +148,14 @@ Dump3Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump4Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -162,12 +166,14 @@ Dump4Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump6Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -178,12 +184,14 @@ Dump6Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump8Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -194,12 +202,14 @@ Dump8Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump12Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN       UINT8   *Ptr
+  IN       UINT8   *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -227,8 +237,9 @@ PrintFieldName (
   @param [in] Format  Format string for tracing the data as specified by
                       the 'Format' member of ACPI_PARSER.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
-typedef VOID (EFIAPI *FNPTR_PRINT_FORMATTER)(CONST CHAR16 *Format, UINT8 *Ptr);
+typedef VOID (EFIAPI *FNPTR_PRINT_FORMATTER)(CONST CHAR16 *Format, UINT8 *Ptr, UINT32 Length);
 
 /**
   This function pointer is the template for validating an ACPI table field.
@@ -469,12 +480,14 @@ DumpGasStruct (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 DumpGas (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
