@@ -1,7 +1,7 @@
 /** @file
   ACPI parser
 
-  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -616,7 +616,11 @@ ParseAcpi (
       if (GetConsistencyChecking () &&
           (Parser[Index].FieldValidator != NULL))
       {
-        Parser[Index].FieldValidator (Ptr, Parser[Index].Context);
+        Parser[Index].FieldValidator (
+                        Ptr,
+                        Parser[Index].Length,
+                        Parser[Index].Context
+                        );
       }
 
       Print (L"\n");
@@ -927,7 +931,11 @@ ParseAcpiBitFields (
       if (GetConsistencyChecking () &&
           (Parser[Index].FieldValidator != NULL))
       {
-        Parser[Index].FieldValidator ((UINT8 *)&Data, Parser[Index].Context);
+        Parser[Index].FieldValidator (
+                        (UINT8 *)&Data,
+                        Parser[Index].Length,
+                        Parser[Index].Context
+                        );
       }
 
       Print (L"\n");
