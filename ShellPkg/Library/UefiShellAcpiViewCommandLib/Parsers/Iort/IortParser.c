@@ -1,7 +1,7 @@
 /** @file
   IORT table parser
 
-  Copyright (c) 2016 - 2022, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -46,6 +46,7 @@ STATIC CONST UINT32  *RmrMemDescOffset;
   This function validates the ID Mapping array count for the ITS node.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -53,8 +54,9 @@ STATIC
 VOID
 EFIAPI
 ValidateItsIdMappingCount (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*(UINT32 *)Ptr != 0) {
@@ -68,6 +70,7 @@ ValidateItsIdMappingCount (
   Monitoring Counter Group (PMCG) node.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -75,8 +78,9 @@ STATIC
 VOID
 EFIAPI
 ValidatePmcgIdMappingCount (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*(UINT32 *)Ptr > 1) {
@@ -89,6 +93,7 @@ ValidatePmcgIdMappingCount (
   This function validates the ID Mapping array offset for the ITS node.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -96,8 +101,9 @@ STATIC
 VOID
 EFIAPI
 ValidateItsIdArrayReference (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*(UINT32 *)Ptr != 0) {
@@ -111,6 +117,7 @@ ValidateItsIdArrayReference (
   and is 64K aligned.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -118,8 +125,9 @@ STATIC
 VOID
 EFIAPI
 ValidatePhysicalRange (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT64  Value;
@@ -135,6 +143,7 @@ ValidatePhysicalRange (
   This function validates that the RMR memory range descriptor count.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -142,8 +151,9 @@ STATIC
 VOID
 EFIAPI
 ValidateRmrMemDescCount (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*(UINT32 *)Ptr == 0) {

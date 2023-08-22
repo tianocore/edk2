@@ -1,7 +1,7 @@
 /** @file
   PPTT table parser
 
-  Copyright (c) 2019 - 2021, ARM Limited. All rights reserved.
+  Copyright (c) 2019 - 2024, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -52,6 +52,7 @@ LogCacheFlagError (
   This function validates the Cache Type Structure (Type 1) Cache Flags field.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -59,8 +60,9 @@ STATIC
 VOID
 EFIAPI
 ValidateCacheFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
  #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
@@ -115,6 +117,7 @@ ValidateCacheFlags (
   field.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -122,8 +125,9 @@ STATIC
 VOID
 EFIAPI
 ValidateCacheNumberOfSets (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT32  NumberOfSets;
@@ -166,6 +170,7 @@ ValidateCacheNumberOfSets (
   field.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -173,8 +178,9 @@ STATIC
 VOID
 EFIAPI
 ValidateCacheAssociativity (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  Associativity;
@@ -192,6 +198,7 @@ ValidateCacheAssociativity (
   This function validates the Cache Type Structure (Type 1) Line size field.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -199,8 +206,9 @@ STATIC
 VOID
 EFIAPI
 ValidateCacheLineSize (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
  #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
@@ -237,6 +245,7 @@ ValidateCacheLineSize (
   This function validates the Cache Type Structure (Type 1) Cache ID field.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -244,8 +253,9 @@ STATIC
 VOID
 EFIAPI
 ValidateCacheId (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT32  CacheId;
@@ -276,6 +286,7 @@ ValidateCacheId (
   This function validates the Cache Type Structure (Type 1) Attributes field.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -283,8 +294,9 @@ STATIC
 VOID
 EFIAPI
 ValidateCacheAttributes (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   // Reference: Advanced Configuration and Power Interface (ACPI) Specification

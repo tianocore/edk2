@@ -113,6 +113,7 @@ STATIC CONST ACPI_PARSER  HestErrorNotificationCweParser[] = {
   This function validates the Type field of Hardware Error Notification Structure
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -120,8 +121,9 @@ STATIC
 VOID
 EFIAPI
 ValidateErrorNotificationType (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  Type;
@@ -246,6 +248,7 @@ STATIC CONST ACPI_PARSER  HestErrorNotificationParser[] = {
   pci related Error source structure's bus field.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -253,8 +256,9 @@ STATIC
 VOID
 EFIAPI
 ValidatePciBusReservedBits (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*Ptr != 0x00) {
@@ -277,6 +281,7 @@ STATIC CONST ACPI_PARSER  HestErrorSourcePciCommonBusParser[] = {
   error source descriptor structure.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -284,8 +289,9 @@ STATIC
 VOID
 EFIAPI
 ValidateIA32ErrorSourceFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  SourceFlags;
@@ -313,6 +319,7 @@ ValidateIA32ErrorSourceFlags (
   error source descriptor structure.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -320,8 +327,9 @@ STATIC
 VOID
 EFIAPI
 ValidatePciErrorSourceFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  SourceFlags;
@@ -342,6 +350,7 @@ ValidatePciErrorSourceFlags (
   error source descriptor structure.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -349,8 +358,9 @@ STATIC
 VOID
 EFIAPI
 ValidateGhesSourceFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  SourceFlags;
@@ -368,6 +378,7 @@ ValidateGhesSourceFlags (
   structure.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -375,8 +386,9 @@ STATIC
 VOID
 EFIAPI
 ValidateEnabledField (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*(UINT8 *)Ptr > 1) {
@@ -391,6 +403,7 @@ ValidateEnabledField (
   structure.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -398,8 +411,9 @@ STATIC
 VOID
 EFIAPI
 ValidateRecordCount (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8    RecordCount;

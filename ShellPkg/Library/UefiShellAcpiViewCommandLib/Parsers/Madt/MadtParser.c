@@ -1,7 +1,7 @@
 /** @file
   MADT table parser
 
-  Copyright (c) 2016 - 2023, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -29,6 +29,7 @@ STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
   This function validates the System Vector Base in the GICD.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -36,8 +37,9 @@ STATIC
 VOID
 EFIAPI
 ValidateGICDSystemVectorBase (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*(UINT32 *)Ptr != 0) {
@@ -52,6 +54,7 @@ ValidateGICDSystemVectorBase (
   This function validates the SPE Overflow Interrupt in the GICC.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -59,8 +62,9 @@ STATIC
 VOID
 EFIAPI
 ValidateSpeOverflowInterrupt (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT16  SpeOverflowInterrupt;
@@ -102,6 +106,7 @@ ValidateSpeOverflowInterrupt (
   This function validates the TRBE Interrupt in the GICC.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -109,8 +114,9 @@ STATIC
 VOID
 EFIAPI
 ValidateTrbeInterrupt (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT16  TrbeInterrupt;

@@ -1,7 +1,7 @@
 /** @file
   GTDT table parser
 
-  Copyright (c) 2016 - 2021, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -30,6 +30,7 @@ STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
   This function validates the GT Block timer count.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -37,8 +38,9 @@ STATIC
 VOID
 EFIAPI
 ValidateGtBlockTimerCount (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT32  BlockTimerCount;
@@ -59,6 +61,7 @@ ValidateGtBlockTimerCount (
   This function validates the GT Frame Number.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -66,8 +69,9 @@ STATIC
 VOID
 EFIAPI
 ValidateGtFrameNumber (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  FrameNumber;
