@@ -1,7 +1,7 @@
 /** @file
   HMAT table parser
 
-  Copyright (c) 2020, Arm Limited.
+  Copyright (c) 2023, Arm Limited.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -56,13 +56,15 @@ STATIC CONST CHAR16  *SllbiNames[] = {
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidateCacheAttributes (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES *

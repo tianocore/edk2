@@ -2,7 +2,7 @@
   Header file for ACPI parser
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
-  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2023, Arm Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -237,8 +237,9 @@ typedef VOID (EFIAPI *FNPTR_PRINT_FORMATTER)(CONST CHAR16 *Format, UINT8 *Ptr);
   @param [in] Context Pointer to context specific information as specified by
                       the 'Context' member of the ACPI_PARSER.
                       e.g. this could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
-typedef VOID (EFIAPI *FNPTR_FIELD_VALIDATOR)(UINT8 *Ptr, VOID *Context);
+typedef VOID (EFIAPI *FNPTR_FIELD_VALIDATOR)(UINT8 *Ptr, VOID *Context, UINT32 Length);
 
 /**
   The ACPI_PARSER structure describes the fields of an ACPI table and

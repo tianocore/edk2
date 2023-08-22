@@ -2,7 +2,7 @@
   ERST table parser
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2023, ARM Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -72,13 +72,15 @@ STATIC CONST CHAR16  *ErstInstructionTable[] = {
   @param [in] Ptr       Pointer to the start of the field data.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
+  @param [in] Length    Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidateErstAction (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   if (*Ptr > EFI_ACPI_6_4_ERST_GET_EXECUTE_OPERATION_TIMINGS) {
@@ -93,13 +95,15 @@ ValidateErstAction (
   @param [in] Ptr       Pointer to the start of the field data.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
+  @param [in] Length    Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidateErstInstruction (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   if (*Ptr > EFI_ACPI_6_4_ERST_MOVE_DATA) {
@@ -114,13 +118,15 @@ ValidateErstInstruction (
   @param [in] Ptr       Pointer to the start of the field data.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
+  @param [in] Length    Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidateErstFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   if ((*Ptr & 0xfe) != 0) {

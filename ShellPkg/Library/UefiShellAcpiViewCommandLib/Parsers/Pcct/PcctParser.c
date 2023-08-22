@@ -1,7 +1,7 @@
 /** @file
   PCCT table parser
 
-  Copyright (c) 2021, Arm Limited.
+  Copyright (c) 2023, Arm Limited.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -30,13 +30,15 @@ STATIC UINT8   *ExtendedPccSubspaceInterruptFlags;
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidateRangeLength4 (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   if (*(UINT32 *)Ptr < MIN_EXT_PCC_SUBSPACE_MEM_RANGE_LEN) {
@@ -56,13 +58,15 @@ ValidateRangeLength4 (
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidateRangeLength8 (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   if (*(UINT64 *)Ptr <= MIN_MEMORY_RANGE_LENGTH) {
@@ -82,13 +86,15 @@ ValidateRangeLength8 (
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidatePccMemoryIoGas (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   switch (*(UINT8 *)Ptr) {
@@ -109,13 +115,15 @@ ValidatePccMemoryIoGas (
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidatePccGas (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   switch (*(UINT8 *)Ptr) {
@@ -137,13 +145,15 @@ ValidatePccGas (
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidatePccDoorbellGas (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   // For responder subspaces this field is optional, if not present the field
@@ -158,7 +168,7 @@ ValidatePccDoorbellGas (
     }
   }
 
-  ValidatePccGas (Ptr, Context);
+  ValidatePccGas (Ptr, Context, Length);
 }
 
 /**
@@ -168,13 +178,15 @@ ValidatePccDoorbellGas (
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidatePccIntAckGas (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   // If the subspace does not support interrupts or the interrupt is
@@ -196,7 +208,7 @@ ValidatePccIntAckGas (
     }
   }
 
-  ValidatePccGas (Ptr, Context);
+  ValidatePccGas (Ptr, Context, Length);
 }
 
 /**
@@ -205,13 +217,15 @@ ValidatePccIntAckGas (
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidatePccErrStatusGas (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   // This field is ignored by the OSPM on responder channels.
@@ -219,7 +233,7 @@ ValidatePccErrStatusGas (
     return;
   }
 
-  ValidatePccGas (Ptr, Context);
+  ValidatePccGas (Ptr, Context, Length);
 }
 
 /**
@@ -228,13 +242,15 @@ ValidatePccErrStatusGas (
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 ValidatePlatInterrupt (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN VOID    *Context,
+  IN UINT32  Length
   )
 {
   // If a responder subspace is present in the PCCT, then the global Platform
