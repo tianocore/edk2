@@ -81,13 +81,15 @@ ValidateSratDeviceHandleType (
 
   @param [in] Format  Format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpSratPciBdfNumber (
   IN CONST CHAR16  *Format,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   CHAR16  Buffer[OUTPUT_FIELD_COLUMN_WIDTH];
@@ -169,13 +171,15 @@ STATIC CONST ACPI_PARSER  SratDeviceHandlePciParser[] = {
 
   @param [in] Format  Format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpSratDeviceHandle (
   IN CONST CHAR16  *Format,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (SratDeviceHandleType == NULL) {
@@ -212,13 +216,15 @@ DumpSratDeviceHandle (
 
   @param [in] Format  Format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpSratApicProximity (
   IN CONST CHAR16  *Format,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   UINT32  ProximityDomain;

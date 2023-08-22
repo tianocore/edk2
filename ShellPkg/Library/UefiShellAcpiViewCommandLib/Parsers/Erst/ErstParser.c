@@ -171,13 +171,15 @@ FormatByte (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the Action byte.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpErstAction (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   FormatByte (ErstActionTable, *Ptr, ARRAY_SIZE (ErstActionTable));
@@ -188,13 +190,15 @@ DumpErstAction (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the Instruction byte.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpErstInstruction (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   FormatByte (ErstInstructionTable, *Ptr, ARRAY_SIZE (ErstInstructionTable));
