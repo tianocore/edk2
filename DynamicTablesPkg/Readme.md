@@ -157,6 +157,126 @@ performed, and validate the generated output.
      - Disassemble the generated AML using the iASL compiler
        and verifying the output.
 
+### Bespoke ACPI tables
+
+The Dynamic Tables framework supports the creation of several tables using
+standard generators, see Feature Summary Section for a list of such tables.
+
+The supported platforms already contain several tables.
+If a table is not present for the platform, two alternative processes can be followed:
+
+- define the table in using ASL,
+- define the table in packed C structures (also known as RAW).
+
+The two approaches are detailed below.
+
+#### Adding an ASL table for which the Dynamic Tables Framework does not provide a standard generator
+
+This method creates the SSDT table from the ASL source, using a standard generator.
+Perform the following steps:
+
+1. Create the table source file, placing it within the ConfigurationManager source tree, e.g.:
+
+Create a file Platform/ARM/VExpressPkg/ConfigurationManager/ConfigurationManagerDxe/AslTables/NewTableSource.asl
+with the following contents:
+
+```
+DefinitionBlock ("", "SSDT", 2, "XXXXXX", "XXXXXXXX", 1) {
+  Scope(_SB) {
+    Device(FLA0) {
+      Name(_HID, "XXXX0000")
+      Name(_UID, 0)
+
+      // _DSM - Device Specific Method
+      Function(_DSM,{IntObj,BuffObj},{BuffObj, IntObj, IntObj, PkgObj})
+      {
+          W0 = 0x1
+          return (W0)
+      }
+    }
+  }
+}
+```
+
+2. Reference the table source file in ConfigurationMangerDxe.inf
+
+```
+ [Sources]
+  AslTables/NewTableSource.asl
+```
+
+3. Update the ConfigurationManager.h file
+Platform/ARM/VExpressPkg/ConfigurationManager/ConfigurationManagerDxe/ConfigurationManager.h
+
+Add an array to hold the AML code:
+```
+   extern CHAR8 newtablesource_aml_code[];
+```
+
+Note: the array name is composed of the ASL source file name all in lower case, followed by the _aml_code postfix.
+
+4. Increment the macro PLAT_ACPI_TABLE_COUNT
+
+5. Add a new CM_STD_OBJ_ACPI_TABLE_INFO structure entry and initialise.
+
+ - the entry contains:
+    - the table signature,
+    - the table revision (unused in this case),
+    - the ID of the standard generator to be used (the SSDT generator in this case).
+    - a pointer to the AML code,
+
+```
+     // Table defined in the NewTableSource.asl file
+     {
+       EFI_ACPI_6_4_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
+       0, // Unused
+       CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdSsdt),
+       (EFI_ACPI_DESCRIPTION_HEADER*)newtablesource_aml_code
+     },
+```
+
+#### Add a RAW table for which there is no standard generator
+
+An ACPI table can be defined as a packed C struct in the C source code. This is referred to as the "raw" table format.
+The steps to create a table in raw format are detailed below:
+
+1. Define the table in a C source file and populate the ACPI table structure field with the required values.
+
+   For example, create the file Platform/ARM/VExpressPkg/ConfigurationManager/ConfigurationManagerDxe/RawTable.c
+
+```
+    // Example creating the HMAT in raw format
+    EFI_ACPI_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE Hmat = {
+     ...
+    };
+```
+
+2. Reference the table source file in ConfigurationMangerDxe.inf
+
+```
+ [Sources]
+  RawTable.c
+```
+
+2. Increment the macro PLAT_ACPI_TABLE_COUNT
+
+3. Add a new CM_STD_OBJ_ACPI_TABLE_INFO structure entry and initialise.
+
+ - the entry contains:
+    - the table signature,
+    - the table revision,
+    - the RAW generator ID.
+    - a pointer to the C packed struct that defines the table,
+
+```
+    {
+      EFI_ACPI_6_3_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_SIGNATURE,
+      EFI_ACPI_6_3_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_REVISION,
+      CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdRaw),
+      (EFI_ACPI_DESCRIPTION_HEADER*)&Hmat
+    },
+```
+
 # Roadmap
 
 The current implementation of the Configuration Manager populates the
