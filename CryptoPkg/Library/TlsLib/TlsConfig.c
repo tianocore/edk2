@@ -701,7 +701,6 @@ TlsSetCaCertificate (
   TLS_CONNECTION  *TlsConn;
   SSL_CTX         *SslCtx;
   INTN            Ret;
-  UINTN           ErrorCode;
 
   BioCert   = NULL;
   Cert      = NULL;
@@ -753,11 +752,13 @@ TlsSetCaCertificate (
   //
   Ret = X509_STORE_add_cert (X509Store, Cert);
   if (Ret != 1) {
+    unsigned long  ErrorCode;
+
     ErrorCode = ERR_peek_last_error ();
     //
     // Ignore "already in table" errors
     //
-    if (!((ERR_GET_FUNC (ErrorCode) == X509_F_X509_STORE_ADD_CERT) &&
+    if (!((ERR_GET_LIB (ErrorCode) == ERR_LIB_X509) &&
           (ERR_GET_REASON (ErrorCode) == X509_R_CERT_ALREADY_IN_HASH_TABLE)))
     {
       Status = EFI_ABORTED;

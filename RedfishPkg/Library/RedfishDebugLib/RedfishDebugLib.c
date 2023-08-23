@@ -340,3 +340,29 @@ DumpRedfishResponse (
 
   return EFI_SUCCESS;
 }
+
+/**
+
+  This function dump the IPv4 address in given error level.
+
+  @param[in]  ErrorLevel  DEBUG macro error level
+  @param[in]  Ipv4Address IPv4 address to dump
+
+  @retval     EFI_SUCCESS         IPv4 address string is printed.
+  @retval     Others              Errors occur.
+
+**/
+EFI_STATUS
+DumpIpv4Address (
+  IN UINTN             ErrorLevel,
+  IN EFI_IPv4_ADDRESS  *Ipv4Address
+  )
+{
+  if (Ipv4Address == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DEBUG ((ErrorLevel, "%d.%d.%d.%d\n", Ipv4Address->Addr[0], Ipv4Address->Addr[1], Ipv4Address->Addr[2], Ipv4Address->Addr[3]));
+
+  return EFI_SUCCESS;
+}

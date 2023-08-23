@@ -783,7 +783,7 @@ CoreFreePoolI (
     NoPages  = EFI_SIZE_TO_PAGES (Size) + EFI_SIZE_TO_PAGES (Granularity) - 1;
     NoPages &= ~(UINTN)(EFI_SIZE_TO_PAGES (Granularity) - 1);
     if (IsGuarded) {
-      Head = AdjustPoolHeadF ((EFI_PHYSICAL_ADDRESS)(UINTN)Head);
+      Head = AdjustPoolHeadF ((EFI_PHYSICAL_ADDRESS)(UINTN)Head, NoPages, Size);
       CoreFreePoolPagesWithGuard (
         Pool->MemoryType,
         (EFI_PHYSICAL_ADDRESS)(UINTN)Head,

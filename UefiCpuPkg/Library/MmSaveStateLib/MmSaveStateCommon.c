@@ -99,8 +99,8 @@ MmSaveStateReadRegisterByIndex (
     //
     // Write return buffer
     //
-    ASSERT (gSmst->CpuSaveState[CpuIndex] != NULL);
-    CopyMem (Buffer, (UINT8 *)gSmst->CpuSaveState[CpuIndex] + mCpuWidthOffset[RegisterIndex].Offset32, Width);
+    ASSERT (gMmst->CpuSaveState[CpuIndex] != NULL);
+    CopyMem (Buffer, (UINT8 *)gMmst->CpuSaveState[CpuIndex] + mCpuWidthOffset[RegisterIndex].Offset32, Width);
   } else {
     //
     // If 64-bit mode width is zero, then the specified register can not be accessed
@@ -119,12 +119,12 @@ MmSaveStateReadRegisterByIndex (
     //
     // Write lower 32-bits of return buffer
     //
-    CopyMem (Buffer, (UINT8 *)gSmst->CpuSaveState[CpuIndex] + mCpuWidthOffset[RegisterIndex].Offset64Lo, MIN (4, Width));
+    CopyMem (Buffer, (UINT8 *)gMmst->CpuSaveState[CpuIndex] + mCpuWidthOffset[RegisterIndex].Offset64Lo, MIN (4, Width));
     if (Width > 4) {
       //
       // Write upper 32-bits of return buffer
       //
-      CopyMem ((UINT8 *)Buffer + 4, (UINT8 *)gSmst->CpuSaveState[CpuIndex] + mCpuWidthOffset[RegisterIndex].Offset64Hi, Width - 4);
+      CopyMem ((UINT8 *)Buffer + 4, (UINT8 *)gMmst->CpuSaveState[CpuIndex] + mCpuWidthOffset[RegisterIndex].Offset64Hi, Width - 4);
     }
   }
 

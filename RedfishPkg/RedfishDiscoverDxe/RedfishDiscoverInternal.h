@@ -28,6 +28,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/NetLib.h>
 #include <Library/PrintLib.h>
+#include <Library/RedfishDebugLib.h>
 #include <Library/RestExLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>

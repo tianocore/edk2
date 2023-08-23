@@ -296,7 +296,7 @@ MmSaveStateWriteRegister (
     return EFI_NOT_FOUND;
   }
 
-  CpuSaveState = gSmst->CpuSaveState[CpuIndex];
+  CpuSaveState = gMmst->CpuSaveState[CpuIndex];
 
   //
   // Do not write non-writable SaveState, because it will cause exception.

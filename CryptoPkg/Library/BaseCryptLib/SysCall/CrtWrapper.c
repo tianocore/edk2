@@ -275,6 +275,15 @@ strcpy (
   return strDest;
 }
 
+int
+strcmp (
+  const char  *s1,
+  const char  *s2
+  )
+{
+  return (int)AsciiStrCmp (s1, s2);
+}
+
 //
 // -- Character Classification Routines --
 //
@@ -470,33 +479,6 @@ fwrite (
   )
 {
   return 0;
-}
-
-//
-//  -- Dummy OpenSSL Support Routines --
-//
-
-int
-BIO_printf (
-  void        *bio,
-  const char  *format,
-  ...
-  )
-{
-  return 0;
-}
-
-int
-BIO_snprintf (
-  char        *buf,
-  size_t      n,
-  const char  *format,
-  ...
-  )
-{
-  // Because the function does not actually print anything to buf, it returns -1 as error.
-  // Otherwise, the consumer may think that the buf is valid and parse the buffer.
-  return -1;
 }
 
 #ifdef __GNUC__

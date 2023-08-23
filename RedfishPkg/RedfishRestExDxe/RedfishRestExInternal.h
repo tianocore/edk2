@@ -56,6 +56,20 @@ RedfishCheckHttpReceiveStatus (
   );
 
 /**
+  Create a new TLS session because the previous one is closed.
+
+  @param[in]  Instance            Pointer to EFI_REST_EX_PROTOCOL instance for a particular
+                                  REST service.
+  @retval EFI_SUCCESS             operation succeeded.
+  @retval EFI_ERROR               Other errors.
+
+**/
+EFI_STATUS
+ResetHttpTslSession (
+  IN   RESTEX_INSTANCE  *Instance
+  );
+
+/**
   This function send the HTTP request without body to see
   if the write to URL is permitted by Redfish service. This function
   checks if the HTTP request has Content-length in HTTP header. If yes,

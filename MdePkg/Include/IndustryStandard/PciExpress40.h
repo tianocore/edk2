@@ -82,6 +82,8 @@ typedef struct {
 /// The Designated Vendor Specific Capability definitions
 /// Based on section 7.9.6 of PCI Express Base Specification 4.0.
 ///@{
+#define PCI_EXPRESS_EXTENDED_CAPABILITY_DESIGNATED_VENDOR_SPECIFIC_ID  0x0023
+
 typedef union {
   struct {
     UINT32    DvsecVendorId : 16;                                     // bit 0..15
