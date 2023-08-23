@@ -1859,7 +1859,7 @@ DEFINE CLANGDWARF_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x22
 DEFINE CLANGDWARF_IA32_TARGET             = -target i686-pc-linux-gnu
 DEFINE CLANGDWARF_X64_TARGET              = -target x86_64-pc-linux-gnu
 
-DEFINE CLANGDWARF_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-unaligned-access -Wno-unneeded-internal-declaration
+DEFINE CLANGDWARF_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option -Wno-unused-but-set-variable -Wno-unused-const-variable -Wno-unaligned-access -Wno-unneeded-internal-declaration
 DEFINE CLANGDWARF_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANGDWARF_WARNING_OVERRIDES) -fno-stack-protector -mms-bitfields -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -msoft-float -mno-implicit-float  -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -funsigned-char -fno-ms-extensions -Wno-null-dereference
 
 ###########################
