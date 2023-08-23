@@ -108,7 +108,7 @@ MmSaveStateReadRegister (
   UINT8                      DataWidth;
 
   // Read CPU State
-  CpuSaveState = (AMD_SMRAM_SAVE_STATE_MAP *)gSmst->CpuSaveState[CpuIndex];
+  CpuSaveState = (AMD_SMRAM_SAVE_STATE_MAP *)gMmst->CpuSaveState[CpuIndex];
 
   // Check for special EFI_MM_SAVE_STATE_REGISTER_LMA
   if (Register == EFI_MM_SAVE_STATE_REGISTER_LMA) {
@@ -226,7 +226,7 @@ MmSaveStateWriteRegister (
     return EFI_NOT_FOUND;
   }
 
-  CpuSaveState = gSmst->CpuSaveState[CpuIndex];
+  CpuSaveState = gMmst->CpuSaveState[CpuIndex];
 
   //
   // Do not write non-writable SaveState, because it will cause exception.

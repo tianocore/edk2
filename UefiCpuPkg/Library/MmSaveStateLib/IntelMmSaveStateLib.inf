@@ -31,4 +31,4 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  SmmServicesTableLib
+  MmServicesTableLib

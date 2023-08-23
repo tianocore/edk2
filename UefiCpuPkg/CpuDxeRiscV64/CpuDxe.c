@@ -296,8 +296,7 @@ CpuSetMemoryAttributes (
   IN UINT64                 Attributes
   )
 {
-  DEBUG ((DEBUG_INFO, "%a: Set memory attributes not supported yet\n", __func__));
-  return EFI_SUCCESS;
+  return RiscVSetMemoryAttributes (BaseAddress, Length, Attributes);
 }
 
 /**
@@ -339,6 +338,12 @@ InitializeCpu (
   // Make sure interrupts are disabled
   //
   DisableInterrupts ();
+
+  //
+  // Enable MMU
+  //
+  Status = RiscVConfigureMmu ();
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Install Boot protocol

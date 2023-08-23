@@ -24,7 +24,7 @@ jobs:
       package: 'OvmfPkg'
       vm_image: 'windows-2019'
       should_run: true
-      run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE QEMU_CPUHP_QUIRK=TRUE"
+      run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE"
 
     #Use matrix to speed up the build process
     strategy:
@@ -139,7 +139,7 @@ jobs:
         run_flags: $(Run.Flags)
         usePythonVersion: ${{ variables.default_python_version }}
         extra_install_step:
-        - powershell: choco install qemu --version=2021.5.5; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
+        - powershell: choco install qemu --version=2023.7.25; Write-Host "##vso[task.prependpath]c:\Program Files\qemu"
           displayName: Install QEMU and Set QEMU on path # friendly name displayed in the UI
           condition: and(gt(variables.pkg_count, 0), succeeded())
 

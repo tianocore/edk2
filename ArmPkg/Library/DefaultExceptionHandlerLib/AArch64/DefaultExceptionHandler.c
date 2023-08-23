@@ -22,6 +22,12 @@
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
 
+//
+// Maximum number of characters to print to serial (UINT8s) and to console if
+// available (as UINT16s)
+//
+#define MAX_PRINT_CHARS  100
+
 STATIC CHAR8  *gExceptionTypeString[] = {
   "Synchronous",
   "IRQ",
@@ -188,18 +194,14 @@ DefaultExceptionHandler (
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  CHAR8  Buffer[100];
-  UINTN  CharCount;
-  INT32  Offset;
+  CHAR8   Buffer[MAX_PRINT_CHARS];
+  CHAR16  UnicodeBuffer[MAX_PRINT_CHARS];
+  UINTN   CharCount;
+  INT32   Offset;
 
   if (mRecursiveException) {
     STATIC CHAR8 CONST  Message[] = "\nRecursive exception occurred while dumping the CPU state\n";
-
     SerialPortWrite ((UINT8 *)Message, sizeof Message - 1);
-    if (gST->ConOut != NULL) {
-      AsciiPrint (Message);
-    }
-
     CpuDeadLoop ();
   }
 
@@ -207,9 +209,10 @@ DefaultExceptionHandler (
 
   CharCount = AsciiSPrint (Buffer, sizeof (Buffer), "\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
   SerialPortWrite ((UINT8 *)Buffer, CharCount);
-  if (gST->ConOut != NULL) {
-    AsciiPrint (Buffer);
-  }
+
+  // Prepare a unicode buffer for ConOut, if applicable, in case the buffer
+  // gets reused.
+  UnicodeSPrintAsciiFormat (UnicodeBuffer, MAX_PRINT_CHARS, Buffer);
 
   DEBUG_CODE_BEGIN ();
   CHAR8   *Pdb, *PrevPdb;
@@ -328,6 +331,13 @@ DefaultExceptionHandler (
       *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset + 16),
       *(UINT64 *)(SystemContext.SystemContextAArch64->SP + Offset + 24)
       ));
+  }
+
+  // Attempt to print that we had a synchronous exception to ConOut.  We do
+  // this after the serial logging as ConOut's logging is more complex and we
+  // aren't guaranteed to succeed.
+  if (gST->ConOut != NULL) {
+    gST->ConOut->OutputString (gST->ConOut, UnicodeBuffer);
   }
 
   ASSERT (FALSE);

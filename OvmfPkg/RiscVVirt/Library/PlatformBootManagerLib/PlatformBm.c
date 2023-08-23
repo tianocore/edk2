@@ -936,7 +936,7 @@ PlatformBootManagerAfterConsole (
       );
   }
 
-  Print (L"Press ESCAPE within 10 seconds for boot options ");
+  Print (L"Press ESCAPE within %u seconds for boot options ", PcdGet16 (PcdPlatformBootTimeOut));
   //
   // Process QEMU's -kernel command line option. The kernel booted this way
   // will receive ACPI tables: in PlatformBootManagerBeforeConsole(), we
