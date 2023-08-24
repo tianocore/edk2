@@ -205,6 +205,7 @@ RsiGetIpaState (
   @param [in]   Address     Address to the start of the memory range.
   @param [in]   Size        Length of the memory range.
   @param [in]   State       The RIPAS state to be configured.
+  @param [in]   Flags       The RIPAS change flags.
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
@@ -214,7 +215,8 @@ EFIAPI
 RsiSetIpaState (
   IN  UINT64  *Address,
   IN  UINT64  Size,
-  IN  RIPAS   State
+  IN  RIPAS   State,
+  IN  UINT64  Flags
   );
 
 /**

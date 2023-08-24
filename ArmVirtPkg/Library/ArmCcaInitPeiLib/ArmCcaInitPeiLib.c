@@ -50,7 +50,8 @@ ArmCcaConfigureSystemMemory (
   Status =  RsiSetIpaState (
               (UINT64 *)PcdGet64 (PcdSystemMemoryBase),
               PcdGet64 (PcdSystemMemorySize),
-              RipasRam
+              RipasRam,
+              RIPAS_CHANGE_FLAGS_RSI_NO_CHANGE_DESTROYED
               );
   if (RETURN_ERROR (Status)) {
     // Panic
