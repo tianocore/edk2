@@ -71,6 +71,26 @@
 */
 #define RSI_HASH_SHA_512  1
 
+/* The RsiRipasChangeFlags fieldset contains flags provided by
+   the Realm when requesting a RIPAS change.
+   See section B4.4.8 RsiRipasChangeFlags type in the
+   RMM Specification, version 1.0-eac2.
+   The following macros prefixed RIPAS_CHANGE_FLAGS_xxx
+   define the values of the RsiRipasChangeFlags fieldset.
+*/
+
+/* A RIPAS change from DESTROYED should not be permitted.
+  See section B4.4.7 RsiRipasChangeDestroyed type in the
+  RMM Specification, version 1.0-eac2
+*/
+#define RIPAS_CHANGE_FLAGS_RSI_NO_CHANGE_DESTROYED  0
+
+/* A RIPAS change from DESTROYED should be permitted.
+  See section B4.4.7 RsiRipasChangeDestroyed type in the
+  RMM Specification, version 1.0-eac2
+*/
+#define RIPAS_CHANGE_FLAGS_RSI_CHANGE_DESTROYED  1
+
 /** An enum describing the RSI RIPAS.
    See Section A5.2.2 Realm IPA state, RMM Specification, version 1.0-eac2
 */
