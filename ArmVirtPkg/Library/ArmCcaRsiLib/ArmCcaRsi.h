@@ -41,8 +41,8 @@
    See Section B4.4.3,  RMM Specification, version A-bet0.
    The width of the RsiInterfaceVersion fieldset is 64 bits.
 */
-#define RSI_VER_MINOR_MASK   0x00FFULL
-#define RSI_VER_MAJOR_MASK   0x7F00ULL
+#define RSI_VER_MINOR_MASK   0x0000FFFFULL
+#define RSI_VER_MAJOR_MASK   0x7FFF0000ULL
 #define RSI_VER_MAJOR_SHIFT  16
 
 #endif // ARM_CCA_RSI_H_
