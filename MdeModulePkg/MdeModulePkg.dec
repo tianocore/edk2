@@ -1692,6 +1692,9 @@
   # @Prompt Size of flash NV variable range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize|0x0|UINT32|0x30000002
 
+  ## UPL build switch for HOB or FDT. 1: FDT, 0: HOB
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHandoffFdtMode|1|UINT8|0x3000000B
+
   ## Base address of the FTW spare block range in flash device. Note that this value should be block size aligned.
   # @Prompt Base address of flash FTW spare block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0|UINT32|0x30000013

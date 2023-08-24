@@ -88,6 +88,7 @@
   ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
   ## SOMETIMES_PRODUCES ## HOB
   gEfiMemoryTypeInformationGuid
+  gUniversalPayloadDeviceTreeGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
@@ -114,6 +115,8 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHandoffFdtMode              ## CONSUMES
+
 
 [Depex]
   gEfiPeiLoadFilePpiGuid AND gEfiPeiMasterBootModePpiGuid

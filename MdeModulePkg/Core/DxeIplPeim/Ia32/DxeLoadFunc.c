@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
+#include <UniversalPayload/DeviceTree.h>
 
 #define IDT_ENTRY_COUNT  32
 
@@ -264,6 +265,9 @@ HandOffToDxeCore (
   EFI_VECTOR_HANDOFF_INFO          *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI  *VectorHandoffInfoPpi;
   BOOLEAN                          BuildPageTablesIa32Pae;
+  UINT8                            *GuidHob;
+  UNIVERSAL_PAYLOAD_DEVICE_TREE    *FdtHob;
+  UINT8                            *Raw;
 
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
@@ -310,6 +314,17 @@ HandOffToDxeCore (
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
     PERF_EVENT_SIGNAL_END (gEndOfPeiSignalPpi.Guid);
     ASSERT_EFI_ERROR (Status);
+#if FixedPcdGet8(PcdHandoffFdtMode) == 1
+  //
+  // Get FDT blob address
+  //
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadDeviceTreeGuid);
+  ASSERT (GuidHob != NULL);
+   FdtHob = (UNIVERSAL_PAYLOAD_DEVICE_TREE *) GET_GUID_HOB_DATA (GuidHob);
+  Raw = (UINT8*) FdtHob;
+#else
+    Raw = HobList.Raw;
+#endif
 
     //
     // Paging might be already enabled. To avoid conflict configuration,
@@ -382,7 +397,7 @@ HandOffToDxeCore (
     AsmEnablePaging64 (
       SYS_CODE64_SEL,
       DxeCoreEntryPoint,
-      (EFI_PHYSICAL_ADDRESS)(UINTN)(HobList.Raw),
+      (EFI_PHYSICAL_ADDRESS) (UINTN) Raw,
       0,
       TopOfStack
       );
@@ -436,6 +451,18 @@ HandOffToDxeCore (
     PERF_EVENT_SIGNAL_END (gEndOfPeiSignalPpi.Guid);
     ASSERT_EFI_ERROR (Status);
 
+#if FixedPcdGet8(PcdHandoffFdtMode) == 1
+  //
+  // Get FDT blob address
+  //
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadDeviceTreeGuid);
+  ASSERT (GuidHob != NULL);
+  FdtHob = (UNIVERSAL_PAYLOAD_DEVICE_TREE *) GET_GUID_HOB_DATA (GuidHob);
+  Raw = (UINT8*) FdtHob;
+#else
+  Raw = HobList.Raw;
+#endif
+
     if (BuildPageTablesIa32Pae) {
       //
       // Paging might be already enabled. To avoid conflict configuration,
@@ -468,14 +495,14 @@ HandOffToDxeCore (
     if (BuildPageTablesIa32Pae) {
       AsmEnablePaging32 (
         (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-        HobList.Raw,
+        (VOID *)Raw,
         NULL,
         (VOID *)(UINTN)TopOfStack
         );
     } else {
       SwitchStack (
         (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-        HobList.Raw,
+        (VOID *)Raw,
         NULL,
         (VOID *)(UINTN)TopOfStack
         );
