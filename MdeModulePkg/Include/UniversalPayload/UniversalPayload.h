@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #ifndef UNIVERSAL_PAYLOAD_H_
 #define UNIVERSAL_PAYLOAD_H_
-
+extern GUID gUniversalPayloadBaseGuid;
 /**
   Main entry point to Universal Payload.
 
@@ -43,6 +43,10 @@ typedef struct {
   UINT16    Length;
 } UNIVERSAL_PAYLOAD_GENERIC_HEADER;
 
+typedef struct {
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER    Header;
+  EFI_PHYSICAL_ADDRESS                Entry;
+} UNIVERSAL_PAYLOAD_BASE;
 #pragma pack()
 
 /**
