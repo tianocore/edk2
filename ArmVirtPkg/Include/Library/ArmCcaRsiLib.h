@@ -72,11 +72,12 @@
 #define RSI_HASH_SHA_512  1
 
 /** An enum describing the RSI RIPAS.
-   See Section A5.2.2 Realm IPA state, RMM Specification, version A-bet0
+   See Section A5.2.2 Realm IPA state, RMM Specification, version 1.0-eac2
 */
 typedef enum Ripas {
   RipasEmpty,      ///< Unused IPA location.
   RipasRam,        ///< Private code or data owned by the Realm.
+  RipasDestroyed,  ///< An address which is inaccessible to the Realm.
   RipasMax         ///< A valid RIPAS type value is less than RipasMax.
 } RIPAS;
 
