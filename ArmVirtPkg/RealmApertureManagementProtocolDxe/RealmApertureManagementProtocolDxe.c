@@ -238,7 +238,8 @@ RampOpenAperture (
   Status = RsiSetIpaState (
              (UINT64 *)Memory,
              (Pages * EFI_PAGE_SIZE),
-             RipasEmpty
+             RipasEmpty,
+             RIPAS_CHANGE_FLAGS_RSI_CHANGE_DESTROYED
              );
   if (RETURN_ERROR (Status)) {
     DEBUG ((
@@ -345,7 +346,8 @@ RampCloseAperture (
   Status = RsiSetIpaState (
              (UINT64 *)ApertInfo->BaseAddress,
              (ApertInfo->Pages * EFI_PAGE_SIZE),
-             RipasRam
+             RipasRam,
+             RIPAS_CHANGE_FLAGS_RSI_CHANGE_DESTROYED
              );
   if (RETURN_ERROR (Status)) {
     DEBUG ((
