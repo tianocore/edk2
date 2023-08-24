@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-bet2
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac2
      (https://developer.arm.com/documentation/den0137/)
 **/
 
@@ -61,6 +61,16 @@
 #define MIN_REM_INDEX  1
 #define MAX_REM_INDEX  4
 
+/* The values of the RsiHashAlgorithm enumeration.
+   SHA-256 (Secure Hash Standard (SHS))
+*/
+#define RSI_HASH_SHA_256  0
+
+/* The values of the RsiHashAlgorithm enumeration.
+   SHA-512 (Secure Hash Standard (SHS))
+*/
+#define RSI_HASH_SHA_512  1
+
 /** An enum describing the RSI RIPAS.
    See Section A5.2.2 Realm IPA state, RMM Specification, version A-bet0
 */
@@ -71,14 +81,16 @@ typedef enum Ripas {
 } RIPAS;
 
 /** A structure describing the Realm Configuration.
-  See Section B4.4.4 RsiRealmConfig type, RMM Specification, version A-bet0
+  See Section B4.4.5 RsiRealmConfig type, RMM Specification, version 1.0-eac2
   The width of the RsiRealmConfig structure is 4096 (0x1000) bytes.
 */
 typedef struct RealmConfig {
   // Width of IPA in bits.
   UINT64    IpaWidth;
+  // Width of the RsiHashAlgorithm enumeration is 8 bits.
+  UINT8     HashAlgorithm;
   // Unused bits of the RsiRealmConfig structure should be zero.
-  UINT8     Reserved[SIZE_4KB - sizeof (UINT64)];
+  UINT8     Reserved[SIZE_4KB - (sizeof (UINT64) + sizeof (UINT8))];
 } REALM_CONFIG;
 
 /** A structure describing the Host Call arguments
