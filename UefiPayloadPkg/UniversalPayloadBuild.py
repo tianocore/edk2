@@ -58,6 +58,7 @@ def BuildUniversalPayload(Args):
     BuildDir     = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkgX64"))
     BuildModule = ""
     BuildArch = ""
+
     if Args.Arch == 'X64':
         BuildArch      = "X64"
         EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ElfToolChain), os.path.normpath("X64/UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry/DEBUG/UniversalPayloadEntry.dll"))
@@ -65,8 +66,6 @@ def BuildUniversalPayload(Args):
         BuildArch      = "IA32 -a X64"
         EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ElfToolChain), os.path.normpath("IA32/UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry/DEBUG/UniversalPayloadEntry.dll"))
 
-    if Args.PreBuildUplBinary is not None:
-        EntryOutputDir = os.path.abspath(Args.PreBuildUplBinary)
     DscPath = os.path.normpath("UefiPayloadPkg/UefiPayloadPkg.dsc")
     ModuleReportPath = os.path.join(BuildDir, "UefiUniversalPayloadEntry.txt")
     UpldInfoFile = os.path.join(BuildDir, "UniversalPayloadInfo.bin")
@@ -99,6 +98,11 @@ def BuildUniversalPayload(Args):
         BuildModule += Pcds
         BuildModule += Defines
         RunCommand(BuildModule)
+
+    if Args.PreBuildUplBinary is not None:
+        EntryOutputDir = os.path.join(BuildDir, "UniversalPayload.elf")
+        shutil.copy (os.path.abspath(Args.PreBuildUplBinary), EntryOutputDir)
+
     #
     # Buid Universal Payload Information Section ".upld_info"
     #
@@ -122,7 +126,8 @@ def BuildUniversalPayload(Args):
         AddSectionName = '.upld_info'
         ReplaceFv (EntryOutputDir, UpldInfoFile, AddSectionName, Alignment = 4)
 
-    shutil.copy (EntryOutputDir, os.path.join(BuildDir, 'UniversalPayload.elf'))
+    if Args.PreBuildUplBinary is None:
+        shutil.copy (EntryOutputDir, os.path.join(BuildDir, 'UniversalPayload.elf'))
 
     return MultiFvList, os.path.join(BuildDir, 'UniversalPayload.elf')
 
