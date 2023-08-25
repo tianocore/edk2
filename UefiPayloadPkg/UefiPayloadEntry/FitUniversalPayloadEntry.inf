@@ -58,19 +58,15 @@
 [Guids]
   gEfiMemoryTypeInformationGuid
   gEfiFirmwareFileSystem2Guid
-  gEfiGraphicsInfoHobGuid
-  gEfiGraphicsDeviceInfoHobGuid
   gUefiAcpiBoardInfoGuid
-  gEfiSmbiosTableGuid
-  gUefiSerialPortInfoGuid
   gUniversalPayloadExtraDataGuid
-  gUniversalPayloadBaseGuid
   gPcdDataBaseHobGuid
   gUniversalPayloadSmbiosTableGuid
   gEfiHobMemoryAllocBspStoreGuid
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadPciRootBridgeInfoGuid
   gUniversalPayloadSmbios3TableGuid
+  gUniversalPayloadBaseGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES

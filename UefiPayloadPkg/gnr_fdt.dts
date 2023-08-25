@@ -1,0 +1,104 @@
+/dts-v1/;
+
+/ {
+	acpi = <0x00 0x6dfff160>;
+	smbios = <0x00 0x6dffa000>;
+	#size-cells = <0x02>;
+	#address-cells = <0x02>;
+
+	DebugPrintErrorLevel {
+		errorlevel = <0x80000000>;
+	};
+
+	hoblistptr {
+		hoblistptr = <0x00 0x5ec12040>;
+	};
+
+	pcirbinfo {
+		ResourceAssigned = <0x00>;
+		count = <0x00>;
+	};
+
+	cpu-info {
+		address_width = <0x34>;
+	};
+
+	serial@3F8 {
+		use-mmio = <0x00>;
+		reg-width = <0x08>;
+		reg-shift = <0x01>;
+		reg = <0x00 0x3f8 0x00 0x00>;
+		current-speed = <0x1c200>;
+	};
+
+	reserved-memory {
+		#size-cells = <0x02>;
+		#address-cells = <0x02>;
+
+		mmio@FEC80000 {
+			Attribute = <0x403>;
+			reg = <0x00 0xfec80000 0x00 0x80000>;
+		};
+
+		mmio@FEC00000 {
+			Attribute = <0x403>;
+			reg = <0x00 0xfec00000 0x00 0x1000>;
+		};
+
+		mmio@FDA00000 {
+			Attribute = <0x403>;
+			reg = <0x00 0xfda00000 0x00 0x2600000>;
+		};
+
+		unknown@FDA00000 {
+			Attribute = <0x403>;
+			reg = <0x00 0xfda00000 0x00 0x2600000>;
+		};
+
+		reserved@77800000 {
+			Attribute = <0x00>;
+			reg = <0x00 0x77800000 0x00 0x800000>;
+		};
+
+		reserved@78000000 {
+			Attribute = <0x00>;
+			reg = <0x00 0x78000000 0x00 0x8000000>;
+		};
+
+		reserved@A0000 {
+			Attribute = <0x00>;
+			reg = <0x00 0xa0000 0x00 0x60000>;
+		};
+
+		mmio@FED00000 {
+			Attribute = <0x403>;
+			reg = <0x00 0xfed00000 0x00 0x1000>;
+		};
+
+		mmio@F6800000 {
+			Attribute = <0x403>;
+			reg = <0x00 0xf6800000 0x00 0x1800000>;
+		};
+	};
+
+	memory@100000000 {
+		Attribute = <0x3c03>;
+		reg = <0x01 0x00 0x07 0x80000000>;
+		type = "memory";
+	};
+
+	memory@100000 {
+		reg = <0x00 0x100000 0x00 0x5e8d0000>;
+		type = "memory";
+	};
+
+	memory@0 {
+		reg = <0x00 0x00 0x00 0xa0000>;
+		type = "memory";
+	};
+
+	memory@5E9D0000 {
+		reg = <0x00 0x5e9d0000 0x00 0x18e30000>;
+		type = "memory";
+	};
+};

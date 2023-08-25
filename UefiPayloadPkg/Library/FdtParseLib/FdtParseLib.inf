@@ -1,0 +1,44 @@
+## @file
+#  Coreboot Table Parse Library.
+#
+#  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FdtParseLib
+  FILE_GUID                      = 8956F72D-9626-4959-98B7-1BD4A3EA687E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FdtParseLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FdtParserLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+  HobLib
+  FdtLib
+
+[Guids]
+  gUniversalPayloadDeviceTreeGuid
+  gEfiGraphicsInfoHobGuid
+  gEfiGraphicsDeviceInfoHobGuid
+
+[Pcd.IA32,Pcd.X64]
+  gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
+  gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize

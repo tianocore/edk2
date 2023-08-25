@@ -31,7 +31,6 @@ GetHobList (
   VOID
   )
 {
-  ASSERT (mHobList != NULL);
   return mHobList;
 }
 
@@ -109,6 +108,7 @@ CreateHob (
   VOID                        *Hob;
 
   HandOffHob = GetHobList ();
+  ASSERT (HandOffHob != NULL);
 
   HobLength = (UINT16)((HobLength + 0x7) & (~0x7));
 
@@ -229,6 +229,7 @@ GetFirstHob (
   VOID  *HobList;
 
   HobList = GetHobList ();
+  ASSERT (HobList != NULL);
   return GetNextHob (Type, HobList);
 }
 
@@ -295,6 +296,7 @@ GetFirstGuidHob (
   VOID  *HobList;
 
   HobList = GetHobList ();
+  ASSERT (HobList != NULL);
   return GetNextGuidHob (Guid, HobList);
 }
 
@@ -612,6 +614,7 @@ UpdateStackHob (
   EFI_PEI_HOB_POINTERS  Hob;
 
   Hob.Raw = GetHobList ();
+  ASSERT (Hob.Raw != NULL);
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
     if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name))) {
       //

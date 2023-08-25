@@ -316,6 +316,8 @@
   CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+  ElfLib|UefiPayloadPkg/Library/ElfLib/ElfLib.inf
+  FitLib|UefiPayloadPkg/Library/FitLib/FitLib.inf
 [LibraryClasses.common]
 !if $(BOOTSPLASH_IMAGE)
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
@@ -484,6 +486,7 @@
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsSet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsGet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
 !endif
+  gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport|2
 
 [PcdsPatchableInModule.X64]
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
@@ -605,9 +608,27 @@
   [Components.IA32]
   !if $(UNIVERSAL_PAYLOAD) == TRUE
     !if $(UNIVERSAL_PAYLOAD_FORMAT) == "ELF"
-      UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
+       UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf {
+      <LibraryClasses>
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 0 || gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 2
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+        !endif
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 1 || gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 2
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParseLib/FdtParseLib.inf
+        !endif
+    }
     !elseif $(UNIVERSAL_PAYLOAD_FORMAT) == "FIT"
-      UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf
+      UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf {
+      <LibraryClasses>
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 0 || gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 2
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+        !endif
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 1 || gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 2
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParseLib/FdtParseLib.inf
+        !endif
+    }
     !else
       UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
     !endif
@@ -618,9 +639,27 @@
   [Components.X64]
   !if $(UNIVERSAL_PAYLOAD) == TRUE
     !if $(UNIVERSAL_PAYLOAD_FORMAT) == "ELF"
-      UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
+      UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf {
+      <LibraryClasses>
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 0 || gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 2
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+        !endif
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 1 || gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 2
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParseLib/FdtParseLib.inf
+        !endif
+    }
     !elseif $(UNIVERSAL_PAYLOAD_FORMAT) == "FIT"
-      UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf
+      UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf {
+      <LibraryClasses>
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 0 || gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 2
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+        !endif
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 1 || gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport == 2
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParseLib/FdtParseLib.inf
+        !endif
+    }
     !else
       UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
     !endif

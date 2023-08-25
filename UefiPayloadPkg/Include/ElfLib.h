@@ -42,6 +42,16 @@ typedef struct {
 } SEGMENT_INFO;
 
 /**
+  Check if the ELF image is valid.
+  @param[in]  ImageBase       Memory address of an image.
+  @retval     TRUE if valid.
+**/
+BOOLEAN
+IsElfFormat (
+  IN  CONST UINT8  *ImageBase
+  );
+
+/**
   Parse the ELF image info.
 
   @param[in]  ImageBase      Memory address of an image.
