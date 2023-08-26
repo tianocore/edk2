@@ -829,7 +829,7 @@ SetFilter (
     }
 
     Nic->UsbEth->UsbEthFunDescriptor (Nic->UsbEth, &UsbEthFunDescriptor);
-    if ((UsbEthFunDescriptor.NumberMcFilters << 1) == 0) {
+    if ((UsbEthFunDescriptor.NumberMcFilters & MAC_FILTERS_MASK) == 0) {
       Nic->RxFilter |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
       Nic->UsbEth->SetUsbEthPacketFilter (Nic->UsbEth, Nic->RxFilter);
     } else {

@@ -714,7 +714,7 @@ SetUsbEthMcastFilter (
     return Status;
   }
 
-  if ((UsbEthFunDescriptor.NumberMcFilters << 1) == 0) {
+  if ((UsbEthFunDescriptor.NumberMcFilters & MAC_FILTERS_MASK) == 0) {
     return EFI_UNSUPPORTED;
   }
 
