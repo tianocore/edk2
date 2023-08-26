@@ -661,7 +661,7 @@ SetUsbRndisMcastFilter (
     return Status;
   }
 
-  if ((UsbEthFunDescriptor.NumberMcFilters << 1) == 0) {
+  if ((UsbEthFunDescriptor.NumberMcFilters & MAC_FILTERS_MASK) == 0) {
     return EFI_UNSUPPORTED;
   }
 
@@ -856,7 +856,7 @@ RndisUndiReceiveFilter (
     }
 
     Nic->UsbEth->UsbEthFunDescriptor (Nic->UsbEth, &UsbEthFunDescriptor);
-    if ((UsbEthFunDescriptor.NumberMcFilters << 1) == 0) {
+    if ((UsbEthFunDescriptor.NumberMcFilters & MAC_FILTERS_MASK) == 0) {
       Nic->RxFilter |= PXE_OPFLAGS_RECEIVE_FILTER_ALL_MULTICAST;
       DEBUG ((DEBUG_INFO, "SetUsbEthPacketFilter Nic %lx Nic->UsbEth %lx ", Nic, Nic->UsbEth));
       Nic->UsbEth->SetUsbEthPacketFilter (Nic->UsbEth, Nic->RxFilter);

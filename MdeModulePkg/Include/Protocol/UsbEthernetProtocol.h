@@ -42,6 +42,8 @@ typedef struct _EDKII_USB_ETHERNET_PROTOCOL EDKII_USB_ETHERNET_PROTOCOL;
 #define NETWORK_CONNECTED   0x01
 #define NETWORK_DISCONNECT  0x00
 
+#define MAC_FILTERS_MASK  0x7FFF
+
 // USB Header functional Descriptor
 typedef struct {
   UINT8     FunctionLength;
