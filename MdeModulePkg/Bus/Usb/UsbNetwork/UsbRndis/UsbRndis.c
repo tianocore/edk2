@@ -40,15 +40,15 @@ IsSupportedDevice (
   }
 
   // Check specific device/RNDIS and CDC-DATA
-  if (((InterfaceDescriptor.InterfaceClass == 0x2) &&
-       (InterfaceDescriptor.InterfaceSubClass == 0x2) &&
-       (InterfaceDescriptor.InterfaceProtocol == 0xFF)) || \
-      ((InterfaceDescriptor.InterfaceClass == 0xEF) &&
-       (InterfaceDescriptor.InterfaceSubClass == 0x4) &&
-       (InterfaceDescriptor.InterfaceProtocol == 0x1)) || \
-      ((InterfaceDescriptor.InterfaceClass == 0xA) &&
-       (InterfaceDescriptor.InterfaceSubClass == 0x0) &&
-       (InterfaceDescriptor.InterfaceProtocol == 0x00))
+  if (((InterfaceDescriptor.InterfaceClass == USB_CDC_CLASS) &&
+       (InterfaceDescriptor.InterfaceSubClass == USB_CDC_ACM_SUBCLASS) &&
+       (InterfaceDescriptor.InterfaceProtocol == USB_VENDOR_PROTOCOL)) || \
+      ((InterfaceDescriptor.InterfaceClass == USB_MISC_CLASS) &&
+       (InterfaceDescriptor.InterfaceSubClass == USB_RNDIS_SUBCLASS) &&
+       (InterfaceDescriptor.InterfaceProtocol == USB_RNDIS_ETHERNET_PROTOCOL)) || \
+      ((InterfaceDescriptor.InterfaceClass == USB_CDC_DATA_CLASS) &&
+       (InterfaceDescriptor.InterfaceSubClass == USB_CDC_DATA_SUBCLASS) &&
+       (InterfaceDescriptor.InterfaceProtocol == USB_NO_CLASS_PROTOCOL))
       )
   {
     return TRUE;
@@ -79,12 +79,12 @@ IsRndisInterface (
   }
 
   // Check for specific device/RNDIS and CDC-DATA
-  if (((InterfaceDescriptor.InterfaceClass == 0x2) &&
-       (InterfaceDescriptor.InterfaceSubClass == 0x2) &&
-       (InterfaceDescriptor.InterfaceProtocol == 0xFF)) || \
-      ((InterfaceDescriptor.InterfaceClass == 0xEF) &&
-       (InterfaceDescriptor.InterfaceSubClass == 0x4) &&
-       (InterfaceDescriptor.InterfaceProtocol == 0x1))
+  if (((InterfaceDescriptor.InterfaceClass == USB_CDC_CLASS) &&
+       (InterfaceDescriptor.InterfaceSubClass == USB_CDC_ACM_SUBCLASS) &&
+       (InterfaceDescriptor.InterfaceProtocol == USB_VENDOR_PROTOCOL)) || \
+      ((InterfaceDescriptor.InterfaceClass == USB_MISC_CLASS) &&
+       (InterfaceDescriptor.InterfaceSubClass == USB_RNDIS_SUBCLASS) &&
+       (InterfaceDescriptor.InterfaceProtocol == USB_RNDIS_ETHERNET_PROTOCOL))
       )
   {
     return TRUE;
@@ -155,9 +155,9 @@ IsUsbCdcData (
   }
 
   // Check for CDC-DATA
-  if ((InterfaceDescriptor.InterfaceClass == 0xA) &&
-      (InterfaceDescriptor.InterfaceSubClass == 0x0) &&
-      (InterfaceDescriptor.InterfaceProtocol == 0x0))
+  if ((InterfaceDescriptor.InterfaceClass == USB_CDC_DATA_CLASS) &&
+      (InterfaceDescriptor.InterfaceSubClass == USB_CDC_DATA_SUBCLASS) &&
+      (InterfaceDescriptor.InterfaceProtocol == USB_NO_CLASS_PROTOCOL))
   {
     return TRUE;
   }
@@ -188,9 +188,9 @@ IsUsbRndis (
   }
 
   // Check for Rndis
-  if ((InterfaceDescriptor.InterfaceClass == 0x2) &&
-      (InterfaceDescriptor.InterfaceSubClass == 0x2) &&
-      (InterfaceDescriptor.InterfaceProtocol == 0xFF))
+  if ((InterfaceDescriptor.InterfaceClass == USB_CDC_CLASS) &&
+      (InterfaceDescriptor.InterfaceSubClass == USB_CDC_ACM_SUBCLASS) &&
+      (InterfaceDescriptor.InterfaceProtocol == USB_VENDOR_PROTOCOL))
   {
     return TRUE;
   }
