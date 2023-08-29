@@ -829,6 +829,10 @@ AddAndSignalNewRedfishService (
     } while (TRUE);
   }
 
+  if (Char16Uuid != NULL) {
+    FreePool (Char16Uuid);
+  }
+
   if (NewFound || InfoRefresh) {
     if (!InfoRefresh) {
       DiscoveredList = (EFI_REDFISH_DISCOVERED_INTERNAL_LIST *)AllocateZeroPool (sizeof (EFI_REDFISH_DISCOVERED_INTERNAL_LIST));
@@ -905,10 +909,6 @@ AddAndSignalNewRedfishService (
         DEBUG ((DEBUG_MANAGEABILITY, "Service UUID: unknown.\n"));
       }
     }
-  }
-
-  if (Char16Uuid != NULL) {
-    FreePool ((VOID *)Char16Uuid);
   }
 
   Status = EFI_SUCCESS;
