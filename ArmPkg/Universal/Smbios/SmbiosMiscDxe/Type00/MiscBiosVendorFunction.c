@@ -185,7 +185,7 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscBiosVendor) {
   UINTN               VendorStrLen;
   UINTN               VerStrLen;
   UINTN               DateStrLen;
-  UINTN               BiosPhysicalSize;
+  UINT64              BiosPhysicalSize;
   CHAR16              *Vendor;
   CHAR16              *Version;
   CHAR16              *ReleaseDate;
