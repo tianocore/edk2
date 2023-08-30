@@ -1,7 +1,7 @@
 /** @file
   Locate handle functions
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -730,6 +730,10 @@ CoreLocateHandleBuffer (
   *NumberHandles = BufferSize / sizeof (EFI_HANDLE);
   if (EFI_ERROR (Status)) {
     *NumberHandles = 0;
+    if (*Buffer != NULL) {
+      CoreFreePool (*Buffer);
+      *Buffer = NULL;
+    }
   }
 
   CoreReleaseProtocolLock ();
