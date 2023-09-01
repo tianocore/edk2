@@ -279,7 +279,7 @@ ExtractConfig (
     //
     ConfigRequestHdr = HiiConstructConfigHdr (
                          &gOvmfPlatformConfigGuid,
-                         mVariableName,
+                         mHiiFormName,
                          mImageHandle
                          );
     if (ConfigRequestHdr == NULL) {
