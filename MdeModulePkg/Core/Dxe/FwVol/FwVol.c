@@ -659,6 +659,7 @@ NotifyFwVolBlock (
       //
       FvDevice = AllocateCopyPool (sizeof (FV_DEVICE), &mFvDevice);
       if (FvDevice == NULL) {
+        CoreFreePool (FwVolHeader);
         return;
       }
 
