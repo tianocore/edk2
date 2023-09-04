@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac0
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac1
      (https://developer.arm.com/documentation/den0137/)
 
 **/
@@ -512,7 +512,11 @@ RsiHostCall (
 {
   ARM_SMC_ARGS  SmcCmd;
 
-  if ((Args == NULL) || (!AddrIsGranuleAligned ((UINT64 *)Args))) {
+  // The RMM specification, version 1.0-eac1, relaxes the alignment
+  // requirement for RSI_HOST_CALL from 4KB to 256B. Also see RMM
+  // specification, sections B4.3.3 RSI_HOST_CALL command and
+  // section B4.3.3.2 Failure conditions.
+  if ((Args == NULL) || (((UINT64)Args & (0x100 - 1)) != 0)) {
     return RETURN_INVALID_PARAMETER;
   }
 
