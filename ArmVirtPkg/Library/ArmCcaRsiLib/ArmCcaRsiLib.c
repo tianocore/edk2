@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version A-bet0
+   - Realm Management Monitor (RMM) Specification, version 1.0-bet1
      (https://developer.arm.com/documentation/den0137/)
 
 **/
@@ -516,9 +516,11 @@ RsiHostCall (
     return RETURN_INVALID_PARAMETER;
   }
 
+  // See RMM specification, version 1.0-bet1, Section B4.4.2 RsiHostCall type
+  // The width of the RsiHostCall structure is 256 (0x100) bytes.
   STATIC_ASSERT (
-    sizeof (HOST_CALL_ARGS) == SIZE_4KB,
-    "sizeof (HOST_CALL_ARGS) == SIZE_4KB"
+    sizeof (HOST_CALL_ARGS) == 0x100,
+    "sizeof (HOST_CALL_ARGS) == 0x100"
     );
 
   // Clear the reserved fields
