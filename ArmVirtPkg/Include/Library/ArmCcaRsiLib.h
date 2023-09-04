@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version A-bet0
+   - Realm Management Monitor (RMM) Specification, version 1.0-bet1
      (https://developer.arm.com/documentation/den0137/)
 **/
 
@@ -82,7 +82,7 @@ typedef struct RealmConfig {
 } REALM_CONFIG;
 
 /** A structure describing the Host Call arguments
-    See Section 4.4.2 RsiHostCall type, RMM Specification, version A-bet0
+    See Section 4.4.2 RsiHostCall type, RMM Specification, version 1.0-bet1
 */
 typedef struct HostCallArgs {
   UINT16    Imm;
@@ -95,7 +95,7 @@ typedef struct HostCallArgs {
   UINT64    Gprs4;
   UINT64    Gprs5;
   UINT64    Gprs6;
-  UINT8     Reserved[0x1000 - (sizeof (UINT64) * 8)];
+  UINT8     Reserved[0x100 - (sizeof (UINT64) * 8)];
 } HOST_CALL_ARGS;
 
 /**
