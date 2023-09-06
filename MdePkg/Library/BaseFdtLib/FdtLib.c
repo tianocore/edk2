@@ -416,12 +416,12 @@ FdtSetProp (
 CONST CHAR8 *
 EFIAPI
 FdtGetName (
-  IN VOID    *Fdt,
-  IN INT32   NodeOffset,
-  IN UINT32  *Length
+  IN VOID   *Fdt,
+  IN INT32  NodeOffset,
+  IN INT32  *Length
   )
 {
-  return fdt_get_name (Fdt, NodeOffset, (int *)Length);
+  return fdt_get_name (Fdt, NodeOffset, Length);
 }
 
 /**

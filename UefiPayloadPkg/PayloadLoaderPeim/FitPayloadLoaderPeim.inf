@@ -1,0 +1,59 @@
+## @file
+#  Produce LoadFile PPI for payload loading.
+#
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FitPayloadLoaderPeim
+  FILE_GUID                      = 55AC82C8-FC17-4C56-BCDA-990BB0A73E41
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeFitPayloadLoaderPeim
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  FitPayloadLoaderPeim.c
+  FitLib.h
+  FitLib/FitLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  PeiServicesLib
+  HobLib
+  BaseLib
+  PeimEntryPoint
+  DebugLib
+  FdtLib
+
+[Ppis]
+  gEfiPeiLoadFilePpiGuid                 ## PRODUCES
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister
+
+[Guids]
+  gUniversalPayloadExtraDataGuid         ## PRODUCES
+  gUniversalPayloadBaseGuid              ## PRODUCES
+
+[Depex]
+  TRUE
