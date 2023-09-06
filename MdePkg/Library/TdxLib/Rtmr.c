@@ -51,7 +51,7 @@ TdExtendRtmr (
 
   ASSERT (Data != NULL);
   ASSERT (DataLen == SHA384_DIGEST_SIZE);
-  ASSERT (Index >= 0 && Index < RTMR_COUNT);
+  ASSERT (Index < RTMR_COUNT);
 
   if ((Data == NULL) || (DataLen != SHA384_DIGEST_SIZE) || (Index >= RTMR_COUNT)) {
     return EFI_INVALID_PARAMETER;
