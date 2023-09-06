@@ -246,11 +246,11 @@ else
 fi
 
 #
-# Build the edk2 OvmfPkg
+# Run previously built OVMF image for current build options, in place.
+# Do not rebuild first, rather allow multiple runs of a previously built
+# image to start quickly (without rebuild), and with preserved NVRAM contents
+# between runs (until the next rebuild).
 #
-echo Running edk2 build for OvmfPkg$Processor
-build -p $PLATFORMFILE $BUILD_OPTIONS -b $BUILDTARGET -t $TARGET_TOOLS -n $THREADNUMBER -DDEBUG_ON_SERIAL_PORT=TRUE
-
 if [[ "$RUN_QEMU" == "yes" ]]; then
   if [[ ! -d $QEMU_FIRMWARE_DIR ]]; then
     mkdir $QEMU_FIRMWARE_DIR
@@ -265,3 +265,10 @@ if [[ "$RUN_QEMU" == "yes" ]]; then
   $QEMU_COMMAND "$@"
   exit $?
 fi
+
+#
+# Build the edk2 OvmfPkg
+#
+echo Running edk2 build for OvmfPkg$Processor
+build -p $PLATFORMFILE $BUILD_OPTIONS -b $BUILDTARGET -t $TARGET_TOOLS -n $THREADNUMBER
+exit $?
