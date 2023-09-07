@@ -92,7 +92,9 @@ extern UINT32  mMaxCertDbSize;
 extern UINT32  mPlatformMode;
 extern UINT8   mVendorKeyState;
 
-extern VOID  *mHashCtx;
+extern VOID  *mHashSha256Ctx;
+extern VOID  *mHashSha384Ctx;
+extern VOID  *mHashSha512Ctx;
 
 extern AUTH_VAR_LIB_CONTEXT_IN  *mAuthVarLibContextIn;
 
