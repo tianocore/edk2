@@ -591,7 +591,8 @@ ImageTimestampVerify (
   // Register & Initialize necessary digest algorithms for PKCS#7 Handling.
   //
   if ((EVP_add_digest (EVP_md5 ()) == 0) || (EVP_add_digest (EVP_sha1 ()) == 0) ||
-      (EVP_add_digest (EVP_sha256 ()) == 0) || ((EVP_add_digest_alias (SN_sha1WithRSAEncryption, SN_sha1WithRSA)) == 0))
+      (EVP_add_digest (EVP_sha256 ()) == 0) || (EVP_add_digest (EVP_sha384 ()) == 0) ||
+      (EVP_add_digest (EVP_sha512 ()) == 0) || ((EVP_add_digest_alias (SN_sha1WithRSAEncryption, SN_sha1WithRSA)) == 0))
   {
     return FALSE;
   }
