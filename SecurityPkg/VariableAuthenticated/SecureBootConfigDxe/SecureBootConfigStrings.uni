@@ -124,6 +124,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #string STR_LIST_TYPE_X509                        #language en-US "X509"
 #string STR_LIST_TYPE_SHA1                        #language en-US "SHA1"
 #string STR_LIST_TYPE_SHA256                      #language en-US "SHA256"
+#string STR_LIST_TYPE_SHA384                      #language en-US "SHA384"
+#string STR_LIST_TYPE_SHA512                      #language en-US "SHA512"
 #string STR_LIST_TYPE_X509_SHA256                 #language en-US "X509_SHA256"
 #string STR_LIST_TYPE_X509_SHA384                 #language en-US "X509_SHA384"
 #string STR_LIST_TYPE_X509_SHA512                 #language en-US "X509_SHA512"

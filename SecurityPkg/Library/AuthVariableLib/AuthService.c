@@ -29,12 +29,125 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/VariablePolicy.h>
 #include <Library/VariablePolicyLib.h>
 
+#define SHA_DIGEST_SIZE_MAX  SHA512_DIGEST_SIZE
+
+/**
+  Retrieves the size, in bytes, of the context buffer required for hash operations.
+
+  If this interface is not supported, then return zero.
+
+  @return  The size, in bytes, of the context buffer required for hash operations.
+  @retval  0   This interface is not supported.
+
+**/
+typedef
+UINTN
+(EFIAPI *EFI_HASH_GET_CONTEXT_SIZE)(
+  VOID
+  );
+
+/**
+  Initializes user-supplied memory pointed by Sha1Context as hash context for
+  subsequent use.
+
+  If HashContext is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[out]  HashContext  Pointer to Hashcontext being initialized.
+
+  @retval TRUE   Hash context initialization succeeded.
+  @retval FALSE  Hash context initialization failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EFI_HASH_INIT)(
+  OUT  VOID  *HashContext
+  );
+
+/**
+  Digests the input data and updates Hash context.
+
+  This function performs Hash digest on a data buffer of the specified size.
+  It can be called multiple times to compute the digest of long or discontinuous data streams.
+  Hash context should be already correctly initialized by HashInit(), and should not be finalized
+  by HashFinal(). Behavior with invalid context is undefined.
+
+  If HashContext is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HashContext  Pointer to the Hash context.
+  @param[in]       Data         Pointer to the buffer containing the data to be hashed.
+  @param[in]       DataSize     Size of Data buffer in bytes.
+
+  @retval TRUE   SHA-1 data digest succeeded.
+  @retval FALSE  SHA-1 data digest failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EFI_HASH_UPDATE)(
+  IN OUT  VOID        *HashContext,
+  IN      CONST VOID  *Data,
+  IN      UINTN       DataSize
+  );
+
+/**
+  Completes computation of the Hash digest value.
+
+  This function completes hash computation and retrieves the digest value into
+  the specified memory. After this function has been called, the Hash context cannot
+  be used again.
+  Hash context should be already correctly initialized by HashInit(), and should not be
+  finalized by HashFinal(). Behavior with invalid Hash context is undefined.
+
+  If HashContext is NULL, then return FALSE.
+  If HashValue is NULL, then return FALSE.
+  If this interface is not supported, then return FALSE.
+
+  @param[in, out]  HashContext  Pointer to the Hash context.
+  @param[out]      HashValue    Pointer to a buffer that receives the Hash digest
+                                value.
+
+  @retval TRUE   Hash digest computation succeeded.
+  @retval FALSE  Hash digest computation failed.
+  @retval FALSE  This interface is not supported.
+
+**/
+typedef
+BOOLEAN
+(EFIAPI *EFI_HASH_FINAL)(
+  IN OUT  VOID   *HashContext,
+  OUT     UINT8  *HashValue
+  );
+
+typedef struct {
+  UINT32                       HashSize;
+  EFI_HASH_GET_CONTEXT_SIZE    GetContextSize;
+  EFI_HASH_INIT                Init;
+  EFI_HASH_UPDATE              Update;
+  EFI_HASH_FINAL               Final;
+  VOID                         **HashShaCtx;
+  UINT8                        *OidValue;
+  UINTN                        OidLength;
+} EFI_HASH_INFO;
+
 //
 // Public Exponent of RSA Key.
 //
 CONST UINT8  mRsaE[] = { 0x01, 0x00, 0x01 };
 
-CONST UINT8  mSha256OidValue[] = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01 };
+UINT8  mSha256OidValue[] = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01 };
+UINT8  mSha384OidValue[] = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x02 };
+UINT8  mSha512OidValue[] = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x03 };
+
+EFI_HASH_INFO  mHashInfo[] = {
+  { SHA256_DIGEST_SIZE, Sha256GetContextSize, Sha256Init, Sha256Update, Sha256Final, &mHashSha256Ctx, mSha256OidValue, 9 },
+  { SHA384_DIGEST_SIZE, Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Final, &mHashSha384Ctx, mSha384OidValue, 9 },
+  { SHA512_DIGEST_SIZE, Sha512GetContextSize, Sha512Init, Sha512Update, Sha512Final, &mHashSha512Ctx, mSha512OidValue, 9 },
+};
 
 //
 // Requirement for different signature type which have been defined in UEFI spec.
@@ -1090,26 +1203,28 @@ AuthServiceInternalCompareTimeStamp (
 }
 
 /**
-  Calculate SHA256 digest of SignerCert CommonName + ToplevelCert tbsCertificate
+  Calculate SHA digest of SignerCert CommonName + ToplevelCert tbsCertificate.
   SignerCert and ToplevelCert are inside the signer certificate chain.
 
+  @param[in]  HashAlgId           Hash algorithm index.
   @param[in]  SignerCert          A pointer to SignerCert data.
   @param[in]  SignerCertSize      Length of SignerCert data.
   @param[in]  TopLevelCert        A pointer to TopLevelCert data.
   @param[in]  TopLevelCertSize    Length of TopLevelCert data.
-  @param[out] Sha256Digest       Sha256 digest calculated.
+  @param[out] ShaDigest           Sha digest calculated.
 
   @return EFI_ABORTED          Digest process failed.
-  @return EFI_SUCCESS          SHA256 Digest is successfully calculated.
+  @return EFI_SUCCESS          SHA Digest is successfully calculated.
 
 **/
 EFI_STATUS
-CalculatePrivAuthVarSignChainSHA256Digest (
+CalculatePrivAuthVarSignChainSHADigest (
+  IN     UINT8  HashAlgId,
   IN     UINT8  *SignerCert,
   IN     UINTN  SignerCertSize,
   IN     UINT8  *TopLevelCert,
   IN     UINTN  TopLevelCertSize,
-  OUT    UINT8  *Sha256Digest
+  OUT    UINT8  *ShaDigest
   )
 {
   UINT8       *TbsCert;
@@ -1118,6 +1233,11 @@ CalculatePrivAuthVarSignChainSHA256Digest (
   UINTN       CertCommonNameSize;
   BOOLEAN     CryptoStatus;
   EFI_STATUS  Status;
+
+  if (HashAlgId >= (sizeof (mHashInfo) / sizeof (EFI_HASH_INFO))) {
+    DEBUG ((DEBUG_INFO, "%a Unsupported Hash Algorithm %d\n", __func__, HashAlgId));
+    return EFI_ABORTED;
+  }
 
   CertCommonNameSize = sizeof (CertCommonName);
 
@@ -1141,8 +1261,8 @@ CalculatePrivAuthVarSignChainSHA256Digest (
   //
   // Digest SignerCert CN + TopLevelCert tbsCertificate
   //
-  ZeroMem (Sha256Digest, SHA256_DIGEST_SIZE);
-  CryptoStatus = Sha256Init (mHashCtx);
+  ZeroMem (ShaDigest, mHashInfo[HashAlgId].HashSize);
+  CryptoStatus = mHashInfo[HashAlgId].Init (*(mHashInfo[HashAlgId].HashShaCtx));
   if (!CryptoStatus) {
     return EFI_ABORTED;
   }
@@ -1150,21 +1270,21 @@ CalculatePrivAuthVarSignChainSHA256Digest (
   //
   // '\0' is forced in CertCommonName. No overflow issue
   //
-  CryptoStatus = Sha256Update (
-                   mHashCtx,
-                   CertCommonName,
-                   AsciiStrLen (CertCommonName)
-                   );
+  CryptoStatus = mHashInfo[HashAlgId].Update (
+                                        *(mHashInfo[HashAlgId].HashShaCtx),
+                                        CertCommonName,
+                                        AsciiStrLen (CertCommonName)
+                                        );
   if (!CryptoStatus) {
     return EFI_ABORTED;
   }
 
-  CryptoStatus = Sha256Update (mHashCtx, TbsCert, TbsCertSize);
+  CryptoStatus = mHashInfo[HashAlgId].Update (*(mHashInfo[HashAlgId].HashShaCtx), TbsCert, TbsCertSize);
   if (!CryptoStatus) {
     return EFI_ABORTED;
   }
 
-  CryptoStatus = Sha256Final (mHashCtx, Sha256Digest);
+  CryptoStatus = mHashInfo[HashAlgId].Final (*(mHashInfo[HashAlgId].HashShaCtx), ShaDigest);
   if (!CryptoStatus) {
     return EFI_ABORTED;
   }
@@ -1516,9 +1636,10 @@ DeleteCertsFromDb (
 /**
   Insert signer's certificates for common authenticated variable with VariableName
   and VendorGuid in AUTH_CERT_DB_DATA to "certdb" or "certdbv" according to
-  time based authenticated variable attributes. CertData is the SHA256 digest of
+  time based authenticated variable attributes. CertData is the SHA digest of
   SignerCert CommonName + TopLevelCert tbsCertificate.
 
+  @param[in]  HashAlgId         Hash algorithm index.
   @param[in]  VariableName      Name of authenticated Variable.
   @param[in]  VendorGuid        Vendor GUID of authenticated Variable.
   @param[in]  Attributes        Attributes of authenticated variable.
@@ -1536,6 +1657,7 @@ DeleteCertsFromDb (
 **/
 EFI_STATUS
 InsertCertsToDb (
+  IN     UINT8     HashAlgId,
   IN     CHAR16    *VariableName,
   IN     EFI_GUID  *VendorGuid,
   IN     UINT32    Attributes,
@@ -1556,9 +1678,13 @@ InsertCertsToDb (
   UINT32             CertDataSize;
   AUTH_CERT_DB_DATA  *Ptr;
   CHAR16             *DbName;
-  UINT8              Sha256Digest[SHA256_DIGEST_SIZE];
+  UINT8              ShaDigest[SHA_DIGEST_SIZE_MAX];
 
   if ((VariableName == NULL) || (VendorGuid == NULL) || (SignerCert == NULL) || (TopLevelCert == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (HashAlgId >= (sizeof (mHashInfo) / sizeof (EFI_HASH_INFO))) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1618,20 +1744,22 @@ InsertCertsToDb (
   // Construct new data content of variable "certdb" or "certdbv".
   //
   NameSize      = (UINT32)StrLen (VariableName);
-  CertDataSize  = sizeof (Sha256Digest);
+  CertDataSize  = mHashInfo[HashAlgId].HashSize;
   CertNodeSize  = sizeof (AUTH_CERT_DB_DATA) + (UINT32)CertDataSize + NameSize * sizeof (CHAR16);
   NewCertDbSize = (UINT32)DataSize + CertNodeSize;
   if (NewCertDbSize > mMaxCertDbSize) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = CalculatePrivAuthVarSignChainSHA256Digest (
+  Status = CalculatePrivAuthVarSignChainSHADigest (
+             HashAlgId,
              SignerCert,
              SignerCertSize,
              TopLevelCert,
              TopLevelCertSize,
-             Sha256Digest
+             ShaDigest
              );
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1663,7 +1791,7 @@ InsertCertsToDb (
 
   CopyMem (
     (UINT8 *)Ptr +  sizeof (AUTH_CERT_DB_DATA) + NameSize * sizeof (CHAR16),
-    Sha256Digest,
+    ShaDigest,
     CertDataSize
     );
 
@@ -1791,6 +1919,37 @@ CleanCertsFromDb (
 }
 
 /**
+  Find hash algorithm index.
+
+  @param[in]  SigData      Pointer to the PKCS#7 message.
+  @param[in]  SigDataSize  Length of the PKCS#7 message.
+
+  @retval UINT8        Hash Algorithm Index.
+**/
+UINT8
+FindHashAlgorithmIndex (
+  IN     UINT8   *SigData,
+  IN     UINT32  SigDataSize
+  )
+{
+  UINT8  i;
+
+  for (i = 0; i < (sizeof (mHashInfo) / sizeof (EFI_HASH_INFO)); i++) {
+    if (  (  (SigDataSize >= (13 + mHashInfo[i].OidLength))
+          && (  ((*(SigData + 1) & TWO_BYTE_ENCODE) == TWO_BYTE_ENCODE)
+             && (CompareMem (SigData + 13, mHashInfo[i].OidValue, mHashInfo[i].OidLength) == 0)))
+       || (  ((SigDataSize >= (32 +  mHashInfo[i].OidLength)))
+          && (  ((*(SigData + 20) & TWO_BYTE_ENCODE) == TWO_BYTE_ENCODE)
+             && (CompareMem (SigData + 32, mHashInfo[i].OidValue, mHashInfo[i].OidLength) == 0))))
+    {
+      break;
+    }
+  }
+
+  return i;
+}
+
+/**
   Process variable with EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS set
 
   Caution: This function may receive untrusted input.
@@ -1857,8 +2016,9 @@ VerifyTimeBasedPayload (
   UINTN                          CertStackSize;
   UINT8                          *CertsInCertDb;
   UINT32                         CertsSizeinDb;
-  UINT8                          Sha256Digest[SHA256_DIGEST_SIZE];
+  UINT8                          ShaDigest[SHA_DIGEST_SIZE_MAX];
   EFI_CERT_DATA                  *CertDataPtr;
+  UINT8                          HashAlgId;
 
   //
   // 1. TopLevelCert is the top-level issuer certificate in signature Signer Cert Chain
@@ -1928,7 +2088,7 @@ VerifyTimeBasedPayload (
 
   //
   // SignedData.digestAlgorithms shall contain the digest algorithm used when preparing the
-  // signature. Only a digest algorithm of SHA-256 is accepted.
+  // signature. Only a digest algorithm of SHA-256, SHA-384 or SHA-512 is accepted.
   //
   //    According to PKCS#7 Definition (https://www.rfc-editor.org/rfc/rfc2315):
   //        SignedData ::= SEQUENCE {
@@ -1972,14 +2132,9 @@ VerifyTimeBasedPayload (
   //
   // Example generated with: https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot#Manual_process
   //
+  HashAlgId = FindHashAlgorithmIndex (SigData, SigDataSize);
   if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
-    if (  (  (SigDataSize >= (13 + sizeof (mSha256OidValue)))
-          && (  ((*(SigData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE)
-             || (CompareMem (SigData + 13, &mSha256OidValue, sizeof (mSha256OidValue)) != 0)))
-       && (  (SigDataSize >= (32 + sizeof (mSha256OidValue)))
-          && (  ((*(SigData + 20) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE)
-             || (CompareMem (SigData + 32, &mSha256OidValue, sizeof (mSha256OidValue)) != 0))))
-    {
+    if (HashAlgId >= (sizeof (mHashInfo) / sizeof (EFI_HASH_INFO))) {
       return EFI_SECURITY_VIOLATION;
     }
   }
@@ -2170,19 +2325,20 @@ VerifyTimeBasedPayload (
         goto Exit;
       }
 
-      if (CertsSizeinDb == SHA256_DIGEST_SIZE) {
+      if ((HashAlgId < (sizeof (mHashInfo) / sizeof (EFI_HASH_INFO))) && (CertsSizeinDb == mHashInfo[HashAlgId].HashSize)) {
         //
         // Check hash of signer cert CommonName + Top-level issuer tbsCertificate against data in CertDb
         //
         CertDataPtr = (EFI_CERT_DATA *)(SignerCerts + 1);
-        Status      = CalculatePrivAuthVarSignChainSHA256Digest (
+        Status      = CalculatePrivAuthVarSignChainSHADigest (
+                        HashAlgId,
                         CertDataPtr->CertDataBuffer,
                         ReadUnaligned32 ((UINT32 *)&(CertDataPtr->CertDataLength)),
                         TopLevelCert,
                         TopLevelCertSize,
-                        Sha256Digest
+                        ShaDigest
                         );
-        if (EFI_ERROR (Status) || (CompareMem (Sha256Digest, CertsInCertDb, CertsSizeinDb) != 0)) {
+        if (EFI_ERROR (Status) || (CompareMem (ShaDigest, CertsInCertDb, CertsSizeinDb) != 0)) {
           goto Exit;
         }
       } else {
@@ -2215,6 +2371,7 @@ VerifyTimeBasedPayload (
       //
       CertDataPtr = (EFI_CERT_DATA *)(SignerCerts + 1);
       Status      = InsertCertsToDb (
+                      HashAlgId,
                       VariableName,
                       VendorGuid,
                       Attributes,

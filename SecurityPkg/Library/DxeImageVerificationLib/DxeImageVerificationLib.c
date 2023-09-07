@@ -1620,7 +1620,7 @@ Done:
       in the security database "db", and no valid signature nor any hash value of the image may
       be reflected in the security database "dbx".
     Otherwise, the image is not signed,
-      The SHA256 hash value of the image must match a record in the security database "db", and
+      The hash value of the image must match a record in the security database "db", and
       not be reflected in the security data base "dbx".
 
   Caution: This function may receive untrusted input.
@@ -1690,6 +1690,8 @@ DxeImageVerificationHandler (
   EFI_STATUS                    VarStatus;
   UINT32                        VarAttr;
   BOOLEAN                       IsFound;
+  UINT8                         HashAlg;
+  BOOLEAN                       IsFoundInDatabase;
 
   SignatureList     = NULL;
   SignatureListSize = 0;
@@ -1699,6 +1701,7 @@ DxeImageVerificationHandler (
   Action            = EFI_IMAGE_EXECUTION_AUTH_UNTESTED;
   IsVerified        = FALSE;
   IsFound           = FALSE;
+  IsFoundInDatabase = FALSE;
 
   //
   // Check the image type and get policy setting.
@@ -1837,40 +1840,51 @@ DxeImageVerificationHandler (
   //
   if ((SecDataDir == NULL) || (SecDataDir->Size == 0)) {
     //
-    // This image is not signed. The SHA256 hash value of the image must match a record in the security database "db",
+    // This image is not signed. The hash value of the image must match a record in the security database "db",
     // and not be reflected in the security data base "dbx".
     //
-    if (!HashPeImage (HASHALG_SHA256)) {
-      DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Failed to hash this image using %s.\n", mHashTypeStr));
-      goto Failed;
+    HashAlg = sizeof (mHash) / sizeof (HASH_TABLE);
+    while (HashAlg > 0) {
+      HashAlg--;
+      if ((mHash[HashAlg].GetContextSize == NULL) || (mHash[HashAlg].HashInit == NULL) || (mHash[HashAlg].HashUpdate == NULL) || (mHash[HashAlg].HashFinal == NULL)) {
+        continue;
+      }
+
+      if (!HashPeImage (HashAlg)) {
+        continue;
+      }
+
+      DbStatus = IsSignatureFoundInDatabase (
+                   EFI_IMAGE_SECURITY_DATABASE1,
+                   mImageDigest,
+                   &mCertType,
+                   mImageDigestSize,
+                   &IsFound
+                   );
+      if (EFI_ERROR (DbStatus) || IsFound) {
+        //
+        // Image Hash is in forbidden database (DBX).
+        //
+        DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is not signed and %s hash of image is forbidden by DBX.\n", mHashTypeStr));
+        goto Failed;
+      }
+
+      DbStatus = IsSignatureFoundInDatabase (
+                   EFI_IMAGE_SECURITY_DATABASE,
+                   mImageDigest,
+                   &mCertType,
+                   mImageDigestSize,
+                   &IsFound
+                   );
+      if (!EFI_ERROR (DbStatus) && IsFound) {
+        //
+        // Image Hash is in allowed database (DB).
+        //
+        IsFoundInDatabase = TRUE;
+      }
     }
 
-    DbStatus = IsSignatureFoundInDatabase (
-                 EFI_IMAGE_SECURITY_DATABASE1,
-                 mImageDigest,
-                 &mCertType,
-                 mImageDigestSize,
-                 &IsFound
-                 );
-    if (EFI_ERROR (DbStatus) || IsFound) {
-      //
-      // Image Hash is in forbidden database (DBX).
-      //
-      DEBUG ((DEBUG_INFO, "DxeImageVerificationLib: Image is not signed and %s hash of image is forbidden by DBX.\n", mHashTypeStr));
-      goto Failed;
-    }
-
-    DbStatus = IsSignatureFoundInDatabase (
-                 EFI_IMAGE_SECURITY_DATABASE,
-                 mImageDigest,
-                 &mCertType,
-                 mImageDigestSize,
-                 &IsFound
-                 );
-    if (!EFI_ERROR (DbStatus) && IsFound) {
-      //
-      // Image Hash is in allowed database (DB).
-      //
+    if (IsFoundInDatabase) {
       return EFI_SUCCESS;
     }
 
