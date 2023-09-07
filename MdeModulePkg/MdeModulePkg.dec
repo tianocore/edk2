@@ -1693,6 +1693,9 @@
   # @Prompt Base address of flash FTW spare block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|0x0|UINT32|0x30000013
 
+  ## UPL build switch for HOB or FDT. 1: FDT, 0: HOB
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHandoffFdtMode|1|UINT8|0x3000000B
+
   ## Size of the FTW spare block range. Note that this value should larger than PcdFlashNvStorageVariableSize and block size aligned.
   # The root cause is that variable driver will use FTW protocol to reclaim variable region.
   # If the length of variable region is larger than FTW spare size, it means the whole variable region can not
