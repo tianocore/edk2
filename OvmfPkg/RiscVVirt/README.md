@@ -69,3 +69,20 @@ Below example shows how to boot openSUSE Tumbleweed E20.
         -device virtio-net-pci,netdev=net0 \
         -device virtio-blk-device,drive=hd0 \
         -drive file=openSUSE-Tumbleweed-RISC-V-E20-efi.riscv64.raw,format=raw,id=hd0
+
+## Test with your own OpenSBI binary
+Using the above QEMU command line, **RISCV_VIRT_CODE.fd** is launched by the
+OpenSBI binary that is bundled with QEMU. You can build your own OpenSBI binary
+as well:
+
+    OPENSBI_DIR=...
+    git clone https://github.com/riscv/opensbi.git $OPENSBI_DIR
+    make -C $OPENSBI_DIR \
+        -j $(getconf _NPROCESSORS_ONLN) \
+        CROSS_COMPILE=riscv64-linux-gnu- \
+        PLATFORM=generic
+
+then specify that binary for QEMU, with the following additional command line
+option:
+
+    -bios $OPENSBI_DIR/build/platform/generic/firmware/fw_dynamic.bin
