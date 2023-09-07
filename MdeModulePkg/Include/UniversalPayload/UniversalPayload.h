@@ -55,5 +55,5 @@ typedef struct {
 
 **/
 #define UNIVERSAL_PAYLOAD_SIZEOF_THROUGH_FIELD(TYPE, Field)  (OFFSET_OF(TYPE, Field) + sizeof (((TYPE *) 0)->Field))
-
+#define UNIVERSAL_PAYLOAD_BASE_REVISION 1
 #endif // UNIVERSAL_PAYLOAD_H_
