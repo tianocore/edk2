@@ -1987,7 +1987,7 @@ GetNameFromId (
                    NULL
                    );
   if (BestLanguage == NULL) {
-    BestLanguage = AllocateCopyPool (AsciiStrLen ("en-US"), "en-US");
+    BestLanguage = AllocateCopyPool (sizeof ("en-US"), "en-US");
     ASSERT (BestLanguage != NULL);
   }
 
