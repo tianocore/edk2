@@ -527,9 +527,12 @@ UpdateConsolePage (
         ((NewTerminalContext->IsStdErr != 0) && (UpdatePageId == FORM_CON_ERR_ID))
         )
     {
-      CheckFlags         |= EFI_IFR_CHECKBOX_DEFAULT;
-      ConsoleCheck[Index] = TRUE;
-    } else {
+      CheckFlags |= EFI_IFR_CHECKBOX_DEFAULT;
+
+      if (Index < MAX_MENU_NUMBER) {
+        ConsoleCheck[Index] = TRUE;
+      }
+    } else if (Index < MAX_MENU_NUMBER) {
       ConsoleCheck[Index] = FALSE;
     }
 
@@ -622,7 +625,7 @@ UpdateOrderPage (
   ASSERT (OptionsOpCodeHandle != NULL);
 
   NewMenuEntry = NULL;
-  for (OptionIndex = 0; (OptionOrder[OptionIndex] != 0 && OptionIndex < MAX_MENU_NUMBER); OptionIndex++) {
+  for (OptionIndex = 0; (OptionIndex < MAX_MENU_NUMBER && OptionOrder[OptionIndex] != 0); OptionIndex++) {
     BootOptionFound = FALSE;
     for (Index = 0; Index < OptionMenu->MenuNumber; Index++) {
       NewMenuEntry = BOpt_GetMenuEntry (OptionMenu, Index);
