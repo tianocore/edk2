@@ -35,6 +35,7 @@ STATIC CONST NOR_FLASH_INFO  NorFlashIds[] = {
   /* GIGADEVICE */
   { L"gd25q64b",       { 0xc8, 0x40, 0x17 }, 3, 256, 64 * 1024,  128,  NOR_FLASH_ERASE_4K                       },
   { L"gd25lq32",       { 0xc8, 0x60, 0x16 }, 3, 256, 64 * 1024,  64,   NOR_FLASH_ERASE_4K                       },
+  { L"gd25lq128E",     { 0xc8, 0x60, 0x18 }, 3, 256, 64 * 1024,  256,  NOR_FLASH_ERASE_4K                       },
   /* ISSI */
   { L"is25lp032",      { 0x9d, 0x60, 0x16 }, 3, 256, 64 * 1024,  64,   0                                        },
   { L"is25lp064",      { 0x9d, 0x60, 0x17 }, 3, 256, 64 * 1024,  128,  0                                        },
