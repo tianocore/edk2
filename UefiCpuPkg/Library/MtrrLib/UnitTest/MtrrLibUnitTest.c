@@ -908,14 +908,14 @@ UnitTestMtrrGetDefaultMemoryType (
   SystemParameter.FixedMtrrSupported = FALSE;
   InitializeMtrrRegs (&SystemParameter);
   Result = MtrrGetDefaultMemoryType ();
-  UT_ASSERT_EQUAL (Result, CacheUncacheable);
+  UT_ASSERT_EQUAL (Result, SystemParameter.DefaultCacheType);
 
   SystemParameter.MtrrSupported      = TRUE;
   SystemParameter.FixedMtrrSupported = TRUE;
   SystemParameter.VariableMtrrCount  = 0;
   InitializeMtrrRegs (&SystemParameter);
   Result = MtrrGetDefaultMemoryType ();
-  UT_ASSERT_EQUAL (Result, CacheUncacheable);
+  UT_ASSERT_EQUAL (Result, SystemParameter.DefaultCacheType);
 
   return UNIT_TEST_PASSED;
 }
