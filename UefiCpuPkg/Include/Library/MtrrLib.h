@@ -359,4 +359,27 @@ MtrrSetMemoryAttributesInMtrrSettings (
   IN     UINTN                    RangeCount
   );
 
+/**
+  This function returns a Ranges array containing the memory cache types
+  of all memory addresses.
+
+  @param[in]      MtrrSetting  MTRR setting buffer to parse.
+  @param[out]     Ranges       Pointer to an array of MTRR_MEMORY_RANGE.
+  @param[in,out]  RangeCount   Count of MTRR_MEMORY_RANGE.
+                               On input, the maximum entries the Ranges can hold.
+                               On output, the actual entries that the function returns.
+
+  @retval RETURN_INVALID_PARAMETER RangeCount is NULL.
+  @retval RETURN_INVALID_PARAMETER *RangeCount is not 0 but Ranges is NULL.
+  @retval RETURN_BUFFER_TOO_SMALL  *RangeCount is too small.
+  @retval RETURN_SUCCESS           Ranges are successfully returned.
+**/
+RETURN_STATUS
+EFIAPI
+MtrrGetMemoryAttributesInMtrrSettings (
+  IN CONST MTRR_SETTINGS      *MtrrSetting OPTIONAL,
+  OUT      MTRR_MEMORY_RANGE  *Ranges,
+  IN OUT   UINTN              *RangeCount
+  );
+
 #endif // _MTRR_LIB_H_
