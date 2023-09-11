@@ -3055,9 +3055,11 @@ MtrrGetMemoryAttributesInMtrrSettings (
 
 /**
   Worker function prints all MTRRs for debugging.
+
   If MtrrSetting is not NULL, print MTRR settings from input MTRR
   settings buffer.
   If MtrrSetting is NULL, print MTRR settings from MTRRs.
+
   @param  MtrrSetting    A buffer holding all MTRRs content.
 **/
 VOID
@@ -3124,6 +3126,7 @@ MtrrDebugPrintAllMtrrsWorker (
   }
 
   DEBUG ((DEBUG_CACHE, "\n"));
+
   //
   // Dump MTRR setting in ranges
   //
