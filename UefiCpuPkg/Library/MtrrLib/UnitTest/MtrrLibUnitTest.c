@@ -177,7 +177,8 @@ GenerateRandomMemoryTypeCombination (
 }
 
 /**
-  Unit test of MtrrLib service MtrrSetMemoryAttribute()
+  Unit test of MtrrLib service MtrrGetMemoryAttributesInMtrrSettings() and
+  MtrrSetMemoryAttributesInMtrrSettings()
 
   @param[in]  Context    Ignored
 
@@ -188,7 +189,7 @@ GenerateRandomMemoryTypeCombination (
 **/
 UNIT_TEST_STATUS
 EFIAPI
-UnitTestMtrrSetMemoryAttributesInMtrrSettings (
+UnitTestMtrrSetAndGetMemoryAttributesInMtrrSettings (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
@@ -213,6 +214,9 @@ UnitTestMtrrSetMemoryAttributesInMtrrSettings (
   MTRR_MEMORY_RANGE  ActualMemoryRanges[MTRR_NUMBER_OF_FIXED_MTRR   * sizeof (UINT64) + 2 * MTRR_NUMBER_OF_VARIABLE_MTRR + 1];
   UINT32             ActualVariableMtrrUsage;
   UINTN              ActualMemoryRangesCount;
+
+  MTRR_MEMORY_RANGE  ReturnedMemoryRanges[MTRR_NUMBER_OF_FIXED_MTRR   * sizeof (UINT64) + 2 * MTRR_NUMBER_OF_VARIABLE_MTRR + 1];
+  UINTN              ReturnedMemoryRangesCount;
 
   MTRR_SETTINGS  *Mtrrs[2];
 
@@ -297,6 +301,17 @@ UnitTestMtrrSetMemoryAttributesInMtrrSettings (
     DumpMemoryRanges (ActualMemoryRanges, ActualMemoryRangesCount);
     VerifyMemoryRanges (ExpectedMemoryRanges, ExpectedMemoryRangesCount, ActualMemoryRanges, ActualMemoryRangesCount);
     UT_ASSERT_TRUE (ExpectedVariableMtrrUsage >= ActualVariableMtrrUsage);
+
+    ReturnedMemoryRangesCount = ARRAY_SIZE (ReturnedMemoryRanges);
+    Status                    = MtrrGetMemoryAttributesInMtrrSettings (
+                                  Mtrrs[MtrrIndex],
+                                  ReturnedMemoryRanges,
+                                  &ReturnedMemoryRangesCount
+                                  );
+    UT_ASSERT_STATUS_EQUAL (Status, RETURN_SUCCESS);
+    UT_LOG_INFO ("--- Returned Memory Ranges [%d] ---\n", ReturnedMemoryRangesCount);
+    DumpMemoryRanges (ReturnedMemoryRanges, ReturnedMemoryRangesCount);
+    VerifyMemoryRanges (ExpectedMemoryRanges, ExpectedMemoryRangesCount, ReturnedMemoryRanges, ReturnedMemoryRangesCount);
 
     ZeroMem (&LocalMtrrs, sizeof (LocalMtrrs));
   }
@@ -1019,7 +1034,8 @@ UnitTestMtrrGetDefaultMemoryType (
 }
 
 /**
-  Unit test of MtrrLib service MtrrSetMemoryAttributeInMtrrSettings().
+  Unit test of MtrrLib service MtrrSetMemoryAttributeInMtrrSettings() and
+  MtrrGetMemoryAttributesInMtrrSettings().
 
   @param[in]  Context    Ignored
 
@@ -1030,7 +1046,7 @@ UnitTestMtrrGetDefaultMemoryType (
 **/
 UNIT_TEST_STATUS
 EFIAPI
-UnitTestMtrrSetMemoryAttributeInMtrrSettings (
+UnitTestMtrrSetMemoryAttributeAndGetMemoryAttributesInMtrrSettings (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
@@ -1054,6 +1070,9 @@ UnitTestMtrrSetMemoryAttributeInMtrrSettings (
   MTRR_MEMORY_RANGE  ActualMemoryRanges[MTRR_NUMBER_OF_FIXED_MTRR * sizeof (UINT64) + 2 * MTRR_NUMBER_OF_VARIABLE_MTRR + 1];
   UINT32             ActualVariableMtrrUsage;
   UINTN              ActualMemoryRangesCount;
+
+  MTRR_MEMORY_RANGE  ReturnedMemoryRanges[MTRR_NUMBER_OF_FIXED_MTRR * sizeof (UINT64) + 2 * MTRR_NUMBER_OF_VARIABLE_MTRR + 1];
+  UINTN              ReturnedMemoryRangesCount;
 
   MTRR_SETTINGS  *Mtrrs[2];
 
@@ -1130,6 +1149,17 @@ UnitTestMtrrSetMemoryAttributeInMtrrSettings (
     DumpMemoryRanges (ActualMemoryRanges, ActualMemoryRangesCount);
     VerifyMemoryRanges (ExpectedMemoryRanges, ExpectedMemoryRangesCount, ActualMemoryRanges, ActualMemoryRangesCount);
     UT_ASSERT_TRUE (ExpectedVariableMtrrUsage >= ActualVariableMtrrUsage);
+
+    ReturnedMemoryRangesCount = ARRAY_SIZE (ReturnedMemoryRanges);
+    Status                    = MtrrGetMemoryAttributesInMtrrSettings (
+                                  &LocalMtrrs,
+                                  ReturnedMemoryRanges,
+                                  &ReturnedMemoryRangesCount
+                                  );
+    UT_ASSERT_STATUS_EQUAL (Status, RETURN_SUCCESS);
+    UT_LOG_INFO ("--- Returned Memory Ranges [%d] ---\n", ReturnedMemoryRangesCount);
+    DumpMemoryRanges (ReturnedMemoryRanges, ReturnedMemoryRangesCount);
+    VerifyMemoryRanges (ExpectedMemoryRanges, ExpectedMemoryRangesCount, ReturnedMemoryRanges, ReturnedMemoryRangesCount);
 
     ZeroMem (&LocalMtrrs, sizeof (LocalMtrrs));
   }
@@ -1239,8 +1269,8 @@ UnitTestingEntry (
   for (SystemIndex = 0; SystemIndex < ARRAY_SIZE (mSystemParameters); SystemIndex++) {
     for (Index = 0; Index < Iteration; Index++) {
       AddTestCase (MtrrApiTests, "Test InvalidMemoryLayouts", "InvalidMemoryLayouts", UnitTestInvalidMemoryLayouts, InitializeSystem, NULL, &mSystemParameters[SystemIndex]);
-      AddTestCase (MtrrApiTests, "Test MtrrSetMemoryAttributeInMtrrSettings", "MtrrSetMemoryAttributeInMtrrSettings", UnitTestMtrrSetMemoryAttributeInMtrrSettings, InitializeSystem, NULL, &mSystemParameters[SystemIndex]);
-      AddTestCase (MtrrApiTests, "Test MtrrSetMemoryAttributesInMtrrSettings", "MtrrSetMemoryAttributesInMtrrSettings", UnitTestMtrrSetMemoryAttributesInMtrrSettings, InitializeSystem, NULL, &mSystemParameters[SystemIndex]);
+      AddTestCase (MtrrApiTests, "Test MtrrSetMemoryAttributeInMtrrSettings and MtrrGetMemoryAttributesInMtrrSettings", "MtrrSetMemoryAttributeInMtrrSettings and MtrrGetMemoryAttributesInMtrrSettings", UnitTestMtrrSetMemoryAttributeAndGetMemoryAttributesInMtrrSettings, InitializeSystem, NULL, &mSystemParameters[SystemIndex]);
+      AddTestCase (MtrrApiTests, "Test MtrrSetMemoryAttributesInMtrrSettings and MtrrGetMemoryAttributesInMtrrSettings", "MtrrSetMemoryAttributesInMtrrSettings and MtrrGetMemoryAttributesInMtrrSetting", UnitTestMtrrSetAndGetMemoryAttributesInMtrrSettings, InitializeSystem, NULL, &mSystemParameters[SystemIndex]);
     }
   }
 
