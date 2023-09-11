@@ -550,7 +550,7 @@ UnitTestGetFirmwareVariableMtrrCount (
   InitializeMtrrRegs (&SystemParameter);
   PatchPcdSet32 (PcdCpuNumberOfReservedVariableMtrrs, 2);
   Result = GetFirmwareVariableMtrrCount ();
-  UT_ASSERT_EQUAL (Result, 0);
+  UT_ASSERT_EQUAL (Result, SystemParameter.VariableMtrrCount - 2);
 
   //
   // Expect ASSERT() if variable MTRR count is > MTRR_NUMBER_OF_VARIABLE_MTRR
