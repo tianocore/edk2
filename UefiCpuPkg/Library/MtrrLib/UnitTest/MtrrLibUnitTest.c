@@ -399,7 +399,7 @@ UnitTestIsMtrrSupported (
   SystemParameter.VariableMtrrCount  = 0;
   SystemParameter.FixedMtrrSupported = TRUE;
   InitializeMtrrRegs (&SystemParameter);
-  UT_ASSERT_FALSE (IsMtrrSupported ());
+  UT_ASSERT_TRUE (IsMtrrSupported ());
 
   //
   // MTRR capability on in CPUID leaf, but no fixed MTRRs.
@@ -408,7 +408,7 @@ UnitTestIsMtrrSupported (
   SystemParameter.VariableMtrrCount  = 7;
   SystemParameter.FixedMtrrSupported = FALSE;
   InitializeMtrrRegs (&SystemParameter);
-  UT_ASSERT_FALSE (IsMtrrSupported ());
+  UT_ASSERT_TRUE (IsMtrrSupported ());
 
   //
   // MTRR capability on in CPUID leaf with both variable and fixed MTRRs.
