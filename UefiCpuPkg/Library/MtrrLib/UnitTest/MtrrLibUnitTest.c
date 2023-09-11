@@ -904,18 +904,24 @@ UnitTestMtrrGetDefaultMemoryType (
   Result = MtrrGetDefaultMemoryType ();
   UT_ASSERT_EQUAL (Result, CacheUncacheable);
 
+  //
+  // If MTRRs are supported, but Fixed MTRRs are not supported.
+  //
   SystemParameter.MtrrSupported      = TRUE;
   SystemParameter.FixedMtrrSupported = FALSE;
   InitializeMtrrRegs (&SystemParameter);
   Result = MtrrGetDefaultMemoryType ();
-  UT_ASSERT_EQUAL (Result, CacheUncacheable);
+  UT_ASSERT_EQUAL (Result, SystemParameter.DefaultCacheType);
 
+  //
+  // If MTRRs are supported, but Variable MTRRs are not supported.
+  //
   SystemParameter.MtrrSupported      = TRUE;
   SystemParameter.FixedMtrrSupported = TRUE;
   SystemParameter.VariableMtrrCount  = 0;
   InitializeMtrrRegs (&SystemParameter);
   Result = MtrrGetDefaultMemoryType ();
-  UT_ASSERT_EQUAL (Result, CacheUncacheable);
+  UT_ASSERT_EQUAL (Result, SystemParameter.DefaultCacheType);
 
   return UNIT_TEST_PASSED;
 }
