@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "DxeIpl.h"
 #include "X64/VirtualMemory.h"
+#include <UniversalPayload/DeviceTree.h>
 
 /**
    Transfers control to DxeCore.
@@ -35,7 +36,10 @@ HandOffToDxeCore (
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI  *VectorHandoffInfoPpi;
   VOID                             *GhcbBase;
   UINTN                            GhcbSize;
+  UINT8                            *GuidHob;
+  UNIVERSAL_PAYLOAD_DEVICE_TREE    *FdtHob;
 
+  DEBUG ((DEBUG_ERROR, "Transfer the control to the entry point of DxeCore via Mde 64bit\n:"));
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
   //
@@ -114,6 +118,20 @@ HandOffToDxeCore (
   Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
   ASSERT_EFI_ERROR (Status);
 
+
+  DEBUG ((DEBUG_INFO, "End of PEI phase signal end via Mde 64bit\n:"));
+
+#if 1
+  //
+  // Get FDT blob address
+  //
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadDeviceTreeGuid);
+  ASSERT (GuidHob != NULL);
+  FdtHob = (UNIVERSAL_PAYLOAD_DEVICE_TREE *) GET_GUID_HOB_DATA (GuidHob);
+#endif
+
+//  DEBUG ((DEBUG_INFO, "Get FDT hob via Mde 64bit\n:"));
+
   if (FeaturePcdGet (PcdDxeIplBuildPageTables)) {
     AsmWriteCr3 (PageTables);
   }
@@ -128,7 +146,8 @@ HandOffToDxeCore (
   //
   SwitchStack (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-    HobList.Raw,
+    //HobList.Raw,
+    (VOID *)(UINTN)FdtHob->DeviceTreeAddress,
     NULL,
     TopOfStack
     );

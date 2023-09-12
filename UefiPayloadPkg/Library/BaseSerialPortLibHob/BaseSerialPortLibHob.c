@@ -138,11 +138,104 @@ SerialPortInitialize (
   BOOLEAN                             Initialized;
   BOOLEAN                             MmioEnable;
   UINT8                               Value;
+  EFI_STATUS                          Status;
+
+  IoWrite8(0x80,0xB5);
 
   if (mUartCount > 0) {
     return RETURN_SUCCESS;
   }
 
+  IoWrite8(0x80,0xB6);
+  if (GetHobList() == NULL)
+  {
+    IoWrite8(0x80,0xB7);
+    mUartInfo[mUartCount].BaseAddress    = 0x3f8;
+    mUartInfo[mUartCount].UseMmio        = FALSE;
+    mUartInfo[mUartCount].BaudRate       = 115200;
+    mUartInfo[mUartCount].RegisterStride = 1;
+    IoWrite8(0x80,0xB8);
+
+    MmioEnable         = mUartInfo[mUartCount].UseMmio ;
+    SerialRegisterBase = mUartInfo[mUartCount].BaseAddress;
+    RegisterStride     = mUartInfo[mUartCount].RegisterStride;
+    BaudRate           = mUartInfo[mUartCount].BaudRate;
+
+    Status = PcdSetBoolS (PcdSerialUseMmio, FALSE);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+    Status = PcdSet64S (PcdSerialRegisterBase, 0x3f8);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+    Status = PcdSet32S (PcdSerialRegisterStride, 1);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+    Status = PcdSet32S (PcdSerialBaudRate, 115200);
+    if (RETURN_ERROR (Status)) {
+      return Status;
+    }
+
+    Divisor = PcdGet32 (PcdSerialClockRate) / (BaudRate * 16);
+    if ((PcdGet32 (PcdSerialClockRate) % (BaudRate * 16)) >= BaudRate * 8) {
+      Divisor++;
+    }
+
+    //
+    // See if the serial port is already initialized
+    //
+    Initialized = TRUE;
+    if ((SerialPortReadRegister (SerialRegisterBase, R_UART_LCR, MmioEnable, RegisterStride) & 0x3F) != (PcdGet8 (PcdSerialLineControl) & 0x3F)) {
+      Initialized = FALSE;
+    }
+
+    Value = (UINT8)(SerialPortReadRegister (SerialRegisterBase, R_UART_LCR, MmioEnable, RegisterStride) | B_UART_LCR_DLAB);
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, Value, MmioEnable, RegisterStride);
+    CurrentDivisor  =  SerialPortReadRegister (SerialRegisterBase, R_UART_BAUD_HIGH, MmioEnable, RegisterStride) << 8;
+    CurrentDivisor |= (UINT32)SerialPortReadRegister (SerialRegisterBase, R_UART_BAUD_LOW, MmioEnable, RegisterStride);
+    Value           = (UINT8)(SerialPortReadRegister (SerialRegisterBase, R_UART_LCR, MmioEnable, RegisterStride) & ~B_UART_LCR_DLAB);
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, Value, MmioEnable, RegisterStride);
+    if (CurrentDivisor != Divisor) {
+      Initialized = FALSE;
+    }
+
+    //
+    // Configure baud rate
+    //
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, B_UART_LCR_DLAB, MmioEnable, RegisterStride);
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_HIGH, (UINT8)(Divisor >> 8), MmioEnable, RegisterStride);
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_BAUD_LOW, (UINT8)(Divisor & 0xff), MmioEnable, RegisterStride);
+
+    //
+    // Clear DLAB and configure Data Bits, Parity, and Stop Bits.
+    // Strip reserved bits from PcdSerialLineControl
+    //
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_LCR, (UINT8)(PcdGet8 (PcdSerialLineControl) & 0x3F), MmioEnable, RegisterStride);
+
+    //
+    // Enable and reset FIFOs
+    // Strip reserved bits from PcdSerialFifoControl
+    //
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_FCR, 0x00, MmioEnable, RegisterStride);
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_FCR, (UINT8)(PcdGet8 (PcdSerialFifoControl) & (B_UART_FCR_FIFOE | B_UART_FCR_FIFO64)), MmioEnable, RegisterStride);
+
+    //
+    // Set FIFO Polled Mode by clearing IER after setting FCR
+    //
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_IER, 0x00, MmioEnable, RegisterStride);
+
+    //
+    // Put Modem Control Register(MCR) into its reset state of 0x00.
+    //
+    SerialPortWriteRegister (SerialRegisterBase, R_UART_MCR, 0x00, MmioEnable, RegisterStride);
+
+    return RETURN_SUCCESS;
+  }
+//#endif
+
+  IoWrite8(0x80,0xB9);
   GuidHob = GetFirstGuidHob (&gUniversalPayloadSerialPortInfoGuid);
   while (GuidHob != NULL) {
     SerialPortInfo     = (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO *)GET_GUID_HOB_DATA (GuidHob);
