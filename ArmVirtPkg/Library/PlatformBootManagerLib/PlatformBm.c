@@ -606,7 +606,7 @@ SetupVirtioSerial (
     1
   };
 
-  STATIC CONST VENDOR_DEVICE_PATH  TerminalNode = {
+  STATIC VENDOR_DEVICE_PATH  TerminalNode = {
     {
       MESSAGING_DEVICE_PATH,
       MSG_VENDOR_DP,
@@ -615,7 +615,7 @@ SetupVirtioSerial (
         (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       },
     },
-    DEVICE_PATH_MESSAGING_VT_UTF8
+    // copy from PcdTerminalTypeGuidBuffer
   };
 
   EFI_STATUS                Status;
@@ -633,6 +633,11 @@ SetupVirtioSerial (
       ));
     return;
   }
+
+  CopyGuid (
+    &TerminalNode.Guid,
+    PcdGetPtr (PcdTerminalTypeGuidBuffer)
+    );
 
   DevicePath = AppendDevicePathNode (
                  DevicePath,

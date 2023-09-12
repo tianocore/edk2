@@ -19,17 +19,20 @@
   INF_VERSION                    = 1.27
   BASE_NAME                      = BaseRngLibTimerLib
   MODULE_UNI_FILE                = BaseRngLibTimerLib.uni
-  FILE_GUID                      = 74950C45-10FC-4AB5-B114-49C87C17409B
+  FILE_GUID                      = B3E66B05-D218-4B9A-AC33-EF0F83D6A513
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = RngLib
-  CONSTRUCTOR                    = BaseRngLibTimerConstructor
 
 [Sources]
   RngLibTimer.c
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Guids]
+  gEdkiiRngAlgorithmUnSafe
 
 [LibraryClasses]
   BaseLib

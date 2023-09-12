@@ -4,7 +4,7 @@
   This module will execute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -23,6 +23,7 @@
 #include <Ppi/PostBootScriptTable.h>
 #include <Ppi/EndOfPeiPhase.h>
 #include <Ppi/SmmCommunication.h>
+#include <Ppi/MpServices2.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
@@ -988,6 +989,7 @@ S3RestoreConfig2 (
   BOOLEAN                        Build4GPageTableOnly;
   BOOLEAN                        InterruptStatus;
   IA32_CR0                       Cr0;
+  EDKII_PEI_MP_SERVICES2_PPI     *MpService2Ppi;
 
   TempAcpiS3Context                 = 0;
   TempEfiBootScriptExecutorVariable = 0;
@@ -1088,6 +1090,7 @@ S3RestoreConfig2 (
     SmmS3ResumeState->ReturnContext1     = (EFI_PHYSICAL_ADDRESS)(UINTN)AcpiS3Context;
     SmmS3ResumeState->ReturnContext2     = (EFI_PHYSICAL_ADDRESS)(UINTN)EfiBootScriptExecutorVariable;
     SmmS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)STACK_ALIGN_DOWN (&Status);
+    SmmS3ResumeState->MpService2Ppi      = 0;
 
     DEBUG ((DEBUG_INFO, "SMM S3 Signature                = %x\n", SmmS3ResumeState->Signature));
     DEBUG ((DEBUG_INFO, "SMM S3 Stack Base               = %x\n", SmmS3ResumeState->SmmS3StackBase));
@@ -1104,11 +1107,31 @@ S3RestoreConfig2 (
     DEBUG ((DEBUG_INFO, "SMM S3 Smst                     = %x\n", SmmS3ResumeState->Smst));
 
     //
+    // 64bit PEI and 32bit DXE is not a supported combination.
+    //
+    if (SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) {
+      ASSERT (sizeof (UINTN) == sizeof (UINT32));
+    }
+
+    //
     // Directly do the switch stack when PEI and SMM env run in the same execution mode.
     //
     if (((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) && (sizeof (UINTN) == sizeof (UINT32))) ||
         ((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_64) && (sizeof (UINTN) == sizeof (UINT64))))
     {
+      //
+      // Get MP Services2 Ppi to pass it to Smm S3.
+      //
+      Status = PeiServicesLocatePpi (
+                 &gEdkiiPeiMpServices2PpiGuid,
+                 0,
+                 NULL,
+                 (VOID **)&MpService2Ppi
+                 );
+      ASSERT_EFI_ERROR (Status);
+      SmmS3ResumeState->MpService2Ppi = (EFI_PHYSICAL_ADDRESS)(UINTN)MpService2Ppi;
+      DEBUG ((DEBUG_INFO, "SMM S3 MpService2Ppi Point = %lx\n", SmmS3ResumeState->MpService2Ppi));
+
       SwitchStack (
         (SWITCH_STACK_ENTRY_POINT)(UINTN)SmmS3ResumeState->SmmS3ResumeEntryPoint,
         (VOID *)AcpiS3Context,

@@ -554,6 +554,7 @@ typedef enum {
   ProcessorFamilyM2                              = 0x13,
   ProcessorFamilyIntelCeleronM                   = 0x14,
   ProcessorFamilyIntelPentium4Ht                 = 0x15,
+  ProcessorFamilyIntel                           = 0x16,
   ProcessorFamilyAmdDuron                        = 0x18,
   ProcessorFamilyK5                              = 0x19,
   ProcessorFamilyK6                              = 0x1A,

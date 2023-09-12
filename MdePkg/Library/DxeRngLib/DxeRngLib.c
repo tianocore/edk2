@@ -1,6 +1,7 @@
 /** @file
  Provides an implementation of the library class RngLib that uses the Rng protocol.
 
+ Copyright (c) 2023, Arm Limited. All rights reserved.
  Copyright (c) Microsoft Corporation. All rights reserved.
  SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -65,9 +66,15 @@ GenerateRandomNumberViaNist800Algorithm (
     return Status;
   }
 
+  Status = RngProtocol->GetRNG (RngProtocol, &gEfiRngAlgorithmRaw, BufferSize, Buffer);
+  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm Raw - Status = %r\n", __func__, Status));
+  if (!EFI_ERROR (Status)) {
+    return Status;
+  }
+
   // If all the other methods have failed, use the default method from the RngProtocol
   Status = RngProtocol->GetRNG (RngProtocol, NULL, BufferSize, Buffer);
-  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm Hash-256 - Status = %r\n", __func__, Status));
+  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm default - Status = %r\n", __func__, Status));
   if (!EFI_ERROR (Status)) {
     return Status;
   }
@@ -200,4 +207,31 @@ GetRandomNumber128 (
   }
 
   return TRUE;
+}
+
+/**
+  Get a GUID identifying the RNG algorithm implementation.
+
+  @param [out] RngGuid  If success, contains the GUID identifying
+                        the RNG algorithm implementation.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_UNSUPPORTED         Not supported.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+GetRngGuid (
+  GUID  *RngGuid
+  )
+{
+  /* It is not possible to know beforehand which Rng algorithm will
+   * be used by this library.
+   * This API is mainly used by RngDxe. RngDxe relies on the RngLib.
+   * The RngLib|DxeRngLib.inf implementation locates and uses an installed
+   * EFI_RNG_PROTOCOL.
+   * It is thus not possible to have both RngDxe and RngLib|DxeRngLib.inf.
+   * and it is ok not to support this API.
+   */
+  return EFI_UNSUPPORTED;
 }
