@@ -799,13 +799,10 @@ UnitTestMtrrGetAllMtrrs (
 
 /**
   Unit test of MtrrLib service MtrrSetAllMtrrs()
-
   @param[in]  Context    Ignored
-
   @retval  UNIT_TEST_PASSED             The Unit test has completed and the test
                                         case was successful.
   @retval  UNIT_TEST_ERROR_TEST_FAILED  A test case assertion has failed.
-
 **/
 UNIT_TEST_STATUS
 EFIAPI
@@ -814,35 +811,43 @@ UnitTestMtrrSetAllMtrrs (
   )
 {
   MTRR_SETTINGS                    *Result;
-  MTRR_SETTINGS                    Mtrrs;
+  MTRR_SETTINGS                    ExpectedMtrrs;
   UINT32                           Index;
   MSR_IA32_MTRR_DEF_TYPE_REGISTER  Default;
   MTRR_LIB_SYSTEM_PARAMETER        SystemParameter;
   MTRR_LIB_TEST_CONTEXT            *LocalContext;
+  UINTN                            MsrIndex;
+  UINTN                            ByteIndex;
+  UINT64                           MsrValue;
 
   LocalContext = (MTRR_LIB_TEST_CONTEXT *)Context;
-
   CopyMem (&SystemParameter, LocalContext->SystemParameter, sizeof (SystemParameter));
   InitializeMtrrRegs (&SystemParameter);
-
   Default.Uint64    = 0;
   Default.Bits.E    = 1;
   Default.Bits.FE   = 1;
   Default.Bits.Type = GenerateRandomCacheType ();
-
-  ZeroMem (&Mtrrs, sizeof (Mtrrs));
-  Mtrrs.MtrrDefType = Default.Uint64;
+  ZeroMem (&ExpectedMtrrs, sizeof (ExpectedMtrrs));
+  ExpectedMtrrs.MtrrDefType = Default.Uint64;
   for (Index = 0; Index < SystemParameter.VariableMtrrCount; Index++) {
-    GenerateRandomMtrrPair (SystemParameter.PhysicalAddressBits, GenerateRandomCacheType (), &Mtrrs.Variables.Mtrr[Index], NULL);
+    GenerateRandomMtrrPair (SystemParameter.PhysicalAddressBits, GenerateRandomCacheType (), &ExpectedMtrrs.Variables.Mtrr[Index], NULL);
   }
 
-  Result = MtrrSetAllMtrrs (&Mtrrs);
-  UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&Mtrrs);
+  for (MsrIndex = 0; MsrIndex < ARRAY_SIZE (mFixedMtrrsIndex); MsrIndex++) {
+    MsrValue = 0;
+    for (ByteIndex = 0; ByteIndex < sizeof (UINT64); ByteIndex++) {
+      MsrValue = MsrValue | LShiftU64 (GenerateRandomCacheType (), ByteIndex * 8);
+    }
 
-  UT_ASSERT_EQUAL (AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE), Mtrrs.MtrrDefType);
+    ExpectedMtrrs.Fixed.Mtrr[MsrIndex] = MsrValue;
+  }
+
+  Result = MtrrSetAllMtrrs (&ExpectedMtrrs);
+  UT_ASSERT_EQUAL ((UINTN)Result, (UINTN)&ExpectedMtrrs);
+  UT_ASSERT_EQUAL (AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE), ExpectedMtrrs.MtrrDefType);
   for (Index = 0; Index < SystemParameter.VariableMtrrCount; Index++) {
-    UT_ASSERT_EQUAL (AsmReadMsr64 (MSR_IA32_MTRR_PHYSBASE0 + (Index << 1)), Mtrrs.Variables.Mtrr[Index].Base);
-    UT_ASSERT_EQUAL (AsmReadMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1)), Mtrrs.Variables.Mtrr[Index].Mask);
+    UT_ASSERT_EQUAL (AsmReadMsr64 (MSR_IA32_MTRR_PHYSBASE0 + (Index << 1)), ExpectedMtrrs.Variables.Mtrr[Index].Base);
+    UT_ASSERT_EQUAL (AsmReadMsr64 (MSR_IA32_MTRR_PHYSMASK0 + (Index << 1)), ExpectedMtrrs.Variables.Mtrr[Index].Mask);
   }
 
   return UNIT_TEST_PASSED;
