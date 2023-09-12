@@ -1250,7 +1250,7 @@ DetectAndPreparePlatformVirtioDevicePath (
   DEBUG ((DEBUG_INFO, "%a:%d: id %d\n", __func__, __LINE__, VirtIo->SubSystemDeviceId));
 
   switch (VirtIo->SubSystemDeviceId) {
-    case 3:
+    case VIRTIO_SUBSYSTEM_CONSOLE:
       PrepareVirtioSerialDevicePath (Handle);
       break;
     default:
