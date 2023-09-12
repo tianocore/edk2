@@ -36,6 +36,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _SYS_ELF64_H_
 #define _SYS_ELF64_H_  1
 
+#include "ElfCommon.h"
 /*
  * ELF definitions common to all 64-bit architectures.
  */
@@ -249,5 +250,29 @@ typedef struct {
   Elf64_Half    si_boundto; /* direct bindings - symbol bound to */
   Elf64_Half    si_flags;   /* per symbol flags */
 } Elf64_Syminfo;
+
+/**
+  Return the section header specified by Index.
+  @param ImageBase      The image base.
+  @param Index          The section index.
+  @return Pointer to the section header.
+**/
+Elf64_Shdr *
+GetElf64SectionByIndex (
+  IN  UINT8   *ImageBase,
+  IN  UINT32  Index
+  );
+
+/**
+  Return the segment header specified by Index.
+  @param ImageBase      The image base.
+  @param Index          The segment index.
+  @return Pointer to the segment header.
+**/
+Elf64_Phdr *
+GetElf64SegmentByIndex (
+  IN  UINT8   *ImageBase,
+  IN  UINT32  Index
+  );
 
 #endif /* !_SYS_ELF64_H_ */

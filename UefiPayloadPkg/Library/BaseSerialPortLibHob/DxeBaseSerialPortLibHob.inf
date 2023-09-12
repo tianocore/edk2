@@ -36,6 +36,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio  
+ 
 
 [Guids]
   gUniversalPayloadSerialPortInfoGuid

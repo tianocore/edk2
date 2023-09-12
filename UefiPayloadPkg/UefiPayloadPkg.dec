@@ -86,3 +86,7 @@ gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|FALSE|BOOLEAN|0x00000020
 ## FFS filename to find the default variable initial data file.
 # @Prompt FFS Name of variable initial data file
  gUefiPayloadPkgTokenSpaceGuid.PcdNvsDataFile |{ 0x1a, 0xf1, 0xb1, 0xae, 0x42, 0xcc, 0xcf, 0x4e, 0xac, 0x60, 0xdb, 0xab, 0xf6, 0xca, 0x69, 0xe6 }|VOID*|0x00000025
+
+
+## UPL build switch for HOB or FDT: 0: HOB, 1: FDT
+ gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface|1|UINT8|0x00000026
