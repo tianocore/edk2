@@ -55,7 +55,7 @@ def CreatFdt(Fdt):
 def BuildConfNode(Fdt, ParentNode, MultiImage):
     ConfNode1     = libfdt.fdt_add_subnode(Fdt, ParentNode, 'conf-1')
 
-    libfdt.fdt_setprop_u32(Fdt, ConfNode1, 'require-fit', 1)
+    libfdt.fdt_setprop(Fdt, ConfNode1, 'require-fit', b'', 0)
     libfdt.fdt_setprop(Fdt, ConfNode1, 'firmware', bytes('tianocore', 'utf-8'), len('tianocore') + 1)
 
 def BuildFvImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description):

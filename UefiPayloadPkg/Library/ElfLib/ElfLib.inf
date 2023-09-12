@@ -1,0 +1,40 @@
+## @file
+#  ELF format Parse Library.
+#
+#  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ElfLib
+  FILE_GUID                      = 37604D79-F6F6-4ED5-BFD3-42B72B07B8E0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ElfLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ElfLibInternal.h
+  ElfLib.c
+  Elf32Lib.c
+  Elf64Lib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  BaseMemoryLib
+  HobLib
+  BaseLib
+  DebugLib

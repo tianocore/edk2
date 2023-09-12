@@ -149,7 +149,7 @@ FIT Edk2boot use below way to support compress and sign
   | ...               |  FMMT                                                                                                  UniversalPayloadBuild.py --Fit    tianocore -> data-offset
   +-------------------+<----------------+--------------------------------+  GenFfs +--------------------------------+  GenSec +--------------------------------+ tianocore -> reloc-start +--------------------------+
   |                   |                 | EDK2 FFS Header                |<--------| EDK2 SEC Header                |<--------| FIT Header                     |<-------------------------| UniversalPayload.pecoff  |
-  |                   |                 +--------------------------------+         +--------------------------------+         | description = “Uefi Payload”;  |                          +--------------------------+
+  |                   |                 +--------------------------------+         +--------------------------------+         | description = "Uefi Payload";  |                          +--------------------------+
   |                   |                 | EDK2 SEC Header                |         | FIT Header                     |         | ...                            |
   | RAW Data          |                 +--------------------------------+         |                                |         | images {                       | uefi-fv -> data-offset   +--------------------------+
   |                   |                 | FIT Header                     |         |                                |         |   tianocore {...};             |<-------------------------| uefi_fv                  |

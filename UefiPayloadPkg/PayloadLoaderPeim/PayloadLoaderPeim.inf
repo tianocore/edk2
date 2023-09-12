@@ -24,15 +24,6 @@
 
 [Sources]
   PayloadLoaderPeim.c
-  ElfLib.h
-  ElfLib/ElfLibInternal.h
-  ElfLib/ElfCommon.h
-  ElfLib/Elf32.h
-  ElfLib/Elf64.h
-  ElfLib/ElfLibInternal.h
-  ElfLib/ElfLib.c
-  ElfLib/Elf32Lib.c
-  ElfLib/Elf64Lib.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -49,16 +40,21 @@
   BaseLib
   PeimEntryPoint
   DebugLib
+  ElfLib
+  FdtLib
 
 [Ppis]
   gEfiPeiLoadFilePpiGuid                 ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid              ## CONSUMES
+  gEfiReadyToPayloadPpiGuid              ## PRODUCES
 
 [Pcd]
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister
+  gUefiPayloadPkgTokenSpaceGuid.PcdFdtSupport
 
 [Guids]
-  gUniversalPayloadExtraDataGuid         ## PRODUCES
+  gUniversalPayloadBaseGuid              ## PRODUCE
 
 [Depex]
   TRUE
