@@ -169,7 +169,6 @@ PopulateLevel2PageTable (
 
       // Overwrite the section entry to point to the new Level2 Translation Table
       *SectionEntry = (TranslationTable & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) |
-                      (IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE (Attributes) ? (1 << 3) : 0) |
                       TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
     } else {
       // We do not support the other section type (16MB Section)
@@ -192,7 +191,6 @@ PopulateLevel2PageTable (
     ZeroMem ((VOID *)TranslationTable, TRANSLATION_TABLE_PAGE_SIZE);
 
     *SectionEntry = (TranslationTable & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) |
-                    (IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE (Attributes) ? (1 << 3) : 0) |
                     TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
   }
 

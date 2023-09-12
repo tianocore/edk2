@@ -45,8 +45,6 @@ typedef enum {
   ARM_MEMORY_REGION_ATTRIBUTE_DEVICE,
 } ARM_MEMORY_REGION_ATTRIBUTES;
 
-#define IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(attr)  ((UINT32)(attr) & 1)
-
 typedef struct {
   EFI_PHYSICAL_ADDRESS            PhysicalBase;
   EFI_VIRTUAL_ADDRESS             VirtualBase;
