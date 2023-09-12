@@ -85,7 +85,9 @@ typedef struct RealmConfig {
     See Section 4.4.2 RsiHostCall type, RMM Specification, version A-bet0
 */
 typedef struct HostCallArgs {
-  UINT64    Imm;
+  UINT16    Imm;
+  UINT8     Reserved1[6];
+
   UINT64    Gprs0;
   UINT64    Gprs1;
   UINT64    Gprs2;

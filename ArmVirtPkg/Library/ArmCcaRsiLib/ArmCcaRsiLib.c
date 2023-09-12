@@ -519,6 +519,7 @@ RsiHostCall (
   STATIC_ASSERT (sizeof (HOST_CALL_ARGS) == SIZE_4KB);
 
   // Clear the reserved fields
+  ZeroMem (&Args->Reserved1, sizeof (Args->Reserved1));
   ZeroMem (&Args->Reserved, sizeof (Args->Reserved));
 
   ZeroMem (&SmcCmd, sizeof (SmcCmd));
