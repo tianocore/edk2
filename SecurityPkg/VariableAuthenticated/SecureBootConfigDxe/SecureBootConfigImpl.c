@@ -1847,7 +1847,7 @@ HashPeImage (
   SectionHeader = NULL;
   Status        = FALSE;
 
-  if (HashAlg != HASHALG_SHA256) {
+  if ((HashAlg >= HASHALG_MAX)) {
     return FALSE;
   }
 
@@ -1856,8 +1856,25 @@ HashPeImage (
   //
   ZeroMem (mImageDigest, MAX_DIGEST_SIZE);
 
-  mImageDigestSize = SHA256_DIGEST_SIZE;
-  mCertType        = gEfiCertSha256Guid;
+  switch (HashAlg) {
+    case HASHALG_SHA256:
+      mImageDigestSize = SHA256_DIGEST_SIZE;
+      mCertType        = gEfiCertSha256Guid;
+      break;
+
+    case HASHALG_SHA384:
+      mImageDigestSize = SHA384_DIGEST_SIZE;
+      mCertType        = gEfiCertSha384Guid;
+      break;
+
+    case HASHALG_SHA512:
+      mImageDigestSize = SHA512_DIGEST_SIZE;
+      mCertType        = gEfiCertSha512Guid;
+      break;
+
+    default:
+      return FALSE;
+  }
 
   CtxSize = mHash[HashAlg].GetContextSize ();
 
@@ -2251,6 +2268,7 @@ EnrollImageSignatureToSigDB (
   UINT32                     Attr;
   WIN_CERTIFICATE_UEFI_GUID  *GuidCertData;
   EFI_TIME                   Time;
+  UINT32                     HashAlg;
 
   Data         = NULL;
   GuidCertData = NULL;
@@ -2289,8 +2307,22 @@ EnrollImageSignatureToSigDB (
   }
 
   if (mSecDataDir->SizeOfCert == 0) {
-    if (!HashPeImage (HASHALG_SHA256)) {
-      Status =  EFI_SECURITY_VIOLATION;
+    Status  = EFI_SECURITY_VIOLATION;
+    HashAlg = sizeof (mHash) / sizeof (HASH_TABLE);
+    while (HashAlg > 0) {
+      HashAlg--;
+      if ((mHash[HashAlg].GetContextSize == NULL) || (mHash[HashAlg].HashInit == NULL) || (mHash[HashAlg].HashUpdate == NULL) || (mHash[HashAlg].HashFinal == NULL)) {
+        continue;
+      }
+
+      if (HashPeImage (HashAlg)) {
+        Status = EFI_SUCCESS;
+        break;
+      }
+    }
+
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Fail to get hash digest: %r", Status));
       goto ON_EXIT;
     }
   } else {
@@ -3764,6 +3796,10 @@ LoadSignatureList (
       ListType = STRING_TOKEN (STR_LIST_TYPE_SHA1);
     } else if (CompareGuid (&ListWalker->SignatureType, &gEfiCertSha256Guid)) {
       ListType = STRING_TOKEN (STR_LIST_TYPE_SHA256);
+    } else if (CompareGuid (&ListWalker->SignatureType, &gEfiCertSha384Guid)) {
+      ListType = STRING_TOKEN (STR_LIST_TYPE_SHA384);
+    } else if (CompareGuid (&ListWalker->SignatureType, &gEfiCertSha512Guid)) {
+      ListType = STRING_TOKEN (STR_LIST_TYPE_SHA512);
     } else if (CompareGuid (&ListWalker->SignatureType, &gEfiCertX509Sha256Guid)) {
       ListType = STRING_TOKEN (STR_LIST_TYPE_X509_SHA256);
     } else if (CompareGuid (&ListWalker->SignatureType, &gEfiCertX509Sha384Guid)) {
@@ -4011,6 +4047,12 @@ FormatHelpInfo (
   } else if (CompareGuid (&ListEntry->SignatureType, &gEfiCertSha256Guid)) {
     ListTypeId = STRING_TOKEN (STR_LIST_TYPE_SHA256);
     DataSize   = 32;
+  } else if (CompareGuid (&ListEntry->SignatureType, &gEfiCertSha384Guid)) {
+    ListTypeId = STRING_TOKEN (STR_LIST_TYPE_SHA384);
+    DataSize   = 48;
+  } else if (CompareGuid (&ListEntry->SignatureType, &gEfiCertSha512Guid)) {
+    ListTypeId = STRING_TOKEN (STR_LIST_TYPE_SHA512);
+    DataSize   = 64;
   } else if (CompareGuid (&ListEntry->SignatureType, &gEfiCertX509Sha256Guid)) {
     ListTypeId = STRING_TOKEN (STR_LIST_TYPE_X509_SHA256);
     DataSize   = 32;

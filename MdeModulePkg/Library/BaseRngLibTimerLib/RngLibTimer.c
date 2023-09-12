@@ -2,38 +2,20 @@
   BaseRng Library that uses the TimerLib to provide reasonably random numbers.
   Do not use this on a production system.
 
+  Copyright (c) 2023, Arm Limited. All rights reserved.
   Copyright (c) Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Base.h>
+#include <Uefi.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/TimerLib.h>
+#include <Guid/RngAlgorithm.h>
 
 #define DEFAULT_DELAY_TIME_IN_MICROSECONDS  10
-
-/**
-  This implementation is to be replaced by its MdeModulePkg copy.
-  The cause being that some GUIDs (gEdkiiRngAlgorithmUnSafe) cannot
-  be defined in the MdePkg.
-
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
-**/
-RETURN_STATUS
-EFIAPI
-BaseRngLibTimerConstructor (
-  VOID
-  )
-{
-  DEBUG ((
-    DEBUG_WARN,
-    "Warning: This BaseRngTimerLib implementation will be deprecated. "
-    "Please use the MdeModulePkg implementation equivalent.\n"
-    ));
-
-  return RETURN_SUCCESS;
-}
 
 /**
  Using the TimerLib GetPerformanceCounterProperties() we delay
@@ -223,15 +205,16 @@ GetRandomNumber128 (
   @retval EFI_UNSUPPORTED         Not supported.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
 **/
-RETURN_STATUS
+EFI_STATUS
 EFIAPI
 GetRngGuid (
   GUID  *RngGuid
   )
 {
-  /* This implementation is to be replaced by its MdeModulePkg copy.
-   * The cause being that some GUIDs (gEdkiiRngAlgorithmUnSafe) cannot
-   * be defined in the MdePkg.
-   */
-  return RETURN_UNSUPPORTED;
+  if (RngGuid == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem (RngGuid, &gEdkiiRngAlgorithmUnSafe, sizeof (*RngGuid));
+  return EFI_SUCCESS;
 }

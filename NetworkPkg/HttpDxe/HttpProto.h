@@ -37,7 +37,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define HTTP_TOS_DEAULT           8
 #define HTTP_TTL_DEAULT           255
-#define HTTP_BUFFER_SIZE_DEAULT   65535
+#define HTTP_BUFFER_SIZE_DEAULT   0x200000
 #define HTTP_MAX_SYN_BACK_LOG     5
 #define HTTP_CONNECTION_TIMEOUT   60
 #define HTTP_DATA_RETRIES         12

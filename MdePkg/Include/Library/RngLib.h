@@ -1,6 +1,7 @@
 /** @file
   Provides random number generator services.
 
+Copyright (c) 2023, Arm Limited. All rights reserved.<BR>
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -75,6 +76,22 @@ BOOLEAN
 EFIAPI
 GetRandomNumber128 (
   OUT     UINT64  *Rand
+  );
+
+/**
+  Get a GUID identifying the RNG algorithm implementation.
+
+  @param [out] RngGuid  If success, contains the GUID identifying
+                        the RNG algorithm implementation.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_UNSUPPORTED         Not supported.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+GetRngGuid (
+  GUID  *RngGuid
   );
 
 #endif // __RNG_LIB_H__

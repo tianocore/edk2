@@ -244,6 +244,11 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         # Conditional Args
         if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
+        else:
+            args += " -device virtio-gpu-pci"                         # add recommended QEMU graphics device
+            args += " -device qemu-xhci,id=usb"                       # add USB support for below devices
+            args += " -device usb-tablet,id=input0,bus=usb.0,port=1"  # add a usb mouse
+            args += " -device usb-kbd,id=input1,bus=usb.0,port=2"     # add a usb keyboard
 
         if (self.env.GetValue("MAKE_STARTUP_NSH").upper() == "TRUE"):
             f = open(os.path.join(VirtualDrive, "startup.nsh"), "w")

@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "PiSmmCpuDxeSmm.h"
+#include <PiPei.h>
+#include <Ppi/MpServices2.h>
 
 #pragma pack(1)
 typedef struct {
@@ -539,44 +541,152 @@ SetRegister (
 }
 
 /**
-  AP initialization before then after SMBASE relocation in the S3 boot path.
+  The function is invoked before SMBASE relocation in S3 path to restores CPU status.
+
+  The function is invoked before SMBASE relocation in S3 path. It does first time microcode load
+  and restores MTRRs for both BSP and APs.
+
+  @param   IsBsp   The CPU this function executes on is BSP or not.
+
 **/
 VOID
-InitializeAp (
-  VOID
+InitializeCpuBeforeRebase (
+  IN BOOLEAN  IsBsp
   )
 {
-  UINTN  TopOfStack;
-  UINT8  Stack[128];
-
   LoadMtrrData (mAcpiCpuData.MtrrTable);
 
   SetRegister (TRUE);
+
+  ProgramVirtualWireMode ();
+  if (!IsBsp) {
+    DisableLvtInterrupts ();
+  }
 
   //
   // Count down the number with lock mechanism.
   //
   InterlockedDecrement (&mNumberToFinish);
 
-  //
-  // Wait for BSP to signal SMM Base relocation done.
-  //
-  while (!mInitApsAfterSmmBaseReloc) {
-    CpuPause ();
+  if (IsBsp) {
+    //
+    // Bsp wait here till all AP finish the initialization before rebase
+    //
+    while (mNumberToFinish > 0) {
+      CpuPause ();
+    }
   }
+}
 
-  ProgramVirtualWireMode ();
-  DisableLvtInterrupts ();
+/**
+  The function is invoked after SMBASE relocation in S3 path to restores CPU status.
+
+  The function is invoked after SMBASE relocation in S3 path. It restores configuration according to
+  data saved by normal boot path for both BSP and APs.
+
+  @param   IsBsp   The CPU this function executes on is BSP or not.
+
+**/
+VOID
+InitializeCpuAfterRebase (
+  IN BOOLEAN  IsBsp
+  )
+{
+  UINTN  TopOfStack;
+  UINT8  Stack[128];
 
   SetRegister (FALSE);
 
+  if (mSmmS3ResumeState->MpService2Ppi == 0) {
+    if (IsBsp) {
+      while (mNumberToFinish > 0) {
+        CpuPause ();
+      }
+    } else {
+      //
+      // Place AP into the safe code, count down the number with lock mechanism in the safe code.
+      //
+      TopOfStack  = (UINTN)Stack + sizeof (Stack);
+      TopOfStack &= ~(UINTN)(CPU_STACK_ALIGNMENT - 1);
+      CopyMem ((VOID *)(UINTN)mApHltLoopCode, mApHltLoopCodeTemplate, sizeof (mApHltLoopCodeTemplate));
+      TransferApToSafeState ((UINTN)mApHltLoopCode, TopOfStack, (UINTN)&mNumberToFinish);
+    }
+  }
+}
+
+/**
+  Cpu initialization procedure.
+
+  @param[in,out] Buffer  The pointer to private data buffer.
+
+**/
+VOID
+EFIAPI
+InitializeCpuProcedure (
+  IN OUT VOID  *Buffer
+  )
+{
+  BOOLEAN  IsBsp;
+
+  IsBsp =  (BOOLEAN)(mBspApicId == GetApicId ());
+
   //
-  // Place AP into the safe code, count down the number with lock mechanism in the safe code.
+  // Skip initialization if mAcpiCpuData is not valid
   //
-  TopOfStack  = (UINTN)Stack + sizeof (Stack);
-  TopOfStack &= ~(UINTN)(CPU_STACK_ALIGNMENT - 1);
-  CopyMem ((VOID *)(UINTN)mApHltLoopCode, mApHltLoopCodeTemplate, sizeof (mApHltLoopCodeTemplate));
-  TransferApToSafeState ((UINTN)mApHltLoopCode, TopOfStack, (UINTN)&mNumberToFinish);
+  if (mAcpiCpuData.NumberOfCpus > 0) {
+    //
+    // First time microcode load and restore MTRRs
+    //
+    InitializeCpuBeforeRebase (IsBsp);
+  }
+
+  if (IsBsp) {
+    DEBUG ((DEBUG_INFO, "SmmRestoreCpu: mSmmRelocated is %d\n", mSmmRelocated));
+
+    //
+    // Check whether Smm Relocation is done or not.
+    // If not, will do the SmmBases Relocation here!!!
+    //
+    if (!mSmmRelocated) {
+      //
+      // Restore SMBASE for BSP and all APs
+      //
+      SmmRelocateBases ();
+    } else {
+      //
+      // Issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
+      //
+      ExecuteFirstSmiInit ();
+    }
+  }
+
+  //
+  // Skip initialization if mAcpiCpuData is not valid
+  //
+  if (mAcpiCpuData.NumberOfCpus > 0) {
+    if (IsBsp) {
+      //
+      // mNumberToFinish should be set before AP executes InitializeCpuAfterRebase()
+      //
+      mNumberToFinish = (UINT32)(mNumberOfCpus - 1);
+      //
+      // Signal that SMM base relocation is complete and to continue initialization for all APs.
+      //
+      mInitApsAfterSmmBaseReloc = TRUE;
+    } else {
+      //
+      // AP Wait for BSP to signal SMM Base relocation done.
+      //
+      while (!mInitApsAfterSmmBaseReloc) {
+        CpuPause ();
+      }
+    }
+
+    //
+    // Restore MSRs for BSP and all APs
+    //
+    InitializeCpuAfterRebase (IsBsp);
+  }
 }
 
 /**
@@ -627,91 +737,7 @@ PrepareApStartupVector (
   mExchangeInfo->BufferStart                         = (UINT32)StartupVector;
   mExchangeInfo->Cr3                                 = (UINT32)(AsmReadCr3 ());
   mExchangeInfo->InitializeFloatingPointUnitsAddress = (UINTN)InitializeFloatingPointUnits;
-}
-
-/**
-  The function is invoked before SMBASE relocation in S3 path to restores CPU status.
-
-  The function is invoked before SMBASE relocation in S3 path. It does first time microcode load
-  and restores MTRRs for both BSP and APs.
-
-**/
-VOID
-InitializeCpuBeforeRebase (
-  VOID
-  )
-{
-  LoadMtrrData (mAcpiCpuData.MtrrTable);
-
-  SetRegister (TRUE);
-
-  ProgramVirtualWireMode ();
-
-  PrepareApStartupVector (mAcpiCpuData.StartupVector);
-
-  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
-    ASSERT (mNumberOfCpus <= mAcpiCpuData.NumberOfCpus);
-  } else {
-    ASSERT (mNumberOfCpus == mAcpiCpuData.NumberOfCpus);
-  }
-
-  mNumberToFinish           = (UINT32)(mNumberOfCpus - 1);
-  mExchangeInfo->ApFunction = (VOID *)(UINTN)InitializeAp;
-
-  //
-  // Execute code for before SmmBaseReloc. Note: This flag is maintained across S3 boots.
-  //
-  mInitApsAfterSmmBaseReloc = FALSE;
-
-  //
-  // Send INIT IPI - SIPI to all APs
-  //
-  SendInitSipiSipiAllExcludingSelf ((UINT32)mAcpiCpuData.StartupVector);
-
-  while (mNumberToFinish > 0) {
-    CpuPause ();
-  }
-}
-
-/**
-  The function is invoked after SMBASE relocation in S3 path to restores CPU status.
-
-  The function is invoked after SMBASE relocation in S3 path. It restores configuration according to
-  data saved by normal boot path for both BSP and APs.
-
-**/
-VOID
-InitializeCpuAfterRebase (
-  VOID
-  )
-{
-  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
-    ASSERT (mNumberOfCpus <= mAcpiCpuData.NumberOfCpus);
-  } else {
-    ASSERT (mNumberOfCpus == mAcpiCpuData.NumberOfCpus);
-  }
-
-  mNumberToFinish = (UINT32)(mNumberOfCpus - 1);
-
-  //
-  // Signal that SMM base relocation is complete and to continue initialization for all APs.
-  //
-  mInitApsAfterSmmBaseReloc = TRUE;
-
-  //
-  // Must begin set register after all APs have continue their initialization.
-  // This is a requirement to support semaphore mechanism in register table.
-  // Because if semaphore's dependence type is package type, semaphore will wait
-  // for all Aps in one package finishing their tasks before set next register
-  // for all APs. If the Aps not begin its task during BSP doing its task, the
-  // BSP thread will hang because it is waiting for other Aps in the same
-  // package finishing their task.
-  //
-  SetRegister (FALSE);
-
-  while (mNumberToFinish > 0) {
-    CpuPause ();
-  }
+  mExchangeInfo->ApFunction                          = (VOID *)(UINTN)InitializeCpuProcedure;
 }
 
 /**
@@ -762,11 +788,12 @@ SmmRestoreCpu (
   VOID
   )
 {
-  SMM_S3_RESUME_STATE       *SmmS3ResumeState;
-  IA32_DESCRIPTOR           Ia32Idtr;
-  IA32_DESCRIPTOR           X64Idtr;
-  IA32_IDT_GATE_DESCRIPTOR  IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
-  EFI_STATUS                Status;
+  SMM_S3_RESUME_STATE         *SmmS3ResumeState;
+  IA32_DESCRIPTOR             Ia32Idtr;
+  IA32_DESCRIPTOR             X64Idtr;
+  IA32_IDT_GATE_DESCRIPTOR    IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
+  EFI_STATUS                  Status;
+  EDKII_PEI_MP_SERVICES2_PPI  *Mp2ServicePpi;
 
   DEBUG ((DEBUG_INFO, "SmmRestoreCpu()\n"));
 
@@ -813,42 +840,37 @@ SmmRestoreCpu (
     InitializeDebugAgent (DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64, (VOID *)&Ia32Idtr, NULL);
   }
 
+  mBspApicId = GetApicId ();
   //
-  // Skip initialization if mAcpiCpuData is not valid
+  // Skip AP initialization if mAcpiCpuData is not valid
   //
   if (mAcpiCpuData.NumberOfCpus > 0) {
-    //
-    // First time microcode load and restore MTRRs
-    //
-    InitializeCpuBeforeRebase ();
-  }
+    if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
+      ASSERT (mNumberOfCpus <= mAcpiCpuData.NumberOfCpus);
+    } else {
+      ASSERT (mNumberOfCpus == mAcpiCpuData.NumberOfCpus);
+    }
 
-  DEBUG ((DEBUG_INFO, "SmmRestoreCpu: mSmmRelocated is %d\n", mSmmRelocated));
+    mNumberToFinish = (UINT32)mNumberOfCpus;
 
-  //
-  // Check whether Smm Relocation is done or not.
-  // If not, will do the SmmBases Relocation here!!!
-  //
-  if (!mSmmRelocated) {
     //
-    // Restore SMBASE for BSP and all APs
+    // Execute code for before SmmBaseReloc. Note: This flag is maintained across S3 boots.
     //
-    SmmRelocateBases ();
+    mInitApsAfterSmmBaseReloc = FALSE;
+
+    if (mSmmS3ResumeState->MpService2Ppi != 0) {
+      Mp2ServicePpi = (EDKII_PEI_MP_SERVICES2_PPI *)(UINTN)mSmmS3ResumeState->MpService2Ppi;
+      Mp2ServicePpi->StartupAllCPUs (Mp2ServicePpi, InitializeCpuProcedure, 0, NULL);
+    } else {
+      PrepareApStartupVector (mAcpiCpuData.StartupVector);
+      //
+      // Send INIT IPI - SIPI to all APs
+      //
+      SendInitSipiSipiAllExcludingSelf ((UINT32)mAcpiCpuData.StartupVector);
+      InitializeCpuProcedure (NULL);
+    }
   } else {
-    //
-    // Issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
-    //
-    ExecuteFirstSmiInit ();
-  }
-
-  //
-  // Skip initialization if mAcpiCpuData is not valid
-  //
-  if (mAcpiCpuData.NumberOfCpus > 0) {
-    //
-    // Restore MSRs for BSP and all APs
-    //
-    InitializeCpuAfterRebase ();
+    InitializeCpuProcedure (NULL);
   }
 
   //

@@ -12,6 +12,7 @@
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemEncryptTdxLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SynchronizationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include "IoMmuInternal.h"
 
@@ -268,16 +269,17 @@ InternalAllocateBuffer (
   IN  EFI_ALLOCATE_TYPE        Type,
   IN  EFI_MEMORY_TYPE          MemoryType,
   IN  UINTN                    Pages,
-  IN OUT UINT32                *ReservedMemBitmap,
+  OUT UINT32                   *ReservedMemBit,
   IN OUT EFI_PHYSICAL_ADDRESS  *PhysicalAddress
   )
 {
   UINT32                    MemBitmap;
+  UINT32                    ReservedMemBitmap;
   UINT8                     Index;
   IOMMU_RESERVED_MEM_RANGE  *MemRange;
   UINTN                     PagesOfLastMemRange;
 
-  *ReservedMemBitmap = 0;
+  *ReservedMemBit = 0;
 
   if (Pages == 0) {
     ASSERT (FALSE);
@@ -309,23 +311,31 @@ InternalAllocateBuffer (
 
   MemRange = &mReservedMemRanges[Index];
 
-  if ((mReservedMemBitmap & MemRange->BitmapMask) == MemRange->BitmapMask) {
-    // The reserved memory is exausted. Turn to legacy allocate.
-    goto LegacyAllocateBuffer;
-  }
+  do {
+    ReservedMemBitmap = mReservedMemBitmap;
 
-  MemBitmap = (mReservedMemBitmap & MemRange->BitmapMask) >> MemRange->Shift;
-
-  for (Index = 0; Index < MemRange->Slots; Index++) {
-    if ((MemBitmap & (UINT8)(1<<Index)) == 0) {
-      break;
+    if ((ReservedMemBitmap & MemRange->BitmapMask) == MemRange->BitmapMask) {
+      // The reserved memory is exhausted. Turn to legacy allocate.
+      goto LegacyAllocateBuffer;
     }
-  }
 
-  ASSERT (Index != MemRange->Slots);
+    MemBitmap = (ReservedMemBitmap & MemRange->BitmapMask) >> MemRange->Shift;
 
-  *PhysicalAddress   = MemRange->StartAddressOfMemRange + Index * SIZE_OF_MEM_RANGE (MemRange) + MemRange->HeaderSize;
-  *ReservedMemBitmap = (UINT32)(1 << (Index + MemRange->Shift));
+    for (Index = 0; Index < MemRange->Slots; Index++) {
+      if ((MemBitmap & (UINT8)(1<<Index)) == 0) {
+        break;
+      }
+    }
+
+    ASSERT (Index != MemRange->Slots);
+
+    *PhysicalAddress = MemRange->StartAddressOfMemRange + Index * SIZE_OF_MEM_RANGE (MemRange) + MemRange->HeaderSize;
+    *ReservedMemBit  = (UINT32)(1 << (Index + MemRange->Shift));
+  } while (ReservedMemBitmap != InterlockedCompareExchange32 (
+                                  &mReservedMemBitmap,
+                                  ReservedMemBitmap,
+                                  ReservedMemBitmap | *ReservedMemBit
+                                  ));
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -334,16 +344,16 @@ InternalAllocateBuffer (
     MemRange->DataSize,
     *PhysicalAddress,
     Pages,
-    *ReservedMemBitmap,
-    mReservedMemBitmap,
-    mReservedMemBitmap | *ReservedMemBitmap
+    *ReservedMemBit,
+    ReservedMemBitmap,
+    ReservedMemBitmap | *ReservedMemBit
     ));
 
   return EFI_SUCCESS;
 
 LegacyAllocateBuffer:
 
-  *ReservedMemBitmap = 0;
+  *ReservedMemBit = 0;
   return gBS->AllocatePages (Type, MemoryType, Pages, PhysicalAddress);
 }
 
@@ -366,25 +376,39 @@ IoMmuAllocateBounceBuffer (
   )
 {
   EFI_STATUS  Status;
-  UINT32      ReservedMemBitmap;
-  EFI_TPL     OldTpl;
 
-  OldTpl            = gBS->RaiseTPL (TPL_NOTIFY);
-  ReservedMemBitmap = 0;
-  Status            = InternalAllocateBuffer (
-                        Type,
-                        MemoryType,
-                        MapInfo->NumberOfPages,
-                        &ReservedMemBitmap,
-                        &MapInfo->PlainTextAddress
-                        );
-  MapInfo->ReservedMemBitmap = ReservedMemBitmap;
-  mReservedMemBitmap        |= ReservedMemBitmap;
-  gBS->RestoreTPL (OldTpl);
-
+  Status = InternalAllocateBuffer (
+             Type,
+             MemoryType,
+             MapInfo->NumberOfPages,
+             &MapInfo->ReservedMemBitmap,
+             &MapInfo->PlainTextAddress
+             );
   ASSERT (Status == EFI_SUCCESS);
 
   return Status;
+}
+
+/**
+ * Clear a bit in the reserved memory bitmap in a thread safe manner
+ *
+ * @param ReservedMemBit  The bit to clear
+ */
+STATIC
+VOID
+ClearReservedMemBit (
+  IN  UINT32  ReservedMemBit
+  )
+{
+  UINT32  ReservedMemBitmap;
+
+  do {
+    ReservedMemBitmap = mReservedMemBitmap;
+  } while (ReservedMemBitmap != InterlockedCompareExchange32 (
+                                  &mReservedMemBitmap,
+                                  ReservedMemBitmap,
+                                  ReservedMemBitmap & ~ReservedMemBit
+                                  ));
 }
 
 /**
@@ -398,8 +422,6 @@ IoMmuFreeBounceBuffer (
   IN OUT     MAP_INFO  *MapInfo
   )
 {
-  EFI_TPL  OldTpl;
-
   if (MapInfo->ReservedMemBitmap == 0) {
     gBS->FreePages (MapInfo->PlainTextAddress, MapInfo->NumberOfPages);
   } else {
@@ -412,11 +434,9 @@ IoMmuFreeBounceBuffer (
       mReservedMemBitmap,
       mReservedMemBitmap & ((UINT32)(~MapInfo->ReservedMemBitmap))
       ));
-    OldTpl                     = gBS->RaiseTPL (TPL_NOTIFY);
+    ClearReservedMemBit (MapInfo->ReservedMemBitmap);
     MapInfo->PlainTextAddress  = 0;
-    mReservedMemBitmap        &= (UINT32)(~MapInfo->ReservedMemBitmap);
     MapInfo->ReservedMemBitmap = 0;
-    gBS->RestoreTPL (OldTpl);
   }
 
   return EFI_SUCCESS;
@@ -451,8 +471,6 @@ IoMmuAllocateCommonBuffer (
              PhysicalAddress
              );
   ASSERT (Status == EFI_SUCCESS);
-
-  mReservedMemBitmap |= *ReservedMemBitmap;
 
   if (*ReservedMemBitmap != 0) {
     *PhysicalAddress -= SIZE_4KB;
@@ -494,7 +512,7 @@ IoMmuFreeCommonBuffer (
     mReservedMemBitmap & ((UINT32)(~CommonBufferHeader->ReservedMemBitmap))
     ));
 
-  mReservedMemBitmap &= (UINT32)(~CommonBufferHeader->ReservedMemBitmap);
+  ClearReservedMemBit (CommonBufferHeader->ReservedMemBitmap);
   return EFI_SUCCESS;
 
 LegacyFreeCommonBuffer:
