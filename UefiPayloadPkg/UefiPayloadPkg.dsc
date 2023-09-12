@@ -271,6 +271,7 @@
 !endif
   PlatformBootManagerLib|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
+  ElfLib|UefiPayloadPkg/Library/ElfLib/Elflib.inf
 
   #
   # Misc
@@ -481,6 +482,8 @@
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsGet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
 !endif
 
+  gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface|2
+
 [PcdsPatchableInModule.X64]
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
@@ -600,14 +603,34 @@
 !if "IA32" in "$(ARCH)"
   [Components.IA32]
   !if $(UNIVERSAL_PAYLOAD) == TRUE
-    UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
+    UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf {
+      <LibraryClasses>
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface == 0 || gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface == 2
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+        !endif
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface == 1 || gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface == 2
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+        !endif
+    }
   !else
     UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
   !endif
 !else
   [Components.X64]
   !if $(UNIVERSAL_PAYLOAD) == TRUE
-    UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
+    UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf {
+      <LibraryClasses>
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface == 0 || gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface == 2
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+        !endif
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface == 1 || gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface == 2
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
+        !endif
+    }
   !else
     UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
   !endif

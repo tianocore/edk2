@@ -418,6 +418,8 @@ DxeLoadCore (
                          &DxeCoreEntryPoint,
                          &AuthenticationState
                          );
+
+    DEBUG ((DEBUG_ERROR, "Instance :%x ,LoadFile->LoadFile .(Status = %r), DxeCoreEntryPoint :%x\n", Instance, Status, (UINTN)DxeCoreEntryPoint));
   } while (EFI_ERROR (Status));
 
   //

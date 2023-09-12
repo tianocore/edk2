@@ -53,6 +53,7 @@
   HobLib
   PeCoffLib
   CpuLib
+  ElfLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -69,6 +70,8 @@
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadPciRootBridgeInfoGuid
   gUniversalPayloadSmbios3TableGuid
+  gUniversalPayloadBaseGuid
+  gUniversalPayloadDeviceTreeGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
@@ -79,6 +82,7 @@
 
 [Pcd.IA32,Pcd.X64]
   gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile
+  gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
@@ -94,4 +98,5 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
+
 
