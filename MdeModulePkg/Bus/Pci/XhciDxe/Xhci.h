@@ -2,6 +2,7 @@
 
   Provides some data structure definitions used by the XHCI host controller driver.
 
+(C) Copyright 2023 Hewlett Packard Enterprise Development LP<BR>
 Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -26,6 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/TimerLib.h>
 
 #include <IndustryStandard/Pci.h>
 
@@ -36,6 +38,11 @@ typedef struct _USB_DEV_CONTEXT    USB_DEV_CONTEXT;
 #include "XhciSched.h"
 #include "ComponentName.h"
 #include "UsbHcMem.h"
+
+//
+// Converts a count from microseconds to nanoseconds
+//
+#define XHC_MICROSECOND_TO_NANOSECOND(Time)  (MultU64x32((Time), 1000))
 
 //
 // The unit is microsecond, setting it as 1us.
@@ -718,6 +725,31 @@ XhcAsyncIsochronousTransfer (
   IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR  *Translator,
   IN     EFI_ASYNC_USB_TRANSFER_CALLBACK     IsochronousCallBack,
   IN     VOID                                *Context
+  );
+
+/**
+  Converts a time in nanoseconds to a performance counter tick count.
+
+  @param  Time  The time in nanoseconds to be converted to performance counter ticks.
+  @return Time in nanoseconds converted to ticks.
+**/
+UINT64
+XhcConvertTimeToTicks (
+  UINT64  Time
+  );
+
+/**
+  Computes and returns the elapsed ticks since PreviousTick. The
+  value of PreviousTick is overwritten with the current performance
+  counter value.
+
+  @param  PreviousTick    Pointer to PreviousTick count.
+  @return The elapsed ticks since PreviousCount. PreviousCount is
+          overwritten with the current performance counter value.
+**/
+UINT64
+XhcGetElapsedTicks (
+  IN OUT UINT64  *PreviousTick
   );
 
 #endif

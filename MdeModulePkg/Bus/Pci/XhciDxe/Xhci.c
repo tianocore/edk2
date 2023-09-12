@@ -1,6 +1,7 @@
 /** @file
   The XHCI controller driver.
 
+(C) Copyright 2023 Hewlett Packard Enterprise Development LP<BR>
 Copyright (c) 2011 - 2022, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -84,6 +85,11 @@ EFI_USB2_HC_PROTOCOL  gXhciUsb2HcTemplate = {
   0x3,
   0x0
 };
+
+UINT64   mPerformanceCounterStartValue;
+UINT64   mPerformanceCounterEndValue;
+UINT64   mPerformanceCounterFrequency;
+BOOLEAN  mPerformanceCounterValuesCached = FALSE;
 
 /**
   Retrieves the capability of root hub ports.
@@ -2293,4 +2299,115 @@ XhcDriverBindingStop (
   FreePool (Xhc);
 
   return EFI_SUCCESS;
+}
+
+/**
+  Converts a time in nanoseconds to a performance counter tick count.
+
+  @param  Time  The time in nanoseconds to be converted to performance counter ticks.
+  @return Time in nanoseconds converted to ticks.
+**/
+UINT64
+XhcConvertTimeToTicks (
+  IN UINT64  Time
+  )
+{
+  UINT64  Ticks;
+  UINT64  Remainder;
+  UINT64  Divisor;
+  UINTN   Shift;
+
+  // Cache the return values to avoid repeated calls to GetPerformanceCounterProperties ()
+  if (!mPerformanceCounterValuesCached) {
+    mPerformanceCounterFrequency = GetPerformanceCounterProperties (
+                                     &mPerformanceCounterStartValue,
+                                     &mPerformanceCounterEndValue
+                                     );
+
+    mPerformanceCounterValuesCached = TRUE;
+  }
+
+  // Prevent returning a tick value of 0, unless Time is already 0
+  if (0 == mPerformanceCounterFrequency) {
+    return Time;
+  }
+
+  // Nanoseconds per second
+  Divisor = 1000000000;
+
+  //
+  //           Frequency
+  // Ticks = ------------- x Time
+  //         1,000,000,000
+  //
+  Ticks = MultU64x64 (
+            DivU64x64Remainder (
+              mPerformanceCounterFrequency,
+              Divisor,
+              &Remainder
+              ),
+            Time
+            );
+
+  //
+  // Ensure (Remainder * Time) will not overflow 64-bit.
+  //
+  // HighBitSet64 (Remainder) + 1 + HighBitSet64 (Time) + 1 <= 64
+  //
+  Shift     = MAX (0, HighBitSet64 (Remainder) + HighBitSet64 (Time) - 62);
+  Remainder = RShiftU64 (Remainder, (UINTN)Shift);
+  Divisor   = RShiftU64 (Divisor, (UINTN)Shift);
+  Ticks    += DivU64x64Remainder (MultU64x64 (Remainder, Time), Divisor, NULL);
+
+  return Ticks;
+}
+
+/**
+  Computes and returns the elapsed ticks since PreviousTick. The
+  value of PreviousTick is overwritten with the current performance
+  counter value.
+
+  @param  PreviousTick    Pointer to PreviousTick count.
+  @return The elapsed ticks since PreviousCount. PreviousCount is
+          overwritten with the current performance counter value.
+**/
+UINT64
+XhcGetElapsedTicks (
+  IN OUT UINT64  *PreviousTick
+  )
+{
+  UINT64  CurrentTick;
+  UINT64  Delta;
+
+  CurrentTick = GetPerformanceCounter ();
+
+  //
+  // Determine if the counter is counting up or down
+  //
+  if (mPerformanceCounterStartValue < mPerformanceCounterEndValue) {
+    //
+    // Counter counts upwards, check for an overflow condition
+    //
+    if (*PreviousTick > CurrentTick) {
+      Delta = (mPerformanceCounterEndValue - *PreviousTick) + CurrentTick;
+    } else {
+      Delta = CurrentTick - *PreviousTick;
+    }
+  } else {
+    //
+    // Counter counts downwards, check for an underflow condition
+    //
+    if (*PreviousTick < CurrentTick) {
+      Delta = (mPerformanceCounterStartValue - CurrentTick) + *PreviousTick;
+    } else {
+      Delta = *PreviousTick - CurrentTick;
+    }
+  }
+
+  //
+  // Set PreviousTick to CurrentTick
+  //
+  *PreviousTick = CurrentTick;
+
+  return Delta;
 }
