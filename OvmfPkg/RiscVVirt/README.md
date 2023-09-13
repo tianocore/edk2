@@ -86,3 +86,8 @@ then specify that binary for QEMU, with the following additional command line
 option:
 
     -bios $OPENSBI_DIR/build/platform/generic/firmware/fw_dynamic.bin
+
+Note that the above only makes a difference with software emulation (which you
+can force with `-M accel=tcg`). With hardware virtualization (`-M accel=kvm`),
+KVM services the SBI (Supervisor Binary Interface) calls internally, therefore
+any OpenSBI binary specified with `-bios` is rejected.
