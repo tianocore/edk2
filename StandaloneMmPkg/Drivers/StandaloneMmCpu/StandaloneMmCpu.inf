@@ -1,9 +1,10 @@
 ## @file
-#  Standalone MM CPU driver for ARM Standard Platforms
+#  Standalone MM CPU driver
 #
 #  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
 #  Copyright (c) 2016 HP Development Company, L.P.
 #  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.
+#  Copyright (c) 2023, Ventana Micro System Inc. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -19,18 +20,14 @@
 
 [Sources]
   StandaloneMmCpu.c
-  StandaloneMmCpu.h
   EventHandle.c
 
 [Packages]
-  ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
 
 [LibraryClasses]
-  ArmLib
-  ArmSvcLib
   BaseMemoryLib
   DebugLib
   HobLib
@@ -46,7 +43,7 @@
   gZeroGuid
   gMpInformationHobGuid
   gEfiStandaloneMmNonSecureBufferGuid
-  gEfiArmTfCpuDriverEpDescriptorGuid
+  gEfiMmCpuDriverEpDescriptorGuid
 
 [Depex]
   TRUE
