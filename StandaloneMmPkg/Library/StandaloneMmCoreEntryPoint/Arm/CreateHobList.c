@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MmramMemoryReserve.h>
 #include <Guid/MpInformation.h>
 
+#include <StandaloneMmCpu.h>
 #include <Library/Arm/StandaloneMmCoreEntryPoint.h>
 #include <Library/ArmMmuLib.h>
 #include <Library/ArmSvcLib.h>
@@ -39,7 +40,7 @@ extern EFI_GUID  gEfiStandaloneMmNonSecureBufferGuid;
 // GUID to identify HOB where the entry point of the CPU driver will be
 // populated to allow this entry point driver to invoke it upon receipt of an
 // event
-extern EFI_GUID  gEfiArmTfCpuDriverEpDescriptorGuid;
+extern EFI_GUID  gEfiMmCpuDriverEpDescriptorGuid;
 
 /**
   Use the boot information passed by privileged firmware to populate a HOB list
@@ -52,22 +53,22 @@ extern EFI_GUID  gEfiArmTfCpuDriverEpDescriptorGuid;
 **/
 VOID *
 CreateHobListFromBootInfo (
-  IN  OUT  PI_MM_ARM_TF_CPU_DRIVER_ENTRYPOINT  *CpuDriverEntryPoint,
-  IN       EFI_SECURE_PARTITION_BOOT_INFO      *PayloadBootInfo
+  IN  OUT  PI_MM_CPU_DRIVER_ENTRYPOINT     *CpuDriverEntryPoint,
+  IN       EFI_SECURE_PARTITION_BOOT_INFO  *PayloadBootInfo
   )
 {
-  EFI_HOB_HANDOFF_INFO_TABLE       *HobStart;
-  EFI_RESOURCE_ATTRIBUTE_TYPE      Attributes;
-  UINT32                           Index;
-  UINT32                           BufferSize;
-  UINT32                           Flags;
-  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK   *MmramRangesHob;
-  EFI_MMRAM_DESCRIPTOR             *MmramRanges;
-  EFI_MMRAM_DESCRIPTOR             *NsCommBufMmramRange;
-  MP_INFORMATION_HOB_DATA          *MpInformationHobData;
-  EFI_PROCESSOR_INFORMATION        *ProcInfoBuffer;
-  EFI_SECURE_PARTITION_CPU_INFO    *CpuInfo;
-  ARM_TF_CPU_DRIVER_EP_DESCRIPTOR  *CpuDriverEntryPointDesc;
+  EFI_HOB_HANDOFF_INFO_TABLE      *HobStart;
+  EFI_RESOURCE_ATTRIBUTE_TYPE     Attributes;
+  UINT32                          Index;
+  UINT32                          BufferSize;
+  UINT32                          Flags;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHob;
+  EFI_MMRAM_DESCRIPTOR            *MmramRanges;
+  EFI_MMRAM_DESCRIPTOR            *NsCommBufMmramRange;
+  MP_INFORMATION_HOB_DATA         *MpInformationHobData;
+  EFI_PROCESSOR_INFORMATION       *ProcInfoBuffer;
+  EFI_SECURE_PARTITION_CPU_INFO   *CpuInfo;
+  MM_CPU_DRIVER_EP_DESCRIPTOR     *CpuDriverEntryPointDesc;
 
   // Create a hoblist with a PHIT and EOH
   HobStart = HobConstructor (
@@ -144,13 +145,13 @@ CreateHobListFromBootInfo (
 
   // Create a Guided HOB to enable the ARM TF CPU driver to share its entry
   // point and populate it with the address of the shared buffer
-  CpuDriverEntryPointDesc = (ARM_TF_CPU_DRIVER_EP_DESCRIPTOR *)BuildGuidHob (
-                                                                 &gEfiArmTfCpuDriverEpDescriptorGuid,
-                                                                 sizeof (ARM_TF_CPU_DRIVER_EP_DESCRIPTOR)
-                                                                 );
+  CpuDriverEntryPointDesc = (MM_CPU_DRIVER_EP_DESCRIPTOR *)BuildGuidHob (
+                                                             &gEfiMmCpuDriverEpDescriptorGuid,
+                                                             sizeof (MM_CPU_DRIVER_EP_DESCRIPTOR)
+                                                             );
 
-  *CpuDriverEntryPoint                         = NULL;
-  CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr = CpuDriverEntryPoint;
+  *CpuDriverEntryPoint                      = NULL;
+  CpuDriverEntryPointDesc->MmCpuDriverEpPtr = CpuDriverEntryPoint;
 
   // Find the size of the GUIDed HOB with SRAM ranges
   BufferSize  = sizeof (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK);
