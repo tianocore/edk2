@@ -75,8 +75,39 @@ Below example shows how to boot openSUSE Tumbleweed E20.
     Currently, `acpi=off` is recommended unless you are developing ACPI support
     yourself.
 
+3) Running QEMU with direct kernel boot
+
+    The following example boots the same guest, but loads the kernel image and
+    the initial RAM disk (which were extracted from
+    `openSUSE-Tumbleweed-RISC-V-E20-efi.riscv64.raw`) from the host filesystem.
+    It also sets the guest kernel command line on the QEMU command line.
+
+        CMDLINE=(root=UUID=76d9b92d-09e9-4df0-8262-c1a7a466f2bc
+                 systemd.show_status=1
+                 ignore_loglevel
+                 console=ttyS0
+                 earlycon=uart8250,mmio,0x10000000)
+
+        qemu-system-riscv64 \
+        -M virt,pflash0=pflash0,pflash1=pflash1,acpi=off \
+        -m 4096 -smp 2 \
+        -serial mon:stdio \
+        -device virtio-gpu-pci -full-screen \
+        -device qemu-xhci \
+        -device usb-kbd \
+        -device virtio-rng-pci \
+        -blockdev node-name=pflash0,driver=file,read-only=on,filename=RISCV_VIRT_CODE.fd \
+        -blockdev node-name=pflash1,driver=file,filename=RISCV_VIRT_VARS.fd \
+        -netdev user,id=net0 \
+        -device virtio-net-pci,netdev=net0 \
+        -device virtio-blk-device,drive=hd0 \
+        -drive file=openSUSE-Tumbleweed-RISC-V-E20-efi.riscv64.raw,format=raw,id=hd0 \
+        -kernel Image-6.5.2-1-default \
+        -initrd initrd-6.5.2-1-default \
+        -append "${CMDLINE[*]}"
+
 ## Test with your own OpenSBI binary
-Using the above QEMU command line, **RISCV_VIRT_CODE.fd** is launched by the
+Using the above QEMU command lines, **RISCV_VIRT_CODE.fd** is launched by the
 OpenSBI binary that is bundled with QEMU. You can build your own OpenSBI binary
 as well:
 
