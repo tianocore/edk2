@@ -3068,30 +3068,28 @@ MtrrDebugPrintAllMtrrsWorker (
   )
 {
   DEBUG_CODE_BEGIN ();
+  UINT32             Index;
   MTRR_SETTINGS      LocalMtrrs;
   MTRR_SETTINGS      *Mtrrs;
-  UINTN              Index;
+  RETURN_STATUS      Status;
   UINTN              RangeCount;
-  UINT64             MtrrValidBitsMask;
-  UINT64             MtrrValidAddressMask;
-  UINT32             VariableMtrrCount;
   BOOLEAN            ContainVariableMtrr;
   MTRR_MEMORY_RANGE  Ranges[
                             ARRAY_SIZE (mMtrrLibFixedMtrrTable) * sizeof (UINT64) + 2 * ARRAY_SIZE (Mtrrs->Variables.Mtrr) + 1
   ];
-  MTRR_MEMORY_RANGE  RawVariableRanges[ARRAY_SIZE (Mtrrs->Variables.Mtrr)];
-
-  if (!IsMtrrSupported ()) {
-    return;
-  }
-
-  VariableMtrrCount = GetVariableMtrrCountWorker ();
 
   if (MtrrSetting != NULL) {
     Mtrrs = MtrrSetting;
   } else {
     MtrrGetAllMtrrs (&LocalMtrrs);
     Mtrrs = &LocalMtrrs;
+  }
+
+  RangeCount = ARRAY_SIZE (Ranges);
+  Status     = MtrrGetMemoryAttributesInMtrrSettings (Mtrrs, Ranges, &RangeCount);
+  if (RETURN_ERROR (Status)) {
+    DEBUG ((DEBUG_CACHE, "MTRR is not enabled.\n"));
+    return;
   }
 
   //
@@ -3105,7 +3103,7 @@ MtrrDebugPrintAllMtrrsWorker (
   }
 
   ContainVariableMtrr = FALSE;
-  for (Index = 0; Index < VariableMtrrCount; Index++) {
+  for (Index = 0; Index < ARRAY_SIZE (Mtrrs->Variables.Mtrr); Index++) {
     if ((Mtrrs->Variables.Mtrr[Index].Mask & BIT11) == 0) {
       //
       // If mask is not valid, then do not display range
@@ -3134,29 +3132,6 @@ MtrrDebugPrintAllMtrrsWorker (
   //
   DEBUG ((DEBUG_CACHE, "Memory Ranges:\n"));
   DEBUG ((DEBUG_CACHE, "====================================\n"));
-  MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
-  Ranges[0].BaseAddress = 0;
-  Ranges[0].Length      = MtrrValidBitsMask + 1;
-  Ranges[0].Type        = MtrrGetDefaultMemoryTypeWorker (Mtrrs);
-  RangeCount            = 1;
-
-  MtrrLibGetRawVariableRanges (
-    &Mtrrs->Variables,
-    VariableMtrrCount,
-    MtrrValidBitsMask,
-    MtrrValidAddressMask,
-    RawVariableRanges
-    );
-  MtrrLibApplyVariableMtrrs (
-    RawVariableRanges,
-    VariableMtrrCount,
-    Ranges,
-    ARRAY_SIZE (Ranges),
-    &RangeCount
-    );
-
-  MtrrLibApplyFixedMtrrs (&Mtrrs->Fixed, Ranges, ARRAY_SIZE (Ranges), &RangeCount);
-
   for (Index = 0; Index < RangeCount; Index++) {
     DEBUG ((
       DEBUG_CACHE,
