@@ -70,6 +70,11 @@ Below example shows how to boot openSUSE Tumbleweed E20.
         -device virtio-blk-device,drive=hd0 \
         -drive file=openSUSE-Tumbleweed-RISC-V-E20-efi.riscv64.raw,format=raw,id=hd0
 
+    Note: the `acpi=off` machine property is specified because Linux guest
+    support for ACPI (that is, the ACPI consumer side) is a work in progress.
+    Currently, `acpi=off` is recommended unless you are developing ACPI support
+    yourself.
+
 ## Test with your own OpenSBI binary
 Using the above QEMU command line, **RISCV_VIRT_CODE.fd** is launched by the
 OpenSBI binary that is bundled with QEMU. You can build your own OpenSBI binary
