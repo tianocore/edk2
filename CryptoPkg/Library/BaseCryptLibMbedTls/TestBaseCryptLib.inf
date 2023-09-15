@@ -27,6 +27,8 @@
 
 [Sources]
   InternalCryptLib.h
+  Cipher/CryptAeadAesGcm.c
+  Cipher/CryptAes.c
   Hash/CryptSha256.c
   Hash/CryptSha512.c
   Hash/CryptSm3Null.c
@@ -39,8 +41,6 @@
   Pk/CryptRsaPss.c
   Pk/CryptRsaPssSign.c
   Bn/CryptBnNull.c
-  Cipher/CryptAeadAesGcmNull.c
-  Cipher/CryptAesNull.c
   Pem/CryptPemNull.c
   Pk/CryptDhNull.c
   Pk/CryptEcNull.c

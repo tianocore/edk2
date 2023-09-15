@@ -37,11 +37,11 @@
   Hash/CryptParallelHashNull.c
   Hmac/CryptHmacNull.c
   Kdf/CryptHkdfNull.c
+  Cipher/CryptAesNull.c
+  Cipher/CryptAeadAesGcmNull.c
   Pk/CryptRsaBasicNull.c
   Pk/CryptRsaExtNull.c
   Bn/CryptBnNull.c
-  Cipher/CryptAeadAesGcmNull.c
-  Cipher/CryptAesNull.c
   Pem/CryptPemNull.c
   Pk/CryptDhNull.c
   Pk/CryptEcNull.c
