@@ -42,6 +42,10 @@
   #
   MemEncryptTdxLib|Include/Library/MemEncryptTdxLib.h
 
+  ## @libraryclass  Declares helper functions for parsing fw_cfg for
+  #                 the memory protection profile strings
+  MemoryProtectionConfigLib|Include/Library/MemoryProtectionConfigLib.h
+
   ##  @libraryclass  Handle TPL changes within nested interrupt handlers
   #
   NestedInterruptTplLib|Include/Library/NestedInterruptTplLib.h

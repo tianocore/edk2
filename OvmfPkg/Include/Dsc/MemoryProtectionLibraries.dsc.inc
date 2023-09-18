@@ -7,6 +7,7 @@
 #
 [LibraryClasses.common]
   SetMemoryProtectionsLib|MdeModulePkg/Library/SetMemoryProtectionsLib/SetMemoryProtectionsLib.inf
+  MemoryProtectionConfigLib|OvmfPkg/Library/MemoryProtectionConfigLib/MemoryProtectionConfigLib.inf
 
 [LibraryClasses.common.SMM_CORE, LibraryClasses.common.DXE_SMM_DRIVER, LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE]
   GetMemoryProtectionsLib|MdeModulePkg/Library/GetMemoryProtectionsLib/MmGetMemoryProtectionsLib.inf
