@@ -3679,3 +3679,87 @@ error_handler:
   AmlDeleteTree ((AML_NODE_HANDLE)CpcNode);
   return Status;
 }
+
+/** AML code generation to add a NameString to the package in a named node.
+
+
+  @param [in]  NameString     NameString to add
+  @param [in]  NamedNode      Node to add the string to the included package.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddNameStringToNamedPackage (
+  IN CHAR8                   *NameString,
+  IN AML_OBJECT_NODE_HANDLE  NamedNode
+  )
+{
+  EFI_STATUS              Status;
+  AML_DATA_NODE           *DataNode;
+  CHAR8                   *AmlNameString;
+  UINT32                  AmlNameStringSize;
+  AML_OBJECT_NODE_HANDLE  PackageNode;
+
+  DataNode = NULL;
+
+  if ((NamedNode == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)NamedNode) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (NamedNode, AML_NAME_OP, 0)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  PackageNode = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                          NamedNode,
+                                          EAmlParseIndexTerm1
+                                          );
+  if ((PackageNode == NULL)                                             ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PackageNode) != EAmlNodeObject) ||
+      (!AmlNodeHasOpCode (PackageNode, AML_PACKAGE_OP, 0)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ConvertAslNameToAmlName (NameString, &AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8 *)AmlNameString,
+             AmlNameStringSize,
+             &DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    AmlDeleteTree ((AML_NODE_HANDLE)DataNode);
+  }
+
+exit_handler:
+  if (AmlNameString != NULL) {
+    FreePool (AmlNameString);
+  }
+
+  return Status;
+}
