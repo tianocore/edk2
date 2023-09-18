@@ -869,6 +869,92 @@ AmlCodeGenNameResourceTemplate (
   return Status;
 }
 
+/** AML code generation for a Name object node, containing a String.
+
+ AmlCodeGenNameUnicodeString ("_STR", L"String", ParentNode, NewObjectNode) is
+ equivalent of the following ASL code:
+   Name(_STR, Unicode ("String"))
+
+ @ingroup CodeGenApis
+
+ @param  [in] NameString     The new variable name.
+                             Must be a NULL-terminated ASL NameString
+                             e.g.: "DEV0", "DV15.DEV0", etc.
+                             The input string is copied.
+ @param [in]  String         NULL terminated Unicode String to associate to the
+                             NameString.
+ @param [in]  ParentNode     If provided, set ParentNode as the parent
+                             of the node created.
+ @param [out] NewObjectNode  If success, contains the created node.
+
+ @retval EFI_SUCCESS             Success.
+ @retval EFI_INVALID_PARAMETER   Invalid parameter.
+ @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenNameUnicodeString (
+  IN  CONST CHAR8                   *NameString,
+  IN        CHAR16                  *String,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_DATA_NODE    *DataNode;
+
+  if ((NameString == NULL)  ||
+      (String == NULL)      ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlCodeGenBuffer (NULL, 0, &ObjectNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeRaw,
+             (CONST UINT8 *)String,
+             StrSize (String),
+             &DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
+    return Status;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HEADER *)ObjectNode,
+             (AML_NODE_HEADER *)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
+    AmlDeleteTree ((AML_NODE_HANDLE)DataNode);
+    return Status;
+  }
+
+  Status = AmlCodeGenName (
+             NameString,
+             ObjectNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
+  }
+
+  return Status;
+}
+
 /** Add a _PRT entry.
 
   AmlCodeGenPrtEntry (0x0FFFF, 0, "LNKA", 0, PrtNameNode) is
