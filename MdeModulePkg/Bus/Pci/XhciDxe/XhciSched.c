@@ -2122,6 +2122,29 @@ RingIntTransferDoorBell (
 }
 
 /**
+  Set Command abort
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be disabled.
+
+  @retval EFI_SUCCESS   Successfully disable the device slot.
+
+**/
+VOID
+XhcCmdRingCmdAbort (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId
+  )
+{
+  //
+  // Some 3rd party XHCI external cards don't support single 64-bytes width register access,
+  // So divide it to two 32-bytes width register access.
+  //
+  DEBUG ((DEBUG_INFO, "Command Ring Control set Command Abort, SlotId: %d!\n", SlotId));
+  XhcSetOpRegBit (Xhc, XHC_CRCR_OFFSET, XHC_CRCR_CA);
+}
+
+/**
   Assign and initialize the device slot for a new device.
 
   @param  Xhc                 The XHCI Instance.
@@ -2331,6 +2354,12 @@ XhcInitializeDeviceSlot (
     Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
   } else {
     DEBUG ((DEBUG_ERROR, "    Slot %d address not assigned successfully. Status = %r\n", SlotId, Status));
+    //
+    // Software need abort the command if a command times out in xHCI spec 4.6.
+    //
+    if (Status == EFI_TIMEOUT) {
+      XhcCmdRingCmdAbort (Xhc, SlotId);
+    }
     XhcDisableSlotCmd (Xhc, SlotId);
   }
 
@@ -2547,6 +2576,12 @@ XhcInitializeDeviceSlot64 (
     Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
   } else {
     DEBUG ((DEBUG_ERROR, "    Slot %d address not assigned successfully. Status = %r\n", SlotId, Status));
+    //
+    // Software need abort the command if a command times out in xHCI spec 4.6.
+    //
+    if (Status == EFI_TIMEOUT) {
+      XhcCmdRingCmdAbort (Xhc, SlotId);
+    }
     XhcDisableSlotCmd64 (Xhc, SlotId);
   }
 
