@@ -1038,6 +1038,34 @@ AmlCodeGenDevice (
   OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   );
 
+/** AML code generation for a ThermalZone object node.
+
+  AmlCodeGenThermalZone ("TZ00", ParentNode, NewObjectNode) is
+  equivalent of the following ASL code:
+    ThermalZone(TZ00) {}
+
+  @ingroup CodeGenApis
+
+  @param  [in] NameString     The new ThermalZone's name.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "DEV0", "DV15.DEV0", etc.
+                              The input string is copied.
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+  @param [out] NewObjectNode  If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenThermalZone (
+  IN  CONST CHAR8                   *NameString,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
+  );
+
 /** AML code generation for a Scope object node.
 
   AmlCodeGenScope ("_SB", ParentNode, NewObjectNode) is
