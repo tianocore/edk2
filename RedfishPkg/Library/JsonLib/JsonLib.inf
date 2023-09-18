@@ -15,6 +15,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = JsonLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = JsonLibConstructor
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
