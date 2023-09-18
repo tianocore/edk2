@@ -426,3 +426,14 @@ QemuFwCfgParseUintn (
   *Value = (UINTN)Uint64;
   return RETURN_SUCCESS;
 }
+
+RETURN_STATUS
+EFIAPI
+QemuFwCfgParseString (
+  IN     CONST CHAR8  *FileName,
+  IN OUT UINTN        *BufferSize,
+  OUT    CHAR8        *Buffer
+  )
+{
+  return QemuFwCfgGetAsString (FileName, BufferSize, Buffer);
+}
