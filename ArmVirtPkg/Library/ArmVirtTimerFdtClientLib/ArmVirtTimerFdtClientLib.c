@@ -35,6 +35,7 @@ ArmVirtTimerFdtClientLibConstructor (
   CONST INTERRUPT_PROPERTY  *InterruptProp;
   UINT32                    PropSize;
   INT32                     SecIntrNum, IntrNum, VirtIntrNum, HypIntrNum;
+  INT32                     HypVirtIntrNum;
   RETURN_STATUS             PcdStatus;
 
   Status = gBS->LocateProtocol (
@@ -66,10 +67,10 @@ ArmVirtTimerFdtClientLibConstructor (
   }
 
   //
-  // - interrupts : Interrupt list for secure, non-secure, virtual and
-  //  hypervisor timers, in that order.
+  // - interrupts : Interrupt list for secure, non-secure, virtual,
+  //  hypervisor and hypervisor virtual timers, in that order.
   //
-  ASSERT (PropSize == 36 || PropSize == 48);
+  ASSERT (PropSize >= 36);
 
   SecIntrNum = SwapBytes32 (InterruptProp[0].Number)
                + (InterruptProp[0].Type ? 16 : 0);
@@ -79,6 +80,8 @@ ArmVirtTimerFdtClientLibConstructor (
                 + (InterruptProp[2].Type ? 16 : 0);
   HypIntrNum = PropSize < 48 ? 0 : SwapBytes32 (InterruptProp[3].Number)
                + (InterruptProp[3].Type ? 16 : 0);
+  HypVirtIntrNum = PropSize < 60 ? 0 : SwapBytes32 (InterruptProp[4].Number)
+                   + (InterruptProp[4].Type ? 16 : 0);
 
   DEBUG ((
     DEBUG_INFO,
@@ -96,6 +99,8 @@ ArmVirtTimerFdtClientLibConstructor (
   PcdStatus = PcdSet32S (PcdArmArchTimerVirtIntrNum, VirtIntrNum);
   ASSERT_RETURN_ERROR (PcdStatus);
   PcdStatus = PcdSet32S (PcdArmArchTimerHypIntrNum, HypIntrNum);
+  ASSERT_RETURN_ERROR (PcdStatus);
+  PcdStatus = PcdSet32S (PcdArmArchTimerHypVirtIntrNum, HypVirtIntrNum);
   ASSERT_RETURN_ERROR (PcdStatus);
 
   return EFI_SUCCESS;
