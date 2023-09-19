@@ -253,6 +253,7 @@
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0x0
+  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
 
   #
   # ARM General Interrupt Controller
