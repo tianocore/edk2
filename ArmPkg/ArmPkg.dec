@@ -328,6 +328,7 @@
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26|UINT32|0x00000040
   gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|27|UINT32|0x00000041
+  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|28|UINT32|0x0000004A
 
   #
   # ARM Generic Watchdog
