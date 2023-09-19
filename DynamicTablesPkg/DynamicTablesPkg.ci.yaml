@@ -130,5 +130,13 @@
                                      # should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check
                                      # (wildcards supported)
+    },
+
+    "DebugMacroCheck": {
+      "StringSubstitutions": {
+          # DynamicTablesPkg/Library/Common/TableHelperLib/ConfigurationManagerObjectParser.c
+          # Reason: Debug format strings are dynamically set.
+          "Parser[Index].Format": "%d"
+      }
     }
 }

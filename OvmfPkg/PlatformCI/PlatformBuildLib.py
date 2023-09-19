@@ -170,6 +170,7 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         self.env.SetValue("PRODUCT_NAME", "OVMF", "Platform Hardcoded")
         self.env.SetValue("MAKE_STARTUP_NSH", "FALSE", "Default to false")
         self.env.SetValue("QEMU_HEADLESS", "FALSE", "Default to false")
+        self.env.SetValue("DISABLE_DEBUG_MACRO_CHECK", "TRUE", "Disable by default")
         return 0
 
     def PlatformPreBuild(self):
