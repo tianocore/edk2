@@ -106,5 +106,14 @@
 
     "Defines": {
         "BLD_*_CONTINUOUS_INTEGRATION": "TRUE",
+    },
+
+    "DebugMacroCheck": {
+      "StringSubstitutions": {
+          # SecurityPkg/IntelTdx/TdTcg2Dxe/TdTcg2Dxe.c
+          # Reason: Acknowledging use of two format specifiers in string with one argument
+          #         Replace ternary operator in debug string with single specifier
+          'Index == COLUME_SIZE/2 ? " | %02x" : " %02x"': "%d"
+      }
     }
 }
