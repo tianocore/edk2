@@ -2,6 +2,7 @@
 Implementation for handling user input from the User Interfaces.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1564,6 +1565,47 @@ TheKey:
             ASSERT (CurrentOption != NULL);
             SwapListEntries (&CurrentOption->Link, CurrentOption->Link.ForwardLink);
           }
+        }
+
+        break;
+
+      case '^':
+        if ((TopOptionIndex > 0) && (TopOptionIndex == HighlightOptionIndex)) {
+          //
+          // Highlight reaches the top of the popup window, scroll one menu item.
+          //
+          TopOptionIndex--;
+          ShowDownArrow = TRUE;
+        }
+
+        if (TopOptionIndex == 0) {
+          ShowUpArrow = FALSE;
+        }
+
+        if (HighlightOptionIndex > 0) {
+          HighlightOptionIndex--;
+        }
+
+        break;
+
+      case 'V':
+      case 'v':
+        if (((TopOptionIndex + MenuLinesInView) < PopUpMenuLines) &&
+            (HighlightOptionIndex == (TopOptionIndex + MenuLinesInView - 1)))
+        {
+          //
+          // Highlight reaches the bottom of the popup window, scroll one menu item.
+          //
+          TopOptionIndex++;
+          ShowUpArrow = TRUE;
+        }
+
+        if ((TopOptionIndex + MenuLinesInView) == PopUpMenuLines) {
+          ShowDownArrow = FALSE;
+        }
+
+        if (HighlightOptionIndex < (PopUpMenuLines - 1)) {
+          HighlightOptionIndex++;
         }
 
         break;
