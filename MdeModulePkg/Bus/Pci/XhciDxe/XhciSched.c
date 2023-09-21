@@ -2122,6 +2122,26 @@ RingIntTransferDoorBell (
 }
 
 /**
+  Set Command abort
+
+  @param  Xhc           The XHCI Instance.
+  @param  SlotId        The slot id to be disabled.
+
+**/
+VOID
+XhcCmdRingCmdAbort (
+  IN USB_XHCI_INSTANCE  *Xhc,
+  IN UINT8              SlotId
+  )
+{
+  //
+  // Set XHC_CRCR_CA bit in XHC_CRCR_OFFSET to abort command.
+  //
+  DEBUG ((DEBUG_INFO, "Command Ring Control set Command Abort, SlotId: %d\n", SlotId));
+  XhcSetOpRegBit (Xhc, XHC_CRCR_OFFSET, XHC_CRCR_CA);
+}
+
+/**
   Assign and initialize the device slot for a new device.
 
   @param  Xhc                 The XHCI Instance.
@@ -2331,6 +2351,14 @@ XhcInitializeDeviceSlot (
     Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
   } else {
     DEBUG ((DEBUG_ERROR, "    Slot %d address not assigned successfully. Status = %r\n", SlotId, Status));
+    //
+    // Software may abort the execution of Address Device Command when command failed
+    // due to timeout by following XHCI spec. 4.6.1.2.
+    //
+    if (Status == EFI_TIMEOUT) {
+      XhcCmdRingCmdAbort (Xhc, SlotId);
+    }
+
     XhcDisableSlotCmd (Xhc, SlotId);
   }
 
@@ -2547,6 +2575,14 @@ XhcInitializeDeviceSlot64 (
     Xhc->UsbDevContext[SlotId].XhciDevAddr = DeviceAddress;
   } else {
     DEBUG ((DEBUG_ERROR, "    Slot %d address not assigned successfully. Status = %r\n", SlotId, Status));
+    //
+    // Software may abort the execution of Address Device Command when command failed
+    // due to timeout by following XHCI spec. 4.6.1.2.
+    //
+    if (Status == EFI_TIMEOUT) {
+      XhcCmdRingCmdAbort (Xhc, SlotId);
+    }
+
     XhcDisableSlotCmd64 (Xhc, SlotId);
   }
 
