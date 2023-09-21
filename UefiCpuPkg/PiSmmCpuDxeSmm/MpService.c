@@ -122,6 +122,7 @@ LockdownSemaphore (
 }
 
 /**
+  Used for BSP to wait all APs.
   Wait all APs to performs an atomic compare exchange operation to release semaphore.
 
   @param   NumberOfAPs      AP number
@@ -141,6 +142,7 @@ WaitForAllAPs (
 }
 
 /**
+  Used for BSP to release all APs.
   Performs an atomic compare exchange operation to release semaphore
   for each AP.
 
@@ -157,6 +159,48 @@ ReleaseAllAPs (
       ReleaseSemaphore (mSmmMpSyncData->CpuData[Index].Run);
     }
   }
+}
+
+/**
+  Used for BSP to release one AP.
+
+  @param      ApSem     IN:  32-bit unsigned integer
+                        OUT: original integer + 1
+**/
+VOID
+ReleaseOneAp   (
+  IN OUT  volatile UINT32  *ApSem
+  )
+{
+  ReleaseSemaphore (ApSem);
+}
+
+/**
+  Used for AP to wait BSP.
+
+  @param      ApSem      IN:  32-bit unsigned integer
+                         OUT: original integer - 1
+**/
+VOID
+WaitForBsp  (
+  IN OUT  volatile UINT32  *ApSem
+  )
+{
+  WaitForSemaphore (ApSem);
+}
+
+/**
+  Used for AP to release BSP.
+
+  @param      BspSem     IN:  32-bit unsigned integer
+                         OUT: original integer + 1
+**/
+VOID
+ReleaseBsp   (
+  IN OUT  volatile UINT32  *BspSem
+  )
+{
+  ReleaseSemaphore (BspSem);
 }
 
 /**
@@ -634,7 +678,7 @@ BSPHandler (
       ReleaseAllAPs ();
 
       //
-      // WaitForSemaphore() may wait for ever if an AP happens to enter SMM at
+      // WaitForAllAPs() may wait for ever if an AP happens to enter SMM at
       // exactly this point. Please make sure PcdCpuSmmMaxSyncLoops has been set
       // to a large enough value to avoid this situation.
       // Note: For HT capable CPUs, threads within a core share the same set of MTRRs.
@@ -654,7 +698,7 @@ BSPHandler (
       ReleaseAllAPs ();
 
       //
-      // WaitForSemaphore() may wait for ever if an AP happens to enter SMM at
+      // WaitForAllAPs() may wait for ever if an AP happens to enter SMM at
       // exactly this point. Please make sure PcdCpuSmmMaxSyncLoops has been set
       // to a large enough value to avoid this situation.
       //
@@ -900,14 +944,14 @@ APHandler (
     //
     // Notify BSP of arrival at this point
     //
-    ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
+    ReleaseBsp (mSmmMpSyncData->CpuData[BspIndex].Run);
   }
 
   if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Wait for the signal from BSP to backup MTRRs
     //
-    WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
+    WaitForBsp (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
     //
     // Backup OS MTRRs
@@ -917,12 +961,12 @@ APHandler (
     //
     // Signal BSP the completion of this AP
     //
-    ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
+    ReleaseBsp (mSmmMpSyncData->CpuData[BspIndex].Run);
 
     //
     // Wait for BSP's signal to program MTRRs
     //
-    WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
+    WaitForBsp (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
     //
     // Replace OS MTRRs with SMI MTRRs
@@ -932,14 +976,14 @@ APHandler (
     //
     // Signal BSP the completion of this AP
     //
-    ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
+    ReleaseBsp (mSmmMpSyncData->CpuData[BspIndex].Run);
   }
 
   while (TRUE) {
     //
     // Wait for something to happen
     //
-    WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
+    WaitForBsp (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
     //
     // Check if BSP wants to exit SMM
@@ -979,12 +1023,12 @@ APHandler (
     //
     // Notify BSP the readiness of this AP to program MTRRs
     //
-    ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
+    ReleaseBsp (mSmmMpSyncData->CpuData[BspIndex].Run);
 
     //
     // Wait for the signal from BSP to program MTRRs
     //
-    WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
+    WaitForBsp (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
     //
     // Restore OS MTRRs
@@ -996,12 +1040,12 @@ APHandler (
   //
   // Notify BSP the readiness of this AP to Reset states/semaphore for this processor
   //
-  ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
+  ReleaseBsp (mSmmMpSyncData->CpuData[BspIndex].Run);
 
   //
   // Wait for the signal from BSP to Reset states/semaphore for this processor
   //
-  WaitForSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
+  WaitForBsp (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
   //
   // Reset states/semaphore for this processor
@@ -1011,7 +1055,7 @@ APHandler (
   //
   // Notify BSP the readiness of this AP to exit SMM
   //
-  ReleaseSemaphore (mSmmMpSyncData->CpuData[BspIndex].Run);
+  ReleaseBsp (mSmmMpSyncData->CpuData[BspIndex].Run);
 }
 
 /**
@@ -1279,7 +1323,7 @@ InternalSmmStartupThisAp (
     *mSmmMpSyncData->CpuData[CpuIndex].Status = EFI_NOT_READY;
   }
 
-  ReleaseSemaphore (mSmmMpSyncData->CpuData[CpuIndex].Run);
+  ReleaseOneAp (mSmmMpSyncData->CpuData[CpuIndex].Run);
 
   if (Token == NULL) {
     AcquireSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
