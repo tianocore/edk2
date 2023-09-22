@@ -24,6 +24,9 @@
 // Coprocessor Trap Register (CPTR)
 #define AARCH64_CPTR_TFP  (1 << 10)
 
+// ID_AA64MMFR1 - AArch64 Memory Model Feature Register 0 definitions
+#define AARCH64_MMFR1_VH  (0xF << 8)
+
 // ID_AA64PFR0 - AArch64 Processor Feature Register 0 definitions
 #define AARCH64_PFR0_FP   (0xF << 16)
 #define AARCH64_PFR0_GIC  (0xF << 24)
