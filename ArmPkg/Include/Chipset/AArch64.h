@@ -32,7 +32,8 @@
 #define AARCH64_PFR0_GIC  (0xF << 24)
 
 // ID_AA64DFR0 - AArch64 Debug Feature Register 0 definitions
-#define AARCH64_DFR0_TRBE  (0xFULL << 44)
+#define AARCH64_DFR0_TRACEVER  (0xFULL << 4)
+#define AARCH64_DFR0_TRBE      (0xFULL << 44)
 
 // SCR - Secure Configuration Register definitions
 #define SCR_NS   (1 << 0)
