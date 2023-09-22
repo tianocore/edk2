@@ -203,6 +203,13 @@ typedef struct CmArmGicCInfo {
       i.e. a token referencing a CM_ARM_CPC_INFO object.
   */
   CM_OBJECT_TOKEN    CpcToken;
+
+  /** Trace Buffer Extension interrupt GSIV. Zero if
+      unsupported by this processor. This field was introduced in
+      ACPI 6.5 (MADT revision 6) and is therefore ignored when
+      generating MADT revision 5 or lower.
+  */
+  UINT16             TrbeInterrupt;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
