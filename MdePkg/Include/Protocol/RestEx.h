@@ -131,7 +131,8 @@ typedef struct {
   response when the data is retrieved from the service. RequestMessage contains the HTTP
   request to the REST resource identified by RequestMessage.Request.Url. The
   ResponseMessage is the returned HTTP response for that request, including any HTTP
-  status.
+  status. It's caller's responsibility to free this ResponseMessage using FreePool().
+  RestConfigFreeHttpMessage() in RedfishLib is an example to release ResponseMessage structure.
 
   @param[in]  This                Pointer to EFI_REST_EX_PROTOCOL instance for a particular
                                   REST service.
