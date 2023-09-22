@@ -1778,7 +1778,17 @@ WriteSections64 (
           case R_LARCH_TLS_LD64_HI20:
           case R_LARCH_TLS_GD_PC_HI20:
           case R_LARCH_TLS_GD64_HI20:
+          case R_LARCH_32_PCREL:
           case R_LARCH_RELAX:
+          case R_LARCH_DELETE:
+          case R_LARCH_ALIGN:
+          case R_LARCH_PCREL20_S2:
+          case R_LARCH_CFA:
+          case R_LARCH_ADD6:
+          case R_LARCH_SUB6:
+          case R_LARCH_ADD_ULEB128:
+          case R_LARCH_SUB_ULEB128:
+          case R_LARCH_64_PCREL:
             //
             // These types are not used or do not require fixup.
             //
@@ -2185,7 +2195,17 @@ WriteRelocations64 (
               case R_LARCH_TLS_LD64_HI20:
               case R_LARCH_TLS_GD_PC_HI20:
               case R_LARCH_TLS_GD64_HI20:
+              case R_LARCH_32_PCREL:
               case R_LARCH_RELAX:
+              case R_LARCH_DELETE:
+              case R_LARCH_ALIGN:
+              case R_LARCH_PCREL20_S2:
+              case R_LARCH_CFA:
+              case R_LARCH_ADD6:
+              case R_LARCH_SUB6:
+              case R_LARCH_ADD_ULEB128:
+              case R_LARCH_SUB_ULEB128:
+              case R_LARCH_64_PCREL:
                 //
                 // These types are not used or do not require fixup in PE format files.
                 //
