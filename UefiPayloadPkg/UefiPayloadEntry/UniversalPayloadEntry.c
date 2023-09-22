@@ -134,6 +134,21 @@ GetDxeFv (
   return EFI_SUCCESS;
 }
 
+BOOLEAN
+IfUPLFv( CHAR8 *SectionName)
+{
+   if (AsciiStrnCmp (SectionName, ".upld.uefi_fv", AsciiStrLen (".upld.uefi_fv")) == 0) {
+      return TRUE;
+   } else if (AsciiStrnCmp (SectionName, ".upld.network_fv", AsciiStrLen (".upld.network_fv")) == 0) {
+      return TRUE;
+   } else if (AsciiStrnCmp (SectionName, ".upld.bds_fv", AsciiStrLen (".upld.bds_fv")) == 0) {
+      return TRUE;
+   } else {
+    return FALSE;
+   }
+}
+
+
 /**
   Find extra FV sections from EFL image.
 
@@ -159,6 +174,9 @@ FindExtraSection (
   EFI_HOB_FIRMWARE_VOLUME  *FvHob;
   UINT8                    *GuidHob;
   UNIVERSAL_PAYLOAD_BASE   *PayloadBase;
+  EFI_FIRMWARE_VOLUME_HEADER *UplFV = NULL;
+  EFI_PHYSICAL_ADDRESS      BaseAddress;
+  UINT64                    Length;
 
   GuidHob = GetFirstGuidHob (&gUniversalPayloadBaseGuid);
   if (GuidHob != NULL) {
@@ -218,14 +236,28 @@ FindExtraSection (
     }
 
     DEBUG ((DEBUG_INFO, "Payload Section[%d]: %a\n", Index, SectionName));
-    if (AsciiStrnCmp (SectionName, ".upld.uefi_fv", AsciiStrLen (".upld.uefi_fv")) == 0) {
+    //if (AsciiStrnCmp (SectionName, ".upld.uefi_fv", AsciiStrLen (".upld.uefi_fv")) == 0) {
+    if (IfUPLFv (SectionName)) {
+
+
       Status = GetElfSectionPos (&ElfCt, Index, &Offset, &Size);
       if (!EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_INFO, "  - Found uefi_fv section %x\n", (UINTN) (ElfCt.FileBase + Offset)));
-        *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (ElfCt.FileBase + Offset);;
-        FvHob              = GetFirstHob (EFI_HOB_TYPE_FV);
-        FvHob->BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) *DxeFv;
-        FvHob->Length      = (*DxeFv)->FvLength;
+        DEBUG ((DEBUG_INFO, "  - Found upld_fv section %x\n", (UINTN) (ElfCt.FileBase + Offset)));
+        if(UplFV == NULL){
+         *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (ElfCt.FileBase + Offset);
+        } 
+        UplFV = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (ElfCt.FileBase + Offset);
+        BaseAddress = (EFI_PHYSICAL_ADDRESS) (UINTN) UplFV;
+        Length      = UplFV->FvLength;
+        BuildFvHob (BaseAddress, Length);
+        DEBUG ((
+          DEBUG_INFO,
+          "UPL Multiple fv[%d], name :%a , Base=0x%x, size=0x%x\n",
+           Index,
+           SectionName,
+           BaseAddress,
+           Length
+         ));
       }
     }
   }
@@ -495,18 +527,22 @@ _ModuleEntryPoint (
   UNIVERSAL_PAYLOAD_DEVICE_TREE  *FdtHob;
   VOID                           *Fdt;
 #endif   
+  IoWrite8(0x80,0xCF);
 
-  mHobList = (VOID *)BootloaderParameter;
+  //mHobList = (VOID *)BootloaderParameter;
   DxeFv    = NULL;
   // Call constructor with default values for all libraries
   ProcessLibraryConstructorList ();
+  IoWrite8(0x80,0xCD);
   // Initialize floating point operating environment to be compliant with UEFI spec.
   InitializeFloatingPointUnits ();
-
+  IoWrite8(0x80,0xCC);
+#if 0
   DEBUG ((DEBUG_INFO, "Entering Universal Payload...\n"));
   DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof (UINTN)));
   DEBUG ((DEBUG_INFO, "BootloaderParameter = 0x%x\n", BootloaderParameter));
-
+#endif
+  IoWrite8(0x80,0xCB);
 #if FixedPcdGet8 (PcdUplInterface) == 0
   mHobList = (VOID *) BootloaderParameter;
 
@@ -518,12 +554,19 @@ _ModuleEntryPoint (
 #endif
 
 #if FixedPcdGet8 (PcdUplInterface) == 1 || FixedPcdGet8 (PcdUplInterface) == 2
-  DEBUG ((DEBUG_INFO, "Start parsing FDT...\n"));
+  IoWrite8(0x80,0xCA);
+
+  //DEBUG ((DEBUG_INFO, "Start parsing FDT...\n"));
   HobListPtr = UplInitHob ((VOID *) BootloaderParameter);
+  mHobList = (VOID *)HobListPtr;
+
+  IoWrite8(0x80,0xC9);
 
   GuidHob = GetFirstGuidHob (&gUniversalPayloadDeviceTreeGuid);
   ASSERT (GuidHob != NULL);
   FdtHob = (UNIVERSAL_PAYLOAD_DEVICE_TREE *) GET_GUID_HOB_DATA (GuidHob);
+
+  IoWrite8(0x80,0xC8);
 
   Fdt = (VOID *) (FdtHob->DeviceTreeAddress);
 
@@ -536,11 +579,15 @@ _ModuleEntryPoint (
   }
 #endif
 
+  IoWrite8(0x80,0xC7);
+
   // Call constructor for all libraries again since hobs were built
   ProcessLibraryConstructorList ();
 
+  IoWrite8(0x80,0xC6);
   FindExtraSection ((EFI_PHYSICAL_ADDRESS) (UINTN) _ModuleEntryPoint, &DxeFv);
 
+  IoWrite8(0x80,0xC5);
   DEBUG_CODE (
     //
     // Dump the Hobs from boot loader
@@ -549,13 +596,17 @@ _ModuleEntryPoint (
     );
 
 
+  IoWrite8(0x80,0xC4);
   // Build HOB based on information from Bootloader
-  Status = BuildUPLHobs (BootloaderParameter, &DxeFv);
-  ASSERT_EFI_ERROR (Status);
+  //Status = BuildUPLHobs ((UINTN)mHobList, &DxeFv);
+  //ASSERT_EFI_ERROR (Status);
 
+  IoWrite8(0x80,0xC3);
   FixUpPcdDatabase (DxeFv);
   Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);
   ASSERT_EFI_ERROR (Status);
+
+  IoWrite8(0x80,0xC2);
 
   //
   // Mask off all legacy 8259 interrupt sources

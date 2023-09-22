@@ -19,6 +19,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  NovaLakeBoardPkg/BoardPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -36,6 +37,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio  
+  gBoardModuleTokenSpaceGuid.PcdUplEnable                               ## CONSUMES  
 
 [Guids]
   gUniversalPayloadSerialPortInfoGuid

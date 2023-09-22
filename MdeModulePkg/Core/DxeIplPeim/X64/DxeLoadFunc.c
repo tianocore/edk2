@@ -36,8 +36,8 @@ HandOffToDxeCore (
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI  *VectorHandoffInfoPpi;
   VOID                             *GhcbBase;
   UINTN                            GhcbSize;
-  //UINT8                            *GuidHob;
-  //UNIVERSAL_PAYLOAD_DEVICE_TREE    *FdtHob;
+  UINT8                            *GuidHob;
+  UNIVERSAL_PAYLOAD_DEVICE_TREE    *FdtHob;
 
   DEBUG ((DEBUG_ERROR, "Transfer the control to the entry point of DxeCore via Mde 64bit\n:"));
   //
@@ -121,7 +121,7 @@ HandOffToDxeCore (
 
   DEBUG ((DEBUG_INFO, "End of PEI phase signal end via Mde 64bit\n:"));
 
-#if 0
+#if 1
   //
   // Get FDT blob address
   //
@@ -146,7 +146,8 @@ HandOffToDxeCore (
   //
   SwitchStack (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-    HobList.Raw,
+    //HobList.Raw,
+    (VOID *)(UINTN)FdtHob->DeviceTreeAddress,
     NULL,
     TopOfStack
     );
