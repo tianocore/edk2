@@ -59,6 +59,18 @@ typedef void *AML_DATA_NODE_HANDLE;
 
 #endif // AML_HANDLE
 
+/** Enum for ISA Ranges.
+
+  See ACPI 6.4 spec, s19.6.34 for more.
+*/
+typedef enum {
+  EAmlIsaRangeReserved = 0,   ///< Reserved.
+  EAmlIsaRangeNonIsaOnly,     ///< NonIsaOnly.
+  EAmlIsaRangeIsaOnly,        ///< IsaOnly.
+  EAmlIsaRangeEntireRange,    ///< EntireRange.
+  EAmlIsaRangeMax,            ///< Max.
+} EAML_ISA_RANGE;
+
 /** Parse the definition block.
 
   The function parses the whole AML blob. It starts with the ACPI DSDT/SSDT
@@ -471,11 +483,7 @@ AmlUpdateRdQWord (
   @param [in]  IsMinFixed           Minimum address is fixed.
   @param [in]  IsMaxFixed           Maximum address is fixed.
   @param [in]  IsPosDecode          Decode parameter
-  @param [in]  IsaRanges            Possible values are:
-                                     0-Reserved
-                                     1-NonISAOnly
-                                     2-ISAOnly
-                                     3-EntireRange
+  @param [in]  IsaRanges            Isa Range.
   @param [in]  AddressGranularity   Address granularity.
   @param [in]  AddressMinimum       Minimum address.
   @param [in]  AddressMaximum       Maximum address.
@@ -505,7 +513,7 @@ AmlCodeGenRdDWordIo (
   IN        BOOLEAN IsMinFixed,
   IN        BOOLEAN IsMaxFixed,
   IN        BOOLEAN IsPosDecode,
-  IN        UINT8 IsaRanges,
+  IN        EAML_ISA_RANGE IsaRanges,
   IN        UINT32 AddressGranularity,
   IN        UINT32 AddressMinimum,
   IN        UINT32 AddressMaximum,
@@ -702,11 +710,7 @@ AmlCodeGenRdWordBusNumber (
   @param [in]  IsMinFixed           Minimum address is fixed.
   @param [in]  IsMaxFixed           Maximum address is fixed.
   @param [in]  IsPosDecode          Decode parameter
-  @param [in]  IsaRanges            Possible values are:
-                                     0-Reserved
-                                     1-NonISAOnly
-                                     2-ISAOnly
-                                     3-EntireRange
+  @param [in]  IsaRanges            Isa Range.
   @param [in]  AddressGranularity   Address granularity.
   @param [in]  AddressMinimum       Minimum address.
   @param [in]  AddressMaximum       Maximum address.
@@ -736,7 +740,7 @@ AmlCodeGenRdQWordIo (
   IN        BOOLEAN IsMinFixed,
   IN        BOOLEAN IsMaxFixed,
   IN        BOOLEAN IsPosDecode,
-  IN        UINT8 IsaRanges,
+  IN        EAML_ISA_RANGE IsaRanges,
   IN        UINT64 AddressGranularity,
   IN        UINT64 AddressMinimum,
   IN        UINT64 AddressMaximum,

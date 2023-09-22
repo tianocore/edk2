@@ -545,7 +545,7 @@ GeneratePciCrs (
                    TRUE,
                    TRUE,
                    IsPosDecode,
-                   3,
+                   EAmlIsaRangeEntireRange,
                    0,
                    AddrMapInfo->PciAddress,
                    AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1,

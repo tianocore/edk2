@@ -121,13 +121,13 @@ STATIC
 UINT8
 EFIAPI
 RdIoRangeSpecificFlags (
-  IN  UINT8    IsaRanges,
-  IN  BOOLEAN  IsDenseTranslation,
-  IN  BOOLEAN  IsTypeStatic
+  IN  EAML_ISA_RANGE  IsaRanges,
+  IN  BOOLEAN         IsDenseTranslation,
+  IN  BOOLEAN         IsTypeStatic
   )
 {
   // Only check type specific parameters.
-  if (IsaRanges > 3) {
+  if (IsaRanges >= EAmlIsaRangeMax) {
     ASSERT (0);
     return MAX_UINT8;
   }
@@ -440,20 +440,16 @@ AmlCodeGenRdDWordSpace (
   @param [in]  IsMinFixed           Minimum address is fixed.
   @param [in]  IsMaxFixed           Maximum address is fixed.
   @param [in]  IsPosDecode          Decode parameter
-  @param [in]  IsaRanges            Possible values are:
-                                     0-Reserved
-                                     1-NonISAOnly
-                                     2-ISAOnly
-                                     3-EntireRange
+  @param [in]  IsaRanges            Isa Range.
   @param [in]  AddressGranularity   Address granularity.
   @param [in]  AddressMinimum       Minimum address.
   @param [in]  AddressMaximum       Maximum address.
   @param [in]  AddressTranslation   Address translation.
   @param [in]  RangeLength          Range length.
   @param [in]  ResourceSourceIndex  Resource Source index.
-                                    Unused. Must be 0.
+                                    Not supported. Must be 0.
   @param [in]  ResourceSource       Resource Source.
-                                    Unused. Must be NULL.
+                                    Not supported. Must be NULL.
   @param [in]  IsDenseTranslation   TranslationDensity parameter.
   @param [in]  IsTypeStatic         TranslationType parameter.
   @param [in]  NameOpNode           NameOp object node defining a named object.
@@ -474,7 +470,7 @@ AmlCodeGenRdDWordIo (
   IN        BOOLEAN IsMinFixed,
   IN        BOOLEAN IsMaxFixed,
   IN        BOOLEAN IsPosDecode,
-  IN        UINT8 IsaRanges,
+  IN        EAML_ISA_RANGE IsaRanges,
   IN        UINT32 AddressGranularity,
   IN        UINT32 AddressMinimum,
   IN        UINT32 AddressMaximum,
@@ -1031,11 +1027,7 @@ AmlCodeGenRdQWordSpace (
   @param [in]  IsMinFixed           Minimum address is fixed.
   @param [in]  IsMaxFixed           Maximum address is fixed.
   @param [in]  IsPosDecode          Decode parameter
-  @param [in]  IsaRanges            Possible values are:
-                                     0-Reserved
-                                     1-NonISAOnly
-                                     2-ISAOnly
-                                     3-EntireRange
+  @param [in]  IsaRanges            Isa Range.
   @param [in]  AddressGranularity   Address granularity.
   @param [in]  AddressMinimum       Minimum address.
   @param [in]  AddressMaximum       Maximum address.
@@ -1065,7 +1057,7 @@ AmlCodeGenRdQWordIo (
   IN        BOOLEAN IsMinFixed,
   IN        BOOLEAN IsMaxFixed,
   IN        BOOLEAN IsPosDecode,
-  IN        UINT8 IsaRanges,
+  IN        EAML_ISA_RANGE IsaRanges,
   IN        UINT64 AddressGranularity,
   IN        UINT64 AddressMinimum,
   IN        UINT64 AddressMaximum,
