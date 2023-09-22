@@ -1,11 +1,11 @@
 /** @file
   FADT Table Generator
 
-  Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.
+  Copyright (c) 2017 - 2023, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-  - ACPI 6.4 Specification, January 2021
+  - ACPI 6.5 Specification, Aug 29, 2022
 
 **/
 
@@ -32,8 +32,8 @@ Requirements:
 
 /** This macro defines the FADT flag options for ARM Platforms.
 */
-#define FADT_FLAGS  (EFI_ACPI_6_4_HW_REDUCED_ACPI |          \
-                     EFI_ACPI_6_4_LOW_POWER_S0_IDLE_CAPABLE)
+#define FADT_FLAGS  (EFI_ACPI_6_5_HW_REDUCED_ACPI |          \
+                     EFI_ACPI_6_5_LOW_POWER_S0_IDLE_CAPABLE)
 
 /** This macro defines the valid mask for the FADT flag option
     if HW_REDUCED_ACPI flag in the table is set.
@@ -42,47 +42,47 @@ Requirements:
     22-31 (reserved).
 
   Valid bits are:
-    EFI_ACPI_6_4_WBINVD                               BIT0
-    EFI_ACPI_6_4_PWR_BUTTON                           BIT4
-    EFI_ACPI_6_4_SLP_BUTTON                           BIT5
-    EFI_ACPI_6_4_FIX_RTC                              BIT6
-    EFI_ACPI_6_4_DCK_CAP                              BIT9
-    EFI_ACPI_6_4_RESET_REG_SUP                        BIT10
-    EFI_ACPI_6_4_SEALED_CASE                          BIT11
-    EFI_ACPI_6_4_HEADLESS                             BIT12
-    EFI_ACPI_6_4_USE_PLATFORM_CLOCK                   BIT15
-    EFI_ACPI_6_4_FORCE_APIC_CLUSTER_MODEL             BIT18
-    EFI_ACPI_6_4_FORCE_APIC_PHYSICAL_DESTINATION_MODE BIT19
-    EFI_ACPI_6_4_HW_REDUCED_ACPI                      BIT20
-    EFI_ACPI_6_4_LOW_POWER_S0_IDLE_CAPABLE            BIT21
+    EFI_ACPI_6_5_WBINVD                               BIT0
+    EFI_ACPI_6_5_PWR_BUTTON                           BIT4
+    EFI_ACPI_6_5_SLP_BUTTON                           BIT5
+    EFI_ACPI_6_5_FIX_RTC                              BIT6
+    EFI_ACPI_6_5_DCK_CAP                              BIT9
+    EFI_ACPI_6_5_RESET_REG_SUP                        BIT10
+    EFI_ACPI_6_5_SEALED_CASE                          BIT11
+    EFI_ACPI_6_5_HEADLESS                             BIT12
+    EFI_ACPI_6_5_USE_PLATFORM_CLOCK                   BIT15
+    EFI_ACPI_6_5_FORCE_APIC_CLUSTER_MODEL             BIT18
+    EFI_ACPI_6_5_FORCE_APIC_PHYSICAL_DESTINATION_MODE BIT19
+    EFI_ACPI_6_5_HW_REDUCED_ACPI                      BIT20
+    EFI_ACPI_6_5_LOW_POWER_S0_IDLE_CAPABLE            BIT21
 */
 #define VALID_HARDWARE_REDUCED_FLAG_MASK  (                   \
-          EFI_ACPI_6_4_WBINVD                               | \
-          EFI_ACPI_6_4_PWR_BUTTON                           | \
-          EFI_ACPI_6_4_SLP_BUTTON                           | \
-          EFI_ACPI_6_4_FIX_RTC                              | \
-          EFI_ACPI_6_4_DCK_CAP                              | \
-          EFI_ACPI_6_4_RESET_REG_SUP                        | \
-          EFI_ACPI_6_4_SEALED_CASE                          | \
-          EFI_ACPI_6_4_HEADLESS                             | \
-          EFI_ACPI_6_4_USE_PLATFORM_CLOCK                   | \
-          EFI_ACPI_6_4_FORCE_APIC_CLUSTER_MODEL             | \
-          EFI_ACPI_6_4_FORCE_APIC_PHYSICAL_DESTINATION_MODE | \
-          EFI_ACPI_6_4_HW_REDUCED_ACPI                      | \
-          EFI_ACPI_6_4_LOW_POWER_S0_IDLE_CAPABLE)
+          EFI_ACPI_6_5_WBINVD                               | \
+          EFI_ACPI_6_5_PWR_BUTTON                           | \
+          EFI_ACPI_6_5_SLP_BUTTON                           | \
+          EFI_ACPI_6_5_FIX_RTC                              | \
+          EFI_ACPI_6_5_DCK_CAP                              | \
+          EFI_ACPI_6_5_RESET_REG_SUP                        | \
+          EFI_ACPI_6_5_SEALED_CASE                          | \
+          EFI_ACPI_6_5_HEADLESS                             | \
+          EFI_ACPI_6_5_USE_PLATFORM_CLOCK                   | \
+          EFI_ACPI_6_5_FORCE_APIC_CLUSTER_MODEL             | \
+          EFI_ACPI_6_5_FORCE_APIC_PHYSICAL_DESTINATION_MODE | \
+          EFI_ACPI_6_5_HW_REDUCED_ACPI                      | \
+          EFI_ACPI_6_5_LOW_POWER_S0_IDLE_CAPABLE)
 
 #pragma pack(1)
 
-/** The AcpiFadt is a template EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE
+/** The AcpiFadt is a template EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE
     structure used for generating the FADT Table.
   Note: fields marked with "{Template}" will be updated dynamically.
 */
 STATIC
-EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
+EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
   ACPI_HEADER (
-    EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
-    EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE,
-    EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_REVISION
+    EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+    EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE,
+    EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE_REVISION
     ),
   // UINT32     FirmwareCtrl
   0,
@@ -91,7 +91,7 @@ EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
   // UINT8      Reserved0
   EFI_ACPI_RESERVED_BYTE,
   // UINT8      PreferredPmProfile
-  EFI_ACPI_6_4_PM_PROFILE_UNSPECIFIED,  // {Template}: Power Management Profile
+  EFI_ACPI_6_5_PM_PROFILE_UNSPECIFIED,  // {Template}: Power Management Profile
   // UINT16     SciInt
   0,
   // UINT32     SmiCmd
@@ -160,37 +160,37 @@ EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
   0,
   // UINT32     Flags
   FADT_FLAGS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  ResetReg
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  ResetReg
   NULL_GAS,
   // UINT8      ResetValue
   0,
   // UINT16     ArmBootArch
-  EFI_ACPI_6_4_ARM_PSCI_COMPLIANT,  // {Template}: ARM Boot Architecture Flags
+  EFI_ACPI_6_5_ARM_PSCI_COMPLIANT,  // {Template}: ARM Boot Architecture Flags
   // UINT8      MinorRevision
-  EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION, // {Template}
+  EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION, // {Template}
   // UINT64     XFirmwareCtrl
   0,
   // UINT64     XDsdt
   0,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  XPm1aEvtBlk
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm1aEvtBlk
   NULL_GAS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  XPm1bEvtBlk
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm1bEvtBlk
   NULL_GAS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  XPm1aCntBlk
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm1aCntBlk
   NULL_GAS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  XPm1bCntBlk
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm1bCntBlk
   NULL_GAS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  XPm2CntBlk
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPm2CntBlk
   NULL_GAS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  XPmTmrBlk
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XPmTmrBlk
   NULL_GAS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  XGpe0Blk
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XGpe0Blk
   NULL_GAS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  XGpe1Blk
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  XGpe1Blk
   NULL_GAS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  SleepControlReg
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  SleepControlReg
   NULL_GAS,
-  // EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE  SleepStatusReg
+  // EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  SleepStatusReg
   NULL_GAS,
   // UINT64     HypervisorVendorIdentity
   EFI_ACPI_RESERVED_QWORD  // {Template}: Hypervisor Vendor ID
@@ -535,7 +535,7 @@ BuildFadtTable (
              This,
              (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiFadt,
              AcpiTableInfo,
-             sizeof (EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE)
+             sizeof (EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE)
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -557,7 +557,7 @@ BuildFadtTable (
     if (((AcpiTableInfo->MinorRevision & 0xF) >=
          EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION) &&
         ((AcpiTableInfo->MinorRevision & 0xF) <=
-         EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION))
+         EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION))
     {
       AcpiFadt.MinorVersion = AcpiTableInfo->MinorRevision;
     } else {
@@ -566,7 +566,7 @@ BuildFadtTable (
         "WARNING: FADT: Unsupported FADT Minor Revision 0x%x specified, " \
         "defaulting to FADT Minor Revision 0x%x\n",
         AcpiTableInfo->MinorRevision,
-        EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION
+        EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION
         ));
     }
   }
@@ -642,9 +642,9 @@ ACPI_TABLE_GENERATOR  FadtGenerator = {
   // Generator Description
   L"ACPI.STD.FADT.GENERATOR",
   // ACPI Table Signature
-  EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+  EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
   // ACPI Table Revision supported by this Generator
-  EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
+  EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
   // Minimum supported ACPI Table Revision
   EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
   // Creator ID
