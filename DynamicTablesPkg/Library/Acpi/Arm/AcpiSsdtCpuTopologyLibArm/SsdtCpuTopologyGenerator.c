@@ -1298,7 +1298,7 @@ CreateTopologyFromGicC (
 
     // If a CPC info is associated with the
     // GicCinfo, create an _CPC method returning them.
-    if (GicCInfo->CpcToken != CM_NULL_TOKEN) {
+    if (GicCInfo[Index].CpcToken != CM_NULL_TOKEN) {
       Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, &GicCInfo[Index], CpuNode);
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
