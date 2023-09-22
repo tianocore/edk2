@@ -8,7 +8,7 @@
   This code produces 128 K of temporary memory for the SEC stack by directly
   allocate memory space with ReadWrite and Execute attribute.
 
-Copyright (c) 2006 - 2022, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016-2020 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -977,7 +977,7 @@ AddModHandle (
   for (Index = 0; Index < mPdbNameModHandleArraySize; Index++, Array++) {
     if (Array->PdbPointer == NULL) {
       //
-      // Make a copy of the stirng and store the ModHandle
+      // Make a copy of the string and store the ModHandle
       //
       Handle            = GetProcessHeap ();
       Size              = AsciiStrLen (ImageContext->PdbPointer) + 1;
@@ -1056,26 +1056,45 @@ RemoveModHandle (
   return NULL;
 }
 
+typedef struct {
+  UINTN   Base;
+  UINT32  Size;
+  UINT32  Flags;
+} IMAGE_SECTION_DATA;
+
 VOID
 EFIAPI
 PeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  EFI_STATUS  Status;
-  VOID        *DllEntryPoint;
-  CHAR16      *DllFileName;
-  HMODULE     Library;
-  UINTN       Index;
+  EFI_STATUS                          Status;
+  VOID                                *DllEntryPoint;
+  CHAR16                              *DllFileName;
+  HMODULE                             Library;
+  UINTN                               Index;
+  PE_COFF_LOADER_IMAGE_CONTEXT        PeCoffImageContext;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION Hdr;
+  EFI_IMAGE_SECTION_HEADER            *FirstSection;
+  EFI_IMAGE_SECTION_HEADER            *Section;
+  IMAGE_SECTION_DATA                  *SectionData;
+  UINTN                               NumberOfSections;
+  UINTN                               Base;
+  UINTN                               End;
+  UINTN                               RegionBase;
+  UINTN                               RegionSize;
+  UINT32                              Flags;
+  DWORD                               NewProtection;
+  DWORD                               OldProtection;
 
   ASSERT (ImageContext != NULL);
   //
-  // If we load our own PE COFF images the Windows debugger can not source
-  //  level debug our code. If a valid PDB pointer exists use it to load
-  //  the *.dll file as a library using Windows* APIs. This allows
-  //  source level debug. The image is still loaded and relocated
-  //  in the Framework memory space like on a real system (by the code above),
-  //  but the entry point points into the DLL loaded by the code below.
+  // If we load our own PE/COFF images the Windows debugger can not source
+  // level debug our code. If a valid PDB pointer exists use it to load
+  // the *.dll file as a library using Windows* APIs. This allows
+  // source level debug. The image is still loaded and relocated
+  // in the Framework memory space like on a real system (by the code above),
+  // but the entry point points into the DLL loaded by the code below.
   //
 
   DllEntryPoint = NULL;
@@ -1106,27 +1125,166 @@ PeCoffLoaderRelocateImageExtraAction (
     }
 
     //
-    // Replace .PDB with .DLL on the filename
+    // Replace .PDB with .DLL in the filename
     //
     DllFileName[Index - 3] = 'D';
     DllFileName[Index - 2] = 'L';
     DllFileName[Index - 1] = 'L';
 
     //
-    // Load the .DLL file into the user process's address space for source
-    // level debug
+    // Load the .DLL file into the process's address space for source level
+    // debug.
+    //
+    // EFI modules use the PE32 entry point for a different purpose than
+    // Windows. For Windows DLLs, the PE entry point is used for the DllMain()
+    // function. DllMain() has a very specific purpose; it initializes runtime
+    // libraries, instance data, and thread local storage. LoadLibrary()/
+    // LoadLibraryEx() will run the PE32 entry point and assume it to be a
+    // DllMain() implementation by default. By passing the
+    // DONT_RESOLVE_DLL_REFERENCES argument to LoadLibraryEx(), the execution
+    // of the entry point as a DllMain() function will be suppressed. This
+    // also prevents other modules that are referenced by the DLL from being
+    // loaded. We use LoadLibraryEx() to create a copy of the PE32
+    // image that the OS (and therefore the debugger) is aware of.
+    // Source level debugging is the only reason to do this.
     //
     Library = LoadLibraryEx (DllFileName, NULL, DONT_RESOLVE_DLL_REFERENCES);
     if (Library != NULL) {
       //
-      // InitializeDriver is the entry point we put in all our EFI DLL's. The
-      // DONT_RESOLVE_DLL_REFERENCES argument to LoadLIbraryEx() suppresses the
-      // normal DLL entry point of DllMain, and prevents other modules that are
-      // referenced in side the DllFileName from being loaded. There is no error
-      // checking as the we can point to the PE32 image loaded by Tiano. This
-      // step is only needed for source level debugging
+      // Parse the PE32 image loaded by the OS and find the entry point
       //
-      DllEntryPoint = (VOID *)(UINTN)GetProcAddress (Library, "InitializeDriver");
+      ZeroMem (&PeCoffImageContext, sizeof (PeCoffImageContext));
+      PeCoffImageContext.Handle = Library;
+      PeCoffImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
+      Status = PeCoffLoaderGetImageInfo (&PeCoffImageContext);
+      if (EFI_ERROR (Status) || (PeCoffImageContext.ImageError != IMAGE_ERROR_SUCCESS)) {
+        SecPrint ("DLL is not a valid PE/COFF image.\n\r");
+        FreeLibrary (Library);
+        Library = NULL;
+      } else {
+        Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Library + (UINTN)PeCoffImageContext.PeCoffHeaderOffset);
+        if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+          //
+          // Use PE32 offset
+          //
+          DllEntryPoint = (VOID *) ((UINTN)Library + (UINTN)Hdr.Pe32->OptionalHeader.AddressOfEntryPoint);
+        } else {
+          //
+          // Use PE32+ offset
+          //
+          DllEntryPoint = (VOID *) ((UINTN)Library + (UINTN)Hdr.Pe32Plus->OptionalHeader.AddressOfEntryPoint);
+        }
+        //
+        // Now we need to configure memory access for the copy of the PE32 image
+        // loaded by the OS.
+        //
+        // Most Windows DLLs are linked with sections 4KB aligned but EFI
+        // modules are not to reduce size. Because of this we need to compute
+        // the union of memory access attributes and explicitly configure
+        // each page.
+        //
+        FirstSection = (EFI_IMAGE_SECTION_HEADER *)(
+                                            (UINTN)Library +
+                                            PeCoffImageContext.PeCoffHeaderOffset +
+                                            sizeof (UINT32) +
+                                            sizeof (EFI_IMAGE_FILE_HEADER) +
+                                            Hdr.Pe32->FileHeader.SizeOfOptionalHeader
+                                            );
+        NumberOfSections = (UINTN)(Hdr.Pe32->FileHeader.NumberOfSections);
+        Section = FirstSection;
+        SectionData = malloc (NumberOfSections * sizeof (IMAGE_SECTION_DATA));
+        if (SectionData == NULL) {
+          FreeLibrary (Library);
+          Library = NULL;
+          DllEntryPoint = NULL;
+        }
+        ZeroMem (SectionData, NumberOfSections * sizeof (IMAGE_SECTION_DATA));
+        //
+        // Extract the section data from the PE32 image
+        //
+        for (Index = 0; Index < NumberOfSections; Index++) {
+          SectionData[Index].Base = (UINTN)Library + Section->VirtualAddress;
+          SectionData[Index].Size = Section->Misc.VirtualSize;
+          if (SectionData[Index].Size == 0) {
+            SectionData[Index].Size = Section->SizeOfRawData;
+          }
+          SectionData[Index].Flags = (Section->Characteristics &
+                                      (EFI_IMAGE_SCN_MEM_EXECUTE | EFI_IMAGE_SCN_MEM_WRITE));
+          Section += 1;
+        }
+        //
+        // Loop over every DWORD in memory and compute the union of the memory
+        // access bits.
+        //
+        End = (UINTN)Library + (UINTN)PeCoffImageContext.ImageSize;
+        RegionBase = (UINTN)Library;
+        RegionSize = 0;
+        Flags = 0;
+        for (Base = (UINTN)Library + sizeof (UINT32); Base < End; Base += sizeof (UINT32)) {
+          for (Index = 0; Index < NumberOfSections; Index++) {
+            if (SectionData[Index].Base <= Base &&
+                (SectionData[Index].Base + SectionData[Index].Size) > Base) {
+              Flags |= SectionData[Index].Flags;
+            }
+          }
+          //
+          // When a new page is reached configure the memory access for the
+          // previous page.
+          //
+          if (Base % SIZE_4KB == 0) {
+            RegionSize += SIZE_4KB;
+            if ((Flags & EFI_IMAGE_SCN_MEM_WRITE) == EFI_IMAGE_SCN_MEM_WRITE) {
+              if ((Flags & EFI_IMAGE_SCN_MEM_EXECUTE) == EFI_IMAGE_SCN_MEM_EXECUTE) {
+                NewProtection = PAGE_EXECUTE_READWRITE;
+              } else {
+                NewProtection = PAGE_READWRITE;
+              }
+            } else {
+              if ((Flags & EFI_IMAGE_SCN_MEM_EXECUTE) == EFI_IMAGE_SCN_MEM_EXECUTE) {
+                NewProtection = PAGE_EXECUTE_READ;
+              } else {
+                NewProtection = PAGE_READONLY;
+              }
+            }
+            if (!VirtualProtect ((LPVOID)RegionBase, (SIZE_T) RegionSize, NewProtection, &OldProtection)) {
+              SecPrint ("Setting PE32 Section Access Failed\n\r");
+              FreeLibrary (Library);
+              free (SectionData);
+              Library = NULL;
+              DllEntryPoint = NULL;
+              break;
+            }
+            Flags = 0;
+            RegionBase = Base;
+            RegionSize = 0;
+          }
+        }
+        free (SectionData);
+        //
+        // Configure the last partial page
+        //
+        if (Library != NULL && (End - RegionBase) > 0) {
+          if ((Flags & EFI_IMAGE_SCN_MEM_WRITE) == EFI_IMAGE_SCN_MEM_WRITE) {
+            if ((Flags & EFI_IMAGE_SCN_MEM_EXECUTE) == EFI_IMAGE_SCN_MEM_EXECUTE) {
+              NewProtection = PAGE_EXECUTE_READWRITE;
+            } else {
+              NewProtection = PAGE_READWRITE;
+            }
+          } else {
+            if ((Flags & EFI_IMAGE_SCN_MEM_EXECUTE) == EFI_IMAGE_SCN_MEM_EXECUTE) {
+              NewProtection = PAGE_EXECUTE_READ;
+            } else {
+              NewProtection = PAGE_READONLY;
+            }
+          }
+          if (!VirtualProtect ((LPVOID)RegionBase, (SIZE_T) (End - RegionBase), NewProtection, &OldProtection)) {
+            SecPrint ("Setting PE32 Section Access Failed\n\r");
+            FreeLibrary (Library);
+            Library = NULL;
+            DllEntryPoint = NULL;
+          }
+        }
+      }
     }
 
     if ((Library != NULL) && (DllEntryPoint != NULL)) {
@@ -1142,7 +1300,7 @@ PeCoffLoaderRelocateImageExtraAction (
         // This DLL is not already loaded, so source level debugging is supported.
         //
         ImageContext->EntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)DllEntryPoint;
-        SecPrint ("LoadLibraryEx (\n\r  %S,\n\r  NULL, DONT_RESOLVE_DLL_REFERENCES)\n\r", DllFileName);
+        SecPrint ("LoadLibraryEx (\n\r  %S,\n\r  NULL, DONT_RESOLVE_DLL_REFERENCES) @ 0x%X\n\r", DllFileName, (int) (UINTN) Library);
       }
     } else {
       SecPrint ("WARNING: No source level debug %S. \n\r", DllFileName);
