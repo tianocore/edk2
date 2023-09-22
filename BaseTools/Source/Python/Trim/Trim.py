@@ -281,10 +281,10 @@ def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None, Inclu
                         F = File.readlines()
                 break
         else:
-            EdkLogger.warn("Trim", "Failed to find include file %s" % Source)
+            EdkLogger.error("Trim", "Failed to find include file %s" % Source)
             return []
     except:
-        EdkLogger.warn("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
+        EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
         return []
 
 
