@@ -1,7 +1,7 @@
 /** @file
   MADT table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2023, ARM Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -98,6 +98,48 @@ ValidateSpeOverflowInterrupt (
 }
 
 /**
+  This function validates the TRBE Interrupt in the GICC.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
+STATIC
+VOID
+EFIAPI
+ValidateTrbeInterrupt (
+  IN UINT8  *Ptr,
+  IN VOID   *Context
+  )
+{
+  UINT16  TrbeInterrupt;
+
+  TrbeInterrupt = *(UINT16 *)Ptr;
+
+  // SPE not supported by this processor
+  if (TrbeInterrupt == 0) {
+    return;
+  }
+
+  if ((TrbeInterrupt < ARM_PPI_ID_MIN) ||
+      ((TrbeInterrupt > ARM_PPI_ID_MAX) &&
+       (TrbeInterrupt < ARM_PPI_ID_EXTENDED_MIN)) ||
+      (TrbeInterrupt > ARM_PPI_ID_EXTENDED_MAX))
+  {
+    IncrementErrorCount ();
+    Print (
+      L"\nERROR: TRBE Interrupt ID of %d is not in the allowed PPI ID "
+      L"ranges of %d-%d or %d-%d (for GICv3.1 or later).",
+      TrbeInterrupt,
+      ARM_PPI_ID_MIN,
+      ARM_PPI_ID_MAX,
+      ARM_PPI_ID_EXTENDED_MIN,
+      ARM_PPI_ID_EXTENDED_MAX
+      );
+  }
+}
+
+/**
   An ACPI_PARSER array describing the GICC Interrupt Controller Structure.
 **/
 STATIC CONST ACPI_PARSER  GicCParser[] = {
@@ -122,7 +164,9 @@ STATIC CONST ACPI_PARSER  GicCParser[] = {
     NULL },
   { L"Reserved",                         1, 77, L"0x%x",  NULL, NULL, NULL, NULL },
   { L"SPE overflow Interrupt",           2, 78, L"0x%x",  NULL, NULL,
-    ValidateSpeOverflowInterrupt, NULL }
+    ValidateSpeOverflowInterrupt, NULL },
+  { L"TRBE Interrupt",                   2, 80, L"0x%x",  NULL, NULL,
+    ValidateTrbeInterrupt, NULL }
 };
 
 /**
