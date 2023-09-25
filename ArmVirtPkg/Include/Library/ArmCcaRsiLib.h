@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac2
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac3
      (https://developer.arm.com/documentation/den0137/)
 **/
 
@@ -90,6 +90,29 @@
   RMM Specification, version 1.0-eac2
 */
 #define RIPAS_CHANGE_FLAGS_RSI_CHANGE_DESTROYED  1
+
+/* The RsiResponse type is a value returned by the
+   RSI_IPA_STATE_SET command and represents whether
+   the Host accepted or rejected a Realm request.
+   See section B4.4.6 RsiResponse type in the
+   RMM Specification, version 1.0-eac3.
+   The width of the RsiResponse enumeration is 1 bit
+   and the following macros prefixed RIPAS_CHANGE_RESPONSE_xxx
+   define the values of the RsiResponse type.
+*/
+
+/* The RIPAS change request to RAM was accepted
+   by the host.
+*/
+#define RIPAS_CHANGE_RESPONSE_ACCEPT  0
+
+/* The RIPAS change request to RAM was rejected
+   by the host.
+*/
+#define RIPAS_CHANGE_RESPONSE_REJECT  1
+
+/* A mask for the RSI Response bit */
+#define RSI_RESPONSE_MASK  BIT0
 
 /** An enum describing the RSI RIPAS.
    See Section A5.2.2 Realm IPA state, RMM Specification, version 1.0-eac2
@@ -209,6 +232,7 @@ RsiGetIpaState (
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_ACCESS_DENIED      RIPAS change request was rejected.
 **/
 RETURN_STATUS
 EFIAPI
