@@ -1,0 +1,13 @@
+## @file CodeQlBuild_plug_in.py
+#
+# Build plugin used to produce a CodeQL database from a build.
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+{
+  "scope": "codeql-build",
+  "name": "CodeQL Build Plugin",
+  "module": "CodeQlBuildPlugin"
+}

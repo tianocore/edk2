@@ -1,0 +1,24 @@
+## @file codeqlcli_windows_ext_dep.yaml
+#
+# Downloads the Windows CodeQL Command-Line Interface (CLI) application.
+#
+# This download only supports Windows. In an environment where a platform might build in different operating
+# systems, it is recommended to set the scope for the appropriate CodeQL external dependency based on the
+# host operating system being used.
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+{
+  "scope": "codeql-windows-ext-dep",
+  "type": "web",
+  "name": "codeql_windows_cli",
+  "source": "https://github.com/github/codeql-cli-binaries/releases/download/v2.14.5/codeql-win64.zip",
+  "version": "2.14.5",
+  "sha256": "861fcb38365cc311efee0c3a28c77494e93c69a969885b72e53173ad473f61aa",
+  "compression_type": "zip",
+  "internal_path": "/codeql/",
+  "flags": ["set_shell_var", ],
+  "var_name": "STUART_CODEQL_PATH"
+}
