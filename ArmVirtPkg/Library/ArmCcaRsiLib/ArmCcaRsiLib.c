@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac2
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac3
      (https://developer.arm.com/documentation/den0137/)
 
 **/
@@ -322,6 +322,7 @@ RsiGetIpaState (
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_ACCESS_DENIED      RIPAS change request was rejected.
 **/
 RETURN_STATUS
 EFIAPI
@@ -365,6 +366,11 @@ RsiSetIpaState (
 
     BaseAddress = (UINT64 *)SmcCmd.Arg1;
     Size        = EndAddress - BaseAddress;
+
+    if ((SmcCmd.Arg2 & RSI_RESPONSE_MASK) == RIPAS_CHANGE_RESPONSE_REJECT) {
+      Status = RETURN_ACCESS_DENIED;
+      break;
+    }
   }   // while
 
   return Status;
