@@ -1,7 +1,7 @@
 /** @file
   Ia32-specific functionality for DxeLoad.
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -279,7 +279,7 @@ HandOffToDxeCore (
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     //
     // Compute the top of the stack we were allocated, which is used to load X64 dxe core.
-    // Pre-allocate a 32 bytes which confroms to x64 calling convention.
+    // Pre-allocate a 32 bytes which conforms to x64 calling convention.
     //
     // The first four parameters to a function are passed in rcx, rdx, r8 and r9.
     // Any further parameters are pushed on the stack. Furthermore, space (4 * 8bytes) for the
