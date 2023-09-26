@@ -869,6 +869,92 @@ AmlCodeGenNameResourceTemplate (
   return Status;
 }
 
+/** AML code generation for a Name object node, containing a String.
+
+ AmlCodeGenNameUnicodeString ("_STR", L"String", ParentNode, NewObjectNode) is
+ equivalent of the following ASL code:
+   Name(_STR, Unicode ("String"))
+
+ @ingroup CodeGenApis
+
+ @param  [in] NameString     The new variable name.
+                             Must be a NULL-terminated ASL NameString
+                             e.g.: "DEV0", "DV15.DEV0", etc.
+                             The input string is copied.
+ @param [in]  String         NULL terminated Unicode String to associate to the
+                             NameString.
+ @param [in]  ParentNode     If provided, set ParentNode as the parent
+                             of the node created.
+ @param [out] NewObjectNode  If success, contains the created node.
+
+ @retval EFI_SUCCESS             Success.
+ @retval EFI_INVALID_PARAMETER   Invalid parameter.
+ @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenNameUnicodeString (
+  IN  CONST CHAR8                   *NameString,
+  IN        CHAR16                  *String,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_DATA_NODE    *DataNode;
+
+  if ((NameString == NULL)  ||
+      (String == NULL)      ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlCodeGenBuffer (NULL, 0, &ObjectNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeRaw,
+             (CONST UINT8 *)String,
+             StrSize (String),
+             &DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
+    return Status;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HEADER *)ObjectNode,
+             (AML_NODE_HEADER *)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
+    AmlDeleteTree ((AML_NODE_HANDLE)DataNode);
+    return Status;
+  }
+
+  Status = AmlCodeGenName (
+             NameString,
+             ObjectNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
+  }
+
+  return Status;
+}
+
 /** Add a _PRT entry.
 
   AmlCodeGenPrtEntry (0x0FFFF, 0, "LNKA", 0, PrtNameNode) is
@@ -1161,6 +1247,122 @@ AmlCodeGenDevice (
 
   Status = AmlCreateObjectNode (
              AmlGetByteEncodingByOpCode (AML_EXT_OP, AML_EXT_DEVICE_OP),
+             AmlNameStringSize + AmlComputePkgLengthWidth (AmlNameStringSize),
+             &ObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler1;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8 *)AmlNameString,
+             AmlNameStringSize,
+             &DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler2;
+  }
+
+  Status = AmlSetFixedArgument (
+             ObjectNode,
+             EAmlParseIndexTerm0,
+             (AML_NODE_HEADER *)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    AmlDeleteTree ((AML_NODE_HEADER *)DataNode);
+    goto error_handler2;
+  }
+
+  Status = LinkNode (
+             ObjectNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler2;
+  }
+
+  // Free AmlNameString before returning as it is copied
+  // in the call to AmlCreateDataNode().
+  goto error_handler1;
+
+error_handler2:
+  if (ObjectNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HEADER *)ObjectNode);
+  }
+
+error_handler1:
+  if (AmlNameString != NULL) {
+    FreePool (AmlNameString);
+  }
+
+  return Status;
+}
+
+/** AML code generation for a ThermalZone object node.
+
+  AmlCodeGenThermalZone ("TZ00", ParentNode, NewObjectNode) is
+  equivalent of the following ASL code:
+    ThermalZone(TZ00) {}
+
+  @ingroup CodeGenApis
+
+  @param  [in] NameString     The new ThermalZone's name.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "DEV0", "DV15.DEV0", etc.
+                              The input string is copied.
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+  @param [out] NewObjectNode  If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenThermalZone (
+  IN  CONST CHAR8                   *NameString,
+  IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *ObjectNode;
+  AML_DATA_NODE    *DataNode;
+  CHAR8            *AmlNameString;
+  UINT32           AmlNameStringSize;
+
+  if ((NameString == NULL)  ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ObjectNode    = NULL;
+  DataNode      = NULL;
+  AmlNameString = NULL;
+
+  Status = ConvertAslNameToAmlName (NameString, &AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler1;
+  }
+
+  Status = AmlCreateObjectNode (
+             AmlGetByteEncodingByOpCode (AML_EXT_OP, AML_EXT_THERMAL_ZONE_OP),
              AmlNameStringSize + AmlComputePkgLengthWidth (AmlNameStringSize),
              &ObjectNode
              );
@@ -1765,6 +1967,132 @@ AmlCodeGenReturnInteger (
   return Status;
 }
 
+/** AML code generation for a Return object node,
+    returning the object as an input NameString with a integer argument.
+
+  AmlCodeGenReturn ("NAM1", 6, ParentNode, NewObjectNode) is
+  equivalent of the following ASL code:
+    Return(NAM1 (6))
+
+  The ACPI 6.3 specification, s20.2.5.3 "Type 1 Opcodes Encoding" states:
+    DefReturn := ReturnOp ArgObject
+    ReturnOp := 0xA4
+    ArgObject := TermArg => DataRefObject
+
+  Thus, the ReturnNode must be evaluated as a DataRefObject. It can
+  be a NameString referencing an object. As this CodeGen Api doesn't
+  do semantic checking, it is strongly advised to check the AML bytecode
+  generated by this function against an ASL compiler.
+
+  The ReturnNode must be generated inside a Method body scope.
+
+  @param [in]  NameString     The object referenced by this NameString
+                              is returned by the Return ASL statement.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "NAM1", "_SB.NAM1", etc.
+                              The input string is copied.
+  @param [in]  Integer        Argument to pass to the NameString
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+                              Must be a MethodOp node.
+  @param [out] NewObjectNode  If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+AmlCodeGenReturnNameStringIntegerArgument (
+  IN  CONST CHAR8            *NameString,
+  IN        UINT64           Integer,
+  IN        AML_NODE_HEADER  *ParentNode      OPTIONAL,
+  OUT       AML_OBJECT_NODE  **NewObjectNode   OPTIONAL
+  )
+{
+  EFI_STATUS       Status;
+  AML_DATA_NODE    *DataNode;
+  AML_OBJECT_NODE  *IntNode;
+  CHAR8            *AmlNameString;
+  UINT32           AmlNameStringSize;
+  AML_OBJECT_NODE  *ObjectNode;
+
+  DataNode   = NULL;
+  IntNode    = NULL;
+  ObjectNode = NULL;
+
+  Status = ConvertAslNameToAmlName (NameString, &AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCodeGenInteger (Integer, &IntNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8 *)AmlNameString,
+             AmlNameStringSize,
+             &DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler1;
+  }
+
+  // AmlCodeGenReturn() deletes DataNode if error.
+  Status = AmlCodeGenReturn (
+             (AML_NODE_HEADER *)DataNode,
+             ParentNode,
+             &ObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler1;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)ObjectNode,
+             (AML_NODE_HANDLE)IntNode
+             );
+  if (EFI_ERROR (Status)) {
+    // ObjectNode is already attached to ParentNode in AmlCodeGenReturn(),
+    // so no need to free it here, it will be deleted when deleting the
+    // ParentNode tree
+    ASSERT (0);
+    goto exit_handler1;
+  }
+
+  if (NewObjectNode != 0) {
+    *NewObjectNode = ObjectNode;
+  }
+
+  goto exit_handler;
+
+exit_handler1:
+  if (IntNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)IntNode);
+  }
+
+exit_handler:
+  if (AmlNameString != NULL) {
+    FreePool (AmlNameString);
+  }
+
+  return Status;
+}
+
 /** AML code generation for a method returning a NameString.
 
   AmlCodeGenMethodRetNameString (
@@ -1844,6 +2172,118 @@ AmlCodeGenMethodRetNameString (
   if (ReturnedNameString != NULL) {
     Status = AmlCodeGenReturnNameString (
                ReturnedNameString,
+               (AML_NODE_HANDLE)MethodNode,
+               NULL
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      goto error_handler;
+    }
+  }
+
+  Status = LinkNode (
+             MethodNode,
+             ParentNode,
+             NewObjectNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  if (MethodNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)MethodNode);
+  }
+
+  return Status;
+}
+
+/** AML code generation for a method returning a NameString that takes an
+    integer argument.
+
+  AmlCodeGenMethodRetNameStringIntegerArgument (
+    "MET0", "MET1", 1, TRUE, 3, 5, ParentNode, NewObjectNode
+    );
+  is equivalent of the following ASL code:
+    Method(MET0, 1, Serialized, 3) {
+      Return (MET1 (5))
+    }
+
+  The ASL parameters "ReturnType" and "ParameterTypes" are not asked
+  in this function. They are optional parameters in ASL.
+
+  @param [in]  MethodNameString     The new Method's name.
+                                    Must be a NULL-terminated ASL NameString
+                                    e.g.: "MET0", "_SB.MET0", etc.
+                                    The input string is copied.
+  @param [in]  ReturnedNameString   The name of the object returned by the
+                                    method. Optional parameter, can be:
+                                     - NULL (ignored).
+                                     - A NULL-terminated ASL NameString.
+                                       e.g.: "MET0", "_SB.MET0", etc.
+                                       The input string is copied.
+  @param [in]  NumArgs              Number of arguments.
+                                    Must be 0 <= NumArgs <= 6.
+  @param [in]  IsSerialized         TRUE is equivalent to Serialized.
+                                    FALSE is equivalent to NotSerialized.
+                                    Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel            Synchronization level for the method.
+                                    Must be 0 <= SyncLevel <= 15.
+                                    Default is 0 in ASL.
+  @param [in]  IntegerArgument      Argument to pass to the NameString.
+  @param [in]  ParentNode           If provided, set ParentNode as the parent
+                                    of the node created.
+  @param [out] NewObjectNode        If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethodRetNameStringIntegerArgument (
+  IN  CONST CHAR8                   *MethodNameString,
+  IN  CONST CHAR8                   *ReturnedNameString   OPTIONAL,
+  IN        UINT8                   NumArgs,
+  IN        BOOLEAN                 IsSerialized,
+  IN        UINT8                   SyncLevel,
+  IN        UINT64                  IntegerArgument,
+  IN        AML_NODE_HANDLE         ParentNode           OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode        OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  MethodNode;
+
+  if ((MethodNameString == NULL)  ||
+      ((ParentNode == NULL) && (NewObjectNode == NULL)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Create a Method named MethodNameString.
+  Status = AmlCodeGenMethod (
+             MethodNameString,
+             NumArgs,
+             IsSerialized,
+             SyncLevel,
+             NULL,
+             &MethodNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Return ReturnedNameString if provided.
+  if (ReturnedNameString != NULL) {
+    Status = AmlCodeGenReturnNameStringIntegerArgument (
+               ReturnedNameString,
+               IntegerArgument,
                (AML_NODE_HANDLE)MethodNode,
                NULL
                );
@@ -3323,5 +3763,89 @@ AmlCreateCpcNode (
 
 error_handler:
   AmlDeleteTree ((AML_NODE_HANDLE)CpcNode);
+  return Status;
+}
+
+/** AML code generation to add a NameString to the package in a named node.
+
+
+  @param [in]  NameString     NameString to add
+  @param [in]  NamedNode      Node to add the string to the included package.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddNameStringToNamedPackage (
+  IN CHAR8                   *NameString,
+  IN AML_OBJECT_NODE_HANDLE  NamedNode
+  )
+{
+  EFI_STATUS              Status;
+  AML_DATA_NODE           *DataNode;
+  CHAR8                   *AmlNameString;
+  UINT32                  AmlNameStringSize;
+  AML_OBJECT_NODE_HANDLE  PackageNode;
+
+  DataNode = NULL;
+
+  if ((NamedNode == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)NamedNode) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (NamedNode, AML_NAME_OP, 0)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  PackageNode = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                          NamedNode,
+                                          EAmlParseIndexTerm1
+                                          );
+  if ((PackageNode == NULL)                                             ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PackageNode) != EAmlNodeObject) ||
+      (!AmlNodeHasOpCode (PackageNode, AML_PACKAGE_OP, 0)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ConvertAslNameToAmlName (NameString, &AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8 *)AmlNameString,
+             AmlNameStringSize,
+             &DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    AmlDeleteTree ((AML_NODE_HANDLE)DataNode);
+  }
+
+exit_handler:
+  if (AmlNameString != NULL) {
+    FreePool (AmlNameString);
+  }
+
   return Status;
 }

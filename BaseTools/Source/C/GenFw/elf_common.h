@@ -1144,5 +1144,16 @@ typedef struct {
 #define R_LARCH_TLS_LD64_HI20              96
 #define R_LARCH_TLS_GD_PC_HI20             97
 #define R_LARCH_TLS_GD64_HI20              98
-#define R_LARCH_RELAX                      99
+#define R_LARCH_32_PCREL                   99
+#define R_LARCH_RELAX                      100
+#define R_LARCH_DELETE                     101
+#define R_LARCH_ALIGN                      102
+#define R_LARCH_PCREL20_S2                 103
+#define R_LARCH_CFA                        104
+#define R_LARCH_ADD6                       105
+#define R_LARCH_SUB6                       106
+#define R_LARCH_ADD_ULEB128                107
+#define R_LARCH_SUB_ULEB128                108
+#define R_LARCH_64_PCREL                   109
+
 #endif /* !_SYS_ELF_COMMON_H_ */

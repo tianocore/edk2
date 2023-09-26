@@ -764,6 +764,24 @@ ArmHasCcidx (
   VOID
   );
 
+#ifdef MDE_CPU_AARCH64
+///
+/// AArch64-only ID Register Helper functions
+///
+
+/**
+  Checks whether the CPU implements the Virtualization Host Extensions.
+
+  @retval TRUE  FEAT_VHE is implemented.
+  @retval FALSE FEAT_VHE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasVhe (
+  VOID
+  );
+#endif // MDE_CPU_AARCH64
+
 #ifdef MDE_CPU_ARM
 ///
 /// AArch32-only ID Register Helper functions
