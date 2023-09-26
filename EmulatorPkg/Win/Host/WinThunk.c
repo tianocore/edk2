@@ -1,6 +1,6 @@
 /**@file
 
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
@@ -29,6 +29,12 @@ Abstract:
 **/
 
 #include "WinHost.h"
+
+STATIC BOOLEAN  mEmulatorStdInConfigured = FALSE;
+STATIC DWORD    mOldStdInMode;
+#if defined (NTDDI_VERSION) && defined (NTDDI_WIN10_TH2) && (NTDDI_VERSION > NTDDI_WIN10_TH2)
+STATIC DWORD  mOldStdOutMode;
+#endif
 
 UINTN
 SecWriteStdErr (
@@ -61,6 +67,13 @@ SecConfigStdIn (
 
   Success = GetConsoleMode (GetStdHandle (STD_INPUT_HANDLE), &Mode);
   if (Success) {
+    if (!mEmulatorStdInConfigured) {
+      //
+      // Save the original state of the console so it can be restored on exit
+      //
+      mOldStdInMode = Mode;
+    }
+
     //
     // Disable buffer (line input), echo, mouse, window
     //
@@ -82,6 +95,13 @@ SecConfigStdIn (
   //
   if (Success) {
     Success = GetConsoleMode (GetStdHandle (STD_OUTPUT_HANDLE), &Mode);
+    if (!mEmulatorStdInConfigured) {
+      //
+      // Save the original state of the console so it can be restored on exit
+      //
+      mOldStdOutMode = Mode;
+    }
+
     if (Success) {
       Success = SetConsoleMode (
                   GetStdHandle (STD_OUTPUT_HANDLE),
@@ -91,6 +111,10 @@ SecConfigStdIn (
   }
 
  #endif
+  if (Success) {
+    mEmulatorStdInConfigured = TRUE;
+  }
+
   return Success ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 }
 
@@ -467,6 +491,21 @@ SecExit (
   UINTN  Status
   )
 {
+  if (mEmulatorStdInConfigured) {
+    //
+    // Reset the console back to its original state
+    //
+ #if defined (NTDDI_VERSION) && defined (NTDDI_WIN10_TH2) && (NTDDI_VERSION > NTDDI_WIN10_TH2)
+    BOOL  Success = SetConsoleMode (GetStdHandle (STD_INPUT_HANDLE), mOldStdInMode);
+    if (Success) {
+      SetConsoleMode (GetStdHandle (STD_OUTPUT_HANDLE), mOldStdOutMode);
+    }
+
+ #else
+    SetConsoleMode (GetStdHandle (STD_INPUT_HANDLE), mOldStdInMode);
+ #endif
+  }
+
   exit ((int)Status);
 }
 

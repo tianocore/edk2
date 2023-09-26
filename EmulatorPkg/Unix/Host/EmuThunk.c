@@ -9,7 +9,7 @@
   it may cause the table to be initialized with the members at the end being
   set to zero. This is bad as jumping to zero will crash.
 
-Copyright (c) 2004 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2023, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2011, Apple Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -33,6 +33,9 @@ struct timeval  settimer_timeval;
 UINTN           settimer_callback = 0;
 
 BOOLEAN  gEmulatorInterruptEnabled = FALSE;
+
+STATIC BOOLEAN         mEmulatorStdInConfigured = FALSE;
+STATIC struct termios  mOldTty;
 
 UINTN
 SecWriteStdErr (
@@ -58,8 +61,16 @@ SecConfigStdIn (
   // Need to turn off line buffering, ECHO, and make it unbuffered.
   //
   tcgetattr (STDIN_FILENO, &tty);
+  if (!mEmulatorStdInConfigured) {
+    //
+    // Save the original state of the TTY so it can be restored on exit
+    //
+    CopyMem (&mOldTty, &tty, sizeof (struct termios));
+  }
+
   tty.c_lflag &= ~(ICANON | ECHO);
   tcsetattr (STDIN_FILENO, TCSANOW, &tty);
+  mEmulatorStdInConfigured = TRUE;
 
   //  setvbuf (STDIN_FILENO, NULL, _IONBF, 0);
 
@@ -338,6 +349,11 @@ SecExit (
   UINTN  Status
   )
 {
+  // Reset the TTY back to its original state
+  if (mEmulatorStdInConfigured) {
+    tcsetattr (STDIN_FILENO, TCSANOW, &mOldTty);
+  }
+
   exit (Status);
 }
 
