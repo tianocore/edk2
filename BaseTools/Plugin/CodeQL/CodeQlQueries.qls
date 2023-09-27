@@ -8,28 +8,71 @@
 # Queries
 ##########################################################################################
 
-## Enable When Time is Available to Fix Issues
-# Hundreds of issues. Most appear valid. Type: Recommendation.
-#- include:
-#    id: cpp/missing-null-test
-
 ## Errors
 - include:
-    id: cpp/overrunning-write
+    id: cpp/badoverflowguard
 - include:
-    id: cpp/overrunning-write-with-float
+    id: cpp/infiniteloop
+- include:
+    id: cpp/likely-bugs/memory-management/v2/conditionally-uninitialized-variable
+- include:
+    id: cpp/missing-null-test
+- include:
+    id: cpp/missing-return
+- include:
+    id: cpp/no-space-for-terminator
 - include:
     id: cpp/pointer-overflow-check
+- include:
+    id: cpp/redundant-null-check-simple
+- include:
+    id: cpp/sizeof/const-int-argument
+- include:
+    id: cpp/sizeof/sizeof-or-operation-as-argument
+- include:
+    id: cpp/unguardednullreturndereferenc
 - include:
     id: cpp/very-likely-overrunning-write
 
 ## Warnings
 - include:
+    id: cpp/comparison-with-wider-type
+- include:
     id: cpp/conditionallyuninitializedvariable
+- include:
+    id: cpp/comparison-precedence
+- include:
+    id: cpp/implicit-bitfield-downcast
 - include:
     id: cpp/infinite-loop-with-unsatisfiable-exit-condition
 - include:
+    id: cpp/offset-use-before-range-check
+- include:
     id: cpp/overflow-buffer
+- include:
+    id: cpp/overflow-calculated
+- include:
+    id: cpp/overflow-destination
+- include:
+    id: cpp/paddingbyteinformationdisclosure
+- include:
+    id: cpp/return-stack-allocated-memory
+- include:
+    id: cpp/static-buffer-overflow
+- include:
+    id: cpp/unsigned-comparison-zero
+- include:
+    id: cpp/uselesstest
+
+## Recommendations
+- include:
+    id: cpp/missing-header-guard
+- include:
+    id: cpp/unused-local-variable
+- include:
+    id: cpp/unused-static-function
+- include:
+    id: cpp/unused-static-variable
 
 # Note: Some queries above are not active by default with the below filter.
 #       Update the filter and run the queries again to get all results.
