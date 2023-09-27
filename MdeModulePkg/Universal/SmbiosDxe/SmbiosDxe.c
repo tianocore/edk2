@@ -1072,14 +1072,18 @@ SmbiosCreateTable (
     DEBUG ((DEBUG_INFO, "SmbiosCreateTable: Initialize 32-bit entry point structure\n"));
     EntryPointStructureData.MajorVersion      = mPrivateData.Smbios.MajorVersion;
     EntryPointStructureData.MinorVersion      = mPrivateData.Smbios.MinorVersion;
-    EntryPointStructureData.SmbiosBcdRevision = (UINT8)((PcdGet16 (PcdSmbiosVersion) >> 4) & 0xf0) | (UINT8)(PcdGet16 (PcdSmbiosVersion) & 0x0f);
-    PhysicalAddress                           = 0xffffffff;
-    Status                                    = gBS->AllocatePages (
-                                                       AllocateMaxAddress,
-                                                       EfiRuntimeServicesData,
-                                                       EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
-                                                       &PhysicalAddress
-                                                       );
+    EntryPointStructureData.SmbiosBcdRevision = 0;
+    if ((mPrivateData.Smbios.MajorVersion <= 9) && (mPrivateData.Smbios.MinorVersion <= 9)) {
+      EntryPointStructureData.SmbiosBcdRevision = ((mPrivateData.Smbios.MajorVersion & 0x0f) << 4) | (mPrivateData.Smbios.MinorVersion & 0x0f);
+    }
+
+    PhysicalAddress = 0xffffffff;
+    Status          = gBS->AllocatePages (
+                             AllocateMaxAddress,
+                             EfiRuntimeServicesData,
+                             EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
+                             &PhysicalAddress
+                             );
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "SmbiosCreateTable () could not allocate EntryPointStructure < 4GB\n"));
       Status = gBS->AllocatePages (
