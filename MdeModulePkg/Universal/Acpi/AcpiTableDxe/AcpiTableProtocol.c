@@ -1892,7 +1892,18 @@ InstallAcpiTableFromHob (
           }
         }
 
-        if (((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)ChildTable)->Dsdt != 0) {
+        //
+        // First check if xDSDT is available that is preferred
+        //
+        if (((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)ChildTable)->XDsdt != 0) {
+          TableToInstall = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)ChildTable)->XDsdt;
+          Status         = AddTableToList (AcpiTableInstance, TableToInstall, TRUE, Version, TRUE, &TableKey);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "InstallAcpiTableFromHob: Fail to add ACPI table xDSDT\n"));
+            ASSERT_EFI_ERROR (Status);
+            break;
+          }
+        } else if (((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)ChildTable)->Dsdt != 0) {
           TableToInstall = (VOID *)(UINTN)((EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)ChildTable)->Dsdt;
           Status         = AddTableToList (AcpiTableInstance, TableToInstall, TRUE, Version, TRUE, &TableKey);
           if (EFI_ERROR (Status)) {
