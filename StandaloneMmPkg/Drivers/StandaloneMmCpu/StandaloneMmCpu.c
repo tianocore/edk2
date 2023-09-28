@@ -3,6 +3,7 @@
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2016 HP Development Company, L.P.
   Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
+  Copyright (c) 2023, Ventana Micro System Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,10 +11,7 @@
 
 #include <Base.h>
 #include <Pi/PiMmCis.h>
-#include <Library/Arm/StandaloneMmCoreEntryPoint.h>
 #include <Library/DebugLib.h>
-#include <Library/ArmSvcLib.h>
-#include <Library/ArmLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/HobLib.h>
 
@@ -22,7 +20,7 @@
 #include <Guid/ZeroGuid.h>
 #include <Guid/MmramMemoryReserve.h>
 
-#include "StandaloneMmCpu.h"
+#include <StandaloneMmCpu.h>
 
 // GUID to identify HOB with whereabouts of communication buffer with Normal
 // World
@@ -31,7 +29,7 @@ extern EFI_GUID  gEfiStandaloneMmNonSecureBufferGuid;
 // GUID to identify HOB where the entry point of this CPU driver will be
 // populated to allow the entry point driver to invoke it upon receipt of an
 // event
-extern EFI_GUID  gEfiArmTfCpuDriverEpDescriptorGuid;
+extern EFI_GUID  gEfiMmCpuDriverEpDescriptorGuid;
 
 //
 // Private copy of the MM system table for future use
@@ -96,17 +94,17 @@ StandaloneMmCpuInitialize (
   IN EFI_MM_SYSTEM_TABLE  *SystemTable   // not actual systemtable
   )
 {
-  ARM_TF_CPU_DRIVER_EP_DESCRIPTOR  *CpuDriverEntryPointDesc;
-  EFI_CONFIGURATION_TABLE          *ConfigurationTable;
-  MP_INFORMATION_HOB_DATA          *MpInformationHobData;
-  EFI_MMRAM_DESCRIPTOR             *NsCommBufMmramRange;
-  EFI_STATUS                       Status;
-  EFI_HANDLE                       DispatchHandle;
-  UINT32                           MpInfoSize;
-  UINTN                            Index;
-  UINTN                            ArraySize;
-  VOID                             *HobStart;
-  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK   *MmramRangesHob;
+  MM_CPU_DRIVER_EP_DESCRIPTOR     *CpuDriverEntryPointDesc;
+  EFI_CONFIGURATION_TABLE         *ConfigurationTable;
+  MP_INFORMATION_HOB_DATA         *MpInformationHobData;
+  EFI_MMRAM_DESCRIPTOR            *NsCommBufMmramRange;
+  EFI_STATUS                      Status;
+  EFI_HANDLE                      DispatchHandle;
+  UINT32                          MpInfoSize;
+  UINTN                           Index;
+  UINTN                           ArraySize;
+  VOID                            *HobStart;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHob;
 
   ASSERT (SystemTable != NULL);
   mMmst = SystemTable;
@@ -133,7 +131,7 @@ StandaloneMmCpuInitialize (
   }
 
   // Retrieve the Hoblist from the MMST to extract the details of the NS
-  // communication buffer that has been reserved by S-EL1/EL3
+  // communication buffer that has been reserved for StandaloneMmPkg
   ConfigurationTable = mMmst->MmConfigurationTable;
   for (Index = 0; Index < mMmst->NumberOfTableEntries; Index++) {
     if (CompareGuid (&gEfiHobListGuid, &(ConfigurationTable[Index].VendorGuid))) {
@@ -154,11 +152,11 @@ StandaloneMmCpuInitialize (
   //
   Status = GetGuidedHobData (
              HobStart,
-             &gEfiArmTfCpuDriverEpDescriptorGuid,
+             &gEfiMmCpuDriverEpDescriptorGuid,
              (VOID **)&CpuDriverEntryPointDesc
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "ArmTfCpuDriverEpDesc HOB data extraction failed - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "MmCpuDriverEpDesc HOB data extraction failed - 0x%x\n", Status));
     return Status;
   }
 
@@ -166,10 +164,10 @@ StandaloneMmCpuInitialize (
   DEBUG ((
     DEBUG_INFO,
     "Sharing Cpu Driver EP *0x%lx = 0x%lx\n",
-    (UINTN)CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr,
-    (UINTN)PiMmStandaloneArmTfCpuDriverEntry
+    (UINTN)CpuDriverEntryPointDesc->MmCpuDriverEpPtr,
+    (UINTN)PiMmStandaloneMmCpuDriverEntry
     ));
-  *(CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr) = PiMmStandaloneArmTfCpuDriverEntry;
+  *(CpuDriverEntryPointDesc->MmCpuDriverEpPtr) = PiMmStandaloneMmCpuDriverEntry;
 
   // Find the descriptor that contains the whereabouts of the buffer for
   // communication with the Normal world.
