@@ -231,6 +231,44 @@ Dump16Chars (
   );
 
 /**
+  This function traces reserved fields up to 8 bytes in length.
+
+  Format string is ignored by this function as the reserved field is printed
+  byte by byte with intermittent spacing <eg: 0 0 0 0>. Use DumpxChars for any
+  other use case.
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
+**/
+VOID
+EFIAPI
+DumpReserved (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
+  );
+
+/**
+  This function traces reserved fields up to 64 bits in length.
+
+  Format string is ignored by this function as the reserved field is printed
+  byte by byte with intermittent spacing. eg: <0 0 0 0>. When the field length
+  isn't a multiple of 8, the number of bytes are "ceil"-ed by one. eg for 27
+  bits <0 0 0 0>
+
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
+**/
+VOID
+EFIAPI
+DumpReservedBits (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
+  );
+
+/**
   This function indents and prints the ACPI table Field Name.
 
   @param [in] Indent      Number of spaces to add to the global table

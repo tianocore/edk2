@@ -499,6 +499,132 @@ Dump16Chars (
 }
 
 /**
+  This function traces reserved fields up to 8 bytes in length.
+
+  Format string is ignored by this function as the reserved field is printed
+  byte by byte with intermittent spacing <eg: 0 0 0 0>. Use DumpxChars for any
+  other use case.
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
+**/
+VOID
+EFIAPI
+DumpReserved (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
+  )
+{
+  switch (Length) {
+    case 8:
+      Print (
+        L"%u %u %u %u %u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3],
+        Ptr[4],
+        Ptr[5],
+        Ptr[6],
+        Ptr[7]
+        );
+      break;
+    case 7:
+      Print (
+        L"%u %u %u %u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3],
+        Ptr[4],
+        Ptr[5],
+        Ptr[6]
+        );
+      break;
+    case 6:
+      Print (
+        L"%u %u %u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3],
+        Ptr[4],
+        Ptr[5]
+        );
+      break;
+    case 5:
+      Print (
+        L"%u %u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3],
+        Ptr[4]
+        );
+      break;
+    case 4:
+      Print (
+        L"%u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3]
+        );
+      break;
+    case 3:
+      Print (
+        L"%u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2]
+        );
+      break;
+    case 2:
+      Print (
+        L"%u %u",
+        Ptr[0],
+        Ptr[1]
+        );
+      break;
+    case 1:
+      Print (
+        L"%u",
+        Ptr[0]
+        );
+      break;
+    default:
+      return;
+  }
+}
+
+/**
+  This function traces reserved fields up to 64 bits in length.
+
+  Format string is ignored by this function as the reserved field is printed
+  byte by byte with intermittent spacing. eg: <0 0 0 0>. When the field length
+  isn't a multiple of 8, the number of bytes are "ceil"-ed by one. eg for 27
+  bits <0 0 0 0>
+
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
+**/
+VOID
+EFIAPI
+DumpReservedBits (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
+  )
+{
+  UINT32  ByteLength;
+
+  ByteLength = (Length + 7) >> 3;
+  DumpReserved (Format, Ptr, ByteLength);
+}
+
+/**
   This function indents and prints the ACPI table Field Name.
 
   @param [in] Indent      Number of spaces to add to the global table indent.
