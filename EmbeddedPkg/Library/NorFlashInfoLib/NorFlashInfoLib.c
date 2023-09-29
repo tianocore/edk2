@@ -1,6 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2017 Marvell International Ltd.
+*  Copyright (c) 2023 StarFive, Technology Co., Ltd. All rights reserved.<BR>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -33,12 +34,20 @@ STATIC CONST NOR_FLASH_INFO  NorFlashIds[] = {
   { L"en25q128b",      { 0x1c, 0x30, 0x18 }, 3, 256, 64 * 1024,  256,  0                                        },
   { L"en25s64",        { 0x1c, 0x38, 0x17 }, 3, 256, 64 * 1024,  128,  0                                        },
   /* GIGADEVICE */
-  { L"gd25q64b",       { 0xc8, 0x40, 0x17 }, 3, 256, 64 * 1024,  128,  NOR_FLASH_ERASE_4K                       },
+  { L"gd25q16",        { 0xc8, 0x40, 0x15 }, 3, 256, 64 * 1024,  32,   NOR_FLASH_ERASE_4K                       },
+  { L"gd25q32",        { 0xc8, 0x40, 0x16 }, 3, 256, 64 * 1024,  64,   NOR_FLASH_ERASE_4K                       },
   { L"gd25lq32",       { 0xc8, 0x60, 0x16 }, 3, 256, 64 * 1024,  64,   NOR_FLASH_ERASE_4K                       },
+  { L"gd25q64b",       { 0xc8, 0x40, 0x17 }, 3, 256, 64 * 1024,  128,  NOR_FLASH_ERASE_4K                       },
+  { L"gd25lq64c",      { 0xc8, 0x60, 0x17 }, 3, 256, 64 * 1024,  128,  NOR_FLASH_ERASE_4K                       },
+  { L"gd25q128",       { 0xc8, 0x40, 0x18 }, 3, 256, 64 * 1024,  256,  NOR_FLASH_ERASE_4K                       },
+  { L"gd25lq128",      { 0xc8, 0x60, 0x18 }, 3, 256, 64 * 1024,  256,  NOR_FLASH_ERASE_4K                       },
+  { L"gd25q256",       { 0xc8, 0x40, 0x19 }, 3, 256, 64 * 1024,  512,  NOR_FLASH_ERASE_4K                       },
   /* ISSI */
   { L"is25lp032",      { 0x9d, 0x60, 0x16 }, 3, 256, 64 * 1024,  64,   0                                        },
   { L"is25lp064",      { 0x9d, 0x60, 0x17 }, 3, 256, 64 * 1024,  128,  0                                        },
   { L"is25lp128",      { 0x9d, 0x60, 0x18 }, 3, 256, 64 * 1024,  256,  0                                        },
+  /* XINKAI / SILICON KAISER */
+  { L"sk25lp128",      { 0x27, 0x70, 0x18 }, 3, 256, 64 * 1024,  256,  NOR_FLASH_ERASE_4K                       },
   /* MACRONIX */
   { L"mx25l2006e",     { 0xc2, 0x20, 0x12 }, 3, 256, 64 * 1024,  4,    0                                        },
   { L"mx25l4005",      { 0xc2, 0x20, 0x13 }, 3, 256, 64 * 1024,  8,    0                                        },
