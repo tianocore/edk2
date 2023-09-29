@@ -264,11 +264,11 @@ volatile BOOLEAN  mInterruptEnabled = FALSE;
 VOID
 CALLBACK
 MMTimerThread (
-  UINT   wTimerID,
-  UINT   msg,
-  DWORD  dwUser,
-  DWORD  dw1,
-  DWORD  dw2
+  UINT        wTimerID,
+  UINT        msg,
+  DWORD_PTR   dwUser,
+  DWORD_PTR   dw1,
+  DWORD_PTR   dw2
   )
 {
   UINT32  CurrentTick;
