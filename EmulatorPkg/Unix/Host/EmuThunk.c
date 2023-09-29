@@ -387,14 +387,14 @@ SecGetTime (
   }
 }
 
-VOID
+EFI_STATUS
 SecSetTime (
   IN  EFI_TIME  *Time
   )
 {
   // Don't change the time on the system
   // We could save delta to localtime() and have SecGetTime adjust return values?
-  return;
+  return EFI_UNSUPPORTED;
 }
 
 EFI_STATUS
