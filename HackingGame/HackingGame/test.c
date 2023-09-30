@@ -1,5 +1,6 @@
 #include "../../testing.h/testing.h"
 #include "./test_words.h"
+#include "./test_model.h"
 
 static int sanity_test()
 {
@@ -7,7 +8,8 @@ static int sanity_test()
 }
 
 SUB_TEST(exec_tests, {&sanity_test, "Sanity test"},
-{&test_words, "Test words"})
+{&test_words, "Test words"},
+{&test_model, "Test model"})
 
 int main()
 {

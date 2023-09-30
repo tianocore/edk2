@@ -36,6 +36,9 @@
 [Sources]
   main.c
   model.h
+  model.c
+  words.h
+  words.c
 
 [Packages]
   MdePkg/MdePkg.dec
