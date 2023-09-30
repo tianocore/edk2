@@ -15,7 +15,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib|DXE_CORE DXE_DRIVER UEFI_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
-  CONSTRUCTOR                    = FdtPL011SerialPortLibInitialize
+  CONSTRUCTOR                    = SerialPortInitialize
 
 [Sources.common]
   FdtPL011SerialPortLib.c
