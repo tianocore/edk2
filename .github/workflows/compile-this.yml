@@ -21,9 +21,9 @@ jobs:
                   set 1 esp on \
                   print
                 sudo losetup --partscan /dev/loop23 disk.iso
-                sudo mkfs.fat -F16 /dev/loop23
+                sudo mkfs.fat -F16 /dev/loop23p1
                 sudo mkdir /mnt/game
-                sudo mount /dev/loop23 /mnt/game
+                sudo mount /dev/loop23p1 /mnt/game
                 sudo mkdir -p /mnt/game/efi/boot
 
             - uses: actions/checkout@v4
