@@ -52,6 +52,10 @@ jobs:
               with:
                 name: HackingGame EFI
                 path: Build/HackingGame/DEBUG_GCC5/**/HackingGame/HackingGame/HackingGame
-                
 
+            - name: Save build output
+              uses: actions/upload-artifact@v3
+              with:
+                name: HackingGame ISO
+                path: disk.iso
             
