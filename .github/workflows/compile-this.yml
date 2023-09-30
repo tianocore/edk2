@@ -14,18 +14,18 @@ jobs:
             
             - name: Create bootable ISO
               run: |
-                dd if=/dev/zero of=disk.iso bs=1M count=32
+                dd if=/dev/zero of=disk.iso bs=1M count=1
                 parted --script disk.iso \
                   mklabel gpt \
                   mkpart primary fat32 0% 100% \
                   set 1 esp on \
                   print
-                losetup --partscan /dev/loop0 disk.iso
+                sudo losetup --partscan /dev/loop0 disk.iso
                 mkfs.fat -F16 /dev/loop0
                 mkdir /mnt/game
-                mount /dev/loop0 /mnt/game
+                sudo mount /dev/loop0 /mnt/game
+                mkdir -p /mnt/game/efi/boot
                 echo "Hello world!" >> /mnt/game/README.md
-                umount /mnt/game
 
             - uses: actions/checkout@v4
               name: Checkout repoistory
@@ -46,7 +46,13 @@ jobs:
                export EDK_TOOLS_PATH=${{ github.workspace }}/BaseTools
                . edksetup.sh BaseTools
                build
+               cp Build/HackingGame/DEBUG_GCC5/X64/HackingGame/HackingGame/HackingGame/OUTPUT/HackingGame.efi /mnt/game/efi/boot/BOOTX64.efi
             
+            - name: Unmount disk
+              run: |
+                sudo umount /mnt/game
+                sudo losetup --detach /dev/loop0
+
             - name: Save build output
               uses: actions/upload-artifact@v3
               with:
@@ -57,5 +63,4 @@ jobs:
               uses: actions/upload-artifact@v3
               with:
                 name: HackingGame ISO
-                path: disk.iso
-            
+                path: disk-amd64.iso
