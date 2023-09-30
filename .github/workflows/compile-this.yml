@@ -12,6 +12,21 @@ jobs:
                sudo apt update -y
                sudo apt install -y build-essential uuid-dev iasl git nasm python-is-python3
             
+            - name: Create bootable ISO
+              run: |
+                dd if=/dev/zero of=disk.iso bs=1M count=32
+                parted --script disk.iso \
+                  mklabel gpt \
+                  mkpart primary fat32 0% 100% \
+                  set 1 esp on \
+                  print
+                losetup --partscan /dev/loop0 disk.iso
+                mkfs.fat -F16 /dev/loop0
+                mkdir /mnt/game
+                mount /dev/loop0 /mnt/game
+                echo "Hello world!" >> /mnt/game/README.md
+                umount /mnt/game
+
             - uses: actions/checkout@v4
               name: Checkout repoistory
               with:
@@ -37,6 +52,10 @@ jobs:
               with:
                 name: HackingGame EFI
                 path: Build/HackingGame/DEBUG_GCC5/**/HackingGame/HackingGame/HackingGame
-                
 
+            - name: Save build output
+              uses: actions/upload-artifact@v3
+              with:
+                name: HackingGame ISO
+                path: disk.iso
             
