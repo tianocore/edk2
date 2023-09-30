@@ -14,7 +14,7 @@ jobs:
             
             - name: Create bootable ISO
               run: |
-                dd if=/dev/zero of=disk.iso bs=1M count=4
+                dd if=/dev/zero of=disk.iso bs=1M count=10
                 parted --script disk.iso \
                   mklabel gpt \
                   mkpart primary fat32 0% 100% \
