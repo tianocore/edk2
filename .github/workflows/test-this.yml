@@ -1,0 +1,32 @@
+name: 'Test UEFI Game'
+on:
+    push:
+        branches:
+            - '*'
+jobs:
+    test-deez:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Setup test environment
+              run: |
+               sudo apt update -y
+               sudo apt install -y build-essential cmake
+            
+            - uses: actions/checkout@v4
+              name: Checkout repoistory
+              with:
+                submodules: recursive
+            
+            - name: cmake Setup
+              run: |
+               cd HackingGame/HackingGame
+               mkdir -p build
+               cd build
+               cmake ..
+               cmake --build . -j$((`nproc`+1))
+            
+            - name: Run tests
+              run: |
+               cd HackingGame/HackingGame/build
+               ./test
+               
