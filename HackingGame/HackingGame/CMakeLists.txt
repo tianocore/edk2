@@ -12,6 +12,10 @@ set(SOURCES
   "./test_words.h"
   "./test_words.c"
   "./words.h"
-  "./words.c")
+  "./words.c"
+  "./test_model.h"
+  "./test_model.c"
+  "./model.h"
+  "./model.c")
 
 add_executable(test ${SOURCES} ${TESTING_H_FILES})
