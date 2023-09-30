@@ -32,3 +32,6 @@
 [submodule "MdePkg/Library/MipiSysTLib/mipisyst"]
 	path = MdePkg/Library/MipiSysTLib/mipisyst
 	url = https://github.com/MIPI-Alliance/public-mipi-sys-t.git
+[submodule "testing.h"]
+	path = testing.h
+	url = https://github.com/djpiper28/testing.h.git
