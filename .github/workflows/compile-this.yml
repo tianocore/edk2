@@ -28,7 +28,6 @@ jobs:
 
             - name: Setup build environment
               run: | 
-               cd src/edk2
                export EDK_TOOLS_PATH=${{ github.workspace }}/BaseTools
                . edksetup.sh BaseTools
                build
