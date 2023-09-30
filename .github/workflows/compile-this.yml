@@ -26,11 +26,17 @@ jobs:
               run: |
                make -C BaseTools
 
-            - name: Setup build environment
+            - name: Setup build environment, and build
               run: | 
                export EDK_TOOLS_PATH=${{ github.workspace }}/BaseTools
                . edksetup.sh BaseTools
                build
+            
+            - name: Save build output
+              uses: actions/upload-artifact@v3
+              with:
+                name: HackingGame EFI
+                path: Build/HackingGame/DEBUG_GCC5/**/HackingGame/HackingGame/HackingGame
                 
 
             
