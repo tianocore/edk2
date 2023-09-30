@@ -21,11 +21,10 @@ jobs:
                   set 1 esp on \
                   print
                 sudo losetup --partscan /dev/loop23 disk.iso
-                mkfs.fat -F16 /dev/loop23
-                mkdir /mnt/game
+                sudo mkfs.fat -F16 /dev/loop23
+                sudo mkdir /mnt/game
                 sudo mount /dev/loop23 /mnt/game
-                mkdir -p /mnt/game/efi/boot
-                echo "Hello world!" >> /mnt/game/README.md
+                sudo mkdir -p /mnt/game/efi/boot
 
             - uses: actions/checkout@v4
               name: Checkout repoistory
@@ -46,7 +45,7 @@ jobs:
                export EDK_TOOLS_PATH=${{ github.workspace }}/BaseTools
                . edksetup.sh BaseTools
                build
-               cp Build/HackingGame/DEBUG_GCC5/X64/HackingGame/HackingGame/HackingGame/OUTPUT/HackingGame.efi /mnt/game/efi/boot/BOOTX64.efi
+               sudo cp Build/HackingGame/DEBUG_GCC5/X64/HackingGame/HackingGame/HackingGame/OUTPUT/HackingGame.efi /mnt/game/efi/boot/BOOTX64.efi
             
             - name: Unmount disk
               run: |
