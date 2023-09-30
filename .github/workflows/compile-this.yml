@@ -20,10 +20,10 @@ jobs:
                   mkpart primary fat32 0% 100% \
                   set 1 esp on \
                   print
-                sudo losetup --partscan /dev/loop0 disk.iso
+                sudo losetup --partscan /dev/loop23 disk.iso
                 mkfs.fat -F16 /dev/loop23
                 mkdir /mnt/game
-                sudo mount /dev/loop0 /mnt/game
+                sudo mount /dev/loop23 /mnt/game
                 mkdir -p /mnt/game/efi/boot
                 echo "Hello world!" >> /mnt/game/README.md
 
