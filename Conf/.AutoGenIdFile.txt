@@ -1,0 +1,3 @@
+Arch=X64|IA32
+BuildDir=/home/danny/github/uefi-hacking-game/Build/HackingGame/DEBUG_GCC5
+PlatformGuid=587CE499-6CBE-43cd-94E2-186218569478

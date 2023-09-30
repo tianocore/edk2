@@ -1,0 +1,650 @@
+#
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Portions copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+## Syntax
+#
+# "*" is used to indicate that the source files will be processed at the same time.
+# "?" is used to indicate that the source files will be processed one by one.
+#
+# "[" <File-Type>[.<Build-Type>][.<Arch>][, <File-Type>[.<Build-Type>][.<Arch>]] "]" <EOL>
+#   <InputFile[.<ToolChainFamily>]> <EOL>
+#       (?|*).<File-Extension> [(\n|,) (?|*).<File-Extension>]
+#
+#   <OutputFile[.<ToolChainFamily>]> <EOL>
+#       <FileFullPath>
+#
+#   <ExtraDependency>
+#       <FileFullPath>
+#
+#   <Command[.<ToolChainFamily>]> <EOL>
+#       <Command1>
+#       [<Command2>]
+#
+# <Build-Type> is the MODULE_TYPE in EDK2 or COMPONENT_TYPE  in EDK.
+# Missing <InputFile> will cause an exception and break build.
+# Missing <Command> will cause that related build target won't be generated but
+#   won't break build.
+#
+
+## Placeholders for string substitution
+#
+#   ${src}      Source file(s) to be built (full path)
+#   ${s_path}   Source file directory (absolute path)
+#   ${s_dir}    Source file relative directory within a module
+#               (Note: ${s_dir} is always equals to "." if source file is given in absolute path.)
+#   ${s_name}   Source file name without path
+#   ${s_base}   Source file name without extension and path
+#   ${s_ext}    Source file extension
+#
+#   ${dst}      Destination file(s) built from ${src} (full path)
+#   ${d_path}   Destination file directory (absolute path)
+#   ${d_name}   Destination file name without path
+#   ${d_base}   Destination file name without extension and path
+#   ${d_ext}    Destination file extension
+#
+#   (+)         Directory separator
+#
+
+## Macro
+#   $(WORKSPACE)        Workspace directory
+#   $(OUTPUT_DIR)       Directory for intermediate files for building a module
+#   $(DEBUG_DIR)        Directory for files used to debug a module
+#   $(BUILD_DIR)        All files for building a platform will be put in this directory
+#   $(BIN_DIR)          Common directory for executable files
+#   $(FV_DIR)           Directory to store flash image files
+#   $(INC)              Search path of current module
+#   $(NASM_INC)         Search nasm file path of current module
+#   $(INC_LIST)         A file containing search paths of current module
+#   $(LIBS)             Static library files of current module
+#   $(<tool>_FLAGS)     Tools flags of current module
+#   $(MODULE_NAME)      Current module name
+#   $(MODULE_NAME_GUID) Current module name with module FILE_GUID if same $(MODULE_NAME) exists
+#                       in different modules, otherwise its value is same as $(MODULE_NAME)
+#   $(MODULE_TYPE)      Current module type
+#   $(MODULE_GUID)      Current module guid
+#   $(ARCH)             Architecture of current module
+#   $(TOOLCHAIN)        Toolchain used to build current module
+#   $(TARGET)           Target of current module (DEBUG/RELEASE)
+#   $(<tool>)           Path of tool
+#   $(EDK_TOOLS_PATH)   Path of build tools
+#   $(<FILE_TYPES>)     File list of each file type
+#                       (Note: The macro name is derived from file type name. For example,
+#                        C-Code-File will have C_CODE_FILES macro.)
+#   $(<FILE_TYPES_LIST>) Macro point to a file containing list of files of a file type
+#                       (
+#                        Note: The macro and file name are derived from file type name.
+#                        For example, C-Code-File will have C_CODE_FILES_LIST macro pointing
+#                        to $(OUTPUT_DIR)/c_code_files.lst. The list file and macro name
+#                        will be generated only when this macro is used in command line.
+#                        This is intended to get over the long command line limitation.
+#                       )
+#   $(DEPS_FLAGS)        This is a tool flag to have c compiler generate dependent header file list for a source file.
+#                        To enable incremental build, this flag must apply to $(CC), $(VFRPP), $(PP), $(ASLCC) and $(ASLPP).
+#
+#   $(CP)     copy command
+#   $(MV)     move command
+#   $(RM)     delete command
+#   $(MD)     create dir command
+#   $(RD)     remove dir command
+#
+
+## Reserved File-Type
+#
+# Don't change following names of file types and their associated files,
+# which are also used in tools' code
+#
+#   C-Code-File
+#   C-Header-File
+#   Dynamic-Library-File
+#   Static-Library-File
+#   Visual-Form-Representation-File
+#   Unicode-Text-File
+#
+
+## Build Rule Version Number
+#  build_rule_version=0.1
+#
+
+[C-Code-File]
+    <InputFile>
+        ?.c
+        ?.C
+        ?.cc
+        ?.CC
+        ?.cpp
+        ?.Cpp
+        ?.CPP
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.MSFT, Command.INTEL>
+        "$(CC)" /Fo${dst} $(DEPS_FLAGS) $(CC_FLAGS) $(INC) ${src}
+
+    <Command.GCC>
+        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) -c -o ${dst} $(INC) ${src}
+
+    <Command.XCODE>
+        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) -o ${dst} $(INC) ${src}
+
+[C-Code-File.BASE.AARCH64,C-Code-File.SEC.AARCH64,C-Code-File.PEI_CORE.AARCH64,C-Code-File.PEIM.AARCH64,C-Code-File.BASE.ARM,C-Code-File.SEC.ARM,C-Code-File.PEI_CORE.ARM,C-Code-File.PEIM.ARM]
+    <InputFile>
+        ?.c
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.GCC>
+        "$(CC)" $(DEPS_FLAGS) $(CC_FLAGS) $(CC_XIPFLAGS) -c -o ${dst} $(INC) ${src}
+
+[C-Header-File]
+    <InputFile>
+        *.h, *.H
+
+    <OutputFile>
+
+    <Command>
+
+[Assembly-Code-File.COMMON.COMMON]
+    <InputFile.MSFT, InputFile.INTEL>
+        ?.asm, ?.Asm, ?.ASM
+
+    <InputFile.GCC>
+        ?.S, ?.s
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.MSFT, Command.INTEL>
+        Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+        Trim --source-code --convert-hex --trim-long -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
+        "$(ASM)" /Fo${dst} $(ASM_FLAGS) /I${s_path} $(INC) ${d_path}(+)${s_base}.iiii
+
+    <Command.GCC>
+        Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+        Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
+        "$(ASM)" $(ASM_FLAGS) -o ${dst} $(INC) ${d_path}(+)${s_base}.iiii
+
+[Assembly-Code-File.COMMON.ARM,Assembly-Code-File.COMMON.AARCH64]
+    # Remove --convert-hex for ARM as it breaks MSFT assemblers
+    <InputFile.MSFT, InputFile.INTEL>
+        ?.asm, ?.Asm, ?.ASM
+
+    <InputFile.GCC>
+        ?.S, ?.s
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command.INTEL>
+        Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+        Trim --source-code --convert-hex --trim-long -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
+        "$(ASM)" /Fo${dst} $(ASM_FLAGS) /I${s_path} $(INC) ${d_path}(+)${s_base}.iiii
+
+    <Command.MSFT>
+        Trim --asm-file  -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+        Trim --source-code --trim-long -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
+        "$(ASM)" /Fo${dst} $(ASM_FLAGS) /I${s_path} $(INC) ${d_path}(+)${s_base}.iiii
+
+    <Command.GCC>
+        Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+        Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iiii ${d_path}(+)${s_base}.ii
+        "$(ASM)" $(ASM_FLAGS) -o ${dst} $(INC) ${d_path}(+)${s_base}.iiii
+
+[Nasm-Assembly-Code-File.COMMON.COMMON]
+    <InputFile>
+        ?.nasm
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+
+    <Command>
+        Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+        Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
+        "$(NASM)" -I${s_path}(+) $(NASM_INC) $(NASM_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
+
+[Device-Tree-Source-File]
+    <InputFile>
+        ?.dts
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dtb
+
+    <Command.GCC>
+        "$(DTCPP)" $(DTCPP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
+        "$(DTC)" $(DTC_FLAGS) -I dts -O dtb -o ${dst} ${d_path}(+)${s_base}.i
+
+[Visual-Form-Representation-File]
+    <InputFile>
+        ?.vfr
+        ?.Vfr
+        ?.VFR
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)${s_dir}(+)${s_base}.c
+
+    <Command>
+        "$(VFRPP)" $(DEPS_FLAGS) $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_base}.i
+        "$(VFR)" $(VFR_FLAGS) --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_base}.i
+
+[Object-File]
+    <InputFile>
+        *.obj
+        *.o
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).lib
+
+    <Command.MSFT, Command.INTEL, Command.CLANGPDB>
+        "$(SLINK)" $(SLINK_FLAGS) /OUT:${dst} @$(OBJECT_FILES_LIST)
+
+    <Command.GCC>
+        $(RM) ${dst}
+        "$(SLINK)" cr ${dst} $(SLINK_FLAGS) @$(OBJECT_FILES_LIST)
+    
+    <Command.XCODE>
+        "$(SLINK)" $(SLINK_FLAGS) ${dst} -filelist $(OBJECT_FILES_LIST)
+
+[Static-Library-File]
+    <InputFile>
+        *.lib
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)$(MODULE_NAME).dll
+
+    <Command.MSFT, Command.INTEL>
+        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK2_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
+        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
+
+    <Command.CLANGPDB>
+        "$(DLINK)" /OUT:${dst} $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST) $(DLINK2_FLAGS)
+
+    <Command.GCC>
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(DLINK2_FLAGS)
+        "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
+
+    <Command.XCODE>
+        "$(DLINK)" $(DLINK_FLAGS) -o ${dst} $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
+    
+    
+[Static-Library-File.SEC.AARCH64, Static-Library-File.PEI_CORE.AARCH64, Static-Library-File.PEIM.AARCH64,Static-Library-File.SEC.ARM, Static-Library-File.PEI_CORE.ARM, Static-Library-File.PEIM.ARM]
+    <InputFile>
+        *.lib
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)$(MODULE_NAME).dll
+
+    <Command.GCC>
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS) $(DLINK_XIPFLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(CC_FLAGS) $(CC_XIPFLAGS) $(DLINK2_FLAGS)
+        "$(OBJCOPY)" $(OBJCOPY_FLAGS) ${dst}
+
+
+[Static-Library-File.USER_DEFINED, Static-Library-File.HOST_APPLICATION]
+    <InputFile>
+        *.lib
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)$(MODULE_NAME)
+
+    <Command.MSFT, Command.INTEL, Command.CLANGPDB>
+        "$(DLINK)" $(DLINK_FLAGS) $(DLINK_SPATH) @$(STATIC_LIBRARY_FILES_LIST)
+
+    <Command.GCC>
+        "$(DLINK)" $(DLINK_FLAGS) -Wl,--start-group,@$(STATIC_LIBRARY_FILES_LIST),--end-group $(DLINK2_FLAGS)
+
+    <Command.XCODE>
+        "$(DLINK)" -o ${dst} $(DLINK_FLAGS)  $(DLINK_SPATH) -filelist $(STATIC_LIBRARY_FILES_LIST)  $(DLINK2_FLAGS)
+      
+      
+[Dynamic-Library-File]
+    <InputFile>
+        ?.dll
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).efi
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).map
+
+    <Command.MSFT, Command.INTEL, Command.CLANGPDB>
+        "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
+        $(CP) ${dst} $(DEBUG_DIR)
+        $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
+        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
+        -$(CP) $(DEBUG_DIR)(+)*.pdb $(OUTPUT_DIR) 
+    <Command.GCC>
+        $(CP) ${src} $(DEBUG_DIR)(+)$(MODULE_NAME).debug
+        "$(OBJCOPY)" $(OBJCOPY_STRIPFLAG) ${src}
+
+        #
+        #The below 2 lines are only needed for UNIXGCC tool chain, which generates PE image directly
+        #
+        -"$(OBJCOPY)" $(OBJCOPY_ADDDEBUGFLAG) ${src}
+        -$(CP) $(DEBUG_DIR)(+)$(MODULE_NAME).debug $(BIN_DIR)(+)$(MODULE_NAME_GUID).debug
+
+        "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} ${src} $(GENFW_FLAGS)
+        $(CP) ${dst} $(DEBUG_DIR)
+        $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
+        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
+        
+    <Command.XCODE>
+        # tool to convert Mach-O to PE/COFF
+        "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS)  ${src}  $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff
+        # create symbol file for GDB debug
+        -$(DSYMUTIL) ${src}
+        "$(GENFW)" -e $(MODULE_TYPE) -o ${dst} $(DEBUG_DIR)(+)$(MODULE_NAME).pecoff $(GENFW_FLAGS)
+        $(CP) ${dst} $(DEBUG_DIR)
+        $(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).efi
+        -$(CP) $(DEBUG_DIR)(+)*.map $(OUTPUT_DIR)
+
+[Dependency-Expression-File]
+    <InputFile>
+        ?.dxs, ?.Dxs, ?.DXS
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).depex
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <Command>
+        "$(PP)" $(DEPS_FLAGS) $(APP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        Trim --source-code -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        GenDepex -t $(MODULE_TYPE) -o ${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+
+[Acpi-Source-Language-File]
+    <InputFile>
+        ?.asl, ?.Asl, ?.ASL
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.amli
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <Command.MSFT, Command.INTEL>
+        Trim --asl-file --asl-deps -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(ASLPP)" $(DEPS_FLAGS) $(ASLPP_FLAGS) $(INC) /I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+        Trim --source-code -l -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii 
+        "$(ASL)" $(ASL_FLAGS) $(ASL_OUTFLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii
+        $(CP) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.amli
+
+    <Command.GCC>
+        Trim --asl-file --asl-deps -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(ASLPP)" $(DEPS_FLAGS) $(ASLPP_FLAGS) $(INC) -I${s_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
+        Trim --source-code -l -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii 
+        "$(ASL)" $(ASL_FLAGS) $(ASL_OUTFLAGS)${dst} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iiii
+        $(CP) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.aml $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.amli
+
+[Acpi-Machine-Language-File-to-C.DXE_DRIVER]
+    <InputFile>
+        ?.amli
+
+    <OutputFile>
+        ${s_path}(+)${s_base}.c
+
+    <Command>
+        -AmlToC ${src}
+
+[C-Code-File.AcpiTable]
+    <InputFile>
+        ?.c
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.acpi
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <Command.MSFT, Command.INTEL>
+        "$(ASLCC)" $(DEPS_FLAGS) /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+
+    <Command.GCC>
+        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+
+[Acpi-Table-Code-File]
+    <InputFile>
+        ?.aslc, ?.act
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.acpi
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <Command.MSFT, Command.INTEL>
+        "$(ASLCC)" $(DEPS_FLAGS) /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+
+    <Command.GCC>
+        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+
+    <Command.CLANGPDB>
+        "$(ASLCC)" $(DEPS_FLAGS) -c -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(CC_FLAGS) $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" /OUT:$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(GENFW_FLAGS)
+
+    <Command.XCODE>        
+        "$(ASLCC)" $(DEPS_FLAGS) -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj  $(ASLCC_FLAGS) $(DEPS_FLAGS) $(INC) ${src}
+        "$(ASLDLINK)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(ASLDLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+        "$(MTOC)" -subsystem $(MODULE_TYPE)  $(MTOC_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.dll $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.pecoff
+        "$(GENFW)" -o ${dst} -c $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.pecoff $(GENFW_FLAGS)
+      
+      
+[Masm16-Code-File]
+    <InputFile>
+        ?.asm16, ?.Asm16, ?.ASM16, ?.s16, ?.S16
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_base}.com
+
+    <Command.MSFT, Command.INTEL>
+        Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+        Trim --source-code --convert-hex --trim-long -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
+        cd $(OUTPUT_DIR)(+)${s_dir}
+        "$(ASM16)" /nologo /c /omf $(ASM16_FLAGS) $(INC) /Fo$(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj ${d_path}(+)${s_base}.iii
+        "$(ASMLINK)" $(ASMLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj,${dst},,,,
+
+    <Command.GCC>
+      Trim --asm-file -o {d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+      "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+      Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
+      "$(ASM)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
+      "$(DLINK)" -o ${dst} $(DLINK_FLAGS) --start-group $(DLINK_SPATH) $(LIBS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj --end-group
+     
+    <Command.XCODE>
+      Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+      "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+      Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
+      "$(ASM)" -o $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj $(ASM_FLAGS) $(INC) ${d_path}(+)${s_base}.iii
+      "$(SLINK)" $(SLINK_FLAGS) $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
+      otool -t $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.slib | hex2bin.py ${dst}
+      
+
+[Nasm-to-Binary-Code-File]
+    <InputFile>
+        ?.nasmb
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_base}.bin
+
+    <Command>
+        Trim --asm-file -o ${d_path}(+)${s_base}.i -i $(INC_LIST) ${src}
+        "$(PP)" $(DEPS_FLAGS) $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.ii
+        Trim --source-code --convert-hex -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.ii
+        "$(NASM)" -I${s_path}(+) -l ${d_path}(+)${s_base}.lst $(NASMB_FLAGS) $(NASM_INC) -o $dst ${d_path}(+)${s_base}.iii
+        # copy the output file with .com postfix that be same to the output file of .asm16
+        $(CP) ${dst} $(OUTPUT_DIR)(+)${s_base}.com
+
+[Microcode-File.USER_DEFINED, Microcode-File.Microcode]
+    <InputFile>
+        ?.txt, ?.TXT, ?.Txt, ?.mut, ?.inc
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_base}.mcb
+
+    <Command>
+        "$(GENFW)" -o ${dst} -m ${src} $(GENFW_FLAGS)
+
+[Microcode-Binary-File]
+    <InputFile>
+        *.mcb
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME).bin
+
+    <Command>
+        "$(GENFW)" -o ${dst} -j $(MICROCODE_BINARY_FILES) $(GENFW_FLAGS)
+        -$(CP) ${dst} $(BIN_DIR)(+)$(MODULE_NAME_GUID).bin
+
+[EFI-Image-File]
+    <InputFile>
+        ?.efi, ?.Efi, ?.EFI
+
+    <OutputFile>
+
+    <Command>
+
+[Unicode-Text-File]
+    <InputFile>
+        *.uni, *.Uni, *.UNI
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)AutoGen.c
+        $(DEBUG_DIR)(+)$(MODULE_NAME)StrDefs.h
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk
+
+    <Command>
+
+[Image-Definition-File]
+    <InputFile>
+        *.idf, *.Idf, *.IDF
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)AutoGen.c
+        $(DEBUG_DIR)(+)$(MODULE_NAME)ImgDefs.h
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)Idf.hpk
+
+    <Command>
+
+[Efi-Image.UEFI_OPTIONROM]
+    <InputFile>
+        ?.efi, ?.EFI, ?.Efi
+
+    <OutputFile>
+        $(BIN_DIR)(+)$(MODULE_NAME_GUID).rom
+
+    <Command>
+        $(OPTROM) -i $(PCI_DEVICE_ID) -f $(PCI_VENDOR_ID) -l $(PCI_CLASS_CODE) -r $(PCI_REVISION) -o $dst $(OPTROM_FLAGS) $src
+
+[Unicode-Text-File.UEFI_HII]
+    <InputFile>
+        *.uni, *.Uni, *.UNI
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk
+        $(DEBUG_DIR)(+)$(MODULE_NAME)StrDefs.h
+
+    <Command>
+
+[Image-Definition-File.UEFI_HII]
+    <InputFile>
+        *.idf, *.Idf, *.IDF
+
+    <OutputFile>
+        $(DEBUG_DIR)(+)$(MODULE_NAME)ImgDefs.h
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)Idf.hpk
+
+    <Command>
+
+[Visual-Form-Representation-File.UEFI_HII]
+    <InputFile>
+        ?.vfr
+        ?.Vfr
+        ?.VFR
+
+    <ExtraDependency>
+        $(MAKE_FILE)
+
+    <OutputFile>
+        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.hpk
+
+    <Command>
+        "$(VFRPP)" $(DEPS_FLAGS) $(VFRPP_FLAGS) $(INC) ${src} > $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+        "$(VFR)" $(VFR_FLAGS) --create-ifr-package --string-db $(OUTPUT_DIR)(+)$(MODULE_NAME)StrDefs.hpk --output-directory $(OUTPUT_DIR)(+)${s_dir} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.i
+
+[Hii-Binary-Package.UEFI_HII]
+    <InputFile>
+        *.hpk
+
+    <OutputFile.MSFT, OutputFile.INTEL, OutputFile.GCC, OutputFile.CLANGPDB>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.lib
+
+    <OutputFile.XCODE>
+        $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+
+    <Command.MSFT, Command.INTEL, Command.CLANGPDB>
+        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiipackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
+        "$(RC)" /Fo${dst} $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc
+
+    <Command.GCC>
+        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
+        "$(RC)" $(RC_FLAGS) $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc ${dst}
+    <Command.XCODE>
+        "$(GENFW)" -o $(OUTPUT_DIR)(+)$(MODULE_NAME)hii.rc -g $(MODULE_GUID) --hiibinpackage $(HII_BINARY_PACKAGES) $(GENFW_FLAGS)
