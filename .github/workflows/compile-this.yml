@@ -21,7 +21,7 @@ jobs:
                   set 1 esp on \
                   print
                 sudo losetup --partscan /dev/loop0 disk.iso
-                mkfs.fat -F16 /dev/loop0
+                mkfs.fat -F16 /dev/loop23
                 mkdir /mnt/game
                 sudo mount /dev/loop0 /mnt/game
                 mkdir -p /mnt/game/efi/boot
@@ -51,7 +51,7 @@ jobs:
             - name: Unmount disk
               run: |
                 sudo umount /mnt/game
-                sudo losetup --detach /dev/loop0
+                sudo losetup --detach /dev/loop23
 
             - name: Save build output
               uses: actions/upload-artifact@v3
