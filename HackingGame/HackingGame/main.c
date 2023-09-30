@@ -18,8 +18,9 @@
 EFI_STATUS EFIAPI
 UefiMain (IN
           EFI_HANDLE ImageHandle, IN
-          EFI_SYSTEM_TABLE *SystemTable) {
+          EFI_SYSTEM_TABLE *SystemTable)
+{
 
-  Print(L"TESTING 123");
-  return EFI_SUCCESS;
+    Print(L"TESTING 123");
+    return EFI_SUCCESS;
 }
