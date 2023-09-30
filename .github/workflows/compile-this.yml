@@ -14,13 +14,13 @@ jobs:
             
             - name: Create bootable ISO
               run: |
-                dd if=/dev/zero of=disk.iso bs=1M count=10
-                parted --script disk.iso \
+                dd if=/dev/zero of=disk-amd64.iso bs=1M count=10
+                parted --script disk-amd64.iso \
                   mklabel gpt \
                   mkpart primary fat32 0% 100% \
                   set 1 esp on \
                   print
-                sudo losetup --partscan /dev/loop23 disk.iso
+                sudo losetup --partscan /dev/loop23 disk-amd64.iso
                 sudo mkfs.fat -F16 /dev/loop23p1
                 sudo mkdir /mnt/game
                 sudo mount /dev/loop23p1 /mnt/game
