@@ -1,0 +1,36 @@
+name: 'Compile UEFI game'
+on: 
+    push:
+        branches:
+            - '*'
+jobs:
+    compile-deez:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Setup build environment
+              run: |
+               sudo apt update -y
+               sudo apt install -y build-essential uuid-dev iasl git nasm python-is-python3
+            
+            - uses: actions/checkout@v4
+              name: Checkout repoistory
+              with:
+                submodules: recursive
+
+            - name: Compile build tools
+              run: | 
+                make -C BaseTools
+                . edksetup.sh
+            
+            - name: Compile base tools
+              run: |
+               make -C BaseTools
+
+            - name: Setup build environment
+              run: | 
+               export EDK_TOOLS_PATH=${{ github.workspace }}/BaseTools
+               . edksetup.sh BaseTools
+               build
+                
+
+            
