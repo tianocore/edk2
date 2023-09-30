@@ -29,13 +29,17 @@ typedef enum hg_game_tile_t {
     HG_NOISE_10, // ?
     HG_NOISE_11, // "
     HG_NOISE_12, // '
+    HG_NOISE_13, // ^
     __HG_NOISE_SEG_END
 } hg_game_tile_t;
 
-#define HG_NOISE_MAP "!,.%|#:+/?\"'"
+#define HG_NOISE_MAP "!,.%|#:+/?\"'^"
+#define HG_NOISE_VARIENTS (__HG_NOISE_SEG_END - __HG_NOISE_SEG_START - 1)
 
 typedef struct hg_game_state_t {
     size_t word_indexes[HG_WORD_COUNT];
+    /// The index (of words.h) that is correct
+    size_t correct_word_index;
     hg_game_tile_t grid[HG_GRID_ROWS][HG_GRID_COLS];
     int retries;
 } hg_game_state_t;
