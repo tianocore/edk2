@@ -22,12 +22,11 @@
 [LibraryClasses]
   BaseLib
   PcdLib
-  FdtLib
+  FdtSerialPortAddressLib
   HobLib
 
 [Packages]
   ArmVirtPkg/ArmVirtPkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
 
