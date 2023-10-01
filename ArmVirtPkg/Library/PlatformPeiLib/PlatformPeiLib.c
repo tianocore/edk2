@@ -9,6 +9,7 @@
 
 #include <PiPei.h>
 
+#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
@@ -43,7 +44,7 @@ PlatformPeim (
   UINTN                     FdtSize;
   UINTN                     FdtPages;
   UINT64                    *FdtHobData;
-  UINT64                    *UartHobData;
+  EARLY_PL011_BASE_ADDRESS  *UartHobData;
   FDT_SERIAL_PORTS          Ports;
   INT32                     Node, Prev;
   INT32                     Parent, Depth;
@@ -72,24 +73,55 @@ PlatformPeim (
 
   UartHobData = BuildGuidHob (&gEarlyPL011BaseAddressGuid, sizeof *UartHobData);
   ASSERT (UartHobData != NULL);
-  *UartHobData = 0;
+  SetMem (UartHobData, sizeof *UartHobData, 0);
 
   Status = FdtSerialGetPorts (Base, "arm,pl011", &Ports);
   if (!EFI_ERROR (Status)) {
-    UINT64  UartBase;
+    if (Ports.NumberOfPorts == 1) {
+      //
+      // Just one UART; direct both SerialPortLib+console and DebugLib to it.
+      //
+      UartHobData->ConsoleAddress = Ports.BaseAddress[0];
+      UartHobData->DebugAddress   = Ports.BaseAddress[0];
+    } else {
+      UINT64  ConsoleAddress;
 
-    //
-    // Default to the first port found, but (if there are multiple ports) allow
-    // the "/chosen" node to override it. Note that if FdtSerialGetConsolePort()
-    // fails, it does not modify UartBase.
-    //
-    UartBase = Ports.BaseAddress[0];
-    if (Ports.NumberOfPorts > 1) {
-      FdtSerialGetConsolePort (Base, &UartBase);
+      Status = FdtSerialGetConsolePort (Base, &ConsoleAddress);
+      if (EFI_ERROR (Status)) {
+        //
+        // At least two UARTs; but failed to get the console preference. Use the
+        // first UART for SerialPortLib+console, and the second one for
+        // DebugLib.
+        //
+        UartHobData->ConsoleAddress = Ports.BaseAddress[0];
+        UartHobData->DebugAddress   = Ports.BaseAddress[1];
+      } else {
+        //
+        // At least two UARTs; and console preference available. Use the
+        // preferred UART for SerialPortLib+console, and *another* UART for
+        // DebugLib.
+        //
+        UartHobData->ConsoleAddress = ConsoleAddress;
+        if (ConsoleAddress == Ports.BaseAddress[0]) {
+          UartHobData->DebugAddress = Ports.BaseAddress[1];
+        } else {
+          UartHobData->DebugAddress = Ports.BaseAddress[0];
+        }
+      }
     }
 
-    DEBUG ((DEBUG_INFO, "%a: PL011 UART @ 0x%lx\n", __func__, UartBase));
-    *UartHobData = UartBase;
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: PL011 UART (console) @ 0x%lx\n",
+      __func__,
+      UartHobData->ConsoleAddress
+      ));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: PL011 UART (debug) @ 0x%lx\n",
+      __func__,
+      UartHobData->DebugAddress
+      ));
   }
 
   TpmBase = 0;
