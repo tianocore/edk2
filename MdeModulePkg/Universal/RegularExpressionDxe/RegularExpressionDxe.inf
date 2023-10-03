@@ -102,6 +102,7 @@
 
   # Oniguruma: old style declaration in st.c
   MSFT:*_*_*_CC_FLAGS = /wd4131
+  GCC:*_*_*_CC_FLAGS = -Wno-deprecated-non-prototype
 
   # Oniguruma: 'type cast' : truncation from 'OnigUChar *' to 'unsigned int'
   MSFT:*_*_*_CC_FLAGS = /wd4305 /wd4306
