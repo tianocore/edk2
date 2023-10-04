@@ -244,7 +244,6 @@ DxeMain (
   EFI_VECTOR_HANDOFF_INFO       *VectorInfo;
   VOID                          *EntryPoint;
 
-  DEBUG ((DEBUG_INFO | DEBUG_LOAD, " in %a\n", __func__));
   //
   // Setup the default exception handlers
   //

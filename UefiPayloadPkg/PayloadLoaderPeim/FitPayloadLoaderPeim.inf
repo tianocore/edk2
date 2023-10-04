@@ -46,6 +46,7 @@
 
 [Ppis]
   gEfiPeiLoadFilePpiGuid                 ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid              ## CONSUMES
 
 [Pcd]
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister

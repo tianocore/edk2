@@ -52,7 +52,7 @@ AddNewHob (
   IN EFI_PEI_HOB_POINTERS  *Hob
   );
 
-#if FixedPcdGet8(PcdUplInterface) == 0 || FixedPcdGet8 (PcdUplInterface) == 2
+#if FixedPcdGet8(PcdHandOffFdtEnable) == FALSE
 /**
   It will build HOBs based on information from bootloaders.
   @param[in]  BootloaderParameter   The starting memory address of bootloader parameter block.
@@ -65,7 +65,7 @@ BuildHobs (
   );
 #endif
 
-#if FixedPcdGet8(PcdUplInterface) == 1 || FixedPcdGet8 (PcdUplInterface) == 2
+#if FixedPcdGet8(PcdHandOffFdtEnable) == TRUE
 /**
   It will initialize HOBs for UPL.
   @param[in]  FdtBase        Address of the Fdt data.
@@ -362,7 +362,7 @@ _ModuleEntryPoint (
   PHYSICAL_ADDRESS               DxeCoreEntryPoint;
   EFI_PEI_HOB_POINTERS           Hob;
   EFI_FIRMWARE_VOLUME_HEADER     *DxeFv;
-#if FixedPcdGet8 (PcdUplInterface) == 1 || FixedPcdGet8 (PcdUplInterface) == 2
+#if FixedPcdGet8 (PcdHandOffFdtEnable) TRUE
   PHYSICAL_ADDRESS               HobListPtr;
   UINT8                          *GuidHob;
   UNIVERSAL_PAYLOAD_DEVICE_TREE  *FdtHob;
@@ -378,7 +378,7 @@ _ModuleEntryPoint (
   DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof (UINTN)));
   DEBUG ((DEBUG_INFO, "BootloaderParameter = 0x%x\n", BootloaderParameter));
 
-#if FixedPcdGet8 (PcdUplInterface) == 0
+#if FixedPcdGet8 (PcdHandOffFdtEnable) == FALSE
   mHobList = (VOID *) BootloaderParameter;
 
   DEBUG ((DEBUG_INFO, "Start build HOB...\n"));
@@ -388,7 +388,7 @@ _ModuleEntryPoint (
   ASSERT_EFI_ERROR (Status);
 #endif
 
-#if FixedPcdGet8 (PcdUplInterface) == 1 || FixedPcdGet8 (PcdUplInterface) == 2
+#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
 
   DEBUG ((DEBUG_INFO, "Start parsing FDT...\n"));
   HobListPtr = UplInitHob ((VOID *) BootloaderParameter);

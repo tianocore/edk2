@@ -941,6 +941,11 @@
   # @Prompt Enable process non-reset capsule image at runtime.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
 
+  ## Indicates if Universal payload support FDT .<BR><BR>
+  #   TRUE, HandOffData is FDT
+  #  FALSE, HandOffData is HOB
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHandOffFdtEnable|FALSE|BOOLEAN|0x00010080
+
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
 

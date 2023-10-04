@@ -82,7 +82,7 @@
 
 [Pcd.IA32,Pcd.X64]
   gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile
-  gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHandOffFdtEnable
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
