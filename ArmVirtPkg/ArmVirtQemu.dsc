@@ -487,6 +487,10 @@
   #
   # Platform Driver
   #
+  ArmVirtPkg/QemuPlatformDxe/QemuPlatformDxe.inf {
+    <LibraryClasses>
+    NULL|OvmfPkg/Library/FdtNorFlashQemuLib/FdtNorFlashQemuLib.inf
+  }
   OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
   EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
   OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
