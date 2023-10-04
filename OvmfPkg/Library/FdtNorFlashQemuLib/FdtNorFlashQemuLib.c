@@ -19,61 +19,57 @@
 #define MAX_FLASH_BANKS      4
 
 STATIC VIRT_NOR_FLASH_DESCRIPTION  mNorFlashDevices[MAX_FLASH_BANKS];
+STATIC UINTN                       mNorFlashDeviceCount = 0;
+STATIC INT32                       mNorFlashNodes[MAX_FLASH_BANKS];
+STATIC UINTN                       mNorFlashNodeCount = 0;
+FDT_CLIENT_PROTOCOL                *mFdtClient;
 
 EFI_STATUS
-VirtNorFlashPlatformInitialization (
-  VOID
+EFIAPI
+NorFlashQemuLibConstructor (
+  IN  EFI_HANDLE        ImageHandle,
+  IN  EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-VirtNorFlashPlatformGetDevices (
-  OUT VIRT_NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
-  OUT UINT32                      *Count
-  )
-{
-  FDT_CLIENT_PROTOCOL  *FdtClient;
-  INT32                Node;
-  EFI_STATUS           Status;
-  EFI_STATUS           FindNodeStatus;
-  CONST UINT32         *Reg;
-  UINT32               PropSize;
-  UINT32               Num;
-  UINT64               Base;
-  UINT64               Size;
-  BOOLEAN              Found;
+  INT32         Node;
+  EFI_STATUS    Status;
+  EFI_STATUS    FindNodeStatus;
+  CONST UINT32  *Reg;
+  UINT32        PropSize;
+  UINT32        Num;
+  UINT64        Base;
+  UINT64        Size;
+  BOOLEAN       Found;
 
   Status = gBS->LocateProtocol (
                   &gFdtClientProtocolGuid,
                   NULL,
-                  (VOID **)&FdtClient
+                  (VOID **)&mFdtClient
                   );
   ASSERT_EFI_ERROR (Status);
 
   Num   = 0;
   Found = FALSE;
-  for (FindNodeStatus = FdtClient->FindCompatibleNode (
-                                     FdtClient,
-                                     "cfi-flash",
-                                     &Node
-                                     );
+  for (FindNodeStatus = mFdtClient->FindCompatibleNode (
+                                      mFdtClient,
+                                      "cfi-flash",
+                                      &Node
+                                      );
        !EFI_ERROR (FindNodeStatus) && Num < MAX_FLASH_BANKS;
-       FindNodeStatus = FdtClient->FindNextCompatibleNode (
-                                     FdtClient,
-                                     "cfi-flash",
-                                     Node,
-                                     &Node
-                                     ))
+       FindNodeStatus = mFdtClient->FindNextCompatibleNode (
+                                      mFdtClient,
+                                      "cfi-flash",
+                                      Node,
+                                      &Node
+                                      ))
   {
-    Status = FdtClient->GetNodeProperty (
-                          FdtClient,
-                          Node,
-                          "reg",
-                          (CONST VOID **)&Reg,
-                          &PropSize
-                          );
+    Status = mFdtClient->GetNodeProperty (
+                           mFdtClient,
+                           Node,
+                           "reg",
+                           (CONST VOID **)&Reg,
+                           &PropSize
+                           );
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
@@ -107,7 +103,7 @@ VirtNorFlashPlatformGetDevices (
       mNorFlashDevices[Num].RegionBaseAddress = (UINTN)Base;
       mNorFlashDevices[Num].Size              = (UINTN)Size;
       mNorFlashDevices[Num].BlockSize         = QEMU_NOR_BLOCK_SIZE;
-      Num++;
+      mNorFlashDeviceCount                    = ++Num;
       if (!Found) {
         //
         // By default, the second available flash is stored as a non-volatile variable.
@@ -136,30 +132,63 @@ VirtNorFlashPlatformGetDevices (
       }
     }
 
-    //
-    // UEFI takes ownership of the NOR flash, and exposes its functionality
-    // through the UEFI Runtime Services GetVariable, SetVariable, etc. This
-    // means we need to disable it in the device tree to prevent the OS from
-    // attaching its device driver as well.
-    // Note that this also hides other flash banks, but the only other flash
-    // bank we expect to encounter is the one that carries the UEFI executable
-    // code, which is not intended to be guest updatable, and is usually backed
-    // in a readonly manner by QEMU anyway.
-    //
-    Status = FdtClient->SetNodeProperty (
-                          FdtClient,
-                          Node,
-                          "status",
-                          "disabled",
-                          sizeof ("disabled")
-                          );
+    mNorFlashNodes[mNorFlashNodeCount++] = Node;
+  }
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+VirtNorFlashPlatformInitialization (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       Index;
+
+  //
+  // UEFI takes ownership of the NOR flash, and exposes its functionality
+  // through the UEFI Runtime Services GetVariable, SetVariable, etc. This
+  // means we need to disable it in the device tree to prevent the OS from
+  // attaching its device driver as well.
+  // Note that this also hides other flash banks, but the only other flash
+  // bank we expect to encounter is the one that carries the UEFI executable
+  // code, which is not intended to be guest updatable, and is usually backed
+  // in a readonly manner by QEMU anyway.
+  //
+  // Note: this library is loaded multiple times, by QemuPlatformDxe and last by
+  // NorFlashDxe. Since FindNextCompatibleNode() skips disabled nodes, we only
+  // disable the node here, when NorFlashDxe calls
+  // VirtNorFlashPlatformInitialization().
+  //
+  for (Index = 0; Index < mNorFlashNodeCount; Index++) {
+    Status = mFdtClient->SetNodeProperty (
+                           mFdtClient,
+                           mNorFlashNodes[Index],
+                           "status",
+                           "disabled",
+                           sizeof ("disabled")
+                           );
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_WARN, "Failed to set NOR flash status to 'disabled'\n"));
     }
   }
 
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+VirtNorFlashPlatformGetDevices (
+  OUT VIRT_NOR_FLASH_DESCRIPTION  **NorFlashDescriptions,
+  OUT UINT32                      *Count
+  )
+{
+  if (mNorFlashDeviceCount == 0) {
+    return EFI_NOT_FOUND;
+  }
+
   *NorFlashDescriptions = mNorFlashDevices;
-  *Count                = Num;
+  *Count                = mNorFlashDeviceCount;
 
   return EFI_SUCCESS;
 }
