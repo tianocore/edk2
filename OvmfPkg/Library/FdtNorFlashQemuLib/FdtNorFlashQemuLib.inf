@@ -14,6 +14,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NorFlashQemuLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = NorFlashQemuLibConstructor
 
 [Sources]
   FdtNorFlashQemuLib.c
