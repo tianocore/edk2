@@ -135,6 +135,22 @@ NorFlashQemuLibConstructor (
     mNorFlashNodes[mNorFlashNodeCount++] = Node;
   }
 
+  if (Num == 0) {
+    DEBUG ((
+      DEBUG_INFO,
+      "No Flash device found, falling back to Runtime Variable Emulation\n"
+      ));
+
+    Status = PcdSetBoolS (PcdEmuVariableNvModeEnable, TRUE);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "Failed to set PcdEmuVariableNvModeEnable, Status = %r\n",
+        Status
+        ));
+    }
+  }
+
   return EFI_SUCCESS;
 }
 

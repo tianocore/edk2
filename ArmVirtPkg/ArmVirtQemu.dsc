@@ -262,6 +262,9 @@
   gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
 
+  # Define PCD for emulating runtime variable storage when CFI flash is absent
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
+
   #
   # ARM General Interrupt Controller
   #
