@@ -27,16 +27,4 @@ ArmRndr (
   OUT UINT64  *Rand
   );
 
-/**
-  Reads the ID_AA64ISAR0 Register.
-
-  @return The contents of the ID_AA64ISAR0 register.
-
-**/
-UINT64
-EFIAPI
-ArmReadIdIsar0 (
-  VOID
-  );
-
 #endif /* ARM_RNG_H_ */
