@@ -43,28 +43,23 @@ OPENSSL_cpuid_setup (
   */
   OPENSSL_armcap_P |= ARMV7_NEON;
 
-  if (ArmHasAes ())
-  {
+  if (ArmHasAes ()) {
     OPENSSL_armcap_P |= ARMV8_AES;
   }
 
-  if (ArmHasSha1 ())
-  {
+  if (ArmHasSha1 ()) {
     OPENSSL_armcap_P |= ARMV8_SHA1;
   }
 
-  if (ArmHasSha256 ())
-  {
+  if (ArmHasSha256 ()) {
     OPENSSL_armcap_P |= ARMV8_SHA256;
   }
 
-  if (ArmHasPmull ())
-  {
+  if (ArmHasPmull ()) {
     OPENSSL_armcap_P |= ARMV8_PMULL;
   }
 
-  if (ArmHasSha512 ())
-  {
+  if (ArmHasSha512 ()) {
     OPENSSL_armcap_P |= ARMV8_SHA512;
   }
 }
