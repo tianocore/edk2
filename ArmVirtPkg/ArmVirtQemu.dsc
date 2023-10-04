@@ -229,6 +229,9 @@
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
+  # Define PCD for emulating runtime variable storage when CFI flash is absent
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
+
   ## PL031 RealTimeClock
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x0
 
