@@ -262,6 +262,7 @@ def sources_filter_fn(filename):
         'provider_predefined.c',
         'ecp_nistz256.c',
         'x86_64-gcc.c',
+        'armcap.c',
     ]
     for item in exclude:
         if item in filename:
@@ -353,7 +354,8 @@ def main():
         sources = {}
         defines = {}
         for asm in [ 'UEFI-IA32-MSFT', 'UEFI-IA32-GCC',
-                     'UEFI-X64-MSFT', 'UEFI-X64-GCC']:
+                     'UEFI-X64-MSFT', 'UEFI-X64-GCC',
+                     'UEFI-AARCH64-GCC']:
             (uefi, arch, cc) = asm.split('-')
             archcc = f'{arch}-{cc}'
 
@@ -375,6 +377,8 @@ def main():
         x64accel = sources['X64'] + sources['X64-MSFT'] + sources['X64-GCC']
         update_inf(inf, ia32accel, 'IA32', defines['IA32'])
         update_inf(inf, x64accel, 'X64', defines['X64'])
+        aarch64accel = sources['AARCH64'] + sources['AARCH64-GCC']
+        update_inf(inf, aarch64accel, 'AARCH64', defines['AARCH64'])
 
     # noaccel - ec enabled
     openssl_configure(openssldir, 'UEFI', ec = True);
