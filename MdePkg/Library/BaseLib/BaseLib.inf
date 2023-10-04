@@ -377,6 +377,7 @@
   AArch64/CpuBreakpoint.S           | GCC
   AArch64/SpeculationBarrier.S      | GCC
   AArch64/ArmReadCntPctReg.S        | GCC
+  AArch64/ArmReadIdAA64Isar0Reg.S       | GCC
 
   AArch64/MemoryFence.asm           | MSFT
   AArch64/SwitchStack.asm           | MSFT
@@ -387,6 +388,7 @@
   AArch64/CpuBreakpoint.asm         | MSFT
   AArch64/SpeculationBarrier.asm    | MSFT
   AArch64/ArmReadCntPctReg.asm      | MSFT
+  AArch64/ArmReadIdAA64Isar0Reg.asm     | MSFT
 
 [Sources.RISCV64]
   Math64.c
