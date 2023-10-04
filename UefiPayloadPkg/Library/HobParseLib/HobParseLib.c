@@ -302,7 +302,7 @@ BuildHobs (
   EFI_PHYSICAL_ADDRESS          MemoryTop;
   EFI_HOB_RESOURCE_DESCRIPTOR   *PhitResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceHob;
-#if FixedPcdGet8 (PcdUplInterface) == 0  
+#if FixedPcdGet8 (PcdHandOffFdtEnable) == FALSE  
   UINT8                         *GuidHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE  *AcpiTable;
   ACPI_BOARD_INFO               *AcpiBoardInfo;
@@ -390,7 +390,7 @@ BuildHobs (
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
-#if FixedPcdGet8 (PcdUplInterface) == 0
+#if FixedPcdGet8 (PcdHandOffFdtEnable) == FALSE
   //
   // Create guid hob for acpi board information
   //

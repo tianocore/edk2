@@ -27,6 +27,28 @@ extern VOID  *mHobList;
 
 CHAR8  *mLineBuffer = NULL;
 
+
+/**
+  It will initialize HOBs for UPL.
+  @param[in]  FdtBase        Address of the Fdt data.
+  @retval EFI_SUCCESS        If it completed successfully.
+  @retval Others             If it failed to initialize HOBs.
+**/
+UINT64
+UplInitHob (
+  IN VOID                         *FdtBase
+  );
+
+/**
+  It will parse FDT based on DTB from bootloaders.
+  @param[in]  FdtBase               Address of the Fdt data.
+  @retval EFI_SUCCESS               If it completed successfully.
+  @retval Others                    If it failed to parse DTB.
+**/
+UINTN
+ParseDtb (
+  IN VOID                           *FdtBase
+  );
 /**
   Print all HOBs info from the HOB list.
   @return The pointer to the HOB list.
@@ -612,27 +634,40 @@ _ModuleEntryPoint (
   EFI_PEI_HOB_POINTERS        Hob;
   EFI_FIRMWARE_VOLUME_HEADER  *DxeFv;
 
-  mHobList = (VOID *)BootloaderParameter;
   DxeFv    = NULL;
   // Call constructor for all libraries
   ProcessLibraryConstructorList ();
+  // Initialize floating point operating environment to be compliant with UEFI spec.
+  InitializeFloatingPointUnits ();  
 
   DEBUG ((DEBUG_INFO, "Entering Universal Payload...\n"));
   DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof (UINTN)));
+  DEBUG ((DEBUG_INFO, "BootloaderParameter = 0x%x\n", BootloaderParameter));
+
+  DEBUG ((DEBUG_INFO, "Start parsing FDT...\n"));
+  HobListPtr = UplInitHob ((VOID *) BootloaderParameter);
+  mHobList = (VOID *)HobListPtr;
+
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadDeviceTreeGuid);
+  ASSERT (GuidHob != NULL);
+  FdtHob = (UNIVERSAL_PAYLOAD_DEVICE_TREE *) GET_GUID_HOB_DATA (GuidHob);
+  Fdt = (VOID *) (FdtHob->DeviceTreeAddress);
+
+  if (HobListPtr != 0) {
+    // Build HOB based on information from Bootloader
+    Status = BuildHobs (HobListPtr, &DxeFv);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  // Call constructor for all libraries again since hobs were built
+  ProcessLibraryConstructorList ();
 
   DEBUG_CODE (
     //
     // Dump the Hobs from boot loader
     //
     PrintHob (mHobList);
-    );
-
-  // Initialize floating point operating environment to be compliant with UEFI spec.
-  InitializeFloatingPointUnits ();
-
-  // Build HOB based on information from Bootloader
-  Status = BuildHobs (BootloaderParameter, &DxeFv);
-  ASSERT_EFI_ERROR (Status);
+  );
 
   FixUpPcdDatabase (DxeFv);
   Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);
@@ -644,7 +679,7 @@ _ModuleEntryPoint (
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
   IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0xFF);
 
-  Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *)GetFirstHob (EFI_HOB_TYPE_HANDOFF);
+  Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *) GetFirstHob (EFI_HOB_TYPE_HANDOFF);
   HandOffToDxeCore (DxeCoreEntryPoint, Hob);
 
   // Should not get here

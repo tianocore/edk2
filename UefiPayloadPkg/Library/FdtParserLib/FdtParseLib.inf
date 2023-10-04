@@ -42,4 +42,4 @@
 [Pcd.IA32,Pcd.X64]
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
   gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
-  gUefiPayloadPkgTokenSpaceGuid.PcdUplInterface
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHandOffFdtEnable

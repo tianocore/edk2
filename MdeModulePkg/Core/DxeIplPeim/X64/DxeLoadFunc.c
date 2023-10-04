@@ -36,10 +36,11 @@ HandOffToDxeCore (
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI  *VectorHandoffInfoPpi;
   VOID                             *GhcbBase;
   UINTN                            GhcbSize;
+#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
   UINT8                            *GuidHob;
   UNIVERSAL_PAYLOAD_DEVICE_TREE    *FdtHob;
+#endif
 
-  DEBUG ((DEBUG_ERROR, "Transfer the control to the entry point of DxeCore via Mde 64bit\n:"));
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
   //
@@ -118,10 +119,7 @@ HandOffToDxeCore (
   Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
   ASSERT_EFI_ERROR (Status);
 
-
-  DEBUG ((DEBUG_INFO, "End of PEI phase signal end via Mde 64bit\n:"));
-
-#if 1
+#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
   //
   // Get FDT blob address
   //
@@ -129,8 +127,6 @@ HandOffToDxeCore (
   ASSERT (GuidHob != NULL);
   FdtHob = (UNIVERSAL_PAYLOAD_DEVICE_TREE *) GET_GUID_HOB_DATA (GuidHob);
 #endif
-
-//  DEBUG ((DEBUG_INFO, "Get FDT hob via Mde 64bit\n:"));
 
   if (FeaturePcdGet (PcdDxeIplBuildPageTables)) {
     AsmWriteCr3 (PageTables);
@@ -146,8 +142,11 @@ HandOffToDxeCore (
   //
   SwitchStack (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-    //HobList.Raw,
+#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE    
     (VOID *)(UINTN)FdtHob->DeviceTreeAddress,
+#else
+    HobList.Raw,
+#endif
     NULL,
     TopOfStack
     );

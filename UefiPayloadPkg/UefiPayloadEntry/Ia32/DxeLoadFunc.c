@@ -17,8 +17,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/HobLib.h>
 #include "VirtualMemory.h"
 #include "UefiPayloadEntry.h"
-#include <UniversalPayload/DeviceTree.h>
-
 
 #define STACK_SIZE       0x20000
 #define IDT_ENTRY_COUNT  32
@@ -269,10 +267,7 @@ HandOffToDxeCore (
   EFI_PHYSICAL_ADDRESS     VectorAddress;
   UINT32                   Index;
   X64_IDT_TABLE            *IdtTableForX64;
-  UINT8                            *GuidHob;
-  UNIVERSAL_PAYLOAD_DEVICE_TREE    *FdtHob;  
 
-  DEBUG ((DEBUG_ERROR, "Transfer the control to the entry point of DxeCore via UefiPayloadEntry 32bit\n:"));
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
   //
