@@ -246,13 +246,13 @@ specific set of enabled cryptographic services. If ECC services are not
 required, then the size can be reduced by using OpensslLib.inf instead of
 `OpensslLibFull.inf`. Performance optimization requires a size increase.
 
-| OpensslLib Instance     | SSL | ECC | Perf Opt | CPU Arch | Size  |
-|:------------------------|:---:|:---:|:--------:|:--------:|:-----:|
-| OpensslLibCrypto.inf    |  N  |  N  |    N     |   All    |   +0K |
-| OpensslLib.inf          |  Y  |  N  |    N     |   All    |   +0K |
-| OpensslLibAccel.inf     |  Y  |  N  |    Y     | IA32/X64 |  +20K |
-| OpensslLibFull.inf      |  Y  |  Y  |    N     |   All    | +115K |
-| OpensslLibFullAccel.inf |  Y  |  Y  |    Y     | IA32/X64 | +135K |
+| OpensslLib Instance     | SSL | ECC | Perf Opt |      CPU Arch    | Size  |
+|:------------------------|:---:|:---:|:--------:|:----------------:|:-----:|
+| OpensslLibCrypto.inf    |  N  |  N  |    N     |        All       |   +0K |
+| OpensslLib.inf          |  Y  |  N  |    N     |        All       |   +0K |
+| OpensslLibAccel.inf     |  Y  |  N  |    Y     | IA32/X64/AARCH64 |  +20K |
+| OpensslLibFull.inf      |  Y  |  Y  |    N     |        All       | +115K |
+| OpensslLibFullAccel.inf |  Y  |  Y  |    Y     | IA32/X64/AARCH64 | +135K |
 
 ### SEC Phase Library Mappings
 
