@@ -396,6 +396,14 @@
   # @Prompt Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess|TRUE|BOOLEAN|0x3213210F
 
+[PcdsFixedAtBuild.RISCV64]
+  ## Indicate the maximum SATP mode allowed.
+  #  0 - Bare mode.
+  #  8 - 39bit mode.
+  #  9 - 48bit mode.
+  #  10 - 57bit mode.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuRiscVMmuMaxSatpMode|10|UINT32|0x60000021
+
 [PcdsDynamic, PcdsDynamicEx]
   ## Contains the pointer to a CPU S3 data buffer of structure ACPI_CPU_DATA.
   # @Prompt The pointer to a CPU S3 data buffer.
