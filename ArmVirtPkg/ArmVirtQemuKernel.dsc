@@ -270,6 +270,10 @@
 
 !include NetworkPkg/NetworkDynamicPcds.dsc.inc
 
+  # Define PCD for emulating runtime variable storage when CFI flash is absent
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
+
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
