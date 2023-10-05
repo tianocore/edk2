@@ -1093,6 +1093,14 @@ typedef struct {
 } IPMI_GET_SYSTEM_INTERFACE_KCS_SMIC_CAPABILITIES_RESPONSE;
 
 //
+// Response of interface capability of SSIF/KCS/SMIC.
+//
+typedef union {
+  IPMI_GET_SYSTEM_INTERFACE_SSIF_CAPABILITIES_RESPONSE        *InterfaceSsifCapability;
+  IPMI_GET_SYSTEM_INTERFACE_KCS_SMIC_CAPABILITIES_RESPONSE    *InterfaceKcsSmicCapability;
+} IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_RESPONSE;
+
+//
 //  Definitions for Get System Interface Capabilities command SSIF transaction support
 //
 #define IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_SSIF_TRANSACTION_SUPPORT_SINGLE_PARTITION_RW             0x0
