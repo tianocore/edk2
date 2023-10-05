@@ -59,6 +59,47 @@ typedef void *AML_DATA_NODE_HANDLE;
 
 #endif // AML_HANDLE
 
+/** Memory attributes, _MEM (2 bits)
+
+  Possible values are:
+    0-The memory is non-cacheable
+    1-The memory is cacheable (DEPRECATED)
+    2-The memory is cacheable and supports
+      write combining (DEPRECATED)
+    3-The memory is cacheable and prefetchable
+
+  @par Reference(s):
+  - ACPI 6.5, s6.4.3.5.5 "Resource Type Specific Flags"
+
+**/
+typedef enum {
+  AmlMemoryNonCacheable          = 0,
+  AmlMemoryCacheable             = 1,
+  AmlMemoryCacheableWriteCombine = 2,
+  AmlMemoryCacheablePrefetch     = 3,
+  AmlMemoryCacheablityMax        = 4
+} AML_MEMORY_ATTRIBUTES_MEM;
+
+/** Memory attributes, _MTP (2 bits)
+
+  Possible values are:
+    0-AddressRangeMemory
+    1-AddressRangeReserved
+    2-AddressRangeACPI
+    3-AddressRangeNVS
+
+  @par Reference(s):
+  - ACPI 6.5, s6.4.3.5.5 "Resource Type Specific Flags"
+
+**/
+typedef enum {
+  AmlAddressRangeMemory   = 0,
+  AmlAddressRangeReserved = 1,
+  AmlAddressRangeACPI     = 2,
+  AmlAddressRangeNVS      = 3,
+  AmlAddressRangeMax      = 4
+} AML_MEMORY_ATTRIBUTES_MTP;
+
 /** Parse the definition block.
 
   The function parses the whole AML blob. It starts with the ACPI DSDT/SSDT
@@ -578,7 +619,7 @@ AmlCodeGenRdDWordMemory (
   IN        BOOLEAN IsPosDecode,
   IN        BOOLEAN IsMinFixed,
   IN        BOOLEAN IsMaxFixed,
-  IN        UINT8 Cacheable,
+  IN        AML_MEMORY_ATTRIBUTES_MEM Cacheable,
   IN        BOOLEAN IsReadWrite,
   IN        UINT32 AddressGranularity,
   IN        UINT32 AddressMinimum,
@@ -587,7 +628,7 @@ AmlCodeGenRdDWordMemory (
   IN        UINT32 RangeLength,
   IN        UINT8 ResourceSourceIndex,
   IN  CONST CHAR8 *ResourceSource,
-  IN        UINT8 MemoryRangeType,
+  IN        AML_MEMORY_ATTRIBUTES_MTP MemoryRangeType,
   IN        BOOLEAN IsTypeStatic,
   IN        AML_OBJECT_NODE_HANDLE NameOpNode, OPTIONAL
   OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
@@ -809,7 +850,7 @@ AmlCodeGenRdQWordMemory (
   IN        BOOLEAN IsPosDecode,
   IN        BOOLEAN IsMinFixed,
   IN        BOOLEAN IsMaxFixed,
-  IN        UINT8 Cacheable,
+  IN        AML_MEMORY_ATTRIBUTES_MEM Cacheable,
   IN        BOOLEAN IsReadWrite,
   IN        UINT64 AddressGranularity,
   IN        UINT64 AddressMinimum,
@@ -818,7 +859,7 @@ AmlCodeGenRdQWordMemory (
   IN        UINT64 RangeLength,
   IN        UINT8 ResourceSourceIndex,
   IN  CONST CHAR8 *ResourceSource,
-  IN        UINT8 MemoryRangeType,
+  IN        AML_MEMORY_ATTRIBUTES_MTP MemoryRangeType,
   IN        BOOLEAN IsTypeStatic,
   IN        AML_OBJECT_NODE_HANDLE NameOpNode, OPTIONAL
   OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL

@@ -570,7 +570,7 @@ AmlCodeGenRdDWordMemory (
   IN        BOOLEAN IsPosDecode,
   IN        BOOLEAN IsMinFixed,
   IN        BOOLEAN IsMaxFixed,
-  IN        UINT8 Cacheable,
+  IN        AML_MEMORY_ATTRIBUTES_MEM Cacheable,
   IN        BOOLEAN IsReadWrite,
   IN        UINT32 AddressGranularity,
   IN        UINT32 AddressMinimum,
@@ -579,7 +579,7 @@ AmlCodeGenRdDWordMemory (
   IN        UINT32 RangeLength,
   IN        UINT8 ResourceSourceIndex,
   IN  CONST CHAR8 *ResourceSource,
-  IN        UINT8 MemoryRangeType,
+  IN        AML_MEMORY_ATTRIBUTES_MTP MemoryRangeType,
   IN        BOOLEAN IsTypeStatic,
   IN        AML_OBJECT_NODE_HANDLE NameOpNode, OPTIONAL
   OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
@@ -1161,7 +1161,7 @@ AmlCodeGenRdQWordMemory (
   IN        BOOLEAN IsPosDecode,
   IN        BOOLEAN IsMinFixed,
   IN        BOOLEAN IsMaxFixed,
-  IN        UINT8 Cacheable,
+  IN        AML_MEMORY_ATTRIBUTES_MEM Cacheable,
   IN        BOOLEAN IsReadWrite,
   IN        UINT64 AddressGranularity,
   IN        UINT64 AddressMinimum,
@@ -1170,7 +1170,7 @@ AmlCodeGenRdQWordMemory (
   IN        UINT64 RangeLength,
   IN        UINT8 ResourceSourceIndex,
   IN  CONST CHAR8 *ResourceSource,
-  IN        UINT8 MemoryRangeType,
+  IN        AML_MEMORY_ATTRIBUTES_MTP MemoryRangeType,
   IN        BOOLEAN IsTypeStatic,
   IN        AML_OBJECT_NODE_HANDLE NameOpNode, OPTIONAL
   OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
