@@ -14,7 +14,7 @@
 STATIC
 VOID
 EFIAPI
-PrintOemId (
+PrintString (
   CONST CHAR8  *Format,
   UINT8        *Ptr
   );
@@ -22,7 +22,31 @@ PrintOemId (
 STATIC
 VOID
 EFIAPI
-PrintString (
+PrintStringPtr (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr
+  );
+
+STATIC
+VOID
+EFIAPI
+PrintChar4 (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr
+  );
+
+STATIC
+VOID
+EFIAPI
+PrintChar6 (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr
+  );
+
+STATIC
+VOID
+EFIAPI
+PrintChar8 (
   CONST CHAR8  *Format,
   UINT8        *Ptr
   );
@@ -190,16 +214,16 @@ STATIC CONST CM_OBJ_PARSER  CmArmItsGroupNodeParser[] = {
 /** A parser for EArmObjNamedComponent.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmNamedComponentNodeParser[] = {
-  { "Token",             sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
-  { "IdMappingCount",    4,                        "0x%x", NULL        },
-  { "IdMappingToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
-  { "Flags",             4,                        "0x%x", NULL        },
-  { "CacheCoherent",     4,                        "0x%x", NULL        },
-  { "AllocationHints",   1,                        "0x%x", NULL        },
-  { "MemoryAccessFlags", 1,                        "0x%x", NULL        },
-  { "AddressSizeLimit",  1,                        "0x%x", NULL        },
-  { "ObjectName",        sizeof (CHAR8 *),         NULL,   PrintString },
-  { "Identifier",        4,                        "0x%x", NULL        },
+  { "Token",             sizeof (CM_OBJECT_TOKEN), "0x%p", NULL           },
+  { "IdMappingCount",    4,                        "0x%x", NULL           },
+  { "IdMappingToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL           },
+  { "Flags",             4,                        "0x%x", NULL           },
+  { "CacheCoherent",     4,                        "0x%x", NULL           },
+  { "AllocationHints",   1,                        "0x%x", NULL           },
+  { "MemoryAccessFlags", 1,                        "0x%x", NULL           },
+  { "AddressSizeLimit",  1,                        "0x%x", NULL           },
+  { "ObjectName",        sizeof (CHAR8 *),         NULL,   PrintStringPtr },
+  { "Identifier",        4,                        "0x%x", NULL           },
 };
 
 /** A parser for EArmObjRootComplex.
@@ -740,19 +764,19 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
 */
 STATIC CONST CM_OBJ_PARSER  StdObjCfgMgrInfoParser[] = {
   { "Revision", 4, "0x%x",         NULL       },
-  { "OemId[6]", 6, "%C%C%C%C%C%C", PrintOemId }
+  { "OemId[6]", 6, "%c%c%c%c%c%c", PrintChar6 }
 };
 
 /** A parser for EStdObjAcpiTableList.
 */
 STATIC CONST CM_OBJ_PARSER  StdObjAcpiTableInfoParser[] = {
-  { "AcpiTableSignature", 4,                                      "0x%x",   NULL },
-  { "AcpiTableRevision",  1,                                      "%d",     NULL },
-  { "TableGeneratorId",   sizeof (ACPI_TABLE_GENERATOR_ID),       "0x%x",   NULL },
-  { "AcpiTableData",      sizeof (EFI_ACPI_DESCRIPTION_HEADER *), "0x%p",   NULL },
-  { "OemTableId",         8,                                      "0x%LLX", NULL },
-  { "OemRevision",        4,                                      "0x%x",   NULL },
-  { "MinorRevision",      1,                                      "0x%x",   NULL },
+  { "AcpiTableSignature", 4,                                      "%c%c%c%c",         PrintChar4 },
+  { "AcpiTableRevision",  1,                                      "%d",               NULL       },
+  { "TableGeneratorId",   sizeof (ACPI_TABLE_GENERATOR_ID),       "0x%x",             NULL       },
+  { "AcpiTableData",      sizeof (EFI_ACPI_DESCRIPTION_HEADER *), "0x%p",             NULL       },
+  { "OemTableId",         8,                                      "%c%c%c%c%c%c%c%c", PrintChar8 },
+  { "OemRevision",        4,                                      "0x%x",             NULL       },
+  { "MinorRevision",      1,                                      "0x%x",             NULL       },
 };
 
 /** A parser for EStdObjSmbiosTableList.
@@ -773,32 +797,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  StdNamespaceObjectParser[] = {
     ARRAY_SIZE (StdObjSmbiosTableInfoParser) },
 };
 
-/** Print OEM Id.
-
-  @param [in]  Format  Format to print the Ptr.
-  @param [in]  Ptr     Pointer to the OEM Id.
-**/
-STATIC
-VOID
-EFIAPI
-PrintOemId (
-  IN  CONST CHAR8  *Format,
-  IN  UINT8        *Ptr
-  )
-{
-  DEBUG ((
-    DEBUG_INFO,
-    (Format != NULL) ? Format : "%C%C%C%C%C%C",
-    Ptr[0],
-    Ptr[1],
-    Ptr[2],
-    Ptr[3],
-    Ptr[4],
-    Ptr[5]
-    ));
-}
-
-/** Print string.
+/** Print string data.
 
   The string must be NULL terminated.
 
@@ -809,11 +808,122 @@ STATIC
 VOID
 EFIAPI
 PrintString (
-  CONST CHAR8  *Format,
-  UINT8        *Ptr
+  IN CONST CHAR8  *Format,
+  IN UINT8        *Ptr
   )
 {
+  if (Ptr == NULL) {
+    ASSERT (0);
+    return;
+  }
+
   DEBUG ((DEBUG_ERROR, "%a", Ptr));
+}
+
+/** Print string from pointer.
+
+  The string must be NULL terminated.
+
+  @param [in]  Format      Format to print the string.
+  @param [in]  Ptr         Pointer to the string pointer.
+**/
+STATIC
+VOID
+EFIAPI
+PrintStringPtr (
+  IN CONST CHAR8  *Format,
+  IN UINT8        *Ptr
+  )
+{
+  UINT8  *String;
+
+  if (Ptr == NULL) {
+    ASSERT (0);
+    return;
+  }
+
+  String = *(UINT8 **)Ptr;
+
+  if (String == NULL) {
+    String = (UINT8 *)"(NULLPTR)";
+  }
+
+  PrintString (Format, String);
+}
+
+/** Print 4 characters.
+
+  @param [in]  Format  Format to print the Ptr.
+  @param [in]  Ptr     Pointer to the characters.
+**/
+STATIC
+VOID
+EFIAPI
+PrintChar4 (
+  IN  CONST CHAR8  *Format,
+  IN  UINT8        *Ptr
+  )
+{
+  DEBUG ((
+    DEBUG_ERROR,
+    (Format != NULL) ? Format : "%c%c%c%c",
+    Ptr[0],
+    Ptr[1],
+    Ptr[2],
+    Ptr[3]
+    ));
+}
+
+/** Print 6 characters.
+
+  @param [in]  Format  Format to print the Ptr.
+  @param [in]  Ptr     Pointer to the characters.
+**/
+STATIC
+VOID
+EFIAPI
+PrintChar6 (
+  IN  CONST CHAR8  *Format,
+  IN  UINT8        *Ptr
+  )
+{
+  DEBUG ((
+    DEBUG_ERROR,
+    (Format != NULL) ? Format : "%c%c%c%c%c%c",
+    Ptr[0],
+    Ptr[1],
+    Ptr[2],
+    Ptr[3],
+    Ptr[4],
+    Ptr[5]
+    ));
+}
+
+/** Print 8 characters.
+
+  @param [in]  Format  Format to print the Ptr.
+  @param [in]  Ptr     Pointer to the characters.
+**/
+STATIC
+VOID
+EFIAPI
+PrintChar8 (
+  IN  CONST CHAR8  *Format,
+  IN  UINT8        *Ptr
+  )
+{
+  DEBUG ((
+    DEBUG_ERROR,
+    (Format != NULL) ? Format : "%c%c%c%c%c%c%c%c",
+    Ptr[0],
+    Ptr[1],
+    Ptr[2],
+    Ptr[3],
+    Ptr[4],
+    Ptr[5],
+    Ptr[6],
+    Ptr[7]
+    ));
 }
 
 /** Print fields of the objects.
