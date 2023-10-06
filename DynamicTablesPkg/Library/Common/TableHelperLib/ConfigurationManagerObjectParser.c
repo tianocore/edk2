@@ -795,6 +795,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  StdNamespaceObjectParser[] = {
     ARRAY_SIZE (StdObjAcpiTableInfoParser) },
   { "EStdObjSmbiosTableList", StdObjSmbiosTableInfoParser,
     ARRAY_SIZE (StdObjSmbiosTableInfoParser) },
+  { "EStdObjMax",             NULL,                       0}
 };
 
 /** Print string data.
@@ -1066,6 +1067,12 @@ ParseCmObjDesc (
         return;
       }
 
+      if (ObjId >= ARRAY_SIZE (StdNamespaceObjectParser)) {
+        DEBUG ((DEBUG_ERROR, "ObjId 0x%x is missing from the StdNamespaceObjectParser array\n", ObjId));
+        ASSERT (0);
+        return;
+      }
+
       ParserArray = &StdNamespaceObjectParser[ObjId];
       break;
     case EObjNameSpaceArm:
@@ -1074,10 +1081,17 @@ ParseCmObjDesc (
         return;
       }
 
+      if (ObjId >= ARRAY_SIZE (ArmNamespaceObjectParser)) {
+        DEBUG ((DEBUG_ERROR, "ObjId 0x%x is missing from the ArmNamespaceObjectParser array\n", ObjId));
+        ASSERT (0);
+        return;
+      }
+
       ParserArray = &ArmNamespaceObjectParser[ObjId];
       break;
     default:
       // Not supported
+      DEBUG ((DEBUG_ERROR, "NameSpaceId 0x%x, ObjId 0x%x is not supported by the parser\n", NameSpaceId, ObjId));
       ASSERT (0);
       return;
   } // switch
@@ -1095,21 +1109,26 @@ ParseCmObjDesc (
       ObjIndex + 1,
       ObjectCount
       ));
-    PrintCmObjDesc (
-      (VOID *)((UINTN)CmObjDesc->Data + Offset),
-      ParserArray->Parser,
-      ParserArray->ItemCount,
-      &RemainingSize,
-      1
-      );
-    if ((RemainingSize > CmObjDesc->Size) ||
-        (RemainingSize < 0))
-    {
-      ASSERT (0);
-      return;
-    }
+    if (ParserArray->Parser == NULL) {
+      DEBUG ((DEBUG_ERROR, "Parser not implemented\n"));
+      RemainingSize = 0;
+    } else {
+      PrintCmObjDesc (
+        (VOID *)((UINTN)CmObjDesc->Data + Offset),
+        ParserArray->Parser,
+        ParserArray->ItemCount,
+        &RemainingSize,
+        1
+        );
+      if ((RemainingSize > CmObjDesc->Size) ||
+          (RemainingSize < 0))
+      {
+        ASSERT (0);
+        return;
+      }
 
-    Offset = CmObjDesc->Size - RemainingSize;
+      Offset = CmObjDesc->Size - RemainingSize;
+    }
   } // for
 
   ASSERT (RemainingSize == 0);
