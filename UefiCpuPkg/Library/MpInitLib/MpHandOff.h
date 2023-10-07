@@ -1,6 +1,9 @@
 /** @file
-  Defines the HOB GUID used to describe the MSEG memory region allocated in PEI.
+  Defines the HOB GUID, which is utilized for transferring essential
+  information from the PEI to the DXE phase.
+
   Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
