@@ -44,15 +44,15 @@ SerialPortInitialize (
   VOID
   )
 {
-  VOID                *Hob;
-  RETURN_STATUS       Status;
-  CONST UINT64        *UartBase;
-  UINTN               SerialBaseAddress;
-  UINT64              BaudRate;
-  UINT32              ReceiveFifoDepth;
-  EFI_PARITY_TYPE     Parity;
-  UINT8               DataBits;
-  EFI_STOP_BITS_TYPE  StopBits;
+  VOID                            *Hob;
+  RETURN_STATUS                   Status;
+  CONST UINT64                    *UartBase;
+  UINTN                           SerialBaseAddress;
+  UINT64                          BaudRate;
+  UINT32                          ReceiveFifoDepth;
+  EFI_PARITY_TYPE                 Parity;
+  UINT8                           DataBits;
+  EFI_STOP_BITS_TYPE              StopBits;
 
   if (mSerialBaseAddress != 0) {
     return RETURN_SUCCESS;
