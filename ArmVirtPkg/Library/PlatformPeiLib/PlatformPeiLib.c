@@ -14,6 +14,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
+#include <Library/FdtSerialPortAddressLib.h>
 #include <libfdt.h>
 
 #include <Guid/EarlyPL011BaseAddress.h>
@@ -43,17 +44,15 @@ PlatformPeim (
   UINTN                     FdtPages;
   UINT64                    *FdtHobData;
   UINT64                    *UartHobData;
+  FDT_SERIAL_PORTS          Ports;
   INT32                     Node, Prev;
   INT32                     Parent, Depth;
   CONST CHAR8               *Compatible;
   CONST CHAR8               *CompItem;
-  CONST CHAR8               *NodeStatus;
   INT32                     Len;
   INT32                     RangesLen;
-  INT32                     StatusLen;
   CONST UINT64              *RegProp;
   CONST UINT32              *RangesProp;
-  UINT64                    UartBase;
   UINT64                    TpmBase;
   EFI_STATUS                Status;
 
@@ -74,6 +73,24 @@ PlatformPeim (
   UartHobData = BuildGuidHob (&gEarlyPL011BaseAddressGuid, sizeof *UartHobData);
   ASSERT (UartHobData != NULL);
   *UartHobData = 0;
+
+  Status = FdtSerialGetPorts (Base, "arm,pl011", &Ports);
+  if (!EFI_ERROR (Status)) {
+    UINT64  UartBase;
+
+    //
+    // Default to the first port found, but (if there are multiple ports) allow
+    // the "/chosen" node to override it. Note that if FdtSerialGetConsolePort()
+    // fails, it does not modify UartBase.
+    //
+    UartBase = Ports.BaseAddress[0];
+    if (Ports.NumberOfPorts > 1) {
+      FdtSerialGetConsolePort (Base, &UartBase);
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: PL011 UART @ 0x%lx\n", __func__, UartBase));
+    *UartHobData = UartBase;
+  }
 
   TpmBase = 0;
 
@@ -100,23 +117,8 @@ PlatformPeim (
     for (CompItem = Compatible; CompItem != NULL && CompItem < Compatible + Len;
          CompItem += 1 + AsciiStrLen (CompItem))
     {
-      if (AsciiStrCmp (CompItem, "arm,pl011") == 0) {
-        NodeStatus = fdt_getprop (Base, Node, "status", &StatusLen);
-        if ((NodeStatus != NULL) && (AsciiStrCmp (NodeStatus, "okay") != 0)) {
-          continue;
-        }
-
-        RegProp = fdt_getprop (Base, Node, "reg", &Len);
-        ASSERT (Len == 16);
-
-        UartBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
-
-        DEBUG ((DEBUG_INFO, "%a: PL011 UART @ 0x%lx\n", __func__, UartBase));
-
-        *UartHobData = UartBase;
-        break;
-      } else if (FeaturePcdGet (PcdTpm2SupportEnabled) &&
-                 (AsciiStrCmp (CompItem, "tcg,tpm-tis-mmio") == 0))
+      if (FeaturePcdGet (PcdTpm2SupportEnabled) &&
+          (AsciiStrCmp (CompItem, "tcg,tpm-tis-mmio") == 0))
       {
         RegProp = fdt_getprop (Base, Node, "reg", &Len);
         ASSERT (Len == 8 || Len == 16);
