@@ -1,6 +1,6 @@
 /** @file
-  GUID for the HOB that caches the base address of the PL011 serial port, for
-  when PCD access is not available.
+  GUID for the HOB that caches the base address(es) of the PL011 serial port(s),
+  for when PCD access is not available.
 
   Copyright (C) 2014, Red Hat, Inc.
 
@@ -17,5 +17,16 @@
         }
 
 extern EFI_GUID  gEarlyPL011BaseAddressGuid;
+
+typedef struct {
+  //
+  // for SerialPortLib and console IO
+  //
+  UINT64    ConsoleAddress;
+  //
+  // for DebugLib; may equal ConsoleAddress if there's only one PL011 UART
+  //
+  UINT64    DebugAddress;
+} EARLY_PL011_BASE_ADDRESS;
 
 #endif

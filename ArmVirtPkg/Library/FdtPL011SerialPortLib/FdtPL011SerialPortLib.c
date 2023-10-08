@@ -46,7 +46,7 @@ SerialPortInitialize (
 {
   VOID                            *Hob;
   RETURN_STATUS                   Status;
-  CONST UINT64                    *UartBase;
+  CONST EARLY_PL011_BASE_ADDRESS  *UartBase;
   UINTN                           SerialBaseAddress;
   UINT64                          BaudRate;
   UINT32                          ReceiveFifoDepth;
@@ -70,7 +70,7 @@ SerialPortInitialize (
 
   UartBase = GET_GUID_HOB_DATA (Hob);
 
-  SerialBaseAddress = (UINTN)*UartBase;
+  SerialBaseAddress = (UINTN)UartBase->ConsoleAddress;
   if (SerialBaseAddress == 0) {
     Status = RETURN_NOT_FOUND;
     goto Failed;
