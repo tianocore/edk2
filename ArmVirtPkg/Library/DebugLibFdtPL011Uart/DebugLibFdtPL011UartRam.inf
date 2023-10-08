@@ -1,0 +1,60 @@
+## @file
+# DebugLib instance that produces debug output directly via PL011UartLib.
+#
+# If there are at least two PL011 UARTs in the device tree, and the /chosen
+# node's "stdout-path" property references one PL011 UART, then both raw
+# SerialPortLib IO, and -- via SerialDxe -- UEFI console IO, will occur on that
+# UART; and this DebugLib instance will produce output on a *different* UART.
+#
+# This instance is suitable for modules that can only run from RAM (except
+# DXE_RUNTIME_DRIVER).
+#
+# Copyright (C) Red Hat
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.27
+  BASE_NAME      = DebugLibFdtPL011UartRam
+  FILE_GUID      = 0584DE55-9C4C-49C1-ADA0-F62C9C1F3600
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = DebugLib|DXE_CORE SMM_CORE MM_CORE_STANDALONE DXE_DRIVER DXE_SMM_DRIVER SMM_DRIVER MM_STANDALONE UEFI_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR    = DebugLibFdtPL011UartRamConstructor
+
+[Sources]
+  DebugLib.c
+  Ram.c
+  Ram.h
+  RamNonRuntime.c
+  Write.h
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugPrintErrorLevelLib
+  HobLib                  # Ram.c
+  PL011UartLib
+  PcdLib
+  PrintLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugClearMemoryValue
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+  gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PL011UartClkInHz
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+
+[Guids]
+  gEarlyPL011BaseAddressGuid # Ram.c
