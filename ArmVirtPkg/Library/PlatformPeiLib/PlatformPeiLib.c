@@ -37,25 +37,25 @@ PlatformPeim (
   VOID
   )
 {
-  VOID          *Base;
-  VOID          *NewBase;
-  UINTN         FdtSize;
-  UINTN         FdtPages;
-  UINT64        *FdtHobData;
-  UINT64        *UartHobData;
-  INT32         Node, Prev;
-  INT32         Parent, Depth;
-  CONST CHAR8   *Compatible;
-  CONST CHAR8   *CompItem;
-  CONST CHAR8   *NodeStatus;
-  INT32         Len;
-  INT32         RangesLen;
-  INT32         StatusLen;
-  CONST UINT64  *RegProp;
-  CONST UINT32  *RangesProp;
-  UINT64        UartBase;
-  UINT64        TpmBase;
-  EFI_STATUS    Status;
+  VOID                      *Base;
+  VOID                      *NewBase;
+  UINTN                     FdtSize;
+  UINTN                     FdtPages;
+  UINT64                    *FdtHobData;
+  UINT64                    *UartHobData;
+  INT32                     Node, Prev;
+  INT32                     Parent, Depth;
+  CONST CHAR8               *Compatible;
+  CONST CHAR8               *CompItem;
+  CONST CHAR8               *NodeStatus;
+  INT32                     Len;
+  INT32                     RangesLen;
+  INT32                     StatusLen;
+  CONST UINT64              *RegProp;
+  CONST UINT32              *RangesProp;
+  UINT64                    UartBase;
+  UINT64                    TpmBase;
+  EFI_STATUS                Status;
 
   Base = (VOID *)(UINTN)PcdGet64 (PcdDeviceTreeInitialBaseAddress);
   ASSERT (Base != NULL);
