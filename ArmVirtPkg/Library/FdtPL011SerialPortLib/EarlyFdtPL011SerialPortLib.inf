@@ -22,11 +22,10 @@
 [LibraryClasses]
   PL011UartLib
   PcdLib
-  FdtLib
+  FdtSerialPortAddressLib
 
 [Packages]
   MdePkg/MdePkg.dec
-  EmbeddedPkg/EmbeddedPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
 
