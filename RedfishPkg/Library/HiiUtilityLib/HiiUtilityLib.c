@@ -388,11 +388,13 @@ SetQuestionValue (
       Question->Value.BufferLen = Question->StorageWidth;
       Question->Value.Buffer    = AllocateZeroPool (Question->StorageWidth);
       if (Question->Value.Buffer == NULL) {
+        FreePool (TemString);
         return EFI_OUT_OF_RESOURCES;
       }
 
       CopyMem (Question->Value.Buffer, TemString, StrSize (TemString));
       Src = Question->Value.Buffer;
+      FreePool (TemString);
     } else {
       CopyMem (&Question->Value.Value, &QuestionValue->Value, sizeof (EFI_IFR_TYPE_VALUE));
       Src = (UINT8 *)&Question->Value.Value;
