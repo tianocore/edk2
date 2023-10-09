@@ -25,6 +25,10 @@
 #include <Library/MemoryAllocationLib.h>
 #include "ArmCcaRsi.h"
 
+/** The version of RSI specification implemented by this module.
+*/
+STATIC CONST UINT32  mRsiImplVersion = RMM_VERSION (1, 0);
+
 /**
   Convert the RSI status code to EFI Status code.
 
@@ -639,32 +643,67 @@ RsiHostCall (
 /**
    Get the version of the RSI implementation.
 
-  @param [out] Major  The major version of the RSI implementation.
-  @param [out] Minor  The minor version of the RSI implementation.
+  @param [out] UefiImpl     The version of the RSI specification
+                            implemented by the UEFI firmware.
+  @param [out] RmmImplLow   The low version of the RSI specification
+                            implemented by the RMM.
+  @param [out] RmmImplHigh  The high version of the RSI specification
+                            implemented by the RMM.
 
-  @retval RETURN_SUCCESS            Success.
-  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_SUCCESS                Success.
+  @retval RETURN_UNSUPPORTED            The execution context is not a Realm.
+  @retval RETURN_INCOMPATIBLE_VERSION   The Firmware and RMM specification
+                                        revisions are not compatible.
+  @retval RETURN_INVALID_PARAMETER      A parameter is invalid.
 **/
 RETURN_STATUS
 EFIAPI
 RsiGetVersion (
-  OUT UINT16 *CONST  Major,
-  OUT UINT16 *CONST  Minor
+  OUT UINT32 *CONST  UefiImpl,
+  OUT UINT32 *CONST  RmmImplLow,
+  OUT UINT32 *CONST  RmmImplHigh
   )
 {
-  ARM_SMC_ARGS  SmcCmd;
+  RETURN_STATUS  Status;
+  ARM_SMC_ARGS   SmcCmd;
 
-  if ((Major == NULL) || (Minor == NULL)) {
-    return EFI_INVALID_PARAMETER;
+  if ((UefiImpl == NULL) || (RmmImplLow == NULL) || (RmmImplHigh == NULL)) {
+    return RETURN_INVALID_PARAMETER;
   }
 
   ZeroMem (&SmcCmd, sizeof (SmcCmd));
   SmcCmd.Arg0 = FID_RSI_VERSION;
-
+  SmcCmd.Arg1 = mRsiImplVersion;
   ArmCallSmc (&SmcCmd);
-  *Minor = SmcCmd.Arg0 & RSI_VER_MINOR_MASK;
-  *Major = (SmcCmd.Arg0 & RSI_VER_MAJOR_MASK) >> RSI_VER_MAJOR_SHIFT;
-  return RETURN_SUCCESS;
+  if (SmcCmd.Arg0 == MAX_UINT64) {
+    // This FID is not implemented, which means
+    // we are not running in a Realm, therefore
+    // return the error code as unsupported.
+    return RETURN_UNSUPPORTED;
+  }
+
+  *RmmImplLow  = (SmcCmd.Arg1 & RSI_VERSION_MASK);
+  *RmmImplHigh = (SmcCmd.Arg2 & RSI_VERSION_MASK);
+  *UefiImpl    = mRsiImplVersion;
+
+  // The RSI_VERSION command does not have any failure
+  // conditions see section B5.3.10.2 Failure conditions
+  // Therefore the only defined return values are
+  // RSI_SUCCESS and RSI_ERROR_INPUT.
+  Status = RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
+  if (Status == RETURN_INVALID_PARAMETER) {
+    // RSI_VERSION returns RSI_ERROR_INPUT when
+    // the RMM does not support an interface revision
+    // which is compatible with the requested revision.
+    // Since RSI_ERROR_INPUT is mapped to RETURN_INVALID_PARAMETER
+    // by RsiCmdStatusToEfiStatus(), return the status code as
+    // RETURN_INCOMPATIBLE_VERSION.
+    return RETURN_INCOMPATIBLE_VERSION;
+  }
+
+  // Add an assert in case RMM returns a different error code than expected.
+  ASSERT (Status == RETURN_SUCCESS);
+  return Status;
 }
 
 /**
