@@ -36,11 +36,16 @@ IsRealm (
   )
 {
   RETURN_STATUS  Status;
-  UINT16         Major;
-  UINT16         Minor;
+  UINT32         UefiImpl;
+  UINT32         RmmImplLow;
+  UINT32         RmmImplHigh;
 
   if (ArmHasRme ()) {
-    Status = RsiGetVersion (&Major, &Minor);
+    Status = RsiGetVersion (
+               &UefiImpl,
+               &RmmImplLow,
+               &RmmImplHigh
+               );
     if (!RETURN_ERROR (Status)) {
       return TRUE;
     }

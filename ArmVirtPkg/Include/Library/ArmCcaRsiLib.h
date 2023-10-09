@@ -330,17 +330,25 @@ RsiHostCall (
 /**
    Get the version of the RSI implementation.
 
-  @param [out] Major  The major version of the RSI implementation.
-  @param [out] Minor  The minor version of the RSI implementation.
+  @param [out] UefiImpl     The version of the RSI specification
+                            implemented by the UEFI firmware.
+  @param [out] RmmImplLow   The low version of the RSI specification
+                            implemented by the RMM.
+  @param [out] RmmImplHigh  The high version of the RSI specification
+                            implemented by the RMM.
 
-  @retval RETURN_SUCCESS            Success.
-  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_SUCCESS                Success.
+  @retval RETURN_UNSUPPORTED            The execution context is not a Realm.
+  @retval RETURN_INCOMPATIBLE_VERSION   The Firmware and RMM specification
+                                        revisions are not compatible.
+  @retval RETURN_INVALID_PARAMETER      A parameter is invalid.
 **/
 RETURN_STATUS
 EFIAPI
 RsiGetVersion (
-  OUT UINT16 *CONST  Major,
-  OUT UINT16 *CONST  Minor
+  OUT UINT32 *CONST  UefiImpl,
+  OUT UINT32 *CONST  RmmImplLow,
+  OUT UINT32 *CONST  RmmImplHigh
   );
 
 /**
