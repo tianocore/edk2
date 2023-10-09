@@ -10,7 +10,7 @@
     - RIPAS        - Realm IPA state
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac4
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac5
      (https://developer.arm.com/documentation/den0137/)
 **/
 
@@ -45,5 +45,15 @@
 #define RSI_VER_MINOR_MASK   0x0000FFFFULL
 #define RSI_VER_MAJOR_MASK   0x7FFF0000ULL
 #define RSI_VER_MAJOR_SHIFT  16
+#define RSI_VERSION_MASK     (RSI_VER_MAJOR_MASK | RSI_VER_MINOR_MASK)
+
+#define RMM_VERSION(Major, Minor)  ((Minor & RSI_VER_MINOR_MASK) | \
+  ((Major << RSI_VER_MAJOR_SHIFT) & RSI_VER_MAJOR_MASK))
+
+#define GET_MAJOR_REVISION(Rev) \
+  ((Rev & RSI_VER_MAJOR_MASK) >> RSI_VER_MAJOR_SHIFT)
+
+#define GET_MINOR_REVISION(Rev) \
+  ((Rev & RSI_VER_MINOR_MASK))
 
 #endif // ARM_CCA_RSI_H_
