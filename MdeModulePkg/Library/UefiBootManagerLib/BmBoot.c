@@ -880,6 +880,8 @@ BmExpandPartitionDevicePath (
   BOOLEAN                   NeedAdjust;
   EFI_DEVICE_PATH_PROTOCOL  *Instance;
   UINTN                     Size;
+  BOOLEAN                   MatchFound;
+  BOOLEAN                   ConnectAllAttempted;
 
   //
   // Check if there is prestore 'HDDP' variable.
@@ -974,49 +976,69 @@ BmExpandPartitionDevicePath (
   // If we get here we fail to find or 'HDDP' not exist, and now we need
   // to search all devices in the system for a matched partition
   //
-  EfiBootManagerConnectAll ();
-  Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &BlockIoHandleCount, &BlockIoBuffer);
-  if (EFI_ERROR (Status)) {
-    BlockIoHandleCount = 0;
-    BlockIoBuffer      = NULL;
-  }
-
-  //
-  // Loop through all the device handles that support the BLOCK_IO Protocol
-  //
-  for (Index = 0; Index < BlockIoHandleCount; Index++) {
-    BlockIoDevicePath = DevicePathFromHandle (BlockIoBuffer[Index]);
-    if (BlockIoDevicePath == NULL) {
-      continue;
+  BlockIoBuffer       = NULL;
+  MatchFound          = FALSE;
+  ConnectAllAttempted = FALSE;
+  do {
+    if (BlockIoBuffer != NULL) {
+      FreePool (BlockIoBuffer);
     }
 
-    if (BmMatchPartitionDevicePathNode (BlockIoDevicePath, (HARDDRIVE_DEVICE_PATH *)FilePath)) {
-      //
-      // Find the matched partition device path
-      //
-      TempDevicePath = AppendDevicePath (BlockIoDevicePath, NextDevicePathNode (FilePath));
-      FullPath       = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL);
-      FreePool (TempDevicePath);
+    Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiBlockIoProtocolGuid, NULL, &BlockIoHandleCount, &BlockIoBuffer);
+    if (EFI_ERROR (Status)) {
+      BlockIoHandleCount = 0;
+      BlockIoBuffer      = NULL;
+    }
 
-      if (FullPath != NULL) {
-        BmCachePartitionDevicePath (&CachedDevicePath, BlockIoDevicePath);
+    //
+    // Loop through all the device handles that support the BLOCK_IO Protocol
+    //
+    for (Index = 0; Index < BlockIoHandleCount; Index++) {
+      BlockIoDevicePath = DevicePathFromHandle (BlockIoBuffer[Index]);
+      if (BlockIoDevicePath == NULL) {
+        continue;
+      }
 
+      if (BmMatchPartitionDevicePathNode (BlockIoDevicePath, (HARDDRIVE_DEVICE_PATH *)FilePath)) {
         //
-        // Save the matching Device Path so we don't need to do a connect all next time
-        // Failing to save only impacts performance next time expanding the short-form device path
+        // Find the matched partition device path
         //
-        Status = gRT->SetVariable (
-                        L"HDDP",
-                        &mBmHardDriveBootVariableGuid,
-                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                        GetDevicePathSize (CachedDevicePath),
-                        CachedDevicePath
-                        );
+        TempDevicePath = AppendDevicePath (BlockIoDevicePath, NextDevicePathNode (FilePath));
+        FullPath       = BmGetNextLoadOptionDevicePath (TempDevicePath, NULL);
+        FreePool (TempDevicePath);
 
-        break;
+        if (FullPath != NULL) {
+          BmCachePartitionDevicePath (&CachedDevicePath, BlockIoDevicePath);
+
+          //
+          // Save the matching Device Path so we don't need to do a connect all next time
+          // Failing to save only impacts performance next time expanding the short-form device path
+          //
+          Status = gRT->SetVariable (
+                          L"HDDP",
+                          &mBmHardDriveBootVariableGuid,
+                          EFI_VARIABLE_BOOTSERVICE_ACCESS |
+                          EFI_VARIABLE_NON_VOLATILE,
+                          GetDevicePathSize (CachedDevicePath),
+                          CachedDevicePath
+                          );
+          MatchFound = TRUE;
+          break;
+        }
       }
     }
-  }
+
+    //
+    // If we found a matching BLOCK_IO handle or we've already
+    // tried a ConnectAll, we are done searching.
+    //
+    if (MatchFound || ConnectAllAttempted) {
+      break;
+    }
+
+    EfiBootManagerConnectAll ();
+    ConnectAllAttempted = TRUE;
+  } while (1);
 
   if (CachedDevicePath != NULL) {
     FreePool (CachedDevicePath);
