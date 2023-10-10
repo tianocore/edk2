@@ -15,6 +15,7 @@
   .set      TT_MT_MEM, (0x3 << 2) | (0x3 << 8)  // MAIR #3
 
   .set      PAGE_XIP,  TT_TYPE_PAGE  | TT_MT_MEM | TT_AF | TT_RO | TT_NG
+  .set      PAGE_DEV,  TT_TYPE_PAGE  | TT_MT_DEV | TT_AF | TT_XN | TT_NG
   .set      BLOCK_XIP, TT_TYPE_BLOCK | TT_MT_MEM | TT_AF | TT_RO | TT_NG
   .set      BLOCK_DEV, TT_TYPE_BLOCK | TT_MT_DEV | TT_AF | TT_XN | TT_NG
   .set      BLOCK_MEM, TT_TYPE_BLOCK | TT_MT_MEM | TT_AF | TT_XN | TT_NG
@@ -32,7 +33,8 @@
   .endm
 
   .globl    idmap
-  .section  ".rodata.idmap", "a"
+  .globl    uart_pte
+  .section  ".data.idmap", "aw", %progbits
   .align    12
 
 idmap:      /* level 0 */
@@ -45,20 +47,30 @@ idmap:      /* level 0 */
   .fill     510, 8, 0x0                   // 510 GB of remaining VA space
 
 20:         /* level 2 */
-  .quad     3f + TT_TYPE_TABLE            // up to 2 MB of flash
+  .quad     300f + TT_TYPE_TABLE          // up to 2 MB of flash
   .quad     BLOCK_XIP | (0x1  << 21)      // another 2 MB of flash
   .fill     62, 8, 0x0                    // 124 MB of unused flash
             // 896 MB of RW- device mappings
-  id_pte    0x08000000, 0x40000000, BLOCK_DEV
+  id_pte    0x08000000, 0x09000000, BLOCK_DEV
+  .quad     301f + TT_TYPE_TABLE
+  id_pte    0x09200000, 0x40000000, BLOCK_DEV
 
 21:         /* level 2 */
             // 128 MB of RW- memory mappings
   id_pte    0x40000000, 0x48000000, BLOCK_MEM
   .fill     448, 8, 0x0
 
-3:          /* level 3 */
+300:        /* level 3 */
   .quad     0x0                           // omit first 4k page
             // 2044 KiB of R-X flash mappings
   id_pte    0x1000, 0x200000, PAGE_XIP, GRANULE_L3
+
+301:        /* level 3 */
+  /*
+   * In a Realm, we may need to update the UART mapping 0x09000000 - 0x0900ffff
+   * to access the emulated device via unprotected IPA (MSB set).
+   */
+uart_pte:
+  id_pte    0x09000000, 0x09200000, PAGE_DEV, GRANULE_L3
 
 AARCH64_BTI_NOTE()
