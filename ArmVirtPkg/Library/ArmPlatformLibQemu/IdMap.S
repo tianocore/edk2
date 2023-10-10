@@ -20,6 +20,18 @@
   .set      BLOCK_DEV, TT_TYPE_BLOCK | TT_AF | TT_XN | TT_NG
   .set      BLOCK_MEM, TT_TYPE_BLOCK | TT_AF | TT_XN | TT_NG
 
+  .set      GRANULE_L2, 21                // 2MB
+  .set      GRANULE_L3, 12                // 4KB
+
+  /* Identity-map range of addresses [from, to) */
+  .macro    id_pte  from, to, flags, granule=GRANULE_L2
+  .set      idx, (\from) >> (\granule)
+  .rept     ((\to) - (\from)) >> (\granule)
+  .quad     (\flags) | (idx << (\granule))
+  .set      idx, idx + 1
+  .endr
+  .endm
+
   .section  ".rodata.idmap", "a"
   .align    12
 
@@ -40,27 +52,18 @@
   .quad     3f + TT_TYPE_TABLE                  // up to 2 MB of flash
   .quad     BLOCK_XIP | \mt | (0x1  << 21)      // another 2 MB of flash
   .fill     62, 8, 0x0                          // 124 MB of unused flash
-  .set      idx, 64
-  .rept     448
-  .quad     BLOCK_DEV | TT_MT_DEV | (idx << 21) // 896 MB of RW- device mappings
-  .set      idx, idx + 1
-  .endr
+                                                  // 896 MB of RW- device mappings
+  id_pte    0x08000000, 0x40000000, BLOCK_DEV | TT_MT_DEV
 
 21:         /* level 2 */
-  .set      idx, 0x40000000 >> 21
-  .rept     64
-  .quad     BLOCK_MEM | \mt | (idx << 21)       // 128 MB of RW- memory mappings
-  .set      idx, idx + 1
-  .endr
+                                                  // 128 MB of RW- memory mappings
+  id_pte    0x40000000, 0x48000000, BLOCK_MEM | \mt
   .fill     448, 8, 0x0
 
 3:          /* level 3 */
   .quad     0x0                                 // omit first 4k page
-  .set      idx, 1
-  .rept     511
-  .quad     PAGE_XIP | \mt | (idx << 12)        // 2044 KiB of R-X flash mappings
-  .set      idx, idx + 1
-  .endr
+                                                  // 2044 KiB of R-X flash mappings
+  id_pte    0x1000, 0x200000, PAGE_XIP | \mt, GRANULE_L3
   .endm
 
   make_idmap  idmap,      root_levels=1, mt=TT_MT_MEM
