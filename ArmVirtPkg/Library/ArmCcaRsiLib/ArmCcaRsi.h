@@ -10,7 +10,7 @@
     - RIPAS        - Realm IPA state
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version A-bet0
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac4
      (https://developer.arm.com/documentation/den0137/)
 **/
 
@@ -20,6 +20,7 @@
 // FIDs for Realm Service Interface calls.
 #define FID_RSI_ATTESTATION_TOKEN_CONTINUE  0xC4000195
 #define FID_RSI_ATTESTATION_TOKEN_INIT      0xC4000194
+#define FID_RSI_FEATURES                    0xC4000191
 #define FID_RSI_HOST_CALL                   0xC4000199
 #define FID_RSI_IPA_STATE_GET               0xC4000198
 #define FID_RSI_IPA_STATE_SET               0xC4000197

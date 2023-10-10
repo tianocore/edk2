@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac3
+   - Realm Management Monitor (RMM) Specification, version 1.0-eac4
      (https://developer.arm.com/documentation/den0137/)
 **/
 
@@ -332,6 +332,28 @@ EFIAPI
 RsiGetVersion (
   OUT UINT16 *CONST  Major,
   OUT UINT16 *CONST  Minor
+  );
+
+/**
+  Get the features supported by the RSI implementation.
+
+  RMM implementations across different CCA platforms may support
+  disparate features and may offer disparate configuration options
+  for Realms. The features supported by an RSI implementation are
+  discovered by reading feature pseudo-register values using the
+  RSI_FEATURES command.
+
+  @param [in]   FeatureRegIndex    The Feature Register Index.
+  @param [out]  FeatureRegValue    The Feature Register Value.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+RsiGetFeatures (
+  IN    UINT64  FeatureRegIndex,
+  OUT   UINT64  *FeatureRegValue
   );
 
 #endif // ARM_CCA_RSI_LIB_
