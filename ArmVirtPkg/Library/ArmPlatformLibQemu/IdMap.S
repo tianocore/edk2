@@ -16,6 +16,7 @@
   .set      TT_MT_MEM_LPA2, (0x3 << 2)          // MAIR #3
 
   .set      PAGE_XIP,  TT_TYPE_PAGE  | TT_AF | TT_RO | TT_NG
+  .set      PAGE_DEV,  TT_TYPE_PAGE  | TT_AF | TT_XN | TT_NG
   .set      BLOCK_XIP, TT_TYPE_BLOCK | TT_AF | TT_RO | TT_NG
   .set      BLOCK_DEV, TT_TYPE_BLOCK | TT_AF | TT_XN | TT_NG
   .set      BLOCK_MEM, TT_TYPE_BLOCK | TT_AF | TT_XN | TT_NG
@@ -32,11 +33,21 @@
   .endr
   .endm
 
-  .section  ".rodata.idmap", "a"
+// CLANGPDB does not support %progbits and
+// expects comdat type such as 'discard' or
+// 'largest' after protection bits.
+// Therefore, for CLANGPDB configure the
+// section as data + writable.
+#ifdef __ELF__
+  .section  ".data.idmap", "aw", %progbits
+#else
+  .section  ".data.idmap", "dw"
+#endif
   .align    12
 
-   .macro   make_idmap, name, root_levels, mt
+   .macro   make_idmap, name, uart_pte_name, root_levels, mt
   .globl    \name
+  .globl    \uart_pte_name
 \name:
   .rept     \root_levels
   .quad     1f + TT_TYPE_TABLE
@@ -49,24 +60,34 @@
   .fill     510, 8, 0x0                         // 510 GB of remaining VA space
 
 20:         /* level 2 */
-  .quad     3f + TT_TYPE_TABLE                  // up to 2 MB of flash
+  .quad     300f + TT_TYPE_TABLE                // up to 2 MB of flash
   .quad     BLOCK_XIP | \mt | (0x1  << 21)      // another 2 MB of flash
   .fill     62, 8, 0x0                          // 124 MB of unused flash
                                                   // 896 MB of RW- device mappings
-  id_pte    0x08000000, 0x40000000, BLOCK_DEV | TT_MT_DEV
+  id_pte    0x08000000, 0x09000000, BLOCK_DEV | TT_MT_DEV
+  .quad     301f + TT_TYPE_TABLE
+  id_pte    0x09200000, 0x40000000, BLOCK_DEV | TT_MT_DEV
 
 21:         /* level 2 */
                                                   // 128 MB of RW- memory mappings
   id_pte    0x40000000, 0x48000000, BLOCK_MEM | \mt
   .fill     448, 8, 0x0
 
-3:          /* level 3 */
+300:        /* level 3 */
   .quad     0x0                                 // omit first 4k page
                                                   // 2044 KiB of R-X flash mappings
   id_pte    0x1000, 0x200000, PAGE_XIP | \mt, GRANULE_L3
+
+301:        /* level 3 */
+  /*
+   * In a Realm, we may need to update the UART mapping 0x09000000 - 0x0900ffff
+   * to access the emulated device via unprotected IPA (MSB set).
+   */
+\uart_pte_name:
+  id_pte    0x09000000, 0x09200000, PAGE_DEV | TT_MT_DEV, GRANULE_L3
   .endm
 
-  make_idmap  idmap,      root_levels=1, mt=TT_MT_MEM
-  make_idmap  idmap_lpa2, root_levels=2, mt=TT_MT_MEM_LPA2
+  make_idmap  idmap,      uart_pte_name=uart_pte,      root_levels=1, mt=TT_MT_MEM
+  make_idmap  idmap_lpa2, uart_pte_name=uart_pte_lpa2, root_levels=2, mt=TT_MT_MEM_LPA2
 
 AARCH64_BTI_NOTE()
