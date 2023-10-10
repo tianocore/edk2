@@ -388,3 +388,25 @@ ArmCcaRsiGetVersion (
   OUT UINT32 *CONST  RmmImplLow,
   OUT UINT32 *CONST  RmmImplHigh
   );
+
+/**
+  Get the features supported by the RSI implementation.
+
+  RMM implementations across different CCA platforms may support
+  disparate features and may offer disparate configuration options
+  for Realms. The features supported by an RSI implementation are
+  discovered by reading feature pseudo-register values using the
+  RSI_FEATURES command.
+
+  @param [in]   FeatureRegIndex    The Feature Register Index.
+  @param [out]  FeatureRegValue    The Feature Register Value.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRsiGetFeatures (
+  IN    UINT64  FeatureRegIndex,
+  OUT   UINT64  *FeatureRegValue
+  );
