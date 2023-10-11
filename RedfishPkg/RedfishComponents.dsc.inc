@@ -16,9 +16,15 @@
 !if $(REDFISH_ENABLE) == TRUE
   RedfishPkg/RestJsonStructureDxe/RestJsonStructureDxe.inf
   RedfishPkg/RedfishHostInterfaceDxe/RedfishHostInterfaceDxe.inf
-  RedfishPkg/RedfishRestExDxe/RedfishRestExDxe.inf
+  RedfishPkg/RedfishRestExDxe/RedfishRestExDxe.inf  {
+    <LibraryClasses>
+      SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+  }
   RedfishPkg/RedfishCredentialDxe/RedfishCredentialDxe.inf
-  RedfishPkg/RedfishDiscoverDxe/RedfishDiscoverDxe.inf
+  RedfishPkg/RedfishDiscoverDxe/RedfishDiscoverDxe.inf  {
+    <LibraryClasses>
+      SortLib|MdeModulePkg/Library/BaseSortLib/BaseSortLib.inf
+  }
   RedfishPkg/RedfishConfigHandler/RedfishConfigHandlerDriver.inf
   RedfishPkg/RedfishPlatformConfigDxe/RedfishPlatformConfigDxe.inf
   MdeModulePkg/Universal/RegularExpressionDxe/RegularExpressionDxe.inf
