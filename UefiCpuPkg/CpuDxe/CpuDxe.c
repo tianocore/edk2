@@ -15,15 +15,13 @@
 //
 // Global Variables
 //
-BOOLEAN                InterruptState = FALSE;
-EFI_HANDLE             mCpuHandle     = NULL;
-BOOLEAN                mIsFlushingGCD;
-BOOLEAN                mIsAllocatingPageTable = FALSE;
-UINT64                 mValidMtrrAddressMask;
-UINT64                 mValidMtrrBitsMask;
-UINT64                 mTimerPeriod     = 0;
-UINT32                 mCpuTargetCState = 0;
-EFI_CPU_ARCH_PROTOCOL  gCpu             = {
+BOOLEAN     InterruptState = FALSE;
+EFI_HANDLE  mCpuHandle     = NULL;
+BOOLEAN     mIsFlushingGCD;
+BOOLEAN     mIsAllocatingPageTable = FALSE;
+UINT64      mTimerPeriod           = 0;
+
+EFI_CPU_ARCH_PROTOCOL  gCpu = {
   CpuFlushCpuDataCache,
   CpuEnableInterrupt,
   CpuDisableInterrupt,
