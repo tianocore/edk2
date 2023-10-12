@@ -439,6 +439,10 @@ class WorkspaceAutoGen(AutoGen):
             PkgSet = set()
             for mb in [self.BuildDatabase[m, Arch, self.BuildTarget, self.ToolChain] for m in Platform.Modules]:
                 PkgSet.update(mb.Packages)
+
+            for lb in [self.BuildDatabase[l, Arch, self.BuildTarget, self.ToolChain] for l in Platform.LibraryInstances]:
+                PkgSet.update(lb.Packages)
+
             for Inf in ModuleList:
                 ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch)
                 if ModuleFile in Platform.Modules:
@@ -968,4 +972,3 @@ class WorkspaceAutoGen(AutoGen):
     #
     def CreateAsBuiltInf(self):
         return
-
