@@ -307,6 +307,26 @@ SetTlbRebaseAddress (
   IN UINT64
   );
 
+/**
+  Enables local CPU interrupts.
+
+  @param  Needs to enable local interrupt bit.
+**/
+VOID
+EnableLocalInterrupts (
+  IN UINT16
+  );
+
+/**
+  Disables local CPU interrupts.
+
+  @param  Needs to disable local interrupt bit.
+**/
+VOID
+DisableLocalInterrupts (
+  IN UINT16
+  );
+
 #endif // defined (MDE_CPU_LOONGARCH64)
 
 //
