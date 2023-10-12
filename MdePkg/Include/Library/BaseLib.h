@@ -339,6 +339,18 @@ AsmCpucfg (
   OUT UINT32  *Data
   );
 
+/**
+  Gets the timer count value.
+
+  @param[] VOID
+  @retval  timer count value.
+
+**/
+UINTN
+AsmReadStableCounter (
+  VOID
+  );
+
 #endif // defined (MDE_CPU_LOONGARCH64)
 
 //
