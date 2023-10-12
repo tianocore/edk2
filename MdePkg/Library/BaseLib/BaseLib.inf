@@ -422,6 +422,7 @@
   LoongArch64/SwitchStack.S         | GCC
   LoongArch64/ExceptionBase.S       | GCC
   LoongArch64/Cpucfg.S              | GCC
+  LoongArch64/ReadStableCounter.S   | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
