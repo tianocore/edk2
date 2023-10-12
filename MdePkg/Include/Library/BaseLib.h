@@ -396,6 +396,118 @@ CsrXChg (
   IN UINTN   Mask
   );
 
+/**
+  IO CSR read byte operation.
+
+  @param[in]  Select   IO CSR read instruction select values.
+
+  @return     The return value of iocsrrd.b instruction.
+
+**/
+UINT8
+IoCsrRead8 (
+  IN UINTN  Select
+  );
+
+/**
+  IO CSR read half word operation.
+
+  @param[in]  Select   IO CSR read instruction select values.
+
+  @return     The return value of iocsrrd.h instruction.
+
+**/
+UINT16
+IoCsrRead16 (
+  IN UINTN  Select
+  );
+
+/**
+  IO CSR read word operation.
+
+  @param[in]  Select   IO CSR read instruction select values.
+
+  @return     The return value of iocsrrd.w instruction.
+
+**/
+UINT32
+IoCsrRead32 (
+  IN UINTN  Select
+  );
+
+/**
+  IO CSR read double word operation. Only for LoongArch64.
+
+  @param[in]  Select   IO CSR read instruction select values.
+
+  @return     The return value of iocsrrd.d instruction.
+
+**/
+UINT64
+IoCsrRead64 (
+  IN UINTN  Select
+  );
+
+/**
+  IO CSR write byte operation.
+
+  @param[in]  Select   IO CSR write instruction select values.
+  @param[in]  Value    The iocsrwr.b will write the value.
+
+  @return     VOID.
+
+**/
+VOID
+IoCsrWrite8 (
+  IN UINTN  Select,
+  IN UINT8  Value
+  );
+
+/**
+  IO CSR write half word operation.
+
+  @param[in]  Select   IO CSR write instruction select values.
+  @param[in]  Value    The iocsrwr.h will write the value.
+
+  @return     VOID.
+
+**/
+VOID
+IoCsrWrite16 (
+  IN UINTN   Select,
+  IN UINT16  Value
+  );
+
+/**
+  IO CSR write word operation.
+
+  @param[in]  Select   IO CSR write instruction select values.
+  @param[in]  Value    The iocsrwr.w will write the value.
+
+  @return     VOID.
+
+**/
+VOID
+IoCsrWrite32 (
+  IN UINTN   Select,
+  IN UINT32  Value
+  );
+
+/**
+  IO CSR write double word operation. Only for LoongArch64.
+
+  @param[in]  Select   IO CSR write instruction select values.
+  @param[in]  Value    The iocsrwr.d will write the value.
+
+  @return     VOID.
+
+**/
+VOID
+IoCsrWrite64 (
+  IN UINTN   Select,
+  IN UINT64  Value
+  );
+
 #endif // defined (MDE_CPU_LOONGARCH64)
 
 //
