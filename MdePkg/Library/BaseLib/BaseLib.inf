@@ -413,6 +413,7 @@
   LoongArch64/Csr.c
   LoongArch64/InternalSwitchStack.c
   LoongArch64/AsmCsr.S              | GCC
+  LoongArch64/IoCsr.S               | GCC
   LoongArch64/GetInterruptState.S   | GCC
   LoongArch64/EnableInterrupts.S    | GCC
   LoongArch64/DisableInterrupts.S   | GCC
