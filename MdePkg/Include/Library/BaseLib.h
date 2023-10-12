@@ -287,6 +287,26 @@ typedef struct {
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT  8
 
+/*
+ * Set the exception base address for LoongArch.
+ *
+ * @param  ExceptionBaseAddress   The exception base address, must be aligned greater than or qeual to 4K .
+ */
+VOID
+SetExceptionBaseAddress (
+  IN UINT64
+  );
+
+/*
+ * Set the TlbRebase address for LoongArch.
+ *
+ * @param  TlbRebaseAddress   The TlbRebase address, must be aligned greater than or qeual to 4K .
+ */
+VOID
+SetTlbRebaseAddress (
+  IN UINT64
+  );
+
 #endif // defined (MDE_CPU_LOONGARCH64)
 
 //
