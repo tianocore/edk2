@@ -25,7 +25,7 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
         ''' parse arguments '''
         ParserObj = argparse.ArgumentParser()
         ParserObj.add_argument("-t", "--tool_chain_tag", dest="tct", default="VS2017",
-                               help="Set the toolchain used to compile the build tools. Available options: " + 
+                               help="Set the toolchain used to compile the build tools. Versions: " + 
                                ', '.join(str(key) for key in supported_vs_versions.keys()))
         args = ParserObj.parse_args()
         self.tool_chain_tag = args.tct
