@@ -53,6 +53,11 @@ InstallCloudHvTablesTdx (
                                CurrentTable->Length,
                                &TableHandle
                                );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
       for (UINTN i = 0; i < CurrentTable->Length; i++) {
         DEBUG ((DEBUG_INFO, " %x", *((UINT8 *)CurrentTable + i)));
       }
