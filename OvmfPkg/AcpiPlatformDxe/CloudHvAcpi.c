@@ -71,6 +71,7 @@ InstallCloudHvTablesTdx (
   if (DsdtTable == NULL) {
     DEBUG ((DEBUG_INFO, "%a: no DSDT found\n", __func__));
     ASSERT (FALSE);
+    CpuDeadLoop ();
   }
 
   Status = AcpiProtocol->InstallAcpiTable (
