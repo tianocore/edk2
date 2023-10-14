@@ -196,6 +196,12 @@ class Settings(CiBuildSettingsManager, UpdateSettingsManager, SetupSettingsManag
 
             try:
                 scopes += codeql_helpers.get_scopes(self.codeql)
+
+                if self.codeql:
+                    shell_environment.GetBuildVars().SetValue(
+                        "STUART_CODEQL_AUDIT_ONLY",
+                        "TRUE",
+                        "Set in CISettings.py")
             except NameError:
                 pass
 
