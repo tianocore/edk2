@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "DxeIpl.h"
 #include "VirtualMemory.h"
-#include <UniversalPayload/DeviceTree.h>
 
 #define IDT_ENTRY_COUNT  32
 
@@ -265,10 +264,6 @@ HandOffToDxeCore (
   EFI_VECTOR_HANDOFF_INFO          *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI  *VectorHandoffInfoPpi;
   BOOLEAN                          BuildPageTablesIa32Pae;
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
-  UINT8                            *GuidHob;
-  UNIVERSAL_PAYLOAD_DEVICE_TREE    *FdtHob;
-#endif
 
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
@@ -316,14 +311,6 @@ HandOffToDxeCore (
     PERF_EVENT_SIGNAL_END (gEndOfPeiSignalPpi.Guid);
     ASSERT_EFI_ERROR (Status);
 
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
-    //
-    // Get FDT blob address
-    //
-    GuidHob = GetFirstGuidHob (&gUniversalPayloadDeviceTreeGuid);
-    ASSERT (GuidHob != NULL);
-    FdtHob = (UNIVERSAL_PAYLOAD_DEVICE_TREE *) GET_GUID_HOB_DATA (GuidHob);
-#endif
     //
     // Paging might be already enabled. To avoid conflict configuration,
     // disable paging first anyway.
@@ -395,11 +382,7 @@ HandOffToDxeCore (
     AsmEnablePaging64 (
       SYS_CODE64_SEL,
       DxeCoreEntryPoint,
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
-      (EFI_PHYSICAL_ADDRESS) (UINTN) (FdtHob->DeviceTreeAddress),
-#else
       (EFI_PHYSICAL_ADDRESS)(UINTN)(HobList.Raw),
-#endif
       0,
       TopOfStack
       );
@@ -453,15 +436,6 @@ HandOffToDxeCore (
     PERF_EVENT_SIGNAL_END (gEndOfPeiSignalPpi.Guid);
     ASSERT_EFI_ERROR (Status);
 
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
-    //
-    // Get FDT blob address
-    //
-    GuidHob = GetFirstGuidHob (&gUniversalPayloadDeviceTreeGuid);
-    ASSERT (GuidHob != NULL);
-    FdtHob = (UNIVERSAL_PAYLOAD_DEVICE_TREE *) GET_GUID_HOB_DATA (GuidHob);
-#endif
-
     if (BuildPageTablesIa32Pae) {
       //
       // Paging might be already enabled. To avoid conflict configuration,
@@ -494,22 +468,14 @@ HandOffToDxeCore (
     if (BuildPageTablesIa32Pae) {
       AsmEnablePaging32 (
         (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
-      (EFI_PHYSICAL_ADDRESS) (UINTN) (FdtHob->DeviceTreeAddress),
-#else
-      (EFI_PHYSICAL_ADDRESS)(UINTN)(HobList.Raw),
-#endif
+        HobList.Raw,
         NULL,
         (VOID *)(UINTN)TopOfStack
         );
     } else {
       SwitchStack (
         (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
-      (EFI_PHYSICAL_ADDRESS) (UINTN) (FdtHob->DeviceTreeAddress),
-#else
-      (EFI_PHYSICAL_ADDRESS)(UINTN)(HobList.Raw),
-#endif
+        HobList.Raw,
         NULL,
         (VOID *)(UINTN)TopOfStack
         );

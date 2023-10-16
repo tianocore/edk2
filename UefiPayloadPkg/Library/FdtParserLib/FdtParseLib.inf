@@ -43,3 +43,7 @@
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
   gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdHandOffFdtEnable
+
+[BuildOptions]
+  # DeviceTreeAddress: 'EFI_PHYSICAL_ADDRESS' : truncation from 'Fdt ' to 'VOID *'
+  MSFT:*_*_*_CC_FLAGS = /wd4305

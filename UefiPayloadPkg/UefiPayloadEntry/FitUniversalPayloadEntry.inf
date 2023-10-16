@@ -98,3 +98,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdHandOffFdtEnable
+
+  [BuildOptions]
+  # 'type cast' :  conversion from 'PHYSICAL_ADDRESS' to 'UINTN'
+  MSFT:*_*_*_CC_FLAGS = /wd4244

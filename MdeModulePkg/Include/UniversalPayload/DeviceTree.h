@@ -17,8 +17,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #pragma pack (1)
 
 typedef struct {
-  UNIVERSAL_PAYLOAD_GENERIC_HEADER Header;
-  EFI_PHYSICAL_ADDRESS             DeviceTreeAddress;
+  UNIVERSAL_PAYLOAD_GENERIC_HEADER    Header;
+  EFI_PHYSICAL_ADDRESS                DeviceTreeAddress;
 } UNIVERSAL_PAYLOAD_DEVICE_TREE;
 
 #pragma pack()

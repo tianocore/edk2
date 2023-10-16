@@ -5,7 +5,7 @@
 
 #include "UefiPayloadEntry.h"
 #include <Library/FdtLib.h>
-//#include <Guid/UniversalPayloadBase.h>
+// #include <Guid/UniversalPayloadBase.h>
 
 #define MEMORY_ATTRIBUTE_MASK  (EFI_RESOURCE_ATTRIBUTE_PRESENT             |        \
                                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED         | \
@@ -27,7 +27,6 @@ extern VOID  *mHobList;
 
 CHAR8  *mLineBuffer = NULL;
 
-
 /**
   It will initialize HOBs for UPL.
   @param[in]  FdtBase        Address of the Fdt data.
@@ -36,7 +35,7 @@ CHAR8  *mLineBuffer = NULL;
 **/
 UINT64
 UplInitHob (
-  IN VOID                         *FdtBase
+  IN VOID  *FdtBase
   );
 
 /**
@@ -47,8 +46,9 @@ UplInitHob (
 **/
 UINTN
 ParseDtb (
-  IN VOID                           *FdtBase
+  IN VOID  *FdtBase
   );
+
 /**
   Print all HOBs info from the HOB list.
   @return The pointer to the HOB list.
@@ -508,7 +508,7 @@ BuildHobs (
   EFI_HOB_RESOURCE_DESCRIPTOR   *PhitResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceHob;
   UINT8                         *GuidHob;
-  UINT32                         Idx;
+  UINT32                        Idx;
   UNIVERSAL_PAYLOAD_EXTRA_DATA  *ExtraData;
   EFI_HOB_FIRMWARE_VOLUME       *FvHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE  *AcpiTable;
@@ -594,34 +594,36 @@ BuildHobs (
 
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
-if (PcdGetBool (PcdHandOffFdtEnable)) {
-  BuildFitLoadablesFvHob (DxeFv);
-} else {
- //
-  // Get DXE FV location
-  //
-  GuidHob = GetFirstGuidHob (&gUniversalPayloadExtraDataGuid);
-  ASSERT (GuidHob != NULL);
-  ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *)GET_GUID_HOB_DATA (GuidHob);
-  DEBUG ((DEBUG_INFO, "Multiple Fv Count=%d\n", ExtraData->Count));
-  ASSERT (AsciiStrCmp (ExtraData->Entry[0].Identifier, "uefi_fv") == 0);
 
-  *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)ExtraData->Entry[0].Base;
-  ASSERT ((*DxeFv)->FvLength == ExtraData->Entry[0].Size);
-  //
-  // support multiple FVs provided by UPL
-  //
-  for (Idx = 1; Idx < ExtraData->Count; Idx++) {
-    BuildFvHob (ExtraData->Entry[Idx].Base, ExtraData->Entry[Idx].Size);
-    DEBUG ((
-      DEBUG_INFO,
-      "UPL Multiple fv[%d], Base=0x%x, size=0x%x\n",
-      Idx,
-      ExtraData->Entry[Idx].Base,
-      ExtraData->Entry[Idx].Size
-      ));
+  if (PcdGetBool (PcdHandOffFdtEnable)) {
+    BuildFitLoadablesFvHob (DxeFv);
+  } else {
+    //
+    // Get DXE FV location
+    //
+    GuidHob = GetFirstGuidHob (&gUniversalPayloadExtraDataGuid);
+    ASSERT (GuidHob != NULL);
+    ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *)GET_GUID_HOB_DATA (GuidHob);
+    DEBUG ((DEBUG_INFO, "Multiple Fv Count=%d\n", ExtraData->Count));
+    ASSERT (AsciiStrCmp (ExtraData->Entry[0].Identifier, "uefi_fv") == 0);
+
+    *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)ExtraData->Entry[0].Base;
+    ASSERT ((*DxeFv)->FvLength == ExtraData->Entry[0].Size);
+    //
+    // support multiple FVs provided by UPL
+    //
+    for (Idx = 1; Idx < ExtraData->Count; Idx++) {
+      BuildFvHob (ExtraData->Entry[Idx].Base, ExtraData->Entry[Idx].Size);
+      DEBUG ((
+        DEBUG_INFO,
+        "UPL Multiple fv[%d], Base=0x%x, size=0x%x\n",
+        Idx,
+        ExtraData->Entry[Idx].Base,
+        ExtraData->Entry[Idx].Size
+        ));
+    }
   }
-}
+
   //
   // Create guid hob for acpi board information
   //
@@ -656,13 +658,13 @@ _ModuleEntryPoint (
   IN UINTN  BootloaderParameter
   )
 {
-  EFI_STATUS                     Status;
-  PHYSICAL_ADDRESS               DxeCoreEntryPoint;
-  EFI_PEI_HOB_POINTERS           Hob;
-  EFI_FIRMWARE_VOLUME_HEADER     *DxeFv;
-  PHYSICAL_ADDRESS               HobListPtr;
+  EFI_STATUS                  Status;
+  PHYSICAL_ADDRESS            DxeCoreEntryPoint;
+  EFI_PEI_HOB_POINTERS        Hob;
+  EFI_FIRMWARE_VOLUME_HEADER  *DxeFv;
+  PHYSICAL_ADDRESS            HobListPtr;
 
-  DxeFv    = NULL;
+  DxeFv = NULL;
   // Call constructor for all libraries
   ProcessLibraryConstructorList ();
   // Initialize floating point operating environment to be compliant with UEFI spec.
@@ -672,9 +674,8 @@ _ModuleEntryPoint (
   DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof (UINTN)));
   DEBUG ((DEBUG_INFO, "BootloaderParameter = 0x%x\n", BootloaderParameter));
 
-
   DEBUG ((DEBUG_INFO, "Start init Hobs...\n"));
-  HobListPtr = UplInitHob ((VOID *) BootloaderParameter);
+  HobListPtr = UplInitHob ((VOID *)BootloaderParameter);
 
   //
   // Found hob list node
@@ -683,6 +684,7 @@ _ModuleEntryPoint (
     // Build HOB based on information from Bootloader
     Status = BuildHobs (HobListPtr, &DxeFv);
   }
+
   // Call constructor for all libraries again since hobs were built
   ProcessLibraryConstructorList ();
 
@@ -691,7 +693,7 @@ _ModuleEntryPoint (
     // Dump the Hobs from boot loader
     //
     PrintHob (mHobList);
-  );
+    );
 
   FixUpPcdDatabase (DxeFv);
   Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);
@@ -703,7 +705,7 @@ _ModuleEntryPoint (
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
   IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0xFF);
 
-  Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *) GetFirstHob (EFI_HOB_TYPE_HANDOFF);
+  Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *)GetFirstHob (EFI_HOB_TYPE_HANDOFF);
   HandOffToDxeCore (DxeCoreEntryPoint, Hob);
 
   // Should not get here

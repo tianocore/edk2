@@ -88,7 +88,6 @@
   ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
   ## SOMETIMES_PRODUCES ## HOB
   gEfiMemoryTypeInformationGuid
-  gUniversalPayloadDeviceTreeGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
@@ -108,7 +107,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable                  ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHandOffFdtEnable
 
 [Pcd.IA32,Pcd.X64,Pcd.ARM,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES

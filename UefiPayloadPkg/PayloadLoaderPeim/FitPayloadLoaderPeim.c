@@ -40,8 +40,8 @@ EndOfPeiPpiNotifyCallback (
   IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
   IN VOID                       *Ppi
   )
- {
-  EFI_STATUS                     Status;
+{
+  EFI_STATUS  Status;
 
   //
   // Ready to Payload phase signal
@@ -49,7 +49,7 @@ EndOfPeiPpiNotifyCallback (
   Status = PeiServicesInstallPpi (&gReadyToPayloadSignalPpi);
 
   return Status;
- }
+}
 
 EFI_PEI_NOTIFY_DESCRIPTOR  mEndOfPeiNotifyList[] = {
   {
@@ -157,7 +157,6 @@ PeiLoadFileLoadPayload (
 
   Status = PeiServicesNotifyPpi (&mEndOfPeiNotifyList[0]);
   ASSERT_EFI_ERROR (Status);
-
 
   return EFI_SUCCESS;
 }
