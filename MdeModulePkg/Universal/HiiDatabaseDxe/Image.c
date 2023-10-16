@@ -1391,7 +1391,7 @@ HiiDrawImage (
         OffsetY1 = Image->Width * Ypos;
         OffsetY2 = Width * Ypos;
         for (Xpos = 0; Xpos < Width; Xpos++) {
-          BltBuffer[OffsetY2 + Xpos] = Image->Bitmap[OffsetY1 + Xpos];
+          CopyMem (BltBuffer + OffsetY2 + Xpos, Image->Bitmap + OffsetY1 + Xpos, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
         }
       }
     }
