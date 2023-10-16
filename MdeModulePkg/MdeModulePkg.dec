@@ -941,10 +941,7 @@
   # @Prompt Enable process non-reset capsule image at runtime.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSupportProcessCapsuleAtRuntime|FALSE|BOOLEAN|0x00010079
 
-  ## Indicates if Universal payload support FDT .<BR><BR>
-  #   TRUE, HandOffData is FDT
-  #  FALSE, HandOffData is HOB
-  gEfiMdeModulePkgTokenSpaceGuid.PcdHandOffFdtEnable|FALSE|BOOLEAN|0x00010080
+
 
 [PcdsFeatureFlag.IA32, PcdsFeatureFlag.ARM, PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.LOONGARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE|BOOLEAN|0x0001003a
@@ -1622,6 +1619,12 @@
   ## The Retry Count of AHCI command if there is a failure
   # @Prompt The value of Retry Count,  Default value is 5.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAhciCommandRetryCount|5|UINT32|0x00000032
+
+  ## Indicates if Universal payload support FDT .<BR><BR>
+  #   TRUE, HandOffData is FDT
+  #  FALSE, HandOffData is HOB
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHandOffFdtEnable|FALSE|BOOLEAN|0x30001059
+
 
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.

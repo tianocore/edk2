@@ -36,9 +36,8 @@ GetDebugPrintErrorLevel (
   UEFI_PAYLOAD_DEBUG_PRINT_ERROR_LEVEL  *DebugPrintErrorLevel;
 
   if (GetHobList() == NULL) {
-    return PcdGet32 (PcdDebugPrintErrorLevel);;
+    return PcdGet32 (PcdDebugPrintErrorLevel);
   }
-
   if (!gDebugPrintErrorLevelInitialized) {
     gDebugPrintErrorLevelInitialized = TRUE;
     gDebugPrintErrorLevel            = PcdGet32 (PcdDebugPrintErrorLevel);

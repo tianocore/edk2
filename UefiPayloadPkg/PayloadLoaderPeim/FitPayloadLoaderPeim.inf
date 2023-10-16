@@ -46,6 +46,7 @@
 
 [Ppis]
   gEfiPeiLoadFilePpiGuid                 ## PRODUCES
+  gEfiReadyToPayloadPpiGuid              ## PRODUCES
   gEfiEndOfPeiSignalPpiGuid              ## CONSUMES
 
 [Pcd]

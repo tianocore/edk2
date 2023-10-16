@@ -49,8 +49,8 @@
   # ELF: Build UniversalPayload file as UniversalPayload.elf
   # FIT: Build UniversalPayload file as UniversalPayload.fit
   #
-  DEFINE UNIVERSAL_PAYLOAD            = FALSE
-  DEFINE UNIVERSAL_PAYLOAD_FORMAT     = ELF
+  DEFINE UNIVERSAL_PAYLOAD            = TRUE
+  DEFINE UNIVERSAL_PAYLOAD_FORMAT     = FIT
 
   #
   # NULL:    NullMemoryTestDxe
@@ -279,7 +279,7 @@
   PlatformBootManagerLib|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
   ElfLib|UefiPayloadPkg/Library/ElfLib/Elflib.inf
-
+#  FdtParseLib|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
   #
   # Misc
   #
@@ -434,6 +434,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection|FALSE
 
+
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x10000
@@ -490,7 +491,6 @@
 !endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdHandOffFdtEnable|TRUE
-
 [PcdsPatchableInModule.X64]
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
@@ -612,14 +612,16 @@
   !if $(UNIVERSAL_PAYLOAD) == TRUE
     !if $(UNIVERSAL_PAYLOAD_FORMAT) == "ELF"
       UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf {
-        FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
-        NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
-        NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+        <LibraryClasses>
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
       }
     !elseif $(UNIVERSAL_PAYLOAD_FORMAT) == "FIT"
       UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf {
-        FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
-        NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
+        <LibraryClasses>
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
       }
     !else
       UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
@@ -632,14 +634,16 @@
   !if $(UNIVERSAL_PAYLOAD) == TRUE
     !if $(UNIVERSAL_PAYLOAD_FORMAT) == "ELF"
       UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf {
-        FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
-        NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
-        NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+        <LibraryClasses>
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
       }
     !elseif $(UNIVERSAL_PAYLOAD_FORMAT) == "FIT"
       UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf {
-        FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
-        NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
+        <LibraryClasses>
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
       }
     !else
       UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf

@@ -19,6 +19,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "FitLib.h"
 
+CONST EFI_PEI_PPI_DESCRIPTOR  gReadyToPayloadSignalPpi = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiReadyToPayloadPpiGuid,
+  NULL
+};
+
 /**
   Notify ReadyToPayLoad signal.
   @param[in] PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.

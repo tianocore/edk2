@@ -98,12 +98,10 @@ ParseDtb (
   UINT32                                   *Data32;
   UINT64                                   *Data64;
   UINT64                                   StartAddress;
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
   INT32                                    SubNode;
   UINT64                                   NumberOfBytes;
   UINT32                                   Attribute;
-#endif
-//  EFI_GUID                                 *Guid;
+  EFI_GUID                                 *Guid;
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO       *Serial;
   UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES       *PciRootBridgeInfo;
   UEFI_PAYLOAD_DEBUG_PRINT_ERROR_LEVEL     *DebugPrintErrorLevelInfo;
@@ -112,9 +110,6 @@ ParseDtb (
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE           *SmbiosTable;
   EFI_PEI_GRAPHICS_INFO_HOB                *GraphicsInfo;
   EFI_PEI_GRAPHICS_DEVICE_INFO_HOB         *GraphicsDev;
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == FALSE    
-  ACPI_BOARD_INFO                          *AcpiBoardInfo;
-#endif
   UINT8                                    SizeOfMemorySpace;
   UINT64                                   FrameBufferBase;
   UINT64                                   FrameBufferSize;
@@ -173,10 +168,6 @@ ParseDtb (
     DEBUG ((DEBUG_INFO, "  %016lX\n", StartAddress));
  
     PldAcpiTable->Rsdp = (EFI_PHYSICAL_ADDRESS)StartAddress;
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == FALSE  
-    AcpiBoardInfo = BuildHobFromAcpi ((UINT64)PldAcpiTable->Rsdp);
-    ASSERT (AcpiBoardInfo != NULL);
-#endif
   }
 
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
@@ -187,7 +178,6 @@ ParseDtb (
     NodePtr = (FDT_NODE_HEADER *) ((CONST CHAR8 *) Fdt + Node + Fdt32ToCpu (((FDT_HEADER *) Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x", Node, NodePtr->Name, Depth));
 
-#if FixedPcdGet8 (PcdHandOffFdtEnable) == TRUE
     // memory node
     if (AsciiStrnCmp (NodePtr->Name, "memory@", AsciiStrLen("memory@")) == 0) {
       Attribute = MEMORY_ATTRIBUTE_DEFAULT;
@@ -340,7 +330,6 @@ ParseDtb (
         }
       }
     } // end of memory allocation
-#endif
 
     if (AsciiStrnCmp (NodePtr->Name, "serial@", AsciiStrLen ("serial@")) == 0) {
       //
