@@ -20,10 +20,16 @@
 [Sources.X64]
   QemuX64.c
 
+[Sources.AARCH64, Sources.ARM]
+  QemuFdt.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   OvmfPkg/OvmfPkg.dec
+
+[Packages.AARCH64, Packages.ARM]
+  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -32,6 +38,9 @@
   HobLib
   MemoryAllocationLib
   UefiDriverEntryPoint
+
+[LibraryClasses.AARCH64, LibraryClasses.ARM]
+  FdtLib
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache           ## CONSUMES
@@ -42,6 +51,9 @@
   gEfiMmCommunication2ProtocolGuid              ## PRODUCES
   gEfiSmmVariableProtocolGuid                   ## PRODUCES
 
+[Protocols.AARCH64, Protocols.ARM]
+  gFdtClientProtocolGuid
+
 [Guids]
   gEfiEndOfDxeEventGroupGuid
   gEfiEventExitBootServicesGuid
@@ -50,3 +62,6 @@
 
 [Depex]
   gEfiCpuArchProtocolGuid
+
+[Depex.AARCH64, Depex.ARM]
+  gFdtClientProtocolGuid
