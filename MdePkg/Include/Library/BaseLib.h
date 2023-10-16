@@ -351,6 +351,51 @@ AsmReadStableCounter (
   VOID
   );
 
+/**
+  CSR read operation.
+
+  @param[in]  Select   CSR read instruction select values.
+
+  @return     The return value of csrrd instruction, return -1 means no CSR instruction
+              is found.
+**/
+UINTN
+CsrRead (
+  IN UINT16  Select
+  );
+
+/**
+  CSR write operation.
+
+  @param[in]  Select   CSR write instruction select values.
+  @param[in]  Value    The csrwr will write the value.
+
+  @return     The return value of csrwr instruction, that is, store the old value of
+              the register, return -1 means no CSR instruction is found.
+**/
+UINTN
+CsrWrite (
+  IN UINT16  Select,
+  IN UINTN   Value
+  );
+
+/**
+  CSR exchange operation.
+
+  @param[in]  Select   CSR exchange instruction select values.
+  @param[in]  Value    The csrxchg will write the value.
+  @param[in]  Mask     The csrxchg mask value.
+
+  @return     The return value of csrxchg instruction, that is, store the old value of
+              the register, return -1 means no CSR instruction is found.
+**/
+UINTN
+CsrXChg (
+  IN UINT16  Select,
+  IN UINTN   Value,
+  IN UINTN   Mask
+  );
+
 #endif // defined (MDE_CPU_LOONGARCH64)
 
 //
