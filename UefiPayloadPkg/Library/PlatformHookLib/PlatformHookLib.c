@@ -51,23 +51,27 @@ PlatformHookSerialPortInitialize (
   UINT8                               *GuidHob;
   UNIVERSAL_PAYLOAD_GENERIC_HEADER    *GenericHeader;
 
-  if (GetHobList() == NULL) {
+  if (GetHobList () == NULL) {
     Status = PcdSetBoolS (PcdSerialUseMmio, FALSE);
     if (RETURN_ERROR (Status)) {
       return Status;
     }
+
     Status = PcdSet64S (PcdSerialRegisterBase, 0x3f8);
     if (RETURN_ERROR (Status)) {
       return Status;
     }
+
     Status = PcdSet32S (PcdSerialRegisterStride, 1);
     if (RETURN_ERROR (Status)) {
       return Status;
     }
+
     Status = PcdSet32S (PcdSerialBaudRate, 115200);
     if (RETURN_ERROR (Status)) {
       return Status;
     }
+
     return RETURN_SUCCESS;
   }
 

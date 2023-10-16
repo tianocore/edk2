@@ -37,6 +37,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define _SYS_ELF64_H_  1
 
 #include "ElfCommon.h"
+
 /*
  * ELF definitions common to all 64-bit architectures.
  */

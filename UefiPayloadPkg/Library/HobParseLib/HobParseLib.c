@@ -20,7 +20,6 @@
 #include <UniversalPayload/UniversalPayload.h>
 #include <UniversalPayload/ExtraData.h>
 
-
 #define MEMORY_ATTRIBUTE_MASK  (EFI_RESOURCE_ATTRIBUTE_PRESENT             |        \
                                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED         | \
                                        EFI_RESOURCE_ATTRIBUTE_TESTED              | \
@@ -266,7 +265,6 @@ IsHobNeed (
   EFI_PEI_HOB_POINTERS  Hob
   )
 {
-
   if (Hob.Header->HobType == EFI_HOB_TYPE_HANDOFF) {
     return FALSE;
   }
@@ -291,24 +289,25 @@ IsHobNeed (
 **/
 EFI_STATUS
 BuildHobs (
-  IN  UINTN                       BootloaderParameter
+  IN  UINTN  BootloaderParameter
   )
 {
-  EFI_PEI_HOB_POINTERS          Hob;
-  UINTN                         MinimalNeededSize;
-  EFI_PHYSICAL_ADDRESS          FreeMemoryBottom;
-  EFI_PHYSICAL_ADDRESS          FreeMemoryTop;
-  EFI_PHYSICAL_ADDRESS          MemoryBottom;
-  EFI_PHYSICAL_ADDRESS          MemoryTop;
-  EFI_HOB_RESOURCE_DESCRIPTOR   *PhitResourceHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceHob;
-#if(!PcdGetBool (PcdHandOffFdtEnable))
+  EFI_PEI_HOB_POINTERS         Hob;
+  UINTN                        MinimalNeededSize;
+  EFI_PHYSICAL_ADDRESS         FreeMemoryBottom;
+  EFI_PHYSICAL_ADDRESS         FreeMemoryTop;
+  EFI_PHYSICAL_ADDRESS         MemoryBottom;
+  EFI_PHYSICAL_ADDRESS         MemoryTop;
+  EFI_HOB_RESOURCE_DESCRIPTOR  *PhitResourceHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
+
+ #if (!PcdGetBool (PcdHandOffFdtEnable))
   UINT8                         *GuidHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE  *AcpiTable;
   ACPI_BOARD_INFO               *AcpiBoardInfo;
-#endif
-  EFI_HOB_HANDOFF_INFO_TABLE    *HobInfo;
-  
+ #endif
+  EFI_HOB_HANDOFF_INFO_TABLE  *HobInfo;
+
   Hob.Raw           = (UINT8 *)BootloaderParameter;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
 
@@ -380,7 +379,7 @@ BuildHobs (
   //
   // Since payload created new Hob, move all hobs except PHIT from boot loader hob list.
   //
-  Hob.Raw           = (UINT8 *)BootloaderParameter;
+  Hob.Raw = (UINT8 *)BootloaderParameter;
   while (!END_OF_HOB_LIST (Hob)) {
     if (IsHobNeed (Hob)) {
       // Add this hob to payload HOB
@@ -390,7 +389,7 @@ BuildHobs (
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
-#if(!PcdGetBool (PcdHandOffFdtEnable))
+ #if (!PcdGetBool (PcdHandOffFdtEnable))
   //
   // Create guid hob for acpi board information
   //
@@ -402,7 +401,8 @@ BuildHobs (
     AcpiBoardInfo = BuildHobFromAcpi ((UINT64)AcpiTable->Rsdp);
     ASSERT (AcpiBoardInfo != NULL);
   }
-#endif
+
+ #endif
 
   return EFI_SUCCESS;
 }
