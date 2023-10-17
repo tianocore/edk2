@@ -24,6 +24,10 @@ typedef struct _EDKII_USB_ETHERNET_PROTOCOL EDKII_USB_ETHERNET_PROTOCOL;
 #define USB_NCM_NTB_PROTOCOL   0x01
 #define USB_VENDOR_PROTOCOL    0xFF
 
+#define USB_MISC_CLASS               0xEF
+#define USB_RNDIS_SUBCLASS           0x04
+#define USB_RNDIS_ETHERNET_PROTOCOL  0x01
+
 // Type Values for the DescriptorType Field
 #define CS_INTERFACE  0x24
 #define CS_ENDPOINT   0x25
@@ -41,6 +45,8 @@ typedef struct _EDKII_USB_ETHERNET_PROTOCOL EDKII_USB_ETHERNET_PROTOCOL;
 // 6.3.1 NetworkConnection
 #define NETWORK_CONNECTED   0x01
 #define NETWORK_DISCONNECT  0x00
+
+#define MAC_FILTERS_MASK  0x7FFF
 
 // USB Header functional Descriptor
 typedef struct {
