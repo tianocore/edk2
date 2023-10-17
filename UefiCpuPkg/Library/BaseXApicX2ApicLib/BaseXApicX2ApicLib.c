@@ -1294,11 +1294,12 @@ GetProcessorLocationByApicId (
       NULL
       );
     //
-    // If CPUID.(EAX=0BH, ECX=0H):EBX returns zero and maximum input value for
-    // basic CPUID information is greater than 0BH, then CPUID.0BH leaf is not
-    // supported on that processor.
+    // Quoting Intel SDM:
+    // Software must detect the presence of CPUID leaf 0BH by
+    // verifying (a) the highest leaf index supported by CPUID is >=
+    // 0BH, and (b) CPUID.0BH:EBX[15:0] reports a non-zero value.
     //
-    if (ExtendedTopologyEbx.Uint32 != 0) {
+    if (ExtendedTopologyEbx.Bits.LogicalProcessors != 0) {
       TopologyLeafSupported = TRUE;
 
       //
@@ -1424,6 +1425,7 @@ GetProcessorLocation2ByApicId (
   )
 {
   CPUID_EXTENDED_TOPOLOGY_EAX  ExtendedTopologyEax;
+  CPUID_EXTENDED_TOPOLOGY_EBX  ExtendedTopologyEbx;
   CPUID_EXTENDED_TOPOLOGY_ECX  ExtendedTopologyEcx;
   UINT32                       MaxStandardCpuIdIndex;
   UINT32                       Index;
@@ -1436,10 +1438,19 @@ GetProcessorLocation2ByApicId (
   }
 
   //
-  // Get max index of CPUID
+  // Quoting Intel SDM:
+  // Software must detect the presence of CPUID leaf 1FH by verifying
+  // (a) the highest leaf index supported by CPUID is >= 1FH, and (b)
+  // CPUID.1FH:EBX[15:0] reports a non-zero value.
   //
   AsmCpuid (CPUID_SIGNATURE, &MaxStandardCpuIdIndex, NULL, NULL, NULL);
   if (MaxStandardCpuIdIndex < CPUID_V2_EXTENDED_TOPOLOGY) {
+    ExtendedTopologyEbx.Bits.LogicalProcessors = 0;
+  } else {
+    AsmCpuidEx (CPUID_V2_EXTENDED_TOPOLOGY, 0, NULL, &ExtendedTopologyEbx.Uint32, NULL, NULL);
+  }
+
+  if (ExtendedTopologyEbx.Bits.LogicalProcessors == 0) {
     if (Die != NULL) {
       *Die = 0;
     }
