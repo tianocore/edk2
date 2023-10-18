@@ -1,7 +1,8 @@
 /** @file
-  RISC-V specific functionality for cache.
+  Implement Risc-V Cache Management Operations
 
   Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+  Copyright (c) 2023, Rivos Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -9,10 +10,111 @@
 #include <Base.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
+
+// TODO: This will be removed once RISC-V CPU HOB is available
+#define RISCV_CACHE_BLOCK_SIZE         64
+#define RISCV_CPU_FEATURE_CMO_BITMASK  0x1
+
+typedef enum {
+  Clean,
+  Flush,
+  Invld,
+} CACHE_OP;
+
+/**
+Verify CBOs are supported by this HW
+TODO: Use RISC-V CPU HOB once available.
+
+**/
+STATIC
+BOOLEAN
+RiscVIsCMOEnabled (
+  VOID
+  )
+{
+  // TODO: Add check for CMO from CPU HOB.
+  // If CMO is disabled in HW, skip Override check
+  // Otherwise this PCD can override settings
+  return ((PcdGet64 (PcdRiscVFeatureOverride) & RISCV_CPU_FEATURE_CMO_BITMASK) != 0);
+}
+
+/**
+  Performs required opeartion on cache lines in the cache coherency domain
+  of the calling CPU. If Address is not aligned on a cache line boundary,
+  then entire cache line containing Address is operated. If Address + Length
+  is not aligned on a cache line boundary, then the entire cache line
+  containing Address + Length -1 is operated.
+  If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
+  @param  Address The base address of the cache lines to
+          invalidate.
+  @param  Length  The number of bytes to invalidate from the instruction
+          cache.
+  @param  Op  Type of CMO operation to be performed
+  @return Address.
+
+**/
+STATIC
+VOID
+CacheOpCacheRange (
+  IN VOID      *Address,
+  IN UINTN     Length,
+  IN CACHE_OP  Op
+  )
+{
+  UINTN  CacheLineSize;
+  UINTN  Start;
+  UINTN  End;
+
+  if (Length == 0) {
+    return;
+  }
+
+  if ((Op != Invld) && (Op != Flush) && (Op != Clean)) {
+    return;
+  }
+
+  ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Address));
+
+  CacheLineSize = RISCV_CACHE_BLOCK_SIZE;
+
+  Start = (UINTN)Address;
+  //
+  // Calculate the cache line alignment
+  //
+  End    = (Start + Length + (CacheLineSize - 1)) & ~(CacheLineSize - 1);
+  Start &= ~((UINTN)CacheLineSize - 1);
+
+  DEBUG (
+    (DEBUG_INFO,
+     "%a Performing Cache Management Operation %d \n", __func__, Op)
+    );
+
+  do {
+    switch (Op) {
+      case Invld:
+        RiscVCpuCacheInvalAsmCbo (Start);
+        break;
+      case Flush:
+        RiscVCpuCacheFlushAsmCbo (Start);
+        break;
+      case Clean:
+        RiscVCpuCacheCleanAsmCbo (Start);
+        break;
+      default:
+        break;
+    }
+
+    Start = Start + CacheLineSize;
+  } while (Start != End);
+}
 
 /**
   Invalidates the entire instruction cache in cache coherency domain of the
-  calling CPU.
+  calling CPU. Risc-V does not have currently an CBO implementation which can
+  invalidate entire I-cache. Hence using Fence instruction for now. P.S. Fence
+  instruction may or may not implement full I-cache invd functionality on all
+  implementations.
 
 **/
 VOID
@@ -56,12 +158,17 @@ InvalidateInstructionCacheRange (
   IN UINTN  Length
   )
 {
-  DEBUG (
-    (DEBUG_WARN,
-     "%a:RISC-V unsupported function.\n"
-     "Invalidating the whole instruction cache instead.\n", __func__)
-    );
-  InvalidateInstructionCache ();
+  if (RiscVIsCMOEnabled ()) {
+    CacheOpCacheRange (Address, Length, Invld);
+  } else {
+    DEBUG (
+      (DEBUG_WARN,
+       "%a:RISC-V unsupported function.\n"
+       "Invalidating the whole instruction cache instead.\n", __func__)
+      );
+    InvalidateInstructionCache ();
+  }
+
   return Address;
 }
 
@@ -117,7 +224,12 @@ WriteBackInvalidateDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  if (RiscVIsCMOEnabled ()) {
+    CacheOpCacheRange (Address, Length, Flush);
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  }
+
   return Address;
 }
 
@@ -156,10 +268,7 @@ WriteBackDataCache (
 
   If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
 
-  @param  Address The base address of the data cache lines to write back. If
-                  the CPU is in a physical addressing mode, then Address is a
-                  physical address. If the CPU is in a virtual addressing
-                  mode, then Address is a virtual address.
+  @param  Address The base address of the data cache lines to write back.
   @param  Length  The number of bytes to write back from the data cache.
 
   @return Address of cache written in main memory.
@@ -172,7 +281,12 @@ WriteBackDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  if (RiscVIsCMOEnabled ()) {
+    CacheOpCacheRange (Address, Length, Clean);
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  }
+
   return Address;
 }
 
@@ -214,10 +328,7 @@ InvalidateDataCache (
 
   If Length is greater than (MAX_ADDRESS - Address + 1), then ASSERT().
 
-  @param  Address The base address of the data cache lines to invalidate. If
-                  the CPU is in a physical addressing mode, then Address is a
-                  physical address. If the CPU is in a virtual addressing mode,
-                  then Address is a virtual address.
+  @param  Address The base address of the data cache lines to invalidate.
   @param  Length  The number of bytes to invalidate from the data cache.
 
   @return Address.
@@ -230,6 +341,16 @@ InvalidateDataCacheRange (
   IN      UINTN  Length
   )
 {
-  DEBUG ((DEBUG_ERROR, "%a:RISC-V unsupported function.\n", __func__));
+  if (RiscVIsCMOEnabled ()) {
+    CacheOpCacheRange (Address, Length, Invld);
+  } else {
+    DEBUG (
+      (DEBUG_WARN,
+       "%a:RISC-V unsupported function.\n"
+       "Invalidating the whole Data cache instead.\n", __func__)
+      );
+    InvalidateDataCache ();
+  }
+
   return Address;
 }

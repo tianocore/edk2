@@ -56,3 +56,5 @@
   BaseLib
   DebugLib
 
+[Pcd.RISCV64]
+  gEfiMdePkgTokenSpaceGuid.PcdRiscVFeatureOverride  ## CONSUMES
