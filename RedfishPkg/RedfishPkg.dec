@@ -142,3 +142,8 @@
   # This PCD indicates that if BMC bootstrap credential service will be disabled by BIOS or not.
   #
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDisableBootstrapCredentialService|FALSE|BOOLEAN|0x00001007
+  #
+  # The EFI_REST_EX_HTTP_CONFIG_DATA.SendReceiveTimeout value that RedfishDiscoverDxe driver
+  # set to EFI_REST_EX_PROTOCOL.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishSendReceiveTimeout|5000|UINT32|0x00001008
