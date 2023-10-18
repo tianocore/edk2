@@ -206,6 +206,26 @@ RiscVClearPendingTimerInterrupt (
   VOID
   );
 
+/**
+  RISC-V invalidate instruction cache.
+
+**/
+VOID
+EFIAPI
+RiscVInvalidateInstCacheAsm (
+  VOID
+  );
+
+/**
+  RISC-V invalidate data cache.
+
+**/
+VOID
+EFIAPI
+RiscVInvalidateDataCacheAsm (
+  VOID
+  );
+
 #endif // defined (MDE_CPU_RISCV64)
 
 #if defined (MDE_CPU_LOONGARCH64)
