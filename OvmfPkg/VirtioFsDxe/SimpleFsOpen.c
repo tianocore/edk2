@@ -395,11 +395,20 @@ VirtioFsSimpleFileOpen (
   //
   // Referring to a file relative to a regular file makes no sense (or at least
   // it cannot be implemented consistently with how a file is referred to
-  // relative to a directory).
+  // relative to a directory). See USWG Mantis ticket #2367.
   //
   if (!VirtioFsFile->IsDirectory) {
+    BOOLEAN  BugCompat;
+
+    //
+    // Tolerate this bug in the caller if FileName is absolute. If FileName is
+    // absolute, then VirtioFsAppendPath() below will disregard
+    // VirtioFsFile->CanonicalPathname.
+    //
+    BugCompat = (FileName[0] == L'\\');
+
     DEBUG ((
-      DEBUG_ERROR,
+      BugCompat ? DEBUG_WARN : DEBUG_ERROR,
       ("%a: Label=\"%s\" CanonicalPathname=\"%a\" FileName=\"%s\": "
        "nonsensical request to open a file or directory relative to a regular "
        "file\n"),
@@ -408,7 +417,9 @@ VirtioFsSimpleFileOpen (
       VirtioFsFile->CanonicalPathname,
       FileName
       ));
-    return EFI_INVALID_PARAMETER;
+    if (!BugCompat) {
+      return EFI_INVALID_PARAMETER;
+    }
   }
 
   //
