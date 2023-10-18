@@ -877,7 +877,7 @@ AddAndSignalNewRedfishService (
         goto EXIT_FREE_CONFIG_DATA;
       }
 
-      RestExHttpConfigData->SendReceiveTimeout                = 5000;
+      RestExHttpConfigData->SendReceiveTimeout                = PcdGet32 (PcdRedfishSendReceiveTimeout);
       RestExHttpConfigData->HttpConfigData.HttpVersion        = HttpVersion11;
       RestExHttpConfigData->HttpConfigData.LocalAddressIsIPv6 = CheckIsIpVersion6 (NetworkInterface);
       if (RestExHttpConfigData->HttpConfigData.LocalAddressIsIPv6) {
