@@ -9,13 +9,13 @@
 //------------------------------------------------------------------------------
 
 .align 3
-ASM_GLOBAL ASM_PFX(RiscVInvalidateInstCacheAsm)
-ASM_GLOBAL ASM_PFX(RiscVInvalidateDataCacheAsm)
+ASM_GLOBAL ASM_PFX(RiscVInvalidateInstCacheAsmFence)
+ASM_GLOBAL ASM_PFX(RiscVInvalidateDataCacheAsmFence)
 
-ASM_PFX(RiscVInvalidateInstCacheAsm):
+ASM_PFX(RiscVInvalidateInstCacheAsmFence):
     fence.i
     ret
 
-ASM_PFX(RiscVInvalidateDataCacheAsm):
+ASM_PFX(RiscVInvalidateDataCacheAsmFence):
     fence
     ret
