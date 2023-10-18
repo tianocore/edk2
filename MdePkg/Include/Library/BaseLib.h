@@ -212,7 +212,7 @@ RiscVClearPendingTimerInterrupt (
 **/
 VOID
 EFIAPI
-RiscVInvalidateInstCacheAsm (
+RiscVInvalidateInstCacheAsmFence (
   VOID
   );
 
@@ -222,7 +222,7 @@ RiscVInvalidateInstCacheAsm (
 **/
 VOID
 EFIAPI
-RiscVInvalidateDataCacheAsm (
+RiscVInvalidateDataCacheAsmFence (
   VOID
   );
 
