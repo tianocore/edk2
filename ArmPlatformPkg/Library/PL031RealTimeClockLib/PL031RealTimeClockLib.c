@@ -27,8 +27,6 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
 
-#include <Protocol/RealTimeClock.h>
-
 #include "PL031RealTimeClock.h"
 
 STATIC BOOLEAN    mPL031Initialized = FALSE;
@@ -310,7 +308,6 @@ LibRtcInitialize (
   )
 {
   EFI_STATUS  Status;
-  EFI_HANDLE  Handle;
 
   // Initialize RTC Base Address
   mPL031RtcBase = PcdGet32 (PcdPL031RtcBase);
@@ -330,16 +327,6 @@ LibRtcInitialize (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  // Install the protocol
-  Handle = NULL;
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &Handle,
-                  &gEfiRealTimeClockArchProtocolGuid,
-                  NULL,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
 
   //
   // Register for the virtual address change event
