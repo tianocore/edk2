@@ -93,7 +93,7 @@ M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 RISCV64
 F: */RiscV64/
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
-R: Daniel Schaefer <git@danielschaefer.me> [JohnAZoidberg]
+R: Andrei Warkentin <andrei.warkentin@intel.com> [andreiw]
 
 LOONGARCH64
 F: */LoongArch64/
@@ -157,16 +157,6 @@ R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
-ArmVirtPkg: modules used on Xen
-F: ArmVirtPkg/ArmVirtXen.*
-F: ArmVirtPkg/Library/XenArmGenericTimerVirtCounterLib/
-F: ArmVirtPkg/Library/XenVirtMemInfoLib/
-F: ArmVirtPkg/PrePi/
-F: ArmVirtPkg/XenAcpiPlatformDxe/
-F: ArmVirtPkg/XenPlatformHasAcpiDtDxe/
-F: ArmVirtPkg/XenioFdtDxe/
-R: Julien Grall <julien@xen.org> [jgrall]
-
 BaseTools
 F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
@@ -187,8 +177,7 @@ F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 M: Yi Li <yi1.li@intel.com> [liyi77]
-R: Xiaoyu Lu <xiaoyu1.lu@intel.com> [xiaoyuxlu]
-R: Guomin Jiang <guomin.jiang@intel.com> [guominjia]
+R: Wenxing Hou <wenxing.hou@intel.com> [Wenxing-hou]
 
 DynamicTablesPkg
 F: DynamicTablesPkg/
@@ -202,7 +191,6 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Abner Chang <abner.chang@amd.com> [changab]
-R: Daniel Schaefer <git@danielschaefer.me> [JohnAZoidberg]
 
 EmulatorPkg
 F: EmulatorPkg/
@@ -228,7 +216,6 @@ F: FmpDevicePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/FmpDevicePkg
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 M: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
-R: Guomin Jiang <guomin.jiang@intel.com> [guominjia]
 R: Wei6 Xu <wei6.xu@intel.com> [xuweiintel]
 
 IntelFsp2Pkg
@@ -237,7 +224,6 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFsp2Pkg
 M: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 M: Nate DeSimone <nathaniel.l.desimone@intel.com> [nate-desimone]
 M: Duggapu Chinni B <chinni.b.duggapu@intel.com> [cbduggap]
-M: Ray Han Lim Ng <ray.han.lim.ng@intel.com> [rayhanlimng]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
@@ -258,7 +244,6 @@ R: Susovan Mohapatra <susovan.mohapatra@intel.com> [susovanmohapatra]
 MdeModulePkg
 F: MdeModulePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
-M: Jian J Wang <jian.j.wang@intel.com> [jwang36]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 MdeModulePkg: ACPI modules
@@ -267,15 +252,6 @@ F: MdeModulePkg/Universal/Acpi/
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
-
-MdeModulePkg: ACPI modules related to S3
-F: MdeModulePkg/*LockBox*/
-F: MdeModulePkg/Include/*BootScript*.h
-F: MdeModulePkg/Include/*LockBox*.h
-F: MdeModulePkg/Include/*S3*.h
-F: MdeModulePkg/Library/*S3*/
-R: Hao A Wu <hao.a.wu@intel.com> [hwu25]
-R: Eric Dong <eric.dong@intel.com> [ydong10]
 
 MdeModulePkg: BDS modules
 F: MdeModulePkg/*BootManager*/
@@ -326,7 +302,6 @@ F: MdeModulePkg/Library/DxeSecurityManagementLib/
 F: MdeModulePkg/Universal/PCD/
 F: MdeModulePkg/Universal/PlatformDriOverrideDxe/
 F: MdeModulePkg/Universal/SecurityStubDxe/SecurityStub.c
-R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 MdeModulePkg: Device and Peripheral modules
@@ -346,12 +321,10 @@ F: MdeModulePkg/Include/Ppi/StorageSecurityCommand.h
 F: MdeModulePkg/Include/Protocol/Ps2Policy.h
 F: MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/
 F: MdeModulePkg/Universal/PcatSingleSegmentPciCfg2Pei/
-R: Hao A Wu <hao.a.wu@intel.com> [hwu25]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
 
 MdeModulePkg: Disk modules
 F: MdeModulePkg/Universal/Disk/
-R: Hao A Wu <hao.a.wu@intel.com> [hwu25]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 
@@ -366,7 +339,6 @@ F: MdeModulePkg/Library/DisplayUpdateProgressLib*/
 F: MdeModulePkg/Library/FmpAuthenticationLibNull/
 F: MdeModulePkg/Universal/Esrt*/
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
-R: Guomin Jiang <guomin.jiang@intel.com> [guominjia]
 
 MdeModulePkg: HII and UI modules
 F: MdeModulePkg/*FileExplorer*/
@@ -383,7 +355,6 @@ F: MdeModulePkg/Universal/DisplayEngineDxe/
 F: MdeModulePkg/Universal/DriverSampleDxe/
 F: MdeModulePkg/Universal/SetupBrowserDxe/
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
-R: Eric Dong <eric.dong@intel.com> [ydong10]
 
 MdeModulePkg: Management Mode (MM, SMM) modules
 F: MdeModulePkg/*Smi*/
@@ -395,10 +366,7 @@ R: Ray Ni <ray.ni@intel.com> [niruiyu]
 
 MdeModulePkg: Pei Core
 F: MdeModulePkg/Core/Pei/
-R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
-R: Debkumar De <debkumar.de@intel.com> [dde01]
-R: Catharine West <catharine.west@intel.com> [catharine-intl]
 
 MdeModulePkg: Reset modules
 F: MdeModulePkg/*Reset*/
@@ -424,7 +392,6 @@ F: MdeModulePkg/Include/*/*Var*.h
 F: MdeModulePkg/Include/Guid/SystemNvDataGuid.h
 F: MdeModulePkg/Include/Protocol/SwapAddressRange.h
 F: MdeModulePkg/Universal/FaultTolerantWrite*/
-R: Hao A Wu <hao.a.wu@intel.com> [hwu25]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
 MdeModulePkg: Universal Payload definitions
@@ -437,7 +404,6 @@ F: MdeModulePkg/Library/TraceHubDebugSysTLib/
 F: MdeModulePkg/Include/Guid/TraceHubDebugInfoHob.h
 M: Gua Guo <gua.guo@intel.com> [gguo11837463]
 M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakashan@intel.com> [kprakas2]
-R: Chan Laura <laura.chan@intel.com> [lauracha]
 R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
 
 MdeModulePkg: USB Network modules
@@ -497,7 +463,6 @@ F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-R: Jordan Justen <jordan.l.justen@intel.com> [jljusten]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 S: Maintained
 
@@ -513,7 +478,6 @@ F: OvmfPkg/Library/PlatformBootManagerLibBhyve/
 F: OvmfPkg/Library/ResetSystemLib/BaseResetShutdownBhyve.c
 F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
 R: Rebecca Cran <rebecca@bsdio.com> [bcran]
-R: Peter Grehan <grehan@freebsd.org> [grehan-freebsd]
 R: Corvin Köhne <corvink@freebsd.org> [corvink]
 
 OvmfPkg: cloudhv-related modules
@@ -528,10 +492,6 @@ F: OvmfPkg/Include/IndustryStandard/Microvm.h
 F: OvmfPkg/Library/ResetSystemLib/*Microvm.*
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
-OvmfPkg: CSM modules
-F: OvmfPkg/Csm/
-R: David Woodhouse <dwmw2@infradead.org> [dwmw2]
-
 OvmfPkg: Confidential Computing
 F: OvmfPkg/AmdSev/
 F: OvmfPkg/AmdSevDxe/
@@ -545,7 +505,6 @@ F: OvmfPkg/PlatformPei/AmdSev.c
 F: OvmfPkg/ResetVector/
 F: OvmfPkg/Sec/
 R: Erdem Aktas <erdemaktas@google.com> [ruleof2]
-R: James Bottomley <jejb@linux.ibm.com> [jejb]
 R: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Min Xu <min.m.xu@intel.com> [mxu9]
 R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
@@ -568,7 +527,6 @@ F: OvmfPkg/Library/Tcg2PhysicalPresenceLib*/
 F: OvmfPkg/PlatformPei/ClearCache.c
 F: OvmfPkg/Tcg/
 R: Marc-André Lureau <marcandre.lureau@redhat.com> [elmarco]
-R: Stefan Berger <stefanb@linux.ibm.com> [stefanberger]
 
 OvmfPkg: Xen-related modules
 F: OvmfPkg/Include/Guid/XenBusRootDevice.h
@@ -597,7 +555,6 @@ F: OvmfPkg/XenPlatformPei/
 F: OvmfPkg/XenPvBlkDxe/
 F: OvmfPkg/XenResetVector/
 R: Anthony Perard <anthony.perard@citrix.com> [tperard]
-R: Julien Grall <julien@xen.org> [jgrall]
 
 OvmfPkg: RISC-V Qemu Virt Platform
 F: OvmfPkg/RiscVVirt
@@ -627,7 +584,6 @@ SecurityPkg
 F: SecurityPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-M: Jian J Wang <jian.j.wang@intel.com> [jwang36]
 
 SecurityPkg: Secure boot related modules
 F: SecurityPkg/Library/DxeImageVerificationLib/
@@ -637,7 +593,6 @@ R: Min Xu <min.m.xu@intel.com> [mxu9]
 
 SecurityPkg: Tcg related modules
 F: SecurityPkg/Tcg/
-R: Qi Zhang <qi1.zhang@intel.com> [qizhangz]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 
 ShellPkg
@@ -648,12 +603,10 @@ M: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 SignedCapsulePkg
 F: SignedCapsulePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/SignedCapsulePkg
-M: Jian J Wang <jian.j.wang@intel.com> [jwang36]
 
 SourceLevelDebugPkg
 F: SourceLevelDebugPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
-M: Hao A Wu <hao.a.wu@intel.com> [hwu25]
 
 StandaloneMmPkg
 F: StandaloneMmPkg/
@@ -664,7 +617,6 @@ M: Ray Ni <ray.ni@intel.com> [niruiyu]
 UefiCpuPkg
 F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
-M: Eric Dong <eric.dong@intel.com> [ydong10]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
@@ -672,7 +624,6 @@ R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 UefiCpuPkg: Sec related modules
 F: UefiCpuPkg/SecCore/
 F: UefiCpuPkg/ResetVector/
-R: Debkumar De <debkumar.de@intel.com> [dde01]
 R: Catharine West <catharine.west@intel.com> [catharine-intl]
 
 UefiCpuPkg: AMD related files
