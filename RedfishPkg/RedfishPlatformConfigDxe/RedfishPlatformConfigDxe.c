@@ -204,6 +204,106 @@ FindFormLinkToThis (
 }
 
 /**
+  Debug dump HII statement value.
+
+  @param[in]  ErrorLevel    DEBUG macro error level
+  @param[in]  Value         HII statement value to dump
+  @param[in]  Message       Debug message
+
+  @retval EFI_SUCCESS       Dump HII statement value successfully
+  @retval Others            Errors occur
+
+**/
+EFI_STATUS
+DumpHiiStatementValue (
+  IN UINTN                ErrorLevel,
+  IN HII_STATEMENT_VALUE  *Value,
+  IN CHAR8                *Message OPTIONAL
+  )
+{
+  UINT64  Data;
+
+  if (Value == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (Value->Type) {
+    case EFI_IFR_TYPE_NUM_SIZE_8:
+      Data = Value->Value.u8;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_16:
+      Data = Value->Value.u16;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_32:
+      Data = Value->Value.u32;
+      break;
+    case EFI_IFR_TYPE_NUM_SIZE_64:
+      Data = Value->Value.u64;
+      break;
+    case EFI_IFR_TYPE_BOOLEAN:
+      Data = (Value->Value.b ? 1 : 0);
+      break;
+    default:
+      DEBUG ((ErrorLevel, "%a: unsupported type: 0x%x\n", __func__, Value->Type));
+      return EFI_UNSUPPORTED;
+  }
+
+  if (IS_EMPTY_STRING (Message)) {
+    DEBUG ((ErrorLevel, "0x%lx\n", Data));
+  } else {
+    DEBUG ((ErrorLevel, "%a: 0x%lx\n", Message, Data));
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Debug dump HII statement prompt string.
+
+  @param[in]  ErrorLevel    DEBUG macro error level
+  @param[in]  HiiHandle     HII handle instance
+  @param[in]  HiiStatement  HII statement
+  @param[in]  Message       Debug message
+
+  @retval EFI_SUCCESS       Dump HII statement string successfully
+  @retval Others            Errors occur
+
+**/
+EFI_STATUS
+DumpHiiStatementPrompt (
+  IN UINTN           ErrorLevel,
+  IN EFI_HII_HANDLE  HiiHandle,
+  IN HII_STATEMENT   *HiiStatement,
+  IN CHAR8           *Message OPTIONAL
+  )
+{
+  EFI_STRING  String;
+
+  if ((HiiHandle == NULL) || (HiiStatement == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (HiiStatement->Prompt == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  String = HiiGetString (HiiHandle, HiiStatement->Prompt, NULL);
+  if (String == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  if (IS_EMPTY_STRING (Message)) {
+    DEBUG ((ErrorLevel, "%s\n", String));
+  } else {
+    DEBUG ((ErrorLevel, "%a: %s\n", Message, String));
+  }
+
+  FreePool (String);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Build the menu path to given statement instance. It is caller's
   responsibility to free returned string buffer.
 
@@ -890,6 +990,7 @@ HiiValueToRedfishNumeric (
       break;
     default:
       RedfishValue->Type = RedfishValueTypeUnknown;
+      DEBUG ((DEBUG_ERROR, "%a: Unsupported value type: 0x%x\n", __func__, Value->Type));
       break;
   }
 
@@ -1187,6 +1288,11 @@ HiiValueToRedfishValue (
     case EFI_IFR_ONE_OF_OP:
       StringId = HiiValueToOneOfOptionStringId (HiiStatement, Value);
       if (StringId == 0) {
+        //
+        // Print prompt string of HII statement for ease of debugging
+        //
+        DumpHiiStatementPrompt (DEBUG_ERROR, HiiHandle, HiiStatement, "Can not find string ID");
+        DumpHiiStatementValue (DEBUG_ERROR, Value, "Current value");
         ASSERT (FALSE);
         Status = EFI_DEVICE_ERROR;
         break;
@@ -1254,6 +1360,10 @@ HiiValueToRedfishValue (
     case EFI_IFR_ORDERED_LIST_OP:
       StringIdArray = HiiValueToOrderedListOptionStringId (HiiStatement, &Count);
       if (StringIdArray == NULL) {
+        //
+        // Print prompt string of HII statement for ease of debugging
+        //
+        DumpHiiStatementPrompt (DEBUG_ERROR, HiiHandle, HiiStatement, "Can not get string ID array");
         ASSERT (FALSE);
         Status = EFI_DEVICE_ERROR;
         break;
@@ -1261,13 +1371,24 @@ HiiValueToRedfishValue (
 
       RedfishValue->Value.StringArray = AllocatePool (sizeof (CHAR8 *) * Count);
       if (RedfishValue->Value.StringArray == NULL) {
+        //
+        // Print prompt string of HII statement for ease of debugging
+        //
+        DumpHiiStatementPrompt (DEBUG_ERROR, HiiHandle, HiiStatement, "Can not allocate memory");
         ASSERT (FALSE);
         Status = EFI_OUT_OF_RESOURCES;
         break;
       }
 
       for (Index = 0; Index < Count; Index++) {
-        ASSERT (StringIdArray[Index] != 0);
+        if (StringIdArray[Index] == 0) {
+          //
+          // Print prompt string of HII statement for ease of debugging
+          //
+          DumpHiiStatementPrompt (DEBUG_ERROR, HiiHandle, HiiStatement, "String ID in array is 0");
+          ASSERT (FALSE);
+        }
+
         RedfishValue->Value.StringArray[Index] = HiiGetRedfishAsciiString (HiiHandle, FullSchema, StringIdArray[Index]);
         ASSERT (RedfishValue->Value.StringArray[Index] != NULL);
       }
