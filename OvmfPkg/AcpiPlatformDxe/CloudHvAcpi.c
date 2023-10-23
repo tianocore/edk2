@@ -53,6 +53,11 @@ InstallCloudHvTablesTdx (
                                CurrentTable->Length,
                                &TableHandle
                                );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
       for (UINTN i = 0; i < CurrentTable->Length; i++) {
         DEBUG ((DEBUG_INFO, " %x", *((UINT8 *)CurrentTable + i)));
       }
@@ -69,8 +74,9 @@ InstallCloudHvTablesTdx (
   // then we're out of sync with the hypervisor, and cannot continue.
   //
   if (DsdtTable == NULL) {
-    DEBUG ((DEBUG_INFO, "%a: no DSDT found\n", __func__));
+    DEBUG ((DEBUG_ERROR, "%a: no DSDT found\n", __func__));
     ASSERT (FALSE);
+    CpuDeadLoop ();
   }
 
   Status = AcpiProtocol->InstallAcpiTable (
