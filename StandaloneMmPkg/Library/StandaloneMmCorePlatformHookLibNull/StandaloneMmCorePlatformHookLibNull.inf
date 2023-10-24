@@ -1,0 +1,30 @@
+## @file
+#  Standalone MM Core Platform Hook NULL Library instance.
+#
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StandaloneMmCorePlatformHookLibNull
+  FILE_GUID                      = A5924660-072B-4188-A850-C45FBED9FCE0
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = StandaloneMmCorePlatformHookLib|MM_CORE_STANDALONE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  StandaloneMmCorePlatformHookLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
