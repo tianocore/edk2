@@ -351,7 +351,7 @@ MmEntryPoint (
   //
   // Call platform hook before Mm Dispatch
   //
-  // PlatformHookBeforeMmDispatch ();
+  PlatformHookBeforeMmDispatch ();
 
   //
   // If a legacy boot has occurred, then make sure gMmCorePrivate is not accessed
@@ -399,6 +399,11 @@ MmEntryPoint (
   // Process Asynchronous MMI sources
   //
   MmiManage (NULL, NULL, NULL, NULL);
+
+  //
+  // Call platform hook after Mm Dispatch
+  //
+  PlatformHookAfterMmDispatch ();
 
   //
   // TBD: Do not use private data structure ?
