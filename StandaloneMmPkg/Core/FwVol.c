@@ -104,23 +104,40 @@ MmCoreFfsFindMmDriver (
       break;
     }
 
+    //
+    // Check uncompressed firmware volumes
+    //
     Status = FfsFindSectionData (
-               EFI_SECTION_GUID_DEFINED,
+               EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
                FileHeader,
                &SectionData,
                &SectionDataSize
+               );
+    if (!EFI_ERROR (Status)) {
+      if (SectionDataSize > sizeof (EFI_FIRMWARE_VOLUME_HEADER)) {
+        InnerFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)SectionData;
+        MmCoreFfsFindMmDriver (InnerFvHeader);
+      }
+    }
+
+    //
+    // Check compressed firmware volumes
+    //
+    Status = FfsFindSection (
+               EFI_SECTION_GUID_DEFINED,
+               FileHeader,
+               &Section
                );
     if (EFI_ERROR (Status)) {
       break;
     }
 
-    Section = (EFI_COMMON_SECTION_HEADER *)(FileHeader + 1);
-    Status  = ExtractGuidedSectionGetInfo (
-                Section,
-                &DstBufferSize,
-                &ScratchBufferSize,
-                &SectionAttribute
-                );
+    Status = ExtractGuidedSectionGetInfo (
+               Section,
+               &DstBufferSize,
+               &ScratchBufferSize,
+               &SectionAttribute
+               );
     if (EFI_ERROR (Status)) {
       break;
     }
@@ -138,6 +155,7 @@ MmCoreFfsFindMmDriver (
     //
     DstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
     if (DstBuffer == NULL) {
+      FreePages (ScratchBuffer, EFI_SIZE_TO_PAGES (ScratchBufferSize));
       return EFI_OUT_OF_RESOURCES;
     }
 
