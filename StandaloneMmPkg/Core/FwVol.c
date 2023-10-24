@@ -105,6 +105,17 @@ MmCoreFfsFindMmDriver (
     }
 
     Status = FfsFindSectionData (
+               EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+               FileHeader,
+               &SectionData,
+               &SectionDataSize
+               );
+    if (!EFI_ERROR (Status)) {
+      InnerFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)SectionData;
+      MmCoreFfsFindMmDriver (InnerFvHeader);
+    }
+
+    Status = FfsFindSectionData (
                EFI_SECTION_GUID_DEFINED,
                FileHeader,
                &SectionData,
