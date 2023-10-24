@@ -356,7 +356,7 @@ RedfishGetByUri (
 
   ZeroMem (RedResponse, sizeof (REDFISH_RESPONSE));
 
-  JsonValue            = getUriFromService (RedfishService, Uri, &RedResponse->StatusCode);
+  JsonValue            = getUriFromServiceEx (RedfishService, Uri, &RedResponse->Headers, &RedResponse->HeaderCount, &RedResponse->StatusCode);
   RedResponse->Payload = createRedfishPayload (JsonValue, RedfishService);
 
   //
@@ -498,10 +498,12 @@ RedfishPatchToUri (
 
   ZeroMem (RedResponse, sizeof (REDFISH_RESPONSE));
 
-  JsonValue = (EDKII_JSON_VALUE)patchUriFromService (
+  JsonValue = (EDKII_JSON_VALUE)patchUriFromServiceEx (
                                   RedfishService,
                                   Uri,
                                   Content,
+                                  &(RedResponse->Headers),
+                                  &(RedResponse->HeaderCount),
                                   &(RedResponse->StatusCode)
                                   );
 
@@ -661,12 +663,14 @@ RedfishPostToUri (
 
   ZeroMem (RedResponse, sizeof (REDFISH_RESPONSE));
 
-  JsonValue = (EDKII_JSON_VALUE)postUriFromService (
+  JsonValue = (EDKII_JSON_VALUE)postUriFromServiceEx (
                                   RedfishService,
                                   Uri,
                                   Content,
                                   ContentSize,
                                   ContentType,
+                                  &(RedResponse->Headers),
+                                  &(RedResponse->HeaderCount),
                                   &(RedResponse->StatusCode)
                                   );
 
