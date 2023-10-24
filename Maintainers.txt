@@ -175,6 +175,13 @@ M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Bob Feng <bob.c.feng@intel.com> [BobCF]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
 
+BaseTools: Plugins
+F: BaseTools/Plugin/
+M: Sean Brogan <sean.brogan@microsoft.com> [spbrogan]
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
+R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
+
 CryptoPkg
 F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
