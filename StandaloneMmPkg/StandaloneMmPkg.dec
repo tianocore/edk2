@@ -29,6 +29,10 @@
   ##                 MM Memory Operation.
   MemLib|Include/Library/StandaloneMmMemLib.h
 
+  ##  @libraryclass  Defines a set of platform hooks called by the Standalone
+  ##                 Mm Core.
+  StandaloneMmCorePlatformHookLib|Include/Library/StandaloneMmCorePlatformHookLib.h
+
 [LibraryClasses.AArch64, LibraryClasses.ARM]
   ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint for
   ##                 AArch64 and ARM.

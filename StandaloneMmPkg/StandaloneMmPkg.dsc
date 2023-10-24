@@ -72,6 +72,7 @@
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
+  StandaloneMmCorePlatformHookLib|StandaloneMmPkg/Library/StandaloneMmCorePlatformHookLibNull/StandaloneMmCorePlatformHookLibNull.inf
 
 [LibraryClasses.common.MM_STANDALONE]
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
@@ -117,6 +118,7 @@
   StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
   StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
   StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
+  StandaloneMmPkg/Library/StandaloneMmCorePlatformHookLibNull/StandaloneMmCorePlatformHookLibNull.inf
 
 [Components.AARCH64, Components.ARM]
   StandaloneMmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
