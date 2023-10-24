@@ -3,6 +3,7 @@
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -168,18 +169,18 @@ RedfishGetAuthInfo (
 /**
   This function returns the string of Redfish service version.
 
-  @param[in]   ServiceVerisonStr The string of Redfish service version.
+  @param[in]   ServiceVersionStr The string of Redfish service version.
   @param[in]   Url               The URL to build Redpath with ID.
                                  Start with "/", for example "/Registries"
   @param[in]   Id                ID string
-  @param[out]  Redpath           Pointer to retrive Redpath, caller has to free
+  @param[out]  Redpath           Pointer to retrieved Redpath, caller has to free
                                  the memory allocated for this string.
   @return     EFI_STATUS
 
 **/
 EFI_STATUS
 RedfishBuildRedpathUseId (
-  IN  CHAR8  *ServiceVerisonStr,
+  IN  CHAR8  *ServiceVersionStr,
   IN  CHAR8  *Url,
   IN  CHAR8  *Id,
   OUT CHAR8  **Redpath
@@ -187,12 +188,12 @@ RedfishBuildRedpathUseId (
 {
   UINTN  RedpathSize;
 
-  if ((Redpath == NULL) || (ServiceVerisonStr == NULL) || (Url == NULL) || (Id == NULL)) {
+  if ((Redpath == NULL) || (ServiceVersionStr == NULL) || (Url == NULL) || (Id == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   RedpathSize = AsciiStrLen ("/") +
-                AsciiStrLen (ServiceVerisonStr) +
+                AsciiStrLen (ServiceVersionStr) +
                 AsciiStrLen (Url) +
                 AsciiStrLen ("[Id=]") +
                 AsciiStrLen (Id) + 1;
@@ -201,6 +202,6 @@ RedfishBuildRedpathUseId (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  AsciiSPrint (*Redpath, RedpathSize, "/%a%a[Id=%a]", ServiceVerisonStr, Url, Id);
+  AsciiSPrint (*Redpath, RedpathSize, "/%a%a[Id=%a]", ServiceVersionStr, Url, Id);
   return EFI_SUCCESS;
 }
