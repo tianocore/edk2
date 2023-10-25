@@ -38,6 +38,29 @@ typedef enum {
 
 STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
+#define TDVMCALL_RETRY  0x1
+
+#define MAX_RETRY_COUNT  3
+
+/**
+  This function is used to help request the host VMM to map a GPA range as
+  private or shared-memory mappings.
+  @param[in]     Address     4K aligned start GPA of address range.
+  @param[in]     Length      Size of GPA region to be mapped.
+  @param[in,out] Results     Returned result of the GPA at which MapGPA failed
+  @return 0               A successful call
+  @return 1               TDVF must retry this operation
+  @return Other           Some error occures when mapping
+**/
+
+UINTN
+EFIAPI
+TdVmCallMapGPA (
+  IN UINT64    Address,
+  IN UINT64    Length,
+  IN OUT VOID  *Results
+  );
+
 /**
   Returns boolean to indicate whether to indicate which, if any, memory encryption is enabled
 
@@ -527,6 +550,13 @@ SetOrClearSharedBit (
   EFI_STATUS                    Status;
   EDKII_MEMORY_ACCEPT_PROTOCOL  *MemoryAcceptProtocol;
 
+  UINT64  MapGpaRetryaddr;
+  UINT32  RetryCount;
+  UINT64  EndAddress;
+
+  MapGpaRetryaddr = 0;
+  RetryCount      = 0;
+
   AddressEncMask = GetMemEncryptionAddressMask ();
 
   //
@@ -540,7 +570,30 @@ SetOrClearSharedBit (
     PhysicalAddress   &= ~AddressEncMask;
   }
 
-  TdStatus = TdVmCall (TDVMCALL_MAPGPA, PhysicalAddress, Length, 0, 0, NULL);
+  while (RetryCount < MAX_RETRY_COUNT) {
+    TdStatus = TdVmCallMapGPA (PhysicalAddress, Length, &MapGpaRetryaddr);
+    if (TdStatus != TDVMCALL_RETRY) {
+      break;
+    }
+
+    DEBUG ((DEBUG_VERBOSE, "%a: TdVmcall(MAPGPA) Retry PhysicalAddress is %llx, MapGpaRetryaddr is %llx\n", __func__, PhysicalAddress, MapGpaRetryaddr));
+
+    EndAddress = PhysicalAddress + Length;
+    if ((MapGpaRetryaddr < PhysicalAddress) || (MapGpaRetryaddr > EndAddress)) {
+      DEBUG ((DEBUG_ERROR, "%a: TdVmcall(MAPGPA) failed Retry PhysicalAddress is %llx, MapGpaRetryaddr is %llx\n", __func__, PhysicalAddress, MapGpaRetryaddr));
+      break;
+    }
+
+    if (MapGpaRetryaddr == PhysicalAddress) {
+      RetryCount++;
+      continue;
+    }
+
+    PhysicalAddress = MapGpaRetryaddr;
+    Length          = EndAddress - PhysicalAddress;
+    RetryCount      = 0;
+  }
+
   if (TdStatus != 0) {
     DEBUG ((DEBUG_ERROR, "%a: TdVmcall(MAPGPA) failed with %llx\n", __func__, TdStatus));
     ASSERT (FALSE);

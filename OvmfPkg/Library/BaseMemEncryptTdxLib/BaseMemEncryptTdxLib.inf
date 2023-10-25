@@ -30,6 +30,7 @@
 [Sources]
   VirtualMemory.h
   MemoryEncryption.c
+  X64/TdVmCallMapGPA.nasm
 
 [LibraryClasses]
   BaseLib
