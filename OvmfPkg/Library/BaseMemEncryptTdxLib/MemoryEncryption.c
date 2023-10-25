@@ -39,6 +39,25 @@ typedef enum {
 STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
 /**
+  This function is used to help request the host VMM to map a GPA range as
+  private or shared-memory mappings.
+  @param[in]     Address     4K aligned start GPA of address range.
+  @param[in]     Length      Size of GPA region to be mapped.
+  @param[in,out] Results     Returned result of the GPA at which MapGPA failed
+
+  @return 0               A successful mapping
+  @return Other           Some errors occurred while mapping
+**/
+
+UINTN
+EFIAPI
+TdVmCallMapGPA (
+  IN UINT64    Address,
+  IN UINT64    Length,
+  IN OUT VOID  *Results
+  );
+
+/**
   Returns boolean to indicate whether to indicate which, if any, memory encryption is enabled
 
   @param[in]  Type          Bitmask of encryption technologies to check is enabled
