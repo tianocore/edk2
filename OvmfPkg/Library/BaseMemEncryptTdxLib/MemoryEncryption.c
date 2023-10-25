@@ -38,6 +38,10 @@ typedef enum {
 
 STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
+#define TDVMCALL_STATUS_RETRY  0x1
+
+#define MAX_RETRIES_PER_PAGE  3
+
 /**
   This function is used to help request the host VMM to map a GPA range as
   private or shared-memory mappings.
@@ -546,6 +550,13 @@ SetOrClearSharedBit (
   EFI_STATUS                    Status;
   EDKII_MEMORY_ACCEPT_PROTOCOL  *MemoryAcceptProtocol;
 
+  UINT64  MapGpaRetryaddr;
+  UINT32  RetryCount;
+  UINT64  EndAddress;
+
+  MapGpaRetryaddr = 0;
+  RetryCount      = 0;
+
   AddressEncMask = GetMemEncryptionAddressMask ();
 
   //
@@ -559,7 +570,30 @@ SetOrClearSharedBit (
     PhysicalAddress   &= ~AddressEncMask;
   }
 
-  TdStatus = TdVmCall (TDVMCALL_MAPGPA, PhysicalAddress, Length, 0, 0, NULL);
+  while (RetryCount < MAX_RETRIES_PER_PAGE) {
+    TdStatus = TdVmCallMapGPA (PhysicalAddress, Length, &MapGpaRetryaddr);
+    if (TdStatus != TDVMCALL_STATUS_RETRY) {
+      break;
+    }
+
+    DEBUG ((DEBUG_VERBOSE, "%a: TdVmcall(MAPGPA) Retry PhysicalAddress is %llx, MapGpaRetryaddr is %llx\n", __func__, PhysicalAddress, MapGpaRetryaddr));
+
+    EndAddress = PhysicalAddress + Length;
+    if ((MapGpaRetryaddr < PhysicalAddress) || (MapGpaRetryaddr > EndAddress)) {
+      DEBUG ((DEBUG_ERROR, "%a: TdVmcall(MAPGPA) failed Retry PhysicalAddress is %llx, MapGpaRetryaddr is %llx\n", __func__, PhysicalAddress, MapGpaRetryaddr));
+      break;
+    }
+
+    if (MapGpaRetryaddr == PhysicalAddress) {
+      RetryCount++;
+      continue;
+    }
+
+    PhysicalAddress = MapGpaRetryaddr;
+    Length          = EndAddress - PhysicalAddress;
+    RetryCount      = 0;
+  }
+
   if (TdStatus != 0) {
     DEBUG ((DEBUG_ERROR, "%a: TdVmcall(MAPGPA) failed with %llx\n", __func__, TdStatus));
     ASSERT (FALSE);
