@@ -129,6 +129,8 @@ def BuildFitImage(Fdt, InfoHeader):
             MultiImage[Index][-2] = BinaryData
             MultiImage[Index][-1] = DataOffset
             DataOffset += len (BinaryData)
+        else:
+            del MultiImage[Index]
     libfdt.fdt_setprop_u32(Fdt, 0, 'size', DataOffset)
     posix_time = int(time.time())
     libfdt.fdt_setprop_u32(Fdt, 0, 'timestamp', posix_time)
