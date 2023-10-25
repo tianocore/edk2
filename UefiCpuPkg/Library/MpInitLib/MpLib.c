@@ -913,8 +913,8 @@ DxeApEntryPoint (
   UINTN  ProcessorNumber;
 
   GetProcessorNumber (CpuMpData, &ProcessorNumber);
-  InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
   RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+  InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
   PlaceAPInMwaitLoopOrRunLoop (
     CpuMpData->ApLoopMode,
     CpuMpData->CpuData[ProcessorNumber].StartupApSignal,
@@ -2201,7 +2201,12 @@ MpInitLibInitialize (
       // looping process there.
       //
       SwitchApContext (MpHandOff);
-      ASSERT (CpuMpData->FinishedCount == (CpuMpData->CpuCount - 1));
+      //
+      // Wait for all APs finished initialization
+      //
+      while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
+        CpuPause ();
+      }
 
       //
       // Set Apstate as Idle, otherwise Aps cannot be waken-up again.
