@@ -39,10 +39,15 @@ IoReadFifo8 (
   OUT     VOID   *Buffer
   )
 {
+  UINT8  *Buffer8;
+
   if (IsTdxGuest ()) {
     TdIoReadFifo8 (Port, Count, Buffer);
   } else {
-    SevIoReadFifo8 (Port, Count, Buffer);
+    Buffer8 = (UINT8 *)Buffer;
+    while (Count-- > 0) {
+      *Buffer8++ = IoRead8 (Port);
+    }
   }
 }
 
@@ -73,10 +78,15 @@ IoWriteFifo8 (
   IN      VOID   *Buffer
   )
 {
+  UINT8  *Buffer8;
+
   if (IsTdxGuest ()) {
     TdIoWriteFifo8 (Port, Count, Buffer);
   } else {
-    SevIoWriteFifo8 (Port, Count, Buffer);
+    Buffer8 = (UINT8 *)Buffer;
+    while (Count-- > 0) {
+      IoWrite8 (Port, *Buffer8++);
+    }
   }
 }
 
@@ -107,10 +117,15 @@ IoReadFifo16 (
   OUT     VOID   *Buffer
   )
 {
+  UINT16  *Buffer16;
+
   if (IsTdxGuest ()) {
     TdIoReadFifo16 (Port, Count, Buffer);
   } else {
-    SevIoReadFifo16 (Port, Count, Buffer);
+    Buffer16 = (UINT16 *)Buffer;
+    while (Count-- > 0) {
+      *Buffer16++ = IoRead16 (Port);
+    }
   }
 }
 
@@ -141,10 +156,15 @@ IoWriteFifo16 (
   IN      VOID   *Buffer
   )
 {
+  UINT16  *Buffer16;
+
   if (IsTdxGuest ()) {
     TdIoWriteFifo16 (Port, Count, Buffer);
   } else {
-    SevIoWriteFifo16 (Port, Count, Buffer);
+    Buffer16 = (UINT16 *)Buffer;
+    while (Count-- > 0) {
+      IoWrite16 (Port, *Buffer16++);
+    }
   }
 }
 
@@ -175,10 +195,15 @@ IoReadFifo32 (
   OUT     VOID   *Buffer
   )
 {
+  UINT32  *Buffer32;
+
   if (IsTdxGuest ()) {
     TdIoReadFifo32 (Port, Count, Buffer);
   } else {
-    SevIoReadFifo32 (Port, Count, Buffer);
+    Buffer32 = (UINT32 *)Buffer;
+    while (Count-- > 0) {
+      *Buffer32++ = IoRead32 (Port);
+    }
   }
 }
 
@@ -209,9 +234,14 @@ IoWriteFifo32 (
   IN      VOID   *Buffer
   )
 {
+  UINT32  *Buffer32;
+
   if (IsTdxGuest ()) {
     TdIoWriteFifo32 (Port, Count, Buffer);
   } else {
-    SevIoWriteFifo32 (Port, Count, Buffer);
+    Buffer32 = (UINT32 *)Buffer;
+    while (Count-- > 0) {
+      IoWrite32 (Port, *Buffer32++);
+    }
   }
 }
