@@ -396,5 +396,15 @@ FreeBufferPages:
   FreePages (mCommunicateBuffer, EFI_SIZE_TO_PAGES (MAX_BUFFER_SIZE));
 
 ReturnErrorStatus:
+  if (FeaturePcdGet (PcdQemuVarsRequire)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: qemu uefi variable service is not available, use \n"
+      "  'qemu-system-x86_64 -device uefi-vars-x64' or\n"
+      "  'qemu-system-aarch64 -device uefi-vars-sysbus'\n"
+      ));
+    CpuDeadLoop ();
+  }
+
   return EFI_INVALID_PARAMETER;
 }
