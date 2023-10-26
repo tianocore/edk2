@@ -223,7 +223,7 @@ APRIORI DXE {
   # encrypted region (Since the range has not been marked shared/unencrypted).
   INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
   INF  OvmfPkg/TdxDxe/TdxDxe.inf
-!if $(SMM_REQUIRE) == FALSE
+!if $(SMM_REQUIRE) == FALSE && $(QEMU_VARS) == FALSE
   INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 !endif
 }
@@ -393,6 +393,15 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 
 !else
+!if $(QEMU_VARS) == TRUE
+
+  #
+  # Variable driver stack (qemu -device uefi-vars)
+  #
+INF  OvmfPkg/VirtMmCommunicationDxe/VirtMmCommunication.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+
+!else
 
 #
 # Variable driver stack (non-SMM)
@@ -401,6 +410,7 @@ INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+!endif
 !endif
 
 #
