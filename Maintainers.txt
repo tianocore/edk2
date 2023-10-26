@@ -439,6 +439,13 @@ F: MdeModulePkg/Include/Protocol/UsbEthernetProtocol.h
 M: Richard Ho <richardho@ami.com> [richardho]
 R: Rebecca Cran <rebecca@bsdio.com> [bcran]
 
+MdeModulePkg: Manageability modules
+F: MdeModulePkg/Include/*Ipmi*.*
+F: MdeModulePkg/Library/*Ipmi*.*
+M: Abner Chang <abner.chang@amd.com> [changab]
+R: Abdul Lateef Attar <AbdulLateef.Attar@amd.com> [abdattar]
+R: Nickle Wang <nicklew@nvidia.com> [nicklela]
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
@@ -463,6 +470,14 @@ M: Benny Lin <benny.lin@intel.com> [Benny3345678]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 R: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: James Lu <james.lu@intel.com> [jameslu8]
+
+MdePkg: Manageability industryStandard standard C header files
+F: MdePkg/Include/IndustryStandard/*Ipmi*.h
+F: MdePkg/Include/IndustryStandard/*Mctp*.h
+F: MdePkg/Include/IndustryStandard/*Pldm*.h
+M: Abner Chang <abner.chang@amd.com> [changab]
+R: Abdul Lateef Attar <AbdulLateef.Attar@amd.com> [abdattar]
+R: Nickle Wang <nicklew@nvidia.com> [nicklela]
 
 NetworkPkg
 F: NetworkPkg/
@@ -652,6 +667,12 @@ F: UefiCpuPkg/SecCore/
 F: UefiCpuPkg/ResetVector/
 R: Debkumar De <debkumar.de@intel.com> [dde01]
 R: Catharine West <catharine.west@intel.com> [catharine-intl]
+
+UefiCpuPkg: AMD related files
+F: UefiCpuPkg/Library/MmSaveStateLib/*Amd*.*
+F: UefiCpuPkg/Library/SmmCpuFeaturesLib/*Amd*.*
+M: Abdul Lateef Attar <AbdulLateef.Attar@amd.com> [abdattar]
+R: Abner Chang <abner.chang@amd.com> [changab]
 
 UefiPayloadPkg
 F: UefiPayloadPkg/
