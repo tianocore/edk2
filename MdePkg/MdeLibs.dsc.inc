@@ -16,3 +16,5 @@
   RegisterFilterLib|MdePkg/Library/RegisterFilterLibNull/RegisterFilterLibNull.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   SmmCpuRendezvousLib|MdePkg/Library/SmmCpuRendezvousLibNull/SmmCpuRendezvousLibNull.inf
+  CcProbeLib|MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLibNull.inf
