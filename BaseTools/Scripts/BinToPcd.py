@@ -37,13 +37,13 @@ if __name__ == '__main__':
         return Value
 
     def ValidatePcdName (Argument):
-        if re.split ('[a-zA-Z\_][a-zA-Z0-9\_]*\.[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['', '']:
+        if re.split (r'[a-zA-Z\_][a-zA-Z0-9\_]*\.[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['', '']:
             Message = '{Argument} is not in the form <PcdTokenSpaceGuidCName>.<PcdCName>'.format (Argument = Argument)
             raise argparse.ArgumentTypeError (Message)
         return Argument
 
     def ValidateGuidName (Argument):
-        if re.split ('[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['', '']:
+        if re.split (r'[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['', '']:
             Message = '{Argument} is not a valid GUID C name'.format (Argument = Argument)
             raise argparse.ArgumentTypeError (Message)
         return Argument
