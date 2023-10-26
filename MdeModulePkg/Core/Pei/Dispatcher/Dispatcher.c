@@ -1184,7 +1184,10 @@ EvacuateTempRam (
 
   PEI_CORE_FV_HANDLE            PeiCoreFvHandle;
   EFI_PEI_CORE_FV_LOCATION_PPI  *PeiCoreFvLocationPpi;
+  EDKII_TO_MIGRATE_FV_INFO      *ToMigrateFvInfo;
   EDKII_MIGRATED_FV_INFO        MigratedFvInfo;
+  EFI_PEI_HOB_POINTERS          Hob;
+  UINT32                        MigrationFlags;
 
   ASSERT (Private->PeiMemoryInstalled);
 
@@ -1225,7 +1228,32 @@ EvacuateTempRam (
         )
     {
       //
-      // Allocate page to save the rebased PEIMs, the PEIMs will get dispatched later.
+      // Check if platform defined hobs to indicate which FVs are expected to migrate or keep raw data.
+      // If ToMigrateFvInfo hobs exists, only migrate FVs recorded by hobs.
+      // If ToMigrateFvInfo hobs not exists, migrate all FVs to permanent memory.
+      //
+      Hob.Raw = GetFirstGuidHob (&gEdkiiToMigrateFvInfoGuid);
+      if (Hob.Raw == NULL) {
+        MigrationFlags = 0;
+      } else {
+        while (Hob.Raw != NULL) {
+          ToMigrateFvInfo = GET_GUID_HOB_DATA (Hob);
+          if (ToMigrateFvInfo->FvTemporaryRamBase == (UINT32)(UINTN)FvHeader) {
+            MigrationFlags = ToMigrateFvInfo->MigrationFlags;
+            break;
+          }
+
+          Hob.Raw = GET_NEXT_HOB (Hob);
+          Hob.Raw = GetNextGuidHob (&gEdkiiToMigrateFvInfoGuid, Hob.Raw);
+        }
+
+        if (Hob.Raw == NULL) {
+          continue;
+        }
+      }
+
+      //
+      // Allocate pages to save the rebased PEIMs, the PEIMs will get dispatched later.
       //
       Status =  PeiServicesAllocatePages (
                   EfiBootServicesCode,
@@ -1234,18 +1262,7 @@ EvacuateTempRam (
                   );
       ASSERT_EFI_ERROR (Status);
       MigratedFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHeaderAddress;
-
-      //
-      // Allocate pool to save the raw PEIMs, which is used to keep consistent context across
-      // multiple boot and PCR0 will keep the same no matter if the address of allocated page is changed.
-      //
-      Status =  PeiServicesAllocatePages (
-                  EfiBootServicesCode,
-                  EFI_SIZE_TO_PAGES ((UINTN)FvHeader->FvLength),
-                  &FvHeaderAddress
-                  );
-      ASSERT_EFI_ERROR (Status);
-      RawDataFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHeaderAddress;
+      CopyMem (MigratedFvHeader, FvHeader, (UINTN)FvHeader->FvLength);
 
       DEBUG ((
         DEBUG_VERBOSE,
@@ -1256,18 +1273,30 @@ EvacuateTempRam (
         ));
 
       //
-      // Copy the context to the rebased pages and raw pages, and create hob to save the
-      // information. The MigratedFvInfo HOB will never be produced when
-      // PcdMigrateTemporaryRamFirmwareVolumes is FALSE, because the PCD control the
-      // feature.
+      // Copy the context to the raw pages and create hob to save the information. The MigratedFvInfo
+      // HOB will never be produced when PcdMigrateTemporaryRamFirmwareVolumes is FALSE, because the PCD
+      // controls the feature. This copy can be skipped by FLAGS_SKIP_FV_RAW_DATA_COPY flag to optimize
+      // boot performance.
       //
-      CopyMem (MigratedFvHeader, FvHeader, (UINTN)FvHeader->FvLength);
-      CopyMem (RawDataFvHeader, MigratedFvHeader, (UINTN)FvHeader->FvLength);
-      MigratedFvInfo.FvOrgBase  = (UINT32)(UINTN)FvHeader;
-      MigratedFvInfo.FvNewBase  = (UINT32)(UINTN)MigratedFvHeader;
-      MigratedFvInfo.FvDataBase = (UINT32)(UINTN)RawDataFvHeader;
-      MigratedFvInfo.FvLength   = (UINT32)(UINTN)FvHeader->FvLength;
-      BuildGuidDataHob (&gEdkiiMigratedFvInfoGuid, &MigratedFvInfo, sizeof (MigratedFvInfo));
+      if ((MigrationFlags & FLAGS_SKIP_FV_RAW_DATA_COPY) != FLAGS_SKIP_FV_RAW_DATA_COPY) {
+        //
+        // Allocate pages to save the raw PEIMs, which is used to keep consistent context across
+        // multiple boot and PCR0 will keep the same no matter if the address of allocated page is changed.
+        //
+        Status =  PeiServicesAllocatePages (
+                    EfiBootServicesCode,
+                    EFI_SIZE_TO_PAGES ((UINTN)FvHeader->FvLength),
+                    &FvHeaderAddress
+                    );
+        ASSERT_EFI_ERROR (Status);
+        RawDataFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHeaderAddress;
+        CopyMem (RawDataFvHeader, MigratedFvHeader, (UINTN)FvHeader->FvLength);
+        MigratedFvInfo.FvOrgBase  = (UINT32)(UINTN)FvHeader;
+        MigratedFvInfo.FvNewBase  = (UINT32)(UINTN)MigratedFvHeader;
+        MigratedFvInfo.FvDataBase = (UINT32)(UINTN)RawDataFvHeader;
+        MigratedFvInfo.FvLength   = (UINT32)(UINTN)FvHeader->FvLength;
+        BuildGuidDataHob (&gEdkiiMigratedFvInfoGuid, &MigratedFvInfo, sizeof (MigratedFvInfo));
+      }
 
       //
       // Migrate any children for this FV now
@@ -1329,8 +1358,6 @@ EvacuateTempRam (
       ConvertFvHob (Private, (UINTN)FvHeader, (UINTN)MigratedFvHeader);
     }
   }
-
-  RemoveFvHobsInTemporaryMemory (Private);
 
   return Status;
 }
