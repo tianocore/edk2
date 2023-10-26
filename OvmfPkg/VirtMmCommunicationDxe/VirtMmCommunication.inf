@@ -36,6 +36,7 @@
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics            ## CONSUMES
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire                          ## CONSUMES
 
 [Protocols]
   gEfiMmCommunication2ProtocolGuid              ## PRODUCES
