@@ -158,7 +158,6 @@
 
 [Components.IA32, Components.X64]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicSev.inf
   MdePkg/Library/BaseMemoryLibMmx/BaseMemoryLibMmx.inf
   MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
   MdePkg/Library/BaseMemoryLibOptPei/BaseMemoryLibOptPei.inf

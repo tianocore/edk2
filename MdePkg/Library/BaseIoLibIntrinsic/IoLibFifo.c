@@ -7,7 +7,6 @@
 **/
 
 #include "BaseIoLibIntrinsicInternal.h"
-#include "IoLibSev.h"
 #include "IoLibTdx.h"
 #include <Uefi/UefiBaseType.h>
 #include <Library/TdxLib.h>
