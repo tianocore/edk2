@@ -594,7 +594,7 @@ InitPaging (
   UINT64         Limit;
   UINT64         PreviousAddress;
   UINT64         MemoryAttrMask;
-  BOOLEAN        WpEnabled;
+  BOOLEAN        WriteProtect;
   BOOLEAN        CetEnabled;
 
   PERF_FUNCTION_BEGIN ();
@@ -606,7 +606,8 @@ InitPaging (
     Limit = (IsRestrictedMemoryAccess ()) ? LShiftU64 (1, mPhysicalAddressBits) : BASE_4GB;
   }
 
-  DisableReadOnlyPageWriteProtect (&WpEnabled, &CetEnabled);
+  WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
+
   //
   // [0, 4k] may be non-present.
   //
@@ -672,7 +673,7 @@ InitPaging (
     ASSERT_RETURN_ERROR (Status);
   }
 
-  EnableReadOnlyPageWriteProtect (WpEnabled, CetEnabled);
+  WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
   //
   // Flush TLB
