@@ -10,6 +10,7 @@ from os.path import exists
 import libfdt
 from ctypes import *
 import time
+import os
 
 class FIT_IMAGE_INFO_HEADER:
     """Class for user setting data to use MakeFitImage()
@@ -139,6 +140,8 @@ def BuildFitImage(Fdt, InfoHeader):
     ImageNode = libfdt.fdt_add_subnode(Fdt, 0, 'images')
     for Item in reversed (MultiImage):
         Name, Path, BuildFvNode, Description, BinaryData, DataOffset = Item
+        if os.path.exists (Item[1]) == False:
+            continue
         FvNode = libfdt.fdt_add_subnode(Fdt, ImageNode, Name)
         BuildFvNode (Fdt, InfoHeader, FvNode, DataOffset, len(BinaryData), Description)
 
@@ -149,7 +152,9 @@ def BuildFitImage(Fdt, InfoHeader):
     DtbFile.truncate()
     DtbFile.write(Fdt)
     for Item in MultiImage:
-        _, _, _, _, BinaryData, _ = Item
+        _, FilePath, _, _, BinaryData, _ = Item
+        if os.path.exists (Item[1]) == False:
+            continue
         DtbFile.write(BinaryData)
     DtbFile.close()
 
