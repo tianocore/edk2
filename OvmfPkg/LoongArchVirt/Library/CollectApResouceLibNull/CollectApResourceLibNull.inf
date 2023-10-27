@@ -1,0 +1,31 @@
+## @file
+#  LoongArch64 CPU Collect AP resource NULL Library.
+#
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = CollectApResourceLibNull
+  MODULE_UNI_FILE                = CollectApResourceLibNull.uni
+  FILE_GUID                      = 8C3B54BF-6A9F-E8B4-4D57-67B3AB578DD6
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.1
+  LIBRARY_CLASS                  = PEIM
+
+[Sources.common]
+  CollectApResourceLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  HobLib
+  MemoryAllocationLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
