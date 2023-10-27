@@ -52,6 +52,7 @@
   PcdLib
   PciLib
   PeiHardwareInfoLib
+  CcProbeLib
 
 [LibraryClasses.X64]
   TdxLib
