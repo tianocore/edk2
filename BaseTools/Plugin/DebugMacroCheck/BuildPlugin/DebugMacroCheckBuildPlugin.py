@@ -58,12 +58,12 @@ class DebugMacroCheckBuildPlugin(IUefiBuildPlugin):
         if "no-target" in build_target:
             return 0
 
-        pp = builder.pp.split(os.pathsep)
-        edk2 = Edk2Path(builder.ws, pp)
+        edk2 = builder.edk2path
         package = edk2.GetContainingPackage(
-                            builder.mws.join(builder.ws,
-                                             builder.env.GetValue(
-                                                "ACTIVE_PLATFORM")))
+            builder.edk2path.GetAbsolutePathOnThisSystemFromEdk2RelativePath(
+                builder.env.GetValue("ACTIVE_PLATFORM")
+            )
+        )
         package_path = Path(
                           edk2.GetAbsolutePathOnThisSystemFromEdk2RelativePath(
                                 package))
