@@ -146,16 +146,6 @@ def BuildUniversalPayload(Args):
     ModuleReportPath = os.path.join(BuildDir, "UefiUniversalPayloadEntry.txt")
     UpldInfoFile = os.path.join(BuildDir, "UniversalPayloadInfo.bin")
 
-    if "CLANG_BIN" in os.environ:
-        LlvmObjcopyPath = os.path.join(os.environ["CLANG_BIN"], "llvm-objcopy")
-    else:
-        LlvmObjcopyPath = "llvm-objcopy"
-    try:
-        RunCommand('"%s" --version'%LlvmObjcopyPath)
-    except:
-        print("- Failed - Please check if LLVM is installed or if CLANG_BIN is set correctly")
-        sys.exit(1)
-
     Pcds = ""
     if (Args.pcd != None):
         for PcdItem in Args.pcd:
