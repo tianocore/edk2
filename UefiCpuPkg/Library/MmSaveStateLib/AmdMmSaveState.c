@@ -102,7 +102,6 @@ MmSaveStateReadRegister (
   OUT VOID                        *Buffer
   )
 {
-  UINT32                     SmmRevId;
   EFI_MM_SAVE_STATE_IO_INFO  *IoInfo;
   AMD_SMRAM_SAVE_STATE_MAP   *CpuSaveState;
   UINT8                      DataWidth;
@@ -124,18 +123,6 @@ MmSaveStateReadRegister (
 
   // Check for special EFI_MM_SAVE_STATE_REGISTER_IO
   if (Register == EFI_MM_SAVE_STATE_REGISTER_IO) {
-    //
-    // Get SMM Revision ID
-    //
-    MmSaveStateReadRegisterByIndex (CpuIndex, AMD_MM_SAVE_STATE_REGISTER_SMMREVID_INDEX, sizeof (SmmRevId), &SmmRevId);
-
-    //
-    // See if the CPU supports the IOMisc register in the save state
-    //
-    if (SmmRevId < AMD_SMM_MIN_REV_ID_X64) {
-      return EFI_NOT_FOUND;
-    }
-
     // Check if IO Restart Dword [IO Trap] is valid or not using bit 1.
     if (!(CpuSaveState->x64.IO_DWord & 0x02u)) {
       return EFI_NOT_FOUND;
