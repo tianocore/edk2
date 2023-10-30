@@ -11,7 +11,8 @@
 
 EFI_STATUS
 MmCoreFfsFindMmDriver (
-  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
+  IN  UINT32                      Depth
   );
 
 EFI_STATUS
@@ -643,7 +644,7 @@ StandaloneMmMain (
   //
   DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", gMmCorePrivate->StandaloneBfvAddress));
   if (gMmCorePrivate->StandaloneBfvAddress != 0) {
-    MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)gMmCorePrivate->StandaloneBfvAddress);
+    MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)gMmCorePrivate->StandaloneBfvAddress, 0);
     MmDispatcher ();
   }
 
