@@ -79,6 +79,8 @@ MmCoreFfsFindMmDriver (
   UINTN                       DepexSize;
   UINTN                       Index;
   EFI_COMMON_SECTION_HEADER   *Section;
+  VOID                        *SectionData;
+  UINTN                       SectionDataSize;
   UINT32                      DstBufferSize;
   VOID                        *ScratchBuffer;
   UINT32                      ScratchBufferSize;
@@ -115,6 +117,26 @@ MmCoreFfsFindMmDriver (
       break;
     }
 
+    //
+    // Check uncompressed firmware volumes
+    //
+    Status = FfsFindSectionData (
+               EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+               FileHeader,
+               &SectionData,
+               &SectionDataSize
+               );
+    if (!EFI_ERROR (Status)) {
+      if (SectionDataSize > sizeof (EFI_FIRMWARE_VOLUME_HEADER)) {
+        InnerFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)SectionData;
+        MmCoreFfsFindMmDriver (InnerFvHeader, Depth + 1);
+        continue;
+      }
+    }
+
+    //
+    // Check compressed firmware volumes
+    //
     Status = FfsFindSection (
                EFI_SECTION_GUID_DEFINED,
                FileHeader,
