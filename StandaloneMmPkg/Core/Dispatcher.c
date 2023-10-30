@@ -53,11 +53,6 @@ typedef struct {
 // Function Prototypes
 //
 
-EFI_STATUS
-MmCoreFfsFindMmDriver (
-  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
-  );
-
 /**
   Insert InsertedDriverEntry onto the mScheduledQueue. To do this you
   must add any driver with a before dependency on InsertedDriverEntry first.
