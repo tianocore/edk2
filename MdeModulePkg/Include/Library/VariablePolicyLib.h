@@ -103,6 +103,113 @@ DumpVariablePolicy (
   );
 
 /**
+  This function will return variable policy information for a UEFI variable with a
+  registered variable policy.
+
+  @param[in]      VariableName                          The name of the variable to use for the policy search.
+  @param[in]      VendorGuid                            The vendor GUID of the variable to use for the policy search.
+  @param[in,out]  VariablePolicyVariableNameBufferSize  On input, the size, in bytes, of the VariablePolicyVariableName
+                                                        buffer.
+
+                                                        On output, the size, in bytes, needed to store the variable
+                                                        policy variable name.
+
+                                                        If testing for the VariablePolicyVariableName buffer size
+                                                        needed, set this value to zero so EFI_BUFFER_TOO_SMALL is
+                                                        guaranteed to be returned if the variable policy variable name
+                                                        is found.
+  @param[out]     VariablePolicy                        Pointer to a buffer where the policy entry will be written
+                                                        if found.
+  @param[out]     VariablePolicyVariableName            Pointer to a buffer where the variable name used for the
+                                                        variable policy will be written if a variable name is
+                                                        registered.
+
+                                                        If the variable policy is not associated with a variable name
+                                                        (e.g. applied to variable vendor namespace) and this parameter
+                                                        is given, this parameter will not be modified and
+                                                        VariablePolicyVariableNameBufferSize will be set to zero to
+                                                        indicate a name was not present.
+
+                                                        If the pointer given is not NULL,
+                                                        VariablePolicyVariableNameBufferSize must be non-NULL.
+
+  @retval     EFI_SUCCESS             A variable policy entry was found and returned successfully.
+  @retval     EFI_BAD_BUFFER_SIZE     An internal buffer size caused a calculation error.
+  @retval     EFI_BUFFER_TOO_SMALL    The VariablePolicyVariableName buffer value is too small for the size needed.
+                                      The buffer should now point to the size needed.
+  @retval     EFI_NOT_READY           Variable policy has not yet been initialized.
+  @retval     EFI_INVALID_PARAMETER   A required pointer argument passed is NULL. This will be returned if
+                                      VariablePolicyVariableName is non-NULL and VariablePolicyVariableNameBufferSize
+                                      is NULL.
+  @retval     EFI_NOT_FOUND           A variable policy was not found for the given UEFI variable name and vendor GUID.
+
+**/
+EFI_STATUS
+EFIAPI
+GetVariablePolicyInfo (
+  IN      CONST CHAR16           *VariableName,
+  IN      CONST EFI_GUID         *VendorGuid,
+  IN OUT  UINTN                  *VariablePolicyVariableNameBufferSize OPTIONAL,
+  OUT     VARIABLE_POLICY_ENTRY  *VariablePolicy,
+  OUT     CHAR16                 *VariablePolicyVariableName OPTIONAL
+  );
+
+/**
+  This function will return the Lock on Variable State policy information for the policy
+  associated with the given UEFI variable.
+
+  @param[in]      VariableName                              The name of the variable to use for the policy search.
+  @param[in]      VendorGuid                                The vendor GUID of the variable to use for the policy
+                                                            search.
+  @param[in,out]  VariableLockPolicyVariableNameBufferSize  On input, the size, in bytes, of the
+                                                            VariableLockPolicyVariableName buffer.
+
+                                                            On output, the size, in bytes, needed to store the variable
+                                                            policy variable name.
+
+                                                            If testing for the VariableLockPolicyVariableName buffer
+                                                            size needed, set this value to zero so EFI_BUFFER_TOO_SMALL
+                                                            is guaranteed to be returned if the variable policy variable
+                                                            name is found.
+  @param[out]     VariablePolicy                            Pointer to a buffer where the policy entry will be written
+                                                            if found.
+  @param[out]     VariableLockPolicyVariableName            Pointer to a buffer where the variable name used for the
+                                                            variable lock on variable state policy will be written if
+                                                            a variable name is registered.
+
+                                                            If the lock on variable policy is not associated with a
+                                                            variable name (e.g. applied to variable vendor namespace)
+                                                            and this parameter is given, this parameter will not be
+                                                            modified and VariableLockPolicyVariableNameBufferSize will
+                                                            be set to zero to indicate a name was not present.
+
+                                                            If the pointer given is not NULL,
+                                                            VariableLockPolicyVariableNameBufferSize must be non-NULL.
+
+  @retval     EFI_SUCCESS             A Lock on Variable State variable policy entry was found and returned
+                                      successfully.
+  @retval     EFI_BAD_BUFFER_SIZE     An internal buffer size caused a calculation error.
+  @retval     EFI_BUFFER_TOO_SMALL    The VariableLockPolicyVariableName buffer is too small for the size needed.
+                                      The buffer should now point to the size needed.
+  @retval     EFI_NOT_READY           Variable policy has not yet been initialized.
+  @retval     EFI_INVALID_PARAMETER   A required pointer argument passed is NULL. This will be returned if
+                                      VariableLockPolicyVariableName is non-NULL and
+                                      VariableLockPolicyVariableNameBufferSize is NULL.
+  @retval     EFI_NOT_FOUND           A Lock on Variable State variable policy was not found for the given UEFI
+                                      variable name and vendor GUID.
+
+**/
+EFI_STATUS
+EFIAPI
+GetLockOnVariableStateVariablePolicyInfo (
+  IN      CONST CHAR16                       *VariableName,
+  IN      CONST EFI_GUID                     *VendorGuid,
+  IN OUT  UINTN                              *VariableLockPolicyVariableNameBufferSize OPTIONAL,
+  OUT     VARIABLE_LOCK_ON_VAR_STATE_POLICY  *VariablePolicy,
+  OUT     CHAR16                             *VariableLockPolicyVariableName OPTIONAL
+  );
+
+/**
   This API function returns whether or not the policy engine is
   currently being enforced.
 
