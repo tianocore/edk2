@@ -48,6 +48,9 @@ FvIsBeingProcessed (
   MM driver and return its PE32 image.
 
   @param [in] FwVolHeader   Pointer to memory mapped FV
+  @param [in] Depth         Nesting depth of encapsulation sections. Callers
+                            different from MmCoreFfsFindMmDriver() are
+                            responsible for passing in a zero Depth.
 
   @retval  EFI_SUCCESS            Success.
   @retval  EFI_INVALID_PARAMETER  Invalid parameter.
@@ -55,11 +58,15 @@ FvIsBeingProcessed (
   @retval  EFI_OUT_OF_RESOURCES   Out of resources.
   @retval  EFI_VOLUME_CORRUPTED   Firmware volume is corrupted.
   @retval  EFI_UNSUPPORTED        Operation not supported.
+  @retval  EFI_ABORTED            Recursion aborted because Depth has been
+                                  greater than or equal to
+                                  PcdFwVolMmMaxEncapsulationDepth.
 
 **/
 EFI_STATUS
 MmCoreFfsFindMmDriver (
-  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
+  IN  UINT32                      Depth
   )
 {
   EFI_STATUS                  Status;
@@ -83,6 +90,11 @@ MmCoreFfsFindMmDriver (
   EFI_FIRMWARE_VOLUME_HEADER  *InnerFvHeader;
 
   DEBUG ((DEBUG_INFO, "MmCoreFfsFindMmDriver - 0x%x\n", FwVolHeader));
+
+  if (Depth >= PcdGet32 (PcdFwVolMmMaxEncapsulationDepth)) {
+    DEBUG ((DEBUG_ERROR, "%a: recursion aborted due to nesting depth\n", __func__));
+    return EFI_ABORTED;
+  }
 
   if (FvHasBeenProcessed (FwVolHeader)) {
     return EFI_SUCCESS;
@@ -172,7 +184,7 @@ MmCoreFfsFindMmDriver (
     }
 
     InnerFvHeader = (VOID *)(Section + 1);
-    Status        = MmCoreFfsFindMmDriver (InnerFvHeader);
+    Status        = MmCoreFfsFindMmDriver (InnerFvHeader, Depth + 1);
     if (EFI_ERROR (Status)) {
       goto FreeDstBuffer;
     }
