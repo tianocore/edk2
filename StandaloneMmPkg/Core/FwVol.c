@@ -116,6 +116,25 @@ MmCoreFfsFindMmDriver (
       break;
     }
 
+    //
+    // Check uncompressed firmware volumes
+    //
+    Status = FfsFindSectionData (
+               EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+               FileHeader,
+               &SectionData,
+               &SectionDataSize
+               );
+    if (!EFI_ERROR (Status)) {
+      if (SectionDataSize > sizeof (EFI_FIRMWARE_VOLUME_HEADER)) {
+        InnerFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)SectionData;
+        MmCoreFfsFindMmDriver (InnerFvHeader, Depth + 1);
+      }
+    }
+
+    //
+    // Check compressed firmware volumes
+    //
     Status = FfsFindSection (
                EFI_SECTION_GUID_DEFINED,
                FileHeader,
