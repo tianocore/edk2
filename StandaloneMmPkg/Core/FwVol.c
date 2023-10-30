@@ -116,23 +116,21 @@ MmCoreFfsFindMmDriver (
       break;
     }
 
-    Status = FfsFindSectionData (
+    Status = FfsFindSection (
                EFI_SECTION_GUID_DEFINED,
                FileHeader,
-               &SectionData,
-               &SectionDataSize
+               &Section
                );
     if (EFI_ERROR (Status)) {
       break;
     }
 
-    Section = (EFI_COMMON_SECTION_HEADER *)(FileHeader + 1);
-    Status  = ExtractGuidedSectionGetInfo (
-                Section,
-                &DstBufferSize,
-                &ScratchBufferSize,
-                &SectionAttribute
-                );
+    Status = ExtractGuidedSectionGetInfo (
+               Section,
+               &DstBufferSize,
+               &ScratchBufferSize,
+               &SectionAttribute
+               );
     if (EFI_ERROR (Status)) {
       break;
     }
