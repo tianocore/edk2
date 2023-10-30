@@ -79,8 +79,6 @@ MmCoreFfsFindMmDriver (
   UINTN                       DepexSize;
   UINTN                       Index;
   EFI_COMMON_SECTION_HEADER   *Section;
-  VOID                        *SectionData;
-  UINTN                       SectionDataSize;
   UINT32                      DstBufferSize;
   VOID                        *ScratchBuffer;
   UINT32                      ScratchBufferSize;
@@ -117,23 +115,21 @@ MmCoreFfsFindMmDriver (
       break;
     }
 
-    Status = FfsFindSectionData (
+    Status = FfsFindSection (
                EFI_SECTION_GUID_DEFINED,
                FileHeader,
-               &SectionData,
-               &SectionDataSize
+               &Section
                );
     if (EFI_ERROR (Status)) {
       break;
     }
 
-    Section = (EFI_COMMON_SECTION_HEADER *)(FileHeader + 1);
-    Status  = ExtractGuidedSectionGetInfo (
-                Section,
-                &DstBufferSize,
-                &ScratchBufferSize,
-                &SectionAttribute
-                );
+    Status = ExtractGuidedSectionGetInfo (
+               Section,
+               &DstBufferSize,
+               &ScratchBufferSize,
+               &SectionAttribute
+               );
     if (EFI_ERROR (Status)) {
       break;
     }
@@ -194,8 +190,13 @@ MmCoreFfsFindMmDriver (
       goto FreeDstBuffer;
     }
 
-    InnerFvHeader = (VOID *)(Section + 1);
-    Status        = MmCoreFfsFindMmDriver (InnerFvHeader, Depth + 1);
+    if (IS_SECTION2 (Section)) {
+      InnerFvHeader = (VOID *)((EFI_COMMON_SECTION_HEADER2 *)Section + 1);
+    } else {
+      InnerFvHeader = (VOID *)(Section + 1);
+    }
+
+    Status = MmCoreFfsFindMmDriver (InnerFvHeader, Depth + 1);
     if (EFI_ERROR (Status)) {
       goto FreeDstBuffer;
     }
