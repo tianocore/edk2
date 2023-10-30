@@ -150,6 +150,7 @@ MmCoreFfsFindMmDriver (
     //
     DstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
     if (DstBuffer == NULL) {
+      FreePages (ScratchBuffer, EFI_SIZE_TO_PAGES (ScratchBufferSize));
       return EFI_OUT_OF_RESOURCES;
     }
 
