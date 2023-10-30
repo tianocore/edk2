@@ -5,27 +5,42 @@ to use the same Pytools based build infrastructure locally.
 
 ## Supported Configuration Details
 
-This solution for building and running ArmVirtPkg has only been validated with Ubuntu
-18.04 and the GCC5 toolchain. Two different firmware builds are supported and are
-described below.
+This solution for building and running ArmVirtPkg has been validated with Fedora
+37 Linux and the GCC5 toolchain. The following different firmware builds are
+supported.
 
-| Configuration name      | Architecture       | DSC File         |Additional Flags |
-| :----------             | :-----             | :-----           | :----           |
-| AARCH64                 | AARCH64            | ArmVirtQemu.dsc  | None            |
-| ARM                     | ARM                | ArmVirtQemu.dsc  | None            |
+| Configuration name      | Architecture       | DSC File               | Additional Flags |
+| :----------             | :-----             | :-----                 | :----            |
+| AARCH64 - KVM Cloud HV  | AARCH64            | ArmVirtCloudHv.dsc     | None             |
+| ARM - KVM Cloud HV      | ARM                | ArmVirtCloudHv.dsc     | None             |
+| AARCH64 - kvmtool       | AARCH64            | ArmVirtKvmTool.dsc     | None             |
+| ARM - kvmtool           | ARM                | ArmVirtKvmTool.dsc     | None             |
+| AARCH64 - QEMU          | AARCH64            | ArmVirtQemu.dsc        | None             |
+| ARM - QEMU              | ARM                | ArmVirtQemu.dsc        | None             |
+| AARCH64 - QEMU Kernel   | AARCH64            | ArmVirtQemuKernel.dsc  | None             |
+| ARM - QEMU Kernel       | ARM                | ArmVirtQemuKernel.dsc  | None             |
+| AARCH64 - Xen HV        | AARCH64            | ArmVirtXen.dsc         | None             |
+| ARM - Xen HV            | ARM                | ArmVirtXen.dsc         | None             |
 
 ## EDK2 Developer environment
 
-- [Python 3.8.x - Download & Install](https://www.python.org/downloads/)
+- [Python 3.12.x - Download & Install](https://www.python.org/downloads/)
 - [GIT - Download & Install](https://git-scm.com/download/)
 - [QEMU - Download, Install, and add to your path](https://www.qemu.org/download/)
 - [Edk2 Source](https://github.com/tianocore/edk2)
-- Additional packages found necessary for Ubuntu 18.04
-  - apt-get install gcc g++ make uuid-dev
+- Additional packages found necessary for Fedora Linux 37
+  - dnf install gcc g++ make libuuid-devel
 
 Note: edksetup, Submodule initialization and manual installation of NASM, iASL, or
 the required cross-compiler toolchains are **not** required, this is handled by the
 Pytools build system.
+
+The code is built in CI using a container. The latest Fedora Linux 37 container is
+available in this GitHub container registry feed
+[fedora-37-test](https://github.com/tianocore/containers/pkgs/container/containers%2Ffedora-37-test).
+
+The exact container version tested in CI is maintained in this file
+[edk2/.azurepipelines/templates/default.yml](https://github.com/tianocore/edk2/blob/HEAD/.azurepipelines/templates/defaults.yml).
 
 ## Building with Pytools for ArmVirtPkg
 
@@ -57,16 +72,16 @@ the generic set of edk2 [Build Instructions](https://github.com/tianocore/tianoc
     pip install --upgrade -r pip-requirements.txt
     ```
 
-4. Initialize & Update Submodules - only when submodules updated
+4. Initialize & Update Submodules - only when submodules updated (QEMU build example)
 
     ``` bash
-    stuart_setup -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+    stuart_setup -c ArmVirtPkg/PlatformCI/QemuBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
     ```
 
-5. Initialize & Update Dependencies - only as needed when ext_deps change
+5. Initialize & Update Dependencies - only as needed when ext_deps change (QEMU build example)
 
     ``` bash
-    stuart_update -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+    stuart_update -c ArmVirtPkg/PlatformCI/QemuBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
     ```
 
 6. Compile the basetools if necessary - only when basetools C source files change
@@ -75,13 +90,13 @@ the generic set of edk2 [Build Instructions](https://github.com/tianocore/tianoc
     python BaseTools/Edk2ToolsBuild.py -t <ToolChainTag>
     ```
 
-7. Compile Firmware
+7. Compile Firmware (QEMU build example)
 
     ``` bash
-    stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
+    stuart_build -c ArmVirtPkg/PlatformCI/QemuBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH>
     ```
 
-    - use `stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py -h` option to see additional
+    - use `stuart_build -c ArmVirtPkg/PlatformCI/QemuBuild.py -h` option to see additional
     options like `--clean`
 
 8. Running Emulator
@@ -90,7 +105,7 @@ the generic set of edk2 [Build Instructions](https://github.com/tianocore/tianoc
     - or use the `--FlashOnly` feature to just run the emulator.
 
       ``` bash
-      stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH> --FlashOnly
+      stuart_build -c ArmVirtPkg/PlatformCI/QemuBuild.py TOOL_CHAIN_TAG=<TOOL_CHAIN_TAG> -a <TARGET_ARCH> --FlashOnly
       ```
 
 ### Notes
@@ -120,7 +135,7 @@ command-line. _stuart_build_ currently requires values to be assigned, so add an
 For example, to enable the TPM2 support, instead of the traditional "-D TPM2_ENABLE=TRUE", the stuart_build
 command-line would be:
 
-`stuart_build -c ArmVirtPkg/PlatformCI/PlatformBuild.py BLD_*_TPM2_ENABLE=TRUE`
+`stuart_build -c ArmVirtPkg/PlatformCI/QemuBuild.py BLD_*_TPM2_ENABLE=TRUE`
 
 ## References
 
