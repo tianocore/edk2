@@ -10,11 +10,6 @@
 #include "StandaloneMmCore.h"
 
 EFI_STATUS
-MmCoreFfsFindMmDriver (
-  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
-  );
-
-EFI_STATUS
 MmDispatcher (
   VOID
   );
@@ -643,7 +638,7 @@ StandaloneMmMain (
   //
   DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", gMmCorePrivate->StandaloneBfvAddress));
   if (gMmCorePrivate->StandaloneBfvAddress != 0) {
-    MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)gMmCorePrivate->StandaloneBfvAddress);
+    MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)gMmCorePrivate->StandaloneBfvAddress, 0);
     MmDispatcher ();
   }
 
