@@ -84,6 +84,7 @@ MmCoreFfsFindMmDriver (
   UINT32                      DstBufferSize;
   VOID                        *ScratchBuffer;
   UINT32                      ScratchBufferSize;
+  VOID                        *AllocatedDstBuffer;
   VOID                        *DstBuffer;
   UINT16                      SectionAttribute;
   UINT32                      AuthenticationStatus;
@@ -148,23 +149,33 @@ MmCoreFfsFindMmDriver (
     //
     // Allocate destination buffer, extra one page for adjustment
     //
-    DstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
-    if (DstBuffer == NULL) {
+    AllocatedDstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+    if (AllocatedDstBuffer == NULL) {
+      FreePages (ScratchBuffer, EFI_SIZE_TO_PAGES (ScratchBufferSize));
       return EFI_OUT_OF_RESOURCES;
     }
 
     //
     // Call decompress function
     //
-    Status = ExtractGuidedSectionDecode (
-               Section,
-               &DstBuffer,
-               ScratchBuffer,
-               &AuthenticationStatus
-               );
+    DstBuffer = AllocatedDstBuffer;
+    Status    = ExtractGuidedSectionDecode (
+                  Section,
+                  &DstBuffer,
+                  ScratchBuffer,
+                  &AuthenticationStatus
+                  );
     FreePages (ScratchBuffer, EFI_SIZE_TO_PAGES (ScratchBufferSize));
     if (EFI_ERROR (Status)) {
       goto FreeDstBuffer;
+    }
+
+    //
+    // Free allocated DstBuffer if it is not used
+    //
+    if (DstBuffer != AllocatedDstBuffer) {
+      FreePages (AllocatedDstBuffer, EFI_SIZE_TO_PAGES (DstBufferSize));
+      AllocatedDstBuffer = NULL;
     }
 
     DEBUG ((
@@ -210,7 +221,9 @@ MmCoreFfsFindMmDriver (
   return EFI_SUCCESS;
 
 FreeDstBuffer:
-  FreePages (DstBuffer, EFI_SIZE_TO_PAGES (DstBufferSize));
+  if (AllocatedDstBuffer != NULL) {
+    FreePages (AllocatedDstBuffer, EFI_SIZE_TO_PAGES (DstBufferSize));
+  }
 
   return Status;
 }
