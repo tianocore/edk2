@@ -1,0 +1,29 @@
+## @file
+#  LoongArch64 CPU Real Time Clock PEI Phase Library.
+#
+# Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = PeiLsRealTimeClockLib
+  FILE_GUID                      = d4358430-15ec-9358-1b12-26dab955e9c6
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib|PEIM
+
+#
+#  VALID_ARCHITECTURES           = LOONGARCH64
+#
+
+[Sources]
+  PeiLsRealTimeClockLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  HobLib
