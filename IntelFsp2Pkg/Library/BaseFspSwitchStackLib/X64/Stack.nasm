@@ -1,6 +1,6 @@
 ;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2022 - 2023, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Abstract:
@@ -60,7 +60,9 @@ ASM_PFX(FspSwitchStack):
 
     ; Load new stack
     mov     rcx, rsp
+    sub     rsp, 0x20
     call    ASM_PFX(SwapStack)
+    add     rsp, 0x20
     mov     rsp, rax
 
     ; Restore previous contexts
