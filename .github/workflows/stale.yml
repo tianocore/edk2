@@ -1,0 +1,44 @@
+# This workflow warns and then closes issues and PRs that have had no activity
+# for a specified amount of time.
+#
+# For more information, see:
+# https://github.com/actions/stale
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+name: Stale Check
+
+on:
+  schedule:
+    # At 23:35 on every day-of-week from Sunday through Saturday
+    # https://crontab.guru/#35_23_*_*_0-6
+    - cron: '35 23 * * 0-6'
+  workflow_dispatch:
+
+jobs:
+  stale:
+    name: Stale
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+    - name: Check for Stale Items
+      uses: actions/stale@v8
+      with:
+        days-before-issue-close: -1
+        days-before-issue-stale: -1
+        days-before-pr-stale: 60
+        days-before-pr-close: 7
+        stale-pr-message: >
+          This PR has been automatically marked as stale because it has not had
+          activity in 60 days. It will be closed if no further activity occurs within
+          7 days. Thank you for your contributions.
+        close-pr-message: >
+          This pull request has been automatically been closed because it did not have any
+          activity in 60 days and no follow up within 7 days after being marked stale.
+          Thank you for your contributions.
+        stale-pr-label: stale
