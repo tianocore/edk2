@@ -11,9 +11,9 @@
 #include <Library/GoogleTestLib.h>
 #include <Library/FunctionMockLib.h>
 extern "C" {
-#include <Pi/PiMultiPhase.h>
-#include <Uefi.h>
-#include <Library/HobLib.h>
+  #include <Pi/PiMultiPhase.h>
+  #include <Uefi.h>
+  #include <Library/HobLib.h>
 }
 
 struct MockHobLib {

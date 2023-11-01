@@ -111,7 +111,7 @@ typedef union {
     UINT32    HeaderVersion         : 4; ///< The version of header.
     UINT32    Reserved              : 4; ///< Reserved for future definitions.
     UINT32    DestinationEndpointId : 8; ///< Destination endpoint Id (EID).
-    UINT32    SourceEndpointIdId    : 8; ///< Source endpoint Id (EID)
+    UINT32    SourceEndpointId      : 8; ///< Source endpoint Id (EID)
     UINT32    MessageTag            : 3; ///< Check the MCTP Base specification for the
                                          ///< usages.
     UINT32    TagOwner              : 1; ///< Tag owner identifies the message was

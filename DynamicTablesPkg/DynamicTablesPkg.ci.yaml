@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "PrEval": {
+        "DscPath": "DynamicTablesPkg.dsc",
+    },
     "EccCheck": {
         ## Exception sample looks like below:
         ## "ExceptionList": [
@@ -97,6 +100,7 @@
            "ARMLTD",
            "AMLDBG",
            "EISAID",
+           "cacheablity",
            "CCIDX",
            "CCSIDR",
            "countof",

@@ -31,9 +31,11 @@
   gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled
 
 [LibraryClasses]
+  BaseMemoryLib
   DebugLib
   HobLib
   FdtLib
+  FdtSerialPortAddressLib
   PcdLib
   PeiServicesLib
 

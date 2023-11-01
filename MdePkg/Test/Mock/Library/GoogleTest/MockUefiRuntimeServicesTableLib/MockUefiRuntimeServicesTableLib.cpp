@@ -6,13 +6,13 @@
 **/
 #include <GoogleTest/Library/MockUefiRuntimeServicesTableLib.h>
 
-MOCK_INTERFACE_DEFINITION(MockUefiRuntimeServicesTableLib);
+MOCK_INTERFACE_DEFINITION (MockUefiRuntimeServicesTableLib);
 
-MOCK_FUNCTION_DEFINITION(MockUefiRuntimeServicesTableLib, gRT_GetVariable, 5, EFIAPI);
-MOCK_FUNCTION_DEFINITION(MockUefiRuntimeServicesTableLib, gRT_SetVariable, 5, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiRuntimeServicesTableLib, gRT_GetVariable, 5, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockUefiRuntimeServicesTableLib, gRT_SetVariable, 5, EFIAPI);
 
-static EFI_RUNTIME_SERVICES localRt = {
-  {0},              // EFI_TABLE_HEADER
+static EFI_RUNTIME_SERVICES  localRt = {
+  { 0 },              // EFI_TABLE_HEADER
 
   NULL,             // EFI_GET_TIME
   NULL,             // EFI_SET_TIME
@@ -36,5 +36,5 @@ static EFI_RUNTIME_SERVICES localRt = {
 };
 
 extern "C" {
-  EFI_RUNTIME_SERVICES* gRT = &localRt;
+  EFI_RUNTIME_SERVICES  *gRT = &localRt;
 }

@@ -2,7 +2,7 @@
   ACPI 6.5 definitions from the ACPI Specification Revision 6.5 Aug, 2022.
 
   Copyright (c) 2017 - 2022, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2019 - 2021, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2019 - 2023, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2023, Loongson Technology Corporation Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -43,6 +43,7 @@ typedef struct {
 #define EFI_ACPI_6_5_GENERAL_PURPOSE_IO              0x08
 #define EFI_ACPI_6_5_GENERIC_SERIAL_BUS              0x09
 #define EFI_ACPI_6_5_PLATFORM_COMMUNICATION_CHANNEL  0x0A
+#define EFI_ACPI_6_5_PLATFORM_RUNTIME_MECHANISM      0x0B
 #define EFI_ACPI_6_5_FUNCTIONAL_FIXED_HARDWARE       0x7F
 
 //
@@ -525,6 +526,7 @@ typedef struct {
   UINT8     ProcessorPowerEfficiencyClass;
   UINT8     Reserved2;
   UINT16    SpeOverflowInterrupt;
+  UINT16    TrbeInterrupt;
 } EFI_ACPI_6_5_GIC_STRUCTURE;
 
 ///
@@ -533,6 +535,7 @@ typedef struct {
 #define EFI_ACPI_6_5_GIC_ENABLED                            BIT0
 #define EFI_ACPI_6_5_PERFORMANCE_INTERRUPT_MODEL            BIT1
 #define EFI_ACPI_6_5_VGIC_MAINTENANCE_INTERRUPT_MODE_FLAGS  BIT2
+#define EFI_ACPI_6_5_GIC_ONLINE_CAPABLE                     BIT3
 
 ///
 /// GIC Distributor Structure

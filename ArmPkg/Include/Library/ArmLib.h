@@ -780,6 +780,31 @@ EFIAPI
 ArmHasVhe (
   VOID
   );
+
+/**
+  Checks whether the CPU implements the Trace Buffer Extension.
+
+  @retval TRUE  FEAT_TRBE is implemented.
+  @retval FALSE FEAT_TRBE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasTrbe (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements the Embedded Trace Extension.
+
+  @retval TRUE  FEAT_ETE is implemented.
+  @retval FALSE FEAT_ETE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasEte (
+  VOID
+  );
+
 #endif // MDE_CPU_AARCH64
 
 #ifdef MDE_CPU_ARM

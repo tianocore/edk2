@@ -119,3 +119,34 @@ ArmHasVhe (
 {
   return ((ArmReadIdAA64Mmfr1 () & AARCH64_MMFR1_VH) != 0);
 }
+
+/**
+  Checks whether the CPU implements the Trace Buffer Extension.
+
+  @retval TRUE  FEAT_TRBE is implemented.
+  @retval FALSE FEAT_TRBE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasTrbe (
+  VOID
+  )
+{
+  return ((ArmReadIdAA64Dfr0 () & AARCH64_DFR0_TRBE) != 0);
+}
+
+/**
+  Checks whether the CPU implements the Embedded Trace Extension.
+
+  @retval TRUE  FEAT_ETE is implemented.
+  @retval FALSE FEAT_ETE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasEte (
+  VOID
+  )
+{
+  // The ID_AA64DFR0_EL1.TraceVer field identifies the presence of FEAT_ETE.
+  return ((ArmReadIdAA64Dfr0 () & AARCH64_DFR0_TRACEVER) != 0);
+}

@@ -10,6 +10,7 @@
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -401,10 +402,41 @@ ON_EXIT:
   return ret;
 }
 
+EFI_HTTP_HEADER *
+cloneHttpHeaders (
+  EFI_HTTP_MESSAGE  *message,
+  UINTN             *HeaderCount
+  )
+{
+  EFI_HTTP_HEADER  *Buffer;
+  UINTN            Index;
+
+  if ((message == NULL) || (HeaderCount == NULL)) {
+    return NULL;
+  }
+
+  *HeaderCount = message->HeaderCount;
+  Buffer       = AllocatePool (sizeof (EFI_HTTP_HEADER) *  message->HeaderCount);
+  if (Buffer == NULL) {
+    return NULL;
+  }
+
+  for (Index = 0; Index < message->HeaderCount; Index++) {
+    Buffer[Index].FieldName = AllocateCopyPool (AsciiStrSize (message->Headers[Index].FieldName), message->Headers[Index].FieldName);
+    ASSERT (Buffer[Index].FieldName != NULL);
+    Buffer[Index].FieldValue = AllocateCopyPool (AsciiStrSize (message->Headers[Index].FieldValue), message->Headers[Index].FieldValue);
+    ASSERT (Buffer[Index].FieldValue != NULL);
+  }
+
+  return Buffer;
+}
+
 json_t *
-getUriFromService (
+getUriFromServiceEx (
   redfishService        *service,
   const char            *uri,
+  EFI_HTTP_HEADER       **Headers OPTIONAL,
+  UINTN                 *HeaderCount OPTIONAL,
   EFI_HTTP_STATUS_CODE  **StatusCode
   )
 {
@@ -422,13 +454,20 @@ getUriFromService (
   }
 
   *StatusCode = NULL;
+  if (HeaderCount != NULL) {
+    *HeaderCount = 0;
+  }
+
+  if (Headers != NULL) {
+    *Headers = NULL;
+  }
 
   url = makeUrlForService (service, uri);
   if (!url) {
     return NULL;
   }
 
-  DEBUG ((DEBUG_MANAGEABILITY, "libredfish: getUriFromService(): %a\n", url));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: %a\n", __func__, url));
 
   //
   // Step 1: Create HTTP request message with 4 headers:
@@ -491,6 +530,23 @@ getUriFromService (
   Status = service->RestEx->SendReceive (service->RestEx, RequestMsg, &ResponseMsg);
   if (EFI_ERROR (Status)) {
     ret = NULL;
+
+    //
+    // Deliver status code to caller when error happens so caller can do error handling.
+    //
+    if (ResponseMsg.Data.Response != NULL) {
+      *StatusCode = AllocateZeroPool (sizeof (EFI_HTTP_STATUS_CODE));
+      if (*StatusCode == NULL) {
+        ret = NULL;
+        goto ON_EXIT;
+      }
+
+      //
+      // The caller shall take the responsibility to free the buffer.
+      //
+      **StatusCode = ResponseMsg.Data.Response->StatusCode;
+    }
+
     goto ON_EXIT;
   }
 
@@ -508,6 +564,10 @@ getUriFromService (
     // The caller shall take the responsibility to free the buffer.
     //
     **StatusCode = ResponseMsg.Data.Response->StatusCode;
+  }
+
+  if ((ResponseMsg.Headers != NULL) && (Headers != NULL) && (HeaderCount != NULL)) {
+    *Headers = cloneHttpHeaders (&ResponseMsg, HeaderCount);
   }
 
   if ((ResponseMsg.BodyLength != 0) && (ResponseMsg.Body != NULL)) {
@@ -558,10 +618,14 @@ ON_EXIT:
 }
 
 json_t *
-patchUriFromService (
+putUriFromServiceEx (
   redfishService        *service,
   const char            *uri,
   const char            *content,
+  size_t                contentLength,
+  const char            *contentType,
+  EFI_HTTP_HEADER       **Headers OPTIONAL,
+  UINTN                 *HeaderCount OPTIONAL,
   EFI_HTTP_STATUS_CODE  **StatusCode
   )
 {
@@ -581,13 +645,224 @@ patchUriFromService (
   }
 
   *StatusCode = NULL;
+  if (HeaderCount != NULL) {
+    *HeaderCount = 0;
+  }
+
+  if (Headers != NULL) {
+    *Headers = NULL;
+  }
+
+  url = makeUrlForService (service, uri);
+  if (url == NULL) {
+    return NULL;
+  }
+
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: %a\n", __func__, url));
+
+  if (contentLength == 0) {
+    contentLength = strlen (content);
+  }
+
+  //
+  // Step 1: Create HTTP request message with 4 headers:
+  //
+  HttpIoHeader = HttpIoCreateHeader ((service->sessionToken != NULL || service->basicAuthStr != NULL) ? 9 : 8);
+  if (HttpIoHeader == NULL) {
+    ret = NULL;
+    goto ON_EXIT;
+  }
+
+  if (service->sessionToken) {
+    Status = HttpIoSetHeader (HttpIoHeader, "X-Auth-Token", service->sessionToken);
+    ASSERT_EFI_ERROR (Status);
+  } else if (service->basicAuthStr) {
+    Status = HttpIoSetHeader (HttpIoHeader, "Authorization", service->basicAuthStr);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  if (contentType == NULL) {
+    Status = HttpIoSetHeader (HttpIoHeader, "Content-Type", "application/json");
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    Status = HttpIoSetHeader (HttpIoHeader, "Content-Type", (CHAR8 *)contentType);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Status = HttpIoSetHeader (HttpIoHeader, "Host", service->HostHeaderValue);
+  ASSERT_EFI_ERROR (Status);
+  Status = HttpIoSetHeader (HttpIoHeader, "Content-Type", "application/json");
+  ASSERT_EFI_ERROR (Status);
+  Status = HttpIoSetHeader (HttpIoHeader, "Accept", "application/json");
+  ASSERT_EFI_ERROR (Status);
+  Status = HttpIoSetHeader (HttpIoHeader, "User-Agent", "libredfish");
+  ASSERT_EFI_ERROR (Status);
+  Status = HttpIoSetHeader (HttpIoHeader, "Connection", "Keep-Alive");
+  ASSERT_EFI_ERROR (Status);
+
+  AsciiSPrint (
+    ContentLengthStr,
+    sizeof (ContentLengthStr),
+    "%lu",
+    (UINT64)contentLength
+    );
+  Status = HttpIoSetHeader (HttpIoHeader, "Content-Length", ContentLengthStr);
+  ASSERT_EFI_ERROR (Status);
+  Status = HttpIoSetHeader (HttpIoHeader, "OData-Version", "4.0");
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Step 2: build the rest of HTTP request info.
+  //
+  RequestData = AllocateZeroPool (sizeof (EFI_HTTP_REQUEST_DATA));
+  if (RequestData == NULL) {
+    ret = NULL;
+    goto ON_EXIT;
+  }
+
+  RequestData->Method = HttpMethodPut;
+  RequestData->Url    = C8ToC16 (url);
+
+  //
+  // Step 3: fill in EFI_HTTP_MESSAGE
+  //
+  RequestMsg = AllocateZeroPool (sizeof (EFI_HTTP_MESSAGE));
+  if (RequestMsg == NULL) {
+    ret = NULL;
+    goto ON_EXIT;
+  }
+
+  EncodedContent    = (CHAR8 *)content;
+  EncodedContentLen = contentLength;
+  //
+  // We currently only support gzip Content-Encoding.
+  //
+  Status = EncodeRequestContent ((CHAR8 *)HTTP_CONTENT_ENCODING_GZIP, (CHAR8 *)content, (VOID **)&EncodedContent, &EncodedContentLen);
+  if (Status == EFI_INVALID_PARAMETER) {
+    DEBUG ((DEBUG_ERROR, "%a: Error to encode content.\n", __func__));
+    ret = NULL;
+    goto ON_EXIT;
+  } else if (Status == EFI_UNSUPPORTED) {
+    DEBUG ((DEBUG_MANAGEABILITY, "No content coding for %a! Use raw data instead.\n", HTTP_CONTENT_ENCODING_GZIP));
+    Status = HttpIoSetHeader (HttpIoHeader, "Content-Encoding", HTTP_CONTENT_ENCODING_IDENTITY);
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    Status = HttpIoSetHeader (HttpIoHeader, "Content-Encoding", HTTP_CONTENT_ENCODING_GZIP);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  RequestMsg->Data.Request = RequestData;
+  RequestMsg->HeaderCount  = HttpIoHeader->HeaderCount;
+  RequestMsg->Headers      = HttpIoHeader->Headers;
+  RequestMsg->BodyLength   = EncodedContentLen;
+  RequestMsg->Body         = (VOID *)EncodedContent;
+
+  ZeroMem (&ResponseMsg, sizeof (ResponseMsg));
+
+  //
+  // Step 4: call RESTEx to get response from REST service.
+  //
+  Status = service->RestEx->SendReceive (service->RestEx, RequestMsg, &ResponseMsg);
+  if (EFI_ERROR (Status)) {
+    ret = NULL;
+    goto ON_EXIT;
+  }
+
+  //
+  // Step 5: Return the HTTP StatusCode and Body message.
+  //
+  if (ResponseMsg.Data.Response != NULL) {
+    *StatusCode = AllocateZeroPool (sizeof (EFI_HTTP_STATUS_CODE));
+    if (*StatusCode == NULL) {
+      ret = NULL;
+      goto ON_EXIT;
+    }
+
+    //
+    // The caller shall take the responsibility to free the buffer.
+    //
+    **StatusCode = ResponseMsg.Data.Response->StatusCode;
+  }
+
+  if ((ResponseMsg.Headers != NULL) && (Headers != NULL) && (HeaderCount != NULL)) {
+    *Headers = cloneHttpHeaders (&ResponseMsg, HeaderCount);
+  }
+
+  if (EncodedContent != content) {
+    FreePool (EncodedContent);
+  }
+
+  if ((ResponseMsg.BodyLength != 0) && (ResponseMsg.Body != NULL)) {
+    ret = json_loadb (ResponseMsg.Body, ResponseMsg.BodyLength, 0, NULL);
+  } else {
+    //
+    // There is no message body returned from server.
+    //
+    ret = NULL;
+  }
+
+ON_EXIT:
+  if (url != NULL) {
+    free (url);
+  }
+
+  if (HttpIoHeader != NULL) {
+    HttpIoFreeHeader (HttpIoHeader);
+  }
+
+  if (RequestData != NULL) {
+    RestConfigFreeHttpRequestData (RequestData);
+  }
+
+  if (RequestMsg != NULL) {
+    FreePool (RequestMsg);
+  }
+
+  RestConfigFreeHttpMessage (&ResponseMsg, FALSE);
+
+  return ret;
+}
+
+json_t *
+patchUriFromServiceEx (
+  redfishService        *service,
+  const char            *uri,
+  const char            *content,
+  EFI_HTTP_HEADER       **Headers OPTIONAL,
+  UINTN                 *HeaderCount OPTIONAL,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  )
+{
+  char                   *url;
+  json_t                 *ret;
+  HTTP_IO_HEADER         *HttpIoHeader = NULL;
+  EFI_STATUS             Status;
+  EFI_HTTP_REQUEST_DATA  *RequestData = NULL;
+  EFI_HTTP_MESSAGE       *RequestMsg  = NULL;
+  EFI_HTTP_MESSAGE       ResponseMsg;
+  CHAR8                  ContentLengthStr[80];
+  CHAR8                  *EncodedContent;
+  UINTN                  EncodedContentLen;
+
+  if ((service == NULL) || (uri == NULL) || (content == NULL) || (StatusCode == NULL)) {
+    return NULL;
+  }
+
+  *StatusCode = NULL;
+  if (HeaderCount != NULL) {
+    *HeaderCount = 0;
+  }
+
+  if (Headers != NULL) {
+    *Headers = NULL;
+  }
 
   url = makeUrlForService (service, uri);
   if (!url) {
     return NULL;
   }
 
-  DEBUG ((DEBUG_MANAGEABILITY, "libredfish: patchUriFromService(): %a\n", url));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: %a\n", __func__, url));
 
   //
   // Step 1: Create HTTP request message with 4 headers:
@@ -701,6 +976,10 @@ patchUriFromService (
     **StatusCode = ResponseMsg.Data.Response->StatusCode;
   }
 
+  if ((ResponseMsg.Headers != NULL) && (Headers != NULL) && (HeaderCount != NULL)) {
+    *Headers = cloneHttpHeaders (&ResponseMsg, HeaderCount);
+  }
+
   if (EncodedContent != content) {
     FreePool (EncodedContent);
   }
@@ -737,12 +1016,14 @@ ON_EXIT:
 }
 
 json_t *
-postUriFromService (
+postUriFromServiceEx (
   redfishService        *service,
   const char            *uri,
   const char            *content,
   size_t                contentLength,
   const char            *contentType,
+  EFI_HTTP_HEADER       **Headers OPTIONAL,
+  UINTN                 *HeaderCount OPTIONAL,
   EFI_HTTP_STATUS_CODE  **StatusCode
   )
 {
@@ -763,13 +1044,20 @@ postUriFromService (
   }
 
   *StatusCode = NULL;
+  if (HeaderCount != NULL) {
+    *HeaderCount = 0;
+  }
+
+  if (Headers != NULL) {
+    *Headers = NULL;
+  }
 
   url = makeUrlForService (service, uri);
   if (!url) {
     return NULL;
   }
 
-  DEBUG ((DEBUG_MANAGEABILITY, "libredfish: postUriFromService(): %a\n", url));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: %a\n", __func__, url));
 
   if (contentLength == 0) {
     contentLength = strlen (content);
@@ -850,7 +1138,12 @@ postUriFromService (
   //
   Status = service->RestEx->SendReceive (service->RestEx, RequestMsg, &ResponseMsg);
   if (EFI_ERROR (Status)) {
-    goto ON_EXIT;
+    //
+    // If there is no response to handle, go to error exit.
+    //
+    if (ResponseMsg.Data.Response == NULL) {
+      goto ON_EXIT;
+    }
   }
 
   //
@@ -868,15 +1161,20 @@ postUriFromService (
     **StatusCode = ResponseMsg.Data.Response->StatusCode;
   }
 
+  if ((ResponseMsg.Headers != NULL) && (Headers != NULL) && (HeaderCount != NULL)) {
+    *Headers = cloneHttpHeaders (&ResponseMsg, HeaderCount);
+  }
+
   if ((ResponseMsg.BodyLength != 0) && (ResponseMsg.Body != NULL)) {
     ret = json_loadb (ResponseMsg.Body, ResponseMsg.BodyLength, 0, NULL);
   }
 
   //
-  // Step 6: Parsing the HttpHeader to retrive the X-Auth-Token if the HTTP StatusCode is correct.
+  // Step 6: Parsing the HttpHeader to retrieve the X-Auth-Token if the HTTP StatusCode is correct.
   //
-  if ((ResponseMsg.Data.Response->StatusCode == HTTP_STATUS_200_OK) ||
-      (ResponseMsg.Data.Response->StatusCode == HTTP_STATUS_204_NO_CONTENT))
+  if ((ResponseMsg.Data.Response != NULL) &&
+      ((ResponseMsg.Data.Response->StatusCode == HTTP_STATUS_200_OK) ||
+       (ResponseMsg.Data.Response->StatusCode == HTTP_STATUS_204_NO_CONTENT)))
   {
     HttpHeader = HttpFindHeader (ResponseMsg.HeaderCount, ResponseMsg.Headers, "X-Auth-Token");
     if (HttpHeader != NULL) {
@@ -886,19 +1184,6 @@ postUriFromService (
 
       service->sessionToken = AllocateCopyPool (AsciiStrSize (HttpHeader->FieldValue), HttpHeader->FieldValue);
     }
-
-    /*
-    //
-    // Below opeation seems to be unnecessary.
-    // Besides, the FieldValue for the Location is the full HTTP URI (Http://0.0.0.0:5000/XXX), so we can't use it as the
-    // parameter of getUriFromService () directly.
-    //
-    HttpHeader = HttpFindHeader (ResponseMsg.HeaderCount, ResponseMsg.Headers, "Location");
-    if (HttpHeader != NULL) {
-      ret = getUriFromService(service, HttpHeader->FieldValue);
-      goto ON_EXIT;
-    }
-    */
   }
 
 ON_EXIT:
@@ -921,6 +1206,40 @@ ON_EXIT:
   RestConfigFreeHttpMessage (&ResponseMsg, FALSE);
 
   return ret;
+}
+
+json_t *
+getUriFromService (
+  redfishService        *service,
+  const char            *uri,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  )
+{
+  return getUriFromServiceEx (service, uri, NULL, NULL, StatusCode);
+}
+
+json_t *
+patchUriFromService (
+  redfishService        *service,
+  const char            *uri,
+  const char            *content,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  )
+{
+  return patchUriFromServiceEx (service, uri, content, NULL, NULL, StatusCode);
+}
+
+json_t *
+postUriFromService (
+  redfishService        *service,
+  const char            *uri,
+  const char            *content,
+  size_t                contentLength,
+  const char            *contentType,
+  EFI_HTTP_STATUS_CODE  **StatusCode
+  )
+{
+  return postUriFromServiceEx (service, uri, content, contentLength, contentType, NULL, NULL, StatusCode);
 }
 
 json_t *
@@ -1498,6 +1817,10 @@ makeUrlForService (
   }
 
   url = (char *)malloc (strlen (service->host)+strlen (uri)+1);
+  if (url == NULL) {
+    return NULL;
+  }
+
   strcpy (url, service->host);
   strcat (url, uri);
   return url;
