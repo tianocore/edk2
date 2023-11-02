@@ -7,6 +7,7 @@ Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 Portions Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 Portions Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
+Copyright (c) 2023 - 2024, Arm Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -125,6 +126,20 @@ typedef struct {
 } BASE_LIBRARY_JUMP_BUFFER;
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT  8
+
+/**
+  Reads the current value of CNTPCT_EL0 register.
+
+  Reads and returns the current value of CNTPCT_EL0.
+  This function is only available on AARCH64.
+
+  @return The current value of CNTPCT_EL0
+**/
+UINT64
+EFIAPI
+ArmReadCntPctReg (
+  VOID
+  );
 
 #endif // defined (MDE_CPU_AARCH64)
 
