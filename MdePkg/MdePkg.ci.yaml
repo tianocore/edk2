@@ -80,7 +80,8 @@
             "Include/Register/Amd/SmramSaveStateMap.h",
             "Test/UnitTest/Library/DevicePathLib/TestDevicePathLib.c",
             "Test/UnitTest/Library/DevicePathLib/TestDevicePathLib.h",
-            "Test/UnitTest/Library/DevicePathLib/TestDevicePathStringConversions.c"
+            "Test/UnitTest/Library/DevicePathLib/TestDevicePathStringConversions.c",
+            "Include/Register/LoongArch64/Cpucfg.h"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin
