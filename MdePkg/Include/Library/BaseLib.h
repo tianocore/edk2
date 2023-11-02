@@ -327,6 +327,18 @@ DisableLocalInterrupts (
   IN UINT16
   );
 
+/**
+  Read CPUCFG register.
+
+  @param  Index  Specifies the register number of the CPUCFG to read the data.
+  @param  Data   A pointer to the variable used to store the CPUCFG register value.
+**/
+VOID
+AsmCpucfg (
+  IN  UINT32  Index,
+  OUT UINT32  *Data
+  );
+
 #endif // defined (MDE_CPU_LOONGARCH64)
 
 //
