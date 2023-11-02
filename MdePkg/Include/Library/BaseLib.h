@@ -126,6 +126,20 @@ typedef struct {
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT  8
 
+/**
+  Reads the current value of CNTPCT_EL0 register.
+
+  Reads and returns the current value of CNTPCT_EL0.
+  This function is only available on AARCH64.
+
+  @return The current value of CNTPCT_EL0
+**/
+UINT64
+EFIAPI
+ArmReadCntPctReg (
+  VOID
+  );
+
 #endif // defined (MDE_CPU_AARCH64)
 
 #if defined (MDE_CPU_RISCV64)
