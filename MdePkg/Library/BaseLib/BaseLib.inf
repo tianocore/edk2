@@ -421,6 +421,7 @@
   LoongArch64/SetJumpLongJump.S     | GCC
   LoongArch64/SwitchStack.S         | GCC
   LoongArch64/ExceptionBase.S       | GCC
+  LoongArch64/Cpucfg.S              | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
