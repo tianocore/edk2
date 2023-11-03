@@ -94,6 +94,7 @@
   DebugAgentLib
   CpuExceptionHandlerLib
   PcdLib
+  ImagePropertiesRecordLib
 
 [Guids]
   gEfiEventMemoryMapChangeGuid                  ## PRODUCES             ## Event
