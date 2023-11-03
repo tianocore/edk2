@@ -13,6 +13,7 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/ImagePropertiesRecordLib.h>
 
 #define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
@@ -857,4 +858,189 @@ FindImageRecord (
   }
 
   return NULL;
+}
+
+/**
+  Creates an IMAGE_PROPERTIES_RECORD from a loaded PE image. The PE/COFF header will be found
+  and parsed to determine the number of code segments and their base addresses and sizes.
+
+  @param[in]      ImageBase               Base of the PE image
+  @param[in]      ImageSize               Size of the PE image
+  @param[in]      RequiredAlignment       If non-NULL, the alignment specified in the PE/COFF header
+                                          will be compared against this value.
+  @param[out]     ImageRecord             On out, a populated image properties record
+
+  @retval     EFI_INVALID_PARAMETER   This function ImageBase or ImageRecord was NULL, or the
+                                      image located at ImageBase was not a valid PE/COFF image
+  @retval     EFI_OUT_OF_RESOURCES    Failure to Allocate()
+  @retval     EFI_ABORTED             The input Alignment was non-NULL and did not match the
+                                      alignment specified in the PE/COFF header
+  @retval     EFI_SUCCESS             The image properties record was successfully created
+**/
+EFI_STATUS
+EFIAPI
+CreateImagePropertiesRecord (
+  IN  CONST   VOID                     *ImageBase,
+  IN  CONST   UINT64                   ImageSize,
+  IN  CONST   UINT32                   *RequiredAlignment OPTIONAL,
+  OUT         IMAGE_PROPERTIES_RECORD  *ImageRecord
+  )
+{
+  EFI_STATUS                            Status;
+  EFI_IMAGE_DOS_HEADER                  *DosHdr;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Hdr;
+  EFI_IMAGE_SECTION_HEADER              *Section;
+  IMAGE_PROPERTIES_RECORD_CODE_SECTION  *ImageRecordCodeSection;
+  UINTN                                 Index;
+  UINT8                                 *Name;
+  UINT32                                SectionAlignment;
+  UINT32                                PeCoffHeaderOffset;
+
+  if ((ImageRecord == NULL) || (ImageBase == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "Creating Image Properties Record: 0x%016lx - 0x%016lx\n",
+    (EFI_PHYSICAL_ADDRESS)(UINTN)ImageBase,
+    ImageSize
+    ));
+
+  //
+  // Step 1: record whole region
+  //
+  Status                        = EFI_SUCCESS;
+  ImageRecord->Signature        = IMAGE_PROPERTIES_RECORD_SIGNATURE;
+  ImageRecord->ImageBase        = (EFI_PHYSICAL_ADDRESS)(UINTN)ImageBase;
+  ImageRecord->ImageSize        = ImageSize;
+  ImageRecord->CodeSegmentCount = 0;
+  InitializeListHead (&ImageRecord->Link);
+  InitializeListHead (&ImageRecord->CodeSegmentList);
+
+  // Check PE/COFF image
+  DosHdr             = (EFI_IMAGE_DOS_HEADER *)(UINTN)ImageBase;
+  PeCoffHeaderOffset = 0;
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+    PeCoffHeaderOffset = DosHdr->e_lfanew;
+  }
+
+  Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINT8 *)(UINTN)ImageBase + PeCoffHeaderOffset);
+  if (Hdr.Pe32->Signature != EFI_IMAGE_NT_SIGNATURE) {
+    DEBUG ((DEBUG_VERBOSE, "Hdr.Pe32->Signature invalid - 0x%x\n", Hdr.Pe32->Signature));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Get SectionAlignment
+  if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    SectionAlignment = Hdr.Pe32->OptionalHeader.SectionAlignment;
+  } else {
+    SectionAlignment = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
+  }
+
+  // Check RequiredAlignment
+  if ((RequiredAlignment != NULL) && ((SectionAlignment & (*RequiredAlignment - 1)) != 0)) {
+    DEBUG ((
+      DEBUG_WARN,
+      "!!!!!!!!  Image Section Alignment(0x%x) does not match Required Alignment (0x%x)  !!!!!!!!\n",
+      SectionAlignment,
+      *RequiredAlignment
+      ));
+
+    return EFI_ABORTED;
+  }
+
+  Section = (EFI_IMAGE_SECTION_HEADER *)(
+                                         (UINT8 *)(UINTN)ImageBase +
+                                         PeCoffHeaderOffset +
+                                         sizeof (UINT32) +
+                                         sizeof (EFI_IMAGE_FILE_HEADER) +
+                                         Hdr.Pe32->FileHeader.SizeOfOptionalHeader
+                                         );
+  for (Index = 0; Index < Hdr.Pe32->FileHeader.NumberOfSections; Index++) {
+    Name = Section[Index].Name;
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "  Section - '%c%c%c%c%c%c%c%c'\n",
+      Name[0],
+      Name[1],
+      Name[2],
+      Name[3],
+      Name[4],
+      Name[5],
+      Name[6],
+      Name[7]
+      ));
+
+    if ((Section[Index].Characteristics & EFI_IMAGE_SCN_CNT_CODE) != 0) {
+      DEBUG ((DEBUG_VERBOSE, "  VirtualSize          - 0x%08x\n", Section[Index].Misc.VirtualSize));
+      DEBUG ((DEBUG_VERBOSE, "  VirtualAddress       - 0x%08x\n", Section[Index].VirtualAddress));
+      DEBUG ((DEBUG_VERBOSE, "  SizeOfRawData        - 0x%08x\n", Section[Index].SizeOfRawData));
+      DEBUG ((DEBUG_VERBOSE, "  PointerToRawData     - 0x%08x\n", Section[Index].PointerToRawData));
+      DEBUG ((DEBUG_VERBOSE, "  PointerToRelocations - 0x%08x\n", Section[Index].PointerToRelocations));
+      DEBUG ((DEBUG_VERBOSE, "  PointerToLinenumbers - 0x%08x\n", Section[Index].PointerToLinenumbers));
+      DEBUG ((DEBUG_VERBOSE, "  NumberOfRelocations  - 0x%08x\n", Section[Index].NumberOfRelocations));
+      DEBUG ((DEBUG_VERBOSE, "  NumberOfLinenumbers  - 0x%08x\n", Section[Index].NumberOfLinenumbers));
+      DEBUG ((DEBUG_VERBOSE, "  Characteristics      - 0x%08x\n", Section[Index].Characteristics));
+
+      // Record code section(s)
+      ImageRecordCodeSection = AllocatePool (sizeof (*ImageRecordCodeSection));
+      if (ImageRecordCodeSection == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      ImageRecordCodeSection->Signature = IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE;
+
+      ImageRecordCodeSection->CodeSegmentBase = (UINTN)ImageBase + Section[Index].VirtualAddress;
+      ImageRecordCodeSection->CodeSegmentSize = Section[Index].SizeOfRawData;
+
+      InsertTailList (&ImageRecord->CodeSegmentList, &ImageRecordCodeSection->Link);
+      ImageRecord->CodeSegmentCount++;
+    }
+  }
+
+  if (ImageRecord->CodeSegmentCount > 0) {
+    SortImageRecordCodeSection (ImageRecord);
+  }
+
+  return Status;
+}
+
+/**
+  Deleted an image properties record. The function will also call
+  RemoveEntryList() on each code segment and the input ImageRecord before
+  freeing each pool.
+
+  @param[in]      ImageRecord             The IMAGE_PROPERTIES_RECORD to delete
+**/
+VOID
+EFIAPI
+DeleteImagePropertiesRecord (
+  IN  IMAGE_PROPERTIES_RECORD  *ImageRecord
+  )
+{
+  LIST_ENTRY                            *CodeSegmentListHead;
+  IMAGE_PROPERTIES_RECORD_CODE_SECTION  *ImageRecordCodeSection;
+
+  if (ImageRecord == NULL) {
+    return;
+  }
+
+  CodeSegmentListHead = &ImageRecord->CodeSegmentList;
+  while (!IsListEmpty (CodeSegmentListHead)) {
+    ImageRecordCodeSection = CR (
+                               CodeSegmentListHead->ForwardLink,
+                               IMAGE_PROPERTIES_RECORD_CODE_SECTION,
+                               Link,
+                               IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE
+                               );
+    RemoveEntryList (&ImageRecordCodeSection->Link);
+    FreePool (ImageRecordCodeSection);
+  }
+
+  if (!IsListEmpty (&ImageRecord->Link)) {
+    RemoveEntryList (&ImageRecord->Link);
+  }
+
+  FreePool (ImageRecord);
 }

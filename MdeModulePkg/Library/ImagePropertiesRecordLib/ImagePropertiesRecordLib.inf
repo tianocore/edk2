@@ -23,6 +23,7 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  MemoryAllocationLib
 
 [Packages]
   MdePkg/MdePkg.dec
