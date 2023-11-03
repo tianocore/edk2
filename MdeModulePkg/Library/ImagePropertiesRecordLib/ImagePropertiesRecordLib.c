@@ -784,6 +784,35 @@ SortImageRecord (
 }
 
 /**
+  Dump image record.
+
+  @param[in]  ImageRecordList  A list of IMAGE_PROPERTIES_RECORD entries
+**/
+VOID
+EFIAPI
+DumpImageRecord (
+  IN LIST_ENTRY  *ImageRecordList
+  )
+{
+  IMAGE_PROPERTIES_RECORD  *ImageRecord;
+  LIST_ENTRY               *ImageRecordLink;
+  UINTN                    Index;
+
+  for (ImageRecordLink = ImageRecordList->ForwardLink, Index = 0;
+       ImageRecordLink != ImageRecordList;
+       ImageRecordLink = ImageRecordLink->ForwardLink, Index++)
+  {
+    ImageRecord = CR (
+                    ImageRecordLink,
+                    IMAGE_PROPERTIES_RECORD,
+                    Link,
+                    IMAGE_PROPERTIES_RECORD_SIGNATURE
+                    );
+    DEBUG ((DEBUG_VERBOSE, "Image[%d]: 0x%016lx - 0x%016lx\n", Index, ImageRecord->ImageBase, ImageRecord->ImageSize));
+  }
+}
+
+/**
   Find image record according to image base and size.
 
   @param[in]  ImageBase           Base of PE image
