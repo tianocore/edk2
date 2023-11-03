@@ -57,6 +57,7 @@
   MdeModulePkg/Library/ImagePropertiesRecordLib/UnitTest/ImagePropertiesRecordLibUnitTestHost.inf {
     <LibraryClasses>
       ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
+      PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   }
 
   #

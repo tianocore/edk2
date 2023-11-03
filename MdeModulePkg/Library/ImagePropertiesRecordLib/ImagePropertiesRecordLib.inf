@@ -24,6 +24,7 @@
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  PeCoffGetEntryPointLib
 
 [Packages]
   MdePkg/MdePkg.dec
