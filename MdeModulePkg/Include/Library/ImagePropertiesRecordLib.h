@@ -181,4 +181,15 @@ FindImageRecord (
   IN LIST_ENTRY            *ImageRecordList
   );
 
+/**
+  Dump image record.
+
+  @param[in]  ImageRecordList  A list of IMAGE_PROPERTIES_RECORD entries
+**/
+VOID
+EFIAPI
+DumpImageRecord (
+  IN LIST_ENTRY  *ImageRecordList
+  );
+
 #endif
