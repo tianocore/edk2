@@ -20,19 +20,20 @@
 ; Variables referenced by C code
 ;
 
+%define MSR_IA32_U_CET                     0x6A0
 %define MSR_IA32_S_CET                     0x6A2
-%define   MSR_IA32_CET_SH_STK_EN             0x1
-%define   MSR_IA32_CET_WR_SHSTK_EN           0x2
-%define   MSR_IA32_CET_ENDBR_EN              0x4
-%define   MSR_IA32_CET_LEG_IW_EN             0x8
-%define   MSR_IA32_CET_NO_TRACK_EN           0x10
-%define   MSR_IA32_CET_SUPPRESS_DIS          0x20
-%define   MSR_IA32_CET_SUPPRESS              0x400
-%define   MSR_IA32_CET_TRACKER               0x800
+%define MSR_IA32_CET_SH_STK_EN             0x1
+%define MSR_IA32_CET_WR_SHSTK_EN           0x2
+%define MSR_IA32_CET_ENDBR_EN              0x4
+%define MSR_IA32_CET_LEG_IW_EN             0x8
+%define MSR_IA32_CET_NO_TRACK_EN           0x10
+%define MSR_IA32_CET_SUPPRESS_DIS          0x20
+%define MSR_IA32_CET_SUPPRESS              0x400
+%define MSR_IA32_CET_TRACKER               0x800
 %define MSR_IA32_PL0_SSP                   0x6A4
 %define MSR_IA32_INTERRUPT_SSP_TABLE_ADDR  0x6A8
 
-%define CR4_CET                            0x800000
+%define CR4_CET_BIT                        23
 
 %define MSR_IA32_MISC_ENABLE 0x1A0
 %define MSR_EFER      0xc0000080
@@ -230,6 +231,11 @@ ASM_PFX(mPatchCetSupported):
     push    rdx
     push    rax
 
+    mov     ecx, MSR_IA32_U_CET
+    rdmsr
+    push    rdx
+    push    rax
+
     mov     ecx, MSR_IA32_PL0_SSP
     rdmsr
     push    rdx
@@ -239,6 +245,11 @@ ASM_PFX(mPatchCetSupported):
     rdmsr
     push    rdx
     push    rax
+
+    mov     ecx, MSR_IA32_U_CET
+    xor     eax, eax
+    xor     edx, edx
+    wrmsr
 
     mov     ecx, MSR_IA32_S_CET
     mov     eax, MSR_IA32_CET_SH_STK_EN
@@ -276,7 +287,8 @@ CetInterruptDone:
     bts     ecx, 16                     ; set WP
     mov     cr0, rcx
 
-    mov     eax, 0x668 | CR4_CET
+    mov     rax, cr4
+    bts     rax, CR4_CET_BIT
     mov     cr4, rax
 
     setssbsy
@@ -316,13 +328,20 @@ CpuSmmDebugExitAbsAddr:
     add     rsp, 0x200
 
     mov     rax, strict qword 0        ;    mov     rax, ASM_PFX(mCetSupported)
-mCetSupportedAbsAddr:
+mCetSupportedAbsAddr1:
     mov     al, [rax]
     cmp     al, 0
     jz      CetDone2
 
-    mov     eax, 0x668
-    mov     cr4, rax       ; disable CET
+    mov     ecx, MSR_IA32_S_CET
+    xor     eax, eax
+    xor     edx, edx
+    wrmsr
+
+    ; clear CR4.CET bit
+    mov     rax, cr4
+    btr     rax, CR4_CET_BIT
+    mov     cr4, rax
 
     mov     ecx, MSR_IA32_INTERRUPT_SSP_TABLE_ADDR
     pop     rax
@@ -334,10 +353,15 @@ mCetSupportedAbsAddr:
     pop     rdx
     wrmsr
 
-    mov     ecx, MSR_IA32_S_CET
+    mov     ecx, MSR_IA32_U_CET
     pop     rax
     pop     rdx
     wrmsr
+
+    mov     ecx, MSR_IA32_S_CET
+    pop     rax
+    pop     rdx
+    mov     ebx, eax
 CetDone2:
 
     mov     rax, strict qword 0         ;       lea     rax, [ASM_PFX(mXdSupported)]
@@ -356,6 +380,19 @@ mXdSupportedAbsAddr:
 .1:
 
     StuffRsb64
+
+    mov     rax, strict qword 0        ;    mov     rax, ASM_PFX(mCetSupported)
+mCetSupportedAbsAddr2:
+    mov     al, [rax]
+    cmp     al, 0
+    jz      CetDone3
+
+    mov     ecx, MSR_IA32_S_CET
+    mov     eax, ebx
+    xor     edx, edx
+    wrmsr
+CetDone3:
+
     rsm
 
 ASM_PFX(gcSmiHandlerSize)    DW      $ - _SmiEntryPoint
@@ -391,6 +428,11 @@ ASM_PFX(PiSmmCpuSmiEntryFixupAddress):
     mov    qword [rcx - 8], rax
 
     lea    rax, [ASM_PFX(mCetSupported)]
-    lea    rcx, [mCetSupportedAbsAddr]
+    lea    rcx, [mCetSupportedAbsAddr1]
     mov    qword [rcx - 8], rax
+
+    lea    rax, [ASM_PFX(mCetSupported)]
+    lea    rcx, [mCetSupportedAbsAddr2]
+    mov    qword [rcx - 8], rax
+
     ret
