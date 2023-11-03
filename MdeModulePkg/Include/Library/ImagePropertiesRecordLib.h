@@ -192,4 +192,43 @@ DumpImageRecord (
   IN LIST_ENTRY  *ImageRecordList
   );
 
+/**
+  Creates an IMAGE_PROPERTIES_RECORD from a loaded PE image. The PE/COFF header will be found
+  and parsed to determine the number of code segments and their base addresses and sizes.
+
+  @param[in]      ImageBase               Base of the PE image
+  @param[in]      ImageSize               Size of the PE image
+  @param[in]      RequiredAlignment       If non-NULL, the alignment specified in the PE/COFF header
+                                          will be compared against this value.
+  @param[out]     ImageRecord             On out, a populated image properties record
+
+  @retval     EFI_INVALID_PARAMETER   This function ImageBase or ImageRecord was NULL, or the
+                                      image located at ImageBase was not a valid PE/COFF image
+  @retval     EFI_OUT_OF_RESOURCES    Failure to Allocate()
+  @retval     EFI_ABORTED             The input Alignment was non-NULL and did not match the
+                                      alignment specified in the PE/COFF header
+  @retval     EFI_SUCCESS             The image properties record was successfully created
+**/
+EFI_STATUS
+EFIAPI
+CreateImagePropertiesRecord (
+  IN  CONST   VOID                     *ImageBase,
+  IN  CONST   UINT64                   ImageSize,
+  IN  CONST   UINT32                   *Alignment OPTIONAL,
+  OUT         IMAGE_PROPERTIES_RECORD  *ImageRecord
+  );
+
+/**
+  Deleted an image properties record. The function will also call
+  RemoveEntryList() on each code segment and the input ImageRecord before
+  freeing each pool.
+
+  @param[in]      ImageRecord             The IMAGE_PROPERTIES_RECORD to delete
+**/
+VOID
+EFIAPI
+DeleteImagePropertiesRecord (
+  IN  IMAGE_PROPERTIES_RECORD  *ImageRecord
+  );
+
 #endif
