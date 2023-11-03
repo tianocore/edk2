@@ -32,56 +32,47 @@ typedef struct {
 } IMAGE_PROPERTIES_RECORD;
 
 /**
-  Split the original memory map, and add more entries to describe PE code section and data section.
-  This function will set EfiRuntimeServicesData to be EFI_MEMORY_XP.
-  This function will merge entries with same attributes finally.
+  Split the original memory map and add more entries to describe PE code
+  and data sections for each image in the input ImageRecordList.
 
-  NOTE: It assumes PE code/data section are page aligned.
-  NOTE: It assumes enough entry is prepared for new memory map.
+  NOTE: This function assumes PE code/data section are page aligned.
+  NOTE: This function assumes there are enough entries for the new memory map.
 
-  Split table:
-   +---------------+
-   | Record X      |
-   +---------------+
-   | Record RtCode |
-   +---------------+
-   | Record Y      |
-   +---------------+
-   ==>
-   +---------------+
-   | Record X      |
-   +---------------+ ----
-   | Record RtData |     |
-   +---------------+     |
-   | Record RtCode |     |-> PE/COFF1
-   +---------------+     |
-   | Record RtData |     |
-   +---------------+ ----
-   | Record RtData |     |
-   +---------------+     |
-   | Record RtCode |     |-> PE/COFF2
-   +---------------+     |
-   | Record RtData |     |
-   +---------------+ ----
-   | Record Y      |
-   +---------------+
+  |         |      |      |      |      |      |         |
+  | 4K PAGE | DATA | CODE | DATA | CODE | DATA | 4K PAGE |
+  |         |      |      |      |      |      |         |
+  Assume the above memory region is the result of one split memory map descriptor. It's unlikely
+  that a linker will orient an image this way, but the caller must assume the worst case scenario.
+  This image layout example contains code sections oriented in a way that maximizes the number of
+  descriptors which would be required to describe each section. To ensure we have enough space
+  for every descriptor of the broken up memory map, the caller must assume that every image will
+  have the maximum number of code sections oriented in a way which maximizes the number of data
+  sections with unrelated memory regions flanking each image within a single descriptor.
 
-  @param  MemoryMapSize                   A pointer to the size, in bytes, of the
-                                          MemoryMap buffer. On input, this is the size of
-                                          old MemoryMap before split. The actual buffer
-                                          size of MemoryMap is MemoryMapSize +
-                                          (AdditionalRecordCount * DescriptorSize) calculated
-                                          below. On output, it is the size of new MemoryMap
-                                          after split.
-  @param  MemoryMap                       A pointer to the buffer in which firmware places
-                                          the current memory map.
-  @param  DescriptorSize                  Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
-  @param  ImageRecordList                 A list of IMAGE_PROPERTIES_RECORD entries used when searching
-                                          for an image record contained by the memory range described in
-                                          EFI memory map descriptors.
-  @param  NumberOfAdditionalDescriptors   The number of unused descriptors at the end of the input MemoryMap.
+  Given an image record list, the caller should use the following formula when allocating extra descriptors:
+  NumberOfAdditionalDescriptors = (MemoryMapSize / DescriptorSize) +
+                                    ((2 * <Most Code Segments in a Single Image> + 3) * <Number of Images>)
+
+  @param[in, out] MemoryMapSize                   IN:   The size, in bytes, of the old memory map before the split.
+                                                  OUT:  The size, in bytes, of the used descriptors of the split
+                                                        memory map
+  @param[in, out] MemoryMap                       IN:   A pointer to the buffer containing the current memory map.
+                                                        This buffer must have enough space to accomodate the "worst case"
+                                                        scenario where every image in ImageRecordList needs a new descriptor
+                                                        to describe its code and data sections.
+                                                  OUT:  A pointer to the updated memory map with separated image section
+                                                        descriptors.
+  @param[in]      DescriptorSize                  The size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+  @param[in]      ImageRecordList                 A list of IMAGE_PROPERTIES_RECORD entries used when searching
+                                                  for an image record contained by the memory range described in
+                                                  EFI memory map descriptors.
+  @param[in]      NumberOfAdditionalDescriptors   The number of unused descriptors at the end of the input MemoryMap.
+                                                  The formula in the description should be used to calculate this value.
+
+  @retval EFI_SUCCESS                             The memory map was successfully split.
+  @retval EFI_INVALID_PARAMETER                   MemoryMapSize, MemoryMap, or ImageRecordList was NULL.
 **/
-VOID
+EFI_STATUS
 EFIAPI
 SplitTable (
   IN OUT UINTN                  *MemoryMapSize,
@@ -92,23 +83,30 @@ SplitTable (
   );
 
 /**
-  Sort code section in image record, based upon CodeSegmentBase from low to high.
+  Sort the code sections in the input ImageRecord based upon CodeSegmentBase from low to high.
 
-  @param  ImageRecord    image record to be sorted
+  @param[in]  ImageRecord         IMAGE_PROPERTIES_RECORD to be sorted
+
+  @retval EFI_SUCCESS             The code sections in the input ImageRecord were sorted successfully
+  @retval EFI_ABORTED             An error occurred while sorting the code sections in the input ImageRecord
+  @retval EFI_INVALID_PARAMETER   ImageRecord is NULL
 **/
-VOID
+EFI_STATUS
 EFIAPI
 SortImageRecordCodeSection (
   IN IMAGE_PROPERTIES_RECORD  *ImageRecord
   );
 
 /**
-  Check if code section in image record is valid.
+  Check if the code sections in the input ImageRecord are valid.
+  The code sections are valid if they don't overlap, are contained
+  within the the ImageRecord's ImageBase and ImageSize, and are
+  contained within the MAX_ADDRESS.
 
-  @param  ImageRecord    image record to be checked
+  @param[in]  ImageRecord    IMAGE_PROPERTIES_RECORD to be checked
 
-  @retval TRUE  image record is valid
-  @retval FALSE image record is invalid
+  @retval TRUE  The code sections in the input ImageRecord are valid
+  @retval FALSE The code sections in the input ImageRecord are invalid
 **/
 BOOLEAN
 EFIAPI
@@ -117,11 +115,15 @@ IsImageRecordCodeSectionValid (
   );
 
 /**
-  Sort image record based upon the ImageBase from low to high.
+  Sort the input ImageRecordList based upon the ImageBase from low to high.
 
-  @param ImageRecordList    Image record list to be sorted
+  @param[in] ImageRecordList    Image record list to be sorted
+
+  @retval EFI_SUCCESS           The image record list was sorted successfully
+  @retval EFI_ABORTED           An error occurred while sorting the image record list
+  @retval EFI_INVALID_PARAMETER ImageRecordList is NULL
 **/
-VOID
+EFI_STATUS
 EFIAPI
 SortImageRecord (
   IN LIST_ENTRY  *ImageRecordList
@@ -132,8 +134,11 @@ SortImageRecord (
 
   @param[in]  FirstImageRecord   The first image record.
   @param[in]  SecondImageRecord  The second image record.
+
+  @retval EFI_SUCCESS            The image records were swapped successfully
+  @retval EFI_INVALID_PARAMETER  FirstImageRecord or SecondImageRecord is NULL
 **/
-VOID
+EFI_STATUS
 EFIAPI
 SwapImageRecord (
   IN IMAGE_PROPERTIES_RECORD  *FirstImageRecord,
@@ -145,8 +150,11 @@ SwapImageRecord (
 
   @param[in]  FirstImageRecordCodeSection    The first code section
   @param[in]  SecondImageRecordCodeSection   The second code section
+
+  @retval EFI_SUCCESS                        The code sections were swapped successfully
+  @retval EFI_INVALID_PARAMETER              FirstImageRecordCodeSection or SecondImageRecordCodeSection is NULL
 **/
-VOID
+EFI_STATUS
 EFIAPI
 SwapImageRecordCodeSection (
   IN IMAGE_PROPERTIES_RECORD_CODE_SECTION  *FirstImageRecordCodeSection,
@@ -154,13 +162,16 @@ SwapImageRecordCodeSection (
   );
 
 /**
-  Find image record according to image base and size.
+  Find image properties record according to image base and size in the
+  input ImageRecordList.
 
-  @param  ImageBase           Base of PE image
-  @param  ImageSize           Size of PE image
-  @param  ImageRecordList     Image record list to be searched
+  @param[in]  ImageBase           Base of PE image
+  @param[in]  ImageSize           Size of PE image
+  @param[in]  ImageRecordList     Image record list to be searched
 
-  @return image record
+  @retval    NULL             No IMAGE_PROPERTIES_RECORD matches ImageBase
+                              and ImageSize in the input ImageRecordList
+  @retval    Other            The found IMAGE_PROPERTIES_RECORD
 **/
 IMAGE_PROPERTIES_RECORD *
 EFIAPI
