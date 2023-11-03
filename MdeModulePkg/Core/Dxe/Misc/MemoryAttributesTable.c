@@ -284,6 +284,15 @@ InstallMemoryAttributesTableOnEndOfDxe (
 {
   mMemoryAttributesTableEndOfDxe = TRUE;
   InstallMemoryAttributesTable ();
+
+  DEBUG_CODE_BEGIN ();
+  if ( mImagePropertiesPrivateData.ImageRecordCount > 0) {
+    DEBUG ((DEBUG_INFO, "DXE - Total Runtime Image Count: 0x%x\n", mImagePropertiesPrivateData.ImageRecordCount));
+    DEBUG ((DEBUG_INFO, "DXE - Dump Runtime Image Records:\n"));
+    DumpImageRecords (&mImagePropertiesPrivateData.ImageRecordList);
+  }
+
+  DEBUG_CODE_END ();
 }
 
 /**
