@@ -496,9 +496,14 @@ SmmInstallMemoryAttributesTable (
     return EFI_SUCCESS;
   }
 
-  DEBUG ((DEBUG_VERBOSE, "SMM Total Image Count - 0x%x\n", mImagePropertiesPrivateData.ImageRecordCount));
-  DEBUG ((DEBUG_VERBOSE, "SMM Dump ImageRecord:\n"));
-  DumpImageRecord (&mImagePropertiesPrivateData.ImageRecordList);
+  DEBUG_CODE_BEGIN ();
+  if ( mImagePropertiesPrivateData.ImageRecordCount > 0) {
+    DEBUG ((DEBUG_INFO, "SMM - Total Runtime Image Count - 0x%x\n", mImagePropertiesPrivateData.ImageRecordCount));
+    DEBUG ((DEBUG_INFO, "SMM - Dump Runtime Image Records:\n"));
+    DumpImageRecords (&mImagePropertiesPrivateData.ImageRecordList);
+  }
+
+  DEBUG_CODE_END ();
 
   PublishMemoryAttributesTable ();
 

@@ -14,6 +14,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/ImagePropertiesRecordLib.h>
 
 #define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
@@ -785,31 +786,128 @@ SortImageRecord (
 }
 
 /**
-  Dump image record.
+  Extract the .efi filename out of the input PDB.
 
-  @param[in]  ImageRecordList  A list of IMAGE_PROPERTIES_RECORD entries
+  @param[in]      PdbPointer      Pointer to the PDB file path.
+  @param[out]     EfiFileName     Pointer to the .efi filename.
+  @param[in]      EfiFileNameSize Size of the .efi filename buffer.
+**/
+STATIC
+VOID
+GetFilename (
+  IN CHAR8   *PdbPointer,
+  OUT CHAR8  *EfiFileName,
+  IN UINTN   EfiFileNameSize
+  )
+{
+  UINTN  Index;
+  UINTN  StartIndex;
+
+  if ((PdbPointer == NULL) || (EfiFileNameSize < 5)) {
+    return;
+  }
+
+  // Print Module Name by Pdb file path.
+  StartIndex = 0;
+  for (Index = 0; PdbPointer[Index] != 0; Index++) {
+    if ((PdbPointer[Index] == '\\') || (PdbPointer[Index] == '/')) {
+      StartIndex = Index + 1;
+    }
+  }
+
+  // Copy the PDB file name to EfiFileName and replace .pdb with .efi
+  for (Index = 0; Index < EfiFileNameSize - 4; Index++) {
+    EfiFileName[Index] = PdbPointer[Index + StartIndex];
+    if (EfiFileName[Index] == 0) {
+      EfiFileName[Index] = '.';
+    }
+
+    if (EfiFileName[Index] == '.') {
+      EfiFileName[Index + 1] = 'e';
+      EfiFileName[Index + 2] = 'f';
+      EfiFileName[Index + 3] = 'i';
+      EfiFileName[Index + 4] = 0;
+      break;
+    }
+  }
+
+  if (Index == sizeof (EfiFileName) - 4) {
+    EfiFileName[Index] = 0;
+  }
+}
+
+/**
+  Debug dumps the input list of IMAGE_PROPERTIES_RECORD structs.
+
+  @param[in]  ImageRecordList   Head of the IMAGE_PROPERTIES_RECORD list
 **/
 VOID
 EFIAPI
-DumpImageRecord (
+DumpImageRecords (
   IN LIST_ENTRY  *ImageRecordList
   )
 {
-  IMAGE_PROPERTIES_RECORD  *ImageRecord;
-  LIST_ENTRY               *ImageRecordLink;
-  UINTN                    Index;
+  LIST_ENTRY                            *ImageRecordLink;
+  IMAGE_PROPERTIES_RECORD               *CurrentImageRecord;
+  LIST_ENTRY                            *CodeSectionLink;
+  IMAGE_PROPERTIES_RECORD_CODE_SECTION  *CurrentCodeSection;
+  CHAR8                                 *PdbPointer;
+  CHAR8                                 EfiFileName[256];
 
-  for (ImageRecordLink = ImageRecordList->ForwardLink, Index = 0;
-       ImageRecordLink != ImageRecordList;
-       ImageRecordLink = ImageRecordLink->ForwardLink, Index++)
-  {
-    ImageRecord = CR (
-                    ImageRecordLink,
-                    IMAGE_PROPERTIES_RECORD,
-                    Link,
-                    IMAGE_PROPERTIES_RECORD_SIGNATURE
-                    );
-    DEBUG ((DEBUG_VERBOSE, "Image[%d]: 0x%016lx - 0x%016lx\n", Index, ImageRecord->ImageBase, ImageRecord->ImageSize));
+  if (ImageRecordList == NULL) {
+    return;
+  }
+
+  ImageRecordLink = ImageRecordList->ForwardLink;
+
+  while (ImageRecordLink != ImageRecordList) {
+    CurrentImageRecord = CR (
+                           ImageRecordLink,
+                           IMAGE_PROPERTIES_RECORD,
+                           Link,
+                           IMAGE_PROPERTIES_RECORD_SIGNATURE
+                           );
+
+    PdbPointer = PeCoffLoaderGetPdbPointer ((VOID *)(UINTN)CurrentImageRecord->ImageBase);
+    if (PdbPointer != NULL) {
+      GetFilename (PdbPointer, EfiFileName, sizeof (EfiFileName));
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: 0x%llx - 0x%llx\n",
+        EfiFileName,
+        CurrentImageRecord->ImageBase,
+        CurrentImageRecord->ImageBase + CurrentImageRecord->ImageSize
+        ));
+    } else {
+      DEBUG ((
+        DEBUG_INFO,
+        "Unknown Image: 0x%llx - 0x%llx\n",
+        CurrentImageRecord->ImageBase,
+        CurrentImageRecord->ImageBase + CurrentImageRecord->ImageSize
+        ));
+    }
+
+    CodeSectionLink = CurrentImageRecord->CodeSegmentList.ForwardLink;
+
+    while (CodeSectionLink != &CurrentImageRecord->CodeSegmentList) {
+      CurrentCodeSection = CR (
+                             CodeSectionLink,
+                             IMAGE_PROPERTIES_RECORD_CODE_SECTION,
+                             Link,
+                             IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE
+                             );
+
+      DEBUG ((
+        DEBUG_INFO,
+        "  Code Section: 0x%llx - 0x%llx\n",
+        CurrentCodeSection->CodeSegmentBase,
+        CurrentCodeSection->CodeSegmentBase + CurrentCodeSection->CodeSegmentSize
+        ));
+
+      CodeSectionLink = CodeSectionLink->ForwardLink;
+    }
+
+    ImageRecordLink = ImageRecordLink->ForwardLink;
   }
 }
 
