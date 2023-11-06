@@ -11,26 +11,6 @@
 #include <Library/DebugLib.h>
 
 /**
-  RISC-V invalidate instruction cache.
-
-**/
-VOID
-EFIAPI
-RiscVInvalidateInstCacheAsm (
-  VOID
-  );
-
-/**
-  RISC-V invalidate data cache.
-
-**/
-VOID
-EFIAPI
-RiscVInvalidateDataCacheAsm (
-  VOID
-  );
-
-/**
   Invalidates the entire instruction cache in cache coherency domain of the
   calling CPU.
 
