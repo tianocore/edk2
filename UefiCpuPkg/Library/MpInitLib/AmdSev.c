@@ -256,7 +256,14 @@ FillExchangeInfoDataSevEs (
   if (StdRangeMax >= CPUID_EXTENDED_TOPOLOGY) {
     CPUID_EXTENDED_TOPOLOGY_EBX  ExtTopoEbx;
 
-    AsmCpuid (CPUID_EXTENDED_TOPOLOGY, NULL, &ExtTopoEbx.Uint32, NULL, NULL);
+    AsmCpuidEx (
+      CPUID_EXTENDED_TOPOLOGY,
+      0,
+      NULL,
+      &ExtTopoEbx.Uint32,
+      NULL,
+      NULL
+      );
     ExchangeInfo->ExtTopoAvail = !!ExtTopoEbx.Bits.LogicalProcessors;
   }
 }
