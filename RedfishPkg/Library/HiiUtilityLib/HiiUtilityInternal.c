@@ -5451,6 +5451,7 @@ GetQuestionDefault (
 
   Status            = EFI_NOT_FOUND;
   StrValue          = NULL;
+  ConfigAccess      = NULL;
   OriginalDefaultId = DefaultId;
   DefaultLink       = GetFirstNode (&FormSet->DefaultStoreListHead);
 
