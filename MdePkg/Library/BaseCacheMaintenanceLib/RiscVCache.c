@@ -21,7 +21,7 @@ InvalidateInstructionCache (
   VOID
   )
 {
-  RiscVInvalidateInstCacheAsm ();
+  RiscVInvalidateInstCacheFenceAsm ();
 }
 
 /**
@@ -193,7 +193,7 @@ InvalidateDataCache (
   VOID
   )
 {
-  RiscVInvalidateDataCacheAsm ();
+  RiscVInvalidateDataCacheFenceAsm ();
 }
 
 /**
