@@ -78,6 +78,7 @@
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
+  gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC

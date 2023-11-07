@@ -57,3 +57,10 @@
   #  in the MM phase. Minimum value is 1. Sections nested more deeply are rejected.
   # @Prompt Maximum permitted FwVol section nesting depth (exclusive) in MM.
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth|0x10|UINT32|0x00000001
+
+[PcdsFeatureFlag]
+  ## Indicates if restart MM Dispatcher once MM Entry Point is registered.<BR><BR>
+  #   TRUE  - Restart MM Dispatcher once MM Entry Point is registered.<BR>
+  #   FALSE - Do not restart MM Dispatcher once MM Entry Point is registered.<BR>
+  # @Prompt Restart MM Dispatcher once MM Entry Point is registered.
+  gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered|FALSE|BOOLEAN|0x00000002
