@@ -586,6 +586,7 @@ MmDispatcher (
   LIST_ENTRY           *Link;
   EFI_MM_DRIVER_ENTRY  *DriverEntry;
   BOOLEAN              ReadyToRun;
+  BOOLEAN              PreviousMmEntryPointRegistered;
 
   DEBUG ((DEBUG_INFO, "MmDispatcher\n"));
 
@@ -650,6 +651,11 @@ MmDispatcher (
       RemoveEntryList (&DriverEntry->ScheduledLink);
 
       //
+      // Cache state of MmEntryPointRegistered before calling entry point
+      //
+      PreviousMmEntryPointRegistered = gMmCorePrivate->MmEntryPointRegistered;
+
+      //
       // For each MM driver, pass NULL as ImageHandle
       //
       if (mEfiSystemTable == NULL) {
@@ -666,6 +672,22 @@ MmDispatcher (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_INFO, "StartImage Status - %r\n", Status));
         MmFreePages (DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);
+      }
+
+      if (!PreviousMmEntryPointRegistered && gMmCorePrivate->MmEntryPointRegistered) {
+        if (FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
+          //
+          // Return immediately if the MM Entry Point was registered by the MM
+          // Driver that was just dispatched. The MM IPL will reinvoke the MM
+          // Core Dispatcher. This is required so MM Mode may be enabled as soon
+          // as all the dependent MM Drivers for MM Mode have been dispatched.
+          // Once the MM Entry Point has been registered, then MM Mode will be
+          // used.
+          //
+          gRequestDispatch   = TRUE;
+          gDispatcherRunning = FALSE;
+          return EFI_NOT_READY;
+        }
       }
     }
 
@@ -893,6 +915,60 @@ MmAddToDriverList (
 
   InsertTailList (&mDiscoveredList, &DriverEntry->Link);
   gRequestDispatch = TRUE;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Event notification that is fired MM IPL to dispatch the previously discovered MM drivers.
+
+  @param[in]       DispatchHandle  The unique handle assigned to this handler by MmiHandlerRegister().
+  @param[in]       Context         Points to an optional handler context which was specified when the
+                                   handler was registered.
+  @param[in, out]  CommBuffer      A pointer to a collection of data in memory that will
+                                   be conveyed from a non-MM environment into an MM environment.
+  @param[in, out]  CommBufferSize  The size of the CommBuffer.
+
+  @return EFI_SUCCESS              Dispatcher is executed.
+
+**/
+EFI_STATUS
+EFIAPI
+MmDriverDispatchHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+
+  DEBUG ((DEBUG_INFO, "MmDriverDispatchHandler\n"));
+
+  //
+  // Execute the MM Dispatcher on MM drivers that have been discovered
+  // previously but not dispatched.
+  //
+  Status = MmDispatcher ();
+
+  //
+  // Check to see if CommBuffer and CommBufferSize are valid
+  //
+  if ((CommBuffer != NULL) && (CommBufferSize != NULL)) {
+    if (*CommBufferSize > 0) {
+      if (!EFI_ERROR (Status)) {
+        //
+        // Set the flag to show that the MM Dispatcher executed without errors
+        //
+        *(UINT8 *)CommBuffer = COMM_BUFFER_MM_DISPATCH_SUCCESS;
+      } else {
+        //
+        // Set the flag to show that the MM Dispatcher encountered an error
+        //
+        *(UINT8 *)CommBuffer = COMM_BUFFER_MM_DISPATCH_ERROR;
+      }
+    }
+  }
 
   return EFI_SUCCESS;
 }

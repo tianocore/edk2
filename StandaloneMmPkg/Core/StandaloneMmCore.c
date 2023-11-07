@@ -84,6 +84,7 @@ EFI_MM_SYSTEM_TABLE  gMmCoreMmst = {
 // Table of MMI Handlers that are registered by the MM Core when it is initialized
 //
 MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
+  { MmDriverDispatchHandler,  &gEfiEventDxeDispatchGuid,         NULL, TRUE  },
   { MmReadyToLockHandler,     &gEfiDxeMmReadyToLockProtocolGuid, NULL, TRUE  },
   { MmEndOfDxeHandler,        &gEfiEndOfDxeEventGroupGuid,       NULL, FALSE },
   { MmExitBootServiceHandler, &gEfiEventExitBootServicesGuid,    NULL, FALSE },
