@@ -1238,6 +1238,14 @@ RootBridgeIoPciAccess (
     }
   }
 
+  //
+  // Perform readback after write to confirm completion was received for the last write
+  // before subsequent memory operations can be issued.
+  //
+  if (!Read) {
+    PciSegmentRead8 (Address - InStride);
+  }
+
   return EFI_SUCCESS;
 }
 
