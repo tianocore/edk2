@@ -38,6 +38,8 @@ typedef enum {
 
 STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
 
+#define MAX_RETRIES_PER_PAGE  3
+
 /**
   Returns boolean to indicate whether to indicate which, if any, memory encryption is enabled
 
@@ -527,6 +529,13 @@ SetOrClearSharedBit (
   EFI_STATUS                    Status;
   EDKII_MEMORY_ACCEPT_PROTOCOL  *MemoryAcceptProtocol;
 
+  UINT64  MapGpaRetryAddr;
+  UINT32  RetryCount;
+  UINT64  EndAddress;
+
+  MapGpaRetryAddr = 0;
+  RetryCount      = 0;
+
   AddressEncMask = GetMemEncryptionAddressMask ();
 
   //
@@ -540,7 +549,37 @@ SetOrClearSharedBit (
     PhysicalAddress   &= ~AddressEncMask;
   }
 
-  TdStatus = TdVmCall (TDVMCALL_MAPGPA, PhysicalAddress, Length, 0, 0, NULL);
+  EndAddress = PhysicalAddress + Length;
+  while (RetryCount < MAX_RETRIES_PER_PAGE) {
+    TdStatus = TdVmCall (TDVMCALL_MAPGPA, PhysicalAddress, Length, 0, 0, &MapGpaRetryAddr);
+    if (TdStatus != TDVMCALL_STATUS_RETRY) {
+      break;
+    }
+
+    DEBUG ((DEBUG_VERBOSE, "%a: TdVmcall(MAPGPA) Retry PhysicalAddress is %llx, MapGpaRetryAddr is %llx\n", __func__, PhysicalAddress, MapGpaRetryAddr));
+
+    if ((MapGpaRetryAddr < PhysicalAddress) || (MapGpaRetryAddr >= EndAddress)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: TdVmcall(MAPGPA) failed with MapGpaRetryAddr(%llx) less than PhysicalAddress(%llx) or more than or equal to EndAddress(%llx) \n",
+        __func__,
+        MapGpaRetryAddr,
+        PhysicalAddress,
+        EndAddress
+        ));
+      break;
+    }
+
+    if (MapGpaRetryAddr == PhysicalAddress) {
+      RetryCount++;
+      continue;
+    }
+
+    PhysicalAddress = MapGpaRetryAddr;
+    Length          = EndAddress - PhysicalAddress;
+    RetryCount      = 0;
+  }
+
   if (TdStatus != 0) {
     DEBUG ((DEBUG_ERROR, "%a: TdVmcall(MAPGPA) failed with %llx\n", __func__, TdStatus));
     ASSERT (FALSE);
