@@ -103,6 +103,8 @@
 #define TDVMCALL_REPORT_FATAL_ERR    0x10003
 #define TDVMCALL_SETUP_EVENT_NOTIFY  0x10004
 
+#define TDVMCALL_STATUS_RETRY  0x1
+
 #pragma pack(1)
 typedef struct {
   UINT64    Data[6];
