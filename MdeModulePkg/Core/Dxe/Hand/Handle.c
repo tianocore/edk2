@@ -198,6 +198,66 @@ CoreFindProtocolInterface (
 }
 
 /**
+  Check if the given device path is already installed.
+
+  @param  DevicePath            The given device path
+
+  @retval TRUE                  The device path is already installed
+  @retval FALSE                 The device path is not installed
+
+**/
+BOOLEAN
+IsDevicePathInstalled (
+  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  UINTN               SourceSize;
+  UINTN               Size;
+  BOOLEAN             Found;
+  LIST_ENTRY          *Link;
+  PROTOCOL_ENTRY      *ProtEntry;
+  PROTOCOL_INTERFACE  *Prot;
+
+  if (DevicePath == NULL) {
+    return FALSE;
+  }
+
+  Found      = FALSE;
+  SourceSize = GetDevicePathSize (DevicePath);
+  ASSERT (SourceSize >= END_DEVICE_PATH_LENGTH);
+
+  CoreAcquireProtocolLock ();
+  //
+  // Look up the protocol entry
+  //
+  ProtEntry = CoreFindProtocolEntry (&gEfiDevicePathProtocolGuid, FALSE);
+  if (ProtEntry == NULL) {
+    goto Done;
+  }
+
+  for (Link = ProtEntry->Protocols.ForwardLink; Link != &ProtEntry->Protocols; Link = Link->ForwardLink) {
+    //
+    // Loop on the DevicePathProtocol interfaces
+    //
+    Prot = CR (Link, PROTOCOL_INTERFACE, ByProtocol, PROTOCOL_INTERFACE_SIGNATURE);
+
+    //
+    // Check if DevicePath is same as this interface
+    //
+    Size = GetDevicePathSize (Prot->Interface);
+    ASSERT (Size >= END_DEVICE_PATH_LENGTH);
+    if ((Size == SourceSize) && (CompareMem (DevicePath, Prot->Interface, Size - END_DEVICE_PATH_LENGTH) == 0)) {
+      Found = TRUE;
+      break;
+    }
+  }
+
+Done:
+  CoreReleaseProtocolLock ();
+  return Found;
+}
+
+/**
   Removes an event from a register protocol notify list on a protocol.
 
   @param  Event                  The event to search for in the protocol
@@ -510,15 +570,13 @@ CoreInstallMultipleProtocolInterfaces (
   ...
   )
 {
-  VA_LIST                   Args;
-  EFI_STATUS                Status;
-  EFI_GUID                  *Protocol;
-  VOID                      *Interface;
-  EFI_TPL                   OldTpl;
-  UINTN                     Index;
-  EFI_HANDLE                OldHandle;
-  EFI_HANDLE                DeviceHandle;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  VA_LIST     Args;
+  EFI_STATUS  Status;
+  EFI_GUID    *Protocol;
+  VOID        *Interface;
+  EFI_TPL     OldTpl;
+  UINTN       Index;
+  EFI_HANDLE  OldHandle;
 
   if (Handle == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -548,14 +606,11 @@ CoreInstallMultipleProtocolInterfaces (
     //
     // Make sure you are installing on top a device path that has already been added.
     //
-    if (CompareGuid (Protocol, &gEfiDevicePathProtocolGuid)) {
-      DeviceHandle = NULL;
-      DevicePath   = Interface;
-      Status       = CoreLocateDevicePath (&gEfiDevicePathProtocolGuid, &DevicePath, &DeviceHandle);
-      if (!EFI_ERROR (Status) && (DeviceHandle != NULL) && IsDevicePathEnd (DevicePath)) {
-        Status = EFI_ALREADY_STARTED;
-        continue;
-      }
+    if (CompareGuid (Protocol, &gEfiDevicePathProtocolGuid) &&
+        IsDevicePathInstalled (Interface))
+    {
+      Status = EFI_ALREADY_STARTED;
+      continue;
     }
 
     //
