@@ -497,7 +497,6 @@ F: OvmfPkg/Include/Guid/ConfidentialComputingSecret.h
 F: OvmfPkg/Include/Library/MemEncryptSevLib.h
 F: OvmfPkg/IoMmuDxe/CcIoMmu.*
 F: OvmfPkg/Library/BaseMemEncryptSevLib/
-F: OvmfPkg/Library/PlatformBootManagerLibGrub/
 F: OvmfPkg/Library/CcExitLib/
 F: OvmfPkg/PlatformPei/AmdSev.c
 F: OvmfPkg/ResetVector/
