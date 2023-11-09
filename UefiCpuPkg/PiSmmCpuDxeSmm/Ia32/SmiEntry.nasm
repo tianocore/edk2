@@ -237,7 +237,9 @@ CetInterruptDone:
     bts     ecx, 16                     ; set WP
     mov     cr0, ecx
 
-    mov     eax, 0x668 | CR4_CET
+    ; set CR4.CET bit for enable CET
+    mov     eax, cr4
+    bts     eax, CR4_CET_BIT
     mov     cr4, eax
 
     setssbsy
@@ -264,8 +266,10 @@ CetDone:
     cmp     al, 0
     jz      CetDone2
 
-    mov     eax, 0x668
-    mov     cr4, eax       ; disable CET
+    ; clear CR4.CET bit for disable CET
+    mov     eax, cr4
+    btr     eax, CR4_CET_BIT
+    mov     cr4, eax
 
     mov     ecx, MSR_IA32_PL0_SSP
     pop     eax
