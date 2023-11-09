@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2011 - 2023, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -126,6 +126,64 @@
 // The ID_AA64MMFR2_EL1 register was added in ARMv8.2. Since we
 // build for ARMv8.0, we need to define the register here.
 #define ID_AA64MMFR2_EL1  S3_0_C0_C7_2
+
+//
+// Bit shifts for the ID_AA64ISAR0_EL1 register.
+//
+#define ARM_ID_AA64ISAR0_EL1_AES_SHIFT     (4U)
+#define ARM_ID_AA64ISAR0_EL1_SHA1_SHIFT    (8U)
+#define ARM_ID_AA64ISAR0_EL1_SHA2_SHIFT    (12U)
+#define ARM_ID_AA64ISAR0_EL1_CRC32_SHIFT   (16U)
+#define ARM_ID_AA64ISAR0_EL1_ATOMIC_SHIFT  (20U)
+#define ARM_ID_AA64ISAR0_EL1_RDM_SHIFT     (28U)
+#define ARM_ID_AA64ISAR0_EL1_SHA3_SHIFT    (32U)
+#define ARM_ID_AA64ISAR0_EL1_SM3_SHIFT     (36U)
+#define ARM_ID_AA64ISAR0_EL1_SM4_SHIFT     (40U)
+#define ARM_ID_AA64ISAR0_EL1_DP_SHIFT      (44U)
+#define ARM_ID_AA64ISAR0_EL1_FHM_SHIFT     (48U)
+#define ARM_ID_AA64ISAR0_EL1_TS_SHIFT      (52U)
+#define ARM_ID_AA64ISAR0_EL1_TLB_SHIFT     (56U)
+#define ARM_ID_AA64ISAR0_EL1_RNDR_SHIFT    (60U)
+
+//
+// Bit masks for the ID_AA64ISAR0_EL1 fields.
+//
+#define ARM_ID_AA64ISAR0_EL1_AES_MASK     (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_SHA1_MASK    (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_SHA2_MASK    (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_CRC32_MASK   (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_ATOMIC_MASK  (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_RDM_MASK     (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_SHA3_MASK    (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_SM3_MASK     (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_SM4_MASK     (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_DP_MASK      (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_FHM_MASK     (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_TS_MASK      (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_TLB_MASK     (0xFU)
+#define ARM_ID_AA64ISAR0_EL1_RNDR_MASK    (0xFU)
+
+//
+// Bit masks for the ID_AA64ISAR0_EL1 field values.
+//
+#define ARM_ID_AA64ISAR0_EL1_AES_FEAT_AES_MASK        (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_AES_FEAT_PMULL_MASK      (0x2U)
+#define ARM_ID_AA64ISAR0_EL1_SHA1_FEAT_SHA1_MASK      (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_SHA2_FEAT_SHA256_MASK    (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_SHA2_FEAT_SHA512_MASK    (0x2U)
+#define ARM_ID_AA64ISAR0_EL1_CRC32_HAVE_CRC32_MASK    (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_ATOMIC_FEAT_LSE_MASK     (0x2U)
+#define ARM_ID_AA64ISAR0_EL1_RDM_FEAT_RDM_MASK        (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_SHA3_FEAT_SHA3_MASK      (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_SM3_FEAT_SM3_MASK        (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_SM4_FEAT_SM4_MASK        (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_DP_FEAT_DOTPROD_MASK     (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_FHM_FEAT_FHM_MASK        (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_TS_FEAT_FLAGM_MASK       (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_TS_FEAT_FLAGM2_MASK      (0x2U)
+#define ARM_ID_AA64ISAR0_EL1_TLB_FEAT_TLBIOS_MASK     (0x1U)
+#define ARM_ID_AA64ISAR0_EL1_TLB_FEAT_TLBIRANGE_MASK  (0x2U)
+#define ARM_ID_AA64ISAR0_EL1_RNDR_FEAT_RNG_MASK       (0x1U)
 
 #define VECTOR_BASE(tbl)          \
   .section .text.##tbl##,"ax";    \
