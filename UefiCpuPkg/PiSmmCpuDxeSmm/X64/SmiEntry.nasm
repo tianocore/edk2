@@ -263,7 +263,9 @@ CetInterruptDone:
     bts     ecx, 16                     ; set WP
     mov     cr0, rcx
 
-    mov     eax, 0x668 | CR4_CET
+    ; set CR4.CET bit for enable CET
+    mov     rax, cr4
+    bts     rax, CR4_CET_BIT
     mov     cr4, rax
 
     setssbsy
@@ -308,8 +310,10 @@ mCetSupportedAbsAddr:
     cmp     al, 0
     jz      CetDone2
 
-    mov     eax, 0x668
-    mov     cr4, rax       ; disable CET
+    ; clear CR4.CET bit for disable CET
+    mov     rax, cr4
+    btr     rax, CR4_CET_BIT
+    mov     cr4, rax
 
     mov     ecx, MSR_IA32_INTERRUPT_SSP_TABLE_ADDR
     pop     rax
