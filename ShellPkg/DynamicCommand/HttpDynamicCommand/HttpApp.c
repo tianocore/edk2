@@ -28,7 +28,7 @@ EFI_STRING_ID  mStringHelpTokenId = STRING_TOKEN (STR_GET_HELP_HTTP);
   @param ImageHandle            The image handle of the process.
   @param SystemTable            The EFI System Table pointer.
 
-  @retval EFI_SUCCESS           Http command is executed sucessfully.
+  @retval EFI_SUCCESS           Http command is executed successfully.
   @retval EFI_ABORTED           HII package was failed to initialize.
   @retval others                Other errors when executing http command.
 **/
