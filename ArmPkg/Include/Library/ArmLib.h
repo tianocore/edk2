@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2023, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2020 - 2021, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -802,6 +802,222 @@ ArmHasTrbe (
 BOOLEAN
 EFIAPI
 ArmHasEte (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_AES.
+
+  @retval TRUE  FEAT_AES is implemented.
+  @retval FALSE FEAT_AES is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasAes (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_PMULL.
+
+  @retval TRUE  FEAT_PMULL is implemented.
+  @retval FALSE FEAT_PMULL is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasPmull (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_SHA1.
+
+  @retval TRUE  FEAT_SHA1 is implemented.
+  @retval FALSE FEAT_SHA1 is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasSha1 (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_SHA256.
+
+  @retval TRUE  FEAT_SHA256 is implemented.
+  @retval FALSE FEAT_SHA256 is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasSha256 (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_SHA512.
+
+  @retval TRUE  FEAT_SHA512 is implemented.
+  @retval FALSE FEAT_SHA512 is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasSha512 (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements CRC32 instruction.
+
+  @retval TRUE  CRC32 instruction is implemented.
+  @retval FALSE CRC32 instruction is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasCrc32 (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_LSE.
+
+  @retval TRUE  FEAT_LSE is implemented.
+  @retval FALSE FEAT_LSE is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasLse (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_RDM.
+
+  @retval TRUE  FEAT_RDM is implemented.
+  @retval FALSE FEAT_RDM is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasRdm (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_SHA3.
+
+  @retval TRUE  FEAT_SHA3 is implemented.
+  @retval FALSE FEAT_SHA3 is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasSha3 (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_SM3.
+
+  @retval TRUE  FEAT_SM3 is implemented.
+  @retval FALSE FEAT_SM3 is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasSm3 (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_SM4.
+
+  @retval TRUE  FEAT_SM4 is implemented.
+  @retval FALSE FEAT_SM4 is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasSm4 (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_DotProd.
+
+  @retval TRUE  FEAT_DotProd is implemented.
+  @retval FALSE FEAT_DotProd is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasDp (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_FHM.
+
+  @retval TRUE  FEAT_FHM is implemented.
+  @retval FALSE FEAT_FHM is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasFhm (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_FlagM.
+
+  @retval TRUE  FEAT_FlagM is implemented.
+  @retval FALSE FEAT_FlagM is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasFlagm (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_FlagM2.
+
+  @retval TRUE  FEAT_FlagM2 is implemented.
+  @retval FALSE FEAT_FlagM2 is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasFlagm2 (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_TLBIOS.
+
+  @retval TRUE  FEAT_TLBIOS is implemented.
+  @retval FALSE FEAT_TLBIOS is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasTlbios (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_TLBIRANGE.
+
+  @retval TRUE  FEAT_TLBIRANGE is implemented.
+  @retval FALSE FEAT_TLBIRANGE is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasTlbirange (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements FEAT_RNG.
+
+  @retval TRUE  FEAT_RNG is implemented.
+  @retval FALSE FEAT_RNG is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasRndr (
   VOID
   );
 
