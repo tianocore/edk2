@@ -52,12 +52,6 @@ ArmReadIdAA64Dfr1 (
 
 UINTN
 EFIAPI
-ArmReadIdAA64Isar0 (
-  VOID
-  );
-
-UINTN
-EFIAPI
 ArmReadIdAA64Isar1 (
   VOID
   );
