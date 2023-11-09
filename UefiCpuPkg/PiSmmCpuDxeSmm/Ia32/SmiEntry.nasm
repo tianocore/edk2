@@ -202,10 +202,20 @@ ASM_PFX(mPatchCetSupported):
     push    edx
     push    eax
 
+    mov     ecx, MSR_IA32_U_CET
+    rdmsr
+    push    edx
+    push    eax
+
     mov     ecx, MSR_IA32_PL0_SSP
     rdmsr
     push    edx
     push    eax
+
+    mov     ecx, MSR_IA32_U_CET
+    xor     eax, eax
+    xor     edx, edx
+    wrmsr
 
     mov     ecx, MSR_IA32_S_CET
     mov     eax, MSR_IA32_CET_SH_STK_EN
@@ -272,6 +282,11 @@ CetDone:
     mov     cr4, eax
 
     mov     ecx, MSR_IA32_PL0_SSP
+    pop     eax
+    pop     edx
+    wrmsr
+
+    mov     ecx, MSR_IA32_U_CET
     pop     eax
     pop     edx
     wrmsr
