@@ -18,7 +18,7 @@
   @param[in] SystemTable    the EFI System Table pointer
   @param[in] Name           the profile name to use
 
-  @retval EFI_SUCCESS        the shell command handlers were installed sucessfully
+  @retval EFI_SUCCESS        the shell command handlers were installed successfully
   @retval EFI_UNSUPPORTED    the shell level required was not found.
 **/
 EFI_STATUS

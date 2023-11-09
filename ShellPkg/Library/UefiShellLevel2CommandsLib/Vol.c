@@ -18,7 +18,7 @@
   @param[in] Delete         TRUE to delete the volume label. FALSE otherwise.
   @param[in] Name           New name to set to the volume label.
 
-  @retval SHELL_SUCCESS     The operation was sucessful.
+  @retval SHELL_SUCCESS     The operation was successful.
 **/
 SHELL_STATUS
 HandleVol (

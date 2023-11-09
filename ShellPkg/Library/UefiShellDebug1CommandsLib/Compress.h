@@ -18,7 +18,7 @@
   @param[in, out]  DstSize       On input the size (in bytes) of DstBuffer, on
                                  return the number of bytes placed in DstBuffer.
 
-  @retval EFI_SUCCESS           The compression was sucessful.
+  @retval EFI_SUCCESS           The compression was successful.
   @retval EFI_BUFFER_TOO_SMALL  The buffer was too small.  DstSize is required.
 **/
 EFI_STATUS

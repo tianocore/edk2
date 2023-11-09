@@ -32,7 +32,7 @@ ShellCommandGetManFileNameNetwork2 (
   @param ImageHandle            The image handle of the process.
   @param SystemTable            The EFI System Table pointer.
 
-  @retval EFI_SUCCESS           The shell command handlers were installed sucessfully.
+  @retval EFI_SUCCESS           The shell command handlers were installed successfully.
   @retval EFI_UNSUPPORTED       The shell level required was not found.
 **/
 EFI_STATUS

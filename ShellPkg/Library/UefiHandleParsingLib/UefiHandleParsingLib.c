@@ -2549,7 +2549,7 @@ Function to add a new GUID/Name mapping.
 @param[in] DumpFunc   The pointer to the dump function
 
 
-@retval EFI_SUCCESS           The operation was sucessful
+@retval EFI_SUCCESS           The operation was successful
 @retval EFI_OUT_OF_RESOURCES  A memory allocation failed
 @retval EFI_INVALID_PARAMETER Guid NameId was invalid
 **/
@@ -2595,7 +2595,7 @@ InsertNewGuidNameMapping (
   @param[in] TheName    The Guid's name
   @param[in] Lang       RFC4646 language code list or NULL
 
-  @retval EFI_SUCCESS           The operation was sucessful
+  @retval EFI_SUCCESS           The operation was successful
   @retval EFI_ACCESS_DENIED     There was a duplicate
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed
   @retval EFI_INVALID_PARAMETER Guid or TheName was NULL
@@ -2708,7 +2708,7 @@ GetProtocolInformationDump (
   @param[in] Lang           The pointer to the language code.
   @param[out] Guid          The pointer to the Guid.
 
-  @retval EFI_SUCCESS       The operation was sucessful.
+  @retval EFI_SUCCESS       The operation was successful.
 **/
 EFI_STATUS
 EFIAPI
@@ -3312,7 +3312,7 @@ ParseHandleDatabaseByRelationshipWithType (
   If both DriverBindingHandle and ControllerHandle are NULL, then ASSERT.
   If MatchingHandleCount is NULL, then ASSERT.
 
-  If MatchingHandleBuffer is not NULL upon a sucessful return the memory must be
+  If MatchingHandleBuffer is not NULL upon a successful return the memory must be
   caller freed.
 
   @param[in] DriverBindingHandle    Handle to a object with Driver Binding protocol
@@ -3321,10 +3321,10 @@ ParseHandleDatabaseByRelationshipWithType (
   @param[in] Mask                   Mask of what relationship(s) is desired.
   @param[in] MatchingHandleCount    Poitner to UINTN specifying number of HANDLES in
                                     MatchingHandleBuffer.
-  @param[out] MatchingHandleBuffer  On a sucessful return a buffer of MatchingHandleCount
+  @param[out] MatchingHandleBuffer  On a successful return a buffer of MatchingHandleCount
                                     EFI_HANDLEs and a terminating NULL EFI_HANDLE.
 
-  @retval EFI_SUCCESS               The operation was sucessful and any related handles
+  @retval EFI_SUCCESS               The operation was successful and any related handles
                                     are in MatchingHandleBuffer;
   @retval EFI_NOT_FOUND             No matching handles were found.
   @retval EFI_INVALID_PARAMETER     A parameter was invalid or out of range.
@@ -3450,7 +3450,7 @@ ParseHandleDatabaseByRelationship (
                                     return.
 
 
-  @retval EFI_SUCCESS               The operation was sucessful.
+  @retval EFI_SUCCESS               The operation was successful.
 **/
 EFI_STATUS
 EFIAPI
@@ -3613,7 +3613,7 @@ BuffernCatGrow (
                                     MatchingHandleBuffer on return.
   @param[out] MatchingHandleBuffer  Buffer containing handles on a successful
                                     return.
-  @retval EFI_SUCCESS               The operation was sucessful.
+  @retval EFI_SUCCESS               The operation was successful.
   @sa ParseHandleDatabaseByRelationship
 **/
 EFI_STATUS

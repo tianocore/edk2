@@ -183,7 +183,7 @@ LIST_ENTRY *
   @param[in] MovePast          TRUE makes function return 1 past the found
                                location.
   @param[in] FindOnly          TRUE to not change the ScriptFile.
-  @param[in] WrapAroundScript  TRUE to wrap end-to-begining or vise versa in
+  @param[in] WrapAroundScript  TRUE to wrap end-to-beginning or vise versa in
                                searching.
 **/
 BOOLEAN
