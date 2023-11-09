@@ -41,6 +41,11 @@
   gEfiGraphicsInfoHobGuid
   gEfiGraphicsDeviceInfoHobGuid
   gUniversalPayloadPciRootBridgeInfoGuid
+  gSmmRegisterInfoGuid
+  gEfiSmmSmramMemoryGuid
+  gSpiFlashInfoGuid
+  gNvVariableInfoGuid
+  gS3CommunicationGuid
 
 [Pcd]
   gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter

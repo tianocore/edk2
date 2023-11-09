@@ -16,6 +16,11 @@
 #include <Library/BlParseLib.h>
 #include <IndustryStandard/Acpi.h>
 #include <UniversalPayload/PciRootBridges.h>
+#include <Guid/SmmRegisterInfoGuid.h>
+#include <Guid/SmramMemoryReserve.h>
+#include <Guid/SpiFlashInfoGuid.h>
+#include <Guid/NvVariableInfoGuid.h>
+#include <Guid/SmmS3CommunicationInfoGuid.h>
 
 /**
   This function retrieves the parameter base address from boot loader.
@@ -264,6 +269,17 @@ ParseMiscInfo (
   RETURN_STATUS                       Status;
   UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *BlRootBridgesHob;
   UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *PldRootBridgesHob;
+  PLD_SMM_REGISTERS                   *BlSmmRegisterHob;
+  PLD_SMM_REGISTERS                   *PldSmmRegisterHob;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK      *BlSmmMemoryHob;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK      *PldSmmMemoryHob;
+  SPI_FLASH_INFO                      *BlSpiFlashInfoHob;
+  SPI_FLASH_INFO                      *PldSpiFlashInfoHob;
+  NV_VARIABLE_INFO                    *BlNvVariableHob;
+  NV_VARIABLE_INFO                    *PldNvVariableHob;
+  PLD_S3_COMMUNICATION                *BlS3CommunicationHob;
+  PLD_S3_COMMUNICATION                *PldS3CommunicationHob;
+  UINT32                              Length;
 
   Status           = RETURN_NOT_FOUND;
   BlRootBridgesHob = (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES *)GetGuidHobDataFromSbl (
@@ -278,13 +294,98 @@ ParseMiscInfo (
                           BlRootBridgesHob->Header.Length
                           );
     ASSERT (PldRootBridgesHob != NULL);
-    if (PldRootBridgesHob != NULL) {
-      CopyMem (PldRootBridgesHob, BlRootBridgesHob, BlRootBridgesHob->Header.Length);
-      DEBUG ((DEBUG_INFO, "Create PCI root bridge info guid hob\n"));
-      Status = RETURN_SUCCESS;
-    } else {
-      Status = RETURN_OUT_OF_RESOURCES;
+    if (PldRootBridgesHob == NULL) {
+      return RETURN_OUT_OF_RESOURCES;
     }
+
+    CopyMem (PldRootBridgesHob, BlRootBridgesHob, BlRootBridgesHob->Header.Length);
+    DEBUG ((DEBUG_INFO, "Create PCI root bridge info guid hob\n"));
+    Status = RETURN_SUCCESS;
+  }
+
+  //
+  // Create SMM info hob.
+  //
+  BlSmmRegisterHob = (PLD_SMM_REGISTERS *)GetGuidHobDataFromSbl (&gSmmRegisterInfoGuid);
+  if (BlSmmRegisterHob != NULL) {
+    Length            = sizeof (PLD_SMM_REGISTERS) + 5 * sizeof (PLD_GENERIC_REGISTER);
+    PldSmmRegisterHob = BuildGuidHob (&gSmmRegisterInfoGuid, Length);
+    ASSERT (PldSmmRegisterHob != NULL);
+    if (PldSmmRegisterHob == NULL) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
+
+    CopyMem (PldSmmRegisterHob, BlSmmRegisterHob, Length);
+    DEBUG ((DEBUG_INFO, "Created SMM info hob\n"));
+    Status = RETURN_SUCCESS;
+  }
+
+  //
+  // Create SMM memory hob.
+  //
+  BlSmmMemoryHob = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)GetGuidHobDataFromSbl (&gEfiSmmSmramMemoryGuid);
+  if (BlSmmMemoryHob != NULL) {
+    Length          = sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + sizeof (EFI_SMRAM_DESCRIPTOR);
+    PldSmmMemoryHob = BuildGuidHob (&gEfiSmmSmramMemoryGuid, Length);
+    ASSERT (PldSmmMemoryHob != NULL);
+    if (PldSmmMemoryHob == NULL) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
+
+    CopyMem (PldSmmMemoryHob, BlSmmMemoryHob, Length);
+    DEBUG ((DEBUG_INFO, "Created SMM memory hob\n"));
+    Status = RETURN_SUCCESS;
+  }
+
+  //
+  // Create SPI flash info hob.
+  //
+  BlSpiFlashInfoHob = (SPI_FLASH_INFO *)GetGuidHobDataFromSbl (&gSpiFlashInfoGuid);
+  if (BlSpiFlashInfoHob != NULL) {
+    Length             = sizeof (SPI_FLASH_INFO);
+    PldSpiFlashInfoHob = BuildGuidHob (&gSpiFlashInfoGuid, Length);
+    ASSERT (PldSpiFlashInfoHob != NULL);
+    if (PldSpiFlashInfoHob == NULL) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
+
+    CopyMem (PldSpiFlashInfoHob, BlSpiFlashInfoHob, Length);
+    DEBUG ((DEBUG_INFO, "Created SPI flash info hob\n"));
+    Status = RETURN_SUCCESS;
+  }
+
+  //
+  // Create SPI flash variable info hob.
+  //
+  BlNvVariableHob = (NV_VARIABLE_INFO *)GetGuidHobDataFromSbl (&gNvVariableInfoGuid);
+  if (BlNvVariableHob != NULL) {
+    Length           = sizeof (NV_VARIABLE_INFO);
+    PldNvVariableHob = BuildGuidHob (&gNvVariableInfoGuid, Length);
+    ASSERT (PldNvVariableHob != NULL);
+    if (PldNvVariableHob == NULL) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
+
+    CopyMem (PldNvVariableHob, BlNvVariableHob, Length);
+    DEBUG ((DEBUG_INFO, "Created SPI flash variable info hob\n"));
+    Status = RETURN_SUCCESS;
+  }
+
+  //
+  // Create SMM S3 communication hob.
+  //
+  BlS3CommunicationHob = (PLD_S3_COMMUNICATION *)GetGuidHobDataFromSbl (&gS3CommunicationGuid);
+  if (BlS3CommunicationHob != NULL) {
+    Length                = sizeof (PLD_S3_COMMUNICATION);
+    PldS3CommunicationHob = BuildGuidHob (&gS3CommunicationGuid, Length);
+    ASSERT (PldS3CommunicationHob != NULL);
+    if (PldS3CommunicationHob == NULL) {
+      return RETURN_OUT_OF_RESOURCES;
+    }
+
+    CopyMem (PldS3CommunicationHob, BlS3CommunicationHob, Length);
+    DEBUG ((DEBUG_INFO, "Created SMM S3 communication hob\n"));
+    Status = RETURN_SUCCESS;
   }
 
   return Status;
