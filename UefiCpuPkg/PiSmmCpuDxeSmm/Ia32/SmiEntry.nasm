@@ -15,19 +15,7 @@
 
 %include "StuffRsbNasm.inc"
 %include "Nasm.inc"
-
-%define MSR_IA32_S_CET                     0x6A2
-%define   MSR_IA32_CET_SH_STK_EN             0x1
-%define   MSR_IA32_CET_WR_SHSTK_EN           0x2
-%define   MSR_IA32_CET_ENDBR_EN              0x4
-%define   MSR_IA32_CET_LEG_IW_EN             0x8
-%define   MSR_IA32_CET_NO_TRACK_EN           0x10
-%define   MSR_IA32_CET_SUPPRESS_DIS          0x20
-%define   MSR_IA32_CET_SUPPRESS              0x400
-%define   MSR_IA32_CET_TRACKER               0x800
-%define MSR_IA32_PL0_SSP                   0x6A4
-
-%define CR4_CET                            0x800000
+%include "Cet.inc"
 
 %define MSR_IA32_MISC_ENABLE 0x1A0
 %define MSR_EFER      0xc0000080
