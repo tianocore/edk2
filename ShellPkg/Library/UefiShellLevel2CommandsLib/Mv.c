@@ -216,7 +216,7 @@ IsValidMove (
   that there is only a single possible target (IE we cant have wildcards that
   have 2 possible destination).
 
-  if the result is sucessful the caller must free *DestPathPointer.
+  if the result is successful the caller must free *DestPathPointer.
 
   @param[in] DestParameter               The original path to the destination.
   @param[in, out] DestPathPointer  A pointer to the callee allocated final path.
@@ -227,7 +227,7 @@ IsValidMove (
   @retval SHELL_INVALID_PARAMETER  The DestParameter could not be resolved to a location.
   @retval SHELL_INVALID_PARAMETER  The DestParameter could be resolved to more than 1 location.
   @retval SHELL_INVALID_PARAMETER  Cwd is required and is NULL.
-  @retval SHELL_SUCCESS            The operation was sucessful.
+  @retval SHELL_SUCCESS            The operation was successful.
 **/
 SHELL_STATUS
 GetDestinationLocation (
@@ -850,7 +850,7 @@ ShellCommandRunMv (
           } else {
             //
             // ValidateAndMoveFiles will report errors to the screen itself
-            // Only change ShellStatus if it's sucessful
+            // Only change ShellStatus if it's successful
             //
             if (ShellStatus == SHELL_SUCCESS) {
               ShellStatus = ValidateAndMoveFiles (FileList, &Response, ShellCommandLineGetRawValue (Package, ParamCount));

@@ -300,7 +300,7 @@ ShellWriteFile (
 
   @param[in] FileHandle           The file handle to close.
 
-  @retval EFI_SUCCESS             The file handle was closed sucessfully.
+  @retval EFI_SUCCESS             The file handle was closed successfully.
   @retval INVALID_PARAMETER       One of the parameters has an invalid value.
 **/
 EFI_STATUS
@@ -318,7 +318,7 @@ ShellCloseFile (
 
   @param[in] FileHandle             The file handle to delete.
 
-  @retval EFI_SUCCESS               The file was closed sucessfully.
+  @retval EFI_SUCCESS               The file was closed successfully.
   @retval EFI_WARN_DELETE_FAILURE   The handle was closed, but the file was not
                                     deleted.
   @retval INVALID_PARAMETER         One of the parameters has an invalid value.
@@ -342,9 +342,9 @@ ShellDeleteFile (
 
   @param[in] FileHandle         The file handle on which the position is being set.
 
-  @param[in] Position           The byte position from the begining of the file.
+  @param[in] Position           The byte position from the beginning of the file.
 
-  @retval EFI_SUCCESS           Operation completed sucessfully.
+  @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_UNSUPPORTED       The seek request for non-zero is not valid on
                                 directories.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
@@ -365,9 +365,9 @@ ShellSetFilePosition (
   if FileHandle is a directory.
 
   @param[in] FileHandle         The open file handle on which to get the position.
-  @param[out] Position          The byte position from the begining of the file.
+  @param[out] Position          The byte position from the beginning of the file.
 
-  @retval EFI_SUCCESS           The operation completed sucessfully.
+  @retval EFI_SUCCESS           The operation completed successfully.
   @retval INVALID_PARAMETER     One of the parameters has an invalid value.
   @retval EFI_UNSUPPORTED       The request is not valid on directories.
 **/
@@ -466,7 +466,7 @@ ShellFindNextFile (
   @param[in] FileHandle         The file handle from which size is retrieved.
   @param[out] Size              The pointer to size.
 
-  @retval EFI_SUCCESS           The operation was completed sucessfully.
+  @retval EFI_SUCCESS           The operation was completed successfully.
   @retval EFI_DEVICE_ERROR      Cannot access the file.
 **/
 EFI_STATUS
@@ -524,7 +524,7 @@ ShellGetEnvironmentVariable (
   @param[in] EnvVal             The Value of the environment variable
   @param[in] Volatile           Indicates whether the variable is non-volatile (FALSE) or volatile (TRUE).
 
-  @retval EFI_SUCCESS           The operation completed sucessfully
+  @retval EFI_SUCCESS           The operation completed successfully
   @retval EFI_UNSUPPORTED       This operation is not allowed in pre-UEFI 2.0 Shell environments.
 **/
 EFI_STATUS
@@ -559,7 +559,7 @@ ShellSetEnvironmentVariable (
                                   in the form "x=y".  If NULL, the current set is used.
   @param[out] Status              The status of the run command line.
 
-  @retval EFI_SUCCESS             The operation completed sucessfully.  Status
+  @retval EFI_SUCCESS             The operation completed successfully.  Status
                                   contains the status code returned.
   @retval EFI_INVALID_PARAMETER   A parameter contains an invalid value.
   @retval EFI_OUT_OF_RESOURCES    Out of resources.
@@ -626,7 +626,7 @@ ShellSetPageBreakMode (
   @param[in] OpenMode            Mode to open files with.
   @param[in, out] ListHead       Head of linked list of results.
 
-  @retval EFI_SUCCESS           The operation was sucessful and the list head
+  @retval EFI_SUCCESS           The operation was successful and the list head
                                 contains the list of opened files.
   @retval != EFI_SUCCESS        The operation failed.
 
@@ -645,7 +645,7 @@ ShellOpenFileMetaArg (
 
   @param[in, out] ListHead       The pointer to free.
 
-  @retval EFI_SUCCESS           The operation was sucessful.
+  @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
 **/
 EFI_STATUS
@@ -730,7 +730,7 @@ extern SHELL_PARAM_ITEM  SfoParamList[];
   @param[in] AutoPageBreak      Will automatically set PageBreakEnabled.
   @param[in] AlwaysAllowNumbers Will never fail for number based flags.
 
-  @retval EFI_SUCCESS           The operation completed sucessfully.
+  @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
   @retval EFI_VOLUME_CORRUPTED  The command line was corrupt.
@@ -878,7 +878,7 @@ ShellCommandLineCheckDuplicate (
 
   This function is intended for internal access for shell commands only.
 
-  @retval EFI_SUCCESS   The initialization was complete sucessfully.
+  @retval EFI_SUCCESS   The initialization was complete successfully.
 
 **/
 EFI_STATUS
@@ -1249,7 +1249,7 @@ ShellPromptForResponse (
   @param[in] HiiFormatHandle     The format string Handle for getting from Hii.
   @param[in, out] Response       The pointer to Response, which will be populated upon return.
 
-  @retval EFI_SUCCESS The operation was sucessful.
+  @retval EFI_SUCCESS The operation was successful.
   @return other       The operation failed.
 
   @sa ShellPromptForResponse
@@ -1385,7 +1385,7 @@ ShellFileHandleReadLine (
 
   @param[in]       FileName       Pointer to file name to delete.
 
-  @retval EFI_SUCCESS             the file was deleted sucessfully
+  @retval EFI_SUCCESS             the file was deleted successfully
   @retval EFI_WARN_DELETE_FAILURE the handle was closed, but the file was not
                                   deleted
   @retval EFI_INVALID_PARAMETER   One of the parameters has an invalid value.

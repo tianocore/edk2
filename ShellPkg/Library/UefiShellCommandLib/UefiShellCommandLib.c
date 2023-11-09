@@ -155,7 +155,7 @@ CommandInit (
   @param ImageHandle    the image handle of the process
   @param SystemTable    the EFI System Table pointer
 
-  @retval EFI_SUCCESS   the initialization was complete sucessfully
+  @retval EFI_SUCCESS   the initialization was complete successfully
 **/
 RETURN_STATUS
 EFIAPI
@@ -1286,7 +1286,7 @@ ShellCommandCreateNewMappingName (
   @param[in] Flags              The Flags attribute for this map item.
   @param[in] Path               TRUE to update path, FALSE to skip this step (should only be TRUE during initialization).
 
-  @retval EFI_SUCCESS           The addition was sucessful.
+  @retval EFI_SUCCESS           The addition was successful.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_INVALID_PARAMETER A parameter was invalid.
 **/
@@ -1374,7 +1374,7 @@ ShellCommandAddMapItemAndUpdatePath (
 
   Also sets up the default path environment variable if Type is FileSystem.
 
-  @retval EFI_SUCCESS           All map names were created sucessfully.
+  @retval EFI_SUCCESS           All map names were created successfully.
   @retval EFI_NOT_FOUND         No protocols were found in the system.
   @return                       Error returned from gBS->LocateHandle().
 

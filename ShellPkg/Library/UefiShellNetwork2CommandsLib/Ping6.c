@@ -357,7 +357,7 @@ Ping6OnMatchEchoReply (
   The original intention is to send a request.
   Currently, the application retransmits an icmp6 echo request packet
   per second in sendnumber times that is specified by the user.
-  Because nothing can be done here, all things move to the timer rountine.
+  Because nothing can be done here, all things move to the timer routine.
 
   @param[in]    Event      A EFI_EVENT type event.
   @param[in]    Context    The pointer to Context.
