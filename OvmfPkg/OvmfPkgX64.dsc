@@ -701,9 +701,7 @@
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
 
-!if $(CSM_ENABLE) == FALSE
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|1000000000
-!endif
 
 [PcdsDynamicHii]
 !include OvmfPkg/Include/Dsc/OvmfTpmPcdsHii.dsc.inc
@@ -839,10 +837,8 @@
 
 !ifdef $(CSM_ENABLE)
   OvmfPkg/8259InterruptControllerDxe/8259.inf
-  OvmfPkg/8254TimerDxe/8254Timer.inf
-!else
-  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
 !endif
+  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
   OvmfPkg/IncompatiblePciDeviceSupportDxe/IncompatiblePciDeviceSupport.inf
   OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
