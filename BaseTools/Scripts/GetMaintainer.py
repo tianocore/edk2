@@ -192,14 +192,16 @@ if __name__ == '__main__':
     else:
         FILES = get_modified_files(REPO, ARGS)
 
-    ADDRESSES = []
-
+    # Accumulate a sorted list of addresses
+    ADDRESSES = set([])
     for file in FILES:
         print(file)
         recipients = get_maintainers(file, SECTIONS)
-        ADDRESSES += recipients['maintainers'] + recipients['reviewers'] + recipients['lists']
+        ADDRESSES |= set(recipients['maintainers'] + recipients['reviewers'] + recipients['lists'])
+    ADDRESSES = list(ADDRESSES)
+    ADDRESSES.sort()
 
-    for address in list(OrderedDict.fromkeys(ADDRESSES)):
+    for address in ADDRESSES:
         if '<' in address and '>' in address:
             address = address.split('>', 1)[0] + '>'
         print('  %s' % address)
