@@ -764,7 +764,6 @@
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-#  OvmfPkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
 !ifdef $(CSM_ENABLE)
   OvmfPkg/Bhyve/Csm/BhyveCsm16/BhyveCsm16.inf
 !endif
