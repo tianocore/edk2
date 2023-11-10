@@ -291,26 +291,6 @@
   #  For the corresponding bits, 0 = Edge triggered and 1 = Level triggered.
   gUefiOvmfPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0000|UINT16|0x5
 
-  ## Indicates if BiosVideo driver will switch to 80x25 Text VGA Mode when
-  #  exiting boot service.
-  #   TRUE  - Switch to Text VGA Mode.
-  #   FALSE - Does not switch to Text VGA Mode.
-  gUefiOvmfPkgTokenSpaceGuid.PcdBiosVideoSetTextVgaModeEnable|FALSE|BOOLEAN|0x28
-
-  ## Indicates if BiosVideo driver will check for VESA BIOS Extension service
-  #  support.
-  #   TRUE  - Check for VESA BIOS Extension service.
-  #   FALSE - Does not check for VESA BIOS Extension service.
-  gUefiOvmfPkgTokenSpaceGuid.PcdBiosVideoCheckVbeEnable|TRUE|BOOLEAN|0x29
-
-  ## Indicates if BiosVideo driver will check for VGA service support.
-  #  NOTE: If both PcdBiosVideoCheckVbeEnable and PcdBiosVideoCheckVgaEnable
-  #  are set to FALSE, that means Graphics Output protocol will not be
-  #  installed, the VGA miniport protocol will be installed instead.
-  #   TRUE  - Check for VGA service.<BR>
-  #   FALSE - Does not check for VGA service.<BR>
-  gUefiOvmfPkgTokenSpaceGuid.PcdBiosVideoCheckVgaEnable|TRUE|BOOLEAN|0x2a
-
   ## Indicates if memory space for legacy region will be set as cacheable.
   #   TRUE  - Set cachebility for legacy region.
   #   FALSE - Does not set cachebility for legacy region.
