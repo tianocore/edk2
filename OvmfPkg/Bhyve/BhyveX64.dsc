@@ -665,6 +665,7 @@
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
 !ifdef $(CSM_ENABLE)
+!error "CSM is being torn down"
       NULL|OvmfPkg/Bhyve/Csm/CsmSupportLib/CsmSupportLib.inf
       NULL|OvmfPkg/Csm/LegacyBootManagerLib/LegacyBootManagerLib.inf
 !endif

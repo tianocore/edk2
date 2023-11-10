@@ -478,6 +478,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
 !ifdef $(CSM_ENABLE)
+!error "CSM is being torn down"
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable|TRUE
 !endif
 !if $(SMM_REQUIRE) == TRUE
