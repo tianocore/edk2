@@ -288,44 +288,6 @@
   #  For the corresponding bits, 0 = Edge triggered and 1 = Level triggered.
   gUefiOvmfPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0000|UINT16|0x5
 
-  ## Indicates if memory space for legacy region will be set as cacheable.
-  #   TRUE  - Set cachebility for legacy region.
-  #   FALSE - Does not set cachebility for legacy region.
-  gUefiOvmfPkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion|TRUE|BOOLEAN|0x2b
-
-  ## Specify memory size with bytes to reserve EBDA below 640K for OPROM.
-  #  The value should be a multiple of 4KB.
-  gUefiOvmfPkgTokenSpaceGuid.PcdEbdaReservedMemorySize|0x8000|UINT32|0x2c
-
-  ## Specify memory base address for OPROM to find free memory.
-  #  Some OPROMs do not use EBDA or PMM to allocate memory for its usage,
-  #  instead they find the memory filled with zero from 0x20000.
-  #  The value should be a multiple of 4KB.
-  #  The range should be below the EBDA reserved range from
-  #  (CONVENTIONAL_MEMORY_TOP - Reserved EBDA Memory Size) to
-  #  CONVENTIONAL_MEMORY_TOP.
-  gUefiOvmfPkgTokenSpaceGuid.PcdOpromReservedMemoryBase|0x60000|UINT32|0x2d
-
-  ## Specify memory size with bytes for OPROM to find free memory.
-  #  The value should be a multiple of 4KB. And the range should be below the
-  #  EBDA reserved range from
-  #  (CONVENTIONAL_MEMORY_TOP - Reserved EBDA Memory Size) to
-  #  CONVENTIONAL_MEMORY_TOP.
-  gUefiOvmfPkgTokenSpaceGuid.PcdOpromReservedMemorySize|0x28000|UINT32|0x2e
-
-  ## Specify the end of address below 1MB for the OPROM.
-  #  The last shadowed OpROM should not exceed this address.
-  gUefiOvmfPkgTokenSpaceGuid.PcdEndOpromShadowAddress|0xdffff|UINT32|0x2f
-
-  ## Specify the low PMM (Post Memory Manager) size with bytes below 1MB.
-  #  The value should be a multiple of 4KB.
-  # @Prompt Low PMM (Post Memory Manager) Size
-  gUefiOvmfPkgTokenSpaceGuid.PcdLowPmmMemorySize|0x10000|UINT32|0x30
-
-  ## Specify the high PMM (Post Memory Manager) size with bytes above 1MB.
-  #  The value should be a multiple of 4KB.
-  gUefiOvmfPkgTokenSpaceGuid.PcdHighPmmMemorySize|0x400000|UINT32|0x31
-
   gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr|0x0|UINT32|0x17
   gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize|0x0|UINT32|0x32
 
