@@ -764,12 +764,6 @@
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-!ifdef $(CSM_ENABLE)
-  IntelFrameworkModulePkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  }
-!endif
 #  OvmfPkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
 !ifdef $(CSM_ENABLE)
   OvmfPkg/Bhyve/Csm/BhyveCsm16/BhyveCsm16.inf

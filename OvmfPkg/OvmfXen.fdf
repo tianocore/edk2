@@ -336,7 +336,6 @@ INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
 !ifdef $(CSM_ENABLE)
-INF  OvmfPkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf
 INF  OvmfPkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
 INF  RuleOverride=CSM OvmfPkg/Csm/Csm16/Csm16.inf
 !endif
