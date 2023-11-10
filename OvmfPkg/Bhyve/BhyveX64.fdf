@@ -296,9 +296,6 @@ INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
-!ifdef $(CSM_ENABLE)
-INF  IntelFrameworkModulePkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf
-!endif
 #INF  OvmfPkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
 !ifdef $(CSM_ENABLE)
 INF  RuleOverride=CSM OvmfPkg/Bhyve/Csm/BhyveCsm16/BhyveCsm16.inf

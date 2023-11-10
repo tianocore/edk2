@@ -930,9 +930,7 @@
   MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 
-!ifndef $(CSM_ENABLE)
   OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
-!endif
   OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
   OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 
@@ -980,10 +978,6 @@
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
 !ifdef $(CSM_ENABLE)
-  OvmfPkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-  }
   OvmfPkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
   OvmfPkg/Csm/Csm16/Csm16.inf
 !endif
