@@ -377,7 +377,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
 !ifdef $(CSM_ENABLE)
 !error "CSM is being torn down"
-  gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable|TRUE
 !endif
 !if $(SECURE_BOOT_ENABLE) == TRUE
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|TRUE
