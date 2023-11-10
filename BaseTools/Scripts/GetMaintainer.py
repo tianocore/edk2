@@ -105,10 +105,8 @@ def get_maintainers(path, sections, level=0):
     lists = []
     for section in sections:
         tmp_maint, tmp_lists = get_section_maintainers(path, section)
-        if tmp_maint:
-            maintainers += tmp_maint
-        if tmp_lists:
-            lists += tmp_lists
+        maintainers += tmp_maint
+        lists += tmp_lists
 
     if not maintainers:
         # If no match found, look for match for (nonexistent) file
