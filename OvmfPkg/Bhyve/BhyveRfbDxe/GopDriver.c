@@ -302,9 +302,7 @@ EmuGopDriverBindingStart (
   //
   // Install int10 handler
   //
- #ifndef CSM_ENABLE
   InstallVbeShim (L"Framebuffer", Private->FbAddr);
- #endif
 
 Done:
   if (EFI_ERROR (Status)) {
