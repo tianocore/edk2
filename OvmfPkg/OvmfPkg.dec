@@ -17,7 +17,6 @@
 
 [Includes]
   Include
-  Csm/Include
 
 [LibraryClasses]
   ##  @libraryclass  Search and install ACPI tables.
