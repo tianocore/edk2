@@ -76,6 +76,7 @@ def get_section_maintainers(path, section):
     """Returns a list with email addresses to any M: and R: entries
        matching the provided path in the provided section."""
     maintainers = []
+    reviewers = []
     lists = []
     nowarn_status = ['Supported', 'Maintained']
 
@@ -83,12 +84,18 @@ def get_section_maintainers(path, section):
         for status in section['status']:
             if status not in nowarn_status:
                 print('WARNING: Maintained status for "%s" is \'%s\'!' % (path, status))
-        for address in section['maintainer'], section['reviewer']:
+        for address in section['maintainer']:
             # Convert to list if necessary
             if isinstance(address, list):
                 maintainers += address
             else:
                 maintainers += [address]
+        for address in section['reviewer']:
+            # Convert to list if necessary
+            if isinstance(address, list):
+                reviewers += address
+            else:
+                reviewers += [address]
         for address in section['list']:
             # Convert to list if necessary
             if isinstance(address, list):
@@ -96,16 +103,18 @@ def get_section_maintainers(path, section):
             else:
                 lists += [address]
 
-    return {'maintainers': maintainers, 'lists': lists}
+    return {'maintainers': maintainers, 'reviewers': reviewers, 'lists': lists}
 
 def get_maintainers(path, sections, level=0):
     """For 'path', iterates over all sections, returning maintainers
        for matching ones."""
     maintainers = []
+    reviewers = []
     lists = []
     for section in sections:
         recipients = get_section_maintainers(path, section)
         maintainers += recipients['maintainers']
+        reviewers += recipients['reviewers']
         lists += recipients['lists']
 
     if not maintainers:
@@ -115,13 +124,14 @@ def get_maintainers(path, sections, level=0):
         if level == 0:
             recipients = get_maintainers('<default>', sections, level=level + 1)
             maintainers += recipients['maintainers']
+            reviewers += recipients['reviewers']
             lists += recipients['lists']
         else:
             print("No <default> maintainers set for project.")
         if not maintainers:
             return None
 
-    return {'maintainers': maintainers, 'lists': lists}
+    return {'maintainers': maintainers, 'reviewers': reviewers, 'lists': lists}
 
 def parse_maintainers_line(line):
     """Parse one line of Maintainers.txt, returning any match group and its key."""
@@ -187,7 +197,7 @@ if __name__ == '__main__':
     for file in FILES:
         print(file)
         recipients = get_maintainers(file, SECTIONS)
-        ADDRESSES += recipients['maintainers'] + recipients['lists']
+        ADDRESSES += recipients['maintainers'] + recipients['reviewers'] + recipients['lists']
 
     for address in list(OrderedDict.fromkeys(ADDRESSES)):
         if '<' in address and '>' in address:
