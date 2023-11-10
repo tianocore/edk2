@@ -863,9 +863,6 @@
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
     <LibraryClasses>
       XenPlatformLib|OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
-!ifdef $(CSM_ENABLE)
-      NULL|OvmfPkg/Csm/CsmSupportLib/CsmSupportLib.inf
-!endif
   }
   MdeModulePkg/Logo/LogoDxe.inf
   MdeModulePkg/Application/UiApp/UiApp.inf {
