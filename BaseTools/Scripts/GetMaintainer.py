@@ -96,7 +96,7 @@ def get_section_maintainers(path, section):
             else:
                 lists += [address]
 
-    return maintainers, lists
+    return {'maintainers': maintainers, 'lists': lists}
 
 def get_maintainers(path, sections, level=0):
     """For 'path', iterates over all sections, returning maintainers
@@ -104,22 +104,24 @@ def get_maintainers(path, sections, level=0):
     maintainers = []
     lists = []
     for section in sections:
-        tmp_maint, tmp_lists = get_section_maintainers(path, section)
-        maintainers += tmp_maint
-        lists += tmp_lists
+        recipients = get_section_maintainers(path, section)
+        maintainers += recipients['maintainers']
+        lists += recipients['lists']
 
     if not maintainers:
         # If no match found, look for match for (nonexistent) file
         # REPO.working_dir/<default>
         print('"%s": no maintainers found, looking for default' % path)
         if level == 0:
-            maintainers = get_maintainers('<default>', sections, level=level + 1)
+            recipients = get_maintainers('<default>', sections, level=level + 1)
+            maintainers += recipients['maintainers']
+            lists += recipients['lists']
         else:
             print("No <default> maintainers set for project.")
         if not maintainers:
             return None
 
-    return maintainers + lists
+    return {'maintainers': maintainers, 'lists': lists}
 
 def parse_maintainers_line(line):
     """Parse one line of Maintainers.txt, returning any match group and its key."""
@@ -184,9 +186,8 @@ if __name__ == '__main__':
 
     for file in FILES:
         print(file)
-        addresslist = get_maintainers(file, SECTIONS)
-        if addresslist:
-            ADDRESSES += addresslist
+        recipients = get_maintainers(file, SECTIONS)
+        ADDRESSES += recipients['maintainers'] + recipients['lists']
 
     for address in list(OrderedDict.fromkeys(ADDRESSES)):
         if '<' in address and '>' in address:
