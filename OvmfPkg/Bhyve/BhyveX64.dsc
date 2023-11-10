@@ -668,7 +668,6 @@
 !ifdef $(CSM_ENABLE)
 !error "CSM is being torn down"
       NULL|OvmfPkg/Bhyve/Csm/CsmSupportLib/CsmSupportLib.inf
-      NULL|OvmfPkg/Csm/LegacyBootManagerLib/LegacyBootManagerLib.inf
 !endif
   }
   MdeModulePkg/Logo/LogoDxe.inf
@@ -678,7 +677,6 @@
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
 !ifdef $(CSM_ENABLE)
-      NULL|OvmfPkg/Csm/LegacyBootManagerLib/LegacyBootManagerLib.inf
       NULL|OvmfPkg/Csm/LegacyBootMaintUiLib/LegacyBootMaintUiLib.inf
 !endif
   }
