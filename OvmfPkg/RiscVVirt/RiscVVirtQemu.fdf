@@ -218,8 +218,6 @@ INF  MdeModulePkg/Logo/LogoDxe.inf
 #
 INF  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
 
-#INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
-
 ################################################################################
 
 [FV.FVMAIN_COMPACT]
