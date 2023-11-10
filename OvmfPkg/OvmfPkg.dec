@@ -256,32 +256,6 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize|0x0|UINT32|0x1a
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDecompressionScratchEnd|0x0|UINT32|0x1f
 
-  ## Pcd8259LegacyModeMask defines the default mask value for platform. This
-  #  value is determined.
-  #  1) If platform only support pure UEFI, value should be set to 0xFFFF or
-  #     0xFFFE; Because only clock interrupt is allowed in legacy mode in pure
-  #     UEFI platform.
-  #  2) If platform install CSM and use thunk module:
-  #     a) If thunk call provided by CSM binary requires some legacy interrupt
-  #        support, the corresponding bit should be opened as 0.
-  #        For example, if keyboard interfaces provided CSM binary use legacy
-  #        keyboard interrupt in 8259 bit 1, then the value should be set to
-  #        0xFFFC.
-  #     b) If all thunk call provied by CSM binary do not require legacy
-  #        interrupt support, value should be set to 0xFFFF or 0xFFFE.
-  #
-  #  The default value of legacy mode mask could be changed by
-  #  EFI_LEGACY_8259_PROTOCOL->SetMask(). But it is rarely need change it
-  #  except some special cases such as when initializing the CSM binary, it
-  #  should be set to 0xFFFF to mask all legacy interrupt. Please restore the
-  #  original legacy mask value if changing is made for these special case.
-  gUefiOvmfPkgTokenSpaceGuid.Pcd8259LegacyModeMask|0xFFFF|UINT16|0x3
-
-  ## Pcd8259LegacyModeEdgeLevel defines the default edge level for legacy
-  #  mode's interrrupt controller.
-  #  For the corresponding bits, 0 = Edge triggered and 1 = Level triggered.
-  gUefiOvmfPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0000|UINT16|0x5
-
   gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtr|0x0|UINT32|0x17
   gUefiOvmfPkgTokenSpaceGuid.PcdXenPvhStartOfDayStructPtrSize|0x0|UINT32|0x32
 
