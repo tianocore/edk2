@@ -654,11 +654,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Base|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio32Size|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Base|0x0
-!ifdef $(CSM_ENABLE)
-  gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x0
-!else
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size|0x800000000
-!endif
 
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|0
 
