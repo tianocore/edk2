@@ -497,8 +497,3 @@
 
   ## This feature flag indicates the firmware build supports secure boot.
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|FALSE|BOOLEAN|0x6d
-
-  ## Informs modules (including pre-DXE-phase modules) whether the platform
-  #  firmware contains a CSM (Compatibility Support Module).
-  #
-  gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable|FALSE|BOOLEAN|0x35
