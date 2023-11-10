@@ -88,7 +88,7 @@ def get_section_maintainers(path, section):
             if isinstance(address, list):
                 maintainers += address
             else:
-                lists += [address]
+                maintainers += [address]
         for address in section['list']:
             # Convert to list if necessary
             if isinstance(address, list):
