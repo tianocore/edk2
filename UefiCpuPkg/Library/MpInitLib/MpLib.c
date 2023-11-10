@@ -910,9 +910,16 @@ DxeApEntryPoint (
   CPU_MP_DATA  *CpuMpData
   )
 {
-  UINTN  ProcessorNumber;
+  UINTN                   ProcessorNumber;
+  MSR_IA32_EFER_REGISTER  EferMsr;
 
   GetProcessorNumber (CpuMpData, &ProcessorNumber);
+  if (CpuMpData->EnableExecuteDisableForSwitchContext) {
+    EferMsr.Uint64   = AsmReadMsr64 (MSR_IA32_EFER);
+    EferMsr.Bits.NXE = 1;
+    AsmWriteMsr64 (MSR_IA32_EFER, EferMsr.Uint64);
+  }
+
   RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
   InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
   PlaceAPInMwaitLoopOrRunLoop (
@@ -2188,8 +2195,9 @@ MpInitLibInitialize (
     if (MpHandOff->WaitLoopExecutionMode == sizeof (VOID *)) {
       ASSERT (CpuMpData->ApLoopMode != ApInHltLoop);
 
-      CpuMpData->FinishedCount = 0;
-      CpuMpData->InitFlag      = ApInitDone;
+      CpuMpData->FinishedCount                        = 0;
+      CpuMpData->InitFlag                             = ApInitDone;
+      CpuMpData->EnableExecuteDisableForSwitchContext = IsBspExecuteDisableEnabled ();
       SaveCpuMpData (CpuMpData);
       //
       // In scenarios where both the PEI and DXE phases run in the same
