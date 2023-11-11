@@ -20,7 +20,7 @@ UINT32                    mCetPl0Ssp;
 UINT32                    mCetInterruptSsp;
 UINT32                    mCetInterruptSspTable;
 
-UINTN  mSmmInterruptSspTables;
+UINTN  mSmmInterruptSspTables = 0;
 
 /**
   Initialize IDT IST Field.
