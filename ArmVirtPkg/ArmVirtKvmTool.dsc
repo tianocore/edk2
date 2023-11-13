@@ -372,7 +372,7 @@
   #
   # PCI support
   #
-  ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf {
+  UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
       NULL|OvmfPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
