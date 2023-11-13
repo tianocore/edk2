@@ -1553,6 +1553,19 @@ SmmWaitForApArrival (
   );
 
 /**
+  Returns the Number of SMM Delayed & Blocked & Disabled Thread Count.
+  @param[in,out] DelayedCount  The Number of SMM Delayed Thread Count.
+  @param[in,out] BlockedCount  The Number of SMM Blocked Thread Count.
+  @param[in,out] DisabledCount The Number of SMM Disabled Thread Count.
+**/
+VOID
+GetSmmDelayedBlockedDisabledCount (
+  IN OUT UINT32  *DelayedCount,
+  IN OUT UINT32  *BlockedCount,
+  IN OUT UINT32  *DisabledCount
+  );
+
+/**
   Write unprotect read-only pages if Cr0.Bits.WP is 1.
 
   @param[out]  WriteProtect      If Cr0.Bits.WP is enabled.

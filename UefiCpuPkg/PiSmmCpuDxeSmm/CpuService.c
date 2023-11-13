@@ -416,7 +416,14 @@ SmmCpuRendezvous (
   IN BOOLEAN                            BlockingMode
   )
 {
+  UINTN       Index;
+  UINTN       PresentCount;
+  UINT32      BlockedCount;
+  UINT32      DisabledCount;
   EFI_STATUS  Status;
+
+  BlockedCount  = 0;
+  DisabledCount = 0;
 
   //
   // Return success immediately if all CPUs are already synchronized.
@@ -436,6 +443,26 @@ SmmCpuRendezvous (
     // There are some APs outside SMM, Wait for all avaiable APs to arrive.
     //
     SmmWaitForApArrival ();
+
+    //
+    // Make sure all APs have their Present flag set
+    //
+    while (TRUE) {
+      PresentCount = 0;
+      for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+        if (*(mSmmMpSyncData->CpuData[Index].Present)) {
+          PresentCount++;
+        }
+      }
+
+      GetSmmDelayedBlockedDisabledCount (NULL, &BlockedCount, &DisabledCount);
+      if (PresentCount == mMaxNumberOfCpus - BlockedCount - DisabledCount ) {
+        break;
+      }
+
+      CpuPause ();
+    }
+
     Status = mSmmMpSyncData->AllApArrivedWithException ? EFI_SUCCESS : EFI_TIMEOUT;
   } else {
     //
