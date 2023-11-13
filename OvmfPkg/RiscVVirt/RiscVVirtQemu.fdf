@@ -184,7 +184,7 @@ INF  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
 #
 # PCI support
 #
-INF  OvmfPkg/RiscVVirt/PciCpuIo2Dxe/PciCpuIo2Dxe.inf
+INF  UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
 INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
 INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
 INF  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
