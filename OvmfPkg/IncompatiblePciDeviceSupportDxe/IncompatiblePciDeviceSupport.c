@@ -49,12 +49,12 @@ STATIC EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL
 STATIC CONST EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  mMmio64Configuration = {
   ACPI_ADDRESS_SPACE_DESCRIPTOR,                   // Desc
   (UINT16)(                                        // Len
-                                                   sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
-                                                   OFFSET_OF (
-                                                     EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
-                                                     ResType
-                                                     )
-                                                   ),
+    sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
+    OFFSET_OF (
+      EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
+      ResType
+      )
+    ),
   ACPI_ADDRESS_SPACE_TYPE_MEM,                     // ResType
   0,                                               // GenFlag
   0,                                               // SpecificFlag
@@ -83,12 +83,12 @@ STATIC CONST EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  mMmio64Configuration = {
 STATIC CONST EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  mOptionRomConfiguration =   {
   ACPI_ADDRESS_SPACE_DESCRIPTOR,                   // Desc
   (UINT16)(                                        // Len
-                                                   sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
-                                                   OFFSET_OF (
-                                                     EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
-                                                     ResType
-                                                     )
-                                                   ),
+    sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
+    OFFSET_OF (
+      EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
+      ResType
+      )
+    ),
   ACPI_ADDRESS_SPACE_TYPE_MEM,                     // ResType
   0,                                               // GenFlag
   0,                                               // Disable option roms SpecificFlag

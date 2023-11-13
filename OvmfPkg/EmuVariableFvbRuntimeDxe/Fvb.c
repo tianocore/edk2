@@ -658,8 +658,8 @@ InitializeFvAndVariableStoreHeaders (
 
       // UINT32  Size;
       (
-       FixedPcdGet32 (PcdFlashNvStorageVariableSize) -
-       OFFSET_OF (FVB_FV_HDR_AND_VARS_TEMPLATE, VarHdr)
+        FixedPcdGet32 (PcdFlashNvStorageVariableSize) -
+        OFFSET_OF (FVB_FV_HDR_AND_VARS_TEMPLATE, VarHdr)
       ),
 
       // UINT8   Format;
