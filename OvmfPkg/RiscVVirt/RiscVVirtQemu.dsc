@@ -433,7 +433,7 @@
   #
   # PCI support
   #
-  OvmfPkg/RiscVVirt/PciCpuIo2Dxe/PciCpuIo2Dxe.inf {
+  UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
   }
