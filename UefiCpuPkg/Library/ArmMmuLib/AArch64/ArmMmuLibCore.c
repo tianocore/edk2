@@ -523,10 +523,26 @@ FillTranslationTable (
   IN  BOOLEAN                       Lpa2Enabled
   )
 {
+  UINT64  CcaProtectionAttribute;
+
+  //
+  // The CCA protection attribute corresponds to the (IPA_WIDTH - 1) bit of the
+  // Realm address space. The VA and PA for a region are expected to differ only
+  // in this bit. Derive the attribute by XORing the two addresses.
+  //
+  // NOTE: If more than one bit differs, the memory map is misconfigured.
+  //
+  CcaProtectionAttribute = MemoryRegion->VirtualBase ^ MemoryRegion->PhysicalBase;
+
+  //
+  // Ensure only one bit is set.
+  //
+  ASSERT (((CcaProtectionAttribute & (CcaProtectionAttribute - 1)) == 0));
+
   return UpdateRegionMapping (
            MemoryRegion->VirtualBase,
            MemoryRegion->Length,
-           ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
+           ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF | CcaProtectionAttribute,
            0,
            RootTable,
            FALSE,
