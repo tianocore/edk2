@@ -359,6 +359,7 @@ CreateAmlCpcNode (
 
   @param [in]  Generator    The SSDT Cpu Topology generator.
   @param [in]  ParentNode   Parent node to attach the Cpu node to.
+  @param [in]  GicCInfo     CM_ARM_GICC_INFO object used to create the node.
   @param [in]  CpuName      Value used to generate the node name.
   @param [out] EtNodePtr   If not NULL, return the created Cpu node.
 
@@ -372,6 +373,7 @@ EFIAPI
 CreateAmlEtd (
   IN   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
   IN   AML_NODE_HANDLE              ParentNode,
+  IN   CM_ARM_GICC_INFO             *GicCInfo,
   IN   UINT32                       CpuName,
   OUT  AML_OBJECT_NODE_HANDLE       *EtNodePtr OPTIONAL
   )
@@ -397,7 +399,7 @@ CreateAmlEtd (
 
   Status = AmlCodeGenNameInteger (
              "_UID",
-             CpuName,
+             GicCInfo->AcpiProcessorUid,
              EtNode,
              NULL
              );
@@ -474,6 +476,7 @@ CreateAmlEtNode (
   Status = CreateAmlEtd (
              Generator,
              Node,
+             GicCInfo,
              CpuName,
              NULL
              );
