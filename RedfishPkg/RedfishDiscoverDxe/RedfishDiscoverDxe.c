@@ -322,9 +322,16 @@ GetTargetNetworkInterfaceInternal (
 {
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *ThisNetworkInterface;
 
+  if (IsListEmpty (&mEfiRedfishDiscoverNetworkInterface)) {
+    return NULL;
+  }
+
   ThisNetworkInterface = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
   while (TRUE) {
-    if (CompareMem ((VOID *)&ThisNetworkInterface->MacAddress, &TargetNetworkInterface->MacAddress, ThisNetworkInterface->HwAddressSize) == 0) {
+    if ((MAC_COMPARE (ThisNetworkInterface, TargetNetworkInterface) == 0) &&
+        (VALID_TCP6 (TargetNetworkInterface, ThisNetworkInterface) ||
+         VALID_TCP4 (TargetNetworkInterface, ThisNetworkInterface)))
+    {
       return ThisNetworkInterface;
     }
 
@@ -353,6 +360,10 @@ GetTargetNetworkInterfaceInternalByController (
   )
 {
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *ThisNetworkInterface;
+
+  if (IsListEmpty (&mEfiRedfishDiscoverNetworkInterface)) {
+    return NULL;
+  }
 
   ThisNetworkInterface = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
   while (TRUE) {
@@ -477,6 +488,42 @@ CheckIsIpVersion6 (
 }
 
 /**
+  This function returns the  IP type supported by the Host Interface.
+
+  @retval 00h is Unknown
+          01h is Ipv4
+          02h is Ipv6
+
+**/
+UINT8
+GetHiIpProtocolType (
+  VOID
+  )
+{
+  EFI_STATUS                     Status;
+  REDFISH_OVER_IP_PROTOCOL_DATA  *Data;
+  REDFISH_INTERFACE_DATA         *DeviceDescriptor;
+
+  Data             = NULL;
+  DeviceDescriptor = NULL;
+  if (mSmbios == NULL) {
+    Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **)&mSmbios);
+    if (EFI_ERROR (Status)) {
+      return REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_UNKNOWN;
+    }
+  }
+
+  Status = RedfishGetHostInterfaceProtocolData (mSmbios, &DeviceDescriptor, &Data); // Search for SMBIOS type 42h
+  if (!EFI_ERROR (Status) && (Data != NULL) &&
+      (Data->HostIpAssignmentType == RedfishHostIpAssignmentStatic))
+  {
+    return Data->HostIpAddressFormat;
+  }
+
+  return REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_UNKNOWN;
+}
+
+/**
   This function discover Redfish service through SMBIOS host interface.
 
   @param[in]    Instance     EFI_REDFISH_DISCOVERED_INTERNAL_INSTANCE
@@ -512,6 +559,18 @@ DiscoverRedfishHostInterface (
 
   Status = RedfishGetHostInterfaceProtocolData (mSmbios, &DeviceDescriptor, &Data); // Search for SMBIOS type 42h
   if (!EFI_ERROR (Status) && (Data != NULL) && (DeviceDescriptor != NULL)) {
+    if ((Instance->NetworkInterface->NetworkProtocolType == ProtocolTypeTcp4) &&
+        (Data->HostIpAddressFormat != REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_IP4)) // IPv4 case
+    {
+      DEBUG ((DEBUG_ERROR, "%a: Network Interface is IPv4, but Host Interface requires Ipv6\n", __func__));
+      return EFI_UNSUPPORTED;
+    } else if ((Instance->NetworkInterface->NetworkProtocolType == ProtocolTypeTcp6) &&
+               (Data->HostIpAddressFormat != REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_IP6)) // IPv6 case
+    {
+      DEBUG ((DEBUG_ERROR, "%a: Network Interface is IPv6, but Host Interface requires IPv4\n", __func__));
+      return EFI_UNSUPPORTED;
+    }
+
     //
     // Check if we can reach out Redfish service using this network interface.
     // Check with MAC address using Device Descriptor Data Device Type 04 and Type 05.
@@ -1102,6 +1161,7 @@ RedfishServiceGetNetworkInterface (
   OUT EFI_REDFISH_DISCOVER_NETWORK_INTERFACE  **NetworkIntfInstances
   )
 {
+  EFI_STATUS                                       Status;
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL  *ThisNetworkInterfaceIntn;
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE           *ThisNetworkInterface;
   EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL   *RestExInstance;
@@ -1141,13 +1201,23 @@ RedfishServiceGetNetworkInterface (
 
   ThisNetworkInterfaceIntn = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
   while (TRUE) {
+    // If Get Subnet Info failed then skip this interface
+    Status = NetworkInterfaceGetSubnetInfo (ThisNetworkInterfaceIntn, ImageHandle); // Get subnet info
+    if (EFI_ERROR (Status)) {
+      if (IsNodeAtEnd (&mEfiRedfishDiscoverNetworkInterface, &ThisNetworkInterfaceIntn->Entry)) {
+        break;
+      }
+
+      ThisNetworkInterfaceIntn = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetNextNode (&mEfiRedfishDiscoverNetworkInterface, &ThisNetworkInterfaceIntn->Entry);
+      continue;
+    }
+
     ThisNetworkInterface->IsIpv6 = FALSE;
     if (CheckIsIpVersion6 (ThisNetworkInterfaceIntn)) {
       ThisNetworkInterface->IsIpv6 = TRUE;
     }
 
     CopyMem ((VOID *)&ThisNetworkInterface->MacAddress, &ThisNetworkInterfaceIntn->MacAddress, ThisNetworkInterfaceIntn->HwAddressSize);
-    NetworkInterfaceGetSubnetInfo (ThisNetworkInterfaceIntn, ImageHandle); // Get subnet info.
     if (!ThisNetworkInterface->IsIpv6) {
       IP4_COPY_ADDRESS (&ThisNetworkInterface->SubnetId.v4, &ThisNetworkInterfaceIntn->SubnetAddr.v4); // IPv4 subnet information.
     } else {
@@ -1230,7 +1300,12 @@ RedfishServiceAcquireService (
 
   if (TargetNetworkInterface != NULL) {
     TargetNetworkInterfaceInternal = GetTargetNetworkInterfaceInternal (TargetNetworkInterface);
-    NumNetworkInterfaces           = 1;
+    if (TargetNetworkInterfaceInternal == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a:No network interface on platform.\n", __func__));
+      return EFI_UNSUPPORTED;
+    }
+
+    NumNetworkInterfaces = 1;
   } else {
     TargetNetworkInterfaceInternal = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
     NumNetworkInterfaces           = NumberOfNetworkInterface ();
@@ -1260,7 +1335,13 @@ RedfishServiceAcquireService (
       // Get subnet information in case subnet information is not set because
       // RedfishServiceGetNetworkInterfaces hasn't been called yet.
       //
-      NetworkInterfaceGetSubnetInfo (TargetNetworkInterfaceInternal, ImageHandle);
+      Status1 = NetworkInterfaceGetSubnetInfo (TargetNetworkInterfaceInternal, ImageHandle);
+      if (EFI_ERROR (Status1)) {
+        DEBUG ((DEBUG_ERROR, "%a: Get subnet information fail.\n", __func__));
+        FreePool (Instance);
+        continue;
+      }
+
       NewInstance = TRUE;
     }
 
@@ -1601,10 +1682,22 @@ BuildupNetworkInterface (
   EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL   *RestExInstance;
   EFI_TPL                                          OldTpl;
   BOOLEAN                                          NewNetworkInterfaceInstalled;
+  UINT8                                            IpType;
+  UINTN                                            ListCount;
 
+  ListCount                    = (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL));
   NewNetworkInterfaceInstalled = FALSE;
   Index                        = 0;
-  do {
+
+  // Get IP Type to filter out unnecessary network protocol if possible
+  IpType = GetHiIpProtocolType ();
+
+  for (Index = 0; Index < ListCount; Index++) {
+    // Check IP Type and skip an unnecessary network protocol if does not match
+    if (IS_TCP4_MATCH (IpType) || IS_TCP6_MATCH (IpType)) {
+      continue;
+    }
+
     Status = gBS->OpenProtocol (
                     // Already in list?
                     ControllerHandle,
@@ -1615,11 +1708,6 @@ BuildupNetworkInterface (
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
     if (!EFI_ERROR (Status)) {
-      Index++;
-      if (Index == (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL))) {
-        break;
-      }
-
       continue;
     }
 
@@ -1632,11 +1720,6 @@ BuildupNetworkInterface (
                     EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
     if (EFI_ERROR (Status)) {
-      Index++;
-      if (Index == (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL))) {
-        break;
-      }
-
       continue;
     }
 
@@ -1695,11 +1778,6 @@ BuildupNetworkInterface (
                     ProtocolDiscoverIdPtr
                     );
     if (EFI_ERROR (Status)) {
-      Index++;
-      if (Index == (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL))) {
-        break;
-      }
-
       continue;
     }
 
@@ -1756,25 +1834,13 @@ BuildupNetworkInterface (
           }
         } else {
           DEBUG ((DEBUG_MANAGEABILITY, "%a: Not REST EX, continue with next\n", __func__));
-          Index++;
-          if (Index == (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL))) {
-            break;
-          }
-
           continue;
         }
       }
 
       return Status;
-    } else {
-      Index++;
-      if (Index == (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL))) {
-        break;
-      }
-
-      continue;
     }
-  } while (Index < (sizeof (gRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL)));
+  }
 
   return EFI_DEVICE_ERROR;
 }
