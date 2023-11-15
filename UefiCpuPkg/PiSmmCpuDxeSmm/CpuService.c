@@ -171,6 +171,16 @@ SmmAddProcessor (
         &gSmmCpuPrivate->ProcessorInfo[Index].Location.Thread
         );
 
+      GetProcessorLocation2ByApicId (
+        (UINT32)ProcessorId,
+        &gSmmCpuPrivate->ProcessorInfo[Index].ExtendedInformation.Location2.Package,
+        &gSmmCpuPrivate->ProcessorInfo[Index].ExtendedInformation.Location2.Die,
+        &gSmmCpuPrivate->ProcessorInfo[Index].ExtendedInformation.Location2.Tile,
+        &gSmmCpuPrivate->ProcessorInfo[Index].ExtendedInformation.Location2.Module,
+        &gSmmCpuPrivate->ProcessorInfo[Index].ExtendedInformation.Location2.Core,
+        &gSmmCpuPrivate->ProcessorInfo[Index].ExtendedInformation.Location2.Thread
+        );
+
       *ProcessorNumber                 = Index;
       gSmmCpuPrivate->Operation[Index] = SmmCpuAdd;
       return EFI_SUCCESS;
