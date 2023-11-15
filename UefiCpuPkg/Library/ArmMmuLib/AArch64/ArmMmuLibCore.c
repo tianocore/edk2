@@ -484,10 +484,14 @@ FillTranslationTable (
   IN  BOOLEAN                       Lpa2Enabled
   )
 {
+  UINT64  CcaNsBit;
+
+  CcaNsBit = MemoryRegion->VirtualBase ^ MemoryRegion->PhysicalBase;
+
   return UpdateRegionMapping (
            MemoryRegion->VirtualBase,
            MemoryRegion->Length,
-           ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
+           ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF | CcaNsBit,
            0,
            RootTable,
            FALSE,
