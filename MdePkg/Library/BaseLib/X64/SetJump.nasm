@@ -14,6 +14,7 @@
 ;------------------------------------------------------------------------------
 
 %include "Nasm.inc"
+%include "Cet.inc"
 
     DEFAULT REL
     SECTION .text
@@ -44,7 +45,7 @@ ASM_PFX(SetJump):
     test    eax, eax
     jz      CetDone
     mov     rax, cr4
-    bt      eax, 23                      ; check if CET is enabled
+    bt      eax, CR4_CET_BIT             ; check if CET is enabled
     jnc     CetDone
 
     mov     rax, 1
