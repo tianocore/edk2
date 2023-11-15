@@ -39,6 +39,10 @@
 #define REDFISH_DISCOVER_VERSION                    0x00010000
 #define EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_TPL  TPL_NOTIFY
 
+#define MAC_COMPARE(This, Target)  (CompareMem ((VOID *)&(This)->MacAddress, &(Target)->MacAddress, (This)->HwAddressSize) == 0)
+#define VALID_TCP6(Target, This)   ((Target)->IsIpv6 && ((This)->NetworkProtocolType == ProtocolTypeTcp6))
+#define VALID_TCP4(Target, This)   (!(Target)->IsIpv6 && ((This)->NetworkProtocolType == ProtocolTypeTcp4))
+
 //
 // GUID definitions
 //
