@@ -78,13 +78,14 @@ PvalidateRange (
   IN  BOOLEAN                     Validate
   )
 {
-  UINTN  Address, RmpPageSize, Ret, i;
+  UINTN                 RmpPageSize, Ret, i;
+  EFI_PHYSICAL_ADDRESS  Address;
 
   for ( ; StartIndex <= EndIndex; StartIndex++) {
     //
     // Get the address and the page size from the Info.
     //
-    Address     = Info->Entry[StartIndex].GuestFrameNumber << EFI_PAGE_SHIFT;
+    Address     = ((EFI_PHYSICAL_ADDRESS)Info->Entry[StartIndex].GuestFrameNumber) << EFI_PAGE_SHIFT;
     RmpPageSize = Info->Entry[StartIndex].PageSize;
 
     Ret = AsmPvalidate (RmpPageSize, Validate, Address);
