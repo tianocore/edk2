@@ -462,6 +462,7 @@ F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
+M: Laszlo Ersek <lersek@redhat.com> [lersek]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 S: Maintained
 
