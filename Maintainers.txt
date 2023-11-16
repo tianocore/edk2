@@ -617,6 +617,7 @@ UefiCpuPkg
 F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
+M: Laszlo Ersek <lersek@redhat.com> [lersek]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
