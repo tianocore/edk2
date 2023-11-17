@@ -29,7 +29,8 @@
   ArmVirtPkg/ArmVirtPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [Pcd]
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
