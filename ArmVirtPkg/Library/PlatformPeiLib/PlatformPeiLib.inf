@@ -41,16 +41,16 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvSize
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeAllocationPadding
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding
 
 [Pcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress         ## SOMETIMES_PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress             ## SOMETIMES_PRODUCES
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
 
 [Ppis]
-  gOvmfTpmDiscoveredPpiGuid                               ## SOMETIMES_PRODUCES
-  gPeiTpmInitializationDonePpiGuid                        ## SOMETIMES_PRODUCES
+  gOvmfTpmDiscoveredPpiGuid                                   ## SOMETIMES_PRODUCES
+  gPeiTpmInitializationDonePpiGuid                            ## SOMETIMES_PRODUCES
 
 [Guids]
   gEarlyPL011BaseAddressGuid

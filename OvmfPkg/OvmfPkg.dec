@@ -386,6 +386,21 @@
   #
   gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|0x0|BOOLEAN|0x69
 
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  #
+  # This is the physical address where the device tree is expected to be stored
+  # upon first entry into UEFI. This needs to be a FixedAtBuild PCD, so that we
+  # can do a first pass over the device tree in the SEC phase to discover the
+  # UART base address.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0|UINT64|0x6e
+
+  #
+  # Padding in bytes to add to the device tree allocation, so that the DTB can
+  # be modified in place (default: 256 bytes)
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding|256|UINT32|0x6f
+
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x1d
