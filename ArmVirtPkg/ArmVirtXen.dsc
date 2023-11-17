@@ -115,7 +115,7 @@
   #
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x0
   gArmTokenSpaceGuid.PcdSystemMemorySize|0x0
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0
 
   gArmTokenSpaceGuid.PcdFdBaseAddress|0x0
   gArmTokenSpaceGuid.PcdFvBaseAddress|0x0

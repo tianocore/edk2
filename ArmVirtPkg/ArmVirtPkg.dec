@@ -43,20 +43,6 @@
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   #
-  # This is the physical address where the device tree is expected to be stored
-  # upon first entry into UEFI. This needs to be a FixedAtBuild PCD, so that we
-  # can do a first pass over the device tree in the SEC phase to discover the
-  # UART base address.
-  #
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0|UINT64|0x00000001
-
-  #
-  # Padding in bytes to add to the device tree allocation, so that the DTB can
-  # be modified in place (default: 256 bytes)
-  #
-  gArmVirtTokenSpaceGuid.PcdDeviceTreeAllocationPadding|256|UINT32|0x00000002
-
-  #
   # Binary representation of the GUID that determines the terminal type. The
   # size must be exactly 16 bytes. The default value corresponds to
   # EFI_VT_100_GUID.
