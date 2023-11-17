@@ -1547,26 +1547,25 @@ TestForRequiredProtocols (
                     ControllerHandle,
                     EFI_OPEN_PROTOCOL_TEST_PROTOCOL
                     );
-    if (EFI_ERROR (Status)) {
-      return EFI_UNSUPPORTED;
-    }
-
-    Status = gBS->OpenProtocol (
-                    ControllerHandle,
-                    gRequiredProtocol[Index].DiscoveredProtocolGuid,
-                    (VOID **)&Id,
-                    This->DriverBindingHandle,
-                    ControllerHandle,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                    );
     if (!EFI_ERROR (Status)) {
-      // Already installed
-      return EFI_UNSUPPORTED;
+      Status = gBS->OpenProtocol (
+                      ControllerHandle,
+                      gRequiredProtocol[Index].DiscoveredProtocolGuid,
+                      (VOID **)&Id,
+                      This->DriverBindingHandle,
+                      ControllerHandle,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
+      if (EFI_ERROR (Status)) {
+        if (Index == ListCount - 1) {
+          DEBUG ((DEBUG_INFO, "%a: all required protocols are found on this controller handle: %p.\n", __func__, ControllerHandle));
+          return EFI_SUCCESS;
+        }
+      }
     }
   }
 
-  DEBUG ((DEBUG_MANAGEABILITY, "%a: all required protocols are found on this controller handle: %p.\n", __func__, ControllerHandle));
-  return EFI_SUCCESS;
+  return EFI_UNSUPPORTED;
 }
 
 /**
