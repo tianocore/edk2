@@ -1638,7 +1638,7 @@ EfiMemoryTypeToE820Type (
 
   //
   // All other types map to reserved.
-  // Adding the code just waists FLASH space.
+  // Adding the code just wastes FLASH space.
   //
   //  case  EfiReservedMemoryType:
   //  case  EfiUnusableMemory:
