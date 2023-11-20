@@ -67,6 +67,8 @@ endstruc
 
 ;
 ; Equivalent NASM structure of MP_CPU_EXCHANGE_INFO
+; Assembly routines should refrain from directly interacting with
+; the internal details of CPU_MP_DATA.
 ;
 struc MP_CPU_EXCHANGE_INFO
   .StackStart:                   CTYPE_UINTN 1
