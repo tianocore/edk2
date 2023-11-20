@@ -277,7 +277,7 @@ GetMaxSplitRecordCount (
       break;
     }
 
-    SplitRecordCount += (2 * ImageRecord->CodeSegmentCount + 1);
+    SplitRecordCount += (2 * ImageRecord->CodeSegmentCount + 3);
     PhysicalStart     = ImageRecord->ImageBase + ImageRecord->ImageSize;
   } while ((ImageRecord != NULL) && (PhysicalStart < PhysicalEnd));
 
