@@ -434,7 +434,27 @@ ApFuncEnableX2Apic (
 }
 
 /**
-  Do sync on APs.
+  Sync BSP's MTRR table to AP during waking up APs.
+  @param[in, out] Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+ApMtrrSync (
+  IN OUT VOID  *Buffer
+  )
+{
+  CPU_MP_DATA  *CpuMpData;
+
+  CpuMpData = (CPU_MP_DATA *)Buffer;
+
+  //
+  // Sync BSP's MTRR table to AP
+  //
+  MtrrSetAllMtrrs (&CpuMpData->MtrrTable);
+}
+
+/**
+  Do sync on APs, includes loading microcode, and sync MTRRs.
 
   @param[in, out] Buffer  Pointer to private data buffer.
 **/
@@ -2155,10 +2175,16 @@ MpInitLibInitialize (
   //
   ProgramVirtualWireMode ();
 
+  //
+  // If MpHandOff is NULL, it indicates the first-time MP initialization.
+  // Following this if/else condition, CpuMpData will be either filled or updated.
+  // Additionally, for pure 32/64-bit mode, MP initialization will be completed directly.
+  //
   if (MpHandOff == NULL) {
     if (MaxLogicalProcessorNumber > 1) {
       //
-      // Wakeup all APs and calculate the processor count in system
+      // Wakeup all APs and calculate the processor count in system,
+      // and may also update CpuInfoInHob.
       //
       CollectProcessorCount (CpuMpData);
     }
@@ -2185,6 +2211,10 @@ MpInitLibInitialize (
     }
 
     DEBUG ((DEBUG_INFO, "MpHandOff->WaitLoopExecutionMode: %04d, sizeof (VOID *): %04d\n", MpHandOff->WaitLoopExecutionMode, sizeof (VOID *)));
+    //
+    // For the scenarios where both the PEI and DXE phases run in the same
+    // execution mode (32bit or 64bit).
+    //
     if (MpHandOff->WaitLoopExecutionMode == sizeof (VOID *)) {
       ASSERT (CpuMpData->ApLoopMode != ApInHltLoop);
 
@@ -2224,29 +2254,28 @@ MpInitLibInitialize (
     }
   }
 
-  if (!GetMicrocodePatchInfoFromHob (
-         &CpuMpData->MicrocodePatchAddress,
-         &CpuMpData->MicrocodePatchRegionSize
-         ))
-  {
+  //
+  // Microcode preparation for BSP is required
+  // only during the first time MP initialization.
+  //
+if (MpHandOff == NULL) {
     //
     // The microcode patch information cache HOB does not exist, which means
     // the microcode patches data has not been loaded into memory yet
     //
     ShadowMicrocodeUpdatePatch (CpuMpData);
+    //
+    // Detect and apply Microcode on BSP
+    //
+    MicrocodeDetect (CpuMpData, CpuMpData->BspNumber);
   }
-
-  //
-  // Detect and apply Microcode on BSP
-  //
-  MicrocodeDetect (CpuMpData, CpuMpData->BspNumber);
   //
   // Store BSP's MTRR setting
   //
   MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
 
   //
-  // Wakeup APs to do some AP initialize sync (Microcode & MTRR)
+  // Wakeup APs to do some AP initialize sync.
   //
   if (CpuMpData->CpuCount > 1) {
     if (MpHandOff != NULL) {
@@ -2256,8 +2285,17 @@ MpInitLibInitialize (
       // in DXE.
       //
       CpuMpData->InitFlag = ApInitReconfig;
-      WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
+      //
+      //  Wakeup APs to sync MTRR settings.
+      //  For the case the PEI and DXE are in different bit mode.
+      //  It is necessary to do the MTRRs syncing.
+      //
+      WakeUpAP (CpuMpData, TRUE, 0, ApMtrrSync, CpuMpData, TRUE);
     } else {
+      //
+      // Wakeup APs to do some AP initialize sync, includes loading
+      // microcode and syncing MTRRs
+      //
       WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
     }
 
