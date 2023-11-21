@@ -50,10 +50,6 @@
   #
   ArmHvcLib|Include/Library/ArmHvcLib.h
 
-  ##  @libraryclass  Provides an interface to Arm registers.
-  #
-  ArmLib|Include/Library/ArmLib.h
-
   ##  @libraryclass  Provides a Mmu interface.
   #
   ArmMmuLib|Include/Library/ArmMmuLib.h
