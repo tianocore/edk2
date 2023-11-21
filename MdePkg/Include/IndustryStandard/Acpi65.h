@@ -19,6 +19,29 @@
 #pragma pack(1)
 
 ///
+/// C-state/T-state/P-state Coordination Types
+/// Cf. s8.3 Power, Performance, and Throttling State Dependencies
+///
+#define EFI_ACPI_6_5_AML_STATE_COORD_TYPE_SW_ALL  0xFC
+#define EFI_ACPI_6_5_AML_STATE_COORD_TYPE_SW_ANY  0xFD
+#define EFI_ACPI_6_5_AML_STATE_COORD_TYPE_HW_ALL  0xFE
+
+///
+/// _PSD Revision
+/// Cf. s8.4.5.5 _PSD (P-State Dependency)
+///
+#define EFI_ACPI_6_5_AML_PSD_REVISION_V0  0
+
+///
+/// _CPC Revision
+/// Cf. s8.4.6.1 _CPC (Continuous Performance Control)
+///
+#define EFI_ACPI_6_5_AML_CPC_REVISION_V0  0
+#define EFI_ACPI_6_5_AML_CPC_REVISION_V1  1
+#define EFI_ACPI_6_5_AML_CPC_REVISION_V2  2
+#define EFI_ACPI_6_5_AML_CPC_REVISION_V3  3
+
+///
 /// ACPI 6.5 Generic Address Space definition
 ///
 typedef struct {
