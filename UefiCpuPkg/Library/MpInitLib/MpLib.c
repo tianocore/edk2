@@ -2256,9 +2256,11 @@ MpInitLibInitialize (
       // in DXE.
       //
       CpuMpData->InitFlag = ApInitReconfig;
+      WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
+    } else {
+      WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
     }
 
-    WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
     //
     // Wait for all APs finished initialization
     //
