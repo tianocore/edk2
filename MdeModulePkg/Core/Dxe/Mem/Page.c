@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "DxeMain.h"
 #include "Imem.h"
 #include "HeapGuard.h"
-#include <Pi/PrePiDxeCis.h>
+#include <Pi/PiDxeCis.h>
 
 //
 // Entry for tracking the memory regions for each memory type to coalesce similar memory types
@@ -70,23 +70,23 @@ EFI_PHYSICAL_ADDRESS  mDefaultMaximumAddress = MAX_ALLOC_ADDRESS;
 EFI_PHYSICAL_ADDRESS  mDefaultBaseAddress    = MAX_ALLOC_ADDRESS;
 
 EFI_MEMORY_TYPE_INFORMATION  gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
-  { EfiReservedMemoryType,          0 },
-  { EfiLoaderCode,                  0 },
-  { EfiLoaderData,                  0 },
-  { EfiBootServicesCode,            0 },
-  { EfiBootServicesData,            0 },
-  { EfiRuntimeServicesCode,         0 },
-  { EfiRuntimeServicesData,         0 },
-  { EfiConventionalMemory,          0 },
-  { EfiUnusableMemory,              0 },
-  { EfiACPIReclaimMemory,           0 },
-  { EfiACPIMemoryNVS,               0 },
-  { EfiMemoryMappedIO,              0 },
-  { EfiMemoryMappedIOPortSpace,     0 },
-  { EfiPalCode,                     0 },
-  { EfiPersistentMemory,            0 },
-  { EFI_GCD_MEMORY_TYPE_UNACCEPTED, 0 },
-  { EfiMaxMemoryType,               0 }
+  { EfiReservedMemoryType,      0 },
+  { EfiLoaderCode,              0 },
+  { EfiLoaderData,              0 },
+  { EfiBootServicesCode,        0 },
+  { EfiBootServicesData,        0 },
+  { EfiRuntimeServicesCode,     0 },
+  { EfiRuntimeServicesData,     0 },
+  { EfiConventionalMemory,      0 },
+  { EfiUnusableMemory,          0 },
+  { EfiACPIReclaimMemory,       0 },
+  { EfiACPIMemoryNVS,           0 },
+  { EfiMemoryMappedIO,          0 },
+  { EfiMemoryMappedIOPortSpace, 0 },
+  { EfiPalCode,                 0 },
+  { EfiPersistentMemory,        0 },
+  { EfiGcdMemoryTypeUnaccepted, 0 },
+  { EfiMaxMemoryType,           0 }
 };
 //
 // Only used when load module at fixed address feature is enabled. True means the memory is alreay successfully allocated
@@ -2083,7 +2083,7 @@ CoreGetMemoryMap (
       MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
     }
 
-    if (MergeGcdMapEntry.GcdMemoryType == EFI_GCD_MEMORY_TYPE_UNACCEPTED) {
+    if (MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypeUnaccepted) {
       //
       // Page Align GCD range is required. When it is converted to EFI_MEMORY_DESCRIPTOR,
       // it will be recorded as page PhysicalStart and NumberOfPages.
