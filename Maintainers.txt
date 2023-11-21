@@ -519,6 +519,11 @@ OvmfPkg: LsiScsi driver
 F: OvmfPkg/LsiScsiDxe/
 R: Gary Lin <glin@suse.com> [lcp]
 
+OvmfPkg: MptScsi and PVSCSI driver
+F: OvmfPkg/MptScsiDxe/
+F: OvmfPkg/PvScsiDxe/
+R: Aaron Young <aaron.young@oracle.com> [ajyoung-oracle]
+
 OvmfPkg: TCG- and TPM2-related modules
 F: OvmfPkg/Include/IndustryStandard/QemuTpm.h
 F: OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c
