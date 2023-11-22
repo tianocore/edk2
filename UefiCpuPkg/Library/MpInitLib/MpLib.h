@@ -735,6 +735,16 @@ MicrocodeDetect (
   );
 
 /**
+    Dump the microcode revision for each core.
+
+    @param[in] CpuMpData          Pointer to CPU MP Data
+  **/
+VOID
+DumpMicrocodeRevision (
+  IN CPU_MP_DATA  *CpuMpData
+  );
+
+/**
   Shadow the required microcode patches data into memory.
 
   @param[in, out]  CpuMpData    The pointer to CPU MP Data structure.

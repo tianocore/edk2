@@ -322,6 +322,45 @@ OnExit:
 }
 
 /**
+    Dump the microcode revision for each core.
+
+    @param[in] CpuMpData          Pointer to CPU MP Data
+  **/
+VOID
+DumpMicrocodeRevision (
+  IN CPU_MP_DATA  *CpuMpData
+  )
+{
+  UINT32           ThreadId;
+  UINT32           ExpectedMicrocodeRevision;
+  CPU_INFO_IN_HOB  *CpuInfoInHob;
+  UINTN            Index;
+
+  CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+  for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+    GetProcessorLocationByApicId (CpuInfoInHob[Index].InitialApicId, NULL, NULL, &ThreadId);
+    if (ThreadId == 0) {
+      //
+      // MicrocodeDetect() loads microcode in first thread of each core, so,
+      // CpuMpData->CpuData[Index].MicrocodeEntryAddr is initialized only for first thread of each core.
+      //
+      ExpectedMicrocodeRevision = 0;
+      if (CpuMpData->CpuData[Index].MicrocodeEntryAddr != 0) {
+        ExpectedMicrocodeRevision = ((CPU_MICROCODE_HEADER *)(UINTN)CpuMpData->CpuData[Index].MicrocodeEntryAddr)->UpdateRevision;
+      }
+
+      DEBUG ((
+        DEBUG_INFO,
+        "CPU[%04d]: Microcode revision = %08x, expected = %08x\n",
+        Index,
+        CpuMpData->CpuData[Index].MicrocodeRevision,
+        ExpectedMicrocodeRevision
+        ));
+    }
+  }
+}
+
+/**
   Shadow the required microcode patches data into memory.
 
   @param[in, out]  CpuMpData    The pointer to CPU MP Data structure.
