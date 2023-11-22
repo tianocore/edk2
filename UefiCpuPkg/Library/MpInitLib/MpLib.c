@@ -451,12 +451,18 @@ ApInitializeSync (
   CpuMpData = (CPU_MP_DATA *)Buffer;
   Status    = GetProcessorNumber (CpuMpData, &ProcessorNumber);
   ASSERT_EFI_ERROR (Status);
+  if (CpuMpData->InitFlag != ApInitReconfig) {
+    //
+    // Load microcode on AP for PEI phase.
+    // During the DXE phase, it cannot omitted.
+    //
+    MicrocodeDetect (CpuMpData, ProcessorNumber);
+  }
+
   //
-  // Load microcode on AP
-  //
-  MicrocodeDetect (CpuMpData, ProcessorNumber);
-  //
-  // Sync BSP's MTRR table to AP
+  // Synchronizing the MTRR table to the AP is always essential.
+  // During the DXE phase, it cannot be omitted like loading microcode,
+  // as the PEI and DXE may be in different bit modes.
   //
   MtrrSetAllMtrrs (&CpuMpData->MtrrTable);
 }
@@ -2224,29 +2230,25 @@ MpInitLibInitialize (
     }
   }
 
-  if (!GetMicrocodePatchInfoFromHob (
-         &CpuMpData->MicrocodePatchAddress,
-         &CpuMpData->MicrocodePatchRegionSize
-         ))
-  {
+  if (MpHandOff == NULL) {
     //
     // The microcode patch information cache HOB does not exist, which means
     // the microcode patches data has not been loaded into memory yet
     //
     ShadowMicrocodeUpdatePatch (CpuMpData);
+    //
+    // Detect and apply Microcode on BSP
+    //
+    MicrocodeDetect (CpuMpData, CpuMpData->BspNumber);
   }
 
-  //
-  // Detect and apply Microcode on BSP
-  //
-  MicrocodeDetect (CpuMpData, CpuMpData->BspNumber);
   //
   // Store BSP's MTRR setting
   //
   MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
 
   //
-  // Wakeup APs to do some AP initialize sync (Microcode & MTRR)
+  // Wakeup APs to do some AP initialize sync (MTRR and/or Microcode).
   //
   if (CpuMpData->CpuCount > 1) {
     if (MpHandOff != NULL) {
@@ -2258,6 +2260,11 @@ MpInitLibInitialize (
       CpuMpData->InitFlag = ApInitReconfig;
     }
 
+    //
+    // Wake up the AP to perform some AP initialization synchronization.
+    // 1. For PEI stage, load microcode and synchronize MTRR,
+    // 2. For the DXE phase, only synchronize MTRR.
+    //
     WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
     //
     // Wait for all APs finished initialization
