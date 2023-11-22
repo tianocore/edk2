@@ -451,12 +451,20 @@ ApInitializeSync (
   CpuMpData = (CPU_MP_DATA *)Buffer;
   Status    = GetProcessorNumber (CpuMpData, &ProcessorNumber);
   ASSERT_EFI_ERROR (Status);
+  ASSERT (CpuMpData->InitFlag == ApInitReconfig || CpuMpData->InitFlag == ApInitDone);
+  if (CpuMpData->InitFlag != ApInitReconfig) {
+    //
+    // Load microcode on AP for PEI phase.
+    // During the DXE phase, it cannot omitted.
+    //
+    MicrocodeDetect (CpuMpData, ProcessorNumber);
+  }
+
   //
-  // Load microcode on AP
-  //
-  MicrocodeDetect (CpuMpData, ProcessorNumber);
-  //
-  // Sync BSP's MTRR table to AP
+  // Synchronizing the MTRRs setting to the APs is always essential.
+  // The modification of the MTRRs on the BSP may happens during
+  // timing in the early DXE phase, while the CpuMp PPI service and
+  // the CpuMp Protocol are both not available.
   //
   MtrrSetAllMtrrs (&CpuMpData->MtrrTable);
 }
@@ -2224,29 +2232,25 @@ MpInitLibInitialize (
     }
   }
 
-  if (!GetMicrocodePatchInfoFromHob (
-         &CpuMpData->MicrocodePatchAddress,
-         &CpuMpData->MicrocodePatchRegionSize
-         ))
-  {
+  if (MpHandOff == NULL) {
     //
     // The microcode patch information cache HOB does not exist, which means
     // the microcode patches data has not been loaded into memory yet
     //
     ShadowMicrocodeUpdatePatch (CpuMpData);
+    //
+    // Detect and apply Microcode on BSP
+    //
+    MicrocodeDetect (CpuMpData, CpuMpData->BspNumber);
   }
 
-  //
-  // Detect and apply Microcode on BSP
-  //
-  MicrocodeDetect (CpuMpData, CpuMpData->BspNumber);
   //
   // Store BSP's MTRR setting
   //
   MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
 
   //
-  // Wakeup APs to do some AP initialize sync (Microcode & MTRR)
+  // Wakeup APs to do some AP initialize sync (MTRR and/or Microcode).
   //
   if (CpuMpData->CpuCount > 1) {
     if (MpHandOff != NULL) {
@@ -2258,6 +2262,11 @@ MpInitLibInitialize (
       CpuMpData->InitFlag = ApInitReconfig;
     }
 
+    //
+    // Wake up APs to perform AP initialization synchronization.
+    // 1. For the PEI stage, load microcode and synchronize MTRRs,
+    // 2. For the DXE phase, only synchronize MTRRs.
+    //
     WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
     //
     // Wait for all APs finished initialization

@@ -745,27 +745,6 @@ ShadowMicrocodeUpdatePatch (
   );
 
 /**
-  Get the cached microcode patch base address and size from the microcode patch
-  information cache HOB.
-
-  @param[out] Address       Base address of the microcode patches data.
-                            It will be updated if the microcode patch
-                            information cache HOB is found.
-  @param[out] RegionSize    Size of the microcode patches data.
-                            It will be updated if the microcode patch
-                            information cache HOB is found.
-
-  @retval  TRUE     The microcode patch information cache HOB is found.
-  @retval  FALSE    The microcode patch information cache HOB is not found.
-
-**/
-BOOLEAN
-GetMicrocodePatchInfoFromHob (
-  UINT64  *Address,
-  UINT64  *RegionSize
-  );
-
-/**
   Detect whether Mwait-monitor feature is supported.
 
   @retval TRUE    Mwait-monitor feature is supported.
