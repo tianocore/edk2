@@ -2240,41 +2240,62 @@ MpInitLibInitialize (
     // Detect and apply Microcode on BSP
     //
     MicrocodeDetect (CpuMpData, CpuMpData->BspNumber);
+    //
+    // Wakeup APs to do some AP initialize sync (MTRR and/or Microcode).
+    //
+    if (CpuMpData->CpuCount > 1) {
+      //
+      // Store BSP's MTRR setting
+      //
+      MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
+      //
+      // Wake up the AP to perform some AP initialization synchronization.
+      // For PEI stage, load microcode and synchronize MTRR,
+      //
+      WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
+
+      //
+      // Wait for all APs finished initialization
+      //
+      while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
+        CpuPause ();
+      }
+
+      for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+        SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
+      }
+    }
   }
 
   //
-  // Wakeup APs to do some AP initialize sync (MTRR and/or Microcode).
+  // Wakeup APs to sync MTRR in DXE phase.
   //
-  if (CpuMpData->CpuCount > 1) {
+  if ((CpuMpData->CpuCount > 1) && (MpHandOff != NULL)) {
     //
     // Store BSP's MTRR setting
     //
     MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
-    if (MpHandOff != NULL) {
-      //
-      // Only needs to use this flag for DXE phase to update the wake up
-      // buffer. Wakeup buffer allocated in PEI phase is no longer valid
-      // in DXE.
-      //
-      CpuMpData->InitFlag = ApInitReconfig;
-    }
+
+    //
+    // Only needs to use this flag for DXE phase to update the wake up
+    // buffer. Wakeup buffer allocated in PEI phase is no longer valid
+    // in DXE.
+    //
+    CpuMpData->InitFlag = ApInitReconfig;
 
     //
     // Wake up the AP to perform some AP initialization synchronization.
-    // 1. For PEI stage, load microcode and synchronize MTRR,
-    // 2. For the DXE phase, only synchronize MTRR.
+    // For the DXE phase, only synchronize MTRR.
     //
     WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
     //
-    // Wait for all APs finished initialization
+    // Wait for all APs finished initialization.
     //
     while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
       CpuPause ();
     }
 
-    if (MpHandOff != NULL) {
-      CpuMpData->InitFlag = ApInitDone;
-    }
+    CpuMpData->InitFlag = ApInitDone;
 
     for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
       SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
