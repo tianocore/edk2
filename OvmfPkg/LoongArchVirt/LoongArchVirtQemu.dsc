@@ -654,6 +654,7 @@
   #
   # Platform Driver
   #
+  OvmfPkg/IoMmuAbsentDxe/IoMmuAbsentDxe.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
   OvmfPkg/VirtioRngDxe/VirtioRng.inf
