@@ -120,7 +120,7 @@ RedfishPlatformHostInterfaceDeviceDescriptor (
       InterfaceData->DeviceDescriptor.UsbDeviceV2.SerialNumberStr = 0;
       CopyMem (
         (VOID *)&InterfaceData->DeviceDescriptor.UsbDeviceV2.MacAddress,
-        (VOID *)&ThisInstance->MacAddress,
+        (VOID *)ThisInstance->MacAddress,
         sizeof (InterfaceData->DeviceDescriptor.UsbDeviceV2.MacAddress)
         );
       InterfaceData->DeviceDescriptor.UsbDeviceV2.Characteristics              |= (UINT16)ThisInstance->CredentialBootstrapping;
