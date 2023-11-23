@@ -425,14 +425,14 @@ AcquireRedfishServiceOnNetworkInterfaceCallback (
   protocol interface is installed.
 
   @param[in]   Event    Event whose notification function is being invoked.
-  @param[out]  Context  Pointer to the Context buffer
+  @param[in]   Context  Pointer to the Context buffer
 
 **/
 VOID
 EFIAPI
 RedfishDiscoverProtocolInstalled (
   IN  EFI_EVENT  Event,
-  OUT VOID       *Context
+  IN  VOID       *Context
   )
 {
   EFI_STATUS  Status;
