@@ -2245,14 +2245,13 @@ MpInitLibInitialize (
   }
 
   //
-  // Store BSP's MTRR setting
-  //
-  MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
-
-  //
   // Wakeup APs to do some AP initialize sync (MTRR and/or Microcode).
   //
   if (CpuMpData->CpuCount > 1) {
+    //
+    // Store BSP's MTRR setting
+    //
+    MtrrGetAllMtrrs (&CpuMpData->MtrrTable);
     if (MpHandOff != NULL) {
       //
       // Only needs to use this flag for DXE phase to update the wake up
