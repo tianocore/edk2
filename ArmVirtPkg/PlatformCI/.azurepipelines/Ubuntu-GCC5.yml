@@ -140,6 +140,19 @@ jobs:
             Build.Target: "RELEASE"
             Run: false
 
+          CLOUDHV_AARCH64_DEBUG:
+            Build.File: "$(package)/PlatformCI/CloudHvBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run: false
+          CLOUDHV_AARCH64_RELEASE:
+            Build.File: "$(package)/PlatformCI/CloudHvBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run: false
+
     workspace:
       clean: all
 
