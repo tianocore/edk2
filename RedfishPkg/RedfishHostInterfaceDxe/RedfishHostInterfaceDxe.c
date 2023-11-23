@@ -53,7 +53,9 @@ RedfishCreateSmbiosTable42 (
   SMBIOS_TABLE_TYPE42                *Type42Record;
   EFI_SMBIOS_PROTOCOL                *Smbios;
   EFI_SMBIOS_HANDLE                  MemArrayMappedAddrSmbiosHandle;
+  EFI_HANDLE                         Handle;
 
+  Handle = NULL;
   //
   // Get platform Redfish host interface device type descriptor data.
   //
@@ -226,6 +228,22 @@ RedfishCreateSmbiosTable42 (
     goto ON_EXIT;
   }
 
+  //
+  // Install Redfish Host Interface ready protocol.
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &Handle,
+                  &gEdkIIRedfishHostInterfaceReadyProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  (VOID *)NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to install gEdkIIRedfishHostInterfaceReadyProtocolGuid.\n"));
+    DEBUG ((DEBUG_ERROR, "PlatformConfigHandler driver may not be triggered to acquire Redfish service.\n"));
+  }
+
+  // Set Status to EFI_SUCCESS that indicates SMBIOS 42 record was installed
+  // on the platform sucessfully.
   Status = EFI_SUCCESS;
 
 ON_EXIT:
