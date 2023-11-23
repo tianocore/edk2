@@ -603,6 +603,27 @@ DiscoverRedfishHostInterface (
     }
 
     if (MacCompareStatus != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: MAC address is not matched.\n", __func__));
+      DEBUG ((
+        DEBUG_ERROR,
+        "    NetworkInterface: %02x %02x %02x %02x %02x %02x.\n",
+        Instance->NetworkInterface->MacAddress.Addr[0],
+        Instance->NetworkInterface->MacAddress.Addr[1],
+        Instance->NetworkInterface->MacAddress.Addr[2],
+        Instance->NetworkInterface->MacAddress.Addr[3],
+        Instance->NetworkInterface->MacAddress.Addr[4],
+        Instance->NetworkInterface->MacAddress.Addr[5]
+        ));
+      DEBUG ((
+        DEBUG_ERROR,
+        "    Redfish Host interface: %02x %02x %02x %02x %02x %02x.\n",
+        DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress[0],
+        DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress[1],
+        DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress[2],
+        DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress[3],
+        DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress[4],
+        DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress[5]
+        ));
       return EFI_UNSUPPORTED;
     }
 
@@ -716,6 +737,8 @@ DiscoverRedfishHostInterface (
                  IsHttps
                  );
     }
+  } else {
+    DEBUG ((DEBUG_ERROR, "%a: RedfishGetHostInterfaceProtocolData is failed.\n", __func__));
   }
 
   return Status;
