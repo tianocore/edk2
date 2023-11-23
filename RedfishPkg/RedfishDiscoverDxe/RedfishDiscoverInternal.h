@@ -42,6 +42,8 @@
 #define MAC_COMPARE(This, Target)  (CompareMem ((VOID *)&(This)->MacAddress, &(Target)->MacAddress, (This)->HwAddressSize) == 0)
 #define VALID_TCP6(Target, This)   ((Target)->IsIpv6 && ((This)->NetworkProtocolType == ProtocolTypeTcp6))
 #define VALID_TCP4(Target, This)   (!(Target)->IsIpv6 && ((This)->NetworkProtocolType == ProtocolTypeTcp4))
+#define REDFISH_HI_ITERFACE_SPECIFIC_DATA_LENGTH_OFFSET  ((UINT16)(UINTN)(&((SMBIOS_TABLE_TYPE42 *)0)->InterfaceTypeSpecificDataLength))
+#define REDFISH_HI_PROTOCOL_HOSTNAME_LENGTH_OFFSET       ((UINT16)(UINTN)(&((REDFISH_OVER_IP_PROTOCOL_DATA *)0)->RedfishServiceHostnameLength))
 
 //
 // GUID definitions
