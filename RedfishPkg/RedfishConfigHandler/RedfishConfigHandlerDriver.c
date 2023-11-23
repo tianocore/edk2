@@ -17,11 +17,15 @@ EFI_EVENT  gEfiRedfishDiscoverProtocolEvent = NULL;
 //
 // Variables for using RFI Redfish Discover Protocol
 //
-VOID                           *gEfiRedfishDiscoverRegistration;
-EFI_HANDLE                     gEfiRedfishDiscoverControllerHandle = NULL;
-EFI_REDFISH_DISCOVER_PROTOCOL  *gEfiRedfishDiscoverProtocol        = NULL;
-BOOLEAN                        gRedfishDiscoverActivated           = FALSE;
-BOOLEAN                        gRedfishServiceDiscovered           = FALSE;
+VOID                                    *gEfiRedfishDiscoverRegistration;
+EFI_HANDLE                              gEfiRedfishDiscoverControllerHandle = NULL;
+EFI_REDFISH_DISCOVER_PROTOCOL           *gEfiRedfishDiscoverProtocol        = NULL;
+BOOLEAN                                 gRedfishDiscoverActivated           = FALSE;
+BOOLEAN                                 gRedfishServiceDiscovered           = FALSE;
+EFI_REDFISH_DISCOVER_NETWORK_INTERFACE  *mNetworkInterfaces                 = NULL;
+UINTN                                   mNumberOfNetworkInterfaces;
+EFI_EVENT                               mEdkIIRedfishHostInterfaceReadyEvent;
+VOID                                    *mEdkIIRedfishHostInterfaceRegistration;
 
 ///
 /// Driver Binding Protocol instance
@@ -340,79 +344,30 @@ RedfishServiceDiscoveredCallback (
 }
 
 /**
-  Callback function executed when the EFI_REDFISH_DISCOVER_PROTOCOL
+  Callback function executed when the gEdkIIRedfishHostInterfaceReadyProtocolGuid
   protocol interface is installed.
 
   @param[in]   Event    Event whose notification function is being invoked.
-  @param[out]  Context  Pointer to the Context buffer
+  @param[in]   Context  Pointer to the Context buffer
 
 **/
 VOID
 EFIAPI
-RedfishDiscoverProtocolInstalled (
+AcquireRedfishServiceOnNetworkInterfaceCallback (
   IN  EFI_EVENT  Event,
-  OUT VOID       *Context
+  IN  VOID       *Context
   )
 {
   EFI_STATUS                              Status;
-  UINTN                                   BufferSize;
-  EFI_HANDLE                              HandleBuffer;
-  UINTN                                   NetworkInterfaceIndex;
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE  *ThisNetworkInterface;
+  UINTN                                   NetworkInterfaceIndex;
   EFI_REDFISH_DISCOVERED_TOKEN            *ThisRedfishDiscoveredToken;
-  UINTN                                   NumberOfNetworkInterfaces;
 
-  DEBUG ((DEBUG_MANAGEABILITY, "%a: New network interface is installed on system by EFI Redfish discover driver.\n", __func__));
-
-  BufferSize = sizeof (EFI_HANDLE);
-  Status     = gBS->LocateHandle (
-                      ByRegisterNotify,
-                      NULL,
-                      gEfiRedfishDiscoverRegistration,
-                      &BufferSize,
-                      &HandleBuffer
-                      );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Can't locate handle with EFI_REDFISH_DISCOVER_PROTOCOL installed.\n", __func__));
-  }
-
-  gRedfishDiscoverActivated = TRUE;
-  if (gEfiRedfishDiscoverProtocol == NULL) {
-    gEfiRedfishDiscoverControllerHandle = HandleBuffer;
-    //
-    // First time to open EFI_REDFISH_DISCOVER_PROTOCOL.
-    //
-    Status = gBS->OpenProtocol (
-                    gEfiRedfishDiscoverControllerHandle,
-                    &gEfiRedfishDiscoverProtocolGuid,
-                    (VOID **)&gEfiRedfishDiscoverProtocol,
-                    gRedfishConfigData.Image,
-                    gRedfishConfigData.Image,
-                    EFI_OPEN_PROTOCOL_BY_DRIVER
-                    );
-    if (EFI_ERROR (Status)) {
-      gEfiRedfishDiscoverProtocol = NULL;
-      gRedfishDiscoverActivated   = FALSE;
-      DEBUG ((DEBUG_ERROR, "%a: Can't locate EFI_REDFISH_DISCOVER_PROTOCOL.\n", __func__));
-      return;
-    }
-  }
-
-  Status = gEfiRedfishDiscoverProtocol->GetNetworkInterfaceList (
-                                          gEfiRedfishDiscoverProtocol,
-                                          gRedfishConfigData.Image,
-                                          &NumberOfNetworkInterfaces,
-                                          &ThisNetworkInterface
-                                          );
-  if (EFI_ERROR (Status) || (NumberOfNetworkInterfaces == 0)) {
-    DEBUG ((DEBUG_ERROR, "%a: No network interfaces found on the handle.\n", __func__));
-    return;
-  }
-
+  ThisNetworkInterface = mNetworkInterfaces;
   //
   // Loop to discover Redfish service on each network interface.
   //
-  for (NetworkInterfaceIndex = 0; NetworkInterfaceIndex < NumberOfNetworkInterfaces; NetworkInterfaceIndex++) {
+  for (NetworkInterfaceIndex = 0; NetworkInterfaceIndex < mNumberOfNetworkInterfaces; NetworkInterfaceIndex++) {
     ThisRedfishDiscoveredToken = (EFI_REDFISH_DISCOVERED_TOKEN *)AllocateZeroPool (sizeof (EFI_REDFISH_DISCOVERED_TOKEN));
     if (ThisRedfishDiscoveredToken == NULL) {
       DEBUG ((DEBUG_ERROR, "%a: Not enough memory for EFI_REDFISH_DISCOVERED_TOKEN.\n", __func__));
@@ -462,6 +417,105 @@ RedfishDiscoverProtocolInstalled (
     }
 
     ThisNetworkInterface++;
+  }
+}
+
+/**
+  Callback function executed when the EFI_REDFISH_DISCOVER_PROTOCOL
+  protocol interface is installed.
+
+  @param[in]   Event    Event whose notification function is being invoked.
+  @param[out]  Context  Pointer to the Context buffer
+
+**/
+VOID
+EFIAPI
+RedfishDiscoverProtocolInstalled (
+  IN  EFI_EVENT  Event,
+  OUT VOID       *Context
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       BufferSize;
+  EFI_HANDLE  HandleBuffer;
+  VOID        *RedfishHostInterfaceReadyProtocol;
+
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: New network interface is installed on system by EFI Redfish discover driver.\n", __func__));
+
+  BufferSize = sizeof (EFI_HANDLE);
+  Status     = gBS->LocateHandle (
+                      ByRegisterNotify,
+                      NULL,
+                      gEfiRedfishDiscoverRegistration,
+                      &BufferSize,
+                      &HandleBuffer
+                      );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Can't locate handle with EFI_REDFISH_DISCOVER_PROTOCOL installed.\n", __func__));
+  }
+
+  gRedfishDiscoverActivated = TRUE;
+  if (gEfiRedfishDiscoverProtocol == NULL) {
+    gEfiRedfishDiscoverControllerHandle = HandleBuffer;
+    //
+    // First time to open EFI_REDFISH_DISCOVER_PROTOCOL.
+    //
+    Status = gBS->OpenProtocol (
+                    gEfiRedfishDiscoverControllerHandle,
+                    &gEfiRedfishDiscoverProtocolGuid,
+                    (VOID **)&gEfiRedfishDiscoverProtocol,
+                    gRedfishConfigData.Image,
+                    gRedfishConfigData.Image,
+                    EFI_OPEN_PROTOCOL_BY_DRIVER
+                    );
+    if (EFI_ERROR (Status)) {
+      gEfiRedfishDiscoverProtocol = NULL;
+      gRedfishDiscoverActivated   = FALSE;
+      DEBUG ((DEBUG_ERROR, "%a: Can't locate EFI_REDFISH_DISCOVER_PROTOCOL.\n", __func__));
+      return;
+    }
+  }
+
+  Status = gEfiRedfishDiscoverProtocol->GetNetworkInterfaceList (
+                                          gEfiRedfishDiscoverProtocol,
+                                          gRedfishConfigData.Image,
+                                          &mNumberOfNetworkInterfaces,
+                                          &mNetworkInterfaces
+                                          );
+  if (EFI_ERROR (Status) || (mNumberOfNetworkInterfaces == 0)) {
+    DEBUG ((DEBUG_ERROR, "%a: No network interfaces found on the handle.\n", __func__));
+    return;
+  }
+
+  //
+  // Check if Redfish Host Interface is ready or not.
+  //
+  Status = gBS->LocateProtocol (&gEdkIIRedfishHostInterfaceReadyProtocolGuid, NULL, &RedfishHostInterfaceReadyProtocol);
+  if (!EFI_ERROR (Status)) {
+    // Acquire Redfish service;
+    AcquireRedfishServiceOnNetworkInterfaceCallback ((EFI_EVENT)NULL, (VOID *)NULL);
+  } else {
+    Status = gBS->CreateEvent (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    AcquireRedfishServiceOnNetworkInterfaceCallback,
+                    NULL,
+                    &mEdkIIRedfishHostInterfaceReadyEvent
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to create event for gEdkIIRedfishHostInterfaceReadyProtocolGuid installation.", __func__));
+      return;
+    }
+
+    Status = gBS->RegisterProtocolNotify (
+                    &gEdkIIRedfishHostInterfaceReadyProtocolGuid,
+                    mEdkIIRedfishHostInterfaceReadyEvent,
+                    &mEdkIIRedfishHostInterfaceRegistration
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Fail to register event for the installation of gEdkIIRedfishHostInterfaceReadyProtocolGuid.", __func__));
+      return;
+    }
   }
 
   return;
