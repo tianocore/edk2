@@ -180,7 +180,7 @@ RedfishPlatformHostInterfaceProtocolData (
       HostNameLength     = (UINT8)AsciiStrSize (HostNameString);
       ThisProtocolRecord = (MC_HOST_INTERFACE_PROTOCOL_RECORD *)AllocateZeroPool (
                                                                   sizeof (MC_HOST_INTERFACE_PROTOCOL_RECORD) - 1 +
-                                                                  sizeof (REDFISH_OVER_IP_PROTOCOL_DATA) +
+                                                                  sizeof (REDFISH_OVER_IP_PROTOCOL_DATA) - 1 +
                                                                   HostNameLength
                                                                   );
       if (ThisProtocolRecord == NULL) {
@@ -189,7 +189,7 @@ RedfishPlatformHostInterfaceProtocolData (
       }
 
       ThisProtocolRecord->ProtocolType        = MCHostInterfaceProtocolTypeRedfishOverIP;
-      ThisProtocolRecord->ProtocolTypeDataLen = sizeof (REDFISH_OVER_IP_PROTOCOL_DATA) + HostNameLength;
+      ThisProtocolRecord->ProtocolTypeDataLen = sizeof (REDFISH_OVER_IP_PROTOCOL_DATA) -1 + HostNameLength;
       RedfishOverIpData                       = (REDFISH_OVER_IP_PROTOCOL_DATA *)&ThisProtocolRecord->ProtocolTypeData[0];
       //
       // Fill up REDFISH_OVER_IP_PROTOCOL_DATA
