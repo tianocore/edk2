@@ -210,6 +210,11 @@ Tcg2MeasureGptTable (
     return EFI_BAD_BUFFER_SIZE;
   }
 
+  if (PrimaryHeader->NumberOfPartitionEntries > MAX_UINT32 / PrimaryHeader->SizeOfPartitionEntry) {
+    DEBUG ((DEBUG_ERROR, "Overflow of PrimaryHeader->NumberOfPartitionEntries(%d) * PrimaryHeader->SizeOfPartitionEntry(%d)\n", PrimaryHeader->NumberOfPartitionEntries, PrimaryHeader->SizeOfPartitionEntry));
+    return EFI_INVALID_PARAMETER;
+  }
+
   //
   // Read the partition entry.
   //
