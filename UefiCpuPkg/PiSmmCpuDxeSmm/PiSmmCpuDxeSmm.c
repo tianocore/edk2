@@ -99,8 +99,8 @@ UINTN  mSmmStackSize;
 UINTN    mSmmShadowStackSize;
 BOOLEAN  mCetSupported = TRUE;
 
-UINTN  mMaxNumberOfCpus = 1;
-UINTN  mNumberOfCpus    = 1;
+UINTN  mMaxNumberOfCpus = 0;
+UINTN  mNumberOfCpus    = 0;
 
 //
 // SMM ready to lock flag
@@ -587,6 +587,146 @@ SmmReadyToLockEventNotify (
 }
 
 /**
+  Function to compare 2 MP_INFORMATION2_HOB_DATA pointer based on ProcessorIndex.
+
+  @param[in] Buffer1            pointer to MP_INFORMATION2_HOB_DATA poiner to compare
+  @param[in] Buffer2            pointer to second MP_INFORMATION2_HOB_DATA pointer to compare
+
+  @retval 0                     Buffer1 equal to Buffer2
+  @retval <0                    Buffer1 is less than Buffer2
+  @retval >0                    Buffer1 is greater than Buffer2
+**/
+INTN
+EFIAPI
+MpInformation2HobCompare (
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
+  )
+{
+  if ((*(MP_INFORMATION2_HOB_DATA **)Buffer1)->ProcessorIndex > (*(MP_INFORMATION2_HOB_DATA **)Buffer2)->ProcessorIndex) {
+    return 1;
+  } else if ((*(MP_INFORMATION2_HOB_DATA **)Buffer1)->ProcessorIndex < (*(MP_INFORMATION2_HOB_DATA **)Buffer2)->ProcessorIndex) {
+    return -1;
+  }
+
+  return 0;
+}
+
+/**
+  Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION for all CPU from MpInformation2 HOB.
+
+  @param[out] NumberOfCpus           Pointer to NumberOfCpus.
+  @param[out] MaxNumberOfCpus        Pointer to MaxNumberOfCpus.
+
+  @retval ProcessorInfo              Pointer to EFI_PROCESSOR_INFORMATION buffer.
+**/
+EFI_PROCESSOR_INFORMATION *
+GetMpInformation (
+  OUT UINTN  *NumberOfCpus,
+  OUT UINTN  *MaxNumberOfCpus
+  )
+{
+  EFI_HOB_GUID_TYPE          *GuidHob;
+  EFI_HOB_GUID_TYPE          *FirstMpInfo2Hob;
+  MP_INFORMATION2_HOB_DATA   *MpInformation2HobData;
+  UINTN                      HobCount;
+  UINTN                      HobIndex;
+  MP_INFORMATION2_HOB_DATA   **MpInfo2Hobs;
+  UINTN                      SortBuffer;
+  UINTN                      ProcessorIndex;
+  UINT64                     PrevProcessorIndex;
+  MP_INFORMATION2_ENTRY      *MpInformation2Entry;
+  EFI_PROCESSOR_INFORMATION  *ProcessorInfo;
+
+  GuidHob               = NULL;
+  MpInformation2HobData = NULL;
+  FirstMpInfo2Hob       = NULL;
+  MpInfo2Hobs           = NULL;
+  HobIndex              = 0;
+  HobCount              = 0;
+
+  FirstMpInfo2Hob = GetFirstGuidHob (&gMpInformationHobGuid2);
+  ASSERT (FirstMpInfo2Hob != NULL);
+  GuidHob = FirstMpInfo2Hob;
+  while (GuidHob != NULL) {
+    MpInformation2HobData = GET_GUID_HOB_DATA (GuidHob);
+
+    //
+    // This is the last MpInformationHob in the HOB list.
+    //
+    if (MpInformation2HobData->NumberOfProcessors == 0) {
+      ASSERT (HobCount != 0);
+      break;
+    }
+
+    HobCount++;
+    *NumberOfCpus += MpInformation2HobData->NumberOfProcessors;
+    GuidHob        = GetNextGuidHob (&gMpInformationHobGuid2, GET_NEXT_HOB (GuidHob));
+  }
+
+  ASSERT (*NumberOfCpus <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+
+  //
+  // If support CPU hot plug, we need to allocate resources for possibly hot-added processors
+  //
+  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
+    *MaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  } else {
+    *MaxNumberOfCpus = *NumberOfCpus;
+  }
+
+  MpInfo2Hobs = AllocatePool (sizeof (MP_INFORMATION2_HOB_DATA *) * HobCount);
+  ASSERT (MpInfo2Hobs != NULL);
+  if (MpInfo2Hobs == NULL) {
+    return NULL;
+  }
+
+  //
+  // Record each MpInformation2Hob pointer in the MpInfo2Hobs.
+  // The FirstMpInfo2Hob is to speed up this while-loop without
+  // needing to look for MpInfo2Hob from beginning.
+  //
+  GuidHob = FirstMpInfo2Hob;
+  while (HobIndex < HobCount) {
+    MpInfo2Hobs[HobIndex++] = GET_GUID_HOB_DATA (GuidHob);
+    GuidHob                 = GetNextGuidHob (&gMpInformationHobGuid2, GET_NEXT_HOB (GuidHob));
+  }
+
+  ProcessorInfo = (EFI_PROCESSOR_INFORMATION *)AllocatePool (sizeof (EFI_PROCESSOR_INFORMATION) * (*MaxNumberOfCpus));
+  ASSERT (ProcessorInfo != NULL);
+  if (ProcessorInfo == NULL) {
+    FreePool (MpInfo2Hobs);
+    return NULL;
+  }
+
+  QuickSort (MpInfo2Hobs, HobCount, sizeof (MP_INFORMATION2_HOB_DATA *), (BASE_SORT_COMPARE)MpInformation2HobCompare, &SortBuffer);
+  PrevProcessorIndex = 0;
+  for (HobIndex = 0; HobIndex < HobCount; HobIndex++) {
+    //
+    // Make sure no overlap and no gap in the CPU range covered by each HOB
+    //
+    ASSERT (MpInfo2Hobs[HobIndex]->ProcessorIndex == PrevProcessorIndex);
+
+    //
+    // Cache each EFI_PROCESSOR_INFORMATION in order.
+    //
+    for (ProcessorIndex = 0; ProcessorIndex < MpInfo2Hobs[HobIndex]->NumberOfProcessors; ProcessorIndex++) {
+      MpInformation2Entry = GET_MP_INFORMATION_ENTRY (MpInfo2Hobs[HobIndex], ProcessorIndex);
+      CopyMem (
+        &ProcessorInfo[PrevProcessorIndex + ProcessorIndex],
+        &MpInformation2Entry->ProcessorInfo,
+        sizeof (EFI_PROCESSOR_INFORMATION)
+        );
+    }
+
+    PrevProcessorIndex += MpInfo2Hobs[HobIndex]->NumberOfProcessors;
+  }
+
+  FreePool (MpInfo2Hobs);
+  return ProcessorInfo;
+}
+
+/**
   The module Entry Point of the CPU SMM driver.
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.
@@ -603,26 +743,24 @@ PiCpuSmmEntry (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                Status;
-  EFI_MP_SERVICES_PROTOCOL  *MpServices;
-  UINTN                     NumberOfEnabledProcessors;
-  UINTN                     Index;
-  VOID                      *Buffer;
-  UINTN                     BufferPages;
-  UINTN                     TileCodeSize;
-  UINTN                     TileDataSize;
-  UINTN                     TileSize;
-  UINT8                     *Stacks;
-  VOID                      *Registration;
-  UINT32                    RegEax;
-  UINT32                    RegEbx;
-  UINT32                    RegEcx;
-  UINT32                    RegEdx;
-  UINTN                     FamilyId;
-  UINTN                     ModelId;
-  UINT32                    Cr3;
-  EFI_HOB_GUID_TYPE         *GuidHob;
-  SMM_BASE_HOB_DATA         *SmmBaseHobData;
+  EFI_STATUS         Status;
+  UINTN              Index;
+  VOID               *Buffer;
+  UINTN              BufferPages;
+  UINTN              TileCodeSize;
+  UINTN              TileDataSize;
+  UINTN              TileSize;
+  UINT8              *Stacks;
+  VOID               *Registration;
+  UINT32             RegEax;
+  UINT32             RegEbx;
+  UINT32             RegEcx;
+  UINT32             RegEdx;
+  UINTN              FamilyId;
+  UINTN              ModelId;
+  UINT32             Cr3;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  SMM_BASE_HOB_DATA  *SmmBaseHobData;
 
   GuidHob        = NULL;
   SmmBaseHobData = NULL;
@@ -654,17 +792,10 @@ PiCpuSmmEntry (
   FindSmramInfo (&mCpuHotPlugData.SmrrBase, &mCpuHotPlugData.SmrrSize);
 
   //
-  // Get MP Services Protocol
+  // Retrive NumberOfProcessors, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION for all CPU from MpInformation2 HOB.
   //
-  Status = SystemTable->BootServices->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **)&MpServices);
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Use MP Services Protocol to retrieve the number of processors and number of enabled processors
-  //
-  Status = MpServices->GetNumberOfProcessors (MpServices, &mNumberOfCpus, &NumberOfEnabledProcessors);
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (mNumberOfCpus <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+  gSmmCpuPrivate->ProcessorInfo = GetMpInformation (&mNumberOfCpus, &mMaxNumberOfCpus);
+  ASSERT (gSmmCpuPrivate->ProcessorInfo != NULL);
 
   //
   // If support CPU hot plug, PcdCpuSmmEnableBspElection should be set to TRUE.
@@ -689,15 +820,6 @@ PiCpuSmmEntry (
   //
   mAddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
   DEBUG ((DEBUG_INFO, "mAddressEncMask = 0x%lx\n", mAddressEncMask));
-
-  //
-  // If support CPU hot plug, we need to allocate resources for possibly hot-added processors
-  //
-  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
-    mMaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
-  } else {
-    mMaxNumberOfCpus = mNumberOfCpus;
-  }
 
   gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus = mMaxNumberOfCpus;
 
@@ -908,9 +1030,6 @@ PiCpuSmmEntry (
   //
   // Allocate buffer for pointers to array in  SMM_CPU_PRIVATE_DATA.
   //
-  gSmmCpuPrivate->ProcessorInfo = (EFI_PROCESSOR_INFORMATION *)AllocatePool (sizeof (EFI_PROCESSOR_INFORMATION) * mMaxNumberOfCpus);
-  ASSERT (gSmmCpuPrivate->ProcessorInfo != NULL);
-
   gSmmCpuPrivate->Operation = (SMM_CPU_OPERATION *)AllocatePool (sizeof (SMM_CPU_OPERATION) * mMaxNumberOfCpus);
   ASSERT (gSmmCpuPrivate->Operation != NULL);
 
@@ -945,8 +1064,6 @@ PiCpuSmmEntry (
     gSmmCpuPrivate->Operation[Index]        = SmmCpuNone;
 
     if (Index < mNumberOfCpus) {
-      Status = MpServices->GetProcessorInfo (MpServices, Index | CPU_V2_EXTENDED_TOPOLOGY, &gSmmCpuPrivate->ProcessorInfo[Index]);
-      ASSERT_EFI_ERROR (Status);
       mCpuHotPlugData.ApicId[Index] = gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId;
 
       DEBUG ((
