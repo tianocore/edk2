@@ -542,6 +542,92 @@ InitializeMpExceptionStackSwitchHandlers (
 }
 
 /**
+  Create gMpInformationHobGuid2.
+**/
+VOID
+BuildMpInformationHob (
+  VOID
+  )
+{
+  EFI_STATUS                Status;
+  UINTN                     ProcessorIndex;
+  UINTN                     NumberOfProcessors;
+  UINTN                     NumberOfEnabledProcessors;
+  UINTN                     NumberOfProcessorsInHob;
+  UINTN                     MaxProcessorsPerHob;
+  MP_INFORMATION2_HOB_DATA  *MpInformation2HobData;
+  MP_INFORMATION2_ENTRY     *MpInformation2Entry;
+  UINTN                     Index;
+
+  ProcessorIndex        = 0;
+  MpInformation2HobData = NULL;
+  MpInformation2Entry   = NULL;
+
+  Status = MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
+  ASSERT_EFI_ERROR (Status);
+  MaxProcessorsPerHob     = ((MAX_UINT16 & ~7) - sizeof (EFI_HOB_GUID_TYPE) - sizeof (MP_INFORMATION2_HOB_DATA)) / sizeof (MP_INFORMATION2_ENTRY);
+  NumberOfProcessorsInHob = MaxProcessorsPerHob;
+
+  //
+  // Create MP_INFORMATION2_HOB. when the max HobLength 0xFFF8 is not enough, there
+  // will be a MP_INFORMATION2_HOB series in the HOB list.
+  // In the HOB list, there is a gMpInformationHobGuid2 with 0 value NumberOfProcessors
+  // fields to indicate it's the last MP_INFORMATION2_HOB.
+  //
+  while (NumberOfProcessorsInHob != 0) {
+    NumberOfProcessorsInHob = MIN (NumberOfProcessors - ProcessorIndex, MaxProcessorsPerHob);
+    MpInformation2HobData   = BuildGuidHob (
+                                &gMpInformationHobGuid2,
+                                sizeof (MP_INFORMATION2_HOB_DATA) + sizeof (MP_INFORMATION2_ENTRY) * NumberOfProcessorsInHob
+                                );
+    ASSERT (MpInformation2HobData != NULL);
+
+    MpInformation2HobData->Version            = MP_INFORMATION2_HOB_REVISION;
+    MpInformation2HobData->ProcessorIndex     = ProcessorIndex;
+    MpInformation2HobData->NumberOfProcessors = (UINT16)NumberOfProcessorsInHob;
+    MpInformation2HobData->EntrySize          = sizeof (MP_INFORMATION2_ENTRY);
+
+    DEBUG ((DEBUG_INFO, "Creating MpInformation2 HOB...\n"));
+
+    for (Index = 0; Index < NumberOfProcessorsInHob; Index++) {
+      MpInformation2Entry = &MpInformation2HobData->Entry[Index];
+      Status              = MpInitLibGetProcessorInfo (
+                              (Index + ProcessorIndex) | CPU_V2_EXTENDED_TOPOLOGY,
+                              &MpInformation2Entry->ProcessorInfo,
+                              NULL
+                              );
+      ASSERT_EFI_ERROR (Status);
+      DEBUG ((
+        DEBUG_INFO,
+        "  Processor[%04d]: ProcessorId = 0x%lx, StatusFlag = 0x%x\n",
+        Index + ProcessorIndex,
+        MpInformation2Entry->ProcessorInfo.ProcessorId,
+        MpInformation2Entry->ProcessorInfo.StatusFlag
+        ));
+      DEBUG ((
+        DEBUG_INFO,
+        "    Location = Package:%d Core:%d Thread:%d\n",
+        MpInformation2Entry->ProcessorInfo.Location.Package,
+        MpInformation2Entry->ProcessorInfo.Location.Core,
+        MpInformation2Entry->ProcessorInfo.Location.Thread
+        ));
+      DEBUG ((
+        DEBUG_INFO,
+        "    Location2 = Package:%d Die:%d Tile:%d Module:%d Core:%d Thread:%d\n",
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Package,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Die,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Tile,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Module,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Core,
+        MpInformation2Entry->ProcessorInfo.ExtendedInformation.Location2.Thread
+        ));
+    }
+
+    ProcessorIndex += NumberOfProcessorsInHob;
+  }
+}
+
+/**
   Initializes MP and exceptions handlers.
 
   @param  PeiServices                The pointer to the PEI Services Table.
@@ -601,6 +687,11 @@ InitializeCpuMpWorker (
   //
   Status = PeiServicesInstallPpi (mPeiCpuMpPpiList);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Create gMpInformationHobGuid2
+  //
+  BuildMpInformationHob ();
 
   return Status;
 }
