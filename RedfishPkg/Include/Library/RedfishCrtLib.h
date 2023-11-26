@@ -69,20 +69,17 @@
 //
 // Basic types mapping
 //
-typedef UINTN   size_t;
-typedef INTN    ssize_t;
-typedef INT32   time_t;
-typedef UINT8   __uint8_t;
-typedef UINT8   sa_family_t;
-typedef UINT32  uid_t;
-typedef UINT32  gid_t;
-typedef INT32   int32_t;
-typedef UINT32  uint32_t;
-typedef UINT16  uint16_t;
-typedef UINT8   uint8_t;
-typedef enum {
-  false, true
-} bool;
+typedef UINTN    size_t;
+typedef INTN     ssize_t;
+typedef INT32    time_t;
+typedef INT32    int32_t;
+typedef UINT32   uint32_t;
+typedef UINT16   uint16_t;
+typedef UINT8    uint8_t;
+typedef BOOLEAN  bool;
+
+#define true   (1 == 1)
+#define false  (1 == 0)
 
 //
 // File operations are not required for EFI building,
@@ -341,26 +338,6 @@ fprintf     (
 int
 fgetc       (
   FILE  *_File
-  );
-
-uid_t
-getuid      (
-  void
-  );
-
-uid_t
-geteuid     (
-  void
-  );
-
-gid_t
-getgid      (
-  void
-  );
-
-gid_t
-getegid     (
-  void
   );
 
 void
