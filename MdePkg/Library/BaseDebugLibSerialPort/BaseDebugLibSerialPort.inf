@@ -42,3 +42,9 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask      ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel ## CONSUMES
 
+[BuildOptions]
+  #
+  # Disable following Visual Studio 2015/2019 compiler warnings unreachable code
+  #   Compiler Warning (level 4) C4702
+  #
+  MSFT:*_*_*_CC_FLAGS = /wd4702
