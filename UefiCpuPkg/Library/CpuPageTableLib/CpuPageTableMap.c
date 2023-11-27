@@ -338,7 +338,7 @@ PageTableLibMapInLevel (
   ParentAttribute             = &LocalParentAttribute;
 
   OriginalParentPagingEntry.Uint64 = ParentPagingEntry->Uint64;
-
+  OneOfPagingEntry.Uint64          = 0;
   //
   // RegionLength: 256T (1 << 48) 512G (1 << 39), 1G (1 << 30), 2M (1 << 21) or 4K (1 << 12).
   //
@@ -367,8 +367,6 @@ PageTableLibMapInLevel (
       if (RETURN_ERROR (Status)) {
         return Status;
       }
-
-      OneOfPagingEntry.Pnle.Uint64 = 0;
     } else {
       PageTableLibSetPle (Level, &OneOfPagingEntry, 0, &PleBAttribute, &AllOneMask);
     }
