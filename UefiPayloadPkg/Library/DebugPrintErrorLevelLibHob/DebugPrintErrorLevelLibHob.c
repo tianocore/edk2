@@ -13,6 +13,7 @@
 #include <Library/PcdLib.h>
 #include <Library/HobLib.h>
 #include <Guid/DebugPrintErrorLevel.h>
+#include <Guid/UniversalPayloadBase.h>
 #include <Library/DebugPrintErrorLevelLib.h>
 #include <UniversalPayload/UniversalPayload.h>
 
@@ -34,6 +35,10 @@ GetDebugPrintErrorLevel (
   VOID                                  *GuidHob;
   UNIVERSAL_PAYLOAD_GENERIC_HEADER      *GenericHeader;
   UEFI_PAYLOAD_DEBUG_PRINT_ERROR_LEVEL  *DebugPrintErrorLevel;
+
+  if (GetHobList () == NULL) {
+    return PcdGet32 (PcdDebugPrintErrorLevel);
+  }
 
   if (!gDebugPrintErrorLevelInitialized) {
     gDebugPrintErrorLevelInitialized = TRUE;

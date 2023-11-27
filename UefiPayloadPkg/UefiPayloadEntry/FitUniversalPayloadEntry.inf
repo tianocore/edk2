@@ -30,13 +30,13 @@
 [Sources.Ia32]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
-  Ia32/DxeLoadFunc.c
+  Ia32/DxeLoadFuncFit.c
   Ia32/IdtVectorAsm.nasm
 
 [Sources.X64]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
-  X64/DxeLoadFunc.c
+  X64/DxeLoadFuncFit.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -54,6 +54,8 @@
   PeCoffLib
   CpuLib
   FdtLib
+  CustomFdtNodeParserLib
+  PcdLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -71,13 +73,13 @@
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadPciRootBridgeInfoGuid
   gUniversalPayloadSmbios3TableGuid
+  gUniversalPayloadDeviceTreeGuid
 
 [FeaturePcd.IA32]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode      ## CONSUMES
 
 [FeaturePcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
-
 
 [Pcd.IA32,Pcd.X64]
   gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile
@@ -88,11 +90,19 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbSize                            ## CONSUMES
-
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemBase
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
   gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
-
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
+  gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData
+  gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /wd4244 /wd4305
+  GCC:*_*_*_CC_FLAGS  = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast

@@ -1,11 +1,24 @@
 /** @file
-
-  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2022, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
-
 **/
 
-#include "UefiPayloadEntry.h"
+#include <PiPei.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/DebugLib.h>
+#include <Library/HobLib.h>
+#include <Library/PcdLib.h>
+#include <Guid/MemoryAllocationHob.h>
+#include <Library/IoLib.h>
+#include <Library/CpuLib.h>
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+#include <Guid/AcpiBoardInfoGuid.h>
+#include <UniversalPayload/AcpiTable.h>
+#include <UniversalPayload/UniversalPayload.h>
+#include <UniversalPayload/ExtraData.h>
 
 #define MEMORY_ATTRIBUTE_MASK  (EFI_RESOURCE_ATTRIBUTE_PRESENT             |        \
                                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED         | \
@@ -26,75 +39,60 @@
 extern VOID  *mHobList;
 
 /**
-  Print all HOBs info from the HOB list.
+  Add a new HOB to the HOB List.
 
-  @return The pointer to the HOB list.
+  @param HobType            Type of the new HOB.
+  @param HobLength          Length of the new HOB to allocate.
+
+  @return  NULL if there is no space to create a hob.
+  @return  The address point to the new created hob.
+
 **/
-VOID
-PrintHob (
-  IN CONST VOID  *HobStart
+VOID *
+EFIAPI
+CreateHob (
+  IN  UINT16  HobType,
+  IN  UINT16  HobLength
   );
 
 /**
-  Some bootloader may pass a pcd database, and UPL also contain a PCD database.
-  Dxe PCD driver has the assumption that the two PCD database can be catenated and
-  the local token number should be successive.
-  This function will fix up the UPL PCD database to meet that assumption.
+  Build a Handoff Information Table HOB
 
-  @param[in]   DxeFv         The FV where to find the Universal PCD database.
+  This function initialize a HOB region from EfiMemoryBegin to
+  EfiMemoryTop. And EfiFreeMemoryBottom and EfiFreeMemoryTop should
+  be inside the HOB region.
 
-  @retval EFI_SUCCESS        If it completed successfully.
-  @retval other              Failed to fix up.
+  @param[in] EfiMemoryBottom       Total memory start address
+  @param[in] EfiMemoryTop          Total memory end address.
+  @param[in] EfiFreeMemoryBottom   Free memory start address
+  @param[in] EfiFreeMemoryTop      Free memory end address.
+
+  @return   The pointer to the handoff HOB table.
+
 **/
-EFI_STATUS
-FixUpPcdDatabase (
-  IN  EFI_FIRMWARE_VOLUME_HEADER  *DxeFv
-  )
-{
-  EFI_STATUS           Status;
-  EFI_FFS_FILE_HEADER  *FileHeader;
-  VOID                 *PcdRawData;
-  PEI_PCD_DATABASE     *PeiDatabase;
-  PEI_PCD_DATABASE     *UplDatabase;
-  EFI_HOB_GUID_TYPE    *GuidHob;
-  DYNAMICEX_MAPPING    *ExMapTable;
-  UINTN                Index;
-
-  GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
-  if (GuidHob == NULL) {
-    //
-    // No fix-up is needed.
-    //
-    return EFI_SUCCESS;
-  }
-
-  PeiDatabase = (PEI_PCD_DATABASE *)GET_GUID_HOB_DATA (GuidHob);
-  DEBUG ((DEBUG_INFO, "Find the Pei PCD data base, the total local token number is %d\n", PeiDatabase->LocalTokenCount));
-
-  Status = FvFindFileByTypeGuid (DxeFv, EFI_FV_FILETYPE_DRIVER, PcdGetPtr (PcdPcdDriverFile), &FileHeader);
-  ASSERT_EFI_ERROR (Status);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = FileFindSection (FileHeader, EFI_SECTION_RAW, &PcdRawData);
-  ASSERT_EFI_ERROR (Status);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  UplDatabase = (PEI_PCD_DATABASE *)PcdRawData;
-  ExMapTable  = (DYNAMICEX_MAPPING *)(UINTN)((UINTN)PcdRawData + UplDatabase->ExMapTableOffset);
-
-  for (Index = 0; Index < UplDatabase->ExTokenCount; Index++) {
-    ExMapTable[Index].TokenNumber += PeiDatabase->LocalTokenCount;
-  }
-
-  DEBUG ((DEBUG_INFO, "Fix up UPL PCD database successfully\n"));
-  return EFI_SUCCESS;
-}
+EFI_HOB_HANDOFF_INFO_TABLE *
+EFIAPI
+HobConstructor (
+  IN VOID  *EfiMemoryBottom,
+  IN VOID  *EfiMemoryTop,
+  IN VOID  *EfiFreeMemoryBottom,
+  IN VOID  *EfiFreeMemoryTop
+  );
 
 /**
+  Build ACPI board info HOB using infomation from ACPI table
+
+  @param  AcpiTableBase      ACPI table start address in memory
+
+  @retval  A pointer to ACPI board HOB ACPI_BOARD_INFO. Null if build HOB failure.
+**/
+ACPI_BOARD_INFO *
+BuildHobFromAcpi (
+  IN   UINT64  AcpiTableBase
+  );
+
+/**
+ *
   Add HOB into HOB list
 
   @param[in]  Hob    The HOB to be added into the HOB list.
@@ -111,12 +109,10 @@ AddNewHob (
   }
 
   NewHob.Header = CreateHob (Hob->Header->HobType, Hob->Header->HobLength);
-  ASSERT (NewHob.Header != NULL);
-  if (NewHob.Header == NULL) {
-    return;
-  }
 
-  CopyMem (NewHob.Header + 1, Hob->Header + 1, Hob->Header->HobLength - sizeof (EFI_HOB_GENERIC_HEADER));
+  if (NewHob.Header != NULL) {
+    CopyMem (NewHob.Header + 1, Hob->Header + 1, Hob->Header->HobLength - sizeof (EFI_HOB_GENERIC_HEADER));
+  }
 }
 
 /**
@@ -287,32 +283,30 @@ IsHobNeed (
   It will build HOBs based on information from bootloaders.
 
   @param[in]  BootloaderParameter   The starting memory address of bootloader parameter block.
-  @param[out] DxeFv                 The pointer to the DXE FV in memory.
 
   @retval EFI_SUCCESS        If it completed successfully.
   @retval Others             If it failed to build required HOBs.
 **/
 EFI_STATUS
 BuildHobs (
-  IN  UINTN                       BootloaderParameter,
-  OUT EFI_FIRMWARE_VOLUME_HEADER  **DxeFv
+  IN  UINTN  BootloaderParameter
   )
 {
-  EFI_PEI_HOB_POINTERS          Hob;
-  UINTN                         MinimalNeededSize;
-  EFI_PHYSICAL_ADDRESS          FreeMemoryBottom;
-  EFI_PHYSICAL_ADDRESS          FreeMemoryTop;
-  EFI_PHYSICAL_ADDRESS          MemoryBottom;
-  EFI_PHYSICAL_ADDRESS          MemoryTop;
-  EFI_HOB_RESOURCE_DESCRIPTOR   *PhitResourceHob;
-  EFI_HOB_RESOURCE_DESCRIPTOR   *ResourceHob;
-  UNIVERSAL_PAYLOAD_EXTRA_DATA  *ExtraData;
+  EFI_PEI_HOB_POINTERS         Hob;
+  UINTN                        MinimalNeededSize;
+  EFI_PHYSICAL_ADDRESS         FreeMemoryBottom;
+  EFI_PHYSICAL_ADDRESS         FreeMemoryTop;
+  EFI_PHYSICAL_ADDRESS         MemoryBottom;
+  EFI_PHYSICAL_ADDRESS         MemoryTop;
+  EFI_HOB_RESOURCE_DESCRIPTOR  *PhitResourceHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
+
+ #if (!FixedPcdGetBool (PcdHandOffFdtEnable))
   UINT8                         *GuidHob;
-  EFI_HOB_FIRMWARE_VOLUME       *FvHob;
   UNIVERSAL_PAYLOAD_ACPI_TABLE  *AcpiTable;
   ACPI_BOARD_INFO               *AcpiBoardInfo;
-  EFI_HOB_HANDOFF_INFO_TABLE    *HobInfo;
-  UINT8                         Idx;
+ #endif
+  EFI_HOB_HANDOFF_INFO_TABLE  *HobInfo;
 
   Hob.Raw           = (UINT8 *)BootloaderParameter;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
@@ -385,6 +379,7 @@ BuildHobs (
   //
   // Since payload created new Hob, move all hobs except PHIT from boot loader hob list.
   //
+  Hob.Raw = (UINT8 *)BootloaderParameter;
   while (!END_OF_HOB_LIST (Hob)) {
     if (IsHobNeed (Hob)) {
       // Add this hob to payload HOB
@@ -394,102 +389,20 @@ BuildHobs (
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
 
-  //
-  // Get DXE FV location
-  //
-  GuidHob = GetFirstGuidHob (&gUniversalPayloadExtraDataGuid);
-  ASSERT (GuidHob != NULL);
-  ExtraData = (UNIVERSAL_PAYLOAD_EXTRA_DATA *)GET_GUID_HOB_DATA (GuidHob);
-  DEBUG ((DEBUG_INFO, "Multiple Fv Count=%d\n", ExtraData->Count));
-  ASSERT (AsciiStrCmp (ExtraData->Entry[0].Identifier, "uefi_fv") == 0);
-
-  *DxeFv = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)ExtraData->Entry[0].Base;
-  ASSERT ((*DxeFv)->FvLength == ExtraData->Entry[0].Size);
-  //
-  // support multiple FVs provided by UPL
-  //
-  for (Idx = 1; Idx < ExtraData->Count; Idx++) {
-    BuildFvHob (ExtraData->Entry[Idx].Base, ExtraData->Entry[Idx].Size);
-    DEBUG ((
-      DEBUG_INFO,
-      "UPL Multiple fv[%d], Base=0x%x, size=0x%x\n",
-      Idx,
-      ExtraData->Entry[Idx].Base,
-      ExtraData->Entry[Idx].Size
-      ));
-  }
-
+ #if (!FixedPcdGetBool (PcdHandOffFdtEnable))
   //
   // Create guid hob for acpi board information
   //
+  DEBUG ((DEBUG_INFO, "Create guid hob for acpi board information \n"));
+
   GuidHob = GetFirstGuidHob (&gUniversalPayloadAcpiTableGuid);
   if (GuidHob != NULL) {
-    AcpiTable = (UNIVERSAL_PAYLOAD_ACPI_TABLE *)GET_GUID_HOB_DATA (GuidHob);
-    GuidHob   = GetFirstGuidHob (&gUefiAcpiBoardInfoGuid);
-    if (GuidHob == NULL) {
-      AcpiBoardInfo = BuildHobFromAcpi ((UINT64)AcpiTable->Rsdp);
-      ASSERT (AcpiBoardInfo != NULL);
-    }
+    AcpiTable     = (UNIVERSAL_PAYLOAD_ACPI_TABLE *)GET_GUID_HOB_DATA (GuidHob);
+    AcpiBoardInfo = BuildHobFromAcpi ((UINT64)AcpiTable->Rsdp);
+    ASSERT (AcpiBoardInfo != NULL);
   }
 
-  //
-  // Update DXE FV information to first fv hob in the hob list, which
-  // is the empty FvHob created before.
-  //
-  FvHob              = GetFirstHob (EFI_HOB_TYPE_FV);
-  FvHob->BaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)*DxeFv;
-  FvHob->Length      = (*DxeFv)->FvLength;
-  return EFI_SUCCESS;
-}
+ #endif
 
-/**
-  Entry point to the C language phase of UEFI payload.
-
-  @param[in]   BootloaderParameter    The starting address of bootloader parameter block.
-
-  @retval      It will not return if SUCCESS, and return error when passing bootloader parameter.
-**/
-EFI_STATUS
-EFIAPI
-_ModuleEntryPoint (
-  IN UINTN  BootloaderParameter
-  )
-{
-  EFI_STATUS                  Status;
-  PHYSICAL_ADDRESS            DxeCoreEntryPoint;
-  EFI_PEI_HOB_POINTERS        Hob;
-  EFI_FIRMWARE_VOLUME_HEADER  *DxeFv;
-
-  mHobList = (VOID *)BootloaderParameter;
-  DxeFv    = NULL;
-  // Call constructor for all libraries
-  ProcessLibraryConstructorList ();
-
-  DEBUG ((DEBUG_INFO, "Entering Universal Payload...\n"));
-  DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof (UINTN)));
-
-  DEBUG_CODE (
-    //
-    // Dump the Hobs from boot loader
-    //
-    PrintHob (mHobList);
-    );
-
-  // Initialize floating point operating environment to be compliant with UEFI spec.
-  InitializeFloatingPointUnits ();
-
-  // Build HOB based on information from Bootloader
-  Status = BuildHobs (BootloaderParameter, &DxeFv);
-  ASSERT_EFI_ERROR (Status);
-
-  FixUpPcdDatabase (DxeFv);
-  Status = UniversalLoadDxeCore (DxeFv, &DxeCoreEntryPoint);
-  ASSERT_EFI_ERROR (Status);
-
-  Hob.HandoffInformationTable = (EFI_HOB_HANDOFF_INFO_TABLE *)GetFirstHob (EFI_HOB_TYPE_HANDOFF);
-  HandOffToDxeCore (DxeCoreEntryPoint, Hob);
-
-  // Should not get here
-  CpuDeadLoop ();
   return EFI_SUCCESS;
 }
