@@ -1060,7 +1060,7 @@ IdentifyUsbNicBmcChannel (
 
   InitializeListHead (&BmcUsbNic->NextInstance);
   BmcUsbNic->MacAddressSize = Snp->Mode->HwAddressSize;
-  BmcUsbNic->MacAddress     = AllocateZeroPool (sizeof (BmcUsbNic->MacAddressSize));
+  BmcUsbNic->MacAddress     = AllocatePool (BmcUsbNic->MacAddressSize);
   if (BmcUsbNic->MacAddress == NULL) {
     DEBUG ((DEBUG_ERROR, "    Failed to allocate memory for HW MAC addresss.\n"));
     FreePool (BmcUsbNic);
@@ -1133,7 +1133,7 @@ CheckBmcUsbNicOnHandles (
                     (VOID **)&DevicePath
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "    Failed to locate device path on %d handle.\n", __func__, Index));
+      DEBUG ((DEBUG_ERROR, "    Failed to locate device path on %d handle.\n", Index));
       continue;
     }
 
