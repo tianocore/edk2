@@ -13,6 +13,7 @@
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
+#include "ArmMmuLibInternal.h"
 
 EFI_STATUS
 EFIAPI
@@ -21,9 +22,9 @@ ArmMmuPeiLibConstructor (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  extern UINT32  ArmReplaceLiveTranslationEntrySize;
-  VOID           *ArmReplaceLiveTranslationEntryFunc;
-  VOID           *Hob;
+  extern UINT32                       ArmReplaceLiveTranslationEntrySize;
+  ARM_REPLACE_LIVE_TRANSLATION_ENTRY  ArmReplaceLiveTranslationEntryFunc;
+  VOID                                *Hob;
 
   EFI_FV_FILE_INFO  FileInfo;
   EFI_STATUS        Status;

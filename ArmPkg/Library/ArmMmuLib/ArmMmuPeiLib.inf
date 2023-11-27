@@ -17,6 +17,7 @@
   CONSTRUCTOR                    = ArmMmuPeiLibConstructor
 
 [Sources.AARCH64]
+  ArmMmuLibInternal.h
   AArch64/ArmMmuLibCore.c
   AArch64/ArmMmuPeiLibConstructor.c
   AArch64/ArmMmuLibReplaceEntry.S
