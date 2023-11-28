@@ -43,6 +43,7 @@
 [Pcd]
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishHostName     ## CONSUMED
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceUuid  ## CONSUMED
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServicePort  ## CONSUMED
 
 [Depex]
   gIpmiProtocolGuid

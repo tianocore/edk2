@@ -244,7 +244,7 @@ RedfishPlatformHostInterfaceProtocolData (
         );
 
       // RedfishServiceIpPort
-      RedfishOverIpData->RedfishServiceIpPort = 0;
+      RedfishOverIpData->RedfishServiceIpPort = PcdGet16 (PcdRedfishServicePort);
 
       // RedfishServiceVlanId
       RedfishOverIpData->RedfishServiceVlanId = ThisInstance->VLanId;
