@@ -22,8 +22,8 @@ ACTIVE_PLATFORM       = EmulatorPkg/EmulatorPkg.dsc
 #  TARGET                List       Optional    Zero or more of the following: DEBUG, RELEASE, NOOPT
 #                                               UserDefined; separated by a space character.
 #                                               If the line is missing or no value is specified, all
-#                                               valid targets specified in the platform description file 
-#                                               will attempt to be built. The following line will build 
+#                                               valid targets specified in the platform description file
+#                                               will attempt to be built. The following line will build
 #                                               DEBUG platform target.
 TARGET                = DEBUG
 
@@ -32,7 +32,7 @@ TARGET                = DEBUG
 #                                               or AArch64.
 #                                               Multiple values can be specified on a single line, using
 #                                               space characters to separate the values.  These are used
-#                                               during the parsing of a platform description file, 
+#                                               during the parsing of a platform description file,
 #                                               restricting the build output target(s.)
 #                                               The Build Target ARCH is determined by (precedence high to low):
 #                                                 Command-line: -a ARCH option
@@ -51,7 +51,7 @@ TOOL_CHAIN_CONF       = Conf/tools_def.txt
 #  TAGNAME               List      Optional   Specify the name(s) of the tools_def.txt TagName to use.
 #                                             If not specified, all applicable TagName tools will be
 #                                             used for the build.  The list uses space character separation.
-TOOL_CHAIN_TAG        = VS2015x86
+TOOL_CHAIN_TAG        = VS2019
 
 # MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. If not specified or set
 #                                                 to zero, tool automatically detect number of processor
@@ -64,7 +64,7 @@ TOOL_CHAIN_TAG        = VS2015x86
 
 
 # BUILD_RULE_CONF  Filename Optional  Specify the file name to use for the build rules that are followed
-#                                     when generating Makefiles. If not specified, the file: 
+#                                     when generating Makefiles. If not specified, the file:
 #                                     WORKSPACE/Conf/build_rule.txt will be used
 BUILD_RULE_CONF = Conf/build_rule.txt
 
