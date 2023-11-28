@@ -291,6 +291,67 @@ CopyDigestListToBuffer (
 }
 
 /**
+  Copy a buffer into a TPML_DIGEST_VALUES structure.
+
+  @param[in]     Buffer             Buffer to hold TPML_DIGEST_VALUES compact binary.
+  @param[in]     BufferSize         Size of Buffer.
+  @param[out]    DigestList         TPML_DIGEST_VALUES.
+
+  @retval EFI_SUCCESS               Buffer was succesfully copied to Digest List.
+  @retval EFI_BAD_BUFFER_SIZE       Bad buffer size passed to function.
+  @retval EFI_INVALID_PARAMETER     Invalid parameter passed to function: NULL pointer or
+                                    BufferSize bigger than TPML_DIGEST_VALUES
+**/
+EFI_STATUS
+EFIAPI
+CopyBufferToDigestList (
+  IN CONST  VOID                *Buffer,
+  IN        UINTN               BufferSize,
+  OUT       TPML_DIGEST_VALUES  *DigestList
+  )
+{
+  EFI_STATUS   Status;
+  UINTN        Index;
+  UINT16       DigestSize;
+  CONST UINT8  *BufferPtr;
+
+  Status = EFI_INVALID_PARAMETER;
+
+  if ((Buffer == NULL) || (DigestList == NULL) || (BufferSize > sizeof (TPML_DIGEST_VALUES))) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DigestList->count = SwapBytes32 (ReadUnaligned32 ((CONST UINT32 *)Buffer));
+  if (DigestList->count > HASH_COUNT) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  BufferPtr = (CONST UINT8 *)Buffer +  sizeof (UINT32);
+  for (Index = 0; Index < DigestList->count; Index++) {
+    if (BufferPtr - (CONST UINT8 *)Buffer + sizeof (UINT16) > BufferSize) {
+      Status = EFI_BAD_BUFFER_SIZE;
+      break;
+    } else {
+      DigestList->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 ((CONST UINT16 *)BufferPtr));
+    }
+
+    BufferPtr += sizeof (UINT16);
+    DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
+    if (BufferPtr - (CONST UINT8 *)Buffer + (UINTN)DigestSize > BufferSize) {
+      Status = EFI_BAD_BUFFER_SIZE;
+      break;
+    } else {
+      CopyMem (&DigestList->digests[Index].digest, BufferPtr, DigestSize);
+    }
+
+    BufferPtr += DigestSize;
+    Status     = EFI_SUCCESS;
+  }
+
+  return Status;
+}
+
+/**
   Get TPML_DIGEST_VALUES data size.
 
   @param[in]     DigestList    TPML_DIGEST_VALUES data.
@@ -311,6 +372,32 @@ GetDigestListSize (
   for (Index = 0; Index < DigestList->count; Index++) {
     DigestSize = GetHashSizeFromAlgo (DigestList->digests[Index].hashAlg);
     TotalSize += sizeof (DigestList->digests[Index].hashAlg) + DigestSize;
+  }
+
+  return TotalSize;
+}
+
+/**
+  Get the total digest size from a hash algorithm mask.
+
+  @param[in]     HashAlgorithmMask.
+
+  @return Digest size in bytes.
+**/
+UINT32
+EFIAPI
+GetDigestListSizeFromHashAlgorithmMask (
+  IN UINT32  HashAlgorithmMask
+  )
+{
+  UINTN   Index;
+  UINT32  TotalSize;
+
+  TotalSize = sizeof (UINT32);
+  for (Index = 0; Index < ARRAY_SIZE (mHashInfo); Index++) {
+    if ((mHashInfo[Index].HashMask & HashAlgorithmMask) != 0) {
+      TotalSize += sizeof (TPMI_ALG_HASH) + mHashInfo[Index].HashSize;
+    }
   }
 
   return TotalSize;
