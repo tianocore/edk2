@@ -92,7 +92,7 @@ jobs:
         git config --system core.longpaths true
 
     - name: Install/Upgrade pip Modules
-      run: pip install -r pip-requirements.txt --upgrade requests
+      run: pip install -r pip-requirements.txt --upgrade requests sarif-tools
 
     - name: Determine CI Settings File Supported Operations
       id: get_ci_file_operations
@@ -304,16 +304,26 @@ jobs:
         PACKAGE_NAME: ${{ matrix.Package }}
       shell: python
       run: |
+        import logging
         import os
+        from edk2toollib.utility_functions import RunCmd
+        from io import StringIO
+        from pathlib import Path
 
         package = os.environ['PACKAGE_NAME'].strip().lower()
         directory_name = 'codeql-analysis-' + package + '-debug'
         file_name = 'codeql-db-' + package + '-debug-0.sarif'
-        sarif_path = os.path.join('Build', directory_name, file_name)
+        sarif_path = Path('Build', directory_name, file_name)
 
         with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
-            if os.path.isfile(sarif_path):
+            if sarif_path.is_file():
+                emacs_file_path = sarif_path.with_name(sarif_path.stem + "-emacs.txt")
+                out_stream_buffer = StringIO()
+                exit_code = RunCmd("sarif", f"emacs {sarif_path} --output {emacs_file_path} --no-autotrim",
+                                   outstream=out_stream_buffer,
+                                   logging_level=logging.NOTSET)
                 print(f'upload_sarif_file=true', file=fh)
+                print(f'emacs_file_path={emacs_file_path}', file=fh)
                 print(f'sarif_file_path={sarif_path}', file=fh)
             else:
                 print(f'upload_sarif_file=false', file=fh)
@@ -323,7 +333,9 @@ jobs:
       if: steps.env_data.outputs.upload_sarif_file == 'true'
       with:
         name: ${{ matrix.Package }}-CodeQL-SARIF
-        path: ${{ steps.env_data.outputs.sarif_file_path }}
+        path: |
+          ${{ steps.env_data.outputs.emacs_file_path }}
+          ${{ steps.env_data.outputs.sarif_file_path }}
         retention-days: 14
         if-no-files-found: warn
 
