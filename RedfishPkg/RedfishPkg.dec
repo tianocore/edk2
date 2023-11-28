@@ -138,12 +138,16 @@
   # specification for that.
   #
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceUuid|L"00000000-0000-0000-0000-000000000000"|VOID*|0x00001006
+  # Use PCD to declare the Redfish service port, default set to port 443.
+  # Platform can overide this value in platform DSC file.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServicePort|443|UINT16|0x00001007
   #
   # This PCD indicates that if BMC bootstrap credential service will be disabled by BIOS or not.
   #
-  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDisableBootstrapCredentialService|FALSE|BOOLEAN|0x00001007
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDisableBootstrapCredentialService|FALSE|BOOLEAN|0x00001008
   #
   # The EFI_REST_EX_HTTP_CONFIG_DATA.SendReceiveTimeout value that RedfishDiscoverDxe driver
   # set to EFI_REST_EX_PROTOCOL.
   #
-  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishSendReceiveTimeout|5000|UINT32|0x00001008
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishSendReceiveTimeout|5000|UINT32|0x00001009
