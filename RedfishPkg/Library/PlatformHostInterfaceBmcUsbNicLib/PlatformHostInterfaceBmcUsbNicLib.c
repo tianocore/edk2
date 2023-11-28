@@ -616,9 +616,10 @@ HostInterfaceIpmiCheckMacAddress (
   }
 
   // Initial the get MAC address request.
-  GetLanConfigReq.SetSelector       = 0;
-  GetLanConfigReq.BlockSelector     = 0;
-  GetLanConfigReq.ParameterSelector = IpmiLanMacAddress;
+  GetLanConfigReq.ChannelNumber.Uint8 = 0;
+  GetLanConfigReq.SetSelector         = 0;
+  GetLanConfigReq.BlockSelector       = 0;
+  GetLanConfigReq.ParameterSelector   = IpmiLanMacAddress;
 
   ExitStatus = EFI_NOT_FOUND;
   for (ChannelNum = IPMI_CHANNEL_NUMBER_IMPLEMENTATION_SPECIFIC_1;
@@ -640,6 +641,7 @@ HostInterfaceIpmiCheckMacAddress (
     } else {
       DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "  No cached IPMI LAN info\n"));
       DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "  Send NetFn = App, Command = 0x42 to channel %d\n", ChannelNum));
+      GetChanelInfoRequest.ChannelNumber.Uint8          = 0;
       GetChanelInfoRequest.ChannelNumber.Bits.ChannelNo = (UINT8)ChannelNum;
       Status                                            = IpmiGetChannelInfo (
                                                             &GetChanelInfoRequest,
