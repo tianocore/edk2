@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include "CpuDxe.h"
 
-#define INVALID_ENTRY  ((UINT32)~0)
+#define INVALID_ENTRY  ((UINT64)~0)
 
 #define MIN_T0SZ        16
 #define BITS_PER_LEVEL  9
@@ -169,14 +169,14 @@ GetNextEntryAttribute (
   IN     UINTN   EntryCount,
   IN     UINTN   TableLevel,
   IN     UINT64  BaseAddress,
-  IN OUT UINT32  *PrevEntryAttribute,
+  IN OUT UINT64  *PrevEntryAttribute,
   IN OUT UINT64  *StartGcdRegion
   )
 {
   UINTN                            Index;
   UINT64                           Entry;
-  UINT32                           EntryAttribute;
-  UINT32                           EntryType;
+  UINT64                           EntryAttribute;
+  UINT64                           EntryType;
   EFI_STATUS                       Status;
   UINTN                            NumberOfDescriptors;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
@@ -271,7 +271,7 @@ SyncCacheConfig (
   )
 {
   EFI_STATUS                       Status;
-  UINT32                           PageAttribute;
+  UINT64                           PageAttribute;
   UINT64                           *FirstLevelTableAddress;
   UINTN                            TableLevel;
   UINTN                            TableCount;
