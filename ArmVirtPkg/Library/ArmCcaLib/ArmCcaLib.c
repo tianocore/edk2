@@ -35,23 +35,28 @@ IsRealm (
   VOID
   )
 {
-  RETURN_STATUS  Status;
-  UINT32         UefiImpl;
-  UINT32         RmmImplLow;
-  UINT32         RmmImplHigh;
+  RETURN_STATUS   Status;
+  UINT32          UefiImpl;
+  UINT32          RmmImplLow;
+  UINT32          RmmImplHigh;
+  STATIC BOOLEAN  RealmWorld       = FALSE;
+  STATIC BOOLEAN  FlagsInitialised = FALSE;
 
-  if (ArmHasRme ()) {
-    Status = RsiGetVersion (
-               &UefiImpl,
-               &RmmImplLow,
-               &RmmImplHigh
-               );
-    if (!RETURN_ERROR (Status)) {
-      return TRUE;
+  if (!FlagsInitialised) {
+    FlagsInitialised = TRUE;
+    if (ArmHasRme ()) {
+      Status = RsiGetVersion (
+                 &UefiImpl,
+                 &RmmImplLow,
+                 &RmmImplHigh
+                 );
+      if (!RETURN_ERROR (Status)) {
+        RealmWorld = TRUE;
+      }
     }
   }
 
-  return FALSE;
+  return RealmWorld;
 }
 
 /**
