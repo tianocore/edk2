@@ -10,8 +10,8 @@
 
 #include <gtest/gtest.h>
 extern "C" {
-  #include <Base.h>
-  #include <Library/SafeIntLib.h>
+#include <Base.h>
+#include <Library/SafeIntLib.h>
 }
 
 TEST (ConversionTestSuite, TestSafeInt32ToUintn) {

@@ -20,6 +20,7 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 
 [LibraryClasses]
+  BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibBase.inf
 
@@ -31,6 +32,10 @@
   MdePkg/Test/UnitTest/Library/BaseLib/BaseLibUnitTestsHost.inf
   MdePkg/Test/GoogleTest/Library/BaseSafeIntLib/GoogleTestBaseSafeIntLib.inf
   MdePkg/Test/UnitTest/Library/DevicePathLib/TestDevicePathLibHost.inf
+  #
+  # BaseLib tests
+  #
+  MdePkg/Test/GoogleTest/Library/BaseLib/GoogleTestBaseLib.inf
 
   #
   # Build HOST_APPLICATION Libraries
