@@ -45,5 +45,6 @@
   gEfiAcpiTableGuid
   gFdtTableGuid
 
-[FeaturePcd]
+[Pcd]
   gEmbeddedTokenSpaceGuid.PcdAndroidBootLoadFile2
+  gEmbeddedTokenSpaceGuid.PcdAndroidKernelCommandLineOverflow
