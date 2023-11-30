@@ -196,7 +196,7 @@ OnReadOnlyVariable2Available (
 //
 STATIC CONST EFI_PEI_NOTIFY_DESCRIPTOR  mReadOnlyVariable2Notify = {
   (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH |
-   EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),  // Flags
+    EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST), // Flags
   &gEfiPeiReadOnlyVariable2PpiGuid,         // Guid
   OnReadOnlyVariable2Available              // Notify
 };

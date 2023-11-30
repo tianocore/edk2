@@ -75,9 +75,9 @@ EFI_FVB_MEDIA_INFO  mPlatformFvbMediaInfo[] = {
       {
         {
           (FixedPcdGet32 (PcdFlashNvStorageVariableSize) +
-           FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
-           FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
-           FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize)) /
+            FixedPcdGet32 (PcdFlashNvStorageFtwWorkingSize) +
+            FixedPcdGet32 (PcdFlashNvStorageFtwSpareSize) +
+            FixedPcdGet32 (PcdOvmfFlashNvStorageEventLogSize)) /
           FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
           FixedPcdGet32 (PcdOvmfFirmwareBlockSize),
         }
