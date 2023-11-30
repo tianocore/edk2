@@ -211,6 +211,7 @@
   CcProbeLib|OvmfPkg/Library/CcProbeLib/DxeCcProbeLib.inf
 !else
   CcProbeLib|MdePkg/Library/CcProbeLibNull/CcProbeLibNull.inf
+  SmmCpuSyncLib|UefiCpuPkg/Library/SmmCpuSyncLib/SmmCpuSyncLib.inf
 !endif
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
   FrameBufferBltLib|MdeModulePkg/Library/FrameBufferBltLib/FrameBufferBltLib.inf
