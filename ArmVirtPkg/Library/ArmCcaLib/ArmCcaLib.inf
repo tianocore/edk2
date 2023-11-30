@@ -27,3 +27,8 @@
   ArmCcaRsiLib
   ArmLib
   BaseLib
+  HobLib
+
+[Guids]
+  gArmCcaIpaWidthGuid
+  gArmCcaIsRealmGuid
