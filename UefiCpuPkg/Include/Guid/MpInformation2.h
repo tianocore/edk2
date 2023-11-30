@@ -29,6 +29,8 @@
 
 typedef struct {
   EFI_PROCESSOR_INFORMATION    ProcessorInfo;
+  UINT8                        CoreType;
+  UINT8                        Reserved[7];
   //
   // Add more fields in future
   //
