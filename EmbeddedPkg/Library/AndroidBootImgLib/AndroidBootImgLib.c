@@ -335,7 +335,7 @@ AndroidBootImgUpdateArgs (
     return Status;
   }
 
-  NewKernelArgSize = ANDROID_BOOTIMG_KERNEL_ARGS_SIZE;
+  NewKernelArgSize = ANDROID_BOOTIMG_KERNEL_ARGS_SIZE + PcdGet32 (PcdAndroidKernelCommandLineOverflow);
   *KernelArgs      = AllocateZeroPool (sizeof (CHAR16) * NewKernelArgSize);
   if (*KernelArgs == NULL) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate memory\n"));
