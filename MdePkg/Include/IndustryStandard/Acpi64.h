@@ -609,6 +609,7 @@ typedef struct {
   UINT16    MailBoxVersion;
   UINT32    Reserved;
   UINT64    MailBoxAddress;
+  UINT64    ResetVector;
 } EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_STRUCTURE;
 
 ///
