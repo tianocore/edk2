@@ -1,7 +1,7 @@
 /** @file
   ACPI Timer implements one instance of Timer Library.
 
-  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -10,6 +10,11 @@
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
 #include <Library/HobLib.h>
+
+//
+// Cached performance counter frequency
+//
+static UINT64  mAcpiTimerLibTscFrequency = 0;
 
 extern GUID  mFrequencyHobGuid;
 
@@ -48,11 +53,6 @@ InternalCalculateTscFrequency (
   VOID
   );
 
-//
-// Cached performance counter frequency
-//
-UINT64  mPerformanceCounterFrequency = 0;
-
 /**
   Internal function to retrieves the 64-bit frequency in Hz.
 
@@ -66,7 +66,7 @@ InternalGetPerformanceCounterFrequency (
   VOID
   )
 {
-  return mPerformanceCounterFrequency;
+  return mAcpiTimerLibTscFrequency;
 }
 
 /**
@@ -92,9 +92,9 @@ CommonAcpiTimerLibConstructor (
   //
   GuidHob = GetFirstGuidHob (&mFrequencyHobGuid);
   if (GuidHob != NULL) {
-    mPerformanceCounterFrequency = *(UINT64 *)GET_GUID_HOB_DATA (GuidHob);
+    mAcpiTimerLibTscFrequency = *(UINT64 *)GET_GUID_HOB_DATA (GuidHob);
   } else {
-    mPerformanceCounterFrequency = InternalCalculateTscFrequency ();
+    mAcpiTimerLibTscFrequency = InternalCalculateTscFrequency ();
   }
 
   return EFI_SUCCESS;
