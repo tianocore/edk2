@@ -28,6 +28,46 @@
 #include <Uefi.h>
 #include <TdxAcpiTable.h>
 
+
+ IA32_GDT  mGdtEntries[] = {
+  {
+    { 0,      0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0 }
+  },                                                            /* 0x0:  reserve */
+  {
+    { 0xFFFF, 0, 0, 0xB, 1, 0, 1, 0xF, 0, 0, 1, 1, 0 }
+  },                                                            /* 0x8:  compatibility mode */
+  {
+    { 0xFFFF, 0, 0, 0xB, 1, 0, 1, 0xF, 0, 1, 0, 1, 0 }
+  },                                                            /* 0x10: for long mode */
+  {
+    { 0xFFFF, 0, 0, 0x3, 1, 0, 1, 0xF, 0, 0, 1, 1, 0 }
+  },                                                            /* 0x18: data */
+  {
+    { 0,      0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0 }
+  },                                                            /* 0x20: reserve */
+};
+
+
+/**
+  At the beginning of ResetVector in OS, the GDT needs to be reloaded.
+**/
+VOID
+SetMailboxResetVectorGDT (
+ VOID
+ )
+{
+  TDX_WORK_AREA  *TdxWorkArea;
+
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  ASSERT (TdxWorkArea != NULL);
+  ZeroMem ((VOID *)TdxWorkArea->MailboxGdt.Data, sizeof (TdxWorkArea->MailboxGdt.Data));
+
+  CopyMem((VOID *)TdxWorkArea->MailboxGdt.Data, (VOID *)mGdtEntries, sizeof(mGdtEntries));
+  TdxWorkArea->MailboxGdt.Gdtr.Base = (UINTN)TdxWorkArea->MailboxGdt.Data;
+  TdxWorkArea->MailboxGdt.Gdtr.Limit  = sizeof (mGdtEntries) - 1;
+}
+
+
 /**
   At the beginning of system boot, a 4K-aligned, 4K-size memory (Td mailbox) is
   pre-allocated by host VMM. BSP & APs do the page accept together in that memory
@@ -37,12 +77,14 @@
   memory block which is allocated in the ACPI Nvs memory. APs are waken up and
   spin around the relocated mailbox for further command.
 
+  @param[in, out]  ResetVector      Pointer to the ResetVector
+
   @return   EFI_PHYSICAL_ADDRESS    Address of the relocated mailbox
 **/
 EFI_PHYSICAL_ADDRESS
 EFIAPI
 RelocateMailbox (
-  VOID
+  EFI_PHYSICAL_ADDRESS *ResetVector
   )
 {
   EFI_PHYSICAL_ADDRESS  Address;
@@ -92,6 +134,7 @@ RelocateMailbox (
     ApLoopFunc
     ));
 
+  SetMailboxResetVectorGDT();
   //
   // Initialize mailbox
   //
@@ -115,6 +158,13 @@ RelocateMailbox (
     0
     );
 
+  *ResetVector = (UINT64)ApLoopFunc + (RelocationMap.RelocateApResetVector -
+				       RelocationMap.RelocateApLoopFuncAddress);
+  DEBUG ((
+    DEBUG_INFO,
+    "Ap Relocation: reset_vector %llx\n",
+    *ResetVector
+    ));
   return Address;
 }
 
@@ -142,6 +192,7 @@ AlterAcpiTable (
   UINT8                                                *NewMadtTable;
   UINTN                                                NewMadtTableLength;
   EFI_PHYSICAL_ADDRESS                                 RelocateMailboxAddress;
+  EFI_PHYSICAL_ADDRESS                                 RelocateResetVector;
   EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_STRUCTURE         *MadtMpWk;
   EFI_ACPI_1_0_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER  *MadtHeader;
 
@@ -155,7 +206,7 @@ AlterAcpiTable (
     return;
   }
 
-  RelocateMailboxAddress = RelocateMailbox ();
+  RelocateMailboxAddress = RelocateMailbox (&RelocateResetVector);
   if (RelocateMailboxAddress == 0) {
     ASSERT (FALSE);
     DEBUG ((DEBUG_ERROR, "Failed to relocate Td mailbox\n"));
@@ -186,9 +237,10 @@ AlterAcpiTable (
       MadtMpWk                 = (EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_STRUCTURE *)(NewMadtTable + Table->Length);
       MadtMpWk->Type           = EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP;
       MadtMpWk->Length         = sizeof (EFI_ACPI_6_4_MULTIPROCESSOR_WAKEUP_STRUCTURE);
-      MadtMpWk->MailBoxVersion = 0;
+      MadtMpWk->MailBoxVersion = 1;
       MadtMpWk->Reserved       = 0;
       MadtMpWk->MailBoxAddress = RelocateMailboxAddress;
+      MadtMpWk->ResetVector    = RelocateResetVector;
 
       Status = AcpiTableProtocol->InstallAcpiTable (AcpiTableProtocol, NewMadtTable, NewMadtTableLength, &NewTableKey);
       if (EFI_ERROR (Status)) {

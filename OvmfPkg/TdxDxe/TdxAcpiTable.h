@@ -18,6 +18,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+#include <WorkArea.h>
+
 #include <IndustryStandard/IntelTdx.h>
 #include <IndustryStandard/Acpi.h>
 
@@ -41,7 +43,7 @@ AsmGetRelocationMap (
 EFI_PHYSICAL_ADDRESS
 EFIAPI
 RelocateMailbox (
-  VOID
+  EFI_PHYSICAL_ADDRESS *ResetVector
   );
 
 /**
