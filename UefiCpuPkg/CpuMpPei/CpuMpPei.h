@@ -32,6 +32,8 @@
 
 #include <Guid/MpInformation2.h>
 
+#include <Register/Cpuid.h>
+
 extern EFI_PEI_PPI_DESCRIPTOR  mPeiCpuMpPpiDesc;
 
 /**
