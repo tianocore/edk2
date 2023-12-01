@@ -71,3 +71,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
