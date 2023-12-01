@@ -488,43 +488,6 @@ CheckIsIpVersion6 (
 }
 
 /**
-  This function returns the  IP type supported by the Host Interface.
-
-  @retval 00h is Unknown
-          01h is Ipv4
-          02h is Ipv6
-
-**/
-STATIC
-UINT8
-GetHiIpProtocolType (
-  VOID
-  )
-{
-  EFI_STATUS                     Status;
-  REDFISH_OVER_IP_PROTOCOL_DATA  *Data;
-  REDFISH_INTERFACE_DATA         *DeviceDescriptor;
-
-  Data             = NULL;
-  DeviceDescriptor = NULL;
-  if (mSmbios == NULL) {
-    Status = gBS->LocateProtocol (&gEfiSmbiosProtocolGuid, NULL, (VOID **)&mSmbios);
-    if (EFI_ERROR (Status)) {
-      return REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_UNKNOWN;
-    }
-  }
-
-  Status = RedfishGetHostInterfaceProtocolData (mSmbios, &DeviceDescriptor, &Data); // Search for SMBIOS type 42h
-  if (!EFI_ERROR (Status) && (Data != NULL) &&
-      (Data->HostIpAssignmentType == RedfishHostIpAssignmentStatic))
-  {
-    return Data->HostIpAddressFormat;
-  }
-
-  return REDFISH_HOST_INTERFACE_HOST_IP_ADDRESS_FORMAT_UNKNOWN;
-}
-
-/**
   Check if Network Protocol Type matches with SMBIOS Type 42 IP Address Type.
 
   @param[in]  NetworkProtocolType  The Network Protocol Type to check with.
@@ -583,7 +546,10 @@ DiscoverRedfishHostInterface (
   }
 
   Status = RedfishGetHostInterfaceProtocolData (mSmbios, &DeviceDescriptor, &Data); // Search for SMBIOS type 42h
-  if (!EFI_ERROR (Status) && (Data != NULL) && (DeviceDescriptor != NULL)) {
+  if (EFI_ERROR (Status) || (Data == NULL) || (DeviceDescriptor == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a: RedfishGetHostInterfaceProtocolData is failed.\n", __func__));
+    return Status;
+  } else {
     // Check IP Type and skip an unnecessary network protocol if does not match
     if (FilterProtocol (Instance->NetworkInterface->NetworkProtocolType, Data->HostIpAddressFormat)) {
       return EFI_UNSUPPORTED;
@@ -675,6 +641,9 @@ DiscoverRedfishHostInterface (
       IsHttps = FALSE;
       if (Data->RedfishServiceIpPort == 443) {
         IsHttps = TRUE;
+        DEBUG ((DEBUG_MANAGEABILITY, "Redfish service port: 443\n"));
+      } else {
+        DEBUG ((DEBUG_MANAGEABILITY, "Redfish service port: 80\n"));
       }
 
       StrSize = sizeof (UuidStr);
@@ -737,8 +706,6 @@ DiscoverRedfishHostInterface (
                  IsHttps
                  );
     }
-  } else {
-    DEBUG ((DEBUG_ERROR, "%a: RedfishGetHostInterfaceProtocolData is failed.\n", __func__));
   }
 
   return Status;
@@ -1015,9 +982,11 @@ AddAndSignalNewRedfishService (
                          (EFI_REST_EX_CONFIG_DATA)(UINT8 *)RestExHttpConfigData
                          );
       if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "%a:REST EX configured..\n", __func__));
+        DEBUG ((DEBUG_ERROR, "%a: REST EX is not configured..\n", __func__));
         DeleteRestEx = TRUE;
         goto EXIT_FREE_ALL;
+      } else {
+        DEBUG ((DEBUG_MANAGEABILITY, "%a: REST EX is configured..\n", __func__));
       }
 
       //
@@ -1207,6 +1176,8 @@ RedfishServiceGetNetworkInterface (
   EFI_REDFISH_DISCOVER_NETWORK_INTERFACE           *ThisNetworkInterface;
   EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL   *RestExInstance;
 
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry.\n", __func__));
+
   if ((This == NULL) || (NetworkIntfInstances == NULL) || (NumberOfNetworkIntfs == NULL) ||
       (ImageHandle == NULL))
   {
@@ -1242,31 +1213,27 @@ RedfishServiceGetNetworkInterface (
 
   ThisNetworkInterfaceIntn = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetFirstNode (&mEfiRedfishDiscoverNetworkInterface);
   while (TRUE) {
-    // If Get Subnet Info failed then skip this interface
-    Status = NetworkInterfaceGetSubnetInfo (ThisNetworkInterfaceIntn, ImageHandle); // Get subnet info
-    if (EFI_ERROR (Status)) {
-      if (IsNodeAtEnd (&mEfiRedfishDiscoverNetworkInterface, &ThisNetworkInterfaceIntn->Entry)) {
-        break;
-      }
-
-      ThisNetworkInterfaceIntn = (EFI_REDFISH_DISCOVER_NETWORK_INTERFACE_INTERNAL *)GetNextNode (&mEfiRedfishDiscoverNetworkInterface, &ThisNetworkInterfaceIntn->Entry);
-      continue;
-    }
-
     ThisNetworkInterface->IsIpv6 = FALSE;
     if (CheckIsIpVersion6 (ThisNetworkInterfaceIntn)) {
       ThisNetworkInterface->IsIpv6 = TRUE;
     }
 
     CopyMem ((VOID *)&ThisNetworkInterface->MacAddress, &ThisNetworkInterfaceIntn->MacAddress, ThisNetworkInterfaceIntn->HwAddressSize);
-    if (!ThisNetworkInterface->IsIpv6) {
-      IP4_COPY_ADDRESS (&ThisNetworkInterface->SubnetId.v4, &ThisNetworkInterfaceIntn->SubnetAddr.v4); // IPv4 subnet information.
-    } else {
-      IP6_COPY_ADDRESS (&ThisNetworkInterface->SubnetId.v6, &ThisNetworkInterfaceIntn->SubnetAddr.v6); // IPv6 subnet information in IPv6 address information.
+    //
+    // If Get Subnet Info failed then skip this interface
+    //
+    Status = NetworkInterfaceGetSubnetInfo (ThisNetworkInterfaceIntn, ImageHandle); // Get subnet info
+    if (!EFI_ERROR (Status)) {
+      if (!ThisNetworkInterface->IsIpv6) {
+        IP4_COPY_ADDRESS (&ThisNetworkInterface->SubnetId.v4, &ThisNetworkInterfaceIntn->SubnetAddr.v4); // IPv4 subnet information.
+      } else {
+        IP6_COPY_ADDRESS (&ThisNetworkInterface->SubnetId.v6, &ThisNetworkInterfaceIntn->SubnetAddr.v6); // IPv6 subnet information in IPv6 address information.
+      }
+
+      ThisNetworkInterface->SubnetPrefixLength = ThisNetworkInterfaceIntn->SubnetPrefixLength;
     }
 
-    ThisNetworkInterface->SubnetPrefixLength = ThisNetworkInterfaceIntn->SubnetPrefixLength;
-    ThisNetworkInterface->VlanId             = ThisNetworkInterfaceIntn->VlanId;
+    ThisNetworkInterface->VlanId = ThisNetworkInterfaceIntn->VlanId;
     RestExInstance->NumberOfNetworkInterfaces++;
     if (IsNodeAtEnd (&mEfiRedfishDiscoverNetworkInterface, &ThisNetworkInterfaceIntn->Entry)) {
       break;
@@ -1378,9 +1345,16 @@ RedfishServiceAcquireService (
       //
       Status1 = NetworkInterfaceGetSubnetInfo (TargetNetworkInterfaceInternal, ImageHandle);
       if (EFI_ERROR (Status1)) {
-        DEBUG ((DEBUG_ERROR, "%a: Get subnet information fail.\n", __func__));
-        FreePool (Instance);
-        continue;
+        //
+        // Get subnet information could be failed for EFI_REDFISH_DISCOVER_HOST_INTERFACE case.
+        // We will configure network in AddAndSignalNewRedfishService. So don't skip this
+        // target network interface.
+        //
+        if ((Flags & EFI_REDFISH_DISCOVER_HOST_INTERFACE) == 0) {
+          DEBUG ((DEBUG_ERROR, "%a: Get subnet information fail.\n", __func__));
+          FreePool (Instance);
+          continue;
+        }
       }
 
       NewInstance = TRUE;
@@ -1448,6 +1422,7 @@ RedfishServiceAbortAcquire (
   IN EFI_REDFISH_DISCOVER_NETWORK_INTERFACE  *TargetNetworkInterface OPTIONAL
   )
 {
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry.\n", __func__));
   // This function is used to abort Redfish service discovery through SSDP
   // on the network interface. SSDP is optionally suppoted by EFI_REDFISH_DISCOVER_PROTOCOL,
   // we dont have implementation for SSDP now.
@@ -1476,6 +1451,8 @@ RedfishServiceReleaseService (
   BOOLEAN                               AnyFailRelease;
   EFI_REDFISH_DISCOVERED_INSTANCE       *ThisRedfishInstance;
   EFI_REDFISH_DISCOVERED_INTERNAL_LIST  *DiscoveredRedfishInstance;
+
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry.\n", __func__));
 
   if (IsListEmpty (&mRedfishInstanceList)) {
     DEBUG ((DEBUG_ERROR, "%a:No any discovered Redfish service.\n", __func__));
@@ -1723,22 +1700,13 @@ BuildupNetworkInterface (
   EFI_REDFISH_DISCOVER_REST_EX_INSTANCE_INTERNAL   *RestExInstance;
   EFI_TPL                                          OldTpl;
   BOOLEAN                                          NewNetworkInterfaceInstalled;
-  UINT8                                            IpType;
   UINTN                                            ListCount;
 
   ListCount                    = (sizeof (mRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL));
   NewNetworkInterfaceInstalled = FALSE;
   Index                        = 0;
 
-  // Get IP Type to filter out unnecessary network protocol if possible
-  IpType = GetHiIpProtocolType ();
-
   for (Index = 0; Index < ListCount; Index++) {
-    // Check IP Type and skip an unnecessary network protocol if does not match
-    if (FilterProtocol (mRequiredProtocol[Index].ProtocolType, IpType)) {
-      continue;
-    }
-
     Status = gBS->OpenProtocol (
                     // Already in list?
                     ControllerHandle,
@@ -2164,6 +2132,7 @@ RedfishDiscoverDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
+  DEBUG ((DEBUG_MANAGEABILITY, "%a:Entry.\n", __func__));
   return BuildupNetworkInterface (This, ControllerHandle);
 }
 
