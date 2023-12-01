@@ -587,6 +587,132 @@ SmmReadyToLockEventNotify (
 }
 
 /**
+  Function to compare 2 SMM_BASE_HOB_DATA pointer based on ProcessorIndex.
+
+  @param[in] Buffer1            pointer to SMM_BASE_HOB_DATA poiner to compare
+  @param[in] Buffer2            pointer to second SMM_BASE_HOB_DATA pointer to compare
+
+  @retval 0                     Buffer1 equal to Buffer2
+  @retval <0                    Buffer1 is less than Buffer2
+  @retval >0                    Buffer1 is greater than Buffer2
+**/
+INTN
+EFIAPI
+SmBaseHobCompare (
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
+  )
+{
+  if ((*(SMM_BASE_HOB_DATA **)Buffer1)->ProcessorIndex > (*(SMM_BASE_HOB_DATA **)Buffer2)->ProcessorIndex) {
+    return 1;
+  } else if ((*(SMM_BASE_HOB_DATA **)Buffer1)->ProcessorIndex < (*(SMM_BASE_HOB_DATA **)Buffer2)->ProcessorIndex) {
+    return -1;
+  }
+
+  return 0;
+}
+
+/**
+  Extract SmBase for all CPU from SmmBase HOB.
+
+  @param[in]  MaxNumberOfCpus   Max NumberOfCpus.
+
+  @retval SmBaseBuffer          Pointer to SmBase Buffer.
+  @retval NULL                  gSmmBaseHobGuid was not been created.
+**/
+UINTN *
+GetSmBase (
+  IN  UINTN  MaxNumberOfCpus
+  )
+{
+  UINTN              HobCount;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  SMM_BASE_HOB_DATA  *SmmBaseHobData;
+  UINTN              NumberOfProcessors;
+  SMM_BASE_HOB_DATA  **SmBaseHobs;
+  UINTN              *SmBaseBuffer;
+  UINTN              HobIndex;
+  UINTN              SortBuffer;
+  UINTN              ProcessorIndex;
+  UINT64             PrevProcessorIndex;
+  EFI_HOB_GUID_TYPE  *FirstSmmBaseGuidHob;
+
+  SmmBaseHobData     = NULL;
+  HobIndex           = 0;
+  ProcessorIndex     = 0;
+  HobCount           = 0;
+  NumberOfProcessors = 0;
+
+  FirstSmmBaseGuidHob = GetFirstGuidHob (&gSmmBaseHobGuid);
+  if (FirstSmmBaseGuidHob == NULL) {
+    return NULL;
+  }
+
+  GuidHob = FirstSmmBaseGuidHob;
+  while (GuidHob != NULL) {
+    HobCount++;
+    SmmBaseHobData      = GET_GUID_HOB_DATA (GuidHob);
+    NumberOfProcessors += SmmBaseHobData->NumberOfProcessors;
+
+    if (NumberOfProcessors >= MaxNumberOfCpus) {
+      break;
+    }
+
+    GuidHob = GetNextGuidHob (&gSmmBaseHobGuid, GET_NEXT_HOB (GuidHob));
+  }
+
+  ASSERT (NumberOfProcessors == MaxNumberOfCpus);
+  if (NumberOfProcessors != MaxNumberOfCpus) {
+    CpuDeadLoop ();
+  }
+
+  SmBaseHobs = AllocatePool (sizeof (SMM_BASE_HOB_DATA *) * HobCount);
+  ASSERT (SmBaseHobs != NULL);
+  if (SmBaseHobs == NULL) {
+    return NULL;
+  }
+
+  //
+  // Record each SmmBaseHob pointer in the SmBaseHobs.
+  // The FirstSmmBaseGuidHob is to speed up this while-loop
+  // without needing to look for SmBaseHob from beginning.
+  //
+  GuidHob = FirstSmmBaseGuidHob;
+  while (HobIndex < HobCount) {
+    SmBaseHobs[HobIndex++] = GET_GUID_HOB_DATA (GuidHob);
+    GuidHob                = GetNextGuidHob (&gSmmBaseHobGuid, GET_NEXT_HOB (GuidHob));
+  }
+
+  SmBaseBuffer = (UINTN *)AllocatePool (sizeof (UINTN) * (MaxNumberOfCpus));
+  ASSERT (SmBaseBuffer != NULL);
+  if (SmBaseBuffer == NULL) {
+    FreePool (SmBaseHobs);
+    return NULL;
+  }
+
+  QuickSort (SmBaseHobs, HobCount, sizeof (SMM_BASE_HOB_DATA *), (BASE_SORT_COMPARE)SmBaseHobCompare, &SortBuffer);
+  PrevProcessorIndex = 0;
+  for (HobIndex = 0; HobIndex < HobCount; HobIndex++) {
+    //
+    // Make sure no overlap and no gap in the CPU range covered by each HOB
+    //
+    ASSERT (SmBaseHobs[HobIndex]->ProcessorIndex == PrevProcessorIndex);
+
+    //
+    // Cache each SmBase in order.
+    //
+    for (ProcessorIndex = 0; ProcessorIndex < SmBaseHobs[HobIndex]->NumberOfProcessors; ProcessorIndex++) {
+      SmBaseBuffer[PrevProcessorIndex + ProcessorIndex] = (UINTN)SmBaseHobs[HobIndex]->SmBase[ProcessorIndex];
+    }
+
+    PrevProcessorIndex += SmBaseHobs[HobIndex]->NumberOfProcessors;
+  }
+
+  FreePool (SmBaseHobs);
+  return SmBaseBuffer;
+}
+
+/**
   Function to compare 2 MP_INFORMATION2_HOB_DATA pointer based on ProcessorIndex.
 
   @param[in] Buffer1            pointer to MP_INFORMATION2_HOB_DATA poiner to compare
@@ -743,27 +869,22 @@ PiCpuSmmEntry (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS         Status;
-  UINTN              Index;
-  VOID               *Buffer;
-  UINTN              BufferPages;
-  UINTN              TileCodeSize;
-  UINTN              TileDataSize;
-  UINTN              TileSize;
-  UINT8              *Stacks;
-  VOID               *Registration;
-  UINT32             RegEax;
-  UINT32             RegEbx;
-  UINT32             RegEcx;
-  UINT32             RegEdx;
-  UINTN              FamilyId;
-  UINTN              ModelId;
-  UINT32             Cr3;
-  EFI_HOB_GUID_TYPE  *GuidHob;
-  SMM_BASE_HOB_DATA  *SmmBaseHobData;
-
-  GuidHob        = NULL;
-  SmmBaseHobData = NULL;
+  EFI_STATUS  Status;
+  UINTN       Index;
+  VOID        *Buffer;
+  UINTN       BufferPages;
+  UINTN       TileCodeSize;
+  UINTN       TileDataSize;
+  UINTN       TileSize;
+  UINT8       *Stacks;
+  VOID        *Registration;
+  UINT32      RegEax;
+  UINT32      RegEbx;
+  UINT32      RegEcx;
+  UINT32      RegEdx;
+  UINTN       FamilyId;
+  UINTN       ModelId;
+  UINT32      Cr3;
 
   PERF_FUNCTION_BEGIN ();
 
@@ -985,23 +1106,19 @@ PiCpuSmmEntry (
   // Retrive the allocated SmmBase from gSmmBaseHobGuid. If found,
   // means the SmBase relocation has been done.
   //
-  GuidHob = GetFirstGuidHob (&gSmmBaseHobGuid);
-  if (GuidHob != NULL) {
+  mCpuHotPlugData.SmBase = GetSmBase (mMaxNumberOfCpus);
+  if (mCpuHotPlugData.SmBase != NULL) {
     //
     // Check whether the Required TileSize is enough.
     //
     if (TileSize > SIZE_8KB) {
       DEBUG ((DEBUG_ERROR, "The Range of Smbase in SMRAM is not enough -- Required TileSize = 0x%08x, Actual TileSize = 0x%08x\n", TileSize, SIZE_8KB));
+      FreePool (mCpuHotPlugData.SmBase);
+      FreePool (gSmmCpuPrivate->ProcessorInfo);
       CpuDeadLoop ();
       return RETURN_BUFFER_TOO_SMALL;
     }
 
-    SmmBaseHobData = GET_GUID_HOB_DATA (GuidHob);
-
-    //
-    // Assume single instance of HOB produced, expect the HOB.NumberOfProcessors equals to the mMaxNumberOfCpus.
-    //
-    ASSERT (SmmBaseHobData->NumberOfProcessors == (UINT32)mMaxNumberOfCpus && SmmBaseHobData->ProcessorIndex == 0);
     mSmmRelocated = TRUE;
   } else {
     //
@@ -1047,8 +1164,6 @@ PiCpuSmmEntry (
   //
   mCpuHotPlugData.ApicId = (UINT64 *)AllocatePool (sizeof (UINT64) * mMaxNumberOfCpus);
   ASSERT (mCpuHotPlugData.ApicId != NULL);
-  mCpuHotPlugData.SmBase = (UINTN *)AllocatePool (sizeof (UINTN) * mMaxNumberOfCpus);
-  ASSERT (mCpuHotPlugData.SmBase != NULL);
   mCpuHotPlugData.ArrayLength = (UINT32)mMaxNumberOfCpus;
 
   //
@@ -1057,7 +1172,9 @@ PiCpuSmmEntry (
   // size for each CPU in the platform
   //
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-    mCpuHotPlugData.SmBase[Index] = mSmmRelocated ? (UINTN)SmmBaseHobData->SmBase[Index] : (UINTN)Buffer + Index * TileSize - SMM_HANDLER_OFFSET;
+    if (!mSmmRelocated) {
+      mCpuHotPlugData.SmBase[Index] = (UINTN)Buffer + Index * TileSize - SMM_HANDLER_OFFSET;
+    }
 
     gSmmCpuPrivate->CpuSaveStateSize[Index] = sizeof (SMRAM_SAVE_STATE_MAP);
     gSmmCpuPrivate->CpuSaveState[Index]     = (VOID *)(mCpuHotPlugData.SmBase[Index] + SMRAM_SAVE_STATE_MAP_OFFSET);
