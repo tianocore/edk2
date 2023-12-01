@@ -7,10 +7,6 @@
 
 #include <gtest/gtest.h>
 
-// Note: Until we can --whole-archive libs, we're forced to include secondary files from the main one.
-// Yuck.
-
-#include "TestCheckSum.cpp"
 
 int
 main (
