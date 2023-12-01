@@ -542,6 +542,30 @@ InitializeMpExceptionStackSwitchHandlers (
 }
 
 /**
+  Get CPU core type.
+
+  @param[in, out] Buffer  Argument of the procedure.
+**/
+VOID
+EFIAPI
+GetProcessorCoreType (
+  IN OUT VOID  *Buffer
+  )
+{
+  EFI_STATUS                               Status;
+  UINT8                                    *CoreTypes;
+  CPUID_NATIVE_MODEL_ID_AND_CORE_TYPE_EAX  NativeModelIdAndCoreTypeEax;
+  UINTN                                    ProcessorIndex;
+
+  Status = MpInitLibWhoAmI (&ProcessorIndex);
+  ASSERT_EFI_ERROR (Status);
+
+  CoreTypes = (UINT8 *)Buffer;
+  AsmCpuidEx (CPUID_HYBRID_INFORMATION, CPUID_HYBRID_INFORMATION_MAIN_LEAF, &NativeModelIdAndCoreTypeEax.Uint32, NULL, NULL, NULL);
+  CoreTypes[ProcessorIndex] = (UINT8)NativeModelIdAndCoreTypeEax.Bits.CoreType;
+}
+
+/**
   Create gMpInformationHobGuid2.
 **/
 VOID
@@ -558,13 +582,36 @@ BuildMpInformationHob (
   MP_INFORMATION2_HOB_DATA  *MpInformation2HobData;
   MP_INFORMATION2_ENTRY     *MpInformation2Entry;
   UINTN                     Index;
+  UINT8                     *CoreTypes;
+  UINT32                    CpuidMaxInput;
+  UINTN                     CoreTypePages;
 
   ProcessorIndex        = 0;
   MpInformation2HobData = NULL;
   MpInformation2Entry   = NULL;
+  CoreTypes             = NULL;
+  CoreTypePages         = 0;
 
   Status = MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Get Processors CoreType
+  //
+  AsmCpuid (CPUID_SIGNATURE, &CpuidMaxInput, NULL, NULL, NULL);
+  if (CpuidMaxInput >= CPUID_HYBRID_INFORMATION) {
+    CoreTypePages = EFI_SIZE_TO_PAGES (sizeof (UINT8) * NumberOfProcessors);
+    CoreTypes     = AllocatePages (CoreTypePages);
+    ASSERT (CoreTypes != NULL);
+
+    Status = MpInitLibStartupAllCPUs (
+               GetProcessorCoreType,
+               0,
+               (VOID *)CoreTypes
+               );
+    ASSERT_EFI_ERROR (Status);
+  }
+
   MaxProcessorsPerHob     = ((MAX_UINT16 & ~7) - sizeof (EFI_HOB_GUID_TYPE) - sizeof (MP_INFORMATION2_HOB_DATA)) / sizeof (MP_INFORMATION2_ENTRY);
   NumberOfProcessorsInHob = MaxProcessorsPerHob;
 
@@ -597,12 +644,16 @@ BuildMpInformationHob (
                               NULL
                               );
       ASSERT_EFI_ERROR (Status);
+
+      MpInformation2Entry->CoreType = (CoreTypes != NULL) ? CoreTypes[Index + ProcessorIndex] : 0;
+
       DEBUG ((
         DEBUG_INFO,
-        "  Processor[%04d]: ProcessorId = 0x%lx, StatusFlag = 0x%x\n",
+        "  Processor[%04d]: ProcessorId = 0x%lx, StatusFlag = 0x%x, CoreType = 0x%x\n",
         Index + ProcessorIndex,
         MpInformation2Entry->ProcessorInfo.ProcessorId,
-        MpInformation2Entry->ProcessorInfo.StatusFlag
+        MpInformation2Entry->ProcessorInfo.StatusFlag,
+        MpInformation2Entry->CoreType
         ));
       DEBUG ((
         DEBUG_INFO,
@@ -624,6 +675,10 @@ BuildMpInformationHob (
     }
 
     ProcessorIndex += NumberOfProcessorsInHob;
+  }
+
+  if (CoreTypes != NULL) {
+    FreePages (CoreTypes, CoreTypePages);
   }
 }
 
