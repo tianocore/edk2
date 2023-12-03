@@ -36,7 +36,7 @@
   #
   # MSFT
   #
-  MSFT:*_*_*_CC_FLAGS               = /EHsc
+  MSFT:*_*_*_CC_FLAGS               = /EHsc /bigobj
   MSFT:*_*_*_DLINK_FLAGS            == /out:"$(BIN_DIR)\$(MODULE_NAME_GUID).exe" /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb" /IGNORE:4001 /NOLOGO /SUBSYSTEM:CONSOLE /DEBUG /STACK:0x40000,0x40000 /WHOLEARCHIVE
   MSFT:*_*_IA32_DLINK_FLAGS         = /MACHINE:I386
   MSFT:*_*_X64_DLINK_FLAGS          = /MACHINE:AMD64

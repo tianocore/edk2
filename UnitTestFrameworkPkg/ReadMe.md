@@ -835,9 +835,7 @@ The `[Sources]` section will contain the single mock function definition
 source file, the `[Packages]` section will contain all the necessary DEC
 files to compile the mock functions (which at a minimum will include the
 `UnitTestFrameworkPkg.dec` file), the `[LibraryClasses]` section will contain
-the `GoogleTestLib`, and the `[BuildOptions]` will need to append the `/EHsc`
-compilation flag to all MSFT builds to enable proper use of the C++ exception
-handler. Below is the complete `MockUefiLib.inf` as an example.
+the `GoogleTestLib`. Below is the complete `MockUefiLib.inf` as an example.
 
 ```
 [Defines]
@@ -863,9 +861,6 @@ handler. Below is the complete `MockUefiLib.inf` as an example.
 
 [LibraryClasses]
   GoogleTestLib
-
-[BuildOptions]
-  MSFT:*_*_*_CC_FLAGS = /EHsc
 ```
 
 To ensure that this specific set of mock functions are always buildable even
