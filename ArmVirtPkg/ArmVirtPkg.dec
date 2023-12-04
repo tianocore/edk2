@@ -68,3 +68,9 @@
   # Cloud Hypervisor has no other way to pass Rsdp address to the guest except use a PCD.
   #
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x0|UINT64|0x00000005
+
+  ##
+  # Whether the EFI memory attributes protocol should be uninstalled before
+  # invoking the OS loader. This may be needed to work around problematic
+  # builds of shim that use the protocol incorrectly.
+  gArmVirtTokenSpaceGuid.PcdUninstallMemAttrProtocol|FALSE|BOOLEAN|0x00000006

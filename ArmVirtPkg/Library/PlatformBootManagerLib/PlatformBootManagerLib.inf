@@ -46,6 +46,7 @@
   PcdLib
   PlatformBmPrintScLib
   QemuBootOrderLib
+  QemuFwCfgSimpleParserLib
   QemuLoadImageLib
   ReportStatusCodeLib
   TpmPlatformHierarchyLib
@@ -55,6 +56,7 @@
   UefiRuntimeServicesTableLib
 
 [FixedPcd]
+  gArmVirtTokenSpaceGuid.PcdUninstallMemAttrProtocol
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
@@ -73,5 +75,6 @@
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid
   gEfiGraphicsOutputProtocolGuid
+  gEfiMemoryAttributeProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
   gVirtioDeviceProtocolGuid
