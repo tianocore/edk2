@@ -322,11 +322,12 @@ AndroidBootImgGetFdt (
 EFI_STATUS
 AndroidBootImgUpdateArgs (
   IN  VOID  *BootImg,
-  OUT VOID  *KernelArgs
+  OUT VOID  **KernelArgs
   )
 {
   CHAR8       ImageKernelArgs[ANDROID_BOOTIMG_KERNEL_ARGS_SIZE];
   EFI_STATUS  Status;
+  UINT32      NewKernelArgSize;
 
   // Get kernel arguments from Android boot image
   Status = AndroidBootImgGetKernelArgs (BootImg, ImageKernelArgs);
@@ -334,16 +335,23 @@ AndroidBootImgUpdateArgs (
     return Status;
   }
 
+  NewKernelArgSize = ANDROID_BOOTIMG_KERNEL_ARGS_SIZE + PcdGet32 (PcdAndroidKernelCommandLineOverflow);
+  *KernelArgs      = AllocateZeroPool (sizeof (CHAR16) * NewKernelArgSize);
+  if (*KernelArgs == NULL) {
+    DEBUG ((DEBUG_ERROR, "Fail to allocate memory\n"));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   AsciiStrToUnicodeStrS (
     ImageKernelArgs,
-    KernelArgs,
-    ANDROID_BOOTIMG_KERNEL_ARGS_SIZE >> 1
+    *KernelArgs,
+    NewKernelArgSize
     );
   // Append platform kernel arguments
   if (mAndroidBootImg->AppendArgs) {
     Status = mAndroidBootImg->AppendArgs (
-                                KernelArgs,
-                                ANDROID_BOOTIMG_KERNEL_ARGS_SIZE
+                                *KernelArgs,
+                                NewKernelArgSize
                                 );
   }
 
@@ -616,6 +624,10 @@ AndroidBootImgBoot (
   UINTN                      RamdiskSize;
   IN  VOID                   *FdtBase;
 
+  if ((Buffer == NULL) || (BufferSize == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   NewKernelArg = NULL;
   ImageHandle  = NULL;
 
@@ -637,14 +649,7 @@ AndroidBootImgBoot (
     goto Exit;
   }
 
-  NewKernelArg = AllocateZeroPool (ANDROID_BOOTIMG_KERNEL_ARGS_SIZE);
-  if (NewKernelArg == NULL) {
-    DEBUG ((DEBUG_ERROR, "Fail to allocate memory\n"));
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Exit;
-  }
-
-  Status = AndroidBootImgUpdateArgs (Buffer, NewKernelArg);
+  Status = AndroidBootImgUpdateArgs (Buffer, &NewKernelArg);
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
