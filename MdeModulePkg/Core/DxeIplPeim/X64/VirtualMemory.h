@@ -157,6 +157,7 @@ typedef union {
 #define PAGING_L2_ADDRESS_SHIFT  21
 #define PAGING_L3_ADDRESS_SHIFT  30
 #define PAGING_L4_ADDRESS_SHIFT  39
+#define PAGING_L5_ADDRESS_SHIFT  48
 
 #define PAGING_PML4E_NUMBER  4
 
@@ -294,12 +295,14 @@ IsNullDetectionEnabled (
 
   @param[in] PageTableBase    Base address of page table (CR3).
   @param[in] Level4Paging     Level 4 paging flag.
+  @param[in] Level5Paging     Level 5 paging flag.
 
 **/
 VOID
 EnablePageTableProtection (
   IN  UINTN    PageTableBase,
-  IN  BOOLEAN  Level4Paging
+  IN  BOOLEAN  Level4Paging,
+  IN  BOOLEAN  Level5Paging
   );
 
 /**
