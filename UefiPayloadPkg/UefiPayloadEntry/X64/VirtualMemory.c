@@ -482,13 +482,15 @@ Split1GPageTo2M (
   @param[in] PageTableBase    Base address of page table (CR3).
   @param[in] Address          Start address of a page to be set as read-only.
   @param[in] Level4Paging     Level 4 paging flag.
+  @param[in] Level5Paging     Level 5 paging flag.
 
 **/
 VOID
 SetPageTablePoolReadOnly (
   IN  UINTN                 PageTableBase,
   IN  EFI_PHYSICAL_ADDRESS  Address,
-  IN  BOOLEAN               Level4Paging
+  IN  BOOLEAN               Level4Paging,
+  IN  BOOLEAN               Level5Paging
   )
 {
   UINTN                 Index;
@@ -498,9 +500,9 @@ SetPageTablePoolReadOnly (
   UINT64                *PageTable;
   UINT64                *NewPageTable;
   UINT64                PageAttr;
-  UINT64                LevelSize[5];
-  UINT64                LevelMask[5];
-  UINTN                 LevelShift[5];
+  UINT64                LevelSize[6];
+  UINT64                LevelMask[6];
+  UINTN                 LevelShift[6];
   UINTN                 Level;
   UINT64                PoolUnitSize;
 
@@ -517,23 +519,26 @@ SetPageTablePoolReadOnly (
   LevelShift[2] = PAGING_L2_ADDRESS_SHIFT;
   LevelShift[3] = PAGING_L3_ADDRESS_SHIFT;
   LevelShift[4] = PAGING_L4_ADDRESS_SHIFT;
+  LevelShift[5] = PAGING_L5_ADDRESS_SHIFT;
 
   LevelMask[1] = PAGING_4K_ADDRESS_MASK_64;
   LevelMask[2] = PAGING_2M_ADDRESS_MASK_64;
   LevelMask[3] = PAGING_1G_ADDRESS_MASK_64;
   LevelMask[4] = PAGING_1G_ADDRESS_MASK_64;
+  LevelMask[5] = 0;
 
   LevelSize[1] = SIZE_4KB;
   LevelSize[2] = SIZE_2MB;
   LevelSize[3] = SIZE_1GB;
   LevelSize[4] = SIZE_512GB;
+  LevelSize[5] = SIZE_256TB;
 
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) &
                    PAGING_1G_ADDRESS_MASK_64;
   PageTable    = (UINT64 *)(UINTN)PageTableBase;
   PoolUnitSize = PAGE_TABLE_POOL_UNIT_SIZE;
 
-  for (Level = (Level4Paging) ? 4 : 3; Level > 0; --Level) {
+  for (Level = Level5Paging ? 5 : (Level4Paging ? 4 : 3); Level > 0; --Level) {
     Index  = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
     Index &= PAGING_PAE_INDEX_MASK;
 
@@ -604,12 +609,14 @@ SetPageTablePoolReadOnly (
 
   @param[in] PageTableBase    Base address of page table (CR3).
   @param[in] Level4Paging     Level 4 paging flag.
+  @param[in] Level5Paging     Level 5 paging flag.
 
 **/
 VOID
 EnablePageTableProtection (
   IN  UINTN    PageTableBase,
-  IN  BOOLEAN  Level4Paging
+  IN  BOOLEAN  Level4Paging,
+  IN  BOOLEAN  Level5Paging
   )
 {
   PAGE_TABLE_POOL       *HeadPool;
@@ -638,7 +645,7 @@ EnablePageTableProtection (
     // protection to them one by one.
     //
     while (PoolSize > 0) {
-      SetPageTablePoolReadOnly (PageTableBase, Address, Level4Paging);
+      SetPageTablePoolReadOnly (PageTableBase, Address, Level4Paging, Level5Paging);
       Address  += PAGE_TABLE_POOL_UNIT_SIZE;
       PoolSize -= PAGE_TABLE_POOL_UNIT_SIZE;
     }
@@ -933,7 +940,7 @@ CreateIdentityMappingPageTables (
   // Protect the page table by marking the memory used for page table to be
   // read-only.
   //
-  EnablePageTableProtection ((UINTN)PageMap, TRUE);
+  EnablePageTableProtection ((UINTN)PageMap, !Enable5LevelPaging, Enable5LevelPaging);
 
   //
   // Set IA32_EFER.NXE if necessary.
