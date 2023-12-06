@@ -126,7 +126,7 @@ class DependencyExpression:
     #
     # open and close brace must be taken as individual tokens
     #
-    TokenPattern = re.compile("(\(|\)|\{[^{}]+\{?[^{}]+\}?[ ]*\}|\w+)")
+    TokenPattern = re.compile(r"(\(|\)|\{[^{}]+\{?[^{}]+\}?[ ]*\}|\w+)")
 
     ## Constructor
     #

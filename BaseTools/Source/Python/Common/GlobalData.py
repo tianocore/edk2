@@ -33,10 +33,10 @@ gDefaultStores = []
 gGuidDict = {}
 
 # definition for a MACRO name.  used to create regular expressions below.
-_MacroNamePattern = "[A-Z][A-Z0-9_]*"
+_MacroNamePattern = r"[A-Z][A-Z0-9_]*"
 
 ## Regular expression for matching macro used in DSC/DEC/INF file inclusion
-gMacroRefPattern = re.compile("\$\(({})\)".format(_MacroNamePattern), re.UNICODE)
+gMacroRefPattern = re.compile(r"\$\(({})\)".format(_MacroNamePattern), re.UNICODE)
 gMacroDefPattern = re.compile("^(DEFINE|EDK_GLOBAL)[ \t]+")
 gMacroNamePattern = re.compile("^{}$".format(_MacroNamePattern))
 

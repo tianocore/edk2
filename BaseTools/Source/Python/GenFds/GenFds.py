@@ -733,7 +733,7 @@ class GenFds(object):
                         if not os.path.exists(FfsPath[0]):
                             continue
                         MatchDict = {}
-                        ReFileEnds = compile('\S+(.ui)$|\S+(fv.sec.txt)$|\S+(.pe32.txt)$|\S+(.te.txt)$|\S+(.pic.txt)$|\S+(.raw.txt)$|\S+(.ffs.txt)$')
+                        ReFileEnds = compile(r'\S+(.ui)$|\S+(fv.sec.txt)$|\S+(.pe32.txt)$|\S+(.te.txt)$|\S+(.pic.txt)$|\S+(.raw.txt)$|\S+(.ffs.txt)$')
                         FileList = os.listdir(FfsPath[0])
                         for File in FileList:
                             Match = ReFileEnds.search(File)

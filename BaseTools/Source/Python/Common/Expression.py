@@ -41,8 +41,8 @@ ERR_EMPTY_EXPR          = 'Empty expression is not allowed.'
 ERR_IN_OPERAND          = 'Macro after IN operator can only be: $(FAMILY), $(ARCH), $(TOOL_CHAIN_TAG) and $(TARGET).'
 
 __ValidString = re.compile(r'[_a-zA-Z][_0-9a-zA-Z]*$')
-_ReLabel = re.compile('LABEL\((\w+)\)')
-_ReOffset = re.compile('OFFSET_OF\((\w+)\)')
+_ReLabel = re.compile(r'LABEL\((\w+)\)')
+_ReOffset = re.compile(r'OFFSET_OF\((\w+)\)')
 PcdPattern = re.compile(r'^[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
 
 ## SplitString
@@ -242,10 +242,10 @@ class ValueExpression(BaseExpression):
 
 
     SymbolPattern = re.compile("("
-                                 "\$\([A-Z][A-Z0-9_]*\)|\$\(\w+\.\w+\)|\w+\.\w+|"
-                                 "&&|\|\||!(?!=)|"
-                                 "(?<=\W)AND(?=\W)|(?<=\W)OR(?=\W)|(?<=\W)NOT(?=\W)|(?<=\W)XOR(?=\W)|"
-                                 "(?<=\W)EQ(?=\W)|(?<=\W)NE(?=\W)|(?<=\W)GT(?=\W)|(?<=\W)LT(?=\W)|(?<=\W)GE(?=\W)|(?<=\W)LE(?=\W)"
+                                 r"\$\([A-Z][A-Z0-9_]*\)|\$\(\w+\.\w+\)|\w+\.\w+|"
+                                 r"&&|\|\||!(?!=)|"
+                                 r"(?<=\W)AND(?=\W)|(?<=\W)OR(?=\W)|(?<=\W)NOT(?=\W)|(?<=\W)XOR(?=\W)|"
+                                 r"(?<=\W)EQ(?=\W)|(?<=\W)NE(?=\W)|(?<=\W)GT(?=\W)|(?<=\W)LT(?=\W)|(?<=\W)GE(?=\W)|(?<=\W)LE(?=\W)"
                                ")")
 
     @staticmethod
@@ -737,7 +737,7 @@ class ValueExpression(BaseExpression):
             self._Token = "'" + UStr + "'"
             return self._Token
         elif Expr.startswith('UINT'):
-            Re = re.compile('(?:UINT8|UINT16|UINT32|UINT64)\((.+)\)')
+            Re = re.compile(r'(?:UINT8|UINT16|UINT32|UINT64)\((.+)\)')
             try:
                 RetValue = Re.search(Expr).group(1)
             except:
@@ -975,7 +975,7 @@ class ValueExpressionEx(ValueExpression):
                                 TokenSpaceGuidName = ''
                                 if Item.startswith(TAB_GUID) and Item.endswith(')'):
                                     try:
-                                        TokenSpaceGuidName = re.search('GUID\((\w+)\)', Item).group(1)
+                                        TokenSpaceGuidName = re.search(r'GUID\((\w+)\)', Item).group(1)
                                     except:
                                         pass
                                     if TokenSpaceGuidName and TokenSpaceGuidName in self._Symb:
