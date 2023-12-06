@@ -26,7 +26,7 @@ from Common.Misc import *
 import json
 
 ## Regular expression for splitting Dependency Expression string into tokens
-gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
+gDepexTokenPattern = re.compile(r"(\(|\)|\w+| \S+\.inf)")
 
 ## Regular expression for match: PCD(xxxx.yyy)
 gPCDAsGuidPattern = re.compile(r"^PCD\(.+\..+\)$")
