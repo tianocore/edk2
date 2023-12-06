@@ -306,7 +306,7 @@ class BuildRule:
     _SubSectionList = [_InputFile, _OutputFile, _Command]
 
     _PATH_SEP = "(+)"
-    _FileTypePattern = re.compile("^[_a-zA-Z][_\-0-9a-zA-Z]*$")
+    _FileTypePattern = re.compile(r"^[_a-zA-Z][_\-0-9a-zA-Z]*$")
     _BinaryFileRule = FileBuildRule(TAB_DEFAULT_BINARY_FILE, [], [os.path.join("$(OUTPUT_DIR)", "${s_name}")],
                                     ["$(CP) ${src} ${dst}"], [])
 
