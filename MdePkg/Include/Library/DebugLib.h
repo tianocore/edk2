@@ -48,8 +48,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define DEBUG_CACHE     0x00200000       // Memory range cachability changes
 #define DEBUG_VERBOSE   0x00400000       // Detailed debug messages that may
                                          // significantly impact boot performance
-#define DEBUG_MANAGEABILITY  0x00800000  // Detailed debug and payload message of manageability
-                                         // related modules, such Redfish, IPMI, MCTP and etc.
+#define DEBUG_MANAGEABILITY  0x00800000  // Detailed debug and payload manageability messages
+                                         // related to modules such as Redfish, IPMI, MCTP etc.
 #define DEBUG_ERROR  0x80000000          // Error
 
 //
