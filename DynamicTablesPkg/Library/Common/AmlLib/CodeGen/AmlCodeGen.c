@@ -3849,3 +3849,145 @@ exit_handler:
 
   return Status;
 }
+
+/** AML code generation for a method invoking another method
+    with grguments.
+
+  AmlCodeGenMethodInvokeMethodArgN (
+    "MET0", "MET1", 4, TRUE, 3, ParentNode, NewObjectNode
+    );
+  is equivalent of the following ASL code:
+    Method(MET0, 4, Serialized, 3) {
+      MET1 (Arg0, Arg1, Arg2, Arg3)
+    }
+
+  @param [in]  MethodNameString       The new Method's name.
+                                      Must be a NULL-terminated ASL NameString
+                                      e.g.: "MET0", "_SB.MET0", etc.
+                                      The input string is copied.
+  @param [in]  InvokeMethodNameString The called/invoked method's name.
+                                      Must be a NULL-terminated ASL NameString
+                                      e.g.: "MET1", "_SB.MET1", etc.
+                                      The input string is copied.
+  @param [in]  NumArgs                Number of arguments.
+                                      Must be 0 <= NumArgs <= 6.
+  @param [in]  IsSerialized           TRUE is equivalent to Serialized.
+                                      FALSE is equivalent to NotSerialized.
+                                      Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel              Synchronization level for the method.
+                                      Must be 0 <= SyncLevel <= 15.
+                                      Default is 0 in ASL.
+  @param [in]  ParentNode             If provided, set ParentNode as the parent
+                                      of the node created.
+  @param [out] NewObjectNode          If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethodInvokeMethodArgN (
+  IN  CONST CHAR8                   *MethodNameString,
+  IN  CONST CHAR8                   *InvokeMethodNameString,
+  IN        UINT8                   NumArgs,
+  IN        BOOLEAN                 IsSerialized,
+  IN        UINT8                   SyncLevel,
+  IN        AML_NODE_HANDLE         ParentNode           OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode        OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  MethodNode;
+  AML_DATA_NODE           *DataNode;
+  AML_OBJECT_NODE         *ObjectNode;
+  CHAR8                   *AmlNameString;
+  UINT32                  AmlNameStringSize;
+  UINT8                   ArgnCount;
+
+  if ((MethodNameString == NULL) || (InvokeMethodNameString == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Create a Method named MethodNameString
+  Status = AmlCodeGenMethod (
+             MethodNameString,
+             NumArgs,
+             IsSerialized,
+             SyncLevel,
+             ParentNode,
+             &MethodNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  DataNode = NULL;
+  Status   = ConvertAslNameToAmlName (InvokeMethodNameString, &AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    FreePool (AmlNameString);
+    return Status;
+  }
+
+  Status = AmlCreateDataNode (
+             EAmlNodeDataTypeNameString,
+             (UINT8 *)AmlNameString,
+             AmlNameStringSize,
+             &DataNode
+             );
+  FreePool (AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HEADER *)MethodNode,
+             (AML_NODE_HEADER *)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  DataNode = NULL;
+
+  for (ArgnCount = 0; ArgnCount < NumArgs; ArgnCount++) {
+    Status = AmlCreateObjectNode (
+               AmlGetByteEncodingByOpCode (AML_ARG0 + ArgnCount, 0),
+               0,
+               &ObjectNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    Status = AmlVarListAddTail (
+               (AML_NODE_HEADER *)MethodNode,
+               (AML_NODE_HEADER *)ObjectNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto exit_handler;
+    }
+
+    ObjectNode = NULL;
+  }
+
+  return Status;
+
+exit_handler:
+  if (MethodNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)MethodNode);
+  }
+
+  return Status;
+}
