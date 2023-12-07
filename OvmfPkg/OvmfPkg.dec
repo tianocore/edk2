@@ -502,3 +502,6 @@
   #  firmware contains a CSM (Compatibility Support Module).
   #
   gUefiOvmfPkgTokenSpaceGuid.PcdCsmEnable|FALSE|BOOLEAN|0x35
+
+  ## This feature flag indicates the firmware build needs the qemu variable service.
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuVarsRequire|FALSE|BOOLEAN|0x6e
