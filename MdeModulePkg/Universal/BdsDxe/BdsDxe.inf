@@ -98,6 +98,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport              ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootBoot0000              ## CONSUMES
 
 [Depex]
   TRUE

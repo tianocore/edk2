@@ -692,6 +692,9 @@ BdsEntry (
   EFI_STATUS                      BootManagerMenuStatus;
   EFI_BOOT_MANAGER_LOAD_OPTION    PlatformDefaultBootOption;
   BOOLEAN                         PlatformDefaultBootOptionValid;
+  EFI_BOOT_MANAGER_LOAD_OPTION    PlatformDefaultBoot0000;
+  BOOLEAN                         PlatformDefaultBoot0000Valid;
+  CONST CHAR16                    *Boot0000;
 
   HotkeyTriggered = NULL;
   Status          = EFI_SUCCESS;
@@ -797,6 +800,35 @@ BdsEntry (
     }
 
     BootNext = NULL;
+  }
+
+  Boot0000 = ((CONST CHAR16 *)PcdGetPtr (PcdPlatformBootBoot0000));
+  if (Boot0000 && (*Boot0000 != L'\0')) {
+    FilePath = ConvertTextToDevicePath (Boot0000);
+    if (FilePath == NULL) {
+      DEBUG ((DEBUG_ERROR, "Fail to allocate memory for default boot file path. Unable to boot.\n"));
+      CpuDeadLoop ();
+    }
+
+    PlatformDefaultBoot0000Valid = EfiBootManagerInitializeLoadOption (
+                                     &PlatformDefaultBoot0000,
+                                     0,
+                                     LoadOptionTypeBoot,
+                                     LOAD_OPTION_ACTIVE,
+                                     L"Default PlatformBoot",
+                                     FilePath,
+                                     NULL,
+                                     0
+                                     ) == EFI_SUCCESS;
+
+    DEBUG ((DEBUG_ERROR, "%d\n", PlatformDefaultBoot0000Valid));
+    ASSERT (PlatformDefaultBoot0000Valid == TRUE);
+    if (PlatformDefaultBoot0000Valid) {
+      EfiBootManagerLoadOptionToVariable (&PlatformDefaultBoot0000);
+      EfiBootManagerFreeLoadOption (&PlatformDefaultBoot0000);
+    }
+
+    FreePool (FilePath);
   }
 
   //
