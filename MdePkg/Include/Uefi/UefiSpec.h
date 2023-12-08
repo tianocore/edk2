@@ -898,7 +898,7 @@ EFI_STATUS
 (EFIAPI *EFI_IMAGE_LOAD)(
   IN  BOOLEAN                      BootPolicy,
   IN  EFI_HANDLE                   ParentImageHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath   OPTIONAL,
   IN  VOID                         *SourceBuffer OPTIONAL,
   IN  UINTN                        SourceSize,
   OUT EFI_HANDLE                   *ImageHandle
