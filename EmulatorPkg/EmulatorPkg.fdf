@@ -192,6 +192,7 @@ INF  MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
 INF  RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
 INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
+INF  EmulatorPkg/HeapMemory/HeapMemoryDxe.inf
 
 #
 # Secure Boot Key Enroll

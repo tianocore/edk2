@@ -441,6 +441,7 @@
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
+  EmulatorPkg/HeapMemory/HeapMemoryDxe.inf
 
   FatPkg/EnhancedFatDxe/Fat.inf
 

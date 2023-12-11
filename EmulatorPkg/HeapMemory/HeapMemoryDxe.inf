@@ -1,0 +1,27 @@
+# This module is to identify and print the Heap memory availability, location and size on BIOS Setup page.
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HeapMemory
+  FILE_GUID                      = 2D409E55-C2EB-45A1-9C8C-6D60019BA2AB
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = HeapMemoryEntryPoint
+
+[Sources]
+  HeapMemoryDxe.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmulatorPkg/EmulatorPkg.dec
+
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+
+[Depex]
+  TRUE
+
