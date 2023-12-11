@@ -1739,4 +1739,72 @@ AmlCodeGenMethodInvokeMethodArgn (
   OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode       OPTIONAL
   );
 
+/** AML code generation for a method invoking another method
+    with ArgN arguments and optionally integer arguments.
+
+  Arg0Int = 0x10;
+  Arg1Int = 0x20;
+  AmlCodeGenMethodInvokeMethodArgnWithInteger (
+    "MET0", "MET1", 4, TRUE, 3,
+    Arg0Int, Arg1Int, NULL, NULL, NULL, NULL,
+    ParentNode, NewObjectNode
+    );
+  is equivalent of the following ASL code:
+    Method(MET0, 4, Serialized, 3) {
+      MET1 (Arg0, Arg1, Arg2, Arg3, 0x10, 0x20)
+    }
+
+  @param [in]  MethodNameString     The new Method's name.
+                                    Must be a NULL-terminated ASL NameString
+                                    e.g.: "MET0", "_SB.MET0", etc.
+                                    The input string is copied.
+  @param [in]  InvokeMethodNameString The called/invoked method's name.
+                                    Must be a NULL-terminated ASL NameString
+                                    e.g.: "MET1", "_SB.MET1", etc.
+                                    The input string is copied.
+  @param [in]  NumArgs              Number of arguments.
+                                    Must be 0 <= NumArgs <= 6.
+  @param [in]  IsSerialized         TRUE is equivalent to Serialized.
+                                    FALSE is equivalent to NotSerialized.
+                                    Default is NotSerialized in ASL spec.
+  @param [in]  SyncLevel            Synchronization level for the method.
+                                    Must be 0 <= SyncLevel <= 15.
+                                    Default is 0 in ASL.
+  @param [in]  IntegerArg0          If provided and meets the validation criteria,
+                                    then set as integer argument to invoked method.
+  @param [in]  IntegerArg1          If provided and meets the validation criteria,
+                                    then set as integer argument to invoked method.
+  @param [in]  IntegerArg2          If provided and meets the validation criteria,
+                                    then set as integer argument to invoked method.
+  @param [in]  IntegerArg3          If provided and meets the validation criteria,
+                                    then set as integer argument to invoked method.
+  @param [in]  IntegerArg4          If provided and meets the validation criteria,
+                                    then set as integer argument to invoked method.
+  @param [in]  IntegerArg5          If provided and meets the validation criteria,
+                                    then set as integer argument to invoked method.
+  @param [in]  ParentNode           If provided, set ParentNode as the parent
+                                    of the node created.
+  @param [out] NewObjectNode        If success, contains the created node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenMethodInvokeMethodArgnWithInteger (
+  IN  CONST CHAR8                   *MethodNameString,
+  IN  CONST CHAR8                   *InvokeMethodNameString,
+  IN        UINT8                   NumArgs,
+  IN        BOOLEAN                 IsSerialized,
+  IN        UINT8                   SyncLevel,
+  IN        UINT64                  *IntegerArg0        OPTIONAL,
+  IN        UINT64                  *IntegerArg1        OPTIONAL,
+  IN        UINT64                  *IntegerArg2        OPTIONAL,
+  IN        UINT64                  *IntegerArg3        OPTIONAL,
+  IN        UINT64                  *IntegerArg4        OPTIONAL,
+  IN        UINT64                  *IntegerArg5        OPTIONAL,
+  IN        AML_NODE_HANDLE         ParentNode          OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode      OPTIONAL
+  );
+
 #endif // AML_LIB_H_
