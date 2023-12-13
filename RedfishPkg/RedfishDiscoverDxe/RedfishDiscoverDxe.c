@@ -759,6 +759,7 @@ FreeInformationData (
   The function initializes particular strings into the structure instance.
 
   @param[in]  Information           EFI_REDFISH_DISCOVERED_INFORMATION
+  @param[in]  IsIpv6                Flag indicating IP version 6 protocol is used
   @param[in]  RedfishVersion        Redfish version.
   @param[in]  RedfishLocation       Redfish location.
   @param[in]  Uuid                  Service UUID string.
@@ -772,6 +773,7 @@ STATIC
 VOID
 InitInformationData (
   IN EFI_REDFISH_DISCOVERED_INFORMATION  *Information,
+  IN BOOLEAN                             IsIpv6,
   IN UINTN                               *RedfishVersion OPTIONAL,
   IN CONST CHAR8                         *RedfishLocation OPTIONAL,
   IN CONST CHAR8                         *Uuid OPTIONAL,
@@ -789,10 +791,20 @@ InitInformationData (
   }
 
   if (RedfishLocation != NULL) {
-    AllocationSize        = AsciiStrSize (RedfishLocation) * sizeof (CHAR16);
+    AllocationSize = AsciiStrSize (RedfishLocation) * sizeof (CHAR16);
+
+    if (IsIpv6) {
+      AllocationSize += 2 * sizeof (CHAR16); // take into account '[' and ']'
+    }
+
     Information->Location = AllocatePool (AllocationSize);
     if (Information->Location != NULL) {
-      AsciiStrToUnicodeStrS (RedfishLocation, Information->Location, AllocationSize);
+      if (IsIpv6) {
+        UnicodeSPrintAsciiFormat (Information->Location, AllocationSize, "[%a]", RedfishLocation);
+      } else {
+        AsciiStrToUnicodeStrS (RedfishLocation, Information->Location, AllocationSize);
+      }
+
       DEBUG ((DEBUG_MANAGEABILITY, "Redfish service location: %s.\n", Information->Location));
     } else {
       DEBUG ((
@@ -1038,6 +1050,7 @@ AddAndSignalNewRedfishService (
 
     InitInformationData (
       &DiscoveredInstance->Information,
+      CheckIsIpVersion6 (NetworkInterface),
       RedfishVersion,
       RedfishLocation,
       Uuid,
