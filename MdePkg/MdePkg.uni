@@ -214,6 +214,7 @@
                                                                                    "BIT20 - Global Coherency Database changes message.<BR>\n"
                                                                                    "BIT21 - Memory range cacheability changes message.<BR>\n"
                                                                                    "BIT22 - Detailed debug message.<BR>\n"
+                                                                                   "BIT23 - Manageability debug message.<BR>\n"
                                                                                    "BIT31 - Error message.<BR>"
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdFixedDebugPrintErrorLevel_PROMPT  #language en-US "Fixed Debug Message Print Level"
@@ -237,6 +238,7 @@
                                                                                    "BIT20 - Global Coherency Database changes message.<BR>\n"
                                                                                    "BIT21 - Memory range cacheability changes message.<BR>\n"
                                                                                    "BIT22 - Detailed debug message.<BR>\n"
+                                                                                   "BIT23 - Manageability debug message.<BR>\n"
                                                                                    "BIT31 - Error message.<BR>"
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdReportStatusCodePropertyMask_PROMPT  #language en-US "Report Status Code Property"

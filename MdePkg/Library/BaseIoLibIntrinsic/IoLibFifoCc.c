@@ -7,7 +7,10 @@
 **/
 
 #include "BaseIoLibIntrinsicInternal.h"
+#include "IoLibSev.h"
+#include "IoLibTdx.h"
 #include <Uefi/UefiBaseType.h>
+#include <Library/TdxLib.h>
 
 /**
   Reads an 8-bit I/O port fifo into a block of memory.
@@ -36,11 +39,10 @@ IoReadFifo8 (
   OUT     VOID   *Buffer
   )
 {
-  UINT8  *Buffer8;
-
-  Buffer8 = (UINT8 *)Buffer;
-  while (Count-- > 0) {
-    *Buffer8++ = IoRead8 (Port);
+  if (IsTdxGuest ()) {
+    TdIoReadFifo8 (Port, Count, Buffer);
+  } else {
+    SevIoReadFifo8 (Port, Count, Buffer);
   }
 }
 
@@ -71,11 +73,10 @@ IoWriteFifo8 (
   IN      VOID   *Buffer
   )
 {
-  UINT8  *Buffer8;
-
-  Buffer8 = (UINT8 *)Buffer;
-  while (Count-- > 0) {
-    IoWrite8 (Port, *Buffer8++);
+  if (IsTdxGuest ()) {
+    TdIoWriteFifo8 (Port, Count, Buffer);
+  } else {
+    SevIoWriteFifo8 (Port, Count, Buffer);
   }
 }
 
@@ -106,11 +107,10 @@ IoReadFifo16 (
   OUT     VOID   *Buffer
   )
 {
-  UINT16  *Buffer16;
-
-  Buffer16 = (UINT16 *)Buffer;
-  while (Count-- > 0) {
-    *Buffer16++ = IoRead16 (Port);
+  if (IsTdxGuest ()) {
+    TdIoReadFifo16 (Port, Count, Buffer);
+  } else {
+    SevIoReadFifo16 (Port, Count, Buffer);
   }
 }
 
@@ -141,11 +141,10 @@ IoWriteFifo16 (
   IN      VOID   *Buffer
   )
 {
-  UINT16  *Buffer16;
-
-  Buffer16 = (UINT16 *)Buffer;
-  while (Count-- > 0) {
-    IoWrite16 (Port, *Buffer16++);
+  if (IsTdxGuest ()) {
+    TdIoWriteFifo16 (Port, Count, Buffer);
+  } else {
+    SevIoWriteFifo16 (Port, Count, Buffer);
   }
 }
 
@@ -176,11 +175,10 @@ IoReadFifo32 (
   OUT     VOID   *Buffer
   )
 {
-  UINT32  *Buffer32;
-
-  Buffer32 = (UINT32 *)Buffer;
-  while (Count-- > 0) {
-    *Buffer32++ = IoRead32 (Port);
+  if (IsTdxGuest ()) {
+    TdIoReadFifo32 (Port, Count, Buffer);
+  } else {
+    SevIoReadFifo32 (Port, Count, Buffer);
   }
 }
 
@@ -211,10 +209,9 @@ IoWriteFifo32 (
   IN      VOID   *Buffer
   )
 {
-  UINT32  *Buffer32;
-
-  Buffer32 = (UINT32 *)Buffer;
-  while (Count-- > 0) {
-    IoWrite32 (Port, *Buffer32++);
+  if (IsTdxGuest ()) {
+    TdIoWriteFifo32 (Port, Count, Buffer);
+  } else {
+    SevIoWriteFifo32 (Port, Count, Buffer);
   }
 }

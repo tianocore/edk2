@@ -45,7 +45,7 @@
   IoLibMsc.c    | MSFT
   IoLib.c
   IoLibInternalTdx.c
-  IoLibFifo.c
+  IoLibFifoCc.c
   X64/IoFifoSev.nasm
 
 [Packages]
