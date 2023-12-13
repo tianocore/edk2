@@ -226,6 +226,39 @@ RiscVInvalidateDataCacheFenceAsm (
   VOID
   );
 
+/**
+  RISC-V flush cache block. Atomically perform a clean operation
+  followed by an invalidate operation
+
+**/
+VOID
+EFIAPI
+RiscVCpuCacheFlushCmoAsm (
+  IN UINTN
+  );
+
+/**
+Perform a write transfer to another cache or to memory if the
+data in the copy of the cache block have been modified by a store
+operation
+
+**/
+VOID
+EFIAPI
+RiscVCpuCacheCleanCmoAsm (
+  IN UINTN
+  );
+
+/**
+Deallocate the copy of the cache block
+
+**/
+VOID
+EFIAPI
+RiscVCpuCacheInvalCmoAsm (
+  IN UINTN
+  );
+
 #endif // defined (MDE_CPU_RISCV64)
 
 #if defined (MDE_CPU_LOONGARCH64)
