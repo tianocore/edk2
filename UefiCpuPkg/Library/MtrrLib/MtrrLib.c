@@ -823,28 +823,54 @@ MtrrLibInitializeMtrrMask (
   UINT32                                       MaxFunction;
   CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  ExtendedFeatureFlagsEcx;
   MSR_IA32_TME_ACTIVATE_REGISTER               TmeActivate;
+  UINT32                                       i;
+  UINT32                                       bit = 0;
+  UINT32                                       VariableMtrrCount;
+  MTRR_VARIABLE_SETTINGS                       VariableSettings;
 
-  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunction, NULL, NULL, NULL);
-
-  if (MaxExtendedFunction >= CPUID_VIR_PHY_ADDRESS_SIZE) {
-    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
-  } else {
-    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+  // Detect PhysicalAddressBits based on the first valid MTRR mask.  Some
+  // platforms use Physical Address bit which is different than what can be
+  // detected by hardware probing. If a variable MTRR already provides the
+  // Physical Address bit let's use it to keep all MTRRs consistent.
+  VariableMtrrCount = GetVariableMtrrCountWorker ();
+  ASSERT (VariableMtrrCount <= ARRAY_SIZE (VariableSettings.Mtrr));
+  MtrrGetVariableMtrrWorker (NULL, VariableMtrrCount, &VariableSettings);
+  for (i = 0; i < VariableMtrrCount; i++) {
+    if ((VariableSettings.Mtrr[0].Mask & BIT11) == BIT11) {
+      for (bit = 63; bit > 0; bit--) {
+        if (VariableSettings.Mtrr[i].Mask & (1ULL << bit)) {
+          break;
+        }
+      }
+      break;
+    }
   }
 
-  //
-  // CPUID enumeration of MAX_PA is unaffected by TME-MK activation and will continue
-  // to report the maximum physical address bits available for software to use,
-  // irrespective of the number of KeyID bits.
-  // So, we need to check if TME is enabled and adjust the PA size accordingly.
-  //
-  AsmCpuid (CPUID_SIGNATURE, &MaxFunction, NULL, NULL, NULL);
-  if (MaxFunction >= CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
-    AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, 0, NULL, NULL, &ExtendedFeatureFlagsEcx.Uint32, NULL);
-    if (ExtendedFeatureFlagsEcx.Bits.TME_EN == 1) {
-      TmeActivate.Uint64 = AsmReadMsr64 (MSR_IA32_TME_ACTIVATE);
-      if (TmeActivate.Bits.TmeEnable == 1) {
-        VirPhyAddressSize.Bits.PhysicalAddressBits -= TmeActivate.Bits.MkTmeKeyidBits;
+  if (bit != 0) {
+    VirPhyAddressSize.Bits.PhysicalAddressBits = bit + 1;
+  } else {
+    AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunction, NULL, NULL, NULL);
+
+    if (MaxExtendedFunction >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+      AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
+    } else {
+      VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+    }
+
+    //
+    // CPUID enumeration of MAX_PA is unaffected by TME-MK activation and will continue
+    // to report the maximum physical address bits available for software to use,
+    // irrespective of the number of KeyID bits.
+    // So, we need to check if TME is enabled and adjust the PA size accordingly.
+    //
+    AsmCpuid (CPUID_SIGNATURE, &MaxFunction, NULL, NULL, NULL);
+    if (MaxFunction >= CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
+      AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, 0, NULL, NULL, &ExtendedFeatureFlagsEcx.Uint32, NULL);
+      if (ExtendedFeatureFlagsEcx.Bits.TME_EN == 1) {
+        TmeActivate.Uint64 = AsmReadMsr64 (MSR_IA32_TME_ACTIVATE);
+        if (TmeActivate.Bits.TmeEnable == 1) {
+          VirPhyAddressSize.Bits.PhysicalAddressBits -= TmeActivate.Bits.MkTmeKeyidBits;
+        }
       }
     }
   }
