@@ -791,38 +791,105 @@ InitInformationData (
   if (RedfishLocation != NULL) {
     AllocationSize        = AsciiStrSize (RedfishLocation) * sizeof (CHAR16);
     Information->Location = AllocatePool (AllocationSize);
-    AsciiStrToUnicodeStrS (RedfishLocation, Information->Location, AllocationSize);
-    DEBUG ((DEBUG_MANAGEABILITY, "Redfish service location: %s.\n", Information->Location));
+    if (Information->Location != NULL) {
+      AsciiStrToUnicodeStrS (RedfishLocation, Information->Location, AllocationSize);
+      DEBUG ((DEBUG_MANAGEABILITY, "Redfish service location: %s.\n", Information->Location));
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish service location: %a.\n",
+        __func__,
+        RedfishLocation
+        ));
+    }
   }
 
   if (Uuid != NULL) {
     AllocationSize    = AsciiStrSize (Uuid) * sizeof (CHAR16);
     Information->Uuid = AllocatePool (AllocationSize);
-    AsciiStrToUnicodeStrS (Uuid, Information->Uuid, AllocationSize);
-    DEBUG ((DEBUG_MANAGEABILITY, "Service UUID: %s.\n", Information->Uuid));
+    if (Information->Uuid != NULL) {
+      AsciiStrToUnicodeStrS (Uuid, Information->Uuid, AllocationSize);
+      DEBUG ((DEBUG_MANAGEABILITY, "Service UUID: %s.\n", Information->Uuid));
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Service UUID: %a.\n",
+        __func__,
+        Uuid
+        ));
+    }
   }
 
   if (Os != NULL) {
     AllocationSize  = AsciiStrSize (Os) * sizeof (CHAR16);
     Information->Os = AllocatePool (AllocationSize);
-    AsciiStrToUnicodeStrS (Os, Information->Os, AllocationSize);
+    if (Information->Os != NULL) {
+      AsciiStrToUnicodeStrS (Os, Information->Os, AllocationSize);
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish service OS: %a.\n",
+        __func__,
+        Os
+        ));
+    }
   }
 
   if (OsVer != NULL) {
     AllocationSize         = AsciiStrSize (OsVer) * sizeof (CHAR16);
     Information->OsVersion = AllocatePool (AllocationSize);
-    AsciiStrToUnicodeStrS (OsVer, Information->OsVersion, AllocationSize);
-    DEBUG ((DEBUG_MANAGEABILITY, "Redfish service OS: %s, Version:%s.\n", Information->Os, Information->OsVersion));
+    if (Information->OsVersion != NULL) {
+      AsciiStrToUnicodeStrS (OsVer, Information->OsVersion, AllocationSize);
+      DEBUG ((
+        DEBUG_MANAGEABILITY,
+        "Redfish service OS: %s, Version:%s.\n",
+        Information->Os,
+        Information->OsVersion
+        ));
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish OS Version:%a.\n",
+        __func__,
+        OsVer
+        ));
+    }
   }
 
-  if ((Product != NULL) && (ProductVer != NULL)) {
+  if (Product != NULL) {
     AllocationSize       = AsciiStrSize (Product) * sizeof (CHAR16);
     Information->Product = AllocatePool (AllocationSize);
-    AsciiStrToUnicodeStrS (Product, Information->Product, AllocationSize);
+    if (Information->Product != NULL) {
+      AsciiStrToUnicodeStrS (Product, Information->Product, AllocationSize);
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish service product: %a.\n",
+        __func__,
+        Product
+        ));
+    }
+  }
+
+  if (ProductVer != NULL) {
     AllocationSize          = AsciiStrSize (ProductVer) * sizeof (CHAR16);
     Information->ProductVer = AllocatePool (AllocationSize);
-    AsciiStrToUnicodeStrS (ProductVer, Information->ProductVer, AllocationSize);
-    DEBUG ((DEBUG_MANAGEABILITY, "Redfish service product: %s, Version:%s.\n", Information->Product, Information->ProductVer));
+    if (Information->ProductVer != NULL) {
+      AsciiStrToUnicodeStrS (ProductVer, Information->ProductVer, AllocationSize);
+      DEBUG ((
+        DEBUG_MANAGEABILITY,
+        "Redfish service product: %s, Version:%s.\n",
+        Information->Product,
+        Information->ProductVer
+        ));
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish service product Version: %a.\n",
+        __func__,
+        ProductVer
+        ));
+    }
   }
 }
 
