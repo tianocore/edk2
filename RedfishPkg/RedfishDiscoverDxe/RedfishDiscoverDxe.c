@@ -738,39 +738,47 @@ InitInformationData (
   IN CONST CHAR8                         *ProductVer OPTIONAL
   )
 {
+  UINTN  AllocationSize;
+
   if (RedfishVersion != NULL) {
     Information->RedfishVersion = *RedfishVersion;
     DEBUG ((DEBUG_MANAGEABILITY, "Redfish service version: %d.\n", Information->RedfishVersion));
   }
 
   if (RedfishLocation != NULL) {
-    Information->Location = AllocatePool (AsciiStrSize (RedfishLocation) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS (RedfishLocation, Information->Location, AsciiStrSize (RedfishLocation) * sizeof (CHAR16));
+    AllocationSize        = AsciiStrSize (RedfishLocation) * sizeof (CHAR16);
+    Information->Location = AllocatePool (AllocationSize);
+    AsciiStrToUnicodeStrS (RedfishLocation, Information->Location, AllocationSize);
     DEBUG ((DEBUG_MANAGEABILITY, "Redfish service location: %s.\n", Information->Location));
   }
 
   if (Uuid != NULL) {
-    Information->Uuid = AllocatePool (AsciiStrSize (Uuid) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS (Uuid, Information->Uuid, AsciiStrSize (Uuid) * sizeof (CHAR16));
+    AllocationSize    = AsciiStrSize (Uuid) * sizeof (CHAR16);
+    Information->Uuid = AllocatePool (AllocationSize);
+    AsciiStrToUnicodeStrS (Uuid, Information->Uuid, AllocationSize);
     DEBUG ((DEBUG_MANAGEABILITY, "Service UUID: %s.\n", Information->Uuid));
   }
 
   if (Os != NULL) {
-    Information->Os = AllocatePool (AsciiStrSize (Os) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS (Os, Information->Os, AsciiStrSize (Os) * sizeof (CHAR16));
-    DEBUG ((DEBUG_MANAGEABILITY, "Redfish service OS: %s, Version:%s.\n", Information->Os, Information->OsVersion));
+    AllocationSize  = AsciiStrSize (Os) * sizeof (CHAR16);
+    Information->Os = AllocatePool (AllocationSize);
+    AsciiStrToUnicodeStrS (Os, Information->Os, AllocationSize);
   }
 
   if (OsVer != NULL) {
-    Information->OsVersion = AllocatePool (AsciiStrSize (OsVer) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS (OsVer, Information->OsVersion, AsciiStrSize (OsVer) * sizeof (CHAR16));
+    AllocationSize         = AsciiStrSize (OsVer) * sizeof (CHAR16);
+    Information->OsVersion = AllocatePool (AllocationSize);
+    AsciiStrToUnicodeStrS (OsVer, Information->OsVersion, AllocationSize);
+    DEBUG ((DEBUG_MANAGEABILITY, "Redfish service OS: %s, Version:%s.\n", Information->Os, Information->OsVersion));
   }
 
   if ((Product != NULL) && (ProductVer != NULL)) {
-    Information->Product = AllocatePool (AsciiStrSize (Product) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS (Product, Information->Product, AsciiStrSize (Product) * sizeof (CHAR16));
-    Information->ProductVer = AllocatePool (AsciiStrSize (ProductVer) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS (ProductVer, Information->ProductVer, AsciiStrSize (ProductVer) * sizeof (CHAR16));
+    AllocationSize       = AsciiStrSize (Product) * sizeof (CHAR16);
+    Information->Product = AllocatePool (AllocationSize);
+    AsciiStrToUnicodeStrS (Product, Information->Product, AllocationSize);
+    AllocationSize          = AsciiStrSize (ProductVer) * sizeof (CHAR16);
+    Information->ProductVer = AllocatePool (AllocationSize);
+    AsciiStrToUnicodeStrS (ProductVer, Information->ProductVer, AllocationSize);
     DEBUG ((DEBUG_MANAGEABILITY, "Redfish service product: %s, Version:%s.\n", Information->Product, Information->ProductVer));
   }
 }
