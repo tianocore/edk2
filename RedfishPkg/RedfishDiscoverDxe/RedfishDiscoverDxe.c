@@ -730,12 +730,12 @@ VOID
 InitInformationData (
   IN EFI_REDFISH_DISCOVERED_INFORMATION  *Information,
   IN UINTN                               *RedfishVersion OPTIONAL,
-  IN CHAR8                               *RedfishLocation OPTIONAL,
-  IN CHAR8                               *Uuid  OPTIONAL,
-  IN CHAR8                               *Os  OPTIONAL,
-  IN CHAR8                               *OsVer  OPTIONAL,
-  IN CHAR8                               *Product  OPTIONAL,
-  IN CHAR8                               *ProductVer  OPTIONAL
+  IN CONST CHAR8                         *RedfishLocation OPTIONAL,
+  IN CONST CHAR8                         *Uuid OPTIONAL,
+  IN CONST CHAR8                         *Os OPTIONAL,
+  IN CONST CHAR8                         *OsVer OPTIONAL,
+  IN CONST CHAR8                         *Product OPTIONAL,
+  IN CONST CHAR8                         *ProductVer OPTIONAL
   )
 {
   if (RedfishVersion != NULL) {
@@ -744,33 +744,33 @@ InitInformationData (
   }
 
   if (RedfishLocation != NULL) {
-    Information->Location = (CHAR16 *)AllocatePool (AsciiStrSize ((CONST CHAR8 *)RedfishLocation) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS ((CONST CHAR8 *)RedfishLocation, Information->Location, AsciiStrSize ((CONST CHAR8 *)RedfishLocation) * sizeof (CHAR16));
+    Information->Location = AllocatePool (AsciiStrSize (RedfishLocation) * sizeof (CHAR16));
+    AsciiStrToUnicodeStrS (RedfishLocation, Information->Location, AsciiStrSize (RedfishLocation) * sizeof (CHAR16));
     DEBUG ((DEBUG_MANAGEABILITY, "Redfish service location: %s.\n", Information->Location));
   }
 
   if (Uuid != NULL) {
-    Information->Uuid = (CHAR16 *)AllocatePool (AsciiStrSize ((CONST CHAR8 *)Uuid) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS ((CONST CHAR8 *)Uuid, Information->Uuid, AsciiStrSize ((CONST CHAR8 *)Uuid) * sizeof (CHAR16));
+    Information->Uuid = AllocatePool (AsciiStrSize (Uuid) * sizeof (CHAR16));
+    AsciiStrToUnicodeStrS (Uuid, Information->Uuid, AsciiStrSize (Uuid) * sizeof (CHAR16));
     DEBUG ((DEBUG_MANAGEABILITY, "Service UUID: %s.\n", Information->Uuid));
   }
 
   if (Os != NULL) {
-    Information->Os = (CHAR16 *)AllocatePool (AsciiStrSize ((CONST CHAR8 *)Os) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS ((CONST CHAR8 *)Os, Information->Os, AsciiStrSize ((CONST CHAR8 *)Os) * sizeof (CHAR16));
+    Information->Os = AllocatePool (AsciiStrSize (Os) * sizeof (CHAR16));
+    AsciiStrToUnicodeStrS (Os, Information->Os, AsciiStrSize (Os) * sizeof (CHAR16));
     DEBUG ((DEBUG_MANAGEABILITY, "Redfish service OS: %s, Version:%s.\n", Information->Os, Information->OsVersion));
   }
 
   if (OsVer != NULL) {
-    Information->OsVersion = (CHAR16 *)AllocatePool (AsciiStrSize ((CONST CHAR8 *)OsVer) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS ((CONST CHAR8 *)OsVer, Information->OsVersion, AsciiStrSize ((CONST CHAR8 *)OsVer) * sizeof (CHAR16));
+    Information->OsVersion = AllocatePool (AsciiStrSize (OsVer) * sizeof (CHAR16));
+    AsciiStrToUnicodeStrS (OsVer, Information->OsVersion, AsciiStrSize (OsVer) * sizeof (CHAR16));
   }
 
   if ((Product != NULL) && (ProductVer != NULL)) {
-    Information->Product = (CHAR16 *)AllocatePool (AsciiStrSize ((CONST CHAR8 *)Product) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS ((CONST CHAR8 *)Product, Information->Product, AsciiStrSize ((CONST CHAR8 *)Product) * sizeof (CHAR16));
-    Information->ProductVer = (CHAR16 *)AllocatePool (AsciiStrSize ((CONST CHAR8 *)ProductVer) * sizeof (CHAR16));
-    AsciiStrToUnicodeStrS ((CONST CHAR8 *)ProductVer, Information->ProductVer, AsciiStrSize ((CONST CHAR8 *)ProductVer) * sizeof (CHAR16));
+    Information->Product = AllocatePool (AsciiStrSize (Product) * sizeof (CHAR16));
+    AsciiStrToUnicodeStrS (Product, Information->Product, AsciiStrSize (Product) * sizeof (CHAR16));
+    Information->ProductVer = AllocatePool (AsciiStrSize (ProductVer) * sizeof (CHAR16));
+    AsciiStrToUnicodeStrS (ProductVer, Information->ProductVer, AsciiStrSize (ProductVer) * sizeof (CHAR16));
     DEBUG ((DEBUG_MANAGEABILITY, "Redfish service product: %s, Version:%s.\n", Information->Product, Information->ProductVer));
   }
 }
