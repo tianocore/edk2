@@ -476,10 +476,12 @@ BSPHandler (
   //
   *mSmmMpSyncData->InsideSmm = TRUE;
 
-  //
-  // Initialize Debug Agent to start source level debug in BSP handler
-  //
-  InitializeDebugAgent (DEBUG_AGENT_INIT_ENTER_SMI, NULL, NULL);
+  if (mSmmDebugAgentSupport) {
+    //
+    // Initialize Debug Agent to start source level debug in BSP handler
+    //
+    InitializeDebugAgent (DEBUG_AGENT_INIT_ENTER_SMI, NULL, NULL);
+  }
 
   //
   // Mark this processor's presence
@@ -648,11 +650,13 @@ BSPHandler (
     SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex);
   }
 
-  //
-  // Stop source level debug in BSP handler, the code below will not be
-  // debugged.
-  //
-  InitializeDebugAgent (DEBUG_AGENT_INIT_EXIT_SMI, NULL, NULL);
+  if (mSmmDebugAgentSupport) {
+    //
+    // Stop source level debug in BSP handler, the code below will not be
+    // debugged.
+    //
+    InitializeDebugAgent (DEBUG_AGENT_INIT_EXIT_SMI, NULL, NULL);
+  }
 
   //
   // Signal APs to Reset states/semaphore for this processor
