@@ -837,7 +837,9 @@ SmmRestoreCpu (
     //
     // Initialize Debug Agent to support source level debug
     //
-    InitializeDebugAgent (DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64, (VOID *)&Ia32Idtr, NULL);
+    if (mSmmDebugAgentSupport) {
+      InitializeDebugAgent (DEBUG_AGENT_INIT_THUNK_PEI_IA32TOX64, (VOID *)&Ia32Idtr, NULL);
+    }
   }
 
   mBspApicId = GetApicId ();

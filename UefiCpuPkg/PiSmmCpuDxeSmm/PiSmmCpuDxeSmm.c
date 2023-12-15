@@ -113,6 +113,11 @@ BOOLEAN  mSmmReadyToLock = FALSE;
 BOOLEAN  mSmmCodeAccessCheckEnable = FALSE;
 
 //
+// Global used to cache SMM Debug Agent Supported ot not
+//
+BOOLEAN  mSmmDebugAgentSupport = FALSE;
+
+//
 // Global copy of the PcdPteMemoryEncryptionAddressOrMask
 //
 UINT64  mAddressEncMask = 0;
@@ -897,7 +902,7 @@ PiCpuSmmEntry (
   //
   // Initialize Debug Agent to support source level debug in SMM code
   //
-  InitializeDebugAgent (DEBUG_AGENT_INIT_SMM, NULL, NULL);
+  InitializeDebugAgent (DEBUG_AGENT_INIT_SMM, &mSmmDebugAgentSupport, NULL);
 
   //
   // Report the start of CPU SMM initialization.
