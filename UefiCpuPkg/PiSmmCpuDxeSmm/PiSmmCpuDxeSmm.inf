@@ -103,6 +103,7 @@
   PerformanceLib
   CpuPageTableLib
   MmSaveStateLib
+  SmmCpuSyncLib
 
 [Protocols]
   gEfiSmmAccess2ProtocolGuid               ## CONSUMES
