@@ -650,6 +650,11 @@ BSPHandler (
   //
   SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex);
 
+  //
+  // Signal APs to Reset states/semaphore for this processor
+  //
+  ReleaseAllAPs ();
+
   if (mSmmDebugAgentSupport) {
     //
     // Stop source level debug in BSP handler, the code below will not be
@@ -657,11 +662,6 @@ BSPHandler (
     //
     InitializeDebugAgent (DEBUG_AGENT_INIT_EXIT_SMI, NULL, NULL);
   }
-
-  //
-  // Signal APs to Reset states/semaphore for this processor
-  //
-  ReleaseAllAPs ();
 
   //
   // Perform pending operations for hot-plug
