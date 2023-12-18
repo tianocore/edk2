@@ -259,6 +259,12 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiListS3SmmInitDoneTable = {
   0
 };
 
+EFI_PEI_PPI_DESCRIPTOR  mPpiListEndOfS3ResumeTable = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiEndOfS3ResumeGuid,
+  0
+};
+
 //
 // Global Descriptor Table (GDT)
 //
@@ -489,6 +495,13 @@ S3ResumeBootOs (
   PERF_INMODULE_BEGIN ("EndOfS3Resume");
 
   DEBUG ((DEBUG_INFO, "Signal EndOfS3Resume\n"));
+
+  //
+  // Install EndOfS3Resume.
+  //
+  Status = PeiServicesInstallPpi (&mPpiListEndOfS3ResumeTable);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Signal EndOfS3Resume to SMM.
   //
