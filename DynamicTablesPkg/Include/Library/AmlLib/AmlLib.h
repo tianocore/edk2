@@ -101,6 +101,56 @@ typedef enum {
   AmlAddressRangeMax      = 4
 } AML_MEMORY_ATTRIBUTES_MTP;
 
+/** Method parameter types
+
+  Possible values are:
+    0 - AmlMethodParamTypeInteger
+    1 - AmlMethodParamTypeString
+    2 - AmlMethodParamTypeArg
+    3 - AmlMethodParamTypeLocal
+
+  @par Reference(s)
+  - ACPI 6.5, s20.2.5 "Term Objects Encoding"
+
+**/
+typedef enum {
+  AmlMethodParamTypeInteger = 0,
+  AmlMethodParamTypeString  = 1,
+  AmlMethodParamTypeArg     = 2,
+  AmlMethodParamTypeLocal   = 3
+} AML_METHOD_PARAM_TYPE;
+
+/** AML Method parameter data
+  holds the AML method parameter data.
+**/
+typedef union {
+  UINT8     Arg;
+  UINT8     Local;
+  UINT64    Integer;
+  VOID      *Buffer;
+} AML_METHOD_PARAM_DATA;
+
+/** structure to hold AML method parameter types
+  Type  -   Type of parameter
+  Data  -   holds data of parameter
+            if Type is AmlMethodParamTypeInteger
+              then Data is of type Integer to hold integer value.
+            if Type is AmlMethodParamTypeString
+              then Data contains null terminated string.
+            If Type is AmlMethodParamTypeArg
+              then Data contains the Argument number,
+              0 to 6 are supported value.
+            If Type is AmlMethodParamTypeLocal
+              then Data contains the Local variable number,
+              0 to 7 are supported value.
+  DataSize - for future use
+**/
+typedef struct {
+  AML_METHOD_PARAM_TYPE    Type;
+  AML_METHOD_PARAM_DATA    Data;
+  UINTN                    DataSize;
+} AML_METHOD_PARAM;
+
 /** Parse the definition block.
 
   The function parses the whole AML blob. It starts with the ACPI DSDT/SSDT
@@ -1691,6 +1741,68 @@ EFIAPI
 AmlAddNameStringToNamedPackage (
   IN CHAR8                   *NameString,
   IN AML_OBJECT_NODE_HANDLE  NamedNode
+  );
+
+/** AML code generation to invoke/call another method.
+
+  This method is subset implementation of MethodInvocation
+  defined in the ACPI specification 6.5,
+  section 20.2.5 "Term Objects Encoding".
+  Added integer, string, ArgObj and LocalObj support.
+
+  Example 1:
+    AmlCodeGenInvokeMethod ("MET0", 0, NULL, ParentNode);
+    is equivalent of the following ASL code:
+      MET0 ();
+
+  Example 2:
+    AML_METHOD_PARAM  Param[4];
+    Param[0].Data.Integer = 0x100;
+    Param[0].Type = AmlMethodParamTypeInteger;
+    Param[1].Data.Buffer = "TEST";
+    Param[1].Type = AmlMethodParamTypeString;
+    Param[2].Data.Arg = 0;
+    Param[2].Type = AmlMethodParamTypeArg;
+    Param[3].Data.Local = 2;
+    Param[3].Type = AmlMethodParamTypeLocal;
+    AmlCodeGenInvokeMethod ("MET0", 4, Param, ParentNode);
+
+    is equivalent of the following ASL code:
+      MET0 (0x100, "TEST", Arg0, Local2);
+
+  Example 3:
+    AML_METHOD_PARAM  Param[2];
+    Param[0].Data.Arg = 0;
+    Param[0].Type = AmlMethodParamTypeArg;
+    Param[1].Data.Integer = 0x100;
+    Param[1].Type = AmlMethodParamTypeInteger;
+    AmlCodeGenMethodRetNameString ("MET2", NULL, 2, TRUE, 0, ParentNode, &MethodNode);
+    AmlCodeGenInvokeMethod ("MET3", 2, Param, MethodNode);
+
+    is equivalent of the following ASL code:
+    Method (MET2, 2, Serialized)
+    {
+      MET3 (Arg0, 0x0100)
+    }
+
+  @param [in] MethodNameString  Method name to be called/invoked.
+  @param [in] NumArgs           Number of arguments to be passed,
+                                0 to 7 are permissible values.
+  @param [in] Parameters        contains the parameter data.
+  @param [in] ParentNode        set ParentNode as the parent
+                                of the node created.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+ **/
+EFI_STATUS
+EFIAPI
+AmlCodeGenInvokeMethod (
+  IN  CONST CHAR8             *MethodNameString,
+  IN        UINT8             NumArgs,
+  IN        AML_METHOD_PARAM  *Parameters   OPTIONAL,
+  IN        AML_NODE_HANDLE   ParentNode
   );
 
 #endif // AML_LIB_H_

@@ -2,6 +2,7 @@
   AML Code Generation.
 
   Copyright (c) 2020 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -921,7 +922,7 @@ AmlCodeGenNameUnicodeString (
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeRaw,
              (CONST UINT8 *)String,
-             StrSize (String),
+             (UINT32)StrSize (String),
              &DataNode
              );
   if (EFI_ERROR (Status)) {
@@ -3845,6 +3846,239 @@ AmlAddNameStringToNamedPackage (
 exit_handler:
   if (AmlNameString != NULL) {
     FreePool (AmlNameString);
+  }
+
+  return Status;
+}
+
+/** AML code generation to invoke/call another method.
+
+  This method is subset implementation of MethodInvocation
+  defined in the ACPI specification 6.5,
+  section 20.2.5 "Term Objects Encoding".
+  Added integer, string, ArgObj and LocalObj support.
+
+  Example 1:
+    AmlCodeGenInvokeMethod ("MET0", 0, NULL, ParentNode);
+    is equivalent of the following ASL code:
+      MET0 ();
+
+  Example 2:
+    AML_METHOD_PARAM  Param[4];
+    Param[0].Data.Integer = 0x100;
+    Param[0].Type = AmlMethodParamTypeInteger;
+    Param[1].Data.Buffer = "TEST";
+    Param[1].Type = AmlMethodParamTypeString;
+    Param[2].Data.Arg = 0;
+    Param[2].Type = AmlMethodParamTypeArg;
+    Param[3].Data.Local = 2;
+    Param[3].Type = AmlMethodParamTypeLocal;
+    AmlCodeGenInvokeMethod ("MET0", 4, Param, ParentNode);
+
+    is equivalent of the following ASL code:
+      MET0 (0x100, "TEST", Arg0, Local2);
+
+  Example 3:
+    AML_METHOD_PARAM  Param[2];
+    Param[0].Data.Arg = 0;
+    Param[0].Type = AmlMethodParamTypeArg;
+    Param[1].Data.Integer = 0x100;
+    Param[1].Type = AmlMethodParamTypeInteger;
+    AmlCodeGenMethodRetNameString ("MET2", NULL, 2, TRUE, 0, ParentNode, &MethodNode);
+    AmlCodeGenInvokeMethod ("MET3", 2, Param, MethodNode);
+
+    is equivalent of the following ASL code:
+    Method (MET2, 2, Serialized)
+    {
+      MET3 (Arg0, 0x0100)
+    }
+
+  @param [in] MethodNameString  Method name to be called/invoked.
+  @param [in] NumArgs           Number of arguments to be passed,
+                                0 to 7 are permissible values.
+  @param [in] Parameters        contains the parameter data.
+  @param [in] ParentNode        set ParentNode as the parent
+                                of the node created.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+ **/
+EFI_STATUS
+EFIAPI
+AmlCodeGenInvokeMethod (
+  IN  CONST CHAR8             *MethodNameString,
+  IN        UINT8             NumArgs,
+  IN        AML_METHOD_PARAM  *Parameters   OPTIONAL,
+  IN        AML_NODE_HANDLE   ParentNode
+  )
+{
+  EFI_STATUS       Status;
+  UINT8            Index;
+  CHAR8            *AmlNameString;
+  UINT32           AmlNameStringSize;
+  AML_DATA_NODE    *DataNode;
+  AML_OBJECT_NODE  *IntNode;
+  AML_NODE_HANDLE  HeadNode;
+  AML_NODE_HANDLE  CurrentNode;
+  AML_OBJECT_NODE  *ObjectNode;
+
+  if ((MethodNameString == NULL) || (ParentNode == NULL)) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((NumArgs > 7) ||
+      ((Parameters == NULL) && (NumArgs > 0)))
+  {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Parameters != NULL) {
+    /// Validate and convert the Parameters to the stream of node
+    HeadNode    = NULL;
+    CurrentNode = NULL;
+    for (Index = 0; Index < NumArgs; Index++) {
+      switch (Parameters[Index].Type) {
+        case AmlMethodParamTypeInteger:
+          IntNode = NULL;
+          Status  = AmlCodeGenInteger (Parameters[Index].Data.Integer, &IntNode);
+          if (EFI_ERROR (Status)) {
+            ASSERT_EFI_ERROR (Status);
+            goto exit_handler;
+          }
+
+          CurrentNode = (AML_NODE_HANDLE)IntNode;
+          break;
+        case AmlMethodParamTypeString:
+          ObjectNode = NULL;
+          if (Parameters[Index].Data.Buffer == NULL) {
+            ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+            Status = EFI_INVALID_PARAMETER;
+            goto exit_handler;
+          }
+
+          Status = AmlCodeGenString (Parameters[Index].Data.Buffer, &ObjectNode);
+          if (EFI_ERROR (Status)) {
+            ASSERT_EFI_ERROR (Status);
+            goto exit_handler;
+          }
+
+          CurrentNode = (AML_NODE_HANDLE)ObjectNode;
+          break;
+        case AmlMethodParamTypeArg:
+          ObjectNode = NULL;
+          if (Parameters[Index].Data.Arg > (UINT8)(AML_ARG6 - AML_ARG0)) {
+            ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+            Status = EFI_INVALID_PARAMETER;
+            goto exit_handler;
+          }
+
+          Status = AmlCreateObjectNode (
+                     AmlGetByteEncodingByOpCode (AML_ARG0 + Parameters[Index].Data.Arg, 0),
+                     0,
+                     &ObjectNode
+                     );
+          if (EFI_ERROR (Status)) {
+            ASSERT_EFI_ERROR (Status);
+            goto exit_handler;
+          }
+
+          CurrentNode = (AML_NODE_HANDLE)ObjectNode;
+          break;
+        case AmlMethodParamTypeLocal:
+          ObjectNode = NULL;
+          if (Parameters[Index].Data.Local > (UINT8)(AML_LOCAL7 - AML_LOCAL0)) {
+            ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+            Status = EFI_INVALID_PARAMETER;
+            goto exit_handler;
+          }
+
+          Status = AmlCreateObjectNode (
+                     AmlGetByteEncodingByOpCode (AML_LOCAL0 + Parameters[Index].Data.Local, 0),
+                     0,
+                     &ObjectNode
+                     );
+          if (EFI_ERROR (Status)) {
+            ASSERT_EFI_ERROR (Status);
+            goto exit_handler;
+          }
+
+          CurrentNode = (AML_NODE_HANDLE)ObjectNode;
+          break;
+        default:
+          ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+          Status = EFI_INVALID_PARAMETER;
+          goto exit_handler;
+          break;
+      }
+
+      if (HeadNode == NULL) {
+        HeadNode = CurrentNode;
+      } else {
+        Status = AmlVarListAddTail (
+                   HeadNode,
+                   CurrentNode
+                   );
+        if (EFI_ERROR (Status)) {
+          ASSERT_EFI_ERROR (Status);
+          goto exit_handler;
+        }
+      }
+    }
+  }
+
+  /// Create called/invoked method name string
+  Status = ConvertAslNameToAmlName (MethodNameString, &AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  Status = AmlGetNameStringSize (AmlNameString, &AmlNameStringSize);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    FreePool (AmlNameString);
+    goto exit_handler;
+  }
+
+  DataNode = NULL;
+  Status   = AmlCreateDataNode (
+               EAmlNodeDataTypeNameString,
+               (UINT8 *)AmlNameString,
+               AmlNameStringSize,
+               &DataNode
+               );
+  FreePool (AmlNameString);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)ParentNode,
+             (AML_NODE_HANDLE)DataNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)ParentNode,
+             HeadNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto exit_handler;
+  }
+
+  return Status;
+
+exit_handler:
+  if (HeadNode != NULL) {
+    AmlDeleteTree (HeadNode);
   }
 
   return Status;
