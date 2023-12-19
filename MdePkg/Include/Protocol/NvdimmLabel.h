@@ -108,6 +108,9 @@ typedef struct {
 ///
 /// When set, the complete label set is local to a single NVDIMM Label Storage Area.
 /// When clear, the complete label set is contained on multiple NVDIMM Label Storage Areas.
+/// If NLabel is 1 then setting this flag is optional and it is implied that the
+/// EFI_NVDIMM_LABEL_FLAGS_LOCAL flag is set as the complete label set is local to a single NVDIMM
+/// Label Storage Area.
 ///
 #define EFI_NVDIMM_LABEL_FLAGS_LOCAL  0x00000002
 
