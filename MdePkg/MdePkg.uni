@@ -289,6 +289,10 @@
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdGuidedExtractHandlerTableAddress_HELP  #language en-US "This value is used to set the available memory address to store Guided Extract Handlers. The required memory space is decided by the value of PcdMaximumGuidedExtractHandler."
 
+#string STR_gEfiMdePkgTokenSpaceGuid_PcdRiscVFeatureOverride_PROMPT  #language en-US "RISC-V Feature Override"
+
+#string STR_gEfiMdePkgTokenSpaceGuid_PcdRiscVFeatureOverride_HELP  #language en-US "This value is used to override any RISC-V specific features supported by this PCD"
+
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdPciExpressBaseAddress_PROMPT  #language en-US "PCI Express Base Address"
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdPciExpressBaseAddress_HELP  #language en-US "This value is used to set the base address of PCI express hierarchy."
