@@ -82,15 +82,6 @@ SMM_S3_RESUME_STATE  *mSmmS3ResumeState = NULL;
 
 BOOLEAN  mAcpiS3Enable = TRUE;
 
-UINT8  *mApHltLoopCode          = NULL;
-UINT8  mApHltLoopCodeTemplate[] = {
-  0x8B, 0x44, 0x24, 0x04, // mov  eax, dword ptr [esp+4]
-  0xF0, 0xFF, 0x08,       // lock dec  dword ptr [eax]
-  0xFA,                   // cli
-  0xF4,                   // hlt
-  0xEB, 0xFC              // jmp $-2
-};
-
 /**
   Sync up the MTRR values for all processors.
 
@@ -579,42 +570,6 @@ InitializeCpuBeforeRebase (
 }
 
 /**
-  The function is invoked after SMBASE relocation in S3 path to restores CPU status.
-
-  The function is invoked after SMBASE relocation in S3 path. It restores configuration according to
-  data saved by normal boot path for both BSP and APs.
-
-  @param   IsBsp   The CPU this function executes on is BSP or not.
-
-**/
-VOID
-InitializeCpuAfterRebase (
-  IN BOOLEAN  IsBsp
-  )
-{
-  UINTN  TopOfStack;
-  UINT8  Stack[128];
-
-  SetRegister (FALSE);
-
-  if (mSmmS3ResumeState->MpService2Ppi == 0) {
-    if (IsBsp) {
-      while (mNumberToFinish > 0) {
-        CpuPause ();
-      }
-    } else {
-      //
-      // Place AP into the safe code, count down the number with lock mechanism in the safe code.
-      //
-      TopOfStack  = (UINTN)Stack + sizeof (Stack);
-      TopOfStack &= ~(UINTN)(CPU_STACK_ALIGNMENT - 1);
-      CopyMem ((VOID *)(UINTN)mApHltLoopCode, mApHltLoopCodeTemplate, sizeof (mApHltLoopCodeTemplate));
-      TransferApToSafeState ((UINTN)mApHltLoopCode, TopOfStack, (UINTN)&mNumberToFinish);
-    }
-  }
-}
-
-/**
   Cpu initialization procedure.
 
   @param[in,out] Buffer  The pointer to private data buffer.
@@ -666,10 +621,6 @@ InitializeCpuProcedure (
   if (mAcpiCpuData.NumberOfCpus > 0) {
     if (IsBsp) {
       //
-      // mNumberToFinish should be set before AP executes InitializeCpuAfterRebase()
-      //
-      mNumberToFinish = (UINT32)(mNumberOfCpus - 1);
-      //
       // Signal that SMM base relocation is complete and to continue initialization for all APs.
       //
       mInitApsAfterSmmBaseReloc = TRUE;
@@ -682,10 +633,7 @@ InitializeCpuProcedure (
       }
     }
 
-    //
-    // Restore MSRs for BSP and all APs
-    //
-    InitializeCpuAfterRebase (IsBsp);
+    SetRegister (FALSE);
   }
 }
 
@@ -942,8 +890,6 @@ InitSmmS3ResumeState (
   VOID                  *GuidHob;
   EFI_SMRAM_DESCRIPTOR  *SmramDescriptor;
   SMM_S3_RESUME_STATE   *SmmS3ResumeState;
-  EFI_PHYSICAL_ADDRESS  Address;
-  EFI_STATUS            Status;
 
   if (!mAcpiS3Enable) {
     return;
@@ -995,20 +941,6 @@ InitSmmS3ResumeState (
     //
     InitSmmS3Cr3 ();
   }
-
-  //
-  // Allocate safe memory in ACPI NVS for AP to execute hlt loop in
-  // protected mode on S3 path
-  //
-  Address = BASE_4GB - 1;
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiACPIMemoryNVS,
-                   EFI_SIZE_TO_PAGES (sizeof (mApHltLoopCodeTemplate)),
-                   &Address
-                   );
-  ASSERT_EFI_ERROR (Status);
-  mApHltLoopCode = (UINT8 *)(UINTN)Address;
 }
 
 /**
