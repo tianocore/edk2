@@ -40,6 +40,7 @@ STATIC BOOLEAN  mExitedBootServices = FALSE;
 
 STATIC EFI_HARDWARE_INTERRUPT2_PROTOCOL  *mInterruptProtocol;
 STATIC EFI_WATCHDOG_TIMER_NOTIFY         mWatchdogNotify;
+STATIC EFI_EVENT                         mEfiExitBootServicesEvent;
 
 /**
   This function returns the maximum watchdog offset register value.
@@ -122,7 +123,8 @@ WatchdogExitBootServicesEvent (
   )
 {
   WatchdogDisable ();
-  mTimerPeriod = 0;
+  mTimerPeriod        = 0;
+  mExitedBootServices = TRUE;
 }
 
 /* This function is called when the watchdog's first signal (WS0) goes high.
@@ -219,6 +221,8 @@ WatchdogRegisterHandler (
 
   @retval EFI_SUCCESS           The watchdog timer has been programmed to fire
                                 in TimerPeriod 100ns units.
+  @retval EFI_DEVICE_ERROR      Boot Services has been exited but TimerPeriod
+                                is not zero.
 
 **/
 STATIC
@@ -233,7 +237,15 @@ WatchdogSetTimerPeriod (
   UINT64  TimerFrequencyHz;
   UINT64  NumTimerTicks;
 
-  // if TimerPeriod is 0, this is a request to stop the watchdog.
+  // If we've exited Boot Services but TimerPeriod isn't zero, this
+  // indicates that the caller is doing something wrong.
+  if (mExitedBootServices && (TimerPeriod != 0)) {
+    mTimerPeriod = 0;
+    WatchdogDisable ();
+    return EFI_DEVICE_ERROR;
+  }
+
+  // If TimerPeriod is 0 this is a request to stop the watchdog.
   if (TimerPeriod == 0) {
     mTimerPeriod = 0;
     WatchdogDisable ();
@@ -336,8 +348,6 @@ STATIC EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  mWatchdogTimer = {
   WatchdogSetTimerPeriod,
   WatchdogGetTimerPeriod
 };
-
-STATIC EFI_EVENT  mEfiExitBootServicesEvent;
 
 EFI_STATUS
 EFIAPI
