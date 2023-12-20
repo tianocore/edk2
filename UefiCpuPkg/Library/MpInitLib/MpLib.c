@@ -16,6 +16,11 @@
 EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
 EFI_GUID  mMpHandOffGuid       = MP_HANDOFF_GUID;
 
+RELOCATE_AP_LOOP_ENTRY  mReservedApLoop;
+UINTN                   mReservedTopOfApStack;
+volatile UINT32         mNumberToFinish = 0;
+UINTN                   mApPageTable;
+
 /**
   Save the volatile registers required to be restored following INIT IPI.
 
@@ -3141,4 +3146,141 @@ ConfidentialComputingGuestHas (
   }
 
   return (CurrentAttr == Attr);
+}
+
+/**
+  Do sync on APs.
+
+  @param[in, out] Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+RelocateApLoop (
+  IN OUT VOID  *Buffer
+  )
+{
+  CPU_MP_DATA  *CpuMpData;
+  BOOLEAN      MwaitSupport;
+  UINTN        ProcessorNumber;
+  UINTN        StackStart;
+
+  MpInitLibWhoAmI (&ProcessorNumber);
+  CpuMpData    = GetCpuMpData ();
+  MwaitSupport = IsMwaitSupport ();
+  if (CpuMpData->UseSevEsAPMethod) {
+    //
+    // 64-bit AMD processors with SEV-ES
+    //
+    StackStart = CpuMpData->SevEsAPResetStackStart;
+    mReservedApLoop.AmdSevEntry (
+                      MwaitSupport,
+                      CpuMpData->ApTargetCState,
+                      CpuMpData->PmCodeSegment,
+                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+                      (UINTN)&mNumberToFinish,
+                      CpuMpData->Pm16CodeSegment,
+                      CpuMpData->SevEsAPBuffer,
+                      CpuMpData->WakeupBuffer
+                      );
+  } else {
+    //
+    // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or 64-bit AMD processors without SEV-ES
+    //
+    StackStart = mReservedTopOfApStack;
+    mReservedApLoop.GenericEntry (
+                      MwaitSupport,
+                      CpuMpData->ApTargetCState,
+                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+                      (UINTN)&mNumberToFinish,
+                      mApPageTable
+                      );
+  }
+
+  //
+  // It should never reach here
+  //
+  ASSERT (FALSE);
+}
+
+/**
+  Prepare ApLoopCode.
+
+  @param[in] CpuMpData  Pointer to CpuMpData.
+**/
+VOID
+PrepareApLoopCode (
+  IN CPU_MP_DATA  *CpuMpData
+  )
+{
+  EFI_PHYSICAL_ADDRESS     Address;
+  MP_ASSEMBLY_ADDRESS_MAP  *AddressMap;
+  UINT8                    *ApLoopFunc;
+  UINTN                    ApLoopFuncSize;
+  UINTN                    StackPages;
+  UINTN                    FuncPages;
+  IA32_CR0                 Cr0;
+
+  AddressMap = &CpuMpData->AddressMap;
+  if (CpuMpData->UseSevEsAPMethod) {
+    //
+    // 64-bit AMD processors with SEV-ES
+    //
+    Address        = BASE_4GB - 1;
+    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddressAmdSev;
+    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeAmdSev;
+  } else {
+    //
+    // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or 64-bit AMD processors without SEV-ES
+    //
+    Address        = MAX_ADDRESS;
+    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddressGeneric;
+    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeGeneric;
+  }
+
+  //
+  // Avoid APs access invalid buffer data which allocated by BootServices,
+  // so we will allocate reserved data for AP loop code. We also need to
+  // allocate this buffer below 4GB due to APs may be transferred to 32bit
+  // protected mode on long mode DXE.
+  // Allocating it in advance since memory services are not available in
+  // Exit Boot Services callback function.
+  //
+  // +------------+ (TopOfApStack)
+  // |  Stack * N |
+  // +------------+ (stack base, 4k aligned)
+  // |  Padding   |
+  // +------------+
+  // |  Ap Loop   |
+  // +------------+ ((low address, 4k-aligned)
+  //
+
+  StackPages = EFI_SIZE_TO_PAGES (CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
+  FuncPages  = EFI_SIZE_TO_PAGES (ApLoopFuncSize);
+
+  AllocateApLoopCodeBuffer (StackPages + FuncPages, &Address);
+  ASSERT (Address != 0);
+
+  Cr0.UintN = AsmReadCr0 ();
+  if (Cr0.Bits.PG != 0) {
+    //
+    // Make sure that the buffer memory is executable if NX protection is enabled
+    // for EfiReservedMemoryType.
+    //
+    RemoveNxprotection (Address, EFI_PAGES_TO_SIZE (FuncPages));
+  }
+
+  mReservedTopOfApStack = (UINTN)Address + EFI_PAGES_TO_SIZE (StackPages+FuncPages);
+  ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
+  mReservedApLoop.Data = (VOID *)(UINTN)Address;
+  ASSERT (mReservedApLoop.Data != NULL);
+  CopyMem (mReservedApLoop.Data, ApLoopFunc, ApLoopFuncSize);
+  if (!CpuMpData->UseSevEsAPMethod) {
+    //
+    // processors without SEV-ES and paging is enabled
+    //
+    mApPageTable = CreatePageTable (
+                     (UINTN)Address,
+                     EFI_PAGES_TO_SIZE (StackPages+FuncPages)
+                     );
+  }
 }
