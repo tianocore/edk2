@@ -1,5 +1,6 @@
 /** @file
 *
+*  Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
 *  Copyright (c) 2013-2018, ARM Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -35,16 +36,53 @@ STATIC UINTN  mTimerFrequencyHz = 0;
    It is therefore stored here. 0 means the timer is not running. */
 STATIC UINT64  mNumTimerTicks = 0;
 
+/* disables watchdog interaction after Exit Boot Services */
+STATIC BOOLEAN  mExitedBootServices = FALSE;
+
+#define MAX_UINT48  0xFFFFFFFFFFFFULL
+
 STATIC EFI_HARDWARE_INTERRUPT2_PROTOCOL  *mInterruptProtocol;
 STATIC EFI_WATCHDOG_TIMER_NOTIFY         mWatchdogNotify;
+
+/**
+  This function returns the maximum watchdog offset register value.
+
+  @retval MAX_UINT32 The watchdog offset register holds a 32-bit value.
+  @retval MAX_UINT48 The watchdog offset register holds a 48-bit value.
+**/
+STATIC
+UINT64
+GetMaxWatchdogOffsetRegisterValue (
+  VOID
+  )
+{
+  UINT64 MaxWatchdogOffsetValue;
+  UINT32 WatchdogIId;
+  UINT8  WatchdogArchRevision;
+
+  WatchdogIId          = MmioRead32 (GENERIC_WDOG_IID_REG);
+  WatchdogArchRevision = (WatchdogIId >> GENERIC_WDOG_IID_ARCH_REV_SHIFT) & GENERIC_WDOG_IID_ARCH_REV_MASK;
+
+  if (WatchdogArchRevision == 0) {
+    MaxWatchdogOffsetValue = MAX_UINT32;
+  } else {
+    MaxWatchdogOffsetValue = MAX_UINT48;
+  }
+
+  return MaxWatchdogOffsetValue;
+
+}
 
 STATIC
 VOID
 WatchdogWriteOffsetRegister (
-  UINT32  Value
+  UINT64  Value
   )
 {
-  MmioWrite32 (GENERIC_WDOG_OFFSET_REG, Value);
+  MmioWrite32 (GENERIC_WDOG_OFFSET_REG_LOW, Value & MAX_UINT32);
+  if (GetMaxWatchdogOffsetRegisterValue () == MAX_UINT48) {
+    MmioWrite32 (GENERIC_WDOG_OFFSET_REG_HIGH, (Value >> 32) & MAX_UINT16);
+  }
 }
 
 STATIC
@@ -211,17 +249,17 @@ WatchdogSetTimerPeriod (
   /* If the number of required ticks is greater than the max the watchdog's
      offset register (WOR) can hold, we need to manually compute and set
      the compare register (WCV) */
-  if (mNumTimerTicks > MAX_UINT32) {
+  if (mNumTimerTicks > MAX_UINT48) {
     /* We need to enable the watchdog *before* writing to the compare register,
        because enabling the watchdog causes an "explicit refresh", which
        clobbers the compare register (WCV). In order to make sure this doesn't
        trigger an interrupt, set the offset to max. */
-    WatchdogWriteOffsetRegister (MAX_UINT32);
+    WatchdogWriteOffsetRegister (MAX_UINT48);
     WatchdogEnable ();
     SystemCount = ArmGenericTimerGetSystemCount ();
     WatchdogWriteCompareRegister (SystemCount + mNumTimerTicks);
   } else {
-    WatchdogWriteOffsetRegister ((UINT32)mNumTimerTicks);
+    WatchdogWriteOffsetRegister (mNumTimerTicks);
     WatchdogEnable ();
   }
 
