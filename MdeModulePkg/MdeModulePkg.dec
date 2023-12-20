@@ -1110,7 +1110,7 @@
   #   TRUE  - UEFI Stack Guard will be enabled.<BR>
   #   FALSE - UEFI Stack Guard will be disabled.<BR>
   # @Prompt Enable UEFI Stack Guard.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|FALSE|BOOLEAN|0x30001055
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|TRUE|BOOLEAN|0x30001055
 
   ## Indicate debug level of Trace Hub.
   #   0x0 - TraceHubDebugLevelError.<BR>

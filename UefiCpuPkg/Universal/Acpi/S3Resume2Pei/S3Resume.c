@@ -409,6 +409,15 @@ SignalToSmmByCommunication (
   return;
 }
 
+VOID
+Loop (
+  )
+{
+  DEBUG ((DEBUG_INFO, "MyResetCommand: into loop\n"));
+  while (TRUE) {
+  }
+}
+
 /**
   Jump to OS waking vector.
   The function will install boot script done PPI, report S3 resume status code, and then jump to OS waking vector.
@@ -515,6 +524,14 @@ S3ResumeBootOs (
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_OS_WAKE);
 
   AsmTransferControl = (ASM_TRANSFER_CONTROL)(UINTN)PeiS3ResumeState->AsmTransferControl;
+  Facs->XFirmwareWakingVector = (UINTN)Loop;
+  IA32_CR0  Cr0;
+  Cr0.UintN = AsmReadCr0 ();
+  DEBUG ((
+      DEBUG_INFO,
+      "%a() CR0: %x",
+       Cr0.UintN
+      ));
   if (Facs->XFirmwareWakingVector != 0) {
     //
     // Switch to native waking vector
