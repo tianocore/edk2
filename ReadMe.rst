@@ -256,6 +256,9 @@ command
   cd edk2
   git submodule update --init
   cd ..
+  #if clone too slow: try this cmd to perform a shallow clone(shallow clone also  apply to submodules) 
+  git clone --recurse-submodules --depth 1 --shallow-submodules https://github.com/tianocore/edk2.git
+
 
 If there's update for submodules, use following git commands to get
 the latest submodules code.
