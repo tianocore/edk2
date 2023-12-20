@@ -110,7 +110,7 @@ class GUIDTools:
         if os.environ['FmmtConfPath']:
             self.tooldef_file = os.path.join(os.environ['FmmtConfPath'], 'FmmtConf.ini')
         else:
-            PathList = os.environ['PATH']
+            PathList = os.environ['PATH'].split(os.pathsep)
             for CurrentPath in PathList:
                 if os.path.exists(os.path.join(CurrentPath, 'FmmtConf.ini')):
                     self.tooldef_file = os.path.join(CurrentPath, 'FmmtConf.ini')
