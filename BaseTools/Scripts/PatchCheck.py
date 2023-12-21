@@ -3,7 +3,7 @@
 #
 #  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 #  Copyright (C) 2020, Red Hat, Inc.<BR>
-#  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2020 - 2023, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -25,6 +25,9 @@ import email.header
 class Verbose:
     SILENT, ONELINE, NORMAL = range(3)
     level = NORMAL
+
+class PatchCheckConf:
+    ignore_change_id = False
 
 class EmailAddressCheck:
     """Checks an email address."""
@@ -111,6 +114,8 @@ class CommitMessageCheck:
             self.check_signed_off_by()
             self.check_misc_signatures()
             self.check_overall_format()
+            if not PatchCheckConf.ignore_change_id:
+                self.check_change_id_format()
         self.report_message_result()
 
     url = 'https://github.com/tianocore/tianocore.github.io/wiki/Commit-Message-Format'
@@ -306,6 +311,12 @@ class CommitMessageCheck:
                     self.error('The signature block was not found')
                 break
             last_sig_line = line.strip()
+
+    def check_change_id_format(self):
+        cid='Change-Id:'
+        if self.msg.find(cid) != -1:
+            self.error('\"%s\" found in commit message:' % cid)
+            return
 
 (START, PRE_PATCH, PATCH) = range(3)
 
@@ -780,11 +791,16 @@ class PatchCheckApp:
         group.add_argument("--silent",
                            action="store_true",
                            help="Print nothing")
+        group.add_argument("--ignore-change-id",
+                           action="store_true",
+                           help="Ignore the presence of 'Change-Id:' tags in commit message")
         self.args = parser.parse_args()
         if self.args.oneline:
             Verbose.level = Verbose.ONELINE
         if self.args.silent:
             Verbose.level = Verbose.SILENT
+        if self.args.ignore_change_id:
+            PatchCheckConf.ignore_change_id = True
 
 if __name__ == "__main__":
     sys.exit(PatchCheckApp().retval)
