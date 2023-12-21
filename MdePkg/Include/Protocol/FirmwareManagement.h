@@ -293,6 +293,8 @@ EFI_STATUS
                                      to contain the image(s) information if the buffer was too small.
   @param[in, out] ImageInfo          A pointer to the buffer in which firmware places the current image(s)
                                      information. The information is an array of EFI_FIRMWARE_IMAGE_DESCRIPTORs.
+                                     May be NULL with a zero ImageInfoSize in order to determine the size of the
+                                     buffer needed.
   @param[out]     DescriptorVersion  A pointer to the location in which firmware returns the version number
                                      associated with the EFI_FIRMWARE_IMAGE_DESCRIPTOR.
   @param[out]     DescriptorCount    A pointer to the location in which firmware returns the number of
@@ -313,7 +315,12 @@ EFI_STATUS
   @retval EFI_SUCCESS                The device was successfully updated with the new image.
   @retval EFI_BUFFER_TOO_SMALL       The ImageInfo buffer was too small. The current buffer size
                                      needed to hold the image(s) information is returned in ImageInfoSize.
-  @retval EFI_INVALID_PARAMETER      ImageInfoSize is NULL.
+  @retval EFI_INVALID_PARAMETER      ImageInfoSize is not too small and ImageInfo is NULL.
+  @retval EFI_INVALID_PARAMETER      ImageInfoSize is non-zero and DescriptorVersion is NULL.
+  @retval EFI_INVALID_PARAMETER      ImageInfoSize is non-zero and DescriptorCount is NULL.
+  @retval EFI_INVALID_PARAMETER      ImageInfoSize is non-zero and DescriptorSize is NULL.
+  @retval EFI_INVALID_PARAMETER      ImageInfoSize is non-zero and PackageVersion is NULL.
+  @retval EFI_INVALID_PARAMETER      ImageInfoSize is non-zero and PackageVersionName is NULL.
   @retval EFI_DEVICE_ERROR           Valid information could not be returned. Possible corrupted image.
 
 **/
@@ -340,6 +347,8 @@ EFI_STATUS
   @param[in]      ImageIndex     A unique number identifying the firmware image(s) within the device.
                                  The number is between 1 and DescriptorCount.
   @param[out]     Image          Points to the buffer where the current image is copied to.
+                                 May be NULL with a zero ImageSize in order to determine the size of the
+                                 buffer needed.
   @param[in, out] ImageSize      On entry, points to the size of the buffer pointed to by Image, in bytes.
                                  On return, points to the length of the image, in bytes.
 
@@ -347,7 +356,7 @@ EFI_STATUS
   @retval EFI_BUFFER_TOO_SMALL   The buffer specified by ImageSize is too small to hold the
                                  image. The current buffer size needed to hold the image is returned
                                  in ImageSize.
-  @retval EFI_INVALID_PARAMETER  The Image was NULL.
+  @retval EFI_INVALID_PARAMETER  The ImageSize is not too small and Image is NULL.
   @retval EFI_NOT_FOUND          The current image is not copied to the buffer.
   @retval EFI_UNSUPPORTED        The operation is not supported.
   @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
