@@ -961,6 +961,8 @@ AddAndSignalNewRedfishService (
         FreePool ((VOID *)DiscoveredList);
         return EFI_OUT_OF_RESOURCES;
       }
+    } else {
+      FreeInformationData (&DiscoveredInstance->Information);
     }
 
     DEBUG ((DEBUG_MANAGEABILITY, "*** Redfish Service Information ***\n"));
