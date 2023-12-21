@@ -713,6 +713,49 @@ DiscoverRedfishHostInterface (
 }
 
 /**
+  The function releases particular strings into the structure instance.
+
+  @param[in]  Information           EFI_REDFISH_DISCOVERED_INFORMATION
+
+**/
+STATIC
+VOID
+FreeInformationData (
+  IN EFI_REDFISH_DISCOVERED_INFORMATION  *Information
+  )
+{
+  if (Information->Location != NULL) {
+    FreePool (Information->Location);
+    Information->Location = NULL;
+  }
+
+  if (Information->Uuid != NULL) {
+    FreePool (Information->Uuid);
+    Information->Uuid = NULL;
+  }
+
+  if (Information->Os != NULL) {
+    FreePool (Information->Os);
+    Information->Os = NULL;
+  }
+
+  if (Information->OsVersion != NULL) {
+    FreePool (Information->OsVersion);
+    Information->OsVersion = NULL;
+  }
+
+  if (Information->Product != NULL) {
+    FreePool (Information->Product);
+    Information->Product = NULL;
+  }
+
+  if (Information->ProductVer != NULL) {
+    FreePool (Information->ProductVer);
+    Information->ProductVer = NULL;
+  }
+}
+
+/**
   The function initializes particular strings into the structure instance.
 
   @param[in]  Information           EFI_REDFISH_DISCOVERED_INFORMATION
@@ -1514,30 +1557,7 @@ RedfishServiceReleaseService (
     do {
       if (DiscoveredRedfishInstance->Instance == ThisRedfishInstance) {
         RemoveEntryList (&DiscoveredRedfishInstance->NextInstance);
-        if (ThisRedfishInstance->Information.Location != NULL) {
-          FreePool (ThisRedfishInstance->Information.Location);
-        }
-
-        if (ThisRedfishInstance->Information.Uuid != NULL) {
-          FreePool (ThisRedfishInstance->Information.Uuid);
-        }
-
-        if (ThisRedfishInstance->Information.Os != NULL) {
-          FreePool (ThisRedfishInstance->Information.Os);
-        }
-
-        if (ThisRedfishInstance->Information.OsVersion != NULL) {
-          FreePool (ThisRedfishInstance->Information.OsVersion);
-        }
-
-        if (ThisRedfishInstance->Information.Product != NULL) {
-          FreePool (ThisRedfishInstance->Information.Product);
-        }
-
-        if (ThisRedfishInstance->Information.ProductVer != NULL) {
-          FreePool (ThisRedfishInstance->Information.ProductVer);
-        }
-
+        FreeInformationData (&ThisRedfishInstance->Information);
         FreePool ((VOID *)ThisRedfishInstance);
         goto ReleaseNext;
       }
