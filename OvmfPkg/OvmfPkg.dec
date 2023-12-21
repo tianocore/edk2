@@ -405,6 +405,19 @@
   #
   gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding|256|UINT32|0x6f
 
+  #
+  # Binary representation of the GUID that determines the terminal type. The
+  # size must be exactly 16 bytes. The default value corresponds to
+  # EFI_VT_100_GUID.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdTerminalTypeGuidBuffer|{0x65, 0x60, 0xA6, 0xDF, 0x19, 0xB4, 0xD3, 0x11, 0x9A, 0x2D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D}|VOID*|0x66
+
+  ##
+  # Whether the EFI memory attributes protocol should be uninstalled before
+  # invoking the OS loader. This may be needed to work around problematic
+  # builds of shim that use the protocol incorrectly.
+  gUefiOvmfPkgTokenSpaceGuid.PcdUninstallMemAttrProtocol|FALSE|BOOLEAN|0x67
+
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|FALSE|BOOLEAN|0x1d
