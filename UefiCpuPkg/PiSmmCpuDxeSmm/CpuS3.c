@@ -810,6 +810,7 @@ SmmRestoreCpu (
       Mp2ServicePpi = (EDKII_PEI_MP_SERVICES2_PPI *)(UINTN)mSmmS3ResumeState->MpService2Ppi;
       Mp2ServicePpi->StartupAllCPUs (Mp2ServicePpi, InitializeCpuProcedure, 0, NULL);
     } else {
+      DEBUG ((DEBUG_INFO, "Send INIT IPI - SIPI to all APs CR3: %x\n", AsmReadCr3 ()));
       PrepareApStartupVector (mAcpiCpuData.StartupVector);
       //
       // Send INIT IPI - SIPI to all APs

@@ -1015,6 +1015,7 @@ FillExchangeInfoData (
   ExchangeInfo->DataSegment = AsmReadDs ();
 
   ExchangeInfo->Cr3 = AsmReadCr3 ();
+  DEBUG ((DEBUG_INFO, "FillExchangeInfoData AsmReadCr3 = %x\n", ExchangeInfo->Cr3));
 
   ExchangeInfo->CFunction       = (UINTN)ApWakeupFunction;
   ExchangeInfo->ApIndex         = 0;
@@ -1024,6 +1025,7 @@ FillExchangeInfoData (
   ExchangeInfo->CpuMpData       = CpuMpData;
 
   ExchangeInfo->EnableExecuteDisable = IsBspExecuteDisableEnabled ();
+  DEBUG ((DEBUG_INFO, "IsBspExecuteDisableEnabled = %d\n", ExchangeInfo->EnableExecuteDisable));
 
   ExchangeInfo->InitializeFloatingPointUnitsAddress = (UINTN)InitializeFloatingPointUnits;
 

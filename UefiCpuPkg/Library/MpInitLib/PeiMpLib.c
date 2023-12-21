@@ -452,7 +452,25 @@ NotifyOnEndOfS3Resume (
 
   CpuMpData       = GetCpuMpData ();
   mNumberToFinish = CpuMpData->CpuCount - 1;
+  DEBUG ((DEBUG_INFO, "NotifyOnEndOfS3Resume\n"));
+  DEBUG ((DEBUG_INFO, "BSP really CR3 = %x\n", AsmReadCr3 ()));
+  DEBUG ((
+    DEBUG_INFO,
+    "BSP:Cr0 = %x, CR3 = %x\n",
+    CpuMpData->CpuData[0].VolatileRegisters.Cr0,
+    CpuMpData->CpuData[0].VolatileRegisters.Cr3
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "AP:Cr0 = %x, CR3 = %x\n",
+    CpuMpData->CpuData[1].VolatileRegisters.Cr0,
+    CpuMpData->CpuData[1].VolatileRegisters.Cr3
+    ));
+
   WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, NULL, TRUE);
+  while (TRUE) {
+    CpuPause ();
+  }
   while (mNumberToFinish > 0) {
     CpuPause ();
   }
