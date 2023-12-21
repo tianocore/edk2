@@ -463,8 +463,11 @@ MeasureFvImage (
       //
       // Found the migrated FV info
       //
-      FvOrgBase  = (EFI_PHYSICAL_ADDRESS)(UINTN)MigratedFvInfo->FvOrgBase;
-      FvDataBase = (EFI_PHYSICAL_ADDRESS)(UINTN)MigratedFvInfo->FvDataBase;
+      FvOrgBase = (EFI_PHYSICAL_ADDRESS)(UINTN)MigratedFvInfo->FvOrgBase;
+      if (MigratedFvInfo->FvDataBase != 0) {
+        FvDataBase = (EFI_PHYSICAL_ADDRESS)(UINTN)MigratedFvInfo->FvDataBase;
+      }
+
       break;
     }
 
