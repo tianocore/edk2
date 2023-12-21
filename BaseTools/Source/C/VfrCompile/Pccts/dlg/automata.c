@@ -136,7 +136,10 @@ nfa_node *start;
 	unsigned *reach_list;
 
 	reach_list = (unsigned *) malloc((2+nfa_allocated)*sizeof(unsigned));
-	if (!start) return NULL;
+  if (!start) {
+  free(reach_list);
+  return NULL;
+  }
 	t = set_of(NFA_NO(start));
 	_set_pdq(t,reach_list);
 	closure(&t,reach_list);
