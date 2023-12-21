@@ -41,21 +41,8 @@
   gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled|FALSE|BOOLEAN|0x00000004
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
-  #
-  # Binary representation of the GUID that determines the terminal type. The
-  # size must be exactly 16 bytes. The default value corresponds to
-  # EFI_VT_100_GUID.
-  #
-  gArmVirtTokenSpaceGuid.PcdTerminalTypeGuidBuffer|{0x65, 0x60, 0xA6, 0xDF, 0x19, 0xB4, 0xD3, 0x11, 0x9A, 0x2D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D}|VOID*|0x00000007
-
   ##
   # This is the physical address of Rsdp which is the core struct of Acpi.
   # Cloud Hypervisor has no other way to pass Rsdp address to the guest except use a PCD.
   #
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x0|UINT64|0x00000005
-
-  ##
-  # Whether the EFI memory attributes protocol should be uninstalled before
-  # invoking the OS loader. This may be needed to work around problematic
-  # builds of shim that use the protocol incorrectly.
-  gArmVirtTokenSpaceGuid.PcdUninstallMemAttrProtocol|FALSE|BOOLEAN|0x00000006
