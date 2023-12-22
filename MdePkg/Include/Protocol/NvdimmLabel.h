@@ -124,6 +124,12 @@ typedef struct {
 ///
 #define EFI_NVDIMM_LABEL_FLAGS_UPDATING  0x00000008
 
+///
+/// When set, the SPALocationCookie in the namespace label is valid and should match the
+/// current value in the NFIT SPA Range Structure.
+///
+#define EFI_NVDIMM_LABEL_FLAGS_SPACOOKIE_BOUND  0x00000010
+
 typedef struct {
   ///
   /// Unique Label Identifier UUID per RFC 4122.
@@ -199,9 +205,17 @@ typedef struct {
   EFI_GUID    AddressAbstractionGuid;
 
   ///
+  /// When creating the label, this value is set to the value from the NFIT SPA Range Structure if the
+  /// SPALocationCookie flag (bit 2) is set. If EFI_NVDIMM_LABEL_FLAGS_SPACOOKIE_BOUND is set, the SPALocationCookie
+  /// value stored in the namespace label should match the current value in the NFIT SPA Range Structure.
+  /// Otherwise, the data may not be read correctly.
+  ///
+  UINT64      SPALocationCookie;
+
+  ///
   /// Shall be 0.
   ///
-  UINT8       Reserved1[88];
+  UINT8       Reserved1[80];
 
   ///
   /// 64-bit Fletcher64 checksum of all fields in this Label.
