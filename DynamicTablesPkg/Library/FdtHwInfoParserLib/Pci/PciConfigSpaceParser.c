@@ -1,5 +1,5 @@
 /** @file
-  Arm PCI Configuration Space Parser.
+  PCI Configuration Space Parser.
 
   Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -16,8 +16,7 @@
 #include <Library/DebugLib.h>
 
 #include "FdtHwInfoParser.h"
-#include "Pci/ArmPciConfigSpaceParser.h"
-#include "Arm/Gic/ArmGicDispatcher.h"
+#include "Pci/PciConfigSpaceParser.h"
 
 /** List of "compatible" property values for host PCIe bridges nodes.
 
@@ -306,8 +305,7 @@ ParseIrqMap (
   CONST UINT8  *IrqMapMask;
   INT32        IrqMapMaskSize;
 
-  INT32   PHandleOffset;
-  UINT32  GicVersion;
+  INT32  PHandleOffset;
 
   UINT32  PciAddressAttr;
 
@@ -364,13 +362,6 @@ ParseIrqMap (
   if (IntcNode < 0) {
     ASSERT (0);
     return EFI_ABORTED;
-  }
-
-  // Only support Gic(s) for now.
-  Status = GetGicVersion (Fdt, IntcNode, &GicVersion);
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
   }
 
   // Get the "address-cells" property of the IntcNode.
@@ -725,7 +716,7 @@ FreeParserTable (
 **/
 EFI_STATUS
 EFIAPI
-ArmPciConfigInfoParser (
+PciConfigInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   )

@@ -22,8 +22,8 @@
   FdtHwInfoParser.h
   FdtUtility.c
   FdtUtility.h
-  Pci/ArmPciConfigSpaceParser.c
-  Pci/ArmPciConfigSpaceParser.h
+  Pci/PciConfigSpaceParser.c
+  Pci/PciConfigSpaceParser.h
   Serial/ArmSerialPortParser.c
   Serial/ArmSerialPortParser.h
 
