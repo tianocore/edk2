@@ -106,7 +106,7 @@ typedef UINT32 CM_OBJECT_ID;
 */
 typedef enum ObjectNameSpaceID {
   EObjNameSpaceStandard,      ///< Standard Objects Namespace
-  EObjNameSpaceArm,           ///< ARM Objects Namespace
+  EObjNameSpaceArch,          ///< ARCH Objects Namespace
   EObjNameSpaceOem = 0x8,     ///< OEM Objects Namespace
   EObjNameSpaceMax
 } EOBJECT_NAMESPACE_ID;
@@ -180,7 +180,7 @@ typedef struct CmObjDescriptor {
   @retval Returns an ARM Configuration Manager Object ID.
 **/
 #define CREATE_CM_ARCH_OBJECT_ID(ObjectId) \
-          (CREATE_CM_OBJECT_ID (EObjNameSpaceArm, ObjectId))
+          (CREATE_CM_OBJECT_ID (EObjNameSpaceArch, ObjectId))
 
 /** This macro returns a Configuration Manager Object ID
     in the OEM Object Namespace.

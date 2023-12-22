@@ -98,7 +98,7 @@ EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE  AcpiSpcr = {
     Port Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjSerialConsolePortInfo,
   CM_ARCH_SERIAL_PORT_INFO
   )

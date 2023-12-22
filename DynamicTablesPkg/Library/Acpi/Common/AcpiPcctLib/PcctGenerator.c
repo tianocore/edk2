@@ -41,7 +41,7 @@ Requirements:
     Subspace of Type 0 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPccSubspaceType0Info,
   CM_ARCH_PCC_SUBSPACE_TYPE0_INFO
   );
@@ -50,7 +50,7 @@ GET_OBJECT_LIST (
     Subspace of Type 1 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPccSubspaceType1Info,
   CM_ARCH_PCC_SUBSPACE_TYPE1_INFO
   );
@@ -59,7 +59,7 @@ GET_OBJECT_LIST (
     Subspace of Type 2 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPccSubspaceType2Info,
   CM_ARCH_PCC_SUBSPACE_TYPE2_INFO
   );
@@ -68,7 +68,7 @@ GET_OBJECT_LIST (
     Subspace of Type 3 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPccSubspaceType3Info,
   CM_ARCH_PCC_SUBSPACE_TYPE3_INFO
   );
@@ -77,7 +77,7 @@ GET_OBJECT_LIST (
     Subspace of Type 4 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPccSubspaceType4Info,
   CM_ARCH_PCC_SUBSPACE_TYPE4_INFO
   );
@@ -86,7 +86,7 @@ GET_OBJECT_LIST (
     Subspace of Type 5 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPccSubspaceType5Info,
   CM_ARCH_PCC_SUBSPACE_TYPE5_INFO
   );

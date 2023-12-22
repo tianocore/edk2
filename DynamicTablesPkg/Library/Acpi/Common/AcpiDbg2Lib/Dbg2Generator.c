@@ -181,7 +181,7 @@ DBG2_TABLE  AcpiDbg2 = {
     debug port information from the Configuration Manager
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjSerialDebugPortInfo,
   CM_ARCH_SERIAL_PORT_INFO
   );

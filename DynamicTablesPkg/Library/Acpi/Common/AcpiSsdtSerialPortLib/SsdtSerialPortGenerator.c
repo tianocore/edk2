@@ -36,7 +36,7 @@ Requirements:
     information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjSerialPortInfo,
   CM_ARCH_SERIAL_PORT_INFO
   );

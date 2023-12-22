@@ -52,7 +52,7 @@ Requirements:
     reference information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjCmRef,
   CM_ARCH_OBJ_REF
   );
@@ -61,7 +61,7 @@ GET_OBJECT_LIST (
     Configuration Space Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPciConfigSpaceInfo,
   CM_ARCH_PCI_CONFIG_SPACE_INFO
   );
@@ -70,7 +70,7 @@ GET_OBJECT_LIST (
     Address Mapping Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPciAddressMapInfo,
   CM_ARCH_PCI_ADDRESS_MAP_INFO
   );
@@ -79,7 +79,7 @@ GET_OBJECT_LIST (
     Interrupt Mapping Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPciInterruptMapInfo,
   CM_ARCH_PCI_INTERRUPT_MAP_INFO
   );

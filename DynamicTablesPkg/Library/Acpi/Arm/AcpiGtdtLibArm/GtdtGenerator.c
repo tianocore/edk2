@@ -36,7 +36,7 @@ Requirements:
     Timer Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGenericTimerInfo,
   CM_ARCH_GENERIC_TIMER_INFO
   );
@@ -45,7 +45,7 @@ GET_OBJECT_LIST (
     Watchdog Timer Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPlatformGenericWatchdogInfo,
   CM_ARCH_GENERIC_WATCHDOG_INFO
   );
@@ -54,7 +54,7 @@ GET_OBJECT_LIST (
     Timer Block Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPlatformGTBlockInfo,
   CM_ARCH_GTBLOCK_INFO
   );
@@ -63,7 +63,7 @@ GET_OBJECT_LIST (
   Timer Block Timer Frame Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGTBlockTimerFrameInfo,
   CM_ARCH_GTBLOCK_TIMER_FRAME_INFO
   );

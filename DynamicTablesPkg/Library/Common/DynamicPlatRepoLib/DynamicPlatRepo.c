@@ -149,7 +149,7 @@ DynPlatRepoAddObject (
       (CmObjDesc->Count == 0)             ||
       (ArmNamespaceObjId >= EArchObjMax)   ||
       ((CmObjDesc->Count > 1)  && (ArmNamespaceObjId != EArchObjCmRef))  ||
-      (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceArm))
+      (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceArch))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;

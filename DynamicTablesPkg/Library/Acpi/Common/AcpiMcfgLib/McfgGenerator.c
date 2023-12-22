@@ -51,7 +51,7 @@ typedef
 /** Retrieve the PCI Configuration Space Information.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPciConfigSpaceInfo,
   CM_ARCH_PCI_CONFIG_SPACE_INFO
   );

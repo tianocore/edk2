@@ -202,7 +202,7 @@ EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
     Management Profile Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPowerManagementProfileInfo,
   CM_ARCH_POWER_MANAGEMENT_PROFILE_INFO
   );
@@ -211,7 +211,7 @@ GET_OBJECT_LIST (
     Architecture Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjBootArchInfo,
   CM_ARCH_BOOT_ARCH_INFO
   );
@@ -220,7 +220,7 @@ GET_OBJECT_LIST (
     Vendor ID from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjHypervisorVendorIdentity,
   CM_ARCH_HYPERVISOR_VENDOR_ID
   );
@@ -229,7 +229,7 @@ GET_OBJECT_LIST (
   feature flags for the platform from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjFixedFeatureFlags,
   CM_ARCH_FIXED_FEATURE_FLAGS
   );

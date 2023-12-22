@@ -211,7 +211,7 @@ FixupCmObjectSelfToken (
 
   // Only support Arm objects for now.
   if ((CmObjDesc == NULL)   ||
-      (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceArm))
+      (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceArch))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;

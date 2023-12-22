@@ -48,7 +48,7 @@ Requirements:
     CPU interface Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicCInfo,
   CM_ARCH_GICC_INFO
   );
@@ -58,7 +58,7 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjProcHierarchyInfo,
   CM_ARCH_PROC_HIERARCHY_INFO
   );
@@ -68,7 +68,7 @@ GET_OBJECT_LIST (
   reference information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjCmRef,
   CM_ARCH_OBJ_REF
   );
@@ -78,7 +78,7 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjLpiInfo,
   CM_ARCH_LPI_INFO
   );
@@ -88,7 +88,7 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjCpcInfo,
   CM_ARCH_CPC_INFO
   );
@@ -98,7 +98,7 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjEtInfo,
   CM_ARCH_ET_INFO
   );

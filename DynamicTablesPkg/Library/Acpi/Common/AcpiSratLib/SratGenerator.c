@@ -42,7 +42,7 @@
     CPU interface Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicCInfo,
   CM_ARCH_GICC_INFO
   );
@@ -52,7 +52,7 @@ GET_OBJECT_LIST (
     Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicItsInfo,
   CM_ARCH_GIC_ITS_INFO
   );
@@ -62,7 +62,7 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjMemoryAffinityInfo,
   CM_ARCH_MEMORY_AFFINITY_INFO
   );
@@ -72,7 +72,7 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGenericInitiatorAffinityInfo,
   CM_ARCH_GENERIC_INITIATOR_AFFINITY_INFO
   );
@@ -82,7 +82,7 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjDeviceHandleAcpi,
   CM_ARCH_DEVICE_HANDLE_ACPI
   );
@@ -92,7 +92,7 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjDeviceHandlePci,
   CM_ARCH_DEVICE_HANDLE_PCI
   );

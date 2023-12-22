@@ -44,7 +44,7 @@ extern CHAR8  ssdtcmn600template_aml_code[];
     Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjCmn600Info,
   CM_ARCH_CMN_600_INFO
   );

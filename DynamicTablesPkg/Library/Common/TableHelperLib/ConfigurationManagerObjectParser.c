@@ -1085,7 +1085,7 @@ ParseCmObjDesc (
 
       ParserArray = &StdNamespaceObjectParser[ObjId];
       break;
-    case EObjNameSpaceArm:
+    case EObjNameSpaceArch:
       if (ObjId >= EArchObjMax) {
         ASSERT (0);
         return;

@@ -43,7 +43,7 @@
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjProcHierarchyInfo,
   CM_ARCH_PROC_HIERARCHY_INFO
   );
@@ -53,7 +53,7 @@ GET_OBJECT_LIST (
   from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjCacheInfo,
   CM_ARCH_CACHE_INFO
   );
@@ -63,7 +63,7 @@ GET_OBJECT_LIST (
   reference information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjCmRef,
   CM_ARCH_OBJ_REF
   );
@@ -73,7 +73,7 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicCInfo,
   CM_ARCH_GICC_INFO
   );

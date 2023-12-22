@@ -48,7 +48,7 @@ Requirements:
     Group node information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjItsGroup,
   CM_ARCH_ITS_GROUP_NODE
   );
@@ -57,7 +57,7 @@ GET_OBJECT_LIST (
     Named Component node information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjNamedComponent,
   CM_ARCH_NAMED_COMPONENT_NODE
   );
@@ -66,7 +66,7 @@ GET_OBJECT_LIST (
      Root Complex node information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjRootComplex,
   CM_ARCH_ROOT_COMPLEX_NODE
   );
@@ -75,7 +75,7 @@ GET_OBJECT_LIST (
     SMMU v1/v2 node information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjSmmuV1SmmuV2,
   CM_ARCH_SMMUV1_SMMUV2_NODE
   );
@@ -84,7 +84,7 @@ GET_OBJECT_LIST (
     SMMU v3 node information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjSmmuV3,
   CM_ARCH_SMMUV3_NODE
   );
@@ -93,7 +93,7 @@ GET_OBJECT_LIST (
     PMCG node information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjPmcg,
   CM_ARCH_PMCG_NODE
   );
@@ -102,7 +102,7 @@ GET_OBJECT_LIST (
     RMR node information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjRmr,
   CM_ARCH_RMR_NODE
   );
@@ -111,7 +111,7 @@ GET_OBJECT_LIST (
     Memory Range Descriptor Array information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjMemoryRangeDescriptor,
   CM_ARCH_MEMORY_RANGE_DESCRIPTOR
   );
@@ -120,7 +120,7 @@ GET_OBJECT_LIST (
     ITS Identifier Array information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicItsIdentifierArray,
   CM_ARCH_ITS_IDENTIFIER
   );
@@ -129,7 +129,7 @@ GET_OBJECT_LIST (
     Id Mapping Array information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjIdMappingArray,
   CM_ARCH_ID_MAPPING
   );
@@ -138,7 +138,7 @@ GET_OBJECT_LIST (
     SMMU Interrupt Array information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjSmmuInterruptArray,
   CM_ARCH_SMMU_INTERRUPT
   );

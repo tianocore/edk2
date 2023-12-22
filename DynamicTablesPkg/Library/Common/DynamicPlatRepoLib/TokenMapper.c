@@ -67,7 +67,7 @@ TokenMapperAddObject (
   CmObjDesc->Data = Data;
 
   // Only EArchObjCmRef CmObj can be added as arrays (more than 1 elements).
-  if ((GET_CM_NAMESPACE_ID (ObjectId) == EObjNameSpaceArm) &&
+  if ((GET_CM_NAMESPACE_ID (ObjectId) == EObjNameSpaceArch) &&
       (GET_CM_OBJECT_ID (ObjectId) == EArchObjCmRef))
   {
     CmObjDesc->Count = Size / sizeof (CM_ARCH_OBJ_REF);

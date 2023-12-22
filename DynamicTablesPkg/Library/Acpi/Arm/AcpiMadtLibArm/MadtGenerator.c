@@ -37,7 +37,7 @@ Requirements:
     CPU interface Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicCInfo,
   CM_ARCH_GICC_INFO
   );
@@ -47,7 +47,7 @@ GET_OBJECT_LIST (
 */
 
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicDInfo,
   CM_ARCH_GICD_INFO
   );
@@ -56,7 +56,7 @@ GET_OBJECT_LIST (
     MSI Frame Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicMsiFrameInfo,
   CM_ARCH_GIC_MSI_FRAME_INFO
   );
@@ -66,7 +66,7 @@ GET_OBJECT_LIST (
 */
 
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicRedistributorInfo,
   CM_ARCH_GIC_REDIST_INFO
   );
@@ -76,7 +76,7 @@ GET_OBJECT_LIST (
     Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
+  EObjNameSpaceArch,
   EArchObjGicItsInfo,
   CM_ARCH_GIC_ITS_INFO
   );
