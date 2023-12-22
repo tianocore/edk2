@@ -13,8 +13,8 @@
 
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
-#include "Gic/ArmGicCParser.h"
-#include "Gic/ArmGicDispatcher.h"
+#include "Arm/Gic/ArmGicCParser.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
 
 /** List of "compatible" property values for CPU nodes.
 

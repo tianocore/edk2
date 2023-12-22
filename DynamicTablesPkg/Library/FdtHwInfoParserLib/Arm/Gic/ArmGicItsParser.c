@@ -1,28 +1,28 @@
 /** @file
-  Arm Gic Distributor Parser.
+  Arm Gic Interrupt Translation Service Parser.
 
   Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
-  - linux/Documentation/devicetree/bindings/interrupt-controller/arm,gic.yaml
   - linux/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
 **/
 
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"
-#include "Gic/ArmGicDispatcher.h"
-#include "Gic/ArmGicDParser.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
+#include "Arm/Gic/ArmGicItsParser.h"
 
 /** Parse a Gic compatible interrupt-controller node,
-    extracting GicD information.
+    extracting GicIts information.
 
-  This parser is valid for Gic v2 and v3.
+  This parser is valid for Gic v3 and higher.
 
   @param [in]  Fdt              Pointer to a Flattened Device Tree (Fdt).
   @param [in]  GicIntcNode      Offset of a Gic compatible
                                 interrupt-controller node.
-  @param [in]  GicDInfo         The CM_ARM_GICD_INFO to populate.
+  @param [in]  GicItsId         Id for the Gic ITS node.
+  @param [in]  GicItsInfo       The CM_ARM_GIC_ITS_INFO to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -31,10 +31,11 @@
 STATIC
 EFI_STATUS
 EFIAPI
-GicDIntcNodeParser (
-  IN  CONST VOID        *Fdt,
-  IN  INT32             GicIntcNode,
-  IN  CM_ARM_GICD_INFO  *GicDInfo
+GicItsIntcNodeParser (
+  IN  CONST VOID           *Fdt,
+  IN  INT32                GicIntcNode,
+  IN  UINT32               GicItsId,
+  IN  CM_ARM_GIC_ITS_INFO  *GicItsInfo
   )
 {
   EFI_STATUS   Status;
@@ -43,7 +44,7 @@ GicDIntcNodeParser (
   INT32        DataSize;
 
   if ((Fdt == NULL) ||
-      (GicDInfo == NULL))
+      (GicItsInfo == NULL))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -71,24 +72,28 @@ GicDIntcNodeParser (
   }
 
   if (AddressCells == 2) {
-    GicDInfo->PhysicalBaseAddress = fdt64_to_cpu (*(UINT64 *)Data);
+    GicItsInfo->PhysicalBaseAddress = fdt64_to_cpu (*(UINT64 *)Data);
   } else {
-    GicDInfo->PhysicalBaseAddress = fdt32_to_cpu (*(UINT32 *)Data);
+    GicItsInfo->PhysicalBaseAddress = fdt32_to_cpu (*(UINT32 *)Data);
   }
 
+  // Gic Its Id
+  GicItsInfo->GicItsId = GicItsId;
+
+  // {default = 0}
+  GicItsInfo->ProximityDomain = 0;
   return Status;
 }
 
-/** CM_ARM_GICD_INFO parser function.
+/** CM_ARM_GIC_ITS_INFO parser function.
 
   This parser expects FdtBranch to be a Gic interrupt-controller node.
-  At most one CmObj is created.
-  The following structure is populated:
-  typedef struct CmArmGicDInfo {
+  Gic version must be v3 or higher.
+  typedef struct CmArmGicItsInfo {
+    UINT32  GicItsId;                         // {Populated}
     UINT64  PhysicalBaseAddress;              // {Populated}
-    UINT32  SystemVectorBase;
-    UINT8   GicVersion;                       // {Populated}
-  } CM_ARM_GICD_INFO;
+    UINT32  ProximityDomain;                  // {default = 0}
+  } CM_ARM_GIC_ITS_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -109,15 +114,18 @@ GicDIntcNodeParser (
 **/
 EFI_STATUS
 EFIAPI
-ArmGicDInfoParser (
+ArmGicItsInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   )
 {
-  EFI_STATUS        Status;
-  UINT32            GicVersion;
-  CM_ARM_GICD_INFO  GicDInfo;
-  VOID              *Fdt;
+  EFI_STATUS           Status;
+  UINT32               GicVersion;
+  CM_ARM_GIC_ITS_INFO  GicItsInfo;
+  UINT32               Index;
+  INT32                GicItsNode;
+  UINT32               GicItsNodeCount;
+  VOID                 *Fdt;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
@@ -138,34 +146,73 @@ ArmGicDInfoParser (
     return Status;
   }
 
-  ZeroMem (&GicDInfo, sizeof (GicDInfo));
-  GicDInfo.GicVersion = GicVersion;
-
-  // Parse the interrupt-controller depending on its Gic version.
-  switch (GicVersion) {
-    case 2:
-    case 3:
-    {
-      // Set the Gic version, then parse the GicD information.
-      Status = GicDIntcNodeParser (Fdt, FdtBranch, &GicDInfo);
-      break;
-    }
-    default:
-    {
-      // Unsupported Gic version.
-      ASSERT (0);
-      return EFI_UNSUPPORTED;
-    }
+  if (GicVersion < 3) {
+    ASSERT (0);
+    return EFI_UNSUPPORTED;
   }
 
-  // Add the CmObj to the Configuration Manager.
-  Status = AddSingleCmObj (
-             FdtParserHandle,
-             CREATE_CM_ARM_OBJECT_ID (EArmObjGicDInfo),
-             &GicDInfo,
-             sizeof (CM_ARM_GICD_INFO),
-             NULL
+  // Count the nodes with the "msi-controller" property.
+  // The interrupt-controller itself can have this property,
+  // but the first node is skipped in the search.
+  Status = FdtCountPropNodeInBranch (
+             Fdt,
+             FdtBranch,
+             "msi-controller",
+             &GicItsNodeCount
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  if (GicItsNodeCount == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  GicItsNode = FdtBranch;
+  for (Index = 0; Index < GicItsNodeCount; Index++) {
+    ZeroMem (&GicItsInfo, sizeof (CM_ARM_GIC_ITS_INFO));
+
+    Status = FdtGetNextPropNodeInBranch (
+               Fdt,
+               FdtBranch,
+               "msi-controller",
+               &GicItsNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      if (Status == EFI_NOT_FOUND) {
+        // Should have found the node.
+        Status = EFI_ABORTED;
+      }
+
+      return Status;
+    }
+
+    Status = GicItsIntcNodeParser (
+               Fdt,
+               GicItsNode,
+               Index,
+               &GicItsInfo
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      return Status;
+    }
+
+    // Add the CmObj to the Configuration Manager.
+    Status = AddSingleCmObj (
+               FdtParserHandle,
+               CREATE_CM_ARM_OBJECT_ID (EArmObjGicItsInfo),
+               &GicItsInfo,
+               sizeof (CM_ARM_GIC_ITS_INFO),
+               NULL
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT (0);
+      return Status;
+    }
+  } // for
+
   return Status;
 }

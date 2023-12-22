@@ -10,7 +10,7 @@
 
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
-#include "BootArch/ArmBootArchParser.h"
+#include "Arm/BootArch/ArmBootArchParser.h"
 
 /** List of "compatible" property values for Psci nodes.
 

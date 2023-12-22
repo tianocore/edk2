@@ -11,8 +11,8 @@
 
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"
-#include "Gic/ArmGicDispatcher.h"
-#include "Gic/ArmGicMsiFrameParser.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
+#include "Arm/Gic/ArmGicMsiFrameParser.h"
 
 /** List of "compatible" property values for Msi-frame nodes.
 

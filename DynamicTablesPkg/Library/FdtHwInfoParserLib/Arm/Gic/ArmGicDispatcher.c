@@ -10,12 +10,12 @@
 **/
 
 #include "FdtHwInfoParser.h"
-#include "Gic/ArmGicCParser.h"
-#include "Gic/ArmGicDispatcher.h"
-#include "Gic/ArmGicDParser.h"
-#include "Gic/ArmGicItsParser.h"
-#include "Gic/ArmGicMsiFrameParser.h"
-#include "Gic/ArmGicRParser.h"
+#include "Arm/Gic/ArmGicCParser.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
+#include "Arm/Gic/ArmGicDParser.h"
+#include "Arm/Gic/ArmGicItsParser.h"
+#include "Arm/Gic/ArmGicMsiFrameParser.h"
+#include "Arm/Gic/ArmGicRParser.h"
 
 /** List of "compatible" property values for GicV2 interrupt nodes.
 
