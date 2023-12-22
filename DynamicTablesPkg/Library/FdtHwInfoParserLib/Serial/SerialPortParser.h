@@ -1,5 +1,5 @@
 /** @file
-  Arm Serial Port Parser.
+  Serial Port Parser.
 
   Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -9,8 +9,8 @@
   - linux/Documentation/devicetree/bindings/serial/8250.txt
 **/
 
-#ifndef ARM_SERIAL_PORT_PARSER_H_
-#define ARM_SERIAL_PORT_PARSER_H_
+#ifndef SERIAL_PORT_PARSER_H_
+#define SERIAL_PORT_PARSER_H_
 
 /** SerialPort dispatcher.
 
@@ -44,4 +44,4 @@ SerialPortDispatcher (
   IN        INT32                      FdtBranch
   );
 
-#endif // ARM_SERIAL_PORT_PARSER_H_
+#endif // SERIAL_PORT_PARSER_H_

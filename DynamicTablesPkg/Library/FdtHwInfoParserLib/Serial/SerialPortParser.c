@@ -1,5 +1,5 @@
 /** @file
-  Arm Serial Port Parser.
+  Serial Port Parser.
 
   Copyright (c) 2021 - 2023, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -15,7 +15,7 @@
 
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"
-#include "Serial/ArmSerialPortParser.h"
+#include "Serial/SerialPortParser.h"
 
 /** List of "compatible" property values for serial port nodes.
 
@@ -329,7 +329,7 @@ GetSerialConsoleNode (
 STATIC
 EFI_STATUS
 EFIAPI
-ArmSerialPortInfoDispatch (
+SerialPortInfoDispatch (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN  CM_ARCH_SERIAL_PORT_INFO         *GenericSerialInfo,
   IN  INT32                            NodeCount,
@@ -396,7 +396,7 @@ ArmSerialPortInfoDispatch (
   @param [in]  FdtParserHandle A handle to the parser instance.
   @param [in]  FdtBranch       When searching for DT node name, restrict
                                the search to this Device Tree branch.
-  @param [in]  SerialObjectId  ArmNamespace Object ID for the serial port.
+  @param [in]  SerialObjectId  ArchNamespace Object ID for the serial port.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -407,7 +407,7 @@ ArmSerialPortInfoDispatch (
 STATIC
 EFI_STATUS
 EFIAPI
-ArmSerialPortInfoParser (
+SerialPortInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch,
   IN        EARCH_OBJECT_ID            SerialObjectId
@@ -435,7 +435,7 @@ ArmSerialPortInfoParser (
     return Status;
   }
 
-  Status = ArmSerialPortInfoDispatch (
+  Status = SerialPortInfoDispatch (
              FdtParserHandle,
              &SerialInfo,
              1,
@@ -528,7 +528,7 @@ SerialPortDispatcher (
     return Status;
   } else {
     // Parse the console serial-port.
-    Status = ArmSerialPortInfoParser (
+    Status = SerialPortInfoParser (
                FdtParserHandle,
                SerialConsoleNode,
                EArchObjSerialConsolePortInfo
@@ -586,7 +586,7 @@ SerialPortDispatcher (
       // The first serial-port node, not being the console serial-port,
       // will be the debug serial-port.
       SerialDebugNode = SerialNode;
-      Status          = ArmSerialPortInfoParser (
+      Status          = SerialPortInfoParser (
                           FdtParserHandle,
                           SerialDebugNode,
                           EArchObjSerialDebugPortInfo
@@ -616,7 +616,7 @@ SerialPortDispatcher (
   } // for
 
   if (GenericSerialIndex > 0) {
-    Status = ArmSerialPortInfoDispatch (
+    Status = SerialPortInfoDispatch (
                FdtParserHandle,
                GenericSerialInfo,
                GenericSerialIndex,
