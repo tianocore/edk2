@@ -8,7 +8,7 @@
 
 [Defines]
   INF_VERSION    = 0x00010019
-  BASE_NAME      = AcpiDbg2LibArm
+  BASE_NAME      = AcpiDbg2Lib
   FILE_GUID      = A17BA4F0-3DEB-4FE5-BD27-EC008E541B22
   VERSION_STRING = 1.0
   MODULE_TYPE    = DXE_DRIVER
@@ -19,16 +19,20 @@
 [Sources]
   Dbg2Generator.c
 
+[Packages.ARM, Packages.AARCH64]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  ArmPlatformPkg/ArmPlatformPkg.dec
   DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
+  PL011UartLib
 
 [LibraryClasses]
   BaseLib
-  PL011UartLib
   SsdtSerialPortFixupLib
 
 [FixedPcd]
@@ -36,8 +40,3 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
-
-[Protocols]
-
-[Guids]
-

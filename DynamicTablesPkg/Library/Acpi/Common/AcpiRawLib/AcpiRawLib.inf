@@ -8,7 +8,7 @@
 
 [Defines]
   INF_VERSION    = 0x00010019
-  BASE_NAME      = AcpiRawLibArm
+  BASE_NAME      = AcpiRawLib
   FILE_GUID      = 20F31568-D687-49BA-B326-CCD9D38EDE16
   VERSION_STRING = 1.0
   MODULE_TYPE    = DXE_DRIVER
@@ -27,10 +27,3 @@
 
 [LibraryClasses]
   BaseLib
-
-[Pcd]
-
-[Protocols]
-
-[Guids]
-
