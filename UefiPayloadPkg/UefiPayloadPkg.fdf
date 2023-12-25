@@ -161,7 +161,11 @@ INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
 INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 
-INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+!if $(TIMER_SUPPORT) == "HPET"
+  INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+!elseif $(TIMER_SUPPORT) == "LAPIC"
+  INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+!endif
 INF MdeModulePkg/Universal/Metronome/Metronome.inf
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
