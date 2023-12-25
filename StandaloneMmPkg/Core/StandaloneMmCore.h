@@ -177,7 +177,6 @@ typedef struct {
 extern MM_CORE_PRIVATE_DATA  *gMmCorePrivate;
 extern EFI_MM_SYSTEM_TABLE   gMmCoreMmst;
 extern LIST_ENTRY            gHandleList;
-extern EFI_PHYSICAL_ADDRESS  gLoadModuleAtFixAddressMmramBase;
 
 /**
   Called to initialize the memory service.
