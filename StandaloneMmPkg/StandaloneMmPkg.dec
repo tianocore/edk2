@@ -48,3 +48,8 @@
   gEfiStandaloneMmNonSecureBufferGuid      = { 0xf00497e3, 0xbfa2, 0x41a1, { 0x9d, 0x29, 0x54, 0xc2, 0xe9, 0x37, 0x21, 0xc5 }}
   gEfiArmTfCpuDriverEpDescriptorGuid       = { 0x6ecbd5a1, 0xc0f8, 0x4702, { 0x83, 0x01, 0x4f, 0xc2, 0xc5, 0x47, 0x0a, 0x51 }}
 
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## Maximum permitted encapsulation levels of sections in a firmware volume,
+  #  in the MM phase. Minimum value is 1. Sections nested more deeply are rejected.
+  # @Prompt Maximum permitted FwVol section nesting depth (exclusive) in MM.
+  gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth|0x10|UINT32|0x00000001

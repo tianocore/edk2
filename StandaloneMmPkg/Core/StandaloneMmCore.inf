@@ -76,6 +76,9 @@
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
 
+[Pcd]
+  gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
+
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC
 # sense. Such however is required for ARM family StandaloneMmCore
