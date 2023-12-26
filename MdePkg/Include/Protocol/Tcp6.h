@@ -192,12 +192,12 @@ typedef struct {
   BOOLEAN    EnableNagle;
   ///
   /// Set it to TRUE to enable TCP timestamps option as defined in
-  /// RFC1323. Set to FALSE to disable it.
+  /// RFC7323. Set to FALSE to disable it.
   ///
   BOOLEAN    EnableTimeStamp;
   ///
   /// Set it to TRUE to enable TCP window scale option as defined in
-  /// RFC1323. Set it to FALSE to disable it.
+  /// RFC7323. Set it to FALSE to disable it.
   ///
   BOOLEAN    EnableWindowScaling;
   ///
