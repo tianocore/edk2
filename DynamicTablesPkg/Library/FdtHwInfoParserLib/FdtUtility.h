@@ -455,4 +455,13 @@ FdtGetParentAddressInfo (
   OUT       INT32     *SizeCells       OPTIONAL
   );
 
+EFI_STATUS
+EFIAPI
+FdtGetIntcAddressCells (
+  IN  CONST VOID *Fdt,
+  IN        INT32 Node,
+  OUT       INT32 *AddressCells, OPTIONAL
+  OUT       INT32     *SizeCells       OPTIONAL
+  );
+
 #endif // FDT_UTILITY_H_

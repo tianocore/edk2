@@ -83,3 +83,32 @@ FdtGetInterruptFlags (
 
   return AcpiIrqFlags;
 }
+
+/** Get the Address cell info of the INTC node
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  Node             Offset of the node having to get the
+                                "#address-cells" and "#size-cells"
+                                properties from.
+  @param [out] AddressCells     If success, number of address-cells.
+                                If the property is not available,
+                                default value is 2.
+  @param [out] SizeCells        If success, number of size-cells.
+                                If the property is not available,
+                                default value is 1.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_ABORTED             An error occurred.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetIntcAddressCells (
+  IN  CONST VOID *Fdt,
+  IN        INT32 Node,
+  OUT       INT32 *AddressCells, OPTIONAL
+  OUT       INT32 *SizeCells     OPTIONAL
+  )
+{
+  return FdtGetAddressInfo (Fdt, Node, AddressCells, SizeCells);
+}

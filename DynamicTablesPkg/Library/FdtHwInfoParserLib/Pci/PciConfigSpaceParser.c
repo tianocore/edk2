@@ -365,7 +365,7 @@ ParseIrqMap (
   }
 
   // Get the "address-cells" property of the IntcNode.
-  Status = FdtGetAddressInfo (Fdt, IntcNode, &IntcAddressCells, NULL);
+  Status = FdtGetIntcAddressCells (Fdt, IntcNode, &IntcAddressCells, NULL);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
