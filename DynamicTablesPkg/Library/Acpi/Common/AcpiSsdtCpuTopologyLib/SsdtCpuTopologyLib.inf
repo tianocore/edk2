@@ -16,6 +16,9 @@
   CONSTRUCTOR    = AcpiSsdtCpuTopologyLibConstructor
   DESTRUCTOR     = AcpiSsdtCpuTopologyLibDestructor
 
+[Sources.ARM, Sources.AARCH64]
+  ArmSsdtCpuTopologyGenerator.c
+
 [Sources]
   SsdtCpuTopologyGenerator.c
   SsdtCpuTopologyGenerator.h

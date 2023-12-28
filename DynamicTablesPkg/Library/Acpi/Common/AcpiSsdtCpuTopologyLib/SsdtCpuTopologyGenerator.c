@@ -32,26 +32,16 @@
 
 #include "SsdtCpuTopologyGenerator.h"
 
-/** ARM standard SSDT Cpu Topology Table Generator.
+/** SSDT Cpu Topology Table Generator.
 
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArchObjGicCInfo
   - EArchObjProcHierarchyInfo (OPTIONAL) along with
   - EArchObjCmRef (OPTIONAL)
   - EArchObjLpiInfo (OPTIONAL)
   - GetEArchObjEtInfo (OPTIONAL)
 */
-
-/** This macro expands to a function that retrieves the GIC
-    CPU interface Information from the Configuration Manager.
-*/
-GET_OBJECT_LIST (
-  EObjNameSpaceArch,
-  EArchObjGicCInfo,
-  CM_ARCH_GICC_INFO
-  );
 
 /**
   This macro expands to a function that retrieves the Processor Hierarchy
@@ -301,7 +291,7 @@ WriteAslName (
   @param [in]  Generator              The SSDT Cpu Topology generator.
   @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
                                       Protocol Interface.
-  @param [in]  GicCInfo               Pointer to the CM_ARCH_GICC_INFO object
+  @param [in]  CpcToken               CPC token of the INTC info
                                       describing the Cpu.
   @param [in]  Node                   CPU Node to which the _CPC node is
                                       attached.
@@ -310,22 +300,21 @@ WriteAslName (
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 CreateAmlCpcNode (
   IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN  CM_ARCH_GICC_INFO                                    *GicCInfo,
+  IN  CM_OBJECT_TOKEN                                     CpcToken,
   IN  AML_OBJECT_NODE_HANDLE                              *Node
   )
 {
-  EFI_STATUS       Status;
+  EFI_STATUS        Status;
   CM_ARCH_CPC_INFO  *CpcInfo;
 
   Status = GetEArchObjCpcInfo (
              CfgMgrProtocol,
-             GicCInfo->CpcToken,
+             CpcToken,
              &CpcInfo,
              NULL
              );
@@ -357,11 +346,11 @@ CreateAmlCpcNode (
   ETE has a system register interface and therefore does not need
   the MMIO range to be described.
 
-  @param [in]  Generator    The SSDT Cpu Topology generator.
-  @param [in]  ParentNode   Parent node to attach the Cpu node to.
-  @param [in]  GicCInfo     CM_ARCH_GICC_INFO object used to create the node.
-  @param [in]  CpuName      Value used to generate the node name.
-  @param [out] EtNodePtr   If not NULL, return the created Cpu node.
+  @param [in]  Generator            The SSDT Cpu Topology generator.
+  @param [in]  ParentNode           Parent node to attach the Cpu node to.
+  @param [in]  AcpiProcessorUid     ACPI Processor UID of the CPU.
+  @param [in]  CpuName              Value used to generate the node name.
+  @param [out] EtNodePtr            If not NULL, return the created Cpu node.
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -373,7 +362,7 @@ EFIAPI
 CreateAmlEtd (
   IN   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
   IN   AML_NODE_HANDLE              ParentNode,
-  IN   CM_ARCH_GICC_INFO             *GicCInfo,
+  IN   UINT32                       AcpiProcessorUid,
   IN   UINT32                       CpuName,
   OUT  AML_OBJECT_NODE_HANDLE       *EtNodePtr OPTIONAL
   )
@@ -399,7 +388,7 @@ CreateAmlEtd (
 
   Status = AmlCodeGenNameInteger (
              "_UID",
-             GicCInfo->AcpiProcessorUid,
+             AcpiProcessorUid,
              EtNode,
              NULL
              );
@@ -432,34 +421,33 @@ CreateAmlEtd (
   @param [in]  Generator              The SSDT Cpu Topology generator.
   @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
                                       Protocol Interface.
-  @param [in]  GicCInfo               Pointer to the CM_ARCH_GICC_INFO object
-                                      describing the Cpu.
+  @param [in]  AcpiProcessorUid       ACPI processor Uid of the local interrupt
+                                      controller describing the Cpu.
+  @param [in]  EtToken                EtToken of the CPU node name.
   @param [in]  CpuName                Value used to generate the CPU node name.
   @param [in]  Node                   CPU Node to which the ET device node is
                                       attached.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_UNSUPPORTED         Feature Unsupported.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 CreateAmlEtNode (
   IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN  CM_ARCH_GICC_INFO                                   *GicCInfo,
-  IN        UINT32                                        CpuName,
+  IN  UINT32                                              AcpiProcessorUid,
+  IN  CM_OBJECT_TOKEN                                     EtToken,
+  IN  UINT32                                              CpuName,
   IN  AML_OBJECT_NODE_HANDLE                              *Node
   )
 {
-  EFI_STATUS      Status;
+  EFI_STATUS       Status;
   CM_ARCH_ET_INFO  *EtInfo;
 
   Status = GetEArchObjEtInfo (
              CfgMgrProtocol,
-             GicCInfo->EtToken,
+             EtToken,
              &EtInfo,
              NULL
              );
@@ -476,7 +464,7 @@ CreateAmlEtNode (
   Status = CreateAmlEtd (
              Generator,
              Node,
-             GicCInfo,
+             AcpiProcessorUid,
              CpuName,
              NULL
              );
@@ -708,23 +696,22 @@ GenerateLpiStates (
       Name (_HID, "ACPI0007")
   }
 
-  @param [in]  Generator    The SSDT Cpu Topology generator.
-  @param [in]  ParentNode   Parent node to attach the Cpu node to.
-  @param [in]  GicCInfo     CM_ARCH_GICC_INFO object used to create the node.
-  @param [in]  CpuName      Value used to generate the node name.
-  @param [out] CpuNodePtr   If not NULL, return the created Cpu node.
+  @param [in]  Generator         The SSDT Cpu Topology generator.
+  @param [in]  ParentNode        Parent node to attach the Cpu node to.
+  @param [in]  AcpiProcessorUid  ACPI processor UID of the CPU.
+  @param [in]  CpuName           Value used to generate the node name.
+  @param [out] CpuNodePtr        If not NULL, return the created Cpu node.
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 CreateAmlCpu (
   IN   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
   IN   AML_NODE_HANDLE              ParentNode,
-  IN   CM_ARCH_GICC_INFO            *GicCInfo,
+  IN   UINT32                       AcpiProcessorUid,
   IN   UINT32                       CpuName,
   OUT  AML_OBJECT_NODE_HANDLE       *CpuNodePtr OPTIONAL
   )
@@ -735,7 +722,6 @@ CreateAmlCpu (
 
   ASSERT (Generator != NULL);
   ASSERT (ParentNode != NULL);
-  ASSERT (GicCInfo != NULL);
 
   Status = WriteAslName ('C', CpuName, AslName);
   if (EFI_ERROR (Status)) {
@@ -751,7 +737,7 @@ CreateAmlCpu (
 
   Status = AmlCodeGenNameInteger (
              "_UID",
-             GicCInfo->AcpiProcessorUid,
+             AcpiProcessorUid,
              CpuNode,
              NULL
              );
@@ -806,8 +792,9 @@ CreateAmlCpuFromProcHierarchy (
   )
 {
   EFI_STATUS              Status;
-  CM_ARCH_GICC_INFO       *GicCInfo;
   AML_OBJECT_NODE_HANDLE  CpuNode;
+  UINT32                  AcpiProcessorUid;
+  CM_OBJECT_TOKEN         CpcToken, EtToken;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -815,18 +802,19 @@ CreateAmlCpuFromProcHierarchy (
   ASSERT (ProcHierarchyNodeInfo != NULL);
   ASSERT (ProcHierarchyNodeInfo->GicCToken != CM_NULL_TOKEN);
 
-  Status = GetEArchObjGicCInfo (
+  Status = GetIntCUidTokens (
              CfgMgrProtocol,
              ProcHierarchyNodeInfo->GicCToken,
-             &GicCInfo,
-             NULL
+             &AcpiProcessorUid,
+             &CpcToken,
+             &EtToken
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
   }
 
-  Status = CreateAmlCpu (Generator, ParentNode, GicCInfo, CpuName, &CpuNode);
+  Status = CreateAmlCpu (Generator, ParentNode, AcpiProcessorUid, CpuName, &CpuNode);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -843,9 +831,9 @@ CreateAmlCpuFromProcHierarchy (
   }
 
   // If a CPC info is associated with the
-  // GicCinfo, create an _CPC method returning them.
-  if (GicCInfo->CpcToken != CM_NULL_TOKEN) {
-    Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, GicCInfo, CpuNode);
+  // IntcInfo, create an _CPC method returning them.
+  if (CpcToken != CM_NULL_TOKEN) {
+    Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, CpcToken, CpuNode);
     if (EFI_ERROR (Status)) {
       ASSERT_EFI_ERROR (Status);
       return Status;
@@ -853,11 +841,12 @@ CreateAmlCpuFromProcHierarchy (
   }
 
   // Add an Embedded Trace node if present.
-  if (GicCInfo->EtToken != CM_NULL_TOKEN) {
+  if (EtToken != CM_NULL_TOKEN) {
     Status = CreateAmlEtNode (
                Generator,
                CfgMgrProtocol,
-               GicCInfo,
+               AcpiProcessorUid,
+               EtToken,
                CpuName,
                CpuNode
                );
@@ -892,7 +881,8 @@ CreateAmlCpuFromProcHierarchy (
                                       container node to.
   @param [in]  ProcHierarchyNodeInfo  CM_ARCH_PROC_HIERARCHY_INFO object used
                                       to create the node.
-  @param [in]  ProcContainerIndex     Index used to generate the node name.
+  @param [in]  ProcContainerName      Node name.
+  @param [in]  ProcContainerUid       UID of the processor container node.
   @param [out] ProcContainerNodePtr   If success, contains the created processor
                                       container node.
 
@@ -1241,92 +1231,6 @@ exit_handler:
   return Status;
 }
 
-/** Create the processor hierarchy AML tree from CM_ARCH_GICC_INFO
-    CM objects.
-
-  A processor container is by extension any non-leave device in the cpu topology.
-
-  @param [in] Generator        The SSDT Cpu Topology generator.
-  @param [in] CfgMgrProtocol   Pointer to the Configuration Manager
-                               Protocol Interface.
-  @param [in] ScopeNode        Scope node handle ('\_SB' scope).
-
-  @retval EFI_SUCCESS             Success.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-CreateTopologyFromGicC (
-  IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN        AML_OBJECT_NODE_HANDLE                        ScopeNode
-  )
-{
-  EFI_STATUS              Status;
-  CM_ARCH_GICC_INFO        *GicCInfo;
-  UINT32                  GicCInfoCount;
-  UINT32                  Index;
-  AML_OBJECT_NODE_HANDLE  CpuNode;
-
-  ASSERT (Generator != NULL);
-  ASSERT (CfgMgrProtocol != NULL);
-  ASSERT (ScopeNode != NULL);
-
-  Status = GetEArchObjGicCInfo (
-             CfgMgrProtocol,
-             CM_NULL_TOKEN,
-             &GicCInfo,
-             &GicCInfoCount
-             );
-  if (EFI_ERROR (Status)) {
-    ASSERT (0);
-    return Status;
-  }
-
-  // For each CM_ARCH_GICC_INFO object, create an AML node.
-  for (Index = 0; Index < GicCInfoCount; Index++) {
-    Status = CreateAmlCpu (
-               Generator,
-               ScopeNode,
-               &GicCInfo[Index],
-               Index,
-               &CpuNode
-               );
-    if (EFI_ERROR (Status)) {
-      ASSERT (0);
-      break;
-    }
-
-    // If a CPC info is associated with the
-    // GicCinfo, create an _CPC method returning them.
-    if (GicCInfo[Index].CpcToken != CM_NULL_TOKEN) {
-      Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, &GicCInfo[Index], CpuNode);
-      if (EFI_ERROR (Status)) {
-        ASSERT_EFI_ERROR (Status);
-        break;
-      }
-    }
-
-    if (GicCInfo[Index].EtToken != CM_NULL_TOKEN) {
-      Status = CreateAmlEtNode (
-                 Generator,
-                 CfgMgrProtocol,
-                 &GicCInfo[Index],
-                 Index,
-                 CpuNode
-                 );
-      if (EFI_ERROR (Status)) {
-        ASSERT_EFI_ERROR (Status);
-        return Status;
-      }
-    }
-  } // for
-
-  return Status;
-}
-
 /** Construct the SSDT Cpu Topology ACPI table.
 
   This function invokes the Configuration Manager protocol interface
@@ -1407,7 +1311,7 @@ BuildSsdtCpuTopologyTable (
   if (Status == EFI_NOT_FOUND) {
     // If hierarchy information is not found generate a flat topology
     // using CM_ARCH_GICC_INFO objects.
-    Status = CreateTopologyFromGicC (
+    Status = CreateTopologyFromIntC (
                Generator,
                CfgMgrProtocol,
                ScopeNode

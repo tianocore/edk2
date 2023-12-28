@@ -144,4 +144,52 @@ typedef struct AcpiCpuTopologyGenerator {
 
 #pragma pack()
 
+EFI_STATUS
+EFIAPI
+GetIntCUidTokens (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CM_OBJECT_TOKEN                                     IntCToken,
+  OUT UINT32                                              *AcpiProcessorUid,
+  OUT CM_OBJECT_TOKEN                                     *CpcToken,
+  OUT CM_OBJECT_TOKEN                                     *EtToken
+  );
+
+EFI_STATUS
+EFIAPI
+CreateAmlEtNode (
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  UINT32                                              AcpiProcessorUid,
+  IN  CM_OBJECT_TOKEN                                     EtToken,
+  IN  UINT32                                              CpuName,
+  IN  AML_OBJECT_NODE_HANDLE                              *Node
+  );
+
+EFI_STATUS
+EFIAPI
+CreateAmlCpcNode (
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CM_OBJECT_TOKEN                                     CpcToken,
+  IN  AML_OBJECT_NODE_HANDLE                              *Node
+  );
+
+EFI_STATUS
+EFIAPI
+CreateAmlCpu (
+  IN   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
+  IN   AML_NODE_HANDLE              ParentNode,
+  IN   UINT32                       Uid,
+  IN   UINT32                       CpuName,
+  OUT  AML_OBJECT_NODE_HANDLE       *CpuNodePtr OPTIONAL
+  );
+
+EFI_STATUS
+EFIAPI
+CreateTopologyFromIntC (
+  IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN        AML_OBJECT_NODE_HANDLE                        ScopeNode
+  );
+
 #endif // SSDT_CPU_TOPOLOGY_GENERATOR_H_
