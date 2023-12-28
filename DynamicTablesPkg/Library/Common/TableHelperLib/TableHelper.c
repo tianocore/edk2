@@ -161,20 +161,16 @@ AddAcpiHeader (
   CopyMem (AcpiHeader->OemId, CfgMfrInfo->OemId, sizeof (AcpiHeader->OemId));
 
   // UINT64  OemTableId
-  if (AcpiTableInfo->OemTableId != 0) {
-    AcpiHeader->OemTableId = AcpiTableInfo->OemTableId;
-  } else {
-    AcpiHeader->OemTableId = SIGNATURE_32 (
-                               CfgMfrInfo->OemId[0],
-                               CfgMfrInfo->OemId[1],
-                               CfgMfrInfo->OemId[2],
-                               CfgMfrInfo->OemId[3]
-                               ) |
-                             LShiftU64 (
-                               (UINT64)Generator->AcpiTableSignature,
-                               32
-                               );
-  }
+  AcpiHeader->OemTableId = SIGNATURE_32 (
+                             CfgMfrInfo->OemId[0],
+                             CfgMfrInfo->OemId[1],
+                             CfgMfrInfo->OemId[2],
+                             CfgMfrInfo->OemId[3]
+                             ) |
+                           LShiftU64 (
+                             (UINT64)Generator->AcpiTableSignature,
+                             32
+                             );
 
   // UINT32  OemRevision
   if (AcpiTableInfo->OemRevision != 0) {
