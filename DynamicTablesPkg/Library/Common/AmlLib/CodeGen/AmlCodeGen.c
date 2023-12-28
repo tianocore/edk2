@@ -95,6 +95,7 @@ AmlCodeGenDefinitionBlock (
   IN  CONST CHAR8          *OemId,
   IN  CONST CHAR8          *OemTableId,
   IN        UINT32         OemRevision,
+  IN  CONST CHAR8          *CreatorId,
   OUT       AML_ROOT_NODE  **NewRootNode
   )
 {
@@ -115,8 +116,8 @@ AmlCodeGenDefinitionBlock (
   AcpiHeader.Revision = 2;
   CopyMem (&AcpiHeader.OemId, OemId, 6);
   CopyMem (&AcpiHeader.OemTableId, OemTableId, 8);
+  CopyMem (&AcpiHeader.CreatorId, CreatorId, 4);
   AcpiHeader.OemRevision     = OemRevision;
-  AcpiHeader.CreatorId       = TABLE_GENERATOR_CREATOR_ID_ARM;
   AcpiHeader.CreatorRevision = CREATE_REVISION (1, 0);
 
   Status = AmlCreateRootNode (&AcpiHeader, NewRootNode);

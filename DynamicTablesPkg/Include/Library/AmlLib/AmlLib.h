@@ -1061,6 +1061,7 @@ AmlCodeGenDefinitionBlock (
   IN  CONST CHAR8                 *OemId,
   IN  CONST CHAR8                 *OemTableId,
   IN        UINT32                OemRevision,
+  IN  CONST CHAR8                 *CreatorId,
   OUT       AML_ROOT_NODE_HANDLE  *NewRootNode
   );
 

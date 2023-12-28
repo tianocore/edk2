@@ -180,7 +180,12 @@ AddAcpiHeader (
   }
 
   // UINT32  CreatorId
-  AcpiHeader->CreatorId = Generator->CreatorId;
+  AcpiHeader->CreatorId = SIGNATURE_32 (
+                            CfgMfrInfo->CreatorId[0],
+                            CfgMfrInfo->CreatorId[1],
+                            CfgMfrInfo->CreatorId[2],
+                            CfgMfrInfo->CreatorId[3]
+                            );
   // UINT32  CreatorRevision
   AcpiHeader->CreatorRevision = Generator->CreatorRevision;
 
@@ -270,6 +275,7 @@ AddSsdtAcpiHeader (
              (CONST CHAR8 *)&CfgMfrInfo->OemId,
              (CONST CHAR8 *)&OemTableId,
              OemRevision,
+             (CONST CHAR8 *)&CfgMfrInfo->CreatorId,
              RootNode
              );
   ASSERT_EFI_ERROR (Status);

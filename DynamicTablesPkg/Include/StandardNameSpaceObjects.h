@@ -60,6 +60,7 @@ typedef struct CmStdObjConfigurationManagerInfo {
       populate the ACPI table header information.
   */
   UINT8     OemId[6];
+  UINT8     CreatorId[4];
 } CM_STD_OBJ_CONFIGURATION_MANAGER_INFO;
 
 /** A structure used to describe the ACPI table generators to be invoked.
