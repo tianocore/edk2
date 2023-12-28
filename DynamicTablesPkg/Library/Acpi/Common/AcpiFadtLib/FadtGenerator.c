@@ -19,14 +19,14 @@
 #include <ConfigurationManagerHelper.h>
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
+#include "FadtGenerator.h"
 
-/** ARM standard FADT Generator
+/** Standard FADT Generator
 
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
   - EArchObjPowerManagementProfileInfo
-  - EArchObjBootArchInfo
   - EArchObjHypervisorVendorIdentity (OPTIONAL)
 */
 
@@ -165,7 +165,7 @@ EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
   // UINT8      ResetValue
   0,
   // UINT16     ArmBootArch
-  EFI_ACPI_6_5_ARM_PSCI_COMPLIANT,  // {Template}: ARM Boot Architecture Flags
+  0,  // {Template}: ARM Boot Architecture Flags
   // UINT8      MinorRevision
   EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION, // {Template}
   // UINT64     XFirmwareCtrl
@@ -205,15 +205,6 @@ GET_OBJECT_LIST (
   EObjNameSpaceArch,
   EArchObjPowerManagementProfileInfo,
   CM_ARCH_POWER_MANAGEMENT_PROFILE_INFO
-  );
-
-/** This macro expands to a function that retrieves the Boot
-    Architecture Information from the Configuration Manager.
-*/
-GET_OBJECT_LIST (
-  EObjNameSpaceArch,
-  EArchObjBootArchInfo,
-  CM_ARCH_BOOT_ARCH_INFO
   );
 
 /** This macro expands to a function that retrieves the Hypervisor
@@ -282,58 +273,6 @@ FadtAddPmProfileInfo (
     ));
 
   AcpiFadt.PreferredPmProfile = PmProfile->PowerManagementProfile;
-
-error_handler:
-  return Status;
-}
-
-/** Updates the Boot Architecture information in the FADT Table.
-
-  @param [in]  CfgMgrProtocol Pointer to the Configuration Manager
-                              Protocol Interface.
-
-  @retval EFI_SUCCESS           Success.
-  @retval EFI_INVALID_PARAMETER A parameter is invalid.
-  @retval EFI_NOT_FOUND         The required object was not found.
-  @retval EFI_BAD_BUFFER_SIZE   The size returned by the Configuration
-                                Manager is less than the Object size for the
-                                requested object.
-**/
-STATIC
-EFI_STATUS
-EFIAPI
-FadtAddBootArchInfo (
-  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
-  )
-{
-  EFI_STATUS             Status;
-  CM_ARCH_BOOT_ARCH_INFO  *BootArchInfo;
-
-  ASSERT (CfgMgrProtocol != NULL);
-
-  // Get the Boot Architecture flags from the Platform Configuration Manager
-  Status = GetEArchObjBootArchInfo (
-             CfgMgrProtocol,
-             CM_NULL_TOKEN,
-             &BootArchInfo,
-             NULL
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: FADT: Failed to get Boot Architecture flags. Status = %r\n",
-      Status
-      ));
-    goto error_handler;
-  }
-
-  DEBUG ((
-    DEBUG_INFO,
-    "FADT BootArchFlag = 0x%x\n",
-    BootArchInfo->BootArchFlags
-    ));
-
-  AcpiFadt.ArmBootArch = BootArchInfo->BootArchFlags;
 
 error_handler:
   return Status;
@@ -577,8 +516,8 @@ BuildFadtTable (
     goto error_handler;
   }
 
-  // Update BootArch Info
-  Status = FadtAddBootArchInfo (CfgMgrProtocol);
+  // Update Arch specific Info
+  Status = FadtAddArchInfo (CfgMgrProtocol, &AcpiFadt);
   if (EFI_ERROR (Status)) {
     goto error_handler;
   }

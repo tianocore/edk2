@@ -49,8 +49,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 PsciNodeParser (
-  IN  CONST VOID                   *Fdt,
-  IN        INT32                  PsciNode,
+  IN  CONST VOID                    *Fdt,
+  IN        INT32                   PsciNode,
   IN        CM_ARCH_BOOT_ARCH_INFO  *BootArchInfo
   )
 {
@@ -115,8 +115,8 @@ ArmBootArchInfoParser (
   IN        INT32                      FdtBranch
   )
 {
-  EFI_STATUS             Status;
-  INT32                  PsciNode;
+  EFI_STATUS              Status;
+  INT32                   PsciNode;
   CM_ARCH_BOOT_ARCH_INFO  BootArchInfo;
 
   if (FdtParserHandle == NULL) {
