@@ -357,6 +357,21 @@ RedfishRestExDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
 {
+  EFI_STATUS  Status;
+  UINT32      *Id;
+
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gEfiCallerIdGuid,
+                  (VOID **)&Id,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (!EFI_ERROR (Status)) {
+    return EFI_ALREADY_STARTED;
+  }
+
   //
   // Test for the HttpServiceBinding Protocol.
   //
