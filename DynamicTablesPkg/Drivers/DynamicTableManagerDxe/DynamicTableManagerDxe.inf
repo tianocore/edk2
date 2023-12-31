@@ -22,6 +22,10 @@
 
 [Sources]
   DynamicTableManagerDxe.c
+  DynamicTableManagerDxe.h
+
+[Sources.ARM, Sources.AARCH64]
+  ArmDynamicTableManagerDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
