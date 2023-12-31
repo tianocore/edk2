@@ -282,7 +282,7 @@ FindCbMemTable (
   for (Idx = 0; Idx < Root->num_entries; Idx++) {
     if (Entries[Idx].id == TableId) {
       if (IsImdEntry) {
-        *MemTable = (VOID *)((UINTN)Entries[Idx].start + (UINTN)Root);
+        *MemTable = (VOID *)((INTN)(INT32)Entries[Idx].start + (UINTN)Root);
       } else {
         *MemTable = (VOID *)(UINTN)Entries[Idx].start;
       }
