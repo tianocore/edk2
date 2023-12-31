@@ -49,6 +49,7 @@
   Ia32/MathModU64x64.c      | GCC
 [Sources.X64]
   CopyMem.c
+  MathDiv.c                 | GCC
 [Sources.RISCV64]
   CopyMem.c
 
