@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Cpu.h>
 #include <Protocol/Timer.h>
 
+#include <Register/Cpuid.h>
 #include <Register/LocalApic.h>
 
 #include <Library/UefiBootServicesTableLib.h>

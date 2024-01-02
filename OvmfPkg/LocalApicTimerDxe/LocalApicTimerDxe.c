@@ -169,6 +169,8 @@ TimerDriverSetTimerPeriod (
   UINT64  TimerCount;
   UINT32  TimerFrequency;
   UINT32  DivideValue = 1;
+  UINT32  RegEbx;
+  UINT32  RegEcx;
 
   if (TimerPeriod == 0) {
     //
@@ -176,7 +178,21 @@ TimerDriverSetTimerPeriod (
     //
     DisableApicTimerInterrupt ();
   } else {
-    TimerFrequency = PcdGet32 (PcdFSBClock) / (UINT32)DivideValue;
+    //
+    // Use CPUID leaf 0x15 Time Stamp Counter and Nominal Core Crystal Clock Information
+    // EBX returns 0 if not supported. ECX, if non zero, provides Core Xtal Frequency in hertz.
+    //
+    AsmCpuid (CPUID_TIME_STAMP_COUNTER, NULL, &RegEbx, &RegEcx, NULL);
+
+    //
+    // If EBX or ECX returns 0, the Core XTAL Frequency is not enumerated.
+    // Use the value from PcdFSBClock
+    //
+    if ((RegEbx == 0) || (RegEcx == 0)) {
+      TimerFrequency = PcdGet32 (PcdFSBClock) / (UINT32)DivideValue;
+    } else {
+      TimerFrequency = RegEcx / (UINT32)DivideValue;
+    }
 
     //
     // Convert TimerPeriod into local APIC counts
