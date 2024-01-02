@@ -19,6 +19,16 @@
 #pragma pack(1)
 
 ///
+/// _PSD Revision for ACPI 6.5
+///
+#define EFI_ACPI_6_5_AML_PSD_REVISION  0
+
+///
+/// _CPC Revision for ACPI 6.5
+///
+#define EFI_ACPI_6_5_AML_CPC_REVISION  3
+
+///
 /// ACPI 6.5 Generic Address Space definition
 ///
 typedef struct {
