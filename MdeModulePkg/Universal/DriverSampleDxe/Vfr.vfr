@@ -513,6 +513,16 @@ formset
             default = 18,
     endnumeric;
 
+    numeric varid   = MyIfrNVData.QuestionApply,
+            questionid = 0x1253,
+            prompt  = STRING_TOKEN(STR_QUESTION_APPLY_TEST_PROMPT),
+            help    = STRING_TOKEN(STR_QUESTION_APPLY_TEST_HELP),
+            flags   = INTERACTIVE,
+            minimum = 0,
+            maximum = 255,
+            default = 19,
+    endnumeric;
+
     text
       help  = STRING_TOKEN(STR_POPUP_TEST_HELP),
       text  = STRING_TOKEN(STR_POPUP_TEST_PROMPT),
