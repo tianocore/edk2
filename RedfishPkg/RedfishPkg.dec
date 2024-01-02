@@ -69,6 +69,11 @@
   #
   RedfishPlatformConfigLib|Include/Library/RedfishPlatformConfigLib.h
 
+  ##  @libraryclass  Provides the library functions to access Redfish HTTP
+  #   protocol.
+  #
+  RedfishHttpLib|Include/Library/RedfishHttpLib.h
+
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides the private C runtime library functions.
   #   CRT library is currently used by edk2 JsonLib (open source
