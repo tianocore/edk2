@@ -148,7 +148,7 @@ FixupIds (
   CONST CHAR8             *NonBsaHid;
 
   // Get the _CID and _HID value to write.
-  switch (SerialPortInfo->PortSubtype) {
+  switch (SerialPortInfo->PortSubtype + 1) {
     case EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_FULL_16550:
     case EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS:
     {
