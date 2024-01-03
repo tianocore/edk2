@@ -138,9 +138,12 @@ EFI_STATUS
   @retval EFI_SUCCESS           The results have been distributed or are
                                 awaiting distribution.
 
-  @retval EFI_OUT_OF_RESOURCES  The ResultsDataSize specified
+  @retval EFI_BUFFER_TOO_SMALL  The ResultsDataSize specified
                                 was too small to contain the
                                 results data.
+
+  @retval EFI_UNSUPPORTED       Uncommitted browser state is not available
+                                at the current stage of execution.
 
 **/
 typedef
