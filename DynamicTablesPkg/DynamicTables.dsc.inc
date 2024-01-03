@@ -27,7 +27,7 @@
   #
   DynamicTablesPkg/Drivers/DynamicTableManagerDxe/DynamicTableManagerDxe.inf
 
-[Components.X64]
+[Components.IA32, Components.X64]
   #
   # Dynamic Table Factory Dxe
   #
