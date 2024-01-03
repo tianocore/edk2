@@ -2,6 +2,7 @@
   Table Helper
 
   Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -14,6 +15,7 @@
 // Module specific include files.
 #include <AcpiTableGenerator.h>
 #include <ConfigurationManagerObject.h>
+#include <Library/AmlLib/AmlLib.h>
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 

@@ -2,6 +2,7 @@
   Dynamic Platform Info Repository
 
   Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -287,8 +288,8 @@ GroupCmObjNodes (
 
   CmObjDesc           = &This->ArmCmObjArray[ArmObjIndex];
   CmObjDesc->ObjectId = CmObjId;
-  CmObjDesc->Size     = Size;
-  CmObjDesc->Count    = Count;
+  CmObjDesc->Size     = (UINT32)Size;
+  CmObjDesc->Count    = (UINT32)Count;
   CmObjDesc->Data     = GroupedData;
 
   return Status;
@@ -340,7 +341,7 @@ DynamicPlatRepoFinalise (
   //    (the array is wrapped in a CmObjDesc).
   //  - Add the Token/CmObj binding to the token mapper.
   for (ArmObjIndex = 0; ArmObjIndex < EArmObjMax; ArmObjIndex++) {
-    Status = GroupCmObjNodes (This, ArmObjIndex);
+    Status = GroupCmObjNodes (This, (UINT32)ArmObjIndex);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       // Free the TokenMapper.
