@@ -65,8 +65,11 @@
   RiscV/Cpu.S
 
 [Sources.LOONGARCH64]
-  LoongArch/CpuFlushTlb.S | GCC
-  LoongArch/CpuSleep.S    | GCC
+  LoongArch/CpuFlushTlb.S   | GCC
+  LoongArch/CpuSleep.S      | GCC
+  LoongArch/InitializeFpu.S | GCC
+  LoongArch/EnableFpu.S     | GCC
+  LoongArch/DisableFpu.S    | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
