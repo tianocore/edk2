@@ -2405,6 +2405,8 @@
   # Configurability to override RISC-V CPU Features
   # BIT 0 = Cache Management Operations. This bit is relevant only if
   # previous stage has feature enabled and user wants to disable it.
+  # BIT 1 = Supervisor Time Compare (Sstc). This bit is relevant only if
+  # previous stage has feature enabled and user wants to disable it.
   #
   gEfiMdePkgTokenSpaceGuid.PcdRiscVFeatureOverride|0xFFFFFFFFFFFFFFFF|UINT64|0x69
 
