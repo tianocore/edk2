@@ -1506,8 +1506,8 @@ WifiMgrOnTimerTick (
   }
 
   Nic->ScanTickTime++;
-  if (((Nic->ScanTickTime > WIFI_SCAN_FREQUENCY) || Nic->OneTimeScanRequest) &&
-      (Nic->ScanState == WifiMgrScanFinished))
+  if ((((Nic->ScanTickTime > WIFI_SCAN_FREQUENCY) && (Nic->ConnectState != WifiMgrConnectedToAp)) ||
+       Nic->OneTimeScanRequest) && (Nic->ScanState == WifiMgrScanFinished))
   {
     Nic->OneTimeScanRequest = FALSE;
     Nic->ScanTickTime       = 0;
