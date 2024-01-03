@@ -170,7 +170,10 @@ AddAcpiHeader (
                                CfgMfrInfo->OemId[2],
                                CfgMfrInfo->OemId[3]
                                ) |
-                             ((UINT64)Generator->AcpiTableSignature << 32);
+                             LShiftU64 (
+                               (UINT64)Generator->AcpiTableSignature,
+                               32
+                               );
   }
 
   // UINT32  OemRevision
@@ -257,7 +260,7 @@ AddSsdtAcpiHeader (
                    CfgMfrInfo->OemId[2],
                    CfgMfrInfo->OemId[3]
                    ) |
-                 ((UINT64)Generator->AcpiTableSignature << 32);
+                 LShiftU64 ((UINT64)Generator->AcpiTableSignature, 32);
   }
 
   if (AcpiTableInfo->OemRevision != 0) {
