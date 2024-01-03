@@ -239,9 +239,7 @@ ValidateFvHeader (
   VariableStoreHeader = (VARIABLE_STORE_HEADER *)((UINTN)FwVolHeader + FwVolHeader->HeaderLength);
 
   // Check the Variable Store Guid
-  if (!CompareGuid (&VariableStoreHeader->Signature, &gEfiVariableGuid) &&
-      !CompareGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid))
-  {
+  if (!CompareGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid)) {
     DEBUG ((
       DEBUG_INFO,
       "%a: Variable Store Guid non-compatible\n",
