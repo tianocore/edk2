@@ -189,6 +189,20 @@
 [PcdsDynamicHii]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5
 
+  #
+  #  Dynamic Hii PCD to select ACPI/DT boot.
+  #
+  #   1. Check the status of the 'ForceNoAcpi' variable
+  #      setvar ForceNoAcpi -guid "50BEA1E5-A2C5-46E9-9B3A-59596516B00A" -nv -bs
+  #        Value 00 indicates ACPI boot
+  #        Value 01 indicates DT boot
+  #   2. Set the boot mode to ACPI
+  #      setvar ForceNoAcpi -guid "50BEA1E5-A2C5-46E9-9B3A-59596516B00A" -nv -bs =0x00
+  #   3. Set the boot mode to DT
+  #      setvar ForceNoAcpi -guid "50BEA1E5-A2C5-46E9-9B3A-59596516B00A" -nv -bs =0x01
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gOvmfVariableGuid|0x0|FALSE|NV,BS
+
 [PcdsDynamicDefault.common]
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|0x0
