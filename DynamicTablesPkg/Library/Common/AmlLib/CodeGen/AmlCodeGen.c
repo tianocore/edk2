@@ -2,7 +2,7 @@
   AML Code Generation.
 
   Copyright (c) 2020 - 2022, Arm Limited. All rights reserved.<BR>
-  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -922,7 +922,7 @@ AmlCodeGenNameUnicodeString (
   Status = AmlCreateDataNode (
              EAmlNodeDataTypeRaw,
              (CONST UINT8 *)String,
-             StrSize (String),
+             (UINT32)StrSize (String),
              &DataNode
              );
   if (EFI_ERROR (Status)) {
