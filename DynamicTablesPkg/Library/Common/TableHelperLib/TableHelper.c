@@ -2,6 +2,7 @@
   Table Helper
 
   Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -16,6 +17,7 @@
 #include <ConfigurationManagerObject.h>
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
+#include <Library/AmlLib/AmlLib.h>
 
 /** The GetCgfMgrInfo function gets the CM_STD_OBJ_CONFIGURATION_MANAGER_INFO
     object from the Configuration Manager.
@@ -168,7 +170,7 @@ AddAcpiHeader (
                                CfgMfrInfo->OemId[2],
                                CfgMfrInfo->OemId[3]
                                ) |
-                             ((UINT64)Generator->AcpiTableSignature << 32);
+                             LShiftU64 ((UINT64)Generator->AcpiTableSignature, 32);
   }
 
   // UINT32  OemRevision
@@ -255,7 +257,7 @@ AddSsdtAcpiHeader (
                    CfgMfrInfo->OemId[2],
                    CfgMfrInfo->OemId[3]
                    ) |
-                 ((UINT64)Generator->AcpiTableSignature << 32);
+                 LShiftU64 ((UINT64)Generator->AcpiTableSignature, 32);
   }
 
   if (AcpiTableInfo->OemRevision != 0) {
