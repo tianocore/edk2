@@ -102,8 +102,15 @@ typedef UINTN EFI_BROWSER_ACTION;
                                   string.
 
   @retval EFI_INVALID_PARAMETER   Unknown name. Progress points
-                                  to the & before the name in
+                                  to the "&" before the name in
                                   question.
+
+  @retval EFI_INVALID_PARAMETER   If Results or Progress is NULL.
+
+  @retval EFI_ACCESS_DENIED       The action violated a system policy.
+
+  @retval EFI_DEVICE_ERROR        Failed to extract the current configuration
+                                  for one or more named elements.
 
 **/
 typedef
