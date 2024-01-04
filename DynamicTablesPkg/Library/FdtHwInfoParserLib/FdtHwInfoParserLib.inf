@@ -28,6 +28,7 @@
   Serial/SerialPortParser.h
 
 [Sources.ARM, Sources.AARCH64]
+  Arm/ArmFdtUtility.c
   Arm/ArmFdtHwInfoParser.c
   Arm/BootArch/ArmBootArchParser.c
   Arm/BootArch/ArmBootArchParser.h
