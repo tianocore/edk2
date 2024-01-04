@@ -1,40 +1,18 @@
 /** @file
-  Flattened Device Tree parser definitions.
+  Flattened Device Tree parser library for KvmTool.
 
   Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#ifndef FDT_HW_INFO_PARSER_H_
-#define FDT_HW_INFO_PARSER_H_
+#include "FdtHwInfoParser.h"
+#include "Arm/BootArch/ArmBootArchParser.h"
+#include "Arm/GenericTimer/ArmGenericTimerParser.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
+#include "Pci/ArmPciConfigSpaceParser.h"
+#include "Serial/ArmSerialPortParser.h"
 
-#include <FdtHwInfoParserInclude.h>
-
-#include <ConfigurationManagerObject.h>
-#include <Library/HwInfoParserLib.h>
-
-#include "FdtUtility.h"
-
-/** A structure describing the instance of the FdtHwInfoParser.
-*/
-typedef struct FdtHwInfoParser {
-  /// Pointer to the HwDataSource i.e. the
-  /// Flattened Device Tree (Fdt).
-  VOID                  *Fdt;
-
-  /// Pointer to the caller's context.
-  VOID                  *Context;
-
-  /// Function pointer called by the
-  /// parser when adding information.
-  HW_INFO_ADD_OBJECT    HwInfoAdd;
-} FDT_HW_INFO_PARSER;
-
-/** A pointer type for FDT_HW_INFO_PARSER.
-*/
-typedef FDT_HW_INFO_PARSER *FDT_HW_INFO_PARSER_HANDLE;
-
-/** Function pointer to a parser function.
+/** Ordered table of parsers/dispatchers.
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -42,23 +20,14 @@ typedef FDT_HW_INFO_PARSER *FDT_HW_INFO_PARSER_HANDLE;
   HW_INFO_ADD_OBJECT interface.
   This can also be a dispatcher. I.e. a function that not parsing a
   Device Tree but calling other parsers.
-
-  @param [in]  ParserHandle    Handle to the parser instance.
-  @param [in]  FdtBranch       When searching for DT node name, restrict
-                               the search to this Device Tree branch.
-
-  @retval EFI_SUCCESS             The function completed successfully.
-  @retval EFI_ABORTED             An error occurred.
-  @retval EFI_INVALID_PARAMETER   Invalid parameter.
-  @retval EFI_NOT_FOUND           Not found.
-  @retval EFI_UNSUPPORTED         Unsupported.
-**/
-typedef
-EFI_STATUS
-(EFIAPI *FDT_HW_INFO_PARSER_FUNC)(
-  IN  CONST FDT_HW_INFO_PARSER_HANDLE ParserHandle,
-  IN        INT32                     FdtBranch
-  );
+*/
+STATIC CONST FDT_HW_INFO_PARSER_FUNC  HwInfoParserTable[] = {
+  ArmBootArchInfoParser,
+  ArmGenericTimerInfoParser,
+  ArmGicDispatcher,
+  ArmPciConfigInfoParser,
+  SerialPortDispatcher
+};
 
 /** Main dispatcher: sequentially call the parsers/dispatchers
     of the HwInfoParserTable.
@@ -85,6 +54,30 @@ EFIAPI
 FdtHwInfoMainDispatcher (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
-  );
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      Index;
 
-#endif // FDT_HW_INFO_PARSER_H_
+  if (fdt_check_header (FdtParserHandle->Fdt) < 0) {
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < ARRAY_SIZE (HwInfoParserTable); Index++) {
+    Status = HwInfoParserTable[Index](
+                                      FdtParserHandle,
+                                      FdtBranch
+                                      );
+    if (EFI_ERROR (Status)  &&
+        (Status != EFI_NOT_FOUND))
+    {
+      // If EFI_NOT_FOUND, the parser didn't find information in the DT.
+      // Don't trigger an error.
+      ASSERT (0);
+      return Status;
+    }
+  } // for
+
+  return EFI_SUCCESS;
+}
