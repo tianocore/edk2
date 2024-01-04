@@ -294,7 +294,7 @@ IsAttributesAndMaskValidForNonPresentEntry (
                                     Page table entries that map the linear address range are reset to 0 before set to the new attribute
                                     when a new physical base address is set.
   @param[in]      Mask              The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
-  @param[out]     IsModified        TRUE means page table is modified. FALSE means page table is not modified.
+  @param[in, out] IsModified        Change IsModified to True if page table is modified and input parameter Modify is TRUE.
 
   @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 0 but some other attributes are provided.
   @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 1 but some other attributes are not provided.
@@ -314,7 +314,7 @@ PageTableLibMapInLevel (
   IN     UINT64              Offset,
   IN     IA32_MAP_ATTRIBUTE  *Attribute,
   IN     IA32_MAP_ATTRIBUTE  *Mask,
-  OUT    BOOLEAN             *IsModified
+  IN OUT BOOLEAN             *IsModified
   )
 {
   RETURN_STATUS       Status;
@@ -587,7 +587,10 @@ PageTableLibMapInLevel (
         OriginalCurrentPagingEntry.Uint64 = CurrentPagingEntry->Uint64;
         PageTableLibSetPle (Level, CurrentPagingEntry, Offset, Attribute, &CurrentMask);
 
-        if (OriginalCurrentPagingEntry.Uint64 != CurrentPagingEntry->Uint64) {
+        if (Modify && (OriginalCurrentPagingEntry.Uint64 != CurrentPagingEntry->Uint64)) {
+          //
+          // The page table entry can be changed by this function only when Modify is true.
+          //
           *IsModified = TRUE;
         }
       }
@@ -629,7 +632,10 @@ PageTableLibMapInLevel (
   // Check if ParentPagingEntry entry is modified here is enough. Except the changes happen in leaf PagingEntry during
   // the while loop, if there is any other change happens in page table, the ParentPagingEntry must has been modified.
   //
-  if (OriginalParentPagingEntry.Uint64 != ParentPagingEntry->Uint64) {
+  if (Modify && (OriginalParentPagingEntry.Uint64 != ParentPagingEntry->Uint64)) {
+    //
+    // The page table entry can be changed by this function only when Modify is true.
+    //
     *IsModified = TRUE;
   }
 
@@ -654,7 +660,9 @@ PageTableLibMapInLevel (
                                  Page table entries that map the linear address range are reset to 0 before set to the new attribute
                                  when a new physical base address is set.
   @param[in]      Mask           The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
-  @param[out]     IsModified     TRUE means page table is modified. FALSE means page table is not modified.
+  @param[out]     IsModified     TRUE means page table is modified by software or hardware. FALSE means page table is not modified by software.
+                                 If the output IsModified is FALSE, there is possibility that the page table is changed by hardware. It is ok
+                                 because page table can be changed by hardware anytime, and caller don't need to Flush TLB.
 
   @retval RETURN_UNSUPPORTED        PagingMode is not supported.
   @retval RETURN_INVALID_PARAMETER  PageTable, BufferSize, Attribute or Mask is NULL.
