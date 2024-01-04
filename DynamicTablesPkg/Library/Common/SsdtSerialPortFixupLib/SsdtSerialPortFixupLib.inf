@@ -18,11 +18,14 @@
   SsdtSerialPortFixupLib.c
   SsdtSerialPortTemplate.asl
 
-[Packages]
+[Packages.common]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   DynamicTablesPkg/DynamicTablesPkg.dec
+
+[Packages.ARM, Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
 
 [LibraryClasses]
   AcpiHelperLib
