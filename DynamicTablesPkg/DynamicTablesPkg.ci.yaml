@@ -24,6 +24,9 @@
         "9005", "@ingroup",       # Use extra Doxygen commands
         "9005", "@mainpage",      # Use extra Doxygen commands
         "9005", "@ref",           # Use extra Doxygen commands
+        "8005", "CM_ARCH_GICC_INFO.GICV",
+        "8005", "CM_ARCH_GICC_INFO.GICH",
+        "8005", "CM_ARCH_GICC_INFO.MPIDR",
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
@@ -128,7 +131,9 @@
            "TABLEEX",
            "TNSID",
            "Vatos",
-           "WBINVD"
+           "WBINVD",
+           "EARCH",
+           "NAMESPACEID"
            ],           # words to extend to the dictionary for this package
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that
                                      # should be ignore
