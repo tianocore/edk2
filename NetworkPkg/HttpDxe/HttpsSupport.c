@@ -722,8 +722,21 @@ TlsConfigureSession (
   //
   Status = TlsConfigCertificate (HttpInstance);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "TLS Certificate Config Error!\n"));
-    return Status;
+    if (Status == EFI_NOT_FOUND) {
+      DEBUG((DEBUG_WARN, "TLS Certificate is not found on the system!\n"));
+      //
+      // We still return EFI_SUCCESS to the caller when TlsConfigCertificate
+      // returns error, for the use case the platform doesn't require
+      // certificate for the specific HTTP session. This ensures
+      // HttpInitSession function still initiated and returns EFI_SUCCESS to
+      // the caller. The failure is pushed back to TLS DXE driver if the
+      // HTTP communication actually requires certificate.
+      //
+      Status = EFI_SUCCESS;
+    } else {
+      DEBUG((DEBUG_ERROR, "TLS Certificate Config Error!\n"));
+      return Status;
+    }
   }
 
   //
