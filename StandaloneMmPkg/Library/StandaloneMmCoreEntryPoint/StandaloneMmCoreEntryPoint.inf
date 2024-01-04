@@ -42,6 +42,7 @@
   DebugLib
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
+  SerialPortLib
   StandaloneMmMmuLib
   ArmSvcLib
 
