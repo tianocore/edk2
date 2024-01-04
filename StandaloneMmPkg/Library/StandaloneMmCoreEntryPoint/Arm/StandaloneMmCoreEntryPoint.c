@@ -335,6 +335,9 @@ _ModuleEntryPoint (
   UINTN                           TeDataSize;
   EFI_PHYSICAL_ADDRESS            ImageBase;
 
+  // Initialize the Serial Port early to print debug log before StandaloneMmMain.
+  SerialPortInitialize ();
+
   // Get Secure Partition Manager Version Information
   Status = GetSpmVersion ();
   if (EFI_ERROR (Status)) {
