@@ -1172,6 +1172,84 @@ SdMmcHcInitPowerVoltage (
 }
 
 /**
+  Set the voltage regulator for I/O signaling.
+
+  @param[in] ControllerHandle   The handle of the controller.
+  @param[in] PciIo              The PCI IO protocol instance.
+  @param[in] Slot               The slot number of the SD card to send the command to.
+  @param[in] Voltage            The signaling voltage.
+
+  @retval EFI_SUCCESS           The voltage is set successfully.
+  @retval Others                The voltage isn't set successfully.
+
+**/
+EFI_STATUS
+SdMmcHcSetSignalingVoltage (
+  IN EFI_HANDLE                ControllerHandle,
+  IN EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN UINT8                     Slot,
+  IN SD_MMC_SIGNALING_VOLTAGE  Voltage
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       HostCtrl2;
+
+  //
+  // Set the internal regulator first.
+  //
+  switch (Voltage) {
+    case SdMmcSignalingVoltage33:
+      HostCtrl2 = (UINT8)(~SD_MMC_HC_CTRL_1V8_SIGNAL);
+      SdMmcHcAndMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
+      break;
+    case SdMmcSignalingVoltage18:
+      HostCtrl2 = SD_MMC_HC_CTRL_1V8_SIGNAL;
+      SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
+      break;
+    default:
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Some controllers rely on an external regulator.
+  //
+  if ((mOverride != NULL) && (mOverride->NotifyPhase != NULL)) {
+    Status = mOverride->NotifyPhase (
+                          ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcSetSignalingVoltage,
+                          &Voltage
+                          );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: SD/MMC set signaling voltage notifier callback failed - %r\n",
+        __func__,
+        Status
+        ));
+      return Status;
+    }
+  }
+
+  gBS->Stall (5000);
+
+  Status = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, TRUE, sizeof (HostCtrl2), &HostCtrl2);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  HostCtrl2 &= SD_MMC_HC_CTRL_1V8_SIGNAL;
+  if (((Voltage == SdMmcSignalingVoltage33) && (HostCtrl2 != 0)) ||
+      ((Voltage == SdMmcSignalingVoltage18) && (HostCtrl2 == 0)))
+  {
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Initialize the Timeout Control register with most conservative value at initialization.
 
   Refer to SD Host Controller Simplified spec 3.0 Section 2.2.15 for details.
