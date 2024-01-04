@@ -1,7 +1,7 @@
 /** @file
   SSDT Serial Port Fixup Library.
 
-  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2024, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -9,6 +9,9 @@
   - Arm Server Base Boot Requirements (SBBR), s4.2.1.8 "SPCR".
   - Microsoft Debug Port Table 2 (DBG2) Specification - December 10, 2015.
   - ACPI for Arm Components 1.0 - 2020
+  - Arm Generic Interrupt Controller Architecture Specification,
+    Issue H, January 2022.
+    (https://developer.arm.com/documentation/ihi0069/)
 **/
 
 #include <IndustryStandard/DebugPort2Table.h>
@@ -26,6 +29,10 @@
 #include <Library/AcpiHelperLib.h>
 #include <Library/AmlLib/AmlLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
+
+#if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+  #include <Library/ArmGicArchLib.h>
+#endif
 
 /** C array containing the compiled AML template.
     This symbol is defined in the auto generated C file
@@ -99,6 +106,26 @@ ValidateSerialPortInfo (
         ));
       return EFI_INVALID_PARAMETER;
     }
+
+ #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
+    // If an interrupt is not wired to the serial port, the Configuration
+    // Manager specifies the interrupt as 0.
+    // Any other value must be within the SPI or extended SPI range.
+    if ((SerialPortInfo->Interrupt != 0) &&
+        !(((SerialPortInfo->Interrupt >= ARM_GIC_ARCH_SPI_MIN) &&
+           (SerialPortInfo->Interrupt <= ARM_GIC_ARCH_SPI_MAX)) ||
+          ((SerialPortInfo->Interrupt >= ARM_GIC_ARCH_EXT_SPI_MIN) &&
+           (SerialPortInfo->Interrupt <= ARM_GIC_ARCH_EXT_SPI_MAX))))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: Invalid UART port interrupt ID. Interrupt = %lu\n",
+        SerialPortInfo->Interrupt
+        ));
+      return EFI_INVALID_PARAMETER;
+    }
+
+ #endif
 
     DEBUG ((DEBUG_INFO, "UART Configuration:\n"));
     DEBUG ((
@@ -270,7 +297,6 @@ FixupCrs (
   EFI_STATUS              Status;
   AML_OBJECT_NODE_HANDLE  NameOpCrsNode;
   AML_DATA_NODE_HANDLE    QWordRdNode;
-  AML_DATA_NODE_HANDLE    InterruptRdNode;
 
   // Get the "_CRS" object defined by the "Name ()" statement.
   Status = AmlFindNode (
@@ -303,20 +329,22 @@ FixupCrs (
     return Status;
   }
 
-  // Get the Interrupt node.
-  // It is the second Resource Data element in the NameOpCrsNode's
-  // variable list of arguments.
-  Status = AmlNameOpGetNextRdNode (QWordRdNode, &InterruptRdNode);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  // Generate an interrupt node as the second Resource Data element in the
+  // NameOpCrsNode, if the interrupt for the serial-port is a valid SPI from
+  // Table 2-1 in Arm Generic Interrupt Controller Architecture Specification.
+  Status = AmlCodeGenRdInterrupt (
+             TRUE,                  // Resource Consumer
+             FALSE,                 // Level Triggered
+             FALSE,                 // Active High
+             FALSE,                 // Exclusive
+             (UINT32 *)&SerialPortInfo->Interrupt,
+             1,
+             NameOpCrsNode,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
 
-  if (InterruptRdNode == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  // Update the interrupt number.
-  return AmlUpdateRdInterrupt (InterruptRdNode, SerialPortInfo->Interrupt);
+  return Status;
 }
 
 /** Fixup the Serial Port device name.

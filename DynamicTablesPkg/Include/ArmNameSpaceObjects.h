@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -317,7 +317,10 @@ typedef struct CmArmSerialPortInfo {
   /// The physical base address for the serial port
   UINT64    BaseAddress;
 
-  /// The serial port interrupt
+  /** The serial port interrupt.
+      0 indicates that the serial port does not
+      have an interrupt wired.
+  */
   UINT32    Interrupt;
 
   /// The serial port baud rate
