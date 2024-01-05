@@ -188,8 +188,8 @@ ParseAddressMap (
   UINT32       Count;
   UINT32       PciAddressAttr;
 
-  CM_ARM_PCI_ADDRESS_MAP_INFO  *PciAddressMapInfo;
-  UINT32                       BufferSize;
+  CM_ARCH_PCI_ADDRESS_MAP_INFO  *PciAddressMapInfo;
+  UINT32                        BufferSize;
 
   // The mapping is done on AddressMapSize bytes.
   AddressMapSize = (PCI_ADDRESS_CELLS + AddressCells + PCI_SIZE_CELLS) *
@@ -208,7 +208,7 @@ ParseAddressMap (
   Count = DataSize / AddressMapSize;
 
   // Allocate a buffer to store each address mapping.
-  BufferSize        = Count * sizeof (CM_ARM_PCI_ADDRESS_MAP_INFO);
+  BufferSize        = Count * sizeof (CM_ARCH_PCI_ADDRESS_MAP_INFO);
   PciAddressMapInfo = AllocateZeroPool (BufferSize);
   if (PciAddressMapInfo == NULL) {
     ASSERT (0);
@@ -246,9 +246,9 @@ ParseAddressMap (
   } // for
 
   PciInfo->Mapping[PciMappingTableAddress].ObjectId =
-    CREATE_CM_ARM_OBJECT_ID (EArmObjPciAddressMapInfo);
+    CREATE_CM_ARCH_OBJECT_ID (EArchObjPciAddressMapInfo);
   PciInfo->Mapping[PciMappingTableAddress].Size =
-    sizeof (CM_ARM_PCI_ADDRESS_MAP_INFO) * Count;
+    sizeof (CM_ARCH_PCI_ADDRESS_MAP_INFO) * Count;
   PciInfo->Mapping[PciMappingTableAddress].Data  = PciAddressMapInfo;
   PciInfo->Mapping[PciMappingTableAddress].Count = Count;
 
@@ -311,8 +311,8 @@ ParseIrqMap (
 
   UINT32  PciAddressAttr;
 
-  CM_ARM_PCI_INTERRUPT_MAP_INFO  *PciInterruptMapInfo;
-  UINT32                         BufferSize;
+  CM_ARCH_PCI_INTERRUPT_MAP_INFO  *PciInterruptMapInfo;
+  UINT32                          BufferSize;
 
   Data = fdt_getprop (Fdt, HostPciNode, "interrupt-map", &DataSize);
   if ((Data == NULL) || (DataSize <= 0)) {
@@ -413,7 +413,7 @@ ParseIrqMap (
 
   // Allocate a buffer to store each interrupt mapping.
   IrqMapCount         = DataSize / IrqMapSize;
-  BufferSize          = IrqMapCount * sizeof (CM_ARM_PCI_ADDRESS_MAP_INFO);
+  BufferSize          = IrqMapCount * sizeof (CM_ARCH_PCI_ADDRESS_MAP_INFO);
   PciInterruptMapInfo = AllocateZeroPool (BufferSize);
   if (PciInterruptMapInfo == NULL) {
     ASSERT (0);
@@ -455,9 +455,9 @@ ParseIrqMap (
   } // for
 
   PciInfo->Mapping[PciMappingTableInterrupt].ObjectId =
-    CREATE_CM_ARM_OBJECT_ID (EArmObjPciInterruptMapInfo);
+    CREATE_CM_ARCH_OBJECT_ID (EArchObjPciInterruptMapInfo);
   PciInfo->Mapping[PciMappingTableInterrupt].Size =
-    sizeof (CM_ARM_PCI_INTERRUPT_MAP_INFO) * IrqMapCount;
+    sizeof (CM_ARCH_PCI_INTERRUPT_MAP_INFO) * IrqMapCount;
   PciInfo->Mapping[PciMappingTableInterrupt].Data  = PciInterruptMapInfo;
   PciInfo->Mapping[PciMappingTableInterrupt].Count = IrqMapCount;
 
@@ -468,7 +468,7 @@ ParseIrqMap (
 
   @param [in]       Fdt          Pointer to a Flattened Device Tree (Fdt).
   @param [in]       HostPciNode  Offset of a host-pci node.
-  @param [in, out]  PciInfo      The CM_ARM_PCI_CONFIG_SPACE_INFO to populate.
+  @param [in, out]  PciInfo      The CM_ARCH_PCI_CONFIG_SPACE_INFO to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -579,9 +579,9 @@ PciNodeParser (
 /** Add the parsed Pci information to the Configuration Manager.
 
   CmObj of the following types are concerned:
-   - EArmObjPciConfigSpaceInfo
-   - EArmObjPciAddressMapInfo
-   - EArmObjPciInterruptMapInfo
+   - EArchObjPciConfigSpaceInfo
+   - EArchObjPciAddressMapInfo
+   - EArchObjPciInterruptMapInfo
 
   @param [in]  FdtParserHandle  A handle to the parser instance.
   @param [in]  PciTableInfo     PCI_PARSER_TABLE structure containing the
@@ -599,8 +599,8 @@ PciInfoAdd (
   IN        PCI_PARSER_TABLE           *PciTableInfo
   )
 {
-  EFI_STATUS                    Status;
-  CM_ARM_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfo;
+  EFI_STATUS                     Status;
+  CM_ARCH_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfo;
 
   if ((FdtParserHandle == NULL) ||
       (PciTableInfo == NULL))
@@ -640,9 +640,9 @@ PciInfoAdd (
   // Add the configuration space CmObj to the Configuration Manager.
   Status = AddSingleCmObj (
              FdtParserHandle,
-             CREATE_CM_ARM_OBJECT_ID (EArmObjPciConfigSpaceInfo),
+             CREATE_CM_ARCH_OBJECT_ID (EArchObjPciConfigSpaceInfo),
              &PciTableInfo->PciConfigSpaceInfo,
-             sizeof (CM_ARM_PCI_CONFIG_SPACE_INFO),
+             sizeof (CM_ARCH_PCI_CONFIG_SPACE_INFO),
              NULL
              );
   ASSERT_EFI_ERROR (Status);
@@ -682,29 +682,29 @@ FreeParserTable (
   return EFI_SUCCESS;
 }
 
-/** CM_ARM_PCI_CONFIG_SPACE_INFO parser function.
+/** CM_ARCH_PCI_CONFIG_SPACE_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmPciConfigSpaceInfo {
+  typedef struct CmArchPciConfigSpaceInfo {
     UINT64  BaseAddress;                          // {Populated}
     UINT16  PciSegmentGroupNumber;                // {Populated}
     UINT8   StartBusNumber;                       // {Populated}
     UINT8   EndBusNumber;                         // {Populated}
-  } CM_ARM_PCI_CONFIG_SPACE_INFO;
+  } CM_ARCH_PCI_CONFIG_SPACE_INFO;
 
-  typedef struct CmArmPciAddressMapInfo {
+  typedef struct CmArchPciAddressMapInfo {
     UINT8                     SpaceCode;          // {Populated}
     UINT64                    PciAddress;         // {Populated}
     UINT64                    CpuAddress;         // {Populated}
     UINT64                    AddressSize;        // {Populated}
-  } CM_ARM_PCI_ADDRESS_MAP_INFO;
+  } CM_ARCH_PCI_ADDRESS_MAP_INFO;
 
-  typedef struct CmArmPciInterruptMapInfo {
+  typedef struct CmArchPciInterruptMapInfo {
     UINT8                       PciBus;           // {Populated}
     UINT8                       PciDevice;        // {Populated}
     UINT8                       PciInterrupt;     // {Populated}
-    CM_ARM_GENERIC_INTERRUPT    IntcInterrupt;    // {Populated}
-  } CM_ARM_PCI_INTERRUPT_MAP_INFO;
+    CM_ARCH_GENERIC_INTERRUPT    IntcInterrupt;    // {Populated}
+  } CM_ARCH_PCI_INTERRUPT_MAP_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

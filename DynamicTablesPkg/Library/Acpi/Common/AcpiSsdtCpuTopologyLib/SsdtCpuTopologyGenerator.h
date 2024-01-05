@@ -69,29 +69,29 @@
 
 /** A structure used to handle the Lpi structures referencing.
 
-  A CM_ARM_PROC_HIERARCHY_INFO structure references a CM_ARM_OBJ_REF.
-  This CM_ARM_OBJ_REF references CM_ARM_LPI_INFO structures.
+  A CM_ARCH_PROC_HIERARCHY_INFO structure references a CM_ARCH_OBJ_REF.
+  This CM_ARCH_OBJ_REF references CM_ARCH_LPI_INFO structures.
 
   Example:
   (Cpu0)                                   (Cpu1)
-  CM_ARM_PROC_HIERARCHY_INFO               CM_ARM_PROC_HIERARCHY_INFO
+  CM_ARCH_PROC_HIERARCHY_INFO               CM_ARCH_PROC_HIERARCHY_INFO
               |                                       |
               +----------------------------------------
               |
               v
   (List of references to Lpi states)
-  CM_ARM_OBJ_REF
+  CM_ARCH_OBJ_REF
               |
               +----------------------------------------
               |                                       |
               v                                       v
   (A first Lpi state)                       (A second Lpi state)
-  CM_ARM_LPI_INFO[0]                        CM_ARM_LPI_INFO[1]
+  CM_ARCH_LPI_INFO[0]                        CM_ARCH_LPI_INFO[1]
 
-  Here, Cpu0 and Cpu1 have the same Lpi states. Both CM_ARM_PROC_HIERARCHY_INFO
-  structures reference the same CM_ARM_OBJ_REF. An entry is created in the
+  Here, Cpu0 and Cpu1 have the same Lpi states. Both CM_ARCH_PROC_HIERARCHY_INFO
+  structures reference the same CM_ARCH_OBJ_REF. An entry is created in the
   TokenTable such as:
-  0 <-> CM_ARM_OBJ_REF
+  0 <-> CM_ARCH_OBJ_REF
 
   This will lead to the creation of this pseudo-ASL code where Cpu0 and Cpu1
   return the same object at \_SB.L000:
@@ -118,7 +118,7 @@
 */
 typedef struct TokenTable {
   /// TokenTable, a table allowing to map:
-  /// Index <-> CM_OBJECT_TOKEN (to CM_ARM_LPI_INFO structures).
+  /// Index <-> CM_OBJECT_TOKEN (to CM_ARCH_LPI_INFO structures).
   CM_OBJECT_TOKEN    *Table;
 
   /// Last used index of the TokenTable.
@@ -130,16 +130,16 @@ typedef struct TokenTable {
 */
 typedef struct AcpiCpuTopologyGenerator {
   /// ACPI Table generator header
-  ACPI_TABLE_GENERATOR          Header;
+  ACPI_TABLE_GENERATOR           Header;
 
   // Private fields are defined from here.
 
   /// Private object used to handle token referencing.
-  TOKEN_TABLE                   TokenTable;
-  /// List of CM_ARM_PROC_HIERARCHY_INFO CM objects.
-  CM_ARM_PROC_HIERARCHY_INFO    *ProcNodeList;
-  /// Count of CM_ARM_PROC_HIERARCHY_INFO CM objects.
-  UINT32                        ProcNodeCount;
+  TOKEN_TABLE                    TokenTable;
+  /// List of CM_ARCH_PROC_HIERARCHY_INFO CM objects.
+  CM_ARCH_PROC_HIERARCHY_INFO    *ProcNodeList;
+  /// Count of CM_ARCH_PROC_HIERARCHY_INFO CM objects.
+  UINT32                         ProcNodeCount;
 } ACPI_CPU_TOPOLOGY_GENERATOR;
 
 #pragma pack()

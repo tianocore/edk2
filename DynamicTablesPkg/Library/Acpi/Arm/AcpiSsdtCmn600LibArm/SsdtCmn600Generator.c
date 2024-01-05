@@ -37,7 +37,7 @@ extern CHAR8  ssdtcmn600template_aml_code[];
   Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjCmn600Info
+  - EArchObjCmn600Info
 */
 
 /** This macro expands to a function that retrieves the CMN-600
@@ -45,8 +45,8 @@ extern CHAR8  ssdtcmn600template_aml_code[];
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjCmn600Info,
-  CM_ARM_CMN_600_INFO
+  EArchObjCmn600Info,
+  CM_ARCH_CMN_600_INFO
   );
 
 /** Check the CMN-600 Information.
@@ -61,14 +61,14 @@ STATIC
 EFI_STATUS
 EFIAPI
 ValidateCmn600Info (
-  IN  CONST CM_ARM_CMN_600_INFO  *Cmn600InfoList,
-  IN  CONST UINT32               Cmn600Count
+  IN  CONST CM_ARCH_CMN_600_INFO  *Cmn600InfoList,
+  IN  CONST UINT32                Cmn600Count
   )
 {
-  UINT32                          Index;
-  UINT32                          DtcIndex;
-  CONST CM_ARM_CMN_600_INFO       *Cmn600Info;
-  CONST CM_ARM_GENERIC_INTERRUPT  *DtcInterrupt;
+  UINT32                           Index;
+  UINT32                           DtcIndex;
+  CONST CM_ARCH_CMN_600_INFO       *Cmn600Info;
+  CONST CM_ARCH_GENERIC_INTERRUPT  *DtcInterrupt;
 
   if ((Cmn600InfoList == NULL) ||
       (Cmn600Count == 0))
@@ -225,16 +225,16 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupCmn600Info (
-  IN  CONST CM_ARM_CMN_600_INFO          *Cmn600Info,
+  IN  CONST CM_ARCH_CMN_600_INFO         *Cmn600Info,
   IN  CONST CHAR8                        *Name,
   IN  CONST UINT64                       Uid,
   OUT       EFI_ACPI_DESCRIPTION_HEADER  **Table
   )
 {
-  EFI_STATUS                      Status;
-  EFI_STATUS                      Status1;
-  UINT8                           Index;
-  CONST CM_ARM_GENERIC_INTERRUPT  *DtcInt;
+  EFI_STATUS                       Status;
+  EFI_STATUS                       Status1;
+  UINT8                            Index;
+  CONST CM_ARCH_GENERIC_INTERRUPT  *DtcInt;
 
   EFI_ACPI_DESCRIPTION_HEADER  *SsdtCmn600Template;
   AML_ROOT_NODE_HANDLE         RootNodeHandle;
@@ -518,7 +518,7 @@ BuildSsdtCmn600TableEx (
 {
   EFI_STATUS                   Status;
   UINT64                       Index;
-  CM_ARM_CMN_600_INFO          *Cmn600Info;
+  CM_ARCH_CMN_600_INFO         *Cmn600Info;
   UINT32                       Cmn600Count;
   CHAR8                        NewName[AML_NAME_SEG_SIZE + 1];
   EFI_ACPI_DESCRIPTION_HEADER  **TableList;
@@ -534,7 +534,7 @@ BuildSsdtCmn600TableEx (
   *Table = NULL;
 
   // Get CMN-600 information.
-  Status = GetEArmObjCmn600Info (
+  Status = GetEArchObjCmn600Info (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &Cmn600Info,

@@ -416,7 +416,7 @@ GetDeviceIdMappingArray (
   }
 
   CmObject->ObjectId = CmObjectId;
-  CmObject->Size     = sizeof (CM_ARM_ID_MAPPING);
+  CmObject->Size     = sizeof (CM_ARCH_ID_MAPPING);
   CmObject->Data     = (VOID *)Token;
   CmObject->Count    = 1;
   return EFI_SUCCESS;
@@ -662,7 +662,7 @@ GetStandardNameSpaceObject (
       //
       Status = DynamicPlatRepoGetObject (
                  PlatformRepo->DynamicPlatformRepo,
-                 CREATE_CM_ARM_OBJECT_ID (EArmObjPciConfigSpaceInfo),
+                 CREATE_CM_ARCH_OBJECT_ID (EArchObjPciConfigSpaceInfo),
                  CM_NULL_TOKEN,
                  &CmObjDesc
                  );
@@ -683,7 +683,7 @@ GetStandardNameSpaceObject (
       //
       Status = DynamicPlatRepoGetObject (
                  PlatformRepo->DynamicPlatformRepo,
-                 CREATE_CM_ARM_OBJECT_ID (EArmObjGicDInfo),
+                 CREATE_CM_ARCH_OBJECT_ID (EArchObjGicDInfo),
                  CM_NULL_TOKEN,
                  &CmObjDesc
                  );
@@ -692,7 +692,7 @@ GetStandardNameSpaceObject (
         return Status;
       }
 
-      if (((CM_ARM_GICD_INFO *)CmObjDesc.Data)->GicVersion < 3) {
+      if (((CM_ARCH_GICD_INFO *)CmObjDesc.Data)->GicVersion < 3) {
         //
         // IORT is only required for GicV3/4
         //
@@ -761,7 +761,7 @@ GetArmNameSpaceObject (
   // First check among the static objects.
   //
   switch (GET_CM_OBJECT_ID (CmObjectId)) {
-    case EArmObjPowerManagementProfileInfo:
+    case EArchObjPowerManagementProfileInfo:
       Status = HandleCmObject (
                  CmObjectId,
                  &PlatformRepo->PmProfileInfo,
@@ -771,7 +771,7 @@ GetArmNameSpaceObject (
                  );
       break;
 
-    case EArmObjItsGroup:
+    case EArchObjItsGroup:
       Status = HandleCmObject (
                  CmObjectId,
                  &PlatformRepo->ItsGroupInfo,
@@ -781,7 +781,7 @@ GetArmNameSpaceObject (
                  );
       break;
 
-    case EArmObjGicItsIdentifierArray:
+    case EArchObjGicItsIdentifierArray:
       Status = HandleCmObjectRefByToken (
                  This,
                  CmObjectId,
@@ -794,7 +794,7 @@ GetArmNameSpaceObject (
                  );
       break;
 
-    case EArmObjRootComplex:
+    case EArchObjRootComplex:
       Status = HandleCmObject (
                  CmObjectId,
                  &PlatformRepo->RootComplexInfo,
@@ -804,7 +804,7 @@ GetArmNameSpaceObject (
                  );
       break;
 
-    case EArmObjIdMappingArray:
+    case EArchObjIdMappingArray:
       Status = HandleCmObjectRefByToken (
                  This,
                  CmObjectId,

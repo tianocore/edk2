@@ -16,12 +16,12 @@
 */
 #define BSA_PMU_IRQ  23
 
-/** CM_ARM_GICC_INFO parser function.
+/** CM_ARCH_GICC_INFO parser function.
 
   This parser expects FdtBranch to be the "\cpus" node node.
   At most one CmObj is created.
   The following structure is populated:
-  typedef struct CmArmGicCInfo {
+  typedef struct CmArchGicCInfo {
     UINT32  CPUInterfaceNumber;               // {Populated}
     UINT32  AcpiProcessorUid;                 // {Populated}
     UINT32  Flags;                            // {Populated}
@@ -39,7 +39,7 @@
     UINT32  ProximityDomain;                  // {default = 0}
     UINT32  ClockDomain;                      // {default = 0}
     UINT32  AffinityFlags;                    // {default = 0}
-  } CM_ARM_GICC_INFO;
+  } CM_ARCH_GICC_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

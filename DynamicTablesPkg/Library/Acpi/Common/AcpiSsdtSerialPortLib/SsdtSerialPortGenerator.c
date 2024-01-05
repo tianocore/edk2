@@ -29,7 +29,7 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjSerialPortInfo
+  - EArchObjSerialPortInfo
 */
 
 /** This macro expands to a function that retrieves the Serial-port
@@ -37,8 +37,8 @@ Requirements:
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjSerialPortInfo,
-  CM_ARM_SERIAL_PORT_INFO
+  EArchObjSerialPortInfo,
+  CM_ARCH_SERIAL_PORT_INFO
   );
 
 /** Starting value for the UID to represent the serial ports.
@@ -168,7 +168,7 @@ BuildSsdtSerialPortTableEx (
   )
 {
   EFI_STATUS                   Status;
-  CM_ARM_SERIAL_PORT_INFO      *SerialPortInfo;
+  CM_ARCH_SERIAL_PORT_INFO     *SerialPortInfo;
   UINT32                       SerialPortCount;
   UINTN                        Index;
   CHAR8                        NewName[AML_NAME_SEG_SIZE + 1];
@@ -185,7 +185,7 @@ BuildSsdtSerialPortTableEx (
 
   *Table = NULL;
 
-  Status = GetEArmObjSerialPortInfo (
+  Status = GetEArchObjSerialPortInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &SerialPortInfo,

@@ -25,9 +25,9 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjPowerManagementProfileInfo
-  - EArmObjBootArchInfo
-  - EArmObjHypervisorVendorIdentity (OPTIONAL)
+  - EArchObjPowerManagementProfileInfo
+  - EArchObjBootArchInfo
+  - EArchObjHypervisorVendorIdentity (OPTIONAL)
 */
 
 /** This macro defines the FADT flag options for ARM Platforms.
@@ -203,8 +203,8 @@ EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjPowerManagementProfileInfo,
-  CM_ARM_POWER_MANAGEMENT_PROFILE_INFO
+  EArchObjPowerManagementProfileInfo,
+  CM_ARCH_POWER_MANAGEMENT_PROFILE_INFO
   );
 
 /** This macro expands to a function that retrieves the Boot
@@ -212,8 +212,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjBootArchInfo,
-  CM_ARM_BOOT_ARCH_INFO
+  EArchObjBootArchInfo,
+  CM_ARCH_BOOT_ARCH_INFO
   );
 
 /** This macro expands to a function that retrieves the Hypervisor
@@ -221,8 +221,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjHypervisorVendorIdentity,
-  CM_ARM_HYPERVISOR_VENDOR_ID
+  EArchObjHypervisorVendorIdentity,
+  CM_ARCH_HYPERVISOR_VENDOR_ID
   );
 
 /** This macro expands to a function that retrieves the Fixed
@@ -230,8 +230,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjFixedFeatureFlags,
-  CM_ARM_FIXED_FEATURE_FLAGS
+  EArchObjFixedFeatureFlags,
+  CM_ARCH_FIXED_FEATURE_FLAGS
   );
 
 /** Update the Power Management Profile information in the FADT Table.
@@ -253,13 +253,13 @@ FadtAddPmProfileInfo (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
   )
 {
-  EFI_STATUS                            Status;
-  CM_ARM_POWER_MANAGEMENT_PROFILE_INFO  *PmProfile;
+  EFI_STATUS                             Status;
+  CM_ARCH_POWER_MANAGEMENT_PROFILE_INFO  *PmProfile;
 
   ASSERT (CfgMgrProtocol != NULL);
 
   // Get the Power Management Profile from the Platform Configuration Manager
-  Status = GetEArmObjPowerManagementProfileInfo (
+  Status = GetEArchObjPowerManagementProfileInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PmProfile,
@@ -307,12 +307,12 @@ FadtAddBootArchInfo (
   )
 {
   EFI_STATUS             Status;
-  CM_ARM_BOOT_ARCH_INFO  *BootArchInfo;
+  CM_ARCH_BOOT_ARCH_INFO  *BootArchInfo;
 
   ASSERT (CfgMgrProtocol != NULL);
 
   // Get the Boot Architecture flags from the Platform Configuration Manager
-  Status = GetEArmObjBootArchInfo (
+  Status = GetEArchObjBootArchInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &BootArchInfo,
@@ -358,13 +358,13 @@ FadtAddHypervisorVendorId (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
   )
 {
-  EFI_STATUS                   Status;
-  CM_ARM_HYPERVISOR_VENDOR_ID  *HypervisorVendorInfo;
+  EFI_STATUS                    Status;
+  CM_ARCH_HYPERVISOR_VENDOR_ID  *HypervisorVendorInfo;
 
   ASSERT (CfgMgrProtocol != NULL);
 
   // Get the Hypervisor Vendor ID from the Platform Configuration Manager
-  Status = GetEArmObjHypervisorVendorIdentity (
+  Status = GetEArchObjHypervisorVendorIdentity (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &HypervisorVendorInfo,
@@ -391,7 +391,7 @@ FadtAddHypervisorVendorId (
 
   DEBUG ((
     DEBUG_INFO,
-    "FADT: EArmObjHypervisorVendorIdentity = 0x%lx\n",
+    "FADT: EArchObjHypervisorVendorIdentity = 0x%lx\n",
     HypervisorVendorInfo->HypervisorVendorId
     ));
 
@@ -420,13 +420,13 @@ FadtAddFixedFeatureFlags (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
   )
 {
-  EFI_STATUS                  Status;
-  CM_ARM_FIXED_FEATURE_FLAGS  *FixedFeatureFlags;
+  EFI_STATUS                   Status;
+  CM_ARCH_FIXED_FEATURE_FLAGS  *FixedFeatureFlags;
 
   ASSERT (CfgMgrProtocol != NULL);
 
   // Get the Fixed feature flags from the Platform Configuration Manager
-  Status = GetEArmObjFixedFeatureFlags (
+  Status = GetEArchObjFixedFeatureFlags (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &FixedFeatureFlags,
@@ -453,7 +453,7 @@ FadtAddFixedFeatureFlags (
 
   DEBUG ((
     DEBUG_INFO,
-    "FADT: EArmObjFixedFeatureFlags = 0x%x\n",
+    "FADT: EArchObjFixedFeatureFlags = 0x%x\n",
     FixedFeatureFlags->Flags
     ));
 

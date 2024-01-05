@@ -22,7 +22,7 @@
   @param [in]  GicIntcNode      Offset of a Gic compatible
                                 interrupt-controller node.
   @param [in]  GicItsId         Id for the Gic ITS node.
-  @param [in]  GicItsInfo       The CM_ARM_GIC_ITS_INFO to populate.
+  @param [in]  GicItsInfo       The CM_ARCH_GIC_ITS_INFO to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -32,10 +32,10 @@ STATIC
 EFI_STATUS
 EFIAPI
 GicItsIntcNodeParser (
-  IN  CONST VOID           *Fdt,
-  IN  INT32                GicIntcNode,
-  IN  UINT32               GicItsId,
-  IN  CM_ARM_GIC_ITS_INFO  *GicItsInfo
+  IN  CONST VOID            *Fdt,
+  IN  INT32                 GicIntcNode,
+  IN  UINT32                GicItsId,
+  IN  CM_ARCH_GIC_ITS_INFO  *GicItsInfo
   )
 {
   EFI_STATUS   Status;
@@ -85,15 +85,15 @@ GicItsIntcNodeParser (
   return Status;
 }
 
-/** CM_ARM_GIC_ITS_INFO parser function.
+/** CM_ARCH_GIC_ITS_INFO parser function.
 
   This parser expects FdtBranch to be a Gic interrupt-controller node.
   Gic version must be v3 or higher.
-  typedef struct CmArmGicItsInfo {
+  typedef struct CmArchGicItsInfo {
     UINT32  GicItsId;                         // {Populated}
     UINT64  PhysicalBaseAddress;              // {Populated}
     UINT32  ProximityDomain;                  // {default = 0}
-  } CM_ARM_GIC_ITS_INFO;
+  } CM_ARCH_GIC_ITS_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -119,13 +119,13 @@ ArmGicItsInfoParser (
   IN        INT32                      FdtBranch
   )
 {
-  EFI_STATUS           Status;
-  UINT32               GicVersion;
-  CM_ARM_GIC_ITS_INFO  GicItsInfo;
-  UINT32               Index;
-  INT32                GicItsNode;
-  UINT32               GicItsNodeCount;
-  VOID                 *Fdt;
+  EFI_STATUS            Status;
+  UINT32                GicVersion;
+  CM_ARCH_GIC_ITS_INFO  GicItsInfo;
+  UINT32                Index;
+  INT32                 GicItsNode;
+  UINT32                GicItsNodeCount;
+  VOID                  *Fdt;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
@@ -171,7 +171,7 @@ ArmGicItsInfoParser (
 
   GicItsNode = FdtBranch;
   for (Index = 0; Index < GicItsNodeCount; Index++) {
-    ZeroMem (&GicItsInfo, sizeof (CM_ARM_GIC_ITS_INFO));
+    ZeroMem (&GicItsInfo, sizeof (CM_ARCH_GIC_ITS_INFO));
 
     Status = FdtGetNextPropNodeInBranch (
                Fdt,
@@ -203,9 +203,9 @@ ArmGicItsInfoParser (
     // Add the CmObj to the Configuration Manager.
     Status = AddSingleCmObj (
                FdtParserHandle,
-               CREATE_CM_ARM_OBJECT_ID (EArmObjGicItsInfo),
+               CREATE_CM_ARCH_OBJECT_ID (EArchObjGicItsInfo),
                &GicItsInfo,
-               sizeof (CM_ARM_GIC_ITS_INFO),
+               sizeof (CM_ARCH_GIC_ITS_INFO),
                NULL
                );
     if (EFI_ERROR (Status)) {

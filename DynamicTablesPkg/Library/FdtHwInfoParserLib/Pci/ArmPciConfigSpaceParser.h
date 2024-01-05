@@ -83,38 +83,38 @@ typedef enum PciMappingTable {
 */
 typedef struct PciParserTable {
   /// PCI Configuration Space Info
-  CM_ARM_PCI_CONFIG_SPACE_INFO    PciConfigSpaceInfo;
+  CM_ARCH_PCI_CONFIG_SPACE_INFO    PciConfigSpaceInfo;
 
   /// Store the address mapping and interrupt mapping as CmObjDesc
   /// before adding them to the Configuration Manager.
-  CM_OBJ_DESCRIPTOR               Mapping[PciMappingTableMax];
+  CM_OBJ_DESCRIPTOR                Mapping[PciMappingTableMax];
 } PCI_PARSER_TABLE;
 
 #pragma pack()
 
-/** CM_ARM_PCI_CONFIG_SPACE_INFO parser function.
+/** CM_ARCH_PCI_CONFIG_SPACE_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmPciConfigSpaceInfo {
+  typedef struct CmArchPciConfigSpaceInfo {
     UINT64  BaseAddress;                          // {Populated}
     UINT16  PciSegmentGroupNumber;                // {Populated}
     UINT8   StartBusNumber;                       // {Populated}
     UINT8   EndBusNumber;                         // {Populated}
-  } CM_ARM_PCI_CONFIG_SPACE_INFO;
+  } CM_ARCH_PCI_CONFIG_SPACE_INFO;
 
-  typedef struct CmArmPciAddressMapInfo {
+  typedef struct CmArchPciAddressMapInfo {
     UINT8                     SpaceCode;          // {Populated}
     UINT64                    PciAddress;         // {Populated}
     UINT64                    CpuAddress;         // {Populated}
     UINT64                    AddressSize;        // {Populated}
-  } CM_ARM_PCI_ADDRESS_MAP_INFO;
+  } CM_ARCH_PCI_ADDRESS_MAP_INFO;
 
-  typedef struct CmArmPciInterruptMapInfo {
+  typedef struct CmArchPciInterruptMapInfo {
     UINT8                       PciBus;           // {Populated}
     UINT8                       PciDevice;        // {Populated}
     UINT8                       PciInterrupt;     // {Populated}
-    CM_ARM_GENERIC_INTERRUPT    IntcInterrupt;    // {Populated}
-  } CM_ARM_PCI_INTERRUPT_MAP_INFO;
+    CM_ARCH_GENERIC_INTERRUPT    IntcInterrupt;    // {Populated}
+  } CM_ARCH_PCI_INTERRUPT_MAP_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

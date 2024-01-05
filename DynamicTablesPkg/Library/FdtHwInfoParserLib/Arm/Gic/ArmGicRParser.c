@@ -34,16 +34,16 @@ GicRIntcNodeParser (
   IN        INT32                      GicIntcNode
   )
 {
-  EFI_STATUS              Status;
-  UINT32                  Index;
-  UINT32                  RedistReg;
-  UINT32                  RegSize;
-  INT32                   AddressCells;
-  INT32                   SizeCells;
-  CONST UINT8             *Data;
-  INT32                   DataSize;
-  CM_ARM_GIC_REDIST_INFO  GicRInfo;
-  VOID                    *Fdt;
+  EFI_STATUS               Status;
+  UINT32                   Index;
+  UINT32                   RedistReg;
+  UINT32                   RegSize;
+  INT32                    AddressCells;
+  INT32                    SizeCells;
+  CONST UINT8              *Data;
+  INT32                    DataSize;
+  CM_ARCH_GIC_REDIST_INFO  GicRInfo;
+  VOID                     *Fdt;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
@@ -136,7 +136,7 @@ GicRIntcNodeParser (
   Data += GET_DT_REG_ADDRESS_OFFSET (1, AddressCells, SizeCells)
           * sizeof (UINT32);
   for (Index = 0; Index < RedistReg; Index++) {
-    ZeroMem (&GicRInfo, sizeof (CM_ARM_GIC_REDIST_INFO));
+    ZeroMem (&GicRInfo, sizeof (CM_ARCH_GIC_REDIST_INFO));
 
     if (AddressCells == 2) {
       GicRInfo.DiscoveryRangeBaseAddress = fdt64_to_cpu (*(UINT64 *)Data);
@@ -155,9 +155,9 @@ GicRIntcNodeParser (
     // Add the CmObj to the Configuration Manager.
     Status = AddSingleCmObj (
                FdtParserHandle,
-               CREATE_CM_ARM_OBJECT_ID (EArmObjGicRedistributorInfo),
+               CREATE_CM_ARCH_OBJECT_ID (EArchObjGicRedistributorInfo),
                &GicRInfo,
-               sizeof (CM_ARM_GIC_REDIST_INFO),
+               sizeof (CM_ARCH_GIC_REDIST_INFO),
                NULL
                );
     if (EFI_ERROR (Status)) {
@@ -171,14 +171,14 @@ GicRIntcNodeParser (
   return Status;
 }
 
-/** CM_ARM_GIC_REDIST_INFO parser function.
+/** CM_ARCH_GIC_REDIST_INFO parser function.
 
   This parser expects FdtBranch to be a Gic interrupt-controller node.
   Gic version must be v3 or higher.
-  typedef struct CmArmGicRedistInfo {
+  typedef struct CmArchGicRedistInfo {
     UINT64  DiscoveryRangeBaseAddress;        // {Populated}
     UINT32  DiscoveryRangeLength;             // {Populated}
-  } CM_ARM_GIC_REDIST_INFO;
+  } CM_ARCH_GIC_REDIST_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

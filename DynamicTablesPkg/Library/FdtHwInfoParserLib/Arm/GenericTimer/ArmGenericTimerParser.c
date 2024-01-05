@@ -33,7 +33,7 @@ STATIC CONST COMPATIBILITY_INFO  TimerCompatibleInfo = {
 
   @param [in]  Fdt                Pointer to a Flattened Device Tree (Fdt).
   @param [in]  TimerNode          Offset of a timer node.
-  @param [in]  GenericTimerInfo   The CM_ARM_BOOT_ARCH_INFO to populate.
+  @param [in]  GenericTimerInfo   The CM_ARCH_BOOT_ARCH_INFO to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -43,9 +43,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 TimerNodeParser (
-  IN  CONST VOID                       *Fdt,
-  IN        INT32                      TimerNode,
-  IN        CM_ARM_GENERIC_TIMER_INFO  *GenericTimerInfo
+  IN  CONST VOID                        *Fdt,
+  IN        INT32                       TimerNode,
+  IN        CM_ARCH_GENERIC_TIMER_INFO  *GenericTimerInfo
   )
 {
   EFI_STATUS    Status;
@@ -143,10 +143,10 @@ TimerNodeParser (
   return EFI_SUCCESS;
 }
 
-/** CM_ARM_GENERIC_TIMER_INFO parser function.
+/** CM_ARCH_GENERIC_TIMER_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmGenericTimerInfo {
+  typedef struct CmArchGenericTimerInfo {
     UINT64  CounterControlBaseAddress;        // {default}
     UINT64  CounterReadBaseAddress;           // {default}
     UINT32  SecurePL1TimerGSIV;               // {Populated}
@@ -159,7 +159,7 @@ TimerNodeParser (
     UINT32  NonSecurePL2TimerFlags;           // {Populated}
     UINT32  VirtualPL2TimerGSIV;              // {default}
     UINT32  VirtualPL2TimerFlags;             // {default}
-  } CM_ARM_GENERIC_TIMER_INFO;
+  } CM_ARCH_GENERIC_TIMER_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -185,12 +185,12 @@ ArmGenericTimerInfoParser (
   IN        INT32                      FdtBranch
   )
 {
-  EFI_STATUS                 Status;
-  UINT32                     Index;
-  INT32                      TimerNode;
-  UINT32                     TimerNodeCount;
-  CM_ARM_GENERIC_TIMER_INFO  GenericTimerInfo;
-  VOID                       *Fdt;
+  EFI_STATUS                  Status;
+  UINT32                      Index;
+  INT32                       TimerNode;
+  UINT32                      TimerNodeCount;
+  CM_ARCH_GENERIC_TIMER_INFO  GenericTimerInfo;
+  VOID                        *Fdt;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
@@ -216,7 +216,7 @@ ArmGenericTimerInfoParser (
   // Parse each timer node in the branch.
   TimerNode = FdtBranch;
   for (Index = 0; Index < TimerNodeCount; Index++) {
-    ZeroMem (&GenericTimerInfo, sizeof (CM_ARM_GENERIC_TIMER_INFO));
+    ZeroMem (&GenericTimerInfo, sizeof (CM_ARCH_GENERIC_TIMER_INFO));
 
     Status = FdtGetNextCompatNodeInBranch (
                Fdt,
@@ -243,9 +243,9 @@ ArmGenericTimerInfoParser (
     // Add the CmObj to the Configuration Manager.
     Status = AddSingleCmObj (
                FdtParserHandle,
-               CREATE_CM_ARM_OBJECT_ID (EArmObjGenericTimerInfo),
+               CREATE_CM_ARCH_OBJECT_ID (EArchObjGenericTimerInfo),
                &GenericTimerInfo,
-               sizeof (CM_ARM_GENERIC_TIMER_INFO),
+               sizeof (CM_ARCH_GENERIC_TIMER_INFO),
                NULL
                );
     if (EFI_ERROR (Status)) {

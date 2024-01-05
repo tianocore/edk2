@@ -89,9 +89,9 @@ GetGicVersion (
 /** Gic dispatcher.
 
   This disptacher populates the following structures:
-   - CM_ARM_GICC_INFO
-   - CM_ARM_GICD_INFO
-   - CM_ARM_GIC_MSI_FRAME_INFO
+   - CM_ARCH_GICC_INFO
+   - CM_ARCH_GICD_INFO
+   - CM_ARCH_GIC_MSI_FRAME_INFO
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

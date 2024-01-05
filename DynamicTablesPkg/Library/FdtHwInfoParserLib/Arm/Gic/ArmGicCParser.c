@@ -58,7 +58,7 @@ CONST COMPATIBILITY_INFO  PmuCompatibleInfo = {
   @param [in]  GicVersion       Version of the GIC.
   @param [in]  AddressCells     Number of address cells used for the reg
                                 property.
-  @param [out] GicCInfo         CM_ARM_GICC_INFO structure to populate.
+  @param [out] GicCInfo         CM_ARCH_GICC_INFO structure to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -69,11 +69,11 @@ STATIC
 EFI_STATUS
 EFIAPI
 CpuNodeParser (
-  IN  CONST VOID              *Fdt,
-  IN        INT32             CpuNode,
-  IN        UINT32            GicVersion,
-  IN        UINT32            AddressCells,
-  OUT       CM_ARM_GICC_INFO  *GicCInfo
+  IN  CONST VOID               *Fdt,
+  IN        INT32              CpuNode,
+  IN        UINT32             GicVersion,
+  IN        UINT32             AddressCells,
+  OUT       CM_ARCH_GICC_INFO  *GicCInfo
   )
 {
   CONST UINT8  *Data;
@@ -146,13 +146,13 @@ CpuNodeParser (
 
 /** Parse a "cpus" node and its children "cpu" nodes.
 
-  Create as many CM_ARM_GICC_INFO structures as "cpu" nodes.
+  Create as many CM_ARCH_GICC_INFO structures as "cpu" nodes.
 
   @param [in]  Fdt              Pointer to a Flattened Device Tree (Fdt).
   @param [in]  CpusNode         Offset of a cpus node.
   @param [in]  GicVersion       Version of the GIC.
   @param [out] NewGicCmObjDesc  If success, CM_OBJ_DESCRIPTOR containing
-                                all the created CM_ARM_GICC_INFO.
+                                all the created CM_ARCH_GICC_INFO.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -174,9 +174,9 @@ CpusNodeParser (
   UINT32      CpuNodeCount;
   INT32       AddressCells;
 
-  UINT32            Index;
-  CM_ARM_GICC_INFO  *GicCInfoBuffer;
-  UINT32            GicCInfoBufferSize;
+  UINT32             Index;
+  CM_ARCH_GICC_INFO  *GicCInfoBuffer;
+  UINT32             GicCInfoBufferSize;
 
   if (NewGicCmObjDesc == NULL) {
     ASSERT (0);
@@ -201,8 +201,8 @@ CpusNodeParser (
     return EFI_NOT_FOUND;
   }
 
-  // Allocate memory for CpuNodeCount CM_ARM_GICC_INFO structures.
-  GicCInfoBufferSize = CpuNodeCount * sizeof (CM_ARM_GICC_INFO);
+  // Allocate memory for CpuNodeCount CM_ARCH_GICC_INFO structures.
+  GicCInfoBufferSize = CpuNodeCount * sizeof (CM_ARCH_GICC_INFO);
   GicCInfoBuffer     = AllocateZeroPool (GicCInfoBufferSize);
   if (GicCInfoBuffer == NULL) {
     ASSERT (0);
@@ -243,7 +243,7 @@ CpusNodeParser (
   } // for
 
   Status = CreateCmObjDesc (
-             CREATE_CM_ARM_OBJECT_ID (EArmObjGicCInfo),
+             CREATE_CM_ARCH_OBJECT_ID (EArchObjGicCInfo),
              CpuNodeCount,
              GicCInfoBuffer,
              GicCInfoBufferSize,
@@ -260,14 +260,14 @@ exit_handler:
     extracting GicC information generic to Gic v2 and v3.
 
   This function modifies a CM_OBJ_DESCRIPTOR object.
-  The following CM_ARM_GICC_INFO fields are patched:
+  The following CM_ARCH_GICC_INFO fields are patched:
     - VGICMaintenanceInterrupt;
     - Flags;
 
   @param [in]       Fdt              Pointer to a Flattened Device Tree (Fdt).
   @param [in]       GicIntcNode      Offset of a Gic compatible
                                      interrupt-controller node.
-  @param [in, out]  GicCCmObjDesc    The CM_ARM_GICC_INFO to patch.
+  @param [in, out]  GicCCmObjDesc    The CM_ARCH_GICC_INFO to patch.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -282,9 +282,9 @@ GicCIntcNodeParser (
   IN  OUT       CM_OBJ_DESCRIPTOR  *GicCCmObjDesc
   )
 {
-  EFI_STATUS        Status;
-  INT32             IntCells;
-  CM_ARM_GICC_INFO  *GicCInfo;
+  EFI_STATUS         Status;
+  INT32              IntCells;
+  CM_ARCH_GICC_INFO  *GicCInfo;
 
   CONST UINT8  *Data;
   INT32        DataSize;
@@ -307,7 +307,7 @@ GicCIntcNodeParser (
   // but it is assumed that only one Gic is available.
   Data = fdt_getprop (Fdt, GicIntcNode, "interrupts", &DataSize);
   if ((Data != NULL) && (DataSize == (IntCells * sizeof (UINT32)))) {
-    GicCInfo                           = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
+    GicCInfo                           = (CM_ARCH_GICC_INFO *)GicCCmObjDesc->Data;
     GicCInfo->VGICMaintenanceInterrupt =
       FdtGetInterruptId ((CONST UINT32 *)Data);
     GicCInfo->Flags = DT_IRQ_IS_EDGE_TRIGGERED (
@@ -330,7 +330,7 @@ GicCIntcNodeParser (
     extracting GicCv2 information.
 
   This function modifies a CM_OBJ_DESCRIPTOR object.
-  The following CM_ARM_GICC_INFO fields are patched:
+  The following CM_ARCH_GICC_INFO fields are patched:
     - PhysicalAddress;
     - GICH;
     - GICV;
@@ -338,7 +338,7 @@ GicCIntcNodeParser (
   @param [in]       Fdt              Pointer to a Flattened Device Tree (Fdt).
   @param [in]       Gicv2IntcNode    Offset of a Gicv2 compatible
                                      interrupt-controller node.
-  @param [in, out]  GicCCmObjDesc    The CM_ARM_GICC_INFO to patch.
+  @param [in, out]  GicCCmObjDesc    The CM_ARCH_GICC_INFO to patch.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -353,11 +353,11 @@ GicCv2IntcNodeParser (
   IN  OUT       CM_OBJ_DESCRIPTOR  *GicCCmObjDesc
   )
 {
-  EFI_STATUS        Status;
-  UINT32            Index;
-  CM_ARM_GICC_INFO  *GicCInfo;
-  INT32             AddressCells;
-  INT32             SizeCells;
+  EFI_STATUS         Status;
+  UINT32             Index;
+  CM_ARCH_GICC_INFO  *GicCInfo;
+  INT32              AddressCells;
+  INT32              SizeCells;
 
   CONST UINT8  *GicCValue;
   CONST UINT8  *GicVValue;
@@ -373,7 +373,7 @@ GicCv2IntcNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  GicCInfo  = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
+  GicCInfo  = (CM_ARCH_GICC_INFO *)GicCCmObjDesc->Data;
   GicVValue = NULL;
   GicHValue = NULL;
 
@@ -443,7 +443,7 @@ GicCv2IntcNodeParser (
     }
   }
 
-  // Patch the relevant fields of the CM_ARM_GICC_INFO objects.
+  // Patch the relevant fields of the CM_ARCH_GICC_INFO objects.
   for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
     if (AddressCells == 2) {
       GicCInfo[Index].PhysicalBaseAddress = fdt64_to_cpu (*(UINT64 *)GicCValue);
@@ -467,7 +467,7 @@ GicCv2IntcNodeParser (
     extracting GicCv3 information.
 
   This function modifies a CM_OBJ_DESCRIPTOR object.
-  The following CM_ARM_GICC_INFO fields are patched:
+  The following CM_ARCH_GICC_INFO fields are patched:
     - PhysicalAddress;
     - GICH;
     - GICV;
@@ -475,7 +475,7 @@ GicCv2IntcNodeParser (
   @param [in]       Fdt              Pointer to a Flattened Device Tree (Fdt).
   @param [in]       Gicv3IntcNode    Offset of a Gicv3 compatible
                                      interrupt-controller node.
-  @param [in, out]  GicCCmObjDesc    The CM_ARM_GICC_INFO to patch.
+  @param [in, out]  GicCCmObjDesc    The CM_ARCH_GICC_INFO to patch.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -490,12 +490,12 @@ GicCv3IntcNodeParser (
   IN  OUT       CM_OBJ_DESCRIPTOR  *GicCCmObjDesc
   )
 {
-  EFI_STATUS        Status;
-  UINT32            Index;
-  CM_ARM_GICC_INFO  *GicCInfo;
-  INT32             AddressCells;
-  INT32             SizeCells;
-  UINT32            AdditionalRedistReg;
+  EFI_STATUS         Status;
+  UINT32             Index;
+  CM_ARCH_GICC_INFO  *GicCInfo;
+  INT32              AddressCells;
+  INT32              SizeCells;
+  UINT32             AdditionalRedistReg;
 
   CONST UINT8  *GicCValue;
   CONST UINT8  *GicVValue;
@@ -511,7 +511,7 @@ GicCv3IntcNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  GicCInfo  = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
+  GicCInfo  = (CM_ARCH_GICC_INFO *)GicCCmObjDesc->Data;
   GicCValue = NULL;
   GicVValue = NULL;
   GicHValue = NULL;
@@ -616,8 +616,8 @@ GicCv3IntcNodeParser (
     }
     case 2:
     {
-      // GicR is discribed by the CM_ARM_GIC_REDIST_INFO object.
-      // GicD is described by the CM_ARM_GICD_INFO object.
+      // GicR is discribed by the CM_ARCH_GIC_REDIST_INFO object.
+      // GicD is described by the CM_ARCH_GICD_INFO object.
       break;
     }
     default:
@@ -628,10 +628,10 @@ GicCv3IntcNodeParser (
     }
   }
 
-  // Patch the relevant fields of the CM_ARM_GICC_INFO objects.
+  // Patch the relevant fields of the CM_ARCH_GICC_INFO objects.
   if (AddressCells == 2) {
     for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-      // GicR is discribed by the CM_ARM_GIC_REDIST_INFO object.
+      // GicR is discribed by the CM_ARCH_GIC_REDIST_INFO object.
       GicCInfo[Index].GICRBaseAddress     = 0;
       GicCInfo[Index].PhysicalBaseAddress = (GicCValue == NULL) ? 0 :
                                             fdt64_to_cpu (*(UINT64 *)GicCValue);
@@ -642,7 +642,7 @@ GicCv3IntcNodeParser (
     }
   } else {
     for (Index = 0; Index < GicCCmObjDesc->Count; Index++) {
-      // GicR is discribed by the CM_ARM_GIC_REDIST_INFO object.
+      // GicR is discribed by the CM_ARCH_GIC_REDIST_INFO object.
       GicCInfo[Index].GICRBaseAddress     = 0;
       GicCInfo[Index].PhysicalBaseAddress = (GicCValue == NULL) ? 0 :
                                             fdt32_to_cpu (*(UINT32 *)GicCValue);
@@ -659,13 +659,13 @@ GicCv3IntcNodeParser (
 /** Parse a Pmu compatible node, extracting Pmu information.
 
   This function modifies a CM_OBJ_DESCRIPTOR object.
-  The following CM_ARM_GICC_INFO fields are patched:
+  The following CM_ARCH_GICC_INFO fields are patched:
     - PerformanceInterruptGsiv;
 
   @param [in]       Fdt              Pointer to a Flattened Device Tree (Fdt).
   @param [in]       GicIntcNode      Offset of a Gic compatible
                                      interrupt-controller node.
-  @param [in, out]  GicCCmObjDesc    The CM_ARM_GICC_INFO to patch.
+  @param [in, out]  GicCCmObjDesc    The CM_ARCH_GICC_INFO to patch.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -680,22 +680,22 @@ GicCPmuNodeParser (
   IN  OUT       CM_OBJ_DESCRIPTOR  *GicCCmObjDesc
   )
 {
-  EFI_STATUS        Status;
-  INT32             IntCells;
-  INT32             PmuNode;
-  UINT32            PmuNodeCount;
-  UINT32            PmuIrq;
-  UINT32            Index;
-  CM_ARM_GICC_INFO  *GicCInfo;
-  CONST UINT8       *Data;
-  INT32             DataSize;
+  EFI_STATUS         Status;
+  INT32              IntCells;
+  INT32              PmuNode;
+  UINT32             PmuNodeCount;
+  UINT32             PmuIrq;
+  UINT32             Index;
+  CM_ARCH_GICC_INFO  *GicCInfo;
+  CONST UINT8        *Data;
+  INT32              DataSize;
 
   if (GicCCmObjDesc == NULL) {
     ASSERT (GicCCmObjDesc != NULL);
     return EFI_INVALID_PARAMETER;
   }
 
-  GicCInfo = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
+  GicCInfo = (CM_ARCH_GICC_INFO *)GicCCmObjDesc->Data;
   PmuNode  = 0;
 
   // Count the number of pmu nodes.
@@ -761,12 +761,12 @@ GicCPmuNodeParser (
   return EFI_SUCCESS;
 }
 
-/** CM_ARM_GICC_INFO parser function.
+/** CM_ARCH_GICC_INFO parser function.
 
   This parser expects FdtBranch to be the "\cpus" node node.
   At most one CmObj is created.
   The following structure is populated:
-  typedef struct CmArmGicCInfo {
+  typedef struct CmArchGicCInfo {
     UINT32  CPUInterfaceNumber;               // {Populated}
     UINT32  AcpiProcessorUid;                 // {Populated}
     UINT32  Flags;                            // {Populated}
@@ -784,7 +784,7 @@ GicCPmuNodeParser (
     UINT32  ProximityDomain;                  // {default = 0}
     UINT32  ClockDomain;                      // {default = 0}
     UINT32  AffinityFlags;                    // {default = 0}
-  } CM_ARM_GICC_INFO;
+  } CM_ARCH_GICC_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

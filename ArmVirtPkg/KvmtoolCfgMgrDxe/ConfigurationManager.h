@@ -83,27 +83,27 @@ typedef struct PlatformRepositoryInfo {
   ///
   /// Power management profile information
   ///
-  CM_ARM_POWER_MANAGEMENT_PROFILE_INFO     PmProfileInfo;
+  CM_ARCH_POWER_MANAGEMENT_PROFILE_INFO    PmProfileInfo;
 
   ///
   /// ITS Group node
   ///
-  CM_ARM_ITS_GROUP_NODE                    ItsGroupInfo;
+  CM_ARCH_ITS_GROUP_NODE                   ItsGroupInfo;
 
   ///
   /// ITS Identifier array
   ///
-  CM_ARM_ITS_IDENTIFIER                    ItsIdentifierArray[1];
+  CM_ARCH_ITS_IDENTIFIER                   ItsIdentifierArray[1];
 
   ///
   /// PCI Root complex node
   ///
-  CM_ARM_ROOT_COMPLEX_NODE                 RootComplexInfo;
+  CM_ARCH_ROOT_COMPLEX_NODE                RootComplexInfo;
 
   ///
   /// Array of DeviceID mapping
   ///
-  CM_ARM_ID_MAPPING                        DeviceIdMapping[1];
+  CM_ARCH_ID_MAPPING                       DeviceIdMapping[1];
 
   ///
   /// Dynamic platform repository.

@@ -30,12 +30,12 @@
 
   Requirements:
     The following Configuration Manager Object(s) are used by this Generator:
-    - EArmObjGicCInfo (REQUIRED)
-    - EArmObjGicItsInfo (OPTIONAL)
-    - EArmObjMemoryAffinityInfo (OPTIONAL)
-    - EArmObjGenericInitiatorAffinityInfo (OPTIONAL)
-    - EArmObjDeviceHandleAcpi (OPTIONAL)
-    - EArmObjDeviceHandlePci (OPTIONAL)
+    - EArchObjGicCInfo (REQUIRED)
+    - EArchObjGicItsInfo (OPTIONAL)
+    - EArchObjMemoryAffinityInfo (OPTIONAL)
+    - EArchObjGenericInitiatorAffinityInfo (OPTIONAL)
+    - EArchObjDeviceHandleAcpi (OPTIONAL)
+    - EArchObjDeviceHandlePci (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the GIC
@@ -43,8 +43,8 @@
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGicCInfo,
-  CM_ARM_GICC_INFO
+  EArchObjGicCInfo,
+  CM_ARCH_GICC_INFO
   );
 
 /** This macro expands to a function that retrieves the GIC
@@ -53,8 +53,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGicItsInfo,
-  CM_ARM_GIC_ITS_INFO
+  EArchObjGicItsInfo,
+  CM_ARCH_GIC_ITS_INFO
   );
 
 /**
@@ -63,8 +63,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjMemoryAffinityInfo,
-  CM_ARM_MEMORY_AFFINITY_INFO
+  EArchObjMemoryAffinityInfo,
+  CM_ARCH_MEMORY_AFFINITY_INFO
   );
 
 /**
@@ -73,8 +73,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGenericInitiatorAffinityInfo,
-  CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO
+  EArchObjGenericInitiatorAffinityInfo,
+  CM_ARCH_GENERIC_INITIATOR_AFFINITY_INFO
   );
 
 /**
@@ -83,8 +83,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjDeviceHandleAcpi,
-  CM_ARM_DEVICE_HANDLE_ACPI
+  EArchObjDeviceHandleAcpi,
+  CM_ARCH_DEVICE_HANDLE_ACPI
   );
 
 /**
@@ -93,8 +93,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjDeviceHandlePci,
-  CM_ARM_DEVICE_HANDLE_PCI
+  EArchObjDeviceHandlePci,
+  CM_ARCH_DEVICE_HANDLE_PCI
   );
 
 /** Return the PCI Device information in BDF format
@@ -110,7 +110,7 @@ GET_OBJECT_LIST (
 STATIC
 UINT16
 GetBdf (
-  IN CONST CM_ARM_DEVICE_HANDLE_PCI  *DeviceHandlePci
+  IN CONST CM_ARCH_DEVICE_HANDLE_PCI  *DeviceHandlePci
   )
 {
   UINT16  Bdf;
@@ -139,7 +139,7 @@ AddGICCAffinity (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               GicCAffOffset,
-  IN CONST CM_ARM_GICC_INFO                                     *GicCInfo,
+  IN CONST CM_ARCH_GICC_INFO                                    *GicCInfo,
   IN       UINT32                                               GicCCount
   )
 {
@@ -187,7 +187,7 @@ AddGICItsAffinity (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               GicItsAffOffset,
-  IN CONST CM_ARM_GIC_ITS_INFO                                  *GicItsInfo,
+  IN CONST CM_ARCH_GIC_ITS_INFO                                 *GicItsInfo,
   IN       UINT32                                               GicItsCount
   )
 {
@@ -235,7 +235,7 @@ AddMemoryAffinity (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               MemAffOffset,
-  IN CONST CM_ARM_MEMORY_AFFINITY_INFO                          *MemAffInfo,
+  IN CONST CM_ARCH_MEMORY_AFFINITY_INFO                         *MemAffInfo,
   IN       UINT32                                               MemAffCount
   )
 {
@@ -295,14 +295,14 @@ AddGenericInitiatorAffinity (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               GenInitAffOff,
-  IN CONST CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO               *GenInitAffInfo,
+  IN CONST CM_ARCH_GENERIC_INITIATOR_AFFINITY_INFO              *GenInitAffInfo,
   IN       UINT32                                               GenInitAffCount
   )
 {
   EFI_STATUS                                         Status;
   EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE  *GenInitAff;
-  CM_ARM_DEVICE_HANDLE_ACPI                          *DeviceHandleAcpi;
-  CM_ARM_DEVICE_HANDLE_PCI                           *DeviceHandlePci;
+  CM_ARCH_DEVICE_HANDLE_ACPI                         *DeviceHandleAcpi;
+  CM_ARCH_DEVICE_HANDLE_PCI                          *DeviceHandlePci;
   UINT32                                             DeviceHandleCount;
 
   ASSERT (Srat != NULL);
@@ -331,7 +331,7 @@ AddGenericInitiatorAffinity (
     }
 
     if (GenInitAffInfo->DeviceHandleType == EFI_ACPI_6_3_ACPI_DEVICE_HANDLE) {
-      Status = GetEArmObjDeviceHandleAcpi (
+      Status = GetEArchObjDeviceHandleAcpi (
                  CfgMgrProtocol,
                  GenInitAffInfo->DeviceHandleToken,
                  &DeviceHandleAcpi,
@@ -362,7 +362,7 @@ AddGenericInitiatorAffinity (
     } else if (GenInitAffInfo->DeviceHandleType ==
                EFI_ACPI_6_3_PCI_DEVICE_HANDLE)
     {
-      Status = GetEArmObjDeviceHandlePci (
+      Status = GetEArchObjDeviceHandlePci (
                  CfgMgrProtocol,
                  GenInitAffInfo->DeviceHandleToken,
                  &DeviceHandlePci,
@@ -465,10 +465,10 @@ BuildSratTable (
   UINT32  MemAffOffset;
   UINT32  GenInitiatorAffOffset;
 
-  CM_ARM_GICC_INFO                        *GicCInfo;
-  CM_ARM_GIC_ITS_INFO                     *GicItsInfo;
-  CM_ARM_MEMORY_AFFINITY_INFO             *MemAffInfo;
-  CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO  *GenInitiatorAffInfo;
+  CM_ARCH_GICC_INFO                        *GicCInfo;
+  CM_ARCH_GIC_ITS_INFO                     *GicItsInfo;
+  CM_ARCH_MEMORY_AFFINITY_INFO             *MemAffInfo;
+  CM_ARCH_GENERIC_INITIATOR_AFFINITY_INFO  *GenInitiatorAffInfo;
 
   EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER  *Srat;
 
@@ -497,7 +497,7 @@ BuildSratTable (
 
   *Table = NULL;
 
-  Status = GetEArmObjGicCInfo (
+  Status = GetEArchObjGicCInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GicCInfo,
@@ -522,7 +522,7 @@ BuildSratTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjGicItsInfo (
+  Status = GetEArchObjGicItsInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GicItsInfo,
@@ -537,7 +537,7 @@ BuildSratTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjMemoryAffinityInfo (
+  Status = GetEArchObjMemoryAffinityInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &MemAffInfo,
@@ -552,7 +552,7 @@ BuildSratTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjGenericInitiatorAffinityInfo (
+  Status = GetEArchObjGenericInitiatorAffinityInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GenInitiatorAffInfo,

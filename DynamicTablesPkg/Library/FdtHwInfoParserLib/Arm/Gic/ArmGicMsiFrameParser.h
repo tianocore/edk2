@@ -12,16 +12,16 @@
 #ifndef ARM_GIC_MSI_FRAME_PARSER_H_
 #define ARM_GIC_MSI_FRAME_PARSER_H_
 
-/** CM_ARM_GIC_MSI_FRAME_INFO parser function.
+/** CM_ARCH_GIC_MSI_FRAME_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmGicMsiFrameInfo {
+  typedef struct CmArchGicMsiFrameInfo {
     UINT32  GicMsiFrameId;                    // {Populated}
     UINT64  PhysicalBaseAddress;              // {Populated}
     UINT32  Flags;                            // {default = 0}
     UINT16  SPICount;
     UINT16  SPIBase;
-  } CM_ARM_GIC_MSI_FRAME_INFO;
+  } CM_ARCH_GIC_MSI_FRAME_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

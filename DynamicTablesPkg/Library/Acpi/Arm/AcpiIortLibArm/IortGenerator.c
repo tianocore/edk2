@@ -31,17 +31,17 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjItsGroup
-  - EArmObjNamedComponent
-  - EArmObjRootComplex
-  - EArmObjSmmuV1SmmuV2
-  - EArmObjSmmuV3
-  - EArmObjPmcg
-  - EArmObjRmr
-  - EArmObjGicItsIdentifierArray
-  - EArmObjIdMappingArray
-  - EArmObjSmmuInterruptArray
-  - EArmObjMemoryRangeDescriptor
+  - EArchObjItsGroup
+  - EArchObjNamedComponent
+  - EArchObjRootComplex
+  - EArchObjSmmuV1SmmuV2
+  - EArchObjSmmuV3
+  - EArchObjPmcg
+  - EArchObjRmr
+  - EArchObjGicItsIdentifierArray
+  - EArchObjIdMappingArray
+  - EArchObjSmmuInterruptArray
+  - EArchObjMemoryRangeDescriptor
 */
 
 /** This macro expands to a function that retrieves the ITS
@@ -49,8 +49,8 @@ Requirements:
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjItsGroup,
-  CM_ARM_ITS_GROUP_NODE
+  EArchObjItsGroup,
+  CM_ARCH_ITS_GROUP_NODE
   );
 
 /** This macro expands to a function that retrieves the
@@ -58,8 +58,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjNamedComponent,
-  CM_ARM_NAMED_COMPONENT_NODE
+  EArchObjNamedComponent,
+  CM_ARCH_NAMED_COMPONENT_NODE
   );
 
 /** This macro expands to a function that retrieves the
@@ -67,8 +67,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjRootComplex,
-  CM_ARM_ROOT_COMPLEX_NODE
+  EArchObjRootComplex,
+  CM_ARCH_ROOT_COMPLEX_NODE
   );
 
 /** This macro expands to a function that retrieves the
@@ -76,8 +76,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjSmmuV1SmmuV2,
-  CM_ARM_SMMUV1_SMMUV2_NODE
+  EArchObjSmmuV1SmmuV2,
+  CM_ARCH_SMMUV1_SMMUV2_NODE
   );
 
 /** This macro expands to a function that retrieves the
@@ -85,8 +85,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjSmmuV3,
-  CM_ARM_SMMUV3_NODE
+  EArchObjSmmuV3,
+  CM_ARCH_SMMUV3_NODE
   );
 
 /** This macro expands to a function that retrieves the
@@ -94,8 +94,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjPmcg,
-  CM_ARM_PMCG_NODE
+  EArchObjPmcg,
+  CM_ARCH_PMCG_NODE
   );
 
 /** This macro expands to a function that retrieves the
@@ -103,8 +103,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjRmr,
-  CM_ARM_RMR_NODE
+  EArchObjRmr,
+  CM_ARCH_RMR_NODE
   );
 
 /** This macro expands to a function that retrieves the
@@ -112,8 +112,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjMemoryRangeDescriptor,
-  CM_ARM_MEMORY_RANGE_DESCRIPTOR
+  EArchObjMemoryRangeDescriptor,
+  CM_ARCH_MEMORY_RANGE_DESCRIPTOR
   );
 
 /** This macro expands to a function that retrieves the
@@ -121,8 +121,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGicItsIdentifierArray,
-  CM_ARM_ITS_IDENTIFIER
+  EArchObjGicItsIdentifierArray,
+  CM_ARCH_ITS_IDENTIFIER
   );
 
 /** This macro expands to a function that retrieves the
@@ -130,8 +130,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjIdMappingArray,
-  CM_ARM_ID_MAPPING
+  EArchObjIdMappingArray,
+  CM_ARCH_ID_MAPPING
   );
 
 /** This macro expands to a function that retrieves the
@@ -139,8 +139,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjSmmuInterruptArray,
-  CM_ARM_SMMU_INTERRUPT
+  EArchObjSmmuInterruptArray,
+  CM_ARCH_SMMU_INTERRUPT
   );
 
 /** Returns the size of the ITS Group node.
@@ -152,7 +152,7 @@ GET_OBJECT_LIST (
 STATIC
 UINT32
 GetItsGroupNodeSize (
-  IN  CONST CM_ARM_ITS_GROUP_NODE  *Node
+  IN  CONST CM_ARCH_ITS_GROUP_NODE  *Node
   )
 {
   ASSERT (Node != NULL);
@@ -183,7 +183,7 @@ STATIC
 UINT64
 GetSizeofItsGroupNodes (
   IN      CONST UINT32                         NodeStartOffset,
-  IN      CONST CM_ARM_ITS_GROUP_NODE          *NodeList,
+  IN      CONST CM_ARCH_ITS_GROUP_NODE         *NodeList,
   IN            UINT32                         NodeCount,
   IN OUT        IORT_NODE_INDEXER     **CONST  NodeIndexer
   )
@@ -226,7 +226,7 @@ GetSizeofItsGroupNodes (
 STATIC
 UINT32
 GetNamedComponentNodeSize (
-  IN  CONST CM_ARM_NAMED_COMPONENT_NODE  *Node
+  IN  CONST CM_ARCH_NAMED_COMPONENT_NODE  *Node
   )
 {
   ASSERT (Node != NULL);
@@ -260,7 +260,7 @@ STATIC
 UINT64
 GetSizeofNamedComponentNodes (
   IN      CONST UINT32                              NodeStartOffset,
-  IN      CONST CM_ARM_NAMED_COMPONENT_NODE         *NodeList,
+  IN      CONST CM_ARCH_NAMED_COMPONENT_NODE        *NodeList,
   IN            UINT32                              NodeCount,
   IN OUT        IORT_NODE_INDEXER          **CONST  NodeIndexer
   )
@@ -303,7 +303,7 @@ GetSizeofNamedComponentNodes (
 STATIC
 UINT32
 GetRootComplexNodeSize (
-  IN  CONST CM_ARM_ROOT_COMPLEX_NODE  *Node
+  IN  CONST CM_ARCH_ROOT_COMPLEX_NODE  *Node
   )
 {
   ASSERT (Node != NULL);
@@ -335,7 +335,7 @@ STATIC
 UINT64
 GetSizeofRootComplexNodes (
   IN      CONST UINT32                              NodeStartOffset,
-  IN      CONST CM_ARM_ROOT_COMPLEX_NODE            *NodeList,
+  IN      CONST CM_ARCH_ROOT_COMPLEX_NODE           *NodeList,
   IN            UINT32                              NodeCount,
   IN OUT        IORT_NODE_INDEXER          **CONST  NodeIndexer
   )
@@ -378,7 +378,7 @@ GetSizeofRootComplexNodes (
 STATIC
 UINT32
 GetSmmuV1V2NodeSize (
-  IN  CONST CM_ARM_SMMUV1_SMMUV2_NODE  *Node
+  IN  CONST CM_ARCH_SMMUV1_SMMUV2_NODE  *Node
   )
 {
   ASSERT (Node != NULL);
@@ -416,7 +416,7 @@ STATIC
 UINT64
 GetSizeofSmmuV1V2Nodes (
   IN      CONST UINT32                              NodeStartOffset,
-  IN      CONST CM_ARM_SMMUV1_SMMUV2_NODE           *NodeList,
+  IN      CONST CM_ARCH_SMMUV1_SMMUV2_NODE          *NodeList,
   IN            UINT32                              NodeCount,
   IN OUT        IORT_NODE_INDEXER          **CONST  NodeIndexer
   )
@@ -459,7 +459,7 @@ GetSizeofSmmuV1V2Nodes (
 STATIC
 UINT32
 GetSmmuV3NodeSize (
-  IN  CONST CM_ARM_SMMUV3_NODE  *Node
+  IN  CONST CM_ARCH_SMMUV3_NODE  *Node
   )
 {
   ASSERT (Node != NULL);
@@ -491,7 +491,7 @@ STATIC
 UINT64
 GetSizeofSmmuV3Nodes (
   IN      CONST UINT32                       NodeStartOffset,
-  IN      CONST CM_ARM_SMMUV3_NODE           *NodeList,
+  IN      CONST CM_ARCH_SMMUV3_NODE          *NodeList,
   IN            UINT32                       NodeCount,
   IN OUT        IORT_NODE_INDEXER   **CONST  NodeIndexer
   )
@@ -534,7 +534,7 @@ GetSizeofSmmuV3Nodes (
 STATIC
 UINT32
 GetPmcgNodeSize (
-  IN  CONST CM_ARM_PMCG_NODE  *Node
+  IN  CONST CM_ARCH_PMCG_NODE  *Node
   )
 {
   ASSERT (Node != NULL);
@@ -566,7 +566,7 @@ STATIC
 UINT64
 GetSizeofPmcgNodes (
   IN      CONST UINT32                     NodeStartOffset,
-  IN      CONST CM_ARM_PMCG_NODE           *NodeList,
+  IN      CONST CM_ARCH_PMCG_NODE          *NodeList,
   IN            UINT32                     NodeCount,
   IN OUT        IORT_NODE_INDEXER **CONST  NodeIndexer
   )
@@ -609,7 +609,7 @@ GetSizeofPmcgNodes (
 STATIC
 UINT32
 GetRmrNodeSize (
-  IN  CONST CM_ARM_RMR_NODE  *Node
+  IN  CONST CM_ARCH_RMR_NODE  *Node
   )
 {
   ASSERT (Node != NULL);
@@ -644,7 +644,7 @@ STATIC
 UINT64
 GetSizeofRmrNodes (
   IN      CONST UINT32                     NodeStartOffset,
-  IN      CONST CM_ARM_RMR_NODE            *NodeList,
+  IN      CONST CM_ARCH_RMR_NODE           *NodeList,
   IN            UINT32                     NodeCount,
   IN OUT        IORT_NODE_INDEXER **CONST  NodeIndexer
   )
@@ -760,7 +760,7 @@ AddIdMappingArray (
   )
 {
   EFI_STATUS           Status;
-  CM_ARM_ID_MAPPING    *IdMappings;
+  CM_ARCH_ID_MAPPING   *IdMappings;
   UINT32               IdMappingCount;
   ACPI_IORT_GENERATOR  *Generator;
 
@@ -769,7 +769,7 @@ AddIdMappingArray (
   Generator = (ACPI_IORT_GENERATOR *)This;
 
   // Get the Id Mapping Array
-  Status = GetEArmObjIdMappingArray (
+  Status = GetEArchObjIdMappingArray (
              CfgMgrProtocol,
              IdMappingToken,
              &IdMappings,
@@ -849,14 +849,14 @@ AddItsGroupNodes (
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
   IN  CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE               *Iort,
   IN  CONST UINT32                                        NodesStartOffset,
-  IN  CONST CM_ARM_ITS_GROUP_NODE                         *NodeList,
+  IN  CONST CM_ARCH_ITS_GROUP_NODE                        *NodeList,
   IN        UINT32                                        NodeCount
   )
 {
   EFI_STATUS                          Status;
   EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE  *ItsGroupNode;
   UINT32                              *ItsIds;
-  CM_ARM_ITS_IDENTIFIER               *ItsIdentifier;
+  CM_ARCH_ITS_IDENTIFIER              *ItsIdentifier;
   UINT32                              ItsIdentifierCount;
   UINT32                              IdIndex;
   UINT64                              NodeLength;
@@ -901,7 +901,7 @@ AddItsGroupNodes (
     ItsIds                          = (UINT32 *)((UINT8 *)ItsGroupNode +
                                                  sizeof (EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE));
 
-    Status = GetEArmObjGicItsIdentifierArray (
+    Status = GetEArchObjGicItsIdentifierArray (
                CfgMgrProtocol,
                NodeList->ItsIdToken,
                &ItsIdentifier,
@@ -966,7 +966,7 @@ AddNamedComponentNodes (
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN      CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE                *Iort,
   IN      CONST UINT32                                         NodesStartOffset,
-  IN      CONST CM_ARM_NAMED_COMPONENT_NODE                    *NodeList,
+  IN      CONST CM_ARCH_NAMED_COMPONENT_NODE                   *NodeList,
   IN            UINT32                                         NodeCount
   )
 {
@@ -1111,7 +1111,7 @@ AddRootComplexNodes (
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN      CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE                *Iort,
   IN      CONST UINT32                                         NodesStartOffset,
-  IN      CONST CM_ARM_ROOT_COMPLEX_NODE                       *NodeList,
+  IN      CONST CM_ARCH_ROOT_COMPLEX_NODE                      *NodeList,
   IN            UINT32                                         NodeCount
   )
 {
@@ -1236,14 +1236,14 @@ AddSmmuInterruptArray (
   IN      CONST CM_OBJECT_TOKEN                               InterruptToken
   )
 {
-  EFI_STATUS             Status;
-  CM_ARM_SMMU_INTERRUPT  *SmmuInterrupt;
-  UINT32                 SmmuInterruptCount;
+  EFI_STATUS              Status;
+  CM_ARCH_SMMU_INTERRUPT  *SmmuInterrupt;
+  UINT32                  SmmuInterruptCount;
 
   ASSERT (InterruptArray != NULL);
 
   // Get the SMMU Interrupt Array
-  Status = GetEArmObjSmmuInterruptArray (
+  Status = GetEArchObjSmmuInterruptArray (
              CfgMgrProtocol,
              InterruptToken,
              &SmmuInterrupt,
@@ -1302,7 +1302,7 @@ AddSmmuV1V2Nodes (
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
   IN      CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE               *Iort,
   IN      CONST UINT32                                        NodesStartOffset,
-  IN      CONST CM_ARM_SMMUV1_SMMUV2_NODE                     *NodeList,
+  IN      CONST CM_ARCH_SMMUV1_SMMUV2_NODE                    *NodeList,
   IN            UINT32                                        NodeCount
   )
 {
@@ -1515,7 +1515,7 @@ AddSmmuV3Nodes (
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
   IN      CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE               *Iort,
   IN      CONST UINT32                                        NodesStartOffset,
-  IN      CONST CM_ARM_SMMUV3_NODE                            *NodeList,
+  IN      CONST CM_ARCH_SMMUV3_NODE                           *NodeList,
   IN            UINT32                                        NodeCount
   )
 {
@@ -1654,7 +1654,7 @@ AddPmcgNodes (
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
   IN      CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE               *Iort,
   IN      CONST UINT32                                        NodesStartOffset,
-  IN      CONST CM_ARM_PMCG_NODE                              *NodeList,
+  IN      CONST CM_ARCH_PMCG_NODE                             *NodeList,
   IN            UINT32                                        NodeCount
   )
 {
@@ -1794,14 +1794,14 @@ AddMemRangeDescArray (
   IN  CONST CM_OBJECT_TOKEN                                   DescToken
   )
 {
-  EFI_STATUS                      Status;
-  CM_ARM_MEMORY_RANGE_DESCRIPTOR  *MemRangeDesc;
-  UINT32                          MemRangeDescCount;
+  EFI_STATUS                       Status;
+  CM_ARCH_MEMORY_RANGE_DESCRIPTOR  *MemRangeDesc;
+  UINT32                           MemRangeDescCount;
 
   ASSERT (DescArray != NULL);
 
   // Get the Id Mapping Array
-  Status = GetEArmObjMemoryRangeDescriptor (
+  Status = GetEArchObjMemoryRangeDescriptor (
              CfgMgrProtocol,
              DescToken,
              &MemRangeDesc,
@@ -1863,7 +1863,7 @@ AddRmrNodes (
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
   IN      CONST EFI_ACPI_6_0_IO_REMAPPING_TABLE               *Iort,
   IN      CONST UINT32                                        NodesStartOffset,
-  IN      CONST CM_ARM_RMR_NODE                               *NodeList,
+  IN      CONST CM_ARCH_RMR_NODE                              *NodeList,
   IN            UINT32                                        NodeCount
   )
 {
@@ -2088,13 +2088,13 @@ BuildIortTable (
   UINT32  PmcgOffset;
   UINT32  RmrOffset;
 
-  CM_ARM_ITS_GROUP_NODE        *ItsGroupNodeList;
-  CM_ARM_NAMED_COMPONENT_NODE  *NamedComponentNodeList;
-  CM_ARM_ROOT_COMPLEX_NODE     *RootComplexNodeList;
-  CM_ARM_SMMUV1_SMMUV2_NODE    *SmmuV1V2NodeList;
-  CM_ARM_SMMUV3_NODE           *SmmuV3NodeList;
-  CM_ARM_PMCG_NODE             *PmcgNodeList;
-  CM_ARM_RMR_NODE              *RmrNodeList;
+  CM_ARCH_ITS_GROUP_NODE        *ItsGroupNodeList;
+  CM_ARCH_NAMED_COMPONENT_NODE  *NamedComponentNodeList;
+  CM_ARCH_ROOT_COMPLEX_NODE     *RootComplexNodeList;
+  CM_ARCH_SMMUV1_SMMUV2_NODE    *SmmuV1V2NodeList;
+  CM_ARCH_SMMUV3_NODE           *SmmuV3NodeList;
+  CM_ARCH_PMCG_NODE             *PmcgNodeList;
+  CM_ARCH_RMR_NODE              *RmrNodeList;
 
   EFI_ACPI_6_0_IO_REMAPPING_TABLE  *Iort;
   IORT_NODE_INDEXER                *NodeIndexer;
@@ -2137,7 +2137,7 @@ BuildIortTable (
   *Table    = NULL;
 
   // Get the ITS group node info
-  Status = GetEArmObjItsGroup (
+  Status = GetEArchObjItsGroup (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &ItsGroupNodeList,
@@ -2156,7 +2156,7 @@ BuildIortTable (
   IortNodeCount = ItsGroupNodeCount;
 
   // Get the Named component node info
-  Status = GetEArmObjNamedComponent (
+  Status = GetEArchObjNamedComponent (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &NamedComponentNodeList,
@@ -2175,7 +2175,7 @@ BuildIortTable (
   IortNodeCount += NamedComponentNodeCount;
 
   // Get the Root complex node info
-  Status = GetEArmObjRootComplex (
+  Status = GetEArchObjRootComplex (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &RootComplexNodeList,
@@ -2194,7 +2194,7 @@ BuildIortTable (
   IortNodeCount += RootComplexNodeCount;
 
   // Get the SMMU v1/v2 node info
-  Status = GetEArmObjSmmuV1SmmuV2 (
+  Status = GetEArchObjSmmuV1SmmuV2 (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &SmmuV1V2NodeList,
@@ -2213,7 +2213,7 @@ BuildIortTable (
   IortNodeCount += SmmuV1V2NodeCount;
 
   // Get the SMMUv3 node info
-  Status = GetEArmObjSmmuV3 (
+  Status = GetEArchObjSmmuV3 (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &SmmuV3NodeList,
@@ -2232,7 +2232,7 @@ BuildIortTable (
   IortNodeCount += SmmuV3NodeCount;
 
   // Get the PMCG node info
-  Status = GetEArmObjPmcg (
+  Status = GetEArchObjPmcg (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PmcgNodeList,
@@ -2254,7 +2254,7 @@ BuildIortTable (
       EFI_ACPI_IO_REMAPPING_TABLE_REVISION_05)
   {
     // Get the RMR node info
-    Status = GetEArmObjRmr (
+    Status = GetEArchObjRmr (
                CfgMgrProtocol,
                CM_NULL_TOKEN,
                &RmrNodeList,

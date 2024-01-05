@@ -40,7 +40,7 @@ TokenFixerNotImplemented (
   return EFI_UNSUPPORTED;
 }
 
-/** EArmObjItsGroup token fixer.
+/** EArchObjItsGroup token fixer.
 
   CmObjectToken fixer function that updates the Tokens in the CmObjects.
 
@@ -60,11 +60,11 @@ TokenFixerItsGroup (
   )
 {
   ASSERT (CmObject != NULL);
-  ((CM_ARM_ITS_GROUP_NODE *)CmObject->Data)->Token = Token;
+  ((CM_ARCH_ITS_GROUP_NODE *)CmObject->Data)->Token = Token;
   return EFI_SUCCESS;
 }
 
-/** EArmObjNamedComponent token fixer.
+/** EArchObjNamedComponent token fixer.
 
   CmObjectToken fixer function that updates the Tokens in the CmObjects.
 
@@ -84,11 +84,11 @@ TokenFixerNamedComponentNode (
   )
 {
   ASSERT (CmObject != NULL);
-  ((CM_ARM_NAMED_COMPONENT_NODE *)CmObject->Data)->Token = Token;
+  ((CM_ARCH_NAMED_COMPONENT_NODE *)CmObject->Data)->Token = Token;
   return EFI_SUCCESS;
 }
 
-/** EArmObjRootComplex token fixer.
+/** EArchObjRootComplex token fixer.
 
   CmObjectToken fixer function that updates the Tokens in the CmObjects.
 
@@ -108,11 +108,11 @@ TokenFixerRootComplexNode (
   )
 {
   ASSERT (CmObject != NULL);
-  ((CM_ARM_ROOT_COMPLEX_NODE *)CmObject->Data)->Token = Token;
+  ((CM_ARCH_ROOT_COMPLEX_NODE *)CmObject->Data)->Token = Token;
   return EFI_SUCCESS;
 }
 
-/** EArmObjSmmuV3 token fixer.
+/** EArchObjSmmuV3 token fixer.
 
   CmObjectToken fixer function that updates the Tokens in the CmObjects.
 
@@ -132,7 +132,7 @@ TokenFixerSmmuV3Node (
   )
 {
   ASSERT (CmObject != NULL);
-  ((CM_ARM_SMMUV3_NODE *)CmObject->Data)->Token = Token;
+  ((CM_ARCH_SMMUV3_NODE *)CmObject->Data)->Token = Token;
   return EFI_SUCCESS;
 }
 
@@ -142,7 +142,7 @@ TokenFixerSmmuV3Node (
   Token fixed. Each CmObj can have its Token in a specific way.
 */
 CONST
-CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
+CM_OBJECT_TOKEN_FIXER  TokenFixer[EArchObjMax] = {
   NULL,                             ///<  0 - Reserved
   NULL,                             ///<  1 - Boot Architecture Info
   NULL,                             ///<  2 - CPU Info
@@ -218,7 +218,7 @@ FixupCmObjectSelfToken (
   }
 
   ArmNamespaceObjId = GET_CM_OBJECT_ID (CmObjDesc->ObjectId);
-  if (ArmNamespaceObjId >= EArmObjMax) {
+  if (ArmNamespaceObjId >= EArchObjMax) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }

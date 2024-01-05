@@ -71,7 +71,7 @@ CONST COMPATIBILITY_INFO  SerialSbsaCompatibleInfo = {
 
   @param [in]  Fdt               Pointer to a Flattened Device Tree (Fdt).
   @param [in]  SerialPortNode    Offset of a serial-port node.
-  @param [in]  SerialPortInfo    The CM_ARM_SERIAL_PORT_INFO to populate.
+  @param [in]  SerialPortInfo    The CM_ARCH_SERIAL_PORT_INFO to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -82,9 +82,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 SerialPortNodeParser (
-  IN  CONST VOID               *Fdt,
-  IN  INT32                    SerialPortNode,
-  IN  CM_ARM_SERIAL_PORT_INFO  *SerialPortInfo
+  IN  CONST VOID                *Fdt,
+  IN  INT32                     SerialPortNode,
+  IN  CM_ARCH_SERIAL_PORT_INFO  *SerialPortInfo
   )
 {
   EFI_STATUS   Status;
@@ -313,7 +313,7 @@ GetSerialConsoleNode (
   return EFI_SUCCESS;
 }
 
-/** CM_ARM_SERIAL_PORT_INFO dispatcher function (for a generic serial-port).
+/** CM_ARCH_SERIAL_PORT_INFO dispatcher function (for a generic serial-port).
 
   @param [in]  FdtParserHandle A handle to the parser instance.
   @param [in]  GenericSerialInfo  Pointer to a serial port info list.
@@ -331,9 +331,9 @@ EFI_STATUS
 EFIAPI
 ArmSerialPortInfoDispatch (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
-  IN  CM_ARM_SERIAL_PORT_INFO          *GenericSerialInfo,
+  IN  CM_ARCH_SERIAL_PORT_INFO         *GenericSerialInfo,
   IN  INT32                            NodeCount,
-  IN  EARM_OBJECT_ID                   SerialObjectId
+  IN  EARCH_OBJECT_ID                  SerialObjectId
   )
 {
   EFI_STATUS         Status;
@@ -344,9 +344,9 @@ ArmSerialPortInfoDispatch (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((SerialObjectId != EArmObjSerialPortInfo) &&
-      (SerialObjectId != EArmObjSerialDebugPortInfo) &&
-      (SerialObjectId != EArmObjSerialConsolePortInfo))
+  if ((SerialObjectId != EArchObjSerialPortInfo) &&
+      (SerialObjectId != EArchObjSerialDebugPortInfo) &&
+      (SerialObjectId != EArchObjSerialConsolePortInfo))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -354,10 +354,10 @@ ArmSerialPortInfoDispatch (
 
   // Dispatch the Generic Serial ports
   Status = CreateCmObjDesc (
-             CREATE_CM_ARM_OBJECT_ID (SerialObjectId),
+             CREATE_CM_ARCH_OBJECT_ID (SerialObjectId),
              NodeCount,
              GenericSerialInfo,
-             sizeof (CM_ARM_SERIAL_PORT_INFO) * NodeCount,
+             sizeof (CM_ARCH_SERIAL_PORT_INFO) * NodeCount,
              &NewCmObjDesc
              );
   if (EFI_ERROR (Status)) {
@@ -372,19 +372,19 @@ ArmSerialPortInfoDispatch (
   return Status;
 }
 
-/** CM_ARM_SERIAL_PORT_INFO parser function (for debug/console serial-port).
+/** CM_ARCH_SERIAL_PORT_INFO parser function (for debug/console serial-port).
 
   This parser expects FdtBranch to be the debug serial-port node.
   At most one CmObj is created.
   The following structure is populated:
-  typedef struct CmArmSerialPortInfo {
+  typedef struct CmArchSerialPortInfo {
     UINT64  BaseAddress;                      // {Populated}
     UINT32  Interrupt;                        // {Populated}
     UINT64  BaudRate;                         // {default}
     UINT32  Clock;                            // {Populated}
     UINT16  PortSubtype;                      // {Populated}
     UINT64  BaseAddressLength                 // {Populated}
-  } CM_ARM_SERIAL_PORT_INFO;
+  } CM_ARCH_SERIAL_PORT_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -410,14 +410,14 @@ EFIAPI
 ArmSerialPortInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch,
-  IN        EARM_OBJECT_ID             SerialObjectId
+  IN        EARCH_OBJECT_ID            SerialObjectId
   )
 {
-  EFI_STATUS               Status;
-  CM_ARM_SERIAL_PORT_INFO  SerialInfo;
+  EFI_STATUS                Status;
+  CM_ARCH_SERIAL_PORT_INFO  SerialInfo;
 
-  if ((SerialObjectId != EArmObjSerialDebugPortInfo) &&
-      (SerialObjectId != EArmObjSerialConsolePortInfo))
+  if ((SerialObjectId != EArchObjSerialDebugPortInfo) &&
+      (SerialObjectId != EArchObjSerialConsolePortInfo))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -447,11 +447,11 @@ ArmSerialPortInfoParser (
 
 /** SerialPort dispatcher.
 
-  This disptacher populates the CM_ARM_SERIAL_PORT_INFO structure for
+  This disptacher populates the CM_ARCH_SERIAL_PORT_INFO structure for
   the following CM_OBJ_ID:
-   - EArmObjSerialConsolePortInfo
-   - EArmObjSerialDebugPortInfo
-   - EArmObjSerialPortInfo
+   - EArchObjSerialConsolePortInfo
+   - EArchObjSerialDebugPortInfo
+   - EArchObjSerialPortInfo
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -477,16 +477,16 @@ SerialPortDispatcher (
   IN        INT32                      FdtBranch
   )
 {
-  EFI_STATUS               Status;
-  INT32                    SerialConsoleNode;
-  INT32                    SerialDebugNode;
-  INT32                    SerialNode;
-  UINT32                   Index;
-  UINT32                   SerialNodeCount;
-  UINT32                   SerialNodesRemaining;
-  CM_ARM_SERIAL_PORT_INFO  *GenericSerialInfo;
-  UINT32                   GenericSerialIndex;
-  VOID                     *Fdt;
+  EFI_STATUS                Status;
+  INT32                     SerialConsoleNode;
+  INT32                     SerialDebugNode;
+  INT32                     SerialNode;
+  UINT32                    Index;
+  UINT32                    SerialNodeCount;
+  UINT32                    SerialNodesRemaining;
+  CM_ARCH_SERIAL_PORT_INFO  *GenericSerialInfo;
+  UINT32                    GenericSerialIndex;
+  VOID                      *Fdt;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
@@ -531,7 +531,7 @@ SerialPortDispatcher (
     Status = ArmSerialPortInfoParser (
                FdtParserHandle,
                SerialConsoleNode,
-               EArmObjSerialConsolePortInfo
+               EArchObjSerialConsolePortInfo
                );
     if (EFI_ERROR (Status)) {
       ASSERT (0);
@@ -550,7 +550,7 @@ SerialPortDispatcher (
     SerialNodesRemaining--;
     GenericSerialInfo = AllocateZeroPool (
                           SerialNodesRemaining *
-                          sizeof (CM_ARM_SERIAL_PORT_INFO)
+                          sizeof (CM_ARCH_SERIAL_PORT_INFO)
                           );
     if (GenericSerialInfo == NULL) {
       ASSERT (0);
@@ -589,7 +589,7 @@ SerialPortDispatcher (
       Status          = ArmSerialPortInfoParser (
                           FdtParserHandle,
                           SerialDebugNode,
-                          EArmObjSerialDebugPortInfo
+                          EArchObjSerialDebugPortInfo
                           );
       if (EFI_ERROR (Status)) {
         ASSERT (0);
@@ -620,7 +620,7 @@ SerialPortDispatcher (
                FdtParserHandle,
                GenericSerialInfo,
                GenericSerialIndex,
-               EArmObjSerialPortInfo
+               EArchObjSerialPortInfo
                );
   }
 

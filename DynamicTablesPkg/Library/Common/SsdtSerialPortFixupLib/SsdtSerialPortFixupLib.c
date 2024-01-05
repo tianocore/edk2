@@ -39,7 +39,7 @@ extern CHAR8  ssdtserialporttemplate_aml_code[];
 
 /** Validate the Serial Port Information.
 
-  @param [in]  SerialPortInfoTable    Table of CM_ARM_SERIAL_PORT_INFO.
+  @param [in]  SerialPortInfoTable    Table of CM_ARCH_SERIAL_PORT_INFO.
   @param [in]  SerialPortCount        Count of SerialPort in the table.
 
   @retval EFI_SUCCESS             Success.
@@ -48,12 +48,12 @@ extern CHAR8  ssdtserialporttemplate_aml_code[];
 EFI_STATUS
 EFIAPI
 ValidateSerialPortInfo (
-  IN  CONST CM_ARM_SERIAL_PORT_INFO  *SerialPortInfoTable,
-  IN        UINT32                   SerialPortCount
+  IN  CONST CM_ARCH_SERIAL_PORT_INFO  *SerialPortInfoTable,
+  IN        UINT32                    SerialPortCount
   )
 {
-  UINT32                         Index;
-  CONST CM_ARM_SERIAL_PORT_INFO  *SerialPortInfo;
+  UINT32                          Index;
+  CONST CM_ARCH_SERIAL_PORT_INFO  *SerialPortInfo;
 
   if ((SerialPortInfoTable == NULL)  ||
       (SerialPortCount == 0))
@@ -136,9 +136,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupIds (
-  IN        AML_ROOT_NODE_HANDLE     RootNodeHandle,
-  IN  CONST UINT64                   Uid,
-  IN  CONST CM_ARM_SERIAL_PORT_INFO  *SerialPortInfo
+  IN        AML_ROOT_NODE_HANDLE      RootNodeHandle,
+  IN  CONST UINT64                    Uid,
+  IN  CONST CM_ARCH_SERIAL_PORT_INFO  *SerialPortInfo
   )
 {
   EFI_STATUS              Status;
@@ -263,8 +263,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupCrs (
-  IN        AML_ROOT_NODE_HANDLE     RootNodeHandle,
-  IN  CONST CM_ARM_SERIAL_PORT_INFO  *SerialPortInfo
+  IN        AML_ROOT_NODE_HANDLE      RootNodeHandle,
+  IN  CONST CM_ARCH_SERIAL_PORT_INFO  *SerialPortInfo
   )
 {
   EFI_STATUS              Status;
@@ -338,9 +338,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupName (
-  IN        AML_ROOT_NODE_HANDLE     RootNodeHandle,
-  IN  CONST CM_ARM_SERIAL_PORT_INFO  *SerialPortInfo,
-  IN  CONST CHAR8                    *Name
+  IN        AML_ROOT_NODE_HANDLE      RootNodeHandle,
+  IN  CONST CM_ARCH_SERIAL_PORT_INFO  *SerialPortInfo,
+  IN  CONST CHAR8                     *Name
   )
 {
   EFI_STATUS              Status;
@@ -382,11 +382,11 @@ STATIC
 EFI_STATUS
 EFIAPI
 FixupSerialPortInfo (
-  IN            AML_ROOT_NODE_HANDLE     RootNodeHandle,
-  IN      CONST CM_ARM_SERIAL_PORT_INFO  *SerialPortInfo,
-  IN      CONST CHAR8                    *Name,
-  IN      CONST UINT64                   Uid,
-  OUT       EFI_ACPI_DESCRIPTION_HEADER  **Table
+  IN            AML_ROOT_NODE_HANDLE      RootNodeHandle,
+  IN      CONST CM_ARCH_SERIAL_PORT_INFO  *SerialPortInfo,
+  IN      CONST CHAR8                     *Name,
+  IN      CONST UINT64                    Uid,
+  OUT       EFI_ACPI_DESCRIPTION_HEADER   **Table
   )
 {
   EFI_STATUS  Status;
@@ -453,7 +453,7 @@ EFI_STATUS
 EFIAPI
 BuildSsdtSerialPortTable (
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO   *AcpiTableInfo,
-  IN  CONST CM_ARM_SERIAL_PORT_INFO      *SerialPortInfo,
+  IN  CONST CM_ARCH_SERIAL_PORT_INFO     *SerialPortInfo,
   IN  CONST CHAR8                        *Name,
   IN  CONST UINT64                       Uid,
   OUT       EFI_ACPI_DESCRIPTION_HEADER  **Table

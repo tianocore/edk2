@@ -34,7 +34,7 @@ STATIC CONST COMPATIBILITY_INFO  MsiFrameCompatibleInfo = {
   @param [in]  Fdt            Pointer to a Flattened Device Tree (Fdt).
   @param [in]  MsiFrameNode   Offset of a Msi frame node.
   @param [in]  MsiFrameId     Frame ID.
-  @param [out] MsiFrameInfo   The CM_ARM_GIC_MSI_FRAME_INFO to populate.
+  @param [out] MsiFrameInfo   The CM_ARCH_GIC_MSI_FRAME_INFO to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -44,10 +44,10 @@ STATIC
 EFI_STATUS
 EFIAPI
 MsiFrameNodeParser (
-  IN  CONST VOID                 *Fdt,
-  IN  INT32                      MsiFrameNode,
-  IN  UINT32                     MsiFrameId,
-  OUT CM_ARM_GIC_MSI_FRAME_INFO  *MsiFrameInfo
+  IN  CONST VOID                  *Fdt,
+  IN  INT32                       MsiFrameNode,
+  IN  UINT32                      MsiFrameId,
+  OUT CM_ARCH_GIC_MSI_FRAME_INFO  *MsiFrameInfo
   )
 {
   EFI_STATUS   Status;
@@ -94,16 +94,16 @@ MsiFrameNodeParser (
   return EFI_SUCCESS;
 }
 
-/** CM_ARM_GIC_MSI_FRAME_INFO parser function.
+/** CM_ARCH_GIC_MSI_FRAME_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmGicMsiFrameInfo {
+  typedef struct CmArchGicMsiFrameInfo {
     UINT32  GicMsiFrameId;                    // {Populated}
     UINT64  PhysicalBaseAddress;              // {Populated}
     UINT32  Flags;                            // {default = 0}
     UINT16  SPICount;
     UINT16  SPIBase;
-  } CM_ARM_GIC_MSI_FRAME_INFO;
+  } CM_ARCH_GIC_MSI_FRAME_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -133,9 +133,9 @@ ArmGicMsiFrameInfoParser (
   INT32       MsiFrameNode;
   UINT32      MsiFrameNodeCount;
 
-  UINT32                     Index;
-  CM_ARM_GIC_MSI_FRAME_INFO  MsiFrameInfo;
-  VOID                       *Fdt;
+  UINT32                      Index;
+  CM_ARCH_GIC_MSI_FRAME_INFO  MsiFrameInfo;
+  VOID                        *Fdt;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
@@ -163,7 +163,7 @@ ArmGicMsiFrameInfoParser (
   // Parse each node having the "msi-controller" property.
   MsiFrameNode = FdtBranch;
   for (Index = 0; Index < MsiFrameNodeCount; Index++) {
-    ZeroMem (&MsiFrameInfo, sizeof (CM_ARM_GIC_MSI_FRAME_INFO));
+    ZeroMem (&MsiFrameInfo, sizeof (CM_ARCH_GIC_MSI_FRAME_INFO));
 
     Status = FdtGetNextPropNodeInBranch (
                Fdt,
@@ -202,9 +202,9 @@ ArmGicMsiFrameInfoParser (
     // Add the CmObj to the Configuration Manager.
     Status = AddSingleCmObj (
                FdtParserHandle,
-               CREATE_CM_ARM_OBJECT_ID (EArmObjGicMsiFrameInfo),
+               CREATE_CM_ARCH_OBJECT_ID (EArchObjGicMsiFrameInfo),
                &MsiFrameInfo,
-               sizeof (CM_ARM_GIC_MSI_FRAME_INFO),
+               sizeof (CM_ARCH_GIC_MSI_FRAME_INFO),
                NULL
                );
     if (EFI_ERROR (Status)) {

@@ -26,10 +26,10 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjGenericTimerInfo
-  - EArmObjPlatformGenericWatchdogInfo (OPTIONAL)
-  - EArmObjPlatformGTBlockInfo (OPTIONAL)
-  - EArmObjGTBlockTimerFrameInfo (OPTIONAL)
+  - EArchObjGenericTimerInfo
+  - EArchObjPlatformGenericWatchdogInfo (OPTIONAL)
+  - EArchObjPlatformGTBlockInfo (OPTIONAL)
+  - EArchObjGTBlockTimerFrameInfo (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the Generic
@@ -37,8 +37,8 @@ Requirements:
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGenericTimerInfo,
-  CM_ARM_GENERIC_TIMER_INFO
+  EArchObjGenericTimerInfo,
+  CM_ARCH_GENERIC_TIMER_INFO
   );
 
 /** This macro expands to a function that retrieves the Arm Generic
@@ -46,8 +46,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjPlatformGenericWatchdogInfo,
-  CM_ARM_GENERIC_WATCHDOG_INFO
+  EArchObjPlatformGenericWatchdogInfo,
+  CM_ARCH_GENERIC_WATCHDOG_INFO
   );
 
 /** This macro expands to a function that retrieves the Platform Generic
@@ -55,8 +55,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjPlatformGTBlockInfo,
-  CM_ARM_GTBLOCK_INFO
+  EArchObjPlatformGTBlockInfo,
+  CM_ARCH_GTBLOCK_INFO
   );
 
 /** This macro expands to a function that retrieves the Generic
@@ -64,8 +64,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGTBlockTimerFrameInfo,
-  CM_ARM_GTBLOCK_TIMER_FRAME_INFO
+  EArchObjGTBlockTimerFrameInfo,
+  CM_ARCH_GTBLOCK_TIMER_FRAME_INFO
   );
 
 /** Add the Generic Timer Information to the GTDT table.
@@ -96,13 +96,13 @@ AddGenericTimerInfo (
   IN  CONST UINT32                                               AcpiTableRevision
   )
 {
-  EFI_STATUS                 Status;
-  CM_ARM_GENERIC_TIMER_INFO  *GenericTimerInfo;
+  EFI_STATUS                  Status;
+  CM_ARCH_GENERIC_TIMER_INFO  *GenericTimerInfo;
 
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (Gtdt != NULL);
 
-  Status = GetEArmObjGenericTimerInfo (
+  Status = GetEArchObjGenericTimerInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GenericTimerInfo,
@@ -156,7 +156,7 @@ VOID
 AddGenericWatchdogList (
   IN EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE  *CONST  Gtdt,
   IN CONST UINT32                                          WatchdogOffset,
-  IN CONST CM_ARM_GENERIC_WATCHDOG_INFO                    *WatchdogInfoList,
+  IN CONST CM_ARCH_GENERIC_WATCHDOG_INFO                   *WatchdogInfoList,
   IN       UINT32                                          WatchdogCount
   )
 {
@@ -217,8 +217,8 @@ IsGtFrameNumberEqual (
 
   ASSERT ((Frame1 != NULL) && (Frame2 != NULL));
 
-  FrameNumber1 = ((CM_ARM_GTBLOCK_TIMER_FRAME_INFO *)Frame1)->FrameNumber;
-  FrameNumber2 = ((CM_ARM_GTBLOCK_TIMER_FRAME_INFO *)Frame2)->FrameNumber;
+  FrameNumber1 = ((CM_ARCH_GTBLOCK_TIMER_FRAME_INFO *)Frame1)->FrameNumber;
+  FrameNumber2 = ((CM_ARCH_GTBLOCK_TIMER_FRAME_INFO *)Frame2)->FrameNumber;
 
   if (FrameNumber1 == FrameNumber2) {
     DEBUG ((
@@ -250,7 +250,7 @@ STATIC
 EFI_STATUS
 AddGTBlockTimerFrames (
   IN       EFI_ACPI_6_4_GTDT_GT_BLOCK_TIMER_STRUCTURE  *GtBlockFrame,
-  IN CONST CM_ARM_GTBLOCK_TIMER_FRAME_INFO             *GTBlockTimerFrameList,
+  IN CONST CM_ARCH_GTBLOCK_TIMER_FRAME_INFO            *GTBlockTimerFrameList,
   IN       UINT32                                      GTBlockFrameCount
   )
 {
@@ -262,7 +262,7 @@ AddGTBlockTimerFrames (
   IsFrameNumberDuplicated = FindDuplicateValue (
                               GTBlockTimerFrameList,
                               GTBlockFrameCount,
-                              sizeof (CM_ARM_GTBLOCK_TIMER_FRAME_INFO),
+                              sizeof (CM_ARCH_GTBLOCK_TIMER_FRAME_INFO),
                               IsGtFrameNumberEqual
                               );
   // Duplicate entry was found so timer frame numbers provided are invalid
@@ -332,14 +332,14 @@ AddGTBlockList (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL     *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE    *CONST  Gtdt,
   IN CONST UINT32                                            GTBlockOffset,
-  IN CONST CM_ARM_GTBLOCK_INFO                               *GTBlockInfo,
+  IN CONST CM_ARCH_GTBLOCK_INFO                              *GTBlockInfo,
   IN       UINT32                                            BlockTimerCount
   )
 {
   EFI_STATUS                                  Status;
   EFI_ACPI_6_4_GTDT_GT_BLOCK_STRUCTURE        *GTBlock;
   EFI_ACPI_6_4_GTDT_GT_BLOCK_TIMER_STRUCTURE  *GtBlockFrame;
-  CM_ARM_GTBLOCK_TIMER_FRAME_INFO             *GTBlockTimerFrameList;
+  CM_ARCH_GTBLOCK_TIMER_FRAME_INFO            *GTBlockTimerFrameList;
   UINT32                                      GTBlockTimerFrameCount;
   UINTN                                       Length;
 
@@ -352,7 +352,7 @@ AddGTBlockList (
   while (BlockTimerCount-- != 0) {
     DEBUG ((DEBUG_INFO, "GTDT: GTBlock = 0x%p\n", GTBlock));
 
-    Status = GetEArmObjGTBlockTimerFrameInfo (
+    Status = GetEArchObjGTBlockTimerFrameInfo (
                CfgMgrProtocol,
                GTBlockInfo->GTBlockTimerFrameToken,
                &GTBlockTimerFrameList,
@@ -461,8 +461,8 @@ BuildGtdtTable (
   UINT32                                        PlatformTimerCount;
   UINT32                                        WatchdogCount;
   UINT32                                        BlockTimerCount;
-  CM_ARM_GENERIC_WATCHDOG_INFO                  *WatchdogInfoList;
-  CM_ARM_GTBLOCK_INFO                           *GTBlockInfo;
+  CM_ARCH_GENERIC_WATCHDOG_INFO                 *WatchdogInfoList;
+  CM_ARCH_GTBLOCK_INFO                          *GTBlockInfo;
   EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE  *Gtdt;
   UINT32                                        Idx;
   UINT32                                        GTBlockOffset;
@@ -490,7 +490,7 @@ BuildGtdtTable (
   }
 
   *Table = NULL;
-  Status = GetEArmObjPlatformGTBlockInfo (
+  Status = GetEArchObjPlatformGTBlockInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GTBlockInfo,
@@ -506,7 +506,7 @@ BuildGtdtTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjPlatformGenericWatchdogInfo (
+  Status = GetEArchObjPlatformGenericWatchdogInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &WatchdogInfoList,

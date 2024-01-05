@@ -26,11 +26,11 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjGicCInfo
-  - EArmObjGicDInfo
-  - EArmObjGicMsiFrameInfo (OPTIONAL)
-  - EArmObjGicRedistributorInfo (OPTIONAL)
-  - EArmObjGicItsInfo (OPTIONAL)
+  - EArchObjGicCInfo
+  - EArchObjGicDInfo
+  - EArchObjGicMsiFrameInfo (OPTIONAL)
+  - EArchObjGicRedistributorInfo (OPTIONAL)
+  - EArchObjGicItsInfo (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the GIC
@@ -38,8 +38,8 @@ Requirements:
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGicCInfo,
-  CM_ARM_GICC_INFO
+  EArchObjGicCInfo,
+  CM_ARCH_GICC_INFO
   );
 
 /** This macro expands to a function that retrieves the GIC
@@ -48,8 +48,8 @@ GET_OBJECT_LIST (
 
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGicDInfo,
-  CM_ARM_GICD_INFO
+  EArchObjGicDInfo,
+  CM_ARCH_GICD_INFO
   );
 
 /** This macro expands to a function that retrieves the GIC
@@ -57,8 +57,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGicMsiFrameInfo,
-  CM_ARM_GIC_MSI_FRAME_INFO
+  EArchObjGicMsiFrameInfo,
+  CM_ARCH_GIC_MSI_FRAME_INFO
   );
 
 /** This macro expands to a function that retrieves the GIC
@@ -67,8 +67,8 @@ GET_OBJECT_LIST (
 
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGicRedistributorInfo,
-  CM_ARM_GIC_REDIST_INFO
+  EArchObjGicRedistributorInfo,
+  CM_ARCH_GIC_REDIST_INFO
   );
 
 /** This macro expands to a function that retrieves the GIC
@@ -77,8 +77,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGicItsInfo,
-  CM_ARM_GIC_ITS_INFO
+  EArchObjGicItsInfo,
+  CM_ARCH_GIC_ITS_INFO
   );
 
 /** This function updates the GIC CPU Interface Information in the
@@ -91,9 +91,9 @@ GET_OBJECT_LIST (
 STATIC
 VOID
 AddGICC (
-  IN        EFI_ACPI_6_5_GIC_STRUCTURE  *CONST  Gicc,
-  IN  CONST CM_ARM_GICC_INFO            *CONST  GicCInfo,
-  IN  CONST UINT8                               MadtRev
+  IN        EFI_ACPI_6_5_GIC_STRUCTURE  *CONST   Gicc,
+  IN  CONST CM_ARCH_GICC_INFO            *CONST  GicCInfo,
+  IN  CONST UINT8                                MadtRev
   )
 {
   ASSERT (Gicc != NULL);
@@ -183,8 +183,8 @@ IsAcpiUidEqual (
 
   ASSERT ((GicCInfo1 != NULL) && (GicCInfo2 != NULL));
 
-  Uid1 = ((CM_ARM_GICC_INFO *)GicCInfo1)->AcpiProcessorUid;
-  Uid2 = ((CM_ARM_GICC_INFO *)GicCInfo2)->AcpiProcessorUid;
+  Uid1 = ((CM_ARCH_GICC_INFO *)GicCInfo1)->AcpiProcessorUid;
+  Uid2 = ((CM_ARCH_GICC_INFO *)GicCInfo2)->AcpiProcessorUid;
 
   if (Uid1 == Uid2) {
     DEBUG ((
@@ -220,7 +220,7 @@ STATIC
 EFI_STATUS
 AddGICCList (
   IN  EFI_ACPI_6_5_GIC_STRUCTURE  *Gicc,
-  IN  CONST CM_ARM_GICC_INFO      *GicCInfo,
+  IN  CONST CM_ARCH_GICC_INFO     *GicCInfo,
   IN        UINT32                GicCCount,
   IN  CONST UINT8                 MadtRev
   )
@@ -233,7 +233,7 @@ AddGICCList (
   IsAcpiProcUidDuplicated = FindDuplicateValue (
                               GicCInfo,
                               GicCCount,
-                              sizeof (CM_ARM_GICC_INFO),
+                              sizeof (CM_ARCH_GICC_INFO),
                               IsAcpiUidEqual
                               );
   // Duplicate ACPI Processor UID was found so the GICC info provided
@@ -257,8 +257,8 @@ AddGICCList (
 STATIC
 VOID
 AddGICD (
-  EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE  *CONST  Gicd,
-  CONST CM_ARM_GICD_INFO                  *CONST  GicDInfo
+  EFI_ACPI_6_5_GIC_DISTRIBUTOR_STRUCTURE  *CONST   Gicd,
+  CONST CM_ARCH_GICD_INFO                  *CONST  GicDInfo
   )
 {
   ASSERT (Gicd != NULL);
@@ -294,8 +294,8 @@ AddGICD (
 STATIC
 VOID
 AddGICMsiFrame (
-  IN  EFI_ACPI_6_5_GIC_MSI_FRAME_STRUCTURE  *CONST  GicMsiFrame,
-  IN  CONST CM_ARM_GIC_MSI_FRAME_INFO       *CONST  GicMsiFrameInfo
+  IN  EFI_ACPI_6_5_GIC_MSI_FRAME_STRUCTURE  *CONST   GicMsiFrame,
+  IN  CONST CM_ARCH_GIC_MSI_FRAME_INFO       *CONST  GicMsiFrameInfo
   )
 {
   ASSERT (GicMsiFrame != NULL);
@@ -322,7 +322,7 @@ STATIC
 VOID
 AddGICMsiFrameInfoList (
   IN  EFI_ACPI_6_5_GIC_MSI_FRAME_STRUCTURE  *GicMsiFrame,
-  IN  CONST CM_ARM_GIC_MSI_FRAME_INFO       *GicMsiFrameInfo,
+  IN  CONST CM_ARCH_GIC_MSI_FRAME_INFO      *GicMsiFrameInfo,
   IN        UINT32                          GicMsiFrameCount
   )
 {
@@ -342,8 +342,8 @@ AddGICMsiFrameInfoList (
 STATIC
 VOID
 AddGICRedistributor (
-  IN  EFI_ACPI_6_5_GICR_STRUCTURE   *CONST  Gicr,
-  IN  CONST CM_ARM_GIC_REDIST_INFO  *CONST  GicRedistributorInfo
+  IN  EFI_ACPI_6_5_GICR_STRUCTURE   *CONST   Gicr,
+  IN  CONST CM_ARCH_GIC_REDIST_INFO  *CONST  GicRedistributorInfo
   )
 {
   ASSERT (Gicr != NULL);
@@ -366,9 +366,9 @@ AddGICRedistributor (
 STATIC
 VOID
 AddGICRedistributorList (
-  IN  EFI_ACPI_6_5_GICR_STRUCTURE   *Gicr,
-  IN  CONST CM_ARM_GIC_REDIST_INFO  *GicRInfo,
-  IN        UINT32                  GicRCount
+  IN  EFI_ACPI_6_5_GICR_STRUCTURE    *Gicr,
+  IN  CONST CM_ARCH_GIC_REDIST_INFO  *GicRInfo,
+  IN        UINT32                   GicRCount
   )
 {
   ASSERT (Gicr != NULL);
@@ -387,8 +387,8 @@ AddGICRedistributorList (
 STATIC
 VOID
 AddGICInterruptTranslationService (
-  IN  EFI_ACPI_6_5_GIC_ITS_STRUCTURE  *CONST  GicIts,
-  IN  CONST CM_ARM_GIC_ITS_INFO       *CONST  GicItsInfo
+  IN  EFI_ACPI_6_5_GIC_ITS_STRUCTURE  *CONST   GicIts,
+  IN  CONST CM_ARCH_GIC_ITS_INFO       *CONST  GicItsInfo
   )
 {
   ASSERT (GicIts != NULL);
@@ -413,7 +413,7 @@ STATIC
 VOID
 AddGICItsList (
   IN  EFI_ACPI_6_5_GIC_ITS_STRUCTURE  *GicIts,
-  IN  CONST CM_ARM_GIC_ITS_INFO       *GicItsInfo,
+  IN  CONST CM_ARCH_GIC_ITS_INFO      *GicItsInfo,
   IN        UINT32                    GicItsCount
   )
 {
@@ -457,23 +457,23 @@ BuildMadtTable (
   OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
-  EFI_STATUS                 Status;
-  UINT32                     TableSize;
-  UINT32                     GicCCount;
-  UINT32                     GicDCount;
-  UINT32                     GicMSICount;
-  UINT32                     GicRedistCount;
-  UINT32                     GicItsCount;
-  CM_ARM_GICC_INFO           *GicCInfo;
-  CM_ARM_GICD_INFO           *GicDInfo;
-  CM_ARM_GIC_MSI_FRAME_INFO  *GicMSIInfo;
-  CM_ARM_GIC_REDIST_INFO     *GicRedistInfo;
-  CM_ARM_GIC_ITS_INFO        *GicItsInfo;
-  UINT32                     GicCOffset;
-  UINT32                     GicDOffset;
-  UINT32                     GicMSIOffset;
-  UINT32                     GicRedistOffset;
-  UINT32                     GicItsOffset;
+  EFI_STATUS                  Status;
+  UINT32                      TableSize;
+  UINT32                      GicCCount;
+  UINT32                      GicDCount;
+  UINT32                      GicMSICount;
+  UINT32                      GicRedistCount;
+  UINT32                      GicItsCount;
+  CM_ARCH_GICC_INFO           *GicCInfo;
+  CM_ARCH_GICD_INFO           *GicDInfo;
+  CM_ARCH_GIC_MSI_FRAME_INFO  *GicMSIInfo;
+  CM_ARCH_GIC_REDIST_INFO     *GicRedistInfo;
+  CM_ARCH_GIC_ITS_INFO        *GicItsInfo;
+  UINT32                      GicCOffset;
+  UINT32                      GicDOffset;
+  UINT32                      GicMSIOffset;
+  UINT32                      GicRedistOffset;
+  UINT32                      GicItsOffset;
 
   EFI_ACPI_6_5_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER  *Madt;
 
@@ -500,7 +500,7 @@ BuildMadtTable (
 
   *Table = NULL;
 
-  Status = GetEArmObjGicCInfo (
+  Status = GetEArchObjGicCInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GicCInfo,
@@ -525,7 +525,7 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjGicDInfo (
+  Status = GetEArchObjGicDInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GicDInfo,
@@ -562,7 +562,7 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjGicMsiFrameInfo (
+  Status = GetEArchObjGicMsiFrameInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GicMSIInfo,
@@ -577,7 +577,7 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjGicRedistributorInfo (
+  Status = GetEArchObjGicRedistributorInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GicRedistInfo,
@@ -592,7 +592,7 @@ BuildMadtTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjGicItsInfo (
+  Status = GetEArchObjGicItsInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GicItsInfo,

@@ -27,7 +27,7 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjPciConfigSpaceInfo
+  - EArchObjPciConfigSpaceInfo
 */
 
 #pragma pack(1)
@@ -52,8 +52,8 @@ typedef
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjPciConfigSpaceInfo,
-  CM_ARM_PCI_CONFIG_SPACE_INFO
+  EArchObjPciConfigSpaceInfo,
+  CM_ARCH_PCI_CONFIG_SPACE_INFO
   );
 
 /** Add the PCI Enhanced Configuration Space Information to the MCFG Table.
@@ -70,7 +70,7 @@ VOID
 AddPciConfigurationSpaceList (
   IN       MCFG_TABLE                   *CONST  Mcfg,
   IN CONST UINT32                               PciCfgSpaceOffset,
-  IN CONST CM_ARM_PCI_CONFIG_SPACE_INFO         *PciCfgSpaceInfoList,
+  IN CONST CM_ARCH_PCI_CONFIG_SPACE_INFO        *PciCfgSpaceInfoList,
   IN       UINT32                               PciCfgSpaceCount
   )
 {
@@ -126,11 +126,11 @@ BuildMcfgTable (
   OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
-  EFI_STATUS                    Status;
-  UINT32                        TableSize;
-  UINT32                        ConfigurationSpaceCount;
-  CM_ARM_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfoList;
-  MCFG_TABLE                    *Mcfg;
+  EFI_STATUS                     Status;
+  UINT32                         TableSize;
+  UINT32                         ConfigurationSpaceCount;
+  CM_ARCH_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfoList;
+  MCFG_TABLE                     *Mcfg;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -154,7 +154,7 @@ BuildMcfgTable (
   }
 
   *Table = NULL;
-  Status = GetEArmObjPciConfigSpaceInfo (
+  Status = GetEArchObjPciConfigSpaceInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PciConfigSpaceInfoList,

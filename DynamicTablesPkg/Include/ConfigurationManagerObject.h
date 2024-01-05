@@ -12,7 +12,7 @@
 #ifndef CONFIGURATION_MANAGER_OBJECT_H_
 #define CONFIGURATION_MANAGER_OBJECT_H_
 
-#include <ArmNameSpaceObjects.h>
+#include <ArchNameSpaceObjects.h>
 #include <StandardNameSpaceObjects.h>
 
 #pragma pack(1)
@@ -179,7 +179,7 @@ typedef struct CmObjDescriptor {
 
   @retval Returns an ARM Configuration Manager Object ID.
 **/
-#define CREATE_CM_ARM_OBJECT_ID(ObjectId) \
+#define CREATE_CM_ARCH_OBJECT_ID(ObjectId) \
           (CREATE_CM_OBJECT_ID (EObjNameSpaceArm, ObjectId))
 
 /** This macro returns a Configuration Manager Object ID

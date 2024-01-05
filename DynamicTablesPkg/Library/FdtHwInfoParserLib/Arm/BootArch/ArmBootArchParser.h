@@ -11,12 +11,12 @@
 #ifndef ARM_BOOT_ARCH_PARSER_H_
 #define ARM_BOOT_ARCH_PARSER_H_
 
-/** CM_ARM_BOOT_ARCH_INFO parser function.
+/** CM_ARCH_BOOT_ARCH_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmBootArchInfo {
+  typedef struct CmArchBootArchInfo {
     UINT16  BootArchFlags;                    // {Populated}
-  } CM_ARM_BOOT_ARCH_INFO;
+  } CM_ARCH_BOOT_ARCH_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

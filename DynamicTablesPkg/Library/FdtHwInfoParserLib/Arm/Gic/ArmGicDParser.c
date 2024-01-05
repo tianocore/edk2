@@ -22,7 +22,7 @@
   @param [in]  Fdt              Pointer to a Flattened Device Tree (Fdt).
   @param [in]  GicIntcNode      Offset of a Gic compatible
                                 interrupt-controller node.
-  @param [in]  GicDInfo         The CM_ARM_GICD_INFO to populate.
+  @param [in]  GicDInfo         The CM_ARCH_GICD_INFO to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -32,9 +32,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 GicDIntcNodeParser (
-  IN  CONST VOID        *Fdt,
-  IN  INT32             GicIntcNode,
-  IN  CM_ARM_GICD_INFO  *GicDInfo
+  IN  CONST VOID         *Fdt,
+  IN  INT32              GicIntcNode,
+  IN  CM_ARCH_GICD_INFO  *GicDInfo
   )
 {
   EFI_STATUS   Status;
@@ -79,16 +79,16 @@ GicDIntcNodeParser (
   return Status;
 }
 
-/** CM_ARM_GICD_INFO parser function.
+/** CM_ARCH_GICD_INFO parser function.
 
   This parser expects FdtBranch to be a Gic interrupt-controller node.
   At most one CmObj is created.
   The following structure is populated:
-  typedef struct CmArmGicDInfo {
+  typedef struct CmArchGicDInfo {
     UINT64  PhysicalBaseAddress;              // {Populated}
     UINT32  SystemVectorBase;
     UINT8   GicVersion;                       // {Populated}
-  } CM_ARM_GICD_INFO;
+  } CM_ARCH_GICD_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -114,10 +114,10 @@ ArmGicDInfoParser (
   IN        INT32                      FdtBranch
   )
 {
-  EFI_STATUS        Status;
-  UINT32            GicVersion;
-  CM_ARM_GICD_INFO  GicDInfo;
-  VOID              *Fdt;
+  EFI_STATUS         Status;
+  UINT32             GicVersion;
+  CM_ARCH_GICD_INFO  GicDInfo;
+  VOID               *Fdt;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
@@ -161,9 +161,9 @@ ArmGicDInfoParser (
   // Add the CmObj to the Configuration Manager.
   Status = AddSingleCmObj (
              FdtParserHandle,
-             CREATE_CM_ARM_OBJECT_ID (EArmObjGicDInfo),
+             CREATE_CM_ARCH_OBJECT_ID (EArchObjGicDInfo),
              &GicDInfo,
-             sizeof (CM_ARM_GICD_INFO),
+             sizeof (CM_ARCH_GICD_INFO),
              NULL
              );
   ASSERT_EFI_ERROR (Status);

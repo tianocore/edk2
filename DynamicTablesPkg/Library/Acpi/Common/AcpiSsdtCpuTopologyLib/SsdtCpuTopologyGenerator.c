@@ -37,11 +37,11 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjGicCInfo
-  - EArmObjProcHierarchyInfo (OPTIONAL) along with
-  - EArmObjCmRef (OPTIONAL)
-  - EArmObjLpiInfo (OPTIONAL)
-  - GetEArmObjEtInfo (OPTIONAL)
+  - EArchObjGicCInfo
+  - EArchObjProcHierarchyInfo (OPTIONAL) along with
+  - EArchObjCmRef (OPTIONAL)
+  - EArchObjLpiInfo (OPTIONAL)
+  - GetEArchObjEtInfo (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the GIC
@@ -49,8 +49,8 @@ Requirements:
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjGicCInfo,
-  CM_ARM_GICC_INFO
+  EArchObjGicCInfo,
+  CM_ARCH_GICC_INFO
   );
 
 /**
@@ -59,8 +59,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjProcHierarchyInfo,
-  CM_ARM_PROC_HIERARCHY_INFO
+  EArchObjProcHierarchyInfo,
+  CM_ARCH_PROC_HIERARCHY_INFO
   );
 
 /**
@@ -69,8 +69,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjCmRef,
-  CM_ARM_OBJ_REF
+  EArchObjCmRef,
+  CM_ARCH_OBJ_REF
   );
 
 /**
@@ -79,8 +79,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjLpiInfo,
-  CM_ARM_LPI_INFO
+  EArchObjLpiInfo,
+  CM_ARCH_LPI_INFO
   );
 
 /**
@@ -89,8 +89,8 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjCpcInfo,
-  CM_ARM_CPC_INFO
+  EArchObjCpcInfo,
+  CM_ARCH_CPC_INFO
   );
 
 /**
@@ -99,18 +99,18 @@ GET_OBJECT_LIST (
 */
 GET_OBJECT_LIST (
   EObjNameSpaceArm,
-  EArmObjEtInfo,
-  CM_ARM_ET_INFO
+  EArchObjEtInfo,
+  CM_ARCH_ET_INFO
   );
 
 /** Initialize the TokenTable.
 
-  One entry should be allocated for each CM_ARM_PROC_HIERARCHY_INFO
+  One entry should be allocated for each CM_ARCH_PROC_HIERARCHY_INFO
   structure of the platform. The TokenTable allows to have a mapping:
-  Index <-> CM_OBJECT_TOKEN (to CM_ARM_LPI_INFO structures).
+  Index <-> CM_OBJECT_TOKEN (to CM_ARCH_LPI_INFO structures).
 
-  There will always be less sets of Lpi states (CM_ARM_OBJ_REF)
-  than the number of cpus/clusters (CM_ARM_PROC_HIERARCHY_INFO).
+  There will always be less sets of Lpi states (CM_ARCH_OBJ_REF)
+  than the number of cpus/clusters (CM_ARCH_PROC_HIERARCHY_INFO).
 
   @param [in]  Generator  The SSDT Cpu Topology generator.
   @param [in]  Count      Number of entries to allocate in the TokenTable.
@@ -301,7 +301,7 @@ WriteAslName (
   @param [in]  Generator              The SSDT Cpu Topology generator.
   @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
                                       Protocol Interface.
-  @param [in]  GicCInfo               Pointer to the CM_ARM_GICC_INFO object
+  @param [in]  GicCInfo               Pointer to the CM_ARCH_GICC_INFO object
                                       describing the Cpu.
   @param [in]  Node                   CPU Node to which the _CPC node is
                                       attached.
@@ -316,14 +316,14 @@ EFIAPI
 CreateAmlCpcNode (
   IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN  CM_ARM_GICC_INFO                                    *GicCInfo,
+  IN  CM_ARCH_GICC_INFO                                    *GicCInfo,
   IN  AML_OBJECT_NODE_HANDLE                              *Node
   )
 {
   EFI_STATUS       Status;
-  CM_ARM_CPC_INFO  *CpcInfo;
+  CM_ARCH_CPC_INFO  *CpcInfo;
 
-  Status = GetEArmObjCpcInfo (
+  Status = GetEArchObjCpcInfo (
              CfgMgrProtocol,
              GicCInfo->CpcToken,
              &CpcInfo,
@@ -359,7 +359,7 @@ CreateAmlCpcNode (
 
   @param [in]  Generator    The SSDT Cpu Topology generator.
   @param [in]  ParentNode   Parent node to attach the Cpu node to.
-  @param [in]  GicCInfo     CM_ARM_GICC_INFO object used to create the node.
+  @param [in]  GicCInfo     CM_ARCH_GICC_INFO object used to create the node.
   @param [in]  CpuName      Value used to generate the node name.
   @param [out] EtNodePtr   If not NULL, return the created Cpu node.
 
@@ -373,7 +373,7 @@ EFIAPI
 CreateAmlEtd (
   IN   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
   IN   AML_NODE_HANDLE              ParentNode,
-  IN   CM_ARM_GICC_INFO             *GicCInfo,
+  IN   CM_ARCH_GICC_INFO             *GicCInfo,
   IN   UINT32                       CpuName,
   OUT  AML_OBJECT_NODE_HANDLE       *EtNodePtr OPTIONAL
   )
@@ -432,7 +432,7 @@ CreateAmlEtd (
   @param [in]  Generator              The SSDT Cpu Topology generator.
   @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
                                       Protocol Interface.
-  @param [in]  GicCInfo               Pointer to the CM_ARM_GICC_INFO object
+  @param [in]  GicCInfo               Pointer to the CM_ARCH_GICC_INFO object
                                       describing the Cpu.
   @param [in]  CpuName                Value used to generate the CPU node name.
   @param [in]  Node                   CPU Node to which the ET device node is
@@ -449,15 +449,15 @@ EFIAPI
 CreateAmlEtNode (
   IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN  CM_ARM_GICC_INFO                                    *GicCInfo,
+  IN  CM_ARCH_GICC_INFO                                   *GicCInfo,
   IN        UINT32                                        CpuName,
   IN  AML_OBJECT_NODE_HANDLE                              *Node
   )
 {
   EFI_STATUS      Status;
-  CM_ARM_ET_INFO  *EtInfo;
+  CM_ARCH_ET_INFO  *EtInfo;
 
-  Status = GetEArmObjEtInfo (
+  Status = GetEArchObjEtInfo (
              CfgMgrProtocol,
              GicCInfo->EtToken,
              &EtInfo,
@@ -505,7 +505,7 @@ CreateAmlEtNode (
   }
 
   @param [in]  Generator              The SSDT Cpu Topology generator.
-  @param [in]  ProcHierarchyNodeInfo  CM_ARM_PROC_HIERARCHY_INFO describing
+  @param [in]  ProcHierarchyNodeInfo  CM_ARCH_PROC_HIERARCHY_INFO describing
                                       the Cpu.
   @param [in]  Node                   Node to which the _LPI method is
                                       attached. Can represent a Cpu or a
@@ -520,7 +520,7 @@ EFI_STATUS
 EFIAPI
 CreateAmlLpiMethod (
   IN  ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
-  IN  CM_ARM_PROC_HIERARCHY_INFO   *ProcHierarchyNodeInfo,
+  IN  CM_ARCH_PROC_HIERARCHY_INFO  *ProcHierarchyNodeInfo,
   IN  AML_OBJECT_NODE_HANDLE       *Node
   )
 {
@@ -617,10 +617,10 @@ GenerateLpiStates (
   UINT32  LastIndex;
 
   AML_OBJECT_NODE_HANDLE  LpiNode;
-  CM_ARM_OBJ_REF          *LpiRefInfo;
+  CM_ARCH_OBJ_REF         *LpiRefInfo;
   UINT32                  LpiRefInfoCount;
   UINT32                  LpiRefIndex;
-  CM_ARM_LPI_INFO         *LpiInfo;
+  CM_ARCH_LPI_INFO        *LpiInfo;
   CHAR8                   AslName[AML_NAME_SEG_SIZE + 1];
 
   ASSERT (Generator != NULL);
@@ -647,7 +647,7 @@ GenerateLpiStates (
     }
 
     // Fetch the LPI objects referenced by the token.
-    Status = GetEArmObjCmRef (
+    Status = GetEArchObjCmRef (
                CfgMgrProtocol,
                Generator->TokenTable.Table[Index],
                &LpiRefInfo,
@@ -659,8 +659,8 @@ GenerateLpiStates (
     }
 
     for (LpiRefIndex = 0; LpiRefIndex < LpiRefInfoCount; LpiRefIndex++) {
-      // For each CM_ARM_LPI_INFO referenced by the token, add an Lpi state.
-      Status = GetEArmObjLpiInfo (
+      // For each CM_ARCH_LPI_INFO referenced by the token, add an Lpi state.
+      Status = GetEArchObjLpiInfo (
                  CfgMgrProtocol,
                  LpiRefInfo[LpiRefIndex].ReferenceToken,
                  &LpiInfo,
@@ -710,7 +710,7 @@ GenerateLpiStates (
 
   @param [in]  Generator    The SSDT Cpu Topology generator.
   @param [in]  ParentNode   Parent node to attach the Cpu node to.
-  @param [in]  GicCInfo     CM_ARM_GICC_INFO object used to create the node.
+  @param [in]  GicCInfo     CM_ARCH_GICC_INFO object used to create the node.
   @param [in]  CpuName      Value used to generate the node name.
   @param [out] CpuNodePtr   If not NULL, return the created Cpu node.
 
@@ -724,7 +724,7 @@ EFIAPI
 CreateAmlCpu (
   IN   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
   IN   AML_NODE_HANDLE              ParentNode,
-  IN   CM_ARM_GICC_INFO             *GicCInfo,
+  IN   CM_ARCH_GICC_INFO            *GicCInfo,
   IN   UINT32                       CpuName,
   OUT  AML_OBJECT_NODE_HANDLE       *CpuNodePtr OPTIONAL
   )
@@ -779,7 +779,7 @@ CreateAmlCpu (
   return Status;
 }
 
-/** Create a Cpu in the AML namespace from a CM_ARM_PROC_HIERARCHY_INFO
+/** Create a Cpu in the AML namespace from a CM_ARCH_PROC_HIERARCHY_INFO
     CM object.
 
   @param [in]  Generator              The SSDT Cpu Topology generator.
@@ -787,7 +787,7 @@ CreateAmlCpu (
                                       Protocol Interface.
   @param [in]  ParentNode             Parent node to attach the Cpu node to.
   @param [in]  CpuName                Value used to generate the node name.
-  @param [in]  ProcHierarchyNodeInfo  CM_ARM_PROC_HIERARCHY_INFO describing
+  @param [in]  ProcHierarchyNodeInfo  CM_ARCH_PROC_HIERARCHY_INFO describing
                                       the Cpu.
 
   @retval EFI_SUCCESS             Success.
@@ -802,11 +802,11 @@ CreateAmlCpuFromProcHierarchy (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        AML_NODE_HANDLE                               ParentNode,
   IN        UINT32                                        CpuName,
-  IN        CM_ARM_PROC_HIERARCHY_INFO                    *ProcHierarchyNodeInfo
+  IN        CM_ARCH_PROC_HIERARCHY_INFO                   *ProcHierarchyNodeInfo
   )
 {
   EFI_STATUS              Status;
-  CM_ARM_GICC_INFO        *GicCInfo;
+  CM_ARCH_GICC_INFO       *GicCInfo;
   AML_OBJECT_NODE_HANDLE  CpuNode;
 
   ASSERT (Generator != NULL);
@@ -815,7 +815,7 @@ CreateAmlCpuFromProcHierarchy (
   ASSERT (ProcHierarchyNodeInfo != NULL);
   ASSERT (ProcHierarchyNodeInfo->GicCToken != CM_NULL_TOKEN);
 
-  Status = GetEArmObjGicCInfo (
+  Status = GetEArchObjGicCInfo (
              CfgMgrProtocol,
              ProcHierarchyNodeInfo->GicCToken,
              &GicCInfo,
@@ -833,7 +833,7 @@ CreateAmlCpuFromProcHierarchy (
   }
 
   // If a set of Lpi states is associated with the
-  // CM_ARM_PROC_HIERARCHY_INFO, create an _LPI method returning them.
+  // CM_ARCH_PROC_HIERARCHY_INFO, create an _LPI method returning them.
   if (ProcHierarchyNodeInfo->LpiToken != CM_NULL_TOKEN) {
     Status = CreateAmlLpiMethod (Generator, ProcHierarchyNodeInfo, CpuNode);
     if (EFI_ERROR (Status)) {
@@ -872,7 +872,7 @@ CreateAmlCpuFromProcHierarchy (
 
 /** Create a Processor Container in the AML namespace.
 
-  Any CM_ARM_PROC_HIERARCHY_INFO object with the following flags is
+  Any CM_ARCH_PROC_HIERARCHY_INFO object with the following flags is
   assumed to be a processor container:
    - EFI_ACPI_6_3_PPTT_PACKAGE_NOT_PHYSICAL
    - EFI_ACPI_6_3_PPTT_PROCESSOR_ID_INVALID
@@ -890,7 +890,7 @@ CreateAmlCpuFromProcHierarchy (
                                       Protocol Interface.
   @param [in]  ParentNode             Parent node to attach the processor
                                       container node to.
-  @param [in]  ProcHierarchyNodeInfo  CM_ARM_PROC_HIERARCHY_INFO object used
+  @param [in]  ProcHierarchyNodeInfo  CM_ARCH_PROC_HIERARCHY_INFO object used
                                       to create the node.
   @param [in]  ProcContainerIndex     Index used to generate the node name.
   @param [out] ProcContainerNodePtr   If success, contains the created processor
@@ -907,7 +907,7 @@ CreateAmlProcessorContainer (
   IN        ACPI_CPU_TOPOLOGY_GENERATOR                   *Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        AML_NODE_HANDLE                               ParentNode,
-  IN        CM_ARM_PROC_HIERARCHY_INFO                    *ProcHierarchyNodeInfo,
+  IN        CM_ARCH_PROC_HIERARCHY_INFO                   *ProcHierarchyNodeInfo,
   IN        UINT16                                        ProcContainerName,
   IN        UINT32                                        ProcContainerUid,
   OUT       AML_OBJECT_NODE_HANDLE                        *ProcContainerNodePtr
@@ -960,7 +960,7 @@ CreateAmlProcessorContainer (
   }
 
   // If a set of Lpi states are associated with the
-  // CM_ARM_PROC_HIERARCHY_INFO, create an _LPI method returning them.
+  // CM_ARCH_PROC_HIERARCHY_INFO, create an _LPI method returning them.
   if (ProcHierarchyNodeInfo->LpiToken != CM_NULL_TOKEN) {
     Status = CreateAmlLpiMethod (
                Generator,
@@ -1036,7 +1036,7 @@ CheckProcNode (
   @param [in] Generator               The SSDT Cpu Topology generator.
   @param [in] CfgMgrProtocol          Pointer to the Configuration Manager
                                       Protocol Interface.
-  @param [in] NodeToken               Token of the CM_ARM_PROC_HIERARCHY_INFO
+  @param [in] NodeToken               Token of the CM_ARCH_PROC_HIERARCHY_INFO
                                       currently handled.
   @param [in] ParentNode              Parent node to attach the created
                                       node to.
@@ -1077,7 +1077,7 @@ CreateAmlCpuTopologyTree (
   ProcContainerName = 0;
 
   for (Index = 0; Index < Generator->ProcNodeCount; Index++) {
-    // Find the children of the CM_ARM_PROC_HIERARCHY_INFO
+    // Find the children of the CM_ARCH_PROC_HIERARCHY_INFO
     // currently being handled (i.e. ParentToken == NodeToken).
     if (Generator->ProcNodeList[Index].ParentToken == NodeToken) {
       // Only Cpus (leaf nodes in this tree) have a GicCToken.
@@ -1180,7 +1180,7 @@ CreateAmlCpuTopologyTree (
   return EFI_SUCCESS;
 }
 
-/** Create the processor hierarchy AML tree from CM_ARM_PROC_HIERARCHY_INFO
+/** Create the processor hierarchy AML tree from CM_ARCH_PROC_HIERARCHY_INFO
     CM objects.
 
   @param [in] Generator        The SSDT Cpu Topology generator.
@@ -1241,7 +1241,7 @@ exit_handler:
   return Status;
 }
 
-/** Create the processor hierarchy AML tree from CM_ARM_GICC_INFO
+/** Create the processor hierarchy AML tree from CM_ARCH_GICC_INFO
     CM objects.
 
   A processor container is by extension any non-leave device in the cpu topology.
@@ -1265,7 +1265,7 @@ CreateTopologyFromGicC (
   )
 {
   EFI_STATUS              Status;
-  CM_ARM_GICC_INFO        *GicCInfo;
+  CM_ARCH_GICC_INFO        *GicCInfo;
   UINT32                  GicCInfoCount;
   UINT32                  Index;
   AML_OBJECT_NODE_HANDLE  CpuNode;
@@ -1274,7 +1274,7 @@ CreateTopologyFromGicC (
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (ScopeNode != NULL);
 
-  Status = GetEArmObjGicCInfo (
+  Status = GetEArchObjGicCInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GicCInfo,
@@ -1285,7 +1285,7 @@ CreateTopologyFromGicC (
     return Status;
   }
 
-  // For each CM_ARM_GICC_INFO object, create an AML node.
+  // For each CM_ARCH_GICC_INFO object, create an AML node.
   for (Index = 0; Index < GicCInfoCount; Index++) {
     Status = CreateAmlCpu (
                Generator,
@@ -1362,7 +1362,7 @@ BuildSsdtCpuTopologyTable (
   EFI_STATUS                   Status;
   AML_ROOT_NODE_HANDLE         RootNode;
   AML_OBJECT_NODE_HANDLE       ScopeNode;
-  CM_ARM_PROC_HIERARCHY_INFO   *ProcHierarchyNodeList;
+  CM_ARCH_PROC_HIERARCHY_INFO  *ProcHierarchyNodeList;
   UINT32                       ProcHierarchyNodeCount;
   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator;
 
@@ -1392,7 +1392,7 @@ BuildSsdtCpuTopologyTable (
 
   // Get the processor hierarchy info and update the processor topology
   // structure count with Processor Hierarchy Nodes (Type 0)
-  Status = GetEArmObjProcHierarchyInfo (
+  Status = GetEArchObjProcHierarchyInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &ProcHierarchyNodeList,
@@ -1406,7 +1406,7 @@ BuildSsdtCpuTopologyTable (
 
   if (Status == EFI_NOT_FOUND) {
     // If hierarchy information is not found generate a flat topology
-    // using CM_ARM_GICC_INFO objects.
+    // using CM_ARCH_GICC_INFO objects.
     Status = CreateTopologyFromGicC (
                Generator,
                CfgMgrProtocol,
@@ -1416,7 +1416,7 @@ BuildSsdtCpuTopologyTable (
       goto exit_handler;
     }
   } else {
-    // Generate the topology from CM_ARM_PROC_HIERARCHY_INFO objects.
+    // Generate the topology from CM_ARCH_PROC_HIERARCHY_INFO objects.
     Generator->ProcNodeList  = ProcHierarchyNodeList;
     Generator->ProcNodeCount = ProcHierarchyNodeCount;
 

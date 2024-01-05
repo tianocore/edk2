@@ -21,10 +21,10 @@ typedef enum FdtTimerInterruptItems {
   FdtMaxTimerItem         ///< Max timer item
 } FDT_TIMER_INTERRUPT_ITEMS;
 
-/** CM_ARM_BOOT_ARCH_INFO parser function.
+/** CM_ARCH_BOOT_ARCH_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmGenericTimerInfo {
+  typedef struct CmArchGenericTimerInfo {
     UINT64  CounterControlBaseAddress;        // {default}
     UINT64  CounterReadBaseAddress;           // {default}
     UINT32  SecurePL1TimerGSIV;               // {Populated}
@@ -37,7 +37,7 @@ typedef enum FdtTimerInterruptItems {
     UINT32  NonSecurePL2TimerFlags;           // {Populated}
     UINT32  VirtualPL2TimerGSIV;              // {default}
     UINT32  VirtualPL2TimerFlags;             // {default}
-  } CM_ARM_GENERIC_TIMER_INFO;
+  } CM_ARCH_GENERIC_TIMER_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

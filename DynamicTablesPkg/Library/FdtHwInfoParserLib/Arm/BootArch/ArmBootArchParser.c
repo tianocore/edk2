@@ -39,7 +39,7 @@ STATIC CONST CHAR8  *PsciMethod[] = {
 
   @param [in]  Fdt            Pointer to a Flattened Device Tree (Fdt).
   @param [in]  PsciNode       Offset of a Psci node.
-  @param [in]  BootArchInfo   The CM_ARM_BOOT_ARCH_INFO to populate.
+  @param [in]  BootArchInfo   The CM_ARCH_BOOT_ARCH_INFO to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -51,7 +51,7 @@ EFIAPI
 PsciNodeParser (
   IN  CONST VOID                   *Fdt,
   IN        INT32                  PsciNode,
-  IN        CM_ARM_BOOT_ARCH_INFO  *BootArchInfo
+  IN        CM_ARCH_BOOT_ARCH_INFO  *BootArchInfo
   )
 {
   CONST VOID  *Data;
@@ -84,12 +84,12 @@ PsciNodeParser (
   return EFI_SUCCESS;
 }
 
-/** CM_ARM_BOOT_ARCH_INFO parser function.
+/** CM_ARCH_BOOT_ARCH_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmBootArchInfo {
+  typedef struct CmArchBootArchInfo {
     UINT16  BootArchFlags;                    // {Populated}
-  } CM_ARM_BOOT_ARCH_INFO;
+  } CM_ARCH_BOOT_ARCH_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
@@ -117,14 +117,14 @@ ArmBootArchInfoParser (
 {
   EFI_STATUS             Status;
   INT32                  PsciNode;
-  CM_ARM_BOOT_ARCH_INFO  BootArchInfo;
+  CM_ARCH_BOOT_ARCH_INFO  BootArchInfo;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
   }
 
-  ZeroMem (&BootArchInfo, sizeof (CM_ARM_BOOT_ARCH_INFO));
+  ZeroMem (&BootArchInfo, sizeof (CM_ARCH_BOOT_ARCH_INFO));
 
   PsciNode = FdtBranch;
   Status   = FdtGetNextCompatNodeInBranch (
@@ -149,9 +149,9 @@ ArmBootArchInfoParser (
   // Add the CmObj to the Configuration Manager.
   Status = AddSingleCmObj (
              FdtParserHandle,
-             CREATE_CM_ARM_OBJECT_ID (EArmObjBootArchInfo),
+             CREATE_CM_ARCH_OBJECT_ID (EArchObjBootArchInfo),
              &BootArchInfo,
-             sizeof (CM_ARM_BOOT_ARCH_INFO),
+             sizeof (CM_ARCH_BOOT_ARCH_INFO),
              NULL
              );
   ASSERT_EFI_ERROR (Status);

@@ -11,15 +11,15 @@
 #ifndef ARM_GIC_ITS_PARSER_H_
 #define ARM_GIC_ITS_PARSER_H_
 
-/** CM_ARM_GIC_ITS_INFO parser function.
+/** CM_ARCH_GIC_ITS_INFO parser function.
 
   This parser expects FdtBranch to be a Gic interrupt-controller node.
   Gic version must be v3 or higher.
-  typedef struct CmArmGicItsInfo {
+  typedef struct CmArchGicItsInfo {
     UINT32  GicItsId;                         // {Populated}
     UINT64  PhysicalBaseAddress;              // {Populated}
     UINT32  ProximityDomain;                  // {default = 0}
-  } CM_ARM_GIC_ITS_INFO;
+  } CM_ARCH_GIC_ITS_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

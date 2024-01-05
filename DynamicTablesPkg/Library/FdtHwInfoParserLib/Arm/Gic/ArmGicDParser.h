@@ -12,16 +12,16 @@
 #ifndef ARM_GICD_PARSER_H_
 #define ARM_GICD_PARSER_H_
 
-/** CM_ARM_GICD_INFO parser function.
+/** CM_ARCH_GICD_INFO parser function.
 
   This parser expects FdtBranch to be a Gic interrupt-controller node.
   At most one CmObj is created.
   The following structure is populated:
-  typedef struct CmArmGicDInfo {
+  typedef struct CmArchGicDInfo {
     UINT64  PhysicalBaseAddress;              // {Populated}
     UINT32  SystemVectorBase;
     UINT8   GicVersion;                       // {Populated}
-  } CM_ARM_GICD_INFO;
+  } CM_ARCH_GICD_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

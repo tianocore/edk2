@@ -11,14 +11,14 @@
 #ifndef ARM_GICR_PARSER_H_
 #define ARM_GICR_PARSER_H_
 
-/** CM_ARM_GIC_REDIST_INFO parser function.
+/** CM_ARCH_GIC_REDIST_INFO parser function.
 
   This parser expects FdtBranch to be a Gic interrupt-controller node.
   Gic version must be v3 or higher.
-  typedef struct CmArmGicRedistInfo {
+  typedef struct CmArchGicRedistInfo {
     UINT64  DiscoveryRangeBaseAddress;        // {Populated}
     UINT32  DiscoveryRangeLength;             // {Populated}
-  } CM_ARM_GIC_REDIST_INFO;
+  } CM_ARCH_GIC_REDIST_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
