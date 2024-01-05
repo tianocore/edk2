@@ -139,6 +139,12 @@
   # Note: for emulation platform such as QEMU, this may not work and should set it as FALSE
   DEFINE CPU_TIMER_LIB_ENABLE  = TRUE
 
+  #
+  # HPET:  UEFI Payload will use HPET timer
+  # LAPIC: UEFI Payload will use local APIC timer
+  #
+  DEFINE TIMER_SUPPORT      = HPET
+
   DEFINE MULTIPLE_DEBUG_PORT_SUPPORT = FALSE
 
 [BuildOptions]
@@ -676,7 +682,17 @@
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 
 
+!if $(TIMER_SUPPORT) == "HPET"
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+!elseif $(TIMER_SUPPORT) == "LAPIC"
+  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf {
+    <LibraryClasses>
+      NestedInterruptTplLib|OvmfPkg/Library/NestedInterruptTplLib/NestedInterruptTplLib.inf
+  }
+!else
+  !error "Invalid TIMER_SUPPORT"
+!endif
+
   MdeModulePkg/Universal/Metronome/Metronome.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
