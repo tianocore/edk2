@@ -1,14 +1,12 @@
 /** @file
   Timer Architectural Protocol as defined in the DXE CIS
 
-Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2019, Citrix Systems, Inc.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-
-#include <Library/NestedInterruptTplLib.h>
 
 #include "LocalApicTimerDxe.h"
 
@@ -60,10 +58,9 @@ TimerInterruptHandler (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  STATIC NESTED_INTERRUPT_STATE  NestedInterruptState;
-  EFI_TPL                        OriginalTPL;
+  EFI_TPL  OriginalTPL;
 
-  OriginalTPL = NestedInterruptRaiseTPL ();
+  OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
   SendApicEoi ();
 
@@ -74,7 +71,7 @@ TimerInterruptHandler (
     mTimerNotifyFunction (mTimerPeriod);
   }
 
-  NestedInterruptRestoreTPL (OriginalTPL, SystemContext, &NestedInterruptState);
+  gBS->RestoreTPL (OriginalTPL);
 }
 
 /**
