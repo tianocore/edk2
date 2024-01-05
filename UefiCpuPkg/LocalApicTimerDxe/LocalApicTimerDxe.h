@@ -1,7 +1,7 @@
 /** @file
   Private data structures
 
-Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2019, Citrix Systems, Inc.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -16,12 +16,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Timer.h>
 
 #include <Register/LocalApic.h>
+#include <Register/Cpuid.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/PcdLib.h>
+#include <Library/TimerLib.h>
 
 // The default timer tick duration is set to 10 ms = 100000 100 ns units
 //

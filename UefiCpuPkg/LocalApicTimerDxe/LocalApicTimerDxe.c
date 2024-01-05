@@ -129,6 +129,50 @@ TimerDriverRegisterHandler (
 }
 
 /**
+  Return the Crystal Clock Frequency in Hz.
+
+  If CPUID.0x15 is supported, the Crystal Clock Frequency is retrieved from CPUID.0x15.ECX.
+  Otherwise, the Crystal Clock Frequency is retrieved from PcdCpuCoreCrystalClockFrequency.
+
+  @return the Crystal Clock Frequency in Hz.
+**/
+UINT64
+GetCoreXtalClockFrequency (
+  VOID
+  )
+{
+  UINT32  MaxLeaf;
+  UINT32  RegEax;
+  UINT32  RegEbx;
+  UINT32  CoreXtalClockFrequency;
+
+  CoreXtalClockFrequency = 0;
+  AsmCpuid (CPUID_SIGNATURE, &MaxLeaf, NULL, NULL, NULL);
+  if (MaxLeaf >= CPUID_TIME_STAMP_COUNTER) {
+    //
+    // Use CPUID leaf 0x15 Time Stamp Counter and Nominal Core Crystal Clock Information
+    // EBX returns 0 if not supported. ECX, if non zero, provides Core Xtal Frequency in hertz.
+    // TSC frequency = (ECX, Core Xtal Frequency) * EBX/EAX.
+    //
+    AsmCpuid (CPUID_TIME_STAMP_COUNTER, &RegEax, &RegEbx, (UINT32 *)&CoreXtalClockFrequency, NULL);
+
+    //
+    // If EAX or EBX returns 0, the Crystal ratio is not enumerated.
+    //
+    if ((RegEax == 0) || (RegEbx == 0)) {
+      CoreXtalClockFrequency = 0;
+    }
+  }
+
+  if (CoreXtalClockFrequency != 0) {
+    return CoreXtalClockFrequency;
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: Using PcdCpuCoreCrystalClockFrequency (%ld)\n", __func__, PcdGet64 (PcdCpuCoreCrystalClockFrequency)));
+    return PcdGet64 (PcdCpuCoreCrystalClockFrequency);
+  }
+}
+
+/**
 
   This function adjusts the period of timer interrupts to the value specified
   by TimerPeriod.  If the timer period is updated, then the selected timer
@@ -163,9 +207,13 @@ TimerDriverSetTimerPeriod (
   IN UINT64                   TimerPeriod
   )
 {
-  UINT64  TimerCount;
-  UINT32  TimerFrequency;
-  UINT32  DivideValue = 1;
+  UINT64  InitialCount;
+  UINT64  CoreXtalClockFrequency;
+  UINT64  ApicTimerFrequency;
+  UINT8   Divisor;
+  UINT32  TimerPeriodDivisor;
+
+  DEBUG ((DEBUG_INFO, "%a: TimerPeriod = %d (100ns)\n", __func__, TimerPeriod));
 
   if (TimerPeriod == 0) {
     //
@@ -173,29 +221,67 @@ TimerDriverSetTimerPeriod (
     //
     DisableApicTimerInterrupt ();
   } else {
-    TimerFrequency = PcdGet32 (PcdFSBClock) / (UINT32)DivideValue;
-
+    CoreXtalClockFrequency = GetCoreXtalClockFrequency ();
     //
-    // Convert TimerPeriod into local APIC counts
+    // Find a good Divisor that can support the TimerPeriod.
     //
-    // TimerPeriod is in 100ns
-    // TimerPeriod/10000000 will be in seconds.
-    TimerCount = DivU64x32 (
-                   MultU64x32 (TimerPeriod, TimerFrequency),
-                   10000000
-                   );
+    for (Divisor = 1; Divisor <= 128; Divisor *= 2) {
+      ApicTimerFrequency = DivU64x32 (CoreXtalClockFrequency, Divisor);
 
-    // Check for overflow
-    if (TimerCount > MAX_UINT32) {
-      TimerCount = MAX_UINT32;
-      /* TimerPeriod = (MAX_UINT32 / TimerFrequency) * 10000000; */
-      TimerPeriod = 429496730;
+      //
+      //                   TimerPeriod
+      // InitialCount =   ---------------- * ApicTimerFrequency
+      //                  10 * 1000 * 1000
+      //
+      // So,
+      //
+      //                        InitialCount * 10 * 1000 * 1000
+      // ApicTimerFrequency =   ------------------------------
+      //                                TimerPeriod
+      //
+      // Because InitialCount is a UINT32, the maximum ApicTimerFrequency is:
+      //
+      //                        MAX_UINT32 * 10 * 1000 * 1000
+      //                        ------------------------------
+      //                                TimerPeriod
+      //
+      if (ApicTimerFrequency <= DivU64x64Remainder (MultU64x32 (MAX_UINT32, 10 * 1000 * 1000), TimerPeriod, NULL)) {
+        break;
+      }
     }
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: ApicTimerFrequency (%d) = CoreXtalClockFrequency (%d) / Divisor (%d)\n",
+      __func__,
+      ApicTimerFrequency,
+      CoreXtalClockFrequency,
+      Divisor
+      ));
+
+    //
+    // Convert TimerPeriod (in 100ns) into local APIC counts
+    //                   TimerPeriod
+    // InitialCount =   ---------------- * ApicTimerFrequency
+    //                10 * 1000 * 1000
+    //
+    TimerPeriodDivisor = 10 * 1000 * 1000;
+
+    //
+    // If TimerPeriod * ApicTimerFrequency > MAX_UINT64, divide TimerPeriod by 10 until the result <= MAX_UINT64.
+    //
+    while (TimerPeriod > DivU64x64Remainder (MAX_UINT64, ApicTimerFrequency, NULL)) {
+      TimerPeriod         = DivU64x32 (TimerPeriod, 10);
+      TimerPeriodDivisor /= 10;
+    }
+
+    InitialCount = DivU64x64Remainder (MultU64x64 (TimerPeriod, ApicTimerFrequency), TimerPeriodDivisor, NULL);
+    DEBUG ((DEBUG_INFO, "%a: InitialCount = %d\n", __func__, InitialCount));
 
     //
     // Program the timer with the new count value
     //
-    InitializeApicTimer (DivideValue, (UINT32)TimerCount, TRUE, LOCAL_APIC_TIMER_VECTOR);
+    InitializeApicTimer (Divisor, (UINT32)InitialCount, TRUE, LOCAL_APIC_TIMER_VECTOR);
 
     //
     // Enable timer interrupt
