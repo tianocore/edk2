@@ -1,7 +1,7 @@
 ## @file
 #  UefiCpuPkg Package
 #
-#  Copyright (c) 2007 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 #  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -137,6 +137,7 @@
   UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
   UefiCpuPkg/CpuIo2Smm/CpuIo2StandaloneMm.inf
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
+  UefiCpuPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
   UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf
   UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
   UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
