@@ -66,7 +66,17 @@ TimerInterruptHandler (
 
   if (mTimerNotifyFunction != NULL) {
     //
-    // @bug : This does not handle missed timer interrupts
+    // When mTimerPeriod is 10ms but 1st call of mTimerNotifyFunction() takes 1 hour, the timer
+    // interrupt will be queued and TimerInterruptHandler() will be called immediately after the
+    // interrupt is re-enabled with gBS->RestoreTPL(). The most precise implementation should pass
+    // 1 hour as the time period to 2nd call of mTimerNotifyFunction().
+    // Always passing 10ms to mTimerNotifyFunction() might cause some timer event callbacks to be
+    // invoked later than expected.
+    //
+    // But in reality, DxeCore implements the mTimerNotifyFunction() as a simple function which
+    // runs at TPL_HIGH_LEVEL. Considering almost all UEFI services require to run at TPL lower
+    // than TPL_HIGH_LEVEL, the mTimerNotifyFunction() does not have much heavy work to do. It
+    // should not take longer.
     //
     mTimerNotifyFunction (mTimerPeriod);
   }
@@ -361,9 +371,6 @@ TimerDriverGenerateSoftInterrupt (
     OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
     if (mTimerNotifyFunction != NULL) {
-      //
-      // @bug : This does not handle missed timer interrupts
-      //
       mTimerNotifyFunction (mTimerPeriod);
     }
 
