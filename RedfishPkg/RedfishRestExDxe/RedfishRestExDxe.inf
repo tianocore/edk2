@@ -5,6 +5,7 @@
 #  (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) 2023, American Megatrends International LLC.
 #  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -57,6 +58,8 @@
   gEfiHttpServiceBindingProtocolGuid              ## TO_START
   gEfiHttpProtocolGuid                            ## TO_START
   gEfiDevicePathProtocolGuid                      ## TO_START
+  gEdkiiHttpCallbackProtocolGuid                  ## CONSUMES
+  gEfiTlsProtocolGuid                             ## CONSUMES
 
 [Pcd]
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishRestExServiceAccessModeInBand ## CONSUMES
