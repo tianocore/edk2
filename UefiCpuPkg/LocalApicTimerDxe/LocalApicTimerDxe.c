@@ -393,12 +393,25 @@ TimerDriverInitialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS                          Status;
+  UINT32                              MaxLeaf;
+  CPUID_THERMAL_POWER_MANAGEMENT_EAX  Eax;
 
   //
   // Initialize the pointer to our notify function.
   //
   mTimerNotifyFunction = NULL;
+
+  //
+  // Make sure the APIC timer does not stop while the processor is in deep C-states
+  // because DxeCore signals an Idle event which may cause the processor to enter to a deep C-state.
+  // If CPUID.06H:EAX.ARAT[bit 2] = 0 or if CPUID 06H is not supported, the APIC timer may temporarily stop while the
+  // processor is in deep C-states or during transitions caused by Enhanced Intel SpeedStep(R) Technology.
+  //
+  AsmCpuid (CPUID_SIGNATURE, &MaxLeaf, NULL, NULL, NULL);
+  ASSERT (MaxLeaf >= CPUID_THERMAL_POWER_MANAGEMENT);
+  AsmCpuid (CPUID_THERMAL_POWER_MANAGEMENT, &Eax.Uint32, NULL, NULL, NULL);
+  ASSERT (Eax.Bits.ARAT == 1);
 
   //
   // Make sure the Timer Architectural Protocol is not already installed in the system
