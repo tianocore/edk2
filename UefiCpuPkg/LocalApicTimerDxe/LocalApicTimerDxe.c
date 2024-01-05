@@ -413,6 +413,15 @@ TimerDriverInitialize (
   AsmCpuid (CPUID_THERMAL_POWER_MANAGEMENT, &Eax.Uint32, NULL, NULL, NULL);
   ASSERT (Eax.Bits.ARAT == 1);
 
+  if (GetApicTimerInitCount () != 0) {
+    DEBUG ((
+      DEBUG_WARN,
+      "Warning: APIC timer might be used by other drivers.\n"
+      "         The timer period may be changed unexpectedly.\n"
+      "         Please make sure no other code programs the APIC timer.\n"
+      ));
+  }
+
   //
   // Make sure the Timer Architectural Protocol is not already installed in the system
   //
