@@ -113,6 +113,11 @@
   # Reduces the amount of memory available for the PeiCore heap.
   #
   gIntelFsp2PkgTokenSpaceGuid.PcdFspPrivateTemporaryRamSize |0x00000000|UINT32|0x10000006
+  #
+  # Allows FSP-T to skip Microcode patch load
+  # Reduce the boot time on emulated/simulated systems that doesn't support microcode load
+  #
+  gIntelFsp2PkgTokenSpaceGuid.PcdLoadMicroCodePatch       |      TRUE|BOOLEAN|0x10000007
 
 [PcdsFixedAtBuild,PcdsDynamic,PcdsDynamicEx]
   gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedMemoryLength  |0x00100000|UINT32|0x46530000

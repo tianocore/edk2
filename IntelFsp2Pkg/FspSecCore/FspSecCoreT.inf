@@ -51,6 +51,7 @@
   gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES
   gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize              ## CONSUMES
   gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedBufferSize         ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdLoadMicroCodePatch            ## CONSUMES
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                              ## PRODUCES

@@ -16,6 +16,7 @@
 extern   ASM_PFX(PcdGet32 (PcdTemporaryRamBase))
 extern   ASM_PFX(PcdGet32 (PcdTemporaryRamSize))
 extern   ASM_PFX(PcdGet32 (PcdFspReservedBufferSize))
+extern   ASM_PFX(PcdGetBool(PcdLoadMicroCodePatch))
 
 ;
 ; Following functions will be provided in PlatformSecLib
@@ -607,10 +608,14 @@ ASM_PFX(TempRamInitApi):
   jnz       TempRamInitExit
 
   ; Load microcode
+  mov       ax, ASM_PFX(FixedPcdGetBool (PcdLoadMicroCodePatch))
+  cmp       ax, 0
+  jz        SkipMicrocodeLoad
   LOAD_ESP
   LOAD_ECX
   CALL_MMX  ASM_PFX(LoadMicrocodeDefault)
   SAVE_UCODE_STATUS                 ; Save microcode return status in slot 1 in xmm5.
+SkipMicrocodeLoad:
   ;@note If return value eax is not 0, microcode did not load, but continue and attempt to boot.
 
   ; Call Sec CAR Init
