@@ -723,7 +723,7 @@ TlsConfigureSession (
   Status = TlsConfigCertificate (HttpInstance);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_NOT_FOUND) {
-      DEBUG((DEBUG_WARN, "TLS Certificate is not found on the system!\n"));
+      DEBUG ((DEBUG_WARN, "TLS Certificate is not found on the system!\n"));
       //
       // We still return EFI_SUCCESS to the caller when TlsConfigCertificate
       // returns error, for the use case the platform doesn't require
@@ -734,7 +734,7 @@ TlsConfigureSession (
       //
       Status = EFI_SUCCESS;
     } else {
-      DEBUG((DEBUG_ERROR, "TLS Certificate Config Error!\n"));
+      DEBUG ((DEBUG_ERROR, "TLS Certificate Config Error!\n"));
       return Status;
     }
   }
