@@ -759,6 +759,40 @@ typedef UINTN *BASE_LIST;
 #endif
 
 /**
+  Returns the alignment requirement of a type.
+
+  @param   TYPE  The name of the type to retrieve the alignment requirement of.
+
+  @return  Alignment requirement, in Bytes, of TYPE.
+**/
+#if defined (__cplusplus)
+//
+// Standard C++ operator.
+//
+#define ALIGNOF(TYPE)  alignof (TYPE)
+#elif defined (__GNUC__) || defined (__clang__) || (defined (_MSC_VER) && _MSC_VER >= 1900)
+//
+// All supported versions of GCC and Clang, as well as MSVC 2015 and later,
+// support the standard operator _Alignof.
+//
+#define ALIGNOF(TYPE)  _Alignof (TYPE)
+#elif defined (_MSC_EXTENSIONS)
+//
+// Earlier versions of MSVC, at least MSVC 2008 and later, support the vendor
+// extension __alignof.
+//
+#define ALIGNOF(TYPE)  __alignof (TYPE)
+#else
+//
+// For compilers that do not support inbuilt alignof operators, use OFFSET_OF.
+// CHAR8 is known to have both a size and an alignment requirement of 1 Byte.
+// As such, A must be located exactly at the offset equal to its alignment
+// requirement.
+//
+#define ALIGNOF(TYPE)  OFFSET_OF (struct { CHAR8 C; TYPE A; }, A)
+#endif
+
+/**
   Portable definition for compile time assertions.
   Equivalent to C11 static_assert macro from assert.h.
 
@@ -793,12 +827,27 @@ STATIC_ASSERT (sizeof (CHAR16)  == 2, "sizeof (CHAR16) does not meet UEFI Specif
 STATIC_ASSERT (sizeof (L'A')    == 2, "sizeof (L'A') does not meet UEFI Specification Data Type requirements");
 STATIC_ASSERT (sizeof (L"A")    == 4, "sizeof (L\"A\") does not meet UEFI Specification Data Type requirements");
 
+STATIC_ASSERT (ALIGNOF (BOOLEAN) == sizeof (BOOLEAN), "Alignment of BOOLEAN does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (INT8)    == sizeof (INT8), "Alignment of INT8 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (UINT8)   == sizeof (UINT8), "Alignment of INT16 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (INT16)   == sizeof (INT16), "Alignment of INT16 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (UINT16)  == sizeof (UINT16), "Alignment of UINT16 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (INT32)   == sizeof (INT32), "Alignment of INT32 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (UINT32)  == sizeof (UINT32), "Alignment of UINT32 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (INT64)   == sizeof (INT64), "Alignment of INT64 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (UINT64)  == sizeof (UINT64), "Alignment of UINT64 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (CHAR8)   == sizeof (CHAR8), "Alignment of CHAR8 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (CHAR16)  == sizeof (CHAR16), "Alignment of CHAR16 does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (INTN)    == sizeof (INTN), "Alignment of INTN does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (UINTN)   == sizeof (UINTN), "Alignment of UINTN does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (VOID *)  == sizeof (VOID *), "Alignment of VOID * does not meet UEFI Specification Data Type requirements");
+
 //
 // The following three enum types are used to verify that the compiler
 // configuration for enum types is compliant with Section 2.3.1 of the
-// UEFI 2.3 Specification. These enum types and enum values are not
-// intended to be used. A prefix of '__' is used avoid conflicts with
-// other types.
+// UEFI 2.3.1 Errata C Specification. These enum types and enum values
+// are not intended to be used. A prefix of '__' is used avoid
+// conflicts with other types.
 //
 typedef enum {
   __VerifyUint8EnumValue = 0xff
@@ -809,12 +858,16 @@ typedef enum {
 } __VERIFY_UINT16_ENUM_SIZE;
 
 typedef enum {
-  __VerifyUint32EnumValue = 0xffffffff
-} __VERIFY_UINT32_ENUM_SIZE;
+  __VerifyInt32EnumValue = 0x7fffffff
+} __VERIFY_INT32_ENUM_SIZE;
 
 STATIC_ASSERT (sizeof (__VERIFY_UINT8_ENUM_SIZE) == 4, "Size of enum does not meet UEFI Specification Data Type requirements");
 STATIC_ASSERT (sizeof (__VERIFY_UINT16_ENUM_SIZE) == 4, "Size of enum does not meet UEFI Specification Data Type requirements");
-STATIC_ASSERT (sizeof (__VERIFY_UINT32_ENUM_SIZE) == 4, "Size of enum does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (sizeof (__VERIFY_INT32_ENUM_SIZE) == 4, "Size of enum does not meet UEFI Specification Data Type requirements");
+
+STATIC_ASSERT (ALIGNOF (__VERIFY_UINT8_ENUM_SIZE)  == sizeof (__VERIFY_UINT8_ENUM_SIZE), "Alignment of enum does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (__VERIFY_UINT16_ENUM_SIZE) == sizeof (__VERIFY_UINT16_ENUM_SIZE), "Alignment of enum does not meet UEFI Specification Data Type requirements");
+STATIC_ASSERT (ALIGNOF (__VERIFY_INT32_ENUM_SIZE) == sizeof (__VERIFY_INT32_ENUM_SIZE), "Alignment of enum does not meet UEFI Specification Data Type requirements");
 
 /**
   Macro that returns a pointer to the data structure that contains a specified field of
@@ -838,6 +891,49 @@ STATIC_ASSERT (sizeof (__VERIFY_UINT32_ENUM_SIZE) == 4, "Size of enum does not m
 #define BASE_CR(Record, TYPE, Field)  ((TYPE *) ((CHAR8 *) (Record) - OFFSET_OF (TYPE, Field)))
 
 /**
+  Checks whether a value is a power of two.
+
+  @param   Value  The value to check.
+
+  @retval TRUE   Value is a power of two.
+  @retval FALSE  Value is not a power of two.
+**/
+#define IS_POW2(Value)  ((Value) != 0U && ((Value) & ((Value) - 1U)) == 0U)
+
+/**
+  Checks whether a value is aligned by a specified alignment.
+
+  @param   Value      The value to check.
+  @param   Alignment  The alignment boundary used to check against.
+
+  @retval TRUE   Value is aligned by Alignment.
+  @retval FALSE  Value is not aligned by Alignment.
+**/
+#define IS_ALIGNED(Value, Alignment)  (((Value) & ((Alignment) - 1U)) == 0U)
+
+/**
+  Checks whether a pointer or address is aligned by a specified alignment.
+
+  @param   Address    The pointer or address to check.
+  @param   Alignment  The alignment boundary used to check against.
+
+  @retval TRUE   Address is aligned by Alignment.
+  @retval FALSE  Address is not aligned by Alignment.
+**/
+#define ADDRESS_IS_ALIGNED(Address, Alignment)  IS_ALIGNED ((UINTN) (Address), Alignment)
+
+/**
+  Determines the addend to add to a value to round it up to the next boundary of
+  a specified alignment.
+
+  @param   Value      The value to round up.
+  @param   Alignment  The alignment boundary used to return the addend.
+
+  @return  Addend to round Value up to alignment boundary Alignment.
+**/
+#define ALIGN_VALUE_ADDEND(Value, Alignment)  (((Alignment) - (Value)) & ((Alignment) - 1U))
+
+/**
   Rounds a value up to the next boundary using a specified alignment.
 
   This function rounds Value up to the next boundary using the specified Alignment.
@@ -849,7 +945,7 @@ STATIC_ASSERT (sizeof (__VERIFY_UINT32_ENUM_SIZE) == 4, "Size of enum does not m
   @return  A value up to the next boundary.
 
 **/
-#define ALIGN_VALUE(Value, Alignment)  ((Value) + (((Alignment) - (Value)) & ((Alignment) - 1)))
+#define ALIGN_VALUE(Value, Alignment)  ((Value) + ALIGN_VALUE_ADDEND (Value, Alignment))
 
 /**
   Adjust a pointer by adding the minimum offset required for it to be aligned on
@@ -1134,6 +1230,11 @@ typedef UINTN RETURN_STATUS;
 #define RETURN_COMPROMISED_DATA  ENCODE_ERROR (33)
 
 ///
+/// There is an address conflict address allocation.
+///
+#define RETURN_IP_ADDRESS_CONFLICT  ENCODE_ERROR (34)
+
+///
 /// A HTTP error occurred during the network operation.
 ///
 #define RETURN_HTTP_ERROR  ENCODE_ERROR (35)
@@ -1171,6 +1272,11 @@ typedef UINTN RETURN_STATUS;
 /// The resulting buffer contains UEFI-compliant file system.
 ///
 #define RETURN_WARN_FILE_SYSTEM  ENCODE_WARNING (6)
+
+///
+/// The operation will be processed across a system reset.
+///
+#define RETURN_WARN_RESET_REQUIRED  ENCODE_WARNING (7)
 
 /**
   Returns a 16-bit signature built from 2 ASCII characters.

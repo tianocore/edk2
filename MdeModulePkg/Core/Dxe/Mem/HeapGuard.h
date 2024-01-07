@@ -378,12 +378,17 @@ AdjustPoolHeadA (
   Get the page base address according to pool head address.
 
   @param[in]  Memory    Head address of pool to free.
+  @param[in]  NoPages   Number of pages actually allocated.
+  @param[in]  Size      Size of memory requested.
+                        (plus pool head/tail overhead)
 
   @return Address of pool head.
 **/
 VOID *
 AdjustPoolHeadF (
-  IN EFI_PHYSICAL_ADDRESS  Memory
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NoPages,
+  IN UINTN                 Size
   );
 
 /**

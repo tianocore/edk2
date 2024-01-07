@@ -40,6 +40,9 @@
   Timer.h
   Timer.c
 
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES
+
 [Protocols]
   gEfiCpuArchProtocolGuid       ## CONSUMES
   gEfiTimerArchProtocolGuid     ## PRODUCES

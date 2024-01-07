@@ -45,7 +45,7 @@
   DebugLib
   BaseMemoryLib
   PcdLib
-  UefiCpuLib
+  CpuLib
   DebugAgentLib
   IoLib
   LocalApicLib
@@ -83,3 +83,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfDxeMemFvSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported

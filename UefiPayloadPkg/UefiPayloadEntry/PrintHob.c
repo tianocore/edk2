@@ -10,7 +10,6 @@
 #include <UniversalPayload/ExtraData.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/AcpiBoardInfoGuid.h>
-#include <Guid/BootManagerMenu.h>
 
 #define ROW_LIMITER  16
 
@@ -437,28 +436,6 @@ PrintMemoryTypeInfoGuidHob (
   return EFI_SUCCESS;
 }
 
-/**
-  Print the information in EdkiiBootManagerMenuFileGuid.
-  @param[in] HobRaw          A pointer to the start of gEdkiiBootManagerMenuFileGuid HOB.
-  @param[in] HobLength       The size of the HOB data buffer.
-  @retval EFI_SUCCESS        If it completed successfully.
-**/
-EFI_STATUS
-PrintBootManagerMenuGuidHob (
-  IN  UINT8   *HobRaw,
-  IN  UINT16  HobLength
-  )
-{
-  UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU  *BootManagerMenuFile;
-
-  BootManagerMenuFile = (UNIVERSAL_PAYLOAD_BOOT_MANAGER_MENU *)GET_GUID_HOB_DATA (HobRaw);
-  ASSERT (HobLength >= sizeof (*BootManagerMenuFile));
-  DEBUG ((DEBUG_INFO, "   Revision  = 0x%x\n", BootManagerMenuFile->Header.Revision));
-  DEBUG ((DEBUG_INFO, "   Length    = 0x%x\n", BootManagerMenuFile->Header.Length));
-  DEBUG ((DEBUG_INFO, "   FileName  = %g\n", &BootManagerMenuFile->FileName));
-  return EFI_SUCCESS;
-}
-
 //
 // Mappint table for dump Guid Hob information.
 // This table can be easily extented.
@@ -471,8 +448,7 @@ GUID_HOB_PRINT_HANDLE  GuidHobPrintHandleTable[] = {
   { &gUefiAcpiBoardInfoGuid,                 PrintAcpiBoardInfoGuidHob,     "gUefiAcpiBoardInfoGuid(Acpi Guid)"                           },
   { &gUniversalPayloadPciRootBridgeInfoGuid, PrintPciRootBridgeInfoGuidHob, "gUniversalPayloadPciRootBridgeInfoGuid(Pci Guid)"            },
   { &gEfiMemoryTypeInformationGuid,          PrintMemoryTypeInfoGuidHob,    "gEfiMemoryTypeInformationGuid(Memory Type Information Guid)" },
-  { &gUniversalPayloadExtraDataGuid,         PrintExtraDataGuidHob,         "gUniversalPayloadExtraDataGuid(PayLoad Extra Data Guid)"     },
-  { &gEdkiiBootManagerMenuFileGuid,          PrintBootManagerMenuGuidHob,   "gEdkiiBootManagerMenuFileGuid(Boot Manager Menu File Guid)"  }
+  { &gUniversalPayloadExtraDataGuid,         PrintExtraDataGuidHob,         "gUniversalPayloadExtraDataGuid(PayLoad Extra Data Guid)"     }
 };
 
 /**

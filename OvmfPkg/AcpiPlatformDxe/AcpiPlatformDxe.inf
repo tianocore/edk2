@@ -23,11 +23,8 @@
 [Sources]
   AcpiPlatform.c
   AcpiPlatform.h
-  BootScript.c
   CloudHvAcpi.c
   EntryPoint.c
-  PciDecoding.c
-  QemuFwCfgAcpi.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
@@ -35,23 +32,18 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  AcpiPlatformLib
   BaseLib
   BaseMemoryLib
-  DebugLib
   MemoryAllocationLib
   OrderedCollectionLib
-  PcdLib
   QemuFwCfgLib
-  QemuFwCfgS3Lib
-  UefiBootServicesTableLib
   UefiDriverEntryPoint
   HobLib
-  TpmMeasurementLib
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
   gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
-  gQemuAcpiTableNotifyProtocolGuid              # PROTOCOL PRODUCES
 
 [Guids]
   gRootBridgesConnectedEventGroupGuid

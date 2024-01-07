@@ -2,7 +2,7 @@
 @REM Windows batch file to set up the Microsoft Visual Studio environment
 @REM
 @REM This script is used to set up one of the Microsoft Visual Studio
-@REM environments, VS2008x86, VS2010x86, VS2012x86 or VS2013x86 for
+@REM environments, VS2015 for
 @REM building the Nt32Pkg/Nt32Pkg.dsc emulation environment to run on
 @REM an X64 version of Windows.
 @REM The system environment variables in this script are set by the
@@ -21,26 +21,6 @@
 echo.
 @if defined VS140COMNTOOLS (
    @set "COMMONTOOLSx64=C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64"
-   @goto SetVs
-)
-
-@if defined VS120COMNTOOLS (
-   @set "COMMONTOOLSx64=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64"
-   @goto SetVs
-)
-
-@if defined VS110COMNTOOLS (
-   @set "COMMONTOOLSx64=C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\x86_amd64"
-   @goto SetVs
-)
-
-@if defined VS100COMNTOOLS (
-   @set "COMMONTOOLSx64=C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\x86_amd64"
-   @goto SetVs
-)
-
-@if defined VS90COMNTOOLS (
-   @set "COMMONTOOLSx64=C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\x86_amd64"
    @goto SetVs
 )
 @echo.

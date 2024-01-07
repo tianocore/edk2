@@ -98,7 +98,7 @@ DetectSmbiosVersion (
       DEBUG ((
         DEBUG_INFO,
         "%a: SMBIOS 3.x DocRev from QEMU: 0x%02x\n",
-        __FUNCTION__,
+        __func__,
         QemuAnchor.V3.DocRev
         ));
       PcdStatus = PcdSet8S (PcdSmbiosDocRev, QemuAnchor.V3.DocRev);
@@ -112,7 +112,7 @@ DetectSmbiosVersion (
   DEBUG ((
     DEBUG_INFO,
     "%a: SMBIOS version from QEMU: 0x%04x\n",
-    __FUNCTION__,
+    __func__,
     SmbiosVersion
     ));
   PcdStatus = PcdSet16S (PcdSmbiosVersion, SmbiosVersion);

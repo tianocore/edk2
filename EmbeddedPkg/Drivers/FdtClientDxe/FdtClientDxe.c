@@ -222,7 +222,7 @@ FindCompatibleNodeReg (
     DEBUG ((
       DEBUG_ERROR,
       "%a: '%a' compatible node has invalid 'reg' property (size == 0x%x)\n",
-      __FUNCTION__,
+      __func__,
       CompatibleString,
       *RegSize
       ));
@@ -263,7 +263,7 @@ FindNextMemoryNodeReg (
     }
 
     if (!IsNodeEnabled (Next)) {
-      DEBUG ((DEBUG_WARN, "%a: ignoring disabled memory node\n", __FUNCTION__));
+      DEBUG ((DEBUG_WARN, "%a: ignoring disabled memory node\n", __func__));
       continue;
     }
 
@@ -279,7 +279,7 @@ FindNextMemoryNodeReg (
         DEBUG ((
           DEBUG_WARN,
           "%a: ignoring memory node with no 'reg' property\n",
-          __FUNCTION__
+          __func__
           ));
         continue;
       }
@@ -288,7 +288,7 @@ FindNextMemoryNodeReg (
         DEBUG ((
           DEBUG_WARN,
           "%a: ignoring memory node with invalid 'reg' property (size == 0x%x)\n",
-          __FUNCTION__,
+          __func__,
           *RegSize
           ));
         continue;
@@ -391,7 +391,7 @@ OnPlatformHasDeviceTree (
   DEBUG ((
     DEBUG_INFO,
     "%a: exposing DTB @ 0x%p to OS\n",
-    __FUNCTION__,
+    __func__,
     DeviceTreeBase
     ));
   Status = gBS->InstallConfigurationTable (&gFdtTableGuid, DeviceTreeBase);
@@ -424,7 +424,7 @@ InitializeFdtClientDxe (
     DEBUG ((
       DEBUG_ERROR,
       "%a: No DTB found @ 0x%p\n",
-      __FUNCTION__,
+      __func__,
       DeviceTreeBase
       ));
     return EFI_NOT_FOUND;
@@ -432,7 +432,7 @@ InitializeFdtClientDxe (
 
   mDeviceTreeBase = DeviceTreeBase;
 
-  DEBUG ((DEBUG_INFO, "%a: DTB @ 0x%p\n", __FUNCTION__, mDeviceTreeBase));
+  DEBUG ((DEBUG_INFO, "%a: DTB @ 0x%p\n", __func__, mDeviceTreeBase));
 
   //
   // Register a protocol notify for the EDKII Platform Has Device Tree
@@ -446,7 +446,7 @@ InitializeFdtClientDxe (
                   &PlatformHasDeviceTreeEvent
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: CreateEvent(): %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: CreateEvent(): %r\n", __func__, Status));
     return Status;
   }
 
@@ -459,7 +459,7 @@ InitializeFdtClientDxe (
     DEBUG ((
       DEBUG_ERROR,
       "%a: RegisterProtocolNotify(): %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto CloseEvent;
@@ -470,7 +470,7 @@ InitializeFdtClientDxe (
   //
   Status = gBS->SignalEvent (PlatformHasDeviceTreeEvent);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: SignalEvent(): %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: SignalEvent(): %r\n", __func__, Status));
     goto CloseEvent;
   }
 
@@ -484,7 +484,7 @@ InitializeFdtClientDxe (
     DEBUG ((
       DEBUG_ERROR,
       "%a: InstallProtocolInterface(): %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     goto CloseEvent;

@@ -244,4 +244,13 @@
 #define TRNG_STATUS_INVALID_PARAMETER  (INT32)(-2)
 #define TRNG_STATUS_NO_ENTROPY         (INT32)(-3)
 
+/*
+ *  SMC64 SiP Service Calls
+ */
+
+#define SMC_FASTCALL      0x80000000
+#define SMC64_FUNCTION    (SMC_FASTCALL     | 0x40000000)
+#define SMC_SIP_FUNCTION  (SMC64_FUNCTION   | 0x02000000)
+#define SMC_SIP_FUNCTION_ID(n)  (SMC_SIP_FUNCTION | (n))
+
 #endif // ARM_STD_SMC_H_

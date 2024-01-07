@@ -81,7 +81,6 @@ TlsDoHandshake (
   TLS_CONNECTION  *TlsConn;
   UINTN           PendingBufferSize;
   INTN            Ret;
-  UINTN           ErrorCode;
 
   TlsConn           = (TLS_CONNECTION *)Tls;
   PendingBufferSize = 0;
@@ -127,12 +126,14 @@ TlsDoHandshake (
       DEBUG ((
         DEBUG_ERROR,
         "%a SSL_HANDSHAKE_ERROR State=0x%x SSL_ERROR_%a\n",
-        __FUNCTION__,
+        __func__,
         SSL_get_state (TlsConn->Ssl),
         Ret == SSL_ERROR_SSL ? "SSL" : Ret == SSL_ERROR_SYSCALL ? "SYSCALL" : "ZERO_RETURN"
         ));
       DEBUG_CODE_BEGIN ();
       while (TRUE) {
+        unsigned long  ErrorCode;
+
         ErrorCode = ERR_get_error ();
         if (ErrorCode == 0) {
           break;
@@ -140,11 +141,10 @@ TlsDoHandshake (
 
         DEBUG ((
           DEBUG_ERROR,
-          "%a ERROR 0x%x=L%x:F%x:R%x\n",
-          __FUNCTION__,
+          "%a ERROR 0x%x=L%x:R%x\n",
+          __func__,
           ErrorCode,
           ERR_GET_LIB (ErrorCode),
-          ERR_GET_FUNC (ErrorCode),
           ERR_GET_REASON (ErrorCode)
           ));
       }

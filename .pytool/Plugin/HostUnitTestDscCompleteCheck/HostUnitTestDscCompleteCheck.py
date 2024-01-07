@@ -10,7 +10,7 @@ import logging
 import os
 from edk2toolext.environment.plugintypes.ci_build_plugin import ICiBuildPlugin
 from edk2toollib.uefi.edk2.parsers.dsc_parser import DscParser
-from edk2toollib.uefi.edk2.parsers.inf_parser import InfParser
+from edk2toollib.uefi.edk2.parsers.inf_parser import InfParser, AllPhases
 from edk2toolext.environment.var_dict import VarDict
 
 
@@ -116,8 +116,9 @@ class HostUnitTestDscCompleteCheck(ICiBuildPlugin):
                     # should compile test a library that is declared type HOST_APPLICATION
                     pass
 
-                elif len(infp.SupportedPhases) > 0 and \
-                        "HOST_APPLICATION" in infp.SupportedPhases:
+                elif (len(infp.SupportedPhases) > 0 and
+                      "HOST_APPLICATION" in infp.SupportedPhases and
+                      infp.SupportedPhases != AllPhases):
                     # should compile test a library that supports HOST_APPLICATION but
                     # require it to be an explicit opt-in
                     pass

@@ -1,11 +1,17 @@
 /** @file
   SSDT Cpu Topology Table Generator.
 
-  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2023, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
     - ACPI 6.3 Specification - January 2019 - s8.4 Declaring Processors
+    - ACPI for CoreSight version 1.2 Platform Design Document
+      (https://developer.arm.com/documentation/den0067/a/?lang=en)
+
+  @par Glossary:
+    - ETE - Embedded Trace Extension.
+    - ETM - Embedded Trace Macrocell.
 **/
 
 #ifndef SSDT_CPU_TOPOLOGY_GENERATOR_H_
@@ -34,6 +40,10 @@
           (EFI_ACPI_6_3_PPTT_PROCESSOR_ID_INVALID << 1) |                     \
           (EFI_ACPI_6_3_PPTT_NODE_IS_NOT_LEAF << 3))
 
+// Leaf nodes specific mask.
+#define PPTT_LEAF_MASK  ((EFI_ACPI_6_3_PPTT_PROCESSOR_ID_VALID << 1) |        \
+                         (EFI_ACPI_6_3_PPTT_NODE_IS_LEAF << 3))
+
 /** LPI states are stored in the ASL namespace at '\_SB_.Lxxx',
     with xxx being the node index of the LPI state.
 */
@@ -44,6 +54,9 @@
 
 /// HID for a processor device.
 #define ACPI_HID_PROCESSOR_DEVICE  "ACPI0007"
+
+/// HID for a ETM/ETE device.
+#define ACPI_HID_ET_DEVICE  "ARMHC500"
 
 /// HID for a processor container device.
 #define ACPI_HID_PROCESSOR_CONTAINER_DEVICE  "ACPI0010"

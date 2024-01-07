@@ -121,6 +121,7 @@
   gEfiBlockIoProtocolGuid                     ## SOMETIMES_CONSUMES
   gEfiSimplePointerProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiCpuIo2ProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiHiiDatabaseProtocolGuid                 ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiGlobalVariableGuid          ## SOMETIMES_CONSUMES ## GUID
@@ -130,3 +131,11 @@
   gEfiAcpi10TableGuid             ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi20TableGuid             ## SOMETIMES_CONSUMES ## SystemTable
   gShellDebug1HiiGuid             ## SOMETIMES_CONSUMES ## HII
+  gEfiMemoryAttributesTableGuid   ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiRtPropertiesTableGuid       ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiSystemResourceTableGuid     ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiDebugImageInfoTableGuid     ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiImageSecurityDatabaseGuid   ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiJsonConfigDataTableGuid     ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiJsonCapsuleDataTableGuid    ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiJsonCapsuleResultTableGuid  ## SOMETIMES_CONSUMES ## SystemTable

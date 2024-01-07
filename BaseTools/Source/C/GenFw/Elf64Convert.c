@@ -10,8 +10,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "WinNtInclude.h"
-
 #ifndef __GNUC__
 #include <windows.h>
 #include <io.h>
@@ -770,6 +768,49 @@ WriteSectionRiscV64 (
   }
 }
 
+STATIC UINT16 mDllCharacteristicsEx;
+
+STATIC
+VOID
+ParseNoteSection (
+  CONST Elf_Shdr  *Shdr
+  )
+{
+  CONST Elf_Note *Note;
+  CONST UINT32   *Prop;
+  UINT32         Prop0;
+  UINT32         Prop2;
+
+  Note = (Elf_Note *)((UINT8 *)mEhdr + Shdr->sh_offset);
+
+  if ((Note->n_type == NT_GNU_PROPERTY_TYPE_0) &&
+      (Note->n_namesz == sizeof ("GNU")) &&
+      (strcmp ((CHAR8 *)(Note + 1), "GNU") == 0) &&
+      (Note->n_descsz > sizeof (UINT32[2]))) {
+    Prop = (UINT32 *)((UINT8 *)(Note + 1) + sizeof("GNU"));
+
+    switch (mEhdr->e_machine) {
+    case EM_AARCH64:
+      Prop0 = GNU_PROPERTY_AARCH64_FEATURE_1_AND;
+      Prop2 = GNU_PROPERTY_AARCH64_FEATURE_1_BTI;
+      break;
+
+    case EM_X86_64:
+      Prop0 = GNU_PROPERTY_X86_FEATURE_1_AND;
+      Prop2 = GNU_PROPERTY_X86_FEATURE_1_IBT;
+      break;
+
+    default:
+      return;
+    }
+    if ((Prop[0] == Prop0) &&
+        (Prop[1] >= sizeof (UINT32)) &&
+        ((Prop[2] & Prop2) != 0)) {
+      mDllCharacteristicsEx |= EFI_IMAGE_DLLCHARACTERISTICS_EX_FORWARD_CFI_COMPAT;
+    }
+  }
+}
+
 //
 // Elf functions interface implementation
 //
@@ -823,6 +864,13 @@ ScanSections64 (
     }
     if (IsTextShdr(shdr) || IsDataShdr(shdr) || IsHiiRsrcShdr(shdr)) {
       mCoffAlignment = (UINT32)shdr->sh_addralign;
+    }
+  }
+
+  for (i = 0; i < mEhdr->e_shnum; i++) {
+    Elf_Shdr *shdr = GetShdrByIndex(i);
+    if (shdr->sh_type == SHT_NOTE) {
+      ParseNoteSection (shdr);
     }
   }
 
@@ -941,6 +989,16 @@ ScanSections64 (
   mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
                 sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
                 strlen(mInImageName) + 1;
+
+  //
+  // Add more space in the .debug data region for the DllCharacteristicsEx
+  // field.
+  //
+  if (mDllCharacteristicsEx != 0) {
+    mCoffOffset = DebugRvaAlign(mCoffOffset) +
+                  sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
+                  sizeof (EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY);
+  }
 
   mCoffOffset = CoffAlign(mCoffOffset);
   if (SectionCount == 0) {
@@ -1079,25 +1137,25 @@ ScanSections64 (
 
   switch (mEhdr->e_machine) {
   case EM_X86_64:
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_X64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_X64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
   case EM_AARCH64:
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_AARCH64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_ARM64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
   case EM_RISCV64:
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_RISCV64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_RISCV64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
   case EM_LOONGARCH:
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_LOONGARCH64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_LOONGARCH64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
 
   default:
     VerboseMsg ("%u unknown e_machine type. Assume X64", (UINTN)mEhdr->e_machine);
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_X64;
+    NtHdr->Pe32Plus.FileHeader.Machine = IMAGE_FILE_MACHINE_X64;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
   }
 
@@ -1504,7 +1562,27 @@ WriteSections64 (
             // subsequent LDR instruction (covered by a R_AARCH64_LD64_GOT_LO12_NC
             // relocation) into an ADD instruction - this is handled above.
             //
-            Offset = (Sym->st_value - (Rel->r_offset & ~0xfff)) >> 12;
+            // In order to handle Cortex-A53 erratum #843419, the GCC toolchain
+            // may convert an ADRP instruction at the end of a page (0xffc
+            // offset) into an ADR instruction. If so, be sure to calculate the
+            // offset for an ADR instead of ADRP.
+            //
+            if ((*(UINT32 *)Targ & BIT31) == 0) {
+              //
+              // Calculate the offset for an ADR.
+              //
+              Offset = (Sym->st_value & ~0xfff) - Rel->r_offset;
+              if (Offset < -0x100000 || Offset > 0xfffff) {
+                Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s  due to its size (> 1 MB), unable to relocate ADR.",
+                  mInImageName);
+                break;
+              }
+            } else {
+              //
+              // Calculate the offset for an ADRP.
+              //
+              Offset = (Sym->st_value - (Rel->r_offset & ~0xfff)) >> 12;
+            }
 
             *(UINT32 *)Targ &= 0x9000001f;
             *(UINT32 *)Targ |= ((Offset & 0x1ffffc) << (5 - 2)) | ((Offset & 0x3) << 29);
@@ -1720,7 +1798,17 @@ WriteSections64 (
           case R_LARCH_TLS_LD64_HI20:
           case R_LARCH_TLS_GD_PC_HI20:
           case R_LARCH_TLS_GD64_HI20:
+          case R_LARCH_32_PCREL:
           case R_LARCH_RELAX:
+          case R_LARCH_DELETE:
+          case R_LARCH_ALIGN:
+          case R_LARCH_PCREL20_S2:
+          case R_LARCH_CFA:
+          case R_LARCH_ADD6:
+          case R_LARCH_SUB6:
+          case R_LARCH_ADD_ULEB128:
+          case R_LARCH_SUB_ULEB128:
+          case R_LARCH_64_PCREL:
             //
             // These types are not used or do not require fixup.
             //
@@ -2127,7 +2215,17 @@ WriteRelocations64 (
               case R_LARCH_TLS_LD64_HI20:
               case R_LARCH_TLS_GD_PC_HI20:
               case R_LARCH_TLS_GD64_HI20:
+              case R_LARCH_32_PCREL:
               case R_LARCH_RELAX:
+              case R_LARCH_DELETE:
+              case R_LARCH_ALIGN:
+              case R_LARCH_PCREL20_S2:
+              case R_LARCH_CFA:
+              case R_LARCH_ADD6:
+              case R_LARCH_SUB6:
+              case R_LARCH_ADD_ULEB128:
+              case R_LARCH_SUB_ULEB128:
+              case R_LARCH_64_PCREL:
                 //
                 // These types are not used or do not require fixup in PE format files.
                 //
@@ -2194,29 +2292,47 @@ WriteDebug64 (
   VOID
   )
 {
-  UINT32                              Len;
-  EFI_IMAGE_OPTIONAL_HEADER_UNION     *NtHdr;
-  EFI_IMAGE_DATA_DIRECTORY            *DataDir;
-  EFI_IMAGE_DEBUG_DIRECTORY_ENTRY     *Dir;
-  EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY *Nb10;
+  UINT32                                      Len;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION             *NtHdr;
+  EFI_IMAGE_DATA_DIRECTORY                    *DataDir;
+  EFI_IMAGE_DEBUG_DIRECTORY_ENTRY             *Dir;
+  EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY         *Nb10;
+  EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY *DllEntry;
 
   Len = strlen(mInImageName) + 1;
-
-  Dir = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY*)(mCoffFile + mDebugOffset);
-  Dir->Type = EFI_IMAGE_DEBUG_TYPE_CODEVIEW;
-  Dir->SizeOfData = sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) + Len;
-  Dir->RVA = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
-  Dir->FileOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
-
-  Nb10 = (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY*)(Dir + 1);
-  Nb10->Signature = CODEVIEW_SIGNATURE_NB10;
-  strcpy ((char *)(Nb10 + 1), mInImageName);
-
 
   NtHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)(mCoffFile + mNtHdrOffset);
   DataDir = &NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG];
   DataDir->VirtualAddress = mDebugOffset;
-  DataDir->Size = sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+  DataDir->Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+
+  Dir = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY*)(mCoffFile + mDebugOffset);
+
+  if (mDllCharacteristicsEx != 0) {
+    DataDir->Size  += sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+
+    Dir->Type       = EFI_IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS;
+    Dir->SizeOfData = sizeof (EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY);
+    Dir->FileOffset = mDebugOffset + DataDir->Size +
+                      sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
+                      DebugRvaAlign(Len);
+    Dir->RVA        = Dir->FileOffset;
+
+    DllEntry = (VOID *)(mCoffFile + Dir->FileOffset);
+
+    DllEntry->DllCharacteristicsEx = mDllCharacteristicsEx;
+
+    Dir++;
+  }
+
+  Dir->Type = EFI_IMAGE_DEBUG_TYPE_CODEVIEW;
+  Dir->SizeOfData = sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) + Len;
+  Dir->RVA = mDebugOffset + DataDir->Size;
+  Dir->FileOffset = mDebugOffset + DataDir->Size;
+
+  Nb10 = (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY*)(Dir + 1);
+  Nb10->Signature = CODEVIEW_SIGNATURE_NB10;
+  strcpy ((char *)(Nb10 + 1), mInImageName);
 }
 
 STATIC

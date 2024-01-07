@@ -55,7 +55,6 @@
   PeCoffLib
   PlatformSupportLib
   CpuLib
-  UefiCpuLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
@@ -96,6 +95,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy       ## SOMETIMES_CONSUMES
-
-  gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory
 

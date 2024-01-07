@@ -2,6 +2,7 @@
   The common code of EDKII Redfish Configuration Handler driver.
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -9,7 +10,7 @@
 
 #include "RedfishConfigHandlerCommon.h"
 
-REDFISH_CONFIG_DRIVER_DATA  gRedfishConfigData;     // Only one Redfish service supproted
+REDFISH_CONFIG_DRIVER_DATA  gRedfishConfigData;     // Only one Redfish service supported
                                                     // on platform for the BIOS
                                                     // Redfish configuration.
 EFI_EVENT                          gEndOfDxeEvent        = NULL;
@@ -34,7 +35,7 @@ RedfishConfigOnEndOfDxe (
 
   Status = gCredential->StopService (gCredential, ServiceStopTypeSecureBootDisabled);
   if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
-    DEBUG ((DEBUG_ERROR, "Redfish credential protocol faied to stop service on EndOfDxe: %r", Status));
+    DEBUG ((DEBUG_ERROR, "Redfish credential protocol failed to stop service on EndOfDxe: %r", Status));
   }
 
   //
@@ -62,7 +63,7 @@ RedfishConfigOnExitBootService (
 
   Status = gCredential->StopService (gCredential, ServiceStopTypeExitBootService);
   if (EFI_ERROR (Status) && (Status != EFI_UNSUPPORTED)) {
-    DEBUG ((DEBUG_ERROR, "Redfish credential protocol faied to stop service on ExitBootService: %r", Status));
+    DEBUG ((DEBUG_ERROR, "Redfish credential protocol failed to stop service on ExitBootService: %r", Status));
   }
 }
 
@@ -121,7 +122,7 @@ RedfishConfigCommonInit (
   //
   Status = gBS->LocateProtocol (&gEdkIIRedfishCredentialProtocolGuid, NULL, (VOID **)&gCredential);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INFO, "%a: No Redfish Credential Protocol is installed on system.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: No Redfish Credential Protocol is installed on system.", __func__));
     return Status;
   }
 
@@ -137,7 +138,7 @@ RedfishConfigCommonInit (
                   &gEndOfDxeEvent
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Fail to register End Of DXE event.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to register End Of DXE event.", __func__));
     return Status;
   }
 
@@ -155,7 +156,7 @@ RedfishConfigCommonInit (
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (gEndOfDxeEvent);
     gEndOfDxeEvent = NULL;
-    DEBUG ((DEBUG_ERROR, "%a: Fail to register Exit Boot Service event.", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to register Exit Boot Service event.", __func__));
     return Status;
   }
 
@@ -225,7 +226,7 @@ RedfishConfigHandlerInitialization (
   UINTN                                  NumberOfHandles;
   EDKII_REDFISH_CONFIG_HANDLER_PROTOCOL  *ConfigHandler;
   UINTN                                  Index;
-  UINT32                                 Id;
+  UINT32                                 *Id;
 
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
@@ -257,6 +258,7 @@ RedfishConfigHandlerInitialization (
     Status = ConfigHandler->Init (ConfigHandler, &gRedfishConfigData.RedfishServiceInfo);
     if (EFI_ERROR (Status) && (Status != EFI_ALREADY_STARTED)) {
       DEBUG ((DEBUG_ERROR, "ERROR: Failed to init Redfish config handler %p.\n", ConfigHandler));
+      continue;
     }
 
     //

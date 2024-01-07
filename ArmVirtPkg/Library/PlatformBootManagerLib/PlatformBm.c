@@ -16,6 +16,7 @@
 #include <Library/PcdLib.h>
 #include <Library/PlatformBmPrintScLib.h>
 #include <Library/QemuBootOrderLib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/TpmPlatformHierarchyLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Protocol/DevicePath.h>
@@ -190,7 +191,7 @@ FilterAndProcess (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: %g: %r\n",
-      __FUNCTION__,
+      __func__,
       ProtocolGuid,
       Status
       ));
@@ -261,7 +262,7 @@ IsPciDisplay (
                         &Pci
                         );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __FUNCTION__, ReportText, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __func__, ReportText, Status));
     return FALSE;
   }
 
@@ -269,15 +270,16 @@ IsPciDisplay (
 }
 
 /**
-  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
-  the VIRTIO_DEVICE_PROTOCOL level.
+  This function checks if a handle corresponds to the Virtio Device ID given
+  at the VIRTIO_DEVICE_PROTOCOL level.
 **/
 STATIC
 BOOLEAN
 EFIAPI
-IsVirtioRng (
+IsVirtio (
   IN EFI_HANDLE    Handle,
-  IN CONST CHAR16  *ReportText
+  IN CONST CHAR16  *ReportText,
+  IN UINT16        VirtIoDeviceId
   )
 {
   EFI_STATUS              Status;
@@ -293,19 +295,50 @@ IsVirtioRng (
   }
 
   return (BOOLEAN)(VirtIo->SubSystemDeviceId ==
-                   VIRTIO_SUBSYSTEM_ENTROPY_SOURCE);
+                   VirtIoDeviceId);
 }
 
 /**
   This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
-  the EFI_PCI_IO_PROTOCOL level.
+  the VIRTIO_DEVICE_PROTOCOL level.
 **/
 STATIC
 BOOLEAN
 EFIAPI
-IsVirtioPciRng (
+IsVirtioRng (
   IN EFI_HANDLE    Handle,
   IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtio (Handle, ReportText, VIRTIO_SUBSYSTEM_ENTROPY_SOURCE);
+}
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio serial device at
+  the VIRTIO_DEVICE_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioSerial (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtio (Handle, ReportText, VIRTIO_SUBSYSTEM_CONSOLE);
+}
+
+/**
+  This function checks if a handle corresponds to the Virtio Device ID given
+  at the EFI_PCI_IO_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioPci (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText,
+  IN UINT16        VirtIoDeviceId
   )
 {
   EFI_STATUS           Status;
@@ -371,11 +404,11 @@ IsVirtioPciRng (
   //
   // From DeviceId and RevisionId, determine whether the device is a
   // modern-only Virtio 1.0 device. In case of Virtio 1.0, DeviceId can
-  // immediately be restricted to VIRTIO_SUBSYSTEM_ENTROPY_SOURCE, and
+  // immediately be restricted to VirtIoDeviceId, and
   // SubsystemId will only play a sanity-check role. Otherwise, DeviceId can
   // only be sanity-checked, and SubsystemId will decide.
   //
-  if ((DeviceId == 0x1040 + VIRTIO_SUBSYSTEM_ENTROPY_SOURCE) &&
+  if ((DeviceId == 0x1040 + VirtIoDeviceId) &&
       (RevisionId >= 0x01))
   {
     Virtio10 = TRUE;
@@ -403,15 +436,45 @@ IsVirtioPciRng (
     return TRUE;
   }
 
-  if (!Virtio10 && (SubsystemId == VIRTIO_SUBSYSTEM_ENTROPY_SOURCE)) {
+  if (!Virtio10 && (SubsystemId == VirtIoDeviceId)) {
     return TRUE;
   }
 
   return FALSE;
 
 PciError:
-  DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __FUNCTION__, ReportText, Status));
+  DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __func__, ReportText, Status));
   return FALSE;
+}
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
+  the EFI_PCI_IO_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioPciRng (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtioPci (Handle, ReportText, VIRTIO_SUBSYSTEM_ENTROPY_SOURCE);
+}
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio serial device at
+  the EFI_PCI_IO_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioPciSerial (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  return IsVirtioPci (Handle, ReportText, VIRTIO_SUBSYSTEM_CONSOLE);
 }
 
 /**
@@ -437,7 +500,7 @@ Connect (
   DEBUG ((
     EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
     "%a: %s: %r\n",
-    __FUNCTION__,
+    __func__,
     ReportText,
     Status
     ));
@@ -463,7 +526,7 @@ AddOutput (
     DEBUG ((
       DEBUG_ERROR,
       "%a: %s: handle %p: device path not found\n",
-      __FUNCTION__,
+      __func__,
       ReportText,
       Handle
       ));
@@ -475,7 +538,7 @@ AddOutput (
     DEBUG ((
       DEBUG_ERROR,
       "%a: %s: adding to ConOut: %r\n",
-      __FUNCTION__,
+      __func__,
       ReportText,
       Status
       ));
@@ -487,7 +550,7 @@ AddOutput (
     DEBUG ((
       DEBUG_ERROR,
       "%a: %s: adding to ErrOut: %r\n",
-      __FUNCTION__,
+      __func__,
       ReportText,
       Status
       ));
@@ -497,7 +560,148 @@ AddOutput (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: %s: added to ConOut and ErrOut\n",
-    __FUNCTION__,
+    __func__,
+    ReportText
+    ));
+}
+
+/**
+  This CALLBACK_FUNCTION retrieves the EFI_DEVICE_PATH_PROTOCOL from
+  the handle, appends serial, uart and terminal nodes, finally updates
+  ConIn, ConOut and ErrOut.
+**/
+STATIC
+VOID
+EFIAPI
+SetupVirtioSerial (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  STATIC CONST ACPI_HID_DEVICE_PATH  SerialNode = {
+    {
+      ACPI_DEVICE_PATH,
+      ACPI_DP,
+      {
+        (UINT8)(sizeof (ACPI_HID_DEVICE_PATH)),
+        (UINT8)((sizeof (ACPI_HID_DEVICE_PATH)) >> 8)
+      },
+    },
+    EISA_PNP_ID (0x0501),
+    0
+  };
+
+  STATIC CONST UART_DEVICE_PATH  UartNode = {
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_UART_DP,
+      {
+        (UINT8)(sizeof (UART_DEVICE_PATH)),
+        (UINT8)((sizeof (UART_DEVICE_PATH)) >> 8)
+      },
+    },
+    0,
+    115200,
+    8,
+    1,
+    1
+  };
+
+  STATIC VENDOR_DEVICE_PATH  TerminalNode = {
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_VENDOR_DP,
+      {
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      },
+    },
+    // copy from PcdTerminalTypeGuidBuffer
+  };
+
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath, *OldDevicePath;
+
+  DevicePath = DevicePathFromHandle (Handle);
+
+  if (DevicePath == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %s: handle %p: device path not found\n",
+      __func__,
+      ReportText,
+      Handle
+      ));
+    return;
+  }
+
+  CopyGuid (
+    &TerminalNode.Guid,
+    PcdGetPtr (PcdTerminalTypeGuidBuffer)
+    );
+
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 &SerialNode.Header
+                 );
+
+  OldDevicePath = DevicePath;
+  DevicePath    = AppendDevicePathNode (
+                    DevicePath,
+                    &UartNode.Header
+                    );
+  FreePool (OldDevicePath);
+
+  OldDevicePath = DevicePath;
+  DevicePath    = AppendDevicePathNode (
+                    DevicePath,
+                    &TerminalNode.Header
+                    );
+  FreePool (OldDevicePath);
+
+  Status = EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %s: adding to ConIn: %r\n",
+      __func__,
+      ReportText,
+      Status
+      ));
+    return;
+  }
+
+  Status = EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+
+      "%a: %s: adding to ConOut: %r\n",
+      __func__,
+      ReportText,
+      Status
+      ));
+    return;
+  }
+
+  Status = EfiBootManagerUpdateConsoleVariable (ErrOut, DevicePath, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: %s: adding to ErrOut: %r\n",
+      __func__,
+      ReportText,
+      Status
+      ));
+    return;
+  }
+
+  FreePool (DevicePath);
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: %s: added to ConIn, ConOut and ErrOut\n",
+    __func__,
     ReportText
     ));
 }
@@ -698,7 +902,7 @@ RemoveStaleFvFileOptions (
     DEBUG ((
       EFI_ERROR (Status) ? DEBUG_WARN : DEBUG_VERBOSE,
       "%a: removing stale Boot#%04x %s: %r\n",
-      __FUNCTION__,
+      __func__,
       (UINT32)BootOptions[Index].OptionNumber,
       DevicePathString == NULL ? L"<unavailable>" : DevicePathString,
       Status
@@ -878,7 +1082,7 @@ PlatformBootManagerBeforeConsole (
   DEBUG ((
     EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
     "%a: SetVariable(%s, %u): %r\n",
-    __FUNCTION__,
+    __func__,
     EFI_TIME_OUT_VARIABLE_NAME,
     FrontPageTimeout,
     Status
@@ -900,6 +1104,55 @@ PlatformBootManagerBeforeConsole (
   // instances on Virtio PCI RNG devices.
   //
   FilterAndProcess (&gEfiPciIoProtocolGuid, IsVirtioPciRng, Connect);
+
+  //
+  // Register Virtio serial devices as console.
+  //
+  FilterAndProcess (&gVirtioDeviceProtocolGuid, IsVirtioSerial, SetupVirtioSerial);
+  FilterAndProcess (&gEfiPciIoProtocolGuid, IsVirtioPciSerial, SetupVirtioSerial);
+}
+
+/**
+  Uninstall the EFI memory attribute protocol if it exists.
+**/
+STATIC
+VOID
+UninstallEfiMemoryAttributesProtocol (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+  UINTN       Size;
+  VOID        *MemoryAttributeProtocol;
+
+  Size   = sizeof (Handle);
+  Status = gBS->LocateHandle (
+                  ByProtocol,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  NULL,
+                  &Size,
+                  &Handle
+                  );
+
+  if (EFI_ERROR (Status)) {
+    ASSERT (Status == EFI_NOT_FOUND);
+    return;
+  }
+
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  &MemoryAttributeProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->UninstallProtocolInterface (
+                  Handle,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  MemoryAttributeProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**
@@ -920,11 +1173,31 @@ PlatformBootManagerAfterConsole (
   )
 {
   RETURN_STATUS  Status;
+  BOOLEAN        Uninstall;
 
   //
   // Show the splash screen.
   //
   BootLogoEnableLogo ();
+
+  //
+  // Work around shim's terminally broken use of the EFI memory attributes
+  // protocol, by uninstalling it if requested on the QEMU command line.
+  //
+  // E.g.,
+  //       -fw_cfg opt/org.tianocore/UninstallMemAttrProtocol,string=y
+  //
+  Uninstall = FixedPcdGetBool (PcdUninstallMemAttrProtocol);
+  QemuFwCfgParseBool ("opt/org.tianocore/UninstallMemAttrProtocol", &Uninstall);
+  DEBUG ((
+    DEBUG_WARN,
+    "%a: %auninstalling EFI memory protocol\n",
+    __func__,
+    Uninstall ? "" : "not "
+    ));
+  if (Uninstall) {
+    UninstallEfiMemoryAttributesProtocol ();
+  }
 
   //
   // Process QEMU's -kernel command line option. The kernel booted this way

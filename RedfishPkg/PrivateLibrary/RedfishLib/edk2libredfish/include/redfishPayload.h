@@ -10,6 +10,7 @@
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -19,7 +20,7 @@
 #define LIBREDFISH_REDFISH_PAYLOAD_H_
 
 #include <Include/Library/RedfishCrtLib.h>
-
+#include <Library/JsonLib.h>
 #include <jansson.h>
 #include <redfishService.h>
 #include <redpath.h>

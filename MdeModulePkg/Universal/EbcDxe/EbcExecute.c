@@ -2015,7 +2015,7 @@ ExecuteJMP (
     // check for alignment, and jump absolute.
     //
     Data64 = (UINT64)VmReadImmed64 (VmPtr, 2);
-    if (!IS_ALIGNED ((UINTN)Data64, sizeof (UINT16))) {
+    if (!ADDRESS_IS_ALIGNED ((UINTN)Data64, sizeof (UINT16))) {
       EbcDebugSignalException (
         EXCEPT_EBC_ALIGNMENT_CHECK,
         EXCEPTION_FLAG_FATAL,
@@ -2074,7 +2074,7 @@ ExecuteJMP (
     // Form: JMP32 @Rx {Index32}
     //
     Addr = VmReadMemN (VmPtr, (UINTN)Data64 + Index32);
-    if (!IS_ALIGNED ((UINTN)Addr, sizeof (UINT16))) {
+    if (!ADDRESS_IS_ALIGNED ((UINTN)Addr, sizeof (UINT16))) {
       EbcDebugSignalException (
         EXCEPT_EBC_ALIGNMENT_CHECK,
         EXCEPTION_FLAG_FATAL,
@@ -2097,7 +2097,7 @@ ExecuteJMP (
     // Form: JMP32 Rx {Immed32}
     //
     Addr = (UINTN)(Data64 + Index32);
-    if (!IS_ALIGNED ((UINTN)Addr, sizeof (UINT16))) {
+    if (!ADDRESS_IS_ALIGNED ((UINTN)Addr, sizeof (UINT16))) {
       EbcDebugSignalException (
         EXCEPT_EBC_ALIGNMENT_CHECK,
         EXCEPTION_FLAG_FATAL,
@@ -3158,7 +3158,7 @@ ExecuteRET (
     // Pull the return address off the VM app's stack and set the IP
     // to it
     //
-    if (!IS_ALIGNED ((UINTN)VmPtr->Gpr[0], sizeof (UINT16))) {
+    if (!ADDRESS_IS_ALIGNED ((UINTN)VmPtr->Gpr[0], sizeof (UINT16))) {
       EbcDebugSignalException (
         EXCEPT_EBC_ALIGNMENT_CHECK,
         EXCEPTION_FLAG_FATAL,
@@ -4733,7 +4733,7 @@ VmWriteMem16 (
   //
   // Do a simple write if aligned
   //
-  if (IS_ALIGNED (Addr, sizeof (UINT16))) {
+  if (ADDRESS_IS_ALIGNED (Addr, sizeof (UINT16))) {
     *(UINT16 *)Addr = Data;
   } else {
     //
@@ -4795,7 +4795,7 @@ VmWriteMem32 (
   //
   // Do a simple write if aligned
   //
-  if (IS_ALIGNED (Addr, sizeof (UINT32))) {
+  if (ADDRESS_IS_ALIGNED (Addr, sizeof (UINT32))) {
     *(UINT32 *)Addr = Data;
   } else {
     //
@@ -4857,7 +4857,7 @@ VmWriteMem64 (
   //
   // Do a simple write if aligned
   //
-  if (IS_ALIGNED (Addr, sizeof (UINT64))) {
+  if (ADDRESS_IS_ALIGNED (Addr, sizeof (UINT64))) {
     *(UINT64 *)Addr = Data;
   } else {
     //
@@ -4922,7 +4922,7 @@ VmWriteMemN (
   //
   // Do a simple write if aligned
   //
-  if (IS_ALIGNED (Addr, sizeof (UINTN))) {
+  if (ADDRESS_IS_ALIGNED (Addr, sizeof (UINTN))) {
     *(UINTN *)Addr = Data;
   } else {
     for (Index = 0; Index < sizeof (UINTN) / sizeof (UINT32); Index++) {
@@ -4985,7 +4985,7 @@ VmReadImmed16 (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (INT16))) {
+  if (ADDRESS_IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (INT16))) {
     return *(INT16 *)(VmPtr->Ip + Offset);
   } else {
     //
@@ -5029,7 +5029,7 @@ VmReadImmed32 (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT32))) {
+  if (ADDRESS_IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT32))) {
     return *(INT32 *)(VmPtr->Ip + Offset);
   }
 
@@ -5068,7 +5068,7 @@ VmReadImmed64 (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT64))) {
+  if (ADDRESS_IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT64))) {
     return *(UINT64 *)(VmPtr->Ip + Offset);
   }
 
@@ -5105,7 +5105,7 @@ VmReadCode16 (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT16))) {
+  if (ADDRESS_IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT16))) {
     return *(UINT16 *)(VmPtr->Ip + Offset);
   } else {
     //
@@ -5147,7 +5147,7 @@ VmReadCode32 (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT32))) {
+  if (ADDRESS_IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT32))) {
     return *(UINT32 *)(VmPtr->Ip + Offset);
   }
 
@@ -5184,7 +5184,7 @@ VmReadCode64 (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT64))) {
+  if (ADDRESS_IS_ALIGNED ((UINTN)VmPtr->Ip + Offset, sizeof (UINT64))) {
     return *(UINT64 *)(VmPtr->Ip + Offset);
   }
 
@@ -5247,7 +5247,7 @@ VmReadMem16 (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED (Addr, sizeof (UINT16))) {
+  if (ADDRESS_IS_ALIGNED (Addr, sizeof (UINT16))) {
     return *(UINT16 *)Addr;
   }
 
@@ -5281,7 +5281,7 @@ VmReadMem32 (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED (Addr, sizeof (UINT32))) {
+  if (ADDRESS_IS_ALIGNED (Addr, sizeof (UINT32))) {
     return *(UINT32 *)Addr;
   }
 
@@ -5319,7 +5319,7 @@ VmReadMem64 (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED (Addr, sizeof (UINT64))) {
+  if (ADDRESS_IS_ALIGNED (Addr, sizeof (UINT64))) {
     return *(UINT64 *)Addr;
   }
 
@@ -5388,7 +5388,7 @@ VmReadMemN (
   //
   // Read direct if aligned
   //
-  if (IS_ALIGNED (Addr, sizeof (UINTN))) {
+  if (ADDRESS_IS_ALIGNED (Addr, sizeof (UINTN))) {
     return *(UINTN *)Addr;
   }
 

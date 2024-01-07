@@ -114,12 +114,13 @@ VerifyHashedFv (
   IN EFI_BOOT_MODE   BootMode
   )
 {
-  UINTN                FvIndex;
-  CONST HASH_ALG_INFO  *AlgInfo;
-  UINT8                *HashValue;
-  UINT8                *FvHashValue;
-  VOID                 *FvBuffer;
-  EFI_STATUS           Status;
+  UINTN                                 FvIndex;
+  CONST HASH_ALG_INFO                   *AlgInfo;
+  UINT8                                 *HashValue;
+  UINT8                                 *FvHashValue;
+  VOID                                  *FvBuffer;
+  EDKII_PEI_FIRMWARE_VOLUME_SHADOW_PPI  *FvShadowPpi;
+  EFI_STATUS                            Status;
 
   if ((HashInfo == NULL) ||
       (HashInfo->HashSize == 0) ||
@@ -191,8 +192,30 @@ VerifyHashedFv (
     // Copy FV to permanent memory to avoid potential TOC/TOU.
     //
     FvBuffer = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)FvInfo[FvIndex].Length));
+
     ASSERT (FvBuffer != NULL);
-    CopyMem (FvBuffer, (CONST VOID *)(UINTN)FvInfo[FvIndex].Base, (UINTN)FvInfo[FvIndex].Length);
+    Status = PeiServicesLocatePpi (
+               &gEdkiiPeiFirmwareVolumeShadowPpiGuid,
+               0,
+               NULL,
+               (VOID **)&FvShadowPpi
+               );
+
+    if (!EFI_ERROR (Status)) {
+      Status = FvShadowPpi->FirmwareVolumeShadow (
+                              (EFI_PHYSICAL_ADDRESS)FvInfo[FvIndex].Base,
+                              FvBuffer,
+                              (UINTN)FvInfo[FvIndex].Length
+                              );
+    }
+
+    if (EFI_ERROR (Status)) {
+      CopyMem (
+        FvBuffer,
+        (CONST VOID *)(UINTN)FvInfo[FvIndex].Base,
+        (UINTN)FvInfo[FvIndex].Length
+        );
+    }
 
     if (!AlgInfo->HashAll (FvBuffer, (UINTN)FvInfo[FvIndex].Length, FvHashValue)) {
       Status = EFI_ABORTED;

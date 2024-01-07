@@ -27,6 +27,7 @@
 
 [LibraryClasses]
   ArmVirtMemInfoLib|Include/Library/ArmVirtMemInfoLib.h
+  FdtSerialPortAddressLib|Include/Library/FdtSerialPortAddressLib.h
 
 [Guids.common]
   gArmVirtTokenSpaceGuid = { 0x0B6F5CA7, 0x4F53, 0x445A, { 0xB7, 0x6E, 0x2E, 0x36, 0x5B, 0x80, 0x63, 0x66 } }
@@ -67,3 +68,9 @@
   # Cloud Hypervisor has no other way to pass Rsdp address to the guest except use a PCD.
   #
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x0|UINT64|0x00000005
+
+  ##
+  # Whether the EFI memory attributes protocol should be uninstalled before
+  # invoking the OS loader. This may be needed to work around problematic
+  # builds of shim that use the protocol incorrectly.
+  gArmVirtTokenSpaceGuid.PcdUninstallMemAttrProtocol|FALSE|BOOLEAN|0x00000006

@@ -312,6 +312,11 @@ SetVariableCheckHandlerMorLock (
       mMorLockState    = MorLockStateLocked;
       mMorLockKeyEmpty = TRUE;
       ZeroMem (mMorLockKey, sizeof (mMorLockKey));
+      //
+      // Update value to reflect locked without key
+      //
+      Status = SetMorLockVariable (MOR_LOCK_DATA_LOCKED_WITHOUT_KEY);
+      ASSERT_EFI_ERROR (Status);
       return EFI_ACCESS_DENIED;
     }
   }
@@ -485,7 +490,7 @@ MorLockInitAtEndOfDxe (
     DEBUG ((
       DEBUG_WARN,
       "%a: deleting unexpected / unsupported variable %g:%s\n",
-      __FUNCTION__,
+      __func__,
       &gEfiMemoryOverwriteControlDataGuid,
       MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME
       ));
@@ -521,7 +526,7 @@ MorLockInitAtEndOfDxe (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to lock variable %s! %r\n", __FUNCTION__, MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to lock variable %s! %r\n", __func__, MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME, Status));
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -559,7 +564,7 @@ MorLockInitAtEndOfDxe (
   }
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to lock variable %s! %r\n", __FUNCTION__, MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME, Status));
+    DEBUG ((DEBUG_ERROR, "%a - Failed to lock variable %s! %r\n", __func__, MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME, Status));
     ASSERT_EFI_ERROR (Status);
   }
 

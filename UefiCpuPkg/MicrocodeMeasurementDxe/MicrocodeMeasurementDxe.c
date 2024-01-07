@@ -238,7 +238,7 @@ MeasureMicrocodePatches (
        TotalMicrocodeSize)
       );
   } else {
-    DEBUG ((DEBUG_ERROR, "ERROR: TpmMeasureAndLogData failed with status %a!\n", Status));
+    DEBUG ((DEBUG_ERROR, "ERROR: TpmMeasureAndLogData failed with status %r!\n", Status));
   }
 
   FreePool (Offsets);

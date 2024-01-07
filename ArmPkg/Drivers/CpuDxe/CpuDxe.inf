@@ -23,6 +23,7 @@
   CpuDxe.h
   CpuMmuCommon.c
   Exception.c
+  MemoryAttribute.c
 
 [Sources.ARM]
   Arm/Mmu.c
@@ -47,12 +48,14 @@
   DefaultExceptionHandlerLib
   DxeServicesTableLib
   HobLib
+  MemoryAllocationLib
   PeCoffGetEntryPointLib
   UefiDriverEntryPoint
   UefiLib
 
 [Protocols]
   gEfiCpuArchProtocolGuid
+  gEfiMemoryAttributeProtocolGuid
 
 [Guids]
   gEfiDebugImageInfoTableGuid
@@ -62,9 +65,11 @@
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdVFPEnabled
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [FeaturePcd.common]
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
+  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx
 
 [Depex]
   gHardwareInterruptProtocolGuid OR gHardwareInterrupt2ProtocolGuid

@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -197,8 +197,8 @@ CProcedureInvoke:
 
     push       ebx               ; Push ApIndex
     mov        eax, esi
-    add        eax, MP_CPU_EXCHANGE_INFO_OFFSET
-    push       eax               ; push address of exchange info data buffer
+    add        eax, MP_CPU_EXCHANGE_INFO_FIELD (CpuMpData)
+    push       dword [eax]       ; push address of CpuMpData
 
     mov        edi, esi
     add        edi, MP_CPU_EXCHANGE_INFO_FIELD (CFunction)
@@ -219,24 +219,24 @@ SwitchToRealProcEnd:
 RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
-;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish, Pm16CodeSegment, SevEsAPJumpTable, WakeupBuffer);
+;  AsmRelocateApLoopGeneric (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish, Pm16CodeSegment, SevEsAPJumpTable, WakeupBuffer);
 ;
 ;  The last three parameters (Pm16CodeSegment, SevEsAPJumpTable and WakeupBuffer) are
 ;  specific to SEV-ES support and are not applicable on IA32.
 ;-------------------------------------------------------------------------------------
-AsmRelocateApLoopStart:
+AsmRelocateApLoopGenericStart:
     mov        eax, esp
-    mov        esp, [eax + 16]     ; TopOfApStack
+    mov        esp, [eax + 12]     ; TopOfApStack
     push       dword [eax]         ; push return address for stack trace
     push       ebp
     mov        ebp, esp
     mov        ebx, [eax + 8]      ; ApTargetCState
     mov        ecx, [eax + 4]      ; MwaitSupport
-    mov        eax, [eax + 20]     ; CountTofinish
+    mov        eax, [eax + 16]     ; CountTofinish
     lock dec   dword [eax]         ; (*CountTofinish)--
     cmp        cl,  1              ; Check mwait-monitor support
-    jnz        HltLoop
-MwaitLoop:
+    jnz        HltLoopGeneric
+MwaitLoopGeneric:
     cli
     mov        eax, esp
     xor        ecx, ecx
@@ -245,12 +245,12 @@ MwaitLoop:
     mov        eax, ebx            ; Mwait Cx, Target C-State per eax[7:4]
     shl        eax, 4
     mwait
-    jmp        MwaitLoop
-HltLoop:
+    jmp        MwaitLoopGeneric
+HltLoopGeneric:
     cli
     hlt
-    jmp        HltLoop
-AsmRelocateApLoopEnd:
+    jmp        HltLoopGeneric
+AsmRelocateApLoopGenericEnd:
 
 ;-------------------------------------------------------------------------------------
 ;  AsmGetAddressMap (&AddressMap);
@@ -264,8 +264,8 @@ ASM_PFX(AsmGetAddressMap):
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelAddress], RendezvousFunnelProcStart
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.ModeEntryOffset], Flat32Start - RendezvousFunnelProcStart
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelSize], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
-    mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddress], AsmRelocateApLoopStart
-    mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSize], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
+    mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddressGeneric], AsmRelocateApLoopGenericStart
+    mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSizeGeneric], AsmRelocateApLoopGenericEnd - AsmRelocateApLoopGenericStart
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.ModeTransitionOffset], Flat32Start - RendezvousFunnelProcStart
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealNoNxOffset], SwitchToRealProcStart - Flat32Start
     mov        dword [ebx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealPM16ModeOffset], 0

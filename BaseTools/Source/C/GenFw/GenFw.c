@@ -6,8 +6,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "WinNtInclude.h"
-
 #ifndef __GNUC__
 #include <windows.h>
 #include <io.h>
@@ -28,9 +26,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Acpi Table definition
 //
 #include <IndustryStandard/Acpi.h>
-#include <IndustryStandard/Acpi1_0.h>
-#include <IndustryStandard/Acpi2_0.h>
-#include <IndustryStandard/Acpi3_0.h>
+#include <IndustryStandard/Acpi10.h>
+#include <IndustryStandard/Acpi20.h>
+#include <IndustryStandard/Acpi30.h>
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
 
 #include "CommonLib.h"
@@ -88,6 +86,7 @@ UINT32 mImageSize = 0;
 UINT32 mOutImageType = FW_DUMMY_IMAGE;
 BOOLEAN mIsConvertXip = FALSE;
 BOOLEAN mExportFlag = FALSE;
+BOOLEAN mNoNxCompat = FALSE;
 
 STATIC
 EFI_STATUS
@@ -283,6 +282,9 @@ Returns:
                         write export table into PE-COFF.\n\
                         This option can be used together with -e.\n\
                         It doesn't work for other options.\n");
+  fprintf (stdout, "  --nonxcompat          Do not set the IMAGE_DLLCHARACTERISTICS_NX_COMPAT bit \n\
+                        of the optional header in the PE header even if the \n\
+                        requirements are met.\n");
   fprintf (stdout, "  -v, --verbose         Turn on verbose output with informational messages.\n");
   fprintf (stdout, "  -q, --quiet           Disable all messages except key message and fatal error\n");
   fprintf (stdout, "  -d, --debug level     Enable debug messages, at input debug level.\n");
@@ -370,7 +372,7 @@ Returns:
     if (Facs->Version > EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) {
       break;
     }
-    if ((Facs->Version != EFI_ACPI_1_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
+    if ((Facs->Version != 0 /* field is reserved in ACPI 1.0 */) &&
         (Facs->Version != EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         (Facs->Version != EFI_ACPI_3_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION)){
       Error (NULL, 0, 3000, "Invalid", "FACS version check failed.");
@@ -441,6 +443,59 @@ Returns:
   }
 
   return STATUS_SUCCESS;
+}
+
+/**
+
+  Checks if the Pe image is nxcompat compliant.
+
+  Must meet the following conditions:
+  1. The PE is 64bit
+  2. The section alignment is evenly divisible by 4k
+  3. No section is writable and executable.
+
+  @param  PeHdr     - The PE header
+
+  @retval TRUE      - The PE is nx compat compliant
+  @retval FALSE     - The PE is not nx compat compliant
+
+**/
+STATIC
+BOOLEAN
+IsNxCompatCompliant (
+  EFI_IMAGE_OPTIONAL_HEADER_UNION  *PeHdr
+  )
+{
+  EFI_IMAGE_SECTION_HEADER     *SectionHeader;
+  UINT32                       Index;
+  UINT32                       Mask;
+
+  // Must have an optional header to perform verification
+  if (PeHdr->Pe32.FileHeader.SizeOfOptionalHeader == 0) {
+    return FALSE;
+  }
+
+  // Verify PE is 64 bit
+  if (!(PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC)) {
+    return FALSE;
+  }
+
+  // Verify Section Alignment is divisible by 4K
+  if (!((PeHdr->Pe32Plus.OptionalHeader.SectionAlignment % EFI_PAGE_SIZE) == 0)) {
+    return FALSE;
+  }
+
+  // Verify sections are not Write & Execute
+  Mask = EFI_IMAGE_SCN_MEM_EXECUTE | EFI_IMAGE_SCN_MEM_WRITE;
+  SectionHeader = (EFI_IMAGE_SECTION_HEADER *) ((UINT8 *) &(PeHdr->Pe32Plus.OptionalHeader) + PeHdr->Pe32Plus.FileHeader.SizeOfOptionalHeader);
+  for (Index = 0; Index < PeHdr->Pe32Plus.FileHeader.NumberOfSections; Index ++, SectionHeader ++) {
+    if ((SectionHeader->Characteristics & Mask) == Mask) {
+      return FALSE;
+    }
+  }
+
+  // Passed all requirements, return TRUE
+  return TRUE;
 }
 
 VOID
@@ -1454,6 +1509,13 @@ Returns:
       continue;
     }
 
+    if (stricmp (argv[0], "--nonxcompat") == 0) {
+      mNoNxCompat = TRUE;
+      argc --;
+      argv ++;
+      continue;
+    }
+
     if (argv[0][0] == '-') {
       Error (NULL, 0, 1000, "Unknown option", argv[0]);
       goto Finish;
@@ -2199,12 +2261,6 @@ Returns:
     }
   }
 
-  if (PeHdr->Pe32.FileHeader.Machine == IMAGE_FILE_MACHINE_ARM) {
-    // Some tools kick out IMAGE_FILE_MACHINE_ARM (0x1c0) vs IMAGE_FILE_MACHINE_ARMT (0x1c2)
-    // so patch back to the official UEFI value.
-    PeHdr->Pe32.FileHeader.Machine = IMAGE_FILE_MACHINE_ARMT;
-  }
-
   //
   // Set new base address into image
   //
@@ -2465,6 +2521,11 @@ Returns:
     TEImageHeader.AddressOfEntryPoint = Optional64->AddressOfEntryPoint;
     TEImageHeader.BaseOfCode          = Optional64->BaseOfCode;
     TEImageHeader.ImageBase           = (UINT64) (Optional64->ImageBase);
+
+    // Set NxCompat flag
+    if (IsNxCompatCompliant (PeHdr) && !mNoNxCompat) {
+      Optional64->DllCharacteristics |= IMAGE_DLLCHARACTERISTICS_NX_COMPAT;
+    }
 
     if (Optional64->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
       TEImageHeader.DataDirectory[EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress = Optional64->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC].VirtualAddress;
@@ -2932,7 +2993,8 @@ Returns:
       if (mIsConvertXip) {
         DebugEntry->FileOffset = DebugEntry->RVA;
       }
-      if (ZeroDebugFlag || DebugEntry->Type != EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
+      if ((ZeroDebugFlag || DebugEntry->Type != EFI_IMAGE_DEBUG_TYPE_CODEVIEW) &&
+          (DebugEntry->Type != EFI_IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS)) {
         memset (FileBuffer + DebugEntry->FileOffset, 0, DebugEntry->SizeOfData);
         memset (DebugEntry, 0, sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
       }
@@ -3118,7 +3180,7 @@ Returns:
   // Get Debug, Export and Resource EntryTable RVA address.
   // Resource Directory entry need to review.
   //
-  if (FileHdr->Machine == EFI_IMAGE_MACHINE_IA32) {
+  if (FileHdr->Machine == IMAGE_FILE_MACHINE_I386) {
     Optional32Hdr = (EFI_IMAGE_OPTIONAL_HEADER32 *) ((UINT8*) FileHdr + sizeof (EFI_IMAGE_FILE_HEADER));
     SectionHeader = (EFI_IMAGE_SECTION_HEADER *) ((UINT8 *) Optional32Hdr +  FileHdr->SizeOfOptionalHeader);
     if (Optional32Hdr->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_EXPORT && \

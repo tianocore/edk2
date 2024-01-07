@@ -579,7 +579,7 @@ S3BootScriptLibDeinitialize (
     return RETURN_SUCCESS;
   }
 
-  DEBUG ((DEBUG_INFO, "%a() in %a module\n", __FUNCTION__, gEfiCallerBaseName));
+  DEBUG ((DEBUG_INFO, "%a() in %a module\n", __func__, gEfiCallerBaseName));
 
   if (mEventDxeSmmReadyToLock != NULL) {
     //

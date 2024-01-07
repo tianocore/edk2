@@ -3,6 +3,7 @@
 #  It implements the interfaces of monitoring the status of all ports and transferring
 #  Control, Bulk, Interrupt and Isochronous requests to those attached usb LS/FS/HS/SS devices.
 #
+#  (C) Copyright 2023 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -54,6 +55,7 @@
   BaseMemoryLib
   DebugLib
   ReportStatusCodeLib
+  TimerLib
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event

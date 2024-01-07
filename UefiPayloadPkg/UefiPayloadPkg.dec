@@ -24,13 +24,14 @@
   #
   gUefiPayloadPkgTokenSpaceGuid  = {0x1d127ea, 0xf6f1, 0x4ef6, {0x94, 0x15, 0x8a, 0x0, 0x0, 0x93, 0xf8, 0x9d}}
 
+  ## Include/Guid/UniversalPayloadBase.h
+  gUniversalPayloadBaseGuid = { 0x03d4c61d, 0x2713, 0x4ec5, {0xa1, 0xcc, 0x88, 0x3b, 0xe9, 0xdc, 0x18, 0xe5 } }
+
   #
   # Gop Temp
   #
   gBmpImageGuid                           = { 0x878AC2CC, 0x5343, 0x46F2, { 0xB5, 0x63, 0x51, 0xF8, 0x9D, 0xAF, 0x56, 0xBA } }
 
-  ##include/Guid/BootManagerMenu.h
-  gEdkiiBootManagerMenuFileGuid = { 0xdf939333, 0x42fc, 0x4b2a, { 0xa5, 0x9e, 0xbb, 0xae, 0x82, 0x81, 0xfe, 0xef }}
   gEdkiiDebugPrintErrorLevelGuid = { 0xad82f436, 0x75c5, 0x4aa9, { 0x92, 0x93, 0xc5, 0x55, 0x0a, 0x7f, 0xf9, 0x71 }}
   gUefiAcpiBoardInfoGuid   = {0xad3d31b, 0xb3d8, 0x4506, {0xae, 0x71, 0x2e, 0xf1, 0x10, 0x6, 0xd9, 0xf}}
   gUefiSerialPortInfoGuid  = { 0x6c6872fe, 0x56a9, 0x4403, { 0xbb, 0x98, 0x95, 0x8d, 0x62, 0xde, 0x87, 0xf1 } }
@@ -67,23 +68,17 @@ gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize|0|UINT32|0x10000002
 ## Save bootloader parameter
 gUefiPayloadPkgTokenSpaceGuid.PcdBootloaderParameter|0|UINT64|0x10000004
 
-## FFS filename to find the shell application.
-gUefiPayloadPkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1c, 0x4f, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }|VOID*|0x10000005
-
 ## Used to help reduce fragmentation in the EFI memory map
-gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x08|UINT32|0x10000012
+gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory|0x19|UINT32|0x10000012
 gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS|0x04|UINT32|0x10000013
-gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x04|UINT32|0x00000014
-gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0xC0|UINT32|0x00000015
-gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x80|UINT32|0x00000016
+gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType|0x08|UINT32|0x00000014
+gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesData|0x100|UINT32|0x00000015
+gUefiPayloadPkgTokenSpaceGuid.PcdMemoryTypeEfiRuntimeServicesCode|0x100|UINT32|0x00000016
 
 # Size of the region used by UEFI in permanent memory
 gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000|UINT32|0x00000017
 
 gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile|{ 0x57, 0x72, 0xcf, 0x80, 0xab, 0x87, 0xf9, 0x47, 0xa3, 0xfe, 0xD5, 0x0B, 0x76, 0xd8, 0x95, 0x41 }|VOID*|0x00000018
-
-# Above 4G Memory
-gUefiPayloadPkgTokenSpaceGuid.PcdDispatchModuleAbove4GMemory|TRUE|BOOLEAN|0x00000019
 
 # Boot Manager Key
 gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|FALSE|BOOLEAN|0x00000020

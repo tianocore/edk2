@@ -4,6 +4,7 @@
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2023, American Megatrends International LLC.
+  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -12,8 +13,7 @@
 #include "RedfishRestExInternal.h"
 
 /**
-  Create a new TLS session becuase the previous on is closed.
-  status.
+  Create a new TLS session because the previous one is closed.
 
   @param[in]  Instance            Pointer to EFI_REST_EX_PROTOCOL instance for a particular
                                   REST service.
@@ -28,17 +28,17 @@ ResetHttpTslSession (
 {
   EFI_STATUS  Status;
 
-  DEBUG ((DEBUG_INFO, "%a: TCP connection is finished. Could be TSL session closure, reset HTTP instance for the new TLS session.\n", __FUNCTION__));
+  DEBUG ((DEBUG_MANAGEABILITY, "%a: TCP connection is finished. Could be TSL session closure, reset HTTP instance for the new TLS session.\n", __func__));
 
   Status = Instance->HttpIo.Http->Configure (Instance->HttpIo.Http, NULL);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Error to reset HTTP instance.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Error to reset HTTP instance.\n", __func__));
     return Status;
   }
 
   Status = Instance->HttpIo.Http->Configure (Instance->HttpIo.Http, &((EFI_REST_EX_HTTP_CONFIG_DATA *)Instance->ConfigData)->HttpConfigData);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Error to re-initiate HTTP instance.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Error to re-initiate HTTP instance.\n", __func__));
   }
 
   return Status;
@@ -70,7 +70,7 @@ RedfishCheckHttpReceiveStatus (
     ReturnStatus = EFI_SUCCESS;
   } else if (HttpIoReceiveStatus != EFI_CONNECTION_FIN) {
     if ((Instance->Flags & RESTEX_INSTANCE_FLAGS_TCP_ERROR_RETRY) == 0) {
-      DEBUG ((DEBUG_ERROR, "%a: TCP error, reset HTTP session.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: TCP error, reset HTTP session.\n", __func__));
       Instance->Flags |= RESTEX_INSTANCE_FLAGS_TCP_ERROR_RETRY;
       gBS->Stall (500);
       Status = ResetHttpTslSession (Instance);
@@ -78,20 +78,20 @@ RedfishCheckHttpReceiveStatus (
         return EFI_NOT_READY;
       }
 
-      DEBUG ((DEBUG_ERROR, "%a: Reset HTTP instance fail.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: Reset HTTP instance fail.\n", __func__));
     }
 
     ReturnStatus = EFI_DEVICE_ERROR;
   } else {
     if ((Instance->Flags & RESTEX_INSTANCE_FLAGS_TLS_RETRY) != 0) {
-      DEBUG ((DEBUG_ERROR, "%a: REST_EX Send and receive fail even with a new TLS session.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: REST_EX Send and receive fail even with a new TLS session.\n", __func__));
       ReturnStatus = EFI_DEVICE_ERROR;
     }
 
     Instance->Flags |= RESTEX_INSTANCE_FLAGS_TLS_RETRY;
     Status           = ResetHttpTslSession (Instance);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Reset HTTP instance fail.\n", __FUNCTION__));
+      DEBUG ((DEBUG_ERROR, "%a: Reset HTTP instance fail.\n", __func__));
       ReturnStatus = EFI_DEVICE_ERROR;
     }
 

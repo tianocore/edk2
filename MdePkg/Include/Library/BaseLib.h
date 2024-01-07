@@ -182,6 +182,11 @@ RiscVSetSupervisorAddressTranslationRegister (
   );
 
 UINT64
+RiscVGetSupervisorAddressTranslationRegister (
+  VOID
+  );
+
+UINT64
 RiscVReadTimer (
   VOID
   );
@@ -199,6 +204,59 @@ RiscVDisableTimerInterrupt (
 VOID
 RiscVClearPendingTimerInterrupt (
   VOID
+  );
+
+/**
+  RISC-V invalidate instruction cache.
+
+**/
+VOID
+EFIAPI
+RiscVInvalidateInstCacheFenceAsm (
+  VOID
+  );
+
+/**
+  RISC-V invalidate data cache.
+
+**/
+VOID
+EFIAPI
+RiscVInvalidateDataCacheFenceAsm (
+  VOID
+  );
+
+/**
+  RISC-V flush cache block. Atomically perform a clean operation
+  followed by an invalidate operation
+
+**/
+VOID
+EFIAPI
+RiscVCpuCacheFlushCmoAsm (
+  IN UINTN
+  );
+
+/**
+Perform a write transfer to another cache or to memory if the
+data in the copy of the cache block have been modified by a store
+operation
+
+**/
+VOID
+EFIAPI
+RiscVCpuCacheCleanCmoAsm (
+  IN UINTN
+  );
+
+/**
+Deallocate the copy of the cache block
+
+**/
+VOID
+EFIAPI
+RiscVCpuCacheInvalCmoAsm (
+  IN UINTN
   );
 
 #endif // defined (MDE_CPU_RISCV64)
@@ -4593,6 +4651,11 @@ CalculateCrc16Ansi (
   IN  UINTN       Length,
   IN  UINT16      InitialValue
   );
+
+//
+// Initial value for the CRC16-ANSI algorithm, when no prior checksum has been calculated.
+//
+#define CRC16ANSI_INIT  0xffff
 
 /**
    Calculates the CRC32c checksum of the given buffer.

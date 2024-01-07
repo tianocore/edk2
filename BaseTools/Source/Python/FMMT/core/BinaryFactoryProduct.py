@@ -15,10 +15,13 @@ from core.GuidTools import GUIDTools
 from utils.FmmtLogger import FmmtLogger as logger
 
 ROOT_TREE = 'ROOT'
+ROOT_ELF_TREE = 'ROOT_ELF_TREE'
 ROOT_FV_TREE = 'ROOT_FV_TREE'
 ROOT_FFS_TREE = 'ROOT_FFS_TREE'
 ROOT_SECTION_TREE = 'ROOT_SECTION_TREE'
 
+ELF_TREE = 'ELF'
+ELF_SECTION_TREE = 'ELF_SECTION_TREE'
 FV_TREE = 'FV'
 DATA_FV_TREE = 'DATA_FV'
 FFS_TREE = 'FFS'
@@ -48,6 +51,12 @@ class BinaryProduct():
 
     def ParserData():
         pass
+
+class ElfFactory(BinaryFactory):
+    type = [ROOT_ELF_TREE, ELF_TREE]
+
+    def Create_Product():
+        return ElfProduct()
 
 class SectionFactory(BinaryFactory):
     type = [SECTION_TREE]
@@ -354,6 +363,30 @@ class FdProduct(BinaryProduct):
                 tmp_index += 1
         return Fd_Struct
 
+class ElfSectionProduct(BinaryProduct):
+    ## Decompress the compressed section.
+    def ParserData(self, Section_Tree, whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
+        pass
+    def ParserSectionData(self, Section_Tree, whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
+        pass
+    def ParserProgramData(self, Section_Tree, whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
+        pass
+
+class ElfProduct(BinaryProduct):
+
+    def ParserData(self, ParTree, Whole_Data: bytes, Rel_Whole_Offset: int=0) -> None:
+        Elf_Info = ElfNode(Whole_Data)
+        if Elf_Info.Header.ELF_PHOff != 0:
+            Elf_Info.GetProgramList(Whole_Data[Elf_Info.Header.ELF_PHOff:])
+        if Elf_Info.Header.ELF_SHOff != 0:
+            Elf_Info.GetSectionList(Whole_Data[Elf_Info.Header.ELF_SHOff:])
+            Elf_Info.FindUPLDSection(Whole_Data)
+        Elf_Tree = BIOSTREE(Elf_Info.Name)
+        Elf_Tree.type = ELF_TREE
+        Elf_Info.Data = Whole_Data[Elf_Info.HeaderLength:]
+        Elf_Tree.Data = Elf_Info
+        ParTree.insertChild(Elf_Tree)
+
 class ParserEntry():
     FactoryTable:dict = {
         SECTION_TREE: SectionFactory,
@@ -364,6 +397,7 @@ class ParserEntry():
         SEC_FV_TREE: FvFactory,
         ROOT_FV_TREE: FdFactory,
         ROOT_TREE: FdFactory,
+        ROOT_ELF_TREE: ElfFactory,
     }
 
     def GetTargetFactory(self, Tree_type: str) -> BinaryFactory:
@@ -377,4 +411,4 @@ class ParserEntry():
     def DataParser(self, Tree, Data: bytes, Offset: int) -> None:
         TargetFactory = self.GetTargetFactory(Tree.type)
         if TargetFactory:
-            self.Generate_Product(TargetFactory, Tree, Data, Offset)
+            self.Generate_Product(TargetFactory, Tree, Data, Offset)

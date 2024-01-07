@@ -1,7 +1,7 @@
 /** @file
 Implementation shared across all library instances.
 
-Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -37,6 +37,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 UINT32  mSmrrPhysBaseMsr = SMM_FEATURES_LIB_IA32_SMRR_PHYSBASE;
 UINT32  mSmrrPhysMaskMsr = SMM_FEATURES_LIB_IA32_SMRR_PHYSMASK;
+
+//
+// Indicate SmBase for each Processors has been relocated or not. If TRUE,
+// means no need to do the relocation in SmmCpuFeaturesInitializeProcessor().
+//
+BOOLEAN  mSmmCpuFeaturesSmmRelocated;
 
 //
 // Set default value to assume MTRRs need to be configured on each SMI
@@ -144,6 +150,12 @@ CpuFeaturesLibInitialization (
   //
   mSmrrEnabled = (BOOLEAN *)AllocatePool (sizeof (BOOLEAN) * GetCpuMaxLogicalProcessorNumber ());
   ASSERT (mSmrrEnabled != NULL);
+
+  //
+  // If gSmmBaseHobGuid found, means SmBase info has been relocated and recorded
+  // in the SmBase array.
+  //
+  mSmmCpuFeaturesSmmRelocated = (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL);
 }
 
 /**
@@ -187,10 +199,15 @@ SmmCpuFeaturesInitializeProcessor (
   UINTN                 ModelId;
 
   //
-  // Configure SMBASE.
+  // No need to configure SMBASE if SmBase relocation has been done.
   //
-  CpuState             = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
-  CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  if (!mSmmCpuFeaturesSmmRelocated) {
+    //
+    // Configure SMBASE.
+    //
+    CpuState             = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+    CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  }
 
   //
   // Intel(R) 64 and IA-32 Architectures Software Developer's Manual
@@ -399,4 +416,74 @@ SmmCpuFeaturesSetSmmRegister (
   if (FeaturePcdGet (PcdSmmFeatureControlEnable) && (RegName == SmmRegFeatureControl)) {
     AsmWriteMsr64 (SMM_FEATURES_LIB_SMM_FEATURE_CONTROL, Value);
   }
+}
+
+/**
+  This function updates the SMRAM save state on the currently executing CPU
+  to resume execution at a specific address after an RSM instruction.  This
+  function must evaluate the SMRAM save state to determine the execution mode
+  the RSM instruction resumes and update the resume execution address with
+  either NewInstructionPointer32 or NewInstructionPoint.  The auto HALT restart
+  flag in the SMRAM save state must always be cleared.  This function returns
+  the value of the instruction pointer from the SMRAM save state that was
+  replaced.  If this function returns 0, then the SMRAM save state was not
+  modified.
+
+  This function is called during the very first SMI on each CPU after
+  SmmCpuFeaturesInitializeProcessor() to set a flag in normal execution mode
+  to signal that the SMBASE of each CPU has been updated before the default
+  SMBASE address is used for the first SMI to the next CPU.
+
+  @param[in] CpuIndex                 The index of the CPU to hook.  The value
+                                      must be between 0 and the NumberOfCpus
+                                      field in the System Management System Table
+                                      (SMST).
+  @param[in] CpuState                 Pointer to SMRAM Save State Map for the
+                                      currently executing CPU.
+  @param[in] NewInstructionPointer32  Instruction pointer to use if resuming to
+                                      32-bit execution mode from 64-bit SMM.
+  @param[in] NewInstructionPointer    Instruction pointer to use if resuming to
+                                      same execution mode as SMM.
+
+  @retval 0    This function did modify the SMRAM save state.
+  @retval > 0  The original instruction pointer value from the SMRAM save state
+               before it was replaced.
+**/
+UINT64
+EFIAPI
+SmmCpuFeaturesHookReturnFromSmm (
+  IN UINTN                 CpuIndex,
+  IN SMRAM_SAVE_STATE_MAP  *CpuState,
+  IN UINT64                NewInstructionPointer32,
+  IN UINT64                NewInstructionPointer
+  )
+{
+  return 0;
+}
+
+/**
+  Check to see if an SMM register is supported by a specified CPU.
+
+  @param[in] CpuIndex  The index of the CPU to check for SMM register support.
+                       The value must be between 0 and the NumberOfCpus field
+                       in the System Management System Table (SMST).
+  @param[in] RegName   Identifies the SMM register to check for support.
+
+  @retval TRUE   The SMM register specified by RegName is supported by the CPU
+                 specified by CpuIndex.
+  @retval FALSE  The SMM register specified by RegName is not supported by the
+                 CPU specified by CpuIndex.
+**/
+BOOLEAN
+EFIAPI
+SmmCpuFeaturesIsSmmRegisterSupported (
+  IN UINTN         CpuIndex,
+  IN SMM_REG_NAME  RegName
+  )
+{
+  if (FeaturePcdGet (PcdSmmFeatureControlEnable) && (RegName == SmmRegFeatureControl)) {
+    return TRUE;
+  }
+
+  return FALSE;
 }

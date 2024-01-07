@@ -1,0 +1,34 @@
+## @file
+# SMM Smram save state service lib.
+#
+# This is SMM Smram save state service lib that provide service to read and
+# save savestate area registers.
+#
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = IntelMmSaveStateLib
+  FILE_GUID                      = 37E8137B-9F74-4250-8951-7A970A3C39C0
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MmSaveStateLib
+
+[Sources]
+  MmSaveState.h
+  MmSaveStateCommon.c
+  IntelMmSaveState.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MmServicesTableLib

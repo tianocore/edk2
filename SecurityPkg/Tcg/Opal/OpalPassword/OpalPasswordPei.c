@@ -280,7 +280,7 @@ UnlockOpalPassword (
     DEBUG ((
       DEBUG_INFO,
       "%a() OpalUtilUpdateGlobalLockingRange() Result = 0x%x\n",
-      __FUNCTION__,
+      __func__,
       Result
       ));
   }
@@ -302,7 +302,7 @@ UnlockOpalPassword (
     DEBUG ((
       DEBUG_INFO,
       "%a() OpalBlockSid() Result = 0x%x\n",
-      __FUNCTION__,
+      __func__,
       Result
       ));
   }
@@ -427,11 +427,11 @@ OpalPasswordStorageSecurityPpiNotify (
   IN VOID                       *Ppi
   )
 {
-  DEBUG ((DEBUG_INFO, "%a entered at S3 resume!\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a entered at S3 resume!\n", __func__));
 
   UnlockOpalPasswordDevices ((EDKII_PEI_STORAGE_SECURITY_CMD_PPI *)Ppi);
 
-  DEBUG ((DEBUG_INFO, "%a exit at S3 resume!\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a exit at S3 resume!\n", __func__));
 
   return EFI_SUCCESS;
 }
@@ -466,7 +466,7 @@ OpalPasswordPeiInit (
     return EFI_UNSUPPORTED;
   }
 
-  DEBUG ((DEBUG_INFO, "%a: Enters in S3 path.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: Enters in S3 path.\n", __func__));
 
   Status = PeiServicesNotifyPpi (&mOpalPasswordStorageSecurityPpiNotifyDesc);
   ASSERT_EFI_ERROR (Status);

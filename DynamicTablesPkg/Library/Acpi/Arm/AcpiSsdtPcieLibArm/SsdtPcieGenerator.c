@@ -540,7 +540,7 @@ GeneratePciCrs (
 
     switch (AddrMapInfo->SpaceCode) {
       case PCI_SS_IO:
-        Status = AmlCodeGenRdDWordIo (
+        Status = AmlCodeGenRdQWordIo (
                    FALSE,
                    TRUE,
                    TRUE,
@@ -566,7 +566,7 @@ GeneratePciCrs (
                    IsPosDecode,
                    TRUE,
                    TRUE,
-                   TRUE,
+                   AmlMemoryCacheable,
                    TRUE,
                    0,
                    AddrMapInfo->PciAddress,
@@ -575,7 +575,7 @@ GeneratePciCrs (
                    AddrMapInfo->AddressSize,
                    0,
                    NULL,
-                   0,
+                   AmlAddressRangeMemory,
                    TRUE,
                    CrsNode,
                    NULL
@@ -588,7 +588,7 @@ GeneratePciCrs (
                    IsPosDecode,
                    TRUE,
                    TRUE,
-                   TRUE,
+                   AmlMemoryCacheable,
                    TRUE,
                    0,
                    AddrMapInfo->PciAddress,
@@ -597,7 +597,7 @@ GeneratePciCrs (
                    AddrMapInfo->AddressSize,
                    0,
                    NULL,
-                   0,
+                   AmlAddressRangeMemory,
                    TRUE,
                    CrsNode,
                    NULL
@@ -718,7 +718,7 @@ ReserveEcamSpace (
              TRUE,
              TRUE,
              TRUE,
-             FALSE,  // non-cacheable
+             AmlMemoryNonCacheable,
              TRUE,
              0,
              AddressMinimum,
@@ -727,7 +727,7 @@ ReserveEcamSpace (
              AddressMaximum - AddressMinimum + 1,
              0,
              NULL,
-             0,
+             AmlAddressRangeMemory,
              TRUE,
              CrsNode,
              NULL

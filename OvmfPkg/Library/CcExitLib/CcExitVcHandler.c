@@ -1114,8 +1114,6 @@ SnpEnabled (
 
   @param[in]      XFeaturesEnabled  Bit-mask of enabled XSAVE features/areas as
                                     indicated by XCR0/MSR_IA32_XSS bits
-  @param[in]      XSaveBaseSize     Base/legacy XSAVE area size (e.g. when
-                                    XCR0 is 1)
   @param[in, out] XSaveSize         Pointer to storage for calculated XSAVE area
                                     size
   @param[in]      Compacted         Whether or not the calculation is for the
@@ -1130,7 +1128,6 @@ STATIC
 BOOLEAN
 GetCpuidXSaveSize (
   IN     UINT64   XFeaturesEnabled,
-  IN     UINT32   XSaveBaseSize,
   IN OUT UINT32   *XSaveSize,
   IN     BOOLEAN  Compacted
   )
@@ -1139,15 +1136,16 @@ GetCpuidXSaveSize (
   UINT64              XFeaturesFound = 0;
   UINT32              Idx;
 
-  *XSaveSize = XSaveBaseSize;
+  //
+  // The base/legacy XSave size is documented to be 0x240 in the APM.
+  //
+  *XSaveSize = 0x240;
   CpuidInfo  = (SEV_SNP_CPUID_INFO *)(UINT64)PcdGet32 (PcdOvmfCpuidBase);
 
   for (Idx = 0; Idx < CpuidInfo->Count; Idx++) {
     SEV_SNP_CPUID_FUNCTION  *CpuidFn = &CpuidInfo->function[Idx];
 
-    if (!((CpuidFn->EaxIn == 0xD) &&
-          ((CpuidFn->EcxIn == 0) || (CpuidFn->EcxIn == 1))))
-    {
+    if (!((CpuidFn->EaxIn == 0xD) && (CpuidFn->EcxIn > 1))) {
       continue;
     }
 
@@ -1357,7 +1355,6 @@ GetCpuidFw (
 
     if (!GetCpuidXSaveSize (
            XCr0 | XssMsr.Uint64,
-           *Ebx,
            &XSaveSize,
            Compacted
            ))

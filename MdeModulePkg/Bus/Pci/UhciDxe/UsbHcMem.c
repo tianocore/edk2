@@ -250,6 +250,11 @@ UsbHcGetPciAddressForHostMem (
   }
 
   ASSERT ((Block != NULL));
+
+  if (Block == NULL) {
+    return 0;
+  }
+
   //
   // calculate the pci memory address for host memory address.
   //
@@ -535,6 +540,10 @@ UsbHcFreeMem (
   // the caller has passed in a wrong memory point
   //
   ASSERT (Block != NULL);
+
+  if (Block == NULL) {
+    return;
+  }
 
   //
   // Release the current memory block if it is empty and not the head

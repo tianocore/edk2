@@ -75,12 +75,10 @@
   gEfiRngAlgorithmX9313DesGuid        ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
   gEfiRngAlgorithmX931AesGuid         ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
   gEfiRngAlgorithmRaw                 ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
+  gEdkiiRngAlgorithmUnSafe            ## SOMETIMES_PRODUCES    ## GUID        # Unique ID of the algorithm for RNG
 
 [Protocols]
   gEfiRngProtocolGuid                ## PRODUCES
-
-[Pcd]
-  gEfiSecurityPkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm      ## CONSUMES
 
 [Depex]
   TRUE

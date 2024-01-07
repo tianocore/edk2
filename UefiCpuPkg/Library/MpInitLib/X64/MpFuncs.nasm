@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -259,8 +259,7 @@ CProcedureInvoke:
     add        rsp, 20h
 
     mov        edx, ebx          ; edx is ApIndex
-    mov        ecx, esi
-    add        ecx, MP_CPU_EXCHANGE_INFO_OFFSET ; rcx is address of exchange info data buffer
+    mov        rcx, qword [esi + MP_CPU_EXCHANGE_INFO_FIELD (CpuMpData)]
 
     mov        edi, esi
     add        edi, MP_CPU_EXCHANGE_INFO_FIELD (CFunction)
@@ -279,173 +278,57 @@ CProcedureInvoke:
 RendezvousFunnelProcEnd:
 
 ;-------------------------------------------------------------------------------------
-;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, PmCodeSegment, TopOfApStack, CountTofinish, Pm16CodeSegment, SevEsAPJumpTable, WakeupBuffer);
+;  AsmRelocateApLoop (MwaitSupport, ApTargetCState, TopOfApStack, CountTofinish, Cr3);
+;  This function is called during the finalizaiton of Mp initialization before booting
+;  to OS, and aim to put Aps either in Mwait or HLT.
 ;-------------------------------------------------------------------------------------
-AsmRelocateApLoopStart:
-BITS 64
-    cmp        qword [rsp + 56], 0  ; SevEsAPJumpTable
-    je         NoSevEs
+; +----------------+
+; | Cr3            |  rsp+40
+; +----------------+
+; | CountTofinish  |  r9
+; +----------------+
+; | TopOfApStack   |  r8
+; +----------------+
+; | ApTargetCState |  rdx
+; +----------------+
+; | MwaitSupport   |  rcx
+; +----------------+
+; | the return     |
+; +----------------+ low address
 
-    ;
-    ; Perform some SEV-ES related setup before leaving 64-bit mode
-    ;
-    push       rcx
-    push       rdx
-
-    ;
-    ; Get the RDX reset value using CPUID
-    ;
-    mov        rax, 1
-    cpuid
-    mov        rsi, rax          ; Save off the reset value for RDX
-
-    ;
-    ; Prepare the GHCB for the AP_HLT_LOOP VMGEXIT call
-    ;   - Must be done while in 64-bit long mode so that writes to
-    ;     the GHCB memory will be unencrypted.
-    ;   - No NAE events can be generated once this is set otherwise
-    ;     the AP_RESET_HOLD SW_EXITCODE will be overwritten.
-    ;
-    mov        rcx, 0xc0010130
-    rdmsr                        ; Retrieve current GHCB address
-    shl        rdx, 32
-    or         rdx, rax
-
-    mov        rdi, rdx
-    xor        rax, rax
-    mov        rcx, 0x800
-    shr        rcx, 3
-    rep stosq                    ; Clear the GHCB
-
-    mov        rax, 0x80000004   ; VMGEXIT AP_RESET_HOLD
-    mov        [rdx + 0x390], rax
-    mov        rax, 114          ; Set SwExitCode valid bit
-    bts        [rdx + 0x3f0], rax
-    inc        rax               ; Set SwExitInfo1 valid bit
-    bts        [rdx + 0x3f0], rax
-    inc        rax               ; Set SwExitInfo2 valid bit
-    bts        [rdx + 0x3f0], rax
-
-    pop        rdx
-    pop        rcx
-
-NoSevEs:
-    cli                          ; Disable interrupt before switching to 32-bit mode
-    mov        rax, [rsp + 40]   ; CountTofinish
+AsmRelocateApLoopGenericStart:
+    mov        rax, r9           ; CountTofinish
     lock dec   dword [rax]       ; (*CountTofinish)--
 
-    mov        r10, [rsp + 48]   ; Pm16CodeSegment
-    mov        rax, [rsp + 56]   ; SevEsAPJumpTable
-    mov        rbx, [rsp + 64]   ; WakeupBuffer
-    mov        rsp, r9           ; TopOfApStack
+    mov        rax, [rsp + 40]    ; Cr3
+    ; Do not push on old stack, since old stack is not mapped
+    ; in the page table pointed by cr3
+    mov        cr3, rax
+    mov        rsp, r8            ; TopOfApStack
 
-    push       rax               ; Save SevEsAPJumpTable
-    push       rbx               ; Save WakeupBuffer
-    push       r10               ; Save Pm16CodeSegment
-    push       rcx               ; Save MwaitSupport
-    push       rdx               ; Save ApTargetCState
-
-    lea        rax, [PmEntry]    ; rax <- The start address of transition code
-
-    push       r8
-    push       rax
-
-    ;
-    ; Clear R8 - R15, for reset, before going into 32-bit mode
-    ;
-    xor        r8, r8
-    xor        r9, r9
-    xor        r10, r10
-    xor        r11, r11
-    xor        r12, r12
-    xor        r13, r13
-    xor        r14, r14
-    xor        r15, r15
-
-    ;
-    ; Far return into 32-bit mode
-    ;
-    retfq
-
-BITS 32
-PmEntry:
-    mov        eax, cr0
-    btr        eax, 31           ; Clear CR0.PG
-    mov        cr0, eax          ; Disable paging and caches
-
-    mov        ecx, 0xc0000080
-    rdmsr
-    and        ah, ~ 1           ; Clear LME
-    wrmsr
-    mov        eax, cr4
-    and        al, ~ (1 << 5)    ; Clear PAE
-    mov        cr4, eax
-
-    pop        edx
-    add        esp, 4
-    pop        ecx,
-    add        esp, 4
-
-MwaitCheck:
+MwaitCheckGeneric:
     cmp        cl, 1              ; Check mwait-monitor support
-    jnz        HltLoop
-    mov        ebx, edx           ; Save C-State to ebx
-MwaitLoop:
+    jnz        HltLoopGeneric
+    mov        rbx, rdx           ; Save C-State to ebx
+
+MwaitLoopGeneric:
     cli
-    mov        eax, esp           ; Set Monitor Address
+    mov        rax, rsp           ; Set Monitor Address
+    sub        eax, 8             ; To ensure the monitor address is in the page table
     xor        ecx, ecx           ; ecx = 0
     xor        edx, edx           ; edx = 0
     monitor
-    mov        eax, ebx           ; Mwait Cx, Target C-State per eax[7:4]
+    mov        rax, rbx           ; Mwait Cx, Target C-State per eax[7:4]
     shl        eax, 4
     mwait
-    jmp        MwaitLoop
+    jmp        MwaitLoopGeneric
 
-HltLoop:
-    pop        edx                ; PM16CodeSegment
-    add        esp, 4
-    pop        ebx                ; WakeupBuffer
-    add        esp, 4
-    pop        eax                ; SevEsAPJumpTable
-    add        esp, 4
-    cmp        eax, 0             ; Check for SEV-ES
-    je         DoHlt
-
-    cli
-    ;
-    ; SEV-ES is enabled, use VMGEXIT (GHCB information already
-    ; set by caller)
-    ;
-BITS 64
-    rep        vmmcall
-BITS 32
-
-    ;
-    ; Back from VMGEXIT AP_HLT_LOOP
-    ;   Push the FLAGS/CS/IP values to use
-    ;
-    push       word 0x0002        ; EFLAGS
-    xor        ecx, ecx
-    mov        cx, [eax + 2]      ; CS
-    push       cx
-    mov        cx, [eax]          ; IP
-    push       cx
-    push       word 0x0000        ; For alignment, will be discarded
-
-    push       edx
-    push       ebx
-
-    mov        edx, esi           ; Restore RDX reset value
-
-    retf
-
-DoHlt:
+HltLoopGeneric:
     cli
     hlt
-    jmp        DoHlt
+    jmp        HltLoopGeneric
 
-BITS 64
-AsmRelocateApLoopEnd:
+AsmRelocateApLoopGenericEnd:
 
 ;-------------------------------------------------------------------------------------
 ;  AsmGetAddressMap (&AddressMap);
@@ -456,9 +339,12 @@ ASM_PFX(AsmGetAddressMap):
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelAddress], rax
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.ModeEntryOffset], LongModeStart - RendezvousFunnelProcStart
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RendezvousFunnelSize], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
-    lea        rax, [AsmRelocateApLoopStart]
-    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddress], rax
-    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSize], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
+lea        rax, [AsmRelocateApLoopGenericStart]
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddressGeneric], rax
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSizeGeneric], AsmRelocateApLoopGenericEnd - AsmRelocateApLoopGenericStart
+    lea        rax, [AsmRelocateApLoopAmdSevStart]
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncAddressAmdSev], rax
+    mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.RelocateApLoopFuncSizeAmdSev], AsmRelocateApLoopAmdSevEnd - AsmRelocateApLoopAmdSevStart
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.ModeTransitionOffset], Flat32Start - RendezvousFunnelProcStart
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealNoNxOffset], SwitchToRealProcStart - Flat32Start
     mov        qword [rcx + MP_ASSEMBLY_ADDRESS_MAP.SwitchToRealPM16ModeOffset], PM16Mode - RendezvousFunnelProcStart

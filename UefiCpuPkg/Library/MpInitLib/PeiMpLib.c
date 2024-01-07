@@ -126,7 +126,37 @@ SaveCpuMpData (
   IN CPU_MP_DATA  *CpuMpData
   )
 {
-  UINT64  Data64;
+  UINT64           Data64;
+  UINTN            Index;
+  CPU_INFO_IN_HOB  *CpuInfoInHob;
+  MP_HAND_OFF      *MpHandOff;
+  UINTN            MpHandOffSize;
+
+  //
+  // When APs are in a state that can be waken up by a store operation to a memory address,
+  // report the MP_HAND_OFF data for DXE to use.
+  //
+  CpuInfoInHob  = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+  MpHandOffSize = sizeof (MP_HAND_OFF) + sizeof (PROCESSOR_HAND_OFF) * CpuMpData->CpuCount;
+  MpHandOff     = (MP_HAND_OFF *)BuildGuidHob (&mMpHandOffGuid, MpHandOffSize);
+  ASSERT (MpHandOff != NULL);
+  ZeroMem (MpHandOff, MpHandOffSize);
+  MpHandOff->ProcessorIndex = 0;
+
+  MpHandOff->CpuCount = CpuMpData->CpuCount;
+  if (CpuMpData->ApLoopMode != ApInHltLoop) {
+    MpHandOff->StartupSignalValue    = MP_HAND_OFF_SIGNAL;
+    MpHandOff->WaitLoopExecutionMode = sizeof (VOID *);
+  }
+
+  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+    MpHandOff->Info[Index].ApicId = CpuInfoInHob[Index].ApicId;
+    MpHandOff->Info[Index].Health = CpuInfoInHob[Index].Health;
+    if (CpuMpData->ApLoopMode != ApInHltLoop) {
+      MpHandOff->Info[Index].StartupSignalAddress    = (UINT64)(UINTN)CpuMpData->CpuData[Index].StartupApSignal;
+      MpHandOff->Info[Index].StartupProcedureAddress = (UINT64)(UINTN)&CpuMpData->CpuData[Index].ApFunction;
+    }
+  }
 
   //
   // Build location of CPU MP DATA buffer in HOB
@@ -758,7 +788,7 @@ PlatformShadowMicrocode (
   DEBUG ((
     DEBUG_INFO,
     "%a: Required microcode patches have been loaded at 0x%lx, with size 0x%lx.\n",
-    __FUNCTION__,
+    __func__,
     CpuMpData->MicrocodePatchAddress,
     CpuMpData->MicrocodePatchRegionSize
     ));

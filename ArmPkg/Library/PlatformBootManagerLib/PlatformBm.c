@@ -2,7 +2,7 @@
   Implementation for PlatformBootManagerLib library class interfaces.
 
   Copyright (C) 2015-2016, Red Hat, Inc.
-  Copyright (c) 2014 - 2021, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2014 - 2023, Arm Ltd. All rights reserved.<BR>
   Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
   Copyright (c) 2021, Semihalf All rights reserved.<BR>
@@ -195,7 +195,7 @@ FilterAndProcess (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: %g: %r\n",
-      __FUNCTION__,
+      __func__,
       ProtocolGuid,
       Status
       ));
@@ -266,7 +266,7 @@ IsPciDisplay (
                         &Pci
                         );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __FUNCTION__, ReportText, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __func__, ReportText, Status));
     return FALSE;
   }
 
@@ -330,7 +330,7 @@ Connect (
   DEBUG ((
     EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
     "%a: %s: %r\n",
-    __FUNCTION__,
+    __func__,
     ReportText,
     Status
     ));
@@ -356,7 +356,7 @@ AddOutput (
     DEBUG ((
       DEBUG_ERROR,
       "%a: %s: handle %p: device path not found\n",
-      __FUNCTION__,
+      __func__,
       ReportText,
       Handle
       ));
@@ -368,7 +368,7 @@ AddOutput (
     DEBUG ((
       DEBUG_ERROR,
       "%a: %s: adding to ConOut: %r\n",
-      __FUNCTION__,
+      __func__,
       ReportText,
       Status
       ));
@@ -380,7 +380,7 @@ AddOutput (
     DEBUG ((
       DEBUG_ERROR,
       "%a: %s: adding to ErrOut: %r\n",
-      __FUNCTION__,
+      __func__,
       ReportText,
       Status
       ));
@@ -390,7 +390,7 @@ AddOutput (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: %s: added to ConOut and ErrOut\n",
-    __FUNCTION__,
+    __func__,
     ReportText
     ));
 }
@@ -470,6 +470,64 @@ PlatformRegisterFvBootOption (
   EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
 }
 
+/** Boot a Fv Boot Option.
+
+  This function is useful for booting the UEFI Shell as it is loaded
+  as a non active boot option.
+
+  @param[in] FileGuid      The File GUID.
+  @param[in] Description   String describing the Boot Option.
+
+**/
+STATIC
+VOID
+PlatformBootFvBootOption (
+  IN  CONST EFI_GUID  *FileGuid,
+  IN  CHAR16          *Description
+  )
+{
+  EFI_STATUS                         Status;
+  EFI_BOOT_MANAGER_LOAD_OPTION       NewOption;
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  FileNode;
+  EFI_LOADED_IMAGE_PROTOCOL          *LoadedImage;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
+
+  Status = gBS->HandleProtocol (
+                  gImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  (VOID **)&LoadedImage
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // The UEFI Shell was registered in PlatformRegisterFvBootOption ()
+  // previously, thus it must still be available in this FV.
+  //
+  EfiInitializeFwVolDevicepathNode (&FileNode, FileGuid);
+  DevicePath = DevicePathFromHandle (LoadedImage->DeviceHandle);
+  ASSERT (DevicePath != NULL);
+  DevicePath = AppendDevicePathNode (
+                 DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&FileNode
+                 );
+  ASSERT (DevicePath != NULL);
+
+  Status = EfiBootManagerInitializeLoadOption (
+             &NewOption,
+             LoadOptionNumberUnassigned,
+             LoadOptionTypeBoot,
+             LOAD_OPTION_ACTIVE,
+             Description,
+             DevicePath,
+             NULL,
+             0
+             );
+  ASSERT_EFI_ERROR (Status);
+  FreePool (DevicePath);
+
+  EfiBootManagerBoot (&NewOption);
+}
+
 STATIC
 VOID
 GetPlatformOptions (
@@ -547,7 +605,7 @@ GetPlatformOptions (
         DEBUG ((
           DEBUG_ERROR,
           "%a: failed to register \"%s\": %r\n",
-          __FUNCTION__,
+          __func__,
           BootOptions[Index].Description,
           Status
           ));
@@ -575,7 +633,7 @@ GetPlatformOptions (
       DEBUG ((
         DEBUG_ERROR,
         "%a: failed to register hotkey for \"%s\": %r\n",
-        __FUNCTION__,
+        __func__,
         BootOptions[Index].Description,
         Status
         ));
@@ -757,7 +815,7 @@ HandleCapsules (
   BOOLEAN                   NeedReset;
   EFI_STATUS                Status;
 
-  DEBUG ((DEBUG_INFO, "%a: processing capsules ...\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: processing capsules ...\n", __func__));
 
   Status = gBS->LocateProtocol (
                   &gEsrtManagementProtocolGuid,
@@ -785,7 +843,7 @@ HandleCapsules (
       DEBUG ((
         DEBUG_ERROR,
         "%a: failed to process capsule %p - %r\n",
-        __FUNCTION__,
+        __func__,
         CapsuleHeader,
         Status
         ));
@@ -800,7 +858,7 @@ HandleCapsules (
     DEBUG ((
       DEBUG_WARN,
       "%a: capsule update successful, resetting ...\n",
-      __FUNCTION__
+      __func__
       ));
 
     gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
@@ -868,7 +926,7 @@ BootDiscoveryPolicyHandler (
       DEBUG ((
         DEBUG_INFO,
         "%a - Unexpected DiscoveryPolicy (0x%x). Run Minimal Discovery Policy\n",
-        __FUNCTION__,
+        __func__,
         DiscoveryPolicy
         ));
       return EFI_SUCCESS;
@@ -884,14 +942,14 @@ BootDiscoveryPolicyHandler (
       DEBUG_INFO,
       "%a - Failed to locate gEfiBootManagerPolicyProtocolGuid."
       "Driver connect will be skipped.\n",
-      __FUNCTION__
+      __func__
       ));
     return Status;
   }
 
   Status = BMPolicy->ConnectDeviceClass (BMPolicy, Class);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - ConnectDeviceClass returns - %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a - ConnectDeviceClass returns - %r\n", __func__, Status));
     return Status;
   }
 
@@ -1076,6 +1134,18 @@ PlatformBootManagerUnableToBoot (
   EfiBootManagerRefreshAllBootOption ();
 
   //
+  // Boot the 'UEFI Shell'. If the Pcd is not set, the UEFI Shell is not
+  // an active boot option and must be manually selected through UiApp
+  // (at least during the fist boot).
+  //
+  if (FixedPcdGetBool (PcdUefiShellDefaultBootEnable)) {
+    PlatformBootFvBootOption (
+      &gUefiShellFileGuid,
+      L"UEFI Shell (default)"
+      );
+  }
+
+  //
   // Record the updated number of boot configured boot options
   //
   BootOptions = EfiBootManagerGetLoadOptions (
@@ -1096,7 +1166,7 @@ PlatformBootManagerUnableToBoot (
       DEBUG ((
         DEBUG_WARN,
         "%a: rebooting after refreshing all boot options\n",
-        __FUNCTION__
+        __func__
         ));
       gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
     }

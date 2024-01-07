@@ -73,6 +73,7 @@ The majority of the content in the EDK II open source project uses a
 source project contains the following components that are covered by additional
 licenses:
 
+-  `BaseTools/Plugin/CodeQL/analyze <https://www.apache.org/licenses/LICENSE-2.0>`__
 -  `BaseTools/Source/C/LzmaCompress <BaseTools/Source/C/LzmaCompress/LZMA-SDK-README.txt>`__
 -  `BaseTools/Source/C/VfrCompile/Pccts <BaseTools/Source/C/VfrCompile/Pccts/RIGHTS>`__
 -  `CryptoPkg\Library\BaseCryptLib\SysCall\inet_pton.c <CryptoPkg\Library\BaseCryptLib\SysCall\inet_pton.c>`__
@@ -94,7 +95,10 @@ that are covered by additional licenses.
 -  `MdeModulePkg/Universal/RegularExpressionDxe/oniguruma <https://github.com/kkos/oniguruma/blob/abfc8ff81df4067f309032467785e06975678f0d/COPYING>`__
 -  `UnitTestFrameworkPkg/Library/CmockaLib/cmocka <https://github.com/tianocore/edk2-cmocka/blob/f5e2cd77c88d9f792562888d2b70c5a396bfbf7a/COPYING>`__
 -  `UnitTestFrameworkPkg/Library/GoogleTestLib/googletest <https://github.com/google/googletest/blob/86add13493e5c881d7e4ba77fb91c1f57752b3a4/LICENSE>`__
+-  `UnitTestFrameworkPkg/Library/SubhookLib/subhook <https://github.com/Zeex/subhook/blob/83d4e1ebef3588fae48b69a7352cc21801cb70bc/LICENSE.txt>`__
 -  `RedfishPkg/Library/JsonLib/jansson <https://github.com/akheron/jansson/blob/2882ead5bb90cf12a01b07b2c2361e24960fae02/LICENSE>`__
+-  `MdePkg/Library/BaseFdtLib/libfdt <https://github.com/devicetree-org/pylibfdt/blob/f39368a217496d32c4091a2dba4045b60649e3a5/BSD-2-Clause>`__
+-  `MdePkg/Library/MipiSysTLib/mipisyst <https://github.com/MIPI-Alliance/public-mipi-sys-t/blob/aae857d0d05ac65152ed24992a4acd834a0a107c/LICENSE>`__
 
 The EDK II Project is composed of packages. The maintainers for each package
 are listed in `Maintainers.txt <Maintainers.txt>`__.
@@ -131,11 +135,12 @@ To make a contribution to a TianoCore project, follow these steps.
     copyright license as the base project. When that is not possible,
     then contributions using the following licenses can be accepted:
 
--  BSD (2-clause): http://opensource.org/licenses/BSD-2-Clause
--  BSD (3-clause): http://opensource.org/licenses/BSD-3-Clause
--  MIT: http://opensource.org/licenses/MIT
--  Python-2.0: http://opensource.org/licenses/Python-2.0
--  Zlib: http://opensource.org/licenses/Zlib
+-  Apache License, Version 2.0: https://opensource.org/license/apache-2-0/
+-  BSD (2-clause): https://opensource.org/license/BSD-2-Clause
+-  BSD (3-clause): https://opensource.org/license/BSD-3-Clause
+-  MIT: https://opensource.org/license/MIT
+-  Python-2.0: https://opensource.org/license/Python-2.0
+-  Zlib: https://opensource.org/license/Zlib
 
 For documentation:
 
@@ -240,19 +245,7 @@ Definitions for sample patch email
 Submodules
 ----------
 
-Submodule in EDK II is allowed but submodule chain should be avoided
-as possible as we can. Currently EDK II contains the following submodules
-
--  CryptoPkg/Library/OpensslLib/openssl
--  ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
--  MdeModulePkg/Universal/RegularExpressionDxe/oniguruma
--  MdeModulePkg/Library/BrotliCustomDecompressLib/brotli
--  BaseTools/Source/C/BrotliCompress/brotli
-
-ArmSoftFloatLib is actually required by OpensslLib. It's inevitable
-in openssl-1.1.1 (since stable201905) for floating point parameter
-conversion, but should be dropped once there's no such need in future
-release of openssl.
+The current submodules used in EDK II are in `.gitmodules <.gitmodules>`__.
 
 To get a full, buildable EDK II repository, use following steps of git
 command
@@ -279,6 +272,12 @@ submodules in above submodules. So using '--recursive' adds a
 dependency on being able to reach servers we do not actually want
 any code from, as well as needlessly downloading code we will not
 use.
+
+**Submodule Notes**
+
+ArmSoftFloatLib is required by OpensslLib. It's inevitable in openssl-1.1.1
+(since stable201905) for floating point parameter conversion, but should be
+dropped once there's no such need in future release of openssl.
 
 .. ===================================================================
 .. This is a bunch of directives to make the README file more readable

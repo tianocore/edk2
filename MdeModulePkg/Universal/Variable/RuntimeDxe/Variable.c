@@ -2168,11 +2168,9 @@ UpdateVariable (
 
     if (!mVariableModuleGlobal->VariableGlobal.EmuNvMode) {
       //
-      // Four steps
-      // 1. Write variable header
-      // 2. Set variable state to header valid
-      // 3. Write variable data
-      // 4. Set variable state to valid
+      // Two steps
+      // 1. Write variable header and data
+      // 2. Set variable state to valid
       //
       //
       // Step 1:
@@ -2183,7 +2181,7 @@ UpdateVariable (
                  TRUE,
                  Fvb,
                  mVariableModuleGlobal->NonVolatileLastVariableOffset,
-                 (UINT32)GetVariableHeaderSize (AuthFormat),
+                 (UINT32)VarSize,
                  (UINT8 *)NextVariable
                  );
 
@@ -2193,41 +2191,6 @@ UpdateVariable (
 
       //
       // Step 2:
-      //
-      NextVariable->State = VAR_HEADER_VALID_ONLY;
-      Status              = UpdateVariableStore (
-                              &mVariableModuleGlobal->VariableGlobal,
-                              FALSE,
-                              TRUE,
-                              Fvb,
-                              mVariableModuleGlobal->NonVolatileLastVariableOffset + OFFSET_OF (VARIABLE_HEADER, State),
-                              sizeof (UINT8),
-                              &NextVariable->State
-                              );
-
-      if (EFI_ERROR (Status)) {
-        goto Done;
-      }
-
-      //
-      // Step 3:
-      //
-      Status = UpdateVariableStore (
-                 &mVariableModuleGlobal->VariableGlobal,
-                 FALSE,
-                 TRUE,
-                 Fvb,
-                 mVariableModuleGlobal->NonVolatileLastVariableOffset + GetVariableHeaderSize (AuthFormat),
-                 (UINT32)(VarSize - GetVariableHeaderSize (AuthFormat)),
-                 (UINT8 *)NextVariable + GetVariableHeaderSize (AuthFormat)
-                 );
-
-      if (EFI_ERROR (Status)) {
-        goto Done;
-      }
-
-      //
-      // Step 4:
       //
       NextVariable->State = VAR_ADDED;
       Status              = UpdateVariableStore (
@@ -2453,7 +2416,7 @@ VariableServiceGetVariable (
   AcquireLockOnlyAtBootTime (&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
 
   Status = FindVariable (VariableName, VendorGuid, &Variable, &mVariableModuleGlobal->VariableGlobal, FALSE);
-  if ((Variable.CurrPtr == NULL) || EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Variable.CurrPtr == NULL)) {
     goto Done;
   }
 
@@ -2770,7 +2733,7 @@ VariableServiceSetVariable (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Failed to set variable '%s' with Guid %g\n",
-          __FUNCTION__,
+          __func__,
           VariableName,
           VendorGuid
           ));
@@ -2792,7 +2755,7 @@ VariableServiceSetVariable (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Failed to set variable '%s' with Guid %g\n",
-          __FUNCTION__,
+          __func__,
           VariableName,
           VendorGuid
           ));
@@ -2814,7 +2777,7 @@ VariableServiceSetVariable (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Failed to set variable '%s' with Guid %g\n",
-          __FUNCTION__,
+          __func__,
           VariableName,
           VendorGuid
           ));

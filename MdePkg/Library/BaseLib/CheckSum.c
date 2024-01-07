@@ -678,13 +678,13 @@ CalculateCrc16Ansi (
 
   Buf = Buffer;
 
-  Crc = ~InitialValue;
+  Crc = InitialValue;
 
   while (Length-- != 0) {
     Crc = mCrc16LookupTable[(Crc & 0xFF) ^ *(Buf++)] ^ (Crc >> 8);
   }
 
-  return ~Crc;
+  return Crc;
 }
 
 GLOBAL_REMOVE_IF_UNREFERENCED STATIC CONST UINT32  mCrc32cLookupTable[256] = {

@@ -152,26 +152,12 @@ PlatformMemMapInitialization (
     return;
   }
 
-  PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
-  PciExBarBase = 0;
-  if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
-    //
-    // The MMCONFIG area is expected to fall between the top of low RAM and
-    // the base of the 32-bit PCI host aperture.
-    //
-    PciExBarBase = PcdGet64 (PcdPciExpressBaseAddress);
-    ASSERT (PlatformInfoHob->LowMemory <= PciExBarBase);
-    ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
-    PciBase = (UINT32)(PciExBarBase + SIZE_256MB);
-  } else {
-    ASSERT (PlatformInfoHob->LowMemory <= PlatformInfoHob->Uc32Base);
-    PciBase = PlatformInfoHob->Uc32Base;
-  }
-
   //
   // address       purpose   size
   // ------------  --------  -------------------------
-  // max(top, 2g)  PCI MMIO  0xFC000000 - max(top, 2g)
+  // max(top, 2g)  PCI MMIO  0xFC000000 - max(top, 2g)  (pc)
+  // max(top, 2g)  PCI MMIO  0xE0000000 - max(top, 2g)  (q35)
+  // 0xE0000000    MMCONFIG                     256 MB  (q35)
   // 0xFC000000    gap                           44 MB
   // 0xFEC00000    IO-APIC                        4 KB
   // 0xFEC01000    gap                         1020 KB
@@ -181,7 +167,23 @@ PlatformMemMapInitialization (
   // 0xFED20000    gap                          896 KB
   // 0xFEE00000    LAPIC                          1 MB
   //
-  PciSize = 0xFC000000 - PciBase;
+  PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
+  PciBase      = PlatformInfoHob->Uc32Base;
+  PciExBarBase = 0;
+  if (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID) {
+    //
+    // The MMCONFIG area is expected to fall between the top of low RAM and
+    // the base of the 32-bit PCI host aperture.
+    //
+    PciExBarBase = PcdGet64 (PcdPciExpressBaseAddress);
+    ASSERT (PlatformInfoHob->LowMemory <= PciExBarBase);
+    ASSERT (PciExBarBase <= MAX_UINT32 - SIZE_256MB);
+    PciSize = (UINT32)(PciExBarBase - PciBase);
+  } else {
+    ASSERT (PlatformInfoHob->LowMemory <= PlatformInfoHob->Uc32Base);
+    PciSize = 0xFC000000 - PciBase;
+  }
+
   PlatformAddIoMemoryBaseSizeHob (PciBase, PciSize);
 
   PlatformInfoHob->PcdPciMmio32Base = PciBase;
@@ -356,7 +358,7 @@ PlatformMiscInitialization (
       DEBUG ((
         DEBUG_ERROR,
         "%a: Unknown Host Bridge Device ID: 0x%04x\n",
-        __FUNCTION__,
+        __func__,
         PlatformInfoHob->HostBridgeDevId
         ));
       ASSERT (FALSE);
@@ -364,7 +366,7 @@ PlatformMiscInitialization (
   }
 
   if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
-    DEBUG ((DEBUG_INFO, "%a: Cloud Hypervisor is done.\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: Cloud Hypervisor is done.\n", __func__));
     return;
   }
 
@@ -487,12 +489,12 @@ PlatformCpuCountBugCheck (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Present=%u Possible=%u\n",
-      __FUNCTION__,
+      __func__,
       *Present,
       *Possible
       ));
     for (Idx = 0; Idx < ARRAY_SIZE (Message); ++Idx) {
-      DEBUG ((DEBUG_ERROR, "%a: %a\n", __FUNCTION__, Message[Idx]));
+      DEBUG ((DEBUG_ERROR, "%a: %a\n", __func__, Message[Idx]));
     }
 
     ParseStatus = QemuFwCfgParseBool (
@@ -503,7 +505,7 @@ PlatformCpuCountBugCheck (
       DEBUG ((
         DEBUG_WARN,
         "%a: \"%a\" active. You've been warned.\n",
-        __FUNCTION__,
+        __func__,
         CPUHP_BUGCHECK_OVERRIDE_FWCFG_FILE
         ));
       //
@@ -529,7 +531,7 @@ PlatformCpuCountBugCheck (
     DEBUG ((
       DEBUG_WARN,
       "%a: QEMU v2.7 reset bug: BootCpuCount=%d Present=%u\n",
-      __FUNCTION__,
+      __func__,
       *BootCpuCount,
       *Present
       ));
@@ -571,7 +573,7 @@ PlatformMaxCpuCountInitialization (
     // until PcdCpuApInitTimeOutInMicroSeconds elapses (whichever is reached
     // first).
     //
-    DEBUG ((DEBUG_WARN, "%a: boot CPU count unavailable\n", __FUNCTION__));
+    DEBUG ((DEBUG_WARN, "%a: boot CPU count unavailable\n", __func__));
     MaxCpuCount = PlatformInfoHob->DefaultMaxCpuNumber;
   } else {
     //
@@ -624,7 +626,7 @@ PlatformMaxCpuCountInitialization (
     //    steps. Both cases confirm modern mode.
     //
     CmdData2 = IoRead32 (CpuHpBase + QEMU_CPUHP_R_CMD_DATA2);
-    DEBUG ((DEBUG_VERBOSE, "%a: CmdData2=0x%x\n", __FUNCTION__, CmdData2));
+    DEBUG ((DEBUG_VERBOSE, "%a: CmdData2=0x%x\n", __func__, CmdData2));
     if (CmdData2 != 0) {
       //
       // QEMU doesn't support the modern CPU hotplug interface. Assume that the
@@ -633,7 +635,7 @@ PlatformMaxCpuCountInitialization (
       DEBUG ((
         DEBUG_WARN,
         "%a: modern CPU hotplug interface unavailable\n",
-        __FUNCTION__
+        __func__
         ));
       MaxCpuCount = BootCpuCount;
     } else {
@@ -691,7 +693,7 @@ PlatformMaxCpuCountInitialization (
   DEBUG ((
     DEBUG_INFO,
     "%a: BootCpuCount=%d MaxCpuCount=%u\n",
-    __FUNCTION__,
+    __func__,
     BootCpuCount,
     MaxCpuCount
     ));

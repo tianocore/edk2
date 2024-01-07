@@ -21,6 +21,7 @@
 
 [Includes]
   Include
+  Test/Mock/Include
 
 [LibraryClasses]
   ##  @libraryclass  Provides hash interfaces from different implementations.
@@ -307,10 +308,10 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass|0|UINT8|0x00000006
 
   ## Progress Code for TPM device subclass definitions.<BR><BR>
-  #  EFI_PERIPHERAL_TPM  = (EFI_PERIPHERAL | 0x000D0000) = 0x010D0000<BR>
+  #  EFI_PERIPHERAL_TPM  = (EFI_PERIPHERAL | 0x000E0000) = 0x010E0000<BR>
   # @Prompt Status Code for TPM device definitions
-  # @ValidList  0x80000003 | 0x010D0000
-  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice|0x010D0000|UINT32|0x00000007
+  # @ValidList  0x80000003 | 0x010E0000
+  gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice|0x010E0000|UINT32|0x00000007
 
   ## Defines the IO port used to trigger a software System Management Interrupt (SMI).<BR><BR>
   #  Used as the SMI Command IO port by security functionality that triggers a software SMI such
@@ -323,8 +324,6 @@
   # @Prompt Status Code for FV verification result
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationPass|0x0303100A|UINT32|0x00010030
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeFvVerificationFail|0x0303100B|UINT32|0x00010031
-
-  gEfiSecurityPkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00010032
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## Image verification policy for OptionRom. Only following values are valid:<BR><BR>

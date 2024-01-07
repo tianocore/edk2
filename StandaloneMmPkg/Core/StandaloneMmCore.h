@@ -177,7 +177,6 @@ typedef struct {
 extern MM_CORE_PRIVATE_DATA  *gMmCorePrivate;
 extern EFI_MM_SYSTEM_TABLE   gMmCoreMmst;
 extern LIST_ENTRY            gHandleList;
-extern EFI_PHYSICAL_ADDRESS  gLoadModuleAtFixAddressMmramBase;
 
 /**
   Called to initialize the memory service.
@@ -844,6 +843,32 @@ MmIsSchedulable (
 VOID
 DumpMmramInfo (
   VOID
+  );
+
+/**
+  Given the pointer to the Firmware Volume Header find the
+  MM driver and return its PE32 image.
+
+  @param [in] FwVolHeader   Pointer to memory mapped FV
+  @param [in] Depth         Nesting depth of encapsulation sections. Callers
+                            different from MmCoreFfsFindMmDriver() are
+                            responsible for passing in a zero Depth.
+
+  @retval  EFI_SUCCESS            Success.
+  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
+  @retval  EFI_NOT_FOUND          Could not find section data.
+  @retval  EFI_OUT_OF_RESOURCES   Out of resources.
+  @retval  EFI_VOLUME_CORRUPTED   Firmware volume is corrupted.
+  @retval  EFI_UNSUPPORTED        Operation not supported.
+  @retval  EFI_ABORTED            Recursion aborted because Depth has been
+                                  greater than or equal to
+                                  PcdFwVolMmMaxEncapsulationDepth.
+
+**/
+EFI_STATUS
+MmCoreFfsFindMmDriver (
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
+  IN  UINT32                      Depth
   );
 
 extern UINTN                 mMmramRangeCount;

@@ -4,7 +4,7 @@
   This local APIC library instance supports x2APIC capable processors
   which have xAPIC and x2APIC modes.
 
-  Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2023, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017 - 2020, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -23,7 +23,6 @@
 #include <Library/TimerLib.h>
 #include <Library/PcdLib.h>
 #include <Library/CpuLib.h>
-#include <Library/UefiCpuLib.h>
 #include <IndustryStandard/Tdx.h>
 
 //
@@ -738,6 +737,33 @@ SendInitIpiAllExcludingSelf (
 }
 
 /**
+  Send a Start-up IPI to all processors excluding self.
+  This function returns after the IPI has been accepted by the target processors.
+  if StartupRoutine >= 1M, then ASSERT.
+  if StartupRoutine is not multiple of 4K, then ASSERT.
+  @param  StartupRoutine  Points to a start-up routine which is below 1M physical
+                          address and 4K aligned.
+**/
+VOID
+EFIAPI
+SendStartupIpiAllExcludingSelf (
+  IN UINT32  StartupRoutine
+  )
+{
+  LOCAL_APIC_ICR_LOW  IcrLow;
+
+  ASSERT (StartupRoutine < 0x100000);
+  ASSERT ((StartupRoutine & 0xfff) == 0);
+
+  IcrLow.Uint32                    = 0;
+  IcrLow.Bits.Vector               = (StartupRoutine >> 12);
+  IcrLow.Bits.DeliveryMode         = LOCAL_APIC_DELIVERY_MODE_STARTUP;
+  IcrLow.Bits.Level                = 1;
+  IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
+  SendIpi (IcrLow.Uint32, 0);
+}
+
+/**
   Send an INIT-Start-up-Start-up IPI sequence to a specified target processor.
 
   This function returns after the IPI has been accepted by the target processor.
@@ -791,22 +817,12 @@ SendInitSipiSipiAllExcludingSelf (
   IN UINT32  StartupRoutine
   )
 {
-  LOCAL_APIC_ICR_LOW  IcrLow;
-
-  ASSERT (StartupRoutine < 0x100000);
-  ASSERT ((StartupRoutine & 0xfff) == 0);
-
   SendInitIpiAllExcludingSelf ();
   MicroSecondDelay (PcdGet32 (PcdCpuInitIpiDelayInMicroSeconds));
-  IcrLow.Uint32                    = 0;
-  IcrLow.Bits.Vector               = (StartupRoutine >> 12);
-  IcrLow.Bits.DeliveryMode         = LOCAL_APIC_DELIVERY_MODE_STARTUP;
-  IcrLow.Bits.Level                = 1;
-  IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
-  SendIpi (IcrLow.Uint32, 0);
+  SendStartupIpiAllExcludingSelf (StartupRoutine);
   if (!StandardSignatureIsAuthenticAMD ()) {
     MicroSecondDelay (200);
-    SendIpi (IcrLow.Uint32, 0);
+    SendStartupIpiAllExcludingSelf (StartupRoutine);
   }
 }
 
@@ -1278,11 +1294,12 @@ GetProcessorLocationByApicId (
       NULL
       );
     //
-    // If CPUID.(EAX=0BH, ECX=0H):EBX returns zero and maximum input value for
-    // basic CPUID information is greater than 0BH, then CPUID.0BH leaf is not
-    // supported on that processor.
+    // Quoting Intel SDM:
+    // Software must detect the presence of CPUID leaf 0BH by
+    // verifying (a) the highest leaf index supported by CPUID is >=
+    // 0BH, and (b) CPUID.0BH:EBX[15:0] reports a non-zero value.
     //
-    if (ExtendedTopologyEbx.Uint32 != 0) {
+    if (ExtendedTopologyEbx.Bits.LogicalProcessors != 0) {
       TopologyLeafSupported = TRUE;
 
       //
@@ -1408,6 +1425,7 @@ GetProcessorLocation2ByApicId (
   )
 {
   CPUID_EXTENDED_TOPOLOGY_EAX  ExtendedTopologyEax;
+  CPUID_EXTENDED_TOPOLOGY_EBX  ExtendedTopologyEbx;
   CPUID_EXTENDED_TOPOLOGY_ECX  ExtendedTopologyEcx;
   UINT32                       MaxStandardCpuIdIndex;
   UINT32                       Index;
@@ -1420,10 +1438,19 @@ GetProcessorLocation2ByApicId (
   }
 
   //
-  // Get max index of CPUID
+  // Quoting Intel SDM:
+  // Software must detect the presence of CPUID leaf 1FH by verifying
+  // (a) the highest leaf index supported by CPUID is >= 1FH, and (b)
+  // CPUID.1FH:EBX[15:0] reports a non-zero value.
   //
   AsmCpuid (CPUID_SIGNATURE, &MaxStandardCpuIdIndex, NULL, NULL, NULL);
   if (MaxStandardCpuIdIndex < CPUID_V2_EXTENDED_TOPOLOGY) {
+    ExtendedTopologyEbx.Bits.LogicalProcessors = 0;
+  } else {
+    AsmCpuidEx (CPUID_V2_EXTENDED_TOPOLOGY, 0, NULL, &ExtendedTopologyEbx.Uint32, NULL, NULL);
+  }
+
+  if (ExtendedTopologyEbx.Bits.LogicalProcessors == 0) {
     if (Die != NULL) {
       *Die = 0;
     }

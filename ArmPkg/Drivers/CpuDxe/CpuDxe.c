@@ -11,6 +11,8 @@
 
 #include <Guid/IdleLoopEvent.h>
 
+#include <Library/MemoryAllocationLib.h>
+
 BOOLEAN  mIsFlushingGCD;
 
 /**
@@ -227,6 +229,77 @@ InitializeDma (
   CpuArchProtocol->DmaBufferAlignment = ArmCacheWritebackGranule ();
 }
 
+/**
+  Map all EfiConventionalMemory regions in the memory map with NX
+  attributes so that allocating or freeing EfiBootServicesData regions
+  does not result in changes to memory permission attributes.
+
+**/
+STATIC
+VOID
+RemapUnusedMemoryNx (
+  VOID
+  )
+{
+  UINT64                 TestBit;
+  UINTN                  MemoryMapSize;
+  UINTN                  MapKey;
+  UINTN                  DescriptorSize;
+  UINT32                 DescriptorVersion;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMapEntry;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMapEnd;
+  EFI_STATUS             Status;
+
+  TestBit = LShiftU64 (1, EfiBootServicesData);
+  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & TestBit) == 0) {
+    return;
+  }
+
+  MemoryMapSize = 0;
+  MemoryMap     = NULL;
+
+  Status = gBS->GetMemoryMap (
+                  &MemoryMapSize,
+                  MemoryMap,
+                  &MapKey,
+                  &DescriptorSize,
+                  &DescriptorVersion
+                  );
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  do {
+    MemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocatePool (MemoryMapSize);
+    ASSERT (MemoryMap != NULL);
+    Status = gBS->GetMemoryMap (
+                    &MemoryMapSize,
+                    MemoryMap,
+                    &MapKey,
+                    &DescriptorSize,
+                    &DescriptorVersion
+                    );
+    if (EFI_ERROR (Status)) {
+      FreePool (MemoryMap);
+    }
+  } while (Status == EFI_BUFFER_TOO_SMALL);
+
+  ASSERT_EFI_ERROR (Status);
+
+  MemoryMapEntry = MemoryMap;
+  MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + MemoryMapSize);
+  while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
+    if (MemoryMapEntry->Type == EfiConventionalMemory) {
+      ArmSetMemoryAttributes (
+        MemoryMapEntry->PhysicalStart,
+        EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages),
+        EFI_MEMORY_XP,
+        EFI_MEMORY_XP
+        );
+    }
+
+    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+  }
+}
+
 EFI_STATUS
 CpuDxeInitialize (
   IN EFI_HANDLE        ImageHandle,
@@ -240,10 +313,26 @@ CpuDxeInitialize (
 
   InitializeDma (&mCpu);
 
+  //
+  // Once we install the CPU arch protocol, the DXE core's memory
+  // protection routines will invoke them to manage the permissions of page
+  // allocations as they are created. Given that this includes pages
+  // allocated for page tables by this driver, we must ensure that unused
+  // memory is mapped with the same permissions as boot services data
+  // regions. Otherwise, we may end up with unbounded recursion, due to the
+  // fact that updating permissions on a newly allocated page table may trigger
+  // a block entry split, which triggers a page table allocation, etc etc
+  //
+  if (FeaturePcdGet (PcdRemapUnusedMemoryNx)) {
+    RemapUnusedMemoryNx ();
+  }
+
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mCpuHandle,
                   &gEfiCpuArchProtocolGuid,
                   &mCpu,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  &mMemoryAttribute,
                   NULL
                   );
 

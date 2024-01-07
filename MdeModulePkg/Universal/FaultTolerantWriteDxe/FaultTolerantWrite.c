@@ -731,7 +731,7 @@ FtwRestart (
     return EFI_ABORTED;
   }
 
-  DEBUG ((DEBUG_INFO, "%a(): success\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a(): success\n", __func__));
   return EFI_SUCCESS;
 }
 
@@ -787,7 +787,7 @@ FtwAbort (
 
   FtwDevice->FtwLastWriteHeader->Complete = FTW_VALID_STATE;
 
-  DEBUG ((DEBUG_INFO, "%a(): success\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a(): success\n", __func__));
   return EFI_SUCCESS;
 }
 
@@ -901,7 +901,7 @@ FtwGetLastWrite (
     Status = EFI_SUCCESS;
   }
 
-  DEBUG ((DEBUG_INFO, "%a(): success\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a(): success\n", __func__));
 
   return Status;
 }

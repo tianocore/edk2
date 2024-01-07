@@ -48,6 +48,9 @@ FvIsBeingProcessed (
   MM driver and return its PE32 image.
 
   @param [in] FwVolHeader   Pointer to memory mapped FV
+  @param [in] Depth         Nesting depth of encapsulation sections. Callers
+                            different from MmCoreFfsFindMmDriver() are
+                            responsible for passing in a zero Depth.
 
   @retval  EFI_SUCCESS            Success.
   @retval  EFI_INVALID_PARAMETER  Invalid parameter.
@@ -55,11 +58,15 @@ FvIsBeingProcessed (
   @retval  EFI_OUT_OF_RESOURCES   Out of resources.
   @retval  EFI_VOLUME_CORRUPTED   Firmware volume is corrupted.
   @retval  EFI_UNSUPPORTED        Operation not supported.
+  @retval  EFI_ABORTED            Recursion aborted because Depth has been
+                                  greater than or equal to
+                                  PcdFwVolMmMaxEncapsulationDepth.
 
 **/
 EFI_STATUS
 MmCoreFfsFindMmDriver (
-  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader
+  IN  EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
+  IN  UINT32                      Depth
   )
 {
   EFI_STATUS                  Status;
@@ -77,12 +84,18 @@ MmCoreFfsFindMmDriver (
   UINT32                      DstBufferSize;
   VOID                        *ScratchBuffer;
   UINT32                      ScratchBufferSize;
+  VOID                        *AllocatedDstBuffer;
   VOID                        *DstBuffer;
   UINT16                      SectionAttribute;
   UINT32                      AuthenticationStatus;
   EFI_FIRMWARE_VOLUME_HEADER  *InnerFvHeader;
 
   DEBUG ((DEBUG_INFO, "MmCoreFfsFindMmDriver - 0x%x\n", FwVolHeader));
+
+  if (Depth >= PcdGet32 (PcdFwVolMmMaxEncapsulationDepth)) {
+    DEBUG ((DEBUG_ERROR, "%a: recursion aborted due to nesting depth\n", __func__));
+    return EFI_ABORTED;
+  }
 
   if (FvHasBeenProcessed (FwVolHeader)) {
     return EFI_SUCCESS;
@@ -104,23 +117,41 @@ MmCoreFfsFindMmDriver (
       break;
     }
 
+    //
+    // Check uncompressed firmware volumes
+    //
     Status = FfsFindSectionData (
-               EFI_SECTION_GUID_DEFINED,
+               EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
                FileHeader,
                &SectionData,
                &SectionDataSize
+               );
+    if (!EFI_ERROR (Status)) {
+      if (SectionDataSize > sizeof (EFI_FIRMWARE_VOLUME_HEADER)) {
+        InnerFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)SectionData;
+        MmCoreFfsFindMmDriver (InnerFvHeader, Depth + 1);
+        continue;
+      }
+    }
+
+    //
+    // Check compressed firmware volumes
+    //
+    Status = FfsFindSection (
+               EFI_SECTION_GUID_DEFINED,
+               FileHeader,
+               &Section
                );
     if (EFI_ERROR (Status)) {
       break;
     }
 
-    Section = (EFI_COMMON_SECTION_HEADER *)(FileHeader + 1);
-    Status  = ExtractGuidedSectionGetInfo (
-                Section,
-                &DstBufferSize,
-                &ScratchBufferSize,
-                &SectionAttribute
-                );
+    Status = ExtractGuidedSectionGetInfo (
+               Section,
+               &DstBufferSize,
+               &ScratchBufferSize,
+               &SectionAttribute
+               );
     if (EFI_ERROR (Status)) {
       break;
     }
@@ -136,23 +167,33 @@ MmCoreFfsFindMmDriver (
     //
     // Allocate destination buffer, extra one page for adjustment
     //
-    DstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
-    if (DstBuffer == NULL) {
+    AllocatedDstBuffer = (VOID *)(UINTN)AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
+    if (AllocatedDstBuffer == NULL) {
+      FreePages (ScratchBuffer, EFI_SIZE_TO_PAGES (ScratchBufferSize));
       return EFI_OUT_OF_RESOURCES;
     }
 
     //
     // Call decompress function
     //
-    Status = ExtractGuidedSectionDecode (
-               Section,
-               &DstBuffer,
-               ScratchBuffer,
-               &AuthenticationStatus
-               );
+    DstBuffer = AllocatedDstBuffer;
+    Status    = ExtractGuidedSectionDecode (
+                  Section,
+                  &DstBuffer,
+                  ScratchBuffer,
+                  &AuthenticationStatus
+                  );
     FreePages (ScratchBuffer, EFI_SIZE_TO_PAGES (ScratchBufferSize));
     if (EFI_ERROR (Status)) {
       goto FreeDstBuffer;
+    }
+
+    //
+    // Free allocated DstBuffer if it is not used
+    //
+    if (DstBuffer != AllocatedDstBuffer) {
+      FreePages (AllocatedDstBuffer, EFI_SIZE_TO_PAGES (DstBufferSize));
+      AllocatedDstBuffer = NULL;
     }
 
     DEBUG ((
@@ -171,8 +212,13 @@ MmCoreFfsFindMmDriver (
       goto FreeDstBuffer;
     }
 
-    InnerFvHeader = (VOID *)(Section + 1);
-    Status        = MmCoreFfsFindMmDriver (InnerFvHeader);
+    if (IS_SECTION2 (Section)) {
+      InnerFvHeader = (VOID *)((EFI_COMMON_SECTION_HEADER2 *)Section + 1);
+    } else {
+      InnerFvHeader = (VOID *)(Section + 1);
+    }
+
+    Status = MmCoreFfsFindMmDriver (InnerFvHeader, Depth + 1);
     if (EFI_ERROR (Status)) {
       goto FreeDstBuffer;
     }
@@ -198,7 +244,9 @@ MmCoreFfsFindMmDriver (
   return EFI_SUCCESS;
 
 FreeDstBuffer:
-  FreePages (DstBuffer, EFI_SIZE_TO_PAGES (DstBufferSize));
+  if (AllocatedDstBuffer != NULL) {
+    FreePages (AllocatedDstBuffer, EFI_SIZE_TO_PAGES (DstBufferSize));
+  }
 
   return Status;
 }

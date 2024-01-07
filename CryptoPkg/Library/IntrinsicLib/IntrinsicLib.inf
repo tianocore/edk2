@@ -32,6 +32,10 @@
   Ia32/MathFtol.c           | MSFT
   Ia32/MathLlmul.asm        | MSFT
   Ia32/MathLlshr.asm        | MSFT
+  Ia32/MathUlldiv.asm       | MSFT
+  Ia32/MathUlldvrm.asm      | MSFT
+  Ia32/MathLldiv.asm        | MSFT
+  Ia32/MathUllrem.asm       | MSFT
 
   Ia32/MathLShiftS64.c      | INTEL
   Ia32/MathRShiftU64.c      | INTEL
@@ -39,8 +43,13 @@
 
   Ia32/MathLShiftS64.nasm   | GCC
   Ia32/MathRShiftU64.nasm   | GCC
-
+  Ia32/MathDivModU64x64.c   | GCC
+  Ia32/MathDivS64x64.c      | GCC
+  Ia32/MathDivU64x64.c      | GCC
+  Ia32/MathModU64x64.c      | GCC
 [Sources.X64]
+  CopyMem.c
+[Sources.RISCV64]
   CopyMem.c
 
 [Packages]

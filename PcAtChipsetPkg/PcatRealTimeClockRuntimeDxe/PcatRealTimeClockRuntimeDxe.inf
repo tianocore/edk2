@@ -76,6 +76,7 @@
   gPcAtChipsetPkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout   ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear             ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcDefaultYear               ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister             ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister            ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64           ## CONSUMES

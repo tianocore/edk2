@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "PrEval": {
+        "DscPath": "UnitTestFrameworkPkg.dsc",
+    },
     ## options defined .pytool/Plugin/LicenseCheck
     "LicenseCheck": {
         "IgnoreFiles": []
@@ -79,9 +82,14 @@
         "AuditOnly": False,           # Fails test but run in AuditOnly mode to collect log
         "IgnoreFiles": [             # use gitignore syntax to ignore errors in matching files
             "Library/CmockaLib/cmocka/**/*.*",  # not going to spell check a submodule
-            "Library/GoogleTestLib/googletest/**/*.*"  # not going to spell check a submodule
+            "Library/GoogleTestLib/googletest/**/*.*",  # not going to spell check a submodule
+            "Library/SubhookLib/subhook/**/*.*"  # not going to spell check a submodule
         ],
         "ExtendWords": [             # words to extend to the dictionary for this package
+            "Pointee",
+            "gmock",
+            "GMOCK",
+            "DSUBHOOK",
             "testcase",
             "testsuites",
             "cmocka",

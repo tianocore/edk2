@@ -3,6 +3,7 @@
   mode at PEI phase.
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -91,6 +92,15 @@ AhciPassThruExecute (
   )
 {
   EFI_STATUS  Status;
+
+  if (PortMultiplierPort == 0xFFFF) {
+    //
+    // If there is no port multiplier, PortMultiplierPort will be 0xFFFF
+    // according to UEFI spec. Here, we convert its value to 0 to follow
+    // AHCI spec.
+    //
+    PortMultiplierPort = 0;
+  }
 
   switch (Packet->Protocol) {
     case EFI_ATA_PASS_THRU_PROTOCOL_ATA_NON_DATA:
@@ -194,15 +204,15 @@ AhciAtaPassThruPassThru (
   }
 
   IoAlign = This->Mode->IoAlign;
-  if ((IoAlign > 1) && !IS_ALIGNED (Packet->InDataBuffer, IoAlign)) {
+  if ((IoAlign > 1) && !ADDRESS_IS_ALIGNED (Packet->InDataBuffer, IoAlign)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((IoAlign > 1) && !IS_ALIGNED (Packet->OutDataBuffer, IoAlign)) {
+  if ((IoAlign > 1) && !ADDRESS_IS_ALIGNED (Packet->OutDataBuffer, IoAlign)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((IoAlign > 1) && !IS_ALIGNED (Packet->Asb, IoAlign)) {
+  if ((IoAlign > 1) && !ADDRESS_IS_ALIGNED (Packet->Asb, IoAlign)) {
     return EFI_INVALID_PARAMETER;
   }
 

@@ -23,3 +23,15 @@
 [submodule "UnitTestFrameworkPkg/Library/GoogleTestLib/googletest"]
 	path = UnitTestFrameworkPkg/Library/GoogleTestLib/googletest
 	url = https://github.com/google/googletest.git
+[submodule "UnitTestFrameworkPkg/Library/SubhookLib/subhook"]
+	path = UnitTestFrameworkPkg/Library/SubhookLib/subhook
+	url = https://github.com/Zeex/subhook.git
+[submodule "MdePkg/Library/BaseFdtLib/libfdt"]
+	path = MdePkg/Library/BaseFdtLib/libfdt
+	url = https://github.com/devicetree-org/pylibfdt.git
+[submodule "MdePkg/Library/MipiSysTLib/mipisyst"]
+	path = MdePkg/Library/MipiSysTLib/mipisyst
+	url = https://github.com/MIPI-Alliance/public-mipi-sys-t.git
+[submodule "CryptoPkg/Library/MbedTlsLib/mbedtls"]
+	path = CryptoPkg/Library/MbedTlsLib/mbedtls
+	url = https://github.com/ARMmbed/mbedtls

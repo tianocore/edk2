@@ -104,3 +104,49 @@ ArmHasCcidx (
   Mmfr2 = ArmReadIdAA64Mmfr2 ();
   return (((Mmfr2 >> 20) & 0xF) == 1) ? TRUE : FALSE;
 }
+
+/**
+  Checks whether the CPU implements the Virtualization Host Extensions.
+
+  @retval TRUE  FEAT_VHE is implemented.
+  @retval FALSE FEAT_VHE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasVhe (
+  VOID
+  )
+{
+  return ((ArmReadIdAA64Mmfr1 () & AARCH64_MMFR1_VH) != 0);
+}
+
+/**
+  Checks whether the CPU implements the Trace Buffer Extension.
+
+  @retval TRUE  FEAT_TRBE is implemented.
+  @retval FALSE FEAT_TRBE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasTrbe (
+  VOID
+  )
+{
+  return ((ArmReadIdAA64Dfr0 () & AARCH64_DFR0_TRBE) != 0);
+}
+
+/**
+  Checks whether the CPU implements the Embedded Trace Extension.
+
+  @retval TRUE  FEAT_ETE is implemented.
+  @retval FALSE FEAT_ETE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasEte (
+  VOID
+  )
+{
+  // The ID_AA64DFR0_EL1.TraceVer field identifies the presence of FEAT_ETE.
+  return ((ArmReadIdAA64Dfr0 () & AARCH64_DFR0_TRACEVER) != 0);
+}

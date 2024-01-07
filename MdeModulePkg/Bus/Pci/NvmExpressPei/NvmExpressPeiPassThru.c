@@ -57,7 +57,7 @@ NvmeCreatePrpList (
       DEBUG_ERROR,
       "%a: The implementation only supports PrpList number up to 4."
       " But %d are needed here.\n",
-      __FUNCTION__,
+      __func__,
       PrpListNo
       ));
     return 0;
@@ -115,7 +115,7 @@ NvmeCreatePrpList (
 **/
 EFI_STATUS
 NvmeCheckCqStatus (
-  IN NVME_CQ  *Cq
+  IN volatile NVME_CQ  *Cq
   )
 {
   if ((Cq->Sct == 0x0) && (Cq->Sc == 0x0)) {
@@ -344,7 +344,7 @@ NvmePassThruExecute (
 {
   EFI_STATUS             Status;
   NVME_SQ                *Sq;
-  NVME_CQ                *Cq;
+  volatile NVME_CQ       *Cq;
   UINT8                  QueueId;
   UINTN                  SqSize;
   UINTN                  CqSize;
@@ -365,7 +365,7 @@ NvmePassThruExecute (
     DEBUG ((
       DEBUG_ERROR,
       "%a, Invalid parameter: Packet(%lx)\n",
-      __FUNCTION__,
+      __func__,
       (UINTN)Packet
       ));
     return EFI_INVALID_PARAMETER;
@@ -375,7 +375,7 @@ NvmePassThruExecute (
     DEBUG ((
       DEBUG_ERROR,
       "%a, Invalid parameter: NvmeCmd (%lx)/NvmeCompletion(%lx)\n",
-      __FUNCTION__,
+      __func__,
       (UINTN)Packet->NvmeCmd,
       (UINTN)Packet->NvmeCompletion
       ));
@@ -386,7 +386,7 @@ NvmePassThruExecute (
     DEBUG ((
       DEBUG_ERROR,
       "%a, Invalid parameter: QueueId(%lx)\n",
-      __FUNCTION__,
+      __func__,
       (UINTN)Packet->QueueType
       ));
     return EFI_INVALID_PARAMETER;
@@ -407,7 +407,7 @@ NvmePassThruExecute (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Nsid mismatch (%x, %x)\n",
-      __FUNCTION__,
+      __func__,
       Packet->NvmeCmd->Nsid,
       NamespaceId
       ));
@@ -425,7 +425,7 @@ NvmePassThruExecute (
   //
   ASSERT (Sq->Psdt == 0);
   if (Sq->Psdt != 0) {
-    DEBUG ((DEBUG_ERROR, "%a: Does not support SGL mechanism.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Does not support SGL mechanism.\n", __func__));
     return EFI_UNSUPPORTED;
   }
 
@@ -458,7 +458,7 @@ NvmePassThruExecute (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Does not support external IO queues creation request.\n",
-          __FUNCTION__
+          __func__
           ));
         return EFI_UNSUPPORTED;
       }
@@ -480,7 +480,7 @@ NvmePassThruExecute (
                       );
         if (EFI_ERROR (Status) || (MapLength != Packet->TransferLength)) {
           Status = EFI_OUT_OF_RESOURCES;
-          DEBUG ((DEBUG_ERROR, "%a: Fail to map data buffer.\n", __FUNCTION__));
+          DEBUG ((DEBUG_ERROR, "%a: Fail to map data buffer.\n", __func__));
           goto Exit;
         }
 
@@ -498,7 +498,7 @@ NvmePassThruExecute (
                       );
         if (EFI_ERROR (Status) || (MapLength != Packet->MetadataLength)) {
           Status = EFI_OUT_OF_RESOURCES;
-          DEBUG ((DEBUG_ERROR, "%a: Fail to map meta data buffer.\n", __FUNCTION__));
+          DEBUG ((DEBUG_ERROR, "%a: Fail to map meta data buffer.\n", __func__));
           goto Exit;
         }
 
@@ -526,7 +526,7 @@ NvmePassThruExecute (
                    );
     if (Sq->Prp[1] == 0) {
       Status = EFI_OUT_OF_RESOURCES;
-      DEBUG ((DEBUG_ERROR, "%a: Create PRP list fail, Status - %r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: Create PRP list fail, Status - %r\n", __func__, Status));
       goto Exit;
     }
   } else if ((Offset + Bytes) > EFI_PAGE_SIZE) {
@@ -568,7 +568,7 @@ NvmePassThruExecute (
   Data32 = ReadUnaligned32 ((UINT32 *)&Private->SqTdbl[QueueId]);
   Status = NVME_SET_SQTDBL (Private, QueueId, &Data32);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: NVME_SET_SQTDBL fail, Status - %r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: NVME_SET_SQTDBL fail, Status - %r\n", __func__, Status));
     goto Exit;
   }
 
@@ -591,7 +591,7 @@ NvmePassThruExecute (
     //
     // Timeout occurs for an NVMe command, reset the controller to abort the outstanding command
     //
-    DEBUG ((DEBUG_ERROR, "%a: Timeout occurs for the PassThru command.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Timeout occurs for the PassThru command.\n", __func__));
     Status = NvmeControllerInit (Private);
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
@@ -617,7 +617,7 @@ NvmePassThruExecute (
   //
   // Copy the Respose Queue entry for this command to the callers response buffer
   //
-  CopyMem (Packet->NvmeCompletion, Cq, sizeof (EFI_NVM_EXPRESS_COMPLETION));
+  CopyMem (Packet->NvmeCompletion, (VOID *)Cq, sizeof (EFI_NVM_EXPRESS_COMPLETION));
 
   //
   // Check the NVMe cmd execution result

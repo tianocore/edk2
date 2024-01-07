@@ -759,7 +759,7 @@ AhciPioTransfer (
       DEBUG_ERROR,
       "%a: Driver only support a maximum of 0x%x PRDT entries, "
       "current number of data byte 0x%x is too large, maximum allowed is 0x%x.\n",
-      __FUNCTION__,
+      __func__,
       AHCI_MAX_PRDT_NUMBER,
       DataCount,
       AHCI_MAX_PRDT_NUMBER * AHCI_MAX_DATA_PER_PRDT
@@ -778,7 +778,7 @@ AhciPioTransfer (
                 &MapData
                 );
   if (EFI_ERROR (Status) || (MapLength != DataCount)) {
-    DEBUG ((DEBUG_ERROR, "%a: Fail to map data buffer.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to map data buffer.\n", __func__));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -860,7 +860,7 @@ AhciPioTransfer (
       Offset         = FisBaseAddr + AHCI_PIO_FIS_OFFSET;
       Status         = AhciCheckMemSet (Offset, AHCI_FIS_TYPE_MASK, AHCI_FIS_PIO_SETUP);
       if (!EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_INFO, "%a: PioFisReceived.\n", __FUNCTION__));
+        DEBUG ((DEBUG_INFO, "%a: PioFisReceived.\n", __func__));
         PioFisReceived = TRUE;
       }
 
@@ -874,7 +874,7 @@ AhciPioTransfer (
       Offset = FisBaseAddr + AHCI_D2H_FIS_OFFSET;
       Status = AhciCheckMemSet (Offset, AHCI_FIS_TYPE_MASK, AHCI_FIS_REGISTER_D2H);
       if (!EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_INFO, "%a: D2hFisReceived.\n", __FUNCTION__));
+        DEBUG ((DEBUG_INFO, "%a: D2hFisReceived.\n", __func__));
         D2hFisReceived = TRUE;
       }
 
@@ -918,7 +918,7 @@ AhciPioTransfer (
                Timeout
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: AhciWaitMemSet (%r)\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: AhciWaitMemSet (%r)\n", __func__, Status));
       goto Exit;
     }
 
@@ -1479,7 +1479,7 @@ IdentifyAtaDevice (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Not a hard disk device on Port 0x%x PortMultiplierPort 0x%x\n",
-      __FUNCTION__,
+      __func__,
       DeviceData->Port,
       DeviceData->PortMultiplier
       ));
@@ -1489,7 +1489,7 @@ IdentifyAtaDevice (
   DEBUG ((
     DEBUG_INFO,
     "%a: Identify Device: Port 0x%x PortMultiplierPort 0x%x\n",
-    __FUNCTION__,
+    __func__,
     DeviceData->Port,
     DeviceData->PortMultiplier
     ));
@@ -1518,7 +1518,7 @@ IdentifyAtaDevice (
   }
 
   if (Capacity == 0) {
-    DEBUG ((DEBUG_ERROR, "%a: Invalid Capacity (0) for ATA device.\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a: Invalid Capacity (0) for ATA device.\n", __func__));
     return EFI_UNSUPPORTED;
   }
 
@@ -1532,7 +1532,7 @@ IdentifyAtaDevice (
   DEBUG ((
     DEBUG_INFO,
     "%a: PhyLogicSectorSupport = 0x%x\n",
-    __FUNCTION__,
+    __func__,
     PhyLogicSectorSupport
     ));
   if ((PhyLogicSectorSupport & (BIT14 | BIT15)) == BIT14) {
@@ -1550,20 +1550,20 @@ IdentifyAtaDevice (
   //
   MaxSectorCount = mMaxTransferBlockNumber[DeviceData->Lba48Bit];
   if ((Media->BlockSize == 0) || (Media->BlockSize > MAX_UINT32 / MaxSectorCount)) {
-    DEBUG ((DEBUG_ERROR, "%a: Invalid BlockSize (0x%x).\n", __FUNCTION__, Media->BlockSize));
+    DEBUG ((DEBUG_ERROR, "%a: Invalid BlockSize (0x%x).\n", __func__, Media->BlockSize));
     return EFI_UNSUPPORTED;
   }
 
   DEBUG ((
     DEBUG_INFO,
     "%a: BlockSize = 0x%x, LastBlock = 0x%lx\n",
-    __FUNCTION__,
+    __func__,
     Media->BlockSize,
     Media->LastBlock
     ));
 
   if ((IdentifyData->trusted_computing_support & BIT0) != 0) {
-    DEBUG ((DEBUG_INFO, "%a: Found Trust Computing feature support.\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: Found Trust Computing feature support.\n", __func__));
     DeviceData->TrustComputing = TRUE;
   }
 
@@ -1686,7 +1686,7 @@ AhciModeInitialization (
 
   Status = AhciReset (AhciBar, AHCI_PEI_RESET_TIMEOUT);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: AHCI HBA reset failed with %r.\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: AHCI HBA reset failed with %r.\n", __func__, Status));
     return EFI_DEVICE_ERROR;
   }
 
@@ -1708,7 +1708,7 @@ AhciModeInitialization (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Transfer-related data allocation failed with %r.\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return EFI_OUT_OF_RESOURCES;
@@ -1814,7 +1814,7 @@ AhciModeInitialization (
         //
         Offset = AHCI_PORT_START + Port * AHCI_PORT_REG_WIDTH + AHCI_PORT_CMD;
         AhciAndReg (AhciBar, Offset, (UINT32) ~(AHCI_PORT_CMD_SUD));
-        DEBUG ((DEBUG_ERROR, "%a: No device detected at Port %d.\n", __FUNCTION__, Port));
+        DEBUG ((DEBUG_ERROR, "%a: No device detected at Port %d.\n", __func__, Port));
         continue;
       }
 
@@ -1844,7 +1844,7 @@ AhciModeInitialization (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Port %d device presence detected but phy not ready (TFD=0x%x).\n",
-          __FUNCTION__,
+          __func__,
           Port,
           Data
           ));
@@ -1866,7 +1866,7 @@ AhciModeInitialization (
         DEBUG ((
           DEBUG_ERROR,
           "%a: Error occurred when waiting for the first D2H register FIS - %r\n",
-          __FUNCTION__,
+          __func__,
           Status
           ));
         continue;
@@ -1876,11 +1876,11 @@ AhciModeInitialization (
       if ((Data & AHCI_ATAPI_SIG_MASK) == AHCI_ATA_DEVICE_SIG) {
         Status = AhciIdentify (Private, Port, 0, PortIndex - 1, &IdentifyData);
         if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_ERROR, "%a: AhciIdentify() failed with %r\n", __FUNCTION__, Status));
+          DEBUG ((DEBUG_ERROR, "%a: AhciIdentify() failed with %r\n", __func__, Status));
           continue;
         }
 
-        DEBUG ((DEBUG_INFO, "%a: ATA hard disk found on Port %d.\n", __FUNCTION__, Port));
+        DEBUG ((DEBUG_INFO, "%a: ATA hard disk found on Port %d.\n", __func__, Port));
       } else {
         continue;
       }
@@ -2126,7 +2126,7 @@ TrustTransferAtaDevice (
     // ATA PassThru PPI.
     //
     if ((AtaPassThru->Mode->IoAlign > 1) &&
-        !IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign))
+        !ADDRESS_IS_ALIGNED (Buffer, AtaPassThru->Mode->IoAlign))
     {
       NewBuffer = AllocateAlignedPages (
                     EFI_SIZE_TO_PAGES (TransferLength),

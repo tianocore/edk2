@@ -2,7 +2,7 @@
 #  Implementation for PlatformBootManagerLib library class interfaces.
 #
 #  Copyright (C) 2015-2016, Red Hat, Inc.
-#  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2023, Arm Ltd. All rights reserved.<BR>
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #
@@ -29,6 +29,7 @@
   PlatformBm.h
 
 [Packages]
+  ArmPkg/ArmPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
@@ -55,7 +56,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [FixedPcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
+  gArmTokenSpaceGuid.PcdUefiShellDefaultBootEnable
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
@@ -66,6 +67,7 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootDiscoveryPolicy
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
 
 [Guids]
   gBootDiscoveryPolicyMgrFormsetGuid

@@ -1,26 +1,12 @@
 /*++
 
-Copyright (c) 2013-2017, ARM Ltd. All rights reserved.<BR>
+Copyright (c) 2013-2023, Arm Ltd. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 --*/
 
 #include "ArmGicDxe.h"
-
-VOID
-EFIAPI
-IrqInterruptHandler (
-  IN EFI_EXCEPTION_TYPE  InterruptType,
-  IN EFI_SYSTEM_CONTEXT  SystemContext
-  );
-
-VOID
-EFIAPI
-ExitBootServicesEvent (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  );
 
 // Making this global saves a few bytes in image size
 EFI_HANDLE  gHardwareInterruptHandle = NULL;
@@ -61,7 +47,7 @@ GicGetDistributorIcfgBaseAndBit (
 
   RegIndex    = Source / ARM_GIC_ICDICFR_F_STRIDE; // NOTE: truncation is significant
   Field       = Source % ARM_GIC_ICDICFR_F_STRIDE;
-  *RegAddress = PcdGet64 (PcdGicDistributorBase)
+  *RegAddress = (UINTN)PcdGet64 (PcdGicDistributorBase)
                 + ARM_GIC_ICDICFR
                 + (ARM_GIC_ICDICFR_BYTES * RegIndex);
   *Config1Bit = ((Field * ARM_GIC_ICDICFR_F_WIDTH)
@@ -137,7 +123,7 @@ CpuArchEventProtocolNotify (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Cpu->RegisterInterruptHandler() - %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return;
@@ -153,7 +139,7 @@ CpuArchEventProtocolNotify (
     DEBUG ((
       DEBUG_ERROR,
       "%a: Cpu->RegisterInterruptHandler() - %r\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
   }

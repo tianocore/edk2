@@ -7,6 +7,7 @@
   Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
  Copyright (c) 2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
     SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -18,6 +19,8 @@
 
 #include "jansson.h"
 
+extern volatile UINT32  hashtable_seed;
+
 /**
   The function is used to initialize a JSON value which contains a new JSON array,
   or NULL on error. Initially, the array is empty.
@@ -27,7 +30,7 @@
 
   More details for reference count strategy can refer to the API description for JsonValueFree().
 
-  @retval      The created JSON value which contains a JSON array or NULL if intial a JSON array
+  @retval      The created JSON value which contains a JSON array or NULL if initial a JSON array
                is failed.
 
 **/
@@ -49,7 +52,7 @@ JsonValueInitArray (
 
   More details for reference count strategy can refer to the API description for JsonValueFree().
 
-  @retval      The created JSON value which contains a JSON object or NULL if intial a JSON object
+  @retval      The created JSON value which contains a JSON object or NULL if initial a JSON object
                is failed.
 
 **/
@@ -672,6 +675,29 @@ JsonObjectSize (
 }
 
 /**
+  The function removes all elements from object. Returns 0 on success and -1 if object is not
+  a JSON object. The reference count of all removed values are decremented.
+
+  @param[in]   JsonObject              The provided JSON object.
+
+  @retval      EFI_ABORTED            Some error occur and operation aborted.
+  @retval      EFI_SUCCESS            JSON value has been appended to the end of the JSON array.
+
+**/
+EFI_STATUS
+EFIAPI
+JsonObjectClear (
+  IN    EDKII_JSON_OBJECT  JsonObject
+  )
+{
+  if (json_object_clear ((json_t *)JsonObject) != 0) {
+    return EFI_ABORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   The function is used to enumerate all keys in a JSON object.
 
   Caller should be responsible to free the returned key array reference using
@@ -863,7 +889,7 @@ JsonArrayAppendValue (
   More details for reference count strategy can refer to the API description for JsonValueFree().
 
   @param[in]   JsonArray              The provided JSON array.
-  @param[in]   Index                  The Index position before removement.
+  @param[in]   Index                  The Index position before removal.
 
   @retval      EFI_ABORTED            Some error occur and operation aborted.
   @retval      EFI_SUCCESS            The JSON array has been removed at position index.
@@ -887,7 +913,7 @@ JsonArrayRemoveValue (
   Dump JSON to a buffer.
 
   @param[in]   JsonValue       The provided JSON value.
-  @param[in]   Flags           The Index position before removement. The value
+  @param[in]   Flags           The Index position before removal. The value
                                could be the combination of below flags.
                                  - EDKII_JSON_INDENT(n)
                                  - EDKII_JSON_COMPACT
@@ -902,7 +928,7 @@ JsonArrayRemoveValue (
                                https://jansson.readthedocs.io/en/2.13/apiref.html#encoding
 
   @retval      CHAR8 *         Dump fail if NULL returned, otherwise the buffer
-                               contain JSON paylaod in ASCII string. The return
+                               contain JSON payload in ASCII string. The return
                                value must be freed by the caller using FreePool().
 **/
 CHAR8 *
@@ -925,7 +951,7 @@ JsonDumpString (
   value. Only object and array represented strings can be converted successfully,
   since they are the only valid root values of a JSON text for UEFI usage.
 
-  Real number and number with exponent part are not supportted by UEFI.
+  Real number and number with exponent part are not supported by UEFI.
 
   Caller needs to cleanup the root value by calling JsonValueFree().
 
@@ -950,7 +976,7 @@ JsonLoadString (
 /**
   Load JSON from a buffer.
 
-  @param[in]   Buffer        Bufffer to the JSON payload
+  @param[in]   Buffer        Buffier to the JSON payload
   @param[in]   BufferLen     Length of the buffer
   @param[in]   Flags         Flag of loading JSON buffer, the value
                              could be the combination of below flags.
@@ -985,7 +1011,7 @@ JsonLoadBuffer (
   When the reference count drops to zero, there are no references left and the
   value can be destroyed.
 
-  This funciton decrement the reference count of EDKII_JSON_VALUE. As soon as
+  This function decrement the reference count of EDKII_JSON_VALUE. As soon as
   a call to json_decref() drops the reference count to zero, the value is
   destroyed and it can no longer be used.
 
@@ -1112,5 +1138,38 @@ JsonGetType (
   IN EDKII_JSON_VALUE  JsonValue
   )
 {
-  return ((json_t *)JsonValue)->type;
+  return (EDKII_JSON_TYPE)(((json_t *)JsonValue)->type);
+}
+
+/**
+  JSON Library constructor.
+
+  @param ImageHandle     The image handle.
+  @param SystemTable     The system table.
+
+  @retval  EFI_SUCCESS  Protocol listener is registered successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+JsonLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  //
+  // hashtable_seed is initalized by current time while JsonLib is loaded.
+  // Due to above mechanism, hashtable_seed will be different in each individual
+  // UEFI driver. As the result, the hash of same key in different UEFI driver
+  // would be different. This breaks JsonObjectGetValue() because
+  // JsonObjectGetValue() won't be able to find corresponding JSON value if
+  // this EDKII_JSON_VALUE is created by another UEFI driver.
+  //
+  // Initial the seed to a fixed magic value for JsonLib to be working in all
+  // UEFI drivers. This fixed number will be removed after the protocol version
+  // of JsonLib is implemented in the future.
+  //
+  hashtable_seed = 0xFDAE2143;
+
+  return EFI_SUCCESS;
 }

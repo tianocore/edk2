@@ -256,7 +256,31 @@ FillExchangeInfoDataSevEs (
   if (StdRangeMax >= CPUID_EXTENDED_TOPOLOGY) {
     CPUID_EXTENDED_TOPOLOGY_EBX  ExtTopoEbx;
 
-    AsmCpuid (CPUID_EXTENDED_TOPOLOGY, NULL, &ExtTopoEbx.Uint32, NULL, NULL);
+    AsmCpuidEx (
+      CPUID_EXTENDED_TOPOLOGY,
+      0,
+      NULL,
+      &ExtTopoEbx.Uint32,
+      NULL,
+      NULL
+      );
     ExchangeInfo->ExtTopoAvail = !!ExtTopoEbx.Bits.LogicalProcessors;
   }
+}
+
+/**
+  Get pointer to CPU MP Data structure from GUIDed HOB.
+
+  @param[in] CpuMpData  The pointer to CPU MP Data structure.
+**/
+VOID
+AmdSevUpdateCpuMpData (
+  IN CPU_MP_DATA  *CpuMpData
+  )
+{
+  CPU_MP_DATA  *OldCpuMpData;
+
+  OldCpuMpData = GetCpuMpDataFromGuidedHob ();
+
+  OldCpuMpData->NewCpuMpData = CpuMpData;
 }

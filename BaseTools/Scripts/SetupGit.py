@@ -57,6 +57,8 @@ MIN_GIT_VERSION = (1, 9, 0)
 
 # Set of options to be set identically for all repositories
 OPTIONS = [
+    {'section': 'alias',       'option': 'fp',
+     'value': 'format-patch -M --stat=1000 --stat-graph-width=20'},
     {'section': 'am',          'option': 'keepcr',            'value': True},
     {'section': 'am',          'option': 'signoff',           'value': True},
     {'section': 'cherry-pick', 'option': 'signoff',           'value': True},

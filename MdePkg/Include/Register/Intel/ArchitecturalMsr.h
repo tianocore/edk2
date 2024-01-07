@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -5678,6 +5678,110 @@ typedef union {
   @note MSR_IA32_X2APIC_SELF_IPI is defined as IA32_X2APIC_SELF_IPI in SDM.
 **/
 #define MSR_IA32_X2APIC_SELF_IPI  0x0000083F
+
+/**
+  Memory Encryption Activation MSR. If CPUID.07H:ECX.[13] = 1.
+
+  @param  ECX  MSR_IA32_TME_ACTIVATE (0x00000982)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_IA32_TME_ACTIVATE_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_IA32_TME_ACTIVATE_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_IA32_TME_ACTIVATE_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_TME_ACTIVATE);
+  AsmWriteMsr64 (MSR_IA32_TME_ACTIVATE, Msr.Uint64);
+  @endcode
+  @note MSR_IA32_TME_ACTIVATE is defined as IA32_TME_ACTIVATE in SDM.
+**/
+#define MSR_IA32_TME_ACTIVATE  0x00000982
+
+/**
+  MSR information returned for MSR index #MSR_IA32_TME_ACTIVATE
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] Lock R/O: Will be set upon successful WRMSR (or first SMI);
+    /// written value ignored..
+    ///
+    UINT32    Lock              : 1;
+    ///
+    /// [Bit 1] Hardware Encryption Enable: This bit also enables MKTME; MKTME
+    /// cannot be enabled without enabling encryption hardware.
+    ///
+    UINT32    TmeEnable         : 1;
+    ///
+    /// [Bit 2] Key Select:
+    /// 0: Create a new TME key (expected cold/warm boot).
+    /// 1: Restore the TME key from storage (Expected when resume from standby).
+    ///
+    UINT32    KeySelect         : 1;
+    ///
+    /// [Bit 3] Save TME Key for Standby: Save key into storage to be used when
+    /// resume from standby.
+    /// Note: This may not be supported in all processors.
+    ///
+    UINT32    SaveKeyForStandby : 1;
+    ///
+    /// [Bit 7:4] TME Policy/Encryption Algorithm: Only algorithms enumerated in
+    /// IA32_TME_CAPABILITY are allowed.
+    /// For example:
+    ///   0000 – AES-XTS-128.
+    ///   0001 – AES-XTS-128 with integrity.
+    ///   0010 – AES-XTS-256.
+    ///   Other values are invalid.
+    ///
+    UINT32    TmePolicy : 4;
+    UINT32    Reserved  : 23;
+    ///
+    /// [Bit 31] TME Encryption Bypass Enable: When encryption hardware is enabled:
+    /// * Total Memory Encryption is enabled using a CPU generated ephemeral key
+    ///   based on a hardware random number generator when this bit is set to 0.
+    /// * Total Memory Encryption is bypassed (no encryption/decryption for KeyID0)
+    ///   when this bit is set to 1.
+    /// Software must inspect Hardware Encryption Enable (bit 1) and TME encryption
+    /// bypass Enable (bit 31) to determine if TME encryption is enabled.
+    ///
+    UINT32    TmeBypassMode : 1;
+    ///
+    /// [Bit 35:32] MK_TME_KEYID_BITS: Reserved if MKTME is not enumerated, otherwise:
+    /// The number of key identifier bits to allocate to MKTME usage.
+    /// Similar to enumeration, this is an encoded value.
+    /// Writing a value greater than MK_TME_MAX_KEYID_BITS will result in #GP.
+    /// Writing a non-zero value to this field will #GP if bit 1 of EAX (Hardware
+    /// Encryption Enable) is not also set to ‘1, as encryption hardware must be
+    /// enabled to use MKTME.
+    /// Example: To support 255 keys, this field would be set to a value of 8.
+    ///
+    UINT32    MkTmeKeyidBits : 4;
+    UINT32    Reserved2      : 12;
+    ///
+    /// [Bit 63:48] MK_TME_CRYPTO_ALGS: Reserved if MKTME is not enumerated, otherwise:
+    ///   Bit 48: AES-XTS 128.
+    ///   Bit 49: AES-XTS 128 with integrity.
+    ///   Bit 50: AES-XTS 256.
+    ///   Bit 63:51: Reserved (#GP)
+    /// Bitmask for BIOS to set which encryption algorithms are allowed for MKTME, would
+    /// be later enforced by the key loading ISA ('1= allowed)
+    ///
+    UINT32    MkTmeCryptoAlgs : 16;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32    Uint32[2];
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64    Uint64;
+} MSR_IA32_TME_ACTIVATE_REGISTER;
 
 /**
   Silicon Debug Feature Control (R/W). If CPUID.01H:ECX.[11] = 1.

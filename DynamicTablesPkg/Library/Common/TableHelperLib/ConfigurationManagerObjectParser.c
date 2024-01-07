@@ -1,7 +1,7 @@
 /** @file
   Configuration Manager Object parser.
 
-  Copyright (c) 2021 - 2022, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2023, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -14,7 +14,7 @@
 STATIC
 VOID
 EFIAPI
-PrintOemId (
+PrintString (
   CONST CHAR8  *Format,
   UINT8        *Ptr
   );
@@ -22,7 +22,31 @@ PrintOemId (
 STATIC
 VOID
 EFIAPI
-PrintString (
+PrintStringPtr (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr
+  );
+
+STATIC
+VOID
+EFIAPI
+PrintChar4 (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr
+  );
+
+STATIC
+VOID
+EFIAPI
+PrintChar6 (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr
+  );
+
+STATIC
+VOID
+EFIAPI
+PrintChar8 (
   CONST CHAR8  *Format,
   UINT8        *Ptr
   );
@@ -59,7 +83,9 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicCInfoParser[] = {
   { "ProximityDomain",               4,                        "0x%x",   NULL },
   { "ClockDomain",                   4,                        "0x%x",   NULL },
   { "AffinityFlags",                 4,                        "0x%x",   NULL },
-  { "CpcToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
+  { "CpcToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "TRBEInterrupt",                 2,                        "0x%x",   NULL },
+  { "EtToken",                       sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
 };
 
 /** A parser for EArmObjGicDInfo.
@@ -190,16 +216,16 @@ STATIC CONST CM_OBJ_PARSER  CmArmItsGroupNodeParser[] = {
 /** A parser for EArmObjNamedComponent.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmNamedComponentNodeParser[] = {
-  { "Token",             sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
-  { "IdMappingCount",    4,                        "0x%x", NULL        },
-  { "IdMappingToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
-  { "Flags",             4,                        "0x%x", NULL        },
-  { "CacheCoherent",     4,                        "0x%x", NULL        },
-  { "AllocationHints",   1,                        "0x%x", NULL        },
-  { "MemoryAccessFlags", 1,                        "0x%x", NULL        },
-  { "AddressSizeLimit",  1,                        "0x%x", NULL        },
-  { "ObjectName",        sizeof (CHAR8 *),         NULL,   PrintString },
-  { "Identifier",        4,                        "0x%x", NULL        },
+  { "Token",             sizeof (CM_OBJECT_TOKEN), "0x%p", NULL           },
+  { "IdMappingCount",    4,                        "0x%x", NULL           },
+  { "IdMappingToken",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL           },
+  { "Flags",             4,                        "0x%x", NULL           },
+  { "CacheCoherent",     4,                        "0x%x", NULL           },
+  { "AllocationHints",   1,                        "0x%x", NULL           },
+  { "MemoryAccessFlags", 1,                        "0x%x", NULL           },
+  { "AddressSizeLimit",  1,                        "0x%x", NULL           },
+  { "ObjectName",        sizeof (CHAR8 *),         NULL,   PrintStringPtr },
+  { "Identifier",        4,                        "0x%x", NULL           },
 };
 
 /** A parser for EArmObjRootComplex.
@@ -637,6 +663,12 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType5InfoParser[] = {
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
 };
 
+/** A parser for EArmObjEtInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmEtInfo[] = {
+  { "EtType", sizeof (ARM_ET_TYPE), "0x%x", NULL }
+};
+
 /** A parser for Arm namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
@@ -733,6 +765,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmPccSubspaceType34InfoParser) },
   { "EArmObjPccSubspaceType5Info",         CmArmPccSubspaceType5InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType5InfoParser) },
+  { "EArmObjEtInfo",                       CmArmEtInfo,
+    ARRAY_SIZE (CmArmEtInfo) },
   { "EArmObjMax",                          NULL,                                  0                                },
 };
 
@@ -740,19 +774,19 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
 */
 STATIC CONST CM_OBJ_PARSER  StdObjCfgMgrInfoParser[] = {
   { "Revision", 4, "0x%x",         NULL       },
-  { "OemId[6]", 6, "%C%C%C%C%C%C", PrintOemId }
+  { "OemId[6]", 6, "%c%c%c%c%c%c", PrintChar6 }
 };
 
 /** A parser for EStdObjAcpiTableList.
 */
 STATIC CONST CM_OBJ_PARSER  StdObjAcpiTableInfoParser[] = {
-  { "AcpiTableSignature", 4,                                      "0x%x",   NULL },
-  { "AcpiTableRevision",  1,                                      "%d",     NULL },
-  { "TableGeneratorId",   sizeof (ACPI_TABLE_GENERATOR_ID),       "0x%x",   NULL },
-  { "AcpiTableData",      sizeof (EFI_ACPI_DESCRIPTION_HEADER *), "0x%p",   NULL },
-  { "OemTableId",         8,                                      "0x%LLX", NULL },
-  { "OemRevision",        4,                                      "0x%x",   NULL },
-  { "MinorRevision",      1,                                      "0x%x",   NULL },
+  { "AcpiTableSignature", 4,                                      "%c%c%c%c",         PrintChar4 },
+  { "AcpiTableRevision",  1,                                      "%d",               NULL       },
+  { "TableGeneratorId",   sizeof (ACPI_TABLE_GENERATOR_ID),       "0x%x",             NULL       },
+  { "AcpiTableData",      sizeof (EFI_ACPI_DESCRIPTION_HEADER *), "0x%p",             NULL       },
+  { "OemTableId",         8,                                      "%c%c%c%c%c%c%c%c", PrintChar8 },
+  { "OemRevision",        4,                                      "0x%x",             NULL       },
+  { "MinorRevision",      1,                                      "0x%x",             NULL       },
 };
 
 /** A parser for EStdObjSmbiosTableList.
@@ -771,34 +805,10 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  StdNamespaceObjectParser[] = {
     ARRAY_SIZE (StdObjAcpiTableInfoParser) },
   { "EStdObjSmbiosTableList", StdObjSmbiosTableInfoParser,
     ARRAY_SIZE (StdObjSmbiosTableInfoParser) },
+  { "EStdObjMax",             NULL,                       0}
 };
 
-/** Print OEM Id.
-
-  @param [in]  Format  Format to print the Ptr.
-  @param [in]  Ptr     Pointer to the OEM Id.
-**/
-STATIC
-VOID
-EFIAPI
-PrintOemId (
-  IN  CONST CHAR8  *Format,
-  IN  UINT8        *Ptr
-  )
-{
-  DEBUG ((
-    DEBUG_ERROR,
-    (Format != NULL) ? Format : "%C%C%C%C%C%C",
-    Ptr[0],
-    Ptr[1],
-    Ptr[2],
-    Ptr[3],
-    Ptr[4],
-    Ptr[5]
-    ));
-}
-
-/** Print string.
+/** Print string data.
 
   The string must be NULL terminated.
 
@@ -809,11 +819,122 @@ STATIC
 VOID
 EFIAPI
 PrintString (
-  CONST CHAR8  *Format,
-  UINT8        *Ptr
+  IN CONST CHAR8  *Format,
+  IN UINT8        *Ptr
   )
 {
+  if (Ptr == NULL) {
+    ASSERT (0);
+    return;
+  }
+
   DEBUG ((DEBUG_ERROR, "%a", Ptr));
+}
+
+/** Print string from pointer.
+
+  The string must be NULL terminated.
+
+  @param [in]  Format      Format to print the string.
+  @param [in]  Ptr         Pointer to the string pointer.
+**/
+STATIC
+VOID
+EFIAPI
+PrintStringPtr (
+  IN CONST CHAR8  *Format,
+  IN UINT8        *Ptr
+  )
+{
+  UINT8  *String;
+
+  if (Ptr == NULL) {
+    ASSERT (0);
+    return;
+  }
+
+  String = *(UINT8 **)Ptr;
+
+  if (String == NULL) {
+    String = (UINT8 *)"(NULLPTR)";
+  }
+
+  PrintString (Format, String);
+}
+
+/** Print 4 characters.
+
+  @param [in]  Format  Format to print the Ptr.
+  @param [in]  Ptr     Pointer to the characters.
+**/
+STATIC
+VOID
+EFIAPI
+PrintChar4 (
+  IN  CONST CHAR8  *Format,
+  IN  UINT8        *Ptr
+  )
+{
+  DEBUG ((
+    DEBUG_ERROR,
+    (Format != NULL) ? Format : "%c%c%c%c",
+    Ptr[0],
+    Ptr[1],
+    Ptr[2],
+    Ptr[3]
+    ));
+}
+
+/** Print 6 characters.
+
+  @param [in]  Format  Format to print the Ptr.
+  @param [in]  Ptr     Pointer to the characters.
+**/
+STATIC
+VOID
+EFIAPI
+PrintChar6 (
+  IN  CONST CHAR8  *Format,
+  IN  UINT8        *Ptr
+  )
+{
+  DEBUG ((
+    DEBUG_ERROR,
+    (Format != NULL) ? Format : "%c%c%c%c%c%c",
+    Ptr[0],
+    Ptr[1],
+    Ptr[2],
+    Ptr[3],
+    Ptr[4],
+    Ptr[5]
+    ));
+}
+
+/** Print 8 characters.
+
+  @param [in]  Format  Format to print the Ptr.
+  @param [in]  Ptr     Pointer to the characters.
+**/
+STATIC
+VOID
+EFIAPI
+PrintChar8 (
+  IN  CONST CHAR8  *Format,
+  IN  UINT8        *Ptr
+  )
+{
+  DEBUG ((
+    DEBUG_ERROR,
+    (Format != NULL) ? Format : "%c%c%c%c%c%c%c%c",
+    Ptr[0],
+    Ptr[1],
+    Ptr[2],
+    Ptr[3],
+    Ptr[4],
+    Ptr[5],
+    Ptr[6],
+    Ptr[7]
+    ));
 }
 
 /** Print fields of the objects.
@@ -855,7 +976,7 @@ PrintCmObjDesc (
     *RemainingSize -= Parser[Index].Length;
     if (*RemainingSize < 0) {
       DEBUG ((
-        DEBUG_ERROR,
+        DEBUG_INFO,
         "\nERROR: %a: Buffer overrun\n",
         Parser[Index].NameStr
         ));
@@ -865,11 +986,11 @@ PrintCmObjDesc (
 
     // Indentation
     for (IndentIndex = 0; IndentIndex < IndentLevel; IndentIndex++) {
-      DEBUG ((DEBUG_ERROR, "  "));
+      DEBUG ((DEBUG_INFO, "  "));
     }
 
     DEBUG ((
-      DEBUG_ERROR,
+      DEBUG_INFO,
       "%-*a :",
       OUTPUT_FIELD_COLUMN_WIDTH - 2 * IndentLevel,
       Parser[Index].NameStr
@@ -879,20 +1000,20 @@ PrintCmObjDesc (
     } else if (Parser[Index].Format != NULL) {
       switch (Parser[Index].Length) {
         case 1:
-          DEBUG ((DEBUG_ERROR, Parser[Index].Format, *(UINT8 *)Data));
+          DEBUG ((DEBUG_INFO, Parser[Index].Format, *(UINT8 *)Data));
           break;
         case 2:
-          DEBUG ((DEBUG_ERROR, Parser[Index].Format, *(UINT16 *)Data));
+          DEBUG ((DEBUG_INFO, Parser[Index].Format, *(UINT16 *)Data));
           break;
         case 4:
-          DEBUG ((DEBUG_ERROR, Parser[Index].Format, *(UINT32 *)Data));
+          DEBUG ((DEBUG_INFO, Parser[Index].Format, *(UINT32 *)Data));
           break;
         case 8:
-          DEBUG ((DEBUG_ERROR, Parser[Index].Format, ReadUnaligned64 (Data)));
+          DEBUG ((DEBUG_INFO, Parser[Index].Format, ReadUnaligned64 (Data)));
           break;
         default:
           DEBUG ((
-            DEBUG_ERROR,
+            DEBUG_INFO,
             "\nERROR: %a: CANNOT PARSE THIS FIELD, Field Length = %d\n",
             Parser[Index].NameStr,
             Parser[Index].Length
@@ -901,7 +1022,7 @@ PrintCmObjDesc (
     } else if (Parser[Index].SubObjParser != NULL) {
       SubStructSize = Parser[Index].Length;
 
-      DEBUG ((DEBUG_ERROR, "\n"));
+      DEBUG ((DEBUG_INFO, "\n"));
       PrintCmObjDesc (
         Data,
         Parser[Index].SubObjParser,
@@ -912,14 +1033,14 @@ PrintCmObjDesc (
     } else {
       ASSERT (0);
       DEBUG ((
-        DEBUG_ERROR,
+        DEBUG_INFO,
         "\nERROR: %a: CANNOT PARSE THIS FIELD, Field Length = %d\n",
         Parser[Index].NameStr,
         Parser[Index].Length
         ));
     }
 
-    DEBUG ((DEBUG_ERROR, "\n"));
+    DEBUG ((DEBUG_INFO, "\n"));
     Data = (UINT8 *)Data + Parser[Index].Length;
   } // for
 }
@@ -956,6 +1077,12 @@ ParseCmObjDesc (
         return;
       }
 
+      if (ObjId >= ARRAY_SIZE (StdNamespaceObjectParser)) {
+        DEBUG ((DEBUG_ERROR, "ObjId 0x%x is missing from the StdNamespaceObjectParser array\n", ObjId));
+        ASSERT (0);
+        return;
+      }
+
       ParserArray = &StdNamespaceObjectParser[ObjId];
       break;
     case EObjNameSpaceArm:
@@ -964,10 +1091,17 @@ ParseCmObjDesc (
         return;
       }
 
+      if (ObjId >= ARRAY_SIZE (ArmNamespaceObjectParser)) {
+        DEBUG ((DEBUG_ERROR, "ObjId 0x%x is missing from the ArmNamespaceObjectParser array\n", ObjId));
+        ASSERT (0);
+        return;
+      }
+
       ParserArray = &ArmNamespaceObjectParser[ObjId];
       break;
     default:
       // Not supported
+      DEBUG ((DEBUG_ERROR, "NameSpaceId 0x%x, ObjId 0x%x is not supported by the parser\n", NameSpaceId, ObjId));
       ASSERT (0);
       return;
   } // switch
@@ -978,28 +1112,33 @@ ParseCmObjDesc (
 
   for (ObjIndex = 0; ObjIndex < ObjectCount; ObjIndex++) {
     DEBUG ((
-      DEBUG_ERROR,
+      DEBUG_INFO,
       "\n%-*a [%d/%d]:\n",
       OUTPUT_FIELD_COLUMN_WIDTH,
       ParserArray->ObjectName,
       ObjIndex + 1,
       ObjectCount
       ));
-    PrintCmObjDesc (
-      (VOID *)((UINTN)CmObjDesc->Data + Offset),
-      ParserArray->Parser,
-      ParserArray->ItemCount,
-      &RemainingSize,
-      1
-      );
-    if ((RemainingSize > CmObjDesc->Size) ||
-        (RemainingSize < 0))
-    {
-      ASSERT (0);
-      return;
-    }
+    if (ParserArray->Parser == NULL) {
+      DEBUG ((DEBUG_ERROR, "Parser not implemented\n"));
+      RemainingSize = 0;
+    } else {
+      PrintCmObjDesc (
+        (VOID *)((UINTN)CmObjDesc->Data + Offset),
+        ParserArray->Parser,
+        ParserArray->ItemCount,
+        &RemainingSize,
+        1
+        );
+      if ((RemainingSize > (INTN)CmObjDesc->Size) ||
+          (RemainingSize < 0))
+      {
+        ASSERT (0);
+        return;
+      }
 
-    Offset = CmObjDesc->Size - RemainingSize;
+      Offset = CmObjDesc->Size - RemainingSize;
+    }
   } // for
 
   ASSERT (RemainingSize == 0);

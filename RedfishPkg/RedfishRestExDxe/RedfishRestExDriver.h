@@ -3,6 +3,7 @@
 
   Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -84,7 +85,7 @@ struct _RESTEX_SERVICE {
   //
   EFI_HANDLE                      HttpChildHandle;
 
-  UINT32                          Id;
+  UINT32                          *Id;
 
   EFI_REST_EX_SERVICE_INFO        RestExServiceInfo;
 };

@@ -18,13 +18,6 @@ EarlyBspInitReal16:
     jmp     short Main16
 
 ;
-; @param[out] DI    'AP' to indicate application processor
-;
-EarlyApInitReal16:
-    mov     di, 'AP'
-    jmp     short Main16
-
-;
 ; Modified:  EAX
 ;
 ; @param[in]  EAX   Initial value of the EAX register (BIST: Built-in Self Test)

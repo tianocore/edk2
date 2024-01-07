@@ -40,7 +40,7 @@ FindContextBufferInModuleBuffers (
 {
   UINTN  Index;
 
-  DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __func__));
 
   if ((HandlerGuid == NULL) || (ModuleContextBuffers == NULL) || (ContextBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -89,7 +89,7 @@ GetModuleContextBuffers (
   PRM_CONFIG_PROTOCOL       *PrmConfigProtocol;
   CONST PRM_CONTEXT_BUFFER  *PrmContextBuffer;
 
-  DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __func__));
 
   if ((Guid == NULL) || (PrmModuleContextBuffers == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -122,7 +122,7 @@ GetModuleContextBuffers (
             DEBUG_INFO,
             "      %a %a: Found a PRM configuration protocol for PRM module %g.\n",
             _DBGMSGID_,
-            __FUNCTION__,
+            __func__,
             Guid
             ));
 
@@ -143,7 +143,7 @@ GetModuleContextBuffers (
     DEBUG_INFO,
     "      %a %a: Could not locate a PRM configuration protocol for PRM handler %g.\n",
     _DBGMSGID_,
-    __FUNCTION__,
+    __func__,
     Guid
     ));
 
@@ -176,7 +176,7 @@ GetContextBuffer (
   EFI_STATUS                        Status;
   CONST PRM_MODULE_CONTEXT_BUFFERS  *ContextBuffers;
 
-  DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "    %a %a - Entry.\n", _DBGMSGID_, __func__));
 
   if ((PrmHandlerGuid == NULL) || (PrmContextBuffer == NULL)) {
     return EFI_INVALID_PARAMETER;

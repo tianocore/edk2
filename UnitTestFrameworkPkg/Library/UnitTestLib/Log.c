@@ -118,7 +118,7 @@ UnitTestLogInit (
   // Make sure that you're cooking with gas.
   //
   if (Test == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a called with invalid Test parameter\n", __FUNCTION__));
+    DEBUG ((DEBUG_ERROR, "%a called with invalid Test parameter\n", __func__));
     return;
   }
 

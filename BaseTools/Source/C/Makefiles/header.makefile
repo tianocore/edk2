@@ -8,6 +8,8 @@
 # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 
+EDK2_PATH ?= $(MAKEROOT)/../../..
+
 ifndef HOST_ARCH
   #
   # If HOST_ARCH is not defined, then we use 'uname -m' to attempt
@@ -44,71 +46,73 @@ endif
 CYGWIN:=$(findstring CYGWIN, $(shell uname -s))
 LINUX:=$(findstring Linux, $(shell uname -s))
 DARWIN:=$(findstring Darwin, $(shell uname -s))
-ifeq ($(CXX), llvm)
-BUILD_CC ?= $(CLANG_BIN)clang
-BUILD_CXX ?= $(CLANG_BIN)clang++
-BUILD_AS ?= $(CLANG_BIN)clang
-BUILD_AR ?= $(CLANG_BIN)llvm-ar
-BUILD_LD ?= $(CLANG_BIN)llvm-ld
-else
-BUILD_CC ?= gcc
-BUILD_CXX ?= g++
-BUILD_AS ?= gcc
-BUILD_AR ?= ar
-BUILD_LD ?= ld
+CLANG:=$(shell $(CC) --version | grep clang)
+ifneq ($(CLANG),)
+CC ?= $(CLANG_BIN)clang
+CXX ?= $(CLANG_BIN)clang++
+AS ?= $(CLANG_BIN)clang
+AR ?= $(CLANG_BIN)llvm-ar
+LD ?= $(CLANG_BIN)llvm-ld
+else ifeq ($(origin CC),default)
+CC = gcc
+CXX = g++
+AS = gcc
+AR = ar
+LD = ld
 endif
-LINKER ?= $(BUILD_CC)
+LINKER ?= $(CC)
 ifeq ($(HOST_ARCH), IA32)
-ARCH_INCLUDE = -I $(MAKEROOT)/Include/Ia32/
+ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/Ia32/
 
 else ifeq ($(HOST_ARCH), X64)
-ARCH_INCLUDE = -I $(MAKEROOT)/Include/X64/
+ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/X64/
 
 else ifeq ($(HOST_ARCH), ARM)
-ARCH_INCLUDE = -I $(MAKEROOT)/Include/Arm/
+ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/Arm/
 
 else ifeq ($(HOST_ARCH), AARCH64)
-ARCH_INCLUDE = -I $(MAKEROOT)/Include/AArch64/
+ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/AArch64/
 
 else ifeq ($(HOST_ARCH), RISCV64)
-ARCH_INCLUDE = -I $(MAKEROOT)/Include/RiscV64/
+ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/RiscV64/
 
 else ifeq ($(HOST_ARCH), LOONGARCH64)
-ARCH_INCLUDE = -I $(MAKEROOT)/Include/LoongArch64/
+ARCH_INCLUDE = -I $(EDK2_PATH)/MdePkg/Include/LoongArch64/
 
 else
 $(error Bad HOST_ARCH)
 endif
 
 INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE)
-BUILD_CPPFLAGS = $(INCLUDE)
+INCLUDE += -I $(EDK2_PATH)/MdePkg/Include
+CPPFLAGS = $(INCLUDE)
 
 # keep EXTRA_OPTFLAGS last
 BUILD_OPTFLAGS = -O2 $(EXTRA_OPTFLAGS)
 
 ifeq ($(DARWIN),Darwin)
 # assume clang or clang compatible flags on OS X
-BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
+CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror \
 -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -g
 else
-ifeq ($(CXX), llvm)
-BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
+ifneq ($(CLANG),)
+CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
 -fno-delete-null-pointer-checks -Wall -Werror \
 -Wno-deprecated-declarations -Wno-self-assign \
 -Wno-unused-result -nostdlib -g
 else
-BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
+CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
 -fno-delete-null-pointer-checks -Wall -Werror \
 -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict \
 -Wno-unused-result -nostdlib -g
 endif
 endif
-ifeq ($(CXX), llvm)
-BUILD_LFLAGS =
-BUILD_CXXFLAGS = -Wno-deprecated-register -Wno-unused-result
+ifneq ($(CLANG),)
+LDFLAGS =
+CXXFLAGS = -Wno-deprecated-register -Wno-unused-result -std=c++14
 else
-BUILD_LFLAGS =
-BUILD_CXXFLAGS = -Wno-unused-result
+LDFLAGS =
+CXXFLAGS = -Wno-unused-result
 endif
 ifeq ($(HOST_ARCH), IA32)
 #
@@ -117,18 +121,18 @@ ifeq ($(HOST_ARCH), IA32)
 #  so only do this is uname -m returns i386.
 #
 ifeq ($(DARWIN),Darwin)
-  BUILD_CFLAGS   += -arch i386
-  BUILD_CPPFLAGS += -arch i386
-  BUILD_LFLAGS   += -arch i386
+  CFLAGS   += -arch i386
+  CPPFLAGS += -arch i386
+  LDFLAGS  += -arch i386
 endif
 endif
 
 # keep BUILD_OPTFLAGS last
-BUILD_CFLAGS   += $(BUILD_OPTFLAGS)
-BUILD_CXXFLAGS += $(BUILD_OPTFLAGS)
+CFLAGS   += $(BUILD_OPTFLAGS)
+CXXFLAGS += $(BUILD_OPTFLAGS)
 
 # keep EXTRA_LDFLAGS last
-BUILD_LFLAGS += $(EXTRA_LDFLAGS)
+LDFLAGS += $(EXTRA_LDFLAGS)
 
 .PHONY: all
 .PHONY: install

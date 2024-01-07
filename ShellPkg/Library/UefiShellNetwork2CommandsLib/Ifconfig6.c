@@ -382,7 +382,7 @@ IfConfig6PrintIpAddr (
 
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG6_INFO_COLON), gShellNetwork2HiiHandle);
 
-      while ((Ip->Addr[Index] == 0) && (Ip->Addr[Index + 1] == 0) && (Index < PREFIXMAXLEN)) {
+      while ((Index < PREFIXMAXLEN) && (Ip->Addr[Index] == 0) && (Ip->Addr[Index + 1] == 0)) {
         Index = Index + 2;
         if (Index > PREFIXMAXLEN - 2) {
           break;

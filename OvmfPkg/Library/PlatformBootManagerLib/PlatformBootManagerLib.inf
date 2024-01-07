@@ -61,6 +61,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdEmuVariableEvent
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
+  gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate         ## CONSUMES
@@ -74,6 +75,7 @@
 [Protocols]
   gEfiDecompressProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
+  gVirtioDeviceProtocolGuid
   gEfiS3SaveStateProtocolGuid                   # PROTOCOL SOMETIMES_CONSUMED
   gEfiDxeSmmReadyToLockProtocolGuid             # PROTOCOL SOMETIMES_PRODUCED
   gEfiLoadedImageProtocolGuid                   # PROTOCOL SOMETIMES_PRODUCED
@@ -84,3 +86,4 @@
   gEfiGlobalVariableGuid
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
+  gGrubFileGuid

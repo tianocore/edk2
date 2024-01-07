@@ -1072,14 +1072,18 @@ SmbiosCreateTable (
     DEBUG ((DEBUG_INFO, "SmbiosCreateTable: Initialize 32-bit entry point structure\n"));
     EntryPointStructureData.MajorVersion      = mPrivateData.Smbios.MajorVersion;
     EntryPointStructureData.MinorVersion      = mPrivateData.Smbios.MinorVersion;
-    EntryPointStructureData.SmbiosBcdRevision = (UINT8)((PcdGet16 (PcdSmbiosVersion) >> 4) & 0xf0) | (UINT8)(PcdGet16 (PcdSmbiosVersion) & 0x0f);
-    PhysicalAddress                           = 0xffffffff;
-    Status                                    = gBS->AllocatePages (
-                                                       AllocateMaxAddress,
-                                                       EfiRuntimeServicesData,
-                                                       EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
-                                                       &PhysicalAddress
-                                                       );
+    EntryPointStructureData.SmbiosBcdRevision = 0;
+    if ((mPrivateData.Smbios.MajorVersion <= 9) && (mPrivateData.Smbios.MinorVersion <= 9)) {
+      EntryPointStructureData.SmbiosBcdRevision = ((mPrivateData.Smbios.MajorVersion & 0x0f) << 4) | (mPrivateData.Smbios.MinorVersion & 0x0f);
+    }
+
+    PhysicalAddress = 0xffffffff;
+    Status          = gBS->AllocatePages (
+                             AllocateMaxAddress,
+                             EfiRuntimeServicesData,
+                             EFI_SIZE_TO_PAGES (sizeof (SMBIOS_TABLE_ENTRY_POINT)),
+                             &PhysicalAddress
+                             );
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "SmbiosCreateTable () could not allocate EntryPointStructure < 4GB\n"));
       Status = gBS->AllocatePages (
@@ -1157,7 +1161,7 @@ SmbiosCreateTable (
     DEBUG ((
       DEBUG_INFO,
       "%a() re-allocate SMBIOS 32-bit table\n",
-      __FUNCTION__
+      __func__
       ));
     if (EntryPointStructure->TableAddress != 0) {
       //
@@ -1329,7 +1333,7 @@ SmbiosCreate64BitTable (
     DEBUG ((
       DEBUG_INFO,
       "%a() re-allocate SMBIOS 64-bit table\n",
-      __FUNCTION__
+      __func__
       ));
     if (Smbios30EntryPointStructure->TableAddress != 0) {
       //
@@ -1608,9 +1612,7 @@ ParseAndAddExistingSmbiosTable (
     //
     // Make sure not to access memory beyond SmbiosEnd
     //
-    if ((Smbios.Raw + sizeof (SMBIOS_STRUCTURE) > SmbiosEnd.Raw) ||
-        (Smbios.Raw + sizeof (SMBIOS_STRUCTURE) < Smbios.Raw))
-    {
+    if ((UINTN)(SmbiosEnd.Raw - Smbios.Raw) < sizeof (SMBIOS_STRUCTURE)) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -1625,9 +1627,7 @@ ParseAndAddExistingSmbiosTable (
     // Make sure not to access memory beyond SmbiosEnd
     // Each structure shall be terminated by a double-null (0000h).
     //
-    if ((Smbios.Raw + Smbios.Hdr->Length + 2 * sizeof (UINT8) > SmbiosEnd.Raw) ||
-        (Smbios.Raw + Smbios.Hdr->Length + 2 * sizeof (UINT8) < Smbios.Raw))
-    {
+    if ((UINTN)(SmbiosEnd.Raw - Smbios.Raw) < (Smbios.Hdr->Length + 2U)) {
       return EFI_INVALID_PARAMETER;
     }
 

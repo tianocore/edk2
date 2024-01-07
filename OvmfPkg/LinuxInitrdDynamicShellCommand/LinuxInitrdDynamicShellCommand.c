@@ -204,7 +204,7 @@ CacheInitrdFile (
     DEBUG ((
       DEBUG_WARN,
       "%a: failed to read initrd file - %r 0x%lx 0x%lx\n",
-      __FUNCTION__,
+      __func__,
       Status,
       (UINT64)ReadSize,
       FileSize

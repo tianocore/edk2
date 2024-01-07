@@ -641,7 +641,7 @@ SdMmcPciHcDriverBindingStart (
       DEBUG ((
         DEBUG_INFO,
         "%a: found SD/MMC override protocol\n",
-        __FUNCTION__
+        __func__
         ));
     }
   }
@@ -676,7 +676,7 @@ SdMmcPciHcDriverBindingStart (
           DEBUG ((
             DEBUG_WARN,
             "%a: Failed to override capability - %r\n",
-            __FUNCTION__,
+            __func__,
             Status
             ));
           continue;
@@ -691,7 +691,7 @@ SdMmcPciHcDriverBindingStart (
                               (VOID *)&Private->Slot[Slot].OperatingParameters
                               );
         if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_WARN, "%a: Failed to get operating parameters, using defaults\n", __FUNCTION__));
+          DEBUG ((DEBUG_WARN, "%a: Failed to get operating parameters, using defaults\n", __func__));
         }
       }
     }

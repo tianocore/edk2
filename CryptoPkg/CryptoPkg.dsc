@@ -364,6 +364,14 @@
   CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
+  CryptoPkg/Library/BaseCryptLibMbedTls/BaseCryptLib.inf
+  CryptoPkg/Library/BaseCryptLibMbedTls/SecCryptLib.inf
+  CryptoPkg/Library/BaseCryptLibMbedTls/PeiCryptLib.inf
+  CryptoPkg/Library/BaseCryptLibMbedTls/SmmCryptLib.inf
+  CryptoPkg/Library/BaseCryptLibMbedTls/RuntimeCryptLib.inf
+  CryptoPkg/Library/BaseCryptLibMbedTls/TestBaseCryptLib.inf
+  CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
+  CryptoPkg/Library/MbedTlsLib/MbedTlsLibFull.inf
   CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
   CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   CryptoPkg/Library/TlsLib/TlsLib.inf
@@ -456,8 +464,8 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
     <BuildOptions>
-      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
-      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
   }
 !endif
 
@@ -522,8 +530,8 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
     <BuildOptions>
-      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
-      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
   }
   #
   # CryptoSmm with OpensslLib instance with no SSL or EC services
@@ -575,8 +583,8 @@
     <LibraryClasses>
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
     <BuildOptions>
-      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:64
-      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
+      MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
+      MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
   }
 !endif
 

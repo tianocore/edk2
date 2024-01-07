@@ -3,6 +3,8 @@
 #
 # Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2021 Hewlett-Packard Enterprise Development LP.
+# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -34,12 +36,19 @@
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   RedfishPlatformHostInterfaceLib|RedfishPkg/Library/PlatformHostInterfaceLibNull/PlatformHostInterfaceLibNull.inf
+  RedfishPlatformHostInterfaceLib|RedfishPkg/Library/PlatformHostInterfaceBmcUsbNicLib/PlatformHostInterfaceBmcUsbNicLib.inf
   HttpLib|NetworkPkg/Library/DxeHttpLib/DxeHttpLib.inf
   HttpIoLib|NetworkPkg/Library/DxeHttpIoLib/DxeHttpIoLib.inf
   NetLib|NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
   DpcLib|NetworkPkg/Library/DxeDpcLib/DxeDpcLib.inf
+  HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
+  UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   RedfishPlatformCredentialLib|RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
   RedfishContentCodingLib|RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
+
+  # NULL instance of IPMI related library.
+  IpmiLib|MdeModulePkg/Library/BaseIpmiLibNull/BaseIpmiLibNull.inf
+  IpmiCommandLib|MdeModulePkg/Library/BaseIpmiCommandLibNull/BaseIpmiCommandLibNull.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
@@ -51,12 +60,17 @@
 
 [Components]
   RedfishPkg/Library/PlatformHostInterfaceLibNull/PlatformHostInterfaceLibNull.inf
+  RedfishPkg/Library/PlatformHostInterfaceBmcUsbNicLib/PlatformHostInterfaceBmcUsbNicLib.inf
   RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
+  RedfishPkg/Library/RedfishPlatformCredentialIpmiLib/RedfishPlatformCredentialIpmiLib.inf
   RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
   RedfishPkg/Library/DxeRestExLib/DxeRestExLib.inf
   RedfishPkg/Library/BaseUcs2Utf8Lib/BaseUcs2Utf8Lib.inf
   RedfishPkg/PrivateLibrary/RedfishCrtLib/RedfishCrtLib.inf
   RedfishPkg/Library/JsonLib/JsonLib.inf
   RedfishPkg/PrivateLibrary/RedfishLib/RedfishLib.inf
+  RedfishPkg/Library/RedfishDebugLib/RedfishDebugLib.inf
+  RedfishPkg/Library/HiiUtilityLib/HiiUtilityLib.inf
+  RedfishPkg/Library/RedfishPlatformConfigLib/RedfishPlatformConfigLib.inf
 
   !include RedfishPkg/Redfish.dsc.inc

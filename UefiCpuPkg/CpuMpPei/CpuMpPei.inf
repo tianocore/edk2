@@ -1,7 +1,7 @@
 ## @file
 #  CPU driver installs CPU PI Multi-processor PPI.
 #
-#  Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -46,9 +46,11 @@
   BaseMemoryLib
   CpuLib
   MemoryAllocationLib
+  CpuPageTableLib
 
 [Guids]
   gEdkiiMigratedFvInfoGuid                                             ## SOMETIMES_CONSUMES     ## HOB
+  gMpInformationHobGuid2                        ## PRODUCES
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid                      ## PRODUCES

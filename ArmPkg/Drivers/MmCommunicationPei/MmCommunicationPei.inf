@@ -1,0 +1,40 @@
+## @file -- MmCommunicationPei.inf
+#  PEI MM Communicate driver
+#
+#  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = MmCommunicationPei
+  FILE_GUID                      = 58FFB346-1B75-42C7-AD69-37C652423C1A
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MmCommunicationPeiInitialize
+
+[Sources]
+  MmCommunicationPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  ArmSmcLib
+  PeimEntryPoint
+  PeiServicesLib
+  HobLib
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdMmBufferBase
+  gArmTokenSpaceGuid.PcdMmBufferSize
+
+[Ppis]
+  gEfiPeiMmCommunicationPpiGuid     ## PRODUCES
+
+[Depex]
+  TRUE

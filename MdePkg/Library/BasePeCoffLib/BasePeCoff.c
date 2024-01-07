@@ -308,10 +308,11 @@ PeCoffLoaderGetPeHeader (
       //
       // Use PE32 offset
       //
-      ImageContext->ImageType        = Hdr.Pe32->OptionalHeader.Subsystem;
-      ImageContext->ImageSize        = (UINT64)Hdr.Pe32->OptionalHeader.SizeOfImage;
-      ImageContext->SectionAlignment = Hdr.Pe32->OptionalHeader.SectionAlignment;
-      ImageContext->SizeOfHeaders    = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
+      ImageContext->ImageType          = Hdr.Pe32->OptionalHeader.Subsystem;
+      ImageContext->ImageSize          = (UINT64)Hdr.Pe32->OptionalHeader.SizeOfImage;
+      ImageContext->SectionAlignment   = Hdr.Pe32->OptionalHeader.SectionAlignment;
+      ImageContext->SizeOfHeaders      = Hdr.Pe32->OptionalHeader.SizeOfHeaders;
+      ImageContext->DllCharacteristics = Hdr.Pe32->OptionalHeader.DllCharacteristics;
     } else if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
       //
       // 1. Check FileHeader.NumberOfRvaAndSizes filed.
@@ -429,10 +430,11 @@ PeCoffLoaderGetPeHeader (
       //
       // Use PE32+ offset
       //
-      ImageContext->ImageType        = Hdr.Pe32Plus->OptionalHeader.Subsystem;
-      ImageContext->ImageSize        = (UINT64)Hdr.Pe32Plus->OptionalHeader.SizeOfImage;
-      ImageContext->SectionAlignment = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
-      ImageContext->SizeOfHeaders    = Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders;
+      ImageContext->ImageType          = Hdr.Pe32Plus->OptionalHeader.Subsystem;
+      ImageContext->ImageSize          = (UINT64)Hdr.Pe32Plus->OptionalHeader.SizeOfImage;
+      ImageContext->SectionAlignment   = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;
+      ImageContext->SizeOfHeaders      = Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders;
+      ImageContext->DllCharacteristics = Hdr.Pe32Plus->OptionalHeader.DllCharacteristics;
     } else {
       ImageContext->ImageError = IMAGE_ERROR_INVALID_MACHINE_TYPE;
       return RETURN_UNSUPPORTED;
@@ -545,8 +547,9 @@ PeCoffLoaderGetPeHeader (
   Retrieves information about a PE/COFF image.
 
   Computes the PeCoffHeaderOffset, IsTeImage, ImageType, ImageAddress, ImageSize,
-  DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders, and
-  DebugDirectoryEntryRva fields of the ImageContext structure.
+  DestinationAddress, RelocationsStripped, SectionAlignment, SizeOfHeaders,
+  DllCharacteristics, DllCharacteristicsEx and DebugDirectoryEntryRva fields of
+  the ImageContext structure.
   If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.
   If the PE/COFF image accessed through the ImageRead service in the ImageContext
   structure is not a supported PE/COFF image type, then return RETURN_UNSUPPORTED.
@@ -582,6 +585,7 @@ PeCoffLoaderGetImageInfo (
   UINTN                                Size;
   UINTN                                ReadSize;
   UINTN                                Index;
+  UINTN                                NextIndex;
   UINTN                                DebugDirectoryEntryRva;
   UINTN                                DebugDirectoryEntryFileOffset;
   UINTN                                SectionHeaderOffset;
@@ -752,7 +756,42 @@ PeCoffLoaderGetImageInfo (
               ImageContext->ImageSize += DebugEntry.SizeOfData;
             }
 
-            return RETURN_SUCCESS;
+            //
+            // Implementations of GenFw before commit 60e85a39fe49071 will
+            // concatenate the debug directory entry and the codeview entry,
+            // and erroneously put the combined size into the debug directory's
+            // size field. If this is the case, no other relevant directory
+            // entries can exist, and we can terminate here.
+            //
+            NextIndex = Index + sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+            if ((NextIndex < DebugDirectoryEntry->Size) &&
+                (DebugEntry.FileOffset == (DebugDirectoryEntryFileOffset + NextIndex)))
+            {
+              break;
+            }
+
+            continue;
+          }
+
+          if (DebugEntry.Type == EFI_IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS) {
+            Size     = sizeof (EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY);
+            ReadSize = sizeof (EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY);
+            Status   = ImageContext->ImageRead (
+                                       ImageContext->Handle,
+                                       DebugEntry.FileOffset,
+                                       &Size,
+                                       &ImageContext->DllCharacteristicsEx
+                                       );
+            if (RETURN_ERROR (Status) || (Size != ReadSize)) {
+              ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
+              if (Size != ReadSize) {
+                Status = RETURN_UNSUPPORTED;
+              }
+
+              return Status;
+            }
+
+            continue;
           }
         }
       }

@@ -75,7 +75,7 @@ Q35TsegMbytesInitialization (
   DEBUG ((
     DEBUG_INFO,
     "%a: QEMU offers an extended TSEG (%d MB)\n",
-    __FUNCTION__,
+    __func__,
     ExtendedTsegMbytes
     ));
   PcdStatus = PcdSet16S (PcdQ35TsegMbytes, ExtendedTsegMbytes);
@@ -89,32 +89,22 @@ Q35SmramAtDefaultSmbaseInitialization (
   )
 {
   RETURN_STATUS  PcdStatus;
+  UINTN          CtlReg;
+  UINT8          CtlRegVal;
 
   ASSERT (PlatformInfoHob->HostBridgeDevId == INTEL_Q35_MCH_DEVICE_ID);
 
-  PlatformInfoHob->Q35SmramAtDefaultSmbase = FALSE;
-  if (FeaturePcdGet (PcdCsmEnable)) {
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: SMRAM at default SMBASE not checked due to CSM\n",
-      __FUNCTION__
-      ));
-  } else {
-    UINTN  CtlReg;
-    UINT8  CtlRegVal;
-
-    CtlReg = DRAMC_REGISTER_Q35 (MCH_DEFAULT_SMBASE_CTL);
-    PciWrite8 (CtlReg, MCH_DEFAULT_SMBASE_QUERY);
-    CtlRegVal                                = PciRead8 (CtlReg);
-    PlatformInfoHob->Q35SmramAtDefaultSmbase = (BOOLEAN)(CtlRegVal ==
-                                                         MCH_DEFAULT_SMBASE_IN_RAM);
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: SMRAM at default SMBASE %a\n",
-      __FUNCTION__,
-      PlatformInfoHob->Q35SmramAtDefaultSmbase ? "found" : "not found"
-      ));
-  }
+  CtlReg = DRAMC_REGISTER_Q35 (MCH_DEFAULT_SMBASE_CTL);
+  PciWrite8 (CtlReg, MCH_DEFAULT_SMBASE_QUERY);
+  CtlRegVal                                = PciRead8 (CtlReg);
+  PlatformInfoHob->Q35SmramAtDefaultSmbase = (BOOLEAN)(CtlRegVal ==
+                                                       MCH_DEFAULT_SMBASE_IN_RAM);
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: SMRAM at default SMBASE %a\n",
+    __func__,
+    PlatformInfoHob->Q35SmramAtDefaultSmbase ? "found" : "not found"
+    ));
 
   PcdStatus = PcdSetBoolS (
                 PcdQ35SmramAtDefaultSmbase,
@@ -152,7 +142,7 @@ AddressWidthInitialization (
       DEBUG ((
         DEBUG_INFO,
         "%a: disabling 64-bit PCI host aperture\n",
-        __FUNCTION__
+        __func__
         ));
       PcdStatus = PcdSet64S (PcdPciMmio64Size, 0);
       ASSERT_RETURN_ERROR (PcdStatus);
@@ -175,7 +165,7 @@ AddressWidthInitialization (
     DEBUG ((
       DEBUG_INFO,
       "%a: Pci64Base=0x%Lx Pci64Size=0x%Lx\n",
-      __FUNCTION__,
+      __func__,
       PlatformInfoHob->PcdPciMmio64Base,
       PlatformInfoHob->PcdPciMmio64Size
       ));
@@ -307,7 +297,7 @@ PublishPeiMemory (
     DEBUG ((
       DEBUG_INFO,
       "%a: PhysMemAddressWidth=%d PeiMemoryCap=%u KB\n",
-      __FUNCTION__,
+      __func__,
       PlatformInfoHob->PhysMemAddressWidth,
       PeiMemoryCap >> 10
       ));

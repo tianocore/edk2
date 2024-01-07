@@ -45,7 +45,6 @@
   PcdLib
   DebugAgentLib
   CpuLib
-  UefiCpuLib
   PeCoffGetEntryPointLib
   PeCoffExtraActionLib
   CpuExceptionHandlerLib
@@ -53,6 +52,7 @@
   PeiServicesLib
   PeiServicesTablePointerLib
   HobLib
+  CpuPageTableLib
 
 [Ppis]
   ## SOMETIMES_CONSUMES

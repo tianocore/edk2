@@ -164,7 +164,7 @@ AllocatePageTableMemory (
     DEBUG_VERBOSE,
     "%a:%a: Buffer=0x%Lx Pages=%ld\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     Buffer,
     Pages
     ));
@@ -232,8 +232,14 @@ Split2MPageTo4K (
   //
   // Fill in 2M page entry.
   //
+  // AddressEncMask is not set for non-leaf entries since CpuPageTableLib doesn't consume
+  // encryption mask PCD. The encryption mask is overlapped with the PageTableBaseAddress
+  // field of non-leaf page table entries. If encryption mask is set for non-leaf entries,
+  // issue happens when CpuPageTableLib code use the non-leaf entry PageTableBaseAddress
+  // field with the encryption mask set to find the next level page table.
+  //
   *PageEntry2M = ((UINT64)(UINTN)PageTableEntry1 |
-                  IA32_PG_P | IA32_PG_RW | AddressEncMask);
+                  IA32_PG_P | IA32_PG_RW);
 }
 
 /**
@@ -352,7 +358,10 @@ SetPageTablePoolReadOnly (
         PhysicalAddress += LevelSize[Level - 1];
       }
 
-      PageTable[Index] = (UINT64)(UINTN)NewPageTable | AddressEncMask |
+      //
+      // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
+      //
+      PageTable[Index] = (UINT64)(UINTN)NewPageTable |
                          IA32_PG_P | IA32_PG_RW;
       PageTable = NewPageTable;
     }
@@ -439,8 +448,10 @@ Split1GPageTo2M (
   //
   // Fill in 1G page entry.
   //
+  // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
+  //
   *PageEntry1G = ((UINT64)(UINTN)PageDirectoryEntry |
-                  IA32_PG_P | IA32_PG_RW | AddressEncMask);
+                  IA32_PG_P | IA32_PG_RW);
 
   PhysicalAddress2M = PhysicalAddress;
   for (IndexOfPageDirectoryEntries = 0;
@@ -548,6 +559,7 @@ InternalMemEncryptSevCreateIdentityMap1G (
   PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel4Entry;
   PAGE_TABLE_1G_ENTRY             *PageDirectory1GEntry;
   UINT64                          PgTableMask;
+  UINT64                          *NewPageTable;
   UINT64                          AddressEncMask;
   BOOLEAN                         IsWpEnabled;
   RETURN_STATUS                   Status;
@@ -561,7 +573,7 @@ InternalMemEncryptSevCreateIdentityMap1G (
     DEBUG_VERBOSE,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     Cr3BaseAddress,
     PhysicalAddress,
     (UINT64)Length
@@ -602,15 +614,27 @@ InternalMemEncryptSevCreateIdentityMap1G (
     PageMapLevel4Entry  = (VOID *)(Cr3BaseAddress & ~PgTableMask);
     PageMapLevel4Entry += PML4_OFFSET (PhysicalAddress);
     if (!PageMapLevel4Entry->Bits.Present) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a:%a: bad PML4 for Physical=0x%Lx\n",
-        gEfiCallerBaseName,
-        __FUNCTION__,
-        PhysicalAddress
-        ));
-      Status = RETURN_NO_MAPPING;
-      goto Done;
+      NewPageTable = AllocatePageTableMemory (1);
+      if (NewPageTable == NULL) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a:%a: failed to allocate a new PML4 entry\n",
+          gEfiCallerBaseName,
+          __func__
+          ));
+        Status = RETURN_NO_MAPPING;
+        goto Done;
+      }
+
+      SetMem (NewPageTable, EFI_PAGE_SIZE, 0);
+
+      //
+      // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
+      //
+      PageMapLevel4Entry->Uint64          = (UINT64)(UINTN)NewPageTable;
+      PageMapLevel4Entry->Bits.MustBeZero = 0;
+      PageMapLevel4Entry->Bits.ReadWrite  = 1;
+      PageMapLevel4Entry->Bits.Present    = 1;
     }
 
     PageDirectory1GEntry = (VOID *)(
@@ -713,7 +737,7 @@ SetMemoryEncDec (
     DEBUG_VERBOSE,
     "%a:%a: Cr3Base=0x%Lx Physical=0x%Lx Length=0x%Lx Mode=%a CacheFlush=%u Mmio=%u\n",
     gEfiCallerBaseName,
-    __FUNCTION__,
+    __func__,
     Cr3BaseAddress,
     PhysicalAddress,
     (UINT64)Length,
@@ -786,7 +810,7 @@ SetMemoryEncDec (
         DEBUG_ERROR,
         "%a:%a: bad PML4 for Physical=0x%Lx\n",
         gEfiCallerBaseName,
-        __FUNCTION__,
+        __func__,
         PhysicalAddress
         ));
       Status = RETURN_NO_MAPPING;
@@ -803,7 +827,7 @@ SetMemoryEncDec (
         DEBUG_ERROR,
         "%a:%a: bad PDPE for Physical=0x%Lx\n",
         gEfiCallerBaseName,
-        __FUNCTION__,
+        __func__,
         PhysicalAddress
         ));
       Status = RETURN_NO_MAPPING;
@@ -824,7 +848,7 @@ SetMemoryEncDec (
           DEBUG_VERBOSE,
           "%a:%a: updated 1GB entry for Physical=0x%Lx\n",
           gEfiCallerBaseName,
-          __FUNCTION__,
+          __func__,
           PhysicalAddress
           ));
         PhysicalAddress += BIT30;
@@ -837,7 +861,7 @@ SetMemoryEncDec (
           DEBUG_VERBOSE,
           "%a:%a: splitting 1GB page for Physical=0x%Lx\n",
           gEfiCallerBaseName,
-          __FUNCTION__,
+          __func__,
           PhysicalAddress
           ));
         Split1GPageTo2M (
@@ -865,7 +889,7 @@ SetMemoryEncDec (
           DEBUG_ERROR,
           "%a:%a: bad PDE for Physical=0x%Lx\n",
           gEfiCallerBaseName,
-          __FUNCTION__,
+          __func__,
           PhysicalAddress
           ));
         Status = RETURN_NO_MAPPING;
@@ -892,7 +916,7 @@ SetMemoryEncDec (
             DEBUG_VERBOSE,
             "%a:%a: splitting 2MB page for Physical=0x%Lx\n",
             gEfiCallerBaseName,
-            __FUNCTION__,
+            __func__,
             PhysicalAddress
             ));
           Split2MPageTo4K (
@@ -917,7 +941,7 @@ SetMemoryEncDec (
             DEBUG_ERROR,
             "%a:%a: bad PTE for Physical=0x%Lx\n",
             gEfiCallerBaseName,
-            __FUNCTION__,
+            __func__,
             PhysicalAddress
             ));
           Status = RETURN_NO_MAPPING;

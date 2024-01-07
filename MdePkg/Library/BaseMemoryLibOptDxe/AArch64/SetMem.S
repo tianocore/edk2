@@ -29,29 +29,34 @@
 
 ASM_GLOBAL ASM_PFX(InternalMemSetMem16)
 ASM_PFX(InternalMemSetMem16):
+    AARCH64_BTI(c)
     dup     v0.8H, valw
     lsl     count, count, #1
     b       0f
 
 ASM_GLOBAL ASM_PFX(InternalMemSetMem32)
 ASM_PFX(InternalMemSetMem32):
+    AARCH64_BTI(c)
     dup     v0.4S, valw
     lsl     count, count, #2
     b       0f
 
 ASM_GLOBAL ASM_PFX(InternalMemSetMem64)
 ASM_PFX(InternalMemSetMem64):
+    AARCH64_BTI(c)
     dup     v0.2D, val
     lsl     count, count, #3
     b       0f
 
 ASM_GLOBAL ASM_PFX(InternalMemZeroMem)
 ASM_PFX(InternalMemZeroMem):
+    AARCH64_BTI(c)
     movi    v0.16B, #0
     b       0f
 
 ASM_GLOBAL ASM_PFX(InternalMemSetMem)
 ASM_PFX(InternalMemSetMem):
+    AARCH64_BTI(c)
     dup     v0.16B, valw
 0:  add     dstend, dstin, count
     mov     val, v0.D[0]

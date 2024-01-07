@@ -10,13 +10,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiDxe.h>
 
-#include <Library/ArmMmuLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/PeCoffExtraActionLib.h>
+#include <Library/StandaloneMmMmuLib.h>
 
 typedef RETURN_STATUS (*REGION_PERMISSION_UPDATE_FUNC) (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
@@ -55,7 +55,7 @@ UpdatePeCoffPermissions (
       DEBUG ((
         DEBUG_ERROR,
         "%a: PeCoffLoaderGetImageInfo () failed (Status = %r)\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       return Status;
@@ -68,7 +68,7 @@ UpdatePeCoffPermissions (
     DEBUG ((
       DEBUG_INFO,
       "%a: ignoring XIP TE image at 0x%lx\n",
-      __FUNCTION__,
+      __func__,
       ImageContext->ImageAddress
       ));
     return RETURN_SUCCESS;
@@ -84,7 +84,7 @@ UpdatePeCoffPermissions (
       DEBUG ((
         DEBUG_WARN,
         "%a: non-TE Image at 0x%lx has SectionAlignment < 4 KB (%lu)\n",
-        __FUNCTION__,
+        __func__,
         ImageContext->ImageAddress,
         TmpContext.SectionAlignment
         ));
@@ -114,7 +114,7 @@ UpdatePeCoffPermissions (
     DEBUG ((
       DEBUG_ERROR,
       "%a: TmpContext.ImageRead () failed (Status = %r)\n",
-      __FUNCTION__,
+      __func__,
       Status
       ));
     return Status;
@@ -156,7 +156,7 @@ UpdatePeCoffPermissions (
       DEBUG ((
         DEBUG_ERROR,
         "%a: TmpContext.ImageRead () failed (Status = %r)\n",
-        __FUNCTION__,
+        __func__,
         Status
         ));
       return Status;
@@ -169,7 +169,7 @@ UpdatePeCoffPermissions (
         DEBUG ((
           DEBUG_INFO,
           "%a: Mapping section %d of image at 0x%lx with RO-XN permissions and size 0x%x\n",
-          __FUNCTION__,
+          __func__,
           Index,
           Base,
           SectionHeader.Misc.VirtualSize
@@ -179,7 +179,7 @@ UpdatePeCoffPermissions (
         DEBUG ((
           DEBUG_WARN,
           "%a: Mapping section %d of image at 0x%lx with RW-XN permissions and size 0x%x\n",
-          __FUNCTION__,
+          __func__,
           Index,
           Base,
           SectionHeader.Misc.VirtualSize
@@ -189,7 +189,7 @@ UpdatePeCoffPermissions (
       DEBUG ((
         DEBUG_INFO,
         "%a: Mapping section %d of image at 0x%lx with RO-X permissions and size 0x%x\n",
-        __FUNCTION__,
+        __func__,
         Index,
         Base,
         SectionHeader.Misc.VirtualSize

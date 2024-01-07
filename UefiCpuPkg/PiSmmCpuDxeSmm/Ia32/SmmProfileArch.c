@@ -18,7 +18,7 @@ InitSmmS3Cr3 (
   VOID
   )
 {
-  mSmmS3ResumeState->SmmS3Cr3 = Gen4GPageTable (TRUE);
+  mSmmS3ResumeState->SmmS3Cr3 = GenSmmPageTable (PagingPae, mPhysicalAddressBits);
 
   return;
 }

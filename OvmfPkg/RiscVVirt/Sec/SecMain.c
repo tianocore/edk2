@@ -1,7 +1,7 @@
 /** @file
   RISC-V SEC phase module for Qemu Virt.
 
-  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2023, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2022, Ventana Micro Systems Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -55,6 +55,9 @@ SecStartup (
   EFI_STATUS                  Status;
   UINT64                      UefiMemoryBase;
   UINT64                      StackBase;
+  UINT32                      StackSize;
+
+  SerialPortInitialize ();
 
   //
   // Report Status Code to indicate entering SEC core
@@ -62,7 +65,7 @@ SecStartup (
   DEBUG ((
     DEBUG_INFO,
     "%a() BootHartId: 0x%x, DeviceTreeAddress=0x%x\n",
-    __FUNCTION__,
+    __func__,
     BootHartId,
     DeviceTreeAddress
     ));
@@ -71,9 +74,9 @@ SecStartup (
   FirmwareContext.FlattenedDeviceTree = (UINT64)DeviceTreeAddress;
   SetFirmwareContextPointer (&FirmwareContext);
 
-  StackBase = (UINT64)FixedPcdGet32 (PcdOvmfSecPeiTempRamBase) +
-              FixedPcdGet32 (PcdOvmfSecPeiTempRamSize);
-  UefiMemoryBase = StackBase - SIZE_32MB;
+  StackBase      = (UINT64)FixedPcdGet32 (PcdOvmfSecPeiTempRamBase);
+  StackSize      = FixedPcdGet32 (PcdOvmfSecPeiTempRamSize);
+  UefiMemoryBase = StackBase + StackSize - SIZE_32MB;
 
   // Declare the PI/UEFI memory region
   HobList = HobConstructor (
@@ -85,6 +88,8 @@ SecStartup (
   PrePeiSetHobList (HobList);
 
   SecInitializePlatform ();
+
+  BuildStackHob (StackBase, StackSize);
 
   //
   // Process all libraries constructor function linked to SecMain.

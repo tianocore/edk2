@@ -59,6 +59,35 @@ INF UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
 FILE FV_IMAGE = 4E35FD93-9C72-4c15-8C4B-E77F1DB2D793 {
     SECTION FV_IMAGE = DXEFV
 }
+!if $(UNIVERSAL_PAYLOAD) == TRUE
+!if $(NETWORK_DRIVER_ENABLE) == TRUE
+################################################################################
+[FV.NETWORKFV]
+FvNameGuid         = 3CF5CB69-C439-4B84-AF11-8167B22D7221
+BlockSize          = $(FD_BLOCK_SIZE)
+FvForceRebase      = FALSE
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+#
+# UEFI network modules
+#
+!include NetworkPkg/Network.fdf.inc
+!endif
 
 ################################################################################
 [FV.BDSFV]
@@ -83,6 +112,9 @@ READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
 
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
+INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
+!endif
 
 [FV.DXEFV]
 FvNameGuid         = 8063C21A-8E58-4576-95CE-089E87975D23
@@ -129,8 +161,6 @@ INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
 INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 
-INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
-INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
 INF MdeModulePkg/Universal/Metronome/Metronome.inf
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
@@ -276,13 +306,14 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 
 !if $(UNIVERSAL_PAYLOAD) == FALSE
 INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
-!endif
-
+INF RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
+INF MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 #
 # UEFI network modules
 #
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
   !include NetworkPkg/Network.fdf.inc
+!endif
 !endif
 
 #

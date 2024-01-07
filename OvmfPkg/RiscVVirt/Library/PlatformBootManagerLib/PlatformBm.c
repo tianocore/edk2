@@ -193,7 +193,7 @@ FilterAndProcess (
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: %g: %r\n",
-      __FUNCTION__,
+      __func__,
       ProtocolGuid,
       Status
       ));
@@ -264,7 +264,7 @@ IsPciDisplay (
                         &Pci
                         );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __FUNCTION__, ReportText, Status));
+    DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __func__, ReportText, Status));
     return FALSE;
   }
 
@@ -413,7 +413,7 @@ IsVirtioPciRng (
   return FALSE;
 
 PciError:
-  DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __FUNCTION__, ReportText, Status));
+  DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __func__, ReportText, Status));
   return FALSE;
 }
 
@@ -440,7 +440,7 @@ Connect (
   DEBUG ((
     EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
     "%a: %s: %r\n",
-    __FUNCTION__,
+    __func__,
     ReportText,
     Status
     ));
@@ -466,7 +466,7 @@ AddOutput (
     DEBUG ((
       DEBUG_ERROR,
       "%a: %s: handle %p: device path not found\n",
-      __FUNCTION__,
+      __func__,
       ReportText,
       Handle
       ));
@@ -478,7 +478,7 @@ AddOutput (
     DEBUG ((
       DEBUG_ERROR,
       "%a: %s: adding to ConOut: %r\n",
-      __FUNCTION__,
+      __func__,
       ReportText,
       Status
       ));
@@ -490,7 +490,7 @@ AddOutput (
     DEBUG ((
       DEBUG_ERROR,
       "%a: %s: adding to ErrOut: %r\n",
-      __FUNCTION__,
+      __func__,
       ReportText,
       Status
       ));
@@ -500,7 +500,7 @@ AddOutput (
   DEBUG ((
     DEBUG_VERBOSE,
     "%a: %s: added to ConOut and ErrOut\n",
-    __FUNCTION__,
+    __func__,
     ReportText
     ));
 }
@@ -701,7 +701,7 @@ RemoveStaleFvFileOptions (
     DEBUG ((
       EFI_ERROR (Status) ? DEBUG_WARN : DEBUG_VERBOSE,
       "%a: removing stale Boot#%04x %s: %r\n",
-      __FUNCTION__,
+      __func__,
       (UINT32)BootOptions[Index].OptionNumber,
       DevicePathString == NULL ? L"<unavailable>" : DevicePathString,
       Status
@@ -879,7 +879,7 @@ PlatformBootManagerBeforeConsole (
   DEBUG ((
     EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
     "%a: SetVariable(%s, %u): %r\n",
-    __FUNCTION__,
+    __func__,
     EFI_TIME_OUT_VARIABLE_NAME,
     FrontPageTimeout,
     Status
@@ -936,7 +936,7 @@ PlatformBootManagerAfterConsole (
       );
   }
 
-  Print (L"Press ESCAPE within 10 seconds for boot options ");
+  Print (L"Press ESCAPE within %u seconds for boot options ", PcdGet16 (PcdPlatformBootTimeOut));
   //
   // Process QEMU's -kernel command line option. The kernel booted this way
   // will receive ACPI tables: in PlatformBootManagerBeforeConsole(), we

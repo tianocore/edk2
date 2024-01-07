@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Decompression algorithm begins here
 //
+#define UINT8_MAX 0xff
 #define BITBUFSIZ 32
 #define MAXMATCH  256
 #define THRESHOLD 3
@@ -62,26 +63,18 @@ typedef struct {
 
 STATIC UINT16 mPbit = EFIPBIT;
 
+/**
+  Shift mBitBuf NumOfBits left. Read in NumOfBits of bits from source.
+
+  @param Sd        The global scratch data
+  @param NumOfBit  The number of bits to shift and read.
+**/
 STATIC
 VOID
 FillBuf (
   IN  SCRATCH_DATA  *Sd,
   IN  UINT16        NumOfBits
   )
-/*++
-
-Routine Description:
-
-  Shift mBitBuf NumOfBits left. Read in NumOfBits of bits from source.
-
-Arguments:
-
-  Sd        - The global scratch data
-  NumOfBit  - The number of bits to shift and read.
-
-Returns: (VOID)
-
---*/
 {
   Sd->mBitBuf = (UINT32) (((UINT64)Sd->mBitBuf) << NumOfBits);
 
@@ -112,30 +105,22 @@ Returns: (VOID)
   Sd->mBitBuf |= Sd->mSubBitBuf >> Sd->mBitCount;
 }
 
+/**
+  Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent
+  NumOfBits of bits from source. Returns NumOfBits of bits that are
+  popped out.
+
+  @param Sd            The global scratch data.
+  @param NumOfBits     The number of bits to pop and read.
+
+  @return The bits that are popped out.
+**/
 STATIC
 UINT32
 GetBits (
   IN  SCRATCH_DATA  *Sd,
   IN  UINT16        NumOfBits
   )
-/*++
-
-Routine Description:
-
-  Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent
-  NumOfBits of bits from source. Returns NumOfBits of bits that are
-  popped out.
-
-Arguments:
-
-  Sd            - The global scratch data.
-  NumOfBits     - The number of bits to pop and read.
-
-Returns:
-
-  The bits that are popped out.
-
---*/
 {
   UINT32  OutBits;
 
@@ -146,6 +131,18 @@ Returns:
   return OutBits;
 }
 
+/**
+  Creates Huffman Code mapping table according to code length array.
+
+  @param Sd        The global scratch data
+  @param NumOfChar Number of symbols in the symbol set
+  @param BitLen    Code length array
+  @param TableBits The width of the mapping table
+  @param Table     The table
+
+  @retval 0         - OK.
+  @retval BAD_TABLE - The table is corrupted.
+**/
 STATIC
 UINT16
 MakeTable (
@@ -155,26 +152,6 @@ MakeTable (
   IN  UINT16        TableBits,
   OUT UINT16        *Table
   )
-/*++
-
-Routine Description:
-
-  Creates Huffman Code mapping table according to code length array.
-
-Arguments:
-
-  Sd        - The global scratch data
-  NumOfChar - Number of symbols in the symbol set
-  BitLen    - Code length array
-  TableBits - The width of the mapping table
-  Table     - The table
-
-Returns:
-
-  0         - OK.
-  BAD_TABLE - The table is corrupted.
-
---*/
 {
   UINT16  Count[17];
   UINT16  Weight[17];
@@ -290,26 +267,18 @@ Returns:
   return 0;
 }
 
+/**
+  Decodes a position value.
+
+  @param Sd      the global scratch data
+
+  @return The position value decoded.
+**/
 STATIC
 UINT32
 DecodeP (
   IN  SCRATCH_DATA  *Sd
   )
-/*++
-
-Routine Description:
-
-  Decodes a position value.
-
-Arguments:
-
-  Sd      - the global scratch data
-
-Returns:
-
-  The position value decoded.
-
---*/
 {
   UINT16  Val;
   UINT32  Mask;
@@ -344,6 +313,17 @@ Returns:
   return Pos;
 }
 
+/**
+  Reads code lengths for the Extra Set or the Position Set
+
+  @param Sd        The global scratch data
+  @param nn        Number of symbols
+  @param nbit      Number of bits needed to represent nn
+  @param Special   The special symbol that needs to be taken care of
+
+  @retval 0         - OK.
+  @retval BAD_TABLE - Table is corrupted.
+**/
 STATIC
 UINT16
 ReadPTLen (
@@ -352,25 +332,6 @@ ReadPTLen (
   IN  UINT16        nbit,
   IN  UINT16        Special
   )
-/*++
-
-Routine Description:
-
-  Reads code lengths for the Extra Set or the Position Set
-
-Arguments:
-
-  Sd        - The global scratch data
-  nn        - Number of symbols
-  nbit      - Number of bits needed to represent nn
-  Special   - The special symbol that needs to be taken care of
-
-Returns:
-
-  0         - OK.
-  BAD_TABLE - Table is corrupted.
-
---*/
 {
   UINT16  Number;
   UINT16  CharC;
@@ -430,24 +391,16 @@ Returns:
   return MakeTable (Sd, nn, Sd->mPTLen, 8, Sd->mPTTable);
 }
 
+/**
+  Reads code lengths for Char&Len Set.
+
+  @param Sd    the global scratch data
+**/
 STATIC
 VOID
 ReadCLen (
   SCRATCH_DATA  *Sd
   )
-/*++
-
-Routine Description:
-
-  Reads code lengths for Char&Len Set.
-
-Arguments:
-
-  Sd    - the global scratch data
-
-Returns: (VOID)
-
---*/
 {
   UINT16  Number;
   UINT16  CharC;
@@ -526,26 +479,18 @@ Returns: (VOID)
   return ;
 }
 
+/**
+  Decode a character/length value.
+
+  @param Sd    The global scratch data.
+
+  @return The value decoded.
+**/
 STATIC
 UINT16
 DecodeC (
   SCRATCH_DATA  *Sd
   )
-/*++
-
-Routine Description:
-
-  Decode a character/length value.
-
-Arguments:
-
-  Sd    - The global scratch data.
-
-Returns:
-
-  The value decoded.
-
---*/
 {
   UINT16  Index2;
   UINT32  Mask;
@@ -592,24 +537,16 @@ Returns:
   return Index2;
 }
 
+/**
+  Decode the source data and put the resulting data into the destination buffer.
+
+  @param Sd            The global scratch data
+ **/
 STATIC
 VOID
 Decode (
   SCRATCH_DATA  *Sd
   )
-/*++
-
-Routine Description:
-
-  Decode the source data and put the resulting data into the destination buffer.
-
-Arguments:
-
-  Sd            - The global scratch data
-
-Returns: (VOID)
-
- --*/
 {
   UINT16  BytesRemain;
   UINT32  DataIdx;
@@ -669,6 +606,17 @@ Returns: (VOID)
   return ;
 }
 
+/**
+  The implementation of EFI_DECOMPRESS_PROTOCOL.GetInfo().
+
+  @param Source      The source buffer containing the compressed data.
+  @param SrcSize     The size of source buffer
+  @param DstSize     The size of destination buffer.
+  @param ScratchSize The size of scratch buffer.
+
+  @retval EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successfully retrieved.
+  @retval EFI_INVALID_PARAMETER - The source data is corrupted
+**/
 EFI_STATUS
 GetInfo (
   IN      VOID    *Source,
@@ -676,25 +624,6 @@ GetInfo (
   OUT     UINT32  *DstSize,
   OUT     UINT32  *ScratchSize
   )
-/*++
-
-Routine Description:
-
-  The implementation of EFI_DECOMPRESS_PROTOCOL.GetInfo().
-
-Arguments:
-
-  Source      - The source buffer containing the compressed data.
-  SrcSize     - The size of source buffer
-  DstSize     - The size of destination buffer.
-  ScratchSize - The size of scratch buffer.
-
-Returns:
-
-  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successfully retrieved.
-  EFI_INVALID_PARAMETER - The source data is corrupted
-
---*/
 {
   UINT8 *Src;
   UINT32 CompSize;
@@ -716,6 +645,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  The implementation Efi and Tiano Decompress().
+
+  @param Source      - The source buffer containing the compressed data.
+  @param SrcSize     - The size of source buffer
+  @param Destination - The destination buffer to store the decompressed data
+  @param DstSize     - The size of destination buffer.
+  @param Scratch     - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
+  @param ScratchSize - The size of scratch buffer.
+
+  @retval EFI_SUCCESS           - Decompression is successful
+  @retval EFI_INVALID_PARAMETER - The source data is corrupted
+**/
 EFI_STATUS
 Decompress (
   IN      VOID    *Source,
@@ -725,27 +667,6 @@ Decompress (
   IN OUT  VOID    *Scratch,
   IN      UINT32  ScratchSize
   )
-/*++
-
-Routine Description:
-
-  The implementation Efi and Tiano Decompress().
-
-Arguments:
-
-  Source      - The source buffer containing the compressed data.
-  SrcSize     - The size of source buffer
-  Destination - The destination buffer to store the decompressed data
-  DstSize     - The size of destination buffer.
-  Scratch     - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
-  ScratchSize - The size of scratch buffer.
-
-Returns:
-
-  EFI_SUCCESS           - Decompression is successful
-  EFI_INVALID_PARAMETER - The source data is corrupted
-
---*/
 {
   UINT32        Index;
   UINT32        CompSize;
@@ -811,6 +732,17 @@ Returns:
   return Status;
 }
 
+/**
+  The implementation Efi Decompress GetInfo().
+
+  @param Source      The source buffer containing the compressed data.
+  @param SrcSize     The size of source buffer
+  @param DstSize     The size of destination buffer.
+  @param ScratchSize The size of scratch buffer.
+
+  @retval EFI_SUCCESS           The size of destination buffer and the size of scratch buffer are successfully retrieved.
+  @retval EFI_INVALID_PARAMETER The source data is corrupted
+**/
 EFI_STATUS
 EfiGetInfo (
   IN      VOID    *Source,
@@ -818,29 +750,21 @@ EfiGetInfo (
   OUT     UINT32  *DstSize,
   OUT     UINT32  *ScratchSize
   )
-/*++
-
-Routine Description:
-
-  The implementation Efi Decompress GetInfo().
-
-Arguments:
-
-  Source      - The source buffer containing the compressed data.
-  SrcSize     - The size of source buffer
-  DstSize     - The size of destination buffer.
-  ScratchSize - The size of scratch buffer.
-
-Returns:
-
-  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successfully retrieved.
-  EFI_INVALID_PARAMETER - The source data is corrupted
-
---*/
 {
   return GetInfo (Source, SrcSize, DstSize, ScratchSize);
 }
 
+/**
+  The implementation Tiano Decompress GetInfo().
+
+  @param Source      The source buffer containing the compressed data.
+  @param SrcSize     The size of source buffer
+  @param DstSize     The size of destination buffer.
+  @param ScratchSize The size of scratch buffer.
+
+  @retval EFI_SUCCESS           The size of destination buffer and the size of scratch buffer are successfully retrieved.
+  @retval EFI_INVALID_PARAMETER The source data is corrupted
+**/
 EFI_STATUS
 TianoGetInfo (
   IN      VOID    *Source,
@@ -848,29 +772,23 @@ TianoGetInfo (
   OUT     UINT32  *DstSize,
   OUT     UINT32  *ScratchSize
   )
-/*++
-
-Routine Description:
-
-  The implementation Tiano Decompress GetInfo().
-
-Arguments:
-
-  Source      - The source buffer containing the compressed data.
-  SrcSize     - The size of source buffer
-  DstSize     - The size of destination buffer.
-  ScratchSize - The size of scratch buffer.
-
-Returns:
-
-  EFI_SUCCESS           - The size of destination buffer and the size of scratch buffer are successfully retrieved.
-  EFI_INVALID_PARAMETER - The source data is corrupted
-
---*/
 {
   return GetInfo (Source, SrcSize, DstSize, ScratchSize);
 }
 
+/**
+  The implementation of Efi Decompress().
+
+  @param Source      The source buffer containing the compressed data.
+  @param SrcSize     The size of source buffer
+  @param Destination The destination buffer to store the decompressed data
+  @param DstSize     The size of destination buffer.
+  @param Scratch     The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
+  @param ScratchSize The size of scratch buffer.
+
+  @retval EFI_SUCCESS           Decompression is successful
+  @retval EFI_INVALID_PARAMETER The source data is corrupted
+**/
 EFI_STATUS
 EfiDecompress (
   IN      VOID    *Source,
@@ -880,32 +798,24 @@ EfiDecompress (
   IN OUT  VOID    *Scratch,
   IN      UINT32  ScratchSize
   )
-/*++
-
-Routine Description:
-
-  The implementation of Efi Decompress().
-
-Arguments:
-
-  Source      - The source buffer containing the compressed data.
-  SrcSize     - The size of source buffer
-  Destination - The destination buffer to store the decompressed data
-  DstSize     - The size of destination buffer.
-  Scratch     - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
-  ScratchSize - The size of scratch buffer.
-
-Returns:
-
-  EFI_SUCCESS           - Decompression is successful
-  EFI_INVALID_PARAMETER - The source data is corrupted
-
---*/
 {
   mPbit = EFIPBIT;
   return Decompress (Source, SrcSize, Destination, DstSize, Scratch, ScratchSize);
 }
 
+/**
+  The implementation of Tiano Decompress().
+
+  @param Source      The source buffer containing the compressed data.
+  @param SrcSize     The size of source buffer
+  @param Destination The destination buffer to store the decompressed data
+  @param DstSize     The size of destination buffer.
+  @param Scratch     The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
+  @param ScratchSize The size of scratch buffer.
+
+  @retval EFI_SUCCESS           Decompression is successful
+  @retval EFI_INVALID_PARAMETER The source data is corrupted
+**/
 EFI_STATUS
 TianoDecompress (
   IN      VOID    *Source,
@@ -915,27 +825,6 @@ TianoDecompress (
   IN OUT  VOID    *Scratch,
   IN      UINT32  ScratchSize
   )
-/*++
-
-Routine Description:
-
-  The implementation of Tiano Decompress().
-
-Arguments:
-
-  Source      - The source buffer containing the compressed data.
-  SrcSize     - The size of source buffer
-  Destination - The destination buffer to store the decompressed data
-  DstSize     - The size of destination buffer.
-  Scratch     - The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
-  ScratchSize - The size of scratch buffer.
-
-Returns:
-
-  EFI_SUCCESS           - Decompression is successful
-  EFI_INVALID_PARAMETER - The source data is corrupted
-
---*/
 {
   mPbit = MAXPBIT;
   return Decompress (Source, SrcSize, Destination, DstSize, Scratch, ScratchSize);

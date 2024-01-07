@@ -10,7 +10,7 @@
   This library is mainly used by DxeCore to start performance logging to ensure that
   Performance Protocol is installed at the very beginning of DXE phase.
 
-Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -73,6 +73,7 @@ UINT8    *mPerformancePointer  = NULL;
 UINT8    *mBootRecordBuffer    = NULL;
 BOOLEAN  mLockInsertRecord     = FALSE;
 CHAR8    *mDevicePathString    = NULL;
+UINTN    mSmmBootRecordOffset  = 0;
 
 EFI_DEVICE_PATH_TO_TEXT_PROTOCOL  *mDevicePathToText = NULL;
 
@@ -236,6 +237,7 @@ InternalGetSmmPerfData (
   VOID                                     *SmmBootRecordData;
   UINTN                                    SmmBootRecordDataSize;
   UINTN                                    ReservedMemSize;
+  UINTN                                    SmmBootRecordDataRetrieved;
 
   //
   // Collect boot records from SMM drivers.
@@ -297,27 +299,31 @@ InternalGetSmmPerfData (
           }
 
           //
-          // Get all boot records
+          // Get boot records starting from mSmmBootRecordOffset
           //
-          SmmCommData->Function = SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA_BY_OFFSET;
-          SmmBootRecordDataSize = SmmCommData->BootRecordSize;
-          SmmBootRecordData     = AllocateZeroPool (SmmBootRecordDataSize);
+          SmmCommData->Function         = SMM_FPDT_FUNCTION_GET_BOOT_RECORD_DATA_BY_OFFSET;
+          SmmCommData->BootRecordOffset = mSmmBootRecordOffset;
+          SmmBootRecordDataSize         = SmmCommData->BootRecordSize - mSmmBootRecordOffset;
+          SmmBootRecordData             = AllocateZeroPool (SmmBootRecordDataSize);
+          SmmBootRecordDataRetrieved    = 0;
           ASSERT (SmmBootRecordData  != NULL);
-          SmmCommData->BootRecordOffset = 0;
-          SmmCommData->BootRecordData   = (VOID *)((UINTN)SmmCommMemRegion->PhysicalStart + SMM_BOOT_RECORD_COMM_SIZE);
-          SmmCommData->BootRecordSize   = ReservedMemSize - SMM_BOOT_RECORD_COMM_SIZE;
-          while (SmmCommData->BootRecordOffset < SmmBootRecordDataSize) {
+          SmmCommData->BootRecordData = (VOID *)((UINTN)SmmCommMemRegion->PhysicalStart + SMM_BOOT_RECORD_COMM_SIZE);
+          SmmCommData->BootRecordSize = ReservedMemSize - SMM_BOOT_RECORD_COMM_SIZE;
+          while (SmmBootRecordDataRetrieved < SmmBootRecordDataSize) {
             Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
             ASSERT_EFI_ERROR (Status);
             ASSERT_EFI_ERROR (SmmCommData->ReturnStatus);
-            if (SmmCommData->BootRecordOffset + SmmCommData->BootRecordSize > SmmBootRecordDataSize) {
-              CopyMem ((UINT8 *)SmmBootRecordData + SmmCommData->BootRecordOffset, SmmCommData->BootRecordData, SmmBootRecordDataSize - SmmCommData->BootRecordOffset);
+            if (SmmBootRecordDataRetrieved + SmmCommData->BootRecordSize > SmmBootRecordDataSize) {
+              CopyMem ((UINT8 *)SmmBootRecordData + SmmBootRecordDataRetrieved, SmmCommData->BootRecordData, SmmBootRecordDataSize - SmmBootRecordDataRetrieved);
             } else {
-              CopyMem ((UINT8 *)SmmBootRecordData + SmmCommData->BootRecordOffset, SmmCommData->BootRecordData, SmmCommData->BootRecordSize);
+              CopyMem ((UINT8 *)SmmBootRecordData + SmmBootRecordDataRetrieved, SmmCommData->BootRecordData, SmmCommData->BootRecordSize);
             }
 
-            SmmCommData->BootRecordOffset = SmmCommData->BootRecordOffset + SmmCommData->BootRecordSize;
+            SmmBootRecordDataRetrieved    += SmmCommData->BootRecordSize;
+            SmmCommData->BootRecordOffset += SmmCommData->BootRecordSize;
           }
+
+          mSmmBootRecordOffset = SmmCommData->BootRecordOffset;
 
           *SmmPerfData     = SmmBootRecordData;
           *SmmPerfDataSize = SmmBootRecordDataSize;
@@ -1403,6 +1409,8 @@ ReportFpdtRecordBuffer (
         &BPDTAddr,
         sizeof (UINT64)
         );
+      Status = gBS->InstallConfigurationTable (&gEdkiiFpdtExtendedFirmwarePerformanceGuid, (VOID *)(UINTN)BPDTAddr);
+      ASSERT_EFI_ERROR (Status);
     }
 
     //

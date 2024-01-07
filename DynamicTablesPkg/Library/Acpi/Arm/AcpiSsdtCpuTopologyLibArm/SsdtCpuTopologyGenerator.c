@@ -1,11 +1,17 @@
 /** @file
   SSDT Cpu Topology Table Generator.
 
-  Copyright (c) 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2021 - 2023, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
     - ACPI 6.3 Specification - January 2019 - s8.4 Declaring Processors
+    - ACPI for CoreSight version 1.2 Platform Design Document
+      (https://developer.arm.com/documentation/den0067/a/?lang=en)
+
+  @par Glossary:
+    - ETE - Embedded Trace Extension.
+    - ETM - Embedded Trace Macrocell.
 **/
 
 #include <Library/AcpiLib.h>
@@ -35,6 +41,7 @@ Requirements:
   - EArmObjProcHierarchyInfo (OPTIONAL) along with
   - EArmObjCmRef (OPTIONAL)
   - EArmObjLpiInfo (OPTIONAL)
+  - GetEArmObjEtInfo (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the GIC
@@ -84,6 +91,16 @@ GET_OBJECT_LIST (
   EObjNameSpaceArm,
   EArmObjCpcInfo,
   CM_ARM_CPC_INFO
+  );
+
+/**
+  This macro expands to a function that retrieves the ET device
+  information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjEtInfo,
+  CM_ARM_ET_INFO
   );
 
 /** Initialize the TokenTable.
@@ -320,6 +337,147 @@ CreateAmlCpcNode (
   Status = AmlCreateCpcNode (
              CpcInfo,
              Node,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+  return Status;
+}
+
+/** Create an embedded trace device and add it to the Cpu Node in the
+    AML namespace.
+
+  This generates the following ASL code:
+  Device (E002)
+  {
+      Name (_UID, 2)
+      Name (_HID, "ARMHC500")
+  }
+
+  Note: Currently we only support generating ETE nodes. Unlike ETM,
+  ETE has a system register interface and therefore does not need
+  the MMIO range to be described.
+
+  @param [in]  Generator    The SSDT Cpu Topology generator.
+  @param [in]  ParentNode   Parent node to attach the Cpu node to.
+  @param [in]  GicCInfo     CM_ARM_GICC_INFO object used to create the node.
+  @param [in]  CpuName      Value used to generate the node name.
+  @param [out] EtNodePtr   If not NULL, return the created Cpu node.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CreateAmlEtd (
+  IN   ACPI_CPU_TOPOLOGY_GENERATOR  *Generator,
+  IN   AML_NODE_HANDLE              ParentNode,
+  IN   CM_ARM_GICC_INFO             *GicCInfo,
+  IN   UINT32                       CpuName,
+  OUT  AML_OBJECT_NODE_HANDLE       *EtNodePtr OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  EtNode;
+  CHAR8                   AslName[AML_NAME_SEG_SIZE + 1];
+
+  ASSERT (Generator != NULL);
+  ASSERT (ParentNode != NULL);
+
+  Status = WriteAslName ('E', CpuName, AslName);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCodeGenDevice (AslName, ParentNode, &EtNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCodeGenNameInteger (
+             "_UID",
+             GicCInfo->AcpiProcessorUid,
+             EtNode,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  Status = AmlCodeGenNameString (
+             "_HID",
+             ACPI_HID_ET_DEVICE,
+             EtNode,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // If requested, return the handle to the EtNode.
+  if (EtNodePtr != NULL) {
+    *EtNodePtr = EtNode;
+  }
+
+  return Status;
+}
+
+/** Create and add an Embedded trace device to the Cpu Node.
+
+  @param [in]  Generator              The SSDT Cpu Topology generator.
+  @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
+                                      Protocol Interface.
+  @param [in]  GicCInfo               Pointer to the CM_ARM_GICC_INFO object
+                                      describing the Cpu.
+  @param [in]  CpuName                Value used to generate the CPU node name.
+  @param [in]  Node                   CPU Node to which the ET device node is
+                                      attached.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_UNSUPPORTED         Feature Unsupported.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CreateAmlEtNode (
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CM_ARM_GICC_INFO                                    *GicCInfo,
+  IN        UINT32                                        CpuName,
+  IN  AML_OBJECT_NODE_HANDLE                              *Node
+  )
+{
+  EFI_STATUS      Status;
+  CM_ARM_ET_INFO  *EtInfo;
+
+  Status = GetEArmObjEtInfo (
+             CfgMgrProtocol,
+             GicCInfo->EtToken,
+             &EtInfo,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (0);
+    return Status;
+  }
+
+  // Currently we only support creation of a ETE Node.
+  if (EtInfo->EtType != ArmEtTypeEte) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = CreateAmlEtd (
+             Generator,
+             Node,
+             GicCInfo,
+             CpuName,
              NULL
              );
   ASSERT_EFI_ERROR (Status);
@@ -694,6 +852,21 @@ CreateAmlCpuFromProcHierarchy (
     }
   }
 
+  // Add an Embedded Trace node if present.
+  if (GicCInfo->EtToken != CM_NULL_TOKEN) {
+    Status = CreateAmlEtNode (
+               Generator,
+               CfgMgrProtocol,
+               GicCInfo,
+               CpuName,
+               CpuNode
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+  }
+
   return Status;
 }
 
@@ -805,6 +978,57 @@ CreateAmlProcessorContainer (
   return Status;
 }
 
+/** Check flags and topology of a ProcNode.
+
+  @param [in]  NodeFlags        Flags of the ProcNode to check.
+  @param [in]  IsLeaf           The ProcNode is a leaf.
+  @param [in]  NodeToken        NodeToken of the ProcNode.
+  @param [in]  ParentNodeToken  Parent NodeToken of the ProcNode.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CheckProcNode (
+  UINT32           NodeFlags,
+  BOOLEAN          IsLeaf,
+  CM_OBJECT_TOKEN  NodeToken,
+  CM_OBJECT_TOKEN  ParentNodeToken
+  )
+{
+  BOOLEAN  InvalidFlags;
+  BOOLEAN  HasPhysicalPackageBit;
+  BOOLEAN  IsTopLevelNode;
+
+  HasPhysicalPackageBit = (NodeFlags & EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL) ==
+                          EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL;
+  IsTopLevelNode = (ParentNodeToken == CM_NULL_TOKEN);
+
+  // A top-level node is a Physical Package and conversely.
+  InvalidFlags = HasPhysicalPackageBit ^ IsTopLevelNode;
+
+  // Check Leaf specific flags.
+  if (IsLeaf) {
+    InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != PPTT_LEAF_MASK);
+  } else {
+    InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != 0);
+  }
+
+  if (InvalidFlags) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: SSDT-CPU-TOPOLOGY: Invalid flags for ProcNode: 0x%p.\n",
+      (VOID *)NodeToken
+      ));
+    ASSERT (0);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /** Create an AML representation of the Cpu topology.
 
   A processor container is by extension any non-leave device in the cpu topology.
@@ -814,7 +1038,6 @@ CreateAmlProcessorContainer (
                                       Protocol Interface.
   @param [in] NodeToken               Token of the CM_ARM_PROC_HIERARCHY_INFO
                                       currently handled.
-                                      Cannot be CM_NULL_TOKEN.
   @param [in] ParentNode              Parent node to attach the created
                                       node to.
   @param [in,out] ProcContainerIndex  Pointer to the current processor container
@@ -838,6 +1061,7 @@ CreateAmlCpuTopologyTree (
   EFI_STATUS              Status;
   UINT32                  Index;
   UINT32                  CpuIndex;
+  UINT32                  ProcContainerName;
   AML_OBJECT_NODE_HANDLE  ProcContainerNode;
   UINT32                  Uid;
   UINT16                  Name;
@@ -846,11 +1070,11 @@ CreateAmlCpuTopologyTree (
   ASSERT (Generator->ProcNodeList != NULL);
   ASSERT (Generator->ProcNodeCount != 0);
   ASSERT (CfgMgrProtocol != NULL);
-  ASSERT (NodeToken != CM_NULL_TOKEN);
   ASSERT (ParentNode != NULL);
   ASSERT (ProcContainerIndex != NULL);
 
-  CpuIndex = 0;
+  CpuIndex          = 0;
+  ProcContainerName = 0;
 
   for (Index = 0; Index < Generator->ProcNodeCount; Index++) {
     // Find the children of the CM_ARM_PROC_HIERARCHY_INFO
@@ -859,16 +1083,15 @@ CreateAmlCpuTopologyTree (
       // Only Cpus (leaf nodes in this tree) have a GicCToken.
       // Create a Cpu node.
       if (Generator->ProcNodeList[Index].GicCToken != CM_NULL_TOKEN) {
-        if ((Generator->ProcNodeList[Index].Flags & PPTT_PROCESSOR_MASK) !=
-            PPTT_CPU_PROCESSOR_MASK)
-        {
-          DEBUG ((
-            DEBUG_ERROR,
-            "ERROR: SSDT-CPU-TOPOLOGY: Invalid flags for cpu: 0x%x.\n",
-            Generator->ProcNodeList[Index].Flags
-            ));
+        Status = CheckProcNode (
+                   Generator->ProcNodeList[Index].Flags,
+                   TRUE,
+                   Generator->ProcNodeList[Index].Token,
+                   NodeToken
+                   );
+        if (EFI_ERROR (Status)) {
           ASSERT (0);
-          return EFI_INVALID_PARAMETER;
+          return Status;
         }
 
         if (Generator->ProcNodeList[Index].OverrideNameUidEnabled) {
@@ -893,24 +1116,22 @@ CreateAmlCpuTopologyTree (
       } else {
         // If this is not a Cpu, then this is a processor container.
 
-        // Acpi processor Id for clusters is not handled.
-        if ((Generator->ProcNodeList[Index].Flags & PPTT_PROCESSOR_MASK) !=
-            PPTT_CLUSTER_PROCESSOR_MASK)
-        {
-          DEBUG ((
-            DEBUG_ERROR,
-            "ERROR: SSDT-CPU-TOPOLOGY: Invalid flags for cluster: 0x%x.\n",
-            Generator->ProcNodeList[Index].Flags
-            ));
+        Status = CheckProcNode (
+                   Generator->ProcNodeList[Index].Flags,
+                   FALSE,
+                   Generator->ProcNodeList[Index].Token,
+                   NodeToken
+                   );
+        if (EFI_ERROR (Status)) {
           ASSERT (0);
-          return EFI_INVALID_PARAMETER;
+          return Status;
         }
 
         if (Generator->ProcNodeList[Index].OverrideNameUidEnabled) {
           Name = Generator->ProcNodeList[Index].OverrideName;
           Uid  = Generator->ProcNodeList[Index].OverrideUid;
         } else {
-          Name = *ProcContainerIndex;
+          Name = ProcContainerName;
           Uid  = *ProcContainerIndex;
         }
 
@@ -932,6 +1153,13 @@ CreateAmlCpuTopologyTree (
         // Reset the Cpu index whenever we create a new processor container.
         (*ProcContainerIndex)++;
         CpuIndex = 0;
+
+        // And reset the cluster name whenever there is a package.
+        if (NodeToken == CM_NULL_TOKEN) {
+          ProcContainerName = 0;
+        } else {
+          ProcContainerName++;
+        }
 
         // Recursively continue creating an AML tree.
         Status = CreateAmlCpuTopologyTree (
@@ -974,8 +1202,6 @@ CreateTopologyFromProcHierarchy (
   )
 {
   EFI_STATUS  Status;
-  UINT32      Index;
-  UINT32      TopLevelProcNodeIndex;
   UINT32      ProcContainerIndex;
 
   ASSERT (Generator != NULL);
@@ -984,8 +1210,7 @@ CreateTopologyFromProcHierarchy (
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (ScopeNode != NULL);
 
-  TopLevelProcNodeIndex = MAX_UINT32;
-  ProcContainerIndex    = 0;
+  ProcContainerIndex = 0;
 
   Status = TokenTableInitialize (Generator, Generator->ProcNodeCount);
   if (EFI_ERROR (Status)) {
@@ -993,33 +1218,10 @@ CreateTopologyFromProcHierarchy (
     return Status;
   }
 
-  // It is assumed that there is one unique CM_ARM_PROC_HIERARCHY_INFO
-  // structure with no ParentToken and the EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL
-  // flag set. All other CM_ARM_PROC_HIERARCHY_INFO are non-physical and
-  // have a ParentToken.
-  for (Index = 0; Index < Generator->ProcNodeCount; Index++) {
-    if ((Generator->ProcNodeList[Index].ParentToken == CM_NULL_TOKEN) &&
-        (Generator->ProcNodeList[Index].Flags &
-         EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL))
-    {
-      if (TopLevelProcNodeIndex != MAX_UINT32) {
-        DEBUG ((
-          DEBUG_ERROR,
-          "ERROR: SSDT-CPU-TOPOLOGY: Top level CM_ARM_PROC_HIERARCHY_INFO "
-          "must be unique\n"
-          ));
-        ASSERT (0);
-        goto exit_handler;
-      }
-
-      TopLevelProcNodeIndex = Index;
-    }
-  } // for
-
   Status = CreateAmlCpuTopologyTree (
              Generator,
              CfgMgrProtocol,
-             Generator->ProcNodeList[TopLevelProcNodeIndex].Token,
+             CM_NULL_TOKEN,
              ScopeNode,
              &ProcContainerIndex
              );
@@ -1099,11 +1301,25 @@ CreateTopologyFromGicC (
 
     // If a CPC info is associated with the
     // GicCinfo, create an _CPC method returning them.
-    if (GicCInfo->CpcToken != CM_NULL_TOKEN) {
+    if (GicCInfo[Index].CpcToken != CM_NULL_TOKEN) {
       Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, &GicCInfo[Index], CpuNode);
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
         break;
+      }
+    }
+
+    if (GicCInfo[Index].EtToken != CM_NULL_TOKEN) {
+      Status = CreateAmlEtNode (
+                 Generator,
+                 CfgMgrProtocol,
+                 &GicCInfo[Index],
+                 Index,
+                 CpuNode
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
       }
     }
   } // for
