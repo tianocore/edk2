@@ -100,31 +100,31 @@ struct _RESTEX_SERVICE {
 #define RESTEX_INSTANCE_FLAGS_TCP_ERROR_RETRY  0x00000002
 
 struct _RESTEX_INSTANCE {
-  UINT32                        Signature;
-  LIST_ENTRY                    Link;
+  UINT32                          Signature;
+  LIST_ENTRY                      Link;
 
-  EFI_REST_EX_PROTOCOL          RestEx;
+  EFI_REST_EX_PROTOCOL            RestEx;
 
-  INTN                          State;
-  BOOLEAN                       InDestroy;
+  INTN                            State;
+  BOOLEAN                         InDestroy;
 
-  RESTEX_SERVICE                *Service;
-  EFI_HANDLE                    ChildHandle;
+  RESTEX_SERVICE                  *Service;
+  EFI_HANDLE                      ChildHandle;
 
-  EFI_REST_EX_CONFIG_DATA       ConfigData;
+  EFI_REST_EX_CONFIG_DATA         ConfigData;
 
   //
   // HTTP_IO to access the HTTP service
   //
-  HTTP_IO                       HttpIo;
+  HTTP_IO                         HttpIo;
 
   //
   // EDKII_HTTP_CALLBACK_PROTOCOL that listens to
   // HttpEventInitSession event.
   //
-  EDKII_HTTP_CALLBACK_PROTOCOL  HttpCallbakFunction;
+  EDKII_HTTP_CALLBACK_PROTOCOL    HttpCallbakFunction;
 
-  UINT32                        Flags;
+  UINT32                          Flags;
 };
 
 typedef struct {
