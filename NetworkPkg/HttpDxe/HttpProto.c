@@ -1418,6 +1418,7 @@ HttpInitSession (
   //
   if (TlsConfigure) {
     Status = TlsConfigureSession (HttpInstance);
+    HttpNotify (HttpEventTlsConfigured, Status);
     if (EFI_ERROR (Status)) {
       return Status;
     }
