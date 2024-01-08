@@ -1,6 +1,7 @@
 ## @file
 # generate capsule
 #
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -78,6 +79,8 @@ class Capsule (CapsuleClassObject):
                     Flags |= 0x00010000
                 elif flag == 'InitiateReset':
                     Flags |= 0x00040000
+        if 'OEM_CAPSULE_FLAGS' in self.TokensDict:
+            Flags |= int(self.TokensDict['OEM_CAPSULE_FLAGS'],16)
         Header.write(pack('=I', Flags))
         #
         # typedef struct {
