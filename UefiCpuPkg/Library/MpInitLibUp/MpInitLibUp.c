@@ -107,7 +107,10 @@ MpInitLibGetProcessorInfo (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (ProcessorNumber != 0) {
+  //
+  // Lower 24 bits contains the actual processor number.
+  //
+  if ((ProcessorNumber & (BIT24 - 1)) != 0) {
     return EFI_NOT_FOUND;
   }
 
