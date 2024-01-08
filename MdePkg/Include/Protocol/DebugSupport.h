@@ -683,6 +683,20 @@ typedef struct {
 //
 // LoongArch processor exception types.
 //
+// The exception types is located in the CSR ESTAT
+// register offset 16 bits, width 6 bits.
+//
+// If you want to register an exception hook, you can
+// shfit the number left by 16 bits, and the exception
+// handler will know the types.
+//
+// For example:
+// mCpu->CpuRegisterInterruptHandler (
+//         mCpu,
+//         (EXCEPT_LOONGARCH_PPI << CSR_ESTAT_EXC_SHIFT),
+//         PpiExceptionHandler
+//         );
+//
 #define EXCEPT_LOONGARCH_INT   0
 #define EXCEPT_LOONGARCH_PIL   1
 #define EXCEPT_LOONGARCH_PIS   2
