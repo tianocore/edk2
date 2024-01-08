@@ -134,44 +134,6 @@ Done:
   ASSERT (Fadt->Pm1aEvtBlk != 0);
   ASSERT (Fadt->Gpe0Blk != 0);
 
-  DEBUG_CODE_BEGIN ();
-  BOOLEAN  SciEnabled;
-
-  //
-  // Check the consistency of SCI enabling
-  //
-
-  //
-  // Get SCI_EN value
-  //
-  if (Fadt->Pm1CntLen == 4) {
-    SciEnabled = (IoRead32 (Fadt->Pm1aCntBlk) & BIT0) ? TRUE : FALSE;
-  } else {
-    //
-    // if (Pm1CntLen == 2), use 16 bit IO read;
-    // if (Pm1CntLen != 2 && Pm1CntLen != 4), use 16 bit IO read as a fallback
-    //
-    SciEnabled = (IoRead16 (Fadt->Pm1aCntBlk) & BIT0) ? TRUE : FALSE;
-  }
-
-  if (!(Fadt->Flags & EFI_ACPI_5_0_HW_REDUCED_ACPI) &&
-      (Fadt->SmiCmd == 0) &&
-      !SciEnabled)
-  {
-    //
-    // The ACPI enabling status is inconsistent: SCI is not enabled but ACPI
-    // table does not provide a means to enable it through FADT->SmiCmd
-    //
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: The ACPI enabling status is inconsistent: SCI is not"
-      " enabled but the ACPI table does not provide a means to enable it through FADT->SmiCmd."
-      " This may cause issues in OS.\n"
-      ));
-  }
-
-  DEBUG_CODE_END ();
-
   return RETURN_SUCCESS;
 }
 
