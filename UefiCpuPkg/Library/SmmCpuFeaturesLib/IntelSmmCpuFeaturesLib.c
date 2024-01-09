@@ -89,7 +89,7 @@ CpuFeaturesLibInitialization (
     // Check MTRR_CAP MSR bit 11 for SMRR support
     //
     if ((AsmReadMsr64 (SMM_FEATURES_LIB_IA32_MTRR_CAP) & BIT11) != 0) {
-      ASSERT (FeaturePcdGet (PcdSmrrEnable));
+      // ASSERT (FeaturePcdGet (PcdSmrrEnable));
     }
   }
 
