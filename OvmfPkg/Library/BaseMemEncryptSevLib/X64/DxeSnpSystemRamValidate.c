@@ -16,6 +16,8 @@
 #include "SnpPageStateChange.h"
 #include "VirtualMemory.h"
 
+STATIC VOID  *mPscBuffer = NULL;
+
 /**
   Pre-validate the system RAM when SEV-SNP is enabled in the guest VM.
 
@@ -52,5 +54,17 @@ MemEncryptSevSnpPreValidateSystemRam (
     }
   }
 
-  InternalSetPageState (BaseAddress, NumPages, SevSnpPagePrivate, TRUE);
+  if (mPscBuffer == NULL) {
+    mPscBuffer = AllocateReservedPages (1);
+    ASSERT (mPscBuffer != NULL);
+  }
+
+  InternalSetPageState (
+    BaseAddress,
+    NumPages,
+    SevSnpPagePrivate,
+    TRUE,
+    mPscBuffer,
+    EFI_PAGE_SIZE
+    );
 }

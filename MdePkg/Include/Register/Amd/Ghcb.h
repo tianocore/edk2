@@ -195,12 +195,13 @@ typedef struct {
   UINT32    Reserved;
 } SNP_PAGE_STATE_HEADER;
 
-#define SNP_PAGE_STATE_MAX_ENTRY  253
-
 typedef struct {
   SNP_PAGE_STATE_HEADER    Header;
-  SNP_PAGE_STATE_ENTRY     Entry[SNP_PAGE_STATE_MAX_ENTRY];
+  SNP_PAGE_STATE_ENTRY     Entry[];
 } SNP_PAGE_STATE_CHANGE_INFO;
+
+#define SNP_PAGE_STATE_MAX_ENTRY   \
+  ((sizeof (((GHCB *)0)->SharedBuffer) - sizeof (SNP_PAGE_STATE_HEADER)) / sizeof (SNP_PAGE_STATE_ENTRY))
 
 //
 // SEV-ES save area mapping structures used for SEV-SNP AP Creation.
