@@ -18,6 +18,7 @@
 
 #include "CcExitVcHandler.h"
 #include "CcInstruction.h"
+#include "CcExitSvsm.h"
 
 //
 // Non-automatic Exit function prototype
@@ -713,9 +714,28 @@ MsrExit (
   IN     CC_INSTRUCTION_DATA     *InstructionData
   )
 {
-  UINT64  ExitInfo1, Status;
+  MSR_SVSM_CAA_REGISTER  Msr;
+  UINT64                 ExitInfo1;
+  UINT64                 Status;
 
   ExitInfo1 = 0;
+
+  //
+  // The SVSM CAA MSR is a software implemented MSR and not supported
+  // by the hardware, handle it directly.
+  //
+  if (Regs->Rax == MSR_SVSM_CAA) {
+    // Writes to the SVSM CAA MSR are ignored
+    if (*(InstructionData->OpCodes + 1) == 0x30) {
+      return 0;
+    }
+
+    Msr.Uint64 = SvsmGetCaaPa ();
+    Regs->Rax  = Msr.Bits.Lower32Bits;
+    Regs->Rdx  = Msr.Bits.Upper32Bits;
+
+    return 0;
+  }
 
   switch (*(InstructionData->OpCodes + 1)) {
     case 0x30: // WRMSR
@@ -1388,6 +1408,11 @@ GetCpuidFw (
     *Ebx = (*Ebx & 0xFFFFFF00) | (Ebx2 & 0x000000FF);
     /* node ID */
     *Ecx = (*Ecx & 0xFFFFFF00) | (Ecx2 & 0x000000FF);
+  } else if (EaxIn == 0x8000001F) {
+    /* Set the SVSM feature bit if running under an SVSM */
+    if (CcExitSnpSvsmPresent ()) {
+      *Eax |= BIT28;
+    }
   }
 
 Out:

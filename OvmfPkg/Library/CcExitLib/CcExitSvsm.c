@@ -45,6 +45,27 @@ SvsmTerminate (
 }
 
 /**
+  Return the physical address of SVSM Call Area (CAA).
+
+  Determines the physical address of the SVSM CAA.
+
+  @return                         The physical address of the SVSM CAA
+
+**/
+UINT64
+EFIAPI
+SvsmGetCaaPa (
+  VOID
+  )
+{
+  SVSM_INFORMATION  *SvsmInfo;
+
+  SvsmInfo = (SVSM_INFORMATION *)(UINTN)PcdGet32 (PcdOvmfSnpSecretsBase);
+
+  return CcExitSnpSvsmPresent () ? SvsmInfo->SvsmCaa : 0;
+}
+
+/**
   Return the address of SVSM Call Area (CAA).
 
   Determines the address of the SVSM CAA.
