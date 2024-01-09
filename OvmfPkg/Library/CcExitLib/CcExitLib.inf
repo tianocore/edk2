@@ -23,6 +23,7 @@
 
 [Sources.common]
   CcExitLib.c
+  CcExitSvsm.c
   CcExitVcHandler.c
   CcExitVcHandler.h
   CcInstruction.c
@@ -45,3 +46,5 @@
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
