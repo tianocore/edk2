@@ -42,11 +42,13 @@
   DebugLib
   HobLib
   IntrinsicLib
+  MmUnblockMemoryLib
 
 [Guids]
   gMmCoreDataHobGuid
   gEfiSmmSmramMemoryGuid
   gEdkiiEventMmDispatchGuid
+  gEdkiiCommunicationBufferGuid
 
 [Ppis]
   gPeiSmmControlPpiGuid
@@ -57,6 +59,7 @@
   gEfiMmEndOfPeiProtocol
 
 [Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFixedCommBufferPages
 
 [Depex]
   gEfiPeiMpServicesPpiGuid AND gPeiSmmControlPpiGuid
