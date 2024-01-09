@@ -218,13 +218,12 @@ CoreInitializeImageServices (
   //
   Image = &mCorePrivateImage;
 
-  Image->EntryPoint       = (EFI_IMAGE_ENTRY_POINT)(UINTN)DxeCoreEntryPoint;
-  Image->ImageBasePage    = DxeCoreImageBaseAddress;
-  Image->NumberOfPages    = (UINTN)(EFI_SIZE_TO_PAGES ((UINTN)(DxeCoreImageLength)));
-  Image->Tpl              = gEfiCurrentTpl;
-  Image->Info.SystemTable = gDxeCoreST;
-  Image->Info.ImageBase   = (VOID *)(UINTN)DxeCoreImageBaseAddress;
-  Image->Info.ImageSize   = DxeCoreImageLength;
+  Image->EntryPoint     = (EFI_IMAGE_ENTRY_POINT)(UINTN)DxeCoreEntryPoint;
+  Image->ImageBasePage  = DxeCoreImageBaseAddress;
+  Image->NumberOfPages  = (UINTN)(EFI_SIZE_TO_PAGES ((UINTN)(DxeCoreImageLength)));
+  Image->Tpl            = gEfiCurrentTpl;
+  Image->Info.ImageBase = (VOID *)(UINTN)DxeCoreImageBaseAddress;
+  Image->Info.ImageSize = DxeCoreImageLength;
 
   //
   // Install the protocol interfaces for this image
