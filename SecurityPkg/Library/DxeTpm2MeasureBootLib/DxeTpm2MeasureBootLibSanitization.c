@@ -131,8 +131,8 @@ SanitizeEfiPartitionTableHeader (
   }
 
   //
-  // SizeOfPartitionEntry must be 128, 256, 512... improper size may lead to accessing uninitialized memory\
-  //   //
+  // SizeOfPartitionEntry must be 128, 256, 512... improper size may lead to accessing uninitialized memory
+  //
   if ((PrimaryHeader->SizeOfPartitionEntry < 128) || ((PrimaryHeader->SizeOfPartitionEntry & (PrimaryHeader->SizeOfPartitionEntry - 1)) != 0)) {
     DEBUG ((DEBUG_ERROR, "SizeOfPartitionEntry shall be set to a value of 128 x 2^n where n is an integer greater than or equal to zero (e.g., 128, 256, 512, etc.)!\n"));
     return EFI_DEVICE_ERROR;
@@ -268,6 +268,50 @@ SanitizePrimaryHeaderGptEventSize (
                           );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Event Size would have overflowed because of GPTData!\n"));
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This function will validate that the PeImage Event Size from the loaded image is sane
+  It will check the following:
+    - EventSize does not overflow
+
+  @param[in] FilePathSize - Size of the file path.
+  @param[out] EventSize - Pointer to the event size.
+
+  @retval EFI_SUCCESS
+    The event size is valid.
+
+  @retval EFI_OUT_OF_RESOURCES
+    Overflow would have occurred.
+
+  @retval EFI_INVALID_PARAMETER
+    One of the passed parameters was invalid.
+**/
+EFI_STATUS
+SanitizePeImageEventSize (
+  IN  UINT32  FilePathSize,
+  OUT UINT32  *EventSize
+  )
+{
+  EFI_STATUS  Status;
+
+  // Replacing logic:
+  // sizeof (*ImageLoad) - sizeof (ImageLoad->DevicePath) + FilePathSize;
+  Status = SafeUint32Add (OFFSET_OF (EFI_IMAGE_LOAD_EVENT, DevicePath), FilePathSize, EventSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EventSize would overflow!\n"));
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  // Replacing logic:
+  // EventSize + sizeof (EFI_TCG2_EVENT) - sizeof (Tcg2Event->Event)
+  Status = SafeUint32Add (*EventSize, OFFSET_OF (EFI_TCG2_EVENT, Event), EventSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EventSize would overflow!\n"));
     return EFI_BAD_BUFFER_SIZE;
   }
 

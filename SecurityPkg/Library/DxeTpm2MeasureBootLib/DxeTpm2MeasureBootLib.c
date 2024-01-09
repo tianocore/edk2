@@ -378,7 +378,6 @@ Exit:
   @retval EFI_OUT_OF_RESOURCES   No enough resource to measure image.
   @retval EFI_UNSUPPORTED        ImageType is unsupported or PE image is mal-format.
   @retval other error value
-
 **/
 EFI_STATUS
 EFIAPI
@@ -405,6 +404,7 @@ Tcg2MeasurePeImage (
   Status    = EFI_UNSUPPORTED;
   ImageLoad = NULL;
   EventPtr  = NULL;
+  Tcg2Event = NULL;
 
   Tcg2Protocol = MeasureBootProtocols->Tcg2Protocol;
   CcProtocol   = MeasureBootProtocols->CcProtocol;
@@ -420,18 +420,22 @@ Tcg2MeasurePeImage (
   }
 
   FilePathSize = (UINT32)GetDevicePathSize (FilePath);
+  Status = SanitizePeImageEventSize (FilePathSize, &EventSize);
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Determine destination PCR by BootPolicy
   //
-  EventSize = sizeof (*ImageLoad) - sizeof (ImageLoad->DevicePath) + FilePathSize;
-  EventPtr  = AllocateZeroPool (EventSize + sizeof (EFI_TCG2_EVENT) - sizeof (Tcg2Event->Event));
+  // from a malicious GPT disk partition
+  EventPtr = AllocateZeroPool (EventSize);
   if (EventPtr == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Tcg2Event                       = (EFI_TCG2_EVENT *)EventPtr;
-  Tcg2Event->Size                 = EventSize + sizeof (EFI_TCG2_EVENT) - sizeof (Tcg2Event->Event);
+  Tcg2Event       = (EFI_TCG2_EVENT *)EventPtr;
+  Tcg2Event->Size = EventSize;
   Tcg2Event->Header.HeaderSize    = sizeof (EFI_TCG2_EVENT_HEADER);
   Tcg2Event->Header.HeaderVersion = EFI_TCG2_EVENT_HEADER_VERSION;
   ImageLoad                       = (EFI_IMAGE_LOAD_EVENT *)Tcg2Event->Event;
