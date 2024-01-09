@@ -477,5 +477,10 @@
   # @Prompt GHCB Hypervisor Features
   gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures|0x0|UINT64|0x60000018
 
+  ## This dynamic PCD contains the address of the APIC ID list obtained through the GHCB GET APIC IDS
+  #  VMGEXIT defined in the version 3 of GHCB spec.
+  # @Prompt SEV-ES CPU APIC ID List
+  gUefiCpuPkgTokenSpaceGuid.PcdSevSnpApicIds|0x0|UINT64|0x6000001A
+
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiCpuPkgExtra.uni
