@@ -330,7 +330,7 @@ AmlParseString (
   StrSize = 0;
   // AML String is NULL terminated.
   do {
-    // Reading the stream moves the stream forward aswell.
+    // Reading the stream moves the stream forward as well.
     Status = AmlStreamReadByte (FStream, &Byte);
     if (EFI_ERROR (Status)) {
       ASSERT (0);
