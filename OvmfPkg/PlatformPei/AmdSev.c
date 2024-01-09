@@ -465,5 +465,16 @@ SevInitializeRam (
       (UINT64)(UINTN)PcdGet32 (PcdOvmfCpuidSize),
       EfiReservedMemoryType
       );
+
+    //
+    // The calling area memory needs to be protected until the OS can create
+    // its own calling area. Mark it as EfiReservedMemoryType so that the
+    // guest firmware and OS do not use it as a system memory.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfSecSvsmCaaBase),
+      (UINT64)(UINTN)PcdGet32 (PcdOvmfSecSvsmCaaSize),
+      EfiReservedMemoryType
+      );
   }
 }
