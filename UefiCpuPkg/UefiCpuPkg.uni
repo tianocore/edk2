@@ -301,3 +301,6 @@
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsWorkAreaSize_PROMPT  #language en-US "Specify the size of the SEV-ES work area"
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevEsWorkAreaSize_HELP    #language en-US "Specifies the size of the work area used by an SEV-ES guest."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevSnpApicIds_PROMPT      #language en-US "Specifies the address of the APIC ID list."
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdSevSnpApicIds_HELP        #language en-US "Set to the address of the APIC ID list retrieved from the hypervisor, zero if unavailable."
