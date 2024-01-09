@@ -1,7 +1,7 @@
 /**@file
   Initialize Secure Encrypted Virtualization (SEV) support
 
-  Copyright (c) 2017 - 2020, Advanced Micro Devices. All rights reserved.<BR>
+  Copyright (c) 2017 - 2024, Advanced Micro Devices. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -463,6 +463,17 @@ SevInitializeRam (
     BuildMemoryAllocationHob (
       (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfCpuidBase),
       (UINT64)(UINTN)PcdGet32 (PcdOvmfCpuidSize),
+      EfiReservedMemoryType
+      );
+
+    //
+    // The calling area memory needs to be protected until the OS can create
+    // its own calling area. Mark it as EfiReservedMemoryType so that the
+    // guest firmware and OS do not use it as a system memory.
+    //
+    BuildMemoryAllocationHob (
+      (EFI_PHYSICAL_ADDRESS)(UINTN)PcdGet32 (PcdOvmfSecSvsmCaaBase),
+      (UINT64)(UINTN)PcdGet32 (PcdOvmfSecSvsmCaaSize),
       EfiReservedMemoryType
       );
   }

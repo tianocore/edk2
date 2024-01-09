@@ -94,6 +94,9 @@ gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase|gUefiOvmfPkgTokenSpaceGuid.PcdO
 0x00E000|0x001000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
 
+0x00F000|0x001000
+gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaSize
+
 0x010000|0x010000
 gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamBase|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPeiTempRamSize
 
