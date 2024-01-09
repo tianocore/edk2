@@ -1302,9 +1302,10 @@ WakeUpAP (
       //
       // Wakeup all APs
       //   Must use the INIT-SIPI-SIPI method for initial configuration in
-      //   order to obtain the APIC ID.
+      //   order to obtain the APIC ID if not an SEV-SNP guest and the
+      //   list of APIC IDs is not available.
       //
-      if (CpuMpData->SevSnpIsEnabled && (CpuMpData->InitFlag != ApInitConfig)) {
+      if (SevSnpUseCreateAP (CpuMpData)) {
         SevSnpCreateAP (CpuMpData, -1);
       } else {
         if ((CpuMpData->InitFlag == ApInitConfig) && FixedPcdGetBool (PcdFirstTimeWakeUpAPsBySipi)) {
@@ -1414,7 +1415,7 @@ WakeUpAP (
         SetSevEsJumpTable (ExchangeInfo->BufferStart);
       }
 
-      if (CpuMpData->SevSnpIsEnabled && (CpuMpData->InitFlag != ApInitConfig)) {
+      if (SevSnpUseCreateAP (CpuMpData)) {
         SevSnpCreateAP (CpuMpData, (INTN)ProcessorNumber);
       } else {
         SendInitSipiSipi (

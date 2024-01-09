@@ -48,3 +48,22 @@ SevSnpCreateAP (
   //
   ASSERT (FALSE);
 }
+
+/**
+  Determine if the SEV-SNP AP Create protocol should be used.
+
+  @param[in]  CpuMpData  Pointer to CPU MP Data
+
+  @retval     TRUE       Use SEV-SNP AP Create protocol
+  @retval     FALSE      Do not use SEV-SNP AP Create protocol
+**/
+BOOLEAN
+SevSnpUseCreateAP (
+  IN  CPU_MP_DATA  *CpuMpData
+  )
+{
+  //
+  // SEV-SNP is not supported on 32-bit build.
+  //
+  return FALSE;
+}
