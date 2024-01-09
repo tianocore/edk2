@@ -1,7 +1,7 @@
 ## @file
 #  CcExitLib Library.
 #
-#  Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2020 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 #  Copyright (C) 2020 - 2022, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -23,6 +23,7 @@
 
 [Sources.common]
   CcExitLib.c
+  CcExitSvsm.c
   CcExitVcHandler.c
   CcExitVcHandler.h
   CcInstruction.c
@@ -45,3 +46,5 @@
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
