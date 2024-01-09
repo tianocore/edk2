@@ -32,6 +32,85 @@ GetHypervisorFeature (
   );
 
 /**
+  Retrieve APIC IDs from the hypervisor.
+
+**/
+STATIC
+VOID
+AmdSevSnpGetApicIds (
+  VOID
+  )
+{
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  GHCB                      *Ghcb;
+  BOOLEAN                   InterruptState;
+  UINT64                    VmgExitStatus;
+  UINT64                    PageCount;
+  BOOLEAN                   PageCountValid;
+  VOID                      *ApicIds;
+  RETURN_STATUS             Status;
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+  Ghcb                    = Msr.Ghcb;
+
+  PageCount      = 0;
+  PageCountValid = FALSE;
+
+  CcExitVmgInit (Ghcb, &InterruptState);
+  Ghcb->SaveArea.Rax = PageCount;
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
+  VmgExitStatus = CcExitVmgExit (Ghcb, SVM_EXIT_GET_APIC_IDS, 0, 0);
+  if (CcExitVmgIsOffsetValid (Ghcb, GhcbRax)) {
+    PageCount      = Ghcb->SaveArea.Rax;
+    PageCountValid = TRUE;
+  }
+
+  CcExitVmgDone (Ghcb, InterruptState);
+
+  ASSERT (VmgExitStatus == 0);
+  ASSERT (PageCountValid);
+  if ((VmgExitStatus != 0) || !PageCountValid) {
+    return;
+  }
+
+  //
+  // Allocate the memory for the APIC IDs
+  //
+  ApicIds = AllocateReservedPages ((UINTN)PageCount);
+  ASSERT (ApicIds != NULL);
+
+  Status = MemEncryptSevClearPageEncMask (
+             0,
+             (UINTN)ApicIds,
+             (UINTN)PageCount
+             );
+  ASSERT_RETURN_ERROR (Status);
+
+  ZeroMem (ApicIds, EFI_PAGES_TO_SIZE ((UINTN)PageCount));
+
+  PageCountValid = FALSE;
+
+  CcExitVmgInit (Ghcb, &InterruptState);
+  Ghcb->SaveArea.Rax = PageCount;
+  CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
+  VmgExitStatus = CcExitVmgExit (Ghcb, SVM_EXIT_GET_APIC_IDS, (UINTN)ApicIds, 0);
+  if (CcExitVmgIsOffsetValid (Ghcb, GhcbRax) && (Ghcb->SaveArea.Rax == PageCount)) {
+    PageCountValid = TRUE;
+  }
+
+  CcExitVmgDone (Ghcb, InterruptState);
+
+  ASSERT (VmgExitStatus == 0);
+  ASSERT (PageCountValid);
+  if ((VmgExitStatus != 0) || !PageCountValid) {
+    FreePages (ApicIds, (UINTN)PageCount);
+    return;
+  }
+
+  Status = PcdSet64S (PcdSevSnpApicIds, (UINTN)ApicIds);
+}
+
+/**
   Initialize SEV-SNP support if running as an SEV-SNP guest.
 
 **/
@@ -77,6 +156,14 @@ AmdSevSnpInitialize (
           );
       }
     }
+  }
+
+  //
+  // Retrieve the APIC IDs if the hypervisor supports it. These will be used
+  // to always start APs using SNP AP Create.
+  //
+  if ((HvFeatures & GHCB_HV_FEATURES_APIC_ID_LIST) == GHCB_HV_FEATURES_APIC_ID_LIST) {
+    AmdSevSnpGetApicIds ();
   }
 }
 

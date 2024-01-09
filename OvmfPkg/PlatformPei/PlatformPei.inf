@@ -116,6 +116,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
   gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures
   gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask
+  gUefiCpuPkgTokenSpaceGuid.PcdSevSnpApicIds
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfCpuidBase
