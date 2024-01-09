@@ -9,6 +9,8 @@
 #include <PiPei.h>
 #include <PiSmm.h>
 #include <StandaloneMm.h>
+#include <Ppi/SmmControl.h>
+#include <Ppi/MmCommunication.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeCoffLib.h>
@@ -18,6 +20,7 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/HobLib.h>
+#include <Protocol/SmmCommunication.h>
 #include <Guid/MmCoreData.h>
 #include <Guid/SmramMemoryReserve.h>
 
@@ -54,6 +57,118 @@ EFI_SMRAM_DESCRIPTOR  *mCurrentSmramRange;
 EFI_PHYSICAL_ADDRESS  mSmramCacheBase;
 UINT64                mSmramCacheSize;
 UINTN                 mSmramRangeCount;
+
+/**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                The EFI_PEI_MM_COMMUNICATION_PPI instance.
+  @param[in, out] CommBuffer     A pointer to the buffer to convey into SMRAM.
+  @param[in, out] CommSize       The size of the data buffer being passed in.On exit, the size of data
+                                 being returned. Zero if the handler does not wish to reply with any data.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
+  @retval EFI_NOT_STARTED        The service is NOT started.
+**/
+EFI_STATUS
+EFIAPI
+Communicate (
+  IN CONST EFI_PEI_MM_COMMUNICATION_PPI  *This,
+  IN OUT VOID                            *CommBuffer,
+  IN OUT UINTN                           *CommSize
+  );
+
+EFI_PEI_MM_COMMUNICATION_PPI  mMmCommunicationPpi = { Communicate };
+
+EFI_PEI_PPI_DESCRIPTOR  mPpiList = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiMmCommunicationPpiGuid,
+  &mMmCommunicationPpi
+};
+
+/**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                The EFI_PEI_MM_COMMUNICATION_PPI instance.
+  @param[in, out] CommBuffer     A pointer to the buffer to convey into SMRAM.
+  @param[in, out] CommSize       The size of the data buffer being passed in.On exit, the size of data
+                                 being returned. Zero if the handler does not wish to reply with any data.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
+  @retval EFI_NOT_STARTED        The service is NOT started.
+**/
+EFI_STATUS
+EFIAPI
+Communicate (
+  IN CONST EFI_PEI_MM_COMMUNICATION_PPI  *This,
+  IN OUT VOID                            *CommBuffer,
+  IN OUT UINTN                           *CommSize
+  )
+{
+  EFI_STATUS           Status;
+  PEI_SMM_CONTROL_PPI  *SmmControl;
+  UINT8                SmiCommand;
+  UINTN                Size;
+
+  DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Enter\n"));
+
+  SmiCommand = 0;
+  Size       = sizeof (SmiCommand);
+
+  if (CommBuffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // If not already in SMM, then generate a Software SMI
+  //
+  if (!gMmCorePrivate->InMm && gMmCorePrivate->MmEntryPointRegistered) {
+    //
+    // Put arguments for Software SMI in gMmCorePrivate
+    //
+    gMmCorePrivate->CommunicationBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer;
+    gMmCorePrivate->BufferSize          = (UINT64)*CommSize;
+
+    //
+    // Generate Software SMI
+    //
+    Status = PeiServicesLocatePpi (&gPeiSmmControlPpiGuid, 0, NULL, (VOID **)&SmmControl);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = SmmControl->Trigger (
+                           (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
+                           SmmControl,
+                           (INT8 *)&SmiCommand,
+                           &Size,
+                           FALSE,
+                           0
+                           );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Return status from software SMI
+    //
+    *CommSize = (UINTN)gMmCorePrivate->BufferSize;
+
+    Status = (EFI_STATUS)gMmCorePrivate->ReturnStatus;
+    if (Status != EFI_SUCCESS) {
+      Status = Status | MAX_BIT;
+    }
+
+    DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Exit (%r)\n", Status));
+
+    return Status;
+  }
+
+  DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Exit (%r)\n", EFI_UNSUPPORTED));
+
+  return EFI_UNSUPPORTED;
+}
 
 /**
   Find the maximum SMRAM cache range that covers the range specified by SmramRange.
@@ -602,6 +717,12 @@ StandaloneMmIplPeiEntry (
     //
     DEBUG ((DEBUG_ERROR, "SMM IPL could not find a large enough SMRAM region to load SMM Core\n"));
   }
+
+  //
+  // Install MmCommunicationPpi
+  //
+  Status = PeiServicesInstallPpi (&mPpiList);
+  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }

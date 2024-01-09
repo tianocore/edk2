@@ -48,9 +48,11 @@
   gEfiSmmSmramMemoryGuid
 
 [Ppis]
+  gPeiSmmControlPpiGuid
+  gEfiPeiMmCommunicationPpiGuid
 
 [Pcd]
 
 [Depex]
-  gEfiPeiMpServicesPpiGuid
+  gEfiPeiMpServicesPpiGuid AND gPeiSmmControlPpiGuid
 
