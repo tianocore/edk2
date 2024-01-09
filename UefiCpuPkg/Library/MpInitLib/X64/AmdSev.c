@@ -263,17 +263,63 @@ SevSnpCreateAP (
   CPU_INFO_IN_HOB  *CpuInfoInHob;
   CPU_AP_DATA      *CpuData;
   UINTN            Index;
+  UINTN            MaxIndex;
   UINT32           ApicId;
+  GHCB_APIC_IDS    *GhcbApicIds;
 
   ASSERT (CpuMpData->MpCpuExchangeInfo->BufferStart < 0x100000);
 
   CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
 
   if (ProcessorNumber < 0) {
-    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+    GhcbApicIds = (GHCB_APIC_IDS *)(UINTN)PcdGet64 (PcdSevSnpApicIds);
+
+    if (CpuMpData->InitFlag == ApInitConfig) {
+      //
+      // APs have not been started, so CpuCount is not "known" yet.
+      // Use the retrieved APIC IDs to start the APs and fill out the
+      // MpLib CPU information properly.
+      //
+      ASSERT (GhcbApicIds != NULL);
+      if (GhcbApicIds == NULL) {
+        return;
+      }
+
+      MaxIndex = MIN (GhcbApicIds->NumEntries, PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+    } else {
+      //
+      // APs have been previously started.
+      //
+      MaxIndex = CpuMpData->CpuCount;
+    }
+
+    for (Index = 0; Index < MaxIndex; Index++) {
       if (Index != CpuMpData->BspNumber) {
         CpuData = &CpuMpData->CpuData[Index];
-        ApicId  = CpuInfoInHob[Index].ApicId,
+
+        if (CpuMpData->InitFlag == ApInitConfig) {
+          //
+          // CodeQL doesn't understand that a check for NULL was already done
+          // above, so check again.
+          //
+          if (GhcbApicIds == NULL) {
+            return;
+          }
+
+          ApicId = GhcbApicIds->ApicIds[Index];
+
+          //
+          // For the first boot, use the BSP register information.
+          //
+          CopyMem (
+            &CpuData->VolatileRegisters,
+            &CpuMpData->CpuData[0].VolatileRegisters,
+            sizeof (CpuData->VolatileRegisters)
+            );
+        } else {
+          ApicId = CpuInfoInHob[Index].ApicId;
+        }
+
         SevSnpCreateSaveArea (CpuMpData, CpuData, ApicId);
       }
     }
@@ -283,4 +329,33 @@ SevSnpCreateAP (
     ApicId  = CpuInfoInHob[ProcessorNumber].ApicId,
     SevSnpCreateSaveArea (CpuMpData, CpuData, ApicId);
   }
+}
+
+/**
+  Determine if the SEV-SNP AP Create protocol should be used.
+
+  @param[in]  CpuMpData  Pointer to CPU MP Data
+
+  @retval     TRUE       Use SEV-SNP AP Create protocol
+  @retval     FALSE      Do not use SEV-SNP AP Create protocol
+**/
+BOOLEAN
+SevSnpUseCreateAP (
+  IN  CPU_MP_DATA  *CpuMpData
+  )
+{
+  //
+  // The AP Create protocol is used for an SEV-SNP guest if
+  //   - The initial configuration has been performed already or
+  //   - PcdSevSnpApicIds is non-zero.
+  //
+  if (!CpuMpData->SevSnpIsEnabled) {
+    return FALSE;
+  }
+
+  if ((CpuMpData->InitFlag == ApInitConfig) && (PcdGet64 (PcdSevSnpApicIds) == 0)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }

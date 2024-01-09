@@ -82,6 +82,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures                  ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                       ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi                ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSevSnpApicIds                           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr           ## CONSUMES
