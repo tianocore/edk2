@@ -72,14 +72,19 @@ SnpPageStateFailureTerminate (
 STATIC
 VOID
 PvalidateRange (
-  IN  SNP_PAGE_STATE_CHANGE_INFO  *Info,
-  IN  UINTN                       StartIndex,
-  IN  UINTN                       EndIndex,
-  IN  BOOLEAN                     Validate
+  IN  SNP_PAGE_STATE_CHANGE_INFO  *Info
   )
 {
-  UINTN                 RmpPageSize, Ret, i;
+  UINTN                 RmpPageSize;
+  UINTN                 StartIndex;
+  UINTN                 EndIndex;
+  UINTN                 Index;
+  UINTN                 Ret;
   EFI_PHYSICAL_ADDRESS  Address;
+  BOOLEAN               Validate;
+
+  StartIndex = Info->Header.CurrentEntry;
+  EndIndex   = Info->Header.EndEntry;
 
   for ( ; StartIndex <= EndIndex; StartIndex++) {
     //
@@ -87,6 +92,7 @@ PvalidateRange (
     //
     Address     = ((EFI_PHYSICAL_ADDRESS)Info->Entry[StartIndex].GuestFrameNumber) << EFI_PAGE_SHIFT;
     RmpPageSize = Info->Entry[StartIndex].PageSize;
+    Validate    = Info->Entry[StartIndex].Operation == SNP_PAGE_STATE_PRIVATE;
 
     Ret = AsmPvalidate (RmpPageSize, Validate, Address);
 
@@ -96,7 +102,7 @@ PvalidateRange (
     // the RMP entry is 4K and we are validating it as a 2MB.
     //
     if ((Ret == PVALIDATE_RET_SIZE_MISMATCH) && (RmpPageSize == PvalidatePageSize2MB)) {
-      for (i = 0; i < PAGES_PER_LARGE_ENTRY; i++) {
+      for (Index = 0; Index < PAGES_PER_LARGE_ENTRY; Index++) {
         Ret = AsmPvalidate (PvalidatePageSize4K, Validate, Address);
         if (Ret) {
           break;
@@ -131,22 +137,37 @@ BuildPageStateBuffer (
   IN EFI_PHYSICAL_ADDRESS        EndAddress,
   IN SEV_SNP_PAGE_STATE          State,
   IN BOOLEAN                     UseLargeEntry,
-  IN SNP_PAGE_STATE_CHANGE_INFO  *Info
+  IN SNP_PAGE_STATE_CHANGE_INFO  *Info,
+  IN UINTN                       InfoSize
   )
 {
   EFI_PHYSICAL_ADDRESS  NextAddress;
-  UINTN                 i, RmpPageSize;
+  UINTN                 Index;
+  UINTN                 IndexMax;
+  UINTN                 PscIndexMax;
+  UINTN                 RmpPageSize;
 
   // Clear the page state structure
-  SetMem (Info, sizeof (*Info), 0);
+  SetMem (Info, InfoSize, 0);
 
-  i           = 0;
+  Index       = 0;
+  IndexMax    = (InfoSize - sizeof (Info->Header)) / sizeof (Info->Entry[0]);
   NextAddress = EndAddress;
+
+  //
+  // Make the use of the work area as efficient as possible relative to
+  // exiting from the guest to the hypervisor. Maximize the number of entries
+  // that can be processed per exit.
+  //
+  PscIndexMax = (IndexMax / SNP_PAGE_STATE_MAX_ENTRY) * SNP_PAGE_STATE_MAX_ENTRY;
+  if (PscIndexMax > 0) {
+    IndexMax = MIN (IndexMax, PscIndexMax);
+  }
 
   //
   // Populate the page state entry structure
   //
-  while ((BaseAddress < EndAddress) && (i < SNP_PAGE_STATE_MAX_ENTRY)) {
+  while ((BaseAddress < EndAddress) && (Index < IndexMax)) {
     //
     // Is this a 2MB aligned page? Check if we can use the Large RMP entry.
     //
@@ -160,14 +181,14 @@ BuildPageStateBuffer (
       NextAddress = BaseAddress + EFI_PAGE_SIZE;
     }
 
-    Info->Entry[i].GuestFrameNumber = BaseAddress >> EFI_PAGE_SHIFT;
-    Info->Entry[i].PageSize         = RmpPageSize;
-    Info->Entry[i].Operation        = MemoryStateToGhcbOp (State);
-    Info->Entry[i].CurrentPage      = 0;
-    Info->Header.EndEntry           = (UINT16)i;
+    Info->Entry[Index].GuestFrameNumber = BaseAddress >> EFI_PAGE_SHIFT;
+    Info->Entry[Index].PageSize         = RmpPageSize;
+    Info->Entry[Index].Operation        = MemoryStateToGhcbOp (State);
+    Info->Entry[Index].CurrentPage      = 0;
+    Info->Header.EndEntry               = (UINT16)Index;
 
     BaseAddress = NextAddress;
-    i++;
+    Index++;
   }
 
   return NextAddress;
@@ -176,11 +197,29 @@ BuildPageStateBuffer (
 STATIC
 VOID
 PageStateChangeVmgExit (
-  IN GHCB                        *Ghcb,
-  IN SNP_PAGE_STATE_CHANGE_INFO  *Info
+  IN GHCB                  *Ghcb,
+  IN SNP_PAGE_STATE_ENTRY  *Start,
+  IN UINT16                Count
   )
 {
-  EFI_STATUS  Status;
+  SNP_PAGE_STATE_CHANGE_INFO  *GhcbInfo;
+  EFI_STATUS                  Status;
+  BOOLEAN                     InterruptState;
+
+  ASSERT (Count <= SNP_PAGE_STATE_MAX_ENTRY);
+  if (Count > SNP_PAGE_STATE_MAX_ENTRY) {
+    SnpPageStateFailureTerminate ();
+  }
+
+  //
+  // Initialize the GHCB
+  //
+  CcExitVmgInit (Ghcb, &InterruptState);
+
+  GhcbInfo                      = (SNP_PAGE_STATE_CHANGE_INFO *)Ghcb->SharedBuffer;
+  GhcbInfo->Header.CurrentEntry = 0;
+  GhcbInfo->Header.EndEntry     = Count - 1;
+  CopyMem (GhcbInfo->Entry, Start, sizeof (*Start) * Count);
 
   //
   // As per the GHCB specification, the hypervisor can resume the guest before
@@ -191,7 +230,7 @@ PageStateChangeVmgExit (
   // page state was not successful, then later memory access will result
   // in the crash.
   //
-  while (Info->Header.CurrentEntry <= Info->Header.EndEntry) {
+  while (GhcbInfo->Header.CurrentEntry <= GhcbInfo->Header.EndEntry) {
     Ghcb->SaveArea.SwScratch = (UINT64)Ghcb->SharedBuffer;
     CcExitVmgSetOffsetValid (Ghcb, GhcbSwScratch);
 
@@ -204,6 +243,34 @@ PageStateChangeVmgExit (
     if ((Status != 0) || (Ghcb->SaveArea.SwExitInfo2)) {
       SnpPageStateFailureTerminate ();
     }
+  }
+
+  CcExitVmgDone (Ghcb, InterruptState);
+}
+
+STATIC
+VOID
+PageStateChange (
+  IN SNP_PAGE_STATE_CHANGE_INFO  *Info
+  )
+{
+  GHCB                      *Ghcb;
+  MSR_SEV_ES_GHCB_REGISTER  Msr;
+  SNP_PAGE_STATE_HEADER     *Header;
+  UINT16                    Index;
+  UINT16                    Count;
+
+  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
+  Ghcb                    = Msr.Ghcb;
+
+  Header = &Info->Header;
+
+  for (Index = Header->CurrentEntry; Index <= Header->EndEntry;) {
+    Count = MIN (Header->EndEntry - Index + 1, SNP_PAGE_STATE_MAX_ENTRY);
+
+    PageStateChangeVmgExit (Ghcb, &Info->Entry[Index], Count);
+
+    Index += Count;
   }
 }
 
@@ -220,17 +287,13 @@ InternalSetPageState (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN                 NumPages,
   IN SEV_SNP_PAGE_STATE    State,
-  IN BOOLEAN               UseLargeEntry
+  IN BOOLEAN               UseLargeEntry,
+  IN VOID                  *PscBuffer,
+  IN UINTN                 PscBufferSize
   )
 {
-  GHCB                        *Ghcb;
   EFI_PHYSICAL_ADDRESS        NextAddress, EndAddress;
-  MSR_SEV_ES_GHCB_REGISTER    Msr;
-  BOOLEAN                     InterruptState;
   SNP_PAGE_STATE_CHANGE_INFO  *Info;
-
-  Msr.GhcbPhysicalAddress = AsmReadMsr64 (MSR_SEV_ES_GHCB);
-  Ghcb                    = Msr.Ghcb;
 
   EndAddress = BaseAddress + EFI_PAGES_TO_SIZE (NumPages);
 
@@ -245,56 +308,40 @@ InternalSetPageState (
     UseLargeEntry
     ));
 
-  while (BaseAddress < EndAddress) {
-    UINTN  CurrentEntry, EndEntry;
+  Info = (SNP_PAGE_STATE_CHANGE_INFO *)PscBuffer;
 
-    //
-    // Initialize the GHCB
-    //
-    CcExitVmgInit (Ghcb, &InterruptState);
-
+  for (NextAddress = BaseAddress; NextAddress < EndAddress;) {
     //
     // Build the page state structure
     //
-    Info        = (SNP_PAGE_STATE_CHANGE_INFO *)Ghcb->SharedBuffer;
     NextAddress = BuildPageStateBuffer (
-                    BaseAddress,
+                    NextAddress,
                     EndAddress,
                     State,
                     UseLargeEntry,
-                    Info
+                    PscBuffer,
+                    PscBufferSize
                     );
-
-    //
-    // Save the current and end entry from the page state structure. We need
-    // it later.
-    //
-    CurrentEntry = Info->Header.CurrentEntry;
-    EndEntry     = Info->Header.EndEntry;
 
     //
     // If the caller requested to change the page state to shared then
     // invalidate the pages before making the page shared in the RMP table.
     //
     if (State == SevSnpPageShared) {
-      PvalidateRange (Info, CurrentEntry, EndEntry, FALSE);
+      PvalidateRange (Info);
     }
 
     //
     // Invoke the page state change VMGEXIT.
     //
-    PageStateChangeVmgExit (Ghcb, Info);
+    PageStateChange (Info);
 
     //
     // If the caller requested to change the page state to private then
     // validate the pages after it has been added in the RMP table.
     //
     if (State == SevSnpPagePrivate) {
-      PvalidateRange (Info, CurrentEntry, EndEntry, TRUE);
+      PvalidateRange (Info);
     }
-
-    CcExitVmgDone (Ghcb, InterruptState);
-
-    BaseAddress = NextAddress;
   }
 }

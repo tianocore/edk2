@@ -24,7 +24,9 @@ InternalSetPageState (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINTN                 NumPages,
   IN SEV_SNP_PAGE_STATE    State,
-  IN BOOLEAN               UseLargeEntry
+  IN BOOLEAN               UseLargeEntry,
+  IN VOID                  *PscBuffer,
+  IN UINTN                 PscBufferSize
   );
 
 VOID

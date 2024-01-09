@@ -4,7 +4,7 @@
   Provides data types allowing an SEV-ES guest to interact with the hypervisor
   using the GHCB protocol.
 
-  Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2020 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -195,12 +195,13 @@ typedef struct {
   UINT32    Reserved;
 } SNP_PAGE_STATE_HEADER;
 
-#define SNP_PAGE_STATE_MAX_ENTRY  253
-
 typedef struct {
   SNP_PAGE_STATE_HEADER    Header;
-  SNP_PAGE_STATE_ENTRY     Entry[SNP_PAGE_STATE_MAX_ENTRY];
+  SNP_PAGE_STATE_ENTRY     Entry[];
 } SNP_PAGE_STATE_CHANGE_INFO;
+
+#define SNP_PAGE_STATE_MAX_ENTRY   \
+  ((sizeof (((GHCB *)0)->SharedBuffer) - sizeof (SNP_PAGE_STATE_HEADER)) / sizeof (SNP_PAGE_STATE_ENTRY))
 
 //
 // SEV-ES save area mapping structures used for SEV-SNP AP Creation.
