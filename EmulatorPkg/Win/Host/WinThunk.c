@@ -10,21 +10,14 @@ Module Name:
 Abstract:
 
   Since the SEC is the only windows program in our emulation we
-  must use a Tiano mechanism to export Win32 APIs to other modules.
-  This is the role of the EFI_WIN_NT_THUNK_PROTOCOL.
+  must use a Tiano mechanism to export operating system services
+  to other modules. This is the role of the EMU_THUNK_PROTOCOL.
 
-  The mWinNtThunkTable exists so that a change to EFI_WIN_NT_THUNK_PROTOCOL
+  The gEmuThunkProtocol exists so that a change to EMU_THUNK_PROTOCOL
   will cause an error in initializing the array if all the member functions
   are not added. It looks like adding a element to end and not initializing
-  it may cause the table to be initaliized with the members at the end being
-  set to zero. This is bad as jumping to zero will case the NT32 to crash.
-
-  All the member functions in mWinNtThunkTable are Win32
-  API calls, so please reference Microsoft documentation.
-
-
-  gWinNt is a a public exported global that contains the initialized
-  data.
+  it may cause the table to be initalized with the members at the end being
+  set to zero. This is bad as jumping to zero will case EmulatorPkg to crash.
 
 **/
 
@@ -271,11 +264,11 @@ volatile BOOLEAN  mInterruptEnabled = FALSE;
 VOID
 CALLBACK
 MMTimerThread (
-  UINT   wTimerID,
-  UINT   msg,
-  DWORD  dwUser,
-  DWORD  dw1,
-  DWORD  dw2
+  UINT       wTimerID,
+  UINT       msg,
+  DWORD_PTR  dwUser,
+  DWORD_PTR  dw1,
+  DWORD_PTR  dw2
   )
 {
   UINT32  CurrentTick;

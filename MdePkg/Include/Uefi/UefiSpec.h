@@ -1663,7 +1663,7 @@ typedef struct {
   ///
   UINT32      Flags;
   ///
-  /// Size in bytes of the capsule.
+  /// Size in bytes of the capsule (including capsule header).
   ///
   UINT32      CapsuleImageSize;
 } EFI_CAPSULE_HEADER;

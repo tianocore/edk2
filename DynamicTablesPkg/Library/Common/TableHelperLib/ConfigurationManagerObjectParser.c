@@ -1130,7 +1130,7 @@ ParseCmObjDesc (
         &RemainingSize,
         1
         );
-      if ((RemainingSize > CmObjDesc->Size) ||
+      if ((RemainingSize > (INTN)CmObjDesc->Size) ||
           (RemainingSize < 0))
       {
         ASSERT (0);

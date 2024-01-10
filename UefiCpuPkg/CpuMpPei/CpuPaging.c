@@ -267,13 +267,15 @@ GetStackBase (
   )
 {
   EFI_PHYSICAL_ADDRESS  StackBase;
+  UINTN                 Index;
 
+  MpInitLibWhoAmI (&Index);
   StackBase  = (EFI_PHYSICAL_ADDRESS)(UINTN)&StackBase;
   StackBase += BASE_4KB;
   StackBase &= ~((EFI_PHYSICAL_ADDRESS)BASE_4KB - 1);
   StackBase -= PcdGet32 (PcdCpuApStackSize);
 
-  *(EFI_PHYSICAL_ADDRESS *)Buffer = StackBase;
+  *((EFI_PHYSICAL_ADDRESS *)Buffer + Index) = StackBase;
 }
 
 /**
@@ -287,7 +289,7 @@ SetupStackGuardPage (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
-  EFI_PHYSICAL_ADDRESS  StackBase;
+  EFI_PHYSICAL_ADDRESS  *StackBase;
   UINTN                 NumberOfProcessors;
   UINTN                 Bsp;
   UINTN                 Index;
@@ -308,44 +310,44 @@ SetupStackGuardPage (
     NumberOfProcessors = 1;
   }
 
+  StackBase = (EFI_PHYSICAL_ADDRESS *)AllocatePages (EFI_SIZE_TO_PAGES (sizeof (EFI_PHYSICAL_ADDRESS) * NumberOfProcessors));
+  ASSERT (StackBase != NULL);
+  if (StackBase == NULL) {
+    return;
+  }
+
+  ZeroMem (StackBase, sizeof (EFI_PHYSICAL_ADDRESS) * NumberOfProcessors);
+  MpInitLibStartupAllAPs (GetStackBase, FALSE, NULL, 0, (VOID *)StackBase, NULL);
   MpInitLibWhoAmI (&Bsp);
-  for (Index = 0; Index < NumberOfProcessors; ++Index) {
-    StackBase = 0;
-
-    if (Index == Bsp) {
-      Hob.Raw = GetHobList ();
-      while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
-        if (CompareGuid (
-              &gEfiHobMemoryAllocStackGuid,
-              &(Hob.MemoryAllocationStack->AllocDescriptor.Name)
-              ))
-        {
-          StackBase = Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress;
-          break;
-        }
-
-        Hob.Raw = GET_NEXT_HOB (Hob);
-      }
-    } else {
-      //
-      // Ask AP to return is stack base address.
-      //
-      MpInitLibStartupThisAP (GetStackBase, Index, NULL, 0, (VOID *)&StackBase, NULL);
+  Hob.Raw = GetHobList ();
+  while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
+    if (CompareGuid (
+          &gEfiHobMemoryAllocStackGuid,
+          &(Hob.MemoryAllocationStack->AllocDescriptor.Name)
+          ))
+    {
+      StackBase[Bsp] = Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress;
+      break;
     }
 
-    ASSERT (StackBase != 0);
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  for (Index = 0; Index < NumberOfProcessors; ++Index) {
+    ASSERT (StackBase[Index] != 0);
     //
     // Set Guard page at stack base address.
     //
-    ConvertMemoryPageToNotPresent (StackBase, EFI_PAGE_SIZE);
+    ConvertMemoryPageToNotPresent (StackBase[Index], EFI_PAGE_SIZE);
     DEBUG ((
       DEBUG_INFO,
       "Stack Guard set at %lx [cpu%lu]!\n",
-      (UINT64)StackBase,
+      (UINT64)StackBase[Index],
       (UINT64)Index
       ));
   }
 
+  FreePages (StackBase, EFI_SIZE_TO_PAGES (sizeof (EFI_PHYSICAL_ADDRESS) * NumberOfProcessors));
   //
   // Publish the changes of page table.
   //

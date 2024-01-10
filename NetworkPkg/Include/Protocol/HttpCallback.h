@@ -2,6 +2,7 @@
   This file defines the EDKII HTTP Callback Protocol interface.
 
   Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -55,7 +56,18 @@ typedef enum {
   /// EFI_SUCCESS            The initialization of session is done.
   /// Others                 Other error as indicated.
   ///
-  HttpEventInitSession
+  HttpEventInitSession,
+
+  ///
+  /// The Status of Event to configure TLS configuration data.
+  /// EventStatus:
+  /// EFI_SUCCESS            The TLS is configured successfully with the default value.
+  /// EFI_INVALID_PARAMETER  One or more input parameters to SetSessionData() is invalid.
+  /// EFI_NOT_READY          Current TLS session state is NOT EfiTlsSessionStateNotStarted.
+  /// EFI_NOT_FOUND          Fail to get 'HttpTlsCipherList' variable.
+  /// Others                 Other error as indicated.
+  ///
+  HttpEventTlsConfigured
 } EDKII_HTTP_CALLBACK_EVENT;
 
 /**
