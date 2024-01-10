@@ -144,6 +144,9 @@
                                                   "  UPDATE_CAPSULE                   %d\r\n"
                                                   "  QUERY_CAPSULE_CAPABILITIES       %d\r\n"
                                                   "  QUERY_VARIABLE_INFO              %d\r\n"
+#string STR_DMEM_IMG_EXE_TABLE    #language en-US "\r\nImage Execution Table\r\n"
+                                                  "----------------------------------------\r\n"
+#string STR_DMEM_IMG_EXE_ENTRY    #language en-US "%20s: %s\r\n"
 #string STR_DMEM_ERR_NOT_FOUND    #language en-US "\r\n%H%s%N: Table address not found.\r\n"
 #string STR_DMEM_ERR_GET_FAIL     #language en-US "\r\n%H%s%N: Unable to get table information.\r\n"
 
