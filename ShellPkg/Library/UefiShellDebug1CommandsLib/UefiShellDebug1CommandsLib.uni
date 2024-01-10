@@ -147,6 +147,11 @@
 #string STR_DMEM_IMG_EXE_TABLE    #language en-US "\r\nImage Execution Table\r\n"
                                                   "----------------------------------------\r\n"
 #string STR_DMEM_IMG_EXE_ENTRY    #language en-US "%20s: %s\r\n"
+#string STR_DMEM_CONF_PRO_TABLE   #language en-US "\r\nConformance Profile Table\r\n"
+                                                  "----------------------------------------\r\n"
+                                                  "Version     0x1\r\n"
+                                                  "Profile GUIDs:\r\n"
+#string STR_DMEM_CONF_PRO_ROW     #language en-US "    %s    %g\r\n"
 #string STR_DMEM_ERR_NOT_FOUND    #language en-US "\r\n%H%s%N: Table address not found.\r\n"
 #string STR_DMEM_ERR_GET_FAIL     #language en-US "\r\n%H%s%N: Unable to get table information.\r\n"
 
