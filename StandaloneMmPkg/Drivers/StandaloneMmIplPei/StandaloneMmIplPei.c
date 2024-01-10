@@ -602,6 +602,45 @@ GetFullSmramRanges (
 }
 
 /**
+  Dispatch StandaloneMm drivers in MM.
+
+  StandaloneMm core will exit when MmEntryPoint was registered in CPU
+  StandaloneMm driver, and issue a software SMI by communicate mode to
+  dispatch other StandaloneMm drivers.
+
+**/
+VOID
+SmmIplDispatchDriver (
+  VOID
+  )
+{
+  EFI_SMM_COMMUNICATE_HEADER  CommunicateHeader;
+  UINTN                       Size;
+
+  while (TRUE) {
+    //
+    // Use Guid to initialize EFI_MM_COMMUNICATE_HEADER structure
+    //
+    CopyGuid (&CommunicateHeader.HeaderGuid, &gEdkiiEventMmDispatchGuid);
+    CommunicateHeader.MessageLength = 1;
+    CommunicateHeader.Data[0]       = 0;
+
+    //
+    // Generate the Software SMI and return the result
+    //
+    Size = sizeof (CommunicateHeader);
+    Communicate (NULL, &CommunicateHeader, &Size);
+
+    //
+    // Return if there is no request to restart the SMM Core Dispatcher
+    //
+    if (CommunicateHeader.Data[0] != COMM_BUFFER_MM_DISPATCH_RESTART) {
+      break;
+    }
+  }
+}
+
+/**
   The Entry Point for SMM IPL at PEI stage.
 
   Load SMM Core into SMRAM.
@@ -723,6 +762,11 @@ StandaloneMmIplPeiEntry (
   //
   Status = PeiServicesInstallPpi (&mPpiList);
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Dispatch StandaloneMm drivers in MM
+  //
+  SmmIplDispatchDriver ();
 
   return EFI_SUCCESS;
 }
