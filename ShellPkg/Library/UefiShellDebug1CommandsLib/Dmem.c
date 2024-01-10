@@ -84,9 +84,65 @@ DisplayMmioMemory (
   return (ShellStatus);
 }
 
+/**
+  Display the RtPropertiesTable entries
+
+  @param[in] Address    The pointer to the RtPropertiesTable.
+**/
+SHELL_STATUS
+DisplayRtProperties (
+  IN UINT64  Address
+  )
+{
+  EFI_RT_PROPERTIES_TABLE  *RtPropertiesTable;
+  UINT32                   RtServices;
+  SHELL_STATUS             ShellStatus;
+  EFI_STATUS               Status;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  if (Address != 0) {
+    EfiGetSystemConfigurationTable (&gEfiRtPropertiesTableGuid, (VOID **)&RtPropertiesTable);
+
+    RtServices = (UINT32)RtPropertiesTable->RuntimeServicesSupported;
+    Status     = ShellPrintHiiEx (
+                   -1,
+                   -1,
+                   NULL,
+                   STRING_TOKEN (STR_DMEM_RT_PROPERTIES),
+                   gShellDebug1HiiHandle,
+                   EFI_RT_PROPERTIES_TABLE_VERSION,
+                   (RtServices & EFI_RT_SUPPORTED_GET_TIME) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_SET_TIME) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_GET_WAKEUP_TIME) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_SET_WAKEUP_TIME) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_GET_VARIABLE) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_GET_NEXT_VARIABLE_NAME) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_SET_VARIABLE) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_SET_VIRTUAL_ADDRESS_MAP) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_CONVERT_POINTER) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_GET_NEXT_HIGH_MONOTONIC_COUNT) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_RESET_SYSTEM) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_UPDATE_CAPSULE) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_QUERY_CAPSULE_CAPABILITIES) ? 1 : 0,
+                   (RtServices & EFI_RT_SUPPORTED_QUERY_VARIABLE_INFO) ? 1 : 0
+                   );
+
+    if (EFI_ERROR (Status)) {
+      ShellStatus = SHELL_ABORTED;
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"RtPropertiesTable");
+    }
+  } else {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"RtPropertiesTable");
+  }
+
+  return (ShellStatus);
+}
+
 STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
-  { L"-mmio", TypeFlag },
-  { NULL,     TypeMax  }
+  { L"-mmio",    TypeFlag },
+  { L"-verbose", TypeFlag },
+  { NULL,        TypeMax  }
 };
 
 /**
@@ -307,6 +363,12 @@ ShellCommandRunDmem (
             HiiDatabaseExportBufferAddress,
             ConformanceProfileTableAddress
             );
+        }
+
+        if (ShellCommandLineGetFlag (Package, L"-verbose")) {
+          if (ShellStatus == SHELL_SUCCESS) {
+            ShellStatus = DisplayRtProperties (RtPropertiesTableAddress);
+          }
         }
       } else {
         ShellStatus = DisplayMmioMemory (Address, (UINTN)Size);
