@@ -139,6 +139,138 @@ DisplayRtProperties (
   return (ShellStatus);
 }
 
+/**
+  Retrieve the ImageExecutionTable Entry ImageName from ImagePath
+
+  @param[in]  FileName    The full path of the image.
+  @param[out] BaseName    The name of the image.
+**/
+EFI_STATUS
+GetBaseName (
+  IN  CHAR16  *FileName,
+  OUT CHAR16  **BaseName
+  )
+{
+  UINTN   StrLen;
+  CHAR16  *StrTail;
+
+  StrLen = StrSize (FileName);
+
+  for (StrTail = FileName + StrLen - 1; StrTail != FileName && *StrTail != L'\\'; StrTail--) {
+  }
+
+  if (StrTail == FileName) {
+    return EFI_NOT_FOUND;
+  }
+
+  *BaseName = StrTail+1;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Retrieve the ImageExecutionTable entries.
+**/
+EFI_STATUS
+GetImageExecutionInfo (
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_IMAGE_EXECUTION_INFO_TABLE  *ExecInfoTablePtr;
+  EFI_IMAGE_EXECUTION_INFO        *InfoPtr;
+  CHAR8                           *ptr;
+  CHAR16                          *ImagePath;
+  CHAR16                          *ImageName;
+  UINTN                           Image;
+  UINTN                           *NumberOfImages;
+  CHAR16                          *ActionType;
+
+  EfiGetSystemConfigurationTable (&gEfiImageSecurityDatabaseGuid, (VOID **)&ExecInfoTablePtr);
+
+  NumberOfImages = &ExecInfoTablePtr->NumberOfImages;
+
+  ptr = (CHAR8 *)ExecInfoTablePtr + 1;
+
+  for (Image = 0; Image < *NumberOfImages; Image++, ptr += InfoPtr->InfoSize) {
+    InfoPtr   = (EFI_IMAGE_EXECUTION_INFO *)ptr;
+    ImagePath = (CHAR16 *)(InfoPtr + 1);
+
+    GetBaseName (ImagePath, &ImageName);
+
+    switch (InfoPtr->Action) {
+      case EFI_IMAGE_EXECUTION_AUTHENTICATION:
+        ActionType = L"AUTHENTICATION";
+        break;
+      case EFI_IMAGE_EXECUTION_AUTH_UNTESTED:
+        ActionType = L"AUTH_UNTESTED";
+        break;
+      case EFI_IMAGE_EXECUTION_AUTH_SIG_FAILED:
+        ActionType = L"AUTH_SIG_FAILED";
+        break;
+      case EFI_IMAGE_EXECUTION_AUTH_SIG_PASSED:
+        ActionType = L"AUTH_SIG_PASSED";
+        break;
+      case EFI_IMAGE_EXECUTION_AUTH_SIG_NOT_FOUND:
+        ActionType = L"AUTH_SIG_NOT_FOUND";
+        break;
+      case EFI_IMAGE_EXECUTION_AUTH_SIG_FOUND:
+        ActionType = L"AUTH_SIG_FOUND";
+        break;
+      case EFI_IMAGE_EXECUTION_POLICY_FAILED:
+        ActionType = L"POLICY_FAILED";
+        break;
+      case EFI_IMAGE_EXECUTION_INITIALIZED:
+        ActionType = L"INITIALIZED";
+        break;
+      default:
+        ActionType = L"invalid action";
+    }
+
+    Status = ShellPrintHiiEx (
+               -1,
+               -1,
+               NULL,
+               STRING_TOKEN (STR_DMEM_IMG_EXE_ENTRY),
+               gShellDebug1HiiHandle,
+               ImageName,
+               ActionType
+               );
+  }
+
+  return Status;
+}
+
+/**
+  Display the ImageExecutionTable entries
+
+  @param[in] Address    The pointer to the ImageExecutionTable.
+**/
+SHELL_STATUS
+DisplayImageExecutionEntries (
+  IN UINT64  Address
+  )
+{
+  SHELL_STATUS  ShellStatus;
+  EFI_STATUS    Status;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  if (Address != 0) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_IMG_EXE_TABLE), gShellDebug1HiiHandle);
+    Status = GetImageExecutionInfo ();
+    if (EFI_ERROR (Status)) {
+      ShellStatus = SHELL_ABORTED;
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"ImageExecutionTable");
+    }
+  } else {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"ImageExecutionTable");
+  }
+
+  return (ShellStatus);
+}
+
+
+
 STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { L"-mmio",    TypeFlag },
   { L"-verbose", TypeFlag },
@@ -368,6 +500,10 @@ ShellCommandRunDmem (
         if (ShellCommandLineGetFlag (Package, L"-verbose")) {
           if (ShellStatus == SHELL_SUCCESS) {
             ShellStatus = DisplayRtProperties (RtPropertiesTableAddress);
+          }
+
+          if (ShellStatus == SHELL_SUCCESS) {
+            ShellStatus = DisplayImageExecutionEntries (ImageExecutionTableAddress);
           }
         }
       } else {
