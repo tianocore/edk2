@@ -76,7 +76,8 @@ AllocatePageTableMemory (
 
 /**
   This function modifies the page attributes for the memory region specified
-  by BaseAddress and Length to not present.
+  by BaseAddress and Length to not present. This function only change page
+  table, but not flush TLB. Caller have the responsbility to flush TLB.
 
   Caller should make sure BaseAddress and Length is at page boundary.
 
@@ -167,7 +168,6 @@ ConvertMemoryPageToNotPresent (
   }
 
   ASSERT_EFI_ERROR (Status);
-  AsmWriteCr3 (PageTable);
   return Status;
 }
 
