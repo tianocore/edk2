@@ -139,3 +139,7 @@
   gEfiJsonConfigDataTableGuid     ## SOMETIMES_CONSUMES ## SystemTable
   gEfiJsonCapsuleDataTableGuid    ## SOMETIMES_CONSUMES ## SystemTable
   gEfiJsonCapsuleResultTableGuid  ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiConfProfilesTableGuid       ## SOMETIMES_CONSUMES ## SystemTable
+  gEfiConfProfilesUefiSpecGuid    ## SOMETIMES_CONSUMES ## GUID
+  gEfiConfProfilesEbbrSpec21Guid  ## SOMETIMES_CONSUMES ## GUID
+  gEfiConfProfilesEbbrSpec22Guid  ## SOMETIMES_CONSUMES ## GUID
