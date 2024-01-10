@@ -51,6 +51,10 @@
 [Ppis]
   gPeiSmmControlPpiGuid
   gEfiPeiMmCommunicationPpiGuid
+  gEfiEndOfPeiSignalPpiGuid
+
+[Protocols]
+  gEfiMmEndOfPeiProtocol
 
 [Pcd]
 

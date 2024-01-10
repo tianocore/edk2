@@ -89,6 +89,33 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiList = {
 };
 
 /**
+  This is the callback function on end of PEI.
+
+  This callback is used for call MmEndOfPeiHandler in standalone MM core.
+
+  @param   PeiServices       General purpose services available to every PEIM.
+  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
+  @param   Ppi               Pointer to the PPI data associated with this function.
+  @retval  EFI_SUCCESS       Exit boot services successfully.
+  @retval  Other             Exit boot services failed.
+**/
+EFI_STATUS
+EFIAPI
+EndOfPeiCallback (
+  IN  EFI_PEI_SERVICES           **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN  VOID                       *Ppi
+  );
+
+EFI_PEI_NOTIFY_DESCRIPTOR  mNotifyList[] = {
+  {
+    EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+    &gEfiEndOfPeiSignalPpiGuid,
+    EndOfPeiCallback
+  }
+};
+
+/**
   Communicates with a registered handler.
 
   This function provides a service to send and receive messages from a registered UEFI service.
@@ -602,6 +629,46 @@ GetFullSmramRanges (
 }
 
 /**
+  This is the callback function on end of PEI.
+
+  This callback is used for call MmEndOfPeiHandler in standalone MM core.
+
+  @param   PeiServices       General purpose services available to every PEIM.
+  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
+  @param   Ppi               Pointer to the PPI data associated with this function.
+  @retval  EFI_SUCCESS       Exit boot services successfully.
+  @retval  Other             Exit boot services failed.
+**/
+EFI_STATUS
+EFIAPI
+EndOfPeiCallback (
+  IN  EFI_PEI_SERVICES           **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN  VOID                       *Ppi
+  )
+{
+  EFI_SMM_COMMUNICATE_HEADER  CommunicateHeader;
+  UINTN                       Size;
+  EFI_STATUS                  Status;
+
+  //
+  // Use Guid to initialize EFI_SMM_COMMUNICATE_HEADER structure
+  //
+  CopyGuid (&CommunicateHeader.HeaderGuid, &gEfiMmEndOfPeiProtocol);
+  CommunicateHeader.MessageLength = 1;
+  CommunicateHeader.Data[0]       = 0;
+
+  //
+  // Generate the Software SMI and return the result
+  //
+  Size   = sizeof (CommunicateHeader);
+  Status = Communicate (NULL, &CommunicateHeader, &Size);
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
+}
+
+/**
   Dispatch StandaloneMm drivers in MM.
 
   StandaloneMm core will exit when MmEntryPoint was registered in CPU
@@ -761,6 +828,12 @@ StandaloneMmIplPeiEntry (
   // Install MmCommunicationPpi
   //
   Status = PeiServicesInstallPpi (&mPpiList);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Create exit boot services callback to call MmExitBootServiceHandler
+  //
+  Status = PeiServicesNotifyPpi (mNotifyList);
   ASSERT_EFI_ERROR (Status);
 
   //
