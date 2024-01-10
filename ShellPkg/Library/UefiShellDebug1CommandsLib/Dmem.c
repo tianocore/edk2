@@ -34,7 +34,7 @@ MakePrintable (
   IN CONST CHAR16  Char
   )
 {
-  if (((Char < 0x20) && (Char > 0)) || (Char > 126)) {
+  if ( ( (Char < 0x20) && (Char > 0)) || (Char > 126)) {
     return (L'?');
   }
 
@@ -71,12 +71,12 @@ DisplayMmioMemory (
     return SHELL_OUT_OF_RESOURCES;
   }
 
-  Status = PciRbIo->Mem.Read (PciRbIo, EfiPciWidthUint8, (UINT64)(UINTN)Address, Size, Buffer);
+  Status = PciRbIo->Mem.Read (PciRbIo, EfiPciWidthUint8, (UINT64) (UINTN)Address, Size, Buffer);
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_ER), gShellDebug1HiiHandle, L"dmem");
     ShellStatus = SHELL_NOT_FOUND;
   } else {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_MMIO_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_MMIO_HEADER_ROW), gShellDebug1HiiHandle, (UINT64) (UINTN)Address, Size);
     DumpHex (2, (UINTN)Address, Size, Buffer);
   }
 
@@ -84,8 +84,64 @@ DisplayMmioMemory (
   return (ShellStatus);
 }
 
+/**
+  Display the RtPropertiesTable entries
+
+  @param[in] Address    The pointer to the RtPropertiesTable.
+**/
+SHELL_STATUS
+DisplayRtProperties (
+  IN UINT64 Address
+  )
+{
+  EFI_RT_PROPERTIES_TABLE *RtPropertiesTable;
+  UINT32                  RtServices;
+  SHELL_STATUS            ShellStatus;
+  EFI_STATUS              Status;
+
+  ShellStatus = SHELL_SUCCESS;
+
+  if (Address != 0) {
+    RtPropertiesTable = (EFI_RT_PROPERTIES_TABLE *)Address;
+
+    RtServices = (UINT32)RtPropertiesTable->RuntimeServicesSupported;
+    Status = ShellPrintHiiEx (
+      -1,
+      -1,
+      NULL,
+      STRING_TOKEN (STR_DMEM_RT_PROPERTIES),
+      gShellDebug1HiiHandle,
+      EFI_RT_PROPERTIES_TABLE_VERSION,
+      (RtServices & EFI_RT_SUPPORTED_GET_TIME) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_SET_TIME) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_GET_WAKEUP_TIME) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_SET_WAKEUP_TIME) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_GET_VARIABLE) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_GET_NEXT_VARIABLE_NAME) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_SET_VARIABLE) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_SET_VIRTUAL_ADDRESS_MAP) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_CONVERT_POINTER) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_GET_NEXT_HIGH_MONOTONIC_COUNT) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_RESET_SYSTEM) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_UPDATE_CAPSULE) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_QUERY_CAPSULE_CAPABILITIES) ? 1 : 0,
+      (RtServices & EFI_RT_SUPPORTED_QUERY_VARIABLE_INFO) ? 1 : 0
+      );
+
+    if (EFI_ERROR (Status)) {
+      ShellStatus = SHELL_ABORTED;
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_GET_FAIL), gShellDebug1HiiHandle, L"RtPropertiesTable");
+    }
+  } else {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_ERR_NOT_FOUND), gShellDebug1HiiHandle, L"RtPropertiesTable");
+  }
+
+  return (ShellStatus);
+}
+
 STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
   { L"-mmio", TypeFlag },
+  { L"-verbose", TypeFlag },
   { NULL,     TypeMax  }
 };
 
@@ -147,7 +203,7 @@ ShellCommandRunDmem (
   //
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR (Status)) {
-    if ((Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
+    if ( (Status == EFI_VOLUME_CORRUPTED) && (ProblemParam != NULL)) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"dmem", ProblemParam);
       FreePool (ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
@@ -183,7 +239,7 @@ ShellCommandRunDmem (
 
     if (ShellStatus == SHELL_SUCCESS) {
       if (!ShellCommandLineGetFlag (Package, L"-mmio")) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64)(UINTN)Address, Size);
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DMEM_HEADER_ROW), gShellDebug1HiiHandle, (UINT64) (UINTN)Address, Size);
         DumpHex (2, (UINTN)Address, (UINTN)Size, Address);
         if (Address == (VOID *)gST) {
           Acpi20TableAddress             = 0;
@@ -205,72 +261,72 @@ ShellCommandRunDmem (
           ConformanceProfileTableAddress = 0;
           for (TableWalker = 0; TableWalker < gST->NumberOfTableEntries; TableWalker++) {
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi20TableGuid)) {
-              Acpi20TableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              Acpi20TableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiAcpi10TableGuid)) {
-              AcpiTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              AcpiTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbiosTableGuid)) {
-              SmbiosTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              SmbiosTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSmbios3TableGuid)) {
-              SmbiosTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              SmbiosTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMpsTableGuid)) {
-              MpsTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              MpsTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiMemoryAttributesTableGuid)) {
-              MemoryAttributesTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              MemoryAttributesTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiRtPropertiesTableGuid)) {
-              RtPropertiesTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              RtPropertiesTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiSystemResourceTableGuid)) {
-              SystemResourceTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              SystemResourceTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiDebugImageInfoTableGuid)) {
-              DebugImageInfoTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              DebugImageInfoTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiImageSecurityDatabaseGuid)) {
-              ImageExecutionTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              ImageExecutionTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonConfigDataTableGuid)) {
-              JsonConfigDataTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              JsonConfigDataTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonCapsuleDataTableGuid)) {
-              JsonCapsuleDataTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              JsonCapsuleDataTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiJsonCapsuleResultTableGuid)) {
-              JsonCapsuleResultTableAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              JsonCapsuleResultTableAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
 
             if (CompareGuid (&gST->ConfigurationTable[TableWalker].VendorGuid, &gEfiHiiDatabaseProtocolGuid)) {
-              HiiDatabaseExportBufferAddress = (UINT64)(UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
+              HiiDatabaseExportBufferAddress = (UINT64) (UINTN)gST->ConfigurationTable[TableWalker].VendorTable;
               continue;
             }
           }
@@ -281,14 +337,14 @@ ShellCommandRunDmem (
             NULL,
             STRING_TOKEN (STR_DMEM_SYSTEM_TABLE),
             gShellDebug1HiiHandle,
-            (UINT64)(UINTN)Address,
+            (UINT64) (UINTN)Address,
             gST->Hdr.HeaderSize,
             gST->Hdr.Revision,
-            (UINT64)(UINTN)gST->ConIn,
-            (UINT64)(UINTN)gST->ConOut,
-            (UINT64)(UINTN)gST->StdErr,
-            (UINT64)(UINTN)gST->RuntimeServices,
-            (UINT64)(UINTN)gST->BootServices,
+            (UINT64) (UINTN)gST->ConIn,
+            (UINT64) (UINTN)gST->ConOut,
+            (UINT64) (UINTN)gST->StdErr,
+            (UINT64) (UINTN)gST->RuntimeServices,
+            (UINT64) (UINTN)gST->BootServices,
             SalTableAddress,
             AcpiTableAddress,
             Acpi20TableAddress,
@@ -308,6 +364,13 @@ ShellCommandRunDmem (
             ConformanceProfileTableAddress
             );
         }
+
+        if (ShellCommandLineGetFlag (Package, L"-verbose")) {
+          if (ShellStatus == SHELL_SUCCESS) {
+            ShellStatus = DisplayRtProperties (RtPropertiesTableAddress);
+          }
+        }
+
       } else {
         ShellStatus = DisplayMmioMemory (Address, (UINTN)Size);
       }
