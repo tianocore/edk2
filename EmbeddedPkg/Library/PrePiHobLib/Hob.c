@@ -110,6 +110,13 @@ CreateHob (
 
   HandOffHob = GetHobList ();
 
+  //
+  // Check Length to avoid data overflow.
+  //
+  if (HobLength > MAX_UINT16 - 0x7) {
+    return NULL;
+  }
+
   HobLength = (UINT16)((HobLength + 0x7) & (~0x7));
 
   FreeMemory = HandOffHob->EfiFreeMemoryTop - HandOffHob->EfiFreeMemoryBottom;
@@ -160,6 +167,9 @@ BuildResourceDescriptorHob (
 
   Hob = CreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
   ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->ResourceType      = ResourceType;
   Hob->ResourceAttribute = ResourceAttribute;
@@ -401,6 +411,10 @@ BuildModuleHob (
     );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
+  ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return;
+  }
 
   CopyGuid (&(Hob->MemoryAllocationHeader.Name), &gEfiHobMemoryAllocModuleGuid);
   Hob->MemoryAllocationHeader.MemoryBaseAddress = MemoryAllocationModule;
@@ -449,6 +463,11 @@ BuildGuidHob (
   ASSERT (DataLength <= (0xffff - sizeof (EFI_HOB_GUID_TYPE)));
 
   Hob = CreateHob (EFI_HOB_TYPE_GUID_EXTENSION, (UINT16)(sizeof (EFI_HOB_GUID_TYPE) + DataLength));
+  ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return NULL;
+  }
+
   CopyGuid (&Hob->Name, Guid);
   return Hob + 1;
 }
@@ -512,6 +531,10 @@ BuildFvHob (
   EFI_HOB_FIRMWARE_VOLUME  *Hob;
 
   Hob = CreateHob (EFI_HOB_TYPE_FV, sizeof (EFI_HOB_FIRMWARE_VOLUME));
+  ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
@@ -543,6 +566,10 @@ BuildFv2Hob (
   EFI_HOB_FIRMWARE_VOLUME2  *Hob;
 
   Hob = CreateHob (EFI_HOB_TYPE_FV2, sizeof (EFI_HOB_FIRMWARE_VOLUME2));
+  ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
@@ -584,6 +611,10 @@ BuildFv3Hob (
   EFI_HOB_FIRMWARE_VOLUME3  *Hob;
 
   Hob = CreateHob (EFI_HOB_TYPE_FV3, sizeof (EFI_HOB_FIRMWARE_VOLUME3));
+  ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->BaseAddress          = BaseAddress;
   Hob->Length               = Length;
@@ -639,6 +670,10 @@ BuildCpuHob (
   EFI_HOB_CPU  *Hob;
 
   Hob = CreateHob (EFI_HOB_TYPE_CPU, sizeof (EFI_HOB_CPU));
+  ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return;
+  }
 
   Hob->SizeOfMemorySpace = SizeOfMemorySpace;
   Hob->SizeOfIoSpace     = SizeOfIoSpace;
@@ -676,6 +711,10 @@ BuildStackHob (
     );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_STACK));
+  ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return;
+  }
 
   CopyGuid (&(Hob->AllocDescriptor.Name), &gEfiHobMemoryAllocStackGuid);
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
@@ -756,6 +795,10 @@ BuildMemoryAllocationHob (
     );
 
   Hob = CreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION));
+  ASSERT (Hob != NULL);
+  if (Hob == NULL) {
+    return;
+  }
 
   ZeroMem (&(Hob->AllocDescriptor.Name), sizeof (EFI_GUID));
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
