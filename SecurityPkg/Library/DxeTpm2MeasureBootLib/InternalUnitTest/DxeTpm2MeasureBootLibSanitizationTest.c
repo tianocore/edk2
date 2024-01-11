@@ -72,10 +72,10 @@ TestSanitizeEfiPartitionTableHeader (
   PrimaryHeader.Header.Revision          = DEFAULT_PRIMARY_TABLE_HEADER_REVISION;
   PrimaryHeader.Header.HeaderSize        = sizeof (EFI_PARTITION_TABLE_HEADER);
   PrimaryHeader.MyLBA                    = 1;
-  PrimaryHeader.AlternateLBA             = 2;
-  PrimaryHeader.FirstUsableLBA           = 3;
-  PrimaryHeader.LastUsableLBA            = 4;
-  PrimaryHeader.PartitionEntryLBA        = 5;
+  PrimaryHeader.PartitionEntryLBA        = 2;
+  PrimaryHeader.AlternateLBA             = 3;
+  PrimaryHeader.FirstUsableLBA           = 4;
+  PrimaryHeader.LastUsableLBA            = 5;
   PrimaryHeader.NumberOfPartitionEntries = DEFAULT_PRIMARY_TABLE_HEADER_NUMBER_OF_PARTITION_ENTRIES;
   PrimaryHeader.SizeOfPartitionEntry     = DEFAULT_PRIMARY_TABLE_HEADER_SIZE_OF_PARTITION_ENTRY;
   PrimaryHeader.PartitionEntryArrayCRC32 = 0; // Purposely invalid
@@ -187,11 +187,6 @@ TestSanitizePrimaryHeaderGptEventSize (
   EFI_STATUS                  Status;
   EFI_PARTITION_TABLE_HEADER  PrimaryHeader;
   UINTN                       NumberOfPartition;
-  EFI_GPT_DATA                *GptData;
-  EFI_TCG2_EVENT              *Tcg2Event;
-
-  Tcg2Event = NULL;
-  GptData   = NULL;
 
   // Test that a normal PrimaryHeader passes validation
   PrimaryHeader.NumberOfPartitionEntries = 5;
@@ -218,6 +213,52 @@ TestSanitizePrimaryHeaderGptEventSize (
   // Test that the size of partition entries may not overflow
   PrimaryHeader.SizeOfPartitionEntry = MAX_UINT32;
   Status                             = SanitizePrimaryHeaderGptEventSize (&PrimaryHeader, NumberOfPartition, &EventSize);
+  UT_ASSERT_EQUAL (Status, EFI_BAD_BUFFER_SIZE);
+
+  DEBUG ((DEBUG_INFO, "%a: Test passed\n", __func__));
+
+  return UNIT_TEST_PASSED;
+}
+
+/**
+  This function tests the SanitizePeImageEventSize function.
+  It's intent is to test that the untrusted input from a file path when generating a
+  EFI_IMAGE_LOAD_EVENT structure will not cause an overflow when calculating
+  the event size when allocating space
+
+  @param[in] Context  The unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+  @retval UNIT_TEST_ERROR_TEST_FAILED  The test failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+TestSanitizePeImageEventSize (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINT32      EventSize;
+  UINTN       ExistingLogicEventSize;
+  UINT32      FilePathSize;
+  EFI_STATUS  Status;
+
+  FilePathSize = 255;
+
+  // Test that a normal PE image passes validation
+  Status = SanitizePeImageEventSize (FilePathSize, &EventSize);
+  UT_ASSERT_EQUAL (Status, EFI_SUCCESS);
+
+  // Test that the event size is correct compared to the existing logic
+  ExistingLogicEventSize  = OFFSET_OF (EFI_IMAGE_LOAD_EVENT, DevicePath) + FilePathSize;
+  ExistingLogicEventSize += OFFSET_OF (EFI_TCG2_EVENT, Event);
+
+  if (EventSize != ExistingLogicEventSize) {
+    UT_LOG_ERROR ("SanitizePeImageEventSize returned an incorrect event size. Expected %u, got %u\n", ExistingLogicEventSize, EventSize);
+    return UNIT_TEST_ERROR_TEST_FAILED;
+  }
+
+  // Test that the event size may not overflow
+  Status = SanitizePeImageEventSize (MAX_UINT32, &EventSize);
   UT_ASSERT_EQUAL (Status, EFI_BAD_BUFFER_SIZE);
 
   DEBUG ((DEBUG_INFO, "%a: Test passed\n", __func__));
@@ -267,6 +308,7 @@ UefiTestMain (
   AddTestCase (Tcg2MeasureBootLibValidationTestSuite, "Tests Validating EFI Partition Table", "Common.Tcg2MeasureBootLibValidation", TestSanitizeEfiPartitionTableHeader, NULL, NULL, NULL);
   AddTestCase (Tcg2MeasureBootLibValidationTestSuite, "Tests Primary header gpt event checks for overflow", "Common.Tcg2MeasureBootLibValidation", TestSanitizePrimaryHeaderAllocationSize, NULL, NULL, NULL);
   AddTestCase (Tcg2MeasureBootLibValidationTestSuite, "Tests Primary header allocation size checks for overflow", "Common.Tcg2MeasureBootLibValidation", TestSanitizePrimaryHeaderGptEventSize, NULL, NULL, NULL);
+  AddTestCase (Tcg2MeasureBootLibValidationTestSuite, "Tests PE Image and FileSize checks for overflow", "Common.Tcg2MeasureBootLibValidation", TestSanitizePeImageEventSize, NULL, NULL, NULL);
 
   Status = RunAllTestSuites (Framework);
 
