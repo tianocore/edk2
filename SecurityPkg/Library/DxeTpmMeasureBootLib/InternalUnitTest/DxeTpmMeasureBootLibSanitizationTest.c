@@ -1,8 +1,8 @@
 /** @file
-This file includes the unit test cases for the DxeTpmMeasureBootLibSanitizationTest.c.
+  This file includes the unit test cases for the DxeTpmMeasureBootLibSanitizationTest.c.
 
-Copyright (c) Microsoft Corporation.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) Microsoft Corporation.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Uefi.h>
@@ -186,9 +186,6 @@ TestSanitizePrimaryHeaderGptEventSize (
   EFI_STATUS                  Status;
   EFI_PARTITION_TABLE_HEADER  PrimaryHeader;
   UINTN                       NumberOfPartition;
-  EFI_GPT_DATA                *GptData;
-
-  GptData = NULL;
 
   // Test that a normal PrimaryHeader passes validation
   PrimaryHeader.NumberOfPartitionEntries = 5;
@@ -220,6 +217,94 @@ TestSanitizePrimaryHeaderGptEventSize (
   DEBUG ((DEBUG_INFO, "%a: Test passed\n", __func__));
 
   return UNIT_TEST_PASSED;
+}
+
+/**
+  This function tests the SanitizePeImageEventSize function.
+  It's intent is to test that the untrusted input from a file path for an
+  EFI_IMAGE_LOAD_EVENT structure will not cause an overflow when calculating
+  the event size when allocating space.
+
+  @param[in] Context  The unit test context.
+
+  @retval UNIT_TEST_PASSED  The test passed.
+  @retval UNIT_TEST_ERROR_TEST_FAILED  The test failed.
+**/
+UNIT_TEST_STATUS
+EFIAPI
+TestSanitizePeImageEventSize (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINT32                    EventSize;
+  UINTN                     ExistingLogicEventSize;
+  UINT32                    FilePathSize;
+  EFI_STATUS                Status;
+  EFI_DEVICE_PATH_PROTOCOL  DevicePath;
+  EFI_IMAGE_LOAD_EVENT      *ImageLoadEvent;
+  UNIT_TEST_STATUS          TestStatus;
+
+  TestStatus = UNIT_TEST_ERROR_TEST_FAILED;
+
+  // Generate EFI_DEVICE_PATH_PROTOCOL test data
+  DevicePath.Type      = 0;
+  DevicePath.SubType   = 0;
+  DevicePath.Length[0] = 0;
+  DevicePath.Length[1] = 0;
+
+  // Generate EFI_IMAGE_LOAD_EVENT test data
+  ImageLoadEvent = AllocateZeroPool (sizeof (EFI_IMAGE_LOAD_EVENT) + sizeof (EFI_DEVICE_PATH_PROTOCOL));
+  if (ImageLoadEvent == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: AllocateZeroPool failed\n", __func__));
+    goto Exit;
+  }
+
+  // Populate EFI_IMAGE_LOAD_EVENT54 test data
+  ImageLoadEvent->ImageLocationInMemory = (EFI_PHYSICAL_ADDRESS)0x12345678;
+  ImageLoadEvent->ImageLengthInMemory   = 0x1000;
+  ImageLoadEvent->ImageLinkTimeAddress  = (UINTN)ImageLoadEvent;
+  ImageLoadEvent->LengthOfDevicePath    = sizeof (EFI_DEVICE_PATH_PROTOCOL);
+  CopyMem (ImageLoadEvent->DevicePath, &DevicePath, sizeof (EFI_DEVICE_PATH_PROTOCOL));
+
+  FilePathSize = 255;
+
+  // Test that a normal PE image passes validation
+  Status = SanitizePeImageEventSize (FilePathSize, &EventSize);
+  if (EFI_ERROR (Status)) {
+    UT_LOG_ERROR ("SanitizePeImageEventSize failed with %r\n", Status);
+    goto Exit;
+  }
+
+  // Test that the event size is correct compared to the existing logic
+  ExistingLogicEventSize  = OFFSET_OF (EFI_IMAGE_LOAD_EVENT, DevicePath) + FilePathSize;
+  ExistingLogicEventSize += sizeof (TCG_PCR_EVENT_HDR);
+
+  if (EventSize != ExistingLogicEventSize) {
+    UT_LOG_ERROR ("SanitizePeImageEventSize returned an incorrect event size. Expected %u, got %u\n", ExistingLogicEventSize, EventSize);
+    goto Exit;
+  }
+
+  // Test that the event size may not overflow
+  Status = SanitizePeImageEventSize (MAX_UINT32, &EventSize);
+  if (Status != EFI_BAD_BUFFER_SIZE) {
+    UT_LOG_ERROR ("SanitizePeImageEventSize succeded when it was supposed to fail with %r\n", Status);
+    goto Exit;
+  }
+
+  TestStatus = UNIT_TEST_PASSED;
+Exit:
+
+  if (ImageLoadEvent != NULL) {
+    FreePool (ImageLoadEvent);
+  }
+
+  if (TestStatus == UNIT_TEST_ERROR_TEST_FAILED) {
+    DEBUG ((DEBUG_ERROR, "%a: Test failed\n", __func__));
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: Test passed\n", __func__));
+  }
+
+  return TestStatus;
 }
 
 // *--------------------------------------------------------------------*
@@ -265,6 +350,7 @@ UefiTestMain (
   AddTestCase (TcgMeasureBootLibValidationTestSuite, "Tests Validating EFI Partition Table", "Common.TcgMeasureBootLibValidation", TestSanitizeEfiPartitionTableHeader, NULL, NULL, NULL);
   AddTestCase (TcgMeasureBootLibValidationTestSuite, "Tests Primary header gpt event checks for overflow", "Common.TcgMeasureBootLibValidation", TestSanitizePrimaryHeaderAllocationSize, NULL, NULL, NULL);
   AddTestCase (TcgMeasureBootLibValidationTestSuite, "Tests Primary header allocation size checks for overflow", "Common.TcgMeasureBootLibValidation", TestSanitizePrimaryHeaderGptEventSize, NULL, NULL, NULL);
+  AddTestCase (TcgMeasureBootLibValidationTestSuite, "Tests PE Image and FileSize checks for overflow", "Common.TcgMeasureBootLibValidation", TestSanitizePeImageEventSize, NULL, NULL, NULL);
 
   Status = RunAllTestSuites (Framework);
 

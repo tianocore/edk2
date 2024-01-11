@@ -239,3 +239,47 @@ SanitizePrimaryHeaderGptEventSize (
 
   return EFI_SUCCESS;
 }
+
+/**
+  This function will validate that the PeImage Event Size from the loaded image is sane
+  It will check the following:
+    - EventSize does not overflow
+
+  @param[in] FilePathSize - Size of the file path.
+  @param[out] EventSize - Pointer to the event size.
+
+  @retval EFI_SUCCESS
+    The event size is valid.
+
+  @retval EFI_OUT_OF_RESOURCES
+    Overflow would have occurred.
+
+  @retval EFI_INVALID_PARAMETER
+    One of the passed parameters was invalid.
+**/
+EFI_STATUS
+SanitizePeImageEventSize (
+  IN  UINT32  FilePathSize,
+  OUT UINT32  *EventSize
+  )
+{
+  EFI_STATUS  Status;
+
+  // Replacing logic:
+  // sizeof (*ImageLoad) - sizeof (ImageLoad->DevicePath) + FilePathSize;
+  Status = SafeUint32Add (OFFSET_OF (EFI_IMAGE_LOAD_EVENT, DevicePath), FilePathSize, EventSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EventSize would overflow!\n"));
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  // Replacing logic:
+  // EventSize + sizeof (TCG_PCR_EVENT_HDR)
+  Status = SafeUint32Add (*EventSize, sizeof (TCG_PCR_EVENT_HDR), EventSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "EventSize would overflow!\n"));
+    return EFI_BAD_BUFFER_SIZE;
+  }
+
+  return EFI_SUCCESS;
+}
