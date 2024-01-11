@@ -566,7 +566,7 @@ GetProcessorCoreType (
 }
 
 /**
-  Create gMpInformationHobGuid2.
+  Create gMpInformation2HobGuid.
 **/
 VOID
 BuildMpInformationHob (
@@ -618,13 +618,13 @@ BuildMpInformationHob (
   //
   // Create MP_INFORMATION2_HOB. when the max HobLength 0xFFF8 is not enough, there
   // will be a MP_INFORMATION2_HOB series in the HOB list.
-  // In the HOB list, there is a gMpInformationHobGuid2 with 0 value NumberOfProcessors
+  // In the HOB list, there is a gMpInformation2HobGuid with 0 value NumberOfProcessors
   // fields to indicate it's the last MP_INFORMATION2_HOB.
   //
   while (NumberOfProcessorsInHob != 0) {
     NumberOfProcessorsInHob = MIN (NumberOfProcessors - ProcessorIndex, MaxProcessorsPerHob);
     MpInformation2HobData   = BuildGuidHob (
-                                &gMpInformationHobGuid2,
+                                &gMpInformation2HobGuid,
                                 sizeof (MP_INFORMATION2_HOB_DATA) + sizeof (MP_INFORMATION2_ENTRY) * NumberOfProcessorsInHob
                                 );
     ASSERT (MpInformation2HobData != NULL);
@@ -744,7 +744,7 @@ InitializeCpuMpWorker (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Create gMpInformationHobGuid2
+  // Create gMpInformation2HobGuid
   //
   BuildMpInformationHob ();
 

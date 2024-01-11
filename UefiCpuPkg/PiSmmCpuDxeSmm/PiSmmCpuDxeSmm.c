@@ -776,7 +776,7 @@ GetMpInformation (
   HobIndex              = 0;
   HobCount              = 0;
 
-  FirstMpInfo2Hob = GetFirstGuidHob (&gMpInformationHobGuid2);
+  FirstMpInfo2Hob = GetFirstGuidHob (&gMpInformation2HobGuid);
   ASSERT (FirstMpInfo2Hob != NULL);
   GuidHob = FirstMpInfo2Hob;
   while (GuidHob != NULL) {
@@ -792,7 +792,7 @@ GetMpInformation (
 
     HobCount++;
     *NumberOfCpus += MpInformation2HobData->NumberOfProcessors;
-    GuidHob        = GetNextGuidHob (&gMpInformationHobGuid2, GET_NEXT_HOB (GuidHob));
+    GuidHob        = GetNextGuidHob (&gMpInformation2HobGuid, GET_NEXT_HOB (GuidHob));
   }
 
   ASSERT (*NumberOfCpus <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
@@ -820,7 +820,7 @@ GetMpInformation (
   GuidHob = FirstMpInfo2Hob;
   while (HobIndex < HobCount) {
     MpInfo2Hobs[HobIndex++] = GET_GUID_HOB_DATA (GuidHob);
-    GuidHob                 = GetNextGuidHob (&gMpInformationHobGuid2, GET_NEXT_HOB (GuidHob));
+    GuidHob                 = GetNextGuidHob (&gMpInformation2HobGuid, GET_NEXT_HOB (GuidHob));
   }
 
   ProcessorInfo = (EFI_PROCESSOR_INFORMATION *)AllocatePool (sizeof (EFI_PROCESSOR_INFORMATION) * (*MaxNumberOfCpus));
