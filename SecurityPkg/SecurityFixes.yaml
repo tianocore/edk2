@@ -20,3 +20,17 @@ CVE_2022_36763:
   - https://bugzilla.tianocore.org/show_bug.cgi?id=4117
   - https://bugzilla.tianocore.org/show_bug.cgi?id=2168
   - https://bugzilla.tianocore.org/show_bug.cgi?id=1990
+CVE_2022_36764:
+  commit_titles:
+     - "SecurityPkg: DxeTpm2MeasureBootLib: SECURITY PATCH 4118 - CVE 2022-36764"
+     - "SecurityPkg: DxeTpmMeasureBootLib: SECURITY PATCH 4118 - CVE 2022-36764"
+     - "SecurityPkg: : Adding CVE 2022-36764 to SecurityFixes.yaml"
+  cve: CVE-2022-36764
+  date_reported: 2022-10-25 12:23 UTC
+  description: Heap Buffer Overflow in Tcg2MeasurePeImage()
+  note:
+  files_impacted:
+  - Library\DxeTpm2MeasureBootLib\DxeTpm2MeasureBootLib.c
+  - Library\DxeTpmMeasureBootLib\DxeTpmMeasureBootLib.c
+  links:
+  - https://bugzilla.tianocore.org/show_bug.cgi?id=4118
