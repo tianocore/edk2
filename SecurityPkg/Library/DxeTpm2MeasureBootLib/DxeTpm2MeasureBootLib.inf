@@ -37,6 +37,8 @@
 
 [Sources]
   DxeTpm2MeasureBootLib.c
+  DxeTpm2MeasureBootLibSanitization.c
+  DxeTpm2MeasureBootLibSanitization.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -46,6 +48,7 @@
 
 [LibraryClasses]
   BaseMemoryLib
+  SafeIntLib
   DebugLib
   MemoryAllocationLib
   DevicePathLib
@@ -65,4 +68,3 @@
   gEfiFirmwareVolumeBlockProtocolGuid   ## SOMETIMES_CONSUMES
   gEfiBlockIoProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiDiskIoProtocolGuid                ## SOMETIMES_CONSUMES
-
