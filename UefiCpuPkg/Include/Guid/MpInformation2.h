@@ -53,6 +53,6 @@ typedef struct {
 #define GET_MP_INFORMATION_ENTRY(MpInfoHobData, Index) \
     (MP_INFORMATION2_ENTRY *)((UINTN)&((MP_INFORMATION2_HOB_DATA *)(MpInfoHobData))->Entry + (MpInfoHobData)->EntrySize * Index)
 
-extern EFI_GUID  gMpInformationHobGuid2;
+extern EFI_GUID  gMpInformation2HobGuid;
 
 #endif

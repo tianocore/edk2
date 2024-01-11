@@ -50,7 +50,7 @@
 
 [Guids]
   gEdkiiMigratedFvInfoGuid                                             ## SOMETIMES_CONSUMES     ## HOB
-  gMpInformationHobGuid2                        ## PRODUCES
+  gMpInformation2HobGuid                        ## PRODUCES
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid                      ## PRODUCES

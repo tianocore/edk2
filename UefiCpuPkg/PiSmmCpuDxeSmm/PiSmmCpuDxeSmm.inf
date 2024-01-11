@@ -120,7 +120,7 @@
   gEdkiiPiSmmMemoryAttributesTableGuid     ## CONSUMES ## SystemTable
   gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
   gSmmBaseHobGuid                          ## CONSUMES
-  gMpInformationHobGuid2                   ## CONSUMES # Assume the HOB must has been created
+  gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES
