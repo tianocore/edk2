@@ -28,6 +28,12 @@
 //
 #define LMA  BIT10
 
+//
+// Indicate SmBase for each Processors has been relocated or not. If TRUE,
+// means no need to do the relocation in SmmCpuFeaturesInitializeProcessor().
+//
+BOOLEAN  mSmmCpuFeaturesSmmRelocated;
+
 /**
   The constructor function
 
@@ -46,9 +52,9 @@ SmmCpuFeaturesLibConstructor (
 {
   //
   // If gSmmBaseHobGuid found, means SmBase info has been relocated and recorded
-  // in the SmBase array. ASSERT it's not supported in OVMF.
+  // in the SmBase array.
   //
-  ASSERT (GetFirstGuidHob (&gSmmBaseHobGuid) == NULL);
+  mSmmCpuFeaturesSmmRelocated = (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL);
 
   //
   // No need to program SMRRs on our virtual platform.
@@ -92,16 +98,21 @@ SmmCpuFeaturesInitializeProcessor (
   AMD_SMRAM_SAVE_STATE_MAP  *CpuState;
 
   //
-  // Configure SMBASE.
+  // No need to configure SMBASE if SmBase relocation has been done.
   //
-  CpuState = (AMD_SMRAM_SAVE_STATE_MAP *)(UINTN)(
-                                                 SMM_DEFAULT_SMBASE +
-                                                 SMRAM_SAVE_STATE_MAP_OFFSET
-                                                 );
-  if ((CpuState->x86.SMMRevId & 0xFFFF) == 0) {
-    CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
-  } else {
-    CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  if (!mSmmCpuFeaturesSmmRelocated) {
+    //
+    // Configure SMBASE.
+    //
+    CpuState = (AMD_SMRAM_SAVE_STATE_MAP *)(UINTN)(
+                                                   SMM_DEFAULT_SMBASE +
+                                                   SMRAM_SAVE_STATE_MAP_OFFSET
+                                                   );
+    if ((CpuState->x86.SMMRevId & 0xFFFF) == 0) {
+      CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+    } else {
+      CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+    }
   }
 
   //
