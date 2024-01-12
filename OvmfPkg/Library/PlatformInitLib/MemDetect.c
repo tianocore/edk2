@@ -874,6 +874,18 @@ PlatformAddressWidthInitialization (
   if (PlatformInfoHob->HostBridgeDevId == 0xffff /* microvm */) {
     PlatformAddressWidthFromCpuid (PlatformInfoHob, FALSE);
     return;
+  } else if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    PlatformInfoHob->FirstNonAddress = BASE_4GB;
+    Status                           = PlatformScanE820 (PlatformGetFirstNonAddressCB, PlatformInfoHob);
+    if (EFI_ERROR (Status)) {
+      PlatformInfoHob->FirstNonAddress = BASE_4GB + PlatformGetSystemMemorySizeAbove4gb ();
+    }
+
+    PlatformInfoHob->PcdPciMmio64Base = PlatformInfoHob->FirstNonAddress;
+    PlatformAddressWidthFromCpuid (PlatformInfoHob, FALSE);
+    PlatformInfoHob->PcdPciMmio64Size = PlatformInfoHob->FirstNonAddress - PlatformInfoHob->PcdPciMmio64Base;
+
+    return;
   }
 
   //
