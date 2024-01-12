@@ -237,7 +237,7 @@ TdMmioRead8 (
 
   Status = TdVmCall (TDVMCALL_MMIO, TDVMCALL_ACCESS_SIZE_1, TDVMCALL_ACCESS_READ, Address | TdSharedPageMask (), 0, &Value);
   if (Status != 0) {
-    Value = *(volatile UINT64 *)Address;
+    Value = *(volatile UINT8 *)Address;
   }
 
   return (UINT8)Value;
@@ -294,7 +294,7 @@ TdMmioRead16 (
 
   Status = TdVmCall (TDVMCALL_MMIO, TDVMCALL_ACCESS_SIZE_2, TDVMCALL_ACCESS_READ, Address | TdSharedPageMask (), 0, &Value);
   if (Status != 0) {
-    Value = *(volatile UINT64 *)Address;
+    Value = *(volatile UINT16 *)Address;
   }
 
   return (UINT16)Value;
@@ -353,7 +353,7 @@ TdMmioRead32 (
 
   Status = TdVmCall (TDVMCALL_MMIO, TDVMCALL_ACCESS_SIZE_4, TDVMCALL_ACCESS_READ, Address | TdSharedPageMask (), 0, &Value);
   if (Status != 0) {
-    Value = *(volatile UINT64 *)Address;
+    Value = *(volatile UINT32 *)Address;
   }
 
   return (UINT32)Value;
