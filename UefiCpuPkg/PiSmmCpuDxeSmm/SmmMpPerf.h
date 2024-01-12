@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // The list of all MP procedures that need to be perf-logged.
 //
 #define  SMM_MP_PERF_PROCEDURE_LIST(_) \
-  _(SmmInitHandler), \
+  _(InitializeSmm), \
   _(SmmRendezvousEntry), \
   _(PlatformValidSmi), \
   _(SmmRendezvousExit), \

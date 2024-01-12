@@ -1513,9 +1513,7 @@ SmiRendezvous (
 
   ASSERT (CpuIndex < mMaxNumberOfCpus);
 
-  if (mSmmRelocated) {
-    ASSERT (mSmmInitialized != NULL);
-  }
+  ASSERT (mSmmInitialized != NULL);
 
   //
   // Save Cr2 because Page Fault exception in SMM may override its value,
@@ -1524,11 +1522,11 @@ SmiRendezvous (
   Cr2 = 0;
   SaveCr2 (&Cr2);
 
-  if (mSmmRelocated && !mSmmInitialized[CpuIndex]) {
+  if (!mSmmInitialized[CpuIndex]) {
     //
-    // Perform SmmInitHandler for CpuIndex
+    // Perform InitializeSmm for CpuIndex
     //
-    SmmInitHandler ();
+    InitializeSmm ();
 
     //
     // Restore Cr2
