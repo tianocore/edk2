@@ -641,23 +641,10 @@ InitializeCpuProcedure (
   }
 
   if (IsBsp) {
-    DEBUG ((DEBUG_INFO, "SmmRestoreCpu: mSmmRelocated is %d\n", mSmmRelocated));
-
     //
-    // Check whether Smm Relocation is done or not.
-    // If not, will do the SmmBases Relocation here!!!
+    // Issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
     //
-    if (!mSmmRelocated) {
-      //
-      // Restore SMBASE for BSP and all APs
-      //
-      SmmRelocateBases ();
-    } else {
-      //
-      // Issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
-      //
-      ExecuteFirstSmiInit ();
-    }
+    ExecuteFirstSmiInit ();
   }
 
   //
@@ -980,9 +967,9 @@ InitSmmS3ResumeState (
       SmmS3ResumeState->SmmS3StackSize = 0;
     }
 
-    SmmS3ResumeState->SmmS3Cr0 = mSmmCr0;
+    SmmS3ResumeState->SmmS3Cr0 = (UINT32)AsmReadCr0 ();
     SmmS3ResumeState->SmmS3Cr3 = Cr3;
-    SmmS3ResumeState->SmmS3Cr4 = mSmmCr4;
+    SmmS3ResumeState->SmmS3Cr4 = (UINT32)AsmReadCr4 ();
 
     if (sizeof (UINTN) == sizeof (UINT64)) {
       SmmS3ResumeState->Signature = SMM_S3_RESUME_SMM_64;
