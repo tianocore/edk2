@@ -137,11 +137,13 @@ GetSubEntriesNum (
 /**
   Calculate the maximum support address.
 
+  @param[in] Is5LevelPagingNeeded    If 5-level paging enabling is needed.
+
   @return the maximum support address.
 **/
 UINT8
 CalculateMaximumSupportAddress (
-  VOID
+  BOOLEAN  Is5LevelPagingNeeded
   )
 {
   UINT32  RegEax;
@@ -162,6 +164,18 @@ CalculateMaximumSupportAddress (
     } else {
       PhysicalAddressBits = 36;
     }
+  }
+
+  //
+  // 4-level paging supports translating 48-bit linear addresses to 52-bit physical addresses.
+  // Since linear addresses are sign-extended, the linear-address space of 4-level paging is:
+  // [0, 2^47-1] and [0xffff8000_00000000, 0xffffffff_ffffffff].
+  // So only [0, 2^47-1] linear-address range maps to the identical physical-address range when
+  // 5-Level paging is disabled.
+  //
+  ASSERT (PhysicalAddressBits <= 52);
+  if (!Is5LevelPagingNeeded && (PhysicalAddressBits > 47)) {
+    PhysicalAddressBits = 47;
   }
 
   return PhysicalAddressBits;
@@ -197,7 +211,7 @@ SmmInitPageTable (
   mCpuSmmRestrictedMemoryAccess = PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
   m1GPageTableSupport           = Is1GPageSupport ();
   m5LevelPagingNeeded           = Is5LevelPagingNeeded ();
-  mPhysicalAddressBits          = CalculateMaximumSupportAddress ();
+  mPhysicalAddressBits          = CalculateMaximumSupportAddress (m5LevelPagingNeeded);
   PatchInstructionX86 (gPatch5LevelPagingNeeded, m5LevelPagingNeeded, 1);
   if (m5LevelPagingNeeded) {
     mPagingMode = m1GPageTableSupport ? Paging5Level1GB : Paging5Level;
