@@ -138,6 +138,103 @@ SvsmMsrProtocol (
 }
 
 /**
+  Perform an RMPADJUST operation to alter the VMSA setting of a page.
+
+  Add or remove the VMSA attribute for a page.
+
+  @param[in]       Vmsa           Pointer to an SEV-ES save area page
+  @param[in]       ApicId         APIC ID associated with the VMSA
+  @param[in]       SetVmsa        Boolean indicator as to whether to set or
+                                  or clear the VMSA setting for the page
+
+  @retval  EFI_SUCCESS            RMPADJUST operation successful
+  @retval  EFI_UNSUPPORTED        Operation is not supported
+  @retval  EFI_INVALID_PARAMETER  RMPADJUST operation failed, an invalid
+                                  parameter was supplied
+
+**/
+EFI_STATUS
+EFIAPI
+SvsmVmsaRmpAdjust (
+  IN SEV_ES_SAVE_AREA  *Vmsa,
+  IN UINT32            ApicId,
+  IN BOOLEAN           SetVmsa
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINTN           Ret;
+
+  SvsmCallData.Caa = SvsmGetCaa ();
+
+  Function.Id.Protocol = 0;
+
+  if (SetVmsa) {
+    Function.Id.CallId = 2;
+
+    SvsmCallData.RaxIn = Function.Uint64;
+    SvsmCallData.RcxIn = (UINT64)(UINTN)Vmsa;
+    SvsmCallData.RdxIn = (UINT64)(UINTN)Vmsa + SIZE_4KB;
+    SvsmCallData.R8In  = ApicId;
+  } else {
+    Function.Id.CallId = 3;
+
+    SvsmCallData.RaxIn = Function.Uint64;
+    SvsmCallData.RcxIn = (UINT64)(UINTN)Vmsa;
+  }
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+
+  return (Ret == 0) ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
+}
+
+/**
+  Perform an RMPADJUST operation to alter the VMSA setting of a page.
+
+  Add or remove the VMSA attribute for a page.
+
+  @param[in]       Vmsa           Pointer to an SEV-ES save area page
+  @param[in]       ApicId         APIC ID associated with the VMSA
+  @param[in]       SetVmsa        Boolean indicator as to whether to set or
+                                  or clear the VMSA setting for the page
+
+  @retval  EFI_SUCCESS            RMPADJUST operation successful
+  @retval  EFI_UNSUPPORTED        Operation is not supported
+  @retval  EFI_INVALID_PARAMETER  RMPADJUST operation failed, an invalid
+                                  parameter was supplied
+
+**/
+EFI_STATUS
+EFIAPI
+BaseVmsaRmpAdjust (
+  IN SEV_ES_SAVE_AREA  *Vmsa,
+  IN UINT32            ApicId,
+  IN BOOLEAN           SetVmsa
+  )
+{
+  UINT64  Rdx;
+  UINT32  Ret;
+
+  //
+  // The RMPADJUST instruction is used to set or clear the VMSA bit for a
+  // page. The VMSA change is only made when running at VMPL0 and is ignored
+  // otherwise. If too low a target VMPL is specified, the instruction can
+  // succeed without changing the VMSA bit when not running at VMPL0. Using a
+  // target VMPL level of 1, RMPADJUST will return a FAIL_PERMISSION error if
+  // not running at VMPL0, thus ensuring that the VMSA bit is set appropriately
+  // when no error is returned.
+  //
+  Rdx = 1;
+  if (SetVmsa) {
+    Rdx |= RMPADJUST_VMSA_PAGE_BIT;
+  }
+
+  Ret = AsmRmpAdjust ((UINT64)(UINTN)Vmsa, 0, Rdx);
+
+  return (Ret == 0) ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
+}
+
+/**
   Issue an SVSM request to perform the PVALIDATE instruction.
 
   Invokes the SVSM to process the PVALIDATE instruction on behalf of the
@@ -409,5 +506,6 @@ CcExitSnpVmsaRmpAdjust (
   IN BOOLEAN           SetVmsa
   )
 {
-  return EFI_UNSUPPORTED;
+  return CcExitSnpSvsmPresent () ? SvsmVmsaRmpAdjust (Vmsa, ApicId, SetVmsa)
+                                 : BaseVmsaRmpAdjust (Vmsa, ApicId, SetVmsa);
 }
