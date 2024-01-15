@@ -141,7 +141,7 @@ jobs:
       run: stuart_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019
 
     - name: Upload Setup Log As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: (success() || failure()) && steps.get_ci_file_operations.outputs.setup_supported == 'true'
       with:
         name: ${{ matrix.Package }}-Logs
@@ -155,7 +155,7 @@ jobs:
       run: stuart_ci_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019
 
     - name: Upload CI Setup Log As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: (success() || failure()) && steps.get_ci_file_operations.outputs.ci_setup_supported == 'true'
       with:
         name: ${{ matrix.Package }}-Logs
@@ -168,7 +168,7 @@ jobs:
       run: stuart_update -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019
 
     - name: Upload Update Log As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
         name: ${{ matrix.Package }}-Logs
@@ -284,7 +284,7 @@ jobs:
         delete_dirs(build_path)
 
     - name: Upload Build Logs As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
         name: ${{ matrix.Package }}-Logs
@@ -329,7 +329,7 @@ jobs:
                 print(f'upload_sarif_file=false', file=fh)
 
     - name: Upload CodeQL Results (SARIF) As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: steps.env_data.outputs.upload_sarif_file == 'true'
       with:
         name: ${{ matrix.Package }}-CodeQL-SARIF
