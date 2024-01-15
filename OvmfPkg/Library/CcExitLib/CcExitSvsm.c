@@ -73,6 +73,8 @@ SvsmGetCaa (
   @param[in]  Caa     Pointer to the call area
   @param[in]  Rax     Contents to be set in RAX at VMGEXIT
   @param[in]  Rcx     Contents to be set in RCX at VMGEXIT
+  @param[in]  Rdx     Contents to be set in RDX at VMGEXIT
+  @param[in]  R8      Contents to be set in R8 at VMGEXIT
 
   @return             Contents of RAX upon return from VMGEXIT
 **/
@@ -81,7 +83,9 @@ UINTN
 SvsmMsrProtocol (
   IN SVSM_CAA  *Caa,
   IN UINT64    Rax,
-  IN UINT64    Rcx
+  IN UINT64    Rcx,
+  IN UINT64    Rdx,
+  IN UINT64    R8
   )
 {
   MSR_SEV_ES_GHCB_REGISTER  Msr;
@@ -115,7 +119,7 @@ SvsmMsrProtocol (
   // synchronized properly.
   //
   MemoryFence ();
-  Ret = AsmVmgExitSvsm (Rcx, 0, 0, 0, Rax, &Caa->SvsmCallPending, &Pending);
+  Ret = AsmVmgExitSvsm (Rcx, Rdx, R8, 0, Rax, &Caa->SvsmCallPending, &Pending);
   MemoryFence ();
 
   Msr.Uint64 = AsmReadMsr64 (MSR_SEV_ES_GHCB);
@@ -137,6 +141,101 @@ SvsmMsrProtocol (
   }
 
   return Ret;
+}
+
+/**
+  Perform an RMPADJUST operation to alter the VMSA setting of a page.
+
+  Add or remove the VMSA attribute for a page.
+
+  @param[in]       Vmsa           Pointer to an SEV-ES save area page
+  @param[in]       ApicId         APIC ID associated with the VMSA
+  @param[in]       SetVmsa        Boolean indicator as to whether to set or
+                                  or clear the VMSA setting for the page
+
+  @retval  EFI_SUCCESS            RMPADJUST operation successful
+  @retval  EFI_UNSUPPORTED        Operation is not supported
+  @retval  EFI_INVALID_PARAMETER  RMPADJUST operation failed, an invalid
+                                  parameter was supplied
+
+**/
+EFI_STATUS
+EFIAPI
+SvsmVmsaRmpAdjust (
+  IN SEV_ES_SAVE_AREA  *Vmsa,
+  IN UINT32            ApicId,
+  IN BOOLEAN           SetVmsa
+  )
+{
+  SVSM_CAA       *Caa;
+  SVSM_FUNCTION  Function;
+  UINT64         VmsaGpa;
+  UINT64         CaaGpa;
+  UINTN          Ret;
+
+  Caa = SvsmGetCaa ();
+
+  Function.Id.Protocol = 0;
+  if (SetVmsa) {
+    Function.Id.CallId = 2;
+
+    VmsaGpa = (UINT64)(UINTN)Vmsa;
+    CaaGpa  = (UINT64)(UINTN)Vmsa + SIZE_4KB;
+    Ret     = SvsmMsrProtocol (Caa, Function.Uint64, VmsaGpa, CaaGpa, ApicId);
+  } else {
+    Function.Id.CallId = 3;
+
+    VmsaGpa = (UINT64)(UINTN)Vmsa;
+    Ret     = SvsmMsrProtocol (Caa, Function.Uint64, VmsaGpa, 0, 0);
+  }
+
+  return (Ret == 0) ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
+}
+
+/**
+  Perform an RMPADJUST operation to alter the VMSA setting of a page.
+
+  Add or remove the VMSA attribute for a page.
+
+  @param[in]       Vmsa           Pointer to an SEV-ES save area page
+  @param[in]       ApicId         APIC ID associated with the VMSA
+  @param[in]       SetVmsa        Boolean indicator as to whether to set or
+                                  or clear the VMSA setting for the page
+
+  @retval  EFI_SUCCESS            RMPADJUST operation successful
+  @retval  EFI_UNSUPPORTED        Operation is not supported
+  @retval  EFI_INVALID_PARAMETER  RMPADJUST operation failed, an invalid
+                                  parameter was supplied
+
+**/
+EFI_STATUS
+EFIAPI
+BaseVmsaRmpAdjust (
+  IN SEV_ES_SAVE_AREA  *Vmsa,
+  IN UINT32            ApicId,
+  IN BOOLEAN           SetVmsa
+  )
+{
+  UINT64  Rdx;
+  UINT32  Ret;
+
+  //
+  // The RMPADJUST instruction is used to set or clear the VMSA bit for a
+  // page. The VMSA change is only made when running at VMPL0 and is ignored
+  // otherwise. If too low a target VMPL is specified, the instruction can
+  // succeed without changing the VMSA bit when not running at VMPL0. Using a
+  // target VMPL level of 1, RMPADJUST will return a FAIL_PERMISSION error if
+  // not running at VMPL0, thus ensuring that the VMSA bit is set appropriately
+  // when no error is returned.
+  //
+  Rdx = 1;
+  if (SetVmsa) {
+    Rdx |= RMPADJUST_VMSA_PAGE_BIT;
+  }
+
+  Ret = AsmRmpAdjust ((UINT64)(UINTN)Vmsa, 0, Rdx);
+
+  return (Ret == 0) ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
 }
 
 /**
@@ -192,7 +291,7 @@ SvsmPvalidate (
     Entry++;
     if ((Entry > EntryLimit) || (Index == EndIndex)) {
       do {
-        Ret = SvsmMsrProtocol (Caa, Function.Uint64, (UINT64)Request);
+        Ret = SvsmMsrProtocol (Caa, Function.Uint64, (UINT64)Request, 0, 0);
       } while (Ret == SVSM_ERR_INCOMPLETE || Ret == SVSM_ERR_BUSY);
 
       if ((Ret == SVSM_ERR_PVALIDATE_FAIL_SIZE_MISMATCH) &&
@@ -221,7 +320,7 @@ SvsmPvalidate (
           Entry++;
           if ((Entry > EntryLimit) || (Gfn == GfnEnd)) {
             do {
-              Ret = SvsmMsrProtocol (Caa, Function.Uint64, (UINT64)Request);
+              Ret = SvsmMsrProtocol (Caa, Function.Uint64, (UINT64)Request, 0, 0);
             } while (Ret == SVSM_ERR_INCOMPLETE || Ret == SVSM_ERR_BUSY);
 
             ASSERT (Ret == 0);
@@ -408,5 +507,6 @@ CcExitSnpVmsaRmpAdjust (
   IN BOOLEAN           SetVmsa
   )
 {
-  return EFI_UNSUPPORTED;
+  return CcExitSnpSvsmPresent () ? SvsmVmsaRmpAdjust (Vmsa, ApicId, SetVmsa)
+                                 : BaseVmsaRmpAdjust (Vmsa, ApicId, SetVmsa);
 }
