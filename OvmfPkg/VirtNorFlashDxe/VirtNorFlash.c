@@ -581,7 +581,7 @@ NorFlashWriteSingleBlock (
     // contents, while checking whether the old version had any bits cleared
     // that we want to set. In that case, we will need to erase the block first.
     for (CurOffset = 0; CurOffset < *NumBytes; CurOffset++) {
-      if (~OrigData[CurOffset] & Buffer[CurOffset]) {
+      if (~(UINT32)OrigData[CurOffset] & (UINT32)Buffer[CurOffset]) {
         goto DoErase;
       }
 
