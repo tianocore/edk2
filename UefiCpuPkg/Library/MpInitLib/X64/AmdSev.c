@@ -38,20 +38,15 @@ SevSnpPerformApAction (
   BOOLEAN                   InterruptState;
   UINT64                    ExitInfo1;
   UINT64                    ExitInfo2;
-  UINT32                    RmpAdjustStatus;
   UINT64                    VmgExitStatus;
+  EFI_STATUS                VmsaStatus;
 
   if (Action == SVM_VMGEXIT_SNP_AP_CREATE) {
     //
-    // To turn the page into a recognized VMSA page, issue RMPADJUST:
-    //   Target VMPL but numerically higher than current VMPL
-    //   Target PermissionMask is not used
+    // Turn the page into a recognized VMSA page.
     //
-    RmpAdjustStatus = SevSnpRmpAdjust (
-                        (EFI_PHYSICAL_ADDRESS)(UINTN)SaveArea,
-                        TRUE
-                        );
-    if (RmpAdjustStatus != 0) {
+    VmsaStatus = CcExitSnpVmsaRmpAdjust (SaveArea, ApicId, TRUE);
+    if (EFI_ERROR (VmsaStatus)) {
       DEBUG ((DEBUG_INFO, "SEV-SNP: RMPADJUST failed for VMSA creation\n"));
       ASSERT (FALSE);
 
@@ -94,11 +89,8 @@ SevSnpPerformApAction (
     // Make the current VMSA not runnable and accessible to be
     // reprogrammed.
     //
-    RmpAdjustStatus = SevSnpRmpAdjust (
-                        (EFI_PHYSICAL_ADDRESS)(UINTN)SaveArea,
-                        FALSE
-                        );
-    if (RmpAdjustStatus != 0) {
+    VmsaStatus = CcExitSnpVmsaRmpAdjust (SaveArea, ApicId, FALSE);
+    if (EFI_ERROR (VmsaStatus)) {
       DEBUG ((DEBUG_INFO, "SEV-SNP: RMPADJUST failed for VMSA reset\n"));
       ASSERT (FALSE);
 
@@ -291,37 +283,4 @@ SevSnpCreateAP (
     ApicId  = CpuInfoInHob[ProcessorNumber].ApicId,
     SevSnpCreateSaveArea (CpuMpData, CpuData, ApicId);
   }
-}
-
-/**
-  Issue RMPADJUST to adjust the VMSA attribute of an SEV-SNP page.
-
-  @param[in]  PageAddress
-  @param[in]  VmsaPage
-
-  @return  RMPADJUST return value
-**/
-UINT32
-SevSnpRmpAdjust (
-  IN  EFI_PHYSICAL_ADDRESS  PageAddress,
-  IN  BOOLEAN               VmsaPage
-  )
-{
-  UINT64  Rdx;
-
-  //
-  // The RMPADJUST instruction is used to set or clear the VMSA bit for a
-  // page. The VMSA change is only made when running at VMPL0 and is ignored
-  // otherwise. If too low a target VMPL is specified, the instruction can
-  // succeed without changing the VMSA bit when not running at VMPL0. Using a
-  // target VMPL level of 1, RMPADJUST will return a FAIL_PERMISSION error if
-  // not running at VMPL0, thus ensuring that the VMSA bit is set appropriately
-  // when no error is returned.
-  //
-  Rdx = 1;
-  if (VmsaPage) {
-    Rdx |= RMPADJUST_VMSA_PAGE_BIT;
-  }
-
-  return AsmRmpAdjust ((UINT64)PageAddress, 0, Rdx);
 }

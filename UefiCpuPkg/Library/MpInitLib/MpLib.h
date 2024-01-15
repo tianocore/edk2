@@ -871,20 +871,6 @@ FillExchangeInfoDataSevEs (
   );
 
 /**
-  Issue RMPADJUST to adjust the VMSA attribute of an SEV-SNP page.
-
-  @param[in]  PageAddress
-  @param[in]  VmsaPage
-
-  @return  RMPADJUST return value
-**/
-UINT32
-SevSnpRmpAdjust (
-  IN  EFI_PHYSICAL_ADDRESS  PageAddress,
-  IN  BOOLEAN               VmsaPage
-  );
-
-/**
   Create an SEV-SNP AP save area (VMSA) for use in running the vCPU.
 
   @param[in]  CpuMpData        Pointer to CPU MP Data
