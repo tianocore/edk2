@@ -55,6 +55,7 @@ SevSnpPerformApAction (
   }
 
   ExitInfo1  = (UINT64)ApicId << 32;
+  ExitInfo1 |= (UINT64)SaveArea->Vmpl << 16;
   ExitInfo1 |= Action;
   ExitInfo2  = (UINT64)(UINTN)SaveArea;
 
@@ -115,6 +116,7 @@ SevSnpCreateSaveArea (
   UINT32          ApicId
   )
 {
+  UINTN             PageCount;
   UINT8             *Pages;
   SEV_ES_SAVE_AREA  *SaveArea;
   IA32_CR0          ApCr0;
@@ -124,13 +126,18 @@ SevSnpCreateSaveArea (
   UINTN             StartIp;
   UINT8             SipiVector;
 
+  //
+  // When running under an SVSM, a Calling Area page is also needed
+  //
+  PageCount = CcExitSnpSvsmPresent () ? 2 : 1;
+
   if (CpuData->SevEsSaveArea == NULL) {
     //
     // Allocate a page for the SEV-ES Save Area and initialize it. Due to AMD
     // erratum #1467 (VMSA cannot be on a 2MB boundary), allocate an extra page
     // to choose from to work around the issue.
     //
-    Pages = AllocateReservedPages (2);
+    Pages = AllocateReservedPages (PageCount + 1);
     if (!Pages) {
       return;
     }
@@ -139,12 +146,12 @@ SevSnpCreateSaveArea (
     // Since page allocation works by allocating downward in the address space,
     // try to always free the first (lower address) page to limit possible holes
     // in the memory map. So, if the address of the second page is 2MB aligned,
-    // then use the first page and free the second page. Otherwise, free the
+    // then use the first page and free the last page. Otherwise, free the
     // first page and use the second page.
     //
     if (_IS_ALIGNED (Pages + EFI_PAGE_SIZE, SIZE_2MB)) {
       SaveArea = (SEV_ES_SAVE_AREA *)Pages;
-      FreePages (Pages + EFI_PAGE_SIZE, 1);
+      FreePages (Pages + (EFI_PAGE_SIZE * PageCount), 1);
     } else {
       SaveArea = (SEV_ES_SAVE_AREA *)(Pages + EFI_PAGE_SIZE);
       FreePages (Pages, 1);
@@ -162,7 +169,7 @@ SevSnpCreateSaveArea (
     }
   }
 
-  ZeroMem (SaveArea, EFI_PAGE_SIZE);
+  ZeroMem (SaveArea, EFI_PAGE_SIZE * PageCount);
 
   //
   // Propogate the CR0.NW and CR0.CD setting to the AP
@@ -238,10 +245,10 @@ SevSnpCreateSaveArea (
 
   //
   // Set the SEV-SNP specific fields for the save area:
-  //   VMPL - always VMPL0
+  //   VMPL - based on current mode
   //   SEV_FEATURES - equivalent to the SEV_STATUS MSR right shifted 2 bits
   //
-  SaveArea->Vmpl        = 0;
+  SaveArea->Vmpl        = CcExitSnpGetVmpl ();
   SaveArea->SevFeatures = AsmReadMsr64 (MSR_SEV_STATUS) >> 2;
 
   SevSnpPerformApAction (SaveArea, ApicId, SVM_VMGEXIT_SNP_AP_CREATE);
