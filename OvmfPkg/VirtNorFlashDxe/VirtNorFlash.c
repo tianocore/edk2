@@ -502,6 +502,38 @@ NorFlashRead (
   return EFI_SUCCESS;
 }
 
+STATIC
+EFI_STATUS
+NorFlashWriteSingleBlockWithErase (
+  IN        NOR_FLASH_INSTANCE  *Instance,
+  IN        EFI_LBA             Lba,
+  IN        UINTN               Offset,
+  IN OUT    UINTN               *NumBytes,
+  IN        UINT8               *Buffer
+  )
+{
+  EFI_STATUS  Status;
+
+  // Read NOR Flash data into shadow buffer
+  Status = NorFlashReadBlocks (Instance, Lba, Instance->BlockSize, Instance->ShadowBuffer);
+  if (EFI_ERROR (Status)) {
+    // Return one of the pre-approved error statuses
+    return EFI_DEVICE_ERROR;
+  }
+
+  // Put the data at the appropriate location inside the buffer area
+  CopyMem ((VOID *)((UINTN)Instance->ShadowBuffer + Offset), Buffer, *NumBytes);
+
+  // Write the modified buffer back to the NorFlash
+  Status = NorFlashWriteBlocks (Instance, Lba, Instance->BlockSize, Instance->ShadowBuffer);
+  if (EFI_ERROR (Status)) {
+    // Return one of the pre-approved error statuses
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /*
   Write a full or portion of a block. It must not span block boundaries; that is,
   Offset + *NumBytes <= Instance->BlockSize.
@@ -607,7 +639,14 @@ NorFlashWriteSingleBlock (
     // that we want to set. In that case, we will need to erase the block first.
     for (CurOffset = 0; CurOffset < *NumBytes; CurOffset++) {
       if (~(UINT32)OrigData[CurOffset] & (UINT32)Buffer[CurOffset]) {
-        goto DoErase;
+        Status = NorFlashWriteSingleBlockWithErase (
+                   Instance,
+                   Lba,
+                   Offset,
+                   NumBytes,
+                   Buffer
+                   );
+        return Status;
       }
 
       OrigData[CurOffset] = Buffer[CurOffset];
@@ -636,33 +675,22 @@ NorFlashWriteSingleBlock (
         goto Exit;
       }
     }
-
-Exit:
-    // Put device back into Read Array mode
-    SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
-
+  } else {
+    Status = NorFlashWriteSingleBlockWithErase (
+               Instance,
+               Lba,
+               Offset,
+               NumBytes,
+               Buffer
+               );
     return Status;
   }
 
-DoErase:
-  // Read NOR Flash data into shadow buffer
-  Status = NorFlashReadBlocks (Instance, Lba, BlockSize, Instance->ShadowBuffer);
-  if (EFI_ERROR (Status)) {
-    // Return one of the pre-approved error statuses
-    return EFI_DEVICE_ERROR;
-  }
+Exit:
+  // Put device back into Read Array mode
+  SEND_NOR_COMMAND (Instance->DeviceBaseAddress, 0, P30_CMD_READ_ARRAY);
 
-  // Put the data at the appropriate location inside the buffer area
-  CopyMem ((VOID *)((UINTN)Instance->ShadowBuffer + Offset), Buffer, *NumBytes);
-
-  // Write the modified buffer back to the NorFlash
-  Status = NorFlashWriteBlocks (Instance, Lba, BlockSize, Instance->ShadowBuffer);
-  if (EFI_ERROR (Status)) {
-    // Return one of the pre-approved error statuses
-    return EFI_DEVICE_ERROR;
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 EFI_STATUS
