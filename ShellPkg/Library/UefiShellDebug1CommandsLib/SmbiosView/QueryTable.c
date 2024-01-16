@@ -3652,6 +3652,14 @@ TABLE_ITEM  ProcessorArchitectureTypesTable[] = {
   {
     8,
     L" 128-bit RISC-V (RV128) "
+  },
+  {
+    9,
+    L" 32-bit LoongArch (LoongArch32) "
+  },
+  {
+    10,
+    L" 64-bit LoongArch (LoongArch64) "
   }
 };
 
