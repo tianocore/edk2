@@ -183,9 +183,8 @@ WriteBackInvalidateDataCache (
   VOID
   )
 {
-  ASSERT (FALSE);
   DEBUG ((
-    DEBUG_ERROR,
+    DEBUG_VERBOSE,
     "WriteBackInvalidateDataCache: RISC-V unsupported function.\n"
     ));
 }
@@ -226,7 +225,9 @@ WriteBackInvalidateDataCacheRange (
   if (RiscVIsCMOEnabled ()) {
     CacheOpCacheRange (Address, Length, CacheOpFlush);
   } else {
-    ASSERT (FALSE);
+    DEBUG (
+      (DEBUG_VERBOSE, "WriteBackInvalidateDataCacheRange not supported \n")
+      );
   }
 
   return Address;
@@ -248,7 +249,7 @@ WriteBackDataCache (
   VOID
   )
 {
-  ASSERT (FALSE);
+  DEBUG ((DEBUG_VERBOSE, "WriteBackDataCache not supported \n"));
 }
 
 /**
@@ -283,7 +284,7 @@ WriteBackDataCacheRange (
   if (RiscVIsCMOEnabled ()) {
     CacheOpCacheRange (Address, Length, CacheOpClean);
   } else {
-    ASSERT (FALSE);
+    DEBUG ((DEBUG_VERBOSE, "WriteBackDataCacheRange not supported \n"));
   }
 
   return Address;
