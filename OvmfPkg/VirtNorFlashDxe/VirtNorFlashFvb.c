@@ -302,6 +302,11 @@ ValidateFvHeader (
       break;
     }
 
+    if (VarHeader->State == 0xff) {
+      DEBUG ((DEBUG_INFO, "%a: end of var list (unwritten state)\n", __func__));
+      break;
+    }
+
     VarName = NULL;
     switch (VarHeader->State) {
       // usage: State = VAR_HEADER_VALID_ONLY
