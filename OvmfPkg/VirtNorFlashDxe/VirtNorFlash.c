@@ -550,13 +550,15 @@ NorFlashWriteSingleBlock (
     return EFI_BAD_BUFFER_SIZE;
   }
 
-  // Pick P30_MAX_BUFFER_SIZE_IN_BYTES (== 128 bytes) as a good start for word
-  // operations as opposed to erasing the block and writing the data regardless
-  // if an erase is really needed.  It looks like most individual NV variable
-  // writes are smaller than 128 bytes.
-  // To avoid pathological cases were a 2 byte write is disregarded because it
-  // occurs right at a 128 byte buffered write alignment boundary, permit up to
-  // twice the max buffer size, and perform two writes if needed.
+  // Pick 4 * P30_MAX_BUFFER_SIZE_IN_BYTES (== 512 bytes) as a good
+  // start for word operations as opposed to erasing the block and
+  // writing the data regardless if an erase is really needed.
+  //
+  // Many NV variable updates are small enough for a a single
+  // P30_MAX_BUFFER_SIZE_IN_BYTES block write.  In case the update is
+  // larger than a single block, or the update crosses a
+  // P30_MAX_BUFFER_SIZE_IN_BYTES boundary (as shown in the diagram
+  // below), or both, we might have to write two or more blocks.
   //
   //    0               128              256
   //    [----------------|----------------]
@@ -578,7 +580,7 @@ NorFlashWriteSingleBlock (
   Start = Offset & ~BOUNDARY_OF_32_WORDS;
   End   = ALIGN_VALUE (Offset + *NumBytes, P30_MAX_BUFFER_SIZE_IN_BYTES);
 
-  if ((End - Start) <= (2 * P30_MAX_BUFFER_SIZE_IN_BYTES)) {
+  if ((End - Start) <= (4 * P30_MAX_BUFFER_SIZE_IN_BYTES)) {
     // Check to see if we need to erase before programming the data into NOR.
     // If the destination bits are only changing from 1s to 0s we can just write.
     // After a block is erased all bits in the block is set to 1.
