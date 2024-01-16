@@ -4,12 +4,7 @@
 
 !if $(TPM2_ENABLE) == TRUE
   OvmfPkg/Tcg/TpmMmioSevDecryptPei/TpmMmioSevDecryptPei.inf
-!if $(TPM1_ENABLE) == TRUE
-  OvmfPkg/Tcg/Tcg2Config/Tcg12ConfigPei.inf
-  SecurityPkg/Tcg/TcgPei/TcgPei.inf
-!else
   OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
-!endif
   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <LibraryClasses>
       HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf

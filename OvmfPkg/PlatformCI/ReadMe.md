@@ -14,7 +14,7 @@ supported and are described below.
 | IA32                    | IA32               | OvmfPkgIa32.dsc     | None            |
 | X64                     | X64                | OvmfPkgIa64.dsc     | None            |
 | IA32 X64                | PEI-IA32 DXE-X64   | OvmfPkgIa32X64.dsc  | None            |
-| IA32 X64 Full           | PEI-IA32 DXE-X64   | OvmfPkgIa32X64.dsc  | SECURE_BOOT_ENABLE=1 SMM_REQUIRE=1 TPM1_ENABLE=1 TPM2_ENABLE=1 NETWORK_TLS_ENABLE=1 NETWORK_IP6_ENABLE=1 NETWORK_HTTP_BOOT_ENABLE=1 |
+| IA32 X64 Full           | PEI-IA32 DXE-X64   | OvmfPkgIa32X64.dsc  | SECURE_BOOT_ENABLE=1 SMM_REQUIRE=1 TPM2_ENABLE=1 NETWORK_TLS_ENABLE=1 NETWORK_IP6_ENABLE=1 NETWORK_HTTP_BOOT_ENABLE=1 |
 
 ## EDK2 Developer environment
 
