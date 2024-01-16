@@ -2610,6 +2610,74 @@ DisplayProcessorFamily2 (
       Print (L"RISC-V RV128\n");
       break;
 
+    case 0x258:
+      Print (L"LoongArch\n");
+      break;
+
+    case 0x259:
+      Print (L"Loongson1\n");
+      break;
+
+    case 0x25A:
+      Print (L"Loongson2\n");
+      break;
+
+    case 0x25B:
+      Print (L"Loongson3\n");
+      break;
+
+    case 0x25C:
+      Print (L"Loongson2K\n");
+      break;
+
+    case 0x25D:
+      Print (L"Loongson3A\n");
+      break;
+
+    case 0x25E:
+      Print (L"Loongson3B\n");
+      break;
+
+    case 0x25F:
+      Print (L"Loongson3C\n");
+      break;
+
+    case 0x260:
+      Print (L"Loongson3D\n");
+      break;
+
+    case 0x261:
+      Print (L"Loongson3E\n");
+      break;
+
+    case 0x262:
+      Print (L"DualCoreLoongson2K\n");
+      break;
+
+    case 0x26C:
+      Print (L"QuadCoreLoongson3A\n");
+      break;
+
+    case 0x26D:
+      Print (L"MultiCoreLoongson3A\n");
+      break;
+
+    case 0x26E:
+      Print (L"QuadCoreLoongson3B\n");
+      break;
+
+    case 0x26F:
+      Print (L"MultiCoreLoongson3B\n");
+      break;
+
+    case 0x270:
+      Print (L"MultiCoreLoongson3C\n");
+      break;
+
+    case 0x271:
+      Print (L"MultiCoreLoongson3D\n");
+      break;
+
     default:
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_UNDEFINED_PROC_FAMILY), gShellDebug1HiiHandle);
   }
