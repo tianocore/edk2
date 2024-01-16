@@ -521,6 +521,7 @@ NorFlashWriteSingleBlock (
   UINTN       BlockAddress;
   UINT8       *OrigData;
   UINTN       Start, End;
+  UINT32      Index, Count;
 
   DEBUG ((DEBUG_BLKIO, "NorFlashWriteSingleBlock(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Lba, Offset, *NumBytes, Buffer));
 
@@ -621,23 +622,17 @@ NorFlashWriteSingleBlock (
       goto Exit;
     }
 
-    Status = NorFlashWriteBuffer (
-               Instance,
-               BlockAddress + Start,
-               P30_MAX_BUFFER_SIZE_IN_BYTES,
-               Instance->ShadowBuffer
-               );
-    if (EFI_ERROR (Status)) {
-      goto Exit;
-    }
-
-    if ((End - Start) > P30_MAX_BUFFER_SIZE_IN_BYTES) {
+    Count = (End - Start) / P30_MAX_BUFFER_SIZE_IN_BYTES;
+    for (Index = 0; Index < Count; Index++) {
       Status = NorFlashWriteBuffer (
                  Instance,
-                 BlockAddress + Start + P30_MAX_BUFFER_SIZE_IN_BYTES,
+                 BlockAddress + Start + Index * P30_MAX_BUFFER_SIZE_IN_BYTES,
                  P30_MAX_BUFFER_SIZE_IN_BYTES,
-                 Instance->ShadowBuffer + P30_MAX_BUFFER_SIZE_IN_BYTES
+                 Instance->ShadowBuffer + Index * P30_MAX_BUFFER_SIZE_IN_BYTES
                  );
+      if (EFI_ERROR (Status)) {
+        goto Exit;
+      }
     }
 
 Exit:
