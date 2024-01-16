@@ -29,6 +29,10 @@
   ##  @libraryclass  Verify blobs read from the VMM
   BlobVerifierLib|Include/Library/BlobVerifierLib.h
 
+  ##  @libraryclass  FdtSerialPortAddressLib
+  #
+  FdtSerialPortAddressLib|Include/Library/FdtSerialPortAddressLib.h
+
   ##  @libraryclass  Loads and boots a Linux kernel image
   #
   LoadLinuxLib|Include/Library/LoadLinuxLib.h
