@@ -61,6 +61,7 @@ typedef enum {
   Create or update page table to map [LinearAddress, LinearAddress + Length) with specified attribute.
 
   @param[in, out] PageTable      The pointer to the page table to update, or pointer to NULL if a new page table is to be created.
+                                 If not pointer to NULL, the value it points to won't be changed in this function.
   @param[in]      PagingMode     The paging mode.
   @param[in]      Buffer         The free buffer to be used for page table creation/updating.
   @param[in, out] BufferSize     The buffer size.
