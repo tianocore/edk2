@@ -200,7 +200,7 @@ Tcg2MeasureGptTable (
                      BlockIo->Media->BlockSize,
                      (UINT8 *)PrimaryHeader
                      );
-  if (EFI_ERROR (Status) || EFI_ERROR (SanitizeEfiPartitionTableHeader (PrimaryHeader, BlockIo))) {
+  if (EFI_ERROR (Status) || EFI_ERROR (Tpm2SanitizeEfiPartitionTableHeader (PrimaryHeader, BlockIo))) {
     DEBUG ((DEBUG_ERROR, "Failed to read Partition Table Header or invalid Partition Table Header!\n"));
     FreePool (PrimaryHeader);
     return EFI_DEVICE_ERROR;
@@ -209,7 +209,7 @@ Tcg2MeasureGptTable (
   //
   // Read the partition entry.
   //
-  Status = SanitizePrimaryHeaderAllocationSize (PrimaryHeader, &AllocSize);
+  Status = Tpm2SanitizePrimaryHeaderAllocationSize (PrimaryHeader, &AllocSize);
   if (EFI_ERROR (Status)) {
     FreePool (PrimaryHeader);
     return EFI_BAD_BUFFER_SIZE;
@@ -250,7 +250,7 @@ Tcg2MeasureGptTable (
   //
   // Prepare Data for Measurement (CcProtocol and Tcg2Protocol)
   //
-  Status = SanitizePrimaryHeaderGptEventSize (PrimaryHeader, NumberOfPartition, &TcgEventSize);
+  Status = Tpm2SanitizePrimaryHeaderGptEventSize (PrimaryHeader, NumberOfPartition, &TcgEventSize);
   if (EFI_ERROR (Status)) {
     FreePool (PrimaryHeader);
     FreePool (EntryPtr);
@@ -420,7 +420,7 @@ Tcg2MeasurePeImage (
   }
 
   FilePathSize = (UINT32)GetDevicePathSize (FilePath);
-  Status       = SanitizePeImageEventSize (FilePathSize, &EventSize);
+  Status       = Tpm2SanitizePeImageEventSize (FilePathSize, &EventSize);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
