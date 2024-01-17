@@ -84,27 +84,27 @@ TestSanitizeEfiPartitionTableHeader (
   PrimaryHeader.Header.CRC32 = CalculateCrc32 ((UINT8 *)&PrimaryHeader, PrimaryHeader.Header.HeaderSize);
 
   // Test that a normal PrimaryHeader passes validation
-  Status = SanitizeEfiPartitionTableHeader (&PrimaryHeader, &BlockIo);
+  Status = Tpm2SanitizeEfiPartitionTableHeader (&PrimaryHeader, &BlockIo);
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   // Test that when number of partition entries is 0, the function returns EFI_DEVICE_ERROR
   // Should print "Invalid Partition Table Header NumberOfPartitionEntries!""
   PrimaryHeader.NumberOfPartitionEntries = 0;
-  Status                                 = SanitizeEfiPartitionTableHeader (&PrimaryHeader, &BlockIo);
+  Status                                 = Tpm2SanitizeEfiPartitionTableHeader (&PrimaryHeader, &BlockIo);
   UT_ASSERT_EQUAL (Status, EFI_DEVICE_ERROR);
   PrimaryHeader.NumberOfPartitionEntries = DEFAULT_PRIMARY_TABLE_HEADER_SIZE_OF_PARTITION_ENTRY;
 
   // Test that when the header size is too small, the function returns EFI_DEVICE_ERROR
   // Should print "Invalid Partition Table Header Size!"
   PrimaryHeader.Header.HeaderSize = 0;
-  Status                          = SanitizeEfiPartitionTableHeader (&PrimaryHeader, &BlockIo);
+  Status                          = Tpm2SanitizeEfiPartitionTableHeader (&PrimaryHeader, &BlockIo);
   UT_ASSERT_EQUAL (Status, EFI_DEVICE_ERROR);
   PrimaryHeader.Header.HeaderSize = sizeof (EFI_PARTITION_TABLE_HEADER);
 
   // Test that when the SizeOfPartitionEntry is too small, the function returns EFI_DEVICE_ERROR
   // should print: "SizeOfPartitionEntry shall be set to a value of 128 x 2^n where n is an integer greater than or equal to zero (e.g., 128, 256, 512, etc.)!"
   PrimaryHeader.SizeOfPartitionEntry = 1;
-  Status                             = SanitizeEfiPartitionTableHeader (&PrimaryHeader, &BlockIo);
+  Status                             = Tpm2SanitizeEfiPartitionTableHeader (&PrimaryHeader, &BlockIo);
   UT_ASSERT_EQUAL (Status, EFI_DEVICE_ERROR);
 
   DEBUG ((DEBUG_INFO, "%a: Test passed\n", __func__));
@@ -137,7 +137,7 @@ TestSanitizePrimaryHeaderAllocationSize (
   PrimaryHeader.NumberOfPartitionEntries = 5;
   PrimaryHeader.SizeOfPartitionEntry     = DEFAULT_PRIMARY_TABLE_HEADER_SIZE_OF_PARTITION_ENTRY;
 
-  Status = SanitizePrimaryHeaderAllocationSize (&PrimaryHeader, &AllocationSize);
+  Status = Tpm2SanitizePrimaryHeaderAllocationSize (&PrimaryHeader, &AllocationSize);
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   // Test that the allocation size is correct compared to the existing logic
@@ -146,19 +146,19 @@ TestSanitizePrimaryHeaderAllocationSize (
   // Test that an overflow is detected
   PrimaryHeader.NumberOfPartitionEntries = MAX_UINT32;
   PrimaryHeader.SizeOfPartitionEntry     = 5;
-  Status                                 = SanitizePrimaryHeaderAllocationSize (&PrimaryHeader, &AllocationSize);
+  Status                                 = Tpm2SanitizePrimaryHeaderAllocationSize (&PrimaryHeader, &AllocationSize);
   UT_ASSERT_EQUAL (Status, EFI_BAD_BUFFER_SIZE);
 
   // Test the inverse
   PrimaryHeader.NumberOfPartitionEntries = 5;
   PrimaryHeader.SizeOfPartitionEntry     = MAX_UINT32;
-  Status                                 = SanitizePrimaryHeaderAllocationSize (&PrimaryHeader, &AllocationSize);
+  Status                                 = Tpm2SanitizePrimaryHeaderAllocationSize (&PrimaryHeader, &AllocationSize);
   UT_ASSERT_EQUAL (Status, EFI_BAD_BUFFER_SIZE);
 
   // Test the worst case scenario
   PrimaryHeader.NumberOfPartitionEntries = MAX_UINT32;
   PrimaryHeader.SizeOfPartitionEntry     = MAX_UINT32;
-  Status                                 = SanitizePrimaryHeaderAllocationSize (&PrimaryHeader, &AllocationSize);
+  Status                                 = Tpm2SanitizePrimaryHeaderAllocationSize (&PrimaryHeader, &AllocationSize);
   UT_ASSERT_EQUAL (Status, EFI_BAD_BUFFER_SIZE);
 
   DEBUG ((DEBUG_INFO, "%a: Test passed\n", __func__));
@@ -196,7 +196,7 @@ TestSanitizePrimaryHeaderGptEventSize (
   NumberOfPartition = 13;
 
   // that the primary event size is correct
-  Status = SanitizePrimaryHeaderGptEventSize (&PrimaryHeader, NumberOfPartition, &EventSize);
+  Status = Tpm2SanitizePrimaryHeaderGptEventSize (&PrimaryHeader, NumberOfPartition, &EventSize);
   UT_ASSERT_NOT_EFI_ERROR (Status);
 
   // Calculate the existing logic event size
@@ -207,12 +207,12 @@ TestSanitizePrimaryHeaderGptEventSize (
   UT_ASSERT_EQUAL (EventSize, ExistingLogicEventSize);
 
   // Tests that the primary event size may not overflow
-  Status = SanitizePrimaryHeaderGptEventSize (&PrimaryHeader, MAX_UINT32, &EventSize);
+  Status = Tpm2SanitizePrimaryHeaderGptEventSize (&PrimaryHeader, MAX_UINT32, &EventSize);
   UT_ASSERT_EQUAL (Status, EFI_BAD_BUFFER_SIZE);
 
   // Test that the size of partition entries may not overflow
   PrimaryHeader.SizeOfPartitionEntry = MAX_UINT32;
-  Status                             = SanitizePrimaryHeaderGptEventSize (&PrimaryHeader, NumberOfPartition, &EventSize);
+  Status                             = Tpm2SanitizePrimaryHeaderGptEventSize (&PrimaryHeader, NumberOfPartition, &EventSize);
   UT_ASSERT_EQUAL (Status, EFI_BAD_BUFFER_SIZE);
 
   DEBUG ((DEBUG_INFO, "%a: Test passed\n", __func__));
@@ -245,7 +245,7 @@ TestSanitizePeImageEventSize (
   FilePathSize = 255;
 
   // Test that a normal PE image passes validation
-  Status = SanitizePeImageEventSize (FilePathSize, &EventSize);
+  Status = Tpm2SanitizePeImageEventSize (FilePathSize, &EventSize);
   UT_ASSERT_EQUAL (Status, EFI_SUCCESS);
 
   // Test that the event size is correct compared to the existing logic
@@ -258,7 +258,7 @@ TestSanitizePeImageEventSize (
   }
 
   // Test that the event size may not overflow
-  Status = SanitizePeImageEventSize (MAX_UINT32, &EventSize);
+  Status = Tpm2SanitizePeImageEventSize (MAX_UINT32, &EventSize);
   UT_ASSERT_EQUAL (Status, EFI_BAD_BUFFER_SIZE);
 
   DEBUG ((DEBUG_INFO, "%a: Test passed\n", __func__));
