@@ -174,7 +174,7 @@ TcgMeasureGptTable (
                      BlockIo->Media->BlockSize,
                      (UINT8 *)PrimaryHeader
                      );
-  if (EFI_ERROR (Status) || EFI_ERROR (SanitizeEfiPartitionTableHeader (PrimaryHeader, BlockIo))) {
+  if (EFI_ERROR (Status) || EFI_ERROR (TpmSanitizeEfiPartitionTableHeader (PrimaryHeader, BlockIo))) {
     DEBUG ((DEBUG_ERROR, "Failed to read Partition Table Header or invalid Partition Table Header!\n"));
     FreePool (PrimaryHeader);
     return EFI_DEVICE_ERROR;
@@ -183,7 +183,7 @@ TcgMeasureGptTable (
   //
   // Read the partition entry.
   //
-  Status = SanitizePrimaryHeaderAllocationSize (PrimaryHeader, &AllocSize);
+  Status = TpmSanitizePrimaryHeaderAllocationSize (PrimaryHeader, &AllocSize);
   if (EFI_ERROR (Status)) {
     FreePool (PrimaryHeader);
     return EFI_DEVICE_ERROR;
@@ -224,7 +224,7 @@ TcgMeasureGptTable (
   //
   // Prepare Data for Measurement
   //
-  Status   = SanitizePrimaryHeaderGptEventSize (PrimaryHeader, NumberOfPartition, &EventSize);
+  Status   = TpmSanitizePrimaryHeaderGptEventSize (PrimaryHeader, NumberOfPartition, &EventSize);
   TcgEvent = (TCG_PCR_EVENT *)AllocateZeroPool (EventSize);
   if (TcgEvent == NULL) {
     FreePool (PrimaryHeader);
@@ -351,7 +351,7 @@ TcgMeasurePeImage (
 
   // Determine destination PCR by BootPolicy
   //
-  Status = SanitizePeImageEventSize (FilePathSize, &EventSize);
+  Status = TpmSanitizePeImageEventSize (FilePathSize, &EventSize);
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
   }
