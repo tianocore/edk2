@@ -277,14 +277,8 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 INF  FatPkg/EnhancedFatDxe/Fat.inf
 INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
-!if $(TOOL_CHAIN_TAG) != "XCODE5" && $(BUILD_SHELL) == TRUE
-INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
-!endif
 INF OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
 INF  OvmfPkg/AmdSev/Grub/Grub.inf
-!if $(BUILD_SHELL) == TRUE
-INF  ShellPkg/Application/Shell/Shell.inf
-!endif
 
 INF MdeModulePkg/Logo/LogoDxe.inf
 
@@ -319,6 +313,8 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 # TPM support
 #
 !include OvmfPkg/Include/Fdf/OvmfTpmDxe.fdf.inc
+
+!include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 
 ################################################################################
 
