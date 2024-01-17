@@ -63,7 +63,7 @@
 **/
 EFI_STATUS
 EFIAPI
-SanitizeEfiPartitionTableHeader (
+Tpm2SanitizeEfiPartitionTableHeader (
   IN CONST EFI_PARTITION_TABLE_HEADER  *PrimaryHeader,
   IN CONST EFI_BLOCK_IO_PROTOCOL       *BlockIo
   )
@@ -169,7 +169,7 @@ SanitizeEfiPartitionTableHeader (
 **/
 EFI_STATUS
 EFIAPI
-SanitizePrimaryHeaderAllocationSize (
+Tpm2SanitizePrimaryHeaderAllocationSize (
   IN CONST EFI_PARTITION_TABLE_HEADER  *PrimaryHeader,
   OUT UINT32                           *AllocationSize
   )
@@ -221,7 +221,7 @@ SanitizePrimaryHeaderAllocationSize (
     One of the passed parameters was invalid.
 **/
 EFI_STATUS
-SanitizePrimaryHeaderGptEventSize (
+Tpm2SanitizePrimaryHeaderGptEventSize (
   IN  CONST EFI_PARTITION_TABLE_HEADER  *PrimaryHeader,
   IN  UINTN                             NumberOfPartition,
   OUT UINT32                            *EventSize
@@ -292,7 +292,7 @@ SanitizePrimaryHeaderGptEventSize (
     One of the passed parameters was invalid.
 **/
 EFI_STATUS
-SanitizePeImageEventSize (
+Tpm2SanitizePeImageEventSize (
   IN  UINT32  FilePathSize,
   OUT UINT32  *EventSize
   )
