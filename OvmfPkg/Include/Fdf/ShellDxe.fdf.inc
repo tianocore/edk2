@@ -2,7 +2,7 @@
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
-!if $(BUILD_SHELL) == TRUE
+!if $(BUILD_SHELL) == TRUE && $(SECURE_BOOT_ENABLE) == FALSE
 
 !if $(TOOL_CHAIN_TAG) != "XCODE5"
 !if $(NETWORK_ENABLE) == TRUE
