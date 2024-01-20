@@ -44,6 +44,7 @@
             # This has Mbedtls interfaces that aren't UEFI spec compliant
             "Library/Include/stdint.h",
             "Library/Include/stubs-32.h",
+            "Library/Include/inttypes.h",
             # These directories contain auto-generated OpenSSL content
             "Library/OpensslLib",
             "Library/IntrinsicLib",
