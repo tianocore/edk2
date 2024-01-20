@@ -29,6 +29,16 @@
 #define ACPI_PIN_GROUP_FUNCTION_DESCRIPTOR       0x91
 #define ACPI_PIN_GROUP_CONFIGURATION_DESCRIPTOR  0x92
 
+///
+/// _PSD Revision for ACPI 6.2
+///
+#define EFI_ACPI_6_2_AML_PSD_REVISION  0
+
+///
+/// _CPC Revision for ACPI 6.2
+///
+#define EFI_ACPI_6_2_AML_CPC_REVISION  3
+
 #pragma pack(1)
 
 ///

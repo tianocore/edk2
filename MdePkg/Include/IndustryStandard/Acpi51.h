@@ -13,6 +13,16 @@
 
 #include <IndustryStandard/Acpi50.h>
 
+///
+/// _PSD Revision for ACPI 5.1
+///
+#define EFI_ACPI_5_1_AML_PSD_REVISION  0
+
+///
+/// _CPC Revision for ACPI 5.1
+///
+#define EFI_ACPI_5_1_AML_CPC_REVISION  2
+
 //
 // Ensure proper structure formats
 //
