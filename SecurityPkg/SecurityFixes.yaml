@@ -1,0 +1,42 @@
+## @file
+# Security Fixes for SecurityPkg
+#
+# Copyright (c) Microsoft Corporation
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+CVE_2022_36763:
+  commit_titles:
+    - "SecurityPkg: DxeTpm2Measurement: SECURITY PATCH 4117 - CVE 2022-36763"
+    - "SecurityPkg: DxeTpmMeasurement: SECURITY PATCH 4117 - CVE 2022-36763"
+    - "SecurityPkg: : Adding CVE 2022-36763 to SecurityFixes.yaml"
+    - "SecurityPkg: DxeTpm2MeasureBootLib: SECURITY PATCH 4117/4118 symbol rename"
+    - "SecurityPkg: DxeTpmMeasureBootLib: SECURITY PATCH 4117/4118 symbol rename"
+    - "SecurityPkg: : Updating SecurityFixes.yaml after symbol rename"
+  cve: CVE-2022-36763
+  date_reported: 2022-10-25 11:31 UTC
+  description: (CVE-2022-36763) - Heap Buffer Overflow in Tcg2MeasureGptTable()
+  note: This patch is related to and supersedes TCBZ2168
+  files_impacted:
+    - Library\DxeTpm2MeasureBootLib\DxeTpm2MeasureBootLib.c
+    - Library\DxeTpmMeasureBootLib\DxeTpmMeasureBootLib.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4117
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=2168
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=1990
+CVE_2022_36764:
+  commit_titles:
+    - "SecurityPkg: DxeTpm2MeasureBootLib: SECURITY PATCH 4118 - CVE 2022-36764"
+    - "SecurityPkg: DxeTpmMeasureBootLib: SECURITY PATCH 4118 - CVE 2022-36764"
+    - "SecurityPkg: : Adding CVE 2022-36764 to SecurityFixes.yaml"
+    - "SecurityPkg: DxeTpm2MeasureBootLib: SECURITY PATCH 4117/4118 symbol rename"
+    - "SecurityPkg: DxeTpmMeasureBootLib: SECURITY PATCH 4117/4118 symbol rename"
+    - "SecurityPkg: : Updating SecurityFixes.yaml after symbol rename"
+  cve: CVE-2022-36764
+  date_reported: 2022-10-25 12:23 UTC
+  description: Heap Buffer Overflow in Tcg2MeasurePeImage()
+  note:
+  files_impacted:
+    - Library\DxeTpm2MeasureBootLib\DxeTpm2MeasureBootLib.c
+    - Library\DxeTpmMeasureBootLib\DxeTpmMeasureBootLib.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4118

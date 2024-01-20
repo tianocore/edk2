@@ -9,6 +9,7 @@
 #include "CpuPageTableLibUnitTest.h"
 #include "../CpuPageTable.h"
 
+#define IA32_PAE_RESERVED_MASK  0x7FF0000000000000ull
 //
 // Global Data to validate if the page table is legal
 // mValidMaskNoLeaf[0] is not used
@@ -95,6 +96,7 @@ InitGlobalData (
   @param[in]   Level          the level of PagingEntry.
   @param[in]   MaxLeafLevel   Max leaf entry level.
   @param[in]   LinearAddress  The linear address verified.
+  @param[in]   PagingMode     The paging mode.
 
   @retval  Leaf entry.
 **/
@@ -103,12 +105,17 @@ IsPageTableEntryValid (
   IN IA32_PAGING_ENTRY  *PagingEntry,
   IN UINTN              Level,
   IN UINTN              MaxLeafLevel,
-  IN UINT64             Address
+  IN UINT64             Address,
+  IN PAGING_MODE        PagingMode
   )
 {
   UINT64             Index;
   IA32_PAGING_ENTRY  *ChildPageEntry;
   UNIT_TEST_STATUS   Status;
+
+  if (PagingMode == PagingPae) {
+    UT_ASSERT_EQUAL (PagingEntry->Uint64 & IA32_PAE_RESERVED_MASK, 0);
+  }
 
   if (PagingEntry->Pce.Present == 0) {
     return UNIT_TEST_PASSED;
@@ -142,7 +149,7 @@ IsPageTableEntryValid (
 
   ChildPageEntry = (IA32_PAGING_ENTRY  *)(UINTN)(IA32_PNLE_PAGE_TABLE_BASE_ADDRESS (&PagingEntry->Pnle));
   for (Index = 0; Index < 512; Index++) {
-    Status = IsPageTableEntryValid (&ChildPageEntry[Index], Level-1, MaxLeafLevel, Address + (Index<<(9*(Level-1) + 3)));
+    Status = IsPageTableEntryValid (&ChildPageEntry[Index], Level-1, MaxLeafLevel, Address + (Index<<(9*(Level-1) + 3)), PagingMode);
     if (Status != UNIT_TEST_PASSED) {
       return Status;
     }
@@ -190,9 +197,10 @@ IsPageTableValid (
     if (PagingMode == PagingPae) {
       UT_ASSERT_EQUAL (PagingEntry[Index].PdptePae.Bits.MustBeZero, 0);
       UT_ASSERT_EQUAL (PagingEntry[Index].PdptePae.Bits.MustBeZero2, 0);
+      UT_ASSERT_EQUAL (PagingEntry[Index].PdptePae.Bits.MustBeZero3, 0);
     }
 
-    Status = IsPageTableEntryValid (&PagingEntry[Index], MaxLevel, MaxLeafLevel, Index << (9 * MaxLevel + 3));
+    Status = IsPageTableEntryValid (&PagingEntry[Index], MaxLevel, MaxLeafLevel, Index << (9 * MaxLevel + 3), PagingMode);
     if (Status != UNIT_TEST_PASSED) {
       return Status;
     }

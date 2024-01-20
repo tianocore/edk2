@@ -279,7 +279,7 @@ class FvHandler:
                             ParTree.Child.remove(ParTree.Child[-1])
                             ParTree.Data.Free_Space = 0
                         ParTree.Data.Size += Needed_Space
-                        ParTree.Data.Header.Fvlength = ParTree.Data.Size
+                        ParTree.Data.Header.FvLength = ParTree.Data.Size
                 ModifyFvSystemGuid(ParTree)
                 for item in ParTree.Child:
                     if item.type == FFS_FREE_SPACE:
@@ -387,7 +387,21 @@ class FvHandler:
         if self.NewFfs.Data.Size >= self.TargetFfs.Data.Size:
             Needed_Space = self.NewFfs.Data.Size + len(self.NewFfs.Data.PadData) - self.TargetFfs.Data.Size - len(self.TargetFfs.Data.PadData)
             # If TargetFv have enough free space, just move part of the free space to NewFfs.
-            if TargetFv.Data.Free_Space >= Needed_Space:
+            if Needed_Space == 0:
+                Target_index = TargetFv.Child.index(self.TargetFfs)
+                TargetFv.Child.remove(self.TargetFfs)
+                TargetFv.insertChild(self.NewFfs, Target_index)
+                # Modify TargetFv Header and ExtHeader info.
+                TargetFv.Data.ModFvExt()
+                TargetFv.Data.ModFvSize()
+                TargetFv.Data.ModExtHeaderData()
+                ModifyFvExtData(TargetFv)
+                TargetFv.Data.ModCheckSum()
+                # Recompress from the Fv node to update all the related node data.
+                self.CompressData(TargetFv)
+                # return the Status
+                self.Status = True
+            elif TargetFv.Data.Free_Space >= Needed_Space:
                 # Modify TargetFv Child info and BiosTree.
                 TargetFv.Child[-1].Data.Data = b'\xff' * (TargetFv.Data.Free_Space - Needed_Space)
                 TargetFv.Data.Free_Space -= Needed_Space
@@ -442,7 +456,7 @@ class FvHandler:
                     # Start free space calculating and moving process.
                     self.ModifyTest(TargetFv.Parent, Needed_Space)
         else:
-            New_Free_Space = self.TargetFfs.Data.Size - self.NewFfs.Data.Size
+            New_Free_Space = self.TargetFfs.Data.Size + len(self.TargetFfs.Data.PadData) - self.NewFfs.Data.Size - len(self.NewFfs.Data.PadData)
             # If TargetFv already have free space, move the new free space into it.
             if TargetFv.Data.Free_Space:
                 TargetFv.Child[-1].Data.Data += b'\xff' * New_Free_Space
@@ -450,7 +464,6 @@ class FvHandler:
                 Target_index = TargetFv.Child.index(self.TargetFfs)
                 TargetFv.Child.remove(self.TargetFfs)
                 TargetFv.insertChild(self.NewFfs, Target_index)
-                self.Status = True
             # If TargetFv do not have free space, create free space for Fv.
             else:
                 New_Free_Space_Tree = BIOSTREE('FREE_SPACE')
@@ -461,7 +474,6 @@ class FvHandler:
                 Target_index = TargetFv.Child.index(self.TargetFfs)
                 TargetFv.Child.remove(self.TargetFfs)
                 TargetFv.insertChild(self.NewFfs, Target_index)
-                self.Status = True
             # Modify TargetFv Header and ExtHeader info.
             TargetFv.Data.ModFvExt()
             TargetFv.Data.ModFvSize()
@@ -470,6 +482,7 @@ class FvHandler:
             TargetFv.Data.ModCheckSum()
             # Recompress from the Fv node to update all the related node data.
             self.CompressData(TargetFv)
+            self.Status = True
         logger.debug('Done!')
         return self.Status
 
@@ -650,8 +663,12 @@ class FvHandler:
             Removed_Space = TargetFv.Data.Free_Space - New_Free_Space
             TargetFv.Child[-1].Data.Data = b'\xff' * New_Free_Space
             TargetFv.Data.Size -= Removed_Space
-            TargetFv.Data.Header.Fvlength = TargetFv.Data.Size
-            ModifyFvSystemGuid(TargetFv)
+            TargetFv.Data.Header.FvLength = TargetFv.Data.Size
+            if struct2stream(TargetFv.Data.Header.FileSystemGuid) == EFI_FIRMWARE_FILE_SYSTEM3_GUID_BYTE:
+                if TargetFv.Data.Size <= 0xFFFFFF:
+                    TargetFv.Data.Header.FileSystemGuid = ModifyGuidFormat(
+                        "8c8ce578-8a3d-4f1c-9935-896185c32dd3")
+
             for item in TargetFv.Child:
                 if item.type == FFS_FREE_SPACE:
                     TargetFv.Data.Data += item.Data.Data + item.Data.PadData

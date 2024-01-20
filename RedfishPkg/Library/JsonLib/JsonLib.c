@@ -19,6 +19,8 @@
 
 #include "jansson.h"
 
+extern volatile UINT32  hashtable_seed;
+
 /**
   The function is used to initialize a JSON value which contains a new JSON array,
   or NULL on error. Initially, the array is empty.
@@ -809,6 +811,30 @@ JsonObjectSetValue (
 }
 
 /**
+  The function is used to delete a JSON key from the given JSON bject
+
+  @param[in]   JsonObj                The provided JSON object.
+  @param[in]   Key                    The key of the JSON value to be deleted.
+
+  @retval      EFI_ABORTED            Some error occur and operation aborted.
+  @retval      EFI_SUCCESS            The JSON value has been deleted from this JSON object.
+
+**/
+EFI_STATUS
+EFIAPI
+JsonObjectDelete (
+  IN    EDKII_JSON_OBJECT  JsonObj,
+  IN    CONST CHAR8        *Key
+  )
+{
+  if (json_object_del ((json_t *)JsonObj, (const char *)Key) != 0) {
+    return EFI_ABORTED;
+  } else {
+    return EFI_SUCCESS;
+  }
+}
+
+/**
   The function is used to get the number of elements in a JSON array. Returns or 0 if JsonArray
   is NULL or not a JSON array.
 
@@ -1137,4 +1163,37 @@ JsonGetType (
   )
 {
   return (EDKII_JSON_TYPE)(((json_t *)JsonValue)->type);
+}
+
+/**
+  JSON Library constructor.
+
+  @param ImageHandle     The image handle.
+  @param SystemTable     The system table.
+
+  @retval  EFI_SUCCESS  Protocol listener is registered successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+JsonLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  //
+  // hashtable_seed is initalized by current time while JsonLib is loaded.
+  // Due to above mechanism, hashtable_seed will be different in each individual
+  // UEFI driver. As the result, the hash of same key in different UEFI driver
+  // would be different. This breaks JsonObjectGetValue() because
+  // JsonObjectGetValue() won't be able to find corresponding JSON value if
+  // this EDKII_JSON_VALUE is created by another UEFI driver.
+  //
+  // Initial the seed to a fixed magic value for JsonLib to be working in all
+  // UEFI drivers. This fixed number will be removed after the protocol version
+  // of JsonLib is implemented in the future.
+  //
+  hashtable_seed = 0xFDAE2143;
+
+  return EFI_SUCCESS;
 }

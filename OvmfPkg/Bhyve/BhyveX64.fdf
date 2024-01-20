@@ -249,7 +249,6 @@ INF  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
 INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
-INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
 
 
 INF  OvmfPkg/SioBusDxe/SioBusDxe.inf
@@ -295,14 +294,6 @@ INF  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
 INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-
-!ifdef $(CSM_ENABLE)
-INF  IntelFrameworkModulePkg/Csm/BiosThunk/VideoDxe/VideoDxe.inf
-!endif
-#INF  OvmfPkg/Csm/LegacyBiosDxe/LegacyBiosDxe.inf
-!ifdef $(CSM_ENABLE)
-INF  RuleOverride=CSM OvmfPkg/Bhyve/Csm/BhyveCsm16/BhyveCsm16.inf
-!endif
 
 INF  OvmfPkg/PlatformDxe/Platform.inf
 INF  OvmfPkg/AmdSevDxe/AmdSevDxe.inf
@@ -461,11 +452,6 @@ FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
   FILE FREEFORM = 7E374E25-8E01-4FEE-87F2-390C23C606CD {
     RAW ACPI               |.acpi
     RAW ASL                |.aml
-  }
-
-[Rule.Common.USER_DEFINED.CSM]
-  FILE FREEFORM = $(NAMED_GUID) {
-    RAW BIN                |.bin
   }
 
 [Rule.Common.SEC.RESET_VECTOR]

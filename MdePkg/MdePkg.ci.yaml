@@ -9,6 +9,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "PrEval": {
+        "DscPath": "MdePkg.dsc",
+    },
     ## options defined .pytool/Plugin/LicenseCheck
     "LicenseCheck": {
         "IgnoreFiles": [
@@ -74,7 +77,10 @@
             "Test/UnitTest/Library/BaseSafeIntLib/TestBaseSafeIntLib.c",
             "Library/BaseFdtLib",
             "Library/MipiSysTLib/mipi_syst.h",
-            "Include/Register/Amd/SmramSaveStateMap.h"
+            "Include/Register/Amd/SmramSaveStateMap.h",
+            "Test/UnitTest/Library/DevicePathLib/TestDevicePathLib.c",
+            "Test/UnitTest/Library/DevicePathLib/TestDevicePathLib.h",
+            "Test/UnitTest/Library/DevicePathLib/TestDevicePathStringConversions.c"
         ]
     },
     ## options defined ci/Plugin/CompilerPlugin

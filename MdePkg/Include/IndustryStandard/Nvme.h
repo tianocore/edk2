@@ -1,5 +1,5 @@
 /** @file
-  Definitions based on NVMe spec. version 1.1.
+  Definitions based on NVMe spec. version 2.0c.
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2017 - 2023, Intel Corporation. All rights reserved.<BR>
@@ -9,6 +9,7 @@
   NVMe Specification 1.1
   NVMe Specification 1.4
   NVMe Specification 2.0
+  NVMe Specification 2.0c
 
 **/
 
@@ -354,6 +355,15 @@ typedef struct {
   UINT8     Rsvd7[16];      /* Reserved as of Nvm Express 1.1 Spec */
 } NVME_PSDESCRIPTOR;
 
+typedef struct {
+  UINT32    Ces     : 1;    /* Crypto Erase Supported */
+  UINT32    Bes     : 1;    /* Block Erase Supported */
+  UINT32    Ows     : 1;    /* Overwrite Supported */
+  UINT32    Rsvd1   : 26;   /* Reserved as of NVM Express 2.0c Spec */
+  UINT32    Ndi     : 1;    /* No-Deallocate Inhibited */
+  UINT32    Nodmmas : 2;    /* No-Deallocate Modifies Media After Sanitize */
+} NVME_SANICAP;
+
 //
 //  Identify Controller Data
 //
@@ -403,7 +413,12 @@ typedef struct {
   UINT16               Edstt;       /* Extended Device Self-test Time */
   UINT8                Dsto;        /* Device Self-test Options  */
   UINT8                Fwug;        /* Firmware Update Granularity */
-  UINT8                Rsvd2[192];  /* Reserved as of Nvm Express 1.4 Spec */
+  UINT16               Kas;         /* Keep Alive Support */
+  UINT16               Hctma;       /* Host Controlled Thermal Management Attributes */
+  UINT16               Mntmt;       /* Minimum Thermal Management Temperature */
+  UINT16               Mxtmt;       /* Maximum Thermal Management Temperature */
+  NVME_SANICAP         Sanicap;     /* Sanitize Capabilities */
+  UINT8                Rsvd2[180];  /* Reserved as of Nvm Express 1.4 Spec */
   //
   // NVM Command Set Attributes
   //
@@ -687,10 +702,11 @@ typedef struct {
   // CDW 10
   //
   UINT32    Lid   : 8;        /* Log Page Identifier */
-  #define LID_ERROR_INFO    0x1
-  #define LID_SMART_INFO    0x2
-  #define LID_FW_SLOT_INFO  0x3
-  #define LID_BP_INFO       0x15
+  #define LID_ERROR_INFO            0x1
+  #define LID_SMART_INFO            0x2
+  #define LID_FW_SLOT_INFO          0x3
+  #define LID_BP_INFO               0x15
+  #define LID_SANITIZE_STATUS_INFO  0x81
   UINT32    Rsvd1 : 8;
   UINT32    Numd  : 12;       /* Number of Dwords */
   UINT32    Rsvd2 : 4;        /* Reserved as of Nvm Express 1.1 Spec */
@@ -707,6 +723,31 @@ typedef struct {
   UINT32    Rsvd1 : 23;
   UINT32    Sv    : 1;        /* Save */
 } NVME_ADMIN_SET_FEATURES;
+
+//
+// NvmExpress Admin Sanitize Command
+//
+typedef struct {
+  //
+  // CDW 10
+  //
+  UINT32    Sanact : 3;       /* Sanitize Action */
+  UINT32    Ause   : 1;       /* Allow Unrestricted Sanitize Exit */
+  UINT32    Owpass : 4;       /* Overwrite Pass Count */
+  UINT32    Oipbp  : 1;       /* Overwrite Invert Pattern Between Passes */
+  UINT32    Nodas  : 1;       /* No-Deallocate After Sanitize */
+  UINT32    Rsvd1  : 22;
+  //
+  // CDW 11
+  //
+  UINT32    Ovrpat;           /* Overwrite Pattern */
+} NVME_ADMIN_SANITIZE;
+
+#define SANITIZE_ACTION_NO_ACTION          0x0
+#define SANITIZE_ACTION_EXIT_FAILURE_MODE  0x1
+#define SANITIZE_ACTION_BLOCK_ERASE        0x2
+#define SANITIZE_ACTION_OVERWRITE          0x3
+#define SANITIZE_ACTION_CRYPTO_ERASE       0x4
 
 //
 // NvmExpress Admin Format NVM Command
@@ -770,6 +811,7 @@ typedef union {
   NVME_ADMIN_FORMAT_NVM                 FormatNvm;
   NVME_ADMIN_SECURITY_RECEIVE           SecurityReceive;
   NVME_ADMIN_SECURITY_SEND              SecuritySend;
+  NVME_ADMIN_SANITIZE                   Sanitize;
 } NVME_ADMIN_CMD;
 
 typedef struct {
@@ -872,6 +914,7 @@ typedef struct {
 #define NVME_ADMIN_FORMAT_NVM_CMD           0x80
 #define NVME_ADMIN_SECURITY_SEND_CMD        0x81
 #define NVME_ADMIN_SECURITY_RECEIVE_CMD     0x82
+#define NVME_ADMIN_SANITIZE_CMD             0x84
 
 #define NVME_IO_FLUSH_OPC  0
 #define NVME_IO_WRITE_OPC  1
@@ -894,7 +937,8 @@ typedef enum {
   NamespaceAttachmentOpcode     = NVME_ADMIN_NAMESACE_ATTACHMENT_CMD,
   FormatNvmOpcode               = NVME_ADMIN_FORMAT_NVM_CMD,
   SecuritySendOpcode            = NVME_ADMIN_SECURITY_SEND_CMD,
-  SecurityReceiveOpcode         = NVME_ADMIN_SECURITY_RECEIVE_CMD
+  SecurityReceiveOpcode         = NVME_ADMIN_SECURITY_RECEIVE_CMD,
+  SanitizeOpcode                = NVME_ADMIN_SANITIZE_CMD
 } NVME_ADMIN_COMMAND_OPCODE;
 
 //
@@ -934,12 +978,14 @@ typedef enum {
 
 //
 // Get Log Page ? Log Page Identifiers
-// (ref. spec. v1.1 Figure 73).
+// (ref. spec. v2.0c Figure 202).
 //
 typedef enum {
-  ErrorInfoLogID        = LID_ERROR_INFO,
-  SmartHealthInfoLogID  = LID_SMART_INFO,
-  FirmwareSlotInfoLogID = LID_FW_SLOT_INFO
+  ErrorInfoLogID          = LID_ERROR_INFO,
+  SmartHealthInfoLogID    = LID_SMART_INFO,
+  FirmwareSlotInfoLogID   = LID_FW_SLOT_INFO,
+  BootPartitionInfoLogID  = LID_BP_INFO,
+  SanitizeStatusInfoLogID = LID_SANITIZE_STATUS_INFO
 } NVME_LOG_ID;
 
 //
@@ -1061,6 +1107,59 @@ typedef struct {
   UINT16    TemperatureSensor[8];
   UINT8     Reserved2[296];
 } NVME_SMART_HEALTH_INFO_LOG;
+
+//
+// Sanitize Status (Log Identifier 81h)
+// (ref. spec. v2.0c 5.16.1.25).
+//
+typedef struct {
+  //
+  // Indicates the fraction complete of the sanitize operation. (SPROG)
+  //
+  UINT16    SanitizeProgress;
+  //
+  // Indicates the status associated with the most recent sanitize operation. (SSTAT)
+  //
+  UINT16    SanitizeStatus                   : 3;
+  UINT16    OverwriteSanitizeCompletedNumber : 5;
+  UINT16    GlobalDataErased                 : 1;
+  UINT16    SanitizeStatusRsvd               : 7;
+  //
+  // Contains the value of the Command Dword 10 field of the Sanitize command that started the sanitize operation whose status is reported in the SSTAT field. (SCDW10)
+  //
+  UINT32    SanitizeCmdDw10Info;
+  //
+  // Indicates the number of seconds required to complete an Overwrite sanitize operation with 16 passes in the background when the No-Deallocate Modifies Media After Sanitize field is not set to 10b.
+  //
+  UINT32    OverwriteEstimatedTime;
+  //
+  // Indicates the number of seconds required to complete a Block Erase sanitize operation in the background when the No-Deallocate Modifies Media After Sanitize field is not set to 10b.
+  //
+  UINT32    BlockEraseEstimatedTime;
+  //
+  // Indicates the number of seconds required to complete a Crypto Erase sanitize operation in the background when the No-Deallocate Modifies Media After Sanitize field is not set to 10b.
+  //
+  UINT32    CryptoEraseEstimatedTime;
+  //
+  // Indicates the number of seconds required to complete an Overwrite sanitize operation and the associated additional media modification after the Overwrite sanitize operation in the background.
+  // The No-Deallocate After Sanitize bit was set to ?1? in the Sanitize command that requested the Overwrite sanitize operation.
+  // The No-Deallocate Modifies Media After Sanitize field is set to 10b.
+  //
+  UINT32    OverwriteEstimatedTimeWithNodmm;
+  //
+  // Indicates the number of seconds required to complete a Block Erase sanitize operation and the associated additional media modification after the Block Erase sanitize operation in the background.
+  // The No-Deallocate After Sanitize bit was set to ?1? in the Sanitize command that requested the Block Erase sanitize operation.
+  // The No-Deallocate Modifies Media After Sanitize field is set to 10b.
+  //
+  UINT32    BlockEraseEstimatedTimeWithNodmm;
+  //
+  // Indicates  the number of seconds required to complete a Crypto Erase sanitize operation and the associated additional media modification after the Crypto Erase sanitize operation in the background.
+  // The No-Deallocate After Sanitize bit was set to ?1? in the Sanitize command that requested the Crypto Erase sanitize operation.
+  // The No-Deallocate Modifies Media After Sanitize field is set to 10b.
+  //
+  UINT32    CryptoEraseEstimatedTimeWithNodmm;
+  UINT8     Reserved[480];
+} NVME_SANITIZE_STATUS_INFO_LOG;
 
 #pragma pack()
 

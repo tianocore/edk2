@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <PiSmm.h>
 
-#include <Protocol/MpService.h>
 #include <Protocol/SmmConfiguration.h>
 #include <Protocol/SmmCpu.h>
 #include <Protocol/SmmAccess2.h>
@@ -27,6 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MemoryAttributesTable.h>
 #include <Guid/PiSmmMemoryAttributesTable.h>
 #include <Guid/SmmBaseHob.h>
+#include <Guid/MpInformation2.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
@@ -54,6 +54,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PerformanceLib.h>
 #include <Library/CpuPageTableLib.h>
 #include <Library/MmSaveStateLib.h>
+#include <Library/SmmCpuSyncLib.h>
 
 #include <AcpiCpuData.h>
 #include <CpuHotPlugData.h>
@@ -405,7 +406,6 @@ typedef struct {
   SPIN_LOCK                     *Busy;
   volatile EFI_AP_PROCEDURE2    Procedure;
   volatile VOID                 *Parameter;
-  volatile UINT32               *Run;
   volatile BOOLEAN              *Present;
   PROCEDURE_TOKEN               *Token;
   EFI_STATUS                    *Status;
@@ -423,7 +423,6 @@ typedef struct {
   // so that UC cache-ability can be set together.
   //
   SMM_CPU_DATA_BLOCK            *CpuData;
-  volatile UINT32               *Counter;
   volatile UINT32               BspIndex;
   volatile BOOLEAN              *InsideSmm;
   volatile BOOLEAN              *AllCpusInSync;
@@ -433,6 +432,7 @@ typedef struct {
   volatile BOOLEAN              AllApArrivedWithException;
   EFI_AP_PROCEDURE              StartupProcedure;
   VOID                          *StartupProcArgs;
+  SMM_CPU_SYNC_CONTEXT          *SyncContext;
 } SMM_DISPATCHER_MP_SYNC_DATA;
 
 #define SMM_PSD_OFFSET  0xfb00
@@ -441,7 +441,6 @@ typedef struct {
 /// All global semaphores' pointer
 ///
 typedef struct {
-  volatile UINT32     *Counter;
   volatile BOOLEAN    *InsideSmm;
   volatile BOOLEAN    *AllCpusInSync;
   SPIN_LOCK           *PFLock;
@@ -453,7 +452,6 @@ typedef struct {
 ///
 typedef struct {
   SPIN_LOCK           *Busy;
-  volatile UINT32     *Run;
   volatile BOOLEAN    *Present;
   SPIN_LOCK           *Token;
 } SMM_CPU_SEMAPHORE_CPU;
@@ -485,6 +483,7 @@ extern SPIN_LOCK                     *mConfigSmmCodeAccessCheckLock;
 extern EFI_SMRAM_DESCRIPTOR          *mSmmCpuSmramRanges;
 extern UINTN                         mSmmCpuSmramRangeCount;
 extern UINT8                         mPhysicalAddressBits;
+extern BOOLEAN                       mSmmDebugAgentSupport;
 
 //
 // Copy of the PcdPteMemoryEncryptionAddressOrMask
@@ -1553,27 +1552,62 @@ SmmWaitForApArrival (
   );
 
 /**
-  Disable Write Protect on pages marked as read-only if Cr0.Bits.WP is 1.
+  Write unprotect read-only pages if Cr0.Bits.WP is 1.
 
-  @param[out]  WpEnabled      If Cr0.WP is enabled.
-  @param[out]  CetEnabled     If CET is enabled.
+  @param[out]  WriteProtect      If Cr0.Bits.WP is enabled.
+
 **/
 VOID
-DisableReadOnlyPageWriteProtect (
-  OUT BOOLEAN  *WpEnabled,
-  OUT BOOLEAN  *CetEnabled
+SmmWriteUnprotectReadOnlyPage (
+  OUT BOOLEAN  *WriteProtect
   );
 
 /**
-  Enable Write Protect on pages marked as read-only.
+  Write protect read-only pages.
 
-  @param[out]  WpEnabled      If Cr0.WP should be enabled.
-  @param[out]  CetEnabled     If CET should be enabled.
+  @param[in]  WriteProtect      If Cr0.Bits.WP should be enabled.
+
 **/
 VOID
-EnableReadOnlyPageWriteProtect (
-  BOOLEAN  WpEnabled,
-  BOOLEAN  CetEnabled
+SmmWriteProtectReadOnlyPage (
+  IN  BOOLEAN  WriteProtect
   );
+
+///
+/// Define macros to encapsulate the write unprotect/protect
+/// read-only pages.
+/// Below pieces of logic are defined as macros and not functions
+/// because "CET" feature disable & enable must be in the same
+/// function to avoid shadow stack and normal SMI stack mismatch,
+/// thus WRITE_UNPROTECT_RO_PAGES () must be called pair with
+/// WRITE_PROTECT_RO_PAGES () in same function.
+///
+/// @param[in,out] Wp   A BOOLEAN variable local to the containing
+///                     function, carrying write protection status from
+///                     WRITE_UNPROTECT_RO_PAGES() to
+///                     WRITE_PROTECT_RO_PAGES().
+///
+/// @param[in,out] Cet  A BOOLEAN variable local to the containing
+///                     function, carrying control flow integrity
+///                     enforcement status from
+///                     WRITE_UNPROTECT_RO_PAGES() to
+///                     WRITE_PROTECT_RO_PAGES().
+///
+#define WRITE_UNPROTECT_RO_PAGES(Wp, Cet) \
+  do { \
+    Cet = ((AsmReadCr4 () & CR4_CET_ENABLE) != 0); \
+    if (Cet) { \
+      DisableCet (); \
+    } \
+    SmmWriteUnprotectReadOnlyPage (&Wp); \
+  } while (FALSE)
+
+#define WRITE_PROTECT_RO_PAGES(Wp, Cet) \
+  do { \
+    SmmWriteProtectReadOnlyPage (Wp); \
+    if (Cet) { \
+      EnableCet (); \
+    } \
+  } while (FALSE)
 
 #endif

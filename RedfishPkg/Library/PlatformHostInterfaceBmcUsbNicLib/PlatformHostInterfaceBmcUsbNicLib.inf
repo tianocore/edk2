@@ -14,7 +14,7 @@
   FILE_GUID                      = C4837B58-225E-4352-8FDC-4C52A5D65891
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatformHostInterfaceBmcUsbNicLib
+  LIBRARY_CLASS                  = RedfishPlatformHostInterfaceLib
 
 [Sources]
   PlatformHostInterfaceBmcUsbNicLib.c
@@ -43,6 +43,7 @@
 [Pcd]
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishHostName     ## CONSUMED
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceUuid  ## CONSUMED
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServicePort  ## CONSUMED
 
 [Depex]
   gIpmiProtocolGuid

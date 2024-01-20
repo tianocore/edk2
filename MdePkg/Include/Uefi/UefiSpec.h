@@ -111,6 +111,21 @@ typedef enum {
 #define EFI_MEMORY_RUNTIME  0x8000000000000000ULL
 
 //
+// If this flag is set, the memory region is
+// described with additional ISA-specific memory attributes
+// as specified in EFI_MEMORY_ISA_MASK.
+//
+#define EFI_MEMORY_ISA_VALID  0x4000000000000000ULL
+
+//
+// Defines the bits reserved for describing optional ISA-specific cacheability
+// attributes that are not covered by the standard UEFI Memory Attributes cacheability
+// bits (EFI_MEMORY_UC, EFI_MEMORY_WC, EFI_MEMORY_WT, EFI_MEMORY_WB and EFI_MEMORY_UCE).
+// See Calling Conventions for further ISA-specific enumeration of these bits.
+//
+#define EFI_MEMORY_ISA_MASK  0x0FFFF00000000000ULL
+
+//
 // Attributes bitmasks, grouped by type
 //
 #define EFI_CACHE_ATTRIBUTE_MASK   (EFI_MEMORY_UC | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB | EFI_MEMORY_UCE | EFI_MEMORY_WP)
@@ -898,7 +913,7 @@ EFI_STATUS
 (EFIAPI *EFI_IMAGE_LOAD)(
   IN  BOOLEAN                      BootPolicy,
   IN  EFI_HANDLE                   ParentImageHandle,
-  IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath,
+  IN  EFI_DEVICE_PATH_PROTOCOL     *DevicePath   OPTIONAL,
   IN  VOID                         *SourceBuffer OPTIONAL,
   IN  UINTN                        SourceSize,
   OUT EFI_HANDLE                   *ImageHandle
@@ -1648,7 +1663,7 @@ typedef struct {
   ///
   UINT32      Flags;
   ///
-  /// Size in bytes of the capsule.
+  /// Size in bytes of the capsule (including capsule header).
   ///
   UINT32      CapsuleImageSize;
 } EFI_CAPSULE_HEADER;

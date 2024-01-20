@@ -249,6 +249,67 @@ PlatformReservationConflictCB (
 }
 
 /**
+  Returns PVH memmap
+  @param Entries      Pointer to PVH memmap
+  @param Count        Number of entries
+  @return EFI_STATUS
+**/
+EFI_STATUS
+GetPvhMemmapEntries (
+  struct hvm_memmap_table_entry  **Entries,
+  UINT32                         *Count
+  )
+{
+  UINT32                 *PVHResetVectorData;
+  struct hvm_start_info  *pvh_start_info;
+
+  PVHResetVectorData = (VOID *)(UINTN)PcdGet32 (PcdXenPvhStartOfDayStructPtr);
+  if (PVHResetVectorData == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  pvh_start_info = (struct hvm_start_info *)(UINTN)PVHResetVectorData[0];
+
+  *Entries = (struct hvm_memmap_table_entry *)(UINTN)pvh_start_info->memmap_paddr;
+  *Count   = pvh_start_info->memmap_entries;
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+PlatformScanE820Pvh (
+  IN      E820_SCAN_CALLBACK     Callback,
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  struct hvm_memmap_table_entry  *Memmap;
+  UINT32                         MemmapEntriesCount;
+  struct hvm_memmap_table_entry  *Entry;
+  EFI_E820_ENTRY64               E820Entry;
+  EFI_STATUS                     Status;
+  UINT32                         Loop;
+
+  Status = GetPvhMemmapEntries (&Memmap, &MemmapEntriesCount);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  for (Loop = 0; Loop < MemmapEntriesCount; Loop++) {
+    Entry = Memmap + Loop;
+
+    if (Entry->type == XEN_HVM_MEMMAP_TYPE_RAM) {
+      E820Entry.BaseAddr = Entry->addr;
+      E820Entry.Length   = Entry->size;
+      E820Entry.Type     = Entry->type;
+      Callback (&E820Entry, PlatformInfoHob);
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Iterate over the entries in QEMU's fw_cfg E820 RAM map, call the
   passed callback for each entry.
 
@@ -279,6 +340,10 @@ PlatformScanE820 (
   EFI_E820_ENTRY64      E820Entry;
   UINTN                 Processed;
 
+  if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    return PlatformScanE820Pvh (Callback, PlatformInfoHob);
+  }
+
   Status = QemuFwCfgFindFile ("etc/e820", &FwCfgItem, &FwCfgSize);
   if (EFI_ERROR (Status)) {
     return Status;
@@ -293,36 +358,6 @@ PlatformScanE820 (
     QemuFwCfgReadBytes (sizeof E820Entry, &E820Entry);
     Callback (&E820Entry, PlatformInfoHob);
   }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Returns PVH memmap
-
-  @param Entries      Pointer to PVH memmap
-  @param Count        Number of entries
-
-  @return EFI_STATUS
-**/
-EFI_STATUS
-GetPvhMemmapEntries (
-  struct hvm_memmap_table_entry  **Entries,
-  UINT32                         *Count
-  )
-{
-  UINT32                 *PVHResetVectorData;
-  struct hvm_start_info  *pvh_start_info;
-
-  PVHResetVectorData = (VOID *)(UINTN)PcdGet32 (PcdXenPvhStartOfDayStructPtr);
-  if (PVHResetVectorData == 0) {
-    return EFI_NOT_FOUND;
-  }
-
-  pvh_start_info = (struct hvm_start_info *)(UINTN)PVHResetVectorData[0];
-
-  *Entries = (struct hvm_memmap_table_entry *)(UINTN)pvh_start_info->memmap_paddr;
-  *Count   = pvh_start_info->memmap_entries;
 
   return EFI_SUCCESS;
 }
@@ -838,6 +873,18 @@ PlatformAddressWidthInitialization (
 
   if (PlatformInfoHob->HostBridgeDevId == 0xffff /* microvm */) {
     PlatformAddressWidthFromCpuid (PlatformInfoHob, FALSE);
+    return;
+  } else if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
+    PlatformInfoHob->FirstNonAddress = BASE_4GB;
+    Status                           = PlatformScanE820 (PlatformGetFirstNonAddressCB, PlatformInfoHob);
+    if (EFI_ERROR (Status)) {
+      PlatformInfoHob->FirstNonAddress = BASE_4GB + PlatformGetSystemMemorySizeAbove4gb ();
+    }
+
+    PlatformInfoHob->PcdPciMmio64Base = PlatformInfoHob->FirstNonAddress;
+    PlatformAddressWidthFromCpuid (PlatformInfoHob, FALSE);
+    PlatformInfoHob->PcdPciMmio64Size = PlatformInfoHob->FirstNonAddress - PlatformInfoHob->PcdPciMmio64Base;
+
     return;
   }
 

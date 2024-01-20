@@ -4,7 +4,7 @@
   EFI_IMAGE_NT_HEADERS64 is for PE32+.
 
   This file is coded to the Visual Studio, Microsoft Portable Executable and
-  Common Object File Format Specification, Revision 8.3 - February 6, 2013.
+  Common Object File Format Specification, Revision 9.3 - December 29, 2015.
   This file also includes some definitions in PI Specification, Revision 1.0.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -268,6 +268,21 @@ typedef struct {
 #define EFI_IMAGE_SUBSYSTEM_WINDOWS_CUI  3
 #define EFI_IMAGE_SUBSYSTEM_OS2_CUI      5
 #define EFI_IMAGE_SUBSYSTEM_POSIX_CUI    7
+
+//
+// DLL Characteristics
+//
+#define IMAGE_DLLCHARACTERISTICS_HIGH_ENTROPY_VA        0x0020
+#define IMAGE_DLLCHARACTERISTICS_DYNAMIC_BASE           0x0040
+#define IMAGE_DLLCHARACTERISTICS_FORCE_INTEGRITY        0x0080
+#define IMAGE_DLLCHARACTERISTICS_NX_COMPAT              0x0100
+#define IMAGE_DLLCHARACTERISTICS_NO_ISOLATION           0x0200
+#define IMAGE_DLLCHARACTERISTICS_NO_SEH                 0x0400
+#define IMAGE_DLLCHARACTERISTICS_NO_BIND                0x0800
+#define IMAGE_DLLCHARACTERISTICS_APPCONTAINER           0x1000
+#define IMAGE_DLLCHARACTERISTICS_WDM_DRIVER             0x2000
+#define IMAGE_DLLCHARACTERISTICS_GUARD_CF               0x4000
+#define IMAGE_DLLCHARACTERISTICS_TERMINAL_SERVER_AWARE  0x8000
 
 ///
 /// Length of ShortName.

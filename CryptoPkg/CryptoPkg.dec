@@ -27,6 +27,10 @@
   Library/OpensslLib/openssl/providers/implementations/include
   Library/OpensslLib/OpensslGen/include
   Library/OpensslLib/OpensslGen/providers/common/include
+  Library/MbedTlsLib/Include
+  Library/MbedTlsLib/mbedtls/include
+  Library/MbedTlsLib/mbedtls/include/mbedtls
+  Library/MbedTlsLib/mbedtls/library
 
 [LibraryClasses]
   ##  @libraryclass  Provides basic library functions for cryptographic primitives.
@@ -45,6 +49,7 @@
   ##  @libraryclass  Provides library functions from the openssl project.
   #
   OpensslLib|Private/Library/OpensslLib.h
+  MbedTlsLib|Private/Library/MbedTlsLib.h
 
   ##  @libraryclass  Provides compiler intrinsic functions required to link openssl project.
   #

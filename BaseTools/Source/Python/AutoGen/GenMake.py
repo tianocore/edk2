@@ -28,7 +28,7 @@ from Common.DataType import TAB_COMPILER_MSFT
 gIncludePattern = re.compile(r"^[ \t]*[#%]?[ \t]*include(?:[ \t]*(?:\\(?:\r\n|\r|\n))*[ \t]*)*(?:\(?[\"<]?[ \t]*)([-\w.\\/() \t]+)(?:[ \t]*[\">]?\)?)", re.MULTILINE | re.UNICODE | re.IGNORECASE)
 
 ## Regular expression for matching macro used in header file inclusion
-gMacroPattern = re.compile("([_A-Z][_A-Z0-9]*)[ \t]*\((.+)\)", re.UNICODE)
+gMacroPattern = re.compile("([_A-Z][_A-Z0-9]*)[ \t]*\\((.+)\\)", re.UNICODE)
 
 gIsFileMap = {}
 

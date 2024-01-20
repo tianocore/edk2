@@ -52,6 +52,7 @@
 
 
 !include MdePkg/MdeLibs.dsc.inc
+!include NetworkPkg/Network.dsc.inc
 
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
@@ -68,8 +69,6 @@
 # Library Class section - list of all Library Classes needed by this Platform.
 #
 ################################################################################
-
-!include NetworkPkg/NetworkDefines.dsc.inc
 
 !include OvmfPkg/RiscVVirt/RiscVVirt.dsc.inc
 
@@ -101,6 +100,7 @@
   PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
   PeiHardwareInfoLib|OvmfPkg/Library/HardwareInfoLib/PeiHardwareInfoLib.inf
   PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
+  ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
   Tpm2CommandLib|SecurityPkg/Library/Tpm2CommandLib/Tpm2CommandLib.inf
@@ -124,8 +124,6 @@
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   PciExpressLib|OvmfPkg/Library/BaseCachingPciExpressLib/BaseCachingPciExpressLib.inf
-
-#!include NetworkPkg/NetworkBuildOptions.dsc.inc
 
 ################################################################################
 #
@@ -164,11 +162,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|3686400
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
-
-  #
-  # Network Pcds
-  #
-!include NetworkPkg/NetworkPcds.dsc.inc
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdResetOnMemoryTypeInformationChange|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
@@ -397,11 +390,6 @@
     <LibraryClasses>
       NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
   }
-
-  #
-  # Networking stack
-  #
-!include NetworkPkg/NetworkComponents.dsc.inc
 
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
     <LibraryClasses>

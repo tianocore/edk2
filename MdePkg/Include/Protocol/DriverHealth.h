@@ -137,34 +137,18 @@ EFI_STATUS
                               will only be returned with a HealthStatus value of
                               EfiDriverHealthStatusConfigurationRequired.
 
-  @retval EFI_SUCCESS           ControllerHandle is NULL, and all the controllers
-                                managed by this driver specified by This have a health
-                                status of EfiDriverHealthStatusHealthy with no warning
-                                messages to be returned.  The ChildHandle, HealthStatus,
-                                MessageList, and FormList parameters are ignored.
-
-  @retval EFI_DEVICE_ERROR      ControllerHandle is NULL, and one or more of the
-                                controllers managed by this driver specified by This
-                                do not have a health status of EfiDriverHealthStatusHealthy.
-                                The ChildHandle, HealthStatus, MessageList, and
-                                FormList parameters are ignored.
-
-  @retval EFI_DEVICE_ERROR      ControllerHandle is NULL, and one or more of the
-                                controllers managed by this driver specified by This
-                                have one or more warning and/or error messages.
-                                The ChildHandle, HealthStatus, MessageList, and
-                                FormList parameters are ignored.
-
-  @retval EFI_SUCCESS           ControllerHandle is not NULL and the health status
-                                of the controller specified by ControllerHandle and
-                                ChildHandle was returned in HealthStatus.  A list
-                                of warning and error messages may be optionally
-                                returned in MessageList, and a list of HII Forms
-                                may be optionally returned in FormList.
+  @retval EFI_SUCCESS           The health status of the controller specified by
+                                ControllerHandle and ChildHandle was returned in HealthStatus.
+                                A list of warning and error messages may be optionally
+                                returned in MessageList, and an HII Form may be optionally
+                                specified by FormHiiHandle.
 
   @retval EFI_UNSUPPORTED       ControllerHandle is not NULL, and the controller
                                 specified by ControllerHandle and ChildHandle is not
                                 currently being managed by the driver specified by This.
+
+  @retval EFI_UNSUPPORTED       ControllerHandle is NULL and there are no devices being
+                                managed by the driver.
 
   @retval EFI_INVALID_PARAMETER HealthStatus is NULL.
 

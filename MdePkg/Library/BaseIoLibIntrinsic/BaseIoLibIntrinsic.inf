@@ -38,17 +38,11 @@
   IoLibInternalTdxNull.c
   IoLibTdx.h
 
-[Sources.IA32]
+[Sources.IA32, Sources.X64]
   IoLibGcc.c    | GCC
   IoLibMsc.c    | MSFT
   IoLib.c
-  Ia32/IoFifo.nasm
-
-[Sources.X64]
-  IoLibGcc.c    | GCC
-  IoLibMsc.c    | MSFT
-  IoLib.c
-  X64/IoFifo.nasm
+  IoLibFifo.c
 
 [Sources.EBC]
   IoLibEbc.c

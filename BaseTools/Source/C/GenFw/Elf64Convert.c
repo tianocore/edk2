@@ -1562,7 +1562,27 @@ WriteSections64 (
             // subsequent LDR instruction (covered by a R_AARCH64_LD64_GOT_LO12_NC
             // relocation) into an ADD instruction - this is handled above.
             //
-            Offset = (Sym->st_value - (Rel->r_offset & ~0xfff)) >> 12;
+            // In order to handle Cortex-A53 erratum #843419, the GCC toolchain
+            // may convert an ADRP instruction at the end of a page (0xffc
+            // offset) into an ADR instruction. If so, be sure to calculate the
+            // offset for an ADR instead of ADRP.
+            //
+            if ((*(UINT32 *)Targ & BIT31) == 0) {
+              //
+              // Calculate the offset for an ADR.
+              //
+              Offset = (Sym->st_value & ~0xfff) - Rel->r_offset;
+              if (Offset < -0x100000 || Offset > 0xfffff) {
+                Error (NULL, 0, 3000, "Invalid", "WriteSections64(): %s  due to its size (> 1 MB), unable to relocate ADR.",
+                  mInImageName);
+                break;
+              }
+            } else {
+              //
+              // Calculate the offset for an ADRP.
+              //
+              Offset = (Sym->st_value - (Rel->r_offset & ~0xfff)) >> 12;
+            }
 
             *(UINT32 *)Targ &= 0x9000001f;
             *(UINT32 *)Targ |= ((Offset & 0x1ffffc) << (5 - 2)) | ((Offset & 0x3) << 29);
@@ -1778,7 +1798,17 @@ WriteSections64 (
           case R_LARCH_TLS_LD64_HI20:
           case R_LARCH_TLS_GD_PC_HI20:
           case R_LARCH_TLS_GD64_HI20:
+          case R_LARCH_32_PCREL:
           case R_LARCH_RELAX:
+          case R_LARCH_DELETE:
+          case R_LARCH_ALIGN:
+          case R_LARCH_PCREL20_S2:
+          case R_LARCH_CFA:
+          case R_LARCH_ADD6:
+          case R_LARCH_SUB6:
+          case R_LARCH_ADD_ULEB128:
+          case R_LARCH_SUB_ULEB128:
+          case R_LARCH_64_PCREL:
             //
             // These types are not used or do not require fixup.
             //
@@ -2185,7 +2215,17 @@ WriteRelocations64 (
               case R_LARCH_TLS_LD64_HI20:
               case R_LARCH_TLS_GD_PC_HI20:
               case R_LARCH_TLS_GD64_HI20:
+              case R_LARCH_32_PCREL:
               case R_LARCH_RELAX:
+              case R_LARCH_DELETE:
+              case R_LARCH_ALIGN:
+              case R_LARCH_PCREL20_S2:
+              case R_LARCH_CFA:
+              case R_LARCH_ADD6:
+              case R_LARCH_SUB6:
+              case R_LARCH_ADD_ULEB128:
+              case R_LARCH_SUB_ULEB128:
+              case R_LARCH_64_PCREL:
                 //
                 // These types are not used or do not require fixup in PE format files.
                 //

@@ -249,6 +249,23 @@ IpmiGetChannelInfo (
   OUT UINT32                          *GetChannelInfoResponseSize
   );
 
+/**
+  This function gets system interface capability
+
+  @param[in]  InterfaceCapabilityRequest    Get system interface capability request.
+  @param[out] InterfaceCapabilityResponse   The response of system interface capability.
+
+  @retval EFI_SUCCESS            Command is sent successfully.
+  @retval Other                  Failure.
+
+**/
+EFI_STATUS
+EFIAPI
+IpmiGetSystemInterfaceCapability (
+  IN  IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_REQUEST   *InterfaceCapabilityRequest,
+  OUT IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_RESPONSE  *InterfaceCapabilityResponse
+  );
+
 //
 // IPMI NetFnTransport
 //

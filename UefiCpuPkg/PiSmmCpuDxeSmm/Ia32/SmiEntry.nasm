@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
 ; Copyright (c) 2020, AMD Incorporated. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
@@ -15,19 +15,7 @@
 
 %include "StuffRsbNasm.inc"
 %include "Nasm.inc"
-
-%define MSR_IA32_S_CET                     0x6A2
-%define   MSR_IA32_CET_SH_STK_EN             0x1
-%define   MSR_IA32_CET_WR_SHSTK_EN           0x2
-%define   MSR_IA32_CET_ENDBR_EN              0x4
-%define   MSR_IA32_CET_LEG_IW_EN             0x8
-%define   MSR_IA32_CET_NO_TRACK_EN           0x10
-%define   MSR_IA32_CET_SUPPRESS_DIS          0x20
-%define   MSR_IA32_CET_SUPPRESS              0x400
-%define   MSR_IA32_CET_TRACKER               0x800
-%define MSR_IA32_PL0_SSP                   0x6A4
-
-%define CR4_CET                            0x800000
+%include "Cet.inc"
 
 %define MSR_IA32_MISC_ENABLE 0x1A0
 %define MSR_EFER      0xc0000080
@@ -214,10 +202,20 @@ ASM_PFX(mPatchCetSupported):
     push    edx
     push    eax
 
+    mov     ecx, MSR_IA32_U_CET
+    rdmsr
+    push    edx
+    push    eax
+
     mov     ecx, MSR_IA32_PL0_SSP
     rdmsr
     push    edx
     push    eax
+
+    mov     ecx, MSR_IA32_U_CET
+    xor     eax, eax
+    xor     edx, edx
+    wrmsr
 
     mov     ecx, MSR_IA32_S_CET
     mov     eax, MSR_IA32_CET_SH_STK_EN
@@ -249,7 +247,9 @@ CetInterruptDone:
     bts     ecx, 16                     ; set WP
     mov     cr0, ecx
 
-    mov     eax, 0x668 | CR4_CET
+    ; set CR4.CET bit for enable CET
+    mov     eax, cr4
+    bts     eax, CR4_CET_BIT
     mov     cr4, eax
 
     setssbsy
@@ -276,10 +276,17 @@ CetDone:
     cmp     al, 0
     jz      CetDone2
 
-    mov     eax, 0x668
-    mov     cr4, eax       ; disable CET
+    ; clear CR4.CET bit for disable CET
+    mov     eax, cr4
+    btr     eax, CR4_CET_BIT
+    mov     cr4, eax
 
     mov     ecx, MSR_IA32_PL0_SSP
+    pop     eax
+    pop     edx
+    wrmsr
+
+    mov     ecx, MSR_IA32_U_CET
     pop     eax
     pop     edx
     wrmsr

@@ -167,46 +167,6 @@ MigrateMemoryPages (
 }
 
 /**
-  Removes any FV HOBs whose base address is not in PEI installed memory.
-
-  @param[in] Private          Pointer to PeiCore's private data structure.
-
-**/
-VOID
-RemoveFvHobsInTemporaryMemory (
-  IN PEI_CORE_INSTANCE  *Private
-  )
-{
-  EFI_PEI_HOB_POINTERS     Hob;
-  EFI_HOB_FIRMWARE_VOLUME  *FirmwareVolumeHob;
-
-  DEBUG ((DEBUG_INFO, "Removing FVs in FV HOB not already migrated to permanent memory.\n"));
-
-  for (Hob.Raw = GetHobList (); !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    if ((GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV) || (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV2) || (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_FV3)) {
-      FirmwareVolumeHob = Hob.FirmwareVolume;
-      DEBUG ((DEBUG_INFO, "  Found FV HOB.\n"));
-      DEBUG ((
-        DEBUG_INFO,
-        "    BA=%016lx  L=%016lx\n",
-        FirmwareVolumeHob->BaseAddress,
-        FirmwareVolumeHob->Length
-        ));
-      if (
-          !(
-            ((EFI_PHYSICAL_ADDRESS)(UINTN)FirmwareVolumeHob->BaseAddress >= Private->PhysicalMemoryBegin) &&
-            (((EFI_PHYSICAL_ADDRESS)(UINTN)FirmwareVolumeHob->BaseAddress + (FirmwareVolumeHob->Length - 1)) < Private->FreePhysicalMemoryTop)
-            )
-          )
-      {
-        DEBUG ((DEBUG_INFO, "      Removing FV HOB to an FV in T-RAM (was not migrated).\n"));
-        Hob.Header->HobType = EFI_HOB_TYPE_UNUSED;
-      }
-    }
-  }
-}
-
-/**
   Migrate the base address in firmware volume allocation HOBs
   from temporary memory to PEI installed memory.
 

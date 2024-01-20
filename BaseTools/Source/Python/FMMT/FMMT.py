@@ -84,6 +84,8 @@ class FMMT():
             ROOT_TYPE = ROOT_FFS_TREE
         elif filetype == '.sec':
             ROOT_TYPE = ROOT_SECTION_TREE
+        elif filetype == '.elf':
+            ROOT_TYPE = ROOT_ELF_TREE
         else:
             ROOT_TYPE = ROOT_TREE
         ViewFile(inputfile, ROOT_TYPE, layoutfilename, outputfile)

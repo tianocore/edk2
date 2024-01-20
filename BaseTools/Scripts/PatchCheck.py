@@ -363,6 +363,9 @@ class GitDiffCheck:
                 self.is_newfile = False
                 self.force_crlf = True
                 self.force_notabs = True
+                if self.filename.endswith('.rtf'):
+                    self.force_crlf = False
+                    self.force_notabs = False
                 if self.filename.endswith('.sh') or \
                     self.filename.startswith('BaseTools/BinWrappers/PosixLike/') or \
                     self.filename.startswith('BaseTools/BinPipWrappers/PosixLike/') or \
@@ -416,7 +419,7 @@ class GitDiffCheck:
                     self.format_error("didn't find diff hunk marker (@@)")
             self.line_num += 1
         elif self.state == PATCH:
-            if self.binary:
+            if self.binary or self.filename.endswith(".rtf"):
                 pass
             elif line.startswith('-'):
                 pass

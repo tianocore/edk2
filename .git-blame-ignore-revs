@@ -50,3 +50,7 @@ e7108d0e9655b1795c94ac372b0449f28dd907df
 40b0b23ed34f48c26d711d3e4613a4bb35eeadff
 # ArmPkg: Apply uncrustify changes
 429309e0c6b74792d679681a8edd0d5ae0ff850c
+# EmulatorPkg: Format with Uncrustify 73.0.8
+972e3b0b9d67ef2847c9c1c89e606e6074a7ddda
+# OvmfPkg: Format with Uncrustify 73.0.8
+0e9ce9146a6dc50a35488e3a4a7a2a4bbaf1eb1c

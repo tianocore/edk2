@@ -15,7 +15,7 @@ on the TianoCore wiki.
 | ArmPlatformPkg       |                    | :heavy_check_mark: |
 | ArmVirtPkg           | SEE PACKAGE README | SEE PACKAGE README |
 | CryptoPkg            | :heavy_check_mark: | :heavy_check_mark: | Spell checking in audit mode
-| DynamicTablesPkg     |                    | :heavy_check_mark: |
+| DynamicTablesPkg     | :heavy_check_mark: | :heavy_check_mark: |
 | EmbeddedPkg          |
 | EmulatorPkg          | SEE PACKAGE README | SEE PACKAGE README | Spell checking in audit mode
 | FatPkg               | :heavy_check_mark: | :heavy_check_mark: |

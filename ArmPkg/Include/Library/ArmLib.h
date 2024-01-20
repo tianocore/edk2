@@ -45,8 +45,6 @@ typedef enum {
   ARM_MEMORY_REGION_ATTRIBUTE_DEVICE,
 } ARM_MEMORY_REGION_ATTRIBUTES;
 
-#define IS_ARM_MEMORY_REGION_ATTRIBUTES_SECURE(attr)  ((UINT32)(attr) & 1)
-
 typedef struct {
   EFI_PHYSICAL_ADDRESS            PhysicalBase;
   EFI_VIRTUAL_ADDRESS             VirtualBase;
@@ -765,6 +763,49 @@ EFIAPI
 ArmHasCcidx (
   VOID
   );
+
+#ifdef MDE_CPU_AARCH64
+///
+/// AArch64-only ID Register Helper functions
+///
+
+/**
+  Checks whether the CPU implements the Virtualization Host Extensions.
+
+  @retval TRUE  FEAT_VHE is implemented.
+  @retval FALSE FEAT_VHE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasVhe (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements the Trace Buffer Extension.
+
+  @retval TRUE  FEAT_TRBE is implemented.
+  @retval FALSE FEAT_TRBE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasTrbe (
+  VOID
+  );
+
+/**
+  Checks whether the CPU implements the Embedded Trace Extension.
+
+  @retval TRUE  FEAT_ETE is implemented.
+  @retval FALSE FEAT_ETE is not mplemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasEte (
+  VOID
+  );
+
+#endif // MDE_CPU_AARCH64
 
 #ifdef MDE_CPU_ARM
 ///

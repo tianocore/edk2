@@ -1,7 +1,7 @@
 ## @file
 # A simple DXE_DRIVER that causes the PCI Bus UEFI_DRIVER to allocate 64-bit
-# MMIO BARs above 4 GB, regardless of option ROM availability (as long as a CSM
-# is not present), conserving 32-bit MMIO aperture for 32-bit BARs.
+# MMIO BARs above 4 GB, regardless of option ROM availability, conserving 32-bit
+# MMIO aperture for 32-bit BARs.
 #
 # Copyright (C) 2016, Red Hat, Inc.
 #
@@ -33,7 +33,6 @@
 
 [Protocols]
   gEfiIncompatiblePciDeviceSupportProtocolGuid ## SOMETIMES_PRODUCES
-  gEfiLegacyBiosProtocolGuid                   ## NOTIFY
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdPciMmio64Size                ## CONSUMES

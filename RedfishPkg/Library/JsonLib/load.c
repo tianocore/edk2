@@ -5,6 +5,7 @@
  * it under the terms of the MIT license. See LICENSE for details.
 
  (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+ Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
     SPDX-License-Identifier: BSD-2-Clause-Patent AND MIT
  */
@@ -717,8 +718,8 @@ lex_scan_number (
     goto out;
   }
 
-  lex->token      = TOKEN_REAL;
-  lex->value.real = doubleval;
+  lex->token         = TOKEN_INTEGER;
+  lex->value.integer = doubleval;
   return 0;
 
 out:

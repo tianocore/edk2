@@ -15,50 +15,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MigratedFvInfo.h>
 
 #include "CpuMpPei.h"
-
-#define IA32_PG_P   BIT0
-#define IA32_PG_RW  BIT1
-#define IA32_PG_U   BIT2
-#define IA32_PG_A   BIT5
-#define IA32_PG_D   BIT6
-#define IA32_PG_PS  BIT7
-#define IA32_PG_NX  BIT63
-
-#define PAGE_ATTRIBUTE_BITS  (IA32_PG_RW | IA32_PG_P)
-#define PAGE_PROGATE_BITS    (IA32_PG_D | IA32_PG_A | IA32_PG_NX | IA32_PG_U | \
-                               PAGE_ATTRIBUTE_BITS)
-
-#define PAGING_PAE_INDEX_MASK        0x1FF
-#define PAGING_4K_ADDRESS_MASK_64    0x000FFFFFFFFFF000ull
-#define PAGING_2M_ADDRESS_MASK_64    0x000FFFFFFFE00000ull
-#define PAGING_1G_ADDRESS_MASK_64    0x000FFFFFC0000000ull
-#define PAGING_512G_ADDRESS_MASK_64  0x000FFF8000000000ull
-
-typedef enum {
-  PageNone = 0,
-  PageMin  = 1,
-  Page4K   = PageMin,
-  Page2M   = 2,
-  Page1G   = 3,
-  Page512G = 4,
-  PageMax  = Page512G
-} PAGE_ATTRIBUTE;
-
-typedef struct {
-  PAGE_ATTRIBUTE    Attribute;
-  UINT64            Length;
-  UINT64            AddressMask;
-  UINTN             AddressBitOffset;
-  UINTN             AddressBitLength;
-} PAGE_ATTRIBUTE_TABLE;
-
-PAGE_ATTRIBUTE_TABLE  mPageAttributeTable[] = {
-  { PageNone, 0,          0,                           0,  0 },
-  { Page4K,   SIZE_4KB,   PAGING_4K_ADDRESS_MASK_64,   12, 9 },
-  { Page2M,   SIZE_2MB,   PAGING_2M_ADDRESS_MASK_64,   21, 9 },
-  { Page1G,   SIZE_1GB,   PAGING_1G_ADDRESS_MASK_64,   30, 9 },
-  { Page512G, SIZE_512GB, PAGING_512G_ADDRESS_MASK_64, 39, 9 },
-};
+#define PAGING_4K_ADDRESS_MASK_64  0x000FFFFFFFFFF000ull
 
 EFI_PEI_NOTIFY_DESCRIPTOR  mPostMemNotifyList[] = {
   {
@@ -118,236 +75,100 @@ AllocatePageTableMemory (
 }
 
 /**
-  Get the type of top level page table.
-
-  @retval Page512G  PML4 paging.
-  @retval Page1G    PAE paging.
-
-**/
-PAGE_ATTRIBUTE
-GetPageTableTopLevelType (
-  VOID
-  )
-{
-  MSR_IA32_EFER_REGISTER  MsrEfer;
-
-  MsrEfer.Uint64 = AsmReadMsr64 (MSR_CORE_IA32_EFER);
-
-  return (MsrEfer.Bits.LMA == 1) ? Page512G : Page1G;
-}
-
-/**
-  Return page table entry matching the address.
-
-  @param[in]   Address          The address to be checked.
-  @param[out]  PageAttributes   The page attribute of the page entry.
-
-  @return The page entry.
-**/
-VOID *
-GetPageTableEntry (
-  IN  PHYSICAL_ADDRESS  Address,
-  OUT PAGE_ATTRIBUTE    *PageAttribute
-  )
-{
-  INTN    Level;
-  UINTN   Index;
-  UINT64  *PageTable;
-  UINT64  AddressEncMask;
-
-  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask);
-  PageTable      = (UINT64 *)(UINTN)(AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64);
-  for (Level = (INTN)GetPageTableTopLevelType (); Level > 0; --Level) {
-    Index  = (UINTN)RShiftU64 (Address, mPageAttributeTable[Level].AddressBitOffset);
-    Index &= PAGING_PAE_INDEX_MASK;
-
-    //
-    // No mapping?
-    //
-    if (PageTable[Index] == 0) {
-      *PageAttribute = PageNone;
-      return NULL;
-    }
-
-    //
-    // Page memory?
-    //
-    if (((PageTable[Index] & IA32_PG_PS) != 0) || (Level == PageMin)) {
-      *PageAttribute = (PAGE_ATTRIBUTE)Level;
-      return &PageTable[Index];
-    }
-
-    //
-    // Page directory or table
-    //
-    PageTable = (UINT64 *)(UINTN)(PageTable[Index] &
-                                  ~AddressEncMask &
-                                  PAGING_4K_ADDRESS_MASK_64);
-  }
-
-  *PageAttribute = PageNone;
-  return NULL;
-}
-
-/**
-  This function splits one page entry to smaller page entries.
-
-  @param[in]  PageEntry        The page entry to be splitted.
-  @param[in]  PageAttribute    The page attribute of the page entry.
-  @param[in]  SplitAttribute   How to split the page entry.
-  @param[in]  Recursively      Do the split recursively or not.
-
-  @retval RETURN_SUCCESS            The page entry is splitted.
-  @retval RETURN_INVALID_PARAMETER  If target page attribute is invalid
-  @retval RETURN_OUT_OF_RESOURCES   No resource to split page entry.
-**/
-RETURN_STATUS
-SplitPage (
-  IN  UINT64          *PageEntry,
-  IN  PAGE_ATTRIBUTE  PageAttribute,
-  IN  PAGE_ATTRIBUTE  SplitAttribute,
-  IN  BOOLEAN         Recursively
-  )
-{
-  UINT64          BaseAddress;
-  UINT64          *NewPageEntry;
-  UINTN           Index;
-  UINT64          AddressEncMask;
-  PAGE_ATTRIBUTE  SplitTo;
-
-  if ((SplitAttribute == PageNone) || (SplitAttribute >= PageAttribute)) {
-    ASSERT (SplitAttribute != PageNone);
-    ASSERT (SplitAttribute < PageAttribute);
-    return RETURN_INVALID_PARAMETER;
-  }
-
-  NewPageEntry = AllocatePageTableMemory (1);
-  if (NewPageEntry == NULL) {
-    ASSERT (NewPageEntry != NULL);
-    return RETURN_OUT_OF_RESOURCES;
-  }
-
-  //
-  // One level down each step to achieve more compact page table.
-  //
-  SplitTo        = PageAttribute - 1;
-  AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) &
-                   mPageAttributeTable[SplitTo].AddressMask;
-  BaseAddress = *PageEntry &
-                ~PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) &
-                mPageAttributeTable[PageAttribute].AddressMask;
-  for (Index = 0; Index < SIZE_4KB / sizeof (UINT64); Index++) {
-    NewPageEntry[Index] = BaseAddress | AddressEncMask |
-                          ((*PageEntry) & PAGE_PROGATE_BITS);
-
-    if (SplitTo != PageMin) {
-      NewPageEntry[Index] |= IA32_PG_PS;
-    }
-
-    if (Recursively && (SplitTo > SplitAttribute)) {
-      SplitPage (&NewPageEntry[Index], SplitTo, SplitAttribute, Recursively);
-    }
-
-    BaseAddress += mPageAttributeTable[SplitTo].Length;
-  }
-
-  (*PageEntry) = (UINT64)(UINTN)NewPageEntry | AddressEncMask | PAGE_ATTRIBUTE_BITS;
-
-  return RETURN_SUCCESS;
-}
-
-/**
   This function modifies the page attributes for the memory region specified
-  by BaseAddress and Length from their current attributes to the attributes
-  specified by Attributes.
+  by BaseAddress and Length to not present.
 
   Caller should make sure BaseAddress and Length is at page boundary.
 
   @param[in]   BaseAddress      Start address of a memory region.
   @param[in]   Length           Size in bytes of the memory region.
-  @param[in]   Attributes       Bit mask of attributes to modify.
 
-  @retval RETURN_SUCCESS            The attributes were modified for the memory
-                                    region.
-  @retval RETURN_INVALID_PARAMETER  Length is zero; or,
-                                    Attributes specified an illegal combination
-                                    of attributes that cannot be set together; or
-                                    Addressis not 4KB aligned.
+  @retval RETURN_SUCCESS            The memory region is changed to not present.
   @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to modify
                                     the attributes.
   @retval RETURN_UNSUPPORTED        Cannot modify the attributes of given memory.
 
 **/
 RETURN_STATUS
-EFIAPI
-ConvertMemoryPageAttributes (
+ConvertMemoryPageToNotPresent (
   IN  PHYSICAL_ADDRESS  BaseAddress,
-  IN  UINT64            Length,
-  IN  UINT64            Attributes
+  IN  UINT64            Length
   )
 {
-  UINT64                *PageEntry;
-  PAGE_ATTRIBUTE        PageAttribute;
-  RETURN_STATUS         Status;
-  EFI_PHYSICAL_ADDRESS  MaximumAddress;
+  EFI_STATUS                  Status;
+  UINTN                       PageTable;
+  EFI_PHYSICAL_ADDRESS        Buffer;
+  UINTN                       BufferSize;
+  IA32_MAP_ATTRIBUTE          MapAttribute;
+  IA32_MAP_ATTRIBUTE          MapMask;
+  PAGING_MODE                 PagingMode;
+  IA32_CR4                    Cr4;
+  BOOLEAN                     Page5LevelSupport;
+  UINT32                      RegEax;
+  BOOLEAN                     Page1GSupport;
+  CPUID_EXTENDED_CPU_SIG_EDX  RegEdx;
 
-  if ((Length == 0) ||
-      ((BaseAddress & (SIZE_4KB - 1)) != 0) ||
-      ((Length & (SIZE_4KB - 1)) != 0))
-  {
-    ASSERT (Length > 0);
-    ASSERT ((BaseAddress & (SIZE_4KB - 1)) == 0);
-    ASSERT ((Length & (SIZE_4KB - 1)) == 0);
+  if (sizeof (UINTN) == sizeof (UINT64)) {
+    //
+    // Check Page5Level Support or not.
+    //
+    Cr4.UintN         = AsmReadCr4 ();
+    Page5LevelSupport = (Cr4.Bits.LA57 ? TRUE : FALSE);
 
-    return RETURN_INVALID_PARAMETER;
-  }
-
-  MaximumAddress = (EFI_PHYSICAL_ADDRESS)MAX_UINT32;
-  if ((BaseAddress > MaximumAddress) ||
-      (Length > MaximumAddress) ||
-      (BaseAddress > MaximumAddress - (Length - 1)))
-  {
-    return RETURN_UNSUPPORTED;
-  }
-
-  //
-  // Below logic is to check 2M/4K page to make sure we do not waste memory.
-  //
-  while (Length != 0) {
-    PageEntry = GetPageTableEntry (BaseAddress, &PageAttribute);
-    if (PageEntry == NULL) {
-      return RETURN_UNSUPPORTED;
-    }
-
-    if (PageAttribute != Page4K) {
-      Status = SplitPage (PageEntry, PageAttribute, Page4K, FALSE);
-      if (RETURN_ERROR (Status)) {
-        return Status;
+    //
+    // Check Page1G Support or not.
+    //
+    Page1GSupport = FALSE;
+    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= CPUID_EXTENDED_CPU_SIG) {
+      AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx.Uint32);
+      if (RegEdx.Bits.Page1GB != 0) {
+        Page1GSupport = TRUE;
       }
-
-      //
-      // Do it again until the page is 4K.
-      //
-      continue;
     }
 
     //
-    // Just take care of 'present' bit for Stack Guard.
+    // Decide Paging Mode according Page5LevelSupport & Page1GSupport.
     //
-    if ((Attributes & IA32_PG_P) != 0) {
-      *PageEntry |= (UINT64)IA32_PG_P;
+    if (Page5LevelSupport) {
+      PagingMode = Page1GSupport ? Paging5Level1GB : Paging5Level;
     } else {
-      *PageEntry &= ~((UINT64)IA32_PG_P);
+      PagingMode = Page1GSupport ? Paging4Level1GB : Paging4Level;
     }
-
-    //
-    // Convert success, move to next
-    //
-    BaseAddress += SIZE_4KB;
-    Length      -= SIZE_4KB;
+  } else {
+    PagingMode = PagingPae;
   }
 
-  return RETURN_SUCCESS;
+  MapAttribute.Uint64  = 0;
+  MapMask.Uint64       = 0;
+  MapMask.Bits.Present = 1;
+  PageTable            = AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64;
+  BufferSize           = 0;
+
+  //
+  // Get required buffer size for the pagetable that will be created.
+  //
+  Status = PageTableMap (&PageTable, PagingMode, 0, &BufferSize, BaseAddress, Length, &MapAttribute, &MapMask, NULL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    //
+    // Allocate required Buffer.
+    //
+    Status = PeiServicesAllocatePages (
+               EfiBootServicesData,
+               EFI_SIZE_TO_PAGES (BufferSize),
+               &Buffer
+               );
+    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Status = PageTableMap (&PageTable, PagingMode, (VOID *)(UINTN)Buffer, &BufferSize, BaseAddress, Length, &MapAttribute, &MapMask, NULL);
+  }
+
+  ASSERT_EFI_ERROR (Status);
+  AsmWriteCr3 (PageTable);
+  return Status;
 }
 
 /**
@@ -446,13 +267,15 @@ GetStackBase (
   )
 {
   EFI_PHYSICAL_ADDRESS  StackBase;
+  UINTN                 Index;
 
+  MpInitLibWhoAmI (&Index);
   StackBase  = (EFI_PHYSICAL_ADDRESS)(UINTN)&StackBase;
   StackBase += BASE_4KB;
   StackBase &= ~((EFI_PHYSICAL_ADDRESS)BASE_4KB - 1);
   StackBase -= PcdGet32 (PcdCpuApStackSize);
 
-  *(EFI_PHYSICAL_ADDRESS *)Buffer = StackBase;
+  *((EFI_PHYSICAL_ADDRESS *)Buffer + Index) = StackBase;
 }
 
 /**
@@ -466,7 +289,7 @@ SetupStackGuardPage (
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
-  EFI_PHYSICAL_ADDRESS  StackBase;
+  EFI_PHYSICAL_ADDRESS  *StackBase;
   UINTN                 NumberOfProcessors;
   UINTN                 Bsp;
   UINTN                 Index;
@@ -487,44 +310,44 @@ SetupStackGuardPage (
     NumberOfProcessors = 1;
   }
 
+  StackBase = (EFI_PHYSICAL_ADDRESS *)AllocatePages (EFI_SIZE_TO_PAGES (sizeof (EFI_PHYSICAL_ADDRESS) * NumberOfProcessors));
+  ASSERT (StackBase != NULL);
+  if (StackBase == NULL) {
+    return;
+  }
+
+  ZeroMem (StackBase, sizeof (EFI_PHYSICAL_ADDRESS) * NumberOfProcessors);
+  MpInitLibStartupAllAPs (GetStackBase, FALSE, NULL, 0, (VOID *)StackBase, NULL);
   MpInitLibWhoAmI (&Bsp);
-  for (Index = 0; Index < NumberOfProcessors; ++Index) {
-    StackBase = 0;
-
-    if (Index == Bsp) {
-      Hob.Raw = GetHobList ();
-      while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
-        if (CompareGuid (
-              &gEfiHobMemoryAllocStackGuid,
-              &(Hob.MemoryAllocationStack->AllocDescriptor.Name)
-              ))
-        {
-          StackBase = Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress;
-          break;
-        }
-
-        Hob.Raw = GET_NEXT_HOB (Hob);
-      }
-    } else {
-      //
-      // Ask AP to return is stack base address.
-      //
-      MpInitLibStartupThisAP (GetStackBase, Index, NULL, 0, (VOID *)&StackBase, NULL);
+  Hob.Raw = GetHobList ();
+  while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
+    if (CompareGuid (
+          &gEfiHobMemoryAllocStackGuid,
+          &(Hob.MemoryAllocationStack->AllocDescriptor.Name)
+          ))
+    {
+      StackBase[Bsp] = Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress;
+      break;
     }
 
-    ASSERT (StackBase != 0);
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  for (Index = 0; Index < NumberOfProcessors; ++Index) {
+    ASSERT (StackBase[Index] != 0);
     //
     // Set Guard page at stack base address.
     //
-    ConvertMemoryPageAttributes (StackBase, EFI_PAGE_SIZE, 0);
+    ConvertMemoryPageToNotPresent (StackBase[Index], EFI_PAGE_SIZE);
     DEBUG ((
       DEBUG_INFO,
       "Stack Guard set at %lx [cpu%lu]!\n",
-      (UINT64)StackBase,
+      (UINT64)StackBase[Index],
       (UINT64)Index
       ));
   }
 
+  FreePages (StackBase, EFI_SIZE_TO_PAGES (sizeof (EFI_PHYSICAL_ADDRESS) * NumberOfProcessors));
   //
   // Publish the changes of page table.
   //
@@ -599,7 +422,7 @@ MemoryDiscoveredPpiNotifyCallback (
     // Enable #PF exception, so if the code access SPI after disable NEM, it will generate
     // the exception to avoid potential vulnerability.
     //
-    ConvertMemoryPageAttributes (MigratedFvInfo->FvOrgBase, MigratedFvInfo->FvLength, 0);
+    ConvertMemoryPageToNotPresent (MigratedFvInfo->FvOrgBase, MigratedFvInfo->FvLength);
 
     Hob.Raw = GET_NEXT_HOB (Hob);
     Hob.Raw = GetNextGuidHob (&gEdkiiMigratedFvInfoGuid, Hob.Raw);

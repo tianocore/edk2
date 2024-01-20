@@ -4,6 +4,7 @@
 # Copyright (c) 2021-, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
+from FirmwareStorageFormat.UPLHeader import *
 from FirmwareStorageFormat.FvHeader import *
 from FirmwareStorageFormat.FfsFileHeader import *
 from FirmwareStorageFormat.SectionHeader import *
@@ -36,6 +37,59 @@ class BinaryNode:
         self.Name = "BINARY" + str(name)
         self.HOffset = 0
         self.Data = b''
+
+class ElfNode:
+    def __init__(self, buffer: bytes) -> None:
+        self.Header = ELF_HEADER32.from_buffer_copy(buffer)
+        if self.Header.ELF_Identification[0:4] != b'\x7fELF':
+            logger.error('Invalid Elf Header! Elf Identification {} is not ".ELF".'.format(self.Header.ELF_Identification))
+            raise Exception("Process Failed: Invalid ELF Header Identification!")
+        self.Class = self.Header.ELF_Identification[4]
+        if self.Class == 0x02:
+            self.Header = ELF_HEADER64.from_buffer_copy(buffer)
+        elif self.Class != 0x01:
+            logger.error('Invalid Elf Class! Elf Class {} is not 0x01 or 0x02.'.format(self.Class))
+            raise Exception("Process Failed: Invalid ELF Class!")
+
+        self.ProList = []
+        self.SecList = []
+        self.UpldInfoSection = None
+        self.UpldInfo = None
+        self.UpldBuffer = b''
+        self.Name = "ELF"
+        self.HeaderLength = len(struct2stream(self.Header))
+        self.HOffset = 0
+        self.DOffset = 0
+        self.ROffset = 0
+        self.Data = b''
+        self.PadData = b''
+        self.Upld_Info_Align = False
+
+    def GetProgramList(self, buffer: bytes) -> None:
+        for i in range(self.Header.ELF_PHNum):
+            if self.Class == 0x01:
+                ElfProgramHeader = ELF_PROGRAM_HEADER32.from_buffer_copy(buffer[i*self.Header.ELF_PHEntSize:])
+            elif self.Class == 0x02:
+                ElfProgramHeader = ELF_PROGRAM_HEADER64.from_buffer_copy(buffer[i*self.Header.ELF_PHEntSize:])
+            self.ProList.append(ElfProgramHeader)
+
+    def GetSectionList(self, buffer: bytes) -> None:
+        for i in range(self.Header.ELF_SHNum):
+            if self.Class == 0x01:
+                ElfSectionHeader = ELF_SECTION_HEADER32.from_buffer_copy(buffer[i*self.Header.ELF_SHEntSize:])
+            elif self.Class == 0x02:
+                ElfSectionHeader = ELF_SECTION_HEADER64.from_buffer_copy(buffer[i*self.Header.ELF_SHEntSize:])
+            self.SecList.append(ElfSectionHeader)
+
+    def FindUPLDSection(self, buffer: bytes) -> None:
+        for item in self.SecList:
+            if buffer[item.SH_Offset:item.SH_Offset+4] == b'PLDH' or buffer[item.SH_Offset:item.SH_Offset+4] == b'UPLD':
+                self.UpldInfoSection = item
+                self.UpldInfo = UNIVERSAL_PAYLOAD_INFO.from_buffer_copy(buffer[item.SH_Offset:item.SH_Offset+item.SH_Size])
+                self.UpldBuffer = struct2stream(self.UpldInfo)
+                if (self.UpldInfoSection.SH_Offset) % 4 == 0:
+                # if (self.UpldInfoSection.SH_Offset - self.Header.ELF_Entry) % 4 == 0:
+                    self.Upld_Info_Align = True
 
 class FvNode:
     def __init__(self, name, buffer: bytes) -> None:
@@ -191,4 +245,4 @@ class FreeSpaceNode:
         self.HOffset = 0
         self.DOffset = 0
         self.ROffset = 0
-        self.PadData = b''
+        self.PadData = b''

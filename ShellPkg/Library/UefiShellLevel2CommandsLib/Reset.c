@@ -79,30 +79,35 @@ ShellCommandRunReset (
                           &DataSize,
                           &OsIndications
                           );
-        if (!EFI_ERROR (Status)) {
-          if ((OsIndications & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0) {
-            DataSize = sizeof (OsIndications);
-            Status   = gRT->GetVariable (
-                              EFI_OS_INDICATIONS_VARIABLE_NAME,
-                              &gEfiGlobalVariableGuid,
-                              &Attr,
-                              &DataSize,
-                              &OsIndications
-                              );
-            if (!EFI_ERROR (Status)) {
-              OsIndications |= EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
-            } else {
-              OsIndications = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
-            }
 
-            Status = gRT->SetVariable (
+        if (EFI_ERROR (Status)) {
+          ShellStatus = SHELL_UNSUPPORTED;
+          goto Error;
+        }
+
+        if ((OsIndications & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0) {
+          DataSize = sizeof (OsIndications);
+          Status   = gRT->GetVariable (
                             EFI_OS_INDICATIONS_VARIABLE_NAME,
                             &gEfiGlobalVariableGuid,
-                            EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                            sizeof (OsIndications),
+                            &Attr,
+                            &DataSize,
                             &OsIndications
                             );
+
+          if (EFI_ERROR (Status)) {
+            OsIndications = EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
+          } else {
+            OsIndications |= EFI_OS_INDICATIONS_BOOT_TO_FW_UI;
           }
+
+          Status = gRT->SetVariable (
+                          EFI_OS_INDICATIONS_VARIABLE_NAME,
+                          &gEfiGlobalVariableGuid,
+                          EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                          sizeof (OsIndications),
+                          &OsIndications
+                          );
         }
 
         if (EFI_ERROR (Status)) {

@@ -1,7 +1,7 @@
 /** @file
   A simple DXE_DRIVER that causes the PCI Bus UEFI_DRIVER to allocate 64-bit
-  MMIO BARs above 4 GB, regardless of option ROM availability (as long as a CSM
-  is not present), conserving 32-bit MMIO aperture for 32-bit BARs.
+  MMIO BARs above 4 GB, regardless of option ROM availability, conserving 32-bit
+  MMIO aperture for 32-bit BARs.
 
   Copyright (C) 2016, Red Hat, Inc.
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
@@ -21,12 +21,6 @@
 #include <Library/CcProbeLib.h>
 
 #include <Protocol/IncompatiblePciDeviceSupport.h>
-#include <Protocol/LegacyBios.h>
-
-//
-// The Legacy BIOS protocol has been located.
-//
-STATIC BOOLEAN  mLegacyBiosInstalled;
 
 //
 // The protocol interface this driver produces.
@@ -49,12 +43,12 @@ STATIC EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL
 STATIC CONST EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  mMmio64Configuration = {
   ACPI_ADDRESS_SPACE_DESCRIPTOR,                   // Desc
   (UINT16)(                                        // Len
-                                                   sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
-                                                   OFFSET_OF (
-                                                     EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
-                                                     ResType
-                                                     )
-                                                   ),
+    sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
+    OFFSET_OF (
+      EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
+      ResType
+      )
+    ),
   ACPI_ADDRESS_SPACE_TYPE_MEM,                     // ResType
   0,                                               // GenFlag
   0,                                               // SpecificFlag
@@ -83,12 +77,12 @@ STATIC CONST EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  mMmio64Configuration = {
 STATIC CONST EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  mOptionRomConfiguration =   {
   ACPI_ADDRESS_SPACE_DESCRIPTOR,                   // Desc
   (UINT16)(                                        // Len
-                                                   sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
-                                                   OFFSET_OF (
-                                                     EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
-                                                     ResType
-                                                     )
-                                                   ),
+    sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) -
+    OFFSET_OF (
+      EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR,
+      ResType
+      )
+    ),
   ACPI_ADDRESS_SPACE_TYPE_MEM,                     // ResType
   0,                                               // GenFlag
   0,                                               // Disable option roms SpecificFlag
@@ -110,50 +104,6 @@ STATIC CONST EFI_ACPI_END_TAG_DESCRIPTOR  mEndDesc = {
   ACPI_END_TAG_DESCRIPTOR,                         // Desc
   0                                                // Checksum: to be ignored
 };
-
-//
-// The CheckDevice() member function has been called.
-//
-STATIC BOOLEAN  mCheckDeviceCalled;
-
-/**
-  Notification callback for Legacy BIOS protocol installation.
-
-  @param[in] Event    Event whose notification function is being invoked.
-
-  @param[in] Context  The pointer to the notification function's context, which
-                      is implementation-dependent.
-**/
-STATIC
-VOID
-EFIAPI
-LegacyBiosInstalled (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  EFI_STATUS                Status;
-  EFI_LEGACY_BIOS_PROTOCOL  *LegacyBios;
-
-  ASSERT (!mCheckDeviceCalled);
-
-  Status = gBS->LocateProtocol (
-                  &gEfiLegacyBiosProtocolGuid,
-                  NULL /* Registration */,
-                  (VOID **)&LegacyBios
-                  );
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  mLegacyBiosInstalled = TRUE;
-
-  //
-  // Close the event and deregister this callback.
-  //
-  Status = gBS->CloseEvent (Event);
-  ASSERT_EFI_ERROR (Status);
-}
 
 /**
   Returns a list of ACPI resource descriptors that detail the special resource
@@ -228,7 +178,6 @@ CheckDevice (
   OUT VOID                                          **Configuration
   )
 {
-  mCheckDeviceCalled = TRUE;
   UINTN  Length;
   UINT8  *Ptr;
 
@@ -243,17 +192,8 @@ CheckDevice (
   // The concern captured in the PCI Bus UEFI_DRIVER is that a legacy BIOS boot
   // (via a CSM) could dispatch a legacy option ROM on the device, which might
   // have trouble with MMIO BARs that have been allocated outside of the 32-bit
-  // address space. But, if we don't support legacy option ROMs at all, then
-  // this problem cannot arise.
-  //
-  if (mLegacyBiosInstalled) {
-    //
-    // Don't interfere with resource degradation.
-    //
-    *Configuration = NULL;
-    return EFI_SUCCESS;
-  }
-
+  // address space. But, we don't support legacy option ROMs at all, thus this
+  // problem cannot arise.
   //
   // This member function is mis-specified actually: it is supposed to allocate
   // memory, but as specified, it could not return an error status. Thankfully,
@@ -317,8 +257,6 @@ DriverInitialize (
   )
 {
   EFI_STATUS  Status;
-  EFI_EVENT   Event;
-  VOID        *Registration;
 
   //
   // If there is no 64-bit PCI MMIO aperture, then 64-bit MMIO BARs have to be
@@ -328,63 +266,6 @@ DriverInitialize (
     return EFI_UNSUPPORTED;
   }
 
-  //
-  // Otherwise, create a protocol notify to see if a CSM is present. (With the
-  // CSM absent, the PCI Bus driver won't have to worry about allocating 64-bit
-  // MMIO BARs in the 32-bit MMIO aperture, for the sake of a legacy BIOS.)
-  //
-  // If the Legacy BIOS Protocol is present at the time of this driver starting
-  // up, we can mark immediately that the PCI Bus driver should perform the
-  // usual 64-bit MMIO BAR degradation.
-  //
-  // Otherwise, if the Legacy BIOS Protocol is absent at startup, it may be
-  // installed later. However, if it doesn't show up until the first
-  // EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL.CheckDevice() call from the
-  // PCI Bus driver, then it never will:
-  //
-  // 1. The following drivers are dispatched in some unspecified order:
-  //    - PCI Host Bridge DXE_DRIVER,
-  //    - PCI Bus UEFI_DRIVER,
-  //    - this DXE_DRIVER,
-  //    - Legacy BIOS DXE_DRIVER.
-  //
-  // 2. The DXE_CORE enters BDS.
-  //
-  // 3. The platform BDS connects the PCI Root Bridge IO instances (produced by
-  //    the PCI Host Bridge DXE_DRIVER).
-  //
-  // 4. The PCI Bus UEFI_DRIVER enumerates resources and calls into this
-  //    DXE_DRIVER (CheckDevice()).
-  //
-  // 5. This driver remembers if EFI_LEGACY_BIOS_PROTOCOL has been installed
-  //    sometime during step 1 (produced by the Legacy BIOS DXE_DRIVER).
-  //
-  // For breaking this order, the Legacy BIOS DXE_DRIVER would have to install
-  // its protocol after the firmware enters BDS, which cannot happen.
-  //
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  LegacyBiosInstalled,
-                  NULL /* Context */,
-                  &Event
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->RegisterProtocolNotify (
-                  &gEfiLegacyBiosProtocolGuid,
-                  Event,
-                  &Registration
-                  );
-  if (EFI_ERROR (Status)) {
-    goto CloseEvent;
-  }
-
-  Status = gBS->SignalEvent (Event);
-  ASSERT_EFI_ERROR (Status);
-
   mIncompatiblePciDeviceSupport.CheckDevice = CheckDevice;
   Status                                    = gBS->InstallMultipleProtocolInterfaces (
                                                      &ImageHandle,
@@ -392,19 +273,5 @@ DriverInitialize (
                                                      &mIncompatiblePciDeviceSupport,
                                                      NULL
                                                      );
-  if (EFI_ERROR (Status)) {
-    goto CloseEvent;
-  }
-
-  return EFI_SUCCESS;
-
-CloseEvent:
-  if (!mLegacyBiosInstalled) {
-    EFI_STATUS  CloseStatus;
-
-    CloseStatus = gBS->CloseEvent (Event);
-    ASSERT_EFI_ERROR (CloseStatus);
-  }
-
   return Status;
 }

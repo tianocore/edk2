@@ -36,7 +36,7 @@
 #define PTE_PPN_SHIFT         10
 #define RISCV_MMU_PAGE_SHIFT  12
 
-STATIC UINTN  mModeSupport[] = { SATP_MODE_SV57, SATP_MODE_SV48, SATP_MODE_SV39 };
+STATIC UINTN  mModeSupport[] = { SATP_MODE_SV57, SATP_MODE_SV48, SATP_MODE_SV39, SATP_MODE_OFF };
 STATIC UINTN  mMaxRootTableLevel;
 STATIC UINTN  mBitPerLevel;
 STATIC UINTN  mTableEntryCount;
@@ -589,6 +589,10 @@ RiscVMmuSetSatpMode  (
   UINTN                            NumberOfDescriptors;
   UINTN                            Index;
   EFI_STATUS                       Status;
+
+  if (SatpMode > PcdGet32 (PcdCpuRiscVMmuMaxSatpMode)) {
+    return EFI_DEVICE_ERROR;
+  }
 
   switch (SatpMode) {
     case SATP_MODE_OFF:

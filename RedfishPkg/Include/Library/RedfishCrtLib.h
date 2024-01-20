@@ -69,20 +69,17 @@
 //
 // Basic types mapping
 //
-typedef UINTN   size_t;
-typedef INTN    ssize_t;
-typedef INT32   time_t;
-typedef UINT8   __uint8_t;
-typedef UINT8   sa_family_t;
-typedef UINT32  uid_t;
-typedef UINT32  gid_t;
-typedef INT32   int32_t;
-typedef UINT32  uint32_t;
-typedef UINT16  uint16_t;
-typedef UINT8   uint8_t;
-typedef enum {
-  false, true
-} bool;
+typedef UINTN    size_t;
+typedef INTN     ssize_t;
+typedef INT32    time_t;
+typedef INT32    int32_t;
+typedef UINT32   uint32_t;
+typedef UINT16   uint16_t;
+typedef UINT8    uint8_t;
+typedef BOOLEAN  bool;
+
+#define true   (1 == 1)
+#define false  (1 == 0)
 
 //
 // File operations are not required for EFI building,
@@ -172,20 +169,6 @@ free        (
   void *
   );
 
-void           *
-memset     (
-  void *,
-  int,
-  size_t
-  );
-
-int
-memcmp      (
-  const void *,
-  const void *,
-  size_t
-  );
-
 int
 isdigit     (
   int
@@ -216,100 +199,15 @@ isalnum     (
   int
   );
 
-void           *
-memcpy     (
-  void *,
-  const void *,
-  size_t
-  );
-
-void           *
-memset     (
-  void *,
-  int,
-  size_t
-  );
-
-void           *
-memchr     (
-  const void *,
-  int,
-  size_t
-  );
-
-int
-memcmp      (
-  const void *,
-  const void *,
-  size_t
-  );
-
-void           *
-memmove    (
-  void *,
-  const void *,
-  size_t
-  );
-
-int
-strcmp      (
-  const char *,
-  const char *
-  );
-
 int
 strncmp     (
   const char *,
   const char *,
   size_t
-  );
-
-char           *
-strcpy     (
-  char *,
-  const char *
-  );
-
-size_t
-strlen      (
-  const char *
-  );
-
-char           *
-strcat     (
-  char *,
-  const char *
-  );
-
-char           *
-strchr     (
-  const char *,
-  int
-  );
-
-int
-strcasecmp  (
-  const char *,
-  const char *
   );
 
 int
 strncasecmp (
-  const char *,
-  const char *,
-  size_t
-  );
-
-char           *
-strncpy    (
-  char *,
-  size_t,
-  const char *,
-  size_t
-  );
-
-int
-strncmp     (
   const char *,
   const char *,
   size_t
@@ -326,12 +224,6 @@ strtoul     (
   const char *,
   char **,
   int
-  );
-
-char *
-strstr      (
-  const char  *s1,
-  const char  *s2
   );
 
 long
@@ -446,26 +338,6 @@ fprintf     (
 int
 fgetc       (
   FILE  *_File
-  );
-
-uid_t
-getuid      (
-  void
-  );
-
-uid_t
-geteuid     (
-  void
-  );
-
-gid_t
-getgid      (
-  void
-  );
-
-gid_t
-getegid     (
-  void
   );
 
 void

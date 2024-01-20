@@ -19,67 +19,7 @@ BOOLEAN     InterruptState = FALSE;
 EFI_HANDLE  mCpuHandle     = NULL;
 BOOLEAN     mIsFlushingGCD;
 BOOLEAN     mIsAllocatingPageTable = FALSE;
-UINT64      mValidMtrrAddressMask;
-UINT64      mValidMtrrBitsMask;
-UINT64      mTimerPeriod = 0;
-
-FIXED_MTRR  mFixedMtrrTable[] = {
-  {
-    MSR_IA32_MTRR_FIX64K_00000,
-    0,
-    0x10000
-  },
-  {
-    MSR_IA32_MTRR_FIX16K_80000,
-    0x80000,
-    0x4000
-  },
-  {
-    MSR_IA32_MTRR_FIX16K_A0000,
-    0xA0000,
-    0x4000
-  },
-  {
-    MSR_IA32_MTRR_FIX4K_C0000,
-    0xC0000,
-    0x1000
-  },
-  {
-    MSR_IA32_MTRR_FIX4K_C8000,
-    0xC8000,
-    0x1000
-  },
-  {
-    MSR_IA32_MTRR_FIX4K_D0000,
-    0xD0000,
-    0x1000
-  },
-  {
-    MSR_IA32_MTRR_FIX4K_D8000,
-    0xD8000,
-    0x1000
-  },
-  {
-    MSR_IA32_MTRR_FIX4K_E0000,
-    0xE0000,
-    0x1000
-  },
-  {
-    MSR_IA32_MTRR_FIX4K_E8000,
-    0xE8000,
-    0x1000
-  },
-  {
-    MSR_IA32_MTRR_FIX4K_F0000,
-    0xF0000,
-    0x1000
-  },
-  {
-    MSR_IA32_MTRR_FIX4K_F8000,
-    0xF8000,
-    0x1000
-  },
-};
+UINT64      mTimerPeriod           = 0;
 
 EFI_CPU_ARCH_PROTOCOL  gCpu = {
   CpuFlushCpuDataCache,
@@ -495,76 +435,30 @@ CpuSetMemoryAttributes (
 }
 
 /**
-  Initializes the valid bits mask and valid address mask for MTRRs.
-
-  This function initializes the valid bits mask and valid address mask for MTRRs.
-
-**/
-VOID
-InitializeMtrrMask (
-  VOID
-  )
-{
-  UINT32                                       MaxExtendedFunction;
-  CPUID_VIR_PHY_ADDRESS_SIZE_EAX               VirPhyAddressSize;
-  UINT32                                       MaxFunction;
-  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  ExtendedFeatureFlagsEcx;
-  MSR_IA32_TME_ACTIVATE_REGISTER               TmeActivate;
-
-  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunction, NULL, NULL, NULL);
-
-  if (MaxExtendedFunction >= CPUID_VIR_PHY_ADDRESS_SIZE) {
-    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
-  } else {
-    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
-  }
-
-  //
-  // CPUID enumeration of MAX_PA is unaffected by TME-MK activation and will continue
-  // to report the maximum physical address bits available for software to use,
-  // irrespective of the number of KeyID bits.
-  // So, we need to check if TME is enabled and adjust the PA size accordingly.
-  //
-  AsmCpuid (CPUID_SIGNATURE, &MaxFunction, NULL, NULL, NULL);
-  if (MaxFunction >= CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
-    AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, 0, NULL, NULL, &ExtendedFeatureFlagsEcx.Uint32, NULL);
-    if (ExtendedFeatureFlagsEcx.Bits.TME_EN == 1) {
-      TmeActivate.Uint64 = AsmReadMsr64 (MSR_IA32_TME_ACTIVATE);
-      if (TmeActivate.Bits.TmeEnable == 1) {
-        VirPhyAddressSize.Bits.PhysicalAddressBits -= TmeActivate.Bits.MkTmeKeyidBits;
-      }
-    }
-  }
-
-  mValidMtrrBitsMask    = LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits) - 1;
-  mValidMtrrAddressMask = mValidMtrrBitsMask & 0xfffffffffffff000ULL;
-}
-
-/**
   Gets GCD Mem Space type from MTRR Type.
 
   This function gets GCD Mem Space type from MTRR Type.
 
-  @param  MtrrAttributes  MTRR memory type
+  @param  Type  MTRR memory type
 
   @return GCD Mem Space type
 
 **/
 UINT64
 GetMemorySpaceAttributeFromMtrrType (
-  IN UINT8  MtrrAttributes
+  IN MTRR_MEMORY_CACHE_TYPE  Type
   )
 {
-  switch (MtrrAttributes) {
-    case MTRR_CACHE_UNCACHEABLE:
+  switch (Type) {
+    case CacheUncacheable:
       return EFI_MEMORY_UC;
-    case MTRR_CACHE_WRITE_COMBINING:
+    case CacheWriteCombining:
       return EFI_MEMORY_WC;
-    case MTRR_CACHE_WRITE_THROUGH:
+    case CacheWriteThrough:
       return EFI_MEMORY_WT;
-    case MTRR_CACHE_WRITE_PROTECTED:
+    case CacheWriteProtected:
       return EFI_MEMORY_WP;
-    case MTRR_CACHE_WRITE_BACK:
+    case CacheWriteBack:
       return EFI_MEMORY_WB;
     default:
       return 0;
@@ -716,40 +610,14 @@ RefreshMemoryAttributesFromMtrr (
   )
 {
   EFI_STATUS                       Status;
+  RETURN_STATUS                    ReturnStatus;
   UINTN                            Index;
-  UINTN                            SubIndex;
-  UINT64                           RegValue;
-  EFI_PHYSICAL_ADDRESS             BaseAddress;
-  UINT64                           Length;
-  UINT64                           Attributes;
-  UINT64                           CurrentAttributes;
-  UINT8                            MtrrType;
   UINTN                            NumberOfDescriptors;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
-  UINT64                           DefaultAttributes;
-  VARIABLE_MTRR                    VariableMtrr[MTRR_NUMBER_OF_VARIABLE_MTRR];
-  MTRR_FIXED_SETTINGS              MtrrFixedSettings;
-  UINT32                           FirmwareVariableMtrrCount;
-  UINT8                            DefaultMemoryType;
-
-  FirmwareVariableMtrrCount = GetFirmwareVariableMtrrCount ();
-  ASSERT (FirmwareVariableMtrrCount <= MTRR_NUMBER_OF_VARIABLE_MTRR);
+  MTRR_MEMORY_RANGE                *Ranges;
+  UINTN                            RangeCount;
 
   MemorySpaceMap = NULL;
-
-  //
-  // Initialize the valid bits mask and valid address mask for MTRRs
-  //
-  InitializeMtrrMask ();
-
-  //
-  // Get the memory attribute of variable MTRRs
-  //
-  MtrrGetMemoryAttributeInVariableMtrr (
-    mValidMtrrBitsMask,
-    mValidMtrrAddressMask,
-    VariableMtrr
-    );
 
   //
   // Get the memory space map from GCD
@@ -760,130 +628,23 @@ RefreshMemoryAttributesFromMtrr (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  DefaultMemoryType = (UINT8)MtrrGetDefaultMemoryType ();
-  DefaultAttributes = GetMemorySpaceAttributeFromMtrrType (DefaultMemoryType);
+  RangeCount   = 0;
+  ReturnStatus = MtrrGetMemoryAttributesInMtrrSettings (NULL, NULL, &RangeCount);
+  ASSERT (ReturnStatus == RETURN_BUFFER_TOO_SMALL);
+  Ranges = AllocatePool (sizeof (*Ranges) * RangeCount);
+  ASSERT (Ranges != NULL);
+  ReturnStatus = MtrrGetMemoryAttributesInMtrrSettings (NULL, Ranges, &RangeCount);
+  ASSERT_RETURN_ERROR (ReturnStatus);
 
-  //
-  // Set default attributes to all spaces.
-  //
-  for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeNonExistent) {
-      continue;
-    }
-
-    gDS->SetMemorySpaceAttributes (
-           MemorySpaceMap[Index].BaseAddress,
-           MemorySpaceMap[Index].Length,
-           (MemorySpaceMap[Index].Attributes & ~EFI_CACHE_ATTRIBUTE_MASK) |
-           (MemorySpaceMap[Index].Capabilities & DefaultAttributes)
-           );
+  for (Index = 0; Index < RangeCount; Index++) {
+    SetGcdMemorySpaceAttributes (
+      MemorySpaceMap,
+      NumberOfDescriptors,
+      Ranges[Index].BaseAddress,
+      Ranges[Index].Length,
+      GetMemorySpaceAttributeFromMtrrType (Ranges[Index].Type)
+      );
   }
-
-  //
-  // Go for variable MTRRs with WB attribute
-  //
-  for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
-    if (VariableMtrr[Index].Valid &&
-        (VariableMtrr[Index].Type == MTRR_CACHE_WRITE_BACK))
-    {
-      SetGcdMemorySpaceAttributes (
-        MemorySpaceMap,
-        NumberOfDescriptors,
-        VariableMtrr[Index].BaseAddress,
-        VariableMtrr[Index].Length,
-        EFI_MEMORY_WB
-        );
-    }
-  }
-
-  //
-  // Go for variable MTRRs with the attribute except for WB and UC attributes
-  //
-  for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
-    if (VariableMtrr[Index].Valid &&
-        (VariableMtrr[Index].Type != MTRR_CACHE_WRITE_BACK) &&
-        (VariableMtrr[Index].Type != MTRR_CACHE_UNCACHEABLE))
-    {
-      Attributes = GetMemorySpaceAttributeFromMtrrType ((UINT8)VariableMtrr[Index].Type);
-      SetGcdMemorySpaceAttributes (
-        MemorySpaceMap,
-        NumberOfDescriptors,
-        VariableMtrr[Index].BaseAddress,
-        VariableMtrr[Index].Length,
-        Attributes
-        );
-    }
-  }
-
-  //
-  // Go for variable MTRRs with UC attribute
-  //
-  for (Index = 0; Index < FirmwareVariableMtrrCount; Index++) {
-    if (VariableMtrr[Index].Valid &&
-        (VariableMtrr[Index].Type == MTRR_CACHE_UNCACHEABLE))
-    {
-      SetGcdMemorySpaceAttributes (
-        MemorySpaceMap,
-        NumberOfDescriptors,
-        VariableMtrr[Index].BaseAddress,
-        VariableMtrr[Index].Length,
-        EFI_MEMORY_UC
-        );
-    }
-  }
-
-  //
-  // Go for fixed MTRRs
-  //
-  Attributes  = 0;
-  BaseAddress = 0;
-  Length      = 0;
-  MtrrGetFixedMtrr (&MtrrFixedSettings);
-  for (Index = 0; Index < MTRR_NUMBER_OF_FIXED_MTRR; Index++) {
-    RegValue = MtrrFixedSettings.Mtrr[Index];
-    //
-    // Check for continuous fixed MTRR sections
-    //
-    for (SubIndex = 0; SubIndex < 8; SubIndex++) {
-      MtrrType          = (UINT8)RShiftU64 (RegValue, SubIndex * 8);
-      CurrentAttributes = GetMemorySpaceAttributeFromMtrrType (MtrrType);
-      if (Length == 0) {
-        //
-        // A new MTRR attribute begins
-        //
-        Attributes = CurrentAttributes;
-      } else {
-        //
-        // If fixed MTRR attribute changed, then set memory attribute for previous attribute
-        //
-        if (CurrentAttributes != Attributes) {
-          SetGcdMemorySpaceAttributes (
-            MemorySpaceMap,
-            NumberOfDescriptors,
-            BaseAddress,
-            Length,
-            Attributes
-            );
-          BaseAddress = mFixedMtrrTable[Index].BaseAddress + mFixedMtrrTable[Index].Length * SubIndex;
-          Length      = 0;
-          Attributes  = CurrentAttributes;
-        }
-      }
-
-      Length += mFixedMtrrTable[Index].Length;
-    }
-  }
-
-  //
-  // Handle the last fixed MTRR region
-  //
-  SetGcdMemorySpaceAttributes (
-    MemorySpaceMap,
-    NumberOfDescriptors,
-    BaseAddress,
-    Length,
-    Attributes
-    );
 
   //
   // Free memory space map allocated by GCD service GetMemorySpaceMap ()

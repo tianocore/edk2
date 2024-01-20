@@ -6,6 +6,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "PrEval": {
+        "DscPath": "CryptoPkg.dsc",
+    },
     "LicenseCheck": {
         "IgnoreFiles": [
             # These directories contain auto-generated OpenSSL content
@@ -38,10 +41,20 @@
             # This has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/BaseCryptLib/Hash/CryptParallelHash.h",
             "Library/Include/fcntl.h",
+            # This has Mbedtls interfaces that aren't UEFI spec compliant
+            "Library/Include/stdint.h",
+            "Library/Include/stubs-32.h",
             # These directories contain auto-generated OpenSSL content
             "Library/OpensslLib",
             "Library/IntrinsicLib",
-            "Library/BaseCryptLib/Pk/CryptPkcs7VerifyBase.c"
+            "Library/BaseCryptLib/Pk/CryptPkcs7VerifyBase.c",
+            # mbedtls
+            "Library/MbedTlsLib/mbedtls",
+            # This has mbedtls interfaces that aren't UEFI spec compliant
+            "Library/MbedTlsLib/EcSm2Null.c",
+            "Library/MbedTlsLib/CrtWrapper.c",
+            "Library/MbedTlsLib/Include/mbedtls/mbedtls_config.h",
+            "Library/BaseCryptLibMbedTls/SysCall"
         ]
     },
     "CompilerPlugin": {

@@ -12,6 +12,7 @@ ROOT_TREE = 'ROOT'
 ROOT_FV_TREE = 'ROOT_FV_TREE'
 ROOT_FFS_TREE = 'ROOT_FFS_TREE'
 ROOT_SECTION_TREE = 'ROOT_SECTION_TREE'
+ROOT_ELF_TREE = 'ROOT_ELF_TREE'
 
 FV_TREE = 'FV'
 DATA_FV_TREE = 'DATA_FV'
@@ -21,11 +22,13 @@ FFS_FREE_SPACE = 'FFS_FREE_SPACE'
 SECTION_TREE = 'SECTION'
 SEC_FV_TREE = 'SEC_FV_IMAGE'
 BINARY_DATA = 'BINARY'
+ELF_TREE = 'ELF'
 
 RootType = [ROOT_TREE, ROOT_FV_TREE, ROOT_FFS_TREE, ROOT_SECTION_TREE]
 FvType = [FV_TREE, SEC_FV_TREE]
 FfsType = FFS_TREE
 SecType = SECTION_TREE
+ElfType = [ROOT_ELF_TREE, ELF_TREE]
 
 class BIOSTREE:
     def __init__(self, NodeName: str) -> None:
@@ -56,7 +59,7 @@ class BIOSTREE:
         if len(self.Child) == 0:
             self.Child.append(newNode)
         else:
-            if not pos:
+            if not pos or pos == len(self.Child):
                 LastTree = self.Child[-1]
                 self.Child.append(newNode)
                 LastTree.NextRel = newNode
@@ -118,6 +121,31 @@ class BIOSTREE:
             Info.append("Image File: {}".format(Key))
             Info.append("FilesNum: {}".format(TargetDict.get(Key).get('FilesNum')))
             Info.append("\n")
+        elif TargetDict[Key]["Type"] == ROOT_ELF_TREE:
+            Info.append("ELF File: {}\n".format(Key))
+        elif TargetDict[Key]["Type"] == ELF_TREE:
+            ProducerId = ""
+            ImageId = ""
+            if TargetDict.get(Key).get('IfExist'):
+                Identifier = TargetDict.get(Key).get('Identifier')
+                for item in TargetDict.get(Key).get('ProducerId'):
+                    ProducerId += chr(item)
+                for item in TargetDict.get(Key).get('ImageId'):
+                    ImageId += chr(item)
+                Info.append("- UNIVERSAL_PAYLOAD_INFO")
+                Info.append("  - 4 bytes align: {}".format(TargetDict.get(Key).get('Upld_Info_Align')))
+                Info.append("    - Identifier: {}  # 0x48444c50--PLDH / 0x444c5055--UPLD".format(hex(Identifier)))
+                Info.append("    - SpecRevision: {}".format(hex(TargetDict.get(Key).get('SpecRevision'))))
+                Info.append("    - Attribute: {}".format(hex(TargetDict.get(Key).get('Attribute'))))
+                Info.append("    - Revision: {}".format(hex(TargetDict.get(Key).get('Revision'))))
+                Info.append("    - Capability: {}".format(hex(TargetDict.get(Key).get('Capability'))))
+                Info.append("    - ProducerId: {}".format(ProducerId))
+                Info.append("    - ImageId: {}".format(ImageId))
+                Info.append("\n")
+                Info.append("- UPLD buffer")
+                Info.append("  Buffer: {}".format(TargetDict.get(Key).get('Upld_Buffer')))
+            else:
+                print("Do not find the Upld Info section!!!\n")
         elif TargetDict[Key]["Type"] in FvType:
             space += 2
             if TargetDict[Key]["Type"] == SEC_FV_TREE:
@@ -146,13 +174,29 @@ class BIOSTREE:
         if TreeInfo is None:
             TreeInfo =collections.OrderedDict()
 
-        if self.type == ROOT_TREE or self.type == ROOT_FV_TREE or self.type == ROOT_FFS_TREE or self.type == ROOT_SECTION_TREE:
+        if self.type == ROOT_TREE or self.type == ROOT_FV_TREE or self.type == ROOT_FFS_TREE or self.type == ROOT_SECTION_TREE or self.type == ROOT_ELF_TREE:
             key = str(self.key)
             TreeInfo[self.key] = collections.OrderedDict()
             TreeInfo[self.key]["Name"] = key
             TreeInfo[self.key]["Type"] = self.type
             TreeInfo[self.key]["FilesNum"] = len(self.Child)
-        elif self.type == FV_TREE or  self.type == SEC_FV_TREE:
+        elif self.type == ELF_TREE:
+            key = str(self.Data.Name)
+            TreeInfo[key] = collections.OrderedDict()
+            TreeInfo[key]["Name"] = key
+            TreeInfo[key]["Type"] = self.type
+            TreeInfo[key]["IfExist"] = self.Data.UpldInfo
+            if self.Data.UpldInfo:
+                TreeInfo[key]["Identifier"] = self.Data.UpldInfo.Identifier
+                TreeInfo[key]["SpecRevision"] = self.Data.UpldInfo.SpecRevision
+                TreeInfo[key]["Attribute"] = self.Data.UpldInfo.Attribute
+                TreeInfo[key]["Revision"] = self.Data.UpldInfo.Revision
+                TreeInfo[key]["Capability"] = self.Data.UpldInfo.Capability
+                TreeInfo[key]["ProducerId"] = self.Data.UpldInfo.ProducerId
+                TreeInfo[key]["ImageId"] = self.Data.UpldInfo.ImageId
+                TreeInfo[key]["Upld_Info_Align"] = self.Data.Upld_Info_Align
+                TreeInfo[key]["Upld_Buffer"] = self.Data.UpldBuffer
+        elif self.type == FV_TREE or self.type == SEC_FV_TREE:
             key = str(self.Data.FvId)
             TreeInfo[key] = collections.OrderedDict()
             TreeInfo[key]["Name"] = key
@@ -195,4 +239,4 @@ class BIOSTREE:
         for item in self.Child:
             TreeInfo[key].setdefault('Files',[]).append( item.ExportTree())
 
-        return TreeInfo
+        return TreeInfo

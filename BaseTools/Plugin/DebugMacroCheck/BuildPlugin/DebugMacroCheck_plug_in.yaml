@@ -1,0 +1,11 @@
+## @file
+# Build plugin used to check that debug macros are formatted properly.
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global",
+  "name": "Debug Macro Check Plugin",
+  "module": "DebugMacroCheckBuildPlugin"
+}

@@ -103,10 +103,10 @@
   PerformanceLib
   CpuPageTableLib
   MmSaveStateLib
+  SmmCpuSyncLib
 
 [Protocols]
   gEfiSmmAccess2ProtocolGuid               ## CONSUMES
-  gEfiMpServiceProtocolGuid                ## CONSUMES
   gEfiSmmConfigurationProtocolGuid         ## PRODUCES
   gEfiSmmCpuProtocolGuid                   ## PRODUCES
   gEfiSmmReadyToLockProtocolGuid           ## NOTIFY
@@ -120,6 +120,7 @@
   gEdkiiPiSmmMemoryAttributesTableGuid     ## CONSUMES ## SystemTable
   gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
   gSmmBaseHobGuid                          ## CONSUMES
+  gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES
@@ -153,11 +154,11 @@
 [FixedPcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmMpTokenCountPerChunk               ## CONSUMES
 
+[Depex]
+  TRUE
+
 [Pcd.X64]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess        ## CONSUMES
-
-[Depex]
-  gEfiMpServiceProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PiSmmCpuDxeSmmExtra.uni

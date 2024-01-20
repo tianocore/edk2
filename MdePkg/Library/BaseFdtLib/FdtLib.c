@@ -402,3 +402,43 @@ FdtSetProp (
 {
   return fdt_setprop (Fdt, NodeOffset, Name, Value, (int)Length);
 }
+
+/**
+  Returns the name of a given node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     Offset of node to check.
+  @param[in] Length         The pointer to an integer variable (will be overwritten) or NULL.
+
+  @return The pointer to the node's name.
+
+**/
+CONST CHAR8 *
+EFIAPI
+FdtGetName (
+  IN VOID   *Fdt,
+  IN INT32  NodeOffset,
+  IN INT32  *Length
+  )
+{
+  return fdt_get_name (Fdt, NodeOffset, Length);
+}
+
+/**
+  FdtNodeDepth() finds the depth of a given node.  The root node
+  has depth 0, its immediate subnodes depth 1 and so forth.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     Offset of node to check.
+
+  @returns Depth of the node at NodeOffset.
+**/
+INT32
+EFIAPI
+FdtNodeDepth (
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset
+  )
+{
+  return fdt_node_depth (Fdt, NodeOffset);
+}

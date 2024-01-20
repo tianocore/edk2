@@ -36,3 +36,4 @@
   gEfiRngAlgorithmSp80090Ctr256Guid
   gEfiRngAlgorithmSp80090Hash256Guid
   gEfiRngAlgorithmSp80090Hmac256Guid
+  gEfiRngAlgorithmRaw

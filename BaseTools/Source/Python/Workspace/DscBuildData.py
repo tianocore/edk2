@@ -90,7 +90,7 @@ PcdMakefileHeader = '''
 
 WindowsCFLAGS = 'CFLAGS = $(CFLAGS) /wd4200 /wd4034 /wd4101 '
 LinuxCFLAGS = 'CFLAGS += -Wno-pointer-to-int-cast -Wno-unused-variable '
-PcdMakefileEnd = '''
+PcdMakefileEnd = r'''
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.common
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.app
 '''
@@ -110,7 +110,7 @@ LIBS = -lCommon
 variablePattern = re.compile(r'[\t\s]*0[xX][a-fA-F0-9]+$')
 SkuIdPattern = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
 ## regular expressions for finding decimal and hex numbers
-Pattern = re.compile('^[1-9]\d*|0$')
+Pattern = re.compile(r'^[1-9]\d*|0$')
 HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
 ## Regular expression for finding header file inclusions
 from AutoGen.GenMake import gIncludePattern
@@ -2840,7 +2840,7 @@ class DscBuildData(PlatformBuildClassObject):
         # start generating makefile
         MakeApp = PcdMakefileHeader
         if sys.platform == "win32":
-            MakeApp = MakeApp + 'APPFILE = %s\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj %s.obj\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + 'INC = '
+            MakeApp = MakeApp + 'APPFILE = %s\\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\\%s.obj %s.obj\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + 'INC = '
         else:
             MakeApp = MakeApp + PcdGccMakefile
             MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + \
@@ -2950,7 +2950,7 @@ class DscBuildData(PlatformBuildClassObject):
             MakeApp += "$(OBJECTS) : %s\n" % include_file
         if sys.platform == "win32":
             PcdValueCommonPath = os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source\C\Common\PcdValueCommon.c"))
-            MakeApp = MakeApp + '%s\PcdValueCommon.c : %s\n' % (self.OutputPath, PcdValueCommonPath)
+            MakeApp = MakeApp + '%s\\PcdValueCommon.c : %s\n' % (self.OutputPath, PcdValueCommonPath)
             MakeApp = MakeApp + '\tcopy /y %s $@\n' % (PcdValueCommonPath)
         else:
             PcdValueCommonPath = os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source/C/Common/PcdValueCommon.c"))

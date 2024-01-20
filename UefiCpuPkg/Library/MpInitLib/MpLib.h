@@ -203,6 +203,8 @@ typedef struct _CPU_MP_DATA CPU_MP_DATA;
 // MP CPU exchange information for AP reset code
 // This structure is required to be packed because fixed field offsets
 // into this structure are used in assembly code in this module
+// Assembly routines should refrain from directly interacting with
+// the internal details of CPU_MP_DATA.
 //
 typedef struct {
   UINTN              StackStart;
@@ -239,17 +241,16 @@ typedef struct {
 #pragma pack()
 
 //
-// CPU MP Data save in memory
+// CPU MP Data save in memory, and intended for use in C code.
+// There are some duplicated fields, such as XD status, between
+// CpuMpData and ExchangeInfo. These duplications in CpuMpData
+// are present to avoid to be direct accessed and comprehended
+// in assembly code.
 //
 struct _CPU_MP_DATA {
   UINT64                           CpuInfoInHob;
   UINT32                           CpuCount;
   UINT32                           BspNumber;
-  //
-  // The above fields data will be passed from PEI to DXE
-  // Please make sure the fields offset same in the different
-  // architecture.
-  //
   SPIN_LOCK                        MpLock;
   UINTN                            Buffer;
   UINTN                            CpuApStackSize;
@@ -270,6 +271,7 @@ struct _CPU_MP_DATA {
   UINT64                           TotalTime;
   EFI_EVENT                        WaitEvent;
   UINTN                            **FailedCpuList;
+  BOOLEAN                          EnableExecuteDisableForSwitchContext;
 
   AP_INIT_STATE                    InitFlag;
   BOOLEAN                          SwitchBspFlag;

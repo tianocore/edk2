@@ -30,6 +30,7 @@
   RedfishPkg/RedfishPkg.dec
 
 [Sources]
+  ComponentName.c
   RedfishConfigHandlerDriver.h
   RedfishConfigHandlerDriver.c
   RedfishConfigHandlerCommon.h
@@ -46,11 +47,12 @@
   UefiDriverEntryPoint
 
 [Protocols]
-  gEfiRedfishDiscoverProtocolGuid         ## CONSUMES
+  gEfiRedfishDiscoverProtocolGuid              ## CONSUMES
   gEfiRestExServiceBindingProtocolGuid
-  gEfiRestExProtocolGuid                  ## CONSUMES
-  gEdkIIRedfishCredentialProtocolGuid     ## CONSUMES
-  gEdkIIRedfishConfigHandlerProtocolGuid  ## CONSUMES
+  gEfiRestExProtocolGuid                       ## CONSUMES
+  gEdkIIRedfishCredentialProtocolGuid          ## CONSUMES
+  gEdkIIRedfishConfigHandlerProtocolGuid       ## CONSUMES
+  gEdkIIRedfishHostInterfaceReadyProtocolGuid  ## CONSUMES
 
 [Guids]
   gEfiEventExitBootServicesGuid           ## CONSUMES ## Event

@@ -87,7 +87,11 @@ OpalSupportGetAvailableActions (
     // Secure erase is performed by generating a new encryption key
     // this is only available if encryption is supported
     //
-    AvalDiskActions->SecureErase = 1;
+    if (SupportedAttributes->MediaEncryption) {
+      AvalDiskActions->SecureErase = 1;
+    } else {
+      AvalDiskActions->SecureErase = 0;
+    }
   } else {
     AvalDiskActions->PsidRevert  = 0;
     AvalDiskActions->SecureErase = 0;

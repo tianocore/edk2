@@ -8,5 +8,5 @@
 ##
 
 variables:
-  default_python_version: ">=3.10.6"
+  default_python_version: "3.12"
   default_linux_image: "ghcr.io/tianocore/containers/fedora-37-test:a0dd931"

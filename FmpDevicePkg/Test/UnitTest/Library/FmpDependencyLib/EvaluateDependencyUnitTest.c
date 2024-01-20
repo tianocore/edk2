@@ -125,19 +125,75 @@ static UINT8  mExpression11[] = {
   EFI_FMP_DEP_END
 };
 
+// Valid Dependency Expression 7: With correct declared length
+static UINT8  mExpression12[] = {
+  EFI_FMP_DEP_DECLARE_LENGTH, 0x35, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_VERSION,   0x01, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_GUID,      0xFA, 0x4D, 0x14, 0x97,0x8E,  0xEB, 0x4D, 0xD1, 0x8B, 0x4D, 0x39, 0x88, 0x24, 0x96, 0x56, 0x42,
+  EFI_FMP_DEP_GT,
+  EFI_FMP_DEP_PUSH_VERSION,   0x03, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_GUID,      0x70, 0x73, 0x2A, 0xA4,0x3A,  0x43, 0x4D, 0x68, 0x9A, 0xA1, 0xDE, 0x62, 0x23, 0x30, 0x6C, 0xF3,
+  EFI_FMP_DEP_GTE,
+  EFI_FMP_DEP_AND,
+  EFI_FMP_DEP_END
+};
+
+// Valid Dependency Expression 7: With longer declared length
+static UINT8  mExpression13[] = {
+  EFI_FMP_DEP_DECLARE_LENGTH, 0x3B, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_VERSION,   0x01, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_GUID,      0xFA, 0x4D, 0x14, 0x97,0x8E,  0xEB, 0x4D, 0xD1, 0x8B, 0x4D, 0x39, 0x88, 0x24, 0x96, 0x56, 0x42,
+  EFI_FMP_DEP_GT,
+  EFI_FMP_DEP_PUSH_VERSION,   0x03, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_GUID,      0x70, 0x73, 0x2A, 0xA4,0x3A,  0x43, 0x4D, 0x68, 0x9A, 0xA1, 0xDE, 0x62, 0x23, 0x30, 0x6C, 0xF3,
+  EFI_FMP_DEP_GTE,
+  EFI_FMP_DEP_AND,
+  EFI_FMP_DEP_END
+};
+
+// Valid Dependency Expression 7: With shorter declared length
+static UINT8  mExpression14[] = {
+  EFI_FMP_DEP_DECLARE_LENGTH, 0x1B, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_VERSION,   0x01, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_GUID,      0xFA, 0x4D, 0x14, 0x97,0x8E,  0xEB, 0x4D, 0xD1, 0x8B, 0x4D, 0x39, 0x88, 0x24, 0x96, 0x56, 0x42,
+  EFI_FMP_DEP_GT,
+  EFI_FMP_DEP_PUSH_VERSION,   0x03, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_GUID,      0x70, 0x73, 0x2A, 0xA4,0x3A,  0x43, 0x4D, 0x68, 0x9A, 0xA1, 0xDE, 0x62, 0x23, 0x30, 0x6C, 0xF3,
+  EFI_FMP_DEP_GTE,
+  EFI_FMP_DEP_AND,
+  EFI_FMP_DEP_END
+};
+
+// Valid Dependency Expression 7: DECLARE_LENGTH opcode is not first one
+static UINT8  mExpression15[] = {
+  EFI_FMP_DEP_PUSH_VERSION,   0x01, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_GUID,      0xFA, 0x4D, 0x14, 0x97,0x8E,  0xEB, 0x4D, 0xD1, 0x8B, 0x4D, 0x39, 0x88, 0x24, 0x96, 0x56, 0x42,
+  EFI_FMP_DEP_GT,
+  EFI_FMP_DEP_DECLARE_LENGTH, 0x35, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_VERSION,   0x03, 0x00, 0x00, 0x00,
+  EFI_FMP_DEP_PUSH_GUID,      0x70, 0x73, 0x2A, 0xA4,0x3A,  0x43, 0x4D, 0x68, 0x9A, 0xA1, 0xDE, 0x62, 0x23, 0x30, 0x6C, 0xF3,
+  EFI_FMP_DEP_GTE,
+  EFI_FMP_DEP_AND,
+  EFI_FMP_DEP_END
+};
+
 // ------------------------------------------------Test Depex------Depex Size----------------Expected Result
-static BASIC_TEST_CONTEXT  mBasicTestTrue1    = { mExpression1, sizeof (mExpression1), TRUE };
-static BASIC_TEST_CONTEXT  mBasicTestTrue2    = { mExpression2, sizeof (mExpression2), TRUE };
-static BASIC_TEST_CONTEXT  mBasicTestFalse1   = { mExpression3, sizeof (mExpression3), FALSE };
-static BASIC_TEST_CONTEXT  mBasicTestFalse2   = { mExpression4, sizeof (mExpression4), FALSE };
-static BASIC_TEST_CONTEXT  mBasicTestInvalid1 = { mExpression1, sizeof (mExpression1) - 1, FALSE };
-static BASIC_TEST_CONTEXT  mBasicTestInvalid2 = { mExpression5, sizeof (mExpression5), FALSE };
-static BASIC_TEST_CONTEXT  mBasicTestInvalid3 = { mExpression6, sizeof (mExpression6), FALSE };
-static BASIC_TEST_CONTEXT  mBasicTestInvalid4 = { mExpression7, sizeof (mExpression7), FALSE };
-static BASIC_TEST_CONTEXT  mBasicTestInvalid5 = { mExpression8, sizeof (mExpression8), FALSE };
-static BASIC_TEST_CONTEXT  mBasicTestInvalid6 = { mExpression9, sizeof (mExpression9), FALSE };
-static BASIC_TEST_CONTEXT  mBasicTestInvalid7 = { mExpression10, sizeof (mExpression10), FALSE };
-static BASIC_TEST_CONTEXT  mBasicTestInvalid8 = { mExpression11, sizeof (mExpression11), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestTrue1     = { mExpression1, sizeof (mExpression1), TRUE };
+static BASIC_TEST_CONTEXT  mBasicTestTrue2     = { mExpression2, sizeof (mExpression2), TRUE };
+static BASIC_TEST_CONTEXT  mBasicTestFalse1    = { mExpression3, sizeof (mExpression3), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestFalse2    = { mExpression4, sizeof (mExpression4), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid1  = { mExpression1, sizeof (mExpression1) - 1, FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid2  = { mExpression5, sizeof (mExpression5), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid3  = { mExpression6, sizeof (mExpression6), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid4  = { mExpression7, sizeof (mExpression7), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid5  = { mExpression8, sizeof (mExpression8), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid6  = { mExpression9, sizeof (mExpression9), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid7  = { mExpression10, sizeof (mExpression10), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid8  = { mExpression11, sizeof (mExpression11), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestValid1    = { mExpression12, sizeof (mExpression12), TRUE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid9  = { mExpression13, sizeof (mExpression13), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid10 = { mExpression14, sizeof (mExpression14), FALSE };
+static BASIC_TEST_CONTEXT  mBasicTestInvalid11 = { mExpression15, sizeof (mExpression15), FALSE };
 
 /**
   Unit test for EvaluateDependency() API of the FmpDependencyLib.
@@ -233,6 +289,10 @@ UnitTestingEntry (
   AddTestCase (DepexEvalTests, "Error: Operand and operator mismatch", "Test10", EvaluateDependencyTest, NULL, NULL, &mBasicTestInvalid6);
   AddTestCase (DepexEvalTests, "Error: GUID is NOT FOUND", "Test11", EvaluateDependencyTest, NULL, NULL, &mBasicTestInvalid7);
   AddTestCase (DepexEvalTests, "Error: Stack Underflow", "Test12", EvaluateDependencyTest, NULL, NULL, &mBasicTestInvalid8);
+  AddTestCase (DepexEvalTests, "Evaluate to True - 3", "Test13", EvaluateDependencyTest, NULL, NULL, &mBasicTestValid1);
+  AddTestCase (DepexEvalTests, "Error: Declared length too long", "Test14", EvaluateDependencyTest, NULL, NULL, &mBasicTestInvalid9);
+  AddTestCase (DepexEvalTests, "Error: Declared length too short", "Test15", EvaluateDependencyTest, NULL, NULL, &mBasicTestInvalid10);
+  AddTestCase (DepexEvalTests, "Error: DECLARE_LENGTH is not first opcode", "Test16", EvaluateDependencyTest, NULL, NULL, &mBasicTestInvalid11);
 
   //
   // Execute the tests.

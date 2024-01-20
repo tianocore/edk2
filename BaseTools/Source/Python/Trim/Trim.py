@@ -28,15 +28,15 @@ __version__ = "%prog Version " + __version_number__
 __copyright__ = "Copyright (c) 2007-2018, Intel Corporation. All rights reserved."
 
 ## Regular expression for matching Line Control directive like "#line xxx"
-gLineControlDirective = re.compile('^\s*#(?:line)?\s+([0-9]+)\s+"*([^"]*)"')
+gLineControlDirective = re.compile(r'^\s*#(?:line)?\s+([0-9]+)\s+"*([^"]*)"')
 ## Regular expression for matching "typedef struct"
-gTypedefPattern = re.compile("^\s*typedef\s+struct(\s+\w+)?\s*[{]*$", re.MULTILINE)
+gTypedefPattern = re.compile(r"^\s*typedef\s+struct(\s+\w+)?\s*[{]*$", re.MULTILINE)
 ## Regular expression for matching "#pragma pack"
-gPragmaPattern = re.compile("^\s*#pragma\s+pack", re.MULTILINE)
+gPragmaPattern = re.compile(r"^\s*#pragma\s+pack", re.MULTILINE)
 ## Regular expression for matching "typedef"
-gTypedef_SinglePattern = re.compile("^\s*typedef", re.MULTILINE)
+gTypedef_SinglePattern = re.compile(r"^\s*typedef", re.MULTILINE)
 ## Regular expression for matching "typedef struct, typedef union, struct, union"
-gTypedef_MulPattern = re.compile("^\s*(typedef)?\s+(struct|union)(\s+\w+)?\s*[{]*$", re.MULTILINE)
+gTypedef_MulPattern = re.compile(r"^\s*(typedef)?\s+(struct|union)(\s+\w+)?\s*[{]*$", re.MULTILINE)
 
 #
 # The following number pattern match will only match if following criteria is met:
@@ -44,14 +44,14 @@ gTypedef_MulPattern = re.compile("^\s*(typedef)?\s+(struct|union)(\s+\w+)?\s*[{]
 # as the pattern is greedily match, so it is ok for the gDecNumberPattern or gHexNumberPattern to grab the maximum match
 #
 ## Regular expression for matching HEX number
-gHexNumberPattern = re.compile("(?<=[^a-zA-Z0-9_])(0[xX])([0-9a-fA-F]+)(U(?=$|[^a-zA-Z0-9_]))?")
+gHexNumberPattern = re.compile(r"(?<=[^a-zA-Z0-9_])(0[xX])([0-9a-fA-F]+)(U(?=$|[^a-zA-Z0-9_]))?")
 ## Regular expression for matching decimal number with 'U' postfix
-gDecNumberPattern = re.compile("(?<=[^a-zA-Z0-9_])([0-9]+)U(?=$|[^a-zA-Z0-9_])")
+gDecNumberPattern = re.compile(r"(?<=[^a-zA-Z0-9_])([0-9]+)U(?=$|[^a-zA-Z0-9_])")
 ## Regular expression for matching constant with 'ULL' 'LL' postfix
-gLongNumberPattern = re.compile("(?<=[^a-zA-Z0-9_])(0[xX][0-9a-fA-F]+|[0-9]+)U?LL(?=$|[^a-zA-Z0-9_])")
+gLongNumberPattern = re.compile(r"(?<=[^a-zA-Z0-9_])(0[xX][0-9a-fA-F]+|[0-9]+)U?LL(?=$|[^a-zA-Z0-9_])")
 
 ## Regular expression for matching "Include ()" in asl file
-gAslIncludePattern = re.compile("^(\s*)[iI]nclude\s*\(\"?([^\"\(\)]+)\"\)", re.MULTILINE)
+gAslIncludePattern = re.compile(r"^(\s*)[iI]nclude\s*\(\"?([^\"\(\)]+)\"\)", re.MULTILINE)
 ## Regular expression for matching C style #include "XXX.asl" in asl file
 gAslCIncludePattern = re.compile(r'^(\s*)#include\s*[<"]\s*([-\\/\w.]+)\s*([>"])', re.MULTILINE)
 ## Patterns used to convert EDK conventions to EDK2 ECP conventions
@@ -281,10 +281,10 @@ def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None, Inclu
                         F = File.readlines()
                 break
         else:
-            EdkLogger.warn("Trim", "Failed to find include file %s" % Source)
+            EdkLogger.error("Trim", "Failed to find include file %s" % Source)
             return []
     except:
-        EdkLogger.warn("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
+        EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
         return []
 
 

@@ -277,7 +277,7 @@ struct _TCP_CONTROL_BLOCK {
   BOOLEAN             ProbeTimerOn;            ///< If TRUE, the probe time is on.
 
   //
-  // RFC1323 defined variables, about window scale,
+  // RFC7323 defined variables, about window scale,
   // timestamp and PAWS
   //
   UINT8               SndWndScale; ///< Wndscale received from the peer.

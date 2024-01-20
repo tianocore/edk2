@@ -6,6 +6,7 @@
  to exiting the function. If the "canary" is overwritten __stack_chk_fail()
  is called. This is GCC specific code.
 
+ Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
  Copyright (c) 2012, Apple Inc. All rights reserved.<BR>
  SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -34,7 +35,7 @@ __stack_chk_fail (
 {
   UINT8  DebugPropertyMask;
 
-  DEBUG ((DEBUG_ERROR, "STACK FAULT: Buffer Overflow in function %a.\n", __builtin_return_address (0)));
+  DEBUG ((DEBUG_ERROR, "STACK FAULT: Buffer Overflow at 0x%p.\n", RETURN_ADDRESS (0)));
 
   //
   // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings even if

@@ -2213,6 +2213,7 @@
   #  BIT20 - Global Coherency Database changes message.<BR>
   #  BIT21 - Memory range cachability changes message.<BR>
   #  BIT22 - Detailed debug message.<BR>
+  #  BIT23 - Manageability debug message.<BR>
   #  BIT31 - Error message.<BR>
   # @Prompt Fixed Debug Message Print Level.
   gEfiMdePkgTokenSpaceGuid.PcdFixedDebugPrintErrorLevel|0xFFFFFFFF|UINT32|0x30001016
@@ -2398,6 +2399,16 @@
   ## GUID identifying the Rng algorithm implemented by CPU instruction.
   # @Prompt CPU Rng algorithm's GUID.
   gEfiMdePkgTokenSpaceGuid.PcdCpuRngSupportedAlgorithm|{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}|VOID*|0x00000037
+
+[PcdsFixedAtBuild.RISCV64, PcdsPatchableInModule.RISCV64]
+  #
+  # Configurability to override RISC-V CPU Features
+  # BIT 0 = Cache Management Operations. This bit is relevant only if
+  # previous stage has feature enabled and user wants to disable it.
+  # BIT 1 = Supervisor Time Compare (Sstc). This bit is relevant only if
+  # previous stage has feature enabled and user wants to disable it.
+  #
+  gEfiMdePkgTokenSpaceGuid.PcdRiscVFeatureOverride|0xFFFFFFFFFFFFFFFF|UINT64|0x69
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This value is used to set the base address of PCI express hierarchy.

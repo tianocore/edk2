@@ -64,6 +64,9 @@
   ## @libraryclass   Provides functions for manipulating smram savestate registers.
   MmSaveStateLib|Include/Library/MmSaveStateLib.h
 
+  ## @libraryclass   Provides functions for SMM CPU Sync Operation.
+  SmmCpuSyncLib|Include/Library/SmmCpuSyncLib.h
+
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides functions to manage MMU features on RISCV64 CPUs.
   ##
@@ -84,6 +87,9 @@
 
   ## Include/Guid/SmmBaseHob.h
   gSmmBaseHobGuid      = { 0xc2217ba7, 0x03bb, 0x4f63, {0xa6, 0x47, 0x7c, 0x25, 0xc5, 0xfc, 0x9d, 0x73 }}
+
+  ## Include/Guid/MpInformation2.h
+  gMpInformation2HobGuid         = { 0x417a7f64, 0xf4e9, 0x4b32, {0x84, 0x6a, 0x5c, 0xc4, 0xd8, 0x62, 0x18, 0x79 }}
 
 [Protocols]
   ## Include/Protocol/SmmCpuService.h
@@ -395,6 +401,14 @@
   #   FALSE - Access to any type of non-SMRAM memory after SmmReadyToLock is allowed.<BR>
   # @Prompt Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess|TRUE|BOOLEAN|0x3213210F
+
+[PcdsFixedAtBuild.RISCV64]
+  ## Indicate the maximum SATP mode allowed.
+  #  0 - Bare mode.
+  #  8 - 39bit mode.
+  #  9 - 48bit mode.
+  #  10 - 57bit mode.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuRiscVMmuMaxSatpMode|10|UINT32|0x60000021
 
 [PcdsDynamic, PcdsDynamicEx]
   ## Contains the pointer to a CPU S3 data buffer of structure ACPI_CPU_DATA.
