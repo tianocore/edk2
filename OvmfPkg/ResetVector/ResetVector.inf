@@ -64,3 +64,4 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable

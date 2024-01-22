@@ -42,8 +42,10 @@ BITS    32
                                  PAGE_READ_WRITE + \
                                  PAGE_PRESENT)
 
+%define NOT_TDX         0
 %define TDX_BSP         1
 %define TDX_AP          2
+%define TDX_AP_LA57     3
 
 ;
 ; Modified:  EAX, EBX, ECX, EDX
@@ -55,11 +57,21 @@ SetCr3ForPageTables64:
     ; the page tables. APs will spin on until byte[TDX_WORK_AREA_PGTBL_READY]
     ; is set.
     OneTimeCall   CheckTdxFeaturesBeforeBuildPagetables
+    cmp       eax, NOT_TDX
+    je        CheckSev
     cmp       eax, TDX_BSP
     je        ClearOvmfPageTables
+%if PG_5_LEVEL
     cmp       eax, TDX_AP
     je        SetCr3
+    ; TDX_AP_LA57 -> set cr4.la57
+    mov       eax, cr4
+    bts       eax, 12
+    mov       cr4, eax
+%endif
+    jmp       SetCr3
 
+CheckSev:
     ; Check whether the SEV is active and populate the SevEsWorkArea
     OneTimeCall   CheckSevFeatures
 
@@ -85,6 +97,105 @@ ClearOvmfPageTables:
 clearPageTablesMemoryLoop:
     mov     dword[ecx * 4 + PT_ADDR (0) - 4], eax
     loop    clearPageTablesMemoryLoop
+
+%if PG_5_LEVEL
+
+    ; save GetSevCBitMaskAbove31 result (cpuid changes edx)
+    mov     edi, edx
+
+    ; check for cpuid leaf 0x07
+    mov     eax, 0x00
+    cpuid
+    cmp     eax, 0x07
+    jb      Paging4Lvl
+
+    ; check for la57 (aka 5-level paging)
+    mov     eax, 0x07
+    mov     ecx, 0x00
+    cpuid
+    bt      ecx, 16
+    jnc     Paging4Lvl
+
+    ; check for cpuid leaf 0x80000001
+    mov     eax, 0x80000000
+    cpuid
+    cmp     eax, 0x80000001
+    jb      Paging4Lvl
+
+    ; check for 1g pages
+    mov     eax, 0x80000001
+    cpuid
+    bt      edx, 26
+    jnc     Paging4Lvl
+
+    ;
+    ; Use 5-level paging with gigabyte pages.
+    ;
+    ; We have 6 pages available for the early page tables,
+    ; we use four of them:
+    ;    PT_ADDR(0)      - level 5 directory
+    ;    PT_ADDR(0x1000) - level 4 directory
+    ;    PT_ADDR(0x2000) - level 2 directory (0 -> 1GB)
+    ;    PT_ADDR(0x3000) - level 3 directory
+    ;
+    ; The level 2 directory for the first gigabyte has the same
+    ; physical address in both 4-level and 5-level paging mode,
+    ; SevClearPageEncMaskForGhcbPage depends on this.
+    ;
+    ; The 1 GB -> 4 GB range is mapped using 1G pages in the
+    ; level 3 directory.
+    ;
+    debugShowPostCode 0x51      ; 5-level paging
+
+    ; restore GetSevCBitMaskAbove31 result
+    mov     edx, edi
+
+    ; level 5
+    mov     dword[PT_ADDR (0)], PT_ADDR (0x1000) + PAGE_PDE_DIRECTORY_ATTR
+    mov     dword[PT_ADDR (4)], edx
+
+    ; level 4
+    mov     dword[PT_ADDR (0x1000)], PT_ADDR (0x3000) + PAGE_PDE_DIRECTORY_ATTR
+    mov     dword[PT_ADDR (0x1004)], edx
+
+    ; level 3 (1x -> level 2, 3x 1GB)
+    mov     dword[PT_ADDR (0x3000)], PT_ADDR (0x2000) + PAGE_PDE_DIRECTORY_ATTR
+    mov     dword[PT_ADDR (0x3004)], edx
+    mov     dword[PT_ADDR (0x3008)], (1 << 30) + PAGE_PDE_LARGEPAGE_ATTR
+    mov     dword[PT_ADDR (0x300c)], edx
+    mov     dword[PT_ADDR (0x3010)], (2 << 30) + PAGE_PDE_LARGEPAGE_ATTR
+    mov     dword[PT_ADDR (0x3014)], edx
+    mov     dword[PT_ADDR (0x3018)], (3 << 30) + PAGE_PDE_LARGEPAGE_ATTR
+    mov     dword[PT_ADDR (0x301c)], edx
+
+    ;
+    ; level 2 (512 * 2MB entries => 1GB)
+    ;
+    mov     ecx, 0x200
+pageTableEntriesLoopLa57:
+    mov     eax, ecx
+    dec     eax
+    shl     eax, 21
+    add     eax, PAGE_PDE_LARGEPAGE_ATTR
+    mov     [ecx * 8 + PT_ADDR (0x2000 - 8)], eax
+    mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
+    loop    pageTableEntriesLoopLa57
+
+    ; set la57 bit in cr4
+    mov     eax, cr4
+    bts     eax, 12
+    mov     cr4, eax
+
+    ; done
+    jmp     PageTablesReadyLa57
+
+Paging4Lvl:
+    debugShowPostCode 0x41      ; 4-level paging
+
+    ; restore GetSevCBitMaskAbove31 result
+    mov     edx, edi
+
+%endif ; PG_5_LEVEL
 
     ;
     ; Top level Page Directory Pointers (1 * 512GB entry)
@@ -117,12 +228,24 @@ pageTableEntriesLoop:
     mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
     loop    pageTableEntriesLoop
 
-    ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
-    OneTimeCall   SevClearPageEncMaskForGhcbPage
+%if PG_5_LEVEL
 
+PageTablesReadyLa57:
+    ; TDX will do some PostBuildPages task, such as setting
+    ; byte[TDX_WORK_AREA_PGTBL_READY].
+    OneTimeCall   TdxPostBuildPageTablesLa57
+    jmp SevPostBuildPageTables
+
+%endif
+
+PageTablesReady:
     ; TDX will do some PostBuildPages task, such as setting
     ; byte[TDX_WORK_AREA_PGTBL_READY].
     OneTimeCall   TdxPostBuildPageTables
+
+SevPostBuildPageTables:
+    ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
+    OneTimeCall   SevClearPageEncMaskForGhcbPage
 
 SetCr3:
     ;

@@ -179,7 +179,7 @@ InitTdx:
 ;
 ; Modified:  EAX, EDX
 ;
-; 0-NonTdx, 1-TdxBsp, 2-TdxAps
+; 0-NonTdx, 1-TdxBsp, 2-TdxAps, 3-TdxApsLa57
 ;
 CheckTdxFeaturesBeforeBuildPagetables:
     xor     eax, eax
@@ -203,6 +203,21 @@ TdxPostBuildPageTables:
 
 ExitTdxPostBuildPageTables:
     OneTimeCallRet TdxPostBuildPageTables
+
+%if PG_5_LEVEL
+
+;
+; Set byte[TDX_WORK_AREA_PGTBL_READY] to 2
+;
+TdxPostBuildPageTablesLa57:
+    cmp     byte[WORK_AREA_GUEST_TYPE], VM_GUEST_TDX
+    jne     ExitTdxPostBuildPageTablesLa57
+    mov     byte[TDX_WORK_AREA_PGTBL_READY], 2
+
+ExitTdxPostBuildPageTablesLa57:
+    OneTimeCallRet TdxPostBuildPageTablesLa57
+
+%endif
 
 ;
 ; Check if TDX is enabled
