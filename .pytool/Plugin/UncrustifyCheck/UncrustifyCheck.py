@@ -12,6 +12,7 @@ import logging
 import os
 import pathlib
 import shutil
+import stat
 import timeit
 from edk2toolext.environment import version_aggregator
 from edk2toolext.environment.plugin_manager import PluginManager
@@ -628,7 +629,7 @@ class UncrustifyCheck(ICiBuildPlugin):
             """
             Private function to attempt to change permissions on file/folder being deleted.
             """
-            os.chmod(path, os.stat.S_IWRITE)
+            os.chmod(path, stat.S_IWRITE)
             func(path)
 
         for _ in range(3):  # retry up to 3 times
