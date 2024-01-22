@@ -628,11 +628,12 @@ PlatformAddressWidthFromCpuid (
   IN     BOOLEAN                QemuQuirk
   )
 {
-  UINT32   RegEax, RegEbx, RegEcx, RegEdx, Max;
-  UINT8    PhysBits;
-  CHAR8    Signature[13];
-  BOOLEAN  Valid         = FALSE;
-  BOOLEAN  Page1GSupport = FALSE;
+  UINT32    RegEax, RegEbx, RegEcx, RegEdx, Max;
+  UINT8     PhysBits;
+  CHAR8     Signature[13];
+  IA32_CR4  Cr4;
+  BOOLEAN   Valid         = FALSE;
+  BOOLEAN   Page1GSupport = FALSE;
 
   ZeroMem (Signature, sizeof (Signature));
 
@@ -670,30 +671,48 @@ PlatformAddressWidthFromCpuid (
     }
   }
 
+  Cr4.UintN = AsmReadCr4 ();
+
   DEBUG ((
     DEBUG_INFO,
-    "%a: Signature: '%a', PhysBits: %d, QemuQuirk: %a, Valid: %a\n",
+    "%a: Signature: '%a', PhysBits: %d, QemuQuirk: %a, la57: %a, Valid: %a\n",
     __func__,
     Signature,
     PhysBits,
     QemuQuirk ? "On" : "Off",
+    Cr4.Bits.LA57 ? "On" : "Off",
     Valid ? "Yes" : "No"
     ));
 
   if (Valid) {
-    if (PhysBits > 46) {
-      /*
-       * Avoid 5-level paging altogether for now, which limits
-       * PhysBits to 48.  Also avoid using address bit 48, due to sign
-       * extension we can't identity-map these addresses (and lots of
-       * places in edk2 assume we have everything identity-mapped).
-       * So the actual limit is 47.
-       *
-       * Also some older linux kernels apparently have problems handling
-       * phys-bits > 46 correctly, so use that as limit.
-       */
-      DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 46 (avoid 5-level paging)\n", __func__));
-      PhysBits = 46;
+    /*
+     * Due to the sign extension we can use only the lower half of the
+     * virtual address space to identity-map physical address space,
+     * which gives us a 47 bit wide address space with 4 paging levels
+     * and a 56 bit wide address space with 5 paging levels.
+     */
+    if (Cr4.Bits.LA57) {
+      if (PhysBits > 48) {
+        /*
+         * Some Intel CPUs support 5-level paging, have more than 48
+         * phys-bits but support only 4-level EPT, which effectively
+         * limits guest phys-bits to 48.  Until we have some way to
+         * communicate that limitation from hypervisor to guest, limit
+         * phys-bits to 48 unconditionally.
+         */
+        DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 48 (5-level paging)\n", __func__));
+        PhysBits = 48;
+      }
+    } else {
+      if (PhysBits > 46) {
+        /*
+         * Some older linux kernels apparently have problems handling
+         * phys-bits > 46 correctly, so use that instead of 47 as
+         * limit.
+         */
+        DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 46 (4-level paging)\n", __func__));
+        PhysBits = 46;
+      }
     }
 
     if (!Page1GSupport && (PhysBits > 40)) {
