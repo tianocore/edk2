@@ -511,18 +511,18 @@ QemuInitializeRam (
     MtrrGetAllMtrrs (&MtrrSettings);
 
     //
-    // MTRRs disabled, fixed MTRRs disabled, default type is uncached
+    // See SecMtrrSetup(), default type should be write back
     //
-    ASSERT ((MtrrSettings.MtrrDefType & BIT11) == 0);
+    ASSERT ((MtrrSettings.MtrrDefType & BIT11) != 0);
     ASSERT ((MtrrSettings.MtrrDefType & BIT10) == 0);
-    ASSERT ((MtrrSettings.MtrrDefType & 0xFF) == 0);
+    ASSERT ((MtrrSettings.MtrrDefType & 0xFF) == MTRR_CACHE_WRITE_BACK);
 
     //
     // flip default type to writeback
     //
-    SetMem (&MtrrSettings.Fixed, sizeof MtrrSettings.Fixed, 0x06);
+    SetMem (&MtrrSettings.Fixed, sizeof MtrrSettings.Fixed, MTRR_CACHE_WRITE_BACK);
     ZeroMem (&MtrrSettings.Variables, sizeof MtrrSettings.Variables);
-    MtrrSettings.MtrrDefType |= BIT11 | BIT10 | 6;
+    MtrrSettings.MtrrDefType |= BIT10;
     MtrrSetAllMtrrs (&MtrrSettings);
 
     //
