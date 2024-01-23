@@ -18,28 +18,7 @@
 // so the code gets a bit clunky to handle that case specifically.
 
 char *
-strchr (
-  const char  *Str,
-  int         Char
-  )
-{
-  char  *S;
-
-  S = (char *)Str;
-
-  for ( ; ; S++) {
-    if (*S == Char) {
-      return S;
-    }
-
-    if (*S == '\0') {
-      return NULL;
-    }
-  }
-}
-
-char *
-strrchr (
+fdt_strrchr (
   const char  *Str,
   int         Char
   )
@@ -71,7 +50,7 @@ __isspace (
 }
 
 unsigned long
-strtoul (
+fdt_strtoul (
   const char  *Nptr,
   char        **EndPtr,
   int         Base
