@@ -47,6 +47,7 @@ typedef struct {
   UINT64      Attribute;
   ///
   /// The Null-terminated name of the file.
+  /// For a root directory, the name is an empty string.
   ///
   CHAR16      FileName[1];
 } EFI_FILE_INFO;
