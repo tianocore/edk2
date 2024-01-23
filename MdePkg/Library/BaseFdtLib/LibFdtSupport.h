@@ -63,13 +63,13 @@ strchr     (
   );
 
 char *
-strrchr    (
+fdt_strrchr    (
   const char *,
   int
   );
 
 unsigned long
-strtoul     (
+fdt_strtoul     (
   const char *,
   char **,
   int
@@ -93,7 +93,10 @@ strcpy (
 #define strnlen(str, count)                 (size_t)(AsciiStrnLenS(str, count))
 #define strncpy(strDest, strSource, count)  AsciiStrnCpyS(strDest, MAX_STRING_SIZE, strSource, (UINTN)count)
 #define strcat(strDest, strSource)          AsciiStrCatS(strDest, MAX_STRING_SIZE, strSource)
+#define strchr(str, ch)                     ScanMem8(str, AsciiStrSize (str), (UINT8)ch)
 #define strcmp(string1, string2, count)     (int)(AsciiStrCmp(string1, string2))
 #define strncmp(string1, string2, count)    (int)(AsciiStrnCmp(string1, string2, (UINTN)(count)))
+#define strrchr(str, ch)                    fdt_strrchr(str, ch)
+#define strtoul(ptr, end_ptr, base)         fdt_strtoul(ptr, end_ptr, base)
 
 #endif /* FDT_LIB_SUPPORT_H_ */
