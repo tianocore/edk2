@@ -35,3 +35,18 @@ CpuFlushTlb (
   )
 {
 }
+
+/**
+  Determine if the standard CPU signature is "AuthenticAMD".
+
+  @retval TRUE  The CPU signature matches.
+  @retval FALSE The CPU signature does not match.
+**/
+BOOLEAN
+EFIAPI
+StandardSignatureIsAuthenticAMD (
+  VOID
+  )
+{
+  return FALSE;
+}
