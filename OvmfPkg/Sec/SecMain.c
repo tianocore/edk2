@@ -30,6 +30,8 @@
 #include <Ppi/MpInitLibDep.h>
 #include <Library/TdxHelperLib.h>
 #include <Library/CcProbeLib.h>
+#include <Register/Intel/ArchitecturalMsr.h>
+#include <Register/Intel/Cpuid.h>
 #include "AmdSev.h"
 
 #define SEC_IDT_ENTRY_COUNT  34
@@ -744,6 +746,31 @@ FindAndReportEntryPoints (
   return;
 }
 
+//
+// Enable MTRR early, set default type to write back.
+// Needed to make sure caching is enabled,
+// without this lzma decompress can be very slow.
+//
+STATIC
+VOID
+SecMtrrSetup (
+  VOID
+  )
+{
+  CPUID_VERSION_INFO_EDX           Edx;
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER  DefType;
+
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &Edx.Uint32);
+  if (!Edx.Bits.MTRR) {
+    return;
+  }
+
+  DefType.Uint64    = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
+  DefType.Bits.Type = 6; /* write back */
+  DefType.Bits.E    = 1; /* enable */
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, DefType.Uint64);
+}
+
 VOID
 EFIAPI
 SecCoreStartupWithStack (
@@ -941,6 +968,11 @@ SecCoreStartupWithStack (
   //
   InitializeApicTimer (0, MAX_UINT32, TRUE, 5);
   DisableApicTimerInterrupt ();
+
+  //
+  // Initialize MTRR
+  //
+  SecMtrrSetup ();
 
   //
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.
