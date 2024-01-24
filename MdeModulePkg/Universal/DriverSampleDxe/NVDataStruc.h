@@ -95,6 +95,7 @@ typedef struct {
   MY_EFI_UNION_DATA    MyUnionData;
   UINT8                QuestionXUefiKeywordRestStyle;
   UINT8                QuestionNonXUefiKeywordRestStyle;
+  UINT8                QuestionApply;
 } DRIVER_SAMPLE_CONFIGURATION;
 
 //

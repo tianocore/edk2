@@ -55,6 +55,7 @@ typedef UINTN EFI_BROWSER_ACTION_REQUEST;
 #define EFI_BROWSER_ACTION_REQUEST_FORM_APPLY         6
 #define EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD       7
 #define EFI_BROWSER_ACTION_REQUEST_RECONNECT          8
+#define EFI_BROWSER_ACTION_REQUEST_QUESTION_APPLY     9
 
 /**
   Initialize the browser to display the specified configuration forms.
