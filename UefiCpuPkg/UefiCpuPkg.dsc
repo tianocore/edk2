@@ -123,6 +123,7 @@
   UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
   UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
   UefiCpuPkg/MicrocodeMeasurementDxe/MicrocodeMeasurementDxe.inf
+  UefiCpuPkg/S3ResumeStandaloneMm/S3ResumeStandaloneMm.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuDxe/CpuDxe.inf
