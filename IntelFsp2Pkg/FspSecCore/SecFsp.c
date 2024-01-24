@@ -47,11 +47,11 @@ FspGetExceptionHandler (
 VOID
 EFIAPI
 SecGetPlatformData (
-  IN OUT  FSP_GLOBAL_DATA  *FspData
+  IN OUT  FSP_GLOBAL_DATA  *FspData,
+  IN UINTN TopOfCar
   )
 {
   FSP_PLAT_DATA  *FspPlatformData;
-  UINT32         TopOfCar;
   UINT32         *StackPtr;
   UINT32         DwordSize;
 
@@ -68,11 +68,10 @@ SecGetPlatformData (
   FspPlatformData->CodeRegionBase      = 0;
   FspPlatformData->CodeRegionSize      = 0;
 
-  //
-  // Pointer to the size field
-  //
-  TopOfCar = PcdGet32 (PcdTemporaryRamBase) + PcdGet32 (PcdTemporaryRamSize);
-  StackPtr = (UINT32 *)(TopOfCar - sizeof (UINT32));
+  if ((TopOfCar == 0) || (TopOfCar == 0xFFFFFFFF)) {
+    return;
+  }
+  StackPtr = (UINT32 *)((UINT32) TopOfCar - sizeof (UINT32));
 
   if (*(StackPtr - 1) == FSP_MCUD_SIGNATURE) {
     while (*StackPtr != 0) {
@@ -123,7 +122,14 @@ FspGlobalDataInit (
   VOID   *FspmUpdDataPtr;
   CHAR8  ImageId[9];
   UINTN  Idx;
+  UINTN *TopOfCar;
 
+  //
+  // If TempRam is initilized using FspTempRamInitApi (), GlobalDataPointer
+  // will point to the Top of the Car and any Data that FspTempRamInitApi
+  // wants to Handoff to later stages will be pushed on to the Top of the car.
+  //
+  TopOfCar = *(VOID  **)(UINTN)PcdGet32 (PcdGlobalDataPointerAddress);
   //
   // Set FSP Global Data pointer
   //
@@ -147,7 +153,7 @@ FspGlobalDataInit (
   // It may have multiple FVs, so look into the last one for FSP header
   //
   PeiFspData->FspInfoHeader = (FSP_INFO_HEADER *)(UINTN)AsmGetFspInfoHeader ();
-  SecGetPlatformData (PeiFspData);
+  SecGetPlatformData (PeiFspData, (UINTN) TopOfCar);
 
   //
   // Set API calling mode
@@ -211,6 +217,7 @@ FspGlobalDataInit (
     ((PeiFspData->FspInfoHeader->ImageRevision & 0xFF) | ((PeiFspData->FspInfoHeader->ExtendedImageRevision & 0xFF) << 8)) : \
     (PeiFspData->FspInfoHeader->ImageRevision & 0xFF)
     ));
+    DEBUG (( DEBUG_INFO | DEBUG_INIT,"\nTop of the car : %x \n", (UINTN) TopOfCar ));
 }
 
 /**
