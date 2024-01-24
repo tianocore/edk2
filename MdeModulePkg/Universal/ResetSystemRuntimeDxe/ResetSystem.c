@@ -252,6 +252,14 @@ RuntimeServiceResetSystem (
     mResetNotifyDepth
     ));
 
+  if ((ResetData != NULL) && (DataSize != 0)) {
+    DEBUG ((
+      DEBUG_INFO,
+      "DXE ResetSystem2: ResetData: %s\n",
+      ResetData
+      ));
+  }
+
   if (mResetNotifyDepth <= MAX_RESET_NOTIFY_DEPTH) {
     if (!EfiAtRuntime ()) {
       //
