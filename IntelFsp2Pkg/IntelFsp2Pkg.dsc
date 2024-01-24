@@ -79,6 +79,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x1f
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80080046
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x07
+  gIntelFsp2PkgTokenSpaceGuid.PcdGlobalDataPointerAddress |0xFED00108
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
