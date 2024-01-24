@@ -62,7 +62,6 @@
 
 [Pcd]
   gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize              ## CONSUMES
   gIntelFsp2PkgTokenSpaceGuid.PcdFspTemporaryRamSize           ## CONSUMES
   gIntelFsp2PkgTokenSpaceGuid.PcdFspHeapSizePercentage         ## CONSUMES
   gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxInterruptSupported      ## CONSUMES
