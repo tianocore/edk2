@@ -134,8 +134,14 @@ SmiManage (
 
   Head = &SmiEntry->SmiHandlers;
 
-  for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
+  for (Link = Head->ForwardLink; Link != Head;) {
     SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
+    //
+    // To support unregister SMI handler inside SMI handler itself,
+    // get next node before handler is executed, since LIST_ENTRY that
+    // Link points to may be freed if unregister SMI handler.
+    //
+    Link = Link->ForwardLink;
 
     Status = SmiHandler->Handler (
                            (EFI_HANDLE)SmiHandler,
