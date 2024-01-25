@@ -16,6 +16,7 @@
   SKUID_IDENTIFIER        = DEFAULT
 
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
+
 [Packages]
   MdePkg/MdePkg.dec
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
