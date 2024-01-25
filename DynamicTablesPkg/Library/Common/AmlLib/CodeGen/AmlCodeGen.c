@@ -12,7 +12,7 @@
 #include <AcpiTableGenerator.h>
 
 #include <AmlCoreInterface.h>
-#include <AmlCpcInfo.h>
+#include <AcpiObjects.h>
 #include <AmlEncoding/Aml.h>
 #include <Api/AmlApiHelper.h>
 #include <CodeGen/AmlResourceDataCodeGen.h>
