@@ -4,7 +4,9 @@
   Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
-#include <gtest/gtest.h>
+#include <Library/GoogleTestLib.h>
+#include <GoogleTest/Library/MockUefiLib.h>
+#include <GoogleTest/Library/MockUefiRuntimeServicesTableLib.h>
 
 extern "C" {
   #include <Uefi.h>
@@ -19,7 +21,8 @@ extern "C" {
 // Definitions
 ///////////////////////////////////////////////////////////////////////////////
 
-#define PACKET_SIZE  (1500)
+#define PACKET_SIZE            (1500)
+#define REQUEST_OPTION_LENGTH  (120)
 
 typedef struct {
   UINT16    OptionCode;   // The option code for DHCP6_OPT_SERVER_ID (e.g., 0x03)
@@ -76,6 +79,26 @@ MockConfigure (
 }
 
 // Needed by PxeBcSupport
+EFI_STATUS
+PxeBcDns6 (
+  IN PXEBC_PRIVATE_DATA  *Private,
+  IN     CHAR16          *HostName,
+  OUT EFI_IPv6_ADDRESS   *IpAddress
+  )
+{
+  return EFI_SUCCESS;
+}
+
+UINT32
+PxeBcBuildDhcp6Options (
+  IN  PXEBC_PRIVATE_DATA       *Private,
+  OUT EFI_DHCP6_PACKET_OPTION  **OptList,
+  IN  UINT8                    *Buffer
+  )
+{
+  return EFI_SUCCESS;
+}
+
 EFI_STATUS
 EFIAPI
 QueueDpc (
@@ -158,6 +181,10 @@ TEST_F (PxeBcHandleDhcp6OfferTest, BasicUsageTest) {
 
   ASSERT_EQ (PxeBcHandleDhcp6Offer (&(PxeBcHandleDhcp6OfferTest::Private)), EFI_DEVICE_ERROR);
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// PxeBcCacheDnsServerAddresses Tests
+///////////////////////////////////////////////////////////////////////////////
 
 class PxeBcCacheDnsServerAddressesTest : public ::testing::Test {
 public:
@@ -297,4 +324,251 @@ TEST_F (PxeBcCacheDnsServerAddressesTest, MultipleDnsEntries) {
   if (Private.DnsServer) {
     FreePool (Private.DnsServer);
   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// PxeBcRequestBootServiceTest Test Cases
+///////////////////////////////////////////////////////////////////////////////
+
+class PxeBcRequestBootServiceTest : public ::testing::Test {
+public:
+  PXEBC_PRIVATE_DATA Private = { 0 };
+  EFI_UDP6_PROTOCOL Udp6Read;
+
+protected:
+  // Add any setup code if needed
+  virtual void
+  SetUp (
+    )
+  {
+    Private.Dhcp6Request = (EFI_DHCP6_PACKET *)AllocateZeroPool (PACKET_SIZE);
+
+    // Need to setup the EFI_PXE_BASE_CODE_PROTOCOL
+    // The function under test really only needs the following:
+    //  UdpWrite
+    //  UdpRead
+
+    Private.PxeBc.UdpWrite = (EFI_PXE_BASE_CODE_UDP_WRITE)MockUdpWrite;
+    Private.PxeBc.UdpRead  = (EFI_PXE_BASE_CODE_UDP_READ)MockUdpRead;
+
+    // Need to setup EFI_UDP6_PROTOCOL
+    // The function under test really only needs the following:
+    //  Configure
+
+    Udp6Read.Configure = (EFI_UDP6_CONFIGURE)MockConfigure;
+    Private.Udp6Read   = &Udp6Read;
+  }
+
+  // Add any cleanup code if needed
+  virtual void
+  TearDown (
+    )
+  {
+    if (Private.Dhcp6Request != NULL) {
+      FreePool (Private.Dhcp6Request);
+    }
+
+    // Clean up any resources or variables
+  }
+};
+
+TEST_F (PxeBcRequestBootServiceTest, ServerDiscoverBasicUsageTest) {
+  PxeBcRequestBootServiceTest::Private.OfferBuffer[0].Dhcp6.OfferType = PxeOfferTypeProxyBinl;
+
+  DHCP6_OPTION_SERVER_ID  Server = { 0 };
+
+  Server.OptionCode =  HTONS (DHCP6_OPT_SERVER_ID);
+  Server.OptionLen  = HTONS (16); // valid length
+  UINT8  Index = 0;
+
+  EFI_DHCP6_PACKET  *Packet = (EFI_DHCP6_PACKET *)&Private.OfferBuffer[Index].Dhcp6.Packet.Offer;
+
+  UINT8  *Cursor = (UINT8 *)(Packet->Dhcp6.Option);
+
+  CopyMem (Cursor, &Server, sizeof (Server));
+  Cursor += sizeof (Server);
+
+  // Update the packet length
+  Packet->Length = (UINT16)(Cursor - (UINT8 *)Packet);
+  Packet->Size   = PACKET_SIZE;
+
+  ASSERT_EQ (PxeBcRequestBootService (&(PxeBcRequestBootServiceTest::Private), Index), EFI_SUCCESS);
+}
+
+TEST_F (PxeBcRequestBootServiceTest, AttemptDiscoverOverFlowExpectFailure) {
+  PxeBcRequestBootServiceTest::Private.OfferBuffer[0].Dhcp6.OfferType = PxeOfferTypeProxyBinl;
+
+  DHCP6_OPTION_SERVER_ID  Server = { 0 };
+
+  Server.OptionCode =  HTONS (DHCP6_OPT_SERVER_ID);
+  Server.OptionLen  = HTONS (1500); // This length would overflow without a check
+  UINT8  Index = 0;
+
+  EFI_DHCP6_PACKET  *Packet = (EFI_DHCP6_PACKET *)&Private.OfferBuffer[Index].Dhcp6.Packet.Offer;
+
+  UINT8  *Cursor = (UINT8 *)(Packet->Dhcp6.Option);
+
+  CopyMem (Cursor, &Server, sizeof (Server));
+  Cursor += sizeof (Server);
+
+  // Update the packet length
+  Packet->Length = (UINT16)(Cursor - (UINT8 *)Packet);
+  Packet->Size   = PACKET_SIZE;
+
+  // This is going to be stopped by the duid overflow check
+  ASSERT_EQ (PxeBcRequestBootService (&(PxeBcRequestBootServiceTest::Private), Index), EFI_INVALID_PARAMETER);
+}
+
+TEST_F (PxeBcRequestBootServiceTest, RequestBasicUsageTest) {
+  EFI_DHCP6_PACKET_OPTION  RequestOpt = { 0 }; // the data section doesn't really matter
+
+  RequestOpt.OpCode = HTONS (0x1337);
+  RequestOpt.OpLen  = 0; // valid length
+
+  UINT8  Index = 0;
+
+  EFI_DHCP6_PACKET  *Packet = (EFI_DHCP6_PACKET *)&Private.Dhcp6Request[Index];
+
+  UINT8  *Cursor = (UINT8 *)(Packet->Dhcp6.Option);
+
+  CopyMem (Cursor, &RequestOpt, sizeof (RequestOpt));
+  Cursor += sizeof (RequestOpt);
+
+  // Update the packet length
+  Packet->Length = (UINT16)(Cursor - (UINT8 *)Packet);
+  Packet->Size   = PACKET_SIZE;
+
+  ASSERT_EQ (PxeBcRequestBootService (&(PxeBcRequestBootServiceTest::Private), Index), EFI_SUCCESS);
+}
+
+TEST_F (PxeBcRequestBootServiceTest, AttemptRequestOverFlowExpectFailure) {
+  EFI_DHCP6_PACKET_OPTION  RequestOpt = { 0 }; // the data section doesn't really matter
+
+  RequestOpt.OpCode = HTONS (0x1337);
+  RequestOpt.OpLen  = 1500; // this length would overflow without a check
+
+  UINT8  Index = 0;
+
+  EFI_DHCP6_PACKET  *Packet = (EFI_DHCP6_PACKET *)&Private.Dhcp6Request[Index];
+
+  UINT8  *Cursor = (UINT8 *)(Packet->Dhcp6.Option);
+
+  CopyMem (Cursor, &RequestOpt, sizeof (RequestOpt));
+  Cursor += sizeof (RequestOpt);
+
+  // Update the packet length
+  Packet->Length = (UINT16)(Cursor - (UINT8 *)Packet);
+  Packet->Size   = PACKET_SIZE;
+
+  ASSERT_EQ (PxeBcRequestBootService (&(PxeBcRequestBootServiceTest::Private), Index), EFI_OUT_OF_RESOURCES);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// PxeBcDhcp6Discover Test
+///////////////////////////////////////////////////////////////////////////////
+
+class PxeBcDhcp6DiscoverTest : public ::testing::Test {
+public:
+  PXEBC_PRIVATE_DATA Private = { 0 };
+  EFI_UDP6_PROTOCOL Udp6Read;
+
+protected:
+  MockUefiRuntimeServicesTableLib RtServicesMock;
+
+  // Add any setup code if needed
+  virtual void
+  SetUp (
+    )
+  {
+    Private.Dhcp6Request = (EFI_DHCP6_PACKET *)AllocateZeroPool (PACKET_SIZE);
+
+    // Need to setup the EFI_PXE_BASE_CODE_PROTOCOL
+    // The function under test really only needs the following:
+    //  UdpWrite
+    //  UdpRead
+
+    Private.PxeBc.UdpWrite = (EFI_PXE_BASE_CODE_UDP_WRITE)MockUdpWrite;
+    Private.PxeBc.UdpRead  = (EFI_PXE_BASE_CODE_UDP_READ)MockUdpRead;
+
+    // Need to setup EFI_UDP6_PROTOCOL
+    // The function under test really only needs the following:
+    //  Configure
+
+    Udp6Read.Configure = (EFI_UDP6_CONFIGURE)MockConfigure;
+    Private.Udp6Read   = &Udp6Read;
+  }
+
+  // Add any cleanup code if needed
+  virtual void
+  TearDown (
+    )
+  {
+    if (Private.Dhcp6Request != NULL) {
+      FreePool (Private.Dhcp6Request);
+    }
+
+    // Clean up any resources or variables
+  }
+};
+
+// Test Description
+// This will cause an overflow by an untrusted packet during the option parsing
+TEST_F (PxeBcDhcp6DiscoverTest, BasicOverflowTest) {
+  EFI_IPv6_ADDRESS         DestIp     = { 0 };
+  EFI_DHCP6_PACKET_OPTION  RequestOpt = { 0 }; // the data section doesn't really matter
+
+  RequestOpt.OpCode = HTONS (0x1337);
+  RequestOpt.OpLen  = HTONS (0xFFFF); // overflow
+
+  UINT8  *Cursor = (UINT8 *)(Private.Dhcp6Request->Dhcp6.Option);
+
+  CopyMem (Cursor, &RequestOpt, sizeof (RequestOpt));
+  Cursor += sizeof (RequestOpt);
+
+  Private.Dhcp6Request->Length = (UINT16)(Cursor - (UINT8 *)Private.Dhcp6Request);
+
+  EXPECT_CALL (RtServicesMock, gRT_GetTime)
+    .WillOnce (::testing::Return (0));
+
+  ASSERT_EQ (
+    PxeBcDhcp6Discover (
+      &(PxeBcDhcp6DiscoverTest::Private),
+      0,
+      NULL,
+      FALSE,
+      (EFI_IP_ADDRESS *)&DestIp
+      ),
+    EFI_OUT_OF_RESOURCES
+    );
+}
+
+// Test Description
+// This will test that we can handle a packet with a valid option length
+TEST_F (PxeBcDhcp6DiscoverTest, BasicUsageTest) {
+  EFI_IPv6_ADDRESS         DestIp     = { 0 };
+  EFI_DHCP6_PACKET_OPTION  RequestOpt = { 0 }; // the data section doesn't really matter
+
+  RequestOpt.OpCode = HTONS (0x1337);
+  RequestOpt.OpLen  = HTONS (0x30);
+
+  UINT8  *Cursor = (UINT8 *)(Private.Dhcp6Request->Dhcp6.Option);
+
+  CopyMem (Cursor, &RequestOpt, sizeof (RequestOpt));
+  Cursor += sizeof (RequestOpt);
+
+  Private.Dhcp6Request->Length = (UINT16)(Cursor - (UINT8 *)Private.Dhcp6Request);
+
+  EXPECT_CALL (RtServicesMock, gRT_GetTime)
+    .WillOnce (::testing::Return (0));
+
+  ASSERT_EQ (
+    PxeBcDhcp6Discover (
+      &(PxeBcDhcp6DiscoverTest::Private),
+      0,
+      NULL,
+      FALSE,
+      (EFI_IP_ADDRESS *)&DestIp
+      ),
+    EFI_SUCCESS
+    );
 }

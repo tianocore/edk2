@@ -47,4 +47,22 @@ PxeBcCacheDnsServerAddresses (
   IN PXEBC_DHCP6_PACKET_CACHE  *Cache6
   );
 
+/**
+  Build and send out the request packet for the bootfile, and parse the reply.
+
+  @param[in]  Private               The pointer to PxeBc private data.
+  @param[in]  Index                 PxeBc option boot item type.
+
+  @retval     EFI_SUCCESS           Successfully discovered the boot file.
+  @retval     EFI_OUT_OF_RESOURCES  Failed to allocate resources.
+  @retval     EFI_NOT_FOUND         Can't get the PXE reply packet.
+  @retval     Others                Failed to discover the boot file.
+
+**/
+EFI_STATUS
+PxeBcRequestBootService (
+  IN  PXEBC_PRIVATE_DATA  *Private,
+  IN  UINT32              Index
+  );
+
 #endif // PXE_BC_DHCP6_GOOGLE_TEST_H_
