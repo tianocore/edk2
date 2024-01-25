@@ -37,12 +37,18 @@
   DEFINE ATA_ENABLE                   = TRUE
   DEFINE SD_ENABLE                    = TRUE
   DEFINE PS2_MOUSE_ENABLE             = TRUE
-  DEFINE CRYPTO_PROTOCOL_SUPPORT      = FALSE
   DEFINE SD_MMC_TIMEOUT               = 1000000
   DEFINE USE_CBMEM_FOR_CONSOLE        = FALSE
   DEFINE BOOTSPLASH_IMAGE             = FALSE
   DEFINE NVME_ENABLE                  = TRUE
   DEFINE CAPSULE_SUPPORT              = FALSE
+
+  #
+  # Crypto Support
+  #
+  DEFINE CRYPTO_PROTOCOL_SUPPORT        = FALSE
+  DEFINE CRYPTO_DRIVER_EXTERNAL_SUPPORT = FALSE
+
   #
   # Setup Universal Payload
   #
@@ -860,11 +866,13 @@
   # Misc
   #
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
+!if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
   CryptoPkg/Driver/CryptoDxe.inf {
     <LibraryClasses>
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
   }
+!endif
 !endif
 
   #------------------------------
