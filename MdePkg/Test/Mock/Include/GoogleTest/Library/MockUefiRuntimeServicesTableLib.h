@@ -37,6 +37,13 @@ struct MockUefiRuntimeServicesTableLib {
      IN UINTN     DataSize,
      IN VOID      *Data)
     );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gRT_GetTime,
+    (OUT  EFI_TIME                    *Time,
+     OUT  EFI_TIME_CAPABILITIES       *Capabilities OPTIONAL)
+    );
 };
 
 #endif
