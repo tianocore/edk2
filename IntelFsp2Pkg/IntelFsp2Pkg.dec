@@ -85,6 +85,10 @@
   gFspEventEndOfFirmwareGuid            = { 0xbd44f629, 0xeae7, 0x4198, { 0x87, 0xf1, 0x39, 0xfa, 0xb0, 0xfd, 0x71, 0x7e } }
 
 [PcdsFixedAtBuild]
+  #
+  # As part of FSP-T execution, this will be initialized to TopOfCar address where Fsp T data will be saved.
+  # Once Fsp Global Data is initialed later in FSP-M, this will hold the Global data buffer address.
+  #
   gIntelFsp2PkgTokenSpaceGuid.PcdGlobalDataPointerAddress |0xFED00108|UINT32|0x00000001
   gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase         |0xFEF00000|UINT32|0x10001001
   gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize         |    0x2000|UINT32|0x10001002
