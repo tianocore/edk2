@@ -54,6 +54,10 @@ EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig = {
   MmFoundationEntryRegister
 };
 
+EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL  mPiMmCpuDriverEpProtocol = {
+  PiMmStandaloneMmCpuDriverEntry
+};
+
 STATIC EFI_MM_ENTRY_POINT  mMmEntryPoint = NULL;
 
 /**

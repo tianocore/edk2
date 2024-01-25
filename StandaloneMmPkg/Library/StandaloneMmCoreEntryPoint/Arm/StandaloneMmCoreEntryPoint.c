@@ -38,20 +38,22 @@
 #include <IndustryStandard/ArmMmSvc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
 
+#include <Protocol/PiMmCpuDriverEp.h>
+
 #define SPM_MAJOR_VER_MASK   0xFFFF0000
 #define SPM_MINOR_VER_MASK   0x0000FFFF
 #define SPM_MAJOR_VER_SHIFT  16
 #define FFA_NOT_SUPPORTED    -1
+
+#define BOOT_PAYLOAD_VERSION  1
+
+extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
 
 STATIC CONST UINT32  mSpmMajorVer = SPM_MAJOR_VERSION;
 STATIC CONST UINT32  mSpmMinorVer = SPM_MINOR_VERSION;
 
 STATIC CONST UINT32  mSpmMajorVerFfa = SPM_MAJOR_VERSION_FFA;
 STATIC CONST UINT32  mSpmMinorVerFfa = SPM_MINOR_VERSION_FFA;
-
-#define BOOT_PAYLOAD_VERSION  1
-
-PI_MM_CPU_DRIVER_ENTRYPOINT  CpuDriverEntryPoint = NULL;
 
 /**
   Retrieve a pointer to and print the boot information passed by privileged
@@ -216,13 +218,15 @@ SetEventCompleteSvcArgs (
 /**
   A loop to delegated events.
 
+  @param  [in] CpuDriverEntryPoint    Entry point to handle request.
   @param  [in] EventCompleteSvcArgs   Pointer to the event completion arguments.
 
 **/
 VOID
 EFIAPI
 DelegatedEventLoop (
-  IN ARM_SVC_ARGS  *EventCompleteSvcArgs
+  IN EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT  CpuDriverEntryPoint,
+  IN ARM_SVC_ARGS                       *EventCompleteSvcArgs
   )
 {
   BOOLEAN     FfaEnabled;
@@ -381,16 +385,20 @@ _ModuleEntryPoint (
   IN UINT64  cookie2
   )
 {
-  PE_COFF_LOADER_IMAGE_CONTEXT    ImageContext;
-  EFI_SECURE_PARTITION_BOOT_INFO  *PayloadBootInfo;
-  ARM_SVC_ARGS                    EventCompleteSvcArgs;
-  EFI_STATUS                      Status;
-  UINT32                          SectionHeaderOffset;
-  UINT16                          NumberOfSections;
-  VOID                            *HobStart;
-  VOID                            *TeData;
-  UINTN                           TeDataSize;
-  EFI_PHYSICAL_ADDRESS            ImageBase;
+  PE_COFF_LOADER_IMAGE_CONTEXT        ImageContext;
+  EFI_SECURE_PARTITION_BOOT_INFO      *PayloadBootInfo;
+  ARM_SVC_ARGS                        EventCompleteSvcArgs;
+  EFI_STATUS                          Status;
+  UINT32                              SectionHeaderOffset;
+  UINT16                              NumberOfSections;
+  VOID                                *HobStart;
+  VOID                                *TeData;
+  UINTN                               TeDataSize;
+  EFI_PHYSICAL_ADDRESS                ImageBase;
+  EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL  *PiMmCpuDriverEpProtocol;
+  EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT   CpuDriverEntryPoint;
+
+  CpuDriverEntryPoint = NULL;
 
   // Get Secure Partition Manager Version Information
   Status = GetSpmVersion ();
@@ -466,14 +474,33 @@ _ModuleEntryPoint (
   //
   // Create Hoblist based upon boot information passed by privileged software
   //
-  HobStart = CreateHobListFromBootInfo (&CpuDriverEntryPoint, PayloadBootInfo);
+  HobStart = CreateHobListFromBootInfo (PayloadBootInfo);
 
   //
   // Call the MM Core entry point
   //
   ProcessModuleEntryPointList (HobStart);
 
-  DEBUG ((DEBUG_INFO, "Shared Cpu Driver EP %p\n", (VOID *)CpuDriverEntryPoint));
+  //
+  // Find out cpu driver entry point used in DelegatedEventLoop
+  // to handle MMI request.
+  //
+  Status = gMmCoreMmst.MmLocateProtocol (
+                         &gEdkiiPiMmCpuDriverEpProtocolGuid,
+                         NULL,
+                         (VOID **)&PiMmCpuDriverEpProtocol
+                         );
+  if (EFI_ERROR (Status)) {
+    goto finish;
+  }
+
+  CpuDriverEntryPoint = PiMmCpuDriverEpProtocol->PiMmCpuDriverEntryPoint;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "Shared Cpu Driver EP %p\n",
+    CpuDriverEntryPoint
+    ));
 
 finish:
   ZeroMem (&EventCompleteSvcArgs, sizeof (EventCompleteSvcArgs));
@@ -482,5 +509,5 @@ finish:
     Status,
     &EventCompleteSvcArgs
     );
-  DelegatedEventLoop (&EventCompleteSvcArgs);
+  DelegatedEventLoop (CpuDriverEntryPoint, t&EventCompleteSvcArgs);
 }
