@@ -202,6 +202,27 @@
             %endmacro
 
 ;
+; Save TemporaryRamSize to YMM10[192:255]
+; arg 1:general purpose register which holds TemporaryRamSize
+; Modified: XMM5 and YMM10[192:255]
+;
+%macro SAVE_TEMPORARY_RAM_SIZE     1
+            LYMMN   ymm10, xmm5, 1
+            SXMMN   xmm5, 1, %1
+            SYMMN   ymm10, 1, xmm5
+            %endmacro
+
+;
+; Restore TemporaryRamSize from YMM10[192:255]
+; arg 1:general purpose register where to save TemporaryRamSize
+; Modified: XMM5 and %1
+;
+%macro LOAD_TEMPORARY_RAM_SIZE     1
+            LYMMN   ymm10, xmm5, 1
+            LXMMN   xmm5, %1, 1
+            %endmacro
+
+;
 ; YMM7[128:191] for calling stack
 ; arg 1:Entry
 ; Modified: RSI, XMM5, YMM7
