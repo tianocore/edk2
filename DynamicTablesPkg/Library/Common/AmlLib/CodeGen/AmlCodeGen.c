@@ -1,7 +1,7 @@
 /** @file
   AML Code Generation.
 
-  Copyright (c) 2020 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2020 - 2023, Arm Limited. All rights reserved.<BR>
   Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -4088,5 +4088,191 @@ exit_handler:
   }
 
   FreePool (NodeStream);
+  return Status;
+}
+
+/** Create a _PSD node.
+
+  Creates and optionally adds the following node
+   Name(_PSD, Package()
+   {
+    NumEntries,  // Integer
+    Revision,    // Integer
+    Domain,      // Integer
+    CoordType,   // Integer
+    NumProc,     // Integer
+  })
+
+  Cf. ACPI 6.5, s8.4.5.5 _PSD (P-State Dependency)
+
+  @ingroup CodeGenApis
+
+  @param [in]  PsdInfo      PsdInfo object
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewPsdNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreatePsdNode (
+  IN  AML_PSD_INFO            *PsdInfo,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewPsdNode   OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  PsdNode;
+  AML_OBJECT_NODE_HANDLE  PsdPackage;
+  AML_OBJECT_NODE_HANDLE  IntegerNode;
+  UINT32                  NumberOfEntries;
+
+  if ((PsdInfo == NULL) ||
+      ((ParentNode == NULL) && (NewPsdNode == NULL)))
+  {
+    Status = EFI_INVALID_PARAMETER;
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  // Revision 3 per ACPI 6.5 specification
+  if (PsdInfo->Revision == EFI_ACPI_6_5_AML_PSD_REVISION) {
+    // NumEntries 5 per ACPI 6.5 specification
+    NumberOfEntries = 5;
+  } else {
+    Status = EFI_INVALID_PARAMETER;
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  if (((PsdInfo->CoordType != ACPI_AML_COORD_TYPE_SW_ALL) &&
+       (PsdInfo->CoordType != ACPI_AML_COORD_TYPE_SW_ANY) &&
+       (PsdInfo->CoordType != ACPI_AML_COORD_TYPE_HW_ALL)) ||
+      (PsdInfo->NumProc == 0))
+  {
+    Status = EFI_INVALID_PARAMETER;
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlCodeGenNamePackage ("_PSD", NULL, &PsdNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  // Get the Package object node of the _PSD node,
+  // which is the 2nd fixed argument (i.e. index 1).
+  PsdPackage = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                         PsdNode,
+                                         EAmlParseIndexTerm1
+                                         );
+  if ((PsdPackage == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PsdPackage) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (PsdPackage, AML_PACKAGE_OP, 0)))
+  {
+    Status = EFI_INVALID_PARAMETER;
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  // NumEntries
+  Status = AmlCodeGenInteger (NumberOfEntries, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PsdPackage,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    FreePool (IntegerNode);
+    goto error_handler;
+  }
+
+  // Revision
+  Status = AmlCodeGenInteger (PsdInfo->Revision, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PsdPackage,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    FreePool (IntegerNode);
+    goto error_handler;
+  }
+
+  // Domain
+  Status = AmlCodeGenInteger (PsdInfo->Domain, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PsdPackage,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    FreePool (IntegerNode);
+    goto error_handler;
+  }
+
+  // CoordType
+  Status = AmlCodeGenInteger (PsdInfo->CoordType, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PsdPackage,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    FreePool (IntegerNode);
+    goto error_handler;
+  }
+
+  // Num Processors
+  Status = AmlCodeGenInteger (PsdInfo->NumProc, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PsdPackage,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    FreePool (IntegerNode);
+    goto error_handler;
+  }
+
+  Status = LinkNode (PsdNode, ParentNode, NewPsdNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  AmlDeleteTree ((AML_NODE_HANDLE)PsdNode);
   return Status;
 }
