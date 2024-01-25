@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2016 HP Development Company, L.P.
-  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (c) 2023, Ventana Micro System Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -26,10 +26,11 @@
 // World
 extern EFI_GUID  gEfiStandaloneMmNonSecureBufferGuid;
 
-// GUID to identify HOB where the entry point of this CPU driver will be
-// populated to allow the entry point driver to invoke it upon receipt of an
-// event
-extern EFI_GUID  gEfiMmCpuDriverEpDescriptorGuid;
+//
+// mPiMmCpuDriverEpProtocol for Cpu driver entry point to handle
+// mm communication event.
+//
+extern EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL  mPiMmCpuDriverEpProtocol;
 
 //
 // Private copy of the MM system table for future use
@@ -94,7 +95,6 @@ StandaloneMmCpuInitialize (
   IN EFI_MM_SYSTEM_TABLE  *SystemTable   // not actual systemtable
   )
 {
-  MM_CPU_DRIVER_EP_DESCRIPTOR     *CpuDriverEntryPointDesc;
   EFI_CONFIGURATION_TABLE         *ConfigurationTable;
   MP_INFORMATION_HOB_DATA         *MpInformationHobData;
   EFI_MMRAM_DESCRIPTOR            *NsCommBufMmramRange;
@@ -115,6 +115,19 @@ StandaloneMmCpuInitialize (
                     &gEfiMmConfigurationProtocolGuid,
                     EFI_NATIVE_INTERFACE,
                     &mMmConfig
+                    );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Install  entry point of this CPU driver to allow
+  // the entry point driver to be invoked upon receipt of an event in
+  // DelegatedEventLoop.
+  Status = mMmst->MmInstallProtocolInterface (
+                    &mMmCpuHandle,
+                    &gEdkiiPiMmCpuDriverEpProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mPiMmCpuDriverEpProtocol
                     );
   if (EFI_ERROR (Status)) {
     return Status;
@@ -146,28 +159,6 @@ StandaloneMmCpuInitialize (
   }
 
   HobStart = ConfigurationTable[Index].VendorTable;
-
-  //
-  // Locate the HOB with the buffer to populate the entry point of this driver
-  //
-  Status = GetGuidedHobData (
-             HobStart,
-             &gEfiMmCpuDriverEpDescriptorGuid,
-             (VOID **)&CpuDriverEntryPointDesc
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "MmCpuDriverEpDesc HOB data extraction failed - 0x%x\n", Status));
-    return Status;
-  }
-
-  // Share the entry point of the CPU driver
-  DEBUG ((
-    DEBUG_INFO,
-    "Sharing Cpu Driver EP *0x%lx = 0x%lx\n",
-    (UINTN)CpuDriverEntryPointDesc->MmCpuDriverEpPtr,
-    (UINTN)PiMmStandaloneMmCpuDriverEntry
-    ));
-  *(CpuDriverEntryPointDesc->MmCpuDriverEpPtr) = PiMmStandaloneMmCpuDriverEntry;
 
   // Find the descriptor that contains the whereabouts of the buffer for
   // communication with the Normal world.

@@ -36,6 +36,7 @@
 [Protocols]
   gEfiMmConfigurationProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
   gEfiMmCpuProtocolGuid                                  # PROTOCOL ALWAYS_PRODUCED
+  gEdkiiPiMmCpuDriverEpProtocolGuid                      # PROTOCOL ALWAYS_PRODUCED
 
 [Guids]
   gEfiHobListGuid
@@ -43,7 +44,6 @@
   gZeroGuid
   gMpInformationHobGuid
   gEfiStandaloneMmNonSecureBufferGuid
-  gEfiMmCpuDriverEpDescriptorGuid
 
 [Depex]
   TRUE

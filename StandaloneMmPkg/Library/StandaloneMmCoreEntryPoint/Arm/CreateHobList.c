@@ -53,7 +53,6 @@ extern EFI_GUID  gEfiMmCpuDriverEpDescriptorGuid;
 **/
 VOID *
 CreateHobListFromBootInfo (
-  IN  OUT  PI_MM_CPU_DRIVER_ENTRYPOINT     *CpuDriverEntryPoint,
   IN       EFI_SECURE_PARTITION_BOOT_INFO  *PayloadBootInfo
   )
 {
@@ -68,7 +67,6 @@ CreateHobListFromBootInfo (
   MP_INFORMATION_HOB_DATA         *MpInformationHobData;
   EFI_PROCESSOR_INFORMATION       *ProcInfoBuffer;
   EFI_SECURE_PARTITION_CPU_INFO   *CpuInfo;
-  MM_CPU_DRIVER_EP_DESCRIPTOR     *CpuDriverEntryPointDesc;
 
   // Create a hoblist with a PHIT and EOH
   HobStart = HobConstructor (
@@ -142,16 +140,6 @@ CreateHobListFromBootInfo (
   NsCommBufMmramRange->CpuStart      = PayloadBootInfo->SpNsCommBufBase;
   NsCommBufMmramRange->PhysicalSize  = PayloadBootInfo->SpNsCommBufSize;
   NsCommBufMmramRange->RegionState   = EFI_CACHEABLE | EFI_ALLOCATED;
-
-  // Create a Guided HOB to enable the ARM TF CPU driver to share its entry
-  // point and populate it with the address of the shared buffer
-  CpuDriverEntryPointDesc = (MM_CPU_DRIVER_EP_DESCRIPTOR *)BuildGuidHob (
-                                                             &gEfiMmCpuDriverEpDescriptorGuid,
-                                                             sizeof (MM_CPU_DRIVER_EP_DESCRIPTOR)
-                                                             );
-
-  *CpuDriverEntryPoint                      = NULL;
-  CpuDriverEntryPointDesc->MmCpuDriverEpPtr = CpuDriverEntryPoint;
 
   // Find the size of the GUIDed HOB with SRAM ranges
   BufferSize  = sizeof (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK);

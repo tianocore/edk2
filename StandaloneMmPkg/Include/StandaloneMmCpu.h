@@ -13,19 +13,9 @@
 #include <Protocol/MmCommunication2.h>
 #include <Protocol/MmConfiguration.h>
 #include <Protocol/MmCpu.h>
+#include <Protocol/PiMmCpuDriverEp.h>
+
 #include <Guid/MpInformation.h>
-
-typedef
-EFI_STATUS
-(*PI_MM_CPU_DRIVER_ENTRYPOINT) (
-  IN UINTN  EventId,
-  IN UINTN  CpuNumber,
-  IN UINTN  NsCommBufferAddr
-  );
-
-typedef struct {
-  PI_MM_CPU_DRIVER_ENTRYPOINT    *MmCpuDriverEpPtr;
-} MM_CPU_DRIVER_EP_DESCRIPTOR;
 
 //
 // CPU driver initialization specific declarations
