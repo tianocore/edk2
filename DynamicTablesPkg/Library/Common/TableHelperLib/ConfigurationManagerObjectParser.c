@@ -85,7 +85,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicCInfoParser[] = {
   { "AffinityFlags",                 4,                        "0x%x",   NULL },
   { "CpcToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
   { "TRBEInterrupt",                 2,                        "0x%x",   NULL },
-  { "EtToken",                       sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
+  { "EtToken",                       sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "PsdToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArmObjGicDInfo.
