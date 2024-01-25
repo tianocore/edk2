@@ -49,7 +49,9 @@
   gMpInformationHobGuid
   gEfiMmPeiMmramMemoryReserveGuid
   gEfiStandaloneMmNonSecureBufferGuid
-  gEfiMmCpuDriverEpDescriptorGuid
+
+[Protocols.ARM, Protocols.AARCH64]
+  gEdkiiPiMmCpuDriverEpProtocolGuid
 
 [FeaturePcd.ARM, FeaturePcd.AARCH64]
   gArmTokenSpaceGuid.PcdFfaEnable

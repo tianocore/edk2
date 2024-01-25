@@ -126,7 +126,6 @@ LocateStandaloneMmCorePeCoffData (
   Use the boot information passed by privileged firmware to populate a HOB list
   suitable for consumption by the MM Core and drivers.
 
-  @param  [in, out] CpuDriverEntryPoint   Address of MM CPU driver entrypoint
   @param  [in]      PayloadBootInfo       Boot information passed by privileged
                                           firmware
 
@@ -134,7 +133,6 @@ LocateStandaloneMmCorePeCoffData (
 VOID *
 EFIAPI
 CreateHobListFromBootInfo (
-  IN  OUT  PI_MM_CPU_DRIVER_ENTRYPOINT     *CpuDriverEntryPoint,
   IN       EFI_SECURE_PARTITION_BOOT_INFO  *PayloadBootInfo
   );
 
