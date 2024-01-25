@@ -70,7 +70,7 @@ SecMtrrSetup (
   }
 
   DefType.Uint64    = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
-  DefType.Bits.Type = 6; /* write back */
+  DefType.Bits.Type = MSR_IA32_MTRR_CACHE_WRITE_BACK;
   DefType.Bits.E    = 1; /* enable */
   AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, DefType.Uint64);
 }
