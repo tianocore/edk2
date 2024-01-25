@@ -1,12 +1,12 @@
 /** @file
 
-  Copyright (c) 2017-2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017-2023, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
-  System Control and Management Interface V1.0
-    http://infocenter.arm.com/help/topic/com.arm.doc.den0056a/
-    DEN0056A_System_Control_and_Management_Interface.pdf
+  System Control and Management Interface V3.2, latest version at:
+  - https://developer.arm.com/documentation/den0056/latest/
+
 **/
 
 #include <Library/BaseMemoryLib.h>
@@ -416,6 +416,75 @@ PerformanceLevelGet (
   return EFI_SUCCESS;
 }
 
+/** Discover the attributes of the FastChannel for the specified
+    performance domain and the specified message.
+
+  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]  DomainId    Identifier for the performance domain.
+  @param[in]  MessageId   Message Id of the FastChannel to discover.
+                          Must be one of:
+                           - PERFORMANCE_LIMITS_SET
+                           - PERFORMANCE_LIMITS_GET
+                           - PERFORMANCE_LEVEL_SET
+                           - PERFORMANCE_LEVEL_GET
+  @param[out] FastChannel If success, contains the FastChannel description.
+
+  @retval EFI_SUCCESS             Performance level got successfully.
+  @retval EFI_DEVICE_ERROR        SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_TIMEOUT             Time out.
+  @retval EFI_UNSUPPORTED         Unsupported.
+**/
+EFI_STATUS
+DescribeFastchannel (
+  IN  SCMI_PERFORMANCE_PROTOCOL     *This,
+  IN  UINT32                        DomainId,
+  IN  SCMI_MESSAGE_ID_PERFORMANCE   MessageId,
+  OUT SCMI_PERFORMANCE_FASTCHANNEL  *FastChannel
+  )
+{
+  EFI_STATUS    Status;
+  SCMI_COMMAND  Cmd;
+  UINT32        PayloadLength;
+  UINT32        *ReturnValues;
+  UINT32        *MessageParams;
+
+  if ((This == NULL)  ||
+      (FastChannel == NULL))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = ScmiCommandGetPayload (&MessageParams);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  *MessageParams++ = DomainId;
+  *MessageParams   = MessageId;
+
+  Cmd.ProtocolId = ScmiProtocolIdPerformance;
+  Cmd.MessageId  = ScmiMessageIdPerformanceDescribeFastchannel;
+  PayloadLength  = sizeof (DomainId) + sizeof (MessageId);
+
+  Status = ScmiCommandExecute (
+             &Cmd,
+             &PayloadLength,
+             &ReturnValues
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  CopyMem (
+    FastChannel,
+    ReturnValues,
+    sizeof (SCMI_PERFORMANCE_FASTCHANNEL)
+    );
+
+  return Status;
+}
+
 // Instance of the SCMI performance management protocol.
 STATIC CONST SCMI_PERFORMANCE_PROTOCOL  PerformanceProtocol = {
   PerformanceGetVersion,
@@ -425,7 +494,8 @@ STATIC CONST SCMI_PERFORMANCE_PROTOCOL  PerformanceProtocol = {
   PerformanceLimitsSet,
   PerformanceLimitsGet,
   PerformanceLevelSet,
-  PerformanceLevelGet
+  PerformanceLevelGet,
+  DescribeFastchannel,
 };
 
 /** Initialize performance management protocol and install on a given Handle.
