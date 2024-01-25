@@ -816,7 +816,7 @@ Dhcp6SeekStsOption (
   // IA option to the end of the DHCP6 option area, thus subtract the space
   // up until this option
   //
-  OptionLen = OptionLen - (*Option - Packet->Dhcp6.Option);
+  OptionLen = OptionLen - (UINT32)(*Option - Packet->Dhcp6.Option);
 
   //
   // Seek the inner option

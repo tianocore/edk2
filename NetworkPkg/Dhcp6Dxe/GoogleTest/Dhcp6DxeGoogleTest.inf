@@ -18,6 +18,7 @@
 [Sources]
   Dhcp6DxeGoogleTest.cpp
   Dhcp6IoGoogleTest.cpp
+  Dhcp6IoGoogleTest.h
   ../Dhcp6Io.c
   ../Dhcp6Utility.c
 
