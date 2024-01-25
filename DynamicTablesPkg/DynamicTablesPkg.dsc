@@ -51,6 +51,9 @@
 [Components.ARM, Components.AARCH64]
   DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
 
+[Components.AARCH64]
+  DynamicTablesPkg/Library/DynamicTablesScmiInfoLib/DynamicTablesScmiInfoLib.inf
+
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
 
