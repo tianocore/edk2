@@ -137,6 +137,14 @@ Ip6IsNDOptionValid (
     return FALSE;
   }
 
+  //
+  // Cannot process truncated options.
+  // Cannot process options with a length of 0 as there is no Type field.
+  //
+  if (OptionLen < sizeof (IP6_OPTION_HEADER)) {
+    return FALSE;
+  }
+
   Offset = 0;
 
   //
