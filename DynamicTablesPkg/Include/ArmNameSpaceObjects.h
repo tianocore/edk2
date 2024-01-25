@@ -72,6 +72,7 @@ typedef enum ArmObjectID {
   EArmObjPccSubspaceType4Info,                                 ///< 47 - Pcc Subspace Type 4 Info
   EArmObjPccSubspaceType5Info,                                 ///< 48 - Pcc Subspace Type 5 Info
   EArmObjEtInfo,                                               ///< 49 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 50 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -1326,6 +1327,15 @@ typedef enum ArmEtType {
 typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
+
+/** A structure that describes a
+    P-State Dependency (PSD) Info.
+
+    Cf. ACPI 6.5, s8.4.5.5 _PSD (P-State Dependency).
+
+    ID: EArmObjPsdInfo
+*/
+typedef AML_PSD_INFO CM_ARM_PSD_INFO;
 
 #pragma pack()
 
