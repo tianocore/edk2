@@ -1,0 +1,59 @@
+## @file
+# This standalone mm driver produce MmCommunication protocol and signal events via
+# and communicate UEFI memory map to PiSmmCpuStandaloneMm driver in EndOfDxe callback.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = MmCommunicationDxe
+  FILE_GUID                      = 8d4b8bc7-e66b-4be2-add8-4988e08743ed
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = MmCommunicationEntryPoint
+
+[Sources]
+  MmCommunicationDxe.c
+  MmCommunicationDxe.h
+  CpuMemoryManagement.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiDriverEntryPoint
+  HobLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  DxeServicesTableLib
+  UefiLib
+
+[Guids]
+  gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
+  gEfiEndOfDxeEventGroupGuid               ## CONSUMES ## Event
+  gEdkiiPiSmmCommunicationRegionTableGuid  ## CONSUMES ## SystemTable
+  gNonMmramMapGuid                         ## CONSUMES
+  gEfiEventExitBootServicesGuid
+  gMmCoreDataHobGuid
+
+[Protocols]
+  gEfiDxeSmmReadyToLockProtocolGuid        ## NOTIFY
+  gEfiMmCommunicationProtocolGuid          ## produce
+  gEfiMmCommunication2ProtocolGuid         ## PRODUCES
+  gEfiSmmAccess2ProtocolGuid
+  gEfiSmmControl2ProtocolGuid
+
+[Depex]
+  gEfiSmmAccess2ProtocolGuid AND gEfiSmmControl2ProtocolGuid
