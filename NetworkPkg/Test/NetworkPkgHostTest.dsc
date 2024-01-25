@@ -24,6 +24,7 @@
   #
   # Build HOST_APPLICATION that tests NetworkPkg
   #
+  NetworkPkg/Dhcp6Dxe/GoogleTest/Dhcp6DxeGoogleTest.inf
 
 # Despite these library classes being listed in [LibraryClasses] below, they are not needed for the host-based unit tests.
 [LibraryClasses]
