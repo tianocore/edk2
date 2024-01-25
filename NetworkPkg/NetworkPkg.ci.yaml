@@ -24,6 +24,9 @@
     "CompilerPlugin": {
         "DscPath": "NetworkPkg.dsc"
     },
+    "HostUnitTestCompilerPlugin": {
+        "DscPath": "Test/NetworkPkgHostTest.dsc"
+    },
     "CharEncodingCheck": {
         "IgnoreFiles": []
     },
@@ -35,7 +38,9 @@
             "CryptoPkg/CryptoPkg.dec"
         ],
         # For host based unit tests
-        "AcceptableDependencies-HOST_APPLICATION":[],
+        "AcceptableDependencies-HOST_APPLICATION":[
+            UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+        ],
         # For UEFI shell based apps
         "AcceptableDependencies-UEFI_APPLICATION":[
             "ShellPkg/ShellPkg.dec"
