@@ -1,13 +1,13 @@
 ## @file
-# Unit test suite for the Ip6Dxe using Google Test
+# Unit test suite for the Ip6DxeGoogleTest using Google Test
 #
 # Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 [Defines]
   INF_VERSION         = 0x00010017
-  BASE_NAME           = Ip6DxeUnitTest
-  FILE_GUID           = 4F05D17D-D3E7-4AAE-820C-576D46D2D34A
+  BASE_NAME           = Ip6DxeGoogleTest
+  FILE_GUID           = AE39981C-B7FE-41A8-A9C2-F41910477CA3
   VERSION_STRING      = 1.0
   MODULE_TYPE         = HOST_APPLICATION
 #
@@ -16,9 +16,11 @@
 #  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 [Sources]
+  ../Ip6Option.c
+  Ip6OptionGoogleTest.h
   Ip6DxeGoogleTest.cpp
   Ip6OptionGoogleTest.cpp
-  ../Ip6Option.c
+  Ip6OptionGoogleTest.h
 
 [Packages]
   MdePkg/MdePkg.dec
