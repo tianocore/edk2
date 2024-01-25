@@ -45,6 +45,49 @@ typedef struct _DHCP6_INSTANCE  DHCP6_INSTANCE;
 #define DHCP6_SERVICE_SIGNATURE   SIGNATURE_32 ('D', 'H', '6', 'S')
 #define DHCP6_INSTANCE_SIGNATURE  SIGNATURE_32 ('D', 'H', '6', 'I')
 
+//
+// For more information on DHCP options see RFC 8415, Section 21.1
+//
+// The format of DHCP options is:
+//
+//     0                   1                   2                   3
+//     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |          option-code          |           option-len          |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |                          option-data                          |
+//    |                      (option-len octets)                      |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//
+#define DHCP6_SIZE_OF_OPT_CODE  (sizeof(UINT16))
+#define DHCP6_SIZE_OF_OPT_LEN   (sizeof(UINT16))
+
+//
+// Combined size of Code and Length
+//
+#define DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN  (DHCP6_SIZE_OF_OPT_CODE + \
+                                              DHCP6_SIZE_OF_OPT_LEN)
+
+STATIC_ASSERT (
+  DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN == 4,
+  "Combined size of Code and Length must be 4 per RFC 8415"
+  );
+
+//
+// Offset to the length is just past the code
+//
+#define DHCP6_OPT_LEN_OFFSET(a)  (a + DHCP6_SIZE_OF_OPT_CODE)
+STATIC_ASSERT (
+  DHCP6_OPT_LEN_OFFSET (0) == 2,
+  "Offset of length is + 2 past start of option"
+  );
+
+#define DHCP6_OPT_DATA_OFFSET(a)  (a + DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN)
+STATIC_ASSERT (
+  DHCP6_OPT_DATA_OFFSET (0) == 4,
+  "Offset to option data should be +4 from start of option"
+  );
+
 #define DHCP6_PACKET_ALL        0
 #define DHCP6_PACKET_STATEFUL   1
 #define DHCP6_PACKET_STATELESS  2
