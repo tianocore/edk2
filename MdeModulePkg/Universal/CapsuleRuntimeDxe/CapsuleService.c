@@ -53,6 +53,9 @@ UINT32  mMaxSizeNonPopulateCapsule = 0;
                                 in runtime. The caller may resubmit the capsule prior to ExitBootServices().
   @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has not been previously called then this error indicates
                                 the capsule is compatible with this platform but there are insufficient resources to process.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 EFI_STATUS
@@ -247,6 +250,16 @@ UpdateCapsule (
                                 MaximumCapsuleSize and ResetType are undefined.
   @retval EFI_INVALID_PARAMETER MaximumCapsuleSize is NULL, or ResetTyep is NULL,
                                 Or CapsuleCount is Zero, or CapsuleImage is not valid.
+  @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has been previously called this error indicates
+                                the capsule is compatible with this platform but is not capable of
+                                being submitted or processed in runtime.
+                                The caller may resubmit the capsule prior to ExitBootServices().
+  @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has not been previously called then this error
+                                indicates the capsule is compatible with this platform but there are
+                                insufficient resources to process.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 EFI_STATUS
