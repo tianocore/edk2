@@ -320,6 +320,9 @@ EFI_STATUS
                                 map that requires a mapping.
   @retval EFI_NOT_FOUND         A virtual address was supplied for an address that is not found
                                 in the memory map.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
@@ -410,11 +413,14 @@ EFI_STATUS
                                      for the new virtual address mappings being applied.
 
   @retval EFI_SUCCESS           The pointer pointed to by Address was modified.
-  @retval EFI_INVALID_PARAMETER 1) Address is NULL.
-                                2) *Address is NULL and DebugDisposition does
-                                not have the EFI_OPTIONAL_PTR bit set.
   @retval EFI_NOT_FOUND         The pointer pointed to by Address was not found to be part
                                 of the current memory map. This is normally fatal.
+  @retval EFI_INVALID_PARAMETER Address is NULL.
+  @retval EFI_INVALID_PARAMETER *Address is NULL and DebugDisposition does
+                                not have the EFI_OPTIONAL_PTR bit set.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
@@ -679,6 +685,10 @@ VOID
   @retval EFI_INVALID_PARAMETER  The DataSize is not too small and Data is NULL.
   @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
   @retval EFI_SECURITY_VIOLATION The variable could not be retrieved due to an authentication failure.
+  @retval EFI_UNSUPPORTED        After ExitBootServices() has been called, this return code may be returned
+                                 if no variable storage is supported. The platform should describe this
+                                 runtime service as unsupported at runtime via an EFI_RT_PROPERTIES_TABLE
+                                 configuration table.
 
 **/
 typedef
@@ -715,6 +725,10 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Null-terminator is not found in the first VariableNameSize bytes of
                                 the input VariableName buffer.
   @retval EFI_DEVICE_ERROR      The variable could not be retrieved due to a hardware error.
+  @retval EFI_UNSUPPORTED       After ExitBootServices() has been called, this return code may be returned
+                                if no variable storage is supported. The platform should describe this
+                                runtime service as unsupported at runtime via an EFI_RT_PROPERTIES_TABLE
+                                configuration table.
 
 **/
 typedef
@@ -757,6 +771,9 @@ EFI_STATUS
                                  but the AuthInfo does NOT pass the validation check carried out by the firmware.
 
   @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.
+  @retval EFI_UNSUPPORTED        This call is not supported by this platform at the time the call is made.
+                                 The platform should describe this runtime service as unsupported at runtime
+                                 via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
@@ -809,6 +826,9 @@ typedef struct {
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER Time is NULL.
   @retval EFI_DEVICE_ERROR      The time could not be retrieved due to hardware error.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
@@ -826,6 +846,9 @@ EFI_STATUS
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER A time field is out of range.
   @retval EFI_DEVICE_ERROR      The time could not be set due due to hardware error.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
@@ -846,7 +869,9 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Pending is NULL.
   @retval EFI_INVALID_PARAMETER Time is NULL.
   @retval EFI_DEVICE_ERROR      The wakeup time could not be retrieved due to a hardware error.
-  @retval EFI_UNSUPPORTED       A wakeup timer is not supported on this platform.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
@@ -868,7 +893,9 @@ EFI_STATUS
                                 Enable is FALSE, then the wakeup alarm was disabled.
   @retval EFI_INVALID_PARAMETER A time field is out of range.
   @retval EFI_DEVICE_ERROR      The wakeup time could not be set due to a hardware error.
-  @retval EFI_UNSUPPORTED       A wakeup timer is not supported on this platform.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
@@ -1090,6 +1117,9 @@ EFI_STATUS
   @retval EFI_SUCCESS           The next high monotonic count was returned.
   @retval EFI_INVALID_PARAMETER HighCount is NULL.
   @retval EFI_DEVICE_ERROR      The device is not functioning properly.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
@@ -1716,6 +1746,9 @@ typedef struct {
                                 in runtime. The caller may resubmit the capsule prior to ExitBootServices().
   @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has not been previously called then this error indicates
                                 the capsule is compatible with this platform but there are insufficient resources to process.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
@@ -1747,6 +1780,9 @@ EFI_STATUS
                                 in runtime. The caller may resubmit the capsule prior to ExitBootServices().
   @retval EFI_OUT_OF_RESOURCES  When ExitBootServices() has not been previously called then this error indicates
                                 the capsule is compatible with this platform but there are insufficient resources to process.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 typedef
