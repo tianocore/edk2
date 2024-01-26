@@ -43,13 +43,16 @@
 [Packages]
   MdePkg/MdePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
   HobLib
   MemoryAllocationLib
+  MmServicesTableLib
 
 [Guids]
   gMmCoreDataHobGuid                  ## SOMETIMES_CONSUMES ## HOB
   gEfiMmPeiMmramMemoryReserveGuid     ## SOMETIMES_CONSUMES ## HOB
+  gNonMmramMapGuid

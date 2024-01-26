@@ -18,9 +18,14 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MmServicesTableLib.h>
+
+#include <Guid/NonMmramMap.h>
+#include <Library/MemoryAllocationLib.h>
 
 EFI_MMRAM_DESCRIPTOR  *mMmMemLibInternalMmramRanges;
 UINTN                 mMmMemLibInternalMmramCount;
+NON_MMRAM_MAP         *mNonMmramMap = NULL;
 
 //
 // Maximum support address used to check input buffer
@@ -73,7 +78,8 @@ MmIsBufferOutsideMmValid (
   IN UINT64                Length
   )
 {
-  UINTN  Index;
+  UINTN                Index;
+  NON_MMRAM_MAP_ENTRY  *NonMmramMapEntry;
 
   //
   // Check override.
@@ -115,6 +121,31 @@ MmIsBufferOutsideMmValid (
         mMmMemLibInternalMmramRanges[Index].PhysicalSize
         ));
       return FALSE;
+    }
+  }
+
+  if (mNonMmramMap != NULL) {
+    NonMmramMapEntry = mNonMmramMap->Entry;
+    for (Index = 0; Index < mNonMmramMap->NumberOfEntry; Index++) {
+      if (((Buffer >= NonMmramMapEntry[Index].PhysicalStart) &&
+           (Buffer < NonMmramMapEntry[Index].PhysicalStart + EFI_PAGES_TO_SIZE (NonMmramMapEntry[Index].NumberOfPages))) ||
+          ((NonMmramMapEntry[Index].PhysicalStart >= Buffer) &&
+           (NonMmramMapEntry[Index].PhysicalStart < Buffer + Length)))
+      {
+        DEBUG ((
+          DEBUG_ERROR,
+          "MmIsBufferOutsideMmValid: Overlap: Buffer (0x%lx) - Length (0x%lx), ",
+          Buffer,
+          Length
+          ));
+        DEBUG ((
+          DEBUG_ERROR,
+          "CpuStart (0x%lx) - PhysicalSize (0x%lx)\n",
+          NonMmramMapEntry[Index].PhysicalStart,
+          EFI_PAGES_TO_SIZE (NonMmramMapEntry[Index].NumberOfPages)
+          ));
+        return FALSE;
+      }
     }
   }
 
@@ -272,6 +303,44 @@ MmSetMem (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+EFIAPI
+CacheNonMmramMapMmiHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *RegisterContext,
+  IN OUT VOID        *CommBuffer,
+  IN OUT UINTN       *CommBufferSize
+  )
+{
+  UINTN          TempCommBufferSize;
+  NON_MMRAM_MAP  *NonMmramMap;
+
+  DEBUG ((DEBUG_INFO, "%a()\n", __FUNCTION__));
+
+  //
+  // If input is invalid, stop processing this SMI
+  //
+  if ((CommBuffer == NULL) || (CommBufferSize == NULL)) {
+    return EFI_SUCCESS;
+  }
+
+  TempCommBufferSize = *CommBufferSize;
+  NonMmramMap        = (NON_MMRAM_MAP *)CommBuffer;
+
+  if (TempCommBufferSize != sizeof (NonMmramMap) + NonMmramMap->NumberOfEntry * sizeof (NON_MMRAM_MAP_ENTRY)) {
+    DEBUG ((DEBUG_ERROR, "[%a] MM Communication buffer size is invalid for this handler!\n", __FUNCTION__));
+    return EFI_ACCESS_DENIED;
+  }
+
+  //
+  // Cache the Non-Mmram map from the CommonBuffer.
+  //
+  mNonMmramMap = AllocateCopyPool (TempCommBufferSize, CommBuffer);
+  ASSERT (mNonMmramMap != NULL);
+
+  return EFI_SUCCESS;
+}
+
 /**
   The constructor function initializes the Mm Mem library
 
@@ -289,6 +358,9 @@ MemLibConstructor (
   )
 {
   EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+
+  Handle = NULL;
 
   //
   // Calculate and save maximum support address
@@ -299,6 +371,12 @@ MemLibConstructor (
   // Initialize cached Mmram Ranges from HOB.
   //
   Status = MmMemLibInternalPopulateMmramRanges ();
+
+  ///
+  /// Register SMM FTW SMI handler
+  ///
+  Status = gMmst->MmiHandlerRegister (CacheNonMmramMapMmiHandler, &gNonMmramMapGuid, &Handle);
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
