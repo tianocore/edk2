@@ -2,8 +2,17 @@
   Entry point to the Standalone MM Foundation when initialized during the SEC
   phase on ARM platforms
 
-Copyright (c) 2017 - 2021, Arm Ltd. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2017 - 2024, Arm Ltd. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  @par Glossary:
+    - SpmMM - An implementation where the Secure Partition Manager resides at EL3
+              with management services running from an isolated Secure Partitions
+              at S-EL0, and the communication protocol is the Management Mode(MM)
+              interface.
+
+  @par Reference(s):
+  - Secure Partition Manager [https://trustedfirmware-a.readthedocs.io/en/latest/components/secure-partition-manager-mm.html].
 
 **/
 
@@ -113,6 +122,98 @@ GetAndPrintBootinformation (
 }
 
 /**
+  Convert EFI_STATUS to SPM_MM return code.
+
+  @param [in] Status          edk2 status code.
+
+  @retval ARM_SVC_SPM_RET_*   return value correspond to EFI_STATUS.
+
+**/
+STATIC
+UINTN
+EFIAPI
+EfiStatusToSpmMmStatus (
+  IN EFI_STATUS  Status
+  )
+{
+  switch (Status) {
+    case EFI_SUCCESS:
+      return ARM_SVC_SPM_RET_SUCCESS;
+    case EFI_INVALID_PARAMETER:
+      return ARM_SVC_SPM_RET_INVALID_PARAMS;
+    case EFI_ACCESS_DENIED:
+      return ARM_SVC_SPM_RET_DENIED;
+    case EFI_OUT_OF_RESOURCES:
+      return ARM_SVC_SPM_RET_NO_MEMORY;
+    default:
+      return ARM_SVC_SPM_RET_NOT_SUPPORTED;
+  }
+}
+
+/**
+  Convert EFI_STATUS to FFA return code.
+
+  @param [in] Status          edk2 status code.
+
+  @retval ARM_FFA_SPM_RET_*   return value correspond to EFI_STATUS.
+
+**/
+STATIC
+UINTN
+EFIAPI
+EfiStatusToFfaStatus (
+  IN EFI_STATUS  Status
+  )
+{
+  switch (Status) {
+    case EFI_SUCCESS:
+      return ARM_FFA_SPM_RET_SUCCESS;
+    case EFI_INVALID_PARAMETER:
+      return ARM_FFA_SPM_RET_INVALID_PARAMETERS;
+    case EFI_OUT_OF_RESOURCES:
+      return ARM_FFA_SPM_RET_NO_MEMORY;
+    case EFI_ALREADY_STARTED:
+      return ARM_FFA_SPM_RET_BUSY;
+    case EFI_INTERRUPT_PENDING:
+      return ARM_FFA_SPM_RET_INTERRUPTED;
+    case EFI_ACCESS_DENIED:
+      return ARM_FFA_SPM_RET_DENIED;
+    case EFI_ABORTED:
+      return ARM_FFA_SPM_RET_ABORTED;
+    default:
+      return ARM_FFA_SPM_RET_NOT_SUPPORTED;
+  }
+}
+
+/**
+  Initialise Event Complete arguments to be returned via SVC call.
+
+  @param[in]      FfaEnabled                Ffa enabled.
+  @param[in]      Status                    Result of StMm.
+  @param[out]     EventCompleteSvcArgs      Args structure.
+
+**/
+STATIC
+VOID
+SetEventCompleteSvcArgs (
+  IN BOOLEAN        FfaEnabled,
+  IN EFI_STATUS     Status,
+  OUT ARM_SVC_ARGS  *EventCompleteSvcArgs
+  )
+{
+  if (FfaEnabled) {
+    EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP;
+    EventCompleteSvcArgs->Arg1 = 0;
+    EventCompleteSvcArgs->Arg2 = 0;
+    EventCompleteSvcArgs->Arg3 = ARM_SVC_ID_SP_EVENT_COMPLETE;
+    EventCompleteSvcArgs->Arg4 = EfiStatusToFfaStatus (Status);
+  } else {
+    EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_SP_EVENT_COMPLETE;
+    EventCompleteSvcArgs->Arg1 = EfiStatusToSpmMmStatus (Status);
+  }
+}
+
+/**
   A loop to delegated events.
 
   @param  [in] EventCompleteSvcArgs   Pointer to the event completion arguments.
@@ -126,7 +227,8 @@ DelegatedEventLoop (
 {
   BOOLEAN     FfaEnabled;
   EFI_STATUS  Status;
-  UINTN       SvcStatus;
+
+  FfaEnabled = FeaturePcdGet (PcdFfaEnable);
 
   while (TRUE) {
     ArmCallSvc (EventCompleteSvcArgs);
@@ -152,7 +254,6 @@ DelegatedEventLoop (
       DEBUG ((DEBUG_ERROR, "UnRecognized Event - 0x%x\n", (UINT32)EventCompleteSvcArgs->Arg0));
       Status = EFI_INVALID_PARAMETER;
     } else {
-      FfaEnabled = FeaturePcdGet (PcdFfaEnable);
       if (FfaEnabled) {
         Status = CpuDriverEntryPoint (
                    EventCompleteSvcArgs->Arg0,
@@ -184,37 +285,7 @@ DelegatedEventLoop (
       }
     }
 
-    switch (Status) {
-      case EFI_SUCCESS:
-        SvcStatus = ARM_SVC_SPM_RET_SUCCESS;
-        break;
-      case EFI_INVALID_PARAMETER:
-        SvcStatus = ARM_SVC_SPM_RET_INVALID_PARAMS;
-        break;
-      case EFI_ACCESS_DENIED:
-        SvcStatus = ARM_SVC_SPM_RET_DENIED;
-        break;
-      case EFI_OUT_OF_RESOURCES:
-        SvcStatus = ARM_SVC_SPM_RET_NO_MEMORY;
-        break;
-      case EFI_UNSUPPORTED:
-        SvcStatus = ARM_SVC_SPM_RET_NOT_SUPPORTED;
-        break;
-      default:
-        SvcStatus = ARM_SVC_SPM_RET_NOT_SUPPORTED;
-        break;
-    }
-
-    if (FfaEnabled) {
-      EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP;
-      EventCompleteSvcArgs->Arg1 = 0;
-      EventCompleteSvcArgs->Arg2 = 0;
-      EventCompleteSvcArgs->Arg3 = ARM_SVC_ID_SP_EVENT_COMPLETE;
-      EventCompleteSvcArgs->Arg4 = SvcStatus;
-    } else {
-      EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_SP_EVENT_COMPLETE;
-      EventCompleteSvcArgs->Arg1 = SvcStatus;
-    }
+    SetEventCompleteSvcArgs (FfaEnabled, Status, EventCompleteSvcArgs);
   }
 }
 
@@ -293,32 +364,6 @@ GetSpmVersion (
 }
 
 /**
-  Initialize parameters to be sent via SVC call.
-
-  @param[out]     InitMmFoundationSvcArgs  Args structure
-  @param[out]     Ret                      Return Code
-
-**/
-STATIC
-VOID
-InitArmSvcArgs (
-  OUT ARM_SVC_ARGS  *InitMmFoundationSvcArgs,
-  OUT INT32         *Ret
-  )
-{
-  if (FeaturePcdGet (PcdFfaEnable)) {
-    InitMmFoundationSvcArgs->Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP;
-    InitMmFoundationSvcArgs->Arg1 = 0;
-    InitMmFoundationSvcArgs->Arg2 = 0;
-    InitMmFoundationSvcArgs->Arg3 = ARM_SVC_ID_SP_EVENT_COMPLETE;
-    InitMmFoundationSvcArgs->Arg4 = *Ret;
-  } else {
-    InitMmFoundationSvcArgs->Arg0 = ARM_SVC_ID_SP_EVENT_COMPLETE;
-    InitMmFoundationSvcArgs->Arg1 = *Ret;
-  }
-}
-
-/**
   The entry point of Standalone MM Foundation.
 
   @param  [in]  SharedBufAddress  Pointer to the Buffer between SPM and SP.
@@ -338,9 +383,8 @@ _ModuleEntryPoint (
 {
   PE_COFF_LOADER_IMAGE_CONTEXT    ImageContext;
   EFI_SECURE_PARTITION_BOOT_INFO  *PayloadBootInfo;
-  ARM_SVC_ARGS                    InitMmFoundationSvcArgs;
+  ARM_SVC_ARGS                    EventCompleteSvcArgs;
   EFI_STATUS                      Status;
-  INT32                           Ret;
   UINT32                          SectionHeaderOffset;
   UINT16                          NumberOfSections;
   VOID                            *HobStart;
@@ -432,17 +476,11 @@ _ModuleEntryPoint (
   DEBUG ((DEBUG_INFO, "Shared Cpu Driver EP %p\n", (VOID *)CpuDriverEntryPoint));
 
 finish:
-  if (Status == RETURN_UNSUPPORTED) {
-    Ret = -1;
-  } else if (Status == RETURN_INVALID_PARAMETER) {
-    Ret = -2;
-  } else if (Status == EFI_NOT_FOUND) {
-    Ret = -7;
-  } else {
-    Ret = 0;
-  }
-
-  ZeroMem (&InitMmFoundationSvcArgs, sizeof (InitMmFoundationSvcArgs));
-  InitArmSvcArgs (&InitMmFoundationSvcArgs, &Ret);
-  DelegatedEventLoop (&InitMmFoundationSvcArgs);
+  ZeroMem (&EventCompleteSvcArgs, sizeof (EventCompleteSvcArgs));
+  SetEventCompleteSvcArgs (
+    FeaturePcdGet (PcdFfaEnable),
+    Status,
+    &EventCompleteSvcArgs
+    );
+  DelegatedEventLoop (&EventCompleteSvcArgs);
 }
