@@ -277,6 +277,12 @@ CoreInitializePool (
   VOID
   );
 
+VOID
+CoreSetMemoryTypeInformationRange (
+  IN EFI_PHYSICAL_ADDRESS  Start,
+  IN UINT64                Length
+  );
+
 /**
   Called to initialize the memory map and add descriptors to
   the current descriptor list.
