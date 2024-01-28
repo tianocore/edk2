@@ -1,0 +1,33 @@
+## @file
+# Instance of HOB Producer Library for Standalone MM Core.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = MmHobProducerLib
+  FILE_GUID                      = DE6B5E7C-6636-4646-90F8-776408157750
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MmHobProducerLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  MmHobProducerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+
+[Guids]

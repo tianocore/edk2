@@ -60,6 +60,17 @@
   StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   VariableMmDependency|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
 
+[LibraryClasses.common.PEIM]
+  HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
+  PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+  MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+  PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+  PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+
+[LibraryClasses.X64.PEIM]
+  MmHobProducerLib|StandaloneMmPkg/Library/MmHobProducerLib/MmHobProducerLib.inf
+
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   StandaloneMmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
@@ -104,7 +115,7 @@
 #       generated for it, but the binary will not be put into any firmware volume.
 #
 ###################################################################################################
-[Components.common]
+[Components.AARCH64, Components.ARM, Components.X64]
   #
   # MM Core
   #
@@ -121,6 +132,9 @@
 [Components.AARCH64, Components.ARM]
   StandaloneMmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
   StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
+
+[Components.X64]
+  StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
 
 ###################################################################################################
 #
