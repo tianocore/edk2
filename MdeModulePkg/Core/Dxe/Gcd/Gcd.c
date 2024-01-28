@@ -2238,6 +2238,8 @@ CoreInitializeMemoryServices (
   EFI_HOB_HANDOFF_INFO_TABLE   *PhitHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceHob;
   EFI_HOB_RESOURCE_DESCRIPTOR  *PhitResourceHob;
+  EFI_HOB_RESOURCE_DESCRIPTOR  *MemoryTypeInformationResourceHob;
+  UINTN                        Count;
   EFI_PHYSICAL_ADDRESS         BaseAddress;
   UINT64                       Length;
   UINT64                       Attributes;
@@ -2289,12 +2291,47 @@ CoreInitializeMemoryServices (
   //
   // See if a Memory Type Information HOB is available
   //
-  GuidHob = GetFirstGuidHob (&gEfiMemoryTypeInformationGuid);
+  MemoryTypeInformationResourceHob = NULL;
+  GuidHob                          = GetFirstGuidHob (&gEfiMemoryTypeInformationGuid);
   if (GuidHob != NULL) {
     EfiMemoryTypeInformation = GET_GUID_HOB_DATA (GuidHob);
     DataSize                 = GET_GUID_HOB_DATA_SIZE (GuidHob);
     if ((EfiMemoryTypeInformation != NULL) && (DataSize > 0) && (DataSize <= (EfiMaxMemoryType + 1) * sizeof (EFI_MEMORY_TYPE_INFORMATION))) {
       CopyMem (&gMemoryTypeInformation, EfiMemoryTypeInformation, DataSize);
+
+      //
+      // Look for Resource Descriptor HOB with a ResourceType of System Memory
+      // and an Owner GUID of gEfiMemoryTypeInformationGuid. If more than 1 is
+      // found, then set MemoryTypeInformationResourceHob to NULL.
+      //
+      Count = 0;
+      for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
+        if (GET_HOB_TYPE (Hob) != EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+          continue;
+        }
+
+        ResourceHob = Hob.ResourceDescriptor;
+        if (!CompareGuid (&ResourceHob->Owner, &gEfiMemoryTypeInformationGuid)) {
+          continue;
+        }
+
+        Count++;
+        if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
+          continue;
+        }
+
+        if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
+          continue;
+        }
+
+        if (ResourceHob->ResourceLength >= CalculateTotalMemoryBinSizeNeeded ()) {
+          MemoryTypeInformationResourceHob = ResourceHob;
+        }
+      }
+
+      if (Count > 1) {
+        MemoryTypeInformationResourceHob = NULL;
+      }
     }
   }
 
@@ -2345,6 +2382,15 @@ CoreInitializeMemoryServices (
     Found           = TRUE;
 
     //
+    // If a Memory Type Information Resource HOB was found and is the same
+    // Resource HOB that describes the PHIT HOB, then ignore the Memory Type
+    // Information Resource HOB.
+    //
+    if (MemoryTypeInformationResourceHob == PhitResourceHob) {
+      MemoryTypeInformationResourceHob = NULL;
+    }
+
+    //
     // Compute range between PHIT EfiMemoryTop and the end of the Resource Descriptor HOB
     //
     Attributes  = PhitResourceHob->ResourceAttribute;
@@ -2387,8 +2433,9 @@ CoreInitializeMemoryServices (
   if (Length < MinimalMemorySizeNeeded) {
     //
     // Search all the resource descriptor HOBs from the highest possible addresses down for a memory
-    // region that is big enough to initialize the DXE core.  Always skip the PHIT Resource HOB.
-    // The max address must be within the physically addressible range for the processor.
+    // region that is big enough to initialize the DXE core.  Always skip the PHIT Resource HOB
+    // and the Memory Type Information Resource HOB. The max address must be within the physically
+    // addressable range for the processor.
     //
     HighAddress = MAX_ALLOC_ADDRESS;
     for (Hob.Raw = *HobStart; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
@@ -2396,6 +2443,13 @@ CoreInitializeMemoryServices (
       // Skip the Resource Descriptor HOB that contains the PHIT
       //
       if (Hob.ResourceDescriptor == PhitResourceHob) {
+        continue;
+      }
+
+      //
+      // Skip the Resource Descriptor HOB that contains Memory Type Information bins
+      //
+      if (Hob.ResourceDescriptor == MemoryTypeInformationResourceHob) {
         continue;
       }
 
@@ -2464,6 +2518,18 @@ CoreInitializeMemoryServices (
     Capabilities = CoreConvertResourceDescriptorHobAttributesToCapabilities (EfiGcdMemoryTypeMoreReliable, Attributes);
   } else {
     Capabilities = CoreConvertResourceDescriptorHobAttributesToCapabilities (EfiGcdMemoryTypeSystemMemory, Attributes);
+  }
+
+  if (MemoryTypeInformationResourceHob != NULL) {
+    //
+    // If a Memory Type Information Resource HOB was found, then use the address
+    // range of the  Memory Type Information Resource HOB as the preferred
+    // address range for the Memory Type Information bins.
+    //
+    CoreSetMemoryTypeInformationRange (
+      MemoryTypeInformationResourceHob->PhysicalStart,
+      MemoryTypeInformationResourceHob->ResourceLength
+      );
   }
 
   //
