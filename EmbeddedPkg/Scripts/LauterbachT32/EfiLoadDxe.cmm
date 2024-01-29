@@ -1,79 +1,22 @@
 ;
+; Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
 ; Copyright (c) 2011, Hewlett-Packard Company. All rights reserved.<BR>
 ; 
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ; 
 
-  LOCAL &maxmem &systbl &memsize
-  
-  &memsize=0x20000000   ; default to 512MB
-  
-  gosub FindSystemTable &memsize
-  ENTRY &systbl
-  
-  if &systbl!=0
-  (
-    print "found system table at &systbl"
-    gosub FindDebugInfo &systbl
-  )
-  else
-  (
-    print "ERROR: system table not found, check memory size"
-  )
+  PARAMETERS &systbl
+
+  gosub FindDebugInfo &systbl
   enddo
-
-FindSystemTable:
-  LOCAL   &TopOfRam &offset
-  ENTRY   &TopOfRam
-  
-  print "FindSystemTable"
-  print "top of mem is &TopOfRam$"
-  
-  &offset=&TopOfRam
-  
-  ; align to highest 4MB boundary
-  &offset=&offset&0xFFC00000
-  
-  ; start at top and look on 4MB boundaries for system table ptr structure
-  while &offset>0
-  (
-    ; low signature match
-    if Data.Long(a:&offset)==0x20494249
-    (
-      ; high signature match
-      if Data.Long(a:&offset+4)==0x54535953
-      (
-        ; less than 4GB?
-        if Data.Long(a:&offset+0x0c)==0
-        (
-          ; less than top of ram?
-          if Data.Long(a:&offset+8)<&TopOfRam
-          (
-            return Data.Long(a:&offset+8)
-          )
-        )
-      )
-    )
-   
-    if &offset<0x400000
-    (
-      return 0
-    )
-    &offset=&offset-0x400000
-  )
-  
-  return 0
-
 
 FindDebugInfo:
   LOCAL   &SystemTable &CfgTableEntries &ConfigTable &i &offset &dbghdr &dbgentries &dbgptr &dbginfo &loadedimg
   ENTRY   &SystemTable
   
-  print "FindDebugInfo"
-  
   &dbgentries=0
-  &CfgTableEntries=Data.Long(a:&SystemTable+0x40)
-  &ConfigTable=Data.Long(a:&SystemTable+0x44)
+  &CfgTableEntries=Data.Long(a:&SystemTable+0x68)
+  &ConfigTable=Data.Long(a:&SystemTable+0x70)
   
   print "config table is at &ConfigTable (&CfgTableEntries entries)"
   
@@ -82,7 +25,7 @@ FindDebugInfo:
   &i=0
   while &i<&CfgTableEntries
   (
-    &offset=&ConfigTable+(&i*0x14)
+    &offset=&ConfigTable+(&i*0x18)
     if Data.Long(a:&offset)==0x49152E77
     (
       if Data.Long(a:&offset+4)==0x47641ADA
@@ -120,8 +63,10 @@ FindDebugInfo:
     (
       if Data.Long(a:&dbginfo)==1 ; normal debug info type
       (
-        &loadedimg=Data.Long(a:&dbginfo+4)
-        do EfiProcessPeImage Data.Long(a:&loadedimg+0x20)
+        &loadedimg=Data.Long(a:&dbginfo+8)
+        &imagebaseptr=&loadedimg+0x40
+        &imagebase=Data.Long(a:&imagebaseptr)
+        do ~~~~/EfiProcessPeImage.cmm "&imagebase"
       )
     )
     &i=&i+1

@@ -1,10 +1,10 @@
 # DXE Phase Debug
-Update the memsize variable in EfiLoadDxe.cmm for the actual amount of memory
-available in your system.  Allow your system to boot to the point that the DXE
+Allow your system to boot to the point that the DXE
 core is initialized (so that the System Table and Debug Information table is
 present in memory) and execute this script (using the toolbar button or
-'do EfiLoadDxe' from the command area).  It will scan memory for the debug info
-table and load modules in it.
+'do EfiLoadDxe "0xGST_ADDRESS"' from the command area). 'GST_ADDRESS' is the
+address of the EFI_SYSTEM_TABLE, and can be found by the global `gST`.
+The script will scan memory for the debug info table and load modules in it.
 
 # SEC/PEI Phase Debug
 There is no way to autodetect where these images reside so you must pass an
