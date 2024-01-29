@@ -71,6 +71,9 @@
   BaseLib
   MemoryAllocationLib
 
+[FixedPcd]
+  gEdkiiDynamicTablesPkgTokenSpaceGuid.PcdDevelopmentPlatformRelaxations
+
 [BuildOptions]
   *_*_*_CC_FLAGS = -DAML_HANDLE
 
