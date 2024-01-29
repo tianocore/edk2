@@ -3,7 +3,7 @@
   hash handler registered, such as SHA1, SHA256.
   Platform can use PcdTpm2HashMask to mask some hash engines.
 
-Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2024, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/HashLib.h>
+#include <Protocol/Tcg2Protocol.h>
 
 #include "HashLibBaseCryptoRouterCommon.h"
 
@@ -128,6 +129,38 @@ HashUpdate (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+EFIAPI
+Tpm2ExtendNvIndex (
+  TPMI_RH_NV_INDEX  NvIndex,
+  UINT16            DataSize,
+  BYTE              *Data
+  )
+{
+  EFI_STATUS        Status;
+  TPMI_RH_NV_AUTH   AuthHandle;
+  TPM2B_MAX_BUFFER  NvExtendData;
+
+  AuthHandle = TPM_RH_PLATFORM;
+  ZeroMem (&NvExtendData, sizeof (NvExtendData));
+  CopyMem (NvExtendData.buffer, Data, DataSize);
+  NvExtendData.size = DataSize;
+  Status            = Tpm2NvExtend (
+                        AuthHandle,
+                        NvIndex,
+                        NULL,
+                        &NvExtendData
+                        );
+  if (EFI_ERROR (Status)) {
+    DEBUG (
+           (DEBUG_ERROR, "Extend TPM NV index failed, Index: 0x%x Status: %d\n",
+            NvIndex, Status)
+           );
+  }
+
+  return Status;
+}
+
 /**
   Hash sequence complete and extend to PCR.
 
@@ -149,11 +182,16 @@ HashCompleteAndExtend (
   OUT TPML_DIGEST_VALUES  *DigestList
   )
 {
-  TPML_DIGEST_VALUES  Digest;
-  HASH_HANDLE         *HashCtx;
-  UINTN               Index;
-  EFI_STATUS          Status;
-  UINT32              HashMask;
+  TPML_DIGEST_VALUES               Digest;
+  HASH_HANDLE                      *HashCtx;
+  UINTN                            Index;
+  EFI_STATUS                       Status;
+  UINT32                           HashMask;
+  TPML_DIGEST_VALUES               TcgPcrEvent2Digest;
+  EFI_TCG2_EVENT_ALGORITHM_BITMAP  TpmHashAlgorithmBitmap;
+  UINT32                           ActivePcrBanks;
+  UINT32                           *BufferPtr;
+  UINT32                           DigestListBinSize;
 
   if (mHashInterfaceCount == 0) {
     return EFI_UNSUPPORTED;
@@ -175,10 +213,29 @@ HashCompleteAndExtend (
 
   FreePool (HashCtx);
 
-  Status = Tpm2PcrExtend (
-             PcrIndex,
-             DigestList
-             );
+  if (PcrIndex <= MAX_PCR_INDEX) {
+    Status = Tpm2PcrExtend (
+               PcrIndex,
+               DigestList
+               );
+  } else {
+    Status = Tpm2GetCapabilitySupportedAndActivePcrs (&TpmHashAlgorithmBitmap, &ActivePcrBanks);
+    ASSERT_EFI_ERROR (Status);
+    ActivePcrBanks = ActivePcrBanks & mSupportedHashMaskCurrent;
+    ZeroMem (&TcgPcrEvent2Digest, sizeof (TcgPcrEvent2Digest));
+    BufferPtr         = CopyDigestListToBuffer (&TcgPcrEvent2Digest, DigestList, ActivePcrBanks);
+    DigestListBinSize = (UINT32)((UINT8 *)BufferPtr - (UINT8 *)&TcgPcrEvent2Digest);
+
+    //
+    // Extend to TPM NvIndex
+    //
+    Status = Tpm2ExtendNvIndex (
+               PcrIndex,
+               (UINT16)DigestListBinSize,
+               (BYTE *)&TcgPcrEvent2Digest
+               );
+  }
+
   return Status;
 }
 

@@ -1,7 +1,7 @@
 /** @file
   This module implements Tcg2 Protocol.
 
-Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -1230,10 +1230,25 @@ TcgDxeHashLogExtendEvent (
     //
     // Do not do TPM extend for EV_NO_ACTION
     //
-    Status = EFI_SUCCESS;
-    InitNoActionEvent (&NoActionEvent, NewEventHdr->EventSize);
-    if ((Flags & EFI_TCG2_EXTEND_ONLY) == 0) {
-      Status = TcgDxeLogHashEvent (&(NoActionEvent.Digests), NewEventHdr, NewEventData);
+    if (NewEventHdr->PCRIndex <= MAX_PCR_INDEX) {
+      Status = EFI_SUCCESS;
+      InitNoActionEvent (&NoActionEvent, NewEventHdr->EventSize);
+      if ((Flags & EFI_TCG2_EXTEND_ONLY) == 0) {
+        Status = TcgDxeLogHashEvent (&(NoActionEvent.Digests), NewEventHdr, NewEventData);
+      }
+    } else {
+      //
+      // Extend to NvIndex
+      //
+      Status = HashAndExtend (
+                 NewEventHdr->PCRIndex,
+                 HashData,
+                 (UINTN)HashDataLen,
+                 &DigestList
+                 );
+      if (!EFI_ERROR (Status)) {
+        Status = TcgDxeLogHashEvent (&DigestList, NewEventHdr, NewEventData);
+      }
     }
 
     return Status;
@@ -1317,7 +1332,7 @@ Tcg2HashLogExtendEvent (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Event->Header.PCRIndex > MAX_PCR_INDEX) {
+  if ((Event->Header.EventType != EV_NO_ACTION) && (Event->Header.PCRIndex > MAX_PCR_INDEX)) {
     return EFI_INVALID_PARAMETER;
   }
 
