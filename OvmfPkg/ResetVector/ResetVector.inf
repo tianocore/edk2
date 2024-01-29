@@ -62,5 +62,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSevLaunchSecretSize
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableBase
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuHashTableSize
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecSvsmCaaSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSnpSecretsSize
