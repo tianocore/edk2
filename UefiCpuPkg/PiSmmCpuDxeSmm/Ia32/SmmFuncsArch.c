@@ -1,12 +1,12 @@
 /** @file
   SMM CPU misc functions for Ia32 arch specific.
 
-Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 extern UINT64  gTaskGateDescriptor;
 
@@ -116,7 +116,7 @@ InitGdt (
       //
       // Setup ShadowStack for stack switch
       //
-      if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+      if ((FixedPcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
         InterruptShadowStack                       = (UINTN)(mSmmStackArrayBase + mSmmStackSize + EFI_PAGES_TO_SIZE (1) - sizeof (UINT64) + (mSmmStackSize + mSmmShadowStackSize) * Index);
         *(UINT32 *)(TssBase + TSS_IA32_SSP_OFFSET) = (UINT32)InterruptShadowStack;
       }
@@ -182,8 +182,8 @@ InitShadowStack (
 {
   UINTN  SmmShadowStackSize;
 
-  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
-    SmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmShadowStackSize)));
+  if ((FixedPcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+    SmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (FixedPcdGet32 (PcdCpuSmmShadowStackSize)));
     if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
       SmmShadowStackSize += EFI_PAGES_TO_SIZE (2);
     }

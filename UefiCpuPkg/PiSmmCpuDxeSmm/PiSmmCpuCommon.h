@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
@@ -13,20 +13,24 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define _CPU_PISMMCPUDXESMM_H_
 
 #include <PiSmm.h>
+#include <PiMm.h>
 
 #include <Protocol/SmmConfiguration.h>
 #include <Protocol/SmmCpu.h>
-#include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmCpuService.h>
 #include <Protocol/SmmMemoryAttribute.h>
 #include <Protocol/MmMp.h>
+#include <Protocol/SmmVariable.h>
 
 #include <Guid/AcpiS3Context.h>
 #include <Guid/MemoryAttributesTable.h>
 #include <Guid/PiSmmMemoryAttributesTable.h>
+#include <Guid/SmramMemoryReserve.h>
 #include <Guid/SmmBaseHob.h>
 #include <Guid/MpInformation2.h>
+#include <Guid/NonMmramMap.h>
+#include <Guid/SmmCpuFeatureInfo.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
@@ -37,10 +41,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/SmmCpuPlatformHookLib.h>
-#include <Library/SmmServicesTableLib.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/UefiLib.h>
 #include <Library/HobLib.h>
@@ -265,6 +267,9 @@ extern UINTN                 mSmmShadowStackSize;
 /// The mode of the CPU at the time an SMI occurs
 ///
 extern UINT8  mSmmSaveStateRegisterLma;
+
+extern SMM_CPU_FEATURE_INFO_HOB  *mSmmCpuFeatureInfoHob;
+extern NON_MMRAM_MAP             *mNonMmramMap;
 
 #define PAGE_TABLE_POOL_ALIGNMENT   BASE_128KB
 #define PAGE_TABLE_POOL_UNIT_SIZE   BASE_128KB
@@ -1511,5 +1516,33 @@ SmmWriteProtectReadOnlyPage (
       EnableCet (); \
     } \
   } while (FALSE)
+
+
+/**
+  This function is an abstraction layer for implementation specific Mm buffer validation routine.
+
+  @param Buffer  The buffer start address to be checked.
+  @param Length  The buffer length to be checked.
+
+  @retval TRUE  This buffer is valid per processor architecture and not overlap with SMRAM.
+  @retval FALSE This buffer is not valid per processor architecture or overlap with SMRAM.
+**/
+BOOLEAN
+IsBufferOutsideMmValid (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  );
+
+/**
+  The common Entry Point of the SMM CPU driver.
+
+  @retval EFI_SUCCESS    The common entry point is executed successfully.
+  @retval Other          Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+PiSmmCpuEntryCommon (
+  VOID
+  );
 
 #endif

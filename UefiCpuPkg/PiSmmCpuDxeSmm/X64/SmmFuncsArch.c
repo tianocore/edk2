@@ -1,12 +1,12 @@
 /** @file
   SMM CPU misc functions for x64 arch specific.
 
-Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 EFI_PHYSICAL_ADDRESS  mGdtBuffer;
 UINTN                 mGdtBufferSize;
@@ -88,7 +88,7 @@ InitGdt (
     GdtDescriptor->Bits.BaseMid  = (UINT8)((UINTN)TssBase >> 16);
     GdtDescriptor->Bits.BaseHigh = (UINT8)((UINTN)TssBase >> 24);
 
-    if ((FeaturePcdGet (PcdCpuSmmStackGuard)) || ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported)) {
+    if ((FeaturePcdGet (PcdCpuSmmStackGuard)) || ((FixedPcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported)) {
       //
       // Setup top of known good stack as IST1 for each processor.
       //
@@ -176,8 +176,8 @@ InitShadowStack (
   UINT64  *InterruptSspTable;
   UINT32  InterruptSsp;
 
-  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
-    SmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmShadowStackSize)));
+  if ((FixedPcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+    SmmShadowStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (FixedPcdGet32 (PcdCpuSmmShadowStackSize)));
     //
     // Add 1 page as known good shadow stack
     //

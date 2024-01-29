@@ -1,14 +1,14 @@
 /** @file
 Page Fault (#PF) handler for X64 processors
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 #define PAGE_TABLE_PAGES  8
 #define ACC_MAX_BIT       BIT3
@@ -208,7 +208,7 @@ SmmInitPageTable (
   //
   InitializeSpinLock (mPFLock);
 
-  mCpuSmmRestrictedMemoryAccess = PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
+  mCpuSmmRestrictedMemoryAccess = FixedPcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
   m1GPageTableSupport           = Is1GPageSupport ();
   m5LevelPagingNeeded           = Is5LevelPagingNeeded ();
   mPhysicalAddressBits          = CalculateMaximumSupportAddress (m5LevelPagingNeeded);
@@ -303,7 +303,7 @@ SmmInitPageTable (
   //
   // Additional SMM IDT initialization for SMM CET shadow stack
   //
-  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+  if ((FixedPcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
     DEBUG ((DEBUG_INFO, "Initialize IDT IST field for SMM Shadow Stack\n"));
     InitializeIdtIst (EXCEPT_IA32_PAGE_FAULT, 1);
     InitializeIdtIst (EXCEPT_IA32_MACHINE_CHECK, 1);
@@ -946,7 +946,7 @@ SmiPFHandler (
     //
     // If NULL pointer was just accessed
     //
-    if (((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) &&
+    if (((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) &&
         (PFAddress < EFI_PAGE_SIZE))
     {
       DumpCpuContext (InterruptType, SystemContext);

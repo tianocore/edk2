@@ -1,12 +1,12 @@
 /** @file
 Implementation of SMM CPU Services Protocol.
 
-Copyright (c) 2011 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 //
 // SMM CPU Service Protocol instance
@@ -98,7 +98,7 @@ SmmSwitchBsp (
   }
 
   if ((gSmmCpuPrivate->Operation[ProcessorNumber] != SmmCpuNone) ||
-      (gSmst->CurrentlyExecutingCpu == ProcessorNumber))
+      (gMmst->CurrentlyExecutingCpu == ProcessorNumber))
   {
     return EFI_UNSUPPORTED;
   }
@@ -376,7 +376,7 @@ InitializeSmmCpuServices (
 {
   EFI_STATUS  Status;
 
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &Handle,
                     &gEfiSmmCpuServiceProtocolGuid,
                     EFI_NATIVE_INTERFACE,
@@ -387,10 +387,45 @@ InitializeSmmCpuServices (
     return Status;
   }
 
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &Handle,
                     &gEdkiiSmmCpuRendezvousProtocolGuid,
                     EFI_NATIVE_INTERFACE,
+                    &mSmmCpuRendezvousService
+                    );
+  ASSERT_EFI_ERROR (Status);
+  return Status;
+}
+
+/**
+  Uninstall SMM CPU Services.
+
+  It installs EFI SMM CPU Services Protocol.
+
+  @param ImageHandle The firmware allocated handle for the EFI image.
+
+  @retval EFI_SUCCESS    EFI SMM CPU Services Protocol was installed successfully.
+**/
+EFI_STATUS
+DeinitializeSmmCpuServices (
+  IN EFI_HANDLE  Handle
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gMmst->MmUninstallProtocolInterface (
+                    Handle,
+                    &gEfiSmmCpuServiceProtocolGuid,
+                    &mSmmCpuService
+                    );
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = gMmst->MmUninstallProtocolInterface (
+                    Handle,
+                    &gEdkiiSmmCpuRendezvousProtocolGuid,
                     &mSmmCpuRendezvousService
                     );
   ASSERT_EFI_ERROR (Status);

@@ -1,7 +1,7 @@
 /** @file
 SMM profile internal header file.
 
-Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2020, AMD Incorporated. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -11,8 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define _SMM_PROFILE_INTERNAL_H_
 
 #include <Protocol/SmmReadyToLock.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/DxeServicesTableLib.h>
 #include <Library/CpuLib.h>
 #include <IndustryStandard/Acpi.h>
 
@@ -58,10 +56,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MSR_DS_AREA            0x600
 
 #define HEAP_GUARD_NONSTOP_MODE      \
-        ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT6|BIT3|BIT2)) > BIT6)
+        ((FixedPcdGet8 (PcdHeapGuardPropertyMask) & (BIT6|BIT3|BIT2)) > BIT6)
 
 #define NULL_DETECTION_NONSTOP_MODE  \
-        ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT6|BIT1)) > BIT6)
+        ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT6|BIT1)) > BIT6)
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS    Base;

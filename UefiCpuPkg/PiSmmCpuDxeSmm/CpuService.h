@@ -1,7 +1,7 @@
 /** @file
 Include file for SMM CPU Services protocol implementation.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -169,6 +169,20 @@ SmmCpuUpdate (
 **/
 EFI_STATUS
 InitializeSmmCpuServices (
+  IN EFI_HANDLE  Handle
+  );
+
+/**
+  Uninstall SMM CPU Services.
+
+  It installs EFI SMM CPU Services Protocol.
+
+  @param ImageHandle The firmware allocated handle for the EFI image.
+
+  @retval EFI_SUCCESS    EFI SMM CPU Services Protocol was installed successfully.
+**/
+EFI_STATUS
+DeinitializeSmmCpuServices (
   IN EFI_HANDLE  Handle
   );
 

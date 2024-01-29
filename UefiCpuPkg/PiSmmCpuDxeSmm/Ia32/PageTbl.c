@@ -1,14 +1,14 @@
 /** @file
 Page table manipulation functions for IA-32 processors
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 /**
   Create PageTable for SMM use.
@@ -160,7 +160,7 @@ SmiPFHandler (
     //
     // If NULL pointer was just accessed
     //
-    if (((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) &&
+    if (((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) &&
         (PFAddress < EFI_PAGE_SIZE))
     {
       DumpCpuContext (InterruptType, SystemContext);

@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 #include "SmmProfileInternal.h"
 
 UINT32  mSmmProfileCr3;
@@ -115,7 +115,7 @@ UINTN         mSplitMemRangeCount = 0;
 //
 // SMI command port.
 //
-UINT32  mSmiCommandPort;
+UINT32  mSmiCommandPort; /// TODO: get the info from SMM Communicate
 
 /**
   Disable branch trace store.
@@ -415,7 +415,7 @@ InitProtectedMemRange (
   UINTN                            NumberOfAddedDescriptors;
   UINTN                            NumberOfProtectRange;
   UINTN                            NumberOfSpliteRange;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  //EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
   UINTN                            TotalSize;
   EFI_PHYSICAL_ADDRESS             ProtectBaseAddress;
   EFI_PHYSICAL_ADDRESS             ProtectEndAddress;
@@ -428,11 +428,13 @@ InitProtectedMemRange (
   NumberOfDescriptors      = 0;
   NumberOfAddedDescriptors = mSmmCpuSmramRangeCount;
   NumberOfSpliteRange      = 0;
-  MemorySpaceMap           = NULL;
+  //MemorySpaceMap           = NULL;
 
   //
   // Get MMIO ranges from GCD and add them into protected memory ranges.
   //
+  // TODO:
+  /*
   gDS->GetMemorySpaceMap (
          &NumberOfDescriptors,
          &MemorySpaceMap
@@ -442,6 +444,7 @@ InitProtectedMemRange (
       NumberOfAddedDescriptors++;
     }
   }
+  */
 
   if (NumberOfAddedDescriptors != 0) {
     TotalSize           = NumberOfAddedDescriptors * sizeof (MEMORY_PROTECTION_RANGE) + sizeof (mProtectionMemRangeTemplate);
@@ -485,6 +488,7 @@ InitProtectedMemRange (
     //
     // Create MMIO ranges which are set to present and execution-disable.
     //
+    /*
     for (Index = 0; Index < NumberOfDescriptors; Index++) {
       if (MemorySpaceMap[Index].GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) {
         continue;
@@ -496,6 +500,7 @@ InitProtectedMemRange (
       mProtectionMemRange[NumberOfProtectRange].Nx         = TRUE;
       NumberOfProtectRange++;
     }
+    */
 
     //
     // Check and updated actual protected memory ranges count
@@ -611,7 +616,7 @@ InitPaging (
   //
   // [0, 4k] may be non-present.
   //
-  PreviousAddress = ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
+  PreviousAddress = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
 
   DEBUG ((DEBUG_INFO, "Patch page table start ...\n"));
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
@@ -689,26 +694,6 @@ InitPaging (
 }
 
 /**
-  To get system port address of the SMI Command Port in FADT table.
-
-**/
-VOID
-GetSmiCommandPort (
-  VOID
-  )
-{
-  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE  *Fadt;
-
-  Fadt = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *)EfiLocateFirstAcpiTable (
-                                                        EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE
-                                                        );
-  ASSERT (Fadt != NULL);
-
-  mSmiCommandPort = Fadt->SmiCmd;
-  DEBUG ((DEBUG_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));
-}
-
-/**
   Updates page table to make some memory ranges (like system memory) absent
   and make some memory ranges (like MMIO) present and execute disable. It also
   update 2MB-page to 4KB-page for some memory ranges.
@@ -742,21 +727,26 @@ InitSmmProfileCallBack (
   IN EFI_HANDLE      Handle
   )
 {
+  EFI_STATUS                 Status;
+  EFI_SMM_VARIABLE_PROTOCOL  *SmmProfileVariable;
+
+  //
+  // Locate SmmVariableProtocol.
+  //
+  Status = gMmst->MmLocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **)&SmmProfileVariable);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Save to variable so that SMM profile data can be found.
   //
-  gRT->SetVariable (
-         SMM_PROFILE_NAME,
-         &gEfiCallerIdGuid,
-         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-         sizeof (mSmmProfileBase),
-         &mSmmProfileBase
-         );
-
-  //
-  // Get Software SMI from FADT
-  //
-  GetSmiCommandPort ();
+  SmmProfileVariable->SmmSetVariable (
+                        SMM_PROFILE_NAME,
+                        &gEfiCallerIdGuid,
+                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                        //mSmmCpuFeatureInfoHob->SmmProfileSize,
+                        0, /// TODO, get the info from HOB
+                        &mSmmProfileBase
+                        );
 
   //
   // Initialize protected memory range for patching page table later.
@@ -776,11 +766,10 @@ InitSmmProfileInternal (
   )
 {
   EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Base;
   VOID                  *Registration;
   UINTN                 Index;
   UINTN                 MsrDsAreaSizePerCpu;
-  UINTN                 TotalSize;
+  UINTN                 SmmProfileSize;
 
   mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mMaxNumberOfCpus);
   ASSERT (mPFEntryCount != NULL);
@@ -794,28 +783,15 @@ InitSmmProfileInternal (
   ASSERT (mLastPFEntryPointer != NULL);
 
   //
-  // Allocate memory for SmmProfile below 4GB.
-  // The base address
+  // Get Smm Profile Base & Size from SMM CPU Feature Info HOB
   //
-  mSmmProfileSize = PcdGet32 (PcdCpuSmmProfileSize);
-  ASSERT ((mSmmProfileSize & 0xFFF) == 0);
-
-  if (mBtsSupported) {
-    TotalSize = mSmmProfileSize + mMsrDsAreaSize;
-  } else {
-    TotalSize = mSmmProfileSize;
-  }
-
-  Base   = 0xFFFFFFFF;
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  EFI_SIZE_TO_PAGES (TotalSize),
-                  &Base
-                  );
-  ASSERT_EFI_ERROR (Status);
-  ZeroMem ((VOID *)(UINTN)Base, TotalSize);
-  mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)Base;
+  // mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)mSmmCpuFeatureInfoHob->SmmProfileBase;
+  // SmmProfileSize  = (UINTN)mSmmCpuFeatureInfoHob->SmmProfileSize;
+  // TODO: Get the SmmProfileBase from HOBs
+  mSmmProfileBase = 0;
+  SmmProfileSize  = 0;
+  DEBUG ((DEBUG_ERROR, "SmmProfileBase = 0x%016x.\n", (UINTN)mSmmProfileBase));
+  DEBUG ((DEBUG_ERROR, "SmmProfileSize = 0x%016x.\n", (UINTN)SmmProfileSize));
 
   //
   // Initialize SMM profile data header.
@@ -838,7 +814,7 @@ InitSmmProfileInternal (
     mMsrPEBSRecord = (PEBS_RECORD **)AllocateZeroPool (sizeof (PEBS_RECORD *) * mMaxNumberOfCpus);
     ASSERT (mMsrPEBSRecord != NULL);
 
-    mMsrDsAreaBase      = (MSR_DS_AREA_STRUCT *)((UINTN)Base + mSmmProfileSize);
+    mMsrDsAreaBase      = (MSR_DS_AREA_STRUCT *)((UINTN)mSmmProfileBase + mSmmProfileSize);
     MsrDsAreaSizePerCpu = mMsrDsAreaSize / mMaxNumberOfCpus;
     mBTSRecordNumber    = (MsrDsAreaSizePerCpu - sizeof (PEBS_RECORD) * PEBS_RECORD_NUMBER - sizeof (MSR_DS_AREA_STRUCT)) / sizeof (BRANCH_TRACE_RECORD);
     for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
@@ -871,7 +847,7 @@ InitSmmProfileInternal (
   // Update SMM profile entry.
   //
   mProtectionMemRange[1].Range.Base = (EFI_PHYSICAL_ADDRESS)(UINTN)mSmmProfileBase;
-  mProtectionMemRange[1].Range.Top  = (EFI_PHYSICAL_ADDRESS)(UINTN)mSmmProfileBase + TotalSize;
+  mProtectionMemRange[1].Range.Top  = (EFI_PHYSICAL_ADDRESS)(UINTN)mSmmProfileBase + SmmProfileSize;
 
   //
   // Allocate memory reserved for creating 4KB pages.
@@ -881,7 +857,7 @@ InitSmmProfileInternal (
   //
   // Start SMM profile when SmmReadyToLock protocol is installed.
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
+  Status = gMmst->MmRegisterProtocolNotify (
                     &gEfiSmmReadyToLockProtocolGuid,
                     InitSmmProfileCallBack,
                     &Registration
@@ -905,7 +881,7 @@ CheckFeatureSupported (
   UINT32                         RegEdx;
   MSR_IA32_MISC_ENABLE_REGISTER  MiscEnableMsr;
 
-  if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
+  if ((FixedPcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
     AsmCpuid (CPUID_SIGNATURE, &RegEax, NULL, NULL, NULL);
     if (RegEax >= CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
       AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO, NULL, NULL, &RegEcx, NULL);
@@ -1360,7 +1336,7 @@ SmmProfilePFHandler (
     // Indicate it is not software SMI
     //
     SmiCommand = 0xFFFFFFFFFFFFFFFFULL;
-    for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
+    for (Index = 0; Index < gMmst->NumberOfCpus; Index++) {
       Status = SmmReadSaveState (&mSmmCpu, sizeof (IoInfo), EFI_SMM_SAVE_STATE_REGISTER_IO, Index, &IoInfo);
       if (EFI_ERROR (Status)) {
         continue;

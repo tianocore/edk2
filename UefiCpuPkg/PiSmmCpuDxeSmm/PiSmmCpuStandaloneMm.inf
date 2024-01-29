@@ -1,12 +1,9 @@
 ## @file
-# CPU SMM driver.
-#
-# This SMM driver performs SMM initialization, deploy SMM Entry Vector,
+# PiSmmCpuStandaloneMm driver.
+# This Standalone MM driver performs SMM initialization, deploy SMM Entry Vector,
 # provides CPU specific services in SMM.
 #
-# Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
-# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -14,27 +11,27 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = PiSmmCpuDxeSmm
-  MODULE_UNI_FILE                = PiSmmCpuDxeSmm.uni
-  FILE_GUID                      = A3FF0EF5-0C28-42f5-B544-8C7DE1E80014
-  MODULE_TYPE                    = DXE_SMM_DRIVER
+  BASE_NAME                      = PiSmmCpuStandaloneMm
+  MODULE_UNI_FILE                = PiSmmCpuStandaloneMm.uni
+  FILE_GUID                      = d88f894b-9287-4706-8b28-f716ae4d35c7
+  MODULE_TYPE                    = MM_STANDALONE
   VERSION_STRING                 = 1.0
-  PI_SPECIFICATION_VERSION       = 0x0001000A
-  ENTRY_POINT                    = PiCpuSmmEntry
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = PiCpuStandaloneMmEntry
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = X64
 #
 
 [Sources]
-  PiSmmCpuDxeSmm.c
+  PiSmmCpuStandaloneMm.c
   PiSmmCpuCommon.c
   PiSmmCpuCommon.h
   MpService.c
   SyncTimer.c
-  CpuS3.c
+  CpuS3StandaloneMm.c
   CpuService.c
   CpuService.h
   SmmProfile.c
@@ -46,16 +43,6 @@
   SmmMp.c
   SmmMpPerf.h
   SmmMpPerf.c
-
-[Sources.Ia32]
-  Ia32/PageTbl.c
-  Ia32/SmmFuncsArch.c
-  Ia32/SmmProfileArch.c
-  Ia32/SmmProfileArch.h
-  Ia32/SmiEntry.nasm
-  Ia32/SmiException.nasm
-  Ia32/MpFuncs.nasm
-  Ia32/Cet.nasm
 
 [Sources.X64]
   X64/PageTbl.c
@@ -71,10 +58,10 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
 
 [LibraryClasses]
-  UefiDriverEntryPoint
-  UefiRuntimeServicesTableLib
+  StandaloneMmDriverEntryPoint
   PcdLib
   DebugLib
   BaseLib
@@ -91,8 +78,6 @@
   LocalApicLib
   SmmCpuPlatformHookLib
   CpuExceptionHandlerLib
-  UefiLib
-  DxeServicesTableLib
   CpuLib
   ReportStatusCodeLib
   SmmCpuFeaturesLib
@@ -101,7 +86,7 @@
   CpuPageTableLib
   MmSaveStateLib
   SmmCpuSyncLib
-  SmmMemLib
+  MemLib
 
 [Protocols]
   gEfiSmmConfigurationProtocolGuid         ## PRODUCES
@@ -116,13 +101,11 @@
 [Guids]
   gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.
   gEdkiiPiSmmMemoryAttributesTableGuid     ## CONSUMES ## SystemTable
-  gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
   gSmmBaseHobGuid                          ## CONSUMES
   gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
   gEfiSmmSmramMemoryGuid
   gSmmCpuFeatureInfoGuid
   gNonMmramMapGuid
-
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES
@@ -136,30 +119,24 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSmmApPerfLogEnable                  ## CONSUMES
 
-[Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize                   ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize                     ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                    ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress               ## SOMETIMES_PRODUCES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable         ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmShadowStackSize               ## SOMETIMES_CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume           ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
+[FixedPcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber             ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize                          ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable              ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmShadowStackSize                    ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume                ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask        ## CONSUMES
-
-[FixedPcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmMpTokenCountPerChunk               ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess             ## CONSUMES
 
 [Depex]
   TRUE
 
-[Pcd.X64]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess        ## CONSUMES
-
 [UserExtensions.TianoCore."ExtraFiles"]
-  PiSmmCpuDxeSmmExtra.uni
+  PiSmmCpuStandaloneMmExtra.uni
+
+[BuildOptions.Common]
+  MSFT:*_*_*_CC_FLAGS = /Od /FAcs
+  MSFT:*_*_*_DLINK_FLAGS = /OPT:NOREF

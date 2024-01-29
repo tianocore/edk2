@@ -1,15 +1,16 @@
 /** @file
 
-Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 //
 // attributes for reserved memory before it is promoted to system memory
 //
+/*
 #define EFI_MEMORY_PRESENT      0x0100000000000000ULL
 #define EFI_MEMORY_INITIALIZED  0x0200000000000000ULL
 #define EFI_MEMORY_TESTED       0x0400000000000000ULL
@@ -25,7 +26,7 @@ EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *mGcdMemSpace       = NULL;
 UINTN                            mGcdMemNumberOfDesc = 0;
 
 EFI_MEMORY_ATTRIBUTES_TABLE  *mUefiMemoryAttributesTable = NULL;
-
+*/
 BOOLEAN      mIsShadowStack      = FALSE;
 BOOLEAN      m5LevelPagingNeeded = FALSE;
 PAGING_MODE  mPagingMode         = PagingModeMax;
@@ -774,9 +775,9 @@ SmmGetSystemConfigurationTable (
   ASSERT (Table != NULL);
 
   *Table = NULL;
-  for (Index = 0; Index < gSmst->NumberOfTableEntries; Index++) {
-    if (CompareGuid (TableGuid, &(gSmst->SmmConfigurationTable[Index].VendorGuid))) {
-      *Table = gSmst->SmmConfigurationTable[Index].VendorTable;
+  for (Index = 0; Index < gMmst->NumberOfTableEntries; Index++) {
+    if (CompareGuid (TableGuid, &(gMmst->MmConfigurationTable[Index].VendorGuid))) {
+      *Table = gMmst->MmConfigurationTable[Index].VendorTable;
       return EFI_SUCCESS;
     }
   }
@@ -1126,6 +1127,7 @@ SetMemMapAttributes (
   @param  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
+/*
 STATIC
 VOID
 SortMemoryMap (
@@ -1157,6 +1159,7 @@ SortMemoryMap (
     NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
   }
 }
+*/
 
 /**
   Return if a UEFI memory page should be marked as not present in SMM page table.
@@ -1170,6 +1173,7 @@ SortMemoryMap (
   @return TRUE  The memory described will be marked as not present in SMM page table.
   @return FALSE The memory described will not be marked as not present in SMM page table.
 **/
+/*
 BOOLEAN
 IsUefiPageNotPresent (
   IN EFI_MEMORY_DESCRIPTOR  *MemoryMap
@@ -1188,6 +1192,7 @@ IsUefiPageNotPresent (
       return FALSE;
   }
 }
+*/
 
 /**
   Merge continuous memory map entries whose type is
@@ -1203,6 +1208,7 @@ IsUefiPageNotPresent (
                                           it is the size of new memory map after merge.
   @param[in]       DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
+/*
 STATIC
 VOID
 MergeMemoryMapForNotPresentEntry (
@@ -1251,10 +1257,12 @@ MergeMemoryMapForNotPresentEntry (
 
   return;
 }
+*/
 
 /**
   This function caches the GCD memory map information.
 **/
+/*
 VOID
 GetGcdMemoryMap (
   VOID
@@ -1307,10 +1315,12 @@ GetGcdMemoryMap (
 
   gBS->FreePool (MemSpaceMap);
 }
+*/
 
 /**
   Get UEFI MemoryAttributesTable.
 **/
+/*
 VOID
 GetUefiMemoryAttributesTable (
   VOID
@@ -1327,10 +1337,12 @@ GetUefiMemoryAttributesTable (
     ASSERT (mUefiMemoryAttributesTable != NULL);
   }
 }
+*/
 
 /**
   This function caches the UEFI memory map information.
 **/
+/*
 VOID
 GetUefiMemoryMap (
   VOID
@@ -1398,6 +1410,7 @@ GetUefiMemoryMap (
   //
   GetUefiMemoryAttributesTable ();
 }
+*/
 
 /**
   This function sets UEFI memory attribute according to UEFI memory map.
@@ -1412,10 +1425,8 @@ SetUefiMemMapAttributes (
   )
 {
   EFI_STATUS             Status;
-  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
-  UINTN                  MemoryMapEntryCount;
   UINTN                  Index;
-  EFI_MEMORY_DESCRIPTOR  *Entry;
+  UINT64                 Attribute;
   BOOLEAN                WriteProtect;
   BOOLEAN                CetEnabled;
 
@@ -1425,82 +1436,22 @@ SetUefiMemMapAttributes (
 
   WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
-  if (mUefiMemoryMap != NULL) {
-    MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
-    MemoryMap           = mUefiMemoryMap;
-    for (Index = 0; Index < MemoryMapEntryCount; Index++) {
-      if (IsUefiPageNotPresent (MemoryMap)) {
-        Status = SmmSetMemoryAttributes (
-                   MemoryMap->PhysicalStart,
-                   EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
-                   EFI_MEMORY_RP
-                   );
-        DEBUG ((
-          DEBUG_INFO,
-          "UefiMemory protection: 0x%lx - 0x%lx %r\n",
-          MemoryMap->PhysicalStart,
-          MemoryMap->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
-          Status
-          ));
-      }
-
-      MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, mUefiDescriptorSize);
-    }
+  if (mNonMmramMap == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: mNonMmramMap is NULL!\n", __func__));
+    return;
   }
 
-  //
-  // Do not free mUefiMemoryMap, it will be checked in IsSmmCommBufferForbiddenAddress().
-  //
+  for (Index = 0; Index < mNonMmramMap->NumberOfEntry; Index++) {
 
-  //
-  // Set untested memory as not present.
-  //
-  if (mGcdMemSpace != NULL) {
-    for (Index = 0; Index < mGcdMemNumberOfDesc; Index++) {
-      Status = SmmSetMemoryAttributes (
-                 mGcdMemSpace[Index].BaseAddress,
-                 mGcdMemSpace[Index].Length,
-                 EFI_MEMORY_RP
-                 );
-      DEBUG ((
-        DEBUG_INFO,
-        "GcdMemory protection: 0x%lx - 0x%lx %r\n",
-        mGcdMemSpace[Index].BaseAddress,
-        mGcdMemSpace[Index].BaseAddress + mGcdMemSpace[Index].Length,
-        Status
-        ));
-    }
-  }
+    Attribute = mNonMmramMap->Entry[Index].Attribute;
+    ASSERT ((Attribute & (EFI_MEMORY_RP | EFI_MEMORY_RO)) != 0);
 
-  //
-  // Do not free mGcdMemSpace, it will be checked in IsSmmCommBufferForbiddenAddress().
-  //
-
-  //
-  // Set UEFI runtime memory with EFI_MEMORY_RO as not present.
-  //
-  if (mUefiMemoryAttributesTable != NULL) {
-    Entry = (EFI_MEMORY_DESCRIPTOR *)(mUefiMemoryAttributesTable + 1);
-    for (Index = 0; Index < mUefiMemoryAttributesTable->NumberOfEntries; Index++) {
-      if ((Entry->Type == EfiRuntimeServicesCode) || (Entry->Type == EfiRuntimeServicesData)) {
-        if ((Entry->Attribute & EFI_MEMORY_RO) != 0) {
-          Status = SmmSetMemoryAttributes (
-                     Entry->PhysicalStart,
-                     EFI_PAGES_TO_SIZE ((UINTN)Entry->NumberOfPages),
-                     EFI_MEMORY_RP
-                     );
-          DEBUG ((
-            DEBUG_INFO,
-            "UefiMemoryAttribute protection: 0x%lx - 0x%lx %r\n",
-            Entry->PhysicalStart,
-            Entry->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE ((UINTN)Entry->NumberOfPages),
-            Status
-            ));
-        }
-      }
-
-      Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mUefiMemoryAttributesTable->DescriptorSize);
-    }
+    Status = SmmSetMemoryAttributes (
+                mNonMmramMap->Entry[Index].PhysicalStart,
+                EFI_PAGES_TO_SIZE ((UINTN)mNonMmramMap->Entry[Index].NumberOfPages),
+                Attribute
+                );
+    ASSERT_EFI_ERROR (Status);
   }
 
   WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
@@ -1525,51 +1476,24 @@ IsSmmCommBufferForbiddenAddress (
   IN UINT64  Address
   )
 {
-  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
-  UINTN                  MemoryMapEntryCount;
+
   UINTN                  Index;
-  EFI_MEMORY_DESCRIPTOR  *Entry;
+  UINT64                 Attribute;
 
-  if (mUefiMemoryMap != NULL) {
-    MemoryMap           = mUefiMemoryMap;
-    MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
-    for (Index = 0; Index < MemoryMapEntryCount; Index++) {
-      if (IsUefiPageNotPresent (MemoryMap)) {
-        if ((Address >= MemoryMap->PhysicalStart) &&
-            (Address < MemoryMap->PhysicalStart + EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages)))
-        {
-          return TRUE;
-        }
-      }
-
-      MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, mUefiDescriptorSize);
-    }
+  if (mNonMmramMap == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: mNonMmramMap is NULL!\n", __func__));
+    ASSERT (FALSE);
+    return FALSE;
   }
 
-  if (mGcdMemSpace != NULL) {
-    for (Index = 0; Index < mGcdMemNumberOfDesc; Index++) {
-      if ((Address >= mGcdMemSpace[Index].BaseAddress) &&
-          (Address < mGcdMemSpace[Index].BaseAddress + mGcdMemSpace[Index].Length))
-      {
-        return TRUE;
-      }
-    }
-  }
+  for (Index = 0; Index < mNonMmramMap->NumberOfEntry; Index++) {
+    Attribute = mNonMmramMap->Entry[Index].Attribute;
+    ASSERT ((Attribute & (EFI_MEMORY_RP | EFI_MEMORY_RO)) != 0);
 
-  if (mUefiMemoryAttributesTable != NULL) {
-    Entry = (EFI_MEMORY_DESCRIPTOR *)(mUefiMemoryAttributesTable + 1);
-    for (Index = 0; Index < mUefiMemoryAttributesTable->NumberOfEntries; Index++) {
-      if ((Entry->Type == EfiRuntimeServicesCode) || (Entry->Type == EfiRuntimeServicesData)) {
-        if ((Entry->Attribute & EFI_MEMORY_RO) != 0) {
-          if ((Address >= Entry->PhysicalStart) &&
-              (Address < Entry->PhysicalStart + LShiftU64 (Entry->NumberOfPages, EFI_PAGE_SHIFT)))
-          {
-            return TRUE;
-          }
-
-          Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mUefiMemoryAttributesTable->DescriptorSize);
-        }
-      }
+    if ((Address >= mNonMmramMap->Entry[Index].PhysicalStart) &&
+        (Address < mNonMmramMap->Entry[Index].PhysicalStart + EFI_PAGES_TO_SIZE ((UINTN)mNonMmramMap->Entry[Index].NumberOfPages)) &&
+        ((Attribute & EFI_MEMORY_RP) != 0)) {
+      return TRUE;
     }
   }
 
@@ -1768,7 +1692,7 @@ GenSmmPageTable (
     }
   }
 
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) {
+  if ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) {
     //
     // Mark [0, 4k] as non-present
     //
@@ -1930,7 +1854,7 @@ IfReadOnlyPageTableNeeded (
   //  - SMM profile feature enabled
   //
   if (!IsRestrictedMemoryAccess () ||
-      ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
+      ((FixedPcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
       FeaturePcdGet (PcdCpuSmmProfileEnable))
   {
     if (sizeof (UINTN) == sizeof (UINT64)) {
@@ -1939,7 +1863,7 @@ IfReadOnlyPageTableNeeded (
       //
       ASSERT (
         !(IsRestrictedMemoryAccess () &&
-          (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0)
+          (FixedPcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0)
         );
 
       //

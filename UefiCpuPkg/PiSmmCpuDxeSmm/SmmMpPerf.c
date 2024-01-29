@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 #define  SMM_MP_PERF_PROCEDURE_NAME(procedure)  # procedure
 GLOBAL_REMOVE_IF_UNREFERENCED

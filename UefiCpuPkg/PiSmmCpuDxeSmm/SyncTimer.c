@@ -1,12 +1,12 @@
 /** @file
 SMM Timer feature support
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 UINT64  mTimeoutTicker = 0;
 //
@@ -33,7 +33,7 @@ InitializeSmmTimer (
 
   TimerFrequency = GetPerformanceCounterProperties (&Start, &End);
   mTimeoutTicker = DivU64x32 (
-                     MultU64x64 (TimerFrequency, PcdGet64 (PcdCpuSmmApSyncTimeout)),
+                     MultU64x64 (TimerFrequency, mSmmCpuFeatureInfoHob->CpuSmmApSyncTimeout),
                      1000 * 1000
                      );
   if (End < Start) {
