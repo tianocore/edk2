@@ -378,6 +378,57 @@ CcSvsmSnpPvalidate (
 }
 
 /**
+  Perform an RMPADJUST operation to alter the VMSA setting of a page.
+
+  Add or remove the VMSA attribute for a page.
+
+  @param[in]       Vmsa           Pointer to an SEV-ES save area page
+  @param[in]       ApicId         APIC ID associated with the VMSA
+  @param[in]       SetVmsa        Boolean indicator as to whether to set or
+                                  or clear the VMSA setting for the page
+
+  @retval  EFI_SUCCESS            RMPADJUST operation successful
+  @retval  EFI_UNSUPPORTED        Operation is not supported
+  @retval  EFI_INVALID_PARAMETER  RMPADJUST operation failed, an invalid
+                                  parameter was supplied
+
+**/
+STATIC
+EFI_STATUS
+SvsmVmsaRmpAdjust (
+  IN SEV_ES_SAVE_AREA  *Vmsa,
+  IN UINT32            ApicId,
+  IN BOOLEAN           SetVmsa
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINTN           Ret;
+
+  SvsmCallData.Caa = (SVSM_CAA *)CcSvsmSnpGetCaa ();
+
+  Function.Id.Protocol = 0;
+
+  if (SetVmsa) {
+    Function.Id.CallId = 2;
+
+    SvsmCallData.RaxIn = Function.Uint64;
+    SvsmCallData.RcxIn = (UINT64)(UINTN)Vmsa;
+    SvsmCallData.RdxIn = (UINT64)(UINTN)Vmsa + SIZE_4KB;
+    SvsmCallData.R8In  = ApicId;
+  } else {
+    Function.Id.CallId = 3;
+
+    SvsmCallData.RaxIn = Function.Uint64;
+    SvsmCallData.RcxIn = (UINT64)(UINTN)Vmsa;
+  }
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+
+  return (Ret == 0) ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
+}
+
+/**
   Perform a native RMPADJUST operation to alter the VMSA setting of a page.
 
   Add or remove the VMSA attribute for a page.
@@ -444,5 +495,6 @@ CcSvsmSnpVmsaRmpAdjust (
   IN BOOLEAN           SetVmsa
   )
 {
-  return BaseVmsaRmpAdjust (Vmsa, SetVmsa);
+  return CcSvsmIsSvsmPresent () ? SvsmVmsaRmpAdjust (Vmsa, ApicId, SetVmsa)
+                                : BaseVmsaRmpAdjust (Vmsa, SetVmsa);
 }
