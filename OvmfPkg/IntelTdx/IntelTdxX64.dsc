@@ -215,6 +215,7 @@
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   CcExitLib|OvmfPkg/Library/CcExitLib/CcExitLib.inf
+  CcSvsmLib|UefiCpuPkg/Library/CcSvsmLibNull/CcSvsmLibNull.inf
   TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
   TdxMailboxLib|OvmfPkg/Library/TdxMailboxLib/TdxMailboxLib.inf
   PlatformInitLib|OvmfPkg/Library/PlatformInitLib/PlatformInitLib.inf

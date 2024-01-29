@@ -234,6 +234,7 @@
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
+  CcSvsmLib|UefiCpuPkg/Library/CcSvsmLibNull/CcSvsmLibNull.inf
   TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
 
 [LibraryClasses.common.SEC]

@@ -242,6 +242,7 @@
 [LibraryClasses.common]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   CcExitLib|OvmfPkg/Library/CcExitLib/CcExitLib.inf
+  CcSvsmLib|OvmfPkg/Library/CcSvsmLib/CcSvsmLib.inf
   SerialPortLib|MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
   PlatformHookLib|MdeModulePkg/Library/BasePlatformHookLibNull/BasePlatformHookLibNull.inf
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
