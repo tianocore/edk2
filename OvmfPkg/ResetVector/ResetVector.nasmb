@@ -40,6 +40,10 @@
   %include "Port80Debug.asm"
 %elifdef DEBUG_SERIAL
   %include "SerialDebug.asm"
+%elif 0
+; Set ^ this to 1 to enable postcodes on the qemu debug console.
+; Disabled by default because it is incompatible with SEV-ES/SEV-SNP and TDX.
+  %include "QemuDebugCon.asm"
 %else
   %include "DebugDisabled.asm"
 %endif
