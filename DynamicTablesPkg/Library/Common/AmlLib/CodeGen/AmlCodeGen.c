@@ -3532,6 +3532,29 @@ AmlCreateCpcNode (
     return EFI_INVALID_PARAMETER;
   }
 
+  /// The following fields are theoretically mandatory, but not supported
+  /// by some platforms.
+  /// - PerformanceLimitedRegister
+  /// - ReferencePerformanceCounterRegister
+  /// - DeliveredPerformanceCounterRegister
+  /// Warn if BIT0 in PcdDevelopmentPlatformRelaxations is set, otherwise
+  /// return an error.
+  if (IsNullGenericAddress (&CpcInfo->PerformanceLimitedRegister) ||
+      IsNullGenericAddress (&CpcInfo->ReferencePerformanceCounterRegister) ||
+      IsNullGenericAddress (&CpcInfo->DeliveredPerformanceCounterRegister))
+  {
+    if ((PcdGet64 (PcdDevelopmentPlatformRelaxations) & BIT0) != 0) {
+      DEBUG ((
+        DEBUG_WARN,
+        "Missing PerformanceLimited|ReferencePerformanceCounter|"
+        "DeliveredPerformanceCounter field in _CPC object\n"
+        ));
+    } else {
+      ASSERT (0);
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
   if ((IsNullGenericAddress (&CpcInfo->HighestPerformanceBuffer) &&
        (CpcInfo->HighestPerformanceInteger == 0)) ||
       (IsNullGenericAddress (&CpcInfo->NominalPerformanceBuffer) &&
@@ -3540,10 +3563,7 @@ AmlCreateCpcNode (
        (CpcInfo->LowestNonlinearPerformanceInteger == 0)) ||
       (IsNullGenericAddress (&CpcInfo->LowestPerformanceBuffer) &&
        (CpcInfo->LowestPerformanceInteger == 0)) ||
-      IsNullGenericAddress (&CpcInfo->DesiredPerformanceRegister) ||
-      IsNullGenericAddress (&CpcInfo->ReferencePerformanceCounterRegister) ||
-      IsNullGenericAddress (&CpcInfo->DeliveredPerformanceCounterRegister) ||
-      IsNullGenericAddress (&CpcInfo->PerformanceLimitedRegister))
+      IsNullGenericAddress (&CpcInfo->DesiredPerformanceRegister))
   {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
