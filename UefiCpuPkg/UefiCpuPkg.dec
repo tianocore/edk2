@@ -2,7 +2,7 @@
 # This Package provides UEFI compatible CPU modules and libraries.
 #
 # Copyright (c) 2007 - 2023, Intel Corporation. All rights reserved.<BR>
-# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -51,6 +51,9 @@
 
   ##  @libraryclass  Provides function to support CcExit processing.
   CcExitLib|Include/Library/CcExitLib.h
+
+  ##  @libraryclass  Provides function to support CcSvsm processing.
+  CcSvsmLib|Include/Library/CcSvsmLib.h
 
   ##  @libraryclass  Provides function to get CPU cache information.
   CpuCacheInfoLib|Include/Library/CpuCacheInfoLib.h

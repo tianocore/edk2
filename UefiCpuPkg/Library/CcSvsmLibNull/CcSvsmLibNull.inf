@@ -1,0 +1,27 @@
+## @file
+#  CcSvsm Base Support Library.
+#
+#  Copyright (C) 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = CcSvsmLibNull
+  MODULE_UNI_FILE                = CcSvsmLibNull.uni
+  FILE_GUID                      = 62b45e0f-c9b4-45ce-a5b3-41762709b3d9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CcSvsmLib
+
+[Sources.common]
+  CcSvsmLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+

@@ -2,7 +2,7 @@
 #  UefiCpuPkg Package
 #
 #  Copyright (c) 2007 - 2023, Intel Corporation. All rights reserved.<BR>
-#  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -61,6 +61,7 @@
   PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
+  CcSvsmLib|UefiCpuPkg/Library/CcSvsmLibNull/CcSvsmLibNull.inf
   MicrocodeLib|UefiCpuPkg/Library/MicrocodeLib/MicrocodeLib.inf
   SmmCpuRendezvousLib|UefiCpuPkg/Library/SmmCpuRendezvousLib/SmmCpuRendezvousLib.inf
   CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
@@ -159,6 +160,7 @@
   UefiCpuPkg/Library/SmmCpuFeaturesLib/StandaloneMmCpuFeaturesLib.inf
   UefiCpuPkg/Library/SmmCpuSyncLib/SmmCpuSyncLib.inf
   UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
+  UefiCpuPkg/Library/CcSvsmLibNull/CcSvsmLibNull.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
   UefiCpuPkg/SecCore/SecCore.inf
