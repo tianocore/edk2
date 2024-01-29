@@ -2,7 +2,7 @@
 
   SEV-SNP Page Validation functions.
 
-  Copyright (c) 2021 AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2021 - 2024, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -78,7 +78,9 @@ PvalidateRange (
   IN  BOOLEAN                     Validate
   )
 {
-  UINTN                 RmpPageSize, Ret, i;
+  UINTN                 RmpPageSize;
+  UINTN                 Index;
+  UINTN                 Ret;
   EFI_PHYSICAL_ADDRESS  Address;
 
   for ( ; StartIndex <= EndIndex; StartIndex++) {
@@ -96,7 +98,7 @@ PvalidateRange (
     // the RMP entry is 4K and we are validating it as a 2MB.
     //
     if ((Ret == PVALIDATE_RET_SIZE_MISMATCH) && (RmpPageSize == PvalidatePageSize2MB)) {
-      for (i = 0; i < PAGES_PER_LARGE_ENTRY; i++) {
+      for (Index = 0; Index < PAGES_PER_LARGE_ENTRY; Index++) {
         Ret = AsmPvalidate (PvalidatePageSize4K, Validate, Address);
         if (Ret) {
           break;
@@ -135,18 +137,19 @@ BuildPageStateBuffer (
   )
 {
   EFI_PHYSICAL_ADDRESS  NextAddress;
-  UINTN                 i, RmpPageSize;
+  UINTN                 RmpPageSize;
+  UINTN                 Index;
 
   // Clear the page state structure
   SetMem (Info, sizeof (*Info), 0);
 
-  i           = 0;
+  Index       = 0;
   NextAddress = EndAddress;
 
   //
   // Populate the page state entry structure
   //
-  while ((BaseAddress < EndAddress) && (i < SNP_PAGE_STATE_MAX_ENTRY)) {
+  while ((BaseAddress < EndAddress) && (Index < SNP_PAGE_STATE_MAX_ENTRY)) {
     //
     // Is this a 2MB aligned page? Check if we can use the Large RMP entry.
     //
@@ -160,14 +163,14 @@ BuildPageStateBuffer (
       NextAddress = BaseAddress + EFI_PAGE_SIZE;
     }
 
-    Info->Entry[i].GuestFrameNumber = BaseAddress >> EFI_PAGE_SHIFT;
-    Info->Entry[i].PageSize         = RmpPageSize;
-    Info->Entry[i].Operation        = MemoryStateToGhcbOp (State);
-    Info->Entry[i].CurrentPage      = 0;
-    Info->Header.EndEntry           = (UINT16)i;
+    Info->Entry[Index].GuestFrameNumber = BaseAddress >> EFI_PAGE_SHIFT;
+    Info->Entry[Index].PageSize         = RmpPageSize;
+    Info->Entry[Index].Operation        = MemoryStateToGhcbOp (State);
+    Info->Entry[Index].CurrentPage      = 0;
+    Info->Header.EndEntry               = (UINT16)Index;
 
     BaseAddress = NextAddress;
-    i++;
+    Index++;
   }
 
   return NextAddress;
