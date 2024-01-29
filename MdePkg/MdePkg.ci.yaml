@@ -71,6 +71,7 @@
             "Include/IndustryStandard/Tpm20.h",
             "Include/IndustryStandard/IoRemappingTable.h",
             "Include/IndustryStandard/UefiTcgPlatform.h",
+            "Include/IndustryStandard/Spdm.h",
             "Include/Library/PcdLib.h",
             "Include/Library/SafeIntLib.h",
             "Include/Protocol/DebugSupport.h",
