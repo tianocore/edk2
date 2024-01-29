@@ -44,6 +44,9 @@ STATIC NON_VOLATILE_TIME_SETTINGS  mTimeSettings;
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER Time is NULL.
   @retval EFI_DEVICE_ERROR      The time could not be retrieved due to hardware error.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 EFI_STATUS
@@ -75,6 +78,9 @@ GetTime (
   @retval EFI_SUCCESS           The operation completed successfully.
   @retval EFI_INVALID_PARAMETER A time field is out of range.
   @retval EFI_DEVICE_ERROR      The time could not be set due to hardware error.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 EFI_STATUS
@@ -132,6 +138,9 @@ SetTime (
   @retval EFI_SUCCESS           The alarm settings were returned.
   @retval EFI_INVALID_PARAMETER Any parameter is NULL.
   @retval EFI_DEVICE_ERROR      The wakeup time could not be retrieved due to a hardware error.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 EFI_STATUS
@@ -166,7 +175,9 @@ GetWakeupTime (
                                 Enable is FALSE, then the wakeup alarm was disabled.
   @retval EFI_INVALID_PARAMETER A time field is out of range.
   @retval EFI_DEVICE_ERROR      The wakeup time could not be set due to a hardware error.
-  @retval EFI_UNSUPPORTED       A wakeup timer is not supported on this platform.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 EFI_STATUS
