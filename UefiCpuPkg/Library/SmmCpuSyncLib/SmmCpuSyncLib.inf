@@ -13,7 +13,7 @@
   BASE_NAME                      = SmmCpuSyncLib
   FILE_GUID                      = 1ca1bc1a-16a4-46ef-956a-ca500fd3381f
   MODULE_TYPE                    = DXE_SMM_DRIVER
-  LIBRARY_CLASS                  = SmmCpuSyncLib|DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = SmmCpuSyncLib|DXE_SMM_DRIVER MM_STANDALONE
 
 [Sources]
   SmmCpuSyncLib.c
