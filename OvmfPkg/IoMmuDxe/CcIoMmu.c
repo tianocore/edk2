@@ -5,7 +5,7 @@
   operations must be performed on unencrypted buffer hence we use a bounce
   buffer to map the guest buffer into an unencrypted DMA buffer.
 
-  Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+  Copyright (c) 2017 - 2024, AMD Inc. All rights reserved.<BR>
   Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -751,7 +751,58 @@ IoMmuSetAttribute (
   IN UINT64                IoMmuAccess
   )
 {
-  return EFI_UNSUPPORTED;
+  MAP_INFO    *MapInfo;
+  EFI_STATUS  Status;
+
+  DEBUG ((DEBUG_VERBOSE, "%a: Mapping=0x%p Access=%lu\n", __func__, Mapping, IoMmuAccess));
+
+  if (Mapping == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = EFI_SUCCESS;
+
+  //
+  // An IoMmuAccess value of 0 is always accepted, validate any non-zero value.
+  //
+  if (IoMmuAccess != 0) {
+    MapInfo = (MAP_INFO *)Mapping;
+
+    //
+    // The mapping operation already implied the access mode. Validate that
+    // the supplied access mode matches operation access mode.
+    //
+    switch (MapInfo->Operation) {
+      case EdkiiIoMmuOperationBusMasterRead:
+      case EdkiiIoMmuOperationBusMasterRead64:
+        if (IoMmuAccess != EDKII_IOMMU_ACCESS_READ) {
+          Status = EFI_INVALID_PARAMETER;
+        }
+
+        break;
+
+      case EdkiiIoMmuOperationBusMasterWrite:
+      case EdkiiIoMmuOperationBusMasterWrite64:
+        if (IoMmuAccess != EDKII_IOMMU_ACCESS_WRITE) {
+          Status = EFI_INVALID_PARAMETER;
+        }
+
+        break;
+
+      case EdkiiIoMmuOperationBusMasterCommonBuffer:
+      case EdkiiIoMmuOperationBusMasterCommonBuffer64:
+        if (IoMmuAccess != (EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE)) {
+          Status = EFI_INVALID_PARAMETER;
+        }
+
+        break;
+
+      default:
+        Status = EFI_UNSUPPORTED;
+    }
+  }
+
+  return Status;
 }
 
 EDKII_IOMMU_PROTOCOL  mIoMmu = {
