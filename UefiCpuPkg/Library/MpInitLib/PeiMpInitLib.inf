@@ -53,6 +53,7 @@
   PeiServicesLib
   PcdLib
   CcExitLib
+  CcSvsmLib
   MicrocodeLib
 
 [Pcd]
