@@ -257,7 +257,7 @@ S3BootScriptEventCallBack (
     //
     // Save BootScript data to lockbox
     //
-    SaveBootScriptDataToLockBox ();
+    //SaveBootScriptDataToLockBox ();
   }
 }
 
