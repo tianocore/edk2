@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/UefiLib.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
 
@@ -44,14 +45,28 @@ SmmCommunicationBufferEntryPoint (
   UINT32                                   DescriptorSize;
   EDKII_PI_SMM_COMMUNICATION_REGION_TABLE  *PiSmmCommunicationRegionTable;
   EFI_MEMORY_DESCRIPTOR                    *Entry;
+  EFI_PEI_HOB_POINTERS                     HobList;
+  EFI_HOB_MEMORY_ALLOCATION                *Hob;
+  EFI_PHYSICAL_ADDRESS                     CommunicateBuffer;
 
-  DescriptorSize = sizeof (EFI_MEMORY_DESCRIPTOR);
+  DescriptorSize    = sizeof (EFI_MEMORY_DESCRIPTOR);
+  CommunicateBuffer = 0;
+
   //
   // Make sure Size != sizeof(EFI_MEMORY_DESCRIPTOR). This will
   // prevent people from having pointer math bugs in their code.
   // now you have to use *DescriptorSize to make things work.
   //
   DescriptorSize += sizeof (UINT64) - (DescriptorSize % sizeof (UINT64));
+
+  HobList.Raw = GetHobList ();
+  while ((Hob = (EFI_HOB_MEMORY_ALLOCATION *)(UINTN)GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, HobList.Raw)) != NULL) {
+    if (CompareGuid (&(Hob->AllocDescriptor.Name), &gMmCommunicationBufferGuid) && (Hob->AllocDescriptor.MemoryType == EfiReservedMemoryType)) {
+      CommunicateBuffer = Hob->AllocDescriptor.MemoryBaseAddress;
+    }
+
+    HobList.Raw = GET_NEXT_HOB (HobList);
+  }
 
   //
   // Allocate and fill PiSmmCommunicationRegionTable
@@ -65,7 +80,13 @@ SmmCommunicationBufferEntryPoint (
   PiSmmCommunicationRegionTable->DescriptorSize  = DescriptorSize;
   Entry                                          = (EFI_MEMORY_DESCRIPTOR *)(PiSmmCommunicationRegionTable + 1);
   Entry->Type                                    = EfiConventionalMemory;
-  Entry->PhysicalStart                           = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedPages (DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES);
+
+  if (CommunicateBuffer == 0) {
+    Entry->PhysicalStart = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedPages (DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES);
+  } else {
+    Entry->PhysicalStart = CommunicateBuffer;
+  }
+
   ASSERT (Entry->PhysicalStart != 0);
   Entry->VirtualStart  = 0;
   Entry->NumberOfPages = DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES;

@@ -47,6 +47,7 @@
 
 [Guids]
   gEdkiiPiSmmCommunicationRegionTableGuid     ## PRODUCES   ## SystemTable
+  gMmCommunicationBufferGuid                  ## CONSUMES
 
 [Depex]
   TRUE
