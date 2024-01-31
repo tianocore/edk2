@@ -774,7 +774,7 @@ AmlSetPkgLength (
   // Write to the Buffer.
   *Buffer       = LeadByte;
   CurrentOffset = 1;
-  while (CurrentOffset < (Offset + 1)) {
+  while (CurrentOffset < (Offset + (UINT8)1)) {
     CurrentShift              = (UINT8)((CurrentOffset - 1) * 8);
     ComputedLength            = Length & (UINT32)(0x00000FF0 << CurrentShift);
     ComputedLength            = (ComputedLength) >> (4 + CurrentShift);
