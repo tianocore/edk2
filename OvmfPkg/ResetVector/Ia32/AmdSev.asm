@@ -158,6 +158,11 @@ SevClearPageEncMaskForGhcbPage:
     cmp       byte[WORK_AREA_GUEST_TYPE], 1
     jnz       SevClearPageEncMaskForGhcbPageExit
 
+    ; Clear exception handlers and stack
+    mov       eax, ADDR_OF(IdtrClear)
+    lidt      [cs:eax]
+    mov       esp, 0
+
     ; Check if SEV-ES is enabled
     mov       ecx, 1
     bt        [SEV_ES_WORK_AREA_STATUS_MSR], ecx
@@ -332,7 +337,6 @@ NoSevEsVcHlt:
 NoSevPass:
     xor       eax, eax
 
-SevExit:
     ;
     ; Clear exception handlers and stack
     ;
@@ -342,6 +346,7 @@ SevExit:
     pop       eax
     mov       esp, 0
 
+SevExit:
     OneTimeCallRet CheckSevFeatures
 
 ; Start of #VC exception handling routines
