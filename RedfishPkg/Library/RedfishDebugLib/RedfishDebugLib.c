@@ -13,6 +13,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/RedfishDebugLib.h>
+#include <Library/RedfishHttpLib.h>
 #include <Library/UefiLib.h>
 
 #ifndef IS_EMPTY_STRING
