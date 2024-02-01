@@ -11,9 +11,9 @@
 #define REDFISH_DEBUG_LIB_H_
 
 #include <Uefi.h>
+#include <RedfishServiceData.h>
 #include <Library/HiiUtilityLib.h>
 #include <Library/JsonLib.h>
-#include <Library/RedfishLib.h>
 
 #include <Protocol/EdkIIRedfishPlatformConfig.h>
 
