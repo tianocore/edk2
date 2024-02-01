@@ -157,8 +157,11 @@
   # set to EFI_REST_EX_PROTOCOL.
   #
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishSendReceiveTimeout|5000|UINT32|0x00001009
-  ## This is used to enable HTTP content encoding on Redfish communication.
-  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceContentEncoding|TRUE|BOOLEAN|0x0000100A
+  #
+  # This PCD string is introduced for platform developer to set the encoding method supported by BMC Redfish.
+  # Currently only "None" and "gzip" are supported.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceContentEncoding|"None"|VOID*|0x0000100A
   #
   # Use below PCDs to control Redfhs HTTP protocol.
   #

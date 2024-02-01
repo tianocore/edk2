@@ -1,0 +1,73 @@
+## @file
+#  RedfishHttpDxe is the DXE driver which provides
+#  EdkIIRedfishHttpProtocol to EDK2 Redfish Feature
+#  drivers for HTTP operation.
+#
+#  Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001000b
+  BASE_NAME                      = RedfishHttpDxe
+  FILE_GUID                      = 85ADB2F1-DA93-47D4-AF4F-3D920D9BD2C0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RedfishHttpEntryPoint
+  UNLOAD_IMAGE                   = RedfishHttpDriverUnload
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64
+#
+
+[Sources]
+  RedfishHttpData.c
+  RedfishHttpData.h
+  RedfishHttpDxe.c
+  RedfishHttpDxe.h
+  RedfishHttpOperation.c
+  RedfishHttpOperation.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  RedfishPkg/RedfishPkg.dec
+
+[LibraryClasses.ARM]
+  ArmSoftFloatLib
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  RedfishContentCodingLib
+  DebugLib
+  HttpLib
+  JsonLib
+  MemoryAllocationLib
+  PrintLib
+  RedfishDebugLib
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEdkIIRedfishHttpProtocolGuid             ## PRODUCED
+  gEdkIIRedfishCredentialProtocolGuid       ## CONSUMES
+  gEfiRestExProtocolGuid                    ## CONSUEMS
+
+[Pcd]
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpGetRetry
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpPutRetry
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpPatchRetry
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpPostRetry
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpDeleteRetry
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpRetryWaitInSecond
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpCacheDisabled
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceContentEncoding
+
+[Depex]
+  TRUE
