@@ -70,6 +70,7 @@
 #ifndef REDFISH_LIB_H_
 #define REDFISH_LIB_H_
 
+#include <RedfishServiceData.h>
 #include <Library/JsonLib.h>
 
 #include <Protocol/Http.h>
@@ -77,22 +78,6 @@
 
 #define ODATA_TYPE_NAME_MAX_SIZE  128
 #define ODATA_TYPE_MAX_SIZE       128
-
-///
-/// Library class public defines
-///
-typedef  VOID  *REDFISH_SERVICE;
-typedef  VOID  *REDFISH_PAYLOAD;
-
-///
-/// Library class public structures/unions
-///
-typedef struct {
-  EFI_HTTP_STATUS_CODE    *StatusCode;
-  UINTN                   HeaderCount;
-  EFI_HTTP_HEADER         *Headers;
-  REDFISH_PAYLOAD         Payload;
-} REDFISH_RESPONSE;
 
 ///
 /// Odata type-name mapping structure.
