@@ -831,10 +831,19 @@ Done:
                                      data, this value contains the required size.
   @param[out]     Data               Data pointer.
 
-  @retval EFI_INVALID_PARAMETER      Invalid parameter.
-  @retval EFI_SUCCESS                Find the specified variable.
-  @retval EFI_NOT_FOUND              Not found.
-  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+  @retval EFI_SUCCESS                The function completed successfully.
+  @retval EFI_NOT_FOUND              The variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL       The DataSize is too small for the result.
+  @retval EFI_INVALID_PARAMETER      VariableName is NULL.
+  @retval EFI_INVALID_PARAMETER      VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER      DataSize is NULL.
+  @retval EFI_INVALID_PARAMETER      The DataSize is not too small and Data is NULL.
+  @retval EFI_DEVICE_ERROR           The variable could not be retrieved due to a hardware error.
+  @retval EFI_SECURITY_VIOLATION     The variable could not be retrieved due to an authentication failure.
+  @retval EFI_UNSUPPORTED            After ExitBootServices() has been called, this return code may be returned
+                                     if no variable storage is supported. The platform should describe this
+                                     runtime service as unsupported at runtime via an EFI_RT_PROPERTIES_TABLE
+                                     configuration table.
 
 **/
 EFI_STATUS
@@ -876,10 +885,22 @@ RuntimeServiceGetVariable (
   @param[in, out] VariableName       Pointer to variable name.
   @param[in, out] VendorGuid         Variable Vendor Guid.
 
-  @retval EFI_INVALID_PARAMETER      Invalid parameter.
-  @retval EFI_SUCCESS                Find the specified variable.
-  @retval EFI_NOT_FOUND              Not found.
-  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+  @retval EFI_SUCCESS                The function completed successfully.
+  @retval EFI_NOT_FOUND              The next variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL       The VariableNameSize is too small for the result.
+                                     VariableNameSize has been updated with the size needed to complete the request.
+  @retval EFI_INVALID_PARAMETER      VariableNameSize is NULL.
+  @retval EFI_INVALID_PARAMETER      VariableName is NULL.
+  @retval EFI_INVALID_PARAMETER      VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER      The input values of VariableName and VendorGuid are not a name and
+                                     GUID of an existing variable.
+  @retval EFI_INVALID_PARAMETER      Null-terminator is not found in the first VariableNameSize bytes of
+                                     the input VariableName buffer.
+  @retval EFI_DEVICE_ERROR           The variable could not be retrieved due to a hardware error.
+  @retval EFI_UNSUPPORTED            After ExitBootServices() has been called, this return code may be returned
+                                     if no variable storage is supported. The platform should describe this
+                                     runtime service as unsupported at runtime via an EFI_RT_PROPERTIES_TABLE
+                                     configuration table.
 
 **/
 EFI_STATUS
@@ -951,10 +972,22 @@ GetNextVariableNameInRuntimeCache (
   @param[in, out] VariableName       Pointer to variable name.
   @param[in, out] VendorGuid         Variable Vendor Guid.
 
-  @retval EFI_INVALID_PARAMETER      Invalid parameter.
-  @retval EFI_SUCCESS                Find the specified variable.
-  @retval EFI_NOT_FOUND              Not found.
-  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+  @retval EFI_SUCCESS                The function completed successfully.
+  @retval EFI_NOT_FOUND              The next variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL       The VariableNameSize is too small for the result.
+                                     VariableNameSize has been updated with the size needed to complete the request.
+  @retval EFI_INVALID_PARAMETER      VariableNameSize is NULL.
+  @retval EFI_INVALID_PARAMETER      VariableName is NULL.
+  @retval EFI_INVALID_PARAMETER      VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER      The input values of VariableName and VendorGuid are not a name and
+                                     GUID of an existing variable.
+  @retval EFI_INVALID_PARAMETER      Null-terminator is not found in the first VariableNameSize bytes of
+                                     the input VariableName buffer.
+  @retval EFI_DEVICE_ERROR           The variable could not be retrieved due to a hardware error.
+  @retval EFI_UNSUPPORTED            After ExitBootServices() has been called, this return code may be returned
+                                     if no variable storage is supported. The platform should describe this
+                                     runtime service as unsupported at runtime via an EFI_RT_PROPERTIES_TABLE
+                                     configuration table.
 
 **/
 EFI_STATUS
@@ -1052,10 +1085,22 @@ Done:
   @param[in, out] VariableName       Pointer to variable name.
   @param[in, out] VendorGuid         Variable Vendor Guid.
 
-  @retval EFI_INVALID_PARAMETER      Invalid parameter.
-  @retval EFI_SUCCESS                Find the specified variable.
-  @retval EFI_NOT_FOUND              Not found.
-  @retval EFI_BUFFER_TO_SMALL        DataSize is too small for the result.
+  @retval EFI_SUCCESS                The function completed successfully.
+  @retval EFI_NOT_FOUND              The next variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL       The VariableNameSize is too small for the result.
+                                     VariableNameSize has been updated with the size needed to complete the request.
+  @retval EFI_INVALID_PARAMETER      VariableNameSize is NULL.
+  @retval EFI_INVALID_PARAMETER      VariableName is NULL.
+  @retval EFI_INVALID_PARAMETER      VendorGuid is NULL.
+  @retval EFI_INVALID_PARAMETER      The input values of VariableName and VendorGuid are not a name and
+                                     GUID of an existing variable.
+  @retval EFI_INVALID_PARAMETER      Null-terminator is not found in the first VariableNameSize bytes of
+                                     the input VariableName buffer.
+  @retval EFI_DEVICE_ERROR           The variable could not be retrieved due to a hardware error.
+  @retval EFI_UNSUPPORTED            After ExitBootServices() has been called, this return code may be returned
+                                     if no variable storage is supported. The platform should describe this
+                                     runtime service as unsupported at runtime via an EFI_RT_PROPERTIES_TABLE
+                                     configuration table.
 
 **/
 EFI_STATUS
@@ -1112,11 +1157,23 @@ RuntimeServiceGetNextVariableName (
                                           data, this value contains the required size.
   @param[in] Data                         Data pointer.
 
-  @retval EFI_INVALID_PARAMETER           Invalid parameter.
-  @retval EFI_SUCCESS                     Set successfully.
-  @retval EFI_OUT_OF_RESOURCES            Resource not enough to set variable.
-  @retval EFI_NOT_FOUND                   Not found.
-  @retval EFI_WRITE_PROTECTED             Variable is read-only.
+  @retval EFI_SUCCESS                     The firmware has successfully stored the variable and its data as
+                                          defined by the Attributes.
+  @retval EFI_INVALID_PARAMETER           An invalid combination of attribute bits, name, and GUID was supplied, or the
+                                          DataSize exceeds the maximum allowed.
+  @retval EFI_INVALID_PARAMETER           VariableName is an empty string.
+  @retval EFI_OUT_OF_RESOURCES            Not enough storage is available to hold the variable and its data.
+  @retval EFI_DEVICE_ERROR                The variable could not be retrieved due to a hardware error.
+  @retval EFI_WRITE_PROTECTED             The variable in question is read-only.
+  @retval EFI_WRITE_PROTECTED             The variable in question cannot be deleted.
+  @retval EFI_SECURITY_VIOLATION          The variable could not be written due to
+                                          EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set,
+                                          but the AuthInfo does NOT pass the validation check carried out by the firmware.
+
+  @retval EFI_NOT_FOUND                   The variable trying to be updated or deleted was not found.
+  @retval EFI_UNSUPPORTED                 This call is not supported by this platform at the time the call is made.
+                                          The platform should describe this runtime service as unsupported at runtime
+                                          via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 EFI_STATUS
