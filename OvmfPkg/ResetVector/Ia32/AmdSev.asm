@@ -395,9 +395,9 @@ SnpCpuidEntryFound:
     mov     [esp + VC_CPUID_RESULT_EAX], eax
     mov     eax, [ecx + SNP_CPUID_ENTRY_EBX]
     mov     [esp + VC_CPUID_RESULT_EBX], eax
-    mov     eax, [ecx + SNP_CPUID_ENTRY_EDX]
-    mov     [esp + VC_CPUID_RESULT_ECX], eax
     mov     eax, [ecx + SNP_CPUID_ENTRY_ECX]
+    mov     [esp + VC_CPUID_RESULT_ECX], eax
+    mov     eax, [ecx + SNP_CPUID_ENTRY_EDX]
     mov     [esp + VC_CPUID_RESULT_EDX], eax
     jmp     VmmDoneSnpCpuid
 
