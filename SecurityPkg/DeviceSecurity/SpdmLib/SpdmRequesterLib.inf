@@ -21,31 +21,33 @@
 #  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
+  DEFINE LIBSPDM_PATH            = libspdm
+
 [Sources]
-  libspdm/library/spdm_requester_lib/libspdm_req_challenge.c
-  libspdm/library/spdm_requester_lib/libspdm_req_common.c
-  libspdm/library/spdm_requester_lib/libspdm_req_communication.c
-  libspdm/library/spdm_requester_lib/libspdm_req_encap_certificate.c
-  libspdm/library/spdm_requester_lib/libspdm_req_encap_challenge_auth.c
-  libspdm/library/spdm_requester_lib/libspdm_req_encap_digests.c
-  libspdm/library/spdm_requester_lib/libspdm_req_encap_error.c
-  libspdm/library/spdm_requester_lib/libspdm_req_encap_key_update.c
-  libspdm/library/spdm_requester_lib/libspdm_req_encap_request.c
-  libspdm/library/spdm_requester_lib/libspdm_req_end_session.c
-  libspdm/library/spdm_requester_lib/libspdm_req_finish.c
-  libspdm/library/spdm_requester_lib/libspdm_req_get_capabilities.c
-  libspdm/library/spdm_requester_lib/libspdm_req_get_certificate.c
-  libspdm/library/spdm_requester_lib/libspdm_req_get_digests.c
-  libspdm/library/spdm_requester_lib/libspdm_req_get_measurements.c
-  libspdm/library/spdm_requester_lib/libspdm_req_get_version.c
-  libspdm/library/spdm_requester_lib/libspdm_req_handle_error_response.c
-  libspdm/library/spdm_requester_lib/libspdm_req_heartbeat.c
-  libspdm/library/spdm_requester_lib/libspdm_req_key_exchange.c
-  libspdm/library/spdm_requester_lib/libspdm_req_key_update.c
-  libspdm/library/spdm_requester_lib/libspdm_req_negotiate_algorithms.c
-  libspdm/library/spdm_requester_lib/libspdm_req_psk_exchange.c
-  libspdm/library/spdm_requester_lib/libspdm_req_psk_finish.c
-  libspdm/library/spdm_requester_lib/libspdm_req_send_receive.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_challenge.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_common.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_communication.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_encap_certificate.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_encap_challenge_auth.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_encap_digests.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_encap_error.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_encap_key_update.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_encap_request.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_end_session.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_finish.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_get_capabilities.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_get_certificate.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_get_digests.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_get_measurements.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_get_version.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_handle_error_response.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_heartbeat.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_key_exchange.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_key_update.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_negotiate_algorithms.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_psk_exchange.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_psk_finish.c
+  $(LIBSPDM_PATH)/library/spdm_requester_lib/libspdm_req_send_receive.c
 
 [Packages]
   MdePkg/MdePkg.dec
