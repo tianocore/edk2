@@ -4,7 +4,7 @@
   Provides data types allowing an SEV-ES guest to interact with the hypervisor
   using the GHCB protocol.
 
-  Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2020 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -56,6 +56,7 @@
 #define SVM_EXIT_AP_JUMP_TABLE          0x80000005ULL
 #define SVM_EXIT_SNP_PAGE_STATE_CHANGE  0x80000010ULL
 #define SVM_EXIT_SNP_AP_CREATION        0x80000013ULL
+#define SVM_EXIT_GET_APIC_IDS           0x80000017ULL
 #define SVM_EXIT_HYPERVISOR_FEATURES    0x8000FFFDULL
 #define SVM_EXIT_UNSUPPORTED            0x8000FFFFULL
 
@@ -170,6 +171,7 @@ typedef union {
 #define GHCB_HV_FEATURES_SNP_AP_CREATE                   (GHCB_HV_FEATURES_SNP | BIT1)
 #define GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION        (GHCB_HV_FEATURES_SNP_AP_CREATE | BIT2)
 #define GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION_TIMER  (GHCB_HV_FEATURES_SNP_RESTRICTED_INJECTION | BIT3)
+#define GHCB_HV_FEATURES_APIC_ID_LIST                    BIT4
 
 //
 // SNP Page State Change.
@@ -201,6 +203,18 @@ typedef struct {
   SNP_PAGE_STATE_HEADER    Header;
   SNP_PAGE_STATE_ENTRY     Entry[SNP_PAGE_STATE_MAX_ENTRY];
 } SNP_PAGE_STATE_CHANGE_INFO;
+
+//
+// Get APIC IDs
+//
+#define EFI_APIC_IDS_GUID  \
+  { 0xbc964338, 0xee39, 0x4fc8, { 0xa2, 0x24, 0x10, 0x10, 0x8b, 0x17, 0x80, 0x1b }}
+extern EFI_GUID  gEfiApicIdsGuid;
+
+typedef struct {
+  UINT32    NumEntries;
+  UINT32    ApicIds[];
+} GHCB_APIC_IDS;
 
 //
 // SEV-ES save area mapping structures used for SEV-SNP AP Creation.
