@@ -45,6 +45,7 @@
   gEfiMemoryTypeInformationGuid
   gFdtHobGuid
   gUefiOvmfPkgPlatformInfoGuid
+  gEfiApicIdsGuid
 
 [LibraryClasses]
   BaseLib
