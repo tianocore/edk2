@@ -11,7 +11,6 @@
 
 #include <PiPei.h>
 
-#include <Library/PeimEntryPoint.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -38,6 +37,12 @@ typedef struct _SEC_IDT_TABLE {
   EFI_PEI_SERVICES            *PeiService;
   IA32_IDT_GATE_DESCRIPTOR    IdtTable[SEC_IDT_ENTRY_COUNT];
 } SEC_IDT_TABLE;
+
+VOID
+EFIAPI
+ProcessLibraryConstructorList (
+  VOID
+  );
 
 VOID
 EFIAPI
@@ -844,7 +849,7 @@ SecCoreStartupWithStack (
     InitializeCpuExceptionHandlers (NULL);
   }
 
-  ProcessLibraryConstructorList (NULL, NULL);
+  ProcessLibraryConstructorList ();
 
   if (!SevEsIsEnabled ()) {
     //
