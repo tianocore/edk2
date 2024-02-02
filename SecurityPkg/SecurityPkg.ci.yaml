@@ -25,9 +25,10 @@
         "IgnoreFiles": [
             "Library/TcgStorageCoreLib/TcgStorageUtil.c",
             "Library/TcgStorageCoreLib/TcgStorageCore.c",
-            "Library/Tpm2CommandLib/Tpm2NVStorage.c",
+            "Library/Tpm2CommandLib/Tpm2NVStorage.c",           
             "DeviceSecurity/SpdmLib/Include",
             "DeviceSecurity/SpdmLib/libspdm",
+            "DeviceSecurity/SpdmLib",
             "DeviceSecurity/OsStub"
         ]
     },
