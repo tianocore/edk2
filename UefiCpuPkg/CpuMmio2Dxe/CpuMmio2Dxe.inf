@@ -1,0 +1,48 @@
+## @file
+#  Produces the CPU I/O 2 Protocol by using the services of the I/O Library.
+#
+# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+# Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = CpuMmio2Dxe
+  MODULE_UNI_FILE                = CpuMmio2Dxe.uni
+  FILE_GUID                      = FBC36D76-CF22-2584-DBD8-85FF765BAEF1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CpuMmio2Initialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM AARCH64 LOONGARCH64 RISCV64
+#
+
+[Sources]
+  CpuMmio2Dxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation
+
+[Protocols]
+  gEfiCpuIo2ProtocolGuid                         ## PRODUCES
+
+[Depex]
+  TRUE
