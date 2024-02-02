@@ -125,6 +125,9 @@ MonotonicCounterDriverGetNextMonotonicCount (
   @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
   @retval EFI_OUT_OF_RESOURCES  If variable service reports that not enough storage
                                 is available to hold the variable and its data.
+  @retval EFI_UNSUPPORTED       This call is not supported by this platform at the time the call is made.
+                                The platform should describe this runtime service as unsupported at runtime
+                                via an EFI_RT_PROPERTIES_TABLE configuration table.
 
 **/
 EFI_STATUS
