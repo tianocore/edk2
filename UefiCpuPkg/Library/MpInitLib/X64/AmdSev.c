@@ -2,7 +2,7 @@
 
   AMD SEV helper function.
 
-  Copyright (c) 2021, AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2021 - 2024, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -268,20 +268,55 @@ SevSnpCreateAP (
   IN INTN         ProcessorNumber
   )
 {
-  CPU_INFO_IN_HOB  *CpuInfoInHob;
-  CPU_AP_DATA      *CpuData;
-  UINTN            Index;
-  UINT32           ApicId;
+  CPU_INFO_IN_HOB    *CpuInfoInHob;
+  CPU_AP_DATA        *CpuData;
+  UINTN              Index;
+  UINTN              MaxIndex;
+  UINT32             ApicId;
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  GHCB_APIC_IDS      *GhcbApicIds;
 
   ASSERT (CpuMpData->MpCpuExchangeInfo->BufferStart < 0x100000);
 
   CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
 
   if (ProcessorNumber < 0) {
-    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+    if (CpuMpData->InitFlag == ApInitConfig) {
+      //
+      // APs have not been started, so CpuCount is not "known" yet. Use the
+      // retrieved APIC IDs to start the APs and fill out the MpLib CPU
+      // information properly. CanUseSevSnpCreateAP() guarantees we have a
+      // HOB when InitFlag is ApInitConfig.
+      //
+      GuidHob     = GetFirstGuidHob (&gEfiApicIdsGuid);
+      GhcbApicIds = (GHCB_APIC_IDS *)(*(UINTN *)GET_GUID_HOB_DATA (GuidHob));
+      MaxIndex    = MIN (GhcbApicIds->NumEntries, PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+    } else {
+      //
+      // APs have been previously started.
+      //
+      MaxIndex = CpuMpData->CpuCount;
+    }
+
+    for (Index = 0; Index < MaxIndex; Index++) {
       if (Index != CpuMpData->BspNumber) {
         CpuData = &CpuMpData->CpuData[Index];
-        ApicId  = CpuInfoInHob[Index].ApicId,
+
+        if (CpuMpData->InitFlag == ApInitConfig) {
+          ApicId = GhcbApicIds->ApicIds[Index];
+
+          //
+          // For the first boot, use the BSP register information.
+          //
+          CopyMem (
+            &CpuData->VolatileRegisters,
+            &CpuMpData->CpuData[0].VolatileRegisters,
+            sizeof (CpuData->VolatileRegisters)
+            );
+        } else {
+          ApicId = CpuInfoInHob[Index].ApicId;
+        }
+
         SevSnpCreateSaveArea (CpuMpData, CpuData, ApicId);
       }
     }
@@ -324,4 +359,33 @@ SevSnpRmpAdjust (
   }
 
   return AsmRmpAdjust ((UINT64)PageAddress, 0, Rdx);
+}
+
+/**
+  Determine if the SEV-SNP AP Create protocol should be used.
+
+  @param[in]  CpuMpData  Pointer to CPU MP Data
+
+  @retval     TRUE       Use SEV-SNP AP Create protocol
+  @retval     FALSE      Do not use SEV-SNP AP Create protocol
+**/
+BOOLEAN
+CanUseSevSnpCreateAP (
+  IN  CPU_MP_DATA  *CpuMpData
+  )
+{
+  //
+  // The AP Create protocol is used for an SEV-SNP guest if
+  //   - The initial configuration has been performed already or
+  //   - The APIC IDs GUIDed HOB is non-zero.
+  //
+  if (!CpuMpData->SevSnpIsEnabled) {
+    return FALSE;
+  }
+
+  if ((CpuMpData->InitFlag == ApInitConfig) && (GetFirstGuidHob (&gEfiApicIdsGuid) == NULL)) {
+    return FALSE;
+  }
+
+  return TRUE;
 }

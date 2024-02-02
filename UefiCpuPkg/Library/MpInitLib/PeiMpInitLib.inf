@@ -76,3 +76,4 @@
 [Guids]
   gEdkiiS3SmmInitDoneGuid
   gEdkiiMicrocodePatchHobGuid
+  gEfiApicIdsGuid                        ## SOMETIMES_CONSUMES
