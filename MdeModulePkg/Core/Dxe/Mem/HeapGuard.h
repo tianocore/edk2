@@ -270,24 +270,41 @@ AdjustMemoryF (
   );
 
 /**
-  Adjust address of free memory according to existing and/or required Guard.
+  Adjust the start address of a proposed allocation to ensure that guard
+  pages fit within free space around the allocation.
 
-  This function will check if there're existing Guard pages of adjacent
+  This function will check if there are existing Guard pages of adjacent
   memory blocks, and try to use it as the Guard page of the memory to be
-  allocated.
+  allocated. It will respect the alignment guarantees of the allocation in
+  question and attempt to shift the allocation within the provided memory
+  descriptor if there is no tail guard to share.
 
-  @param[in]  Start           Start address of free memory block.
-  @param[in]  Size            Size of free memory block.
-  @param[in]  SizeRequested   Size of memory to allocate.
+  This function assumes that the free memory descriptors are merged to create
+  the largest possible contiguous free memory range. This is a behavior of the
+  page management code. This function also assumes that the page management code
+  has attempted an AllocationStart as close to the end of the memory descriptor
+  as possible, so that if a new tail guard is allocated we can shift the
+  allocation towards the start of the memory descriptor. However, if the
+  AllocationStart is at the beginning of the memory descriptor and we need to
+  allocate a new head guard, we will fail because we know there is not enough space
+  at the end of the descriptor.
 
-  @return The end address of memory block found.
-  @return 0 if no enough space for the required size of memory and its Guard.
+  @param[in]  AllocationStart           Start address of allocation to check if guards fit
+  @param[in]  AllocationSize            Size of memory requested in this allocation
+  @param[in]  DescriptorStart           Start address of the free memory descriptor
+  @param[in]  DescriptorSize            Size from DescriptorStart to end of the descriptor
+  @param[in]  Alignment                 Required alignment of the start of this allocation
+
+  @return The start address of this new allocation that will satisify alignment and guard requirements
+  @return 0 if there is not enough space for the required size of memory and the guards
 **/
 UINT64
 AdjustMemoryS (
-  IN UINT64  Start,
-  IN UINT64  Size,
-  IN UINT64  SizeRequested
+  IN UINT64  AllocationStart,
+  IN UINT64  AllocationSize,
+  IN UINT64  DescriptorStart,
+  IN UINT64  DescriptorSize,
+  IN UINT64  Alignment
   );
 
 /**

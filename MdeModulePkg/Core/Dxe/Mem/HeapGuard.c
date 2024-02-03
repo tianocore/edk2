@@ -808,24 +808,41 @@ UnsetGuardForMemory (
 }
 
 /**
-  Adjust address of free memory according to existing and/or required Guard.
+  Adjust the start address of a proposed allocation to ensure that guard
+  pages fit within free space around the allocation.
 
-  This function will check if there're existing Guard pages of adjacent
+  This function will check if there are existing Guard pages of adjacent
   memory blocks, and try to use it as the Guard page of the memory to be
-  allocated.
+  allocated. It will respect the alignment guarantees of the allocation in
+  question and attempt to shift the allocation within the provided memory
+  descriptor if there is no tail guard to share.
 
-  @param[in]  Start           Start address of free memory block.
-  @param[in]  Size            Size of free memory block.
-  @param[in]  SizeRequested   Size of memory to allocate.
+  This function assumes that the free memory descriptors are merged to create
+  the largest possible contiguous free memory range. This is a behavior of the
+  page management code. This function also assumes that the page management code
+  has attempted an AllocationStart as close to the end of the memory descriptor
+  as possible, so that if a new tail guard is allocated we can shift the
+  allocation towards the start of the memory descriptor. However, if the
+  AllocationStart is at the beginning of the memory descriptor and we need to
+  allocate a new head guard, we will fail because we know there is not enough space
+  at the end of the descriptor.
 
-  @return The end address of memory block found.
-  @return 0 if no enough space for the required size of memory and its Guard.
+  @param[in]  AllocationStart           Start address of allocation to check if guards fit
+  @param[in]  AllocationSize            Size of memory requested in this allocation
+  @param[in]  DescriptorStart           Start address of the free memory descriptor
+  @param[in]  DescriptorSize            Size from DescriptorStart to end of the descriptor
+  @param[in]  Alignment                 Required alignment of the start of this allocation
+
+  @return The start address of this new allocation that will satisify alignment and guard requirements
+  @return 0 if there is not enough space for the required size of memory and the guards
 **/
 UINT64
 AdjustMemoryS (
-  IN UINT64  Start,
-  IN UINT64  Size,
-  IN UINT64  SizeRequested
+  IN UINT64  AllocationStart,
+  IN UINT64  AllocationSize,
+  IN UINT64  DescriptorStart,
+  IN UINT64  DescriptorSize,
+  IN UINT64  Alignment
   )
 {
   UINT64  Target;
@@ -836,36 +853,55 @@ AdjustMemoryS (
   // make sure alignment of the returned pool address.
   //
   if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0) {
-    SizeRequested = ALIGN_VALUE (SizeRequested, 8);
+    AllocationSize = ALIGN_VALUE (AllocationSize, 8);
   }
 
-  Target = Start + Size - SizeRequested;
-  ASSERT (Target >= Start);
+  Target = AllocationStart;
+
+  // if we try to allocate at 0, fail
   if (Target == 0) {
     return 0;
   }
 
-  if (!IsGuardPage (Start + Size)) {
+  // check if we have a tail guard already for this region
+  // we need to align the guard page check to the next page past
+  // where we are trying to allocate memory
+  if (!IsGuardPage (Target + AllocationSize)) {
     // No Guard at tail to share. One more page is needed.
-    Target -= EFI_PAGES_TO_SIZE (1);
-  }
-
-  // Out of range?
-  if (Target < Start) {
-    return 0;
-  }
-
-  // At the edge?
-  if (Target == Start) {
-    if (!IsGuardPage (Target - EFI_PAGES_TO_SIZE (1))) {
-      // No enough space for a new head Guard if no Guard at head to share.
+    // we need to check if this descriptor has enough space to allocate another
+    // guard page at the end of the current allocation
+    if (Target + AllocationSize + EFI_PAGE_SIZE < DescriptorStart + DescriptorSize) {
+      // we fit within the descriptor, so we can place a guard at the next page boundary
+    } else if ((Alignment < Target) && (Target - Alignment >= DescriptorStart)) {
+      // this descriptor has enough space to shift the allocation by
+      // the alignment requirement to fit the new tail guard after the
+      // allocation. We attempt to allocate at the end of the descriptor, so we
+      // need to look behind the current target to see if this is valid to take
+      Target -= Alignment;
+    } else {
+      // this descriptor won't fit a tail new guard, we have to find a new descriptor
       return 0;
     }
   }
 
-  // OK, we have enough pages for memory and its Guards. Return the End of the
+  // check if we are at the beginning of the memory descriptor
+  // if so, we need to check if we can share the head guard
+  // or if we need to adjust the allocation to accommodate a new head guard
+  // if we are not at the start of the Descriptor, we will have space to allocate
+  // the new head guard if required, since our descriptors are in units of pages
+  if (Target == DescriptorStart) {
+    if (!IsGuardPage (Target - EFI_PAGES_TO_SIZE (1))) {
+      // there is not a shared head guard here and there is
+      // not enough space for a new head Guard, we need to find a new descriptor
+      // we can't shift the allocation here because we put the AllocationStart as
+      // close to the end of the descriptor as we can and still satisfy the alignment
+      return 0;
+    }
+  }
+
+  // OK, we have enough pages for memory and its Guards. Return the start of the
   // free space.
-  return Target + SizeRequested - 1;
+  return Target;
 }
 
 /**
