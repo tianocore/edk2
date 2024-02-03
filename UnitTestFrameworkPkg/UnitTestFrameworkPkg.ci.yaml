@@ -102,6 +102,8 @@
             "cobertura",
             "DHAVE", # build flag for cmocka in the INF
             "gtest", # file name in GoogleTestLib.inf
+            "defiapi",      # build flag for gtest
+            "fexceptions",  # build flag for gtest
             "corthon",      # Contact GitHub account in Readme
             "mdkinney",     # Contact GitHub account in Readme
             "spbrogan"      # Contact GitHub account in Readme
