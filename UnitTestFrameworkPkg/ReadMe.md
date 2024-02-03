@@ -59,7 +59,7 @@ reviewed. The paths to the SecureBootVariableLib unit tests are:
 | Unit Test Source Language   |     C     |    C++     |
 | Register Test Suite         |    YES    |    Auto    |
 | Register Test Case          |    YES    |    Auto    |
-| Death/Expected Assert Tests |    YES    |    YES     |
+| Expected Assert Tests       |    YES    |    YES     |
 | Setup/Teardown Hooks        |    YES    |    YES     |
 | Value-Parameterized Tests   |    NO     |    YES     |
 | Typed Tests                 |    NO     |    YES     |
