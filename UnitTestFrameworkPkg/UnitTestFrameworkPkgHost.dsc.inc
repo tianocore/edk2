@@ -24,9 +24,10 @@
   PeiServicesTablePointerLib|UnitTestFrameworkPkg/Library/UnitTestPeiServicesTablePointerLib/UnitTestPeiServicesTablePointerLib.inf
 
 [BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /MT
   GCC:*_*_*_CC_FLAGS = -fno-pie
 !ifdef $(UNIT_TESTING_DEBUG)
-  MSFT:*_*_*_CC_FLAGS  = -D UNIT_TESTING_DEBUG=1
+  MSFT:*_*_*_CC_FLAGS  = /MTd -D UNIT_TESTING_DEBUG=1
   GCC:*_*_*_CC_FLAGS   = -D UNIT_TESTING_DEBUG=1
   XCODE:*_*_*_CC_FLAGS = -D UNIT_TESTING_DEBUG=1
 !endif
