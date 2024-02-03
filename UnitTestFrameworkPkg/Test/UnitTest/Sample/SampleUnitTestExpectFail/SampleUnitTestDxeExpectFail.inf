@@ -1,0 +1,41 @@
+## @file
+# Sample UnitTest built for execution in DXE.
+# All test case are always expected to fail to demonstrate the format of the log
+# file and reports when failures occur.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010006
+  BASE_NAME      = SampleUnitTestDxeExpectFail
+  FILE_GUID      = 7092E907-E817-4D39-877C-64BD0F54C1D4
+  MODULE_TYPE    = DXE_DRIVER
+  VERSION_STRING = 1.0
+  ENTRY_POINT    = DxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SampleUnitTestExpectFail.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  UnitTestLib
+  PrintLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+
+[Depex]
+  TRUE

@@ -1,0 +1,42 @@
+## @file
+# Sample UnitTest built for execution in SMM.
+# All test case are always expected to fail to demonstrate the format of the log
+# file and reports when failures occur.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION              = 0x00010006
+  BASE_NAME                = SampleUnitTestSmmExpectFail
+  FILE_GUID                = 031B1FE7-582E-4F43-B50D-5A7E42BCC11C
+  MODULE_TYPE              = DXE_SMM_DRIVER
+  VERSION_STRING           = 1.0
+  PI_SPECIFICATION_VERSION = 0x0001000A
+  ENTRY_POINT              = DxeEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SampleUnitTestExpectFail.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  UnitTestLib
+  PrintLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask
+
+[Depex]
+  gEfiSmmCpuProtocolGuid

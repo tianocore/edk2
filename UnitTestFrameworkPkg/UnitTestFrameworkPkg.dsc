@@ -41,3 +41,29 @@
   UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTest/SampleUnitTestPei.inf
   UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTest/SampleUnitTestSmm.inf
   UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTest/SampleUnitTestUefiShell.inf
+
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestExpectFail/SampleUnitTestDxeExpectFail.inf
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestExpectFail/SampleUnitTestPeiExpectFail.inf
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestExpectFail/SampleUnitTestSmmExpectFail.inf
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestExpectFail/SampleUnitTestUefiShellExpectFail.inf
+
+  #
+  # Disable warning for divide by zero to pass build of unit tests
+  # that generate a divide by zero exception.
+  #
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestGenerateException/SampleUnitTestDxeGenerateException.inf {
+    <BuildOptions>
+      MSFT:*_*_*_CC_FLAGS = /wd4723
+  }
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestGenerateException/SampleUnitTestPeiGenerateException.inf {
+    <BuildOptions>
+      MSFT:*_*_*_CC_FLAGS = /wd4723
+  }
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestGenerateException/SampleUnitTestSmmGenerateException.inf {
+    <BuildOptions>
+      MSFT:*_*_*_CC_FLAGS = /wd4723
+  }
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestGenerateException/SampleUnitTestUefiShellGenerateException.inf {
+    <BuildOptions>
+      MSFT:*_*_*_CC_FLAGS = /wd4723
+  }
