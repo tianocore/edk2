@@ -13,6 +13,26 @@
 #include <gmock/gmock.h>
 #include <cstring>
 
+using ::testing::Throws;
+using ::testing::ThrowsMessage;
+using ::testing::HasSubstr;
+
+//
+// Extended macros for testing exceptions with a specific description string
+// in the exception message.  Typically used to check that the expression
+// that generates an ASSERT() matches the expected expression.
+//
+#define EXPECT_THROW_MESSAGE(statement, description)            \
+  EXPECT_THAT (                                                 \
+    []() { statement; },                                        \
+    ThrowsMessage<std::runtime_error>(HasSubstr (description))  \
+    )
+#define ASSERT_THROW_MESSAGE(statement, description)            \
+  ASSERT_THAT (                                                 \
+    []() { statement; },                                        \
+    ThrowsMessage<std::runtime_error>(HasSubstr (description))  \
+    )
+
 extern "C" {
   #include <Uefi.h>
 }
