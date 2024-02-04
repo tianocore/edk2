@@ -61,6 +61,7 @@ typedef struct {
 typedef struct {
   UINT8    *RelocateApLoopFuncAddress;
   UINTN    RelocateApLoopFuncSize;
+  UINT8    *RelocateApResetVector;
 } MP_RELOCATION_MAP;
 
 #pragma pack()

@@ -37,12 +37,14 @@ AsmGetRelocationMap (
   memory block which is allocated in the ACPI Nvs memory. APs are waken up and
   spin around the relocated mailbox for further command.
 
+  @param[in, out]  ResetVector      Pointer to the ResetVector
+
   @return   EFI_PHYSICAL_ADDRESS    Address of the relocated mailbox
 **/
 EFI_PHYSICAL_ADDRESS
 EFIAPI
 RelocateMailbox (
-  VOID
+  EFI_PHYSICAL_ADDRESS  *ResetVector
   );
 
 /**
