@@ -28,6 +28,43 @@
 #include <Uefi.h>
 #include <TdxAcpiTable.h>
 
+IA32_GDT  mGdtEntries[] = {
+  {
+    { 0,      0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0 }
+  },                                                            /* 0x0:  reserve */
+  {
+    { 0xFFFF, 0, 0, 0xB, 1, 0, 1, 0xF, 0, 0, 1, 1, 0 }
+  },                                                            /* 0x8:  compatibility mode */
+  {
+    { 0xFFFF, 0, 0, 0xB, 1, 0, 1, 0xF, 0, 1, 0, 1, 0 }
+  },                                                            /* 0x10: for long mode */
+  {
+    { 0xFFFF, 0, 0, 0x3, 1, 0, 1, 0xF, 0, 0, 1, 1, 0 }
+  },                                                            /* 0x18: data */
+  {
+    { 0,      0, 0, 0,   0, 0, 0, 0,   0, 0, 0, 0, 0 }
+  },                                                            /* 0x20: reserve */
+};
+
+/**
+  At the beginning of ResetVector in OS, the GDT needs to be reloaded.
+**/
+VOID
+SetMailboxResetVectorGDT (
+  VOID
+  )
+{
+  TDX_WORK_AREA  *TdxWorkArea;
+
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  ASSERT (TdxWorkArea != NULL);
+  ZeroMem ((VOID *)TdxWorkArea->MailboxGdt.Data, sizeof (TdxWorkArea->MailboxGdt.Data));
+
+  CopyMem ((VOID *)TdxWorkArea->MailboxGdt.Data, (VOID *)mGdtEntries, sizeof (mGdtEntries));
+  TdxWorkArea->MailboxGdt.Gdtr.Base  = (UINTN)TdxWorkArea->MailboxGdt.Data;
+  TdxWorkArea->MailboxGdt.Gdtr.Limit = sizeof (mGdtEntries) - 1;
+}
+
 /**
   At the beginning of system boot, a 4K-aligned, 4K-size memory (Td mailbox) is
   pre-allocated by host VMM. BSP & APs do the page accept together in that memory
@@ -92,6 +129,7 @@ RelocateMailbox (
     ApLoopFunc
     ));
 
+  SetMailboxResetVectorGDT ();
   //
   // Initialize mailbox
   //
