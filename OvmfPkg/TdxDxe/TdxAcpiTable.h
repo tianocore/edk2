@@ -20,6 +20,7 @@
 #include <Library/PcdLib.h>
 #include <IndustryStandard/IntelTdx.h>
 #include <IndustryStandard/Acpi.h>
+#include <WorkArea.h>
 
 VOID
 EFIAPI
