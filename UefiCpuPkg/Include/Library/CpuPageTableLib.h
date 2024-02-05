@@ -46,11 +46,17 @@ typedef enum {
   // High byte in paging mode indicates the max levels of the page table.
   // Low byte in paging mode indicates the max level that can be a leaf entry.
   //
-  PagingPae = 0x0302,
+  PagingPae4KB = 0x0301,
+  PagingPae2MB = 0x0302,
+  PagingPae    = 0x0302,
 
+  Paging4Level4KB = 0x0401,
+  Paging4Level2MB = 0x0402,
   Paging4Level    = 0x0402,
   Paging4Level1GB = 0x0403,
 
+  Paging5Level4KB = 0x0501,
+  Paging5Level2MB = 0x0502,
   Paging5Level    = 0x0502,
   Paging5Level1GB = 0x0503,
 
