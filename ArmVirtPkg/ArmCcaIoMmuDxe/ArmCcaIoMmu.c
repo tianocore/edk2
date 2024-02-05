@@ -629,7 +629,9 @@ IoMmuFreeBuffer (
   @param[in]  Mapping           The mapping value returned from Map().
   @param[in]  IoMmuAccess       The IOMMU access.
 
-  @retval EFI_UNSUPPORTED        Operation not supported by IOMMU.
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_UNSUPPORTED         The requested operation is not supported.
+  @retval EFI_SUCCESS             Success.
 
 **/
 EFI_STATUS
@@ -641,7 +643,64 @@ IoMmuSetAttribute (
   IN UINT64                IoMmuAccess
   )
 {
-  return EFI_UNSUPPORTED;
+  EFI_STATUS  Status;
+  MAP_INFO    *MapInfo;
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: Mapping=0x%p Access=%lu\n",
+    __func__,
+    Mapping,
+    IoMmuAccess
+    ));
+
+  if (Mapping == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = EFI_SUCCESS;
+
+  // An IoMmuAccess value of 0 is always accepted,
+  // validate any non-zero value.
+  if (IoMmuAccess != 0) {
+    MapInfo = (MAP_INFO *)Mapping;
+
+    // The mapping operation already implied the access mode.
+    // Validate that the supplied access mode matches operation
+    // access mode.
+    switch (MapInfo->Operation) {
+      case EdkiiIoMmuOperationBusMasterRead:
+      case EdkiiIoMmuOperationBusMasterRead64:
+        if (IoMmuAccess != EDKII_IOMMU_ACCESS_READ) {
+          Status = EFI_INVALID_PARAMETER;
+        }
+
+        break;
+
+      case EdkiiIoMmuOperationBusMasterWrite:
+      case EdkiiIoMmuOperationBusMasterWrite64:
+        if (IoMmuAccess != EDKII_IOMMU_ACCESS_WRITE) {
+          Status = EFI_INVALID_PARAMETER;
+        }
+
+        break;
+
+      case EdkiiIoMmuOperationBusMasterCommonBuffer:
+      case EdkiiIoMmuOperationBusMasterCommonBuffer64:
+        if (IoMmuAccess !=
+            (EDKII_IOMMU_ACCESS_READ | EDKII_IOMMU_ACCESS_WRITE))
+        {
+          Status = EFI_INVALID_PARAMETER;
+        }
+
+        break;
+
+      default:
+        Status = EFI_UNSUPPORTED;
+    } // switch
+  }
+
+  return Status;
 }
 
 /** Arm CCA IoMMU protocol
