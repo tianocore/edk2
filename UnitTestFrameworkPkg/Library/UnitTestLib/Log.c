@@ -166,6 +166,10 @@ UnitTestLog (
   VA_LIST                     Marker;
 
   FrameworkHandle = GetActiveFrameworkHandle ();
+  if (FrameworkHandle == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a - FrameworkHandle not initialized\n", __func__));
+    return;
+  }
 
   LogTypePrefix = NULL;
 

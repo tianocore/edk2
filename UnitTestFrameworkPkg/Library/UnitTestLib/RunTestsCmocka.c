@@ -27,7 +27,6 @@ GetActiveFrameworkHandle (
   VOID
   )
 {
-  ASSERT (mFrameworkHandle != NULL);
   return mFrameworkHandle;
 }
 
