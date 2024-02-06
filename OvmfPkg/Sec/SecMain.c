@@ -40,12 +40,6 @@ typedef struct _SEC_IDT_TABLE {
 
 VOID
 EFIAPI
-ProcessLibraryConstructorList (
-  VOID
-  );
-
-VOID
-EFIAPI
 SecStartupPhase2 (
   IN VOID  *Context
   );
