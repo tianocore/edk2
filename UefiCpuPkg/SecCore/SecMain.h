@@ -102,18 +102,6 @@ FindAndReportEntryPoints (
   );
 
 /**
-  Auto-generated function that calls the library constructors for all of the module's
-  dependent libraries.  This function must be called by the SEC Core once a stack has
-  been established.
-
-**/
-VOID
-EFIAPI
-ProcessLibraryConstructorList (
-  VOID
-  );
-
-/**
   Implementation of the PlatformInformation service in EFI_SEC_PLATFORM_INFORMATION_PPI.
 
   @param  PeiServices                Pointer to the PEI Services Table.
