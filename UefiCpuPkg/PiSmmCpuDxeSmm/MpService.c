@@ -1654,11 +1654,13 @@ SmiRendezvous (
             //
             // Platform hook fails to determine, use default BSP election method
             //
-            InterlockedCompareExchange32 (
-              (UINT32 *)&mSmmMpSyncData->BspIndex,
-              MAX_UINT32,
-              (UINT32)CpuIndex
-              );
+            if (mSmmMpSyncData->BspIndex == MAX_UINT32) {
+              InterlockedCompareExchange32 (
+                (UINT32 *)&mSmmMpSyncData->BspIndex,
+                MAX_UINT32,
+                (UINT32)CpuIndex
+                );
+            }
           }
         }
       }
