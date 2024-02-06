@@ -308,7 +308,7 @@ ReallocatePool (
   if (OldBuffer != NULL) {
     HandOffHob = GetHobList ();
     ASSERT (((EFI_PHYSICAL_ADDRESS)(UINTN)OldBuffer >= HandOffHob->EfiMemoryBottom));
-    ASSERT (((EFI_PHYSICAL_ADDRESS)(UINTN)(OldBuffer + OldSize) <= HandOffHob->EfiFreeMemoryBottom));
+    ASSERT (((EFI_PHYSICAL_ADDRESS)((UINTN)OldBuffer + OldSize) <= HandOffHob->EfiFreeMemoryBottom));
   }
 
   DEBUG_CODE_END ();
