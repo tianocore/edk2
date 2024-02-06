@@ -826,6 +826,10 @@ SaveFrameworkState (
 
   Header          = NULL;
   FrameworkHandle = GetActiveFrameworkHandle ();
+  if (FrameworkHandle == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a - Could not save state! FrameworkHandle not initialized\n", __func__));
+    return EFI_DEVICE_ERROR;
+  }
 
   //
   // Return a unique error code if the framework is not set.
