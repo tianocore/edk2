@@ -258,7 +258,7 @@ SmmInternalAllocatePool (
 
   NeedGuard   = IsPoolTypeToGuard (PoolType);
   HasPoolTail = !(NeedGuard &&
-                  ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0));
+                  gMps.Mm.HeapGuard.GuardAlignedToTail);
 
   //
   // Adjust the size by the pool header & tail overhead
@@ -392,7 +392,7 @@ SmmInternalFreePool (
   MemoryGuarded = IsHeapGuardEnabled () &&
                   IsMemoryGuarded ((EFI_PHYSICAL_ADDRESS)(UINTN)FreePoolHdr);
   HasPoolTail = !(MemoryGuarded &&
-                  ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0));
+                  gMps.Mm.HeapGuard.GuardAlignedToTail);
 
   if (HasPoolTail) {
     PoolTail = HEAD_TO_TAIL (&FreePoolHdr->Header);

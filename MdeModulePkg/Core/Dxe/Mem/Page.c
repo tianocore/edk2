@@ -181,7 +181,7 @@ CoreAddRange (
   // used for other purposes.
   //
   if ((Type == EfiConventionalMemory) && (Start == 0) && (End >= EFI_PAGE_SIZE - 1)) {
-    if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) == 0) {
+    if (!gMps.Dxe.NullPointerDetection.Enabled) {
       SetMem ((VOID *)(UINTN)Start, EFI_PAGE_SIZE, 0);
     }
   }

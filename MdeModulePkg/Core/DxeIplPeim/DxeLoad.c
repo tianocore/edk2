@@ -50,6 +50,8 @@ CONST EFI_PEI_NOTIFY_DESCRIPTOR  mMemoryDiscoveredNotifyList = {
   InstallIplPermanentMemoryPpis
 };
 
+MEMORY_PROTECTION_SETTINGS  mMps = { 0 };
+
 /**
   Entry point of DXE IPL PEIM.
 

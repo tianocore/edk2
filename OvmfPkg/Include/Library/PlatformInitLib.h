@@ -32,7 +32,6 @@ typedef struct {
   UINT32               Uc32Base;
   UINT32               Uc32Size;
 
-  BOOLEAN              PcdSetNxForStack;
   UINT64               PcdTdxSharedBitMask;
 
   UINT64               PcdPciMmio64Base;
@@ -179,18 +178,6 @@ PlatformQemuInitializeRamForS3 (
 VOID
 EFIAPI
 PlatformMemMapInitialization (
-  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
-  );
-
-/**
- * Fetch "opt/ovmf/PcdSetNxForStack" from QEMU
- *
- * @param Setting     The pointer to the setting of "/opt/ovmf/PcdSetNxForStack".
- * @return EFI_SUCCESS  Successfully fetch the settings.
- */
-EFI_STATUS
-EFIAPI
-PlatformNoexecDxeInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 

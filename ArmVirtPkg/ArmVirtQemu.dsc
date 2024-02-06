@@ -212,11 +212,6 @@
   #
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
 
-  #
-  # Enable the non-executable DXE stack. (This gets set up by DxeIpl)
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
-
 !if $(SECURE_BOOT_ENABLE) == TRUE
   # override the default values from SecurityPkg to ensure images from all sources are verified in secure boot
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04

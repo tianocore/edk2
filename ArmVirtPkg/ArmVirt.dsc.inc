@@ -159,6 +159,12 @@
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
   #
+  # Memory Protection Libraries for setting and getting memory protection settings
+  #
+  SetMemoryProtectionsLib|MdeModulePkg/Library/SetMemoryProtectionsLib/SetMemoryProtectionsLib.inf
+  GetMemoryProtectionsLib|MdeModulePkg/Library/GetMemoryProtectionsLib/DxeGetMemoryProtectionsLib.inf
+
+  #
   # Secure Boot dependencies
   #
 !if $(SECURE_BOOT_ENABLE) == TRUE
@@ -366,21 +372,6 @@
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiBootServicesData|12000
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderCode|20
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiLoaderData|0
-
-  #
-  # Enable strict image permissions for all images. (This applies
-  # only to images that were built with >= 4 KB section alignment.)
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x3
-
-  #
-  # Enable NX memory protection for all non-code regions, including OEM and OS
-  # reserved ones, with the exception of LoaderData regions, of which OS loaders
-  # (i.e., GRUB) may assume that its contents are executable.
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD5
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard|TRUE
 
 [Components.common]
   #

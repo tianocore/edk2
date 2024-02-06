@@ -33,13 +33,11 @@
   PcdLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  GetMemoryProtectionsLib
 
 [Protocols]
   gEfiCpuArchProtocolGuid                 ## CONSUMES
   gFdtClientProtocolGuid                  ## CONSUMES
-
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy
 
 [Depex]
   gEfiCpuArchProtocolGuid AND gFdtClientProtocolGuid

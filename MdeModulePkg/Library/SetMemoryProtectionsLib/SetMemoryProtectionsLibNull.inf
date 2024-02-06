@@ -1,0 +1,25 @@
+## @file
+# Library for setting the memory protection settings for DXE.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SetMemoryProtectionsLibNull
+  FILE_GUID                      = CBD02C10-1F4B-4374-A7B2-BB2547C08433
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SetMemoryProtectionsLib|SEC PEI_CORE PEIM
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  SetMemoryProtectionsLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec

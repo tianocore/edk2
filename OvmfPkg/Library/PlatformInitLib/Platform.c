@@ -249,21 +249,6 @@ PlatformMemMapInitialization (
   PlatformInfoHob->PcdPciIoSize = PciIoSize;
 }
 
-/**
- * Fetch "opt/ovmf/PcdSetNxForStack" from QEMU
- *
- * @param Setting     The pointer to the setting of "/opt/ovmf/PcdSetNxForStack".
- * @return EFI_SUCCESS  Successfully fetch the settings.
- */
-EFI_STATUS
-EFIAPI
-PlatformNoexecDxeInitialization (
-  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
-  )
-{
-  return QemuFwCfgParseBool ("opt/ovmf/PcdSetNxForStack", &PlatformInfoHob->PcdSetNxForStack);
-}
-
 VOID
 PciExBarInitialization (
   VOID

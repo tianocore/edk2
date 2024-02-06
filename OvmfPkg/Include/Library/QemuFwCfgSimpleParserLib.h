@@ -125,4 +125,12 @@ QemuFwCfgParseUintn (
   OUT UINTN        *Value
   );
 
+RETURN_STATUS
+EFIAPI
+QemuFwCfgParseString (
+  IN     CONST CHAR8  *FileName,
+  IN OUT UINTN        *BufferSize,
+  OUT    CHAR8        *Buffer
+  );
+
 #endif // QEMU_FW_CFG_SIMPLE_PARSER_LIB_H_

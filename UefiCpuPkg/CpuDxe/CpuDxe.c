@@ -339,7 +339,7 @@ CpuSetMemoryAttributes (
   // During memory attributes updating, new pages may be allocated to setup
   // smaller granularity of page table. Page allocation action might then cause
   // another calling of CpuSetMemoryAttributes() recursively, due to memory
-  // protection policy configured (such as PcdDxeNxMemoryProtectionPolicy).
+  // protection policy configured (such as the DXE NX Protection Policy).
   // Since this driver will always protect memory used as page table by itself,
   // there's no need to apply protection policy requested from memory service.
   // So it's safe to just return EFI_SUCCESS if this time of calling is caused

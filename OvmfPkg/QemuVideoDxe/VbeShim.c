@@ -19,6 +19,7 @@
 #include <Library/DebugLib.h>
 #include <Library/PciLib.h>
 #include <Library/PrintLib.h>
+#include <Library/GetMemoryProtectionsLib.h>
 #include <OvmfPlatforms.h>
 
 #include "Qemu.h"
@@ -69,7 +70,7 @@ InstallVbeShim (
   UINTN                 Printed;
   VBE_MODE_INFO         *VbeModeInfo;
 
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7)) == BIT0) {
+  if (gMps.Dxe.NullPointerDetection.Enabled && !gMps.Dxe.NullPointerDetection.DisableEndOfDxe) {
     DEBUG ((
       DEBUG_WARN,
       "%a: page 0 protected, not installing VBE shim\n",

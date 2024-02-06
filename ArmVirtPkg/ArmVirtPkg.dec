@@ -74,3 +74,9 @@
   # invoking the OS loader. This may be needed to work around problematic
   # builds of shim that use the protocol incorrectly.
   gArmVirtTokenSpaceGuid.PcdUninstallMemAttrProtocol|FALSE|BOOLEAN|0x00000006
+
+  # This value will be used to determine the level of memory protection each boot.
+  # See DXE_MEMORY_PROTECTION_PROFILE_INDEX in
+  # MdeModulePkg/Include/Library/SetMemoryProtectionsLib.h for index definitions.
+  #
+  gArmVirtTokenSpaceGuid.PcdDxeMemoryProtectionProfile|0x3|UINT8|0x00000007

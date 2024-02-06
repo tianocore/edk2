@@ -48,9 +48,9 @@
   PeiServicesLib
   CpuPageTableLib
   PeiServicesTablePointerLib
+  SetMemoryProtectionsLib
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard   ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApStackSize       ## CONSUMES
 
 [Ppis]

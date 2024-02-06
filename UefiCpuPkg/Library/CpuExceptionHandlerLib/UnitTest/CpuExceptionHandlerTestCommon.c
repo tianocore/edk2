@@ -743,10 +743,6 @@ TestCpuStackGuardInBspAndAp (
   VOID                            *NewIdtr;
   UINTN                           *CpuStackBaseBuffer;
 
-  if (!PcdGetBool (PcdCpuStackGuard)) {
-    return UNIT_TEST_PASSED;
-  }
-
   //
   // Get MP Service Protocol
   //
@@ -846,7 +842,7 @@ AddCommonTestCase (
   AddTestCase (CpuExceptionLibUnitTestSuite, "Check if exception handler can be registered/unregistered for GP and PF", "TestRegisterHandlerForGPAndPF", TestRegisterHandlerForGPAndPF, NULL, NULL, NULL);
 
   AddTestCase (CpuExceptionLibUnitTestSuite, "Check if Cpu Context is consistent before and after exception.", "TestCpuContextConsistency", TestCpuContextConsistency, NULL, NULL, NULL);
-  AddTestCase (CpuExceptionLibUnitTestSuite, "Check if stack overflow is captured by CpuStackGuard in Bsp and AP", "TestCpuStackGuardInBspAndAp", TestCpuStackGuardInBspAndAp, NULL, NULL, NULL);
+  AddTestCase (CpuExceptionLibUnitTestSuite, "Check if stack overflow is captured by CpuStackGuard in Bsp and AP", "TestCpuStackGuardInBspAndAp", TestCpuStackGuardInBspAndAp, IsStackGuardEnabled, NULL, NULL);
 
   return EFI_SUCCESS;
 }

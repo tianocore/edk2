@@ -131,15 +131,12 @@ SetPcdSettings (
 
   PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, PlatformInfoHob->PcdConfidentialComputingGuestAttr);
   ASSERT_RETURN_ERROR (PcdStatus);
-  PcdStatus = PcdSetBoolS (PcdSetNxForStack, PlatformInfoHob->PcdSetNxForStack);
-  ASSERT_RETURN_ERROR (PcdStatus);
 
   DEBUG ((
     DEBUG_INFO,
-    "HostBridgeDevId=0x%x, CCAttr=0x%x, SetNxForStack=%x\n",
+    "HostBridgeDevId=0x%x, CCAttr=0x%x\n",
     PlatformInfoHob->HostBridgeDevId,
-    PlatformInfoHob->PcdConfidentialComputingGuestAttr,
-    PlatformInfoHob->PcdSetNxForStack
+    PlatformInfoHob->PcdConfidentialComputingGuestAttr
     ));
 
   PcdStatus = PcdSet32S (PcdCpuBootLogicalProcessorNumber, PlatformInfoHob->PcdCpuBootLogicalProcessorNumber);

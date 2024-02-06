@@ -14,10 +14,13 @@
 #include <Protocol/DebugSupport.h>
 #include <Library/TdxLib.h>
 #include <IndustryStandard/Tdx.h>
+#include <Library/PcdLib.h>
 #include <Library/PrePiLib.h>
 #include <Library/PeilessStartupLib.h>
 #include <Library/PlatformInitLib.h>
 #include <Library/TdxHelperLib.h>
+#include <Library/SetMemoryProtectionsLib.h>
+#include <Library/MemoryProtectionConfigLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <OvmfPlatforms.h>
@@ -42,7 +45,9 @@ InitializePlatform (
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
-  VOID  *VariableStore;
+  VOID                            *VariableStore;
+  DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
+  MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
 
   DEBUG ((DEBUG_INFO, "InitializePlatform in Pei-less boot\n"));
   PlatformDebugDumpCmos ();
@@ -104,12 +109,23 @@ InitializePlatform (
 
   PlatformMemMapInitialization (PlatformInfoHob);
 
-  PlatformNoexecDxeInitialization (PlatformInfoHob);
+  if (EFI_ERROR (ParseFwCfgDxeMemoryProtectionSettings (&DxeSettings))) {
+    DxeSettings = DxeMemoryProtectionProfiles[DxeMemoryProtectionSettingsRelease].Settings;
+  }
+
+  if (EFI_ERROR (ParseFwCfgMmMemoryProtectionSettings (&MmSettings))) {
+    MmSettings = MmMemoryProtectionProfiles[MmMemoryProtectionSettingsOff].Settings;
+  }
+
+  // Always disable NullPointerDetection in EndOfDxe phase for shim compatability
+  DxeSettings.NullPointerDetection.DisableEndOfDxe = TRUE;
+
+  SetDxeMemoryProtectionSettings (&DxeSettings, DxeMemoryProtectionSettingsRelease);
+  SetMmMemoryProtectionSettings (&MmSettings, MmMemoryProtectionSettingsOff);
 
   if (TdIsEnabled ()) {
     PlatformInfoHob->PcdConfidentialComputingGuestAttr = CCAttrIntelTdx;
     PlatformInfoHob->PcdTdxSharedBitMask               = TdSharedPageMask ();
-    PlatformInfoHob->PcdSetNxForStack                  = TRUE;
   }
 
   PlatformMiscInitialization (PlatformInfoHob);

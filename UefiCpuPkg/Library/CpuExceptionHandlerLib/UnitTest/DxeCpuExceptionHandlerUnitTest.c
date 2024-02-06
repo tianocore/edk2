@@ -8,6 +8,7 @@
 
 #include "CpuExceptionHandlerTest.h"
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/GetMemoryProtectionsLib.h>
 #include <Protocol/Timer.h>
 
 /**
@@ -143,6 +144,20 @@ GetMpServices (
   )
 {
   return gBS->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **)&MpServices->Protocol);
+}
+
+/**
+  Checks if stack guard is enabled.
+
+  @param[in] Context The unit test context
+**/
+UNIT_TEST_STATUS
+EFIAPI
+IsStackGuardEnabled (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  return gMps.Dxe.CpuStackGuardEnabled;
 }
 
 /**

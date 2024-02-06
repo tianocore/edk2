@@ -8,6 +8,8 @@
 
 #include "UefiPayloadEntry.h"
 
+MEMORY_PROTECTION_SETTINGS  mMps = { 0 };
+
 /**
   Allocate pages for code.
 

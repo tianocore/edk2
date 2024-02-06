@@ -38,6 +38,8 @@
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <Library/MemEncryptSevLib.h>
 #include <OvmfPlatforms.h>
+#include <Library/SetMemoryProtectionsLib.h>
+#include <Library/MemoryProtectionConfigLib.h>
 
 #include "Platform.h"
 
@@ -71,21 +73,6 @@ MemMapInitialization (
   ASSERT_RETURN_ERROR (PcdStatus);
   PcdStatus = PcdSet64S (PcdPciIoSize, PlatformInfoHob->PcdPciIoSize);
   ASSERT_RETURN_ERROR (PcdStatus);
-}
-
-STATIC
-VOID
-NoexecDxeInitialization (
-  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
-  )
-{
-  RETURN_STATUS  Status;
-
-  Status = PlatformNoexecDxeInitialization (PlatformInfoHob);
-  if (!RETURN_ERROR (Status)) {
-    Status = PcdSetBoolS (PcdSetNxForStack, PlatformInfoHob->PcdSetNxForStack);
-    ASSERT_RETURN_ERROR (Status);
-  }
 }
 
 static const UINT8  EmptyFdt[] = {
@@ -304,8 +291,10 @@ InitializePlatform (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob;
-  EFI_STATUS             Status;
+  EFI_HOB_PLATFORM_INFO           *PlatformInfoHob;
+  EFI_STATUS                      Status;
+  DXE_MEMORY_PROTECTION_SETTINGS  DxeSettings;
+  MM_MEMORY_PROTECTION_SETTINGS   MmSettings;
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
   PlatformInfoHob = BuildPlatformInfoHob ();
@@ -342,6 +331,18 @@ InitializePlatform (
 
   PublishPeiMemory (PlatformInfoHob);
 
+  if (EFI_ERROR (ParseFwCfgDxeMemoryProtectionSettings (&DxeSettings))) {
+    SetDxeMemoryProtectionSettings (NULL, DxeMemoryProtectionSettingsGrubCompat);
+  } else {
+    SetDxeMemoryProtectionSettings (&DxeSettings, DxeMemoryProtectionSettingsGrubCompat);
+  }
+
+  if (EFI_ERROR (ParseFwCfgMmMemoryProtectionSettings (&MmSettings))) {
+    SetMmMemoryProtectionSettings (NULL, MmMemoryProtectionSettingsOff);
+  } else {
+    SetMmMemoryProtectionSettings (&MmSettings, MmMemoryProtectionSettingsOff);
+  }
+
   PlatformQemuUc32BaseInitialization (PlatformInfoHob);
 
   InitializeRamRegions (PlatformInfoHob);
@@ -354,7 +355,6 @@ InitializePlatform (
     PeiFvInitialization (PlatformInfoHob);
     MemTypeInfoInitialization (PlatformInfoHob);
     MemMapInitialization (PlatformInfoHob);
-    NoexecDxeInitialization (PlatformInfoHob);
   }
 
   InstallClearCacheCallback ();

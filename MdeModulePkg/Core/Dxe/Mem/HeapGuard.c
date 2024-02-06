@@ -553,7 +553,7 @@ UnsetGuardPage (
   // memory.
   //
   Attributes = 0;
-  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & (1 << EfiConventionalMemory)) != 0) {
+  if (gMps.Dxe.ExecutionProtection.EnabledForType[EfiConventionalMemory]) {
     Attributes |= EFI_MEMORY_XP;
   }
 
@@ -590,38 +590,48 @@ IsMemoryTypeToGuard (
   IN UINT8              PageOrPool
   )
 {
-  UINT64  TestBit;
+  UINT32  MpsMemoryType;
   UINT64  ConfigBit;
 
   if (AllocateType == AllocateAddress) {
     return FALSE;
   }
 
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & PageOrPool) == 0) {
+  ConfigBit  = gMps.Dxe.HeapGuard.PageGuardEnabled ? GUARD_HEAP_TYPE_PAGE : 0;
+  ConfigBit |= gMps.Dxe.HeapGuard.PoolGuardEnabled ? GUARD_HEAP_TYPE_POOL : 0;
+  ConfigBit |= gMps.Dxe.HeapGuard.FreedMemoryGuardEnabled ? GUARD_HEAP_TYPE_FREED : 0;
+
+  if ((PageOrPool & ConfigBit) == 0) {
     return FALSE;
   }
 
-  if (PageOrPool == GUARD_HEAP_TYPE_POOL) {
-    ConfigBit = PcdGet64 (PcdHeapGuardPoolType);
-  } else if (PageOrPool == GUARD_HEAP_TYPE_PAGE) {
-    ConfigBit = PcdGet64 (PcdHeapGuardPageType);
-  } else {
-    ConfigBit = (UINT64)-1;
+  if (((PageOrPool & GUARD_HEAP_TYPE_FREED) != 0) && gMps.Dxe.HeapGuard.FreedMemoryGuardEnabled) {
+    return TRUE;
   }
 
   if ((UINT32)MemoryType >= MEMORY_TYPE_OS_RESERVED_MIN) {
-    TestBit = BIT63;
+    MpsMemoryType = OS_RESERVED_MPS_MEMORY_TYPE;
   } else if ((UINT32)MemoryType >= MEMORY_TYPE_OEM_RESERVED_MIN) {
-    TestBit = BIT62;
+    MpsMemoryType = OEM_RESERVED_MPS_MEMORY_TYPE;
   } else if (MemoryType < EfiMaxMemoryType) {
-    TestBit = LShiftU64 (1, MemoryType);
+    MpsMemoryType = MemoryType;
   } else if (MemoryType == EfiMaxMemoryType) {
-    TestBit = (UINT64)-1;
+    return (((PageOrPool & GUARD_HEAP_TYPE_PAGE) != 0) && IS_DXE_PAGE_GUARD_ACTIVE) ||
+           (((PageOrPool & GUARD_HEAP_TYPE_POOL) != 0) && IS_DXE_POOL_GUARD_ACTIVE) ||
+           (((PageOrPool & GUARD_HEAP_TYPE_FREED) != 0) && gMps.Dxe.HeapGuard.FreedMemoryGuardEnabled);
   } else {
-    TestBit = 0;
+    return FALSE;
   }
 
-  return ((ConfigBit & TestBit) != 0);
+  if (((PageOrPool & GUARD_HEAP_TYPE_PAGE) != 0) && gMps.Dxe.PageGuard.EnabledForType[MpsMemoryType]) {
+    return TRUE;
+  }
+
+  if (((PageOrPool & GUARD_HEAP_TYPE_POOL) != 0) && gMps.Dxe.PoolGuard.EnabledForType[MpsMemoryType]) {
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**
@@ -835,7 +845,7 @@ AdjustMemoryS (
   // indicated to put the pool near the Tail Guard, we need extra bytes to
   // make sure alignment of the returned pool address.
   //
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0) {
+  if (gMps.Dxe.HeapGuard.GuardAlignedToTail) {
     SizeRequested = ALIGN_VALUE (SizeRequested, 8);
   }
 
@@ -1019,7 +1029,7 @@ AdjustPoolHeadA (
   IN UINTN                 Size
   )
 {
-  if ((Memory == 0) || ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0)) {
+  if ((Memory == 0) || (!gMps.Dxe.HeapGuard.GuardAlignedToTail)) {
     //
     // Pool head is put near the head Guard
     //
@@ -1050,7 +1060,7 @@ AdjustPoolHeadF (
   IN UINTN                 Size
   )
 {
-  if ((Memory == 0) || ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0)) {
+  if ((Memory == 0) || (!gMps.Dxe.HeapGuard.GuardAlignedToTail)) {
     //
     // Pool head is put near the head Guard
     //

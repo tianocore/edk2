@@ -55,7 +55,6 @@
   CcExitLib
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard    # CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList
 

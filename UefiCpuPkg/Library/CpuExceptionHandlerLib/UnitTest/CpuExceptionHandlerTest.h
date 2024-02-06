@@ -27,7 +27,7 @@
     In this test case, stack overflow is triggered by a funtion which calls itself continuously. This test case triggers stack
     overflow in both BSP and AP. All AP use same Idt with Bsp. The expectation is:
       1. PF exception is triggered (leading to a DF if sepereated stack is not prepared for PF) when Rsp <= StackBase + SIZE_4KB
-         since [StackBase, StackBase + SIZE_4KB] is marked as not present in page table when PcdCpuStackGuard is TRUE.
+         since [StackBase, StackBase + SIZE_4KB] is marked as not present in page table when CpuStackGuard is TRUE.
       2. Stack for PF/DF exception handler in both Bsp and AP is succussfully switched by InitializeSeparateExceptionStacks.
 
 **/
@@ -340,6 +340,17 @@ EFIAPI
 CpuStackGuardExceptionHandler (
   IN EFI_EXCEPTION_TYPE  ExceptionType,
   IN EFI_SYSTEM_CONTEXT  SystemContext
+  );
+
+/**
+  Checks if stack guard is enabled.
+
+  @param[in] Context The unit test context
+**/
+UNIT_TEST_STATUS
+EFIAPI
+IsStackGuardEnabled (
+  IN UNIT_TEST_CONTEXT  Context
   );
 
 #endif

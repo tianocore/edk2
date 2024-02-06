@@ -198,13 +198,13 @@
 
 [PcdsFixedAtBuild]
   ## List of exception vectors which need switching stack.
-  #  This PCD will only take into effect if PcdCpuStackGuard is enabled.
+  #  This PCD will only take into effect if the CPU Stack Guard is enabled.
   #  By default exception #DD(8), #PF(14) are supported.
   # @Prompt Specify exception vectors which need switching stack.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList|{0x08, 0x0E}|VOID*|0x30002000
 
   ## Size of good stack for an exception.
-  #  This PCD will only take into effect if PcdCpuStackGuard is enabled.
+  #  This PCD will only take into effect if the CPU Stack Guard is enabled.
   # @Prompt Specify size of good stack of exception which need switching stack.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize|2048|UINT32|0x30002001
 
@@ -394,9 +394,8 @@
   #  and the memory occupied by page table is protected by page table itself as read-only.
   #  In X64 build, it cannot be enabled at the same time with SMM profile feature (PcdCpuSmmProfileEnable).
   #  In X64 build, it could not be enabled also at the same time with heap guard feature for SMM
-  #  (PcdHeapGuardPropertyMask in MdeModulePkg).
   #  In IA32 build, page table memory is not marked as read-only when either SMM profile feature (PcdCpuSmmProfileEnable)
-  #  or heap guard feature for SMM (PcdHeapGuardPropertyMask in MdeModulePkg) is enabled.
+  #  or heap guard feature for SMM is enabled.
   #   TRUE  - Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.<BR>
   #   FALSE - Access to any type of non-SMRAM memory after SmmReadyToLock is allowed.<BR>
   # @Prompt Access to non-SMRAM memory is restricted to reserved, runtime and ACPI NVS type after SmmReadyToLock.

@@ -219,11 +219,14 @@ ToBuildPageTable (
     return TRUE;
   }
 
-  if (PcdGet8 (PcdHeapGuardPropertyMask) != 0) {
+  if (mMps.Dxe.HeapGuard.PageGuardEnabled ||
+      mMps.Dxe.HeapGuard.PoolGuardEnabled ||
+      mMps.Dxe.HeapGuard.FreedMemoryGuardEnabled)
+  {
     return TRUE;
   }
 
-  if (PcdGetBool (PcdCpuStackGuard)) {
+  if (mMps.Dxe.CpuStackGuardEnabled) {
     return TRUE;
   }
 
@@ -264,6 +267,8 @@ HandOffToDxeCore (
   EFI_VECTOR_HANDOFF_INFO          *VectorInfo;
   EFI_PEI_VECTOR_HANDOFF_INFO_PPI  *VectorHandoffInfoPpi;
   BOOLEAN                          BuildPageTablesIa32Pae;
+
+  GetCurrentMemoryProtectionSettings (&mMps);
 
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
