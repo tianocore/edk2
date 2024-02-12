@@ -495,10 +495,4 @@ QemuVideoBochsModeSetup (
   BOOLEAN                  IsQxl
   );
 
-VOID
-InstallVbeShim (
-  IN CONST CHAR16          *CardName,
-  IN EFI_PHYSICAL_ADDRESS  FrameBufferBase
-  );
-
 #endif
