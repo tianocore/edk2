@@ -217,4 +217,26 @@ Dhcp6OnTimerTick (
   IN VOID       *Context
   );
 
+/**
+  Seeks the Inner Options from a DHCP6 Option
+
+  @param[in]  IaType          The type of the IA option.
+  @param[in]  Option          The pointer to the DHCP6 Option.
+  @param[in]  OptionLen       The length of the DHCP6 Option.
+  @param[out] IaInnerOpt      The pointer to the IA inner option.
+  @param[out] IaInnerLen      The length of the IA inner option.
+
+  @retval EFI_SUCCESS         Seek the inner option successfully.
+  @retval EFI_DEVICE_ERROR    The OptionLen is invalid. On Error,
+                              the pointers are not modified
+**/
+EFI_STATUS
+Dhcp6SeekInnerOptionSafe (
+  IN  UINT16  IaType,
+  IN  UINT8   *Option,
+  IN  UINT32  OptionLen,
+  OUT UINT8   **IaInnerOpt,
+  OUT UINT16  *IaInnerLen
+  );
+
 #endif

@@ -528,13 +528,23 @@ Dhcp6UpdateIaInfo (
 {
   EFI_STATUS  Status;
   UINT8       *Option;
+  UINT32      OptionLen;
   UINT8       *IaInnerOpt;
   UINT16      IaInnerLen;
   UINT16      StsCode;
   UINT32      T1;
   UINT32      T2;
 
+  T1 = 0;
+  T2 = 0;
+
   ASSERT (Instance->Config != NULL);
+
+  // OptionLen is the length of the Options excluding the DHCP header.
+  // Length of the EFI_DHCP6_PACKET from the first byte of the Header field to the last
+  // byte of the Option[] field.
+  OptionLen = Packet->Length - sizeof (Packet->Dhcp6.Header);
+
   //
   // If the reply was received in response to a solicit with rapid commit option,
   // request, renew or rebind message, the client updates the information it has
@@ -549,12 +559,28 @@ Dhcp6UpdateIaInfo (
   //
   Option = Dhcp6SeekIaOption (
              Packet->Dhcp6.Option,
-             Packet->Length - sizeof (EFI_DHCP6_HEADER),
+             OptionLen,
              &Instance->Config->IaDescriptor
              );
   if (Option == NULL) {
     return EFI_DEVICE_ERROR;
   }
+
+  //
+  // Calculate the distance from Packet->Dhcp6.Option to the IA option.
+  //
+  // Packet->Size and Packet->Length are both UINT32 type, and Packet->Size is
+  // the size of the whole packet, including the DHCP header, and Packet->Length
+  // is the length of the DHCP message body, excluding the DHCP header.
+  //
+  // (*Option - Packet->Dhcp6.Option) is the number of bytes from the start of
+  // DHCP6 option area to the start of the IA option.
+  //
+  // Dhcp6SeekInnerOptionSafe() is searching starting from the start of the
+  // IA option to the end of the DHCP6 option area, thus subtract the space
+  // up until this option
+  //
+  OptionLen = OptionLen - (UINT32)(Option - Packet->Dhcp6.Option);
 
   //
   // The format of the IA_NA option is:
@@ -591,32 +617,32 @@ Dhcp6UpdateIaInfo (
   //
 
   //
-  // sizeof (option-code + option-len + IaId)           = 8
-  // sizeof (option-code + option-len + IaId + T1)      = 12
-  // sizeof (option-code + option-len + IaId + T1 + T2) = 16
+  // Seek the inner option
   //
-  // The inner options still start with 2 bytes option-code and 2 bytes option-len.
-  //
+  if (EFI_ERROR (
+        Dhcp6SeekInnerOptionSafe (
+          Instance->Config->IaDescriptor.Type,
+          Option,
+          OptionLen,
+          &IaInnerOpt,
+          &IaInnerLen
+          )
+        ))
+  {
+    return EFI_DEVICE_ERROR;
+  }
+
   if (Instance->Config->IaDescriptor.Type == Dhcp6OptIana) {
     T1 = NTOHL (ReadUnaligned32 ((UINT32 *)(DHCP6_OFFSET_OF_IA_NA_T1 (Option))));
     T2 = NTOHL (ReadUnaligned32 ((UINT32 *)(DHCP6_OFFSET_OF_IA_NA_T2 (Option))));
     //
     // Refer to RFC3155 Chapter 22.4. If a client receives an IA_NA with T1 greater than T2,
     // and both T1 and T2 are greater than 0, the client discards the IA_NA option and processes
-    // the remainder of the message as though the server had not  included the invalid IA_NA option.
+    // the remainder of the message as though the server had not included the invalid IA_NA option.
     //
     if ((T1 > T2) && (T2 > 0)) {
       return EFI_DEVICE_ERROR;
     }
-
-    IaInnerOpt = DHCP6_OFFSET_OF_IA_NA_INNER_OPT (Option);
-    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(DHCP6_OFFSET_OF_OPT_LEN (Option)))) - DHCP6_SIZE_OF_COMBINED_IAID_T1_T2);
-  } else {
-    T1 = 0;
-    T2 = 0;
-
-    IaInnerOpt = DHCP6_OFFSET_OF_IA_TA_INNER_OPT (Option);
-    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(DHCP6_OFFSET_OF_OPT_LEN (Option)))) - DHCP6_SIZE_OF_IAID);
   }
 
   //
@@ -642,7 +668,7 @@ Dhcp6UpdateIaInfo (
   Option  = Dhcp6SeekOption (IaInnerOpt, IaInnerLen, Dhcp6OptStatusCode);
 
   if (Option != NULL) {
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(DHCP6_OFFSET_OF_OPT_LEN (Option))));
+    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(DHCP6_OFFSET_OF_STATUS_CODE (Option))));
     if (StsCode != Dhcp6StsSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -703,15 +729,21 @@ Dhcp6SeekInnerOptionSafe (
   }
 
   if (IaType == Dhcp6OptIana) {
+    //
     // Verify we have a fully formed IA_NA
+    //
     if (OptionLen < DHCP6_MIN_SIZE_OF_IA_NA) {
       return EFI_DEVICE_ERROR;
     }
 
     //
+    // Get the IA Inner Option and Length
+    //
     IaInnerOptTmp = DHCP6_OFFSET_OF_IA_NA_INNER_OPT (Option);
 
+    //
     // Verify the IaInnerLen is valid.
+    //
     IaInnerLenTmp = (UINT16)NTOHS (ReadUnaligned16 ((UINT16 *)DHCP6_OFFSET_OF_OPT_LEN (Option)));
     if (IaInnerLenTmp < DHCP6_SIZE_OF_COMBINED_IAID_T1_T2) {
       return EFI_DEVICE_ERROR;
@@ -719,14 +751,18 @@ Dhcp6SeekInnerOptionSafe (
 
     IaInnerLenTmp -= DHCP6_SIZE_OF_COMBINED_IAID_T1_T2;
   } else if (IaType == Dhcp6OptIata) {
+    //
     // Verify the OptionLen is valid.
+    //
     if (OptionLen < DHCP6_MIN_SIZE_OF_IA_TA) {
       return EFI_DEVICE_ERROR;
     }
 
     IaInnerOptTmp = DHCP6_OFFSET_OF_IA_TA_INNER_OPT (Option);
 
+    //
     // Verify the IaInnerLen is valid.
+    //
     IaInnerLenTmp = (UINT16)NTOHS (ReadUnaligned16 ((UINT16 *)(DHCP6_OFFSET_OF_OPT_LEN (Option))));
     if (IaInnerLenTmp < DHCP6_SIZE_OF_IAID) {
       return EFI_DEVICE_ERROR;
