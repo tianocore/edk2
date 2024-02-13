@@ -1146,6 +1146,13 @@ PiCpuSmmEntry (
     // When the HOB doesn't exist, allocate new SMBASE itself.
     //
     DEBUG ((DEBUG_INFO, "PiCpuSmmEntry: gSmmBaseHobGuid not found!\n"));
+
+    mCpuHotPlugData.SmBase = (UINTN *)AllocatePool (sizeof (UINTN) * mMaxNumberOfCpus);
+    if (mCpuHotPlugData.SmBase == NULL) {
+      ASSERT (mCpuHotPlugData.SmBase != NULL);
+      CpuDeadLoop ();
+    }
+
     //
     // very old processors (i486 + pentium) need 32k not 4k alignment, exclude them.
     //
