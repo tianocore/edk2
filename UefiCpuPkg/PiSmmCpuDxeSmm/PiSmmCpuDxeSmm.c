@@ -620,14 +620,21 @@ SmBaseHobCompare (
 /**
   Extract SmBase for all CPU from SmmBase HOB.
 
-  @param[in]  MaxNumberOfCpus   Max NumberOfCpus.
+  @param[in]  MaxNumberOfCpus        Max NumberOfCpus.
 
-  @retval SmBaseBuffer          Pointer to SmBase Buffer.
-  @retval NULL                  gSmmBaseHobGuid was not been created.
+  @param[out] AllocatedSmBaseBuffer  Pointer to SmBase Buffer allocated
+                                     by this function. Only set if the
+                                     function returns EFI_SUCCESS.
+
+  @retval EFI_SUCCESS           SmBase Buffer output successfully.
+  @retval EFI_OUT_OF_RESOURCES  Memory allocation failed.
+  @retval EFI_NOT_FOUND         gSmmBaseHobGuid was never created.
 **/
-UINTN *
+STATIC
+EFI_STATUS
 GetSmBase (
-  IN  UINTN  MaxNumberOfCpus
+  IN  UINTN  MaxNumberOfCpus,
+  OUT UINTN  **AllocatedSmBaseBuffer
   )
 {
   UINTN              HobCount;
@@ -650,7 +657,7 @@ GetSmBase (
 
   FirstSmmBaseGuidHob = GetFirstGuidHob (&gSmmBaseHobGuid);
   if (FirstSmmBaseGuidHob == NULL) {
-    return NULL;
+    return EFI_NOT_FOUND;
   }
 
   GuidHob = FirstSmmBaseGuidHob;
@@ -672,9 +679,8 @@ GetSmBase (
   }
 
   SmBaseHobs = AllocatePool (sizeof (SMM_BASE_HOB_DATA *) * HobCount);
-  ASSERT (SmBaseHobs != NULL);
   if (SmBaseHobs == NULL) {
-    return NULL;
+    return EFI_OUT_OF_RESOURCES;
   }
 
   //
@@ -692,7 +698,7 @@ GetSmBase (
   ASSERT (SmBaseBuffer != NULL);
   if (SmBaseBuffer == NULL) {
     FreePool (SmBaseHobs);
-    return NULL;
+    return EFI_OUT_OF_RESOURCES;
   }
 
   QuickSort (SmBaseHobs, HobCount, sizeof (SMM_BASE_HOB_DATA *), (BASE_SORT_COMPARE)SmBaseHobCompare, &SortBuffer);
@@ -714,7 +720,8 @@ GetSmBase (
   }
 
   FreePool (SmBaseHobs);
-  return SmBaseBuffer;
+  *AllocatedSmBaseBuffer = SmBaseBuffer;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1111,8 +1118,15 @@ PiCpuSmmEntry (
   // Retrive the allocated SmmBase from gSmmBaseHobGuid. If found,
   // means the SmBase relocation has been done.
   //
-  mCpuHotPlugData.SmBase = GetSmBase (mMaxNumberOfCpus);
-  if (mCpuHotPlugData.SmBase != NULL) {
+  mCpuHotPlugData.SmBase = NULL;
+  Status                 = GetSmBase (mMaxNumberOfCpus, &mCpuHotPlugData.SmBase);
+  if (Status == EFI_OUT_OF_RESOURCES) {
+    ASSERT (Status != EFI_OUT_OF_RESOURCES);
+    CpuDeadLoop ();
+  }
+
+  if (!EFI_ERROR (Status)) {
+    ASSERT (mCpuHotPlugData.SmBase != NULL);
     //
     // Check whether the Required TileSize is enough.
     //
@@ -1126,6 +1140,8 @@ PiCpuSmmEntry (
 
     mSmmRelocated = TRUE;
   } else {
+    ASSERT (Status == EFI_NOT_FOUND);
+    ASSERT (mCpuHotPlugData.SmBase == NULL);
     //
     // When the HOB doesn't exist, allocate new SMBASE itself.
     //
