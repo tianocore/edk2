@@ -31,10 +31,13 @@
   DynamicTablesPkg/Drivers/DynamicTableManagerDxe/DynamicTableManagerDxe.inf
 
 [Components.IA32, Components.X64]
+  DynamicTablesPkg/Library/Acpi/AcpiFadtLib/AcpiFadtLib.inf
   #
   # Dynamic Table Factory Dxe
   #
-  DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf
+  DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf {
+    NULL|DynamicTablesPkg/Library/Acpi/AcpiFadtLib/AcpiFadtLib.inf
+  }
 
 [Components.ARM, Components.AARCH64]
   #

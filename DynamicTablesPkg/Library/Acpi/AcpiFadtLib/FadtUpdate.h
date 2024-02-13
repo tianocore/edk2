@@ -1,0 +1,28 @@
+/** @file
+  FADT Update header file
+  Defines architecture specific function headers.
+
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#ifndef FADT_UPDATE_H_
+#define FADT_UPDATE_H_
+
+#include <Uefi/UefiBaseType.h>
+
+/** Gets Architecture specific bitmask for EObjNameSpaceArch namespace.
+
+  @param [out] ArchObjMask   Pointer to the Mask bit variable.
+
+  @retval None
+**/
+VOID
+EFIAPI
+GetPlatformNameSpaceMask (
+  OUT UINT64  *ArchObjMask
+  );
+
+#endif // FADT_UPDATE_H_

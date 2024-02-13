@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2017 - 2022, ARM Limited. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -14,6 +15,7 @@
 
 #include <ArmNameSpaceObjects.h>
 #include <StandardNameSpaceObjects.h>
+#include <ArchNameSpaceObjects.h>
 
 #pragma pack(1)
 
@@ -107,6 +109,7 @@ typedef UINT32 CM_OBJECT_ID;
 typedef enum ObjectNameSpaceID {
   EObjNameSpaceStandard,      ///< Standard Objects Namespace
   EObjNameSpaceArm,           ///< ARM Objects Namespace
+  EObjNameSpaceArch,          ///< Arch Objects Namespace
   EObjNameSpaceOem = 0x8,     ///< OEM Objects Namespace
   EObjNameSpaceMax
 } EOBJECT_NAMESPACE_ID;
@@ -171,6 +174,9 @@ typedef struct CmObjDescriptor {
 **/
 #define CREATE_CM_STD_OBJECT_ID(ObjectId) \
           (CREATE_CM_OBJECT_ID (EObjNameSpaceStandard, ObjectId))
+
+#define CREATE_CM_ARCH_OBJECT_ID(ObjectId) \
+          (CREATE_CM_OBJECT_ID (EObjNameSpaceArch, ObjectId))
 
 /** This macro returns a Configuration Manager Object ID
     in the ARM Object Namespace.
