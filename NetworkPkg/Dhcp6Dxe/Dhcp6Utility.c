@@ -925,6 +925,11 @@ Dhcp6AppendIaOption (
   }
 
   //
+  // Update the packet length
+  //
+  Packet->Length += BytesNeeded;
+
+  //
   // Fill all the addresses belong to the Ia
   //
   for (Index = 0; Index < Ia->IaAddressCount; Index++) {
@@ -934,11 +939,6 @@ Dhcp6AppendIaOption (
       return Status;
     }
   }
-
-  //
-  // Update the packet length
-  //
-  Packet->Length += BytesNeeded;
 
   //
   // Fill the value of Ia option length
