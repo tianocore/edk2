@@ -10,6 +10,16 @@
 
 #include "Dhcp6Impl.h"
 
+//
+// Verifies the packet cursor is within the packet
+// otherwise it is invalid
+//
+#define IS_INVALID_PACKET_CURSOR(PacketCursor, Packet) \
+  (((*PacketCursor) < (Packet)->Dhcp6.Option) || \
+   ((*PacketCursor) >= (Packet)->Dhcp6.Option + ((Packet)->Size - sizeof(EFI_DHCP6_HEADER))) \
+  )                                                                            \
+
+
 /**
   Generate client Duid in the format of Duid-llt.
 
@@ -638,9 +648,7 @@ Dhcp6AppendOption (
   //
   // Verify the PacketCursor is within the packet
   //
-  if (  (*PacketCursor < Packet->Dhcp6.Option)
-     || (*PacketCursor >= Packet->Dhcp6.Option + (Packet->Size - sizeof (EFI_DHCP6_HEADER))))
-  {
+  if (IS_INVALID_PACKET_CURSOR (PacketCursor, Packet)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -655,15 +663,6 @@ Dhcp6AppendOption (
   Length = Packet->Size - Packet->Length;
   if (Length < BytesNeeded) {
     return EFI_BUFFER_TOO_SMALL;
-  }
-
-  //
-  // Verify the PacketCursor is within the packet
-  //
-  if (  (*PacketCursor < Packet->Dhcp6.Option)
-     || (*PacketCursor >= Packet->Dhcp6.Option + (Packet->Size - sizeof (EFI_DHCP6_HEADER))))
-  {
-    return EFI_INVALID_PARAMETER;
   }
 
   WriteUnaligned16 ((UINT16 *)*PacketCursor, OptType);
@@ -744,9 +743,7 @@ Dhcp6AppendIaAddrOption (
   //
   // Verify the PacketCursor is within the packet
   //
-  if (  (*PacketCursor < Packet->Dhcp6.Option)
-     || (*PacketCursor >= Packet->Dhcp6.Option + (Packet->Size - sizeof (EFI_DHCP6_HEADER))))
-  {
+  if (IS_INVALID_PACKET_CURSOR (PacketCursor, Packet)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -877,9 +874,7 @@ Dhcp6AppendIaOption (
   //
   // Verify the PacketCursor is within the packet
   //
-  if (  (*PacketCursor < Packet->Dhcp6.Option)
-     || (*PacketCursor >= Packet->Dhcp6.Option + (Packet->Size - sizeof (EFI_DHCP6_HEADER))))
-  {
+  if (IS_INVALID_PACKET_CURSOR (PacketCursor, Packet)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -941,14 +936,14 @@ Dhcp6AppendIaOption (
   }
 
   //
-  // Fill the value of Ia option length
-  //
-  *Len = HTONS ((UINT16)(*PacketCursor - (UINT8 *)Len - 2));
-
-  //
   // Update the packet length
   //
   Packet->Length += BytesNeeded;
+
+  //
+  // Fill the value of Ia option length
+  //
+  *Len = HTONS ((UINT16)(*PacketCursor - (UINT8 *)Len - 2));
 
   return EFI_SUCCESS;
 }
@@ -957,6 +952,7 @@ Dhcp6AppendIaOption (
   Append the appointed Elapsed time option to Buf, and move Buf to the end.
 
   @param[in, out] Packet        A pointer to the packet, on success Packet->Length
+                                will be updated.
   @param[in, out] PacketCursor  The pointer in the packet, on success PacketCursor
                                 will be moved to the end of the option.
   @param[in]      Instance      The pointer to the Dhcp6 instance.
@@ -1012,9 +1008,7 @@ Dhcp6AppendETOption (
   //
   // Verify the PacketCursor is within the packet
   //
-  if (  (*PacketCursor < Packet->Dhcp6.Option)
-     || (*PacketCursor >= Packet->Dhcp6.Option + (Packet->Size - sizeof (EFI_DHCP6_HEADER))))
-  {
+  if (IS_INVALID_PACKET_CURSOR (PacketCursor, Packet)) {
     return EFI_INVALID_PARAMETER;
   }
 
