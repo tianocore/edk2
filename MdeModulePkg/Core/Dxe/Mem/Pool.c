@@ -381,6 +381,17 @@ CoreAllocatePoolI (
   }
 
   //
+  // the heap guard system does not support non-EFI_PAGE_SIZE alignments
+  // architectures that require larger RUNTIME_PAGE_ALLOCATION_GRANULARITY
+  // will have the runtime and ACPI memory regions unguarded. OSes do not
+  // map guard pages anyway, so this is a minimal loss. Not guarding prevents
+  // alignment mismatches
+  //
+  if (Granularity != EFI_PAGE_SIZE) {
+    NeedGuard = FALSE;
+  }
+
+  //
   // Adjust the size by the pool header & tail overhead
   //
 

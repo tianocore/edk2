@@ -469,4 +469,18 @@ PromoteGuardedFreePages (
 
 extern BOOLEAN  mOnGuarding;
 
+//
+// the heap guard system does not support non-EFI_PAGE_SIZE alignments
+// architectures that require larger RUNTIME_PAGE_ALLOCATION_GRANULARITY
+// cannot have EfiRuntimeServicesCode, EfiRuntimeServicesData, EfiACPIReclaimMemory,
+// and EfiACPIMemoryNVS guarded. OSes do not map guard pages anyway, so this is a
+// minimal loss. Not guarding prevents alignment mismatches
+//
+STATIC_ASSERT (
+  RUNTIME_PAGE_ALLOCATION_GRANULARITY == EFI_PAGE_SIZE ||
+  (((FixedPcdGet64 (PcdHeapGuardPageType) & 0x660) == 0) &&
+   ((FixedPcdGet64 (PcdHeapGuardPoolType) & 0x660) == 0)),
+  "Unsupported Heap Guard configuration on system with greater than EFI_PAGE_SIZE RUNTIME_PAGE_ALLOCATION_GRANULARITY"
+  );
+
 #endif
