@@ -187,6 +187,8 @@ GetPeiMemoryCap (
   UINT32   Pml4Entries;
   UINT32   PdpEntries;
   UINTN    TotalPages;
+  UINT64   ApStacks;
+  UINT64   MemoryCap;
 
   //
   // If DXE is 32-bit, then just return the traditional 64 MB cap.
@@ -235,11 +237,20 @@ GetPeiMemoryCap (
   ASSERT (TotalPages <= 0x40201);
 
   //
-  // Add 64 MB for miscellaneous allocations. Note that for
-  // PhysMemAddressWidth values close to 36, the cap will actually be
-  // dominated by this increment.
+  // With 32k stacks and 4096 vcpus this lands at 128 MB (far away
+  // from MAX_UINT32).
   //
-  return (UINT32)(EFI_PAGES_TO_SIZE (TotalPages) + SIZE_64MB);
+  ApStacks = PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber * PcdGet32 (PcdCpuApStackSize);
+
+  //
+  // Add 64 MB for miscellaneous allocations. Note that for
+  // PhysMemAddressWidth values close to 36 and a small number of
+  // CPUs, the cap will actually be dominated by this increment.
+  //
+  MemoryCap = EFI_PAGES_TO_SIZE (TotalPages) + ApStacks + SIZE_64MB;
+
+  ASSERT (MemoryCap <= MAX_UINT32);
+  return (UINT32)MemoryCap;
 }
 
 /**
