@@ -53,8 +53,7 @@
         "AcceptableDependencies": [
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
-            "StandaloneMmPkg/StandaloneMmPkg.dec",
-            "ArmPkg/ArmPkg.dec"  # this should be fixed by promoting an abstraction
+            "StandaloneMmPkg/StandaloneMmPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
