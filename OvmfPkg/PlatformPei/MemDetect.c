@@ -319,6 +319,14 @@ PublishPeiMemory (
     if (MemorySize > PeiMemoryCap) {
       MemoryBase = LowerMemorySize - PeiMemoryCap;
       MemorySize = PeiMemoryCap;
+    } else {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: Not enough memory for PEI (have %lu KB, estimated need %u KB)\n",
+        __func__,
+        RShiftU64 (MemorySize, 10),
+        PeiMemoryCap >> 10
+        ));
     }
   }
 
