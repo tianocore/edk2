@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017 - 2022, ARM Limited. All rights reserved.
+  Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -29,8 +29,9 @@ _______________________________________________________________________________
 
 Bits: [31:28] - Name Space ID
                 0000 - Standard
-                0001 - ARM
-                1000 - Custom/OEM
+                0001 - Arch Common
+                0010 - ARM
+                1111 - Custom/OEM
                 All other values are reserved.
 
 Bits: [27:16] - Reserved.
@@ -105,10 +106,11 @@ typedef UINT32 CM_OBJECT_ID;
     for the Configuration Manager Objects.
 */
 typedef enum ObjectNameSpaceID {
-  EObjNameSpaceStandard,      ///< Standard Objects Namespace
-  EObjNameSpaceArm,           ///< ARM Objects Namespace
-  EObjNameSpaceOem = 0x8,     ///< OEM Objects Namespace
-  EObjNameSpaceMax
+  EObjNameSpaceStandard,          ///< Standard Objects Namespace
+  EObjNameSpaceArchCommon,        ///< Arch Common Objects Namespace
+  EObjNameSpaceArm,               ///< ARM Objects Namespace
+  EObjNameSpaceOem = 0xF,         ///< OEM Objects Namespace
+  EObjNameSpaceMax,
 } EOBJECT_NAMESPACE_ID;
 
 /** A descriptor for Configuration Manager Objects.
@@ -181,6 +183,16 @@ typedef struct CmObjDescriptor {
 **/
 #define CREATE_CM_ARM_OBJECT_ID(ObjectId) \
           (CREATE_CM_OBJECT_ID (EObjNameSpaceArm, ObjectId))
+
+/** This macro returns a Configuration Manager Object ID
+    in the Arch Common Object Namespace.
+
+  @param [in] ObjectId    The Object ID.
+
+  @retval Returns an Arch Common Configuration Manager Object ID.
+**/
+#define CREATE_CM_ARCH_COMMON_OBJECT_ID(ObjectId) \
+          (CREATE_CM_OBJECT_ID (EObjNameSpaceArchCommon, ObjectId))
 
 /** This macro returns a Configuration Manager Object ID
     in the OEM Object Namespace.
