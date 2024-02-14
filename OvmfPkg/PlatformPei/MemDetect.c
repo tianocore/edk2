@@ -184,9 +184,12 @@ GetPeiMemoryCap (
   BOOLEAN  Page1GSupport;
   UINT32   RegEax;
   UINT32   RegEdx;
-  UINT32   Pml4Entries;
-  UINT32   PdpEntries;
-  UINTN    TotalPages;
+  UINT64   MaxAddr;
+  UINT32   Level5Pages;
+  UINT32   Level4Pages;
+  UINT32   Level3Pages;
+  UINT32   Level2Pages;
+  UINT32   TotalPages;
   UINT64   ApStacks;
   UINT64   MemoryCap;
 
@@ -203,8 +206,7 @@ GetPeiMemoryCap (
   //
   // Dependent on physical address width, PEI memory allocations can be
   // dominated by the page tables built for 64-bit DXE. So we key the cap off
-  // of those. The code below is based on CreateIdentityMappingPageTables() in
-  // "MdeModulePkg/Core/DxeIplPeim/X64/VirtualMemory.c".
+  // of those.
   //
   Page1GSupport = FALSE;
   if (PcdGetBool (PcdUse1GPageTable)) {
@@ -217,24 +219,36 @@ GetPeiMemoryCap (
     }
   }
 
-  if (PlatformInfoHob->PhysMemAddressWidth <= 39) {
-    Pml4Entries = 1;
-    PdpEntries  = 1 << (PlatformInfoHob->PhysMemAddressWidth - 30);
-    ASSERT (PdpEntries <= 0x200);
+  //
+  // - A 4KB page accommodates the least significant 12 bits of the
+  //   virtual address.
+  // - A page table entry at any level consumes 8 bytes, so a 4KB page
+  //   table page (at any level) contains 512 entries, and
+  //   accommodates 9 bits of the virtual address.
+  // - we minimally cover the phys address space with 2MB pages, so
+  //   level 1 never exists.
+  // - If 1G paging is available, then level 2 doesn't exist either.
+  // - Start with level 2, where a page table page accommodates
+  //   9 + 9 + 12 = 30 bits of the virtual address (and covers 1GB of
+  //   physical address space).
+  //
+
+  MaxAddr     = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
+  Level2Pages = (UINT32)RShiftU64 (MaxAddr, 30);
+  Level3Pages = MAX (Level2Pages >> 9, 1u);
+  Level4Pages = MAX (Level3Pages >> 9, 1u);
+  Level5Pages = 1;
+
+  if (Page1GSupport) {
+    Level2Pages = 0;
+    TotalPages  = Level5Pages + Level4Pages + Level3Pages;
+    ASSERT (TotalPages <= 0x40201);
   } else {
-    if (PlatformInfoHob->PhysMemAddressWidth > 48) {
-      Pml4Entries = 0x200;
-    } else {
-      Pml4Entries = 1 << (PlatformInfoHob->PhysMemAddressWidth - 39);
-    }
-
-    ASSERT (Pml4Entries <= 0x200);
-    PdpEntries = 512;
+    TotalPages = Level5Pages + Level4Pages + Level3Pages + Level2Pages;
+    // PlatformAddressWidthFromCpuid() caps at 40 phys bits without 1G pages.
+    ASSERT (PlatformInfoHob->PhysMemAddressWidth <= 40);
+    ASSERT (TotalPages <= 0x404);
   }
-
-  TotalPages = Page1GSupport ? Pml4Entries + 1 :
-               (PdpEntries + 1) * Pml4Entries + 1;
-  ASSERT (TotalPages <= 0x40201);
 
   //
   // With 32k stacks and 4096 vcpus this lands at 128 MB (far away
@@ -247,7 +261,7 @@ GetPeiMemoryCap (
   // PhysMemAddressWidth values close to 36 and a small number of
   // CPUs, the cap will actually be dominated by this increment.
   //
-  MemoryCap = EFI_PAGES_TO_SIZE (TotalPages) + ApStacks + SIZE_64MB;
+  MemoryCap = EFI_PAGES_TO_SIZE ((UINTN)TotalPages) + ApStacks + SIZE_64MB;
 
   ASSERT (MemoryCap <= MAX_UINT32);
   return (UINT32)MemoryCap;
