@@ -263,6 +263,30 @@ GetPeiMemoryCap (
   //
   MemoryCap = EFI_PAGES_TO_SIZE ((UINTN)TotalPages) + ApStacks + SIZE_64MB;
 
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: page tables: %6lu KB (%u/%u/%u/%u pages for levels 5/4/3/2)\n",
+    __func__,
+    RShiftU64 (EFI_PAGES_TO_SIZE ((UINTN)TotalPages), 10),
+    Level5Pages,
+    Level4Pages,
+    Level3Pages,
+    Level2Pages
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: ap stacks:   %6lu KB (%u cpus)\n",
+    __func__,
+    RShiftU64 (ApStacks, 10),
+    PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: memory cap:  %6lu KB\n",
+    __func__,
+    RShiftU64 (MemoryCap, 10)
+    ));
+
   ASSERT (MemoryCap <= MAX_UINT32);
   return (UINT32)MemoryCap;
 }
