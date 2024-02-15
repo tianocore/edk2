@@ -45,7 +45,7 @@ TraceHubSysTDebugWrite (
   MIPI_SYST_HANDLE  MipiSystHandle;
   MIPI_SYST_HEADER  MipiSystHeader;
   RETURN_STATUS     Status;
-  UINT16            Index;
+  UINT32            Index;
 
   if ((mDbgInstCount == 0) || (mThDebugInstArray == NULL)) {
     return RETURN_ABORTED;

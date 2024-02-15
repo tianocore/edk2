@@ -41,7 +41,7 @@ TraceHubSysTDebugWrite (
   MIPI_SYST_HEADER  MipiSystHeader;
   RETURN_STATUS     Status;
   UINT32            DbgInstCount;
-  UINT16            Index;
+  UINT32            Index;
 
   if (NumberOfBytes == 0) {
     //
@@ -109,7 +109,7 @@ TraceHubSysTWriteCataLog64StatusCode (
   MIPI_SYST_HEADER  MipiSystHeader;
   RETURN_STATUS     Status;
   UINT32            DbgInstCount;
-  UINT16            Index;
+  UINT32            Index;
 
   if (Guid == NULL) {
     return RETURN_INVALID_PARAMETER;

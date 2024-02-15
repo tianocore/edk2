@@ -56,7 +56,7 @@ PackThDebugInstance (
   )
 {
   UINT8   *DbgContext;
-  UINT16  Index;
+  UINT32  Index;
 
   DbgContext = GetFirstGuidHob (&gTraceHubDebugInfoHobGuid);
   if (DbgContext != NULL) {
