@@ -147,7 +147,6 @@ FspGlobalDataInit (
   // It may have multiple FVs, so look into the last one for FSP header
   //
   PeiFspData->FspInfoHeader = (FSP_INFO_HEADER *)(UINTN)AsmGetFspInfoHeader ();
-  SecGetPlatformData (PeiFspData);
 
   //
   // Set API calling mode
@@ -211,7 +210,7 @@ FspGlobalDataInit (
     ((PeiFspData->FspInfoHeader->ImageRevision & 0xFF) | ((PeiFspData->FspInfoHeader->ExtendedImageRevision & 0xFF) << 8)) : \
     (PeiFspData->FspInfoHeader->ImageRevision & 0xFF)
     ));
-}
+  }
 
 /**
 

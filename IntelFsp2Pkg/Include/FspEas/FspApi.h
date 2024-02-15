@@ -139,7 +139,7 @@ typedef struct {
 ///
 typedef struct {
   ///
-  /// Revision of the structure is 2 for this version of the specification.
+  /// Revision of the structure is 3 for this version of the specification.
   ///
   UINT8                   Revision;
   UINT8                   Reserved[3];
@@ -152,7 +152,8 @@ typedef struct {
   /// occurring during FSP execution.
   ///
   EFI_PHYSICAL_ADDRESS    FspDebugHandler;
-  UINT8                   Reserved1[16];
+  UINT32                  FspTemporaryRamSize;
+  UINT8                   Reserved1[12];
 } FSPT_ARCH2_UPD;
 
 ///
