@@ -331,6 +331,7 @@
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
+  CcSvsmLib|UefiCpuPkg/Library/CcSvsmLibNull/CcSvsmLibNull.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
 [LibraryClasses.common]
