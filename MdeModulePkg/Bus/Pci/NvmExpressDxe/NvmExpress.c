@@ -288,9 +288,9 @@ EnumerateNvmeDevNamespace (
     // Dump NvmExpress Identify Namespace Data
     //
     DEBUG ((DEBUG_INFO, " == NVME IDENTIFY NAMESPACE [%d] DATA ==\n", NamespaceId));
-    DEBUG ((DEBUG_INFO, "    NSZE        : 0x%x\n", NamespaceData->Nsze));
-    DEBUG ((DEBUG_INFO, "    NCAP        : 0x%x\n", NamespaceData->Ncap));
-    DEBUG ((DEBUG_INFO, "    NUSE        : 0x%x\n", NamespaceData->Nuse));
+    DEBUG ((DEBUG_INFO, "    NSZE        : 0x%lx\n", NamespaceData->Nsze));
+    DEBUG ((DEBUG_INFO, "    NCAP        : 0x%lx\n", NamespaceData->Ncap));
+    DEBUG ((DEBUG_INFO, "    NUSE        : 0x%lx\n", NamespaceData->Nuse));
     DEBUG ((DEBUG_INFO, "    LBAF0.LBADS : 0x%x\n", (NamespaceData->LbaFormat[0].Lbads)));
 
     //
