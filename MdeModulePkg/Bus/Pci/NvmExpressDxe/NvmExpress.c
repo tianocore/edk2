@@ -300,7 +300,7 @@ EnumerateNvmeDevNamespace (
     Sn[20] = 0;
     CopyMem (Mn, Private->ControllerData->Mn, sizeof (Private->ControllerData->Mn));
     Mn[40] = 0;
-    UnicodeSPrintAsciiFormat (Device->ModelName, sizeof (Device->ModelName), "%a-%a-%x", Sn, Mn, NamespaceData->Eui64);
+    UnicodeSPrintAsciiFormat (Device->ModelName, sizeof (Device->ModelName), "%a-%a-%lx", Sn, Mn, NamespaceData->Eui64);
 
     AddUnicodeString2 (
       "eng",
