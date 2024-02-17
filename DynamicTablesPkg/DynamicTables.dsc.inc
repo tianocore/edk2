@@ -36,6 +36,7 @@
   #
   DynamicTablesPkg/Library/Acpi/AcpiFadtLib/AcpiFadtLib.inf
   DynamicTablesPkg/Library/Acpi/AcpiHpetLib/AcpiHpetLib.inf
+  DynamicTablesPkg/Library/Acpi/AcpiWsmtLib/AcpiWsmtLib.inf
 
   #
   # Dynamic Table Factory Dxe
@@ -44,6 +45,7 @@
     <LibraryClasses>
       NULL|DynamicTablesPkg/Library/Acpi/AcpiFadtLib/AcpiFadtLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/AcpiHpetLib/AcpiHpetLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/AcpiWsmtLib/AcpiWsmtLib.inf
   }
 
 [Components.ARM, Components.AARCH64]
