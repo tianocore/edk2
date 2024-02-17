@@ -39,6 +39,7 @@ typedef enum ArchObjectID {
   EArchObjFadtArmBootArch,        ///< 11 - ARM boot arch information
   EArchObjFadtHypervisorVendorId, ///< 12 - Hypervisor vendor identity information
   EArchObjFadtMiscInfo,           ///< 13 - Legacy fields; RTC, latency, flush stride, etc
+  EArchObjHpetBaseAddress,        ///< 14 - HPET Base Address
   EArchObjMax
 } E_ARCH_OBJECT_ID;
 
@@ -214,4 +215,12 @@ typedef struct CmArchFadtMiscInfo {
   UINT8     Century;
 } CM_ARCH_FADT_MISC_INFO;
 
+/** A structure that describes the
+    HPET Base Address.
+
+    ID: EArchObjHpetBaseAddress
+*/
+typedef struct CmArchHpetBaseAddress {
+  UINT64    BaseAddress;
+} CM_ARCH_HPET_BASE_ADDRESS;
 #endif
