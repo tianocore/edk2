@@ -34,6 +34,7 @@
   # Generators
   #
   DynamicTablesPkg/Library/Acpi/AcpiFadtLib/AcpiFadtLib.inf
+  DynamicTablesPkg/Library/Acpi/AcpiHpetLib/AcpiHpetLib.inf
 
 [Components.IA32, Components.X64]
   #
@@ -42,6 +43,7 @@
   DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf {
     <LibraryClasses>
       NULL|DynamicTablesPkg/Library/Acpi/AcpiFadtLib/AcpiFadtLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/AcpiHpetLib/AcpiHpetLib.inf
   }
 
 [Components.ARM, Components.AARCH64]
