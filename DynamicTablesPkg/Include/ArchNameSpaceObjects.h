@@ -39,6 +39,7 @@ typedef enum ArchObjectID {
   EArchObjFadtArmBootArch,        ///< 11 - ARM boot arch information
   EArchObjFadtHypervisorVendorId, ///< 12 - Hypervisor vendor identity information
   EArchObjFadtMiscInfo,           ///< 13 - Legacy fields; RTC, latency, flush stride, etc
+  EArchObjWsmtProtectionFlags,    ///< 14 - WSMT protection flags
   EArchObjMax
 } E_ARCH_OBJECT_ID;
 
@@ -213,5 +214,14 @@ typedef struct CmArchFadtMiscInfo {
   UINT8     MonAlrm;
   UINT8     Century;
 } CM_ARCH_FADT_MISC_INFO;
+
+/** A structure that describes the
+    protection flags for the WSMT fields information.
+
+    ID: EArchObjWsmtProtectionFlags
+*/
+typedef struct CmArchWsmtProtectionFlags {
+  UINT32    ProtectionFlags;
+} CM_ARCH_WSMT_PROTECTION_FLAGS;
 
 #endif
