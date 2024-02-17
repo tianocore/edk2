@@ -40,6 +40,7 @@ typedef enum ArchObjectID {
   EArchObjFadtHypervisorVendorId, ///< 12 - Hypervisor vendor identity information
   EArchObjFadtMiscInfo,           ///< 13 - Legacy fields; RTC, latency, flush stride, etc
   EArchObjHpetBaseAddress,        ///< 14 - HPET Base Address
+  EArchObjWsmtProtectionFlags,    ///< 15 - WSMT protection flags
   EArchObjMax
 } E_ARCH_OBJECT_ID;
 
@@ -223,4 +224,14 @@ typedef struct CmArchFadtMiscInfo {
 typedef struct CmArchHpetBaseAddress {
   UINT64    BaseAddress;
 } CM_ARCH_HPET_BASE_ADDRESS;
+
+/** A structure that describes the
+    protection flags for the WSMT fields information.
+
+    ID: EArchObjWsmtProtectionFlags
+*/
+typedef struct CmArchWsmtProtectionFlags {
+  UINT32    ProtectionFlags;
+} CM_ARCH_WSMT_PROTECTION_FLAGS;
+
 #endif
