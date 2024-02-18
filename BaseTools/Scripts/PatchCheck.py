@@ -28,6 +28,7 @@ class Verbose:
 
 class PatchCheckConf:
     ignore_change_id = False
+    ignore_multi_package = False
 
 class EmailAddressCheck:
     """Checks an email address."""
@@ -98,6 +99,7 @@ class CommitMessageCheck:
 
     def __init__(self, subject, message, author_email):
         self.ok = True
+        self.ignore_multi_package = False
 
         if subject is None and  message is None:
             self.error('Commit message is missing!')
@@ -120,6 +122,7 @@ class CommitMessageCheck:
             self.check_overall_format()
             if not PatchCheckConf.ignore_change_id:
                 self.check_change_id_format()
+            self.check_ci_options_format()
         self.report_message_result()
 
     url = 'https://github.com/tianocore/tianocore.github.io/wiki/Commit-Message-Format'
@@ -323,6 +326,15 @@ class CommitMessageCheck:
         if self.msg.find(cid) != -1:
             self.error('\"%s\" found in commit message:' % cid)
             return
+
+    def check_ci_options_format(self):
+        cio='Continuous-integration-options:'
+        for line in self.msg.splitlines():
+            if not line.startswith(cio):
+                continue
+            options = line.split(':', 1)[1].split()
+            if 'PatchCheck.ignore-multi-package' in options:
+                self.ignore_multi_package = True
 
 (START, PRE_PATCH, PATCH) = range(3)
 
@@ -561,6 +573,7 @@ class CheckOnePatch:
 
         msg_check = CommitMessageCheck(self.commit_subject, self.commit_msg, self.author_email)
         msg_ok = msg_check.ok
+        self.ignore_multi_package = msg_check.ignore_multi_package
 
         diff_ok = True
         if self.diff is not None:
@@ -671,6 +684,7 @@ class CheckGitCommits:
     """
 
     def __init__(self, rev_spec, max_count):
+        dec_files = self.read_dec_files_from_git()
         commits = self.read_commit_list_from_git(rev_spec, max_count)
         if len(commits) == 1 and Verbose.level > Verbose.ONELINE:
             commits = [ rev_spec ]
@@ -686,9 +700,65 @@ class CheckGitCommits:
             email = self.read_committer_email_address_from_git(commit)
             self.ok &= EmailAddressCheck(email, 'Committer').ok
             patch = self.read_patch_from_git(commit)
-            self.ok &= CheckOnePatch(commit, patch).ok
+            check_patch = CheckOnePatch(commit, patch)
+            self.ok &= check_patch.ok
+            ignore_multi_package = check_patch.ignore_multi_package
+            if PatchCheckConf.ignore_multi_package:
+                ignore_multi_package = True
+            prefix = 'WARNING: ' if ignore_multi_package else ''
+            check_parent = self.check_parent_packages (dec_files, commit, prefix)
+            if not ignore_multi_package:
+                self.ok &= check_parent
+
         if not commits:
             print("Couldn't find commit matching: '{}'".format(rev_spec))
+
+    def check_parent_packages(self, dec_files, commit, prefix):
+        ok = True
+        modified = self.get_parent_packages (dec_files, commit, 'AM')
+        if len (modified) > 1:
+            print("{}The commit adds/modifies files in multiple packages:".format(prefix))
+            print(" *", '\n * '.join(modified))
+            ok = False
+        deleted = self.get_parent_packages (dec_files, commit, 'D')
+        if len (deleted) > 1:
+            print("{}The commit deletes files from multiple packages:".format(prefix))
+            print(" *", '\n * '.join(deleted))
+            ok = False
+        return ok
+
+    def get_parent_packages(self, dec_files, commit, filter):
+        filelist = self.read_files_modified_from_git (commit, filter)
+        parents = set()
+        for file in filelist:
+            dec_found = False
+            for dec_file in dec_files:
+                if os.path.commonpath([dec_file, file]):
+                    dec_found = True
+                    parents.add(dec_file)
+            if not dec_found and os.path.dirname (file):
+                # No DEC file found and file is in a subdir
+                # Covers BaseTools, .github, .azurepipelines, .pytool
+                parents.add(file.split('/')[0])
+        return list(parents)
+
+    def read_dec_files_from_git(self):
+        # run git ls-files *.dec
+        out = self.run_git('ls-files', '*.dec')
+        # return list of .dec files
+        try:
+            return out.split()
+        except:
+            return []
+
+    def read_files_modified_from_git(self, commit, filter):
+        # run git diff-tree --no-commit-id --name-only -r <commit>
+        out = self.run_git('diff-tree', '--no-commit-id', '--name-only',
+                           '--diff-filter=' + filter, '-r', commit)
+        try:
+            return out.split()
+        except:
+            return []
 
     def read_commit_list_from_git(self, rev_spec, max_count):
         # Run git to get the commit patch
@@ -800,6 +870,9 @@ class PatchCheckApp:
         group.add_argument("--ignore-change-id",
                            action="store_true",
                            help="Ignore the presence of 'Change-Id:' tags in commit message")
+        group.add_argument("--ignore-multi-package",
+                           action="store_true",
+                           help="Ignore if commit modifies files in multiple packages")
         self.args = parser.parse_args()
         if self.args.oneline:
             Verbose.level = Verbose.ONELINE
@@ -807,6 +880,8 @@ class PatchCheckApp:
             Verbose.level = Verbose.SILENT
         if self.args.ignore_change_id:
             PatchCheckConf.ignore_change_id = True
+        if self.args.ignore_multi_package:
+            PatchCheckConf.ignore_multi_package = True
 
 if __name__ == "__main__":
     sys.exit(PatchCheckApp().retval)
