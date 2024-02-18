@@ -229,8 +229,10 @@ class CommitMessageCheck:
         )
 
     def check_misc_signatures(self):
-        for sig in self.sig_types:
-            self.find_signatures(sig)
+        for sigtype in self.sig_types:
+            sigs = self.find_signatures(sigtype)
+            if sigtype == 'Cc' and len(sigs) == 0:
+                self.error('No Cc: tags for maintainers/reviewers found!')
 
     cve_re = re.compile('CVE-[0-9]{4}-[0-9]{5}[^0-9]')
 
