@@ -85,7 +85,11 @@ class EmailAddressCheck:
             self.error("The email address cannot contain a space: " +
                        mo.group(3))
 
-        if ' via Groups.Io' in name and mo.group(3).endswith('@groups.io'):
+        if mo.group(3) == 'devel@edk2.groups.io':
+            self.error("Email rewritten by lists DMARC / DKIM / SPF: " +
+                       email)
+
+        if ' via groups.io' in name.lower() and mo.group(3).endswith('@groups.io'):
             self.error("Email rewritten by lists DMARC / DKIM / SPF: " +
                        email)
 
