@@ -153,7 +153,7 @@
 
 [LibraryClasses.common.HOST_APPLICATION]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  PeCoffExtraActionLib|EmulatorPkg/Win/Host/WinPeCoffExtraActionLib.inf
+  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PpiListLib|EmulatorPkg/Library/SecPpiListLib/SecPpiListLib.inf
@@ -298,7 +298,10 @@
     #  CLANGPDB is cross OS tool chain. It depends on WIN_HOST_BUILD flag
     #  to build WinHost application.
     ##
-    EmulatorPkg/Win/Host/WinHost.inf
+    EmulatorPkg/Win/Host/WinHost.inf {
+      <LibraryClasses>
+        PeCoffExtraActionLib|EmulatorPkg/Win/Host/WinPeCoffExtraActionLib.inf
+    }
   !else
     ##
     #  Emulator, OS POSIX application
@@ -490,19 +493,98 @@
   #
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
 
-  MSFT:DEBUG_*_*_CC_FLAGS = /Od /Oy-
-  MSFT:NOOPT_*_*_CC_FLAGS = /Od /Oy-
-  GCC:DEBUG_CLANGPDB_*_CC_FLAGS =-O0 -Wno-unused-command-line-argument -Wno-incompatible-pointer-types -Wno-enum-conversion -Wno-incompatible-pointer-types -Wno-sometimes-uninitialized -Wno-constant-conversion -Wno-main-return-type
+  #
+  # Use statically linked libraries by default.
+  # Required for all components to prevent linker warnings/error when
+  # HOST_APPLICATION components are linked with non-HOST_APPLICATION libraries
+  #
+  MSFT:RELEASE_*_*_CC_FLAGS = /MT
+  MSFT:DEBUG_*_*_CC_FLAGS   = /MTd
+  MSFT:NOOPT_*_*_CC_FLAGS   = /MTd
 
-  MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
-  MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-  MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
+  #
+  # Build modules as DLLs for DEBUG and NOOPT buiilds to support symbolic debug.
+  # RELEASE builds do not support symbolic debug.
+  #
+  MSFT:DEBUG_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE
+  MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE
+
+  GCC:DEBUG_CLANGPDB_*_CC_FLAGS =-O0 -Wno-unused-command-line-argument -Wno-incompatible-pointer-types -Wno-enum-conversion -Wno-incompatible-pointer-types -Wno-sometimes-uninitialized -Wno-constant-conversion -Wno-main-return-type
 
 !if $(WIN_HOST_BUILD) == TRUE
   #
   # CLANGPDB tool chain depends on WIN_HOST_BUILD flag to generate the windows application.
   #
-  GCC:*_CLANGPDB_*_DLINK_FLAGS     = /ALIGN:4096 /FILEALIGN:4096 /SUBSYSTEM:CONSOLE
-  GCC:DEBUG_CLANGPDB_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
-  GCC:NOOPT_CLANGPDB_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
+  GCC:DEBUG_CLANGPDB_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE
+  GCC:NOOPT_CLANGPDB_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE
 !endif
+
+[BuildOptions.common.EDKII.HOST_APPLICATION]
+  #
+  # MSFT CC_FLAGS
+  #
+  MSFT:*_*_*_CC_FLAGS = /EHs /D _CRT_SECURE_NO_WARNINGS /D _CRT_SECURE_NO_DEPRECATE
+
+  #
+  # MSFT DLINK_FLAGS
+  # Must use == to establish entire set of DLINK_FLAGS because there is no option
+  # that allows an override of /NODEFAULTLIB option from tools_def.txt
+  #
+  MSFT:*_*_*_DLINK_FLAGS            == /out:"$(BIN_DIR)\$(MODULE_NAME_GUID).exe" /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb" /NOLOGO /SUBSYSTEM:CONSOLE /DEBUG /WHOLEARCHIVE
+  MSFT:*_*_*_DLINK_FLAGS             = /DEFAULTLIB:Gdi32.lib /DEFAULTLIB:User32.lib /DEFAULTLIB:Winmm.lib /DEFAULTLIB:Advapi32.lib
+
+  MSFT:*_*_IA32_DLINK_FLAGS          = /MACHINE:I386
+  MSFT:*_VS2015_IA32_DLINK_FLAGS     = /LIBPATH:"%VS2015_PREFIX%Lib" /LIBPATH:"%VS2015_PREFIX%VC\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
+  MSFT:*_VS2015x86_IA32_DLINK_FLAGS  = /LIBPATH:"%VS2015_PREFIX%Lib" /LIBPATH:"%VS2015_PREFIX%VC\Lib" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
+  MSFT:*_VS2017_IA32_DLINK_FLAGS     = /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
+  MSFT:*_VS2019_IA32_DLINK_FLAGS     = /LIBPATH:"%VCToolsInstallDir%lib\x86" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x86" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x86"
+
+  MSFT:*_*_X64_DLINK_FLAGS           = /MACHINE:X64
+  MSFT:*_VS2015_X64_DLINK_FLAGS      = /LIBPATH:"%VS2015_PREFIX%VC\Lib\AMD64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
+  MSFT:*_VS2015x86_X64_DLINK_FLAGS   = /LIBPATH:"%VS2015_PREFIX%VC\Lib\AMD64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
+  MSFT:*_VS2017_X64_DLINK_FLAGS      = /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
+  MSFT:*_VS2019_X64_DLINK_FLAGS      = /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
+
+  #
+  # From Host.inf
+  #
+  GCC:*_*_*_PP_FLAGS    == -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+  GCC:*_*_IA32_PP_FLAGS  = -m32
+  GCC:*_*_X64_PP_FLAGS   = -m64
+
+  GCC:*_*_*_CC_FLAGS     == -fno-pie -fexceptions -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings "-DEFIAPI=__attribute__((ms_abi))"
+  GCC:*_*_IA32_CC_FLAGS   = -m32
+  GCC:*_*_X64_CC_FLAGS    = -m64
+  GCC:*_GCC5_X64_CC_FLAGS = -flto -DUSING_LTO -Os
+  GCC:*_GCC_X64_CC_FLAGS  = -flto -DUSING_LTO -Os
+
+  GCC:*_*_*_ASM_FLAGS    == -c -x assembler -imacros $(DEST_DIR_DEBUG)/AutoGen.h
+  GCC:*_*_IA32_ASM_FLAGS  = -m32
+  GCC:*_*_X64_ASM_FLAGS   = -m64
+
+  GCC:*_*_*_DLINK_FLAGS      == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -L/usr/X11R6/lib -no-pie
+  GCC:*_*_IA32_DLINK_FLAGS    = -m32
+  GCC:*_*_X64_DLINK_FLAGS     = -m64
+  GCC:*_GCC5_X64_DLINK_FLAGS  = -flto
+  GCC:*_GCC_X64_DLINK_FLAGS   = -flto
+
+  #
+  # Surround our static libraries with whole-archive, so constructor-based test registration works properly.
+  # Note that we need to --no-whole-archive before linking system libraries.
+  #
+  GCC:*_*_*_DLINK_FLAGS   = -Wl,--whole-archive
+  GCC:*_*_*_DLINK2_FLAGS == -Wl,--no-whole-archive -lgcov -lpthread -lstdc++ -lm -ldl -lXext -lX11
+
+  #
+  # Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
+  #
+  XCODE:*_*_*_CC_FLAGS        = -I$(WORKSPACE)/EmulatorPkg/Unix/Host/X11IncludeHack
+  XCODE:*_*_X64_CC_FLAGS      = -O0 -target x86_64-apple-darwin "-DEFIAPI=__attribute__((ms_abi))"
+
+  XCODE:*_*_*_ASM_FLAGS      == -g
+  XCODE:*_*_IA32_ASM_FLAGS    = -arch i386
+
+  XCODE:*_*_*_DLINK_PATH     == gcc
+  XCODE:*_*_*_DLINK_FLAGS    == -o $(BIN_DIR)/$(MODULE_NAME_GUID) -L/usr/X11R6/lib -lXext -lX11 -framework Carbon
+  XCODE:*_*_IA32_DLINK_FLAGS  = -arch i386
+  XCODE:*_*_X64_DLINK_FLAGS   = -Wl,-no_pie
