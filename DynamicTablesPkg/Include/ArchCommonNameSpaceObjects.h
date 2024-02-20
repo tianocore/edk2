@@ -64,6 +64,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjGenericDbg2DeviceInfo,          ///< 36 - Generic DBG2 Device Info
   EArchCommonObjCxlHostBridgeInfo,              ///< 37 - CXL Host Bridge Info
   EArchCommonObjCxlFixedMemoryWindowInfo,       ///< 38 - CXL Fixed Memory Window Info
+  EArchCommonObjGenericDeviceInfo,              ///< 39 - Generic Device Info
+  EArchCommonObjGenericInterrupt,               ///< 40 - Generic Interrupt
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -206,6 +208,8 @@ typedef struct CmArchCommonPciAddressMapInfo {
 
 /** A structure that describes the
     Generic Interrupts.
+
+    ID: EArchCommonObjGenericInterrupt
 */
 typedef struct CmArchCommonGenericInterrupt {
   /// Interrupt number
@@ -906,6 +910,42 @@ typedef struct CmArchCommonCxlFixedMemoryWindowInfo {
   /// structure via token matching.
   CM_OBJECT_TOKEN    InterleaveTargetTokens[CFMWS_MAX_INTERLEAVE_WAYS];
 } CM_ARCH_COMMON_CXL_FIXED_MEMORY_WINDOW_INFO;
+
+/** A structure that describes a generic device to create SSDT node from.
+
+  ID: EArchCommonObjGenericDeviceInfo,
+*/
+typedef struct CmArchCommonGenericDeviceInfo {
+  /// ACPI device name
+  CHAR8              Name[AML_NAME_SEG_SIZE + 1];
+
+  /// Hardware ID
+  CHAR8              Hid[8+1];
+
+  /// Compatible ID
+  BOOLEAN            CidValid;
+  CHAR8              Cid[8+1];
+
+  /// Unique Id
+  UINT32             Uid;
+
+  /// Hardware revision
+  BOOLEAN            HrvValid;
+  UINT32             Hrv;
+
+  /// Cache Coherency Attribute
+  BOOLEAN            Cca;
+
+  /// References used to create _CRS method.
+
+  /// Optional field: Reference Token for address resources.
+  /// Token identifying an array of CM_ARCH_COMMON_MEMORY_RANGE_DESCRIPTOR objects
+  CM_OBJECT_TOKEN    AddressResourceToken;
+
+  /// Optional field: Reference Token for interrupt resources.
+  /// Token identifying an array of CM_ARCH_COMMON_GENERIC_INTERRUPT objects
+  CM_OBJECT_TOKEN    InterruptResourceToken;
+} CM_ARCH_COMMON_GENERIC_DEVICE_INFO;
 
 #pragma pack()
 

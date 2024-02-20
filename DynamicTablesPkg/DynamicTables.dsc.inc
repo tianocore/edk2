@@ -48,6 +48,8 @@
   # AML Codegen (Common)
   DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/SsdtCpuTopologyLib.inf
   DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtPcieLib/SsdtPcieLib.inf
+  DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtGenericDeviceLib/AcpiSsdtGenericDeviceLib.inf
+
 
   #
   # Dynamic Tables Manager Dxe
@@ -131,4 +133,6 @@
       #  Common
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/SsdtCpuTopologyLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtPcieLib/SsdtPcieLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtGenericDeviceLib/AcpiSsdtGenericDeviceLib.inf
+
   }
