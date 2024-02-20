@@ -15,7 +15,7 @@
   FILE_GUID                      = 465FDE84-E8B0-B04B-A843-A03F68F617A9
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MemoryAllocationLib|SEC BASE USER_DEFINED
+  LIBRARY_CLASS                  = MemoryAllocationLib
 
 [Sources]
   ThunkPpiList.c

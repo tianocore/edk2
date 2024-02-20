@@ -15,7 +15,7 @@
   FILE_GUID                      = F950E820-0457-8143-86AD-30E4A45FD4BF
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PpiListLib|SEC BASE USER_DEFINED
+  LIBRARY_CLASS                  = PpiListLib
 
 [Sources]
   PpiListLib.c
