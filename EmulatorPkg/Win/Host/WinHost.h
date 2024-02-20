@@ -67,6 +67,18 @@ SecPeCoffGetEntryPoint (
   );
 
 VOID
+EFIAPI
+SecPeCoffLoaderRelocateImageExtraAction (
+  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  );
+
+VOID
+EFIAPI
+SecPeCoffLoaderUnloadImageExtraAction (
+  IN PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
+  );
+
+VOID
 SecLoadSecCore (
   IN  UINTN  TemporaryRam,
   IN  UINTN  TemporaryRamSize,

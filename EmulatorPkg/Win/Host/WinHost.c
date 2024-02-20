@@ -1058,7 +1058,7 @@ RemoveModHandle (
 
 VOID
 EFIAPI
-PeCoffLoaderRelocateImageExtraAction (
+SecPeCoffLoaderRelocateImageExtraAction (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
@@ -1154,7 +1154,7 @@ PeCoffLoaderRelocateImageExtraAction (
 
 VOID
 EFIAPI
-PeCoffLoaderUnloadImageExtraAction (
+SecPeCoffLoaderUnloadImageExtraAction (
   IN PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
