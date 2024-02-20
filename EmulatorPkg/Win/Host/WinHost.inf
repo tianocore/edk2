@@ -52,7 +52,6 @@
   PeCoffLib
   ThunkPpiList
   ThunkProtocolList
-  PpiListLib
   PeiServicesLib
   FrameBufferBltLib
 

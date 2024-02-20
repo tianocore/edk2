@@ -58,7 +58,6 @@
   PeCoffLib
   ThunkPpiList
   ThunkProtocolList
-  PpiListLib
   PeiServicesLib
   PeCoffGetEntryPointLib
 

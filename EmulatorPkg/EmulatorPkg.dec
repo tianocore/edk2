@@ -26,7 +26,6 @@
   ThunkProtocolList|Include/Library/ThunkProtocolList.h
   EmuThunkLib|Include/Library/EmuThunkLib.h
   KeyMap|Include/Library/KeyMapLib.h
-  PpiListLib|Include/Library/PpiListLib.h
   SmbiosLib|Include/Library/SmbiosLib.h
   EmuMagicPageLib|Include/Library/EmuMagicPageLib.h
 
