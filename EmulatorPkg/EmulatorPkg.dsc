@@ -151,9 +151,9 @@
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   TimerLib|EmulatorPkg/Library/PeiTimerLib/PeiTimerLib.inf
 
-[LibraryClasses.common.USER_DEFINED, LibraryClasses.common.BASE]
+[LibraryClasses.common.HOST_APPLICATION]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
-  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
+  PeCoffExtraActionLib|EmulatorPkg/Win/Host/WinPeCoffExtraActionLib.inf
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   PpiListLib|EmulatorPkg/Library/SecPpiListLib/SecPpiListLib.inf
