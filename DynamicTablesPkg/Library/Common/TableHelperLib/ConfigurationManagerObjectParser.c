@@ -2,6 +2,7 @@
   Configuration Manager Object parser.
 
   Copyright (c) 2021 - 2023, ARM Limited. All rights reserved.<BR>
+  Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved. <BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -10,6 +11,7 @@
 #include <Library/DebugLib.h>
 #include <ConfigurationManagerObject.h>
 #include "ConfigurationManagerObjectParser.h"
+#include "IndustryStandard/Pci22.h"
 
 STATIC
 VOID
@@ -49,6 +51,15 @@ EFIAPI
 PrintChar8 (
   CONST CHAR8  *Format,
   UINT8        *Ptr
+  );
+
+STATIC
+VOID
+EFIAPI
+PrintUint64Array (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr,
+  UINT32       Length
   );
 
 /** A parser for EArmObjBootArchInfo.
@@ -679,6 +690,18 @@ STATIC CONST CM_OBJ_PARSER  CmArmPsdInfoParser[] = {
   { "NumProc",   4, "0x%x", NULL },
 };
 
+/** A parser for EArmObjDbg2DeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmDbg2DeviceInfoParser[] = {
+  { "NumberOfAddresses", sizeof (UINT8),                "0x%x",   NULL             },
+  { "BaseAddress",       sizeof (UINT64) * PCI_MAX_BAR, "0x%llx", PrintUint64Array },
+  { "BaseAddressLength", sizeof (UINT64) * PCI_MAX_BAR, "0x%llx", PrintUint64Array },
+  { "PortType",          sizeof (UINT16),               "0x%x",   NULL             },
+  { "PortSubtype",       sizeof (UINT16),               "0x%x",   NULL             },
+  { "AccessSize",        sizeof (UINT8),                "0x%x",   NULL             },
+  { "ObjectName",        AML_NAME_SEG_SIZE + 1,         NULL,     PrintString      }
+};
+
 /** A parser for Arm namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
@@ -779,6 +802,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmEtInfo) },
   { "EArmObjPsdInfo",                      CmArmPsdInfoParser,
     ARRAY_SIZE (CmArmPsdInfoParser) },
+  { "EArmObjDbg2DeviceInfo",               CmArmDbg2DeviceInfoParser,
+    ARRAY_SIZE (CmArmDbg2DeviceInfoParser) },
   { "EArmObjMax",                          NULL,                                  0                                },
 };
 
@@ -947,6 +972,29 @@ PrintChar8 (
     Ptr[6],
     Ptr[7]
     ));
+}
+
+STATIC
+VOID
+EFIAPI
+PrintUint64Array (
+  CONST CHAR8  *Format,
+  UINT8        *Ptr,
+  UINT32       Length
+  )
+{
+  UINT32  Index;
+
+  DEBUG ((DEBUG_INFO, "[ "));
+  for (Index = 0; Index < (Length/sizeof (UINT64)); Index++) {
+    if ((Index != 0) && ((Index % 5) == 0)) {
+      DEBUG ((DEBUG_INFO, "\r\n"));
+    }
+
+    DEBUG ((DEBUG_INFO, "0x%08llx ", ((UINT64 *)Ptr)[Index]));
+  }
+
+  DEBUG ((DEBUG_INFO, "]"));
 }
 
 /** Print fields of the objects.

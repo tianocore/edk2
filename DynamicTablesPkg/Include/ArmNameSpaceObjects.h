@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved. <BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -13,6 +14,8 @@
 #ifndef ARM_NAMESPACE_OBJECTS_H_
 #define ARM_NAMESPACE_OBJECTS_H_
 
+#include <IndustryStandard/AcpiAml.h>
+#include <IndustryStandard/Pci.h>
 #include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
 
@@ -73,6 +76,7 @@ typedef enum ArmObjectID {
   EArmObjPccSubspaceType5Info,                                 ///< 48 - Pcc Subspace Type 5 Info
   EArmObjEtInfo,                                               ///< 49 - Embedded Trace Extension/Module Info
   EArmObjPsdInfo,                                              ///< 50 - P-State Dependency (PSD) Info
+  EArmObjDbg2DeviceInfo,                                       ///< 51 - Generic DBG2 devices
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -1344,6 +1348,34 @@ typedef struct CmArmEtInfo {
     ID: EArmObjPsdInfo
 */
 typedef AML_PSD_INFO CM_ARM_PSD_INFO;
+
+/** A structure that describes a generic device to add a DBG2 device node from.
+
+  ID: EArmObjDbg2DeviceInfo,
+*/
+typedef struct CmArmDbg2DeviceInfo {
+  /// The number of addresses in the device
+  UINT8     NumberOfAddresses;
+
+  /// The physical base address array for the device
+  UINT64    BaseAddress[PCI_MAX_BAR];
+
+  /// The Base address length array
+  UINT64    BaseAddressLength[PCI_MAX_BAR];
+
+  /// The DBG2 port type
+  UINT16    PortType;
+
+  /// The DBG2 port subtype
+  UINT16    PortSubtype;
+
+  /// Access Size
+  UINT8     AccessSize;
+
+  /** ASCII Null terminated string that will be appended to \_SB_. for the full path.
+  */
+  CHAR8     ObjectName[AML_NAME_SEG_SIZE + 1];
+} CM_ARM_DBG2_DEVICE_INFO;
 
 #pragma pack()
 
