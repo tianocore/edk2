@@ -65,11 +65,11 @@ ALIGNMENTS = {"Auto", "8", "16", "32", "64", "128", "512", "1K", "4K", "32K", "6
 ALIGNMENT_NOAUTO = ALIGNMENTS - {"Auto"}
 CR_LB_SET = {T_CHAR_CR, TAB_LINE_BREAK}
 
-RegionSizePattern = compile("\s*(?P<base>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<size>(?:0x|0X)?[a-fA-F0-9]+)\s*")
-RegionSizeGuidPattern = compile("\s*(?P<base>\w+\.\w+[\.\w\[\]]*)\s*\|\s*(?P<size>\w+\.\w+[\.\w\[\]]*)\s*")
-RegionOffsetPcdPattern = compile("\s*(?P<base>\w+\.\w+[\.\w\[\]]*)\s*$")
-ShortcutPcdPattern = compile("\s*\w+\s*=\s*(?P<value>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<name>\w+\.\w+)\s*")
-BaseAddrValuePattern = compile('^0[xX][0-9a-fA-F]+')
+RegionSizePattern = compile(r"\s*(?P<base>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<size>(?:0x|0X)?[a-fA-F0-9]+)\s*")
+RegionSizeGuidPattern = compile(r"\s*(?P<base>\w+\.\w+[\.\w\[\]]*)\s*\|\s*(?P<size>\w+\.\w+[\.\w\[\]]*)\s*")
+RegionOffsetPcdPattern = compile(r"\s*(?P<base>\w+\.\w+[\.\w\[\]]*)\s*$")
+ShortcutPcdPattern = compile(r"\s*\w+\s*=\s*(?P<value>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<name>\w+\.\w+)\s*")
+BaseAddrValuePattern = compile(r'^0[xX][0-9a-fA-F]+')
 FileExtensionPattern = compile(r'([a-zA-Z][a-zA-Z0-9]*)')
 TokenFindPattern = compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
 AllIncludeFileList = []

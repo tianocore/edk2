@@ -601,11 +601,17 @@ RedfishConfigHandlerDriverEntryPoint (
   //
   // Install UEFI Driver Model protocol(s).
   //
-  Status = EfiLibInstallDriverBinding (
+  Status = EfiLibInstallAllDriverProtocols2 (
              ImageHandle,
              SystemTable,
              &gRedfishConfigDriverBinding,
-             ImageHandle
+             ImageHandle,
+             &gRedfishConfigHandlerComponentName,
+             &gRedfishConfigHandlerComponentName2,
+             NULL,
+             NULL,
+             NULL,
+             NULL
              );
   if (EFI_ERROR (Status)) {
     gBS->CloseEvent (gEndOfDxeEvent);

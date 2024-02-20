@@ -13,7 +13,7 @@
 #ifndef ARM_NAMESPACE_OBJECTS_H_
 #define ARM_NAMESPACE_OBJECTS_H_
 
-#include <AmlCpcInfo.h>
+#include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
 
 #pragma pack(1)
@@ -72,6 +72,7 @@ typedef enum ArmObjectID {
   EArmObjPccSubspaceType4Info,                                 ///< 47 - Pcc Subspace Type 4 Info
   EArmObjPccSubspaceType5Info,                                 ///< 48 - Pcc Subspace Type 5 Info
   EArmObjEtInfo,                                               ///< 49 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 50 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -217,6 +218,11 @@ typedef struct CmArmGicCInfo {
       i.e. a token referencing a CM_ARM_ET_INFO object.
   */
   CM_OBJECT_TOKEN    EtToken;
+
+  /** Optional field: Reference Token for the Psd info of this processor.
+      i.e. a token referencing a CM_ARM_PSD_INFO object.
+  */
+  CM_OBJECT_TOKEN    PsdToken;
 } CM_ARM_GICC_INFO;
 
 /** A structure that describes the
@@ -1326,6 +1332,15 @@ typedef enum ArmEtType {
 typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
+
+/** A structure that describes a
+    P-State Dependency (PSD) Info.
+
+    Cf. ACPI 6.5, s8.4.5.5 _PSD (P-State Dependency).
+
+    ID: EArmObjPsdInfo
+*/
+typedef AML_PSD_INFO CM_ARM_PSD_INFO;
 
 #pragma pack()
 

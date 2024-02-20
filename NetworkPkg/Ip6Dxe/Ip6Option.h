@@ -12,6 +12,77 @@
 
 #define IP6_FRAGMENT_OFFSET_MASK  (~0x3)
 
+//
+// For more information see RFC 8200, Section 4.3, 4.4, and 4.6
+//
+//  This example format is from section 4.6
+//  This does not apply to fragment headers
+//
+//     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |  Next Header  |  Hdr Ext Len  |                               |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               +
+//    |                                                               |
+//    .                                                               .
+//    .                  Header-Specific Data                         .
+//    .                                                               .
+//    |                                                               |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//
+//      Next Header           8-bit selector.  Identifies the type of
+//                            header immediately following the extension
+//                            header.  Uses the same values as the IPv4
+//                            Protocol field [IANA-PN].
+//
+//      Hdr Ext Len           8-bit unsigned integer.  Length of the
+//                            Destination Options header in 8-octet units,
+//                            not including the first 8 octets.
+
+//
+// These defines apply to the following:
+//   1. Hop by Hop
+//   2. Routing
+//   3. Destination
+//
+typedef struct _IP6_EXT_HDR {
+  ///
+  /// The Next Header field identifies the type of header immediately
+  ///
+  UINT8    NextHeader;
+  ///
+  /// The Hdr Ext Len field specifies the length of the Hop-by-Hop Options
+  ///
+  UINT8    HdrExtLen;
+  ///
+  /// Header-Specific Data
+  ///
+} IP6_EXT_HDR;
+
+STATIC_ASSERT (
+  sizeof (IP6_EXT_HDR) == 2,
+  "The combined size of Next Header and Len is two 8 bit fields"
+  );
+
+//
+// IPv6 extension headers contain an 8-bit length field which describes the size of
+// the header. However, the length field only includes the size of the extension
+// header options, not the size of the first 8 bytes of the header. Therefore, in
+// order to calculate the full size of the extension header, we add 1 (to account
+// for the first 8 bytes omitted by the length field reporting) and then multiply
+// by 8 (since the size is represented in 8-byte units).
+//
+// a is the length field of the extension header (UINT8)
+// The result may be up to 2046 octets (UINT16)
+//
+#define IP6_HDR_EXT_LEN(a)  (((UINT16)((UINT8)(a)) + 1) * 8)
+
+// This is the maxmimum length permissible by a extension header
+// Length is UINT8 of 8 octets not including the first 8 octets
+#define IP6_MAX_EXT_DATA_LENGTH  (IP6_HDR_EXT_LEN (MAX_UINT8) - sizeof(IP6_EXT_HDR))
+STATIC_ASSERT (
+  IP6_MAX_EXT_DATA_LENGTH == 2046,
+  "Maximum data length is ((MAX_UINT8 + 1) * 8) - 2"
+  );
+
 typedef struct _IP6_FRAGMENT_HEADER {
   UINT8     NextHeader;
   UINT8     Reserved;

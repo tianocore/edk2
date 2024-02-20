@@ -17,6 +17,20 @@
 
 #define ACPI_EXTENDED_ADDRESS_SPACE_DESCRIPTOR  0x8B
 
+///
+/// C-state Coordination Types
+/// See s8.4.2.2 _CSD (C-State Dependency)
+///
+#define ACPI_AML_COORD_TYPE_SW_ALL  0xFC
+#define ACPI_AML_COORD_TYPE_SW_ANY  0xFD
+#define ACPI_AML_COORD_TYPE_HW_ALL  0xFE
+
+///
+/// _PSD Revision for ACPI 3.0
+// See s8.4.4.5 _PSD (P-State Dependency)
+///
+#define EFI_ACPI_3_0_AML_PSD_REVISION  0
+
 //
 // Ensure proper structure formats
 //

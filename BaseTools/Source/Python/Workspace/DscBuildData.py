@@ -37,6 +37,8 @@ from functools import reduce
 from Common.Misc import SaveFileOnChange
 from Workspace.BuildClassObject import PlatformBuildClassObject, StructurePcd, PcdClassObject, ModuleBuildClassObject
 from collections import OrderedDict, defaultdict
+import json
+import shutil
 
 def _IsFieldValueAnArray (Value):
     Value = Value.strip()
@@ -56,6 +58,7 @@ def _IsFieldValueAnArray (Value):
 
 PcdValueInitName = 'PcdValueInit'
 PcdValueCommonName = 'PcdValueCommon'
+StructuredPcdsDataName = 'StructuredPcdsData.json'
 
 PcdMainCHeader = '''
 /**
@@ -90,7 +93,7 @@ PcdMakefileHeader = '''
 
 WindowsCFLAGS = 'CFLAGS = $(CFLAGS) /wd4200 /wd4034 /wd4101 '
 LinuxCFLAGS = 'CFLAGS += -Wno-pointer-to-int-cast -Wno-unused-variable '
-PcdMakefileEnd = '''
+PcdMakefileEnd = r'''
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.common
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.app
 '''
@@ -110,7 +113,7 @@ LIBS = -lCommon
 variablePattern = re.compile(r'[\t\s]*0[xX][a-fA-F0-9]+$')
 SkuIdPattern = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
 ## regular expressions for finding decimal and hex numbers
-Pattern = re.compile('^[1-9]\d*|0$')
+Pattern = re.compile(r'^[1-9]\d*|0$')
 HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
 ## Regular expression for finding header file inclusions
 from AutoGen.GenMake import gIncludePattern
@@ -2750,12 +2753,129 @@ class DscBuildData(PlatformBuildClassObject):
                 ccflags.add(item)
             i +=1
         return ccflags
+
+    def GetStructurePcdSet (self, OutputValueFile):
+        if not os.path.isfile(OutputValueFile):
+            EdkLogger.error("GetStructurePcdSet", FILE_NOT_FOUND, "Output.txt doesn't exist", ExtraData=OutputValueFile)
+            return []
+        File = open (OutputValueFile, 'r')
+        FileBuffer = File.readlines()
+        File.close()
+
+        #start update structure pcd final value
+        StructurePcdSet = []
+        for Pcd in FileBuffer:
+            PcdValue = Pcd.split ('|')
+            PcdInfo = PcdValue[0].split ('.')
+            StructurePcdSet.append((PcdInfo[0], PcdInfo[1], PcdInfo[2], PcdInfo[3], PcdValue[2].strip()))
+        return StructurePcdSet
+
+    def GetBuildOptionsValueList(self):
+        CC_FLAGS = LinuxCFLAGS
+        if sys.platform == "win32":
+            CC_FLAGS = WindowsCFLAGS
+        BuildOptions = OrderedDict()
+        for Options in self.BuildOptions:
+            if Options[2] != EDKII_NAME:
+                continue
+            Family = Options[0]
+            if Family and Family != self.ToolChainFamily:
+                continue
+            Target, Tag, Arch, Tool, Attr = Options[1].split("_")
+            if Tool != 'CC':
+                continue
+            if Attr != "FLAGS":
+                continue
+            if Target == TAB_STAR or Target == self._Target:
+                if Tag == TAB_STAR or Tag == self._Toolchain:
+                    if 'COMMON' not in BuildOptions:
+                        BuildOptions['COMMON'] = set()
+                    if Arch == TAB_STAR:
+                        BuildOptions['COMMON']|= self.ParseCCFlags(self.BuildOptions[Options])
+                    if Arch in self.SupArchList:
+                        if Arch not in BuildOptions:
+                            BuildOptions[Arch] = set()
+                        BuildOptions[Arch] |= self.ParseCCFlags(self.BuildOptions[Options])
+
+        if BuildOptions:
+            ArchBuildOptions = {arch:flags for arch,flags in BuildOptions.items() if arch != 'COMMON'}
+            if len(ArchBuildOptions.keys()) == 1:
+                BuildOptions['COMMON'] |= (list(ArchBuildOptions.values())[0])
+            elif len(ArchBuildOptions.keys()) > 1:
+                CommonBuildOptions = reduce(lambda x,y: x&y, ArchBuildOptions.values())
+                BuildOptions['COMMON'] |= CommonBuildOptions
+            ValueList = [item for item in BuildOptions['COMMON'] if item.startswith((r"/U","-U"))]
+            ValueList.extend([item for item in BuildOptions['COMMON'] if item.startswith((r"/D", "-D"))])
+            CC_FLAGS += " ".join(ValueList)
+        return CC_FLAGS
+
+
     def GenerateByteArrayValue (self, StructuredPcds):
         #
         # Generate/Compile/Run C application to determine if there are any flexible array members
         #
         if not StructuredPcds:
             return
+
+        StructuredPcdsData = {}
+        StoredStructuredPcdObjectPaths = {}
+        SkipPcdValueInit = False
+
+        CC_FLAGS = self.GetBuildOptionsValueList()
+
+        for PcdName in StructuredPcds:
+            Pcd = StructuredPcds[PcdName]
+            TokenSpaceGuidCName = Pcd.TokenSpaceGuidCName
+            TokenCName = Pcd.TokenCName
+
+            # Create a key using TokenSpaceGuidCName and TokenCName
+            StructuredPcdsData[f"{TokenSpaceGuidCName}_{TokenCName}"] = {
+                "DefaultValueFromDec": Pcd.DefaultValueFromDec,
+                "DefaultValues": Pcd.DefaultValues,
+                "PcdFieldValueFromComm": Pcd.PcdFieldValueFromComm,
+                "PcdFieldValueFromFdf": Pcd.PcdFieldValueFromFdf,
+                "DefaultFromDSC": Pcd.DefaultFromDSC,
+                "PcdFiledValueFromDscComponent": Pcd.PcdFiledValueFromDscComponent
+            }
+
+        # Store the CC Flags
+        StructuredPcdsData["CC_FLAGS"] = CC_FLAGS
+        #
+        # If the output path doesn't exists then create it
+        #
+        if not os.path.exists(self.OutputPath):
+            os.makedirs(self.OutputPath)
+
+        StructuredPcdsDataPath = os.path.join(self.OutputPath, self._Arch, StructuredPcdsDataName)
+        PcdRecordOutputValueFile = os.path.join(self.OutputPath, self._Arch, 'Output.txt')
+
+        if not os.path.exists(os.path.dirname(StructuredPcdsDataPath)):
+            os.makedirs(os.path.dirname(StructuredPcdsDataPath))
+        #
+        # Check if the StructuredPcdsData.json exists or not
+        # if exits then it might be a incremental build then check if the StructuredPcdsData has been changed or not.
+        # if changed then proceed further, if not changed then return the stored data from earlier build
+        #
+        if os.path.isfile(StructuredPcdsDataPath):
+            with open(StructuredPcdsDataPath, 'r') as file:
+                StoredStructuredPcdsData = json.load(file)
+                # OBJECTS will have the modified time, which needs to be checked later
+                StoredStructuredPcdObjectPaths = StoredStructuredPcdsData.pop("OBJECTS", {})
+
+                if StructuredPcdsData == StoredStructuredPcdsData:
+                    SkipPcdValueInit = True
+                    for filename, file_mtime in StoredStructuredPcdObjectPaths.items():
+                        f_mtime = os.path.getmtime(filename)
+                        #
+                        # check if the include_file are modified or not,
+                        # if modified then generate the PcdValueInit
+                        #
+                        if f_mtime != file_mtime:
+                            SkipPcdValueInit = False
+                            break
+
+        if SkipPcdValueInit:
+            return self.GetStructurePcdSet(PcdRecordOutputValueFile)
 
         InitByteValue = ""
         CApp = PcdMainCHeader
@@ -2832,15 +2952,13 @@ class DscBuildData(PlatformBuildClassObject):
 
         CApp = CApp + PcdMainCEntry + '\n'
 
-        if not os.path.exists(self.OutputPath):
-            os.makedirs(self.OutputPath)
         CAppBaseFileName = os.path.join(self.OutputPath, PcdValueInitName)
         SaveFileOnChange(CAppBaseFileName + '.c', CApp, False)
 
         # start generating makefile
         MakeApp = PcdMakefileHeader
         if sys.platform == "win32":
-            MakeApp = MakeApp + 'APPFILE = %s\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj %s.obj\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + 'INC = '
+            MakeApp = MakeApp + 'APPFILE = %s\\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\\%s.obj %s.obj\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + 'INC = '
         else:
             MakeApp = MakeApp + PcdGccMakefile
             MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + \
@@ -2890,42 +3008,6 @@ class DscBuildData(PlatformBuildClassObject):
                         IncSearchList.append(inc)
         MakeApp = MakeApp + '\n'
 
-        CC_FLAGS = LinuxCFLAGS
-        if sys.platform == "win32":
-            CC_FLAGS = WindowsCFLAGS
-        BuildOptions = OrderedDict()
-        for Options in self.BuildOptions:
-            if Options[2] != EDKII_NAME:
-                continue
-            Family = Options[0]
-            if Family and Family != self.ToolChainFamily:
-                continue
-            Target, Tag, Arch, Tool, Attr = Options[1].split("_")
-            if Tool != 'CC':
-                continue
-            if Attr != "FLAGS":
-                continue
-            if Target == TAB_STAR or Target == self._Target:
-                if Tag == TAB_STAR or Tag == self._Toolchain:
-                    if 'COMMON' not in BuildOptions:
-                        BuildOptions['COMMON'] = set()
-                    if Arch == TAB_STAR:
-                        BuildOptions['COMMON']|= self.ParseCCFlags(self.BuildOptions[Options])
-                    if Arch in self.SupArchList:
-                        if Arch not in BuildOptions:
-                            BuildOptions[Arch] = set()
-                        BuildOptions[Arch] |= self.ParseCCFlags(self.BuildOptions[Options])
-
-        if BuildOptions:
-            ArchBuildOptions = {arch:flags for arch,flags in BuildOptions.items() if arch != 'COMMON'}
-            if len(ArchBuildOptions.keys()) == 1:
-                BuildOptions['COMMON'] |= (list(ArchBuildOptions.values())[0])
-            elif len(ArchBuildOptions.keys()) > 1:
-                CommonBuildOptions = reduce(lambda x,y: x&y, ArchBuildOptions.values())
-                BuildOptions['COMMON'] |= CommonBuildOptions
-            ValueList = [item for item in BuildOptions['COMMON'] if item.startswith((r"/U","-U"))]
-            ValueList.extend([item for item in BuildOptions['COMMON'] if item.startswith((r"/D", "-D"))])
-            CC_FLAGS += " ".join(ValueList)
         MakeApp += CC_FLAGS
 
         if sys.platform == "win32":
@@ -2946,11 +3028,13 @@ class DscBuildData(PlatformBuildClassObject):
         SearchPathList.append(os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "BaseTools/Source/C/Common")))
         SearchPathList.extend(str(item) for item in IncSearchList)
         IncFileList = GetDependencyList(IncludeFileFullPaths, SearchPathList)
+        StructuredPcdsData["OBJECTS"] = {}
         for include_file in IncFileList:
+            StructuredPcdsData["OBJECTS"][include_file] = os.path.getmtime(include_file)
             MakeApp += "$(OBJECTS) : %s\n" % include_file
         if sys.platform == "win32":
             PcdValueCommonPath = os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source\C\Common\PcdValueCommon.c"))
-            MakeApp = MakeApp + '%s\PcdValueCommon.c : %s\n' % (self.OutputPath, PcdValueCommonPath)
+            MakeApp = MakeApp + '%s\\PcdValueCommon.c : %s\n' % (self.OutputPath, PcdValueCommonPath)
             MakeApp = MakeApp + '\tcopy /y %s $@\n' % (PcdValueCommonPath)
         else:
             PcdValueCommonPath = os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source/C/Common/PcdValueCommon.c"))
@@ -3042,17 +3126,18 @@ class DscBuildData(PlatformBuildClassObject):
             if returncode != 0:
                 EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s\n%s\n%s\n' % (Command, StdOut, StdErr))
 
-        #start update structure pcd final value
-        File = open (OutputValueFile, 'r')
-        FileBuffer = File.readlines()
-        File.close()
+        #
+        # In 1st build create the StructuredPcdsData.json
+        # update the record as PCD Input has been changed if its incremental build
+        #
+        with open(StructuredPcdsDataPath, 'w') as file:
+            json.dump(StructuredPcdsData, file, indent=2)
 
-        StructurePcdSet = []
-        for Pcd in FileBuffer:
-            PcdValue = Pcd.split ('|')
-            PcdInfo = PcdValue[0].split ('.')
-            StructurePcdSet.append((PcdInfo[0], PcdInfo[1], PcdInfo[2], PcdInfo[3], PcdValue[2].strip()))
-        return StructurePcdSet
+        # Copy update output file for each Arch
+        shutil.copyfile(OutputValueFile, PcdRecordOutputValueFile)
+
+        #start update structure pcd final value
+        return self.GetStructurePcdSet(OutputValueFile)
 
     @staticmethod
     def NeedUpdateOutput(OutputFile, ValueCFile, StructureInput):

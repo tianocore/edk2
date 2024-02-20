@@ -811,6 +811,30 @@ JsonObjectSetValue (
 }
 
 /**
+  The function is used to delete a JSON key from the given JSON bject
+
+  @param[in]   JsonObj                The provided JSON object.
+  @param[in]   Key                    The key of the JSON value to be deleted.
+
+  @retval      EFI_ABORTED            Some error occur and operation aborted.
+  @retval      EFI_SUCCESS            The JSON value has been deleted from this JSON object.
+
+**/
+EFI_STATUS
+EFIAPI
+JsonObjectDelete (
+  IN    EDKII_JSON_OBJECT  JsonObj,
+  IN    CONST CHAR8        *Key
+  )
+{
+  if (json_object_del ((json_t *)JsonObj, (const char *)Key) != 0) {
+    return EFI_ABORTED;
+  } else {
+    return EFI_SUCCESS;
+  }
+}
+
+/**
   The function is used to get the number of elements in a JSON array. Returns or 0 if JsonArray
   is NULL or not a JSON array.
 

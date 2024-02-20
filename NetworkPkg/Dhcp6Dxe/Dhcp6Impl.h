@@ -59,6 +59,149 @@ typedef struct _DHCP6_INSTANCE  DHCP6_INSTANCE;
 #define DHCP6_INSTANCE_FROM_THIS(Instance)  CR ((Instance), DHCP6_INSTANCE, Dhcp6, DHCP6_INSTANCE_SIGNATURE)
 #define DHCP6_SERVICE_FROM_THIS(Service)    CR ((Service), DHCP6_SERVICE, ServiceBinding, DHCP6_SERVICE_SIGNATURE)
 
+//
+// For more information on DHCP options see RFC 8415, Section 21.1
+//
+// The format of DHCP options is:
+//
+//     0                   1                   2                   3
+//     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |          option-code          |           option-len          |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |                          option-data                          |
+//    |                      (option-len octets)                      |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//
+#define DHCP6_SIZE_OF_OPT_CODE  (sizeof (((EFI_DHCP6_PACKET_OPTION *)0)->OpCode))
+#define DHCP6_SIZE_OF_OPT_LEN   (sizeof (((EFI_DHCP6_PACKET_OPTION *)0)->OpLen))
+
+// Combined size of Code and Length
+#define DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN  (DHCP6_SIZE_OF_OPT_CODE + \
+                                              DHCP6_SIZE_OF_OPT_LEN)
+
+STATIC_ASSERT (
+  DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN == 4,
+  "Combined size of Code and Length must be 4 per RFC 8415"
+  );
+
+// Offset to the length is just past the code
+#define DHCP6_OFFSET_OF_OPT_LEN(a)  (a + DHCP6_SIZE_OF_OPT_CODE)
+STATIC_ASSERT (
+  DHCP6_OFFSET_OF_OPT_LEN (0) == 2,
+  "Offset of length is + 2 past start of option"
+  );
+
+#define DHCP6_OFFSET_OF_OPT_DATA(a)  (a + DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN)
+STATIC_ASSERT (
+  DHCP6_OFFSET_OF_OPT_DATA (0) == 4,
+  "Offset to option data should be +4 from start of option"
+  );
+//
+// Identity Association options (both NA (Non-Temporary) and TA (Temporary Association))
+// are defined in RFC 8415 and are a deriviation of a TLV stucture
+// For more information on IA_NA see Section 21.4
+// For more information on IA_TA see Section 21.5
+//
+//
+//  The format of IA_NA and IA_TA option:
+//
+//     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |          OPTION_IA_NA         |          option-len           |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |                        IAID (4 octets)                        |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |                        T1 (only for IA_NA)                    |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |                        T2 (only for IA_NA)                    |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |                                                               |
+//    .                  IA_NA-options/IA_TA-options                  .
+//    .                                                               .
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//
+#define DHCP6_SIZE_OF_IAID           (sizeof(UINT32))
+#define DHCP6_SIZE_OF_TIME_INTERVAL  (sizeof(UINT32))
+
+// Combined size of IAID, T1, and T2
+#define DHCP6_SIZE_OF_COMBINED_IAID_T1_T2  (DHCP6_SIZE_OF_IAID +  \
+                                            DHCP6_SIZE_OF_TIME_INTERVAL + \
+                                            DHCP6_SIZE_OF_TIME_INTERVAL)
+STATIC_ASSERT (
+  DHCP6_SIZE_OF_COMBINED_IAID_T1_T2 == 12,
+  "Combined size of IAID, T1, T2 must be 12 per RFC 8415"
+  );
+
+// This is the size of IA_TA without options
+#define DHCP6_MIN_SIZE_OF_IA_TA  (DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN + \
+                                  DHCP6_SIZE_OF_IAID)
+STATIC_ASSERT (
+  DHCP6_MIN_SIZE_OF_IA_TA == 8,
+  "Minimum combined size of IA_TA per RFC 8415"
+  );
+
+// Offset to a IA_TA inner option
+#define DHCP6_OFFSET_OF_IA_TA_INNER_OPT(a)  (a + DHCP6_MIN_SIZE_OF_IA_TA)
+STATIC_ASSERT (
+  DHCP6_OFFSET_OF_IA_TA_INNER_OPT (0) == 8,
+  "Offset of IA_TA Inner option is + 8 past start of option"
+  );
+
+// This is the size of IA_NA without options (16)
+#define DHCP6_MIN_SIZE_OF_IA_NA  DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN + \
+                                 DHCP6_SIZE_OF_COMBINED_IAID_T1_T2
+STATIC_ASSERT (
+  DHCP6_MIN_SIZE_OF_IA_NA == 16,
+  "Minimum combined size of IA_TA per RFC 8415"
+  );
+
+#define DHCP6_OFFSET_OF_IA_NA_INNER_OPT(a)  (a + DHCP6_MIN_SIZE_OF_IA_NA)
+STATIC_ASSERT (
+  DHCP6_OFFSET_OF_IA_NA_INNER_OPT (0) == 16,
+  "Offset of IA_NA Inner option is + 16 past start of option"
+  );
+
+#define DHCP6_OFFSET_OF_IA_NA_T1(a)  (a + \
+                                   DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN + \
+                                   DHCP6_SIZE_OF_IAID)
+STATIC_ASSERT (
+  DHCP6_OFFSET_OF_IA_NA_T1 (0) == 8,
+  "Offset of IA_NA Inner option is + 8 past start of option"
+  );
+
+#define DHCP6_OFFSET_OF_IA_NA_T2(a)  (a + \
+                                   DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN +\
+                                   DHCP6_SIZE_OF_IAID + \
+                                   DHCP6_SIZE_OF_TIME_INTERVAL)
+STATIC_ASSERT (
+  DHCP6_OFFSET_OF_IA_NA_T2 (0) == 12,
+  "Offset of IA_NA Inner option is + 12 past start of option"
+  );
+
+//
+// For more information see RFC 8415 Section 21.13
+//
+// The format of the Status Code Option:
+//
+//     0                   1                   2                   3
+//     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |       OPTION_STATUS_CODE      |         option-len            |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//    |          status-code          |                               |
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               |
+//    .                                                               .
+//    .                        status-message                         .
+//    .                                                               .
+//    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+//
+#define DHCP6_OFFSET_OF_STATUS_CODE(a)  (a + DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN)
+STATIC_ASSERT (
+  DHCP6_OFFSET_OF_STATUS_CODE (0) == 4,
+  "Offset of status is + 4 past start of option"
+  );
+
 extern EFI_IPv6_ADDRESS    mAllDhcpRelayAndServersAddress;
 extern EFI_DHCP6_PROTOCOL  gDhcp6ProtocolTemplate;
 

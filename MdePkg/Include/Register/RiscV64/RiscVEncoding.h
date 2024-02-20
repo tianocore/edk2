@@ -96,6 +96,9 @@
 /* Supervisor Protection and Translation */
 #define CSR_SATP  0x180
 
+/* Sstc extension */
+#define CSR_STIMECMP  0x14D
+
 /* Trap/Exception Causes */
 #define CAUSE_MISALIGNED_FETCH          0x0
 #define CAUSE_FETCH_ACCESS              0x1

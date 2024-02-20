@@ -41,16 +41,16 @@ from CommonDataClass.Exceptions import BadExpression
 from Common.caching import cached_property
 import struct
 
-ArrayIndex = re.compile("\[\s*[0-9a-fA-FxX]*\s*\]")
+ArrayIndex = re.compile(r"\[\s*[0-9a-fA-FxX]*\s*\]")
 ## Regular expression used to find out place holders in string template
-gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE | re.UNICODE)
+gPlaceholderPattern = re.compile(r"\$\{([^$()\s]+)\}", re.MULTILINE | re.UNICODE)
 
 ## regular expressions for map file processing
-startPatternGeneral = re.compile("^Start[' ']+Length[' ']+Name[' ']+Class")
-addressPatternGeneral = re.compile("^Address[' ']+Publics by Value[' ']+Rva\+Base")
-valuePatternGcc = re.compile('^([\w_\.]+) +([\da-fA-Fx]+) +([\da-fA-Fx]+)$')
-pcdPatternGcc = re.compile('^([\da-fA-Fx]+) +([\da-fA-Fx]+)')
-secReGeneral = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\da-fA-F]+)[Hh]? +([.\w\$]+) +(\w+)', re.UNICODE)
+startPatternGeneral = re.compile(r"^Start[' ']+Length[' ']+Name[' ']+Class")
+addressPatternGeneral = re.compile(r"^Address[' ']+Publics by Value[' ']+Rva\+Base")
+valuePatternGcc = re.compile(r'^([\w_\.]+) +([\da-fA-Fx]+) +([\da-fA-Fx]+)$')
+pcdPatternGcc = re.compile(r'^([\da-fA-Fx]+) +([\da-fA-Fx]+)')
+secReGeneral = re.compile(r'^([\da-fA-F]+):([\da-fA-F]+) +([\da-fA-F]+)[Hh]? +([.\w\$]+) +(\w+)', re.UNICODE)
 
 StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
 
@@ -82,7 +82,7 @@ def GetVariableOffset(mapfilepath, efifilepath, varnames):
 
     if len(lines) == 0: return None
     firstline = lines[0].strip()
-    if re.match('^\s*Address\s*Size\s*Align\s*Out\s*In\s*Symbol\s*$', firstline):
+    if re.match(r'^\s*Address\s*Size\s*Align\s*Out\s*In\s*Symbol\s*$', firstline):
         return _parseForXcodeAndClang9(lines, efifilepath, varnames)
     if (firstline.startswith("Archive member included ") and
         firstline.endswith(" file (symbol)")):
@@ -96,7 +96,7 @@ def _parseForXcodeAndClang9(lines, efifilepath, varnames):
     ret = []
     for line in lines:
         line = line.strip()
-        if status == 0 and (re.match('^\s*Address\s*Size\s*Align\s*Out\s*In\s*Symbol\s*$', line) \
+        if status == 0 and (re.match(r'^\s*Address\s*Size\s*Align\s*Out\s*In\s*Symbol\s*$', line) \
             or line == "# Symbols:"):
             status = 1
             continue
@@ -104,7 +104,7 @@ def _parseForXcodeAndClang9(lines, efifilepath, varnames):
             for varname in varnames:
                 if varname in line:
                     # cannot pregenerate this RegEx since it uses varname from varnames.
-                    m = re.match('^([\da-fA-FxX]+)([\s\S]*)([_]*%s)$' % varname, line)
+                    m = re.match(r'^([\da-fA-FxX]+)([\s\S]*)([_]*%s)$' % varname, line)
                     if m is not None:
                         ret.append((varname, m.group(1)))
     return ret
@@ -170,7 +170,7 @@ def _parseGeneral(lines, efifilepath, varnames):
     status = 0    #0 - beginning of file; 1 - PE section definition; 2 - symbol table
     secs  = []    # key = section name
     varoffset = []
-    symRe = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\.:\\\\\w\?@\$-]+) +([\da-fA-F]+)', re.UNICODE)
+    symRe = re.compile(r'^([\da-fA-F]+):([\da-fA-F]+) +([\.:\\\\\w\?@\$-]+) +([\da-fA-F]+)', re.UNICODE)
 
     for line in lines:
         line = line.strip()
@@ -1926,4 +1926,4 @@ def CopyDict(ori_dict):
 # Remove the c/c++ comments: // and /* */
 #
 def RemoveCComments(ctext):
-    return re.sub('//.*?\n|/\*.*?\*/', '\n', ctext, flags=re.S)
+    return re.sub('//.*?\n|/\\*.*?\\*/', '\n', ctext, flags=re.S)

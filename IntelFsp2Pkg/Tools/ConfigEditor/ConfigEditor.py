@@ -1015,6 +1015,10 @@ class application(tkinter.Frame):
                                      "Unsupported file '%s' !" % path)
                 return
 
+    # VFR Format Page modification
+    def page_construct(self):
+        self.left.bind("<<TreeviewSelect>>", self.on_config_page_select_change)
+
     def search_bar(self):
         # get data from text box
         self.search_text = self.edit.get()
@@ -1165,7 +1169,8 @@ class application(tkinter.Frame):
             page_id = next(iter(page))
             # Put CFG items into related page list
             self.page_list[page_id] = self.cfg_data_obj.get_cfg_list(page_id)
-            self.page_list[page_id].sort(key=lambda x: x['order'])
+            if self.mode == 'fsp':
+                self.page_list[page_id].sort(key=lambda x: x['order'])
             page_name = self.cfg_data_obj.get_page_title(page_id)
             child = self.left.insert(
                 parent, 'end',
@@ -1199,17 +1204,22 @@ class application(tkinter.Frame):
         for item in self.get_current_config_data():
             disp_list.append(item)
         row = 0
-        disp_list.sort(key=lambda x: x['order'])
-        for item in disp_list:
-            self.add_config_item(item, row)
-            row += 2
-        if self.invalid_values:
-            string = 'The following contails invalid options/values \n\n'
-            for i in self.invalid_values:
-                string += i + ": " + str(self.invalid_values[i]) + "\n"
-            reply = messagebox.showwarning('Warning!', string)
-            if reply == 'ok':
-                self.invalid_values.clear()
+        if self.mode == 'fsp':
+            disp_list.sort(key=lambda x: x['order'])
+            for item in disp_list:
+                self.add_config_item(item, row)
+                row += 2
+            if self.invalid_values:
+                string = 'The following contails invalid options/values \n\n'
+                for i in self.invalid_values:
+                    string += i + ": " + str(self.invalid_values[i]) + "\n"
+                reply = messagebox.showwarning('Warning!', string)
+                if reply == 'ok':
+                    self.invalid_values.clear()
+        elif self.mode == 'vfr':
+            for item in disp_list:
+                self.add_vfr_config_item(item, row)
+                row += 2
 
     fsp_version = ''
 
@@ -1219,16 +1229,19 @@ class application(tkinter.Frame):
             with open(file_name, "rb") as pkl_file:
                 gen_cfg_data.__dict__ = marshal.load(pkl_file)
             gen_cfg_data.prepare_marshal(False)
-        elif file_name.endswith('.yaml'):
+        elif file_name.endswith('.yaml') or file_name.endswith('.yml'):
             if gen_cfg_data.load_yaml(file_name) != 0:
                 raise Exception(gen_cfg_data.get_last_error())
         else:
             raise Exception('Unsupported file "%s" !' % file_name)
+
+        self.mode = gen_cfg_data.yaml_type
         # checking fsp version
-        if gen_cfg_data.detect_fsp():
-            self.fsp_version = '2.X'
-        else:
-            self.fsp_version = '1.X'
+        if gen_cfg_data.yaml_type == 'fsp':
+            if gen_cfg_data.detect_fsp():
+                self.fsp_version = '2.X'
+            else:
+                self.fsp_version = '1.X'
 
         return gen_cfg_data
 
@@ -1252,7 +1265,7 @@ class application(tkinter.Frame):
             elif ftype == 'bin':
                 question = 'All configuration will be reloaded from BIN file, \
                             continue ?'
-            elif ftype == 'yaml':
+            elif ftype == 'yaml' or ftype == 'yml':
                 question = ''
             elif ftype == 'bsf':
                 question = ''
@@ -1263,13 +1276,13 @@ class application(tkinter.Frame):
                 if reply == 'no':
                     return None
 
-        if ftype == 'yaml':
-            if self.mode == 'FSP':
+        if ftype == 'yaml' or ftype == 'yml':
+            if self.mode == 'fsp':
                 file_type = 'YAML'
                 file_ext = 'yaml'
             else:
                 file_type = 'YAML or PKL'
-                file_ext = 'pkl *.yaml'
+                file_ext = 'pkl *.yaml *.yml'
         else:
             file_type = ftype.upper()
             file_ext = ftype
@@ -1364,20 +1377,22 @@ class application(tkinter.Frame):
         self.left.delete(*self.left.get_children())
 
         self.cfg_data_obj = self.load_config_data(path)
-
-        self.update_last_dir(path)
-        self.org_cfg_data_bin = self.cfg_data_obj.generate_binary_array()
         self.build_config_page_tree(self.cfg_data_obj.get_cfg_page()['root'],
                                     '')
 
-        msg_string = 'Click YES if it is FULL FSP '\
-            + self.fsp_version + ' Binary'
-        reply = messagebox.askquestion('Form', msg_string)
-        if reply == 'yes':
-            self.load_from_bin()
+        self.update_last_dir(path)
+        if self.cfg_data_obj.yaml_type == 'fsp':
+            self.org_cfg_data_bin = self.cfg_data_obj.generate_binary_array()
 
-        for menu in self.menu_string:
-            self.file_menu.entryconfig(menu, state="normal")
+
+            msg_string = 'Click YES if it is FULL FSP '\
+                + self.fsp_version + ' Binary'
+            reply = messagebox.askquestion('Form', msg_string)
+            if reply == 'yes':
+                self.load_from_bin()
+
+            for menu in self.menu_string:
+                self.file_menu.entryconfig(menu, state="normal")
 
         return 0
 
@@ -1405,8 +1420,9 @@ class application(tkinter.Frame):
             return
 
         self.update_config_data_on_page()
-        new_data = self.cfg_data_obj.generate_binary_array()
-        self.cfg_data_obj.generate_delta_file_from_bin(path,
+        if self.mode == "fsp":
+            new_data = self.cfg_data_obj.generate_binary_array()
+            self.cfg_data_obj.generate_delta_file_from_bin(path,
                                                        self.org_cfg_data_bin,
                                                        new_data, full)
 
@@ -1526,6 +1542,13 @@ class application(tkinter.Frame):
             new_value = bytes_to_bracket_str(widget.get())
             self.set_config_item_value(item, new_value)
 
+    #YAML VFR Part Start
+    def update_vfr_config_data_from_widget(self, widget, args):
+
+        item = self.get_config_data_item_from_widget(widget)
+
+    #YAML VFR Part End
+
     def evaluate_condition(self, item):
         try:
             result = self.cfg_data_obj.evaluate_condition(item)
@@ -1534,6 +1557,132 @@ class application(tkinter.Frame):
                   % (item['condition'], item['path']))
             result = 1
         return result
+
+  #YAML VFR Part Start
+    def add_vfr_config_item(self, item, row):
+        parent = self.right_grid
+        widget = None
+        if item['type'] == 'string':
+            value = ''
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            txt_val = tkinter.StringVar()
+            widget = tkinter.Entry(parent, textvariable=txt_val)
+            txt_val.set(value)
+
+        elif item['type'] == 'text':
+            value = ''
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            txt_val = tkinter.StringVar()
+            widget = tkinter.Entry(parent, textvariable=txt_val)
+            txt_val.set(value)
+        elif item['type'] == 'label':
+            value = ''
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            txt_val = tkinter.StringVar()
+            widget = tkinter.Entry(parent, textvariable=txt_val)
+            txt_val.set(value)
+
+        elif item['type'] == 'checkbox':
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            widget = tkinter.Checkbutton(parent, text= item['prompt'].split("#")[0], variable= 1)
+
+        elif item['type'] == 'subtitle':
+            value = ''
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            txt_val = tkinter.StringVar()
+            widget = tkinter.Entry(parent, textvariable=txt_val)
+            txt_val.set(value)
+
+        elif item['type'] == 'oneof':
+            OPTIONS = []
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            for key in item:
+                if key.startswith("option"):
+                    if type(item[key]) == type([]):
+                        for option_data in item[key]:
+                            OPTIONS.append(option_data['text'])
+                    else:
+                        OPTIONS.append(item[key]["text"])
+            txt_val = tkinter.StringVar()
+            txt_val.set(OPTIONS[0]) # set default value
+            widget = tkinter.OptionMenu(parent, txt_val, *OPTIONS)
+            txt_val.set(OPTIONS[0])
+
+        elif item['type'] == 'numeric':
+            value = 0
+            for key in item.keys():
+                if key == "value":
+                    value = item['value']
+                elif key == 'default':
+                    for dict_key in item['default']:
+                        if dict_key == "value":
+                            value = item['default']['value']
+                else:
+                    continue
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            txt_val = tkinter.StringVar()
+            widget = tkinter.Entry(parent, textvariable=txt_val)
+            txt_val.set(value)
+
+        elif item['type'] == 'orderedlist':
+            OPTIONS = []
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            for key in item:
+                if key.startswith("option"):
+                    if type(item[key]) == type([]):
+                        for option_data in item[key]:
+                            OPTIONS.append(option_data['text'])
+                    else:
+                        OPTIONS.append(item[key]["text"])
+            txt_val = tkinter.StringVar()
+            txt_val.set(OPTIONS[0]) # default value
+            widget = tkinter.OptionMenu(parent, txt_val, *OPTIONS)
+            txt_val.set(OPTIONS[0])
+
+        elif item['type'] == 'date':
+            value = ''
+            for key in item.keys():
+                if key == "value":
+                    value = item['value']
+                elif key == 'default':
+                    for dict_key in item['default']:
+                        if dict_key == "value":
+                            value = item['default']['value']
+                else:
+                    continue
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            txt_val = tkinter.StringVar()
+            widget = tkinter.Entry(parent, textvariable=txt_val)
+            txt_val.set(value)
+        elif item['type'] == 'time':
+            value = ''
+            for key in item.keys():
+                if key == "value":
+                    value = item['value']
+                elif key == 'default':
+                    for dict_key in item['default']:
+                        if dict_key == "value":
+                            value = item['default']['value']
+                else:
+                    continue
+            name = tkinter.Label(parent, text=item['prompt'].split("#")[0], anchor="w")
+            txt_val = tkinter.StringVar()
+            widget = tkinter.Entry(parent, textvariable=txt_val)
+            txt_val.set(value)
+
+
+        if widget:
+            if item['type'] == 'string' or item['type'] == 'text' or item['type'] == 'numeric' or item['type'] == "oneof"\
+                or item['type'] == 'date' or item['type'] == 'time' or item['type'] == 'orderedlist' or item['type'] == 'label':# or item['type'] == 'goto'or item['type'] == 'checkbox':
+
+                if 'help' in item.keys():
+                    create_tool_tip(widget, item['help'].split("#")[0])
+
+            name.grid(row=row, column=0, padx=5, pady=5, sticky="nsew")
+            widget.grid(row=row + 1, rowspan=1, column=0,
+                        padx=5, pady=5, sticky="nsew")
+
+  #YAML VFR Part End
 
     def add_config_item(self, item, row):
         parent = self.right_grid
@@ -1611,9 +1760,15 @@ class application(tkinter.Frame):
                         padx=10, pady=5, sticky="nsew")
 
     def update_config_data_on_page(self):
-        self.walk_widgets_in_layout(self.right_grid,
-                                    self.update_config_data_from_widget)
 
+        if self.mode == "fsp":
+            self.walk_widgets_in_layout(self.right_grid,
+                                    self.update_config_data_from_widget)
+        elif self.mode == "vfr":
+            self.walk_widgets_in_layout(self.right_grid,
+                                    self.update_vfr_config_data_from_widget)
+        else:
+            print("WARNING: Invalid config file!!")
 
 if __name__ == '__main__':
     root = tkinter.Tk()

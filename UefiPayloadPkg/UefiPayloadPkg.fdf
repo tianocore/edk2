@@ -154,14 +154,20 @@ INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRou
 INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
 
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
+!if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
 INF CryptoPkg/Driver/CryptoDxe.inf
+!endif
 !endif
 !if $(SECURITY_STUB_ENABLE) == TRUE
 INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
 INF UefiCpuPkg/CpuDxe/CpuDxe.inf
 
+!if $(TIMER_SUPPORT) == "HPET"
 INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+!elseif $(TIMER_SUPPORT) == "LAPIC"
+INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+!endif
 INF MdeModulePkg/Universal/Metronome/Metronome.inf
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf

@@ -547,17 +547,14 @@ FlushTlbForAll (
   VOID
   )
 {
-  UINTN  Index;
-
   FlushTlbOnCurrentProcessor (NULL);
-
-  for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
-    if (Index != gSmst->CurrentlyExecutingCpu) {
-      // Force to start up AP in blocking mode,
-      SmmBlockingStartupThisAp (FlushTlbOnCurrentProcessor, Index, NULL);
-      // Do not check return status, because AP might not be present in some corner cases.
-    }
-  }
+  InternalSmmStartupAllAPs (
+    (EFI_AP_PROCEDURE2)FlushTlbOnCurrentProcessor,
+    0,
+    NULL,
+    NULL,
+    NULL
+    );
 }
 
 /**
@@ -799,72 +796,108 @@ PatchSmmSaveStateMap (
   UINTN  TileCodeSize;
   UINTN  TileDataSize;
   UINTN  TileSize;
+  UINTN  PageTableBase;
 
-  TileCodeSize = GetSmiHandlerSize ();
-  TileCodeSize = ALIGN_VALUE (TileCodeSize, SIZE_4KB);
-  TileDataSize = (SMRAM_SAVE_STATE_MAP_OFFSET - SMM_PSD_OFFSET) + sizeof (SMRAM_SAVE_STATE_MAP);
-  TileDataSize = ALIGN_VALUE (TileDataSize, SIZE_4KB);
-  TileSize     = TileDataSize + TileCodeSize - 1;
-  TileSize     = 2 * GetPowerOfTwo32 ((UINT32)TileSize);
+  TileCodeSize  = GetSmiHandlerSize ();
+  TileCodeSize  = ALIGN_VALUE (TileCodeSize, SIZE_4KB);
+  TileDataSize  = (SMRAM_SAVE_STATE_MAP_OFFSET - SMM_PSD_OFFSET) + sizeof (SMRAM_SAVE_STATE_MAP);
+  TileDataSize  = ALIGN_VALUE (TileDataSize, SIZE_4KB);
+  TileSize      = TileDataSize + TileCodeSize - 1;
+  TileSize      = 2 * GetPowerOfTwo32 ((UINT32)TileSize);
+  PageTableBase = AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64;
 
   DEBUG ((DEBUG_INFO, "PatchSmmSaveStateMap:\n"));
   for (Index = 0; Index < mMaxNumberOfCpus - 1; Index++) {
     //
     // Code
     //
-    SmmSetMemoryAttributes (
+    ConvertMemoryPageAttributes (
+      PageTableBase,
+      mPagingMode,
       mCpuHotPlugData.SmBase[Index] + SMM_HANDLER_OFFSET,
       TileCodeSize,
-      EFI_MEMORY_RO
+      EFI_MEMORY_RO,
+      TRUE,
+      NULL
       );
-    SmmClearMemoryAttributes (
+    ConvertMemoryPageAttributes (
+      PageTableBase,
+      mPagingMode,
       mCpuHotPlugData.SmBase[Index] + SMM_HANDLER_OFFSET,
       TileCodeSize,
-      EFI_MEMORY_XP
+      EFI_MEMORY_XP,
+      FALSE,
+      NULL
       );
 
     //
     // Data
     //
-    SmmClearMemoryAttributes (
+    ConvertMemoryPageAttributes (
+      PageTableBase,
+      mPagingMode,
       mCpuHotPlugData.SmBase[Index] + SMM_HANDLER_OFFSET + TileCodeSize,
       TileSize - TileCodeSize,
-      EFI_MEMORY_RO
+      EFI_MEMORY_RO,
+      FALSE,
+      NULL
       );
-    SmmSetMemoryAttributes (
+    ConvertMemoryPageAttributes (
+      PageTableBase,
+      mPagingMode,
       mCpuHotPlugData.SmBase[Index] + SMM_HANDLER_OFFSET + TileCodeSize,
       TileSize - TileCodeSize,
-      EFI_MEMORY_XP
+      EFI_MEMORY_XP,
+      TRUE,
+      NULL
       );
   }
 
   //
   // Code
   //
-  SmmSetMemoryAttributes (
+  ConvertMemoryPageAttributes (
+    PageTableBase,
+    mPagingMode,
     mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET,
     TileCodeSize,
-    EFI_MEMORY_RO
+    EFI_MEMORY_RO,
+    TRUE,
+    NULL
     );
-  SmmClearMemoryAttributes (
+  ConvertMemoryPageAttributes (
+    PageTableBase,
+    mPagingMode,
     mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET,
     TileCodeSize,
-    EFI_MEMORY_XP
+    EFI_MEMORY_XP,
+    FALSE,
+    NULL
     );
 
   //
   // Data
   //
-  SmmClearMemoryAttributes (
+  ConvertMemoryPageAttributes (
+    PageTableBase,
+    mPagingMode,
     mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET + TileCodeSize,
     SIZE_32KB - TileCodeSize,
-    EFI_MEMORY_RO
+    EFI_MEMORY_RO,
+    FALSE,
+    NULL
     );
-  SmmSetMemoryAttributes (
+  ConvertMemoryPageAttributes (
+    PageTableBase,
+    mPagingMode,
     mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET + TileCodeSize,
     SIZE_32KB - TileCodeSize,
-    EFI_MEMORY_XP
+    EFI_MEMORY_XP,
+    TRUE,
+    NULL
     );
+
+  FlushTlbForAll ();
 }
 
 /**
@@ -1614,6 +1647,70 @@ EdkiiSmmClearMemoryAttributes (
 }
 
 /**
+  Create page table based on input PagingMode, LinearAddress and Length.
+
+  @param[in, out]  PageTable           The pointer to the page table.
+  @param[in]       PagingMode          The paging mode.
+  @param[in]       LinearAddress       The start of the linear address range.
+  @param[in]       Length              The length of the linear address range.
+
+**/
+VOID
+GenPageTable (
+  IN OUT UINTN        *PageTable,
+  IN     PAGING_MODE  PagingMode,
+  IN     UINT64       LinearAddress,
+  IN     UINT64       Length
+  )
+{
+  RETURN_STATUS       Status;
+  UINTN               PageTableBufferSize;
+  VOID                *PageTableBuffer;
+  IA32_MAP_ATTRIBUTE  MapAttribute;
+  IA32_MAP_ATTRIBUTE  MapMask;
+
+  MapMask.Uint64                   = MAX_UINT64;
+  MapAttribute.Uint64              = mAddressEncMask|LinearAddress;
+  MapAttribute.Bits.Present        = 1;
+  MapAttribute.Bits.ReadWrite      = 1;
+  MapAttribute.Bits.UserSupervisor = 1;
+  MapAttribute.Bits.Accessed       = 1;
+  MapAttribute.Bits.Dirty          = 1;
+  PageTableBufferSize              = 0;
+
+  Status = PageTableMap (
+             PageTable,
+             PagingMode,
+             NULL,
+             &PageTableBufferSize,
+             LinearAddress,
+             Length,
+             &MapAttribute,
+             &MapMask,
+             NULL
+             );
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    DEBUG ((DEBUG_INFO, "GenSMMPageTable: 0x%x bytes needed for initial SMM page table\n", PageTableBufferSize));
+    PageTableBuffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (PageTableBufferSize));
+    ASSERT (PageTableBuffer != NULL);
+    Status = PageTableMap (
+               PageTable,
+               PagingMode,
+               PageTableBuffer,
+               &PageTableBufferSize,
+               LinearAddress,
+               Length,
+               &MapAttribute,
+               &MapMask,
+               NULL
+               );
+  }
+
+  ASSERT (Status == RETURN_SUCCESS);
+  ASSERT (PageTableBufferSize == 0);
+}
+
+/**
   Create page table based on input PagingMode and PhysicalAddressBits in smm.
 
   @param[in]      PagingMode           The paging mode.
@@ -1628,35 +1725,37 @@ GenSmmPageTable (
   IN UINT8        PhysicalAddressBits
   )
 {
-  UINTN               PageTableBufferSize;
-  UINTN               PageTable;
-  VOID                *PageTableBuffer;
-  IA32_MAP_ATTRIBUTE  MapAttribute;
-  IA32_MAP_ATTRIBUTE  MapMask;
-  RETURN_STATUS       Status;
-  UINTN               GuardPage;
-  UINTN               Index;
-  UINT64              Length;
+  UINTN          PageTable;
+  RETURN_STATUS  Status;
+  UINTN          GuardPage;
+  UINTN          Index;
+  UINT64         Length;
+  PAGING_MODE    SmramPagingMode;
 
-  Length                           = LShiftU64 (1, PhysicalAddressBits);
-  PageTable                        = 0;
-  PageTableBufferSize              = 0;
-  MapMask.Uint64                   = MAX_UINT64;
-  MapAttribute.Uint64              = mAddressEncMask;
-  MapAttribute.Bits.Present        = 1;
-  MapAttribute.Bits.ReadWrite      = 1;
-  MapAttribute.Bits.UserSupervisor = 1;
-  MapAttribute.Bits.Accessed       = 1;
-  MapAttribute.Bits.Dirty          = 1;
+  PageTable = 0;
+  Length    = LShiftU64 (1, PhysicalAddressBits);
+  ASSERT (Length > mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize);
 
-  Status = PageTableMap (&PageTable, PagingMode, NULL, &PageTableBufferSize, 0, Length, &MapAttribute, &MapMask, NULL);
-  ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
-  DEBUG ((DEBUG_INFO, "GenSMMPageTable: 0x%x bytes needed for initial SMM page table\n", PageTableBufferSize));
-  PageTableBuffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (PageTableBufferSize));
-  ASSERT (PageTableBuffer != NULL);
-  Status = PageTableMap (&PageTable, PagingMode, PageTableBuffer, &PageTableBufferSize, 0, Length, &MapAttribute, &MapMask, NULL);
-  ASSERT (Status == RETURN_SUCCESS);
-  ASSERT (PageTableBufferSize == 0);
+  if (sizeof (UINTN) == sizeof (UINT64)) {
+    SmramPagingMode = m5LevelPagingNeeded ? Paging5Level4KB : Paging4Level4KB;
+  } else {
+    SmramPagingMode = PagingPae4KB;
+  }
+
+  ASSERT (mCpuHotPlugData.SmrrBase % SIZE_4KB == 0);
+  ASSERT (mCpuHotPlugData.SmrrSize % SIZE_4KB == 0);
+  GenPageTable (&PageTable, PagingMode, 0, mCpuHotPlugData.SmrrBase);
+
+  //
+  // Map smram range in 4K page granularity to avoid subsequent page split when smm ready to lock.
+  // If BSP are splitting the 1G/2M paging entries to 512 2M/4K paging entries, and all APs are
+  // still running in SMI at the same time, which might access the affected linear-address range
+  // between the time of modification and the time of invalidation access. That will be a potential
+  // problem leading exception happen.
+  //
+  GenPageTable (&PageTable, SmramPagingMode, mCpuHotPlugData.SmrrBase, mCpuHotPlugData.SmrrSize);
+
+  GenPageTable (&PageTable, PagingMode, mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize, Length - mCpuHotPlugData.SmrrBase - mCpuHotPlugData.SmrrSize);
 
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     //
@@ -1665,6 +1764,7 @@ GenSmmPageTable (
     for (Index = 0; Index < gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus; Index++) {
       GuardPage = mSmmStackArrayBase + EFI_PAGE_SIZE + Index * (mSmmStackSize + mSmmShadowStackSize);
       Status    = ConvertMemoryPageAttributes (PageTable, PagingMode, GuardPage, SIZE_4KB, EFI_MEMORY_RP, TRUE, NULL);
+      ASSERT (Status == RETURN_SUCCESS);
     }
   }
 
@@ -1673,6 +1773,7 @@ GenSmmPageTable (
     // Mark [0, 4k] as non-present
     //
     Status = ConvertMemoryPageAttributes (PageTable, PagingMode, 0, SIZE_4KB, EFI_MEMORY_RP, TRUE, NULL);
+    ASSERT (Status == RETURN_SUCCESS);
   }
 
   return (UINTN)PageTable;

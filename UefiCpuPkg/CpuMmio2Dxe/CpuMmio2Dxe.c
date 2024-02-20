@@ -3,7 +3,7 @@
 
 Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
-Copyright (c) 2022, Ventana Micro Systems Inc. All rights reserved.<BR>
+Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -514,7 +514,7 @@ CpuIoServiceWrite (
 //
 // CPU I/O 2 Protocol instance
 //
-STATIC EFI_CPU_IO2_PROTOCOL  mCpuIo2 = {
+STATIC EFI_CPU_IO2_PROTOCOL  mCpuMmio2 = {
   {
     CpuMemoryServiceRead,
     CpuMemoryServiceWrite
@@ -537,7 +537,7 @@ STATIC EFI_CPU_IO2_PROTOCOL  mCpuIo2 = {
 **/
 EFI_STATUS
 EFIAPI
-PciCpuIo2Initialize (
+CpuMmio2Initialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
@@ -548,7 +548,7 @@ PciCpuIo2Initialize (
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mHandle,
                   &gEfiCpuIo2ProtocolGuid,
-                  &mCpuIo2,
+                  &mCpuMmio2,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

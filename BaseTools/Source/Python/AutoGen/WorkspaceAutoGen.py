@@ -26,7 +26,7 @@ from Common.Misc import *
 import json
 
 ## Regular expression for splitting Dependency Expression string into tokens
-gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
+gDepexTokenPattern = re.compile(r"(\(|\)|\w+| \S+\.inf)")
 
 ## Regular expression for match: PCD(xxxx.yyy)
 gPCDAsGuidPattern = re.compile(r"^PCD\(.+\..+\)$")
@@ -160,22 +160,18 @@ class WorkspaceAutoGen(AutoGen):
 
     def CollectPlatformGuids(self):
         oriInfList = []
-        oriPkgSet = set()
-        PlatformPkg = set()
+        pkgSet = set()
         for Arch in self.ArchList:
             Platform = self.BuildDatabase[self.MetaFile, Arch, self.BuildTarget, self.ToolChain]
             oriInfList = Platform.Modules
             for ModuleFile in oriInfList:
                 ModuleData = self.BuildDatabase[ModuleFile, Platform._Arch, Platform._Target, Platform._Toolchain]
-                oriPkgSet.update(ModuleData.Packages)
-                for Pkg in oriPkgSet:
-                    Guids = Pkg.Guids
-                    GlobalData.gGuidDict.update(Guids)
+                pkgSet.update(ModuleData.Packages)
             if Platform.Packages:
-                PlatformPkg.update(Platform.Packages)
-                for Pkg in PlatformPkg:
-                    Guids = Pkg.Guids
-                    GlobalData.gGuidDict.update(Guids)
+                pkgSet.update(Platform.Packages)
+        for Pkg in pkgSet:
+            Guids = Pkg.Guids
+            GlobalData.gGuidDict.update(Guids)
 
     @cached_property
     def FdfProfile(self):
@@ -439,6 +435,10 @@ class WorkspaceAutoGen(AutoGen):
             PkgSet = set()
             for mb in [self.BuildDatabase[m, Arch, self.BuildTarget, self.ToolChain] for m in Platform.Modules]:
                 PkgSet.update(mb.Packages)
+
+            for lb in [self.BuildDatabase[l, Arch, self.BuildTarget, self.ToolChain] for l in Platform.LibraryInstances]:
+                PkgSet.update(lb.Packages)
+
             for Inf in ModuleList:
                 ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch)
                 if ModuleFile in Platform.Modules:
@@ -968,4 +968,3 @@ class WorkspaceAutoGen(AutoGen):
     #
     def CreateAsBuiltInf(self):
         return
-

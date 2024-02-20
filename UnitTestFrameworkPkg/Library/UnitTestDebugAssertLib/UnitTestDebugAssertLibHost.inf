@@ -1,0 +1,36 @@
+## @file
+#  Unit Test Debug Assert Library for host-based environments
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UnitTestDebugAssertLibHost
+  MODULE_UNI_FILE                = UnitTestDebugAssertLibHost.uni
+  FILE_GUID                      = F097D67C-0340-49C8-AB30-ABC1B7D1C8D2
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  UnitTestDebugAssertLibHost.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UnitTestLib
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS   == /c /EHs /Zi /Od /MT
+  GCC:*_*_IA32_CC_FLAGS == -g -c -fshort-wchar -fexceptions -O0 -m32 -malign-double -fno-pie
+  GCC:*_*_X64_CC_FLAGS  == -g -c -fshort-wchar -fexceptions -O0 -m64 -fno-pie "-DEFIAPI=__attribute__((ms_abi))"

@@ -12,6 +12,8 @@ It supports the following options:
 ## 1. Open Config YAML file
 This option loads the YAML file for a FSP UPD into the ConfigEditor to change the desired configuration values.
 
+This option loads the YAML file for a VFR config data into the ConfigEditor to view the desired form values.
+
 #####Example:
 ```
 ![Example ConfigEditor 1](https://slimbootloader.github.io/_images/CfgEditOpen.png)

@@ -30,6 +30,7 @@
   RedfishPkg/RedfishPkg.dec
 
 [Sources]
+  ComponentName.c
   RedfishConfigHandlerDriver.h
   RedfishConfigHandlerDriver.c
   RedfishConfigHandlerCommon.h

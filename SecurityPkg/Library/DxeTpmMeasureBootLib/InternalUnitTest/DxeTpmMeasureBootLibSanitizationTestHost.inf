@@ -1,0 +1,28 @@
+## @file
+# This file builds the unit tests for DxeTpmMeasureBootLib
+#
+# Copyright (C) Microsoft Corporation.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = DxeTpmMeasuredBootLibTest
+  FILE_GUID                      = eb01bc38-309c-4d3e-967e-9f078c90772f
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = main
+
+[Sources]
+  DxeTpmMeasureBootLibSanitizationTest.c
+  ../DxeTpmMeasureBootLibSanitization.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UnitTestLib
+  PrintLib
+  SafeIntLib

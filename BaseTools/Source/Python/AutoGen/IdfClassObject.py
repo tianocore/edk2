@@ -18,7 +18,7 @@ import os
 from Common.GlobalData import gIdentifierPattern
 from .UniClassObject import StripComments
 
-IMAGE_TOKEN = re.compile('IMAGE_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
+IMAGE_TOKEN = re.compile(r'IMAGE_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
 
 #
 # Value of different image information block types

@@ -397,6 +397,7 @@
   RiscV64/CpuPause.c
   RiscV64/MemoryFence.S             | GCC
   RiscV64/RiscVSetJumpLongJump.S    | GCC
+  RiscV64/SwitchStack.S             | GCC
   RiscV64/RiscVCpuBreakpoint.S      | GCC
   RiscV64/RiscVCpuPause.S           | GCC
   RiscV64/RiscVInterrupt.S          | GCC
@@ -409,7 +410,10 @@
 [Sources.LOONGARCH64]
   Math64.c
   Unaligned.c
+  LoongArch64/Csr.c
   LoongArch64/InternalSwitchStack.c
+  LoongArch64/AsmCsr.S              | GCC
+  LoongArch64/IoCsr.S               | GCC
   LoongArch64/GetInterruptState.S   | GCC
   LoongArch64/EnableInterrupts.S    | GCC
   LoongArch64/DisableInterrupts.S   | GCC
@@ -419,6 +423,9 @@
   LoongArch64/CpuPause.S            | GCC
   LoongArch64/SetJumpLongJump.S     | GCC
   LoongArch64/SwitchStack.S         | GCC
+  LoongArch64/ExceptionBase.S       | GCC
+  LoongArch64/Cpucfg.S              | GCC
+  LoongArch64/ReadStableCounter.S   | GCC
 
 [Packages]
   MdePkg/MdePkg.dec

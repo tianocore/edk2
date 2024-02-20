@@ -90,6 +90,20 @@ CpuFlushCpuDataCache (
   IN EFI_CPU_FLUSH_TYPE     FlushType
   )
 {
+  switch (FlushType) {
+    case EfiCpuFlushTypeWriteBack:
+      WriteBackDataCacheRange ((VOID *)(UINTN)Start, (UINTN)Length);
+      break;
+    case EfiCpuFlushTypeInvalidate:
+      InvalidateDataCacheRange ((VOID *)(UINTN)Start, (UINTN)Length);
+      break;
+    case EfiCpuFlushTypeWriteBackInvalidate:
+      WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)Start, (UINTN)Length);
+      break;
+    default:
+      return EFI_INVALID_PARAMETER;
+  }
+
   return EFI_SUCCESS;
 }
 

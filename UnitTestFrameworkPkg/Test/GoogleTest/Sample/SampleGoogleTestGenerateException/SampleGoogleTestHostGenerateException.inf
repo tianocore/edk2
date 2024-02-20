@@ -1,0 +1,39 @@
+## @file
+# This is a sample to demonstrates the use of GoogleTest that supports host
+# execution environments for test case that generates an exception. For some
+# host-based environments, this is a fatal condition that terminates the unit
+# tests and no additional test cases are executed. On other environments, this
+# condition may be report a unit test failure and continue with additional unit
+# tests.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x00010005
+  BASE_NAME      = SampleGoogleTestHostGenerateException
+  FILE_GUID      = 037A3C56-44C5-4899-AC4D-911943E6FBA1
+  MODULE_TYPE    = HOST_APPLICATION
+  VERSION_STRING = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SampleGoogleTestGenerateException.cpp
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  GoogleTestLib
+  BaseLib
+  DebugLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask

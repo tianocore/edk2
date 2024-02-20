@@ -23,6 +23,16 @@
 #define ACPI_GPIO_CONNECTION_DESCRIPTOR                0x8C
 #define ACPI_GENERIC_SERIAL_BUS_CONNECTION_DESCRIPTOR  0x8E
 
+///
+/// _PSD Revision for ACPI 5.0
+///
+#define EFI_ACPI_5_0_AML_PSD_REVISION  0
+
+///
+/// _CPC Revision for ACPI 5.0
+///
+#define EFI_ACPI_5_0_AML_CPC_REVISION  1
+
 #pragma pack(1)
 
 ///

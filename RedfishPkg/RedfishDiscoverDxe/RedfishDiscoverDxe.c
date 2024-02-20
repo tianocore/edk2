@@ -6,6 +6,7 @@
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
+  Copyright (c) 2023, Mike Maslenkin <mike.maslenkin@gmail.com> <BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -712,6 +713,199 @@ DiscoverRedfishHostInterface (
 }
 
 /**
+  The function releases particular strings into the structure instance.
+
+  @param[in]  Information           EFI_REDFISH_DISCOVERED_INFORMATION
+
+**/
+STATIC
+VOID
+FreeInformationData (
+  IN EFI_REDFISH_DISCOVERED_INFORMATION  *Information
+  )
+{
+  if (Information->Location != NULL) {
+    FreePool (Information->Location);
+    Information->Location = NULL;
+  }
+
+  if (Information->Uuid != NULL) {
+    FreePool (Information->Uuid);
+    Information->Uuid = NULL;
+  }
+
+  if (Information->Os != NULL) {
+    FreePool (Information->Os);
+    Information->Os = NULL;
+  }
+
+  if (Information->OsVersion != NULL) {
+    FreePool (Information->OsVersion);
+    Information->OsVersion = NULL;
+  }
+
+  if (Information->Product != NULL) {
+    FreePool (Information->Product);
+    Information->Product = NULL;
+  }
+
+  if (Information->ProductVer != NULL) {
+    FreePool (Information->ProductVer);
+    Information->ProductVer = NULL;
+  }
+}
+
+/**
+  The function initializes particular strings into the structure instance.
+
+  @param[in]  Information           EFI_REDFISH_DISCOVERED_INFORMATION
+  @param[in]  IsIpv6                Flag indicating IP version 6 protocol is used
+  @param[in]  RedfishVersion        Redfish version.
+  @param[in]  RedfishLocation       Redfish location.
+  @param[in]  Uuid                  Service UUID string.
+  @param[in]  Os                    OS string.
+  @param[in]  OsVer                 OS version string.
+  @param[in]  Product               Product string.
+  @param[in]  ProductVer            Product version string.
+
+**/
+STATIC
+VOID
+InitInformationData (
+  IN EFI_REDFISH_DISCOVERED_INFORMATION  *Information,
+  IN BOOLEAN                             IsIpv6,
+  IN UINTN                               *RedfishVersion OPTIONAL,
+  IN CONST CHAR8                         *RedfishLocation OPTIONAL,
+  IN CONST CHAR8                         *Uuid OPTIONAL,
+  IN CONST CHAR8                         *Os OPTIONAL,
+  IN CONST CHAR8                         *OsVer OPTIONAL,
+  IN CONST CHAR8                         *Product OPTIONAL,
+  IN CONST CHAR8                         *ProductVer OPTIONAL
+  )
+{
+  UINTN  AllocationSize;
+
+  if (RedfishVersion != NULL) {
+    Information->RedfishVersion = *RedfishVersion;
+    DEBUG ((DEBUG_MANAGEABILITY, "Redfish service version: %d.\n", Information->RedfishVersion));
+  }
+
+  if (RedfishLocation != NULL) {
+    AllocationSize = AsciiStrSize (RedfishLocation) * sizeof (CHAR16);
+
+    if (IsIpv6) {
+      AllocationSize += 2 * sizeof (CHAR16); // take into account '[' and ']'
+    }
+
+    Information->Location = AllocatePool (AllocationSize);
+    if (Information->Location != NULL) {
+      if (IsIpv6) {
+        UnicodeSPrintAsciiFormat (Information->Location, AllocationSize, "[%a]", RedfishLocation);
+      } else {
+        AsciiStrToUnicodeStrS (RedfishLocation, Information->Location, AllocationSize);
+      }
+
+      DEBUG ((DEBUG_MANAGEABILITY, "Redfish service location: %s.\n", Information->Location));
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish service location: %a.\n",
+        __func__,
+        RedfishLocation
+        ));
+    }
+  }
+
+  if (Uuid != NULL) {
+    AllocationSize    = AsciiStrSize (Uuid) * sizeof (CHAR16);
+    Information->Uuid = AllocatePool (AllocationSize);
+    if (Information->Uuid != NULL) {
+      AsciiStrToUnicodeStrS (Uuid, Information->Uuid, AllocationSize);
+      DEBUG ((DEBUG_MANAGEABILITY, "Service UUID: %s.\n", Information->Uuid));
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Service UUID: %a.\n",
+        __func__,
+        Uuid
+        ));
+    }
+  }
+
+  if (Os != NULL) {
+    AllocationSize  = AsciiStrSize (Os) * sizeof (CHAR16);
+    Information->Os = AllocatePool (AllocationSize);
+    if (Information->Os != NULL) {
+      AsciiStrToUnicodeStrS (Os, Information->Os, AllocationSize);
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish service OS: %a.\n",
+        __func__,
+        Os
+        ));
+    }
+  }
+
+  if (OsVer != NULL) {
+    AllocationSize         = AsciiStrSize (OsVer) * sizeof (CHAR16);
+    Information->OsVersion = AllocatePool (AllocationSize);
+    if (Information->OsVersion != NULL) {
+      AsciiStrToUnicodeStrS (OsVer, Information->OsVersion, AllocationSize);
+      DEBUG ((
+        DEBUG_MANAGEABILITY,
+        "Redfish service OS: %s, Version:%s.\n",
+        Information->Os,
+        Information->OsVersion
+        ));
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish OS Version:%a.\n",
+        __func__,
+        OsVer
+        ));
+    }
+  }
+
+  if (Product != NULL) {
+    AllocationSize       = AsciiStrSize (Product) * sizeof (CHAR16);
+    Information->Product = AllocatePool (AllocationSize);
+    if (Information->Product != NULL) {
+      AsciiStrToUnicodeStrS (Product, Information->Product, AllocationSize);
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish service product: %a.\n",
+        __func__,
+        Product
+        ));
+    }
+  }
+
+  if (ProductVer != NULL) {
+    AllocationSize          = AsciiStrSize (ProductVer) * sizeof (CHAR16);
+    Information->ProductVer = AllocatePool (AllocationSize);
+    if (Information->ProductVer != NULL) {
+      AsciiStrToUnicodeStrS (ProductVer, Information->ProductVer, AllocationSize);
+      DEBUG ((
+        DEBUG_MANAGEABILITY,
+        "Redfish service product: %s, Version:%s.\n",
+        Information->Product,
+        Information->ProductVer
+        ));
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Can not allocate memory for Redfish service product Version: %a.\n",
+        __func__,
+        ProductVer
+        ));
+    }
+  }
+}
+
+/**
   The function adds a new found Redfish service to internal list and
   notify client.
 
@@ -829,6 +1023,10 @@ AddAndSignalNewRedfishService (
     } while (TRUE);
   }
 
+  if (Char16Uuid != NULL) {
+    FreePool (Char16Uuid);
+  }
+
   if (NewFound || InfoRefresh) {
     if (!InfoRefresh) {
       DiscoveredList = (EFI_REDFISH_DISCOVERED_INTERNAL_LIST *)AllocateZeroPool (sizeof (EFI_REDFISH_DISCOVERED_INTERNAL_LIST));
@@ -842,46 +1040,25 @@ AddAndSignalNewRedfishService (
         FreePool ((VOID *)DiscoveredList);
         return EFI_OUT_OF_RESOURCES;
       }
+    } else {
+      FreeInformationData (&DiscoveredInstance->Information);
     }
 
     DEBUG ((DEBUG_MANAGEABILITY, "*** Redfish Service Information ***\n"));
 
     DiscoveredInstance->Information.UseHttps = UseHttps;
-    if (RedfishVersion != NULL) {
-      DiscoveredInstance->Information.RedfishVersion = *RedfishVersion;
-      DEBUG ((DEBUG_MANAGEABILITY, "Redfish service version: %d.\n", DiscoveredInstance->Information.RedfishVersion));
-    }
 
-    if (RedfishLocation != NULL) {
-      DiscoveredInstance->Information.Location = (CHAR16 *)AllocatePool (AsciiStrSize ((const CHAR8 *)RedfishLocation) * sizeof (CHAR16));
-      AsciiStrToUnicodeStrS ((const CHAR8 *)RedfishLocation, DiscoveredInstance->Information.Location, AsciiStrSize ((const CHAR8 *)RedfishLocation) * sizeof (CHAR16));
-      DEBUG ((DEBUG_MANAGEABILITY, "Redfish service location: %s.\n", DiscoveredInstance->Information.Location));
-    }
-
-    if (Uuid != NULL) {
-      DiscoveredInstance->Information.Uuid = (CHAR16 *)AllocatePool (AsciiStrSize ((const CHAR8 *)Uuid) * sizeof (CHAR16));
-      AsciiStrToUnicodeStrS ((const CHAR8 *)Uuid, DiscoveredInstance->Information.Uuid, AsciiStrSize ((const CHAR8 *)Uuid) * sizeof (CHAR16));
-      DEBUG ((DEBUG_MANAGEABILITY, "Service UUID: %s.\n", DiscoveredInstance->Information.Uuid));
-    }
-
-    if (Os != NULL) {
-      DiscoveredInstance->Information.Os = (CHAR16 *)AllocatePool (AsciiStrSize ((const CHAR8 *)Os) * sizeof (CHAR16));
-      AsciiStrToUnicodeStrS ((const CHAR8 *)Os, DiscoveredInstance->Information.Os, AsciiStrSize ((const CHAR8 *)Os) * sizeof (CHAR16));
-      DEBUG ((DEBUG_MANAGEABILITY, "Redfish service OS: %s, Version:%s.\n", DiscoveredInstance->Information.Os, DiscoveredInstance->Information.OsVersion));
-    }
-
-    if (OsVer != NULL) {
-      DiscoveredInstance->Information.OsVersion = (CHAR16 *)AllocatePool (AsciiStrSize ((const CHAR8 *)OsVer) * sizeof (CHAR16));
-      AsciiStrToUnicodeStrS ((const CHAR8 *)OsVer, DiscoveredInstance->Information.OsVersion, AsciiStrSize ((const CHAR8 *)OsVer) * sizeof (CHAR16));
-    }
-
-    if ((Product != NULL) && (ProductVer != NULL)) {
-      DiscoveredInstance->Information.Product = (CHAR16 *)AllocatePool (AsciiStrSize ((const CHAR8 *)Product) * sizeof (CHAR16));
-      AsciiStrToUnicodeStrS ((const CHAR8 *)Product, DiscoveredInstance->Information.Product, AsciiStrSize ((const CHAR8 *)Product) * sizeof (CHAR16));
-      DiscoveredInstance->Information.ProductVer = (CHAR16 *)AllocatePool (AsciiStrSize ((const CHAR8 *)ProductVer) * sizeof (CHAR16));
-      AsciiStrToUnicodeStrS ((const CHAR8 *)ProductVer, DiscoveredInstance->Information.ProductVer, AsciiStrSize ((const CHAR8 *)ProductVer) * sizeof (CHAR16));
-      DEBUG ((DEBUG_MANAGEABILITY, "Redfish service product: %s, Version:%s.\n", DiscoveredInstance->Information.Product, DiscoveredInstance->Information.ProductVer));
-    }
+    InitInformationData (
+      &DiscoveredInstance->Information,
+      CheckIsIpVersion6 (NetworkInterface),
+      RedfishVersion,
+      RedfishLocation,
+      Uuid,
+      Os,
+      OsVer,
+      Product,
+      ProductVer
+      );
 
     if (RedfishLocation == NULL) {
       // This is the Redfish reported from SMBIOS 42h
@@ -905,10 +1082,6 @@ AddAndSignalNewRedfishService (
         DEBUG ((DEBUG_MANAGEABILITY, "Service UUID: unknown.\n"));
       }
     }
-  }
-
-  if (Char16Uuid != NULL) {
-    FreePool ((VOID *)Char16Uuid);
   }
 
   Status = EFI_SUCCESS;
@@ -1466,30 +1639,7 @@ RedfishServiceReleaseService (
     do {
       if (DiscoveredRedfishInstance->Instance == ThisRedfishInstance) {
         RemoveEntryList (&DiscoveredRedfishInstance->NextInstance);
-        if (ThisRedfishInstance->Information.Location != NULL) {
-          FreePool (ThisRedfishInstance->Information.Location);
-        }
-
-        if (ThisRedfishInstance->Information.Uuid != NULL) {
-          FreePool (ThisRedfishInstance->Information.Uuid);
-        }
-
-        if (ThisRedfishInstance->Information.Os != NULL) {
-          FreePool (ThisRedfishInstance->Information.Os);
-        }
-
-        if (ThisRedfishInstance->Information.OsVersion != NULL) {
-          FreePool (ThisRedfishInstance->Information.OsVersion);
-        }
-
-        if (ThisRedfishInstance->Information.Product != NULL) {
-          FreePool (ThisRedfishInstance->Information.Product);
-        }
-
-        if (ThisRedfishInstance->Information.ProductVer != NULL) {
-          FreePool (ThisRedfishInstance->Information.ProductVer);
-        }
-
+        FreeInformationData (&ThisRedfishInstance->Information);
         FreePool ((VOID *)ThisRedfishInstance);
         goto ReleaseNext;
       }

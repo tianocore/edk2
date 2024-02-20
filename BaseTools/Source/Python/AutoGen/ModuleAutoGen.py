@@ -51,12 +51,12 @@ gInfSpecVersion = "0x00010017"
 #
 # Match name = variable
 #
-gEfiVarStoreNamePattern = re.compile("\s*name\s*=\s*(\w+)")
+gEfiVarStoreNamePattern = re.compile(r"\s*name\s*=\s*(\w+)")
 #
 # The format of guid in efivarstore statement likes following and must be correct:
 # guid = {0xA04A27f4, 0xDF00, 0x4D42, {0xB5, 0x52, 0x39, 0x51, 0x13, 0x02, 0x11, 0x3D}}
 #
-gEfiVarStoreGuidPattern = re.compile("\s*guid\s*=\s*({.*?{.*?}\s*})")
+gEfiVarStoreGuidPattern = re.compile(r"\s*guid\s*=\s*({.*?{.*?}\s*})")
 
 #
 # Template string to generic AsBuilt INF

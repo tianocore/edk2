@@ -3,6 +3,7 @@
 #
 #  Copyright (c) 2019, Linaro Limited. All rights reserved.<BR>
 #  Copyright (c) 2019 - 2022, Arm Limited. All rights reserved.<BR>
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -14,7 +15,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x0001001a
   OUTPUT_DIRECTORY               = Build/DynamicTables
-  SUPPORTED_ARCHITECTURES        = ARM|AARCH64
+  SUPPORTED_ARCHITECTURES        = ARM|AARCH64|IA32|X64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -44,9 +45,14 @@
   DynamicTablesPkg/Library/Common/SsdtPcieSupportLib/SsdtPcieSupportLib.inf
   DynamicTablesPkg/Library/Common/SsdtSerialPortFixupLib/SsdtSerialPortFixupLib.inf
   DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
-  DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
   DynamicTablesPkg/Library/Common/DynamicPlatRepoLib/DynamicPlatRepoLib.inf
   DynamicTablesPkg/Library/Common/SmbiosStringTableLib/SmbiosStringTableLib.inf
+
+[Components.ARM, Components.AARCH64]
+  DynamicTablesPkg/Library/FdtHwInfoParserLib/FdtHwInfoParserLib.inf
+
+[Components.AARCH64]
+  DynamicTablesPkg/Library/DynamicTablesScmiInfoLib/DynamicTablesScmiInfoLib.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES

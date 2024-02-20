@@ -28,6 +28,6 @@
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS   == /c /EHsc /Zi /Od
-  GCC:*_*_IA32_CC_FLAGS == -g -c -fshort-wchar -O0 -m32
-  GCC:*_*_X64_CC_FLAGS  == -g -c -fshort-wchar -O0 -m64
+  MSFT:*_*_*_CC_FLAGS   == /c /EHs /Zi /Od /MT
+  GCC:*_*_IA32_CC_FLAGS == -g -c -fshort-wchar -fexceptions -O0 -m32 -malign-double -fno-pie
+  GCC:*_*_X64_CC_FLAGS  == -g -c -fshort-wchar -fexceptions -O0 -m64 -fno-pie "-DEFIAPI=__attribute__((ms_abi))"

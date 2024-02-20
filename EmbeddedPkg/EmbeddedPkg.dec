@@ -28,6 +28,7 @@
 ################################################################################
 [Includes.common]
   Include                        # Root include for the package
+  Test/Mock/Include
 
 [LibraryClasses.common]
   PrePiLib|Include/Library/PrePiLib.h
@@ -163,6 +164,9 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
 
 [PcdsFixedAtBuild.X64]
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
+
+[PcdsFixedAtBuild.LOONGARCH64]
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
 
 [PcdsFixedAtBuild.common, PcdsDynamic.common]

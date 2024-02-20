@@ -234,6 +234,7 @@ EvaluateDependency (
   GUID           ImageTypeId;
   UINT32         Version;
   UINT32         LocalLastAttemptStatus;
+  UINT32         DeclaredLength;
 
   LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
 
@@ -489,6 +490,37 @@ EvaluateDependency (
         }
 
         return Element1.Value.Boolean;
+      case EFI_FMP_DEP_DECLARE_LENGTH:
+        if (Iterator + sizeof (UINT32) >= (UINT8 *)Dependencies->Dependencies + DependenciesSize ) {
+          DEBUG ((DEBUG_ERROR, "EvaluateDependency: DECLARE_LENGTH extends beyond end of dependency expression!\n"));
+          LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_LIB_ERROR_DECLARE_LENGTH_BEYOND_DEPEX;
+          goto Error;
+        }
+
+        //
+        // This opcode must be the first one in a dependency expression.
+        //
+        if (Iterator != Dependencies->Dependencies) {
+          DEBUG ((DEBUG_ERROR, "EvaluateDependency: DECLARE_LENGTH is not the first opcode!\n"));
+          LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_LIB_ERROR_DECLARE_LENGTH_NOT_FIRST_OPCODE;
+          goto Error;
+        }
+
+        DeclaredLength = *(UINT32 *)(Iterator + 1);
+        if (DeclaredLength != DependenciesSize) {
+          DEBUG ((DEBUG_ERROR, "EvaluateDependency: DECLARE_LENGTH is not equal to length of dependency expression!\n"));
+          LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_LIB_ERROR_DECLARE_LENGTH_INCORRECT;
+          goto Error;
+        }
+
+        Status = Push (DeclaredLength, VersionType);
+        if (EFI_ERROR (Status)) {
+          LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_LIB_ERROR_PUSH_FAILURE;
+          goto Error;
+        }
+
+        Iterator = Iterator + sizeof (UINT32);
+        break;
       default:
         DEBUG ((DEBUG_ERROR, "EvaluateDependency: Unknown Opcode - %02x!\n", *Iterator));
         LocalLastAttemptStatus = LAST_ATTEMPT_STATUS_DEPENDENCY_LIB_ERROR_UNKNOWN_OPCODE;
@@ -574,6 +606,9 @@ ValidateDependency (
         }
 
         return TRUE;
+      case EFI_FMP_DEP_DECLARE_LENGTH:
+        Depex += sizeof (UINT32) + 1;
+        break;
       default:
         return FALSE;
     }

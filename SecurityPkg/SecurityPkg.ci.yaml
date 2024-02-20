@@ -16,6 +16,8 @@
         ## ]
         "ExceptionList": [
             "8005", "gRT",
+            "8001", "DxeTpm2MeasureBootLibUnitTestMain",
+            "8001", "DxeTpmMeasureBootLibUnitTestMain"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [

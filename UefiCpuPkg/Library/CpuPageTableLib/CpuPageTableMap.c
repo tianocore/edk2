@@ -26,52 +26,59 @@ PageTableLibSetPte4K (
   IN IA32_MAP_ATTRIBUTE  *Mask
   )
 {
+  IA32_PTE_4K  LocalPte4K;
+
+  LocalPte4K.Uint64 = Pte4K->Uint64;
   if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
-    Pte4K->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (Pte4K->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_40);
+    LocalPte4K.Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (Pte4K->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_40);
   }
 
   if (Mask->Bits.Present) {
-    Pte4K->Bits.Present = Attribute->Bits.Present;
+    LocalPte4K.Bits.Present = Attribute->Bits.Present;
   }
 
   if (Mask->Bits.ReadWrite) {
-    Pte4K->Bits.ReadWrite = Attribute->Bits.ReadWrite;
+    LocalPte4K.Bits.ReadWrite = Attribute->Bits.ReadWrite;
   }
 
   if (Mask->Bits.UserSupervisor) {
-    Pte4K->Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
+    LocalPte4K.Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
   }
 
   if (Mask->Bits.WriteThrough) {
-    Pte4K->Bits.WriteThrough = Attribute->Bits.WriteThrough;
+    LocalPte4K.Bits.WriteThrough = Attribute->Bits.WriteThrough;
   }
 
   if (Mask->Bits.CacheDisabled) {
-    Pte4K->Bits.CacheDisabled = Attribute->Bits.CacheDisabled;
+    LocalPte4K.Bits.CacheDisabled = Attribute->Bits.CacheDisabled;
   }
 
   if (Mask->Bits.Accessed) {
-    Pte4K->Bits.Accessed = Attribute->Bits.Accessed;
+    LocalPte4K.Bits.Accessed = Attribute->Bits.Accessed;
   }
 
   if (Mask->Bits.Dirty) {
-    Pte4K->Bits.Dirty = Attribute->Bits.Dirty;
+    LocalPte4K.Bits.Dirty = Attribute->Bits.Dirty;
   }
 
   if (Mask->Bits.Pat) {
-    Pte4K->Bits.Pat = Attribute->Bits.Pat;
+    LocalPte4K.Bits.Pat = Attribute->Bits.Pat;
   }
 
   if (Mask->Bits.Global) {
-    Pte4K->Bits.Global = Attribute->Bits.Global;
+    LocalPte4K.Bits.Global = Attribute->Bits.Global;
   }
 
   if (Mask->Bits.ProtectionKey) {
-    Pte4K->Bits.ProtectionKey = Attribute->Bits.ProtectionKey;
+    LocalPte4K.Bits.ProtectionKey = Attribute->Bits.ProtectionKey;
   }
 
   if (Mask->Bits.Nx) {
-    Pte4K->Bits.Nx = Attribute->Bits.Nx;
+    LocalPte4K.Bits.Nx = Attribute->Bits.Nx;
+  }
+
+  if (Pte4K->Uint64 != LocalPte4K.Uint64) {
+    Pte4K->Uint64 = LocalPte4K.Uint64;
   }
 }
 
@@ -93,54 +100,61 @@ PageTableLibSetPleB (
   IN IA32_MAP_ATTRIBUTE                 *Mask
   )
 {
+  IA32_PAGE_LEAF_ENTRY_BIG_PAGESIZE  LocalPleB;
+
+  LocalPleB.Uint64 = PleB->Uint64;
   if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
-    PleB->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (PleB->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_39);
+    LocalPleB.Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (PleB->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_39);
   }
 
-  PleB->Bits.MustBeOne = 1;
+  LocalPleB.Bits.MustBeOne = 1;
 
   if (Mask->Bits.Present) {
-    PleB->Bits.Present = Attribute->Bits.Present;
+    LocalPleB.Bits.Present = Attribute->Bits.Present;
   }
 
   if (Mask->Bits.ReadWrite) {
-    PleB->Bits.ReadWrite = Attribute->Bits.ReadWrite;
+    LocalPleB.Bits.ReadWrite = Attribute->Bits.ReadWrite;
   }
 
   if (Mask->Bits.UserSupervisor) {
-    PleB->Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
+    LocalPleB.Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
   }
 
   if (Mask->Bits.WriteThrough) {
-    PleB->Bits.WriteThrough = Attribute->Bits.WriteThrough;
+    LocalPleB.Bits.WriteThrough = Attribute->Bits.WriteThrough;
   }
 
   if (Mask->Bits.CacheDisabled) {
-    PleB->Bits.CacheDisabled = Attribute->Bits.CacheDisabled;
+    LocalPleB.Bits.CacheDisabled = Attribute->Bits.CacheDisabled;
   }
 
   if (Mask->Bits.Accessed) {
-    PleB->Bits.Accessed = Attribute->Bits.Accessed;
+    LocalPleB.Bits.Accessed = Attribute->Bits.Accessed;
   }
 
   if (Mask->Bits.Dirty) {
-    PleB->Bits.Dirty = Attribute->Bits.Dirty;
+    LocalPleB.Bits.Dirty = Attribute->Bits.Dirty;
   }
 
   if (Mask->Bits.Pat) {
-    PleB->Bits.Pat = Attribute->Bits.Pat;
+    LocalPleB.Bits.Pat = Attribute->Bits.Pat;
   }
 
   if (Mask->Bits.Global) {
-    PleB->Bits.Global = Attribute->Bits.Global;
+    LocalPleB.Bits.Global = Attribute->Bits.Global;
   }
 
   if (Mask->Bits.ProtectionKey) {
-    PleB->Bits.ProtectionKey = Attribute->Bits.ProtectionKey;
+    LocalPleB.Bits.ProtectionKey = Attribute->Bits.ProtectionKey;
   }
 
   if (Mask->Bits.Nx) {
-    PleB->Bits.Nx = Attribute->Bits.Nx;
+    LocalPleB.Bits.Nx = Attribute->Bits.Nx;
+  }
+
+  if (PleB->Uint64 != LocalPleB.Uint64) {
+    PleB->Uint64 = LocalPleB.Uint64;
   }
 }
 
@@ -186,24 +200,27 @@ PageTableLibSetPnle (
   IN IA32_MAP_ATTRIBUTE        *Mask
   )
 {
+  IA32_PAGE_NON_LEAF_ENTRY  LocalPnle;
+
+  LocalPnle.Uint64 = Pnle->Uint64;
   if (Mask->Bits.Present) {
-    Pnle->Bits.Present = Attribute->Bits.Present;
+    LocalPnle.Bits.Present = Attribute->Bits.Present;
   }
 
   if (Mask->Bits.ReadWrite) {
-    Pnle->Bits.ReadWrite = Attribute->Bits.ReadWrite;
+    LocalPnle.Bits.ReadWrite = Attribute->Bits.ReadWrite;
   }
 
   if (Mask->Bits.UserSupervisor) {
-    Pnle->Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
+    LocalPnle.Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
   }
 
   if (Mask->Bits.Nx) {
-    Pnle->Bits.Nx = Attribute->Bits.Nx;
+    LocalPnle.Bits.Nx = Attribute->Bits.Nx;
   }
 
-  Pnle->Bits.Accessed   = 0;
-  Pnle->Bits.MustBeZero = 0;
+  LocalPnle.Bits.Accessed   = 0;
+  LocalPnle.Bits.MustBeZero = 0;
 
   //
   // Set the attributes (WT, CD, A) to 0.
@@ -211,8 +228,11 @@ PageTableLibSetPnle (
   // So, it implictly requires PAT[0] is Write Back.
   // Create a new parameter if caller requires to use a different memory type for accessing page directories.
   //
-  Pnle->Bits.WriteThrough  = 0;
-  Pnle->Bits.CacheDisabled = 0;
+  LocalPnle.Bits.WriteThrough  = 0;
+  LocalPnle.Bits.CacheDisabled = 0;
+  if (Pnle->Uint64 != LocalPnle.Uint64) {
+    Pnle->Uint64 = LocalPnle.Uint64;
+  }
 }
 
 /**

@@ -57,8 +57,8 @@ GetRedfishCredential (
   //
   // User ID and Password.
   //
-  UserIdSize   = AsciiStrSize ((CHAR8 *)PcdGetPtr (PcdRedfishServieUserId));
-  PasswordSize = AsciiStrSize ((CHAR8 *)PcdGetPtr (PcdRedfishServiePassword));
+  UserIdSize   = AsciiStrSize ((CHAR8 *)PcdGetPtr (PcdRedfishServiceUserId));
+  PasswordSize = AsciiStrSize ((CHAR8 *)PcdGetPtr (PcdRedfishServicePassword));
   if ((UserIdSize == 0) || (PasswordSize == 0)) {
     DEBUG ((DEBUG_ERROR, "Incorrect string of UserID or Password for REdfish service.\n"));
     return EFI_INVALID_PARAMETER;
@@ -69,7 +69,7 @@ GetRedfishCredential (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CopyMem (*UserId, (CHAR8 *)PcdGetPtr (PcdRedfishServieUserId), UserIdSize);
+  CopyMem (*UserId, (CHAR8 *)PcdGetPtr (PcdRedfishServiceUserId), UserIdSize);
 
   *Password = AllocateZeroPool (PasswordSize);
   if (*Password == NULL) {
@@ -77,7 +77,7 @@ GetRedfishCredential (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  CopyMem (*Password, (CHAR8 *)PcdGetPtr (PcdRedfishServiePassword), PasswordSize);
+  CopyMem (*Password, (CHAR8 *)PcdGetPtr (PcdRedfishServicePassword), PasswordSize);
   return EFI_SUCCESS;
 }
 
@@ -177,7 +177,7 @@ LibStopRedfishService (
     // Check platform PCD to determine the action for stopping
     // Redfish service due to secure boot is disabled.
     //
-    if (!PcdGetBool (PcdRedfishServieStopIfSecureBootDisabled)) {
+    if (!PcdGetBool (PcdRedfishServiceStopIfSecureBootDisabled)) {
       return EFI_UNSUPPORTED;
     } else {
       //
@@ -198,7 +198,7 @@ LibStopRedfishService (
     // Check platform PCD to determine the action for stopping
     // Redfish service due to exit boot service.
     //
-    if (PcdGetBool (PcdRedfishServieStopIfExitbootService)) {
+    if (PcdGetBool (PcdRedfishServiceStopIfExitbootService)) {
       return EFI_UNSUPPORTED;
     } else {
       mStopRedfishService = TRUE;

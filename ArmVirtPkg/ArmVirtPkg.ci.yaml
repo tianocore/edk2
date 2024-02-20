@@ -24,7 +24,6 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Library/PlatformBootManagerLib/PlatformBm.c"
         ]
     },
     ## options defined .pytool/Plugin/CompilerPlugin

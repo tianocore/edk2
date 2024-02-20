@@ -586,6 +586,31 @@ Ip4Config2ConvertIfrNvDataToConfigNvData (
   }
 
   if (IfrFormNvData->Configure != TRUE) {
+    if (Ip4NvData->DnsAddress != NULL) {
+      FreePool (Ip4NvData->DnsAddress);
+      Ip4NvData->DnsAddress      = NULL;
+      Ip4NvData->DnsAddressCount = 0;
+    }
+
+    if (Ip4NvData->GatewayAddress != NULL) {
+      FreePool (Ip4NvData->GatewayAddress);
+      Ip4NvData->GatewayAddress      = NULL;
+      Ip4NvData->GatewayAddressCount = 0;
+    }
+
+    if (Ip4NvData->ManualAddress != NULL) {
+      FreePool (Ip4NvData->ManualAddress);
+      Ip4NvData->ManualAddress      = NULL;
+      Ip4NvData->ManualAddressCount = 0;
+    }
+
+    Ip4NvData->Policy = Ip4Config2PolicyDhcp;
+    Status            = Ip4Cfg2->SetData (
+                                   Ip4Cfg2,
+                                   Ip4Config2DataTypePolicy,
+                                   sizeof (EFI_IP4_CONFIG2_POLICY),
+                                   &Ip4NvData->Policy
+                                   );
     return EFI_SUCCESS;
   }
 

@@ -160,69 +160,85 @@ Dhcp6OnTransmitted (
   );
 
 /**
-  Append the appointed option to the buf, and move the buf to the end.
+  Append the option to Buf, update the length of packet, and move Buf to the end.
 
-  @param[in, out] Buf           The pointer to buffer.
-  @param[in]      OptType       The option type.
-  @param[in]      OptLen        The length of option content.s
-  @param[in]      Data          The pointer to the option content.
+  @param[in, out] Packet         A pointer to the packet, on success Packet->Length
+                                 will be updated.
+  @param[in, out] PacketCursor   The pointer in the packet, on success PacketCursor
+                                 will be moved to the end of the option.
+  @param[in]      OptType        The option type.
+  @param[in]      OptLen         The length of option contents.
+  @param[in]      Data           The pointer to the option content.
 
-  @return         Buf           The position to append the next option.
-
+  @retval   EFI_INVALID_PARAMETER An argument provided to the function was invalid
+  @retval   EFI_BUFFER_TOO_SMALL  The buffer is too small to append the option.
+  @retval   EFI_SUCCESS           The option is appended successfully.
 **/
-UINT8 *
+EFI_STATUS
 Dhcp6AppendOption (
-  IN OUT UINT8   *Buf,
-  IN     UINT16  OptType,
-  IN     UINT16  OptLen,
-  IN     UINT8   *Data
+  IN OUT EFI_DHCP6_PACKET  *Packet,
+  IN OUT UINT8             **PacketCursor,
+  IN     UINT16            OptType,
+  IN     UINT16            OptLen,
+  IN     UINT8             *Data
   );
 
 /**
-  Append the Ia option to Buf, and move Buf to the end.
-
-  @param[in, out] Buf           The pointer to the position to append.
+  Append the appointed Ia option to Buf, update the Ia option length, and move Buf
+  to the end of the option.
+  @param[in, out] Packet        A pointer to the packet, on success Packet->Length
+                                will be updated.
+  @param[in, out] PacketCursor   The pointer in the packet, on success PacketCursor
+                                 will be moved to the end of the option.
   @param[in]      Ia            The pointer to the Ia.
   @param[in]      T1            The time of T1.
   @param[in]      T2            The time of T2.
   @param[in]      MessageType   Message type of DHCP6 package.
 
-  @return         Buf           The position to append the next Ia option.
-
+  @retval   EFI_INVALID_PARAMETER An argument provided to the function was invalid
+  @retval   EFI_BUFFER_TOO_SMALL  The buffer is too small to append the option.
+  @retval   EFI_SUCCESS           The option is appended successfully.
 **/
-UINT8 *
+EFI_STATUS
 Dhcp6AppendIaOption (
-  IN OUT UINT8         *Buf,
-  IN     EFI_DHCP6_IA  *Ia,
-  IN     UINT32        T1,
-  IN     UINT32        T2,
-  IN     UINT32        MessageType
+  IN OUT EFI_DHCP6_PACKET  *Packet,
+  IN OUT UINT8             **PacketCursor,
+  IN     EFI_DHCP6_IA      *Ia,
+  IN     UINT32            T1,
+  IN     UINT32            T2,
+  IN     UINT32            MessageType
   );
 
 /**
   Append the appointed Elapsed time option to Buf, and move Buf to the end.
 
-  @param[in, out] Buf           The pointer to the position to append.
+  @param[in, out] Packet        A pointer to the packet, on success Packet->Length
+  @param[in, out] PacketCursor   The pointer in the packet, on success PacketCursor
+                                 will be moved to the end of the option.
   @param[in]      Instance      The pointer to the Dhcp6 instance.
   @param[out]     Elapsed       The pointer to the elapsed time value in
                                   the generated packet.
 
-  @return         Buf           The position to append the next Ia option.
+  @retval   EFI_INVALID_PARAMETER An argument provided to the function was invalid
+  @retval   EFI_BUFFER_TOO_SMALL  The buffer is too small to append the option.
+  @retval   EFI_SUCCESS           The option is appended successfully.
 
 **/
-UINT8 *
+EFI_STATUS
 Dhcp6AppendETOption (
-  IN OUT UINT8           *Buf,
-  IN     DHCP6_INSTANCE  *Instance,
-  OUT    UINT16          **Elapsed
+  IN OUT EFI_DHCP6_PACKET  *Packet,
+  IN OUT UINT8             **PacketCursor,
+  IN     DHCP6_INSTANCE    *Instance,
+  OUT    UINT16            **Elapsed
   );
 
 /**
   Set the elapsed time based on the given instance and the pointer to the
   elapsed time option.
 
-  @param[in]      Elapsed       The pointer to the position to append.
-  @param[in]      Instance      The pointer to the Dhcp6 instance.
+  @retval   EFI_INVALID_PARAMETER An argument provided to the function was invalid
+  @retval   EFI_BUFFER_TOO_SMALL  The buffer is too small to append the option.
+  @retval   EFI_SUCCESS           The option is appended successfully.
 **/
 VOID
 SetElapsedTime (

@@ -17,7 +17,7 @@ from Common.BuildToolError import *
 import sys
 import os
 
-__description__ = """
+__description__ = r"""
 Convert an AML file to a .c file containing the AML bytecode stored in a C
 array. By default, Tables\Dsdt.aml will generate Tables\Dsdt.c.
 Tables\Dsdt.c will contain a C array named "dsdt_aml_code" that contains

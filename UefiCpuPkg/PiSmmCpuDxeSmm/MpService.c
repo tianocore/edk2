@@ -476,10 +476,12 @@ BSPHandler (
   //
   *mSmmMpSyncData->InsideSmm = TRUE;
 
-  //
-  // Initialize Debug Agent to start source level debug in BSP handler
-  //
-  InitializeDebugAgent (DEBUG_AGENT_INIT_ENTER_SMI, NULL, NULL);
+  if (mSmmDebugAgentSupport) {
+    //
+    // Initialize Debug Agent to start source level debug in BSP handler
+    //
+    InitializeDebugAgent (DEBUG_AGENT_INIT_ENTER_SMI, NULL, NULL);
+  }
 
   //
   // Mark this processor's presence
@@ -625,12 +627,12 @@ BSPHandler (
   *mSmmMpSyncData->InsideSmm = FALSE;
   ReleaseAllAPs ();
 
-  //
-  // Wait for all APs to complete their pending tasks
-  //
-  SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex);
-
   if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
+    //
+    // Wait for all APs the readiness to program MTRRs
+    //
+    SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex);
+
     //
     // Signal APs to restore MTRRs
     //
@@ -641,23 +643,27 @@ BSPHandler (
     //
     SmmCpuFeaturesReenableSmrr ();
     MtrrSetAllMtrrs (&Mtrrs);
-
-    //
-    // Wait for all APs to complete MTRR programming
-    //
-    SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex);
   }
 
-  //
-  // Stop source level debug in BSP handler, the code below will not be
-  // debugged.
-  //
-  InitializeDebugAgent (DEBUG_AGENT_INIT_EXIT_SMI, NULL, NULL);
+  if (SmmCpuFeaturesNeedConfigureMtrrs () || mSmmDebugAgentSupport) {
+    //
+    // Wait for all APs to complete their pending tasks including MTRR programming if needed.
+    //
+    SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex);
 
-  //
-  // Signal APs to Reset states/semaphore for this processor
-  //
-  ReleaseAllAPs ();
+    //
+    // Signal APs to Reset states/semaphore for this processor
+    //
+    ReleaseAllAPs ();
+  }
+
+  if (mSmmDebugAgentSupport) {
+    //
+    // Stop source level debug in BSP handler, the code below will not be
+    // debugged.
+    //
+    InitializeDebugAgent (DEBUG_AGENT_INIT_EXIT_SMI, NULL, NULL);
+  }
 
   //
   // Perform pending operations for hot-plug
@@ -892,15 +898,17 @@ APHandler (
     MtrrSetAllMtrrs (&Mtrrs);
   }
 
-  //
-  // Notify BSP the readiness of this AP to Reset states/semaphore for this processor
-  //
-  SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex);
+  if (SmmCpuFeaturesNeedConfigureMtrrs () || mSmmDebugAgentSupport) {
+    //
+    // Notify BSP the readiness of this AP to Reset states/semaphore for this processor
+    //
+    SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex);
 
-  //
-  // Wait for the signal from BSP to Reset states/semaphore for this processor
-  //
-  SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex);
+    //
+    // Wait for the signal from BSP to Reset states/semaphore for this processor
+    //
+    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex);
+  }
 
   //
   // Reset states/semaphore for this processor

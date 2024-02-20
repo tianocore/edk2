@@ -1,12 +1,12 @@
 /** @file
 
-  Copyright (c) 2017-2021, Arm Limited. All rights reserved.
+  Copyright (c) 2017-2023, Arm Limited. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
-  System Control and Management Interface V1.0
-    http://infocenter.arm.com/help/topic/com.arm.doc.den0056a/
-    DEN0056A_System_Control_and_Management_Interface.pdf
+  System Control and Management Interface V3.2, latest version at:
+  - https://developer.arm.com/documentation/den0056/latest/
+
 **/
 
 #ifndef ARM_SCMI_PERFORMANCE_PROTOCOL_H_
@@ -14,7 +14,10 @@
 
 #include <Protocol/ArmScmi.h>
 
-#define PERFORMANCE_PROTOCOL_VERSION  0x10000
+/// Arm Scmi performance protocol versions.
+#define PERFORMANCE_PROTOCOL_VERSION_V1  0x10000
+#define PERFORMANCE_PROTOCOL_VERSION_V2  0x20000
+#define PERFORMANCE_PROTOCOL_VERSION_V3  0x30000
 
 #define ARM_SCMI_PERFORMANCE_PROTOCOL_GUID  { \
   0x9b8ba84, 0x3dd3, 0x49a6, {0xa0, 0x5a, 0x31, 0x34, 0xa5, 0xf0, 0x7b, 0xad} \
@@ -76,7 +79,57 @@ typedef struct {
   UINT32    RangeMin;
 } SCMI_PERFORMANCE_LIMITS;
 
+/// Doorbell Support bit.
+#define SCMI_PERF_FC_ATTRIB_HAS_DOORBELL  BIT0
+
+/// Performance protocol describe fastchannel
+typedef struct {
+  /// Attributes.
+  UINT32    Attributes;
+
+  /// Rate limit.
+  UINT32    RateLimit;
+
+  /// Lower 32 bits of the FastChannel address.
+  UINT32    ChanAddrLow;
+
+  /// Higher 32 bits of the FastChannel address.
+  UINT32    ChanAddrHigh;
+
+  /// Size of the FastChannel in bytes.
+  UINT32    ChanSize;
+
+  /// Lower 32 bits of the doorbell address.
+  UINT32    DoorbellAddrLow;
+
+  /// Higher 32 bits of the doorbell address.
+  UINT32    DoorbellAddrHigh;
+
+  /// Mask of lower 32 bits to set when writing to the doorbell register.
+  UINT32    DoorbellSetMaskLow;
+
+  /// Mask of higher 32 bits to set when writing to the doorbell register.
+  UINT32    DoorbellSetMaskHigh;
+
+  /// Mask of lower 32 bits to preserve when writing to the doorbell register.
+  UINT32    DoorbellPreserveMaskLow;
+
+  /// Mask of higher 32 bits to preserve when writing to the doorbell register.
+  UINT32    DoorbellPreserveMaskHigh;
+} SCMI_PERFORMANCE_FASTCHANNEL;
+
 #pragma pack()
+
+/// SCMI Message Ids for the Performance Protocol.
+typedef enum {
+  ScmiMessageIdPerformanceDomainAttributes    = 0x3,
+  ScmiMessageIdPerformanceDescribeLevels      = 0x4,
+  ScmiMessageIdPerformanceLimitsSet           = 0x5,
+  ScmiMessageIdPerformanceLimitsGet           = 0x6,
+  ScmiMessageIdPerformanceLevelSet            = 0x7,
+  ScmiMessageIdPerformanceLevelGet            = 0x8,
+  ScmiMessageIdPerformanceDescribeFastchannel = 0xB,
+} SCMI_MESSAGE_ID_PERFORMANCE;
 
 /** Return version of the performance management protocol supported by SCP.
    firmware.
@@ -235,6 +288,34 @@ EFI_STATUS
   OUT UINT32                    *Level
   );
 
+/** Discover the attributes of the FastChannel for the specified
+    performance domain and the specified message.
+
+  @param[in]  This        A Pointer to SCMI_PERFORMANCE_PROTOCOL Instance.
+  @param[in]  DomainId    Identifier for the performance domain.
+  @param[in]  MessageId   Message Id of the FastChannel to discover.
+                          Must be one of:
+                           - PERFORMANCE_LIMITS_SET
+                           - PERFORMANCE_LIMITS_GET
+                           - PERFORMANCE_LEVEL_SET
+                           - PERFORMANCE_LEVEL_GET
+  @param[out] FastChannel If success, contains the FastChannel description.
+
+  @retval EFI_SUCCESS             Performance level got successfully.
+  @retval EFI_DEVICE_ERROR        SCP returns an SCMI error.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_TIMEOUT             Time out.
+  @retval EFI_UNSUPPORTED         Unsupported.
+**/
+typedef
+EFI_STATUS
+(EFIAPI *SCMI_PERFORMANCE_DESCRIBE_FASTCHANNEL)(
+  IN  SCMI_PERFORMANCE_PROTOCOL       *This,
+  IN  UINT32                          DomainId,
+  IN  SCMI_MESSAGE_ID_PERFORMANCE     MessageId,
+  OUT SCMI_PERFORMANCE_FASTCHANNEL    *FastChannel
+  );
+
 typedef struct _SCMI_PERFORMANCE_PROTOCOL {
   SCMI_PERFORMANCE_GET_VERSION              GetVersion;
   SCMI_PERFORMANCE_GET_ATTRIBUTES           GetProtocolAttributes;
@@ -244,15 +325,7 @@ typedef struct _SCMI_PERFORMANCE_PROTOCOL {
   SCMI_PERFORMANCE_LIMITS_GET               LimitsGet;
   SCMI_PERFORMANCE_LEVEL_SET                LevelSet;
   SCMI_PERFORMANCE_LEVEL_GET                LevelGet;
+  SCMI_PERFORMANCE_DESCRIBE_FASTCHANNEL     DescribeFastchannel;
 } SCMI_PERFORMANCE_PROTOCOL;
-
-typedef enum {
-  ScmiMessageIdPerformanceDomainAttributes = 0x3,
-  ScmiMessageIdPerformanceDescribeLevels   = 0x4,
-  ScmiMessageIdPerformanceLimitsSet        = 0x5,
-  ScmiMessageIdPerformanceLimitsGet        = 0x6,
-  ScmiMessageIdPerformanceLevelSet         = 0x7,
-  ScmiMessageIdPerformanceLevelGet         = 0x8,
-} SCMI_MESSAGE_ID_PERFORMANCE;
 
 #endif /* ARM_SCMI_PERFORMANCE_PROTOCOL_H_ */

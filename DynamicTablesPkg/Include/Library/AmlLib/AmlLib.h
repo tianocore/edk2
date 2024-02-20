@@ -1,7 +1,8 @@
 /** @file
   AML Lib.
 
-  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2019 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -36,7 +37,7 @@
   @}
 */
 
-#include <AmlCpcInfo.h>
+#include <AcpiObjects.h>
 #include <IndustryStandard/Acpi.h>
 
 #ifndef AML_HANDLE
@@ -99,6 +100,56 @@ typedef enum {
   AmlAddressRangeNVS      = 3,
   AmlAddressRangeMax      = 4
 } AML_MEMORY_ATTRIBUTES_MTP;
+
+/** Method parameter types
+
+  Possible values are:
+    0 - AmlMethodParamTypeInteger
+    1 - AmlMethodParamTypeString
+    2 - AmlMethodParamTypeArg
+    3 - AmlMethodParamTypeLocal
+
+  @par Reference(s)
+  - ACPI 6.5, s20.2.5 "Term Objects Encoding"
+
+**/
+typedef enum {
+  AmlMethodParamTypeInteger = 0,
+  AmlMethodParamTypeString  = 1,
+  AmlMethodParamTypeArg     = 2,
+  AmlMethodParamTypeLocal   = 3
+} AML_METHOD_PARAM_TYPE;
+
+/** AML Method parameter data
+  holds the AML method parameter data.
+**/
+typedef union {
+  UINT8     Arg;
+  UINT8     Local;
+  UINT64    Integer;
+  VOID      *Buffer;
+} AML_METHOD_PARAM_DATA;
+
+/** structure to hold AML method parameter types
+  Type  -   Type of parameter
+  Data  -   holds data of parameter
+            if Type is AmlMethodParamTypeInteger
+              then Data is of type Integer to hold integer value.
+            if Type is AmlMethodParamTypeString
+              then Data contains null terminated string.
+            If Type is AmlMethodParamTypeArg
+              then Data contains the Argument number,
+              0 to 6 are supported value.
+            If Type is AmlMethodParamTypeLocal
+              then Data contains the Local variable number,
+              0 to 7 are supported value.
+  DataSize - for future use
+**/
+typedef struct {
+  AML_METHOD_PARAM_TYPE    Type;
+  AML_METHOD_PARAM_DATA    Data;
+  UINTN                    DataSize;
+} AML_METHOD_PARAM;
 
 /** Parse the definition block.
 
@@ -713,13 +764,77 @@ AmlCodeGenRdWordBusNumber (
   IN        BOOLEAN IsMinFixed,
   IN        BOOLEAN IsMaxFixed,
   IN        BOOLEAN IsPosDecode,
-  IN        UINT32 AddressGranularity,
-  IN        UINT32 AddressMinimum,
-  IN        UINT32 AddressMaximum,
-  IN        UINT32 AddressTranslation,
-  IN        UINT32 RangeLength,
+  IN        UINT16 AddressGranularity,
+  IN        UINT16 AddressMinimum,
+  IN        UINT16 AddressMaximum,
+  IN        UINT16 AddressTranslation,
+  IN        UINT16 RangeLength,
   IN        UINT8 ResourceSourceIndex,
   IN  CONST CHAR8 *ResourceSource,
+  IN        AML_OBJECT_NODE_HANDLE NameOpNode, OPTIONAL
+  OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
+  );
+
+/** Code generation for the "WordIO ()" ASL function.
+
+  The Resource Data effectively created is a Word Address Space Resource
+  Data. Cf ACPI 6.5:
+   - s6.4.3.5.3 "Word Address Space Descriptor".
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param [in]  IsResourceConsumer   ResourceUsage parameter.
+  @param [in]  IsMinFixed           Minimum address is fixed.
+  @param [in]  IsMaxFixed           Maximum address is fixed.
+  @param [in]  IsPosDecode          Decode parameter
+  @param [in]  IsaRanges            Possible values are:
+                                     0-Reserved
+                                     1-NonISAOnly
+                                     2-ISAOnly
+                                     3-EntireRange
+  @param [in]  AddressGranularity   Address granularity.
+  @param [in]  AddressMinimum       Minimum address.
+  @param [in]  AddressMaximum       Maximum address.
+  @param [in]  AddressTranslation   Address translation.
+  @param [in]  RangeLength          Range length.
+  @param [in]  ResourceSourceIndex  Resource Source index.
+                                    Not supported. Must be 0.
+  @param [in]  ResourceSource       Resource Source.
+                                    Not supported. Must be NULL.
+  @param [in]  IsDenseTranslation   TranslationDensity parameter.
+  @param [in]  IsTypeStatic         TranslationType parameter.
+  @param [in]  NameOpNode           NameOp object node defining a named object.
+                                    If provided, append the new resource data
+                                    node to the list of resource data elements
+                                    of this node.
+  @param [out] NewRdNode            If provided and success,
+                                    contain the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Could not allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdWordIo (
+  IN        BOOLEAN IsResourceConsumer,
+  IN        BOOLEAN IsMinFixed,
+  IN        BOOLEAN IsMaxFixed,
+  IN        BOOLEAN IsPosDecode,
+  IN        UINT8 IsaRanges,
+  IN        UINT16 AddressGranularity,
+  IN        UINT16 AddressMinimum,
+  IN        UINT16 AddressMaximum,
+  IN        UINT16 AddressTranslation,
+  IN        UINT16 RangeLength,
+  IN        UINT8 ResourceSourceIndex,
+  IN  CONST CHAR8 *ResourceSource,
+  IN        BOOLEAN IsDenseTranslation,
+  IN        BOOLEAN IsTypeStatic,
   IN        AML_OBJECT_NODE_HANDLE NameOpNode, OPTIONAL
   OUT       AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
   );
@@ -1626,6 +1741,101 @@ EFIAPI
 AmlAddNameStringToNamedPackage (
   IN CHAR8                   *NameString,
   IN AML_OBJECT_NODE_HANDLE  NamedNode
+  );
+
+/** AML code generation to invoke/call another method.
+
+  This method is a subset implementation of MethodInvocation
+  defined in the ACPI specification 6.5,
+  section 20.2.5 "Term Objects Encoding".
+  Added integer, string, ArgObj and LocalObj support.
+
+  Example 1:
+    AmlCodeGenInvokeMethod ("MET0", 0, NULL, ParentNode);
+    is equivalent to the following ASL code:
+      MET0 ();
+
+  Example 2:
+    AML_METHOD_PARAM  Param[4];
+    Param[0].Data.Integer = 0x100;
+    Param[0].Type = AmlMethodParamTypeInteger;
+    Param[1].Data.Buffer = "TEST";
+    Param[1].Type = AmlMethodParamTypeString;
+    Param[2].Data.Arg = 0;
+    Param[2].Type = AmlMethodParamTypeArg;
+    Param[3].Data.Local = 2;
+    Param[3].Type = AmlMethodParamTypeLocal;
+    AmlCodeGenInvokeMethod ("MET0", 4, Param, ParentNode);
+
+    is equivalent to the following ASL code:
+      MET0 (0x100, "TEST", Arg0, Local2);
+
+  Example 3:
+    AML_METHOD_PARAM  Param[2];
+    Param[0].Data.Arg = 0;
+    Param[0].Type = AmlMethodParamTypeArg;
+    Param[1].Data.Integer = 0x100;
+    Param[1].Type = AmlMethodParamTypeInteger;
+    AmlCodeGenMethodRetNameString ("MET2", NULL, 2, TRUE, 0, ParentNode, &MethodNode);
+    AmlCodeGenInvokeMethod ("MET3", 2, Param, MethodNode);
+
+    is equivalent to the following ASL code:
+    Method (MET2, 2, Serialized)
+    {
+      MET3 (Arg0, 0x0100)
+    }
+
+  @param [in] MethodNameString  The method name to be called or invoked.
+  @param [in] NumArgs           Number of arguments to be passed,
+                                0 to 7 are permissible values.
+  @param [in] Parameters        Contains the parameter data.
+  @param [in] ParentNode        The parent node to which the method invocation
+                                nodes are attached.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+ **/
+EFI_STATUS
+EFIAPI
+AmlCodeGenInvokeMethod (
+  IN  CONST CHAR8             *MethodNameString,
+  IN        UINT8             NumArgs,
+  IN        AML_METHOD_PARAM  *Parameters   OPTIONAL,
+  IN        AML_NODE_HANDLE   ParentNode
+  );
+
+/** Create a _PSD node.
+
+  Creates and optionally adds the following node
+   Name(_PSD, Package()
+   {
+    NumEntries,  // Integer
+    Revision,    // Integer
+    Domain,      // Integer
+    CoordType,   // Integer
+    NumProc,     // Integer
+  })
+
+  Cf. ACPI 6.5, s8.4.5.5 _PSD (P-State Dependency)
+
+  @ingroup CodeGenApis
+
+  @param [in]  PsdInfo      PsdInfo object
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewPsdNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreatePsdNode (
+  IN  AML_PSD_INFO            *PsdInfo,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewPsdNode   OPTIONAL
   );
 
 #endif // AML_LIB_H_

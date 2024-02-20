@@ -208,7 +208,7 @@ MmiManage (
         //
         // Unexpected status code returned.
         //
-        ASSERT (FALSE);
+        ASSERT_EFI_ERROR (Status);
         break;
     }
   }

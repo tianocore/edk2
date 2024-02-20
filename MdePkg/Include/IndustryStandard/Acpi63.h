@@ -12,6 +12,16 @@
 
 #include <IndustryStandard/Acpi62.h>
 
+///
+/// _PSD Revision for ACPI 6.3
+///
+#define EFI_ACPI_6_3_AML_PSD_REVISION  0
+
+///
+/// _CPC Revision for ACPI 6.3
+///
+#define EFI_ACPI_6_3_AML_CPC_REVISION  3
+
 //
 // Ensure proper structure formats
 //

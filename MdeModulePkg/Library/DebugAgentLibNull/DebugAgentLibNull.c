@@ -24,6 +24,9 @@
   If Function() is NULL, Debug Agent Library instance will return after setup debug
   environment.
 
+  If InitFlag is DEBUG_AGENT_INIT_SMM, Context must point to a BOOLEAN if it's not
+  NULL, which indicates SMM Debug Agent supported or not.
+
   @param[in] InitFlag     Init flag is used to decide the initialize process.
   @param[in] Context      Context needed according to InitFlag; it was optional.
   @param[in] Function     Continue function called by debug agent library; it was
@@ -38,6 +41,15 @@ InitializeDebugAgent (
   IN DEBUG_AGENT_CONTINUE  Function  OPTIONAL
   )
 {
+  switch (InitFlag) {
+    case DEBUG_AGENT_INIT_SMM:
+      if (Context != NULL) {
+        *(BOOLEAN *)Context = FALSE;
+      }
+
+      return;
+  }
+
   if (Function != NULL) {
     Function (Context);
   }

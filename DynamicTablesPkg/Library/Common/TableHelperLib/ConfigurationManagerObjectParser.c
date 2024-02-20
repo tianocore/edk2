@@ -85,7 +85,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicCInfoParser[] = {
   { "AffinityFlags",                 4,                        "0x%x",   NULL },
   { "CpcToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
   { "TRBEInterrupt",                 2,                        "0x%x",   NULL },
-  { "EtToken",                       sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL }
+  { "EtToken",                       sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "PsdToken",                      sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
 };
 
 /** A parser for EArmObjGicDInfo.
@@ -669,6 +670,15 @@ STATIC CONST CM_OBJ_PARSER  CmArmEtInfo[] = {
   { "EtType", sizeof (ARM_ET_TYPE), "0x%x", NULL }
 };
 
+/** A parser for EArmObjPsdInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmPsdInfoParser[] = {
+  { "Revision",  1, "0x%x", NULL },
+  { "DomainId",  4, "0x%x", NULL },
+  { "CoordType", 4, "0x%x", NULL },
+  { "NumProc",   4, "0x%x", NULL },
+};
+
 /** A parser for Arm namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
@@ -767,6 +777,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmPccSubspaceType5InfoParser) },
   { "EArmObjEtInfo",                       CmArmEtInfo,
     ARRAY_SIZE (CmArmEtInfo) },
+  { "EArmObjPsdInfo",                      CmArmPsdInfoParser,
+    ARRAY_SIZE (CmArmPsdInfoParser) },
   { "EArmObjMax",                          NULL,                                  0                                },
 };
 
@@ -1130,7 +1142,7 @@ ParseCmObjDesc (
         &RemainingSize,
         1
         );
-      if ((RemainingSize > CmObjDesc->Size) ||
+      if ((RemainingSize > (INTN)CmObjDesc->Size) ||
           (RemainingSize < 0))
       {
         ASSERT (0);

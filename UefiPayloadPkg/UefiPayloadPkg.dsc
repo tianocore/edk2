@@ -37,12 +37,18 @@
   DEFINE ATA_ENABLE                   = TRUE
   DEFINE SD_ENABLE                    = TRUE
   DEFINE PS2_MOUSE_ENABLE             = TRUE
-  DEFINE CRYPTO_PROTOCOL_SUPPORT      = FALSE
   DEFINE SD_MMC_TIMEOUT               = 1000000
   DEFINE USE_CBMEM_FOR_CONSOLE        = FALSE
   DEFINE BOOTSPLASH_IMAGE             = FALSE
   DEFINE NVME_ENABLE                  = TRUE
   DEFINE CAPSULE_SUPPORT              = FALSE
+
+  #
+  # Crypto Support
+  #
+  DEFINE CRYPTO_PROTOCOL_SUPPORT        = FALSE
+  DEFINE CRYPTO_DRIVER_EXTERNAL_SUPPORT = FALSE
+
   #
   # Setup Universal Payload
   #
@@ -138,6 +144,12 @@
   # This is how BaseCpuTimerLib works, and a recommended way to get Frequence, so set the default value as TRUE.
   # Note: for emulation platform such as QEMU, this may not work and should set it as FALSE
   DEFINE CPU_TIMER_LIB_ENABLE  = TRUE
+
+  #
+  # HPET:  UEFI Payload will use HPET timer
+  # LAPIC: UEFI Payload will use local APIC timer
+  #
+  DEFINE TIMER_SUPPORT      = HPET
 
   DEFINE MULTIPLE_DEBUG_PORT_SUPPORT = FALSE
 
@@ -468,6 +480,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1800000
 
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
+!if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.HmacSha256.Family                        | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Md5.Family                               | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Pkcs.Family                              | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
@@ -488,6 +501,7 @@
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.Tls.Family                               | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsSet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
   gEfiCryptoPkgTokenSpaceGuid.PcdCryptoServiceFamilyEnable.TlsGet.Family                            | PCD_CRYPTO_SERVICE_ENABLE_FAMILY
+!endif
 !endif
 
 [PcdsPatchableInModule.X64]
@@ -676,7 +690,17 @@
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 
 
+!if $(TIMER_SUPPORT) == "HPET"
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+!elseif $(TIMER_SUPPORT) == "LAPIC"
+  OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf {
+    <LibraryClasses>
+      NestedInterruptTplLib|OvmfPkg/Library/NestedInterruptTplLib/NestedInterruptTplLib.inf
+  }
+!else
+  !error "Invalid TIMER_SUPPORT"
+!endif
+
   MdeModulePkg/Universal/Metronome/Metronome.inf
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -844,11 +868,13 @@
   # Misc
   #
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
+!if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
   CryptoPkg/Driver/CryptoDxe.inf {
     <LibraryClasses>
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
   }
+!endif
 !endif
 
   #------------------------------
