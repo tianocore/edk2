@@ -58,6 +58,9 @@ steps:
 - script: pip install -r pip-requirements.txt --upgrade
   displayName: 'Install/Upgrade pip modules'
 
+- script: gcc --version
+  displayName: 'Check GCC version'
+
 # Set default
 - bash: echo "##vso[task.setvariable variable=pkg_count]${{ 1 }}"
 
@@ -137,6 +140,7 @@ steps:
       **/BUILD_TOOLS_REPORT.html
       **/OVERRIDELOG.TXT
       BASETOOLS_BUILD*.*
+      **/*.fd
     flattenFolders: true
   condition: succeededOrFailed()
 
