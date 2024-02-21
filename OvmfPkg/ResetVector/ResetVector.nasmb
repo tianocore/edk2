@@ -92,6 +92,8 @@
 %define SNP_SEC_MEM_BASE_DESC_3       (CPUID_BASE + CPUID_SIZE + SEV_SNP_KERNEL_HASHES_SIZE)
 %define SNP_SEC_MEM_SIZE_DESC_3       (FixedPcdGet32 (PcdOvmfPeiMemFvBase) - SNP_SEC_MEM_BASE_DESC_3)
 
+%include "Ia32/AmdSev.asm"
+
 %ifdef ARCH_X64
   #include <AutoGen.h>
 
@@ -143,8 +145,6 @@
   %include "Ia32/IntelTdx.asm"
   %include "X64/OvmfSevMetadata.asm"
 %endif
-
-%include "Ia32/AmdSev.asm"
 
 %include "Ia16/Real16ToFlat32.asm"
 %include "Ia16/Init16.asm"

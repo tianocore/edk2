@@ -247,11 +247,23 @@ SevInit:
     ; SEV workflow
     ;
     ClearOvmfPageTables
+%if PG_5_LEVEL
+    Check5LevelPaging Sev4Level
     ; If SEV is enabled, the C-bit position is always above 31.
     ; The mask will be saved in the EDX and applied during the
     ; the page table build below.
-    OneTimeCall   GetSevCBitMaskAbove31
+    GetSevCBitMaskAbove31
+    CreatePageTables5Level edx
+    Enable5LevelPaging
+    jmp SevCommon
+Sev4Level:
+%endif
+    ; If SEV is enabled, the C-bit position is always above 31.
+    ; The mask will be saved in the EDX and applied during the
+    ; the page table build below.
+    GetSevCBitMaskAbove31
     CreatePageTables4Level edx
+SevCommon:
     ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
     OneTimeCall   SevClearPageEncMaskForGhcbPage
     OneTimeCall   SevClearVcHandlerAndStack

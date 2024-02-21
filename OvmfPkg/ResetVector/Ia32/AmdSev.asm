@@ -146,6 +146,14 @@ BITS    32
     jmp     %%TerminateHlt
 %endmacro
 
+; Get the C-bit mask above 31.
+; Modified: EDX
+;
+; The value is returned in the EDX
+%macro GetSevCBitMaskAbove31 0
+    mov edx, dword[SEV_ES_WORK_AREA_ENC_MASK + 4]
+%endmacro
+
 ; Terminate the guest due to unexpected response code.
 SevEsUnexpectedRespTerminate:
     TerminateVmgExit    TERM_UNEXPECTED_RESP_CODE
@@ -190,14 +198,6 @@ pageTableEntries4kLoop:
 
 SevClearPageEncMaskForGhcbPageExit:
     OneTimeCallRet SevClearPageEncMaskForGhcbPage
-
-; Get the C-bit mask above 31.
-; Modified: EDX
-;
-; The value is returned in the EDX
-GetSevCBitMaskAbove31:
-    mov       edx, dword[SEV_ES_WORK_AREA_ENC_MASK + 4]
-    OneTimeCallRet GetSevCBitMaskAbove31
 
 %endif
 
