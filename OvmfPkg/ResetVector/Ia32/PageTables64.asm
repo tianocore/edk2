@@ -254,6 +254,7 @@ SevInit:
     CreatePageTables4Level edx
     ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
     OneTimeCall   SevClearPageEncMaskForGhcbPage
+    OneTimeCall   SevClearVcHandlerAndStack
     jmp SetCr3
 
 TdxBspInit:

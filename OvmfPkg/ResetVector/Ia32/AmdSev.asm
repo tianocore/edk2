@@ -320,9 +320,9 @@ NoSevEsVcHlt:
 NoSevPass:
     xor       eax, eax
 
-SevExit:
     ;
-    ; Clear exception handlers and stack
+    ; When NOT running in SEV mode: clear exception handlers and stack here.
+    ; Otherwise: SevClearVcHandlerAndStack must be called later.
     ;
     push      eax
     mov       eax, ADDR_OF(IdtrClear)
@@ -330,7 +330,15 @@ SevExit:
     pop       eax
     mov       esp, 0
 
+SevExit:
     OneTimeCallRet CheckSevFeatures
+
+SevClearVcHandlerAndStack:
+    ; Clear exception handlers and stack
+    mov       eax, ADDR_OF(IdtrClear)
+    lidt      [cs:eax]
+    mov       esp, 0
+    OneTimeCallRet SevClearVcHandlerAndStack
 
 ; Start of #VC exception handling routines
 ;
