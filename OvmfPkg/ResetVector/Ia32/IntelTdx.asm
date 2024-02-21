@@ -197,11 +197,7 @@ NotTdx:
 ; Set byte[TDX_WORK_AREA_PGTBL_READY] to 1
 ;
 TdxPostBuildPageTables:
-    cmp     byte[WORK_AREA_GUEST_TYPE], VM_GUEST_TDX
-    jne     ExitTdxPostBuildPageTables
     mov     byte[TDX_WORK_AREA_PGTBL_READY], 1
-
-ExitTdxPostBuildPageTables:
     OneTimeCallRet TdxPostBuildPageTables
 
 ;
