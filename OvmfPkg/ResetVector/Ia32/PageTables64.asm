@@ -46,6 +46,24 @@ BITS    32
 %define TDX_AP          2
 
 ;
+; For OVMF, build some initial page tables at
+; PcdOvmfSecPageTablesBase - (PcdOvmfSecPageTablesBase + 0x6000).
+;
+; This range should match with PcdOvmfSecPageTablesSize which is
+; declared in the FDF files.
+;
+; At the end of PEI, the pages tables will be rebuilt into a
+; more permanent location by DxeIpl.
+;
+%macro ClearOvmfPageTables 0
+    mov     ecx, 6 * 0x1000 / 4
+    xor     eax, eax
+.clearPageTablesMemoryLoop:
+    mov     dword[ecx * 4 + PT_ADDR (0) - 4], eax
+    loop    .clearPageTablesMemoryLoop
+%endmacro
+
+;
 ; Modified:  EAX, EBX, ECX, EDX
 ;
 SetCr3ForPageTables64:
@@ -69,22 +87,7 @@ SetCr3ForPageTables64:
     OneTimeCall   GetSevCBitMaskAbove31
 
 ClearOvmfPageTables:
-    ;
-    ; For OVMF, build some initial page tables at
-    ; PcdOvmfSecPageTablesBase - (PcdOvmfSecPageTablesBase + 0x6000).
-    ;
-    ; This range should match with PcdOvmfSecPageTablesSize which is
-    ; declared in the FDF files.
-    ;
-    ; At the end of PEI, the pages tables will be rebuilt into a
-    ; more permanent location by DxeIpl.
-    ;
-
-    mov     ecx, 6 * 0x1000 / 4
-    xor     eax, eax
-clearPageTablesMemoryLoop:
-    mov     dword[ecx * 4 + PT_ADDR (0) - 4], eax
-    loop    clearPageTablesMemoryLoop
+    ClearOvmfPageTables
 
     ;
     ; Top level Page Directory Pointers (1 * 512GB entry)
