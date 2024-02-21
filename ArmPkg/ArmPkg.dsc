@@ -86,6 +86,7 @@
 
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
   ArmMtlLib|ArmPkg/Library/ArmMtlNullLib/ArmMtlNullLib.inf
 
@@ -133,6 +134,7 @@
   ArmPkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
   ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
+  ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
