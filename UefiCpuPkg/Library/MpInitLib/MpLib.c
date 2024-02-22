@@ -2025,6 +2025,7 @@ MpInitLibInitialize (
   VOID
   )
 {
+  MP_HAND_OFF              *FirstMpHandOff;
   MP_HAND_OFF              *MpHandOff;
   CPU_INFO_IN_HOB          *CpuInfoInHob;
   UINT32                   MaxLogicalProcessorNumber;
@@ -2038,17 +2039,31 @@ MpInitLibInitialize (
   CPU_MP_DATA              *CpuMpData;
   UINT8                    ApLoopMode;
   UINT8                    *MonitorBuffer;
-  UINTN                    Index;
+  UINT32                   Index, HobIndex;
   UINTN                    ApResetVectorSizeBelow1Mb;
   UINTN                    ApResetVectorSizeAbove1Mb;
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
 
-  MpHandOff = GetNextMpHandOffHob (NULL);
-  if (MpHandOff == NULL) {
-    MaxLogicalProcessorNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  FirstMpHandOff = GetNextMpHandOffHob (NULL);
+  if (FirstMpHandOff != NULL) {
+    MaxLogicalProcessorNumber = 0;
+    for (MpHandOff = FirstMpHandOff;
+         MpHandOff != NULL;
+         MpHandOff = GetNextMpHandOffHob (MpHandOff))
+    {
+      DEBUG ((
+        DEBUG_INFO,
+        "%a: ProcessorIndex=%u CpuCount=%u\n",
+        __func__,
+        MpHandOff->ProcessorIndex,
+        MpHandOff->CpuCount
+        ));
+      ASSERT (MaxLogicalProcessorNumber == MpHandOff->ProcessorIndex);
+      MaxLogicalProcessorNumber += MpHandOff->CpuCount;
+    }
   } else {
-    MaxLogicalProcessorNumber = MpHandOff->CpuCount;
+    MaxLogicalProcessorNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
   }
 
   ASSERT (MaxLogicalProcessorNumber != 0);
@@ -2192,7 +2207,7 @@ MpInitLibInitialize (
   //
   ProgramVirtualWireMode ();
 
-  if (MpHandOff == NULL) {
+  if (FirstMpHandOff == NULL) {
     if (MaxLogicalProcessorNumber > 1) {
       //
       // Wakeup all APs and calculate the processor count in system
@@ -2208,21 +2223,32 @@ MpInitLibInitialize (
       AmdSevUpdateCpuMpData (CpuMpData);
     }
 
-    CpuMpData->CpuCount  = MpHandOff->CpuCount;
-    CpuMpData->BspNumber = GetBspNumber (MpHandOff);
+    CpuMpData->CpuCount  = MaxLogicalProcessorNumber;
+    CpuMpData->BspNumber = GetBspNumber (FirstMpHandOff);
     CpuInfoInHob         = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
-    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
-      InitializeSpinLock (&CpuMpData->CpuData[Index].ApLock);
-      CpuMpData->CpuData[Index].CpuHealthy = (MpHandOff->Info[Index].Health == 0) ? TRUE : FALSE;
-      CpuMpData->CpuData[Index].ApFunction = 0;
-      CpuInfoInHob[Index].InitialApicId    = MpHandOff->Info[Index].ApicId;
-      CpuInfoInHob[Index].ApTopOfStack     = CpuMpData->Buffer + (Index + 1) * CpuMpData->CpuApStackSize;
-      CpuInfoInHob[Index].ApicId           = MpHandOff->Info[Index].ApicId;
-      CpuInfoInHob[Index].Health           = MpHandOff->Info[Index].Health;
+    for (MpHandOff = FirstMpHandOff;
+         MpHandOff != NULL;
+         MpHandOff = GetNextMpHandOffHob (MpHandOff))
+    {
+      for (HobIndex = 0; HobIndex < MpHandOff->CpuCount; HobIndex++) {
+        Index = MpHandOff->ProcessorIndex + HobIndex;
+        InitializeSpinLock (&CpuMpData->CpuData[Index].ApLock);
+        CpuMpData->CpuData[Index].CpuHealthy = (MpHandOff->Info[HobIndex].Health == 0) ? TRUE : FALSE;
+        CpuMpData->CpuData[Index].ApFunction = 0;
+        CpuInfoInHob[Index].InitialApicId    = MpHandOff->Info[HobIndex].ApicId;
+        CpuInfoInHob[Index].ApTopOfStack     = CpuMpData->Buffer + (Index + 1) * CpuMpData->CpuApStackSize;
+        CpuInfoInHob[Index].ApicId           = MpHandOff->Info[HobIndex].ApicId;
+        CpuInfoInHob[Index].Health           = MpHandOff->Info[HobIndex].Health;
+      }
     }
 
-    DEBUG ((DEBUG_INFO, "MpHandOff->WaitLoopExecutionMode: %04d, sizeof (VOID *): %04d\n", MpHandOff->WaitLoopExecutionMode, sizeof (VOID *)));
-    if (MpHandOff->WaitLoopExecutionMode == sizeof (VOID *)) {
+    DEBUG ((
+      DEBUG_INFO,
+      "FirstMpHandOff->WaitLoopExecutionMode: %04d, sizeof (VOID *): %04d\n",
+      FirstMpHandOff->WaitLoopExecutionMode,
+      sizeof (VOID *)
+      ));
+    if (FirstMpHandOff->WaitLoopExecutionMode == sizeof (VOID *)) {
       ASSERT (CpuMpData->ApLoopMode != ApInHltLoop);
 
       CpuMpData->FinishedCount                        = 0;
@@ -2238,7 +2264,7 @@ MpInitLibInitialize (
       // enables the APs to switch to a different memory section and continue their
       // looping process there.
       //
-      SwitchApContext (MpHandOff);
+      SwitchApContext (FirstMpHandOff);
       //
       // Wait for all APs finished initialization
       //
@@ -2287,7 +2313,7 @@ MpInitLibInitialize (
   // Wakeup APs to do some AP initialize sync (Microcode & MTRR)
   //
   if (CpuMpData->CpuCount > 1) {
-    if (MpHandOff != NULL) {
+    if (FirstMpHandOff != NULL) {
       //
       // Only needs to use this flag for DXE phase to update the wake up
       // buffer. Wakeup buffer allocated in PEI phase is no longer valid
@@ -2304,7 +2330,7 @@ MpInitLibInitialize (
       CpuPause ();
     }
 
-    if (MpHandOff != NULL) {
+    if (FirstMpHandOff != NULL) {
       CpuMpData->InitFlag = ApInitDone;
     }
 
