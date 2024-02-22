@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2017 - 2019, Advanced Micro Devices. All rights reserved.<BR>
+  Copyright (c) 2017 - 2024, Advanced Micro Devices. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -19,5 +19,6 @@
 
 #include <Register/Intel/ArchitecturalMsr.h>
 #include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/SvsmMsr.h>
 
 #endif
