@@ -1903,15 +1903,13 @@ GetBspNumber (
   )
 {
   UINT32             ApicId;
-  UINT32             BspNumber;
   UINT32             Index;
   CONST MP_HAND_OFF  *MpHandOff;
 
   //
   // Get the processor number for the BSP
   //
-  BspNumber = MAX_UINT32;
-  ApicId    = GetInitialApicId ();
+  ApicId = GetInitialApicId ();
 
   for (MpHandOff = FirstMpHandOff;
        MpHandOff != NULL;
@@ -1919,14 +1917,13 @@ GetBspNumber (
   {
     for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
       if (MpHandOff->Info[Index].ApicId == ApicId) {
-        BspNumber = MpHandOff->ProcessorIndex + Index;
+        return MpHandOff->ProcessorIndex + Index;
       }
     }
   }
 
-  ASSERT (BspNumber != MAX_UINT32);
-
-  return BspNumber;
+  ASSERT_EFI_ERROR (EFI_NOT_FOUND);
+  return 0;
 }
 
 /**
