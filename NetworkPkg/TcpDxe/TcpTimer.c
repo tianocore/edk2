@@ -481,9 +481,14 @@ TcpTickingDpc (
   LIST_ENTRY  *Next;
   TCP_CB      *Tcb;
   INT16       Index;
+  UINT32      RandomVal;
 
   mTcpTick++;
-  mTcpGlobalIss += TCP_ISS_INCREMENT_2;
+  if ( TRUE == GetRandomNumber32 (&RandomVal)) {
+    mTcpGlobalIss += RandomVal;
+  } else {
+    mTcpGlobalIss += TCP_ISS_INCREMENT_2;
+  }
 
   //
   // Don't use LIST_FOR_EACH, which isn't delete safe.
