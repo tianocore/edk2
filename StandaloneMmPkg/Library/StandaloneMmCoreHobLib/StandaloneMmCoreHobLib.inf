@@ -5,7 +5,7 @@
 #  Uses gHobList defined in the Standalone MM Core Entry Point Library.
 #
 # Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
-# Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
+# Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -24,20 +24,13 @@
 #
 #  VALID_ARCHITECTURES           = X64 AARCH64 ARM
 #
-[Sources.common]
+[Sources]
   Common.c
-
-[Sources.X64]
-  X64/StandaloneMmCoreHobLib.c
-
-[Sources.AARCH64, Sources.ARM]
-  Arm/StandaloneMmCoreHobLib.c
-  Arm/StandaloneMmCoreHobLibInternal.c
+  StandaloneMmCoreHobLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
-
 
 [LibraryClasses]
   BaseMemoryLib
