@@ -57,6 +57,7 @@
   SynchronizationLib
   PcdLib
   CcExitLib
+  AmdSvsmLib
   MicrocodeLib
 [LibraryClasses.X64]
   CpuPageTableLib
