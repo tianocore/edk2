@@ -92,5 +92,6 @@
         "BLD_*_EMU_VARIABLE_ENABLE": "FALSE",
         "BLD_*_DISABLE_RESET_SYSTEM": "TRUE",
         "BLD_*_SERIAL_DRIVER_ENABLE": "FALSE",
+        "BLD_*_BUILD_ARCH": "",
     }
 }

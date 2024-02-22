@@ -59,16 +59,16 @@ def BuildConfNode(Fdt, ParentNode, MultiImage):
     libfdt.fdt_setprop(Fdt, ConfNode1, 'require-fit', b'', 0)
     libfdt.fdt_setprop(Fdt, ConfNode1, 'firmware', bytes('tianocore', 'utf-8'), len('tianocore') + 1)
 
-def BuildFvImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description):
+def BuildFvImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description, Arch):
     libfdt.fdt_setprop_u32(Fdt, ParentNode, 'data-size', DataSize)
     libfdt.fdt_setprop_u32(Fdt, ParentNode, 'data-offset', DataOffset)
     libfdt.fdt_setprop(Fdt, ParentNode, 'compression', bytes('none',                'utf-8'), len('none') + 1)
     libfdt.fdt_setprop(Fdt, ParentNode, 'project ',    bytes('tianocore',           'utf-8'), len('tianocore') + 1)
-    libfdt.fdt_setprop(Fdt, ParentNode, 'arch',        bytes('x86_64',              'utf-8'), len('x86_64') + 1)
+    libfdt.fdt_setprop(Fdt, ParentNode, 'arch',        bytes(Arch,                  'utf-8'), len(Arch) + 1)
     libfdt.fdt_setprop(Fdt, ParentNode, 'type',        bytes('flat-binary',         'utf-8'), len('flat-binary') + 1)
     libfdt.fdt_setprop(Fdt, ParentNode, 'description', bytes(Description,           'utf-8'), len(Description) + 1)
 
-def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description):
+def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description, Arch):
     #
     # Set 'load' and 'data-offset' to reserve the memory first.
     # They would be set again when Fdt completes or this function parses target binary file.
@@ -100,7 +100,7 @@ def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descr
 #
 # The subnode would be inserted from bottom to top of structure block.
 #
-def BuildFitImage(Fdt, InfoHeader):
+def BuildFitImage(Fdt, InfoHeader, Arch):
     MultiImage = [
         ["tianocore",   InfoHeader.Binary,        BuildTianoImageNode , InfoHeader.Description,     None, 0 ],
         ["uefi-fv",     InfoHeader.UefifvPath,    BuildFvImageNode,     "UEFI Firmware Volume",     None, 0 ],
@@ -143,7 +143,7 @@ def BuildFitImage(Fdt, InfoHeader):
         if os.path.exists (Item[1]) == False:
             continue
         FvNode = libfdt.fdt_add_subnode(Fdt, ImageNode, Name)
-        BuildFvNode (Fdt, InfoHeader, FvNode, DataOffset, len(BinaryData), Description)
+        BuildFvNode (Fdt, InfoHeader, FvNode, DataOffset, len(BinaryData), Description, Arch)
 
     #
     # Create new image file and combine all binary.
@@ -160,7 +160,7 @@ def BuildFitImage(Fdt, InfoHeader):
 
     return True
 
-def MakeFitImage(InfoHeader):
+def MakeFitImage(InfoHeader, Arch):
     #
     # Allocate fdt byte array.
     #
@@ -175,9 +175,9 @@ def MakeFitImage(InfoHeader):
     #
     # Parse args to build fit image.
     #
-    return BuildFitImage(Fdt, InfoHeader)
+    return BuildFitImage(Fdt, InfoHeader, Arch)
 
-def ReplaceFv (UplBinary, SectionFvFile, SectionName):
+def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
     try:
         #
         # Get Original Multi Fv
@@ -231,7 +231,7 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName):
                 SectionFvFileBinary = File.read ()
             MultiFvList.append ([SectionName, SectionFvFileBinary])
             FvNode = libfdt.fdt_add_subnode(NewFitHeader, ImagesNode, SectionName)
-            BuildFvImageNode (NewFitHeader, None, FvNode, FitSize, len(SectionFvFileBinary), SectionName + " Firmware Volume")
+            BuildFvImageNode (NewFitHeader, None, FvNode, FitSize, len(SectionFvFileBinary), SectionName + " Firmware Volume", Arch)
             FitSize += len(SectionFvFileBinary)
         else:
             for Index in range (0, len (MultiFvList)):
