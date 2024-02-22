@@ -52,6 +52,9 @@
   ##  @libraryclass  Provides function to support CcExit processing.
   CcExitLib|Include/Library/CcExitLib.h
 
+  ##  @libraryclass  Provides function to support AmdSvsm processing.
+  AmdSvsmLib|Include/Library/AmdSvsmLib.h
+
   ##  @libraryclass  Provides function to get CPU cache information.
   CpuCacheInfoLib|Include/Library/CpuCacheInfoLib.h
 
