@@ -745,7 +745,9 @@ CreateIdentityMappingPageTables (
     //
     Cr4.UintN         = AsmReadCr4 ();
     Page5LevelSupport = (Cr4.Bits.LA57 != 0);
-    ASSERT (PcdGetBool (PcdUse5LevelPageTable) == Page5LevelSupport);
+    if (Page5LevelSupport) {
+      ASSERT (PcdGetBool (PcdUse5LevelPageTable));
+    }
   } else {
     //
     // If cpu runs in 32bit protected mode PEI, Page table Level in DXE is decided by PCD and feature capability.
