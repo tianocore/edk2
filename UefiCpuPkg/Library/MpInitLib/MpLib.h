@@ -482,7 +482,7 @@ GetWakeupBuffer (
 **/
 VOID
 SwitchApContext (
-  IN MP_HAND_OFF  *MpHandOff
+  IN CONST MP_HAND_OFF  *FirstMpHandOff
   );
 
 /**

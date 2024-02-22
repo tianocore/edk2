@@ -1938,31 +1938,42 @@ GetBspNumber (
   This procedure allows the AP to switch to another section of
   memory and continue its loop there.
 
-  @param[in] MpHandOff  Pointer to MP hand-off data structure.
+  @param[in] FirstMpHandOff  Pointer to first MP hand-off HOB body.
 **/
 VOID
 SwitchApContext (
-  IN MP_HAND_OFF  *MpHandOff
+  IN CONST MP_HAND_OFF  *FirstMpHandOff
   )
 {
-  UINTN   Index;
-  UINT32  BspNumber;
+  UINTN              Index;
+  UINT32             BspNumber;
+  CONST MP_HAND_OFF  *MpHandOff;
 
-  BspNumber = GetBspNumber (MpHandOff);
+  BspNumber = GetBspNumber (FirstMpHandOff);
 
-  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
-    if (Index != BspNumber) {
-      *(UINTN *)(UINTN)MpHandOff->Info[Index].StartupProcedureAddress = (UINTN)SwitchContextPerAp;
-      *(UINT32 *)(UINTN)MpHandOff->Info[Index].StartupSignalAddress   = MpHandOff->StartupSignalValue;
+  for (MpHandOff = FirstMpHandOff;
+       MpHandOff != NULL;
+       MpHandOff = GetNextMpHandOffHob (MpHandOff))
+  {
+    for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+      if (MpHandOff->ProcessorIndex + Index != BspNumber) {
+        *(UINTN *)(UINTN)MpHandOff->Info[Index].StartupProcedureAddress = (UINTN)SwitchContextPerAp;
+        *(UINT32 *)(UINTN)MpHandOff->Info[Index].StartupSignalAddress   = MpHandOff->StartupSignalValue;
+      }
     }
   }
 
   //
   // Wait all APs waken up if this is not the 1st broadcast of SIPI
   //
-  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
-    if (Index != BspNumber) {
-      WaitApWakeup ((UINT32 *)(UINTN)(MpHandOff->Info[Index].StartupSignalAddress));
+  for (MpHandOff = FirstMpHandOff;
+       MpHandOff != NULL;
+       MpHandOff = GetNextMpHandOffHob (MpHandOff))
+  {
+    for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+      if (MpHandOff->ProcessorIndex + Index != BspNumber) {
+        WaitApWakeup ((UINT32 *)(UINTN)(MpHandOff->Info[Index].StartupSignalAddress));
+      }
     }
   }
 }
