@@ -1894,26 +1894,33 @@ CheckAllAPs (
 /**
   This function Get BspNumber.
 
-  @param[in] MpHandOff        Pointer to MpHandOff
+  @param[in] FirstMpHandOff   Pointer to first MpHandOff HOB body.
   @return                     BspNumber
 **/
 UINT32
 GetBspNumber (
-  IN CONST MP_HAND_OFF  *MpHandOff
+  IN CONST MP_HAND_OFF  *FirstMpHandOff
   )
 {
-  UINT32  ApicId;
-  UINT32  BspNumber;
-  UINT32  Index;
+  UINT32             ApicId;
+  UINT32             BspNumber;
+  UINT32             Index;
+  CONST MP_HAND_OFF  *MpHandOff;
 
   //
   // Get the processor number for the BSP
   //
   BspNumber = MAX_UINT32;
   ApicId    = GetInitialApicId ();
-  for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
-    if (MpHandOff->Info[Index].ApicId == ApicId) {
-      BspNumber = Index;
+
+  for (MpHandOff = FirstMpHandOff;
+       MpHandOff != NULL;
+       MpHandOff = GetNextMpHandOffHob (MpHandOff))
+  {
+    for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
+      if (MpHandOff->Info[Index].ApicId == ApicId) {
+        BspNumber = MpHandOff->ProcessorIndex + Index;
+      }
     }
   }
 
