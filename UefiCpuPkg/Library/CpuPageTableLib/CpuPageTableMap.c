@@ -20,10 +20,10 @@
 **/
 VOID
 PageTableLibSetPte4K (
-  IN IA32_PTE_4K         *Pte4K,
-  IN UINT64              Offset,
-  IN IA32_MAP_ATTRIBUTE  *Attribute,
-  IN IA32_MAP_ATTRIBUTE  *Mask
+  IN OUT IA32_PTE_4K         *Pte4K,
+  IN UINT64                  Offset,
+  IN IA32_MAP_ATTRIBUTE      *Attribute,
+  IN IA32_MAP_ATTRIBUTE      *Mask
   )
 {
   IA32_PTE_4K  LocalPte4K;
@@ -94,10 +94,10 @@ PageTableLibSetPte4K (
 **/
 VOID
 PageTableLibSetPleB (
-  IN IA32_PAGE_LEAF_ENTRY_BIG_PAGESIZE  *PleB,
-  IN UINT64                             Offset,
-  IN IA32_MAP_ATTRIBUTE                 *Attribute,
-  IN IA32_MAP_ATTRIBUTE                 *Mask
+  IN OUT IA32_PAGE_LEAF_ENTRY_BIG_PAGESIZE  *PleB,
+  IN UINT64                                 Offset,
+  IN IA32_MAP_ATTRIBUTE                     *Attribute,
+  IN IA32_MAP_ATTRIBUTE                     *Mask
   )
 {
   IA32_PAGE_LEAF_ENTRY_BIG_PAGESIZE  LocalPleB;
@@ -171,11 +171,11 @@ PageTableLibSetPleB (
 **/
 VOID
 PageTableLibSetPle (
-  IN UINTN               Level,
-  IN IA32_PAGING_ENTRY   *Ple,
-  IN UINT64              Offset,
-  IN IA32_MAP_ATTRIBUTE  *Attribute,
-  IN IA32_MAP_ATTRIBUTE  *Mask
+  IN UINTN                   Level,
+  IN OUT IA32_PAGING_ENTRY   *Ple,
+  IN UINT64                  Offset,
+  IN IA32_MAP_ATTRIBUTE      *Attribute,
+  IN IA32_MAP_ATTRIBUTE      *Mask
   )
 {
   if (Level == 1) {
@@ -195,9 +195,9 @@ PageTableLibSetPle (
 **/
 VOID
 PageTableLibSetPnle (
-  IN IA32_PAGE_NON_LEAF_ENTRY  *Pnle,
-  IN IA32_MAP_ATTRIBUTE        *Attribute,
-  IN IA32_MAP_ATTRIBUTE        *Mask
+  IN OUT IA32_PAGE_NON_LEAF_ENTRY  *Pnle,
+  IN IA32_MAP_ATTRIBUTE            *Attribute,
+  IN IA32_MAP_ATTRIBUTE            *Mask
   )
 {
   IA32_PAGE_NON_LEAF_ENTRY  LocalPnle;
