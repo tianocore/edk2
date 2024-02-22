@@ -10,6 +10,7 @@
 
 #include <Uefi/UefiBaseType.h>
 #include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
 
 #include "SnpPageStateChange.h"
@@ -65,6 +66,8 @@ MemEncryptSevSnpPreValidateSystemRam (
   IN UINTN             NumPages
   )
 {
+  SEC_SEV_ES_WORK_AREA  *SevEsWorkArea;
+
   if (!MemEncryptSevSnpIsEnabled ()) {
     return;
   }
@@ -78,5 +81,14 @@ MemEncryptSevSnpPreValidateSystemRam (
     SnpPageStateFailureTerminate ();
   }
 
-  InternalSetPageState (BaseAddress, NumPages, SevSnpPagePrivate, TRUE);
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+
+  InternalSetPageState (
+    BaseAddress,
+    NumPages,
+    SevSnpPagePrivate,
+    TRUE,
+    SevEsWorkArea->WorkBuffer,
+    sizeof (SevEsWorkArea->WorkBuffer)
+    );
 }
