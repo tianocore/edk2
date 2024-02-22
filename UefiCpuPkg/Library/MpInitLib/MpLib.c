@@ -1961,25 +1961,31 @@ SwitchApContext (
 }
 
 /**
-  Get pointer to MP_HAND_OFF GUIDed HOB.
+  Get pointer to next MP_HAND_OFF GUIDed HOB body.
+
+  @param[in] MpHandOff  Previous HOB body.  Pass NULL to get the first HOB.
 
   @return  The pointer to MP_HAND_OFF structure.
 **/
 MP_HAND_OFF *
-GetMpHandOffHob (
-  VOID
+GetNextMpHandOffHob (
+  IN CONST MP_HAND_OFF  *MpHandOff
   )
 {
   EFI_HOB_GUID_TYPE  *GuidHob;
-  MP_HAND_OFF        *MpHandOff;
 
-  MpHandOff = NULL;
-  GuidHob   = GetFirstGuidHob (&mMpHandOffGuid);
-  if (GuidHob != NULL) {
-    MpHandOff = (MP_HAND_OFF *)GET_GUID_HOB_DATA (GuidHob);
+  if (MpHandOff == NULL) {
+    GuidHob = GetFirstGuidHob (&mMpHandOffGuid);
+  } else {
+    GuidHob = (VOID *)(((UINT8 *)MpHandOff) - sizeof (EFI_HOB_GUID_TYPE));
+    GuidHob = GetNextGuidHob (&mMpHandOffGuid, GET_NEXT_HOB (GuidHob));
   }
 
-  return MpHandOff;
+  if (GuidHob == NULL) {
+    return NULL;
+  }
+
+  return (MP_HAND_OFF *)GET_GUID_HOB_DATA (GuidHob);
 }
 
 /**
@@ -2020,7 +2026,7 @@ MpInitLibInitialize (
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
 
-  MpHandOff = GetMpHandOffHob ();
+  MpHandOff = GetNextMpHandOffHob (NULL);
   if (MpHandOff == NULL) {
     MaxLogicalProcessorNumber = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
   } else {
