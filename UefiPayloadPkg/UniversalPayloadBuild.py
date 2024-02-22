@@ -125,17 +125,26 @@ def BuildUniversalPayload(Args):
         Args.Macro.append("UNIVERSAL_PAYLOAD_FORMAT=ELF")
         UpldEntryFile = "UniversalPayloadEntry"
 
-    BuildDir     = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkgX64"))
+    BuildDir     = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkg"))
+    BuildDirWithArch = BuildDir + Args.Arch
+    print(BuildDir)
     if Args.Arch == 'X64':
         BuildArch      = "X64"
         FitArch        = "x86_64"
         ObjCopyFlag    = "elf64-x86-64"
-        EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, PayloadEntryToolChain), os.path.normpath("X64/UefiPayloadPkg/UefiPayloadEntry/{}/DEBUG/{}.dll".format (UpldEntryFile, UpldEntryFile)))
-    else:
+        EntryOutputDir = os.path.join(BuildDirWithArch, "{}_{}".format (BuildTarget, PayloadEntryToolChain), os.path.normpath("X64/UefiPayloadPkg/UefiPayloadEntry/{}/DEBUG/{}.dll".format (UpldEntryFile, UpldEntryFile)))
+    elif Args.Arch == 'IA32':
         BuildArch      = "IA32 -a X64"
         FitArch        = "x86"
         ObjCopyFlag    = "elf32-i386"
-        EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, PayloadEntryToolChain), os.path.normpath("IA32/UefiPayloadPkg/UefiPayloadEntry/{}/DEBUG/{}.dll".format (UpldEntryFile, UpldEntryFile)))
+        EntryOutputDir = os.path.join(BuildDirWithArch, "{}_{}".format (BuildTarget, PayloadEntryToolChain), os.path.normpath("IA32/UefiPayloadPkg/UefiPayloadEntry/{}/DEBUG/{}.dll".format (UpldEntryFile, UpldEntryFile)))
+    elif Args.Arch == 'RISCV64':
+        BuildArch      = "RISCV64"
+        FitArch        = "RISCV64"
+        ObjCopyFlag    = "rv64"
+        EntryOutputDir = os.path.join(BuildDirWithArch, "{}_{}".format (BuildTarget, PayloadEntryToolChain), os.path.normpath("RISCV64/UefiPayloadPkg/UefiPayloadEntry/{}/DEBUG/{}.dll".format (UpldEntryFile, UpldEntryFile)))
+    else:
+        print("Incorrect arch option provided")
 
     EntryModuleInf = os.path.normpath("UefiPayloadPkg/UefiPayloadEntry/{}.inf".format (UpldEntryFile))
     DscPath = os.path.normpath("UefiPayloadPkg/UefiPayloadPkg.dsc")
@@ -160,7 +169,7 @@ def BuildUniversalPayload(Args):
     # Building DXE core and DXE drivers as DXEFV.
     #
     if Args.BuildEntryOnly == False:
-        BuildPayload = "build -p {} -b {} -a X64 -t {} -y {} {}".format (DscPath, BuildTarget, ToolChain, PayloadReportPath, Quiet)
+        BuildPayload = "build -p {} -b {} -a {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, ToolChain, PayloadReportPath, Quiet)
         BuildPayload += Pcds
         BuildPayload += Defines
         RunCommand(BuildPayload)
@@ -292,7 +301,7 @@ def BuildUniversalPayload(Args):
         fit_image_info_header.DataSize   = TianoEntryBinarySize
         fit_image_info_header.Binary     = TargetRebaseEntryFile
 
-        if MkFitImage.MakeFitImage(fit_image_info_header) is True:
+        if MkFitImage.MakeFitImage(fit_image_info_header, Args.Arch) is True:
             print('\nSuccessfully build Fit Image')
         else:
             sys.exit(1)
@@ -304,7 +313,7 @@ def main():
     parser = argparse.ArgumentParser(description='For building Universal Payload')
     parser.add_argument('-t', '--ToolChain')
     parser.add_argument('-b', '--Target', default='DEBUG')
-    parser.add_argument('-a', '--Arch', choices=['IA32', 'X64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
+    parser.add_argument('-a', '--Arch', choices=['IA32', 'X64', 'RISCV64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
     parser.add_argument("-D", "--Macro", action="append", default=["UNIVERSAL_PAYLOAD=TRUE"])
     parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default ='UEFI')
     parser.add_argument('-q', '--Quiet', action='store_true', help='Disable all build messages except FATAL ERRORS.')
@@ -331,14 +340,14 @@ def main():
         for (SectionName, SectionFvFile) in args.AddFv:
             MultiFvList.append ([SectionName, SectionFvFile])
 
-    def ReplaceFv (UplBinary, SectionFvFile, SectionName):
+    def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
         print (bcolors.OKGREEN + "Patch {}={} into {}".format (SectionName, SectionFvFile, UplBinary) + bcolors.ENDC)
         if (args.Fit == False):
             import Tools.ElfFv as ElfFv
             return ElfFv.ReplaceFv (UplBinary, SectionFvFile, '.upld.{}'.format (SectionName))
         else:
             import Tools.MkFitImage as MkFitImage
-            return MkFitImage.ReplaceFv (UplBinary, SectionFvFile, SectionName)
+            return MkFitImage.ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch)
 
     if (UniversalPayloadBinary != None):
         for (SectionName, SectionFvFile) in MultiFvList:
@@ -347,7 +356,7 @@ def main():
             if (args.Fit == False):
                 status = ReplaceFv (UniversalPayloadBinary, SectionFvFile, SectionName)
             else:
-                status = ReplaceFv (UniversalPayloadBinary, SectionFvFile, SectionName.replace ("_", "-"))
+                status = ReplaceFv (UniversalPayloadBinary, SectionFvFile, SectionName.replace ("_", "-"), args.Arch)
             if status != 0:
                 print (bcolors.FAIL + "[Fail] Patch {}={}".format (SectionName, SectionFvFile) + bcolors.ENDC)
                 return status
