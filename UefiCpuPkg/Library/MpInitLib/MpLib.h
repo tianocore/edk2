@@ -486,6 +486,18 @@ SwitchApContext (
   );
 
 /**
+  Get pointer to next MP_HAND_OFF GUIDed HOB body.
+
+  @param[in] MpHandOff  Previous HOB body.  Pass NULL to get the first HOB.
+
+  @return  The pointer to MP_HAND_OFF structure.
+**/
+MP_HAND_OFF *
+GetNextMpHandOffHob (
+  IN CONST MP_HAND_OFF  *MpHandOff
+  );
+
+/**
   Get available EfiBootServicesCode memory below 4GB by specified size.
 
   This buffer is required to safely transfer AP from real address mode to
