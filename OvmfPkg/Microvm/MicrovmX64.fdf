@@ -257,13 +257,6 @@ INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
 INF  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
 
-!if $(TOOL_CHAIN_TAG) != "XCODE5"
-INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
-INF  ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf
-INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
-!endif
-INF  ShellPkg/Application/Shell/Shell.inf
-
 INF MdeModulePkg/Logo/LogoDxe.inf
 
 #
@@ -301,6 +294,8 @@ INF  OvmfPkg/QemuFlashFvbServicesRuntimeDxe/FvbServicesRuntimeDxe.inf
 INF  OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.inf
 INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+
+!include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 
 ################################################################################
 
