@@ -12,6 +12,149 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuCommon.h"
 #include <Library/SmmMemLib.h>
 
+//
+// SMM ready to lock flag
+//
+BOOLEAN  mSmmReadyToLock = FALSE;
+
+/**
+  Perform the remaining tasks.
+
+**/
+VOID
+PerformRemainingTasks (
+  VOID
+  )
+{
+  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
+
+  if (mSmmReadyToLock) {
+    PERF_FUNCTION_BEGIN ();
+
+    SmmGetSystemConfigurationTable (&gEdkiiPiSmmMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
+    if (MemoryAttributesTable == NULL) {
+      return;
+    }
+
+    //
+    // Check if all Aps enter SMM. In Relaxed-AP Sync Mode, BSP will not wait for
+    // all Aps arrive. However,PerformRemainingTasks() needs to wait all Aps arrive before calling
+    // SetMemMapAttributes() and ConfigSmmCodeAccessCheck() when mSmmReadyToLock
+    // is true. In SetMemMapAttributes(), SmmSetMemoryAttributesEx() will call
+    // FlushTlbForAll() that need to start up the aps. So it need to let all
+    // aps arrive. Same as SetMemMapAttributes(), ConfigSmmCodeAccessCheck()
+    // also will start up the aps.
+    //
+    if (EFI_ERROR (SmmCpuRendezvous (NULL, TRUE))) {
+      DEBUG ((DEBUG_ERROR, "PerformRemainingTasks: fail to wait for all AP check in SMM!\n"));
+    }
+
+    //
+    // Start SMM Profile feature
+    //
+    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+      SmmProfileStart ();
+    }
+
+    //
+    // Create a mix of 2MB and 4KB page table. Update some memory ranges absent and execute-disable.
+    //
+    InitPaging ();
+
+    //
+    // Mark critical region to be read-only in page table
+    //
+    SetMemMapAttributes (MemoryAttributesTable);
+
+    if (IsRestrictedMemoryAccess ()) {
+      //
+      // Set page table itself to be read-only
+      //
+      SetPageTableAttributes ();
+    }
+
+    //
+    // Configure SMM Code Access Check feature if available.
+    //
+    ConfigSmmCodeAccessCheck ();
+
+    //
+    // Measure performance of SmmCpuFeaturesCompleteSmmReadyToLock() from caller side
+    // as the implementation is provided by platform.
+    //
+    PERF_START (NULL, "SmmCompleteReadyToLock", NULL, 0);
+    SmmCpuFeaturesCompleteSmmReadyToLock ();
+    PERF_END (NULL, "SmmCompleteReadyToLock", NULL, 0);
+
+    //
+    // Clean SMM ready to lock flag
+    //
+    mSmmReadyToLock = FALSE;
+
+    PERF_FUNCTION_END ();
+  }
+}
+
+/**
+  Perform the remaining tasks for SMM Initialization.
+
+  @param[in] CpuIndex        The index of the CPU.
+  @param[in] IsMonarch       TRUE if the CpuIndex is the index of the CPU that
+                             was elected as monarch during SMM initialization.
+**/
+VOID
+PerformRemainingTasksForSmiInit (
+  IN UINTN    CpuIndex,
+  IN BOOLEAN  IsMonarch
+  )
+{
+  return;
+}
+
+/**
+  SMM Ready To Lock event notification handler.
+
+  The CPU S3 data is copied to SMRAM for security and mSmmReadyToLock is set to
+  perform additional lock actions that must be performed from SMM on the next SMI.
+
+  @param[in] Protocol   Points to the protocol's unique identifier.
+  @param[in] Interface  Points to the interface instance.
+  @param[in] Handle     The handle on which the interface was installed.
+
+  @retval EFI_SUCCESS   Notification handler runs successfully.
+ **/
+EFI_STATUS
+EFIAPI
+SmmReadyToLockEventNotify (
+  IN CONST EFI_GUID  *Protocol,
+  IN VOID            *Interface,
+  IN EFI_HANDLE      Handle
+  )
+{
+  // GetAcpiCpuData (); /// TODO: cleanup S3 code even from DXE_SMM_DRIVER
+
+  //
+  // Cache a copy of UEFI memory map before we start profiling feature.
+  //
+  GetUefiMemoryMap ();
+
+  //
+  // Skip SMM profile initialization if feature is disabled
+  //
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    //
+    // Initialize protected memory range for patching page table later.
+    //
+    InitProtectedMemRange ();
+  }
+
+  //
+  // Set SMM ready to lock flag and return
+  //
+  mSmmReadyToLock = TRUE;
+  return EFI_SUCCESS;
+}
+
 /**
   This function is an abstraction layer for implementation specific Mm buffer validation routine.
 
@@ -47,7 +190,8 @@ PiCpuSmmEntry (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS            Status;
+  EFI_STATUS  Status;
+  VOID        *Registration;
 
   //
   // Save the PcdPteMemoryEncryptionAddressOrMask value into a global variable.
@@ -83,6 +227,16 @@ PiCpuSmmEntry (
     Status = PcdSet64S (PcdCpuHotPlugDataAddress, (UINT64)(UINTN)&mCpuHotPlugData);
     ASSERT_EFI_ERROR (Status);
   }
+
+  //
+  // Register SMM Ready To Lock Protocol notification
+  //
+  Status = gMmst->MmRegisterProtocolNotify (
+                    &gEfiSmmReadyToLockProtocolGuid,
+                    SmmReadyToLockEventNotify,
+                    &Registration
+                    );
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }

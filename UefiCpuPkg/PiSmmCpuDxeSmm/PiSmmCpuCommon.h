@@ -29,7 +29,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/SmramMemoryReserve.h>
 #include <Guid/SmmBaseHob.h>
 #include <Guid/MpInformation2.h>
-#include <Guid/NonMmramMap.h>
 #include <Guid/SmmCpuFeatureInfo.h>
 
 #include <Library/BaseLib.h>
@@ -269,7 +268,6 @@ extern UINTN                 mSmmShadowStackSize;
 extern UINT8  mSmmSaveStateRegisterLma;
 
 extern SMM_CPU_FEATURE_INFO_HOB  *mSmmCpuFeatureInfoHob;
-extern NON_MMRAM_MAP             *mNonMmramMap;
 
 #define PAGE_TABLE_POOL_ALIGNMENT   BASE_128KB
 #define PAGE_TABLE_POOL_UNIT_SIZE   BASE_128KB
@@ -471,6 +469,7 @@ extern EFI_SMRAM_DESCRIPTOR          *mSmmCpuSmramRanges;
 extern UINTN                         mSmmCpuSmramRangeCount;
 extern UINT8                         mPhysicalAddressBits;
 extern BOOLEAN                       mSmmDebugAgentSupport;
+extern BOOLEAN                       mSmmCodeAccessCheckEnable;
 
 //
 // Copy of the PcdPteMemoryEncryptionAddressOrMask
@@ -757,6 +756,24 @@ SmmClearMemoryAttributes (
   );
 
 /**
+  Retrieves a pointer to the system configuration table from the SMM System Table
+  based on a specified GUID.
+
+  @param[in]   TableGuid       The pointer to table's GUID type.
+  @param[out]  Table           The pointer to the table associated with TableGuid in the EFI System Table.
+
+  @retval EFI_SUCCESS     A configuration table matching TableGuid was found.
+  @retval EFI_NOT_FOUND   A configuration table matching TableGuid could not be found.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmGetSystemConfigurationTable (
+  IN  EFI_GUID  *TableGuid,
+  OUT VOID      **Table
+  );
+
+/**
   Initialize MP synchronization data.
 
 **/
@@ -822,6 +839,18 @@ PerformPreTasks (
 VOID
 InitMsrSpinLockByIndex (
   IN UINT32  MsrIndex
+  );
+
+/**
+Configure SMM Code Access Check feature on an AP.
+SMM Feature Control MSR will be locked after configuration.
+
+@param[in,out] Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+ConfigSmmCodeAccessCheckOnCurrentProcessor (
+  IN OUT VOID  *Buffer
   );
 
 /**
@@ -896,10 +925,28 @@ DumpModuleInfoByIp (
 
 /**
   This function sets memory attribute according to MemoryAttributesTable.
+
+  @param  MemoryAttributesTable  A pointer to the buffer of SmmMemoryAttributesTable.
+
 **/
 VOID
 SetMemMapAttributes (
-  VOID
+  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable
+  );
+
+/**
+  Sort memory map entries based upon PhysicalStart, from low to high.
+
+  @param  MemoryMap              A pointer to the buffer in which firmware places
+                                 the current memory map.
+  @param  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
+  @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+**/
+VOID
+SortMemoryMap (
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  IN UINTN                      MemoryMapSize,
+  IN UINTN                      DescriptorSize
   );
 
 /**
@@ -907,7 +954,8 @@ SetMemMapAttributes (
 **/
 VOID
 SetUefiMemMapAttributes (
-  VOID
+  UINT64         StartAddress,
+  UINT64         EndAddress
   );
 
 /**
@@ -921,6 +969,13 @@ SetUefiMemMapAttributes (
 BOOLEAN
 IsSmmCommBufferForbiddenAddress (
   IN UINT64  Address
+  );
+
+VOID
+SmmGetMmioRanges (
+  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
+  OUT UINTN                  *MemoryMapSize,
+  OUT UINTN                  *DescriptorSize
   );
 
 /**
@@ -1517,6 +1572,18 @@ SmmWriteProtectReadOnlyPage (
     } \
   } while (FALSE)
 
+/**
+  Perform the remaining tasks for SMM Initialization.
+
+  @param[in] CpuIndex        The index of the CPU.
+  @param[in] IsMonarch       TRUE if the CpuIndex is the index of the CPU that
+                             was elected as monarch during SMM initialization.
+**/
+VOID
+PerformRemainingTasksForSmiInit (
+  IN UINTN    CpuIndex,
+  IN BOOLEAN  IsMonarch
+  );
 
 /**
   This function is an abstraction layer for implementation specific Mm buffer validation routine.

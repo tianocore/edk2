@@ -411,11 +411,12 @@ InitProtectedMemRange (
   )
 {
   UINTN                            Index;
-  UINTN                            NumberOfDescriptors;
+  EFI_MEMORY_DESCRIPTOR            *MemoryMap;
+  UINTN                            MemoryMapSize;
+  UINTN                            DescriptorSize;
   UINTN                            NumberOfAddedDescriptors;
   UINTN                            NumberOfProtectRange;
   UINTN                            NumberOfSpliteRange;
-  //EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
   UINTN                            TotalSize;
   EFI_PHYSICAL_ADDRESS             ProtectBaseAddress;
   EFI_PHYSICAL_ADDRESS             ProtectEndAddress;
@@ -425,26 +426,19 @@ InitProtectedMemRange (
   UINT64                           Low4KBPageSize;
   MEMORY_PROTECTION_RANGE          MemProtectionRange;
 
-  NumberOfDescriptors      = 0;
+  MemoryMap                = NULL;
+  MemoryMapSize            = 0;
+  DescriptorSize           = 0;
   NumberOfAddedDescriptors = mSmmCpuSmramRangeCount;
   NumberOfSpliteRange      = 0;
-  //MemorySpaceMap           = NULL;
 
   //
-  // Get MMIO ranges from GCD and add them into protected memory ranges.
+  // Get MMIO ranges and add them into protected memory ranges.
   //
-  // TODO:
-  /*
-  gDS->GetMemorySpaceMap (
-         &NumberOfDescriptors,
-         &MemorySpaceMap
-         );
-  for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
-      NumberOfAddedDescriptors++;
-    }
-  }
-  */
+  SmmGetMmioRanges (&MemoryMap, &MemoryMapSize, &DescriptorSize);
+  ASSERT (MemoryMap != NULL && (MemoryMapSize % DescriptorSize == 0));
+
+  NumberOfAddedDescriptors += (MemoryMapSize / DescriptorSize);
 
   if (NumberOfAddedDescriptors != 0) {
     TotalSize           = NumberOfAddedDescriptors * sizeof (MEMORY_PROTECTION_RANGE) + sizeof (mProtectionMemRangeTemplate);
@@ -488,19 +482,21 @@ InitProtectedMemRange (
     //
     // Create MMIO ranges which are set to present and execution-disable.
     //
-    /*
-    for (Index = 0; Index < NumberOfDescriptors; Index++) {
-      if (MemorySpaceMap[Index].GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) {
-        continue;
-      }
-
-      mProtectionMemRange[NumberOfProtectRange].Range.Base = MemorySpaceMap[Index].BaseAddress;
-      mProtectionMemRange[NumberOfProtectRange].Range.Top  = MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length;
+    for (Index = 0; Index < MemoryMapSize / DescriptorSize; Index++) {
+      ASSERT (MemoryMap[Index].Type == EfiMemoryMappedIO);
+      mProtectionMemRange[NumberOfProtectRange].Range.Base = MemoryMap[Index].PhysicalStart;
+      mProtectionMemRange[NumberOfProtectRange].Range.Top  = MemoryMap[Index].PhysicalStart + EFI_PAGES_TO_SIZE ((UINTN)MemoryMap[Index].NumberOfPages);
       mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
       mProtectionMemRange[NumberOfProtectRange].Nx         = TRUE;
       NumberOfProtectRange++;
     }
-    */
+
+    //
+    // Free the MemoryMap
+    //
+    if (MemoryMap != NULL) {
+      FreePool (MemoryMap);
+    }
 
     //
     // Check and updated actual protected memory ranges count
@@ -582,6 +578,68 @@ InitProtectedMemRange (
   }
 }
 
+VOID
+SmmProfileSetMemoryAttributes (
+  UINT64         StartAddress,
+  UINT64         EndAddress
+  )
+{
+  RETURN_STATUS  Status;
+  UINTN          Index;
+  UINTN          PageTable;
+  UINT64         Base;
+  UINT64         Length;
+  UINT64         PreviousAddress;
+  UINT64         MemoryAttr;
+
+  PreviousAddress = StartAddress;
+
+  PageTable = AsmReadCr3 ();
+
+  for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
+    MemoryAttr = 0;
+    if (mProtectionMemRange[Index].Nx == TRUE) {
+      MemoryAttr |= EFI_MEMORY_XP;
+    }
+
+    if (mProtectionMemRange[Index].Present == FALSE) {
+      MemoryAttr = EFI_MEMORY_RP;
+    }
+
+    Base   = mProtectionMemRange[Index].Range.Base;
+    Length = mProtectionMemRange[Index].Range.Top - Base;
+    if (MemoryAttr != 0) {
+      Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttr, TRUE, NULL);
+      ASSERT_RETURN_ERROR (Status);
+    }
+
+    if (Base > PreviousAddress) {
+      //
+      // Mark the ranges not in mProtectionMemRange as non-present.
+      //
+      MemoryAttr = EFI_MEMORY_RP;
+      Status         = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, MemoryAttr, TRUE, NULL);
+      ASSERT_RETURN_ERROR (Status);
+    }
+
+    PreviousAddress = Base + Length;
+  }
+
+  //
+  // Set the last remaining range
+  //
+  MemoryAttr = EFI_MEMORY_RP;
+  if (PreviousAddress < EndAddress) {
+    Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, EndAddress - PreviousAddress, MemoryAttr, TRUE, NULL);
+    ASSERT_RETURN_ERROR (Status);
+  }
+
+  //
+  // Flush TLB
+  //
+  CpuFlushTlb ();
+}
+
 /**
   Update page table according to protected memory ranges and the 4KB-page mapped memory ranges.
 
@@ -591,106 +649,44 @@ InitPaging (
   VOID
   )
 {
-  RETURN_STATUS  Status;
-  UINTN          Index;
-  UINTN          PageTable;
-  UINT64         Base;
-  UINT64         Length;
-  UINT64         Limit;
-  UINT64         PreviousAddress;
-  UINT64         MemoryAttrMask;
-  BOOLEAN        WriteProtect;
-  BOOLEAN        CetEnabled;
+  BOOLEAN                WriteProtect;
+  BOOLEAN                CetEnabled;;
+  UINT64                 StartAddress;
+  UINT64                 EndAddress;
+
+  DEBUG ((DEBUG_INFO, "InitPaging Start...\n"));
 
   PERF_FUNCTION_BEGIN ();
-
-  PageTable = AsmReadCr3 ();
-  if (sizeof (UINTN) == sizeof (UINT32)) {
-    Limit = BASE_4GB;
-  } else {
-    Limit = (IsRestrictedMemoryAccess ()) ? LShiftU64 (1, mPhysicalAddressBits) : BASE_4GB;
-  }
 
   WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
   //
   // [0, 4k] may be non-present.
   //
-  PreviousAddress = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
+  StartAddress = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
 
-  DEBUG ((DEBUG_INFO, "Patch page table start ...\n"));
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-    for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
-      MemoryAttrMask = 0;
-      if (mProtectionMemRange[Index].Nx == TRUE) {
-        MemoryAttrMask |= EFI_MEMORY_XP;
-      }
-
-      if (mProtectionMemRange[Index].Present == FALSE) {
-        MemoryAttrMask = EFI_MEMORY_RP;
-      }
-
-      Base   = mProtectionMemRange[Index].Range.Base;
-      Length = mProtectionMemRange[Index].Range.Top - Base;
-      if (MemoryAttrMask != 0) {
-        Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttrMask, TRUE, NULL);
-        ASSERT_RETURN_ERROR (Status);
-      }
-
-      if (Base > PreviousAddress) {
-        //
-        // Mark the ranges not in mProtectionMemRange as non-present.
-        //
-        MemoryAttrMask = EFI_MEMORY_RP;
-        Status         = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, MemoryAttrMask, TRUE, NULL);
-        ASSERT_RETURN_ERROR (Status);
-      }
-
-      PreviousAddress = Base + Length;
-    }
-
-    //
-    // This assignment is for setting the last remaining range
-    //
-    MemoryAttrMask = EFI_MEMORY_RP;
+  if (sizeof (UINTN) == sizeof (UINT32)) {
+    EndAddress = BASE_4GB;
   } else {
-    MemoryAttrMask = EFI_MEMORY_XP;
-    for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
-      Base = mSmmCpuSmramRanges[Index].CpuStart;
-      if (Base > PreviousAddress) {
-        //
-        // Mark the ranges not in mSmmCpuSmramRanges as NX.
-        //
-        Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, MemoryAttrMask, TRUE, NULL);
-        ASSERT_RETURN_ERROR (Status);
-      }
-
-      PreviousAddress = mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize;
-    }
+    EndAddress = (IsRestrictedMemoryAccess ()) ? LShiftU64 (1, mPhysicalAddressBits) : BASE_4GB;
   }
 
-  if (PreviousAddress < Limit) {
-    //
-    // Set the last remaining range to EFI_MEMORY_RP/EFI_MEMORY_XP.
-    // This path applies to both SmmProfile enable/disable case.
-    //
-    Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Limit - PreviousAddress, MemoryAttrMask, TRUE, NULL);
-    ASSERT_RETURN_ERROR (Status);
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    SmmProfileSetMemoryAttributes (StartAddress, EndAddress);
+  } else {
+    SetUefiMemMapAttributes (StartAddress, EndAddress);
   }
 
-  WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
-
-  //
-  // Flush TLB
-  //
-  CpuFlushTlb ();
-  DEBUG ((DEBUG_INFO, "Patch page table done!\n"));
   //
   // Set execute-disable flag
   //
   mXdEnabled = TRUE;
 
+  WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
+
   PERF_FUNCTION_END ();
+
+  DEBUG ((DEBUG_INFO, "InitPaging Done.\n"));
 }
 
 /**
@@ -748,10 +744,6 @@ InitSmmProfileCallBack (
                         &mSmmProfileBase
                         );
 
-  //
-  // Initialize protected memory range for patching page table later.
-  //
-  InitProtectedMemRange ();
 
   return EFI_SUCCESS;
 }
@@ -870,10 +862,11 @@ InitSmmProfileInternal (
 /**
   Check if feature is supported by a processor.
 
+  @param CpuIndex        The index of the CPU.
 **/
 VOID
 CheckFeatureSupported (
-  VOID
+  IN UINTN  CpuIndex
   )
 {
   UINT32                         RegEax;
@@ -940,6 +933,20 @@ CheckFeatureSupported (
         //
         mBtsSupported = FALSE;
       }
+    }
+  }
+
+  if (mSmmCodeAccessCheckEnable) {
+    if (!SmmCpuFeaturesIsSmmRegisterSupported (CpuIndex, SmmRegFeatureControl)) {
+      mSmmCodeAccessCheckEnable = FALSE;
+    }
+
+    //
+    // Check to see if the CPU supports the SMM Code Access Check feature
+    // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
+    //
+    if ((AsmReadMsr64 (EFI_MSR_SMM_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) == 0) {
+      mSmmCodeAccessCheckEnable = FALSE;
     }
   }
 }

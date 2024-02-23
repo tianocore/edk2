@@ -97,11 +97,6 @@ UINTN  mMaxNumberOfCpus = 0;
 UINTN  mNumberOfCpus    = 0;
 
 //
-// SMM ready to lock flag
-//
-BOOLEAN  mSmmReadyToLock = FALSE;
-
-//
 // Global used to cache PCD for SMM Code Access Check enable
 //
 BOOLEAN  mSmmCodeAccessCheckEnable = FALSE;
@@ -131,9 +126,6 @@ UINT8  mPhysicalAddressBits;
 
 SMM_CPU_FEATURE_INFO_HOB    *mSmmCpuFeatureInfoHob = NULL;
 
-NON_MMRAM_MAP               *mNonMmramMap = NULL;
-
-EFI_HANDLE                  mNonMmramMapHandle     = NULL;
 EFI_HANDLE                  mSmiCmdPortHandle      = NULL;
 
 /**
@@ -378,7 +370,12 @@ SmmInitHandler (
         //
         // Check XD and BTS features on each processor on normal boot
         //
-        CheckFeatureSupported ();
+        CheckFeatureSupported (Index);
+
+        //
+        // Perform the remaining tasks for SMM Initialization
+        //
+        PerformRemainingTasksForSmiInit (Index, IsBsp);
       } else if (IsBsp) {
         //
         // BSP rebase is already done above.
@@ -427,6 +424,11 @@ ExecuteFirstSmiInit (
   ZeroMem ((VOID *)mSmmInitialized, sizeof (BOOLEAN) * mMaxNumberOfCpus);
 
   //
+  // Initialize the lock used to serialize the MSR programming in BSP and all APs
+  //
+  InitializeSpinLock (mConfigSmmCodeAccessCheckLock);
+
+  //
   // Get the BSP ApicId.
   //
   mBspApicId = GetApicId ();
@@ -446,111 +448,6 @@ ExecuteFirstSmiInit (
   }
 
   PERF_FUNCTION_END ();
-}
-
-/**
-  Communication service between MM and DXE.
-
-  Caution: This function may receive untrusted input.
-  Communicate buffer and buffer size are external input, so this function will do basic validation.
-
-  @param[in]      DispatchHandle    The unique handle assigned to this handler by SmiHandlerRegister().
-  @param[in]      RegisterContext   Points to an optional handler context which was specified when the
-                                    handler was registered.
-  @param[in, out] CommBuffer        A pointer to a collection of data in memory that will
-                                    be conveyed from a non-SMM environment into an SMM environment.
-  @param[in, out] CommBufferSize    The size of the CommBuffer.
-
-  @retval EFI_SUCCESS               The interrupt was handled and quiesced. No other handlers
-                                    should still be called.
-  @retval EFI_UNSUPPORTED           An unknown test function was requested.
-  @retval EFI_ACCESS_DENIED         Part of the communication buffer lies in an invalid region.
-  @retval EFI_ABORTED               Fail to wait for all AP check in SMM.
-
-**/
-EFI_STATUS
-EFIAPI
-NonMmramMapCommunicate (
-  IN     EFI_HANDLE  DispatchHandle,
-  IN     CONST VOID  *RegisterContext,
-  IN OUT VOID        *CommBuffer,
-  IN OUT UINTN       *CommBufferSize
-  )
-{
-  UINTN                             TempCommBufferSize;
-  UINTN                             NonMmramMapSize;
-  NON_MMRAM_MAP                     *SmmCommBuffer;
-
-  DEBUG ((DEBUG_INFO, "%a - Enter\n", __func__));
-
-  //
-  // If input is invalid, stop processing this SMI
-  //
-  if ((CommBuffer == NULL) || (CommBufferSize == NULL)) {
-    return EFI_SUCCESS;
-  }
-
-  SmmCommBuffer = (NON_MMRAM_MAP *)CommBuffer;
-
-  TempCommBufferSize = *CommBufferSize;
-  NonMmramMapSize    = SmmCommBuffer->NumberOfEntry * sizeof (NON_MMRAM_MAP_ENTRY) + sizeof (UINT64);
-
-  if (TempCommBufferSize != NonMmramMapSize) {
-    DEBUG ((DEBUG_ERROR, "%a: MM Communication buffer size is invalid for this handler!\n", __func__));
-    return EFI_ACCESS_DENIED;
-  }
-
-  if (!IsBufferOutsideMmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
-    DEBUG ((DEBUG_ERROR, "%a: - MM Communication buffer in invalid location!\n", __func__));
-    return EFI_ACCESS_DENIED;
-  }
-
-  mNonMmramMap = AllocateCopyPool (*CommBufferSize , (VOID *) SmmCommBuffer);
-  ASSERT (mNonMmramMap != NULL);
-
-  return EFI_SUCCESS;
-}
-
-/**
-  SMM Ready To Lock event notification handler.
-
-  The CPU S3 data is copied to SMRAM for security and mSmmReadyToLock is set to
-  perform additional lock actions that must be performed from SMM on the next SMI.
-
-  @param[in] Protocol   Points to the protocol's unique identifier.
-  @param[in] Interface  Points to the interface instance.
-  @param[in] Handle     The handle on which the interface was installed.
-
-  @retval EFI_SUCCESS   Notification handler runs successfully.
- **/
-EFI_STATUS
-EFIAPI
-SmmReadyToLockEventNotify (
-  IN CONST EFI_GUID  *Protocol,
-  IN VOID            *Interface,
-  IN EFI_HANDLE      Handle
-  )
-{
-  // GetAcpiCpuData (); /// TODO: cleanup S3 code even from DXE_SMM_DRIVER
-
-  //
-  // Cache a copy of UEFI memory map before we start profiling feature.
-  //
-  // GetUefiMemoryMap ();
-
-  if (mNonMmramMapHandle != NULL) {
-    gMmst->MmiHandlerUnRegister (mNonMmramMapHandle);
-  }
-
-  if (mSmiCmdPortHandle != NULL) {
-    gMmst->MmiHandlerUnRegister (mSmiCmdPortHandle);
-  }
-
-  //
-  // Set SMM ready to lock flag and return
-  //
-  mSmmReadyToLock = TRUE;
-  return EFI_SUCCESS;
 }
 
 /**
@@ -845,7 +742,6 @@ PiSmmCpuEntryCommon (
   UINTN              TileDataSize;
   UINTN              TileSize;
   UINT8              *Stacks;
-  VOID               *Registration;
   UINT32             RegEax;
   UINT32             RegEbx;
   UINT32             RegEcx;
@@ -1330,26 +1226,6 @@ PiSmmCpuEntryCommon (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Register SMM Ready To Lock Protocol notification
-  //
-  Status = gMmst->MmRegisterProtocolNotify (
-                    &gEfiSmmReadyToLockProtocolGuid,
-                    SmmReadyToLockEventNotify,
-                    &Registration
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-// Register a MMI handler to communicate the NON_MMRAM_MAP info
-  //
-  Status = gMmst->MmiHandlerRegister (
-                    NonMmramMapCommunicate,
-                    &gNonMmramMapGuid,
-                    &mNonMmramMapHandle
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Initialize SMM Profile feature
   //
   InitSmmProfile (Cr3);
@@ -1538,26 +1414,6 @@ ConfigSmmCodeAccessCheck (
   // Check to see if the Feature Control MSR is supported on this CPU
   //
   Index = gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu;
-  if (!SmmCpuFeaturesIsSmmRegisterSupported (Index, SmmRegFeatureControl)) {
-    mSmmCodeAccessCheckEnable = FALSE;
-    PERF_FUNCTION_END ();
-    return;
-  }
-
-  //
-  // Check to see if the CPU supports the SMM Code Access Check feature
-  // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
-  //
-  if ((AsmReadMsr64 (EFI_MSR_SMM_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) == 0) {
-    mSmmCodeAccessCheckEnable = FALSE;
-    PERF_FUNCTION_END ();
-    return;
-  }
-
-  //
-  // Initialize the lock used to serialize the MSR programming in BSP and all APs
-  //
-  InitializeSpinLock (mConfigSmmCodeAccessCheckLock);
 
   //
   // Acquire Config SMM Code Access Check spin lock.  The BSP will release the
@@ -1636,82 +1492,6 @@ AllocateCodePages (
   }
 
   return (VOID *)(UINTN)Memory;
-}
-
-/**
-  Perform the remaining tasks.
-
-**/
-VOID
-PerformRemainingTasks (
-  VOID
-  )
-{
-  if (mSmmReadyToLock) {
-    PERF_FUNCTION_BEGIN ();
-
-    //
-    // Check if all Aps enter SMM. In Relaxed-AP Sync Mode, BSP will not wait for
-    // all Aps arrive. However,PerformRemainingTasks() needs to wait all Aps arrive before calling
-    // SetMemMapAttributes() and ConfigSmmCodeAccessCheck() when mSmmReadyToLock
-    // is true. In SetMemMapAttributes(), SmmSetMemoryAttributesEx() will call
-    // FlushTlbForAll() that need to start up the aps. So it need to let all
-    // aps arrive. Same as SetMemMapAttributes(), ConfigSmmCodeAccessCheck()
-    // also will start up the aps.
-    //
-    if (EFI_ERROR (SmmCpuRendezvous (NULL, TRUE))) {
-      DEBUG ((DEBUG_ERROR, "PerformRemainingTasks: fail to wait for all AP check in SMM!\n"));
-    }
-
-    //
-    // Start SMM Profile feature
-    //
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-      SmmProfileStart ();
-    }
-
-    //
-    // Create a mix of 2MB and 4KB page table. Update some memory ranges absent and execute-disable.
-    //
-    InitPaging ();
-
-    //
-    // Mark critical region to be read-only in page table
-    //
-    SetMemMapAttributes ();
-
-    if (IsRestrictedMemoryAccess ()) {
-      //
-      // For outside SMRAM, we only map SMM communication buffer or MMIO.
-      //
-      SetUefiMemMapAttributes ();
-
-      //
-      // Set page table itself to be read-only
-      //
-      SetPageTableAttributes ();
-    }
-
-    //
-    // Configure SMM Code Access Check feature if available.
-    //
-    ConfigSmmCodeAccessCheck ();
-
-    //
-    // Measure performance of SmmCpuFeaturesCompleteSmmReadyToLock() from caller side
-    // as the implementation is provided by platform.
-    //
-    PERF_START (NULL, "SmmCompleteReadyToLock", NULL, 0);
-    SmmCpuFeaturesCompleteSmmReadyToLock ();
-    PERF_END (NULL, "SmmCompleteReadyToLock", NULL, 0);
-
-    //
-    // Clean SMM ready to lock flag
-    //
-    mSmmReadyToLock = FALSE;
-
-    PERF_FUNCTION_END ();
-  }
 }
 
 /**

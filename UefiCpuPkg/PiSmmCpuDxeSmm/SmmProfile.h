@@ -83,9 +83,19 @@ PageFaultIdtHandlerSmmProfile (
 /**
   Check if feature is supported by a processor.
 
+  @param CpuIndex        The index of the CPU.
 **/
 VOID
 CheckFeatureSupported (
+  IN UINTN  CpuIndex
+  );
+
+/**
+  Initialize the protected memory ranges and the 4KB-page mapped memory ranges.
+
+**/
+VOID
+InitProtectedMemRange (
   VOID
   );
 

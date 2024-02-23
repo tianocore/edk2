@@ -7,26 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PiSmmCpuCommon.h"
 
-//
-// attributes for reserved memory before it is promoted to system memory
-//
-/*
-#define EFI_MEMORY_PRESENT      0x0100000000000000ULL
-#define EFI_MEMORY_INITIALIZED  0x0200000000000000ULL
-#define EFI_MEMORY_TESTED       0x0400000000000000ULL
-
-#define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
-  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
-
-EFI_MEMORY_DESCRIPTOR  *mUefiMemoryMap;
-UINTN                  mUefiMemoryMapSize;
-UINTN                  mUefiDescriptorSize;
-
-EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *mGcdMemSpace       = NULL;
-UINTN                            mGcdMemNumberOfDesc = 0;
-
-EFI_MEMORY_ATTRIBUTES_TABLE  *mUefiMemoryAttributesTable = NULL;
-*/
 BOOLEAN      mIsShadowStack      = FALSE;
 BOOLEAN      m5LevelPagingNeeded = FALSE;
 PAGING_MODE  mPagingMode         = PagingModeMax;
@@ -1013,10 +993,13 @@ SetMemMapWithNonPresentRange (
 
 /**
   This function sets memory attribute according to MemoryAttributesTable.
+
+  @param  MemoryAttributesTable  A pointer to the buffer of SmmMemoryAttributesTable.
+
 **/
 VOID
 SetMemMapAttributes (
-  VOID
+  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable
   )
 {
   EFI_MEMORY_DESCRIPTOR                 *MemoryMap;
@@ -1024,7 +1007,6 @@ SetMemMapAttributes (
   UINTN                                 MemoryMapEntryCount;
   UINTN                                 DescriptorSize;
   UINTN                                 Index;
-  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
   UINTN                                 PageTable;
   EFI_STATUS                            Status;
   IA32_MAP_ENTRY                        *Map;
@@ -1033,11 +1015,7 @@ SetMemMapAttributes (
   BOOLEAN                               WriteProtect;
   BOOLEAN                               CetEnabled;
 
-  SmmGetSystemConfigurationTable (&gEdkiiPiSmmMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
-  if (MemoryAttributesTable == NULL) {
-    DEBUG ((DEBUG_INFO, "MemoryAttributesTable - NULL\n"));
-    return;
-  }
+  ASSERT (MemoryAttributesTable != NULL);
 
   PERF_FUNCTION_BEGIN ();
 
@@ -1127,8 +1105,6 @@ SetMemMapAttributes (
   @param  MemoryMapSize          Size, in bytes, of the MemoryMap buffer.
   @param  DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 **/
-/*
-STATIC
 VOID
 SortMemoryMap (
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
@@ -1158,346 +1134,6 @@ SortMemoryMap (
     MemoryMapEntry     = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
     NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
   }
-}
-*/
-
-/**
-  Return if a UEFI memory page should be marked as not present in SMM page table.
-  If the memory map entries type is
-  EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
-  EfiUnusableMemory, EfiACPIReclaimMemory, return TRUE.
-  Or return FALSE.
-
-  @param[in]  MemoryMap              A pointer to the memory descriptor.
-
-  @return TRUE  The memory described will be marked as not present in SMM page table.
-  @return FALSE The memory described will not be marked as not present in SMM page table.
-**/
-/*
-BOOLEAN
-IsUefiPageNotPresent (
-  IN EFI_MEMORY_DESCRIPTOR  *MemoryMap
-  )
-{
-  switch (MemoryMap->Type) {
-    case EfiLoaderCode:
-    case EfiLoaderData:
-    case EfiBootServicesCode:
-    case EfiBootServicesData:
-    case EfiConventionalMemory:
-    case EfiUnusableMemory:
-    case EfiACPIReclaimMemory:
-      return TRUE;
-    default:
-      return FALSE;
-  }
-}
-*/
-
-/**
-  Merge continuous memory map entries whose type is
-  EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
-  EfiUnusableMemory, EfiACPIReclaimMemory, because the memory described by
-  these entries will be set as NOT present in SMM page table.
-
-  @param[in, out]  MemoryMap              A pointer to the buffer in which firmware places
-                                          the current memory map.
-  @param[in, out]  MemoryMapSize          A pointer to the size, in bytes, of the
-                                          MemoryMap buffer. On input, this is the size of
-                                          the current memory map.  On output,
-                                          it is the size of new memory map after merge.
-  @param[in]       DescriptorSize         Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
-**/
-/*
-STATIC
-VOID
-MergeMemoryMapForNotPresentEntry (
-  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
-  IN OUT UINTN                  *MemoryMapSize,
-  IN UINTN                      DescriptorSize
-  )
-{
-  EFI_MEMORY_DESCRIPTOR  *MemoryMapEntry;
-  EFI_MEMORY_DESCRIPTOR  *MemoryMapEnd;
-  UINT64                 MemoryBlockLength;
-  EFI_MEMORY_DESCRIPTOR  *NewMemoryMapEntry;
-  EFI_MEMORY_DESCRIPTOR  *NextMemoryMapEntry;
-
-  MemoryMapEntry    = MemoryMap;
-  NewMemoryMapEntry = MemoryMap;
-  MemoryMapEnd      = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + *MemoryMapSize);
-  while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
-    CopyMem (NewMemoryMapEntry, MemoryMapEntry, sizeof (EFI_MEMORY_DESCRIPTOR));
-    NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
-
-    do {
-      MemoryBlockLength = (UINT64)(EFI_PAGES_TO_SIZE ((UINTN)MemoryMapEntry->NumberOfPages));
-      if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
-          IsUefiPageNotPresent (MemoryMapEntry) && IsUefiPageNotPresent (NextMemoryMapEntry) &&
-          ((MemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart))
-      {
-        MemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
-        if (NewMemoryMapEntry != MemoryMapEntry) {
-          NewMemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
-        }
-
-        NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
-        continue;
-      } else {
-        MemoryMapEntry = PREVIOUS_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
-        break;
-      }
-    } while (TRUE);
-
-    MemoryMapEntry    = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
-    NewMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NewMemoryMapEntry, DescriptorSize);
-  }
-
-  *MemoryMapSize = (UINTN)NewMemoryMapEntry - (UINTN)MemoryMap;
-
-  return;
-}
-*/
-
-/**
-  This function caches the GCD memory map information.
-**/
-/*
-VOID
-GetGcdMemoryMap (
-  VOID
-  )
-{
-  UINTN                            NumberOfDescriptors;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemSpaceMap;
-  EFI_STATUS                       Status;
-  UINTN                            Index;
-
-  Status = gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemSpaceMap);
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  mGcdMemNumberOfDesc = 0;
-  for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if ((MemSpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeReserved) &&
-        ((MemSpaceMap[Index].Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
-         (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED))
-        )
-    {
-      mGcdMemNumberOfDesc++;
-    }
-  }
-
-  mGcdMemSpace = AllocateZeroPool (mGcdMemNumberOfDesc * sizeof (EFI_GCD_MEMORY_SPACE_DESCRIPTOR));
-  ASSERT (mGcdMemSpace != NULL);
-  if (mGcdMemSpace == NULL) {
-    mGcdMemNumberOfDesc = 0;
-    gBS->FreePool (MemSpaceMap);
-    return;
-  }
-
-  mGcdMemNumberOfDesc = 0;
-  for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if ((MemSpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeReserved) &&
-        ((MemSpaceMap[Index].Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
-         (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED))
-        )
-    {
-      CopyMem (
-        &mGcdMemSpace[mGcdMemNumberOfDesc],
-        &MemSpaceMap[Index],
-        sizeof (EFI_GCD_MEMORY_SPACE_DESCRIPTOR)
-        );
-      mGcdMemNumberOfDesc++;
-    }
-  }
-
-  gBS->FreePool (MemSpaceMap);
-}
-*/
-
-/**
-  Get UEFI MemoryAttributesTable.
-**/
-/*
-VOID
-GetUefiMemoryAttributesTable (
-  VOID
-  )
-{
-  EFI_STATUS                   Status;
-  EFI_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
-  UINTN                        MemoryAttributesTableSize;
-
-  Status = EfiGetSystemConfigurationTable (&gEfiMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
-  if (!EFI_ERROR (Status) && (MemoryAttributesTable != NULL)) {
-    MemoryAttributesTableSize  = sizeof (EFI_MEMORY_ATTRIBUTES_TABLE) + MemoryAttributesTable->DescriptorSize * MemoryAttributesTable->NumberOfEntries;
-    mUefiMemoryAttributesTable = AllocateCopyPool (MemoryAttributesTableSize, MemoryAttributesTable);
-    ASSERT (mUefiMemoryAttributesTable != NULL);
-  }
-}
-*/
-
-/**
-  This function caches the UEFI memory map information.
-**/
-/*
-VOID
-GetUefiMemoryMap (
-  VOID
-  )
-{
-  EFI_STATUS             Status;
-  UINTN                  MapKey;
-  UINT32                 DescriptorVersion;
-  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
-  UINTN                  UefiMemoryMapSize;
-
-  DEBUG ((DEBUG_INFO, "GetUefiMemoryMap\n"));
-
-  UefiMemoryMapSize = 0;
-  MemoryMap         = NULL;
-  Status            = gBS->GetMemoryMap (
-                             &UefiMemoryMapSize,
-                             MemoryMap,
-                             &MapKey,
-                             &mUefiDescriptorSize,
-                             &DescriptorVersion
-                             );
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-
-  do {
-    Status = gBS->AllocatePool (EfiBootServicesData, UefiMemoryMapSize, (VOID **)&MemoryMap);
-    ASSERT (MemoryMap != NULL);
-    if (MemoryMap == NULL) {
-      return;
-    }
-
-    Status = gBS->GetMemoryMap (
-                    &UefiMemoryMapSize,
-                    MemoryMap,
-                    &MapKey,
-                    &mUefiDescriptorSize,
-                    &DescriptorVersion
-                    );
-    if (EFI_ERROR (Status)) {
-      gBS->FreePool (MemoryMap);
-      MemoryMap = NULL;
-    }
-  } while (Status == EFI_BUFFER_TOO_SMALL);
-
-  if (MemoryMap == NULL) {
-    return;
-  }
-
-  SortMemoryMap (MemoryMap, UefiMemoryMapSize, mUefiDescriptorSize);
-  MergeMemoryMapForNotPresentEntry (MemoryMap, &UefiMemoryMapSize, mUefiDescriptorSize);
-
-  mUefiMemoryMapSize = UefiMemoryMapSize;
-  mUefiMemoryMap     = AllocateCopyPool (UefiMemoryMapSize, MemoryMap);
-  ASSERT (mUefiMemoryMap != NULL);
-
-  gBS->FreePool (MemoryMap);
-
-  //
-  // Get additional information from GCD memory map.
-  //
-  GetGcdMemoryMap ();
-
-  //
-  // Get UEFI memory attributes table.
-  //
-  GetUefiMemoryAttributesTable ();
-}
-*/
-
-/**
-  This function sets UEFI memory attribute according to UEFI memory map.
-
-  The normal memory region is marked as not present, such as
-  EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
-  EfiUnusableMemory, EfiACPIReclaimMemory.
-**/
-VOID
-SetUefiMemMapAttributes (
-  VOID
-  )
-{
-  EFI_STATUS             Status;
-  UINTN                  Index;
-  UINT64                 Attribute;
-  BOOLEAN                WriteProtect;
-  BOOLEAN                CetEnabled;
-
-  PERF_FUNCTION_BEGIN ();
-
-  DEBUG ((DEBUG_INFO, "SetUefiMemMapAttributes\n"));
-
-  WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
-
-  if (mNonMmramMap == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: mNonMmramMap is NULL!\n", __func__));
-    return;
-  }
-
-  for (Index = 0; Index < mNonMmramMap->NumberOfEntry; Index++) {
-
-    Attribute = mNonMmramMap->Entry[Index].Attribute;
-    ASSERT ((Attribute & (EFI_MEMORY_RP | EFI_MEMORY_RO)) != 0);
-
-    Status = SmmSetMemoryAttributes (
-                mNonMmramMap->Entry[Index].PhysicalStart,
-                EFI_PAGES_TO_SIZE ((UINTN)mNonMmramMap->Entry[Index].NumberOfPages),
-                Attribute
-                );
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
-
-  //
-  // Do not free mUefiMemoryAttributesTable, it will be checked in IsSmmCommBufferForbiddenAddress().
-  //
-
-  PERF_FUNCTION_END ();
-}
-
-/**
-  Return if the Address is forbidden as SMM communication buffer.
-
-  @param[in] Address the address to be checked
-
-  @return TRUE  The address is forbidden as SMM communication buffer.
-  @return FALSE The address is allowed as SMM communication buffer.
-**/
-BOOLEAN
-IsSmmCommBufferForbiddenAddress (
-  IN UINT64  Address
-  )
-{
-
-  UINTN                  Index;
-  UINT64                 Attribute;
-
-  if (mNonMmramMap == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: mNonMmramMap is NULL!\n", __func__));
-    ASSERT (FALSE);
-    return FALSE;
-  }
-
-  for (Index = 0; Index < mNonMmramMap->NumberOfEntry; Index++) {
-    Attribute = mNonMmramMap->Entry[Index].Attribute;
-    ASSERT ((Attribute & (EFI_MEMORY_RP | EFI_MEMORY_RO)) != 0);
-
-    if ((Address >= mNonMmramMap->Entry[Index].PhysicalStart) &&
-        (Address < mNonMmramMap->Entry[Index].PhysicalStart + EFI_PAGES_TO_SIZE ((UINTN)mNonMmramMap->Entry[Index].NumberOfPages)) &&
-        ((Attribute & EFI_MEMORY_RP) != 0)) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
 }
 
 /**

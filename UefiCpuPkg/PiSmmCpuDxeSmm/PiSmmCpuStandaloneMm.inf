@@ -43,6 +43,7 @@
   SmmMp.c
   SmmMpPerf.h
   SmmMpPerf.c
+  NonMmramMapStandaloneMm.c
 
 [Sources.X64]
   X64/PageTbl.c
@@ -105,7 +106,7 @@
   gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
   gEfiSmmSmramMemoryGuid
   gSmmCpuFeatureInfoGuid
-  gNonMmramMapGuid
+  #gNonMmramMapGuid
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES
