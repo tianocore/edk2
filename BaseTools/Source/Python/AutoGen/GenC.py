@@ -1371,6 +1371,14 @@ def CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH):
     else:
         if Info.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC, SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION]:
             AutoGenC.Append(gLibraryString[SUP_MODULE_BASE].Replace(Dict))
+            if Info.ModuleType == SUP_MODULE_SEC and Info.AutoGenVersion >= 0x0001001E:
+                AutoGenH.Append(("\n"
+                                 "// ProcessLibraryConstructorList() declared here because SEC has no standard entry point.\n"
+                                 "VOID\n"
+                                 "EFIAPI\n"
+                                 "ProcessLibraryConstructorList (\n"
+                                 "  VOID\n"
+                                 "  );\n"))
         elif Info.ModuleType in SUP_MODULE_SET_PEI:
             AutoGenC.Append(gLibraryString['PEI'].Replace(Dict))
         elif Info.ModuleType in [SUP_MODULE_DXE_CORE, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER,
