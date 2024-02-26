@@ -250,7 +250,9 @@ EmmcFlushBlocksEx (
   function shall return EFI_DEVICE_ERROR.
 
   @param[in]  This                         Indicates a pointer to the calling context.
-  @param[in]  MediaId                      ID of the medium to receive data from.
+  @param[in]  MediaId                      ID of the medium to receive data from. If there is no
+                                           block IO protocol supported by the physical device, the
+                                           value of MediaId is undefined.
   @param[in]  Timeout                      The timeout, in 100ns units, to use for the execution
                                            of the security protocol command. A Timeout value of 0
                                            means that this function will wait indefinitely for the
@@ -337,7 +339,9 @@ EmmcSecurityProtocolInOut (
   function shall return EFI_DEVICE_ERROR.
 
   @param  This                         Indicates a pointer to the calling context.
-  @param  MediaId                      ID of the medium to receive data from.
+  @param  MediaId                      ID of the medium to receive data from. If there is no
+                                       block IO protocol supported by the physical device, the
+                                       value of MediaId is undefined.
   @param  Timeout                      The timeout, in 100ns units, to use for the execution
                                        of the security protocol command. A Timeout value of 0
                                        means that this function will wait indefinitely for the
@@ -417,7 +421,9 @@ EmmcSecurityProtocolIn (
   shall return EFI_DEVICE_ERROR.
 
   @param  This                         Indicates a pointer to the calling context.
-  @param  MediaId                      ID of the medium to receive data from.
+  @param  MediaId                      ID of the medium to receive data from. If there is no
+                                       block IO protocol supported by the physical device, the
+                                       value of MediaId is undefined.
   @param  Timeout                      The timeout, in 100ns units, to use for the execution
                                        of the security protocol command. A Timeout value of 0
                                        means that this function will wait indefinitely for the
