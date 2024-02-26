@@ -9,7 +9,7 @@
 DEFAULT REL
 SECTION .text
 
-%define TDVMCALL_EXPOSE_REGS_MASK       0xffec
+%define TDVMCALL_EXPOSE_REGS_MASK       0xffcc
 %define TDVMCALL                        0x0
 
 %macro tdcall 0
