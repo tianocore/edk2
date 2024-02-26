@@ -47,7 +47,7 @@
 [Guids]
   gMmCoreDataHobGuid
   gEfiSmmSmramMemoryGuid
-  gMmCommunicationBufferGuid
+  gEdkiiCommunicationBufferGuid
   gEdkiiEventMmDispatchGuid
 
 [Ppis]
@@ -59,6 +59,7 @@
   gEfiMmEndOfPeiProtocol
 
 [Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFixedCommBufferPages
 
 [Depex]
   gEfiPeiMpServicesPpiGuid AND gPeiSmmControlPpiGuid

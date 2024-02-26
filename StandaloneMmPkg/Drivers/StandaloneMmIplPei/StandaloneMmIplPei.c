@@ -759,15 +759,16 @@ StandaloneMmIplPeiEntry (
     );
 
   //
-  // Allocate reserved memory for communicate buffer
+  // Allocate runtime memory for communicate buffer
   //
-  mCommunicateBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedPages (4);
+  mCommunicateBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateRuntimePages (PcdGet32 (PcdFixedCommBufferPages));
   ASSERT (mCommunicateBuffer != 0);
 
   HobList.Raw = GetHobList ();
   while ((Hob = (EFI_HOB_MEMORY_ALLOCATION *)(UINTN)GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, HobList.Raw)) != NULL) {
-    if ((Hob->AllocDescriptor.MemoryBaseAddress == mCommunicateBuffer) && (Hob->AllocDescriptor.MemoryType == EfiReservedMemoryType)) {
-      CopyMem (&(Hob->AllocDescriptor.Name), &gMmCommunicationBufferGuid, sizeof (EFI_GUID));
+    if ((Hob->AllocDescriptor.MemoryBaseAddress == mCommunicateBuffer) && (Hob->AllocDescriptor.MemoryType == EfiRuntimeServicesData)) {
+      CopyMem (&(Hob->AllocDescriptor.Name), &gEdkiiCommunicationBufferGuid, sizeof (EFI_GUID));
+      break;
     }
 
     HobList.Raw = GET_NEXT_HOB (HobList);

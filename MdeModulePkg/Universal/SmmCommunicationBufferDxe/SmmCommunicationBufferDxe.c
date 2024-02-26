@@ -61,8 +61,10 @@ SmmCommunicationBufferEntryPoint (
 
   HobList.Raw = GetHobList ();
   while ((Hob = (EFI_HOB_MEMORY_ALLOCATION *)(UINTN)GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, HobList.Raw)) != NULL) {
-    if (CompareGuid (&(Hob->AllocDescriptor.Name), &gMmCommunicationBufferGuid) && (Hob->AllocDescriptor.MemoryType == EfiReservedMemoryType)) {
+    if (CompareGuid (&(Hob->AllocDescriptor.Name), &gEdkiiCommunicationBufferGuid) && (Hob->AllocDescriptor.MemoryType == EfiRuntimeServicesData)) {
       CommunicateBuffer = Hob->AllocDescriptor.MemoryBaseAddress;
+      DEBUG ((DEBUG_INFO, "CommunicateBuffer:(0x%lx)\n", CommunicateBuffer));
+      break;
     }
 
     HobList.Raw = GET_NEXT_HOB (HobList);

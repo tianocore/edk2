@@ -455,7 +455,7 @@
   gBootDiscoveryPolicyMgrFormsetGuid = { 0x5b6f7107, 0xbb3c, 0x4660, { 0x92, 0xcd, 0x54, 0x26, 0x90, 0x28, 0x0b, 0xbd } }
 
   ## GUID used for DXE/SMM communicate buffer.
-  gMmCommunicationBufferGuid = { 0x6c2a2520, 0x0131, 0x4aee, { 0xa7, 0x50, 0xcc, 0x38, 0x4a, 0xac, 0xe8, 0xc6 }}
+  gEdkiiCommunicationBufferGuid = { 0x6c2a2520, 0x0131, 0x4aee, { 0xa7, 0x50, 0xcc, 0x38, 0x4a, 0xac, 0xe8, 0xc6 }}
 
 [Ppis]
   ## Include/Ppi/FirmwareVolumeShadowPpi.h
@@ -1630,6 +1630,10 @@
   ## The Retry Count of AHCI command if there is a failure
   # @Prompt The value of Retry Count,  Default value is 5.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAhciCommandRetryCount|5|UINT32|0x00000032
+
+  ## The pages for MM communication buffer, buffer size default is 512K (128 Pages).
+  # @Prompt The value of pages,  Default value is 128.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFixedCommBufferPages|128|UINT32|0x00000033
 
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
