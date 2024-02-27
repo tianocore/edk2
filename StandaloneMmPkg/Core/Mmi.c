@@ -154,9 +154,14 @@ MmiManage (
     Head = &MmiEntry->MmiHandlers;
   }
 
-  for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
+  for (Link = Head->ForwardLink; Link != Head;) {
     MmiHandler = CR (Link, MMI_HANDLER, Link, MMI_HANDLER_SIGNATURE);
-
+    //
+    // To support unregister MMI handler inside MMI handler itself,
+    // get next node before handler is executed, since LIST_ENTRY that
+    // Link points to may be freed if unregister MMI handler.
+    //
+    Link   = Link->ForwardLink;
     Status = MmiHandler->Handler (
                            (EFI_HANDLE)MmiHandler,
                            Context,
