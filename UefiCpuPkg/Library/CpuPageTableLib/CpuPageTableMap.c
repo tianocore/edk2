@@ -26,52 +26,59 @@ PageTableLibSetPte4K (
   IN IA32_MAP_ATTRIBUTE  *Mask
   )
 {
+  IA32_PTE_4K  LocalPte4K;
+
+  LocalPte4K.Uint64 = Pte4K->Uint64;
   if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
-    Pte4K->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (Pte4K->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_40);
+    LocalPte4K.Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (Pte4K->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_40);
   }
 
   if (Mask->Bits.Present) {
-    Pte4K->Bits.Present = Attribute->Bits.Present;
+    LocalPte4K.Bits.Present = Attribute->Bits.Present;
   }
 
   if (Mask->Bits.ReadWrite) {
-    Pte4K->Bits.ReadWrite = Attribute->Bits.ReadWrite;
+    LocalPte4K.Bits.ReadWrite = Attribute->Bits.ReadWrite;
   }
 
   if (Mask->Bits.UserSupervisor) {
-    Pte4K->Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
+    LocalPte4K.Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
   }
 
   if (Mask->Bits.WriteThrough) {
-    Pte4K->Bits.WriteThrough = Attribute->Bits.WriteThrough;
+    LocalPte4K.Bits.WriteThrough = Attribute->Bits.WriteThrough;
   }
 
   if (Mask->Bits.CacheDisabled) {
-    Pte4K->Bits.CacheDisabled = Attribute->Bits.CacheDisabled;
+    LocalPte4K.Bits.CacheDisabled = Attribute->Bits.CacheDisabled;
   }
 
   if (Mask->Bits.Accessed) {
-    Pte4K->Bits.Accessed = Attribute->Bits.Accessed;
+    LocalPte4K.Bits.Accessed = Attribute->Bits.Accessed;
   }
 
   if (Mask->Bits.Dirty) {
-    Pte4K->Bits.Dirty = Attribute->Bits.Dirty;
+    LocalPte4K.Bits.Dirty = Attribute->Bits.Dirty;
   }
 
   if (Mask->Bits.Pat) {
-    Pte4K->Bits.Pat = Attribute->Bits.Pat;
+    LocalPte4K.Bits.Pat = Attribute->Bits.Pat;
   }
 
   if (Mask->Bits.Global) {
-    Pte4K->Bits.Global = Attribute->Bits.Global;
+    LocalPte4K.Bits.Global = Attribute->Bits.Global;
   }
 
   if (Mask->Bits.ProtectionKey) {
-    Pte4K->Bits.ProtectionKey = Attribute->Bits.ProtectionKey;
+    LocalPte4K.Bits.ProtectionKey = Attribute->Bits.ProtectionKey;
   }
 
   if (Mask->Bits.Nx) {
-    Pte4K->Bits.Nx = Attribute->Bits.Nx;
+    LocalPte4K.Bits.Nx = Attribute->Bits.Nx;
+  }
+
+  if (Pte4K->Uint64 != LocalPte4K.Uint64) {
+    Pte4K->Uint64 = LocalPte4K.Uint64;
   }
 }
 
@@ -93,54 +100,61 @@ PageTableLibSetPleB (
   IN IA32_MAP_ATTRIBUTE                 *Mask
   )
 {
+  IA32_PAGE_LEAF_ENTRY_BIG_PAGESIZE  LocalPleB;
+
+  LocalPleB.Uint64 = PleB->Uint64;
   if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
-    PleB->Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (PleB->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_39);
+    LocalPleB.Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (PleB->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_39);
   }
 
-  PleB->Bits.MustBeOne = 1;
+  LocalPleB.Bits.MustBeOne = 1;
 
   if (Mask->Bits.Present) {
-    PleB->Bits.Present = Attribute->Bits.Present;
+    LocalPleB.Bits.Present = Attribute->Bits.Present;
   }
 
   if (Mask->Bits.ReadWrite) {
-    PleB->Bits.ReadWrite = Attribute->Bits.ReadWrite;
+    LocalPleB.Bits.ReadWrite = Attribute->Bits.ReadWrite;
   }
 
   if (Mask->Bits.UserSupervisor) {
-    PleB->Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
+    LocalPleB.Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
   }
 
   if (Mask->Bits.WriteThrough) {
-    PleB->Bits.WriteThrough = Attribute->Bits.WriteThrough;
+    LocalPleB.Bits.WriteThrough = Attribute->Bits.WriteThrough;
   }
 
   if (Mask->Bits.CacheDisabled) {
-    PleB->Bits.CacheDisabled = Attribute->Bits.CacheDisabled;
+    LocalPleB.Bits.CacheDisabled = Attribute->Bits.CacheDisabled;
   }
 
   if (Mask->Bits.Accessed) {
-    PleB->Bits.Accessed = Attribute->Bits.Accessed;
+    LocalPleB.Bits.Accessed = Attribute->Bits.Accessed;
   }
 
   if (Mask->Bits.Dirty) {
-    PleB->Bits.Dirty = Attribute->Bits.Dirty;
+    LocalPleB.Bits.Dirty = Attribute->Bits.Dirty;
   }
 
   if (Mask->Bits.Pat) {
-    PleB->Bits.Pat = Attribute->Bits.Pat;
+    LocalPleB.Bits.Pat = Attribute->Bits.Pat;
   }
 
   if (Mask->Bits.Global) {
-    PleB->Bits.Global = Attribute->Bits.Global;
+    LocalPleB.Bits.Global = Attribute->Bits.Global;
   }
 
   if (Mask->Bits.ProtectionKey) {
-    PleB->Bits.ProtectionKey = Attribute->Bits.ProtectionKey;
+    LocalPleB.Bits.ProtectionKey = Attribute->Bits.ProtectionKey;
   }
 
   if (Mask->Bits.Nx) {
-    PleB->Bits.Nx = Attribute->Bits.Nx;
+    LocalPleB.Bits.Nx = Attribute->Bits.Nx;
+  }
+
+  if (PleB->Uint64 != LocalPleB.Uint64) {
+    PleB->Uint64 = LocalPleB.Uint64;
   }
 }
 
@@ -186,24 +200,27 @@ PageTableLibSetPnle (
   IN IA32_MAP_ATTRIBUTE        *Mask
   )
 {
+  IA32_PAGE_NON_LEAF_ENTRY  LocalPnle;
+
+  LocalPnle.Uint64 = Pnle->Uint64;
   if (Mask->Bits.Present) {
-    Pnle->Bits.Present = Attribute->Bits.Present;
+    LocalPnle.Bits.Present = Attribute->Bits.Present;
   }
 
   if (Mask->Bits.ReadWrite) {
-    Pnle->Bits.ReadWrite = Attribute->Bits.ReadWrite;
+    LocalPnle.Bits.ReadWrite = Attribute->Bits.ReadWrite;
   }
 
   if (Mask->Bits.UserSupervisor) {
-    Pnle->Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
+    LocalPnle.Bits.UserSupervisor = Attribute->Bits.UserSupervisor;
   }
 
   if (Mask->Bits.Nx) {
-    Pnle->Bits.Nx = Attribute->Bits.Nx;
+    LocalPnle.Bits.Nx = Attribute->Bits.Nx;
   }
 
-  Pnle->Bits.Accessed   = 0;
-  Pnle->Bits.MustBeZero = 0;
+  LocalPnle.Bits.Accessed   = 0;
+  LocalPnle.Bits.MustBeZero = 0;
 
   //
   // Set the attributes (WT, CD, A) to 0.
@@ -211,8 +228,11 @@ PageTableLibSetPnle (
   // So, it implictly requires PAT[0] is Write Back.
   // Create a new parameter if caller requires to use a different memory type for accessing page directories.
   //
-  Pnle->Bits.WriteThrough  = 0;
-  Pnle->Bits.CacheDisabled = 0;
+  LocalPnle.Bits.WriteThrough  = 0;
+  LocalPnle.Bits.CacheDisabled = 0;
+  if (Pnle->Uint64 != LocalPnle.Uint64) {
+    Pnle->Uint64 = LocalPnle.Uint64;
+  }
 }
 
 /**
@@ -274,7 +294,7 @@ IsAttributesAndMaskValidForNonPresentEntry (
                                     Page table entries that map the linear address range are reset to 0 before set to the new attribute
                                     when a new physical base address is set.
   @param[in]      Mask              The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
-  @param[out]     IsModified        TRUE means page table is modified. FALSE means page table is not modified.
+  @param[in, out] IsModified        Change IsModified to True if page table is modified and input parameter Modify is TRUE.
 
   @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 0 but some other attributes are provided.
   @retval RETURN_INVALID_PARAMETER  For non-present range, Mask->Bits.Present is 1, Attribute->Bits.Present is 1 but some other attributes are not provided.
@@ -294,7 +314,7 @@ PageTableLibMapInLevel (
   IN     UINT64              Offset,
   IN     IA32_MAP_ATTRIBUTE  *Attribute,
   IN     IA32_MAP_ATTRIBUTE  *Mask,
-  OUT    BOOLEAN             *IsModified
+  IN OUT BOOLEAN             *IsModified
   )
 {
   RETURN_STATUS       Status;
@@ -567,7 +587,10 @@ PageTableLibMapInLevel (
         OriginalCurrentPagingEntry.Uint64 = CurrentPagingEntry->Uint64;
         PageTableLibSetPle (Level, CurrentPagingEntry, Offset, Attribute, &CurrentMask);
 
-        if (OriginalCurrentPagingEntry.Uint64 != CurrentPagingEntry->Uint64) {
+        if (Modify && (OriginalCurrentPagingEntry.Uint64 != CurrentPagingEntry->Uint64)) {
+          //
+          // The page table entry can be changed by this function only when Modify is true.
+          //
           *IsModified = TRUE;
         }
       }
@@ -609,7 +632,10 @@ PageTableLibMapInLevel (
   // Check if ParentPagingEntry entry is modified here is enough. Except the changes happen in leaf PagingEntry during
   // the while loop, if there is any other change happens in page table, the ParentPagingEntry must has been modified.
   //
-  if (OriginalParentPagingEntry.Uint64 != ParentPagingEntry->Uint64) {
+  if (Modify && (OriginalParentPagingEntry.Uint64 != ParentPagingEntry->Uint64)) {
+    //
+    // The page table entry can be changed by this function only when Modify is true.
+    //
     *IsModified = TRUE;
   }
 
@@ -620,6 +646,7 @@ PageTableLibMapInLevel (
   Create or update page table to map [LinearAddress, LinearAddress + Length) with specified attribute.
 
   @param[in, out] PageTable      The pointer to the page table to update, or pointer to NULL if a new page table is to be created.
+                                 If not pointer to NULL, the value it points to won't be changed in this function.
   @param[in]      PagingMode     The paging mode.
   @param[in]      Buffer         The free buffer to be used for page table creation/updating.
   @param[in, out] BufferSize     The buffer size.
@@ -633,7 +660,9 @@ PageTableLibMapInLevel (
                                  Page table entries that map the linear address range are reset to 0 before set to the new attribute
                                  when a new physical base address is set.
   @param[in]      Mask           The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
-  @param[out]     IsModified     TRUE means page table is modified. FALSE means page table is not modified.
+  @param[out]     IsModified     TRUE means page table is modified by software or hardware. FALSE means page table is not modified by software.
+                                 If the output IsModified is FALSE, there is possibility that the page table is changed by hardware. It is ok
+                                 because page table can be changed by hardware anytime, and caller don't need to Flush TLB.
 
   @retval RETURN_UNSUPPORTED        PagingMode is not supported.
   @retval RETURN_INVALID_PARAMETER  PageTable, BufferSize, Attribute or Mask is NULL.

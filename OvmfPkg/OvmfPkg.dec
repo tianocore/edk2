@@ -29,6 +29,10 @@
   ##  @libraryclass  Verify blobs read from the VMM
   BlobVerifierLib|Include/Library/BlobVerifierLib.h
 
+  ##  @libraryclass  FdtSerialPortAddressLib
+  #
+  FdtSerialPortAddressLib|Include/Library/FdtSerialPortAddressLib.h
+
   ##  @libraryclass  Loads and boots a Linux kernel image
   #
   LoadLinuxLib|Include/Library/LoadLinuxLib.h
@@ -385,6 +389,34 @@
   # exposed by QEMU
   #
   gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|0x0|BOOLEAN|0x69
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  #
+  # This is the physical address where the device tree is expected to be stored
+  # upon first entry into UEFI. This needs to be a FixedAtBuild PCD, so that we
+  # can do a first pass over the device tree in the SEC phase to discover the
+  # UART base address.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x0|UINT64|0x6e
+
+  #
+  # Padding in bytes to add to the device tree allocation, so that the DTB can
+  # be modified in place (default: 256 bytes)
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeAllocationPadding|256|UINT32|0x6f
+
+  #
+  # Binary representation of the GUID that determines the terminal type. The
+  # size must be exactly 16 bytes. The default value corresponds to
+  # EFI_VT_100_GUID.
+  #
+  gUefiOvmfPkgTokenSpaceGuid.PcdTerminalTypeGuidBuffer|{0x65, 0x60, 0xA6, 0xDF, 0x19, 0xB4, 0xD3, 0x11, 0x9A, 0x2D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D}|VOID*|0x66
+
+  ##
+  # Whether the EFI memory attributes protocol should be uninstalled before
+  # invoking the OS loader. This may be needed to work around problematic
+  # builds of shim that use the protocol incorrectly.
+  gUefiOvmfPkgTokenSpaceGuid.PcdUninstallMemAttrProtocol|FALSE|BOOLEAN|0x67
 
 [PcdsFeatureFlag]
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE|BOOLEAN|0x1c

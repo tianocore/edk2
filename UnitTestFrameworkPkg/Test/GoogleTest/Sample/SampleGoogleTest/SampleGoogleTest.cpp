@@ -7,7 +7,7 @@
 
 **/
 
-#include <gtest/gtest.h>
+#include <Library/GoogleTestLib.h>
 extern "C" {
   #include <Uefi.h>
   #include <Library/BaseLib.h>
@@ -229,7 +229,7 @@ TEST_P (MacroTestsAssertsEnabledDisabled, MacroExpectNoAssertFailure) {
 }
 
 /**
-  Sample unit test using the ASSERT_DEATH() macro to test expected ASSERT()s.
+  Sample unit test using the EXPECT_ANY_THROW() macro to test expected ASSERT()s.
 **/
 TEST_P (MacroTestsAssertsEnabledDisabled, MacroExpectAssertFailure) {
   //
@@ -242,14 +242,35 @@ TEST_P (MacroTestsAssertsEnabledDisabled, MacroExpectAssertFailure) {
   //
   // This test passes because it directly triggers an ASSERT().
   //
-  ASSERT_DEATH (ASSERT (FALSE), "");
+  EXPECT_ANY_THROW (ASSERT (FALSE));
 
   //
   // This test passes because DecimalToBcd() generates an ASSERT() if the
   // value passed in is >= 100.  The expected ASSERT() is caught by the unit
-  // test framework and ASSERT_DEATH() returns without an error.
+  // test framework and EXPECT_ANY_THROW() returns without an error.
   //
-  ASSERT_DEATH (DecimalToBcd8 (101), "");
+  EXPECT_ANY_THROW (DecimalToBcd8 (101));
+
+  //
+  // This test passes because DecimalToBcd() generates an ASSERT() if the
+  // value passed in is >= 100.  The expected ASSERT() is caught by the unit
+  // test framework and throws the C++ exception of type std::runtime_error.
+  // EXPECT_THROW() returns without an error.
+  //
+  EXPECT_THROW (DecimalToBcd8 (101), std::runtime_error);
+
+  //
+  // This test passes because DecimalToBcd() generates an ASSERT() if the
+  // value passed in is >= 100.  The expected ASSERT() is caught by the unit
+  // test framework and throws the C++ exception of type std::runtime_error with
+  // a message that includes the filename, linenumber, and the expression that
+  // triggered the ASSERT().
+  //
+  // EXPECT_THROW_MESSAGE() calls DecimalToBcd() expecting DecimalToBds() to
+  // throw a C++ exception of type std::runtime_error with a message that
+  // includes the expression of "Value < 100" that triggered the ASSERT().
+  //
+  EXPECT_THROW_MESSAGE (DecimalToBcd8 (101), "Value < 100");
 }
 
 INSTANTIATE_TEST_SUITE_P (
@@ -266,6 +287,11 @@ TEST (MacroTestsMessages, MacroTraceMessage) {
   // Example of logging.
   //
   SCOPED_TRACE ("SCOPED_TRACE message\n");
+
+  //
+  // Always pass
+  //
+  ASSERT_TRUE (TRUE);
 }
 
 int

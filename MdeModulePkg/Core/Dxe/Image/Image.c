@@ -77,12 +77,13 @@ typedef struct {
 } MACHINE_TYPE_INFO;
 
 GLOBAL_REMOVE_IF_UNREFERENCED MACHINE_TYPE_INFO  mMachineTypeInfo[] = {
-  { EFI_IMAGE_MACHINE_IA32,           L"IA32"    },
-  { EFI_IMAGE_MACHINE_IA64,           L"IA64"    },
-  { EFI_IMAGE_MACHINE_X64,            L"X64"     },
-  { EFI_IMAGE_MACHINE_ARMTHUMB_MIXED, L"ARM"     },
-  { EFI_IMAGE_MACHINE_AARCH64,        L"AARCH64" },
-  { EFI_IMAGE_MACHINE_RISCV64,        L"RISCV64" },
+  { EFI_IMAGE_MACHINE_IA32,           L"IA32"        },
+  { EFI_IMAGE_MACHINE_IA64,           L"IA64"        },
+  { EFI_IMAGE_MACHINE_X64,            L"X64"         },
+  { EFI_IMAGE_MACHINE_ARMTHUMB_MIXED, L"ARM"         },
+  { EFI_IMAGE_MACHINE_AARCH64,        L"AARCH64"     },
+  { EFI_IMAGE_MACHINE_RISCV64,        L"RISCV64"     },
+  { EFI_IMAGE_MACHINE_LOONGARCH64,    L"LOONGARCH64" },
 };
 
 UINT16  mDxeCoreImageMachineType = 0;

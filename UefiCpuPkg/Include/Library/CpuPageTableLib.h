@@ -46,11 +46,17 @@ typedef enum {
   // High byte in paging mode indicates the max levels of the page table.
   // Low byte in paging mode indicates the max level that can be a leaf entry.
   //
-  PagingPae = 0x0302,
+  PagingPae4KB = 0x0301,
+  PagingPae2MB = 0x0302,
+  PagingPae    = 0x0302,
 
+  Paging4Level4KB = 0x0401,
+  Paging4Level2MB = 0x0402,
   Paging4Level    = 0x0402,
   Paging4Level1GB = 0x0403,
 
+  Paging5Level4KB = 0x0501,
+  Paging5Level2MB = 0x0502,
   Paging5Level    = 0x0502,
   Paging5Level1GB = 0x0503,
 
@@ -61,6 +67,7 @@ typedef enum {
   Create or update page table to map [LinearAddress, LinearAddress + Length) with specified attribute.
 
   @param[in, out] PageTable      The pointer to the page table to update, or pointer to NULL if a new page table is to be created.
+                                 If not pointer to NULL, the value it points to won't be changed in this function.
   @param[in]      PagingMode     The paging mode.
   @param[in]      Buffer         The free buffer to be used for page table creation/updating.
   @param[in, out] BufferSize     The buffer size.
@@ -74,7 +81,9 @@ typedef enum {
                                  Page table entries that map the linear address range are reset to 0 before set to the new attribute
                                  when a new physical base address is set.
   @param[in]      Mask           The mask used for attribute. The corresponding field in Attribute is ignored if that in Mask is 0.
-  @param[out]     IsModified     TRUE means page table is modified. FALSE means page table is not modified.
+  @param[out]     IsModified     TRUE means page table is modified by software or hardware. FALSE means page table is not modified by software.
+                                 If the output IsModified is FALSE, there is possibility that the page table is changed by hardware. It is ok
+                                 because page table can be changed by hardware anytime, and caller don't need to Flush TLB.
 
   @retval RETURN_UNSUPPORTED        PagingMode is not supported.
   @retval RETURN_INVALID_PARAMETER  PageTable, BufferSize, Attribute or Mask is NULL.

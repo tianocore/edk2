@@ -160,22 +160,18 @@ class WorkspaceAutoGen(AutoGen):
 
     def CollectPlatformGuids(self):
         oriInfList = []
-        oriPkgSet = set()
-        PlatformPkg = set()
+        pkgSet = set()
         for Arch in self.ArchList:
             Platform = self.BuildDatabase[self.MetaFile, Arch, self.BuildTarget, self.ToolChain]
             oriInfList = Platform.Modules
             for ModuleFile in oriInfList:
                 ModuleData = self.BuildDatabase[ModuleFile, Platform._Arch, Platform._Target, Platform._Toolchain]
-                oriPkgSet.update(ModuleData.Packages)
-                for Pkg in oriPkgSet:
-                    Guids = Pkg.Guids
-                    GlobalData.gGuidDict.update(Guids)
+                pkgSet.update(ModuleData.Packages)
             if Platform.Packages:
-                PlatformPkg.update(Platform.Packages)
-                for Pkg in PlatformPkg:
-                    Guids = Pkg.Guids
-                    GlobalData.gGuidDict.update(Guids)
+                pkgSet.update(Platform.Packages)
+        for Pkg in pkgSet:
+            Guids = Pkg.Guids
+            GlobalData.gGuidDict.update(Guids)
 
     @cached_property
     def FdfProfile(self):

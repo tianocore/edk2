@@ -29,7 +29,6 @@
   QemuKernel.c
 
 [Packages]
-  ArmVirtPkg/ArmVirtPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
@@ -56,15 +55,15 @@
   UefiRuntimeServicesTableLib
 
 [FixedPcd]
-  gArmVirtTokenSpaceGuid.PcdUninstallMemAttrProtocol
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+  gUefiOvmfPkgTokenSpaceGuid.PcdUninstallMemAttrProtocol
 
 [Pcd]
-  gArmVirtTokenSpaceGuid.PcdTerminalTypeGuidBuffer
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gUefiOvmfPkgTokenSpaceGuid.PcdTerminalTypeGuidBuffer
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
