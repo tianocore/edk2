@@ -144,6 +144,7 @@ MmLoadImage (
              &DstBuffer
              );
   if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
     return Status;
   }
 
