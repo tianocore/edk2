@@ -79,7 +79,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Install Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         cache: 'pip'
@@ -136,15 +136,26 @@ jobs:
             print(f'ci_setup_supported={str(ci_setup_supported).lower()}', file=fh)
             print(f'setup_supported={str(setup_supported).lower()}', file=fh)
 
+    - name: Convert Arch to Log Format
+      id: convert_arch_hyphen
+      env:
+        ARCH_LIST: ${{ matrix.ArchList }}
+      shell: python
+      run: |
+        import os
+
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as fh:
+            print(f'arch_list={os.environ["ARCH_LIST"].replace(",", "-")}', file=fh)
+
     - name: Setup
       if: steps.get_ci_file_operations.outputs.setup_supported == 'true'
       run: stuart_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019
 
     - name: Upload Setup Log As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: (success() || failure()) && steps.get_ci_file_operations.outputs.setup_supported == 'true'
       with:
-        name: ${{ matrix.Package }}-Logs
+        name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-Setup-Log
         path: |
           **/SETUPLOG.txt
           retention-days: 7
@@ -155,10 +166,10 @@ jobs:
       run: stuart_ci_setup -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019
 
     - name: Upload CI Setup Log As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: (success() || failure()) && steps.get_ci_file_operations.outputs.ci_setup_supported == 'true'
       with:
-        name: ${{ matrix.Package }}-Logs
+        name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-CI-Setup-Log
         path: |
           **/CISETUP.txt
           retention-days: 7
@@ -168,10 +179,10 @@ jobs:
       run: stuart_update -c .pytool/CISettings.py -t DEBUG -a ${{ matrix.ArchList }} TOOL_CHAIN_TAG=VS2019
 
     - name: Upload Update Log As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
-        name: ${{ matrix.Package }}-Logs
+        name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-Update-Log
         path: |
           **/UPDATE_LOG.txt
         retention-days: 7
@@ -228,7 +239,7 @@ jobs:
 
     - name: Attempt to Load CodeQL CLI From Cache
       id: codeqlcli_cache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ${{ steps.cache_key_gen.outputs.codeql_cli_ext_dep_dir }}
         key: ${{ steps.cache_key_gen.outputs.codeql_cli_cache_key }}
@@ -284,10 +295,10 @@ jobs:
         delete_dirs(build_path)
 
     - name: Upload Build Logs As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: success() || failure()
       with:
-        name: ${{ matrix.Package }}-Logs
+        name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-Build-Logs
         path: |
           **/BUILD_REPORT.TXT
           **/OVERRIDELOG.TXT
@@ -329,10 +340,10 @@ jobs:
                 print(f'upload_sarif_file=false', file=fh)
 
     - name: Upload CodeQL Results (SARIF) As An Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: steps.env_data.outputs.upload_sarif_file == 'true'
       with:
-        name: ${{ matrix.Package }}-CodeQL-SARIF
+        name: ${{ matrix.Package }}-${{ steps.convert_arch_hyphen.outputs.arch_list }}-CodeQL-SARIF
         path: |
           ${{ steps.env_data.outputs.emacs_file_path }}
           ${{ steps.env_data.outputs.sarif_file_path }}
@@ -340,7 +351,7 @@ jobs:
         if-no-files-found: warn
 
     - name: Upload CodeQL Results (SARIF) To GitHub Code Scanning
-      uses: github/codeql-action/upload-sarif@v2
+      uses: github/codeql-action/upload-sarif@v3
       if: steps.env_data.outputs.upload_sarif_file == 'true'
       with:
         # Path to SARIF file relative to the root of the repository.
