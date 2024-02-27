@@ -320,6 +320,54 @@ MmEndOfDxeHandler (
 }
 
 /**
+  Install LoadedImage protocol for MM Core.
+**/
+VOID
+MmCoreInstallLoadedImage (
+  VOID
+  )
+{
+  EFI_STATUS           Status;
+  EFI_MM_DRIVER_ENTRY  *MmCoreDriverEntry;
+
+  //
+  // Allocate a Loaded Image Protocol in MM
+  //
+  Status = MmAllocatePool (EfiRuntimeServicesData, sizeof (EFI_MM_DRIVER_ENTRY), (VOID **)&MmCoreDriverEntry);
+  ASSERT_EFI_ERROR (Status);
+
+  ZeroMem (MmCoreDriverEntry, sizeof (EFI_MM_DRIVER_ENTRY));
+  //
+  // Fill in the remaining fields of the Loaded Image Protocol instance.
+  //
+  MmCoreDriverEntry->Signature                 = EFI_MM_DRIVER_ENTRY_SIGNATURE;
+  MmCoreDriverEntry->LoadedImage->Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
+  MmCoreDriverEntry->LoadedImage->ParentHandle = NULL;
+  MmCoreDriverEntry->LoadedImage->SystemTable  = NULL;
+
+  MmCoreDriverEntry->LoadedImage->ImageBase     = (VOID *)(UINTN)gMmCorePrivate->MmCoreImageBase;
+  MmCoreDriverEntry->LoadedImage->ImageSize     = gMmCorePrivate->MmCoreImageSize;
+  MmCoreDriverEntry->LoadedImage->ImageCodeType = EfiRuntimeServicesCode;
+  MmCoreDriverEntry->LoadedImage->ImageDataType = EfiRuntimeServicesData;
+
+  MmCoreDriverEntry->ImageEntryPoint = gMmCorePrivate->MmCoreEntryPoint;
+  MmCoreDriverEntry->ImageBuffer     = gMmCorePrivate->MmCoreImageBase;
+  MmCoreDriverEntry->NumberOfPage    = EFI_SIZE_TO_PAGES ((UINTN)gMmCorePrivate->MmCoreImageSize);
+
+  //
+  // Create a new image handle in the MM handle database for the MM Driver
+  //
+  MmCoreDriverEntry->ImageHandle = NULL;
+  Status                         = MmInstallProtocolInterface (
+                                     &MmCoreDriverEntry->ImageHandle,
+                                     &gEfiLoadedImageProtocolGuid,
+                                     EFI_NATIVE_INTERFACE,
+                                     MmCoreDriverEntry->LoadedImage
+                                     );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
   The main entry point to MM Foundation.
 
   Note: This function is only used by MMRAM invocation.  It is never used by DXE invocation.
@@ -654,6 +702,8 @@ StandaloneMmMain (
                );
     DEBUG ((DEBUG_INFO, "MmiHandlerRegister - GUID %g - Status %d\n", mMmCoreMmiHandlers[Index].HandlerType, Status));
   }
+
+  MmCoreInstallLoadedImage ();
 
   DEBUG ((DEBUG_INFO, "MmMain Done!\n"));
 
