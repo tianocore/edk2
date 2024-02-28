@@ -20,6 +20,7 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/HobLib.h>
+#include <Library/MmHobProducerLib.h>
 #include <Library/MmUnblockMemoryLib.h>
 #include <Protocol/SmmCommunication.h>
 #include <Guid/MmCoreData.h>
@@ -489,6 +490,7 @@ ExecuteSmmCoreFromSmram (
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
   UINTN                         PageCount;
   VOID                          *HobList;
+  VOID                          *MmHobList;
   EFI_PHYSICAL_ADDRESS          SourceFvBaseAddress;
 
   Status = PeiServicesGetHobList (&HobList);
@@ -574,6 +576,12 @@ ExecuteSmmCoreFromSmram (
       gMmCorePrivate->MmCoreEntryPoint = ImageContext.EntryPoint;
 
       //
+      // Create the HOB list which StandaloneMm Core needed.
+      //
+      MmHobList = CreateMmCoreHobList (HobList);
+      ASSERT (MmHobList != NULL);
+
+      //
       // Print debug message showing Standalone MM Core entry point address.
       //
       DEBUG ((DEBUG_INFO, "SMM IPL calling Standalone MM Core at SMRAM address - 0x%016lx\n", gMmCorePrivate->MmCoreEntryPoint));
@@ -581,7 +589,7 @@ ExecuteSmmCoreFromSmram (
       //
       // Execute image
       //
-      LoadSmmCore (ImageContext.EntryPoint, HobList);
+      LoadSmmCore (ImageContext.EntryPoint, MmHobList);
     }
   }
 
