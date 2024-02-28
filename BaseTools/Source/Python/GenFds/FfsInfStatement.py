@@ -93,7 +93,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
                 if ModuleType != SUP_MODULE_USER_DEFINED and ModuleType != SUP_MODULE_HOST_APPLICATION:
                     for LibraryClass in PlatformDataBase.LibraryClasses.GetKeys():
-                        if LibraryClass.startswith("NULL") and PlatformDataBase.LibraryClasses[LibraryClass, ModuleType]:
+                        if LibraryClass.startswith("NULL") and LibraryClass[4:].isdigit() and PlatformDataBase.LibraryClasses[LibraryClass, ModuleType]:
                             self.InfModule.LibraryClasses[LibraryClass] = PlatformDataBase.LibraryClasses[LibraryClass, ModuleType]
 
                 StrModule = str(self.InfModule)
@@ -101,7 +101,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 if StrModule in PlatformDataBase.Modules:
                     PlatformModule = PlatformDataBase.Modules[StrModule]
                     for LibraryClass in PlatformModule.LibraryClasses:
-                        if LibraryClass.startswith("NULL"):
+                        if LibraryClass.startswith("NULL") and LibraryClass[4:].isdigit():
                             self.InfModule.LibraryClasses[LibraryClass] = PlatformModule.LibraryClasses[LibraryClass]
 
                 DependencyList = [self.InfModule]
