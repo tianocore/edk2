@@ -15,6 +15,7 @@
 
 EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
 EFI_GUID  mMpHandOffGuid       = MP_HANDOFF_GUID;
+EFI_GUID  mMpHandOffConfigGuid = MP_HANDOFF_CONFIG_GUID;
 
 /**
   Save the volatile registers required to be restored following INIT IPI.
@@ -1935,11 +1936,13 @@ GetBspNumber (
   This procedure allows the AP to switch to another section of
   memory and continue its loop there.
 
-  @param[in] FirstMpHandOff  Pointer to first MP hand-off HOB body.
+  @param[in] MpHandOffConfig  Pointer to MP hand-off config HOB body.
+  @param[in] FirstMpHandOff   Pointer to first MP hand-off HOB body.
 **/
 VOID
 SwitchApContext (
-  IN CONST MP_HAND_OFF  *FirstMpHandOff
+  IN CONST MP_HAND_OFF_CONFIG  *MpHandOffConfig,
+  IN CONST MP_HAND_OFF         *FirstMpHandOff
   )
 {
   UINTN              Index;
@@ -1955,7 +1958,7 @@ SwitchApContext (
     for (Index = 0; Index < MpHandOff->CpuCount; Index++) {
       if (MpHandOff->ProcessorIndex + Index != BspNumber) {
         *(UINTN *)(UINTN)MpHandOff->Info[Index].StartupProcedureAddress = (UINTN)SwitchContextPerAp;
-        *(UINT32 *)(UINTN)MpHandOff->Info[Index].StartupSignalAddress   = MpHandOff->StartupSignalValue;
+        *(UINT32 *)(UINTN)MpHandOff->Info[Index].StartupSignalAddress   = MpHandOffConfig->StartupSignalValue;
       }
     }
   }
@@ -1973,6 +1976,26 @@ SwitchApContext (
       }
     }
   }
+}
+
+/**
+  Get pointer to MP_HAND_OFF_CONFIG GUIDed HOB body.
+
+  @return  The pointer to MP_HAND_OFF_CONFIG structure.
+**/
+MP_HAND_OFF_CONFIG *
+GetMpHandOffConfigHob (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE  *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&mMpHandOffConfigGuid);
+  if (GuidHob == NULL) {
+    return NULL;
+  }
+
+  return (MP_HAND_OFF_CONFIG *)GET_GUID_HOB_DATA (GuidHob);
 }
 
 /**
@@ -2022,6 +2045,7 @@ MpInitLibInitialize (
   VOID
   )
 {
+  MP_HAND_OFF_CONFIG       *MpHandOffConfig;
   MP_HAND_OFF              *FirstMpHandOff;
   MP_HAND_OFF              *MpHandOff;
   CPU_INFO_IN_HOB          *CpuInfoInHob;
@@ -2239,13 +2263,24 @@ MpInitLibInitialize (
       }
     }
 
+    MpHandOffConfig = GetMpHandOffConfigHob ();
+    if (MpHandOffConfig == NULL) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: at least one MpHandOff HOB, but no MpHandOffConfig HOB\n",
+        __func__
+        ));
+      ASSERT (MpHandOffConfig != NULL);
+      CpuDeadLoop ();
+    }
+
     DEBUG ((
       DEBUG_INFO,
       "FirstMpHandOff->WaitLoopExecutionMode: %04d, sizeof (VOID *): %04d\n",
-      FirstMpHandOff->WaitLoopExecutionMode,
+      MpHandOffConfig->WaitLoopExecutionMode,
       sizeof (VOID *)
       ));
-    if (FirstMpHandOff->WaitLoopExecutionMode == sizeof (VOID *)) {
+    if (MpHandOffConfig->WaitLoopExecutionMode == sizeof (VOID *)) {
       ASSERT (CpuMpData->ApLoopMode != ApInHltLoop);
 
       CpuMpData->FinishedCount                        = 0;
@@ -2261,7 +2296,7 @@ MpInitLibInitialize (
       // enables the APs to switch to a different memory section and continue their
       // looping process there.
       //
-      SwitchApContext (FirstMpHandOff);
+      SwitchApContext (MpHandOffConfig, FirstMpHandOff);
       //
       // Wait for all APs finished initialization
       //

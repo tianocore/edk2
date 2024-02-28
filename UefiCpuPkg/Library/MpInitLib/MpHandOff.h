@@ -15,7 +15,13 @@
     0x11e2bd88, 0xed38, 0x4abd, {0xa3, 0x99, 0x21, 0xf2, 0x5f, 0xd0, 0x7a, 0x60 } \
   }
 
+#define MP_HANDOFF_CONFIG_GUID \
+  { \
+    0xdabbd793, 0x7b46, 0x4144, {0x8a, 0xd4, 0x10, 0x1c, 0x7c, 0x08, 0xeb, 0xfa } \
+  }
+
 extern EFI_GUID  mMpHandOffGuid;
+extern EFI_GUID  mMpHandOffConfigGuid;
 
 //
 // The information required to transfer from the PEI phase to the
@@ -43,8 +49,11 @@ typedef struct {
   //
   UINT32                ProcessorIndex;
   UINT32                CpuCount;
-  UINT32                WaitLoopExecutionMode;
-  UINT32                StartupSignalValue;
   PROCESSOR_HAND_OFF    Info[];
 } MP_HAND_OFF;
+
+typedef struct {
+  UINT32    WaitLoopExecutionMode;
+  UINT32    StartupSignalValue;
+} MP_HAND_OFF_CONFIG;
 #endif
