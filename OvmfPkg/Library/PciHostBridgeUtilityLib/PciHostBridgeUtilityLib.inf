@@ -42,3 +42,4 @@
   MemoryAllocationLib
   PciLib
   QemuFwCfgLib
+  TpmMeasurementLib
