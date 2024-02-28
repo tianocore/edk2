@@ -126,14 +126,15 @@ SaveCpuMpData (
   IN CPU_MP_DATA  *CpuMpData
   )
 {
-  UINT32           MaxCpusPerHob;
-  UINT32           CpusInHob;
-  UINT64           Data64;
-  UINT32           Index;
-  UINT32           HobBase;
-  CPU_INFO_IN_HOB  *CpuInfoInHob;
-  MP_HAND_OFF      *MpHandOff;
-  UINTN            MpHandOffSize;
+  UINT32              MaxCpusPerHob;
+  UINT32              CpusInHob;
+  UINT64              Data64;
+  UINT32              Index;
+  UINT32              HobBase;
+  CPU_INFO_IN_HOB     *CpuInfoInHob;
+  MP_HAND_OFF         *MpHandOff;
+  MP_HAND_OFF_CONFIG  MpHandOffConfig;
+  UINTN               MpHandOffSize;
 
   MaxCpusPerHob = (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE) - sizeof (MP_HAND_OFF)) / sizeof (PROCESSOR_HAND_OFF);
 
@@ -155,11 +156,6 @@ SaveCpuMpData (
 
       MpHandOff->ProcessorIndex = HobBase;
       MpHandOff->CpuCount       = CpusInHob;
-
-      if (CpuMpData->ApLoopMode != ApInHltLoop) {
-        MpHandOff->StartupSignalValue    = MP_HAND_OFF_SIGNAL;
-        MpHandOff->WaitLoopExecutionMode = sizeof (VOID *);
-      }
     }
 
     MpHandOff->Info[Index-HobBase].ApicId = CpuInfoInHob[Index].ApicId;
@@ -169,6 +165,18 @@ SaveCpuMpData (
       MpHandOff->Info[Index-HobBase].StartupProcedureAddress = (UINT64)(UINTN)&CpuMpData->CpuData[Index].ApFunction;
     }
   }
+
+  ZeroMem (&MpHandOffConfig, sizeof (MpHandOffConfig));
+  if (CpuMpData->ApLoopMode != ApInHltLoop) {
+    MpHandOffConfig.StartupSignalValue    = MP_HAND_OFF_SIGNAL;
+    MpHandOffConfig.WaitLoopExecutionMode = sizeof (VOID *);
+  }
+
+  BuildGuidDataHob (
+    &mMpHandOffConfigGuid,
+    (VOID *)&MpHandOffConfig,
+    sizeof (MpHandOffConfig)
+    );
 
   //
   // Build location of CPU MP DATA buffer in HOB
