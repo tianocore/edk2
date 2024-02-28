@@ -11,8 +11,12 @@
 #include <Library/DebugLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/LocalApicLib.h>
+#include <Library/CpuLib.h>
 #include <Register/Amd/Ghcb.h>
 #include <Register/Amd/Msr.h>
+#include <IndustryStandard/PageTable.h>
+#include <WorkArea.h>
 
 #include "AmdSev.h"
 
@@ -300,4 +304,69 @@ SecValidateSystemRam (
 
     MemEncryptSevSnpPreValidateSystemRam (Start, EFI_SIZE_TO_PAGES ((UINTN)(End - Start)));
   }
+}
+
+/**
+  Map known MMIO regions unencrypted if SEV-ES is active.
+
+  During early booting, page table entries default to having the encryption bit
+  set for SEV-ES/SEV-SNP guests. In cases where there is MMIO to an address, the
+  encryption bit should be cleared. Clear it here for any known MMIO accesses
+  during SEC, which is currently just the APIC base address.
+
+**/
+VOID
+SecMapMmioUnencrypted (
+  VOID
+  )
+{
+  PAGE_MAP_AND_DIRECTORY_POINTER  *Level4Entry;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *Level3Entry;
+  PAGE_MAP_AND_DIRECTORY_POINTER  *Level2Entry;
+  PAGE_TABLE_4K_ENTRY             *Level1Entry;
+  SEC_SEV_ES_WORK_AREA            *SevEsWorkArea;
+  PHYSICAL_ADDRESS                Cr3;
+  UINT64                          ApicAddress;
+  UINT64                          PgTableMask;
+  UINT32                          Level1Page;
+  UINT64                          Level1Address;
+  UINTN                           PteIndex;
+
+  if (!SevEsIsEnabled ()) {
+    return;
+  }
+
+  SevEsWorkArea = (SEC_SEV_ES_WORK_AREA *)FixedPcdGet32 (PcdSevEsWorkAreaBase);
+  ApicAddress   = (UINT64)GetLocalApicBaseAddress ();
+  Level1Page    = FixedPcdGet32 (PcdOvmfSecApicPageTableBase);
+  PgTableMask   = SevEsWorkArea->EncryptionMask | EFI_PAGE_MASK;
+
+  Cr3 = AsmReadCr3 ();
+  Level4Entry = (VOID *)(Cr3 & ~PgTableMask);
+  Level4Entry += PML4_OFFSET (ApicAddress);
+
+  Level3Entry = (VOID *)((Level4Entry->Bits.PageTableBaseAddress << 12) & ~PgTableMask);
+  Level3Entry += PDP_OFFSET (ApicAddress);
+
+  Level2Entry = (VOID *)((Level3Entry->Bits.PageTableBaseAddress << 12) & ~PgTableMask);
+  Level2Entry += PDE_OFFSET (ApicAddress);
+
+  //
+  // Get memory address including encryption bit
+  //
+  Level1Address = Level2Entry->Bits.PageTableBaseAddress << 12;
+  Level1Entry   = (VOID *)(UINTN)Level1Page;
+  for (PteIndex = 0; PteIndex < 512; PteIndex++, Level1Entry++, Level1Address += SIZE_4KB) {
+    Level1Entry->Uint64 = Level1Address;
+    Level1Entry->Bits.ReadWrite = Level2Entry->Bits.ReadWrite;
+    Level1Entry->Bits.Present   = Level2Entry->Bits.Present;
+
+    if (Level1Address < (ApicAddress + SIZE_4KB) && Level1Address >= ApicAddress) {
+      Level1Entry->Uint64 &= ~SevEsWorkArea->EncryptionMask;
+    }
+  }
+
+  Level2Entry->Uint64 = (UINT64)(UINTN)Level1Page | IA32_PG_P | IA32_PG_RW;
+
+  CpuFlushTlb ();
 }
