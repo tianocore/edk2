@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/UefiLib.h>
+#include <Guid/MmCommBuffer.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
 
 #define DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES  4
@@ -45,12 +46,12 @@ SmmCommunicationBufferEntryPoint (
   UINT32                                   DescriptorSize;
   EDKII_PI_SMM_COMMUNICATION_REGION_TABLE  *PiSmmCommunicationRegionTable;
   EFI_MEMORY_DESCRIPTOR                    *Entry;
-  EFI_PEI_HOB_POINTERS                     HobList;
-  EFI_HOB_MEMORY_ALLOCATION                *Hob;
+  EFI_HOB_GUID_TYPE                        *GuidHob;
+  MM_COMM_BUFFER_HOB_DATA                  *DataInHob;
+  MM_COMM_BUFFER_DATA                      *MmCommBufferData;
   EFI_PHYSICAL_ADDRESS                     CommunicateBuffer;
 
   DescriptorSize    = sizeof (EFI_MEMORY_DESCRIPTOR);
-  CommunicateBuffer = 0;
 
   //
   // Make sure Size != sizeof(EFI_MEMORY_DESCRIPTOR). This will
@@ -59,16 +60,11 @@ SmmCommunicationBufferEntryPoint (
   //
   DescriptorSize += sizeof (UINT64) - (DescriptorSize % sizeof (UINT64));
 
-  HobList.Raw = GetHobList ();
-  while ((Hob = (EFI_HOB_MEMORY_ALLOCATION *)(UINTN)GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, HobList.Raw)) != NULL) {
-    if (CompareGuid (&(Hob->AllocDescriptor.Name), &gEdkiiCommunicationBufferGuid) && (Hob->AllocDescriptor.MemoryType == EfiRuntimeServicesData)) {
-      CommunicateBuffer = Hob->AllocDescriptor.MemoryBaseAddress;
-      DEBUG ((DEBUG_INFO, "CommunicateBuffer:(0x%lx)\n", CommunicateBuffer));
-      break;
-    }
-
-    HobList.Raw = GET_NEXT_HOB (HobList);
-  }
+  GuidHob = GetFirstGuidHob (&gEdkiiCommunicationBufferGuid);
+  ASSERT (GuidHob != NULL);
+  DataInHob         = GET_GUID_HOB_DATA (GuidHob);
+  MmCommBufferData  = (MM_COMM_BUFFER_DATA *)(UINTN)DataInHob->Address;
+  CommunicateBuffer = MmCommBufferData->FixedCommBuffer;
 
   //
   // Allocate and fill PiSmmCommunicationRegionTable

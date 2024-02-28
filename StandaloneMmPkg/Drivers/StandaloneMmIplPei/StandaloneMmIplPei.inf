@@ -42,13 +42,14 @@
   DebugLib
   HobLib
   IntrinsicLib
+  MmUnblockMemoryLib
   MmHobProducerLib
 
 [Guids]
   gMmCoreDataHobGuid
   gEfiSmmSmramMemoryGuid
-  gEdkiiCommunicationBufferGuid
   gEdkiiEventMmDispatchGuid
+  gEdkiiCommunicationBufferGuid
 
 [Ppis]
   gPeiSmmControlPpiGuid
