@@ -935,6 +935,11 @@ SecCoreStartupWithStack (
   IoWrite8 (0xA1, 0xff);
 
   //
+  // Ensure MMIO regions are mapped unencrypted before any attempts to access them (e.g. APIC)
+  //
+  SecMapMmioUnencrypted ();
+
+  //
   // Initialize Local APIC Timer hardware and disable Local APIC Timer
   // interrupts before initializing the Debug Agent and the debug timer is
   // enabled.
