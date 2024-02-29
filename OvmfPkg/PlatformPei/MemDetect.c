@@ -184,9 +184,14 @@ GetPeiMemoryCap (
   BOOLEAN  Page1GSupport;
   UINT32   RegEax;
   UINT32   RegEdx;
-  UINT32   Pml4Entries;
-  UINT32   PdpEntries;
-  UINTN    TotalPages;
+  UINT64   MaxAddr;
+  UINT32   Level5Pages;
+  UINT32   Level4Pages;
+  UINT32   Level3Pages;
+  UINT32   Level2Pages;
+  UINT32   TotalPages;
+  UINT64   ApStacks;
+  UINT64   MemoryCap;
 
   //
   // If DXE is 32-bit, then just return the traditional 64 MB cap.
@@ -201,8 +206,7 @@ GetPeiMemoryCap (
   //
   // Dependent on physical address width, PEI memory allocations can be
   // dominated by the page tables built for 64-bit DXE. So we key the cap off
-  // of those. The code below is based on CreateIdentityMappingPageTables() in
-  // "MdeModulePkg/Core/DxeIplPeim/X64/VirtualMemory.c".
+  // of those.
   //
   Page1GSupport = FALSE;
   if (PcdGetBool (PcdUse1GPageTable)) {
@@ -215,31 +219,76 @@ GetPeiMemoryCap (
     }
   }
 
-  if (PlatformInfoHob->PhysMemAddressWidth <= 39) {
-    Pml4Entries = 1;
-    PdpEntries  = 1 << (PlatformInfoHob->PhysMemAddressWidth - 30);
-    ASSERT (PdpEntries <= 0x200);
-  } else {
-    if (PlatformInfoHob->PhysMemAddressWidth > 48) {
-      Pml4Entries = 0x200;
-    } else {
-      Pml4Entries = 1 << (PlatformInfoHob->PhysMemAddressWidth - 39);
-    }
+  //
+  // - A 4KB page accommodates the least significant 12 bits of the
+  //   virtual address.
+  // - A page table entry at any level consumes 8 bytes, so a 4KB page
+  //   table page (at any level) contains 512 entries, and
+  //   accommodates 9 bits of the virtual address.
+  // - we minimally cover the phys address space with 2MB pages, so
+  //   level 1 never exists.
+  // - If 1G paging is available, then level 2 doesn't exist either.
+  // - Start with level 2, where a page table page accommodates
+  //   9 + 9 + 12 = 30 bits of the virtual address (and covers 1GB of
+  //   physical address space).
+  //
 
-    ASSERT (Pml4Entries <= 0x200);
-    PdpEntries = 512;
+  MaxAddr     = LShiftU64 (1, PlatformInfoHob->PhysMemAddressWidth);
+  Level2Pages = (UINT32)RShiftU64 (MaxAddr, 30);
+  Level3Pages = MAX (Level2Pages >> 9, 1u);
+  Level4Pages = MAX (Level3Pages >> 9, 1u);
+  Level5Pages = 1;
+
+  if (Page1GSupport) {
+    Level2Pages = 0;
+    TotalPages  = Level5Pages + Level4Pages + Level3Pages;
+    ASSERT (TotalPages <= 0x40201);
+  } else {
+    TotalPages = Level5Pages + Level4Pages + Level3Pages + Level2Pages;
+    // PlatformAddressWidthFromCpuid() caps at 40 phys bits without 1G pages.
+    ASSERT (PlatformInfoHob->PhysMemAddressWidth <= 40);
+    ASSERT (TotalPages <= 0x404);
   }
 
-  TotalPages = Page1GSupport ? Pml4Entries + 1 :
-               (PdpEntries + 1) * Pml4Entries + 1;
-  ASSERT (TotalPages <= 0x40201);
+  //
+  // With 32k stacks and 4096 vcpus this lands at 128 MB (far away
+  // from MAX_UINT32).
+  //
+  ApStacks = PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber * PcdGet32 (PcdCpuApStackSize);
 
   //
   // Add 64 MB for miscellaneous allocations. Note that for
-  // PhysMemAddressWidth values close to 36, the cap will actually be
-  // dominated by this increment.
+  // PhysMemAddressWidth values close to 36 and a small number of
+  // CPUs, the cap will actually be dominated by this increment.
   //
-  return (UINT32)(EFI_PAGES_TO_SIZE (TotalPages) + SIZE_64MB);
+  MemoryCap = EFI_PAGES_TO_SIZE ((UINTN)TotalPages) + ApStacks + SIZE_64MB;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: page tables: %6lu KB (%u/%u/%u/%u pages for levels 5/4/3/2)\n",
+    __func__,
+    RShiftU64 (EFI_PAGES_TO_SIZE ((UINTN)TotalPages), 10),
+    Level5Pages,
+    Level4Pages,
+    Level3Pages,
+    Level2Pages
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: ap stacks:   %6lu KB (%u cpus)\n",
+    __func__,
+    RShiftU64 (ApStacks, 10),
+    PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: memory cap:  %6lu KB\n",
+    __func__,
+    RShiftU64 (MemoryCap, 10)
+    ));
+
+  ASSERT (MemoryCap <= MAX_UINT32);
+  return (UINT32)MemoryCap;
 }
 
 /**
@@ -319,6 +368,14 @@ PublishPeiMemory (
     if (MemorySize > PeiMemoryCap) {
       MemoryBase = LowerMemorySize - PeiMemoryCap;
       MemorySize = PeiMemoryCap;
+    } else {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: Not enough memory for PEI (have %lu KB, estimated need %u KB)\n",
+        __func__,
+        RShiftU64 (MemorySize, 10),
+        PeiMemoryCap >> 10
+        ));
     }
   }
 

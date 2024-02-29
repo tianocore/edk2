@@ -3033,7 +3033,7 @@ class DscBuildData(PlatformBuildClassObject):
             StructuredPcdsData["OBJECTS"][include_file] = os.path.getmtime(include_file)
             MakeApp += "$(OBJECTS) : %s\n" % include_file
         if sys.platform == "win32":
-            PcdValueCommonPath = os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source\C\Common\PcdValueCommon.c"))
+            PcdValueCommonPath = os.path.normpath(mws.join(GlobalData.gGlobalDefines["EDK_TOOLS_PATH"], "Source\\C\\Common\\PcdValueCommon.c"))
             MakeApp = MakeApp + '%s\\PcdValueCommon.c : %s\n' % (self.OutputPath, PcdValueCommonPath)
             MakeApp = MakeApp + '\tcopy /y %s $@\n' % (PcdValueCommonPath)
         else:
