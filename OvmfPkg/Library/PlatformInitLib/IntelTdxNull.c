@@ -24,3 +24,13 @@ PlatformTdxPublishRamRegions (
   )
 {
 }
+
+VOID
+MeasurementAndBuildGuidHobForQemuInputData (
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
+  )
+{
+}

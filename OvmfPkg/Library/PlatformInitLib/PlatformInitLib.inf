@@ -39,6 +39,8 @@
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -53,8 +55,12 @@
   PciLib
   PeiHardwareInfoLib
 
+[Guids]
+  gCcEventEntryHobGuid
+
 [LibraryClasses.X64]
   TdxLib
+  BaseCryptLib
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
