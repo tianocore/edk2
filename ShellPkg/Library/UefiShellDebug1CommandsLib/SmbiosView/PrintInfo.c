@@ -1,7 +1,7 @@
 /** @file
   Module for clarifying the content of the smbios structure element information.
 
-  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
@@ -2676,6 +2676,38 @@ DisplayProcessorFamily2 (
 
     case 0x271:
       Print (L"MultiCoreLoongson3D\n");
+      break;
+
+    case 0x300:
+      Print (L"IntelCore3\n");
+      break;
+
+    case 0x301:
+      Print (L"IntelCore5\n");
+      break;
+
+    case 0x302:
+      Print (L"IntelCore7\n");
+      break;
+
+    case 0x303:
+      Print (L"IntelCore9\n");
+      break;
+
+    case 0x304:
+      Print (L"IntelCoreUltra3\n");
+      break;
+
+    case 0x305:
+      Print (L"IntelCoreUltra5\n");
+      break;
+
+    case 0x306:
+      Print (L"IntelCoreUltra7\n");
+      break;
+
+    case 0x307:
+      Print (L"IntelCoreUltra9\n");
       break;
 
     default:
