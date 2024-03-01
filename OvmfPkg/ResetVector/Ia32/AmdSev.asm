@@ -146,6 +146,14 @@ BITS    32
     jmp     %%TerminateHlt
 %endmacro
 
+; Get the C-bit mask above 31.
+; Modified: EDX
+;
+; The value is returned in the EDX
+%macro GetSevCBitMaskAbove31 0
+    mov edx, dword[SEV_ES_WORK_AREA_ENC_MASK + 4]
+%endmacro
+
 ; Terminate the guest due to unexpected response code.
 SevEsUnexpectedRespTerminate:
     TerminateVmgExit    TERM_UNEXPECTED_RESP_CODE
@@ -154,10 +162,6 @@ SevEsUnexpectedRespTerminate:
 
 ; If SEV-ES is enabled then initialize and make the GHCB page shared
 SevClearPageEncMaskForGhcbPage:
-    ; Check if SEV is enabled
-    cmp       byte[WORK_AREA_GUEST_TYPE], 1
-    jnz       SevClearPageEncMaskForGhcbPageExit
-
     ; Check if SEV-ES is enabled
     mov       ecx, 1
     bt        [SEV_ES_WORK_AREA_STATUS_MSR], ecx
@@ -194,22 +198,6 @@ pageTableEntries4kLoop:
 
 SevClearPageEncMaskForGhcbPageExit:
     OneTimeCallRet SevClearPageEncMaskForGhcbPage
-
-; Check if SEV is enabled, and get the C-bit mask above 31.
-; Modified: EDX
-;
-; The value is returned in the EDX
-GetSevCBitMaskAbove31:
-    xor       edx, edx
-
-    ; Check if SEV is enabled
-    cmp       byte[WORK_AREA_GUEST_TYPE], 1
-    jnz       GetSevCBitMaskAbove31Exit
-
-    mov       edx, dword[SEV_ES_WORK_AREA_ENC_MASK + 4]
-
-GetSevCBitMaskAbove31Exit:
-    OneTimeCallRet GetSevCBitMaskAbove31
 
 %endif
 
@@ -332,9 +320,9 @@ NoSevEsVcHlt:
 NoSevPass:
     xor       eax, eax
 
-SevExit:
     ;
-    ; Clear exception handlers and stack
+    ; When NOT running in SEV mode: clear exception handlers and stack here.
+    ; Otherwise: SevClearVcHandlerAndStack must be called later.
     ;
     push      eax
     mov       eax, ADDR_OF(IdtrClear)
@@ -342,7 +330,15 @@ SevExit:
     pop       eax
     mov       esp, 0
 
+SevExit:
     OneTimeCallRet CheckSevFeatures
+
+SevClearVcHandlerAndStack:
+    ; Clear exception handlers and stack
+    mov       eax, ADDR_OF(IdtrClear)
+    lidt      [cs:eax]
+    mov       esp, 0
+    OneTimeCallRet SevClearVcHandlerAndStack
 
 ; Start of #VC exception handling routines
 ;

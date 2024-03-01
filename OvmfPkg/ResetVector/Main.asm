@@ -80,7 +80,9 @@ SearchBfv:
     ; Set the OVMF/SEV work area as appropriate.
     ;
     OneTimeCall CheckSevFeatures
+    OneTimeCall SevClearVcHandlerAndStack
 
+NoSevIa32:
     ;
     ; Restore initial EAX value into the EAX register
     ;

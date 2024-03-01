@@ -53,6 +53,7 @@
 
 %define WORK_AREA_GUEST_TYPE          (FixedPcdGet32 (PcdOvmfWorkAreaBase))
 %define PT_ADDR(Offset)               (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
+%define PG_5_LEVEL                    (FixedPcdGetBool (PcdUse5LevelPageTable))
 
 %define GHCB_PT_ADDR                  (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
 %define GHCB_BASE                     (FixedPcdGet32 (PcdOvmfSecGhcbBase))
@@ -90,6 +91,8 @@
 %define SNP_SEC_MEM_SIZE_DESC_2       (SEV_SNP_SECRETS_BASE - SNP_SEC_MEM_BASE_DESC_2)
 %define SNP_SEC_MEM_BASE_DESC_3       (CPUID_BASE + CPUID_SIZE + SEV_SNP_KERNEL_HASHES_SIZE)
 %define SNP_SEC_MEM_SIZE_DESC_3       (FixedPcdGet32 (PcdOvmfPeiMemFvBase) - SNP_SEC_MEM_BASE_DESC_3)
+
+%include "Ia32/AmdSev.asm"
 
 %ifdef ARCH_X64
   #include <AutoGen.h>
@@ -142,8 +145,6 @@
   %include "Ia32/IntelTdx.asm"
   %include "X64/OvmfSevMetadata.asm"
 %endif
-
-%include "Ia32/AmdSev.asm"
 
 %include "Ia16/Real16ToFlat32.asm"
 %include "Ia16/Init16.asm"
