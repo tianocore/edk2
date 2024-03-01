@@ -112,7 +112,7 @@ SetCr3ForPageTables64:
     ; is set.
     OneTimeCall   CheckTdxFeaturesBeforeBuildPagetables
     cmp       eax, TDX_BSP
-    je        ClearOvmfPageTables
+    je        TdxBspInit
     cmp       eax, TDX_AP
     je        SetCr3
 
@@ -124,16 +124,21 @@ SetCr3ForPageTables64:
     ; the page table build below.
     OneTimeCall   GetSevCBitMaskAbove31
 
-ClearOvmfPageTables:
     ClearOvmfPageTables
     CreatePageTables4Level edx
 
     ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
     OneTimeCall   SevClearPageEncMaskForGhcbPage
+    jmp SetCr3
 
-    ; TDX will do some PostBuildPages task, such as setting
-    ; byte[TDX_WORK_AREA_PGTBL_READY].
-    OneTimeCall   TdxPostBuildPageTables
+TdxBspInit:
+    ;
+    ; TDX BSP workflow
+    ;
+    ClearOvmfPageTables
+    CreatePageTables4Level 0
+    OneTimeCall TdxPostBuildPageTables
+    jmp SetCr3
 
 SetCr3:
     ;
