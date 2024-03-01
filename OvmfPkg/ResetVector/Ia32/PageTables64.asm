@@ -69,6 +69,10 @@ BITS    32
 ; Argument: upper 32 bits of the page table entries
 ;
 %macro CreatePageTables4Level 1
+
+    ; indicate 4-level paging
+    debugShowPostCode 0x41
+
     ;
     ; Top level Page Directory Pointers (1 * 512GB entry)
     ;
@@ -153,6 +157,10 @@ BITS    32
 ; level 3 directory.
 ;
 %macro CreatePageTables5Level 1
+
+    ; indicate 5-level paging
+    debugShowPostCode 0x51
+
     ; level 5
     mov     dword[PT_ADDR (0)], PT_ADDR (0x1000) + PAGE_PDE_DIRECTORY_ATTR
     mov     dword[PT_ADDR (4)], %1
