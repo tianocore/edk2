@@ -2,7 +2,7 @@
 
   AMD SEV helper function.
 
-  Copyright (c) 2021, AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2021 - 2024, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -67,4 +67,23 @@ SevSnpRmpAdjust (
   // RMPADJUST is not supported in 32-bit mode
   //
   return RETURN_UNSUPPORTED;
+}
+
+/**
+  Determine if the SEV-SNP AP Create protocol should be used.
+
+  @param[in]  CpuMpData  Pointer to CPU MP Data
+
+  @retval     TRUE       Use SEV-SNP AP Create protocol
+  @retval     FALSE      Do not use SEV-SNP AP Create protocol
+**/
+BOOLEAN
+CanUseSevSnpCreateAP (
+  IN  CPU_MP_DATA  *CpuMpData
+  )
+{
+  //
+  // SEV-SNP is not supported on 32-bit build.
+  //
+  return FALSE;
 }
