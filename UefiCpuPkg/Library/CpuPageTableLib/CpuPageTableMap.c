@@ -20,17 +20,17 @@
 **/
 VOID
 PageTableLibSetPte4K (
-  IN OUT IA32_PTE_4K         *Pte4K,
-  IN UINT64                  Offset,
-  IN IA32_MAP_ATTRIBUTE      *Attribute,
-  IN IA32_MAP_ATTRIBUTE      *Mask
+  IN OUT volatile IA32_PTE_4K  *Pte4K,
+  IN UINT64                    Offset,
+  IN IA32_MAP_ATTRIBUTE        *Attribute,
+  IN IA32_MAP_ATTRIBUTE        *Mask
   )
 {
   IA32_PTE_4K  LocalPte4K;
 
   LocalPte4K.Uint64 = Pte4K->Uint64;
   if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
-    LocalPte4K.Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (Pte4K->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_40);
+    LocalPte4K.Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (LocalPte4K.Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_40);
   }
 
   if (Mask->Bits.Present) {
@@ -94,17 +94,17 @@ PageTableLibSetPte4K (
 **/
 VOID
 PageTableLibSetPleB (
-  IN OUT IA32_PAGE_LEAF_ENTRY_BIG_PAGESIZE  *PleB,
-  IN UINT64                                 Offset,
-  IN IA32_MAP_ATTRIBUTE                     *Attribute,
-  IN IA32_MAP_ATTRIBUTE                     *Mask
+  IN OUT volatile IA32_PAGE_LEAF_ENTRY_BIG_PAGESIZE  *PleB,
+  IN UINT64                                          Offset,
+  IN IA32_MAP_ATTRIBUTE                              *Attribute,
+  IN IA32_MAP_ATTRIBUTE                              *Mask
   )
 {
   IA32_PAGE_LEAF_ENTRY_BIG_PAGESIZE  LocalPleB;
 
   LocalPleB.Uint64 = PleB->Uint64;
   if (Mask->Bits.PageTableBaseAddressLow || Mask->Bits.PageTableBaseAddressHigh) {
-    LocalPleB.Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (PleB->Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_39);
+    LocalPleB.Uint64 = (IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS (Attribute) + Offset) | (LocalPleB.Uint64 & ~IA32_PE_BASE_ADDRESS_MASK_39);
   }
 
   LocalPleB.Bits.MustBeOne = 1;
@@ -171,11 +171,11 @@ PageTableLibSetPleB (
 **/
 VOID
 PageTableLibSetPle (
-  IN UINTN                   Level,
-  IN OUT IA32_PAGING_ENTRY   *Ple,
-  IN UINT64                  Offset,
-  IN IA32_MAP_ATTRIBUTE      *Attribute,
-  IN IA32_MAP_ATTRIBUTE      *Mask
+  IN UINTN                           Level,
+  IN OUT volatile IA32_PAGING_ENTRY  *Ple,
+  IN UINT64                          Offset,
+  IN IA32_MAP_ATTRIBUTE              *Attribute,
+  IN IA32_MAP_ATTRIBUTE              *Mask
   )
 {
   if (Level == 1) {
@@ -195,9 +195,9 @@ PageTableLibSetPle (
 **/
 VOID
 PageTableLibSetPnle (
-  IN OUT IA32_PAGE_NON_LEAF_ENTRY  *Pnle,
-  IN IA32_MAP_ATTRIBUTE            *Attribute,
-  IN IA32_MAP_ATTRIBUTE            *Mask
+  IN OUT volatile IA32_PAGE_NON_LEAF_ENTRY  *Pnle,
+  IN IA32_MAP_ATTRIBUTE                     *Attribute,
+  IN IA32_MAP_ATTRIBUTE                     *Mask
   )
 {
   IA32_PAGE_NON_LEAF_ENTRY  LocalPnle;
