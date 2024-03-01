@@ -118,15 +118,26 @@ SetCr3ForPageTables64:
 
     ; Check whether the SEV is active and populate the SevEsWorkArea
     OneTimeCall   CheckSevFeatures
+    cmp       byte[WORK_AREA_GUEST_TYPE], 1
+    jz        SevInit
 
+    ;
+    ; normal (non-CoCo) workflow
+    ;
+    ClearOvmfPageTables
+    CreatePageTables4Level 0
+    jmp SetCr3
+
+SevInit:
+    ;
+    ; SEV workflow
+    ;
+    ClearOvmfPageTables
     ; If SEV is enabled, the C-bit position is always above 31.
     ; The mask will be saved in the EDX and applied during the
     ; the page table build below.
     OneTimeCall   GetSevCBitMaskAbove31
-
-    ClearOvmfPageTables
     CreatePageTables4Level edx
-
     ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
     OneTimeCall   SevClearPageEncMaskForGhcbPage
     jmp SetCr3
