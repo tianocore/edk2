@@ -706,7 +706,7 @@ PlatformAddressWidthFromCpuid (
      * and a 56 bit wide address space with 5 paging levels.
      */
     if (Cr4.Bits.LA57) {
-      if (PhysBits > 48) {
+      if ((PhysBits > 48) && !GuestPhysBits) {
         /*
          * Some Intel CPUs support 5-level paging, have more than 48
          * phys-bits but support only 4-level EPT, which effectively
@@ -716,11 +716,11 @@ PlatformAddressWidthFromCpuid (
          * problem: They can handle guest phys-bits larger than 48
          * only in case the host runs in 5-level paging mode.
          *
-         * Until we have some way to communicate that kind of
-         * limitations from hypervisor to guest, limit phys-bits
-         * to 48 unconditionally.
+         * GuestPhysBits is used to communicate that kind of
+         * limitations from hypervisor to guest.  If GuestPhysBits is
+         * not set play safe and limit phys-bits to 48.
          */
-        DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 48 (5-level paging)\n", __func__));
+        DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 48 (5-level paging, no GuestPhysBits)\n", __func__));
         PhysBits = 48;
       }
     } else {
