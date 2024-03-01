@@ -633,6 +633,7 @@ PlatformAddressWidthFromCpuid (
 {
   UINT32    RegEax, RegEbx, RegEcx, RegEdx, Max;
   UINT8     PhysBits;
+  UINT8     GuestPhysBits;
   CHAR8     Signature[13];
   IA32_CR4  Cr4;
   BOOLEAN   Valid         = FALSE;
@@ -655,12 +656,16 @@ PlatformAddressWidthFromCpuid (
 
   if (Max >= 0x80000008) {
     AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-    PhysBits = (UINT8)RegEax;
+    PhysBits      = (UINT8)RegEax;
+    GuestPhysBits = (UINT8)(RegEax >> 16);
   } else {
-    PhysBits = 36;
+    PhysBits      = 36;
+    GuestPhysBits = 0;
   }
 
   if (!QemuQuirk) {
+    Valid = TRUE;
+  } else if (GuestPhysBits) {
     Valid = TRUE;
   } else if (PhysBits >= 41) {
     Valid = TRUE;
@@ -678,14 +683,20 @@ PlatformAddressWidthFromCpuid (
 
   DEBUG ((
     DEBUG_INFO,
-    "%a: Signature: '%a', PhysBits: %d, QemuQuirk: %a, la57: %a, Valid: %a\n",
+    "%a: Signature: '%a', PhysBits: %d, GuestPhysBits: %d, QemuQuirk: %a, la57: %a, Valid: %a\n",
     __func__,
     Signature,
     PhysBits,
+    GuestPhysBits,
     QemuQuirk ? "On" : "Off",
     Cr4.Bits.LA57 ? "On" : "Off",
     Valid ? "Yes" : "No"
     ));
+
+  if (GuestPhysBits && (PhysBits > GuestPhysBits)) {
+    DEBUG ((DEBUG_INFO, "%a: limit PhysBits to %d (GuestPhysBits)\n", __func__, GuestPhysBits));
+    PhysBits = GuestPhysBits;
+  }
 
   if (Valid) {
     /*
