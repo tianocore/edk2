@@ -44,6 +44,7 @@ BITS    32
 
 %define TDX_BSP         1
 %define TDX_AP          2
+%define TDX_AP_5_LEVEL  3
 
 ;
 ; For OVMF, build some initial page tables at
@@ -214,6 +215,13 @@ SetCr3ForPageTables64:
     je        TdxBspInit
     cmp       eax, TDX_AP
     je        SetCr3
+%if PG_5_LEVEL
+    cmp       eax, TDX_AP_5_LEVEL
+    jne       CheckForSev
+    Enable5LevelPaging
+    jmp       SetCr3
+CheckForSev:
+%endif
 
     ; Check whether the SEV is active and populate the SevEsWorkArea
     OneTimeCall   CheckSevFeatures
@@ -253,6 +261,14 @@ TdxBspInit:
     ; TDX BSP workflow
     ;
     ClearOvmfPageTables
+%if PG_5_LEVEL
+    Check5LevelPaging Tdx4Level
+    CreatePageTables5Level 0
+    OneTimeCall TdxPostBuildPageTables5Level
+    Enable5LevelPaging
+    jmp SetCr3
+Tdx4Level:
+%endif
     CreatePageTables4Level 0
     OneTimeCall TdxPostBuildPageTables
     jmp SetCr3
