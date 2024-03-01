@@ -53,6 +53,7 @@
 
 %define WORK_AREA_GUEST_TYPE          (FixedPcdGet32 (PcdOvmfWorkAreaBase))
 %define PT_ADDR(Offset)               (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
+%define PG_5_LEVEL                    (FixedPcdGetBool (PcdUse5LevelPageTable))
 
 %define GHCB_PT_ADDR                  (FixedPcdGet32 (PcdOvmfSecGhcbPageTableBase))
 %define GHCB_BASE                     (FixedPcdGet32 (PcdOvmfSecGhcbBase))
