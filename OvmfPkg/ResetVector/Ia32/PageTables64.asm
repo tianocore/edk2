@@ -64,6 +64,44 @@ BITS    32
 %endmacro
 
 ;
+; Create page tables for 4-level paging
+;
+; Argument: upper 32 bits of the page table entries
+;
+%macro CreatePageTables4Level 1
+    ;
+    ; Top level Page Directory Pointers (1 * 512GB entry)
+    ;
+    mov     dword[PT_ADDR (0)], PT_ADDR (0x1000) + PAGE_PDE_DIRECTORY_ATTR
+    mov     dword[PT_ADDR (4)], %1
+
+    ;
+    ; Next level Page Directory Pointers (4 * 1GB entries => 4GB)
+    ;
+    mov     dword[PT_ADDR (0x1000)], PT_ADDR (0x2000) + PAGE_PDE_DIRECTORY_ATTR
+    mov     dword[PT_ADDR (0x1004)], %1
+    mov     dword[PT_ADDR (0x1008)], PT_ADDR (0x3000) + PAGE_PDE_DIRECTORY_ATTR
+    mov     dword[PT_ADDR (0x100C)], %1
+    mov     dword[PT_ADDR (0x1010)], PT_ADDR (0x4000) + PAGE_PDE_DIRECTORY_ATTR
+    mov     dword[PT_ADDR (0x1014)], %1
+    mov     dword[PT_ADDR (0x1018)], PT_ADDR (0x5000) + PAGE_PDE_DIRECTORY_ATTR
+    mov     dword[PT_ADDR (0x101C)], %1
+
+    ;
+    ; Page Table Entries (2048 * 2MB entries => 4GB)
+    ;
+    mov     ecx, 0x800
+.pageTableEntriesLoop4Level:
+    mov     eax, ecx
+    dec     eax
+    shl     eax, 21
+    add     eax, PAGE_PDE_LARGEPAGE_ATTR
+    mov     dword[ecx * 8 + PT_ADDR (0x2000 - 8)], eax
+    mov     dword[(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], %1
+    loop    .pageTableEntriesLoop4Level
+%endmacro
+
+;
 ; Modified:  EAX, EBX, ECX, EDX
 ;
 SetCr3ForPageTables64:
@@ -88,37 +126,7 @@ SetCr3ForPageTables64:
 
 ClearOvmfPageTables:
     ClearOvmfPageTables
-
-    ;
-    ; Top level Page Directory Pointers (1 * 512GB entry)
-    ;
-    mov     dword[PT_ADDR (0)], PT_ADDR (0x1000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (4)], edx
-
-    ;
-    ; Next level Page Directory Pointers (4 * 1GB entries => 4GB)
-    ;
-    mov     dword[PT_ADDR (0x1000)], PT_ADDR (0x2000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x1004)], edx
-    mov     dword[PT_ADDR (0x1008)], PT_ADDR (0x3000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x100C)], edx
-    mov     dword[PT_ADDR (0x1010)], PT_ADDR (0x4000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x1014)], edx
-    mov     dword[PT_ADDR (0x1018)], PT_ADDR (0x5000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x101C)], edx
-
-    ;
-    ; Page Table Entries (2048 * 2MB entries => 4GB)
-    ;
-    mov     ecx, 0x800
-pageTableEntriesLoop:
-    mov     eax, ecx
-    dec     eax
-    shl     eax, 21
-    add     eax, PAGE_PDE_LARGEPAGE_ATTR
-    mov     [ecx * 8 + PT_ADDR (0x2000 - 8)], eax
-    mov     [(ecx * 8 + PT_ADDR (0x2000 - 8)) + 4], edx
-    loop    pageTableEntriesLoop
+    CreatePageTables4Level edx
 
     ; Clear the C-bit from the GHCB page if the SEV-ES is enabled.
     OneTimeCall   SevClearPageEncMaskForGhcbPage
