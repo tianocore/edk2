@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -101,6 +102,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdPcct,                          ///< PCCT Generator
   EStdAcpiTableIdHpet,                          ///< HPET Generator
   EStdAcpiTableIdWsmt,                          ///< WSMT Generator
+  EStdAcpiTableIdSsdtHpet,                      ///< SSDT HPET Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
