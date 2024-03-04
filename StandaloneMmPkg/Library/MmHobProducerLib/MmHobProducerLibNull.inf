@@ -10,7 +10,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010017
-  BASE_NAME                      = MmHobProducerLib
+  BASE_NAME                      = MmHobProducerLibNull
   FILE_GUID                      = DE6B5E7C-6636-4646-90F8-776408157750
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
