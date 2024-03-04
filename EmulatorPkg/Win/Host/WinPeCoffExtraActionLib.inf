@@ -1,0 +1,28 @@
+## @file
+# Win Emulator specific PE/COFF Extra Action Library
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = WinPeCoffExtraActionLib
+  FILE_GUID                      = 9F74FB5E-6724-4773-986C-DBD30ADA6695
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PeCoffExtraActionLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  WinPeCoffExtraActionLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  EmulatorPkg/EmulatorPkg.dec

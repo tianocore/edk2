@@ -14,7 +14,7 @@
   FILE_GUID                      = 7833616E-AE0D-594F-870C-80E68682D587
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MemoryAllocationLib|BASE SEC USER_DEFINED
+  LIBRARY_CLASS                  = MemoryAllocationLib
 
 [Sources]
   ThunkProtocolList.c

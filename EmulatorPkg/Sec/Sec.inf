@@ -38,7 +38,6 @@
   DebugLib
   PeCoffGetEntryPointLib
   PeiServicesLib
-  PpiListLib
   BaseMemoryLib
 
 [Ppis]
