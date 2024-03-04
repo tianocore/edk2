@@ -487,9 +487,9 @@ DxeIplFindDxeCore (
     //
     if (EFI_ERROR (Status)) {
       REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_EC_DXE_CORRUPT));
+      ASSERT_EFI_ERROR (Status);
+      break;
     }
-
-    ASSERT_EFI_ERROR (Status);
 
     //
     // Find the DxeCore file type from the beginning in this firmware volume.
@@ -509,6 +509,14 @@ DxeIplFindDxeCore (
     //
     Instance++;
   }
+
+  //
+  // DxeCore cannot find in any firmware volume.
+  //
+  ASSERT (FALSE);
+  CpuDeadLoop ();
+
+  return NULL;
 }
 
 /**
