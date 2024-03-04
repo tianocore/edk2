@@ -23,35 +23,8 @@
 #include <Library/MmHobProducerLib.h>
 #include <Library/MmUnblockMemoryLib.h>
 #include <Protocol/SmmCommunication.h>
-#include <Guid/MmCoreData.h>
 #include <Guid/MmCommBuffer.h>
 #include <Guid/SmramMemoryReserve.h>
-
-//
-// MM Core Private Data structure that contains the data shared between
-// the SMM IPL and the Standalone MM Core.
-//
-MM_CORE_PRIVATE_DATA  mMmCorePrivateData = {
-  MM_CORE_PRIVATE_DATA_SIGNATURE,     // Signature
-  0,                                  // MmramRangeCount
-  0,                                  // MmramRanges
-  0,                                  // MmEntryPoint
-  FALSE,                              // MmEntryPointRegistered
-  FALSE,                              // InMm
-  0,                                  // Mmst
-  0,                                  // CommunicationBuffer
-  0,                                  // BufferSize
-  EFI_SUCCESS,                        // ReturnStatus
-  0,                                  // MmCoreImageBase
-  0,                                  // MmCoreImageSize
-  0,                                  // MmCoreEntryPoint
-  0,                                  // StandaloneBfvAddress
-};
-
-//
-// Global pointer used to access mMmCorePrivateData from outside and inside SMM.
-//
-MM_CORE_PRIVATE_DATA  *gMmCorePrivate;
 
 //
 // Global pointer used for Mm communication buffer.
@@ -64,7 +37,8 @@ MM_COMM_BUFFER_DATA  *gMmCommBuffer;
 EFI_SMRAM_DESCRIPTOR  *mCurrentSmramRange;
 EFI_PHYSICAL_ADDRESS  mSmramCacheBase;
 UINT64                mSmramCacheSize;
-UINTN                 mSmramRangeCount;
+EFI_PHYSICAL_ADDRESS  mMmramRanges = 0;
+UINT64                mMmramRangeCount = 0;
 
 /**
   Communicates with a registered handler.
@@ -192,49 +166,34 @@ Communicate (
   }
 
   //
-  // If not already in SMM, then generate a Software SMI
+  // Generate Software SMI
   //
-  if (!gMmCorePrivate->InMm && gMmCorePrivate->MmEntryPointRegistered) {
-    //
-    // Put arguments for Software SMI in gMmCorePrivate
-    //
-    gMmCorePrivate->CommunicationBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)CommBuffer;
-    gMmCorePrivate->BufferSize          = (UINT64)*CommSize;
+  Status = PeiServicesLocatePpi (&gPeiSmmControlPpiGuid, 0, NULL, (VOID **)&SmmControl);
+  ASSERT_EFI_ERROR (Status);
 
-    //
-    // Generate Software SMI
-    //
-    Status = PeiServicesLocatePpi (&gPeiSmmControlPpiGuid, 0, NULL, (VOID **)&SmmControl);
-    ASSERT_EFI_ERROR (Status);
+  Status = SmmControl->Trigger (
+                          (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
+                          SmmControl,
+                          (INT8 *)&SmiCommand,
+                          &Size,
+                          FALSE,
+                          0
+                          );
+  ASSERT_EFI_ERROR (Status);
 
-    Status = SmmControl->Trigger (
-                           (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
-                           SmmControl,
-                           (INT8 *)&SmiCommand,
-                           &Size,
-                           FALSE,
-                           0
-                           );
-    ASSERT_EFI_ERROR (Status);
-
-    //
-    // Return status from software SMI
-    //
-    *CommSize = (UINTN)gMmCommBuffer->CommunicationInOut->ReturnBufferSize;
-    Status    = (EFI_STATUS)gMmCommBuffer->CommunicationInOut->ReturnStatus;
-    if (Status != EFI_SUCCESS) {
-      Status = Status | MAX_BIT;
-    }
-
-    gMmCommBuffer->CommunicationInOut->IsCommBufferValid = FALSE;
-    DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Exit (%r)\n", Status));
-
-    return Status;
+  //
+  // Return status from software SMI
+  //
+  *CommSize = (UINTN)gMmCommBuffer->CommunicationInOut->ReturnBufferSize;
+  Status    = (EFI_STATUS)gMmCommBuffer->CommunicationInOut->ReturnStatus;
+  if (Status != EFI_SUCCESS) {
+     Status = Status | MAX_BIT;
   }
 
-  DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Exit (%r)\n", EFI_UNSUPPORTED));
+  gMmCommBuffer->CommunicationInOut->IsCommBufferValid = FALSE;
+  DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Exit (%r)\n", Status));
 
-  return EFI_UNSUPPORTED;
+  return Status;
 }
 
 /**
@@ -262,10 +221,10 @@ GetSmramCacheRange (
   *SmramCacheBase = SmramRange->CpuStart;
   *SmramCacheSize = SmramRange->PhysicalSize;
 
-  SmramRanges = (EFI_SMRAM_DESCRIPTOR *)(UINTN)gMmCorePrivate->MmramRanges;
+  SmramRanges = (EFI_SMRAM_DESCRIPTOR *)(UINTN)mMmramRanges;
   do {
     FoundAdjacentRange = FALSE;
-    for (Index = 0; Index < gMmCorePrivate->MmramRangeCount; Index++) {
+    for (Index = 0; Index < mMmramRangeCount; Index++) {
       RangeCpuStart     = SmramRanges[Index].CpuStart;
       RangePhysicalSize = SmramRanges[Index].PhysicalSize;
       if ((RangeCpuStart < *SmramCacheBase) && (*SmramCacheBase == (RangeCpuStart + RangePhysicalSize))) {
@@ -475,16 +434,13 @@ LocateMmFvForMmCore (
                                         hold SMM Core will be excluded.
   @param[in, out] SmramRangeSmmCore     Descriptor for the range of SMRAM to hold SMM Core.
 
-  @param[in]      Context               Context to pass into SMM Core
-
   @return  EFI_STATUS
 
 **/
 EFI_STATUS
 ExecuteSmmCoreFromSmram (
   IN OUT EFI_SMRAM_DESCRIPTOR  *SmramRange,
-  IN OUT EFI_SMRAM_DESCRIPTOR  *SmramRangeSmmCore,
-  IN     VOID                  *Context
+  IN OUT EFI_SMRAM_DESCRIPTOR  *SmramRangeSmmCore
   )
 {
   EFI_STATUS                    Status;
@@ -505,8 +461,6 @@ ExecuteSmmCoreFromSmram (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  gMmCorePrivate->StandaloneBfvAddress = SourceFvBaseAddress;
 
   //
   // Initialize ImageContext
@@ -570,13 +524,6 @@ ExecuteSmmCoreFromSmram (
       //
       DEBUG ((DEBUG_INFO, "SMM IPL calling SMM Core at SMRAM address %p\n", (VOID *)(UINTN)ImageContext.EntryPoint));
 
-      gMmCorePrivate->MmCoreImageBase = ImageContext.ImageAddress;
-      gMmCorePrivate->MmCoreImageSize = ImageContext.ImageSize;
-      DEBUG ((DEBUG_INFO, "SmmCoreImageBase - 0x%016lx\n", gMmCorePrivate->MmCoreImageBase));
-      DEBUG ((DEBUG_INFO, "SmmCoreImageSize - 0x%016lx\n", gMmCorePrivate->MmCoreImageSize));
-
-      gMmCorePrivate->MmCoreEntryPoint = ImageContext.EntryPoint;
-
       //
       // Create the HOB list which StandaloneMm Core needed.
       //
@@ -586,7 +533,7 @@ ExecuteSmmCoreFromSmram (
       //
       // Print debug message showing Standalone MM Core entry point address.
       //
-      DEBUG ((DEBUG_INFO, "SMM IPL calling Standalone MM Core at SMRAM address - 0x%016lx\n", gMmCorePrivate->MmCoreEntryPoint));
+      DEBUG ((DEBUG_INFO, "SMM IPL calling Standalone MM Core at SMRAM address - 0x%016lx\n", ImageContext.EntryPoint));
 
       //
       // Execute image
@@ -636,6 +583,7 @@ GetFullSmramRanges (
   UINTN                           AdditionSmramRangeCount;
   EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
   VOID                            *HobList;
+  UINTN                           MmramRangeCount;
 
   //
   // Get SMRAM information.
@@ -647,14 +595,14 @@ GetFullSmramRanges (
   }
 
   DescriptorBlock  = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)(GET_GUID_HOB_DATA (HobList));
-  mSmramRangeCount = DescriptorBlock->NumberOfSmmReservedRegions;
+  MmramRangeCount = DescriptorBlock->NumberOfSmmReservedRegions;
 
   //
   // Reserve one entry SMM Core in the full SMRAM ranges.
   //
   AdditionSmramRangeCount = 1;
 
-  *FullSmramRangeCount = mSmramRangeCount + AdditionSmramRangeCount;
+  *FullSmramRangeCount = MmramRangeCount + AdditionSmramRangeCount;
   Size                 = (*FullSmramRangeCount) * sizeof (EFI_SMRAM_DESCRIPTOR);
   FullSmramRanges      = (EFI_SMRAM_DESCRIPTOR *)AllocateZeroPool (Size);
   ASSERT (FullSmramRanges != NULL);
@@ -665,7 +613,7 @@ GetFullSmramRanges (
   //
   // Get SMRAM descriptors and fill to the full SMRAM ranges
   //
-  for (Index = 0; Index < mSmramRangeCount; Index++) {
+  for (Index = 0; Index < MmramRangeCount; Index++) {
     FullSmramRanges[Index].PhysicalStart = DescriptorBlock->Descriptor[Index].PhysicalStart;
     FullSmramRanges[Index].CpuStart      = DescriptorBlock->Descriptor[Index].CpuStart;
     FullSmramRanges[Index].PhysicalSize  = DescriptorBlock->Descriptor[Index].PhysicalSize;
@@ -776,24 +724,8 @@ StandaloneMmIplPeiEntry (
   EFI_STATUS               Status;
   UINTN                    Index;
   UINT64                   MaxSize;
-  MM_CORE_DATA_HOB_DATA    SmmCoreDataHobData;
   MM_COMM_BUFFER_HOB_DATA  MmCommBufferHobData;
   EFI_SMRAM_DESCRIPTOR     *MmramRanges;
-
-  //
-  // Build Hob for SMM and DXE phase
-  //
-  SmmCoreDataHobData.Address = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateRuntimePages (EFI_SIZE_TO_PAGES (sizeof (mMmCorePrivateData)));
-  ASSERT (SmmCoreDataHobData.Address != 0);
-  gMmCorePrivate = (VOID *)(UINTN)SmmCoreDataHobData.Address;
-  CopyMem ((VOID *)(UINTN)SmmCoreDataHobData.Address, &mMmCorePrivateData, sizeof (mMmCorePrivateData));
-  DEBUG ((DEBUG_INFO, "gMmCorePrivate - 0x%x\n", gMmCorePrivate));
-
-  BuildGuidDataHob (
-    &gMmCoreDataHobGuid,
-    (VOID *)&SmmCoreDataHobData,
-    sizeof (SmmCoreDataHobData)
-    );
 
   //
   // Build communication buffer Hob for SMM and DXE phase
@@ -830,9 +762,9 @@ StandaloneMmIplPeiEntry (
   //
   // Get SMRAM information
   //
-  gMmCorePrivate->MmramRanges = (EFI_PHYSICAL_ADDRESS)(UINTN)GetFullSmramRanges (PeiServices, (UINTN *)&gMmCorePrivate->MmramRangeCount);
-  ASSERT (gMmCorePrivate->MmramRanges != 0);
-  if (gMmCorePrivate->MmramRanges == 0) {
+  mMmramRanges = (EFI_PHYSICAL_ADDRESS)(UINTN)GetFullSmramRanges (PeiServices, (UINTN *)&mMmramRangeCount);
+  ASSERT (mMmramRanges != 0);
+  if (mMmramRanges == 0) {
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -845,13 +777,13 @@ StandaloneMmIplPeiEntry (
   // Find the largest SMRAM range between 1MB and 4GB that is at least 256KB - 4K in size
   //
   mCurrentSmramRange = NULL;
-  MmramRanges        = (EFI_MMRAM_DESCRIPTOR *)(UINTN)gMmCorePrivate->MmramRanges;
+  MmramRanges        = (EFI_MMRAM_DESCRIPTOR *)(UINTN)mMmramRanges;
   if (MmramRanges == NULL) {
     DEBUG ((DEBUG_ERROR, "Fail to retrieve MmramRanges\n"));
     return EFI_UNSUPPORTED;
   }
 
-  for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < gMmCorePrivate->MmramRangeCount; Index++) {
+  for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < mMmramRangeCount; Index++) {
     //
     // Skip any SMRAM region that is already allocated, needs testing, or needs ECC initialization
     //
@@ -884,12 +816,11 @@ StandaloneMmIplPeiEntry (
 
     //
     // Load SMM Core into SMRAM and execute it from SMRAM
-    // Note: SmramRanges specific for SMM Core will put in the gMmCorePrivate->MmramRangeCount - 1.
+    // Note: SmramRanges specific for SMM Core will put in the mMmramRangeCount - 1.
     //
     Status = ExecuteSmmCoreFromSmram (
                mCurrentSmramRange,
-               &(((EFI_MMRAM_DESCRIPTOR *)(UINTN)gMmCorePrivate->MmramRanges)[gMmCorePrivate->MmramRangeCount - 1]),
-               gMmCorePrivate
+               &(((EFI_MMRAM_DESCRIPTOR *)(UINTN)mMmramRanges)[mMmramRangeCount - 1])
                );
     if (EFI_ERROR (Status)) {
       //
