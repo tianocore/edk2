@@ -28,7 +28,7 @@ ASM_PFX(FspInfoHeaderRelativeOff):
 global ASM_PFX(AsmGetFspInfoHeaderNoStack)
 ASM_PFX(AsmGetFspInfoHeaderNoStack):
    lea   rax, [ASM_PFX(AsmGetFspInfoHeader)]
-   lea   rcx, [ASM_PFX(FspInfoHeaderRelativeOff)]
-   mov   ecx, [rcx]
-   sub   rax, rcx
+   lea   rsi, [ASM_PFX(FspInfoHeaderRelativeOff)]
+   mov   esi, [rsi]
+   sub   rax, rsi
    jmp   rdi

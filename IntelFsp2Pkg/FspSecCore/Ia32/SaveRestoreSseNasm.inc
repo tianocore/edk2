@@ -128,6 +128,17 @@
   SXMMN      xmm5, 1, eax
              %endmacro
 
+;
+; XMM5 slot 2 for TemporaryRamSize
+;
+%macro LOAD_TEMPORARY_RAM_SIZE    1
+  LXMMN      xmm5, %1, 2
+             %endmacro
+
+%macro SAVE_TEMPORARY_RAM_SIZE    1
+  SXMMN      xmm5, 2, %1
+             %endmacro
+
 %macro ENABLE_SSE   0
             ;
             ; Initialize floating point units

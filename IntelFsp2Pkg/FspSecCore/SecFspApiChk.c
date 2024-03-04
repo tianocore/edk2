@@ -42,9 +42,7 @@ FspApiCallingCheck (
     //
     // FspMemoryInit check
     //
-    if (((UINTN)FspData != MAX_ADDRESS) && ((UINTN)FspData != MAX_UINT32)) {
-      Status = EFI_UNSUPPORTED;
-    } else if (ApiParam == NULL) {
+    if (ApiParam == NULL) {
       Status = EFI_SUCCESS;
     } else if (EFI_ERROR (FspUpdSignatureCheck (ApiIdx, ApiParam))) {
       Status = EFI_INVALID_PARAMETER;
