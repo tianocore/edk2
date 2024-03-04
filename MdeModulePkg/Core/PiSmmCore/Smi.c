@@ -8,7 +8,8 @@
 
 #include "PiSmmCore.h"
 
-LIST_ENTRY  mSmiEntryList = INITIALIZE_LIST_HEAD_VARIABLE (mSmiEntryList);
+SMI_HANDLER  *mCurrentSmiHandler = NULL;
+LIST_ENTRY   mSmiEntryList       = INITIALIZE_LIST_HEAD_VARIABLE (mSmiEntryList);
 
 SMI_ENTRY  mRootSmiEntry = {
   SMI_ENTRY_SIGNATURE,
@@ -134,15 +135,26 @@ SmiManage (
 
   Head = &SmiEntry->SmiHandlers;
 
-  for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
+  for (Link = Head->ForwardLink; Link != Head;) {
     SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
-
-    Status = SmiHandler->Handler (
-                           (EFI_HANDLE)SmiHandler,
-                           Context,
-                           CommBuffer,
-                           CommBufferSize
-                           );
+    //
+    // To support unregister SMI handler inside SMI handler itself,
+    // get next node before handler is executed, since LIST_ENTRY that
+    // Link points to may be freed if unregister SMI handler.
+    //
+    Link = Link->ForwardLink;
+    //
+    // Assign gCurrentSmiHandle before calling the SMI handler and
+    // set to NULL when it returns.
+    //
+    mCurrentSmiHandler = SmiHandler;
+    Status             = SmiHandler->Handler (
+                                       (EFI_HANDLE)SmiHandler,
+                                       Context,
+                                       CommBuffer,
+                                       CommBufferSize
+                                       );
+    mCurrentSmiHandler = NULL;
 
     switch (Status) {
       case EFI_INTERRUPT_PENDING:
@@ -319,6 +331,13 @@ SmiHandlerUnRegister (
   }
 
   if ((EFI_HANDLE)SmiHandler != DispatchHandle) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Do not allow to unregister SMI Handler inside other SMI Handler
+  //
+  if ((mCurrentSmiHandler != NULL) && (mCurrentSmiHandler != SmiHandler)) {
     return EFI_INVALID_PARAMETER;
   }
 
