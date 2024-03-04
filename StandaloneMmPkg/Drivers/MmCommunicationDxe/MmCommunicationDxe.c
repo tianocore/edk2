@@ -274,10 +274,9 @@ SmmCommunicationMmCommunicate2 (
 {
   EFI_STATUS                 Status;
   EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
-  UINTN                      TempCommSize;
   EFI_HOB_GUID_TYPE          *GuidHob;
-  MM_CORE_DATA_HOB_DATA      *DataInHob;
-  MM_CORE_PRIVATE_DATA       *CorePrivateData;
+  MM_COMM_BUFFER_DATA        *MmCommonBufferData;
+  COMMUNICATION_IN_OUT       *CommunicationInOutBuffer;
 
   //
   // Check parameters
@@ -288,27 +287,25 @@ SmmCommunicationMmCommunicate2 (
 
   CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommBufferPhysical;
 
-  if (CommSize == NULL) {
-    TempCommSize = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
-  } else {
-    TempCommSize = *CommSize;
-    //
-    // CommSize must hold HeaderGuid and MessageLength
-    //
-    if (TempCommSize < OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data)) {
-      return EFI_INVALID_PARAMETER;
-    }
+  if (CommSize != NULL) {
+    ASSERT (*CommSize == OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength);
   }
 
   //
-  // Put arguments for Software SMI in gMmCoreDataHobGuid
+  // Locate gEdkiiCommunicationBufferGuid
   //
-  GuidHob = GetFirstGuidHob (&gMmCoreDataHobGuid);
+  GuidHob = GetFirstGuidHob (&gEdkiiCommunicationBufferGuid);
   ASSERT (GuidHob != NULL);
-  DataInHob                            = GET_GUID_HOB_DATA (GuidHob);
-  CorePrivateData                      = (MM_CORE_PRIVATE_DATA *)(UINTN)DataInHob->Address;
-  CorePrivateData->CommunicationBuffer = (UINTN)CommBufferPhysical;
-  CorePrivateData->BufferSize          = TempCommSize;
+  MmCommonBufferData       = GET_GUID_HOB_DATA (GuidHob);
+  CommunicationInOutBuffer = (COMMUNICATION_IN_OUT *)(UINTN)MmCommonBufferData->CommunicationInOut;
+
+  //
+  // Copy the content at input CommBufferPhysical to FixedCommBuffer
+  // if CommBufferPhysical is not equal to FixedCommBuffer.
+  //
+  if ((UINTN)CommBufferPhysical != MmCommonBufferData->FixedCommBuffer) {
+    CopyMem ((VOID *)(MmCommonBufferData->FixedCommBuffer), CommBufferPhysical, *CommSize);
+  }
 
   //
   // Generate Software SMI
@@ -322,10 +319,10 @@ SmmCommunicationMmCommunicate2 (
   // Retrive BufferSize and return status from gMmCoreDataHobGuid
   //
   if (CommSize != NULL) {
-    *CommSize = CorePrivateData->BufferSize;
+    *CommSize = CommunicationInOutBuffer->ReturnBufferSize;
   }
 
-  return CorePrivateData->ReturnStatus;
+  return CommunicationInOutBuffer->ReturnStatus;
 }
 
 /**

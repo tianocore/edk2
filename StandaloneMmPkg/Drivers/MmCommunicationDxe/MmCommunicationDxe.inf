@@ -44,7 +44,7 @@
   gEfiEndOfDxeEventGroupGuid               ## CONSUMES ## Event
   gEdkiiPiSmmCommunicationRegionTableGuid  ## CONSUMES ## SystemTable
   gEfiEventExitBootServicesGuid
-  gMmCoreDataHobGuid
+  gEdkiiCommunicationBufferGuid
 
 [Protocols]
   gEfiDxeSmmReadyToLockProtocolGuid        ## NOTIFY

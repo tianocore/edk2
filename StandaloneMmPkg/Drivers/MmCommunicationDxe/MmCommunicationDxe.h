@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/EventGroup.h>
 #include <Guid/MemoryAttributesTable.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
-#include <Guid/MmCoreData.h>
+#include <Guid/MmCommBuffer.h>
 
 #include <PiDxe.h>
 
