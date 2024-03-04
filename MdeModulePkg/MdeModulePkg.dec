@@ -2167,6 +2167,10 @@
   # @Prompt The value is use for Usb Network rate limiting supported.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor|100|UINT32|0x10000028
 
+  ## Indicate the first boot entry, does not set bootorder
+  # @Prompt First boot entry.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformBootBoot0000|L""|VOID*|0x0000012e
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
