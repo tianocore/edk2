@@ -2364,6 +2364,8 @@ Done:
                   );
       ASSERT_EFI_ERROR (Status);
     }
+  } else if (Status == EFI_OUT_OF_RESOURCES) {
+    DEBUG ((DEBUG_WARN, "UpdateVariable failed: Out of flash space\n"));
   }
 
   return Status;
