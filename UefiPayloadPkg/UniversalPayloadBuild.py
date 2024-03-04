@@ -348,7 +348,7 @@ def main():
             if os.path.exists (SectionFvFile) == False:
                 continue
             if (args.Fit == False):
-                status = ReplaceFv (UniversalPayloadBinary, SectionFvFile, SectionName)
+                status = ReplaceFv (UniversalPayloadBinary, SectionFvFile, SectionName, args.Arch)
             else:
                 status = ReplaceFv (UniversalPayloadBinary, SectionFvFile, SectionName.replace ("_", "-"), args.Arch)
             if status != 0:
