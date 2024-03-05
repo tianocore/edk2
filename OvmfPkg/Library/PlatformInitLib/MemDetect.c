@@ -40,10 +40,17 @@ Module Name:
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/TdxLib.h>
+#include <Library/TdxHelperLib.h>
 
 #include <Library/PlatformInitLib.h>
 
 #define MEGABYTE_SHIFT  20
+
+#define EV_POSTCODE_INFO_QEMU_RESERVED_MEMORY_END_DATA  "QEMU RESERVED MEMORY END"
+#define QEMU_RESERVED_MEMORY_END_DATA_LEN               (sizeof(EV_POSTCODE_INFO_QEMU_RESERVED_MEMORY_END_DATA) - 1)
+
+#define EV_POSTCODE_INFO_QEMU_X_PCIMMIO64MB_DATA  "QEMU X-PCIMMIO64MB"
+#define QEMU_X_PCIMMIO64MB_DATA_LEN               (sizeof(EV_POSTCODE_INFO_QEMU_X_PCIMMIO64MB_DATA) - 1)
 
 VOID
 EFIAPI
@@ -518,6 +525,20 @@ PlatformGetFirstNonAddress (
     case EFI_NOT_FOUND:
       break;
     case EFI_SUCCESS:
+
+ #ifdef MDE_CPU_X64
+      //
+      // Measure the "opt/ovmf/X-PciMmio64Mb" which is downloaded from QEMU.
+      // It has to be done before it is consumed.
+      //
+      TdxHelperMeasureFwCfgData (
+        EV_POSTCODE_INFO_QEMU_X_PCIMMIO64MB_DATA,
+        QEMU_X_PCIMMIO64MB_DATA_LEN,
+        (VOID *)(UINTN)&FwCfgPciMmio64Mb,
+        sizeof (FwCfgPciMmio64Mb)
+        );
+ #endif
+
       if (FwCfgPciMmio64Mb <= 0x1000000) {
         PlatformInfoHob->PcdPciMmio64Size = LShiftU64 (FwCfgPciMmio64Mb, 20);
         break;
@@ -566,6 +587,20 @@ PlatformGetFirstNonAddress (
   if (!EFI_ERROR (Status) && (FwCfgSize == sizeof HotPlugMemoryEnd)) {
     QemuFwCfgSelectItem (FwCfgItem);
     QemuFwCfgReadBytes (FwCfgSize, &HotPlugMemoryEnd);
+
+ #ifdef MDE_CPU_X64
+    //
+    // Measure the "etc/reserved-memory-end" which is downloaded from QEMU.
+    // It has to be done before it is consumed.
+    //
+    TdxHelperMeasureFwCfgData (
+      EV_POSTCODE_INFO_QEMU_RESERVED_MEMORY_END_DATA,
+      QEMU_RESERVED_MEMORY_END_DATA_LEN,
+      (VOID *)(UINTN)&HotPlugMemoryEnd,
+      FwCfgSize
+      );
+ #endif
+
     DEBUG ((
       DEBUG_VERBOSE,
       "%a: HotPlugMemoryEnd=0x%Lx\n",
