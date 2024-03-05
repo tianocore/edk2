@@ -56,28 +56,27 @@ typedef enum ArmObjectID {
   EArmObjSmmuInterruptArray,                                   ///< 25 - SMMU Interrupt Array
   EArmObjProcHierarchyInfo,                                    ///< 26 - Processor Hierarchy Info
   EArmObjCacheInfo,                                            ///< 27 - Cache Info
-  EArmObjReserved29,                                           ///< 28 - Reserved
-  EArmObjCmRef,                                                ///< 29 - CM Object Reference
-  EArmObjMemoryAffinityInfo,                                   ///< 30 - Memory Affinity Info
-  EArmObjDeviceHandleAcpi,                                     ///< 31 - Device Handle Acpi
-  EArmObjDeviceHandlePci,                                      ///< 32 - Device Handle Pci
-  EArmObjGenericInitiatorAffinityInfo,                         ///< 33 - Generic Initiator Affinity
-  EArmObjSerialPortInfo,                                       ///< 34 - Generic Serial Port Info
-  EArmObjCmn600Info,                                           ///< 35 - CMN-600 Info
-  EArmObjLpiInfo,                                              ///< 36 - Lpi Info
-  EArmObjPciAddressMapInfo,                                    ///< 37 - Pci Address Map Info
-  EArmObjPciInterruptMapInfo,                                  ///< 38 - Pci Interrupt Map Info
-  EArmObjRmr,                                                  ///< 39 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 40 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 41 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 42 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 43 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 44 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 45 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 46 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 47 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 48 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 49 - P-State Dependency (PSD) Info
+  EArmObjCmRef,                                                ///< 28 - CM Object Reference
+  EArmObjMemoryAffinityInfo,                                   ///< 29 - Memory Affinity Info
+  EArmObjDeviceHandleAcpi,                                     ///< 30 - Device Handle Acpi
+  EArmObjDeviceHandlePci,                                      ///< 31 - Device Handle Pci
+  EArmObjGenericInitiatorAffinityInfo,                         ///< 32 - Generic Initiator Affinity
+  EArmObjSerialPortInfo,                                       ///< 33 - Generic Serial Port Info
+  EArmObjCmn600Info,                                           ///< 34 - CMN-600 Info
+  EArmObjLpiInfo,                                              ///< 35 - Lpi Info
+  EArmObjPciAddressMapInfo,                                    ///< 36 - Pci Address Map Info
+  EArmObjPciInterruptMapInfo,                                  ///< 37 - Pci Interrupt Map Info
+  EArmObjRmr,                                                  ///< 38 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 39 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 40 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 41 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 42 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 43 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 44 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 45 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 46 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 47 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 48 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
