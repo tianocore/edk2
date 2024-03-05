@@ -23,12 +23,6 @@
 #include "PrePi.h"
 
 VOID
-EFIAPI
-ProcessLibraryConstructorList (
-  VOID
-  );
-
-VOID
 PrePiMain (
   IN  UINTN   UefiMemoryBase,
   IN  UINTN   StacksBase,
