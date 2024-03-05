@@ -38,6 +38,7 @@
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <Library/MemEncryptSevLib.h>
 #include <OvmfPlatforms.h>
+#include <Library/TdxHelperLib.h>
 
 #include "Platform.h"
 
@@ -309,6 +310,13 @@ InitializePlatform (
 
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
   PlatformInfoHob = BuildPlatformInfoHob ();
+
+ #ifdef MDE_CPU_X64
+  if (TdIsEnabled ()) {
+    TdxHelperBuildGuidHobForTdxMeasurement ();
+  }
+
+ #endif
 
   PlatformInfoHob->SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
   PlatformInfoHob->SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
