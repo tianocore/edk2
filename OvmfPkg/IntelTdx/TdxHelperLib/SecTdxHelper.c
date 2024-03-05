@@ -23,6 +23,7 @@
 #include <WorkArea.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <Library/TdxHelperLib.h>
+#include <IndustryStandard/UefiTcgPlatform.h>
 
 #define ALIGNED_2MB_MASK  0x1fffff
 #define MEGABYTE_SHIFT    20
@@ -816,7 +817,6 @@ TdxHelperProcessTdHob (
  * @retval EFI_SUCCESS    Successfully hash and extend to RTMR
  * @retval Others         Other errors as indicated
  */
-STATIC
 EFI_STATUS
 HashAndExtendToRtmr (
   IN UINT32  RtmrIndex,
@@ -824,37 +824,7 @@ HashAndExtendToRtmr (
   IN UINTN   DataToHashLen,
   OUT UINT8  *Digest,
   IN  UINTN  DigestLen
-  )
-{
-  EFI_STATUS  Status;
-
-  if ((DataToHash == NULL) || (DataToHashLen == 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if ((Digest == NULL) || (DigestLen != SHA384_DIGEST_SIZE)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Calculate the sha384 of the data
-  //
-  if (!Sha384HashAll (DataToHash, DataToHashLen, Digest)) {
-    return EFI_ABORTED;
-  }
-
-  //
-  // Extend to RTMR
-  //
-  Status = TdExtendRtmr (
-             (UINT32 *)Digest,
-             SHA384_DIGEST_SIZE,
-             (UINT8)RtmrIndex
-             );
-
-  ASSERT (!EFI_ERROR (Status));
-  return Status;
-}
+  );
 
 /**
   In Tdx guest, TdHob is passed from host VMM to guest firmware and it contains
@@ -974,6 +944,78 @@ TdxHelperBuildGuidHobForTdxMeasurement (
  #ifdef TDX_PEI_LESS_BOOT
   return InternalBuildGuidHobForTdxMeasurement ();
  #else
+  return EFI_UNSUPPORTED;
+ #endif
+}
+
+EFI_STATUS
+BuildTdxMeasurementGuidHob (
+  UINT32  RtmrIndex,
+  UINT32  EventType,
+  UINT8   *EventData,
+  UINT32  EventSize,
+  UINT8   *HashValue,
+  UINT32  HashSize
+  );
+
+/**
+ * In Tdx guest, OVMF uses FW_CFG_SELECTOR(0x510) and FW_CFG_IO_DATA(0x511)
+ * to get configuration infomation from QEMU. From the security perspective,
+ * that should be measured before it is consumed.
+
+  @retval EFI_SUCCESS  The measurement is successfully
+  @retval Others       Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+TdxHelperMeasureFwCfgData (
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
+  )
+{
+ #ifdef TDX_PEI_LESS_BOOT
+  EFI_STATUS  Status;
+  UINT8       Digest[SHA384_DIGEST_SIZE];
+
+  if ((EventLog == NULL) || (HashData == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!TdIsEnabled ()) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = HashAndExtendToRtmr (
+             0,
+             (UINT8 *)HashData,
+             (UINTN)HashDataLen,
+             Digest,
+             SHA384_DIGEST_SIZE
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: HashAndExtendToRtmr failed with %r\n", __func__, Status));
+    return Status;
+  }
+
+  Status = BuildTdxMeasurementGuidHob (
+             0,
+             EV_PLATFORM_CONFIG_FLAGS,
+             EventLog,
+             LogLen,
+             Digest,
+             SHA384_DIGEST_SIZE
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: BuildTdxMeasurementGuidHob failed with %r\n", __func__, Status));
+  }
+
+  return Status;
+ #else
+  DEBUG ((DEBUG_ERROR, "%a: It's only support for Pei less startup %r\n", __func__));
   return EFI_UNSUPPORTED;
  #endif
 }
