@@ -25,7 +25,6 @@ Module Name:
 #include <Library/HobLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
-#include <Library/PeimEntryPoint.h>
 #include <Library/ResourcePublicationLib.h>
 #include <Library/BaseRiscVSbiLib.h>
 #include <Register/RiscV64/RiscVEncoding.h>
