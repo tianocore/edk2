@@ -11,7 +11,6 @@
 
 #include <PiPei.h>
 
-#include <Library/PeimEntryPoint.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -125,7 +124,7 @@ SecCoreStartupWithStack (
   IdtDescriptor.Base  = (UINTN)&IdtTableInStack.IdtTable;
   IdtDescriptor.Limit = (UINT16)(sizeof (IdtTableInStack.IdtTable) - 1);
 
-  ProcessLibraryConstructorList (NULL, NULL);
+  ProcessLibraryConstructorList ();
 
   //
   // Load the IDTR.
