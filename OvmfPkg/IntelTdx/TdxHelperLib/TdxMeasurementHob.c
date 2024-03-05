@@ -17,6 +17,8 @@
 #include <Library/PrintLib.h>
 #include <Library/TcgEventLogRecordLib.h>
 #include <WorkArea.h>
+#include <Library/TdxLib.h>
+#include <Library/BaseCryptLib.h>
 
 #pragma pack(1)
 
@@ -32,6 +34,57 @@ typedef struct {
 
 #define FV_HANDOFF_TABLE_DESC  "Fv(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)"
 typedef PLATFORM_FIRMWARE_BLOB2_STRUCT CFV_HANDOFF_TABLE_POINTERS2;
+
+/**
+ * Calculate the sha384 of input Data and extend it to RTMR register.
+ *
+ * @param RtmrIndex       Index of the RTMR register
+ * @param DataToHash      Data to be hashed
+ * @param DataToHashLen   Length of the data
+ * @param Digest          Hash value of the input data
+ * @param DigestLen       Length of the hash value
+ *
+ * @retval EFI_SUCCESS    Successfully hash and extend to RTMR
+ * @retval Others         Other errors as indicated
+ */
+EFI_STATUS
+HashAndExtendToRtmr (
+  IN UINT32  RtmrIndex,
+  IN VOID    *DataToHash,
+  IN UINTN   DataToHashLen,
+  OUT UINT8  *Digest,
+  IN  UINTN  DigestLen
+  )
+{
+  EFI_STATUS  Status;
+
+  if ((DataToHash == NULL) || (DataToHashLen == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Digest == NULL) || (DigestLen != SHA384_DIGEST_SIZE)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Calculate the sha384 of the data
+  //
+  if (!Sha384HashAll (DataToHash, DataToHashLen, Digest)) {
+    return EFI_ABORTED;
+  }
+
+  //
+  // Extend to RTMR
+  //
+  Status = TdExtendRtmr (
+             (UINT32 *)Digest,
+             SHA384_DIGEST_SIZE,
+             (UINT8)RtmrIndex
+             );
+
+  ASSERT (!EFI_ERROR (Status));
+  return Status;
+}
 
 /**
  * Build GuidHob for Tdx measurement.
@@ -51,7 +104,6 @@ typedef PLATFORM_FIRMWARE_BLOB2_STRUCT CFV_HANDOFF_TABLE_POINTERS2;
  * @retval EFI_SUCCESS  Successfully build the GuidHobs
  * @retval Others       Other error as indicated
  */
-STATIC
 EFI_STATUS
 BuildTdxMeasurementGuidHob (
   UINT32  RtmrIndex,

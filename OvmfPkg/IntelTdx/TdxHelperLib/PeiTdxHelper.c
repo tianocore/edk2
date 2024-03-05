@@ -9,6 +9,8 @@
 
 #include <Base.h>
 #include <PiPei.h>
+#include <Library/DebugLib.h>
+#include <IndustryStandard/UefiTcgPlatform.h>
 
 /**
   Build the GuidHob for tdx measurements which were done in SEC phase.
@@ -88,4 +90,80 @@ TdxHelperBuildGuidHobForTdxMeasurement (
   )
 {
   return InternalBuildGuidHobForTdxMeasurement ();
+}
+
+EFI_STATUS
+HashAndExtendToRtmr (
+  IN UINT32  RtmrIndex,
+  IN VOID    *DataToHash,
+  IN UINTN   DataToHashLen,
+  OUT UINT8  *Digest,
+  IN  UINTN  DigestLen
+  );
+
+EFI_STATUS
+BuildTdxMeasurementGuidHob (
+  UINT32  RtmrIndex,
+  UINT32  EventType,
+  UINT8   *EventData,
+  UINT32  EventSize,
+  UINT8   *HashValue,
+  UINT32  HashSize
+  );
+
+/**
+ * In Tdx guest, OVMF uses FW_CFG_SELECTOR(0x510) and FW_CFG_IO_DATA(0x511)
+ * to get configuration infomation from QEMU. From the security perspective,
+ * that should be measured before it is consumed.
+
+  @retval EFI_SUCCESS  The measurement is successfully
+  @retval Others       Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+TdxHelperMeasureFwCfgData (
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       Digest[SHA384_DIGEST_SIZE];
+
+  if ((EventLog == NULL) || (HashData == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!TdIsEnabled ()) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = HashAndExtendToRtmr (
+             0,
+             (UINT8 *)HashData,
+             (UINTN)HashDataLen,
+             Digest,
+             SHA384_DIGEST_SIZE
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: HashAndExtendToRtmr failed with %r\n", __func__, Status));
+    return Status;
+  }
+
+  Status = BuildTdxMeasurementGuidHob (
+             0,
+             EV_PLATFORM_CONFIG_FLAGS,
+             EventLog,
+             LogLen,
+             Digest,
+             SHA384_DIGEST_SIZE
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: BuildTdxMeasurementGuidHob failed with %r\n", __func__, Status));
+  }
+
+  return Status;
 }
