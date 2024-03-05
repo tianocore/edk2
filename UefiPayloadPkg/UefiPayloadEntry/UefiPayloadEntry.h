@@ -52,16 +52,6 @@
 #define E820_UNDEFINED  8
 
 /**
-  Auto-generated function that calls the library constructors for all of the module's
-  dependent libraries.
-**/
-VOID
-EFIAPI
-ProcessLibraryConstructorList (
-  VOID
-  );
-
-/**
   Add a new HOB to the HOB List.
 
   @param HobType            Type of the new HOB.
