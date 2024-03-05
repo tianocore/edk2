@@ -705,7 +705,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjSmmuInterruptArray,          CmArmGenericInterruptParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcHierarchyInfo,           CmArmProcHierarchyInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCacheInfo,                   CmArmCacheInfoParser),
-  CM_PARSER_ADD_OBJECT_RESERVED (EArmObjReserved29),
   CM_PARSER_ADD_OBJECT (EArmObjCmRef,                       CmArmObjRefParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryAffinityInfo,          CmArmMemoryAffinityInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjDeviceHandleAcpi,            CmArmDeviceHandleAcpiParser),

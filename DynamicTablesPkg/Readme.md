@@ -468,28 +468,27 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  25   | SMMU Interrupt Array                      | |
 |  26   | Processor Hierarchy Info                  | Move to Arch Common NS |
 |  27   | Cache Info                                | Move to Arch Common NS |
-|  28   | Reserved29                                | Unused to be dropped.|
-|  29   | CM Object Reference                       | Move to Arch Common NS |
-|  30   | Memory Affinity Info                      | Move to Arch Common NS |
-|  31   | Device Handle Acpi                        | Move to Arch Common NS |
-|  32   | Device Handle PCI                         | Move to Arch Common NS |
-|  33   | Generic Initiator Affinity Info           | Move to Arch Common NS |
-|  34   | Serial Port Info                          | Move to Arch Common NS |
-|  35   | CMN 600 Info                              | |
-|  36   | Low Power Idle State Info                 | Move to Arch Common NS |
-|  37   | PCI Address Map Info                      | Move to Arch Common NS |
-|  38   | PCI Interrupt Map Info                    | Move to Arch Common NS |
-|  39   | Reserved Memory Range Node                | |
-|  40   | Memory Range Descriptor                   | |
-|  41   | Continuous Performance Control Info       | Move to Arch Common NS |
-|  42   | Pcc Subspace Type 0 Info                  | Move to Arch Common NS |
-|  43   | Pcc Subspace Type 1 Info                  | Move to Arch Common NS |
-|  44   | Pcc Subspace Type 2 Info                  | Move to Arch Common NS |
-|  45   | Pcc Subspace Type 3 Info                  | Move to Arch Common NS |
-|  46   | Pcc Subspace Type 4 Info                  | Move to Arch Common NS |
-|  47   | Pcc Subspace Type 5 Info                  | Move to Arch Common NS |
-|  48   | Embedded Trace Extension/Module Info      | |
-|  49   | P-State Dependency (PSD) Info             | Move to Arch Common NS |
+|  28   | CM Object Reference                       | Move to Arch Common NS |
+|  29   | Memory Affinity Info                      | Move to Arch Common NS |
+|  30   | Device Handle Acpi                        | Move to Arch Common NS |
+|  31   | Device Handle PCI                         | Move to Arch Common NS |
+|  32   | Generic Initiator Affinity Info           | Move to Arch Common NS |
+|  33   | Serial Port Info                          | Move to Arch Common NS |
+|  34   | CMN 600 Info                              | |
+|  35   | Low Power Idle State Info                 | Move to Arch Common NS |
+|  36   | PCI Address Map Info                      | Move to Arch Common NS |
+|  37   | PCI Interrupt Map Info                    | Move to Arch Common NS |
+|  38   | Reserved Memory Range Node                | |
+|  39   | Memory Range Descriptor                   | |
+|  40   | Continuous Performance Control Info       | Move to Arch Common NS |
+|  41   | Pcc Subspace Type 0 Info                  | Move to Arch Common NS |
+|  42   | Pcc Subspace Type 1 Info                  | Move to Arch Common NS |
+|  43   | Pcc Subspace Type 2 Info                  | Move to Arch Common NS |
+|  44   | Pcc Subspace Type 3 Info                  | Move to Arch Common NS |
+|  45   | Pcc Subspace Type 4 Info                  | Move to Arch Common NS |
+|  46   | Pcc Subspace Type 5 Info                  | Move to Arch Common NS |
+|  47   | Embedded Trace Extension/Module Info      | |
+|  48   | P-State Dependency (PSD) Info             | Move to Arch Common NS |
 |  `*`  | All other values are reserved.            | |
 
 #### Object ID's in the Arch Common Namespace:
