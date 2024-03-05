@@ -11,7 +11,6 @@
 
 #include <PiPei.h>
 
-#include <Library/PeimEntryPoint.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -844,7 +843,7 @@ SecCoreStartupWithStack (
     InitializeCpuExceptionHandlers (NULL);
   }
 
-  ProcessLibraryConstructorList (NULL, NULL);
+  ProcessLibraryConstructorList ();
 
   if (!SevEsIsEnabled ()) {
     //

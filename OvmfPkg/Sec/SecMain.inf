@@ -8,7 +8,7 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.30
   BASE_NAME                      = SecMain
   FILE_GUID                      = df1ccef6-f301-4a63-9661-fc6030dcc880
   MODULE_TYPE                    = SEC
