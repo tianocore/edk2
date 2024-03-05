@@ -11,7 +11,7 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.30
   BASE_NAME                      = EmuSec
   FILE_GUID                      = BCAF98C9-22B0-3B4F-9CBD-C8A6B4DBCEE9
   MODULE_TYPE                    = SEC

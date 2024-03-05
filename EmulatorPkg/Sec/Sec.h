@@ -20,15 +20,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Ppi/TemporaryRamSupport.h>
 
-//
-// I think this should be defined in a MdePkg include file?
-//
-VOID
-EFIAPI
-ProcessLibraryConstructorList (
-  VOID
-  );
-
 EFI_STATUS
 EFIAPI
 SecTemporaryRamSupport (
