@@ -171,28 +171,27 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///< 25 - SMMU Interrupt Array
   TokenFixerNotImplemented,         ///< 26 - Processor Hierarchy Info
   TokenFixerNotImplemented,         ///< 27 - Cache Info
-  TokenFixerNotImplemented,         ///< 29 - Reserved
-  NULL,                             ///< 29 - CM Object Reference
-  NULL,                             ///< 30 - Memory Affinity Info
-  NULL,                             ///< 31 - Device Handle Acpi
-  NULL,                             ///< 32 - Device Handle Pci
-  NULL,                             ///< 33 - Generic Initiator Affinity
-  NULL,                             ///< 34 - Generic Serial Port Info
-  NULL,                             ///< 35 - CMN-600 Info
-  NULL,                             ///< 36 - Lpi Info
-  NULL,                             ///< 37 - Pci Address Map Info
-  NULL,                             ///< 38 - Pci Interrupt Map Info
-  NULL,                             ///< 39 - Reserved Memory Range Node
-  NULL,                             ///< 40 - Memory Range Descriptor
-  NULL,                             ///< 41 - Continuous Performance Control Info
-  NULL,                             ///< 42 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 28 - CM Object Reference
+  NULL,                             ///< 29 - Memory Affinity Info
+  NULL,                             ///< 30 - Device Handle Acpi
+  NULL,                             ///< 31 - Device Handle Pci
+  NULL,                             ///< 32 - Generic Initiator Affinity
+  NULL,                             ///< 33 - Generic Serial Port Info
+  NULL,                             ///< 34 - CMN-600 Info
+  NULL,                             ///< 35 - Lpi Info
+  NULL,                             ///< 36 - Pci Address Map Info
+  NULL,                             ///< 37 - Pci Interrupt Map Info
+  NULL,                             ///< 38 - Reserved Memory Range Node
+  NULL,                             ///< 39 - Memory Range Descriptor
+  NULL,                             ///< 40 - Continuous Performance Control Info
+  NULL,                             ///< 41 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 42 - Pcc Subspace Type 2 Info
   NULL,                             ///< 43 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 44 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 45 - Pcc Subspace Type 3 Info
-  NULL,                             ///< 46 - Pcc Subspace Type 4 Info
-  NULL,                             ///< 47 - Pcc Subspace Type 5 Info
-  NULL,                             ///< 48 - Embedded Trace Extension/Module Info
-  NULL                              ///< 49 - P-State Dependency (PSD) Info
+  NULL,                             ///< 44 - Pcc Subspace Type 3 Info
+  NULL,                             ///< 45 - Pcc Subspace Type 4 Info
+  NULL,                             ///< 46 - Pcc Subspace Type 5 Info
+  NULL,                             ///< 47 - Embedded Trace Extension/Module Info
+  NULL                              ///< 48 - P-State Dependency (PSD) Info
 };
 
 /** CmObj token fixer.
