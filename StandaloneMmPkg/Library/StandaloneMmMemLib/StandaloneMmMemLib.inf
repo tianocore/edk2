@@ -56,3 +56,4 @@
   gMmCoreDataHobGuid                  ## SOMETIMES_CONSUMES ## HOB
   gEfiMmPeiMmramMemoryReserveGuid     ## SOMETIMES_CONSUMES ## HOB
   gNonMmramMapGuid
+  gEfiSmmSmramMemoryGuid

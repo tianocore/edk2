@@ -467,7 +467,7 @@ MmDispatcher (
       //
       // Cache state of MmEntryPointRegistered before calling entry point
       //
-      PreviousMmEntryPointRegistered = gMmCorePrivate->MmEntryPointRegistered;
+      PreviousMmEntryPointRegistered = mMmEntryPointRegistered;
 
       //
       // For each MM driver, pass NULL as ImageHandle
@@ -487,7 +487,7 @@ MmDispatcher (
         }
       }
 
-      if (!PreviousMmEntryPointRegistered && gMmCorePrivate->MmEntryPointRegistered) {
+      if (!PreviousMmEntryPointRegistered && mMmEntryPointRegistered) {
         if (FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
           //
           // Return immediately if the MM Entry Point was registered by the MM

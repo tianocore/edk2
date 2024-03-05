@@ -31,6 +31,7 @@
 #include <Guid/MmFvDispatch.h>
 #include <Guid/MmramMemoryReserve.h>
 #include <Guid/MmCommBuffer.h>
+#include <Guid/MemoryAllocationHob.h>
 
 #include <Library/StandaloneMmCoreEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -175,9 +176,9 @@ typedef struct {
 //
 // MM Core Global Variables
 //
-extern MM_CORE_PRIVATE_DATA  *gMmCorePrivate;
 extern EFI_MM_SYSTEM_TABLE   gMmCoreMmst;
 extern LIST_ENTRY            gHandleList;
+extern BOOLEAN               mMmEntryPointRegistered;
 
 /**
   Called to initialize the memory service.
