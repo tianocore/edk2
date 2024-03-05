@@ -25,7 +25,7 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjPowerManagementProfileInfo
+  - EArchCommonObjPowerManagementProfileInfo
   - EArmObjBootArchInfo
   - EArmObjHypervisorVendorIdentity (OPTIONAL)
 */
@@ -202,9 +202,9 @@ EFI_ACPI_6_5_FIXED_ACPI_DESCRIPTION_TABLE  AcpiFadt = {
     Management Profile Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPowerManagementProfileInfo,
-  CM_ARM_POWER_MANAGEMENT_PROFILE_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPowerManagementProfileInfo,
+  CM_ARCH_COMMON_POWER_MANAGEMENT_PROFILE_INFO
   );
 
 /** This macro expands to a function that retrieves the Boot
@@ -253,13 +253,13 @@ FadtAddPmProfileInfo (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
   )
 {
-  EFI_STATUS                            Status;
-  CM_ARM_POWER_MANAGEMENT_PROFILE_INFO  *PmProfile;
+  EFI_STATUS                                    Status;
+  CM_ARCH_COMMON_POWER_MANAGEMENT_PROFILE_INFO  *PmProfile;
 
   ASSERT (CfgMgrProtocol != NULL);
 
   // Get the Power Management Profile from the Platform Configuration Manager
-  Status = GetEArmObjPowerManagementProfileInfo (
+  Status = GetEArchCommonObjPowerManagementProfileInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PmProfile,

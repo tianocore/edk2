@@ -57,9 +57,9 @@ STATIC CONST CM_OBJ_PARSER  CmArmBootArchInfoParser[] = {
   { "BootArchFlags", 2, "0x%x", NULL }
 };
 
-/** A parser for EArmObjPowerManagementProfileInfo.
+/** A parser for EArchCommonObjPowerManagementProfileInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmPowerManagementProfileInfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPowerManagementProfileInfoParser[] = {
   { "PowerManagementProfile", 1, "0x%x", NULL }
 };
 
@@ -671,6 +671,7 @@ STATIC CONST CM_OBJ_PARSER  CmArmPsdInfoParser[] = {
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjReserved),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPowerManagementProfileInfo,CmArchCommonPowerManagementProfileInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -679,7 +680,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjReserved),
   CM_PARSER_ADD_OBJECT (EArmObjBootArchInfo,                CmArmBootArchInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjPowerManagementProfileInfo,  CmArmPowerManagementProfileInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicCInfo,                    CmArmGicCInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicDInfo,                    CmArmGicDInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicMsiFrameInfo,             CmArmGicMsiFrameInfoParser),
