@@ -679,7 +679,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjReserved),
   CM_PARSER_ADD_OBJECT (EArmObjBootArchInfo,                CmArmBootArchInfoParser),
-  CM_PARSER_ADD_OBJECT_RESERVED (EArmObjCpuInfo),
   CM_PARSER_ADD_OBJECT (EArmObjPowerManagementProfileInfo,  CmArmPowerManagementProfileInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicCInfo,                    CmArmGicCInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicDInfo,                    CmArmGicDInfoParser),
