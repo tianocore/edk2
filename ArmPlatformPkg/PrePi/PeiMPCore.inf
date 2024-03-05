@@ -8,7 +8,7 @@
 #**/
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.30
   BASE_NAME                      = ArmPlatformPrePiMPCore
   FILE_GUID                      = d959e387-7b91-452c-90e0-a1dbac90ddb8
   MODULE_TYPE                    = SEC
