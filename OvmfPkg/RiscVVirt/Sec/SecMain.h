@@ -50,18 +50,6 @@ SecStartup (
   );
 
 /**
-  Auto-generated function that calls the library constructors for all of the module's
-  dependent libraries.  This function must be called by the SEC Core once a stack has
-  been established.
-
-**/
-VOID
-EFIAPI
-ProcessLibraryConstructorList (
-  VOID
-  );
-
-/**
   Perform Platform PEIM initialization.
 
   @return EFI_SUCCESS     The platform initialized successfully.
