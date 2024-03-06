@@ -33,7 +33,7 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjSerialConsolePortInfo
+  - EArchCommonObjConsolePortInfo
 
 NOTE: This implementation ignores the possibility that the Serial settings may
       be modified from the UEFI Shell.  A more complex handler would be needed
@@ -98,9 +98,9 @@ EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE  AcpiSpcr = {
     Port Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjSerialConsolePortInfo,
-  CM_ARM_SERIAL_PORT_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjConsolePortInfo,
+  CM_ARCH_COMMON_SERIAL_PORT_INFO
   )
 
 /** Free any resources allocated for constructing the tables.
@@ -200,10 +200,10 @@ BuildSpcrTableEx (
   OUT       UINTN                                  *CONST  TableCount
   )
 {
-  EFI_STATUS                   Status;
-  CM_ARM_SERIAL_PORT_INFO      *SerialPortInfo;
-  UINT32                       SerialPortCount;
-  EFI_ACPI_DESCRIPTION_HEADER  **TableList;
+  EFI_STATUS                       Status;
+  CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo;
+  UINT32                           SerialPortCount;
+  EFI_ACPI_DESCRIPTION_HEADER      **TableList;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -229,7 +229,7 @@ BuildSpcrTableEx (
 
   *Table = NULL;
 
-  Status = GetEArmObjSerialConsolePortInfo (
+  Status = GetEArchCommonObjConsolePortInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &SerialPortInfo,
