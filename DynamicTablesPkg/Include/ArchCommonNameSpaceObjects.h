@@ -22,6 +22,9 @@
 typedef enum ArchCommonObjectID {
   EArchCommonObjReserved,                       ///<  0 - Reserved
   EArchCommonObjPowerManagementProfileInfo,     ///<  1 - Power Management Profile Info
+  EArchCommonObjSerialPortInfo,                 ///<  2 - Generic Serial Port Info
+  EArchCommonObjConsolePortInfo,                ///<  3 - Serial Console Port Info
+  EArchCommonObjSerialDebugPortInfo,            ///<  4 - Serial Debug Port Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -39,6 +42,38 @@ typedef struct CmArchCommonPowerManagementProfileInfo {
   UINT8    PowerManagementProfile;
 } CM_ARCH_COMMON_POWER_MANAGEMENT_PROFILE_INFO;
 
+/** A structure that describes the
+    Serial Port information for the Platform.
+
+    ID: EArchCommonObjConsolePortInfo or
+        EArchCommonObjSerialDebugPortInfo or
+        EArchCommonObjSerialPortInfo
+*/
+typedef struct EArchCommonSerialPortInfo {
+  /// The physical base address for the serial port
+  UINT64    BaseAddress;
+
+  /** The serial port interrupt.
+      0 indicates that the serial port does not
+      have an interrupt wired.
+  */
+  UINT32    Interrupt;
+
+  /// The serial port baud rate
+  UINT64    BaudRate;
+
+  /// The serial port clock
+  UINT32    Clock;
+
+  /// Serial Port subtype
+  UINT16    PortSubtype;
+
+  /// The Base address length
+  UINT64    BaseAddressLength;
+
+  /// The access size
+  UINT8     AccessSize;
+} CM_ARCH_COMMON_SERIAL_PORT_INFO;
 
 #pragma pack()
 
