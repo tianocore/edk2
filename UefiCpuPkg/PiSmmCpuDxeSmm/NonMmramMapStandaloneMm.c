@@ -93,6 +93,20 @@ SetUefiMemMapAttributes (
     Base   = MemoryMap[Index].PhysicalStart;
     Length = EFI_PAGES_TO_SIZE ((UINTN)MemoryMap[Index].NumberOfPages);
 
+    //
+    // Only set [StartAddress, EndAddress] linear-address range memory attributes.
+    // Note: Consider the case that 5-Level paging is disabled with more than 47
+    //       physical-address bits. The range in memory map entries might go beyond
+    //       the EndAddress.
+    //
+    if (Base >= EndAddress) {
+      break;
+    }
+
+    if (Base + Length > EndAddress) {
+      Length = EndAddress - Base;
+    }
+
     if (MemoryMap[Index].Attribute != 0) {
       Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryMap[Index].Attribute, TRUE, NULL);
       ASSERT_RETURN_ERROR (Status);
