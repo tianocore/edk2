@@ -229,9 +229,9 @@ GET_OBJECT_LIST (
   feature flags for the platform from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjFixedFeatureFlags,
-  CM_ARM_FIXED_FEATURE_FLAGS
+  EObjNameSpaceArchCommon,
+  EArchCommonObjFixedFeatureFlags,
+  CM_ARCH_COMMON_FIXED_FEATURE_FLAGS
   );
 
 /** Update the Power Management Profile information in the FADT Table.
@@ -420,13 +420,13 @@ FadtAddFixedFeatureFlags (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
   )
 {
-  EFI_STATUS                  Status;
-  CM_ARM_FIXED_FEATURE_FLAGS  *FixedFeatureFlags;
+  EFI_STATUS                          Status;
+  CM_ARCH_COMMON_FIXED_FEATURE_FLAGS  *FixedFeatureFlags;
 
   ASSERT (CfgMgrProtocol != NULL);
 
   // Get the Fixed feature flags from the Platform Configuration Manager
-  Status = GetEArmObjFixedFeatureFlags (
+  Status = GetEArchCommonObjFixedFeatureFlags (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &FixedFeatureFlags,
@@ -453,7 +453,7 @@ FadtAddFixedFeatureFlags (
 
   DEBUG ((
     DEBUG_INFO,
-    "FADT: EArmObjFixedFeatureFlags = 0x%x\n",
+    "FADT: EArchCommonObjFixedFeatureFlags = 0x%x\n",
     FixedFeatureFlags->Flags
     ));
 

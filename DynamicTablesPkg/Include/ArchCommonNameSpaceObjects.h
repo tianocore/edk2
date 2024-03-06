@@ -26,6 +26,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjConsolePortInfo,                ///<  3 - Serial Console Port Info
   EArchCommonObjSerialDebugPortInfo,            ///<  4 - Serial Debug Port Info
   EArchCommonObjHypervisorVendorIdentity,       ///<  5 - Hypervisor Vendor Id
+  EArchCommonObjFixedFeatureFlags,              ///<  6 - Fixed feature flags for FADT
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -85,6 +86,16 @@ typedef struct CmArchCommonHypervisorVendorIdentity {
   /// The hypervisor Vendor ID
   UINT64    HypervisorVendorId;
 } CM_ARCH_COMMON_HYPERVISOR_VENDOR_ID;
+
+/** A structure that describes the
+    Fixed feature flags for the Platform.
+
+    ID: EArchCommonObjFixedFeatureFlags
+*/
+typedef struct CmArchCommonFixedFeatureFlags {
+  /// The Fixed feature flags
+  UINT32    Flags;
+} CM_ARCH_COMMON_FIXED_FEATURE_FLAGS;
 
 #pragma pack()
 
