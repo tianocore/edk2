@@ -25,6 +25,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSerialPortInfo,                 ///<  2 - Generic Serial Port Info
   EArchCommonObjConsolePortInfo,                ///<  3 - Serial Console Port Info
   EArchCommonObjSerialDebugPortInfo,            ///<  4 - Serial Debug Port Info
+  EArchCommonObjHypervisorVendorIdentity,       ///<  5 - Hypervisor Vendor Id
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -74,6 +75,16 @@ typedef struct EArchCommonSerialPortInfo {
   /// The access size
   UINT8     AccessSize;
 } CM_ARCH_COMMON_SERIAL_PORT_INFO;
+
+/** A structure that describes the
+    Hypervisor Vendor ID information for the Platform.
+
+    ID: EArchCommonObjHypervisorVendorIdentity
+*/
+typedef struct CmArchCommonHypervisorVendorIdentity {
+  /// The hypervisor Vendor ID
+  UINT64    HypervisorVendorId;
+} CM_ARCH_COMMON_HYPERVISOR_VENDOR_ID;
 
 #pragma pack()
 
