@@ -12,6 +12,7 @@
 #ifndef CONFIGURATION_MANAGER_OBJECT_H_
 #define CONFIGURATION_MANAGER_OBJECT_H_
 
+#include <ArchCommonNameSpaceObjects.h>
 #include <ArmNameSpaceObjects.h>
 #include <StandardNameSpaceObjects.h>
 
