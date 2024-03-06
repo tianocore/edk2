@@ -33,6 +33,7 @@
   Mmi.c
   InstallConfigurationTable.c
   FwVol.c
+  MemoryAttributesTable.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -52,6 +53,7 @@
   PeCoffLib
   ReportStatusCodeLib
   StandaloneMmCoreEntryPoint
+  ImagePropertiesRecordLib
 
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
@@ -77,6 +79,7 @@
   gEfiEventReadyToBootGuid
   gEdkiiCommunicationBufferGuid
   gEfiHobMemoryAllocModuleGuid
+  gEdkiiPiSmmMemoryAttributesTableGuid
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES

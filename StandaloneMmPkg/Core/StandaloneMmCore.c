@@ -760,6 +760,8 @@ StandaloneMmMain (
 
   MmCoreInstallLoadedImage ();
 
+  MmCoreInitializeMemoryAttributesTable ();
+
   DEBUG ((DEBUG_INFO, "MmMain Done!\n"));
 
   return EFI_SUCCESS;
