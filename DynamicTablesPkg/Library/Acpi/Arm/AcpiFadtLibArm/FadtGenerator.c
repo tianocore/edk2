@@ -27,7 +27,7 @@ Requirements:
   this Generator:
   - EArchCommonObjPowerManagementProfileInfo
   - EArmObjBootArchInfo
-  - EArmObjHypervisorVendorIdentity (OPTIONAL)
+  - EArchCommonObjHypervisorVendorIdentity (OPTIONAL)
 */
 
 /** This macro defines the FADT flag options for ARM Platforms.
@@ -220,9 +220,9 @@ GET_OBJECT_LIST (
     Vendor ID from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjHypervisorVendorIdentity,
-  CM_ARM_HYPERVISOR_VENDOR_ID
+  EObjNameSpaceArchCommon,
+  EArchCommonObjHypervisorVendorIdentity,
+  CM_ARCH_COMMON_HYPERVISOR_VENDOR_ID
   );
 
 /** This macro expands to a function that retrieves the Fixed
@@ -358,13 +358,13 @@ FadtAddHypervisorVendorId (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol
   )
 {
-  EFI_STATUS                   Status;
-  CM_ARM_HYPERVISOR_VENDOR_ID  *HypervisorVendorInfo;
+  EFI_STATUS                           Status;
+  CM_ARCH_COMMON_HYPERVISOR_VENDOR_ID  *HypervisorVendorInfo;
 
   ASSERT (CfgMgrProtocol != NULL);
 
   // Get the Hypervisor Vendor ID from the Platform Configuration Manager
-  Status = GetEArmObjHypervisorVendorIdentity (
+  Status = GetEArchCommonObjHypervisorVendorIdentity (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &HypervisorVendorInfo,
@@ -391,7 +391,7 @@ FadtAddHypervisorVendorId (
 
   DEBUG ((
     DEBUG_INFO,
-    "FADT: EArmObjHypervisorVendorIdentity = 0x%lx\n",
+    "FADT: EArchCommonObjHypervisorVendorIdentity = 0x%lx\n",
     HypervisorVendorInfo->HypervisorVendorId
     ));
 
