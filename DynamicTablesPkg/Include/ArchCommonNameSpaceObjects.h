@@ -27,6 +27,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjSerialDebugPortInfo,            ///<  4 - Serial Debug Port Info
   EArchCommonObjHypervisorVendorIdentity,       ///<  5 - Hypervisor Vendor Id
   EArchCommonObjFixedFeatureFlags,              ///<  6 - Fixed feature flags for FADT
+  EArchCommonObjCmRef,                          ///<  7 - CM Object Reference
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -96,6 +97,22 @@ typedef struct CmArchCommonFixedFeatureFlags {
   /// The Fixed feature flags
   UINT32    Flags;
 } CM_ARCH_COMMON_FIXED_FEATURE_FLAGS;
+
+/** A structure that describes a reference to another Configuration Manager
+    object.
+
+    This is useful for creating an array of reference tokens. The framework
+    can then query the configuration manager for these arrays using the
+    object ID EArchCommonObjCmRef.
+
+    This can be used is to represent one-to-many relationships between objects.
+
+    ID: EArchCommonObjCmRef
+*/
+typedef struct CmArchCommonObjRef {
+  /// Token of the CM object being referenced
+  CM_OBJECT_TOKEN    ReferenceToken;
+} CM_ARCH_COMMON_OBJ_REF;
 
 #pragma pack()
 
