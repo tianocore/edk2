@@ -21,7 +21,6 @@
 [Sources]
   MmCommunicationDxe.c
   MmCommunicationDxe.h
-  CpuMemoryManagement.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -44,7 +43,6 @@
   gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
   gEfiEndOfDxeEventGroupGuid               ## CONSUMES ## Event
   gEdkiiPiSmmCommunicationRegionTableGuid  ## CONSUMES ## SystemTable
-  gNonMmramMapGuid                         ## CONSUMES
   gEfiEventExitBootServicesGuid
   gMmCoreDataHobGuid
 

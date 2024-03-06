@@ -237,12 +237,6 @@ SmmEndOfDxeEventNotify (
   )
 {
   mEndOfDxe = TRUE;
-
-  //
-  // Communicate the memory map and PiSmmCpuDxe driver will apply the memory
-  // protection based on the memory map.
-  //
-  CreateAndCommunicateNonMmramMap ();
 }
 
 /**

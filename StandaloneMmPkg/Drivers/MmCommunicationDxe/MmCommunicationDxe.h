@@ -25,7 +25,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MemoryAttributesTable.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
 #include <Guid/MmCoreData.h>
-#include <Guid/NonMmramMap.h>
 
 #include <PiDxe.h>
 
@@ -56,14 +55,6 @@ extern UINTN                             mGcdMemNumberOfDesc;
 extern EFI_MEMORY_ATTRIBUTES_TABLE  *mUefiMemoryAttributesTable;
 
 extern EFI_MM_COMMUNICATION2_PROTOCOL  mMmCommunication2;
-
-/**
-  This function caches the UEFI memory map information.
-**/
-VOID
-CreateAndCommunicateNonMmramMap (
-  VOID
-  );
 
 EFI_STATUS
 EFIAPI
