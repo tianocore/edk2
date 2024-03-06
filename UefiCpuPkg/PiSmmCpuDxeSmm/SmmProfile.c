@@ -184,6 +184,10 @@ GetSourceFromDestinationOnBts (
 
   FirstMatch = FALSE;
 
+  //
+  // mMsrDsArea is initalized in InitSmmProfileInternal() and set into MSR_DS_AREA during
+  // early SmiRendezvous, see ActivateBTS.
+  //
   CurrentBTSRecord = (BRANCH_TRACE_RECORD *)mMsrDsArea[CpuIndex]->BTSIndex;
   for (Index = 0; Index < mBTSRecordNumber; Index++) {
     if ((UINTN)CurrentBTSRecord < (UINTN)mMsrBTSRecord[CpuIndex]) {
@@ -1314,8 +1318,15 @@ SmmProfilePFHandler (
   RestoreAddress    = PFAddress;
   while (RestorePageNumber > 0) {
     if (RestoreAddress <= 0xFFFFFFFF) {
+      //
+      // PFAddress under 4G must be invalid address that should be added into the SMM profile (like Non-Mmram ranges).
+      //
       RestorePageTableBelow4G (PageTable, RestoreAddress, CpuIndex, ErrorCode);
     } else {
+      //
+      // Need check PFAddress above 4G is valid address or not. The SMM accessible MMIO ranges are valid address, which
+      // won't be added into the SMM profile.
+      //
       RestorePageTableAbove4G (PageTable, RestoreAddress, CpuIndex, ErrorCode, &IsValidPFAddress);
     }
 
@@ -1327,7 +1338,10 @@ SmmProfilePFHandler (
     InstructionAddress = Rip;
     if (((ErrorCode & IA32_PF_EC_ID) != 0) && (mBtsSupported)) {
       //
-      // If it is instruction fetch failure, get the correct IP from BTS.
+      // If the Page Fault is caused by instruction fetch failure (IA32_PF_EC_ID is set), get the
+      // correct IP from BTS. The Branch Trace Store (BTS) can be used to retrieve the correct IP
+      // in such cases. It is a debugging feature provided by processors that records information
+      // about the branch instructions executed by the processor.
       //
       InstructionAddress = GetSourceFromDestinationOnBts (CpuIndex, Rip);
       if (InstructionAddress == 0) {
