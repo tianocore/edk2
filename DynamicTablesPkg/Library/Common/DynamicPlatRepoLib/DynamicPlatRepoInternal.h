@@ -67,7 +67,16 @@ typedef struct DynamicPlatformRepositoryInfo {
   /// This array is populated when the Repo is finalized.
   CM_OBJ_DESCRIPTOR      ArmCmObjArray[EArmObjMax];
 
-  /// A token mapper for the objects in the ArmNamespaceObjectArray
+  /// Link lists of CmObj from the ArchCommon Namespace
+  /// that are added in the Transient state.
+  LIST_ENTRY             ArchCommonCmObjList[EArchCommonObjMax];
+
+  /// Structure Members used in Finalized state.
+  /// An array of CmObj Descriptors from the ArchCommon Namespace
+  /// This array is populated when the Repo is finalized.
+  CM_OBJ_DESCRIPTOR      ArchCommonCmObjArray[EArchCommonObjMax];
+
+  /// A token mapper for the objects in the <Arm|ArchCommon>CmObjArray
   /// The Token mapper is populated when the Repo is finalized in
   /// a call to DynamicPlatRepoFinalise ().
   TOKEN_MAPPER           TokenMapper;
