@@ -155,39 +155,38 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///<  9 - Generic Timer Block Frame Info
   NULL,                             ///< 10 - Platform Generic Watchdog
   NULL,                             ///< 11 - PCI Configuration Space Info
-  NULL,                             ///< 12 - Hypervisor Vendor Id
-  NULL,                             ///< 13 - Fixed feature flags for FADT
-  TokenFixerItsGroup,               ///< 14 - ITS Group
-  TokenFixerNamedComponentNode,     ///< 15 - Named Component
-  TokenFixerRootComplexNode,        ///< 16 - Root Complex
-  TokenFixerNotImplemented,         ///< 17 - SMMUv1 or SMMUv2
-  TokenFixerSmmuV3Node,             ///< 18 - SMMUv3
-  TokenFixerNotImplemented,         ///< 19 - PMCG
-  NULL,                             ///< 20 - GIC ITS Identifier Array
-  NULL,                             ///< 21 - ID Mapping Array
-  NULL,                             ///< 22 - SMMU Interrupt Array
-  TokenFixerNotImplemented,         ///< 23 - Processor Hierarchy Info
-  TokenFixerNotImplemented,         ///< 24 - Cache Info
+  NULL,                             ///< 12 - Fixed feature flags for FADT
+  TokenFixerItsGroup,               ///< 13 - ITS Group
+  TokenFixerNamedComponentNode,     ///< 14 - Named Component
+  TokenFixerRootComplexNode,        ///< 15 - Root Complex
+  TokenFixerNotImplemented,         ///< 16 - SMMUv1 or SMMUv2
+  TokenFixerSmmuV3Node,             ///< 17 - SMMUv3
+  TokenFixerNotImplemented,         ///< 18 - PMCG
+  NULL,                             ///< 19 - GIC ITS Identifier Array
+  NULL,                             ///< 20 - ID Mapping Array
+  NULL,                             ///< 21 - SMMU Interrupt Array
+  TokenFixerNotImplemented,         ///< 22 - Processor Hierarchy Info
+  TokenFixerNotImplemented,         ///< 23 - Cache Info
+  NULL,                             ///< 24 - Memory Affinity Info
   NULL,                             ///< 25 - Memory Affinity Info
-  NULL,                             ///< 26 - Memory Affinity Info
-  NULL,                             ///< 27 - Device Handle Acpi
-  NULL,                             ///< 28 - Device Handle Pci
-  NULL,                             ///< 29 - Generic Initiator Affinity
-  NULL,                             ///< 30 - CMN-600 Info
-  NULL,                             ///< 31 - Lpi Info
-  NULL,                             ///< 32 - Pci Address Map Info
-  NULL,                             ///< 33 - Pci Interrupt Map Info
-  NULL,                             ///< 34 - Reserved Memory Range Node
-  NULL,                             ///< 35 - Memory Range Descriptor
-  NULL,                             ///< 36 - Continuous Performance Control Info
-  NULL,                             ///< 37 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 26 - Device Handle Acpi
+  NULL,                             ///< 27 - Device Handle Pci
+  NULL,                             ///< 28 - Generic Initiator Affinity
+  NULL,                             ///< 29 - CMN-600 Info
+  NULL,                             ///< 30 - Lpi Info
+  NULL,                             ///< 31 - Pci Address Map Info
+  NULL,                             ///< 32 - Pci Interrupt Map Info
+  NULL,                             ///< 33 - Reserved Memory Range Node
+  NULL,                             ///< 34 - Memory Range Descriptor
+  NULL,                             ///< 35 - Continuous Performance Control Info
+  NULL,                             ///< 36 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 37 - Pcc Subspace Type 2 Info
   NULL,                             ///< 38 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 39 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 40 - Pcc Subspace Type 3 Info
-  NULL,                             ///< 41 - Pcc Subspace Type 4 Info
-  NULL,                             ///< 42 - Pcc Subspace Type 5 Info
-  NULL,                             ///< 43 - Embedded Trace Extension/Module Info
-  NULL                              ///< 44 - P-State Dependency (PSD) Info
+  NULL,                             ///< 39 - Pcc Subspace Type 3 Info
+  NULL,                             ///< 40 - Pcc Subspace Type 4 Info
+  NULL,                             ///< 41 - Pcc Subspace Type 5 Info
+  NULL,                             ///< 42 - Embedded Trace Extension/Module Info
+  NULL                              ///< 43 - P-State Dependency (PSD) Info
 };
 
 /** CmObj token fixer.
