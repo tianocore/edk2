@@ -122,10 +122,10 @@ STATIC CONST CM_OBJ_PARSER  CmArmGicItsInfoParser[] = {
   { "ProximityDomain",     4, "0x%x",   NULL }
 };
 
-/** A parser for EArmObjSerialConsolePortInfo,
-    EArmObjSerialDebugPortInfo and EArmObjSerialPortInfo.
+/** A parser for EArchCommonObjConsolePortInfo,
+    EArchCommonObjSerialDebugPortInfo and EArchCommonObjSerialPortInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmSerialPortInfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSerialPortInfoParser[] = {
   { "BaseAddress",       8, "0x%llx", NULL },
   { "Interrupt",         4, "0x%x",   NULL },
   { "BaudRate",          8, "0x%llx", NULL },
@@ -672,6 +672,9 @@ STATIC CONST CM_OBJ_PARSER  CmArmPsdInfoParser[] = {
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjReserved),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPowerManagementProfileInfo,CmArchCommonPowerManagementProfileInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSerialPortInfo,            CmArchCommonSerialPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjConsolePortInfo,           CmArchCommonSerialPortInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSerialDebugPortInfo,       CmArchCommonSerialPortInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -685,8 +688,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicMsiFrameInfo,             CmArmGicMsiFrameInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicRedistributorInfo,        CmArmGicRedistInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicItsInfo,                  CmArmGicItsInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjSerialConsolePortInfo,       CmArmSerialPortInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjSerialDebugPortInfo,         CmArmSerialPortInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGenericTimerInfo,            CmArmGenericTimerInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPlatformGTBlockInfo,         CmArmGTBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjGTBlockTimerFrameInfo,       CmArmGTBlockTimerFrameInfoParser),
@@ -710,7 +711,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjDeviceHandleAcpi,            CmArmDeviceHandleAcpiParser),
   CM_PARSER_ADD_OBJECT (EArmObjDeviceHandlePci,             CmArmDeviceHandlePciParser),
   CM_PARSER_ADD_OBJECT (EArmObjGenericInitiatorAffinityInfo,CmArmGenericInitiatorAffinityInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjSerialPortInfo,              CmArmSerialPortInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCmn600Info,                  CmArmCmn600InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjLpiInfo,                     CmArmLpiInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPciAddressMapInfo,           CmArmPciAddressMapInfoParser),
