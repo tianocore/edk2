@@ -199,9 +199,9 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonHypervisorVendorIdentityParser[] = {
   { "HypervisorVendorId", 8, "0x%llx", NULL }
 };
 
-/** A parser for EArmObjFixedFeatureFlags.
+/** A parser for EArchCommonObjFixedFeatureFlags.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmFixedFeatureFlagsParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonFixedFeatureFlagsParser[] = {
   { "Flags", 4, "0x%x", NULL }
 };
 
@@ -676,6 +676,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjConsolePortInfo,           CmArchCommonSerialPortInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSerialDebugPortInfo,       CmArchCommonSerialPortInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjHypervisorVendorIdentity,  CmArchCommonHypervisorVendorIdentityParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjFixedFeatureFlags,         CmArchCommonFixedFeatureFlagsParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -694,7 +695,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGTBlockTimerFrameInfo,       CmArmGTBlockTimerFrameInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPlatformGenericWatchdogInfo, CmArmGenericWatchdogInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPciConfigSpaceInfo,          CmArmPciConfigSpaceInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjFixedFeatureFlags,           CmArmFixedFeatureFlagsParser),
   CM_PARSER_ADD_OBJECT (EArmObjItsGroup,                    CmArmItsGroupNodeParser),
   CM_PARSER_ADD_OBJECT (EArmObjNamedComponent,              CmArmNamedComponentNodeParser),
   CM_PARSER_ADD_OBJECT (EArmObjRootComplex,                 CmArmRootComplexNodeParser),
