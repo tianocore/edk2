@@ -47,9 +47,7 @@ SmmCommunicationBufferEntryPoint (
   EDKII_PI_SMM_COMMUNICATION_REGION_TABLE  *PiSmmCommunicationRegionTable;
   EFI_MEMORY_DESCRIPTOR                    *Entry;
   EFI_HOB_GUID_TYPE                        *GuidHob;
-  MM_COMM_BUFFER_HOB_DATA                  *DataInHob;
   MM_COMM_BUFFER_DATA                      *MmCommBufferData;
-  EFI_PHYSICAL_ADDRESS                     CommunicateBuffer;
 
   DescriptorSize    = sizeof (EFI_MEMORY_DESCRIPTOR);
 
@@ -59,12 +57,6 @@ SmmCommunicationBufferEntryPoint (
   // now you have to use *DescriptorSize to make things work.
   //
   DescriptorSize += sizeof (UINT64) - (DescriptorSize % sizeof (UINT64));
-
-  GuidHob = GetFirstGuidHob (&gEdkiiCommunicationBufferGuid);
-  ASSERT (GuidHob != NULL);
-  DataInHob         = GET_GUID_HOB_DATA (GuidHob);
-  MmCommBufferData  = (MM_COMM_BUFFER_DATA *)(UINTN)DataInHob->Address;
-  CommunicateBuffer = MmCommBufferData->FixedCommBuffer;
 
   //
   // Allocate and fill PiSmmCommunicationRegionTable
@@ -79,10 +71,13 @@ SmmCommunicationBufferEntryPoint (
   Entry                                          = (EFI_MEMORY_DESCRIPTOR *)(PiSmmCommunicationRegionTable + 1);
   Entry->Type                                    = EfiConventionalMemory;
 
-  if (CommunicateBuffer == 0) {
+  GuidHob = GetFirstGuidHob (&gEdkiiCommunicationBufferGuid);
+
+  if (GuidHob == NULL) {
     Entry->PhysicalStart = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedPages (DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES);
   } else {
-    Entry->PhysicalStart = CommunicateBuffer;
+    MmCommBufferData     = GET_GUID_HOB_DATA (GuidHob);
+    Entry->PhysicalStart = MmCommBufferData->FixedCommBuffer;
   }
 
   ASSERT (Entry->PhysicalStart != 0);

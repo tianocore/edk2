@@ -31,13 +31,6 @@ extern EFI_GUID  gEdkiiCommunicationBufferGuid;
 #define COMM_BUFFER_MM_DISPATCH_SUCCESS  0x01
 #define COMM_BUFFER_MM_DISPATCH_RESTART  0x02
 
-typedef struct {
-  //
-  // Address pointer to MM_COMM_BUFFER_DATA
-  //
-  EFI_PHYSICAL_ADDRESS    Address;
-} MM_COMM_BUFFER_HOB_DATA;
-
 ///
 /// This structure is allocated from memory of type EfiRuntimeServicesData.
 /// Since runtime memory types are converted to available memory when a legacy boot
@@ -51,7 +44,6 @@ typedef struct {
   UINT64     ReturnStatus;
   UINT64     ReturnBufferSize;
   BOOLEAN    IsCommBufferValid;
-  UINT8      Reserved[7];
 } COMMUNICATION_IN_OUT;
 
 ///
@@ -83,7 +75,7 @@ typedef struct {
   /// This field is used by the MM Communication Protocol to pass the return status from
   /// a software MMI handler back to the caller of the MM Communication Protocol.
   ///
-  COMMUNICATION_IN_OUT    *CommunicationInOut;
+  EFI_PHYSICAL_ADDRESS    CommunicationInOut;
 } MM_COMM_BUFFER_DATA;
 
 #endif
