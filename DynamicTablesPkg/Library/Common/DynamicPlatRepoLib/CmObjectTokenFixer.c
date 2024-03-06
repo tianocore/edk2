@@ -183,6 +183,17 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///< 37 - Lpi Info
   NULL,                             ///< 38 - Pci Address Map Info
   NULL,                             ///< 39 - Pci Interrupt Map Info
+  NULL,                             ///< 40 - Reserved Memory Range Node
+  NULL,                             ///< 41 - Memory Range Descriptor
+  NULL,                             ///< 42 - Continuous Performance Control Info
+  NULL,                             ///< 43 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 44 - Pcc Subspace Type 2 Info
+  NULL,                             ///< 45 - Pcc Subspace Type 2 Info
+  NULL,                             ///< 46 - Pcc Subspace Type 3 Info
+  NULL,                             ///< 47 - Pcc Subspace Type 4 Info
+  NULL,                             ///< 48 - Pcc Subspace Type 5 Info
+  NULL,                             ///< 49 - Embedded Trace Extension/Module Info
+  NULL                              ///< 50 - P-State Dependency (PSD) Info
 };
 
 /** CmObj token fixer.

@@ -20,6 +20,12 @@
 
 /** The EARM_OBJECT_ID enum describes the Object IDs
     in the ARM Namespace
+
+  Note: Whenever an entry in this enum is updated,
+        the following data structures must also be
+        updated:
+        - CM_OBJECT_TOKEN_FIXER TokenFixer[] in
+          Library\Common\DynamicPlatRepoLib\CmObjectTokenFixer.c
 */
 typedef enum ArmObjectID {
   EArmObjReserved,                                             ///<  0 - Reserved
