@@ -34,7 +34,7 @@
     The following Configuration Manager Object(s) are used by this Generator:
     - EArmObjProcHierarchyInfo (REQUIRED)
     - EArmObjCacheInfo
-    - EArmObjCmRef
+    - EArchCommonObjCmRef
     - EArmObjGicCInfo (REQUIRED)
 */
 
@@ -63,9 +63,9 @@ GET_OBJECT_LIST (
   reference information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjCmRef,
-  CM_ARM_OBJ_REF
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCmRef,
+  CM_ARCH_COMMON_OBJ_REF
   );
 
 /**
@@ -264,7 +264,7 @@ DetectCyclesInTopology (
                                     Protocol Interface.
   @param [in]  PrivResArray         Pointer to the array of private resources.
   @param [in]  PrivResCount         Number of private resources.
-  @param [in]  PrivResArrayToken    Reference Token for the CM_ARM_OBJ_REF
+  @param [in]  PrivResArrayToken    Reference Token for the CM_ARCH_COMMON_OBJ_REF
                                     array describing node's private resources.
 
   @retval EFI_SUCCESS               Array updated successfully.
@@ -281,10 +281,10 @@ AddPrivateResources (
   IN  CONST CM_OBJECT_TOKEN                                PrivResArrayToken
   )
 {
-  EFI_STATUS         Status;
-  CM_ARM_OBJ_REF     *CmObjRefs;
-  UINT32             CmObjRefCount;
-  PPTT_NODE_INDEXER  *PpttNodeFound;
+  EFI_STATUS              Status;
+  CM_ARCH_COMMON_OBJ_REF  *CmObjRefs;
+  UINT32                  CmObjRefCount;
+  PPTT_NODE_INDEXER       *PpttNodeFound;
 
   ASSERT (
     (Generator != NULL) &&
@@ -308,7 +308,7 @@ AddPrivateResources (
 
   CmObjRefCount = 0;
   // Get the CM Object References
-  Status = GetEArmObjCmRef (
+  Status = GetEArchCommonObjCmRef (
              CfgMgrProtocol,
              PrivResArrayToken,
              &CmObjRefs,
