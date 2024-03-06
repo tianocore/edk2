@@ -145,7 +145,7 @@ DynPlatRepoAddObject (
 
   // Check the CmObjDesc:
   //  - only Arm objects and Arch Common objects are supported for now.
-  //  - only EArmObjCmRef objects can be added as arrays.
+  //  - only EArchCommonObjCmRef objects can be added as arrays.
   if ((CmObjDesc->Size == 0) || (CmObjDesc->Count == 0)) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
@@ -155,16 +155,16 @@ DynPlatRepoAddObject (
   NamespaceId = GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId);
 
   if (EObjNameSpaceArm == NamespaceId) {
-    if ((ObjId >= EArmObjMax) ||
-        ((CmObjDesc->Count > 1)  && (ObjId != EArmObjCmRef)))
-    {
+    if (ObjId >= EArmObjMax) {
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
     }
 
     ObjList = &This->ArmCmObjList[ObjId];
   } else if (EObjNameSpaceArchCommon == NamespaceId) {
-    if (ObjId >= EArchCommonObjMax) {
+    if ((ObjId >= EArchCommonObjMax) ||
+        ((CmObjDesc->Count > 1)  && (ObjId != EArchCommonObjCmRef)))
+    {
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
     }
@@ -281,11 +281,11 @@ GroupCmObjNodes (
     }
 
     if ((CmObjDesc->Count != 1) &&
-        ((NamespaceId != EObjNameSpaceArm) ||
-         (ObjIndex != EArmObjCmRef)))
+        ((NamespaceId != EObjNameSpaceArchCommon) ||
+         (ObjIndex != EArchCommonObjCmRef)))
     {
       // We expect each descriptor to contain an individual object.
-      // EArmObjCmRef objects are counted as groups, so +1 as well.
+      // EArchCommonObjCmRef objects are counted as groups, so +1 as well.
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
     }
@@ -452,18 +452,18 @@ DynamicPlatRepoGetObject (
   ObjId       = GET_CM_OBJECT_ID (CmObjectId);
 
   if (NamespaceId == EObjNameSpaceArm) {
-    if ((ObjId >= EArmObjMax) ||
-        ((ObjId == EArmObjCmRef) &&
-         (Token == CM_NULL_TOKEN)))
-    {
-      // EArmObjCmRef object must be requested using a valid token.
+    if (ObjId >= EArmObjMax) {
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
     }
 
     Desc = &This->ArmCmObjArray[ObjId];
   } else if (NamespaceId == EObjNameSpaceArchCommon) {
-    if (ObjId >= EArchCommonObjMax) {
+    if ((ObjId >= EArchCommonObjMax) ||
+        ((ObjId == EArchCommonObjCmRef) &&
+         (Token == CM_NULL_TOKEN)))
+    {
+      // EArchCommonObjCmRef object must be requested using a valid token.
       ASSERT (0);
       return EFI_INVALID_PARAMETER;
     }

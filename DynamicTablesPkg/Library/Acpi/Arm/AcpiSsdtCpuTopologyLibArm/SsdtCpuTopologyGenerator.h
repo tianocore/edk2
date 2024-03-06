@@ -69,8 +69,8 @@
 
 /** A structure used to handle the Lpi structures referencing.
 
-  A CM_ARM_PROC_HIERARCHY_INFO structure references a CM_ARM_OBJ_REF.
-  This CM_ARM_OBJ_REF references CM_ARM_LPI_INFO structures.
+  A CM_ARM_PROC_HIERARCHY_INFO structure references a CM_ARCH_COMMON_OBJ_REF.
+  This CM_ARCH_COMMON_OBJ_REF references CM_ARM_LPI_INFO structures.
 
   Example:
   (Cpu0)                                   (Cpu1)
@@ -80,7 +80,7 @@
               |
               v
   (List of references to Lpi states)
-  CM_ARM_OBJ_REF
+  CM_ARCH_COMMON_OBJ_REF
               |
               +----------------------------------------
               |                                       |
@@ -89,9 +89,9 @@
   CM_ARM_LPI_INFO[0]                        CM_ARM_LPI_INFO[1]
 
   Here, Cpu0 and Cpu1 have the same Lpi states. Both CM_ARM_PROC_HIERARCHY_INFO
-  structures reference the same CM_ARM_OBJ_REF. An entry is created in the
+  structures reference the same CM_ARCH_COMMON_OBJ_REF. An entry is created in the
   TokenTable such as:
-  0 <-> CM_ARM_OBJ_REF
+  0 <-> CM_ARCH_COMMON_OBJ_REF
 
   This will lead to the creation of this pseudo-ASL code where Cpu0 and Cpu1
   return the same object at \_SB.L000:
