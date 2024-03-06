@@ -51,26 +51,25 @@ typedef enum ArmObjectID {
   EArmObjSmmuInterruptArray,                                   ///< 20 - SMMU Interrupt Array
   EArmObjProcHierarchyInfo,                                    ///< 21 - Processor Hierarchy Info
   EArmObjCacheInfo,                                            ///< 22 - Cache Info
-  EArmObjCmRef,                                                ///< 23 - CM Object Reference
-  EArmObjMemoryAffinityInfo,                                   ///< 24 - Memory Affinity Info
-  EArmObjDeviceHandleAcpi,                                     ///< 25 - Device Handle Acpi
-  EArmObjDeviceHandlePci,                                      ///< 26 - Device Handle Pci
-  EArmObjGenericInitiatorAffinityInfo,                         ///< 27 - Generic Initiator Affinity
-  EArmObjCmn600Info,                                           ///< 28 - CMN-600 Info
-  EArmObjLpiInfo,                                              ///< 29 - Lpi Info
-  EArmObjPciAddressMapInfo,                                    ///< 30 - Pci Address Map Info
-  EArmObjPciInterruptMapInfo,                                  ///< 31 - Pci Interrupt Map Info
-  EArmObjRmr,                                                  ///< 32 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 33 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 34 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 35 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 36 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 37 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 38 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 39 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 40 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 41 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 42 - P-State Dependency (PSD) Info
+  EArmObjMemoryAffinityInfo,                                   ///< 23 - Memory Affinity Info
+  EArmObjDeviceHandleAcpi,                                     ///< 24 - Device Handle Acpi
+  EArmObjDeviceHandlePci,                                      ///< 25 - Device Handle Pci
+  EArmObjGenericInitiatorAffinityInfo,                         ///< 26 - Generic Initiator Affinity
+  EArmObjCmn600Info,                                           ///< 27 - CMN-600 Info
+  EArmObjLpiInfo,                                              ///< 28 - Lpi Info
+  EArmObjPciAddressMapInfo,                                    ///< 29 - Pci Address Map Info
+  EArmObjPciInterruptMapInfo,                                  ///< 30 - Pci Interrupt Map Info
+  EArmObjRmr,                                                  ///< 31 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 32 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 33 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 34 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 35 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 36 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 37 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 38 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 39 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 40 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 41 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -428,11 +427,11 @@ typedef struct CmArmPciConfigSpaceInfo {
   UINT8              EndBusNumber;
 
   /// Optional field: Reference Token for address mapping.
-  /// Token identifying a CM_ARM_OBJ_REF structure.
+  /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure.
   CM_OBJECT_TOKEN    AddressMapToken;
 
   /// Optional field: Reference Token for interrupt mapping.
-  /// Token identifying a CM_ARM_OBJ_REF structure.
+  /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure.
   CM_OBJECT_TOKEN    InterruptMapToken;
 } CM_ARM_PCI_CONFIG_SPACE_INFO;
 
@@ -721,7 +720,7 @@ typedef struct CmArmProcHierarchyInfo {
   /// this field to CM_NULL_TOKEN.
   CM_OBJECT_TOKEN    PrivateResourcesArrayToken;
   /// Optional field: Reference Token for the Lpi state of this processor.
-  /// Token identifying a CM_ARM_OBJ_REF structure, itself referencing
+  /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure, itself referencing
   /// CM_ARM_LPI_INFO objects.
   CM_OBJECT_TOKEN    LpiToken;
   /// Set to TRUE if UID should override index for name and _UID
@@ -766,22 +765,6 @@ typedef struct CmArmCacheInfo {
   /// Unique ID for the cache
   UINT32             CacheId;
 } CM_ARM_CACHE_INFO;
-
-/** A structure that describes a reference to another Configuration Manager
-    object.
-
-    This is useful for creating an array of reference tokens. The framework
-    can then query the configuration manager for these arrays using the
-    object ID EArmObjCmRef.
-
-    This can be used is to represent one-to-many relationships between objects.
-
-    ID: EArmObjCmRef
-*/
-typedef struct CmArmObjRef {
-  /// Token of the CM object being referenced
-  CM_OBJECT_TOKEN    ReferenceToken;
-} CM_ARM_OBJ_REF;
 
 /** A structure that describes the Memory Affinity Structure (Type 1) in SRAT
 

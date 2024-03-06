@@ -42,7 +42,7 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjCmRef
+  - EArchCommonObjCmRef
   - EArmObjPciConfigSpaceInfo
   - EArmObjPciAddressMapInfo
   - EArmObjPciInterruptMapInfo
@@ -52,9 +52,9 @@ Requirements:
     reference information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjCmRef,
-  CM_ARM_OBJ_REF
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCmRef,
+  CM_ARCH_COMMON_OBJ_REF
   );
 
 /** This macro expands to a function that retrieves the Pci
@@ -313,7 +313,7 @@ GeneratePrt (
   EFI_STATUS                     Status;
   INT32                          Index;
   AML_OBJECT_NODE_HANDLE         PrtNode;
-  CM_ARM_OBJ_REF                 *RefInfo;
+  CM_ARCH_COMMON_OBJ_REF         *RefInfo;
   UINT32                         RefCount;
   CM_ARM_PCI_INTERRUPT_MAP_INFO  *IrqMapInfo;
 
@@ -324,9 +324,9 @@ GeneratePrt (
 
   PrtNode = NULL;
 
-  // Get the array of CM_ARM_OBJ_REF referencing the
+  // Get the array of CM_ARCH_COMMON_OBJ_REF referencing the
   // CM_ARM_PCI_INTERRUPT_MAP_INFO objects.
-  Status = GetEArmObjCmRef (
+  Status = GetEArchCommonObjCmRef (
              CfgMgrProtocol,
              PciInfo->InterruptMapToken,
              &RefInfo,
@@ -458,7 +458,7 @@ GeneratePciCrs (
   EFI_STATUS                   Status;
   BOOLEAN                      Translation;
   UINT32                       Index;
-  CM_ARM_OBJ_REF               *RefInfo;
+  CM_ARCH_COMMON_OBJ_REF       *RefInfo;
   UINT32                       RefCount;
   CM_ARM_PCI_ADDRESS_MAP_INFO  *AddrMapInfo;
   AML_OBJECT_NODE_HANDLE       CrsNode;
@@ -505,9 +505,9 @@ GeneratePciCrs (
     return Status;
   }
 
-  // Get the array of CM_ARM_OBJ_REF referencing the
+  // Get the array of CM_ARCH_COMMON_OBJ_REF referencing the
   // CM_ARM_PCI_ADDRESS_MAP_INFO objects.
-  Status = GetEArmObjCmRef (
+  Status = GetEArchCommonObjCmRef (
              CfgMgrProtocol,
              PciInfo->AddressMapToken,
              &RefInfo,

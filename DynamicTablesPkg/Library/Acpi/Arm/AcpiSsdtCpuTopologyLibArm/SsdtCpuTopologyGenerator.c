@@ -39,7 +39,7 @@ Requirements:
   this Generator:
   - EArmObjGicCInfo
   - EArmObjProcHierarchyInfo (OPTIONAL) along with
-  - EArmObjCmRef (OPTIONAL)
+  - EArchCommonObjCmRef (OPTIONAL)
   - EArmObjLpiInfo (OPTIONAL)
   - GetEArmObjEtInfo (OPTIONAL)
   - EArmObjPsdInfo (OPTIONAL)
@@ -69,9 +69,9 @@ GET_OBJECT_LIST (
   reference information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjCmRef,
-  CM_ARM_OBJ_REF
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCmRef,
+  CM_ARCH_COMMON_OBJ_REF
   );
 
 /**
@@ -120,7 +120,7 @@ GET_OBJECT_LIST (
   structure of the platform. The TokenTable allows to have a mapping:
   Index <-> CM_OBJECT_TOKEN (to CM_ARM_LPI_INFO structures).
 
-  There will always be less sets of Lpi states (CM_ARM_OBJ_REF)
+  There will always be less sets of Lpi states (CM_ARCH_COMMON_OBJ_REF)
   than the number of cpus/clusters (CM_ARM_PROC_HIERARCHY_INFO).
 
   @param [in]  Generator  The SSDT Cpu Topology generator.
@@ -697,7 +697,7 @@ GenerateLpiStates (
   UINT32  LastIndex;
 
   AML_OBJECT_NODE_HANDLE  LpiNode;
-  CM_ARM_OBJ_REF          *LpiRefInfo;
+  CM_ARCH_COMMON_OBJ_REF  *LpiRefInfo;
   UINT32                  LpiRefInfoCount;
   UINT32                  LpiRefIndex;
   CM_ARM_LPI_INFO         *LpiInfo;
@@ -727,7 +727,7 @@ GenerateLpiStates (
     }
 
     // Fetch the LPI objects referenced by the token.
-    Status = GetEArmObjCmRef (
+    Status = GetEArchCommonObjCmRef (
                CfgMgrProtocol,
                Generator->TokenTable.Table[Index],
                &LpiRefInfo,
