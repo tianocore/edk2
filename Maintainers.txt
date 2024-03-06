@@ -151,7 +151,6 @@ ArmVirtPkg
 F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
-M: Laszlo Ersek <lersek@redhat.com> [lersek]
 R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
@@ -462,7 +461,6 @@ F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-M: Laszlo Ersek <lersek@redhat.com> [lersek]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 S: Maintained
 
@@ -622,7 +620,6 @@ UefiCpuPkg
 F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
-M: Laszlo Ersek <lersek@redhat.com> [lersek]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
