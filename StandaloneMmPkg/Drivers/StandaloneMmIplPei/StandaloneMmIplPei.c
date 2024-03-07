@@ -422,6 +422,7 @@ LocateMmFvForMmCore (
     Status = PeiServicesFfsGetVolumeInfo (VolumeHandle, &VolumeInfo);
     if (!EFI_ERROR (Status)) {
       *MmFvBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)VolumeInfo.FvStart;
+      BuildFvHob (*MmFvBaseAddress, VolumeInfo.FvSize);
     }
 
     return EFI_SUCCESS;
