@@ -2406,6 +2406,92 @@ InstallCcMeasurementProtocol (
 }
 
 /**
+  The function sycn the Cc event log data from CcEventVar.
+
+  @retval EFI_SUCCESS     Synchronization successful.
+  @retval other           Some error occurs.
+**/
+EFI_STATUS
+SyncCcEventVariable (
+  VOID
+  )
+{
+  EFI_STATUS               Status;
+  VOID                     *CcEvent;
+  VOID                     *DigestListBin;
+  UINT32                   DigestListBinSize;
+  UINT8                    *Event;
+  UINT32                   EventSize;
+  EFI_CC_EVENT_LOG_FORMAT  LogFormat;
+  VOID                     *VariableData;
+  UINTN                    VariableSize;
+  UINT8                    *Ptr;
+
+  EFI_CC_EVENT_VARIABLE_HEADER  *CcEventVariableHeader;
+
+  DEBUG ((DEBUG_INFO, "Sync Cc event from early DXE\n"));
+
+  Status       = EFI_SUCCESS;
+  LogFormat    = EFI_CC_EVENT_LOG_FORMAT_TCG_2;
+  VariableData = NULL;
+
+  Status = GetVariable2 (
+             OVMF_CC_MEASUREMENT_EVENT_VARIABLE_NAME,
+             &gCcEventVariableGuid,
+             &VariableData,
+             &VariableSize
+             );
+  if (Status == EFI_NOT_FOUND) {
+    return EFI_SUCCESS;
+  }
+
+  Ptr = VariableData;
+  while ((Status == EFI_SUCCESS) && VariableData != NULL) {
+    if (VariableSize <= 0 ) {
+      break;
+    }
+
+    CcEventVariableHeader = (EFI_CC_EVENT_VARIABLE_HEADER *)Ptr;
+    Ptr                  += sizeof (EFI_CC_EVENT_VARIABLE_HEADER);
+    VariableSize         -= sizeof (EFI_CC_EVENT_VARIABLE_HEADER);
+
+    CcEvent = AllocateCopyPool (CcEventVariableHeader->LogSize, Ptr);
+    if (CcEvent == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Ptr          += CcEventVariableHeader->LogSize;
+    VariableSize -= CcEventVariableHeader->LogSize;
+
+    DEBUG ((DEBUG_INFO, "CcEventVar Index %d, Size %d\n", CcEventVariableHeader->LogIndex, CcEventVariableHeader->LogSize));
+
+    DigestListBin     = (UINT8 *)CcEvent + sizeof (UINT32) + sizeof (TCG_EVENTTYPE);
+    DigestListBinSize = GetDigestListBinSize (DigestListBin);
+
+    //
+    // Event size.
+    //
+    EventSize = *(UINT32 *)((UINT8 *)DigestListBin + DigestListBinSize);
+    Event     = (UINT8 *)DigestListBin + DigestListBinSize + sizeof (UINT32);
+
+    //
+    // Log the event
+    //
+    Status = TdxDxeLogEvent (
+               LogFormat,
+               CcEvent,
+               sizeof (UINT32) + sizeof (TCG_EVENTTYPE) + DigestListBinSize + sizeof (UINT32),
+               Event,
+               EventSize
+               );
+    DumpCcEvent ((CC_EVENT *)CcEvent);
+    FreePool (CcEvent);
+  }
+
+  return Status;
+}
+
+/**
   The driver's entry point. It publishes EFI Tcg2 Protocol.
 
   @param[in] ImageHandle  The firmware allocated handle for the EFI image.
@@ -2459,6 +2545,8 @@ DriverEntry (
 
   if (!EFI_ERROR (Status)) {
     Status = SyncCcEvent ();
+    ASSERT_EFI_ERROR (Status);
+    Status = SyncCcEventVariable ();
     ASSERT_EFI_ERROR (Status);
   }
 
