@@ -587,19 +587,20 @@ GetFullSmramRanges (
   EFI_SMRAM_DESCRIPTOR            *FullSmramRanges;
   UINTN                           AdditionSmramRangeCount;
   EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
-  VOID                            *HobList;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *NewDescriptorBlock;
+  EFI_HOB_GUID_TYPE               *GuidHob;
   UINTN                           MmramRangeCount;
 
   //
   // Get SMRAM information.
   //
-  HobList = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
-  ASSERT (HobList != NULL);
-  if (HobList == NULL) {
+  GuidHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
+  ASSERT (GuidHob != NULL);
+  if (GuidHob == NULL) {
     DEBUG ((DEBUG_ERROR, "SmramMemoryReserve HOB not found\n"));
   }
 
-  DescriptorBlock  = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)(GET_GUID_HOB_DATA (HobList));
+  DescriptorBlock = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)(GET_GUID_HOB_DATA (GuidHob));
   MmramRangeCount = DescriptorBlock->NumberOfSmmReservedRegions;
 
   //
@@ -608,12 +609,18 @@ GetFullSmramRanges (
   AdditionSmramRangeCount = 1;
 
   *FullSmramRangeCount = MmramRangeCount + AdditionSmramRangeCount;
-  Size                 = (*FullSmramRangeCount) * sizeof (EFI_SMRAM_DESCRIPTOR);
-  FullSmramRanges      = (EFI_SMRAM_DESCRIPTOR *)AllocateZeroPool (Size);
-  ASSERT (FullSmramRanges != NULL);
-  if (FullSmramRanges == NULL) {
+  Size                 = sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + (*FullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
+  NewDescriptorBlock   = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)BuildGuidHob (
+                                                             &gEfiSmmSmramMemoryGuid,
+                                                             Size
+                                                             );
+  ASSERT (NewDescriptorBlock != NULL);
+  if (NewDescriptorBlock == NULL) {
     return NULL;
   }
+
+  NewDescriptorBlock->NumberOfSmmReservedRegions = (UINT32)*FullSmramRangeCount;
+  FullSmramRanges                                = NewDescriptorBlock->Descriptor;
 
   //
   // Get SMRAM descriptors and fill to the full SMRAM ranges
@@ -624,6 +631,11 @@ GetFullSmramRanges (
     FullSmramRanges[Index].PhysicalSize  = DescriptorBlock->Descriptor[Index].PhysicalSize;
     FullSmramRanges[Index].RegionState   = DescriptorBlock->Descriptor[Index].RegionState;
   }
+
+  //
+  // Scrub old one
+  //
+  ZeroMem (&GuidHob->Name, sizeof (GuidHob->Name));
 
   return FullSmramRanges;
 }
