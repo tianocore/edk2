@@ -667,6 +667,13 @@ STATIC CONST CM_OBJ_PARSER  CmArmPsdInfoParser[] = {
   { "NumProc",   4, "0x%x", NULL },
 };
 
+/** A parser for Arch Common namespace objects.
+*/
+STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
+  CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjReserved),
+  CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
+};
+
 /** A parser for Arm namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
@@ -1049,6 +1056,21 @@ ParseCmObjDesc (
       }
 
       ParserArray = &ArmNamespaceObjectParser[ObjId];
+      break;
+
+    case EObjNameSpaceArchCommon:
+      if (ObjId >= EArchCommonObjMax) {
+        ASSERT (0);
+        return;
+      }
+
+      if (ObjId >= ARRAY_SIZE (ArchCommonNamespaceObjectParser)) {
+        DEBUG ((DEBUG_ERROR, "ObjId 0x%x is missing from the ArchCommonNamespaceObjectParser array\n", ObjId));
+        ASSERT (0);
+        return;
+      }
+
+      ParserArray = &ArchCommonNamespaceObjectParser[ObjId];
       break;
     default:
       // Not supported
