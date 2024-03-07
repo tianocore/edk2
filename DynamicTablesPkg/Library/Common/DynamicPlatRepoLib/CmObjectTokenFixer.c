@@ -172,7 +172,7 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///< 26 - SMMU Interrupt Array
   TokenFixerNotImplemented,         ///< 27 - Processor Hierarchy Info
   TokenFixerNotImplemented,         ///< 28 - Cache Info
-  TokenFixerNotImplemented,         ///< 29 - Processor Node ID Info
+  TokenFixerNotImplemented,         ///< 29 - Reserved
   NULL,                             ///< 30 - CM Object Reference
   NULL,                             ///< 31 - Memory Affinity Info
   NULL,                             ///< 32 - Device Handle Acpi
