@@ -21,13 +21,7 @@
 #
 
 [Sources]
-  MmHobProducerLib.c
+  MmHobProducerLibNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
-
-[LibraryClasses]
-  BaseMemoryLib
-  DebugLib
-
-[Guids]

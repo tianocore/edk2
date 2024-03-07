@@ -455,6 +455,8 @@ ExecuteSmmCoreFromSmram (
   VOID                          *HobList;
   VOID                          *MmHobList;
   EFI_PHYSICAL_ADDRESS          SourceFvBaseAddress;
+  UINTN                         BufferSize;
+  UINTN                         NumberOfPages;
 
   Status = PeiServicesGetHobList (&HobList);
   ASSERT_EFI_ERROR (Status);
@@ -532,8 +534,18 @@ ExecuteSmmCoreFromSmram (
       //
       // Create the HOB list which StandaloneMm Core needed.
       //
-      MmHobList = CreateMmCoreHobList (HobList);
-      ASSERT (MmHobList != NULL);
+      // TODO: implement the foundation HOB list and call CreateMmCoreHobList.
+      //
+      BufferSize = 0;
+      Status     = CreateMmCoreHobList (NULL, &BufferSize);
+      if (Status == RETURN_BUFFER_TOO_SMALL) {
+        NumberOfPages = EFI_SIZE_TO_PAGES(BufferSize);
+        MmHobList     = AllocatePages (NumberOfPages);
+
+        BufferSize = EFI_SIZE_TO_PAGES(BufferSize);
+        Status     = CreateMmCoreHobList (MmHobList, &BufferSize);
+      }
+      ASSERT (Status == EFI_SUCCESS);
 
       //
       // Print debug message showing Standalone MM Core entry point address.

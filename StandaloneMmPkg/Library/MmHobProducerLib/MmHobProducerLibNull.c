@@ -7,33 +7,44 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Library/HobLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
+#include <Uefi.h>
+#include <PiPei.h>
 
 /**
-  Create the HOB list which StandaloneMm Core needed.
+  Create the platform specific HOB list which StandaloneMm Core needs.
 
-  This function searches the HOBs needed by StandaloneMm Core among the whole
-  HOB list. If the input pointer to the HOB list is NULL, then ASSERT().
+  This function build the platform specific HOB list needed by StandaloneMm Core
+  based on the PEI HOB list.
 
-  @param  HobList          Pointer to whole hob list under PEI phase.
+  @param[in]      Buffer            The free buffer to be used for HOB creation.
+  @param[in, out] BufferSize        The buffer size.
+                                    On return, the expected/used size.
 
-  @return The pointer of the whole HOB list which StandaloneMm Core needed.
+  @retval RETURN_INVALID_PARAMETER  BufferSize is NULL.
+  @retval RETURN_INVALID_PARAMETER  Buffer is NULL and BufferSize is not 0.
+  @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for HOB creation.
+                                    BufferSize is updated to indicate the expected buffer size.
+                                    When the input BufferSize is bigger than the expected buffer size,
+                                    the BufferSize value will be changed the used buffer size.
+  @retval RETURN_SUCCESS            The HOB list is created successfully.
 
 **/
-VOID *
+EFI_STATUS
 EFIAPI
 CreateMmCoreHobList (
-  IN VOID  *HobList
+  IN      VOID   *Buffer,
+  IN OUT  UINTN  *BufferSize
   )
 {
-  VOID  *MmHobList = NULL;
-
-  ASSERT (HobList != NULL);
-  if (HobList != NULL) {
-    MmHobList = HobList;
+  if (BufferSize == NULL) {
+    return RETURN_INVALID_PARAMETER;
   }
 
-  return MmHobList;
+  if ((*BufferSize != 0) && (Buffer == NULL)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  *BufferSize = 0;
+
+  return EFI_SUCCESS;
 }
