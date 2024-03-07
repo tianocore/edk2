@@ -350,18 +350,6 @@ STATIC CONST CM_OBJ_PARSER  CmArmCacheInfoParser[] = {
   { "CacheId",               4,                        "0x%x", NULL },
 };
 
-/** A parser for EArmObjProcNodeIdInfo.
-*/
-STATIC CONST CM_OBJ_PARSER  CmArmProcNodeIdInfoParser[] = {
-  { "Token",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "VendorId", 4,                        "0x%p", NULL },
-  { "Level1Id", 8,                        "0x%x", NULL },
-  { "Level2Id", 8,                        "0x%x", NULL },
-  { "MajorRev", 2,                        "0x%x", NULL },
-  { "MinorRev", 2,                        "0x%x", NULL },
-  { "SpinRev",  2,                        "0x%x", NULL }
-};
-
 /** A parser for EArmObjCmRef.
 */
 STATIC CONST CM_OBJ_PARSER  CmArmObjRefParser[] = {
@@ -735,8 +723,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmProcHierarchyInfoParser) },
   { "EArmObjCacheInfo",                    CmArmCacheInfoParser,
     ARRAY_SIZE (CmArmCacheInfoParser) },
-  { "EArmObjProcNodeIdInfo",               CmArmProcNodeIdInfoParser,
-    ARRAY_SIZE (CmArmProcNodeIdInfoParser) },
+  { "EArmObjReserved29",                   NULL,                                  0                                },
   { "EArmObjCmRef",                        CmArmObjRefParser,                     ARRAY_SIZE (CmArmObjRefParser)   },
   { "EArmObjMemoryAffinityInfo",           CmArmMemoryAffinityInfoParser,
     ARRAY_SIZE (CmArmMemoryAffinityInfoParser) },
