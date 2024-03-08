@@ -331,6 +331,7 @@ CreateMmCoreHobList (
   RequiredSize = MmBuildHobForMmio (FALSE, MemoryMap, Count);
 
   if (*BufferSize < RequiredSize) {
+    *BufferSize = RequiredSize;
     FreePool (MemoryMap);
     return EFI_BUFFER_TOO_SMALL;
   }
