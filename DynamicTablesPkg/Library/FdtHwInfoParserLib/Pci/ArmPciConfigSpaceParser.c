@@ -468,7 +468,7 @@ ParseIrqMap (
 
   @param [in]       Fdt          Pointer to a Flattened Device Tree (Fdt).
   @param [in]       HostPciNode  Offset of a host-pci node.
-  @param [in, out]  PciInfo      The CM_ARM_PCI_CONFIG_SPACE_INFO to populate.
+  @param [in, out]  PciInfo      The CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO to populate.
 
   @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_ABORTED             An error occurred.
@@ -579,7 +579,7 @@ PciNodeParser (
 /** Add the parsed Pci information to the Configuration Manager.
 
   CmObj of the following types are concerned:
-   - EArmObjPciConfigSpaceInfo
+   - EArchCommonObjPciConfigSpaceInfo
    - EArmObjPciAddressMapInfo
    - EArmObjPciInterruptMapInfo
 
@@ -599,8 +599,8 @@ PciInfoAdd (
   IN        PCI_PARSER_TABLE           *PciTableInfo
   )
 {
-  EFI_STATUS                    Status;
-  CM_ARM_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfo;
+  EFI_STATUS                            Status;
+  CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfo;
 
   if ((FdtParserHandle == NULL) ||
       (PciTableInfo == NULL))
@@ -640,9 +640,11 @@ PciInfoAdd (
   // Add the configuration space CmObj to the Configuration Manager.
   Status = AddSingleCmObj (
              FdtParserHandle,
-             CREATE_CM_ARM_OBJECT_ID (EArmObjPciConfigSpaceInfo),
+             CREATE_CM_ARCH_COMMON_OBJECT_ID (
+               EArchCommonObjPciConfigSpaceInfo
+               ),
              &PciTableInfo->PciConfigSpaceInfo,
-             sizeof (CM_ARM_PCI_CONFIG_SPACE_INFO),
+             sizeof (CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO),
              NULL
              );
   ASSERT_EFI_ERROR (Status);
@@ -682,15 +684,15 @@ FreeParserTable (
   return EFI_SUCCESS;
 }
 
-/** CM_ARM_PCI_CONFIG_SPACE_INFO parser function.
+/** CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmPciConfigSpaceInfo {
+  typedef struct CmArchCommonPciConfigSpaceInfo {
     UINT64  BaseAddress;                          // {Populated}
     UINT16  PciSegmentGroupNumber;                // {Populated}
     UINT8   StartBusNumber;                       // {Populated}
     UINT8   EndBusNumber;                         // {Populated}
-  } CM_ARM_PCI_CONFIG_SPACE_INFO;
+  } CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO;
 
   typedef struct CmArmPciAddressMapInfo {
     UINT8                     SpaceCode;          // {Populated}

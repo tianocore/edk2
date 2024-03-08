@@ -451,37 +451,36 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |   8   | Platform GT Block Info                    | |
 |   9   | Generic Timer Block Frame Info            | |
 |  10   | Platform Generic Watchdog                 | |
-|  11   | PCI Configuration Space Info              | Move to Arch Common NS |
-|  12   | ITS Group                                 | |
-|  13   | Named Component                           | |
-|  14   | Root Complex                              | |
-|  15   | SMMUv1 or SMMUv2                          | |
-|  16   | SMMUv3                                    | |
-|  17   | PMCG                                      | |
-|  18   | GIC ITS Identifier Array                  | |
-|  19   | ID Mapping Array                          | |
-|  20   | SMMU Interrupt Array                      | |
-|  21   | Processor Hierarchy Info                  | Move to Arch Common NS |
-|  22   | Cache Info                                | Move to Arch Common NS |
-|  23   | Memory Affinity Info                      | Move to Arch Common NS |
-|  24   | Device Handle Acpi                        | Move to Arch Common NS |
-|  25   | Device Handle PCI                         | Move to Arch Common NS |
-|  26   | Generic Initiator Affinity Info           | Move to Arch Common NS |
-|  27   | CMN 600 Info                              | |
-|  28   | Low Power Idle State Info                 | Move to Arch Common NS |
-|  29   | PCI Address Map Info                      | Move to Arch Common NS |
-|  30   | PCI Interrupt Map Info                    | Move to Arch Common NS |
-|  31   | Reserved Memory Range Node                | |
-|  32   | Memory Range Descriptor                   | |
-|  33   | Continuous Performance Control Info       | Move to Arch Common NS |
-|  34   | Pcc Subspace Type 0 Info                  | Move to Arch Common NS |
-|  35   | Pcc Subspace Type 1 Info                  | Move to Arch Common NS |
-|  36   | Pcc Subspace Type 2 Info                  | Move to Arch Common NS |
-|  37   | Pcc Subspace Type 3 Info                  | Move to Arch Common NS |
-|  38   | Pcc Subspace Type 4 Info                  | Move to Arch Common NS |
-|  39   | Pcc Subspace Type 5 Info                  | Move to Arch Common NS |
-|  40   | Embedded Trace Extension/Module Info      | |
-|  41   | P-State Dependency (PSD) Info             | Move to Arch Common NS |
+|  11   | ITS Group                                 | |
+|  12   | Named Component                           | |
+|  13   | Root Complex                              | |
+|  14   | SMMUv1 or SMMUv2                          | |
+|  15   | SMMUv3                                    | |
+|  16   | PMCG                                      | |
+|  17   | GIC ITS Identifier Array                  | |
+|  18   | ID Mapping Array                          | |
+|  19   | SMMU Interrupt Array                      | |
+|  20   | Processor Hierarchy Info                  | Move to Arch Common NS |
+|  21   | Cache Info                                | Move to Arch Common NS |
+|  22   | Memory Affinity Info                      | Move to Arch Common NS |
+|  23   | Device Handle Acpi                        | Move to Arch Common NS |
+|  24   | Device Handle PCI                         | Move to Arch Common NS |
+|  25   | Generic Initiator Affinity Info           | Move to Arch Common NS |
+|  26   | CMN 600 Info                              | |
+|  27   | Low Power Idle State Info                 | Move to Arch Common NS |
+|  28   | PCI Address Map Info                      | Move to Arch Common NS |
+|  29   | PCI Interrupt Map Info                    | Move to Arch Common NS |
+|  30   | Reserved Memory Range Node                | |
+|  31   | Memory Range Descriptor                   | |
+|  32   | Continuous Performance Control Info       | Move to Arch Common NS |
+|  33   | Pcc Subspace Type 0 Info                  | Move to Arch Common NS |
+|  34   | Pcc Subspace Type 1 Info                  | Move to Arch Common NS |
+|  35   | Pcc Subspace Type 2 Info                  | Move to Arch Common NS |
+|  36   | Pcc Subspace Type 3 Info                  | Move to Arch Common NS |
+|  37   | Pcc Subspace Type 4 Info                  | Move to Arch Common NS |
+|  38   | Pcc Subspace Type 5 Info                  | Move to Arch Common NS |
+|  39   | Embedded Trace Extension/Module Info      | |
+|  40   | P-State Dependency (PSD) Info             | Move to Arch Common NS |
 |  `*`  | All other values are reserved.            | |
 
 #### Object ID's in the Arch Common Namespace:
@@ -496,4 +495,5 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |   5   | Hypervisor Vendor Id              | |
 |   6   | Fixed feature flags for FADT      | |
 |   7   | CM Object Reference               | |
+|   8   | PCI Configuration Space Info      | |
 |  `*`  | All other values are reserved.    | |
