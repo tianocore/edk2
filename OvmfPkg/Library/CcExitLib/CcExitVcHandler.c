@@ -117,16 +117,6 @@ ValidateMmioMemory (
 {
   MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE  State;
   GHCB_EVENT_INJECTION                 GpEvent;
-  UINTN                                Address;
-
-  //
-  // Allow APIC accesses (which will have the encryption bit set during
-  // SEC and PEI phases).
-  //
-  Address = MemoryAddress & ~(SIZE_4KB - 1);
-  if (Address == GetLocalApicBaseAddress ()) {
-    return 0;
-  }
 
   State = MemEncryptSevGetAddressRangeState (
             0,
