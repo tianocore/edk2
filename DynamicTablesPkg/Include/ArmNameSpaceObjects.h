@@ -632,21 +632,6 @@ typedef struct CmArmIdMapping {
   UINT32             Flags;
 } CM_ARM_ID_MAPPING;
 
-/** A structure that describes the Arm
-    Generic Interrupts.
-*/
-typedef struct CmArmGenericInterrupt {
-  /// Interrupt number
-  UINT32    Interrupt;
-
-  /// Flags
-  /// BIT0: 0: Interrupt is Level triggered
-  ///       1: Interrupt is Edge triggered
-  /// BIT1: 0: Interrupt is Active high
-  ///       1: Interrupt is Active low
-  UINT32    Flags;
-} CM_ARM_GENERIC_INTERRUPT;
-
 /** A structure that describes the SMMU interrupts for the Platform.
 
     Interrupt   Interrupt number.
@@ -654,7 +639,7 @@ typedef struct CmArmGenericInterrupt {
 
     ID: EArmObjSmmuInterruptArray
 */
-typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
+typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
 
 /** A structure that describes the AML Extended Interrupts.
 
@@ -664,7 +649,7 @@ typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
                 resource descriptor.
                 See EFI_ACPI_EXTENDED_INTERRUPT_FLAG_xxx in Acpi10.h
 */
-typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
+typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 
 /** A structure that describes the Processor Hierarchy Node (Type 0) in PPTT
 
@@ -927,14 +912,14 @@ typedef struct CmArmPciInterruptMapInfo {
   Device-tree bindings are shifted by 1:
       "INTA=1, INTB=2, INTC=3, INTD=4"
   */
-  UINT8                       PciInterrupt;
+  UINT8                               PciInterrupt;
 
   /** Interrupt controller interrupt.
 
   Cf Devicetree Specification - Release v0.3
   s2.4.3 "Interrupt Nexus Properties": "parent interrupt specifier"
   */
-  CM_ARM_GENERIC_INTERRUPT    IntcInterrupt;
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    IntcInterrupt;
 } CM_ARM_PCI_INTERRUPT_MAP_INFO;
 
 /** A structure that describes the
@@ -1085,10 +1070,10 @@ typedef struct CmArmPccSubspaceType1Info {
     The Subspace of Type0 contains information that can be re-used
     in other Subspace types.
   */
-  PCC_SUBSPACE_GENERIC_INFO    GenericPccInfo;
+  PCC_SUBSPACE_GENERIC_INFO           GenericPccInfo;
 
   /// Platform Interrupt.
-  CM_ARM_GENERIC_INTERRUPT     PlatIrq;
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
 } CM_ARM_PCC_SUBSPACE_TYPE1_INFO;
 
 /** A structure that describes a
@@ -1102,13 +1087,13 @@ typedef struct CmArmPccSubspaceType2Info {
     The Subspace of Type0 contains information that can be re-used
     in other Subspace types.
   */
-  PCC_SUBSPACE_GENERIC_INFO    GenericPccInfo;
+  PCC_SUBSPACE_GENERIC_INFO           GenericPccInfo;
 
   /// Platform Interrupt.
-  CM_ARM_GENERIC_INTERRUPT     PlatIrq;
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
 
   /// Platform Interrupt Register.
-  PCC_MAILBOX_REGISTER_INFO    PlatIrqAckReg;
+  PCC_MAILBOX_REGISTER_INFO           PlatIrqAckReg;
 } CM_ARM_PCC_SUBSPACE_TYPE2_INFO;
 
 /** A structure that describes a
@@ -1122,24 +1107,24 @@ typedef struct CmArmPccSubspaceType3Info {
     The Subspace of Type0 contains information that can be re-used
     in other Subspace types.
   */
-  PCC_SUBSPACE_GENERIC_INFO    GenericPccInfo;
+  PCC_SUBSPACE_GENERIC_INFO           GenericPccInfo;
 
   /// Platform Interrupt.
-  CM_ARM_GENERIC_INTERRUPT     PlatIrq;
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
 
   /// Platform Interrupt Register.
-  PCC_MAILBOX_REGISTER_INFO    PlatIrqAckReg;
+  PCC_MAILBOX_REGISTER_INFO           PlatIrqAckReg;
 
   /// Command Complete Check Register.
   /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO    CmdCompleteCheckReg;
+  PCC_MAILBOX_REGISTER_INFO           CmdCompleteCheckReg;
 
   /// Command Complete Update Register.
-  PCC_MAILBOX_REGISTER_INFO    CmdCompleteUpdateReg;
+  PCC_MAILBOX_REGISTER_INFO           CmdCompleteUpdateReg;
 
   /// Error Status Register.
   /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO    ErrorStatusReg;
+  PCC_MAILBOX_REGISTER_INFO           ErrorStatusReg;
 } CM_ARM_PCC_SUBSPACE_TYPE3_INFO;
 
 /** A structure that describes a
@@ -1163,21 +1148,21 @@ typedef struct CmArmPccSubspaceType5Info {
     MaximumPeriodicAccessRate doesn't need to be populated for
     this structure.
   */
-  PCC_SUBSPACE_GENERIC_INFO    GenericPccInfo;
+  PCC_SUBSPACE_GENERIC_INFO           GenericPccInfo;
 
   /// Version.
-  UINT16                       Version;
+  UINT16                              Version;
 
   /// Platform Interrupt.
-  CM_ARM_GENERIC_INTERRUPT     PlatIrq;
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
 
   /// Command Complete Check Register.
   /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO    CmdCompleteCheckReg;
+  PCC_MAILBOX_REGISTER_INFO           CmdCompleteCheckReg;
 
   /// Error Status Register.
   /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO    ErrorStatusReg;
+  PCC_MAILBOX_REGISTER_INFO           ErrorStatusReg;
 } CM_ARM_PCC_SUBSPACE_TYPE5_INFO;
 
 /** An enum describing the Arm Embedded Trace device type.
