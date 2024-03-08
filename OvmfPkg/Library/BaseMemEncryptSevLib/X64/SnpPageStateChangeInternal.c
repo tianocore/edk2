@@ -133,23 +133,26 @@ BuildPageStateBuffer (
   IN EFI_PHYSICAL_ADDRESS        EndAddress,
   IN SEV_SNP_PAGE_STATE          State,
   IN BOOLEAN                     UseLargeEntry,
-  IN SNP_PAGE_STATE_CHANGE_INFO  *Info
+  IN SNP_PAGE_STATE_CHANGE_INFO  *Info,
+  IN UINTN                       InfoSize
   )
 {
   EFI_PHYSICAL_ADDRESS  NextAddress;
   UINTN                 RmpPageSize;
   UINTN                 Index;
+  UINTN                 IndexMax;
 
   // Clear the page state structure
-  SetMem (Info, sizeof (*Info), 0);
+  SetMem (Info, InfoSize, 0);
 
   Index       = 0;
+  IndexMax    = (InfoSize - sizeof (Info->Header)) / sizeof (Info->Entry[0]);
   NextAddress = EndAddress;
 
   //
   // Populate the page state entry structure
   //
-  while ((BaseAddress < EndAddress) && (Index < SNP_PAGE_STATE_MAX_ENTRY)) {
+  while ((BaseAddress < EndAddress) && (Index < IndexMax)) {
     //
     // Is this a 2MB aligned page? Check if we can use the Large RMP entry.
     //
@@ -265,7 +268,8 @@ InternalSetPageState (
                     EndAddress,
                     State,
                     UseLargeEntry,
-                    Info
+                    Info,
+                    sizeof (Ghcb->SharedBuffer)
                     );
 
     //
