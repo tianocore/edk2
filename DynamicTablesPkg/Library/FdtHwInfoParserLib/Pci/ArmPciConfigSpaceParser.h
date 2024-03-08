@@ -102,12 +102,12 @@ typedef struct PciParserTable {
     UINT8   EndBusNumber;                         // {Populated}
   } CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO;
 
-  typedef struct CmArmPciAddressMapInfo {
+  typedef struct CmArchCommonPciAddressMapInfo {
     UINT8                     SpaceCode;          // {Populated}
     UINT64                    PciAddress;         // {Populated}
     UINT64                    CpuAddress;         // {Populated}
     UINT64                    AddressSize;        // {Populated}
-  } CM_ARM_PCI_ADDRESS_MAP_INFO;
+  } CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO;
 
   typedef struct CmArmPciInterruptMapInfo {
     UINT8                       PciBus;           // {Populated}
