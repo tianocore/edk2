@@ -1,0 +1,13 @@
+// /** @file
+// AmdSvsmLib instance.
+//
+// Copyright (C) 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "AmdSvsmLib NULL instance"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "AmdSvsmLib NULL instance."
+
