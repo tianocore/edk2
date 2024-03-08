@@ -36,9 +36,8 @@ typedef struct {
   MMI_ENTRY                     *MmiEntry;
 } MMI_HANDLER;
 
-LIST_ENTRY   mRootMmiHandlerList = INITIALIZE_LIST_HEAD_VARIABLE (mRootMmiHandlerList);
-LIST_ENTRY   mMmiEntryList       = INITIALIZE_LIST_HEAD_VARIABLE (mMmiEntryList);
-MMI_HANDLER  *mCurrentMmiHandler = NULL;
+LIST_ENTRY  mRootMmiHandlerList = INITIALIZE_LIST_HEAD_VARIABLE (mRootMmiHandlerList);
+LIST_ENTRY  mMmiEntryList       = INITIALIZE_LIST_HEAD_VARIABLE (mMmiEntryList);
 
 /**
   Finds the MMI entry for the requested handler type.
@@ -162,19 +161,13 @@ MmiManage (
     // get next node before handler is executed, since LIST_ENTRY that
     // Link points to may be freed if unregister MMI handler.
     //
-    Link = Link->ForwardLink;
-    //
-    // Assign gCurrentMmiHandle before calling the MMI handler and
-    // set to NULL when it returns.
-    //
-    mCurrentMmiHandler = MmiHandler;
-    Status             = MmiHandler->Handler (
-                                       (EFI_HANDLE)MmiHandler,
-                                       Context,
-                                       CommBuffer,
-                                       CommBufferSize
-                                       );
-    mCurrentMmiHandler = NULL;
+    Link   = Link->ForwardLink;
+    Status = MmiHandler->Handler (
+                           (EFI_HANDLE)MmiHandler,
+                           Context,
+                           CommBuffer,
+                           CommBufferSize
+                           );
 
     switch (Status) {
       case EFI_INTERRUPT_PENDING:
@@ -318,13 +311,6 @@ MmiHandlerUnRegister (
   }
 
   if (MmiHandler->Signature != MMI_HANDLER_SIGNATURE) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Do not allow to unregister MMI Handler inside other MMI Handler
-  //
-  if ((mCurrentMmiHandler != NULL) && (mCurrentMmiHandler != MmiHandler)) {
     return EFI_INVALID_PARAMETER;
   }
 
