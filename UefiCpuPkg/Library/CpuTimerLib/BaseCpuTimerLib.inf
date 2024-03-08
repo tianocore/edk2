@@ -28,8 +28,8 @@
 
 [LibraryClasses]
   BaseLib
-  PcdLib
   DebugLib
+  PcdLib
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuCoreCrystalClockFrequency  ## CONSUMES
