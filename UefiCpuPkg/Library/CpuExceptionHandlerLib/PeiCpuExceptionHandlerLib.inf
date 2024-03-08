@@ -22,15 +22,15 @@
 #
 
 [Sources.Ia32]
-  Ia32/ExceptionHandlerAsm.nasm
-  Ia32/ExceptionTssEntryAsm.nasm
   Ia32/ArchExceptionHandler.c
   Ia32/ArchInterruptDefs.h
+  Ia32/ExceptionHandlerAsm.nasm
+  Ia32/ExceptionTssEntryAsm.nasm
 
 [Sources.X64]
-  X64/SecPeiExceptionHandlerAsm.nasm
   X64/ArchExceptionHandler.c
   X64/ArchInterruptDefs.h
+  X64/SecPeiExceptionHandlerAsm.nasm
 
 [Sources.common]
   CpuExceptionCommon.h
@@ -45,14 +45,14 @@
 
 [LibraryClasses]
   BaseLib
-  SerialPortLib
-  PrintLib
-  LocalApicLib
-  PeCoffGetEntryPointLib
-  HobLib
-  MemoryAllocationLib
-  SynchronizationLib
   CcExitLib
+  HobLib
+  LocalApicLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PrintLib
+  SerialPortLib
+  SynchronizationLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard    # CONSUMES
