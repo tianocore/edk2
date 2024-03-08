@@ -56,19 +56,18 @@ typedef enum ArmObjectID {
   EArmObjGenericInitiatorAffinityInfo,                         ///< 25 - Generic Initiator Affinity
   EArmObjCmn600Info,                                           ///< 26 - CMN-600 Info
   EArmObjLpiInfo,                                              ///< 27 - Lpi Info
-  EArmObjPciAddressMapInfo,                                    ///< 28 - Pci Address Map Info
-  EArmObjPciInterruptMapInfo,                                  ///< 29 - Pci Interrupt Map Info
-  EArmObjRmr,                                                  ///< 30 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 31 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 32 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 33 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 34 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 35 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 36 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 37 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 38 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 39 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 40 - P-State Dependency (PSD) Info
+  EArmObjPciInterruptMapInfo,                                  ///< 28 - Pci Interrupt Map Info
+  EArmObjRmr,                                                  ///< 29 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 30 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 31 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 32 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 33 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 34 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 35 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 36 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 37 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 38 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 39 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -900,33 +899,6 @@ typedef struct CmArmLpiInfo {
   */
   CHAR8                                     StateName[16];
 } CM_ARM_LPI_INFO;
-
-/** A structure that describes a PCI Address Map.
-
-  The memory-ranges used by the PCI bus are described by this object.
-
-  ID: EArmObjPciAddressMapInfo
-*/
-typedef struct CmArmPciAddressMapInfo {
-  /** Pci address space code
-
-  Available values are:
-   - 0: Configuration Space
-   - 1: I/O Space
-   - 2: 32-bit-address Memory Space
-   - 3: 64-bit-address Memory Space
-  */
-  UINT8     SpaceCode;
-
-  /// PCI address
-  UINT64    PciAddress;
-
-  /// Cpu address
-  UINT64    CpuAddress;
-
-  /// Address size
-  UINT64    AddressSize;
-} CM_ARM_PCI_ADDRESS_MAP_INFO;
 
 /** A structure that describes a PCI Interrupt Map.
 

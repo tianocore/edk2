@@ -188,8 +188,8 @@ ParseAddressMap (
   UINT32       Count;
   UINT32       PciAddressAttr;
 
-  CM_ARM_PCI_ADDRESS_MAP_INFO  *PciAddressMapInfo;
-  UINT32                       BufferSize;
+  CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO  *PciAddressMapInfo;
+  UINT32                               BufferSize;
 
   // The mapping is done on AddressMapSize bytes.
   AddressMapSize = (PCI_ADDRESS_CELLS + AddressCells + PCI_SIZE_CELLS) *
@@ -208,7 +208,7 @@ ParseAddressMap (
   Count = DataSize / AddressMapSize;
 
   // Allocate a buffer to store each address mapping.
-  BufferSize        = Count * sizeof (CM_ARM_PCI_ADDRESS_MAP_INFO);
+  BufferSize        = Count * sizeof (CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO);
   PciAddressMapInfo = AllocateZeroPool (BufferSize);
   if (PciAddressMapInfo == NULL) {
     ASSERT (0);
@@ -246,9 +246,9 @@ ParseAddressMap (
   } // for
 
   PciInfo->Mapping[PciMappingTableAddress].ObjectId =
-    CREATE_CM_ARM_OBJECT_ID (EArmObjPciAddressMapInfo);
+    CREATE_CM_ARCH_COMMON_OBJECT_ID (EArchCommonObjPciAddressMapInfo);
   PciInfo->Mapping[PciMappingTableAddress].Size =
-    sizeof (CM_ARM_PCI_ADDRESS_MAP_INFO) * Count;
+    sizeof (CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO) * Count;
   PciInfo->Mapping[PciMappingTableAddress].Data  = PciAddressMapInfo;
   PciInfo->Mapping[PciMappingTableAddress].Count = Count;
 
@@ -413,7 +413,7 @@ ParseIrqMap (
 
   // Allocate a buffer to store each interrupt mapping.
   IrqMapCount         = DataSize / IrqMapSize;
-  BufferSize          = IrqMapCount * sizeof (CM_ARM_PCI_ADDRESS_MAP_INFO);
+  BufferSize          = IrqMapCount * sizeof (CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO);
   PciInterruptMapInfo = AllocateZeroPool (BufferSize);
   if (PciInterruptMapInfo == NULL) {
     ASSERT (0);
@@ -580,7 +580,7 @@ PciNodeParser (
 
   CmObj of the following types are concerned:
    - EArchCommonObjPciConfigSpaceInfo
-   - EArmObjPciAddressMapInfo
+   - EArchCommonObjPciAddressMapInfo
    - EArmObjPciInterruptMapInfo
 
   @param [in]  FdtParserHandle  A handle to the parser instance.
@@ -694,12 +694,12 @@ FreeParserTable (
     UINT8   EndBusNumber;                         // {Populated}
   } CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO;
 
-  typedef struct CmArmPciAddressMapInfo {
+  typedef struct CmArchCommonPciAddressMapInfo {
     UINT8                     SpaceCode;          // {Populated}
     UINT64                    PciAddress;         // {Populated}
     UINT64                    CpuAddress;         // {Populated}
     UINT64                    AddressSize;        // {Populated}
-  } CM_ARM_PCI_ADDRESS_MAP_INFO;
+  } CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO;
 
   typedef struct CmArmPciInterruptMapInfo {
     UINT8                       PciBus;           // {Populated}

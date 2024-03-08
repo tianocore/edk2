@@ -171,19 +171,18 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///< 25 - Generic Initiator Affinity
   NULL,                             ///< 26 - CMN-600 Info
   NULL,                             ///< 27 - Lpi Info
-  NULL,                             ///< 28 - Pci Address Map Info
-  NULL,                             ///< 29 - Pci Interrupt Map Info
-  NULL,                             ///< 30 - Reserved Memory Range Node
-  NULL,                             ///< 31 - Memory Range Descriptor
-  NULL,                             ///< 32 - Continuous Performance Control Info
-  NULL,                             ///< 33 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 28 - Pci Interrupt Map Info
+  NULL,                             ///< 29 - Reserved Memory Range Node
+  NULL,                             ///< 30 - Memory Range Descriptor
+  NULL,                             ///< 31 - Continuous Performance Control Info
+  NULL,                             ///< 32 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 33 - Pcc Subspace Type 2 Info
   NULL,                             ///< 34 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 35 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 36 - Pcc Subspace Type 3 Info
-  NULL,                             ///< 37 - Pcc Subspace Type 4 Info
-  NULL,                             ///< 38 - Pcc Subspace Type 5 Info
-  NULL,                             ///< 39 - Embedded Trace Extension/Module Info
-  NULL                              ///< 40 - P-State Dependency (PSD) Info
+  NULL,                             ///< 35 - Pcc Subspace Type 3 Info
+  NULL,                             ///< 36 - Pcc Subspace Type 4 Info
+  NULL,                             ///< 37 - Pcc Subspace Type 5 Info
+  NULL,                             ///< 38 - Embedded Trace Extension/Module Info
+  NULL                              ///< 39 - P-State Dependency (PSD) Info
 };
 
 /** CmObj token fixer.

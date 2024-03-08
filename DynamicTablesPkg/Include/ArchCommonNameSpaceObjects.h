@@ -29,6 +29,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjFixedFeatureFlags,              ///<  6 - Fixed feature flags for FADT
   EArchCommonObjCmRef,                          ///<  7 - CM Object Reference
   EArchCommonObjPciConfigSpaceInfo,             ///<  8 - PCI Configuration Space Info
+  EArchCommonObjPciAddressMapInfo,              ///<  9 - Pci Address Map Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -141,6 +142,33 @@ typedef struct CmArchCommonPciConfigSpaceInfo {
   /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure.
   CM_OBJECT_TOKEN    InterruptMapToken;
 } CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO;
+
+/** A structure that describes a PCI Address Map.
+
+  The memory-ranges used by the PCI bus are described by this object.
+
+  ID: EArchCommonObjPciAddressMapInfo
+*/
+typedef struct CmArchCommonPciAddressMapInfo {
+  /** Pci address space code
+
+  Available values are:
+   - 0: Configuration Space
+   - 1: I/O Space
+   - 2: 32-bit-address Memory Space
+   - 3: 64-bit-address Memory Space
+  */
+  UINT8     SpaceCode;
+
+  /// PCI address
+  UINT64    PciAddress;
+
+  /// Cpu address
+  UINT64    CpuAddress;
+
+  /// Address size
+  UINT64    AddressSize;
+} CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO;
 
 #pragma pack()
 
