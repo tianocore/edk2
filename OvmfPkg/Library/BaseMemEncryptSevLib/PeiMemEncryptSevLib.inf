@@ -1,7 +1,7 @@
 ## @file
 #  Library provides the helper functions for SEV guest
 #
-# Copyright (c) 2020 Advanced Micro Devices. All rights reserved.<BR>
+# Copyright (c) 2020 - 2024, Advanced Micro Devices. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -52,6 +52,7 @@
   MemoryAllocationLib
   PcdLib
   CcExitLib
+  AmdSvsmLib
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
