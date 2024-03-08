@@ -8,8 +8,7 @@
 
 #include "PiSmmCore.h"
 
-SMI_HANDLER  *mCurrentSmiHandler = NULL;
-LIST_ENTRY   mSmiEntryList       = INITIALIZE_LIST_HEAD_VARIABLE (mSmiEntryList);
+LIST_ENTRY  mSmiEntryList = INITIALIZE_LIST_HEAD_VARIABLE (mSmiEntryList);
 
 SMI_ENTRY  mRootSmiEntry = {
   SMI_ENTRY_SIGNATURE,
@@ -143,18 +142,13 @@ SmiManage (
     // Link points to may be freed if unregister SMI handler.
     //
     Link = Link->ForwardLink;
-    //
-    // Assign gCurrentSmiHandle before calling the SMI handler and
-    // set to NULL when it returns.
-    //
-    mCurrentSmiHandler = SmiHandler;
-    Status             = SmiHandler->Handler (
-                                       (EFI_HANDLE)SmiHandler,
-                                       Context,
-                                       CommBuffer,
-                                       CommBufferSize
-                                       );
-    mCurrentSmiHandler = NULL;
+
+    Status = SmiHandler->Handler (
+                           (EFI_HANDLE)SmiHandler,
+                           Context,
+                           CommBuffer,
+                           CommBufferSize
+                           );
 
     switch (Status) {
       case EFI_INTERRUPT_PENDING:
@@ -331,13 +325,6 @@ SmiHandlerUnRegister (
   }
 
   if ((EFI_HANDLE)SmiHandler != DispatchHandle) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Do not allow to unregister SMI Handler inside other SMI Handler
-  //
-  if ((mCurrentSmiHandler != NULL) && (mCurrentSmiHandler != SmiHandler)) {
     return EFI_INVALID_PARAMETER;
   }
 
