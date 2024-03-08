@@ -22,21 +22,21 @@
 #
 
 [Sources.Ia32]
-  Ia32/ExceptionHandlerAsm.nasm
-  Ia32/ExceptionTssEntryAsm.nasm
   Ia32/ArchExceptionHandler.c
   Ia32/ArchInterruptDefs.h
+  Ia32/ExceptionHandlerAsm.nasm
+  Ia32/ExceptionTssEntryAsm.nasm
 
 [Sources.X64]
-  X64/ExceptionHandlerAsm.nasm
   X64/ArchExceptionHandler.c
   X64/ArchInterruptDefs.h
+  X64/ExceptionHandlerAsm.nasm
 
 [Sources.common]
   CpuExceptionCommon.h
   CpuExceptionCommon.c
-  PeiDxeSmmCpuException.c
   DxeException.c
+  PeiDxeSmmCpuException.c
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
@@ -53,14 +53,14 @@
 
 [LibraryClasses]
   BaseLib
-  SerialPortLib
-  PrintLib
-  SynchronizationLib
-  LocalApicLib
-  PeCoffGetEntryPointLib
-  MemoryAllocationLib
-  DebugLib
   CcExitLib
+  DebugLib
+  LocalApicLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PrintLib
+  SerialPortLib
+  SynchronizationLib
 
 [BuildOptions]
   XCODE:*_*_X64_NASM_FLAGS = -D NO_ABSOLUTE_RELOCS_IN_TEXT
