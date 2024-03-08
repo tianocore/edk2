@@ -2,7 +2,7 @@
 
   SEV-SNP Page Validation functions.
 
-  Copyright (c) 2021 AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2021 - 2024, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -31,8 +31,8 @@ SevSnpIsVmpl0 (
   VOID
   )
 {
-  UINT64      Rdx;
-  EFI_STATUS  Status;
+  UINT64  Rdx;
+  UINT32  Status;
 
   //
   // There is no straightforward way to query the current VMPL level.
@@ -44,7 +44,7 @@ SevSnpIsVmpl0 (
   Rdx = 1;
 
   Status = AsmRmpAdjust ((UINT64)gVmpl0Data, 0, Rdx);
-  if (EFI_ERROR (Status)) {
+  if (Status != 0) {
     return FALSE;
   }
 
