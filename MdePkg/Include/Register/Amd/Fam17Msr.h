@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2017, Advanced Micro Devices. All rights reserved.<BR>
+  Copyright (c) 2017 - 2024, Advanced Micro Devices. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
@@ -71,9 +71,24 @@ typedef union {
     UINT32    ErrorCode;
   } SnpPageStateChangeResponse;
 
+  struct {
+    UINT64    Function  : 12;
+    UINT64    Reserved1 : 20;
+    UINT64    Vmpl      : 8;
+    UINT64    Reserved2 : 56;
+  } SnpVmplRequest;
+
+  struct {
+    UINT32    Function : 12;
+    UINT32    Reserved : 20;
+    UINT32    ErrorCode;
+  } SnpVmplResponse;
+
   VOID      *Ghcb;
 
   UINT64    GhcbPhysicalAddress;
+
+  UINT64    Uint64;
 } MSR_SEV_ES_GHCB_REGISTER;
 
 #define GHCB_INFO_SEV_INFO                        1
@@ -84,6 +99,8 @@ typedef union {
 #define GHCB_INFO_GHCB_GPA_REGISTER_RESPONSE      19
 #define GHCB_INFO_SNP_PAGE_STATE_CHANGE_REQUEST   20
 #define GHCB_INFO_SNP_PAGE_STATE_CHANGE_RESPONSE  21
+#define GHCB_INFO_SNP_VMPL_REQUEST                22
+#define GHCB_INFO_SNP_VMPL_RESPONSE               23
 #define GHCB_HYPERVISOR_FEATURES_REQUEST          128
 #define GHCB_HYPERVISOR_FEATURES_RESPONSE         129
 #define GHCB_INFO_TERMINATE_REQUEST               256
