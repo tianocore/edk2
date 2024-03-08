@@ -702,10 +702,10 @@ FreeParserTable (
   } CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO;
 
   typedef struct CmArmPciInterruptMapInfo {
-    UINT8                       PciBus;           // {Populated}
-    UINT8                       PciDevice;        // {Populated}
-    UINT8                       PciInterrupt;     // {Populated}
-    CM_ARM_GENERIC_INTERRUPT    IntcInterrupt;    // {Populated}
+    UINT8                               PciBus;           // {Populated}
+    UINT8                               PciDevice;        // {Populated}
+    UINT8                               PciInterrupt;     // {Populated}
+    CM_ARCH_COMMON_GENERIC_INTERRUPT    IntcInterrupt;    // {Populated}
   } CM_ARM_PCI_INTERRUPT_MAP_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
