@@ -38,6 +38,7 @@
   Parsers/Fadt/FadtParser.c
   Parsers/Gtdt/GtdtParser.c
   Parsers/Hmat/HmatParser.c
+  Parsers/Hpet/HpetParser.c
   Parsers/Iort/IortParser.c
   Parsers/Madt/MadtParser.c
   Parsers/Madt/MadtParser.h
