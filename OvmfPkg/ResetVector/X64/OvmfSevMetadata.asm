@@ -2,7 +2,7 @@
 ; @file
 ; OVMF metadata for the AMD SEV confidential computing guests
 ;
-; Copyright (c) 2021, AMD Inc. All rights reserved.<BR>
+; Copyright (c) 2021 - 2024, AMD Inc. All rights reserved.<BR>
 ;
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;-----------------------------------------------------------------------------
@@ -25,6 +25,9 @@ BITS  64
 ; (CPUID function structure).
 ;
 %define OVMF_SECTION_TYPE_CPUID           0x3
+
+; The SVSM Calling Area Address (CAA)
+%define OVMF_SECTION_TYPE_SVSM_CAA        0x4
 
 ; Kernel hashes section for measured direct boot
 %define OVMF_SECTION_TYPE_KERNEL_HASHES   0x10
@@ -66,6 +69,12 @@ CpuidSec:
   DD  CPUID_BASE
   DD  CPUID_SIZE
   DD  OVMF_SECTION_TYPE_CPUID
+
+; SVSM CAA page
+SvsmCaa:
+  DD  SVSM_CAA_BASE
+  DD  SVSM_CAA_SIZE
+  DD  OVMF_SECTION_TYPE_SVSM_CAA
 
 %if (SEV_SNP_KERNEL_HASHES_BASE > 0)
 ; Kernel hashes for measured direct boot, or zero page if
