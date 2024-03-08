@@ -311,8 +311,8 @@ ParseIrqMap (
 
   UINT32  PciAddressAttr;
 
-  CM_ARM_PCI_INTERRUPT_MAP_INFO  *PciInterruptMapInfo;
-  UINT32                         BufferSize;
+  CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO  *PciInterruptMapInfo;
+  UINT32                                 BufferSize;
 
   Data = fdt_getprop (Fdt, HostPciNode, "interrupt-map", &DataSize);
   if ((Data == NULL) || (DataSize <= 0)) {
@@ -455,9 +455,9 @@ ParseIrqMap (
   } // for
 
   PciInfo->Mapping[PciMappingTableInterrupt].ObjectId =
-    CREATE_CM_ARM_OBJECT_ID (EArmObjPciInterruptMapInfo);
+    CREATE_CM_ARCH_COMMON_OBJECT_ID (EArchCommonObjPciInterruptMapInfo);
   PciInfo->Mapping[PciMappingTableInterrupt].Size =
-    sizeof (CM_ARM_PCI_INTERRUPT_MAP_INFO) * IrqMapCount;
+    sizeof (CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO) * IrqMapCount;
   PciInfo->Mapping[PciMappingTableInterrupt].Data  = PciInterruptMapInfo;
   PciInfo->Mapping[PciMappingTableInterrupt].Count = IrqMapCount;
 
@@ -581,7 +581,7 @@ PciNodeParser (
   CmObj of the following types are concerned:
    - EArchCommonObjPciConfigSpaceInfo
    - EArchCommonObjPciAddressMapInfo
-   - EArmObjPciInterruptMapInfo
+   - EArchCommonObjPciInterruptMapInfo
 
   @param [in]  FdtParserHandle  A handle to the parser instance.
   @param [in]  PciTableInfo     PCI_PARSER_TABLE structure containing the
@@ -701,12 +701,12 @@ FreeParserTable (
     UINT64                    AddressSize;        // {Populated}
   } CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO;
 
-  typedef struct CmArmPciInterruptMapInfo {
+  typedef struct CmArchCommonPciInterruptMapInfo {
     UINT8                               PciBus;           // {Populated}
     UINT8                               PciDevice;        // {Populated}
     UINT8                               PciInterrupt;     // {Populated}
     CM_ARCH_COMMON_GENERIC_INTERRUPT    IntcInterrupt;    // {Populated}
-  } CM_ARM_PCI_INTERRUPT_MAP_INFO;
+  } CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO;
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.
