@@ -2,7 +2,7 @@
 
   SEV-SNP Page Validation functions.
 
-  Copyright (c) 2021 AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2021 - 2024, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -15,6 +15,8 @@
 
 #include "SnpPageStateChange.h"
 #include "VirtualMemory.h"
+
+STATIC VOID  *mPscBuffer = NULL;
 
 /**
   Pre-validate the system RAM when SEV-SNP is enabled in the guest VM.
@@ -52,5 +54,10 @@ MemEncryptSevSnpPreValidateSystemRam (
     }
   }
 
-  InternalSetPageState (BaseAddress, NumPages, SevSnpPagePrivate, TRUE);
+  if (mPscBuffer == NULL) {
+    mPscBuffer = AllocateReservedPages (1);
+    ASSERT (mPscBuffer != NULL);
+  }
+
+  InternalSetPageState (BaseAddress, NumPages, SevSnpPagePrivate, TRUE, mPscBuffer, EFI_PAGE_SIZE);
 }

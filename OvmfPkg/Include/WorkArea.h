@@ -2,7 +2,7 @@
 
   Work Area structure definition
 
-  Copyright (c) 2021, AMD Inc.
+  Copyright (c) 2021 - 2024, AMD Inc.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -54,6 +54,13 @@ typedef struct _SEC_SEV_ES_WORK_AREA {
   // detection in OvmfPkg/ResetVector/Ia32/AmdSev.c
   //
   UINT8     ReceivedVc;
+  UINT8     Reserved[7];
+
+  // Used by SEC to generate Page State Change requests. This should be
+  // sized less than an equal to the GHCB shared buffer area to allow a
+  // single call to the hypervisor.
+  //
+  UINT8     WorkBuffer[1024];
 } SEC_SEV_ES_WORK_AREA;
 
 //

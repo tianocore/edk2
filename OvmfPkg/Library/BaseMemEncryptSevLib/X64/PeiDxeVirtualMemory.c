@@ -3,7 +3,7 @@
   Virtual Memory Management Services to set or clear the memory encryption bit
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2017 - 2024, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,6 +22,8 @@
 STATIC BOOLEAN          mAddressEncMaskChecked = FALSE;
 STATIC UINT64           mAddressEncMask;
 STATIC PAGE_TABLE_POOL  *mPageTablePool = NULL;
+
+STATIC VOID  *mPscBuffer = NULL;
 
 typedef enum {
   SetCBit,
@@ -786,7 +788,19 @@ SetMemoryEncDec (
   // The InternalSetPageState() is used for setting the page state in the RMP table.
   //
   if (!Mmio && (Mode == ClearCBit) && MemEncryptSevSnpIsEnabled ()) {
-    InternalSetPageState (PhysicalAddress, EFI_SIZE_TO_PAGES (Length), SevSnpPageShared, FALSE);
+    if (mPscBuffer == NULL) {
+      mPscBuffer = AllocateReservedPages (1);
+      ASSERT (mPscBuffer != NULL);
+    }
+
+    InternalSetPageState (
+      PhysicalAddress,
+      EFI_SIZE_TO_PAGES (Length),
+      SevSnpPageShared,
+      FALSE,
+      mPscBuffer,
+      EFI_PAGE_SIZE
+      );
   }
 
   //
@@ -975,11 +989,18 @@ SetMemoryEncDec (
   // The InternalSetPageState() is used for setting the page state in the RMP table.
   //
   if ((Mode == SetCBit) && MemEncryptSevSnpIsEnabled ()) {
+    if (mPscBuffer == NULL) {
+      mPscBuffer = AllocateReservedPages (1);
+      ASSERT (mPscBuffer != NULL);
+    }
+
     InternalSetPageState (
       OrigPhysicalAddress,
       EFI_SIZE_TO_PAGES (OrigLength),
       SevSnpPagePrivate,
-      FALSE
+      FALSE,
+      mPscBuffer,
+      EFI_PAGE_SIZE
       );
   }
 

@@ -2,7 +2,7 @@
 
   SEV-SNP Page Validation functions.
 
-  Copyright (c) 2021 AMD Incorporated. All rights reserved.<BR>
+  Copyright (c) 2021 - 2024, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -16,6 +16,8 @@
 
 #include "SnpPageStateChange.h"
 #include "VirtualMemory.h"
+
+STATIC UINT8  mPscBufferPage[EFI_PAGE_SIZE];
 
 typedef struct {
   UINT64    StartAddress;
@@ -113,7 +115,14 @@ MemEncryptSevSnpPreValidateSystemRam (
       if (BaseAddress < OverlapRange.StartAddress) {
         NumPages = EFI_SIZE_TO_PAGES (OverlapRange.StartAddress - BaseAddress);
 
-        InternalSetPageState (BaseAddress, NumPages, SevSnpPagePrivate, TRUE);
+        InternalSetPageState (
+          BaseAddress,
+          NumPages,
+          SevSnpPagePrivate,
+          TRUE,
+          mPscBufferPage,
+          sizeof (mPscBufferPage)
+          );
       }
 
       BaseAddress = OverlapRange.EndAddress;
@@ -122,7 +131,14 @@ MemEncryptSevSnpPreValidateSystemRam (
 
     // Validate the remaining pages.
     NumPages = EFI_SIZE_TO_PAGES (EndAddress - BaseAddress);
-    InternalSetPageState (BaseAddress, NumPages, SevSnpPagePrivate, TRUE);
+    InternalSetPageState (
+      BaseAddress,
+      NumPages,
+      SevSnpPagePrivate,
+      TRUE,
+      mPscBufferPage,
+      sizeof (mPscBufferPage)
+      );
     BaseAddress = EndAddress;
   }
 }
