@@ -44,7 +44,7 @@ Requirements:
   this Generator:
   - EArchCommonObjCmRef
   - EArchCommonObjPciConfigSpaceInfo
-  - EArmObjPciAddressMapInfo
+  - EArchCommonObjPciAddressMapInfo
   - EArmObjPciInterruptMapInfo
 */
 
@@ -70,9 +70,9 @@ GET_OBJECT_LIST (
     Address Mapping Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPciAddressMapInfo,
-  CM_ARM_PCI_ADDRESS_MAP_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPciAddressMapInfo,
+  CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO
   );
 
 /** This macro expands to a function that retrieves the Pci
@@ -455,14 +455,14 @@ GeneratePciCrs (
   IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
   )
 {
-  EFI_STATUS                   Status;
-  BOOLEAN                      Translation;
-  UINT32                       Index;
-  CM_ARCH_COMMON_OBJ_REF       *RefInfo;
-  UINT32                       RefCount;
-  CM_ARM_PCI_ADDRESS_MAP_INFO  *AddrMapInfo;
-  AML_OBJECT_NODE_HANDLE       CrsNode;
-  BOOLEAN                      IsPosDecode;
+  EFI_STATUS                           Status;
+  BOOLEAN                              Translation;
+  UINT32                               Index;
+  CM_ARCH_COMMON_OBJ_REF               *RefInfo;
+  UINT32                               RefCount;
+  CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO  *AddrMapInfo;
+  AML_OBJECT_NODE_HANDLE               CrsNode;
+  BOOLEAN                              IsPosDecode;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -506,7 +506,7 @@ GeneratePciCrs (
   }
 
   // Get the array of CM_ARCH_COMMON_OBJ_REF referencing the
-  // CM_ARM_PCI_ADDRESS_MAP_INFO objects.
+  // CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO objects.
   Status = GetEArchCommonObjCmRef (
              CfgMgrProtocol,
              PciInfo->AddressMapToken,
@@ -519,8 +519,8 @@ GeneratePciCrs (
   }
 
   for (Index = 0; Index < RefCount; Index++) {
-    // Get CM_ARM_PCI_ADDRESS_MAP_INFO structures one by one.
-    Status = GetEArmObjPciAddressMapInfo (
+    // Get CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO structures one by one.
+    Status = GetEArchCommonObjPciAddressMapInfo (
                CfgMgrProtocol,
                RefInfo[Index].ReferenceToken,
                &AddrMapInfo,
