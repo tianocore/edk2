@@ -45,7 +45,7 @@ Requirements:
   - EArchCommonObjCmRef
   - EArchCommonObjPciConfigSpaceInfo
   - EArchCommonObjPciAddressMapInfo
-  - EArmObjPciInterruptMapInfo
+  - EArchCommonObjPciInterruptMapInfo
 */
 
 /** This macro expands to a function that retrieves the cross-CM-object-
@@ -79,9 +79,9 @@ GET_OBJECT_LIST (
     Interrupt Mapping Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPciInterruptMapInfo,
-  CM_ARM_PCI_INTERRUPT_MAP_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPciInterruptMapInfo,
+  CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO
   );
 
 /** Initialize the MappingTable.
@@ -310,12 +310,12 @@ GeneratePrt (
   IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
   )
 {
-  EFI_STATUS                     Status;
-  INT32                          Index;
-  AML_OBJECT_NODE_HANDLE         PrtNode;
-  CM_ARCH_COMMON_OBJ_REF         *RefInfo;
-  UINT32                         RefCount;
-  CM_ARM_PCI_INTERRUPT_MAP_INFO  *IrqMapInfo;
+  EFI_STATUS                             Status;
+  INT32                                  Index;
+  AML_OBJECT_NODE_HANDLE                 PrtNode;
+  CM_ARCH_COMMON_OBJ_REF                 *RefInfo;
+  UINT32                                 RefCount;
+  CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO  *IrqMapInfo;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -325,7 +325,7 @@ GeneratePrt (
   PrtNode = NULL;
 
   // Get the array of CM_ARCH_COMMON_OBJ_REF referencing the
-  // CM_ARM_PCI_INTERRUPT_MAP_INFO objects.
+  // CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO objects.
   Status = GetEArchCommonObjCmRef (
              CfgMgrProtocol,
              PciInfo->InterruptMapToken,
@@ -352,8 +352,8 @@ GeneratePrt (
   }
 
   for (Index = 0; Index < RefCount; Index++) {
-    // Get CM_ARM_PCI_INTERRUPT_MAP_INFO structures one by one.
-    Status = GetEArmObjPciInterruptMapInfo (
+    // Get CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO structures one by one.
+    Status = GetEArchCommonObjPciInterruptMapInfo (
                CfgMgrProtocol,
                RefInfo[Index].ReferenceToken,
                &IrqMapInfo,
