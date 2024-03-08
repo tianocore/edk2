@@ -662,7 +662,9 @@ GetStandardNameSpaceObject (
       //
       Status = DynamicPlatRepoGetObject (
                  PlatformRepo->DynamicPlatformRepo,
-                 CREATE_CM_ARM_OBJECT_ID (EArmObjPciConfigSpaceInfo),
+                 CREATE_CM_ARCH_COMMON_OBJECT_ID (
+                   EArchCommonObjPciConfigSpaceInfo
+                   ),
                  CM_NULL_TOKEN,
                  &CmObjDesc
                  );
