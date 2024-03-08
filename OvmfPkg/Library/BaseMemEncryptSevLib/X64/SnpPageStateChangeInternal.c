@@ -18,6 +18,7 @@
 
 #include <Register/Amd/Ghcb.h>
 #include <Register/Amd/Msr.h>
+#include <Register/Amd/Svsm.h>
 
 #include "SnpPageStateChange.h"
 
@@ -78,6 +79,7 @@ BuildPageStateBuffer (
   UINTN                 Index;
   UINTN                 IndexMax;
   UINTN                 PscIndexMax;
+  UINTN                 SvsmIndexMax;
 
   // Clear the page state structure
   SetMem (Info, InfoSize, 0);
@@ -94,6 +96,11 @@ BuildPageStateBuffer (
   PscIndexMax = (IndexMax / SNP_PAGE_STATE_MAX_ENTRY) * SNP_PAGE_STATE_MAX_ENTRY;
   if (PscIndexMax > 0) {
     IndexMax = MIN (IndexMax, PscIndexMax);
+  }
+
+  SvsmIndexMax = (IndexMax / SVSM_PVALIDATE_MAX_ENTRY) * SVSM_PVALIDATE_MAX_ENTRY;
+  if (SvsmIndexMax > 0) {
+    IndexMax = MIN (IndexMax, SvsmIndexMax);
   }
 
   //
