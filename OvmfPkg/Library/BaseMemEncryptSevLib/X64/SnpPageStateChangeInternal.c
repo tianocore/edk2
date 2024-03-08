@@ -145,6 +145,7 @@ BuildPageStateBuffer (
   UINTN                 RmpPageSize;
   UINTN                 Index;
   UINTN                 IndexMax;
+  UINTN                 PscIndexMax;
 
   // Clear the page state structure
   SetMem (Info, InfoSize, 0);
@@ -152,6 +153,16 @@ BuildPageStateBuffer (
   Index       = 0;
   IndexMax    = (InfoSize - sizeof (Info->Header)) / sizeof (Info->Entry[0]);
   NextAddress = EndAddress;
+
+  //
+  // Make the use of the work area as efficient as possible relative to
+  // exiting from the guest to the hypervisor. Maximize the number of entries
+  // that can be processed per exit.
+  //
+  PscIndexMax = (IndexMax / SNP_PAGE_STATE_MAX_ENTRY) * SNP_PAGE_STATE_MAX_ENTRY;
+  if (PscIndexMax > 0) {
+    IndexMax = MIN (IndexMax, PscIndexMax);
+  }
 
   //
   // Populate the page state entry structure
