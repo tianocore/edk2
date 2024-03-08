@@ -2,7 +2,7 @@
   Common header file for MP Initialize Library.
 
   Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
+  Copyright (c) 2020 - 2024, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -922,6 +922,19 @@ VOID
 SevSnpCreateAP (
   IN CPU_MP_DATA  *CpuMpData,
   IN INTN         ProcessorNumber
+  );
+
+/**
+  Determine if the SEV-SNP AP Create protocol should be used.
+
+  @param[in]  CpuMpData  Pointer to CPU MP Data
+
+  @retval     TRUE       Use SEV-SNP AP Create protocol
+  @retval     FALSE      Do not use SEV-SNP AP Create protocol
+**/
+BOOLEAN
+CanUseSevSnpCreateAP (
+  IN  CPU_MP_DATA  *CpuMpData
   );
 
 /**

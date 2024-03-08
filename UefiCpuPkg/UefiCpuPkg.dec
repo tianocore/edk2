@@ -2,7 +2,7 @@
 # This Package provides UEFI compatible CPU modules and libraries.
 #
 # Copyright (c) 2007 - 2023, Intel Corporation. All rights reserved.<BR>
-# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -98,6 +98,9 @@
 
   ## Include/Guid/ProcessorResourceHob.h
   gProcessorResourceHobGuid      = { 0xb855c7fe, 0xa758, 0x701f, { 0xa7, 0x30, 0x87, 0xf3, 0x9c, 0x03, 0x46, 0x7e }}
+  #
+  ## Include/Guid/GhcbApicIds.h
+  gGhcbApicIdsGuid               = { 0xbc964338, 0xee39, 0x4fc8, { 0xa2, 0x24, 0x10, 0x10, 0x8b, 0x17, 0x80, 0x1b }}
 
 [Protocols]
   ## Include/Protocol/SmmCpuService.h

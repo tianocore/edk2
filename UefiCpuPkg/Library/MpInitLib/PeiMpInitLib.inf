@@ -85,6 +85,7 @@
 [Guids]
   gEdkiiS3SmmInitDoneGuid
   gEdkiiMicrocodePatchHobGuid
+  gGhcbApicIdsGuid                       ## SOMETIMES_CONSUMES
 
 [Guids.LoongArch64]
   gProcessorResourceHobGuid              ## SOMETIMES_CONSUMES  ## HOB
