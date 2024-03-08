@@ -1,0 +1,36 @@
+## @file
+#  SSDT HPET Table Generator
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.27
+  BASE_NAME      = AcpiSsdtHpetLib
+  FILE_GUID      = 85262912-AD7F-4EE0-8BB1-EE177275A54E
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSsdtHpetLibConstructor
+  DESTRUCTOR     = AcpiSsdtHpetLibDestructor
+
+[Sources]
+  SsdtHpetGenerator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib
+  DebugLib
+  PcdLib
+
+[Pcd]
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetBaseAddress

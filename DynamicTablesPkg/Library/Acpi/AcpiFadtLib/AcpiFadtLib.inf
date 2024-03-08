@@ -1,0 +1,36 @@
+## @file
+#  FADT Table Generator
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.27
+  BASE_NAME      = AcpiFadtLib
+  FILE_GUID      = 2EBCA674-3849-4D02-A456-3E0495297FCC
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiFadtLibConstructor
+  DESTRUCTOR     = AcpiFadtLibDestructor
+
+[Sources]
+  FadtGenerator.c
+  FadtUpdate.h
+
+[Sources.IA32, Sources.X64]
+  X64/FadtUpdate.c
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/FadtUpdate.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
