@@ -170,6 +170,21 @@ typedef struct CmArchCommonPciAddressMapInfo {
   UINT64    AddressSize;
 } CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO;
 
+/** A structure that describes the
+    Generic Interrupts.
+*/
+typedef struct CmArchCommonGenericInterrupt {
+  /// Interrupt number
+  UINT32    Interrupt;
+
+  /// Flags
+  /// BIT0: 0: Interrupt is Level triggered
+  ///       1: Interrupt is Edge triggered
+  /// BIT1: 0: Interrupt is Active high
+  ///       1: Interrupt is Active low
+  UINT32    Flags;
+} CM_ARCH_COMMON_GENERIC_INTERRUPT;
+
 #pragma pack()
 
 #endif // ARCH_COMMON_NAMESPACE_OBJECTS_H_

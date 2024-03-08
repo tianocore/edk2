@@ -317,7 +317,7 @@ STATIC CONST CM_OBJ_PARSER  CmArmIdMappingParser[] = {
 
 /** A parser for EArmObjSmmuInterruptArray.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmGenericInterruptParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericInterruptParser[] = {
   { "Interrupt", 4, "0x%x", NULL },
   { "Flags",     4, "0x%x", NULL }
 };
@@ -452,12 +452,12 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonPciAddressMapInfoParser[] = {
 /** A parser for EArmObjPciInterruptMapInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmPciInterruptMapInfoParser[] = {
-  { "PciBus",        1,                                 "0x%x", NULL },
-  { "PciDevice",     1,                                 "0x%x", NULL },
-  { "PciInterrupt",  1,                                 "0x%x", NULL },
-  { "IntcInterrupt", sizeof (CM_ARM_GENERIC_INTERRUPT),
-    NULL, NULL, CmArmGenericInterruptParser,
-    ARRAY_SIZE (CmArmGenericInterruptParser) },
+  { "PciBus",        1,                                         "0x%x", NULL },
+  { "PciDevice",     1,                                         "0x%x", NULL },
+  { "PciInterrupt",  1,                                         "0x%x", NULL },
+  { "IntcInterrupt", sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
 };
 
 /** A parser for EArmObjRmr.
@@ -595,9 +595,9 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType1InfoParser[] = {
   { "GenericPccInfo", sizeof (PCC_SUBSPACE_GENERIC_INFO),
     NULL, NULL, CmArmPccSubspaceType0InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
-  { "PlatIrq",        sizeof (CM_ARM_GENERIC_INTERRUPT),
-    NULL, NULL, CmArmGenericInterruptParser,
-    ARRAY_SIZE (CmArmGenericInterruptParser) },
+  { "PlatIrq",        sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
+    NULL, NULL, CmArchCommonGenericInterruptParser,
+    ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
 };
 
 /** A parser for EArmObjPccSubspaceType2Info.
@@ -606,8 +606,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType2InfoParser[] = {
   { "GenericPccInfo", sizeof (PCC_SUBSPACE_GENERIC_INFO),
     NULL, NULL, CmArmPccSubspaceType0InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
-  { "PlatIrq",        sizeof (CM_ARM_GENERIC_INTERRUPT), NULL,NULL,
-    CmArmGenericInterruptParser, ARRAY_SIZE (CmArmGenericInterruptParser) },
+  { "PlatIrq",        sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),NULL,NULL,
+    CmArchCommonGenericInterruptParser, ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
   { "PlatIrqAckReg",  sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
@@ -619,8 +619,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType34InfoParser[] = {
   { "GenericPccInfo",       sizeof (PCC_SUBSPACE_GENERIC_INFO),
     NULL, NULL, CmArmPccSubspaceType0InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
-  { "PlatIrq",              sizeof (CM_ARM_GENERIC_INTERRUPT), NULL,NULL,
-    CmArmGenericInterruptParser, ARRAY_SIZE (CmArmGenericInterruptParser) },
+  { "PlatIrq",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),NULL,NULL,
+    CmArchCommonGenericInterruptParser, ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
   { "PlatIrqAckReg",        sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
@@ -641,9 +641,9 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType5InfoParser[] = {
   { "GenericPccInfo",      sizeof (PCC_SUBSPACE_GENERIC_INFO),
     NULL, NULL, CmArmPccSubspaceType0InfoParser,
     ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
-  { "Version",             2,                                 "0x%x",NULL },
-  { "PlatIrq",             sizeof (CM_ARM_GENERIC_INTERRUPT), NULL,  NULL,
-    CmArmGenericInterruptParser, ARRAY_SIZE (CmArmGenericInterruptParser) },
+  { "Version",             2,                                        "0x%x",NULL },
+  { "PlatIrq",             sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),NULL,  NULL,
+    CmArchCommonGenericInterruptParser, ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
   { "CmdCompleteCheckReg", sizeof (PCC_MAILBOX_REGISTER_INFO),
     NULL, NULL, CmArmMailboxRegisterInfoParser,
     ARRAY_SIZE (CmArmMailboxRegisterInfoParser) },
@@ -705,7 +705,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjPmcg,                        CmArmPmcgNodeParser),
   CM_PARSER_ADD_OBJECT (EArmObjGicItsIdentifierArray,       CmArmGicItsIdentifierParser),
   CM_PARSER_ADD_OBJECT (EArmObjIdMappingArray,              CmArmIdMappingParser),
-  CM_PARSER_ADD_OBJECT (EArmObjSmmuInterruptArray,          CmArmGenericInterruptParser),
+  CM_PARSER_ADD_OBJECT (EArmObjSmmuInterruptArray,          CmArchCommonGenericInterruptParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcHierarchyInfo,           CmArmProcHierarchyInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCacheInfo,                   CmArmCacheInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryAffinityInfo,          CmArmMemoryAffinityInfoParser),
