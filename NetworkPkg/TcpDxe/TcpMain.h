@@ -16,6 +16,7 @@
 #include <Library/IpIoLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
+#include <Library/RngLib.h>
 
 #include "Socket.h"
 #include "TcpProto.h"
