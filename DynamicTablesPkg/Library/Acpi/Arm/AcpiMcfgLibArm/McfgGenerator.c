@@ -27,7 +27,7 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjPciConfigSpaceInfo
+  - EArchCommonObjPciConfigSpaceInfo
 */
 
 #pragma pack(1)
@@ -51,9 +51,9 @@ typedef
 /** Retrieve the PCI Configuration Space Information.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPciConfigSpaceInfo,
-  CM_ARM_PCI_CONFIG_SPACE_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPciConfigSpaceInfo,
+  CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO
   );
 
 /** Add the PCI Enhanced Configuration Space Information to the MCFG Table.
@@ -68,10 +68,10 @@ GET_OBJECT_LIST (
 STATIC
 VOID
 AddPciConfigurationSpaceList (
-  IN       MCFG_TABLE                   *CONST  Mcfg,
-  IN CONST UINT32                               PciCfgSpaceOffset,
-  IN CONST CM_ARM_PCI_CONFIG_SPACE_INFO         *PciCfgSpaceInfoList,
-  IN       UINT32                               PciCfgSpaceCount
+  IN       MCFG_TABLE                   *CONST   Mcfg,
+  IN CONST UINT32                                PciCfgSpaceOffset,
+  IN CONST CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO  *PciCfgSpaceInfoList,
+  IN       UINT32                                PciCfgSpaceCount
   )
 {
   MCFG_CFG_SPACE_ADDR  *PciCfgSpace;
@@ -126,11 +126,11 @@ BuildMcfgTable (
   OUT       EFI_ACPI_DESCRIPTION_HEADER          **CONST  Table
   )
 {
-  EFI_STATUS                    Status;
-  UINT32                        TableSize;
-  UINT32                        ConfigurationSpaceCount;
-  CM_ARM_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfoList;
-  MCFG_TABLE                    *Mcfg;
+  EFI_STATUS                            Status;
+  UINT32                                TableSize;
+  UINT32                                ConfigurationSpaceCount;
+  CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfoList;
+  MCFG_TABLE                            *Mcfg;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -154,7 +154,7 @@ BuildMcfgTable (
   }
 
   *Table = NULL;
-  Status = GetEArmObjPciConfigSpaceInfo (
+  Status = GetEArchCommonObjPciConfigSpaceInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PciConfigSpaceInfoList,

@@ -83,24 +83,24 @@ typedef enum PciMappingTable {
 */
 typedef struct PciParserTable {
   /// PCI Configuration Space Info
-  CM_ARM_PCI_CONFIG_SPACE_INFO    PciConfigSpaceInfo;
+  CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO    PciConfigSpaceInfo;
 
   /// Store the address mapping and interrupt mapping as CmObjDesc
   /// before adding them to the Configuration Manager.
-  CM_OBJ_DESCRIPTOR               Mapping[PciMappingTableMax];
+  CM_OBJ_DESCRIPTOR                       Mapping[PciMappingTableMax];
 } PCI_PARSER_TABLE;
 
 #pragma pack()
 
-/** CM_ARM_PCI_CONFIG_SPACE_INFO parser function.
+/** CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO parser function.
 
   The following structure is populated:
-  typedef struct CmArmPciConfigSpaceInfo {
+  typedef struct CmArchCommonPciConfigSpaceInfo {
     UINT64  BaseAddress;                          // {Populated}
     UINT16  PciSegmentGroupNumber;                // {Populated}
     UINT8   StartBusNumber;                       // {Populated}
     UINT8   EndBusNumber;                         // {Populated}
-  } CM_ARM_PCI_CONFIG_SPACE_INFO;
+  } CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO;
 
   typedef struct CmArmPciAddressMapInfo {
     UINT8                     SpaceCode;          // {Populated}

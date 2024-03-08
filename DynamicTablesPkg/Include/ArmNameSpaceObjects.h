@@ -39,37 +39,36 @@ typedef enum ArmObjectID {
   EArmObjPlatformGTBlockInfo,                                  ///<  8 - Platform GT Block Info
   EArmObjGTBlockTimerFrameInfo,                                ///<  9 - Generic Timer Block Frame Info
   EArmObjPlatformGenericWatchdogInfo,                          ///< 10 - Platform Generic Watchdog
-  EArmObjPciConfigSpaceInfo,                                   ///< 11 - PCI Configuration Space Info
-  EArmObjItsGroup,                                             ///< 12 - ITS Group
-  EArmObjNamedComponent,                                       ///< 13 - Named Component
-  EArmObjRootComplex,                                          ///< 14 - Root Complex
-  EArmObjSmmuV1SmmuV2,                                         ///< 15 - SMMUv1 or SMMUv2
-  EArmObjSmmuV3,                                               ///< 16 - SMMUv3
-  EArmObjPmcg,                                                 ///< 17 - PMCG
-  EArmObjGicItsIdentifierArray,                                ///< 18 - GIC ITS Identifier Array
-  EArmObjIdMappingArray,                                       ///< 19 - ID Mapping Array
-  EArmObjSmmuInterruptArray,                                   ///< 20 - SMMU Interrupt Array
-  EArmObjProcHierarchyInfo,                                    ///< 21 - Processor Hierarchy Info
-  EArmObjCacheInfo,                                            ///< 22 - Cache Info
-  EArmObjMemoryAffinityInfo,                                   ///< 23 - Memory Affinity Info
-  EArmObjDeviceHandleAcpi,                                     ///< 24 - Device Handle Acpi
-  EArmObjDeviceHandlePci,                                      ///< 25 - Device Handle Pci
-  EArmObjGenericInitiatorAffinityInfo,                         ///< 26 - Generic Initiator Affinity
-  EArmObjCmn600Info,                                           ///< 27 - CMN-600 Info
-  EArmObjLpiInfo,                                              ///< 28 - Lpi Info
-  EArmObjPciAddressMapInfo,                                    ///< 29 - Pci Address Map Info
-  EArmObjPciInterruptMapInfo,                                  ///< 30 - Pci Interrupt Map Info
-  EArmObjRmr,                                                  ///< 31 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 32 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 33 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 34 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 35 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 36 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 37 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 38 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 39 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 40 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 41 - P-State Dependency (PSD) Info
+  EArmObjItsGroup,                                             ///< 11 - ITS Group
+  EArmObjNamedComponent,                                       ///< 12 - Named Component
+  EArmObjRootComplex,                                          ///< 13 - Root Complex
+  EArmObjSmmuV1SmmuV2,                                         ///< 14 - SMMUv1 or SMMUv2
+  EArmObjSmmuV3,                                               ///< 15 - SMMUv3
+  EArmObjPmcg,                                                 ///< 16 - PMCG
+  EArmObjGicItsIdentifierArray,                                ///< 17 - GIC ITS Identifier Array
+  EArmObjIdMappingArray,                                       ///< 18 - ID Mapping Array
+  EArmObjSmmuInterruptArray,                                   ///< 19 - SMMU Interrupt Array
+  EArmObjProcHierarchyInfo,                                    ///< 20 - Processor Hierarchy Info
+  EArmObjCacheInfo,                                            ///< 21 - Cache Info
+  EArmObjMemoryAffinityInfo,                                   ///< 22 - Memory Affinity Info
+  EArmObjDeviceHandleAcpi,                                     ///< 23 - Device Handle Acpi
+  EArmObjDeviceHandlePci,                                      ///< 24 - Device Handle Pci
+  EArmObjGenericInitiatorAffinityInfo,                         ///< 25 - Generic Initiator Affinity
+  EArmObjCmn600Info,                                           ///< 26 - CMN-600 Info
+  EArmObjLpiInfo,                                              ///< 27 - Lpi Info
+  EArmObjPciAddressMapInfo,                                    ///< 28 - Pci Address Map Info
+  EArmObjPciInterruptMapInfo,                                  ///< 29 - Pci Interrupt Map Info
+  EArmObjRmr,                                                  ///< 30 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 31 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 32 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 33 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 34 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 35 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 36 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 37 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 38 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 39 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 40 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -407,33 +406,6 @@ typedef struct CmArmGenericWatchdogInfo {
   */
   UINT32    Flags;
 } CM_ARM_GENERIC_WATCHDOG_INFO;
-
-/** A structure that describes the
-    PCI Configuration Space information for the Platform.
-
-    ID: EArmObjPciConfigSpaceInfo
-*/
-typedef struct CmArmPciConfigSpaceInfo {
-  /// The physical base address for the PCI segment
-  UINT64             BaseAddress;
-
-  /// The PCI segment group number
-  UINT16             PciSegmentGroupNumber;
-
-  /// The start bus number
-  UINT8              StartBusNumber;
-
-  /// The end bus number
-  UINT8              EndBusNumber;
-
-  /// Optional field: Reference Token for address mapping.
-  /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure.
-  CM_OBJECT_TOKEN    AddressMapToken;
-
-  /// Optional field: Reference Token for interrupt mapping.
-  /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure.
-  CM_OBJECT_TOKEN    InterruptMapToken;
-} CM_ARM_PCI_CONFIG_SPACE_INFO;
 
 /** A structure that describes the
     ITS Group node for the Platform.

@@ -28,6 +28,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjHypervisorVendorIdentity,       ///<  5 - Hypervisor Vendor Id
   EArchCommonObjFixedFeatureFlags,              ///<  6 - Fixed feature flags for FADT
   EArchCommonObjCmRef,                          ///<  7 - CM Object Reference
+  EArchCommonObjPciConfigSpaceInfo,             ///<  8 - PCI Configuration Space Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -113,6 +114,33 @@ typedef struct CmArchCommonObjRef {
   /// Token of the CM object being referenced
   CM_OBJECT_TOKEN    ReferenceToken;
 } CM_ARCH_COMMON_OBJ_REF;
+
+/** A structure that describes the
+    PCI Configuration Space information for the Platform.
+
+    ID: EArchCommonObjPciConfigSpaceInfo
+*/
+typedef struct CmArchCommonPciConfigSpaceInfo {
+  /// The physical base address for the PCI segment
+  UINT64             BaseAddress;
+
+  /// The PCI segment group number
+  UINT16             PciSegmentGroupNumber;
+
+  /// The start bus number
+  UINT8              StartBusNumber;
+
+  /// The end bus number
+  UINT8              EndBusNumber;
+
+  /// Optional field: Reference Token for address mapping.
+  /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure.
+  CM_OBJECT_TOKEN    AddressMapToken;
+
+  /// Optional field: Reference Token for interrupt mapping.
+  /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure.
+  CM_OBJECT_TOKEN    InterruptMapToken;
+} CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO;
 
 #pragma pack()
 
