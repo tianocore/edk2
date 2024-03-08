@@ -7876,6 +7876,45 @@ AsmVmgExit (
   VOID
   );
 
+///
+/// The structure used to supply and return data to and from the SVSM.
+///
+typedef struct {
+  VOID      *Caa;
+  UINT64    RaxIn;
+  UINT64    RcxIn;
+  UINT64    RdxIn;
+  UINT64    R8In;
+  UINT64    R9In;
+  UINT64    RaxOut;
+  UINT64    RcxOut;
+  UINT64    RdxOut;
+  UINT64    R8Out;
+  UINT64    R9Out;
+  UINT8     *CallPending;
+} SVSM_CALL_DATA;
+
+/**
+  Executes a VMGEXIT instruction (VMMCALL with a REP prefix) with arguments
+  and return code
+
+  Executes a VMGEXIT instruction placing the specified arguments in the
+  corresponding registers before invocation. Upon return an XCHG is done to
+  atomically clear and retrieve the SVSM call pending value. The returned RAX
+  register value becomes the function return code. This function is intended
+  for use with an SVSM. This function is only available on IA-32 and x64.
+
+  @param[in,out]  SvsmCallPending  Pointer to the location of the SVSM call data
+
+  @return                          Value of the RAX register on return
+
+**/
+UINT32
+EFIAPI
+AsmVmgExitSvsm (
+  IN OUT SVSM_CALL_DATA  *SvsmCallData
+  );
+
 /**
   Patch the immediate operand of an IA32 or X64 instruction such that the byte,
   word, dword or qword operand is encoded at the end of the instruction's
