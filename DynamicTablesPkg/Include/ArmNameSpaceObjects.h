@@ -56,18 +56,17 @@ typedef enum ArmObjectID {
   EArmObjGenericInitiatorAffinityInfo,                         ///< 25 - Generic Initiator Affinity
   EArmObjCmn600Info,                                           ///< 26 - CMN-600 Info
   EArmObjLpiInfo,                                              ///< 27 - Lpi Info
-  EArmObjPciInterruptMapInfo,                                  ///< 28 - Pci Interrupt Map Info
-  EArmObjRmr,                                                  ///< 29 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 30 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 31 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 32 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 33 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 34 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 35 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 36 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 37 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 38 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 39 - P-State Dependency (PSD) Info
+  EArmObjRmr,                                                  ///< 28 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 29 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 30 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 31 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 32 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 33 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 34 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 35 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 36 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 37 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 38 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -884,43 +883,6 @@ typedef struct CmArmLpiInfo {
   */
   CHAR8                                     StateName[16];
 } CM_ARM_LPI_INFO;
-
-/** A structure that describes a PCI Interrupt Map.
-
-  The legacy PCI interrupts used by PCI devices are described by this object.
-
-  Cf Devicetree Specification - Release v0.3
-  s2.4.3 "Interrupt Nexus Properties"
-
-  ID: EArmObjPciInterruptMapInfo
-*/
-typedef struct CmArmPciInterruptMapInfo {
-  /// Pci Bus.
-  /// Value on 8 bits (max 255).
-  UINT8    PciBus;
-
-  /// Pci Device.
-  /// Value on 5 bits (max 31).
-  UINT8    PciDevice;
-
-  /** PCI interrupt
-
-  ACPI bindings are used:
-  Cf. ACPI 6.4, s6.2.13 _PRT (PCI Routing Table):
-      "0-INTA, 1-INTB, 2-INTC, 3-INTD"
-
-  Device-tree bindings are shifted by 1:
-      "INTA=1, INTB=2, INTC=3, INTD=4"
-  */
-  UINT8                               PciInterrupt;
-
-  /** Interrupt controller interrupt.
-
-  Cf Devicetree Specification - Release v0.3
-  s2.4.3 "Interrupt Nexus Properties": "parent interrupt specifier"
-  */
-  CM_ARCH_COMMON_GENERIC_INTERRUPT    IntcInterrupt;
-} CM_ARM_PCI_INTERRUPT_MAP_INFO;
 
 /** A structure that describes the
     RMR node for the Platform.

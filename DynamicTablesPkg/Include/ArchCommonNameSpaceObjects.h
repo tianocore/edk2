@@ -30,6 +30,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjCmRef,                          ///<  7 - CM Object Reference
   EArchCommonObjPciConfigSpaceInfo,             ///<  8 - PCI Configuration Space Info
   EArchCommonObjPciAddressMapInfo,              ///<  9 - Pci Address Map Info
+  EArchCommonObjPciInterruptMapInfo,            ///< 10 - Pci Interrupt Map Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -184,6 +185,43 @@ typedef struct CmArchCommonGenericInterrupt {
   ///       1: Interrupt is Active low
   UINT32    Flags;
 } CM_ARCH_COMMON_GENERIC_INTERRUPT;
+
+/** A structure that describes a PCI Interrupt Map.
+
+  The legacy PCI interrupts used by PCI devices are described by this object.
+
+  Cf Devicetree Specification - Release v0.3
+  s2.4.3 "Interrupt Nexus Properties"
+
+  ID: EArchCommonObjPciInterruptMapInfo
+*/
+typedef struct CmArchCommonPciInterruptMapInfo {
+  /// Pci Bus.
+  /// Value on 8 bits (max 255).
+  UINT8    PciBus;
+
+  /// Pci Device.
+  /// Value on 5 bits (max 31).
+  UINT8    PciDevice;
+
+  /** PCI interrupt
+
+  ACPI bindings are used:
+  Cf. ACPI 6.4, s6.2.13 _PRT (PCI Routing Table):
+      "0-INTA, 1-INTB, 2-INTC, 3-INTD"
+
+  Device-tree bindings are shifted by 1:
+      "INTA=1, INTB=2, INTC=3, INTD=4"
+  */
+  UINT8                               PciInterrupt;
+
+  /** Interrupt controller interrupt.
+
+  Cf Devicetree Specification - Release v0.3
+  s2.4.3 "Interrupt Nexus Properties": "parent interrupt specifier"
+  */
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    IntcInterrupt;
+} CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO;
 
 #pragma pack()
 
