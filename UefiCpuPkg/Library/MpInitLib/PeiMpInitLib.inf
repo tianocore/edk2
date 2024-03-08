@@ -59,6 +59,7 @@
   SynchronizationLib
 
 [LibraryClasses.IA32, LibraryClasses.X64]
+  AmdSvsmLib
   CcExitLib
   LocalApicLib
   MicrocodeLib
