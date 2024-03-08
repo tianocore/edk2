@@ -154,37 +154,36 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///<  8 - Platform GT Block Info
   NULL,                             ///<  9 - Generic Timer Block Frame Info
   NULL,                             ///< 10 - Platform Generic Watchdog
-  NULL,                             ///< 11 - PCI Configuration Space Info
-  TokenFixerItsGroup,               ///< 12 - ITS Group
-  TokenFixerNamedComponentNode,     ///< 13 - Named Component
-  TokenFixerRootComplexNode,        ///< 14 - Root Complex
-  TokenFixerNotImplemented,         ///< 15 - SMMUv1 or SMMUv2
-  TokenFixerSmmuV3Node,             ///< 16 - SMMUv3
-  TokenFixerNotImplemented,         ///< 17 - PMCG
-  NULL,                             ///< 18 - GIC ITS Identifier Array
-  NULL,                             ///< 19 - ID Mapping Array
-  NULL,                             ///< 20 - SMMU Interrupt Array
-  TokenFixerNotImplemented,         ///< 21 - Processor Hierarchy Info
-  TokenFixerNotImplemented,         ///< 22 - Cache Info
-  NULL,                             ///< 23 - Memory Affinity Info
-  NULL,                             ///< 24 - Device Handle Acpi
-  NULL,                             ///< 25 - Device Handle Pci
-  NULL,                             ///< 26 - Generic Initiator Affinity
-  NULL,                             ///< 27 - CMN-600 Info
-  NULL,                             ///< 28 - Lpi Info
-  NULL,                             ///< 29 - Pci Address Map Info
-  NULL,                             ///< 30 - Pci Interrupt Map Info
-  NULL,                             ///< 31 - Reserved Memory Range Node
-  NULL,                             ///< 32 - Memory Range Descriptor
-  NULL,                             ///< 33 - Continuous Performance Control Info
-  NULL,                             ///< 34 - Pcc Subspace Type 0 Info
+  TokenFixerItsGroup,               ///< 11 - ITS Group
+  TokenFixerNamedComponentNode,     ///< 12 - Named Component
+  TokenFixerRootComplexNode,        ///< 13 - Root Complex
+  TokenFixerNotImplemented,         ///< 14 - SMMUv1 or SMMUv2
+  TokenFixerSmmuV3Node,             ///< 15 - SMMUv3
+  TokenFixerNotImplemented,         ///< 16 - PMCG
+  NULL,                             ///< 17 - GIC ITS Identifier Array
+  NULL,                             ///< 18 - ID Mapping Array
+  NULL,                             ///< 19 - SMMU Interrupt Array
+  TokenFixerNotImplemented,         ///< 20 - Processor Hierarchy Info
+  TokenFixerNotImplemented,         ///< 21 - Cache Info
+  NULL,                             ///< 22 - Memory Affinity Info
+  NULL,                             ///< 23 - Device Handle Acpi
+  NULL,                             ///< 24 - Device Handle Pci
+  NULL,                             ///< 25 - Generic Initiator Affinity
+  NULL,                             ///< 26 - CMN-600 Info
+  NULL,                             ///< 27 - Lpi Info
+  NULL,                             ///< 28 - Pci Address Map Info
+  NULL,                             ///< 29 - Pci Interrupt Map Info
+  NULL,                             ///< 30 - Reserved Memory Range Node
+  NULL,                             ///< 31 - Memory Range Descriptor
+  NULL,                             ///< 32 - Continuous Performance Control Info
+  NULL,                             ///< 33 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 34 - Pcc Subspace Type 2 Info
   NULL,                             ///< 35 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 36 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 37 - Pcc Subspace Type 3 Info
-  NULL,                             ///< 38 - Pcc Subspace Type 4 Info
-  NULL,                             ///< 39 - Pcc Subspace Type 5 Info
-  NULL,                             ///< 40 - Embedded Trace Extension/Module Info
-  NULL                              ///< 41 - P-State Dependency (PSD) Info
+  NULL,                             ///< 36 - Pcc Subspace Type 3 Info
+  NULL,                             ///< 37 - Pcc Subspace Type 4 Info
+  NULL,                             ///< 38 - Pcc Subspace Type 5 Info
+  NULL,                             ///< 39 - Embedded Trace Extension/Module Info
+  NULL                              ///< 40 - P-State Dependency (PSD) Info
 };
 
 /** CmObj token fixer.
