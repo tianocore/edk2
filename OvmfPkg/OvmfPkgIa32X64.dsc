@@ -4,7 +4,7 @@
 #  Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) Microsoft Corporation.
-#  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -252,6 +252,7 @@
 !include OvmfPkg/Include/Dsc/ShellLibs.dsc.inc
 
 [LibraryClasses.common]
+  AmdSvsmLib|UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
   TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
