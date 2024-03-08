@@ -187,6 +187,7 @@
   Ia32/XGetBv.nasm
   Ia32/XSetBv.nasm
   Ia32/VmgExit.nasm
+  Ia32/VmgExitSvsm.nasm
 
   Ia32/DivS64x64Remainder.c
   Ia32/InternalSwitchStack.c | MSFT
@@ -328,6 +329,7 @@
   X64/XGetBv.nasm
   X64/XSetBv.nasm
   X64/VmgExit.nasm
+  X64/VmgExitSvsm.nasm
   ChkStkGcc.c  | GCC
 
 [Sources.EBC]
