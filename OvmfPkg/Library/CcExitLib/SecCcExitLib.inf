@@ -1,7 +1,7 @@
 ## @file
 #  VMGEXIT Support Library.
 #
-#  Copyright (C) 2020, Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2020 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -41,6 +41,7 @@
   LocalApicLib
   MemEncryptSevLib
   PcdLib
+  AmdSvsmLib
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
