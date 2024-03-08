@@ -25,21 +25,21 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
+  CpuExceptionHandlerLib
   CpuLib
   DebugLib
   DxeServicesTableLib
+  HobLib
+  LocalApicLib
   MemoryAllocationLib
   MtrrLib
+  MpInitLib
+  PeCoffGetEntryPointLib
+  ReportStatusCodeLib
+  TimerLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  LocalApicLib
   UefiLib
-  CpuExceptionHandlerLib
-  HobLib
-  ReportStatusCodeLib
-  MpInitLib
-  TimerLib
-  PeCoffGetEntryPointLib
 
 [Sources]
   CpuDxe.c
@@ -77,9 +77,9 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask                    ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList              ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize                    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask                    ## CONSUMES
 
 [Depex]
   TRUE
