@@ -1658,9 +1658,14 @@ CoreInternalFreePages (
     goto Done;
   }
 
+  if (Entry == NULL) {
+    ASSERT (Entry != NULL);
+    Status = EFI_NOT_FOUND;
+    goto Done;
+  }
+
   Alignment = DEFAULT_PAGE_ALLOCATION_GRANULARITY;
 
-  ASSERT (Entry != NULL);
   if ((Entry->Type == EfiACPIReclaimMemory) ||
       (Entry->Type == EfiACPIMemoryNVS) ||
       (Entry->Type == EfiRuntimeServicesCode) ||
