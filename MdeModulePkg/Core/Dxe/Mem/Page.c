@@ -1411,6 +1411,17 @@ CoreInternalAllocatePages (
     Alignment = RUNTIME_PAGE_ALLOCATION_GRANULARITY;
   }
 
+  //
+  // The heap guard system does not support non-EFI_PAGE_SIZE alignments.
+  // Architectures that require larger RUNTIME_PAGE_ALLOCATION_GRANULARITY
+  // will have the runtime memory regions unguarded. OSes do not
+  // map guard pages anyway, so this is a minimal loss. Not guarding prevents
+  // alignment mismatches
+  //
+  if (Alignment != EFI_PAGE_SIZE) {
+    NeedGuard = FALSE;
+  }
+
   if (Type == AllocateAddress) {
     if ((*Memory & (Alignment - 1)) != 0) {
       return EFI_NOT_FOUND;
