@@ -370,7 +370,7 @@ CoreAllocatePoolI (
 
   ASSERT_LOCKED (&mPoolMemoryLock);
 
-  if ((PoolType == EfiACPIReclaimMemory) ||
+  if ((PoolType == EfiReservedMemoryType) ||
       (PoolType == EfiACPIMemoryNVS) ||
       (PoolType == EfiRuntimeServicesCode) ||
       (PoolType == EfiRuntimeServicesData))
@@ -753,7 +753,7 @@ CoreFreePoolI (
   Pool->Used -= Size;
   DEBUG ((DEBUG_POOL, "FreePool: %p (len %lx) %,ld\n", Head->Data, (UINT64)(Head->Size - POOL_OVERHEAD), (UINT64)Pool->Used));
 
-  if ((Head->Type == EfiACPIReclaimMemory) ||
+  if ((Head->Type == EfiReservedMemoryType) ||
       (Head->Type == EfiACPIMemoryNVS) ||
       (Head->Type == EfiRuntimeServicesCode) ||
       (Head->Type == EfiRuntimeServicesData))
