@@ -209,12 +209,15 @@ FixupCmObjectSelfToken (
   CM_OBJECT_TOKEN_FIXER  TokenFixerFunc;
   CM_OBJECT_ID           ArmNamespaceObjId;
 
-  // Only support Arm objects for now.
-  if ((CmObjDesc == NULL)   ||
-      (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceArm))
-  {
+  if (CmObjDesc == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
+  }
+
+  // Only support Arm objects for now.
+  if (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceArm) {
+    ASSERT (0);
+    return EFI_UNSUPPORTED;
   }
 
   ArmNamespaceObjId = GET_CM_OBJECT_ID (CmObjDesc->ObjectId);
