@@ -22,4 +22,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #include <mbedtls/mbedtls_config.h>
 
+/**
+  The MbedTLS function f_rng, which MbedtlsRand implements.
+
+  @param[in]   RngState Not used, just for compatibility with mbedlts.
+  @param[out]  Output  Pointer to buffer to receive random value.
+  @param[in]   Len    Size of random bytes to generate.
+
+  @retval 0      Pseudorandom byte stream generated successfully.
+  @retval Non-0  Pseudorandom number generator fails to generate due to lack of entropy.
+**/
+INT32
+MbedtlsRand (
+  VOID   *RngState,
+  UINT8  *Output,
+  UINTN  Len
+  );
 #endif
