@@ -39,6 +39,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjProcHierarchyInfo,              ///< 16 - Processor Hierarchy Info
   EArchCommonObjCacheInfo,                      ///< 17 - Cache Info
   EArchCommonObjCpcInfo,                        ///< 18 - Continuous Performance Control Info
+  EArchCommonObjPccSubspaceType0Info,           ///< 19 - Pcc Subspace Type 0 Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -522,6 +523,13 @@ typedef struct PccSubspaceGenericInfo {
   /// Mailbox Timings.
   PCC_SUBSPACE_CHANNEL_TIMING_INFO    ChannelTiming;
 } PCC_SUBSPACE_GENERIC_INFO;
+
+/** A structure that describes a
+    PCC Subspace of type 0 (Generic).
+
+    ID: EArchCommonObjPccSubspaceType0Info
+*/
+typedef PCC_SUBSPACE_GENERIC_INFO CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO;
 
 #pragma pack()
 

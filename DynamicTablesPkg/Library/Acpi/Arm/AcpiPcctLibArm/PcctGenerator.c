@@ -29,7 +29,7 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjPccSubspaceType0Info
+  - EArchCommonObjPccSubspaceType0Info
   - EArmObjPccSubspaceType1Info
   - EArmObjPccSubspaceType2Info
   - EArmObjPccSubspaceType3Info
@@ -41,9 +41,9 @@ Requirements:
     Subspace of Type 0 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPccSubspaceType0Info,
-  CM_ARM_PCC_SUBSPACE_TYPE0_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPccSubspaceType0Info,
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO
   );
 
 /** This macro expands to a function that retrieves the PCC
@@ -164,11 +164,12 @@ MappingTableFree (
   }
 }
 
-/** Add a new entry for CmArmPccSubspace at Index.
+/** Add a new entry for PccSubspace at Index.
 
   @param [in] MappingTable      The mapping table structure.
-  @param [in] CmArmPccSubspace  Pointer to a CM_ARM_PCC_SUBSPACE_TYPE[X]_INFO.
-  @param [in] Index             Index at which CmArmPccSubspace must be added.
+  @param [in] PccSubspace       A pointer to
+                                CM_[ARM|ARCH_COMMON]_PCC_SUBSPACE_TYPE[X]_INFO.
+  @param [in] Index             Index at which PccSubspace must be added.
                                 This is the Subspace Id.
 
   @retval EFI_SUCCESS            Success.
@@ -180,13 +181,13 @@ EFI_STATUS
 EFIAPI
 MappingTableAdd (
   IN  MAPPING_TABLE  *MappingTable,
-  IN  VOID           *CmArmPccSubspace,
+  IN  VOID           *PccSubspace,
   IN  UINT32         Index
   )
 {
   if ((MappingTable == NULL)        ||
       (MappingTable->Table == NULL) ||
-      (CmArmPccSubspace == NULL))
+      (PccSubspace == NULL))
   {
     ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
     return EFI_INVALID_PARAMETER;
@@ -200,14 +201,15 @@ MappingTableAdd (
   }
 
   // Just map the Pcc Subspace in the Table.
-  MappingTable->Table[Index] = CmArmPccSubspace;
+  MappingTable->Table[Index] = PccSubspace;
   return EFI_SUCCESS;
 }
 
 /** Parse the CmPccArray objects and add them to the MappingTable.
 
   @param [in] MappingTable     The mapping table structure.
-  @param [in] CmPccArray       Pointer to an array of CM_ARM_PCC_SUBSPACE_TYPE[X]_INFO.
+  @param [in] CmPccArray       Pointer to an array of
+                               CM_[ARM|ARCH_COMMON]_PCC_SUBSPACE_TYPE[X]_INFO.
   @param [in] CmPccCount       Count of objects in CmPccArray.
 
   @retval EFI_SUCCESS            Success.
@@ -242,7 +244,7 @@ MapPccSubspaceId (
 
   switch (GenericPcc->Type) {
     case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_GENERIC:
-      CmObjSize = sizeof (CM_ARM_PCC_SUBSPACE_TYPE0_INFO);
+      CmObjSize = sizeof (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO);
       break;
 
     case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_1_HW_REDUCED_COMMUNICATIONS:
@@ -304,8 +306,8 @@ STATIC
 EFI_STATUS
 EFIAPI
 AddSubspaceStructType0 (
-  IN  CM_ARM_PCC_SUBSPACE_TYPE0_INFO      *PccCmObj,
-  IN  EFI_ACPI_6_4_PCCT_SUBSPACE_GENERIC  *PccAcpi
+  IN  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO  *PccCmObj,
+  IN  EFI_ACPI_6_4_PCCT_SUBSPACE_GENERIC      *PccAcpi
   )
 {
   PCC_MAILBOX_REGISTER_INFO         *Doorbell;
@@ -360,11 +362,11 @@ AddSubspaceStructType1 (
   IN  EFI_ACPI_6_4_PCCT_SUBSPACE_1_HW_REDUCED_COMMUNICATIONS  *PccAcpi
   )
 {
-  CM_ARM_PCC_SUBSPACE_TYPE0_INFO    *GenericPccCmObj;
-  PCC_MAILBOX_REGISTER_INFO         *Doorbell;
-  PCC_SUBSPACE_CHANNEL_TIMING_INFO  *ChannelTiming;
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO  *GenericPccCmObj;
+  PCC_MAILBOX_REGISTER_INFO               *Doorbell;
+  PCC_SUBSPACE_CHANNEL_TIMING_INFO        *ChannelTiming;
 
-  GenericPccCmObj = (CM_ARM_PCC_SUBSPACE_TYPE0_INFO *)PccCmObj;
+  GenericPccCmObj = (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO *)PccCmObj;
 
   if ((PccCmObj == NULL) ||
       (GenericPccCmObj->Type != EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_1_HW_REDUCED_COMMUNICATIONS)  ||
@@ -420,12 +422,12 @@ AddSubspaceStructType2 (
   IN  EFI_ACPI_6_4_PCCT_SUBSPACE_2_HW_REDUCED_COMMUNICATIONS  *PccAcpi
   )
 {
-  CM_ARM_PCC_SUBSPACE_TYPE0_INFO    *GenericPccCmObj;
-  PCC_MAILBOX_REGISTER_INFO         *Doorbell;
-  PCC_MAILBOX_REGISTER_INFO         *PlatIrqAck;
-  PCC_SUBSPACE_CHANNEL_TIMING_INFO  *ChannelTiming;
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO  *GenericPccCmObj;
+  PCC_MAILBOX_REGISTER_INFO               *Doorbell;
+  PCC_MAILBOX_REGISTER_INFO               *PlatIrqAck;
+  PCC_SUBSPACE_CHANNEL_TIMING_INFO        *ChannelTiming;
 
-  GenericPccCmObj = (CM_ARM_PCC_SUBSPACE_TYPE0_INFO *)PccCmObj;
+  GenericPccCmObj = (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO *)PccCmObj;
 
   if ((PccCmObj == NULL) ||
       (GenericPccCmObj->Type != EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS)  ||
@@ -491,15 +493,15 @@ AddSubspaceStructType34 (
   IN  EFI_ACPI_6_4_PCCT_SUBSPACE_3_EXTENDED_PCC  *PccAcpi
   )
 {
-  CM_ARM_PCC_SUBSPACE_TYPE0_INFO    *GenericPccCmObj;
-  PCC_MAILBOX_REGISTER_INFO         *Doorbell;
-  PCC_MAILBOX_REGISTER_INFO         *PlatIrqAck;
-  PCC_MAILBOX_REGISTER_INFO         *CmdCompleteCheck;
-  PCC_MAILBOX_REGISTER_INFO         *CmdCompleteUpdate;
-  PCC_MAILBOX_REGISTER_INFO         *ErrorStatus;
-  PCC_SUBSPACE_CHANNEL_TIMING_INFO  *ChannelTiming;
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO  *GenericPccCmObj;
+  PCC_MAILBOX_REGISTER_INFO               *Doorbell;
+  PCC_MAILBOX_REGISTER_INFO               *PlatIrqAck;
+  PCC_MAILBOX_REGISTER_INFO               *CmdCompleteCheck;
+  PCC_MAILBOX_REGISTER_INFO               *CmdCompleteUpdate;
+  PCC_MAILBOX_REGISTER_INFO               *ErrorStatus;
+  PCC_SUBSPACE_CHANNEL_TIMING_INFO        *ChannelTiming;
 
-  GenericPccCmObj = (CM_ARM_PCC_SUBSPACE_TYPE0_INFO *)PccCmObj;
+  GenericPccCmObj = (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO *)PccCmObj;
 
   if ((PccCmObj == NULL) ||
       ((GenericPccCmObj->Type != EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_3_EXTENDED_PCC) &&
@@ -603,13 +605,13 @@ AddSubspaceStructType5 (
   IN  EFI_ACPI_6_4_PCCT_SUBSPACE_5_HW_REGISTERS_COMMUNICATIONS  *PccAcpi
   )
 {
-  CM_ARM_PCC_SUBSPACE_TYPE0_INFO    *GenericPccCmObj;
-  PCC_MAILBOX_REGISTER_INFO         *Doorbell;
-  PCC_MAILBOX_REGISTER_INFO         *CmdCompleteCheck;
-  PCC_MAILBOX_REGISTER_INFO         *ErrorStatus;
-  PCC_SUBSPACE_CHANNEL_TIMING_INFO  *ChannelTiming;
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO  *GenericPccCmObj;
+  PCC_MAILBOX_REGISTER_INFO               *Doorbell;
+  PCC_MAILBOX_REGISTER_INFO               *CmdCompleteCheck;
+  PCC_MAILBOX_REGISTER_INFO               *ErrorStatus;
+  PCC_SUBSPACE_CHANNEL_TIMING_INFO        *ChannelTiming;
 
-  GenericPccCmObj = (CM_ARM_PCC_SUBSPACE_TYPE0_INFO *)PccCmObj;
+  GenericPccCmObj = (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO *)PccCmObj;
 
   if ((PccCmObj == NULL) ||
       (GenericPccCmObj->Type != EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_5_HW_REGISTERS_COMMUNICATIONS)  ||
@@ -705,7 +707,7 @@ PopulatePcctTable (
     switch (((PCC_SUBSPACE_GENERIC_INFO *)CurrentPccSubspace)->Type) {
       case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_GENERIC:
         Status = AddSubspaceStructType0 (
-                   (CM_ARM_PCC_SUBSPACE_TYPE0_INFO *)CurrentPccSubspace,
+                   (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO *)CurrentPccSubspace,
                    (EFI_ACPI_6_4_PCCT_SUBSPACE_GENERIC *)PccBuffer
                    );
 
@@ -822,18 +824,18 @@ BuildPcctTable (
   MAPPING_TABLE  *MappingTable;
   UINT32         MappingTableCount;
 
-  CM_ARM_PCC_SUBSPACE_TYPE0_INFO  *PccType0;
-  UINT32                          PccType0Count;
-  CM_ARM_PCC_SUBSPACE_TYPE1_INFO  *PccType1;
-  UINT32                          PccType1Count;
-  CM_ARM_PCC_SUBSPACE_TYPE2_INFO  *PccType2;
-  UINT32                          PccType2Count;
-  CM_ARM_PCC_SUBSPACE_TYPE3_INFO  *PccType3;
-  UINT32                          PccType3Count;
-  CM_ARM_PCC_SUBSPACE_TYPE4_INFO  *PccType4;
-  UINT32                          PccType4Count;
-  CM_ARM_PCC_SUBSPACE_TYPE5_INFO  *PccType5;
-  UINT32                          PccType5Count;
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE0_INFO  *PccType0;
+  UINT32                                  PccType0Count;
+  CM_ARM_PCC_SUBSPACE_TYPE1_INFO          *PccType1;
+  UINT32                                  PccType1Count;
+  CM_ARM_PCC_SUBSPACE_TYPE2_INFO          *PccType2;
+  UINT32                                  PccType2Count;
+  CM_ARM_PCC_SUBSPACE_TYPE3_INFO          *PccType3;
+  UINT32                                  PccType3Count;
+  CM_ARM_PCC_SUBSPACE_TYPE4_INFO          *PccType4;
+  UINT32                                  PccType4Count;
+  CM_ARM_PCC_SUBSPACE_TYPE5_INFO          *PccType5;
+  UINT32                                  PccType5Count;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -863,7 +865,7 @@ BuildPcctTable (
 
   // First get all the Pcc Subpace CmObj of type X.
 
-  Status = GetEArmObjPccSubspaceType0Info (
+  Status = GetEArchCommonObjPccSubspaceType0Info (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PccType0,
