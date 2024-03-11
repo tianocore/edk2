@@ -372,9 +372,9 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonDeviceHandleAcpiParser[] = {
   { "Uid", 4, "0x%x",   NULL }
 };
 
-/** A parser for EArmObjDeviceHandlePci.
+/** A parser for EArchCommonObjDeviceHandlePci.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmDeviceHandlePciParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonDeviceHandlePciParser[] = {
   { "SegmentNumber",  2, "0x%x", NULL },
   { "BusNumber",      1, "0x%x", NULL },
   { "DeviceNumber",   1, "0x%x", NULL },
@@ -683,6 +683,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPciInterruptMapInfo,       CmArchCommonPciInterruptMapInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjMemoryAffinityInfo,        CmArchCommonMemoryAffinityInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjDeviceHandleAcpi,          CmArchCommonDeviceHandleAcpiParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjDeviceHandlePci,           CmArchCommonDeviceHandlePciParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -711,7 +712,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjSmmuInterruptArray,          CmArchCommonGenericInterruptParser),
   CM_PARSER_ADD_OBJECT (EArmObjProcHierarchyInfo,           CmArmProcHierarchyInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCacheInfo,                   CmArmCacheInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjDeviceHandlePci,             CmArmDeviceHandlePciParser),
   CM_PARSER_ADD_OBJECT (EArmObjGenericInitiatorAffinityInfo,CmArmGenericInitiatorAffinityInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCmn600Info,                  CmArmCmn600InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjLpiInfo,                     CmArmLpiInfoParser),
