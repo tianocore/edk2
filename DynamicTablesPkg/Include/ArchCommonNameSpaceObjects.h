@@ -42,6 +42,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPccSubspaceType0Info,           ///< 19 - Pcc Subspace Type 0 Info
   EArchCommonObjPccSubspaceType1Info,           ///< 20 - Pcc Subspace Type 1 Info
   EArchCommonObjPccSubspaceType2Info,           ///< 21 - Pcc Subspace Type 2 Info
+  EArchCommonObjPccSubspaceType3Info,           ///< 22 - Pcc Subspace Type 3 Info
+  EArchCommonObjPccSubspaceType4Info,           ///< 23 - Pcc Subspace Type 4 Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -569,6 +571,44 @@ typedef struct CmArchCommonPccSubspaceType2Info {
   /// Platform Interrupt Register.
   PCC_MAILBOX_REGISTER_INFO           PlatIrqAckReg;
 } CM_ARCH_COMMON_PCC_SUBSPACE_TYPE2_INFO;
+
+/** A structure that describes a
+    PCC Subspace of type 3 (Extended)
+
+    ID: EArchCommonObjPccSubspaceType3Info
+*/
+typedef struct CmArchCommonPccSubspaceType3Info {
+  /** Generic Pcc information.
+
+    The Subspace of Type0 contains information that can be re-used
+    in other Subspace types.
+  */
+  PCC_SUBSPACE_GENERIC_INFO           GenericPccInfo;
+
+  /// Platform Interrupt.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
+
+  /// Platform Interrupt Register.
+  PCC_MAILBOX_REGISTER_INFO           PlatIrqAckReg;
+
+  /// Command Complete Check Register.
+  /// The WriteMask field is not used.
+  PCC_MAILBOX_REGISTER_INFO           CmdCompleteCheckReg;
+
+  /// Command Complete Update Register.
+  PCC_MAILBOX_REGISTER_INFO           CmdCompleteUpdateReg;
+
+  /// Error Status Register.
+  /// The WriteMask field is not used.
+  PCC_MAILBOX_REGISTER_INFO           ErrorStatusReg;
+} CM_ARCH_COMMON_PCC_SUBSPACE_TYPE3_INFO;
+
+/** A structure that describes a
+    PCC Subspace of type 4 (Extended)
+
+    ID: EArchCommonObjPccSubspaceType4Info
+*/
+typedef CM_ARCH_COMMON_PCC_SUBSPACE_TYPE3_INFO CM_ARCH_COMMON_PCC_SUBSPACE_TYPE4_INFO;
 
 #pragma pack()
 

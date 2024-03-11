@@ -463,11 +463,9 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  20   | CMN 600 Info                              | |
 |  21   | Reserved Memory Range Node                | |
 |  22   | Memory Range Descriptor                   | |
-|  23   | Pcc Subspace Type 3 Info                  | Move to Arch Common NS |
-|  24   | Pcc Subspace Type 4 Info                  | Move to Arch Common NS |
-|  25   | Pcc Subspace Type 5 Info                  | Move to Arch Common NS |
-|  26   | Embedded Trace Extension/Module Info      | |
-|  27   | P-State Dependency (PSD) Info             | Move to Arch Common NS |
+|  23   | Pcc Subspace Type 5 Info                  | Move to Arch Common NS |
+|  24   | Embedded Trace Extension/Module Info      | |
+|  25   | P-State Dependency (PSD) Info             | Move to Arch Common NS |
 |  `*`  | All other values are reserved.            | |
 
 #### Object ID's in the Arch Common Namespace:
@@ -496,5 +494,7 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  19   | Pcc Subspace Type 0 Info                  | |
 |  20   | Pcc Subspace Type 1 Info                  | |
 |  21   | Pcc Subspace Type 2 Info                  | |
+|  22   | Pcc Subspace Type 3 Info                  | |
+|  23   | Pcc Subspace Type 4 Info                  | |
 |  `*`  | All other values are reserved.            | |
 
