@@ -42,7 +42,7 @@ Requirements:
   - EArchCommonObjCmRef (OPTIONAL)
   - EArchCommonObjLpiInfo (OPTIONAL)
   - GetEArmObjEtInfo (OPTIONAL)
-  - EArmObjPsdInfo (OPTIONAL)
+  - EArchCommonObjPsdInfo (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the GIC
@@ -109,9 +109,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPsdInfo,
-  CM_ARM_PSD_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPsdInfo,
+  CM_ARCH_COMMON_PSD_INFO
   );
 
 /** Initialize the TokenTable.
@@ -313,10 +313,10 @@ CreateAmlPsdNode (
   IN  AML_OBJECT_NODE_HANDLE                              *Node
   )
 {
-  EFI_STATUS       Status;
-  CM_ARM_PSD_INFO  *PsdInfo;
+  EFI_STATUS               Status;
+  CM_ARCH_COMMON_PSD_INFO  *PsdInfo;
 
-  Status = GetEArmObjPsdInfo (
+  Status = GetEArchCommonObjPsdInfo (
              CfgMgrProtocol,
              GicCInfo->PsdToken,
              &PsdInfo,

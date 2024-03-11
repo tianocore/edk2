@@ -45,6 +45,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPccSubspaceType3Info,           ///< 22 - Pcc Subspace Type 3 Info
   EArchCommonObjPccSubspaceType4Info,           ///< 23 - Pcc Subspace Type 4 Info
   EArchCommonObjPccSubspaceType5Info,           ///< 24 - Pcc Subspace Type 5 Info
+  EArchCommonObjPsdInfo,                        ///< 25 - P-State Dependency (PSD) Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -641,6 +642,15 @@ typedef struct CmArchCommonPccSubspaceType5Info {
   /// The WriteMask field is not used.
   PCC_MAILBOX_REGISTER_INFO           ErrorStatusReg;
 } CM_ARCH_COMMON_PCC_SUBSPACE_TYPE5_INFO;
+
+/** A structure that describes a
+    P-State Dependency (PSD) Info.
+
+    Cf. ACPI 6.5, s8.4.5.5 _PSD (P-State Dependency).
+
+    ID: EArchCommonObjPsdInfo
+*/
+typedef AML_PSD_INFO CM_ARCH_COMMON_PSD_INFO;
 
 #pragma pack()
 
