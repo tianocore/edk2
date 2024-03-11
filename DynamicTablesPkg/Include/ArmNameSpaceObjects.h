@@ -51,18 +51,17 @@ typedef enum ArmObjectID {
   EArmObjProcHierarchyInfo,                                    ///< 20 - Processor Hierarchy Info
   EArmObjCacheInfo,                                            ///< 21 - Cache Info
   EArmObjCmn600Info,                                           ///< 22 - CMN-600 Info
-  EArmObjLpiInfo,                                              ///< 23 - Lpi Info
-  EArmObjRmr,                                                  ///< 24 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 25 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 26 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 27 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 28 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 29 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 30 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 31 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 32 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 33 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 34 - P-State Dependency (PSD) Info
+  EArmObjRmr,                                                  ///< 23 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 24 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 25 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 26 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 27 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 28 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 29 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 30 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 31 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 32 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 33 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -672,7 +671,7 @@ typedef struct CmArmProcHierarchyInfo {
   CM_OBJECT_TOKEN    PrivateResourcesArrayToken;
   /// Optional field: Reference Token for the Lpi state of this processor.
   /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure, itself referencing
-  /// CM_ARM_LPI_INFO objects.
+  /// CM_ARCH_COMMON_LPI_INFO objects.
   CM_OBJECT_TOKEN    LpiToken;
   /// Set to TRUE if UID should override index for name and _UID
   /// for processor container nodes and name of processors.
@@ -748,69 +747,6 @@ typedef struct CmArmCmn600Info {
   /// constant and does not vary with the DTC count.
   CM_ARM_EXTENDED_INTERRUPT    DtcInterrupt[4];
 } CM_ARM_CMN_600_INFO;
-
-/** A structure that describes the Lpi information.
-
-  The Low Power Idle states are described in DSDT/SSDT and associated
-  to cpus/clusters in the cpu topology.
-
-  ID: EArmObjLpiInfo
-*/
-typedef struct CmArmLpiInfo {
-  /** Minimum Residency. Time in microseconds after which a
-      state becomes more energy efficient than any shallower state.
-  */
-  UINT32                                    MinResidency;
-
-  /** Worst case time in microseconds from a wake interrupt
-      being asserted to the return to a running state
-  */
-  UINT32                                    WorstCaseWakeLatency;
-
-  /** Flags.
-  */
-  UINT32                                    Flags;
-
-  /** Architecture specific context loss flags.
-  */
-  UINT32                                    ArchFlags;
-
-  /** Residency counter frequency in cycles-per-second (Hz).
-  */
-  UINT32                                    ResCntFreq;
-
-  /** Every shallower power state in the parent is also enabled.
-  */
-  UINT32                                    EnableParentState;
-
-  /** The EntryMethod _LPI field can be described as an integer
-      or in a Register resource data descriptor.
-
-  If IsInteger is TRUE, the IntegerEntryMethod field is used.
-  If IsInteger is FALSE, the RegisterEntryMethod field is used.
-  */
-  BOOLEAN                                   IsInteger;
-
-  /** EntryMethod described as an Integer.
-  */
-  UINT64                                    IntegerEntryMethod;
-
-  /** EntryMethod described as a EFI_ACPI_GENERIC_REGISTER_DESCRIPTOR.
-  */
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    RegisterEntryMethod;
-
-  /** Residency counter register.
-  */
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    ResidencyCounterRegister;
-
-  /** Usage counter register.
-  */
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    UsageCounterRegister;
-
-  /** String representing the Lpi state
-  */
-  CHAR8                                     StateName[16];
-} CM_ARM_LPI_INFO;
 
 /** A structure that describes the
     RMR node for the Platform.
