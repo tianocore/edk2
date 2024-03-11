@@ -34,6 +34,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjMemoryAffinityInfo,             ///< 11 - Memory Affinity Info
   EArchCommonObjDeviceHandleAcpi,               ///< 12 - Device Handle Acpi
   EArchCommonObjDeviceHandlePci,                ///< 13 - Device Handle Pci
+  EArchCommonObjGenericInitiatorAffinityInfo,   ///< 14 - Generic Initiator Affinity
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -275,6 +276,24 @@ typedef struct CmArchCommonDeviceHandlePci {
   /// PCI Function Number - Max 8 functions (Bits 2:0 of BDF)
   UINT8     FunctionNumber;
 } CM_ARCH_COMMON_DEVICE_HANDLE_PCI;
+
+/** A structure that describes the Generic Initiator Affinity structure in SRAT
+
+    ID: EArchCommonObjGenericInitiatorAffinityInfo
+*/
+typedef struct CmArchCommonGenericInitiatorAffinityInfo {
+  /// The proximity domain to which the generic initiator belongs.
+  UINT32             ProximityDomain;
+
+  /// Flags
+  UINT32             Flags;
+
+  /// Device Handle Type
+  UINT8              DeviceHandleType;
+
+  /// Reference Token for the Device Handle
+  CM_OBJECT_TOKEN    DeviceHandleToken;
+} CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO;
 
 #pragma pack()
 
