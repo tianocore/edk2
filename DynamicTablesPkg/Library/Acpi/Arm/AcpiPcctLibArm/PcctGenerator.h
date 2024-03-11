@@ -19,7 +19,7 @@
 */
 typedef struct MappingTable {
   /// Mapping table for Subspace Ids.
-  /// Subspace ID/Index <-> CM_[ARM|ARCH_COMMON]_PCC_SUBSPACE_TYPE[X]_INFO pointer
+  /// Subspace ID/Index <-> CM_ARCH_COMMON_PCC_SUBSPACE_TYPE[X]_INFO pointer
   VOID      **Table;
 
   /// Number of entries in the Table.
@@ -35,7 +35,7 @@ typedef struct AcpiPcctGenerator {
   // Private fields are defined from here.
 
   /// Table to map:
-  /// Subspace ID/Index <-> CM_[ARM|ARCH_COMMON]_PCC_SUBSPACE_TYPE[X]_INFO pointer
+  /// Subspace ID/Index <-> CM_ARCH_COMMON_PCC_SUBSPACE_TYPE[X]_INFO pointer
   MAPPING_TABLE           MappingTable;
 } ACPI_PCCT_GENERATOR;
 
