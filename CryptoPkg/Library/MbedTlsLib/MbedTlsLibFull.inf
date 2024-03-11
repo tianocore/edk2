@@ -13,6 +13,7 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MbedTlsLib
+  DEFINE OPENSSL_PATH            = ../OpensslLib/openssl
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -21,6 +22,11 @@
 #
 
 [Sources]
+# Openssl files list starts here
+  $(OPENSSL_PATH)/crypto/mem_clr.c
+  $(OPENSSL_PATH)/crypto/sha/keccak1600.c
+  $(OPENSSL_PATH)/crypto/sm3/sm3.c
+# Openssl files list ends here
   Include/mbedtls/mbedtls_config.h
   mbedtls/library/aes.c
   mbedtls/library/asn1parse.c
