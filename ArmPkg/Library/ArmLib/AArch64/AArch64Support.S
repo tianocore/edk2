@@ -9,7 +9,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <Chipset/AArch64.h>
+#include <Register/AArch64/AArch64.h>
 #include <AsmMacroIoLibV8.h>
 
 .set CTRL_M_BIT,      (1 << 0)

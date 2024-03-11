@@ -10,7 +10,7 @@
 #ifndef AARCH64_H_
 #define AARCH64_H_
 
-#include <Chipset/AArch64Mmu.h>
+#include <Register/AArch64/AArch64Mmu.h>
 
 // ARM Interrupt ID in Exception Table
 #define ARM_ARCH_EXCEPTION_IRQ  EXCEPT_AARCH64_IRQ
