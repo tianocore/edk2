@@ -10,7 +10,7 @@
 
 #include <Uefi.h>
 
-#include <Chipset/AArch64.h>
+#include <AArch64/AArch64.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Protocol/DebugSupport.h> // for MAX_AARCH64_EXCEPTION
 
