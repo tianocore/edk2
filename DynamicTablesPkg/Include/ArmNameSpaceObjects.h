@@ -51,14 +51,13 @@ typedef enum ArmObjectID {
   EArmObjCmn600Info,                                           ///< 20 - CMN-600 Info
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
-  EArmObjPccSubspaceType0Info,                                 ///< 23 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 24 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 25 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 26 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 27 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 28 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 29 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 30 - P-State Dependency (PSD) Info
+  EArmObjPccSubspaceType1Info,                                 ///< 23 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 24 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 25 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 26 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 27 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 28 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 29 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -713,13 +712,6 @@ typedef struct CmArmRmrDescriptor {
   /// Must be a multiple of the page size of 64K.
   UINT64    Length;
 } CM_ARM_MEMORY_RANGE_DESCRIPTOR;
-
-/** A structure that describes a
-    PCC Subspace of type 0 (Generic).
-
-    ID: EArmObjPccSubspaceType0Info
-*/
-typedef PCC_SUBSPACE_GENERIC_INFO CM_ARM_PCC_SUBSPACE_TYPE0_INFO;
 
 /** A structure that describes a
     PCC Subspace of type 1 (HW-Reduced).
