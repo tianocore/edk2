@@ -50,22 +50,21 @@ typedef enum ArmObjectID {
   EArmObjSmmuInterruptArray,                                   ///< 19 - SMMU Interrupt Array
   EArmObjProcHierarchyInfo,                                    ///< 20 - Processor Hierarchy Info
   EArmObjCacheInfo,                                            ///< 21 - Cache Info
-  EArmObjDeviceHandleAcpi,                                     ///< 22 - Device Handle Acpi
-  EArmObjDeviceHandlePci,                                      ///< 23 - Device Handle Pci
-  EArmObjGenericInitiatorAffinityInfo,                         ///< 24 - Generic Initiator Affinity
-  EArmObjCmn600Info,                                           ///< 25 - CMN-600 Info
-  EArmObjLpiInfo,                                              ///< 26 - Lpi Info
-  EArmObjRmr,                                                  ///< 27 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 28 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 29 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 30 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 31 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 32 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 33 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 34 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 35 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 36 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 37 - P-State Dependency (PSD) Info
+  EArmObjDeviceHandlePci,                                      ///< 22 - Device Handle Pci
+  EArmObjGenericInitiatorAffinityInfo,                         ///< 23 - Generic Initiator Affinity
+  EArmObjCmn600Info,                                           ///< 24 - CMN-600 Info
+  EArmObjLpiInfo,                                              ///< 25 - Lpi Info
+  EArmObjRmr,                                                  ///< 26 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 27 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 28 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 29 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 30 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 31 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 32 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 33 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 34 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 35 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 36 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -719,19 +718,6 @@ typedef struct CmArmCacheInfo {
   /// Unique ID for the cache
   UINT32             CacheId;
 } CM_ARM_CACHE_INFO;
-
-/** A structure that describes the ACPI Device Handle (Type 0) in the
-    Generic Initiator Affinity structure in SRAT
-
-    ID: EArmObjDeviceHandleAcpi
-*/
-typedef struct CmArmDeviceHandleAcpi {
-  /// Hardware ID
-  UINT64    Hid;
-
-  /// Unique Id
-  UINT32    Uid;
-} CM_ARM_DEVICE_HANDLE_ACPI;
 
 /** A structure that describes the PCI Device Handle (Type 1) in the
     Generic Initiator Affinity structure in SRAT

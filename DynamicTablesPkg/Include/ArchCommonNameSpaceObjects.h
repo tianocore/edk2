@@ -32,6 +32,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPciAddressMapInfo,              ///<  9 - Pci Address Map Info
   EArchCommonObjPciInterruptMapInfo,            ///< 10 - Pci Interrupt Map Info
   EArchCommonObjMemoryAffinityInfo,             ///< 11 - Memory Affinity Info
+  EArchCommonObjDeviceHandleAcpi,               ///< 12 - Device Handle Acpi
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -241,6 +242,19 @@ typedef struct CmArchCommonMemoryAffinityInfo {
   /// Flags
   UINT32    Flags;
 } CM_ARCH_COMMON_MEMORY_AFFINITY_INFO;
+
+/** A structure that describes the ACPI Device Handle (Type 0) in the
+    Generic Initiator Affinity structure in SRAT
+
+    ID: EArchCommonObjDeviceHandleAcpi
+*/
+typedef struct CmArchCommonDeviceHandleAcpi {
+  /// Hardware ID
+  UINT64    Hid;
+
+  /// Unique Id
+  UINT32    Uid;
+} CM_ARCH_COMMON_DEVICE_HANDLE_ACPI;
 
 #pragma pack()
 
