@@ -3551,6 +3551,8 @@ ConSplitterTextInExDequeueKey (
   @retval EFI_NOT_READY            There was no keystroke data availiable.
   @retval EFI_DEVICE_ERROR         The keydtroke information was not returned due
                                    to hardware errors.
+  @retval EFI_UNSUPPORTED          The device does not support the ability to read
+                                   keystroke data.
 
 **/
 EFI_STATUS
@@ -3623,6 +3625,8 @@ ConSplitterTextInPrivateReadKeyStroke (
   @retval EFI_NOT_READY            There was no keystroke data availiable.
   @retval EFI_DEVICE_ERROR         The keydtroke information was not returned due
                                    to hardware errors.
+  @retval EFI_UNSUPPORTED          The device does not support the ability to read
+                                   keystroke data.
 
 **/
 EFI_STATUS
@@ -3805,6 +3809,8 @@ ConSplitterTextInResetEx (
   @retval EFI_DEVICE_ERROR         The keystroke information was not returned due
                                    to hardware errors.
   @retval EFI_INVALID_PARAMETER    KeyData is NULL.
+  @retval EFI_UNSUPPORTED          The device does not support the ability to read
+                                   keystroke data.
 
 **/
 EFI_STATUS
