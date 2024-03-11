@@ -1,12 +1,13 @@
 /** @file
   Application for Hash Primitives Validation.
 
-Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "TestBaseCryptLib.h"
+#include <Library/CryptSha3Test.h>
 
 //
 // Max Known Digest Size is SHA512 Output (64 bytes) by far
@@ -60,6 +61,22 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  Sha512Digest[SHA512_DIGEST_SIZE] = {
   0x12, 0xe6, 0xfa, 0x4e, 0x89, 0xa9, 0x7e, 0xa2, 0x0a, 0x9e, 0xee, 0xe6, 0x4b, 0x55, 0xd3, 0x9a,
   0x21, 0x92, 0x99, 0x2a, 0x27, 0x4f, 0xc1, 0xa8, 0x36, 0xba, 0x3c, 0x23, 0xa3, 0xfe, 0xeb, 0xbd,
   0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 0xe8, 0x0e, 0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f
+};
+
+//
+// Result for SM3("abc"). (From https://the-x.cn/en-US/hash/SecureHashAlgorithm.aspx)
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  Sm3Digest[SM3_256_DIGEST_SIZE] = {
+  0x66, 0xC7, 0xF0, 0xF4, 0x62, 0xEE, 0xED, 0xD9, 0xD1, 0xF2, 0xD4, 0x6B, 0xDC, 0x10, 0xE4, 0xE2,
+  0x41, 0x67, 0xC4, 0x87, 0x5C, 0xF2, 0xF7, 0xA2, 0x29, 0x7D, 0xA0, 0x2B, 0x8F, 0x4B, 0xA8, 0xE0
+};
+
+//
+// Result for SHA3-256("abc"). (From https://the-x.cn/en-US/hash/SecureHashAlgorithm.aspx)
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  Sha3256Digest[32] = {
+  0x3A, 0x98, 0x5D, 0xA7, 0x4F, 0xE2, 0x25, 0xB2, 0x04, 0x5C, 0x17, 0x2D, 0x6B, 0xD3, 0x90, 0xBD,
+  0x85, 0x5F, 0x08, 0x6E, 0x3E, 0x9D, 0x52, 0x5B, 0x46, 0xBF, 0xE2, 0x45, 0x11, 0x43, 0x15, 0x32
 };
 
 typedef
@@ -123,6 +140,7 @@ HASH_TEST_CONTEXT  mSha1TestCtx   = { SHA1_DIGEST_SIZE, Sha1GetContextSize, Sha1
 HASH_TEST_CONTEXT  mSha256TestCtx = { SHA256_DIGEST_SIZE, Sha256GetContextSize, Sha256Init, Sha256Update, Sha256Duplicate, Sha256Final, Sha256HashAll, Sha256Digest };
 HASH_TEST_CONTEXT  mSha384TestCtx = { SHA384_DIGEST_SIZE, Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Duplicate, Sha384Final, Sha384HashAll, Sha384Digest };
 HASH_TEST_CONTEXT  mSha512TestCtx = { SHA512_DIGEST_SIZE, Sha512GetContextSize, Sha512Init, Sha512Update, Sha512Duplicate, Sha512Final, Sha512HashAll, Sha512Digest };
+HASH_TEST_CONTEXT  mSm3TestCtx    = { SM3_256_DIGEST_SIZE, Sm3GetContextSize, Sm3Init, Sm3Update, Sm3Duplicate, Sm3Final, Sm3HashAll, Sm3Digest };
 
 UNIT_TEST_STATUS
 EFIAPI
@@ -209,6 +227,37 @@ TestVerifyHash (
   return UNIT_TEST_PASSED;
 }
 
+# define TEST_SHA3_BLOCKSIZE(BitLen) (KECCAK1600_WIDTH - BitLen * 2) / 8
+
+UNIT_TEST_STATUS
+EFIAPI
+TestVerifySha3256 (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  UINTN              DataSize;
+  UINT8              Digest[MAX_DIGEST_SIZE];
+  BOOLEAN            Status;
+  Keccak1600_Ctx     Ctx;
+
+  DataSize = AsciiStrLen (HashData);
+
+  ZeroMem (Digest, MAX_DIGEST_SIZE);
+
+  Status = KeccakInit (&Ctx, '\x06', TEST_SHA3_BLOCKSIZE (256), 256 / 8);
+  UT_ASSERT_TRUE (Status);
+
+  Status = Sha3Update (&Ctx, HashData, DataSize);
+  UT_ASSERT_TRUE (Status);
+
+  Status = Sha3Final (&Ctx, Digest);
+  UT_ASSERT_TRUE (Status);
+
+  UT_ASSERT_MEM_EQUAL (Digest, Sha3256Digest, 32);
+
+  return UNIT_TEST_PASSED;
+}
+
 TEST_DESC  mHashTest[] = {
   //
   // -----Description----------------Class---------------------Function---------------Pre------------------Post------------Context
@@ -220,6 +269,8 @@ TEST_DESC  mHashTest[] = {
   { "TestVerifySha256()", "CryptoPkg.BaseCryptLib.Hash", TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSha256TestCtx },
   { "TestVerifySha384()", "CryptoPkg.BaseCryptLib.Hash", TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSha384TestCtx },
   { "TestVerifySha512()", "CryptoPkg.BaseCryptLib.Hash", TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSha512TestCtx },
+  { "TestVerifySm3()",    "CryptoPkg.BaseCryptLib.Hash", TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSm3TestCtx },
+  { "TestVerifySha3256()","CryptoPkg.BaseCryptLib.Hash", TestVerifySha3256,              NULL,                  NULL,            NULL },
 };
 
 UINTN  mHashTestNum = ARRAY_SIZE (mHashTest);
