@@ -33,7 +33,7 @@
     - EArmObjGicCInfo (REQUIRED)
     - EArmObjGicItsInfo (OPTIONAL)
     - EArchCommonObjMemoryAffinityInfo (OPTIONAL)
-    - EArmObjGenericInitiatorAffinityInfo (OPTIONAL)
+    - EArchCommonObjGenericInitiatorAffinityInfo (OPTIONAL)
     - EArchCommonObjDeviceHandleAcpi (OPTIONAL)
     - EArchCommonObjDeviceHandlePci (OPTIONAL)
 */
@@ -72,9 +72,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjGenericInitiatorAffinityInfo,
-  CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjGenericInitiatorAffinityInfo,
+  CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO
   );
 
 /**
@@ -295,7 +295,7 @@ AddGenericInitiatorAffinity (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               GenInitAffOff,
-  IN CONST CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO               *GenInitAffInfo,
+  IN CONST CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO       *GenInitAffInfo,
   IN       UINT32                                               GenInitAffCount
   )
 {
@@ -465,10 +465,10 @@ BuildSratTable (
   UINT32  MemAffOffset;
   UINT32  GenInitiatorAffOffset;
 
-  CM_ARM_GICC_INFO                        *GicCInfo;
-  CM_ARM_GIC_ITS_INFO                     *GicItsInfo;
-  CM_ARCH_COMMON_MEMORY_AFFINITY_INFO     *MemAffInfo;
-  CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO  *GenInitiatorAffInfo;
+  CM_ARM_GICC_INFO                                *GicCInfo;
+  CM_ARM_GIC_ITS_INFO                             *GicItsInfo;
+  CM_ARCH_COMMON_MEMORY_AFFINITY_INFO             *MemAffInfo;
+  CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO  *GenInitiatorAffInfo;
 
   EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER  *Srat;
 
@@ -552,7 +552,7 @@ BuildSratTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjGenericInitiatorAffinityInfo (
+  Status = GetEArchCommonObjGenericInitiatorAffinityInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GenInitiatorAffInfo,

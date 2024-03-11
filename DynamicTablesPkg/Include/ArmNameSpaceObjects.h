@@ -50,20 +50,19 @@ typedef enum ArmObjectID {
   EArmObjSmmuInterruptArray,                                   ///< 19 - SMMU Interrupt Array
   EArmObjProcHierarchyInfo,                                    ///< 20 - Processor Hierarchy Info
   EArmObjCacheInfo,                                            ///< 21 - Cache Info
-  EArmObjGenericInitiatorAffinityInfo,                         ///< 22 - Generic Initiator Affinity
-  EArmObjCmn600Info,                                           ///< 23 - CMN-600 Info
-  EArmObjLpiInfo,                                              ///< 24 - Lpi Info
-  EArmObjRmr,                                                  ///< 25 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 26 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 27 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 28 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 29 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 30 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 31 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 32 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 33 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 34 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 35 - P-State Dependency (PSD) Info
+  EArmObjCmn600Info,                                           ///< 22 - CMN-600 Info
+  EArmObjLpiInfo,                                              ///< 23 - Lpi Info
+  EArmObjRmr,                                                  ///< 24 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 25 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 26 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 27 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 28 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 29 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 30 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 31 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 32 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 33 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 34 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -717,24 +716,6 @@ typedef struct CmArmCacheInfo {
   /// Unique ID for the cache
   UINT32             CacheId;
 } CM_ARM_CACHE_INFO;
-
-/** A structure that describes the Generic Initiator Affinity structure in SRAT
-
-    ID: EArmObjGenericInitiatorAffinityInfo
-*/
-typedef struct CmArmGenericInitiatorAffinityInfo {
-  /// The proximity domain to which the generic initiator belongs.
-  UINT32             ProximityDomain;
-
-  /// Flags
-  UINT32             Flags;
-
-  /// Device Handle Type
-  UINT8              DeviceHandleType;
-
-  /// Reference Token for the Device Handle
-  CM_OBJECT_TOKEN    DeviceHandleToken;
-} CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO;
 
 /** A structure that describes the CMN-600 hardware.
 
