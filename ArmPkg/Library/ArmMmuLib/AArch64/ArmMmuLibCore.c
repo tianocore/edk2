@@ -11,7 +11,7 @@
 
 #include <Uefi.h>
 #include <Pi/PiMultiPhase.h>
-#include <Chipset/AArch64.h>
+#include <AArch64/AArch64.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/MemoryAllocationLib.h>
