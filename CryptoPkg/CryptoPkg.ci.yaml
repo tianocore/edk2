@@ -40,6 +40,7 @@
             "Library/Include/CrtLibSupport.h",
             # This has OpenSSL interfaces that aren't UEFI spec compliant
             "Library/BaseCryptLib/Hash/CryptParallelHash.h",
+            "Library/BaseCryptLibMbedTls/Hash/CryptParallelHash.h",
             "Library/Include/fcntl.h",
             # This has Mbedtls interfaces that aren't UEFI spec compliant
             "Library/Include/stdint.h",
