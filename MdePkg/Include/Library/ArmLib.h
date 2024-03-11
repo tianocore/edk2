@@ -14,7 +14,7 @@
 #include <Uefi/UefiBaseType.h>
 
 #ifdef MDE_CPU_ARM
-  #include <Chipset/ArmV7.h>
+  #include <Register/Arm/AArch32.h>
 #elif defined (MDE_CPU_AARCH64)
   #include <Register/AArch64/AArch64.h>
 #else
