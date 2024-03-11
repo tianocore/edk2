@@ -41,6 +41,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjCpcInfo,                        ///< 18 - Continuous Performance Control Info
   EArchCommonObjPccSubspaceType0Info,           ///< 19 - Pcc Subspace Type 0 Info
   EArchCommonObjPccSubspaceType1Info,           ///< 20 - Pcc Subspace Type 1 Info
+  EArchCommonObjPccSubspaceType2Info,           ///< 21 - Pcc Subspace Type 2 Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -548,6 +549,26 @@ typedef struct CmArchCommonPccSubspaceType1Info {
   /// Platform Interrupt.
   CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
 } CM_ARCH_COMMON_PCC_SUBSPACE_TYPE1_INFO;
+
+/** A structure that describes a
+    PCC Subspace of type 2 (HW-Reduced).
+
+    ID: EArchCommonObjPccSubspaceType2Info
+*/
+typedef struct CmArchCommonPccSubspaceType2Info {
+  /** Generic Pcc information.
+
+    The Subspace of Type0 contains information that can be re-used
+    in other Subspace types.
+  */
+  PCC_SUBSPACE_GENERIC_INFO           GenericPccInfo;
+
+  /// Platform Interrupt.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
+
+  /// Platform Interrupt Register.
+  PCC_MAILBOX_REGISTER_INFO           PlatIrqAckReg;
+} CM_ARCH_COMMON_PCC_SUBSPACE_TYPE2_INFO;
 
 #pragma pack()
 

@@ -600,9 +600,9 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonPccSubspaceType1InfoParser[] = {
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
 };
 
-/** A parser for EArmObjPccSubspaceType2Info.
+/** A parser for EArchCommonObjPccSubspaceType2Info.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType2InfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPccSubspaceType2InfoParser[] = {
   { "GenericPccInfo", sizeof (PCC_SUBSPACE_GENERIC_INFO),
     NULL, NULL, CmArchCommonPccSubspaceType0InfoParser,
     ARRAY_SIZE (CmArchCommonPccSubspaceType0InfoParser) },
@@ -691,6 +691,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjCpcInfo,                     CmArchCommonCpcInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType0Info,        CmArchCommonPccSubspaceType0InfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType1Info,        CmArchCommonPccSubspaceType1InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType2Info,        CmArchCommonPccSubspaceType2InfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -720,7 +721,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjCmn600Info,                 CmArmCmn600InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjRmr,                        CmArmRmrInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryRangeDescriptor,      CmArmMemoryRangeDescriptorInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType2Info,       CmArmPccSubspaceType2InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType3Info,       CmArmPccSubspaceType34InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType4Info,       CmArmPccSubspaceType34InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType5Info,       CmArmPccSubspaceType5InfoParser),
