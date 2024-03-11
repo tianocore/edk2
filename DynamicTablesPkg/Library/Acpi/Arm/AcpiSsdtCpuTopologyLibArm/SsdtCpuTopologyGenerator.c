@@ -894,11 +894,11 @@ CreateAmlCpuFromProcHierarchy (
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (ParentNode != NULL);
   ASSERT (ProcHierarchyNodeInfo != NULL);
-  ASSERT (ProcHierarchyNodeInfo->GicCToken != CM_NULL_TOKEN);
+  ASSERT (ProcHierarchyNodeInfo->AcpiIdObjectToken != CM_NULL_TOKEN);
 
   Status = GetEArmObjGicCInfo (
              CfgMgrProtocol,
-             ProcHierarchyNodeInfo->GicCToken,
+             ProcHierarchyNodeInfo->AcpiIdObjectToken,
              &GicCInfo,
              NULL
              );
@@ -1175,9 +1175,9 @@ CreateAmlCpuTopologyTree (
     // Find the children of the CM_ARM_PROC_HIERARCHY_INFO
     // currently being handled (i.e. ParentToken == NodeToken).
     if (Generator->ProcNodeList[Index].ParentToken == NodeToken) {
-      // Only Cpus (leaf nodes in this tree) have a GicCToken.
+      // Only Cpus (leaf nodes in this tree) have a AcpiIdObjectToken.
       // Create a Cpu node.
-      if (Generator->ProcNodeList[Index].GicCToken != CM_NULL_TOKEN) {
+      if (Generator->ProcNodeList[Index].AcpiIdObjectToken != CM_NULL_TOKEN) {
         Status = CheckProcNode (
                    Generator->ProcNodeList[Index].Flags,
                    TRUE,
