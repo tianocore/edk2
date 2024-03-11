@@ -69,12 +69,12 @@
 
 /** A structure used to handle the Lpi structures referencing.
 
-  A CM_ARM_PROC_HIERARCHY_INFO structure references a CM_ARCH_COMMON_OBJ_REF.
+  A CM_ARCH_COMMON_PROC_HIERARCHY_INFO structure references a CM_ARCH_COMMON_OBJ_REF.
   This CM_ARCH_COMMON_OBJ_REF references CM_ARCH_COMMON_LPI_INFO structures.
 
   Example:
   (Cpu0)                                   (Cpu1)
-  CM_ARM_PROC_HIERARCHY_INFO               CM_ARM_PROC_HIERARCHY_INFO
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO       CM_ARCH_COMMON_PROC_HIERARCHY_INFO
               |                                       |
               +----------------------------------------
               |
@@ -88,7 +88,7 @@
   (A first Lpi state)                       (A second Lpi state)
   CM_ARCH_COMMON_LPI_INFO[0]                        CM_ARCH_COMMON_LPI_INFO[1]
 
-  Here, Cpu0 and Cpu1 have the same Lpi states. Both CM_ARM_PROC_HIERARCHY_INFO
+  Here, Cpu0 and Cpu1 have the same Lpi states. Both CM_ARCH_COMMON_PROC_HIERARCHY_INFO
   structures reference the same CM_ARCH_COMMON_OBJ_REF. An entry is created in the
   TokenTable such as:
   0 <-> CM_ARCH_COMMON_OBJ_REF
@@ -130,16 +130,16 @@ typedef struct TokenTable {
 */
 typedef struct AcpiCpuTopologyGenerator {
   /// ACPI Table generator header
-  ACPI_TABLE_GENERATOR          Header;
+  ACPI_TABLE_GENERATOR                  Header;
 
   // Private fields are defined from here.
 
   /// Private object used to handle token referencing.
-  TOKEN_TABLE                   TokenTable;
-  /// List of CM_ARM_PROC_HIERARCHY_INFO CM objects.
-  CM_ARM_PROC_HIERARCHY_INFO    *ProcNodeList;
-  /// Count of CM_ARM_PROC_HIERARCHY_INFO CM objects.
-  UINT32                        ProcNodeCount;
+  TOKEN_TABLE                           TokenTable;
+  /// List of CM_ARCH_COMMON_PROC_HIERARCHY_INFO CM objects.
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO    *ProcNodeList;
+  /// Count of CM_ARCH_COMMON_PROC_HIERARCHY_INFO CM objects.
+  UINT32                                ProcNodeCount;
 } ACPI_CPU_TOPOLOGY_GENERATOR;
 
 #pragma pack()

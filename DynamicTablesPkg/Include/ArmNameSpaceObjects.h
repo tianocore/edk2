@@ -48,20 +48,19 @@ typedef enum ArmObjectID {
   EArmObjGicItsIdentifierArray,                                ///< 17 - GIC ITS Identifier Array
   EArmObjIdMappingArray,                                       ///< 18 - ID Mapping Array
   EArmObjSmmuInterruptArray,                                   ///< 19 - SMMU Interrupt Array
-  EArmObjProcHierarchyInfo,                                    ///< 20 - Processor Hierarchy Info
-  EArmObjCacheInfo,                                            ///< 21 - Cache Info
-  EArmObjCmn600Info,                                           ///< 22 - CMN-600 Info
-  EArmObjRmr,                                                  ///< 23 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 24 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 25 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 26 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 27 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 28 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 29 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 30 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 31 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 32 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 33 - P-State Dependency (PSD) Info
+  EArmObjCacheInfo,                                            ///< 20 - Cache Info
+  EArmObjCmn600Info,                                           ///< 21 - CMN-600 Info
+  EArmObjRmr,                                                  ///< 22 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 23 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 24 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 25 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 26 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 27 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 28 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 29 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 30 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 31 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 32 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -645,47 +644,6 @@ typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
 */
 typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 
-/** A structure that describes the Processor Hierarchy Node (Type 0) in PPTT
-
-    ID: EArmObjProcHierarchyInfo
-*/
-typedef struct CmArmProcHierarchyInfo {
-  /// A unique token used to identify this object
-  CM_OBJECT_TOKEN    Token;
-  /// Processor structure flags (ACPI 6.3 - January 2019, PPTT, Table 5-155)
-  UINT32             Flags;
-  /// Token for the parent CM_ARM_PROC_HIERARCHY_INFO object in the processor
-  /// topology. A value of CM_NULL_TOKEN means this node has no parent.
-  CM_OBJECT_TOKEN    ParentToken;
-  /// Token of the associated object which has the corresponding ACPI Processor
-  /// ID, e.g. for Arm systems this is a reference to CM_ARM_GICC_INFO object.
-  /// A value of CM_NULL_TOKEN means this node represents a group of associated
-  /// processors and it does not have an associated CPU interface.
-  CM_OBJECT_TOKEN    AcpiIdObjectToken;
-  /// Number of resources private to this Node
-  UINT32             NoOfPrivateResources;
-  /// Token of the array which contains references to the resources private to
-  /// this CM_ARM_PROC_HIERARCHY_INFO instance. This field is ignored if
-  /// the NoOfPrivateResources is 0, in which case it is recommended to set
-  /// this field to CM_NULL_TOKEN.
-  CM_OBJECT_TOKEN    PrivateResourcesArrayToken;
-  /// Optional field: Reference Token for the Lpi state of this processor.
-  /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure, itself referencing
-  /// CM_ARCH_COMMON_LPI_INFO objects.
-  CM_OBJECT_TOKEN    LpiToken;
-  /// Set to TRUE if UID should override index for name and _UID
-  /// for processor container nodes and name of processors.
-  /// This should be consistently set for containers or processors to avoid
-  /// duplicate values
-  BOOLEAN            OverrideNameUidEnabled;
-  /// If OverrideNameUidEnabled is TRUE then this value will be used for name of
-  /// processors and processor containers.
-  UINT16             OverrideName;
-  /// If OverrideNameUidEnabled is TRUE then this value will be used for
-  /// the UID of processor containers.
-  UINT32             OverrideUid;
-} CM_ARM_PROC_HIERARCHY_INFO;
-
 /** A structure that describes the Cache Type Structure (Type 1) in PPTT
 
     ID: EArmObjCacheInfo
@@ -694,9 +652,9 @@ typedef struct CmArmCacheInfo {
   /// A unique token used to identify this object
   CM_OBJECT_TOKEN    Token;
   /// Reference token for the next level of cache that is private to the same
-  /// CM_ARM_PROC_HIERARCHY_INFO instance. A value of CM_NULL_TOKEN means this
-  /// entry represents the last cache level appropriate to the processor
-  /// hierarchy node structures using this entry.
+  /// CM_ARCH_COMMON_PROC_HIERARCHY_INFO instance. A value of CM_NULL_TOKEN
+  /// means this entry represents the last cache level appropriate to the
+  ///  processor hierarchy node structures using this entry.
   CM_OBJECT_TOKEN    NextLevelOfCacheToken;
   /// Size of the cache in bytes
   UINT32             Size;

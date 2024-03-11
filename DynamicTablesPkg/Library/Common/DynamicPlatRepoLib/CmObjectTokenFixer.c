@@ -163,7 +163,6 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///< 17 - GIC ITS Identifier Array
   NULL,                             ///< 18 - ID Mapping Array
   NULL,                             ///< 19 - SMMU Interrupt Array
-  TokenFixerNotImplemented,         ///< 20 - Processor Hierarchy Info
   TokenFixerNotImplemented,         ///< 21 - Cache Info
   NULL,                             ///< 22 - CMN-600 Info
   NULL,                             ///< 23 - Reserved Memory Range Node
