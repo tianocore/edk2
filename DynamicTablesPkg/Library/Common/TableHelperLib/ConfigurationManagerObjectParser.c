@@ -574,9 +574,9 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceChannelTimingInfoParser[] = {
   { "MinRequestTurnaroundTime", 2, "0x%x", NULL },
 };
 
-/** A parser for EArmObjPccSubspaceType0Info.
+/** A parser for EArchCommonObjPccSubspaceType0Info.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType0InfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPccSubspaceType0InfoParser[] = {
   { "SubspaceId",    1,                                         "0x%x",   NULL },
   { "Type",          1,                                         "0x%x",   NULL },
   { "BaseAddress",   8,                                         "0x%llx", NULL },
@@ -593,8 +593,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType0InfoParser[] = {
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType1InfoParser[] = {
   { "GenericPccInfo", sizeof (PCC_SUBSPACE_GENERIC_INFO),
-    NULL, NULL, CmArmPccSubspaceType0InfoParser,
-    ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
+    NULL, NULL, CmArchCommonPccSubspaceType0InfoParser,
+    ARRAY_SIZE (CmArchCommonPccSubspaceType0InfoParser) },
   { "PlatIrq",        sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),
     NULL, NULL, CmArchCommonGenericInterruptParser,
     ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
@@ -604,8 +604,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType1InfoParser[] = {
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType2InfoParser[] = {
   { "GenericPccInfo", sizeof (PCC_SUBSPACE_GENERIC_INFO),
-    NULL, NULL, CmArmPccSubspaceType0InfoParser,
-    ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
+    NULL, NULL, CmArchCommonPccSubspaceType0InfoParser,
+    ARRAY_SIZE (CmArchCommonPccSubspaceType0InfoParser) },
   { "PlatIrq",        sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),NULL,NULL,
     CmArchCommonGenericInterruptParser, ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
   { "PlatIrqAckReg",  sizeof (PCC_MAILBOX_REGISTER_INFO),
@@ -617,8 +617,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType2InfoParser[] = {
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType34InfoParser[] = {
   { "GenericPccInfo",       sizeof (PCC_SUBSPACE_GENERIC_INFO),
-    NULL, NULL, CmArmPccSubspaceType0InfoParser,
-    ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
+    NULL, NULL, CmArchCommonPccSubspaceType0InfoParser,
+    ARRAY_SIZE (CmArchCommonPccSubspaceType0InfoParser) },
   { "PlatIrq",              sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),NULL,NULL,
     CmArchCommonGenericInterruptParser, ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
   { "PlatIrqAckReg",        sizeof (PCC_MAILBOX_REGISTER_INFO),
@@ -639,8 +639,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType34InfoParser[] = {
 */
 STATIC CONST CM_OBJ_PARSER  CmArmPccSubspaceType5InfoParser[] = {
   { "GenericPccInfo",      sizeof (PCC_SUBSPACE_GENERIC_INFO),
-    NULL, NULL, CmArmPccSubspaceType0InfoParser,
-    ARRAY_SIZE (CmArmPccSubspaceType0InfoParser) },
+    NULL, NULL, CmArchCommonPccSubspaceType0InfoParser,
+    ARRAY_SIZE (CmArchCommonPccSubspaceType0InfoParser) },
   { "Version",             2,                                        "0x%x",NULL },
   { "PlatIrq",             sizeof (CM_ARCH_COMMON_GENERIC_INTERRUPT),NULL,  NULL,
     CmArchCommonGenericInterruptParser, ARRAY_SIZE (CmArchCommonGenericInterruptParser) },
@@ -689,6 +689,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjProcHierarchyInfo,           CmArchCommonProcHierarchyInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjCacheInfo,                   CmArchCommonCacheInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjCpcInfo,                     CmArchCommonCpcInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType0Info,        CmArchCommonPccSubspaceType0InfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -718,7 +719,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjCmn600Info,                 CmArmCmn600InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjRmr,                        CmArmRmrInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryRangeDescriptor,      CmArmMemoryRangeDescriptorInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType0Info,       CmArmPccSubspaceType0InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType1Info,       CmArmPccSubspaceType1InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType2Info,       CmArmPccSubspaceType2InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType3Info,       CmArmPccSubspaceType34InfoParser),
