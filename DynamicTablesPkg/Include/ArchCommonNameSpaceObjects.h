@@ -31,6 +31,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPciConfigSpaceInfo,             ///<  8 - PCI Configuration Space Info
   EArchCommonObjPciAddressMapInfo,              ///<  9 - Pci Address Map Info
   EArchCommonObjPciInterruptMapInfo,            ///< 10 - Pci Interrupt Map Info
+  EArchCommonObjMemoryAffinityInfo,             ///< 11 - Memory Affinity Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -222,6 +223,24 @@ typedef struct CmArchCommonPciInterruptMapInfo {
   */
   CM_ARCH_COMMON_GENERIC_INTERRUPT    IntcInterrupt;
 } CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO;
+
+/** A structure that describes the Memory Affinity Structure (Type 1) in SRAT
+
+    ID: EArchCommonObjMemoryAffinityInfo
+*/
+typedef struct CmArchCommonMemoryAffinityInfo {
+  /// The proximity domain to which the "range of memory" belongs.
+  UINT32    ProximityDomain;
+
+  /// Base Address
+  UINT64    BaseAddress;
+
+  /// Length
+  UINT64    Length;
+
+  /// Flags
+  UINT32    Flags;
+} CM_ARCH_COMMON_MEMORY_AFFINITY_INFO;
 
 #pragma pack()
 
