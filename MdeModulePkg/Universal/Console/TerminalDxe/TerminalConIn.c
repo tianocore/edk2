@@ -109,6 +109,8 @@ TerminalConInReset (
   @retval EFI_SUCCESS         The keystroke information is returned successfully.
   @retval EFI_NOT_READY       There is no keystroke data available.
   @retval EFI_DEVICE_ERROR    The dependent serial device encounters error.
+  @retval EFI_UNSUPPORTED     The device does not support the ability to read
+                              keystroke data.
 
 **/
 EFI_STATUS
@@ -237,6 +239,8 @@ TerminalConInResetEx (
   @retval EFI_DEVICE_ERROR         The keystroke information was not returned due
                                    to hardware errors.
   @retval EFI_INVALID_PARAMETER    KeyData is NULL.
+  @retval EFI_UNSUPPORTED          The device does not support the ability to read
+                                   keystroke data.
 
 **/
 EFI_STATUS
