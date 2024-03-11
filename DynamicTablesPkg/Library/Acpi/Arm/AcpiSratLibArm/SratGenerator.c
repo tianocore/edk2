@@ -35,7 +35,7 @@
     - EArchCommonObjMemoryAffinityInfo (OPTIONAL)
     - EArmObjGenericInitiatorAffinityInfo (OPTIONAL)
     - EArchCommonObjDeviceHandleAcpi (OPTIONAL)
-    - EArmObjDeviceHandlePci (OPTIONAL)
+    - EArchCommonObjDeviceHandlePci (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the GIC
@@ -92,9 +92,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjDeviceHandlePci,
-  CM_ARM_DEVICE_HANDLE_PCI
+  EObjNameSpaceArchCommon,
+  EArchCommonObjDeviceHandlePci,
+  CM_ARCH_COMMON_DEVICE_HANDLE_PCI
   );
 
 /** Return the PCI Device information in BDF format
@@ -110,7 +110,7 @@ GET_OBJECT_LIST (
 STATIC
 UINT16
 GetBdf (
-  IN CONST CM_ARM_DEVICE_HANDLE_PCI  *DeviceHandlePci
+  IN CONST CM_ARCH_COMMON_DEVICE_HANDLE_PCI  *DeviceHandlePci
   )
 {
   UINT16  Bdf;
@@ -302,7 +302,7 @@ AddGenericInitiatorAffinity (
   EFI_STATUS                                         Status;
   EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE  *GenInitAff;
   CM_ARCH_COMMON_DEVICE_HANDLE_ACPI                  *DeviceHandleAcpi;
-  CM_ARM_DEVICE_HANDLE_PCI                           *DeviceHandlePci;
+  CM_ARCH_COMMON_DEVICE_HANDLE_PCI                   *DeviceHandlePci;
   UINT32                                             DeviceHandleCount;
 
   ASSERT (Srat != NULL);
@@ -362,7 +362,7 @@ AddGenericInitiatorAffinity (
     } else if (GenInitAffInfo->DeviceHandleType ==
                EFI_ACPI_6_3_PCI_DEVICE_HANDLE)
     {
-      Status = GetEArmObjDeviceHandlePci (
+      Status = GetEArchCommonObjDeviceHandlePci (
                  CfgMgrProtocol,
                  GenInitAffInfo->DeviceHandleToken,
                  &DeviceHandlePci,

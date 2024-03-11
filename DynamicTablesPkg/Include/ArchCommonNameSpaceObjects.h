@@ -33,6 +33,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPciInterruptMapInfo,            ///< 10 - Pci Interrupt Map Info
   EArchCommonObjMemoryAffinityInfo,             ///< 11 - Memory Affinity Info
   EArchCommonObjDeviceHandleAcpi,               ///< 12 - Device Handle Acpi
+  EArchCommonObjDeviceHandlePci,                ///< 13 - Device Handle Pci
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -255,6 +256,25 @@ typedef struct CmArchCommonDeviceHandleAcpi {
   /// Unique Id
   UINT32    Uid;
 } CM_ARCH_COMMON_DEVICE_HANDLE_ACPI;
+
+/** A structure that describes the PCI Device Handle (Type 1) in the
+    Generic Initiator Affinity structure in SRAT
+
+    ID: EArchCommonObjDeviceHandlePci
+*/
+typedef struct CmArchCommonDeviceHandlePci {
+  /// PCI Segment Number
+  UINT16    SegmentNumber;
+
+  /// PCI Bus Number - Max 256 busses (Bits 15:8 of BDF)
+  UINT8     BusNumber;
+
+  /// PCI Device Number - Max 32 devices (Bits 7:3 of BDF)
+  UINT8     DeviceNumber;
+
+  /// PCI Function Number - Max 8 functions (Bits 2:0 of BDF)
+  UINT8     FunctionNumber;
+} CM_ARCH_COMMON_DEVICE_HANDLE_PCI;
 
 #pragma pack()
 
