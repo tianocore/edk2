@@ -38,7 +38,7 @@
   MemoryAllocationLib
 
 [Guids]
-  gSmmCpuFeatureInfoGuid                           ## PRODUCES
+  gEdkiiSmmCpuFeatureInfoHobGuid                           ## PRODUCES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode       ## CONSUMES

@@ -773,7 +773,7 @@ PiSmmCpuEntryCommon (
   //
   // Get SMM_CPU_FEATURE_INFO_HOB for Standalone MM init.
   //
-  GuidHob = GetFirstGuidHob (&gSmmCpuFeatureInfoGuid);
+  GuidHob = GetFirstGuidHob (&gEdkiiSmmCpuFeatureInfoHobGuid);
   ASSERT (GuidHob != NULL);
   if (GuidHob != NULL) {
     mSmmCpuFeatureInfoHob = GET_GUID_HOB_DATA (GuidHob);

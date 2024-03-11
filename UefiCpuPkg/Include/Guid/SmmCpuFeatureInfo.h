@@ -29,6 +29,6 @@ typedef struct {
 } SMM_CPU_FEATURE_INFO_HOB;
 #pragma pack()
 
-extern EFI_GUID  gSmmCpuFeatureInfoGuid;
+extern EFI_GUID  gEdkiiSmmCpuFeatureInfoHobGuid;
 
 #endif

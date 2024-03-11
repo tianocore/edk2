@@ -105,7 +105,7 @@
   gSmmBaseHobGuid                          ## CONSUMES
   gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
   gEfiSmmSmramMemoryGuid
-  gSmmCpuFeatureInfoGuid
+  gEdkiiSmmCpuFeatureInfoHobGuid
   #gNonMmramMapGuid
 
 [FeaturePcd]

@@ -29,7 +29,7 @@ SmmCpuFeatureInfoPeimInit (
 {
   SMM_CPU_FEATURE_INFO_HOB  *SmmSyncModeInfoHob;
 
-  SmmSyncModeInfoHob = BuildGuidHob (&gSmmCpuFeatureInfoGuid, sizeof (SMM_CPU_FEATURE_INFO_HOB));
+  SmmSyncModeInfoHob = BuildGuidHob (&gEdkiiSmmCpuFeatureInfoHobGuid, sizeof (SMM_CPU_FEATURE_INFO_HOB));
   ASSERT (SmmSyncModeInfoHob != NULL);
 
   SmmSyncModeInfoHob->RelaxedCpuSyncMode  = (BOOLEAN)PcdGet8 (PcdCpuSmmSyncMode);
