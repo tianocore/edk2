@@ -37,6 +37,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjGenericInitiatorAffinityInfo,   ///< 14 - Generic Initiator Affinity
   EArchCommonObjLpiInfo,                        ///< 15 - Lpi Info
   EArchCommonObjProcHierarchyInfo,              ///< 16 - Processor Hierarchy Info
+  EArchCommonObjCacheInfo,                      ///< 17 - Cache Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -400,6 +401,36 @@ typedef struct CmArchCommonProcHierarchyInfo {
   /// the UID of processor containers.
   UINT32             OverrideUid;
 } CM_ARCH_COMMON_PROC_HIERARCHY_INFO;
+
+/** A structure that describes the Cache Type Structure (Type 1) in PPTT
+
+    ID: EArchCommonObjCacheInfo
+*/
+typedef struct CmArchCommonCacheInfo {
+  /// A unique token used to identify this object
+  CM_OBJECT_TOKEN    Token;
+  /// Reference token for the next level of cache that is private to the same
+  /// CM_ARCH_COMMON_PROC_HIERARCHY_INFO instance. A value of CM_NULL_TOKEN
+  /// means this entry represents the last cache level appropriate to the
+  ///  processor hierarchy node structures using this entry.
+  CM_OBJECT_TOKEN    NextLevelOfCacheToken;
+  /// Size of the cache in bytes
+  UINT32             Size;
+  /// Number of sets in the cache
+  UINT32             NumberOfSets;
+  /// Integer number of ways. The maximum associativity supported by
+  /// ACPI Cache type structure is limited to MAX_UINT8. However,
+  /// the maximum number of ways supported by the architecture is
+  /// PPTT_ARM_CCIDX_CACHE_ASSOCIATIVITY_MAX. Therfore this field
+  /// is 32-bit wide.
+  UINT32             Associativity;
+  /// Cache attributes (ACPI 6.4 - January 2021, PPTT, Table 5.140)
+  UINT8              Attributes;
+  /// Line size in bytes
+  UINT16             LineSize;
+  /// Unique ID for the cache
+  UINT32             CacheId;
+} CM_ARCH_COMMON_CACHE_INFO;
 
 #pragma pack()
 
