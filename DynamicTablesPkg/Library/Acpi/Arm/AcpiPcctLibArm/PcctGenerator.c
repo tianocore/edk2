@@ -31,7 +31,7 @@ Requirements:
   this Generator:
   - EArchCommonObjPccSubspaceType0Info
   - EArchCommonObjPccSubspaceType1Info
-  - EArmObjPccSubspaceType2Info
+  - EArchCommonObjPccSubspaceType2Info
   - EArmObjPccSubspaceType3Info
   - EArmObjPccSubspaceType4Info
   - EArmObjPccSubspaceType5Info
@@ -59,9 +59,9 @@ GET_OBJECT_LIST (
     Subspace of Type 2 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPccSubspaceType2Info,
-  CM_ARM_PCC_SUBSPACE_TYPE2_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPccSubspaceType2Info,
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE2_INFO
   );
 
 /** This macro expands to a function that retrieves the PCC
@@ -252,7 +252,7 @@ MapPccSubspaceId (
       break;
 
     case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS:
-      CmObjSize = sizeof (CM_ARM_PCC_SUBSPACE_TYPE2_INFO);
+      CmObjSize = sizeof (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE2_INFO);
       break;
 
     case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_3_EXTENDED_PCC:
@@ -418,7 +418,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 AddSubspaceStructType2 (
-  IN  CM_ARM_PCC_SUBSPACE_TYPE2_INFO                          *PccCmObj,
+  IN  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE2_INFO                  *PccCmObj,
   IN  EFI_ACPI_6_4_PCCT_SUBSPACE_2_HW_REDUCED_COMMUNICATIONS  *PccAcpi
   )
 {
@@ -725,7 +725,7 @@ PopulatePcctTable (
 
       case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS:
         Status = AddSubspaceStructType2 (
-                   (CM_ARM_PCC_SUBSPACE_TYPE2_INFO *)CurrentPccSubspace,
+                   (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE2_INFO *)CurrentPccSubspace,
                    (EFI_ACPI_6_4_PCCT_SUBSPACE_2_HW_REDUCED_COMMUNICATIONS *)PccBuffer
                    );
 
@@ -828,7 +828,7 @@ BuildPcctTable (
   UINT32                                  PccType0Count;
   CM_ARCH_COMMON_PCC_SUBSPACE_TYPE1_INFO  *PccType1;
   UINT32                                  PccType1Count;
-  CM_ARM_PCC_SUBSPACE_TYPE2_INFO          *PccType2;
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE2_INFO  *PccType2;
   UINT32                                  PccType2Count;
   CM_ARM_PCC_SUBSPACE_TYPE3_INFO          *PccType3;
   UINT32                                  PccType3Count;
@@ -887,7 +887,7 @@ BuildPcctTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjPccSubspaceType2Info (
+  Status = GetEArchCommonObjPccSubspaceType2Info (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PccType2,
