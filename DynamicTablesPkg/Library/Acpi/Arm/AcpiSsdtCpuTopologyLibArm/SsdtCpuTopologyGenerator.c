@@ -40,7 +40,7 @@ Requirements:
   - EArmObjGicCInfo
   - EArmObjProcHierarchyInfo (OPTIONAL) along with
   - EArchCommonObjCmRef (OPTIONAL)
-  - EArmObjLpiInfo (OPTIONAL)
+  - EArchCommonObjLpiInfo (OPTIONAL)
   - GetEArmObjEtInfo (OPTIONAL)
   - EArmObjPsdInfo (OPTIONAL)
 */
@@ -79,9 +79,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjLpiInfo,
-  CM_ARM_LPI_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjLpiInfo,
+  CM_ARCH_COMMON_LPI_INFO
   );
 
 /**
@@ -118,7 +118,7 @@ GET_OBJECT_LIST (
 
   One entry should be allocated for each CM_ARM_PROC_HIERARCHY_INFO
   structure of the platform. The TokenTable allows to have a mapping:
-  Index <-> CM_OBJECT_TOKEN (to CM_ARM_LPI_INFO structures).
+  Index <-> CM_OBJECT_TOKEN (to CM_ARCH_COMMON_LPI_INFO structures).
 
   There will always be less sets of Lpi states (CM_ARCH_COMMON_OBJ_REF)
   than the number of cpus/clusters (CM_ARM_PROC_HIERARCHY_INFO).
@@ -696,12 +696,12 @@ GenerateLpiStates (
   UINT32  Index;
   UINT32  LastIndex;
 
-  AML_OBJECT_NODE_HANDLE  LpiNode;
-  CM_ARCH_COMMON_OBJ_REF  *LpiRefInfo;
-  UINT32                  LpiRefInfoCount;
-  UINT32                  LpiRefIndex;
-  CM_ARM_LPI_INFO         *LpiInfo;
-  CHAR8                   AslName[AML_NAME_SEG_SIZE + 1];
+  AML_OBJECT_NODE_HANDLE   LpiNode;
+  CM_ARCH_COMMON_OBJ_REF   *LpiRefInfo;
+  UINT32                   LpiRefInfoCount;
+  UINT32                   LpiRefIndex;
+  CM_ARCH_COMMON_LPI_INFO  *LpiInfo;
+  CHAR8                    AslName[AML_NAME_SEG_SIZE + 1];
 
   ASSERT (Generator != NULL);
   ASSERT (Generator->TokenTable.Table != NULL);
@@ -739,8 +739,9 @@ GenerateLpiStates (
     }
 
     for (LpiRefIndex = 0; LpiRefIndex < LpiRefInfoCount; LpiRefIndex++) {
-      // For each CM_ARM_LPI_INFO referenced by the token, add an Lpi state.
-      Status = GetEArmObjLpiInfo (
+      // For each CM_ARCH_COMMON_LPI_INFO referenced by the token,
+      // add an Lpi state.
+      Status = GetEArchCommonObjLpiInfo (
                  CfgMgrProtocol,
                  LpiRefInfo[LpiRefIndex].ReferenceToken,
                  &LpiInfo,
