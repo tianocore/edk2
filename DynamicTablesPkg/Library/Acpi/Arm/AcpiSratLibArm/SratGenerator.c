@@ -32,7 +32,7 @@
     The following Configuration Manager Object(s) are used by this Generator:
     - EArmObjGicCInfo (REQUIRED)
     - EArmObjGicItsInfo (OPTIONAL)
-    - EArmObjMemoryAffinityInfo (OPTIONAL)
+    - EArchCommonObjMemoryAffinityInfo (OPTIONAL)
     - EArmObjGenericInitiatorAffinityInfo (OPTIONAL)
     - EArmObjDeviceHandleAcpi (OPTIONAL)
     - EArmObjDeviceHandlePci (OPTIONAL)
@@ -62,9 +62,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjMemoryAffinityInfo,
-  CM_ARM_MEMORY_AFFINITY_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjMemoryAffinityInfo,
+  CM_ARCH_COMMON_MEMORY_AFFINITY_INFO
   );
 
 /**
@@ -235,7 +235,7 @@ AddMemoryAffinity (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               MemAffOffset,
-  IN CONST CM_ARM_MEMORY_AFFINITY_INFO                          *MemAffInfo,
+  IN CONST CM_ARCH_COMMON_MEMORY_AFFINITY_INFO                  *MemAffInfo,
   IN       UINT32                                               MemAffCount
   )
 {
@@ -467,7 +467,7 @@ BuildSratTable (
 
   CM_ARM_GICC_INFO                        *GicCInfo;
   CM_ARM_GIC_ITS_INFO                     *GicItsInfo;
-  CM_ARM_MEMORY_AFFINITY_INFO             *MemAffInfo;
+  CM_ARCH_COMMON_MEMORY_AFFINITY_INFO     *MemAffInfo;
   CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO  *GenInitiatorAffInfo;
 
   EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER  *Srat;
@@ -537,7 +537,7 @@ BuildSratTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjMemoryAffinityInfo (
+  Status = GetEArchCommonObjMemoryAffinityInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &MemAffInfo,
