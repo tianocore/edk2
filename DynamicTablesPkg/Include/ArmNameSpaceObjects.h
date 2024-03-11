@@ -51,11 +51,9 @@ typedef enum ArmObjectID {
   EArmObjCmn600Info,                                           ///< 20 - CMN-600 Info
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
-  EArmObjPccSubspaceType3Info,                                 ///< 23 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 24 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 25 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 26 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 27 - P-State Dependency (PSD) Info
+  EArmObjPccSubspaceType5Info,                                 ///< 23 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 24 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 25 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -710,44 +708,6 @@ typedef struct CmArmRmrDescriptor {
   /// Must be a multiple of the page size of 64K.
   UINT64    Length;
 } CM_ARM_MEMORY_RANGE_DESCRIPTOR;
-
-/** A structure that describes a
-    PCC Subspace of type 3 (Extended)
-
-    ID: EArmObjPccSubspaceType3Info
-*/
-typedef struct CmArmPccSubspaceType3Info {
-  /** Generic Pcc information.
-
-    The Subspace of Type0 contains information that can be re-used
-    in other Subspace types.
-  */
-  PCC_SUBSPACE_GENERIC_INFO           GenericPccInfo;
-
-  /// Platform Interrupt.
-  CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
-
-  /// Platform Interrupt Register.
-  PCC_MAILBOX_REGISTER_INFO           PlatIrqAckReg;
-
-  /// Command Complete Check Register.
-  /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO           CmdCompleteCheckReg;
-
-  /// Command Complete Update Register.
-  PCC_MAILBOX_REGISTER_INFO           CmdCompleteUpdateReg;
-
-  /// Error Status Register.
-  /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO           ErrorStatusReg;
-} CM_ARM_PCC_SUBSPACE_TYPE3_INFO;
-
-/** A structure that describes a
-    PCC Subspace of type 4 (Extended)
-
-    ID: EArmObjPccSubspaceType4Info
-*/
-typedef CM_ARM_PCC_SUBSPACE_TYPE3_INFO CM_ARM_PCC_SUBSPACE_TYPE4_INFO;
 
 /** A structure that describes a
     PCC Subspace of type 5 (HW-Registers).
