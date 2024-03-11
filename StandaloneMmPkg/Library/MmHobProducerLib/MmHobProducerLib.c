@@ -232,9 +232,9 @@ MemoryDescriptorCompare (
   IN  CONST VOID  *Buffer2
   )
 {
-  if ((*(EFI_MEMORY_DESCRIPTOR **)Buffer1)->PhysicalStart > (*(EFI_MEMORY_DESCRIPTOR **)Buffer2)->PhysicalStart) {
+  if (((EFI_MEMORY_DESCRIPTOR *)Buffer1)->PhysicalStart > ((EFI_MEMORY_DESCRIPTOR *)Buffer2)->PhysicalStart) {
     return 1;
-  } else if ((*(EFI_MEMORY_DESCRIPTOR **)Buffer1)->PhysicalStart < (*(EFI_MEMORY_DESCRIPTOR **)Buffer2)->PhysicalStart) {
+  } else if (((EFI_MEMORY_DESCRIPTOR *)Buffer1)->PhysicalStart < ((EFI_MEMORY_DESCRIPTOR *)Buffer2)->PhysicalStart) {
     return -1;
   }
 
@@ -256,7 +256,7 @@ MemoryDescriptorCompare (
                                     BufferSize is updated to indicate the expected buffer size.
                                     When the input BufferSize is bigger than the expected buffer size,
                                     the BufferSize value will be changed the used buffer size.
-  @retval RETURN_SUCCESS            PageTable is created/updated successfully or the input Length is 0.
+  @retval RETURN_SUCCESS            The HOB list is created successfully.
 
 **/
 EFI_STATUS
@@ -323,7 +323,7 @@ CreateMmCoreHobList (
   //
   // Perform QuickSort for all EFI_RESOURCE_SYSTEM_MEMORY range to calculating the MMIO
   //
-  QuickSort (MemoryMap, Count, sizeof (EFI_MEMORY_DESCRIPTOR *), (BASE_SORT_COMPARE)MemoryDescriptorCompare, &SortBuffer);
+  QuickSort (MemoryMap, Count, sizeof (EFI_MEMORY_DESCRIPTOR), (BASE_SORT_COMPARE)MemoryDescriptorCompare, &SortBuffer);
 
   //
   // Calculate needed buffer size.
