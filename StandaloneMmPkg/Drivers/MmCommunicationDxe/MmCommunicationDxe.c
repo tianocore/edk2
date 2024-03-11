@@ -277,6 +277,7 @@ SmmCommunicationMmCommunicate2 (
   EFI_HOB_GUID_TYPE          *GuidHob;
   MM_COMM_BUFFER_DATA        *MmCommonBufferData;
   COMMUNICATION_IN_OUT       *CommunicationInOutBuffer;
+  UINTN                      BufferSize;
 
   //
   // Check parameters
@@ -286,9 +287,10 @@ SmmCommunicationMmCommunicate2 (
   }
 
   CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)CommBufferPhysical;
+  BufferSize        = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
 
   if (CommSize != NULL) {
-    ASSERT (*CommSize == OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength);
+    ASSERT (*CommSize == BufferSize);
   }
 
   //
@@ -304,7 +306,7 @@ SmmCommunicationMmCommunicate2 (
   // if CommBufferPhysical is not equal to FixedCommBuffer.
   //
   if ((UINTN)CommBufferPhysical != MmCommonBufferData->FixedCommBuffer) {
-    CopyMem ((VOID *)(MmCommonBufferData->FixedCommBuffer), CommBufferPhysical, *CommSize);
+    CopyMem ((VOID *)(MmCommonBufferData->FixedCommBuffer), CommBufferPhysical, BufferSize);
   }
 
   //
