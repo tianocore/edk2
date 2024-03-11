@@ -397,12 +397,14 @@ AddPrivateResources (
   @param [in]  Index2         Index of Object2 to be displayed for debugging
                               purposes.
 
-  @retval TRUE                Object1 and Object2 have the same GicCToken.
-  @retval FALSE               Object1 and Object2 have different GicCTokens.
+  @retval TRUE                Object1 and Object2 have the same
+                              AcpiIdObjectToken.
+  @retval FALSE               Object1 and Object2 have different
+                              AcpiIdObjectTokens.
 **/
 BOOLEAN
 EFIAPI
-IsGicCTokenEqual (
+IsAcpiIdObjectTokenEqual (
   IN  CONST VOID   *Object1,
   IN  CONST VOID   *Object2,
   IN        UINTN  Index1,
@@ -426,18 +428,18 @@ IsGicCTokenEqual (
 
   if (IS_ACPI_PROC_ID_VALID (ProcNode1) &&
       IS_ACPI_PROC_ID_VALID (ProcNode2) &&
-      (ProcNode1->GicCToken != CM_NULL_TOKEN) &&
-      (ProcNode2->GicCToken != CM_NULL_TOKEN) &&
-      (ProcNode1->GicCToken == ProcNode2->GicCToken))
+      (ProcNode1->AcpiIdObjectToken != CM_NULL_TOKEN) &&
+      (ProcNode2->AcpiIdObjectToken != CM_NULL_TOKEN) &&
+      (ProcNode1->AcpiIdObjectToken == ProcNode2->AcpiIdObjectToken))
   {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: PPTT: Two Processor Hierarchy Info objects (%d and %d) map to " \
-      "the same GICC Info object. ACPI Processor IDs are not unique. " \
-      "GicCToken = %p.\n",
+      "the same ACPI ID reference object. ACPI Processor IDs are not unique. " \
+      "AcpiIdObjectToken = %p.\n",
       Index1,
       Index2,
-      ProcNode1->GicCToken
+      ProcNode1->AcpiIdObjectToken
       ));
     return TRUE;
   }
@@ -474,7 +476,7 @@ AddProcHierarchyNodes (
   EFI_STATUS                             Status;
   EFI_ACPI_6_4_PPTT_STRUCTURE_PROCESSOR  *ProcStruct;
   UINT32                                 *PrivateResources;
-  BOOLEAN                                IsGicCTokenDuplicated;
+  BOOLEAN                                IsAcpiIdObjectTokenDuplicated;
 
   CM_ARM_GICC_INFO  *GicCInfoList;
   UINT32            GicCInfoCount;
@@ -500,15 +502,15 @@ AddProcHierarchyNodes (
   NodeCount        = Generator->ProcHierarchyNodeCount;
 
   // Check if every GICC Object is referenced by onlu one Proc Node
-  IsGicCTokenDuplicated = FindDuplicateValue (
-                            ProcNodeIterator,
-                            NodeCount,
-                            sizeof (PPTT_NODE_INDEXER),
-                            IsGicCTokenEqual
-                            );
+  IsAcpiIdObjectTokenDuplicated = FindDuplicateValue (
+                                    ProcNodeIterator,
+                                    NodeCount,
+                                    sizeof (PPTT_NODE_INDEXER),
+                                    IsAcpiIdObjectTokenEqual
+                                    );
   // Duplicate GIC CPU Interface Token was found so two PPTT Processor Hierarchy
   // Nodes map to the same MADT GICC structure
-  if (IsGicCTokenDuplicated) {
+  if (IsAcpiIdObjectTokenDuplicated) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -602,14 +604,14 @@ AddProcHierarchyNodes (
     if (!IS_ACPI_PROC_ID_VALID (ProcInfoNode)) {
       // Default invalid ACPI Processor ID to 0
       ProcStruct->AcpiProcessorId = 0;
-    } else if (ProcInfoNode->GicCToken == CM_NULL_TOKEN) {
+    } else if (ProcInfoNode->AcpiIdObjectToken == CM_NULL_TOKEN) {
       Status = EFI_INVALID_PARAMETER;
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: PPTT: The 'ACPI Processor ID valid' flag is set but no GICC " \
-        "structure token was provided. GicCToken = %p. RequestorToken = %p. " \
-        "Status = %r\n",
-        ProcInfoNode->GicCToken,
+        "ERROR: PPTT: The 'ACPI Processor ID valid' flag is set but no " \
+        "ACPI ID Reference object token was provided. " \
+        "AcpiIdObjectToken = %p. RequestorToken = %p. Status = %r\n",
+        ProcInfoNode->AcpiIdObjectToken,
         ProcInfoNode->Token,
         Status
         ));
@@ -617,17 +619,17 @@ AddProcHierarchyNodes (
     } else {
       Status = GetEArmObjGicCInfo (
                  CfgMgrProtocol,
-                 ProcInfoNode->GicCToken,
+                 ProcInfoNode->AcpiIdObjectToken,
                  &GicCInfoList,
                  &GicCInfoCount
                  );
       if (EFI_ERROR (Status)) {
         DEBUG ((
           DEBUG_ERROR,
-          "ERROR: PPTT: Failed to get GICC structure. ACPI Processor ID " \
-          "can't be populated. GicCToken = %p. RequestorToken = %p. " \
-          "Status = %r\n",
-          ProcInfoNode->GicCToken,
+          "ERROR: PPTT: Failed to get ACPI ID Reference object token.  " \
+          "ACPI Processor ID can't be populated. " \
+          "AcpiIdObjectToken = %p. RequestorToken = %p. Status = %r\n",
+          ProcInfoNode->AcpiIdObjectToken,
           ProcInfoNode->Token,
           Status
           ));
@@ -640,10 +642,10 @@ AddProcHierarchyNodes (
           DEBUG_ERROR,
           "ERROR: PPTT: Failed to find a unique GICC structure. " \
           "ACPI Processor ID can't be populated. " \
-          "GICC Structure Count = %d. GicCToken = %p. RequestorToken = %p " \
+          "GICC Structure Count = %d. AcpiIdObjectToken = %p. RequestorToken = %p " \
           "Status = %r\n",
           GicCInfoCount,
-          ProcInfoNode->GicCToken,
+          ProcInfoNode->AcpiIdObjectToken,
           ProcInfoNode->Token,
           Status
           ));
