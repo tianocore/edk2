@@ -35,6 +35,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjDeviceHandleAcpi,               ///< 12 - Device Handle Acpi
   EArchCommonObjDeviceHandlePci,                ///< 13 - Device Handle Pci
   EArchCommonObjGenericInitiatorAffinityInfo,   ///< 14 - Generic Initiator Affinity
+  EArchCommonObjLpiInfo,                        ///< 15 - Lpi Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -294,6 +295,69 @@ typedef struct CmArchCommonGenericInitiatorAffinityInfo {
   /// Reference Token for the Device Handle
   CM_OBJECT_TOKEN    DeviceHandleToken;
 } CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO;
+
+/** A structure that describes the Lpi information.
+
+  The Low Power Idle states are described in DSDT/SSDT and associated
+  to cpus/clusters in the cpu topology.
+
+  ID: EArchCommonObjLpiInfo
+*/
+typedef struct CmArchCommonLpiInfo {
+  /** Minimum Residency. Time in microseconds after which a
+      state becomes more energy efficient than any shallower state.
+  */
+  UINT32                                    MinResidency;
+
+  /** Worst case time in microseconds from a wake interrupt
+      being asserted to the return to a running state
+  */
+  UINT32                                    WorstCaseWakeLatency;
+
+  /** Flags.
+  */
+  UINT32                                    Flags;
+
+  /** Architecture specific context loss flags.
+  */
+  UINT32                                    ArchFlags;
+
+  /** Residency counter frequency in cycles-per-second (Hz).
+  */
+  UINT32                                    ResCntFreq;
+
+  /** Every shallower power state in the parent is also enabled.
+  */
+  UINT32                                    EnableParentState;
+
+  /** The EntryMethod _LPI field can be described as an integer
+      or in a Register resource data descriptor.
+
+  If IsInteger is TRUE, the IntegerEntryMethod field is used.
+  If IsInteger is FALSE, the RegisterEntryMethod field is used.
+  */
+  BOOLEAN                                   IsInteger;
+
+  /** EntryMethod described as an Integer.
+  */
+  UINT64                                    IntegerEntryMethod;
+
+  /** EntryMethod described as a EFI_ACPI_GENERIC_REGISTER_DESCRIPTOR.
+  */
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    RegisterEntryMethod;
+
+  /** Residency counter register.
+  */
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    ResidencyCounterRegister;
+
+  /** Usage counter register.
+  */
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    UsageCounterRegister;
+
+  /** String representing the Lpi state
+  */
+  CHAR8                                     StateName[16];
+} CM_ARCH_COMMON_LPI_INFO;
 
 #pragma pack()
 

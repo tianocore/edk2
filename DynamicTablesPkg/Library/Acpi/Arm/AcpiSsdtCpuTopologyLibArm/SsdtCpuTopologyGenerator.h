@@ -70,7 +70,7 @@
 /** A structure used to handle the Lpi structures referencing.
 
   A CM_ARM_PROC_HIERARCHY_INFO structure references a CM_ARCH_COMMON_OBJ_REF.
-  This CM_ARCH_COMMON_OBJ_REF references CM_ARM_LPI_INFO structures.
+  This CM_ARCH_COMMON_OBJ_REF references CM_ARCH_COMMON_LPI_INFO structures.
 
   Example:
   (Cpu0)                                   (Cpu1)
@@ -86,7 +86,7 @@
               |                                       |
               v                                       v
   (A first Lpi state)                       (A second Lpi state)
-  CM_ARM_LPI_INFO[0]                        CM_ARM_LPI_INFO[1]
+  CM_ARCH_COMMON_LPI_INFO[0]                        CM_ARCH_COMMON_LPI_INFO[1]
 
   Here, Cpu0 and Cpu1 have the same Lpi states. Both CM_ARM_PROC_HIERARCHY_INFO
   structures reference the same CM_ARCH_COMMON_OBJ_REF. An entry is created in the
@@ -118,7 +118,7 @@
 */
 typedef struct TokenTable {
   /// TokenTable, a table allowing to map:
-  /// Index <-> CM_OBJECT_TOKEN (to CM_ARM_LPI_INFO structures).
+  /// Index <-> CM_OBJECT_TOKEN (to CM_ARCH_COMMON_LPI_INFO structures).
   CM_OBJECT_TOKEN    *Table;
 
   /// Last used index of the TokenTable.
