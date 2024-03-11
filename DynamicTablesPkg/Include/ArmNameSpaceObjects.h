@@ -52,7 +52,6 @@ typedef enum ArmObjectID {
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
   EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 24 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -188,7 +187,7 @@ typedef struct CmArmGicCInfo {
   CM_OBJECT_TOKEN    EtToken;
 
   /** Optional field: Reference Token for the Psd info of this processor.
-      i.e. a token referencing a CM_ARM_PSD_INFO object.
+      i.e. a token referencing a CM_ARCH_COMMON_PSD_INFO object.
   */
   CM_OBJECT_TOKEN    PsdToken;
 } CM_ARM_GICC_INFO;
@@ -723,15 +722,6 @@ typedef enum ArmEtType {
 typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
-
-/** A structure that describes a
-    P-State Dependency (PSD) Info.
-
-    Cf. ACPI 6.5, s8.4.5.5 _PSD (P-State Dependency).
-
-    ID: EArmObjPsdInfo
-*/
-typedef AML_PSD_INFO CM_ARM_PSD_INFO;
 
 #pragma pack()
 
