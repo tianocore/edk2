@@ -34,7 +34,13 @@ typedef struct {
   LIST_ENTRY                    Link;        // Link on MMI_ENTRY.MmiHandlers
   EFI_MM_HANDLER_ENTRY_POINT    Handler;     // The mm handler's entry point
   MMI_ENTRY                     *MmiEntry;
+  BOOLEAN                       NeedDeleted; // To delete this MMI_HANDLER later
 } MMI_HANDLER;
+
+//
+// mMmiManageCallingDepth is used to track the depth of recursive calls of MmiManage.
+//
+UINTN  mMmiManageCallingDepth = 0;
 
 LIST_ENTRY  mRootMmiHandlerList = INITIALIZE_LIST_HEAD_VARIABLE (mRootMmiHandlerList);
 LIST_ENTRY  mMmiEntryList       = INITIALIZE_LIST_HEAD_VARIABLE (mMmiEntryList);
@@ -126,11 +132,14 @@ MmiManage (
 {
   LIST_ENTRY   *Link;
   LIST_ENTRY   *Head;
+  LIST_ENTRY   *EntryLink;
   MMI_ENTRY    *MmiEntry;
   MMI_HANDLER  *MmiHandler;
   BOOLEAN      SuccessReturn;
+  BOOLEAN      CanReturn;
   EFI_STATUS   Status;
 
+  mMmiManageCallingDepth++;
   Status        = EFI_NOT_FOUND;
   SuccessReturn = FALSE;
   if (HandlerType == NULL) {
@@ -171,7 +180,12 @@ MmiManage (
         // no additional handlers will be processed and EFI_INTERRUPT_PENDING will be returned.
         //
         if (HandlerType != NULL) {
-          return EFI_INTERRUPT_PENDING;
+          //
+          // Won't go to next Handler, and will return with EFI_INTERRUPT_PENDING later
+          //
+          SuccessReturn = FALSE;
+          Status        = EFI_INTERRUPT_PENDING;
+          CanReturn     = TRUE;
         }
 
         break;
@@ -183,7 +197,10 @@ MmiManage (
         // additional handlers will be processed.
         //
         if (HandlerType != NULL) {
-          return EFI_SUCCESS;
+          //
+          // Won't go to next Handler, and return with EFI_SUCCESS
+          //
+          CanReturn = TRUE;
         }
 
         SuccessReturn = TRUE;
@@ -211,10 +228,76 @@ MmiManage (
         ASSERT_EFI_ERROR (Status);
         break;
     }
+
+    if (CanReturn) {
+      break;
+    }
   }
 
   if (SuccessReturn) {
     Status = EFI_SUCCESS;
+  }
+
+  ASSERT (mMmiManageCallingDepth > 0);
+  mMmiManageCallingDepth--;
+
+  //
+  // The MmiHandlerUnRegister won't take effect inside MmiManage.
+  // Before returned from MmiManage, delete the MmiHandler which is
+  // marked as NeedDeleted.
+  // Note that MmiManage can be called recursively.
+  //
+  if (mMmiManageCallingDepth == 0) {
+    //
+    // Go through all MmiHandler in root Mmi handlers
+    //
+    for ( Link = GetFirstNode (&mRootMmiHandlerList)
+          ; !IsNull (&mRootMmiHandlerList, Link);
+          )
+    {
+      MmiHandler = CR (Link, MMI_HANDLER, Link, MMI_HANDLER_SIGNATURE);
+      Link       = GetNextNode (&mRootMmiHandlerList, Link);
+      if (MmiHandler->NeedDeleted) {
+        //
+        // Remove MmiHandler if the NeedDeleted is set.
+        //
+        RemoveEntryList (&MmiHandler->Link);
+        FreePool (MmiHandler);
+      }
+    }
+
+    //
+    // Go through all MmiHandler in non-root MMI handlers
+    //
+    for ( EntryLink = GetFirstNode (&mMmiEntryList)
+          ; !IsNull (&mMmiEntryList, EntryLink);
+          )
+    {
+      MmiEntry  = CR (EntryLink, MMI_ENTRY, AllEntries, MMI_ENTRY_SIGNATURE);
+      EntryLink = GetNextNode (&mMmiEntryList, EntryLink);
+      for ( Link = GetFirstNode (&MmiEntry->MmiHandlers)
+            ; !IsNull (&MmiEntry->MmiHandlers, Link);
+            )
+      {
+        MmiHandler = CR (Link, MMI_HANDLER, Link, MMI_HANDLER_SIGNATURE);
+        Link       = GetNextNode (&MmiEntry->MmiHandlers, Link);
+        if (MmiHandler->NeedDeleted) {
+          //
+          // Remove MmiHandler if the NeedDeleted is set.
+          //
+          RemoveEntryList (&MmiHandler->Link);
+          FreePool (MmiHandler);
+        }
+      }
+
+      if (IsListEmpty (&MmiEntry->MmiHandlers)) {
+        //
+        // No handler registered for this MmiEntry now, remove the MMI_ENTRY
+        //
+        RemoveEntryList (&MmiEntry->AllEntries);
+        FreePool (MmiEntry);
+      }
+    }
   }
 
   return Status;
@@ -252,8 +335,9 @@ MmiHandlerRegister (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  MmiHandler->Signature = MMI_HANDLER_SIGNATURE;
-  MmiHandler->Handler   = Handler;
+  MmiHandler->Signature   = MMI_HANDLER_SIGNATURE;
+  MmiHandler->Handler     = Handler;
+  MmiHandler->NeedDeleted = FALSE;
 
   if (HandlerType == NULL) {
     //
@@ -310,6 +394,16 @@ MmiHandlerUnRegister (
   }
 
   MmiEntry = MmiHandler->MmiEntry;
+
+  if (mMmiManageCallingDepth > 0) {
+    //
+    // This function is called from MmiManage()
+    // Do not delete or remove MmiHandler or MmiEntry now.
+    // Set the NeedDeleted field in MmiHandler so that MmiManage will delete it later
+    //
+    MmiHandler->NeedDeleted = TRUE;
+    return EFI_SUCCESS;
+  }
 
   RemoveEntryList (&MmiHandler->Link);
   FreePool (MmiHandler);
