@@ -36,6 +36,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjDeviceHandlePci,                ///< 13 - Device Handle Pci
   EArchCommonObjGenericInitiatorAffinityInfo,   ///< 14 - Generic Initiator Affinity
   EArchCommonObjLpiInfo,                        ///< 15 - Lpi Info
+  EArchCommonObjProcHierarchyInfo,              ///< 16 - Processor Hierarchy Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -358,6 +359,47 @@ typedef struct CmArchCommonLpiInfo {
   */
   CHAR8                                     StateName[16];
 } CM_ARCH_COMMON_LPI_INFO;
+
+/** A structure that describes the Processor Hierarchy Node (Type 0) in PPTT
+
+    ID: EArchCommonObjProcHierarchyInfo
+*/
+typedef struct CmArchCommonProcHierarchyInfo {
+  /// A unique token used to identify this object
+  CM_OBJECT_TOKEN    Token;
+  /// Processor structure flags (ACPI 6.3 - January 2019, PPTT, Table 5-155)
+  UINT32             Flags;
+  /// Token for the parent CM_ARCH_COMMON_PROC_HIERARCHY_INFO object in the processor
+  /// topology. A value of CM_NULL_TOKEN means this node has no parent.
+  CM_OBJECT_TOKEN    ParentToken;
+  /// Token of the associated object which has the corresponding ACPI Processor
+  /// ID, e.g. for Arm systems this is a reference to CM_ARM_GICC_INFO object.
+  /// A value of CM_NULL_TOKEN means this node represents a group of associated
+  /// processors and it does not have an associated CPU interface.
+  CM_OBJECT_TOKEN    AcpiIdObjectToken;
+  /// Number of resources private to this Node
+  UINT32             NoOfPrivateResources;
+  /// Token of the array which contains references to the resources private to
+  /// this CM_ARCH_COMMON_PROC_HIERARCHY_INFO instance. This field is ignored if
+  /// the NoOfPrivateResources is 0, in which case it is recommended to set
+  /// this field to CM_NULL_TOKEN.
+  CM_OBJECT_TOKEN    PrivateResourcesArrayToken;
+  /// Optional field: Reference Token for the Lpi state of this processor.
+  /// Token identifying a CM_ARCH_COMMON_OBJ_REF structure, itself referencing
+  /// CM_ARCH_COMMON_LPI_INFO objects.
+  CM_OBJECT_TOKEN    LpiToken;
+  /// Set to TRUE if UID should override index for name and _UID
+  /// for processor container nodes and name of processors.
+  /// This should be consistently set for containers or processors to avoid
+  /// duplicate values
+  BOOLEAN            OverrideNameUidEnabled;
+  /// If OverrideNameUidEnabled is TRUE then this value will be used for name of
+  /// processors and processor containers.
+  UINT16             OverrideName;
+  /// If OverrideNameUidEnabled is TRUE then this value will be used for
+  /// the UID of processor containers.
+  UINT32             OverrideUid;
+} CM_ARCH_COMMON_PROC_HIERARCHY_INFO;
 
 #pragma pack()
 
