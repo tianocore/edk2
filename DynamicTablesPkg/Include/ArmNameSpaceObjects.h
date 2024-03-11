@@ -51,15 +51,14 @@ typedef enum ArmObjectID {
   EArmObjCmn600Info,                                           ///< 20 - CMN-600 Info
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 23 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 24 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 25 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 26 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 27 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 28 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 29 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 30 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 31 - P-State Dependency (PSD) Info
+  EArmObjPccSubspaceType0Info,                                 ///< 23 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 24 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 25 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 26 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 27 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 28 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 29 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 30 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -177,7 +176,7 @@ typedef struct CmArmGicCInfo {
   UINT32             AffinityFlags;
 
   /** Optional field: Reference Token for the Cpc info of this processor.
-      i.e. a token referencing a CM_ARM_CPC_INFO object.
+      i.e. a token referencing a CM_ARCH_COMMON_CPC_INFO object.
   */
   CM_OBJECT_TOKEN    CpcToken;
 
@@ -714,24 +713,6 @@ typedef struct CmArmRmrDescriptor {
   /// Must be a multiple of the page size of 64K.
   UINT64    Length;
 } CM_ARM_MEMORY_RANGE_DESCRIPTOR;
-
-/** A structure that describes the Cpc information.
-
-  Continuous Performance Control is described in DSDT/SSDT and associated
-  to cpus/clusters in the cpu topology.
-
-  Unsupported Optional registers should be encoded with NULL resource
-  Register {(SystemMemory, 0, 0, 0, 0)}
-
-  For values that support Integer or Buffer, integer will be used
-  if buffer is NULL resource.
-  If resource is not NULL then Integer must be 0
-
-  Cf. ACPI 6.4, s8.4.7.1 _CPC (Continuous Performance Control)
-
-  ID: EArmObjCpcInfo
-*/
-typedef AML_CPC_INFO CM_ARM_CPC_INFO;
 
 /** A structure that describes a
     PCC Mailbox Register.

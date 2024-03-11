@@ -479,9 +479,9 @@ STATIC CONST CM_OBJ_PARSER  CmArmMemoryRangeDescriptorInfoParser[] = {
   { "Length",      8, "0x%llx", NULL },
 };
 
-/** A parser for EArmObjCpcInfo.
+/** A parser for EArchCommonObjCpcInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmCpcInfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonCpcInfoParser[] = {
   { "Revision",                              4,                                               "0x%lx", NULL },
   { "HighestPerformanceBuffer",              sizeof (EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE),
     NULL, NULL, AcpiGenericAddressParser,
@@ -688,6 +688,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjLpiInfo,                     CmArchCommonLpiInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjProcHierarchyInfo,           CmArchCommonProcHierarchyInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjCacheInfo,                   CmArchCommonCacheInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCpcInfo,                     CmArchCommonCpcInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -717,7 +718,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjCmn600Info,                 CmArmCmn600InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjRmr,                        CmArmRmrInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryRangeDescriptor,      CmArmMemoryRangeDescriptorInfoParser),
-  CM_PARSER_ADD_OBJECT (EArmObjCpcInfo,                    CmArmCpcInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType0Info,       CmArmPccSubspaceType0InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType1Info,       CmArmPccSubspaceType1InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjPccSubspaceType2Info,       CmArmPccSubspaceType2InfoParser),
