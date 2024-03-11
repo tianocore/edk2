@@ -1,0 +1,72 @@
+## @file
+#  Component description file for Hsti Silicon Driver
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HstiSiliconDxe
+  FILE_GUID                      = 60740CF3-D428-4500-80E6-04A5798241ED
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = HstiSiliconDxeEntrypoint
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources]
+  HstiSiliconDxe.c
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+  BaseLib
+  DebugLib
+  HstiLib
+  UefiBootServicesTableLib
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Protocols]
+  gEfiDxeSmmReadyToLockProtocolGuid  ## CONSUMES
+  gHstiProtocolGuid                  ## PRODUCES
+  gEfiMpServiceProtocolGuid          ## CONSUMES
+  gHstiPublishCompleteProtocolGuid   ## PRODUCES
+
+[FixedPcd]
+
+[Depex]
+  TRUE
