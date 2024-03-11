@@ -34,7 +34,7 @@
     - EArmObjGicItsInfo (OPTIONAL)
     - EArchCommonObjMemoryAffinityInfo (OPTIONAL)
     - EArmObjGenericInitiatorAffinityInfo (OPTIONAL)
-    - EArmObjDeviceHandleAcpi (OPTIONAL)
+    - EArchCommonObjDeviceHandleAcpi (OPTIONAL)
     - EArmObjDeviceHandlePci (OPTIONAL)
 */
 
@@ -82,9 +82,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjDeviceHandleAcpi,
-  CM_ARM_DEVICE_HANDLE_ACPI
+  EObjNameSpaceArchCommon,
+  EArchCommonObjDeviceHandleAcpi,
+  CM_ARCH_COMMON_DEVICE_HANDLE_ACPI
   );
 
 /**
@@ -301,7 +301,7 @@ AddGenericInitiatorAffinity (
 {
   EFI_STATUS                                         Status;
   EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE  *GenInitAff;
-  CM_ARM_DEVICE_HANDLE_ACPI                          *DeviceHandleAcpi;
+  CM_ARCH_COMMON_DEVICE_HANDLE_ACPI                  *DeviceHandleAcpi;
   CM_ARM_DEVICE_HANDLE_PCI                           *DeviceHandlePci;
   UINT32                                             DeviceHandleCount;
 
@@ -331,7 +331,7 @@ AddGenericInitiatorAffinity (
     }
 
     if (GenInitAffInfo->DeviceHandleType == EFI_ACPI_6_3_ACPI_DEVICE_HANDLE) {
-      Status = GetEArmObjDeviceHandleAcpi (
+      Status = GetEArchCommonObjDeviceHandleAcpi (
                  CfgMgrProtocol,
                  GenInitAffInfo->DeviceHandleToken,
                  &DeviceHandleAcpi,
