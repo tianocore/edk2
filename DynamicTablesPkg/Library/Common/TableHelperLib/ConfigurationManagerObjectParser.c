@@ -658,9 +658,9 @@ STATIC CONST CM_OBJ_PARSER  CmArmEtInfo[] = {
   { "EtType", sizeof (ARM_ET_TYPE), "0x%x", NULL }
 };
 
-/** A parser for EArmObjPsdInfo.
+/** A parser for EArchCommonObjPsdInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmPsdInfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPsdInfoParser[] = {
   { "Revision",  1, "0x%x", NULL },
   { "DomainId",  4, "0x%x", NULL },
   { "CoordType", 4, "0x%x", NULL },
@@ -695,6 +695,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType3Info,        CmArchCommonPccSubspaceType34InfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType4Info,        CmArchCommonPccSubspaceType34InfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType5Info,        CmArchCommonPccSubspaceType5InfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPsdInfo,                     CmArchCommonPsdInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -725,7 +726,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjRmr,                        CmArmRmrInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryRangeDescriptor,      CmArmMemoryRangeDescriptorInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjEtInfo,                     CmArmEtInfo),
-  CM_PARSER_ADD_OBJECT (EArmObjPsdInfo,                    CmArmPsdInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
