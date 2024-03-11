@@ -165,21 +165,20 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///< 19 - SMMU Interrupt Array
   TokenFixerNotImplemented,         ///< 20 - Processor Hierarchy Info
   TokenFixerNotImplemented,         ///< 21 - Cache Info
-  NULL,                             ///< 22 - Device Handle Pci
-  NULL,                             ///< 23 - Generic Initiator Affinity
-  NULL,                             ///< 24 - CMN-600 Info
-  NULL,                             ///< 25 - Lpi Info
-  NULL,                             ///< 26 - Reserved Memory Range Node
-  NULL,                             ///< 27 - Memory Range Descriptor
-  NULL,                             ///< 28 - Continuous Performance Control Info
-  NULL,                             ///< 29 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 22 - Generic Initiator Affinity
+  NULL,                             ///< 23 - CMN-600 Info
+  NULL,                             ///< 24 - Lpi Info
+  NULL,                             ///< 25 - Reserved Memory Range Node
+  NULL,                             ///< 26 - Memory Range Descriptor
+  NULL,                             ///< 27 - Continuous Performance Control Info
+  NULL,                             ///< 28 - Pcc Subspace Type 0 Info
+  NULL,                             ///< 29 - Pcc Subspace Type 2 Info
   NULL,                             ///< 30 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 31 - Pcc Subspace Type 2 Info
-  NULL,                             ///< 32 - Pcc Subspace Type 3 Info
-  NULL,                             ///< 33 - Pcc Subspace Type 4 Info
-  NULL,                             ///< 34 - Pcc Subspace Type 5 Info
-  NULL,                             ///< 35 - Embedded Trace Extension/Module Info
-  NULL                              ///< 36 - P-State Dependency (PSD) Info
+  NULL,                             ///< 31 - Pcc Subspace Type 3 Info
+  NULL,                             ///< 32 - Pcc Subspace Type 4 Info
+  NULL,                             ///< 33 - Pcc Subspace Type 5 Info
+  NULL,                             ///< 34 - Embedded Trace Extension/Module Info
+  NULL                              ///< 35 - P-State Dependency (PSD) Info
 };
 
 /** CmObj token fixer.
