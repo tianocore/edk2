@@ -93,6 +93,7 @@ typedef struct {
   SMI_ENTRY                       *SmiEntry;
   VOID                            *Context;    // for profile
   UINTN                           ContextSize; // for profile
+  BOOLEAN                         ToRemove;    // To remove this SMI_HANDLER later
 } SMI_HANDLER;
 
 //
