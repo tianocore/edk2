@@ -24,6 +24,7 @@
   VERSION_STRING                 = 1.0
   PI_SPECIFICATION_VERSION       = 0x0001000A
   LIBRARY_CLASS                  = BaseCryptLib|DXE_SMM_DRIVER SMM_CORE MM_STANDALONE
+  DEFINE BASE_CRYPT_PATH         = ../BaseCryptLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -36,9 +37,13 @@
   Hash/CryptMd5.c
   Hash/CryptSha1.c
   Hash/CryptSha256.c
-  Hash/CryptSm3Null.c
   Hash/CryptSha512.c
-  Hash/CryptParallelHashNull.c
+  $(BASE_CRYPT_PATH)/Hash/CryptCShake256.c
+  $(BASE_CRYPT_PATH)/Hash/CryptDispatchApMm.c
+  $(BASE_CRYPT_PATH)/Hash/CryptParallelHash.c
+  $(BASE_CRYPT_PATH)/Hash/CryptSha3.c
+  $(BASE_CRYPT_PATH)/Hash/CryptSm3.c
+  $(BASE_CRYPT_PATH)/Hash/CryptXkcp.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c

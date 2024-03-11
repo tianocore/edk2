@@ -18,6 +18,7 @@
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = BaseCryptLib|DXE_DRIVER DXE_CORE UEFI_APPLICATION UEFI_DRIVER
+  DEFINE BASE_CRYPT_PATH         = ../BaseCryptLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -31,7 +32,7 @@
   Hash/CryptSha1.c
   Hash/CryptSha256.c
   Hash/CryptSha512.c
-  Hash/CryptSm3Null.c
+  $(BASE_CRYPT_PATH)/Hash/CryptSm3.c
   Hash/CryptParallelHashNull.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
