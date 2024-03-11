@@ -657,11 +657,11 @@ typedef struct CmArmProcHierarchyInfo {
   /// Token for the parent CM_ARM_PROC_HIERARCHY_INFO object in the processor
   /// topology. A value of CM_NULL_TOKEN means this node has no parent.
   CM_OBJECT_TOKEN    ParentToken;
-  /// Token of the associated CM_ARM_GICC_INFO object which has the
-  /// corresponding ACPI Processor ID. A value of CM_NULL_TOKEN means this
-  /// node represents a group of associated processors and it does not have an
-  /// associated GIC CPU interface.
-  CM_OBJECT_TOKEN    GicCToken;
+  /// Token of the associated object which has the corresponding ACPI Processor
+  /// ID, e.g. for Arm systems this is a reference to CM_ARM_GICC_INFO object.
+  /// A value of CM_NULL_TOKEN means this node represents a group of associated
+  /// processors and it does not have an associated CPU interface.
+  CM_OBJECT_TOKEN    AcpiIdObjectToken;
   /// Number of resources private to this Node
   UINT32             NoOfPrivateResources;
   /// Token of the array which contains references to the resources private to

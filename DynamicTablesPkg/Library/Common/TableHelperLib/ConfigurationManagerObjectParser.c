@@ -328,7 +328,7 @@ STATIC CONST CM_OBJ_PARSER  CmArmProcHierarchyInfoParser[] = {
   { "Token",                      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "Flags",                      4,                        "0x%x", NULL },
   { "ParentToken",                sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "GicCToken",                  sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "AcpiIdObjectToken",          sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "NoOfPrivateResources",       4,                        "0x%x", NULL },
   { "PrivateResourcesArrayToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "LpiToken",                   sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
