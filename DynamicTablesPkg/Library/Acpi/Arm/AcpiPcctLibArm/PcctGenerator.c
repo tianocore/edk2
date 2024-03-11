@@ -32,8 +32,8 @@ Requirements:
   - EArchCommonObjPccSubspaceType0Info
   - EArchCommonObjPccSubspaceType1Info
   - EArchCommonObjPccSubspaceType2Info
-  - EArmObjPccSubspaceType3Info
-  - EArmObjPccSubspaceType4Info
+  - EArchCommonObjPccSubspaceType3Info
+  - EArchCommonObjPccSubspaceType4Info
   - EArmObjPccSubspaceType5Info
 */
 
@@ -68,18 +68,18 @@ GET_OBJECT_LIST (
     Subspace of Type 3 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPccSubspaceType3Info,
-  CM_ARM_PCC_SUBSPACE_TYPE3_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPccSubspaceType3Info,
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE3_INFO
   );
 
 /** This macro expands to a function that retrieves the PCC
     Subspace of Type 4 Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPccSubspaceType4Info,
-  CM_ARM_PCC_SUBSPACE_TYPE4_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPccSubspaceType4Info,
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE4_INFO
   );
 
 /** This macro expands to a function that retrieves the PCC
@@ -256,11 +256,11 @@ MapPccSubspaceId (
       break;
 
     case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_3_EXTENDED_PCC:
-      CmObjSize = sizeof (CM_ARM_PCC_SUBSPACE_TYPE3_INFO);
+      CmObjSize = sizeof (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE3_INFO);
       break;
 
     case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC:
-      CmObjSize = sizeof (CM_ARM_PCC_SUBSPACE_TYPE4_INFO);
+      CmObjSize = sizeof (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE4_INFO);
       break;
 
     case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_5_HW_REGISTERS_COMMUNICATIONS:
@@ -489,7 +489,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 AddSubspaceStructType34 (
-  IN  CM_ARM_PCC_SUBSPACE_TYPE3_INFO             *PccCmObj,
+  IN  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE3_INFO     *PccCmObj,
   IN  EFI_ACPI_6_4_PCCT_SUBSPACE_3_EXTENDED_PCC  *PccAcpi
   )
 {
@@ -734,7 +734,7 @@ PopulatePcctTable (
 
       case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_3_EXTENDED_PCC:
         Status = AddSubspaceStructType34 (
-                   (CM_ARM_PCC_SUBSPACE_TYPE3_INFO *)CurrentPccSubspace,
+                   (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE3_INFO *)CurrentPccSubspace,
                    (EFI_ACPI_6_4_PCCT_SUBSPACE_3_EXTENDED_PCC *)PccBuffer
                    );
 
@@ -743,7 +743,7 @@ PopulatePcctTable (
 
       case EFI_ACPI_6_4_PCCT_SUBSPACE_TYPE_4_EXTENDED_PCC:
         Status = AddSubspaceStructType34 (
-                   (CM_ARM_PCC_SUBSPACE_TYPE4_INFO *)CurrentPccSubspace,
+                   (CM_ARCH_COMMON_PCC_SUBSPACE_TYPE4_INFO *)CurrentPccSubspace,
                    (EFI_ACPI_6_4_PCCT_SUBSPACE_4_EXTENDED_PCC *)PccBuffer
                    );
 
@@ -830,9 +830,9 @@ BuildPcctTable (
   UINT32                                  PccType1Count;
   CM_ARCH_COMMON_PCC_SUBSPACE_TYPE2_INFO  *PccType2;
   UINT32                                  PccType2Count;
-  CM_ARM_PCC_SUBSPACE_TYPE3_INFO          *PccType3;
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE3_INFO  *PccType3;
   UINT32                                  PccType3Count;
-  CM_ARM_PCC_SUBSPACE_TYPE4_INFO          *PccType4;
+  CM_ARCH_COMMON_PCC_SUBSPACE_TYPE4_INFO  *PccType4;
   UINT32                                  PccType4Count;
   CM_ARM_PCC_SUBSPACE_TYPE5_INFO          *PccType5;
   UINT32                                  PccType5Count;
@@ -898,7 +898,7 @@ BuildPcctTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjPccSubspaceType3Info (
+  Status = GetEArchCommonObjPccSubspaceType3Info (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PccType3,
@@ -909,7 +909,7 @@ BuildPcctTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjPccSubspaceType4Info (
+  Status = GetEArchCommonObjPccSubspaceType4Info (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PccType4,
