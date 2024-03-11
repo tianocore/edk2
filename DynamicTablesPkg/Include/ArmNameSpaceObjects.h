@@ -51,9 +51,8 @@ typedef enum ArmObjectID {
   EArmObjCmn600Info,                                           ///< 20 - CMN-600 Info
   EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
   EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
-  EArmObjPccSubspaceType5Info,                                 ///< 23 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 24 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 25 - P-State Dependency (PSD) Info
+  EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 24 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -708,37 +707,6 @@ typedef struct CmArmRmrDescriptor {
   /// Must be a multiple of the page size of 64K.
   UINT64    Length;
 } CM_ARM_MEMORY_RANGE_DESCRIPTOR;
-
-/** A structure that describes a
-    PCC Subspace of type 5 (HW-Registers).
-
-    ID: EArmObjPccSubspaceType5Info
-*/
-typedef struct CmArmPccSubspaceType5Info {
-  /** Generic Pcc information.
-
-    The Subspace of Type0 contains information that can be re-used
-    in other Subspace types.
-
-    MaximumPeriodicAccessRate doesn't need to be populated for
-    this structure.
-  */
-  PCC_SUBSPACE_GENERIC_INFO           GenericPccInfo;
-
-  /// Version.
-  UINT16                              Version;
-
-  /// Platform Interrupt.
-  CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
-
-  /// Command Complete Check Register.
-  /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO           CmdCompleteCheckReg;
-
-  /// Error Status Register.
-  /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO           ErrorStatusReg;
-} CM_ARM_PCC_SUBSPACE_TYPE5_INFO;
 
 /** An enum describing the Arm Embedded Trace device type.
 */
