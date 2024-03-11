@@ -45,6 +45,7 @@
             "Library/Include/stdint.h",
             "Library/Include/stubs-32.h",
             "Library/Include/inttypes.h",
+            "Library/BaseCryptLibMbedTls/InternalCryptLib.h",
             # These directories contain auto-generated OpenSSL content
             "Library/OpensslLib",
             "Library/IntrinsicLib",
