@@ -166,9 +166,8 @@ CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///< 20 - CMN-600 Info
   NULL,                             ///< 21 - Reserved Memory Range Node
   NULL,                             ///< 22 - Memory Range Descriptor
-  NULL,                             ///< 23 - Pcc Subspace Type 5 Info
-  NULL,                             ///< 24 - Embedded Trace Extension/Module Info
-  NULL                              ///< 25 - P-State Dependency (PSD) Info
+  NULL,                             ///< 23 - Embedded Trace Extension/Module Info
+  NULL                              ///< 24 - P-State Dependency (PSD) Info
 };
 
 /** CmObj token fixer.

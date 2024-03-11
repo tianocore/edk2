@@ -44,6 +44,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPccSubspaceType2Info,           ///< 21 - Pcc Subspace Type 2 Info
   EArchCommonObjPccSubspaceType3Info,           ///< 22 - Pcc Subspace Type 3 Info
   EArchCommonObjPccSubspaceType4Info,           ///< 23 - Pcc Subspace Type 4 Info
+  EArchCommonObjPccSubspaceType5Info,           ///< 24 - Pcc Subspace Type 5 Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -609,6 +610,37 @@ typedef struct CmArchCommonPccSubspaceType3Info {
     ID: EArchCommonObjPccSubspaceType4Info
 */
 typedef CM_ARCH_COMMON_PCC_SUBSPACE_TYPE3_INFO CM_ARCH_COMMON_PCC_SUBSPACE_TYPE4_INFO;
+
+/** A structure that describes a
+    PCC Subspace of type 5 (HW-Registers).
+
+    ID: EArchCommonObjPccSubspaceType5Info
+*/
+typedef struct CmArchCommonPccSubspaceType5Info {
+  /** Generic Pcc information.
+
+    The Subspace of Type0 contains information that can be re-used
+    in other Subspace types.
+
+    MaximumPeriodicAccessRate doesn't need to be populated for
+    this structure.
+  */
+  PCC_SUBSPACE_GENERIC_INFO           GenericPccInfo;
+
+  /// Version.
+  UINT16                              Version;
+
+  /// Platform Interrupt.
+  CM_ARCH_COMMON_GENERIC_INTERRUPT    PlatIrq;
+
+  /// Command Complete Check Register.
+  /// The WriteMask field is not used.
+  PCC_MAILBOX_REGISTER_INFO           CmdCompleteCheckReg;
+
+  /// Error Status Register.
+  /// The WriteMask field is not used.
+  PCC_MAILBOX_REGISTER_INFO           ErrorStatusReg;
+} CM_ARCH_COMMON_PCC_SUBSPACE_TYPE5_INFO;
 
 #pragma pack()
 
