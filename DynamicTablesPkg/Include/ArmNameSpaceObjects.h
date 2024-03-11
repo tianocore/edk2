@@ -48,19 +48,18 @@ typedef enum ArmObjectID {
   EArmObjGicItsIdentifierArray,                                ///< 17 - GIC ITS Identifier Array
   EArmObjIdMappingArray,                                       ///< 18 - ID Mapping Array
   EArmObjSmmuInterruptArray,                                   ///< 19 - SMMU Interrupt Array
-  EArmObjCacheInfo,                                            ///< 20 - Cache Info
-  EArmObjCmn600Info,                                           ///< 21 - CMN-600 Info
-  EArmObjRmr,                                                  ///< 22 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 23 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 24 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 25 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 26 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 27 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 28 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 29 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 30 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 31 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 32 - P-State Dependency (PSD) Info
+  EArmObjCmn600Info,                                           ///< 20 - CMN-600 Info
+  EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
+  EArmObjCpcInfo,                                              ///< 23 - Continuous Performance Control Info
+  EArmObjPccSubspaceType0Info,                                 ///< 24 - Pcc Subspace Type 0 Info
+  EArmObjPccSubspaceType1Info,                                 ///< 25 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType2Info,                                 ///< 26 - Pcc Subspace Type 2 Info
+  EArmObjPccSubspaceType3Info,                                 ///< 27 - Pcc Subspace Type 3 Info
+  EArmObjPccSubspaceType4Info,                                 ///< 28 - Pcc Subspace Type 4 Info
+  EArmObjPccSubspaceType5Info,                                 ///< 29 - Pcc Subspace Type 5 Info
+  EArmObjEtInfo,                                               ///< 30 - Embedded Trace Extension/Module Info
+  EArmObjPsdInfo,                                              ///< 31 - P-State Dependency (PSD) Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -643,36 +642,6 @@ typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
                 See EFI_ACPI_EXTENDED_INTERRUPT_FLAG_xxx in Acpi10.h
 */
 typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
-
-/** A structure that describes the Cache Type Structure (Type 1) in PPTT
-
-    ID: EArmObjCacheInfo
-*/
-typedef struct CmArmCacheInfo {
-  /// A unique token used to identify this object
-  CM_OBJECT_TOKEN    Token;
-  /// Reference token for the next level of cache that is private to the same
-  /// CM_ARCH_COMMON_PROC_HIERARCHY_INFO instance. A value of CM_NULL_TOKEN
-  /// means this entry represents the last cache level appropriate to the
-  ///  processor hierarchy node structures using this entry.
-  CM_OBJECT_TOKEN    NextLevelOfCacheToken;
-  /// Size of the cache in bytes
-  UINT32             Size;
-  /// Number of sets in the cache
-  UINT32             NumberOfSets;
-  /// Integer number of ways. The maximum associativity supported by
-  /// ACPI Cache type structure is limited to MAX_UINT8. However,
-  /// the maximum number of ways supported by the architecture is
-  /// PPTT_ARM_CCIDX_CACHE_ASSOCIATIVITY_MAX. Therfore this field
-  /// is 32-bit wide.
-  UINT32             Associativity;
-  /// Cache attributes (ACPI 6.4 - January 2021, PPTT, Table 5.140)
-  UINT8              Attributes;
-  /// Line size in bytes
-  UINT16             LineSize;
-  /// Unique ID for the cache
-  UINT32             CacheId;
-} CM_ARM_CACHE_INFO;
 
 /** A structure that describes the CMN-600 hardware.
 
