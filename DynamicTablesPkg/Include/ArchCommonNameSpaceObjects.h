@@ -38,6 +38,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjLpiInfo,                        ///< 15 - Lpi Info
   EArchCommonObjProcHierarchyInfo,              ///< 16 - Processor Hierarchy Info
   EArchCommonObjCacheInfo,                      ///< 17 - Cache Info
+  EArchCommonObjCpcInfo,                        ///< 18 - Continuous Performance Control Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -431,6 +432,24 @@ typedef struct CmArchCommonCacheInfo {
   /// Unique ID for the cache
   UINT32             CacheId;
 } CM_ARCH_COMMON_CACHE_INFO;
+
+/** A structure that describes the Cpc information.
+
+  Continuous Performance Control is described in DSDT/SSDT and associated
+  to cpus/clusters in the cpu topology.
+
+  Unsupported Optional registers should be encoded with NULL resource
+  Register {(SystemMemory, 0, 0, 0, 0)}
+
+  For values that support Integer or Buffer, integer will be used
+  if buffer is NULL resource.
+  If resource is not NULL then Integer must be 0
+
+  Cf. ACPI 6.4, s8.4.7.1 _CPC (Continuous Performance Control)
+
+  ID: EArchCommonObjCpcInfo
+*/
+typedef AML_CPC_INFO CM_ARCH_COMMON_CPC_INFO;
 
 #pragma pack()
 
