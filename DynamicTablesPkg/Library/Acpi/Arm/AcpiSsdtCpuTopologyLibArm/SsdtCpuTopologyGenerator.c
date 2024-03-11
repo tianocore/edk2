@@ -89,9 +89,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjCpcInfo,
-  CM_ARM_CPC_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCpcInfo,
+  CM_ARCH_COMMON_CPC_INFO
   );
 
 /**
@@ -400,10 +400,10 @@ CreateAmlCpcNode (
   IN  AML_OBJECT_NODE_HANDLE                              *Node
   )
 {
-  EFI_STATUS       Status;
-  CM_ARM_CPC_INFO  *CpcInfo;
+  EFI_STATUS               Status;
+  CM_ARCH_COMMON_CPC_INFO  *CpcInfo;
 
-  Status = GetEArmObjCpcInfo (
+  Status = GetEArchCommonObjCpcInfo (
              CfgMgrProtocol,
              GicCInfo->CpcToken,
              &CpcInfo,
