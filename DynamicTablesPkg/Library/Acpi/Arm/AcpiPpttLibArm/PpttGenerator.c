@@ -32,7 +32,7 @@
 
   Requirements:
     The following Configuration Manager Object(s) are used by this Generator:
-    - EArmObjProcHierarchyInfo (REQUIRED)
+    - EArchCommonObjProcHierarchyInfo (REQUIRED)
     - EArmObjCacheInfo
     - EArchCommonObjCmRef
     - EArmObjGicCInfo (REQUIRED)
@@ -43,9 +43,9 @@
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjProcHierarchyInfo,
-  CM_ARM_PROC_HIERARCHY_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjProcHierarchyInfo,
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO
   );
 
 /**
@@ -90,7 +90,7 @@ GET_OBJECT_LIST (
 STATIC
 UINT32
 GetProcHierarchyNodeSize (
-  IN  CONST CM_ARM_PROC_HIERARCHY_INFO  *Node
+  IN  CONST CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *Node
   )
 {
   ASSERT (Node != NULL);
@@ -107,7 +107,7 @@ GetProcHierarchyNodeSize (
 GET_SIZE_OF_PPTT_STRUCTS (
   ProcHierarchyNodes,
   GetProcHierarchyNodeSize (NodesToIndex),
-  CM_ARM_PROC_HIERARCHY_INFO
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO
   );
 
 /**
@@ -411,10 +411,10 @@ IsAcpiIdObjectTokenEqual (
   IN        UINTN  Index2
   )
 {
-  PPTT_NODE_INDEXER           *IndexedObject1;
-  PPTT_NODE_INDEXER           *IndexedObject2;
-  CM_ARM_PROC_HIERARCHY_INFO  *ProcNode1;
-  CM_ARM_PROC_HIERARCHY_INFO  *ProcNode2;
+  PPTT_NODE_INDEXER                   *IndexedObject1;
+  PPTT_NODE_INDEXER                   *IndexedObject2;
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcNode1;
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcNode2;
 
   ASSERT (
     (Object1 != NULL) &&
@@ -423,8 +423,8 @@ IsAcpiIdObjectTokenEqual (
 
   IndexedObject1 = (PPTT_NODE_INDEXER *)Object1;
   IndexedObject2 = (PPTT_NODE_INDEXER *)Object2;
-  ProcNode1      = (CM_ARM_PROC_HIERARCHY_INFO *)IndexedObject1->Object;
-  ProcNode2      = (CM_ARM_PROC_HIERARCHY_INFO *)IndexedObject2->Object;
+  ProcNode1      = (CM_ARCH_COMMON_PROC_HIERARCHY_INFO *)IndexedObject1->Object;
+  ProcNode2      = (CM_ARCH_COMMON_PROC_HIERARCHY_INFO *)IndexedObject2->Object;
 
   if (IS_ACPI_PROC_ID_VALID (ProcNode1) &&
       IS_ACPI_PROC_ID_VALID (ProcNode2) &&
@@ -482,8 +482,8 @@ AddProcHierarchyNodes (
   UINT32            GicCInfoCount;
   UINT32            UniqueGicCRefCount;
 
-  PPTT_NODE_INDEXER           *PpttNodeFound;
-  CM_ARM_PROC_HIERARCHY_INFO  *ProcInfoNode;
+  PPTT_NODE_INDEXER                   *PpttNodeFound;
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcInfoNode;
 
   PPTT_NODE_INDEXER  *ProcNodeIterator;
   UINT32             NodeCount;
@@ -517,7 +517,7 @@ AddProcHierarchyNodes (
   UniqueGicCRefCount = 0;
 
   while (NodeCount-- != 0) {
-    ProcInfoNode = (CM_ARM_PROC_HIERARCHY_INFO *)ProcNodeIterator->Object;
+    ProcInfoNode = (CM_ARCH_COMMON_PROC_HIERARCHY_INFO *)ProcNodeIterator->Object;
 
     // Check if the private resource count is within the size limit
     // imposed on the Processor Hierarchy node by the specification.
@@ -577,7 +577,7 @@ AddProcHierarchyNodes (
 
       // Test if the reference is to a 'leaf' node
       if (IS_PROC_NODE_LEAF (
-            ((CM_ARM_PROC_HIERARCHY_INFO *)PpttNodeFound->Object)
+            ((CM_ARCH_COMMON_PROC_HIERARCHY_INFO *)PpttNodeFound->Object)
             ))
       {
         Status = EFI_INVALID_PARAMETER;
@@ -1074,8 +1074,8 @@ BuildPpttTable (
   UINT32  ProcHierarchyNodeOffset;
   UINT32  CacheStructOffset;
 
-  CM_ARM_PROC_HIERARCHY_INFO  *ProcHierarchyNodeList;
-  CM_ARM_CACHE_INFO           *CacheStructList;
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcHierarchyNodeList;
+  CM_ARM_CACHE_INFO                   *CacheStructList;
 
   ACPI_PPTT_GENERATOR  *Generator;
 
@@ -1112,7 +1112,7 @@ BuildPpttTable (
 
   // Get the processor hierarchy info and update the processor topology
   // structure count with Processor Hierarchy Nodes (Type 0)
-  Status = GetEArmObjProcHierarchyInfo (
+  Status = GetEArchCommonObjProcHierarchyInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &ProcHierarchyNodeList,
