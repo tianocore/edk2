@@ -337,9 +337,9 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonProcHierarchyInfoParser[] = {
   { "OverrideUid",                4,                        "0x%x", NULL }
 };
 
-/** A parser for EArmObjCacheInfo.
+/** A parser for EArchCommonObjCacheInfo.
 */
-STATIC CONST CM_OBJ_PARSER  CmArmCacheInfoParser[] = {
+STATIC CONST CM_OBJ_PARSER  CmArchCommonCacheInfoParser[] = {
   { "Token",                 sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "NextLevelOfCacheToken", sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "Size",                  4,                        "0x%x", NULL },
@@ -687,6 +687,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjGenericInitiatorAffinityInfo,CmArchCommonGenericInitiatorAffinityInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjLpiInfo,                     CmArchCommonLpiInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjProcHierarchyInfo,           CmArchCommonProcHierarchyInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCacheInfo,                   CmArchCommonCacheInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -713,7 +714,6 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArmObjGicItsIdentifierArray,      CmArmGicItsIdentifierParser),
   CM_PARSER_ADD_OBJECT (EArmObjIdMappingArray,             CmArmIdMappingParser),
   CM_PARSER_ADD_OBJECT (EArmObjSmmuInterruptArray,         CmArchCommonGenericInterruptParser),
-  CM_PARSER_ADD_OBJECT (EArmObjCacheInfo,                  CmArmCacheInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjCmn600Info,                 CmArmCmn600InfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjRmr,                        CmArmRmrInfoParser),
   CM_PARSER_ADD_OBJECT (EArmObjMemoryRangeDescriptor,      CmArmMemoryRangeDescriptorInfoParser),

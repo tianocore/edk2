@@ -33,7 +33,7 @@
   Requirements:
     The following Configuration Manager Object(s) are used by this Generator:
     - EArchCommonObjProcHierarchyInfo (REQUIRED)
-    - EArmObjCacheInfo
+    - EArchCommonObjCacheInfo
     - EArchCommonObjCmRef
     - EArmObjGicCInfo (REQUIRED)
 */
@@ -53,9 +53,9 @@ GET_OBJECT_LIST (
   from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjCacheInfo,
-  CM_ARM_CACHE_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCacheInfo,
+  CM_ARCH_COMMON_CACHE_INFO
   );
 
 /**
@@ -117,7 +117,7 @@ GET_SIZE_OF_PPTT_STRUCTS (
 GET_SIZE_OF_PPTT_STRUCTS (
   CacheTypeStructs,
   sizeof (EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE),
-  CM_ARM_CACHE_INFO
+  CM_ARCH_COMMON_CACHE_INFO
   );
 
 /**
@@ -788,7 +788,7 @@ AddCacheTypeStructures (
   EFI_STATUS                         Status;
   EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE  *CacheStruct;
   PPTT_NODE_INDEXER                  *PpttNodeFound;
-  CM_ARM_CACHE_INFO                  *CacheInfoNode;
+  CM_ARCH_COMMON_CACHE_INFO          *CacheInfoNode;
   PPTT_NODE_INDEXER                  *CacheNodeIterator;
   UINT32                             NodeCount;
   BOOLEAN                            CacheIdUnique;
@@ -814,7 +814,7 @@ AddCacheTypeStructures (
   }
 
   for (NodeIndex = 0; NodeIndex < NodeCount; NodeIndex++) {
-    CacheInfoNode = (CM_ARM_CACHE_INFO *)CacheNodeIterator->Object;
+    CacheInfoNode = (CM_ARCH_COMMON_CACHE_INFO *)CacheNodeIterator->Object;
 
     // Populate the node header
     CacheStruct->Type        = EFI_ACPI_6_4_PPTT_TYPE_CACHE;
@@ -1075,7 +1075,7 @@ BuildPpttTable (
   UINT32  CacheStructOffset;
 
   CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcHierarchyNodeList;
-  CM_ARM_CACHE_INFO                   *CacheStructList;
+  CM_ARCH_COMMON_CACHE_INFO           *CacheStructList;
 
   ACPI_PPTT_GENERATOR  *Generator;
 
@@ -1132,7 +1132,7 @@ BuildPpttTable (
 
   // Get the cache info and update the processor topology structure count with
   // Cache Type Structures (Type 1)
-  Status = GetEArmObjCacheInfo (
+  Status = GetEArchCommonObjCacheInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &CacheStructList,
