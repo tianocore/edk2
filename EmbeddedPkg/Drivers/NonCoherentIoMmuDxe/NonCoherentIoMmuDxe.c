@@ -70,7 +70,7 @@ NonCoherentIoMmuSetAttribute (
   IN UINT64                IoMmuAccess
   )
 {
-  return EFI_UNSUPPORTED;
+  return EFI_SUCCESS;
 }
 
 /**
