@@ -24,11 +24,14 @@
 
 [Sources]
   StandaloneMmIplPei.c
+  StandaloneMmIplPei.h
+  MmFoundationHob.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
@@ -50,6 +53,10 @@
   gEfiSmmSmramMemoryGuid
   gEdkiiEventMmDispatchGuid
   gEdkiiCommunicationBufferGuid
+  gEdkiiMmCoreLocationGuid
+  gEdkiiSmmCpuFeatureInfoHobGuid
+  gSmmBaseHobGuid
+  gMpInformation2HobGuid
 
 [Ppis]
   gPeiSmmControlPpiGuid

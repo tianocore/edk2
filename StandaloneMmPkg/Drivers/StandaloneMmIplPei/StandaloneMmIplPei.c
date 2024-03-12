@@ -1,7 +1,7 @@
 /** @file
   SMM IPL that load the SMM Core into SMRAM at PEI stage
 
-  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -25,6 +25,7 @@
 #include <Protocol/SmmCommunication.h>
 #include <Guid/MmCommBuffer.h>
 #include <Guid/SmramMemoryReserve.h>
+#include <StandaloneMmIplPei.h>
 
 //
 // SMM IPL global variables
@@ -34,6 +35,11 @@ EFI_PHYSICAL_ADDRESS  mSmramCacheBase;
 UINT64                mSmramCacheSize;
 EFI_PHYSICAL_ADDRESS  mMmramRanges = 0;
 UINT64                mMmramRangeCount = 0;
+EFI_PHYSICAL_ADDRESS  mMmCoreImageAddress;
+UINT64                mMmCoreImageSize;
+EFI_PHYSICAL_ADDRESS  mMmCoreEntryPoint;
+EFI_PHYSICAL_ADDRESS  mMmFvBaseAddress;
+UINT64                mMmFvSize;
 
 /**
   Communicates with a registered handler.
@@ -422,13 +428,84 @@ LocateMmFvForMmCore (
     Status = PeiServicesFfsGetVolumeInfo (VolumeHandle, &VolumeInfo);
     if (!EFI_ERROR (Status)) {
       *MmFvBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)VolumeInfo.FvStart;
-      BuildFvHob (*MmFvBaseAddress, VolumeInfo.FvSize);
+      mMmFvBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)VolumeInfo.FvStart;
+      mMmFvSize        = VolumeInfo.FvSize;
     }
 
     return EFI_SUCCESS;
   }
 
   return EFI_NOT_FOUND;
+}
+
+/**
+  Create HOB list for Standalone MM core.
+
+  @param  HobSize              HOB size of fundation and platform HOB list.
+
+  @retval HobList              If fundation and platform HOBs not existed,
+                               it is pointed to PEI HOB List. If existed, 
+                               it is pointed to fundation and platform HOB list.
+
+**/
+VOID *
+CreatMmHobList (
+  OUT UINTN  *HobSize
+)
+{
+  UINTN                         FoundationHobSize;
+  UINTN                         PlatformHobSize;
+  UINTN                         NumberOfPages;
+  UINTN                         TotalHobSize;
+  EFI_PHYSICAL_ADDRESS          FoundationHobEndAddress;
+  EFI_HOB_HANDOFF_INFO_TABLE    *HobList;
+  EFI_STATUS                    Status;
+
+  //
+  // Get foundation HOBs' size.
+  //
+  FoundationHobSize = 0;
+  Status = CreateMmFoundationHobList (NULL, &FoundationHobSize);
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    ASSERT (FoundationHobSize != 0);
+  }
+
+  //
+  // Get platform HOBs' size.
+  //
+  PlatformHobSize = 0;
+  Status     = CreateMmPlatformHob (NULL, &PlatformHobSize);
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    ASSERT (PlatformHobSize != 0);
+  }
+
+  //
+  // If there is no any foundation and platform HOBs, return current PEI HOB list.
+  //
+  *HobSize = FoundationHobSize + PlatformHobSize;
+  if (*HobSize == 0) {
+    HobList = GetHobList ();
+    return HobList;
+  }
+
+  TotalHobSize  = sizeof (EFI_HOB_HANDOFF_INFO_TABLE) + *HobSize + sizeof (EFI_HOB_GENERIC_HEADER);
+  NumberOfPages = EFI_SIZE_TO_PAGES (TotalHobSize);
+  HobList       = AllocatePages (NumberOfPages);
+  if (HobList != NULL){
+    MmIplHobConstructor ((EFI_PHYSICAL_ADDRESS)(UINTN)HobList, EFI_PAGES_TO_SIZE (NumberOfPages));
+    if (FoundationHobSize != 0) {
+      CreateMmFoundationHobList (HobList, &FoundationHobSize);
+    }
+
+    FoundationHobEndAddress = HobList->EfiEndOfHobList;
+
+    if (PlatformHobSize != 0) {
+      Status = CreateMmPlatformHob ((VOID *)(UINTN)FoundationHobEndAddress, &PlatformHobSize);
+    }
+    CreateEndOfList (FoundationHobEndAddress + PlatformHobSize);
+  }
+
+  return HobList;
 }
 
 /**
@@ -454,9 +531,8 @@ ExecuteSmmCoreFromSmram (
   UINTN                         PageCount;
   VOID                          *HobList;
   VOID                          *MmHobList;
+  UINTN                         MmHobSize;
   EFI_PHYSICAL_ADDRESS          SourceFvBaseAddress;
-  UINTN                         BufferSize;
-  UINTN                         NumberOfPages;
 
   Status = PeiServicesGetHobList (&HobList);
   ASSERT_EFI_ERROR (Status);
@@ -527,25 +603,10 @@ ExecuteSmmCoreFromSmram (
       InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
 
       //
-      // Print debug message showing SMM Core entry point address.
+      // Create MM HOB list for Standalone MM Core.
       //
-      DEBUG ((DEBUG_INFO, "SMM IPL calling SMM Core at SMRAM address %p\n", (VOID *)(UINTN)ImageContext.EntryPoint));
-
-      //
-      // Create the HOB list which StandaloneMm Core needed.
-      //
-      // TODO: implement the foundation HOB list and call CreateMmPlatformHob.
-      //
-      BufferSize = 0;
-      Status     = CreateMmPlatformHob (NULL, &BufferSize);
-      if (Status == RETURN_BUFFER_TOO_SMALL) {
-        NumberOfPages = EFI_SIZE_TO_PAGES(BufferSize);
-        MmHobList     = AllocatePages (NumberOfPages);
-
-        BufferSize = EFI_SIZE_TO_PAGES(BufferSize);
-        Status     = CreateMmPlatformHob (MmHobList, &BufferSize);
-      }
-      ASSERT (Status == EFI_SUCCESS);
+      MmHobSize = 0;
+      MmHobList = CreatMmHobList (&MmHobSize);
 
       //
       // Print debug message showing Standalone MM Core entry point address.
@@ -566,6 +627,13 @@ ExecuteSmmCoreFromSmram (
   //
   if (EFI_ERROR (Status)) {
     SmramRange->PhysicalSize += EFI_PAGES_TO_SIZE (PageCount);
+  }
+
+  //
+  // Always free memory allocated buffer for MM IPL Hobs
+  //
+  if (MmHobSize != 0) {
+    FreePool (MmHobList);
   }
 
   //
@@ -755,6 +823,7 @@ StandaloneMmIplPeiEntry (
   UINT64                   MaxSize;
   EFI_SMRAM_DESCRIPTOR     *MmramRanges;
   MM_COMM_BUFFER_DATA      MmCommBufferData;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  MemoryAttribute;  
 
   //
   // Initialize MM communication buffer data
@@ -776,6 +845,17 @@ StandaloneMmIplPeiEntry (
     return EFI_OUT_OF_RESOURCES;
   } 
 
+  //
+  // Build resource Hob for communication buffer
+  //
+  MemoryAttribute = EFI_RESOURCE_ATTRIBUTE_PRESENT |
+                    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                    EFI_RESOURCE_ATTRIBUTE_TESTED |
+                    EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED |
+                    EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE;
+
+  BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, MemoryAttribute, MmCommBufferData.FixedCommBuffer, MmCommBufferData.FixedCommBufferSize);
+
   Status = MmUnblockMemoryRequest (MmCommBufferData.FixedCommBuffer, PcdGet32 (PcdFixedCommBufferPages));
 
   //
@@ -788,6 +868,16 @@ StandaloneMmIplPeiEntry (
     ASSERT (MmCommBufferData.CommunicationInOut != 0);
     return EFI_OUT_OF_RESOURCES;
   } 
+
+  //
+  // Build resource Hob for communication in/out data
+  //
+  MemoryAttribute = EFI_RESOURCE_ATTRIBUTE_PRESENT |
+                    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+                    EFI_RESOURCE_ATTRIBUTE_TESTED |
+                    EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE;
+
+  BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, MemoryAttribute, MmCommBufferData.CommunicationInOut, (EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (sizeof (COMMUNICATION_IN_OUT)))));
 
   Status = MmUnblockMemoryRequest (MmCommBufferData.CommunicationInOut, EFI_SIZE_TO_PAGES (sizeof (COMMUNICATION_IN_OUT)));
 
