@@ -197,6 +197,10 @@ MeasureFspFirmwareBlobWithCfg (
              (UINTN)sizeof (DigestList),
              EDKII_TCG_PRE_HASH_LOG_ONLY
              );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "TpmMeasureAndLogDataWithFlags failed - %r\n", Status));
+    return Status;
+  }
 
   Status = TpmMeasureAndLogData (
              1,
