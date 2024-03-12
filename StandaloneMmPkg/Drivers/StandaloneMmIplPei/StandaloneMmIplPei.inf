@@ -43,7 +43,7 @@
   HobLib
   IntrinsicLib
   MmUnblockMemoryLib
-  MmHobProducerLib
+  MmPlatformHobProducerLib
 
 [Guids]
   gMmCoreDataHobGuid

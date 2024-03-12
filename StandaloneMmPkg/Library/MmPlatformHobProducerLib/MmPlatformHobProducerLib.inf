@@ -10,18 +10,18 @@
 
 [Defines]
   INF_VERSION                    = 0x00010017
-  BASE_NAME                      = MmHobProducerLib
+  BASE_NAME                      = MmPlatformHobProducerLib
   FILE_GUID                      = 98700A68-CB99-4B2A-97DC-F0A0C8755EE7
   MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MmHobProducerLib
+  LIBRARY_CLASS                  = MmPlatformHobProducerLib
 
 #
 #  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
 #
 
 [Sources]
-  MmHobProducerLib.c
+  MmPlatformHobProducerLib.c
 
 [Packages]
   MdePkg/MdePkg.dec

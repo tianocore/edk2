@@ -69,7 +69,7 @@
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
 
 [LibraryClasses.X64.PEIM]
-  MmHobProducerLib|StandaloneMmPkg/Library/MmHobProducerLib/MmHobProducerLib.inf
+  MmPlatformHobProducerLib|StandaloneMmPkg/Library/MmPlatformHobProducerLib/MmPlatformHobProducerLib.inf
 
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf

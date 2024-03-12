@@ -261,7 +261,7 @@ MemoryDescriptorCompare (
 **/
 EFI_STATUS
 EFIAPI
-CreateMmCoreHobList (
+CreateMmPlatformHob (
   IN VOID       *Buffer,
   IN OUT UINTN  *BufferSize
   )

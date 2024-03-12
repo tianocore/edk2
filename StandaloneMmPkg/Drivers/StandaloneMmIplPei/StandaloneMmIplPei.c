@@ -20,7 +20,7 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/HobLib.h>
-#include <Library/MmHobProducerLib.h>
+#include <Library/MmPlatformHobProducerLib.h>
 #include <Library/MmUnblockMemoryLib.h>
 #include <Protocol/SmmCommunication.h>
 #include <Guid/MmCommBuffer.h>
@@ -534,16 +534,16 @@ ExecuteSmmCoreFromSmram (
       //
       // Create the HOB list which StandaloneMm Core needed.
       //
-      // TODO: implement the foundation HOB list and call CreateMmCoreHobList.
+      // TODO: implement the foundation HOB list and call CreateMmPlatformHob.
       //
       BufferSize = 0;
-      Status     = CreateMmCoreHobList (NULL, &BufferSize);
+      Status     = CreateMmPlatformHob (NULL, &BufferSize);
       if (Status == RETURN_BUFFER_TOO_SMALL) {
         NumberOfPages = EFI_SIZE_TO_PAGES(BufferSize);
         MmHobList     = AllocatePages (NumberOfPages);
 
         BufferSize = EFI_SIZE_TO_PAGES(BufferSize);
-        Status     = CreateMmCoreHobList (MmHobList, &BufferSize);
+        Status     = CreateMmPlatformHob (MmHobList, &BufferSize);
       }
       ASSERT (Status == EFI_SUCCESS);
 
