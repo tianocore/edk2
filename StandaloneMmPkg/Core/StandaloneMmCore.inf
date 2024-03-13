@@ -78,7 +78,7 @@
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
   gEdkiiCommunicationBufferGuid
-  gEfiHobMemoryAllocModuleGuid
+  gEfiSmmSmramMemoryGuid
   gEdkiiPiSmmMemoryAttributesTableGuid
 
 [Pcd]
