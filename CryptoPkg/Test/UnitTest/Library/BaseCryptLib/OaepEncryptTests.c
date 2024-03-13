@@ -153,9 +153,42 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  PrivateKey[] = {
   0x86, 0x10, 0x09, 0x88, 0x6C, 0x35, 0x60, 0xF2,
 };
 
+//
+// Public Modulus of RSA Key
+//
+GLOBAL_REMOVE_IF_UNREFERENCED STATIC CONST UINT8  RsaN[] = {
+  0xBB, 0xF8, 0x2F, 0x09, 0x06, 0x82, 0xCE, 0x9C, 0x23, 0x38, 0xAC, 0x2B, 0x9D, 0xA8, 0x71, 0xF7,
+  0x36, 0x8D, 0x07, 0xEE, 0xD4, 0x10, 0x43, 0xA4, 0x40, 0xD6, 0xB6, 0xF0, 0x74, 0x54, 0xF5, 0x1F,
+  0xB8, 0xDF, 0xBA, 0xAF, 0x03, 0x5C, 0x02, 0xAB, 0x61, 0xEA, 0x48, 0xCE, 0xEB, 0x6F, 0xCD, 0x48,
+  0x76, 0xED, 0x52, 0x0D, 0x60, 0xE1, 0xEC, 0x46, 0x19, 0x71, 0x9D, 0x8A, 0x5B, 0x8B, 0x80, 0x7F,
+  0xAF, 0xB8, 0xE0, 0xA3, 0xDF, 0xC7, 0x37, 0x72, 0x3E, 0xE6, 0xB4, 0xB7, 0xD9, 0x3A, 0x25, 0x84,
+  0xEE, 0x6A, 0x64, 0x9D, 0x06, 0x09, 0x53, 0x74, 0x88, 0x34, 0xB2, 0x45, 0x45, 0x98, 0x39, 0x4E,
+  0xE0, 0xAA, 0xB1, 0x2D, 0x7B, 0x61, 0xA5, 0x1F, 0x52, 0x7A, 0x9A, 0x41, 0xF6, 0xC1, 0x68, 0x7F,
+  0xE2, 0x53, 0x72, 0x98, 0xCA, 0x2A, 0x8F, 0x59, 0x46, 0xF8, 0xE5, 0xFD, 0x09, 0x1D, 0xBD, 0xCB
+};
+
+//
+// Public Exponent of RSA Key
+//
+GLOBAL_REMOVE_IF_UNREFERENCED STATIC CONST UINT8  RsaE[] = { 0x11 };
+
+//
+// Private Exponent of RSA Key
+//
+GLOBAL_REMOVE_IF_UNREFERENCED STATIC CONST UINT8  RsaD[] = {
+  0xA5, 0xDA, 0xFC, 0x53, 0x41, 0xFA, 0xF2, 0x89, 0xC4, 0xB9, 0x88, 0xDB, 0x30, 0xC1, 0xCD, 0xF8,
+  0x3F, 0x31, 0x25, 0x1E, 0x06, 0x68, 0xB4, 0x27, 0x84, 0x81, 0x38, 0x01, 0x57, 0x96, 0x41, 0xB2,
+  0x94, 0x10, 0xB3, 0xC7, 0x99, 0x8D, 0x6B, 0xC4, 0x65, 0x74, 0x5E, 0x5C, 0x39, 0x26, 0x69, 0xD6,
+  0x87, 0x0D, 0xA2, 0xC0, 0x82, 0xA9, 0x39, 0xE3, 0x7F, 0xDC, 0xB8, 0x2E, 0xC9, 0x3E, 0xDA, 0xC9,
+  0x7F, 0xF3, 0xAD, 0x59, 0x50, 0xAC, 0xCF, 0xBC, 0x11, 0x1C, 0x76, 0xF1, 0xA9, 0x52, 0x94, 0x44,
+  0xE5, 0x6A, 0xAF, 0x68, 0xC5, 0x6C, 0x09, 0x2C, 0xD3, 0x8D, 0xC3, 0xBE, 0xF5, 0xD2, 0x0A, 0x93,
+  0x99, 0x26, 0xED, 0x4F, 0x74, 0xA1, 0x3E, 0xDD, 0xFB, 0xE1, 0xA1, 0xCE, 0xCC, 0x48, 0x94, 0xAF,
+  0x94, 0x28, 0xC2, 0xB7, 0xB8, 0x88, 0x3F, 0xE4, 0x46, 0x3A, 0x4B, 0xC8, 0x5B, 0x1C, 0xB3, 0xC1
+};
+
 UNIT_TEST_STATUS
 EFIAPI
-TestVerifyOaepEncrypt (
+TestVerifyPkcs1v2Encrypt (
   IN UNIT_TEST_CONTEXT  Context
   )
 {
@@ -296,11 +329,158 @@ TestVerifyOaepEncrypt (
   return UNIT_TEST_PASSED;
 }
 
+UNIT_TEST_STATUS
+EFIAPI
+TestVerifyPkcs1v2Decrypt (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    PlaintextBuffer[4];
+  UINT8    *EncryptedBuffer;
+  UINTN    EncryptedBufferSize;
+  UINT8    *DecryptedBuffer;
+  UINTN    DecryptedBufferSize;
+
+  // Create a file and add content '123' in it
+  PlaintextBuffer[0] = '1';
+  PlaintextBuffer[1] = '2';
+  PlaintextBuffer[2] = '3';
+  PlaintextBuffer[3] = 0;
+
+  Status = Pkcs1v2Encrypt (
+             SelfTestCert,
+             (UINTN)sizeof (SelfTestCert),
+             PlaintextBuffer,
+             (UINTN)sizeof (PlaintextBuffer),
+             NULL,
+             0,
+             &EncryptedBuffer,
+             (UINTN *)&EncryptedBufferSize
+             );
+  UT_ASSERT_TRUE (Status);
+
+  Status = Pkcs1v2Decrypt (
+             PrivateKey,
+             (UINTN)sizeof (PrivateKey),
+             EncryptedBuffer,
+             EncryptedBufferSize,
+             &DecryptedBuffer,
+             (UINTN *)&DecryptedBufferSize
+             );
+  UT_ASSERT_TRUE (Status);
+
+  UT_ASSERT_TRUE ((CompareMem (PlaintextBuffer, DecryptedBuffer, DecryptedBufferSize) == 0));
+
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+TestVerifyRsaOaepEncrypt (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    PlaintextBuffer[4];
+  UINT8    *EncryptedBuffer;
+  UINTN    EncryptedBufferSize;
+  VOID     *RsaContext = NULL;
+
+  // Create a file and add content '123' in it
+  PlaintextBuffer[0] = '1';
+  PlaintextBuffer[1] = '2';
+  PlaintextBuffer[2] = '3';
+  PlaintextBuffer[3] = 0;
+
+  RsaContext = RsaNew ();
+  UT_ASSERT_FALSE (RsaContext == NULL);
+
+  Status = RsaSetKey (RsaContext, RsaKeyN, RsaN, sizeof (RsaN));
+  UT_ASSERT_TRUE (Status);
+
+  Status = RsaSetKey (RsaContext, RsaKeyE, RsaE, sizeof (RsaE));
+  UT_ASSERT_TRUE (Status);
+
+  Status = RsaOaepEncrypt (
+             RsaContext,
+             PlaintextBuffer,
+             sizeof (PlaintextBuffer),
+             NULL,
+             0,
+             &EncryptedBuffer,
+             &EncryptedBufferSize
+             );
+  UT_ASSERT_TRUE (Status);
+
+  return UNIT_TEST_PASSED;
+}
+
+UNIT_TEST_STATUS
+EFIAPI
+TestVerifyRsaOaepDecrypt (
+  IN UNIT_TEST_CONTEXT  Context
+  )
+{
+  BOOLEAN  Status;
+  UINT8    PlaintextBuffer[4];
+  UINT8    *EncryptedBuffer;
+  UINTN    EncryptedBufferSize;
+  UINT8    *DecryptedBuffer;
+  UINTN    DecryptedBufferSize;
+  VOID     *RsaContext = NULL;
+
+  // Create a file and add content '123' in it
+  PlaintextBuffer[0] = '1';
+  PlaintextBuffer[1] = '2';
+  PlaintextBuffer[2] = '3';
+  PlaintextBuffer[3] = 0;
+
+  RsaContext = RsaNew ();
+  UT_ASSERT_FALSE (RsaContext == NULL);
+
+  Status = RsaSetKey (RsaContext, RsaKeyN, RsaN, sizeof (RsaN));
+  UT_ASSERT_TRUE (Status);
+
+  Status = RsaSetKey (RsaContext, RsaKeyE, RsaE, sizeof (RsaE));
+  UT_ASSERT_TRUE (Status);
+
+  Status = RsaOaepEncrypt (
+             RsaContext,
+             PlaintextBuffer,
+             sizeof (PlaintextBuffer),
+             NULL,
+             0,
+             &EncryptedBuffer,
+             &EncryptedBufferSize
+             );
+  UT_ASSERT_TRUE (Status);
+
+  Status = RsaSetKey (RsaContext, RsaKeyD, RsaD, sizeof (RsaD));
+  UT_ASSERT_TRUE (Status);
+
+  Status = RsaOaepDecrypt (
+             RsaContext,
+             EncryptedBuffer,
+             EncryptedBufferSize,
+             &DecryptedBuffer,
+             &DecryptedBufferSize
+             );
+  UT_ASSERT_TRUE (Status);
+
+  UT_ASSERT_TRUE ((CompareMem (PlaintextBuffer, DecryptedBuffer, DecryptedBufferSize) == 0));
+
+  return UNIT_TEST_PASSED;
+}
+
 TEST_DESC  mOaepTest[] = {
   //
   // -----Description--------------------------------------Class----------------------Function-----------------Pre---Post--Context
   //
-  { "TestVerifyOaepEncrypt()", "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt", TestVerifyOaepEncrypt, NULL, NULL, NULL },
+  { "TestVerifyPkcs1v2Encrypt()", "CryptoPkg.BaseCryptLib.Pkcs1v2Encrypt", TestVerifyPkcs1v2Encrypt, NULL, NULL, NULL },
+  { "TestVerifyPkcs1v2Decrypt()", "CryptoPkg.BaseCryptLib.Pkcs1v2Decrypt", TestVerifyPkcs1v2Decrypt, NULL, NULL, NULL },
+  { "TestVerifyRsaOaepEncrypt()", "CryptoPkg.BaseCryptLib.RsaOaepEncrypt", TestVerifyRsaOaepEncrypt, NULL, NULL, NULL },
+  { "TestVerifyRsaOaepDecrypt()", "CryptoPkg.BaseCryptLib.RsaOaepDecrypt", TestVerifyRsaOaepDecrypt, NULL, NULL, NULL },
 };
 
 UINTN  mOaepTestNum = ARRAY_SIZE (mOaepTest);
