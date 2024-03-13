@@ -115,7 +115,7 @@ UINTN         mSplitMemRangeCount = 0;
 //
 // SMI command port.
 //
-UINT32  mSmiCommandPort; /// TODO: get the info from SMM Communicate
+UINT32  mSmiCommandPort = 0xB2; /// TODO: get the info from SMM Communicate
 
 /**
   Disable branch trace store.
@@ -414,21 +414,21 @@ InitProtectedMemRange (
   VOID
   )
 {
-  UINTN                            Index;
-  EFI_MEMORY_DESCRIPTOR            *MemoryMap;
-  UINTN                            MemoryMapSize;
-  UINTN                            DescriptorSize;
-  UINTN                            NumberOfAddedDescriptors;
-  UINTN                            NumberOfProtectRange;
-  UINTN                            NumberOfSpliteRange;
-  UINTN                            TotalSize;
-  EFI_PHYSICAL_ADDRESS             ProtectBaseAddress;
-  EFI_PHYSICAL_ADDRESS             ProtectEndAddress;
-  EFI_PHYSICAL_ADDRESS             Top2MBAlignedAddress;
-  EFI_PHYSICAL_ADDRESS             Base2MBAlignedAddress;
-  UINT64                           High4KBPageSize;
-  UINT64                           Low4KBPageSize;
-  MEMORY_PROTECTION_RANGE          MemProtectionRange;
+  UINTN                    Index;
+  EFI_MEMORY_DESCRIPTOR    *MemoryMap;
+  UINTN                    MemoryMapSize;
+  UINTN                    DescriptorSize;
+  UINTN                    NumberOfAddedDescriptors;
+  UINTN                    NumberOfProtectRange;
+  UINTN                    NumberOfSpliteRange;
+  UINTN                    TotalSize;
+  EFI_PHYSICAL_ADDRESS     ProtectBaseAddress;
+  EFI_PHYSICAL_ADDRESS     ProtectEndAddress;
+  EFI_PHYSICAL_ADDRESS     Top2MBAlignedAddress;
+  EFI_PHYSICAL_ADDRESS     Base2MBAlignedAddress;
+  UINT64                   High4KBPageSize;
+  UINT64                   Low4KBPageSize;
+  MEMORY_PROTECTION_RANGE  MemProtectionRange;
 
   MemoryMap                = NULL;
   MemoryMapSize            = 0;
@@ -437,9 +437,9 @@ InitProtectedMemRange (
   NumberOfSpliteRange      = 0;
 
   //
-  // Get MMIO ranges and add them into protected memory ranges.
+  // Build MMIO MemoryMap and add them into protected memory ranges.
   //
-  SmmGetMmioRanges (&MemoryMap, &MemoryMapSize, &DescriptorSize);
+  BuildMmioMemoryMap (&MemoryMap, &MemoryMapSize, &DescriptorSize);
   ASSERT (MemoryMap != NULL && (MemoryMapSize % DescriptorSize == 0));
 
   NumberOfAddedDescriptors += (MemoryMapSize / DescriptorSize);
@@ -582,23 +582,39 @@ InitProtectedMemRange (
   }
 }
 
+/**
+  This function updates memory attribute according to mProtectionMemRangeCount.
+
+**/
 VOID
-SmmProfileSetMemoryAttributes (
-  UINT64         StartAddress,
-  UINT64         EndAddress
+SmmProfileUpdateMemoryAttributes (
+  VOID
   )
 {
+  BOOLEAN        WriteProtect;
+  BOOLEAN        CetEnabled;
   RETURN_STATUS  Status;
   UINTN          Index;
-  UINTN          PageTable;
   UINT64         Base;
   UINT64         Length;
+  UINT64         Limit;
   UINT64         PreviousAddress;
   UINT64         MemoryAttr;
 
-  PreviousAddress = StartAddress;
+  DEBUG ((DEBUG_INFO, "SmmProfileUpdateMemoryAttributes Start...\n"));
 
-  PageTable = AsmReadCr3 ();
+  WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
+
+  if (sizeof (UINTN) == sizeof (UINT32)) {
+    Limit = BASE_4GB;
+  } else {
+    Limit = (IsRestrictedMemoryAccess ()) ? LShiftU64 (1, mPhysicalAddressBits) : BASE_4GB;
+  }
+
+  //
+  // [0, 4k] may be non-present.
+  //
+  PreviousAddress = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
 
   for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
     MemoryAttr = 0;
@@ -613,7 +629,7 @@ SmmProfileSetMemoryAttributes (
     Base   = mProtectionMemRange[Index].Range.Base;
     Length = mProtectionMemRange[Index].Range.Top - Base;
     if (MemoryAttr != 0) {
-      Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttr, TRUE, NULL);
+      Status = SmmSetMemoryAttributes (Base, Length, MemoryAttr);
       ASSERT_RETURN_ERROR (Status);
     }
 
@@ -622,7 +638,7 @@ SmmProfileSetMemoryAttributes (
       // Mark the ranges not in mProtectionMemRange as non-present.
       //
       MemoryAttr = EFI_MEMORY_RP;
-      Status         = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, MemoryAttr, TRUE, NULL);
+      Status     = SmmSetMemoryAttributes (PreviousAddress, Base - PreviousAddress, MemoryAttr);
       ASSERT_RETURN_ERROR (Status);
     }
 
@@ -633,52 +649,9 @@ SmmProfileSetMemoryAttributes (
   // Set the last remaining range
   //
   MemoryAttr = EFI_MEMORY_RP;
-  if (PreviousAddress < EndAddress) {
-    Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, EndAddress - PreviousAddress, MemoryAttr, TRUE, NULL);
+  if (PreviousAddress < Limit) {
+    Status = SmmSetMemoryAttributes (PreviousAddress, Limit - PreviousAddress, MemoryAttr);
     ASSERT_RETURN_ERROR (Status);
-  }
-
-  //
-  // Flush TLB
-  //
-  CpuFlushTlb ();
-}
-
-/**
-  Update page table according to protected memory ranges and the 4KB-page mapped memory ranges.
-
-**/
-VOID
-InitPaging (
-  VOID
-  )
-{
-  BOOLEAN                WriteProtect;
-  BOOLEAN                CetEnabled;;
-  UINT64                 StartAddress;
-  UINT64                 EndAddress;
-
-  DEBUG ((DEBUG_INFO, "InitPaging Start...\n"));
-
-  PERF_FUNCTION_BEGIN ();
-
-  WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
-
-  //
-  // [0, 4k] may be non-present.
-  //
-  StartAddress = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
-
-  if (sizeof (UINTN) == sizeof (UINT32)) {
-    EndAddress = BASE_4GB;
-  } else {
-    EndAddress = (IsRestrictedMemoryAccess ()) ? LShiftU64 (1, mPhysicalAddressBits) : BASE_4GB;
-  }
-
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-    SmmProfileSetMemoryAttributes (StartAddress, EndAddress);
-  } else {
-    SetUefiMemMapAttributes (StartAddress, EndAddress);
   }
 
   //
@@ -688,9 +661,69 @@ InitPaging (
 
   WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
-  PERF_FUNCTION_END ();
+  DEBUG ((DEBUG_INFO, "SmmProfileUpdateMemoryAttributes Done.\n"));
+}
 
-  DEBUG ((DEBUG_INFO, "InitPaging Done.\n"));
+/*
+  Build SmmProfileBase and MMIO MemoryMap
+
+  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
+  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
+  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+
+*/
+VOID
+SmmProfileBuildNonMmramMemoryMap (
+  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
+  OUT UINTN                  *MemoryMapSize,
+  OUT UINTN                  *DescriptorSize
+  )
+{
+  EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap;
+  UINTN                  MmioMemoryMapSize;
+  UINTN                  Count;
+  EFI_PHYSICAL_ADDRESS   SmmProfileBase;
+  UINTN                  SmmProfileSize;
+
+  ASSERT (MemoryMap != NULL && MemoryMapSize != NULL && DescriptorSize != NULL);
+
+  MmioMemoryMap     = NULL;
+  MmioMemoryMapSize = 0;
+  *MemoryMap        = NULL;
+  *MemoryMapSize    = 0;
+  *DescriptorSize   = 0;
+
+  //
+  // Build MmioMemoryMap
+  //
+  BuildMmioMemoryMap (&MmioMemoryMap, &MmioMemoryMapSize, DescriptorSize);
+  ASSERT (MmioMemoryMap != NULL && (MmioMemoryMapSize % *DescriptorSize == 0) && *DescriptorSize == sizeof (EFI_MEMORY_DESCRIPTOR));
+
+  Count = MmioMemoryMapSize / *DescriptorSize + 1;
+
+  *MemoryMapSize =  *DescriptorSize * Count;
+
+  *MemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocateCopyPool (*MemoryMapSize, MmioMemoryMap);
+  ASSERT (*MemoryMap != NULL);
+
+  //
+  // Free the MemoryMap
+  //
+  if (MmioMemoryMap != NULL) {
+    FreePool (MmioMemoryMap);
+  }
+
+  //
+  // For SMM profile base
+  //
+  //
+  // TODO: Get SmmProfileBase & SmmProfileSize from memory allocation hob
+  //
+  SmmProfileBase                      = 0;
+  SmmProfileSize                      = 0;
+  (*MemoryMap)[Count-1].PhysicalStart = SmmProfileBase;
+  (*MemoryMap)[Count-1].NumberOfPages = EFI_SIZE_TO_PAGES (SmmProfileSize);
+  (*MemoryMap)[Count-1].Attribute     = EFI_MEMORY_XP;
 }
 
 /**
@@ -743,11 +776,9 @@ InitSmmProfileCallBack (
                         SMM_PROFILE_NAME,
                         &gEfiCallerIdGuid,
                         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                        //mSmmCpuFeatureInfoHob->SmmProfileSize,
-                        0, /// TODO, get the info from HOB
+                        0, /// TODO, get the info from HOB ---> Move to a Memory Allocation HOB.
                         &mSmmProfileBase
                         );
-
 
   return EFI_SUCCESS;
 }
@@ -761,11 +792,11 @@ InitSmmProfileInternal (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  VOID                  *Registration;
-  UINTN                 Index;
-  UINTN                 MsrDsAreaSizePerCpu;
-  UINTN                 SmmProfileSize;
+  EFI_STATUS  Status;
+  VOID        *Registration;
+  UINTN       Index;
+  UINTN       MsrDsAreaSizePerCpu;
+  UINTN       SmmProfileSize;
 
   mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mMaxNumberOfCpus);
   ASSERT (mPFEntryCount != NULL);
@@ -778,12 +809,12 @@ InitSmmProfileInternal (
                                                            );
   ASSERT (mLastPFEntryPointer != NULL);
 
+  mSmmProfileSize = FixedPcdGet32 (PcdCpuSmmProfileSize);
+  ASSERT ((mSmmProfileSize & 0xFFF) == 0);
+
   //
-  // Get Smm Profile Base & Size from SMM CPU Feature Info HOB
+  // TODO: Get Smm Profile Base from Memory Allocation HOB
   //
-  // mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)mSmmCpuFeatureInfoHob->SmmProfileBase;
-  // SmmProfileSize  = (UINTN)mSmmCpuFeatureInfoHob->SmmProfileSize;
-  // TODO: Get the SmmProfileBase from HOBs
   mSmmProfileBase = 0;
   SmmProfileSize  = 0;
   DEBUG ((DEBUG_ERROR, "SmmProfileBase = 0x%016x.\n", (UINTN)mSmmProfileBase));

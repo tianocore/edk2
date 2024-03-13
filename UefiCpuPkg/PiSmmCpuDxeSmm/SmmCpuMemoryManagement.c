@@ -1002,18 +1002,18 @@ SetMemMapAttributes (
   EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable
   )
 {
-  EFI_MEMORY_DESCRIPTOR                 *MemoryMap;
-  EFI_MEMORY_DESCRIPTOR                 *MemoryMapStart;
-  UINTN                                 MemoryMapEntryCount;
-  UINTN                                 DescriptorSize;
-  UINTN                                 Index;
-  UINTN                                 PageTable;
-  EFI_STATUS                            Status;
-  IA32_MAP_ENTRY                        *Map;
-  UINTN                                 Count;
-  UINT64                                MemoryAttribute;
-  BOOLEAN                               WriteProtect;
-  BOOLEAN                               CetEnabled;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMapStart;
+  UINTN                  MemoryMapEntryCount;
+  UINTN                  DescriptorSize;
+  UINTN                  Index;
+  UINTN                  PageTable;
+  EFI_STATUS             Status;
+  IA32_MAP_ENTRY         *Map;
+  UINTN                  Count;
+  UINT64                 MemoryAttribute;
+  BOOLEAN                WriteProtect;
+  BOOLEAN                CetEnabled;
 
   ASSERT (MemoryAttributesTable != NULL);
 
@@ -1206,6 +1206,75 @@ EdkiiSmmClearMemoryAttributes (
   return SmmClearMemoryAttributes (BaseAddress, Length, Attributes);
 }
 
+/*
+  Build MemoryMap to cover [0, PhysicalAddressBits length] by excluding all Smram range
+
+  @param[in]      PhysicalAddressBits  The bits of physical address to map.
+  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
+  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
+  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+
+*/
+VOID
+BuildNonMmramMemoryMap (
+  IN  UINT8                  PhysicalAddressBits,
+  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
+  OUT UINTN                  *MemoryMapSize,
+  OUT UINTN                  *DescriptorSize
+  )
+{
+  UINT64  MaxLength;
+  UINTN   Count;
+  UINTN   Index;
+  UINT64  PreviousAddress;
+  UINT64  Base;
+  UINT64  Length;
+
+  ASSERT (MemoryMap != NULL && MemoryMapSize != NULL && DescriptorSize != NULL);
+
+  *MemoryMap      = NULL;
+  *MemoryMapSize  = 0;
+  *DescriptorSize = 0;
+
+  MaxLength = LShiftU64 (1, PhysicalAddressBits);
+
+  //
+  // Build MemoryMap to cover [0, PhysicalAddressBits] by excluding all Smram range
+  //
+  Count = mSmmCpuSmramRangeCount + 1;
+
+  *DescriptorSize = sizeof (EFI_MEMORY_DESCRIPTOR);
+  *MemoryMapSize  =  *DescriptorSize * Count;
+
+  *MemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocateZeroPool (*MemoryMapSize);
+  ASSERT (*MemoryMap != NULL);
+
+  PreviousAddress = 0;
+  for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+    Base   = mSmmCpuSmramRanges[Index].CpuStart;
+    Length = mSmmCpuSmramRanges[Index].PhysicalSize;
+
+    ASSERT (MaxLength > Base +  Length);
+
+    if (Base > PreviousAddress) {
+      (*MemoryMap)[Index].PhysicalStart = PreviousAddress;
+      (*MemoryMap)[Index].NumberOfPages = EFI_SIZE_TO_PAGES (Base - PreviousAddress);
+      (*MemoryMap)[Index].Attribute     = EFI_MEMORY_XP;
+    }
+
+    PreviousAddress = Base + Length;
+  }
+
+  //
+  // Set the last remaining range
+  //
+  if (PreviousAddress < MaxLength) {
+    (*MemoryMap)[Index].PhysicalStart = PreviousAddress;
+    (*MemoryMap)[Index].NumberOfPages = EFI_SIZE_TO_PAGES (MaxLength - PreviousAddress);
+    (*MemoryMap)[Index].Attribute     = EFI_MEMORY_XP;
+  }
+}
+
 /**
   Create page table based on input PagingMode, LinearAddress and Length.
 
@@ -1213,30 +1282,25 @@ EdkiiSmmClearMemoryAttributes (
   @param[in]       PagingMode          The paging mode.
   @param[in]       LinearAddress       The start of the linear address range.
   @param[in]       Length              The length of the linear address range.
+  @param[in]       MapAttribute        The MapAttribute of the linear address range
 
 **/
 VOID
 GenPageTable (
-  IN OUT UINTN        *PageTable,
-  IN     PAGING_MODE  PagingMode,
-  IN     UINT64       LinearAddress,
-  IN     UINT64       Length
+  IN OUT UINTN               *PageTable,
+  IN     PAGING_MODE         PagingMode,
+  IN     UINT64              LinearAddress,
+  IN     UINT64              Length,
+  IN     IA32_MAP_ATTRIBUTE  MapAttribute
   )
 {
   RETURN_STATUS       Status;
   UINTN               PageTableBufferSize;
   VOID                *PageTableBuffer;
-  IA32_MAP_ATTRIBUTE  MapAttribute;
   IA32_MAP_ATTRIBUTE  MapMask;
 
-  MapMask.Uint64                   = MAX_UINT64;
-  MapAttribute.Uint64              = mAddressEncMask|LinearAddress;
-  MapAttribute.Bits.Present        = 1;
-  MapAttribute.Bits.ReadWrite      = 1;
-  MapAttribute.Bits.UserSupervisor = 1;
-  MapAttribute.Bits.Accessed       = 1;
-  MapAttribute.Bits.Dirty          = 1;
-  PageTableBufferSize              = 0;
+  MapMask.Uint64      = MAX_UINT64;
+  PageTableBufferSize = 0;
 
   Status = PageTableMap (
              PageTable,
@@ -1250,7 +1314,6 @@ GenPageTable (
              NULL
              );
   if (Status == RETURN_BUFFER_TOO_SMALL) {
-    DEBUG ((DEBUG_INFO, "GenSMMPageTable: 0x%x bytes needed for initial SMM page table\n", PageTableBufferSize));
     PageTableBuffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (PageTableBufferSize));
     ASSERT (PageTableBuffer != NULL);
     Status = PageTableMap (
@@ -1285,16 +1348,25 @@ GenSmmPageTable (
   IN UINT8        PhysicalAddressBits
   )
 {
-  UINTN          PageTable;
-  RETURN_STATUS  Status;
-  UINTN          GuardPage;
-  UINTN          Index;
-  UINT64         Length;
-  PAGING_MODE    SmramPagingMode;
+  UINTN                  PageTable;
+  UINTN                  Index;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
+  UINTN                  MemoryMapSize;
+  UINTN                  DescriptorSize;
+  IA32_MAP_ATTRIBUTE     MapAttribute;
+  PAGING_MODE            SmramPagingMode;
+  RETURN_STATUS          Status;
+  UINTN                  GuardPage;
 
-  PageTable = 0;
-  Length    = LShiftU64 (1, PhysicalAddressBits);
-  ASSERT (Length > mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize);
+  PageTable                        = 0;
+  MemoryMap                        = NULL;
+  MemoryMapSize                    = 0;
+  DescriptorSize                   = 0;
+  MapAttribute.Bits.Present        = 1;
+  MapAttribute.Bits.ReadWrite      = 1;
+  MapAttribute.Bits.UserSupervisor = 1;
+  MapAttribute.Bits.Accessed       = 1;
+  MapAttribute.Bits.Dirty          = 1;
 
   if (sizeof (UINTN) == sizeof (UINT64)) {
     SmramPagingMode = m5LevelPagingNeeded ? Paging5Level4KB : Paging4Level4KB;
@@ -1302,20 +1374,63 @@ GenSmmPageTable (
     SmramPagingMode = PagingPae4KB;
   }
 
-  ASSERT (mCpuHotPlugData.SmrrBase % SIZE_4KB == 0);
-  ASSERT (mCpuHotPlugData.SmrrSize % SIZE_4KB == 0);
-  GenPageTable (&PageTable, PagingMode, 0, mCpuHotPlugData.SmrrBase);
+  //
+  // 1. Create NonMmram MemoryMap within the range of PhysicalAddressBits
+  //
+  CreateNonMmramMemMap (PhysicalAddressBits, &MemoryMap, &MemoryMapSize, &DescriptorSize);
+  ASSERT (MemoryMap != NULL && MemoryMapSize != 0 && DescriptorSize != 0);
 
   //
+  // 2. Gen NonMmram MemoryMap PageTable
+  //
+  for (Index = 0; Index < MemoryMapSize / DescriptorSize; Index++) {
+    ASSERT (MemoryMap[Index].PhysicalStart % SIZE_4KB == 0);
+    ASSERT (MemoryMap[Index].NumberOfPages % EFI_PAGE_SIZE == 0);
+
+    //
+    // Update the MapAttribute
+    //
+    MapAttribute.Uint64 = mAddressEncMask|MemoryMap[Index].PhysicalStart;
+
+    if ((MemoryMap[Index].Attribute & EFI_MEMORY_RO) != 0) {
+      MapAttribute.Bits.ReadWrite = 0;
+    }
+
+    if ((MemoryMap[Index].Attribute & EFI_MEMORY_XP) != 0) {
+      if (mXdSupported) {
+        MapAttribute.Bits.Nx = 1;
+      }
+    }
+
+    GenPageTable (&PageTable, PagingMode, MemoryMap[Index].PhysicalStart, EFI_PAGES_TO_SIZE ((UINTN)MemoryMap[Index].NumberOfPages), MapAttribute);
+  }
+
+  //
+  // Free the MemoryMap after usage
+  //
+  if (MemoryMap != NULL) {
+    FreePool (MemoryMap);
+  }
+
+  //
+  // 3. Gen MMRAM Range PageTable
   // Map smram range in 4K page granularity to avoid subsequent page split when smm ready to lock.
   // If BSP are splitting the 1G/2M paging entries to 512 2M/4K paging entries, and all APs are
   // still running in SMI at the same time, which might access the affected linear-address range
   // between the time of modification and the time of invalidation access. That will be a potential
   // problem leading exception happen.
   //
-  GenPageTable (&PageTable, SmramPagingMode, mCpuHotPlugData.SmrrBase, mCpuHotPlugData.SmrrSize);
+  for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+    ASSERT (mSmmCpuSmramRanges[Index].CpuStart % SIZE_4KB == 0);
+    ASSERT (mSmmCpuSmramRanges[Index].PhysicalSize % EFI_PAGE_SIZE == 0);
 
-  GenPageTable (&PageTable, PagingMode, mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize, Length - mCpuHotPlugData.SmrrBase - mCpuHotPlugData.SmrrSize);
+    //
+    // Update the MapAttribute
+    //
+    MapAttribute.Uint64 = mAddressEncMask|mSmmCpuSmramRanges[Index].CpuStart;
+
+    GenPageTable (&PageTable, SmramPagingMode, mSmmCpuSmramRanges[Index].CpuStart, mSmmCpuSmramRanges[Index].PhysicalSize, MapAttribute);
+  }
 
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     //

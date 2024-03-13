@@ -37,13 +37,6 @@ PerformRemainingTasks (
     }
 
     //
-    // Start SMM Profile feature
-    //
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-      SmmProfileStart ();
-    }
-
-    //
     // Mark critical region to be read-only in page table
     //
     SetMemMapAttributes (MemoryAttributesTable);
@@ -76,26 +69,13 @@ PerformRemainingTasks (
   Perform the remaining tasks for SMM Initialization.
 
   @param[in] CpuIndex        The index of the CPU.
-  @param[in] IsMonarch       TRUE if the CpuIndex is the index of the CPU that
-                             was elected as monarch during SMM initialization.
+
 **/
 VOID
 PerformRemainingTasksForSmiInit (
-  IN UINTN    CpuIndex,
-  IN BOOLEAN  IsMonarch
+  IN UINTN  CpuIndex
   )
 {
-  if (IsMonarch) {
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-      //
-      // Initialize protected memory range for patching page table later.
-      //
-      InitProtectedMemRange ();
-    }
-
-    InitPaging ();
-  }
-
   //
   // Acquire Config SMM Code Access Check spin lock.
   // It will be released when executing ConfigSmmCodeAccessCheckOnCurrentProcessor().
@@ -148,6 +128,18 @@ PiCpuStandaloneMmEntry (
   Status =  PiSmmCpuEntryCommon ();
 
   ASSERT_EFI_ERROR (Status);
+
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    //
+    // Initialize protected memory range for patching page table later.
+    //
+    InitProtectedMemRange ();
+
+    //
+    // Start SMM Profile feature
+    //
+    SmmProfileStart ();
+  }
 
   //
   // Install the SMM Configuration Protocol onto a new handle on the handle database.

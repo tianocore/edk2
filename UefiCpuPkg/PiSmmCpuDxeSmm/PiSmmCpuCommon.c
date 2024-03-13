@@ -375,7 +375,7 @@ SmmInitHandler (
         //
         // Perform the remaining tasks for SMM Initialization
         //
-        PerformRemainingTasksForSmiInit (Index, IsBsp);
+        PerformRemainingTasksForSmiInit (Index);
       } else if (IsBsp) {
         //
         // BSP rebase is already done above.
@@ -943,6 +943,26 @@ PiSmmCpuEntryCommon (
   } else {
     mCetSupported = FALSE;
     PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+  }
+
+  RegEax = 0;
+  RegEdx = 0;
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+  if (RegEax <= CPUID_EXTENDED_FUNCTION) {
+    //
+    // Extended CPUID functions are not supported on this processor.
+    //
+    mXdSupported = FALSE;
+    PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
+  }
+
+  AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
+  if ((RegEdx & CPUID1_EDX_XD_SUPPORT) == 0) {
+    //
+    // Execute Disable Bit feature is not supported on this processor.
+    //
+    mXdSupported = FALSE;
+    PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
   }
 
   //

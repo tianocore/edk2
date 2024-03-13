@@ -57,12 +57,16 @@ PerformRemainingTasks (
     }
 
     //
-    // Create a mix of 2MB and 4KB page table. Update some memory ranges absent and execute-disable.
+    // Update Page Table
     //
-    InitPaging ();
+    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+      SmmProfileUpdateMemoryAttributes ();
+    } else {
+      UpdateUefiMemMapAttributes ();
+    }
 
     //
-    // Mark critical region to be read-only in page table
+    // Set critical region attribute in page table according to the MemoryAttributesTable
     //
     SetMemMapAttributes (MemoryAttributesTable);
 
@@ -99,13 +103,11 @@ PerformRemainingTasks (
   Perform the remaining tasks for SMM Initialization.
 
   @param[in] CpuIndex        The index of the CPU.
-  @param[in] IsMonarch       TRUE if the CpuIndex is the index of the CPU that
-                             was elected as monarch during SMM initialization.
+
 **/
 VOID
 PerformRemainingTasksForSmiInit (
-  IN UINTN    CpuIndex,
-  IN BOOLEAN  IsMonarch
+  IN UINTN  CpuIndex
   )
 {
   return;

@@ -269,16 +269,19 @@ GetUefiMemoryMap (
 }
 
 /**
-  This function sets UEFI memory attribute according to UEFI memory map.
+  This function updates UEFI memory attribute according to UEFI memory map.
+
 **/
 VOID
-SetUefiMemMapAttributes (
-  UINT64         StartAddress,
-  UINT64         EndAddress
+UpdateUefiMemMapAttributes (
+  VOID
   )
 {
+  BOOLEAN                WriteProtect;
+  BOOLEAN                CetEnabled;
   EFI_STATUS             Status;
   UINTN                  Index;
+  UINT64                 Limit;
   UINT64                 PreviousAddress;
   UINT64                 Base;
   UINT64                 MemoryAttr;
@@ -286,7 +289,20 @@ SetUefiMemMapAttributes (
   UINTN                  MemoryMapEntryCount;
   EFI_MEMORY_DESCRIPTOR  *Entry;
 
-  PreviousAddress = StartAddress;
+  DEBUG ((DEBUG_INFO, "UpdateUefiMemMapAttributes Start...\n"));
+
+  WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
+
+  if (sizeof (UINTN) == sizeof (UINT32)) {
+    Limit = BASE_4GB;
+  } else {
+    Limit = (IsRestrictedMemoryAccess ()) ? LShiftU64 (1, mPhysicalAddressBits) : BASE_4GB;
+  }
+
+  //
+  // [0, 4k] may be non-present.
+  //
+  PreviousAddress = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
 
   MemoryAttr = EFI_MEMORY_XP;
   for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
@@ -302,8 +318,8 @@ SetUefiMemMapAttributes (
     PreviousAddress = mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize;
   }
 
-  if (PreviousAddress < EndAddress) {
-    Status = SmmSetMemoryAttributes (PreviousAddress, EndAddress - PreviousAddress, MemoryAttr);
+  if (PreviousAddress < Limit) {
+    Status = SmmSetMemoryAttributes (PreviousAddress, Limit - PreviousAddress, MemoryAttr);
     ASSERT_RETURN_ERROR (Status);
   }
 
@@ -389,8 +405,16 @@ SetUefiMemMapAttributes (
     //
     // Do not free mUefiMemoryAttributesTable, it will be checked in IsSmmCommBufferForbiddenAddress().
     //
-
   }
+
+  //
+  // Set execute-disable flag
+  //
+  mXdEnabled = TRUE;
+
+  WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
+
+  DEBUG ((DEBUG_INFO, "UpdateUefiMemMapAttributes Done.\n"));
 }
 
 /**
@@ -457,8 +481,18 @@ IsSmmCommBufferForbiddenAddress (
   return FALSE;
 }
 
+/*
+  Build MMIO Memory Map.
+
+  The caller is responsible for freeing MemoryMap via FreePool().
+
+  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
+  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
+  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+
+*/
 VOID
-SmmGetMmioRanges (
+BuildMmioMemoryMap (
   OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
   OUT UINTN                  *MemoryMapSize,
   OUT UINTN                  *DescriptorSize
@@ -513,4 +547,26 @@ SmmGetMmioRanges (
   }
 
   return;
+}
+
+/*
+  Create the Non-Mmram Memory Map within the Range of [0, PhysicalAddressBits Length].
+
+  The caller is responsible for freeing MemoryMap via FreePool().
+
+  @param[in]      PhysicalAddressBits  The bits of physical address to map.
+  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
+  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
+  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+
+*/
+VOID
+CreateNonMmramMemMap (
+  IN  UINT8                  PhysicalAddressBits,
+  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
+  OUT UINTN                  *MemoryMapSize,
+  OUT UINTN                  *DescriptorSize
+  )
+{
+  BuildNonMmramMemoryMap (PhysicalAddressBits, MemoryMap, MemoryMapSize, DescriptorSize);
 }

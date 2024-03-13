@@ -476,16 +476,21 @@ extern BOOLEAN                       mSmmCodeAccessCheckEnable;
 //
 extern UINT64  mAddressEncMask;
 
-/**
-  Create 4G PageTable in SMRAM.
+/*
+  Build MemoryMap to cover [0, PhysicalAddressBits length] by excluding all Smram range
 
-  @param[in]      Is32BitPageTable Whether the page table is 32-bit PAE
-  @return         PageTable Address
+  @param[in]      PhysicalAddressBits  The bits of physical address to map.
+  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
+  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
+  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
 
-**/
-UINT32
-Gen4GPageTable (
-  IN      BOOLEAN  Is32BitPageTable
+*/
+VOID
+BuildNonMmramMemoryMap (
+  IN  UINT8                  PhysicalAddressBits,
+  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
+  OUT UINTN                  *MemoryMapSize,
+  OUT UINTN                  *DescriptorSize
   );
 
 /**
@@ -950,15 +955,6 @@ SortMemoryMap (
   );
 
 /**
-  This function sets UEFI memory attribute according to UEFI memory map.
-**/
-VOID
-SetUefiMemMapAttributes (
-  UINT64         StartAddress,
-  UINT64         EndAddress
-  );
-
-/**
   Return if the Address is forbidden as SMM communication buffer.
 
   @param[in] Address the address to be checked
@@ -971,11 +967,49 @@ IsSmmCommBufferForbiddenAddress (
   IN UINT64  Address
   );
 
+/*
+  Build MMIO Memory Map.
+
+  The caller is responsible for freeing MemoryMap via FreePool().
+
+  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
+  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
+  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+
+*/
 VOID
-SmmGetMmioRanges (
+BuildMmioMemoryMap (
   OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
   OUT UINTN                  *MemoryMapSize,
   OUT UINTN                  *DescriptorSize
+  );
+
+/*
+  Create the Non-Mmram Memory Map within the Range of [0, PhysicalAddressBits Length].
+
+  The caller is responsible for freeing MemoryMap via FreePool().
+
+  @param[in]      PhysicalAddressBits  The bits of physical address to map.
+  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
+  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
+  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+
+*/
+VOID
+CreateNonMmramMemMap (
+  IN  UINT8                  PhysicalAddressBits,
+  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
+  OUT UINTN                  *MemoryMapSize,
+  OUT UINTN                  *DescriptorSize
+  );
+
+/**
+  This function updates UEFI memory attribute according to UEFI memory map.
+
+**/
+VOID
+UpdateUefiMemMapAttributes (
+  VOID
   );
 
 /**
@@ -1576,13 +1610,11 @@ SmmWriteProtectReadOnlyPage (
   Perform the remaining tasks for SMM Initialization.
 
   @param[in] CpuIndex        The index of the CPU.
-  @param[in] IsMonarch       TRUE if the CpuIndex is the index of the CPU that
-                             was elected as monarch during SMM initialization.
+
 **/
 VOID
 PerformRemainingTasksForSmiInit (
-  IN UINTN    CpuIndex,
-  IN BOOLEAN  IsMonarch
+  IN UINTN  CpuIndex
   );
 
 /**

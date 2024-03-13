@@ -100,12 +100,27 @@ InitProtectedMemRange (
   );
 
 /**
-  Update page table according to protected memory ranges and the 4KB-page mapped memory ranges.
+  This function updates memory attribute according to mProtectionMemRangeCount.
 
 **/
 VOID
-InitPaging (
+SmmProfileUpdateMemoryAttributes (
   VOID
+  );
+
+/*
+  Build SmmProfileBase and MMIO MemoryMap
+
+  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
+  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
+  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+
+*/
+VOID
+SmmProfileBuildNonMmramMemoryMap (
+  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
+  OUT UINTN                  *MemoryMapSize,
+  OUT UINTN                  *DescriptorSize
   );
 
 /**
@@ -127,6 +142,8 @@ VOID
 GuardPagePFHandler (
   UINTN  ErrorCode
   );
+
+X86_ASSEMBLY_PATCH_LABEL  gPatchXdSupported;
 
 //
 // The flag indicates if execute-disable is supported by processor.

@@ -96,8 +96,6 @@ typedef struct {
 
 extern SMM_S3_RESUME_STATE  *mSmmS3ResumeState;
 extern UINTN                gSmiExceptionHandlers[];
-extern BOOLEAN              mXdSupported;
-X86_ASSEMBLY_PATCH_LABEL    gPatchXdSupported;
 X86_ASSEMBLY_PATCH_LABEL    gPatchMsrIa32MiscEnableSupported;
 extern UINTN                *mPFEntryCount;
 extern UINT64 (*mLastPFEntryValue)[MAX_PF_ENTRY_COUNT];
