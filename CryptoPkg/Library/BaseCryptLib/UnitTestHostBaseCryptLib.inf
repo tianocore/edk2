@@ -29,6 +29,8 @@
   Hash/CryptSha512.c
   Hash/CryptSm3.c
   Hash/CryptParallelHashNull.c
+  Hash/CryptSha3.c
+  Hash/CryptXkcp.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
