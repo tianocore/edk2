@@ -53,7 +53,6 @@
   gEfiSmmSmramMemoryGuid
   gEdkiiEventMmDispatchGuid
   gEdkiiCommunicationBufferGuid
-  gEdkiiMmCoreLocationGuid
   gEdkiiSmmCpuFeatureInfoHobGuid
   gSmmBaseHobGuid
   gMpInformation2HobGuid

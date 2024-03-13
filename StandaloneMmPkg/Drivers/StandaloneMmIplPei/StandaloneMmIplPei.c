@@ -40,6 +40,7 @@ UINT64                mMmCoreImageSize;
 EFI_PHYSICAL_ADDRESS  mMmCoreEntryPoint;
 EFI_PHYSICAL_ADDRESS  mMmFvBaseAddress;
 UINT64                mMmFvSize;
+EFI_GUID              *mMmCoreFileName;
 
 /**
   Communicates with a registered handler.
@@ -385,7 +386,7 @@ LocateMmFvForMmCore (
   EFI_STATUS           Status;
   UINTN                FvIndex;
   EFI_PEI_FV_HANDLE    VolumeHandle;
-  EFI_PEI_FILE_HANDLE  FileHandle;
+  EFI_FFS_FILE_HEADER  *FileHandle;
   EFI_PE32_SECTION     *SectionData;
   EFI_FV_INFO          VolumeInfo;
 
@@ -430,6 +431,7 @@ LocateMmFvForMmCore (
       *MmFvBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)VolumeInfo.FvStart;
       mMmFvBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)VolumeInfo.FvStart;
       mMmFvSize        = VolumeInfo.FvSize;
+      mMmCoreFileName  = &FileHandle->Name;
     }
 
     return EFI_SUCCESS;

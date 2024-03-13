@@ -26,6 +26,7 @@ extern UINT64                mMmCoreImageSize;
 extern EFI_PHYSICAL_ADDRESS  mMmCoreEntryPoint;
 extern EFI_PHYSICAL_ADDRESS  mMmFvBaseAddress;
 extern UINT64                mMmFvSize;
+extern EFI_GUID              *mMmCoreFileName;
 
 /**
   Returns the pointer to the HOB list.
@@ -848,7 +849,7 @@ CreateMmFoundationHobList (
   if ((*BufferSize == 0) && (Buffer == NULL)) {
     RequiredSize += sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE);
   } else {
-    MmIplBuildMmCoreModuleHob (&gEdkiiMmCoreLocationGuid, mMmCoreImageAddress, mMmCoreImageSize, mMmCoreEntryPoint);
+    MmIplBuildMmCoreModuleHob (mMmCoreFileName, mMmCoreImageAddress, mMmCoreImageSize, mMmCoreEntryPoint);
   }
 
   //
