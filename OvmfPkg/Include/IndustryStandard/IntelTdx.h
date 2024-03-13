@@ -20,8 +20,9 @@
 typedef enum {
   MpProtectedModeWakeupCommandNoop        = 0,
   MpProtectedModeWakeupCommandWakeup      = 1,
-  MpProtectedModeWakeupCommandSleep       = 2,
-  MpProtectedModeWakeupCommandAcceptPages = 3,
+  MpProtectedModeWakeupCommandTest        = 2,
+  MpProtectedModeWakeupCommandSleep       = 3,
+  MpProtectedModeWakeupCommandAcceptPages = 4,
 } MP_CPU_PROTECTED_MODE_WAKEUP_CMD;
 
 #pragma pack(1)
@@ -60,6 +61,7 @@ typedef struct {
 typedef struct {
   UINT8    *RelocateApLoopFuncAddress;
   UINTN    RelocateApLoopFuncSize;
+  UINT8    *RelocateApResetVector;
 } MP_RELOCATION_MAP;
 
 #pragma pack()

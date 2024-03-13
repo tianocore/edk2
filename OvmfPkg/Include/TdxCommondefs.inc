@@ -41,8 +41,9 @@ ERROR_INVALID_FALLBACK_PAGE_LEVEL         equ       3
 
 MpProtectedModeWakeupCommandNoop          equ       0
 MpProtectedModeWakeupCommandWakeup        equ       1
-MpProtectedModeWakeupCommandSleep         equ       2
-MpProtectedModeWakeupCommandAcceptPages   equ       3
+MpProtectedModeWakeupCommandTest          equ       2
+MpProtectedModeWakeupCommandSleep         equ       3
+MpProtectedModeWakeupCommandAcceptPages   equ       4
 
 MailboxApicIdInvalid                      equ       0xffffffff
 MailboxApicidBroadcast                    equ       0xfffffffe
