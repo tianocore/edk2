@@ -3,6 +3,7 @@
 
   (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2022-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -141,6 +142,88 @@ DumpFormsetList (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Return the HII string length. We don't check word alignment
+  of the input string as same as the checking in StrLen
+  function, because the HII string in the database is compact
+  at the byte alignment.
+
+  @param[in]  String  Input UCS format string.
+
+  @retval Length of the string.
+
+**/
+UINTN
+EFIAPI
+HiiStrLen (
+  IN  CONST CHAR16  *String
+  )
+{
+  UINTN  Length;
+
+  ASSERT (String != NULL);
+
+  for (Length = 0; *String != L'\0'; String++, Length++) {
+  }
+
+  return Length;
+}
+
+/**
+  Return the HII string size. We don't check word alignment
+  of the input string as same as the checking in StrLen
+  function, because the HII string in the database is compact
+  at the byte alignment.
+
+  @param[in]  String  Input UCS format string.
+
+  @retval Size of the string.
+
+**/
+UINTN
+EFIAPI
+HiiStrSize (
+  IN      CONST CHAR16  *String
+  )
+{
+  return (HiiStrLen (String) + 1) * sizeof (*String);
+}
+
+/**
+  Compare two HII strings. We don't check word alignment
+  of the input string as same as the checking in StrLen
+  function, because the HII string in the database is compact
+  at the byte alignment.
+
+  @param[in]  FirstString   Input UCS format of string to search.
+  @param[in]  SecondString  Input UCS format of string to look for in
+                            FirstString;
+
+  @retval 0   The strings are identical.
+          !0  The strings are not identical.
+
+**/
+INTN
+EFIAPI
+HiiStrCmp (
+  IN      CONST CHAR16  *FirstString,
+  IN      CONST CHAR16  *SecondString
+  )
+{
+  //
+  // ASSERT both strings are less long than PcdMaximumUnicodeStringLength
+  //
+  ASSERT (HiiStrSize (FirstString) != 0);
+  ASSERT (HiiStrSize (SecondString) != 0);
+
+  while ((*FirstString != L'\0') && (*FirstString == *SecondString)) {
+    FirstString++;
+    SecondString++;
+  }
+
+  return *FirstString - *SecondString;
 }
 
 /**
@@ -299,28 +382,6 @@ HiiGetRedfishAsciiString (
   FreePool (HiiString);
 
   return AsciiString;
-}
-
-/**
-  Get string from HII database in English language. The returned string is allocated
-  using AllocatePool(). The caller is responsible for freeing the allocated buffer using
-  FreePool().
-
-  @param[in]  HiiHandle         A handle that was previously registered in the HII Database.
-  @param[in]  StringId          The identifier of the string to retrieved from the string
-                                package associated with HiiHandle.
-
-  @retval NULL   The string specified by StringId is not present in the string package.
-  @retval Other  The string was returned.
-
-**/
-EFI_STRING
-HiiGetEnglishString (
-  IN EFI_HII_HANDLE  HiiHandle,
-  IN EFI_STRING_ID   StringId
-  )
-{
-  return HiiGetRedfishString (HiiHandle, ENGLISH_LANGUAGE_CODE, StringId);
 }
 
 /**
@@ -562,7 +623,7 @@ GetStatementPrivateByConfigureLangRegex (
         HiiStatementPrivate  = REDFISH_PLATFORM_CONFIG_STATEMENT_FROM_LINK (HiiStatementLink);
 
         if ((HiiStatementPrivate->Description != 0) && !HiiStatementPrivate->Suppressed) {
-          TmpString = HiiGetRedfishString (HiiFormsetPrivate->HiiHandle, Schema, HiiStatementPrivate->Description);
+          TmpString = HiiStatementPrivate->XuefiRedfishStr;
           if (TmpString != NULL) {
             Status = RegularExpressionProtocol->MatchString (
                                                   RegularExpressionProtocol,
@@ -592,8 +653,9 @@ GetStatementPrivateByConfigureLangRegex (
               InsertTailList (&StatementList->StatementList, &StatementRef->Link);
               ++StatementList->Count;
             }
-
-            FreePool (TmpString);
+          } else {
+            DEBUG ((DEBUG_ERROR, "%a: HiiStatementPrivate->XuefiRedfishStr is NULL, x-uefi-string has something wrong.\n", __func__));
+            ASSERT (FALSE);
           }
         }
 
@@ -676,14 +738,11 @@ GetStatementPrivateByConfigureLang (
           );
 
         if (HiiStatementPrivate->Description != 0) {
-          TmpString = HiiGetRedfishString (HiiFormsetPrivate->HiiHandle, Schema, HiiStatementPrivate->Description);
+          TmpString = HiiStatementPrivate->XuefiRedfishStr;
           if (TmpString != NULL) {
-            if (StrCmp (TmpString, ConfigureLang) == 0) {
-              FreePool (TmpString);
+            if (HiiStrCmp (TmpString, ConfigureLang) == 0) {
               return HiiStatementPrivate;
             }
-
-            FreePool (TmpString);
           }
         }
 
@@ -742,9 +801,73 @@ GetFormsetPrivateByHiiHandle (
 }
 
 /**
+  Release x-uefi-string related information.
+
+  @param[in]      FormsetPrivate Pointer to HII form-set private instance.
+
+  @retval         EFI_STATUS
+
+**/
+EFI_STATUS
+ReleaseXuefiStringDatabase (
+  IN REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate
+  )
+{
+  REDFISH_X_UEFI_STRING_DATABASE  *ThisDatabase;
+  REDFISH_X_UEFI_STRING_DATABASE  *PreDatabase;
+  REDFISH_X_UEFI_STRINGS_ARRAY    *ThisStringArray;
+  REDFISH_X_UEFI_STRINGS_ARRAY    *PreStringArray;
+  BOOLEAN                         EndDatabase;
+  BOOLEAN                         EndArray;
+
+  if (FormsetPrivate->HiiPackageListHeader != NULL) {
+    FreePool (FormsetPrivate->HiiPackageListHeader);
+  }
+
+  // Walk through x-uefi-redfish string database.
+  if (!IsListEmpty (&FormsetPrivate->XuefiRedfishStringDatabase)) {
+    EndDatabase  = FALSE;
+    ThisDatabase = (REDFISH_X_UEFI_STRING_DATABASE *)GetFirstNode (&FormsetPrivate->XuefiRedfishStringDatabase);
+    while (!EndDatabase) {
+      // Walk through string arrays.
+      if (!IsListEmpty (&ThisDatabase->XuefiRedfishStringArrays)) {
+        EndArray        = FALSE;
+        ThisStringArray = (REDFISH_X_UEFI_STRINGS_ARRAY *)GetFirstNode (&ThisDatabase->XuefiRedfishStringArrays);
+        while (!EndArray) {
+          // Remove this array
+          FreePool (ThisStringArray->ArrayEntryAddress);
+          EndArray       = IsNodeAtEnd (&ThisDatabase->XuefiRedfishStringArrays, &ThisStringArray->NextArray);
+          PreStringArray = ThisStringArray;
+          if (!EndArray) {
+            ThisStringArray = (REDFISH_X_UEFI_STRINGS_ARRAY *)GetNextNode (&ThisDatabase->XuefiRedfishStringArrays, &ThisStringArray->NextArray);
+          }
+
+          RemoveEntryList (&PreStringArray->NextArray);
+          FreePool (PreStringArray);
+        }
+      }
+
+      //
+      // Remove this database
+      //
+      EndDatabase = IsNodeAtEnd (&FormsetPrivate->XuefiRedfishStringDatabase, &ThisDatabase->NextXuefiRedfishLanguage);
+      PreDatabase = ThisDatabase;
+      if (!EndDatabase) {
+        ThisDatabase = (REDFISH_X_UEFI_STRING_DATABASE *)GetNextNode (&FormsetPrivate->XuefiRedfishStringDatabase, &ThisDatabase->NextXuefiRedfishLanguage);
+      }
+
+      RemoveEntryList (&PreDatabase->NextXuefiRedfishLanguage);
+      FreePool (PreDatabase);
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Release formset and all the forms and statements that belong to this formset.
 
-  @param[in]      FormsetPrivate Pointer to HP_HII_FORM_SET_PRIVATE
+  @param[in]      FormsetPrivate Pointer to HII form-set private instance.
 
   @retval         EFI_STATUS
 
@@ -779,12 +902,6 @@ ReleaseFormset (
       //
       // HiiStatementPrivate->HiiStatement will be released in DestroyFormSet().
       //
-
-      if (HiiStatementPrivate->DesStringCache != NULL) {
-        FreePool (HiiStatementPrivate->DesStringCache);
-        HiiStatementPrivate->DesStringCache = NULL;
-      }
-
       RemoveEntryList (&HiiStatementPrivate->Link);
       FreePool (HiiStatementPrivate);
       HiiStatementLink = HiiNextStatementLink;
@@ -821,6 +938,8 @@ ReleaseFormset (
     FormsetPrivate->SupportedSchema.Count      = 0;
   }
 
+  ReleaseXuefiStringDatabase (FormsetPrivate);
+
   return EFI_SUCCESS;
 }
 
@@ -846,8 +965,596 @@ NewFormsetPrivate (
   // Initial newly created formset private data.
   //
   InitializeListHead (&NewFormsetPrivate->HiiFormList);
+  InitializeListHead (&NewFormsetPrivate->XuefiRedfishStringDatabase);
 
   return NewFormsetPrivate;
+}
+
+/**
+  Create new x-uefi-redfish string array.
+
+  @param[in]      XuefiRedfishStringDatabase  The x-uefi-redfish string database.
+
+  @retval         EFI_OUT_OF_RESOURCES  Not enough memory for creating a new array.
+                  EFI_SUCCESS           New array is created successfully.
+
+**/
+EFI_STATUS
+NewRedfishXuefiStringArray (
+  IN  REDFISH_X_UEFI_STRING_DATABASE  *XuefiRedfishStringDatabase
+  )
+{
+  REDFISH_X_UEFI_STRINGS_ARRAY  *ArrayAddress;
+
+  // Initial first REDFISH_X_UEFI_STRINGS_ARRAY memory.
+  ArrayAddress = (REDFISH_X_UEFI_STRINGS_ARRAY *)AllocateZeroPool (sizeof (REDFISH_X_UEFI_STRINGS_ARRAY));
+  if (ArrayAddress == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate REDFISH_X_UEFI_STRINGS_ARRAY.\n", __func__));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  InitializeListHead (&ArrayAddress->NextArray);
+
+  // Allocate memory buffer for REDFISH_X_UEFI_STRINGS_ARRAY_ELEMENT elements.
+  ArrayAddress->ArrayEntryAddress = \
+    (REDFISH_X_UEFI_STRINGS_ARRAY_ELEMENT *)AllocateZeroPool (sizeof (REDFISH_X_UEFI_STRINGS_ARRAY_ELEMENT) * X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER);
+  if (ArrayAddress->ArrayEntryAddress == NULL) {
+    FreePool (ArrayAddress);
+    DEBUG ((DEBUG_ERROR, "%a: Failed to allocate array for REDFISH_X_UEFI_STRINGS_ARRAY_ELEMENTs.\n", __func__));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  XuefiRedfishStringDatabase->StringsArrayBlocks++;
+  InsertTailList (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays, &ArrayAddress->NextArray);
+  return EFI_SUCCESS;
+}
+
+/**
+  Get the pointer of x-uefi-redfish database or create a new database.
+
+  @param[in]      FormsetPrivate          Pointer to HII form-set private instance.
+  @param[in]      HiiStringPackageHeader  HII string package header.
+
+  @retval         Pointer to REDFISH_X_UEFI_STRING_DATABASE.
+                  If NULL, it fails to obtain x-uefi-redfish database.
+
+**/
+REDFISH_X_UEFI_STRING_DATABASE *
+GetExitOrCreateXuefiStringDatabase (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
+  IN  EFI_HII_STRING_PACKAGE_HDR                *HiiStringPackageHeader
+  )
+{
+  EFI_STATUS                      Status;
+  BOOLEAN                         CreateNewOne;
+  REDFISH_X_UEFI_STRING_DATABASE  *XuefiRedfishStringDatabase;
+
+  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
+
+  CreateNewOne               = TRUE;
+  XuefiRedfishStringDatabase = NULL;
+  if (!IsListEmpty (&FormsetPrivate->XuefiRedfishStringDatabase)) {
+    XuefiRedfishStringDatabase = (REDFISH_X_UEFI_STRING_DATABASE *)GetFirstNode (&FormsetPrivate->XuefiRedfishStringDatabase);
+
+    while (TRUE) {
+      if (AsciiStriCmp (XuefiRedfishStringDatabase->XuefiRedfishLanguage, HiiStringPackageHeader->Language) == 0) {
+        CreateNewOne = FALSE;
+        break;
+      }
+
+      if (IsNodeAtEnd (&FormsetPrivate->XuefiRedfishStringDatabase, &XuefiRedfishStringDatabase->NextXuefiRedfishLanguage)) {
+        break;
+      }
+
+      XuefiRedfishStringDatabase = \
+        (REDFISH_X_UEFI_STRING_DATABASE *)GetNextNode (&FormsetPrivate->XuefiRedfishStringDatabase, &XuefiRedfishStringDatabase->NextXuefiRedfishLanguage);
+    }
+  }
+
+  if (CreateNewOne) {
+    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "  Creating x-uefi-redfish (%a) string database...\n", HiiStringPackageHeader->Language));
+    XuefiRedfishStringDatabase = (REDFISH_X_UEFI_STRING_DATABASE *)AllocateZeroPool (sizeof (REDFISH_X_UEFI_STRING_DATABASE));
+    if (XuefiRedfishStringDatabase == NULL) {
+      DEBUG ((DEBUG_ERROR, "  Failed to allocate REDFISH_X_UEFI_STRING_DATABASE.\n"));
+      return NULL;
+    }
+
+    InitializeListHead (&XuefiRedfishStringDatabase->NextXuefiRedfishLanguage);
+    InitializeListHead (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays);
+    XuefiRedfishStringDatabase->StringsArrayBlocks   = 0;
+    XuefiRedfishStringDatabase->XuefiRedfishLanguage = HiiStringPackageHeader->Language;
+
+    Status = NewRedfishXuefiStringArray (XuefiRedfishStringDatabase);
+    if (EFI_ERROR (Status)) {
+      FreePool (XuefiRedfishStringDatabase);
+      return NULL;
+    }
+
+    DEBUG ((
+      REDFISH_PLATFORM_CONFIG_DEBUG,
+      "  x-uefi-redfish (%a):\n    String array is added to XuefiRedfishStringDatabase, total %d arrays now.\n",
+      XuefiRedfishStringDatabase->XuefiRedfishLanguage,
+      XuefiRedfishStringDatabase->StringsArrayBlocks
+      ));
+
+    // Link string database to FormsetPrivate.
+    InsertTailList (&FormsetPrivate->XuefiRedfishStringDatabase, &XuefiRedfishStringDatabase->NextXuefiRedfishLanguage);
+  }
+
+  return XuefiRedfishStringDatabase;
+}
+
+/**
+  Check and allocate a new x-uefi-redfish array if it is insufficient for the
+  newly added x-uefi-redfish string.
+
+  @param[in]      FormsetPrivate              Pointer to HII form-set private instance.
+  @param[in]      XuefiRedfishStringDatabase  Pointer to the x-uefi-redfish database.
+  @param[in]      StringId                    String ID added to database.
+
+  @retval         EFI_SUCCESS                 The size of x-uefi-string array is adjusted or
+                                              is not required to be adjusted.
+                  Otherwise, refer to the error code returned from NewRedfishXuefiStringArray().
+
+**/
+EFI_STATUS
+RedfishXuefiStringAdjustArrays (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
+  IN  REDFISH_X_UEFI_STRING_DATABASE            *XuefiRedfishStringDatabase,
+  IN  EFI_STRING_ID                             StringId
+  )
+{
+  EFI_STATUS  Status;
+
+  while (((StringId + X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER) / X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER) > (UINT16)XuefiRedfishStringDatabase->StringsArrayBlocks) {
+    Status = NewRedfishXuefiStringArray (XuefiRedfishStringDatabase);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to adjust x-uefi-string array", __func__));
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Insert a x-uefi-redfish string to database.
+
+  @param[in]      FormsetPrivate          Pointer to HII form-set private instance.
+  @param[in]      HiiStringPackageHeader  Pointer to HII string package.
+  @param[in]      StringId                The HII string ID
+  @param[in]      StringTextPtr           Pointer to HII string text.
+
+  @retval         EFI_SUCCESS             The HII string is added to database.
+                  EFI_LOAD_ERROR          Something wrong when insert an HII string
+                                          to database.
+
+**/
+EFI_STATUS
+RedfishXuefiStringInsertDatabase (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
+  IN  EFI_HII_STRING_PACKAGE_HDR                *HiiStringPackageHeader,
+  IN  EFI_STRING_ID                             StringId,
+  IN  CHAR16                                    *StringTextPtr
+  )
+{
+  EFI_STATUS                      Status;
+  UINTN                           StringIdOffset;
+  REDFISH_X_UEFI_STRING_DATABASE  *XuefiRedfishStringDatabase;
+  REDFISH_X_UEFI_STRINGS_ARRAY    *ThisArray;
+
+  XuefiRedfishStringDatabase = GetExitOrCreateXuefiStringDatabase (FormsetPrivate, HiiStringPackageHeader);
+  if (XuefiRedfishStringDatabase == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to get REDFISH_X_UEFI_STRING_DATABASE of x-uefi-redfish language %a.\n", __func__, HiiStringPackageHeader->Language));
+    ReleaseXuefiStringDatabase (FormsetPrivate);
+    return EFI_LOAD_ERROR;
+  }
+
+  Status = RedfishXuefiStringAdjustArrays (FormsetPrivate, XuefiRedfishStringDatabase, StringId);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Failed to adjust x-uefi-redfish string array.\n", __func__));
+    ReleaseXuefiStringDatabase (FormsetPrivate);
+    return EFI_LOAD_ERROR;
+  }
+
+  // Insert string to x-uefi-redfish string array.
+  StringIdOffset = (UINTN)StringId;
+  ThisArray      = (REDFISH_X_UEFI_STRINGS_ARRAY *)GetFirstNode (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays);
+  while (StringIdOffset >= X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER) {
+    ThisArray       = (REDFISH_X_UEFI_STRINGS_ARRAY *)GetNextNode (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays, &ThisArray->NextArray);
+    StringIdOffset -= X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER;
+  }
+
+  // Insert string
+  (ThisArray->ArrayEntryAddress + StringIdOffset)->StringId  = StringId;
+  (ThisArray->ArrayEntryAddress + StringIdOffset)->UcsString = StringTextPtr;
+
+  DEBUG ((
+    REDFISH_PLATFORM_CONFIG_DEBUG,
+    "  Insert string ID: (%d) to database\n    x-uefi-string: \"%s\"\n    Language: %a.\n",
+    StringId,
+    StringTextPtr,
+    HiiStringPackageHeader->Language
+    ));
+  return EFI_SUCCESS;
+}
+
+/**
+  Get x-uefi-redfish string and language by string ID.
+
+  @param[in]      FormsetPrivate          Pointer to HII form-set private instance.
+  @param[in]      HiiStringPackageHeader  HII string package header.
+
+  @retval  TRUE   x-uefi-redfish string and ID map is inserted to database.
+           FALSE  Something is wrong when insert x-uefi-redfish string and ID map.
+
+**/
+BOOLEAN
+CreateXuefiLanguageStringIdMap (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
+  IN  EFI_HII_STRING_PACKAGE_HDR                *HiiStringPackageHeader
+  )
+{
+  EFI_STATUS               Status;
+  UINT8                    *BlockHdr;
+  EFI_STRING_ID            CurrentStringId;
+  UINTN                    BlockSize;
+  UINTN                    Index;
+  UINT8                    *StringTextPtr;
+  UINTN                    Offset;
+  UINT16                   StringCount;
+  UINT16                   SkipCount;
+  UINT8                    Length8;
+  EFI_HII_SIBT_EXT2_BLOCK  Ext2;
+  UINT32                   Length32;
+  UINT8                    *StringBlockInfo;
+
+  //
+  // Parse the string blocks to get the string text and font.
+  //
+  StringBlockInfo = (UINT8 *)((UINTN)HiiStringPackageHeader + HiiStringPackageHeader->StringInfoOffset);
+  BlockHdr        = StringBlockInfo;
+  BlockSize       = 0;
+  Offset          = 0;
+  CurrentStringId = 1;
+  while (*BlockHdr != EFI_HII_SIBT_END) {
+    switch (*BlockHdr) {
+      case EFI_HII_SIBT_STRING_SCSU:
+        Offset        = sizeof (EFI_HII_STRING_BLOCK);
+        StringTextPtr = BlockHdr + Offset;
+        BlockSize    += Offset + AsciiStrSize ((CHAR8 *)StringTextPtr);
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_STRING_SCSU_FONT:
+        Offset        = sizeof (EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK) - sizeof (UINT8);
+        StringTextPtr = BlockHdr + Offset;
+        BlockSize    += Offset + AsciiStrSize ((CHAR8 *)StringTextPtr);
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_STRINGS_SCSU:
+        CopyMem (&StringCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
+        StringTextPtr = (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_BLOCK) - sizeof (UINT8));
+        BlockSize    += StringTextPtr - BlockHdr;
+
+        for (Index = 0; Index < StringCount; Index++) {
+          BlockSize    += AsciiStrSize ((CHAR8 *)StringTextPtr);
+          StringTextPtr = StringTextPtr + AsciiStrSize ((CHAR8 *)StringTextPtr);
+          CurrentStringId++;
+        }
+
+        break;
+
+      case EFI_HII_SIBT_STRINGS_SCSU_FONT:
+        CopyMem (
+          &StringCount,
+          (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)),
+          sizeof (UINT16)
+          );
+        StringTextPtr = (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_SIBT_STRINGS_SCSU_FONT_BLOCK) - sizeof (UINT8));
+        BlockSize    += StringTextPtr - BlockHdr;
+
+        for (Index = 0; Index < StringCount; Index++) {
+          BlockSize    += AsciiStrSize ((CHAR8 *)StringTextPtr);
+          StringTextPtr = StringTextPtr + AsciiStrSize ((CHAR8 *)StringTextPtr);
+          CurrentStringId++;
+        }
+
+        break;
+
+      case EFI_HII_SIBT_STRING_UCS2:
+        Offset        = sizeof (EFI_HII_STRING_BLOCK);
+        StringTextPtr = BlockHdr + Offset;
+
+        // x-uefi-redfish string is always encoded as UCS and started with '/'.
+        if (*StringTextPtr == (UINT16)'/') {
+          Status = RedfishXuefiStringInsertDatabase (
+                     FormsetPrivate,
+                     HiiStringPackageHeader,
+                     CurrentStringId,
+                     (CHAR16 *)StringTextPtr
+                     );
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "%a: Failed to insert x-uefi-redfish string %s.\n", __func__, StringTextPtr));
+            return FALSE;
+          }
+        }
+
+        BlockSize += (Offset + HiiStrSize ((CHAR16 *)StringTextPtr));
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_STRING_UCS2_FONT:
+        Offset        = sizeof (EFI_HII_SIBT_STRING_UCS2_FONT_BLOCK)  - sizeof (CHAR16);
+        StringTextPtr = BlockHdr + Offset;
+        BlockSize    += (Offset + HiiStrSize ((CHAR16 *)StringTextPtr));
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_STRINGS_UCS2:
+        Offset        = sizeof (EFI_HII_SIBT_STRINGS_UCS2_BLOCK) - sizeof (CHAR16);
+        StringTextPtr = BlockHdr + Offset;
+        BlockSize    += Offset;
+        CopyMem (&StringCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
+        for (Index = 0; Index < StringCount; Index++) {
+          BlockSize    += HiiStrSize ((CHAR16 *)StringTextPtr);
+          StringTextPtr = StringTextPtr + HiiStrSize ((CHAR16 *)StringTextPtr);
+          CurrentStringId++;
+        }
+
+        break;
+
+      case EFI_HII_SIBT_STRINGS_UCS2_FONT:
+        Offset        = sizeof (EFI_HII_SIBT_STRINGS_UCS2_FONT_BLOCK) - sizeof (CHAR16);
+        StringTextPtr = BlockHdr + Offset;
+        BlockSize    += Offset;
+        CopyMem (
+          &StringCount,
+          (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)),
+          sizeof (UINT16)
+          );
+        for (Index = 0; Index < StringCount; Index++) {
+          BlockSize    += HiiStrSize ((CHAR16 *)StringTextPtr);
+          StringTextPtr = StringTextPtr + HiiStrSize ((CHAR16 *)StringTextPtr);
+          CurrentStringId++;
+        }
+
+        break;
+
+      case EFI_HII_SIBT_DUPLICATE:
+        BlockSize += sizeof (EFI_HII_SIBT_DUPLICATE_BLOCK);
+        CurrentStringId++;
+        break;
+
+      case EFI_HII_SIBT_SKIP1:
+        SkipCount       = (UINT16)(*(UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK)));
+        CurrentStringId = (UINT16)(CurrentStringId + SkipCount);
+        BlockSize      +=  sizeof (EFI_HII_SIBT_SKIP1_BLOCK);
+        break;
+
+      case EFI_HII_SIBT_SKIP2:
+        CopyMem (&SkipCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
+        CurrentStringId = (UINT16)(CurrentStringId + SkipCount);
+        BlockSize      +=  sizeof (EFI_HII_SIBT_SKIP2_BLOCK);
+        break;
+
+      case EFI_HII_SIBT_EXT1:
+        CopyMem (
+          &Length8,
+          (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)),
+          sizeof (UINT8)
+          );
+        BlockSize += Length8;
+        break;
+
+      case EFI_HII_SIBT_EXT2:
+        CopyMem (&Ext2, BlockHdr, sizeof (EFI_HII_SIBT_EXT2_BLOCK));
+        BlockSize += Ext2.Length;
+        break;
+
+      case EFI_HII_SIBT_EXT4:
+        CopyMem (
+          &Length32,
+          (UINT8 *)((UINTN)BlockHdr + sizeof (EFI_HII_STRING_BLOCK) + sizeof (UINT8)),
+          sizeof (UINT32)
+          );
+
+        BlockSize += Length32;
+        break;
+
+      default:
+        break;
+    }
+
+    BlockHdr = (UINT8 *)(StringBlockInfo + BlockSize);
+  }
+
+  return TRUE;
+}
+
+/**
+  Get x-uefi-redfish string and language by string ID.
+
+  @param[in]      FormsetPrivate       Pointer to HII form-set private instance.
+  @param[in]      StringId             The HII string ID.
+  @param[out]     String               Optionally return USC string.
+  @param[out]     Language             Optionally return x-uefi-redfish language.
+  @param[out]     XuefiStringDatabase  Optionally return x-uefi-redfish database.
+
+  @retval  EFI_SUCCESS            String information is returned.
+           EFI_INVALID_PARAMETER  One of the given parameters to this function is
+                                  invalid.
+           EFI_NOT_FOUND          String is not found.
+
+**/
+EFI_STATUS
+GetXuefiStringAndLangByStringId (
+  IN   REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
+  IN   EFI_STRING_ID                             StringId,
+  OUT  CHAR16                                    **String OPTIONAL,
+  OUT  CHAR8                                     **Language OPTIONAL,
+  OUT  REDFISH_X_UEFI_STRING_DATABASE            **XuefiStringDatabase OPTIONAL
+  )
+{
+  REDFISH_X_UEFI_STRING_DATABASE  *XuefiRedfishStringDatabase;
+  REDFISH_X_UEFI_STRINGS_ARRAY    *StringArray;
+  UINT16                          StringIndex;
+
+  if ((String == NULL) && (Language == NULL) && (XuefiStringDatabase == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid parameters for this function.\n", __func__));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (IsListEmpty (&FormsetPrivate->XuefiRedfishStringDatabase)) {
+    return EFI_NOT_FOUND;
+  }
+
+  XuefiRedfishStringDatabase = (REDFISH_X_UEFI_STRING_DATABASE *)GetFirstNode (&FormsetPrivate->XuefiRedfishStringDatabase);
+  while (TRUE) {
+    if (Language != NULL) {
+      *Language = XuefiRedfishStringDatabase->XuefiRedfishLanguage;
+    }
+
+    StringArray = (REDFISH_X_UEFI_STRINGS_ARRAY *)GetFirstNode (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays);
+
+    // Loop to the correct string array.
+    StringIndex = StringId;
+    while (StringIndex >= X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER) {
+      if (IsNodeAtEnd (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays, &StringArray->NextArray)) {
+        goto ErrorEixt;
+      }
+
+      StringArray  = (REDFISH_X_UEFI_STRINGS_ARRAY *)GetNextNode (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays, &StringArray->NextArray);
+      StringIndex -= X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER;
+    }
+
+    //
+    // NOTE: The string ID in the formset is a unique number.
+    //       If the string in the array is NULL, then the matched string ID
+    //       should be in another x-uefi-redfish database.
+    //
+    if ((StringArray->ArrayEntryAddress + StringIndex)->UcsString != NULL) {
+      //
+      // String ID is belong to this x-uef-redfish language database.
+      //
+      if (String != NULL) {
+        *String = (StringArray->ArrayEntryAddress + StringIndex)->UcsString;
+      }
+
+      if (XuefiStringDatabase != NULL) {
+        *XuefiStringDatabase = XuefiRedfishStringDatabase;
+      }
+
+      return EFI_SUCCESS;
+    }
+
+    if (IsNodeAtEnd (&FormsetPrivate->XuefiRedfishStringDatabase, &XuefiRedfishStringDatabase->NextXuefiRedfishLanguage)) {
+      return EFI_NOT_FOUND;
+    }
+
+    XuefiRedfishStringDatabase = (REDFISH_X_UEFI_STRING_DATABASE *)GetNextNode (
+                                                                     &FormsetPrivate->XuefiRedfishStringDatabase,
+                                                                     &XuefiRedfishStringDatabase->NextXuefiRedfishLanguage
+                                                                     );
+  }
+
+ErrorEixt:;
+  DEBUG ((DEBUG_ERROR, "%a: String ID (%d) is not in any x-uef-redfish string databases.\n", __func__, StringId));
+  return EFI_NOT_FOUND;
+}
+
+/**
+  Build a x-uefi-redfish database for the newly added x-uefi-redfish language.
+
+  @param[in]      FormsetPrivate          Pointer to HII form-set private instance.
+
+**/
+VOID
+BuildXUefiRedfishStringDatabase (
+  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate
+  )
+{
+  EFI_STATUS                  Status;
+  UINTN                       BufferSize;
+  EFI_HII_PACKAGE_HEADER      *PackageHeader;
+  UINTN                       EndingPackageAddress;
+  EFI_HII_STRING_PACKAGE_HDR  *HiiStringPackageHeader;
+  UINTN                       SupportedSchemaLangCount;
+  CHAR8                       **SupportedSchemaLang;
+  BOOLEAN                     StringIdMapIsBuilt;
+
+  DEBUG ((DEBUG_INFO, "%a: Building x-uefi-redfish string database, HII Formset GUID - %g.\n", __func__, FormsetPrivate->Guid));
+
+  BufferSize = 0;
+  Status     = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
+                                                             mRedfishPlatformConfigPrivate->HiiDatabase,
+                                                             FormsetPrivate->HiiHandle,
+                                                             &BufferSize,
+                                                             FormsetPrivate->HiiPackageListHeader
+                                                             );
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    DEBUG ((DEBUG_ERROR, "  Failed to export package list.\n"));
+    return;
+  }
+
+  FormsetPrivate->HiiPackageListHeader = (EFI_HII_PACKAGE_LIST_HEADER *)AllocateZeroPool (BufferSize);
+  if (FormsetPrivate->HiiPackageListHeader == NULL) {
+    DEBUG ((DEBUG_ERROR, "  Failed to allocate memory for the exported package list.\n"));
+    return;
+  }
+
+  Status = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
+                                                         mRedfishPlatformConfigPrivate->HiiDatabase,
+                                                         FormsetPrivate->HiiHandle,
+                                                         &BufferSize,
+                                                         FormsetPrivate->HiiPackageListHeader
+                                                         );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Finding the string package.
+  //
+  EndingPackageAddress = (UINTN)FormsetPrivate->HiiPackageListHeader + FormsetPrivate->HiiPackageListHeader->PackageLength;
+  PackageHeader        = (EFI_HII_PACKAGE_HEADER *)(FormsetPrivate->HiiPackageListHeader + 1);
+  SupportedSchemaLang  = FormsetPrivate->SupportedSchema.SchemaList;
+  while ((UINTN)PackageHeader < EndingPackageAddress) {
+    switch (PackageHeader->Type) {
+      case EFI_HII_PACKAGE_STRINGS:
+        StringIdMapIsBuilt     = FALSE;
+        HiiStringPackageHeader = (EFI_HII_STRING_PACKAGE_HDR *)PackageHeader;
+
+        // Check if this is the string package for x-uefi-redfish
+        for (SupportedSchemaLangCount = 0;
+             SupportedSchemaLangCount < FormsetPrivate->SupportedSchema.Count;
+             SupportedSchemaLangCount++
+             )
+        {
+          if (AsciiStrnCmp (
+                *(SupportedSchemaLang + SupportedSchemaLangCount),
+                HiiStringPackageHeader->Language,
+                AsciiStrLen (HiiStringPackageHeader->Language)
+                ) == 0)
+          {
+            StringIdMapIsBuilt = CreateXuefiLanguageStringIdMap (FormsetPrivate, HiiStringPackageHeader);
+            break;
+          }
+        }
+
+        if (StringIdMapIsBuilt == FALSE) {
+          if (AsciiStrStr (HiiStringPackageHeader->Language, X_UEFI_SCHEMA_PREFIX) == NULL) {
+            DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "  No need to build x-uefi-redfish string ID map for HII language %a\n", HiiStringPackageHeader->Language));
+          } else {
+            DEBUG ((DEBUG_ERROR, "  Failed to build x-uefi-redfish string ID map of HII language %a\n", HiiStringPackageHeader->Language));
+          }
+        }
+
+      default:
+        PackageHeader = (EFI_HII_PACKAGE_HEADER *)((UINTN)PackageHeader + PackageHeader->Length);
+    }
+  }
 }
 
 /**
@@ -856,7 +1563,8 @@ NewFormsetPrivate (
   @param[in]  HiiHandle       Target HII handle to load.
   @param[out] FormsetPrivate  The formset private data.
 
-  @retval EFI_STATUS
+  @retval EFI_STATUS          The formset is loaded successfully.
+  @retval EFI_UNSUPPORTED     This formset doesn't have any x-uefi-redfish configuration.
 
 **/
 EFI_STATUS
@@ -875,6 +1583,7 @@ LoadFormset (
   REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE  *HiiStatementPrivate;
   EFI_GUID                                   ZeroGuid;
   EXPRESS_RESULT                             ExpressionResult;
+  CHAR16                                     *String;
 
   if ((HiiHandle == NULL) || (FormsetPrivate == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -882,6 +1591,7 @@ LoadFormset (
 
   HiiFormSet = AllocateZeroPool (sizeof (HII_FORMSET));
   if (HiiFormSet == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: No memory resource for HII_FORMSET - %g\n", __func__, FormsetPrivate->Guid));
     return EFI_OUT_OF_RESOURCES;
   }
 
@@ -891,6 +1601,7 @@ LoadFormset (
   ZeroMem (&ZeroGuid, sizeof (ZeroGuid));
   Status = CreateFormSetFromHiiHandle (HiiHandle, &ZeroGuid, HiiFormSet);
   if (EFI_ERROR (Status) || IsListEmpty (&HiiFormSet->FormListHead)) {
+    DEBUG ((DEBUG_ERROR, "%a: Formset not found by HII handle - %g\n", __func__, FormsetPrivate->Guid));
     Status = EFI_NOT_FOUND;
     goto ErrorExit;
   }
@@ -909,7 +1620,11 @@ LoadFormset (
   FormsetPrivate->DevicePathStr = ConvertDevicePathToText (HiiFormSet->DevicePath, FALSE, FALSE);
   Status                        = GetSupportedSchema (FormsetPrivate->HiiHandle, &FormsetPrivate->SupportedSchema);
   if (EFI_ERROR (Status)) {
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: No schema from HII handle: 0x%x found: %r\n", __func__, FormsetPrivate->HiiHandle, Status));
+    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: No x-uefi-redfish configuration found on the formset - %g\n", __func__, FormsetPrivate->Guid));
+    return EFI_UNSUPPORTED; // Can't build AttributeRegistry Meni path with returning EFI_UNSUPPORTED.
+  } else {
+    // Building x-uefi-redfish string database
+    BuildXUefiRedfishStringDatabase (FormsetPrivate);
   }
 
   HiiFormLink = GetFirstNode (&HiiFormSet->FormListHead);
@@ -919,6 +1634,7 @@ LoadFormset (
     HiiFormPrivate = AllocateZeroPool (sizeof (REDFISH_PLATFORM_CONFIG_FORM_PRIVATE));
     if (HiiFormPrivate == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
+      DEBUG ((DEBUG_ERROR, "%a: No memory resource for REDFISH_PLATFORM_CONFIG_FORM_PRIVATE.\n", __func__));
       goto ErrorExit;
     }
 
@@ -944,6 +1660,7 @@ LoadFormset (
 
       HiiStatementPrivate = AllocateZeroPool (sizeof (REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE));
       if (HiiStatementPrivate == NULL) {
+        DEBUG ((DEBUG_ERROR, "%a: No memory resource for REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE.\n", __func__));
         Status = EFI_OUT_OF_RESOURCES;
         goto ErrorExit;
       }
@@ -981,10 +1698,18 @@ LoadFormset (
         }
       }
 
-      //
-      // Attach to statement list.
-      //
-      InsertTailList (&HiiFormPrivate->StatementList, &HiiStatementPrivate->Link);
+      // Get x-uefi-redfish string using String ID.
+      Status = GetXuefiStringAndLangByStringId (FormsetPrivate, HiiStatementPrivate->Description, &String, NULL, NULL);
+      if (!EFI_ERROR (Status)) {
+        HiiStatementPrivate->XuefiRedfishStr = String;
+        //
+        // Attach to statement list.
+        //
+        InsertTailList (&HiiFormPrivate->StatementList, &HiiStatementPrivate->Link);
+      } else {
+        FreePool (HiiStatementPrivate);
+      }
+
       HiiStatementLink = GetNextNode (&HiiForm->StatementListHead, HiiStatementLink);
     }
 
@@ -1052,7 +1777,7 @@ LoadFormsetList (
   //
   Status = LoadFormset (HiiHandle, FormsetPrivate);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to load formset: %r\n", __func__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Formset is not loaded for edk2 redfish: %r\n", __func__, Status));
     FreePool (FormsetPrivate);
     return Status;
   }
@@ -1325,7 +2050,11 @@ ProcessPendingList (
 
       Status = LoadFormsetList (Target->HiiHandle, FormsetList);
       if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "%a: load formset from HII handle: 0x%x failed: %r\n", __func__, Target->HiiHandle, Status));
+        if (Status == EFI_UNSUPPORTED) {
+          DEBUG ((DEBUG_ERROR, "  The formset has no x-uefi-redfish configurations.\n"));
+        } else {
+          DEBUG ((DEBUG_ERROR, "  load formset from HII handle: 0x%x failed: %r\n", Target->HiiHandle, Status));
+        }
       }
     }
 
