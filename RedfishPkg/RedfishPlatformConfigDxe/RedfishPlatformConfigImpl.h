@@ -2,7 +2,8 @@
   This file defines the EDKII Redfish Platform Config Protocol private structure.
 
   (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -30,6 +31,10 @@
 #define ENGLISH_LANGUAGE_CODE  "en-US"
 #define X_UEFI_SCHEMA_PREFIX   "x-uefi-redfish-"
 
+#define MAX_X_UEFI_REDFISH_STRING_SIZE  (128 * 2)// 128 character in UCS.
+
+typedef struct _REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE;
+
 //
 // Definition of REDFISH_PLATFORM_CONFIG_PRIVATE.
 //
@@ -46,17 +51,49 @@ typedef struct {
   CHAR8    **SchemaList;                        // Schema list
 } REDFISH_PLATFORM_CONFIG_SCHEMA;
 
+// Defines the number of elements in array
+#define X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER  1024
+
+//
+// Definition of x-uefi-redfish string element.
+//
+typedef struct {
+  EFI_STRING_ID    StringId;
+  CHAR16           *UcsString;
+} REDFISH_X_UEFI_STRINGS_ARRAY_ELEMENT;
+
+//
+// Discrete string array buffer, each has X_UEFI_REDFISH_STRING_ARRAY_NUMBER element.
+//
+typedef struct {
+  LIST_ENTRY                              NextArray;
+  REDFISH_X_UEFI_STRINGS_ARRAY_ELEMENT    *ArrayEntryAddress;
+} REDFISH_X_UEFI_STRINGS_ARRAY;
+
+//
+// x-uefi-redfish string database, x-uefi-redfish language based.
+//
+typedef struct {
+  LIST_ENTRY    NextXuefiRedfishLanguage;                                     // Link to the next suppoted x-uefi-Redfish language.
+  CHAR8         *XuefiRedfishLanguage;                                        // x-uefi-redfish language.
+  UINTN         StringsArrayBlocks;                                           // Number of the array blocks that accommodate X_UEFI_REDFISH_STRING_ARRAY_NUMBER
+                                                                              // elements in each.
+  LIST_ENTRY    XuefiRedfishStringArrays;                                     // Link entry of x-uefi-redfish string array.
+} REDFISH_X_UEFI_STRING_DATABASE;
+
 //
 // Definition of REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE
 //
 typedef struct {
   LIST_ENTRY                        Link;
-  HII_FORMSET                       *HiiFormSet;     // Pointer to HII formset data.
-  EFI_GUID                          Guid;            // Formset GUID.
-  EFI_HII_HANDLE                    HiiHandle;       // Hii Handle of this formset.
-  LIST_ENTRY                        HiiFormList;     // Form list that keep form data under this formset.
-  CHAR16                            *DevicePathStr;  // Device path of this formset.
-  REDFISH_PLATFORM_CONFIG_SCHEMA    SupportedSchema; // Schema that is supported in this formset.
+  HII_FORMSET                       *HiiFormSet;                // Pointer to HII formset data.
+  EFI_GUID                          Guid;                       // Formset GUID.
+  EFI_HII_HANDLE                    HiiHandle;                  // Hii Handle of this formset.
+  EFI_HII_PACKAGE_LIST_HEADER       *HiiPackageListHeader;      // Hii Package list header.
+  LIST_ENTRY                        HiiFormList;                // Form list that keep form data under this formset.
+  CHAR16                            *DevicePathStr;             // Device path of this formset.
+  REDFISH_PLATFORM_CONFIG_SCHEMA    SupportedSchema;            // Schema that is supported in this formset.
+  LIST_ENTRY                        XuefiRedfishStringDatabase; // x-uefi-redfish string/Id data base;
 } REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE;
 
 #define REDFISH_PLATFORM_CONFIG_FORMSET_FROM_LINK(a)  BASE_CR (a, REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE, Link)
@@ -90,19 +127,19 @@ typedef struct {
 //
 // Definition of REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE
 //
-typedef struct {
+struct _REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE {
   LIST_ENTRY                                Link;
   REDFISH_PLATFORM_CONFIG_FORM_PRIVATE      *ParentForm;
-  HII_STATEMENT                             *HiiStatement;  // Pointer to HII statement data.
-  EFI_QUESTION_ID                           QuestionId;     // Question ID of this statement.
-  EFI_STRING_ID                             Description;    // String token of this question.
-  EFI_STRING_ID                             Help;           // String token of help message.
-  EFI_STRING                                DesStringCache; // The string cache for search function.
-  UINT8                                     Flags;          // The statement flag.
-  REDFISH_PLATFORM_CONFIG_STATEMENT_DATA    StatementData;  // The max/min for statement value.
-  BOOLEAN                                   Suppressed;     // Statement is suppressed.
-  BOOLEAN                                   GrayedOut;      // Statement is GrayedOut.
-} REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE;
+  HII_STATEMENT                             *HiiStatement;    // Pointer to HII statement data.
+  EFI_QUESTION_ID                           QuestionId;       // Question ID of this statement.
+  EFI_STRING_ID                             Description;      // String token of this question.
+  CHAR16                                    *DescriptionStr;  // String of this question.
+  EFI_STRING_ID                             Help;             // String token of help message.
+  UINT8                                     Flags;            // The statement flag.
+  REDFISH_PLATFORM_CONFIG_STATEMENT_DATA    StatementData;    // The max/min for statement value.
+  BOOLEAN                                   Suppressed;       // Statement is suppressed.
+  BOOLEAN                                   GrayedOut;        // Statement is GrayedOut.
+};
 
 #define REDFISH_PLATFORM_CONFIG_STATEMENT_FROM_LINK(a)  BASE_CR (a, REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE, Link)
 
@@ -345,6 +382,40 @@ HiiGetEnglishAsciiString (
 EFI_STATUS
 ReleaseStatementList (
   IN  REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE_LIST  *StatementList
+  );
+
+/**
+  Return the HII string length. We don't check word alignment
+  of the input string as the same as the checking in StrLen
+  function. Because the HII string in the database is compact
+  at the byte alignment.
+
+  @param[in]  String  Input UCS format string.
+
+  @retval Length of
+
+**/
+UINTN
+EFIAPI
+HiiStrLen (
+  IN  CONST CHAR16  *String
+  );
+
+/**
+  Return the HII string size. We don't check word alignment
+  of the input string as the same as the checking in StrLen
+  function. Because the HII string in the database is compact
+  at the byte alignment.
+
+  @param[in]  String  Input UCS format string.
+
+  @retval Size of the string.
+
+**/
+UINTN
+EFIAPI
+HiiStrSize (
+  IN      CONST CHAR16  *String
   );
 
 #endif

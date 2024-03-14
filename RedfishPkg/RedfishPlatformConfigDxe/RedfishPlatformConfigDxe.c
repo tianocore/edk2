@@ -2,7 +2,8 @@
   The implementation of EDKII Redfish Platform Config Protocol.
 
   (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -928,6 +929,10 @@ HiiStringToOneOfOptionValue (
     Option = HII_QUESTION_OPTION_FROM_LINK (Link);
 
     TmpString = HiiGetRedfishString (Statement->ParentForm->ParentFormset->HiiHandle, Schema, Option->Text);
+    if (TmpString == NULL) {
+      TmpString = HiiGetRedfishString (Statement->ParentForm->ParentFormset->HiiHandle, ENGLISH_LANGUAGE_CODE, Option->Text);
+    }
+
     if (TmpString != NULL) {
       if (StrCmp (TmpString, HiiString) == 0) {
         CopyMem (Value, &Option->Value, sizeof (HII_STATEMENT_VALUE));
@@ -1227,6 +1232,10 @@ HiiStringToOrderedListOptionValue (
     Option = HII_QUESTION_OPTION_FROM_LINK (Link);
 
     TmpString = HiiGetRedfishString (Statement->ParentForm->ParentFormset->HiiHandle, Schema, Option->Text);
+    if (TmpString == NULL) {
+      TmpString = HiiGetRedfishString (Statement->ParentForm->ParentFormset->HiiHandle, ENGLISH_LANGUAGE_CODE, Option->Text);
+    }
+
     if (TmpString != NULL) {
       if (StrCmp (TmpString, HiiString) == 0) {
         *Value = ExtendHiiValueToU64 (&Option->Value);
@@ -1491,7 +1500,7 @@ StrToAsciiStr (
     return NULL;
   }
 
-  StringLen = StrLen (UnicodeString) + 1;
+  StringLen = HiiStrLen (UnicodeString) + 1;
   Buffer    = AllocatePool (StringLen * sizeof (CHAR8));
   if (Buffer == NULL) {
     return NULL;
@@ -2000,7 +2009,6 @@ RedfishPlatformConfigProtocolGetConfigureLang (
   REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE_LIST  StatementList;
   REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE_REF   *StatementRef;
   LIST_ENTRY                                      *NextLink;
-  EFI_STRING                                      TmpString;
   EFI_STRING                                      *TmpConfigureLangList;
   UINTN                                           Index;
   CHAR8                                           *FullSchema;
@@ -2054,12 +2062,9 @@ RedfishPlatformConfigProtocolGetConfigureLang (
 
       ASSERT (StatementRef->Statement->Description != 0);
       if (StatementRef->Statement->Description != 0) {
-        TmpString = HiiGetRedfishString (StatementRef->Statement->ParentForm->ParentFormset->HiiHandle, FullSchema, StatementRef->Statement->Description);
-        ASSERT (TmpString != NULL);
-        if (TmpString != NULL) {
-          TmpConfigureLangList[Index] = TmpString;
-          ++Index;
-        }
+        ASSERT (StatementRef->Statement->DescriptionStr != NULL);
+        TmpConfigureLangList[Index] = AllocateCopyPool (HiiStrSize (StatementRef->Statement->DescriptionStr), (VOID *)StatementRef->Statement->DescriptionStr);
+        ++Index;
       }
     }
   }
