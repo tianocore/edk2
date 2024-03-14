@@ -36,6 +36,11 @@
 #define PTE_PPN_SHIFT         10
 #define RISCV_MMU_PAGE_SHIFT  12
 
+#define RISCV_CPU_FEATURE_PBMT_BITMASK  BIT2
+#define PTE_PBMT_NC                     BIT61
+#define PTE_PBMT_IO                     BIT62
+#define PTE_PBMT_MASK                   (PTE_PBMT_NC | PTE_PBMT_IO)
+
 STATIC UINTN  mModeSupport[] = { SATP_MODE_SV57, SATP_MODE_SV48, SATP_MODE_SV39, SATP_MODE_OFF };
 STATIC UINTN  mMaxRootTableLevel;
 STATIC UINTN  mBitPerLevel;
@@ -487,32 +492,82 @@ UpdateRegionMapping (
 /**
   Convert GCD attribute to RISC-V page attribute.
 
-  @param  GcdAttributes The GCD attribute.
+  @param  GcdAttributes   The GCD attribute.
+  @param  RiscVAttributes The pointer of RISC-V page attribute.
 
-  @return               The RISC-V page attribute.
+  @retval EFI_INVALID_PARAMETER   The RiscVAttributes is NULL or cache type mask not valid.
+  @retval EFI_SUCCESS             The operation succesfully.
 
 **/
 STATIC
-UINT64
+EFI_STATUS
 GcdAttributeToPageAttribute (
-  IN UINT64  GcdAttributes
+  IN UINT64   GcdAttributes,
+  OUT UINT64  *RiscVAttributes
   )
 {
-  UINT64  RiscVAttributes;
+  UINT64   CacheTypeMask;
+  BOOLEAN  PmbtExtEnabled;
 
-  RiscVAttributes = RISCV_PG_R | RISCV_PG_W | RISCV_PG_X;
+  if (RiscVAttributes == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *RiscVAttributes = RISCV_PG_R | RISCV_PG_W | RISCV_PG_X;
+
+  PmbtExtEnabled = FALSE;
+  if ((PcdGet64 (PcdRiscVFeatureOverride) & RISCV_CPU_FEATURE_PBMT_BITMASK) != 0) {
+    PmbtExtEnabled = TRUE;
+  }
 
   // Determine protection attributes
   if ((GcdAttributes & EFI_MEMORY_RO) != 0) {
-    RiscVAttributes &= ~(UINT64)(RISCV_PG_W);
+    *RiscVAttributes &= ~(UINT64)(RISCV_PG_W);
   }
 
   // Process eXecute Never attribute
   if ((GcdAttributes & EFI_MEMORY_XP) != 0) {
-    RiscVAttributes &= ~(UINT64)RISCV_PG_X;
+    *RiscVAttributes &= ~(UINT64)RISCV_PG_X;
   }
 
-  return RiscVAttributes;
+  CacheTypeMask = GcdAttributes & EFI_CACHE_ATTRIBUTE_MASK;
+  if ((CacheTypeMask != 0) &&
+      (((CacheTypeMask - 1) & CacheTypeMask) != 0))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: More than one bit set in cache type mask (0x%LX)\n",
+      __func__,
+      CacheTypeMask
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (CacheTypeMask) {
+    case EFI_MEMORY_UC:
+      if (PmbtExtEnabled) {
+        *RiscVAttributes |= PTE_PBMT_IO;
+      }
+
+      break;
+    case EFI_MEMORY_WC:
+      if (PmbtExtEnabled) {
+        *RiscVAttributes |= PTE_PBMT_NC;
+      } else {
+        DEBUG ((
+          DEBUG_VERBOSE,
+          "%a: EFI_MEMORY_WC set but Pmbt extension not available\n",
+          __func__
+          ));
+      }
+
+      break;
+    default:
+      // Default PMA mode
+      break;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -535,29 +590,38 @@ RiscVSetMemoryAttributes (
   IN UINT64                Attributes
   )
 {
-  UINT64  PageAttributesSet;
+  UINT64      PageAttributesSet;
+  UINT64      PageAttributesClear;
+  EFI_STATUS  Status;
 
-  PageAttributesSet = GcdAttributeToPageAttribute (Attributes);
+  Status = GcdAttributeToPageAttribute (Attributes, &PageAttributesSet);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if (!RiscVMmuEnabled ()) {
     return EFI_SUCCESS;
   }
 
-  DEBUG (
-    (
-     DEBUG_VERBOSE,
-     "%a: Set %llX page attribute 0x%X\n",
-     __func__,
-     BaseAddress,
-     PageAttributesSet
-    )
-    );
+  PageAttributesClear = PTE_ATTRIBUTES_MASK;
+  if ((PcdGet64 (PcdRiscVFeatureOverride) & RISCV_CPU_FEATURE_PBMT_BITMASK) != 0) {
+    PageAttributesClear |= PTE_PBMT_MASK;
+  }
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: %LX: set attributes 0x%LX, clear attributes 0x%LX\n",
+    __func__,
+    BaseAddress,
+    PageAttributesSet,
+    PageAttributesClear
+    ));
 
   return UpdateRegionMapping (
            BaseAddress,
            Length,
            PageAttributesSet,
-           PTE_ATTRIBUTES_MASK,
+           PageAttributesClear,
            (UINT64 *)RiscVGetRootTranslateTable (),
            TRUE
            );
