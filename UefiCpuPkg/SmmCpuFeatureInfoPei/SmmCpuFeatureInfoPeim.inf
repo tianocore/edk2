@@ -36,14 +36,17 @@
   PcdLib
   PeimEntryPoint
   MemoryAllocationLib
+  BaseMemoryLib
 
 [Guids]
   gEdkiiSmmCpuFeatureInfoHobGuid                           ## PRODUCES
+  gEdkiiSmmProfileDataGuid                                 ## PRODUCES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable    ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout  ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize    ## CONSUMES
 
 [Depex]
   TRUE
