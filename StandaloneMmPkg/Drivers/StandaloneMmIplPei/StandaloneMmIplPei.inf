@@ -56,6 +56,7 @@
   gEdkiiSmmCpuFeatureInfoHobGuid
   gSmmBaseHobGuid
   gMpInformation2HobGuid
+  gEdkiiSmmProfileDataGuid
 
 [Ppis]
   gPeiSmmControlPpiGuid

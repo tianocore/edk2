@@ -14,6 +14,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Guid/SmmCpuFeatureInfo.h>
+#include <Guid/SmmProfileDataHob.h>
 #include <Guid/SmmBaseHob.h>
 #include <Guid/SmramMemoryReserve.h>
 #include <Guid/MmCommBuffer.h>
@@ -663,6 +664,7 @@ MmIplBuildStackHob (
   for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
   If there is no additional space for HOB creation, then ASSERT().
 
+  @param  Name          The name guid of the memory.
   @param  BaseAddress   The 64 bit physical address of the memory.
   @param  Length        The length of the memory allocation in bytes.
   @param  MemoryType    Type of memory allocated by this HOB.
@@ -671,6 +673,7 @@ MmIplBuildStackHob (
 VOID
 EFIAPI
 MmIplBuildMemoryAllocationHob (
+  IN CONST EFI_GUID        *Name,
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
   IN EFI_MEMORY_TYPE       MemoryType
@@ -690,6 +693,9 @@ MmIplBuildMemoryAllocationHob (
   }
 
   ZeroMem (&(Hob->AllocDescriptor.Name), sizeof (EFI_GUID));
+  if (Name != NULL) {
+    CopyGuid (&Hob->AllocDescriptor.Name, Name);
+  }
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
   Hob->AllocDescriptor.MemoryLength      = Length;
   Hob->AllocDescriptor.MemoryType        = MemoryType;
@@ -723,6 +729,7 @@ UpdateStackHob (
       // to be reclaimed by DXE core.
       //
       MmIplBuildMemoryAllocationHob (
+        NULL,
         Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress,
         Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength,
         EfiConventionalMemory
@@ -818,6 +825,7 @@ CreateMmFoundationHobList (
   VOID                   *GuidHob;
   VOID                   *HobData;
   UINTN                  RequiredSize;
+  EFI_PEI_HOB_POINTERS   SmmProfileDataHob;
 
   if (BufferSize == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -917,6 +925,37 @@ CreateMmFoundationHobList (
       MmIplBuildGuidDataHob (&gMpInformation2HobGuid, HobData, sizeof (SMM_CPU_FEATURE_INFO_HOB));
     }
     GuidHob        = GetNextGuidHob (&gMpInformation2HobGuid, GET_NEXT_HOB (GuidHob));
+  }
+
+  //
+  // gEdkiiSmmProfileDataGuid
+  //
+  if ((*BufferSize == 0) && (Buffer == NULL)) {
+    RequiredSize += sizeof (EFI_HOB_MEMORY_ALLOCATION);
+  } else {
+    //
+    // Searching for gEdkiiSmmProfileDataGuid
+    //
+    SmmProfileDataHob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+    while (SmmProfileDataHob.Raw != NULL) {
+      //
+      // Find gEdkiiSmmProfileDataGuid
+      //
+      if (CompareGuid (&SmmProfileDataHob.MemoryAllocation->AllocDescriptor.Name, &gEdkiiSmmProfileDataGuid)) {
+        break;
+      }
+
+      SmmProfileDataHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (SmmProfileDataHob));
+    }
+
+    ASSERT (SmmProfileDataHob.Raw != NULL);
+
+    MmIplBuildMemoryAllocationHob (
+      &SmmProfileDataHob.MemoryAllocation->AllocDescriptor.Name,
+      SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,
+      SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength,
+      SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryType
+      );
   }
 
   //
