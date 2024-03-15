@@ -1618,21 +1618,6 @@ PerformRemainingTasksForSmiInit (
   );
 
 /**
-  This function is an abstraction layer for implementation specific Mm buffer validation routine.
-
-  @param Buffer  The buffer start address to be checked.
-  @param Length  The buffer length to be checked.
-
-  @retval TRUE  This buffer is valid per processor architecture and not overlap with SMRAM.
-  @retval FALSE This buffer is not valid per processor architecture or overlap with SMRAM.
-**/
-BOOLEAN
-IsBufferOutsideMmValid (
-  IN EFI_PHYSICAL_ADDRESS  Buffer,
-  IN UINT64                Length
-  );
-
-/**
   The common Entry Point of the SMM CPU driver.
 
   @retval EFI_SUCCESS    The common entry point is executed successfully.
