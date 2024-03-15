@@ -115,7 +115,7 @@ UINTN         mSplitMemRangeCount = 0;
 //
 // SMI command port.
 //
-UINT32  mSmiCommandPort = 0xB2; /// TODO: get the info from SMM Communicate
+UINT32  mSmiCommandPort;
 
 /**
   Disable branch trace store.

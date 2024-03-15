@@ -158,4 +158,9 @@ extern BOOLEAN  mXdEnabled;
 //
 extern BOOLEAN  mSetupDebugTrap;
 
+//
+// SMI command port.
+//
+extern UINT32  mSmiCommandPort;
+
 #endif // _SMM_PROFILE_H_

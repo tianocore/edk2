@@ -18,6 +18,26 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 BOOLEAN  mSmmReadyToLock = FALSE;
 
 /**
+  To get system port address of the SMI Command Port in FADT table.
+
+**/
+VOID
+GetSmiCommandPort (
+  VOID
+  )
+{
+  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE  *Fadt;
+
+  Fadt = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *)EfiLocateFirstAcpiTable (
+                                                        EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE
+                                                        );
+  ASSERT (Fadt != NULL);
+
+  mSmiCommandPort = Fadt->SmiCmd;
+  DEBUG ((DEBUG_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));
+}
+
+/**
   Perform the remaining tasks.
 
 **/
@@ -144,6 +164,11 @@ SmmReadyToLockEventNotify (
   // Skip SMM profile initialization if feature is disabled
   //
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    //
+    // Get system port address of the SMI Command Port
+    //
+    GetSmiCommandPort ();
+
     //
     // Initialize protected memory range for patching page table later.
     //
