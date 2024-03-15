@@ -605,6 +605,11 @@ ExecuteSmmCoreFromSmram (
       InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
 
       //
+      // Initialize mMmCoreEntryPoint for build memory allocation module HOB
+      //
+      mMmCoreEntryPoint = ImageContext.EntryPoint;
+
+      //
       // Create MM HOB list for Standalone MM Core.
       //
       MmHobSize = 0;
