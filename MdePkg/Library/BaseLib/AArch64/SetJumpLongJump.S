@@ -9,6 +9,7 @@
 
 GCC_ASM_EXPORT(SetJump)
 GCC_ASM_EXPORT(InternalLongJump)
+GCC_ASM_IMPORT(InternalAssertJumpBuffer)
 
 #define GPR_LAYOUT                         \
         REG_PAIR (x19, x20,  0);           \
