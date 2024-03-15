@@ -682,8 +682,7 @@ SmmProfileBuildNonMmramMemoryMap (
   EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap;
   UINTN                  MmioMemoryMapSize;
   UINTN                  Count;
-  EFI_PHYSICAL_ADDRESS   SmmProfileBase;
-  UINTN                  SmmProfileSize;
+  EFI_PEI_HOB_POINTERS   SmmProfileDataHob;
 
   ASSERT (MemoryMap != NULL && MemoryMapSize != NULL && DescriptorSize != NULL);
 
@@ -716,13 +715,22 @@ SmmProfileBuildNonMmramMemoryMap (
   //
   // For SMM profile base
   //
-  //
-  // TODO: Get SmmProfileBase & SmmProfileSize from memory allocation hob
-  //
-  SmmProfileBase                      = 0;
-  SmmProfileSize                      = 0;
-  (*MemoryMap)[Count-1].PhysicalStart = SmmProfileBase;
-  (*MemoryMap)[Count-1].NumberOfPages = EFI_SIZE_TO_PAGES (SmmProfileSize);
+  SmmProfileDataHob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+  while (SmmProfileDataHob.Raw != NULL) {
+    //
+    // Find gEdkiiSmmProfileDataGuid
+    //
+    if (CompareGuid (&SmmProfileDataHob.MemoryAllocation->AllocDescriptor.Name, &gEdkiiSmmProfileDataGuid)) {
+      break;
+    }
+
+    SmmProfileDataHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (SmmProfileDataHob));
+  }
+
+  ASSERT (SmmProfileDataHob.Raw != NULL);
+
+  (*MemoryMap)[Count-1].PhysicalStart = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+  (*MemoryMap)[Count-1].NumberOfPages = EFI_SIZE_TO_PAGES (SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength);
   (*MemoryMap)[Count-1].Attribute     = EFI_MEMORY_XP;
 }
 
@@ -776,7 +784,7 @@ InitSmmProfileCallBack (
                         SMM_PROFILE_NAME,
                         &gEfiCallerIdGuid,
                         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-                        0, /// TODO, get the info from HOB ---> Move to a Memory Allocation HOB.
+                        sizeof (mSmmProfileBase),
                         &mSmmProfileBase
                         );
 
@@ -792,11 +800,12 @@ InitSmmProfileInternal (
   VOID
   )
 {
-  EFI_STATUS  Status;
-  VOID        *Registration;
-  UINTN       Index;
-  UINTN       MsrDsAreaSizePerCpu;
-  UINTN       SmmProfileSize;
+  EFI_STATUS            Status;
+  VOID                  *Registration;
+  UINTN                 Index;
+  UINTN                 MsrDsAreaSizePerCpu;
+  EFI_PEI_HOB_POINTERS  SmmProfileDataHob;
+  UINTN                 SmmProfileSize;
 
   mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mMaxNumberOfCpus);
   ASSERT (mPFEntryCount != NULL);
@@ -813,10 +822,24 @@ InitSmmProfileInternal (
   ASSERT ((mSmmProfileSize & 0xFFF) == 0);
 
   //
-  // TODO: Get Smm Profile Base from Memory Allocation HOB
+  // Get Smm Profile Base from Memory Allocation HOB
   //
-  mSmmProfileBase = 0;
-  SmmProfileSize  = 0;
+  SmmProfileDataHob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+  while (SmmProfileDataHob.Raw != NULL) {
+    //
+    // Find gEdkiiSmmProfileDataGuid
+    //
+    if (CompareGuid (&SmmProfileDataHob.MemoryAllocation->AllocDescriptor.Name, &gEdkiiSmmProfileDataGuid)) {
+      break;
+    }
+
+    SmmProfileDataHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (SmmProfileDataHob));
+  }
+
+  ASSERT (SmmProfileDataHob.Raw != NULL);
+
+  mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+  SmmProfileSize  = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength;
   DEBUG ((DEBUG_ERROR, "SmmProfileBase = 0x%016x.\n", (UINTN)mSmmProfileBase));
   DEBUG ((DEBUG_ERROR, "SmmProfileSize = 0x%016x.\n", (UINTN)SmmProfileSize));
 

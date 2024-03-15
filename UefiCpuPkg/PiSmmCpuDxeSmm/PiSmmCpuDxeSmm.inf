@@ -122,6 +122,7 @@
   gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
   gEfiSmmSmramMemoryGuid
   gEdkiiSmmCpuFeatureInfoHobGuid
+  gEdkiiSmmProfileDataGuid
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES

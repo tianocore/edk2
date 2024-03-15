@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/SmmReadyToLock.h>
 #include <Library/CpuLib.h>
 #include <IndustryStandard/Acpi.h>
+#include <Guid/SmmProfileDataHob.h>
 
 #include "SmmProfileArch.h"
 
