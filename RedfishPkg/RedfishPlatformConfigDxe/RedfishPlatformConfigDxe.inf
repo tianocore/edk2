@@ -3,6 +3,7 @@
 #
 #  (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -23,6 +24,7 @@
   RedfishPkg/RedfishPkg.dec
 
 [Sources]
+  RedfishPlatformConfigCapability.c
   RedfishPlatformConfigDxe.h
   RedfishPlatformConfigDxe.c
   RedfishPlatformConfigImpl.h
@@ -36,7 +38,9 @@
   HiiLib
   HiiUtilityLib
   MemoryAllocationLib
+  PcdLib
   PrintLib
+  RedfishDebugLib
   UefiLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
@@ -50,6 +54,10 @@
 
 [Guids]
   gEfiRegexSyntaxTypePerlGuid             ## CONSUMED
+
+[FixedPcd]
+ gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigFeatureProperty
+ gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigDebugProperty
 
 [Depex]
   TRUE

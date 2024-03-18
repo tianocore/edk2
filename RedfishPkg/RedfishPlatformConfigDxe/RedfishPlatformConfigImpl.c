@@ -32,7 +32,7 @@ DumpHiiString (
   EFI_STRING  String;
 
   if ((HiiHandle == NULL) || (StringId == 0)) {
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "???"));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "???"));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -41,7 +41,7 @@ DumpHiiString (
     return EFI_NOT_FOUND;
   }
 
-  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%s", String));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%s", String));
   FreePool (String);
 
   return EFI_SUCCESS;
@@ -79,18 +79,18 @@ DumpFormset (
     HiiFormPrivate  = REDFISH_PLATFORM_CONFIG_FORM_FROM_LINK (HiiFormLink);
     HiiNextFormLink = GetNextNode (&FormsetPrivate->HiiFormList, HiiFormLink);
 
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "  [%d] form: %d title: ", ++Index, HiiFormPrivate->Id));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  [%d] form: %d title: ", ++Index, HiiFormPrivate->Id));
     DumpHiiString (FormsetPrivate->HiiHandle, HiiFormPrivate->Title);
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "\n"));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "\n"));
 
     HiiStatementLink = GetFirstNode (&HiiFormPrivate->StatementList);
     while (!IsNull (&HiiFormPrivate->StatementList, HiiStatementLink)) {
       HiiStatementPrivate  = REDFISH_PLATFORM_CONFIG_STATEMENT_FROM_LINK (HiiStatementLink);
       HiiNextStatementLink = GetNextNode (&HiiFormPrivate->StatementList, HiiStatementLink);
 
-      DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "    QID: 0x%x Prompt: ", HiiStatementPrivate->QuestionId));
+      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "    QID: 0x%x Prompt: ", HiiStatementPrivate->QuestionId));
       DumpHiiString (FormsetPrivate->HiiHandle, HiiStatementPrivate->Description);
-      DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "\n"));
+      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "\n"));
 
       HiiStatementLink = HiiNextStatementLink;
     }
@@ -125,7 +125,7 @@ DumpFormsetList (
   }
 
   if (IsListEmpty (FormsetList)) {
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: Empty formset list\n", __func__));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Empty formset list\n", __func__));
     return EFI_SUCCESS;
   }
 
@@ -135,7 +135,7 @@ DumpFormsetList (
     HiiFormsetNextLink = GetNextNode (FormsetList, HiiFormsetLink);
     HiiFormsetPrivate  = REDFISH_PLATFORM_CONFIG_FORMSET_FROM_LINK (HiiFormsetLink);
 
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "[%d] HII Handle: 0x%x formset: %g at %s\n", ++Index, HiiFormsetPrivate->HiiHandle, &HiiFormsetPrivate->Guid, HiiFormsetPrivate->DevicePathStr));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "[%d] HII Handle: 0x%x formset: %g at %s\n", ++Index, HiiFormsetPrivate->HiiHandle, &HiiFormsetPrivate->Guid, HiiFormsetPrivate->DevicePathStr));
     DumpFormset (HiiFormsetPrivate);
 
     HiiFormsetLink = HiiFormsetNextLink;
@@ -622,7 +622,9 @@ GetStatementPrivateByConfigureLangRegex (
         HiiNextStatementLink = GetNextNode (&HiiFormPrivate->StatementList, HiiStatementLink);
         HiiStatementPrivate  = REDFISH_PLATFORM_CONFIG_STATEMENT_FROM_LINK (HiiStatementLink);
 
-        if ((HiiStatementPrivate->Description != 0) && !HiiStatementPrivate->Suppressed) {
+        if ((HiiStatementPrivate->Description != 0) &&
+            (RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED) || !HiiStatementPrivate->Suppressed))
+        {
           TmpString = HiiStatementPrivate->XuefiRedfishStr;
           if (TmpString != NULL) {
             Status = RegularExpressionProtocol->MatchString (
@@ -698,6 +700,7 @@ GetStatementPrivateByConfigureLang (
   LIST_ENTRY                                 *HiiNextStatementLink;
   REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE  *HiiStatementPrivate;
   EFI_STRING                                 TmpString;
+  UINTN                                      Index;
 
   if ((FormsetList == NULL) || IS_EMPTY_STRING (Schema) || IS_EMPTY_STRING (ConfigureLang)) {
     return NULL;
@@ -707,6 +710,7 @@ GetStatementPrivateByConfigureLang (
     return NULL;
   }
 
+  Index          = 0;
   HiiFormsetLink = GetFirstNode (FormsetList);
   while (!IsNull (FormsetList, HiiFormsetLink)) {
     HiiFormsetNextLink = GetNextNode (FormsetList, HiiFormsetLink);
@@ -731,15 +735,22 @@ GetStatementPrivateByConfigureLang (
         HiiNextStatementLink = GetNextNode (&HiiFormPrivate->StatementList, HiiStatementLink);
         HiiStatementPrivate  = REDFISH_PLATFORM_CONFIG_STATEMENT_FROM_LINK (HiiStatementLink);
 
-        DEBUG_CODE (
-          STATIC UINTN Index = 0;
-          Index++;
-          DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: [%d] search %s in QID: 0x%x form: 0x%x formset: %g\n", __func__, Index, ConfigureLang, HiiStatementPrivate->QuestionId, HiiFormPrivate->Id, &HiiFormsetPrivate->Guid));
-          );
-
-        if (HiiStatementPrivate->Description != 0) {
+        if ((HiiStatementPrivate->Description != 0) &&
+            (RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED) || !HiiStatementPrivate->Suppressed))
+        {
           TmpString = HiiStatementPrivate->XuefiRedfishStr;
           if (TmpString != NULL) {
+            Index++;
+            DEBUG_REDFISH_THIS_MODULE (
+              REDFISH_PLATFORM_CONFIG_DEBUG_CONFIG_LANG_SEARCH,
+              "%a: [%d] check %s in QID: 0x%x form: 0x%x formset: %g\n",
+              __func__,
+              Index,
+              ConfigureLang,
+              HiiStatementPrivate->QuestionId,
+              HiiFormPrivate->Id,
+              &HiiFormsetPrivate->Guid
+              );
             if (HiiStrCmp (TmpString, ConfigureLang) == 0) {
               return HiiStatementPrivate;
             }
@@ -1020,7 +1031,7 @@ NewRedfishXuefiStringArray (
 
 **/
 REDFISH_X_UEFI_STRING_DATABASE *
-GetExitOrCreateXuefiStringDatabase (
+GetExistOrCreateXuefiStringDatabase (
   IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
   IN  EFI_HII_STRING_PACKAGE_HDR                *HiiStringPackageHeader
   )
@@ -1028,8 +1039,6 @@ GetExitOrCreateXuefiStringDatabase (
   EFI_STATUS                      Status;
   BOOLEAN                         CreateNewOne;
   REDFISH_X_UEFI_STRING_DATABASE  *XuefiRedfishStringDatabase;
-
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
 
   CreateNewOne               = TRUE;
   XuefiRedfishStringDatabase = NULL;
@@ -1052,7 +1061,7 @@ GetExitOrCreateXuefiStringDatabase (
   }
 
   if (CreateNewOne) {
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "  Creating x-uefi-redfish (%a) string database...\n", HiiStringPackageHeader->Language));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  Creating x-uefi-redfish (%a) string database...\n", HiiStringPackageHeader->Language));
     XuefiRedfishStringDatabase = (REDFISH_X_UEFI_STRING_DATABASE *)AllocateZeroPool (sizeof (REDFISH_X_UEFI_STRING_DATABASE));
     if (XuefiRedfishStringDatabase == NULL) {
       DEBUG ((DEBUG_ERROR, "  Failed to allocate REDFISH_X_UEFI_STRING_DATABASE.\n"));
@@ -1071,7 +1080,7 @@ GetExitOrCreateXuefiStringDatabase (
     }
 
     DEBUG ((
-      REDFISH_PLATFORM_CONFIG_DEBUG,
+      DEBUG_REDFISH_PLATFORM_CONFIG,
       "  x-uefi-redfish (%a):\n    String array is added to XuefiRedfishStringDatabase, total %d arrays now.\n",
       XuefiRedfishStringDatabase->XuefiRedfishLanguage,
       XuefiRedfishStringDatabase->StringsArrayBlocks
@@ -1143,7 +1152,7 @@ RedfishXuefiStringInsertDatabase (
   REDFISH_X_UEFI_STRING_DATABASE  *XuefiRedfishStringDatabase;
   REDFISH_X_UEFI_STRINGS_ARRAY    *ThisArray;
 
-  XuefiRedfishStringDatabase = GetExitOrCreateXuefiStringDatabase (FormsetPrivate, HiiStringPackageHeader);
+  XuefiRedfishStringDatabase = GetExistOrCreateXuefiStringDatabase (FormsetPrivate, HiiStringPackageHeader);
   if (XuefiRedfishStringDatabase == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to get REDFISH_X_UEFI_STRING_DATABASE of x-uefi-redfish language %a.\n", __func__, HiiStringPackageHeader->Language));
     ReleaseXuefiStringDatabase (FormsetPrivate);
@@ -1169,21 +1178,22 @@ RedfishXuefiStringInsertDatabase (
   (ThisArray->ArrayEntryAddress + StringIdOffset)->StringId  = StringId;
   (ThisArray->ArrayEntryAddress + StringIdOffset)->UcsString = StringTextPtr;
 
-  DEBUG ((
-    REDFISH_PLATFORM_CONFIG_DEBUG,
+  DEBUG_REDFISH_THIS_MODULE (
+    REDFISH_PLATFORM_CONFIG_DEBUG_STRING_DATABASE,
     "  Insert string ID: (%d) to database\n    x-uefi-string: \"%s\"\n    Language: %a.\n",
     StringId,
     StringTextPtr,
     HiiStringPackageHeader->Language
-    ));
+    );
   return EFI_SUCCESS;
 }
 
 /**
   Get x-uefi-redfish string and language by string ID.
 
-  @param[in]      FormsetPrivate          Pointer to HII form-set private instance.
-  @param[in]      HiiStringPackageHeader  HII string package header.
+  @param[in]       FormsetPrivate          Pointer to HII form-set private instance.
+  @param[in]       HiiStringPackageHeader  HII string package header.
+  @param[out]      TotalStringAdded        Return the total strings added to database.
 
   @retval  TRUE   x-uefi-redfish string and ID map is inserted to database.
            FALSE  Something is wrong when insert x-uefi-redfish string and ID map.
@@ -1191,8 +1201,9 @@ RedfishXuefiStringInsertDatabase (
 **/
 BOOLEAN
 CreateXuefiLanguageStringIdMap (
-  IN  REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
-  IN  EFI_HII_STRING_PACKAGE_HDR                *HiiStringPackageHeader
+  IN   REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE  *FormsetPrivate,
+  IN   EFI_HII_STRING_PACKAGE_HDR                *HiiStringPackageHeader,
+  OUT  UINTN                                     *TotalStringAdded
   )
 {
   EFI_STATUS               Status;
@@ -1208,6 +1219,9 @@ CreateXuefiLanguageStringIdMap (
   EFI_HII_SIBT_EXT2_BLOCK  Ext2;
   UINT32                   Length32;
   UINT8                    *StringBlockInfo;
+  UINTN                    StringsAdded;
+
+  StringsAdded = 0;
 
   //
   // Parse the string blocks to get the string text and font.
@@ -1279,6 +1293,8 @@ CreateXuefiLanguageStringIdMap (
             DEBUG ((DEBUG_ERROR, "%a: Failed to insert x-uefi-redfish string %s.\n", __func__, StringTextPtr));
             return FALSE;
           }
+
+          StringsAdded++;
         }
 
         BlockSize += (Offset + HiiStrSize ((CHAR16 *)StringTextPtr));
@@ -1370,6 +1386,7 @@ CreateXuefiLanguageStringIdMap (
     BlockHdr = (UINT8 *)(StringBlockInfo + BlockSize);
   }
 
+  *TotalStringAdded = StringsAdded;
   return TRUE;
 }
 
@@ -1483,6 +1500,8 @@ BuildXUefiRedfishStringDatabase (
   UINTN                       SupportedSchemaLangCount;
   CHAR8                       **SupportedSchemaLang;
   BOOLEAN                     StringIdMapIsBuilt;
+  UINTN                       TotalStringsAdded;
+  UINTN                       NumberPackageStrings;
 
   DEBUG ((DEBUG_INFO, "%a: Building x-uefi-redfish string database, HII Formset GUID - %g.\n", __func__, FormsetPrivate->Guid));
 
@@ -1514,6 +1533,7 @@ BuildXUefiRedfishStringDatabase (
     return;
   }
 
+  TotalStringsAdded = 0;
   //
   // Finding the string package.
   //
@@ -1538,14 +1558,18 @@ BuildXUefiRedfishStringDatabase (
                 AsciiStrLen (HiiStringPackageHeader->Language)
                 ) == 0)
           {
-            StringIdMapIsBuilt = CreateXuefiLanguageStringIdMap (FormsetPrivate, HiiStringPackageHeader);
+            StringIdMapIsBuilt = CreateXuefiLanguageStringIdMap (FormsetPrivate, HiiStringPackageHeader, &NumberPackageStrings);
+            if (StringIdMapIsBuilt) {
+              TotalStringsAdded += NumberPackageStrings;
+            }
+
             break;
           }
         }
 
         if (StringIdMapIsBuilt == FALSE) {
           if (AsciiStrStr (HiiStringPackageHeader->Language, X_UEFI_SCHEMA_PREFIX) == NULL) {
-            DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "  No need to build x-uefi-redfish string ID map for HII language %a\n", HiiStringPackageHeader->Language));
+            DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  No need to build x-uefi-redfish string ID map for HII language %a\n", HiiStringPackageHeader->Language));
           } else {
             DEBUG ((DEBUG_ERROR, "  Failed to build x-uefi-redfish string ID map of HII language %a\n", HiiStringPackageHeader->Language));
           }
@@ -1555,6 +1579,8 @@ BuildXUefiRedfishStringDatabase (
         PackageHeader = (EFI_HII_PACKAGE_HEADER *)((UINTN)PackageHeader + PackageHeader->Length);
     }
   }
+
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  Total %d x-uefi-redfish config language are added.\n", TotalStringsAdded));
 }
 
 /**
@@ -1620,7 +1646,7 @@ LoadFormset (
   FormsetPrivate->DevicePathStr = ConvertDevicePathToText (HiiFormSet->DevicePath, FALSE, FALSE);
   Status                        = GetSupportedSchema (FormsetPrivate->HiiHandle, &FormsetPrivate->SupportedSchema);
   if (EFI_ERROR (Status)) {
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: No x-uefi-redfish configuration found on the formset - %g\n", __func__, FormsetPrivate->Guid));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: No x-uefi-redfish configuration found on the formset - %g\n", __func__, FormsetPrivate->Guid));
     return EFI_UNSUPPORTED; // Can't build AttributeRegistry Meni path with returning EFI_UNSUPPORTED.
   } else {
     // Building x-uefi-redfish string database
@@ -1788,7 +1814,10 @@ LoadFormsetList (
   InsertTailList (FormsetList, &FormsetPrivate->Link);
 
   DEBUG_CODE (
+    if (RedfishPlatformConfigDebugProp (REDFISH_PLATFORM_CONFIG_DEBUG_DUMP_FORMSET)) {
     DumpFormsetList (FormsetList);
+  }
+
     );
 
   return EFI_SUCCESS;
@@ -1908,7 +1937,7 @@ NotifyFormsetUpdate (
   if (TargetPendingList != NULL) {
     TargetPendingList->IsDeleted = FALSE;
     DEBUG_CODE (
-      DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: HII handle: 0x%x is updated\n", __func__, HiiHandle));
+      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: HII handle: 0x%x is updated\n", __func__, HiiHandle));
       );
     return EFI_SUCCESS;
   }
@@ -1924,7 +1953,7 @@ NotifyFormsetUpdate (
   InsertTailList (PendingList, &TargetPendingList->Link);
 
   DEBUG_CODE (
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: HII handle: 0x%x is created\n", __func__, HiiHandle));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: HII handle: 0x%x is created\n", __func__, HiiHandle));
     );
 
   return EFI_SUCCESS;
@@ -1961,7 +1990,7 @@ NotifyFormsetDeleted (
   if (TargetPendingList != NULL) {
     TargetPendingList->IsDeleted = TRUE;
     DEBUG_CODE (
-      DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: HII handle: 0x%x is updated and deleted\n", __func__, HiiHandle));
+      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: HII handle: 0x%x is updated and deleted\n", __func__, HiiHandle));
       );
     return EFI_SUCCESS;
   }
@@ -1977,7 +2006,7 @@ NotifyFormsetDeleted (
   InsertTailList (PendingList, &TargetPendingList->Link);
 
   DEBUG_CODE (
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: HII handle: 0x%x is deleted\n", __func__, HiiHandle));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: HII handle: 0x%x is deleted\n", __func__, HiiHandle));
     );
 
   return EFI_SUCCESS;
@@ -2026,12 +2055,12 @@ ProcessPendingList (
       //
       FormsetPrivate = GetFormsetPrivateByHiiHandle (Target->HiiHandle, FormsetList);
       if (FormsetPrivate != NULL) {
-        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: formset: %g is removed because driver release HII resource it already\n", __func__, FormsetPrivate->Guid));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: formset: %g is removed because driver release HII resource it already\n", __func__, FormsetPrivate->Guid));
         RemoveEntryList (&FormsetPrivate->Link);
         ReleaseFormset (FormsetPrivate);
         FreePool (FormsetPrivate);
       } else {
-        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: formset on HII handle 0x%x was removed already\n", __func__, Target->HiiHandle));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: formset on HII handle 0x%x was removed already\n", __func__, Target->HiiHandle));
       }
     } else {
       //
@@ -2042,7 +2071,7 @@ ProcessPendingList (
         //
         // HII formset already exist, release it and query again.
         //
-        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%a: formset: %g is updated. Release current formset\n", __func__, &FormsetPrivate->Guid));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: formset: %g is updated. Release current formset\n", __func__, &FormsetPrivate->Guid));
         RemoveEntryList (&FormsetPrivate->Link);
         ReleaseFormset (FormsetPrivate);
         FreePool (FormsetPrivate);
