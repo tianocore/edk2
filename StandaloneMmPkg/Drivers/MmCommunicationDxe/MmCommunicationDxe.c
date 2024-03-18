@@ -320,6 +320,13 @@ SmmCommunicationMmCommunicate2 (
   }
 
   //
+  // Copy the returned data to the non-mmram buffer (CommBufferPhysical)
+  //
+  if ((UINTN)CommBufferPhysical != MmCommonBufferData->FixedCommBuffer) {
+    CopyMem (CommBufferPhysical, (VOID *)(MmCommonBufferData->FixedCommBuffer), CommunicationInOutBuffer->ReturnBufferSize);
+  }
+
+  //
   // Retrieve BufferSize and return status from CommunicationInOutBuffer
   //
   if (CommSize != NULL) {
