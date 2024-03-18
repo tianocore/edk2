@@ -309,6 +309,8 @@ SmmCommunicationMmCommunicate2 (
     CopyMem ((VOID *)(MmCommonBufferData->FixedCommBuffer), CommBufferPhysical, BufferSize);
   }
 
+  CommunicationInOutBuffer->IsCommBufferValid = TRUE;
+
   //
   // Generate Software SMI
   //
@@ -318,11 +320,13 @@ SmmCommunicationMmCommunicate2 (
   }
 
   //
-  // Retrive BufferSize and return status from gMmCoreDataHobGuid
+  // Retrieve BufferSize and return status from CommunicationInOutBuffer
   //
   if (CommSize != NULL) {
     *CommSize = CommunicationInOutBuffer->ReturnBufferSize;
   }
+
+  CommunicationInOutBuffer->IsCommBufferValid = FALSE;
 
   return CommunicationInOutBuffer->ReturnStatus;
 }
