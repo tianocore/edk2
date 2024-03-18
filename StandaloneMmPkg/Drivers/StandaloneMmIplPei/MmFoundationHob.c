@@ -6,8 +6,8 @@
 
 **/
 
+#include <Uefi.h>
 #include <PiPei.h>
-
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -20,6 +20,7 @@
 #include <Guid/SmramMemoryReserve.h>
 #include <Guid/MmCommBuffer.h>
 #include <Guid/AcpiS3Context.h>
+#include <Guid/UnblockRegion.h>
 
 VOID  *mHobList;
 extern EFI_PHYSICAL_ADDRESS  mMmramRanges;
@@ -977,6 +978,18 @@ CreateMmFoundationHobList (
   //
   // Reserouce Hobs for unblockoed memory regions (Multiple instance)
   //
+  GuidHob = GetFirstGuidHob (&gMmUnblockRegionHobGuid);
+  ASSERT (GuidHob != NULL);
+  while (GuidHob != NULL) {
+    if ((*BufferSize == 0) && (Buffer == NULL)) {
+      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_UNBLOCK_REGION);
+    } else {
+      HobData = GET_GUID_HOB_DATA (GuidHob);
+      MmIplBuildGuidDataHob (&gMmUnblockRegionHobGuid, HobData, sizeof (MM_UNBLOCK_REGION));
+    }
+    GuidHob        = GetNextGuidHob (&gMmUnblockRegionHobGuid, GET_NEXT_HOB (GuidHob));
+  }
+
 
   if (*BufferSize < RequiredSize) {
     *BufferSize = RequiredSize;
