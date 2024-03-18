@@ -825,10 +825,15 @@ CreateMmFoundationHobList (
   IN OUT UINTN  *BufferSize
   )
 {
-  VOID                   *GuidHob;
-  VOID                   *HobData;
-  UINTN                  RequiredSize;
-  EFI_PEI_HOB_POINTERS   SmmProfileDataHob;
+  VOID                         *GuidHob;
+  VOID                         *HobData;
+  UINTN                        RequiredSize;
+  EFI_PEI_HOB_POINTERS         SmmProfileDataHob;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  Attribute;
+
+  Attribute = EFI_RESOURCE_ATTRIBUTE_PRESENT |
+              EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
+              EFI_RESOURCE_ATTRIBUTE_TESTED;
 
   if (BufferSize == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -976,20 +981,29 @@ CreateMmFoundationHobList (
   }
 
   //
-  // Reserouce Hobs for unblockoed memory regions (Multiple instance)
+  // Reserouce Hobs from unblockoed memory regions (Multiple instance)
   //
   GuidHob = GetFirstGuidHob (&gMmUnblockRegionHobGuid);
   ASSERT (GuidHob != NULL);
   while (GuidHob != NULL) {
     if ((*BufferSize == 0) && (Buffer == NULL)) {
-      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_UNBLOCK_REGION);
+      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
     } else {
       HobData = GET_GUID_HOB_DATA (GuidHob);
-      MmIplBuildGuidDataHob (&gMmUnblockRegionHobGuid, HobData, sizeof (MM_UNBLOCK_REGION));
+      MmIplBuildResourceDescriptorHob (
+        EFI_RESOURCE_MEMORY_RESERVED,
+        Attribute,
+        ((MM_UNBLOCK_REGION *)HobData)->MemoryDescriptor.PhysicalStart,
+        EFI_PAGES_TO_SIZE (((MM_UNBLOCK_REGION *)HobData)->MemoryDescriptor.NumberOfPages)
+        );
+      DEBUG ((
+        DEBUG_INFO,
+        "BuildResourceDescriptorHob memory is for %x\n",
+        ((MM_UNBLOCK_REGION *)HobData)->MemoryDescriptor.PhysicalStart
+        ));
     }
-    GuidHob        = GetNextGuidHob (&gMmUnblockRegionHobGuid, GET_NEXT_HOB (GuidHob));
+    GuidHob = GetNextGuidHob (&gMmUnblockRegionHobGuid, GET_NEXT_HOB (GuidHob));
   }
-
 
   if (*BufferSize < RequiredSize) {
     *BufferSize = RequiredSize;
