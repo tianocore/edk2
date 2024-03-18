@@ -531,17 +531,18 @@ MmEntryPoint (
       CopyMem (
         mInternalCommBufferCopy,
         (VOID *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer,
-        CommunicateHeader->MessageLength
+        OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength /// MessageLength does not include the size of the header.
         );
 
       CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mInternalCommBufferCopy;
-      BufferSize        = CommunicateHeader->MessageLength - OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+      BufferSize        = CommunicateHeader->MessageLength;
       Status            = MmiManage (
                             &CommunicateHeader->HeaderGuid,
                             NULL,
                             CommunicateHeader->Data,
                             &BufferSize
                             );
+
       //
       // Update CommunicationBuffer, BufferSize and ReturnStatus
       // Communicate service finished, reset the pointer to CommBuffer to NULL
