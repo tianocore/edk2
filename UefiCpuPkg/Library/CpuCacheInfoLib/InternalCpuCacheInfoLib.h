@@ -89,7 +89,11 @@ typedef struct {
   // Value = CPUID.04h:EDX[02]
   //
   UINT16    DirectMappedCache     : 1;
-  UINT16    Reserved              : 4;
+  //
+  // Count of valid cache parameter sub-leaf. The Max support is 2^3 = 8.
+  //
+  UINT16    CacheParamLeafCount   : 3;
+  UINT16    Reserved              : 1;
   //
   // Cache share bits.
   // Value = CPUID.04h:EAX[25:14]
