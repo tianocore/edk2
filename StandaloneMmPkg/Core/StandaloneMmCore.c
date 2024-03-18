@@ -544,6 +544,15 @@ MmEntryPoint (
                             );
 
       //
+      // Copy the data back to FixedCommBuffer
+      //
+      CopyMem (
+        (VOID *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer,
+        mInternalCommBufferCopy,
+        BufferSize + OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data)
+        );
+
+      //
       // Update CommunicationBuffer, BufferSize and ReturnStatus
       // Communicate service finished, reset the pointer to CommBuffer to NULL
       //
