@@ -196,6 +196,12 @@ Communicate (
   // Return status from software SMI
   //
   *CommSize = (UINTN)CommunicationInOut->ReturnBufferSize;
+
+  //
+  // Copy the returned data to the non-mmram buffer (CommBuffer)
+  //
+  CopyMem (CommBuffer, (VOID *)(MmCommBufferData->FixedCommBuffer), CommunicationInOut->ReturnBufferSize);
+
   Status    = (EFI_STATUS)CommunicationInOut->ReturnStatus;
   if (Status != EFI_SUCCESS) {
      Status = Status | MAX_BIT;
