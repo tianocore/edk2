@@ -418,4 +418,32 @@ HiiStrSize (
   IN      CONST CHAR16  *String
   );
 
+/**
+  Check if the debug property is enabled or not.
+
+  @param[in]  DebugType  Debug enablement type
+
+  @retval TRUE, the debug property is enabled.
+          FALSE, the debug property is not enabled.
+
+**/
+BOOLEAN
+RedfishPlatformConfigDebugProp (
+  IN UINT64  DebugProp
+  );
+
+/**
+  Check if the Platform Configure feature is enabled or not.
+
+  @param[in]  FeatureType  Redfish platform config feature enablement
+
+  @retval TRUE, the feature is enabled.
+          FALSE, the feature is not enabled.
+
+**/
+BOOLEAN
+RedfishPlatformConfigFeatureProp (
+  IN UINT64  FeatureProp
+  );
+
 #endif
