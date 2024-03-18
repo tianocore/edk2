@@ -105,11 +105,8 @@ VarCheckPolicyLibMmiHandler (
     return EFI_INVALID_PARAMETER;
   }
 
-  // Make sure that the buffer does not overlap SMM.
-  // This should be covered by the SmiManage infrastructure, but just to be safe...
   InternalCommBufferSize = *CommBufferSize;
-  if ((InternalCommBufferSize > VAR_CHECK_POLICY_MM_COMM_BUFFER_SIZE) ||
-      !VarCheckPolicyIsBufferOutsideValid ((UINTN)CommBuffer, (UINT64)InternalCommBufferSize))
+  if ((InternalCommBufferSize > VAR_CHECK_POLICY_MM_COMM_BUFFER_SIZE))
   {
     DEBUG ((DEBUG_ERROR, "%a - Invalid CommBuffer supplied! 0x%016lX[0x%016lX]\n", __func__, CommBuffer, InternalCommBufferSize));
     return EFI_INVALID_PARAMETER;
