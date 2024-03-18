@@ -16,6 +16,7 @@
 #include <Guid/SmmCpuFeatureInfo.h>
 #include <Guid/SmmProfileDataHob.h>
 #include <Guid/SmmBaseHob.h>
+#include <Guid/MpInformation2.h>
 #include <Guid/SmramMemoryReserve.h>
 #include <Guid/MmCommBuffer.h>
 
@@ -918,11 +919,11 @@ CreateMmFoundationHobList (
   GuidHob = GetFirstGuidHob (&gMpInformation2HobGuid);
   ASSERT (GuidHob != NULL);
   while (GuidHob != NULL) {
+    HobData = GET_GUID_HOB_DATA (GuidHob);
     if ((*BufferSize == 0) && (Buffer == NULL)) {
-      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (SMM_CPU_FEATURE_INFO_HOB);
+      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (MP_INFORMATION2_HOB_DATA) + sizeof (MP_INFORMATION2_ENTRY) * ((MP_INFORMATION2_HOB_DATA *)HobData)->NumberOfProcessors;
     } else {
-      HobData = GET_GUID_HOB_DATA (GuidHob);
-      MmIplBuildGuidDataHob (&gMpInformation2HobGuid, HobData, sizeof (SMM_CPU_FEATURE_INFO_HOB));
+      MmIplBuildGuidDataHob (&gMpInformation2HobGuid, HobData, sizeof (MP_INFORMATION2_HOB_DATA) + sizeof (MP_INFORMATION2_ENTRY) * ((MP_INFORMATION2_HOB_DATA *)HobData)->NumberOfProcessors);
     }
     GuidHob        = GetNextGuidHob (&gMpInformation2HobGuid, GET_NEXT_HOB (GuidHob));
   }
