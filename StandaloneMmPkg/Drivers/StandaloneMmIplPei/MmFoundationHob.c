@@ -889,11 +889,11 @@ CreateMmFoundationHobList (
   GuidHob = GetFirstGuidHob (&gSmmBaseHobGuid);
   ASSERT (GuidHob != NULL);
   while (GuidHob != NULL) {
+    HobData = GET_GUID_HOB_DATA (GuidHob);
     if ((*BufferSize == 0) && (Buffer == NULL)) {
-      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (SMM_BASE_HOB_DATA);
+      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (SMM_BASE_HOB_DATA) + sizeof (UINT64) * ((SMM_BASE_HOB_DATA *)HobData)->NumberOfProcessors;
     } else {
-      HobData = GET_GUID_HOB_DATA (GuidHob);
-      MmIplBuildGuidDataHob (&gSmmBaseHobGuid, HobData, sizeof (SMM_BASE_HOB_DATA));
+      MmIplBuildGuidDataHob (&gSmmBaseHobGuid, HobData, sizeof (SMM_BASE_HOB_DATA) + sizeof (UINT64) * ((SMM_BASE_HOB_DATA *)HobData)->NumberOfProcessors);
     }
     GuidHob        = GetNextGuidHob (&gSmmBaseHobGuid, GET_NEXT_HOB (GuidHob));
   }
