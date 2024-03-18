@@ -30,6 +30,7 @@ IsSmmCommBufferForbiddenAddress (
       return FALSE;
     }
 
+    Hob.Raw = GET_NEXT_HOB (Hob);
     Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
@@ -79,6 +80,7 @@ BuildMemoryMapFromResDescHobs (
       Count++;
     }
 
+    Hob.Raw = GET_NEXT_HOB (Hob);
     Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
@@ -108,6 +110,7 @@ BuildMemoryMapFromResDescHobs (
       Index++;
     }
 
+    Hob.Raw = GET_NEXT_HOB (Hob);
     Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
 
