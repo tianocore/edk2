@@ -2,6 +2,7 @@
 #  INF file for Redfish debug library.
 #
 #  Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -34,6 +35,9 @@
   MemoryAllocationLib
   RedfishHttpLib
   UefiLib
+
+[FixedPcd]
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory
 
 [Depex]
   TRUE
