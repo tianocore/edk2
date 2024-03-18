@@ -1,5 +1,5 @@
 // /** @file
-// Null instance of MM Unblock Page Library.
+// Instance of MM Unblock Page Library.
 //
 // This library provides an interface to request non-MMRAM pages to be mapped/unblocked
 // from inside MM environment.
@@ -9,6 +9,7 @@
 // to be accessed from inside MM.
 //
 // Copyright (c) Microsoft Corporation.
+// Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // **/

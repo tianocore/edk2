@@ -1,5 +1,5 @@
 ## @file
-#  Null instance of MM Unblock Page Library.
+#  Instance of MM Unblock Page Library.
 #
 #  This library provides an interface to request non-MMRAM pages to be mapped/unblocked
 #  from inside MM environment.
@@ -9,6 +9,7 @@
 #  to be accessed from inside MM.
 #
 #  Copyright (c) Microsoft Corporation.
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #
@@ -19,7 +20,7 @@
   BASE_NAME                      = MmUnblockMemoryLib
   MODULE_UNI_FILE                = MmUnblockMemoryLib.uni
   FILE_GUID                      = CBFE5800-70FD-4D9A-AA78-DB617294077E
-  MODULE_TYPE                    = BASE
+  MODULE_TYPE                    = PEIM
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = MmUnblockMemoryLib
 
@@ -32,3 +33,15 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  HobLib
+  DebugLib
+  BaseMemoryLib
+  PeiServicesLib
+
+[Ppis]
+  gEfiPeiMmCommunicationPpiGuid
+
+[Guids]
+  gMmUnblockRegionHobGuid

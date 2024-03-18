@@ -1,4 +1,3 @@
-
 /** @file
   The instance of MM Unblock Page Library.
   This library provides an interface to request non-MMRAM pages to be mapped/unblocked
@@ -6,7 +5,9 @@
   For MM modules that need to access regions outside of MMRAMs, the agents that set up
   these regions are responsible for invoking this API in order for these memory areas
   to be accessed from inside MM.
+
   Copyright (c) Microsoft Corporation.
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 #include <Uefi.h>
@@ -17,6 +18,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Base.h>
+
 /**
   This API provides a way to unblock certain data pages to be accessible inside MM environment.
   For the original design, when the CommonBufferX is allocated, Smi handler can sense directly, there is no need to
@@ -51,7 +53,8 @@ MmUnblockMemoryRequest (
 {
   EFI_STATUS                    Status;
   MM_UNBLOCK_REGION             *MmUnblockMemoryHob;
-  EFI_PEI_MM_COMMUNICATION_PPI  *MmCommunicatePpi;
+  EFI_PEI_MM_COMMUNICATION_PPI  *MmCommunicationPpi;
+
   //
   // IPL should make sure the gMmUnblockRegionHobGuid is created. At the point when we can ensure all the
   // consumers are already called this API via check is the gEfiPeiMmCommunicationPpiGuid failed or not.
@@ -59,23 +62,30 @@ MmUnblockMemoryRequest (
   Status = PeiServicesLocatePpi (&gEfiPeiMmCommunicationPpiGuid, 0, NULL, (VOID **)&MmCommunicationPpi);
   if (!EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to locate PEI MM Communication PPI Communicate PPI is installed, request too late: %r\n", __func__, Status));
+    CpuDeadLoop ();
     goto Exit;
   }
+
+  //
   // Build the GUID'd HOB for MmCore
+  //
   MmUnblockMemoryHob = BuildGuidHob (&gMmUnblockRegionHobGuid, sizeof (MM_UNBLOCK_REGION));
   if (MmUnblockMemoryHob == NULL) {
     DEBUG ((DEBUG_ERROR, "%a Failed to allocate hob for unblocked data parameter!!\n", __FUNCTION__));
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
+
   ZeroMem (MmUnblockMemoryHob, sizeof (MM_UNBLOCK_REGION));
+
   //
   // Caller ID is filled in.
   //
   CopyMem (&MmUnblockMemoryHob->IdentifierGuid, &gEfiCallerIdGuid, sizeof (EFI_GUID));
   MmUnblockMemoryHob->MemoryDescriptor.PhysicalStart = UnblockAddress;
   MmUnblockMemoryHob->MemoryDescriptor.NumberOfPages = NumberOfPages;
-  Status = EFI_SUCCESS;
+  Status                                             = EFI_SUCCESS;
+
 Exit:
   return Status;
 }
