@@ -1385,7 +1385,7 @@ GenSmmPageTable (
   //
   for (Index = 0; Index < MemoryMapSize / DescriptorSize; Index++) {
     ASSERT (MemoryMap[Index].PhysicalStart % SIZE_4KB == 0);
-    ASSERT (MemoryMap[Index].NumberOfPages % EFI_PAGE_SIZE == 0);
+    ASSERT (EFI_PAGES_TO_SIZE (MemoryMap[Index].NumberOfPages) % EFI_PAGE_SIZE == 0);
 
     //
     // Update the MapAttribute
