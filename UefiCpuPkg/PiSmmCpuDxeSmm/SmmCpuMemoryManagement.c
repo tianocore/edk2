@@ -1358,15 +1358,10 @@ GenSmmPageTable (
   RETURN_STATUS          Status;
   UINTN                  GuardPage;
 
-  PageTable                        = 0;
-  MemoryMap                        = NULL;
-  MemoryMapSize                    = 0;
-  DescriptorSize                   = 0;
-  MapAttribute.Bits.Present        = 1;
-  MapAttribute.Bits.ReadWrite      = 1;
-  MapAttribute.Bits.UserSupervisor = 1;
-  MapAttribute.Bits.Accessed       = 1;
-  MapAttribute.Bits.Dirty          = 1;
+  PageTable      = 0;
+  MemoryMap      = NULL;
+  MemoryMapSize  = 0;
+  DescriptorSize = 0;
 
   if (sizeof (UINTN) == sizeof (UINT64)) {
     SmramPagingMode = m5LevelPagingNeeded ? Paging5Level4KB : Paging4Level4KB;
@@ -1388,10 +1383,18 @@ GenSmmPageTable (
     ASSERT (EFI_PAGES_TO_SIZE (MemoryMap[Index].NumberOfPages) % EFI_PAGE_SIZE == 0);
 
     //
-    // Update the MapAttribute
+    // Set the MapAttribute
     //
-    MapAttribute.Uint64 = mAddressEncMask|MemoryMap[Index].PhysicalStart;
+    MapAttribute.Uint64              = mAddressEncMask|MemoryMap[Index].PhysicalStart;
+    MapAttribute.Bits.Present        = 1;
+    MapAttribute.Bits.ReadWrite      = 1;
+    MapAttribute.Bits.UserSupervisor = 1;
+    MapAttribute.Bits.Accessed       = 1;
+    MapAttribute.Bits.Dirty          = 1;
 
+    //
+    // Update the MapAttribute according MemoryMap[Index].Attribute
+    //
     if ((MemoryMap[Index].Attribute & EFI_MEMORY_RO) != 0) {
       MapAttribute.Bits.ReadWrite = 0;
     }
@@ -1425,9 +1428,14 @@ GenSmmPageTable (
     ASSERT (mSmmCpuSmramRanges[Index].PhysicalSize % EFI_PAGE_SIZE == 0);
 
     //
-    // Update the MapAttribute
+    // Set the MapAttribute
     //
-    MapAttribute.Uint64 = mAddressEncMask|mSmmCpuSmramRanges[Index].CpuStart;
+    MapAttribute.Uint64              = mAddressEncMask|mSmmCpuSmramRanges[Index].CpuStart;
+    MapAttribute.Bits.Present        = 1;
+    MapAttribute.Bits.ReadWrite      = 1;
+    MapAttribute.Bits.UserSupervisor = 1;
+    MapAttribute.Bits.Accessed       = 1;
+    MapAttribute.Bits.Dirty          = 1;
 
     GenPageTable (&PageTable, SmramPagingMode, mSmmCpuSmramRanges[Index].CpuStart, mSmmCpuSmramRanges[Index].PhysicalSize, MapAttribute);
   }
