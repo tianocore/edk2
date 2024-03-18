@@ -5,6 +5,7 @@
 # (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2023, American Megatrends International LLC.
 # Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -184,3 +185,11 @@
   gEfiRedfishPkgTokenSpaceGuid.PcdHttpRetryWaitInSecond|1|UINT16|0x00001010
   ## This is used to disable Redfish HTTP cache function and every request will be sent to Redfish service.
   gEfiRedfishPkgTokenSpaceGuid.PcdHttpCacheDisabled|FALSE|BOOLEAN|0x00001011
+  #
+  # Redfish debug catagories
+  # To enable the debug message for the entire edk2 Redfish implementation, below PCDs must be set.
+  # DEBUG_MANAGEABILITY must be set PcdDebugPrintErrorLevel.
+  #
+  #   0x0000000000000001  RedfishPlatformConfigDxe driver debug enabled.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory|0|UINT64|0x00001012
