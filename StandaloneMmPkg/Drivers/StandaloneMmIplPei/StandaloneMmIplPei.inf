@@ -57,6 +57,7 @@
   gSmmBaseHobGuid
   gMpInformation2HobGuid
   gEdkiiSmmProfileDataGuid
+  gEfiAcpiVariableGuid
 
 [Ppis]
   gPeiSmmControlPpiGuid

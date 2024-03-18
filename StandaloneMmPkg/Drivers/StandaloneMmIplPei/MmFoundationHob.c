@@ -19,6 +19,7 @@
 #include <Guid/MpInformation2.h>
 #include <Guid/SmramMemoryReserve.h>
 #include <Guid/MmCommBuffer.h>
+#include <Guid/AcpiS3Context.h>
 
 VOID  *mHobList;
 extern EFI_PHYSICAL_ADDRESS  mMmramRanges;
@@ -957,6 +958,20 @@ CreateMmFoundationHobList (
       SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength,
       SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryType
       );
+  }
+
+  //
+  // gEfiAcpiVariableGuid
+  //
+  GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
+  ASSERT (GuidHob != NULL);
+  if (GuidHob != NULL) {
+    if ((*BufferSize == 0) && (Buffer == NULL)) {
+      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof(EFI_SMRAM_DESCRIPTOR);
+    } else {
+      HobData = GET_GUID_HOB_DATA (GuidHob);
+      MmIplBuildGuidDataHob (&gEfiAcpiVariableGuid, HobData, sizeof (EFI_SMRAM_DESCRIPTOR));
+    }
   }
 
   //
