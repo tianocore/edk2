@@ -1,0 +1,45 @@
+## @file
+#  SPDM library.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SpdmCryptLib
+  FILE_GUID                      = 2FF3E7F6-D95A-48A2-B418-9B6D585C1D7E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SpdmCryptLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  libspdm/library/spdm_crypt_lib/libspdm_crypt_aead.c
+  libspdm/library/spdm_crypt_lib/libspdm_crypt_asym.c
+  libspdm/library/spdm_crypt_lib/libspdm_crypt_cert.c
+  libspdm/library/spdm_crypt_lib/libspdm_crypt_dhe.c
+  libspdm/library/spdm_crypt_lib/libspdm_crypt_hash.c
+  libspdm/library/spdm_crypt_lib/libspdm_crypt_hkdf.c
+  libspdm/library/spdm_crypt_lib/libspdm_crypt_hmac.c
+  libspdm/library/spdm_crypt_lib/libspdm_crypt_rng.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  BaseCryptLib
+  RngLib
+  MemLibWrapper

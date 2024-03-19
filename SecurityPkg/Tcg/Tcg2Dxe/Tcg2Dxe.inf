@@ -86,6 +86,7 @@
   gTcgEvent2EntryHobGuid                             ## SOMETIMES_CONSUMES  ## HOB
   gTpm2StartupLocalityHobGuid                        ## SOMETIMES_CONSUMES  ## HOB
   gTcg800155PlatformIdEventHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
+  gEfiDeviceSignatureDatabaseGuid
 
 [Protocols]
   gEfiTcg2ProtocolGuid                               ## PRODUCES
@@ -107,6 +108,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml                        ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa                        ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableSpdmDeviceAuhenticaion            ## CONSUMES
 
 [Depex]
   # According to PcdTpm2AcpiTableRev definition in SecurityPkg.dec

@@ -1,0 +1,44 @@
+## @file
+#  SPDM library.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SpdmSecuredMessageLib
+  FILE_GUID                      = C5E91542-9B57-4BC4-988C-2DEB0B17D381
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SpdmSecuredMessageLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  libspdm/library/spdm_secured_message_lib/libspdm_secmes_context_data.c
+  libspdm/library/spdm_secured_message_lib/libspdm_secmes_encode_decode.c
+  libspdm/library/spdm_secured_message_lib/libspdm_secmes_encode_decode.c
+  libspdm/library/spdm_secured_message_lib/libspdm_secmes_key_exchange.c
+  libspdm/library/spdm_secured_message_lib/libspdm_secmes_session.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  BaseCryptLib
+  RngLib
+  SpdmCryptLib
+  SpdmDeviceSecretLib
+  MemLibWrapper
