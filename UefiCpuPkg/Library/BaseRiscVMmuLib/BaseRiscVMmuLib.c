@@ -36,6 +36,11 @@
 #define PTE_PPN_SHIFT         10
 #define RISCV_MMU_PAGE_SHIFT  12
 
+#define RISCV_CPU_FEATURE_PBMT_BITMASK  BIT2
+#define PTE_PBMT_NC                     BIT61
+#define PTE_PBMT_IO                     BIT62
+#define PTE_PBMT_MASK                   (PTE_PBMT_NC | PTE_PBMT_IO)
+
 STATIC UINTN  mModeSupport[] = { SATP_MODE_SV57, SATP_MODE_SV48, SATP_MODE_SV39, SATP_MODE_OFF };
 STATIC UINTN  mMaxRootTableLevel;
 STATIC UINTN  mBitPerLevel;
@@ -65,7 +70,7 @@ RiscVMmuEnabled (
 
 **/
 STATIC
-UINTN
+UINT64
 RiscVGetRootTranslateTable (
   VOID
   )
@@ -86,7 +91,7 @@ RiscVGetRootTranslateTable (
 STATIC
 BOOLEAN
 IsValidPte (
-  IN  UINTN  Entry
+  IN  UINT64  Entry
   )
 {
   if (((Entry & RISCV_PG_V) == 0) ||
@@ -107,9 +112,9 @@ IsValidPte (
 
 **/
 STATIC
-UINTN
+UINT64
 SetValidPte (
-  IN  UINTN  Entry
+  IN  UINT64  Entry
   )
 {
   /* Set Valid and Global mapping bits */
@@ -128,7 +133,7 @@ SetValidPte (
 STATIC
 BOOLEAN
 IsBlockEntry (
-  IN  UINTN  Entry
+  IN  UINT64  Entry
   )
 {
   return IsValidPte (Entry) &&
@@ -147,7 +152,7 @@ IsBlockEntry (
 STATIC
 BOOLEAN
 IsTableEntry (
-  IN  UINTN  Entry
+  IN  UINT64  Entry
   )
 {
   return IsValidPte (Entry) &&
@@ -163,13 +168,13 @@ IsTableEntry (
 
 **/
 STATIC
-UINTN
+UINT64
 SetTableEntry (
-  IN  UINTN  Entry
+  IN  UINT64  Entry
   )
 {
   Entry  = SetValidPte (Entry);
-  Entry &= ~(RISCV_PG_X | RISCV_PG_W | RISCV_PG_R);
+  Entry &= ~(UINT64)(RISCV_PG_X | RISCV_PG_W | RISCV_PG_R);
 
   return Entry;
 }
@@ -186,9 +191,9 @@ SetTableEntry (
 STATIC
 VOID
 ReplaceTableEntry (
-  IN  UINTN    *Entry,
-  IN  UINTN    Value,
-  IN  UINTN    RegionStart,
+  IN  UINT64   *Entry,
+  IN  UINT64   Value,
+  IN  UINT64   RegionStart,
   IN  BOOLEAN  IsLiveBlockMapping
   )
 {
@@ -208,9 +213,9 @@ ReplaceTableEntry (
 
 **/
 STATIC
-UINTN
+UINT64
 GetPpnfromPte (
-  IN UINTN  Entry
+  IN UINT64  Entry
   )
 {
   return ((Entry & PTE_PPN_MASK) >> PTE_PPN_SHIFT);
@@ -226,13 +231,13 @@ GetPpnfromPte (
 
 **/
 STATIC
-UINTN
+UINT64
 SetPpnToPte (
-  UINTN  Entry,
-  UINTN  Address
+  UINT64  Entry,
+  UINT64  Address
   )
 {
-  UINTN  Ppn;
+  UINT64  Ppn;
 
   Ppn = ((Address >> RISCV_MMU_PAGE_SHIFT) << PTE_PPN_SHIFT);
   ASSERT (~(Ppn & ~PTE_PPN_MASK));
@@ -250,8 +255,8 @@ SetPpnToPte (
 STATIC
 VOID
 FreePageTablesRecursive (
-  IN  UINTN  *TranslationTable,
-  IN  UINTN  Level
+  IN  UINT64  *TranslationTable,
+  IN  UINTN   Level
   )
 {
   UINTN  Index;
@@ -260,8 +265,8 @@ FreePageTablesRecursive (
     for (Index = 0; Index < mTableEntryCount; Index++) {
       if (IsTableEntry (TranslationTable[Index])) {
         FreePageTablesRecursive (
-          (UINTN *)(GetPpnfromPte ((TranslationTable[Index])) <<
-                    RISCV_MMU_PAGE_SHIFT),
+          (UINT64 *)(GetPpnfromPte ((TranslationTable[Index])) <<
+                     RISCV_MMU_PAGE_SHIFT),
           Level + 1
           );
       }
@@ -289,22 +294,22 @@ FreePageTablesRecursive (
 STATIC
 EFI_STATUS
 UpdateRegionMappingRecursive (
-  IN  UINTN    RegionStart,
-  IN  UINTN    RegionEnd,
-  IN  UINTN    AttributeSetMask,
-  IN  UINTN    AttributeClearMask,
-  IN  UINTN    *PageTable,
+  IN  UINT64   RegionStart,
+  IN  UINT64   RegionEnd,
+  IN  UINT64   AttributeSetMask,
+  IN  UINT64   AttributeClearMask,
+  IN  UINT64   *PageTable,
   IN  UINTN    Level,
   IN  BOOLEAN  TableIsLive
   )
 {
   EFI_STATUS  Status;
-  UINTN       BlockShift;
-  UINTN       BlockMask;
-  UINTN       BlockEnd;
-  UINTN       *Entry;
-  UINTN       EntryValue;
-  UINTN       *TranslationTable;
+  UINT64      BlockShift;
+  UINT64      BlockMask;
+  UINT64      BlockEnd;
+  UINT64      *Entry;
+  UINT64      EntryValue;
+  UINT64      *TranslationTable;
   BOOLEAN     NextTableIsLive;
 
   ASSERT (Level < mMaxRootTableLevel);
@@ -313,18 +318,16 @@ UpdateRegionMappingRecursive (
   BlockShift = (mMaxRootTableLevel - Level - 1) * mBitPerLevel + RISCV_MMU_PAGE_SHIFT;
   BlockMask  = MAX_ADDRESS >> (64 - BlockShift);
 
-  DEBUG (
-    (
-     DEBUG_VERBOSE,
-     "%a(%d): %llx - %llx set %lx clr %lx\n",
-     __func__,
-     Level,
-     RegionStart,
-     RegionEnd,
-     AttributeSetMask,
-     AttributeClearMask
-    )
-    );
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a(%d): %LX - %LX set %LX clr %LX\n",
+    __func__,
+    Level,
+    RegionStart,
+    RegionEnd,
+    AttributeSetMask,
+    AttributeClearMask
+    ));
 
   for ( ; RegionStart < RegionEnd; RegionStart = BlockEnd) {
     BlockEnd = MIN (RegionEnd, (RegionStart | BlockMask) + 1);
@@ -380,7 +383,7 @@ UpdateRegionMappingRecursive (
 
         NextTableIsLive = FALSE;
       } else {
-        TranslationTable = (UINTN *)(GetPpnfromPte (*Entry) << RISCV_MMU_PAGE_SHIFT);
+        TranslationTable = (UINT64 *)(GetPpnfromPte (*Entry) << RISCV_MMU_PAGE_SHIFT);
         NextTableIsLive  = TableIsLive;
       }
 
@@ -412,7 +415,7 @@ UpdateRegionMappingRecursive (
       }
 
       if (!IsTableEntry (*Entry)) {
-        EntryValue = SetPpnToPte (0, (UINTN)TranslationTable);
+        EntryValue = SetPpnToPte (0, (UINT64)TranslationTable);
         EntryValue = SetTableEntry (EntryValue);
         ReplaceTableEntry (
           Entry,
@@ -463,11 +466,11 @@ UpdateRegionMappingRecursive (
 STATIC
 EFI_STATUS
 UpdateRegionMapping (
-  IN  UINTN    RegionStart,
-  IN  UINTN    RegionLength,
-  IN  UINTN    AttributeSetMask,
-  IN  UINTN    AttributeClearMask,
-  IN  UINTN    *RootTable,
+  IN  UINT64   RegionStart,
+  IN  UINT64   RegionLength,
+  IN  UINT64   AttributeSetMask,
+  IN  UINT64   AttributeClearMask,
+  IN  UINT64   *RootTable,
   IN  BOOLEAN  TableIsLive
   )
 {
@@ -489,32 +492,82 @@ UpdateRegionMapping (
 /**
   Convert GCD attribute to RISC-V page attribute.
 
-  @param  GcdAttributes The GCD attribute.
+  @param  GcdAttributes   The GCD attribute.
+  @param  RiscVAttributes The pointer of RISC-V page attribute.
 
-  @return               The RISC-V page attribute.
+  @retval EFI_INVALID_PARAMETER   The RiscVAttributes is NULL or cache type mask not valid.
+  @retval EFI_SUCCESS             The operation succesfully.
 
 **/
 STATIC
-UINTN
+EFI_STATUS
 GcdAttributeToPageAttribute (
-  IN UINTN  GcdAttributes
+  IN UINT64   GcdAttributes,
+  OUT UINT64  *RiscVAttributes
   )
 {
-  UINTN  RiscVAttributes;
+  UINT64   CacheTypeMask;
+  BOOLEAN  PmbtExtEnabled;
 
-  RiscVAttributes = RISCV_PG_R | RISCV_PG_W | RISCV_PG_X;
+  if (RiscVAttributes == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *RiscVAttributes = RISCV_PG_R | RISCV_PG_W | RISCV_PG_X;
+
+  PmbtExtEnabled = FALSE;
+  if ((PcdGet64 (PcdRiscVFeatureOverride) & RISCV_CPU_FEATURE_PBMT_BITMASK) != 0) {
+    PmbtExtEnabled = TRUE;
+  }
 
   // Determine protection attributes
   if ((GcdAttributes & EFI_MEMORY_RO) != 0) {
-    RiscVAttributes &= ~(RISCV_PG_W);
+    *RiscVAttributes &= ~(UINT64)(RISCV_PG_W);
   }
 
   // Process eXecute Never attribute
   if ((GcdAttributes & EFI_MEMORY_XP) != 0) {
-    RiscVAttributes &= ~RISCV_PG_X;
+    *RiscVAttributes &= ~(UINT64)RISCV_PG_X;
   }
 
-  return RiscVAttributes;
+  CacheTypeMask = GcdAttributes & EFI_CACHE_ATTRIBUTE_MASK;
+  if ((CacheTypeMask != 0) &&
+      (((CacheTypeMask - 1) & CacheTypeMask) != 0))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: More than one bit set in cache type mask (0x%LX)\n",
+      __func__,
+      CacheTypeMask
+      ));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  switch (CacheTypeMask) {
+    case EFI_MEMORY_UC:
+      if (PmbtExtEnabled) {
+        *RiscVAttributes |= PTE_PBMT_IO;
+      }
+
+      break;
+    case EFI_MEMORY_WC:
+      if (PmbtExtEnabled) {
+        *RiscVAttributes |= PTE_PBMT_NC;
+      } else {
+        DEBUG ((
+          DEBUG_VERBOSE,
+          "%a: EFI_MEMORY_WC set but Pmbt extension not available\n",
+          __func__
+          ));
+      }
+
+      break;
+    default:
+      // Default PMA mode
+      break;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -533,34 +586,43 @@ EFI_STATUS
 EFIAPI
 RiscVSetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
-  IN UINTN                 Length,
-  IN UINTN                 Attributes
+  IN UINT64                Length,
+  IN UINT64                Attributes
   )
 {
-  UINTN  PageAttributesSet;
+  UINT64      PageAttributesSet;
+  UINT64      PageAttributesClear;
+  EFI_STATUS  Status;
 
-  PageAttributesSet = GcdAttributeToPageAttribute (Attributes);
+  Status = GcdAttributeToPageAttribute (Attributes, &PageAttributesSet);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   if (!RiscVMmuEnabled ()) {
     return EFI_SUCCESS;
   }
 
-  DEBUG (
-    (
-     DEBUG_VERBOSE,
-     "%a: Set %llX page attribute 0x%X\n",
-     __func__,
-     BaseAddress,
-     PageAttributesSet
-    )
-    );
+  PageAttributesClear = PTE_ATTRIBUTES_MASK;
+  if ((PcdGet64 (PcdRiscVFeatureOverride) & RISCV_CPU_FEATURE_PBMT_BITMASK) != 0) {
+    PageAttributesClear |= PTE_PBMT_MASK;
+  }
+
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a: %LX: set attributes 0x%LX, clear attributes 0x%LX\n",
+    __func__,
+    BaseAddress,
+    PageAttributesSet,
+    PageAttributesClear
+    ));
 
   return UpdateRegionMapping (
            BaseAddress,
            Length,
            PageAttributesSet,
-           PTE_ATTRIBUTES_MASK,
-           (UINTN *)RiscVGetRootTranslateTable (),
+           PageAttributesClear,
+           (UINT64 *)RiscVGetRootTranslateTable (),
            TRUE
            );
 }
@@ -583,8 +645,8 @@ RiscVMmuSetSatpMode  (
   )
 {
   VOID                             *TranslationTable;
-  UINTN                            SatpReg;
-  UINTN                            Ppn;
+  UINT64                           SatpReg;
+  UINT64                           Ppn;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemoryMap;
   UINTN                            NumberOfDescriptors;
   UINTN                            Index;
@@ -622,7 +684,7 @@ RiscVMmuSetSatpMode  (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  ZeroMem (TranslationTable, mTableEntryCount * sizeof (UINTN));
+  ZeroMem (TranslationTable, mTableEntryCount * sizeof (UINT64));
 
   NumberOfDescriptors = 0;
   MemoryMap           = NULL;
@@ -662,7 +724,7 @@ RiscVMmuSetSatpMode  (
     DisableInterrupts ();
   }
 
-  Ppn = (UINTN)TranslationTable >> RISCV_MMU_PAGE_SHIFT;
+  Ppn = (UINT64)TranslationTable >> RISCV_MMU_PAGE_SHIFT;
   ASSERT (!(Ppn & ~(SATP64_PPN)));
 
   SatpReg  = Ppn;
@@ -671,14 +733,12 @@ RiscVMmuSetSatpMode  (
   RiscVSetSupervisorAddressTranslationRegister (SatpReg);
   /* Check if HW support the setup satp mode */
   if (SatpReg != RiscVGetSupervisorAddressTranslationRegister ()) {
-    DEBUG (
-      (
-       DEBUG_VERBOSE,
-       "%a: HW does not support SATP mode:%d\n",
-       __func__,
-       SatpMode
-      )
-      );
+    DEBUG ((
+      DEBUG_VERBOSE,
+      "%a: HW does not support SATP mode:%d\n",
+      __func__,
+      SatpMode
+      ));
     FreePageTablesRecursive (TranslationTable, 0);
     return EFI_DEVICE_ERROR;
   }
@@ -706,7 +766,7 @@ RiscVConfigureMmu (
   )
 {
   EFI_STATUS  Status;
-  INTN        Idx;
+  UINTN       Idx;
 
   Status = EFI_SUCCESS;
 
@@ -719,14 +779,12 @@ RiscVConfigureMmu (
       return Status;
     }
 
-    DEBUG (
-      (
-       DEBUG_INFO,
-       "%a: SATP mode %d successfully configured\n",
-       __func__,
-       mModeSupport[Idx]
-      )
-      );
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: SATP mode %d successfully configured\n",
+      __func__,
+      mModeSupport[Idx]
+      ));
     break;
   }
 
