@@ -776,8 +776,7 @@ MmIplBuildMmCoreModuleHob (
   EFI_HOB_MEMORY_ALLOCATION_MODULE  *Hob;
 
   ASSERT (
-    ((MemoryAllocationModule & (EFI_PAGE_SIZE - 1)) == 0) &&
-    ((ModuleLength & (EFI_PAGE_SIZE - 1)) == 0)
+    ((MemoryAllocationModule & (EFI_PAGE_SIZE - 1)) == 0)
     );
 
   Hob = MmIplCreateHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));

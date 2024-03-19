@@ -605,6 +605,13 @@ ExecuteSmmCoreFromSmram (
     //
     Status = PeCoffLoaderRelocateImage (&ImageContext);
     if (!EFI_ERROR (Status)) {
+      mMmCoreImageAddress = ImageContext.ImageAddress;
+      mMmCoreImageSize    = ImageContext.ImageSize;
+      mMmCoreEntryPoint   = ImageContext.EntryPoint;
+      DEBUG ((DEBUG_INFO, "MmCoreImageBase  - 0x%016lx\n", mMmCoreImageAddress));
+      DEBUG ((DEBUG_INFO, "MmCoreImageSize  - 0x%016lx\n", mMmCoreImageSize));
+      DEBUG ((DEBUG_INFO, "MmCoreEntryPoint - 0x%016lx\n", mMmCoreEntryPoint));
+
       //
       // Flush the instruction cache so the image data are written before we execute it
       //
