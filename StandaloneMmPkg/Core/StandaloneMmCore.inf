@@ -61,10 +61,11 @@
   gEfiMmEndOfDxeProtocolGuid                   ## PRODUCES
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiMmConfigurationProtocolGuid               ## CONSUMES
+  gEfiMmEndOfPeiProtocol                      ## CONSUMES
 
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
-  gEfiEventDxeDispatchGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEdkiiEventMmDispatchGuid                     ## PRODUCES             ## GUID # SmiHandlerRegister
   gEfiEndOfDxeEventGroupGuid                    ## PRODUCES             ## GUID # SmiHandlerRegister
   ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
   ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister
