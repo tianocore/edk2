@@ -309,6 +309,7 @@ struct _LIST_ENTRY {
 ///
 /// NULL pointer (VOID *)
 ///
+#undef NULL
 #if defined (__cplusplus)
   #if defined (_MSC_EXTENSIONS)
 #define NULL  nullptr
