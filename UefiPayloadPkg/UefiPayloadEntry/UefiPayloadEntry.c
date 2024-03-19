@@ -434,8 +434,6 @@ _ModuleEntryPoint (
     UniversalSerialPort->RegisterStride  = (UINT8)SerialPortInfo.RegWidth;
   }
 
-  // The library constructors might depend on serial port, so call it after serial port hob
-  ProcessLibraryConstructorList ();
   DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof (UINTN)));
 
   // Build HOB based on information from Bootloader

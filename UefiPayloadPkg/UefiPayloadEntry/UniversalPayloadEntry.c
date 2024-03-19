@@ -462,8 +462,6 @@ _ModuleEntryPoint (
 
   mHobList = (VOID *)BootloaderParameter;
   DxeFv    = NULL;
-  // Call constructor for all libraries
-  ProcessLibraryConstructorList ();
 
   DEBUG ((DEBUG_INFO, "Entering Universal Payload...\n"));
   DEBUG ((DEBUG_INFO, "sizeof(UINTN) = 0x%x\n", sizeof (UINTN)));
