@@ -438,6 +438,7 @@ LocateMmFvForMmCore (
       mMmFvBaseAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)VolumeInfo.FvStart;
       mMmFvSize        = VolumeInfo.FvSize;
       mMmCoreFileName  = &FileHandle->Name;
+      MmUnblockMemoryRequest (mMmFvBaseAddress, EFI_SIZE_TO_PAGES (mMmFvSize));
     }
 
     return EFI_SUCCESS;
