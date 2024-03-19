@@ -370,6 +370,12 @@ MmCoreInstallLoadedImage (
   ASSERT_EFI_ERROR (Status);
 
   ZeroMem (MmCoreDriverEntry, sizeof (EFI_MM_DRIVER_ENTRY));
+
+  Status = MmAllocatePool (EfiRuntimeServicesData, sizeof (EFI_LOADED_IMAGE_PROTOCOL), (VOID **)&MmCoreDriverEntry->LoadedImage);
+  ASSERT_EFI_ERROR (Status);
+
+  ZeroMem (MmCoreDriverEntry->LoadedImage, sizeof (EFI_LOADED_IMAGE_PROTOCOL));
+
   //
   // Fill in the remaining fields of the Loaded Image Protocol instance.
   //

@@ -430,7 +430,7 @@ MmInstallImageRecord (
   }
 
   for (Index = 0; Index < NoHandles; Index++) {
-    Status = MmLocateProtocol (
+    Status = MmHandleProtocol (
                HandleBuffer[Index],
                &gEfiLoadedImageProtocolGuid,
                (VOID **)&LoadedImage
