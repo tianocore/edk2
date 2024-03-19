@@ -1,7 +1,7 @@
 /** @file
   This library is used by other modules to send TPM2 command.
 
-Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2024, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -465,6 +465,27 @@ EFIAPI
 Tpm2NvGlobalWriteLock (
   IN      TPMI_RH_PROVISION  AuthHandle,
   IN      TPMS_AUTH_COMMAND  *AuthSession OPTIONAL
+  );
+
+/**
+  This command extends a value to an area in NV memory that was previously defined by TPM2_NV_DefineSpace().
+
+  @param[in]  AuthHandle         the handle indicating the source of the authorization value.
+  @param[in]  NvIndex            The NV Index of the area to extend.
+  @param[in]  AuthSession        Auth Session context
+  @param[in]  InData             The data to extend.
+
+  @retval EFI_SUCCESS            Operation completed successfully.
+  @retval EFI_DEVICE_ERROR       The command was unsuccessful.
+  @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.
+**/
+EFI_STATUS
+EFIAPI
+Tpm2NvExtend (
+  IN      TPMI_RH_NV_AUTH    AuthHandle,
+  IN      TPMI_RH_NV_INDEX   NvIndex,
+  IN      TPMS_AUTH_COMMAND  *AuthSession  OPTIONAL,
+  IN      TPM2B_MAX_BUFFER   *InData
   );
 
 /**
