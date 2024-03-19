@@ -844,7 +844,6 @@ StandaloneMmIplPeiEntry (
   UINT64                   MaxSize;
   EFI_SMRAM_DESCRIPTOR     *MmramRanges;
   MM_COMM_BUFFER_DATA      MmCommBufferData;
-  EFI_RESOURCE_ATTRIBUTE_TYPE  MemoryAttribute;  
 
   //
   // Initialize MM communication buffer data
@@ -867,16 +866,8 @@ StandaloneMmIplPeiEntry (
   } 
 
   //
-  // Build resource Hob for communication buffer
+  // Build MM unblock memory region HOB for communication buffer
   //
-  MemoryAttribute = EFI_RESOURCE_ATTRIBUTE_PRESENT |
-                    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-                    EFI_RESOURCE_ATTRIBUTE_TESTED |
-                    EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED |
-                    EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE;
-
-  BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, MemoryAttribute, MmCommBufferData.FixedCommBuffer, MmCommBufferData.FixedCommBufferSize);
-
   Status = MmUnblockMemoryRequest (MmCommBufferData.FixedCommBuffer, PcdGet32 (PcdFixedCommBufferPages));
 
   //
@@ -891,15 +882,8 @@ StandaloneMmIplPeiEntry (
   } 
 
   //
-  // Build resource Hob for communication in/out data
+  // Build MM unblock memory region HOB for communication in/out buffer
   //
-  MemoryAttribute = EFI_RESOURCE_ATTRIBUTE_PRESENT |
-                    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-                    EFI_RESOURCE_ATTRIBUTE_TESTED |
-                    EFI_RESOURCE_ATTRIBUTE_EXECUTION_PROTECTABLE;
-
-  BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, MemoryAttribute, MmCommBufferData.CommunicationInOut, (EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (sizeof (COMMUNICATION_IN_OUT)))));
-
   Status = MmUnblockMemoryRequest (MmCommBufferData.CommunicationInOut, EFI_SIZE_TO_PAGES (sizeof (COMMUNICATION_IN_OUT)));
 
   //
