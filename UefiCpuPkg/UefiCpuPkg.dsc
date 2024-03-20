@@ -211,5 +211,8 @@
   UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
 
+[Components.LOONGARCH64]
+  UefiCpuPkg/Library/CpuMmuLib/CpuMmuLib.inf
+
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
