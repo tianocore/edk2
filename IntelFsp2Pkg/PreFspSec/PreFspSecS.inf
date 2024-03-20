@@ -1,0 +1,39 @@
+## @file
+#  Run before FSP SecCore to rebase SecCore and PeiCore
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PreFspSecS
+  FILE_GUID                      = ef13ad51-2bab-4333-bd96-e01c79f2d313
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  PreFspSec.c
+  PreFspSec.h
+  PreFspSecEntryS.nasm
+  PreFspSecCommon.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  BaseLib
+  PeCoffLib
+  StackCheckLib

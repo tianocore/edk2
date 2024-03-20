@@ -33,6 +33,8 @@
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   DebugDeviceLib|IntelFsp2Pkg/Library/BaseDebugDeviceLibNull/BaseDebugDeviceLibNull.inf
+  PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
+  PeCoffExtraActionLib|MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
 
   # FSP override
   DebugLib|IntelFsp2Pkg/Library/BaseFspDebugLibSerialPort/BaseFspDebugLibSerialPort.inf
@@ -74,6 +76,9 @@
   IntelFsp2Pkg/FspSecCore/Fsp22SecCoreS.inf
   IntelFsp2Pkg/FspSecCore/Fsp24SecCoreS.inf
   IntelFsp2Pkg/FspNotifyPhase/FspNotifyPhasePeim.inf
+
+[Components.X64]
+  IntelFsp2Pkg/PreFspSec/PreFspSecS.inf
 
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x1f
