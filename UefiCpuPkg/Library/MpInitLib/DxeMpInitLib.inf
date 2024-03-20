@@ -23,21 +23,21 @@
 
 [Sources.IA32]
   Ia32/AmdSev.c
-  Ia32/MpFuncs.nasm
   Ia32/CreatePageTable.c
+  Ia32/MpFuncs.nasm
 
 [Sources.X64]
   X64/AmdSev.c
-  X64/MpFuncs.nasm
   X64/CreatePageTable.c
+  X64/MpFuncs.nasm
 
 [Sources.common]
   AmdSev.c
-  MpEqu.inc
   DxeMpLib.c
+  Microcode.c
+  MpEqu.inc
   MpLib.c
   MpLib.h
-  Microcode.c
   MpHandOff.h
 
 [Packages]
@@ -47,17 +47,18 @@
 
 [LibraryClasses]
   BaseLib
+  CcExitLib
+  CpuLib
+  DebugAgentLib
+  HobLib
   LocalApicLib
   MemoryAllocationLib
-  HobLib
-  MtrrLib
-  CpuLib
-  UefiBootServicesTableLib
-  DebugAgentLib
-  SynchronizationLib
-  PcdLib
-  CcExitLib
   MicrocodeLib
+  MtrrLib
+  PcdLib
+  SynchronizationLib
+  UefiBootServicesTableLib
+
 [LibraryClasses.X64]
   CpuPageTableLib
 
@@ -70,6 +71,9 @@
   gEdkiiMicrocodePatchHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
 
 [Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber            ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds          ## SOMETIMES_CONSUMES
@@ -82,6 +86,3 @@
   gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures                  ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                       ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi                ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr           ## CONSUMES
