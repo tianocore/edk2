@@ -1873,8 +1873,11 @@ RedfishPlatformConfigSetStatementCommon (
     DEBUG ((DEBUG_ERROR, "%a: failed to save question value: %r\n", __func__, Status));
   }
 
-  if (StatementValue->Value.string != 0) {
-    HiiDeleteString (StatementValue->Value.string, TargetStatement->ParentForm->ParentFormset->HiiHandle);
+  if ((TargetStatement->HiiStatement->Operand == EFI_IFR_STRING_OP) && (StatementValue->Type == EFI_IFR_TYPE_STRING)) {
+    if (StatementValue->Value.string != 0) {
+      // Delete HII string which was created for HII statement operand = EFI_IFR_STRING_OP and Type = EFI_IFR_TYPE_STRING.
+      HiiDeleteString (StatementValue->Value.string, TargetStatement->ParentForm->ParentFormset->HiiHandle);
+    }
   }
 
   return Status;
