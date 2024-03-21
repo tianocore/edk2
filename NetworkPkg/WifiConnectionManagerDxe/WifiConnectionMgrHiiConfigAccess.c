@@ -1412,7 +1412,9 @@ WifiMgrDxeHiiConfigAccessCallback (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  HiiGetBrowserData (&gWifiConfigFormSetGuid, mVendorStorageName, BufferSize, (UINT8 *)IfrNvData);
+  if (Action != EFI_BROWSER_ACTION_FORM_OPEN) {
+    HiiGetBrowserData (&gWifiConfigFormSetGuid, mVendorStorageName, BufferSize, (UINT8 *)IfrNvData);
+  }
 
   if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
     switch (QuestionId) {
@@ -1434,43 +1436,6 @@ WifiMgrDxeHiiConfigAccessCallback (
           WifiMgrCleanProfileSecrets (Profile);
 
           Private->CurrentNic->UserSelectedProfile = NULL;
-        }
-
-        break;
-
-      case KEY_CONNECT_ACTION:
-
-        if (Private->CurrentNic->UserSelectedProfile == NULL) {
-          break;
-        }
-
-        Profile = Private->CurrentNic->UserSelectedProfile;
-
-        //
-        // Enter the network connection configuration page
-        // Recovery from restored data
-        //
-        if (HiiSetString (Private->RegisteredHandle, STRING_TOKEN (STR_SSID), Profile->SSId, NULL) == 0) {
-          return EFI_OUT_OF_RESOURCES;
-        }
-
-        IfrNvData->SecurityType = Profile->SecurityType;
-        if (HiiSetString (
-              Private->RegisteredHandle,
-              STRING_TOKEN (STR_SECURITY_TYPE),
-              mSecurityType[IfrNvData->SecurityType],
-              NULL
-              ) == 0)
-        {
-          return EFI_OUT_OF_RESOURCES;
-        }
-
-        if ((IfrNvData->SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE) ||
-            (IfrNvData->SecurityType == SECURITY_TYPE_WPA3_ENTERPRISE))
-        {
-          IfrNvData->EapAuthMethod       = Profile->EapAuthMethod;
-          IfrNvData->EapSecondAuthMethod = Profile->EapSecondAuthMethod;
-          StrCpyS (IfrNvData->EapIdentity, EAP_IDENTITY_SIZE, Profile->EapIdentity);
         }
 
         break;
@@ -1524,6 +1489,43 @@ WifiMgrDxeHiiConfigAccessCallback (
     }
   } else if (Action == EFI_BROWSER_ACTION_FORM_CLOSE) {
     switch (QuestionId) {
+      case KEY_EAP_ENROLL_CERT_FROM_FILE:
+
+        if (Private->CurrentNic->UserSelectedProfile == NULL) {
+          break;
+        }
+
+        Profile = Private->CurrentNic->UserSelectedProfile;
+
+        //
+        // Enter the network connection configuration page
+        // Recovery from restored data
+        //
+        if (HiiSetString (Private->RegisteredHandle, STRING_TOKEN (STR_SSID), Profile->SSId, NULL) == 0) {
+          return EFI_OUT_OF_RESOURCES;
+        }
+
+        IfrNvData->SecurityType = Profile->SecurityType;
+        if (HiiSetString (
+              Private->RegisteredHandle,
+              STRING_TOKEN (STR_SECURITY_TYPE),
+              mSecurityType[IfrNvData->SecurityType],
+              NULL
+              ) == 0)
+        {
+          return EFI_OUT_OF_RESOURCES;
+        }
+
+        if (  (IfrNvData->SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE)
+           || (IfrNvData->SecurityType == SECURITY_TYPE_WPA3_ENTERPRISE))
+        {
+          IfrNvData->EapAuthMethod       = Profile->EapAuthMethod;
+          IfrNvData->EapSecondAuthMethod = Profile->EapSecondAuthMethod;
+          StrCpyS (IfrNvData->EapIdentity, EAP_IDENTITY_SIZE, Profile->EapIdentity);
+        }
+
+        break;
+
       case KEY_CONNECT_ACTION:
 
         if (Private->CurrentNic->UserSelectedProfile == NULL) {
@@ -1909,6 +1911,39 @@ WifiMgrDxeHiiConfigAccessCallback (
               NULL
               );
           }
+
+          if (Private->CurrentNic->UserSelectedProfile == NULL) {
+            break;
+          }
+
+          Profile = Private->CurrentNic->UserSelectedProfile;
+
+          //
+          // Enter the network connection configuration page
+          // Recovery from restored data
+          //
+          if (HiiSetString (Private->RegisteredHandle, STRING_TOKEN (STR_SSID), Profile->SSId, NULL) == 0) {
+            return EFI_OUT_OF_RESOURCES;
+          }
+
+          IfrNvData->SecurityType = Profile->SecurityType;
+          if (HiiSetString (
+                Private->RegisteredHandle,
+                STRING_TOKEN (STR_SECURITY_TYPE),
+                mSecurityType[IfrNvData->SecurityType],
+                NULL
+                ) == 0)
+          {
+            return EFI_OUT_OF_RESOURCES;
+          }
+
+          if (  (IfrNvData->SecurityType == SECURITY_TYPE_WPA2_ENTERPRISE)
+             || (IfrNvData->SecurityType == SECURITY_TYPE_WPA3_ENTERPRISE))
+          {
+            IfrNvData->EapAuthMethod       = Profile->EapAuthMethod;
+            IfrNvData->EapSecondAuthMethod = Profile->EapSecondAuthMethod;
+            StrCpyS (IfrNvData->EapIdentity, EAP_IDENTITY_SIZE, Profile->EapIdentity);
+          }
         }
 
         break;
@@ -1944,7 +1979,7 @@ WifiMgrDxeHiiConfigAccessCallback (
     }
   }
 
-  if (!EFI_ERROR (Status)) {
+  if (!EFI_ERROR (Status) && (Action != EFI_BROWSER_ACTION_FORM_OPEN)) {
     //
     // Pass changed uncommitted data back to Form Browser.
     //
