@@ -32,10 +32,10 @@
     The following Configuration Manager Object(s) are used by this Generator:
     - EArmObjGicCInfo (REQUIRED)
     - EArmObjGicItsInfo (OPTIONAL)
-    - EArmObjMemoryAffinityInfo (OPTIONAL)
-    - EArmObjGenericInitiatorAffinityInfo (OPTIONAL)
-    - EArmObjDeviceHandleAcpi (OPTIONAL)
-    - EArmObjDeviceHandlePci (OPTIONAL)
+    - EArchCommonObjMemoryAffinityInfo (OPTIONAL)
+    - EArchCommonObjGenericInitiatorAffinityInfo (OPTIONAL)
+    - EArchCommonObjDeviceHandleAcpi (OPTIONAL)
+    - EArchCommonObjDeviceHandlePci (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the GIC
@@ -62,9 +62,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjMemoryAffinityInfo,
-  CM_ARM_MEMORY_AFFINITY_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjMemoryAffinityInfo,
+  CM_ARCH_COMMON_MEMORY_AFFINITY_INFO
   );
 
 /**
@@ -72,9 +72,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjGenericInitiatorAffinityInfo,
-  CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjGenericInitiatorAffinityInfo,
+  CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO
   );
 
 /**
@@ -82,9 +82,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjDeviceHandleAcpi,
-  CM_ARM_DEVICE_HANDLE_ACPI
+  EObjNameSpaceArchCommon,
+  EArchCommonObjDeviceHandleAcpi,
+  CM_ARCH_COMMON_DEVICE_HANDLE_ACPI
   );
 
 /**
@@ -92,9 +92,9 @@ GET_OBJECT_LIST (
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjDeviceHandlePci,
-  CM_ARM_DEVICE_HANDLE_PCI
+  EObjNameSpaceArchCommon,
+  EArchCommonObjDeviceHandlePci,
+  CM_ARCH_COMMON_DEVICE_HANDLE_PCI
   );
 
 /** Return the PCI Device information in BDF format
@@ -110,7 +110,7 @@ GET_OBJECT_LIST (
 STATIC
 UINT16
 GetBdf (
-  IN CONST CM_ARM_DEVICE_HANDLE_PCI  *DeviceHandlePci
+  IN CONST CM_ARCH_COMMON_DEVICE_HANDLE_PCI  *DeviceHandlePci
   )
 {
   UINT16  Bdf;
@@ -235,7 +235,7 @@ AddMemoryAffinity (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               MemAffOffset,
-  IN CONST CM_ARM_MEMORY_AFFINITY_INFO                          *MemAffInfo,
+  IN CONST CM_ARCH_COMMON_MEMORY_AFFINITY_INFO                  *MemAffInfo,
   IN       UINT32                                               MemAffCount
   )
 {
@@ -295,14 +295,14 @@ AddGenericInitiatorAffinity (
   IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
   IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
   IN CONST UINT32                                               GenInitAffOff,
-  IN CONST CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO               *GenInitAffInfo,
+  IN CONST CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO       *GenInitAffInfo,
   IN       UINT32                                               GenInitAffCount
   )
 {
   EFI_STATUS                                         Status;
   EFI_ACPI_6_3_GENERIC_INITIATOR_AFFINITY_STRUCTURE  *GenInitAff;
-  CM_ARM_DEVICE_HANDLE_ACPI                          *DeviceHandleAcpi;
-  CM_ARM_DEVICE_HANDLE_PCI                           *DeviceHandlePci;
+  CM_ARCH_COMMON_DEVICE_HANDLE_ACPI                  *DeviceHandleAcpi;
+  CM_ARCH_COMMON_DEVICE_HANDLE_PCI                   *DeviceHandlePci;
   UINT32                                             DeviceHandleCount;
 
   ASSERT (Srat != NULL);
@@ -331,7 +331,7 @@ AddGenericInitiatorAffinity (
     }
 
     if (GenInitAffInfo->DeviceHandleType == EFI_ACPI_6_3_ACPI_DEVICE_HANDLE) {
-      Status = GetEArmObjDeviceHandleAcpi (
+      Status = GetEArchCommonObjDeviceHandleAcpi (
                  CfgMgrProtocol,
                  GenInitAffInfo->DeviceHandleToken,
                  &DeviceHandleAcpi,
@@ -362,7 +362,7 @@ AddGenericInitiatorAffinity (
     } else if (GenInitAffInfo->DeviceHandleType ==
                EFI_ACPI_6_3_PCI_DEVICE_HANDLE)
     {
-      Status = GetEArmObjDeviceHandlePci (
+      Status = GetEArchCommonObjDeviceHandlePci (
                  CfgMgrProtocol,
                  GenInitAffInfo->DeviceHandleToken,
                  &DeviceHandlePci,
@@ -465,10 +465,10 @@ BuildSratTable (
   UINT32  MemAffOffset;
   UINT32  GenInitiatorAffOffset;
 
-  CM_ARM_GICC_INFO                        *GicCInfo;
-  CM_ARM_GIC_ITS_INFO                     *GicItsInfo;
-  CM_ARM_MEMORY_AFFINITY_INFO             *MemAffInfo;
-  CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO  *GenInitiatorAffInfo;
+  CM_ARM_GICC_INFO                                *GicCInfo;
+  CM_ARM_GIC_ITS_INFO                             *GicItsInfo;
+  CM_ARCH_COMMON_MEMORY_AFFINITY_INFO             *MemAffInfo;
+  CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO  *GenInitiatorAffInfo;
 
   EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER  *Srat;
 
@@ -537,7 +537,7 @@ BuildSratTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjMemoryAffinityInfo (
+  Status = GetEArchCommonObjMemoryAffinityInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &MemAffInfo,
@@ -552,7 +552,7 @@ BuildSratTable (
     goto error_handler;
   }
 
-  Status = GetEArmObjGenericInitiatorAffinityInfo (
+  Status = GetEArchCommonObjGenericInitiatorAffinityInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &GenInitiatorAffInfo,

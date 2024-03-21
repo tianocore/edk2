@@ -32,9 +32,9 @@
 
   Requirements:
     The following Configuration Manager Object(s) are used by this Generator:
-    - EArmObjProcHierarchyInfo (REQUIRED)
-    - EArmObjCacheInfo
-    - EArmObjCmRef
+    - EArchCommonObjProcHierarchyInfo (REQUIRED)
+    - EArchCommonObjCacheInfo
+    - EArchCommonObjCmRef
     - EArmObjGicCInfo (REQUIRED)
 */
 
@@ -43,9 +43,9 @@
   information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjProcHierarchyInfo,
-  CM_ARM_PROC_HIERARCHY_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjProcHierarchyInfo,
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO
   );
 
 /**
@@ -53,9 +53,9 @@ GET_OBJECT_LIST (
   from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjCacheInfo,
-  CM_ARM_CACHE_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCacheInfo,
+  CM_ARCH_COMMON_CACHE_INFO
   );
 
 /**
@@ -63,9 +63,9 @@ GET_OBJECT_LIST (
   reference information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjCmRef,
-  CM_ARM_OBJ_REF
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCmRef,
+  CM_ARCH_COMMON_OBJ_REF
   );
 
 /**
@@ -90,7 +90,7 @@ GET_OBJECT_LIST (
 STATIC
 UINT32
 GetProcHierarchyNodeSize (
-  IN  CONST CM_ARM_PROC_HIERARCHY_INFO  *Node
+  IN  CONST CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *Node
   )
 {
   ASSERT (Node != NULL);
@@ -107,7 +107,7 @@ GetProcHierarchyNodeSize (
 GET_SIZE_OF_PPTT_STRUCTS (
   ProcHierarchyNodes,
   GetProcHierarchyNodeSize (NodesToIndex),
-  CM_ARM_PROC_HIERARCHY_INFO
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO
   );
 
 /**
@@ -117,7 +117,7 @@ GET_SIZE_OF_PPTT_STRUCTS (
 GET_SIZE_OF_PPTT_STRUCTS (
   CacheTypeStructs,
   sizeof (EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE),
-  CM_ARM_CACHE_INFO
+  CM_ARCH_COMMON_CACHE_INFO
   );
 
 /**
@@ -264,7 +264,7 @@ DetectCyclesInTopology (
                                     Protocol Interface.
   @param [in]  PrivResArray         Pointer to the array of private resources.
   @param [in]  PrivResCount         Number of private resources.
-  @param [in]  PrivResArrayToken    Reference Token for the CM_ARM_OBJ_REF
+  @param [in]  PrivResArrayToken    Reference Token for the CM_ARCH_COMMON_OBJ_REF
                                     array describing node's private resources.
 
   @retval EFI_SUCCESS               Array updated successfully.
@@ -281,10 +281,10 @@ AddPrivateResources (
   IN  CONST CM_OBJECT_TOKEN                                PrivResArrayToken
   )
 {
-  EFI_STATUS         Status;
-  CM_ARM_OBJ_REF     *CmObjRefs;
-  UINT32             CmObjRefCount;
-  PPTT_NODE_INDEXER  *PpttNodeFound;
+  EFI_STATUS              Status;
+  CM_ARCH_COMMON_OBJ_REF  *CmObjRefs;
+  UINT32                  CmObjRefCount;
+  PPTT_NODE_INDEXER       *PpttNodeFound;
 
   ASSERT (
     (Generator != NULL) &&
@@ -308,7 +308,7 @@ AddPrivateResources (
 
   CmObjRefCount = 0;
   // Get the CM Object References
-  Status = GetEArmObjCmRef (
+  Status = GetEArchCommonObjCmRef (
              CfgMgrProtocol,
              PrivResArrayToken,
              &CmObjRefs,
@@ -397,22 +397,24 @@ AddPrivateResources (
   @param [in]  Index2         Index of Object2 to be displayed for debugging
                               purposes.
 
-  @retval TRUE                Object1 and Object2 have the same GicCToken.
-  @retval FALSE               Object1 and Object2 have different GicCTokens.
+  @retval TRUE                Object1 and Object2 have the same
+                              AcpiIdObjectToken.
+  @retval FALSE               Object1 and Object2 have different
+                              AcpiIdObjectTokens.
 **/
 BOOLEAN
 EFIAPI
-IsGicCTokenEqual (
+IsAcpiIdObjectTokenEqual (
   IN  CONST VOID   *Object1,
   IN  CONST VOID   *Object2,
   IN        UINTN  Index1,
   IN        UINTN  Index2
   )
 {
-  PPTT_NODE_INDEXER           *IndexedObject1;
-  PPTT_NODE_INDEXER           *IndexedObject2;
-  CM_ARM_PROC_HIERARCHY_INFO  *ProcNode1;
-  CM_ARM_PROC_HIERARCHY_INFO  *ProcNode2;
+  PPTT_NODE_INDEXER                   *IndexedObject1;
+  PPTT_NODE_INDEXER                   *IndexedObject2;
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcNode1;
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcNode2;
 
   ASSERT (
     (Object1 != NULL) &&
@@ -421,23 +423,23 @@ IsGicCTokenEqual (
 
   IndexedObject1 = (PPTT_NODE_INDEXER *)Object1;
   IndexedObject2 = (PPTT_NODE_INDEXER *)Object2;
-  ProcNode1      = (CM_ARM_PROC_HIERARCHY_INFO *)IndexedObject1->Object;
-  ProcNode2      = (CM_ARM_PROC_HIERARCHY_INFO *)IndexedObject2->Object;
+  ProcNode1      = (CM_ARCH_COMMON_PROC_HIERARCHY_INFO *)IndexedObject1->Object;
+  ProcNode2      = (CM_ARCH_COMMON_PROC_HIERARCHY_INFO *)IndexedObject2->Object;
 
   if (IS_ACPI_PROC_ID_VALID (ProcNode1) &&
       IS_ACPI_PROC_ID_VALID (ProcNode2) &&
-      (ProcNode1->GicCToken != CM_NULL_TOKEN) &&
-      (ProcNode2->GicCToken != CM_NULL_TOKEN) &&
-      (ProcNode1->GicCToken == ProcNode2->GicCToken))
+      (ProcNode1->AcpiIdObjectToken != CM_NULL_TOKEN) &&
+      (ProcNode2->AcpiIdObjectToken != CM_NULL_TOKEN) &&
+      (ProcNode1->AcpiIdObjectToken == ProcNode2->AcpiIdObjectToken))
   {
     DEBUG ((
       DEBUG_ERROR,
       "ERROR: PPTT: Two Processor Hierarchy Info objects (%d and %d) map to " \
-      "the same GICC Info object. ACPI Processor IDs are not unique. " \
-      "GicCToken = %p.\n",
+      "the same ACPI ID reference object. ACPI Processor IDs are not unique. " \
+      "AcpiIdObjectToken = %p.\n",
       Index1,
       Index2,
-      ProcNode1->GicCToken
+      ProcNode1->AcpiIdObjectToken
       ));
     return TRUE;
   }
@@ -474,14 +476,14 @@ AddProcHierarchyNodes (
   EFI_STATUS                             Status;
   EFI_ACPI_6_4_PPTT_STRUCTURE_PROCESSOR  *ProcStruct;
   UINT32                                 *PrivateResources;
-  BOOLEAN                                IsGicCTokenDuplicated;
+  BOOLEAN                                IsAcpiIdObjectTokenDuplicated;
 
   CM_ARM_GICC_INFO  *GicCInfoList;
   UINT32            GicCInfoCount;
   UINT32            UniqueGicCRefCount;
 
-  PPTT_NODE_INDEXER           *PpttNodeFound;
-  CM_ARM_PROC_HIERARCHY_INFO  *ProcInfoNode;
+  PPTT_NODE_INDEXER                   *PpttNodeFound;
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcInfoNode;
 
   PPTT_NODE_INDEXER  *ProcNodeIterator;
   UINT32             NodeCount;
@@ -500,22 +502,22 @@ AddProcHierarchyNodes (
   NodeCount        = Generator->ProcHierarchyNodeCount;
 
   // Check if every GICC Object is referenced by onlu one Proc Node
-  IsGicCTokenDuplicated = FindDuplicateValue (
-                            ProcNodeIterator,
-                            NodeCount,
-                            sizeof (PPTT_NODE_INDEXER),
-                            IsGicCTokenEqual
-                            );
+  IsAcpiIdObjectTokenDuplicated = FindDuplicateValue (
+                                    ProcNodeIterator,
+                                    NodeCount,
+                                    sizeof (PPTT_NODE_INDEXER),
+                                    IsAcpiIdObjectTokenEqual
+                                    );
   // Duplicate GIC CPU Interface Token was found so two PPTT Processor Hierarchy
   // Nodes map to the same MADT GICC structure
-  if (IsGicCTokenDuplicated) {
+  if (IsAcpiIdObjectTokenDuplicated) {
     return EFI_INVALID_PARAMETER;
   }
 
   UniqueGicCRefCount = 0;
 
   while (NodeCount-- != 0) {
-    ProcInfoNode = (CM_ARM_PROC_HIERARCHY_INFO *)ProcNodeIterator->Object;
+    ProcInfoNode = (CM_ARCH_COMMON_PROC_HIERARCHY_INFO *)ProcNodeIterator->Object;
 
     // Check if the private resource count is within the size limit
     // imposed on the Processor Hierarchy node by the specification.
@@ -575,7 +577,7 @@ AddProcHierarchyNodes (
 
       // Test if the reference is to a 'leaf' node
       if (IS_PROC_NODE_LEAF (
-            ((CM_ARM_PROC_HIERARCHY_INFO *)PpttNodeFound->Object)
+            ((CM_ARCH_COMMON_PROC_HIERARCHY_INFO *)PpttNodeFound->Object)
             ))
       {
         Status = EFI_INVALID_PARAMETER;
@@ -602,14 +604,14 @@ AddProcHierarchyNodes (
     if (!IS_ACPI_PROC_ID_VALID (ProcInfoNode)) {
       // Default invalid ACPI Processor ID to 0
       ProcStruct->AcpiProcessorId = 0;
-    } else if (ProcInfoNode->GicCToken == CM_NULL_TOKEN) {
+    } else if (ProcInfoNode->AcpiIdObjectToken == CM_NULL_TOKEN) {
       Status = EFI_INVALID_PARAMETER;
       DEBUG ((
         DEBUG_ERROR,
-        "ERROR: PPTT: The 'ACPI Processor ID valid' flag is set but no GICC " \
-        "structure token was provided. GicCToken = %p. RequestorToken = %p. " \
-        "Status = %r\n",
-        ProcInfoNode->GicCToken,
+        "ERROR: PPTT: The 'ACPI Processor ID valid' flag is set but no " \
+        "ACPI ID Reference object token was provided. " \
+        "AcpiIdObjectToken = %p. RequestorToken = %p. Status = %r\n",
+        ProcInfoNode->AcpiIdObjectToken,
         ProcInfoNode->Token,
         Status
         ));
@@ -617,17 +619,17 @@ AddProcHierarchyNodes (
     } else {
       Status = GetEArmObjGicCInfo (
                  CfgMgrProtocol,
-                 ProcInfoNode->GicCToken,
+                 ProcInfoNode->AcpiIdObjectToken,
                  &GicCInfoList,
                  &GicCInfoCount
                  );
       if (EFI_ERROR (Status)) {
         DEBUG ((
           DEBUG_ERROR,
-          "ERROR: PPTT: Failed to get GICC structure. ACPI Processor ID " \
-          "can't be populated. GicCToken = %p. RequestorToken = %p. " \
-          "Status = %r\n",
-          ProcInfoNode->GicCToken,
+          "ERROR: PPTT: Failed to get ACPI ID Reference object token.  " \
+          "ACPI Processor ID can't be populated. " \
+          "AcpiIdObjectToken = %p. RequestorToken = %p. Status = %r\n",
+          ProcInfoNode->AcpiIdObjectToken,
           ProcInfoNode->Token,
           Status
           ));
@@ -640,10 +642,10 @@ AddProcHierarchyNodes (
           DEBUG_ERROR,
           "ERROR: PPTT: Failed to find a unique GICC structure. " \
           "ACPI Processor ID can't be populated. " \
-          "GICC Structure Count = %d. GicCToken = %p. RequestorToken = %p " \
+          "GICC Structure Count = %d. AcpiIdObjectToken = %p. RequestorToken = %p " \
           "Status = %r\n",
           GicCInfoCount,
-          ProcInfoNode->GicCToken,
+          ProcInfoNode->AcpiIdObjectToken,
           ProcInfoNode->Token,
           Status
           ));
@@ -786,7 +788,7 @@ AddCacheTypeStructures (
   EFI_STATUS                         Status;
   EFI_ACPI_6_4_PPTT_STRUCTURE_CACHE  *CacheStruct;
   PPTT_NODE_INDEXER                  *PpttNodeFound;
-  CM_ARM_CACHE_INFO                  *CacheInfoNode;
+  CM_ARCH_COMMON_CACHE_INFO          *CacheInfoNode;
   PPTT_NODE_INDEXER                  *CacheNodeIterator;
   UINT32                             NodeCount;
   BOOLEAN                            CacheIdUnique;
@@ -812,7 +814,7 @@ AddCacheTypeStructures (
   }
 
   for (NodeIndex = 0; NodeIndex < NodeCount; NodeIndex++) {
-    CacheInfoNode = (CM_ARM_CACHE_INFO *)CacheNodeIterator->Object;
+    CacheInfoNode = (CM_ARCH_COMMON_CACHE_INFO *)CacheNodeIterator->Object;
 
     // Populate the node header
     CacheStruct->Type        = EFI_ACPI_6_4_PPTT_TYPE_CACHE;
@@ -1072,8 +1074,8 @@ BuildPpttTable (
   UINT32  ProcHierarchyNodeOffset;
   UINT32  CacheStructOffset;
 
-  CM_ARM_PROC_HIERARCHY_INFO  *ProcHierarchyNodeList;
-  CM_ARM_CACHE_INFO           *CacheStructList;
+  CM_ARCH_COMMON_PROC_HIERARCHY_INFO  *ProcHierarchyNodeList;
+  CM_ARCH_COMMON_CACHE_INFO           *CacheStructList;
 
   ACPI_PPTT_GENERATOR  *Generator;
 
@@ -1110,7 +1112,7 @@ BuildPpttTable (
 
   // Get the processor hierarchy info and update the processor topology
   // structure count with Processor Hierarchy Nodes (Type 0)
-  Status = GetEArmObjProcHierarchyInfo (
+  Status = GetEArchCommonObjProcHierarchyInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &ProcHierarchyNodeList,
@@ -1130,7 +1132,7 @@ BuildPpttTable (
 
   // Get the cache info and update the processor topology structure count with
   // Cache Type Structures (Type 1)
-  Status = GetEArmObjCacheInfo (
+  Status = GetEArchCommonObjCacheInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &CacheStructList,

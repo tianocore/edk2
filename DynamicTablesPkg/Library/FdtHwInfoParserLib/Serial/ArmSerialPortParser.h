@@ -14,11 +14,11 @@
 
 /** SerialPort dispatcher.
 
-  This disptacher populates the CM_ARM_SERIAL_PORT_INFO structure for
+  This disptacher populates the CM_ARCH_COMMON_SERIAL_PORT_INFO structure for
   the following CM_OBJ_ID:
-   - EArmObjSerialConsolePortInfo
-   - EArmObjSerialDebugPortInfo
-   - EArmObjSerialPortInfo
+   - EArchCommonObjConsolePortInfo
+   - EArchCommonObjSerialDebugPortInfo
+   - EArchCommonObjSerialPortInfo
 
   A parser parses a Device Tree to populate a specific CmObj type. None,
   one or many CmObj can be created by the parser.

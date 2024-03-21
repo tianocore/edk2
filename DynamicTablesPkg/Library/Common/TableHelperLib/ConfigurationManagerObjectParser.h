@@ -11,6 +11,18 @@
 
 #define OUTPUT_FIELD_COLUMN_WIDTH  32
 
+/** A helper macro for populating the Reserved objects
+  like EArmObjReserved, EArmObjMax, etc. in the CM_OBJ_PARSER_ARRAY.
+**/
+#define CM_PARSER_ADD_OBJECT_RESERVED(ObjectId) \
+                  {ObjectId, #ObjectId, NULL, 0}
+
+/** A helper macro for populating the Cm Arm objects
+  in the CM_OBJ_PARSER_ARRAY.
+**/
+#define CM_PARSER_ADD_OBJECT(ObjectId, Parser) \
+                  {ObjectId, #ObjectId, Parser, ARRAY_SIZE(Parser) }
+
 /** Function prototype to format a field print.
 
   @param [in] Format  Format string for tracing the data as specified by
@@ -58,6 +70,9 @@ struct CmObjParser {
   with their object names.
 */
 typedef struct CmObjParserArray {
+  /// Object ID
+  CONST UINTN            ObjectId;
+
   /// Object name
   CONST CHAR8            *ObjectName;
 

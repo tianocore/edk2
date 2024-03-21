@@ -98,11 +98,11 @@ AddMultipleCmObj (
 
 /** Add multiple CmObj to the Configuration Manager.
 
-  Get one token referencing a EArmObjCmRef CmObj itself referencing
+  Get one token referencing a EArchCommonObjCmRef CmObj itself referencing
   the input CmObj. In the table below, RefToken is returned.
 
   Token referencing an      Array of tokens             Array of CmObj
-  array of EArmObjCmRef     referencing each            from the input:
+  array of EArchCommonObjCmRef     referencing each            from the input:
   CmObj:                    CmObj from the input:
 
   RefToken         --->     CmObjToken[0]        --->   CmObj[0]
@@ -113,7 +113,7 @@ AddMultipleCmObj (
   @param  [in]  CmObjDesc         CmObjDesc containing multiple CmObj
                                   to add.
   @param  [out] Token             If success, token referencing an array
-                                  of EArmObjCmRef CmObj, themselves
+                                  of EArchCommonObjCmRef CmObj, themselves
                                   referencing the input CmObjs.
 
   @retval EFI_SUCCESS             The function completed successfully.

@@ -42,46 +42,46 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjCmRef
-  - EArmObjPciConfigSpaceInfo
-  - EArmObjPciAddressMapInfo
-  - EArmObjPciInterruptMapInfo
+  - EArchCommonObjCmRef
+  - EArchCommonObjPciConfigSpaceInfo
+  - EArchCommonObjPciAddressMapInfo
+  - EArchCommonObjPciInterruptMapInfo
 */
 
 /** This macro expands to a function that retrieves the cross-CM-object-
     reference information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjCmRef,
-  CM_ARM_OBJ_REF
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCmRef,
+  CM_ARCH_COMMON_OBJ_REF
   );
 
 /** This macro expands to a function that retrieves the Pci
     Configuration Space Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPciConfigSpaceInfo,
-  CM_ARM_PCI_CONFIG_SPACE_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPciConfigSpaceInfo,
+  CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO
   );
 
 /** This macro expands to a function that retrieves the Pci
     Address Mapping Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPciAddressMapInfo,
-  CM_ARM_PCI_ADDRESS_MAP_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPciAddressMapInfo,
+  CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO
   );
 
 /** This macro expands to a function that retrieves the Pci
     Interrupt Mapping Information from the Configuration Manager.
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjPciInterruptMapInfo,
-  CM_ARM_PCI_INTERRUPT_MAP_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPciInterruptMapInfo,
+  CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO
   );
 
 /** Initialize the MappingTable.
@@ -208,9 +208,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 GeneratePciDeviceInfo (
-  IN      CONST CM_ARM_PCI_CONFIG_SPACE_INFO  *PciInfo,
-  IN            UINT32                        Uid,
-  IN  OUT       AML_OBJECT_NODE_HANDLE        PciNode
+  IN      CONST CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO  *PciInfo,
+  IN            UINT32                                Uid,
+  IN  OUT       AML_OBJECT_NODE_HANDLE                PciNode
   )
 {
   EFI_STATUS  Status;
@@ -305,17 +305,17 @@ EFIAPI
 GeneratePrt (
   IN            ACPI_PCI_GENERATOR                            *Generator,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN      CONST CM_ARM_PCI_CONFIG_SPACE_INFO                  *PciInfo,
+  IN      CONST CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO          *PciInfo,
   IN            UINT32                                        Uid,
   IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
   )
 {
-  EFI_STATUS                     Status;
-  INT32                          Index;
-  AML_OBJECT_NODE_HANDLE         PrtNode;
-  CM_ARM_OBJ_REF                 *RefInfo;
-  UINT32                         RefCount;
-  CM_ARM_PCI_INTERRUPT_MAP_INFO  *IrqMapInfo;
+  EFI_STATUS                             Status;
+  INT32                                  Index;
+  AML_OBJECT_NODE_HANDLE                 PrtNode;
+  CM_ARCH_COMMON_OBJ_REF                 *RefInfo;
+  UINT32                                 RefCount;
+  CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO  *IrqMapInfo;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -324,9 +324,9 @@ GeneratePrt (
 
   PrtNode = NULL;
 
-  // Get the array of CM_ARM_OBJ_REF referencing the
-  // CM_ARM_PCI_INTERRUPT_MAP_INFO objects.
-  Status = GetEArmObjCmRef (
+  // Get the array of CM_ARCH_COMMON_OBJ_REF referencing the
+  // CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO objects.
+  Status = GetEArchCommonObjCmRef (
              CfgMgrProtocol,
              PciInfo->InterruptMapToken,
              &RefInfo,
@@ -352,8 +352,8 @@ GeneratePrt (
   }
 
   for (Index = 0; Index < RefCount; Index++) {
-    // Get CM_ARM_PCI_INTERRUPT_MAP_INFO structures one by one.
-    Status = GetEArmObjPciInterruptMapInfo (
+    // Get CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO structures one by one.
+    Status = GetEArchCommonObjPciInterruptMapInfo (
                CfgMgrProtocol,
                RefInfo[Index].ReferenceToken,
                &IrqMapInfo,
@@ -451,18 +451,18 @@ EFIAPI
 GeneratePciCrs (
   IN            ACPI_PCI_GENERATOR                            *Generator,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN      CONST CM_ARM_PCI_CONFIG_SPACE_INFO                  *PciInfo,
+  IN      CONST CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO          *PciInfo,
   IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
   )
 {
-  EFI_STATUS                   Status;
-  BOOLEAN                      Translation;
-  UINT32                       Index;
-  CM_ARM_OBJ_REF               *RefInfo;
-  UINT32                       RefCount;
-  CM_ARM_PCI_ADDRESS_MAP_INFO  *AddrMapInfo;
-  AML_OBJECT_NODE_HANDLE       CrsNode;
-  BOOLEAN                      IsPosDecode;
+  EFI_STATUS                           Status;
+  BOOLEAN                              Translation;
+  UINT32                               Index;
+  CM_ARCH_COMMON_OBJ_REF               *RefInfo;
+  UINT32                               RefCount;
+  CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO  *AddrMapInfo;
+  AML_OBJECT_NODE_HANDLE               CrsNode;
+  BOOLEAN                              IsPosDecode;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -505,9 +505,9 @@ GeneratePciCrs (
     return Status;
   }
 
-  // Get the array of CM_ARM_OBJ_REF referencing the
-  // CM_ARM_PCI_ADDRESS_MAP_INFO objects.
-  Status = GetEArmObjCmRef (
+  // Get the array of CM_ARCH_COMMON_OBJ_REF referencing the
+  // CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO objects.
+  Status = GetEArchCommonObjCmRef (
              CfgMgrProtocol,
              PciInfo->AddressMapToken,
              &RefInfo,
@@ -519,8 +519,8 @@ GeneratePciCrs (
   }
 
   for (Index = 0; Index < RefCount; Index++) {
-    // Get CM_ARM_PCI_ADDRESS_MAP_INFO structures one by one.
-    Status = GetEArmObjPciAddressMapInfo (
+    // Get CM_ARCH_COMMON_PCI_ADDRESS_MAP_INFO structures one by one.
+    Status = GetEArchCommonObjPciAddressMapInfo (
                CfgMgrProtocol,
                RefInfo[Index].ReferenceToken,
                &AddrMapInfo,
@@ -693,7 +693,7 @@ EFIAPI
 ReserveEcamSpace (
   IN            ACPI_PCI_GENERATOR                            *Generator,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN      CONST CM_ARM_PCI_CONFIG_SPACE_INFO                  *PciInfo,
+  IN      CONST CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO          *PciInfo,
   IN  OUT       AML_OBJECT_NODE_HANDLE                        PciNode
   )
 {
@@ -760,7 +760,7 @@ EFIAPI
 GeneratePciDevice (
   IN            ACPI_PCI_GENERATOR                            *Generator,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
-  IN      CONST CM_ARM_PCI_CONFIG_SPACE_INFO                  *PciInfo,
+  IN      CONST CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO          *PciInfo,
   IN            UINT32                                        Uid,
   IN  OUT       AML_ROOT_NODE_HANDLE                          *RootNode
   )
@@ -863,7 +863,7 @@ BuildSsdtPciTable (
   IN        ACPI_PCI_GENERATOR                            *Generator,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
-  IN  CONST CM_ARM_PCI_CONFIG_SPACE_INFO                  *PciInfo,
+  IN  CONST CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO          *PciInfo,
   IN        UINT32                                        Uid,
   OUT       EFI_ACPI_DESCRIPTION_HEADER                   **Table
   )
@@ -971,13 +971,13 @@ BuildSsdtPciTableEx (
   OUT       UINTN                                  *CONST  TableCount
   )
 {
-  EFI_STATUS                    Status;
-  CM_ARM_PCI_CONFIG_SPACE_INFO  *PciInfo;
-  UINT32                        PciCount;
-  UINTN                         Index;
-  EFI_ACPI_DESCRIPTION_HEADER   **TableList;
-  ACPI_PCI_GENERATOR            *Generator;
-  UINT32                        Uid;
+  EFI_STATUS                            Status;
+  CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO  *PciInfo;
+  UINT32                                PciCount;
+  UINTN                                 Index;
+  EFI_ACPI_DESCRIPTION_HEADER           **TableList;
+  ACPI_PCI_GENERATOR                    *Generator;
+  UINT32                                Uid;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -990,7 +990,7 @@ BuildSsdtPciTableEx (
   *TableCount = 0;
   Generator   = (ACPI_PCI_GENERATOR *)This;
 
-  Status = GetEArmObjPciConfigSpaceInfo (
+  Status = GetEArchCommonObjPciConfigSpaceInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &PciInfo,

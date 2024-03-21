@@ -662,7 +662,9 @@ GetStandardNameSpaceObject (
       //
       Status = DynamicPlatRepoGetObject (
                  PlatformRepo->DynamicPlatformRepo,
-                 CREATE_CM_ARM_OBJECT_ID (EArmObjPciConfigSpaceInfo),
+                 CREATE_CM_ARCH_COMMON_OBJECT_ID (
+                   EArchCommonObjPciConfigSpaceInfo
+                   ),
                  CM_NULL_TOKEN,
                  &CmObjDesc
                  );
@@ -723,6 +725,83 @@ GetStandardNameSpaceObject (
 }
 
 /**
+  Return an ArchCommon namespace object.
+
+  @param [in]      This        Pointer to the Configuration Manager Protocol.
+  @param [in]      CmObjectId  The Configuration Manager Object ID.
+  @param [in]      Token       An optional token identifying the object. If
+                               unused this must be CM_NULL_TOKEN.
+  @param [in, out] CmObject    Pointer to the Configuration Manager Object
+                               descriptor describing the requested Object.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_INVALID_PARAMETER A parameter is invalid.
+  @retval EFI_NOT_FOUND         The required object information is not found.
+**/
+EFI_STATUS
+EFIAPI
+GetArchCommonNameSpaceObject (
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  This,
+  IN  CONST CM_OBJECT_ID                                  CmObjectId,
+  IN  CONST CM_OBJECT_TOKEN                               Token OPTIONAL,
+  IN  OUT   CM_OBJ_DESCRIPTOR                     *CONST  CmObject
+  )
+{
+  EFI_STATUS                      Status;
+  EDKII_PLATFORM_REPOSITORY_INFO  *PlatformRepo;
+
+  if ((This == NULL) || (CmObject == NULL)) {
+    ASSERT (This != NULL);
+    ASSERT (CmObject != NULL);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status       = EFI_NOT_FOUND;
+  PlatformRepo = This->PlatRepoInfo;
+
+  //
+  // First check among the static objects.
+  //
+  switch (GET_CM_OBJECT_ID (CmObjectId)) {
+    case EArchCommonObjPowerManagementProfileInfo:
+      Status = HandleCmObject (
+                 CmObjectId,
+                 &PlatformRepo->PmProfileInfo,
+                 sizeof (PlatformRepo->PmProfileInfo),
+                 1,
+                 CmObject
+                 );
+      break;
+
+    default:
+      //
+      // No match found among the static objects.
+      // Check the dynamic objects.
+      //
+      Status = DynamicPlatRepoGetObject (
+                 PlatformRepo->DynamicPlatformRepo,
+                 CmObjectId,
+                 Token,
+                 CmObject
+                 );
+      break;
+  } // switch
+
+  if (Status == EFI_NOT_FOUND) {
+    DEBUG ((
+      DEBUG_INFO,
+      "INFO: CmObjectId " FMT_CM_OBJECT_ID ". Status = %r\n",
+      CmObjectId,
+      Status
+      ));
+  } else {
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return Status;
+}
+
+/**
   Return an ARM namespace object.
 
   @param [in]      This        Pointer to the Configuration Manager Protocol.
@@ -761,16 +840,6 @@ GetArmNameSpaceObject (
   // First check among the static objects.
   //
   switch (GET_CM_OBJECT_ID (CmObjectId)) {
-    case EArmObjPowerManagementProfileInfo:
-      Status = HandleCmObject (
-                 CmObjectId,
-                 &PlatformRepo->PmProfileInfo,
-                 sizeof (PlatformRepo->PmProfileInfo),
-                 1,
-                 CmObject
-                 );
-      break;
-
     case EArmObjItsGroup:
       Status = HandleCmObject (
                  CmObjectId,
@@ -928,6 +997,9 @@ ArmKvmtoolPlatformGetObject (
   switch (GET_CM_NAMESPACE_ID (CmObjectId)) {
     case EObjNameSpaceStandard:
       Status = GetStandardNameSpaceObject (This, CmObjectId, Token, CmObject);
+      break;
+    case EObjNameSpaceArchCommon:
+      Status = GetArchCommonNameSpaceObject (This, CmObjectId, Token, CmObject);
       break;
     case EObjNameSpaceArm:
       Status = GetArmNameSpaceObject (This, CmObjectId, Token, CmObject);

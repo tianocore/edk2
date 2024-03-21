@@ -33,7 +33,7 @@
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArmObjSerialDebugPortInfo
+  - EArchCommonObjSerialDebugPortInfo
 */
 
 #pragma pack(1)
@@ -181,9 +181,9 @@ DBG2_TABLE  AcpiDbg2 = {
     debug port information from the Configuration Manager
 */
 GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjSerialDebugPortInfo,
-  CM_ARM_SERIAL_PORT_INFO
+  EObjNameSpaceArchCommon,
+  EArchCommonObjSerialDebugPortInfo,
+  CM_ARCH_COMMON_SERIAL_PORT_INFO
   );
 
 /** Initialize the PL011/SBSA UART with the parameters obtained from
@@ -198,7 +198,7 @@ GET_OBJECT_LIST (
 STATIC
 EFI_STATUS
 SetupDebugUart (
-  IN  CONST CM_ARM_SERIAL_PORT_INFO  *CONST  SerialPortInfo
+  IN  CONST CM_ARCH_COMMON_SERIAL_PORT_INFO  *CONST  SerialPortInfo
   )
 {
   EFI_STATUS          Status;
@@ -329,10 +329,10 @@ BuildDbg2TableEx (
   OUT       UINTN                                  *CONST  TableCount
   )
 {
-  EFI_STATUS                   Status;
-  CM_ARM_SERIAL_PORT_INFO      *SerialPortInfo;
-  UINT32                       SerialPortCount;
-  EFI_ACPI_DESCRIPTION_HEADER  **TableList;
+  EFI_STATUS                       Status;
+  CM_ARCH_COMMON_SERIAL_PORT_INFO  *SerialPortInfo;
+  UINT32                           SerialPortCount;
+  EFI_ACPI_DESCRIPTION_HEADER      **TableList;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -358,7 +358,7 @@ BuildDbg2TableEx (
 
   *Table = NULL;
 
-  Status = GetEArmObjSerialDebugPortInfo (
+  Status = GetEArchCommonObjSerialDebugPortInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              &SerialPortInfo,
