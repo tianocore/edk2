@@ -980,7 +980,8 @@ CreateAmlCpuFromProcHierarchy (
                                       container node to.
   @param [in]  ProcHierarchyNodeInfo  CM_ARM_PROC_HIERARCHY_INFO object used
                                       to create the node.
-  @param [in]  ProcContainerIndex     Index used to generate the node name.
+  @param [in]  ProcContainerName      Name of the processor container.
+  @param [in]  ProcContainerUid       Uid of the processor container.
   @param [out] ProcContainerNodePtr   If success, contains the created processor
                                       container node.
 
