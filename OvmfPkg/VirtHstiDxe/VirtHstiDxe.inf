@@ -22,6 +22,7 @@
   VirtHstiDxe.c
   QemuPC.c
   QemuQ35.c
+  QemuCommon.c
   Flash.c
 
 [Packages]
@@ -49,6 +50,7 @@
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
 
 [Depex]
   TRUE
