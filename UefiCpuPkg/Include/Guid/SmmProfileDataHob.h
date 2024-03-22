@@ -18,6 +18,12 @@
     0x26ef081d, 0x19b0, 0x4c42, {0xa2, 0x57, 0xa7, 0xf5, 0x9f, 0x8b, 0xd0, 0x38}  \
   }
 
+//
+// MM Logging attribute.
+// The memory with this attribute access will be recorded in SMM Profile.
+//
+#define EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING    0x10000000
+
 extern EFI_GUID  gEdkiiSmmProfileDataGuid;
 
 #endif
