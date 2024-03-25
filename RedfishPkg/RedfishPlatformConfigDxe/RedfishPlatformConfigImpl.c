@@ -2,7 +2,7 @@
   The implementation of EDKII Redfish Platform Config Protocol.
 
   (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -656,8 +656,10 @@ GetStatementPrivateByConfigureLangRegex (
               ++StatementList->Count;
             }
           } else {
-            DEBUG ((DEBUG_ERROR, "%a: HiiStatementPrivate->XuefiRedfishStr is NULL, x-uefi-string has something wrong.\n", __func__));
-            ASSERT (FALSE);
+            if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
+              DEBUG ((DEBUG_ERROR, "%a: HiiStatementPrivate->XuefiRedfishStr is NULL, x-uefi-string has something wrong.\n", __func__));
+              ASSERT (FALSE);
+            }
           }
         }
 
@@ -753,6 +755,11 @@ GetStatementPrivateByConfigureLang (
               );
             if (HiiStrCmp (TmpString, ConfigureLang) == 0) {
               return HiiStatementPrivate;
+            }
+          } else {
+            if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
+              DEBUG ((DEBUG_ERROR, "%a: HiiStatementPrivate->XuefiRedfishStr is NULL, x-uefi-string has something wrong.\n", __func__));
+              ASSERT (FALSE);
             }
           }
         }
@@ -1439,7 +1446,7 @@ GetXuefiStringAndLangByStringId (
     StringIndex = StringId;
     while (StringIndex >= X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER) {
       if (IsNodeAtEnd (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays, &StringArray->NextArray)) {
-        goto ErrorEixt;
+        goto ErrorExit;
       }
 
       StringArray  = (REDFISH_X_UEFI_STRINGS_ARRAY *)GetNextNode (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays, &StringArray->NextArray);
@@ -1476,8 +1483,8 @@ GetXuefiStringAndLangByStringId (
                                                                      );
   }
 
-ErrorEixt:;
-  DEBUG ((DEBUG_ERROR, "%a: String ID (%d) is not in any x-uef-redfish string databases.\n", __func__, StringId));
+ErrorExit:;
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: String ID (%d) is not in any x-uef-redfish string databases.\n", __func__, StringId));
   return EFI_NOT_FOUND;
 }
 
@@ -1503,7 +1510,7 @@ BuildXUefiRedfishStringDatabase (
   UINTN                       TotalStringsAdded;
   UINTN                       NumberPackageStrings;
 
-  DEBUG ((DEBUG_INFO, "%a: Building x-uefi-redfish string database, HII Formset GUID - %g.\n", __func__, FormsetPrivate->Guid));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Building x-uefi-redfish string database, HII Formset GUID - %g.\n", __func__, FormsetPrivate->Guid));
 
   BufferSize = 0;
   Status     = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
@@ -1530,6 +1537,8 @@ BuildXUefiRedfishStringDatabase (
                                                          FormsetPrivate->HiiPackageListHeader
                                                          );
   if (EFI_ERROR (Status)) {
+    FreePool (FormsetPrivate->HiiPackageListHeader);
+    FormsetPrivate->HiiPackageListHeader = NULL;
     return;
   }
 
@@ -1646,8 +1655,14 @@ LoadFormset (
   FormsetPrivate->DevicePathStr = ConvertDevicePathToText (HiiFormSet->DevicePath, FALSE, FALSE);
   Status                        = GetSupportedSchema (FormsetPrivate->HiiHandle, &FormsetPrivate->SupportedSchema);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: No x-uefi-redfish configuration found on the formset - %g\n", __func__, FormsetPrivate->Guid));
-    return EFI_UNSUPPORTED; // Can't build AttributeRegistry Meni path with returning EFI_UNSUPPORTED.
+    if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
+      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: No x-uefi-redfish configuration found on the formset - %g\n", __func__, FormsetPrivate->Guid));
+      //
+      // If there is no x-uefi-redfish language in this form-set, we don't add formset
+      // since we don't need to build menu path for attribute registry.
+      //
+      return EFI_UNSUPPORTED;
+    }
   } else {
     // Building x-uefi-redfish string database
     BuildXUefiRedfishStringDatabase (FormsetPrivate);
@@ -1733,7 +1748,23 @@ LoadFormset (
         //
         InsertTailList (&HiiFormPrivate->StatementList, &HiiStatementPrivate->Link);
       } else {
-        FreePool (HiiStatementPrivate);
+        if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
+          //
+          // If there is no x-uefi-redfish language for this statement, we don't add this statement
+          // since we don't need to build menu path for attribute registry.
+          //
+          FreePool (HiiStatementPrivate);
+        } else {
+          //
+          // This is not x-uefi-redfish string and we don't cache its string for searching Redfish configure language.
+          // When caller wants the string, we will read English string by calling HiiGetString().
+          //
+          HiiStatementPrivate->XuefiRedfishStr = NULL;
+          //
+          // Attach to statement list.
+          //
+          InsertTailList (&HiiFormPrivate->StatementList, &HiiStatementPrivate->Link);
+        }
       }
 
       HiiStatementLink = GetNextNode (&HiiForm->StatementListHead, HiiStatementLink);
