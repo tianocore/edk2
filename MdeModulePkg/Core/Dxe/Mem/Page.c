@@ -1170,6 +1170,8 @@ CoreFindFreePagesI (
     MaxAddress |= EFI_PAGE_MASK;
   }
 
+  // the allocation code has already guaranteed that this number of pages
+  // is in chunks of the alignment size
   NumberOfBytes = LShiftU64 (NumberOfPages, EFI_PAGE_SHIFT);
   Target        = 0;
 
@@ -1183,13 +1185,12 @@ CoreFindFreePagesI (
       continue;
     }
 
-    DescStart = Entry->Start;
-    DescEnd   = Entry->End;
+    DescEnd = Entry->End;
 
     //
     // If desc is past max allowed address or below min allowed address, skip it
     //
-    if ((DescStart >= MaxAddress) || (DescEnd < MinAddress)) {
+    if ((Entry->Start >= MaxAddress) || (DescEnd < MinAddress)) {
       continue;
     }
 
@@ -1200,56 +1201,60 @@ CoreFindFreePagesI (
       DescEnd = MaxAddress;
     }
 
-    DescEnd = ((DescEnd + 1) & (~((UINT64)Alignment - 1))) - 1;
+    // we need to align the start to whatever our alignment requirement without going beyond the descriptor
+    // we also want to allocate as close to the end of this descriptor as we can to maintain the UEFI policy
+    // to allocate from high addresses before low addresses
+    DescStart = ((DescEnd + 1 - NumberOfBytes) & (~(Alignment - 1)));
 
-    // Skip if DescEnd is less than DescStart after alignment clipping
-    if (DescEnd < DescStart) {
+    // Skip if DescEnd is less than DescStart or the descriptor doesn't have enough bytes after alignment clipping
+    if ((DescEnd < DescStart) || (DescStart < Entry->Start)) {
       continue;
     }
 
     //
-    // Compute the number of bytes we can used from this
+    // Compute the number of bytes we can use from this
     // descriptor, and see it's enough to satisfy the request
     //
-    DescNumberOfBytes = DescEnd - DescStart + 1;
+    DescNumberOfBytes = DescEnd - Entry->Start + 1;
 
     if (DescNumberOfBytes >= NumberOfBytes) {
       //
       // If the start of the allocated range is below the min address allowed, skip it
       //
-      if ((DescEnd - NumberOfBytes + 1) < MinAddress) {
+      if (DescStart < MinAddress) {
         continue;
       }
 
       //
-      // If this is the best match so far remember it
+      // Find the allocation at the highest memory address possible. Many systems rely on
+      // allocating specific entities at low memory addresses, so we need to prioritize
+      // leaving those addresses free when possible
       //
-      if (DescEnd > Target) {
+      if (DescStart > Target) {
         if (NeedGuard) {
-          DescEnd = AdjustMemoryS (
-                      DescEnd + 1 - DescNumberOfBytes,
-                      DescNumberOfBytes,
-                      NumberOfBytes
-                      );
-          if (DescEnd == 0) {
+          DescStart = AdjustMemoryS (
+                        DescStart,
+                        NumberOfBytes,
+                        Entry->Start,
+                        DescNumberOfBytes,
+                        Alignment
+                        );
+
+          if (DescStart == 0) {
+            // not enough space in desc for guards, try the next descriptor
             continue;
           }
         }
 
-        Target = DescEnd;
+        Target = DescStart;
       }
     }
   }
 
   //
-  // If this is a grow down, adjust target to be the allocation base
+  // If we didn't meet our alignment requirement, fail the allocation
   //
-  Target -= NumberOfBytes - 1;
-
-  //
-  // If we didn't find a match, return 0
-  //
-  if ((Target & EFI_PAGE_MASK) != 0) {
+  if ((Target & (Alignment - 1)) != 0) {
     return 0;
   }
 
