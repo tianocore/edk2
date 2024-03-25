@@ -2,7 +2,7 @@
   This file defines the EDKII Redfish Platform Config Protocol interface.
 
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -49,8 +49,8 @@
 // 2  RedfishPlatformConfigDxe debug enablement must be set in
 //    PcdRedfishDebugCategory (defined in RedfishPkg.dec)
 //
-// 3. The suborinate debug enablement for RedfishPlatformConfigDxe
-//    must be set in PcdRedfishPlatformConfigDebugPropert (defined
+// 3. The subordinate debug enablement for RedfishPlatformConfigDxe
+//    must be set in PcdRedfishPlatformConfigDebugProperty (defined
 //    in RedfishPkg.dec).
 //
 #define DEBUG_REDFISH_THIS_MODULE(DebugSubordinate, ...) \
@@ -116,7 +116,7 @@ typedef struct {
 
 #define REDFISH_MENU_PATH_SIZE  8
 
-// Definitions of Redfish platform config capbility
+// Definitions of Redfish platform config capability
 #define REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH   0x000000001
 #define REDFISH_PLATFORM_CONFIG_ALLOW_SUPPRESSED  0x000000002
 

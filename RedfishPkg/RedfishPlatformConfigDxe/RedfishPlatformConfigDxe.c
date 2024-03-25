@@ -2016,7 +2016,7 @@ RedfishPlatformConfigProtocolGetConfigureLang (
   UINTN                                           Index;
   CHAR8                                           *FullSchema;
 
-  DEBUG ((DEBUG_INFO, "%a: Harvest config language of %a_%a (Regex: %s).\n", __func__, Schema, Version, RegexPattern));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Harvest config language of %a_%a (Regex: %s).\n", __func__, Schema, Version, RegexPattern));
 
   if ((This == NULL) || IS_EMPTY_STRING (Schema) || IS_EMPTY_STRING (Version) || (Count == NULL) || (ConfigureLangList == NULL) || IS_EMPTY_STRING (RegexPattern)) {
     return EFI_INVALID_PARAMETER;
@@ -2103,7 +2103,7 @@ RELEASE_RESOURCE:
     ReleaseStatementList (&StatementList);
   }
 
-  DEBUG ((DEBUG_INFO, "%a: exit.\n", __func__));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: exit.\n", __func__));
   return Status;
 }
 
@@ -2318,7 +2318,7 @@ RedfishPlatformConfigProtocolGetAttribute (
   CHAR8                                      *FullSchema;
   CHAR8                                      *Buffer;
 
-  DEBUG ((DEBUG_INFO, "%a: Entry\n", __func__));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Entry\n", __func__));
   if ((This == NULL) || IS_EMPTY_STRING (Schema) || IS_EMPTY_STRING (Version) || IS_EMPTY_STRING (ConfigureLang) || (AttributeValue == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -2395,7 +2395,7 @@ RELEASE_RESOURCE:
     FreePool (FullSchema);
   }
 
-  DEBUG ((DEBUG_INFO, "%a: Exit\n", __func__));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Exit\n", __func__));
   return Status;
 }
 
