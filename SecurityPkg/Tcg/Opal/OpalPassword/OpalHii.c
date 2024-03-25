@@ -494,7 +494,6 @@ HiiPopulateMainMenuForm (
     }
   }
 
-  OpalHiiSetBrowserData ();
   return EFI_SUCCESS;
 }
 
@@ -632,17 +631,7 @@ DriverCallback (
   HiiKey.Raw = QuestionId;
   HiiKeyId   = (UINT8)HiiKey.KeyBits.Id;
 
-  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
-    switch (HiiKeyId) {
-      case HII_KEY_ID_VAR_SUPPORTED_DISKS:
-        DEBUG ((DEBUG_INFO, "HII_KEY_ID_VAR_SUPPORTED_DISKS\n"));
-        return HiiPopulateMainMenuForm ();
-
-      case HII_KEY_ID_VAR_SELECTED_DISK_AVAILABLE_ACTIONS:
-        DEBUG ((DEBUG_INFO, "HII_KEY_ID_VAR_SELECTED_DISK_AVAILABLE_ACTIONS\n"));
-        return HiiPopulateDiskInfoForm ();
-    }
-  } else if (Action == EFI_BROWSER_ACTION_CHANGING) {
+  if (Action == EFI_BROWSER_ACTION_CHANGING) {
     switch (HiiKeyId) {
       case HII_KEY_ID_GOTO_DISK_INFO:
         return HiiSelectDisk ((UINT8)HiiKey.KeyBits.Index);
@@ -819,6 +808,7 @@ HiiSelectDisk (
 {
   OpalHiiGetBrowserData ();
   gHiiConfiguration.SelectedDiskIndex = Index;
+  HiiPopulateDiskInfoForm ();
   OpalHiiSetBrowserData ();
 
   return EFI_SUCCESS;
@@ -839,8 +829,6 @@ HiiPopulateDiskInfoForm (
   OPAL_DISK_ACTIONS  AvailActions;
   TCG_RESULT         Ret;
   CHAR8              *DiskName;
-
-  OpalHiiGetBrowserData ();
 
   DiskName = HiiDiskGetNameCB (gHiiConfiguration.SelectedDiskIndex);
   if (DiskName == NULL) {
@@ -902,11 +890,6 @@ HiiPopulateDiskInfoForm (
 
     GetSavedOpalRequest (OpalDisk, &gHiiConfiguration.OpalRequest);
   }
-
-  //
-  // Pass the current configuration to the BIOS
-  //
-  OpalHiiSetBrowserData ();
 
   return EFI_SUCCESS;
 }
@@ -1060,6 +1043,8 @@ ExtractConfig (
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
     FreePool (ConfigRequestHdr);
   }
+
+  HiiPopulateMainMenuForm ();
 
   //
   // Convert Buffer Data to <ConfigResp> by helper function BlockToConfig( )
