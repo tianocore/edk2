@@ -59,6 +59,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,                                                 ParseAcpiFadt },
   { EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,                                              ParseAcpiGtdt },
   { EFI_ACPI_6_4_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_SIGNATURE,                                         ParseAcpiHmat },
+  { EFI_ACPI_6_5_HIGH_PRECISION_EVENT_TIMER_TABLE_SIGNATURE,                                             ParseAcpiHpet },
   { EFI_ACPI_6_2_IO_REMAPPING_TABLE_SIGNATURE,                                                           ParseAcpiIort },
   { EFI_ACPI_6_2_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,                                              ParseAcpiMadt },
   { EFI_ACPI_6_2_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
@@ -72,6 +73,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,                                        ParseAcpiSpcr },
   { EFI_ACPI_6_2_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,                                               ParseAcpiSrat },
   { EFI_ACPI_6_2_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,                                           ParseAcpiSsdt },
+  { EFI_ACPI_6_5_WINDOWS_SMM_SECURITY_MITIGATION_TABLE_SIGNATURE,                                        ParseAcpiWsmt },
   { EFI_ACPI_6_2_EXTENDED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,                                            ParseAcpiXsdt }
 };
 

@@ -38,6 +38,7 @@
   Parsers/Fadt/FadtParser.c
   Parsers/Gtdt/GtdtParser.c
   Parsers/Hmat/HmatParser.c
+  Parsers/Hpet/HpetParser.c
   Parsers/Iort/IortParser.c
   Parsers/Madt/MadtParser.c
   Parsers/Madt/MadtParser.h
@@ -51,6 +52,7 @@
   Parsers/Spcr/SpcrParser.c
   Parsers/Srat/SratParser.c
   Parsers/Ssdt/SsdtParser.c
+  Parsers/Wsmt/WsmtParser.c
   Parsers/Xsdt/XsdtParser.c
   UefiShellAcpiViewCommandLib.c
   UefiShellAcpiViewCommandLib.uni
