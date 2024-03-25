@@ -1,0 +1,21 @@
+# rustfmt (and cargo fmt) will automatically pick up this config when run in the workspace.
+
+# Note that some items are included here set to their default values. This is to explicitly specify settings for
+# more common options.
+
+# Keep these options sorted in ascending order to ease lookup against rustfmt documentation.
+
+edition = "2021"              # This would normally be picked up from Cargo.toml if not specified here
+force_explicit_abi = true     # Always print the ABI for extern items (e.g. extern {... will become extern "C" {...)
+hard_tabs = false             # Always uses spaces for indentation and alignment
+max_width = 120               # The maximum width of each line
+merge_derives = false         # Do not merge derives into a single line (leave to author discretion).
+imports_granularity = "Crate" # Merge imports from a single crate into separate statements.
+newline_style = "Windows"     # Always use Windows line endings '\r\n'
+reorder_impl_items = false    # Do not force where type and const before macros and methods in impl blocks.
+reorder_imports = true        # Do reorder import and extern crate statements alphabetically for readability.
+reorder_modules = true        # Do reorder mod declarations alphabetically for readability.
+tab_spaces = 2                # Use 2 spaces for indentation (Rust default is 4).
+unstable_features = false     # Do not use unstable rustfmt features.
+use_small_heuristics = "Max"  # Set all granular width settings to the same as max_width (do not use heuristics)
+wrap_comments = false         # Leave comment formatting to author's discretion

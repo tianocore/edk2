@@ -1,0 +1,16 @@
+## @file
+# Build plugin used to check that the users environment is ready to build with the Rust tools
+# commonly used. This provides direct feedback early in the build process rather than ambiguous
+# hard to find messages later during code compilation.
+#
+# This plugin requires the "rust-ci" scope to be set which is used in the plugins to determine
+# when a workspace is building code that includes Rust.
+#
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "rust-ci",
+  "name": "Rust Environment Check Pre-Build Plugin",
+  "module": "RustEnvironmentCheck"
+}

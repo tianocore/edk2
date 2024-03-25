@@ -112,7 +112,7 @@ class BuildFile(object):
     #
     _SHELL_CMD_ = {
         WIN32_PLATFORM : {
-            "CP"    :   "copy /y",
+            "CP"    :   "copy /b /y",
             "MV"    :   "move /y",
             "RM"    :   "del /f /q",
             "MD"    :   "mkdir",
@@ -148,7 +148,7 @@ class BuildFile(object):
     ## cp if exist
     _CP_TEMPLATE_ = {
         WIN32_PLATFORM :   'if exist %(Src)s $(CP) %(Src)s %(Dst)s',
-        POSIX_PLATFORM :   "test -f %(Src)s && $(CP) %(Src)s %(Dst)s"
+        POSIX_PLATFORM :   "if [ -f %(Src)s ]; then $(CP) %(Src)s %(Dst)s ;fi"
     }
 
     _CD_TEMPLATE_ = {
@@ -308,6 +308,12 @@ DEST_DIR_OUTPUT = $(OUTPUT_DIR)
 DEST_DIR_DEBUG = $(DEBUG_DIR)
 
 #
+# Cargo (Rust) Definition
+#
+CARGO_OUTPUT_DIR = ${cargo_module_output_directory}
+CARGO_FEATURES = ${cargo_module_enabled_features}
+
+#
 # Shell Command Macro
 #
 ${BEGIN}${shell_command_code} = ${shell_command}
@@ -435,6 +441,8 @@ cleanlib:
     _FILE_MACRO_TEMPLATE = TemplateString("${macro_name} = ${BEGIN} \\\n    ${source_file}${END}\n")
     _BUILD_TARGET_TEMPLATE = TemplateString("${BEGIN}${target} : ${deps}\n${END}\t${cmd}\n")
 
+    _RustFileWatchList = []
+
     ## Constructor of ModuleMakefile
     #
     #   @param  ModuleAutoGen   Object of ModuleAutoGen class
@@ -483,6 +491,18 @@ cleanlib:
             EdkLogger.error("build", AUTOGEN_ERROR, "No files to be built in module [%s, %s, %s]"
                             % (MyAgo.BuildTarget, MyAgo.ToolChain, MyAgo.Arch),
                             ExtraData="[%s]" % str(MyAgo))
+
+        # If rust source file change(.rs), toml file not change, make will not
+        # work for cargo. So, save .toml file and check it before build.
+        for source in MyAgo.SourceFileList:
+            if source.Ext == ".toml":
+                # update toml file if src change
+                if source not in self._RustFileWatchList:
+                    self._RustFileWatchList.append(source)
+                    Context = ""
+                    for source in self._RustFileWatchList:
+                        Context += "%s\n" % str(source)
+                    SaveFileOnChange(os.path.join(MyAgo.PlatformInfo.BuildDir, 'RustFileWatch.lst'), Context, False)
 
         # convert dependent libraries to build command
         self.ProcessDependentLibrary()
@@ -626,6 +646,11 @@ cleanlib:
                 IncludePathList.append(IncludePath)
             FileMacroList.append(self._FILE_MACRO_TEMPLATE.Replace({"macro_name": "NASM_INC", "source_file": IncludePathList}))
 
+        # Add rust libraries to link file.
+        for lib in self._AutoGenObject.LibraryRustAutoGenList:
+            if str(lib.OutPutFilePathName) not in self.ListFileMacros['STATIC_LIBRARY_FILES_LIST']:
+                self.ListFileMacros['STATIC_LIBRARY_FILES_LIST'].append(str(lib.OutPutFilePathName))
+
         # Generate macros used to represent files containing list of input files
         for ListFileMacro in self.ListFileMacros:
             ListFileName = os.path.join(MyAgo.OutputDir, "%s.lst" % ListFileMacro.lower()[:len(ListFileMacro) - 5])
@@ -693,6 +718,8 @@ cleanlib:
             "platform_build_directory"  : self.PlatformInfo.BuildDir,
             "module_build_directory"    : MyAgo.BuildDir,
             "module_output_directory"   : MyAgo.OutputDir,
+            "cargo_module_output_directory": MyAgo.OutputDir,
+            "cargo_module_enabled_features": self.GetModuleEnabledRustFeatures(),
             "module_debug_directory"    : MyAgo.DebugDir,
 
             "separator"                 : Separator,
@@ -1159,6 +1186,16 @@ cleanlib:
             Dependency[F] = GetDependencyList(self._AutoGenObject, self.FileCache, F, ForceInculeList, SearchPathList)
         return Dependency
 
+    ## Returns a comma delimited string of enabled cargo features for this module
+    #
+    #   @retval     str            comma delimited string of cargo feature flags
+    #
+    def GetModuleEnabledRustFeatures(self):
+        features = ""
+        for pcd in self._AutoGenObject.ModulePcdList:
+            if pcd.Type == "FeatureFlag" and bool(pcd.DefaultValue):
+                features += f'{pcd.TokenCName},'
+        return features
 
 ## CustomMakefile class
 #
@@ -1329,6 +1366,7 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
             "platform_build_directory"  : self.PlatformInfo.BuildDir,
             "module_build_directory"    : MyAgo.BuildDir,
             "module_output_directory"   : MyAgo.OutputDir,
+            "cargo_module_output_directory": MyAgo.OutputDir,
             "module_debug_directory"    : MyAgo.DebugDir,
 
             "separator"                 : Separator,

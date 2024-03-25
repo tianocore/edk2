@@ -2264,6 +2264,31 @@ RELEASE_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c    -Os       -W
 # NASMB uses NASM produce a .bin from a .nasmb NASM source file
 *_*_*_NASMB_FLAGS              = -f bin
 
+##################
+# RUST definitions
+##################
+*_*_X64_TARGET_TRIPLE      = x86_64-unknown-uefi
+*_*_IA32_TARGET_TRIPLE     = i686-unknown-uefi
+*_*_AARCH64_TARGET_TRIPLE  = aarch64-unknown-uefi
+
+DEBUG_*_*_RUST_TARGET      = debug
+RELEASE_*_*_RUST_TARGET    = release
+NOOPT_*_*_RUST_TARGET      = debug
+
+*_*_*_RUST_FLAGS           =
+
+####################
+# CARGO defintions #
+####################
+*_*_*_CARGO_PATH  = cargo
+
+##########################
+# CARGO MAKE definitions #
+##########################
+DEBUG_*_*_CARGOMAKE_FLAGS    = --cwd ENV(WORKSPACE) -e CARGO_TARGET_DIR=$(DEBUG_DIR) -p development -e TARGET_TRIPLE=$(TARGET_TRIPLE)
+RELEASE_*_*_CARGOMAKE_FLAGS  = --cwd ENV(WORKSPACE) -e CARGO_TARGET_DIR=$(DEBUG_DIR) -p release -e TARGET_TRIPLE=$(TARGET_TRIPLE)
+NOOPT_*_*_CARGOMAKE_FLAGS    = --cwd ENV(WORKSPACE) -e CARGO_TARGET_DIR=$(DEBUG_DIR) -p development -e TARGET_TRIPLE=$(TARGET_TRIPLE)
+
 #################
 # Build rule order
 #################

@@ -1460,6 +1460,10 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
 def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
     if Info.IsLibrary or Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_HOST_APPLICATION, SUP_MODULE_SEC]:
         return
+
+    if Info.BuildType == 'RUST_MODULE' and Info.ModuleType in [SUP_MODULE_DXE_CORE]:
+        return
+
     #
     # Module Entry Points
     #

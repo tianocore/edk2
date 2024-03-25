@@ -1,0 +1,11 @@
+##
+# Helper plugin used to share the RustPackage class to the rest of the build system.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global",
+  "name": "Rust Package Helper",
+  "module": "RustPackageHelper"
+}
