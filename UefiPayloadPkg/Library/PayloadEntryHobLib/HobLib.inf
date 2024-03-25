@@ -36,4 +36,5 @@
 [Guids]
   gEfiHobMemoryAllocModuleGuid
   gEfiHobMemoryAllocStackGuid
+  gUniversalPayloadDeviceTreeGuid
 
