@@ -7,6 +7,7 @@
 
   EXPORT SetJump
   EXPORT InternalLongJump
+  EXTERN InternalAssertJumpBuffer
   AREA BaseLib_LowLevel, CODE, READONLY
 
 #define GPR_LAYOUT                          \
