@@ -520,6 +520,10 @@ SmbiosPrintStructure (
         ShellPrintEx (-1, -1, L"Thread Count 2: %u\n", Struct->Type4->ThreadCount2);
       }
 
+      if (AE_SMBIOS_VERSION (0x3, 0x6) && (Struct->Hdr->Length > 0x2E)) {
+        ShellPrintEx (-1, -1, L"Thread Enabled: %u\n", Struct->Type4->ThreadEnabled);
+      }
+
       break;
 
     //
