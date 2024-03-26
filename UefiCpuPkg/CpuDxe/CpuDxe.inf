@@ -3,6 +3,7 @@
 #
 #  Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -22,26 +23,32 @@
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
-[LibraryClasses]
+[LibraryClasses.common]
   BaseLib
   BaseMemoryLib
+  CpuExceptionHandlerLib
   CpuLib
   DebugLib
   DxeServicesTableLib
+  HobLib
   MemoryAllocationLib
-  MtrrLib
+  MpInitLib
+  PeCoffGetEntryPointLib
+  ReportStatusCodeLib
+  TimerLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  LocalApicLib
   UefiLib
-  CpuExceptionHandlerLib
-  HobLib
-  ReportStatusCodeLib
-  MpInitLib
-  TimerLib
-  PeCoffGetEntryPointLib
 
-[Sources]
+[LibraryClasses.IA32, LibraryClasses.X64]
+  LocalApicLib
+  MtrrLib
+
+[LibraryClasses.LoongArch64]
+  CacheMaintenanceLib
+  CpuMmuLib
+
+[Sources.IA32, Sources.X64]
   CpuDxe.c
   CpuDxe.h
   CpuGdt.c
@@ -58,6 +65,13 @@
 [Sources.X64]
   X64/CpuAsm.nasm
   X64/PagingAttribute.c
+
+[Sources.LoongArch64]
+  CpuMp.h
+  LoongArch64/CpuDxe.c
+  LoongArch64/CpuMp.c
+  LoongArch64/Exception.c
+  LoongArch64/CpuDxe.h
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
@@ -77,9 +91,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask                    ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList              ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize                    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTdxSharedBitMask                    ## CONSUMES
+
+[Pcd.LoongArch64]
+  gUefiCpuPkgTokenSpaceGuid.PcdLoongArchExceptionVectorBaseAddress      ## CONSUMES
 
 [Depex]
   TRUE

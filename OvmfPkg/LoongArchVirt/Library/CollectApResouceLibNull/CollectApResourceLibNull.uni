@@ -1,0 +1,9 @@
+// @file
+//  LoongArch64 CPU Collect AP resource NULL Library.
+//
+//  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+#string STR_MODULE_ABSTRACT             #language en-US "CPU Collect AP resource NULL Library."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "CPU Collect AP resource NULL Library."

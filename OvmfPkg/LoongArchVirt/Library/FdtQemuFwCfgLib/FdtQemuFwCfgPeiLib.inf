@@ -1,0 +1,42 @@
+## @file
+#  initialized fw_cfg library.
+#
+#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = FdtQemuFwCfgPeiLib
+  FILE_GUID                      = cdf9a9d5-7422-4dcb-b41d-607151ad320b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FtdQemuFwCfgLib|PEIM
+  CONSTRUCTOR                    = FdtQemuFwCfgInitialize
+
+#
+#  VALID_ARCHITECTURES           = LOONGARCH64
+#
+
+[Sources]
+  FdtQemuFwCfgPeiLib.c
+  QemuFwCfgPei.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FdtLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
