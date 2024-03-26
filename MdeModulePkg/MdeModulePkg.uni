@@ -955,6 +955,14 @@
                                                                                              "BIT 4 - EFI_ACPI_TABLE_VERSION_4_0.<BR>\n"
                                                                                              "BIT 5 - EFI_ACPI_TABLE_VERSION_5_0.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNoACPIReclaimMemory_PROMPT  #language en-US "ACPI Reclaim memory is not available."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNoACPIReclaimMemory_HELP  #language en-US "Indicates whether ACPI Reclaim memory is not available\n"
+                                                                                     "Default is FALSE that means ACPI Reclaim memory is available\n"
+                                                                                     "If it is set to TRUE that means ACPI Reclaim memory is not available\n"
+                                                                                     "For example ACPI Table protocol will use ACPI NVS memory instead of ACPI Reclaim memory"
+
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHiiOsRuntimeSupport_PROMPT  #language en-US "Enable export HII data and configuration to be used in OS runtime."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHiiOsRuntimeSupport_HELP  #language en-US "Indicates if HII data and configuration has been exported.<BR><BR>\n"

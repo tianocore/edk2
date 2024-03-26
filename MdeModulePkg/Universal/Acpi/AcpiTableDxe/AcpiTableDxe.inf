@@ -68,6 +68,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId        ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision  ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNoACPIReclaimMemory         ## CONSUMES
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     ## PRODUCES
