@@ -313,7 +313,7 @@ typedef union {
 typedef struct {
   IPMI_SET_LAN_CONFIG_CHANNEL_NUM    ChannelNumber;
   UINT8                              ParameterSelector;
-  UINT8                              ParameterData[0];
+  UINT8                              ParameterData[];
 } IPMI_SET_LAN_CONFIGURATION_PARAMETERS_COMMAND_REQUEST;
 
 //
@@ -343,7 +343,7 @@ typedef struct {
 typedef struct {
   UINT8    CompletionCode;
   UINT8    ParameterRevision;
-  UINT8    ParameterData[0];
+  UINT8    ParameterData[];
 } IPMI_GET_LAN_CONFIGURATION_PARAMETERS_RESPONSE;
 
 //
@@ -879,7 +879,7 @@ typedef union {
 typedef struct {
   IPMI_SET_SOL_CONFIG_PARAM_CHANNEL_NUM    ChannelNumber;
   UINT8                                    ParameterSelector;
-  UINT8                                    ParameterData[0];
+  UINT8                                    ParameterData[];
 } IPMI_SET_SOL_CONFIGURATION_PARAMETERS_REQUEST;
 
 //
@@ -909,7 +909,7 @@ typedef struct {
 typedef struct {
   UINT8    CompletionCode;
   UINT8    ParameterRevision;
-  UINT8    ParameterData[0];
+  UINT8    ParameterData[];
 } IPMI_GET_SOL_CONFIGURATION_PARAMETERS_RESPONSE;
 
 #pragma pack()
