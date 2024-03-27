@@ -1,0 +1,25 @@
+## @file
+#  Instance of PCI vendor name Library
+#
+#  PciVenNameLib fetches the PCI vendor name string given the PCI vendor ID
+#  Code.
+#
+#  Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001D
+  BASE_NAME                      = PciVenNameLib
+  FILE_GUID                      = 489F81BA-0D80-48A3-88F6-317DC58A25BC
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciVenNameLib
+
+[Sources]
+  PciVenNameLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec

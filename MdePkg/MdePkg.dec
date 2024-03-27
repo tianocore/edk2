@@ -11,6 +11,7 @@
 # Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 # Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
+# Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -263,6 +264,9 @@
 
   ## @libraryclass Provides service to get the manufacturer given JEP106 bytes.
   JedecJep106Lib|Include/Library/JedecJep106Lib.h
+
+  ## @libraryclass Provides service to get the vendor name given PCI vendor ID.
+  PciVenNameLib|Include/Library/PciVenNameLib.h
 
   ## @libraryclass Extension to BaseLib for host based unit tests that allows a
   #                subset of BaseLib services to be hooked for emulation.

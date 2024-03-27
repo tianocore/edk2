@@ -5,6 +5,7 @@
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
+# Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -137,6 +138,7 @@
   MdePkg/Library/SmmCpuRendezvousLibNull/SmmCpuRendezvousLibNull.inf
 
   MdePkg/Library/JedecJep106Lib/JedecJep106Lib.inf
+  MdePkg/Library/PciVenNameLib/PciVenNameLib.inf
   MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
