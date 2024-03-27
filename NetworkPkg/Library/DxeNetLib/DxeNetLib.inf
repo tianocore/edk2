@@ -43,7 +43,7 @@
   MemoryAllocationLib
   DevicePathLib
   PrintLib
-
+  RngLib
 
 [Guids]
   gEfiSmbiosTableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable

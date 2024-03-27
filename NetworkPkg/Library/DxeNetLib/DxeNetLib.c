@@ -31,6 +31,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
+#include <Library/RngLib.h>
 
 #define NIC_ITEM_CONFIG_SIZE  (sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * MAX_IP4_CONFIG_IN_VARIABLE)
 #define DEFAULT_ZERO_START    ((UINTN) ~0)
@@ -902,14 +903,19 @@ NetRandomInitSeed (
   EFI_TIME  Time;
   UINT32    Seed;
   UINT64    MonotonicCount;
+  UINT32    RandomVal;
 
-  gRT->GetTime (&Time, NULL);
-  Seed  = (Time.Hour << 24 | Time.Day << 16 | Time.Minute << 8 | Time.Second);
-  Seed ^= Time.Nanosecond;
-  Seed ^= Time.Year << 7;
+  if ( TRUE == GetRandomNumber32 (&RandomVal)) {
+    Seed = RandomVal;
+  } else {
+    gRT->GetTime (&Time, NULL);
+    Seed  = (Time.Hour << 24 | Time.Day << 16 | Time.Minute << 8 | Time.Second);
+    Seed ^= Time.Nanosecond;
+    Seed ^= Time.Year << 7;
 
-  gBS->GetNextMonotonicCount (&MonotonicCount);
-  Seed += (UINT32)MonotonicCount;
+    gBS->GetNextMonotonicCount (&MonotonicCount);
+    Seed += (UINT32)MonotonicCount;
+  }
 
   return Seed;
 }

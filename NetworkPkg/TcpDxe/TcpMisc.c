@@ -516,7 +516,14 @@ TcpGetIss (
   VOID
   )
 {
-  mTcpGlobalIss += TCP_ISS_INCREMENT_1;
+  UINT32  RandomVal;
+
+  if ( TRUE == GetRandomNumber32 (&RandomVal)) {
+    mTcpGlobalIss += RandomVal;
+  } else {
+    mTcpGlobalIss += TCP_ISS_INCREMENT_1;
+  }
+
   return mTcpGlobalIss;
 }
 
