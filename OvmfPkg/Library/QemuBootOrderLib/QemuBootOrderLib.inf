@@ -45,6 +45,7 @@
   DevicePathLib
   BaseMemoryLib
   OrderedCollectionLib
+  TpmMeasurementLib
 
 [Guids]
   gEfiGlobalVariableGuid

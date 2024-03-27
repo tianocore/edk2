@@ -13,6 +13,8 @@
 #include <Library/QemuFwCfgS3Lib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/S3SaveState.h>
+#include <IndustryStandard/UefiTcgPlatform.h>
+#include <Library/TpmMeasurementLib.h>
 
 //
 // Event to signal when the S3SaveState protocol interface is installed.
@@ -884,4 +886,30 @@ QemuFwCfgS3ScriptCheckValue (
   }
 
   return RETURN_SUCCESS;
+}
+
+VOID
+TdxMeasureQemuSystemStates (
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
+  )
+{
+  if ((EventLog == NULL) || (HashData == NULL)) {
+    return;
+  }
+
+  //
+  // Measure the "etc/system-states" which is downloaded from QEMU.
+  // It has to be done before it is consumed.
+  //
+  TpmMeasureAndLogData (
+    1,
+    EV_PLATFORM_CONFIG_FLAGS,
+    EventLog,
+    LogLen,
+    HashData,
+    HashDataLen
+    );
 }

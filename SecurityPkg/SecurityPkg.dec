@@ -219,6 +219,9 @@
   ## GUID used to specify section with default dbt content
   gDefaultdbtFileGuid                = { 0x36c513ee, 0xa338, 0x4976, { 0xa0, 0xfb, 0x6d, 0xdb, 0xa3, 0xda, 0xfe, 0x87 } }
 
+  ## GUID used to specify section with Cc Event Variable content
+  gCcEventVariableGuid               = { 0xa291ce0e, 0xdc09, 0x11ee, { 0x9e, 0xdb, 0x73, 0x49, 0xd7, 0x92, 0xaf, 0x51 } }
+
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
   # Include/Ppi/LockPhysicalPresence.h

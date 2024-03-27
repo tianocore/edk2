@@ -738,6 +738,7 @@
   OvmfPkg/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
       NULL|OvmfPkg/IntelTdx/TdxHelperLib/PeiTdxHelperLib.inf
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
     <LibraryClasses>
@@ -836,6 +837,7 @@
       PciHostBridgeLib|OvmfPkg/Library/PciHostBridgeLib/PciHostBridgeLib.inf
       PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
       NULL|OvmfPkg/Library/PlatformHasIoMmuLib/PlatformHasIoMmuLib.inf
+      NULL|OvmfPkg/IntelTdx/TdxHelperLib/DxeTdxHelperLib.inf
   }
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf {
     <LibraryClasses>

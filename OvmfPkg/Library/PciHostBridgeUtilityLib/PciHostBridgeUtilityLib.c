@@ -22,6 +22,10 @@
 #include <Library/PciLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Protocol/PciHostBridgeResourceAllocation.h>
+#include <Library/TdxHelperLib.h>
+
+#define EV_POSTCODE_INFO_QEMU_EXTRA_PCI_BOOTS_DATA  "QEMU EXTRA PCI ROOTS DATA"
+#define QEMU_EXTRA_PCI_BOOTS_DATA_LEN               (sizeof(EV_POSTCODE_INFO_QEMU_EXTRA_PCI_BOOTS_DATA) - 1)
 
 #pragma pack(1)
 typedef struct {
@@ -270,6 +274,18 @@ PciHostBridgeUtilityGetRootBridgesBusScan (
   } else {
     QemuFwCfgSelectItem (FwCfgItem);
     QemuFwCfgReadBytes (FwCfgSize, &ExtraRootBridges);
+ #if (defined (TDX_GUEST_SUPPORTED) || defined (TDX_PEI_LESS_BOOT))
+    //
+    // Measure the "etc/extra-pci-roots" which is downloaded from QEMU.
+    // It has to be done before it is consumed.
+    //
+    TdxHelperMeasureFwCfgData (
+      EV_POSTCODE_INFO_QEMU_EXTRA_PCI_BOOTS_DATA,
+      QEMU_EXTRA_PCI_BOOTS_DATA_LEN,
+      (VOID *)(UINTN)&ExtraRootBridges,
+      FwCfgSize
+      );
+ #endif
 
     //
     // Validate the number of extra root bridges. As BusMax is inclusive, the

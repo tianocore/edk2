@@ -10,6 +10,7 @@
 **/
 
 #include <Library/QemuFwCfgS3Lib.h>
+#include <Library/TdxHelperLib.h>
 
 /**
   Install the client module's FW_CFG_BOOT_SCRIPT_CALLBACK_FUNCTION callback for
@@ -77,4 +78,26 @@ QemuFwCfgS3CallWhenBootScriptReady (
   )
 {
   return RETURN_UNSUPPORTED;
+}
+
+VOID
+TdxMeasureQemuSystemStates (
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
+  )
+{
+  if ((EventLog == NULL) || (HashData == NULL)) {
+    return;
+  }
+
+ #if defined (TDX_GUEST_SUPPORTED)
+  TdxHelperMeasureFwCfgData (
+    EventLog,
+    LogLen,
+    HashData,
+    HashDataLen
+    );
+ #endif
 }

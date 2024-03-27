@@ -29,6 +29,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -36,6 +37,7 @@
   MemoryAllocationLib
   QemuFwCfgLib
   UefiBootServicesTableLib
+  TpmMeasurementLib
 
 [Protocols]
   gEfiS3SaveStateProtocolGuid ## SOMETIMES_CONSUMES

@@ -69,6 +69,7 @@
   gTcg800155PlatformIdEventHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
   gEfiCcFinalEventsTableGuid                         ## PRODUCES
 
+  gCcEventVariableGuid
 [Protocols]
   gEfiCcMeasurementProtocolGuid                      ## PRODUCES
   gEfiMpServiceProtocolGuid                          ## SOMETIMES_CONSUMES
