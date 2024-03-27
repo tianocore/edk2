@@ -150,6 +150,7 @@ typedef struct {
 
   @retval EFI_SUCCESS                The InformationType information was retrieved.
   @retval EFI_UNSUPPORTED            The InformationType is not known.
+  @retval EFI_NOT_FOUND              Information is not available for the requested information type.
   @retval EFI_DEVICE_ERROR           The device reported an error.
   @retval EFI_OUT_OF_RESOURCES       The request could not be completed due to a lack of resources.
   @retval EFI_INVALID_PARAMETER      This is NULL.
