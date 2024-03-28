@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalCryptLib.h"
 #include <mbedtls/md5.h>
-#include <mbedtls/compat-2.x.h>
 
 #ifdef ENABLE_MD5_DEPRECATED_INTERFACES
 
@@ -56,7 +55,7 @@ Md5Init (
 
   mbedtls_md5_init (Md5Context);
 
-  Ret = mbedtls_md5_starts_ret (Md5Context);
+  Ret = mbedtls_md5_starts (Md5Context);
   if (Ret != 0) {
     return FALSE;
   }
@@ -129,7 +128,7 @@ Md5Update (
     return FALSE;
   }
 
-  Ret = mbedtls_md5_update_ret (Md5Context, Data, DataSize);
+  Ret = mbedtls_md5_update (Md5Context, Data, DataSize);
   if (Ret != 0) {
     return FALSE;
   }
@@ -170,7 +169,7 @@ Md5Final (
     return FALSE;
   }
 
-  Ret = mbedtls_md5_finish_ret (Md5Context, HashValue);
+  Ret = mbedtls_md5_finish (Md5Context, HashValue);
   mbedtls_md5_free (Md5Context);
   if (Ret != 0) {
     return FALSE;
@@ -215,7 +214,7 @@ Md5HashAll (
     return FALSE;
   }
 
-  Ret = mbedtls_md5_ret (Data, DataSize, HashValue);
+  Ret = mbedtls_md5 (Data, DataSize, HashValue);
   if (Ret != 0) {
     return FALSE;
   }
