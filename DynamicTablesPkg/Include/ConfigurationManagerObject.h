@@ -110,6 +110,7 @@ typedef enum ObjectNameSpaceID {
   EObjNameSpaceStandard,      ///< Standard Objects Namespace
   EObjNameSpaceArm,           ///< ARM Objects Namespace
   EObjNameSpaceArch,          ///< Arch Objects Namespace
+  EObjNameSpaceX64,           ///< X64 Objects Namespace
   EObjNameSpaceOem = 0x8,     ///< OEM Objects Namespace
   EObjNameSpaceMax
 } EOBJECT_NAMESPACE_ID;
