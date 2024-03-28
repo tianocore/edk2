@@ -44,6 +44,8 @@ Update Conf/target.txt TARGET_ARCH based on the .dsc file:
 * OvmfPkg/OvmfPkgIa32X64.dsc  IA32 X64
 * OvmfPkg/OvmfPkgX64.dsc      X64
 
+NOTE: Make sure to install all needed tools like **sudo apt-get install uuid-dev** and **sudo apt-get install acpica-tools** for successful build.
+
 Following the edk2 build process, you will find the OVMF binaries
 under the $WORKSPACE/Build/*/*/FV directory.  The actual path will
 depend on how your build is configured.  You can expect to find
