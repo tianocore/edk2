@@ -377,8 +377,7 @@ EFIAPI
 X509GetSerialNumber (
   IN      CONST UINT8  *Cert,
   IN      UINTN        CertSize,
-  OUT     UINT8        *SerialNumber,
-  OPTIONAL
+  OUT     UINT8        *SerialNumber  OPTIONAL,
   IN OUT  UINTN        *SerialNumberSize
   )
 {
@@ -441,8 +440,7 @@ EFIAPI
 X509GetSignatureAlgorithm (
   IN CONST UINT8  *Cert,
   IN       UINTN  CertSize,
-  OUT   UINT8     *Oid,
-  OPTIONAL
+  OUT   UINT8     *Oid  OPTIONAL,
   IN OUT   UINTN  *OidSize
   )
 {
