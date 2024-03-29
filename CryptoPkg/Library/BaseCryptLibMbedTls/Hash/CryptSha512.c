@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalCryptLib.h"
 #include <mbedtls/sha512.h>
-#include <mbedtls/compat-2.x.h>
 
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-384 hash operations.
@@ -51,7 +50,7 @@ Sha384Init (
 
   mbedtls_sha512_init (Sha384Context);
 
-  Ret = mbedtls_sha512_starts_ret (Sha384Context, TRUE);
+  Ret = mbedtls_sha512_starts (Sha384Context, TRUE);
   if (Ret != 0) {
     return FALSE;
   }
@@ -126,7 +125,7 @@ Sha384Update (
     return FALSE;
   }
 
-  Ret = mbedtls_sha512_update_ret (Sha384Context, Data, DataSize);
+  Ret = mbedtls_sha512_update (Sha384Context, Data, DataSize);
   if (Ret != 0) {
     return FALSE;
   }
@@ -167,7 +166,7 @@ Sha384Final (
     return FALSE;
   }
 
-  Ret = mbedtls_sha512_finish_ret (Sha384Context, HashValue);
+  Ret = mbedtls_sha512_finish (Sha384Context, HashValue);
   mbedtls_sha512_free (Sha384Context);
   if (Ret != 0) {
     return FALSE;
@@ -212,7 +211,7 @@ Sha384HashAll (
     return FALSE;
   }
 
-  Ret = mbedtls_sha512_ret (Data, DataSize, HashValue, TRUE);
+  Ret = mbedtls_sha512 (Data, DataSize, HashValue, TRUE);
   if (Ret != 0) {
     return FALSE;
   }
@@ -261,7 +260,7 @@ Sha512Init (
 
   mbedtls_sha512_init (Sha512Context);
 
-  Ret = mbedtls_sha512_starts_ret (Sha512Context, FALSE);
+  Ret = mbedtls_sha512_starts (Sha512Context, FALSE);
   if (Ret != 0) {
     return FALSE;
   }
@@ -336,7 +335,7 @@ Sha512Update (
     return FALSE;
   }
 
-  Ret = mbedtls_sha512_update_ret (Sha512Context, Data, DataSize);
+  Ret = mbedtls_sha512_update (Sha512Context, Data, DataSize);
   if (Ret != 0) {
     return FALSE;
   }
@@ -377,7 +376,7 @@ Sha512Final (
     return FALSE;
   }
 
-  Ret = mbedtls_sha512_finish_ret (Sha512Context, HashValue);
+  Ret = mbedtls_sha512_finish (Sha512Context, HashValue);
   mbedtls_sha512_free (Sha512Context);
   if (Ret != 0) {
     return FALSE;
@@ -422,7 +421,7 @@ Sha512HashAll (
     return FALSE;
   }
 
-  Ret = mbedtls_sha512_ret (Data, DataSize, HashValue, FALSE);
+  Ret = mbedtls_sha512 (Data, DataSize, HashValue, FALSE);
   if (Ret != 0) {
     return FALSE;
   }
