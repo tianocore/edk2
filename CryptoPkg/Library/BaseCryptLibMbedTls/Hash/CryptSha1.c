@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalCryptLib.h"
 #include <mbedtls/sha1.h>
-#include <mbedtls/compat-2.x.h>
 
 #ifndef DISABLE_SHA1_DEPRECATED_INTERFACES
 
@@ -56,7 +55,7 @@ Sha1Init (
 
   mbedtls_sha1_init (Sha1Context);
 
-  Ret = mbedtls_sha1_starts_ret (Sha1Context);
+  Ret = mbedtls_sha1_starts (Sha1Context);
   if (Ret != 0) {
     return FALSE;
   }
@@ -129,7 +128,7 @@ Sha1Update (
     return FALSE;
   }
 
-  Ret = mbedtls_sha1_update_ret (Sha1Context, Data, DataSize);
+  Ret = mbedtls_sha1_update (Sha1Context, Data, DataSize);
   if (Ret != 0) {
     return FALSE;
   }
@@ -170,7 +169,7 @@ Sha1Final (
     return FALSE;
   }
 
-  Ret = mbedtls_sha1_finish_ret (Sha1Context, HashValue);
+  Ret = mbedtls_sha1_finish (Sha1Context, HashValue);
   mbedtls_sha1_free (Sha1Context);
   if (Ret != 0) {
     return FALSE;
@@ -215,7 +214,7 @@ Sha1HashAll (
     return FALSE;
   }
 
-  Ret = mbedtls_sha1_ret (Data, DataSize, HashValue);
+  Ret = mbedtls_sha1 (Data, DataSize, HashValue);
   if (Ret != 0) {
     return FALSE;
   }
