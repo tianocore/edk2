@@ -1090,7 +1090,9 @@ CreateImagePropertiesRecord (
       ImageRecordCodeSection->Signature = IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE;
 
       ImageRecordCodeSection->CodeSegmentBase = (UINTN)ImageBase + Section[Index].VirtualAddress;
-      ImageRecordCodeSection->CodeSegmentSize = Section[Index].SizeOfRawData;
+      // We still need to align the VirtualSize to the SectionAlignment because MSVC does not do
+      // this when creating a PE image. It expects the loader to do this.
+      ImageRecordCodeSection->CodeSegmentSize = ALIGN_VALUE (Section[Index].Misc.VirtualSize, SectionAlignment);
 
       InsertTailList (&ImageRecord->CodeSegmentList, &ImageRecordCodeSection->Link);
       ImageRecord->CodeSegmentCount++;
