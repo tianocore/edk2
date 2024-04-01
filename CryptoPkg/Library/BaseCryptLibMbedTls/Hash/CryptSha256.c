@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "InternalCryptLib.h"
 #include <mbedtls/sha256.h>
-#include <mbedtls/compat-2.x.h>
 
 /**
   Retrieves the size, in bytes, of the context buffer required for SHA-256 hash operations.
@@ -51,7 +50,7 @@ Sha256Init (
 
   mbedtls_sha256_init (Sha256Context);
 
-  Ret = mbedtls_sha256_starts_ret (Sha256Context, FALSE);
+  Ret = mbedtls_sha256_starts (Sha256Context, FALSE);
   if (Ret != 0) {
     return FALSE;
   }
@@ -124,7 +123,7 @@ Sha256Update (
     return FALSE;
   }
 
-  Ret = mbedtls_sha256_update_ret (Sha256Context, Data, DataSize);
+  Ret = mbedtls_sha256_update (Sha256Context, Data, DataSize);
   if (Ret != 0) {
     return FALSE;
   }
@@ -165,7 +164,7 @@ Sha256Final (
     return FALSE;
   }
 
-  Ret = mbedtls_sha256_finish_ret (Sha256Context, HashValue);
+  Ret = mbedtls_sha256_finish (Sha256Context, HashValue);
   mbedtls_sha256_free (Sha256Context);
   if (Ret != 0) {
     return FALSE;
@@ -210,7 +209,7 @@ Sha256HashAll (
     return FALSE;
   }
 
-  Ret = mbedtls_sha256_ret (Data, DataSize, HashValue, FALSE);
+  Ret = mbedtls_sha256 (Data, DataSize, HashValue, FALSE);
   if (Ret != 0) {
     return FALSE;
   }
