@@ -75,3 +75,4 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecPageTablesSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable
