@@ -38,13 +38,8 @@ IsSmmCommBufferForbiddenAddress (
 }
 
 /*
-  Build Memory Map from ResourceDescriptor HOBs according the ResourceType.
+  Build Memory Map from ResourceDescriptor HOBs by excluding Logging attribute range.
 
-  If ResourceType is EFI_RESOURCE_MAX_MEMORY_TYPE, build all Memory Map from
-  ResourceDescriptor HOBs, otherwise, only build the Memory Map according to
-  the corresponding ResourceType.
-
-  @param[in]      ResourceType         The ResourceType for checking to build the Memory Map.
   @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
   @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
   @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
@@ -52,7 +47,6 @@ IsSmmCommBufferForbiddenAddress (
 */
 VOID
 BuildMemoryMapFromResDescHobs (
-  IN  EFI_RESOURCE_TYPE      ResourceType,
   OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
   OUT UINTN                  *MemoryMapSize,
   OUT UINTN                  *DescriptorSize
@@ -76,7 +70,7 @@ BuildMemoryMapFromResDescHobs (
   Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
   while (Hob.Raw != NULL) {
     ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
-    if (ResourceType == EFI_RESOURCE_MAX_MEMORY_TYPE || ResourceType == ResourceDescriptor->ResourceType) {
+    if ((ResourceDescriptor->ResourceAttribute & EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING) == 0) {
       Count++;
     }
 
@@ -94,17 +88,13 @@ BuildMemoryMapFromResDescHobs (
   Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
   while (Hob.Raw != NULL) {
     ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
-    if (ResourceType == EFI_RESOURCE_MAX_MEMORY_TYPE || ResourceType == ResourceDescriptor->ResourceType) {
+    if ((ResourceDescriptor->ResourceAttribute & EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING) == 0) {
       ASSERT (Index < Count);
       (*MemoryMap)[Index].PhysicalStart = ResourceDescriptor->PhysicalStart;
       (*MemoryMap)[Index].NumberOfPages = EFI_SIZE_TO_PAGES (ResourceDescriptor->ResourceLength);
       (*MemoryMap)[Index].Attribute     = EFI_MEMORY_XP;
       if (ResourceDescriptor->ResourceAttribute == EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED) {
         (*MemoryMap)[Index].Attribute |= EFI_MEMORY_RO;
-      }
-
-      if (ResourceType == ResourceDescriptor->ResourceType) {
-        (*MemoryMap)[Index].Type = ResourceType;
       }
 
       Index++;
@@ -118,7 +108,7 @@ BuildMemoryMapFromResDescHobs (
 }
 
 /*
-  Build MMIO Memory Map.
+  Create extended protection MemoryMap.
 
   The caller is responsible for freeing MemoryMap via FreePool().
 
@@ -128,17 +118,18 @@ BuildMemoryMapFromResDescHobs (
 
 */
 VOID
-BuildMmioMemoryMap (
+CreateExtendedProtectionRange (
   OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
   OUT UINTN                  *MemoryMapSize,
   OUT UINTN                  *DescriptorSize
   )
 {
-  BuildMemoryMapFromResDescHobs (EFI_RESOURCE_MEMORY_MAPPED_IO, MemoryMap, MemoryMapSize, DescriptorSize);
+  BuildMemoryMapFromResDescHobs (MemoryMap, MemoryMapSize, DescriptorSize);
 }
 
 /*
-  Create the Non-Mmram Memory Map within the Range of [0, PhysicalAddressBits Length].
+  Create the Non-Mmram Memory Map within the ResourceDescriptor HOBs
+  without Logging attribute.
 
   The caller is responsible for freeing MemoryMap via FreePool().
 
@@ -156,22 +147,5 @@ CreateNonMmramMemMap (
   OUT UINTN                  *DescriptorSize
   )
 {
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-    SmmProfileBuildNonMmramMemoryMap (MemoryMap, MemoryMapSize, DescriptorSize);
-    return;
-  }
-
-  if (IsRestrictedMemoryAccess ()) {
-    //
-    // Build MemoryMap according the ResourceDescriptor HOBs
-    //
-    BuildMemoryMapFromResDescHobs (EFI_RESOURCE_MAX_MEMORY_TYPE, MemoryMap, MemoryMapSize, DescriptorSize);
-  } else {
-    //
-    // Build MemoryMap to cover [0, PhysicalAddressBits] by excluding all Smram range
-    //
-    BuildNonMmramMemoryMap (PhysicalAddressBits, MemoryMap, MemoryMapSize, DescriptorSize);
-  }
-
-  return;
+  BuildMemoryMapFromResDescHobs (MemoryMap, MemoryMapSize, DescriptorSize);
 }

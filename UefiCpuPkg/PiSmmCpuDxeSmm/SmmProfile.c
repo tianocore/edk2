@@ -437,9 +437,9 @@ InitProtectedMemRange (
   NumberOfSpliteRange      = 0;
 
   //
-  // Build MMIO MemoryMap and add them into protected memory ranges.
+  // Create extended protection MemoryMap and add them into protected memory ranges.
   //
-  BuildMmioMemoryMap (&MemoryMap, &MemoryMapSize, &DescriptorSize);
+  CreateExtendedProtectionRange (&MemoryMap, &MemoryMapSize, &DescriptorSize);
   ASSERT (MemoryMap != NULL && (MemoryMapSize % DescriptorSize == 0));
 
   NumberOfAddedDescriptors += (MemoryMapSize / DescriptorSize);
@@ -662,76 +662,6 @@ SmmProfileUpdateMemoryAttributes (
   WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
   DEBUG ((DEBUG_INFO, "SmmProfileUpdateMemoryAttributes Done.\n"));
-}
-
-/*
-  Build SmmProfileBase and MMIO MemoryMap
-
-  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
-  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
-  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
-
-*/
-VOID
-SmmProfileBuildNonMmramMemoryMap (
-  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
-  OUT UINTN                  *MemoryMapSize,
-  OUT UINTN                  *DescriptorSize
-  )
-{
-  EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap;
-  UINTN                  MmioMemoryMapSize;
-  UINTN                  Count;
-  EFI_PEI_HOB_POINTERS   SmmProfileDataHob;
-
-  ASSERT (MemoryMap != NULL && MemoryMapSize != NULL && DescriptorSize != NULL);
-
-  MmioMemoryMap     = NULL;
-  MmioMemoryMapSize = 0;
-  *MemoryMap        = NULL;
-  *MemoryMapSize    = 0;
-  *DescriptorSize   = 0;
-
-  //
-  // Build MmioMemoryMap
-  //
-  BuildMmioMemoryMap (&MmioMemoryMap, &MmioMemoryMapSize, DescriptorSize);
-  ASSERT (MmioMemoryMap != NULL && (MmioMemoryMapSize % *DescriptorSize == 0) && *DescriptorSize == sizeof (EFI_MEMORY_DESCRIPTOR));
-
-  Count = MmioMemoryMapSize / *DescriptorSize + 1;
-
-  *MemoryMapSize =  *DescriptorSize * Count;
-
-  *MemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocateCopyPool (*MemoryMapSize, MmioMemoryMap);
-  ASSERT (*MemoryMap != NULL);
-
-  //
-  // Free the MemoryMap
-  //
-  if (MmioMemoryMap != NULL) {
-    FreePool (MmioMemoryMap);
-  }
-
-  //
-  // For SMM profile base
-  //
-  SmmProfileDataHob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
-  while (SmmProfileDataHob.Raw != NULL) {
-    //
-    // Find gEdkiiSmmProfileDataGuid
-    //
-    if (CompareGuid (&SmmProfileDataHob.MemoryAllocation->AllocDescriptor.Name, &gEdkiiSmmProfileDataGuid)) {
-      break;
-    }
-
-    SmmProfileDataHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (SmmProfileDataHob));
-  }
-
-  ASSERT (SmmProfileDataHob.Raw != NULL);
-
-  (*MemoryMap)[Count-1].PhysicalStart = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
-  (*MemoryMap)[Count-1].NumberOfPages = EFI_SIZE_TO_PAGES (SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength);
-  (*MemoryMap)[Count-1].Attribute     = EFI_MEMORY_XP;
 }
 
 /**

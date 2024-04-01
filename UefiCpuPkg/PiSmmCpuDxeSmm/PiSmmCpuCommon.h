@@ -476,23 +476,6 @@ extern BOOLEAN                       mSmmCodeAccessCheckEnable;
 //
 extern UINT64  mAddressEncMask;
 
-/*
-  Build MemoryMap to cover [0, PhysicalAddressBits length] by excluding all Smram range
-
-  @param[in]      PhysicalAddressBits  The bits of physical address to map.
-  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
-  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
-  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
-
-*/
-VOID
-BuildNonMmramMemoryMap (
-  IN  UINT8                  PhysicalAddressBits,
-  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
-  OUT UINTN                  *MemoryMapSize,
-  OUT UINTN                  *DescriptorSize
-  );
-
 /**
   Create page table based on input PagingMode and PhysicalAddressBits in smm.
 
@@ -968,7 +951,7 @@ IsSmmCommBufferForbiddenAddress (
   );
 
 /*
-  Build MMIO Memory Map.
+  Build extended protection MemoryMap.
 
   The caller is responsible for freeing MemoryMap via FreePool().
 
@@ -978,7 +961,7 @@ IsSmmCommBufferForbiddenAddress (
 
 */
 VOID
-BuildMmioMemoryMap (
+CreateExtendedProtectionRange (
   OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
   OUT UINTN                  *MemoryMapSize,
   OUT UINTN                  *DescriptorSize

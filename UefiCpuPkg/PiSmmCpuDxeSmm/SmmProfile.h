@@ -108,20 +108,6 @@ SmmProfileUpdateMemoryAttributes (
   VOID
   );
 
-/*
-  Build SmmProfileBase and MMIO MemoryMap
-
-  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
-  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
-  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
-
-*/
-VOID
-SmmProfileBuildNonMmramMemoryMap (
-  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
-  OUT UINTN                  *MemoryMapSize,
-  OUT UINTN                  *DescriptorSize
-  );
 
 /**
   Get CPU Index from APIC ID.

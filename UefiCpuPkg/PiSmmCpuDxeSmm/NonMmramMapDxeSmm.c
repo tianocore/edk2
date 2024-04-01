@@ -435,6 +435,10 @@ IsSmmCommBufferForbiddenAddress (
   UINTN                  Index;
   EFI_MEMORY_DESCRIPTOR  *Entry;
 
+  if (!FixedPcdGetBool (PcdCpuSmmRestrictedMemoryAccess)) {
+    return FALSE;
+  }
+
   if (mUefiMemoryMap != NULL) {
     MemoryMap           = mUefiMemoryMap;
     MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
@@ -550,7 +554,35 @@ BuildMmioMemoryMap (
 }
 
 /*
-  Create the Non-Mmram Memory Map within the Range of [0, PhysicalAddressBits Length].
+  Create extended protection MemoryMap.
+
+  The caller is responsible for freeing MemoryMap via FreePool().
+
+  @param[out]     MemoryMap            Returned Non-Mmram Memory Map.
+  @param[out]     MemoryMapSize        A pointer to the size, it is the size of new created memory map.
+  @param[out]     DescriptorSize       Size, in bytes, of an individual EFI_MEMORY_DESCRIPTOR.
+
+*/
+VOID
+CreateExtendedProtectionRange (
+  OUT EFI_MEMORY_DESCRIPTOR  **MemoryMap,
+  OUT UINTN                  *MemoryMapSize,
+  OUT UINTN                  *DescriptorSize
+  )
+{
+  //
+  // Build MMIO
+  //
+  BuildMmioMemoryMap (MemoryMap, MemoryMapSize, DescriptorSize);
+
+  //
+  // Future extended range could be added here.
+  //
+}
+
+/*
+  Create the Non-Mmram Memory Map.
+  The Memory Map shall be within the Range of [0, 2^PhysicalAddressBits] Ranges.
 
   The caller is responsible for freeing MemoryMap via FreePool().
 
@@ -568,5 +600,54 @@ CreateNonMmramMemMap (
   OUT UINTN                  *DescriptorSize
   )
 {
-  BuildNonMmramMemoryMap (PhysicalAddressBits, MemoryMap, MemoryMapSize, DescriptorSize);
+  UINT64  MaxLength;
+  UINTN   Count;
+  UINTN   Index;
+  UINT64  PreviousAddress;
+  UINT64  Base;
+  UINT64  Length;
+
+  ASSERT (MemoryMap != NULL && MemoryMapSize != NULL && DescriptorSize != NULL);
+
+  *MemoryMap      = NULL;
+  *MemoryMapSize  = 0;
+  *DescriptorSize = 0;
+
+  MaxLength = LShiftU64 (1, PhysicalAddressBits);
+
+  //
+  // Build MemoryMap to cover [0, PhysicalAddressBits] by excluding all Smram range
+  //
+  Count = mSmmCpuSmramRangeCount + 1;
+
+  *DescriptorSize = sizeof (EFI_MEMORY_DESCRIPTOR);
+  *MemoryMapSize  =  *DescriptorSize * Count;
+
+  *MemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocateZeroPool (*MemoryMapSize);
+  ASSERT (*MemoryMap != NULL);
+
+  PreviousAddress = 0;
+  for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+    Base   = mSmmCpuSmramRanges[Index].CpuStart;
+    Length = mSmmCpuSmramRanges[Index].PhysicalSize;
+
+    ASSERT (MaxLength > Base +  Length);
+
+    if (Base > PreviousAddress) {
+      (*MemoryMap)[Index].PhysicalStart = PreviousAddress;
+      (*MemoryMap)[Index].NumberOfPages = EFI_SIZE_TO_PAGES (Base - PreviousAddress);
+      (*MemoryMap)[Index].Attribute     = EFI_MEMORY_XP;
+    }
+
+    PreviousAddress = Base + Length;
+  }
+
+  //
+  // Set the last remaining range
+  //
+  if (PreviousAddress < MaxLength) {
+    (*MemoryMap)[Index].PhysicalStart = PreviousAddress;
+    (*MemoryMap)[Index].NumberOfPages = EFI_SIZE_TO_PAGES (MaxLength - PreviousAddress);
+    (*MemoryMap)[Index].Attribute     = EFI_MEMORY_XP;
+  }
 }
