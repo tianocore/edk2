@@ -25,8 +25,13 @@ STACK_TOP:
 SECTION .text
 
 %define TDX_WORK_AREA_MAILBOX_GDTR   (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 128)
+%define PT_ADDR(Offset)              (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
+%define TDX_WORK_AREA_PGTBL_READY    (FixedPcdGet32 (PcdOvmfWorkAreaBase) + 4)
+%define PG_5_LEVEL                   (FixedPcdGetBool (PcdUse5LevelPageTable))
 
-%define PT_ADDR(Offset)                 (FixedPcdGet32 (PcdOvmfSecPageTablesBase) + (Offset))
+%define TDX_BSP         1
+%define TDX_AP          2
+%define TDX_AP_5_LEVEL  3
 
 BITS 64
 
@@ -174,6 +179,19 @@ RestoreCr0:
 RestoreCr4:
     mov     eax, 0x40
     mov     cr4, eax
+
+%if PG_5_LEVEL
+    mov     al, byte[TDX_WORK_AREA_PGTBL_READY]
+    inc     eax
+    cmp     eax, TDX_AP_5_LEVEL
+    jne     SetCr3
+SetCr4La57:
+    ; set la57 bit in cr4
+    mov     eax, cr4
+    bts     eax, 12
+    mov     cr4, eax
+%endif
+
 SetCr3:
     ;
     ; Can use the boot page tables since it's reserved
