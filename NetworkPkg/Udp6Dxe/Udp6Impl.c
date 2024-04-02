@@ -1257,727 +1257,94 @@ Udp6InstanceCancelToken (
 
   @param[in]  Instance           Pointer to the udp instance context data.
   @param[in]  Udp6Session        Pointer to the EFI_UDP6_SESSION_DATA abstracted
-                                 from the received udp datagram.
-
-  @retval TRUE     The udp datagram matches the receiving requirements of the Instance.
-  @retval FALSE    The udp datagram does not match the receiving requirements of the Instance.
-
-**/
-BOOLEAN
-Udp6MatchDgram (
-  IN UDP6_INSTANCE_DATA     *Instance,
-  IN EFI_UDP6_SESSION_DATA  *Udp6Session
-  )
-{
-  EFI_UDP6_CONFIG_DATA  *ConfigData;
-  EFI_IPv6_ADDRESS      Destination;
-
-  ConfigData = &Instance->ConfigData;
-
-  if (ConfigData->AcceptPromiscuous) {
-    //
-    // Always matches if this instance is in the promiscuous state.
-    //
-    return TRUE;
-  }
-
-  if ((!ConfigData->AcceptAnyPort && (Udp6Session->DestinationPort != ConfigData->StationPort)) ||
-      ((ConfigData->RemotePort != 0) && (Udp6Session->SourcePort != ConfigData->RemotePort))
-      )
-  {
-    //
-    // The local port or the remote port doesn't match.
-    //
-    return FALSE;
-  }
-
-  if (!NetIp6IsUnspecifiedAddr (&ConfigData->RemoteAddress) &&
-      !EFI_IP6_EQUAL (&ConfigData->RemoteAddress, &Udp6Session->SourceAddress)
-      )
-  {
-    //
-    // This datagram doesn't come from the instance's specified sender.
-    //
-    return FALSE;
-  }
-
-  if (NetIp6IsUnspecifiedAddr (&ConfigData->StationAddress) ||
-      EFI_IP6_EQUAL (&Udp6Session->DestinationAddress, &ConfigData->StationAddress)
-      )
-  {
-    //
-    // The instance is configured to receive datagrams destinated to any station IP or
-    // the destination address of this datagram matches the configured station IP.
-    //
-    return TRUE;
-  }
-
-  IP6_COPY_ADDRESS (&Destination, &Udp6Session->DestinationAddress);
-
-  if (IP6_IS_MULTICAST (&Destination) &&
-      (NULL != Udp6MapMultiCastAddr (&Instance->McastIps, &Destination))
-      )
-  {
-    //
-    // It's a multicast packet and the multicast address is accepted by this instance.
-    //
-    return TRUE;
-  }
-
-  return FALSE;
-}
-
-/**
-  This function removes the Wrap specified by Context and release relevant resources.
-
-  @param[in]  Event                  The Event this notify function registered to.
-  @param[in]  Context                Pointer to the context data.
-
-**/
-VOID
-EFIAPI
-Udp6RecycleRxDataWrap (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  UDP6_RXDATA_WRAP  *Wrap;
-
-  Wrap = (UDP6_RXDATA_WRAP *)Context;
-
-  //
-  // Remove the Wrap from the list it belongs to.
-  //
-  RemoveEntryList (&Wrap->Link);
-
-  //
-  // Free the Packet associated with this Wrap.
-  //
-  NetbufFree (Wrap->Packet);
-
-  //
-  // Close the event.
-  //
-  gBS->CloseEvent (Wrap->RxData.RecycleSignal);
-
-  FreePool (Wrap);
-}
-
-/**
-  This function wraps the Packet into RxData.
-
-  @param[in]  Instance           Pointer to the instance context data.
-  @param[in]  Packet             Pointer to the buffer containing the received
-                                 datagram.
-  @param[in]  RxData             Pointer to the EFI_UDP6_RECEIVE_DATA of this
-                                 datagram.
-
-  @return Pointer to the structure wrapping the RxData and the Packet. NULL will
-          be returned if any error occurs.
-
-**/
-UDP6_RXDATA_WRAP *
-Udp6WrapRxData (
-  IN UDP6_INSTANCE_DATA     *Instance,
-  IN NET_BUF                *Packet,
-  IN EFI_UDP6_RECEIVE_DATA  *RxData
-  )
-{
-  EFI_STATUS        Status;
-  UDP6_RXDATA_WRAP  *Wrap;
-
-  //
-  // Allocate buffer for the Wrap.
-  //
-  Wrap = AllocateZeroPool (
-           sizeof (UDP6_RXDATA_WRAP) +
-           (Packet->BlockOpNum - 1) * sizeof (EFI_UDP6_FRAGMENT_DATA)
-           );
-  if (Wrap == NULL) {
-    return NULL;
-  }
-
-  InitializeListHead (&Wrap->Link);
-
-  CopyMem (&Wrap->RxData, RxData, sizeof (EFI_UDP6_RECEIVE_DATA));
-  //
-  // Create the Recycle event.
-  //
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  Udp6RecycleRxDataWrap,
-                  Wrap,
-                  &Wrap->RxData.RecycleSignal
-                  );
-  if (EFI_ERROR (Status)) {
-    FreePool (Wrap);
-    return NULL;
-  }
-
-  Wrap->Packet      = Packet;
-  Wrap->TimeoutTick = Instance->ConfigData.ReceiveTimeout;
-
-  return Wrap;
-}
-
-/**
-  This function enqueues the received datagram into the instances' receiving queues.
-
-  @param[in]  Udp6Service        Pointer to the udp service context data.
-  @param[in]  Packet             Pointer to the buffer containing the received
-                                 datagram.
-  @param[in]  RxData             Pointer to the EFI_UDP6_RECEIVE_DATA of this
-                                 datagram.
-
-  @return The times this datagram is enqueued.
-
-**/
-UINTN
-Udp6EnqueueDgram (
-  IN UDP6_SERVICE_DATA      *Udp6Service,
-  IN NET_BUF                *Packet,
-  IN EFI_UDP6_RECEIVE_DATA  *RxData
-  )
-{
-  LIST_ENTRY          *Entry;
-  UDP6_INSTANCE_DATA  *Instance;
-  UDP6_RXDATA_WRAP    *Wrap;
-  UINTN               Enqueued;
-
-  Enqueued = 0;
-
-  NET_LIST_FOR_EACH (Entry, &Udp6Service->ChildrenList) {
-    //
-    // Iterate the instances.
-    //
-    Instance = NET_LIST_USER_STRUCT (Entry, UDP6_INSTANCE_DATA, Link);
-
-    if (!Instance->Configured) {
-      continue;
-    }
-
-    if (Udp6MatchDgram (Instance, &RxData->UdpSession)) {
-      //
-      // Wrap the RxData and put this Wrap into the instances RcvdDgramQue.
-      //
-      Wrap = Udp6WrapRxData (Instance, Packet, RxData);
-      if (Wrap == NULL) {
-        continue;
-      }
-
-      NET_GET_REF (Packet);
-
-      InsertTailList (&Instance->RcvdDgramQue, &Wrap->Link);
-
-      Enqueued++;
-    }
-  }
-
-  return Enqueued;
-}
-
-/**
-  This function delivers the received datagrams to the specified instance.
-
-  @param[in]  Instance               Pointer to the instance context data.
-
-**/
-VOID
-Udp6InstanceDeliverDgram (
-  IN UDP6_INSTANCE_DATA  *Instance
-  )
-{
-  UDP6_RXDATA_WRAP           *Wrap;
-  EFI_UDP6_COMPLETION_TOKEN  *Token;
-  NET_BUF                    *Dup;
-  EFI_UDP6_RECEIVE_DATA      *RxData;
-  EFI_TPL                    OldTpl;
-
-  if (!IsListEmpty (&Instance->RcvdDgramQue) &&
-      !NetMapIsEmpty (&Instance->RxTokens)
-      )
-  {
-    Wrap = NET_LIST_HEAD (&Instance->RcvdDgramQue, UDP6_RXDATA_WRAP, Link);
-
-    if (NET_BUF_SHARED (Wrap->Packet)) {
-      //
-      // Duplicate the Packet if it is shared between instances.
-      //
-      Dup = NetbufDuplicate (Wrap->Packet, NULL, 0);
-      if (Dup == NULL) {
-        return;
-      }
-
-      NetbufFree (Wrap->Packet);
-
-      Wrap->Packet = Dup;
-    }
-
-    NetListRemoveHead (&Instance->RcvdDgramQue);
-
-    Token = (EFI_UDP6_COMPLETION_TOKEN *)NetMapRemoveHead (&Instance->RxTokens, NULL);
-
-    //
-    // Build the FragmentTable and set the FragmentCount in RxData.
-    //
-    RxData                = &Wrap->RxData;
-    RxData->FragmentCount = Wrap->Packet->BlockOpNum;
-
-    NetbufBuildExt (
-      Wrap->Packet,
-      (NET_FRAGMENT *)RxData->FragmentTable,
-      &RxData->FragmentCount
-      );
-
-    Token->Status        = EFI_SUCCESS;
-    Token->Packet.RxData = &Wrap->RxData;
-
-    OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-    InsertTailList (&Instance->DeliveredDgramQue, &Wrap->Link);
-    gBS->RestoreTPL (OldTpl);
-
-    gBS->SignalEvent (Token->Event);
-  }
-}
-
-/**
-  This function delivers the datagrams enqueued in the instances.
-
-  @param[in]  Udp6Service            Pointer to the udp service context data.
-
-**/
-VOID
-Udp6DeliverDgram (
-  IN UDP6_SERVICE_DATA  *Udp6Service
-  )
-{
-  LIST_ENTRY          *Entry;
-  UDP6_INSTANCE_DATA  *Instance;
-
-  NET_LIST_FOR_EACH (Entry, &Udp6Service->ChildrenList) {
-    //
-    // Iterate the instances.
-    //
-    Instance = NET_LIST_USER_STRUCT (Entry, UDP6_INSTANCE_DATA, Link);
-
-    if (!Instance->Configured) {
-      continue;
-    }
-
-    //
-    // Deliver the datagrams of this instance.
-    //
-    Udp6InstanceDeliverDgram (Instance);
-  }
-}
-
-/**
-  This function demultiplexes the received udp datagram to the appropriate instances.
-
-  @param[in]  Udp6Service        Pointer to the udp service context data.
-  @param[in]  NetSession         Pointer to the EFI_NET_SESSION_DATA abstracted from
-                                 the received datagram.
-  @param[in]  Packet             Pointer to the buffer containing the received udp
-                                 datagram.
-
-**/
-VOID
-Udp6Demultiplex (
-  IN UDP6_SERVICE_DATA     *Udp6Service,
-  IN EFI_NET_SESSION_DATA  *NetSession,
-  IN NET_BUF               *Packet
-  )
-{
-  EFI_UDP_HEADER         *Udp6Header;
-  UINT16                 HeadSum;
-  EFI_UDP6_RECEIVE_DATA  RxData;
-  EFI_UDP6_SESSION_DATA  *Udp6Session;
-  UINTN                  Enqueued;
-
-  if (Packet->TotalSize < UDP6_HEADER_SIZE) {
-    NetbufFree (Packet);
-    return;
-  }
-
-  //
-  // Get the datagram header from the packet buffer.
-  //
-  Udp6Header = (EFI_UDP_HEADER *)NetbufGetByte (Packet, 0, NULL);
-  ASSERT (Udp6Header != NULL);
-  if (Udp6Header == NULL) {
-    NetbufFree (Packet);
-    return;
-  }
-
-  if (Udp6Header->Checksum != 0) {
-    //
-    // check the checksum.
-    //
-    HeadSum = NetIp6PseudoHeadChecksum (
-                &NetSession->Source.v6,
-                &NetSession->Dest.v6,
-                EFI_IP_PROTO_UDP,
-                0
-                );
-
-    if (Udp6Checksum (Packet, HeadSum) != 0) {
-      //
-      // Wrong checksum.
-      //
-      NetbufFree (Packet);
-      return;
-    }
-  }
-
-  Udp6Session                  = &RxData.UdpSession;
-  Udp6Session->SourcePort      = NTOHS (Udp6Header->SrcPort);
-  Udp6Session->DestinationPort = NTOHS (Udp6Header->DstPort);
-
-  IP6_COPY_ADDRESS (&Udp6Session->SourceAddress, &NetSession->Source);
-  IP6_COPY_ADDRESS (&Udp6Session->DestinationAddress, &NetSession->Dest);
-
-  //
-  // Trim the UDP header.
-  //
-  NetbufTrim (Packet, UDP6_HEADER_SIZE, TRUE);
-
-  RxData.DataLength = (UINT32)Packet->TotalSize;
-
-  //
-  // Try to enqueue this datagram into the instances.
-  //
-  Enqueued = Udp6EnqueueDgram (Udp6Service, Packet, &RxData);
-
-  if (Enqueued == 0) {
-    //
-    // Send the port unreachable ICMP packet before we free this NET_BUF
-    //
-    Udp6SendPortUnreach (Udp6Service->IpIo, NetSession, Udp6Header);
-  }
-
-  //
-  // Try to free the packet before deliver it.
-  //
-  NetbufFree (Packet);
-
-  if (Enqueued > 0) {
-    //
-    // Deliver the datagram.
-    //
-    Udp6DeliverDgram (Udp6Service);
-  }
-}
-
-/**
-  This function builds and sends out a icmp port unreachable message.
-
-  @param[in]  IpIo               Pointer to the IP_IO instance.
-  @param[in]  NetSession         Pointer to the EFI_NET_SESSION_DATA of the packet
-                                 causes this icmp error message.
-  @param[in]  Udp6Header         Pointer to the udp header of the datagram causes
-                                 this icmp error message.
-
-**/
-VOID
-Udp6SendPortUnreach (
-  IN IP_IO                 *IpIo,
-  IN EFI_NET_SESSION_DATA  *NetSession,
-  IN VOID                  *Udp6Header
-  )
-{
-  NET_BUF              *Packet;
-  UINT32               Len;
-  IP6_ICMP_ERROR_HEAD  *IcmpErrHdr;
-  UINT8                *Ptr;
-  IP_IO_OVERRIDE       Override;
-  IP_IO_IP_INFO        *IpSender;
-  EFI_IP6_MODE_DATA    *Ip6ModeData;
-  EFI_STATUS           Status;
-  EFI_IP6_PROTOCOL     *Ip6Protocol;
-
-  Ip6ModeData = NULL;
-
-  //
-  // An ICMPv6 error message MUST NOT be originated as A packet destined to
-  // 1) an IPv6 multicast address 2) The IPv6 Unspecified Address
-  //
-  if (NetSession->IpVersion == IP_VERSION_6) {
-    if (NetIp6IsUnspecifiedAddr (&NetSession->Dest.v6) ||
-        IP6_IS_MULTICAST (&NetSession->Dest.v6)
-        )
-    {
-      goto EXIT;
-    }
-  }
-
-  IpSender = IpIoFindSender (&IpIo, NetSession->IpVersion, &NetSession->Dest);
-
-  //
-  // Get the Ipv6 Mode Data.
-  //
-  Ip6ModeData = AllocateZeroPool (sizeof (EFI_IP6_MODE_DATA));
-  ASSERT (Ip6ModeData != NULL);
-  if (Ip6ModeData == NULL) {
-    goto EXIT;
-  }
-
-  //
-  // If not finding the related IpSender use the default IpIo to send out
-  // the port unreachable ICMP message.
-  //
-  if (IpSender == NULL) {
-    Ip6Protocol = IpIo->Ip.Ip6;
-  } else {
-    Ip6Protocol = IpSender->Ip.Ip6;
-  }
-
-  Status = Ip6Protocol->GetModeData (
-                          Ip6Protocol,
-                          Ip6ModeData,
-                          NULL,
-                          NULL
-                          );
-
-  if (EFI_ERROR (Status)) {
-    goto EXIT;
-  }
-
-  //
-  // The ICMP6 packet length, includes whole invoking packet and ICMP6 error header.
-  //
-  Len = NetSession->IpHdrLen +
-        NTOHS (((EFI_UDP_HEADER *)Udp6Header)->Length) +
-        sizeof (IP6_ICMP_ERROR_HEAD);
-
-  //
-  // If the ICMP6 packet length larger than IP MTU, adjust its length to MTU.
-  //
-  if (Ip6ModeData->MaxPacketSize < Len) {
-    Len = Ip6ModeData->MaxPacketSize;
-  }
-
-  //
-  // Allocate buffer for the icmp error message.
-  //
-  Packet = NetbufAlloc (Len);
-  if (Packet == NULL) {
-    goto EXIT;
-  }
-
-  //
-  // Allocate space for the IP6_ICMP_ERROR_HEAD.
-  //
-  IcmpErrHdr = (IP6_ICMP_ERROR_HEAD *)NetbufAllocSpace (Packet, Len, FALSE);
-  ASSERT (IcmpErrHdr != NULL);
-  if (IcmpErrHdr == NULL) {
-    goto EXIT;
-  }
-
-  //
-  // Set the required fields for the icmp port unreachable message.
-  //
-  IcmpErrHdr->Head.Type     = ICMP_V6_DEST_UNREACHABLE;
-  IcmpErrHdr->Head.Code     = ICMP_V6_PORT_UNREACHABLE;
-  IcmpErrHdr->Head.Checksum = 0;
-  IcmpErrHdr->Fourth        = 0;
-
-  //
-  // Copy as much of invoking Packet as possible without the ICMPv6 packet
-  // exceeding the minimum Ipv6 MTU. The length of IP6_ICMP_ERROR_HEAD contains
-  // the length of EFI_IP6_HEADER, so when using the length of IP6_ICMP_ERROR_HEAD
-  // for pointer movement that fact should be considered.
-  //
-  Ptr = (VOID *)&IcmpErrHdr->Head;
-  Ptr = (UINT8 *)(UINTN)((UINTN)Ptr + sizeof (IP6_ICMP_ERROR_HEAD) - sizeof (EFI_IP6_HEADER));
-  CopyMem (Ptr, NetSession->IpHdr.Ip6Hdr, NetSession->IpHdrLen);
-  CopyMem (
-    Ptr + NetSession->IpHdrLen,
-    Udp6Header,
-    Len - NetSession->IpHdrLen - sizeof (IP6_ICMP_ERROR_HEAD) + sizeof (EFI_IP6_HEADER)
-    );
-
-  //
-  // Set the checksum as zero, and IP6 driver will calculate it with pseudo header.
-  //
-  IcmpErrHdr->Head.Checksum = 0;
-
-  //
-  // Fill the override data.
-  //
-  Override.Ip6OverrideData.FlowLabel = 0;
-  Override.Ip6OverrideData.HopLimit  = 255;
-  Override.Ip6OverrideData.Protocol  = IP6_ICMP;
-
-  //
-  // Send out this icmp packet.
-  //
-  IpIoSend (IpIo, Packet, IpSender, NULL, NULL, &NetSession->Source, &Override);
-
-  NetbufFree (Packet);
-
-EXIT:
-  if (Ip6ModeData != NULL) {
-    FreePool (Ip6ModeData);
-  }
-}
-
-/**
-  This function handles the received Icmp Error message and de-multiplexes it to the
-  instance.
-
-  @param[in]       Udp6Service        Pointer to the udp service context data.
-  @param[in]       IcmpError          The icmp error code.
-  @param[in]       NetSession         Pointer to the EFI_NET_SESSION_DATA abstracted
-                                      from the received Icmp Error packet.
-  @param[in, out]  Packet             Pointer to the Icmp Error packet.
-
-**/
-VOID
-Udp6IcmpHandler (
-  IN UDP6_SERVICE_DATA     *Udp6Service,
-  IN UINT8                 IcmpError,
-  IN EFI_NET_SESSION_DATA  *NetSession,
-  IN OUT NET_BUF           *Packet
-  )
-{
-  EFI_UDP_HEADER         *Udp6Header;
-  EFI_UDP6_SESSION_DATA  Udp6Session;
-  LIST_ENTRY             *Entry;
-  UDP6_INSTANCE_DATA     *Instance;
-
-  if (Packet->TotalSize < UDP6_HEADER_SIZE) {
-    NetbufFree (Packet);
-    return;
-  }
-
-  Udp6Header = (EFI_UDP_HEADER *)NetbufGetByte (Packet, 0, NULL);
-  ASSERT (Udp6Header != NULL);
-  if (Udp6Header == NULL) {
-    NetbufFree (Packet);
-    return;
-  }
-
-  IP6_COPY_ADDRESS (&Udp6Session.SourceAddress, &NetSession->Source);
-  IP6_COPY_ADDRESS (&Udp6Session.DestinationAddress, &NetSession->Dest);
-
-  Udp6Session.SourcePort      = NTOHS (Udp6Header->DstPort);
-  Udp6Session.DestinationPort = NTOHS (Udp6Header->SrcPort);
-
-  NET_LIST_FOR_EACH (Entry, &Udp6Service->ChildrenList) {
-    //
-    // Iterate all the instances.
-    //
-    Instance = NET_LIST_USER_STRUCT (Entry, UDP6_INSTANCE_DATA, Link);
-
-    if (!Instance->Configured) {
-      continue;
-    }
-
-    if (Udp6MatchDgram (Instance, &Udp6Session)) {
-      //
-      // Translate the Icmp Error code according to the udp spec.
-      //
-      Instance->IcmpError = IpIoGetIcmpErrStatus (IcmpError, IP_VERSION_6, NULL, NULL);
-
-      if (IcmpError > ICMP_ERR_UNREACH_PORT) {
-        Instance->IcmpError = EFI_ICMP_ERROR;
-      }
-
-      //
-      // Notify the instance with the received Icmp Error.
-      //
-      Udp6ReportIcmpError (Instance);
-
-      break;
-    }
-  }
-
-  NetbufFree (Packet);
-}
-
-/**
-  This function reports the received ICMP error.
-
-  @param[in]  Instance          Pointer to the udp instance context data.
-
-**/
-VOID
-Udp6ReportIcmpError (
-  IN UDP6_INSTANCE_DATA  *Instance
-  )
-{
-  EFI_UDP6_COMPLETION_TOKEN  *Token;
-
-  if (NetMapIsEmpty (&Instance->RxTokens)) {
-    //
-    // There are no receive tokens to deliver the ICMP error.
-    //
-    return;
-  }
-
-  if (EFI_ERROR (Instance->IcmpError)) {
-    //
-    // Try to get a RxToken from the RxTokens map.
-    //
-    Token = (EFI_UDP6_COMPLETION_TOKEN *)NetMapRemoveHead (&Instance->RxTokens, NULL);
-
-    if (Token != NULL) {
-      //
-      // Report the error through the Token.
-      //
-      Token->Status = Instance->IcmpError;
-      gBS->SignalEvent (Token->Event);
-
-      //
-      // Clear the IcmpError.
-      //
-      Instance->IcmpError = EFI_SUCCESS;
-    }
-  }
-}
-
-/**
-  This function is a dummy ext-free function for the NET_BUF created for the output
-  udp datagram.
-
-  @param[in]  Context                Pointer to the context data.
-
-**/
-VOID
-EFIAPI
-Udp6NetVectorExtFree (
-  IN VOID  *Context
-  )
-{
-}
-
-/**
-  Find the key in the netmap.
-
-  @param[in]  Map                    The netmap to search within.
-  @param[in]  Key                    The key to search.
-
-  @return The point to the item contains the Key, or NULL, if Key isn't in the map.
-
-**/
-NET_MAP_ITEM *
-Udp6MapMultiCastAddr (
-  IN  NET_MAP  *Map,
-  IN  VOID     *Key
-  )
-{
-  LIST_ENTRY        *Entry;
-  NET_MAP_ITEM      *Item;
-  EFI_IPv6_ADDRESS  *Addr;
-
-  ASSERT (Map != NULL);
-  NET_LIST_FOR_EACH (Entry, &Map->Used) {
-    Item = NET_LIST_USER_STRUCT (Entry, NET_MAP_ITEM, Link);
-    Addr = (EFI_IPv6_ADDRESS *)Item->Key;
-    if (EFI_IP6_EQUAL (Addr, Key)) {
-      return Item;
-    }
-  }
-  return NULL;
-}
+                                /**
+                                  This function binds the UDP6 instance to the specified port.
+
+                                  @param[in]  Instance              Pointer to the instance context data.
+                                  @param[in]  Port                  The port number to bind.
+
+                                  @retval EFI_SUCCESS              The UDP6 instance is successfully bound to the port.
+                                  @retval EFI_INVALID_PARAMETER    The port number is invalid.
+                                  @retval EFI_ALREADY_STARTED      The UDP6 instance is already bound to a port.
+                                  @retval EFI_OUT_OF_RESOURCES     Failed to allocate resources to bind the port.
+                                  @retval EFI_ACCESS_DENIED        The port is already in use by another application.
+
+                                **/
+                                EFI_STATUS
+                                Udp6Bind (
+                                  IN UDP6_INSTANCE_DATA  *Instance,
+                                  IN UINT16              Port
+                                  )
+                                {
+                                  EFI_UDP6_CONFIG_DATA  *ConfigData;
+                                  UINT16                StartPort;
+                                  UINT16                EndPort;
+                                  UINT16                CurrentPort;
+                                  BOOLEAN               PortInUse;
+
+                                  ConfigData = &Instance->ConfigData;
+
+                                  if (ConfigData->AcceptAnyPort) {
+                                    //
+                                    // The instance is configured to accept any port.
+                                    //
+                                    ConfigData->StationPort = Port;
+                                    return EFI_SUCCESS;
+                                  }
+
+                                  if (ConfigData->StationPort != 0) {
+                                    //
+                                    // The instance is already bound to a port.
+                                    //
+                                    return EFI_ALREADY_STARTED;
+                                  }
+
+                                  if (Port == 0) {
+                                    //
+                                    // The port number is invalid.
+                                    //
+                                    return EFI_INVALID_PARAMETER;
+                                  }
+
+                                  //
+                                  // Check if the specified port is already in use.
+                                  //
+                                  PortInUse = Udp6IsPortInUse (Instance->Service, Port);
+                                  if (PortInUse) {
+                                    //
+                                    // The port is already in use by another application.
+                                    //
+                                    return EFI_ACCESS_DENIED;
+                                  }
+
+                                  //
+                                  // Set the start and end port range for allocation.
+                                  //
+                                  StartPort = ConfigData->PortPolicy.Start;
+                                  EndPort = ConfigData->PortPolicy.End;
+
+                                  if (StartPort > EndPort) {
+                                    //
+                                    // Invalid port range.
+                                    //
+                                    return EFI_INVALID_PARAMETER;
+                                  }
+
+                                  //
+                                  // Iterate through the port range to find an available port.
+                                  //
+                                  for (CurrentPort = StartPort; CurrentPort <= EndPort; CurrentPort++) {
+                                    if (!Udp6IsPortInUse (Instance->Service, CurrentPort)) {
+                                      //
+                                      // Found an available port.
+                                      //
+                                      ConfigData->StationPort = CurrentPort;
+                                      return EFI_SUCCESS;
+                                    }
+                                  }
+
+                                  //
+                                  // Failed to find an available port within the range.
+                                  //
+                                  return EFI_OUT_OF_RESOURCES;
+                                }
