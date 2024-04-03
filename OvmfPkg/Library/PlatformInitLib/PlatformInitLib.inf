@@ -26,6 +26,7 @@
   Cmos.c
   MemDetect.c
   Platform.c
+  MeasureFwCfg.c
 
 [Sources.IA32]
   IntelTdxNull.c
@@ -103,3 +104,6 @@
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode
+
+[Guids]
+  gOvmfFwCfgInfoHobGuid

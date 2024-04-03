@@ -275,4 +275,21 @@ PlatformInitEmuVariableNvStore (
   IN VOID  *EmuVariableNvStore
   );
 
+/**
+ Current OVMF got the configuration data from QEMU via fw_cfg.
+ For Td-Guest, VMM is out of TCB, the configuration data is untrusted
+ data, from the security perpective, it must be measured into RTMR[0].
+ And to avoid changing the order when reading the fw_cfg process, which
+ depends on multiple factors(depex, order in the Firmware volume), we
+ should cache with measurement it in early PEI or SEC(Pei less statr).
+
+ @retval  EFI_SUCCESS   - Successfully cache with measurement
+ @retval  Others        - As the error code indicates
+ */
+EFI_STATUS
+EFIAPI
+PlatformInitFwCfgInfoHob (
+  VOID
+  );
+
 #endif // PLATFORM_INIT_LIB_H_
