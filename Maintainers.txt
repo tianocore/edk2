@@ -417,6 +417,11 @@ M: Abner Chang <abner.chang@amd.com> [changab]
 R: Abdul Lateef Attar <AbdulLateef.Attar@amd.com> [abdattar]
 R: Nickle Wang <nicklew@nvidia.com> [nicklela]
 
+MdeModulePkg: SPI driver stack
+F: MdeModulePkg/Bus/Spi/
+M: Abner Chang <abner.chang@amd.com> [changab]
+R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
@@ -449,6 +454,12 @@ F: MdePkg/Include/IndustryStandard/*Pldm*.h
 M: Abner Chang <abner.chang@amd.com> [changab]
 R: Abdul Lateef Attar <AbdulLateef.Attar@amd.com> [abdattar]
 R: Nickle Wang <nicklew@nvidia.com> [nicklela]
+
+MdePkg: SPI related C header files
+F: MdePkg/Include/Protocol/Spi*.h
+F: MdePkg/Include/IndustryStandard/SpiNorFlashJedecSfdp.h
+M: Abner Chang <abner.chang@amd.com> [changab]
+R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
 
 NetworkPkg
 F: NetworkPkg/
