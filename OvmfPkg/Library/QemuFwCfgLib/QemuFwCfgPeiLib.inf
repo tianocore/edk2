@@ -45,6 +45,7 @@
 
 [Guids]
   gUefiOvmfPkgPlatformInfoGuid
+  gOvmfFwCfgInfoHobGuid
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

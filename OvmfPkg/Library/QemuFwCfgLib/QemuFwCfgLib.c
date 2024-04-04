@@ -34,6 +34,10 @@ QemuFwCfgSelectItem (
   IN FIRMWARE_CONFIG_ITEM  QemuFwCfgItem
   )
 {
+  if (QemuFwCfgCacheEnable ()) {
+    InternalQemuFwCfgSelectItem (QemuFwCfgItem);
+  }
+
   DEBUG ((DEBUG_INFO, "Select Item: 0x%x\n", (UINT16)(UINTN)QemuFwCfgItem));
   IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)(UINTN)QemuFwCfgItem);
 }
@@ -52,6 +56,12 @@ InternalQemuFwCfgReadBytes (
   IN VOID   *Buffer  OPTIONAL
   )
 {
+  if (QemuFwCfgCacheEnable () && !QemuFwCfgSkipCache ()) {
+    if (!EFI_ERROR (InternalQemuFwCfgCacheBytes (Size, Buffer))) {
+      return;
+    }
+  }
+
   if (InternalQemuFwCfgDmaIsAvailable () && (Size <= MAX_UINT32)) {
     InternalQemuFwCfgDmaBytes ((UINT32)Size, Buffer, FW_CFG_DMA_CTL_READ);
     return;
@@ -260,6 +270,12 @@ QemuFwCfgFindFile (
     return RETURN_UNSUPPORTED;
   }
 
+  if (QemuFwCfgCacheEnable ()) {
+    if (!EFI_ERROR (QemuFwCfgItemInCacheList (Name, Item, Size))) {
+      return RETURN_SUCCESS;
+    }
+  }
+
   QemuFwCfgSelectItem (QemuFwCfgItemFileDir);
   Count = SwapBytes32 (QemuFwCfgRead32 ());
 
@@ -283,4 +299,102 @@ QemuFwCfgFindFile (
   }
 
   return RETURN_NOT_FOUND;
+}
+
+RETURN_STATUS
+QemuFwCfgItemInCacheList (
+  IN   CONST CHAR8           *Name,
+  OUT  FIRMWARE_CONFIG_ITEM  *Item,
+  OUT  UINTN                 *Size
+  )
+{
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  UINT8              *FwCfgData;
+  UINT16             HobSize;
+
+  FW_CFG_CACHE_INFO  *FwCfgInfo;
+  UINT8              *Ptr;
+  UINTN              ReservedSize;
+
+  GuidHob = GetFirstGuidHob (&gOvmfFwCfgInfoHobGuid);
+  if (GuidHob == NULL) {
+    return RETURN_NOT_READY;
+  }
+
+  FwCfgData = (UINT8 *)GET_GUID_HOB_DATA (GuidHob);
+  HobSize   = GET_GUID_HOB_DATA_SIZE (GuidHob);
+
+  if (HobSize < (sizeof (FW_CFG_CACHE_INFO) + sizeof (FW_CFG_SELECT_INFO))) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid HobSize. \n", __func__));
+    return RETURN_ABORTED;
+  }
+
+  ReservedSize = HobSize - sizeof (FW_CFG_SELECT_INFO);
+
+  Ptr = FwCfgData + sizeof (FW_CFG_SELECT_INFO);
+  while (ReservedSize <= HobSize ) {
+    FwCfgInfo = (FW_CFG_CACHE_INFO *)Ptr;
+    if (AsciiStrCmp (Name, FwCfgInfo->FileName) == 0) {
+      *Item = FwCfgInfo->FwCfgItem;
+      *Size = FwCfgInfo->DataSize;
+      DEBUG ((DEBUG_INFO, "%a: Found %a in FwCfg Cache\n", __func__, Name));
+      return RETURN_SUCCESS;
+    } else {
+      Ptr += sizeof (FW_CFG_CACHE_INFO) + FwCfgInfo->DataSize;
+    }
+
+    ReservedSize -= sizeof (FW_CFG_CACHE_INFO) + FwCfgInfo->DataSize;
+    if (ReservedSize <= 0) {
+      break;
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "%a: Not found %a in FwCfg Cache\n", __func__, Name));
+  return RETURN_NOT_FOUND;
+}
+
+EFI_STATUS
+QemuFwCfgGetBytesFromCache (
+  IN     UINT8                 *Cache,
+  IN     UINT16                CacheSize,
+  IN     FIRMWARE_CONFIG_ITEM  Item,
+  IN     UINTN                 Size,
+  IN     UINTN                 OffSet,
+  IN OUT VOID                  *Buffer
+  )
+{
+  UINT8  *Ptr;
+  UINTN  ReservedSize;
+
+  FW_CFG_CACHE_INFO  *FwCfgInfo;
+
+  if ((Cache == NULL) || (Buffer == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ReservedSize = CacheSize;
+
+  Ptr = Cache;
+  while (ReservedSize <= CacheSize ) {
+    FwCfgInfo = (FW_CFG_CACHE_INFO *)Ptr;
+    if (FwCfgInfo->FwCfgItem == Item) {
+      Ptr += sizeof (FW_CFG_CACHE_INFO);
+      if ((OffSet > FwCfgInfo->DataSize) || (Size > FwCfgInfo->DataSize)) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      Ptr += OffSet;
+      CopyMem (Buffer, Ptr, Size);
+      return RETURN_SUCCESS;
+    } else {
+      Ptr += sizeof (FW_CFG_CACHE_INFO) + FwCfgInfo->DataSize;
+    }
+
+    ReservedSize -= sizeof (FW_CFG_CACHE_INFO) + FwCfgInfo->DataSize;
+    if (ReservedSize <= sizeof (FW_CFG_CACHE_INFO)) {
+      break;
+    }
+  }
+
+  return EFI_NOT_FOUND;
 }

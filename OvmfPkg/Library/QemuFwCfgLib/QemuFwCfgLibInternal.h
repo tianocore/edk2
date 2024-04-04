@@ -11,6 +11,14 @@
 #ifndef __QEMU_FW_CFG_LIB_INTERNAL_H__
 #define __QEMU_FW_CFG_LIB_INTERNAL_H__
 
+#include <Base.h>
+#include <Uefi/UefiMultiPhase.h>
+#include <Uefi/UefiBaseType.h>
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
+#include <Library/HobLib.h>
+#include <Library/BaseMemoryLib.h>
+
 /**
   Returns a boolean indicating if the firmware configuration interface is
   available for library-internal purposes.
@@ -68,6 +76,73 @@ InternalQemuFwCfgDmaBytes (
 BOOLEAN
 QemuFwCfgIsTdxGuest (
   VOID
+  );
+
+EFI_STATUS
+QemuFwCfgGetBytesFromCache (
+  IN     UINT8                 *Cache,
+  IN     UINT16                CacheSize,
+  IN     FIRMWARE_CONFIG_ITEM  Item,
+  IN     UINTN                 Size,
+  IN     UINTN                 OffSet,
+  IN OUT VOID                  *Buffer
+  );
+
+/**
+  Read the fw_cfg data from Cache.
+
+  @retval  EFI_SUCCESS   - Successfully
+  @retval  Others        - As the error code indicates
+**/
+EFI_STATUS
+InternalQemuFwCfgCacheBytes (
+  IN     UINTN  Size,
+  IN OUT VOID   *Buffer
+  );
+
+/**
+  Save the select item and set the offset for reading
+  from cache.
+
+**/
+VOID
+InternalQemuFwCfgSelectItem (
+  IN  FIRMWARE_CONFIG_ITEM  Item
+  );
+
+/**
+  Check if fw_cfg cache is ready.
+
+  @retval    TRUE   Cache is ready
+  @retval    FALSE  Cache is not ready
+**/
+BOOLEAN
+QemuFwCfgCacheEnable (
+  VOID
+  );
+
+/**
+  Check if it needs to skip read from cache.
+
+  @retval    TRUE   Skip
+  @retval    FALSE  Not skip.
+**/
+BOOLEAN
+QemuFwCfgSkipCache (
+  VOID
+  );
+
+/**
+  Check if the fw_cfg file name is in cache.
+
+  @retval    TRUE   The item in cache.
+  @retval    FALSE  The item not in cache.
+**/
+RETURN_STATUS
+QemuFwCfgItemInCacheList (
+  IN  CONST  CHAR8                 *Name,
+  OUT        FIRMWARE_CONFIG_ITEM  *Item,
+  OUT        UINTN                 *Size
   );
 
 #endif

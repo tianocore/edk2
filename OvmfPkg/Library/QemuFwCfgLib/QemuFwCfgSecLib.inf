@@ -39,4 +39,10 @@
   DebugLib
   IoLib
   MemoryAllocationLib
+  HobLib
 
+[Guids]
+  gOvmfFwCfgInfoHobGuid
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

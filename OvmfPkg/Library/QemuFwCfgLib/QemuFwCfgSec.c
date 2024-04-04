@@ -14,6 +14,7 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <PiPei.h>
 
 #include "QemuFwCfgLibInternal.h"
 
@@ -118,4 +119,149 @@ InternalQemuFwCfgDmaBytes (
   //
   ASSERT (FALSE);
   CpuDeadLoop ();
+}
+
+VOID
+InternalQemuFwCfgSelectItem (
+  IN     FIRMWARE_CONFIG_ITEM  Item
+  )
+{
+ #ifdef TDX_PEI_LESS_BOOT
+
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  GuidHob = GetFirstGuidHob (&gOvmfFwCfgInfoHobGuid);
+  if (GuidHob == NULL) {
+    return;
+  }
+
+  FW_CFG_SELECT_INFO  *FwCfgSelectInfo;
+
+  FwCfgSelectInfo = (FW_CFG_SELECT_INFO *)(VOID *)GET_GUID_HOB_DATA (GuidHob);
+
+  if (Item == QemuFwCfgItemFileDir) {
+    FwCfgSelectInfo->SkipCache = TRUE;
+  } else {
+    FwCfgSelectInfo->SkipCache = FALSE;
+  }
+
+  FwCfgSelectInfo->FwCfgItem = Item;
+  FwCfgSelectInfo->Offset    = 0;
+ #else
+  DEBUG ((DEBUG_INFO, "%a: It's only support for Pei less startup %r\n", __func__));
+  return;
+ #endif
+}
+
+EFI_STATUS
+InternalQemuFwCfgCacheBytes (
+  IN     UINTN  Size,
+  IN OUT VOID   *Buffer
+  )
+{
+ #ifdef TDX_PEI_LESS_BOOT
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  UINT8              *FwCfgData;
+  UINT16             HobSize;
+  EFI_STATUS         Status;
+
+  FW_CFG_SELECT_INFO  *FwCfgSelectInfo;
+
+  if (Size == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  GuidHob = GetFirstGuidHob (&gOvmfFwCfgInfoHobGuid);
+  if (GuidHob == NULL) {
+    return RETURN_NOT_READY;
+  }
+
+  FwCfgData = (UINT8 *)GET_GUID_HOB_DATA (GuidHob);
+  HobSize   = GET_GUID_HOB_DATA_SIZE (GuidHob);
+
+  if (HobSize < (sizeof (FW_CFG_CACHE_INFO) + sizeof (FW_CFG_SELECT_INFO))) {
+    DEBUG ((DEBUG_ERROR, "%a: Invalid HobSize. \n", __func__));
+    return RETURN_NOT_READY;
+  }
+
+  HobSize        -= sizeof (FW_CFG_SELECT_INFO);
+  FwCfgSelectInfo = (FW_CFG_SELECT_INFO *)FwCfgData;
+  FwCfgData      += sizeof (FW_CFG_SELECT_INFO);
+
+  Status = QemuFwCfgGetBytesFromCache (FwCfgData, HobSize, FwCfgSelectInfo->FwCfgItem, Size, FwCfgSelectInfo->Offset, Buffer);
+  if (EFI_ERROR (Status)) {
+    return RETURN_NOT_FOUND;
+  }
+
+  FwCfgSelectInfo->Offset = Size;
+
+  DEBUG ((DEBUG_INFO, "%a: found in FwCfg Cache\n", __func__));
+  return RETURN_SUCCESS;
+
+ #else
+  DEBUG ((DEBUG_INFO, "%a: It's only support for Pei less startup %r\n", __func__));
+  return RETURN_UNSUPPORTED;
+ #endif
+}
+
+#include <WorkArea.h>
+BOOLEAN
+QemuFwCfgCacheEnable (
+  VOID
+  )
+{
+ #ifdef TDX_PEI_LESS_BOOT
+  TDX_WORK_AREA  *TdxWorkArea;
+
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+
+  if ((TdxWorkArea == NULL) || (TdxWorkArea->SecTdxWorkArea.HobList == 0)) {
+    return FALSE;
+  }
+
+  EFI_HOB_GUID_TYPE  *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&gOvmfFwCfgInfoHobGuid);
+  if (GuidHob == NULL) {
+    return FALSE;
+  }
+
+  FW_CFG_SELECT_INFO  *FwCfgSelectInfo;
+
+  FwCfgSelectInfo = (FW_CFG_SELECT_INFO *)(VOID *)GET_GUID_HOB_DATA (GuidHob);
+  if (FwCfgSelectInfo->CacheReady) {
+    return TRUE;
+  }
+
+  return FALSE;
+ #else
+  DEBUG ((DEBUG_INFO, "%a: It's only support for Pei less startup %r\n", __func__));
+  return FALSE;
+ #endif
+}
+
+BOOLEAN
+QemuFwCfgSkipCache (
+  VOID
+  )
+{
+ #ifdef TDX_PEI_LESS_BOOT
+  EFI_HOB_GUID_TYPE  *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&gOvmfFwCfgInfoHobGuid);
+  if (GuidHob == NULL) {
+    return TRUE;
+  }
+
+  FW_CFG_SELECT_INFO  *FwCfgSelectInfo;
+
+  FwCfgSelectInfo = (FW_CFG_SELECT_INFO *)(VOID *)GET_GUID_HOB_DATA (GuidHob);
+  if (FwCfgSelectInfo->SkipCache) {
+    return TRUE;
+  }
+
+  return FALSE;
+ #else
+  DEBUG ((DEBUG_INFO, "%a: It's only support for Pei less startup %r\n", __func__));
+  return TRUE;
+ #endif
 }
