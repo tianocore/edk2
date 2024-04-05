@@ -54,6 +54,7 @@ SecGetPlatformData (
   UINT32         TopOfCar;
   UINT32         *StackPtr;
   UINT32         DwordSize;
+  UINT32         TemporaryRamSize;
 
   FspPlatformData = &FspData->PlatformData;
 
@@ -67,12 +68,20 @@ SecGetPlatformData (
   FspPlatformData->MicrocodeRegionSize = 0;
   FspPlatformData->CodeRegionBase      = 0;
   FspPlatformData->CodeRegionSize      = 0;
+  TemporaryRamSize                     = 0;
 
   //
   // Pointer to the size field
   //
   TopOfCar = PcdGet32 (PcdTemporaryRamBase) + PcdGet32 (PcdTemporaryRamSize);
   StackPtr = (UINT32 *)(TopOfCar - sizeof (UINT32));
+  if ((*(StackPtr - 1) != FSP_MCUD_SIGNATURE) && (FspData->FspInfoHeader->ImageAttribute & BIT4)) {
+    ReadTemporaryRamSize (PcdGet32 (PcdTemporaryRamBase), &TemporaryRamSize);
+    if (TemporaryRamSize) {
+      TopOfCar = PcdGet32 (PcdTemporaryRamBase) + TemporaryRamSize;
+      StackPtr = (UINT32 *)(TopOfCar - sizeof (UINT32));
+    }
+  }
 
   if (*(StackPtr - 1) == FSP_MCUD_SIGNATURE) {
     while (*StackPtr != 0) {

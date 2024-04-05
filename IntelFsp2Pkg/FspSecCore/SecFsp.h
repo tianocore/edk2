@@ -17,6 +17,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/FspCommonLib.h>
 #include <Library/FspSecPlatformLib.h>
+#include <Library/FspPlatformLib.h>
 
 #define FSP_MCUD_SIGNATURE  SIGNATURE_32 ('M', 'C', 'U', 'D')
 #define FSP_PER0_SIGNATURE  SIGNATURE_32 ('P', 'E', 'R', '0')
