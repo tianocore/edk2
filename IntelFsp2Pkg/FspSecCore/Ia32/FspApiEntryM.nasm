@@ -11,7 +11,6 @@
 ; Following are fixed PCDs
 ;
 extern   ASM_PFX(PcdGet32(PcdTemporaryRamBase))
-extern   ASM_PFX(PcdGet32(PcdTemporaryRamSize))
 extern   ASM_PFX(PcdGet32(PcdFspTemporaryRamSize))
 extern   ASM_PFX(PcdGet8 (PcdFspHeapSizePercentage))
 

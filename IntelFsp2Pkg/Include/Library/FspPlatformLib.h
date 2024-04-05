@@ -121,4 +121,17 @@ FspTempRamExitDone2 (
   IN EFI_STATUS  Status
   );
 
+/**
+  Calculate TemporaryRam Size using Base address.
+
+  @param[in]  TemporaryRamBase         the address of target memory
+  @param[out] TemporaryRamSize         the size of target memory
+**/
+VOID
+EFIAPI
+ReadTemporaryRamSize (
+  IN  UINT32  TemporaryRamBase,
+  OUT UINT32  *TemporaryRamSize
+  );
+
 #endif

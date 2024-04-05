@@ -76,7 +76,8 @@ struc LoadMicrocodeParamsFsp24
     .FsptArchReserved:        resb    3
     .FsptArchLength:          resd    1
     .FspDebugHandler          resq    1
-    .FsptArchUpd:             resd    4
+    .FspTemporaryRamSize:     resd    1 ; Supported only if ArchRevison is >= 3
+    .FsptArchUpd:             resd    3
     ; }
     ; FSPT_CORE_UPD {
     .MicrocodeCodeAddr:       resq    1
@@ -163,7 +164,7 @@ ASM_PFX(LoadMicrocodeDefault):
    cmp    byte [rsp + LoadMicrocodeParamsFsp24.FspUpdHeaderRevision], 2
    jb     ParamError
    cmp    byte [rsp + LoadMicrocodeParamsFsp24.FsptArchRevision], 2
-   jne    ParamError
+   jb     ParamError
 
    ; UPD structure is compliant with FSP spec 2.4
    mov    rax, qword [rsp + LoadMicrocodeParamsFsp24.MicrocodeCodeSize]
@@ -273,7 +274,7 @@ CheckAddress:
    cmp   byte [rsp + LoadMicrocodeParamsFsp24.FspUpdHeaderRevision], 2
    jb    ParamError
    cmp   byte [rsp + LoadMicrocodeParamsFsp24.FsptArchRevision], 2
-   jne   ParamError
+   jb    ParamError
 
    ; UPD structure is compliant with FSP spec 2.4
    ; Is automatic size detection ?
@@ -337,8 +338,8 @@ ASM_PFX(EstablishStackFsp):
   ;
   mov       rax, ASM_PFX(PcdGet32 (PcdTemporaryRamBase))
   mov       esp, DWORD[rax]
-  mov       rax, ASM_PFX(PcdGet32 (PcdTemporaryRamSize))
-  add       esp, DWORD[rax]
+  LOAD_TEMPORARY_RAM_SIZE rax
+  add       esp, eax
 
   sub       esp, 4
   mov       dword[esp], DATA_LEN_OF_MCUD ; Size of the data region
@@ -349,7 +350,7 @@ ASM_PFX(EstablishStackFsp):
   cmp       byte [rdx + LoadMicrocodeParamsFsp24.FspUpdHeaderRevision], 2
   jb        ParamError1
   cmp       byte [rdx + LoadMicrocodeParamsFsp24.FsptArchRevision], 2
-  je        Fsp24UpdHeader
+  jnb       Fsp24UpdHeader
 
 ParamError1:
   mov       rax, 08000000000000002h
@@ -397,8 +398,8 @@ ContinueAfterUpdPush:
   ;
   mov       rcx, ASM_PFX(PcdGet32 (PcdTemporaryRamBase))
   mov       edx, [ecx]
-  mov       rcx, ASM_PFX(PcdGet32 (PcdTemporaryRamSize))
-  add       edx, [ecx]
+  LOAD_TEMPORARY_RAM_SIZE rcx
+  add       edx, ecx
   mov       rcx, ASM_PFX(PcdGet32 (PcdFspReservedBufferSize))
   sub       edx, [ecx]
   mov       rcx, ASM_PFX(PcdGet32 (PcdTemporaryRamBase))
@@ -440,6 +441,14 @@ ASM_PFX(TempRamInitApi):
   SAVE_BFV  rbp
 
   ;
+  ; Save timestamp into YMM6
+  ;
+  rdtsc
+  shl       rdx, 32
+  or        rax, rdx
+  SAVE_TS   rax
+
+  ;
   ; Save Input Parameter in YMM10
   ;
   cmp       rcx, 0
@@ -455,14 +464,46 @@ ASM_PFX(TempRamInitApi):
 ParamValid:
   SAVE_RCX
 
+  mov       rdx, ASM_PFX(PcdGet32 (PcdTemporaryRamSize))
+  mov       edx, DWORD [rdx]
   ;
-  ; Save timestamp into YMM6
+  ; Read Fsp Arch2 revision
   ;
-  rdtsc
-  shl       rdx, 32
-  or        rax, rdx
-  SAVE_TS   rax
+  cmp       byte [ecx + LoadMicrocodeParamsFsp24.FsptArchRevision], 3
+  jb        UseTemporaryRamSizePcd
+  ;
+  ; Read ARCH2 UPD input value.
+  ;
+  mov       ebx, DWORD [ecx + LoadMicrocodeParamsFsp24.FspTemporaryRamSize]
+  ;
+  ; As per spec, if Bootloader pass zero, use Fsp defined Size
+  ;
+  cmp       ebx, 0
+  jz        UseTemporaryRamSizePcd
 
+  xor       rax, rax
+  mov       ax,  WORD [rsi + 020h]      ; Read ImageAttribute
+  test      ax,  16                     ; check if Bit4 is set
+  jnz       ConsumeInputConfiguration
+  ;
+  ; Sometimes user may change input value even if it is not supported
+  ; return error if input is Non-Zero and not same as PcdTemporaryRamSize.
+  ;
+  cmp       ebx, edx
+  je        UseTemporaryRamSizePcd
+  mov       rax, 08000000000000002h      ; RETURN_INVALID_PARAMETER
+  jmp       TempRamInitExit
+ConsumeInputConfiguration:
+  ;
+  ; Read ARCH2 UPD value and Save.
+  ; Only low-32 bits of rbx/rdx holds the temporary ram size.
+  ;
+  SAVE_TEMPORARY_RAM_SIZE rbx
+  jmp       GotTemporaryRamSize
+UseTemporaryRamSizePcd:
+  SAVE_TEMPORARY_RAM_SIZE rdx
+
+GotTemporaryRamSize:
   ;
   ; Sec Platform Init
   ;

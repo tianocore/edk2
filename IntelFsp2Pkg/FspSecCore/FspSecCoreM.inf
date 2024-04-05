@@ -59,6 +59,7 @@
   FspCommonLib
   FspSecPlatformLib
   CpuLib
+  FspPlatformLib
 
 [Pcd]
   gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES
