@@ -60,7 +60,6 @@
   FspSecPlatformLib
   CpuLib
   FspMultiPhaseLib
-  FspPlatformLib
 
 [Pcd]
   gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES

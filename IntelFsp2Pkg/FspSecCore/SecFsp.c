@@ -8,6 +8,42 @@
 #include "SecFsp.h"
 
 /**
+  Calculate TemporaryRam Size using Base address.
+
+  @param[in]  TemporaryRamBase         the address of target memory
+  @param[out] TemporaryRamSize         the size of target memory
+**/
+VOID
+EFIAPI
+ReadTemporaryRamSize (
+  IN  UINT32  TemporaryRamBase,
+  OUT UINT32 *TemporaryRamSize
+  )
+{
+  MSR_IA32_MTRRCAP_REGISTER Msr;
+  UINT32  MsrNum;
+  UINT32  MsrNumEnd;
+
+  if (TemporaryRamBase == 0) {
+    return ;
+  }
+
+  *TemporaryRamSize = 0;
+  Msr.Uint64 = AsmReadMsr64(MSR_IA32_MTRRCAP);
+  MsrNumEnd = MSR_IA32_MTRR_PHYSBASE0 + (2 * (Msr.Bits.VCNT));
+
+  for (MsrNum = MSR_IA32_MTRR_PHYSBASE0; MsrNum < MsrNumEnd; MsrNum += 2) {
+    if ((AsmReadMsr64 (MsrNum+1) & BIT11) != 0 ) {
+      if (TemporaryRamBase == (AsmReadMsr64 (MsrNum) & 0xFFFFF000)) {
+        *TemporaryRamSize = (~(AsmReadMsr64 (MsrNum+1) & 0xFFFFF000) + 1);
+        break;
+      }
+    }
+  }
+  return;
+}
+
+/**
 
   Calculate the FSP IDT gate descriptor.
 

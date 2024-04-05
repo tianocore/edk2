@@ -122,7 +122,7 @@ FspGetSystemMemorySize (
 }
 
 /**
-  Calculate TemporaryRam Size using Base address
+  Calculate TemporaryRam Size using Base address.
 
   @param[in]  TemporaryRamBase         the address of target memory
   @param[out] TemporaryRamSize         the size of target memory

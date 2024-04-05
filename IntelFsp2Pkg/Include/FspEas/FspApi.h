@@ -153,10 +153,10 @@ typedef struct {
   ///
   EFI_PHYSICAL_ADDRESS    FspDebugHandler;
   ///
-  /// FspTemporaryRamSize is Optional & valid only when 
-  /// FSP image attribute (BIT4) is set. If Programmed as Zero, Platform 
+  /// FspTemporaryRamSize is Optional & valid only when
+  /// FSP image attribute (BIT4) is set. If Programmed as Zero, Platform
   /// recommended value will be used, otherwise input value will be used
-  /// to configure TemporaryRamSize. Refer FSP Integration guide for valid 
+  /// to configure TemporaryRamSize. Refer FSP Integration guide for valid
   /// TemporaryRamSize range for each platform.
   ///
   UINT32                  FspTemporaryRamSize;
