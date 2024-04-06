@@ -77,12 +77,23 @@ HttpBootUninstallCallback (
   IN HTTP_BOOT_PRIVATE_DATA  *Private
   )
 {
+  EFI_STATUS  Status;
+  EFI_HANDLE  ControllerHandle;
+
   if (Private->HttpBootCallback == &Private->LoadFileCallback) {
-    gBS->UninstallProtocolInterface (
-           Private->Controller,
-           &gEfiHttpBootCallbackProtocolGuid,
-           &Private->HttpBootCallback
-           );
+    if (!Private->UsingIpv6) {
+      ControllerHandle = Private->Ip4Nic->Controller;
+    } else {
+      ControllerHandle = Private->Ip6Nic->Controller;
+    }
+
+    Status = gBS->UninstallProtocolInterface (
+                    ControllerHandle,
+                    &gEfiHttpBootCallbackProtocolGuid,
+                    Private->HttpBootCallback
+                    );
+    ASSERT_EFI_ERROR (Status);
+
     Private->HttpBootCallback = NULL;
   }
 }
