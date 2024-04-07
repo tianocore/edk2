@@ -3,7 +3,7 @@
 
   @copyright
   INTEL CONFIDENTIAL
-  Copyright (C) 2023 Intel Corporation.
+  Copyright (C) 2024 Intel Corporation.
 
   This software and the related documents are Intel copyrighted materials,
   and your use of them is governed by the express license under which they
@@ -31,9 +31,8 @@
 
   @param[in] MpServices2        Pointer to this instance of the MpServices.
 
-  @retval EFI_UNSUPPORTED       CPU SmmBase Relocation unsupported.
-  @retval EFI_OUT_OF_RESOURCES  CPU SmmBase Relocation failed.
   @retval EFI_SUCCESS           CPU SmmBase Relocated successfully.
+  @retval Others                CPU SmmBase Relocation failed.
 
 **/
 EFI_STATUS
