@@ -47,6 +47,7 @@
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/StandaloneMmMemLib.h>
 #include <Library/HobLib.h>
+#include <Library/HobPrintLib.h>
 
 #include "StandaloneMmCorePrivateData.h"
 

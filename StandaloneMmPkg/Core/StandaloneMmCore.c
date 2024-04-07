@@ -795,6 +795,10 @@ StandaloneMmMain (
   Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
   ASSERT_EFI_ERROR (Status);
 
+  DEBUG_CODE (
+    PrintHob (MmHobStart);
+    );
+
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
   // use it to register the MM Foundation entrypoint
