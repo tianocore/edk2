@@ -457,12 +457,10 @@ MmCorePrepareCommunicationBuffer (
 {
   EFI_STATUS            Status;
   EFI_HOB_GUID_TYPE     *GuidHob;
-  MM_COMM_BUFFER_DATA   *NonMmramCommunicationBuffer;
   EFI_PHYSICAL_ADDRESS  Buffer;
 
-  NonMmramCommunicationBuffer = NULL;
-  mMmCommunicationBuffer      = NULL;
-  mInternalCommBufferCopy     = NULL;
+  mMmCommunicationBuffer  = NULL;
+  mInternalCommBufferCopy = NULL;
 
   GuidHob = GetFirstGuidHob (&gEdkiiCommunicationBufferGuid);
   ASSERT (GuidHob != NULL);
@@ -470,17 +468,7 @@ MmCorePrepareCommunicationBuffer (
     return;
   }
 
-  //
-  // Copy CommunicationBuffer from NonMmram to MMRAM
-  //
-  NonMmramCommunicationBuffer = (MM_COMM_BUFFER_DATA *)GET_GUID_HOB_DATA (GuidHob);
-  Status                      = MmAllocatePool (EfiRuntimeServicesData, sizeof (MM_COMM_BUFFER_DATA), (VOID **)&mMmCommunicationBuffer);
-  ASSERT_EFI_ERROR (Status);
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-  CopyMem (mMmCommunicationBuffer, NonMmramCommunicationBuffer, sizeof (MM_COMM_BUFFER_DATA));
-
+  mMmCommunicationBuffer = (MM_COMM_BUFFER_DATA *)GET_GUID_HOB_DATA (GuidHob);
   DEBUG ((
     DEBUG_INFO,
     "Fixed Communication Buffer is at %x, size is %x\n",
