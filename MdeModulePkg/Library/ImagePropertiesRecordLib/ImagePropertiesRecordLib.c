@@ -61,6 +61,39 @@ EfiSizeToPages (
 }
 
 /**
+  Frees the memory for each ImageRecordCodeSection within an ImageRecord
+  and removes the entries from the list. It does not free the ImageRecord
+  itself.
+
+  @param[in]  ImageRecord The ImageRecord in which to free code sections
+**/
+STATIC
+VOID
+FreeImageRecordCodeSections (
+  IMAGE_PROPERTIES_RECORD  *ImageRecord
+  )
+{
+  LIST_ENTRY                            *CodeSegmentListHead;
+  IMAGE_PROPERTIES_RECORD_CODE_SECTION  *ImageRecordCodeSection;
+
+  if (ImageRecord == NULL) {
+    return;
+  }
+
+  CodeSegmentListHead = &ImageRecord->CodeSegmentList;
+  while (!IsListEmpty (CodeSegmentListHead)) {
+    ImageRecordCodeSection = CR (
+                               CodeSegmentListHead->ForwardLink,
+                               IMAGE_PROPERTIES_RECORD_CODE_SECTION,
+                               Link,
+                               IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE
+                               );
+    RemoveEntryList (&ImageRecordCodeSection->Link);
+    FreePool (ImageRecordCodeSection);
+  }
+}
+
+/**
   Sort memory map entries based upon PhysicalStart from low to high.
 
   @param[in, out] MemoryMap       A pointer to the buffer in which firmware places
@@ -993,6 +1026,7 @@ CreateImagePropertiesRecord (
   UINT8                                 *Name;
   UINT32                                SectionAlignment;
   UINT32                                PeCoffHeaderOffset;
+  CHAR8                                 *PdbPointer;
 
   if ((ImageRecord == NULL) || (ImageBase == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1015,6 +1049,11 @@ CreateImagePropertiesRecord (
   ImageRecord->CodeSegmentCount = 0;
   InitializeListHead (&ImageRecord->Link);
   InitializeListHead (&ImageRecord->CodeSegmentList);
+
+  PdbPointer = PeCoffLoaderGetPdbPointer ((VOID *)(UINTN)ImageBase);
+  if (PdbPointer != NULL) {
+    DEBUG ((DEBUG_ERROR, " Image - %a\n", PdbPointer));
+  }
 
   // Check PE/COFF image
   DosHdr             = (EFI_IMAGE_DOS_HEADER *)(UINTN)ImageBase;
@@ -1084,13 +1123,16 @@ CreateImagePropertiesRecord (
       // Record code section(s)
       ImageRecordCodeSection = AllocatePool (sizeof (*ImageRecordCodeSection));
       if (ImageRecordCodeSection == NULL) {
-        return EFI_OUT_OF_RESOURCES;
+        Status = EFI_OUT_OF_RESOURCES;
+        goto CreateImagePropertiesRecordEnd;
       }
 
       ImageRecordCodeSection->Signature = IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE;
 
       ImageRecordCodeSection->CodeSegmentBase = (UINTN)ImageBase + Section[Index].VirtualAddress;
-      ImageRecordCodeSection->CodeSegmentSize = Section[Index].SizeOfRawData;
+      // We still need to align the VirtualSize to the SectionAlignment because MSVC does not do
+      // this when creating a PE image. It expects the loader to do this.
+      ImageRecordCodeSection->CodeSegmentSize = ALIGN_VALUE (Section[Index].Misc.VirtualSize, SectionAlignment);
 
       InsertTailList (&ImageRecord->CodeSegmentList, &ImageRecordCodeSection->Link);
       ImageRecord->CodeSegmentCount++;
@@ -1099,6 +1141,27 @@ CreateImagePropertiesRecord (
 
   if (ImageRecord->CodeSegmentCount > 0) {
     SortImageRecordCodeSection (ImageRecord);
+  }
+
+  //
+  // Check overlap all section in ImageBase/Size
+  //
+  if (!IsImageRecordCodeSectionValid (ImageRecord)) {
+    DEBUG ((DEBUG_ERROR, "IsImageRecordCodeSectionValid - FAIL\n"));
+    Status = EFI_INVALID_PARAMETER;
+    goto CreateImagePropertiesRecordEnd;
+  }
+
+  //
+  // Round up the ImageSize, some CPU arch may return EFI_UNSUPPORTED if ImageSize is not aligned.
+  // Given that the loader always allocates full pages, we know the space after the image is not used.
+  //
+  ImageRecord->ImageSize = ALIGN_VALUE (ImageRecord->ImageSize, EFI_PAGE_SIZE);
+
+CreateImagePropertiesRecordEnd:
+  if (EFI_ERROR (Status)) {
+    // we failed to create a valid record, free the section memory that was allocated
+    FreeImageRecordCodeSections (ImageRecord);
   }
 
   return Status;
@@ -1117,24 +1180,7 @@ DeleteImagePropertiesRecord (
   IN  IMAGE_PROPERTIES_RECORD  *ImageRecord
   )
 {
-  LIST_ENTRY                            *CodeSegmentListHead;
-  IMAGE_PROPERTIES_RECORD_CODE_SECTION  *ImageRecordCodeSection;
-
-  if (ImageRecord == NULL) {
-    return;
-  }
-
-  CodeSegmentListHead = &ImageRecord->CodeSegmentList;
-  while (!IsListEmpty (CodeSegmentListHead)) {
-    ImageRecordCodeSection = CR (
-                               CodeSegmentListHead->ForwardLink,
-                               IMAGE_PROPERTIES_RECORD_CODE_SECTION,
-                               Link,
-                               IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE
-                               );
-    RemoveEntryList (&ImageRecordCodeSection->Link);
-    FreePool (ImageRecordCodeSection);
-  }
+  FreeImageRecordCodeSections (ImageRecord);
 
   if (!IsListEmpty (&ImageRecord->Link)) {
     RemoveEntryList (&ImageRecord->Link);

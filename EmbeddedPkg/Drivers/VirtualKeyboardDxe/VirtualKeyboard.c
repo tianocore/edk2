@@ -694,11 +694,12 @@ KeyboardReadKeyStrokeWorker (
 /**
   Read out the scan code of the key that has just been stroked.
 
-  @param  This        Pointer of simple text Protocol.
-  @param  Key         Pointer for store the key that read out.
+  @param  This              Pointer of simple text Protocol.
+  @param  Key               Pointer for store the key that read out.
 
-  @retval EFI_SUCCESS The key is read out successfully.
-  @retval other       The key reading failed.
+  @retval EFI_SUCCESS       The key is read out successfully.
+  @retval other             The key reading failed.
+  @retval EFI_UNSUPPORTED   The device does not support the ability to read keystroke data.
 
 **/
 EFI_STATUS
@@ -752,6 +753,7 @@ VirtualKeyboardReadKeyStroke (
   @retval  EFI_DEVICE_ERROR      The keystroke information was not returned
                                  due to hardware errors.
   @retval  EFI_INVALID_PARAMETER KeyData is NULL.
+  @retval  EFI_UNSUPPORTED       The device does not support the ability to read keystroke data.
 
 **/
 EFI_STATUS
