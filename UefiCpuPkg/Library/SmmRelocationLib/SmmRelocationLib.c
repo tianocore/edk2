@@ -13,9 +13,9 @@
 **/
 #include "InternalSmmRelocationLib.h"
 
-UINTN   mMaxNumberOfCpus  = 1;
-UINTN   mNumberOfCpus     = 1;
-UINT64  *mSmBaseForAllCpu = NULL;
+UINTN   mMaxNumberOfCpus   = 1;
+UINTN   mNumberOfCpus      = 1;
+UINT64  *mSmBaseForAllCpus = NULL;
 
 //
 // The mode of the CPU at the time an SMI occurs
@@ -31,81 +31,6 @@ EFI_PROCESSOR_INFORMATION  *mProcessorInfo = NULL;
 // SmBase Rebased or not
 //
 volatile BOOLEAN  *mRebased;
-
-/**
-  Hook the code executed immediately after an RSM instruction on the currently
-  executing CPU.  The mode of code executed immediately after RSM must be
-  detected, and the appropriate hook must be selected.  Always clear the auto
-  HALT restart flag if it is set.
-
-  @param[in] CpuIndex                 The processor index for the currently
-                                      executing CPU.
-  @param[in] CpuState                 Pointer to SMRAM Save State Map for the
-                                      currently executing CPU.
-  @param[in] NewInstructionPointer32  Instruction pointer to use if resuming to
-                                      32-bit mode from 64-bit SMM.
-  @param[in] NewInstructionPointer    Instruction pointer to use if resuming to
-                                      same mode as SMM.
-
-  @retval The value of the original instruction pointer before it was hooked.
-
-**/
-UINT64
-EFIAPI
-HookReturnFromSmm (
-  IN UINTN              CpuIndex,
-  SMRAM_SAVE_STATE_MAP  *CpuState,
-  UINT64                NewInstructionPointer32,
-  UINT64                NewInstructionPointer
-  )
-{
-  UINT64  OriginalInstructionPointer;
-
-  /*
-  //
-  // TODO for SMM MsrSaveState Enable case
-  //
-  OriginalInstructionPointer = SmmCpuFeaturesHookReturnFromSmm (
-                                 CpuIndex,
-                                 CpuState,
-                                 NewInstructionPointer32,
-                                 NewInstructionPointer
-                                 );
-  if (OriginalInstructionPointer != 0) {
-    return OriginalInstructionPointer;
-  }
-  */
-
-  if (mSmmSaveStateRegisterLma == EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT) {
-    OriginalInstructionPointer = (UINT64)CpuState->x86._EIP;
-    CpuState->x86._EIP         = (UINT32)NewInstructionPointer;
-
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((CpuState->x86.AutoHALTRestart & BIT0) != 0) {
-      CpuState->x86.AutoHALTRestart &= ~BIT0;
-    }
-  } else {
-    OriginalInstructionPointer = CpuState->x64._RIP;
-    if ((CpuState->x64.IA32_EFER & LMA) == 0) {
-      CpuState->x64._RIP = (UINT32)NewInstructionPointer32;
-    } else {
-      CpuState->x64._RIP = (UINT32)NewInstructionPointer;
-    }
-
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((CpuState->x64.AutoHALTRestart & BIT0) != 0) {
-      CpuState->x64.AutoHALTRestart &= ~BIT0;
-    }
-  }
-
-  return OriginalInstructionPointer;
-}
 
 /**
   C function for SMI handler. To change all processor's SMMBase Register.
@@ -136,7 +61,7 @@ SmmInitHandler (
       // Configure SmBase.
       //
       CpuState             = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
-      CpuState->x86.SMBASE = (UINT32)mSmBaseForAllCpu[Index];
+      CpuState->x86.SMBASE = (UINT32)mSmBaseForAllCpus[Index];
 
       //
       // Hook return after RSM to set SMM re-based flag
@@ -152,166 +77,13 @@ SmmInitHandler (
 }
 
 /**
-  Relocate SmmBases for each processor.
-
-  Execute on first boot and all S3 resumes
-
-**/
-VOID
-EFIAPI
-SmmRelocateBases (
-  VOID
-  )
-{
-  UINT8                 BakBuf[BACK_BUF_SIZE];
-  SMRAM_SAVE_STATE_MAP  BakBuf2;
-  SMRAM_SAVE_STATE_MAP  *CpuStatePtr;
-  UINT8                 *U8Ptr;
-  UINTN                 Index;
-  UINTN                 BspIndex;
-  UINT32                BspApicId;
-
-  //
-  // Make sure the reserved size is large enough for procedure SmmInitTemplate.
-  //
-  ASSERT (sizeof (BakBuf) >= gcSmmInitSize);
-
-  //
-  // Patch ASM code template with current CR0, CR3, and CR4 values
-  //
-  PatchInstructionX86 (gPatchSmmCr0, AsmReadCr0 (), 4);
-  PatchInstructionX86 (gPatchSmmCr3, AsmReadCr3 (), 4);
-  PatchInstructionX86 (gPatchSmmCr4, AsmReadCr4 () & (~CR4_CET_ENABLE), 4);
-
-  U8Ptr       = (UINT8 *)(UINTN)(SMM_DEFAULT_SMBASE + SMM_HANDLER_OFFSET);
-  CpuStatePtr = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
-
-  //
-  // Backup original contents at address 0x38000
-  //
-  CopyMem (BakBuf, U8Ptr, sizeof (BakBuf));
-  CopyMem (&BakBuf2, CpuStatePtr, sizeof (BakBuf2));
-
-  //
-  // Load image for relocation
-  //
-  CopyMem (U8Ptr, gcSmmInitTemplate, gcSmmInitSize);
-
-  //
-  // Retrieve the local APIC ID of current processor
-  //
-  BspApicId = GetApicId ();
-
-  //
-  // Relocate SM bases for all APs
-  // This is APs' 1st SMI - rebase will be done here, and APs' default SMI handler will be overridden by gcSmmInitTemplate
-  //
-  BspIndex = (UINTN)-1;
-  for (Index = 0; Index < mNumberOfCpus; Index++) {
-    mRebased[Index] = FALSE;
-    if (BspApicId != (UINT32)mProcessorInfo[Index].ProcessorId) {
-      SendSmiIpi ((UINT32)mProcessorInfo[Index].ProcessorId);
-      //
-      // Wait for this AP to finish its 1st SMI
-      //
-      while (!mRebased[Index]) {
-      }
-    } else {
-      //
-      // BSP will be Relocated later
-      //
-      BspIndex = Index;
-    }
-  }
-
-  //
-  // Relocate BSP's SMM base
-  //
-  ASSERT (BspIndex != (UINTN)-1);
-  SendSmiIpi (BspApicId);
-
-  //
-  // Wait for the BSP to finish its 1st SMI
-  //
-  while (!mRebased[BspIndex]) {
-  }
-
-  //
-  // Restore contents at address 0x38000
-  //
-  CopyMem (CpuStatePtr, &BakBuf2, sizeof (BakBuf2));
-  CopyMem (U8Ptr, BakBuf, sizeof (BakBuf));
-}
-
-/**
-  Initialize IDT to setup exception handlers in SMM.
-
-**/
-VOID
-InitializeSmmIdt (
-  VOID
-  )
-{
-  EFI_STATUS              Status;
-  BOOLEAN                 InterruptState;
-  IA32_DESCRIPTOR         PeiIdtr;
-  CONST EFI_PEI_SERVICES  **PeiServices;
-
-  //
-  // There are 32 (not 255) entries in it since only processor
-  // generated exceptions will be handled.
-  //
-  gcSmiIdtr.Limit = (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32) - 1;
-
-  //
-  // Allocate for IDT.
-  // sizeof (UINTN) is for the PEI Services Table pointer.
-  //
-  gcSmiIdtr.Base = (UINTN)AllocateZeroPool (gcSmiIdtr.Limit + 1 + sizeof (UINTN));
-  ASSERT (gcSmiIdtr.Base != 0);
-  gcSmiIdtr.Base += sizeof (UINTN);
-
-  //
-  // Disable Interrupt, save InterruptState and save PEI IDT table
-  //
-  InterruptState = SaveAndDisableInterrupts ();
-  AsmReadIdtr (&PeiIdtr);
-
-  //
-  // Save the PEI Services Table pointer
-  // The PEI Services Table pointer will be stored in the sizeof (UINTN) bytes
-  // immediately preceding the IDT in memory.
-  //
-  PeiServices                                   = (CONST EFI_PEI_SERVICES **)(*(UINTN *)(PeiIdtr.Base - sizeof (UINTN)));
-  (*(UINTN *)(gcSmiIdtr.Base - sizeof (UINTN))) = (UINTN)PeiServices;
-
-  //
-  // Load SMM temporary IDT table
-  //
-  AsmWriteIdtr (&gcSmiIdtr);
-
-  //
-  // Setup SMM default exception handlers, SMM IDT table
-  // will be updated and saved in gcSmiIdtr
-  //
-  Status = InitializeCpuExceptionHandlers (NULL);
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Restore PEI IDT table and CPU InterruptState
-  //
-  AsmWriteIdtr ((IA32_DESCRIPTOR *)&PeiIdtr);
-  SetInterruptState (InterruptState);
-}
-
-/**
-  This routine will split SmramReserve hob to reserve SmmRelocationSize for Smm relocated memory.
+  This routine will split SmramReserve HOB to reserve SmmRelocationSize for Smm relocated memory.
 
   @param[in]       SmmRelocationSize   SmmRelocationSize for all processors.
   @param[in out]   SmmRelocationStart  Return the start address of Smm relocated memory in SMRAM.
 
   @retval EFI_SUCCESS           The gEfiSmmSmramMemoryGuid is split successfully.
-  @retval EFI_DEVICE_ERROR      Failed to build new hob for gEfiSmmSmramMemoryGuid.
+  @retval EFI_DEVICE_ERROR      Failed to build new HOB for gEfiSmmSmramMemoryGuid.
   @retval EFI_NOT_FOUND         The gEfiSmmSmramMemoryGuid is not found.
 
 **/
@@ -400,70 +172,186 @@ SplitSmramHobForSmmRelocation (
 }
 
 /**
-  CPU SmmBase Relocation Init.
+  This function will create SmBase for all CPUs.
 
-  This function is to relocate CPU SmmBase.
+  @param[in] SmBaseForAllCpus    Pointer to SmBase for all CPUs.
 
-  @param[in] MpServices2        Pointer to this instance of the MpServices.
-
-  @retval EFI_UNSUPPORTED       CPU SmmBase Relocation unsupported.
-  @retval EFI_OUT_OF_RESOURCES  CPU SmmBase Relocation failed.
-  @retval EFI_SUCCESS           CPU SmmBase Relocated successfully.
+  @retval EFI_SUCCESS           Create SmBase for all CPUs successfully.
+  @retval Others                Failed to create SmBase for all CPUs.
 
 **/
 EFI_STATUS
-EFIAPI
-SmmRelocationInit (
-  IN EDKII_PEI_MP_SERVICES2_PPI  *MpServices2
+CreateSmmBaseHob (
+  IN UINT64  *SmBaseForAllCpus
   )
 {
-  EFI_STATUS            Status;
-  UINTN                 NumberOfEnabledCpus;
-  UINTN                 TileSize;
-  UINT64                SmmRelocationSize;
-  EFI_PHYSICAL_ADDRESS  SmmRelocationStart;
-  UINTN                 Index;
-  SMM_BASE_HOB_DATA     *SmmBaseHobData;
-  UINT32                CpuCount;
-  UINT32                NumberOfProcessorsInHob;
-  UINT32                MaxCapOfProcessorsInHob;
-  UINT32                HobCount;
-  UINT32                RegEax;
-  UINT32                RegEdx;
-  UINTN                 FamilyId;
-  UINTN                 ModelId;
-  UINTN                 SmmStackSize;
-  UINT8                 *Stacks;
+  UINTN              Index;
+  SMM_BASE_HOB_DATA  *SmmBaseHobData;
+  UINT32             CpuCount;
+  UINT32             NumberOfProcessorsInHob;
+  UINT32             MaxCapOfProcessorsInHob;
+  UINT32             HobCount;
 
-  SmmRelocationStart      = 0;
   SmmBaseHobData          = NULL;
   CpuCount                = 0;
   NumberOfProcessorsInHob = 0;
   MaxCapOfProcessorsInHob = 0;
   HobCount                = 0;
-  Stacks                  = NULL;
 
-  DEBUG ((DEBUG_INFO, "SmmRelocationInit Start \n"));
-  if (MpServices2 == NULL) {
-    return EFI_INVALID_PARAMETER;
+  //
+  // Count the HOB instance maximum capacity of CPU (MaxCapOfProcessorsInHob) since the max HobLength is 0xFFF8.
+  //
+  MaxCapOfProcessorsInHob = (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE) - sizeof (SMM_BASE_HOB_DATA)) / sizeof (UINT64) + 1;
+  DEBUG ((DEBUG_INFO, "CreateSmmBaseHob - MaxCapOfProcessorsInHob: %03x\n", MaxCapOfProcessorsInHob));
+
+  //
+  // Create Guided SMM Base HOB Instances.
+  //
+  while (CpuCount != mMaxNumberOfCpus) {
+    NumberOfProcessorsInHob = MIN ((UINT32)mMaxNumberOfCpus - CpuCount, MaxCapOfProcessorsInHob);
+
+    SmmBaseHobData = BuildGuidHob (
+                       &gSmmBaseHobGuid,
+                       sizeof (SMM_BASE_HOB_DATA) + sizeof (UINT64) * NumberOfProcessorsInHob
+                       );
+    if (SmmBaseHobData == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    SmmBaseHobData->ProcessorIndex     = CpuCount;
+    SmmBaseHobData->NumberOfProcessors = NumberOfProcessorsInHob;
+
+    DEBUG ((DEBUG_INFO, "CreateSmmBaseHob - SmmBaseHobData[%d]->ProcessorIndex: %03x\n", HobCount, SmmBaseHobData->ProcessorIndex));
+    DEBUG ((DEBUG_INFO, "CreateSmmBaseHob - SmmBaseHobData[%d]->NumberOfProcessors: %03x\n", HobCount, SmmBaseHobData->NumberOfProcessors));
+    for (Index = 0; Index < SmmBaseHobData->NumberOfProcessors; Index++) {
+      //
+      // Calculate the new SMBASE address
+      //
+      SmmBaseHobData->SmBase[Index] = SmBaseForAllCpus[Index + CpuCount];
+      DEBUG ((DEBUG_INFO, "CreateSmmBaseHob - SmmBaseHobData[%d]->SmBase[%03x]: %08x\n", HobCount, Index, SmmBaseHobData->SmBase[Index]));
+    }
+
+    CpuCount += NumberOfProcessorsInHob;
+    HobCount++;
+    SmmBaseHobData = NULL;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Relocate SmmBases for each processor.
+  Execute on first boot and all S3 resumes
+
+**/
+VOID
+SmmRelocateBases (
+  VOID
+  )
+{
+  UINT8                 BakBuf[BACK_BUF_SIZE];
+  SMRAM_SAVE_STATE_MAP  BakBuf2;
+  SMRAM_SAVE_STATE_MAP  *CpuStatePtr;
+  UINT8                 *U8Ptr;
+  UINTN                 Index;
+  UINTN                 BspIndex;
+  UINT32                BspApicId;
+
+  //
+  // Make sure the reserved size is large enough for procedure SmmInitTemplate.
+  //
+  ASSERT (sizeof (BakBuf) >= gcSmmInitSize);
+
+  //
+  // Patch ASM code template with current CR0, CR3, and CR4 values
+  //
+  PatchInstructionX86 (gPatchSmmCr0, AsmReadCr0 (), 4);
+  PatchInstructionX86 (gPatchSmmCr3, AsmReadCr3 (), 4);
+  PatchInstructionX86 (gPatchSmmCr4, AsmReadCr4 () & (~CR4_CET_ENABLE), 4);
+
+  U8Ptr       = (UINT8 *)(UINTN)(SMM_DEFAULT_SMBASE + SMM_HANDLER_OFFSET);
+  CpuStatePtr = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+
+  //
+  // Backup original contents at address 0x38000
+  //
+  CopyMem (BakBuf, U8Ptr, sizeof (BakBuf));
+  CopyMem (&BakBuf2, CpuStatePtr, sizeof (BakBuf2));
+
+  //
+  // Load image for relocation
+  //
+  CopyMem (U8Ptr, gcSmmInitTemplate, gcSmmInitSize);
+
+  //
+  // Retrieve the local APIC ID of current processor
+  //
+  BspApicId = GetApicId ();
+
+  //
+  // Relocate SM bases for all APs
+  // This is APs' 1st SMI - rebase will be done here, and APs' default SMI handler will be overridden by gcSmmInitTemplate
+  //
+  BspIndex = (UINTN)-1;
+  for (Index = 0; Index < mNumberOfCpus; Index++) {
+    mRebased[Index] = FALSE;
+    if (BspApicId != (UINT32)mProcessorInfo[Index].ProcessorId) {
+      SendSmiIpi ((UINT32)mProcessorInfo[Index].ProcessorId);
+      //
+      // Wait for this AP to finish its 1st SMI
+      //
+      while (!mRebased[Index]) {
+      }
+    } else {
+      //
+      // BSP will be Relocated later
+      //
+      BspIndex = Index;
+    }
   }
 
   //
-  // Get the number of processors
-  // If support CPU hot plug, we need to allocate resources for possibly hot-added processors
+  // Relocate BSP's SMM base
   //
-  Status = MpServices2->GetNumberOfProcessors (
-                          MpServices2,
-                          &mNumberOfCpus,
-                          &NumberOfEnabledCpus
-                          );
-  ASSERT_EFI_ERROR (Status);
+  ASSERT (BspIndex != (UINTN)-1);
+  SendSmiIpi (BspApicId);
 
-  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
-    mMaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
-  } else {
-    mMaxNumberOfCpus = mNumberOfCpus;
+  //
+  // Wait for the BSP to finish its 1st SMI
+  //
+  while (!mRebased[BspIndex]) {
   }
+
+  //
+  // Restore contents at address 0x38000
+  //
+  CopyMem (CpuStatePtr, &BakBuf2, sizeof (BakBuf2));
+  CopyMem (U8Ptr, BakBuf, sizeof (BakBuf));
+}
+
+/**
+  This function will initialize SmBase for all CPUs.
+
+  @param[in out] SmBaseForAllCpus    Pointer to SmBase for all CPUs.
+
+  @retval EFI_SUCCESS           Initialize SmBase for all CPUs successfully.
+  @retval Others                Failed to initialize SmBase for all CPUs.
+
+**/
+EFI_STATUS
+InitSmBaseForAllCpus (
+  IN OUT UINT64  **SmBaseForAllCpus
+  )
+{
+  EFI_STATUS            Status;
+  UINTN                 TileSize;
+  UINT64                SmmRelocationSize;
+  EFI_PHYSICAL_ADDRESS  SmmRelocationStart;
+  UINTN                 Index;
+
+  SmmRelocationStart = 0;
+
+  ASSERT (SmBaseForAllCpus != NULL);
 
   //
   // Calculate SmmRelocationSize for all of the tiles.
@@ -485,69 +373,117 @@ SmmRelocationInit (
   SmmRelocationSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1)));
 
   //
-  // Split SmramReserve hob to reserve SmmRelocationSize for Smm relocated memory
+  // Split SmramReserve HOB to reserve SmmRelocationSize for Smm relocated memory
   //
   Status = SplitSmramHobForSmmRelocation (
              SmmRelocationSize,
              &SmmRelocationStart
              );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   ASSERT (SmmRelocationStart != 0);
-  DEBUG ((DEBUG_INFO, "SmmRelocationInit - SmmRelocationSize: 0x%08x\n", SmmRelocationSize));
-  DEBUG ((DEBUG_INFO, "SmmRelocationInit - SmmRelocationStart: 0x%08x\n", SmmRelocationStart));
+  DEBUG ((DEBUG_INFO, "InitSmBaseForAllCpus - SmmRelocationSize: 0x%08x\n", SmmRelocationSize));
+  DEBUG ((DEBUG_INFO, "InitSmBaseForAllCpus - SmmRelocationStart: 0x%08x\n", SmmRelocationStart));
 
   //
-  // Init mSmBaseForAllCpu
+  // Init SmBaseForAllCpus
   //
-  mSmBaseForAllCpu = (UINT64 *)AllocatePages (EFI_SIZE_TO_PAGES (sizeof (UINT64) * mMaxNumberOfCpus));
-  if (mSmBaseForAllCpu == NULL) {
+  *SmBaseForAllCpus = (UINT64 *)AllocatePages (EFI_SIZE_TO_PAGES (sizeof (UINT64) * mMaxNumberOfCpus));
+  if (*SmBaseForAllCpus == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  //
-  // Count the hob instance maximum capacity of CPU (MaxCapOfProcessorsInHob) since the max HobLength is 0xFFF8.
-  //
-  MaxCapOfProcessorsInHob = (0xFFF8 - sizeof (EFI_HOB_GUID_TYPE) - sizeof (SMM_BASE_HOB_DATA)) / sizeof (UINT64) + 1;
-  DEBUG ((DEBUG_INFO, "SmmRelocationInit - MaxCapOfProcessorsInHob: %03x\n", MaxCapOfProcessorsInHob));
-
-  //
-  // Create Guided SMM Base HOB Instances.
-  //
-  while (CpuCount != mMaxNumberOfCpus) {
-    NumberOfProcessorsInHob = MIN ((UINT32)mMaxNumberOfCpus - CpuCount, MaxCapOfProcessorsInHob);
-
-    SmmBaseHobData = BuildGuidHob (
-                       &gSmmBaseHobGuid,
-                       sizeof (SMM_BASE_HOB_DATA) + sizeof (UINT64) * NumberOfProcessorsInHob
-                       );
-    if (SmmBaseHobData == NULL) {
-      Status = EFI_OUT_OF_RESOURCES;
-      goto ON_EXIT;
-    }
-
-    SmmBaseHobData->ProcessorIndex     = CpuCount;
-    SmmBaseHobData->NumberOfProcessors = NumberOfProcessorsInHob;
-
-    DEBUG ((DEBUG_INFO, "SmmRelocationInit - SmmBaseHobData[%d]->ProcessorIndex: %03x\n", HobCount, SmmBaseHobData->ProcessorIndex));
-    DEBUG ((DEBUG_INFO, "SmmRelocationInit - SmmBaseHobData[%d]->NumberOfProcessors: %03x\n", HobCount, SmmBaseHobData->NumberOfProcessors));
-    for (Index = 0; Index < SmmBaseHobData->NumberOfProcessors; Index++) {
-      //
-      // Calculate the new SMBASE address
-      //
-      SmmBaseHobData->SmBase[Index] = (UINTN)(SmmRelocationStart)+ (Index + CpuCount) * TileSize - SMM_HANDLER_OFFSET;
-      DEBUG ((DEBUG_INFO, "SmmRelocationInit - SmmBaseHobData[%d]->SmBase[%03x]: %08x\n", HobCount, Index, SmmBaseHobData->SmBase[Index]));
-
-      //
-      // Record each SmBase in mSmBaseForAllCpu
-      //
-      mSmBaseForAllCpu[Index + CpuCount] = SmmBaseHobData->SmBase[Index];
-    }
-
-    CpuCount += NumberOfProcessorsInHob;
-    HobCount++;
-    SmmBaseHobData = NULL;
+  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
+    //
+    // Return each SmBase in SmBaseForAllCpus
+    //
+    (*SmBaseForAllCpus)[Index] = (UINTN)(SmmRelocationStart)+ Index * TileSize - SMM_HANDLER_OFFSET;
+    DEBUG ((DEBUG_INFO, "InitSmBaseForAllCpus - SmBase For CPU[%03x]: %08x\n", Index, (*SmBaseForAllCpus)[Index]));
   }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Initialize IDT to setup exception handlers in SMM.
+
+**/
+VOID
+InitSmmIdt (
+  VOID
+  )
+{
+  EFI_STATUS              Status;
+  BOOLEAN                 InterruptState;
+  IA32_DESCRIPTOR         PeiIdtr;
+  CONST EFI_PEI_SERVICES  **PeiServices;
+
+  //
+  // There are 32 (not 255) entries in it since only processor
+  // generated exceptions will be handled.
+  //
+  gcSmiIdtr.Limit = (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32) - 1;
+
+  //
+  // Allocate for IDT.
+  // sizeof (UINTN) is for the PEI Services Table pointer.
+  //
+  gcSmiIdtr.Base = (UINTN)AllocateZeroPool (gcSmiIdtr.Limit + 1 + sizeof (UINTN));
+  ASSERT (gcSmiIdtr.Base != 0);
+  gcSmiIdtr.Base += sizeof (UINTN);
+
+  //
+  // Disable Interrupt, save InterruptState and save PEI IDT table
+  //
+  InterruptState = SaveAndDisableInterrupts ();
+  AsmReadIdtr (&PeiIdtr);
+
+  //
+  // Save the PEI Services Table pointer
+  // The PEI Services Table pointer will be stored in the sizeof (UINTN) bytes
+  // immediately preceding the IDT in memory.
+  //
+  PeiServices                                   = (CONST EFI_PEI_SERVICES **)(*(UINTN *)(PeiIdtr.Base - sizeof (UINTN)));
+  (*(UINTN *)(gcSmiIdtr.Base - sizeof (UINTN))) = (UINTN)PeiServices;
+
+  //
+  // Load SMM temporary IDT table
+  //
+  AsmWriteIdtr (&gcSmiIdtr);
+
+  //
+  // Setup SMM default exception handlers, SMM IDT table
+  // will be updated and saved in gcSmiIdtr
+  //
+  Status = InitializeCpuExceptionHandlers (NULL);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Restore PEI IDT table and CPU InterruptState
+  //
+  AsmWriteIdtr ((IA32_DESCRIPTOR *)&PeiIdtr);
+  SetInterruptState (InterruptState);
+}
+
+/**
+  Determine the mode of the CPU at the time an SMI occurs
+
+  @retval EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT   32 bit.
+  @retval EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT   64 bit.
+
+**/
+UINT8
+CheckSmmCpuMode (
+  VOID
+  )
+{
+  UINT32  RegEax;
+  UINT32  RegEdx;
+  UINTN   FamilyId;
+  UINTN   ModelId;
+  UINT8   SmmSaveStateRegisterLma;
 
   //
   // Determine the mode of the CPU at the time an SMI occurs
@@ -567,15 +503,48 @@ SmmRelocationInit (
     AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
   }
 
-  mSmmSaveStateRegisterLma = EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT;
+  SmmSaveStateRegisterLma = EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT;
   if ((RegEdx & BIT29) != 0) {
-    mSmmSaveStateRegisterLma = EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
+    SmmSaveStateRegisterLma = EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
   }
 
   if (FamilyId == 0x06) {
     if ((ModelId == 0x17) || (ModelId == 0x0f) || (ModelId == 0x1c)) {
-      mSmmSaveStateRegisterLma = EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
+      SmmSaveStateRegisterLma = EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
     }
+  }
+
+  return SmmSaveStateRegisterLma;
+}
+
+/**
+  CPU SmmBase Relocation Init.
+
+  This function is to relocate CPU SmmBase.
+
+  @param[in] MpServices2        Pointer to this instance of the MpServices.
+
+  @retval EFI_SUCCESS           CPU SmmBase Relocated successfully.
+  @retval Others                CPU SmmBase Relocation failed.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmRelocationInit (
+  IN EDKII_PEI_MP_SERVICES2_PPI  *MpServices2
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       NumberOfEnabledCpus;
+  UINTN       SmmStackSize;
+  UINT8       *SmmStacks;
+  UINTN       Index;
+
+  SmmStacks = NULL;
+
+  DEBUG ((DEBUG_INFO, "SmmRelocationInit Start \n"));
+  if (MpServices2 == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
   //
@@ -585,47 +554,83 @@ SmmRelocationInit (
   SmmInitFixupAddress ();
 
   //
-  // Allocate SMI stacks for SMM base relocation.
-  // Note: No need allocated for all CPUs since SM bases relocation for all CPUs is one by one.
+  // Check the mode of the CPU at the time an SMI occurs
+  //
+  mSmmSaveStateRegisterLma = CheckSmmCpuMode ();
+
+  //
+  // Patch SMI stack for SMM base relocation
+  // Note: No need allocate stack for all CPUs since the relocation
+  // occurs serially for each CPU
   //
   SmmStackSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (PcdGet32 (PcdCpuSmmStackSize)));
-  Stacks       = (UINT8 *)AllocatePages (EFI_SIZE_TO_PAGES (SmmStackSize));
-  if (Stacks == NULL) {
+  SmmStacks    = (UINT8 *)AllocatePages (EFI_SIZE_TO_PAGES (SmmStackSize));
+  if (SmmStacks == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
 
-  DEBUG ((DEBUG_INFO, "SmmRelocationInit - Stacks: 0x%x\n", Stacks));
+  DEBUG ((DEBUG_INFO, "SmmRelocationInit - SmmStacks: 0x%x\n", SmmStacks));
   DEBUG ((DEBUG_INFO, "SmmRelocationInit - SmmStackSize: 0x%x\n", SmmStackSize));
 
-  //
-  // Set SMI stack for SMM base relocation
-  //
   PatchInstructionX86 (
     gPatchSmmInitStack,
-    (UINTN)(Stacks + SmmStackSize - sizeof (UINTN)),
+    (UINTN)(SmmStacks + SmmStackSize - sizeof (UINTN)),
     sizeof (UINTN)
     );
 
   //
-  // Retrieve the mProcessorInfo
+  // Initialize the SMM IDT for SMM base relocation
+  //
+  InitSmmIdt ();
+
+  //
+  // Get the number of processors
+  //
+  Status = MpServices2->GetNumberOfProcessors (
+                          MpServices2,
+                          &mNumberOfCpus,
+                          &NumberOfEnabledCpus
+                          );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
+    mMaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  } else {
+    mMaxNumberOfCpus = mNumberOfCpus;
+  }
+
+  //
+  // Retrieve the Processor Info for all CPUs
   //
   mProcessorInfo = (EFI_PROCESSOR_INFORMATION *)AllocatePool (sizeof (EFI_PROCESSOR_INFORMATION) * mMaxNumberOfCpus);
-  ASSERT (mProcessorInfo != NULL);
+  if (mProcessorInfo == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+
   for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
     if (Index < mNumberOfCpus) {
       Status = MpServices2->GetProcessorInfo (MpServices2, Index | CPU_V2_EXTENDED_TOPOLOGY, &mProcessorInfo[Index]);
-      ASSERT_EFI_ERROR (Status);
+      if (EFI_ERROR (Status)) {
+        goto ON_EXIT;
+      }
     }
   }
 
   //
-  // Initialize SMM IDT for SMM base relocation
+  // Initialize the SmBase for all CPUs
   //
-  InitializeSmmIdt ();
+  Status = InitSmBaseForAllCpus (&mSmBaseForAllCpus);
+  if (EFI_ERROR (Status)) {
+    goto ON_EXIT;
+  }
 
   //
-  // Relocate SMM Base addresses to the ones allocated from SMRAM
+  // Relocate SmmBases for each processor.
+  // Allocate mRebased as the flag to indicate the relocation is done for each CPU.
   //
   mRebased = (BOOLEAN *)AllocateZeroPool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
   if (mRebased == NULL) {
@@ -635,15 +640,20 @@ SmmRelocationInit (
 
   SmmRelocateBases ();
 
+  //
+  // Create the SmBase HOB for all CPUs
+  //
+  Status = CreateSmmBaseHob (mSmBaseForAllCpus);
+
 ON_EXIT:
-  if (Stacks != NULL) {
-    FreePages (Stacks, EFI_SIZE_TO_PAGES (SmmStackSize));
+  if (SmmStacks != NULL) {
+    FreePages (SmmStacks, EFI_SIZE_TO_PAGES (SmmStackSize));
   }
 
-  if (mSmBaseForAllCpu != NULL) {
-    FreePages (mSmBaseForAllCpu, EFI_SIZE_TO_PAGES (sizeof (UINT64) * mMaxNumberOfCpus));
+  if (mSmBaseForAllCpus != NULL) {
+    FreePages (mSmBaseForAllCpus, EFI_SIZE_TO_PAGES (sizeof (UINT64) * mMaxNumberOfCpus));
   }
 
-  DEBUG ((DEBUG_INFO, "SmmRelocationInit Done!\n"));
+  DEBUG ((DEBUG_INFO, "SmmRelocationInit Done\n"));
   return Status;
 }

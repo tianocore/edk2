@@ -29,6 +29,8 @@
 #include <Register/Intel/SmramSaveStateMap.h>
 #include <Protocol/MmCpu.h>
 
+extern UINT8  mSmmSaveStateRegisterLma;
+
 extern IA32_DESCRIPTOR  gcSmiGdtr;
 extern IA32_DESCRIPTOR  gcSmiIdtr;
 extern CONST UINT16     gcSmmInitSize;
@@ -52,7 +54,7 @@ X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitStack;
 //
 // EFER register LMA bit
 //
-#define LMA BIT10
+#define LMA  BIT10
 
 /**
   Semaphore operation for all processor relocate SMMBase.
