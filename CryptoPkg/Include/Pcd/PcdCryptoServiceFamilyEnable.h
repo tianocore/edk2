@@ -23,6 +23,7 @@
   * Sha1 family
 
   Copyright (c) 2019 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -124,6 +125,7 @@ typedef struct {
       UINT8    Pkcs7GetCertificatesList   : 1;
       UINT8    AuthenticodeVerify         : 1;
       UINT8    ImageTimestampVerify       : 1;
+      UINT8    Pkcs1v2Decrypt             : 1;
     } Services;
     UINT32    Family;
   } Pkcs;
@@ -158,6 +160,8 @@ typedef struct {
       UINT8    Pkcs1Verify          : 1;
       UINT8    GetPrivateKeyFromPem : 1;
       UINT8    GetPublicKeyFromX509 : 1;
+      UINT8    RsaOaepEncrypt       : 1;
+      UINT8    RsaOaepDecrypt       : 1;
     } Services;
     UINT32    Family;
   } Rsa;
