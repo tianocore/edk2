@@ -2351,6 +2351,8 @@ Pkcs7FreeSigners (
   unchained to the signer's certificates.
   The input signed data could be wrapped in a ContentInfo structure.
 
+  Pkcs7GetCertificatesList has not been implemented in BaseCryptoLibMbedTls.
+
   @param[in]  P7Data            Pointer to the PKCS#7 message.
   @param[in]  P7Length          Length of the PKCS#7 message in bytes.
   @param[out] SignerChainCerts  Pointer to the certificates list chained to signer's
