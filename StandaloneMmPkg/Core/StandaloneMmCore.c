@@ -782,6 +782,7 @@ StandaloneMmMain (
   CopyMem (MmHobStart, HobStart, HobSize);
   Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
   ASSERT_EFI_ERROR (Status);
+  gHobList = MmHobStart;
 
   DEBUG_CODE (
     PrintHob (MmHobStart);
