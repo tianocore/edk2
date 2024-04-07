@@ -41,6 +41,7 @@ EFI_PHYSICAL_ADDRESS  mMmCoreEntryPoint;
 EFI_PHYSICAL_ADDRESS  mMmFvBaseAddress;
 UINT64                mMmFvSize;
 EFI_GUID              *mMmCoreFileName;
+VOID                  *mMemMap = NULL;
 
 /**
   Communicates with a registered handler.
@@ -464,28 +465,44 @@ CreatMmHobList (
 {
   UINTN                         FoundationHobSize;
   UINTN                         PlatformHobSize;
-  UINTN                         NumberOfPages;
-  UINTN                         TotalHobSize;
+  UINTN                         MmioCount;
   EFI_PHYSICAL_ADDRESS          FoundationHobEndAddress;
+  EFI_MEMORY_DESCRIPTOR         *MmioMemoryMap;
   EFI_HOB_HANDOFF_INFO_TABLE    *HobList;
-  EFI_STATUS                    Status;
-
-  //
-  // Get foundation HOBs' size.
-  //
-  FoundationHobSize = 0;
-  Status = CreateMmFoundationHobList (NULL, &FoundationHobSize);
-  if (Status == RETURN_BUFFER_TOO_SMALL) {
-    ASSERT (FoundationHobSize != 0);
-  }
+  EFI_STATUS                     Status;
 
   //
   // Get platform HOBs' size.
   //
   PlatformHobSize = 0;
-  Status     = CreateMmPlatformHob (NULL, &PlatformHobSize);
+  Status     = CreateMmPlatformHob (NULL, &PlatformHobSize, NULL);
   if (Status == RETURN_BUFFER_TOO_SMALL) {
     ASSERT (PlatformHobSize != 0);
+  }
+
+  //
+  // Allocate memory buffer for MMIO memory map.
+  //
+  MmioCount     = PlatformHobSize / sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+  MmioMemoryMap = AllocatePool (PlatformHobSize);
+  mMemMap       = MmioMemoryMap;
+
+  //
+  // Create MMIO memory map.
+  //
+  PlatformHobSize = 0;
+  Status = CreateMmPlatformHob (NULL, &PlatformHobSize, MmioMemoryMap);
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    ASSERT (PlatformHobSize != 0);
+  }
+
+  //
+  // Get foundation HOBs' size.
+  //
+  FoundationHobSize = 0;
+  Status = CreateMmFoundationHobList (NULL, &FoundationHobSize, &MmioCount, MmioMemoryMap);
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    ASSERT (FoundationHobSize != 0);
   }
 
   //
@@ -497,20 +514,30 @@ CreatMmHobList (
     return HobList;
   }
 
-  TotalHobSize  = sizeof (EFI_HOB_HANDOFF_INFO_TABLE) + *HobSize + sizeof (EFI_HOB_GENERIC_HEADER);
-  NumberOfPages = EFI_SIZE_TO_PAGES (TotalHobSize);
-  HobList       = AllocatePages (NumberOfPages);
+  *HobSize += sizeof (EFI_HOB_HANDOFF_INFO_TABLE) + sizeof (EFI_HOB_GENERIC_HEADER);
+  HobList = AllocatePages (EFI_SIZE_TO_PAGES (*HobSize));
   if (HobList != NULL){
-    MmIplHobConstructor ((EFI_PHYSICAL_ADDRESS)(UINTN)HobList, EFI_PAGES_TO_SIZE (NumberOfPages));
+    //
+    // Creat MM HOB list header.
+    //
+    MmIplHobConstructor ((EFI_PHYSICAL_ADDRESS)(UINTN)HobList, *HobSize);
+    //
+    // Creat MM foundation HOB list.
+    //
     if (FoundationHobSize != 0) {
-      CreateMmFoundationHobList (HobList, &FoundationHobSize);
+      CreateMmFoundationHobList (HobList, &FoundationHobSize, &MmioCount, MmioMemoryMap);
     }
 
     FoundationHobEndAddress = HobList->EfiEndOfHobList;
-
+    //
+    // Creat MM platform HOB list.
+    //
     if (PlatformHobSize != 0) {
-      Status = CreateMmPlatformHob ((VOID *)(UINTN)FoundationHobEndAddress, &PlatformHobSize);
+      Status = CreateMmPlatformHob ((VOID *)(UINTN)FoundationHobEndAddress, &PlatformHobSize, NULL);
     }
+    //
+    // Creat MM HOB list end.
+    //
     CreateEndOfList (FoundationHobEndAddress + PlatformHobSize);
   }
 
@@ -653,8 +680,15 @@ ExecuteSmmCoreFromSmram (
   //
   // Always free memory allocated buffer for MM IPL Hobs
   //
-  if (MmHobSize != 0) {
-    FreePool (MmHobList);
+  if ((MmHobList != NULL) && (MmHobSize != 0)) {
+    FreePages (MmHobList, EFI_SIZE_TO_PAGES (MmHobSize));
+  }
+
+  //
+  // Always free memory allocated buffer for MMIO memory map.
+  //
+  if (mMemMap != NULL) {
+    FreePool (mMemMap);
   }
 
   //

@@ -21,6 +21,9 @@
 #include <Guid/MmCommBuffer.h>
 #include <Guid/AcpiS3Context.h>
 #include <Guid/UnblockRegion.h>
+#include <Guid/SmmProfileDataHob.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/MmPlatformHobProducerLib.h>
 
 VOID  *mHobList;
 extern EFI_PHYSICAL_ADDRESS  mMmramRanges;
@@ -392,6 +395,161 @@ MmIplBuildMmCoreModuleHob (
 }
 
 /**
+  Build resource HOB to cover [0, PhysicalAddressBits length] by excluding
+  all Mmram ranges, SmmProfile data and MMIO ranges.
+
+  @param[in]      Create            If TRUE, need to create resource HOBs.
+  @param[out]     HobCount          Resource HOB counts.
+  @param[in]      Attribute         Resource HOB attribute.
+  @param[in]      MmioCount         The MMIO memory map count.
+  @param[in]      MmioMemoryMap     The memory map buffer for MMIO.
+
+**/
+VOID
+BuildNonRestrictedMemoryHob (
+  IN  BOOLEAN                      Create,
+  OUT UINTN                        *HobCount,
+  IN  EFI_RESOURCE_ATTRIBUTE_TYPE  *Attribute,
+  IN  UINTN                        *MmioCount,
+  IN  EFI_MEMORY_DESCRIPTOR        *MmioMemoryMap
+  )
+{
+  UINTN                  Index;
+  UINTN                  MmRamIndex;
+  UINTN                  Count;
+  UINTN                  ResourceHobCount;
+  UINT64                 PreviousAddress;
+  UINT64                 Base;
+  UINT64                 Length;
+  UINT64                 MaxLength;
+  EFI_PEI_HOB_POINTERS   SmmProfileDataHob;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
+  EFI_MEMORY_DESCRIPTOR  *NoRestrictedMemoryMap;
+  EFI_MMRAM_DESCRIPTOR   *MmramRanges;
+  EFI_MEMORY_DESCRIPTOR  SortBuffer;
+
+  if ((*MmioCount <= 0) || (MmioMemoryMap == NULL)) {
+    return;
+  }
+
+  //
+  // Allocate memory map buffer for MMIO HOBs, SmmProfile data, MMRam ranges
+  //
+  Count = *MmioCount + 1 + mMmramRangeCount;
+  MemoryMap = AllocatePool (Count * sizeof (EFI_MEMORY_DESCRIPTOR));
+  ASSERT (MemoryMap != NULL);
+
+  //
+  // Set Mmio base and length to memory map buffer
+  //
+  if (*MmioCount > 0 && MmioMemoryMap != NULL) {
+    for (Index = 0; Index < *MmioCount; Index++) {
+      MemoryMap[Index].PhysicalStart = MmioMemoryMap[Index].PhysicalStart;
+      MemoryMap[Index].NumberOfPages = MmioMemoryMap[Index].NumberOfPages;
+    }
+  }
+
+  //
+  // Searching for gEdkiiSmmProfileDataGuid
+  //
+  SmmProfileDataHob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+  while (SmmProfileDataHob.Raw != NULL) {
+    //
+    // Find gEdkiiSmmProfileDataGuid
+    //
+    if (CompareGuid (&SmmProfileDataHob.MemoryAllocation->AllocDescriptor.Name, &gEdkiiSmmProfileDataGuid)) {
+      //
+      // Set SmmProfile data base and length to memory map buffer
+      //
+      MemoryMap[Index].PhysicalStart = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+      MemoryMap[Index].NumberOfPages = EFI_SIZE_TO_PAGES (SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength);
+	  Index++;
+      break;
+    }
+
+    SmmProfileDataHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (SmmProfileDataHob));
+  }
+
+  //
+  // Set Mmram base and length to memory map buffer
+  //
+  MmramRanges = (EFI_SMRAM_DESCRIPTOR *)(UINTN)mMmramRanges;
+  for (MmRamIndex = 0; Index < Count; Index++, MmRamIndex++) {
+    MemoryMap[Index].PhysicalStart = MmramRanges[MmRamIndex].CpuStart;
+    MemoryMap[Index].NumberOfPages = EFI_SIZE_TO_PAGES (MmramRanges[MmRamIndex].PhysicalSize);
+    MemoryMap[Index].PhysicalStart = 0;
+    MemoryMap[Index].NumberOfPages = 0;
+  }
+
+  //
+  // Perform QuickSort for all EFI_RESOURCE_SYSTEM_MEMORY range to calculating the MMIO
+  //
+  QuickSort (MemoryMap, Count, sizeof (EFI_MEMORY_DESCRIPTOR), (BASE_SORT_COMPARE)MemoryDescriptorCompare, &SortBuffer);
+
+  //
+  // Build MemoryMap to cover [0, PhysicalAddressBits] by excluding all Smram range， SmmProfile database and platform-report-MMIO ranges
+  //
+  Count = *MmioCount + 1 + mMmramRangeCount;
+
+  NoRestrictedMemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocateZeroPool ((Count + 1) * sizeof (EFI_MEMORY_DESCRIPTOR));
+  ASSERT (NoRestrictedMemoryMap != NULL);
+
+  ResourceHobCount = 0;
+  PreviousAddress  = 0;
+  MaxLength = LShiftU64 (1, CalculateMaximumSupportAddress ());
+  //
+  // Set non restricted memory map except MMIO ranges, SmmProfile data and Mmram ranges
+  //
+  for (Index = 0; Index < Count; Index++) {
+    Base   = MemoryMap[Index].PhysicalStart;
+    Length = EFI_PAGES_TO_SIZE(MemoryMap[Index].NumberOfPages);
+    ASSERT (MaxLength >= (Base +  Length));
+
+    if (Base > PreviousAddress) {
+      NoRestrictedMemoryMap[Index].PhysicalStart = PreviousAddress;
+      NoRestrictedMemoryMap[Index].NumberOfPages = EFI_SIZE_TO_PAGES (Base - PreviousAddress);
+      DEBUG ((DEBUG_ERROR, "NoRestrictedMemoryMap[%x].PhysicalStart = 0x%lx\n", Index, NoRestrictedMemoryMap[Index].PhysicalStart));
+      DEBUG ((DEBUG_ERROR, "NoRestrictedMemoryMap[%x].NumberOfPages = 0x%lx\n", Index, NoRestrictedMemoryMap[Index].NumberOfPages));
+      ResourceHobCount++;
+    }
+
+    PreviousAddress = Base + Length;
+  }
+
+  //
+  // Set the last remaining range
+  //
+  if (PreviousAddress < MaxLength) {
+    NoRestrictedMemoryMap[Index].PhysicalStart = PreviousAddress;
+    NoRestrictedMemoryMap[Index].NumberOfPages = EFI_SIZE_TO_PAGES (MaxLength - PreviousAddress);
+    ResourceHobCount++;
+  }
+
+  *HobCount = ResourceHobCount;
+  DEBUG ((DEBUG_ERROR, "Final map for NoRestrictedMemory\n"));
+  for (Index = 0; Index < Count; Index++) {
+  }
+
+  DEBUG ((DEBUG_ERROR, "Start create ...\n"));
+  if (Create == TRUE) {
+    for (Index = 0; Index <= Count; Index++) {
+      if ((NoRestrictedMemoryMap[Index].PhysicalStart == 0) && (NoRestrictedMemoryMap[Index].NumberOfPages == 0)) {
+        continue;
+    } else {
+        MmIplBuildResourceDescriptorHob (
+          EFI_RESOURCE_SYSTEM_MEMORY,
+          *Attribute,
+          NoRestrictedMemoryMap[Index].PhysicalStart,
+          EFI_PAGES_TO_SIZE (NoRestrictedMemoryMap[Index].NumberOfPages)
+          );
+      }
+    }
+  }
+  FreePool (NoRestrictedMemoryMap);
+  FreePool (MemoryMap);
+}
+
+/**
   Create the MM foundation specific HOB list which StandaloneMm Core needed.
 
   This function build the MM foundation specific HOB list needed by StandaloneMm Core
@@ -400,6 +558,8 @@ MmIplBuildMmCoreModuleHob (
   @param[in]      Buffer            The free buffer to be used for HOB creation.
   @param[in, out] BufferSize        The buffer size.
                                     On return, the expected/used size.
+  @param[in]      MmioCount         The MMIO memory map count.
+  @param[in]      MmioMemoryMap     The memory map buffer for MMIO.
 
   @retval RETURN_INVALID_PARAMETER  BufferSize is NULL.
   @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for HOB creation.
@@ -412,19 +572,29 @@ MmIplBuildMmCoreModuleHob (
 EFI_STATUS
 EFIAPI
 CreateMmFoundationHobList (
-  IN VOID       *Buffer,
-  IN OUT UINTN  *BufferSize
+  IN     VOID                   *Buffer,
+  IN OUT UINTN                  *BufferSize,
+  IN     UINTN                  *MmioCount,
+  IN     EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
   )
 {
   VOID                         *GuidHob;
   VOID                         *HobData;
   UINTN                        RequiredSize;
+  UINTN                        ResourceHobCount;
   EFI_PEI_HOB_POINTERS         SmmProfileDataHob;
   EFI_RESOURCE_ATTRIBUTE_TYPE  Attribute;
+  EFI_RESOURCE_ATTRIBUTE_TYPE  SmmProfileDataAttribute;
 
   Attribute = EFI_RESOURCE_ATTRIBUTE_PRESENT |
               EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
               EFI_RESOURCE_ATTRIBUTE_TESTED;
+
+  SmmProfileDataAttribute = Attribute;
+
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable) == TRUE) {
+    Attribute |= EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING;
+  }
 
   if (BufferSize == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -560,6 +730,20 @@ CreateMmFoundationHobList (
   }
 
   //
+  // Build Resource HOB for SmmProfile data
+  //
+  if ((*BufferSize == 0) && (Buffer == NULL)) {
+    RequiredSize += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+  } else {
+      MmIplBuildResourceDescriptorHob (
+        SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryType,
+        SmmProfileDataAttribute,
+        SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,
+        SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength
+        );
+  }
+
+  //
   // gEfiAcpiVariableGuid
   //
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
@@ -573,29 +757,39 @@ CreateMmFoundationHobList (
     }
   }
 
-  //
-  // Reserouce Hobs from unblockoed memory regions (Multiple instance)
-  //
-  GuidHob = GetFirstGuidHob (&gMmUnblockRegionHobGuid);
-  ASSERT (GuidHob != NULL);
-  while (GuidHob != NULL) {
-    if ((*BufferSize == 0) && (Buffer == NULL)) {
-      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
-    } else {
-      HobData = GET_GUID_HOB_DATA (GuidHob);
-      MmIplBuildResourceDescriptorHob (
-        EFI_RESOURCE_MEMORY_RESERVED,
-        Attribute,
-        ((MM_UNBLOCK_REGION *)HobData)->MemoryDescriptor.PhysicalStart,
-        EFI_PAGES_TO_SIZE (((MM_UNBLOCK_REGION *)HobData)->MemoryDescriptor.NumberOfPages)
-        );
-      DEBUG ((
-        DEBUG_INFO,
-        "BuildResourceDescriptorHob memory is for %x\n",
-        ((MM_UNBLOCK_REGION *)HobData)->MemoryDescriptor.PhysicalStart
-        ));
+  if (FixedPcdGetBool (PcdCpuSmmRestrictedMemoryAccess) == TRUE) {
+    //
+    // Reserouce Hobs from unblockoed memory regions (Multiple instance)
+    //
+    GuidHob = GetFirstGuidHob (&gMmUnblockRegionHobGuid);
+    ASSERT (GuidHob != NULL);
+    while (GuidHob != NULL) {
+      if ((*BufferSize == 0) && (Buffer == NULL)) {
+        RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+      } else {
+        HobData = GET_GUID_HOB_DATA (GuidHob);
+        MmIplBuildResourceDescriptorHob (
+          EFI_RESOURCE_MEMORY_RESERVED,
+          Attribute,
+          ((MM_UNBLOCK_REGION *)HobData)->MemoryDescriptor.PhysicalStart,
+          EFI_PAGES_TO_SIZE (((MM_UNBLOCK_REGION *)HobData)->MemoryDescriptor.NumberOfPages)
+          );
+        DEBUG ((
+          DEBUG_INFO,
+          "BuildResourceDescriptorHob memory is for %x\n",
+          ((MM_UNBLOCK_REGION *)HobData)->MemoryDescriptor.PhysicalStart
+          ));
+      }
+      GuidHob = GetNextGuidHob (&gMmUnblockRegionHobGuid, GET_NEXT_HOB (GuidHob));
     }
-    GuidHob = GetNextGuidHob (&gMmUnblockRegionHobGuid, GET_NEXT_HOB (GuidHob));
+  } else {
+    if ((*BufferSize == 0) && (Buffer == NULL)) {
+      ResourceHobCount = 0;
+      BuildNonRestrictedMemoryHob (FALSE, &ResourceHobCount, &Attribute, MmioCount, MmioMemoryMap);
+      RequiredSize += ResourceHobCount * sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+    } else {
+      BuildNonRestrictedMemoryHob (TRUE, &ResourceHobCount, &Attribute, MmioCount, MmioMemoryMap);
+    }
   }
 
   if (*BufferSize < RequiredSize) {

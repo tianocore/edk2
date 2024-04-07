@@ -35,8 +35,35 @@
 EFI_STATUS
 EFIAPI
 CreateMmPlatformHob (
-  IN      VOID   *Buffer,
-  IN OUT  UINTN  *BufferSize
+  IN      VOID                   *Buffer,
+  IN  OUT UINTN                  *BufferSize,
+  OUT     EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
   );
 
+/**
+  Calculate the maximum support address.
+
+  @return the maximum support address.
+**/
+UINT8
+CalculateMaximumSupportAddress (
+  VOID
+  );
+
+/**
+  Function to compare 2 EFI_MEMORY_DESCRIPTOR pointer based on PhysicalStart.
+
+  @param[in] Buffer1            pointer to MP_INFORMATION2_HOB_DATA poiner to compare
+  @param[in] Buffer2            pointer to second MP_INFORMATION2_HOB_DATA pointer to compare
+
+  @retval 0                     Buffer1 equal to Buffer2
+  @retval <0                    Buffer1 is less than Buffer2
+  @retval >0                    Buffer1 is greater than Buffer2
+**/
+INTN
+EFIAPI
+MemoryDescriptorCompare (
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
+  );
 #endif

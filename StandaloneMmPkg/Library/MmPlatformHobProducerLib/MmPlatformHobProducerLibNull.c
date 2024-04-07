@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param[in]      Buffer            The free buffer to be used for HOB creation.
   @param[in, out] BufferSize        The buffer size.
                                     On return, the expected/used size.
+  @param[out]     MmioMemoryMap     The memory map buffer for MMIO.
 
   @retval RETURN_INVALID_PARAMETER  BufferSize is NULL.
   @retval RETURN_INVALID_PARAMETER  Buffer is NULL and BufferSize is not 0.
@@ -32,8 +33,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 CreateMmPlatformHob (
-  IN      VOID   *Buffer,
-  IN OUT  UINTN  *BufferSize
+  IN       VOID                   *Buffer,
+  IN  OUT  UINTN                  *BufferSize,
+  OUT      EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
   )
 {
   if (BufferSize == NULL) {
@@ -47,4 +49,37 @@ CreateMmPlatformHob (
   *BufferSize = 0;
 
   return EFI_SUCCESS;
+}
+
+/**
+  Calculate the maximum support address.
+
+  @return the maximum support address.
+**/
+UINT8
+CalculateMaximumSupportAddress (
+  VOID
+  )
+{
+  return 0;
+}
+
+/**
+  Function to compare 2 EFI_MEMORY_DESCRIPTOR pointer based on PhysicalStart.
+
+  @param[in] Buffer1            pointer to MP_INFORMATION2_HOB_DATA poiner to compare
+  @param[in] Buffer2            pointer to second MP_INFORMATION2_HOB_DATA pointer to compare
+
+  @retval 0                     Buffer1 equal to Buffer2
+  @retval <0                    Buffer1 is less than Buffer2
+  @retval >0                    Buffer1 is greater than Buffer2
+**/
+INTN
+EFIAPI
+MemoryDescriptorCompare (
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
+  )
+{
+  return 0;
 }

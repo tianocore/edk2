@@ -33,6 +33,8 @@ MmIplHobConstructor (
   @param[in]      Buffer            The free buffer to be used for HOB creation.
   @param[in, out] BufferSize        The buffer size.
                                     On return, the expected/used size.
+  @param[in]      MmioCount         The MMIO memory map count.
+  @param[in]      MmioMemoryMap     The memory map buffer for MMIO.
 
   @retval RETURN_INVALID_PARAMETER  BufferSize is NULL.
   @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for HOB creation.
@@ -45,8 +47,10 @@ MmIplHobConstructor (
 EFI_STATUS
 EFIAPI
 CreateMmFoundationHobList (
-  IN VOID       *Buffer,
-  IN OUT UINTN  *BufferSize
+  IN     VOID                   *Buffer,
+  IN OUT UINTN                  *BufferSize,
+  IN     UINTN                  *MmioCount,
+  IN     EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
   );
 
 /**

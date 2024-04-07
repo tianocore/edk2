@@ -25,11 +25,15 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
   HobLib
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileEnable                 ## CONSUMES
 
 [Guids]
