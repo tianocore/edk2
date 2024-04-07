@@ -503,11 +503,13 @@ CreateMmFoundationHobList (
   GuidHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
   ASSERT (GuidHob != NULL);
   if (GuidHob != NULL) {
-    if ((*BufferSize == 0) && (Buffer == NULL)) {
-      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + (mMmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
-    } else {
-      HobData = GET_GUID_HOB_DATA (GuidHob);
-      MmIplBuildGuidDataHob (&gEfiSmmSmramMemoryGuid, HobData, (sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + (mMmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR))));
+    if (mMmramRangeCount > 0) {
+      if ((*BufferSize == 0) && (Buffer == NULL)) {
+        RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + ((mMmramRangeCount - 1) * sizeof (EFI_SMRAM_DESCRIPTOR));
+      } else {
+        HobData = GET_GUID_HOB_DATA (GuidHob);
+        MmIplBuildGuidDataHob (&gEfiSmmSmramMemoryGuid, HobData, (sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + ((mMmramRangeCount - 1) * sizeof (EFI_SMRAM_DESCRIPTOR))));
+      }
     }
   }
 

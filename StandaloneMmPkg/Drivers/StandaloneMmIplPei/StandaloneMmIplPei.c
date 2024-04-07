@@ -710,7 +710,7 @@ GetFullSmramRanges (
   AdditionSmramRangeCount = 1;
 
   *FullSmramRangeCount = MmramRangeCount + AdditionSmramRangeCount;
-  Size                 = sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + (*FullSmramRangeCount * sizeof (EFI_SMRAM_DESCRIPTOR));
+  Size                 = sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + ((*FullSmramRangeCount - 1) * sizeof (EFI_SMRAM_DESCRIPTOR));
   NewDescriptorBlock   = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)BuildGuidHob (
                                                              &gEfiSmmSmramMemoryGuid,
                                                              Size
