@@ -785,6 +785,8 @@ MmDriverDispatchHandler (
 
   MmCoreInitializeMemoryAttributesTable ();
 
+  MmiHandlerUnRegister (DispatchHandle);
+
   return EFI_SUCCESS;
 }
 
