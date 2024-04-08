@@ -79,6 +79,11 @@ InstallClearCacheCallback (
   );
 
 VOID
+InstallSmmRelocationCallback (
+  VOID
+  );
+
+VOID
 AmdSevInitialize (
   IN EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );

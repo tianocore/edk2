@@ -367,6 +367,7 @@ InitializePlatform (
 
   IntelTdxInitialize ();
   InstallFeatureControlCallback (PlatformInfoHob);
+  InstallSmmRelocationCallback ();
 
   return EFI_SUCCESS;
 }
