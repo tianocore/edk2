@@ -147,6 +147,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses]
+  SmmRelocationLib|OvmfPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   TimerLib|OvmfPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
   ResetSystemLib|OvmfPkg/Library/ResetSystemLib/BaseResetSystemLib.inf
