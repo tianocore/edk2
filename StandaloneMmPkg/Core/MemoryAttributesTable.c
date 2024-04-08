@@ -458,27 +458,20 @@ MmInstallImageRecord (
 }
 
 /**
-  Install MemoryAttributesTable.
+  Initialize MemoryAttributesTable support.
 
-  @param[in] Protocol   Points to the protocol's unique identifier.
-  @param[in] Interface  Points to the interface instance.
-  @param[in] Handle     The handle on which the interface was installed.
-
-  @retval EFI_SUCCESS   Notification runs successfully.
 **/
-EFI_STATUS
+VOID
 EFIAPI
-MmInstallMemoryAttributesTable (
-  IN CONST EFI_GUID  *Protocol,
-  IN VOID            *Interface,
-  IN EFI_HANDLE      Handle
+MmCoreInitializeMemoryAttributesTable (
+  VOID
   )
 {
   MmInstallImageRecord ();
 
   DEBUG ((DEBUG_VERBOSE, "SMM MemoryProtectionAttribute - 0x%016lx\n", mMemoryProtectionAttribute));
   if ((mMemoryProtectionAttribute & EFI_MEMORY_ATTRIBUTES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) == 0) {
-    return EFI_SUCCESS;
+    return;
   }
 
   DEBUG_CODE_BEGIN ();
@@ -491,28 +484,6 @@ MmInstallMemoryAttributesTable (
   DEBUG_CODE_END ();
 
   PublishMemoryAttributesTable ();
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Initialize MemoryAttributesTable support.
-**/
-VOID
-EFIAPI
-MmCoreInitializeMemoryAttributesTable (
-  VOID
-  )
-{
-  EFI_STATUS  Status;
-  VOID        *Registration;
-
-  Status = MmRegisterProtocolNotify (
-             &gEfiMmEndOfDxeProtocolGuid,
-             MmInstallMemoryAttributesTable,
-             &Registration
-             );
-  ASSERT_EFI_ERROR (Status);
 
   return;
 }

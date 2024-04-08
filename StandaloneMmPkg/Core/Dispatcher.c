@@ -783,6 +783,8 @@ MmDriverDispatchHandler (
     }
   }
 
+  MmCoreInitializeMemoryAttributesTable ();
+
   return EFI_SUCCESS;
 }
 
