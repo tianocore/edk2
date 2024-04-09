@@ -3366,6 +3366,8 @@ SecureBootExtractConfigFromVariable (
     ConfigData->FileEnrollType = UNKNOWN_FILE_TYPE;
   }
 
+  ConfigData->ListCount = Private->ListCount;
+
   //
   // If it is Physical Presence User, set the PhysicalPresent to true.
   //
@@ -4541,12 +4543,13 @@ SecureBootCallback (
   EFI_HII_POPUP_PROTOCOL          *HiiPopup;
   EFI_HII_POPUP_SELECTION         UserSelection;
 
-  Status             = EFI_SUCCESS;
-  SecureBootEnable   = NULL;
-  SecureBootMode     = NULL;
-  SetupMode          = NULL;
-  File               = NULL;
-  EnrollKeyErrorCode = None_Error;
+  Status               = EFI_SUCCESS;
+  SecureBootEnable     = NULL;
+  SecureBootMode       = NULL;
+  SetupMode            = NULL;
+  File                 = NULL;
+  EnrollKeyErrorCode   = None_Error;
+  GetBrowserDataResult = FALSE;
 
   if ((This == NULL) || (Value == NULL) || (ActionRequest == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -4565,15 +4568,12 @@ SecureBootCallback (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  GetBrowserDataResult = HiiGetBrowserData (&gSecureBootConfigFormSetGuid, mSecureBootStorageName, BufferSize, (UINT8 *)IfrNvData);
-
   if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
     if (QuestionId == KEY_SECURE_BOOT_MODE) {
       //
       // Update secure boot strings when opening this form
       //
-      Status = UpdateSecureBootString (Private);
-      SecureBootExtractConfigFromVariable (Private, IfrNvData);
+      Status                 = UpdateSecureBootString (Private);
       mIsEnterSecureBootForm = TRUE;
     } else {
       //
@@ -4587,23 +4587,22 @@ SecureBootCallback (
           (QuestionId == KEY_SECURE_BOOT_DBT_OPTION))
       {
         CloseEnrolledFile (Private->FileContext);
-      } else if (QuestionId == KEY_SECURE_BOOT_DELETE_ALL_LIST) {
-        //
-        // Update ListCount field in varstore
-        // Button "Delete All Signature List" is
-        // enable when ListCount is greater than 0.
-        //
-        IfrNvData->ListCount = Private->ListCount;
       }
     }
 
     goto EXIT;
   }
 
+  GetBrowserDataResult = HiiGetBrowserData (&gSecureBootConfigFormSetGuid, mSecureBootStorageName, BufferSize, (UINT8 *)IfrNvData);
+
   if (Action == EFI_BROWSER_ACTION_RETRIEVE) {
     Status = EFI_UNSUPPORTED;
     if (QuestionId == KEY_SECURE_BOOT_MODE) {
       if (mIsEnterSecureBootForm) {
+        if (GetBrowserDataResult) {
+          SecureBootExtractConfigFromVariable (Private, IfrNvData);
+        }
+
         Value->u8 = SECURE_BOOT_MODE_STANDARD;
         Status    = EFI_SUCCESS;
       }
@@ -4764,6 +4763,8 @@ SecureBootCallback (
                 L"Only Physical Presence User could delete PK in custom mode!",
                 NULL
                 );
+            } else {
+              SecureBootExtractConfigFromVariable (Private, IfrNvData);
             }
           }
         }
@@ -4827,6 +4828,7 @@ SecureBootCallback (
           SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
           OPTION_SIGNATURE_LIST_QUESTION_ID
           );
+        IfrNvData->ListCount = Private->ListCount;
         break;
 
       //
@@ -4851,6 +4853,7 @@ SecureBootCallback (
           SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
           OPTION_SIGNATURE_LIST_QUESTION_ID
           );
+        IfrNvData->ListCount = Private->ListCount;
         break;
 
       //
@@ -4875,6 +4878,7 @@ SecureBootCallback (
           SECUREBOOT_DELETE_SIGNATURE_LIST_FORM,
           OPTION_SIGNATURE_LIST_QUESTION_ID
           );
+        IfrNvData->ListCount = Private->ListCount;
         break;
 
       case SECUREBOOT_DELETE_SIGNATURE_FROM_DBT:
@@ -4954,6 +4958,8 @@ SecureBootCallback (
             L"Only supports DER-encoded X509 certificate, AUTH_2 format data & executable EFI image",
             NULL
             );
+        } else {
+          IfrNvData->ListCount = Private->ListCount;
         }
 
         break;
@@ -5005,6 +5011,8 @@ SecureBootCallback (
             PromptString,
             NULL
             );
+        } else {
+          SecureBootExtractConfigFromVariable (Private, IfrNvData);
         }
 
         break;

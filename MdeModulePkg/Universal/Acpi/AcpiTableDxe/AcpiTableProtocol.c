@@ -340,6 +340,7 @@ ReallocateAcpiTableBuffer (
   EFI_ACPI_TABLE_INSTANCE  TempPrivateData;
   EFI_STATUS               Status;
   UINT64                   CurrentData;
+  EFI_MEMORY_TYPE          AcpiAllocateMemoryType;
 
   CopyMem (&TempPrivateData, AcpiTableInstance, sizeof (EFI_ACPI_TABLE_INSTANCE));
   //
@@ -359,6 +360,12 @@ ReallocateAcpiTableBuffer (
                  NewMaxTableNumber * sizeof (UINT32);
   }
 
+  if (PcdGetBool (PcdNoACPIReclaimMemory)) {
+    AcpiAllocateMemoryType = EfiACPIMemoryNVS;
+  } else {
+    AcpiAllocateMemoryType = EfiACPIReclaimMemory;
+  }
+
   if (mAcpiTableAllocType != AllocateAnyPages) {
     //
     // Allocate memory in the lower 32 bit of address range for
@@ -372,13 +379,13 @@ ReallocateAcpiTableBuffer (
     PageAddress = 0xFFFFFFFF;
     Status      = gBS->AllocatePages (
                          mAcpiTableAllocType,
-                         EfiACPIReclaimMemory,
+                         AcpiAllocateMemoryType,
                          EFI_SIZE_TO_PAGES (TotalSize),
                          &PageAddress
                          );
   } else {
     Status = gBS->AllocatePool (
-                    EfiACPIReclaimMemory,
+                    AcpiAllocateMemoryType,
                     TotalSize,
                     (VOID **)&Pointer
                     );
@@ -512,6 +519,7 @@ AddTableToList (
   EFI_PHYSICAL_ADDRESS  AllocPhysAddress;
   UINT64                Buffer64;
   BOOLEAN               AddToRsdt;
+  EFI_MEMORY_TYPE       AcpiAllocateMemoryType;
 
   //
   // Check for invalid input parameters
@@ -550,6 +558,12 @@ AddTableToList (
   CurrentTableList->TableSize      = CurrentTableSize;
   CurrentTableList->PoolAllocation = FALSE;
 
+  if (PcdGetBool (PcdNoACPIReclaimMemory)) {
+    AcpiAllocateMemoryType = EfiACPIMemoryNVS;
+  } else {
+    AcpiAllocateMemoryType = EfiACPIReclaimMemory;
+  }
+
   //
   // Allocation memory type depends on the type of the table
   //
@@ -585,7 +599,7 @@ AddTableToList (
     // such as AArch64 that allocate multiples of 64 KB
     //
     Status = gBS->AllocatePool (
-                    EfiACPIReclaimMemory,
+                    AcpiAllocateMemoryType,
                     CurrentTableList->TableSize,
                     (VOID **)&CurrentTableList->Table
                     );
@@ -596,7 +610,7 @@ AddTableToList (
     //
     Status = gBS->AllocatePages (
                     mAcpiTableAllocType,
-                    EfiACPIReclaimMemory,
+                    AcpiAllocateMemoryType,
                     EFI_SIZE_TO_PAGES (CurrentTableList->TableSize),
                     &AllocPhysAddress
                     );
@@ -1944,6 +1958,7 @@ AcpiTableAcpiTableConstructor (
   UINTN                 RsdpTableSize;
   UINT8                 *Pointer;
   EFI_PHYSICAL_ADDRESS  PageAddress;
+  EFI_MEMORY_TYPE       AcpiAllocateMemoryType;
 
   //
   // Check for invalid input parameters
@@ -1978,17 +1993,23 @@ AcpiTableAcpiTableConstructor (
     RsdpTableSize += sizeof (EFI_ACPI_1_0_ROOT_SYSTEM_DESCRIPTION_POINTER);
   }
 
+  if (PcdGetBool (PcdNoACPIReclaimMemory)) {
+    AcpiAllocateMemoryType = EfiACPIMemoryNVS;
+  } else {
+    AcpiAllocateMemoryType = EfiACPIReclaimMemory;
+  }
+
   if (mAcpiTableAllocType != AllocateAnyPages) {
     PageAddress = 0xFFFFFFFF;
     Status      = gBS->AllocatePages (
                          mAcpiTableAllocType,
-                         EfiACPIReclaimMemory,
+                         AcpiAllocateMemoryType,
                          EFI_SIZE_TO_PAGES (RsdpTableSize),
                          &PageAddress
                          );
   } else {
     Status = gBS->AllocatePool (
-                    EfiACPIReclaimMemory,
+                    AcpiAllocateMemoryType,
                     RsdpTableSize,
                     (VOID **)&Pointer
                     );
@@ -2037,13 +2058,13 @@ AcpiTableAcpiTableConstructor (
     PageAddress = 0xFFFFFFFF;
     Status      = gBS->AllocatePages (
                          mAcpiTableAllocType,
-                         EfiACPIReclaimMemory,
+                         AcpiAllocateMemoryType,
                          EFI_SIZE_TO_PAGES (TotalSize),
                          &PageAddress
                          );
   } else {
     Status = gBS->AllocatePool (
-                    EfiACPIReclaimMemory,
+                    AcpiAllocateMemoryType,
                     TotalSize,
                     (VOID **)&Pointer
                     );

@@ -1533,6 +1533,13 @@
   # @Prompt Exposed ACPI table versions.
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiExposedTableVersions|0x3E|UINT32|0x0001004c
 
+  ## Indicates whether ACPI Reclaim memory is not available
+  # Default is FALSE that means ACPI Reclaim memory is available
+  # If it is set to TRUE that means ACPI Reclaim memory is not available
+  # For example ACPI Table protocol will use ACPI NVS memory instead of ACPI Reclaim memory
+  # @Prompt ACPI Reclaim memory is not available.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNoACPIReclaimMemory|FALSE|BOOLEAN|0x0001008b
+
   ## This PCD defines the MAX repair count.
   #  The default value is 0 that means infinite.
   # @Prompt MAX repair count
