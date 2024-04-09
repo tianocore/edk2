@@ -395,14 +395,57 @@ MmIplBuildMmCoreModuleHob (
 }
 
 /**
+  Create MMIO memory map according to platform HOB.
+
+  @param[in]       PlatformHobList    Platform HOB list.
+  @param[out]      PlatformHobSize    Platform HOB size.
+  @param[in, out]  MemoryMap          MMIO memory map.
+
+**/
+UINTN
+CreateMmioMemMap (
+  IN      VOID                 *PlatformHobList,
+  IN      UINTN                 PlatformHobSize,
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap
+)
+{
+  UINTN                 Count;
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  Count = 0;
+  //
+  // Get the HOB list for processing
+  //
+  Hob.Raw = PlatformHobList;
+
+  //
+  // Collect memory ranges
+  //
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO) {
+        if (MemoryMap != NULL) {
+          MemoryMap[Count].PhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
+          MemoryMap[Count].NumberOfPages = EFI_SIZE_TO_PAGES (Hob.ResourceDescriptor->ResourceLength);
+        }
+        Count ++;
+      }
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+  return Count;
+}
+
+/**
   Build resource HOB to cover [0, PhysicalAddressBits length] by excluding
   all Mmram ranges, SmmProfile data and MMIO ranges.
 
-  @param[in]      Create            If TRUE, need to create resource HOBs.
-  @param[out]     HobCount          Resource HOB counts.
-  @param[in]      Attribute         Resource HOB attribute.
-  @param[in]      MmioCount         The MMIO memory map count.
-  @param[in]      MmioMemoryMap     The memory map buffer for MMIO.
+  @param[in]     Create             If TRUE, need to create resource HOBs.
+  @param[out]    HobCount           Resource HOB counts.
+  @param[in]     Attribute          Resource HOB attribute.
+  @param[in]     PlatformHobList    Platform HOB list.
+  @param[in]     PlatformHobSize    Platform HOB size.
 
 **/
 VOID
@@ -410,13 +453,14 @@ BuildNonRestrictedMemoryHob (
   IN  BOOLEAN                      Create,
   OUT UINTN                        *HobCount,
   IN  EFI_RESOURCE_ATTRIBUTE_TYPE  *Attribute,
-  IN  UINTN                        *MmioCount,
-  IN  EFI_MEMORY_DESCRIPTOR        *MmioMemoryMap
+  IN  VOID                         *PlatformHobList,
+  IN  UINTN                        PlatformHobSize
   )
 {
   UINTN                  Index;
   UINTN                  MmRamIndex;
   UINTN                  Count;
+  UINTN                  MmioCount;
   UINTN                  ResourceHobCount;
   UINT64                 PreviousAddress;
   UINT64                 Base;
@@ -428,25 +472,32 @@ BuildNonRestrictedMemoryHob (
   EFI_MMRAM_DESCRIPTOR   *MmramRanges;
   EFI_MEMORY_DESCRIPTOR  SortBuffer;
 
-  if ((*MmioCount <= 0) || (MmioMemoryMap == NULL)) {
-    return;
+  if ((PlatformHobList != NULL) && (PlatformHobSize != 0)) {
+    MmioCount = CreateMmioMemMap (PlatformHobList, PlatformHobSize, NULL);
   }
 
   //
   // Allocate memory map buffer for MMIO HOBs, SmmProfile data, MMRam ranges
   //
-  Count = *MmioCount + 1 + mMmramRangeCount;
-  MemoryMap = AllocatePool (Count * sizeof (EFI_MEMORY_DESCRIPTOR));
+  Count = MmioCount + mMmramRangeCount + 1;
+  MemoryMap = AllocatePages (EFI_SIZE_TO_PAGES (Count * sizeof (EFI_MEMORY_DESCRIPTOR)));
   ASSERT (MemoryMap != NULL);
+  ZeroMem (MemoryMap, Count * sizeof (EFI_MEMORY_DESCRIPTOR));
 
   //
-  // Set Mmio base and length to memory map buffer
+  // Set MMIO base and length to memory map buffer
   //
-  if (*MmioCount > 0 && MmioMemoryMap != NULL) {
-    for (Index = 0; Index < *MmioCount; Index++) {
-      MemoryMap[Index].PhysicalStart = MmioMemoryMap[Index].PhysicalStart;
-      MemoryMap[Index].NumberOfPages = MmioMemoryMap[Index].NumberOfPages;
-    }
+  if ((PlatformHobList != NULL) && (PlatformHobSize != 0) && (MemoryMap != NULL)) {
+    MmioCount = CreateMmioMemMap (PlatformHobList, PlatformHobSize, MemoryMap);
+  }
+
+  //
+  // Set Mmram base and length to memory map buffer
+  //
+  MmramRanges = (EFI_SMRAM_DESCRIPTOR *)(UINTN)mMmramRanges;
+  for (Index = MmioCount, MmRamIndex = 0; MmRamIndex < mMmramRangeCount; Index++, MmRamIndex++) {
+    MemoryMap[Index].PhysicalStart = MmramRanges[MmRamIndex].CpuStart;
+    MemoryMap[Index].NumberOfPages = EFI_SIZE_TO_PAGES (MmramRanges[MmRamIndex].PhysicalSize);
   }
 
   //
@@ -471,17 +522,6 @@ BuildNonRestrictedMemoryHob (
   }
 
   //
-  // Set Mmram base and length to memory map buffer
-  //
-  MmramRanges = (EFI_SMRAM_DESCRIPTOR *)(UINTN)mMmramRanges;
-  for (MmRamIndex = 0; Index < Count; Index++, MmRamIndex++) {
-    MemoryMap[Index].PhysicalStart = MmramRanges[MmRamIndex].CpuStart;
-    MemoryMap[Index].NumberOfPages = EFI_SIZE_TO_PAGES (MmramRanges[MmRamIndex].PhysicalSize);
-    MemoryMap[Index].PhysicalStart = 0;
-    MemoryMap[Index].NumberOfPages = 0;
-  }
-
-  //
   // Perform QuickSort for all EFI_RESOURCE_SYSTEM_MEMORY range to calculating the MMIO
   //
   QuickSort (MemoryMap, Count, sizeof (EFI_MEMORY_DESCRIPTOR), (BASE_SORT_COMPARE)MemoryDescriptorCompare, &SortBuffer);
@@ -489,10 +529,9 @@ BuildNonRestrictedMemoryHob (
   //
   // Build MemoryMap to cover [0, PhysicalAddressBits] by excluding all Smram range， SmmProfile database and platform-report-MMIO ranges
   //
-  Count = *MmioCount + 1 + mMmramRangeCount;
-
-  NoRestrictedMemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocateZeroPool ((Count + 1) * sizeof (EFI_MEMORY_DESCRIPTOR));
+  NoRestrictedMemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocatePages (EFI_SIZE_TO_PAGES ((Count + 1) * sizeof (EFI_MEMORY_DESCRIPTOR)));
   ASSERT (NoRestrictedMemoryMap != NULL);
+  ZeroMem (NoRestrictedMemoryMap, (Count + 1) * sizeof (EFI_MEMORY_DESCRIPTOR));
 
   ResourceHobCount = 0;
   PreviousAddress  = 0;
@@ -508,8 +547,6 @@ BuildNonRestrictedMemoryHob (
     if (Base > PreviousAddress) {
       NoRestrictedMemoryMap[Index].PhysicalStart = PreviousAddress;
       NoRestrictedMemoryMap[Index].NumberOfPages = EFI_SIZE_TO_PAGES (Base - PreviousAddress);
-      DEBUG ((DEBUG_ERROR, "NoRestrictedMemoryMap[%x].PhysicalStart = 0x%lx\n", Index, NoRestrictedMemoryMap[Index].PhysicalStart));
-      DEBUG ((DEBUG_ERROR, "NoRestrictedMemoryMap[%x].NumberOfPages = 0x%lx\n", Index, NoRestrictedMemoryMap[Index].NumberOfPages));
       ResourceHobCount++;
     }
 
@@ -545,8 +582,8 @@ BuildNonRestrictedMemoryHob (
       }
     }
   }
-  FreePool (NoRestrictedMemoryMap);
-  FreePool (MemoryMap);
+  FreePages (NoRestrictedMemoryMap, EFI_SIZE_TO_PAGES (MmioCount * sizeof (EFI_MEMORY_DESCRIPTOR)));
+  FreePages (MemoryMap, EFI_SIZE_TO_PAGES (Count * sizeof (EFI_MEMORY_DESCRIPTOR)));
 }
 
 /**
@@ -555,27 +592,27 @@ BuildNonRestrictedMemoryHob (
   This function build the MM foundation specific HOB list needed by StandaloneMm Core
   based on the PEI HOB list.
 
-  @param[in]      Buffer            The free buffer to be used for HOB creation.
-  @param[in, out] BufferSize        The buffer size.
-                                    On return, the expected/used size.
-  @param[in]      MmioCount         The MMIO memory map count.
-  @param[in]      MmioMemoryMap     The memory map buffer for MMIO.
+  @param[in]      FoundationHobList  The foundation HOB list to be used for HOB creation.
+  @param[in, out] FoundationHobSize  The foundation HOB size.
+                                     On return, the expected/used size.
+  @param[in]      PlatformHobList    Platform HOB list.
+  @param[in]      PlatformHobSize    Platform HOB size.
 
-  @retval RETURN_INVALID_PARAMETER  BufferSize is NULL.
-  @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for HOB creation.
-                                    BufferSize is updated to indicate the expected buffer size.
-                                    When the input BufferSize is bigger than the expected buffer size,
-                                    the BufferSize value will be changed the used buffer size.
-  @retval RETURN_SUCCESS            HOB List is created/updated successfully or the input Length is 0.
+  @retval RETURN_INVALID_PARAMETER   BufferSize is NULL.
+  @retval RETURN_BUFFER_TOO_SMALL    The buffer is too small for HOB creation.
+                                     BufferSize is updated to indicate the expected buffer size.
+                                     When the input BufferSize is bigger than the expected buffer size,
+                                     the BufferSize value will be changed the used buffer size.
+  @retval RETURN_SUCCESS             HOB List is created/updated successfully or the input Length is 0.
 
 **/
 EFI_STATUS
 EFIAPI
 CreateMmFoundationHobList (
-  IN     VOID                   *Buffer,
-  IN OUT UINTN                  *BufferSize,
-  IN     UINTN                  *MmioCount,
-  IN     EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
+  IN     VOID   *FoundationHobList,
+  IN OUT UINTN  *FoundationHobSize,
+  IN     VOID   *PlatformHobList,
+  IN     UINTN  PlatformHobSize
   )
 {
   VOID                         *GuidHob;
@@ -596,11 +633,11 @@ CreateMmFoundationHobList (
     Attribute |= EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING;
   }
 
-  if (BufferSize == NULL) {
+  if (FoundationHobSize == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
 
-  if ((*BufferSize != 0) && (Buffer == NULL)) {
+  if ((*FoundationHobSize != 0) && (FoundationHobList == NULL)) {
     return RETURN_INVALID_PARAMETER;
   }
 
@@ -612,7 +649,7 @@ CreateMmFoundationHobList (
   GuidHob = GetFirstGuidHob (&gEdkiiCommunicationBufferGuid);
   ASSERT (GuidHob != NULL);
   if (GuidHob != NULL) {
-    if ((*BufferSize == 0) && (Buffer == NULL)) {
+    if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
       RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_COMM_BUFFER_DATA);
     } else {
       HobData = GET_GUID_HOB_DATA (GuidHob);
@@ -623,7 +660,7 @@ CreateMmFoundationHobList (
   //
   // For MmCore ImageAddress, ImageSize, EntryPoint
   //
-  if ((*BufferSize == 0) && (Buffer == NULL)) {
+  if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
     RequiredSize += sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE);
   } else {
     MmIplBuildMmCoreModuleHob (mMmCoreFileName, mMmCoreImageAddress, mMmCoreImageSize, mMmCoreEntryPoint);
@@ -632,7 +669,7 @@ CreateMmFoundationHobList (
   //
   // BFV address for Standalone Core
   //
-  if ((*BufferSize == 0) && (Buffer == NULL)) {
+  if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
     RequiredSize += sizeof (EFI_HOB_FIRMWARE_VOLUME);
   } else {
     MmIplBuildFvHob (mMmFvBaseAddress, mMmFvSize);
@@ -644,7 +681,7 @@ CreateMmFoundationHobList (
   GuidHob = GetFirstGuidHob (&gEdkiiSmmCpuFeatureInfoHobGuid);
   ASSERT (GuidHob != NULL);
   if (GuidHob != NULL) {
-    if ((*BufferSize == 0) && (Buffer == NULL)) {
+    if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
       RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (SMM_CPU_FEATURE_INFO_HOB);
     } else {
       HobData = GET_GUID_HOB_DATA (GuidHob);
@@ -659,7 +696,7 @@ CreateMmFoundationHobList (
   ASSERT (GuidHob != NULL);
   while (GuidHob != NULL) {
     HobData = GET_GUID_HOB_DATA (GuidHob);
-    if ((*BufferSize == 0) && (Buffer == NULL)) {
+    if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
       RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (SMM_BASE_HOB_DATA) + sizeof (UINT64) * ((SMM_BASE_HOB_DATA *)HobData)->NumberOfProcessors;
     } else {
       MmIplBuildGuidDataHob (&gSmmBaseHobGuid, HobData, sizeof (SMM_BASE_HOB_DATA) + sizeof (UINT64) * ((SMM_BASE_HOB_DATA *)HobData)->NumberOfProcessors);
@@ -674,7 +711,7 @@ CreateMmFoundationHobList (
   ASSERT (GuidHob != NULL);
   if (GuidHob != NULL) {
     if (mMmramRangeCount > 0) {
-      if ((*BufferSize == 0) && (Buffer == NULL)) {
+      if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
         RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + ((mMmramRangeCount - 1) * sizeof (EFI_SMRAM_DESCRIPTOR));
       } else {
         HobData = GET_GUID_HOB_DATA (GuidHob);
@@ -690,7 +727,7 @@ CreateMmFoundationHobList (
   ASSERT (GuidHob != NULL);
   while (GuidHob != NULL) {
     HobData = GET_GUID_HOB_DATA (GuidHob);
-    if ((*BufferSize == 0) && (Buffer == NULL)) {
+    if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
       RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (MP_INFORMATION2_HOB_DATA) + sizeof (MP_INFORMATION2_ENTRY) * ((MP_INFORMATION2_HOB_DATA *)HobData)->NumberOfProcessors;
     } else {
       MmIplBuildGuidDataHob (&gMpInformation2HobGuid, HobData, sizeof (MP_INFORMATION2_HOB_DATA) + sizeof (MP_INFORMATION2_ENTRY) * ((MP_INFORMATION2_HOB_DATA *)HobData)->NumberOfProcessors);
@@ -701,7 +738,7 @@ CreateMmFoundationHobList (
   //
   // gEdkiiSmmProfileDataGuid
   //
-  if ((*BufferSize == 0) && (Buffer == NULL)) {
+  if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
     RequiredSize += sizeof (EFI_HOB_MEMORY_ALLOCATION);
   } else {
     //
@@ -732,7 +769,7 @@ CreateMmFoundationHobList (
   //
   // Build Resource HOB for SmmProfile data
   //
-  if ((*BufferSize == 0) && (Buffer == NULL)) {
+  if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
     RequiredSize += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
   } else {
       MmIplBuildResourceDescriptorHob (
@@ -749,7 +786,7 @@ CreateMmFoundationHobList (
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
   ASSERT (GuidHob != NULL);
   if (GuidHob != NULL) {
-    if ((*BufferSize == 0) && (Buffer == NULL)) {
+    if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
       RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof(EFI_SMRAM_DESCRIPTOR);
     } else {
       HobData = GET_GUID_HOB_DATA (GuidHob);
@@ -764,8 +801,8 @@ CreateMmFoundationHobList (
     GuidHob = GetFirstGuidHob (&gMmUnblockRegionHobGuid);
     ASSERT (GuidHob != NULL);
     while (GuidHob != NULL) {
-      if ((*BufferSize == 0) && (Buffer == NULL)) {
-        RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+      if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
+        RequiredSize += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
       } else {
         HobData = GET_GUID_HOB_DATA (GuidHob);
         MmIplBuildResourceDescriptorHob (
@@ -783,17 +820,17 @@ CreateMmFoundationHobList (
       GuidHob = GetNextGuidHob (&gMmUnblockRegionHobGuid, GET_NEXT_HOB (GuidHob));
     }
   } else {
-    if ((*BufferSize == 0) && (Buffer == NULL)) {
+    if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
       ResourceHobCount = 0;
-      BuildNonRestrictedMemoryHob (FALSE, &ResourceHobCount, &Attribute, MmioCount, MmioMemoryMap);
+      BuildNonRestrictedMemoryHob (FALSE, &ResourceHobCount, &Attribute, PlatformHobList, PlatformHobSize);
       RequiredSize += ResourceHobCount * sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
     } else {
-      BuildNonRestrictedMemoryHob (TRUE, &ResourceHobCount, &Attribute, MmioCount, MmioMemoryMap);
+      BuildNonRestrictedMemoryHob (TRUE, &ResourceHobCount, &Attribute, PlatformHobList, PlatformHobSize);
     }
   }
 
-  if (*BufferSize < RequiredSize) {
-    *BufferSize = RequiredSize;
+  if (*FoundationHobSize < RequiredSize) {
+    *FoundationHobSize = RequiredSize;
     return EFI_BUFFER_TOO_SMALL;
   }
 

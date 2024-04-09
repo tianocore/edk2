@@ -30,27 +30,27 @@ MmIplHobConstructor (
   This function build the MM foundation specific HOB list needed by StandaloneMm Core
   based on the PEI HOB list.
 
-  @param[in]      Buffer            The free buffer to be used for HOB creation.
-  @param[in, out] BufferSize        The buffer size.
-                                    On return, the expected/used size.
-  @param[in]      MmioCount         The MMIO memory map count.
-  @param[in]      MmioMemoryMap     The memory map buffer for MMIO.
+  @param[in]      FoundationHobList  The foundation HOB list to be used for HOB creation.
+  @param[in, out] FoundationHobSize  The foundation HOB size.
+                                     On return, the expected/used size.
+  @param[in]      PlatformHobList    Platform HOB list.
+  @param[in]      PlatformHobSize    Platform HOB size.
 
-  @retval RETURN_INVALID_PARAMETER  BufferSize is NULL.
-  @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for HOB creation.
-                                    BufferSize is updated to indicate the expected buffer size.
-                                    When the input BufferSize is bigger than the expected buffer size,
-                                    the BufferSize value will be changed the used buffer size.
-  @retval RETURN_SUCCESS            HOB List is created/updated successfully or the input Length is 0.
+  @retval RETURN_INVALID_PARAMETER   BufferSize is NULL.
+  @retval RETURN_BUFFER_TOO_SMALL    The buffer is too small for HOB creation.
+                                     BufferSize is updated to indicate the expected buffer size.
+                                     When the input BufferSize is bigger than the expected buffer size,
+                                     the BufferSize value will be changed the used buffer size.
+  @retval RETURN_SUCCESS             HOB List is created/updated successfully or the input Length is 0.
 
 **/
 EFI_STATUS
 EFIAPI
 CreateMmFoundationHobList (
-  IN     VOID                   *Buffer,
-  IN OUT UINTN                  *BufferSize,
-  IN     UINTN                  *MmioCount,
-  IN     EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
+  IN     VOID   *FoundationHobList,
+  IN OUT UINTN  *FoundationHobSize,
+  IN     VOID   *PlatformHobList,
+  IN     UINTN  PlatformHobSize
   );
 
 /**

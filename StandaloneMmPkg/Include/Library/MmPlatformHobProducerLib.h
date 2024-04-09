@@ -36,8 +36,7 @@ EFI_STATUS
 EFIAPI
 CreateMmPlatformHob (
   IN      VOID                   *Buffer,
-  IN  OUT UINTN                  *BufferSize,
-  OUT     EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
+  IN  OUT UINTN                  *BufferSize
   );
 
 /**

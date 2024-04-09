@@ -19,7 +19,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @param[in]      Buffer            The free buffer to be used for HOB creation.
   @param[in, out] BufferSize        The buffer size.
                                     On return, the expected/used size.
-  @param[out]     MmioMemoryMap     The memory map buffer for MMIO.
 
   @retval RETURN_INVALID_PARAMETER  BufferSize is NULL.
   @retval RETURN_INVALID_PARAMETER  Buffer is NULL and BufferSize is not 0.
@@ -33,9 +32,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_STATUS
 EFIAPI
 CreateMmPlatformHob (
-  IN       VOID                   *Buffer,
-  IN  OUT  UINTN                  *BufferSize,
-  OUT      EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
+  IN      VOID   *Buffer,
+  IN OUT  UINTN  *BufferSize
   )
 {
   if (BufferSize == NULL) {

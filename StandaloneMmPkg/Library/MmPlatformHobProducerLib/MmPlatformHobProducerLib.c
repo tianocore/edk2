@@ -165,18 +165,16 @@ CalculateMaximumSupportAddress (
   This function treats all all ranges outside the system memory range as mmio
   and builds resource HOB list for all MMIO range.
 
-  @param  Create         The type of resource described by this HOB.
-  @param  MemoryMap      EFI_MEMORY_DESCRIPTOR that describes all system memory range.
-  @param  Count          Number of EFI_MEMORY_DESCRIPTOR.
-  @param  MmioMemoryMap  The memory map buffer for MMIO.
+  @param  Create      The type of resource described by this HOB.
+  @param  MemoryMap   EFI_MEMORY_DESCRIPTOR that describes all system memory range.
+  @param  Count       Number of EFI_MEMORY_DESCRIPTOR.
 
 **/
 UINTN
 MmBuildHobForMmio (
   IN  BOOLEAN                Create,
   IN  EFI_MEMORY_DESCRIPTOR  *MemoryMap,
-  IN  UINTN                  Count,
-  OUT EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
+  IN  UINTN                  Count
   )
 {
   UINTN                        MmioRangeCount;
@@ -203,10 +201,6 @@ MmBuildHobForMmio (
   for (Index = 0; Index <= Count; Index++) {
     Base = (Index == Count) ? Limit : MemoryMap[Index].PhysicalStart;
     if (Base > PreviousAddress) {
-      if (MmioMemoryMap != NULL) {
-        MmioMemoryMap[MmioRangeCount].PhysicalStart = PreviousAddress;
-        MmioMemoryMap[MmioRangeCount].NumberOfPages = EFI_SIZE_TO_PAGES (Base - PreviousAddress);
-      }
       MmioRangeCount++;
       if (Create) {
         MmBuildResourceDescriptorHob (
@@ -261,7 +255,6 @@ MemoryDescriptorCompare (
   @param[in]      Buffer            The free buffer to be used for HOB creation.
   @param[in, out] BufferSize        The buffer size.
                                     On return, the expected/used size.
-  @param[out]     MmioMemoryMap     The memory map buffer for MMIO.
 
   @retval RETURN_INVALID_PARAMETER  BufferSize is NULL.
   @retval RETURN_BUFFER_TOO_SMALL   The buffer is too small for HOB creation.
@@ -274,9 +267,8 @@ MemoryDescriptorCompare (
 EFI_STATUS
 EFIAPI
 CreateMmPlatformHob (
-  IN      VOID                   *Buffer,
-  IN  OUT UINTN                  *BufferSize,
-  OUT     EFI_MEMORY_DESCRIPTOR  *MmioMemoryMap
+  IN VOID       *Buffer,
+  IN OUT UINTN  *BufferSize
   )
 {
   VOID                   *HobList;
@@ -341,7 +333,7 @@ CreateMmPlatformHob (
   //
   // Calculate needed buffer size.
   //
-  RequiredSize = MmBuildHobForMmio (FALSE, MemoryMap, Count, MmioMemoryMap);
+  RequiredSize = MmBuildHobForMmio (FALSE, MemoryMap, Count);
 
   if (*BufferSize < RequiredSize) {
     *BufferSize = RequiredSize;
@@ -355,7 +347,7 @@ CreateMmPlatformHob (
   //
   // Build resource HOB for MMIO range.
   //
-  *BufferSize = MmBuildHobForMmio (TRUE, MemoryMap, Count, MmioMemoryMap);
+  *BufferSize = MmBuildHobForMmio (TRUE, MemoryMap, Count);
   FreePool (MemoryMap);
 
   return EFI_SUCCESS;
