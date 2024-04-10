@@ -35,6 +35,7 @@ typedef enum {
   KernelBlobTypeKernel,
   KernelBlobTypeInitrd,
   KernelBlobTypeCommandLine,
+  KernelBlobTypeShim,
   KernelBlobTypeMax
 } KERNEL_BLOB_TYPE;
 
@@ -68,6 +69,12 @@ STATIC KERNEL_BLOB  mKernelBlob[KernelBlobTypeMax] = {
     {
       { QemuFwCfgItemCommandLineSize, QemuFwCfgItemCommandLineData, },
     }
+  },  {
+    L"shim",
+    {
+      { 0,                            },
+    },
+    "etc/boot/shim"
   }
 };
 
@@ -790,6 +797,11 @@ StubFileOpen (
   }
 
   if (BlobType == KernelBlobTypeMax) {
+    return EFI_NOT_FOUND;
+  }
+
+  if ((BlobType == KernelBlobTypeShim) && (mKernelBlob[BlobType].Size == 0)) {
+    DEBUG ((DEBUG_INFO, "%a: ERROR: not found (shim zero length)\n", __func__));
     return EFI_NOT_FOUND;
   }
 
