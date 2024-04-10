@@ -75,3 +75,5 @@
 [Depex]
   gEfiPeiMpServicesPpiGuid AND gPeiSmmControlPpiGuid
 
+[BuildOptions]
+ MSFT:*_*_*_CC_FLAGS = /Od

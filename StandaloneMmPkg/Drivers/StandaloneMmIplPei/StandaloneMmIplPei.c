@@ -1,5 +1,5 @@
 /** @file
-  SMM IPL that load the SMM Core into SMRAM at PEI stage
+  MM IPL that load the SMM Core into MMRAM at PEI stage
 
   Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -24,15 +24,14 @@
 #include <Library/MmUnblockMemoryLib.h>
 #include <Protocol/SmmCommunication.h>
 #include <Guid/MmCommBuffer.h>
-#include <Guid/SmramMemoryReserve.h>
+#include <Guid/MmramMemoryReserve.h>
 #include <StandaloneMmIplPei.h>
 
 //
 // SMM IPL global variables
 //
-EFI_SMRAM_DESCRIPTOR  *mCurrentSmramRange;
-EFI_PHYSICAL_ADDRESS  mSmramCacheBase;
-UINT64                mSmramCacheSize;
+EFI_PHYSICAL_ADDRESS  mMmramCacheBase;
+UINT64                mMmramCacheSize;
 EFI_PHYSICAL_ADDRESS  mMmramRanges = 0;
 UINT64                mMmramRangeCount = 0;
 EFI_PHYSICAL_ADDRESS  mMmCoreImageAddress;
@@ -50,7 +49,7 @@ UINTN                 mPlatformHobSize;
   This function provides a service to send and receive messages from a registered UEFI service.
 
   @param[in] This                The EFI_PEI_MM_COMMUNICATION_PPI instance.
-  @param[in, out] CommBuffer     A pointer to the buffer to convey into SMRAM.
+  @param[in, out] CommBuffer     A pointer to the buffer to convey into MMRAM.
   @param[in, out] CommSize       The size of the data buffer being passed in.On exit, the size of data
                                  being returned. Zero if the handler does not wish to reply with any data.
 
@@ -107,7 +106,7 @@ EFI_PEI_NOTIFY_DESCRIPTOR  mNotifyList[] = {
   This function provides a service to send and receive messages from a registered UEFI service.
 
   @param[in] This                The EFI_PEI_MM_COMMUNICATION_PPI instance.
-  @param[in, out] CommBuffer     A pointer to the buffer to convey into SMRAM.
+  @param[in, out] CommBuffer     A pointer to the buffer to convey into MMRAM.
   @param[in, out] CommSize       The size of the data buffer being passed in.On exit, the size of data
                                  being returned. Zero if the handler does not wish to reply with any data.
 
@@ -175,8 +174,8 @@ Communicate (
     return EFI_INVALID_PARAMETER;
   }
 
+  CopyMem ((VOID *)(UINTN)MmCommBufferData->FixedCommBuffer, CommBuffer, TempCommSize);
   CommunicationInOut->IsCommBufferValid = TRUE;
-  CopyMem ((EFI_PHYSICAL_ADDRESS *)(UINTN)MmCommBufferData->FixedCommBuffer, CommBuffer, TempCommSize);
 
   //
   // Generate Software SMI
@@ -206,56 +205,12 @@ Communicate (
 
   Status    = (EFI_STATUS)CommunicationInOut->ReturnStatus;
   if (Status != EFI_SUCCESS) {
-     Status = Status | MAX_BIT;
+    DEBUG ((DEBUG_ERROR, "StandaloneSmmIpl Communicate failed (%r)\n", Status));
+  } else {
+    CommunicationInOut->IsCommBufferValid = FALSE;
+    DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Exit (%r)\n", Status));
   }
-
-  CommunicationInOut->IsCommBufferValid = FALSE;
-  DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Exit (%r)\n", Status));
-
   return Status;
-}
-
-/**
-  Find the maximum SMRAM cache range that covers the range specified by SmramRange.
-
-  This function searches and joins all adjacent ranges of SmramRange into a range to be cached.
-
-  @param   SmramRange       The SMRAM range to search from.
-  @param   SmramCacheBase   The returned cache range base.
-  @param   SmramCacheSize   The returned cache range size.
-**/
-VOID
-GetSmramCacheRange (
-  IN  EFI_SMRAM_DESCRIPTOR  *SmramRange,
-  OUT EFI_PHYSICAL_ADDRESS  *SmramCacheBase,
-  OUT UINT64                *SmramCacheSize
-  )
-{
-  UINTN                 Index;
-  EFI_PHYSICAL_ADDRESS  RangeCpuStart;
-  UINT64                RangePhysicalSize;
-  BOOLEAN               FoundAdjacentRange;
-  EFI_SMRAM_DESCRIPTOR  *SmramRanges;
-
-  *SmramCacheBase = SmramRange->CpuStart;
-  *SmramCacheSize = SmramRange->PhysicalSize;
-
-  SmramRanges = (EFI_SMRAM_DESCRIPTOR *)(UINTN)mMmramRanges;
-  do {
-    FoundAdjacentRange = FALSE;
-    for (Index = 0; Index < mMmramRangeCount; Index++) {
-      RangeCpuStart     = SmramRanges[Index].CpuStart;
-      RangePhysicalSize = SmramRanges[Index].PhysicalSize;
-      if ((RangeCpuStart < *SmramCacheBase) && (*SmramCacheBase == (RangeCpuStart + RangePhysicalSize))) {
-        *SmramCacheBase    = RangeCpuStart;
-        *SmramCacheSize   += RangePhysicalSize;
-        FoundAdjacentRange = TRUE;
-      } else if (((*SmramCacheBase + *SmramCacheSize) == RangeCpuStart) && (RangePhysicalSize > 0)) {
-        *SmramCacheSize   += RangePhysicalSize;
-        FoundAdjacentRange = TRUE;
-      }
-    }
-  } while (FoundAdjacentRange);
 }
 
 /**
@@ -279,100 +234,6 @@ LoadSmmCore (
   DEBUG ((DEBUG_INFO, "Context1- 0x%016lx\n", Context1));
   DEBUG ((DEBUG_INFO, "EntryPoint- 0x%016lx\n", EntryPoint));
   return EntryPoint (Context1);
-}
-
-/**
-  Get the fixed loading address from image header assigned by build tool. This function only be called
-  when Loading module at Fixed address feature enabled.
-
-  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
-                                    image that needs to be examined by this function.
-  @retval EFI_SUCCESS               An fixed loading address is assigned to this image by build tools .
-  @retval EFI_NOT_FOUND             The image has no assigned fixed loading address.
-**/
-EFI_STATUS
-GetPeCoffImageFixLoadingAssignedAddress (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  )
-{
-  UINTN                            SectionHeaderOffset;
-  EFI_STATUS                       Status;
-  EFI_IMAGE_SECTION_HEADER         SectionHeader;
-  EFI_IMAGE_OPTIONAL_HEADER_UNION  *ImgHdr;
-  EFI_PHYSICAL_ADDRESS             FixLoadingAddress;
-  UINT16                           Index;
-  UINTN                            Size;
-  UINT16                           NumberOfSections;
-  EFI_PHYSICAL_ADDRESS             SmramBase;
-  UINT64                           ValueInSectionHeader;
-
-  FixLoadingAddress = 0;
-  Status            = EFI_NOT_FOUND;
-  SmramBase         = mCurrentSmramRange->CpuStart;
-  //
-  // Get PeHeader pointer
-  //
-  ImgHdr              = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)((CHAR8 *)ImageContext->Handle + ImageContext->PeCoffHeaderOffset);
-  SectionHeaderOffset = (UINTN)(
-                                ImageContext->PeCoffHeaderOffset +
-                                sizeof (UINT32) +
-                                sizeof (EFI_IMAGE_FILE_HEADER) +
-                                ImgHdr->Pe32.FileHeader.SizeOfOptionalHeader
-                                );
-  NumberOfSections = ImgHdr->Pe32.FileHeader.NumberOfSections;
-
-  //
-  // Get base address from the first section header that doesn't point to code section.
-  //
-  for (Index = 0; Index < NumberOfSections; Index++) {
-    //
-    // Read section header from file
-    //
-    Size   = sizeof (EFI_IMAGE_SECTION_HEADER);
-    Status = ImageContext->ImageRead (
-                             ImageContext->Handle,
-                             SectionHeaderOffset,
-                             &Size,
-                             &SectionHeader
-                             );
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    Status = EFI_NOT_FOUND;
-
-    if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
-      //
-      // Build tool saves the offset to SMRAM base as image base in PointerToRelocations & PointerToLineNumbers fields in the
-      // first section header that doesn't point to code section in image header. And there is an assumption that when the
-      // feature is enabled, if a module is assigned a loading address by tools, PointerToRelocations & PointerToLineNumbers
-      // fields should NOT be Zero, or else, these 2 fields should be set to Zero
-      //
-      ValueInSectionHeader = ReadUnaligned64 ((UINT64 *)&SectionHeader.PointerToRelocations);
-      if (ValueInSectionHeader != 0) {
-        //
-        // Found first section header that doesn't point to code section in which build tool saves the
-        // offset to SMRAM base as image base in PointerToRelocations & PointerToLineNumbers fields
-        //
-        FixLoadingAddress = (EFI_PHYSICAL_ADDRESS)(SmramBase + (INT64)ValueInSectionHeader);
-
-        if ((SmramBase > FixLoadingAddress) && (SmramBase <= FixLoadingAddress)) {
-          //
-          // The assigned address is valid. Return the specified loading address
-          //
-          ImageContext->ImageAddress = FixLoadingAddress;
-          Status                     = EFI_SUCCESS;
-        }
-      }
-
-      break;
-    }
-
-    SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
-  }
-
-  DEBUG ((DEBUG_INFO|DEBUG_LOAD, "LOADING MODULE FIXED INFO: Loading module at fixed address %x, Status = %r \n", FixLoadingAddress, Status));
-  return Status;
 }
 
 /**
@@ -441,9 +302,12 @@ LocateMmFvForMmCore (
       mMmFvSize        = VolumeInfo.FvSize;
       mMmCoreFileName  = &FileHandle->Name;
       MmUnblockMemoryRequest (mMmFvBaseAddress, EFI_SIZE_TO_PAGES (mMmFvSize));
-    }
 
-    return EFI_SUCCESS;
+      return EFI_SUCCESS;
+    } else {
+
+      return EFI_NOT_FOUND;
+    }
   }
 
   return EFI_NOT_FOUND;
@@ -544,20 +408,20 @@ CreatMmHobList (
 }
 
 /**
-  Load the SMM Core image into SMRAM and executes the SMM Core from SMRAM.
+  Load the MM Core image into MMRAM and executes the MM Core from MMRAM.
 
-  @param[in, out] SmramRange            Descriptor for the range of SMRAM to reload the
+  @param[in, out] MmramRange            Descriptor for the range of MMRAM to reload the
                                         currently executing image, the rang of SMRAM to
                                         hold SMM Core will be excluded.
-  @param[in, out] SmramRangeSmmCore     Descriptor for the range of SMRAM to hold SMM Core.
+  @param[in, out] MmramRangeSmmCore     Descriptor for the range of MMRAM to hold MM Core.
 
   @return  EFI_STATUS
 
 **/
 EFI_STATUS
-ExecuteSmmCoreFromSmram (
-  IN OUT EFI_SMRAM_DESCRIPTOR  *SmramRange,
-  IN OUT EFI_SMRAM_DESCRIPTOR  *SmramRangeSmmCore
+ExecuteMmCoreFromMmram (
+  IN OUT EFI_MMRAM_DESCRIPTOR  *MmramRange,
+  IN OUT EFI_MMRAM_DESCRIPTOR  *MmramRangeSmmCore
   )
 {
   EFI_STATUS                    Status;
@@ -596,23 +460,23 @@ ExecuteSmmCoreFromSmram (
 
   //
   // Allocate memory for the image being loaded from the EFI_SRAM_DESCRIPTOR
-  // specified by SmramRange
+  // specified by MmramRange
   //
   PageCount = (UINTN)EFI_SIZE_TO_PAGES ((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
 
-  ASSERT ((SmramRange->PhysicalSize & EFI_PAGE_MASK) == 0);
-  ASSERT (SmramRange->PhysicalSize > EFI_PAGES_TO_SIZE (PageCount));
+  ASSERT ((MmramRange->PhysicalSize & EFI_PAGE_MASK) == 0);
+  ASSERT (MmramRange->PhysicalSize > EFI_PAGES_TO_SIZE (PageCount));
 
-  SmramRange->PhysicalSize        -= EFI_PAGES_TO_SIZE (PageCount);
-  SmramRangeSmmCore->CpuStart      = SmramRange->CpuStart + SmramRange->PhysicalSize;
-  SmramRangeSmmCore->PhysicalStart = SmramRange->PhysicalStart + SmramRange->PhysicalSize;
-  SmramRangeSmmCore->RegionState   = SmramRange->RegionState | EFI_ALLOCATED;
-  SmramRangeSmmCore->PhysicalSize  = EFI_PAGES_TO_SIZE (PageCount);
+  MmramRange->PhysicalSize        -= EFI_PAGES_TO_SIZE (PageCount);
+  MmramRangeSmmCore->CpuStart      = MmramRange->CpuStart + MmramRange->PhysicalSize;
+  MmramRangeSmmCore->PhysicalStart = MmramRange->PhysicalStart + MmramRange->PhysicalSize;
+  MmramRangeSmmCore->RegionState   = MmramRange->RegionState | EFI_ALLOCATED;
+  MmramRangeSmmCore->PhysicalSize  = EFI_PAGES_TO_SIZE (PageCount);
 
   //
   // Align buffer on section boundary
   //
-  ImageContext.ImageAddress = SmramRangeSmmCore->CpuStart;
+  ImageContext.ImageAddress = MmramRangeSmmCore->CpuStart;
 
   ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
   ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)ImageContext.SectionAlignment - 1);
@@ -620,7 +484,7 @@ ExecuteSmmCoreFromSmram (
   //
   // Print debug message showing SMM Core load address.
   //
-  DEBUG ((DEBUG_INFO, "SMM IPL loading SMM Core at SMRAM address %p\n", (VOID *)(UINTN)ImageContext.ImageAddress));
+  DEBUG ((DEBUG_INFO, "SMM IPL loading MM Core at MMRAM address %p\n", (VOID *)(UINTN)ImageContext.ImageAddress));
 
   //
   // Load the image to our new buffer
@@ -658,7 +522,7 @@ ExecuteSmmCoreFromSmram (
       //
       // Print debug message showing Standalone MM Core entry point address.
       //
-      DEBUG ((DEBUG_INFO, "SMM IPL calling Standalone MM Core at SMRAM address - 0x%016lx\n", ImageContext.EntryPoint));
+      DEBUG ((DEBUG_INFO, "SMM IPL calling Standalone MM Core at MMRAM address - 0x%016lx\n", ImageContext.EntryPoint));
 
       //
       // Execute image
@@ -670,10 +534,10 @@ ExecuteSmmCoreFromSmram (
   //
   // If the load operation, relocate operation, or the image execution return an
   // error, then free memory allocated from the EFI_SRAM_DESCRIPTOR specified by
-  // SmramRange
+  // MmramRange
   //
   if (EFI_ERROR (Status)) {
-    SmramRange->PhysicalSize += EFI_PAGES_TO_SIZE (PageCount);
+    MmramRange->PhysicalSize += EFI_PAGES_TO_SIZE (PageCount);
   }
 
   //
@@ -699,52 +563,50 @@ ExecuteSmmCoreFromSmram (
 }
 
 /**
-  Get full SMRAM ranges.
+  Get full MMRAM ranges.
 
-  It will get SMRAM ranges from SmmAccess PPI. It will also reserve one entry
+  It will get MMRAM ranges from SmmAccess PPI. It will also reserve one entry
   for SMM core.
 
-  @param[in]  PeiServices           Describes the list of possible PEI Services.
-  @param[out] FullSmramRangeCount   Output pointer to full SMRAM range count.
+  @param[out] FullMmramRangeCount   Output pointer to full MMRAM range count.
 
-  @return Pointer to full SMRAM ranges.
+  @return Pointer to full MMRAM ranges.
 
 **/
-EFI_SMRAM_DESCRIPTOR *
-GetFullSmramRanges (
-  IN  CONST EFI_PEI_SERVICES  **PeiServices,
-  OUT       UINTN             *FullSmramRangeCount
+EFI_MMRAM_DESCRIPTOR *
+GetFullMmramRanges (
+  OUT  UINTN  *FullMmramRangeCount
   )
 {
   UINTN                           Size;
   UINTN                           Index;
-  EFI_SMRAM_DESCRIPTOR            *FullSmramRanges;
-  UINTN                           AdditionSmramRangeCount;
-  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
-  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *NewDescriptorBlock;
-  EFI_HOB_GUID_TYPE               *GuidHob;
   UINTN                           MmramRangeCount;
+  UINTN                           AdditionMmramRangeCount;
+  EFI_MMRAM_DESCRIPTOR            *FullMmramRanges;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *NewDescriptorBlock;
+  EFI_HOB_GUID_TYPE               *GuidHob;
 
   //
-  // Get SMRAM information.
+  // Get MMRAM information.
   //
   GuidHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
   ASSERT (GuidHob != NULL);
   if (GuidHob == NULL) {
-    DEBUG ((DEBUG_ERROR, "SmramMemoryReserve HOB not found\n"));
+    DEBUG ((DEBUG_ERROR, "MmramMemoryReserve HOB not found\n"));
   }
 
-  DescriptorBlock = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)(GET_GUID_HOB_DATA (GuidHob));
-  MmramRangeCount = DescriptorBlock->NumberOfSmmReservedRegions;
+  DescriptorBlock = (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK *)(GET_GUID_HOB_DATA (GuidHob));
+  MmramRangeCount = DescriptorBlock->NumberOfMmReservedRegions;
 
   //
-  // Reserve one entry SMM Core in the full SMRAM ranges.
+  // Reserve one entry MM Core in the full MMRAM ranges.
   //
-  AdditionSmramRangeCount = 1;
+  AdditionMmramRangeCount = 1;
 
-  *FullSmramRangeCount = MmramRangeCount + AdditionSmramRangeCount;
-  Size                 = sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + ((*FullSmramRangeCount - 1) * sizeof (EFI_SMRAM_DESCRIPTOR));
-  NewDescriptorBlock   = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)BuildGuidHob (
+  *FullMmramRangeCount = MmramRangeCount + AdditionMmramRangeCount;
+  Size                 = sizeof (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK) + ((*FullMmramRangeCount - 1) * sizeof (EFI_MMRAM_DESCRIPTOR));
+  NewDescriptorBlock   = (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK *)BuildGuidHob (
                                                              &gEfiSmmSmramMemoryGuid,
                                                              Size
                                                              );
@@ -753,17 +615,17 @@ GetFullSmramRanges (
     return NULL;
   }
 
-  NewDescriptorBlock->NumberOfSmmReservedRegions = (UINT32)*FullSmramRangeCount;
-  FullSmramRanges                                = NewDescriptorBlock->Descriptor;
+  NewDescriptorBlock->NumberOfMmReservedRegions = (UINT32)*FullMmramRangeCount;
+  FullMmramRanges                                = NewDescriptorBlock->Descriptor;
 
   //
-  // Get SMRAM descriptors and fill to the full SMRAM ranges
+  // Get MMRAM descriptors and fill to the full MMRAM ranges
   //
   for (Index = 0; Index < MmramRangeCount; Index++) {
-    FullSmramRanges[Index].PhysicalStart = DescriptorBlock->Descriptor[Index].PhysicalStart;
-    FullSmramRanges[Index].CpuStart      = DescriptorBlock->Descriptor[Index].CpuStart;
-    FullSmramRanges[Index].PhysicalSize  = DescriptorBlock->Descriptor[Index].PhysicalSize;
-    FullSmramRanges[Index].RegionState   = DescriptorBlock->Descriptor[Index].RegionState;
+    FullMmramRanges[Index].PhysicalStart = DescriptorBlock->Descriptor[Index].PhysicalStart;
+    FullMmramRanges[Index].CpuStart      = DescriptorBlock->Descriptor[Index].CpuStart;
+    FullMmramRanges[Index].PhysicalSize  = DescriptorBlock->Descriptor[Index].PhysicalSize;
+    FullMmramRanges[Index].RegionState   = DescriptorBlock->Descriptor[Index].RegionState;
   }
 
   //
@@ -771,7 +633,97 @@ GetFullSmramRanges (
   //
   ZeroMem (&GuidHob->Name, sizeof (GuidHob->Name));
 
-  return FullSmramRanges;
+  return FullMmramRanges;
+}
+
+/**
+  Locate the MM Core image into MMRAM and executes from MMRAM to dispatch MM drivers.
+
+  @retval  EFI_STATUS        Locate and execute MM core successfully.
+  @retval  Other             Locate and execute MM core failed.
+
+**/
+EFI_STATUS
+LoadMmCoreDispatchMmDrivers (
+  VOID
+  )
+{
+  EFI_STATUS            Status;
+  UINTN                 Index;
+  UINT64                MaxSize;
+  EFI_MMRAM_DESCRIPTOR  *MmramRanges;
+  EFI_MMRAM_DESCRIPTOR  *CurrentMmramRange;
+
+  //
+  // Get MMRAM information
+  //
+  mMmramRanges = (EFI_PHYSICAL_ADDRESS)(UINTN)GetFullMmramRanges ((UINTN *)&mMmramRangeCount);
+  ASSERT (mMmramRanges != 0);
+  if (mMmramRanges == 0) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Find the largest MMRAM range between 1MB and 4GB that is at least 256KB - 4K in size
+  //
+  CurrentMmramRange = NULL;
+  MmramRanges        = (EFI_MMRAM_DESCRIPTOR *)(UINTN)mMmramRanges;
+  if (MmramRanges == NULL) {
+    DEBUG ((DEBUG_ERROR, "Fail to retrieve MmramRanges\n"));
+    return EFI_UNSUPPORTED;
+  }
+
+  for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < mMmramRangeCount; Index++) {
+    //
+    // Skip any MMRAM region that is already allocated, needs testing, or needs ECC initialization
+    //
+    if ((MmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
+      continue;
+    }
+
+    if (MmramRanges[Index].CpuStart >= BASE_1MB) {
+      if ((MmramRanges[Index].CpuStart + MmramRanges[Index].PhysicalSize) <= BASE_4GB) {
+        if (MmramRanges[Index].PhysicalSize >= MaxSize) {
+          MaxSize            = MmramRanges[Index].PhysicalSize;
+          CurrentMmramRange = &MmramRanges[Index];
+        }
+      }
+    }
+  }
+
+  if (CurrentMmramRange != NULL) {
+    //
+    // Print debug message showing MMRAM window that will be used by SMM IPL and SMM Core
+    //
+    DEBUG ((
+      DEBUG_INFO,
+      "SMM IPL found MMRAM window %p - %p\n",
+      (VOID *)(UINTN)CurrentMmramRange->CpuStart,
+      (VOID *)(UINTN)(CurrentMmramRange->CpuStart + CurrentMmramRange->PhysicalSize - 1)
+      ));
+
+    //
+    // Load MM Core into MMRAM and execute it from MMRAM
+    // Note: MmramRanges specific for MM Core will put in the mMmramRangeCount - 1.
+    //
+    Status = ExecuteMmCoreFromMmram (
+               CurrentMmramRange,
+               &(((EFI_MMRAM_DESCRIPTOR *)(UINTN)mMmramRanges)[mMmramRangeCount - 1])
+               );
+    if (EFI_ERROR (Status)) {
+      //
+      // Print error message that the SMM Core failed to be loaded and executed.
+      //
+      DEBUG ((DEBUG_ERROR, "SMM IPL could not load and execute MM Core from MMRAM\n"));
+    }
+  } else {
+    //
+    // Print error message that there are not enough MMRAM resources to load the MM Core.
+    //
+    DEBUG ((DEBUG_ERROR, "MM IPL could not find a large enough MMRAM region to load MM Core\n"));
+  }
+
+  return Status;
 }
 
 /**
@@ -854,9 +806,9 @@ SmmIplDispatchDriver (
 }
 
 /**
-  The Entry Point for SMM IPL at PEI stage.
+  The Entry Point for MM IPL at PEI stage.
 
-  Load SMM Core into SMRAM.
+  Load MM Core into MMRAM.
 
   @param  FileHandle  Handle of the file being invoked.
   @param  PeiServices Describes the list of possible PEI Services.
@@ -873,9 +825,6 @@ StandaloneMmIplPeiEntry (
   )
 {
   EFI_STATUS               Status;
-  UINTN                    Index;
-  UINT64                   MaxSize;
-  EFI_SMRAM_DESCRIPTOR     *MmramRanges;
   MM_COMM_BUFFER_DATA      MmCommBufferData;
 
   //
@@ -929,79 +878,13 @@ StandaloneMmIplPeiEntry (
     );
 
   //
-  // Get SMRAM information
+  // Locate and execute Mm Core to dispatch MM drivers.
   //
-  mMmramRanges = (EFI_PHYSICAL_ADDRESS)(UINTN)GetFullSmramRanges (PeiServices, (UINTN *)&mMmramRangeCount);
-  ASSERT (mMmramRanges != 0);
-  if (mMmramRanges == 0) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Print debug message that the SMRAM window is now open.
-  //
-  DEBUG ((DEBUG_INFO, "SMM IPL opened SMRAM window\n"));
-
-  //
-  // Find the largest SMRAM range between 1MB and 4GB that is at least 256KB - 4K in size
-  //
-  mCurrentSmramRange = NULL;
-  MmramRanges        = (EFI_MMRAM_DESCRIPTOR *)(UINTN)mMmramRanges;
-  if (MmramRanges == NULL) {
-    DEBUG ((DEBUG_ERROR, "Fail to retrieve MmramRanges\n"));
-    return EFI_UNSUPPORTED;
-  }
-
-  for (Index = 0, MaxSize = SIZE_256KB - EFI_PAGE_SIZE; Index < mMmramRangeCount; Index++) {
-    //
-    // Skip any SMRAM region that is already allocated, needs testing, or needs ECC initialization
-    //
-    if ((MmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
-      continue;
-    }
-
-    if (MmramRanges[Index].CpuStart >= BASE_1MB) {
-      if ((MmramRanges[Index].CpuStart + MmramRanges[Index].PhysicalSize) <= BASE_4GB) {
-        if (MmramRanges[Index].PhysicalSize >= MaxSize) {
-          MaxSize            = MmramRanges[Index].PhysicalSize;
-          mCurrentSmramRange = &MmramRanges[Index];
-        }
-      }
-    }
-  }
-
-  if (mCurrentSmramRange != NULL) {
-    //
-    // Print debug message showing SMRAM window that will be used by SMM IPL and SMM Core
-    //
-    DEBUG ((
-      DEBUG_INFO,
-      "SMM IPL found SMRAM window %p - %p\n",
-      (VOID *)(UINTN)mCurrentSmramRange->CpuStart,
-      (VOID *)(UINTN)(mCurrentSmramRange->CpuStart + mCurrentSmramRange->PhysicalSize - 1)
-      ));
-
-    GetSmramCacheRange (mCurrentSmramRange, &mSmramCacheBase, &mSmramCacheSize);
-
-    //
-    // Load SMM Core into SMRAM and execute it from SMRAM
-    // Note: SmramRanges specific for SMM Core will put in the mMmramRangeCount - 1.
-    //
-    Status = ExecuteSmmCoreFromSmram (
-               mCurrentSmramRange,
-               &(((EFI_MMRAM_DESCRIPTOR *)(UINTN)mMmramRanges)[mMmramRangeCount - 1])
-               );
-    if (EFI_ERROR (Status)) {
-      //
-      // Print error message that the SMM Core failed to be loaded and executed.
-      //
-      DEBUG ((DEBUG_ERROR, "SMM IPL could not load and execute SMM Core from SMRAM\n"));
-    }
-  } else {
-    //
-    // Print error message that there are not enough SMRAM resources to load the SMM Core.
-    //
-    DEBUG ((DEBUG_ERROR, "SMM IPL could not find a large enough SMRAM region to load SMM Core\n"));
+  Status = LoadMmCoreDispatchMmDrivers ();
+  ASSERT_EFI_ERROR (Status);
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Fail to load and execute MM Core\n"));
+    return Status;
   }
 
   //

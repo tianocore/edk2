@@ -623,6 +623,14 @@ CreateMmFoundationHobList (
   EFI_RESOURCE_ATTRIBUTE_TYPE  Attribute;
   EFI_RESOURCE_ATTRIBUTE_TYPE  SmmProfileDataAttribute;
 
+  if (FoundationHobSize == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  if ((*FoundationHobSize != 0) && (FoundationHobList == NULL)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
   Attribute = EFI_RESOURCE_ATTRIBUTE_PRESENT |
               EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
               EFI_RESOURCE_ATTRIBUTE_TESTED;
@@ -631,14 +639,6 @@ CreateMmFoundationHobList (
 
   if (FeaturePcdGet (PcdCpuSmmProfileEnable) == TRUE) {
     Attribute |= EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING;
-  }
-
-  if (FoundationHobSize == NULL) {
-    return RETURN_INVALID_PARAMETER;
-  }
-
-  if ((*FoundationHobSize != 0) && (FoundationHobList == NULL)) {
-    return RETURN_INVALID_PARAMETER;
   }
 
   RequiredSize = 0;
