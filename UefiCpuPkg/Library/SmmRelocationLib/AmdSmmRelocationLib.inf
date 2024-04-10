@@ -22,7 +22,7 @@
 
 [Sources]
   InternalSmmRelocationLib.h
-  AmdHookReturnFromSmm.c
+  AmdSmramSaveStateConfig.c
   SmmRelocationLib.c
 
 [Sources.Ia32]

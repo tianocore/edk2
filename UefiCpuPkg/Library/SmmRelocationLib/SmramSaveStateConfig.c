@@ -1,8 +1,5 @@
 /** @file
-  Hook return code from Smm.
-
-  Hook the code executed immediately after an RSM instruction on the currently
-  executing CPU.
+  Config SMRAM Save State for SmmBases Relocation.
 
   Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -11,19 +8,42 @@
 #include "InternalSmmRelocationLib.h"
 
 /**
+  This function configures the SmBase on the currently executing CPU.
+
+  @param[in]     CpuIndex             The index of the CPU.
+  @param[in out] CpuState             Pointer to SMRAM Save State Map for the
+                                      currently executing CPU. On out, SmBase is
+                                      updated to the new value.
+
+**/
+VOID
+EFIAPI
+ConfigureSmBase (
+  IN     UINTN                 CpuIndex,
+  IN OUT SMRAM_SAVE_STATE_MAP  *CpuState
+  )
+{
+  if (mSmmSaveStateRegisterLma == EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT) {
+    CpuState->x86.SMBASE = (UINT32)mSmBaseForAllCpus[CpuIndex];
+  } else {
+    CpuState->x64.SMBASE = (UINT32)mSmBaseForAllCpus[CpuIndex];
+  }
+}
+
+/**
   Hook the code executed immediately after an RSM instruction on the currently
   executing CPU.  The mode of code executed immediately after RSM must be
   detected, and the appropriate hook must be selected.  Always clear the auto
   HALT restart flag if it is set.
 
-  @param[in] CpuIndex                 The processor index for the currently
-                                      executing CPU.
-  @param[in] CpuState                 Pointer to SMRAM Save State Map for the
-                                      currently executing CPU.
-  @param[in] NewInstructionPointer32  Instruction pointer to use if resuming to
-                                      32-bit mode from 64-bit SMM.
-  @param[in] NewInstructionPointer    Instruction pointer to use if resuming to
-                                      same mode as SMM.
+  @param[in]     CpuIndex                 The processor index for the currently
+                                          executing CPU.
+  @param[in out] CpuState                 Pointer to SMRAM Save State Map for the
+                                          currently executing CPU.
+  @param[in]     NewInstructionPointer32  Instruction pointer to use if resuming to
+                                          32-bit mode from 64-bit SMM.
+  @param[in]     NewInstructionPointer    Instruction pointer to use if resuming to
+                                          same mode as SMM.
 
   @retval The value of the original instruction pointer before it was hooked.
 
@@ -31,10 +51,10 @@
 UINT64
 EFIAPI
 HookReturnFromSmm (
-  IN UINTN              CpuIndex,
-  SMRAM_SAVE_STATE_MAP  *CpuState,
-  UINT64                NewInstructionPointer32,
-  UINT64                NewInstructionPointer
+  IN     UINTN                 CpuIndex,
+  IN OUT SMRAM_SAVE_STATE_MAP  *CpuState,
+  IN     UINT64                NewInstructionPointer32,
+  IN     UINT64                NewInstructionPointer
   )
 {
   UINT64  OriginalInstructionPointer;

@@ -22,7 +22,7 @@
 
 [Sources]
   InternalSmmRelocationLib.h
-  OvmfHookReturnFromSmm.c
+  OvmfSmramSaveStateConfig.c
   SmmRelocationLib.c
 
 [Sources.Ia32]

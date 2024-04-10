@@ -60,8 +60,8 @@ SmmInitHandler (
       //
       // Configure SmBase.
       //
-      CpuState             = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
-      CpuState->x86.SMBASE = (UINT32)mSmBaseForAllCpus[Index];
+      CpuState = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+      ConfigureSmBase (Index, CpuState);
 
       //
       // Hook return after RSM to set SMM re-based flag
