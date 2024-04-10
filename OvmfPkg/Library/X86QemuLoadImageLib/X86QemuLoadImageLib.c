@@ -57,6 +57,25 @@ STATIC CONST KERNEL_VENMEDIA_FILE_DEVPATH  mKernelDevicePath = {
   }
 };
 
+STATIC CONST KERNEL_VENMEDIA_FILE_DEVPATH  mShimDevicePath = {
+  {
+    {
+      MEDIA_DEVICE_PATH, MEDIA_VENDOR_DP,
+      { sizeof (VENDOR_DEVICE_PATH)       }
+    },
+    QEMU_KERNEL_LOADER_FS_MEDIA_GUID
+  },  {
+    {
+      MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP,
+      { sizeof (KERNEL_FILE_DEVPATH)      }
+    },
+    L"shim",
+  },  {
+    END_DEVICE_PATH_TYPE, END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    { sizeof (EFI_DEVICE_PATH_PROTOCOL) }
+  }
+};
+
 STATIC
 VOID
 FreeLegacyImage (
@@ -339,6 +358,7 @@ QemuLoadKernelImage (
   UINTN                      CommandLineSize;
   CHAR8                      *CommandLine;
   UINTN                      InitrdSize;
+  BOOLEAN                    Shim;
 
   //
   // Redundant assignment to work around GCC48/GCC49 limitations.
@@ -351,11 +371,35 @@ QemuLoadKernelImage (
   Status = gBS->LoadImage (
                   FALSE,                    // BootPolicy: exact match required
                   gImageHandle,             // ParentImageHandle
-                  (EFI_DEVICE_PATH_PROTOCOL *)&mKernelDevicePath,
+                  (EFI_DEVICE_PATH_PROTOCOL *)&mShimDevicePath,
                   NULL,                     // SourceBuffer
                   0,                        // SourceSize
                   &KernelImageHandle
                   );
+  if (Status == EFI_SUCCESS) {
+    Shim = TRUE;
+    DEBUG ((DEBUG_INFO, "%a: booting via shim\n", __func__));
+  } else {
+    Shim = FALSE;
+    if (Status == EFI_SECURITY_VIOLATION) {
+      gBS->UnloadImage (KernelImageHandle);
+    }
+
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((DEBUG_INFO, "%a: LoadImage(shim): %r\n", __func__, Status));
+      return Status;
+    }
+
+    Status = gBS->LoadImage (
+                    FALSE,                  // BootPolicy: exact match required
+                    gImageHandle,           // ParentImageHandle
+                    (EFI_DEVICE_PATH_PROTOCOL *)&mKernelDevicePath,
+                    NULL,                   // SourceBuffer
+                    0,                      // SourceSize
+                    &KernelImageHandle
+                    );
+  }
+
   switch (Status) {
     case EFI_SUCCESS:
       break;
@@ -465,6 +509,13 @@ QemuLoadKernelImage (
     KernelLoadedImage->LoadOptionsSize += sizeof (L" initrd=initrd") - 2;
   }
 
+  if (Shim) {
+    //
+    // Prefix 'kernel ' in UTF-16.
+    //
+    KernelLoadedImage->LoadOptionsSize += sizeof (L"kernel ") - 2;
+  }
+
   if (KernelLoadedImage->LoadOptionsSize == 0) {
     KernelLoadedImage->LoadOptions = NULL;
   } else {
@@ -485,7 +536,8 @@ QemuLoadKernelImage (
     UnicodeSPrintAsciiFormat (
       KernelLoadedImage->LoadOptions,
       KernelLoadedImage->LoadOptionsSize,
-      "%a%a",
+      "%a%a%a",
+      (Shim == FALSE)        ?  "" : "kernel ",
       (CommandLineSize == 0) ?  "" : CommandLine,
       (InitrdSize == 0)      ?  "" : " initrd=initrd"
       );
