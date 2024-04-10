@@ -45,6 +45,7 @@ typedef struct {
     FIRMWARE_CONFIG_ITEM CONST    DataKey;
     UINT32                        Size;
   }                             FwCfgItem[2];
+  CHAR8           FwCfgName[16];
   UINT32          Size;
   UINT8           *Data;
 } KERNEL_BLOB;
@@ -55,7 +56,8 @@ STATIC KERNEL_BLOB  mKernelBlob[KernelBlobTypeMax] = {
     {
       { QemuFwCfgItemKernelSetupSize, QemuFwCfgItemKernelSetupData, },
       { QemuFwCfgItemKernelSize,      QemuFwCfgItemKernelData,      },
-    }
+    },
+    "etc/boot/kernel",
   },  {
     L"initrd",
     {
@@ -920,6 +922,47 @@ STATIC CONST EFI_LOAD_FILE2_PROTOCOL  mInitrdLoadFile2 = {
 // Utility functions.
 //
 
+STATIC
+EFI_STATUS
+FetchNamedBlob (
+  IN OUT KERNEL_BLOB  *Blob
+  )
+{
+  FIRMWARE_CONFIG_ITEM  Item;
+  UINTN                 Size;
+  EFI_STATUS            Status;
+
+  Status = QemuFwCfgFindFile (Blob->FwCfgName, &Item, &Size);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Blob->Size = (UINT32)Size;
+  Blob->Data = AllocatePool (Blob->Size);
+  if (Blob->Data == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: failed to allocate %Ld bytes for \"%s\"\n",
+      __func__,
+      (INT64)Blob->Size,
+      Blob->Name
+      ));
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: loading %a -> %s (%lu bytes)\n",
+    __func__,
+    Blob->FwCfgName,
+    Blob->Name,
+    (UINT64)Blob->Size
+    ));
+  QemuFwCfgSelectItem (Item);
+  QemuFwCfgReadBytes (Blob->Size, Blob->Data);
+  return EFI_SUCCESS;
+}
+
 /**
   Populate a blob in mKernelBlob.
 
@@ -938,9 +981,17 @@ FetchBlob (
   IN OUT KERNEL_BLOB  *Blob
   )
 {
-  UINT32  Left;
-  UINTN   Idx;
-  UINT8   *ChunkData;
+  UINT32      Left;
+  UINTN       Idx;
+  UINT8       *ChunkData;
+  EFI_STATUS  Status;
+
+  if (Blob->FwCfgName) {
+    Status = FetchNamedBlob (Blob);
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
 
   //
   // Read blob size.
