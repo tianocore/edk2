@@ -2709,8 +2709,10 @@ ShellCommandLineGetCount (
         ; Node1 = GetNextNode (CheckPackage, Node1)
         )
   {
-    if (((SHELL_PARAM_PACKAGE *)Node1)->Name == NULL) {
+    if (((SHELL_PARAM_PACKAGE *)Node1)->Name != NULL) {
       Count++;
+    } else {
+      break;
     }
   }
 
