@@ -7,11 +7,32 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <PiDxe.h>
-#include <Library/HobLib.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Guid/XenInfo.h>
+#include <Library/HobLib.h>
+#include <Library/CpuLib.h>
 
-STATIC VOID  *HyperPage;
+INTN            UseVmmCall = -1;
+static BOOLEAN  HypercallAvail;
+
+//
+// Interface exposed by the ASM implementation of the core hypercall
+//
+INTN
+EFIAPI
+__XenVmmcall2 (
+  IN     INTN  HypercallNum,
+  IN OUT INTN  Arg1,
+  IN OUT INTN  Arg2
+  );
+
+INTN
+EFIAPI
+__XenVmcall2 (
+  IN     INTN  HypercallNum,
+  IN OUT INTN  Arg1,
+  IN OUT INTN  Arg2
+  );
 
 /**
   Check if the Xen Hypercall library is able to make calls to the Xen
@@ -29,23 +50,11 @@ XenHypercallIsAvailable (
   VOID
   )
 {
-  return HyperPage != NULL;
+  return HypercallAvail;
 }
 
-//
-// Interface exposed by the ASM implementation of the core hypercall
-//
-INTN
-EFIAPI
-__XenHypercall2 (
-  IN     VOID  *HypercallAddr,
-  IN OUT INTN  Arg1,
-  IN OUT INTN  Arg2
-  );
-
 /**
-  Library constructor: retrieves the Hyperpage address
-  from the gEfiXenInfoGuid HOB
+  Library constructor: Check for gEfiXenInfoGuid HOB
 **/
 RETURN_STATUS
 EFIAPI
@@ -54,15 +63,39 @@ XenHypercallLibInit (
   )
 {
   EFI_HOB_GUID_TYPE  *GuidHob;
-  EFI_XEN_INFO       *XenInfo;
+  CHAR8              sig[13];
 
   GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
   if (GuidHob == NULL) {
     return RETURN_NOT_FOUND;
   }
 
-  XenInfo   = (EFI_XEN_INFO *)GET_GUID_HOB_DATA (GuidHob);
-  HyperPage = XenInfo->HyperPages;
+  sig[12] = '\0';
+  AsmCpuid (
+    0,
+    NULL,
+    (UINT32 *)&sig[0],
+    (UINT32 *)&sig[8],
+    (UINT32 *)&sig[4]
+    );
+
+  DEBUG ((DEBUG_ERROR, "Detected CPU \"%12a\"\n", sig));
+
+  if ((AsciiStrCmp ("AuthenticAMD", sig) == 0) ||
+      (AsciiStrCmp ("HygonGenuine", sig) == 0))
+  {
+    UseVmmCall = TRUE;
+  } else if ((AsciiStrCmp ("GenuineIntel", sig) == 0) ||
+             (AsciiStrCmp ("CentaurHauls", sig) == 0) ||
+             (AsciiStrCmp ("  Shanghai  ", sig) == 0))
+  {
+    UseVmmCall = FALSE;
+  } else {
+    return RETURN_NOT_FOUND;
+  }
+
+  HypercallAvail = TRUE;
+
   return RETURN_SUCCESS;
 }
 
@@ -84,7 +117,9 @@ XenHypercall2 (
   IN OUT INTN   Arg2
   )
 {
-  ASSERT (HyperPage != NULL);
-
-  return __XenHypercall2 ((UINT8 *)HyperPage + HypercallID * 32, Arg1, Arg2);
+  if (UseVmmCall) {
+    return __XenVmmcall2 (HypercallID, Arg1, Arg2);
+  } else {
+    return __XenVmcall2 (HypercallID, Arg1, Arg2);
+  }
 }
