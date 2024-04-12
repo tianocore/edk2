@@ -1,0 +1,14 @@
+// /** @file
+// CPU Memory Manager Unit library instance.
+//
+// CPU Memory Manager Unit library instance.
+//
+// Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "CPU Memory Manager Unit library instance."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "CPU Memory Manager Unit library instance."
