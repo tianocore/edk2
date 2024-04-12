@@ -722,33 +722,50 @@ FillBufferWithBootHashAlg (
 }
 
 /**
-  Set ConfigInfo according to TpmAlgHash.
+  Set ConfigInfo according to TpmAlgHash and Tcg2HashAlgBitmap.
 
   @param[in,out] Tcg2ConfigInfo       TCG2 config info.
   @param[in]     TpmAlgHash           TpmAlgHash.
+  @param[in]     Tcg2HashAlgBitmap    TCG2 Hash Algorithm Bitmap.
 
 **/
 VOID
 SetConfigInfo (
   IN OUT TCG2_CONFIGURATION_INFO  *Tcg2ConfigInfo,
-  IN UINT32                       TpmAlgHash
+  IN UINT32                       TpmAlgHash,
+  IN UINT32                       Tcg2HashAlgBitmap
   )
 {
   switch (TpmAlgHash) {
     case TPM_ALG_SHA1:
-      Tcg2ConfigInfo->Sha1Supported = TRUE;
+      if ((Tcg2HashAlgBitmap & HASH_ALG_SHA1) != 0) {
+        Tcg2ConfigInfo->Sha1Supported = TRUE;
+      }
+
       break;
     case TPM_ALG_SHA256:
-      Tcg2ConfigInfo->Sha256Supported = TRUE;
+      if ((Tcg2HashAlgBitmap & HASH_ALG_SHA256) != 0) {
+        Tcg2ConfigInfo->Sha256Supported = TRUE;
+      }
+
       break;
     case TPM_ALG_SHA384:
-      Tcg2ConfigInfo->Sha384Supported = TRUE;
+      if ((Tcg2HashAlgBitmap & HASH_ALG_SHA384) != 0) {
+        Tcg2ConfigInfo->Sha384Supported = TRUE;
+      }
+
       break;
     case TPM_ALG_SHA512:
-      Tcg2ConfigInfo->Sha512Supported = TRUE;
+      if ((Tcg2HashAlgBitmap & HASH_ALG_SHA512) != 0) {
+        Tcg2ConfigInfo->Sha512Supported = TRUE;
+      }
+
       break;
     case TPM_ALG_SM3_256:
-      Tcg2ConfigInfo->Sm3Supported = TRUE;
+      if ((Tcg2HashAlgBitmap & HASH_ALG_SM3_256) != 0) {
+        Tcg2ConfigInfo->Sm3Supported = TRUE;
+      }
+
       break;
   }
 }
@@ -809,16 +826,17 @@ InstallTcg2ConfigForm (
   IN OUT TCG2_CONFIG_PRIVATE_DATA  *PrivateData
   )
 {
-  EFI_STATUS                      Status;
-  EFI_HII_HANDLE                  HiiHandle;
-  EFI_HANDLE                      DriverHandle;
-  EFI_HII_CONFIG_ACCESS_PROTOCOL  *ConfigAccess;
-  UINTN                           Index;
-  TPML_PCR_SELECTION              Pcrs;
-  CHAR16                          TempBuffer[1024];
-  TCG2_CONFIGURATION_INFO         Tcg2ConfigInfo;
-  TPM2_PTP_INTERFACE_TYPE         TpmDeviceInterfaceDetected;
-  BOOLEAN                         IsCmdImp = FALSE;
+  EFI_STATUS                       Status;
+  EFI_HII_HANDLE                   HiiHandle;
+  EFI_HANDLE                       DriverHandle;
+  EFI_HII_CONFIG_ACCESS_PROTOCOL   *ConfigAccess;
+  UINTN                            Index;
+  TPML_PCR_SELECTION               Pcrs;
+  CHAR16                           TempBuffer[1024];
+  TCG2_CONFIGURATION_INFO          Tcg2ConfigInfo;
+  TPM2_PTP_INTERFACE_TYPE          TpmDeviceInterfaceDetected;
+  BOOLEAN                          IsCmdImp;
+  EFI_TCG2_EVENT_ALGORITHM_BITMAP  Tcg2HashAlgorithmBitmap;
 
   DriverHandle = NULL;
   ConfigAccess = &PrivateData->ConfigAccess;
@@ -879,6 +897,8 @@ InstallTcg2ConfigForm (
       break;
   }
 
+  Tcg2HashAlgorithmBitmap = PcdGet32 (PcdTcg2HashAlgorithmBitmap);
+
   ZeroMem (&Tcg2ConfigInfo, sizeof (Tcg2ConfigInfo));
   Status = Tpm2GetCapabilityPcrs (&Pcrs);
   if (EFI_ERROR (Status)) {
@@ -897,20 +917,21 @@ InstallTcg2ConfigForm (
     TempBuffer[0] = 0;
     for (Index = 0; Index < Pcrs.count; Index++) {
       AppendBufferWithTpmAlgHash (TempBuffer, sizeof (TempBuffer), Pcrs.pcrSelections[Index].hash);
-      SetConfigInfo (&Tcg2ConfigInfo, Pcrs.pcrSelections[Index].hash);
+      SetConfigInfo (&Tcg2ConfigInfo, Pcrs.pcrSelections[Index].hash, Tcg2HashAlgorithmBitmap);
     }
 
     HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TPM2_SUPPORTED_HASH_ALGO_CONTENT), TempBuffer, NULL);
   }
 
-  Status = Tpm2GetCapabilityIsCommandImplemented (TPM_CC_ChangeEPS, &IsCmdImp);
+  IsCmdImp = FALSE;
+  Status   = Tpm2GetCapabilityIsCommandImplemented (TPM_CC_ChangeEPS, &IsCmdImp);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Tpm2GetCapabilityIsCmdImpl fails %r\n", Status));
   }
 
   Tcg2ConfigInfo.ChangeEPSSupported = IsCmdImp;
 
-  FillBufferWithBootHashAlg (TempBuffer, sizeof (TempBuffer), PcdGet32 (PcdTcg2HashAlgorithmBitmap));
+  FillBufferWithBootHashAlg (TempBuffer, sizeof (TempBuffer), Tcg2HashAlgorithmBitmap);
   HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_BIOS_HASH_ALGO_CONTENT), TempBuffer, NULL);
 
   //
