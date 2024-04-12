@@ -2,6 +2,7 @@
 #  MP Initialize Library instance for PEI driver.
 #
 #  Copyright (c) 2016 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -18,7 +19,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
 #
 
 [Sources.IA32]
@@ -29,7 +30,7 @@
   X64/AmdSev.c
   X64/MpFuncs.nasm
 
-[Sources.common]
+[Sources.IA32, Sources.X64]
   AmdSev.c
   Microcode.c
   MpEqu.inc
@@ -38,6 +39,11 @@
   MpHandOff.h
   PeiMpLib.c
 
+[Sources.LoongArch64]
+  LoongArch64/PeiMpLib.c
+  LoongArch64/MpLib.c
+  LoongArch64/MpLib.h
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -45,16 +51,18 @@
 
 [LibraryClasses]
   BaseLib
-  CcExitLib
   CpuLib
   HobLib
-  LocalApicLib
   MemoryAllocationLib
-  MicrocodeLib
-  MtrrLib
   PcdLib
   PeiServicesLib
   SynchronizationLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  CcExitLib
+  LocalApicLib
+  MicrocodeLib
+  MtrrLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                       ## CONSUMES
@@ -77,3 +85,6 @@
 [Guids]
   gEdkiiS3SmmInitDoneGuid
   gEdkiiMicrocodePatchHobGuid
+
+[Guids.LoongArch64]
+  gProcessorResourceHobGuid              ## SOMETIMES_CONSUMES  ## HOB

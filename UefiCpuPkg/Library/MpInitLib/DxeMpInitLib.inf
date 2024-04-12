@@ -2,6 +2,7 @@
 #  MP Initialize Library instance for DXE driver.
 #
 #  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -18,7 +19,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
 #
 
 [Sources.IA32]
@@ -31,7 +32,7 @@
   X64/CreatePageTable.c
   X64/MpFuncs.nasm
 
-[Sources.common]
+[Sources.IA32, Sources.X64]
   AmdSev.c
   DxeMpLib.c
   Microcode.c
@@ -40,6 +41,11 @@
   MpLib.h
   MpHandOff.h
 
+[Sources.LoongArch64]
+  LoongArch64/DxeMpLib.c
+  LoongArch64/MpLib.c
+  LoongArch64/MpLib.h
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -47,17 +53,19 @@
 
 [LibraryClasses]
   BaseLib
-  CcExitLib
   CpuLib
   DebugAgentLib
   HobLib
-  LocalApicLib
   MemoryAllocationLib
-  MicrocodeLib
-  MtrrLib
   PcdLib
   SynchronizationLib
   UefiBootServicesTableLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  CcExitLib
+  LocalApicLib
+  MicrocodeLib
+  MtrrLib
 
 [LibraryClasses.X64]
   CpuPageTableLib
@@ -69,6 +77,9 @@
   gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event
   gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES  ## Event
   gEdkiiMicrocodePatchHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
+
+[Guids.LoongArch64]
+  gProcessorResourceHobGuid                     ## SOMETIMES_CONSUMES  ## HOB
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
