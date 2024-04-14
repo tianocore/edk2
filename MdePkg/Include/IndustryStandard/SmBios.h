@@ -880,7 +880,14 @@ typedef enum {
   ProcessorUpgradeSocketBGA1190   = 0x4D,
   ProcessorUpgradeSocketBGA4129   = 0x4E,
   ProcessorUpgradeSocketLGA4710   = 0x4F,
-  ProcessorUpgradeSocketLGA7529   = 0x50
+  ProcessorUpgradeSocketLGA7529   = 0x50,
+  ProcessorUpgradeSocketBGA1964   = 0x51,
+  ProcessorUpgradeSocketBGA1792   = 0x52,
+  ProcessorUpgradeSocketBGA2049   = 0x53,
+  ProcessorUpgradeSocketBGA2551   = 0x54,
+  ProcessorUpgradeSocketLGA1851   = 0x55,
+  ProcessorUpgradeSocketBGA2114   = 0x56,
+  ProcessorUpgradeSocketBGA2833   = 0x57
 } PROCESSOR_UPGRADE;
 
 ///
