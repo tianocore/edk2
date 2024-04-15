@@ -48,7 +48,7 @@
 
 [Protocols]
   gEfiDxeSmmReadyToLockProtocolGuid        ## NOTIFY
-  gEfiMmCommunicationProtocolGuid          ## produce
+  gEfiMmCommunicationProtocolGuid          ## PRODUCES
   gEfiMmCommunication2ProtocolGuid         ## PRODUCES
   gEfiSmmAccess2ProtocolGuid
   gEfiSmmControl2ProtocolGuid

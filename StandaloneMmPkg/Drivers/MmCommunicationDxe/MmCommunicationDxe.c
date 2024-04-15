@@ -17,6 +17,13 @@ EFI_MM_COMMUNICATION2_PROTOCOL  mMmCommunication2 = {
 };
 
 //
+// PI 1.7 MM Communication Protocol instance
+//
+EFI_MM_COMMUNICATION_PROTOCOL  mMmCommunication = {
+  SmmCommunicationMmCommunicate
+};
+
+//
 // Handle to install the SMM Base2 Protocol and the SMM Communication Protocol
 //
 EFI_HANDLE  mSmmIplHandle = NULL;
@@ -240,16 +247,16 @@ SmmEndOfDxeEventNotify (
 }
 
 /**
-  Communicates with a registered handler.
+  Processes the communication buffer for SMM communication protocols.
 
-  This function provides a service to send and receive messages from a registered UEFI service.
+  This function encapsulates the common logic for handling communication buffers
+  used by both SmmCommunicationMmCommunicate and SmmCommunicationMmCommunicate2 functions.
 
-  @param[in] This                The EFI_MM_COMMUNICATION_PROTOCOL instance.
   @param[in] CommBufferPhysical  Physical address of the MM communication buffer
-  @param[in] CommBufferVirtual   Virtual address of the MM communication buffer
   @param[in] CommSize            The size of the data buffer being passed in. On exit, the size of data
                                  being returned. Zero if the handler does not wish to reply with any data.
                                  This parameter is optional and may be NULL.
+  @param[in] IsCommBufferVirtual A boolean indicating if the communication buffer is virtual.
 
   @retval EFI_SUCCESS            The message was successfully posted.
   @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
@@ -261,15 +268,13 @@ SmmEndOfDxeEventNotify (
   @retval EFI_ACCESS_DENIED      The CommunicateBuffer parameter or CommSize parameter,
                                  if not omitted, are in address range that cannot be
                                  accessed by the MM environment.
-
 **/
 EFI_STATUS
 EFIAPI
-SmmCommunicationMmCommunicate2 (
-  IN CONST EFI_MM_COMMUNICATION2_PROTOCOL  *This,
-  IN OUT VOID                              *CommBufferPhysical,
-  IN OUT VOID                              *CommBufferVirtual,
-  IN OUT UINTN                             *CommSize OPTIONAL
+ProcessCommunicationBuffer (
+  IN OUT VOID   *CommBufferPhysical,
+  IN OUT UINTN  *CommSize OPTIONAL,
+  IN BOOLEAN    IsCommBufferVirtual
   )
 {
   EFI_STATUS                 Status;
@@ -339,6 +344,76 @@ SmmCommunicationMmCommunicate2 (
 }
 
 /**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                The EFI_MM_COMMUNICATION_PROTOCOL instance.
+  @param[in] CommBufferPhysical  Physical address of the MM communication buffer
+  @param[in] CommBufferVirtual   Virtual address of the MM communication buffer
+  @param[in] CommSize            The size of the data buffer being passed in. On exit, the size of data
+                                 being returned. Zero if the handler does not wish to reply with any data.
+                                 This parameter is optional and may be NULL.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
+  @retval EFI_BAD_BUFFER_SIZE    The buffer is too large for the MM implementation.
+                                 If this error is returned, the MessageLength field
+                                 in the CommBuffer header or the integer pointed by
+                                 CommSize, are updated to reflect the maximum payload
+                                 size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED      The CommunicateBuffer parameter or CommSize parameter,
+                                 if not omitted, are in address range that cannot be
+                                 accessed by the MM environment.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmCommunicationMmCommunicate2 (
+  IN CONST EFI_MM_COMMUNICATION2_PROTOCOL  *This,
+  IN OUT VOID                              *CommBufferPhysical,
+  IN OUT VOID                              *CommBufferVirtual,
+  IN OUT UINTN                             *CommSize OPTIONAL
+  )
+{
+  return ProcessCommunicationBuffer (CommBufferPhysical, CommSize, TRUE);
+}
+
+/**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                The EFI_MM_COMMUNICATION_PROTOCOL instance.
+  @param[in] CommBufferPhysical  Physical address of the MM communication buffer
+  @param[in] CommSize            The size of the data buffer being passed in. On exit, the size of data
+                                 being returned. Zero if the handler does not wish to reply with any data.
+                                 This parameter is optional and may be NULL.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
+  @retval EFI_BAD_BUFFER_SIZE    The buffer is too large for the MM implementation.
+                                 If this error is returned, the MessageLength field
+                                 in the CommBuffer header or the integer pointed by
+                                 CommSize, are updated to reflect the maximum payload
+                                 size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED      The CommunicateBuffer parameter or CommSize parameter,
+                                 if not omitted, are in address range that cannot be
+                                 accessed by the MM environment.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmCommunicationMmCommunicate (
+  IN CONST EFI_MM_COMMUNICATION_PROTOCOL  *This,
+  IN OUT VOID                             *CommBufferPhysical,
+  IN OUT UINTN                            *CommSize OPTIONAL
+  )
+{
+  return ProcessCommunicationBuffer (CommBufferPhysical, CommSize, FALSE);
+}
+
+/**
   The Entry Point for SMM IPL
 
   Load SMM Core into SMRAM, register SMM Core entry point for SMIs, install
@@ -394,6 +469,14 @@ MmCommunicationEntryPoint (
                   &gEfiMmCommunication2ProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &mMmCommunication2
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->InstallProtocolInterface (
+                  &Handle,
+                  &gEfiMmCommunicationProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mMmCommunication
                   );
   ASSERT_EFI_ERROR (Status);
 
