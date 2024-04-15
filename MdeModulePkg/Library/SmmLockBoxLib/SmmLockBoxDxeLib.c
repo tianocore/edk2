@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/SmmCommunication.h>
 #include <Guid/SmmLockBox.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
-
+#include <Protocol/MmCommunication.h>
 #include "SmmLockBoxLibPrivate.h"
 
 EFI_SMM_COMMUNICATION_PROTOCOL  *mLockBoxSmmCommProtocol = NULL;
