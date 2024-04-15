@@ -1,7 +1,7 @@
 /** @file
   Save the S3 data to S3 boot script.
 
-  Copyright (c) 2006 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -257,7 +257,7 @@ S3BootScriptEventCallBack (
     //
     // Save BootScript data to lockbox
     //
-    //SaveBootScriptDataToLockBox ();
+    SaveBootScriptDataToLockBox ();
   }
 }
 
@@ -468,7 +468,7 @@ S3BootScriptLibInitialize (
     //
     mEventDxeSmmReadyToLock = EfiCreateProtocolNotifyEvent (
                                 &gEfiDxeSmmReadyToLockProtocolGuid,
-                                TPL_CALLBACK,
+                                TPL_NOTIFY,
                                 S3BootScriptEventCallBack,
                                 NULL,
                                 &Registration
