@@ -1,0 +1,56 @@
+## @file
+#  LockBox MM driver.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmLockBoxStandaloneMm
+  MODULE_UNI_FILE                = SmmLockBoxStandaloneMm.uni
+  FILE_GUID                      = a83a87a0-8a3e-482d-86c8-84a139f6ded0
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = SmmLockBoxStandaloneMmEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  SmmLockBoxStandaloneMm.c
+  SmmLockBoxCommon.c
+  SmmLockBoxCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  MmServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  LockBoxLib
+  MemLib
+  StandaloneMmDriverEntryPoint
+
+[Guids]
+  gEfiSmmLockBoxCommunicationGuid   ## PRODUCES ## GUID # SmiHandlerRegister
+
+[Protocols]
+  gEfiSmmReadyToLockProtocolGuid    ## NOTIFY
+  gEfiLockBoxProtocolGuid           ## PRODUCES
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SmmLockBoxStandaloneMmExtra.uni
