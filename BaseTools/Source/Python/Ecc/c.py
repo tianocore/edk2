@@ -182,8 +182,27 @@ def GetIdentifierList():
             continue
 
         if var.Declarator.find('{') == -1:
-            for decl in var.Declarator.split(','):
-                DeclList = decl.split('=')
+            DeclText = var.Declarator
+            while (len(DeclText) > 0):
+                AllocatorPos = DeclText.find('=')
+                SplitPos = DeclText.find(',')
+
+                if (SplitPos == -1):
+                    SplitPos = len(DeclText)
+                elif (SplitPos > AllocatorPos):
+                    NextAllcatorPos = DeclText.find('=', AllocatorPos + 1)
+                    if (NextAllcatorPos == -1):
+                        NextAllcatorPos = len(DeclText)
+                    ParPos = DeclText.rfind(')', SplitPos, NextAllcatorPos)
+                    if (ParPos != -1):
+                        SplitPos = DeclText.find(',', ParPos)
+                        if (SplitPos == -1):
+                            SplitPos = ParPos + 1
+
+                SubDeclText = DeclText[:SplitPos]
+                DeclText = DeclText[SplitPos + 1:]
+
+                DeclList = SubDeclText.split('=')
                 Name = DeclList[0].strip()
                 if ArrayPattern.match(Name):
                     LSBPos = var.Declarator.find('[')
