@@ -38,6 +38,7 @@
   MmServicesTableLib
   BaseLib
   DebugLib
+  StandaloneMmDriverEntryPoint
 
 [Protocols]
   gEfiMmReadyToLockProtocolGuid    ## NOTIFY

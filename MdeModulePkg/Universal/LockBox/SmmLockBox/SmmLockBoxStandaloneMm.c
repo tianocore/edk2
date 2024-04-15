@@ -1,29 +1,19 @@
 /** @file
-  LockBox SMM driver.
+  LockBox MM driver.
 
-  Caution: This module requires additional review when modified.
-  This driver will have external input - communicate buffer in SMM mode.
-  This external input must be validated carefully to avoid security issue like
-  buffer overflow, integer overflow.
-
-  SmmLockBoxHandler(), SmmLockBoxRestore(), SmmLockBoxUpdate(), SmmLockBoxSave()
-  will receive untrusted input and do basic validation.
-
-Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <PiSmm.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/SmmServicesTableLib.h>
+#include <Library/StandaloneMmDriverEntryPoint.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/SmmMemLib.h>
+#include <Library/StandaloneMmMemLib.h>
 #include <Library/LockBoxLib.h>
 
 #include <Protocol/SmmReadyToLock.h>
@@ -48,11 +38,11 @@ IsBufferOutsideMmValid (
   IN UINT64                Length
   )
 {
-  return SmmIsBufferOutsideSmmValid (Buffer, Length);
+  return TRUE;
 }
 
 /**
-  Entry Point for LockBox SMM driver.
+  Entry Point for LockBox MM driver.
 
   @param[in] ImageHandle  Image handle of this driver.
   @param[in] SystemTable  A Pointer to the EFI System Table.
@@ -62,9 +52,9 @@ IsBufferOutsideMmValid (
 **/
 EFI_STATUS
 EFIAPI
-SmmLockBoxEntryPoint (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+SmmLockBoxStandaloneMmEntryPoint (
+  IN EFI_HANDLE           ImageHandle,
+  IN EFI_MM_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -74,7 +64,7 @@ SmmLockBoxEntryPoint (
   //
   // Register LockBox communication handler
   //
-  Status = gSmst->SmiHandlerRegister (
+  Status = gMmst->MmiHandlerRegister (
                     SmmLockBoxHandler,
                     &gEfiSmmLockBoxCommunicationGuid,
                     &DispatchHandle
@@ -84,23 +74,11 @@ SmmLockBoxEntryPoint (
   //
   // Register SMM Ready To Lock Protocol notification
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
+  Status = gMmst->MmRegisterProtocolNotify (
                     &gEfiSmmReadyToLockProtocolGuid,
                     SmmReadyToLockEventNotify,
                     &Registration
                     );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Install NULL to DXE data base as notify
-  //
-  ImageHandle = NULL;
-  Status      = gBS->InstallProtocolInterface (
-                       &ImageHandle,
-                       &gEfiLockBoxProtocolGuid,
-                       EFI_NATIVE_INTERFACE,
-                       NULL
-                       );
   ASSERT_EFI_ERROR (Status);
   return Status;
 }
