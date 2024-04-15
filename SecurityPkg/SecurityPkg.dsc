@@ -99,7 +99,6 @@
 
 [LibraryClasses.X64.SEC]
   HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
-  TpmMeasurementLib|SecurityPkg/Library/SecTpmMeasurementLib/SecTpmMeasurementLibTdx.inf
 
 [LibraryClasses.X64.DXE_DRIVER]
   HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
@@ -296,7 +295,6 @@
 
 [Components.X64]
   SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
-  SecurityPkg/Library/SecTpmMeasurementLib/SecTpmMeasurementLibTdx.inf
   SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf {
     <LibraryClasses>
       HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
