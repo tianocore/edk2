@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Guid/EventGroup.h>
 #include <Guid/S3StorageDeviceInitList.h>
+#include <Guid/MdeModuleHii.h>
 
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
