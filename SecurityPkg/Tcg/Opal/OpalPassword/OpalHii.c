@@ -632,7 +632,7 @@ DriverCallback (
   HiiKey.Raw = QuestionId;
   HiiKeyId   = (UINT8)HiiKey.KeyBits.Id;
 
-  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
+  if (Action == EFI_BROWSER_ACTION_RETRIEVE) {
     switch (HiiKeyId) {
       case HII_KEY_ID_VAR_SUPPORTED_DISKS:
         DEBUG ((DEBUG_INFO, "HII_KEY_ID_VAR_SUPPORTED_DISKS\n"));
