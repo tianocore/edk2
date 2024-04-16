@@ -88,8 +88,9 @@ SecGetPlatformData (
       if (*(StackPtr - 1) == FSP_MCUD_SIGNATURE) {
         //
         // This following data was pushed onto stack after TempRamInit API
+        // 64-bit FSP-T pushes these values as QWORDs
         //
-        DwordSize = 4;
+        DwordSize = (4*sizeof (UINTN))/sizeof (UINT32);
         StackPtr  = StackPtr - 1 - DwordSize;
         CopyMem (&(FspPlatformData->MicrocodeRegionBase), StackPtr, (DwordSize << 2));
         StackPtr--;
