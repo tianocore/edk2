@@ -761,6 +761,16 @@ GetArchCommonNameSpaceObject (
   // First check among the static objects.
   //
   switch (GET_CM_OBJECT_ID (CmObjectId)) {
+    case EArchCommonObjPowerManagementProfileInfo:
+      Status = HandleCmObject (
+                 CmObjectId,
+                 &PlatformRepo->PmProfileInfo,
+                 sizeof (PlatformRepo->PmProfileInfo),
+                 1,
+                 CmObject
+                 );
+      break;
+
     default:
       //
       // No match found among the static objects.
@@ -828,16 +838,6 @@ GetArmNameSpaceObject (
   // First check among the static objects.
   //
   switch (GET_CM_OBJECT_ID (CmObjectId)) {
-    case EArmObjPowerManagementProfileInfo:
-      Status = HandleCmObject (
-                 CmObjectId,
-                 &PlatformRepo->PmProfileInfo,
-                 sizeof (PlatformRepo->PmProfileInfo),
-                 1,
-                 CmObject
-                 );
-      break;
-
     case EArmObjItsGroup:
       Status = HandleCmObject (
                  CmObjectId,
