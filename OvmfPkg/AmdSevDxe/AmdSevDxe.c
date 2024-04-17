@@ -20,7 +20,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Guid/ConfidentialComputingSevSnpBlob.h>
 #include <Library/PcdLib.h>
-#include <Pi/PrePiDxeCis.h>
+#include <Pi/PiDxeCis.h>
 #include <Protocol/SevMemoryAcceptance.h>
 #include <Protocol/MemoryAccept.h>
 #include <Uefi/UefiSpec.h>
@@ -119,7 +119,7 @@ AcceptAllMemory (
     CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *Desc;
 
     Desc = &AllDescMap[Index];
-    if (Desc->GcdMemoryType != EFI_GCD_MEMORY_TYPE_UNACCEPTED) {
+    if (Desc->GcdMemoryType != EfiGcdMemoryTypeUnaccepted) {
       continue;
     }
 
