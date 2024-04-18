@@ -352,12 +352,11 @@ SmmWriteSaveState (
   );
 
 /**
-  C function for SMI handler. To change all processor's SMMBase Register.
+  Initialize SMM environment.
 
 **/
 VOID
-EFIAPI
-SmmInitHandler (
+InitializeSmm (
   VOID
   );
 

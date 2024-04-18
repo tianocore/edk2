@@ -1524,9 +1524,9 @@ SmiRendezvous (
 
   if (!mSmmInitialized[CpuIndex]) {
     //
-    // Perform SmmInitHandler for CpuIndex
+    // Perform InitializeSmm for CpuIndex
     //
-    SmmInitHandler ();
+    InitializeSmm ();
 
     //
     // Restore Cr2

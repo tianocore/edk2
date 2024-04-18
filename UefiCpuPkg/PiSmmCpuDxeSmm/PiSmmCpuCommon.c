@@ -324,12 +324,11 @@ SmmWriteSaveState (
 }
 
 /**
-  C function for SMI handler. To change all processor's SMMBase Register.
+  Initialize SMM environment.
 
 **/
 VOID
-EFIAPI
-SmmInitHandler (
+InitializeSmm (
   VOID
   )
 {
@@ -337,14 +336,6 @@ SmmInitHandler (
   UINTN    Index;
   BOOLEAN  IsBsp;
 
-  /*
-  No need set idt since only smi handler call SmmInitHandler and smi handler has
-  already set idtr in asm code.
-  //
-  // Update SMM IDT entries' code segment and load IDT
-  //
-  AsmWriteIdtr (&gcSmiIdtr);
-  */
   ApicId = GetApicId ();
 
   IsBsp = (BOOLEAN)(mBspApicId == ApicId);
@@ -354,7 +345,7 @@ SmmInitHandler (
   for (Index = 0; Index < mNumberOfCpus; Index++) {
     if (ApicId == (UINT32)gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId) {
       PERF_CODE (
-        MpPerfBegin (Index, SMM_MP_PERF_PROCEDURE_ID (SmmInitHandler));
+        MpPerfBegin (Index, SMM_MP_PERF_PROCEDURE_ID (InitializeSmm));
         );
       //
       // Initialize SMM specific features on the currently executing CPU
@@ -385,7 +376,7 @@ SmmInitHandler (
       }
 
       PERF_CODE (
-        MpPerfEnd (Index, SMM_MP_PERF_PROCEDURE_ID (SmmInitHandler));
+        MpPerfEnd (Index, SMM_MP_PERF_PROCEDURE_ID (InitializeSmm));
         );
 
       return;
@@ -988,6 +979,16 @@ PiSmmCpuEntryCommon (
   ASSERT (TileSize <= (SMRAM_SAVE_STATE_MAP_OFFSET + sizeof (SMRAM_SAVE_STATE_MAP) - SMM_HANDLER_OFFSET));
 
   //
+  // Check whether the Required TileSize is enough.
+  //
+  if (TileSize > SIZE_8KB) {
+    DEBUG ((DEBUG_ERROR, "The Range of Smbase in SMRAM is not enough -- Required TileSize = 0x%08x, Actual TileSize = 0x%08x\n", TileSize, SIZE_8KB));
+    FreePool (gSmmCpuPrivate->ProcessorInfo);
+    CpuDeadLoop ();
+    return RETURN_BUFFER_TOO_SMALL;
+  }
+
+  //
   // Retrieve the allocated SmmBase from gSmmBaseHobGuid. If found,
   // means the SmBase relocation has been done.
   //
@@ -1002,17 +1003,6 @@ PiSmmCpuEntryCommon (
   // ASSERT SmBase has been relocated.
   //
   ASSERT (mCpuHotPlugData.SmBase != NULL);
-
-  //
-  // Check whether the Required TileSize is enough.
-  //
-  if (TileSize > SIZE_8KB) {
-    DEBUG ((DEBUG_ERROR, "The Range of Smbase in SMRAM is not enough -- Required TileSize = 0x%08x, Actual TileSize = 0x%08x\n", TileSize, SIZE_8KB));
-    FreePool (mCpuHotPlugData.SmBase);
-    FreePool (gSmmCpuPrivate->ProcessorInfo);
-    CpuDeadLoop ();
-    return RETURN_BUFFER_TOO_SMALL;
-  }
 
   //
   // Allocate buffer for pointers to array in  SMM_CPU_PRIVATE_DATA.
