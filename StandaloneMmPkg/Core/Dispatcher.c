@@ -768,18 +768,11 @@ MmDriverDispatchHandler (
   // Check to see if CommBuffer and CommBufferSize are valid
   //
   if ((CommBuffer != NULL) && (CommBufferSize != NULL)) {
-    if (*CommBufferSize > 0) {
-      if (!EFI_ERROR (Status)) {
-        //
-        // Set the flag to show that the MM Dispatcher executed without errors
-        //
-        *(UINT8 *)CommBuffer = COMM_BUFFER_MM_DISPATCH_SUCCESS;
-      } else {
-        //
-        // Set the flag to show that the MM Dispatcher encountered an error
-        //
-        *(UINT8 *)CommBuffer = COMM_BUFFER_MM_DISPATCH_ERROR;
-      }
+    if (*CommBufferSize > sizeof (EFI_STATUS)) {
+      //
+      // Set the status of MmDispatcher to CommBuffer
+      //
+      *(EFI_STATUS *) CommBuffer = Status;
     }
   }
 
