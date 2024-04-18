@@ -27,19 +27,44 @@ EFI_PROCESSOR_INFORMATION  *mProcessorInfo = NULL;
 IA32_DESCRIPTOR  gcSmmInitIdtr;
 
 //
-// Smbase for all CPUs
+// Smbase for current CPU
 //
-UINT64  *mSmBase = NULL;
+UINT64  mSmBase;
 
 //
-// SmBase Rebased flag for all CPUs
+// SmBase Rebased flag for current CPU
 //
-volatile BOOLEAN  *mRebased;
+volatile BOOLEAN  mRebased;
+
+/**
+  This function will get the SmBase for CpuIndex.
+
+  @param[in]   CpuIndex            The processor index.
+  @param[in]   SmmRelocationStart  The start address of Smm relocated memory in SMRAM.
+  @param[in]   TileSize            The total size required for a CPU save state, any
+                                   additional CPU-specific context and the size of code
+                                   for the SMI entry point.
+
+  @retval The value of SmBase for CpuIndex.
+
+**/
+UINTN
+GetSmBase (
+  IN UINTN                 CpuIndex,
+  IN EFI_PHYSICAL_ADDRESS  SmmRelocationStart,
+  IN UINTN                 TileSize
+  )
+{
+  return (UINTN)(SmmRelocationStart) + CpuIndex * TileSize - SMM_HANDLER_OFFSET;
+}
 
 /**
   This function will create SmBase for all CPUs.
 
-  @param[in] SmBase    Pointer to SmBase for all CPUs.
+  @param[in]   SmmRelocationStart  The start address of Smm relocated memory in SMRAM.
+  @param[in]   TileSize            The total size required for a CPU save state, any
+                                   additional CPU-specific context and the size of code
+                                   for the SMI entry point.
 
   @retval EFI_SUCCESS           Create SmBase for all CPUs successfully.
   @retval Others                Failed to create SmBase for all CPUs.
@@ -47,7 +72,8 @@ volatile BOOLEAN  *mRebased;
 **/
 EFI_STATUS
 CreateSmmBaseHob (
-  IN UINT64  *SmBase
+  IN EFI_PHYSICAL_ADDRESS  SmmRelocationStart,
+  IN UINTN                 TileSize
   )
 {
   UINTN              Index;
@@ -92,7 +118,7 @@ CreateSmmBaseHob (
       //
       // Calculate the new SMBASE address
       //
-      SmmBaseHobData->SmBase[Index] = SmBase[Index + CpuCount];
+      SmmBaseHobData->SmBase[Index] = GetSmBase (Index + CpuCount, SmmRelocationStart, TileSize);
       DEBUG ((DEBUG_INFO, "CreateSmmBaseHob - SmmBaseHobData[%d]->SmBase[%d]: 0x%08x\n", HobCount, Index, SmmBaseHobData->SmBase[Index]));
     }
 
@@ -128,14 +154,14 @@ SmmInitHandler (
       //
       // Configure SmBase.
       //
-      ConfigureSmBase (mSmBase[Index]);
+      ConfigureSmBase (mSmBase);
 
       //
       // Hook return after RSM to set SMM re-based flag
       // SMM re-based flag can't be set before RSM, because SMM save state context might be override
       // by next AP flow before it take effect.
       //
-      SemaphoreHook (Index, &mRebased[Index]);
+      SemaphoreHook (Index, &mRebased);
       return;
     }
   }
@@ -147,10 +173,18 @@ SmmInitHandler (
   Relocate SmmBases for each processor.
   Execute on first boot and all S3 resumes
 
+  @param[in]   MpServices2         Pointer to this instance of the MpServices.
+  @param[in]   SmmRelocationStart  The start address of Smm relocated memory in SMRAM.
+  @param[in]   TileSize            The total size required for a CPU save state, any
+                                   additional CPU-specific context and the size of code
+                                   for the SMI entry point.
+
 **/
 VOID
 SmmRelocateBases (
-  VOID
+  IN EDKII_PEI_MP_SERVICES2_PPI  *MpServices2,
+  IN EFI_PHYSICAL_ADDRESS        SmmRelocationStart,
+  IN UINTN                       TileSize
   )
 {
   UINT8                 BakBuf[BACK_BUF_SIZE];
@@ -198,13 +232,14 @@ SmmRelocateBases (
   //
   BspIndex = (UINTN)-1;
   for (Index = 0; Index < mNumberOfCpus; Index++) {
-    mRebased[Index] = FALSE;
     if (BspApicId != (UINT32)mProcessorInfo[Index].ProcessorId) {
+      mRebased = FALSE;
+      mSmBase  = GetSmBase (Index, SmmRelocationStart, TileSize);
       SendSmiIpi ((UINT32)mProcessorInfo[Index].ProcessorId);
       //
       // Wait for this AP to finish its 1st SMI
       //
-      while (!mRebased[Index]) {
+      while (!mRebased) {
       }
     } else {
       //
@@ -218,12 +253,14 @@ SmmRelocateBases (
   // Relocate BSP's SMM base
   //
   ASSERT (BspIndex != (UINTN)-1);
+  mRebased = FALSE;
+  mSmBase  = GetSmBase (BspIndex, SmmRelocationStart, TileSize);
   SendSmiIpi (BspApicId);
 
   //
   // Wait for the BSP to finish its 1st SMI
   //
-  while (!mRebased[BspIndex]) {
+  while (!mRebased) {
   }
 
   //
@@ -385,83 +422,6 @@ SplitSmramHobForSmmRelocation (
 }
 
 /**
-  This function will initialize SmBase for all CPUs.
-
-  @param[in,out] SmBase    Pointer to SmBase for all CPUs.
-
-  @retval EFI_SUCCESS           Initialize SmBase for all CPUs successfully.
-  @retval Others                Failed to initialize SmBase for all CPUs.
-
-**/
-EFI_STATUS
-InitSmBaseForAllCpus (
-  IN OUT UINT64  **SmBase
-  )
-{
-  EFI_STATUS            Status;
-  UINTN                 TileSize;
-  UINT64                SmmRelocationSize;
-  EFI_PHYSICAL_ADDRESS  SmmRelocationStart;
-  UINTN                 Index;
-
-  SmmRelocationStart = 0;
-
-  ASSERT (SmBase != NULL);
-
-  //
-  // Calculate SmmRelocationSize for all of the tiles.
-  //
-  // The CPU save state and code for the SMI entry point are tiled within an SMRAM
-  // allocated buffer. The minimum size of this buffer for a uniprocessor system
-  // is 32 KB, because the entry point is SMBASE + 32KB, and CPU save state area
-  // just below SMBASE + 64KB. If more than one CPU is present in the platform,
-  // then the SMI entry point and the CPU save state areas can be tiles to minimize
-  // the total amount SMRAM required for all the CPUs. The tile size can be computed
-  // by adding the CPU save state size, any extra CPU specific context, and
-  // the size of code that must be placed at the SMI entry point to transfer
-  // control to a C function in the native SMM execution mode. This size is
-  // rounded up to the nearest power of 2 to give the tile size for a each CPU.
-  // The total amount of memory required is the maximum number of CPUs that
-  // platform supports times the tile size.
-  //
-  TileSize          = SIZE_8KB;
-  SmmRelocationSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1)));
-
-  //
-  // Split SmramReserve HOB to reserve SmmRelocationSize for Smm relocated memory
-  //
-  Status = SplitSmramHobForSmmRelocation (
-             SmmRelocationSize,
-             &SmmRelocationStart
-             );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  ASSERT (SmmRelocationStart != 0);
-  DEBUG ((DEBUG_INFO, "InitSmBaseForAllCpus - SmmRelocationSize: 0x%08x\n", SmmRelocationSize));
-  DEBUG ((DEBUG_INFO, "InitSmBaseForAllCpus - SmmRelocationStart: 0x%08x\n", SmmRelocationStart));
-
-  //
-  // Init SmBase
-  //
-  *SmBase = (UINT64 *)AllocatePages (EFI_SIZE_TO_PAGES (sizeof (UINT64) * mMaxNumberOfCpus));
-  if (*SmBase == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-    //
-    // Return each SmBase in SmBase
-    //
-    (*SmBase)[Index] = (UINTN)(SmmRelocationStart)+ Index * TileSize - SMM_HANDLER_OFFSET;
-    DEBUG ((DEBUG_INFO, "InitSmBaseForAllCpus - SmBase For CPU[%d]: 0x%08x\n", Index, (*SmBase)[Index]));
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
   CPU SmmBase Relocation Init.
 
   This function is to relocate CPU SmmBase.
@@ -478,13 +438,17 @@ SmmRelocationInit (
   IN EDKII_PEI_MP_SERVICES2_PPI  *MpServices2
   )
 {
-  EFI_STATUS  Status;
-  UINTN       NumberOfEnabledCpus;
-  UINTN       SmmStackSize;
-  UINT8       *SmmStacks;
-  UINTN       Index;
+  EFI_STATUS            Status;
+  UINTN                 NumberOfEnabledCpus;
+  UINTN                 TileSize;
+  UINT64                SmmRelocationSize;
+  EFI_PHYSICAL_ADDRESS  SmmRelocationStart;
+  UINTN                 SmmStackSize;
+  UINT8                 *SmmStacks;
+  UINTN                 Index;
 
-  SmmStacks = NULL;
+  SmmRelocationStart = 0;
+  SmmStacks          = NULL;
 
   DEBUG ((DEBUG_INFO, "SmmRelocationInit Start \n"));
   if (MpServices2 == NULL) {
@@ -530,12 +494,38 @@ SmmRelocationInit (
   }
 
   //
-  // Initialize the SmBase for all CPUs
+  // Calculate SmmRelocationSize for all of the tiles.
   //
-  Status = InitSmBaseForAllCpus (&mSmBase);
+  // The CPU save state and code for the SMI entry point are tiled within an SMRAM
+  // allocated buffer. The minimum size of this buffer for a uniprocessor system
+  // is 32 KB, because the entry point is SMBASE + 32KB, and CPU save state area
+  // just below SMBASE + 64KB. If more than one CPU is present in the platform,
+  // then the SMI entry point and the CPU save state areas can be tiles to minimize
+  // the total amount SMRAM required for all the CPUs. The tile size can be computed
+  // by adding the CPU save state size, any extra CPU specific context, and
+  // the size of code that must be placed at the SMI entry point to transfer
+  // control to a C function in the native SMM execution mode. This size is
+  // rounded up to the nearest power of 2 to give the tile size for a each CPU.
+  // The total amount of memory required is the maximum number of CPUs that
+  // platform supports times the tile size.
+  //
+  TileSize          = SIZE_8KB;
+  SmmRelocationSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (SIZE_32KB + TileSize * (mMaxNumberOfCpus - 1)));
+
+  //
+  // Split SmramReserve HOB to reserve SmmRelocationSize for Smm relocated memory
+  //
+  Status = SplitSmramHobForSmmRelocation (
+             SmmRelocationSize,
+             &SmmRelocationStart
+             );
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
+
+  ASSERT (SmmRelocationStart != 0);
+  DEBUG ((DEBUG_INFO, "SmmRelocationInit - SmmRelocationSize: 0x%08x\n", SmmRelocationSize));
+  DEBUG ((DEBUG_INFO, "SmmRelocationInit - SmmRelocationStart: 0x%08x\n", SmmRelocationStart));
 
   //
   // Fix up the address of the global variable or function referred in
@@ -571,28 +561,17 @@ SmmRelocationInit (
 
   //
   // Relocate SmmBases for each processor.
-  // Allocate mRebased as the flag to indicate the relocation is done for each CPU.
   //
-  mRebased = (BOOLEAN *)AllocateZeroPool (sizeof (BOOLEAN) * mMaxNumberOfCpus);
-  if (mRebased == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
-  SmmRelocateBases ();
+  SmmRelocateBases (MpServices2, SmmRelocationStart, TileSize);
 
   //
   // Create the SmBase HOB for all CPUs
   //
-  Status = CreateSmmBaseHob (mSmBase);
+  Status = CreateSmmBaseHob (SmmRelocationStart, TileSize);
 
 ON_EXIT:
   if (SmmStacks != NULL) {
     FreePages (SmmStacks, EFI_SIZE_TO_PAGES (SmmStackSize));
-  }
-
-  if (mSmBase != NULL) {
-    FreePages (mSmBase, EFI_SIZE_TO_PAGES (sizeof (UINT64) * mMaxNumberOfCpus));
   }
 
   DEBUG ((DEBUG_INFO, "SmmRelocationInit Done\n"));
