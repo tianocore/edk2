@@ -1302,7 +1302,9 @@ typedef struct {
 #define SPDM_ST1_VALUE_US  100000
 
 ///
-/// id-DMTF 1.3.6.1.4.1.412
+/// id-DMTF 1.3.6.1.4.1.412.
+/// These OID are defiend in ANNEX C (informative) OID reference section from the DMTF SPDM spec.
+/// https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.2.2.pdf
 ///
 #define SPDM_OID_DMTF \
     {0x2B, 0x06, 0x01, 0x04, 0x01, 0x83, 0x1C }
