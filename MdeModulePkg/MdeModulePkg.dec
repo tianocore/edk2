@@ -2172,6 +2172,11 @@
   # @Prompt TCG Platform Firmware Profile revision.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision|0|UINT32|0x00010077
 
+  ## Specify whether to enable the state of SPDM device authentication and measurement.<BR><BR>
+  #  0: Platform Firmware not supports SPDM device authentication and measurement.
+  #  1: Platform Firmware supports SPDM device authentication and measurement.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableSpdmDeviceAuthentication|0|UINT8|0x00010033
+
   ## Indicates if StatusCode is reported via Serial port.<BR><BR>
   #   TRUE  - Reports StatusCode via Serial port.<BR>
   #   FALSE - Does not report StatusCode via Serial port.<BR>
