@@ -20,11 +20,6 @@ MmDispatcher (
 EFI_HANDLE  mMmCpuHandle = NULL;
 
 //
-// Physical pointer to private structure shared between MM IPL and the MM Core
-//
-MM_CORE_PRIVATE_DATA  *gMmCorePrivate;
-
-//
 // MM Core global variable for MM System Table.  Only accessed as a physical structure in MMRAM.
 //
 EFI_MM_SYSTEM_TABLE  gMmCoreMmst = {

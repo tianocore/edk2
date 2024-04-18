@@ -49,7 +49,6 @@
   MmPlatformHobProducerLib
 
 [Guids]
-  gMmCoreDataHobGuid
   gEfiSmmSmramMemoryGuid
   gEdkiiEventMmDispatchGuid
   gEdkiiCommunicationBufferGuid
