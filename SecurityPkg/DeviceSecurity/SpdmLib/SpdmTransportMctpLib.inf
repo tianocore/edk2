@@ -1,0 +1,38 @@
+## @file
+#  SPDM library.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SpdmTransportMctpLib
+  FILE_GUID                      = C6ED3DB8-852A-40A8-8099-9D87D93669C4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SpdmTransportMctpLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  libspdm/library/spdm_transport_mctp_lib/libspdm_mctp_common.c
+  libspdm/library/spdm_transport_mctp_lib/libspdm_mctp_mctp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  SpdmSecuredMessageLib
+  MemLibWrapper

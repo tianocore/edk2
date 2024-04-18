@@ -1,0 +1,61 @@
+## @file
+#  SPDM library.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SpdmResponderLib
+  FILE_GUID                      = 9005B3A3-45F1-4DE9-93FF-2512D4B9CCFA
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SpdmResponderLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  libspdm/library/spdm_responder_lib/libspdm_rsp_algorithms.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_capabilities.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_certificate.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_challenge_auth.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_common.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_communication.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_digests.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_encap_challenge.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_encap_get_certificate.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_encap_get_digests.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_encap_key_update.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_encap_response.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_end_session.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_error.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_finish.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_handle_response_state.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_heartbeat.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_key_exchange.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_key_update.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_measurements.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_psk_exchange.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_psk_finish.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_receive_send.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_respond_if_ready.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_version.c
+  libspdm/library/spdm_responder_lib/libspdm_rsp_csr.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  SpdmCommonLib
+  SpdmSecuredMessageLib
+  PlatformLibWrapper
+  MemLibWrapper

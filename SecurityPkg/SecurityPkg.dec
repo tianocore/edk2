@@ -5,7 +5,7 @@
 #  It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 #  and libraries instances, which are used for those features.
 #
-# Copyright (c) 2009 - 2020, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -22,6 +22,10 @@
 [Includes]
   Include
   Test/Mock/Include
+
+[Includes.Common.Private]
+  DeviceSecurity/SpdmLib/Include
+  DeviceSecurity/SpdmLib/libspdm/include
 
 [LibraryClasses]
   ##  @libraryclass  Provides hash interfaces from different implementations.
@@ -96,6 +100,10 @@
   ## @libraryclass  Provides support to manage variable 'PK' related protections.
   #
   PlatformPKProtectionLib|Include/Library/PlatformPKProtectionLib.h
+
+  ##  @libraryclass Perform SPDM (following SPDM spec) and measure data to TPM (following TCG PFP spec).
+  ##
+  SpdmSecurityLib|Include/Library/SpdmSecurityLib.h
 
 [Guids]
   ## Security package token space guid.
@@ -218,6 +226,9 @@
 
   ## GUID used to specify section with default dbt content
   gDefaultdbtFileGuid                = { 0x36c513ee, 0xa338, 0x4976, { 0xa0, 0xfb, 0x6d, 0xdb, 0xa3, 0xda, 0xfe, 0x87 } }
+
+  ## GUID used to generate Spdm Uid
+  gEfiDeviceSecuritySpdmUidGuid = {0xe37b5665, 0x5ef9, 0x4e7e, {0xb4, 0x91, 0xd6, 0x78, 0xab, 0xff, 0xfb, 0xcb }}
 
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
