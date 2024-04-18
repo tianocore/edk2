@@ -1,9 +1,9 @@
 /** @file
-MmCommunicationDxe driverproduce MmCommunication protocol and signal events via
-and communicate UEFI memory map to PiSmmCpuStandaloneMm driver in EndOfDxe callback.
+  MmCommunicationDxe driver produces MmCommunication protocol and
+  create the notifications of some protocols and event.
 
-Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -414,11 +414,7 @@ SmmCommunicationMmCommunicate (
 }
 
 /**
-  The Entry Point for SMM IPL
-
-  Load SMM Core into SMRAM, register SMM Core entry point for SMIs, install
-  SMM Base 2 Protocol and SMM Communication Protocol, and register for the
-  critical events required to coordinate between DXE and SMM environments.
+  The Entry Point for MmCommunicateDxe driver.
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.
   @param  SystemTable    A pointer to the EFI System Table.
@@ -453,17 +449,6 @@ MmCommunicationEntryPoint (
 
   Handle = NULL;
 
-  /*
-    //
-    // Install SMM Communication Protocol
-    //
-    Status = gBS->InstallMultipleProtocolInterfaces (
-                    &Handle,
-                    &gEfiMmCommunication2ProtocolGuid,
-                    &mMmCommunication2,
-                    NULL
-                    );
-                  */
   Status = gBS->InstallProtocolInterface (
                   &Handle,
                   &gEfiMmCommunication2ProtocolGuid,
@@ -481,7 +466,7 @@ MmCommunicationEntryPoint (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Create the set of protocol and event notifications that the SMM IPL requires
+  // Create the set of protocol and event notifications that the MM IPL requires
   //
   for (Index = 0; mSmmEvents[Index].NotifyFunction != NULL; Index++) {
     if (mSmmEvents[Index].Protocol) {

@@ -1,9 +1,8 @@
 /** @file
-  HOB Producer Library implementation for Standalone MM Core.
+  Platform specific HOB Producer Library implementation for Standalone MM Core.
 
-Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
-
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 

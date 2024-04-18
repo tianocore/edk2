@@ -1,7 +1,7 @@
 /** @file
   This PEI Module creates SMM_CPU_FEATURE_INFO_HOB.
 
-  Copyright (c) 2015 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -89,15 +89,12 @@ BuildSmmProfileDataMemAllocHob (
 }
 
 /**
-  The Entry point of the MP CPU PEIM.
-
-  This function will wakeup APs and collect CPU AP count and install the
-  Mp Service Ppi.
+  The Entry point of SmmCpuFeatureInfoPei.
 
   @param  FileHandle    Handle of the file being invoked.
   @param  PeiServices   Describes the list of possible PEI Services.
 
-  @retval EFI_SUCCESS   MpServicePpi is installed successfully.
+  @retval EFI_SUCCESS   The entry point is executed successfully.
 
 **/
 EFI_STATUS

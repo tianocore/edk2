@@ -1,7 +1,7 @@
 /** @file
   This PEIM creates SMM_CPU_FEATURE_INFO_HOB.
 
-  Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/

@@ -1,6 +1,6 @@
 ## @file
-# This standalone mm driver produce MmCommunication protocol and signal events via
-# and communicate UEFI memory map to PiSmmCpuStandaloneMm driver in EndOfDxe callback.
+# MmCommunicationDxe driver produces MmCommunication protocol and 
+# create the notifications of some protocols and event.
 #
 # Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 #

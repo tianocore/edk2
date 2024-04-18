@@ -1,9 +1,8 @@
 /** @file
-  HOB Producer Library implementation for Standalone MM Core.
+  Platform specific HOB producer Library implementation for Standalone MM Core.
 
-Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
-
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -20,9 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 UINTN  mHobListEnd;
 
 /**
-  Returns the pointer to the HOB list.
-
-  This function returns the pointer to first HOB in the list.
+  This function returns the end of the HOB list.
 
   @return The pointer to the HOB list.
 
@@ -36,22 +33,13 @@ MmGetHobListEndPointer (
 }
 
 /**
-  Build a Handoff Information Table HOB
+  This function initialize mHobListEnd.
 
-  This function initialize a HOB region from EfiMemoryBegin to
-  EfiMemoryTop. And EfiFreeMemoryBottom and EfiFreeMemoryTop should
-  be inside the HOB region.
-
-  @param[in] EfiMemoryBottom       Total memory start address
-  @param[in] EfiMemoryTop          Total memory end address.
-  @param[in] EfiFreeMemoryBottom   Free memory start address
-  @param[in] EfiFreeMemoryTop      Free memory end address.
-
-  @return   The pointer to the handoff HOB table.
+  @param Buffer  The buffer to create HOB.
 
 **/
 VOID
-MmHobConstructor (
+InitializeHobListEnd (
   IN VOID  *Buffer
   )
 {
@@ -93,10 +81,7 @@ MmCreateHob (
 }
 
 /**
-  Builds a HOB that describes a chunk of system memory.
-
-  This function builds a HOB that describes a chunk of system memory.
-  If there is no additional space for HOB creation, then ASSERT().
+  Builds a EFI_HOB_TYPE_RESOURCE_DESCRIPTOR HOB.
 
   @param  ResourceType        The type of resource described by this HOB.
   @param  ResourceAttribute   The resource attributes of the memory described by this HOB.
@@ -342,7 +327,7 @@ CreateMmPlatformHob (
   }
 
   ASSERT (Buffer != NULL);
-  MmHobConstructor (Buffer);
+  InitializeHobListEnd (Buffer);
 
   //
   // Build resource HOB for MMIO range.
