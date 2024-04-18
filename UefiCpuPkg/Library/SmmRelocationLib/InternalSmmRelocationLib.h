@@ -32,13 +32,13 @@
 #include <Register/Intel/SmramSaveStateMap.h>
 #include <Protocol/MmCpu.h>
 
-extern IA32_DESCRIPTOR  gcSmiInitGdtr;
+extern IA32_DESCRIPTOR  gcSmmInitGdtr;
 extern CONST UINT16     gcSmmInitSize;
 extern CONST UINT8      gcSmmInitTemplate[];
 
-X86_ASSEMBLY_PATCH_LABEL  gPatchSmmCr0;
-X86_ASSEMBLY_PATCH_LABEL  gPatchSmmCr3;
-X86_ASSEMBLY_PATCH_LABEL  gPatchSmmCr4;
+X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitCr0;
+X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitCr3;
+X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitCr4;
 X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitStack;
 
 //
