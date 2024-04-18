@@ -16,7 +16,7 @@
 #  This external input must be validated carefully to avoid security issue like
 #  buffer overflow, integer overflow.
 #
-# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -86,6 +86,7 @@
   gTcgEvent2EntryHobGuid                             ## SOMETIMES_CONSUMES  ## HOB
   gTpm2StartupLocalityHobGuid                        ## SOMETIMES_CONSUMES  ## HOB
   gTcg800155PlatformIdEventHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
+  gEfiDeviceSignatureDatabaseGuid
 
 [Protocols]
   gEfiTcg2ProtocolGuid                               ## PRODUCES
@@ -107,6 +108,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLaml                        ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableLasa                        ## PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableSpdmDeviceAuthentication           ## CONSUMES
 
 [Depex]
   # According to PcdTpm2AcpiTableRev definition in SecurityPkg.dec
