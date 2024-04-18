@@ -18,11 +18,11 @@ extern ASM_PFX(SmmInitHandler)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
 
-global ASM_PFX(gPatchSmmCr3)
-global ASM_PFX(gPatchSmmCr4)
-global ASM_PFX(gPatchSmmCr0)
+global ASM_PFX(gPatchSmmInitCr3)
+global ASM_PFX(gPatchSmmInitCr4)
+global ASM_PFX(gPatchSmmInitCr0)
 global ASM_PFX(gPatchSmmInitStack)
-global ASM_PFX(gcSmiInitGdtr)
+global ASM_PFX(gcSmmInitGdtr)
 global ASM_PFX(gcSmmInitSize)
 global ASM_PFX(gcSmmInitTemplate)
 global ASM_PFX(gPatchRebasedFlagAddr32)
@@ -84,7 +84,7 @@ CodeSeg64:
             DB      0                   ; BaseHigh
 GDT_SIZE equ $ -   NullSeg
 
-ASM_PFX(gcSmiInitGdtr):
+ASM_PFX(gcSmmInitGdtr):
     DW      GDT_SIZE - 1
     DQ      NullSeg
 
@@ -100,11 +100,11 @@ ASM_PFX(SmmStartup):
     cpuid
     mov     ebx, edx                    ; rdmsr will change edx. keep it in ebx.
     mov     eax, strict dword 0         ; source operand will be patched
-ASM_PFX(gPatchSmmCr3):
+ASM_PFX(gPatchSmmInitCr3):
     mov     cr3, eax
-o32 lgdt    [cs:ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
+o32 lgdt    [cs:ebp + (ASM_PFX(gcSmmInitGdtr) - ASM_PFX(SmmStartup))]
     mov     eax, strict dword 0         ; source operand will be patched
-ASM_PFX(gPatchSmmCr4):
+ASM_PFX(gPatchSmmInitCr4):
     or      ah,  2                      ; enable XMM registers access
     mov     cr4, eax
     mov     ecx, 0xc0000080             ; IA32_EFER MSR
@@ -116,7 +116,7 @@ ASM_PFX(gPatchSmmCr4):
 .1:
     wrmsr
     mov     eax, strict dword 0         ; source operand will be patched
-ASM_PFX(gPatchSmmCr0):
+ASM_PFX(gPatchSmmInitCr0):
     mov     cr0, eax                    ; enable protected mode & paging
     jmp     LONG_MODE_CS : dword 0      ; offset will be patched to @LongMode
 @PatchLongModeOffset:

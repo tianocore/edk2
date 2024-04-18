@@ -24,7 +24,7 @@ EFI_PROCESSOR_INFORMATION  *mProcessorInfo = NULL;
 //
 // IDT used during SMM Init
 //
-IA32_DESCRIPTOR  gcSmiIdtr;
+IA32_DESCRIPTOR  gcSmmInitIdtr;
 
 //
 // Smbase for all CPUs
@@ -120,7 +120,7 @@ SmmInitHandler (
   //
   // Update SMM IDT entries' code segment and load IDT
   //
-  AsmWriteIdtr (&gcSmiIdtr);
+  AsmWriteIdtr (&gcSmmInitIdtr);
   ApicId = GetApicId ();
 
   for (Index = 0; Index < mNumberOfCpus; Index++) {
@@ -169,9 +169,9 @@ SmmRelocateBases (
   //
   // Patch ASM code template with current CR0, CR3, and CR4 values
   //
-  PatchInstructionX86 (gPatchSmmCr0, AsmReadCr0 (), 4);
-  PatchInstructionX86 (gPatchSmmCr3, AsmReadCr3 (), 4);
-  PatchInstructionX86 (gPatchSmmCr4, AsmReadCr4 () & (~CR4_CET_ENABLE), 4);
+  PatchInstructionX86 (gPatchSmmInitCr0, AsmReadCr0 (), 4);
+  PatchInstructionX86 (gPatchSmmInitCr3, AsmReadCr3 (), 4);
+  PatchInstructionX86 (gPatchSmmInitCr4, AsmReadCr4 () & (~CR4_CET_ENABLE), 4);
 
   U8Ptr       = (UINT8 *)(UINTN)(SMM_DEFAULT_SMBASE + SMM_HANDLER_OFFSET);
   CpuStatePtr = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
@@ -251,15 +251,15 @@ InitSmmIdt (
   // There are 32 (not 255) entries in it since only processor
   // generated exceptions will be handled.
   //
-  gcSmiIdtr.Limit = (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32) - 1;
+  gcSmmInitIdtr.Limit = (sizeof (IA32_IDT_GATE_DESCRIPTOR) * 32) - 1;
 
   //
   // Allocate for IDT.
   // sizeof (UINTN) is for the PEI Services Table pointer.
   //
-  gcSmiIdtr.Base = (UINTN)AllocateZeroPool (gcSmiIdtr.Limit + 1 + sizeof (UINTN));
-  ASSERT (gcSmiIdtr.Base != 0);
-  gcSmiIdtr.Base += sizeof (UINTN);
+  gcSmmInitIdtr.Base = (UINTN)AllocateZeroPool (gcSmmInitIdtr.Limit + 1 + sizeof (UINTN));
+  ASSERT (gcSmmInitIdtr.Base != 0);
+  gcSmmInitIdtr.Base += sizeof (UINTN);
 
   //
   // Disable Interrupt, save InterruptState and save PEI IDT table
@@ -272,17 +272,17 @@ InitSmmIdt (
   // The PEI Services Table pointer will be stored in the sizeof (UINTN) bytes
   // immediately preceding the IDT in memory.
   //
-  PeiServices                                   = (CONST EFI_PEI_SERVICES **)(*(UINTN *)(PeiIdtr.Base - sizeof (UINTN)));
-  (*(UINTN *)(gcSmiIdtr.Base - sizeof (UINTN))) = (UINTN)PeiServices;
+  PeiServices                                       = (CONST EFI_PEI_SERVICES **)(*(UINTN *)(PeiIdtr.Base - sizeof (UINTN)));
+  (*(UINTN *)(gcSmmInitIdtr.Base - sizeof (UINTN))) = (UINTN)PeiServices;
 
   //
   // Load SMM temporary IDT table
   //
-  AsmWriteIdtr (&gcSmiIdtr);
+  AsmWriteIdtr (&gcSmmInitIdtr);
 
   //
   // Setup SMM default exception handlers, SMM IDT table
-  // will be updated and saved in gcSmiIdtr
+  // will be updated and saved in gcSmmInitIdtr
   //
   Status = InitializeCpuExceptionHandlers (NULL);
   ASSERT_EFI_ERROR (Status);
