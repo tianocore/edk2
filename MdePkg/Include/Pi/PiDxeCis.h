@@ -56,14 +56,11 @@ typedef enum {
   /// system. If all memory has the same reliability, then this bit is not used.
   ///
   EfiGcdMemoryTypeMoreReliable,
-  // ///
-  // /// A memory region that describes system memory that has not been accepted
-  // /// by a corresponding call to the underlying isolation architecture.
-  // ///
-  // /// Please be noted:
-  // /// EfiGcdMemoryTypeUnaccepted is defined in PrePiDxeCis.h because it has not been
-  // /// defined in PI spec.
-  // EfiGcdMemoryTypeUnaccepted,
+  ///
+  /// A memory region that describes system memory that has not been accepted
+  /// by a corresponding call to the underlying isolation architecture.
+  ///
+  EfiGcdMemoryTypeUnaccepted,
   EfiGcdMemoryTypeMaximum = 7
 } EFI_GCD_MEMORY_TYPE;
 
