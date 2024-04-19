@@ -26,7 +26,7 @@ GetSmiCommandPort (
   VOID
   )
 {
-  mSmiCommandPort = 0xB2; /// TODO: get the info from SMM Communicate
+  mSmiCommandPort = 0xB2; /// TODO: Get the info from SMM Communicate or hardcode to 0xB2
   DEBUG ((DEBUG_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));
 }
 

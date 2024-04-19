@@ -153,7 +153,7 @@ SmmReadyToLockEventNotify (
   IN EFI_HANDLE      Handle
   )
 {
-  // GetAcpiCpuData (); /// TODO: cleanup S3 code even from DXE_SMM_DRIVER
+  // GetAcpiCpuData (); /// TODO: check the impact to DXE_SMM_DRIVER
 
   //
   // Cache a copy of UEFI memory map before we start profiling feature.

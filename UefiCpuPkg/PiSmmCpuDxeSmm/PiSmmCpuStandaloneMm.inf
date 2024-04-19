@@ -31,7 +31,7 @@
   PiSmmCpuCommon.h
   MpService.c
   SyncTimer.c
-  CpuS3StandaloneMm.c
+  CpuS3.c
   CpuService.c
   CpuService.h
   SmmProfile.c

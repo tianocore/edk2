@@ -1126,15 +1126,6 @@ InitSmmS3ResumeState (
   );
 
 /**
-  Get ACPI CPU data.
-
-**/
-VOID
-GetAcpiCpuData (
-  VOID
-  );
-
-/**
   Restore SMM Configuration in S3 boot path.
 
 **/
