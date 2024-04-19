@@ -533,8 +533,6 @@ MwaitExit (
   IN     CC_INSTRUCTION_DATA     *InstructionData
   )
 {
-  CcDecodeModRm (Regs, InstructionData);
-
   Ghcb->SaveArea.Rax = Regs->Rax;
   CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Rcx = Regs->Rcx;
@@ -565,8 +563,6 @@ MonitorExit (
   IN     CC_INSTRUCTION_DATA     *InstructionData
   )
 {
-  CcDecodeModRm (Regs, InstructionData);
-
   Ghcb->SaveArea.Rax = Regs->Rax;  // Identity mapped, so VA = PA
   CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
   Ghcb->SaveArea.Rcx = Regs->Rcx;
@@ -670,8 +666,6 @@ VmmCallExit (
   )
 {
   UINT64  Status;
-
-  CcDecodeModRm (Regs, InstructionData);
 
   Ghcb->SaveArea.Rax = Regs->Rax;
   CcExitVmgSetOffsetValid (Ghcb, GhcbRax);
@@ -1628,8 +1622,6 @@ Dr7WriteExit (
   Ext       = &InstructionData->Ext;
   SevEsData = (SEV_ES_PER_CPU_DATA *)(Ghcb + 1);
 
-  CcDecodeModRm (Regs, InstructionData);
-
   //
   // MOV DRn always treats MOD == 3 no matter how encoded
   //
@@ -1680,8 +1672,6 @@ Dr7ReadExit (
   Ext       = &InstructionData->Ext;
   SevEsData = (SEV_ES_PER_CPU_DATA *)(Ghcb + 1);
 
-  CcDecodeModRm (Regs, InstructionData);
-
   //
   // MOV DRn always treats MOD == 3 no matter how encoded
   //
@@ -1694,6 +1684,170 @@ Dr7ReadExit (
   *Register = (SevEsData->Dr7Cached == 1) ? SevEsData->Dr7 : 0x400;
 
   return 0;
+}
+
+/**
+  Check that the opcode matches the exit code for a #VC.
+
+  Each exit code should only be raised while executing certain instructions.
+  Verify that rIP points to a correct instruction based on the exit code to
+  protect against maliciously injected interrupts via the hypervisor. If it does
+  not, report an unsupported event to the hypervisor.
+
+  Decodes the ModRm byte into InstructionData if necessary.
+
+  @param[in, out] Ghcb             Pointer to the Guest-Hypervisor Communication
+                                   Block
+  @param[in, out] Regs             x64 processor context
+  @param[in, out] InstructionData  Instruction parsing context
+  @param[in]      ExitCode         Exit code given by #VC.
+
+  @retval 0                        No problems detected.
+  @return                          New exception value to propagate
+
+
+**/
+STATIC
+UINT64
+VcCheckOpcodeBytes (
+  IN OUT GHCB                    *Ghcb,
+  IN OUT EFI_SYSTEM_CONTEXT_X64  *Regs,
+  IN OUT CC_INSTRUCTION_DATA     *InstructionData,
+  IN     UINT64                  ExitCode
+  )
+{
+  UINT8  OpCode;
+
+  //
+  // Expected opcodes are either 1 or 2 bytes. If they are 2 bytes, they always
+  // start with TWO_BYTE_OPCODE_ESCAPE (0x0f), so skip over that.
+  //
+  OpCode = *(InstructionData->OpCodes);
+  if (OpCode == TWO_BYTE_OPCODE_ESCAPE) {
+    OpCode = *(InstructionData->OpCodes + 1);
+  }
+
+  switch (ExitCode) {
+    case SVM_EXIT_IOIO_PROT:
+    case SVM_EXIT_NPF:
+      /* handled separately */
+      return 0;
+
+    case SVM_EXIT_CPUID:
+      if (OpCode == 0xa2) {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_INVD:
+      if (OpCode == 0x08) {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_MONITOR:
+      CcDecodeModRm (Regs, InstructionData);
+
+      if ((OpCode == 0x01) &&
+          (  (InstructionData->ModRm.Uint8 == 0xc8)   /* MONITOR */
+          || (InstructionData->ModRm.Uint8 == 0xfa))) /* MONITORX */
+      {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_MWAIT:
+      CcDecodeModRm (Regs, InstructionData);
+
+      if ((OpCode == 0x01) &&
+          (  (InstructionData->ModRm.Uint8 == 0xc9)   /* MWAIT */
+          || (InstructionData->ModRm.Uint8 == 0xfb))) /* MWAITX */
+      {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_MSR:
+      /* RDMSR */
+      if ((OpCode == 0x32) ||
+          /* WRMSR */
+          (OpCode == 0x30))
+      {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_RDPMC:
+      if (OpCode == 0x33) {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_RDTSC:
+      if (OpCode == 0x31) {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_RDTSCP:
+      CcDecodeModRm (Regs, InstructionData);
+
+      if ((OpCode == 0x01) && (InstructionData->ModRm.Uint8 == 0xf9)) {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_DR7_READ:
+      CcDecodeModRm (Regs, InstructionData);
+
+      if ((OpCode == 0x21) &&
+          (InstructionData->Ext.ModRm.Reg == 7))
+      {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_VMMCALL:
+      CcDecodeModRm (Regs, InstructionData);
+
+      if ((OpCode == 0x01) && (InstructionData->ModRm.Uint8 == 0xd9)) {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_DR7_WRITE:
+      CcDecodeModRm (Regs, InstructionData);
+
+      if ((OpCode == 0x23) &&
+          (InstructionData->Ext.ModRm.Reg == 7))
+      {
+        return 0;
+      }
+
+      break;
+
+    case SVM_EXIT_WBINVD:
+      if (OpCode == 0x9) {
+        return 0;
+      }
+
+      break;
+
+    default:
+      break;
+  }
+
+  return UnsupportedExit (Ghcb, Regs, InstructionData);
 }
 
 /**
@@ -1798,7 +1952,15 @@ InternalVmgExitHandleVc (
 
   CcInitInstructionData (&InstructionData, Ghcb, Regs);
 
-  Status = NaeExit (Ghcb, Regs, &InstructionData);
+  Status = VcCheckOpcodeBytes (Ghcb, Regs, &InstructionData, ExitCode);
+
+  //
+  // If the opcode does not match the exit code, do not process the exception
+  //
+  if (Status == 0) {
+    Status = NaeExit (Ghcb, Regs, &InstructionData);
+  }
+
   if (Status == 0) {
     Regs->Rip += CcInstructionLength (&InstructionData);
   } else {
