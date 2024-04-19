@@ -538,57 +538,73 @@ MmEntryPoint (
   // Check to see if this is a Synchronous MMI sent through the MM Communication
   // Protocol or an Asynchronous MMI
   //
-  CommunicationInOut = (COMMUNICATION_IN_OUT *)(UINTN)mMmCommunicationBuffer->CommunicationInOut;
-  if (CommunicationInOut->IsCommBufferValid) {
-    //
-    // Synchronous MMI for MM Core or request from Communicate protocol
-    //
-    if (!MmIsBufferOutsideMmValid (
-           (UINTN)mMmCommunicationBuffer->FixedCommBuffer,
-           mMmCommunicationBuffer->FixedCommBufferSize
-           ))
-    {
+  if ((mMmCommunicationBuffer != NULL) && (mInternalCommBufferCopy != NULL)) {
+    CommunicationInOut = (COMMUNICATION_IN_OUT *)(UINTN)mMmCommunicationBuffer->CommunicationInOut;
+    if (CommunicationInOut->IsCommBufferValid) {
       //
-      // If CommunicationBuffer is not in valid address scope, return EFI_INVALID_PARAMETER
+      // Synchronous MMI for MM Core or request from Communicate protocol
       //
-      CommunicationInOut->ReturnStatus = EFI_INVALID_PARAMETER;
-    } else {
-      //
-      // Shadow the communication buffer to internal buffer
-      //
-      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer;
-      ZeroMem (mInternalCommBufferCopy, mMmCommunicationBuffer->FixedCommBufferSize);
-      CopyMem (
-        mInternalCommBufferCopy,
-        (VOID *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer,
-        OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength /// MessageLength does not include the size of the header.
-        );
+      if (!MmIsBufferOutsideMmValid (
+             (UINTN)mMmCommunicationBuffer->FixedCommBuffer,
+             mMmCommunicationBuffer->FixedCommBufferSize
+             ))
+      {
+        //
+        // If CommunicationBuffer is not in valid address scope, return EFI_INVALID_PARAMETER
+        //
+        CommunicationInOut->ReturnStatus = EFI_INVALID_PARAMETER;
+      } else {
+        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer;
+        BufferSize        = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+        if (BufferSize <= mMmCommunicationBuffer->FixedCommBufferSize) {
+          //
+          // Shadow the communication buffer to internal buffer
+          //
+          ZeroMem (mInternalCommBufferCopy, mMmCommunicationBuffer->FixedCommBufferSize);
+          CopyMem (
+            mInternalCommBufferCopy,
+            (VOID *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer,
+            BufferSize
+            );
 
-      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mInternalCommBufferCopy;
-      BufferSize        = CommunicateHeader->MessageLength;
-      Status            = MmiManage (
-                            &CommunicateHeader->HeaderGuid,
-                            NULL,
-                            CommunicateHeader->Data,
-                            &BufferSize
-                            );
+          CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mInternalCommBufferCopy;
+          BufferSize        = CommunicateHeader->MessageLength;
+          Status            = MmiManage (
+                                &CommunicateHeader->HeaderGuid,
+                                NULL,
+                                CommunicateHeader->Data,
+                                &BufferSize
+                                );
 
-      //
-      // Copy the data back to FixedCommBuffer
-      //
-      CopyMem (
-        (VOID *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer,
-        mInternalCommBufferCopy,
-        BufferSize + OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data)
-        );
+          BufferSize = BufferSize + OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+          if (BufferSize <= mMmCommunicationBuffer->FixedCommBufferSize) {
+            //
+            // Copy the data back to FixedCommBuffer
+            //
+            CopyMem (
+              (VOID *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer,
+              mInternalCommBufferCopy,
+              BufferSize
+              );
+          } else {
+            DEBUG ((DEBUG_ERROR, "Returned buffer size is larger than the size of Fixed Communication Buffer\n"));
+            ASSERT (FALSE);
+          }
 
-      //
-      // Update CommunicationBuffer, BufferSize and ReturnStatus
-      // Communicate service finished, reset the pointer to CommBuffer to NULL
-      //
-      CommunicationInOut->ReturnBufferSize = BufferSize + OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
-      CommunicationInOut->ReturnStatus     = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
+          //
+          // Update CommunicationBuffer, BufferSize and ReturnStatus
+          // Communicate service finished, reset the pointer to CommBuffer to NULL
+          //
+          CommunicationInOut->ReturnBufferSize = BufferSize;
+          CommunicationInOut->ReturnStatus     = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
+        } else {
+          DEBUG ((DEBUG_ERROR, "Input buffer size is larger than the size of Fixed Communication Buffer\n"));
+          ASSERT (FALSE);
+        }
+      }
     }
+  } else {
+    DEBUG ((DEBUG_ERROR, "No valid communication buffer, no Synchronous MMI will be processed\n"));
   }
 
   //
@@ -713,9 +729,9 @@ StandaloneMmMain (
   MmramRangesHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, HobStart);
   if (MmramRangesHob == NULL) {
     MmramRangesHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
-      if (MmramRangesHob == NULL) {
-        return EFI_UNSUPPORTED;
-      }
+    if (MmramRangesHob == NULL) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
