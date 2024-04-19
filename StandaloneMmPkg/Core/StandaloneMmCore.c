@@ -83,9 +83,6 @@ MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
   { NULL,                     NULL,                              NULL, FALSE },
 };
 
-UINTN                 mMmramRangeCount;
-EFI_MMRAM_DESCRIPTOR  *mMmramRanges;
-
 BOOLEAN              mMmEntryPointRegistered = FALSE;
 MM_COMM_BUFFER       *mMmCommunicationBuffer;
 VOID                 *mInternalCommBufferCopy;
@@ -702,58 +699,12 @@ StandaloneMmMain (
   VOID                            *MmHobStart;
   UINTN                           HobSize;
   VOID                            *Registration;
-  EFI_HOB_GUID_TYPE               *MmramRangesHob;
-  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
-  EFI_MMRAM_DESCRIPTOR            *MmramRanges;
-  UINTN                           MmramRangeCount;
   EFI_HOB_FIRMWARE_VOLUME         *BfvHob;
   EFI_PHYSICAL_ADDRESS            StandaloneBfvAddress;
 
   ProcessLibraryConstructorList (HobStart, &gMmCoreMmst);
 
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
-
-  //
-  // Extract the MMRAM ranges from the MMRAM descriptor HOB
-  //
-  MmramRangesHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, HobStart);
-  if (MmramRangesHob == NULL) {
-    MmramRangesHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
-    if (MmramRangesHob == NULL) {
-      return EFI_UNSUPPORTED;
-    }
-  }
-
-  MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
-  ASSERT (MmramRangesHobData != NULL);
-  MmramRanges     = MmramRangesHobData->Descriptor;
-  MmramRangeCount = (UINTN)MmramRangesHobData->NumberOfMmReservedRegions;
-  ASSERT (MmramRanges);
-  ASSERT (MmramRangeCount);
-
-  //
-  // Print the MMRAM ranges passed by the caller
-  //
-  DEBUG ((DEBUG_INFO, "MmramRangeCount - 0x%x\n", MmramRangeCount));
-  for (Index = 0; Index < MmramRangeCount; Index++) {
-    DEBUG ((
-      DEBUG_INFO,
-      "MmramRanges[%d]: 0x%016lx - 0x%lx\n",
-      Index,
-      MmramRanges[Index].CpuStart,
-      MmramRanges[Index].PhysicalSize
-      ));
-  }
-
-  //
-  // Copy the MMRAM ranges into private MMRAM
-  //
-  mMmramRangeCount = MmramRangeCount;
-  DEBUG ((DEBUG_INFO, "mMmramRangeCount - 0x%x\n", mMmramRangeCount));
-  mMmramRanges = AllocatePool (mMmramRangeCount * sizeof (EFI_MMRAM_DESCRIPTOR));
-  DEBUG ((DEBUG_INFO, "mMmramRanges - 0x%x\n", mMmramRanges));
-  ASSERT (mMmramRanges != NULL);
-  CopyMem (mMmramRanges, (VOID *)(UINTN)MmramRanges, mMmramRangeCount * sizeof (EFI_MMRAM_DESCRIPTOR));
 
   //
   // Get Boot Firmware Volume address from the BFV Hob

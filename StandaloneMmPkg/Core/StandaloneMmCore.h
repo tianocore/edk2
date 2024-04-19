@@ -931,8 +931,6 @@ MmCoreFfsFindMmDriver (
   IN  UINT32                      Depth
   );
 
-extern UINTN                 mMmramRangeCount;
-extern EFI_MMRAM_DESCRIPTOR  *mMmramRanges;
 
 #define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
