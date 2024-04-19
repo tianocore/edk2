@@ -77,13 +77,17 @@ FindBlobEntryGuid (
 /**
   Verify blob from an external source.
 
+  If a non-secure configuration is detected this function will enter a
+  dead loop to prevent a boot.
+
   @param[in] BlobName           The name of the blob
   @param[in] Buf                The data of the blob
   @param[in] BufSize            The size of the blob in bytes
 
-  @retval EFI_SUCCESS           The blob was verified successfully.
-  @retval EFI_ACCESS_DENIED     The blob could not be verified, and therefore
-                                should be considered non-secure.
+  @retval EFI_SUCCESS           The blob was verified successfully or was not
+                                found in the hash table.
+  @retval EFI_ACCESS_DENIED     Kernel hashes not supported, but the boot
+                                can continue safely.
 **/
 EFI_STATUS
 EFIAPI
@@ -99,7 +103,7 @@ VerifyBlob (
 
   if ((mHashesTable == NULL) || (mHashesTableSize == 0)) {
     DEBUG ((
-      DEBUG_ERROR,
+      DEBUG_WARN,
       "%a: Verifier called but no hashes table discoverd in MEMFD\n",
       __func__
       ));
@@ -114,7 +118,8 @@ VerifyBlob (
       __func__,
       BlobName
       ));
-    return EFI_ACCESS_DENIED;
+
+    CpuDeadLoop ();
   }
 
   //
@@ -136,10 +141,20 @@ VerifyBlob (
 
     DEBUG ((DEBUG_INFO, "%a: Found GUID %g in table\n", __func__, Guid));
 
+    if (BufSize == 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Blob Specified in Hash Table was not Provided",
+        __func__
+        ));
+
+      CpuDeadLoop ();
+    }
+
     EntrySize = Entry->Len - sizeof Entry->Guid - sizeof Entry->Len;
     if (EntrySize != SHA256_DIGEST_SIZE) {
       DEBUG ((
-        DEBUG_ERROR,
+        DEBUG_WARN,
         "%a: Hash has the wrong size %d != %d\n",
         __func__,
         EntrySize,
@@ -170,18 +185,24 @@ VerifyBlob (
         __func__,
         BlobName
         ));
+
+      CpuDeadLoop ();
     }
 
     return Status;
   }
 
+  //
+  // If the GUID is not in the hash table, execution can still continue.
+  // This blob will not be measured, but at least one blob must be.
+  //
   DEBUG ((
     DEBUG_ERROR,
     "%a: Hash GUID %g not found in table\n",
     __func__,
     Guid
     ));
-  return EFI_ACCESS_DENIED;
+  return EFI_SUCCESS;
 }
 
 /**
