@@ -367,12 +367,13 @@ MmCoreInstallLoadedImage (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  EFI_MM_DRIVER_ENTRY   *MmCoreDriverEntry;
-  EFI_PHYSICAL_ADDRESS  MmCoreImageBaseAddress;
-  UINT64                MmCoreImageLength;
-  EFI_PHYSICAL_ADDRESS  MmCoreEntryPoint;
-  EFI_PEI_HOB_POINTERS  MmCoreHob;
+  EFI_STATUS                 Status;
+  EFI_PHYSICAL_ADDRESS       MmCoreImageBaseAddress;
+  UINT64                     MmCoreImageLength;
+  EFI_PHYSICAL_ADDRESS       MmCoreEntryPoint;
+  EFI_PEI_HOB_POINTERS       MmCoreHob;
+  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
+  EFI_HANDLE                 ImageHandle;
 
   //
   // Searching for image hob
@@ -402,43 +403,33 @@ MmCoreInstallLoadedImage (
   //
   // Allocate a Loaded Image Protocol in MM
   //
-  Status = MmAllocatePool (EfiRuntimeServicesData, sizeof (EFI_MM_DRIVER_ENTRY), (VOID **)&MmCoreDriverEntry);
-  ASSERT_EFI_ERROR (Status);
+  LoadedImage = AllocatePool (sizeof (EFI_LOADED_IMAGE_PROTOCOL));
+  ASSERT (LoadedImage != NULL);
 
-  ZeroMem (MmCoreDriverEntry, sizeof (EFI_MM_DRIVER_ENTRY));
-
-  Status = MmAllocatePool (EfiRuntimeServicesData, sizeof (EFI_LOADED_IMAGE_PROTOCOL), (VOID **)&MmCoreDriverEntry->LoadedImage);
-  ASSERT_EFI_ERROR (Status);
-
-  ZeroMem (MmCoreDriverEntry->LoadedImage, sizeof (EFI_LOADED_IMAGE_PROTOCOL));
+  ZeroMem (LoadedImage, sizeof (EFI_LOADED_IMAGE_PROTOCOL));
 
   //
   // Fill in the remaining fields of the Loaded Image Protocol instance.
   //
-  MmCoreDriverEntry->Signature                 = EFI_MM_DRIVER_ENTRY_SIGNATURE;
-  MmCoreDriverEntry->LoadedImage->Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
-  MmCoreDriverEntry->LoadedImage->ParentHandle = NULL;
-  MmCoreDriverEntry->LoadedImage->SystemTable  = NULL;
+  LoadedImage->Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
+  LoadedImage->ParentHandle = NULL;
+  LoadedImage->SystemTable  = NULL;
 
-  MmCoreDriverEntry->LoadedImage->ImageBase     = (VOID *)(UINTN)MmCoreImageBaseAddress;
-  MmCoreDriverEntry->LoadedImage->ImageSize     = MmCoreImageLength;
-  MmCoreDriverEntry->LoadedImage->ImageCodeType = EfiRuntimeServicesCode;
-  MmCoreDriverEntry->LoadedImage->ImageDataType = EfiRuntimeServicesData;
-
-  MmCoreDriverEntry->ImageEntryPoint = MmCoreEntryPoint;
-  MmCoreDriverEntry->ImageBuffer     = MmCoreImageBaseAddress;
-  MmCoreDriverEntry->NumberOfPage    = EFI_SIZE_TO_PAGES ((UINTN)MmCoreImageLength);
+  LoadedImage->ImageBase     = (VOID *)(UINTN)MmCoreImageBaseAddress;
+  LoadedImage->ImageSize     = MmCoreImageLength;
+  LoadedImage->ImageCodeType = EfiRuntimeServicesCode;
+  LoadedImage->ImageDataType = EfiRuntimeServicesData;
 
   //
   // Create a new image handle in the MM handle database for the MM Driver
   //
-  MmCoreDriverEntry->ImageHandle = NULL;
-  Status                         = MmInstallProtocolInterface (
-                                     &MmCoreDriverEntry->ImageHandle,
-                                     &gEfiLoadedImageProtocolGuid,
-                                     EFI_NATIVE_INTERFACE,
-                                     MmCoreDriverEntry->LoadedImage
-                                     );
+  ImageHandle = NULL;
+  Status      = MmInstallProtocolInterface (
+                  &ImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  LoadedImage
+                  );
   ASSERT_EFI_ERROR (Status);
 }
 
