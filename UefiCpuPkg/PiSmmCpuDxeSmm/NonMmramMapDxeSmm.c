@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "PiSmmCpuCommon.h"
+#include <Library/DxeServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
