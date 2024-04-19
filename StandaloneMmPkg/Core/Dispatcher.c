@@ -202,7 +202,7 @@ MmLoadImage (
   //
   DriverEntry->LoadedImage->Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
   DriverEntry->LoadedImage->ParentHandle = NULL;
-  DriverEntry->LoadedImage->SystemTable  = mEfiSystemTable;
+  DriverEntry->LoadedImage->SystemTable  = NULL;
   DriverEntry->LoadedImage->DeviceHandle = NULL;
   DriverEntry->LoadedImage->FilePath     = NULL;
 

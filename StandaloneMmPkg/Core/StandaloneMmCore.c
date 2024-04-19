@@ -83,7 +83,6 @@ MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
   { NULL,                     NULL,                              NULL, FALSE },
 };
 
-EFI_SYSTEM_TABLE      *mEfiSystemTable;
 UINTN                 mMmramRangeCount;
 EFI_MMRAM_DESCRIPTOR  *mMmramRanges;
 

@@ -15,7 +15,6 @@
 // List of file types supported by dispatcher
 //
 EFI_FV_FILETYPE  mMmFileTypes[] = {
-  EFI_FV_FILETYPE_MM,
   0xE, // EFI_FV_FILETYPE_MM_STANDALONE,
        //
        // Note: DXE core will process the FV image file, so skip it in MM core

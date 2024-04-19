@@ -933,7 +933,6 @@ MmCoreFfsFindMmDriver (
 
 extern UINTN                 mMmramRangeCount;
 extern EFI_MMRAM_DESCRIPTOR  *mMmramRanges;
-extern EFI_SYSTEM_TABLE      *mEfiSystemTable;
 
 #define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
