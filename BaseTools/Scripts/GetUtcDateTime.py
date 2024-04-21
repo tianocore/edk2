@@ -29,7 +29,7 @@ def Main():
         print ("ERROR: At least one argument is required!\n")
         PARSER.print_help()
 
-    today = datetime.datetime.utcnow()
+    today = datetime.datetime.now(datetime.timezone.utc)
     if ARGS.year:
         ReversedNumber = str(today.year)[::-1]
         print (''.join(hex(ord(HexString))[2:] for HexString in ReversedNumber))
