@@ -136,7 +136,7 @@ class CLogicalExpression:
         var = var.strip()
         if   re.match('^0x[a-fA-F0-9]+$', var):
             value = int(var, 16)
-        elif re.match('^[+-]?\d+$', var):
+        elif re.match(r'^[+-]?\d+$', var):
             value = int(var, 10)
         else:
             value = None
@@ -147,7 +147,7 @@ class CLogicalExpression:
         var = ''
         while not self.isLast():
             char = self.getCurr()
-            if re.match('^[\w.]', char):
+            if re.match(r'^[\w.]', char):
                 var += char
                 self.moveNext()
             else:
@@ -161,7 +161,7 @@ class CLogicalExpression:
 
     def parseSingleOp(self):
         self.skipSpace()
-        if re.match('^NOT\W', self.getCurr(-1)):
+        if re.match(r'^NOT\W', self.getCurr(-1)):
             self.moveNext(3)
             op  = self.parseBrace()
             val = self.getNumber (op)
@@ -225,7 +225,7 @@ class CLogicalExpression:
         value = self.parseCompare()
         while True:
             self.skipSpace()
-            if re.match('^AND\W', self.getCurr(-1)):
+            if re.match(r'^AND\W', self.getCurr(-1)):
                 self.moveNext(3)
                 result = self.parseCompare()
                 test = self.getNonNumber(result, value)
@@ -243,10 +243,10 @@ class CLogicalExpression:
         while True:
             self.skipSpace()
             op = None
-            if re.match('^XOR\W', self.getCurr(-1)):
+            if re.match(r'^XOR\W', self.getCurr(-1)):
                 self.moveNext(3)
                 op = '^'
-            elif re.match('^OR\W', self.getCurr(-1)):
+            elif re.match(r'^OR\W', self.getCurr(-1)):
                 self.moveNext(2)
                 op = '|'
             else:
@@ -330,11 +330,11 @@ EndList
                     continue
             if IsExpression:
                 IsExpression = False
-                Match = re.match("(\w+)=(.+)", Macro)
+                Match = re.match(r"(\w+)=(.+)", Macro)
                 if Match:
                     self._MacroDict[Match.group(1)] = Match.group(2)
                 else:
-                    Match = re.match("(\w+)", Macro)
+                    Match = re.match(r"(\w+)", Macro)
                     if Match:
                         self._MacroDict[Match.group(1)] = ''
         if len(self._MacroDict) == 0:
@@ -355,7 +355,7 @@ EndList
 
     def ExpandMacros (self, Input, Preserve = False):
         Line = Input
-        Match = re.findall("\$\(\w+\)", Input)
+        Match = re.findall(r"\$\(\w+\)", Input)
         if Match:
             for Each in Match:
               Variable = Each[2:-1]
@@ -370,7 +370,7 @@ EndList
 
     def ExpandPcds (self, Input):
         Line = Input
-        Match = re.findall("(\w+\.\w+)", Input)
+        Match = re.findall(r"(\w+\.\w+)", Input)
         if Match:
             for PcdName in Match:
               if PcdName in self._PcdsDict:
@@ -390,7 +390,7 @@ EndList
         return Result
 
     def ValueToByteArray (self, ValueStr, Length):
-        Match = re.match("\{\s*FILE:(.+)\}", ValueStr)
+        Match = re.match(r"\{\s*FILE:(.+)\}", ValueStr)
         if Match:
           FileList = Match.group(1).split(',')
           Result  = bytearray()
@@ -427,7 +427,7 @@ EndList
                     if Each[0] in ['"', "'"]:
                         Result.extend(list(bytearray(Each[1:-1], 'utf-8')))
                     elif ':' in Each:
-                        Match    = re.match("(.+):(\d+)b", Each)
+                        Match    = re.match(r"(.+):(\d+)b", Each)
                         if Match is None:
                             raise Exception("Invald value list format '%s' !" % Each)
                         InBitField = True
@@ -539,7 +539,7 @@ EndList
               continue
 
             Handle   = False
-            Match    = re.match("^\[(.+)\]", DscLine)
+            Match    = re.match(r"^\[(.+)\]", DscLine)
             if Match is not None:
                 IsDefSect = False
                 IsPcdSect = False
@@ -575,7 +575,7 @@ EndList
 
                     Match = False if DscLine[0] != '!' else True
                     if Match:
-                        Match = re.match("^!(else|endif|ifdef|ifndef|if|elseif|include)\s*(.+)?$", DscLine.split("#")[0])
+                        Match = re.match(r"^!(else|endif|ifdef|ifndef|if|elseif|include)\s*(.+)?$", DscLine.split("#")[0])
                     Keyword   = Match.group(1) if Match else ''
                     Remaining = Match.group(2) if Match else ''
                     Remaining = '' if Remaining is None else Remaining.strip()
@@ -620,7 +620,7 @@ EndList
                         else:
                             Handle = True
                         if Handle:
-                            Match = re.match("!include\s+(.+)", DscLine)
+                            Match = re.match(r"!include\s+(.+)", DscLine)
                             if Match:
                                 IncludeFilePath = Match.group(1)
                                 IncludeFilePath = self.ExpandMacros(IncludeFilePath)
@@ -660,7 +660,7 @@ EndList
                 #DEFINE FSP_T_UPD_TOOL_GUID = 34686CA3-34F9-4901-B82A-BA630F0714C6
                 #DEFINE FSP_M_UPD_TOOL_GUID = 39A250DB-E465-4DD1-A2AC-E2BD3C0E2385
                 #DEFINE FSP_S_UPD_TOOL_GUID = CAE3605B-5B34-4C85-B3D7-27D54273C40F
-                Match = re.match("^\s*(?:DEFINE\s+)*(\w+)\s*=\s*(.+)", DscLine)
+                Match = re.match(r"^\s*(?:DEFINE\s+)*(\w+)\s*=\s*(.+)", DscLine)
                 if Match:
                     self._MacroDict[Match.group(1)] = self.ExpandMacros(Match.group(2))
                     if self.Debug:
@@ -668,21 +668,21 @@ EndList
             elif IsPcdSect:
                 #gSiPkgTokenSpaceGuid.PcdTxtEnable|FALSE
                 #gSiPkgTokenSpaceGuid.PcdOverclockEnable|TRUE
-                Match = re.match("^\s*([\w\.]+)\s*\|\s*(\w+)", DscLine)
+                Match = re.match(r"^\s*([\w\.]+)\s*\|\s*(\w+)", DscLine)
                 if Match:
                     self._PcdsDict[Match.group(1)] = Match.group(2)
                     if self.Debug:
                         print ("INFO : PCD %s = [ %s ]" % (Match.group(1), Match.group(2)))
                     i = 0
                     while i < len(BuildOptionPcd):
-                        Match = re.match("\s*([\w\.]+)\s*\=\s*(\w+)", BuildOptionPcd[i])
+                        Match = re.match(r"\s*([\w\.]+)\s*\=\s*(\w+)", BuildOptionPcd[i])
                         if Match:
                             self._PcdsDict[Match.group(1)] = Match.group(2)
                         i += 1
 
             elif IsTmpSect:
                 # !BSF DEFT:{GPIO_TMPL:START}
-                Match = re.match("^\s*#\s+(!BSF)\s+DEFT:{(.+?):(START|END)}", DscLine)
+                Match = re.match(r"^\s*#\s+(!BSF)\s+DEFT:{(.+?):(START|END)}", DscLine)
                 if Match:
                     if Match.group(3) == 'START' and not TemplateName:
                         TemplateName = Match.group(2).strip()
@@ -691,33 +691,33 @@ EndList
                         TemplateName = ''
                 else:
                     if TemplateName:
-                        Match = re.match("^!include\s*(.+)?$", DscLine)
+                        Match = re.match(r"^!include\s*(.+)?$", DscLine)
                         if Match:
                             continue
                         self._BsfTempDict[TemplateName].append(DscLine)
 
             else:
-                Match = re.match("^\s*#\s+(!BSF|@Bsf|!HDR)\s+(.+)", DscLine)
+                Match = re.match(r"^\s*#\s+(!BSF|@Bsf|!HDR)\s+(.+)", DscLine)
                 if Match:
                     Remaining = Match.group(2)
                     if Match.group(1) == '!BSF' or Match.group(1) == '@Bsf':
-                        Match = re.match("(?:^|.+\s+)PAGES:{(.+?)}", Remaining)
+                        Match = re.match(r"(?:^|.+\s+)PAGES:{(.+?)}", Remaining)
                         if Match:
                             # !BSF PAGES:{HSW:"Haswell System Agent", LPT:"Lynx Point PCH"}
                             PageList = Match.group(1).split(',')
                             for Page in PageList:
                                 Page  = Page.strip()
-                                Match = re.match("(\w+):\"(.+)\"", Page)
+                                Match = re.match(r"(\w+):\"(.+)\"", Page)
                                 if Match != None:
                                     self._CfgPageDict[Match.group(1)] = Match.group(2)
 
-                        Match = re.match("(?:^|.+\s+)BLOCK:{NAME:\"(.+)\"\s*,\s*VER:\"(.+)\"\s*}", Remaining)
+                        Match = re.match(r"(?:^|.+\s+)BLOCK:{NAME:\"(.+)\"\s*,\s*VER:\"(.+)\"\s*}", Remaining)
                         if Match:
                             self._CfgBlkDict['name'] = Match.group(1)
                             self._CfgBlkDict['ver']  = Match.group(2)
 
                         for Key in self._BsfKeyList:
-                            Match = re.match("(?:^|.+\s+)%s:{(.+?)}" % Key, Remaining)
+                            Match = re.match(r"(?:^|.+\s+)%s:{(.+?)}" % Key, Remaining)
                             if Match:
                                 if Key in ['NAME', 'HELP', 'OPTION'] and Match.group(1).startswith('+'):
                                     ConfigDict[Key.lower()] += Match.group(1)[1:]
@@ -725,15 +725,15 @@ EndList
                                     ConfigDict[Key.lower()]  = Match.group(1)
                     else:
                         for Key in self._HdrKeyList:
-                            Match = re.match("(?:^|.+\s+)%s:{(.+?)}" % Key, Remaining)
+                            Match = re.match(r"(?:^|.+\s+)%s:{(.+?)}" % Key, Remaining)
                             if Match:
                                 ConfigDict[Key.lower()]  = Match.group(1)
 
-                Match = re.match("^\s*#\s+@Prompt\s+(.+)", DscLine)
+                Match = re.match(r"^\s*#\s+@Prompt\s+(.+)", DscLine)
                 if Match:
                     ConfigDict['name'] = Match.group(1)
 
-                Match = re.match("^\s*#\s*@ValidList\s*(.+)\s*\|\s*(.+)\s*\|\s*(.+)\s*", DscLine)
+                Match = re.match(r"^\s*#\s*@ValidList\s*(.+)\s*\|\s*(.+)\s*\|\s*(.+)\s*", DscLine)
                 if Match:
                     if Match.group(2).strip() in self._BuidinOption:
                         ConfigDict['option'] = Match.group(2).strip()
@@ -749,22 +749,22 @@ EndList
                                  ConfigDict['option'] += ', '
                     ConfigDict['type'] = "Combo"
 
-                Match = re.match("^\s*#\s*@ValidRange\s*(.+)\s*\|\s*(.+)\s*-\s*(.+)\s*", DscLine)
+                Match = re.match(r"^\s*#\s*@ValidRange\s*(.+)\s*\|\s*(.+)\s*-\s*(.+)\s*", DscLine)
                 if Match:
                     if "0x" in Match.group(2) or "0x" in Match.group(3):
                         ConfigDict['type'] = "EditNum, HEX, (%s,%s)" % (Match.group(2), Match.group(3))
                     else:
                         ConfigDict['type'] = "EditNum, DEC, (%s,%s)" % (Match.group(2), Match.group(3))
 
-                Match = re.match("^\s*##\s+(.+)", DscLine)
+                Match = re.match(r"^\s*##\s+(.+)", DscLine)
                 if Match:
                     ConfigDict['help'] = Match.group(1)
 
                 # Check VPD/UPD
                 if IsUpdSect:
-                    Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+|\*)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+                    Match = re.match(r"^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+|\*)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
                 else:
-                    Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)(?:\s*\|\s*(.+))?",  DscLine)
+                    Match = re.match(r"^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)(?:\s*\|\s*(.+))?",  DscLine)
                 if Match:
                     ConfigDict['space']  = Match.group(1)
                     ConfigDict['cname']  = Match.group(2)
@@ -796,13 +796,13 @@ EndList
                             Value = ''
                         Value = Value.strip()
                         if '|' in Value:
-                            Match = re.match("^.+\s*\|\s*(.+)", Value)
+                            Match = re.match(r"^.+\s*\|\s*(.+)", Value)
                             if Match:
                                 Value = Match.group(1)
                         Length = -1
 
                     ConfigDict['length'] = Length
-                    Match = re.match("\$\((\w+)\)", Value)
+                    Match = re.match(r"\$\((\w+)\)", Value)
                     if Match:
                         if Match.group(1) in self._MacroDict:
                             Value = self._MacroDict[Match.group(1)]
@@ -879,7 +879,7 @@ EndList
                     # !BSF FIELD:{SerialDebugPortAddress0:1}
                     # or
                     # @Bsf FIELD:{SerialDebugPortAddress0:1b}
-                    Match = re.match("^\s*#\s+(!BSF|@Bsf)\s+FIELD:{(.+):(\d+)([Bb])?}", DscLine)
+                    Match = re.match(r"^\s*#\s+(!BSF|@Bsf)\s+FIELD:{(.+):(\d+)([Bb])?}", DscLine)
                     if Match:
                         SubCfgDict = ConfigDict.copy()
                         if (Match.group(4) == None) or (Match.group(4) == 'B'):
@@ -1023,7 +1023,7 @@ EndList
             self._VarDict['_LENGTH_'] = '%d' % (Item['offset'] + Item['length'])
         for Item in self._CfgItemList:
             Embed = Item['embed']
-            Match = re.match("^(\w+):(\w+):(START|END)", Embed)
+            Match = re.match(r"^(\w+):(\w+):(START|END)", Embed)
             if Match:
                 StructName = Match.group(1)
                 VarName = '_%s_%s_' % (Match.group(3), StructName)
@@ -1215,7 +1215,7 @@ EndList
         IsUpdHeader = False
         for Line in TextBody:
            SplitToLines = Line.splitlines()
-           MatchComment = re.match("^/\*\sCOMMENT:(\w+):([\w|\W|\s]+)\s\*/\s([\s\S]*)", SplitToLines[0])
+           MatchComment = re.match(r"^/\*\sCOMMENT:(\w+):([\w|\W|\s]+)\s\*/\s([\s\S]*)", SplitToLines[0])
            if MatchComment:
               if MatchComment.group(1) == 'FSP_UPD_HEADER':
                   IsUpdHeader = True
@@ -1226,7 +1226,7 @@ EndList
                 NewTextBody.append("/**" + CommentLine + "**/\n")
               Line = Line[(len(SplitToLines[0]) + 1):]
 
-           Match = re.match("^/\*\sEMBED_STRUCT:(\w+):(\w+):(START|END)\s\*/\s([\s\S]*)", Line)
+           Match = re.match(r"^/\*\sEMBED_STRUCT:(\w+):(\w+):(START|END)\s\*/\s([\s\S]*)", Line)
            if Match:
                Line = Match.group(4)
                if Match.group(1) == 'FSP_UPD_HEADER':
@@ -1239,7 +1239,7 @@ EndList
                    NewTextBody.append ('typedef struct {\n')
                StructName   = Match.group(1)
                VariableName = Match.group(2)
-               MatchOffset = re.search('/\*\*\sOffset\s0x([a-fA-F0-9]+)', Line)
+               MatchOffset = re.search(r'/\*\*\sOffset\s0x([a-fA-F0-9]+)', Line)
                if MatchOffset:
                    Offset = int(MatchOffset.group(1), 16)
                else:
@@ -1318,12 +1318,12 @@ EndList
                 CommentLine = ""
                 for Item in self._CfgItemList:
                     if Item["comment"] != '' and Item["offset"] >= UpdOffsetTable[UpdIdx]:
-                        MatchComment = re.match("^(U|V)PD_DATA_REGION:([\w|\W|\s]+)", Item["comment"])
+                        MatchComment = re.match(r"^(U|V)PD_DATA_REGION:([\w|\W|\s]+)", Item["comment"])
                         if MatchComment and MatchComment.group(1) == Region[0]:
                             CommentLine = " " + MatchComment.group(2) + "\n"
                             TxtBody.append("/**" + CommentLine + "**/\n")
                     elif Item["offset"] >= UpdOffsetTable[UpdIdx] and Item["comment"] == '':
-                        Match = re.match("^FSP([\w|\W|\s])_UPD", UpdStructure[UpdIdx])
+                        Match = re.match(r"^FSP([\w|\W|\s])_UPD", UpdStructure[UpdIdx])
                         if Match:
                             TxtBody.append("/** Fsp " + Match.group(1) + " UPD Configuration\n**/\n")
                 TxtBody.append("typedef struct {\n")
@@ -1441,7 +1441,7 @@ EndList
 
             Export = False
             for Line in IncLines:
-                Match = re.search ("!EXPORT\s+([A-Z]+)\s+EXTERNAL_BOOTLOADER_STRUCT_(BEGIN|END)\s+", Line)
+                Match = re.search (r"!EXPORT\s+([A-Z]+)\s+EXTERNAL_BOOTLOADER_STRUCT_(BEGIN|END)\s+", Line)
                 if Match:
                     if Match.group(2) == "BEGIN" and Match.group(1) == UpdRegionCheck[item]:
                         Export = True
@@ -1464,7 +1464,7 @@ EndList
                 Match = re.match("(typedef struct {)", Line)
                 if Match:
                     StartIndex = Index - 1
-                Match = re.match("}\s([_A-Z0-9]+);", Line)
+                Match = re.match(r"}\s([_A-Z0-9]+);", Line)
                 if Match and (UpdRegionCheck[item] in Match.group(1) or UpdConfigCheck[item] in Match.group(1)) and (ExcludedSpecificUpd[item] not in Match.group(1)) and (ExcludedSpecificUpd1[item] not in Match.group(1)):
                     EndIndex = Index
                     StructStart.append(StartIndex)
@@ -1474,7 +1474,7 @@ EndList
                 Index += 1
                 for Item in range(len(StructStart)):
                     if Index == StructStart[Item]:
-                        Match = re.match("^(/\*\*\s*)", Line)
+                        Match = re.match(r"^(/\*\*\s*)", Line)
                         if Match:
                             StructStartWithComment.append(StructStart[Item])
                         else:
@@ -1510,7 +1510,7 @@ EndList
                 Match = re.match("(typedef struct {)", Line)
                 if Match:
                     StartIndex = Index - 1
-                Match = re.match("#define\s([_A-Z0-9]+)\s*", Line)
+                Match = re.match(r"#define\s([_A-Z0-9]+)\s*", Line)
                 if Match and (UpdSignatureCheck[item] in Match.group(1) or UpdSignatureCheck[item] in Match.group(1)):
                     StructStart.append(Index - 1)
                     StructEnd.append(Index)
@@ -1519,7 +1519,7 @@ EndList
                 Index += 1
                 for Item in range(len(StructStart)):
                     if Index == StructStart[Item]:
-                        Match = re.match("^(/\*\*\s*)", Line)
+                        Match = re.match(r"^(/\*\*\s*)", Line)
                         if Match:
                             StructStartWithComment.append(StructStart[Item])
                         else:
@@ -1543,7 +1543,7 @@ EndList
         else:
             Space = Item['space']
         Line = "    $%s_%s" % (Space, Item['cname'])
-        Match = re.match("\s*\{([x0-9a-fA-F,\s]+)\}\s*", Item['value'])
+        Match = re.match(r"\s*\{([x0-9a-fA-F,\s]+)\}\s*", Item['value'])
         if Match:
             DefaultValue = Match.group(1).strip()
         else:
@@ -1576,7 +1576,7 @@ EndList
             BsfFd.write('    %s $%s, "%s", &%s,\n' % (Item['type'], PcdName, Item['name'], Options))
             WriteHelp = 1
         elif Item['type'].startswith("EditNum"):
-            Match = re.match("EditNum\s*,\s*(HEX|DEC)\s*,\s*\((\d+|0x[0-9A-Fa-f]+)\s*,\s*(\d+|0x[0-9A-Fa-f]+)\)", Item['type'])
+            Match = re.match(r"EditNum\s*,\s*(HEX|DEC)\s*,\s*\((\d+|0x[0-9A-Fa-f]+)\s*,\s*(\d+|0x[0-9A-Fa-f]+)\)", Item['type'])
             if Match:
                 BsfFd.write('    EditNum $%s, "%s", %s,\n' % (PcdName, Item['name'], Match.group(1)))
                 WriteHelp = 2
