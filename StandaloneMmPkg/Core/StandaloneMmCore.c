@@ -706,6 +706,10 @@ StandaloneMmMain (
 
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
 
+  DEBUG_CODE (
+    PrintHob (HobStart);
+    );
+
   //
   // Get Boot Firmware Volume address from the BFV Hob
   //
@@ -735,10 +739,6 @@ StandaloneMmMain (
   Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
   ASSERT_EFI_ERROR (Status);
   gHobList = MmHobStart;
-
-  DEBUG_CODE (
-    PrintHob (MmHobStart);
-    );
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
