@@ -6,7 +6,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define VIRT_HSTI_SECURITY_FEATURE_SIZE  2
 
-#define VIRT_HSTI_BYTE0_SMM_SMRAM_LOCK  BIT0
+#define VIRT_HSTI_BYTE0_SMM_SMRAM_LOCK         BIT0
+#define VIRT_HSTI_BYTE0_SMM_SECURE_VARS_FLASH  BIT1
 
 typedef struct {
   // ADAPTER_INFO_PLATFORM_SECURITY
@@ -64,4 +65,17 @@ VirtHstiQemuPCInit (
 VOID
 VirtHstiQemuPCVerify (
   VOID
+  );
+
+/* Flash.c */
+
+#define QEMU_FIRMWARE_FLASH_UNKNOWN    0
+#define QEMU_FIRMWARE_FLASH_IS_ROM     1
+#define QEMU_FIRMWARE_FLASH_IS_RAM     2
+#define QEMU_FIRMWARE_FLASH_READ_ONLY  3
+#define QEMU_FIRMWARE_FLASH_WRITABLE   4
+
+UINT32
+VirtHstiQemuFirmwareFlashCheck (
+  UINT32  Address
   );

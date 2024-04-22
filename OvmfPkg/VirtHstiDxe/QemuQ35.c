@@ -29,6 +29,7 @@ VirtHstiQemuQ35Init (
 {
   if (FeaturePcdGet (PcdSmmSmramRequire)) {
     VirtHstiSetSupported (&mHstiQ35, 0, VIRT_HSTI_BYTE0_SMM_SMRAM_LOCK);
+    VirtHstiSetSupported (&mHstiQ35, 0, VIRT_HSTI_BYTE0_SMM_SECURE_VARS_FLASH);
   }
 
   return &mHstiQ35;
@@ -54,5 +55,17 @@ VirtHstiQemuQ35Verify (
     }
 
     VirtHstiTestResult (ErrorMsg, 0, VIRT_HSTI_BYTE0_SMM_SMRAM_LOCK);
+  }
+
+  if (VirtHstiIsSupported (&mHstiQ35, 0, VIRT_HSTI_BYTE0_SMM_SECURE_VARS_FLASH)) {
+    CHAR16  *ErrorMsg = NULL;
+
+    switch (VirtHstiQemuFirmwareFlashCheck (PcdGet32 (PcdOvmfFlashNvStorageVariableBase))) {
+      case QEMU_FIRMWARE_FLASH_WRITABLE:
+        ErrorMsg = L"qemu vars pflash is not secure";
+        break;
+    }
+
+    VirtHstiTestResult (ErrorMsg, 0, VIRT_HSTI_BYTE0_SMM_SECURE_VARS_FLASH);
   }
 }
