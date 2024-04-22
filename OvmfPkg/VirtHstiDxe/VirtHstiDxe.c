@@ -104,9 +104,11 @@ VirtHstiOnReadyToBoot (
   switch (VirtHstiGetHostBridgeDevId ()) {
     case INTEL_82441_DEVICE_ID:
       VirtHstiQemuPCVerify ();
+      VirtHstiQemuCommonVerify ();
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
       VirtHstiQemuQ35Verify ();
+      VirtHstiQemuCommonVerify ();
       break;
     default:
       ASSERT (FALSE);
@@ -142,9 +144,11 @@ VirtHstiDxeEntrypoint (
   switch (DevId) {
     case INTEL_82441_DEVICE_ID:
       VirtHsti = VirtHstiQemuPCInit ();
+      VirtHstiQemuCommonInit (VirtHsti);
       break;
     case INTEL_Q35_MCH_DEVICE_ID:
       VirtHsti = VirtHstiQemuQ35Init ();
+      VirtHstiQemuCommonInit (VirtHsti);
       break;
     default:
       DEBUG ((DEBUG_INFO, "%a: unknown platform (0x%x)\n", __func__, DevId));
