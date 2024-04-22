@@ -22,6 +22,7 @@
   VirtHstiDxe.c
   QemuPC.c
   QemuQ35.c
+  QemuCommon.c
   Flash.c
 
 [Packages]
@@ -48,6 +49,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
 
 [Depex]

@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define VIRT_HSTI_BYTE0_SMM_SMRAM_LOCK         BIT0
 #define VIRT_HSTI_BYTE0_SMM_SECURE_VARS_FLASH  BIT1
+#define VIRT_HSTI_BYTE0_READONLY_CODE_FLASH    BIT2
 
 typedef struct {
   // ADAPTER_INFO_PLATFORM_SECURITY
@@ -64,6 +65,18 @@ VirtHstiQemuPCInit (
 
 VOID
 VirtHstiQemuPCVerify (
+  VOID
+  );
+
+/* QemuCommon.c */
+
+VOID
+VirtHstiQemuCommonInit (
+  VIRT_ADAPTER_INFO_PLATFORM_SECURITY  *VirtHsti
+  );
+
+VOID
+VirtHstiQemuCommonVerify (
   VOID
   );
 
