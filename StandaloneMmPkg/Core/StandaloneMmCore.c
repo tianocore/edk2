@@ -568,6 +568,10 @@ MmEntryPoint (
             //
             // Copy the data back to FixedCommBuffer
             //
+            ZeroMem (
+              (VOID *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer,
+              mMmCommunicationBuffer->FixedCommBufferSize
+              );
             CopyMem (
               (VOID *)(UINTN)mMmCommunicationBuffer->FixedCommBuffer,
               mInternalCommBufferCopy,
