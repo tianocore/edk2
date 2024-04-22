@@ -694,13 +694,12 @@ StandaloneMmMain (
   IN VOID  *HobStart
   )
 {
-  EFI_STATUS                      Status;
-  UINTN                           Index;
-  VOID                            *MmHobStart;
-  UINTN                           HobSize;
-  VOID                            *Registration;
-  EFI_HOB_FIRMWARE_VOLUME         *BfvHob;
-  EFI_PHYSICAL_ADDRESS            StandaloneBfvAddress;
+  EFI_STATUS               Status;
+  UINTN                    Index;
+  VOID                     *MmHobStart;
+  UINTN                    HobSize;
+  VOID                     *Registration;
+  EFI_HOB_FIRMWARE_VOLUME  *BfvHob;
 
   ProcessLibraryConstructorList (HobStart, &gMmCoreMmst);
 
@@ -709,16 +708,6 @@ StandaloneMmMain (
   DEBUG_CODE (
     PrintHob (HobStart);
     );
-
-  //
-  // Get Boot Firmware Volume address from the BFV Hob
-  //
-  BfvHob = GetFirstHob (EFI_HOB_TYPE_FV);
-  if (BfvHob != NULL) {
-    DEBUG ((DEBUG_INFO, "BFV address - 0x%x\n", BfvHob->BaseAddress));
-    DEBUG ((DEBUG_INFO, "BFV size    - 0x%x\n", BfvHob->Length));
-    StandaloneBfvAddress = BfvHob->BaseAddress;
-  }
 
   //
   // No need to initialize memory service.
@@ -755,12 +744,20 @@ StandaloneMmMain (
   MmCorePrepareCommunicationBuffer ();
 
   //
-  // Dispatch standalone BFV
+  // Get Boot Firmware Volume address from the BFV Hob
   //
-  DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", StandaloneBfvAddress));
-  if (StandaloneBfvAddress != 0) {
-    MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)StandaloneBfvAddress, 0);
-    MmDispatcher ();
+  BfvHob = GetFirstHob (EFI_HOB_TYPE_FV);
+  if (BfvHob != NULL) {
+    DEBUG ((DEBUG_INFO, "BFV address - 0x%x\n", BfvHob->BaseAddress));
+    DEBUG ((DEBUG_INFO, "BFV size    - 0x%x\n", BfvHob->Length));
+    //
+    // Dispatch standalone BFV
+    //
+    if (BfvHob->BaseAddress != 0) {
+      DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", BfvHob->BaseAddress));
+      MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)BfvHob->BaseAddress, 0);
+      MmDispatcher ();
+    }
   }
 
   //
