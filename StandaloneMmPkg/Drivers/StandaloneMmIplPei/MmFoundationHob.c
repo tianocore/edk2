@@ -650,10 +650,10 @@ CreateMmFoundationHobList (
   ASSERT (GuidHob != NULL);
   if (GuidHob != NULL) {
     if ((*FoundationHobSize == 0) && (FoundationHobList == NULL)) {
-      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_COMM_BUFFER_DATA);
+      RequiredSize += sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_COMM_BUFFER);
     } else {
       HobData = GET_GUID_HOB_DATA (GuidHob);
-      MmIplBuildGuidDataHob (&gEdkiiCommunicationBufferGuid, HobData, sizeof (MM_COMM_BUFFER_DATA));
+      MmIplBuildGuidDataHob (&gEdkiiCommunicationBufferGuid, HobData, sizeof (MM_COMM_BUFFER));
     }
   }
 

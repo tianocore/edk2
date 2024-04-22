@@ -93,7 +93,7 @@ UINTN                 mMmramRangeCount;
 EFI_MMRAM_DESCRIPTOR  *mMmramRanges;
 
 BOOLEAN              mMmEntryPointRegistered = FALSE;
-MM_COMM_BUFFER_DATA  *mMmCommunicationBuffer;
+MM_COMM_BUFFER       *mMmCommunicationBuffer;
 VOID                 *mInternalCommBufferCopy;
 
 /**
@@ -468,7 +468,7 @@ MmCorePrepareCommunicationBuffer (
     return;
   }
 
-  mMmCommunicationBuffer = (MM_COMM_BUFFER_DATA *)GET_GUID_HOB_DATA (GuidHob);
+  mMmCommunicationBuffer = (MM_COMM_BUFFER *)GET_GUID_HOB_DATA (GuidHob);
   DEBUG ((
     DEBUG_INFO,
     "Fixed Communication Buffer is at %x, size is %x\n",

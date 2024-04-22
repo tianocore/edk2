@@ -280,7 +280,7 @@ ProcessCommunicationBuffer (
   EFI_STATUS                 Status;
   EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
   EFI_HOB_GUID_TYPE          *GuidHob;
-  MM_COMM_BUFFER_DATA        *MmCommonBufferData;
+  MM_COMM_BUFFER             *MmCommonBuffer;
   COMMUNICATION_IN_OUT       *CommunicationInOutBuffer;
   UINTN                      BufferSize;
 
@@ -303,15 +303,15 @@ ProcessCommunicationBuffer (
   //
   GuidHob = GetFirstGuidHob (&gEdkiiCommunicationBufferGuid);
   ASSERT (GuidHob != NULL);
-  MmCommonBufferData       = GET_GUID_HOB_DATA (GuidHob);
-  CommunicationInOutBuffer = (COMMUNICATION_IN_OUT *)(UINTN)MmCommonBufferData->CommunicationInOut;
+  MmCommonBuffer           = GET_GUID_HOB_DATA (GuidHob);
+  CommunicationInOutBuffer = (COMMUNICATION_IN_OUT *)(UINTN)MmCommonBuffer->CommunicationInOut;
 
   //
   // Copy the content at input CommBufferPhysical to FixedCommBuffer
   // if CommBufferPhysical is not equal to FixedCommBuffer.
   //
-  if ((UINTN)CommBufferPhysical != MmCommonBufferData->FixedCommBuffer) {
-    CopyMem ((VOID *)(MmCommonBufferData->FixedCommBuffer), CommBufferPhysical, BufferSize);
+  if ((UINTN)CommBufferPhysical != MmCommonBuffer->FixedCommBuffer) {
+    CopyMem ((VOID *)(MmCommonBuffer->FixedCommBuffer), CommBufferPhysical, BufferSize);
   }
 
   CommunicationInOutBuffer->IsCommBufferValid = TRUE;
@@ -327,8 +327,8 @@ ProcessCommunicationBuffer (
   //
   // Copy the returned data to the non-mmram buffer (CommBufferPhysical)
   //
-  if ((UINTN)CommBufferPhysical != MmCommonBufferData->FixedCommBuffer) {
-    CopyMem (CommBufferPhysical, (VOID *)(MmCommonBufferData->FixedCommBuffer), CommunicationInOutBuffer->ReturnBufferSize);
+  if ((UINTN)CommBufferPhysical != MmCommonBuffer->FixedCommBuffer) {
+    CopyMem (CommBufferPhysical, (VOID *)(MmCommonBuffer->FixedCommBuffer), CommunicationInOutBuffer->ReturnBufferSize);
   }
 
   //

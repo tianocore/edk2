@@ -129,17 +129,17 @@ Communicate (
   EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
   UINTN                       TempCommSize;
   EFI_HOB_GUID_TYPE           *GuidHob;
-  MM_COMM_BUFFER_DATA         *MmCommBufferData;
+  MM_COMM_BUFFER              *MmCommBuffer;
   COMMUNICATION_IN_OUT        *CommunicationInOut;
 
   DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Enter\n"));
 
   GuidHob = GetFirstGuidHob (&gEdkiiCommunicationBufferGuid);
   if (GuidHob != NULL) {
-    MmCommBufferData   = GET_GUID_HOB_DATA (GuidHob);
-    CommunicationInOut = (COMMUNICATION_IN_OUT *)(UINTN)MmCommBufferData->CommunicationInOut;
+    MmCommBuffer       = GET_GUID_HOB_DATA (GuidHob);
+    CommunicationInOut = (COMMUNICATION_IN_OUT *)(UINTN)MmCommBuffer->CommunicationInOut;
   } else {
-    DEBUG ((DEBUG_ERROR, "MmCommBufferData is not existed !!!\n"));
+    DEBUG ((DEBUG_ERROR, "MmCommBuffer is not existed !!!\n"));
     ASSERT (GuidHob != NULL);
     return EFI_NOT_FOUND;
   }
@@ -168,13 +168,13 @@ Communicate (
     }
   }
 
-  if (TempCommSize > MmCommBufferData->FixedCommBufferSize) {
+  if (TempCommSize > MmCommBuffer->FixedCommBufferSize) {
     DEBUG ((DEBUG_ERROR, "Communicate buffer size is over MAX size\n"));
-    ASSERT (TempCommSize > MmCommBufferData->FixedCommBufferSize);
+    ASSERT (TempCommSize > MmCommBuffer->FixedCommBufferSize);
     return EFI_INVALID_PARAMETER;
   }
 
-  CopyMem ((VOID *)(UINTN)MmCommBufferData->FixedCommBuffer, CommBuffer, TempCommSize);
+  CopyMem ((VOID *)(UINTN)MmCommBuffer->FixedCommBuffer, CommBuffer, TempCommSize);
   CommunicationInOut->IsCommBufferValid = TRUE;
 
   //
@@ -201,7 +201,7 @@ Communicate (
   //
   // Copy the returned data to the non-mmram buffer (CommBuffer)
   //
-  CopyMem (CommBuffer, (VOID *)(MmCommBufferData->FixedCommBuffer), CommunicationInOut->ReturnBufferSize);
+  CopyMem (CommBuffer, (VOID *)(MmCommBuffer->FixedCommBuffer), CommunicationInOut->ReturnBufferSize);
 
   Status    = (EFI_STATUS)CommunicationInOut->ReturnStatus;
   if (Status != EFI_SUCCESS) {
@@ -825,56 +825,56 @@ StandaloneMmIplPeiEntry (
   )
 {
   EFI_STATUS               Status;
-  MM_COMM_BUFFER_DATA      MmCommBufferData;
+  MM_COMM_BUFFER           MmCommBuffer;
 
   //
   // Initialize MM communication buffer data
   //
-  ZeroMem (&MmCommBufferData, sizeof (MM_COMM_BUFFER_DATA));
+  ZeroMem (&MmCommBuffer, sizeof (MM_COMM_BUFFER));
 
   //
   // Set fixed communicate buffer size
   //
-  MmCommBufferData.FixedCommBufferSize = PcdGet32 (PcdFixedCommBufferPages) * EFI_PAGE_SIZE;
+  MmCommBuffer.FixedCommBufferSize = PcdGet32 (PcdFixedCommBufferPages) * EFI_PAGE_SIZE;
 
   //
   // Allocate runtime memory for fixed communicate buffer
   //
-  MmCommBufferData.FixedCommBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateRuntimePages (PcdGet32 (PcdFixedCommBufferPages));
-  if (MmCommBufferData.FixedCommBuffer == 0) {
+  MmCommBuffer.FixedCommBuffer = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateRuntimePages (PcdGet32 (PcdFixedCommBufferPages));
+  if (MmCommBuffer.FixedCommBuffer == 0) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate fixed communication buffer\n"));
-    ASSERT (MmCommBufferData.FixedCommBuffer != 0);
+    ASSERT (MmCommBuffer.FixedCommBuffer != 0);
     return EFI_OUT_OF_RESOURCES;
   } 
 
   //
   // Build MM unblock memory region HOB for communication buffer
   //
-  Status = MmUnblockMemoryRequest (MmCommBufferData.FixedCommBuffer, PcdGet32 (PcdFixedCommBufferPages));
+  Status = MmUnblockMemoryRequest (MmCommBuffer.FixedCommBuffer, PcdGet32 (PcdFixedCommBufferPages));
 
   //
   // Allocate runtime memory for communication in and out parameters :
   // ReturnStatus, ReturnBufferSize, IsCommBufferValid
   //
-  MmCommBufferData.CommunicationInOut = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateRuntimePages (EFI_SIZE_TO_PAGES (sizeof (COMMUNICATION_IN_OUT)));
-  if (MmCommBufferData.CommunicationInOut == 0) {
+  MmCommBuffer.CommunicationInOut = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateRuntimePages (EFI_SIZE_TO_PAGES (sizeof (COMMUNICATION_IN_OUT)));
+  if (MmCommBuffer.CommunicationInOut == 0) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate communication in/out buffer\n"));
-    ASSERT (MmCommBufferData.CommunicationInOut != 0);
+    ASSERT (MmCommBuffer.CommunicationInOut != 0);
     return EFI_OUT_OF_RESOURCES;
   } 
 
   //
   // Build MM unblock memory region HOB for communication in/out buffer
   //
-  Status = MmUnblockMemoryRequest (MmCommBufferData.CommunicationInOut, EFI_SIZE_TO_PAGES (sizeof (COMMUNICATION_IN_OUT)));
+  Status = MmUnblockMemoryRequest (MmCommBuffer.CommunicationInOut, EFI_SIZE_TO_PAGES (sizeof (COMMUNICATION_IN_OUT)));
 
   //
   // Build communication buffer Hob for SMM and DXE phase
   //
   BuildGuidDataHob (
     &gEdkiiCommunicationBufferGuid,
-    &MmCommBufferData,
-    sizeof (MM_COMM_BUFFER_DATA)
+    &MmCommBuffer,
+    sizeof (MM_COMM_BUFFER)
     );
 
   //

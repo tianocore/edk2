@@ -47,7 +47,7 @@ SmmCommunicationBufferEntryPoint (
   EDKII_PI_SMM_COMMUNICATION_REGION_TABLE  *PiSmmCommunicationRegionTable;
   EFI_MEMORY_DESCRIPTOR                    *Entry;
   EFI_HOB_GUID_TYPE                        *GuidHob;
-  MM_COMM_BUFFER_DATA                      *MmCommBufferData;
+  MM_COMM_BUFFER                           *MmCommBuffer;
 
   DescriptorSize    = sizeof (EFI_MEMORY_DESCRIPTOR);
 
@@ -76,8 +76,8 @@ SmmCommunicationBufferEntryPoint (
   if (GuidHob == NULL) {
     Entry->PhysicalStart = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedPages (DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES);
   } else {
-    MmCommBufferData     = GET_GUID_HOB_DATA (GuidHob);
-    Entry->PhysicalStart = MmCommBufferData->FixedCommBuffer;
+    MmCommBuffer         = GET_GUID_HOB_DATA (GuidHob);
+    Entry->PhysicalStart = MmCommBuffer->FixedCommBuffer;
   }
 
   ASSERT (Entry->PhysicalStart != 0);

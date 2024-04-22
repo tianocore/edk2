@@ -76,6 +76,6 @@ typedef struct {
   /// a software MMI handler back to the caller of the MM Communication Protocol.
   ///
   EFI_PHYSICAL_ADDRESS    CommunicationInOut;
-} MM_COMM_BUFFER_DATA;
+} MM_COMM_BUFFER;
 
 #endif
