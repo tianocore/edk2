@@ -143,7 +143,7 @@ class Symbols:
         fdIn.close()
         fvInfo['Base'] = 0
         for rptLine in rptLines:
-            match = re.match("^EFI_BASE_ADDRESS\s*=\s*(0x[a-fA-F0-9]+)", rptLine)
+            match = re.match(r"^EFI_BASE_ADDRESS\s*=\s*(0x[a-fA-F0-9]+)", rptLine)
             if match:
                 fvInfo['Base'] = int(match.group(1), 16)
                 break
@@ -312,7 +312,7 @@ class Symbols:
         self.fdBase = 0xFFFFFFFF
         while (rptLine != "" ):
             #EFI_BASE_ADDRESS = 0xFFFDF400
-            match = re.match("^EFI_BASE_ADDRESS\s*=\s*(0x[a-fA-F0-9]+)", rptLine)
+            match = re.match(r"^EFI_BASE_ADDRESS\s*=\s*(0x[a-fA-F0-9]+)", rptLine)
             if match is not None:
                 self.fdBase = int(match.group(1), 16) - fvOffset
                 break
@@ -340,7 +340,7 @@ class Symbols:
         fdIn     = open(fvTxtFile, "r")
         rptLine  = fdIn.readline()
         while (rptLine != "" ):
-            match = re.match("(0x[a-fA-F0-9]+)\s([0-9a-fA-F\-]+)", rptLine)
+            match = re.match(r"(0x[a-fA-F0-9]+)\s([0-9a-fA-F\-]+)", rptLine)
             if match is not None:
                 if match.group(2) in self.dictFfsOffset:
                     self.dictFfsOffset[fvName + ':' + match.group(2)] = "0x%08X" % (int(match.group(1), 16) + fvOffset)
@@ -374,10 +374,10 @@ class Symbols:
         while (rptLine != "" ):
             if rptLine[0] != ' ':
                 #DxeIpl (Fixed Flash Address, BaseAddress=0x00fffb4310, EntryPoint=0x00fffb4958,Type=PE)
-                match = re.match("([_a-zA-Z0-9\-]+)\s\(.+BaseAddress=(0x[0-9a-fA-F]+),\s+EntryPoint=(0x[0-9a-fA-F]+),\s*Type=\w+\)", rptLine)
+                match = re.match(r"([_a-zA-Z0-9\-]+)\s\(.+BaseAddress=(0x[0-9a-fA-F]+),\s+EntryPoint=(0x[0-9a-fA-F]+),\s*Type=\w+\)", rptLine)
                 if match is None:
                     #DxeIpl (Fixed Flash Address, BaseAddress=0x00fffb4310, EntryPoint=0x00fffb4958)
-                    match = re.match("([_a-zA-Z0-9\-]+)\s\(.+BaseAddress=(0x[0-9a-fA-F]+),\s+EntryPoint=(0x[0-9a-fA-F]+)\)", rptLine)
+                    match = re.match(r"([_a-zA-Z0-9\-]+)\s\(.+BaseAddress=(0x[0-9a-fA-F]+),\s+EntryPoint=(0x[0-9a-fA-F]+)\)", rptLine)
                 if match is not None:
                     foundModHdr = True
                     modName = match.group(1)
@@ -386,7 +386,7 @@ class Symbols:
                     self.dictModBase['%s:BASE'  % modName] = int (match.group(2), 16)
                     self.dictModBase['%s:ENTRY' % modName] = int (match.group(3), 16)
                 #(GUID=86D70125-BAA3-4296-A62F-602BEBBB9081 .textbaseaddress=0x00fffb4398 .databaseaddress=0x00fffb4178)
-                match = re.match("\(GUID=([A-Z0-9\-]+)\s+\.textbaseaddress=(0x[0-9a-fA-F]+)\s+\.databaseaddress=(0x[0-9a-fA-F]+)\)", rptLine)
+                match = re.match(r"\(GUID=([A-Z0-9\-]+)\s+\.textbaseaddress=(0x[0-9a-fA-F]+)\s+\.databaseaddress=(0x[0-9a-fA-F]+)\)", rptLine)
                 if match is not None:
                     if foundModHdr:
                         foundModHdr = False
@@ -399,7 +399,7 @@ class Symbols:
             else:
                 #   0x00fff8016c    __ModuleEntryPoint
                 foundModHdr = False
-                match = re.match("^\s+(0x[a-z0-9]+)\s+([_a-zA-Z0-9]+)", rptLine)
+                match = re.match(r"^\s+(0x[a-z0-9]+)\s+([_a-zA-Z0-9]+)", rptLine)
                 if match is not None:
                     self.dictSymbolAddress["%s:%s"%(modName, match.group(2))] = match.group(1)
             rptLine  = fdIn.readline()
@@ -432,14 +432,14 @@ class Symbols:
         if reportLine.strip().find("Archive member included") != -1:
             #GCC
             #                0x0000000000001d55                IoRead8
-            patchMapFileMatchString = "\s+(0x[0-9a-fA-F]{16})\s+([^\s][^0x][_a-zA-Z0-9\-]+)\s"
+            patchMapFileMatchString = r"\s+(0x[0-9a-fA-F]{16})\s+([^\s][^0x][_a-zA-Z0-9\-]+)\s"
             matchKeyGroupIndex = 2
             matchSymbolGroupIndex  = 1
             prefix = '_'
         else:
             #MSFT
             #0003:00000190       _gComBase                  00007a50     SerialPo
-            patchMapFileMatchString =  "^\s[0-9a-fA-F]{4}:[0-9a-fA-F]{8}\s+(\w+)\s+([0-9a-fA-F]{8,16}\s+)"
+            patchMapFileMatchString =  r"^\s[0-9a-fA-F]{4}:[0-9a-fA-F]{8}\s+(\w+)\s+([0-9a-fA-F]{8,16}\s+)"
             matchKeyGroupIndex = 1
             matchSymbolGroupIndex  = 2
             prefix = ''
@@ -458,11 +458,11 @@ class Symbols:
                 if handleNext:
                     handleNext = False
                     pcdName = match.group(1)
-                    match   = re.match("\s+(0x[0-9a-fA-F]{16})\s+", reportLine)
+                    match   = re.match(r"\s+(0x[0-9a-fA-F]{16})\s+", reportLine)
                     if match is not None:
                         modSymbols[prefix + pcdName] = match.group(1)
                 else:
-                    match = re.match("^\s\.data\.(_gPcd_BinaryPatch[_a-zA-Z0-9\-]+)", reportLine)
+                    match = re.match(r"^\s\.data\.(_gPcd_BinaryPatch[_a-zA-Z0-9\-]+)", reportLine)
                     if match is not None:
                         handleNext = True
                         continue
@@ -507,7 +507,7 @@ class Symbols:
         fdIn     = open(xrefFile, "r")
         rptLine  = fdIn.readline()
         while (rptLine != "" ):
-            match = re.match("([0-9a-fA-F\-]+)\s([_a-zA-Z0-9]+)", rptLine)
+            match = re.match(r"([0-9a-fA-F\-]+)\s([_a-zA-Z0-9]+)", rptLine)
             if match is not None:
                 self.dictGuidNameXref[match.group(1).upper()] = match.group(2)
             rptLine  = fdIn.readline()
