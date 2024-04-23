@@ -17,11 +17,6 @@ UINTN  mMaxNumberOfCpus = 1;
 UINTN  mNumberOfCpus    = 1;
 
 //
-// Record all Processors Info
-//
-EFI_PROCESSOR_INFORMATION  *mProcessorInfo = NULL;
-
-//
 // IDT used during SMM Init
 //
 IA32_DESCRIPTOR  gcSmmInitIdtr;
@@ -35,6 +30,11 @@ UINT64  mSmBase;
 // SmBase Rebased flag for current CPU
 //
 volatile BOOLEAN  mRebased;
+
+//
+// CpuIndex for current CPU
+//
+UINTN  mCpuIndex;
 
 /**
   This function will get the SmBase for CpuIndex.
@@ -140,33 +140,22 @@ SmmInitHandler (
   VOID
   )
 {
-  UINT32  ApicId;
-  UINTN   Index;
-
   //
   // Update SMM IDT entries' code segment and load IDT
   //
   AsmWriteIdtr (&gcSmmInitIdtr);
-  ApicId = GetApicId ();
 
-  for (Index = 0; Index < mNumberOfCpus; Index++) {
-    if (ApicId == (UINT32)mProcessorInfo[Index].ProcessorId) {
-      //
-      // Configure SmBase.
-      //
-      ConfigureSmBase (mSmBase);
+  //
+  // Configure SmBase.
+  //
+  ConfigureSmBase (mSmBase);
 
-      //
-      // Hook return after RSM to set SMM re-based flag
-      // SMM re-based flag can't be set before RSM, because SMM save state context might be override
-      // by next AP flow before it take effect.
-      //
-      SemaphoreHook (Index, &mRebased);
-      return;
-    }
-  }
-
-  ASSERT (FALSE);
+  //
+  // Hook return after RSM to set SMM re-based flag
+  // SMM re-based flag can't be set before RSM, because SMM save state context might be override
+  // by next AP flow before it take effect.
+  //
+  SemaphoreHook (mCpuIndex, &mRebased);
 }
 
 /**
@@ -187,13 +176,15 @@ SmmRelocateBases (
   IN UINTN                       TileSize
   )
 {
-  UINT8                 BakBuf[BACK_BUF_SIZE];
-  SMRAM_SAVE_STATE_MAP  BakBuf2;
-  SMRAM_SAVE_STATE_MAP  *CpuStatePtr;
-  UINT8                 *U8Ptr;
-  UINTN                 Index;
-  UINTN                 BspIndex;
-  UINT32                BspApicId;
+  EFI_STATUS                 Status;
+  UINT8                      BakBuf[BACK_BUF_SIZE];
+  SMRAM_SAVE_STATE_MAP       BakBuf2;
+  SMRAM_SAVE_STATE_MAP       *CpuStatePtr;
+  UINT8                      *U8Ptr;
+  UINTN                      Index;
+  UINTN                      BspIndex;
+  UINT32                     BspApicId;
+  EFI_PROCESSOR_INFORMATION  ProcessorInfo;
 
   //
   // Make sure the reserved size is large enough for procedure SmmInitTemplate.
@@ -232,10 +223,14 @@ SmmRelocateBases (
   //
   BspIndex = (UINTN)-1;
   for (Index = 0; Index < mNumberOfCpus; Index++) {
-    if (BspApicId != (UINT32)mProcessorInfo[Index].ProcessorId) {
-      mRebased = FALSE;
-      mSmBase  = GetSmBase (Index, SmmRelocationStart, TileSize);
-      SendSmiIpi ((UINT32)mProcessorInfo[Index].ProcessorId);
+    Status = MpServices2->GetProcessorInfo (MpServices2, Index | CPU_V2_EXTENDED_TOPOLOGY, &ProcessorInfo);
+    ASSERT_EFI_ERROR (Status);
+
+    if (BspApicId != (UINT32)ProcessorInfo.ProcessorId) {
+      mRebased  = FALSE;
+      mSmBase   = GetSmBase (Index, SmmRelocationStart, TileSize);
+      mCpuIndex = Index;
+      SendSmiIpi ((UINT32)ProcessorInfo.ProcessorId);
       //
       // Wait for this AP to finish its 1st SMI
       //
@@ -445,7 +440,6 @@ SmmRelocationInit (
   EFI_PHYSICAL_ADDRESS  SmmRelocationStart;
   UINTN                 SmmStackSize;
   UINT8                 *SmmStacks;
-  UINTN                 Index;
 
   SmmRelocationStart = 0;
   SmmStacks          = NULL;
@@ -474,24 +468,6 @@ SmmRelocationInit (
   }
 
   ASSERT (mNumberOfCpus <= mMaxNumberOfCpus);
-
-  //
-  // Retrieve the Processor Info for all CPUs
-  //
-  mProcessorInfo = (EFI_PROCESSOR_INFORMATION *)AllocatePool (sizeof (EFI_PROCESSOR_INFORMATION) * mMaxNumberOfCpus);
-  if (mProcessorInfo == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
-  for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
-    if (Index < mNumberOfCpus) {
-      Status = MpServices2->GetProcessorInfo (MpServices2, Index | CPU_V2_EXTENDED_TOPOLOGY, &mProcessorInfo[Index]);
-      if (EFI_ERROR (Status)) {
-        goto ON_EXIT;
-      }
-    }
-  }
 
   //
   // Calculate SmmRelocationSize for all of the tiles.
