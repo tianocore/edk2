@@ -46,9 +46,11 @@
   BaseLib
   MtrrLib
   MemoryAllocationLib
+  LockBoxLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
+  gEdkiiS3MtrrSettingGuid
 
 [Protocols]
   gEfiMpServiceProtocolGuid          ## CONSUMES
