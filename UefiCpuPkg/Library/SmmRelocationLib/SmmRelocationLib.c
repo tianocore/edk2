@@ -31,11 +31,6 @@ UINT64  mSmBase;
 //
 volatile BOOLEAN  mRebased;
 
-//
-// CpuIndex for current CPU
-//
-UINTN  mCpuIndex;
-
 /**
   This function will get the SmBase for CpuIndex.
 
@@ -155,7 +150,7 @@ SmmInitHandler (
   // SMM re-based flag can't be set before RSM, because SMM save state context might be override
   // by next AP flow before it take effect.
   //
-  SemaphoreHook (mCpuIndex, &mRebased);
+  SemaphoreHook (&mRebased);
 }
 
 /**
@@ -227,9 +222,8 @@ SmmRelocateBases (
     ASSERT_EFI_ERROR (Status);
 
     if (BspApicId != (UINT32)ProcessorInfo.ProcessorId) {
-      mRebased  = FALSE;
-      mSmBase   = GetSmBase (Index, SmmRelocationStart, TileSize);
-      mCpuIndex = Index;
+      mRebased = FALSE;
+      mSmBase  = GetSmBase (Index, SmmRelocationStart, TileSize);
       SendSmiIpi ((UINT32)ProcessorInfo.ProcessorId);
       //
       // Wait for this AP to finish its 1st SMI

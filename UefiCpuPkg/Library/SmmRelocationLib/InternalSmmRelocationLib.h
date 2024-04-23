@@ -83,8 +83,6 @@ SmmRelocationSemaphoreComplete (
   detected, and the appropriate hook must be selected.  Always clear the auto
   HALT restart flag if it is set.
 
-  @param[in]     CpuIndex                 The processor index for the currently
-                                          executing CPU.
   @param[in,out] CpuState                 Pointer to SMRAM Save State Map for the
                                           currently executing CPU.
   @param[in]     NewInstructionPointer32  Instruction pointer to use if resuming to
@@ -98,7 +96,6 @@ SmmRelocationSemaphoreComplete (
 UINT64
 EFIAPI
 HookReturnFromSmm (
-  IN     UINTN                 CpuIndex,
   IN OUT SMRAM_SAVE_STATE_MAP  *CpuState,
   IN     UINT64                NewInstructionPointer32,
   IN     UINT64                NewInstructionPointer
@@ -109,14 +106,12 @@ HookReturnFromSmm (
   can be executed immediately after AP exits SMM to indicate to
   the BSP that an AP has exited SMM after SMBASE relocation.
 
-  @param[in] CpuIndex     The processor index.
   @param[in] RebasedFlag  A pointer to a flag that is set to TRUE
                           immediately after AP exits SMM.
 
 **/
 VOID
 SemaphoreHook (
-  IN UINTN             CpuIndex,
   IN volatile BOOLEAN  *RebasedFlag
   );
 

@@ -84,8 +84,6 @@ ConfigureSmBase (
   detected, and the appropriate hook must be selected.  Always clear the auto
   HALT restart flag if it is set.
 
-  @param[in]     CpuIndex                 The processor index for the currently
-                                          executing CPU.
   @param[in,out] CpuState                 Pointer to SMRAM Save State Map for the
                                           currently executing CPU.
   @param[in]     NewInstructionPointer32  Instruction pointer to use if resuming to
@@ -99,7 +97,6 @@ ConfigureSmBase (
 UINT64
 EFIAPI
 HookReturnFromSmm (
-  IN     UINTN                 CpuIndex,
   IN OUT SMRAM_SAVE_STATE_MAP  *CpuState,
   IN     UINT64                NewInstructionPointer32,
   IN     UINT64                NewInstructionPointer
