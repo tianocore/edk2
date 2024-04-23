@@ -11,6 +11,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
+#include <Library/HobPrintLib.h>
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/MemoryAllocationHob.h>
 
@@ -59,23 +60,49 @@ CHAR8  *mResource_Type_List[] = {
   "EFI_RESOURCE_MAX_MEMORY_TYPE        "  // 0x00000007
 };
 
-typedef
+typedef struct {
+  UINTN                    NumberOfGuidHobPrintHandler;
+  GUID_HOB_PRINT_HANDLE    *GuidHobPrintHandlerTable;
+} GUID_HOB_PRINT_HANDLER_INFO;
+
+GUID_HOB_PRINT_HANDLER_INFO  mGuidHobPrintHanlderInfo = {
+  0,
+  NULL
+};
+
+/**
+  Register Guid HOB print handlers.
+
+  @param[in] Handlers           A pointer to the list of Guid Hob print handler
+  @param[in] NumberOfHandlers   Numbers of Guid Hob print handler
+
+  @return EFI_SUCCESS             The handlers were registered.
+  @return EFI_INVALID_PARAMETER   Handlers is NULL or NumberOfHandlers is Zero.
+  @return EFI_OUT_OF_RESOURCES    There are not enough resources available to register the handlers.
+
+**/
 EFI_STATUS
-(*GUID_HOB_PRINT) (
-  IN  UINT8   *HobRaw,
-  IN  UINT16  HobLength
-  );
+EFIAPI
+RegisterGuidHobPrintHandlers (
+  IN GUID_HOB_PRINT_HANDLE  *Handlers,
+  IN UINTN                  NumberOfHandlers
+  )
+{
+  //
+  // Check input parameter
+  //
+  if ((Handlers == NULL) || (NumberOfHandlers == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-typedef struct {
-  EFI_GUID          *Guid;
-  GUID_HOB_PRINT    PrintHandler;
-  CHAR8             *GuidName;
-} GUID_HOB_PRINT_HANDLE;
+  //
+  // Set the Guid Hob print handlers
+  //
+  mGuidHobPrintHanlderInfo.GuidHobPrintHandlerTable    = Handlers;
+  mGuidHobPrintHanlderInfo.NumberOfGuidHobPrintHandler = NumberOfHandlers;
 
-typedef struct {
-  EFI_GUID    *Guid;
-  CHAR8       *Type;
-} PRINT_MEMORY_ALLOCCATION_HOB;
+  return EFI_SUCCESS;
+}
 
 /**
   Print the Hex value of a given range.
@@ -199,37 +226,6 @@ PrintResourceDiscriptorHob (
   return EFI_SUCCESS;
 }
 
-
-/**
-  Print the information in MemoryTypeInfoGuidHob.
-  @param[in] HobRaw          A pointer to the start of gEfiMemoryTypeInformationGuid HOB.
-  @param[in] HobLength       The size of the HOB data buffer.
-
-  @retval EFI_SUCCESS        If it completed successfully.
-**/
-EFI_STATUS
-PrintMemoryTypeInfoGuidHob (
-  IN  UINT8   *HobRaw,
-  IN  UINT16  HobLength
-  )
-{
-  EFI_MEMORY_TYPE_INFORMATION  *MemoryTypeInfo;
-
-  MemoryTypeInfo = (EFI_MEMORY_TYPE_INFORMATION *)GET_GUID_HOB_DATA (HobRaw);
-  ASSERT (HobLength >= sizeof (*MemoryTypeInfo));
-  DEBUG ((DEBUG_INFO, "   Type            = 0x%x\n", MemoryTypeInfo->Type));
-  DEBUG ((DEBUG_INFO, "   NumberOfPages   = 0x%x\n", MemoryTypeInfo->NumberOfPages));
-  return EFI_SUCCESS;
-}
-
-//
-// Mappint table for dump Guid Hob information.
-// This table can be easily extented.
-//
-GUID_HOB_PRINT_HANDLE  GuidHobPrintHandleTable[] = {
-  { &gEfiMemoryTypeInformationGuid,          PrintMemoryTypeInfoGuidHob,    "gEfiMemoryTypeInformationGuid(Memory Type Information Guid)" }
-};
-
 /**
   Print the Guid Hob using related print handle function.
   @param[in] HobStart        A pointer to the HOB of type EFI_HOB_TYPE_GUID_EXTENSION.
@@ -242,18 +238,24 @@ PrintGuidHob (
   IN  UINT16  HobLength
   )
 {
-  EFI_PEI_HOB_POINTERS  Hob;
-  UINTN                 Index;
-  EFI_STATUS            Status;
+  EFI_PEI_HOB_POINTERS   Hob;
+  UINTN                  Index;
+  EFI_STATUS             Status;
+  GUID_HOB_PRINT_HANDLE  *GuidHobPrintHandle;
 
   Hob.Raw = (UINT8 *)HobStart;
   ASSERT (HobLength >= sizeof (Hob.Guid));
 
-  for (Index = 0; Index < ARRAY_SIZE (GuidHobPrintHandleTable); Index++) {
-    if (CompareGuid (&Hob.Guid->Name, GuidHobPrintHandleTable[Index].Guid)) {
-      DEBUG ((DEBUG_INFO, "   Guid   = %a\n", GuidHobPrintHandleTable[Index].GuidName));
-      Status = GuidHobPrintHandleTable[Index].PrintHandler (Hob.Raw, GET_GUID_HOB_DATA_SIZE (Hob.Raw));
-      return Status;
+  if ((mGuidHobPrintHanlderInfo.GuidHobPrintHandlerTable != NULL) &&
+      (mGuidHobPrintHanlderInfo.NumberOfGuidHobPrintHandler != 0))
+  {
+    for (Index = 0; Index < mGuidHobPrintHanlderInfo.NumberOfGuidHobPrintHandler; Index++) {
+      GuidHobPrintHandle = mGuidHobPrintHanlderInfo.GuidHobPrintHandlerTable + Index;
+      if (CompareGuid (&Hob.Guid->Name, GuidHobPrintHandle->Guid)) {
+        DEBUG ((DEBUG_INFO, "   Guid   = %a\n", GuidHobPrintHandle->GuidName));
+        Status = GuidHobPrintHandle->PrintHandler (Hob.Raw, GET_GUID_HOB_DATA_SIZE (Hob.Raw));
+        return Status;
+      }
     }
   }
 
@@ -415,7 +417,7 @@ HOB_PRINT_HANDLER_TABLE  mHobHandles[] = {
   @return    The pointer to the HOB list.
 **/
 VOID
-PrintHob (
+PrintHobs (
   IN CONST VOID  *HobStart
   )
 {

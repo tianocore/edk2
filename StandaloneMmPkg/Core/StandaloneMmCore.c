@@ -710,7 +710,7 @@ StandaloneMmMain (
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
 
   DEBUG_CODE (
-    PrintHob (HobStart);
+    PrintHobs (HobStart);
     );
 
   //
