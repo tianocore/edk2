@@ -26,9 +26,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/LockBoxLib.h>
 
 #include <Protocol/MpService.h>
 #include <Guid/EventGroup.h>
+#include <Guid/S3MtrrSettingGuid.h>
 
 //
 // Data structure used to allocate ACPI_CPU_DATA and its supporting structures
@@ -129,6 +131,16 @@ CpuS3DataOnEndOfDxe (
 
   DEBUG ((DEBUG_VERBOSE, "%a\n", __func__));
   MtrrGetAllMtrrs (&AcpiCpuDataEx->MtrrTable);
+
+  //
+  // Save MTRR in lockbox
+  //
+  Status = SaveLockBox (
+             &gEdkiiS3MtrrSettingGuid,
+             &AcpiCpuDataEx->MtrrTable,
+             sizeof (MTRR_SETTINGS)
+             );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Close event, so it will not be invoked again.

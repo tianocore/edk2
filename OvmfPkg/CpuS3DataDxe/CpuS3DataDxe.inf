@@ -46,9 +46,11 @@
   MtrrLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  LockBoxLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
+  gEdkiiS3MtrrSettingGuid
 
 [Protocols]
   gEfiMpServiceProtocolGuid          ## CONSUMES
