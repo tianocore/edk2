@@ -30,7 +30,6 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS    ReturnContext1;
   EFI_PHYSICAL_ADDRESS    ReturnContext2;
   EFI_PHYSICAL_ADDRESS    ReturnStackPointer;
-  EFI_PHYSICAL_ADDRESS    MpService2Ppi;
   EFI_PHYSICAL_ADDRESS    Smst;
 } SMM_S3_RESUME_STATE;
 
