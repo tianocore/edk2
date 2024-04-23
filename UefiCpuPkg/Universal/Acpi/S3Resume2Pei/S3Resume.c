@@ -1082,6 +1082,17 @@ S3RestoreConfig2 (
       Status = SmmAccess->Open ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
     }
 
+    //
+    // Get MP Services2 Ppi to pass it to Smm S3.
+    //
+    Status = PeiServicesLocatePpi (
+               &gEdkiiPeiMpServices2PpiGuid,
+               0,
+               NULL,
+               (VOID **)&MpService2Ppi
+               );
+    ASSERT_EFI_ERROR (Status);
+
     SmramDescriptor  = (EFI_SMRAM_DESCRIPTOR *)GET_GUID_HOB_DATA (GuidHob);
     SmmS3ResumeState = (SMM_S3_RESUME_STATE *)(UINTN)SmramDescriptor->CpuStart;
 
@@ -1119,16 +1130,6 @@ S3RestoreConfig2 (
     if (((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) && (sizeof (UINTN) == sizeof (UINT32))) ||
         ((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_64) && (sizeof (UINTN) == sizeof (UINT64))))
     {
-      //
-      // Get MP Services2 Ppi to pass it to Smm S3.
-      //
-      Status = PeiServicesLocatePpi (
-                 &gEdkiiPeiMpServices2PpiGuid,
-                 0,
-                 NULL,
-                 (VOID **)&MpService2Ppi
-                 );
-      ASSERT_EFI_ERROR (Status);
       SmmS3ResumeState->MpService2Ppi = (EFI_PHYSICAL_ADDRESS)(UINTN)MpService2Ppi;
       DEBUG ((DEBUG_INFO, "SMM S3 MpService2Ppi Point = %lx\n", SmmS3ResumeState->MpService2Ppi));
 
