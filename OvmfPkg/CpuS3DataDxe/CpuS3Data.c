@@ -9,7 +9,7 @@ number of CPUs reported by the MP Services Protocol, so this module does not
 support hot plug CPUs.  This module can be copied into a CPU specific package
 and customized if these additional features are required.
 
-Copyright (c) 2013 - 2021, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2015 - 2020, Red Hat, Inc.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/LockBoxLib.h>
 
 #include <Protocol/MpService.h>
 #include <Guid/EventGroup.h>
@@ -129,6 +130,16 @@ CpuS3DataOnEndOfDxe (
 
   DEBUG ((DEBUG_VERBOSE, "%a\n", __func__));
   MtrrGetAllMtrrs (&AcpiCpuDataEx->MtrrTable);
+
+  //
+  // Save MTRR in lockbox
+  //
+  Status = SaveLockBox (
+             &gEdkiiS3MtrrSettingGuid,
+             &AcpiCpuDataEx->MtrrTable,
+             sizeof (MTRR_SETTINGS)
+             );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Close event, so it will not be invoked again.
