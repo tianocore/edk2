@@ -37,7 +37,6 @@
 
 **/
 VOID *
-EFIAPI
 MmIplCreateHob (
   IN VOID    *Hob,
   IN UINT16  HobType,
@@ -72,7 +71,6 @@ MmIplCreateHob (
 
 **/
 VOID
-EFIAPI
 MmIplBuildMemoryResourceHob (
   IN UINT8                        *Hob,
   IN EFI_RESOURCE_TYPE            ResourceType,
@@ -187,7 +185,6 @@ MmIplCopyGuidHob (
 
 **/
 VOID
-EFIAPI
 MmIplBuildMmCoreModuleHob (
   IN UINT8                *HobPtr,
   IN CONST EFI_GUID       *ModuleName,

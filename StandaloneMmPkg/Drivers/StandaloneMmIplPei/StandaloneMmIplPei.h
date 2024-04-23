@@ -82,7 +82,6 @@ EndOfPeiCallback (
 
 **/
 VOID *
-EFIAPI
 MmIplCreateHob (
   IN VOID    *Hob,
   IN UINT16  HobType,
@@ -117,7 +116,6 @@ MmIplCreateHob (
 
 **/
 EFI_STATUS
-EFIAPI
 CreateMmFoundationHobList (
   IN     VOID                            *FoundationHobList,
   IN OUT UINTN                           *FoundationHobSize,
