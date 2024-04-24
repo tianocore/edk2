@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PlatformInitLib.h>
 
 #include <IndustryStandard/Hsti.h>
@@ -139,6 +140,11 @@ VirtHstiDxeEntrypoint (
   UINT16                               DevId;
   EFI_STATUS                           Status;
   EFI_EVENT                            Event;
+
+  if (PcdGet64 (PcdConfidentialComputingGuestAttr)) {
+    DEBUG ((DEBUG_INFO, "%a: confidential guest\n", __func__));
+    return EFI_UNSUPPORTED;
+  }
 
   DevId = VirtHstiGetHostBridgeDevId ();
   switch (DevId) {

@@ -49,6 +49,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
 
 [Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
   gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
 
