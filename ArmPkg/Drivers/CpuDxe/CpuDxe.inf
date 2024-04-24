@@ -24,6 +24,7 @@
   CpuMmuCommon.c
   Exception.c
   MemoryAttribute.c
+  PageTableMemoryAllocation.c
 
 [Sources.ARM]
   Arm/Mmu.c
@@ -40,6 +41,7 @@
 [LibraryClasses]
   ArmLib
   ArmMmuLib
+  BaseLib
   BaseMemoryLib
   CacheMaintenanceLib
   CpuLib
@@ -56,6 +58,7 @@
 [Protocols]
   gEfiCpuArchProtocolGuid
   gEfiMemoryAttributeProtocolGuid
+  gArmPageTableMemoryAllocationProtocolGuid
 
 [Guids]
   gEfiDebugImageInfoTableGuid
@@ -69,7 +72,6 @@
 
 [FeaturePcd.common]
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
-  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx
 
 [Depex]
   gHardwareInterruptProtocolGuid OR gHardwareInterrupt2ProtocolGuid

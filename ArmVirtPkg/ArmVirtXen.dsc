@@ -55,6 +55,9 @@
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 
+[LibraryClasses.common.SEC]
+  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuSecLib.inf
+
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
 !if $(TARGET) != RELEASE
   DebugLib|MdePkg/Library/DxeRuntimeDebugLibSerialPort/DxeRuntimeDebugLibSerialPort.inf
