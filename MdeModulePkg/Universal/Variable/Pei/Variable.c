@@ -25,6 +25,15 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiListVariable = {
 };
 
 /**
+  Build gVariableRuntimeCacheContextHobGuid.
+
+**/
+EFI_STATUS
+BuildVariableCacheContextHob (
+  VOID
+  );
+
+/**
   Provide the functionality of the variable services.
 
   @param  FileHandle   Handle of the file being invoked.
@@ -41,6 +50,10 @@ PeimInitializeVariableServices (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  if (FeaturePcdGet (PcdEnableVariableRuntimeCache)) {
+    BuildVariableCacheContextHob ();
+  }
+
   return PeiServicesInstallPpi (&mPpiListVariable);
 }
 
@@ -1249,4 +1262,260 @@ PeiGetNextVariableName (
       Variable.CurrPtr = GetNextVariablePtr (&StoreInfo, Variable.CurrPtr, VariableHeader);
     }
   }
+}
+
+/**
+  Calculate the auth variable storage size converted from normal variable storage.
+
+  @param[in]  StoreInfo         Pointer to the store info
+  @param[in]  NormalVarStorage  Pointer to the normal variable storage header
+
+  @retval the auth variable storage size
+**/
+UINTN
+CalculateAuthVarStorageSize (
+  IN  VARIABLE_STORE_INFO    *StoreInfo,
+  IN  VARIABLE_STORE_HEADER  *NormalVarStorage
+  )
+{
+  VARIABLE_HEADER  *StartPtr;
+  VARIABLE_HEADER  *EndPtr;
+  UINTN            AuthVarStroageSize;
+
+  AuthVarStroageSize = sizeof (VARIABLE_STORE_HEADER);
+
+  //
+  // Calculate Auth Variable Storage Size
+  //
+  StartPtr = GetStartPointer (NormalVarStorage);
+  EndPtr   = GetEndPointer (NormalVarStorage);
+  while (StartPtr < EndPtr) {
+    if (StartPtr->State == VAR_ADDED) {
+      AuthVarStroageSize  = HEADER_ALIGN (AuthVarStroageSize);
+      AuthVarStroageSize += sizeof (AUTHENTICATED_VARIABLE_HEADER);
+      AuthVarStroageSize += StartPtr->NameSize + GET_PAD_SIZE (StartPtr->NameSize);
+      AuthVarStroageSize += StartPtr->DataSize + GET_PAD_SIZE (StartPtr->DataSize);
+    }
+
+    StartPtr = GetNextVariablePtr (StoreInfo, StartPtr, StartPtr);
+  }
+
+  return AuthVarStroageSize;
+}
+
+/**
+  Calculate Hob variable cache size.
+
+  @param[IN]  AuthFlag   If the NV variable store is Auth.
+
+  @retval Maximum of Nv variable cache size.
+
+**/
+UINTN
+CalculateHobVariableCacheSize (
+  IN BOOLEAN  AuthFlag
+  )
+{
+  VARIABLE_STORE_INFO    StoreInfo;
+  VARIABLE_STORE_HEADER  *VariableStoreHeader;
+
+  VariableStoreHeader = NULL;
+  GetHobVariableStore (&StoreInfo, &VariableStoreHeader);
+
+  if (VariableStoreHeader == NULL) {
+    return 0;
+  }
+
+  if (AuthFlag) {
+    if (StoreInfo.AuthFlag) {
+      return VariableStoreHeader->Size;
+    } else {
+      //
+      // Need to calculate auth variable storage size converted from normal variable storage
+      //
+      return CalculateAuthVarStorageSize (&StoreInfo, VariableStoreHeader);
+    }
+  } else {
+    //
+    // Normal NV variable store + Auth HOB variable store is not supported
+    //
+    ASSERT (!StoreInfo.AuthFlag);
+    return VariableStoreHeader->Size;
+  }
+}
+
+/**
+  Calculate Nv variable cache size.
+
+  @param[OUT]  AuthFlag   If the NV variable store is Auth.
+
+  @retval Maximum of Nv variable cache size.
+
+**/
+UINTN
+CalculateNvVariableCacheSize (
+  OUT BOOLEAN  *AuthFlag
+  )
+{
+  EFI_STATUS                            Status;
+  EFI_HOB_GUID_TYPE                     *GuidHob;
+  EFI_FIRMWARE_VOLUME_HEADER            *FvHeader;
+  VARIABLE_STORE_HEADER                 *VariableStoreHeader;
+  EFI_PHYSICAL_ADDRESS                  NvStorageBase;
+  UINT32                                NvStorageSize;
+  UINT64                                NvStorageSize64;
+  FAULT_TOLERANT_WRITE_LAST_WRITE_DATA  *FtwLastWriteData;
+
+  if (PcdGetBool (PcdEmuVariableNvModeEnable)) {
+    return PcdGet32 (PcdVariableStoreSize);
+  }
+
+  Status = GetVariableFlashNvStorageInfo (&NvStorageBase, &NvStorageSize64);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SafeUint64ToUint32 (NvStorageSize64, &NvStorageSize);
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (NvStorageBase != 0);
+  FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)NvStorageBase;
+
+  //
+  // Check the FTW last write data hob.
+  //
+  GuidHob = GetFirstGuidHob (&gEdkiiFaultTolerantWriteGuid);
+  if (GuidHob != NULL) {
+    FtwLastWriteData = (FAULT_TOLERANT_WRITE_LAST_WRITE_DATA *)GET_GUID_HOB_DATA (GuidHob);
+    if (FtwLastWriteData->TargetAddress == NvStorageBase) {
+      //
+      // Let FvHeader point to spare block.
+      //
+      FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FtwLastWriteData->SpareAddress;
+    }
+  }
+
+  VariableStoreHeader = (VARIABLE_STORE_HEADER *)((UINT8 *)FvHeader + FvHeader->HeaderLength);
+  *AuthFlag           = (BOOLEAN)(CompareGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid));
+
+  return NvStorageSize - FvHeader->HeaderLength;
+}
+
+/**
+  Build gVariableRuntimeCacheContextHobGuid.
+
+**/
+EFI_STATUS
+BuildVariableCacheContextHob (
+  VOID
+  )
+{
+  VARIABLE_RUNTIME_CACHE_CONTEXT_HOB  *VariableRuntimeCacheHob;
+  EFI_STATUS                          Status;
+  VOID                                *Buffer;
+  UINTN                               BufferSize;
+  BOOLEAN                             AuthFlag;
+  UINTN                               Pages;
+
+  VariableRuntimeCacheHob = BuildGuidHob (&gVariableRuntimeCacheContextHobGuid, sizeof (VARIABLE_RUNTIME_CACHE_CONTEXT_HOB));
+  ASSERT (VariableRuntimeCacheHob != NULL);
+  ZeroMem (VariableRuntimeCacheHob, sizeof (VARIABLE_RUNTIME_CACHE_CONTEXT_HOB));
+
+  //
+  // Allocate 1 runtime page for three pointers.
+  //
+  Pages  = 1;
+  Buffer = AllocateRuntimePages (Pages);
+  ASSERT (Buffer != NULL);
+  Status = MmUnblockMemoryRequest (
+             (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
+             Pages
+             );
+  if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  VariableRuntimeCacheHob->HobFlushCompletePtr = (UINTN)Buffer;
+  VariableRuntimeCacheHob->PendingUpdatePtr    = ((UINTN)Buffer + sizeof (UINT64));
+  VariableRuntimeCacheHob->ReadLockPtr         = ((UINTN)Buffer + 2 * sizeof (UINT64));
+
+  //
+  // AllocateRuntimePages for VolatileCache and unblock it.
+  //
+  BufferSize = PcdGet32 (PcdVariableStoreSize);
+  if (BufferSize > 0) {
+    Pages  = EFI_SIZE_TO_PAGES (BufferSize);
+    Buffer = AllocateRuntimePages (Pages);
+    ASSERT (Buffer != NULL);
+    Status = MmUnblockMemoryRequest (
+               (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
+               Pages
+               );
+    if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    VariableRuntimeCacheHob->RuntimeVolatileCacheBuffer  = (UINTN)Buffer;
+    VariableRuntimeCacheHob->MaxRuntimeVolatileCacheSize = EFI_PAGES_TO_SIZE (Pages);
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "PeiVariable: Volatile cache Buffer is: 0x%x, size is: 0x%x\n",
+    VariableRuntimeCacheHob->RuntimeVolatileCacheBuffer,
+    VariableRuntimeCacheHob->MaxRuntimeVolatileCacheSize
+    ));
+
+  //
+  // AllocateRuntimePages for NVCache and unblock it.
+  //
+  BufferSize = CalculateNvVariableCacheSize (&AuthFlag);
+  if (BufferSize > 0) {
+    Pages  = EFI_SIZE_TO_PAGES (BufferSize);
+    Buffer = AllocateRuntimePages (Pages);
+    ASSERT (Buffer != NULL);
+    Status = MmUnblockMemoryRequest (
+               (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
+               Pages
+               );
+    if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    VariableRuntimeCacheHob->RuntimeNvCacheBuffer  = (UINTN)Buffer;
+    VariableRuntimeCacheHob->MaxRuntimeNvCacheSize = EFI_PAGES_TO_SIZE (Pages);
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "PeiVariable: NV cache Buffer is: 0x%x, size is: 0x%x\n",
+    VariableRuntimeCacheHob->RuntimeNvCacheBuffer,
+    VariableRuntimeCacheHob->MaxRuntimeNvCacheSize
+    ));
+
+  //
+  // AllocateRuntimePages for HobCache and unblock it.
+  //
+  BufferSize = CalculateHobVariableCacheSize (AuthFlag);
+  if (BufferSize > 0) {
+    Pages  = EFI_SIZE_TO_PAGES (BufferSize);
+    Buffer = AllocateRuntimePages (Pages);
+    ASSERT (Buffer != NULL);
+    Status = MmUnblockMemoryRequest (
+               (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer,
+               Pages
+               );
+    if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    VariableRuntimeCacheHob->RuntimeHobCacheBuffer  = (UINTN)Buffer;
+    VariableRuntimeCacheHob->MaxRuntimeHobCacheSize = EFI_PAGES_TO_SIZE (Pages);
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "PeiVariable: HOB cache Buffer is: 0x%x, size is: 0x%x\n",
+    VariableRuntimeCacheHob->RuntimeHobCacheBuffer,
+    VariableRuntimeCacheHob->MaxRuntimeHobCacheSize
+    ));
+
+  return EFI_SUCCESS;
 }

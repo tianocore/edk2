@@ -41,6 +41,8 @@
   PeiServicesLib
   SafeIntLib
   VariableFlashInfoLib
+  MmUnblockMemoryLib
+  MemoryAllocationLib
 
 [Guids]
   ## CONSUMES             ## GUID # Variable store header
@@ -56,12 +58,15 @@
   ## SOMETIMES_CONSUMES   ## HOB
   ## CONSUMES             ## GUID # Dependence
   gEdkiiFaultTolerantWriteGuid
+  gVariableRuntimeCacheContextHobGuid
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid   ## PRODUCES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable         ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache      ## CONSUMES
 
 [Depex]
   gEdkiiFaultTolerantWriteGuid
