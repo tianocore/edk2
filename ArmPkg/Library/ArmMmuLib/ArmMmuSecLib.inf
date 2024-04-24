@@ -9,14 +9,14 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmMmuPeiLib
-  FILE_GUID                      = b50d8d53-1ad1-44ea-9e69-8c89d4a6d08b
-  MODULE_TYPE                    = PEIM
+  BASE_NAME                      = ArmMmuSecLib
+  FILE_GUID                      = EA59A139-086A-4B8E-9297-FE161EFEB251
+  MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ArmMmuLib | PEIM PEI_CORE
+  LIBRARY_CLASS                  = ArmMmuLib | SEC
 
 [Defines.AARCH64]
-  CONSTRUCTOR                    = ArmMmuPeiLibConstructor
+  CONSTRUCTOR                    = ArmMmuBaseLibConstructor
 
 [Sources.AARCH64]
   ArmMmuLibInternal.h
