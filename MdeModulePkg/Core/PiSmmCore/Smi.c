@@ -152,6 +152,7 @@ SmiManage (
 
   PERF_FUNCTION_BEGIN ();
   mSmiManageCallingDepth++;
+  WillReturn   = FALSE;
   Status       = EFI_NOT_FOUND;
   ReturnStatus = Status;
   if (HandlerType == NULL) {
