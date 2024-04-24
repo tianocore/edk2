@@ -124,8 +124,6 @@
 [BuildOptions]
 !if $(CAVIUM_ERRATUM_27456) == TRUE
   GCC:*_*_AARCH64_PP_FLAGS = -DCAVIUM_ERRATUM_27456
-!else
-  GCC:*_*_AARCH64_CC_XIPFLAGS ==
 !endif
 
 !include NetworkPkg/NetworkBuildOptions.dsc.inc

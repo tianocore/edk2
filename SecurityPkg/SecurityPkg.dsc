@@ -97,13 +97,6 @@
 [LibraryClasses.RISCV64]
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
-[LibraryClasses.X64.SEC]
-  HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
-  TpmMeasurementLib|SecurityPkg/Library/SecTpmMeasurementLib/SecTpmMeasurementLibTdx.inf
-
-[LibraryClasses.X64.DXE_DRIVER]
-  HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
-
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
@@ -293,15 +286,6 @@
   # Random Number Generator
   #
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
-
-[Components.X64]
-  SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
-  SecurityPkg/Library/SecTpmMeasurementLib/SecTpmMeasurementLibTdx.inf
-  SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf {
-    <LibraryClasses>
-      HashLib|SecurityPkg/Library/HashLibTdx/HashLibTdx.inf
-      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
-  }
 
 [Components.IA32, Components.X64]
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf

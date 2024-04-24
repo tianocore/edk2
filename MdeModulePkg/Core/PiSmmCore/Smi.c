@@ -8,8 +8,12 @@
 
 #include "PiSmmCore.h"
 
-SMI_HANDLER  *mCurrentSmiHandler = NULL;
-LIST_ENTRY   mSmiEntryList       = INITIALIZE_LIST_HEAD_VARIABLE (mSmiEntryList);
+//
+// mSmiManageCallingDepth is used to track the depth of recursive calls of SmiManage.
+//
+UINTN  mSmiManageCallingDepth = 0;
+
+LIST_ENTRY  mSmiEntryList = INITIALIZE_LIST_HEAD_VARIABLE (mSmiEntryList);
 
 SMI_ENTRY  mRootSmiEntry = {
   SMI_ENTRY_SIGNATURE,
@@ -81,6 +85,40 @@ SmmCoreFindSmiEntry (
 }
 
 /**
+  Remove SmiHandler and free the memory it used.
+  If SmiEntry is empty, remove SmiEntry and free the memory it used.
+
+  @param  SmiHandler Points to SMI handler.
+  @param  SmiEntry   Points to SMI Entry or NULL for root SMI handlers.
+
+  @retval TRUE        SmiEntry is removed.
+  @retval FALSE       SmiEntry is not removed.
+**/
+BOOLEAN
+RemoveSmiHandler (
+  IN SMI_HANDLER  *SmiHandler,
+  IN SMI_ENTRY    *SmiEntry
+  )
+{
+  ASSERT (SmiHandler->ToRemove);
+  RemoveEntryList (&SmiHandler->Link);
+  FreePool (SmiHandler);
+
+  //
+  // Remove the SMI_ENTRY if all handlers have been removed.
+  //
+  if (SmiEntry != NULL) {
+    if (IsListEmpty (&SmiEntry->SmiHandlers)) {
+      RemoveEntryList (&SmiEntry->AllEntries);
+      FreePool (SmiEntry);
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Manage SMI of a particular type.
 
   @param  HandlerType    Points to the handler type or NULL for root SMI handlers.
@@ -105,15 +143,17 @@ SmiManage (
 {
   LIST_ENTRY   *Link;
   LIST_ENTRY   *Head;
+  LIST_ENTRY   *EntryLink;
   SMI_ENTRY    *SmiEntry;
   SMI_HANDLER  *SmiHandler;
-  BOOLEAN      SuccessReturn;
+  EFI_STATUS   ReturnStatus;
+  BOOLEAN      WillReturn;
   EFI_STATUS   Status;
 
   PERF_FUNCTION_BEGIN ();
-
-  Status        = EFI_NOT_FOUND;
-  SuccessReturn = FALSE;
+  mSmiManageCallingDepth++;
+  Status       = EFI_NOT_FOUND;
+  ReturnStatus = Status;
   if (HandlerType == NULL) {
     //
     // Root SMI handler
@@ -135,26 +175,15 @@ SmiManage (
 
   Head = &SmiEntry->SmiHandlers;
 
-  for (Link = Head->ForwardLink; Link != Head;) {
+  for (Link = Head->ForwardLink; Link != Head; Link = Link->ForwardLink) {
     SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
-    //
-    // To support unregister SMI handler inside SMI handler itself,
-    // get next node before handler is executed, since LIST_ENTRY that
-    // Link points to may be freed if unregister SMI handler.
-    //
-    Link = Link->ForwardLink;
-    //
-    // Assign gCurrentSmiHandle before calling the SMI handler and
-    // set to NULL when it returns.
-    //
-    mCurrentSmiHandler = SmiHandler;
-    Status             = SmiHandler->Handler (
-                                       (EFI_HANDLE)SmiHandler,
-                                       Context,
-                                       CommBuffer,
-                                       CommBufferSize
-                                       );
-    mCurrentSmiHandler = NULL;
+
+    Status = SmiHandler->Handler (
+                           (EFI_HANDLE)SmiHandler,
+                           Context,
+                           CommBuffer,
+                           CommBufferSize
+                           );
 
     switch (Status) {
       case EFI_INTERRUPT_PENDING:
@@ -164,7 +193,16 @@ SmiManage (
         //
         if (HandlerType != NULL) {
           PERF_FUNCTION_END ();
-          return EFI_INTERRUPT_PENDING;
+          ReturnStatus = EFI_INTERRUPT_PENDING;
+          WillReturn   = TRUE;
+        } else {
+          //
+          // If any other handler's result sets ReturnStatus as EFI_SUCCESS, the return status
+          // will be EFI_SUCCESS.
+          //
+          if (ReturnStatus != EFI_SUCCESS) {
+            ReturnStatus = Status;
+          }
         }
 
         break;
@@ -177,10 +215,10 @@ SmiManage (
         //
         if (HandlerType != NULL) {
           PERF_FUNCTION_END ();
-          return EFI_SUCCESS;
+          WillReturn = TRUE;
         }
 
-        SuccessReturn = TRUE;
+        ReturnStatus = EFI_SUCCESS;
         break;
 
       case EFI_WARN_INTERRUPT_SOURCE_QUIESCED:
@@ -188,7 +226,7 @@ SmiManage (
         // If at least one of the handlers returns EFI_WARN_INTERRUPT_SOURCE_QUIESCED
         // then the function will return EFI_SUCCESS.
         //
-        SuccessReturn = TRUE;
+        ReturnStatus = EFI_SUCCESS;
         break;
 
       case EFI_WARN_INTERRUPT_SOURCE_PENDING:
@@ -196,6 +234,10 @@ SmiManage (
         // If all the handlers returned EFI_WARN_INTERRUPT_SOURCE_PENDING
         // then EFI_WARN_INTERRUPT_SOURCE_PENDING will be returned.
         //
+        if (ReturnStatus != EFI_SUCCESS) {
+          ReturnStatus = Status;
+        }
+
         break;
 
       default:
@@ -205,14 +247,74 @@ SmiManage (
         ASSERT (FALSE);
         break;
     }
+
+    if (WillReturn) {
+      break;
+    }
   }
 
-  if (SuccessReturn) {
-    Status = EFI_SUCCESS;
+  ASSERT (mSmiManageCallingDepth > 0);
+  mSmiManageCallingDepth--;
+
+  //
+  // SmiHandlerUnRegister() calls from SMI handlers are deferred till this point.
+  // Before returned from SmiManage, delete the SmiHandler which is
+  // marked as ToRemove.
+  // Note that SmiManage can be called recursively.
+  //
+  if (mSmiManageCallingDepth == 0) {
+    //
+    // Go through all SmiHandler in root SMI handlers
+    //
+    for ( Link = GetFirstNode (&mRootSmiEntry.SmiHandlers)
+          ; !IsNull (&mRootSmiEntry.SmiHandlers, Link);
+          )
+    {
+      //
+      // SmiHandler might be removed in below, so cache the next link in Link
+      //
+      SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
+      Link       = GetNextNode (&mRootSmiEntry.SmiHandlers, Link);
+      if (SmiHandler->ToRemove) {
+        //
+        // Remove SmiHandler if the ToRemove is set.
+        //
+        RemoveSmiHandler (SmiHandler, NULL);
+      }
+    }
+
+    //
+    // Go through all SmiHandler in non-root SMI handlers
+    //
+    for ( EntryLink = GetFirstNode (&mSmiEntryList)
+          ; !IsNull (&mSmiEntryList, EntryLink);
+          )
+    {
+      //
+      // SmiEntry might be removed in below, so cache the next link in EntryLink
+      //
+      SmiEntry  = CR (EntryLink, SMI_ENTRY, AllEntries, SMI_ENTRY_SIGNATURE);
+      EntryLink = GetNextNode (&mSmiEntryList, EntryLink);
+      for ( Link = GetFirstNode (&SmiEntry->SmiHandlers)
+            ; !IsNull (&SmiEntry->SmiHandlers, Link);
+            )
+      {
+        //
+        // SmiHandler might be removed in below, so cache the next link in Link
+        //
+        SmiHandler = CR (Link, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
+        Link       = GetNextNode (&SmiEntry->SmiHandlers, Link);
+        if (SmiHandler->ToRemove) {
+          if (RemoveSmiHandler (SmiHandler, SmiEntry)) {
+            break;
+          }
+        }
+      }
+    }
   }
 
   PERF_FUNCTION_END ();
-  return Status;
+  return ReturnStatus;
 }
 
 /**
@@ -250,6 +352,7 @@ SmiHandlerRegister (
   SmiHandler->Signature  = SMI_HANDLER_SIGNATURE;
   SmiHandler->Handler    = Handler;
   SmiHandler->CallerAddr = (UINTN)RETURN_ADDRESS (0);
+  SmiHandler->ToRemove   = FALSE;
 
   if (HandlerType == NULL) {
     //
@@ -330,37 +433,27 @@ SmiHandlerUnRegister (
     }
   }
 
-  if ((EFI_HANDLE)SmiHandler != DispatchHandle) {
+  if (SmiHandler == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  //
-  // Do not allow to unregister SMI Handler inside other SMI Handler
-  //
-  if ((mCurrentSmiHandler != NULL) && (mCurrentSmiHandler != SmiHandler)) {
-    return EFI_INVALID_PARAMETER;
-  }
+  ASSERT ((EFI_HANDLE)SmiHandler == DispatchHandle);
+  SmiHandler->ToRemove = TRUE;
 
-  SmiEntry = SmiHandler->SmiEntry;
-
-  RemoveEntryList (&SmiHandler->Link);
-  FreePool (SmiHandler);
-
-  if (SmiEntry == NULL) {
+  if (mSmiManageCallingDepth > 0) {
     //
-    // This is root SMI handler
+    // This function is called from SmiManage()
+    // Do not delete or remove SmiHandler or SmiEntry now.
+    // SmiManage will handle it later
     //
     return EFI_SUCCESS;
   }
 
-  if (IsListEmpty (&SmiEntry->SmiHandlers)) {
-    //
-    // No handler registered for this interrupt now, remove the SMI_ENTRY
-    //
-    RemoveEntryList (&SmiEntry->AllEntries);
+  SmiEntry = SmiHandler->SmiEntry;
 
-    FreePool (SmiEntry);
-  }
-
+  //
+  // For root SMI handler, use NULL for SmiEntry
+  //
+  RemoveSmiHandler (SmiHandler, (SmiEntry == &mRootSmiEntry) ? NULL : SmiEntry);
   return EFI_SUCCESS;
 }

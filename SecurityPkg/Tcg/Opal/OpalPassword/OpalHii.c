@@ -40,6 +40,7 @@ EFI_HII_HANDLE  gHiiPackageListHandle = NULL;
 //
 const EFI_GUID  gHiiPackageListGuid   = PACKAGE_LIST_GUID;
 const EFI_GUID  gHiiSetupVariableGuid = SETUP_VARIABLE_GUID;
+const EFI_GUID  gOpalSetupFormSetGuid = SETUP_FORMSET_GUID;
 
 //
 // Structure that contains state of the HII
@@ -611,10 +612,15 @@ DriverCallback (
   EFI_BROWSER_ACTION_REQUEST            *ActionRequest
   )
 {
-  HII_KEY    HiiKey;
-  UINT8      HiiKeyId;
-  UINT32     PpRequest;
-  OPAL_DISK  *OpalDisk;
+  HII_KEY             HiiKey;
+  UINT8               HiiKeyId;
+  UINT32              PpRequest;
+  OPAL_DISK           *OpalDisk;
+  EFI_STATUS          Status;
+  VOID                *StartOpCodeHandle;
+  VOID                *EndOpCodeHandle;
+  EFI_IFR_GUID_LABEL  *StartLabel;
+  EFI_IFR_GUID_LABEL  *EndLabel;
 
   if (ActionRequest != NULL) {
     *ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
@@ -632,15 +638,69 @@ DriverCallback (
   HiiKey.Raw = QuestionId;
   HiiKeyId   = (UINT8)HiiKey.KeyBits.Id;
 
-  if (Action == EFI_BROWSER_ACTION_FORM_OPEN) {
-    switch (HiiKeyId) {
-      case HII_KEY_ID_VAR_SUPPORTED_DISKS:
-        DEBUG ((DEBUG_INFO, "HII_KEY_ID_VAR_SUPPORTED_DISKS\n"));
-        return HiiPopulateMainMenuForm ();
+  if (Action == EFI_BROWSER_ACTION_RETRIEVE) {
+    if ((HiiKeyId == HII_KEY_ID_VAR_SUPPORTED_DISKS) || (HiiKeyId == HII_KEY_ID_VAR_SELECTED_DISK_AVAILABLE_ACTIONS)) {
+      //
+      // Allocate space for creation of UpdateData Buffer
+      //
+      StartOpCodeHandle = HiiAllocateOpCodeHandle ();
+      if (StartOpCodeHandle == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
 
-      case HII_KEY_ID_VAR_SELECTED_DISK_AVAILABLE_ACTIONS:
-        DEBUG ((DEBUG_INFO, "HII_KEY_ID_VAR_SELECTED_DISK_AVAILABLE_ACTIONS\n"));
-        return HiiPopulateDiskInfoForm ();
+      EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+      if (EndOpCodeHandle == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      //
+      // Create Hii Extend Label OpCode as the start opcode
+      //
+      StartLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+      StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+
+      //
+      // Create Hii Extend Label OpCode as the end opcode
+      //
+      EndLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+      EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+
+      switch (HiiKeyId) {
+        case HII_KEY_ID_VAR_SUPPORTED_DISKS:
+          DEBUG ((DEBUG_INFO, "HII_KEY_ID_VAR_SUPPORTED_DISKS\n"));
+          Status = HiiPopulateMainMenuForm ();
+
+          StartLabel->Number = OPAL_MAIN_MENU_LABEL_START;
+          EndLabel->Number   = OPAL_MAIN_MENU_LABEL_END;
+          HiiUpdateForm (
+            gHiiPackageListHandle,
+            (EFI_GUID *)&gOpalSetupFormSetGuid,
+            FORMID_VALUE_MAIN_MENU,
+            StartOpCodeHandle,
+            EndOpCodeHandle
+            );
+          break;
+
+        case HII_KEY_ID_VAR_SELECTED_DISK_AVAILABLE_ACTIONS:
+          DEBUG ((DEBUG_INFO, "HII_KEY_ID_VAR_SELECTED_DISK_AVAILABLE_ACTIONS\n"));
+          Status = HiiPopulateDiskInfoForm ();
+
+          StartLabel->Number = OPAL_DISK_INFO_LABEL_START;
+          EndLabel->Number   = OPAL_DISK_INFO_LABEL_END;
+          HiiUpdateForm (
+            gHiiPackageListHandle,
+            (EFI_GUID *)&gOpalSetupFormSetGuid,
+            FORMID_VALUE_DISK_INFO_FORM_MAIN,
+            StartOpCodeHandle,
+            EndOpCodeHandle
+            );
+          break;
+      }
+
+      HiiFreeOpCodeHandle (StartOpCodeHandle);
+      HiiFreeOpCodeHandle (EndOpCodeHandle);
+
+      return Status;
     }
   } else if (Action == EFI_BROWSER_ACTION_CHANGING) {
     switch (HiiKeyId) {

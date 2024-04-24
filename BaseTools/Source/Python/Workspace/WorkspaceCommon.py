@@ -102,12 +102,12 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
     #
     if Module.ModuleType != SUP_MODULE_USER_DEFINED:
         for LibraryClass in Platform.LibraryClasses.GetKeys():
-            if LibraryClass.startswith("NULL") and Platform.LibraryClasses[LibraryClass, Module.ModuleType]:
+            if LibraryClass.startswith("NULL") and LibraryClass[4:].isdigit() and Platform.LibraryClasses[LibraryClass, Module.ModuleType]:
                 Module.LibraryClasses[LibraryClass] = Platform.LibraryClasses[LibraryClass, Module.ModuleType]
 
     # add forced library instances (specified in module overrides)
     for LibraryClass in Platform.Modules[str(Module)].LibraryClasses:
-        if LibraryClass.startswith("NULL"):
+        if LibraryClass.startswith("NULL") and LibraryClass[4:].isdigit():
             Module.LibraryClasses[LibraryClass] = Platform.Modules[str(Module)].LibraryClasses[LibraryClass]
 
     # EdkII module
@@ -123,6 +123,8 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
     while len(LibraryConsumerList) > 0:
         M = LibraryConsumerList.pop()
         for LibraryClassName in M.LibraryClasses:
+            if LibraryClassName.startswith("NULL") and LibraryClassName[4:].isdigit() and bool(M.LibraryClass):
+                continue
             if LibraryClassName not in LibraryInstance:
                 # override library instance for this module
                 LibraryPath = Platform.Modules[str(Module)].LibraryClasses.get(LibraryClassName,Platform.LibraryClasses[LibraryClassName, ModuleType])
@@ -139,7 +141,7 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
 
                 LibraryModule = BuildDatabase[LibraryPath, Arch, Target, Toolchain]
                 # for those forced library instance (NULL library), add a fake library class
-                if LibraryClassName.startswith("NULL"):
+                if LibraryClassName.startswith("NULL") and LibraryClassName[4:].isdigit():
                     LibraryModule.LibraryClass.append(LibraryClassObject(LibraryClassName, [ModuleType]))
                 elif LibraryModule.LibraryClass is None \
                      or len(LibraryModule.LibraryClass) == 0 \
