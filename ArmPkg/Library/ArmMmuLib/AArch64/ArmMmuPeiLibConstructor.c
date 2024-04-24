@@ -7,6 +7,7 @@
 */
 
 #include <Base.h>
+#include <PiPei.h>
 
 #include <Library/ArmLib.h>
 #include <Library/ArmMmuLib.h>

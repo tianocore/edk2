@@ -4,17 +4,17 @@
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
+#  XIP SEC/PEI modules should use this instance of ArmMmuLib.
 #
 #**/
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = ArmMmuBaseLib
-  FILE_GUID                      = da8f0232-fb14-42f0-922c-63104d2c70bd
+  BASE_NAME                      = ArmMmuSecLib
+  FILE_GUID                      = EA59A139-086A-4B8E-9297-FE161EFEB251
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  # Can't be fully BASE, because it doesn't work in MM_STANDALONE.
-  LIBRARY_CLASS                  = ArmMmuLib | DXE_DRIVER DXE_CORE DXE_RUNTIME_DRIVER
+  LIBRARY_CLASS                  = ArmMmuLib | SEC PEI_CORE PEIM
 
 [Defines.AARCH64]
   CONSTRUCTOR                    = ArmMmuBaseLibConstructor
@@ -22,15 +22,16 @@
 [Sources.AARCH64]
   ArmMmuLibInternal.h
   AArch64/ArmMmuLibCore.c
+  AArch64/ArmMmuPeiLibConstructor.c
   AArch64/ArmMmuLibReplaceEntry.S
-  AArch64/ArmMmuLibPageTableAlloc.c
+  AArch64/ArmMmuLibPageTableAllocPei.c
 
 [Sources.ARM]
   ArmMmuLibInternal.h
   Arm/ArmMmuLibConvert.c
   Arm/ArmMmuLibCore.c
   Arm/ArmMmuLibUpdate.c
-  Arm/ArmMmuLibV7Support.S   |GCC
+  Arm/ArmMmuLibV7Support.S   | GCC
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -42,13 +43,9 @@
   CacheMaintenanceLib
   HobLib
   MemoryAllocationLib
-  UefiBootServicesTableLib
 
 [Guids]
   gArmMmuReplaceLiveTranslationEntryFuncGuid
 
 [Pcd.ARM]
   gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
-
-[Protocols]
-  gArmPageTableMemoryAllocationProtocolGuid ## PRODUCES

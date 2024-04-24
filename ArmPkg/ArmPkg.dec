@@ -116,6 +116,10 @@
   ## ArmPkg/Include/Protocol/ArmScmiPerformanceProtocol.h
   gArmScmiPerformanceProtocolGuid = { 0x9b8ba84, 0x3dd3, 0x49a6, { 0xa0, 0x5a, 0x31, 0x34, 0xa5, 0xf0, 0x7b, 0xad } }
 
+  ## Arm Page Table Memory Allocation Protocol
+  ## ArmPkg/Include/Protocol/ArmPageTableMemoryAllocation.h
+  gArmPageTableMemoryAllocationProtocolGuid = { 0x623be44e, 0x506d, 0x487f, {0xa3, 0xa6, 0x92, 0xda, 0xef, 0x30, 0x2c, 0x70 } }
+
 [Ppis]
   ## Include/Ppi/ArmMpCoreInfo.h
   gArmMpCoreInfoPpiGuid = { 0x6847cc74, 0xe9ec, 0x4f8f, {0xa2, 0x9d, 0xab, 0x44, 0xe7, 0x54, 0xa8, 0xfc} }
@@ -134,11 +138,6 @@
 
   # Define if the GICv3 controller should use the GICv2 legacy
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
-
-  # Whether to remap all unused memory NX before installing the CPU arch
-  # protocol driver. This is needed on platforms that map all DRAM with RWX
-  # attributes initially, and can be disabled otherwise.
-  gArmTokenSpaceGuid.PcdRemapUnusedMemoryNx|TRUE|BOOLEAN|0x00000048
 
 [PcdsFeatureFlag.ARM]
   # Whether to map normal memory as non-shareable. FALSE is the safe choice, but

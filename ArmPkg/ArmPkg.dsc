@@ -94,6 +94,7 @@
 [LibraryClasses.common.SEC]
   # ARM platforms have SEC modules with standard entry points, so we can generically link StackCheckLib
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuSecLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -101,6 +102,7 @@
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
 
 [Components.common]
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
@@ -162,6 +164,7 @@
   ArmPkg/Drivers/ArmPsciMpServicesDxe/ArmPsciMpServicesDxe.inf
   ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf
   ArmPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
+  ArmPkg/Library/ArmMmuLib/ArmMmuSecLib.inf
 
 [Components.AARCH64, Components.ARM]
   ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
