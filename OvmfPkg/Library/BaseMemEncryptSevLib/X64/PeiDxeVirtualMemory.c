@@ -12,6 +12,7 @@
 **/
 
 #include <Library/CpuLib.h>
+#include <Library/CpuPageTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Register/Amd/Cpuid.h>
 #include <Register/Cpuid.h>
@@ -56,139 +57,6 @@ InternalGetMemEncryptionAddressMask (
   return mAddressEncMask;
 }
 
-STATIC
-VOID *
-EFIAPI
-AllocatePageTableMemory (
-  IN UINTN  Pages
-  );
-
-/**
-  Set one page of page table pool memory to be read-only.
-
-  @param[in] PageTableBase    Base address of page table (CR3).
-  @param[in] Address          Start address of a page to be set as read-only.
-  @param[in] Level4Paging     Level 4 paging flag.
-
-**/
-STATIC
-VOID
-SetPageTablePoolReadOnly (
-  IN  UINTN                 PageTableBase,
-  IN  EFI_PHYSICAL_ADDRESS  Address,
-  IN  BOOLEAN               Level4Paging
-  )
-{
-  UINTN                 Index;
-  UINTN                 EntryIndex;
-  UINT64                AddressEncMask;
-  EFI_PHYSICAL_ADDRESS  PhysicalAddress;
-  UINT64                *PageTable;
-  UINT64                *NewPageTable;
-  UINT64                PageAttr;
-  UINT64                LevelSize[5];
-  UINT64                LevelMask[5];
-  UINTN                 LevelShift[5];
-  UINTN                 Level;
-  UINT64                PoolUnitSize;
-
-  ASSERT (PageTableBase != 0);
-
-  //
-  // Since the page table is always from page table pool, which is always
-  // located at the boundary of PcdPageTablePoolAlignment, we just need to
-  // set the whole pool unit to be read-only.
-  //
-  Address = Address & PAGE_TABLE_POOL_ALIGN_MASK;
-
-  LevelShift[1] = PAGING_L1_ADDRESS_SHIFT;
-  LevelShift[2] = PAGING_L2_ADDRESS_SHIFT;
-  LevelShift[3] = PAGING_L3_ADDRESS_SHIFT;
-  LevelShift[4] = PAGING_L4_ADDRESS_SHIFT;
-
-  LevelMask[1] = PAGING_4K_ADDRESS_MASK_64;
-  LevelMask[2] = PAGING_2M_ADDRESS_MASK_64;
-  LevelMask[3] = PAGING_1G_ADDRESS_MASK_64;
-  LevelMask[4] = PAGING_1G_ADDRESS_MASK_64;
-
-  LevelSize[1] = SIZE_4KB;
-  LevelSize[2] = SIZE_2MB;
-  LevelSize[3] = SIZE_1GB;
-  LevelSize[4] = SIZE_512GB;
-
-  AddressEncMask = InternalGetMemEncryptionAddressMask ();
-  PageTable      = (UINT64 *)(UINTN)PageTableBase;
-  PoolUnitSize   = PAGE_TABLE_POOL_UNIT_SIZE;
-
-  for (Level = (Level4Paging) ? 4 : 3; Level > 0; --Level) {
-    Index  = ((UINTN)RShiftU64 (Address, LevelShift[Level]));
-    Index &= PAGING_PAE_INDEX_MASK;
-
-    PageAttr = PageTable[Index];
-    if ((PageAttr & IA32_PG_PS) == 0) {
-      //
-      // Go to next level of table.
-      //
-      PageTable = (UINT64 *)(UINTN)(PageAttr & ~AddressEncMask &
-                                    PAGING_4K_ADDRESS_MASK_64);
-      continue;
-    }
-
-    if (PoolUnitSize >= LevelSize[Level]) {
-      //
-      // Clear R/W bit if current page granularity is not larger than pool unit
-      // size.
-      //
-      if ((PageAttr & IA32_PG_RW) != 0) {
-        while (PoolUnitSize > 0) {
-          //
-          // PAGE_TABLE_POOL_UNIT_SIZE and PAGE_TABLE_POOL_ALIGNMENT are fit in
-          // one page (2MB). Then we don't need to update attributes for pages
-          // crossing page directory. ASSERT below is for that purpose.
-          //
-          ASSERT (Index < EFI_PAGE_SIZE/sizeof (UINT64));
-
-          PageTable[Index] &= ~(UINT64)IA32_PG_RW;
-          PoolUnitSize     -= LevelSize[Level];
-
-          ++Index;
-        }
-      }
-
-      break;
-    } else {
-      //
-      // The smaller granularity of page must be needed.
-      //
-      ASSERT (Level > 1);
-
-      NewPageTable = AllocatePageTableMemory (1);
-      ASSERT (NewPageTable != NULL);
-
-      PhysicalAddress = PageAttr & LevelMask[Level];
-      for (EntryIndex = 0;
-           EntryIndex < EFI_PAGE_SIZE/sizeof (UINT64);
-           ++EntryIndex)
-      {
-        NewPageTable[EntryIndex] = PhysicalAddress  | AddressEncMask |
-                                   IA32_PG_P | IA32_PG_RW;
-        if (Level > 2) {
-          NewPageTable[EntryIndex] |= IA32_PG_PS;
-        }
-
-        PhysicalAddress += LevelSize[Level - 1];
-      }
-
-      //
-      // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
-      //
-      PageTable[Index] = (UINT64)(UINTN)NewPageTable |
-                         IA32_PG_P | IA32_PG_RW;
-      PageTable = NewPageTable;
-    }
-  }
-}
-
 /**
   Initialize a buffer pool for page table use only.
 
@@ -213,16 +81,24 @@ InitializePageTablePool (
   IN  UINTN  PoolPages
   )
 {
-  VOID  *Buffer;
+  UINTN               AllocPages;
+  VOID                *Buffer;
+  UINTN               PageTable;
+  UINT64              MapAddress;
+  UINT64              MapLength;
+  IA32_MAP_ATTRIBUTE  MapAttribute;
+  IA32_MAP_ATTRIBUTE  MapMask;
+  UINTN               BufferSize;
+  BOOLEAN             Flush;
+  RETURN_STATUS       Status;
 
   //
   // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
   // header.
   //
-  PoolPages += 1;   // Add one page for header.
-  PoolPages  = ((PoolPages - 1) / PAGE_TABLE_POOL_UNIT_PAGES + 1) *
-               PAGE_TABLE_POOL_UNIT_PAGES;
-  Buffer = AllocateAlignedPages (PoolPages, PAGE_TABLE_POOL_ALIGNMENT);
+  AllocPages = (PoolPages / PAGE_TABLE_POOL_UNIT_PAGES + 1) * PAGE_TABLE_POOL_UNIT_PAGES;
+
+  Buffer = AllocateAlignedPages (AllocPages, PAGE_TABLE_POOL_ALIGNMENT);
   if (Buffer == NULL) {
     DEBUG ((DEBUG_ERROR, "ERROR: Out of aligned pages\r\n"));
     return FALSE;
@@ -243,17 +119,59 @@ InitializePageTablePool (
   //
   // Reserve one page for pool header.
   //
-  mPageTablePool->FreePages = PoolPages - 1;
+  mPageTablePool->FreePages = AllocPages - 1;
   mPageTablePool->Offset    = EFI_PAGES_TO_SIZE (1);
 
   //
-  // Perform the change to readonly after establishing the pool.
+  // Perform the change to readonly.
   //
-  while (PoolPages != 0) {
-    SetPageTablePoolReadOnly (AsmReadCr3 (), (EFI_PHYSICAL_ADDRESS)(UINTN)Buffer, TRUE);
+  PageTable = AsmReadCr3 ();
 
-    Buffer    += EFI_PAGES_TO_SIZE (PAGE_TABLE_POOL_UNIT_PAGES);
-    PoolPages -= PAGE_TABLE_POOL_UNIT_PAGES;
+  MapAddress = (UINT64)(UINTN)Buffer;
+  MapLength  = EFI_PAGES_TO_SIZE (AllocPages);
+
+  MapAttribute.Uint64    = 0;
+  MapMask.Uint64         = 0;
+  MapMask.Bits.ReadWrite = 1;
+
+  BufferSize = 0;
+  Flush      = FALSE;
+
+  Status = PageTableMap (&PageTable, Paging4Level1GB, NULL, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    //
+    // Ensure there are enough pages in the pool for the new pagetable pages.
+    //
+    ASSERT (EFI_SIZE_TO_PAGES (BufferSize) <= mPageTablePool->FreePages);
+    if (EFI_SIZE_TO_PAGES (BufferSize) <= mPageTablePool->FreePages) {
+      Buffer = mPageTablePool + mPageTablePool->Offset;
+
+      mPageTablePool->Offset    += BufferSize;
+      mPageTablePool->FreePages -= EFI_SIZE_TO_PAGES (BufferSize);
+
+      Status = PageTableMap (&PageTable, Paging4Level1GB, Buffer, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
+    }
+  }
+
+  if (Status != RETURN_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "%a:%a failed to read-only map Address=0x%Lx Length=0x%x\n", gEfiCallerBaseName, __func__, MapAddress, MapLength));
+    return FALSE;
+  }
+
+  //
+  // Ensure there are enough pages remaining in the pool to satisfy the request.
+  //
+  ASSERT (PoolPages <= mPageTablePool->FreePages);
+  if (PoolPages > mPageTablePool->FreePages) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a:%a not enough pages remaining after read-only update: requested=%x, available=%x\n",
+      gEfiCallerBaseName,
+      __func__,
+      PoolPages,
+      mPageTablePool->FreePages
+      ));
+    return FALSE;
   }
 
   return TRUE;
@@ -318,168 +236,6 @@ AllocatePageTableMemory (
 }
 
 /**
-  Split 2M page to 4K.
-
-  @param[in]      PhysicalAddress       Start physical address the 2M page
-                                        covered.
-  @param[in, out] PageEntry2M           Pointer to 2M page entry.
-  @param[in]      StackBase             Stack base address.
-  @param[in]      StackSize             Stack size.
-
-**/
-STATIC
-VOID
-Split2MPageTo4K (
-  IN        PHYSICAL_ADDRESS  PhysicalAddress,
-  IN  OUT   UINT64            *PageEntry2M,
-  IN        PHYSICAL_ADDRESS  StackBase,
-  IN        UINTN             StackSize
-  )
-{
-  PHYSICAL_ADDRESS     PhysicalAddress4K;
-  UINTN                IndexOfPageTableEntries;
-  PAGE_TABLE_4K_ENTRY  *PageTableEntry;
-  PAGE_TABLE_4K_ENTRY  *PageTableEntry1;
-  UINT64               AddressEncMask;
-
-  PageTableEntry = AllocatePageTableMemory (1);
-
-  PageTableEntry1 = PageTableEntry;
-
-  AddressEncMask = InternalGetMemEncryptionAddressMask ();
-
-  ASSERT (PageTableEntry != NULL);
-  ASSERT (*PageEntry2M & AddressEncMask);
-
-  PhysicalAddress4K = PhysicalAddress;
-  for (IndexOfPageTableEntries = 0;
-       IndexOfPageTableEntries < 512;
-       (IndexOfPageTableEntries++,
-        PageTableEntry++,
-        PhysicalAddress4K += SIZE_4KB))
-  {
-    //
-    // Fill in the Page Table entries
-    //
-    PageTableEntry->Uint64         = (UINT64)PhysicalAddress4K | AddressEncMask;
-    PageTableEntry->Bits.ReadWrite = 1;
-    PageTableEntry->Bits.Present   = 1;
-    if ((PhysicalAddress4K >= StackBase) &&
-        (PhysicalAddress4K < StackBase + StackSize))
-    {
-      //
-      // Set Nx bit for stack.
-      //
-      PageTableEntry->Bits.Nx = 1;
-    }
-  }
-
-  //
-  // Fill in 2M page entry.
-  //
-  // AddressEncMask is not set for non-leaf entries since CpuPageTableLib doesn't consume
-  // encryption mask PCD. The encryption mask is overlapped with the PageTableBaseAddress
-  // field of non-leaf page table entries. If encryption mask is set for non-leaf entries,
-  // issue happens when CpuPageTableLib code use the non-leaf entry PageTableBaseAddress
-  // field with the encryption mask set to find the next level page table.
-  //
-  *PageEntry2M = ((UINT64)(UINTN)PageTableEntry1 |
-                  IA32_PG_P | IA32_PG_RW);
-}
-
-/**
-  Split 1G page to 2M.
-
-  @param[in]      PhysicalAddress       Start physical address the 1G page
-                                        covered.
-  @param[in, out] PageEntry1G           Pointer to 1G page entry.
-  @param[in]      StackBase             Stack base address.
-  @param[in]      StackSize             Stack size.
-
-**/
-STATIC
-VOID
-Split1GPageTo2M (
-  IN          PHYSICAL_ADDRESS  PhysicalAddress,
-  IN  OUT     UINT64            *PageEntry1G,
-  IN          PHYSICAL_ADDRESS  StackBase,
-  IN          UINTN             StackSize
-  )
-{
-  PHYSICAL_ADDRESS  PhysicalAddress2M;
-  UINTN             IndexOfPageDirectoryEntries;
-  PAGE_TABLE_ENTRY  *PageDirectoryEntry;
-  UINT64            AddressEncMask;
-
-  PageDirectoryEntry = AllocatePageTableMemory (1);
-
-  AddressEncMask = InternalGetMemEncryptionAddressMask ();
-  ASSERT (PageDirectoryEntry != NULL);
-  ASSERT (*PageEntry1G & AddressEncMask);
-  //
-  // Fill in 1G page entry.
-  //
-  // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
-  //
-  *PageEntry1G = ((UINT64)(UINTN)PageDirectoryEntry |
-                  IA32_PG_P | IA32_PG_RW);
-
-  PhysicalAddress2M = PhysicalAddress;
-  for (IndexOfPageDirectoryEntries = 0;
-       IndexOfPageDirectoryEntries < 512;
-       (IndexOfPageDirectoryEntries++,
-        PageDirectoryEntry++,
-        PhysicalAddress2M += SIZE_2MB))
-  {
-    if ((PhysicalAddress2M < StackBase + StackSize) &&
-        ((PhysicalAddress2M + SIZE_2MB) > StackBase))
-    {
-      //
-      // Need to split this 2M page that covers stack range.
-      //
-      Split2MPageTo4K (
-        PhysicalAddress2M,
-        (UINT64 *)PageDirectoryEntry,
-        StackBase,
-        StackSize
-        );
-    } else {
-      //
-      // Fill in the Page Directory entries
-      //
-      PageDirectoryEntry->Uint64         = (UINT64)PhysicalAddress2M | AddressEncMask;
-      PageDirectoryEntry->Bits.ReadWrite = 1;
-      PageDirectoryEntry->Bits.Present   = 1;
-      PageDirectoryEntry->Bits.MustBe1   = 1;
-    }
-  }
-}
-
-/**
-  Set or Clear the memory encryption bit
-
-  @param[in, out] PageTablePointer      Page table entry pointer (PTE).
-  @param[in]      Mode                  Set or Clear encryption bit
-
-**/
-STATIC VOID
-SetOrClearCBit (
-  IN   OUT     UINT64          *PageTablePointer,
-  IN           MAP_RANGE_MODE  Mode
-  )
-{
-  UINT64  AddressEncMask;
-
-  AddressEncMask = InternalGetMemEncryptionAddressMask ();
-
-  if (Mode == SetCBit) {
-    *PageTablePointer |= AddressEncMask;
-  } else {
-    *PageTablePointer &= ~AddressEncMask;
-  }
-}
-
-/**
  Check the WP status in CR0 register. This bit is used to lock or unlock write
  access to pages marked as read-only.
 
@@ -527,18 +283,17 @@ InternalMemEncryptSevCreateIdentityMap1G (
   IN    UINTN             Length
   )
 {
-  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel4Entry;
-  PAGE_TABLE_1G_ENTRY             *PageDirectory1GEntry;
-  UINT64                          PgTableMask;
-  UINT64                          *NewPageTable;
-  UINT64                          AddressEncMask;
-  BOOLEAN                         IsWpEnabled;
-  RETURN_STATUS                   Status;
-
-  //
-  // Set PageMapLevel4Entry to suppress incorrect compiler/analyzer warnings.
-  //
-  PageMapLevel4Entry = NULL;
+  UINTN               PageTable;
+  UINT64              AddressEncMask;
+  BOOLEAN             IsWpEnabled;
+  UINT64              MapAddress;
+  UINT64              MapLength;
+  IA32_MAP_ATTRIBUTE  MapAttribute;
+  IA32_MAP_ATTRIBUTE  MapMask;
+  VOID                *Buffer;
+  UINTN               BufferSize;
+  BOOLEAN             Flush;
+  RETURN_STATUS       Status;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -554,6 +309,12 @@ InternalMemEncryptSevCreateIdentityMap1G (
     return RETURN_INVALID_PARAMETER;
   }
 
+  if (Cr3BaseAddress == 0) {
+    PageTable = AsmReadCr3 ();
+  } else {
+    PageTable = (UINTN)Cr3BaseAddress;
+  }
+
   //
   // Check if we have a valid memory encryption mask
   //
@@ -561,8 +322,6 @@ InternalMemEncryptSevCreateIdentityMap1G (
   if (!AddressEncMask) {
     return RETURN_ACCESS_DENIED;
   }
-
-  PgTableMask = AddressEncMask | EFI_PAGE_MASK;
 
   //
   // Make sure that the page table is changeable.
@@ -572,75 +331,43 @@ InternalMemEncryptSevCreateIdentityMap1G (
     DisableReadOnlyPageWriteProtect ();
   }
 
-  Status = EFI_SUCCESS;
-
-  while (Length) {
-    //
-    // If Cr3BaseAddress is not specified then read the current CR3
-    //
-    if (Cr3BaseAddress == 0) {
-      Cr3BaseAddress = AsmReadCr3 ();
-    }
-
-    PageMapLevel4Entry  = (VOID *)(Cr3BaseAddress & ~PgTableMask);
-    PageMapLevel4Entry += PML4_OFFSET (PhysicalAddress);
-    if (!PageMapLevel4Entry->Bits.Present) {
-      NewPageTable = AllocatePageTableMemory (1);
-      if (NewPageTable == NULL) {
-        DEBUG ((
-          DEBUG_ERROR,
-          "%a:%a: failed to allocate a new PML4 entry\n",
-          gEfiCallerBaseName,
-          __func__
-          ));
-        Status = RETURN_NO_MAPPING;
-        goto Done;
-      }
-
-      SetMem (NewPageTable, EFI_PAGE_SIZE, 0);
-
-      //
-      // AddressEncMask is not set for non-leaf entries because of the way CpuPageTableLib works
-      //
-      PageMapLevel4Entry->Uint64          = (UINT64)(UINTN)NewPageTable;
-      PageMapLevel4Entry->Bits.MustBeZero = 0;
-      PageMapLevel4Entry->Bits.ReadWrite  = 1;
-      PageMapLevel4Entry->Bits.Present    = 1;
-    }
-
-    PageDirectory1GEntry = (VOID *)(
-                                    (PageMapLevel4Entry->Bits.PageTableBaseAddress <<
-                                     12) & ~PgTableMask
-                                    );
-    PageDirectory1GEntry += PDP_OFFSET (PhysicalAddress);
-    if (!PageDirectory1GEntry->Bits.Present) {
-      PageDirectory1GEntry->Bits.Present    = 1;
-      PageDirectory1GEntry->Bits.MustBe1    = 1;
-      PageDirectory1GEntry->Bits.MustBeZero = 0;
-      PageDirectory1GEntry->Bits.ReadWrite  = 1;
-      PageDirectory1GEntry->Uint64         |= (UINT64)PhysicalAddress | AddressEncMask;
-    }
-
-    if (Length <= BIT30) {
-      Length = 0;
-    } else {
-      Length -= BIT30;
-    }
-
-    PhysicalAddress += BIT30;
+  MapAddress = PhysicalAddress & ~((UINT64)SIZE_1GB - 1);
+  if (MapAddress != PhysicalAddress) {
+    DEBUG ((DEBUG_VERBOSE, "%a:%a: Aligning address to 1GB: 0x%Lx => 0x%Lx\n", gEfiCallerBaseName, __func__, PhysicalAddress, MapAddress));
   }
 
-  //
-  // Flush TLB
-  //
-  CpuFlushTlb ();
+  MapLength  = ALIGN_VALUE (PhysicalAddress + Length, SIZE_1GB);
+  MapLength -= MapAddress;
+  if (MapLength != Length) {
+    DEBUG ((DEBUG_VERBOSE, "%a:%a: Aligning length to 1GB: 0x%Lx => 0x%Lx\n", gEfiCallerBaseName, __func__, Length, MapLength));
+  }
 
-Done:
-  //
-  // Restore page table write protection, if any.
-  //
+  MapAttribute.Uint64         = AddressEncMask | MapAddress;
+  MapAttribute.Bits.Present   = 1;
+  MapAttribute.Bits.ReadWrite = 1;
+  MapMask.Uint64              = MAX_UINT64;
+
+  BufferSize = 0;
+  Flush      = FALSE;
+
+  Status = PageTableMap (&PageTable, Paging4Level1GB, NULL, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    Buffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (BufferSize));
+    if (Buffer != NULL) {
+      Status = PageTableMap (&PageTable, Paging4Level1GB, Buffer, &BufferSize, PhysicalAddress, Length, &MapAttribute, &MapMask, &Flush);
+    }
+  }
+
   if (IsWpEnabled) {
     EnableReadOnlyPageWriteProtect ();
+  }
+
+  if (Flush) {
+    CpuFlushTlb ();
+  }
+
+  if (Status != RETURN_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "%a:%a failed to map Address=0x%Lx Length=0x%x\n", gEfiCallerBaseName, __func__, PhysicalAddress, Length));
   }
 
   return Status;
@@ -686,23 +413,17 @@ SetMemoryEncDec (
   IN    BOOLEAN           Mmio
   )
 {
-  PAGE_MAP_AND_DIRECTORY_POINTER  *PageMapLevel4Entry;
-  PAGE_MAP_AND_DIRECTORY_POINTER  *PageUpperDirectoryPointerEntry;
-  PAGE_MAP_AND_DIRECTORY_POINTER  *PageDirectoryPointerEntry;
-  PAGE_TABLE_1G_ENTRY             *PageDirectory1GEntry;
-  PAGE_TABLE_ENTRY                *PageDirectory2MEntry;
-  PHYSICAL_ADDRESS                OrigPhysicalAddress;
-  PAGE_TABLE_4K_ENTRY             *PageTableEntry;
-  UINT64                          PgTableMask;
-  UINT64                          AddressEncMask;
-  BOOLEAN                         IsWpEnabled;
-  UINTN                           OrigLength;
-  RETURN_STATUS                   Status;
-
-  //
-  // Set PageMapLevel4Entry to suppress incorrect compiler/analyzer warnings.
-  //
-  PageMapLevel4Entry = NULL;
+  UINTN               PageTable;
+  UINT64              AddressEncMask;
+  BOOLEAN             IsWpEnabled;
+  UINT64              MapAddress;
+  UINT64              MapLength;
+  IA32_MAP_ATTRIBUTE  MapAttribute;
+  IA32_MAP_ATTRIBUTE  MapMask;
+  VOID                *Buffer;
+  UINTN               BufferSize;
+  BOOLEAN             Flush;
+  RETURN_STATUS       Status;
 
   DEBUG ((
     DEBUG_VERBOSE,
@@ -725,10 +446,19 @@ SetMemoryEncDec (
     return RETURN_ACCESS_DENIED;
   }
 
-  PgTableMask = AddressEncMask | EFI_PAGE_MASK;
-
   if (Length == 0) {
     return RETURN_INVALID_PARAMETER;
+  }
+
+  MapAddress = PhysicalAddress & ~((UINT64)SIZE_4KB - 1);
+  if (MapAddress != PhysicalAddress) {
+    DEBUG ((DEBUG_VERBOSE, "%a:%a: Aligning address to 4KB: 0x%Lx => 0x%Lx\n", gEfiCallerBaseName, __func__, PhysicalAddress, MapAddress));
+  }
+
+  MapLength  = ALIGN_VALUE (PhysicalAddress + Length, SIZE_4KB);
+  MapLength -= MapAddress;
+  if (MapLength != Length) {
+    DEBUG ((DEBUG_VERBOSE, "%a:%a: Aligning length to 4KB: 0x%Lx => 0x%Lx\n", gEfiCallerBaseName, __func__, Length, MapLength));
   }
 
   //
@@ -737,7 +467,7 @@ SetMemoryEncDec (
   // with correct C-bit
   //
   if (CacheFlush) {
-    WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)PhysicalAddress, Length);
+    WriteBackInvalidateDataCacheRange ((VOID *)(UINTN)MapAddress, MapLength);
   }
 
   //
@@ -747,8 +477,6 @@ SetMemoryEncDec (
   if (IsWpEnabled) {
     DisableReadOnlyPageWriteProtect ();
   }
-
-  Status = EFI_SUCCESS;
 
   //
   // To maintain the security gurantees we must set the page to shared in the RMP
@@ -763,8 +491,8 @@ SetMemoryEncDec (
     }
 
     InternalSetPageState (
-      PhysicalAddress,
-      EFI_SIZE_TO_PAGES (Length),
+      MapAddress,
+      EFI_SIZE_TO_PAGES (MapLength),
       SevSnpPageShared,
       FALSE,
       mPscBuffer,
@@ -772,176 +500,38 @@ SetMemoryEncDec (
       );
   }
 
-  //
-  // Save the specified length and physical address (we need it later).
-  //
-  OrigLength          = Length;
-  OrigPhysicalAddress = PhysicalAddress;
+  PageTable = (Cr3BaseAddress != 0) ? (UINTN)Cr3BaseAddress : AsmReadCr3 ();
 
-  while (Length != 0) {
-    //
-    // If Cr3BaseAddress is not specified then read the current CR3
-    //
-    if (Cr3BaseAddress == 0) {
-      Cr3BaseAddress = AsmReadCr3 ();
-    }
+  MapAttribute.Uint64 = MapAddress;
+  if (Mode == SetCBit) {
+    MapAttribute.Uint64 |= AddressEncMask;
+  }
 
-    PageMapLevel4Entry  = (VOID *)(Cr3BaseAddress & ~PgTableMask);
-    PageMapLevel4Entry += PML4_OFFSET (PhysicalAddress);
-    if (!PageMapLevel4Entry->Bits.Present) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a:%a: bad PML4 for Physical=0x%Lx\n",
-        gEfiCallerBaseName,
-        __func__,
-        PhysicalAddress
-        ));
-      Status = RETURN_NO_MAPPING;
-      goto Done;
-    }
+  MapMask.Uint64 = IA32_MAP_ATTRIBUTE_PAGE_TABLE_BASE_ADDRESS_MASK;
 
-    PageDirectory1GEntry = (VOID *)(
-                                    (PageMapLevel4Entry->Bits.PageTableBaseAddress <<
-                                     12) & ~PgTableMask
-                                    );
-    PageDirectory1GEntry += PDP_OFFSET (PhysicalAddress);
-    if (!PageDirectory1GEntry->Bits.Present) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a:%a: bad PDPE for Physical=0x%Lx\n",
-        gEfiCallerBaseName,
-        __func__,
-        PhysicalAddress
-        ));
-      Status = RETURN_NO_MAPPING;
-      goto Done;
-    }
+  BufferSize = 0;
+  Flush      = FALSE;
 
-    //
-    // If the MustBe1 bit is not 1, it's not actually a 1GB entry
-    //
-    if (PageDirectory1GEntry->Bits.MustBe1) {
-      //
-      // Valid 1GB page
-      // If we have at least 1GB to go, we can just update this entry
-      //
-      if (((PhysicalAddress & (BIT30 - 1)) == 0) && (Length >= BIT30)) {
-        SetOrClearCBit (&PageDirectory1GEntry->Uint64, Mode);
-        DEBUG ((
-          DEBUG_VERBOSE,
-          "%a:%a: updated 1GB entry for Physical=0x%Lx\n",
-          gEfiCallerBaseName,
-          __func__,
-          PhysicalAddress
-          ));
-        PhysicalAddress += BIT30;
-        Length          -= BIT30;
-      } else {
-        //
-        // We must split the page
-        //
-        DEBUG ((
-          DEBUG_VERBOSE,
-          "%a:%a: splitting 1GB page for Physical=0x%Lx\n",
-          gEfiCallerBaseName,
-          __func__,
-          PhysicalAddress
-          ));
-        Split1GPageTo2M (
-          (UINT64)PageDirectory1GEntry->Bits.PageTableBaseAddress << 30,
-          (UINT64 *)PageDirectory1GEntry,
-          0,
-          0
-          );
-        continue;
-      }
-    } else {
-      //
-      // Actually a PDP
-      //
-      PageUpperDirectoryPointerEntry =
-        (PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory1GEntry;
-      PageDirectory2MEntry =
-        (VOID *)(
-                 (PageUpperDirectoryPointerEntry->Bits.PageTableBaseAddress <<
-                  12) & ~PgTableMask
-                 );
-      PageDirectory2MEntry += PDE_OFFSET (PhysicalAddress);
-      if (!PageDirectory2MEntry->Bits.Present) {
-        DEBUG ((
-          DEBUG_ERROR,
-          "%a:%a: bad PDE for Physical=0x%Lx\n",
-          gEfiCallerBaseName,
-          __func__,
-          PhysicalAddress
-          ));
-        Status = RETURN_NO_MAPPING;
-        goto Done;
-      }
-
-      //
-      // If the MustBe1 bit is not a 1, it's not a 2MB entry
-      //
-      if (PageDirectory2MEntry->Bits.MustBe1) {
-        //
-        // Valid 2MB page
-        // If we have at least 2MB left to go, we can just update this entry
-        //
-        if (((PhysicalAddress & (BIT21-1)) == 0) && (Length >= BIT21)) {
-          SetOrClearCBit (&PageDirectory2MEntry->Uint64, Mode);
-          PhysicalAddress += BIT21;
-          Length          -= BIT21;
-        } else {
-          //
-          // We must split up this page into 4K pages
-          //
-          DEBUG ((
-            DEBUG_VERBOSE,
-            "%a:%a: splitting 2MB page for Physical=0x%Lx\n",
-            gEfiCallerBaseName,
-            __func__,
-            PhysicalAddress
-            ));
-          Split2MPageTo4K (
-            (UINT64)PageDirectory2MEntry->Bits.PageTableBaseAddress << 21,
-            (UINT64 *)PageDirectory2MEntry,
-            0,
-            0
-            );
-          continue;
-        }
-      } else {
-        PageDirectoryPointerEntry =
-          (PAGE_MAP_AND_DIRECTORY_POINTER *)PageDirectory2MEntry;
-        PageTableEntry =
-          (VOID *)(
-                   (PageDirectoryPointerEntry->Bits.PageTableBaseAddress <<
-                    12) & ~PgTableMask
-                   );
-        PageTableEntry += PTE_OFFSET (PhysicalAddress);
-        if (!PageTableEntry->Bits.Present) {
-          DEBUG ((
-            DEBUG_ERROR,
-            "%a:%a: bad PTE for Physical=0x%Lx\n",
-            gEfiCallerBaseName,
-            __func__,
-            PhysicalAddress
-            ));
-          Status = RETURN_NO_MAPPING;
-          goto Done;
-        }
-
-        SetOrClearCBit (&PageTableEntry->Uint64, Mode);
-        PhysicalAddress += EFI_PAGE_SIZE;
-        Length          -= EFI_PAGE_SIZE;
-      }
+  Status = PageTableMap (&PageTable, Paging4Level1GB, NULL, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
+  if (Status == RETURN_BUFFER_TOO_SMALL) {
+    Buffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (BufferSize));
+    if (Buffer != NULL) {
+      Status = PageTableMap (&PageTable, Paging4Level1GB, Buffer, &BufferSize, MapAddress, MapLength, &MapAttribute, &MapMask, &Flush);
     }
   }
 
-  //
-  // Flush TLB
-  //
-  CpuFlushTlb ();
+  if (IsWpEnabled) {
+    EnableReadOnlyPageWriteProtect ();
+  }
+
+  if (Flush) {
+    CpuFlushTlb ();
+  }
+
+  if (Status != RETURN_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "%a:%a failed to map Address=0x%Lx Length=0x%x\n", gEfiCallerBaseName, __func__, PhysicalAddress, Length));
+    return Status;
+  }
 
   //
   // SEV-SNP requires that all the private pages (i.e pages mapped encrypted) must be
@@ -956,8 +546,8 @@ SetMemoryEncDec (
     }
 
     InternalSetPageState (
-      OrigPhysicalAddress,
-      EFI_SIZE_TO_PAGES (OrigLength),
+      MapAddress,
+      EFI_SIZE_TO_PAGES (MapLength),
       SevSnpPagePrivate,
       FALSE,
       mPscBuffer,
@@ -965,15 +555,7 @@ SetMemoryEncDec (
       );
   }
 
-Done:
-  //
-  // Restore page table write protection, if any.
-  //
-  if (IsWpEnabled) {
-    EnableReadOnlyPageWriteProtect ();
-  }
-
-  return Status;
+  return RETURN_SUCCESS;
 }
 
 /**
