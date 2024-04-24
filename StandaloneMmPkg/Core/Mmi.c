@@ -174,6 +174,7 @@ MmiManage (
   EFI_STATUS   Status;
 
   mMmiManageCallingDepth++;
+  WillReturn   = FALSE;
   Status       = EFI_NOT_FOUND;
   ReturnStatus = Status;
   if (HandlerType == NULL) {
