@@ -22,11 +22,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeiServicesLib.h>
 #include <Library/SafeIntLib.h>
 #include <Library/VariableFlashInfoLib.h>
+#include <Library/MmUnblockMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include <Guid/VariableFormat.h>
 #include <Guid/VariableIndexTable.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/FaultTolerantWrite.h>
+#include <Guid/VariableRuntimeCacheInfo.h>
 
 typedef enum {
   VariableStoreTypeHob,
