@@ -60,7 +60,7 @@
   TpmMeasurementLib
   SafeIntLib
   PcdLib
-  MmUnblockMemoryLib
+  HobLib
 
 [Protocols]
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
@@ -110,6 +110,7 @@
 
   gVarCheckPolicyLibMmiHandlerGuid
   gEfiEndOfDxeEventGroupGuid
+  gVariableRuntimeCacheContextHobGuid
 
 [Depex]
   gEfiMmCommunication2ProtocolGuid
