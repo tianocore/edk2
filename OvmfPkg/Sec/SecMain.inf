@@ -55,6 +55,7 @@
   MemEncryptSevLib
   CpuExceptionHandlerLib
   CcProbeLib
+  CpuPageTableLib
 
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                # PPI ALWAYS_PRODUCED
@@ -83,6 +84,8 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase
   gUefiOvmfPkgTokenSpaceGuid.PcdTdxAcceptPageSize
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
