@@ -2,7 +2,8 @@
   The implementation of EDKII Redfish Platform Config Protocol.
 
   (C) Copyright 2021-2022 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2022-2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (c) 2022-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -314,7 +315,7 @@ DumpHiiStatementPrompt (
 
 **/
 CHAR8 *
-BuildMenPath (
+BuildMenuPath (
   IN REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE  *StatementPrivate
   )
 {
@@ -344,7 +345,7 @@ BuildMenPath (
   }
 
   do {
-    DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "F(%d) <-", FormPrivate->Id));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "F(%d) <-", FormPrivate->Id));
     FormPrivate = FindFormLinkToThis (FormPrivate);
     if (FormPrivate == NULL) {
       break;
@@ -386,7 +387,7 @@ BuildMenPath (
       AsciiStrCatS (Buffer, OldBufferSize, "/");
       AsciiStrCatS (Buffer, OldBufferSize, FormTitle);
       FreePool (FormTitle);
-      DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, " %a\n", Buffer));
+      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, " %a\n", Buffer));
     }
 
     FormPrivate = (REDFISH_PLATFORM_CONFIG_FORM_PRIVATE *)PopRedfishStack (FormStack);
@@ -928,6 +929,10 @@ HiiStringToOneOfOptionValue (
     Option = HII_QUESTION_OPTION_FROM_LINK (Link);
 
     TmpString = HiiGetRedfishString (Statement->ParentForm->ParentFormset->HiiHandle, Schema, Option->Text);
+    if (TmpString == NULL) {
+      TmpString = HiiGetRedfishString (Statement->ParentForm->ParentFormset->HiiHandle, ENGLISH_LANGUAGE_CODE, Option->Text);
+    }
+
     if (TmpString != NULL) {
       if (StrCmp (TmpString, HiiString) == 0) {
         CopyMem (Value, &Option->Value, sizeof (HII_STATEMENT_VALUE));
@@ -1056,12 +1061,12 @@ DumpOrderedListValue (
     return;
   }
 
-  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.Type= 0x%x\n", OrderedListStatement->Value.Type));
-  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.BufferValueType= 0x%x\n", OrderedListStatement->Value.BufferValueType));
-  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.BufferLen= 0x%x\n", OrderedListStatement->Value.BufferLen));
-  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.Buffer= 0x%x\n", OrderedListStatement->Value.Buffer));
-  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "Value.MaxContainers= 0x%x\n", OrderedListStatement->ExtraData.OrderListData.MaxContainers));
-  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "StorageWidth= 0x%x\n", OrderedListStatement->StorageWidth));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "Value.Type= 0x%x\n", OrderedListStatement->Value.Type));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "Value.BufferValueType= 0x%x\n", OrderedListStatement->Value.BufferValueType));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "Value.BufferLen= 0x%x\n", OrderedListStatement->Value.BufferLen));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "Value.Buffer= 0x%x\n", OrderedListStatement->Value.Buffer));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "Value.MaxContainers= 0x%x\n", OrderedListStatement->ExtraData.OrderListData.MaxContainers));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "StorageWidth= 0x%x\n", OrderedListStatement->StorageWidth));
 
   if (OrderedListStatement->Value.Buffer == NULL) {
     return;
@@ -1078,7 +1083,7 @@ DumpOrderedListValue (
       Value8 = (UINT8 *)OrderedListStatement->Value.Buffer;
       Count  = OrderedListStatement->StorageWidth / sizeof (UINT8);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value8[Index]));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%d ", Value8[Index]));
       }
 
       break;
@@ -1086,7 +1091,7 @@ DumpOrderedListValue (
       Value16 = (UINT16 *)OrderedListStatement->Value.Buffer;
       Count   = OrderedListStatement->StorageWidth / sizeof (UINT16);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value16[Index]));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%d ", Value16[Index]));
       }
 
       break;
@@ -1094,7 +1099,7 @@ DumpOrderedListValue (
       Value32 = (UINT32 *)OrderedListStatement->Value.Buffer;
       Count   = OrderedListStatement->StorageWidth / sizeof (UINT32);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value32[Index]));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%d ", Value32[Index]));
       }
 
       break;
@@ -1102,7 +1107,7 @@ DumpOrderedListValue (
       Value64 = (UINT64 *)OrderedListStatement->Value.Buffer;
       Count   = OrderedListStatement->StorageWidth / sizeof (UINT64);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value64[Index]));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%d ", Value64[Index]));
       }
 
       break;
@@ -1110,13 +1115,13 @@ DumpOrderedListValue (
       Value8 = (UINT8 *)OrderedListStatement->Value.Buffer;
       Count  = OrderedListStatement->StorageWidth / sizeof (UINT8);
       for (Index = 0; Index < Count; Index++) {
-        DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "%d ", Value8[Index]));
+        DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%d ", Value8[Index]));
       }
 
       break;
   }
 
-  DEBUG ((REDFISH_PLATFORM_CONFIG_DEBUG, "\n"));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "\n"));
 }
 
 /**
@@ -1227,6 +1232,10 @@ HiiStringToOrderedListOptionValue (
     Option = HII_QUESTION_OPTION_FROM_LINK (Link);
 
     TmpString = HiiGetRedfishString (Statement->ParentForm->ParentFormset->HiiHandle, Schema, Option->Text);
+    if (TmpString == NULL) {
+      TmpString = HiiGetRedfishString (Statement->ParentForm->ParentFormset->HiiHandle, ENGLISH_LANGUAGE_CODE, Option->Text);
+    }
+
     if (TmpString != NULL) {
       if (StrCmp (TmpString, HiiString) == 0) {
         *Value = ExtendHiiValueToU64 (&Option->Value);
@@ -1491,7 +1500,7 @@ StrToAsciiStr (
     return NULL;
   }
 
-  StringLen = StrLen (UnicodeString) + 1;
+  StringLen = HiiStrLen (UnicodeString) + 1;
   Buffer    = AllocatePool (StringLen * sizeof (CHAR8));
   if (Buffer == NULL) {
     return NULL;
@@ -1864,8 +1873,11 @@ RedfishPlatformConfigSetStatementCommon (
     DEBUG ((DEBUG_ERROR, "%a: failed to save question value: %r\n", __func__, Status));
   }
 
-  if (StatementValue->Value.string != 0) {
-    HiiDeleteString (StatementValue->Value.string, TargetStatement->ParentForm->ParentFormset->HiiHandle);
+  if ((TargetStatement->HiiStatement->Operand == EFI_IFR_STRING_OP) && (StatementValue->Type == EFI_IFR_TYPE_STRING)) {
+    if (StatementValue->Value.string != 0) {
+      // Delete HII string which was created for HII statement operand = EFI_IFR_STRING_OP and Type = EFI_IFR_TYPE_STRING.
+      HiiDeleteString (StatementValue->Value.string, TargetStatement->ParentForm->ParentFormset->HiiHandle);
+    }
   }
 
   return Status;
@@ -2000,10 +2012,11 @@ RedfishPlatformConfigProtocolGetConfigureLang (
   REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE_LIST  StatementList;
   REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE_REF   *StatementRef;
   LIST_ENTRY                                      *NextLink;
-  EFI_STRING                                      TmpString;
   EFI_STRING                                      *TmpConfigureLangList;
   UINTN                                           Index;
   CHAR8                                           *FullSchema;
+
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Harvest config language of %a_%a (Regex: %s).\n", __func__, Schema, Version, RegexPattern));
 
   if ((This == NULL) || IS_EMPTY_STRING (Schema) || IS_EMPTY_STRING (Version) || (Count == NULL) || (ConfigureLangList == NULL) || IS_EMPTY_STRING (RegexPattern)) {
     return EFI_INVALID_PARAMETER;
@@ -2054,18 +2067,31 @@ RedfishPlatformConfigProtocolGetConfigureLang (
 
       ASSERT (StatementRef->Statement->Description != 0);
       if (StatementRef->Statement->Description != 0) {
-        TmpString = HiiGetRedfishString (StatementRef->Statement->ParentForm->ParentFormset->HiiHandle, FullSchema, StatementRef->Statement->Description);
-        ASSERT (TmpString != NULL);
-        if (TmpString != NULL) {
-          TmpConfigureLangList[Index] = TmpString;
-          ++Index;
-        }
+        ASSERT (StatementRef->Statement->XuefiRedfishStr != NULL);
+        TmpConfigureLangList[Index] = AllocateCopyPool (HiiStrSize (StatementRef->Statement->XuefiRedfishStr), (VOID *)StatementRef->Statement->XuefiRedfishStr);
+        ++Index;
       }
     }
   }
 
   *Count             = StatementList.Count;
   *ConfigureLangList = TmpConfigureLangList;
+
+  DEBUG_REDFISH_THIS_MODULE (
+    REDFISH_PLATFORM_CONFIG_DEBUG_CONFIG_LANG_REGEX,
+    "%a: Number of configure language strings harvested: %d\n",
+    __func__,
+    StatementList.Count
+    );
+
+  DEBUG_REDFISH_THIS_MODULE_CODE (
+    REDFISH_PLATFORM_CONFIG_DEBUG_CONFIG_LANG_REGEX,
+    DEBUG_REDFISH (DEBUG_REDFISH_COMPONENT_PLATFORM_CONFIG_DXE, "%a: Number of configure language strings harvested: %d\n", __func__, StatementList.Count);
+    for (Index = 0; Index < *Count; Index++) {
+    DEBUG_REDFISH (DEBUG_REDFISH_COMPONENT_PLATFORM_CONFIG_DXE, "   (%d) %s\n", Index, TmpConfigureLangList[Index]);
+  }
+
+    );
 
 RELEASE_RESOURCE:
 
@@ -2077,6 +2103,7 @@ RELEASE_RESOURCE:
     ReleaseStatementList (&StatementList);
   }
 
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: exit.\n", __func__));
   return Status;
 }
 
@@ -2291,6 +2318,7 @@ RedfishPlatformConfigProtocolGetAttribute (
   CHAR8                                      *FullSchema;
   CHAR8                                      *Buffer;
 
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Entry\n", __func__));
   if ((This == NULL) || IS_EMPTY_STRING (Schema) || IS_EMPTY_STRING (Version) || IS_EMPTY_STRING (ConfigureLang) || (AttributeValue == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -2332,9 +2360,11 @@ RedfishPlatformConfigProtocolGetAttribute (
   //
   // Build up menu path
   //
-  AttributeValue->MenuPath = BuildMenPath (TargetStatement);
-  if (AttributeValue->MenuPath == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to build menu path for \"%a\"\n", __func__, AttributeValue->AttributeName));
+  if (RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
+    AttributeValue->MenuPath = BuildMenuPath (TargetStatement);
+    if (AttributeValue->MenuPath == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a: failed to build menu path for \"%a\"\n", __func__, AttributeValue->AttributeName));
+    }
   }
 
   //
@@ -2365,6 +2395,7 @@ RELEASE_RESOURCE:
     FreePool (FullSchema);
   }
 
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Exit\n", __func__));
   return Status;
 }
 

@@ -287,6 +287,227 @@ typedef struct {
 
 #define BASE_LIBRARY_JUMP_BUFFER_ALIGNMENT  8
 
+/*
+ * Set the exception base address for LoongArch.
+ *
+ * @param  ExceptionBaseAddress   The exception base address, must be aligned greater than or qeual to 4K .
+ */
+VOID
+SetExceptionBaseAddress (
+  IN UINT64
+  );
+
+/*
+ * Set the TlbRebase address for LoongArch.
+ *
+ * @param  TlbRebaseAddress   The TlbRebase address, must be aligned greater than or qeual to 4K .
+ */
+VOID
+SetTlbRebaseAddress (
+  IN UINT64
+  );
+
+/**
+  Enables local CPU interrupts.
+
+  @param  Needs to enable local interrupt bit.
+**/
+VOID
+EnableLocalInterrupts (
+  IN UINT16
+  );
+
+/**
+  Disables local CPU interrupts.
+
+  @param  Needs to disable local interrupt bit.
+**/
+VOID
+DisableLocalInterrupts (
+  IN UINT16
+  );
+
+/**
+  Read CPUCFG register.
+
+  @param  Index  Specifies the register number of the CPUCFG to read the data.
+  @param  Data   A pointer to the variable used to store the CPUCFG register value.
+**/
+VOID
+AsmCpucfg (
+  IN  UINT32  Index,
+  OUT UINT32  *Data
+  );
+
+/**
+  Gets the timer count value.
+
+  @param[] VOID
+  @retval  timer count value.
+
+**/
+UINTN
+AsmReadStableCounter (
+  VOID
+  );
+
+/**
+  CSR read operation.
+
+  @param[in]  Select   CSR read instruction select values.
+
+  @return     The return value of csrrd instruction, return -1 means no CSR instruction
+              is found.
+**/
+UINTN
+CsrRead (
+  IN UINT16  Select
+  );
+
+/**
+  CSR write operation.
+
+  @param[in]  Select   CSR write instruction select values.
+  @param[in]  Value    The csrwr will write the value.
+
+  @return     The return value of csrwr instruction, that is, store the old value of
+              the register, return -1 means no CSR instruction is found.
+**/
+UINTN
+CsrWrite (
+  IN UINT16  Select,
+  IN UINTN   Value
+  );
+
+/**
+  CSR exchange operation.
+
+  @param[in]  Select   CSR exchange instruction select values.
+  @param[in]  Value    The csrxchg will write the value.
+  @param[in]  Mask     The csrxchg mask value.
+
+  @return     The return value of csrxchg instruction, that is, store the old value of
+              the register, return -1 means no CSR instruction is found.
+**/
+UINTN
+CsrXChg (
+  IN UINT16  Select,
+  IN UINTN   Value,
+  IN UINTN   Mask
+  );
+
+/**
+  IO CSR read byte operation.
+
+  @param[in]  Select   IO CSR read instruction select values.
+
+  @return     The return value of iocsrrd.b instruction.
+
+**/
+UINT8
+IoCsrRead8 (
+  IN UINTN  Select
+  );
+
+/**
+  IO CSR read half word operation.
+
+  @param[in]  Select   IO CSR read instruction select values.
+
+  @return     The return value of iocsrrd.h instruction.
+
+**/
+UINT16
+IoCsrRead16 (
+  IN UINTN  Select
+  );
+
+/**
+  IO CSR read word operation.
+
+  @param[in]  Select   IO CSR read instruction select values.
+
+  @return     The return value of iocsrrd.w instruction.
+
+**/
+UINT32
+IoCsrRead32 (
+  IN UINTN  Select
+  );
+
+/**
+  IO CSR read double word operation. Only for LoongArch64.
+
+  @param[in]  Select   IO CSR read instruction select values.
+
+  @return     The return value of iocsrrd.d instruction.
+
+**/
+UINT64
+IoCsrRead64 (
+  IN UINTN  Select
+  );
+
+/**
+  IO CSR write byte operation.
+
+  @param[in]  Select   IO CSR write instruction select values.
+  @param[in]  Value    The iocsrwr.b will write the value.
+
+  @return     VOID.
+
+**/
+VOID
+IoCsrWrite8 (
+  IN UINTN  Select,
+  IN UINT8  Value
+  );
+
+/**
+  IO CSR write half word operation.
+
+  @param[in]  Select   IO CSR write instruction select values.
+  @param[in]  Value    The iocsrwr.h will write the value.
+
+  @return     VOID.
+
+**/
+VOID
+IoCsrWrite16 (
+  IN UINTN   Select,
+  IN UINT16  Value
+  );
+
+/**
+  IO CSR write word operation.
+
+  @param[in]  Select   IO CSR write instruction select values.
+  @param[in]  Value    The iocsrwr.w will write the value.
+
+  @return     VOID.
+
+**/
+VOID
+IoCsrWrite32 (
+  IN UINTN   Select,
+  IN UINT32  Value
+  );
+
+/**
+  IO CSR write double word operation. Only for LoongArch64.
+
+  @param[in]  Select   IO CSR write instruction select values.
+  @param[in]  Value    The iocsrwr.d will write the value.
+
+  @return     VOID.
+
+**/
+VOID
+IoCsrWrite64 (
+  IN UINTN   Select,
+  IN UINT64  Value
+  );
+
 #endif // defined (MDE_CPU_LOONGARCH64)
 
 //
@@ -7653,6 +7874,45 @@ VOID
 EFIAPI
 AsmVmgExit (
   VOID
+  );
+
+///
+/// The structure used to supply and return data to and from the SVSM.
+///
+typedef struct {
+  VOID      *Caa;
+  UINT64    RaxIn;
+  UINT64    RcxIn;
+  UINT64    RdxIn;
+  UINT64    R8In;
+  UINT64    R9In;
+  UINT64    RaxOut;
+  UINT64    RcxOut;
+  UINT64    RdxOut;
+  UINT64    R8Out;
+  UINT64    R9Out;
+  UINT8     *CallPending;
+} SVSM_CALL_DATA;
+
+/**
+  Executes a VMGEXIT instruction (VMMCALL with a REP prefix) with arguments
+  and return code
+
+  Executes a VMGEXIT instruction placing the specified arguments in the
+  corresponding registers before invocation. Upon return an XCHG is done to
+  atomically clear and retrieve the SVSM call pending value. The returned RAX
+  register value becomes the function return code. This function is intended
+  for use with an SVSM. This function is only available on IA-32 and x64.
+
+  @param[in,out]  SvsmCallPending  Pointer to the location of the SVSM call data
+
+  @return                          Value of the RAX register on return
+
+**/
+UINT32
+EFIAPI
+AsmVmgExitSvsm (
+  IN OUT SVSM_CALL_DATA  *SvsmCallData
   );
 
 /**

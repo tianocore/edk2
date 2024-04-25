@@ -255,7 +255,7 @@ INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 #
 # EFI_CC_MEASUREMENT_PROTOCOL
 #
-INF SecurityPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
+INF OvmfPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
 
 ################################################################################
 
@@ -307,13 +307,6 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
 
-!if $(BUILD_SHELL) == TRUE && $(TOOL_CHAIN_TAG) != "XCODE5"
-INF  OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
-!endif
-!if $(BUILD_SHELL) == TRUE
-INF  ShellPkg/Application/Shell/Shell.inf
-!endif
-
 INF MdeModulePkg/Logo/LogoDxe.inf
 
 #
@@ -331,6 +324,8 @@ INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
 INF  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 INF  OvmfPkg/PlatformDxe/Platform.inf
+
+!include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
 
 ################################################################################
 

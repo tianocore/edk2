@@ -8,7 +8,7 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.30
   BASE_NAME                      = FitUniversalPayloadEntry
   FILE_GUID                      = CED5A8A9-B6EA-4D5A-8689-577EE88566CF
   MODULE_TYPE                    = SEC

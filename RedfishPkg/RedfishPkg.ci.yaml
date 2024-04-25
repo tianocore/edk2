@@ -2,6 +2,7 @@
 # CI configuration for NetworkPkg
 #
 # (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
@@ -38,6 +39,7 @@
             "PrivateInclude/Crt/string.h",
             "PrivateInclude/Crt/time.h",
             "PrivateLibrary/RedfishCrtLib/RedfishCrtLib.c",
+            "PrivateLibrary/RedfishCrtLib/Ia32/MathFtol.c",
             "Include/Library/RedfishCrtLib.h",
             ##
             ## For jansson library open source

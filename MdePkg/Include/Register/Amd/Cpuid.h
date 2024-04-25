@@ -6,7 +6,7 @@
   If a register returned is a single 32-bit value, then a data structure is
   not provided for that register.
 
-  Copyright (c) 2017, Advanced Micro Devices. All rights reserved.<BR>
+  Copyright (c) 2017 - 2024, Advanced Micro Devices. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -41,6 +41,27 @@ CPUID Signature Information
 ///
 /// @}
 ///
+
+/**
+  CPUID Extended Topology Enumeration
+
+  @note
+  Reference: AMD64 Architecture Programmer’s Manual Volume 3: General-Purpose and System Instructions,
+             Revision 3.35 Appendix E,
+  E.4.24 Function 8000_0026—Extended CPU Topology:
+    CPUID Fn8000_0026 reports extended topology information for logical processors, including
+    asymmetric and heterogenous topology descriptions. Individual logical processors may report
+    different values in systems with asynchronous and heterogeneous topologies.
+    The topology level is selected by the value passed to the instruction in ECX. To discover the topology
+    of a system, software should execute CPUID Fn8000_0026 with increasing ECX values, starting with
+    a value of zero, until the returned hierarchy level type (CPUID Fn8000_0026_ECX[LevelType]) is
+    equal to zero. It is not guaranteed that all topology level types are present in the system
+
+  @param   EAX  AMD_CPUID_EXTENDED_TOPOLOGY   (0x80000026)
+  @param   ECX  Level number
+
+**/
+#define AMD_CPUID_EXTENDED_TOPOLOGY  0x80000026
 
 /**
   CPUID Extended Processor Signature and Features

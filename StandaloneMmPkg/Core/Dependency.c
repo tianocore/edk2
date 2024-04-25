@@ -14,16 +14,6 @@
 #include "StandaloneMmCore.h"
 
 ///
-/// EFI_DEP_REPLACE_TRUE - Used to dynamically patch the dependency expression
-///                        to save time.  A EFI_DEP_PUSH is evaluated one an
-///                        replaced with EFI_DEP_REPLACE_TRUE. If PI spec's Vol 2
-///                        Driver Execution Environment Core Interface use 0xff
-///                        as new DEPEX opcode. EFI_DEP_REPLACE_TRUE should be
-///                        defined to a new value that is not conflicting with PI spec.
-///
-#define EFI_DEP_REPLACE_TRUE  0xff
-
-///
 /// Define the initial size of the dependency expression evaluation stack
 ///
 #define DEPEX_STACK_SIZE_INCREMENT  0x1000
@@ -170,12 +160,12 @@ MmIsSchedulable (
   IN  EFI_MM_DRIVER_ENTRY  *DriverEntry
   )
 {
-  EFI_STATUS  Status;
-  UINT8       *Iterator;
-  BOOLEAN     Operator;
-  BOOLEAN     Operator2;
-  EFI_GUID    DriverGuid;
-  VOID        *Interface;
+  EFI_STATUS   Status;
+  CONST UINT8  *Iterator;
+  BOOLEAN      Operator;
+  BOOLEAN      Operator2;
+  EFI_GUID     DriverGuid;
+  VOID         *Interface;
 
   Operator  = FALSE;
   Operator2 = FALSE;
@@ -253,8 +243,7 @@ MmIsSchedulable (
           Status = PushBool (FALSE);
         } else {
           DEBUG ((DEBUG_DISPATCH, "  PUSH GUID(%g) = TRUE\n", &DriverGuid));
-          *Iterator = EFI_DEP_REPLACE_TRUE;
-          Status    = PushBool (TRUE);
+          Status = PushBool (TRUE);
         }
 
         if (EFI_ERROR (Status)) {
@@ -355,18 +344,6 @@ MmIsSchedulable (
 
         DEBUG ((DEBUG_DISPATCH, "  RESULT = %a\n", Operator ? "TRUE" : "FALSE"));
         return Operator;
-
-      case EFI_DEP_REPLACE_TRUE:
-        CopyMem (&DriverGuid, Iterator + 1, sizeof (EFI_GUID));
-        DEBUG ((DEBUG_DISPATCH, "  PUSH GUID(%g) = TRUE\n", &DriverGuid));
-        Status = PushBool (TRUE);
-        if (EFI_ERROR (Status)) {
-          DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unexpected error)\n"));
-          return FALSE;
-        }
-
-        Iterator += sizeof (EFI_GUID);
-        break;
 
       default:
         DEBUG ((DEBUG_DISPATCH, "  RESULT = FALSE (Unknown opcode)\n"));

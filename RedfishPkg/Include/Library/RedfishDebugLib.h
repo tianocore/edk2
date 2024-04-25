@@ -2,6 +2,7 @@
   This file defines the Redfish debug library interface.
 
   Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -11,28 +12,48 @@
 #define REDFISH_DEBUG_LIB_H_
 
 #include <Uefi.h>
+#include <Library/DebugLib.h>
+#include <RedfishServiceData.h>
 #include <Library/HiiUtilityLib.h>
 #include <Library/JsonLib.h>
-#include <Library/RedfishLib.h>
 
 #include <Protocol/EdkIIRedfishPlatformConfig.h>
 
-#define DEBUG_REDFISH_NETWORK         DEBUG_MANAGEABILITY   ///< Debug error level for Redfish networking function
-#define DEBUG_REDFISH_HOST_INTERFACE  DEBUG_MANAGEABILITY   ///< Debug error level for Redfish networking function
+// Used with MdePKg DEBUG macro.
+#define DEBUG_REDFISH_NETWORK          DEBUG_MANAGEABILITY          ///< Debug error level for Redfish networking function
+#define DEBUG_REDFISH_HOST_INTERFACE   DEBUG_MANAGEABILITY          ///< Debug error level for Redfish Host INterface
+#define DEBUG_REDFISH_PLATFORM_CONFIG  DEBUG_MANAGEABILITY          ///< Debug error level for Redfish Platform Configure Driver
+
+//
+// Definitions of Redfish debug capability in Redfish component scope, used with DEBUG_REDFISH macro
+// For example, Redfish Platform Config Driver
+//   DEBUG_REDFISH(DEBUG_REDFISH_PLATFORM_CONFIG_DXE, ...)
+//
+#define DEBUG_REDFISH_COMPONENT_PLATFORM_CONFIG_DXE  0x00000001
+
+#define DEBUG_REDFISH(DebugCategory, ...) \
+    do {                                                \
+      if (!DebugPrintEnabled()) {                       \
+        break;                                          \
+      }                                                 \
+      if (!DebugRedfishComponentEnabled (DebugCategory)) { \
+        break;                                             \
+      }                                                    \
+      DEBUG ((DEBUG_MANAGEABILITY, ##__VA_ARGS__));       \
+    } while (FALSE)
 
 /**
-  Debug print the value of StatementValue.
+  Determine whether the Redfish debug category is enabled in
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory.
 
-  @param[in]  ErrorLevel     DEBUG macro error level.
-  @param[in]  StatementValue The statement value to print.
+  @param[in]  DebugCategory  Redfish debug category.
 
-  @retval     EFI_SUCCESS            StatementValue is printed.
-  @retval     EFI_INVALID_PARAMETER  StatementValue is NULL.
+  @retval     TRUE   This debug category is enabled.
+  @retval     FALSE  This debug category is disabled..
 **/
-EFI_STATUS
-DumpHiiStatementValue (
-  IN UINTN                ErrorLevel,
-  IN HII_STATEMENT_VALUE  *StatementValue
+BOOLEAN
+DebugRedfishComponentEnabled (
+  IN  UINT64  DebugCategory
   );
 
 /**

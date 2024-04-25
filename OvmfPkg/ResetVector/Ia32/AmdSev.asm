@@ -154,10 +154,6 @@ SevEsUnexpectedRespTerminate:
 
 ; If SEV-ES is enabled then initialize and make the GHCB page shared
 SevClearPageEncMaskForGhcbPage:
-    ; Check if SEV is enabled
-    cmp       byte[WORK_AREA_GUEST_TYPE], 1
-    jnz       SevClearPageEncMaskForGhcbPageExit
-
     ; Check if SEV-ES is enabled
     mov       ecx, 1
     bt        [SEV_ES_WORK_AREA_STATUS_MSR], ecx
@@ -195,20 +191,12 @@ pageTableEntries4kLoop:
 SevClearPageEncMaskForGhcbPageExit:
     OneTimeCallRet SevClearPageEncMaskForGhcbPage
 
-; Check if SEV is enabled, and get the C-bit mask above 31.
+; Get the C-bit mask above 31.
 ; Modified: EDX
 ;
 ; The value is returned in the EDX
 GetSevCBitMaskAbove31:
-    xor       edx, edx
-
-    ; Check if SEV is enabled
-    cmp       byte[WORK_AREA_GUEST_TYPE], 1
-    jnz       GetSevCBitMaskAbove31Exit
-
     mov       edx, dword[SEV_ES_WORK_AREA_ENC_MASK + 4]
-
-GetSevCBitMaskAbove31Exit:
     OneTimeCallRet GetSevCBitMaskAbove31
 
 %endif
@@ -395,9 +383,9 @@ SnpCpuidEntryFound:
     mov     [esp + VC_CPUID_RESULT_EAX], eax
     mov     eax, [ecx + SNP_CPUID_ENTRY_EBX]
     mov     [esp + VC_CPUID_RESULT_EBX], eax
-    mov     eax, [ecx + SNP_CPUID_ENTRY_EDX]
-    mov     [esp + VC_CPUID_RESULT_ECX], eax
     mov     eax, [ecx + SNP_CPUID_ENTRY_ECX]
+    mov     [esp + VC_CPUID_RESULT_ECX], eax
+    mov     eax, [ecx + SNP_CPUID_ENTRY_EDX]
     mov     [esp + VC_CPUID_RESULT_EDX], eax
     jmp     VmmDoneSnpCpuid
 

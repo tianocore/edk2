@@ -1,0 +1,79 @@
+## @file
+#  Implementation for PlatformBootManagerLib library class interfaces.
+#
+#  Copyright (C) 2015-2016, Red Hat, Inc.
+#  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformBootManagerLib
+  FILE_GUID                      = 469184E8-FADA-41E4-8823-012CA19B40D4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM AARCH64
+#
+
+[Sources]
+  PlatformBm.c
+  PlatformBm.h
+  QemuKernel.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  BootLogoLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PcdLib
+  PlatformBmPrintScLib
+  QemuBootOrderLib
+  QemuFwCfgSimpleParserLib
+  QemuLoadImageLib
+  ReportStatusCodeLib
+  TpmPlatformHierarchyLib
+  UefiBootManagerLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+  gUefiOvmfPkgTokenSpaceGuid.PcdUninstallMemAttrProtocol
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gUefiOvmfPkgTokenSpaceGuid.PcdTerminalTypeGuidBuffer
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiGlobalVariableGuid
+  gRootBridgesConnectedEventGroupGuid
+  gUefiShellFileGuid
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiGraphicsOutputProtocolGuid
+  gEfiMemoryAttributeProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gVirtioDeviceProtocolGuid

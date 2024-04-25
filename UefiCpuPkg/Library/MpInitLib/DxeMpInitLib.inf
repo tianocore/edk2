@@ -2,6 +2,7 @@
 #  MP Initialize Library instance for DXE driver.
 #
 #  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -18,27 +19,32 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
 #
 
 [Sources.IA32]
   Ia32/AmdSev.c
-  Ia32/MpFuncs.nasm
   Ia32/CreatePageTable.c
+  Ia32/MpFuncs.nasm
 
 [Sources.X64]
   X64/AmdSev.c
-  X64/MpFuncs.nasm
   X64/CreatePageTable.c
+  X64/MpFuncs.nasm
 
-[Sources.common]
+[Sources.IA32, Sources.X64]
   AmdSev.c
-  MpEqu.inc
   DxeMpLib.c
+  Microcode.c
+  MpEqu.inc
   MpLib.c
   MpLib.h
-  Microcode.c
   MpHandOff.h
+
+[Sources.LoongArch64]
+  LoongArch64/DxeMpLib.c
+  LoongArch64/MpLib.c
+  LoongArch64/MpLib.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -47,17 +53,21 @@
 
 [LibraryClasses]
   BaseLib
-  LocalApicLib
-  MemoryAllocationLib
-  HobLib
-  MtrrLib
   CpuLib
-  UefiBootServicesTableLib
   DebugAgentLib
-  SynchronizationLib
+  HobLib
+  MemoryAllocationLib
   PcdLib
+  SynchronizationLib
+  UefiBootServicesTableLib
+
+[LibraryClasses.IA32, LibraryClasses.X64]
+  AmdSvsmLib
   CcExitLib
+  LocalApicLib
   MicrocodeLib
+  MtrrLib
+
 [LibraryClasses.X64]
   CpuPageTableLib
 
@@ -68,8 +78,15 @@
   gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event
   gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES  ## Event
   gEdkiiMicrocodePatchHobGuid                   ## SOMETIMES_CONSUMES  ## HOB
+  gGhcbApicIdsGuid                              ## SOMETIMES_CONSUMES  ## HOB
+
+[Guids.LoongArch64]
+  gProcessorResourceHobGuid                     ## SOMETIMES_CONSUMES  ## HOB
 
 [Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber            ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuBootLogicalProcessorNumber           ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds          ## SOMETIMES_CONSUMES
@@ -82,6 +99,3 @@
   gUefiCpuPkgTokenSpaceGuid.PcdGhcbHypervisorFeatures                  ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase                       ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi                ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                      ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase                           ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr           ## CONSUMES

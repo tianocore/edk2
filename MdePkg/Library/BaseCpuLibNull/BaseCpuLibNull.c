@@ -6,6 +6,8 @@
 
 **/
 
+#include <Library/CpuLib.h>
+
 /**
   Places the CPU in a sleep state until an interrupt is received.
 

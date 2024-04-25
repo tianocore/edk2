@@ -67,7 +67,9 @@ FileBasedSimpleTextInReset (
   @param[in] This      A pointer to the SimpleTextIn structure.
   @param[in, out] Key  A pointer to the Key structure to fill.
 
-  @retval   EFI_SUCCESS The read was successful.
+  @retval EFI_SUCCESS      The read was successful.
+  @retval EFI_UNSUPPORTED  The device does not support the ability to read
+                           keystroke data.
 **/
 EFI_STATUS
 EFIAPI

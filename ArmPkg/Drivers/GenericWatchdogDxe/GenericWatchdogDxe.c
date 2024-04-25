@@ -1,5 +1,6 @@
 /** @file
 *
+*  Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
 *  Copyright (c) 2013-2018, ARM Limited. All rights reserved.
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -27,24 +28,58 @@
    in a second */
 #define TIME_UNITS_PER_SECOND  10000000
 
-// Tick frequency of the generic timer basis of the generic watchdog.
-STATIC UINTN  mTimerFrequencyHz = 0;
-
 /* In cases where the compare register was set manually, information about
    how long the watchdog was asked to wait cannot be retrieved from hardware.
    It is therefore stored here. 0 means the timer is not running. */
-STATIC UINT64  mNumTimerTicks = 0;
+STATIC UINT64  mTimerPeriod = 0;
+
+/* disables watchdog interaction after Exit Boot Services */
+STATIC BOOLEAN  mExitedBootServices = FALSE;
+
+#define MAX_UINT48  0xFFFFFFFFFFFFULL
 
 STATIC EFI_HARDWARE_INTERRUPT2_PROTOCOL  *mInterruptProtocol;
 STATIC EFI_WATCHDOG_TIMER_NOTIFY         mWatchdogNotify;
+STATIC EFI_EVENT                         mEfiExitBootServicesEvent;
+
+/**
+  This function returns the maximum watchdog offset register value.
+
+  @retval MAX_UINT32 The watchdog offset register holds a 32-bit value.
+  @retval MAX_UINT48 The watchdog offset register holds a 48-bit value.
+**/
+STATIC
+UINT64
+GetMaxWatchdogOffsetRegisterValue (
+  VOID
+  )
+{
+  UINT64  MaxWatchdogOffsetValue;
+  UINT32  WatchdogIId;
+  UINT8   WatchdogArchRevision;
+
+  WatchdogIId          = MmioRead32 (GENERIC_WDOG_IID_REG);
+  WatchdogArchRevision = (WatchdogIId >> GENERIC_WDOG_IID_ARCH_REV_SHIFT) & GENERIC_WDOG_IID_ARCH_REV_MASK;
+
+  if (WatchdogArchRevision == 0) {
+    MaxWatchdogOffsetValue = MAX_UINT32;
+  } else {
+    MaxWatchdogOffsetValue = MAX_UINT48;
+  }
+
+  return MaxWatchdogOffsetValue;
+}
 
 STATIC
 VOID
 WatchdogWriteOffsetRegister (
-  UINT32  Value
+  UINT64  Value
   )
 {
-  MmioWrite32 (GENERIC_WDOG_OFFSET_REG, Value);
+  MmioWrite32 (GENERIC_WDOG_OFFSET_REG_LOW, Value & MAX_UINT32);
+  if (GetMaxWatchdogOffsetRegisterValue () == MAX_UINT48) {
+    MmioWrite32 (GENERIC_WDOG_OFFSET_REG_HIGH, (Value >> 32) & MAX_UINT16);
+  }
 }
 
 STATIC
@@ -87,7 +122,8 @@ WatchdogExitBootServicesEvent (
   )
 {
   WatchdogDisable ();
-  mNumTimerTicks = 0;
+  mTimerPeriod        = 0;
+  mExitedBootServices = TRUE;
 }
 
 /* This function is called when the watchdog's first signal (WS0) goes high.
@@ -102,7 +138,6 @@ WatchdogInterruptHandler (
   )
 {
   STATIC CONST CHAR16  ResetString[] = L"The generic watchdog timer ran out.";
-  UINT64               TimerPeriod;
 
   WatchdogDisable ();
 
@@ -115,8 +150,7 @@ WatchdogInterruptHandler (
   // the timer period plus 1.
   //
   if (mWatchdogNotify != NULL) {
-    TimerPeriod = ((TIME_UNITS_PER_SECOND / mTimerFrequencyHz) * mNumTimerTicks);
-    mWatchdogNotify (TimerPeriod + 1);
+    mWatchdogNotify (mTimerPeriod + 1);
   }
 
   gRT->ResetSystem (
@@ -186,6 +220,8 @@ WatchdogRegisterHandler (
 
   @retval EFI_SUCCESS           The watchdog timer has been programmed to fire
                                 in TimerPeriod 100ns units.
+  @retval EFI_DEVICE_ERROR      Boot Services has been exited but TimerPeriod
+                                is not zero.
 
 **/
 STATIC
@@ -196,32 +232,47 @@ WatchdogSetTimerPeriod (
   IN UINT64                            TimerPeriod          // In 100ns units
   )
 {
-  UINTN  SystemCount;
+  UINTN   SystemCount;
+  UINT64  MaxWatchdogOffsetValue;
+  UINT64  TimerFrequencyHz;
+  UINT64  NumTimerTicks;
 
-  // if TimerPeriod is 0, this is a request to stop the watchdog.
+  // If we've exited Boot Services but TimerPeriod isn't zero, this
+  // indicates that the caller is doing something wrong.
+  if (mExitedBootServices && (TimerPeriod != 0)) {
+    mTimerPeriod = 0;
+    WatchdogDisable ();
+    return EFI_DEVICE_ERROR;
+  }
+
+  // If TimerPeriod is 0 this is a request to stop the watchdog.
   if (TimerPeriod == 0) {
-    mNumTimerTicks = 0;
+    mTimerPeriod = 0;
     WatchdogDisable ();
     return EFI_SUCCESS;
   }
 
   // Work out how many timer ticks will equate to TimerPeriod
-  mNumTimerTicks = (mTimerFrequencyHz * TimerPeriod) / TIME_UNITS_PER_SECOND;
+  TimerFrequencyHz = ArmGenericTimerGetTimerFreq ();
+  ASSERT (TimerFrequencyHz != 0);
+  mTimerPeriod  = TimerPeriod;
+  NumTimerTicks = (TimerFrequencyHz * TimerPeriod) / TIME_UNITS_PER_SECOND;
 
   /* If the number of required ticks is greater than the max the watchdog's
      offset register (WOR) can hold, we need to manually compute and set
      the compare register (WCV) */
-  if (mNumTimerTicks > MAX_UINT32) {
+  MaxWatchdogOffsetValue = GetMaxWatchdogOffsetRegisterValue ();
+  if (NumTimerTicks > MaxWatchdogOffsetValue) {
     /* We need to enable the watchdog *before* writing to the compare register,
        because enabling the watchdog causes an "explicit refresh", which
        clobbers the compare register (WCV). In order to make sure this doesn't
        trigger an interrupt, set the offset to max. */
-    WatchdogWriteOffsetRegister (MAX_UINT32);
+    WatchdogWriteOffsetRegister (MaxWatchdogOffsetValue);
     WatchdogEnable ();
     SystemCount = ArmGenericTimerGetSystemCount ();
-    WatchdogWriteCompareRegister (SystemCount + mNumTimerTicks);
+    WatchdogWriteCompareRegister (SystemCount + NumTimerTicks);
   } else {
-    WatchdogWriteOffsetRegister ((UINT32)mNumTimerTicks);
+    WatchdogWriteOffsetRegister (NumTimerTicks);
     WatchdogEnable ();
   }
 
@@ -256,7 +307,7 @@ WatchdogGetTimerPeriod (
     return EFI_INVALID_PARAMETER;
   }
 
-  *TimerPeriod = ((TIME_UNITS_PER_SECOND / mTimerFrequencyHz) * mNumTimerTicks);
+  *TimerPeriod = mTimerPeriod;
 
   return EFI_SUCCESS;
 }
@@ -299,8 +350,6 @@ STATIC EFI_WATCHDOG_TIMER_ARCH_PROTOCOL  mWatchdogTimer = {
   WatchdogGetTimerPeriod
 };
 
-STATIC EFI_EVENT  mEfiExitBootServicesEvent;
-
 EFI_STATUS
 EFIAPI
 GenericWatchdogEntry (
@@ -322,9 +371,6 @@ GenericWatchdogEntry (
      in the system yet.
      This will avoid conflicts with the universal watchdog */
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiWatchdogTimerArchProtocolGuid);
-
-  mTimerFrequencyHz = ArmGenericTimerGetTimerFreq ();
-  ASSERT (mTimerFrequencyHz != 0);
 
   // Install interrupt handler
   Status = mInterruptProtocol->RegisterInterruptSource (
@@ -367,7 +413,6 @@ GenericWatchdogEntry (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  mNumTimerTicks = 0;
   WatchdogDisable ();
 
   return EFI_SUCCESS;

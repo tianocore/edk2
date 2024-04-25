@@ -37,7 +37,7 @@ parser.add_argument("-l", "--LayoutFileName", dest="LayoutFileName", nargs='+',
                         the file will be generated with default name (Layout_'InputFileName'.txt). \
                         Currently supports two formats: json, txt. More formats will be added in the future")
 parser.add_argument("-c", "--ConfigFilePath", dest="ConfigFilePath", nargs='+',
-                    help="Provide the target FmmtConf.ini file path: '-c C:\Code\FmmtConf.ini' \
+                    help="Provide the target FmmtConf.ini file path: '-c C:\\Code\\FmmtConf.ini' \
                         FmmtConf file saves the target guidtool used in compress/uncompress process.\
                         If do not provide, FMMT tool will search the inputfile folder for FmmtConf.ini firstly, if not found,\
                         the FmmtConf.ini saved in FMMT tool's folder will be used as default.")

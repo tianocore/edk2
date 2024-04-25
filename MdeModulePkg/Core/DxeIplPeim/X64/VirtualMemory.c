@@ -696,7 +696,7 @@ CreateIdentityMappingPageTables (
   UINTN                                        TotalPagesNum;
   UINTN                                        BigPageAddress;
   VOID                                         *Hob;
-  BOOLEAN                                      Page5LevelSupport;
+  BOOLEAN                                      Page5LevelEnabled;
   BOOLEAN                                      Page1GSupport;
   PAGE_TABLE_1G_ENTRY                          *PageDirectory1GEntry;
   UINT64                                       AddressEncMask;
@@ -744,13 +744,15 @@ CreateIdentityMappingPageTables (
     // If cpu has already run in 64bit long mode PEI, Page table Level in DXE must align with previous level.
     //
     Cr4.UintN         = AsmReadCr4 ();
-    Page5LevelSupport = (Cr4.Bits.LA57 != 0);
-    ASSERT (PcdGetBool (PcdUse5LevelPageTable) == Page5LevelSupport);
+    Page5LevelEnabled = (Cr4.Bits.LA57 != 0);
+    if (Page5LevelEnabled) {
+      ASSERT (PcdGetBool (PcdUse5LevelPageTable));
+    }
   } else {
     //
     // If cpu runs in 32bit protected mode PEI, Page table Level in DXE is decided by PCD and feature capability.
     //
-    Page5LevelSupport = FALSE;
+    Page5LevelEnabled = FALSE;
     if (PcdGetBool (PcdUse5LevelPageTable)) {
       AsmCpuidEx (
         CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
@@ -761,12 +763,12 @@ CreateIdentityMappingPageTables (
         NULL
         );
       if (EcxFlags.Bits.FiveLevelPage != 0) {
-        Page5LevelSupport = TRUE;
+        Page5LevelEnabled = TRUE;
       }
     }
   }
 
-  DEBUG ((DEBUG_INFO, "AddressBits=%u 5LevelPaging=%u 1GPage=%u\n", PhysicalAddressBits, Page5LevelSupport, Page1GSupport));
+  DEBUG ((DEBUG_INFO, "AddressBits=%u 5LevelPaging=%u 1GPage=%u\n", PhysicalAddressBits, Page5LevelEnabled, Page1GSupport));
 
   //
   // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses
@@ -774,7 +776,7 @@ CreateIdentityMappingPageTables (
   //  due to either unsupported by HW, or disabled by PCD.
   //
   ASSERT (PhysicalAddressBits <= 52);
-  if (!Page5LevelSupport && (PhysicalAddressBits > 48)) {
+  if (!Page5LevelEnabled && (PhysicalAddressBits > 48)) {
     PhysicalAddressBits = 48;
   }
 
@@ -809,7 +811,7 @@ CreateIdentityMappingPageTables (
   //
   // Substract the one page occupied by PML5 entries if 5-Level Paging is disabled.
   //
-  if (!Page5LevelSupport) {
+  if (!Page5LevelEnabled) {
     TotalPagesNum--;
   }
 
@@ -829,7 +831,7 @@ CreateIdentityMappingPageTables (
   // By architecture only one PageMapLevel4 exists - so lets allocate storage for it.
   //
   PageMap = (VOID *)BigPageAddress;
-  if (Page5LevelSupport) {
+  if (Page5LevelEnabled) {
     //
     // By architecture only one PageMapLevel5 exists - so lets allocate storage for it.
     //
@@ -851,7 +853,7 @@ CreateIdentityMappingPageTables (
     PageMapLevel4Entry = (VOID *)BigPageAddress;
     BigPageAddress    += SIZE_4KB;
 
-    if (Page5LevelSupport) {
+    if (Page5LevelEnabled) {
       //
       // Make a PML5 Entry
       //
@@ -945,7 +947,7 @@ CreateIdentityMappingPageTables (
     ZeroMem (PageMapLevel4Entry, (512 - IndexOfPml4Entries) * sizeof (PAGE_MAP_AND_DIRECTORY_POINTER));
   }
 
-  if (Page5LevelSupport) {
+  if (Page5LevelEnabled) {
     Cr4.UintN     = AsmReadCr4 ();
     Cr4.Bits.LA57 = 1;
     AsmWriteCr4 (Cr4.UintN);

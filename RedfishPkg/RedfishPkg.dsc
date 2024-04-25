@@ -4,7 +4,7 @@
 # Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2021 Hewlett-Packard Enterprise Development LP.
 # Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.
-# Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -45,6 +45,8 @@
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
   RedfishPlatformCredentialLib|RedfishPkg/Library/PlatformCredentialLibNull/PlatformCredentialLibNull.inf
   RedfishContentCodingLib|RedfishPkg/Library/RedfishContentCodingLibNull/RedfishContentCodingLibNull.inf
+  ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+  SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
 
   # NULL instance of IPMI related library.
   IpmiLib|MdeModulePkg/Library/BaseIpmiLibNull/BaseIpmiLibNull.inf
@@ -72,5 +74,6 @@
   RedfishPkg/Library/RedfishDebugLib/RedfishDebugLib.inf
   RedfishPkg/Library/HiiUtilityLib/HiiUtilityLib.inf
   RedfishPkg/Library/RedfishPlatformConfigLib/RedfishPlatformConfigLib.inf
+  RedfishPkg/Library/RedfishHttpLib/RedfishHttpLib.inf
 
   !include RedfishPkg/Redfish.dsc.inc

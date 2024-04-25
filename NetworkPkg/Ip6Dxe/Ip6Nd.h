@@ -56,12 +56,47 @@ VOID
   VOID  *Context
   );
 
+//
+// Per RFC8200 Section 4.2
+//
+//   Two of the currently-defined extension headers -- the Hop-by-Hop
+//   Options header and the Destination Options header -- carry a variable
+//   number of type-length-value (TLV) encoded "options", of the following
+//   format:
+//
+//      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- - - - - - - - -
+//      |  Option Type  |  Opt Data Len |  Option Data
+//      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+- - - - - - - - -
+//
+//      Option Type          8-bit identifier of the type of option.
+//
+//      Opt Data Len         8-bit unsigned integer.  Length of the Option
+//                           Data field of this option, in octets.
+//
+//      Option Data          Variable-length field.  Option-Type-specific
+//                           data.
+//
 typedef struct _IP6_OPTION_HEADER {
+  ///
+  /// identifier of the type of option.
+  ///
   UINT8    Type;
+  ///
+  /// Length of the Option Data field of this option, in octets.
+  ///
   UINT8    Length;
+  ///
+  /// Option-Type-specific data.
+  ///
 } IP6_OPTION_HEADER;
 
 STATIC_ASSERT (sizeof (IP6_OPTION_HEADER) == 2, "IP6_OPTION_HEADER is expected to be exactly 2 bytes long.");
+
+#define IP6_NEXT_OPTION_OFFSET(offset, length)  (offset + sizeof(IP6_OPTION_HEADER) + length)
+STATIC_ASSERT (
+  IP6_NEXT_OPTION_OFFSET (0, 0) == 2,
+  "The next option is minimally the combined size of the option tag and length"
+  );
 
 typedef struct _IP6_ETHE_ADDR_OPTION {
   UINT8    Type;

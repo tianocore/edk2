@@ -140,7 +140,9 @@ typedef struct {
 
   This function returns information of type InformationType from the adapter.
   If an adapter does not support the requested informational type, then
-  EFI_UNSUPPORTED is returned.
+  EFI_UNSUPPORTED is returned. If an adapter does not contain Information for
+  the requested InformationType, it fills InformationBlockSize with 0 and
+  returns EFI_NOT_FOUND.
 
   @param[in]  This                   A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
   @param[in]  InformationType        A pointer to an EFI_GUID that defines the contents of InformationBlock.
@@ -150,6 +152,7 @@ typedef struct {
 
   @retval EFI_SUCCESS                The InformationType information was retrieved.
   @retval EFI_UNSUPPORTED            The InformationType is not known.
+  @retval EFI_NOT_FOUND              Information is not available for the requested information type.
   @retval EFI_DEVICE_ERROR           The device reported an error.
   @retval EFI_OUT_OF_RESOURCES       The request could not be completed due to a lack of resources.
   @retval EFI_INVALID_PARAMETER      This is NULL.

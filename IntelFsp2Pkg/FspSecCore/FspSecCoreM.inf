@@ -8,7 +8,7 @@
 ##
 
 [Defines]
-  INF_VERSION                    = 0x00010005
+  INF_VERSION                    = 1.30
   BASE_NAME                      = FspSecCoreM
   FILE_GUID                      = C2F9AE46-3437-4FEF-9CB1-9A568B282FEE
   MODULE_TYPE                    = SEC
@@ -59,6 +59,7 @@
   FspCommonLib
   FspSecPlatformLib
   CpuLib
+  FspPlatformLib
 
 [Pcd]
   gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES

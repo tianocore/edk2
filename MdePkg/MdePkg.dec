@@ -4,7 +4,7 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs) of
 # EFI1.10/UEFI2.7/PI1.7 and some Industry Standards.
 #
-# Copyright (c) 2007 - 2022, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 # (C) Copyright 2016 - 2021 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
@@ -739,6 +739,12 @@
 
   ## Include/Protocol/SerilaIo.h
   gEfiSerialTerminalDeviceTypeGuid = { 0x6AD9A60F, 0x5815, 0x4C7C, { 0x8A, 0x10, 0x50, 0x53, 0xD2, 0xBF, 0x7A, 0x1B }}
+
+  # GUIDs defined in UEFI2.10
+  #
+  ## GUID used to specify section with devdb content
+  ## Include/Guid/DeviceAuthentication.h
+  gEfiDeviceSignatureDatabaseGuid  = { 0xb9c2b4f4, 0xbf5f, 0x462d, {0x8a, 0xdf, 0xc5, 0xc7, 0xa, 0xc3, 0x5d, 0xad }}
 
   #
   # GUID defined in PI1.0
@@ -2406,6 +2412,8 @@
   # BIT 0 = Cache Management Operations. This bit is relevant only if
   # previous stage has feature enabled and user wants to disable it.
   # BIT 1 = Supervisor Time Compare (Sstc). This bit is relevant only if
+  # previous stage has feature enabled and user wants to disable it.
+  # BIT 2 = Page-Based Memory Types (Pbmt). This bit is relevant only if
   # previous stage has feature enabled and user wants to disable it.
   #
   gEfiMdePkgTokenSpaceGuid.PcdRiscVFeatureOverride|0xFFFFFFFFFFFFFFFF|UINT64|0x69

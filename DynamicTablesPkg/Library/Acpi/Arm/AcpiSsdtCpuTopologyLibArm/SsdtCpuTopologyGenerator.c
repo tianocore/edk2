@@ -42,6 +42,7 @@ Requirements:
   - EArmObjCmRef (OPTIONAL)
   - EArmObjLpiInfo (OPTIONAL)
   - GetEArmObjEtInfo (OPTIONAL)
+  - EArmObjPsdInfo (OPTIONAL)
 */
 
 /** This macro expands to a function that retrieves the GIC
@@ -101,6 +102,16 @@ GET_OBJECT_LIST (
   EObjNameSpaceArm,
   EArmObjEtInfo,
   CM_ARM_ET_INFO
+  );
+
+/**
+  This macro expands to a function that retrieves the PSD
+  information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArm,
+  EArmObjPsdInfo,
+  CM_ARM_PSD_INFO
   );
 
 /** Initialize the TokenTable.
@@ -254,6 +265,75 @@ WriteAslName (
   }
 
   return EFI_SUCCESS;
+}
+
+/** Create and add an _PSD Node to Cpu Node.
+
+  For instance, transform an AML node from:
+  Device (C002)
+  {
+      Name (_UID, 2)
+      Name (_HID, "ACPI0007")
+  }
+
+  To:
+  Device (C002)
+  {
+      Name (_UID, 2)
+      Name (_HID, "ACPI0007")
+      Name (_PSD, Package()
+      {
+        NumEntries,      // Integer
+        Revision,        // Integer
+        Domain,          // Integer
+        CoordType,       // Integer
+        NumProcessors,   // Integer
+      })
+  }
+
+  @param [in]  Generator              The SSDT Cpu Topology generator.
+  @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
+                                      Protocol Interface.
+  @param [in]  GicCInfo               Pointer to the CM_ARM_GICC_INFO object
+                                      describing the Cpu.
+  @param [in]  Node                   CPU Node to which the _CPC node is
+                                      attached.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CreateAmlPsdNode (
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CM_ARM_GICC_INFO                                    *GicCInfo,
+  IN  AML_OBJECT_NODE_HANDLE                              *Node
+  )
+{
+  EFI_STATUS       Status;
+  CM_ARM_PSD_INFO  *PsdInfo;
+
+  Status = GetEArmObjPsdInfo (
+             CfgMgrProtocol,
+             GicCInfo->PsdToken,
+             &PsdInfo,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlCreatePsdNode (
+             PsdInfo,
+             Node,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+  return Status;
 }
 
 /** Create and add an _CPC Node to Cpu Node.
@@ -842,6 +922,14 @@ CreateAmlCpuFromProcHierarchy (
     }
   }
 
+  if (GicCInfo->PsdToken != CM_NULL_TOKEN) {
+    Status = CreateAmlPsdNode (Generator, CfgMgrProtocol, GicCInfo, CpuNode);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+  }
+
   // If a CPC info is associated with the
   // GicCinfo, create an _CPC method returning them.
   if (GicCInfo->CpcToken != CM_NULL_TOKEN) {
@@ -984,6 +1072,7 @@ CreateAmlProcessorContainer (
   @param [in]  IsLeaf           The ProcNode is a leaf.
   @param [in]  NodeToken        NodeToken of the ProcNode.
   @param [in]  ParentNodeToken  Parent NodeToken of the ProcNode.
+  @param [in]  PackageNodeSeen  A parent of the ProcNode has the physical package flag set.
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -995,23 +1084,24 @@ CheckProcNode (
   UINT32           NodeFlags,
   BOOLEAN          IsLeaf,
   CM_OBJECT_TOKEN  NodeToken,
-  CM_OBJECT_TOKEN  ParentNodeToken
+  CM_OBJECT_TOKEN  ParentNodeToken,
+  BOOLEAN          PackageNodeSeen
   )
 {
   BOOLEAN  InvalidFlags;
   BOOLEAN  HasPhysicalPackageBit;
-  BOOLEAN  IsTopLevelNode;
 
   HasPhysicalPackageBit = (NodeFlags & EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL) ==
                           EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL;
-  IsTopLevelNode = (ParentNodeToken == CM_NULL_TOKEN);
 
-  // A top-level node is a Physical Package and conversely.
-  InvalidFlags = HasPhysicalPackageBit ^ IsTopLevelNode;
+  // Only one Physical Package flag is allowed in the hierarchy
+  InvalidFlags = HasPhysicalPackageBit && PackageNodeSeen;
 
   // Check Leaf specific flags.
   if (IsLeaf) {
     InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != PPTT_LEAF_MASK);
+    // Must have Physical Package flag somewhere in the hierarchy
+    InvalidFlags |= !(HasPhysicalPackageBit || PackageNodeSeen);
   } else {
     InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != 0);
   }
@@ -1042,6 +1132,7 @@ CheckProcNode (
                                       node to.
   @param [in,out] ProcContainerIndex  Pointer to the current processor container
                                       index to be used as UID.
+  @param [in]  PackageNodeSeen        A parent of the ProcNode has the physical package flag set.
 
   @retval EFI_SUCCESS             Success.
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
@@ -1055,7 +1146,8 @@ CreateAmlCpuTopologyTree (
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
   IN        CM_OBJECT_TOKEN                               NodeToken,
   IN        AML_NODE_HANDLE                               ParentNode,
-  IN OUT    UINT32                                        *ProcContainerIndex
+  IN OUT    UINT32                                        *ProcContainerIndex,
+  IN        BOOLEAN                                       PackageNodeSeen
   )
 {
   EFI_STATUS              Status;
@@ -1065,6 +1157,7 @@ CreateAmlCpuTopologyTree (
   AML_OBJECT_NODE_HANDLE  ProcContainerNode;
   UINT32                  Uid;
   UINT16                  Name;
+  BOOLEAN                 HasPhysicalPackageBit;
 
   ASSERT (Generator != NULL);
   ASSERT (Generator->ProcNodeList != NULL);
@@ -1087,7 +1180,8 @@ CreateAmlCpuTopologyTree (
                    Generator->ProcNodeList[Index].Flags,
                    TRUE,
                    Generator->ProcNodeList[Index].Token,
-                   NodeToken
+                   NodeToken,
+                   PackageNodeSeen
                    );
         if (EFI_ERROR (Status)) {
           ASSERT (0);
@@ -1120,7 +1214,8 @@ CreateAmlCpuTopologyTree (
                    Generator->ProcNodeList[Index].Flags,
                    FALSE,
                    Generator->ProcNodeList[Index].Token,
-                   NodeToken
+                   NodeToken,
+                   PackageNodeSeen
                    );
         if (EFI_ERROR (Status)) {
           ASSERT (0);
@@ -1161,13 +1256,17 @@ CreateAmlCpuTopologyTree (
           ProcContainerName++;
         }
 
+        HasPhysicalPackageBit = (Generator->ProcNodeList[Index].Flags & EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL) ==
+                                EFI_ACPI_6_3_PPTT_PACKAGE_PHYSICAL;
+
         // Recursively continue creating an AML tree.
         Status = CreateAmlCpuTopologyTree (
                    Generator,
                    CfgMgrProtocol,
                    Generator->ProcNodeList[Index].Token,
                    ProcContainerNode,
-                   ProcContainerIndex
+                   ProcContainerIndex,
+                   (PackageNodeSeen || HasPhysicalPackageBit)
                    );
         if (EFI_ERROR (Status)) {
           ASSERT (0);
@@ -1223,7 +1322,8 @@ CreateTopologyFromProcHierarchy (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
              ScopeNode,
-             &ProcContainerIndex
+             &ProcContainerIndex,
+             FALSE
              );
   if (EFI_ERROR (Status)) {
     ASSERT (0);
@@ -1297,6 +1397,14 @@ CreateTopologyFromGicC (
     if (EFI_ERROR (Status)) {
       ASSERT (0);
       break;
+    }
+
+    if (GicCInfo->PsdToken != CM_NULL_TOKEN) {
+      Status = CreateAmlPsdNode (Generator, CfgMgrProtocol, GicCInfo, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
     }
 
     // If a CPC info is associated with the

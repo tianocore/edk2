@@ -2,7 +2,7 @@
   Common header file for MP Initialize Library.
 
   Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2020, AMD Inc. All rights reserved.<BR>
+  Copyright (c) 2020 - 2024, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -482,7 +482,20 @@ GetWakeupBuffer (
 **/
 VOID
 SwitchApContext (
-  IN MP_HAND_OFF  *MpHandOff
+  IN CONST MP_HAND_OFF_CONFIG  *MpHandOffConfig,
+  IN CONST MP_HAND_OFF         *FirstMpHandOff
+  );
+
+/**
+  Get pointer to next MP_HAND_OFF GUIDed HOB body.
+
+  @param[in] MpHandOff  Previous HOB body.  Pass NULL to get the first HOB.
+
+  @return  The pointer to MP_HAND_OFF structure.
+**/
+MP_HAND_OFF *
+GetNextMpHandOffHob (
+  IN CONST MP_HAND_OFF  *MpHandOff
   );
 
 /**
@@ -871,20 +884,6 @@ FillExchangeInfoDataSevEs (
   );
 
 /**
-  Issue RMPADJUST to adjust the VMSA attribute of an SEV-SNP page.
-
-  @param[in]  PageAddress
-  @param[in]  VmsaPage
-
-  @return  RMPADJUST return value
-**/
-UINT32
-SevSnpRmpAdjust (
-  IN  EFI_PHYSICAL_ADDRESS  PageAddress,
-  IN  BOOLEAN               VmsaPage
-  );
-
-/**
   Create an SEV-SNP AP save area (VMSA) for use in running the vCPU.
 
   @param[in]  CpuMpData        Pointer to CPU MP Data
@@ -909,6 +908,19 @@ VOID
 SevSnpCreateAP (
   IN CPU_MP_DATA  *CpuMpData,
   IN INTN         ProcessorNumber
+  );
+
+/**
+  Determine if the SEV-SNP AP Create protocol should be used.
+
+  @param[in]  CpuMpData  Pointer to CPU MP Data
+
+  @retval     TRUE       Use SEV-SNP AP Create protocol
+  @retval     FALSE      Do not use SEV-SNP AP Create protocol
+**/
+BOOLEAN
+CanUseSevSnpCreateAP (
+  IN  CPU_MP_DATA  *CpuMpData
   );
 
 /**

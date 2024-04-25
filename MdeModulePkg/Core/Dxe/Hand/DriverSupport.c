@@ -497,7 +497,12 @@ CoreConnectSingleController (
   //
   // Add the Driver Family Override Protocol drivers for ControllerHandle
   //
-  while (TRUE) {
+  Status = CoreLocateProtocol (
+             &gEfiDriverFamilyOverrideProtocolGuid,
+             NULL,
+             (VOID **)&DriverFamilyOverride
+             );
+  while (!EFI_ERROR (Status) && (DriverFamilyOverride != NULL)) {
     HighestIndex   = DriverBindingHandleCount;
     HighestVersion = 0;
     for (Index = 0; Index < DriverBindingHandleCount; Index++) {

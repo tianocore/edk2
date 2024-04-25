@@ -1,0 +1,57 @@
+## @file
+#  Component description file for Virt Hsti Driver
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+# Copyright (c) 2024, Red Hat. Inc
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtHstiDxe
+  FILE_GUID                      = 60740CF3-D428-4500-80E6-04A5798241ED
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VirtHstiDxeEntrypoint
+
+[Sources]
+  VirtHstiDxe.h
+  VirtHstiDxe.c
+  QemuPC.c
+  QemuQ35.c
+  QemuCommon.c
+  Flash.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  HobLib
+  HstiLib
+  PcdLib
+  PciLib
+  UefiBootServicesTableLib
+
+[Guids]
+  gUefiOvmfPkgPlatformInfoGuid
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
+  gUefiOvmfPkgTokenSpaceGuid.PcdBfvBase
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFlashNvStorageVariableBase
+
+[Depex]
+  TRUE

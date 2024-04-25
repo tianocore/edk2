@@ -1,7 +1,7 @@
 /** @file
   Module for clarifying the content of the smbios structure element information.
 
-  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 1985 - 2022, American Megatrends International LLC.<BR>
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2015-2019 Hewlett Packard Enterprise Development LP<BR>
@@ -518,6 +518,10 @@ SmbiosPrintStructure (
         ShellPrintEx (-1, -1, L"Core Count 2: %u\n", Struct->Type4->CoreCount2);
         ShellPrintEx (-1, -1, L"Core Enabled 2: %u\n", Struct->Type4->EnabledCoreCount2);
         ShellPrintEx (-1, -1, L"Thread Count 2: %u\n", Struct->Type4->ThreadCount2);
+      }
+
+      if (AE_SMBIOS_VERSION (0x3, 0x6) && (Struct->Hdr->Length > 0x2E)) {
+        ShellPrintEx (-1, -1, L"Thread Enabled: %u\n", Struct->Type4->ThreadEnabled);
       }
 
       break;
@@ -2608,6 +2612,106 @@ DisplayProcessorFamily2 (
 
     case 0x202:
       Print (L"RISC-V RV128\n");
+      break;
+
+    case 0x258:
+      Print (L"LoongArch\n");
+      break;
+
+    case 0x259:
+      Print (L"Loongson1\n");
+      break;
+
+    case 0x25A:
+      Print (L"Loongson2\n");
+      break;
+
+    case 0x25B:
+      Print (L"Loongson3\n");
+      break;
+
+    case 0x25C:
+      Print (L"Loongson2K\n");
+      break;
+
+    case 0x25D:
+      Print (L"Loongson3A\n");
+      break;
+
+    case 0x25E:
+      Print (L"Loongson3B\n");
+      break;
+
+    case 0x25F:
+      Print (L"Loongson3C\n");
+      break;
+
+    case 0x260:
+      Print (L"Loongson3D\n");
+      break;
+
+    case 0x261:
+      Print (L"Loongson3E\n");
+      break;
+
+    case 0x262:
+      Print (L"DualCoreLoongson2K\n");
+      break;
+
+    case 0x26C:
+      Print (L"QuadCoreLoongson3A\n");
+      break;
+
+    case 0x26D:
+      Print (L"MultiCoreLoongson3A\n");
+      break;
+
+    case 0x26E:
+      Print (L"QuadCoreLoongson3B\n");
+      break;
+
+    case 0x26F:
+      Print (L"MultiCoreLoongson3B\n");
+      break;
+
+    case 0x270:
+      Print (L"MultiCoreLoongson3C\n");
+      break;
+
+    case 0x271:
+      Print (L"MultiCoreLoongson3D\n");
+      break;
+
+    case 0x300:
+      Print (L"IntelCore3\n");
+      break;
+
+    case 0x301:
+      Print (L"IntelCore5\n");
+      break;
+
+    case 0x302:
+      Print (L"IntelCore7\n");
+      break;
+
+    case 0x303:
+      Print (L"IntelCore9\n");
+      break;
+
+    case 0x304:
+      Print (L"IntelCoreUltra3\n");
+      break;
+
+    case 0x305:
+      Print (L"IntelCoreUltra5\n");
+      break;
+
+    case 0x306:
+      Print (L"IntelCoreUltra7\n");
+      break;
+
+    case 0x307:
+      Print (L"IntelCoreUltra9\n");
       break;
 
     default:

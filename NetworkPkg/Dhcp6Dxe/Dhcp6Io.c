@@ -3,9 +3,9 @@
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
-
 **/
 
 #include "Dhcp6Impl.h"
@@ -528,13 +528,23 @@ Dhcp6UpdateIaInfo (
 {
   EFI_STATUS  Status;
   UINT8       *Option;
+  UINT32      OptionLen;
   UINT8       *IaInnerOpt;
   UINT16      IaInnerLen;
   UINT16      StsCode;
   UINT32      T1;
   UINT32      T2;
 
+  T1 = 0;
+  T2 = 0;
+
   ASSERT (Instance->Config != NULL);
+
+  // OptionLen is the length of the Options excluding the DHCP header.
+  // Length of the EFI_DHCP6_PACKET from the first byte of the Header field to the last
+  // byte of the Option[] field.
+  OptionLen = Packet->Length - sizeof (Packet->Dhcp6.Header);
+
   //
   // If the reply was received in response to a solicit with rapid commit option,
   // request, renew or rebind message, the client updates the information it has
@@ -549,12 +559,28 @@ Dhcp6UpdateIaInfo (
   //
   Option = Dhcp6SeekIaOption (
              Packet->Dhcp6.Option,
-             Packet->Length - sizeof (EFI_DHCP6_HEADER),
+             OptionLen,
              &Instance->Config->IaDescriptor
              );
   if (Option == NULL) {
     return EFI_DEVICE_ERROR;
   }
+
+  //
+  // Calculate the distance from Packet->Dhcp6.Option to the IA option.
+  //
+  // Packet->Size and Packet->Length are both UINT32 type, and Packet->Size is
+  // the size of the whole packet, including the DHCP header, and Packet->Length
+  // is the length of the DHCP message body, excluding the DHCP header.
+  //
+  // (*Option - Packet->Dhcp6.Option) is the number of bytes from the start of
+  // DHCP6 option area to the start of the IA option.
+  //
+  // Dhcp6SeekInnerOptionSafe() is searching starting from the start of the
+  // IA option to the end of the DHCP6 option area, thus subtract the space
+  // up until this option
+  //
+  OptionLen = OptionLen - (UINT32)(Option - Packet->Dhcp6.Option);
 
   //
   // The format of the IA_NA option is:
@@ -591,31 +617,32 @@ Dhcp6UpdateIaInfo (
   //
 
   //
-  // sizeof (option-code + option-len + IaId)           = 8
-  // sizeof (option-code + option-len + IaId + T1)      = 12
-  // sizeof (option-code + option-len + IaId + T1 + T2) = 16
+  // Seek the inner option
   //
-  // The inner options still start with 2 bytes option-code and 2 bytes option-len.
-  //
+  if (EFI_ERROR (
+        Dhcp6SeekInnerOptionSafe (
+          Instance->Config->IaDescriptor.Type,
+          Option,
+          OptionLen,
+          &IaInnerOpt,
+          &IaInnerLen
+          )
+        ))
+  {
+    return EFI_DEVICE_ERROR;
+  }
+
   if (Instance->Config->IaDescriptor.Type == Dhcp6OptIana) {
-    T1 = NTOHL (ReadUnaligned32 ((UINT32 *)(Option + 8)));
-    T2 = NTOHL (ReadUnaligned32 ((UINT32 *)(Option + 12)));
+    T1 = NTOHL (ReadUnaligned32 ((UINT32 *)(DHCP6_OFFSET_OF_IA_NA_T1 (Option))));
+    T2 = NTOHL (ReadUnaligned32 ((UINT32 *)(DHCP6_OFFSET_OF_IA_NA_T2 (Option))));
     //
     // Refer to RFC3155 Chapter 22.4. If a client receives an IA_NA with T1 greater than T2,
     // and both T1 and T2 are greater than 0, the client discards the IA_NA option and processes
-    // the remainder of the message as though the server had not  included the invalid IA_NA option.
+    // the remainder of the message as though the server had not included the invalid IA_NA option.
     //
     if ((T1 > T2) && (T2 > 0)) {
       return EFI_DEVICE_ERROR;
     }
-
-    IaInnerOpt = Option + 16;
-    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(Option + 2))) - 12);
-  } else {
-    T1         = 0;
-    T2         = 0;
-    IaInnerOpt = Option + 8;
-    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(Option + 2))) - 4);
   }
 
   //
@@ -641,7 +668,7 @@ Dhcp6UpdateIaInfo (
   Option  = Dhcp6SeekOption (IaInnerOpt, IaInnerLen, Dhcp6OptStatusCode);
 
   if (Option != NULL) {
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(DHCP6_OFFSET_OF_STATUS_CODE (Option))));
     if (StsCode != Dhcp6StsSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -659,6 +686,97 @@ Dhcp6UpdateIaInfo (
              );
 
   return Status;
+}
+
+/**
+  Seeks the Inner Options from a DHCP6 Option
+
+  @param[in]  IaType          The type of the IA option.
+  @param[in]  Option          The pointer to the DHCP6 Option.
+  @param[in]  OptionLen       The length of the DHCP6 Option.
+  @param[out] IaInnerOpt      The pointer to the IA inner option.
+  @param[out] IaInnerLen      The length of the IA inner option.
+
+  @retval EFI_SUCCESS         Seek the inner option successfully.
+  @retval EFI_DEVICE_ERROR    The OptionLen is invalid. On Error,
+                              the pointers are not modified
+**/
+EFI_STATUS
+Dhcp6SeekInnerOptionSafe (
+  IN  UINT16  IaType,
+  IN  UINT8   *Option,
+  IN  UINT32  OptionLen,
+  OUT UINT8   **IaInnerOpt,
+  OUT UINT16  *IaInnerLen
+  )
+{
+  UINT16  IaInnerLenTmp;
+  UINT8   *IaInnerOptTmp;
+
+  if (Option == NULL) {
+    ASSERT (Option != NULL);
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (IaInnerOpt == NULL) {
+    ASSERT (IaInnerOpt != NULL);
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (IaInnerLen == NULL) {
+    ASSERT (IaInnerLen != NULL);
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (IaType == Dhcp6OptIana) {
+    //
+    // Verify we have a fully formed IA_NA
+    //
+    if (OptionLen < DHCP6_MIN_SIZE_OF_IA_NA) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    //
+    // Get the IA Inner Option and Length
+    //
+    IaInnerOptTmp = DHCP6_OFFSET_OF_IA_NA_INNER_OPT (Option);
+
+    //
+    // Verify the IaInnerLen is valid.
+    //
+    IaInnerLenTmp = (UINT16)NTOHS (ReadUnaligned16 ((UINT16 *)DHCP6_OFFSET_OF_OPT_LEN (Option)));
+    if (IaInnerLenTmp < DHCP6_SIZE_OF_COMBINED_IAID_T1_T2) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    IaInnerLenTmp -= DHCP6_SIZE_OF_COMBINED_IAID_T1_T2;
+  } else if (IaType == Dhcp6OptIata) {
+    //
+    // Verify the OptionLen is valid.
+    //
+    if (OptionLen < DHCP6_MIN_SIZE_OF_IA_TA) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    IaInnerOptTmp = DHCP6_OFFSET_OF_IA_TA_INNER_OPT (Option);
+
+    //
+    // Verify the IaInnerLen is valid.
+    //
+    IaInnerLenTmp = (UINT16)NTOHS (ReadUnaligned16 ((UINT16 *)(DHCP6_OFFSET_OF_OPT_LEN (Option))));
+    if (IaInnerLenTmp < DHCP6_SIZE_OF_IAID) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    IaInnerLenTmp -= DHCP6_SIZE_OF_IAID;
+  } else {
+    return EFI_DEVICE_ERROR;
+  }
+
+  *IaInnerOpt = IaInnerOptTmp;
+  *IaInnerLen = IaInnerLenTmp;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -684,6 +802,12 @@ Dhcp6SeekStsOption (
   UINT8   *IaInnerOpt;
   UINT16  IaInnerLen;
   UINT16  StsCode;
+  UINT32  OptionLen;
+
+  // OptionLen is the length of the Options excluding the DHCP header.
+  // Length of the EFI_DHCP6_PACKET from the first byte of the Header field to the last
+  // byte of the Option[] field.
+  OptionLen = Packet->Length - sizeof (Packet->Dhcp6.Header);
 
   //
   // Seek StatusCode option directly in DHCP message body. That is, search in
@@ -691,12 +815,12 @@ Dhcp6SeekStsOption (
   //
   *Option = Dhcp6SeekOption (
               Packet->Dhcp6.Option,
-              Packet->Length - 4,
+              OptionLen,
               Dhcp6OptStatusCode
               );
 
   if (*Option != NULL) {
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(*Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(DHCP6_OFFSET_OF_STATUS_CODE (*Option))));
     if (StsCode != Dhcp6StsSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -707,7 +831,7 @@ Dhcp6SeekStsOption (
   //
   *Option = Dhcp6SeekIaOption (
               Packet->Dhcp6.Option,
-              Packet->Length - sizeof (EFI_DHCP6_HEADER),
+              OptionLen,
               &Instance->Config->IaDescriptor
               );
   if (*Option == NULL) {
@@ -715,52 +839,35 @@ Dhcp6SeekStsOption (
   }
 
   //
-  // The format of the IA_NA option is:
+  // Calculate the distance from Packet->Dhcp6.Option to the IA option.
   //
-  //     0                   1                   2                   3
-  //     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |          OPTION_IA_NA         |          option-len           |
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |                        IAID (4 octets)                        |
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |                              T1                               |
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |                              T2                               |
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |                                                               |
-  //    .                         IA_NA-options                         .
-  //    .                                                               .
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  // Packet->Size and Packet->Length are both UINT32 type, and Packet->Size is
+  // the size of the whole packet, including the DHCP header, and Packet->Length
+  // is the length of the DHCP message body, excluding the DHCP header.
   //
-  // The format of the IA_TA option is:
+  // (*Option - Packet->Dhcp6.Option) is the number of bytes from the start of
+  // DHCP6 option area to the start of the IA option.
   //
-  //     0                   1                   2                   3
-  //     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |         OPTION_IA_TA          |          option-len           |
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |                        IAID (4 octets)                        |
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-  //    |                                                               |
-  //    .                         IA_TA-options                         .
-  //    .                                                               .
-  //    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  // Dhcp6SeekInnerOptionSafe() is searching starting from the start of the
+  // IA option to the end of the DHCP6 option area, thus subtract the space
+  // up until this option
   //
+  OptionLen = OptionLen - (UINT32)(*Option - Packet->Dhcp6.Option);
 
   //
-  // sizeof (option-code + option-len + IaId)           = 8
-  // sizeof (option-code + option-len + IaId + T1)      = 12
-  // sizeof (option-code + option-len + IaId + T1 + T2) = 16
+  // Seek the inner option
   //
-  // The inner options still start with 2 bytes option-code and 2 bytes option-len.
-  //
-  if (Instance->Config->IaDescriptor.Type == Dhcp6OptIana) {
-    IaInnerOpt = *Option + 16;
-    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(*Option + 2))) - 12);
-  } else {
-    IaInnerOpt = *Option + 8;
-    IaInnerLen = (UINT16)(NTOHS (ReadUnaligned16 ((UINT16 *)(*Option + 2))) - 4);
+  if (EFI_ERROR (
+        Dhcp6SeekInnerOptionSafe (
+          Instance->Config->IaDescriptor.Type,
+          *Option,
+          OptionLen,
+          &IaInnerOpt,
+          &IaInnerLen
+          )
+        ))
+  {
+    return EFI_DEVICE_ERROR;
   }
 
   //
@@ -784,7 +891,7 @@ Dhcp6SeekStsOption (
   //
   *Option = Dhcp6SeekOption (IaInnerOpt, IaInnerLen, Dhcp6OptStatusCode);
   if (*Option != NULL) {
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(*Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)((DHCP6_OFFSET_OF_STATUS_CODE (*Option)))));
     if (StsCode != Dhcp6StsSuccess) {
       return EFI_DEVICE_ERROR;
     }
@@ -930,7 +1037,8 @@ Dhcp6SendSolicitMsg   (
   //
   Packet = AllocateZeroPool (DHCP6_BASE_PACKET_SIZE + UserLen);
   if (Packet == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
 
   Packet->Size                       = DHCP6_BASE_PACKET_SIZE + UserLen;
@@ -944,54 +1052,64 @@ Dhcp6SendSolicitMsg   (
   Cursor = Packet->Dhcp6.Option;
 
   Length = HTONS (ClientId->Length);
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              HTONS (Dhcp6OptClientId),
              Length,
              ClientId->Duid
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendETOption (
-             Cursor,
+  Status = Dhcp6AppendETOption (
+             Packet,
+             &Cursor,
              Instance,
              &Elapsed
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendIaOption (
-             Cursor,
+  Status = Dhcp6AppendIaOption (
+             Packet,
+             &Cursor,
              Instance->IaCb.Ia,
              Instance->IaCb.T1,
              Instance->IaCb.T2,
              Packet->Dhcp6.Header.MessageType
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
   //
   // Append user-defined when configurate Dhcp6 service.
   //
   for (Index = 0; Index < Instance->Config->OptionCount; Index++) {
     UserOpt = Instance->Config->OptionList[Index];
-    Cursor  = Dhcp6AppendOption (
-                Cursor,
+    Status  = Dhcp6AppendOption (
+                Packet,
+                &Cursor,
                 UserOpt->OpCode,
                 UserOpt->OpLen,
                 UserOpt->Data
                 );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
   }
 
-  //
-  // Determine the size/length of packet.
-  //
-  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
   // Callback to user with the packet to be sent and check the user's feedback.
   //
   Status = Dhcp6CallbackUser (Instance, Dhcp6SendSolicit, &Packet);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -1005,10 +1123,8 @@ Dhcp6SendSolicitMsg   (
   Instance->StartTime = 0;
 
   Status = Dhcp6TransmitPacket (Instance, Packet, Elapsed);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -1020,6 +1136,14 @@ Dhcp6SendSolicitMsg   (
            Elapsed,
            Instance->Config->SolicitRetransmission
            );
+
+ON_ERROR:
+
+  if (Packet) {
+    FreePool (Packet);
+  }
+
+  return Status;
 }
 
 /**
@@ -1088,7 +1212,7 @@ Dhcp6SendRequestMsg (
   //
   Option = Dhcp6SeekOption (
              Instance->AdSelect->Dhcp6.Option,
-             Instance->AdSelect->Length - 4,
+             Instance->AdSelect->Length - sizeof (EFI_DHCP6_HEADER),
              Dhcp6OptServerId
              );
   if (Option == NULL) {
@@ -1110,7 +1234,8 @@ Dhcp6SendRequestMsg (
   //
   Packet = AllocateZeroPool (DHCP6_BASE_PACKET_SIZE + UserLen);
   if (Packet == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
 
   Packet->Size                       = DHCP6_BASE_PACKET_SIZE + UserLen;
@@ -1124,51 +1249,67 @@ Dhcp6SendRequestMsg (
   Cursor = Packet->Dhcp6.Option;
 
   Length = HTONS (ClientId->Length);
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              HTONS (Dhcp6OptClientId),
              Length,
              ClientId->Duid
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendETOption (
-             Cursor,
+  Status = Dhcp6AppendETOption (
+             Packet,
+             &Cursor,
              Instance,
              &Elapsed
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              HTONS (Dhcp6OptServerId),
              ServerId->Length,
              ServerId->Duid
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendIaOption (
-             Cursor,
+  Status = Dhcp6AppendIaOption (
+             Packet,
+             &Cursor,
              Instance->IaCb.Ia,
              Instance->IaCb.T1,
              Instance->IaCb.T2,
              Packet->Dhcp6.Header.MessageType
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
   //
   // Append user-defined when configurate Dhcp6 service.
   //
   for (Index = 0; Index < Instance->Config->OptionCount; Index++) {
     UserOpt = Instance->Config->OptionList[Index];
-    Cursor  = Dhcp6AppendOption (
-                Cursor,
+    Status  = Dhcp6AppendOption (
+                Packet,
+                &Cursor,
                 UserOpt->OpCode,
                 UserOpt->OpLen,
                 UserOpt->Data
                 );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
   }
 
-  //
-  // Determine the size/length of packet.
-  //
-  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
@@ -1177,8 +1318,7 @@ Dhcp6SendRequestMsg (
   Status = Dhcp6CallbackUser (Instance, Dhcp6SendRequest, &Packet);
 
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -1194,14 +1334,21 @@ Dhcp6SendRequestMsg (
   Status = Dhcp6TransmitPacket (Instance, Packet, Elapsed);
 
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
   // Enqueue the sent packet for the retransmission in case reply timeout.
   //
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
+
+ON_ERROR:
+
+  if (Packet) {
+    FreePool (Packet);
+  }
+
+  return Status;
 }
 
 /**
@@ -1249,7 +1396,7 @@ Dhcp6SendDeclineMsg (
   //
   Option = Dhcp6SeekOption (
              LastReply->Dhcp6.Option,
-             LastReply->Length - 4,
+             LastReply->Length - sizeof (EFI_DHCP6_HEADER),
              Dhcp6OptServerId
              );
   if (Option == NULL) {
@@ -1266,7 +1413,8 @@ Dhcp6SendDeclineMsg (
   //
   Packet = AllocateZeroPool (DHCP6_BASE_PACKET_SIZE);
   if (Packet == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
 
   Packet->Size                       = DHCP6_BASE_PACKET_SIZE;
@@ -1280,42 +1428,58 @@ Dhcp6SendDeclineMsg (
   Cursor = Packet->Dhcp6.Option;
 
   Length = HTONS (ClientId->Length);
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              HTONS (Dhcp6OptClientId),
              Length,
              ClientId->Duid
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendETOption (
-             Cursor,
+  Status = Dhcp6AppendETOption (
+             Packet,
+             &Cursor,
              Instance,
              &Elapsed
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              HTONS (Dhcp6OptServerId),
              ServerId->Length,
              ServerId->Duid
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendIaOption (Cursor, DecIa, 0, 0, Packet->Dhcp6.Header.MessageType);
+  Status = Dhcp6AppendIaOption (
+             Packet,
+             &Cursor,
+             DecIa,
+             0,
+             0,
+             Packet->Dhcp6.Header.MessageType
+             );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  //
-  // Determine the size/length of packet.
-  //
-  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
   // Callback to user with the packet to be sent and check the user's feedback.
   //
   Status = Dhcp6CallbackUser (Instance, Dhcp6SendDecline, &Packet);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -1329,16 +1493,22 @@ Dhcp6SendDeclineMsg (
   Instance->StartTime = 0;
 
   Status = Dhcp6TransmitPacket (Instance, Packet, Elapsed);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
   // Enqueue the sent packet for the retransmission in case reply timeout.
   //
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
+
+ON_ERROR:
+
+  if (Packet) {
+    FreePool (Packet);
+  }
+
+  return Status;
 }
 
 /**
@@ -1385,7 +1555,7 @@ Dhcp6SendReleaseMsg (
   //
   Option = Dhcp6SeekOption (
              LastReply->Dhcp6.Option,
-             LastReply->Length - 4,
+             LastReply->Length - sizeof (EFI_DHCP6_HEADER),
              Dhcp6OptServerId
              );
   if (Option == NULL) {
@@ -1399,7 +1569,8 @@ Dhcp6SendReleaseMsg (
   //
   Packet = AllocateZeroPool (DHCP6_BASE_PACKET_SIZE);
   if (Packet == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
 
   Packet->Size                       = DHCP6_BASE_PACKET_SIZE;
@@ -1413,45 +1584,61 @@ Dhcp6SendReleaseMsg (
   Cursor = Packet->Dhcp6.Option;
 
   Length = HTONS (ClientId->Length);
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              HTONS (Dhcp6OptClientId),
              Length,
              ClientId->Duid
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
   //
   // ServerId is extracted from packet, it's network order.
   //
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              HTONS (Dhcp6OptServerId),
              ServerId->Length,
              ServerId->Duid
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendETOption (
-             Cursor,
+  Status = Dhcp6AppendETOption (
+             Packet,
+             &Cursor,
              Instance,
              &Elapsed
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendIaOption (Cursor, RelIa, 0, 0, Packet->Dhcp6.Header.MessageType);
+  Status = Dhcp6AppendIaOption (
+             Packet,
+             &Cursor,
+             RelIa,
+             0,
+             0,
+             Packet->Dhcp6.Header.MessageType
+             );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  //
-  // Determine the size/length of packet
-  //
-  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
   // Callback to user with the packet to be sent and check the user's feedback.
   //
   Status = Dhcp6CallbackUser (Instance, Dhcp6SendRelease, &Packet);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -1461,16 +1648,22 @@ Dhcp6SendReleaseMsg (
   Instance->IaCb.Ia->State = Dhcp6Releasing;
 
   Status = Dhcp6TransmitPacket (Instance, Packet, Elapsed);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
   // Enqueue the sent packet for the retransmission in case reply timeout.
   //
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
+
+ON_ERROR:
+
+  if (Packet) {
+    FreePool (Packet);
+  }
+
+  return Status;
 }
 
 /**
@@ -1529,7 +1722,8 @@ Dhcp6SendRenewRebindMsg (
   //
   Packet = AllocateZeroPool (DHCP6_BASE_PACKET_SIZE + UserLen);
   if (Packet == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
 
   Packet->Size                       = DHCP6_BASE_PACKET_SIZE + UserLen;
@@ -1543,26 +1737,38 @@ Dhcp6SendRenewRebindMsg (
   Cursor = Packet->Dhcp6.Option;
 
   Length = HTONS (ClientId->Length);
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              HTONS (Dhcp6OptClientId),
              Length,
              ClientId->Duid
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendETOption (
-             Cursor,
+  Status = Dhcp6AppendETOption (
+             Packet,
+             &Cursor,
              Instance,
              &Elapsed
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendIaOption (
-             Cursor,
+  Status = Dhcp6AppendIaOption (
+             Packet,
+             &Cursor,
              Instance->IaCb.Ia,
              Instance->IaCb.T1,
              Instance->IaCb.T2,
              Packet->Dhcp6.Header.MessageType
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
   if (!RebindRequest) {
     //
@@ -1574,22 +1780,26 @@ Dhcp6SendRenewRebindMsg (
 
     Option = Dhcp6SeekOption (
                LastReply->Dhcp6.Option,
-               LastReply->Length - 4,
+               LastReply->Length - sizeof (EFI_DHCP6_HEADER),
                Dhcp6OptServerId
                );
     if (Option == NULL) {
-      FreePool (Packet);
-      return EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
+      goto ON_ERROR;
     }
 
     ServerId = (EFI_DHCP6_DUID *)(Option + 2);
 
-    Cursor = Dhcp6AppendOption (
-               Cursor,
+    Status = Dhcp6AppendOption (
+               Packet,
+               &Cursor,
                HTONS (Dhcp6OptServerId),
                ServerId->Length,
                ServerId->Duid
                );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
   }
 
   //
@@ -1597,18 +1807,18 @@ Dhcp6SendRenewRebindMsg (
   //
   for (Index = 0; Index < Instance->Config->OptionCount; Index++) {
     UserOpt = Instance->Config->OptionList[Index];
-    Cursor  = Dhcp6AppendOption (
-                Cursor,
+    Status  = Dhcp6AppendOption (
+                Packet,
+                &Cursor,
                 UserOpt->OpCode,
                 UserOpt->OpLen,
                 UserOpt->Data
                 );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
   }
 
-  //
-  // Determine the size/length of packet.
-  //
-  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
@@ -1618,10 +1828,8 @@ Dhcp6SendRenewRebindMsg (
   Event = (RebindRequest) ? Dhcp6EnterRebinding : Dhcp6EnterRenewing;
 
   Status = Dhcp6CallbackUser (Instance, Event, &Packet);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -1638,16 +1846,22 @@ Dhcp6SendRenewRebindMsg (
   Instance->StartTime = 0;
 
   Status = Dhcp6TransmitPacket (Instance, Packet, Elapsed);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
   // Enqueue the sent packet for the retransmission in case reply timeout.
   //
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
+
+ON_ERROR:
+
+  if (Packet) {
+    FreePool (Packet);
+  }
+
+  return Status;
 }
 
 /**
@@ -1811,7 +2025,8 @@ Dhcp6SendInfoRequestMsg (
   //
   Packet = AllocateZeroPool (DHCP6_BASE_PACKET_SIZE + UserLen);
   if (Packet == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
 
   Packet->Size                       = DHCP6_BASE_PACKET_SIZE + UserLen;
@@ -1828,44 +2043,56 @@ Dhcp6SendInfoRequestMsg (
 
   if (SendClientId) {
     Length = HTONS (ClientId->Length);
-    Cursor = Dhcp6AppendOption (
-               Cursor,
+    Status = Dhcp6AppendOption (
+               Packet,
+               &Cursor,
                HTONS (Dhcp6OptClientId),
                Length,
                ClientId->Duid
                );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
   }
 
-  Cursor = Dhcp6AppendETOption (
-             Cursor,
+  Status = Dhcp6AppendETOption (
+             Packet,
+             &Cursor,
              Instance,
              &Elapsed
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              OptionRequest->OpCode,
              OptionRequest->OpLen,
              OptionRequest->Data
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
   //
   // Append user-defined when configurate Dhcp6 service.
   //
   for (Index = 0; Index < OptionCount; Index++) {
     UserOpt = OptionList[Index];
-    Cursor  = Dhcp6AppendOption (
-                Cursor,
+    Status  = Dhcp6AppendOption (
+                Packet,
+                &Cursor,
                 UserOpt->OpCode,
                 UserOpt->OpLen,
                 UserOpt->Data
                 );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
   }
 
-  //
-  // Determine the size/length of packet.
-  //
-  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
@@ -1877,16 +2104,22 @@ Dhcp6SendInfoRequestMsg (
   // Send info-request packet with no state.
   //
   Status = Dhcp6TransmitPacket (Instance, Packet, Elapsed);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
   // Enqueue the sent packet for the retransmission in case reply timeout.
   //
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, Retransmission);
+
+ON_ERROR:
+
+  if (Packet) {
+    FreePool (Packet);
+  }
+
+  return Status;
 }
 
 /**
@@ -1937,7 +2170,8 @@ Dhcp6SendConfirmMsg (
   //
   Packet = AllocateZeroPool (DHCP6_BASE_PACKET_SIZE + UserLen);
   if (Packet == NULL) {
-    return EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
   }
 
   Packet->Size                       = DHCP6_BASE_PACKET_SIZE + UserLen;
@@ -1951,54 +2185,64 @@ Dhcp6SendConfirmMsg (
   Cursor = Packet->Dhcp6.Option;
 
   Length = HTONS (ClientId->Length);
-  Cursor = Dhcp6AppendOption (
-             Cursor,
+  Status = Dhcp6AppendOption (
+             Packet,
+             &Cursor,
              HTONS (Dhcp6OptClientId),
              Length,
              ClientId->Duid
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendETOption (
-             Cursor,
+  Status = Dhcp6AppendETOption (
+             Packet,
+             &Cursor,
              Instance,
              &Elapsed
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
-  Cursor = Dhcp6AppendIaOption (
-             Cursor,
+  Status = Dhcp6AppendIaOption (
+             Packet,
+             &Cursor,
              Instance->IaCb.Ia,
              Instance->IaCb.T1,
              Instance->IaCb.T2,
              Packet->Dhcp6.Header.MessageType
              );
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
 
   //
   // Append user-defined when configurate Dhcp6 service.
   //
   for (Index = 0; Index < Instance->Config->OptionCount; Index++) {
     UserOpt = Instance->Config->OptionList[Index];
-    Cursor  = Dhcp6AppendOption (
-                Cursor,
+    Status  = Dhcp6AppendOption (
+                Packet,
+                &Cursor,
                 UserOpt->OpCode,
                 UserOpt->OpLen,
                 UserOpt->Data
                 );
+    if (EFI_ERROR (Status)) {
+      goto ON_ERROR;
+    }
   }
 
-  //
-  // Determine the size/length of packet.
-  //
-  Packet->Length += (UINT32)(Cursor - Packet->Dhcp6.Option);
   ASSERT (Packet->Size > Packet->Length + 8);
 
   //
   // Callback to user with the packet to be sent and check the user's feedback.
   //
   Status = Dhcp6CallbackUser (Instance, Dhcp6SendConfirm, &Packet);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -2012,16 +2256,22 @@ Dhcp6SendConfirmMsg (
   Instance->StartTime = 0;
 
   Status = Dhcp6TransmitPacket (Instance, Packet, Elapsed);
-
   if (EFI_ERROR (Status)) {
-    FreePool (Packet);
-    return Status;
+    goto ON_ERROR;
   }
 
   //
   // Enqueue the sent packet for the retransmission in case reply timeout.
   //
   return Dhcp6EnqueueRetry (Instance, Packet, Elapsed, NULL);
+
+ON_ERROR:
+
+  if (Packet) {
+    FreePool (Packet);
+  }
+
+  return Status;
 }
 
 /**
@@ -2065,7 +2315,7 @@ Dhcp6HandleReplyMsg (
   //
   Option = Dhcp6SeekOption (
              Packet->Dhcp6.Option,
-             Packet->Length - 4,
+             Packet->Length - sizeof (EFI_DHCP6_HEADER),
              Dhcp6OptRapidCommit
              );
 
@@ -2211,7 +2461,7 @@ Dhcp6HandleReplyMsg (
     //
     // Any error status code option is found.
     //
-    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)(Option + 4)));
+    StsCode = NTOHS (ReadUnaligned16 ((UINT16 *)((DHCP6_OFFSET_OF_STATUS_CODE (Option)))));
     switch (StsCode) {
       case Dhcp6StsUnspecFail:
         //
@@ -2344,7 +2594,7 @@ Dhcp6SelectAdvertiseMsg (
   //
   Option = Dhcp6SeekOption (
              AdSelect->Dhcp6.Option,
-             AdSelect->Length - 4,
+             AdSelect->Length - sizeof (EFI_DHCP6_HEADER),
              Dhcp6OptServerUnicast
              );
 
@@ -2355,7 +2605,7 @@ Dhcp6SelectAdvertiseMsg (
       return EFI_OUT_OF_RESOURCES;
     }
 
-    CopyMem (Instance->Unicast, Option + 4, sizeof (EFI_IPv6_ADDRESS));
+    CopyMem (Instance->Unicast, DHCP6_OFFSET_OF_OPT_DATA (Option), sizeof (EFI_IPv6_ADDRESS));
   }
 
   //
@@ -2408,7 +2658,7 @@ Dhcp6HandleAdvertiseMsg (
   //
   Option = Dhcp6SeekOption (
              Packet->Dhcp6.Option,
-             Packet->Length - 4,
+             Packet->Length - sizeof (EFI_DHCP6_HEADER),
              Dhcp6OptRapidCommit
              );
 
@@ -2502,7 +2752,7 @@ Dhcp6HandleAdvertiseMsg (
       CopyMem (Instance->AdSelect, Packet, Packet->Size);
 
       if (Option != NULL) {
-        Instance->AdPref = *(Option + 4);
+        Instance->AdPref = *(DHCP6_OFFSET_OF_OPT_DATA (Option));
       }
     } else {
       //
@@ -2571,11 +2821,11 @@ Dhcp6HandleStateful (
   //
   Option = Dhcp6SeekOption (
              Packet->Dhcp6.Option,
-             Packet->Length - 4,
+             Packet->Length - DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN,
              Dhcp6OptClientId
              );
 
-  if ((Option == NULL) || (CompareMem (Option + 4, ClientId->Duid, ClientId->Length) != 0)) {
+  if ((Option == NULL) || (CompareMem (DHCP6_OFFSET_OF_OPT_DATA (Option), ClientId->Duid, ClientId->Length) != 0)) {
     goto ON_CONTINUE;
   }
 
@@ -2584,7 +2834,7 @@ Dhcp6HandleStateful (
   //
   Option = Dhcp6SeekOption (
              Packet->Dhcp6.Option,
-             Packet->Length - 4,
+             Packet->Length - DHCP6_SIZE_OF_COMBINED_CODE_AND_LEN,
              Dhcp6OptServerId
              );
 
@@ -2689,7 +2939,7 @@ Dhcp6HandleStateless (
   //
   Option = Dhcp6SeekOption (
              Packet->Dhcp6.Option,
-             Packet->Length - 4,
+             Packet->Length - sizeof (EFI_DHCP6_HEADER),
              Dhcp6OptServerId
              );
 

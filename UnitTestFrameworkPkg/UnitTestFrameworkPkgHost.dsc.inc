@@ -22,21 +22,24 @@
   MemoryAllocationLib|UnitTestFrameworkPkg/Library/Posix/MemoryAllocationLibPosix/MemoryAllocationLibPosix.inf
   UefiBootServicesTableLib|UnitTestFrameworkPkg/Library/UnitTestUefiBootServicesTableLib/UnitTestUefiBootServicesTableLib.inf
   PeiServicesTablePointerLib|UnitTestFrameworkPkg/Library/UnitTestPeiServicesTablePointerLib/UnitTestPeiServicesTablePointerLib.inf
+  NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLibHost.inf
 
 [BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /MT
   GCC:*_*_*_CC_FLAGS = -fno-pie
 !ifdef $(UNIT_TESTING_DEBUG)
-  MSFT:*_*_*_CC_FLAGS  = -D UNIT_TESTING_DEBUG=1
+  MSFT:*_*_*_CC_FLAGS  = /MTd -D UNIT_TESTING_DEBUG=1
   GCC:*_*_*_CC_FLAGS   = -D UNIT_TESTING_DEBUG=1
   XCODE:*_*_*_CC_FLAGS = -D UNIT_TESTING_DEBUG=1
 !endif
-  GCC:*_GCC5_*_CC_FLAGS = --coverage
-  GCC:*_GCC5_*_DLINK_FLAGS = --coverage
+  GCC:*_*_*_CC_FLAGS = -fexceptions
+  GCC:*_*_*_CC_FLAGS = --coverage
+  GCC:*_*_*_DLINK_FLAGS = --coverage
 [BuildOptions.common.EDKII.HOST_APPLICATION]
   #
   # MSFT
   #
-  MSFT:*_*_*_CC_FLAGS               = /EHsc
+  MSFT:*_*_*_CC_FLAGS               = /EHs
   MSFT:*_*_*_DLINK_FLAGS            == /out:"$(BIN_DIR)\$(MODULE_NAME_GUID).exe" /pdb:"$(BIN_DIR)\$(MODULE_NAME_GUID).pdb" /IGNORE:4001 /NOLOGO /SUBSYSTEM:CONSOLE /DEBUG /STACK:0x40000,0x40000 /WHOLEARCHIVE
   MSFT:*_*_IA32_DLINK_FLAGS         = /MACHINE:I386
   MSFT:*_*_X64_DLINK_FLAGS          = /MACHINE:AMD64

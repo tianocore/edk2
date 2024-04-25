@@ -2,6 +2,7 @@
   Redfish debug library to debug Redfish application.
 
   Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -13,6 +14,7 @@
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/RedfishDebugLib.h>
+#include <Library/RedfishHttpLib.h>
 #include <Library/UefiLib.h>
 
 #ifndef IS_EMPTY_STRING
@@ -24,55 +26,23 @@
 #define REDFISH_PRINT_BUFFER_BYTES_PER_ROW  16
 
 /**
-  Debug print the value of StatementValue.
+  Determine whether the Redfish debug category is enabled in
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory.
 
-  @param[in]  ErrorLevel     DEBUG macro error level.
-  @param[in]  StatementValue The statement value to print.
+  @param[in]  RedfishDebugCategory  Redfish debug category.
 
-  @retval     EFI_SUCCESS            StatementValue is printed.
-  @retval     EFI_INVALID_PARAMETER  StatementValue is NULL.
+  @retval     TRUE   This debug category is enabled.
+  @retval     FALSE  This debug category is disabled..
 **/
-EFI_STATUS
-DumpHiiStatementValue (
-  IN UINTN                ErrorLevel,
-  IN HII_STATEMENT_VALUE  *StatementValue
+BOOLEAN
+DebugRedfishComponentEnabled (
+  IN  UINT64  RedfishDebugCategory
   )
 {
-  if (StatementValue == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
+  UINT64  DebugCategory;
 
-  DEBUG ((ErrorLevel, "BufferValueType: 0x%x\n", StatementValue->BufferValueType));
-  DEBUG ((ErrorLevel, "BufferLen: 0x%x\n", StatementValue->BufferLen));
-  DEBUG ((ErrorLevel, "Buffer:    0x%p\n", StatementValue->Buffer));
-  DEBUG ((ErrorLevel, "Type:      0x%p\n", StatementValue->Type));
-
-  switch (StatementValue->Type) {
-    case EFI_IFR_TYPE_NUM_SIZE_8:
-      DEBUG ((ErrorLevel, "Value:     0x%x\n", StatementValue->Value.u8));
-      break;
-    case EFI_IFR_TYPE_NUM_SIZE_16:
-      DEBUG ((ErrorLevel, "Value:     0x%x\n", StatementValue->Value.u16));
-      break;
-    case EFI_IFR_TYPE_NUM_SIZE_32:
-      DEBUG ((ErrorLevel, "Value:     0x%x\n", StatementValue->Value.u32));
-      break;
-    case EFI_IFR_TYPE_NUM_SIZE_64:
-      DEBUG ((ErrorLevel, "Value:     0x%lx\n", StatementValue->Value.u64));
-      break;
-    case EFI_IFR_TYPE_BOOLEAN:
-      DEBUG ((ErrorLevel, "Value:     %a\n", (StatementValue->Value.b ? "true" : "false")));
-      break;
-    case EFI_IFR_TYPE_STRING:
-      DEBUG ((ErrorLevel, "Value:     0x%x\n", StatementValue->Value.string));
-      break;
-    case EFI_IFR_TYPE_TIME:
-    case EFI_IFR_TYPE_DATE:
-    default:
-      break;
-  }
-
-  return EFI_SUCCESS;
+  DebugCategory = FixedPcdGet64 (PcdRedfishDebugCategory);
+  return ((DebugCategory & RedfishDebugCategory) != 0);
 }
 
 /**

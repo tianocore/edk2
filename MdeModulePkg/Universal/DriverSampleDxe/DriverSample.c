@@ -858,6 +858,7 @@ ExtractConfig (
   @retval EFI_INVALID_PARAMETER  Configuration is NULL.
   @retval EFI_NOT_FOUND          Routing data doesn't match any storage in this
                                  driver.
+  @retval EFI_DEVICE_ERROR       If value is 44, return error for testing.
 
 **/
 EFI_STATUS
@@ -1063,6 +1064,11 @@ RouteConfig (
                                    );
   if (EFI_ERROR (Status)) {
     return Status;
+  }
+
+  if (PrivateData->Configuration.QuestionApply == 44) {
+    // Return error for verify the error handling of caller.
+    return EFI_DEVICE_ERROR;
   }
 
   //
@@ -1597,6 +1603,13 @@ DriverCallback (
           // User press "Discard current form and Exit now", request Browser to discard the uncommitted data and exit.
           //
           *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_DISCARD_EXIT;
+          break;
+
+        case 0x1253:
+          //
+          // User change the value of "Question apply test".
+          //
+          *ActionRequest = EFI_BROWSER_ACTION_REQUEST_QUESTION_APPLY;
           break;
 
         case 0x1231:

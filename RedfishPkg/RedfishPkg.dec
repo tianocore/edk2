@@ -4,7 +4,8 @@
 # Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2023, American Megatrends International LLC.
-# Copyright (c) 2023, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (c) 2023-2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -69,6 +70,11 @@
   #
   RedfishPlatformConfigLib|Include/Library/RedfishPlatformConfigLib.h
 
+  ##  @libraryclass  Provides the library functions to access Redfish HTTP
+  #   protocol.
+  #
+  RedfishHttpLib|Include/Library/RedfishHttpLib.h
+
 [LibraryClasses.Common.Private]
   ##  @libraryclass  Provides the private C runtime library functions.
   #   CRT library is currently used by edk2 JsonLib (open source
@@ -92,6 +98,9 @@
 
   # Redfish Host Interface ready notification protocol
   gEdkIIRedfishHostInterfaceReadyProtocolGuid = { 0xC3F6D062, 0x3D38, 0x4EA4, { 0x92, 0xB1, 0xE8, 0xF8, 0x02, 0x27, 0x63, 0xDF } }
+
+  ## Include/Protocol/EdkIIRedfishHttpProtocol.h
+  gEdkIIRedfishHttpProtocolGuid = { 0x58a0f47e, 0xf45f, 0x4d44, { 0x89, 0x5b, 0x2a, 0xfe, 0xb0, 0x80, 0x15, 0xe2 } }
 
 [Guids]
   gEfiRedfishPkgTokenSpaceGuid      = { 0x4fdbccb7, 0xe829, 0x4b4c, { 0x88, 0x87, 0xb2, 0x3f, 0xd7, 0x25, 0x4b, 0x85 }}
@@ -154,3 +163,48 @@
   # set to EFI_REST_EX_PROTOCOL.
   #
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishSendReceiveTimeout|5000|UINT32|0x00001009
+  #
+  # This PCD string is introduced for platform developer to set the encoding method supported by BMC Redfish.
+  # Currently only "None" and "gzip" are supported.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishServiceContentEncoding|"None"|VOID*|0x0000100A
+  #
+  # Use below PCDs to control Redfhs HTTP protocol.
+  #
+  ## The number of retry when HTTP GET request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpGetRetry|0|UINT16|0x0000100B
+  ## The number of retry when HTTP PUT request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpPutRetry|0|UINT16|0x0000100C
+  ## The number of retry when HTTP PATCH request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpPatchRetry|0|UINT16|0x0000100D
+  ## The number of retry when HTTP POST request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpPostRetry|0|UINT16|0x0000100E
+  ## The number of retry when HTTP DELETE request failed. If the value is 0, there is no retry enabled.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpDeleteRetry|0|UINT16|0x0000100F
+  ## The number of second to wait before driver retry HTTP request. If the value is 0, there is no wait before next retry.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpRetryWaitInSecond|1|UINT16|0x00001010
+  ## This is used to disable Redfish HTTP cache function and every request will be sent to Redfish service.
+  gEfiRedfishPkgTokenSpaceGuid.PcdHttpCacheDisabled|FALSE|BOOLEAN|0x00001011
+  #
+  # Redfish debug catagories
+  # To enable the debug message for the entire edk2 Redfish implementation, below PCDs must be set.
+  # DEBUG_MANAGEABILITY must be set PcdDebugPrintErrorLevel.
+  #
+  #   0x0000000000000001  RedfishPlatformConfigDxe driver debug enabled.
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishDebugCategory|0|UINT64|0x00001012
+  #
+  # Redfish RedfishPlatformConfigDxe Debug Properties
+  #   0x00000001  x-uefi-redfish string database message enabled
+  #   0x00000002  Debug Message for dumping formset
+  #   0x00000004  Debug Message for x-uefi-redfish searching result
+  #   0x00000008  Debug Message for x-uefi-redfish Regular Expression searching result
+  #
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigDebugProperty|0|UINT32|0x00001013
+  #
+  # RedfishPlatformConfigDxe feature enablement
+  #   0x00000001  Enable building Redfish Attribute Registry menu path.
+  #   0x00000002  Allow supressed HII option to be exposed on Redfish.
+  #
+  # Redfish RedfishPlatformConfigDxe feature Properties
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigFeatureProperty|0|UINT32|0x00001014

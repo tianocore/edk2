@@ -151,7 +151,6 @@ ArmVirtPkg
 F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
-M: Laszlo Ersek <lersek@redhat.com> [lersek]
 R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
@@ -418,6 +417,11 @@ M: Abner Chang <abner.chang@amd.com> [changab]
 R: Abdul Lateef Attar <AbdulLateef.Attar@amd.com> [abdattar]
 R: Nickle Wang <nicklew@nvidia.com> [nicklela]
 
+MdeModulePkg: SPI driver stack
+F: MdeModulePkg/Bus/Spi/
+M: Abner Chang <abner.chang@amd.com> [changab]
+R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
+
 MdePkg
 F: MdePkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
@@ -451,6 +455,12 @@ M: Abner Chang <abner.chang@amd.com> [changab]
 R: Abdul Lateef Attar <AbdulLateef.Attar@amd.com> [abdattar]
 R: Nickle Wang <nicklew@nvidia.com> [nicklela]
 
+MdePkg: SPI related C header files
+F: MdePkg/Include/Protocol/Spi*.h
+F: MdePkg/Include/IndustryStandard/SpiNorFlashJedecSfdp.h
+M: Abner Chang <abner.chang@amd.com> [changab]
+R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
+
 NetworkPkg
 F: NetworkPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
@@ -462,7 +472,6 @@ F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
-M: Laszlo Ersek <lersek@redhat.com> [lersek]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 S: Maintained
 
@@ -622,7 +631,6 @@ UefiCpuPkg
 F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
-M: Laszlo Ersek <lersek@redhat.com> [lersek]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 

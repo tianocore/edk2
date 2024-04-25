@@ -918,27 +918,24 @@ CoreUninstallMultipleProtocolInterfaces (
   Locate a certain GUID protocol interface in a Handle's protocols.
 
   @param  UserHandle             The handle to obtain the protocol interface on
+                                 The caller must pass in a valid UserHandle that
+                                 is checked with CoreValidateHandle().
   @param  Protocol               The GUID of the protocol
 
   @return The requested protocol interface for the handle
 
 **/
+STATIC
 PROTOCOL_INTERFACE  *
 CoreGetProtocolInterface (
   IN  EFI_HANDLE  UserHandle,
   IN  EFI_GUID    *Protocol
   )
 {
-  EFI_STATUS          Status;
   PROTOCOL_ENTRY      *ProtEntry;
   PROTOCOL_INTERFACE  *Prot;
   IHANDLE             *Handle;
   LIST_ENTRY          *Link;
-
-  Status = CoreValidateHandle (UserHandle);
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
 
   Handle = (IHANDLE *)UserHandle;
 
@@ -1391,6 +1388,15 @@ CoreOpenProtocolInformation (
   // Lock the protocol database
   //
   CoreAcquireProtocolLock ();
+
+  //
+  // Check for invalid UserHandle
+  //
+  Status = CoreValidateHandle (UserHandle);
+  if (EFI_ERROR (Status)) {
+    Status = EFI_NOT_FOUND;
+    goto Done;
+  }
 
   //
   // Look at each protocol interface for a match

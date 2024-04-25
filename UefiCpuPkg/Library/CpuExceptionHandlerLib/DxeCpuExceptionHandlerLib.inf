@@ -2,6 +2,7 @@
 #  CPU Exception Handler library instance for DXE modules.
 #
 #  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -18,25 +19,32 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 LOONGARCH64
 #
 
 [Sources.Ia32]
-  Ia32/ExceptionHandlerAsm.nasm
-  Ia32/ExceptionTssEntryAsm.nasm
   Ia32/ArchExceptionHandler.c
   Ia32/ArchInterruptDefs.h
+  Ia32/ExceptionHandlerAsm.nasm
+  Ia32/ExceptionTssEntryAsm.nasm
 
 [Sources.X64]
-  X64/ExceptionHandlerAsm.nasm
   X64/ArchExceptionHandler.c
   X64/ArchInterruptDefs.h
+  X64/ExceptionHandlerAsm.nasm
 
-[Sources.common]
+[Sources.Ia32, Sources.X64]
   CpuExceptionCommon.h
   CpuExceptionCommon.c
-  PeiDxeSmmCpuException.c
   DxeException.c
+  PeiDxeSmmCpuException.c
+
+[Sources.LoongArch64]
+  LoongArch/DxeExceptionLib.c
+  LoongArch/ExceptionCommon.h
+  LoongArch/ExceptionCommon.c
+  LoongArch/LoongArch64/ArchExceptionHandler.c
+  LoongArch/LoongArch64/ExceptionHandlerAsm.S | GCC
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard
@@ -51,16 +59,21 @@
   MdeModulePkg/MdeModulePkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
-[LibraryClasses]
+[LibraryClasses.common]
   BaseLib
-  SerialPortLib
-  PrintLib
-  SynchronizationLib
-  LocalApicLib
-  PeCoffGetEntryPointLib
-  MemoryAllocationLib
   DebugLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  PrintLib
+  SerialPortLib
+  SynchronizationLib
+
+[LibraryClasses.Ia32, LibraryClasses.X64]
   CcExitLib
+  LocalApicLib
+
+[LibraryClasses.LoongArch64]
+  CpuLib
 
 [BuildOptions]
   XCODE:*_*_X64_NASM_FLAGS = -D NO_ABSOLUTE_RELOCS_IN_TEXT

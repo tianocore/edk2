@@ -62,7 +62,12 @@
     },
     ## options defined .pytool/Plugin/HostUnitTestDscCompleteCheck
     "HostUnitTestDscCompleteCheck": {
-        "IgnoreInf": [],
+        "IgnoreInf": [
+            "UnitTestFrameworkPkg/Test/GoogleTest/Sample/SampleGoogleTestExpectFail/SampleGoogleTestHostExpectFail.inf",
+            "UnitTestFrameworkPkg/Test/GoogleTest/Sample/SampleGoogleTestGenerateException/SampleGoogleTestHostGenerateException.inf",
+            "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestExpectFail/SampleUnitTestHostExpectFail.inf",
+            "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestGenerateException/SampleUnitTestHostGenerateException.inf"
+        ],
         "DscPath": "Test/UnitTestFrameworkPkgHostTest.dsc"
     },
     ## options defined .pytool/Plugin/GuidCheck
@@ -102,11 +107,22 @@
             "cobertura",
             "DHAVE", # build flag for cmocka in the INF
             "gtest", # file name in GoogleTestLib.inf
+            "defiapi",      # build flag for gtest
+            "fexceptions",  # build flag for gtest
             "corthon",      # Contact GitHub account in Readme
             "mdkinney",     # Contact GitHub account in Readme
             "spbrogan"      # Contact GitHub account in Readme
         ],
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
+    },
+
+    # options defined in .pytool/Plugin/UncrustifyCheck
+    "UncrustifyCheck": {
+        "IgnoreFiles": [
+            "Library/CmockaLib/cmocka/**",
+            "Library/GoogleTestLib/googletest/**",
+            "Library/SubhookLib/subhook/**"
+        ]
     }
 }

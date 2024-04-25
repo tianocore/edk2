@@ -1,0 +1,27 @@
+## @file
+# Determine the base addresses of serial ports from the Device Tree.
+#
+# Copyright (C) Red Hat
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.27
+  BASE_NAME      = FdtSerialPortAddressLib
+  FILE_GUID      = AEBE813B-25EA-40E5-95C4-2B864FE1E951
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = FdtSerialPortAddressLib
+
+[Sources]
+  FdtSerialPortAddressLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  FdtLib
