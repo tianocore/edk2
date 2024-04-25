@@ -106,13 +106,13 @@ Communicate (
   ASSERT_EFI_ERROR (Status);
 
   Status = SmmControl->Trigger (
-                          (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
-                          SmmControl,
-                          (INT8 *)&SmiCommand,
-                          &Size,
-                          FALSE,
-                          0
-                          );
+                         (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
+                         SmmControl,
+                         (INT8 *)&SmiCommand,
+                         &Size,
+                         FALSE,
+                         0
+                         );
   ASSERT_EFI_ERROR (Status);
 
   //
@@ -132,6 +132,7 @@ Communicate (
     CommunicationInOut->IsCommBufferValid = FALSE;
     DEBUG ((DEBUG_INFO, "StandaloneSmmIpl Communicate Exit (%r)\n", Status));
   }
+
   return Status;
 }
 
@@ -205,7 +206,6 @@ LocateMmFvForMmCore (
       *MmCoreFileName = &FileHandle->Name;
       return EFI_SUCCESS;
     } else {
-
       return EFI_NOT_FOUND;
     }
   }
@@ -227,7 +227,7 @@ LocateMmFvForMmCore (
   @param[in]   Block                Pointer of MMRAM descriptor block.
 
   @retval HobList              If fundation and platform HOBs not existed,
-                               it is pointed to PEI HOB List. If existed, 
+                               it is pointed to PEI HOB List. If existed,
                                it is pointed to fundation and platform HOB list.
 **/
 VOID *
@@ -241,76 +241,102 @@ CreatMmHobList (
   IN  UINT64                          MmCoreImageSize,
   IN  PHYSICAL_ADDRESS                MmCoreEntryPoint,
   IN  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *Block
-)
+  )
 {
   EFI_STATUS  Status;
   VOID        *HobList;
   VOID        *PlatformHobList;
-  UINTN        PlatformHobSize;
-  UINTN        FoundationHobSize;
+  UINTN       PlatformHobSize;
+  UINTN       BufferSize;
+  UINTN       FoundationHobSize;
 
   //
-  // Get platform HOBs' size.
+  // Get platform HOBs
   //
   PlatformHobSize = 0;
-  Status     = CreateMmPlatformHob (NULL, &PlatformHobSize);
+  Status          = CreateMmPlatformHob (NULL, &PlatformHobSize);
   if (Status == RETURN_BUFFER_TOO_SMALL) {
     ASSERT (PlatformHobSize != 0);
-  }
+    //
+    // Creat platform HOBs for MM foundation to get MMIO HOB data.
+    //
+    PlatformHobList = AllocatePages (EFI_SIZE_TO_PAGES (PlatformHobSize));
+    ASSERT (PlatformHobList != NULL);
+    if (PlatformHobList == NULL) {
+      DEBUG ((DEBUG_ERROR, "%a: Out of resource to create platform MM HOBs\n", __func__));
+      CpuDeadLoop ();
+    }
 
-  //
-  // Creat platform HOBs for MM foundation to get MMIO HOB data.
-  //
-  PlatformHobList = AllocatePages (EFI_SIZE_TO_PAGES (PlatformHobSize));
-  if (PlatformHobList != NULL) {
-    Status = CreateMmPlatformHob (PlatformHobList, &PlatformHobSize);
+    BufferSize = PlatformHobSize;
+    Status     = CreateMmPlatformHob (PlatformHobList, &PlatformHobSize);
     ASSERT_EFI_ERROR (Status);
+    ASSERT (BufferSize == PlatformHobSize);
   }
 
+  ASSERT_EFI_ERROR (Status);
+
   //
-  // Get foundation HOBs' size.
+  // Get size of foundation HOBs
   //
   FoundationHobSize = 0;
-  Status = CreateMmFoundationHobList (NULL, &FoundationHobSize, PlatformHobList, PlatformHobSize, MmCommBuffer, MmFvBase, 
-                                        MmFvSize, MmCoreFileName, MmCoreImageAddress, MmCoreImageSize, MmCoreEntryPoint, Block);
-  if (Status == RETURN_BUFFER_TOO_SMALL) {
-    ASSERT (FoundationHobSize != 0);
-  }
-
+  Status            = CreateMmFoundationHobList (
+                        NULL,
+                        &FoundationHobSize,
+                        PlatformHobList,
+                        PlatformHobSize,
+                        MmCommBuffer,
+                        MmFvBase,
+                        MmFvSize,
+                        MmCoreFileName,
+                        MmCoreImageAddress,
+                        MmCoreImageSize,
+                        MmCoreEntryPoint,
+                        Block
+                        );
   FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
+  ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
+  ASSERT (FoundationHobSize != 0);
 
   //
-  // Caculate all page size for all HOBs.
+  // Final result includes platform HOBs, foundation HOBs and a END node.
   //
   *HobSize = PlatformHobSize + FoundationHobSize + sizeof (EFI_HOB_GENERIC_HEADER);
-
-  //
-  // Allocate memory for all HOBs
-  //
-  HobList = AllocatePages (EFI_SIZE_TO_PAGES (*HobSize));
+  HobList  = AllocatePages (EFI_SIZE_TO_PAGES (*HobSize));
   ASSERT (HobList != NULL);
-  if (HobList == NULL){
+  if (HobList == NULL) {
     DEBUG ((DEBUG_ERROR, "Out of resource to create MM HOBs\n"));
-    CpuDeadLoop();
+    CpuDeadLoop ();
   }
 
   //
-  // Creat MM platform HOB list.
+  // Get platform HOBs
   //
-  Status = CreateMmPlatformHob ((VOID *)(UINTN)HobList, &PlatformHobSize);
+  Status = CreateMmPlatformHob (HobList, &PlatformHobSize);
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Creat MM foundation HOB list.
+  // Get foundation HOBs
   //
-  Status = CreateMmFoundationHobList ((VOID *)((UINTN)HobList + PlatformHobSize), &FoundationHobSize, PlatformHobList, PlatformHobSize, MmCommBuffer,
-                                        MmFvBase, MmFvSize, MmCoreFileName, MmCoreImageAddress, MmCoreImageSize, MmCoreEntryPoint, Block);
+  Status = CreateMmFoundationHobList (
+             (UINT8 *)HobList + PlatformHobSize,
+             &FoundationHobSize,
+             PlatformHobList,
+             PlatformHobSize,
+             MmCommBuffer,
+             MmFvBase,
+             MmFvSize,
+             MmCoreFileName,
+             MmCoreImageAddress,
+             MmCoreImageSize,
+             MmCoreEntryPoint,
+             Block
+             );
   ASSERT_EFI_ERROR (Status);
- 
+
   //
   // Creat MM HOB list end.
   //
-  MmIplCreateHob ((VOID *)((UINTN)HobList + PlatformHobSize + FoundationHobSize), EFI_HOB_TYPE_END_OF_HOB_LIST,  sizeof (EFI_HOB_GENERIC_HEADER));
+  MmIplCreateHob ((UINT8 *)HobList + PlatformHobSize + FoundationHobSize, EFI_HOB_TYPE_END_OF_HOB_LIST, sizeof (EFI_HOB_GENERIC_HEADER));
 
   return HobList;
 }
@@ -326,7 +352,8 @@ CreatMmHobList (
 UINTN
 FindLargestSmramRange (
   IN EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *CurrentBlock
-) {
+  )
+{
   UINTN                 Index;
   UINT64                MaxSize;
   EFI_MMRAM_DESCRIPTOR  *MmramRanges;
@@ -363,7 +390,7 @@ FindLargestSmramRange (
   Allocate available MMRAM for MM core image.
 
   @param[in]  Pages                     Page size of MM core image.
-  @param[out] NewBlock                  Pointer of new mmram block HOB.                  
+  @param[out] NewBlock                  Pointer of new mmram block HOB.
 
   @return  EFI_PHYSICAL_ADDRESS         Address for MM core image to be loaded in MMRAM.
 **/
@@ -371,7 +398,8 @@ EFI_PHYSICAL_ADDRESS
 MmIplAllocateSmramPage (
   IN  UINTN                           Pages,
   OUT EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  **NewBlock
-) {
+  )
+{
   UINTN                           LagestMmramRangeIndex;
   UINT32                          FullMmramRangeCount;
   EFI_HOB_GUID_TYPE               *MmramInfoHob;
@@ -380,10 +408,10 @@ MmIplAllocateSmramPage (
   EFI_MMRAM_DESCRIPTOR            *FullMmramRanges;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *CurrentBlock;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *NewDescriptorBlock;
-  
+
   MmramInfoHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
   ASSERT (MmramInfoHob != NULL);
-  
+
   CurrentBlock = (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK *)(GET_GUID_HOB_DATA (MmramInfoHob));
 
   //
@@ -396,10 +424,10 @@ MmIplAllocateSmramPage (
   // 2. Split the largest region and mark the allocated region as ALLOCATED
   //
   FullMmramRangeCount = CurrentBlock->NumberOfMmReservedRegions + 1;
-  NewDescriptorBlock   = (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK *)BuildGuidHob (
-                                                             &gEfiSmmSmramMemoryGuid,
-                                                             sizeof (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK) + ((FullMmramRangeCount - 1) * sizeof (EFI_MMRAM_DESCRIPTOR))
-                                                             );
+  NewDescriptorBlock  = (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK *)BuildGuidHob (
+                                                            &gEfiSmmSmramMemoryGuid,
+                                                            sizeof (EFI_MMRAM_HOB_DESCRIPTOR_BLOCK) + ((FullMmramRangeCount - 1) * sizeof (EFI_MMRAM_DESCRIPTOR))
+                                                            );
   ASSERT (NewDescriptorBlock != NULL);
 
   NewDescriptorBlock->NumberOfMmReservedRegions = FullMmramRangeCount;
@@ -419,12 +447,12 @@ MmIplAllocateSmramPage (
   //
   // Allocate Mmram for MmCore Driver
   //
-  Largest->PhysicalSize    -= EFI_PAGES_TO_SIZE (Pages);
-  Allocated->CpuStart       = Largest->CpuStart + Largest->PhysicalSize;
-  Allocated->PhysicalStart  = Largest->PhysicalStart + Largest->PhysicalSize;
-  Allocated->RegionState    = Largest->RegionState | EFI_ALLOCATED;
-  Allocated->PhysicalSize   = EFI_PAGES_TO_SIZE (Pages); 
- 
+  Largest->PhysicalSize   -= EFI_PAGES_TO_SIZE (Pages);
+  Allocated->CpuStart      = Largest->CpuStart + Largest->PhysicalSize;
+  Allocated->PhysicalStart = Largest->PhysicalStart + Largest->PhysicalSize;
+  Allocated->RegionState   = Largest->RegionState | EFI_ALLOCATED;
+  Allocated->PhysicalSize  = EFI_PAGES_TO_SIZE (Pages);
+
   //
   // Scrub old one
   //
@@ -473,7 +501,7 @@ ExecuteMmCoreFromMmram (
   //
   // Unblock the MM FV range to be accessible from inside MM
   //
-  if (MmFvBase != 0 && MmFvSize != 0) {
+  if ((MmFvBase != 0) && (MmFvSize != 0)) {
     Status = MmUnblockMemoryRequest (MmFvBase, EFI_SIZE_TO_PAGES (MmFvSize));
     ASSERT_EFI_ERROR (Status);
   }
@@ -527,13 +555,22 @@ ExecuteMmCoreFromMmram (
       // Flush the instruction cache so the image data are written before we execute it
       //
       InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
- 
+
       //
       // Create MM HOB list for Standalone MM Core.
       //
       MmHobSize = 0;
-      MmHobList = CreatMmHobList (&MmHobSize, MmCommBuffer, MmFvBase, MmFvSize, MmCoreFileName, 
-	                              ImageContext.ImageAddress, ImageContext.ImageSize, ImageContext.EntryPoint, Block);
+      MmHobList = CreatMmHobList (
+                    &MmHobSize,
+                    MmCommBuffer,
+                    MmFvBase,
+                    MmFvSize,
+                    MmCoreFileName,
+                    ImageContext.ImageAddress,
+                    ImageContext.ImageSize,
+                    ImageContext.EntryPoint,
+                    Block
+                    );
 
       //
       // Print debug message showing Standalone MM Core entry point address.
@@ -543,7 +580,7 @@ ExecuteMmCoreFromMmram (
       //
       // Execute image
       //
-	    Entry  = (STANDALONE_MM_FOUNDATION_ENTRY_POINT)(UINTN)ImageContext.EntryPoint;
+      Entry  = (STANDALONE_MM_FOUNDATION_ENTRY_POINT)(UINTN)ImageContext.EntryPoint;
       Status = Entry (MmHobList);
       ASSERT_EFI_ERROR (Status);
       FreePages (MmHobList, EFI_SIZE_TO_PAGES (MmHobSize));
@@ -640,7 +677,7 @@ MmIplDispatchMmDrivers (
 MM_COMM_BUFFER *
 MmIplBuildCommBufferHob (
   VOID
-)
+  )
 {
   EFI_STATUS      Status;
   MM_COMM_BUFFER  *MmCommBuffer;
@@ -660,7 +697,7 @@ MmIplBuildCommBufferHob (
   if (MmCommBuffer->FixedCommBuffer == 0) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate fixed communication buffer\n"));
     ASSERT (MmCommBuffer->FixedCommBuffer != 0);
-  } 
+  }
 
   //
   // Build MM unblock memory region HOB for communication buffer
@@ -676,7 +713,7 @@ MmIplBuildCommBufferHob (
   if (MmCommBuffer->CommunicationInOut == 0) {
     DEBUG ((DEBUG_ERROR, "Fail to allocate communication in/out buffer\n"));
     ASSERT (MmCommBuffer->CommunicationInOut != 0);
-  } 
+  }
 
   //
   // Build MM unblock memory region HOB for communication in/out buffer
