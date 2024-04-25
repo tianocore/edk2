@@ -112,6 +112,7 @@ RegisterGuidHobPrintHandlers (
 **/
 EFI_STATUS
 PrintHex (
+  IN  UINT32  ErrorLevel,
   IN  UINT8   *DataStart,
   IN  UINT16  DataSize
   )
@@ -122,16 +123,27 @@ PrintHex (
 
   StartAddr = DataStart;
   for (Index1 = 0; Index1 * ROW_LIMITER < DataSize; Index1++) {
-    DEBUG ((DEBUG_VERBOSE, "   0x%04p:", (DataStart - StartAddr)));
+    DEBUG ((ErrorLevel, "   0x%04p:", (DataStart - StartAddr)));
     for (Index2 = 0; (Index2 < ROW_LIMITER) && (Index1 * ROW_LIMITER + Index2 < DataSize); Index2++) {
-      DEBUG ((DEBUG_VERBOSE, " %02x", *DataStart));
+      DEBUG ((ErrorLevel, " %02x", *DataStart));
       DataStart++;
     }
 
-    DEBUG ((DEBUG_VERBOSE, "\n"));
+    DEBUG ((ErrorLevel, "\n"));
   }
 
   return EFI_SUCCESS;
+}
+
+RETURN_STATUS
+HobPrintLibInvalidHob (
+  IN  VOID    *HobStart,
+  IN  UINT16  HobLength
+  )
+{
+  DEBUG ((DEBUG_ERROR, "   Invalid HOB. Full hex dump in below:\n"));
+  PrintHex (DEBUG_ERROR, HobStart, HobLength);
+  return RETURN_INVALID_PARAMETER;
 }
 
 /**
@@ -150,7 +162,9 @@ PrintHandOffHob (
   EFI_PEI_HOB_POINTERS  Hob;
 
   Hob.Raw = (UINT8 *)HobStart;
-  ASSERT (HobLength >= sizeof (*Hob.HandoffInformationTable));
+  if (HobLength < sizeof (*Hob.HandoffInformationTable)) {
+    return HobPrintLibInvalidHob (HobStart, HobLength);
+  }
   DEBUG ((DEBUG_INFO, "   BootMode            = 0x%x\n", Hob.HandoffInformationTable->BootMode));
   DEBUG ((DEBUG_INFO, "   EfiMemoryTop        = 0x%lx\n", Hob.HandoffInformationTable->EfiMemoryTop));
   DEBUG ((DEBUG_INFO, "   EfiMemoryBottom     = 0x%lx\n", Hob.HandoffInformationTable->EfiMemoryBottom));
@@ -177,18 +191,26 @@ PrintMemoryAllocationHob (
   Hob.Raw = (UINT8 *)HobStart;
 
   if (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, &gEfiHobMemoryAllocStackGuid)) {
-    ASSERT (HobLength >= sizeof (*Hob.MemoryAllocationStack));
+    if (HobLength < sizeof (*Hob.MemoryAllocationStack)) {
+      return HobPrintLibInvalidHob (HobStart, HobLength);
+    }
     DEBUG ((DEBUG_INFO, "   Type              = EFI_HOB_MEMORY_ALLOCATION_STACK\n"));
   } else if (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, &gEfiHobMemoryAllocBspStoreGuid)) {
-    ASSERT (HobLength >= sizeof (*Hob.MemoryAllocationBspStore));
+    if (HobLength < sizeof (*Hob.MemoryAllocationBspStore)) {
+      return HobPrintLibInvalidHob (HobStart, HobLength);
+    }
     DEBUG ((DEBUG_INFO, "   Type              = EFI_HOB_MEMORY_ALLOCATION_BSP_STORE\n"));
   } else if (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, &gEfiHobMemoryAllocModuleGuid)) {
-    ASSERT (HobLength >= sizeof (*Hob.MemoryAllocationModule));
+    if (HobLength < sizeof (*Hob.MemoryAllocationModule)) {
+      return HobPrintLibInvalidHob (HobStart, HobLength);
+    }
     DEBUG ((DEBUG_INFO, "   Type              = EFI_HOB_MEMORY_ALLOCATION_MODULE\n"));
-    DEBUG ((DEBUG_INFO, "   Module Name       = %g\n", Hob.MemoryAllocationModule->ModuleName));
-    DEBUG ((DEBUG_INFO, "   Physical Address  = 0x%lx\n", Hob.MemoryAllocationModule->EntryPoint));
+    DEBUG ((DEBUG_INFO, "   ModuleName        = %g\n", Hob.MemoryAllocationModule->ModuleName));
+    DEBUG ((DEBUG_INFO, "   EntryPoint        = 0x%lx\n", Hob.MemoryAllocationModule->EntryPoint));
   } else {
-    ASSERT (HobLength >= sizeof (*Hob.MemoryAllocation));
+    if (HobLength < sizeof (*Hob.MemoryAllocation)) {
+      return HobPrintLibInvalidHob (HobStart, HobLength);
+    }
     DEBUG ((DEBUG_INFO, "   Type              = EFI_HOB_TYPE_MEMORY_ALLOCATION\n"));
   }
 
@@ -217,7 +239,7 @@ PrintResourceDiscriptorHob (
 
   DEBUG ((DEBUG_INFO, "   ResourceType      = %a\n", mResource_Type_List[Hob.ResourceDescriptor->ResourceType]));
   if (!IsZeroGuid (&Hob.ResourceDescriptor->Owner)) {
-    DEBUG ((DEBUG_INFO, " Owner             = %g\n", Hob.ResourceDescriptor->Owner));
+    DEBUG ((DEBUG_INFO, "   Owner             = %g\n", Hob.ResourceDescriptor->Owner));
   }
 
   DEBUG ((DEBUG_INFO, "   ResourceAttribute = 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
@@ -242,10 +264,12 @@ PrintGuidHob (
   UINTN                  Index;
   EFI_STATUS             Status;
   GUID_HOB_PRINT_HANDLE  *GuidHobPrintHandle;
+  UINT16                 DataLength;
 
   Hob.Raw = (UINT8 *)HobStart;
   ASSERT (HobLength >= sizeof (Hob.Guid));
 
+  DataLength = GET_GUID_HOB_DATA_SIZE (Hob.Raw);
   if ((mGuidHobPrintHanlderInfo.GuidHobPrintHandlerTable != NULL) &&
       (mGuidHobPrintHanlderInfo.NumberOfGuidHobPrintHandler != 0))
   {
@@ -253,14 +277,15 @@ PrintGuidHob (
       GuidHobPrintHandle = mGuidHobPrintHanlderInfo.GuidHobPrintHandlerTable + Index;
       if (CompareGuid (&Hob.Guid->Name, GuidHobPrintHandle->Guid)) {
         DEBUG ((DEBUG_INFO, "   Guid   = %a\n", GuidHobPrintHandle->GuidName));
-        Status = GuidHobPrintHandle->PrintHandler (Hob.Raw, GET_GUID_HOB_DATA_SIZE (Hob.Raw));
+        Status = GuidHobPrintHandle->PrintHandler (Hob.Raw, DataLength);
         return Status;
       }
     }
   }
 
-  DEBUG ((DEBUG_INFO, "   Name = %g\n", &Hob.Guid->Name));
-  PrintHex (GET_GUID_HOB_DATA (Hob.Raw), GET_GUID_HOB_DATA_SIZE (Hob.Raw));
+  DEBUG ((DEBUG_INFO, "   Name       = %g\n", &Hob.Guid->Name));
+  DEBUG ((DEBUG_INFO, "   DataLength = 0x%x\n", DataLength));
+  PrintHex (DEBUG_INFO, GET_GUID_HOB_DATA (Hob.Raw), DataLength);
   return EFI_SUCCESS;
 }
 
@@ -390,13 +415,13 @@ PrintFv3Hob (
   DEBUG ((DEBUG_INFO, "   Length               = 0x%lx\n", Hob.FirmwareVolume3->Length));
   DEBUG ((DEBUG_INFO, "   AuthenticationStatus = 0x%x\n", Hob.FirmwareVolume3->AuthenticationStatus));
   DEBUG ((DEBUG_INFO, "   ExtractedFv          = %a\n", (Hob.FirmwareVolume3->ExtractedFv ? "True" : "False")));
-  DEBUG ((DEBUG_INFO, "   FVName               = %g\n", &Hob.FirmwareVolume3->FvName));
+  DEBUG ((DEBUG_INFO, "   FvName               = %g\n", &Hob.FirmwareVolume3->FvName));
   DEBUG ((DEBUG_INFO, "   FileName             = %g\n", &Hob.FirmwareVolume3->FileName));
   return EFI_SUCCESS;
 }
 
 //
-// Mappint table from Hob type to Hob print function.
+// Mapping table from Hob type to Hob print function.
 //
 HOB_PRINT_HANDLER_TABLE  mHobHandles[] = {
   { EFI_HOB_TYPE_HANDOFF,             "EFI_HOB_TYPE_HANDOFF",             PrintHandOffHob            },
@@ -445,8 +470,8 @@ PrintHobs (
 
     if (Index == ARRAY_SIZE (mHobHandles)) {
       DEBUG ((DEBUG_INFO, "HOB[%d]: Type = %d, Offset = 0x%p, Length = 0x%x\n", Count, Hob.Header->HobType, (Hob.Raw - (UINT8 *)HobStart), Hob.Header->HobLength));
-      DEBUG ((DEBUG_INFO, "   Unkown Hob type\n"));
-      PrintHex (Hob.Raw, Hob.Header->HobLength);
+      DEBUG ((DEBUG_INFO, "   Unkown Hob type, full hex dump in below:\n"));
+      PrintHex (DEBUG_INFO, Hob.Raw, Hob.Header->HobLength);
     }
 
     Count++;
