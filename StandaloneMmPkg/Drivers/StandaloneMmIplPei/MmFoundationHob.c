@@ -406,6 +406,39 @@ MemoryRegionBaseAddressCompare (
 }
 
 /**
+  Calculate the maximum support address.
+
+  @return the maximum support address.
+**/
+UINT8
+MmIplCalculateMaximumSupportAddress (
+  VOID
+  )
+{
+  UINT32  RegEax;
+  UINT8   PhysicalAddressBits;
+  VOID    *Hob;
+
+  //
+  // Get physical address bits supported.
+  //
+  Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+  if (Hob != NULL) {
+    PhysicalAddressBits = ((EFI_HOB_CPU *)Hob)->SizeOfMemorySpace;
+  } else {
+    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= 0x80000008) {
+      AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
+      PhysicalAddressBits = (UINT8)RegEax;
+    } else {
+      PhysicalAddressBits = 36;
+    }
+  }
+
+  return PhysicalAddressBits;
+}
+
+/**
   Build resource HOB to cover [0, PhysicalAddressBits length] by excluding
   all Mmram ranges, SmmProfile data and MMIO ranges.
 
@@ -437,7 +470,7 @@ MmIplBuildResourceHobForAllSystemMemory (
   MM_IPL_MEMORY_REGION  *MemoryRegions;
   MM_IPL_MEMORY_REGION  SortBuffer;
 
-  MaxAddress = LShiftU64 (1, CalculateMaximumSupportAddress ());
+  MaxAddress = LShiftU64 (1, MmIplCalculateMaximumSupportAddress ());
 
   //
   // Get the count of platform memory regions
