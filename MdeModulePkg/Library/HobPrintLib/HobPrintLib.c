@@ -205,7 +205,7 @@ PrintMemoryAllocationHob (
       return HobPrintLibInvalidHob (HobStart, HobLength);
     }
     DEBUG ((DEBUG_INFO, "   Type              = EFI_HOB_MEMORY_ALLOCATION_MODULE\n"));
-    DEBUG ((DEBUG_INFO, "   ModuleName        = %g\n", Hob.MemoryAllocationModule->ModuleName));
+    DEBUG ((DEBUG_INFO, "   ModuleName        = %g\n", &Hob.MemoryAllocationModule->ModuleName));
     DEBUG ((DEBUG_INFO, "   EntryPoint        = 0x%lx\n", Hob.MemoryAllocationModule->EntryPoint));
   } else {
     if (HobLength < sizeof (*Hob.MemoryAllocation)) {
@@ -214,6 +214,7 @@ PrintMemoryAllocationHob (
     DEBUG ((DEBUG_INFO, "   Type              = EFI_HOB_TYPE_MEMORY_ALLOCATION\n"));
   }
 
+  DEBUG ((DEBUG_INFO, "   Name              = %g\n", &Hob.MemoryAllocationStack->AllocDescriptor.Name));
   DEBUG ((DEBUG_INFO, "   MemoryBaseAddress = 0x%lx\n", Hob.MemoryAllocationStack->AllocDescriptor.MemoryBaseAddress));
   DEBUG ((DEBUG_INFO, "   MemoryLength      = 0x%lx\n", Hob.MemoryAllocationStack->AllocDescriptor.MemoryLength));
   DEBUG ((DEBUG_INFO, "   MemoryType        = %a \n", mMemoryTypeStr[Hob.MemoryAllocationStack->AllocDescriptor.MemoryType]));
@@ -239,7 +240,7 @@ PrintResourceDiscriptorHob (
 
   DEBUG ((DEBUG_INFO, "   ResourceType      = %a\n", mResource_Type_List[Hob.ResourceDescriptor->ResourceType]));
   if (!IsZeroGuid (&Hob.ResourceDescriptor->Owner)) {
-    DEBUG ((DEBUG_INFO, "   Owner             = %g\n", Hob.ResourceDescriptor->Owner));
+    DEBUG ((DEBUG_INFO, "   Owner             = %g\n", &Hob.ResourceDescriptor->Owner));
   }
 
   DEBUG ((DEBUG_INFO, "   ResourceAttribute = 0x%x\n", Hob.ResourceDescriptor->ResourceAttribute));
