@@ -5,6 +5,7 @@
 # driver.
 #
 # Copyright (C) 2013, 2015, Red Hat, Inc.
+# Copyright (c) 2024 Intel Corporation.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -41,12 +42,16 @@
   PciLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  HobLib
 
 [Protocols]
   gEfiSmmAccess2ProtocolGuid   ## PRODUCES
 
 [FeaturePcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
+
+[Guids]
+  gEfiSmmSmramMemoryGuid             # ALWAYS_CONSUMED
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase

@@ -2,11 +2,10 @@
 # A PEIM with the following responsibilities:
 #
 # - provide SMRAM access by producing PEI_SMM_ACCESS_PPI,
-# - verify & configure the Q35 TSEG in the entry point,
-# - set aside the SMM_S3_RESUME_STATE object at the bottom of TSEG, and expose
-#   it via the gEfiAcpiVariableGuid GUIDed HOB.
+# - verify & configure the Q35 TSEG in the entry point.
 #
 # Copyright (C) 2013, 2015, Red Hat, Inc.
+# Copyright (c) 2024 Intel Corporation.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -36,9 +35,6 @@
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
-[Guids]
-  gEfiAcpiVariableGuid
-
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
@@ -56,6 +52,9 @@
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35TsegMbytes
+
+[Guids]
+  gEfiSmmSmramMemoryGuid             # ALWAYS_CONSUMED
 
 [Ppis]
   gPeiSmmAccessPpiGuid           ## PRODUCES

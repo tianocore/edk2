@@ -3,25 +3,21 @@
   A PEIM with the following responsibilities:
 
   - verify & configure the Q35 TSEG in the entry point,
-  - provide SMRAM access by producing PEI_SMM_ACCESS_PPI,
-  - set aside the SMM_S3_RESUME_STATE object at the bottom of TSEG, and expose
-    it via the gEfiAcpiVariableGuid GUID HOB.
+  - provide SMRAM access by producing PEI_SMM_ACCESS_PPI
 
   This PEIM runs from RAM, so we can write to variables with static storage
   duration.
 
   Copyright (C) 2013, 2015, Red Hat, Inc.<BR>
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Guid/AcpiS3Context.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
-#include <Library/HobLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 #include <Library/PciLib.h>
@@ -64,7 +60,17 @@ SmmAccessPeiOpen (
   IN UINTN               DescriptorIndex
   )
 {
-  if (DescriptorIndex >= DescIdxCount) {
+  EFI_HOB_GUID_TYPE               *GuidHob;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
+
+  //
+  // Get the number of regions in the system that can be usable for SMRAM
+  //
+  GuidHob         = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
+  DescriptorBlock = GET_GUID_HOB_DATA (GuidHob);
+  ASSERT (DescriptorBlock);
+
+  if (DescriptorIndex >= DescriptorBlock->NumberOfSmmReservedRegions) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -102,7 +108,17 @@ SmmAccessPeiClose (
   IN UINTN               DescriptorIndex
   )
 {
-  if (DescriptorIndex >= DescIdxCount) {
+  EFI_HOB_GUID_TYPE               *GuidHob;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
+
+  //
+  // Get the number of regions in the system that can be usable for SMRAM
+  //
+  GuidHob         = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
+  DescriptorBlock = GET_GUID_HOB_DATA (GuidHob);
+  ASSERT (DescriptorBlock);
+
+  if (DescriptorIndex >= DescriptorBlock->NumberOfSmmReservedRegions) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -139,7 +155,17 @@ SmmAccessPeiLock (
   IN UINTN               DescriptorIndex
   )
 {
-  if (DescriptorIndex >= DescIdxCount) {
+  EFI_HOB_GUID_TYPE               *GuidHob;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
+
+  //
+  // Get the number of regions in the system that can be usable for SMRAM
+  //
+  GuidHob         = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
+  DescriptorBlock = GET_GUID_HOB_DATA (GuidHob);
+  ASSERT (DescriptorBlock);
+
+  if (DescriptorIndex >= DescriptorBlock->NumberOfSmmReservedRegions) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -178,8 +204,6 @@ SmmAccessPeiGetCapabilities (
   )
 {
   return SmramAccessGetCapabilities (
-           This->LockState,
-           This->OpenState,
            SmramMapSize,
            SmramMap
            );
@@ -240,14 +264,10 @@ SmmAccessPeiEntryPoint (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
-  UINT16                HostBridgeDevId;
-  UINT8                 EsmramcVal;
-  UINT8                 RegMask8;
-  UINT32                TopOfLowRam, TopOfLowRamMb;
-  EFI_STATUS            Status;
-  UINTN                 SmramMapSize;
-  EFI_SMRAM_DESCRIPTOR  SmramMap[DescIdxCount];
-  VOID                  *GuidHob;
+  UINT16  HostBridgeDevId;
+  UINT8   EsmramcVal;
+  UINT8   RegMask8;
+  UINT32  TopOfLowRam, TopOfLowRamMb;
 
   //
   // This module should only be included if SMRAM support is required.
@@ -356,65 +376,7 @@ SmmAccessPeiEntryPoint (
     MCH_SMRAM_G_SMRAME
     );
 
-  //
-  // Create the GUID HOB and point it to the first SMRAM range.
-  //
   GetStates (&mAccess.LockState, &mAccess.OpenState);
-  SmramMapSize = sizeof SmramMap;
-  Status       = SmramAccessGetCapabilities (
-                   mAccess.LockState,
-                   mAccess.OpenState,
-                   &SmramMapSize,
-                   SmramMap
-                   );
-  ASSERT_EFI_ERROR (Status);
-
-  DEBUG_CODE_BEGIN ();
-  {
-    UINTN  Count;
-    UINTN  Idx;
-
-    Count = SmramMapSize / sizeof SmramMap[0];
-    DEBUG ((
-      DEBUG_VERBOSE,
-      "%a: SMRAM map follows, %d entries\n",
-      __func__,
-      (INT32)Count
-      ));
-    DEBUG ((
-      DEBUG_VERBOSE,
-      "% 20a % 20a % 20a % 20a\n",
-      "PhysicalStart(0x)",
-      "PhysicalSize(0x)",
-      "CpuStart(0x)",
-      "RegionState(0x)"
-      ));
-    for (Idx = 0; Idx < Count; ++Idx) {
-      DEBUG ((
-        DEBUG_VERBOSE,
-        "% 20Lx % 20Lx % 20Lx % 20Lx\n",
-        SmramMap[Idx].PhysicalStart,
-        SmramMap[Idx].PhysicalSize,
-        SmramMap[Idx].CpuStart,
-        SmramMap[Idx].RegionState
-        ));
-    }
-  }
-  DEBUG_CODE_END ();
-
-  GuidHob = BuildGuidHob (
-              &gEfiAcpiVariableGuid,
-              sizeof SmramMap[DescIdxSmmS3ResumeState]
-              );
-  if (GuidHob == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  CopyMem (
-    GuidHob,
-    &SmramMap[DescIdxSmmS3ResumeState],
-    sizeof SmramMap[DescIdxSmmS3ResumeState]
-    );
 
   //
   // SmramAccessLock() depends on "mQ35SmramAtDefaultSmbase"; init the latter

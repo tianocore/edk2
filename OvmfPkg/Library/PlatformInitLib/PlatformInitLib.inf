@@ -58,6 +58,7 @@
 
 [Guids]
   gEfiSmmSmramMemoryGuid
+  gEfiAcpiVariableGuid
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
