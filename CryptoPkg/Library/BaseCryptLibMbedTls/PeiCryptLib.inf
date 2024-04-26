@@ -47,21 +47,23 @@
   Cipher/CryptAeadAesGcmNull.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExtNull.c
-  Pk/CryptRsaPss.c
-  Pk/CryptRsaPssSignNull.c
-  Bn/CryptBnNull.c
-  Pem/CryptPemNull.c
-  Pk/CryptDhNull.c
-  Pk/CryptEcNull.c
   Pk/CryptPkcs1OaepNull.c
   Pk/CryptPkcs5Pbkdf2Null.c
   Pk/CryptPkcs7SignNull.c
-  Pk/CryptPkcs7VerifyNull.c
-  Pk/CryptPkcs7VerifyEkuNull.c
+  Pk/CryptPkcs7VerifyCommon.c
+  Pk/CryptPkcs7VerifyBase.c
+  Pk/CryptPkcs7VerifyEku.c
+  Pk/CryptDhNull.c
   Pk/CryptX509Null.c
   Pk/CryptAuthenticodeNull.c
   Pk/CryptTsNull.c
+  Pk/CryptRsaPss.c
+  Pk/CryptRsaPssSignNull.c
+  Pk/CryptEcNull.c
+  Pem/CryptPemNull.c
   Rand/CryptRandNull.c
+  Bn/CryptBnNull.c
+
   SysCall/CrtWrapper.c
   SysCall/ConstantTimeClock.c
 
