@@ -42,6 +42,8 @@ Module Name:
 #include <Library/TdxLib.h>
 
 #include <Library/PlatformInitLib.h>
+
+#include <Guid/AcpiS3Context.h>
 #include <Guid/SmramMemoryReserve.h>
 
 #define MEGABYTE_SHIFT  20
@@ -1003,6 +1005,7 @@ CreateSmmSmramMemoryHob (
   UINT8                           SmramRanges;
   EFI_PEI_HOB_POINTERS            Hob;
   EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *SmramHobDescriptorBlock;
+  VOID                            *GuidHob;
 
   SmramRanges = 2;
   BufferSize  = sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + (SmramRanges - 1) * sizeof (EFI_SMRAM_DESCRIPTOR);
@@ -1024,6 +1027,13 @@ CreateSmmSmramMemoryHob (
   SmramHobDescriptorBlock->Descriptor[0].CpuStart      = StartAddress;
   SmramHobDescriptorBlock->Descriptor[0].PhysicalSize  = EFI_PAGE_SIZE;
   SmramHobDescriptorBlock->Descriptor[0].RegionState   = EFI_SMRAM_CLOSED | EFI_CACHEABLE | EFI_ALLOCATED;
+
+  //
+  // 1.1 Create gEfiAcpiVariableGuid according SmramHobDescriptorBlock->Descriptor[0] since it's used in S3 resume.
+  //
+  GuidHob = BuildGuidHob (&gEfiAcpiVariableGuid, sizeof (EFI_SMRAM_DESCRIPTOR));
+  ASSERT (GuidHob != NULL);
+  CopyMem (GuidHob, &SmramHobDescriptorBlock->Descriptor[0], sizeof (EFI_SMRAM_DESCRIPTOR));
 
   //
   // 2. Create second SMRAM descriptor, which is free and will be used by SMM foundation.
