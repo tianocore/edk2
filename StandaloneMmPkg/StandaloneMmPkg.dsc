@@ -62,6 +62,9 @@
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
   MmPlatformHobProducerLib|StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
 
+[LibraryClasses.common.PEIM]
+  PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
+
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   StandaloneMmMmuLib|ArmPkg/Library/StandaloneMmMmuLib/ArmMmuStandaloneMmLib.inf
@@ -125,6 +128,9 @@
 [Components.AARCH64, Components.ARM]
   StandaloneMmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
   StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
+
+[Components.X64]
+  StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
 
 ###################################################################################################
 #
