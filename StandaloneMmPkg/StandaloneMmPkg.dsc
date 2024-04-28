@@ -1,7 +1,7 @@
 ## @file
 # Standalone MM Platform.
 #
-# Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 # Copyright (C) Microsoft Corporation<BR>
 #
@@ -60,6 +60,9 @@
   StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   VariableMmDependency|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   MmPlatformHobProducerLib|StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
+
+[LibraryClasses.common.PEIM]
+  PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
 
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -123,6 +126,9 @@
 [Components.AARCH64, Components.ARM]
   StandaloneMmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
   StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
+
+[Components.X64]
+  StandaloneMmPkg/Drivers/StandaloneMmIplPei/StandaloneMmIplPei.inf
 
 ###################################################################################################
 #
