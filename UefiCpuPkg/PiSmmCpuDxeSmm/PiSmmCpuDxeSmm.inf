@@ -55,7 +55,6 @@
   Ia32/SmmProfileArch.h
   Ia32/SmiEntry.nasm
   Ia32/SmiException.nasm
-  Ia32/MpFuncs.nasm
   Ia32/Cet.nasm
 
 [Sources.X64]
@@ -65,7 +64,6 @@
   X64/SmmProfileArch.h
   X64/SmiEntry.nasm
   X64/SmiException.nasm
-  X64/MpFuncs.nasm
   X64/Cet.nasm
 
 [Packages]

@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PiSmmCpuCommon.h"
 #include <PiPei.h>
-#include <Ppi/MpServices2.h>
 
 BOOLEAN  mRestoreSmmConfigurationInS3 = FALSE;
 

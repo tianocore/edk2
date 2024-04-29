@@ -52,7 +52,6 @@
   X64/SmmProfileArch.h
   X64/SmiEntry.nasm
   X64/SmiException.nasm
-  X64/MpFuncs.nasm
   X64/Cet.nasm
 
 [Packages]
