@@ -1,0 +1,41 @@
+## @file
+#  Component description for the SPI BUS SMM module
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION               = 1.27
+  BASE_NAME                 = SpiBusSmm
+  FILE_GUID                 = 5DBB52E1-3D78-4C9C-A9D7-A43E79E93AC0
+  MODULE_TYPE               = DXE_SMM_DRIVER
+  VERSION_STRING            = 0.1
+  PI_SPECIFICATION_VERSION  = 0x0001000A
+  ENTRY_POINT               = SpiBusEntry
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  MmServicesTableLib
+  UefiDriverEntryPoint
+
+[Sources]
+  SpiBus.h
+  SpiBus.c
+  SpiBusSmm.c
+
+[Protocols]
+  gEfiSpiSmmConfigurationProtocolGuid                           ## CONSUMES
+  gEfiSpiSmmHcProtocolGuid                                      ## CONSUMES
+
+[Depex]
+  gEfiSpiSmmConfigurationProtocolGuid AND
+  gEfiSpiSmmHcProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SpiBus.uni
