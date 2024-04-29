@@ -283,6 +283,14 @@ struct lb_efi_fw_info {
   UINT32    fw_size;                  /* Size of firmware in bytes */
 } __attribute__ ((packed));
 
+#define CB_TAG_CAPSULE  0x0046
+struct cb_range {
+  UINT32    tag;
+  UINT32    size;
+  UINT64    range_start;
+  UINT32    range_size;
+} __attribute__ ((packed));
+
 /* Helpful macros */
 
 #define MEM_RANGE_COUNT(_rec) \
