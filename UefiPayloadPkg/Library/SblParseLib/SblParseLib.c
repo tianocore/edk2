@@ -313,3 +313,23 @@ ParseFwInfo (
 {
   return RETURN_NOT_FOUND;
 }
+
+/**
+  Parse update capsules passed in by bootloader
+
+  @param  CapsuleCallback   The callback routine invoked for each capsule.
+
+  @retval RETURN_SUCCESS    Successfully parsed capsules.
+  @retval RETURN_NOT_FOUND  Failed to look up the information.
+**/
+RETURN_STATUS
+EFIAPI
+ParseCapsules (
+  IN BL_CAPSULE_CALLBACK  CapsuleCallback
+  )
+{
+  //
+  // Treat not supporting this function like reporting zero capsules.
+  //
+  return RETURN_SUCCESS;
+}
