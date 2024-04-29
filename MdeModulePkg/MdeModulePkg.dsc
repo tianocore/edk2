@@ -290,6 +290,8 @@
   MdeModulePkg/Bus/Spi/SpiNorFlashJedecSfdp/SpiNorFlashJedecSfdpSmm.inf
   MdeModulePkg/Bus/Spi/SpiBus/SpiBusDxe.inf
   MdeModulePkg/Bus/Spi/SpiBus/SpiBusSmm.inf
+  MdeModulePkg/Bus/Spi/SpiHc/SpiHcDxe.inf
+  MdeModulePkg/Bus/Spi/SpiHc/SpiHcSmm.inf
 
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
