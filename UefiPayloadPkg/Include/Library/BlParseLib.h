@@ -27,6 +27,12 @@ typedef RETURN_STATUS \
   VOID              *Param
   );
 
+typedef VOID \
+(*BL_CAPSULE_CALLBACK) (
+  EFI_PHYSICAL_ADDRESS  BaseAddress,
+  UINT64                Length
+  );
+
 /**
   This function retrieves the parameter base address from boot loader.
 
@@ -162,6 +168,20 @@ RETURN_STATUS
 EFIAPI
 ParseFirmwareInfo (
   OUT FIRMWARE_INFO  *FwInfo
+  );
+
+/**
+  Parse update capsules passed in by bootloader
+
+  @param  CapsuleCallback   The callback routine invoked for each capsule.
+
+  @retval RETURN_SUCCESS    Successfully parsed capsules.
+  @retval RETURN_NOT_FOUND  Failed to look up the information.
+**/
+RETURN_STATUS
+EFIAPI
+ParseCapsules (
+  IN BL_CAPSULE_CALLBACK  CapsuleCallback
   );
 
 #endif
