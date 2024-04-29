@@ -169,6 +169,11 @@
   #
   ImagePropertiesRecordLib|Include/Library/ImagePropertiesRecordLib.h
 
+  ##  @libraryclass   Platform SPI Host Controller library which provides low-level
+  #                   control over the SPI hardware
+  #
+  SpiHcPlatformLib|Include/Library/SpiHcPlatformLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
