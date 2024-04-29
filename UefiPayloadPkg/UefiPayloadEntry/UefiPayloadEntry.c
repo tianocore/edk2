@@ -464,6 +464,15 @@ _ModuleEntryPoint (
   DEBUG ((DEBUG_INFO, "DxeCoreEntryPoint = 0x%lx\n", DxeCoreEntryPoint));
 
   //
+  // Import update capsules, if there are any.
+  //
+  Status = ParseCapsules (BuildCvHob);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error when importing update capsules, Status = %r\n", Status));
+    return Status;
+  }
+
+  //
   // Mask off all legacy 8259 interrupt sources
   //
   IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
