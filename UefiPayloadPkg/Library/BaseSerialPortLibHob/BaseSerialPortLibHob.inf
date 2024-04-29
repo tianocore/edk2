@@ -18,6 +18,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
 
 [LibraryClasses]
   PcdLib
@@ -34,6 +35,15 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialDetectCable             ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialPciDeviceInfo           ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride          ## CONSUMES
+  gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable
+
+
 
 [Guids]
   gUniversalPayloadSerialPortInfoGuid
