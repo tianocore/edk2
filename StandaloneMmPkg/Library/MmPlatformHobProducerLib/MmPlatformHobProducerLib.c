@@ -14,96 +14,61 @@
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/HobLib.h>
+
 #include <Guid/SmmProfileDataHob.h>
+#include <Guid/SmramMemoryReserve.h>
 
-UINTN  mHobListEnd;
-
-/**
-  This function returns the end of the HOB list.
-
-  @return The pointer to the HOB list.
-
-**/
-UINTN *
-MmGetHobListEndPointer (
-  VOID
-  )
-{
-  return &mHobListEnd;
-}
+typedef struct {
+  EFI_PHYSICAL_ADDRESS    Base;
+  UINT64                  Length;
+} MM_PLATFORM_MEMORY_REGION;
 
 /**
-  This function initialize mHobListEnd.
+  Initialize the EFI_HOB_GENERIC_HEADER based on input Hob.
 
-  @param Buffer  The buffer to create HOB.
+  @param[in] Hob          Pointer to the new HOB buffer.
+  @param[in] HobType      Type of the new HOB.
+  @param[in] HobLength    Length of the new HOB to allocate.
 
 **/
 VOID
-InitializeHobListEnd (
-  IN VOID  *Buffer
-  )
-{
-  UINTN  *HobListEnd;
-
-  HobListEnd  = MmGetHobListEndPointer ();
-  *HobListEnd = (UINTN)Buffer;
-}
-
-/**
-  Add a new HOB to the HOB List.
-
-  @param HobType            Type of the new HOB.
-  @param HobLength          Length of the new HOB to allocate.
-
-  @return  NULL if there is no space to create a hob.
-  @return  The address point to the new created hob.
-
-**/
-VOID *
 MmCreateHob (
-  IN  UINT16  HobType,
-  IN  UINT16  HobLength
+  IN VOID    *Hob,
+  IN UINT16  HobType,
+  IN UINT16  HobLength
   )
 {
-  VOID   *Hob;
-  UINTN  *HobListEnd;
+  //
+  // Check Length to avoid data overflow.
+  //
+  ASSERT (HobLength < MAX_UINT16 - 0x7);
 
-  HobListEnd = MmGetHobListEndPointer ();
-
-  Hob                                        = (VOID *)(*HobListEnd);
   ((EFI_HOB_GENERIC_HEADER *)Hob)->HobType   = HobType;
   ((EFI_HOB_GENERIC_HEADER *)Hob)->HobLength = HobLength;
   ((EFI_HOB_GENERIC_HEADER *)Hob)->Reserved  = 0;
-
-  *HobListEnd = (UINTN)Hob + HobLength;
-
-  return Hob;
 }
 
 /**
   Builds a EFI_HOB_TYPE_RESOURCE_DESCRIPTOR HOB.
 
-  @param  ResourceType        The type of resource described by this HOB.
-  @param  ResourceAttribute   The resource attributes of the memory described by this HOB.
-  @param  PhysicalStart       The 64 bit physical address of memory described by this HOB.
-  @param  NumberOfBytes       The length of the memory described by this HOB in bytes.
+  @param[in] Hob                 Pointer to the new HOB buffer.
+  @param[in] ResourceType        The type of resource described by this HOB.
+  @param[in] ResourceAttribute   The resource attributes of the memory described by this HOB.
+  @param[in] PhysicalStart       The 64 bit physical address of memory described by this HOB.
+  @param[in] NumberOfBytes       The length of the memory described by this HOB in bytes.
 
 **/
 VOID
 MmBuildResourceDescriptorHob (
+  IN EFI_HOB_RESOURCE_DESCRIPTOR  *Hob,
   IN EFI_RESOURCE_TYPE            ResourceType,
   IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute,
   IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
   IN UINT64                       NumberOfBytes
   )
 {
-  EFI_HOB_RESOURCE_DESCRIPTOR  *Hob;
-
-  Hob = MmCreateHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
   ASSERT (Hob != NULL);
-  if (Hob == NULL) {
-    return;
-  }
+  MmCreateHob (Hob, EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
 
   Hob->ResourceType      = ResourceType;
   Hob->ResourceAttribute = ResourceAttribute;
@@ -116,8 +81,9 @@ MmBuildResourceDescriptorHob (
 
   @return the maximum support address.
 **/
+static
 UINT8
-CalculateMaximumSupportAddress (
+MmCalculateMaximumSupportAddress (
   VOID
   )
 {
@@ -147,84 +113,85 @@ CalculateMaximumSupportAddress (
 /**
   Builds resource HOB list for all MMIO range.
 
-  This function treats all all ranges outside the system memory range as mmio
-  and builds resource HOB list for all MMIO range.
+  This function treats all all ranges outside the system memory range and smram range
+  as mmio and builds resource HOB list for all MMIO range.
 
-  @param  Create      The type of resource described by this HOB.
-  @param  MemoryMap   EFI_MEMORY_DESCRIPTOR that describes all system memory range.
-  @param  Count       Number of EFI_MEMORY_DESCRIPTOR.
+  @param[in] Create        The type of resource described by this HOB.
+  @param[in] MemoryRegion  MM_PLATFORM_MEMORY_REGION that describes all system memory range.
+  @param[in] Count         Number of MM_PLATFORM_MEMORY_REGION.
+  @param[in] Buffer        The pointer of new HOB buffer.
 
+  @return The expected/used buffer size.
 **/
 UINTN
 MmBuildHobForMmio (
-  IN  BOOLEAN                Create,
-  IN  EFI_MEMORY_DESCRIPTOR  *MemoryMap,
-  IN  UINTN                  Count
+  IN BOOLEAN                    Create,
+  IN MM_PLATFORM_MEMORY_REGION  *MemoryRegion,
+  IN UINTN                      Count,
+  IN UINT8                      *Buffer
   )
 {
-  UINTN                        MmioRangeCount;
-  UINT64                       PreviousAddress;
-  UINT64                       Base;
-  UINT64                       Limit;
-  UINT8                        PhysicalAddressBits;
-  UINTN                        Index;
-  EFI_RESOURCE_ATTRIBUTE_TYPE  Attribute;
+  UINT64  PreviousAddress;
+  UINT64  Base;
+  UINT64  Limit;
+  UINT8   PhysicalAddressBits;
+  UINTN   Index;
+  UINTN   BufferSize;
 
   Index               = 0;
   PreviousAddress     = 0;
-  MmioRangeCount      = 0;
-  PhysicalAddressBits = CalculateMaximumSupportAddress ();
+  PhysicalAddressBits = MmCalculateMaximumSupportAddress ();
   Limit               = LShiftU64 (1, PhysicalAddressBits);
-  Attribute           = EFI_RESOURCE_ATTRIBUTE_PRESENT |
-                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-                        EFI_RESOURCE_ATTRIBUTE_TESTED;
-
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) == TRUE) {
-    Attribute |= EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING;
-  }
+  BufferSize          = 0;
 
   for (Index = 0; Index <= Count; Index++) {
-    Base = (Index == Count) ? Limit : MemoryMap[Index].PhysicalStart;
+    //
+    // When Index is equal to Count, Base covers the very last region.
+    //
+    Base = (Index == Count) ? Limit : MemoryRegion[Index].Base;
     if (Base > PreviousAddress) {
-      MmioRangeCount++;
       if (Create) {
         MmBuildResourceDescriptorHob (
+          (EFI_HOB_RESOURCE_DESCRIPTOR *)(Buffer + BufferSize),
           EFI_RESOURCE_MEMORY_MAPPED_IO,
-          Attribute,
+          0,
           PreviousAddress,
           Base - PreviousAddress
           );
       }
+
+      BufferSize += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
     }
 
     if (Index < Count) {
-      PreviousAddress = MemoryMap[Index].PhysicalStart + EFI_PAGES_TO_SIZE (MemoryMap[Index].NumberOfPages);
+      PreviousAddress = MemoryRegion[Index].Base + MemoryRegion[Index].Length;
     }
   }
 
-  return MmioRangeCount * sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+  return BufferSize;
 }
 
 /**
-  Function to compare 2 EFI_MEMORY_DESCRIPTOR pointer based on PhysicalStart.
+  Function to compare 2 MM_PLATFORM_MEMORY_REGION pointer based on Base.
 
-  @param[in] Buffer1            pointer to MP_INFORMATION2_HOB_DATA poiner to compare
-  @param[in] Buffer2            pointer to second MP_INFORMATION2_HOB_DATA pointer to compare
+  @param[in] Buffer1  pointer to MP_INFORMATION2_HOB_DATA poiner to compare
+  @param[in] Buffer2  pointer to second MP_INFORMATION2_HOB_DATA pointer to compare
 
-  @retval 0                     Buffer1 equal to Buffer2
-  @retval <0                    Buffer1 is less than Buffer2
-  @retval >0                    Buffer1 is greater than Buffer2
+  @retval 0   Buffer1 equal to Buffer2
+  @retval <0  Buffer1 is less than Buffer2
+  @retval >0  Buffer1 is greater than Buffer2
 **/
+static
 INTN
 EFIAPI
-MemoryDescriptorCompare (
+MmMemoryDescriptorCompare (
   IN  CONST VOID  *Buffer1,
   IN  CONST VOID  *Buffer2
   )
 {
-  if (((EFI_MEMORY_DESCRIPTOR *)Buffer1)->PhysicalStart > ((EFI_MEMORY_DESCRIPTOR *)Buffer2)->PhysicalStart) {
+  if (((MM_PLATFORM_MEMORY_REGION *)Buffer1)->Base > ((MM_PLATFORM_MEMORY_REGION *)Buffer2)->Base) {
     return 1;
-  } else if (((EFI_MEMORY_DESCRIPTOR *)Buffer1)->PhysicalStart < ((EFI_MEMORY_DESCRIPTOR *)Buffer2)->PhysicalStart) {
+  } else if (((MM_PLATFORM_MEMORY_REGION *)Buffer1)->Base < ((MM_PLATFORM_MEMORY_REGION *)Buffer2)->Base) {
     return -1;
   }
 
@@ -256,14 +223,15 @@ CreateMmPlatformHob (
   IN OUT UINTN  *BufferSize
   )
 {
-  VOID                   *HobList;
-  EFI_PEI_HOB_POINTERS   Hob;
-  EFI_PEI_HOB_POINTERS   FirstResHob;
-  UINTN                  Count;
-  UINTN                  Index;
-  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
-  EFI_MEMORY_DESCRIPTOR  SortBuffer;
-  UINTN                  RequiredSize;
+  VOID                            *HobList;
+  EFI_PEI_HOB_POINTERS            Hob;
+  EFI_PEI_HOB_POINTERS            FirstResHob;
+  UINTN                           Count;
+  UINTN                           Index;
+  MM_PLATFORM_MEMORY_REGION       *MemoryRegion;
+  MM_PLATFORM_MEMORY_REGION       SortBuffer;
+  UINTN                           RequiredSize;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *SmramHob;
 
   if (BufferSize == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -273,7 +241,6 @@ CreateMmPlatformHob (
     return RETURN_INVALID_PARAMETER;
   }
 
-  Index        = 0;
   Count        = 0;
   RequiredSize = 0;
   HobList      = GetHobList ();
@@ -293,15 +260,34 @@ CreateMmPlatformHob (
   }
 
   //
+  // Count the gEfiSmmSmramMemoryGuid Descriptor number
+  //
+  Hob.Raw = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
+  ASSERT (Hob.Raw != NULL);
+  SmramHob = GET_GUID_HOB_DATA (Hob.Raw);
+  Count   += SmramHob->NumberOfSmmReservedRegions;
+
+  MemoryRegion = AllocatePool (Count * sizeof (MM_PLATFORM_MEMORY_REGION));
+  ASSERT (MemoryRegion != NULL);
+
+  //
+  // Cache gEfiSmmSmramMemoryGuid Descriptor
+  //
+  Index = 0;
+  while (Index < SmramHob->NumberOfSmmReservedRegions) {
+    MemoryRegion[Index].Base   = SmramHob->Descriptor[Index].PhysicalStart;
+    MemoryRegion[Index].Length = SmramHob->Descriptor[Index].PhysicalSize;
+    Index++;
+  }
+
+  //
   // Cache resource HOB
   //
-  MemoryMap = AllocatePool (Count * sizeof (EFI_MEMORY_DESCRIPTOR));
-  ASSERT (MemoryMap != NULL);
   Hob = FirstResHob;
   while (Hob.Raw != NULL) {
     if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
-      MemoryMap[Index].PhysicalStart = Hob.ResourceDescriptor->PhysicalStart;
-      MemoryMap[Index].NumberOfPages = EFI_SIZE_TO_PAGES (Hob.ResourceDescriptor->ResourceLength);
+      MemoryRegion[Index].Base   = Hob.ResourceDescriptor->PhysicalStart;
+      MemoryRegion[Index].Length = Hob.ResourceDescriptor->ResourceLength;
       Index++;
     }
 
@@ -311,29 +297,26 @@ CreateMmPlatformHob (
   ASSERT (Index == Count);
 
   //
-  // Perform QuickSort for all EFI_RESOURCE_SYSTEM_MEMORY range to calculating the MMIO
+  // Perform QuickSort for all MM_PLATFORM_MEMORY_REGION range for calculating the MMIO
   //
-  QuickSort (MemoryMap, Count, sizeof (EFI_MEMORY_DESCRIPTOR), (BASE_SORT_COMPARE)MemoryDescriptorCompare, &SortBuffer);
+  QuickSort (MemoryRegion, Count, sizeof (MM_PLATFORM_MEMORY_REGION), (BASE_SORT_COMPARE)MmMemoryDescriptorCompare, &SortBuffer);
 
   //
   // Calculate needed buffer size.
   //
-  RequiredSize = MmBuildHobForMmio (FALSE, MemoryMap, Count);
+  RequiredSize = MmBuildHobForMmio (FALSE, MemoryRegion, Count, NULL);
 
   if (*BufferSize < RequiredSize) {
     *BufferSize = RequiredSize;
-    FreePool (MemoryMap);
+    FreePool (MemoryRegion);
     return EFI_BUFFER_TOO_SMALL;
   }
-
-  ASSERT (Buffer != NULL);
-  InitializeHobListEnd (Buffer);
 
   //
   // Build resource HOB for MMIO range.
   //
-  *BufferSize = MmBuildHobForMmio (TRUE, MemoryMap, Count);
-  FreePool (MemoryMap);
+  *BufferSize = MmBuildHobForMmio (TRUE, MemoryRegion, Count, Buffer);
+  FreePool (MemoryRegion);
 
   return EFI_SUCCESS;
 }
