@@ -567,7 +567,7 @@ F: OvmfPkg/XenIoPvhDxe/
 F: OvmfPkg/XenPlatformPei/
 F: OvmfPkg/XenPvBlkDxe/
 F: OvmfPkg/XenResetVector/
-R: Anthony Perard <anthony.perard@citrix.com> [tperard]
+R: Anthony Perard <anthony@xenproject.org> [tperard]
 
 OvmfPkg: RISC-V Qemu Virt Platform
 F: OvmfPkg/RiscVVirt
