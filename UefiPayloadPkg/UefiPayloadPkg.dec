@@ -27,6 +27,9 @@
   ## Include/Guid/UniversalPayloadBase.h
   gUniversalPayloadBaseGuid = { 0x03d4c61d, 0x2713, 0x4ec5, {0xa1, 0xcc, 0x88, 0x3b, 0xe9, 0xdc, 0x18, 0xe5 } }
 
+  ## Include/Guid/UniversalPayloadSerialPortDeviceParentInfo.h
+  gUniversalPayloadSerialPortParentDeviceInfoGuid = { 0xc89c359c, 0xd316, 0x4ff8, {0xa9, 0x8f, 0x60, 0x7d, 0x2c, 0xed, 0x1f, 0xed } }
+
   ## Include/UniversalPayload/DeviceTree.h
   gUniversalPayloadDeviceTreeGuid = { 0x6784b889, 0xb13c, 0x4c3b, {0xae, 0x4b, 0xf, 0xa, 0x2e, 0x32, 0xe, 0xa3 } }
   gEdkiiDebugPrintErrorLevelGuid = { 0xad82f436, 0x75c5, 0x4aa9, { 0x92, 0x93, 0xc5, 0x55, 0x0a, 0x7f, 0xf9, 0x71 }}
@@ -98,6 +101,4 @@ gUefiPayloadPkgTokenSpaceGuid.PcdPciReservedPMemAbove4GBBase |0xFFFFFFFFFFFFFFFF
 gUefiPayloadPkgTokenSpaceGuid.PcdPciReservedPMemAbove4GBLimit|0x0000000000000000 |UINT64|0x0000002A
 
 gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace|0|UINT8|0x0000002B
-
-[PcdsDynamic, PcdsDynamicEx]
-gUefiPayloadPkgTokenSpaceGuid.PcdPchBus|0|UINT8|0x0000002C
+gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize|8|UINT8|0x0000002C
