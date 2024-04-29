@@ -13,9 +13,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/HobLib.h>
+#include <Library/FdtLib.h>
 #include "X64/VirtualMemory.h"
 #include "UefiPayloadEntry.h"
 #define STACK_SIZE  0x20000
+
+extern VOID  *mHobList;
 
 /**
    Transfers control to DxeCore.
@@ -39,6 +42,15 @@ HandOffToDxeCore (
   UINTN  PageTables;
   VOID   *GhcbBase;
   UINTN  GhcbSize;
+
+  // Initialize floating point operating environment to be compliant with UEFI spec.
+  InitializeFloatingPointUnits ();
+
+  //
+  // Mask off all legacy 8259 interrupt sources
+  //
+  IoWrite8 (LEGACY_8259_MASK_REGISTER_MASTER, 0xFF);
+  IoWrite8 (LEGACY_8259_MASK_REGISTER_SLAVE, 0xFF);
 
   //
   // Clear page 0 and mark it as allocated if NULL pointer detection is enabled.
