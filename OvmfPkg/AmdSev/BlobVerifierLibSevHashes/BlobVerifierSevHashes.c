@@ -83,6 +83,7 @@ FindBlobEntryGuid (
   @param[in] BlobName           The name of the blob
   @param[in] Buf                The data of the blob
   @param[in] BufSize            The size of the blob in bytes
+  @param[in] FetchStatus        The status of the previous blob fetch
 
   @retval EFI_SUCCESS           The blob was verified successfully or was not
                                 found in the hash table.
@@ -94,12 +95,26 @@ EFIAPI
 VerifyBlob (
   IN  CONST CHAR16  *BlobName,
   IN  CONST VOID    *Buf,
-  IN  UINT32        BufSize
+  IN  UINT32        BufSize,
+  IN  EFI_STATUS    FetchStatus
   )
 {
   CONST GUID  *Guid;
   INT32       Remaining;
   HASH_TABLE  *Entry;
+
+  // Enter a dead loop if the fetching of this blob
+  // failed. This prevents a malicious host from
+  // circumventing the following checks.
+  if (EFI_ERROR (FetchStatus)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Fetching blob failed.\n",
+      __func__
+      ));
+
+    CpuDeadLoop ();
+  }
 
   if ((mHashesTable == NULL) || (mHashesTableSize == 0)) {
     DEBUG ((
