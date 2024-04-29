@@ -1,0 +1,45 @@
+## @file
+#  The SPI Host Controller Module SMM driver INF file
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 1.27
+  BASE_NAME                 = SpiHcSmm
+  FILE_GUID                 = 0CDAE298-CB3B-480A-BDC4-A6840FFE1F5E
+  MODULE_TYPE               = DXE_SMM_DRIVER
+  VERSION_STRING            = 0.1
+  PI_SPECIFICATION_VERSION  = 0x0001000A
+  ENTRY_POINT               = SpiHcProtocolEntry
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  MmServicesTableLib
+  SpiHcPlatformLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Sources]
+  SpiHc.h
+  SpiHc.c
+  SpiHcSmm.c
+
+[Protocols]
+  gEfiSpiSmmHcProtocolGuid
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SpiHc.uni
