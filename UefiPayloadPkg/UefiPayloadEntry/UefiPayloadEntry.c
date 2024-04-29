@@ -457,6 +457,15 @@ BuildHobFromBl (
     return Status;
   }
 
+  //
+  // Import update capsules, if there are any.
+  //
+  Status = ParseCapsules (BuildCvHob);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error when importing update capsules, Status = %r\n", Status));
+    return Status;
+  }
+
   return EFI_SUCCESS;
 }
 
