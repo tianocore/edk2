@@ -287,6 +287,8 @@
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
   MdeModulePkg/Bus/Spi/SpiNorFlashJedecSfdp/SpiNorFlashJedecSfdpDxe.inf
   MdeModulePkg/Bus/Spi/SpiNorFlashJedecSfdp/SpiNorFlashJedecSfdpSmm.inf
+  MdeModulePkg/Bus/Spi/SpiBus/SpiBusDxe.inf
+  MdeModulePkg/Bus/Spi/SpiBus/SpiBusSmm.inf
 
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
