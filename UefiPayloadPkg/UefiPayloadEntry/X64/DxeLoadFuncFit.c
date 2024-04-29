@@ -1,8 +1,8 @@
 /** @file
   x64-specifc functionality for DxeLoad.
 
-Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 #include <Library/HobLib.h>
 #include <Library/FdtLib.h>
+#include <Library/PcdLib.h>
 #include "X64/VirtualMemory.h"
 #include "UefiPayloadEntry.h"
 #define STACK_SIZE  0x20000
@@ -117,4 +118,18 @@ HandOffToDxeCore (
     NULL,
     TopOfStack
     );
+}
+
+/**
+  Entry point to the C language phase of UEFI payload.
+  @param[in]   BootloaderParameter    The starting address of bootloader parameter block.
+  @retval      It will not return if SUCCESS, and return error when passing bootloader parameter.
+**/
+EFI_STATUS
+EFIAPI
+_ModuleEntryPoint (
+  IN UINTN  BootloaderParameter
+  )
+{
+  return FitUplEntryPoint (BootloaderParameter);
 }
