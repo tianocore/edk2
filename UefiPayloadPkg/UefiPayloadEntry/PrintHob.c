@@ -169,13 +169,13 @@ PrintMemoryAllocationHob (
 }
 
 /**
-  Print the information in Resource Discriptor Hob.
+  Print the information in Resource Descriptor Hob.
   @param[in]  HobStart       A pointer to HOB of type EFI_HOB_TYPE_RESOURCE_DESCRIPTOR.
   @param[in]  HobLength      The Length in bytes of HOB of type EFI_HOB_TYPE_RESOURCE_DESCRIPTOR.
   @retval EFI_SUCCESS        If it completed successfully.
 **/
 EFI_STATUS
-PrintResourceDiscriptorHob (
+PrintResourceDescriptorHob (
   IN  VOID    *HobStart,
   IN  UINT16  HobLength
   )
@@ -620,7 +620,7 @@ PrintFv3Hob (
 HOB_PRINT_HANDLER_TABLE  mHobHandles[] = {
   { EFI_HOB_TYPE_HANDOFF,             "EFI_HOB_TYPE_HANDOFF",             PrintHandOffHob            },
   { EFI_HOB_TYPE_MEMORY_ALLOCATION,   "EFI_HOB_TYPE_MEMORY_ALLOCATION",   PrintMemoryAllocationHob   },
-  { EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, "EFI_HOB_TYPE_RESOURCE_DESCRIPTOR", PrintResourceDiscriptorHob },
+  { EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, "EFI_HOB_TYPE_RESOURCE_DESCRIPTOR", PrintResourceDescriptorHob },
   { EFI_HOB_TYPE_GUID_EXTENSION,      "EFI_HOB_TYPE_GUID_EXTENSION",      PrintGuidHob               },
   { EFI_HOB_TYPE_FV,                  "EFI_HOB_TYPE_FV",                  PrintFvHob                 },
   { EFI_HOB_TYPE_CPU,                 "EFI_HOB_TYPE_CPU",                 PrintCpuHob                },
