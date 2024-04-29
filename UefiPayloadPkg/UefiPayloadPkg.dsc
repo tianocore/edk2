@@ -624,6 +624,7 @@
 
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|$(RTC_INDEX_REGISTER)
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|$(RTC_TARGET_REGISTER)
+  gUefiPayloadPkgTokenSpaceGuid.PcdPchBus|0x80
 
 ################################################################################
 #
