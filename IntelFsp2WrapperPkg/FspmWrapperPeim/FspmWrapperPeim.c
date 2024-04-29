@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -33,13 +33,18 @@
 #include <Ppi/SecPlatformInformation.h>
 #include <Ppi/Tcg.h>
 #include <Ppi/FirmwareVolumeInfoMeasurementExcluded.h>
+#include <Ppi/MigrateTempRam.h>
 #include <Library/FspWrapperApiTestLib.h>
 #include <FspEas.h>
 #include <FspStatusCode.h>
 #include <FspGlobalData.h>
 #include <Library/FspCommonLib.h>
+#include <Guid/MigratedFvInfo.h>
 
 extern EFI_GUID  gFspHobGuid;
+
+#define FSP_MIGRATED_FSPT  BIT0
+#define FSP_MIGRATED_FSPM  BIT1
 
 /**
   Get the FSP M UPD Data address
@@ -261,6 +266,30 @@ EFI_PEI_NOTIFY_DESCRIPTOR  mTcgPpiNotifyDesc = {
 };
 
 /**
+  This function is called after temporary ram migration.
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+MigrateTempRamNotify (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
+  );
+
+EFI_PEI_NOTIFY_DESCRIPTOR  mMigrateTempRamNotifyDesc = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiPeiMigrateTempRamPpiGuid,
+  MigrateTempRamNotify
+};
+
+/**
   This function is called after TCG installed PPI.
 
   @param[in] PeiServices    Pointer to PEI Services Table.
@@ -278,18 +307,41 @@ TcgPpiNotify (
   IN VOID                       *Ppi
   )
 {
-  UINT32  FspMeasureMask;
+  UINT32                  FspMeasureMask;
+  EFI_PHYSICAL_ADDRESS    FsptBaseAddress;
+  EFI_PHYSICAL_ADDRESS    FspmBaseAddress;
+  EDKII_MIGRATED_FV_INFO  *MigratedFvInfo;
+  EFI_PEI_HOB_POINTERS    Hob;
 
   DEBUG ((DEBUG_INFO, "TcgPpiNotify FSPM\n"));
 
-  FspMeasureMask = PcdGet32 (PcdFspMeasurementConfig);
+  FspMeasureMask  = PcdGet32 (PcdFspMeasurementConfig);
+  FsptBaseAddress = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFsptBaseAddress);
+  FspmBaseAddress = (EFI_PHYSICAL_ADDRESS)PcdGet32 (PcdFspmBaseAddress);
+  Hob.Raw         = GetFirstGuidHob (&gEdkiiMigratedFvInfoGuid);
+  while (Hob.Raw != NULL) {
+    MigratedFvInfo = GET_GUID_HOB_DATA (Hob);
+    if ((MigratedFvInfo->FvOrgBase == (UINT32)(UINTN)PcdGet32 (PcdFsptBaseAddress)) && (MigratedFvInfo->FvDataBase != 0)) {
+      //
+      // Found the migrated FspT raw data
+      //
+      FsptBaseAddress = MigratedFvInfo->FvDataBase;
+    }
+
+    if ((MigratedFvInfo->FvOrgBase == (UINT32)(UINTN)PcdGet32 (PcdFspmBaseAddress)) && (MigratedFvInfo->FvDataBase != 0)) {
+      FspmBaseAddress = MigratedFvInfo->FvDataBase;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextGuidHob (&gEdkiiMigratedFvInfoGuid, Hob.Raw);
+  }
 
   if ((FspMeasureMask & FSP_MEASURE_FSPT) != 0) {
     MeasureFspFirmwareBlob (
       0,
       "FSPT",
-      PcdGet32 (PcdFsptBaseAddress),
-      (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFsptBaseAddress))->FvLength
+      FsptBaseAddress,
+      (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FsptBaseAddress)->FvLength
       );
   }
 
@@ -297,9 +349,121 @@ TcgPpiNotify (
     MeasureFspFirmwareBlob (
       0,
       "FSPM",
-      PcdGet32 (PcdFspmBaseAddress),
-      (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspmBaseAddress))->FvLength
+      FspmBaseAddress,
+      (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FspmBaseAddress)->FvLength
       );
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This function is called after temporary ram migration.
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+MigrateTempRamNotify (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
+  )
+{
+  EFI_STATUS              Status;
+  EFI_PHYSICAL_ADDRESS    FspBinaryAddress;
+  UINT32                  FspMeasureMask;
+  UINT32                  FspMigratedFlag;
+  EDKII_MIGRATED_FV_INFO  *MigratedFvInfo;
+  EDKII_MIGRATED_FV_INFO  MigratedFspInfo;
+  EFI_PEI_HOB_POINTERS    Hob;
+
+  FspMeasureMask  = PcdGet32 (PcdFspMeasurementConfig);
+  FspMigratedFlag = 0;
+
+  //
+  // Search in migratedFvInfo Hob if FspT/M have been migrated.
+  //
+  Hob.Raw = GetFirstGuidHob (&gEdkiiMigratedFvInfoGuid);
+  while (Hob.Raw != NULL) {
+    MigratedFvInfo = GET_GUID_HOB_DATA (Hob);
+    if (MigratedFvInfo->FvOrgBase == (UINT32)(UINTN)PcdGet32 (PcdFsptBaseAddress)) {
+      //
+      // Found the migrated FV info
+      //
+      if ((FspMeasureMask & FSP_MEASURE_FSPT) != 0) {
+        // Raw data needs to be copied
+        ASSERT (MigratedFvInfo->FvDataBase != 0);
+      }
+
+      if (MigratedFvInfo->FvDataBase != 0) {
+        FspMigratedFlag = FspMigratedFlag | FSP_MIGRATED_FSPT;
+      }
+    }
+
+    if (MigratedFvInfo->FvOrgBase == (UINT32)(UINTN)PcdGet32 (PcdFspmBaseAddress)) {
+      if ((FspMeasureMask & FSP_MEASURE_FSPM) != 0) {
+        ASSERT (MigratedFvInfo->FvDataBase != 0);
+      }
+
+      if (MigratedFvInfo->FvDataBase != 0) {
+        FspMigratedFlag = FspMigratedFlag | FSP_MIGRATED_FSPM;
+      }
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextGuidHob (&gEdkiiMigratedFvInfoGuid, Hob.Raw);
+  }
+
+  //
+  // Allocate page to save the Fspt binary
+  //
+  if (((FspMeasureMask & FSP_MEASURE_FSPT) != 0) && ((FspMigratedFlag & FSP_MIGRATED_FSPT) == 0)) {
+    Status =  PeiServicesAllocatePages (
+                EfiBootServicesCode,
+                EFI_SIZE_TO_PAGES ((UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFsptBaseAddress))->FvLength),
+                &FspBinaryAddress
+                );
+    ASSERT_EFI_ERROR (Status);
+    CopyMem ((VOID *)(UINTN)FspBinaryAddress, (VOID *)(UINTN)PcdGet32 (PcdFsptBaseAddress), (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFsptBaseAddress))->FvLength);
+
+    //
+    // Create hob to save MigratedFvInfo, this hob will only be produced when
+    // Migration feature PCD PcdMigrateTemporaryRamFirmwareVolumes is set to TRUE.
+    //
+    MigratedFspInfo.FvOrgBase  = (UINT32)(UINTN)PcdGet32 (PcdFsptBaseAddress);
+    MigratedFspInfo.FvNewBase  = 0;
+    MigratedFspInfo.FvDataBase = (UINT32)(UINTN)FspBinaryAddress;
+    MigratedFspInfo.FvLength   = (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFsptBaseAddress))->FvLength;
+    BuildGuidDataHob (&gEdkiiMigratedFvInfoGuid, &MigratedFspInfo, sizeof (MigratedFspInfo));
+  }
+
+  //
+  // Allocate page to save the Fspm binary
+  //
+  if (((FspMeasureMask & FSP_MEASURE_FSPM) != 0) && ((FspMigratedFlag & FSP_MIGRATED_FSPM) == 0)) {
+    Status =  PeiServicesAllocatePages (
+                EfiBootServicesCode,
+                EFI_SIZE_TO_PAGES ((UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspmBaseAddress))->FvLength),
+                &FspBinaryAddress
+                );
+    ASSERT_EFI_ERROR (Status);
+    CopyMem ((VOID *)(UINTN)FspBinaryAddress, (VOID *)(UINTN)PcdGet32 (PcdFspmBaseAddress), (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspmBaseAddress))->FvLength);
+
+    //
+    // Create hob to save MigratedFvInfo, this hob will only be produced when
+    // Migration feature PCD PcdMigrateTemporaryRamFirmwareVolumes is set to TRUE.
+    //
+    MigratedFspInfo.FvOrgBase  = (UINT32)(UINTN)PcdGet32 (PcdFspmBaseAddress);
+    MigratedFspInfo.FvNewBase  = 0;
+    MigratedFspInfo.FvDataBase = (UINT32)(UINTN)FspBinaryAddress;
+    MigratedFspInfo.FvLength   = (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspmBaseAddress))->FvLength;
+    BuildGuidDataHob (&gEdkiiMigratedFvInfoGuid, &MigratedFspInfo, sizeof (MigratedFspInfo));
   }
 
   return EFI_SUCCESS;
@@ -325,6 +489,9 @@ FspmWrapperPeimEntryPoint (
   DEBUG ((DEBUG_INFO, "FspmWrapperPeimEntryPoint\n"));
 
   Status = PeiServicesNotifyPpi (&mTcgPpiNotifyDesc);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = PeiServicesNotifyPpi (&mMigrateTempRamNotifyDesc);
   ASSERT_EFI_ERROR (Status);
 
   FspmWrapperInit ();
