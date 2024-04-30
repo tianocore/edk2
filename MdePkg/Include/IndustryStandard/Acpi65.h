@@ -2419,7 +2419,7 @@ typedef struct {
 ///
 /// EINJ Version (as defined in ACPI 6.5 spec.)
 ///
-#define EFI_ACPI_6_5_ERROR_INJECTION_TABLE_REVISION  0x01
+#define EFI_ACPI_6_5_ERROR_INJECTION_TABLE_REVISION  0x02
 
 ///
 /// EINJ Error Injection Actions
@@ -2433,7 +2433,9 @@ typedef struct {
 #define EFI_ACPI_6_5_EINJ_CHECK_BUSY_STATUS               0x06
 #define EFI_ACPI_6_5_EINJ_GET_COMMAND_STATUS              0x07
 #define EFI_ACPI_6_5_EINJ_SET_ERROR_TYPE_WITH_ADDRESS     0x08
-#define EFI_ACPI_6_4_EINJ_GET_EXECUTE_OPERATION_TIMINGS   0x09
+#define EFI_ACPI_6_5_EINJ_GET_EXECUTE_OPERATION_TIMINGS   0x09
+#define EFI_ACPI_6_5_EINJ_EINJV2_SET_ERROR_TYPE           0x10
+#define EFI_ACPI_6_5_EINJ_EINJV2_GET_ERROR_TYPE           0x11
 #define EFI_ACPI_6_5_EINJ_TRIGGER_ERROR                   0xFF
 
 ///
