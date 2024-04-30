@@ -1,7 +1,7 @@
 /** @file
   CPU Register Table Library functions.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -139,7 +139,7 @@ GetProcessorInformation (
 
   Status = CpuMp2Ppi->GetProcessorInfo (
                         CpuMp2Ppi,
-                        ProcessorNumber,
+                        ProcessorNumber | CPU_V2_EXTENDED_TOPOLOGY,
                         ProcessorInfoBuffer
                         );
   return Status;
