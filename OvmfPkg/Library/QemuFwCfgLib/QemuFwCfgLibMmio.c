@@ -3,15 +3,21 @@
   Copyright (C) 2013 - 2014, Red Hat, Inc.
   Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Base.h>
 #include <Uefi.h>
+
+#include <Pi/PiBootMode.h>
+#include <Pi/PiHob.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/IoLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -26,6 +32,50 @@
 READ_BYTES_FUNCTION   *InternalQemuFwCfgReadBytes  = MmioReadBytes;
 WRITE_BYTES_FUNCTION  *InternalQemuFwCfgWriteBytes = MmioWriteBytes;
 SKIP_BYTES_FUNCTION   *InternalQemuFwCfgSkipBytes  = MmioSkipBytes;
+
+/**
+  Build firmware configure resource HOB.
+
+  @param[in]   FwCfgResource  A pointer to firmware configure resource.
+
+  @retval  VOID
+**/
+VOID
+QemuBuildFwCfgResourceHob (
+  IN QEMU_FW_CFG_RESOURCE  *FwCfgResource
+  )
+{
+  BuildGuidDataHob (
+    &gQemuFirmwareResourceHobGuid,
+    (VOID *)FwCfgResource,
+    sizeof (QEMU_FW_CFG_RESOURCE)
+    );
+}
+
+/**
+  Get firmware configure resource in HOB.
+
+  @param VOID
+
+  @retval  non-NULL   The firmware configure resource in HOB.
+           NULL       The firmware configure resource not found.
+**/
+QEMU_FW_CFG_RESOURCE *
+QemuGetFwCfgResourceHob (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE  *GuidHob;
+
+  GuidHob = NULL;
+
+  GuidHob = GetFirstGuidHob (&gQemuFirmwareResourceHobGuid);
+  if (GuidHob == NULL) {
+    return NULL;
+  }
+
+  return (QEMU_FW_CFG_RESOURCE *)GET_GUID_HOB_DATA (GuidHob);
+}
 
 /**
   Returns a boolean indicating if the firmware configuration interface
@@ -43,7 +93,7 @@ QemuFwCfgIsAvailable (
   VOID
   )
 {
-  return (BOOLEAN)(mFwCfgSelectorAddress != 0 && mFwCfgDataAddress != 0);
+  return (BOOLEAN)(QemuGetFwCfgSelectorAddress () != 0 && QemuGetFwCfgDataAddress () != 0);
 }
 
 /**
@@ -62,7 +112,7 @@ QemuFwCfgSelectItem (
   )
 {
   if (QemuFwCfgIsAvailable ()) {
-    MmioWrite16 (mFwCfgSelectorAddress, SwapBytes16 ((UINT16)QemuFwCfgItem));
+    MmioWrite16 (QemuGetFwCfgSelectorAddress (), SwapBytes16 ((UINT16)QemuFwCfgItem));
   }
 }
 
@@ -92,30 +142,30 @@ MmioReadBytes (
 
  #if defined (MDE_CPU_AARCH64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
   while (Ptr < End) {
-    *(UINT64 *)Ptr = MmioRead64 (mFwCfgDataAddress);
+    *(UINT64 *)Ptr = MmioRead64 (QemuGetFwCfgDataAddress ());
     Ptr           += 8;
   }
 
   if (Left & 4) {
-    *(UINT32 *)Ptr = MmioRead32 (mFwCfgDataAddress);
+    *(UINT32 *)Ptr = MmioRead32 (QemuGetFwCfgDataAddress ());
     Ptr           += 4;
   }
 
  #else
   while (Ptr < End) {
-    *(UINT32 *)Ptr = MmioRead32 (mFwCfgDataAddress);
+    *(UINT32 *)Ptr = MmioRead32 (QemuGetFwCfgDataAddress ());
     Ptr           += 4;
   }
 
  #endif
 
   if (Left & 2) {
-    *(UINT16 *)Ptr = MmioRead16 (mFwCfgDataAddress);
+    *(UINT16 *)Ptr = MmioRead16 (QemuGetFwCfgDataAddress ());
     Ptr           += 2;
   }
 
   if (Left & 1) {
-    *Ptr = MmioRead8 (mFwCfgDataAddress);
+    *Ptr = MmioRead8 (QemuGetFwCfgDataAddress ());
   }
 }
 
@@ -168,9 +218,9 @@ DmaTransferBytes (
   // This will fire off the transfer.
   //
  #if defined (MDE_CPU_AARCH64) || defined (MDE_CPU_RISCV64) || defined (MDE_CPU_LOONGARCH64)
-  MmioWrite64 (mFwCfgDmaAddress, SwapBytes64 ((UINT64)&Access));
+  MmioWrite64 (QemuGetFwCfgDmaAddress (), SwapBytes64 ((UINT64)&Access));
  #else
-  MmioWrite32 ((UINT32)(mFwCfgDmaAddress + 4), SwapBytes32 ((UINT32)&Access));
+  MmioWrite32 ((UINT32)(QemuGetFwCfgDmaAddress () + 4), SwapBytes32 ((UINT32)&Access));
  #endif
 
   //
@@ -239,7 +289,7 @@ MmioWriteBytes (
   UINTN  Idx;
 
   for (Idx = 0; Idx < Size; ++Idx) {
-    MmioWrite8 (mFwCfgDataAddress, ((UINT8 *)Buffer)[Idx]);
+    MmioWrite8 (QemuGetFwCfgDataAddress (), ((UINT8 *)Buffer)[Idx]);
   }
 }
 

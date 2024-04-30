@@ -12,9 +12,11 @@
 #ifndef QEMU_FW_CFG_LIB_MMIO_INTERNAL_H_
 #define QEMU_FW_CFG_LIB_MMIO_INTERNAL_H_
 
-extern UINTN  mFwCfgSelectorAddress;
-extern UINTN  mFwCfgDataAddress;
-extern UINTN  mFwCfgDmaAddress;
+typedef struct {
+  UINTN    FwCfgSelectorAddress;
+  UINTN    FwCfgDataAddress;
+  UINTN    FwCfgDmaAddress;
+} QEMU_FW_CFG_RESOURCE;
 
 /**
   Reads firmware configuration bytes into a buffer
@@ -88,6 +90,69 @@ VOID (EFIAPI *InternalQemuFwCfgWriteBytes)(
 extern
 VOID (EFIAPI *InternalQemuFwCfgSkipBytes)(
   IN UINTN  Size
+  );
+
+/**
+  Build firmware configure resource HOB.
+
+  @param[in]   FwCfgResource  A pointer to firmware configure resource.
+
+  @retval  NULL
+**/
+VOID
+QemuBuildFwCfgResourceHob (
+  IN QEMU_FW_CFG_RESOURCE  *FwCfgResource
+  );
+
+/**
+  Get firmware configure resource HOB.
+
+  @param VOID
+
+  @retval  FwCfgResource    The firmware configure resouce in HOB.
+**/
+QEMU_FW_CFG_RESOURCE *
+QemuGetFwCfgResourceHob (
+  VOID
+  );
+
+/**
+  To get firmware configure selector address.
+
+  @param VOID
+
+  @retval  firmware configure selector address
+**/
+UINTN
+EFIAPI
+QemuGetFwCfgSelectorAddress (
+  VOID
+  );
+
+/**
+  To get firmware configure Data address.
+
+  @param VOID
+
+  @retval  firmware configure data address
+**/
+UINTN
+EFIAPI
+QemuGetFwCfgDataAddress (
+  VOID
+  );
+
+/**
+  To get firmware DMA address.
+
+  @param VOID
+
+  @retval  firmware DMA address
+**/
+UINTN
+EFIAPI
+QemuGetFwCfgDmaAddress (
+  VOID
   );
 
 /**
