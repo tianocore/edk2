@@ -45,11 +45,21 @@ typedef struct {
 #define EFI_CONFORMANCE_PROFILES_TABLE_VERSION  0x1
 
 //
-// GUID defined in spec.
+// GUID defined in UEFI 2.10
 //
 #define EFI_CONFORMANCE_PROFILES_UEFI_SPEC_GUID \
     { 0x523c91af, 0xa195, 0x4382, \
     { 0x81, 0x8d, 0x29, 0x5f, 0xe4, 0x00, 0x64, 0x65 }}
+
+//
+// GUID defined in EBBR
+//
+#define EFI_CONFORMANCE_PROFILE_EBBR_2_1_GUID \
+    { 0xcce33c35, 0x74ac, 0x4087, \
+    { 0xbc, 0xe7, 0x8b, 0x29, 0xb0, 0x2e, 0xeb, 0x27 }}
+#define EFI_CONFORMANCE_PROFILE_EBBR_2_2_GUID \
+    { 0x9073eed4, 0xe50d, 0x11ee, \
+    { 0xb8, 0xb0, 0x8b, 0x68, 0xda, 0x62, 0xfc, 0x80 }}
 
 extern EFI_GUID  gEfiConfProfilesTableGuid;
 extern EFI_GUID  gEfiConfProfilesUefiSpecGuid;
