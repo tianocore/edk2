@@ -33,6 +33,7 @@
   Parsers/Bgrt/BgrtParser.c
   Parsers/Dbg2/Dbg2Parser.c
   Parsers/Dsdt/DsdtParser.c
+  Parsers/Einj/EinjParser.c
   Parsers/Erst/ErstParser.c
   Parsers/Facs/FacsParser.c
   Parsers/Fadt/FadtParser.c
