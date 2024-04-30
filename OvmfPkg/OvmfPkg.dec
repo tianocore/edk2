@@ -278,6 +278,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase|0|UINT32|0x44
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize|0|UINT32|0x45
 
+  ## Specify the extra page table needed to mark the APIC MMIO range as unencrypted.
+  #  The value should be a multiple of 4KB for each.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|0x0|UINT32|0x72
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize|0x0|UINT32|0x73
+
   ## The base address and size of the SEV Launch Secret Area provisioned
   #  after remote attestation.  If this is set in the .fdf, the platform
   #  is responsible for protecting the area from DXE phase overwrites.

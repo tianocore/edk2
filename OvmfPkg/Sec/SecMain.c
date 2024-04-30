@@ -938,6 +938,7 @@ SecCoreStartupWithStack (
   // interrupts before initializing the Debug Agent and the debug timer is
   // enabled.
   //
+  SecMapApicBaseUnencrypted ();
   InitializeApicTimer (0, MAX_UINT32, TRUE, 5);
   DisableApicTimerInterrupt ();
 
