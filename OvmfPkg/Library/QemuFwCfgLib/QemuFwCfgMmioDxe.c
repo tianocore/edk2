@@ -5,6 +5,7 @@
   Copyright (C) 2013 - 2014, Red Hat, Inc.
   Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2021 Hewlett Packard Enterprise Development LP<BR>
+  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -20,9 +21,57 @@
 
 #include "QemuFwCfgLibMmioInternal.h"
 
-UINTN  mFwCfgSelectorAddress;
-UINTN  mFwCfgDataAddress;
-UINTN  mFwCfgDmaAddress;
+STATIC UINTN  mFwCfgSelectorAddress;
+STATIC UINTN  mFwCfgDataAddress;
+STATIC UINTN  mFwCfgDmaAddress;
+
+/**
+  To get firmware configure selector address.
+
+  @param VOID
+
+  @retval  firmware configure selector address
+**/
+UINTN
+EFIAPI
+QemuGetFwCfgSelectorAddress (
+  VOID
+  )
+{
+  return mFwCfgSelectorAddress;
+}
+
+/**
+  To get firmware configure Data address.
+
+  @param VOID
+
+  @retval  firmware configure data address
+**/
+UINTN
+EFIAPI
+QemuGetFwCfgDataAddress (
+  VOID
+  )
+{
+  return mFwCfgDataAddress;
+}
+
+/**
+  To get firmware DMA address.
+
+  @param VOID
+
+  @retval  firmware DMA address
+**/
+UINTN
+EFIAPI
+QemuGetFwCfgDmaAddress (
+  VOID
+  )
+{
+  return mFwCfgDmaAddress;
+}
 
 RETURN_STATUS
 EFIAPI
@@ -30,17 +79,37 @@ QemuFwCfgInitialize (
   VOID
   )
 {
-  EFI_STATUS           Status;
-  FDT_CLIENT_PROTOCOL  *FdtClient;
-  CONST UINT64         *Reg;
-  UINT32               RegSize;
-  UINTN                AddressCells, SizeCells;
-  UINT64               FwCfgSelectorAddress;
-  UINT64               FwCfgSelectorSize;
-  UINT64               FwCfgDataAddress;
-  UINT64               FwCfgDataSize;
-  UINT64               FwCfgDmaAddress;
-  UINT64               FwCfgDmaSize;
+  EFI_STATUS            Status;
+  FDT_CLIENT_PROTOCOL   *FdtClient;
+  CONST UINT64          *Reg;
+  UINT32                RegSize;
+  UINTN                 AddressCells, SizeCells;
+  UINT64                FwCfgSelectorAddress;
+  UINT64                FwCfgSelectorSize;
+  UINT64                FwCfgDataAddress;
+  UINT64                FwCfgDataSize;
+  UINT64                FwCfgDmaAddress;
+  UINT64                FwCfgDmaSize;
+  QEMU_FW_CFG_RESOURCE  *FwCfgResource;
+
+  //
+  // Check whether the Qemu firmware configure resources HOB has been created,
+  // if so use the resources in the HOB.
+  //
+  FwCfgResource = QemuGetFwCfgResourceHob ();
+  if (FwCfgResource != NULL) {
+    mFwCfgSelectorAddress = FwCfgResource->FwCfgSelectorAddress;
+    mFwCfgDataAddress     = FwCfgResource->FwCfgDataAddress;
+    mFwCfgDmaAddress      = FwCfgResource->FwCfgDmaAddress;
+
+    if (mFwCfgDmaAddress != 0) {
+      InternalQemuFwCfgReadBytes  = DmaReadBytes;
+      InternalQemuFwCfgWriteBytes = DmaWriteBytes;
+      InternalQemuFwCfgSkipBytes  = DmaSkipBytes;
+    }
+
+    return RETURN_SUCCESS;
+  }
 
   Status = gBS->LocateProtocol (
                   &gFdtClientProtocolGuid,
