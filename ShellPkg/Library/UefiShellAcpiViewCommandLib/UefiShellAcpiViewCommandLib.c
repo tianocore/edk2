@@ -54,6 +54,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,                                                           ParseAcpiDbg2 },
   { EFI_ACPI_6_2_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
     ParseAcpiDsdt },
+  { EFI_ACPI_6_5_ERROR_INJECTION_TABLE_SIGNATURE,                                                        ParseAcpiEinj },
   { EFI_ACPI_6_4_ERROR_RECORD_SERIALIZATION_TABLE_SIGNATURE,                                             ParseAcpiErst },
   { EFI_ACPI_6_3_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE,                                              ParseAcpiFacs },
   { EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,                                                 ParseAcpiFadt },
