@@ -617,6 +617,27 @@ ParseAcpiDsdt (
   );
 
 /**
+  This function parses the EINJ table.
+  When trace is enabled this function parses the EINJ table and
+  traces the ACPI table fields.
+
+  This function also performs validation of the ACPI table fields.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiEinj (
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
+  );
+
+/**
   This function parses the ACPI ERST table.
   When trace is enabled this function parses the ERST table and
   traces the ACPI table fields.
