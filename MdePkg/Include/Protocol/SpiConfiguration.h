@@ -173,8 +173,8 @@ typedef struct _EFI_SPI_BUS {
 /// Definitions of SPI Part Attributes.
 ///
 #define SPI_PART_SUPPORTS_2_BIT_DATA_BUS_WIDTH  BIT0
-#define SPI_PART_SUPPORTS_4_B1T_DATA_BUS_WIDTH  BIT1
-#define SPI_PART_SUPPORTS_8_B1T_DATA_BUS_WIDTH  BIT2
+#define SPI_PART_SUPPORTS_4_BIT_DATA_BUS_WIDTH  BIT1
+#define SPI_PART_SUPPORTS_8_BIT_DATA_BUS_WIDTH  BIT2
 
 ///
 /// The EFI_SPI_PERIPHERAL data structure describes how a specific block of
