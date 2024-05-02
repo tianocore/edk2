@@ -1980,6 +1980,7 @@ typedef struct {
 #define EFI_ACPI_6_1_EINJ_CHECK_BUSY_STATUS               0x06
 #define EFI_ACPI_6_1_EINJ_GET_COMMAND_STATUS              0x07
 #define EFI_ACPI_6_1_EINJ_SET_ERROR_TYPE_WITH_ADDRESS     0x08
+#define EFI_ACPI_6_1_EINJ_GET_EXECUTE_OPERATION_TIMINGS   0x09
 #define EFI_ACPI_6_1_EINJ_TRIGGER_ERROR                   0xFF
 
 ///
