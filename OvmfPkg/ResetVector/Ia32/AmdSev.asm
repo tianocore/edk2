@@ -162,11 +162,14 @@ SevClearPageEncMaskForGhcbPage:
     ;
     ; The initial GHCB will live at GHCB_BASE and needs to be un-encrypted.
     ; This requires the 2MB page for this range be broken down into 512 4KB
-    ; pages.  All will be marked encrypted, except for the GHCB.
+    ; pages.  All will be marked encrypted, except for the GHCB. Since the
+    ; original PMD entry is no longer a leaf entry, remove the encryption
+    ; bit when pointing to the PTE page.
     ;
     mov     ecx, (GHCB_BASE >> 21)
     mov     eax, GHCB_PT_ADDR + PAGE_PDP_ATTR
     mov     [ecx * 8 + PT_ADDR (0x2000)], eax
+    mov     [ecx * 8 + PT_ADDR (0x2000) + 4], strict dword 0
 
     ;
     ; Page Table Entries (512 * 4KB entries => 2MB)
