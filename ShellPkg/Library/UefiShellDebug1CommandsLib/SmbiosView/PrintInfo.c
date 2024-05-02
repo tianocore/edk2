@@ -903,6 +903,13 @@ SmbiosPrintStructure (
         ShellPrintEx (-1, -1, L"Extended Configured Memory Speed: 0x%x\n", Struct->Type17->ExtendedConfiguredMemorySpeed);
       }
 
+      if (AE_SMBIOS_VERSION (0x3, 0x7) && (Struct->Hdr->Length > 0x5C)) {
+        ShellPrintEx (-1, -1, L"PMIC0 Manufacturer ID: 0x%x\n", Struct->Type17->Pmic0ManufacturerID);
+        ShellPrintEx (-1, -1, L"PMIC0 Revision Number: 0x%x\n", Struct->Type17->Pmic0RevisionNumber);
+        ShellPrintEx (-1, -1, L"RCD Manufacturer ID: 0x%x\n", Struct->Type17->RcdManufacturerID);
+        ShellPrintEx (-1, -1, L"RCD Revision Number: 0x%x\n", Struct->Type17->RcdRevisionNumber);
+      }
+
       break;
 
     //
