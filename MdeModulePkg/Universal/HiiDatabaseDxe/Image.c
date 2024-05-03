@@ -1317,7 +1317,9 @@ HiiDrawImage (
         OffsetY1 = ImageIn->Width * Ypos;
         OffsetY2 = Width * Ypos;
         for (Xpos = 0; Xpos < Width; Xpos++) {
-          BltBuffer[OffsetY2 + Xpos] = ImageIn->Bitmap[OffsetY1 + Xpos];
+            // (DKRAUS): https://github.com/tianocore/edk2/pull/4917/commits/73978992d8ea87bed822439a8993894d5604e9c9
+            // BltBuffer[OffsetY2 + Xpos] = ImageIn->Bitmap[OffsetY1 + Xpos];
+            CopyMem (BltBuffer + OffsetY2 + Xpos, Image->Bitmap + OffsetY1 + Xpos, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
         }
       }
     }
@@ -1398,7 +1400,7 @@ HiiDrawImage (
     }
     ASSERT (FontInfo != NULL);
     for (Index = 0; Index < Width * Height; Index++) {
-      BltBuffer[Index] = FontInfo->BackgroundColor;
+          BltBuffer[Index] = FontInfo->BackgroundColor;
     }
     FreePool (FontInfo);
 

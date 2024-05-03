@@ -180,7 +180,7 @@ ParseFfs (
   VOID                          *SectionBuffer;
   UINTN                         VfrBinIndex;
   UINT8                         NumberofMatchingVfrBin;
-  UINTN                         *VfrBinBaseAddress;
+  UINTN                         *VfrBinBaseAddress = 0;
 
   Status = Fv2->ReadFile (
                   Fv2,

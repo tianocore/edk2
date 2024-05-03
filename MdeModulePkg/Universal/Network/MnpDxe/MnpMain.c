@@ -520,7 +520,7 @@ MnpTransmit (
   EFI_STATUS        Status;
   MNP_INSTANCE_DATA *Instance;
   MNP_SERVICE_DATA  *MnpServiceData;
-  UINT8             *PktBuf;
+  UINT8             *PktBuf = 0;
   UINT32            PktLen;
   EFI_TPL           OldTpl;
 
