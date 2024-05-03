@@ -1419,7 +1419,7 @@ HiiValueToRedfishValue (
       RedfishValue->Value.Buffer = HiiGetRedfishAsciiString (HiiHandle, FullSchema, HiiStatement->ExtraData.TextTwo);
       if (RedfishValue->Value.Buffer == NULL) {
         //
-        // No x-uefi-redfish string defined. Try to get string in English.
+        // No x-UEFI-redfish string defined. Try to get string in English.
         //
         RedfishValue->Value.Buffer = HiiGetEnglishAsciiString (HiiHandle, HiiStatement->ExtraData.TextTwo);
       }
@@ -2112,7 +2112,7 @@ RELEASE_RESOURCE:
 
   @param[in]   This                Pointer to EDKII_REDFISH_PLATFORM_CONFIG_PROTOCOL instance.
   @param[out]  SupportedSchema     The supported schema list which is separated by ';'.
-                                   For example: "x-uefi-redfish-Memory.v1_7_1;x-uefi-redfish-Boot.v1_0_1"
+                                   For example: "x-UEFI-redfish-Memory.v1_7_1;x-UEFI-redfish-Boot.v1_0_1"
                                    The SupportedSchema is allocated by the callee. It's caller's
                                    responsibility to free this buffer using FreePool().
 

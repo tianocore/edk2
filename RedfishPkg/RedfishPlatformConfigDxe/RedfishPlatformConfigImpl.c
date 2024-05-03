@@ -657,7 +657,7 @@ GetStatementPrivateByConfigureLangRegex (
             }
           } else {
             if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
-              DEBUG ((DEBUG_ERROR, "%a: HiiStatementPrivate->XuefiRedfishStr is NULL, x-uefi-string has something wrong.\n", __func__));
+              DEBUG ((DEBUG_ERROR, "%a: HiiStatementPrivate->XuefiRedfishStr is NULL, x-UEFI-string has something wrong.\n", __func__));
               ASSERT (FALSE);
             }
           }
@@ -758,7 +758,7 @@ GetStatementPrivateByConfigureLang (
             }
           } else {
             if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
-              DEBUG ((DEBUG_ERROR, "%a: HiiStatementPrivate->XuefiRedfishStr is NULL, x-uefi-string has something wrong.\n", __func__));
+              DEBUG ((DEBUG_ERROR, "%a: HiiStatementPrivate->XuefiRedfishStr is NULL, x-UEFI-string has something wrong.\n", __func__));
               ASSERT (FALSE);
             }
           }
@@ -819,7 +819,7 @@ GetFormsetPrivateByHiiHandle (
 }
 
 /**
-  Release x-uefi-string related information.
+  Release x-UEFI-string related information.
 
   @param[in]      FormsetPrivate Pointer to HII form-set private instance.
 
@@ -842,7 +842,7 @@ ReleaseXuefiStringDatabase (
     FreePool (FormsetPrivate->HiiPackageListHeader);
   }
 
-  // Walk through x-uefi-redfish string database.
+  // Walk through x-UEFI-redfish string database.
   if (!IsListEmpty (&FormsetPrivate->XuefiRedfishStringDatabase)) {
     EndDatabase  = FALSE;
     ThisDatabase = (REDFISH_X_UEFI_STRING_DATABASE *)GetFirstNode (&FormsetPrivate->XuefiRedfishStringDatabase);
@@ -989,9 +989,9 @@ NewFormsetPrivate (
 }
 
 /**
-  Create new x-uefi-redfish string array.
+  Create new x-UEFI-redfish string array.
 
-  @param[in]      XuefiRedfishStringDatabase  The x-uefi-redfish string database.
+  @param[in]      XuefiRedfishStringDatabase  The x-UEFI-redfish string database.
 
   @retval         EFI_OUT_OF_RESOURCES  Not enough memory for creating a new array.
                   EFI_SUCCESS           New array is created successfully.
@@ -1028,13 +1028,13 @@ NewRedfishXuefiStringArray (
 }
 
 /**
-  Get the pointer of x-uefi-redfish database or create a new database.
+  Get the pointer of x-UEFI-redfish database or create a new database.
 
   @param[in]      FormsetPrivate          Pointer to HII form-set private instance.
   @param[in]      HiiStringPackageHeader  HII string package header.
 
   @retval         Pointer to REDFISH_X_UEFI_STRING_DATABASE.
-                  If NULL, it fails to obtain x-uefi-redfish database.
+                  If NULL, it fails to obtain x-UEFI-redfish database.
 
 **/
 REDFISH_X_UEFI_STRING_DATABASE *
@@ -1068,7 +1068,7 @@ GetExistOrCreateXuefiStringDatabase (
   }
 
   if (CreateNewOne) {
-    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  Creating x-uefi-redfish (%a) string database...\n", HiiStringPackageHeader->Language));
+    DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  Creating x-UEFI-redfish (%a) string database...\n", HiiStringPackageHeader->Language));
     XuefiRedfishStringDatabase = (REDFISH_X_UEFI_STRING_DATABASE *)AllocateZeroPool (sizeof (REDFISH_X_UEFI_STRING_DATABASE));
     if (XuefiRedfishStringDatabase == NULL) {
       DEBUG ((DEBUG_ERROR, "  Failed to allocate REDFISH_X_UEFI_STRING_DATABASE.\n"));
@@ -1088,7 +1088,7 @@ GetExistOrCreateXuefiStringDatabase (
 
     DEBUG ((
       DEBUG_REDFISH_PLATFORM_CONFIG,
-      "  x-uefi-redfish (%a):\n    String array is added to XuefiRedfishStringDatabase, total %d arrays now.\n",
+      "  x-UEFI-redfish (%a):\n    String array is added to XuefiRedfishStringDatabase, total %d arrays now.\n",
       XuefiRedfishStringDatabase->XuefiRedfishLanguage,
       XuefiRedfishStringDatabase->StringsArrayBlocks
       ));
@@ -1101,14 +1101,14 @@ GetExistOrCreateXuefiStringDatabase (
 }
 
 /**
-  Check and allocate a new x-uefi-redfish array if it is insufficient for the
-  newly added x-uefi-redfish string.
+  Check and allocate a new x-UEFI-redfish array if it is insufficient for the
+  newly added x-UEFI-redfish string.
 
   @param[in]      FormsetPrivate              Pointer to HII form-set private instance.
-  @param[in]      XuefiRedfishStringDatabase  Pointer to the x-uefi-redfish database.
+  @param[in]      XuefiRedfishStringDatabase  Pointer to the x-UEFI-redfish database.
   @param[in]      StringId                    String ID added to database.
 
-  @retval         EFI_SUCCESS                 The size of x-uefi-string array is adjusted or
+  @retval         EFI_SUCCESS                 The size of x-UEFI-string array is adjusted or
                                               is not required to be adjusted.
                   Otherwise, refer to the error code returned from NewRedfishXuefiStringArray().
 
@@ -1125,7 +1125,7 @@ RedfishXuefiStringAdjustArrays (
   while (((StringId + X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER) / X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER) > (UINT16)XuefiRedfishStringDatabase->StringsArrayBlocks) {
     Status = NewRedfishXuefiStringArray (XuefiRedfishStringDatabase);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Failed to adjust x-uefi-string array", __func__));
+      DEBUG ((DEBUG_ERROR, "%a: Failed to adjust x-UEFI-string array", __func__));
       return Status;
     }
   }
@@ -1134,7 +1134,7 @@ RedfishXuefiStringAdjustArrays (
 }
 
 /**
-  Insert a x-uefi-redfish string to database.
+  Insert a x-UEFI-redfish string to database.
 
   @param[in]      FormsetPrivate          Pointer to HII form-set private instance.
   @param[in]      HiiStringPackageHeader  Pointer to HII string package.
@@ -1161,19 +1161,19 @@ RedfishXuefiStringInsertDatabase (
 
   XuefiRedfishStringDatabase = GetExistOrCreateXuefiStringDatabase (FormsetPrivate, HiiStringPackageHeader);
   if (XuefiRedfishStringDatabase == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to get REDFISH_X_UEFI_STRING_DATABASE of x-uefi-redfish language %a.\n", __func__, HiiStringPackageHeader->Language));
+    DEBUG ((DEBUG_ERROR, "%a: Failed to get REDFISH_X_UEFI_STRING_DATABASE of x-UEFI-redfish language %a.\n", __func__, HiiStringPackageHeader->Language));
     ReleaseXuefiStringDatabase (FormsetPrivate);
     return EFI_LOAD_ERROR;
   }
 
   Status = RedfishXuefiStringAdjustArrays (FormsetPrivate, XuefiRedfishStringDatabase, StringId);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Failed to adjust x-uefi-redfish string array.\n", __func__));
+    DEBUG ((DEBUG_ERROR, "%a: Failed to adjust x-UEFI-redfish string array.\n", __func__));
     ReleaseXuefiStringDatabase (FormsetPrivate);
     return EFI_LOAD_ERROR;
   }
 
-  // Insert string to x-uefi-redfish string array.
+  // Insert string to x-UEFI-redfish string array.
   StringIdOffset = (UINTN)StringId;
   ThisArray      = (REDFISH_X_UEFI_STRINGS_ARRAY *)GetFirstNode (&XuefiRedfishStringDatabase->XuefiRedfishStringArrays);
   while (StringIdOffset >= X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER) {
@@ -1187,7 +1187,7 @@ RedfishXuefiStringInsertDatabase (
 
   DEBUG_REDFISH_THIS_MODULE (
     REDFISH_PLATFORM_CONFIG_DEBUG_STRING_DATABASE,
-    "  Insert string ID: (%d) to database\n    x-uefi-string: \"%s\"\n    Language: %a.\n",
+    "  Insert string ID: (%d) to database\n    x-UEFI-string: \"%s\"\n    Language: %a.\n",
     StringId,
     StringTextPtr,
     HiiStringPackageHeader->Language
@@ -1196,14 +1196,14 @@ RedfishXuefiStringInsertDatabase (
 }
 
 /**
-  Get x-uefi-redfish string and language by string ID.
+  Get x-UEFI-redfish string and language by string ID.
 
   @param[in]       FormsetPrivate          Pointer to HII form-set private instance.
   @param[in]       HiiStringPackageHeader  HII string package header.
   @param[out]      TotalStringAdded        Return the total strings added to database.
 
-  @retval  TRUE   x-uefi-redfish string and ID map is inserted to database.
-           FALSE  Something is wrong when insert x-uefi-redfish string and ID map.
+  @retval  TRUE   x-UEFI-redfish string and ID map is inserted to database.
+           FALSE  Something is wrong when insert x-UEFI-redfish string and ID map.
 
 **/
 BOOLEAN
@@ -1288,7 +1288,7 @@ CreateXuefiLanguageStringIdMap (
         Offset        = sizeof (EFI_HII_STRING_BLOCK);
         StringTextPtr = BlockHdr + Offset;
 
-        // x-uefi-redfish string is always encoded as UCS and started with '/'.
+        // x-UEFI-redfish string is always encoded as UCS and started with '/'.
         if (*StringTextPtr == (UINT16)'/') {
           Status = RedfishXuefiStringInsertDatabase (
                      FormsetPrivate,
@@ -1297,7 +1297,7 @@ CreateXuefiLanguageStringIdMap (
                      (CHAR16 *)StringTextPtr
                      );
           if (EFI_ERROR (Status)) {
-            DEBUG ((DEBUG_ERROR, "%a: Failed to insert x-uefi-redfish string %s.\n", __func__, StringTextPtr));
+            DEBUG ((DEBUG_ERROR, "%a: Failed to insert x-UEFI-redfish string %s.\n", __func__, StringTextPtr));
             return FALSE;
           }
 
@@ -1398,13 +1398,13 @@ CreateXuefiLanguageStringIdMap (
 }
 
 /**
-  Get x-uefi-redfish string and language by string ID.
+  Get x-UEFI-redfish string and language by string ID.
 
   @param[in]      FormsetPrivate       Pointer to HII form-set private instance.
   @param[in]      StringId             The HII string ID.
   @param[out]     String               Optionally return USC string.
-  @param[out]     Language             Optionally return x-uefi-redfish language.
-  @param[out]     XuefiStringDatabase  Optionally return x-uefi-redfish database.
+  @param[out]     Language             Optionally return x-UEFI-redfish language.
+  @param[out]     XuefiStringDatabase  Optionally return x-UEFI-redfish database.
 
   @retval  EFI_SUCCESS            String information is returned.
            EFI_INVALID_PARAMETER  One of the given parameters to this function is
@@ -1456,7 +1456,7 @@ GetXuefiStringAndLangByStringId (
     //
     // NOTE: The string ID in the formset is a unique number.
     //       If the string in the array is NULL, then the matched string ID
-    //       should be in another x-uefi-redfish database.
+    //       should be in another x-UEFI-redfish database.
     //
     if ((StringArray->ArrayEntryAddress + StringIndex)->UcsString != NULL) {
       //
@@ -1489,7 +1489,7 @@ ErrorExit:;
 }
 
 /**
-  Build a x-uefi-redfish database for the newly added x-uefi-redfish language.
+  Build a x-UEFI-redfish database for the newly added x-UEFI-redfish language.
 
   @param[in]      FormsetPrivate          Pointer to HII form-set private instance.
 
@@ -1510,7 +1510,7 @@ BuildXUefiRedfishStringDatabase (
   UINTN                       TotalStringsAdded;
   UINTN                       NumberPackageStrings;
 
-  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Building x-uefi-redfish string database, HII Formset GUID - %g.\n", __func__, FormsetPrivate->Guid));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: Building x-UEFI-redfish string database, HII Formset GUID - %g.\n", __func__, FormsetPrivate->Guid));
 
   BufferSize = 0;
   Status     = mRedfishPlatformConfigPrivate->HiiDatabase->ExportPackageLists (
@@ -1555,7 +1555,7 @@ BuildXUefiRedfishStringDatabase (
         StringIdMapIsBuilt     = FALSE;
         HiiStringPackageHeader = (EFI_HII_STRING_PACKAGE_HDR *)PackageHeader;
 
-        // Check if this is the string package for x-uefi-redfish
+        // Check if this is the string package for x-UEFI-redfish
         for (SupportedSchemaLangCount = 0;
              SupportedSchemaLangCount < FormsetPrivate->SupportedSchema.Count;
              SupportedSchemaLangCount++
@@ -1578,9 +1578,9 @@ BuildXUefiRedfishStringDatabase (
 
         if (StringIdMapIsBuilt == FALSE) {
           if (AsciiStrStr (HiiStringPackageHeader->Language, X_UEFI_SCHEMA_PREFIX) == NULL) {
-            DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  No need to build x-uefi-redfish string ID map for HII language %a\n", HiiStringPackageHeader->Language));
+            DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  No need to build x-UEFI-redfish string ID map for HII language %a\n", HiiStringPackageHeader->Language));
           } else {
-            DEBUG ((DEBUG_ERROR, "  Failed to build x-uefi-redfish string ID map of HII language %a\n", HiiStringPackageHeader->Language));
+            DEBUG ((DEBUG_ERROR, "  Failed to build x-UEFI-redfish string ID map of HII language %a\n", HiiStringPackageHeader->Language));
           }
         }
 
@@ -1589,7 +1589,7 @@ BuildXUefiRedfishStringDatabase (
     }
   }
 
-  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  Total %d x-uefi-redfish config language are added.\n", TotalStringsAdded));
+  DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "  Total %d x-UEFI-redfish config language are added.\n", TotalStringsAdded));
 }
 
 /**
@@ -1599,7 +1599,7 @@ BuildXUefiRedfishStringDatabase (
   @param[out] FormsetPrivate  The formset private data.
 
   @retval EFI_STATUS          The formset is loaded successfully.
-  @retval EFI_UNSUPPORTED     This formset doesn't have any x-uefi-redfish configuration.
+  @retval EFI_UNSUPPORTED     This formset doesn't have any x-UEFI-redfish configuration.
 
 **/
 EFI_STATUS
@@ -1656,15 +1656,15 @@ LoadFormset (
   Status                        = GetSupportedSchema (FormsetPrivate->HiiHandle, &FormsetPrivate->SupportedSchema);
   if (EFI_ERROR (Status)) {
     if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
-      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: No x-uefi-redfish configuration found on the formset - %g\n", __func__, FormsetPrivate->Guid));
+      DEBUG ((DEBUG_REDFISH_PLATFORM_CONFIG, "%a: No x-UEFI-redfish configuration found on the formset - %g\n", __func__, FormsetPrivate->Guid));
       //
-      // If there is no x-uefi-redfish language in this form-set, we don't add formset
+      // If there is no x-UEFI-redfish language in this form-set, we don't add formset
       // since we don't need to build menu path for attribute registry.
       //
       return EFI_UNSUPPORTED;
     }
   } else {
-    // Building x-uefi-redfish string database
+    // Building x-UEFI-redfish string database
     BuildXUefiRedfishStringDatabase (FormsetPrivate);
   }
 
@@ -1739,7 +1739,7 @@ LoadFormset (
         }
       }
 
-      // Get x-uefi-redfish string using String ID.
+      // Get x-UEFI-redfish string using String ID.
       Status = GetXuefiStringAndLangByStringId (FormsetPrivate, HiiStatementPrivate->Description, &String, NULL, NULL);
       if (!EFI_ERROR (Status)) {
         HiiStatementPrivate->XuefiRedfishStr = String;
@@ -1750,13 +1750,13 @@ LoadFormset (
       } else {
         if (!RedfishPlatformConfigFeatureProp (REDFISH_PLATFORM_CONFIG_BUILD_MENU_PATH)) {
           //
-          // If there is no x-uefi-redfish language for this statement, we don't add this statement
+          // If there is no x-UEFI-redfish language for this statement, we don't add this statement
           // since we don't need to build menu path for attribute registry.
           //
           FreePool (HiiStatementPrivate);
         } else {
           //
-          // This is not x-uefi-redfish string and we don't cache its string for searching Redfish configure language.
+          // This is not x-UEFI-redfish string and we don't cache its string for searching Redfish configure language.
           // When caller wants the string, we will read English string by calling HiiGetString().
           //
           HiiStatementPrivate->XuefiRedfishStr = NULL;
@@ -2111,7 +2111,7 @@ ProcessPendingList (
       Status = LoadFormsetList (Target->HiiHandle, FormsetList);
       if (EFI_ERROR (Status)) {
         if (Status == EFI_UNSUPPORTED) {
-          DEBUG ((DEBUG_ERROR, "  The formset has no x-uefi-redfish configurations.\n"));
+          DEBUG ((DEBUG_ERROR, "  The formset has no x-UEFI-redfish configurations.\n"));
         } else {
           DEBUG ((DEBUG_ERROR, "  load formset from HII handle: 0x%x failed: %r\n", Target->HiiHandle, Status));
         }

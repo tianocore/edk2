@@ -29,7 +29,7 @@
 
 #define IS_EMPTY_STRING(a)  (a == NULL || a[0] == L'\0')
 #define ENGLISH_LANGUAGE_CODE  "en-US"
-#define X_UEFI_SCHEMA_PREFIX   "x-uefi-redfish-"
+#define X_UEFI_SCHEMA_PREFIX   "x-UEFI-redfish-"
 
 #define MAX_X_UEFI_REDFISH_STRING_SIZE  (128 * 2)// 128 character in UCS.
 
@@ -55,7 +55,7 @@ typedef struct {
 #define X_UEFI_REDFISH_STRING_ARRAY_ENTRY_NUMBER  1024
 
 //
-// Definition of x-uefi-redfish string element.
+// Definition of x-UEFI-redfish string element.
 //
 typedef struct {
   EFI_STRING_ID    StringId;
@@ -71,14 +71,14 @@ typedef struct {
 } REDFISH_X_UEFI_STRINGS_ARRAY;
 
 //
-// x-uefi-redfish string database, x-uefi-redfish language based.
+// x-UEFI-redfish string database, x-UEFI-redfish language based.
 //
 typedef struct {
-  LIST_ENTRY    NextXuefiRedfishLanguage;                                     // Link to the next suppoted x-uefi-Redfish language.
-  CHAR8         *XuefiRedfishLanguage;                                        // x-uefi-redfish language.
+  LIST_ENTRY    NextXuefiRedfishLanguage;                                     // Link to the next suppoted x-UEFI-Redfish language.
+  CHAR8         *XuefiRedfishLanguage;                                        // x-UEFI-redfish language.
   UINTN         StringsArrayBlocks;                                           // Number of the array blocks that accommodate X_UEFI_REDFISH_STRING_ARRAY_NUMBER
                                                                               // elements in each.
-  LIST_ENTRY    XuefiRedfishStringArrays;                                     // Link entry of x-uefi-redfish string array.
+  LIST_ENTRY    XuefiRedfishStringArrays;                                     // Link entry of x-UEFI-redfish string array.
 } REDFISH_X_UEFI_STRING_DATABASE;
 
 //
@@ -93,7 +93,7 @@ typedef struct {
   LIST_ENTRY                        HiiFormList;                // Form list that keep form data under this formset.
   CHAR16                            *DevicePathStr;             // Device path of this formset.
   REDFISH_PLATFORM_CONFIG_SCHEMA    SupportedSchema;            // Schema that is supported in this formset.
-  LIST_ENTRY                        XuefiRedfishStringDatabase; // x-uefi-redfish string/Id data base;
+  LIST_ENTRY                        XuefiRedfishStringDatabase; // x-UEFI-redfish string/Id data base;
 } REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE;
 
 #define REDFISH_PLATFORM_CONFIG_FORMSET_FROM_LINK(a)  BASE_CR (a, REDFISH_PLATFORM_CONFIG_FORM_SET_PRIVATE, Link)
@@ -133,7 +133,7 @@ struct _REDFISH_PLATFORM_CONFIG_STATEMENT_PRIVATE {
   HII_STATEMENT                             *HiiStatement;     // Pointer to HII statement data.
   EFI_QUESTION_ID                           QuestionId;        // Question ID of this statement.
   EFI_STRING_ID                             Description;       // String token of this question.
-  CHAR16                                    *XuefiRedfishStr;  // x-uefi-redfish string of this question.
+  CHAR16                                    *XuefiRedfishStr;  // x-UEFI-redfish string of this question.
   EFI_STRING_ID                             Help;              // String token of help message.
   UINT8                                     Flags;             // The statement flag.
   REDFISH_PLATFORM_CONFIG_STATEMENT_DATA    StatementData;     // The max/min for statement value.
