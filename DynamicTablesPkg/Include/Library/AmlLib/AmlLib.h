@@ -339,7 +339,7 @@ EFI_STATUS
 EFIAPI
 AmlFindNode (
   IN  AML_NODE_HANDLE  ReferenceNode,
-  IN  CHAR8            *AslPath,
+  IN  CONST CHAR8      *AslPath,
   OUT AML_NODE_HANDLE  *OutNode
   );
 
@@ -374,7 +374,7 @@ EFI_STATUS
 EFIAPI
 AmlDeviceOpUpdateName (
   IN  AML_OBJECT_NODE_HANDLE  DeviceOpNode,
-  IN  CHAR8                   *NewNameString
+  IN  CONST CHAR8             *NewNameString
   );
 
 /** Update an integer value defined by a NameOp object node.
@@ -1090,7 +1090,7 @@ EFI_STATUS
 EFIAPI
 AmlCodeGenNameString (
   IN  CONST CHAR8                   *NameString,
-  IN        CHAR8                   *String,
+  IN  CONST CHAR8                   *String,
   IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   );
@@ -1613,7 +1613,7 @@ AmlAddLpiState (
   IN  UINT64                                  Integer                     OPTIONAL,
   IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *ResidencyCounterRegister    OPTIONAL,
   IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *UsageCounterRegister        OPTIONAL,
-  IN  CHAR8                                   *StateName                   OPTIONAL,
+  IN  CONST CHAR8                             *StateName                   OPTIONAL,
   IN  AML_OBJECT_NODE_HANDLE                  LpiNode
   );
 
@@ -1668,7 +1668,7 @@ AmlAddDeviceDataDescriptorPackage (
 EFI_STATUS
 EFIAPI
 AmlAddNameIntegerPackage (
-  IN CHAR8                   *Name,
+  IN CONST CHAR8             *Name,
   IN UINT64                  Value,
   IN AML_OBJECT_NODE_HANDLE  PackageNode
   );
@@ -1739,7 +1739,7 @@ AmlCreateCpcNode (
 EFI_STATUS
 EFIAPI
 AmlAddNameStringToNamedPackage (
-  IN CHAR8                   *NameString,
+  IN CONST CHAR8             *NameString,
   IN AML_OBJECT_NODE_HANDLE  NamedNode
   );
 
