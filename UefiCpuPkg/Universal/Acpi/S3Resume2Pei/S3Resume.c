@@ -1152,7 +1152,6 @@ S3RestoreConfig2 (
     SmmS3ResumeState->ReturnContext1     = (EFI_PHYSICAL_ADDRESS)(UINTN)AcpiS3Context;
     SmmS3ResumeState->ReturnContext2     = (EFI_PHYSICAL_ADDRESS)(UINTN)EfiBootScriptExecutorVariable;
     SmmS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)STACK_ALIGN_DOWN (&Status);
-    SmmS3ResumeState->MpService2Ppi      = 0;
 
     DEBUG ((DEBUG_INFO, "SMM S3 Signature                = %x\n", SmmS3ResumeState->Signature));
     DEBUG ((DEBUG_INFO, "SMM S3 Stack Base               = %x\n", SmmS3ResumeState->SmmS3StackBase));
@@ -1181,19 +1180,6 @@ S3RestoreConfig2 (
     if (((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) && (sizeof (UINTN) == sizeof (UINT32))) ||
         ((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_64) && (sizeof (UINTN) == sizeof (UINT64))))
     {
-      //
-      // Get MP Services2 Ppi to pass it to Smm S3.
-      //
-      Status = PeiServicesLocatePpi (
-                 &gEdkiiPeiMpServices2PpiGuid,
-                 0,
-                 NULL,
-                 (VOID **)&MpService2Ppi
-                 );
-      ASSERT_EFI_ERROR (Status);
-      SmmS3ResumeState->MpService2Ppi = (EFI_PHYSICAL_ADDRESS)(UINTN)MpService2Ppi;
-      DEBUG ((DEBUG_INFO, "SMM S3 MpService2Ppi Point = %lx\n", SmmS3ResumeState->MpService2Ppi));
-
       SwitchStack (
         (SWITCH_STACK_ENTRY_POINT)(UINTN)SmmS3ResumeState->SmmS3ResumeEntryPoint,
         (VOID *)AcpiS3Context,
