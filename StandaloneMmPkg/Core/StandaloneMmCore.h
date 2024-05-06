@@ -85,7 +85,7 @@ typedef struct {
   BOOLEAN                       DepexProtocolError;
 
   EFI_HANDLE                    ImageHandle;
-  EFI_LOADED_IMAGE_PROTOCOL     *LoadedImage;
+  EFI_LOADED_IMAGE_PROTOCOL     LoadedImage;
   //
   // Image EntryPoint in MMRAM
   //
