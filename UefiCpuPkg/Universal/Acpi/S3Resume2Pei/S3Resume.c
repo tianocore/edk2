@@ -4,7 +4,7 @@
   This module will execute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -39,6 +39,7 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/MtrrLib.h>
 
 #include <Library/HobLib.h>
 #include <Library/LockBoxLib.h>
@@ -939,6 +940,20 @@ S3ResumeExecuteBootScript (
 }
 
 /**
+  Sync up the MTRR values for all processors.
+
+  @param[in] MtrrTable  Address of MTRR setting.
+**/
+VOID
+EFIAPI
+LoadMtrrData (
+  IN VOID  *MtrrTable
+  )
+{
+  MtrrSetAllMtrrs (MtrrTable);
+}
+
+/**
   Restores the platform to its preboot configuration for an S3 resume and
   jumps to the OS waking vector.
 
@@ -990,6 +1005,7 @@ S3RestoreConfig2 (
   BOOLEAN                        InterruptStatus;
   IA32_CR0                       Cr0;
   EDKII_PEI_MP_SERVICES2_PPI     *MpService2Ppi;
+  MTRR_SETTINGS                  MtrrTable;
 
   TempAcpiS3Context                 = 0;
   TempEfiBootScriptExecutorVariable = 0;
@@ -1081,6 +1097,39 @@ S3RestoreConfig2 (
     for (Index = 0; !EFI_ERROR (Status); Index++) {
       Status = SmmAccess->Open ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
     }
+
+    //
+    // Get MP Services2 Ppi to pass it to Smm S3.
+    //
+    Status = PeiServicesLocatePpi (
+               &gEdkiiPeiMpServices2PpiGuid,
+               0,
+               NULL,
+               (VOID **)&MpService2Ppi
+               );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Restore MTRR setting
+    //
+    VarSize = sizeof (MTRR_SETTINGS);
+    Status  = RestoreLockBox (
+                &gEdkiiS3MtrrSettingGuid,
+                &MtrrTable,
+                &VarSize
+                );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Sync up the MTRR values for all processors.
+    //
+    Status = MpService2Ppi->StartupAllCPUs (
+                              MpService2Ppi,
+                              (EFI_AP_PROCEDURE)LoadMtrrData,
+                              0,
+                              (VOID *)&MtrrTable
+                              );
+    ASSERT_EFI_ERROR (Status);
 
     SmramDescriptor  = (EFI_SMRAM_DESCRIPTOR *)GET_GUID_HOB_DATA (GuidHob);
     SmmS3ResumeState = (SMM_S3_RESUME_STATE *)(UINTN)SmramDescriptor->CpuStart;
