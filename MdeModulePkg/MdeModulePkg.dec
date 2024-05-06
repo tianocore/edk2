@@ -4,7 +4,7 @@
 # and libraries instances, which are used for those modules.
 #
 # Copyright (c) 2019, NVIDIA CORPORATION. All rights reserved.
-# Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 - 2019 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
@@ -464,6 +464,9 @@
   #
   gEdk2JedecSfdpSpiDxeDriverGuid  = { 0xBE71701E, 0xB63C, 0x4574, { 0x9C, 0x5C, 0x36, 0x29, 0xE8, 0xEA, 0xC4, 0x14 }}
   gEdk2JedecSfdpSpiSmmDriverGuid  = { 0x95A1E915, 0x195C, 0x477C, { 0x92, 0x6F, 0x7E, 0x24, 0x67, 0xC1, 0xB3, 0x1F }}
+
+  ## GUID used for MM communicate buffer.
+  gEdkiiCommunicationBufferGuid = { 0x6c2a2520, 0x0131, 0x4aee, { 0xa7, 0x50, 0xcc, 0x38, 0x4a, 0xac, 0xe8, 0xc6 }}
 
 [Ppis]
   ## Include/Ppi/FirmwareVolumeShadowPpi.h
@@ -1680,6 +1683,10 @@
   #
   # @Prompt SPI NOR Flash Operation Delay in Microseconds (16 us)
   gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashOperationDelayMicroseconds|0x00000010|UINT32|0x00000035
+
+  ## The pages for MM communication buffer, buffer size default is 512K (128 Pages).
+  # @Prompt The value of pages,  Default value is 128.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFixedCommBufferPages|128|UINT32|0x00000036
 
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
