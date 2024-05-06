@@ -318,6 +318,86 @@ MmEndOfDxeHandler (
 }
 
 /**
+  Install LoadedImage protocol for MM Core.
+
+**/
+VOID
+MmCoreInstallLoadedImage (
+  VOID
+  )
+{
+  EFI_STATUS                 Status;
+  EFI_PHYSICAL_ADDRESS       MmCoreImageBaseAddress;
+  UINT64                     MmCoreImageLength;
+  EFI_PEI_HOB_POINTERS       Hob;
+  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
+  EFI_HANDLE                 ImageHandle;
+
+  //
+  // Searching for Memory Allocation HOB
+  //
+  Hob.Raw = GetHobList ();
+  while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
+    //
+    // Find MM Core HOB
+    //
+    if (CompareGuid (
+          &Hob.MemoryAllocationModule->MemoryAllocationHeader.Name,
+          &gEfiHobMemoryAllocModuleGuid
+          ))
+    {
+      if (CompareGuid (&Hob.MemoryAllocationModule->ModuleName, &gEfiCallerIdGuid)) {
+        break;
+      }
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  if (Hob.Raw == NULL) {
+    return;
+  }
+
+  MmCoreImageBaseAddress = Hob.MemoryAllocationModule->MemoryAllocationHeader.MemoryBaseAddress;
+  MmCoreImageLength      = Hob.MemoryAllocationModule->MemoryAllocationHeader.MemoryLength;
+
+  //
+  // Allocate a Loaded Image Protocol in MM
+  //
+  LoadedImage = AllocatePool (sizeof (EFI_LOADED_IMAGE_PROTOCOL));
+  ASSERT (LoadedImage != NULL);
+  if (LoadedImage == NULL) {
+    return;
+  }
+
+  ZeroMem (LoadedImage, sizeof (EFI_LOADED_IMAGE_PROTOCOL));
+
+  //
+  // Fill in the remaining fields of the Loaded Image Protocol instance.
+  //
+  LoadedImage->Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
+  LoadedImage->ParentHandle = NULL;
+  LoadedImage->SystemTable  = NULL;
+
+  LoadedImage->ImageBase     = (VOID *)(UINTN)MmCoreImageBaseAddress;
+  LoadedImage->ImageSize     = MmCoreImageLength;
+  LoadedImage->ImageCodeType = EfiRuntimeServicesCode;
+  LoadedImage->ImageDataType = EfiRuntimeServicesData;
+
+  //
+  // Create a new image handle in the MM handle database for the MM Core
+  //
+  ImageHandle = NULL;
+  Status      = MmInstallProtocolInterface (
+                  &ImageHandle,
+                  &gEfiLoadedImageProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  LoadedImage
+                  );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
   The main entry point to MM Foundation.
 
   Note: This function is only used by MMRAM invocation.  It is never used by DXE invocation.
@@ -656,6 +736,11 @@ StandaloneMmMain (
                );
     DEBUG ((DEBUG_INFO, "MmiHandlerRegister - GUID %g - Status %d\n", mMmCoreMmiHandlers[Index].HandlerType, Status));
   }
+
+  //
+  // Install Loaded Image Protocol form MM Core
+  //
+  MmCoreInstallLoadedImage ();
 
   DEBUG ((DEBUG_INFO, "MmMain Done!\n"));
 
