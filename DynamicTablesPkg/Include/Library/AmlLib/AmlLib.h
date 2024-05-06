@@ -2,7 +2,7 @@
   AML Lib.
 
   Copyright (c) 2019 - 2023, Arm Limited. All rights reserved.<BR>
-  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -1836,6 +1836,45 @@ AmlCreatePsdNode (
   IN  AML_PSD_INFO            *PsdInfo,
   IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
   OUT AML_OBJECT_NODE_HANDLE  *NewPsdNode   OPTIONAL
+  );
+
+/** Add an integer value to Package node.
+
+  AmlCodeGenNamePackage ("_CID", NULL, &PackageNode);
+  AmlGetEisaIdFromString ("PNP0A03", &EisaId);
+  AmlAddIntegerPackageEntry (EisaId, PackageNameNode);
+  AmlGetEisaIdFromString ("PNP0A08", &EisaId);
+  AmlAddIntegerPackageEntry (EisaId, PackageNameNode);
+
+  equivalent of the following ASL code:
+  Name (_CID, Package (0x02)  // _CID: Compatible ID
+  {
+      EisaId ("PNP0A03"),
+      EisaId ("PNP0A08")
+  })
+
+  The package is added at the tail of the list of the input package node
+  name:
+    Name ("NamePackageNode", Package () {
+      [Pre-existing package entries],
+      [Newly created integer entry]
+    })
+
+
+  @ingroup CodeGenApis
+
+  @param [in]       Integer          Integer value that need to be added to package node.
+  @param [in, out]  PackageNameNode  Package named node to add the object to ....
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval Others                  Error occurred during the operation.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddIntegerPackageEntry (
+  IN        UINT32                  Integer,
+  IN  OUT   AML_OBJECT_NODE_HANDLE  PackageNameNode
   );
 
 #endif // AML_LIB_H_

@@ -4296,3 +4296,78 @@ error_handler:
   AmlDeleteTree ((AML_NODE_HANDLE)PsdNode);
   return Status;
 }
+
+/** Add an integer value to Package node.
+
+  AmlCodeGenNamePackage ("_CID", NULL, &PackageNode);
+  AmlGetEisaIdFromString ("PNP0A03", &EisaId);
+  AmlAddIntegerPackageEntry (EisaId, PackageNameNode);
+  AmlGetEisaIdFromString ("PNP0A08", &EisaId);
+  AmlAddIntegerPackageEntry (EisaId, PackageNameNode);
+
+  equivalent of the following ASL code:
+  Name (_CID, Package (0x02)  // _CID: Compatible ID
+  {
+      EisaId ("PNP0A03"),
+      EisaId ("PNP0A08")
+  })
+
+  The package is added at the tail of the list of the input package node
+  name:
+    Name ("NamePackageNode", Package () {
+      [Pre-existing package entries],
+      [Newly created integer entry]
+    })
+
+
+  @ingroup CodeGenApis
+
+  @param [in]       Integer          Integer value that need to be added to package node.
+  @param [in, out]  PackageNameNode  Package named node to add the object to ....
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval Others                  Error occurred during the operation.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddIntegerPackageEntry (
+  IN        UINT32                  Integer,
+  IN  OUT   AML_OBJECT_NODE_HANDLE  PackageNameNode
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *PackageEntryList;
+
+  if (PackageNameNode == NULL) {
+    ASSERT_EFI_ERROR (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((PackageNameNode == NULL)     ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PackageNameNode) != EAmlNodeObject) ||
+      (!AmlNodeHasOpCode (PackageNameNode, AML_NAME_OP, 0)))
+  {
+    ASSERT_EFI_ERROR (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  PackageEntryList = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                               PackageNameNode,
+                                               EAmlParseIndexTerm1
+                                               );
+  if ((PackageEntryList == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PackageEntryList) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (PackageEntryList, AML_PACKAGE_OP, 0)))
+  {
+    ASSERT_EFI_ERROR (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlAddRegisterOrIntegerToPackage (NULL, Integer, PackageEntryList);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return Status;
+}
