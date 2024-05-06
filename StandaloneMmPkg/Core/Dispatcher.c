@@ -185,6 +185,47 @@ MmLoadImage (
   DriverEntry->ImageBuffer     = DstBuffer;
   DriverEntry->NumberOfPage    = PageCount;
 
+  Status = MmAllocatePool (
+             EfiRuntimeServicesData,
+             sizeof (EFI_LOADED_IMAGE_PROTOCOL),
+             (VOID **)&DriverEntry->LoadedImage
+             );
+  if (EFI_ERROR (Status)) {
+    MmFreePages (DstBuffer, PageCount);
+    return Status;
+  }
+
+  ZeroMem (DriverEntry->LoadedImage, sizeof (EFI_LOADED_IMAGE_PROTOCOL));
+  //
+  // Fill in the remaining fields of the Loaded Image Protocol instance.
+  // Note: ImageBase is an SMRAM address that can not be accessed outside of SMRAM if SMRAM window is closed.
+  //
+  DriverEntry->LoadedImage->Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
+  DriverEntry->LoadedImage->ParentHandle = NULL;
+  DriverEntry->LoadedImage->SystemTable  = NULL;
+  DriverEntry->LoadedImage->DeviceHandle = NULL;
+  DriverEntry->LoadedImage->FilePath     = NULL;
+
+  DriverEntry->LoadedImage->ImageBase     = (VOID *)(UINTN)DriverEntry->ImageBuffer;
+  DriverEntry->LoadedImage->ImageSize     = ImageContext.ImageSize;
+  DriverEntry->LoadedImage->ImageCodeType = EfiRuntimeServicesCode;
+  DriverEntry->LoadedImage->ImageDataType = EfiRuntimeServicesData;
+
+  //
+  // Create a new image handle in the MM handle database for the MM Driver
+  //
+  DriverEntry->ImageHandle = NULL;
+  Status                   = MmInstallProtocolInterface (
+                               &DriverEntry->ImageHandle,
+                               &gEfiLoadedImageProtocolGuid,
+                               EFI_NATIVE_INTERFACE,
+                               DriverEntry->LoadedImage
+                               );
+  if (EFI_ERROR (Status)) {
+    MmFreePool (DriverEntry->LoadedImage);
+    DriverEntry->LoadedImage = NULL;
+  }
+
   //
   // Print the load address and the PDB file name if it is available
   //
@@ -430,6 +471,13 @@ MmDispatcher (
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_INFO, "StartImage Status - %r\n", Status));
         MmFreePages (DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);
+        if (DriverEntry->LoadedImage != NULL) {
+          MmUninstallProtocolInterface (
+            DriverEntry->ImageHandle,
+            &gEfiLoadedImageProtocolGuid,
+            DriverEntry->LoadedImage
+            );
+        }
       }
     }
 
