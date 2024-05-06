@@ -185,45 +185,6 @@ MmLoadImage (
   DriverEntry->ImageBuffer     = DstBuffer;
   DriverEntry->NumberOfPage    = PageCount;
 
-  if (mEfiSystemTable != NULL) {
-    Status = mEfiSystemTable->BootServices->AllocatePool (
-                                              EfiBootServicesData,
-                                              sizeof (EFI_LOADED_IMAGE_PROTOCOL),
-                                              (VOID **)&DriverEntry->LoadedImage
-                                              );
-    if (EFI_ERROR (Status)) {
-      MmFreePages (DstBuffer, PageCount);
-      return Status;
-    }
-
-    ZeroMem (DriverEntry->LoadedImage, sizeof (EFI_LOADED_IMAGE_PROTOCOL));
-    //
-    // Fill in the remaining fields of the Loaded Image Protocol instance.
-    // Note: ImageBase is an SMRAM address that can not be accessed outside of SMRAM if SMRAM window is closed.
-    //
-    DriverEntry->LoadedImage->Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
-    DriverEntry->LoadedImage->ParentHandle = NULL;
-    DriverEntry->LoadedImage->SystemTable  = mEfiSystemTable;
-    DriverEntry->LoadedImage->DeviceHandle = NULL;
-    DriverEntry->LoadedImage->FilePath     = NULL;
-
-    DriverEntry->LoadedImage->ImageBase     = (VOID *)(UINTN)DriverEntry->ImageBuffer;
-    DriverEntry->LoadedImage->ImageSize     = ImageContext.ImageSize;
-    DriverEntry->LoadedImage->ImageCodeType = EfiRuntimeServicesCode;
-    DriverEntry->LoadedImage->ImageDataType = EfiRuntimeServicesData;
-
-    //
-    // Create a new image handle in the UEFI handle database for the MM Driver
-    //
-    DriverEntry->ImageHandle = NULL;
-    Status                   = mEfiSystemTable->BootServices->InstallMultipleProtocolInterfaces (
-                                                                &DriverEntry->ImageHandle,
-                                                                &gEfiLoadedImageProtocolGuid,
-                                                                DriverEntry->LoadedImage,
-                                                                NULL
-                                                                );
-  }
-
   //
   // Print the load address and the PDB file name if it is available
   //
@@ -464,17 +425,8 @@ MmDispatcher (
       //
       // For each MM driver, pass NULL as ImageHandle
       //
-      if (mEfiSystemTable == NULL) {
-        DEBUG ((DEBUG_INFO, "StartImage - 0x%x (Standalone Mode)\n", DriverEntry->ImageEntryPoint));
-        Status = ((MM_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, &gMmCoreMmst);
-      } else {
-        DEBUG ((DEBUG_INFO, "StartImage - 0x%x (Tradition Mode)\n", DriverEntry->ImageEntryPoint));
-        Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(
-  DriverEntry->ImageHandle,
-  mEfiSystemTable
-  );
-      }
-
+      DEBUG ((DEBUG_INFO, "StartImage - 0x%x (Standalone Mode)\n", DriverEntry->ImageEntryPoint));
+      Status = ((MM_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, &gMmCoreMmst);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_INFO, "StartImage Status - %r\n", Status));
         MmFreePages (DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);
