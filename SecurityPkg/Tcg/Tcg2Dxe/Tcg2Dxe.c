@@ -812,11 +812,16 @@ Is800155Event (
 {
   if ((((TCG_PCR_EVENT2_HDR *)NewEventHdr)->EventType == EV_NO_ACTION) &&
       (NewEventSize >= sizeof (TCG_Sp800_155_PlatformId_Event2)) &&
-      (CompareMem (
-         NewEventData,
-         TCG_Sp800_155_PlatformId_Event2_SIGNATURE,
-         sizeof (TCG_Sp800_155_PlatformId_Event2_SIGNATURE) - 1
-         ) == 0))
+      ((CompareMem (
+          NewEventData,
+          TCG_Sp800_155_PlatformId_Event2_SIGNATURE,
+          sizeof (TCG_Sp800_155_PlatformId_Event2_SIGNATURE) - 1
+          ) == 0) ||
+       (CompareMem (
+          NewEventData,
+          TCG_Sp800_155_PlatformId_Event3_SIGNATURE,
+          sizeof (TCG_Sp800_155_PlatformId_Event3_SIGNATURE) - 1
+          ) == 0)))
   {
     return TRUE;
   }
