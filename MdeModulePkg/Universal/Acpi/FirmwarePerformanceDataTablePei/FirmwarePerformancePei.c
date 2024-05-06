@@ -112,11 +112,15 @@ FpdtStatusCodeListenerPei (
   //
   S3ResumeTotal = MultU64x32 (AcpiS3ResumeRecord->AverageResume, AcpiS3ResumeRecord->ResumeCount);
   AcpiS3ResumeRecord->ResumeCount++;
-  AcpiS3ResumeRecord->AverageResume = DivU64x32 (S3ResumeTotal + AcpiS3ResumeRecord->FullResume, AcpiS3ResumeRecord->ResumeCount);
+  if (AcpiS3ResumeRecord->ResumeCount > 0) {
+    AcpiS3ResumeRecord->AverageResume = DivU64x32 (S3ResumeTotal + AcpiS3ResumeRecord->FullResume, AcpiS3ResumeRecord->ResumeCount);
+    DEBUG ((DEBUG_INFO, "\nFPDT: S3 Resume Performance - AverageResume = 0x%x\n", AcpiS3ResumeRecord->AverageResume));
+  } else {
+    DEBUG ((DEBUG_ERROR, "\nFPDT: S3 ResumeCount reaches the MAX_UINT32 value. S3 ResumeCount record reset to Zero."));
+  }
 
-  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - ResumeCount   = %d\n", AcpiS3ResumeRecord->ResumeCount));
-  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - FullResume    = %ld\n", AcpiS3ResumeRecord->FullResume));
-  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - AverageResume = %ld\n", AcpiS3ResumeRecord->AverageResume));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - ResumeCount   = 0x%x\n", AcpiS3ResumeRecord->ResumeCount));
+  DEBUG ((DEBUG_INFO, "FPDT: S3 Resume Performance - FullResume    = 0x%x\n", AcpiS3ResumeRecord->FullResume));
 
   //
   // Update S3 Suspend Performance Record.
