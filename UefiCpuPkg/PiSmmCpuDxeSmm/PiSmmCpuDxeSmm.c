@@ -3,7 +3,7 @@ Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
 Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
-Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -751,6 +751,85 @@ MpInformation2HobCompare (
 }
 
 /**
+  Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION for all CPU from gEfiMpServiceProtocolGuid.
+
+  @param[out] NumberOfCpus           Pointer to NumberOfCpus.
+  @param[out] MaxNumberOfCpus        Pointer to MaxNumberOfCpus.
+
+  @retval ProcessorInfo              Pointer to EFI_PROCESSOR_INFORMATION buffer.
+**/
+EFI_PROCESSOR_INFORMATION *
+GetMpInformationFromMpServices (
+  OUT UINTN  *NumberOfCpus,
+  OUT UINTN  *MaxNumberOfCpus
+  )
+{
+  EFI_STATUS                 Status;
+  UINTN                      Index;
+  UINTN                      NumberOfEnabledProcessors;
+  UINTN                      NumberOfProcessors;
+  EFI_MP_SERVICES_PROTOCOL   *MpService;
+  EFI_PROCESSOR_INFORMATION  *ProcessorInfo;
+
+  if ((NumberOfCpus == NULL) || (MaxNumberOfCpus == NULL)) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return NULL;
+  }
+
+  ProcessorInfo    = NULL;
+  *NumberOfCpus    = 0;
+  *MaxNumberOfCpus = 0;
+
+  /// Get the MP Services Protocol
+  Status = gBS->LocateProtocol (&gEfiMpServiceProtocolGuid, NULL, (VOID **)&MpService);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return NULL;
+  }
+
+  /// Get the number of processors
+  Status = MpService->GetNumberOfProcessors (MpService, &NumberOfProcessors, &NumberOfEnabledProcessors);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return NULL;
+  }
+
+  ASSERT (NumberOfProcessors <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+
+  /// Allocate buffer for processor information
+  ProcessorInfo = AllocateZeroPool (sizeof (EFI_PROCESSOR_INFORMATION) * NumberOfProcessors);
+  if (ProcessorInfo == NULL) {
+    ASSERT_EFI_ERROR (EFI_OUT_OF_RESOURCES);
+    return NULL;
+  }
+
+  /// Get processor information
+  for (Index = 0; Index < NumberOfProcessors; Index++) {
+    Status = MpService->GetProcessorInfo (MpService, Index | CPU_V2_EXTENDED_TOPOLOGY, &ProcessorInfo[Index]);
+    if (EFI_ERROR (Status)) {
+      FreePool (ProcessorInfo);
+      DEBUG ((DEBUG_ERROR, "%a: Failed to get processor information for processor %d\n", __func__, Index));
+      ASSERT_EFI_ERROR (Status);
+      return NULL;
+    }
+  }
+
+  *NumberOfCpus = NumberOfEnabledProcessors;
+
+  ASSERT (*NumberOfCpus <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+  //
+  // If support CPU hot plug, we need to allocate resources for possibly hot-added processors
+  //
+  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
+    *MaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+  } else {
+    *MaxNumberOfCpus = *NumberOfCpus;
+  }
+
+  return ProcessorInfo;
+}
+
+/**
   Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION for all CPU from MpInformation2 HOB.
 
   @param[out] NumberOfCpus           Pointer to NumberOfCpus.
@@ -784,7 +863,11 @@ GetMpInformation (
   HobCount              = 0;
 
   FirstMpInfo2Hob = GetFirstGuidHob (&gMpInformation2HobGuid);
-  ASSERT (FirstMpInfo2Hob != NULL);
+  if (FirstMpInfo2Hob == NULL) {
+    DEBUG ((DEBUG_INFO, "%a: [INFO] gMpInformation2HobGuid HOB not found.\n", __func__));
+    return GetMpInformationFromMpServices (NumberOfCpus, MaxNumberOfCpus);
+  }
+
   GuidHob = FirstMpInfo2Hob;
   while (GuidHob != NULL) {
     MpInformation2HobData = GET_GUID_HOB_DATA (GuidHob);
