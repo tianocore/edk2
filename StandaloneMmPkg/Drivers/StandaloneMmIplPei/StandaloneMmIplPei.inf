@@ -38,8 +38,12 @@
   HobLib
   MemoryAllocationLib
   MmUnblockMemoryLib
+  BaseMemoryLib
+  PeCoffLib
+  CacheMaintenanceLib
 
 [Guids]
+  gEfiSmmSmramMemoryGuid
   gEdkiiCommunicationBufferGuid
 
 [Ppis]
