@@ -28,6 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/TimerLib.h>
+#include <Library/PcdLib.h>
 
 #include <IndustryStandard/Pci.h>
 

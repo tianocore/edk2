@@ -45,6 +45,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   MemoryAllocationLib
@@ -56,6 +57,7 @@
   DebugLib
   ReportStatusCodeLib
   TimerLib
+  PcdLib
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
@@ -63,6 +65,9 @@
 [Protocols]
   gEfiPciIoProtocolGuid                         ## TO_START
   gEfiUsb2HcProtocolGuid                        ## BY_START
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDelayXhciHCReset  ## CONSUMES
 
 # [Event]
 # EVENT_TYPE_PERIODIC_TIMER       ## CONSUMES
