@@ -29,15 +29,23 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  MmUnblockMemoryLib
 
 [Guids]
+  gEdkiiCommunicationBufferGuid
 
 [Ppis]
 
 [Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFixedCommBufferPages
 
 [Depex]
   TRUE
