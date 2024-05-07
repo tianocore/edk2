@@ -1154,6 +1154,11 @@
   # @Prompt Enable large address image loading.
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageLargeAddressLoad|TRUE|BOOLEAN|0x30001059
 
+  ## Indicates time delay for XHCI registers access after it issues HCRST.
+  # Default is 2000, it represent delay is 2 ms.
+  # @Prompt Delay access XHCI register after it issues HCRST (us)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDelayXhciHCReset|2000|UINT16|0x30001060
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
