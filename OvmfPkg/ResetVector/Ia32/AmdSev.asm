@@ -299,6 +299,17 @@ SevSaveMask:
 
     mov       dword[SEV_ES_WORK_AREA_ENC_MASK], 0
     mov       dword[SEV_ES_WORK_AREA_ENC_MASK + 4], edx
+
+%ifdef ARCH_X64
+
+%if PG_5_LEVEL
+    ; Check whether 5-level paging is supported
+    Check5LevelPaging SevExit
+    mov       byte[SEV_ES_WORK_AREA_5LEVEL], 1
+%endif
+
+%endif
+
     jmp       SevExit
 
 NoSev:
