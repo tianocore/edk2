@@ -261,6 +261,11 @@ PlatformNoexecDxeInitialization (
   IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   )
 {
+  if (TdIsEnabled ()) {
+    PlatformInfoHob->PcdSetNxForStack = TRUE;
+    return EFI_SUCCESS;
+  }
+
   return QemuFwCfgParseBool ("opt/ovmf/PcdSetNxForStack", &PlatformInfoHob->PcdSetNxForStack);
 }
 
