@@ -699,6 +699,7 @@ StandaloneMmMain (
   CopyMem (MmHobStart, HobStart, HobSize);
   Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
   ASSERT_EFI_ERROR (Status);
+  gHobList = MmHobStart;
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
