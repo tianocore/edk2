@@ -342,6 +342,7 @@ PageTableLibMapInLevel (
   UINT64              PhysicalAddrInAttr;
   IA32_PAGING_ENTRY   OriginalParentPagingEntry;
   IA32_PAGING_ENTRY   OriginalCurrentPagingEntry;
+  IA32_PAGING_ENTRY   TempPagingEntry;
 
   ASSERT (Level != 0);
   ASSERT ((Attribute != NULL) && (Mask != NULL));
@@ -441,8 +442,12 @@ PageTableLibMapInLevel (
       // Non-leaf entry doesn't have PAT bit. So use ~IA32_PE_BASE_ADDRESS_MASK_40 is to make sure PAT bit
       // (bit12) in original big-leaf entry is not assigned to PageTableBaseAddress field of non-leaf entry.
       //
-      PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute, &AllOneMask);
-      ParentPagingEntry->Uint64 = ((UINTN)(VOID *)PagingEntry) | (ParentPagingEntry->Uint64 & (~IA32_PE_BASE_ADDRESS_MASK_40));
+      TempPagingEntry.Uint64 = ParentPagingEntry->Uint64;
+      PageTableLibSetPnle (&TempPagingEntry.Pnle, &NopAttribute, &AllOneMask);
+      TempPagingEntry.Uint64                           = ((UINTN)(VOID *)PagingEntry) | (TempPagingEntry.Uint64 & (~IA32_PE_BASE_ADDRESS_MASK_40));
+      *(volatile UINT64 *)&(ParentPagingEntry->Uint64) = TempPagingEntry.Uint64;
+      // PageTableLibSetPnle (&ParentPagingEntry->Pnle, &NopAttribute, &AllOneMask);
+      // ParentPagingEntry->Uint64 = ((UINTN)(VOID *)PagingEntry) | (ParentPagingEntry->Uint64 & (~IA32_PE_BASE_ADDRESS_MASK_40));
     }
   } else {
     //
