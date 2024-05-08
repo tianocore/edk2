@@ -406,6 +406,7 @@ INF OvmfPkg/Tcg/TdTcg2Dxe/TdTcg2Dxe.inf
 !include OvmfPkg/Include/Fdf/OvmfTpmDxe.fdf.inc
 
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
+!include OvmfPkg/Include/Fdf/MorLock.fdf.inc
 
 ################################################################################
 
