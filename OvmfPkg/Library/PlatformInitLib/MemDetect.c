@@ -779,7 +779,10 @@ PlatformDynamicMmioWindow (
     DEBUG ((DEBUG_INFO, "%a:   MMIO Space 0x%Lx (%Ld GB)\n", __func__, MmioSpace, RShiftU64 (MmioSpace, 30)));
     PlatformInfoHob->PcdPciMmio64Size = MmioSpace;
     PlatformInfoHob->PcdPciMmio64Base = AddrSpace - MmioSpace;
-    PlatformScanE820 (PlatformReservationConflictCB, PlatformInfoHob);
+
+    if (!TdIsEnabled ()) {
+      PlatformScanE820 (PlatformReservationConflictCB, PlatformInfoHob);
+    }
   } else {
     DEBUG ((DEBUG_INFO, "%a: using classic mmio window\n", __func__));
   }
