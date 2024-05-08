@@ -1,0 +1,47 @@
+## @file
+#  The SPI Host Controller Module DXE driver INF file
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION               = 1.27
+  BASE_NAME                 = SpiHcDxe
+  FILE_GUID                 = 95D148FF-5A23-43B9-9FC4-80AE0DD48D32
+  MODULE_TYPE               = DXE_DRIVER
+  VERSION_STRING            = 0.1
+  PI_SPECIFICATION_VERSION  = 0x0001000A
+  ENTRY_POINT               = SpiHcProtocolEntry
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  SpiHcPlatformLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Sources]
+  SpiHc.h
+  SpiHc.c
+  SpiHcDxe.c
+
+[Protocols]
+  gEfiSpiHcProtocolGuid
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  SpiHc.uni
