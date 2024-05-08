@@ -48,6 +48,16 @@ Module Name:
 
 #define MEGABYTE_SHIFT  20
 
+EFI_STATUS
+PlatformTdxGetFirstNonAddressFromTdHob (
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
+EFI_STATUS
+PlatformTdxGetLowMemFromTdHob (
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  );
+
 VOID
 EFIAPI
 PlatformQemuUc32BaseInitialization (
@@ -420,7 +430,12 @@ PlatformGetSystemMemorySizeBelow4gb (
     return;
   }
 
-  Status = PlatformScanE820 (PlatformGetLowMemoryCB, PlatformInfoHob);
+  if (CcProbe () == CcGuestTypeIntelTdx) {
+    Status = PlatformTdxGetLowMemFromTdHob (PlatformInfoHob);
+  } else {
+    Status = PlatformScanE820 (PlatformGetLowMemoryCB, PlatformInfoHob);
+  }
+
   if (!EFI_ERROR (Status) && (PlatformInfoHob->LowMemory > 0)) {
     return;
   }
@@ -487,7 +502,13 @@ PlatformGetFirstNonAddress (
   // can only express a size smaller than 1TB), and add it to 4GB.
   //
   PlatformInfoHob->FirstNonAddress = BASE_4GB;
-  Status                           = PlatformScanE820 (PlatformGetFirstNonAddressCB, PlatformInfoHob);
+
+  if (CcProbe () == CcGuestTypeIntelTdx) {
+    Status = PlatformTdxGetFirstNonAddressFromTdHob (PlatformInfoHob);
+  } else {
+    Status = PlatformScanE820 (PlatformGetFirstNonAddressCB, PlatformInfoHob);
+  }
+
   if (EFI_ERROR (Status)) {
     PlatformInfoHob->FirstNonAddress = BASE_4GB + PlatformGetSystemMemorySizeAbove4gb ();
   }
