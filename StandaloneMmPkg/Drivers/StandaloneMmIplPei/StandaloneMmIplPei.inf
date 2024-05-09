@@ -45,6 +45,7 @@
 [Guids]
   gMmCommBufferHobGuid
   gEfiSmmSmramMemoryGuid
+  gEventMmDispatchGuid
 
 [Ppis]
   gEfiPeiMmControlPpiGuid
