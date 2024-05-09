@@ -3,7 +3,7 @@
   It is the common head file for all Tcp*.c in TCP driver.
 
   Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -13,6 +13,7 @@
 
 #include <Protocol/ServiceBinding.h>
 #include <Protocol/DriverBinding.h>
+#include <Protocol/Hash2.h>
 #include <Library/IpIoLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
@@ -31,7 +32,7 @@ extern EFI_UNICODE_STRING_TABLE      *gTcpControllerNameTable;
 
 extern LIST_ENTRY  mTcpRunQue;
 extern LIST_ENTRY  mTcpListenQue;
-extern TCP_SEQNO   mTcpGlobalIss;
+extern TCP_SEQNO   mTcpGlobalSecret;
 extern UINT32      mTcpTick;
 
 ///
@@ -44,14 +45,6 @@ extern UINT32      mTcpTick;
 #define TCP6_REFRESH_NEIGHBOR_TICK  25
 
 #define TCP_EXPIRE_TIME  65535
-
-///
-/// The implementation selects the initial send sequence number and the unit to
-/// be added when it is increased.
-///
-#define TCP_BASE_ISS         0x4d7e980b
-#define TCP_ISS_INCREMENT_1  2048
-#define TCP_ISS_INCREMENT_2  100
 
 typedef union {
   EFI_TCP4_CONFIG_DATA    Tcp4CfgData;
@@ -772,6 +765,52 @@ EFI_STATUS
 EFIAPI
 Tcp6Poll (
   IN EFI_TCP6_PROTOCOL  *This
+  );
+
+/**
+  Retrieves the Initial Sequence Number (ISN) for a TCP connection identified by local
+  and remote IP addresses and ports.
+
+  This method is based on https://datatracker.ietf.org/doc/html/rfc9293#section-3.4.1
+  Where the ISN is computed as follows:
+    ISN = TimeStamp + MD5(LocalIP, LocalPort, RemoteIP, RemotePort, Secret)
+
+  Otherwise:
+    ISN = M + F(localip, localport, remoteip, remoteport, secretkey)
+
+    "Here M is the 4 microsecond timer, and F() is a pseudorandom function (PRF) of the
+    connection's identifying parameters ("localip, localport, remoteip, remoteport")
+    and a secret key ("secretkey") (SHLD-1). F() MUST NOT be computable from the
+    outside (MUST-9), or an attacker could still guess at sequence numbers from the
+    ISN used for some other connection. The PRF could be implemented as a
+    cryptographic hash of the concatenation of the TCP connection parameters and some
+    secret data. For discussion of the selection of a specific hash algorithm and
+    management of the secret key data."
+
+  @param[in]       LocalIp        A pointer to the local IP address of the TCP connection.
+  @param[in]       LocalIpSize    The size, in bytes, of the LocalIp buffer.
+  @param[in]       LocalPort      The local port number of the TCP connection.
+  @param[in]       RemoteIp       A pointer to the remote IP address of the TCP connection.
+  @param[in]       RemoteIpSize   The size, in bytes, of the RemoteIp buffer.
+  @param[in]       RemotePort     The remote port number of the TCP connection.
+  @param[out]      Isn            A pointer to the variable that will receive the Initial
+                                  Sequence Number (ISN).
+
+  @retval EFI_SUCCESS             The operation completed successfully, and the ISN was
+                                  retrieved.
+  @retval EFI_INVALID_PARAMETER   One or more of the input parameters are invalid.
+  @retval EFI_UNSUPPORTED         The operation is not supported.
+
+**/
+EFI_STATUS
+TcpGetIsn (
+  IN UINT8       *LocalIp,
+  IN UINTN       LocalIpSize,
+  IN UINT16      LocalPort,
+  IN UINT8       *RemoteIp,
+  IN UINTN       RemoteIpSize,
+  IN UINT16      RemotePort,
+  OUT TCP_SEQNO  *Isn
   );
 
 #endif

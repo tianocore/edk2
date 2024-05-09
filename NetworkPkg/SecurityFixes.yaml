@@ -122,6 +122,28 @@ CVE_2023_45235:
     - http://www.openwall.com/lists/oss-security/2024/01/16/2
     - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
     - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45236:
+  commit_titles:
+    - "NetworkPkg: TcpDxe: SECURITY PATCH CVE-2023-45236 Patch"
+  cve: CVE-2023-45236
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 08 - edk2/NetworkPkg: Predictable TCP Initial Sequence Numbers"
+  note:
+  files_impacted:
+    - NetworkPkg/Include/Library/NetLib.h
+    - NetworkPkg/TcpDxe/TcpDriver.c
+    - NetworkPkg/TcpDxe/TcpDxe.inf
+    - NetworkPkg/TcpDxe/TcpFunc.h
+    - NetworkPkg/TcpDxe/TcpInput.c
+    - NetworkPkg/TcpDxe/TcpMain.h
+    - NetworkPkg/TcpDxe/TcpMisc.c
+    - NetworkPkg/TcpDxe/TcpTimer.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4541
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45236
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
 CVE_2023_45237:
   commit_titles:
     - "NetworkPkg:: SECURITY PATCH CVE 2023-45237"

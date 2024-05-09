@@ -3,7 +3,7 @@
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
-
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -20,7 +20,34 @@ LIST_ENTRY  mTcpListenQue = {
   &mTcpListenQue
 };
 
-TCP_SEQNO  mTcpGlobalIss = TCP_BASE_ISS;
+//
+// The Session secret
+// This must be initialized to a random value at boot time
+//
+TCP_SEQNO  mTcpGlobalSecret;
+
+//
+// Union to hold either an IPv4 or IPv6 address
+// This is used to simplify the ISN hash computation
+//
+typedef union {
+  UINT8    IPv4[4];
+  UINT8    IPv6[16];
+} NETWORK_ADDRESS;
+
+//
+// The ISN is computed by hashing this structure
+// It is initialized with the local and remote IP addresses and ports
+// and the secret
+//
+//
+typedef struct {
+  UINT16             LocalPort;
+  UINT16             RemotePort;
+  NETWORK_ADDRESS    LocalAddress;
+  NETWORK_ADDRESS    RemoteAddress;
+  TCP_SEQNO          Secret;
+} ISN_HASH_CTX;
 
 CHAR16  *mTcpStateName[] = {
   L"TCP_CLOSED",
@@ -41,12 +68,18 @@ CHAR16  *mTcpStateName[] = {
 
   @param[in, out]  Tcb               Pointer to the TCP_CB of this TCP instance.
 
+  @retval EFI_SUCCESS             The operation completed successfully
+  @retval others                  The underlying functions failed and could not complete the operation
+
 **/
-VOID
+EFI_STATUS
 TcpInitTcbLocal (
   IN OUT TCP_CB  *Tcb
   )
 {
+  TCP_SEQNO   Isn;
+  EFI_STATUS  Status;
+
   //
   // Compute the checksum of the fixed parts of pseudo header
   //
@@ -57,6 +90,16 @@ TcpInitTcbLocal (
                      0x06,
                      0
                      );
+
+    Status = TcpGetIsn (
+               Tcb->LocalEnd.Ip.v4.Addr,
+               sizeof (IPv4_ADDRESS),
+               Tcb->LocalEnd.Port,
+               Tcb->RemoteEnd.Ip.v4.Addr,
+               sizeof (IPv4_ADDRESS),
+               Tcb->RemoteEnd.Port,
+               &Isn
+               );
   } else {
     Tcb->HeadSum = NetIp6PseudoHeadChecksum (
                      &Tcb->LocalEnd.Ip.v6,
@@ -64,9 +107,25 @@ TcpInitTcbLocal (
                      0x06,
                      0
                      );
+
+    Status = TcpGetIsn (
+               Tcb->LocalEnd.Ip.v6.Addr,
+               sizeof (IPv6_ADDRESS),
+               Tcb->LocalEnd.Port,
+               Tcb->RemoteEnd.Ip.v6.Addr,
+               sizeof (IPv6_ADDRESS),
+               Tcb->RemoteEnd.Port,
+               &Isn
+               );
   }
 
-  Tcb->Iss    = TcpGetIss ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "TcpInitTcbLocal: failed to get isn\n"));
+    ASSERT (FALSE);
+    return Status;
+  }
+
+  Tcb->Iss    = Isn;
   Tcb->SndUna = Tcb->Iss;
   Tcb->SndNxt = Tcb->Iss;
 
@@ -82,6 +141,8 @@ TcpInitTcbLocal (
   Tcb->RetxmitSeqMax = 0;
 
   Tcb->ProbeTimerOn = FALSE;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -506,18 +567,162 @@ TcpCloneTcb (
 }
 
 /**
-  Compute an ISS to be used by a new connection.
+  Retrieves the Initial Sequence Number (ISN) for a TCP connection identified by local
+  and remote IP addresses and ports.
 
-  @return The resulting ISS.
+  This method is based on https://datatracker.ietf.org/doc/html/rfc9293#section-3.4.1
+  Where the ISN is computed as follows:
+    ISN = TimeStamp + MD5(LocalIP, LocalPort, RemoteIP, RemotePort, Secret)
+
+  Otherwise:
+    ISN = M + F(localip, localport, remoteip, remoteport, secretkey)
+
+    "Here M is the 4 microsecond timer, and F() is a pseudorandom function (PRF) of the
+    connection's identifying parameters ("localip, localport, remoteip, remoteport")
+    and a secret key ("secretkey") (SHLD-1). F() MUST NOT be computable from the
+    outside (MUST-9), or an attacker could still guess at sequence numbers from the
+    ISN used for some other connection. The PRF could be implemented as a
+    cryptographic hash of the concatenation of the TCP connection parameters and some
+    secret data. For discussion of the selection of a specific hash algorithm and
+    management of the secret key data."
+
+  @param[in]       LocalIp        A pointer to the local IP address of the TCP connection.
+  @param[in]       LocalIpSize    The size, in bytes, of the LocalIp buffer.
+  @param[in]       LocalPort      The local port number of the TCP connection.
+  @param[in]       RemoteIp       A pointer to the remote IP address of the TCP connection.
+  @param[in]       RemoteIpSize   The size, in bytes, of the RemoteIp buffer.
+  @param[in]       RemotePort     The remote port number of the TCP connection.
+  @param[out]      Isn            A pointer to the variable that will receive the Initial
+                                  Sequence Number (ISN).
+
+  @retval EFI_SUCCESS             The operation completed successfully, and the ISN was
+                                  retrieved.
+  @retval EFI_INVALID_PARAMETER   One or more of the input parameters are invalid.
+  @retval EFI_UNSUPPORTED         The operation is not supported.
 
 **/
-TCP_SEQNO
-TcpGetIss (
-  VOID
+EFI_STATUS
+TcpGetIsn (
+  IN UINT8       *LocalIp,
+  IN UINTN       LocalIpSize,
+  IN UINT16      LocalPort,
+  IN UINT8       *RemoteIp,
+  IN UINTN       RemoteIpSize,
+  IN UINT16      RemotePort,
+  OUT TCP_SEQNO  *Isn
   )
 {
-  mTcpGlobalIss += TCP_ISS_INCREMENT_1;
-  return mTcpGlobalIss;
+  EFI_STATUS          Status;
+  EFI_HASH2_PROTOCOL  *Hash2Protocol;
+  EFI_HASH2_OUTPUT    HashResult;
+  ISN_HASH_CTX        IsnHashCtx;
+  EFI_TIME            TimeStamp;
+
+  //
+  // Check that the ISN pointer is valid
+  //
+  if (Isn == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // The local ip may be a v4 or v6 address and may not be NULL
+  //
+  if ((LocalIp == NULL) || (LocalIpSize == 0) || (RemoteIp == NULL) || (RemoteIpSize == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // the local ip may be a v4 or v6 address
+  //
+  if ((LocalIpSize != sizeof (EFI_IPv4_ADDRESS)) && (LocalIpSize != sizeof (EFI_IPv6_ADDRESS))) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Locate the Hash Protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiHash2ProtocolGuid, NULL, (VOID **)&Hash2Protocol);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_NET, "Failed to locate Hash Protocol: %r\n", Status));
+
+    //
+    // TcpCreateService(..) is expected to be called prior to this function
+    //
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // Initialize the hash algorithm
+  //
+  Status = Hash2Protocol->HashInit (Hash2Protocol, &gEfiHashAlgorithmSha256Guid);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_NET, "Failed to initialize sha256 hash algorithm: %r\n", Status));
+    return Status;
+  }
+
+  IsnHashCtx.LocalPort  = LocalPort;
+  IsnHashCtx.RemotePort = RemotePort;
+  IsnHashCtx.Secret     = mTcpGlobalSecret;
+
+  //
+  // Check the IP address family and copy accordingly
+  //
+  if (LocalIpSize == sizeof (EFI_IPv4_ADDRESS)) {
+    CopyMem (&IsnHashCtx.LocalAddress.IPv4, LocalIp, LocalIpSize);
+  } else if (LocalIpSize == sizeof (EFI_IPv6_ADDRESS)) {
+    CopyMem (&IsnHashCtx.LocalAddress.IPv6, LocalIp, LocalIpSize);
+  } else {
+    return EFI_INVALID_PARAMETER; // Unsupported address size
+  }
+
+  //
+  // Repeat the process for the remote IP address
+  //
+  if (RemoteIpSize == sizeof (EFI_IPv4_ADDRESS)) {
+    CopyMem (&IsnHashCtx.RemoteAddress.IPv4, RemoteIp, RemoteIpSize);
+  } else if (RemoteIpSize == sizeof (EFI_IPv6_ADDRESS)) {
+    CopyMem (&IsnHashCtx.RemoteAddress.IPv6, RemoteIp, RemoteIpSize);
+  } else {
+    return EFI_INVALID_PARAMETER; // Unsupported address size
+  }
+
+  //
+  // Compute the hash
+  // Update the hash with the data
+  //
+  Status = Hash2Protocol->HashUpdate (Hash2Protocol, (UINT8 *)&IsnHashCtx, sizeof (IsnHashCtx));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_NET, "Failed to update hash: %r\n", Status));
+    return Status;
+  }
+
+  //
+  // Finalize the hash and retrieve the result
+  //
+  Status = Hash2Protocol->HashFinal (Hash2Protocol, &HashResult);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_NET, "Failed to finalize hash: %r\n", Status));
+    return Status;
+  }
+
+  Status = gRT->GetTime (&TimeStamp, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // copy the first 4 bytes of the hash result into the ISN
+  //
+  CopyMem (Isn, HashResult.Md5Hash, sizeof (*Isn));
+
+  //
+  // now add the timestamp to the ISN as 4 microseconds units (1000 / 4 = 250)
+  //
+  *Isn += (TCP_SEQNO)TimeStamp.Nanosecond * 250;
+
+  return Status;
 }
 
 /**
@@ -721,17 +926,28 @@ TcpFormatNetbuf (
   @param[in, out]  Tcb          Pointer to the TCP_CB that wants to initiate a
                                 connection.
 
+  @retval EFI_SUCCESS             The operation completed successfully
+  @retval others                  The underlying functions failed and could not complete the operation
+
 **/
-VOID
+EFI_STATUS
 TcpOnAppConnect (
   IN OUT TCP_CB  *Tcb
   )
 {
-  TcpInitTcbLocal (Tcb);
+  EFI_STATUS  Status;
+
+  Status = TcpInitTcbLocal (Tcb);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   TcpSetState (Tcb, TCP_SYN_SENT);
 
   TcpSetTimer (Tcb, TCP_TIMER_CONNECT, Tcb->ConnectTimeout);
   TcpToSendData (Tcb, 1);
+
+  return EFI_SUCCESS;
 }
 
 /**

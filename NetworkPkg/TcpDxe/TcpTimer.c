@@ -2,7 +2,7 @@
   TCP timer related functions.
 
   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -483,7 +483,6 @@ TcpTickingDpc (
   INT16       Index;
 
   mTcpTick++;
-  mTcpGlobalIss += TCP_ISS_INCREMENT_2;
 
   //
   // Don't use LIST_FOR_EACH, which isn't delete safe.
