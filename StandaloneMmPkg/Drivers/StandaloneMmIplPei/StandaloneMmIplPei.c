@@ -8,6 +8,119 @@
 
 #include "StandaloneMmIplPei.h"
 
+EFI_PEI_MM_COMMUNICATION_PPI  mMmCommunicationPpi = { Communicate };
+
+EFI_PEI_PPI_DESCRIPTOR  mPpiList = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiMmCommunicationPpiGuid,
+  &mMmCommunicationPpi
+};
+
+/**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                The EFI_PEI_MM_COMMUNICATION_PPI instance.
+  @param[in, out] CommBuffer     A pointer to the buffer to convey into MMRAM.
+  @param[in, out] CommSize       The size of the data buffer being passed in.On exit, the size of data
+                                 being returned. Zero if the handler does not wish to reply with any data.
+
+  @retval EFI_SUCCESS            The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER  The CommBuffer was NULL.
+  @retval EFI_NOT_STARTED        The service is NOT started.
+**/
+EFI_STATUS
+EFIAPI
+Communicate (
+  IN CONST EFI_PEI_MM_COMMUNICATION_PPI  *This,
+  IN OUT VOID                            *CommBuffer,
+  IN OUT UINTN                           *CommSize
+  )
+{
+  EFI_STATUS              Status;
+  EFI_PEI_MM_CONTROL_PPI  *MmControl;
+  UINT8                   SmiCommand;
+  UINTN                   Size;
+  UINTN                   TempCommSize;
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  MM_COMM_BUFFER          *MmCommBuffer;
+  MM_COMM_BUFFER_STATUS   *MmCommBufferStatus;
+
+  DEBUG ((DEBUG_INFO, "StandaloneMmIpl Communicate Enter\n"));
+
+  GuidHob = GetFirstGuidHob (&gMmCommBufferHobGuid);
+  if (GuidHob != NULL) {
+    MmCommBuffer       = GET_GUID_HOB_DATA (GuidHob);
+    MmCommBufferStatus = (MM_COMM_BUFFER_STATUS *)(UINTN)MmCommBuffer->Status;
+  } else {
+    DEBUG ((DEBUG_ERROR, "MmCommBuffer is not existed !!!\n"));
+    ASSERT (GuidHob != NULL);
+    return EFI_NOT_FOUND;
+  }
+
+  SmiCommand = 0;
+  Size       = sizeof (SmiCommand);
+
+  //
+  // Check parameters
+  //
+  if ((CommBuffer == NULL) || (CommSize == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  } else {
+    TempCommSize = *CommSize;
+    //
+    // CommSize must hold HeaderGuid and MessageLength
+    //
+    if (TempCommSize < OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data)) {
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  if (TempCommSize > EFI_PAGES_TO_SIZE (MmCommBuffer->NumberOfPages)) {
+    DEBUG ((DEBUG_ERROR, "Communicate buffer size (%d) is over MAX (%d) size!", TempCommSize, EFI_PAGES_TO_SIZE (MmCommBuffer->NumberOfPages)));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CopyMem ((VOID *)(UINTN)MmCommBuffer->PhysicalStart, CommBuffer, TempCommSize);
+  MmCommBufferStatus->IsCommBufferValid = TRUE;
+
+  //
+  // Generate Software SMI
+  //
+  Status = PeiServicesLocatePpi (&gEfiPeiMmControlPpiGuid, 0, NULL, (VOID **)&MmControl);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = MmControl->Trigger (
+                        (EFI_PEI_SERVICES **)GetPeiServicesTablePointer (),
+                        MmControl,
+                        (INT8 *)&SmiCommand,
+                        &Size,
+                        FALSE,
+                        0
+                        );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Return status from software SMI
+  //
+  *CommSize = (UINTN)MmCommBufferStatus->ReturnBufferSize;
+
+  //
+  // Copy the returned data to the non-mmram buffer (CommBuffer)
+  //
+  CopyMem (CommBuffer, (VOID *)(MmCommBuffer->PhysicalStart), *CommSize);
+
+  Status = (EFI_STATUS)MmCommBufferStatus->ReturnStatus;
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "StandaloneMmIpl Communicate failed (%r)\n", Status));
+  } else {
+    MmCommBufferStatus->IsCommBufferValid = FALSE;
+  }
+
+  return Status;
+}
+
 /**
   Search all the available firmware volumes for MM Core driver.
 
@@ -429,6 +542,12 @@ StandaloneMmIplPeiEntry (
   // Locate and execute Mm Core to dispatch MM drivers.
   //
   Status = ExecuteMmCoreFromMmram (MmCommBuffer);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Install MmCommunicationPpi
+  //
+  Status = PeiServicesInstallPpi (&mPpiList);
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
