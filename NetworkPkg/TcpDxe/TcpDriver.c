@@ -2,7 +2,7 @@
   The driver binding and service binding protocol for the TCP driver.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
-
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -163,7 +163,13 @@ TcpDriverEntryPoint (
   )
 {
   EFI_STATUS  Status;
-  UINT32      Seed;
+  UINT32      Random;
+
+  Status = PseudoRandomU32 (&Random);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a Failed to generate random number: %r\n", __func__, Status));
+    return Status;
+  }
 
   //
   // Install the TCP Driver Binding Protocol
@@ -203,9 +209,8 @@ TcpDriverEntryPoint (
   //
   // Initialize ISS and random port.
   //
-  Seed            = NetRandomInitSeed ();
-  mTcpGlobalIss   = NET_RANDOM (Seed) % mTcpGlobalIss;
-  mTcp4RandomPort = (UINT16)(TCP_PORT_KNOWN + (NET_RANDOM (Seed) % TCP_PORT_KNOWN));
+  mTcpGlobalIss   = Random % mTcpGlobalIss;
+  mTcp4RandomPort = (UINT16)(TCP_PORT_KNOWN + (Random % TCP_PORT_KNOWN));
   mTcp6RandomPort = mTcp4RandomPort;
 
   return EFI_SUCCESS;

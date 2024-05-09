@@ -2,6 +2,7 @@
   Miscellaneous routines for iSCSI driver.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -474,20 +475,17 @@ IScsiNetNtoi (
   @param[in, out]  Rand       The buffer to contain random numbers.
   @param[in]       RandLength The length of the Rand buffer.
 
+  @retval EFI_SUCCESS on success
+  @retval others      on error
+
 **/
-VOID
+EFI_STATUS
 IScsiGenRandom (
   IN OUT UINT8  *Rand,
   IN     UINTN  RandLength
   )
 {
-  UINT32  Random;
-
-  while (RandLength > 0) {
-    Random  = NET_RANDOM (NetRandomInitSeed ());
-    *Rand++ = (UINT8)(Random);
-    RandLength--;
-  }
+  return PseudoRandom (Rand, RandLength);
 }
 
 /**
