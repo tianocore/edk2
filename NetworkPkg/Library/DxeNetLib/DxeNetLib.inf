@@ -3,6 +3,7 @@
 #
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+#  Copyright (c) Microsoft Corporation
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -49,7 +50,11 @@
   gEfiSmbiosTableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
   gEfiSmbios3TableGuid                          ## SOMETIMES_CONSUMES  ## SystemTable
   gEfiAdapterInfoMediaStateGuid                 ## SOMETIMES_CONSUMES
-
+  gEfiRngAlgorithmRaw                           ## CONSUMES
+  gEfiRngAlgorithmSp80090Ctr256Guid             ## CONSUMES
+  gEfiRngAlgorithmSp80090Hmac256Guid            ## CONSUMES
+  gEfiRngAlgorithmSp80090Hash256Guid            ## CONSUMES
+  gEfiRngAlgorithmArmRndr                       ## CONSUMES
 
 [Protocols]
   gEfiSimpleNetworkProtocolGuid                 ## SOMETIMES_CONSUMES
@@ -59,3 +64,10 @@
   gEfiComponentNameProtocolGuid                 ## SOMETIMES_CONSUMES
   gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiAdapterInformationProtocolGuid            ## SOMETIMES_CONSUMES
+  gEfiRngProtocolGuid                           ## CONSUMES
+
+[FixedPcd]
+  gEfiNetworkPkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms ## CONSUMES
+
+[Depex]
+  gEfiRngProtocolGuid

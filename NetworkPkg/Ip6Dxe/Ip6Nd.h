@@ -2,7 +2,7 @@
   Definition of Neighbor Discovery support routines.
 
   Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
-
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -780,10 +780,10 @@ Ip6OnArpResolved (
 /**
   Update the ReachableTime in IP6 service binding instance data, in milliseconds.
 
-  @param[in, out] IpSb     Points to the IP6_SERVICE.
-
+  @retval EFI_SUCCESS           ReachableTime Updated
+  @retval others                Failed to update ReachableTime
 **/
-VOID
+EFI_STATUS
 Ip6UpdateReachableTime (
   IN OUT IP6_SERVICE  *IpSb
   );
