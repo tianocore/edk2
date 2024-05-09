@@ -34,6 +34,7 @@
 
 [LibraryClasses]
   PeimEntryPoint
+  PeiServicesLib
   DebugLib
   HobLib
   MemoryAllocationLib
@@ -47,9 +48,11 @@
   gEdkiiCommunicationBufferGuid
 
 [Ppis]
+  gPeiSmmControlPpiGuid
+  gEfiPeiMmCommunicationPpiGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFixedCommBufferPages
 
 [Depex]
-  TRUE
+  gPeiSmmControlPpiGuid
