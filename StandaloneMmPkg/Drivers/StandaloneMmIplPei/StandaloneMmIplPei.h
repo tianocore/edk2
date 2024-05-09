@@ -47,4 +47,23 @@ Communicate (
   IN OUT UINTN                           *CommSize
   );
 
+/**
+  This is the callback function on end of PEI.
+
+  This callback is used for call MmEndOfPeiHandler in standalone MM core.
+
+  @param   PeiServices       General purpose services available to every PEIM.
+  @param   NotifyDescriptor  The notification structure this PEIM registered on install.
+  @param   Ppi               Pointer to the PPI data associated with this function.
+  @retval  EFI_SUCCESS       Exit boot services successfully.
+  @retval  Other             Exit boot services failed.
+**/
+EFI_STATUS
+EFIAPI
+EndOfPeiCallback (
+  IN  EFI_PEI_SERVICES           **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN  VOID                       *Ppi
+  );
+
 #endif
