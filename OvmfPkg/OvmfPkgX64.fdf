@@ -330,6 +330,11 @@ INF MdeModulePkg/Logo/LogoDxe.inf
 INF OvmfPkg/TdxDxe/TdxDxe.inf
 
 #
+# Hash2 Protocol producer
+#
+INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+#
 # Network modules
 #
 !if $(E1000_ENABLE)
