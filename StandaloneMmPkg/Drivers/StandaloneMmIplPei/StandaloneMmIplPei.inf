@@ -46,6 +46,7 @@
 [Guids]
   gEfiSmmSmramMemoryGuid
   gEdkiiCommunicationBufferGuid
+  gEdkiiEventMmDispatchGuid
 
 [Ppis]
   gPeiSmmControlPpiGuid
