@@ -3,6 +3,7 @@
 
 Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) Microsoft Corporation
 SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -31,6 +32,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
+#include <Protocol/Rng.h>
 
 #define NIC_ITEM_CONFIG_SIZE  (sizeof (NIC_IP4_CONFIG_INFO) + sizeof (EFI_IP4_ROUTE_TABLE) * MAX_IP4_CONFIG_IN_VARIABLE)
 #define DEFAULT_ZERO_START    ((UINTN) ~0)
@@ -126,6 +128,25 @@ GLOBAL_REMOVE_IF_UNREFERENCED VLAN_DEVICE_PATH  mNetVlanDevicePathTemplate = {
   },
   0
 };
+
+//
+// These represent UEFI SPEC defined algorithms that should be supported by
+// the RNG protocol and are generally considered secure.
+//
+// The order of the algorithms in this array is important. This order is the order
+// in which the algorithms will be tried by the RNG protocol.
+// If your platform needs to use a specific algorithm for the random number generator,
+// then you should place that algorithm first in the array.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID  *mSecureHashAlgorithms[] = {
+  &gEfiRngAlgorithmSp80090Ctr256Guid,  // SP800-90A DRBG CTR using AES-256
+  &gEfiRngAlgorithmSp80090Hmac256Guid, // SP800-90A DRBG HMAC using SHA-256
+  &gEfiRngAlgorithmSp80090Hash256Guid, // SP800-90A DRBG Hash using SHA-256
+  &gEfiRngAlgorithmArmRndr,            // unspecified SP800-90A DRBG via ARM RNDR register
+  &gEfiRngAlgorithmRaw,                // Raw data from NRBG (or TRNG)
+};
+
+#define SECURE_HASH_ALGORITHMS_SIZE  (sizeof (mSecureHashAlgorithms) / sizeof (EFI_GUID *))
 
 /**
   Locate the handles that support SNP, then open one of them
@@ -884,34 +905,107 @@ Ip6Swap128 (
 }
 
 /**
-  Initialize a random seed using current time and monotonic count.
+  Generate a Random output data given a length.
 
-  Get current time and monotonic count first. Then initialize a random seed
-  based on some basic mathematics operation on the hour, day, minute, second,
-  nanosecond and year of the current time and the monotonic count value.
+  @param[out] Output - The buffer to store the generated random data.
+  @param[in] OutputLength - The length of the output buffer.
 
-  @return The random seed initialized with current time.
+  @retval EFI_SUCCESS           On Success
+  @retval EFI_INVALID_PARAMETER Pointer is null or size is zero
+  @retval EFI_NOT_FOUND         RNG protocol not found
+  @retval Others                Error from RngProtocol->GetRNG()
 
+  @return Status code
 **/
-UINT32
+EFI_STATUS
 EFIAPI
-NetRandomInitSeed (
-  VOID
+PseudoRandom (
+  OUT  VOID   *Output,
+  IN   UINTN  OutputLength
   )
 {
-  EFI_TIME  Time;
-  UINT32    Seed;
-  UINT64    MonotonicCount;
+  EFI_RNG_PROTOCOL  *RngProtocol;
+  EFI_STATUS        Status;
+  UINTN             AlgorithmIndex;
 
-  gRT->GetTime (&Time, NULL);
-  Seed  = (Time.Hour << 24 | Time.Day << 16 | Time.Minute << 8 | Time.Second);
-  Seed ^= Time.Nanosecond;
-  Seed ^= Time.Year << 7;
+  if ((Output == NULL) || (OutputLength == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  gBS->GetNextMonotonicCount (&MonotonicCount);
-  Seed += (UINT32)MonotonicCount;
+  Status = gBS->LocateProtocol (&gEfiRngProtocolGuid, NULL, (VOID **)&RngProtocol);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to locate EFI_RNG_PROTOCOL: %r\n", Status));
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
-  return Seed;
+  if (PcdGetBool (PcdEnforceSecureRngAlgorithms)) {
+    for (AlgorithmIndex = 0; AlgorithmIndex < SECURE_HASH_ALGORITHMS_SIZE; AlgorithmIndex++) {
+      Status = RngProtocol->GetRNG (RngProtocol, mSecureHashAlgorithms[AlgorithmIndex], OutputLength, (UINT8 *)Output);
+      if (!EFI_ERROR (Status)) {
+        //
+        // Secure Algorithm was supported on this platform
+        //
+        return EFI_SUCCESS;
+      } else if (Status == EFI_UNSUPPORTED) {
+        //
+        // Secure Algorithm was not supported on this platform
+        //
+        DEBUG ((DEBUG_ERROR, "Failed to generate random data using secure algorithm %d: %r\n", AlgorithmIndex, Status));
+
+        //
+        // Try the next secure algorithm
+        //
+        continue;
+      } else {
+        //
+        // Some other error occurred
+        //
+        DEBUG ((DEBUG_ERROR, "Failed to generate random data using secure algorithm %d: %r\n", AlgorithmIndex, Status));
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    //
+    // If we get here, we failed to generate random data using any secure algorithm
+    // Platform owner should ensure that at least one secure algorithm is supported
+    //
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  //
+  // Lets try using the default algorithm (which may not be secure)
+  //
+  Status = RngProtocol->GetRNG (RngProtocol, NULL, OutputLength, (UINT8 *)Output);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to generate random data: %r\n", __func__, Status));
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Generate a 32-bit pseudo-random number.
+
+  @param[out] Output - The buffer to store the generated random number.
+
+  @retval EFI_SUCCESS           On Success
+  @retval EFI_NOT_FOUND         RNG protocol not found
+  @retval Others                Error from RngProtocol->GetRNG()
+
+  @return Status code
+**/
+EFI_STATUS
+EFIAPI
+PseudoRandomU32 (
+  OUT UINT32  *Output
+  )
+{
+  return PseudoRandom (Output, sizeof (*Output));
 }
 
 /**
