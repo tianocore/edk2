@@ -3871,6 +3871,73 @@ exit_handler:
   return Status;
 }
 
+/** Add an integer value to the named package node.
+
+  AmlCodeGenNamePackage ("_CID", NULL, &PackageNode);
+  AmlGetEisaIdFromString ("PNP0A03", &EisaId);
+  AmlAddIntegerToNamedPackage (EisaId, NameNode);
+  AmlGetEisaIdFromString ("PNP0A08", &EisaId);
+  AmlAddIntegerToNamedPackage (EisaId, NameNode);
+
+  equivalent of the following ASL code:
+  Name (_CID, Package (0x02)  // _CID: Compatible ID
+  {
+      EisaId ("PNP0A03"),
+      EisaId ("PNP0A08")
+  })
+
+  The package is added at the tail of the list of the input package node
+  name:
+    Name ("NamePackageNode", Package () {
+      [Pre-existing package entries],
+      [Newly created integer entry]
+    })
+
+
+  @ingroup CodeGenApis
+
+  @param [in]       Integer       Integer value that need to be added to package node.
+  @param [in, out]  NameNode      Package named node to add the object to.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval Others                  Error occurred during the operation.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddIntegerToNamedPackage (
+  IN        UINT32                  Integer,
+  IN  OUT   AML_OBJECT_NODE_HANDLE  NameNode
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *PackageNode;
+
+  if (NameNode == NULL) {
+    ASSERT_EFI_ERROR (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  PackageNode = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                          NameNode,
+                                          EAmlParseIndexTerm1
+                                          );
+  if ((PackageNode == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PackageNode) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (PackageNode, AML_PACKAGE_OP, 0)))
+  {
+    ASSERT_EFI_ERROR (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlAddRegisterOrIntegerToPackage (NULL, Integer, PackageNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return Status;
+}
+
 /** AML code generation to invoke/call another method.
 
   This method is a subset implementation of MethodInvocation
