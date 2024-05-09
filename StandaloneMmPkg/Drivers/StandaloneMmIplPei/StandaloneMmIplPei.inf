@@ -47,9 +47,11 @@
   gEfiSmmSmramMemoryGuid
 
 [Ppis]
+  gEfiPeiMmControlPpiGuid
+  gEfiPeiMmCommunicationPpiGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages
 
 [Depex]
-  TRUE
+  gEfiPeiMmControlPpiGuid
