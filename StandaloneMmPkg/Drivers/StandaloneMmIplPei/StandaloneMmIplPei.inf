@@ -49,6 +49,10 @@
 [Ppis]
   gEfiPeiMmControlPpiGuid
   gEfiPeiMmCommunicationPpiGuid
+  gEfiEndOfPeiSignalPpiGuid
+
+[Protocols]
+  gEfiMmEndOfPeiProtocol
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages
