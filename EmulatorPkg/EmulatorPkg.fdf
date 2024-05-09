@@ -199,6 +199,11 @@ INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
 INF  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
 #
+# Hash2 Protocol producer
+#
+INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+#
 # Secure Boot Key Enroll
 #
 !if $(SECURE_BOOT_ENABLE) == TRUE
