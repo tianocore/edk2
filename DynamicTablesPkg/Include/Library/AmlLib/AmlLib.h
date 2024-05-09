@@ -2,7 +2,7 @@
   AML Lib.
 
   Copyright (c) 2019 - 2023, Arm Limited. All rights reserved.<BR>
-  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -1741,6 +1741,45 @@ EFIAPI
 AmlAddNameStringToNamedPackage (
   IN CHAR8                   *NameString,
   IN AML_OBJECT_NODE_HANDLE  NamedNode
+  );
+
+/** Add an integer value to the named package node.
+
+  AmlCodeGenNamePackage ("_CID", NULL, &PackageNode);
+  AmlGetEisaIdFromString ("PNP0A03", &EisaId);
+  AmlAddIntegerToNamedPackage (EisaId, NameNode);
+  AmlGetEisaIdFromString ("PNP0A08", &EisaId);
+  AmlAddIntegerToNamedPackage (EisaId, NameNode);
+
+  equivalent of the following ASL code:
+  Name (_CID, Package (0x02)  // _CID: Compatible ID
+  {
+      EisaId ("PNP0A03"),
+      EisaId ("PNP0A08")
+  })
+
+  The package is added at the tail of the list of the input package node
+  name:
+    Name ("NamePackageNode", Package () {
+      [Pre-existing package entries],
+      [Newly created integer entry]
+    })
+
+
+  @ingroup CodeGenApis
+
+  @param [in]       Integer       Integer value that need to be added to package node.
+  @param [in, out]  NameNode      Package named node to add the object to.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval Others                  Error occurred during the operation.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddIntegerToNamedPackage (
+  IN        UINT32                  Integer,
+  IN  OUT   AML_OBJECT_NODE_HANDLE  NameNode
   );
 
 /** AML code generation to invoke/call another method.
