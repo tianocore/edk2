@@ -1,7 +1,7 @@
 /** @file
 Code for Processor S3 restoration
 
-Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -90,36 +90,6 @@ UINT8  mApHltLoopCodeTemplate[] = {
   0xF4,                   // hlt
   0xEB, 0xFC              // jmp $-2
 };
-
-/**
-  Sync up the MTRR values for all processors.
-
-  @param MtrrTable  Table holding fixed/variable MTRR values to be loaded.
-**/
-VOID
-EFIAPI
-LoadMtrrData (
-  EFI_PHYSICAL_ADDRESS  MtrrTable
-  )
-
-/*++
-
-Routine Description:
-
-  Sync up the MTRR values for all processors.
-
-Arguments:
-
-Returns:
-    None
-
---*/
-{
-  MTRR_SETTINGS  *MtrrSettings;
-
-  MtrrSettings = (MTRR_SETTINGS *)(UINTN)MtrrTable;
-  MtrrSetAllMtrrs (MtrrSettings);
-}
 
 /**
   Increment semaphore by 1.
@@ -554,8 +524,6 @@ InitializeCpuBeforeRebase (
   IN BOOLEAN  IsBsp
   )
 {
-  LoadMtrrData (mAcpiCpuData.MtrrTable);
-
   SetRegister (TRUE);
 
   ProgramVirtualWireMode ();
