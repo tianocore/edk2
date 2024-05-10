@@ -25,6 +25,7 @@
 [Sources]
   StandaloneMmIplPei.c
   StandaloneMmIplPei.h
+  MmFoundationHob.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -42,11 +43,19 @@
   BaseMemoryLib
   PeCoffLib
   CacheMaintenanceLib
+  MmPlatformHobProducerLib
 
 [Guids]
   gEfiSmmSmramMemoryGuid
   gEdkiiCommunicationBufferGuid
   gEdkiiEventMmDispatchGuid
+  gSmmBaseHobGuid
+  gMpInformation2HobGuid
+  gEdkiiSmmProfileDataGuid
+  gEfiAcpiVariableGuid
+  gMmUnblockRegionHobGuid
+  gEdkiiAcpiS3EnableHobGuid
+  gEdkiiSmmCpuSyncConfigHobGuid
 
 [Ppis]
   gPeiSmmControlPpiGuid
