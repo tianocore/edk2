@@ -8,30 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PiSmmCpuDxeSmm.h"
 #include <PiPei.h>
-#include <Ppi/MpServices2.h>
-
-#pragma pack(1)
-typedef struct {
-  UINTN              Lock;
-  VOID               *StackStart;
-  UINTN              StackSize;
-  VOID               *ApFunction;
-  IA32_DESCRIPTOR    GdtrProfile;
-  IA32_DESCRIPTOR    IdtrProfile;
-  UINT32             BufferStart;
-  UINT32             Cr3;
-  UINTN              InitializeFloatingPointUnitsAddress;
-} MP_CPU_EXCHANGE_INFO;
-#pragma pack()
-
-typedef struct {
-  UINT8    *RendezvousFunnelAddress;
-  UINTN    PModeEntryOffset;
-  UINTN    FlatJumpOffset;
-  UINTN    Size;
-  UINTN    LModeEntryOffset;
-  UINTN    LongJumpOffset;
-} MP_ASSEMBLY_ADDRESS_MAP;
 
 //
 // Flags used when program the register.
@@ -44,31 +20,11 @@ typedef struct {
                                                     // package level semaphore.
 } PROGRAM_CPU_REGISTER_FLAGS;
 
-//
-// Signal that SMM BASE relocation is complete.
-//
-volatile BOOLEAN  mInitApsAfterSmmBaseReloc;
-
-/**
-  Get starting address and size of the rendezvous entry for APs.
-  Information for fixing a jump instruction in the code is also returned.
-
-  @param AddressMap  Output buffer for address map information.
-**/
-VOID *
-EFIAPI
-AsmGetAddressMap (
-  MP_ASSEMBLY_ADDRESS_MAP  *AddressMap
-  );
-
 #define LEGACY_REGION_SIZE  (2 * 0x1000)
 #define LEGACY_REGION_BASE  (0xA0000 - LEGACY_REGION_SIZE)
 
-PROGRAM_CPU_REGISTER_FLAGS  mCpuFlags;
-ACPI_CPU_DATA               mAcpiCpuData;
-volatile UINT32             mNumberToFinish;
-MP_CPU_EXCHANGE_INFO        *mExchangeInfo;
-BOOLEAN                     mRestoreSmmConfigurationInS3 = FALSE;
+ACPI_CPU_DATA  mAcpiCpuData;
+BOOLEAN        mRestoreSmmConfigurationInS3 = FALSE;
 
 //
 // S3 boot flag
@@ -81,191 +37,6 @@ BOOLEAN  mSmmS3Flag = FALSE;
 SMM_S3_RESUME_STATE  *mSmmS3ResumeState = NULL;
 
 BOOLEAN  mAcpiS3Enable = TRUE;
-
-UINT8  *mApHltLoopCode          = NULL;
-UINT8  mApHltLoopCodeTemplate[] = {
-  0x8B, 0x44, 0x24, 0x04, // mov  eax, dword ptr [esp+4]
-  0xF0, 0xFF, 0x08,       // lock dec  dword ptr [eax]
-  0xFA,                   // cli
-  0xF4,                   // hlt
-  0xEB, 0xFC              // jmp $-2
-};
-
-/**
-  The function is invoked before SMBASE relocation in S3 path to restores CPU status.
-
-  The function is invoked before SMBASE relocation in S3 path. It does first time microcode load
-  and restores MTRRs for both BSP and APs.
-
-  @param   IsBsp   The CPU this function executes on is BSP or not.
-
-**/
-VOID
-InitializeCpuBeforeRebase (
-  IN BOOLEAN  IsBsp
-  )
-{
-  //
-  // Count down the number with lock mechanism.
-  //
-  InterlockedDecrement (&mNumberToFinish);
-
-  if (IsBsp) {
-    //
-    // Bsp wait here till all AP finish the initialization before rebase
-    //
-    while (mNumberToFinish > 0) {
-      CpuPause ();
-    }
-  }
-}
-
-/**
-  The function is invoked after SMBASE relocation in S3 path to restores CPU status.
-
-  The function is invoked after SMBASE relocation in S3 path. It restores configuration according to
-  data saved by normal boot path for both BSP and APs.
-
-  @param   IsBsp   The CPU this function executes on is BSP or not.
-
-**/
-VOID
-InitializeCpuAfterRebase (
-  IN BOOLEAN  IsBsp
-  )
-{
-  UINTN  TopOfStack;
-  UINT8  Stack[128];
-
-  if (mSmmS3ResumeState->MpService2Ppi == 0) {
-    if (IsBsp) {
-      while (mNumberToFinish > 0) {
-        CpuPause ();
-      }
-    } else {
-      //
-      // Place AP into the safe code, count down the number with lock mechanism in the safe code.
-      //
-      TopOfStack  = (UINTN)Stack + sizeof (Stack);
-      TopOfStack &= ~(UINTN)(CPU_STACK_ALIGNMENT - 1);
-      CopyMem ((VOID *)(UINTN)mApHltLoopCode, mApHltLoopCodeTemplate, sizeof (mApHltLoopCodeTemplate));
-      TransferApToSafeState ((UINTN)mApHltLoopCode, TopOfStack, (UINTN)&mNumberToFinish);
-    }
-  }
-}
-
-/**
-  Cpu initialization procedure.
-
-  @param[in,out] Buffer  The pointer to private data buffer.
-
-**/
-VOID
-EFIAPI
-InitializeCpuProcedure (
-  IN OUT VOID  *Buffer
-  )
-{
-  BOOLEAN  IsBsp;
-
-  IsBsp =  (BOOLEAN)(mBspApicId == GetApicId ());
-
-  //
-  // Skip initialization if mAcpiCpuData is not valid
-  //
-  if (mAcpiCpuData.NumberOfCpus > 0) {
-    //
-    // First time microcode load and restore MTRRs
-    //
-    InitializeCpuBeforeRebase (IsBsp);
-  }
-
-  if (IsBsp) {
-    //
-    // Issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
-    //
-    ExecuteFirstSmiInit ();
-  }
-
-  //
-  // Skip initialization if mAcpiCpuData is not valid
-  //
-  if (mAcpiCpuData.NumberOfCpus > 0) {
-    if (IsBsp) {
-      //
-      // mNumberToFinish should be set before AP executes InitializeCpuAfterRebase()
-      //
-      mNumberToFinish = (UINT32)(mNumberOfCpus - 1);
-      //
-      // Signal that SMM base relocation is complete and to continue initialization for all APs.
-      //
-      mInitApsAfterSmmBaseReloc = TRUE;
-    } else {
-      //
-      // AP Wait for BSP to signal SMM Base relocation done.
-      //
-      while (!mInitApsAfterSmmBaseReloc) {
-        CpuPause ();
-      }
-    }
-
-    //
-    // Restore MSRs for BSP and all APs
-    //
-    InitializeCpuAfterRebase (IsBsp);
-  }
-}
-
-/**
-  Prepares startup vector for APs.
-
-  This function prepares startup vector for APs.
-
-  @param  WorkingBuffer  The address of the work buffer.
-**/
-VOID
-PrepareApStartupVector (
-  EFI_PHYSICAL_ADDRESS  WorkingBuffer
-  )
-{
-  EFI_PHYSICAL_ADDRESS     StartupVector;
-  MP_ASSEMBLY_ADDRESS_MAP  AddressMap;
-
-  //
-  // Get the address map of startup code for AP,
-  // including code size, and offset of long jump instructions to redirect.
-  //
-  ZeroMem (&AddressMap, sizeof (AddressMap));
-  AsmGetAddressMap (&AddressMap);
-
-  StartupVector = WorkingBuffer;
-
-  //
-  // Copy AP startup code to startup vector, and then redirect the long jump
-  // instructions for mode switching.
-  //
-  CopyMem ((VOID *)(UINTN)StartupVector, AddressMap.RendezvousFunnelAddress, AddressMap.Size);
-  *(UINT32 *)(UINTN)(StartupVector + AddressMap.FlatJumpOffset + 3) = (UINT32)(StartupVector + AddressMap.PModeEntryOffset);
-  if (AddressMap.LongJumpOffset != 0) {
-    *(UINT32 *)(UINTN)(StartupVector + AddressMap.LongJumpOffset + 2) = (UINT32)(StartupVector + AddressMap.LModeEntryOffset);
-  }
-
-  //
-  // Get the start address of exchange data between BSP and AP.
-  //
-  mExchangeInfo = (MP_CPU_EXCHANGE_INFO *)(UINTN)(StartupVector + AddressMap.Size);
-  ZeroMem ((VOID *)mExchangeInfo, sizeof (MP_CPU_EXCHANGE_INFO));
-
-  CopyMem ((VOID *)(UINTN)&mExchangeInfo->GdtrProfile, (VOID *)(UINTN)mAcpiCpuData.GdtrProfile, sizeof (IA32_DESCRIPTOR));
-  CopyMem ((VOID *)(UINTN)&mExchangeInfo->IdtrProfile, (VOID *)(UINTN)mAcpiCpuData.IdtrProfile, sizeof (IA32_DESCRIPTOR));
-
-  mExchangeInfo->StackStart                          = (VOID *)(UINTN)mAcpiCpuData.StackAddress;
-  mExchangeInfo->StackSize                           = mAcpiCpuData.StackSize;
-  mExchangeInfo->BufferStart                         = (UINT32)StartupVector;
-  mExchangeInfo->Cr3                                 = (UINT32)(AsmReadCr3 ());
-  mExchangeInfo->InitializeFloatingPointUnitsAddress = (UINTN)InitializeFloatingPointUnits;
-  mExchangeInfo->ApFunction                          = (VOID *)(UINTN)InitializeCpuProcedure;
-}
 
 /**
   Restore SMM Configuration in S3 boot path.
@@ -315,12 +86,11 @@ SmmRestoreCpu (
   VOID
   )
 {
-  SMM_S3_RESUME_STATE         *SmmS3ResumeState;
-  IA32_DESCRIPTOR             Ia32Idtr;
-  IA32_DESCRIPTOR             X64Idtr;
-  IA32_IDT_GATE_DESCRIPTOR    IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
-  EFI_STATUS                  Status;
-  EDKII_PEI_MP_SERVICES2_PPI  *Mp2ServicePpi;
+  SMM_S3_RESUME_STATE       *SmmS3ResumeState;
+  IA32_DESCRIPTOR           Ia32Idtr;
+  IA32_DESCRIPTOR           X64Idtr;
+  IA32_IDT_GATE_DESCRIPTOR  IdtEntryTable[EXCEPTION_VECTOR_NUMBER];
+  EFI_STATUS                Status;
 
   DEBUG ((DEBUG_INFO, "SmmRestoreCpu()\n"));
 
@@ -369,38 +139,10 @@ SmmRestoreCpu (
     }
   }
 
-  mBspApicId = GetApicId ();
   //
-  // Skip AP initialization if mAcpiCpuData is not valid
+  // Issue SMI IPI (All Excluding  Self SMM IPI + BSP SMM IPI) to execute first SMI init.
   //
-  if (mAcpiCpuData.NumberOfCpus > 0) {
-    if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
-      ASSERT (mNumberOfCpus <= mAcpiCpuData.NumberOfCpus);
-    } else {
-      ASSERT (mNumberOfCpus == mAcpiCpuData.NumberOfCpus);
-    }
-
-    mNumberToFinish = (UINT32)mNumberOfCpus;
-
-    //
-    // Execute code for before SmmBaseReloc. Note: This flag is maintained across S3 boots.
-    //
-    mInitApsAfterSmmBaseReloc = FALSE;
-
-    if (mSmmS3ResumeState->MpService2Ppi != 0) {
-      Mp2ServicePpi = (EDKII_PEI_MP_SERVICES2_PPI *)(UINTN)mSmmS3ResumeState->MpService2Ppi;
-      Mp2ServicePpi->StartupAllCPUs (Mp2ServicePpi, InitializeCpuProcedure, 0, NULL);
-    } else {
-      PrepareApStartupVector (mAcpiCpuData.StartupVector);
-      //
-      // Send INIT IPI - SIPI to all APs
-      //
-      SendInitSipiSipiAllExcludingSelf ((UINT32)mAcpiCpuData.StartupVector);
-      InitializeCpuProcedure (NULL);
-    }
-  } else {
-    InitializeCpuProcedure (NULL);
-  }
+  ExecuteFirstSmiInit ();
 
   //
   // Set a flag to restore SMM configuration in S3 path.
@@ -471,8 +213,6 @@ InitSmmS3ResumeState (
   VOID                  *GuidHob;
   EFI_SMRAM_DESCRIPTOR  *SmramDescriptor;
   SMM_S3_RESUME_STATE   *SmmS3ResumeState;
-  EFI_PHYSICAL_ADDRESS  Address;
-  EFI_STATUS            Status;
 
   if (!mAcpiS3Enable) {
     return;
@@ -524,20 +264,6 @@ InitSmmS3ResumeState (
     //
     InitSmmS3Cr3 ();
   }
-
-  //
-  // Allocate safe memory in ACPI NVS for AP to execute hlt loop in
-  // protected mode on S3 path
-  //
-  Address = BASE_4GB - 1;
-  Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
-                   EfiACPIMemoryNVS,
-                   EFI_SIZE_TO_PAGES (sizeof (mApHltLoopCodeTemplate)),
-                   &Address
-                   );
-  ASSERT_EFI_ERROR (Status);
-  mApHltLoopCode = (UINT8 *)(UINTN)Address;
 }
 
 /**

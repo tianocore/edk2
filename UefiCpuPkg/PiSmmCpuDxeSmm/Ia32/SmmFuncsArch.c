@@ -1,7 +1,7 @@
 /** @file
   SMM CPU misc functions for Ia32 arch specific.
 
-Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -139,33 +139,6 @@ InitGdt (
 
   *GdtStepSize = GdtTableStepSize;
   return GdtTssTables;
-}
-
-/**
-  Transfer AP to safe hlt-loop after it finished restore CPU features on S3 patch.
-
-  @param[in] ApHltLoopCode          The address of the safe hlt-loop function.
-  @param[in] TopOfStack             A pointer to the new stack to use for the ApHltLoopCode.
-  @param[in] NumberToFinishAddress  Address of Semaphore of APs finish count.
-
-**/
-VOID
-TransferApToSafeState (
-  IN UINTN  ApHltLoopCode,
-  IN UINTN  TopOfStack,
-  IN UINTN  NumberToFinishAddress
-  )
-{
-  SwitchStack (
-    (SWITCH_STACK_ENTRY_POINT)ApHltLoopCode,
-    (VOID *)NumberToFinishAddress,
-    NULL,
-    (VOID *)TopOfStack
-    );
-  //
-  // It should never reach here
-  //
-  ASSERT (FALSE);
 }
 
 /**
