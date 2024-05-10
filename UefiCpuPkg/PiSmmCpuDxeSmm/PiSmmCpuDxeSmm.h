@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
@@ -1049,15 +1049,6 @@ InitSmmS3ResumeState (
   );
 
 /**
-  Get ACPI CPU data.
-
-**/
-VOID
-GetAcpiCpuData (
-  VOID
-  );
-
-/**
   Restore SMM Configuration in S3 boot path.
 
 **/
@@ -1073,21 +1064,6 @@ RestoreSmmConfigurationInS3 (
 VOID
 GetAcpiS3EnableFlag (
   VOID
-  );
-
-/**
-  Transfer AP to safe hlt-loop after it finished restore CPU features on S3 patch.
-
-  @param[in] ApHltLoopCode          The address of the safe hlt-loop function.
-  @param[in] TopOfStack             A pointer to the new stack to use for the ApHltLoopCode.
-  @param[in] NumberToFinishAddress  Address of Semaphore of APs finish count.
-
-**/
-VOID
-TransferApToSafeState (
-  IN UINTN  ApHltLoopCode,
-  IN UINTN  TopOfStack,
-  IN UINTN  NumberToFinishAddress
   );
 
 /**
