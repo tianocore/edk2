@@ -24,6 +24,7 @@
 #include <Ppi/MmControl.h>
 #include <Ppi/MmCommunication.h>
 #include <Protocol/MmCommunication.h>
+#include <Library/MmPlatformHobProducerLib.h>
 
 /**
   Communicates with a registered handler.
@@ -64,6 +65,65 @@ EndOfPeiCallback (
   IN  EFI_PEI_SERVICES           **PeiServices,
   IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
   IN  VOID                       *Ppi
+  );
+
+/**
+  Add a new HOB to the HOB List.
+
+  @param[in] Hob          The pointer of new HOB buffer.
+  @param[in] HobType      Type of the new HOB.
+  @param[in] HobLength    Length of the new HOB to allocate.
+
+  @return  NULL if there is no space to create a hob.
+  @return  The address point to the new created hob.
+
+**/
+VOID *
+MmIplCreateHob (
+  IN VOID    *Hob,
+  IN UINT16  HobType,
+  IN UINT16  HobLength
+  );
+
+/**
+  Create the MM foundation specific HOB list which StandaloneMm Core needed.
+
+  This function build the MM foundation specific HOB list needed by StandaloneMm Core
+  based on the PEI HOB list.
+
+  @param[in]      FoundationHobList   The foundation HOB list to be used for HOB creation.
+  @param[in, out] FoundationHobSize   The foundation HOB size.
+                                      On return, the expected/used size.
+  @param[in]      PlatformHobList     Platform HOB list.
+  @param[in]      PlatformHobSize     Platform HOB size.
+  @param[in]      MmFvBase            Base of firmare volume which included MM core dirver.
+  @param[in]      MmFvSize            Size of firmare volume which included MM core dirver.
+  @param[in]      MmCoreFileName      File name of MM core dirver.
+  @param[in]      MmCoreImageAddress  Image address of MM core dirver.
+  @param[in]      MmCoreImageSize     Image size of MM core dirver.
+  @param[in]      MmCoreEntryPoint    Entry pinter of MM core dirver.
+  @param[in]      Block               Pointer of MMRAM descriptor block.
+
+  @retval RETURN_BUFFER_TOO_SMALL     The buffer is too small for HOB creation.
+                                      BufferSize is updated to indicate the expected buffer size.
+                                      When the input BufferSize is bigger than the expected buffer size,
+                                      the BufferSize value will be changed the used buffer size.
+  @retval RETURN_SUCCESS              HOB List is created/updated successfully or the input Length is 0.
+
+**/
+RETURN_STATUS
+CreateMmFoundationHobList (
+  IN UINT8                           *FoundationHobList,
+  IN OUT UINTN                       *FoundationHobSize,
+  IN UINT8                           *PlatformHobList,
+  IN UINTN                           PlatformHobSize,
+  IN EFI_PHYSICAL_ADDRESS            MmFvBase,
+  IN UINT64                          MmFvSize,
+  IN EFI_GUID                        *MmCoreFileName,
+  IN EFI_PHYSICAL_ADDRESS            MmCoreImageAddress,
+  IN UINT64                          MmCoreImageSize,
+  IN EFI_PHYSICAL_ADDRESS            MmCoreEntryPoint,
+  IN EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *Block
   );
 
 #endif
