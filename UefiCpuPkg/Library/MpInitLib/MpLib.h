@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020 - 2024, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -357,7 +357,8 @@ typedef
   IN UINTN    StackStart
   );
 
-extern EFI_GUID  mCpuInitMpLibHobGuid;
+extern EFI_GUID         mCpuInitMpLibHobGuid;
+extern volatile UINT32  mNumberToFinish;
 
 /**
   Assembly code to place AP into safe loop mode.
@@ -931,6 +932,54 @@ CanUseSevSnpCreateAP (
 VOID
 AmdSevUpdateCpuMpData (
   IN CPU_MP_DATA  *CpuMpData
+  );
+
+/**
+  Prepare ApLoopCode.
+
+  @param[in] CpuMpData  Pointer to CpuMpData.
+**/
+VOID
+PrepareApLoopCode (
+  IN CPU_MP_DATA  *CpuMpData
+  );
+
+/**
+  Do sync on APs.
+
+  @param[in, out] Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+RelocateApLoop (
+  IN OUT VOID  *Buffer
+  );
+
+/**
+  Allocate buffer for ApLoopCode.
+
+  @param[in]      Pages    Number of pages to allocate.
+  @param[in, out] Address  Pointer to the allocated buffer.
+**/
+VOID
+AllocateApLoopCodeBuffer (
+  IN UINTN                     Pages,
+  IN OUT EFI_PHYSICAL_ADDRESS  *Address
+  );
+
+/**
+  Remove Nx protection for the range specific by BaseAddress and Length.
+
+  The PEI implementation uses CpuPageTableLib to change the attribute.
+  The DXE implementation uses gDS to change the attribute.
+
+  @param[in] BaseAddress  BaseAddress of the range.
+  @param[in] Length       Length of the range.
+**/
+VOID
+RemoveNxprotection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
   );
 
 #endif
