@@ -25,6 +25,7 @@
 [Sources]
   StandaloneMmIplPei.c
   StandaloneMmIplPei.h
+  MmFoundationHob.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -41,6 +42,7 @@
   BaseMemoryLib
   PeCoffLib
   CacheMaintenanceLib
+  MmPlatformHobProducerLib
 
 [Guids]
   gMmCommBufferHobGuid
