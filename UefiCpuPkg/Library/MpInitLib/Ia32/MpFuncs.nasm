@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2023, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -225,6 +225,10 @@ RendezvousFunnelProcEnd:
 ;  specific to SEV-ES support and are not applicable on IA32.
 ;-------------------------------------------------------------------------------------
 AsmRelocateApLoopGenericStart:
+    mov        eax, cr0
+    btr        eax, 31             ; Clear CR0.PG
+    mov        cr0, eax            ; Disable paging since the page table might be unavailiable
+
     mov        eax, esp
     mov        esp, [eax + 12]     ; TopOfApStack
     push       dword [eax]         ; push return address for stack trace
