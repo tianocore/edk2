@@ -33,6 +33,7 @@
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/MicrocodeLib.h>
+#include <Library/CpuPageTableLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 
 #include <Register/Amd/Fam17Msr.h>
@@ -67,6 +68,8 @@
 // Default maximum number of entries to store the microcode patches information
 //
 #define DEFAULT_MAX_MICROCODE_PATCH_NUM  8
+
+#define PAGING_4K_ADDRESS_MASK_64  0x000FFFFFFFFFF000ull
 
 //
 // Data structure for microcode patch information

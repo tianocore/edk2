@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for PEI phase.
 
-  Copyright (c) 2016 - 2020, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,6 +9,7 @@
 #include "MpLib.h"
 #include <Library/PeiServicesLib.h>
 #include <Guid/S3SmmInitDone.h>
+#include <Guid/EndOfS3Resume.h>
 #include <Ppi/ShadowMicrocode.h>
 
 STATIC UINT64  mSevEsPeiWakeupBuffer = BASE_1MB;
@@ -450,6 +451,47 @@ BuildMicrocodeCacheHob (
 }
 
 /**
+  S3 SMM Init Done notification function.
+
+  @param  PeiServices      Indirect reference to the PEI Services Table.
+  @param  NotifyDesc       Address of the notification descriptor data structure.
+  @param  InvokePpi        Address of the PPI that was invoked.
+
+  @retval EFI_SUCCESS      The function completes successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+NotifyOnEndOfS3Resume (
+  IN  EFI_PEI_SERVICES           **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN  VOID                       *InvokePpi
+  )
+{
+  CPU_MP_DATA  *CpuMpData;
+
+  CpuMpData       = GetCpuMpData ();
+  mNumberToFinish = CpuMpData->CpuCount - 1;
+  WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, NULL, TRUE);
+  while (mNumberToFinish > 0) {
+    CpuPause ();
+  }
+
+  DEBUG ((DEBUG_INFO, "%a() done!\n", __func__));
+
+  return EFI_SUCCESS;
+}
+
+//
+// Global function
+//
+EFI_PEI_NOTIFY_DESCRIPTOR  mEndOfS3ResumeNotifyDesc = {
+  EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+  &gEdkiiEndOfS3ResumeGuid,
+  NotifyOnEndOfS3Resume
+};
+
+/**
   Initialize global data for MP support.
 
   @param[in] CpuMpData  The pointer to CPU MP Data structure.
@@ -463,11 +505,15 @@ InitMpGlobalData (
 
   BuildMicrocodeCacheHob (CpuMpData);
   SaveCpuMpData (CpuMpData);
+  PrepareApLoopCode (CpuMpData);
 
   ///
   /// Install Notify
   ///
   Status = PeiServicesNotifyPpi (&mS3SmmInitDoneNotifyDesc);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = PeiServicesNotifyPpi (&mEndOfS3ResumeNotifyDesc);
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -814,4 +860,110 @@ PlatformShadowMicrocode (
     ));
 
   return EFI_SUCCESS;
+}
+
+/**
+  Allocate buffer for ApLoopCode.
+
+  @param[in]      Pages    Number of pages to allocate.
+  @param[in, out] Address  Pointer to the allocated buffer.
+**/
+VOID
+AllocateApLoopCodeBuffer (
+  IN UINTN                     Pages,
+  IN OUT EFI_PHYSICAL_ADDRESS  *Address
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = PeiServicesAllocatePages (EfiACPIMemoryNVS, Pages, Address);
+  if (EFI_ERROR (Status)) {
+    *Address = 0;
+  }
+}
+
+/**
+  Remove Nx protection for the range specific by BaseAddress and Length.
+
+  The PEI implementation uses CpuPageTableLib to change the attribute.
+  The DXE implementation uses gDS to change the attribute.
+
+  @param[in] BaseAddress  BaseAddress of the range.
+  @param[in] Length       Length of the range.
+**/
+VOID
+RemoveNxprotection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
+  )
+{
+  EFI_STATUS                  Status;
+  UINTN                       PageTable;
+  EFI_PHYSICAL_ADDRESS        Buffer;
+  UINTN                       BufferSize;
+  IA32_MAP_ATTRIBUTE          MapAttribute;
+  IA32_MAP_ATTRIBUTE          MapMask;
+  PAGING_MODE                 PagingMode;
+  IA32_CR4                    Cr4;
+  BOOLEAN                     Page5LevelSupport;
+  UINT32                      RegEax;
+  BOOLEAN                     Page1GSupport;
+  CPUID_EXTENDED_CPU_SIG_EDX  RegEdx;
+
+  if (sizeof (UINTN) == sizeof (UINT64)) {
+    //
+    // Check Page5Level Support or not.
+    //
+    Cr4.UintN         = AsmReadCr4 ();
+    Page5LevelSupport = (Cr4.Bits.LA57 ? TRUE : FALSE);
+
+    //
+    // Check Page1G Support or not.
+    //
+    Page1GSupport = FALSE;
+    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= CPUID_EXTENDED_CPU_SIG) {
+      AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx.Uint32);
+      if (RegEdx.Bits.Page1GB != 0) {
+        Page1GSupport = TRUE;
+      }
+    }
+
+    //
+    // Decide Paging Mode according Page5LevelSupport & Page1GSupport.
+    //
+    if (Page5LevelSupport) {
+      PagingMode = Page1GSupport ? Paging5Level1GB : Paging5Level;
+    } else {
+      PagingMode = Page1GSupport ? Paging4Level1GB : Paging4Level;
+    }
+  } else {
+    PagingMode = PagingPae;
+  }
+
+  MapAttribute.Uint64 = 0;
+  MapMask.Uint64      = 0;
+  MapMask.Bits.Nx     = 1;
+  PageTable           = AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64;
+  BufferSize          = 0;
+
+  //
+  // Get required buffer size for changing the pagetable.
+  //
+  Status = PageTableMap (&PageTable, PagingMode, 0, &BufferSize, BaseAddress, Length, &MapAttribute, &MapMask, NULL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
+    //
+    // Allocate required Buffer.
+    //
+    Status = PeiServicesAllocatePages (
+               EfiBootServicesData,
+               EFI_SIZE_TO_PAGES (BufferSize),
+               &Buffer
+               );
+    ASSERT_EFI_ERROR (Status);
+    Status = PageTableMap (&PageTable, PagingMode, (VOID *)(UINTN)Buffer, &BufferSize, BaseAddress, Length, &MapAttribute, &MapMask, NULL);
+  }
+
+  ASSERT_EFI_ERROR (Status);
+  AsmWriteCr3 (PageTable);
 }
