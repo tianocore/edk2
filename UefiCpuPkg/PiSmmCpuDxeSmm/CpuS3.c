@@ -105,11 +105,6 @@ InitializeCpuBeforeRebase (
   IN BOOLEAN  IsBsp
   )
 {
-  ProgramVirtualWireMode ();
-  if (!IsBsp) {
-    DisableLvtInterrupts ();
-  }
-
   //
   // Count down the number with lock mechanism.
   //
