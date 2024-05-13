@@ -70,7 +70,6 @@
   gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
   gEfiHobListGuid
   gEfiHobMemoryAllocModuleGuid
-  gMmCoreDataHobGuid
   gMmFvDispatchGuid
   gEfiEventLegacyBootGuid
   gEfiEventExitBootServicesGuid
