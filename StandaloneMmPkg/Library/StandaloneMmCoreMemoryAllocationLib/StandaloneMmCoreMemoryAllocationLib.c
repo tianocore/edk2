@@ -857,9 +857,12 @@ MemoryAllocationLibConstructor (
   //
   // Search for a Hob containing the MMRAM ranges
   //
-  MmramRangesHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, HobStart);
+  MmramRangesHob = GetNextGuidHob (&gEfiSmmSmramMemoryGuid, HobStart);
   if (MmramRangesHob == NULL) {
-    return EFI_UNSUPPORTED;
+    MmramRangesHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, HobStart);
+    if (MmramRangesHob == NULL) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
