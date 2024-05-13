@@ -142,6 +142,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID  *mSecureHashAlgorithms[] = {
   &gEfiRngAlgorithmSp80090Ctr256Guid,  // SP800-90A DRBG CTR using AES-256
   &gEfiRngAlgorithmSp80090Hmac256Guid, // SP800-90A DRBG HMAC using SHA-256
   &gEfiRngAlgorithmSp80090Hash256Guid, // SP800-90A DRBG Hash using SHA-256
+  &gEfiRngAlgorithmArmRndr,            // unspecified SP800-90A DRBG via ARM RNDR register
   &gEfiRngAlgorithmRaw,                // Raw data from NRBG (or TRNG)
 };
 

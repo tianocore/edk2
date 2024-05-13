@@ -54,6 +54,7 @@
   gEfiRngAlgorithmSp80090Ctr256Guid             ## CONSUMES
   gEfiRngAlgorithmSp80090Hmac256Guid            ## CONSUMES
   gEfiRngAlgorithmSp80090Hash256Guid            ## CONSUMES
+  gEfiRngAlgorithmArmRndr                       ## CONSUMES
 
 [Protocols]
   gEfiSimpleNetworkProtocolGuid                 ## SOMETIMES_CONSUMES
