@@ -111,8 +111,8 @@ READ_LOCK_STATUS   = TRUE
   INF ArmPkg/Drivers/CpuPei/CpuPei.inf
   INF MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
-!if $(TPM2_ENABLE) == TRUE
   INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+!if $(TPM2_ENABLE) == TRUE
   INF MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf
   INF OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   INF SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf
