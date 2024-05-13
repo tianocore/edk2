@@ -71,6 +71,9 @@
   ## @libraryclass   Provides functions for SMM CPU Sync Operation.
   SmmCpuSyncLib|Include/Library/SmmCpuSyncLib.h
 
+  ## @libraryclass   Provides functions for SMM Relocation Operation.
+  SmmRelocationLib|Include/Library/SmmRelocationLib.h
+
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides functions to manage MMU features on RISCV64 CPUs.
   ##

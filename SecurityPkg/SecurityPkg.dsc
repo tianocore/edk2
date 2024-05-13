@@ -1,7 +1,7 @@
 ## @file
 #  Security Module Package for All Architectures.
 #
-# Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2020 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 # Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
@@ -75,6 +75,19 @@
   SecureBootVariableProvisionLib|SecurityPkg/Library/SecureBootVariableProvisionLib/SecureBootVariableProvisionLib.inf
   TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
+
+  SpdmSecurityLib|SecurityPkg/DeviceSecurity/SpdmSecurityLib/SpdmSecurityLib.inf
+  SpdmDeviceSecretLib|SecurityPkg/DeviceSecurity/SpdmLib/SpdmDeviceSecretLibNull.inf
+  SpdmCryptLib|SecurityPkg/DeviceSecurity/SpdmLib/SpdmCryptLib.inf
+  SpdmCommonLib|SecurityPkg/DeviceSecurity/SpdmLib/SpdmCommonLib.inf
+  SpdmRequesterLib|SecurityPkg/DeviceSecurity/SpdmLib/SpdmRequesterLib.inf
+  SpdmResponderLib|SecurityPkg/DeviceSecurity/SpdmLib/SpdmResponderLib.inf
+  SpdmSecuredMessageLib|SecurityPkg/DeviceSecurity/SpdmLib/SpdmSecuredMessageLib.inf
+  SpdmTransportMctpLib|SecurityPkg/DeviceSecurity/SpdmLib/SpdmTransportMctpLib.inf
+  SpdmTransportPciDoeLib|SecurityPkg/DeviceSecurity/SpdmLib/SpdmTransportPciDoeLib.inf
+  CryptlibWrapper|SecurityPkg/DeviceSecurity/OsStub/CryptlibWrapper/CryptlibWrapper.inf
+  PlatformLibWrapper|SecurityPkg/DeviceSecurity/OsStub/PlatformLibWrapper/PlatformLibWrapper.inf
+  MemLibWrapper|SecurityPkg/DeviceSecurity/OsStub/MemLibWrapper/MemLibWrapper.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
@@ -286,6 +299,22 @@
   # Random Number Generator
   #
   SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
+  #
+  # SPDM
+  #
+  SecurityPkg/DeviceSecurity/SpdmSecurityLib/SpdmSecurityLib.inf
+  SecurityPkg/DeviceSecurity/SpdmLib/SpdmDeviceSecretLibNull.inf
+  SecurityPkg/DeviceSecurity/SpdmLib/SpdmCryptLib.inf
+  SecurityPkg/DeviceSecurity/SpdmLib/SpdmCommonLib.inf
+  SecurityPkg/DeviceSecurity/SpdmLib/SpdmRequesterLib.inf
+  SecurityPkg/DeviceSecurity/SpdmLib/SpdmResponderLib.inf
+  SecurityPkg/DeviceSecurity/SpdmLib/SpdmSecuredMessageLib.inf
+  SecurityPkg/DeviceSecurity/SpdmLib/SpdmTransportMctpLib.inf
+  SecurityPkg/DeviceSecurity/SpdmLib/SpdmTransportPciDoeLib.inf
+  SecurityPkg/DeviceSecurity/OsStub/CryptlibWrapper/CryptlibWrapper.inf
+  SecurityPkg/DeviceSecurity/OsStub/PlatformLibWrapper/PlatformLibWrapper.inf
+  SecurityPkg/DeviceSecurity/OsStub/MemLibWrapper/MemLibWrapper.inf
 
 [Components.IA32, Components.X64]
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf

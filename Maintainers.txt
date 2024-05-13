@@ -567,7 +567,7 @@ F: OvmfPkg/XenIoPvhDxe/
 F: OvmfPkg/XenPlatformPei/
 F: OvmfPkg/XenPvBlkDxe/
 F: OvmfPkg/XenResetVector/
-R: Anthony Perard <anthony.perard@citrix.com> [tperard]
+R: Anthony Perard <anthony@xenproject.org> [tperard]
 
 OvmfPkg: RISC-V Qemu Virt Platform
 F: OvmfPkg/RiscVVirt
@@ -626,6 +626,7 @@ F: StandaloneMmPkg/
 M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
+R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 
 UefiCpuPkg
 F: UefiCpuPkg/
@@ -633,6 +634,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
+R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
 
 UefiCpuPkg: Sec related modules
 F: UefiCpuPkg/SecCore/

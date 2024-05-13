@@ -1,7 +1,7 @@
 /**@file
   Memory Detection for Virtual Machines.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
@@ -42,6 +42,9 @@ Module Name:
 #include <Library/TdxLib.h>
 
 #include <Library/PlatformInitLib.h>
+
+#include <Guid/AcpiS3Context.h>
+#include <Guid/SmramMemoryReserve.h>
 
 #define MEGABYTE_SHIFT  20
 
@@ -982,6 +985,65 @@ PlatformAddressWidthInitialization (
   PlatformInfoHob->PhysMemAddressWidth = PhysMemAddressWidth;
 }
 
+/**
+  Create gEfiSmmSmramMemoryGuid HOB defined in the PI specification Vol. 3,
+  section 5, which is used to describe the SMRAM memory regions supported
+  by the platform.
+
+  @param[in] StartAddress      StartAddress of smram.
+  @param[in] Size              Size of smram.
+
+**/
+STATIC
+VOID
+CreateSmmSmramMemoryHob (
+  IN EFI_PHYSICAL_ADDRESS  StartAddress,
+  IN UINT32                Size
+  )
+{
+  UINTN                           BufferSize;
+  UINT8                           SmramRanges;
+  EFI_PEI_HOB_POINTERS            Hob;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *SmramHobDescriptorBlock;
+  VOID                            *GuidHob;
+
+  SmramRanges = 2;
+  BufferSize  = sizeof (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK) + (SmramRanges - 1) * sizeof (EFI_SMRAM_DESCRIPTOR);
+
+  Hob.Raw = BuildGuidHob (
+              &gEfiSmmSmramMemoryGuid,
+              BufferSize
+              );
+  ASSERT (Hob.Raw);
+
+  SmramHobDescriptorBlock                             = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)(Hob.Raw);
+  SmramHobDescriptorBlock->NumberOfSmmReservedRegions = SmramRanges;
+
+  //
+  // 1. Create first SMRAM descriptor, which contains data structures used in S3 resume.
+  // One page is enough for the data structure
+  //
+  SmramHobDescriptorBlock->Descriptor[0].PhysicalStart = StartAddress;
+  SmramHobDescriptorBlock->Descriptor[0].CpuStart      = StartAddress;
+  SmramHobDescriptorBlock->Descriptor[0].PhysicalSize  = EFI_PAGE_SIZE;
+  SmramHobDescriptorBlock->Descriptor[0].RegionState   = EFI_SMRAM_CLOSED | EFI_CACHEABLE | EFI_ALLOCATED;
+
+  //
+  // 1.1 Create gEfiAcpiVariableGuid according SmramHobDescriptorBlock->Descriptor[0] since it's used in S3 resume.
+  //
+  GuidHob = BuildGuidHob (&gEfiAcpiVariableGuid, sizeof (EFI_SMRAM_DESCRIPTOR));
+  ASSERT (GuidHob != NULL);
+  CopyMem (GuidHob, &SmramHobDescriptorBlock->Descriptor[0], sizeof (EFI_SMRAM_DESCRIPTOR));
+
+  //
+  // 2. Create second SMRAM descriptor, which is free and will be used by SMM foundation.
+  //
+  SmramHobDescriptorBlock->Descriptor[1].PhysicalStart = SmramHobDescriptorBlock->Descriptor[0].PhysicalStart + EFI_PAGE_SIZE;
+  SmramHobDescriptorBlock->Descriptor[1].CpuStart      = SmramHobDescriptorBlock->Descriptor[0].CpuStart + EFI_PAGE_SIZE;
+  SmramHobDescriptorBlock->Descriptor[1].PhysicalSize  = Size - EFI_PAGE_SIZE;
+  SmramHobDescriptorBlock->Descriptor[1].RegionState   = EFI_SMRAM_CLOSED | EFI_CACHEABLE;
+}
+
 STATIC
 VOID
 QemuInitializeRamBelow1gb (
@@ -1029,48 +1091,43 @@ PlatformQemuInitializeRam (
   //
   PlatformGetSystemMemorySizeBelow4gb (PlatformInfoHob);
 
-  if (PlatformInfoHob->BootMode == BOOT_ON_S3_RESUME) {
+  //
+  // CpuMpPei saves the original contents of the borrowed area in permanent
+  // PEI RAM, in a backup buffer allocated with the normal PEI services.
+  // CpuMpPei restores the original contents ("returns" the borrowed area) at
+  // End-of-PEI. End-of-PEI in turn is emitted by S3Resume2Pei before
+  // transferring control to the OS's wakeup vector in the FACS.
+  //
+  // We expect any other PEIMs that "borrow" memory similarly to CpuMpPei to
+  // restore the original contents. Furthermore, we expect all such PEIMs
+  // (CpuMpPei included) to claim the borrowed areas by producing memory
+  // allocation HOBs, and to honor preexistent memory allocation HOBs when
+  // looking for an area to borrow.
+  //
+  QemuInitializeRamBelow1gb (PlatformInfoHob);
+
+  if (PlatformInfoHob->SmmSmramRequire) {
+    UINT32                TsegSize;
+    EFI_PHYSICAL_ADDRESS  TsegBase;
+
+    TsegSize = PlatformInfoHob->Q35TsegMbytes * SIZE_1MB;
+    TsegBase = PlatformInfoHob->LowMemory - TsegSize;
+    PlatformAddMemoryRangeHob (BASE_1MB, TsegBase);
+    PlatformAddReservedMemoryBaseSizeHob (
+      TsegBase,
+      TsegSize,
+      TRUE
+      );
+
     //
-    // Create the following memory HOB as an exception on the S3 boot path.
+    // Create gEfiSmmSmramMemoryGuid HOB
     //
-    // Normally we'd create memory HOBs only on the normal boot path. However,
-    // CpuMpPei specifically needs such a low-memory HOB on the S3 path as
-    // well, for "borrowing" a subset of it temporarily, for the AP startup
-    // vector.
-    //
-    // CpuMpPei saves the original contents of the borrowed area in permanent
-    // PEI RAM, in a backup buffer allocated with the normal PEI services.
-    // CpuMpPei restores the original contents ("returns" the borrowed area) at
-    // End-of-PEI. End-of-PEI in turn is emitted by S3Resume2Pei before
-    // transferring control to the OS's wakeup vector in the FACS.
-    //
-    // We expect any other PEIMs that "borrow" memory similarly to CpuMpPei to
-    // restore the original contents. Furthermore, we expect all such PEIMs
-    // (CpuMpPei included) to claim the borrowed areas by producing memory
-    // allocation HOBs, and to honor preexistent memory allocation HOBs when
-    // looking for an area to borrow.
-    //
-    QemuInitializeRamBelow1gb (PlatformInfoHob);
+    CreateSmmSmramMemoryHob (TsegBase, TsegSize);
   } else {
-    //
-    // Create memory HOBs
-    //
-    QemuInitializeRamBelow1gb (PlatformInfoHob);
+    PlatformAddMemoryRangeHob (BASE_1MB, PlatformInfoHob->LowMemory);
+  }
 
-    if (PlatformInfoHob->SmmSmramRequire) {
-      UINT32  TsegSize;
-
-      TsegSize = PlatformInfoHob->Q35TsegMbytes * SIZE_1MB;
-      PlatformAddMemoryRangeHob (BASE_1MB, PlatformInfoHob->LowMemory - TsegSize);
-      PlatformAddReservedMemoryBaseSizeHob (
-        PlatformInfoHob->LowMemory - TsegSize,
-        TsegSize,
-        TRUE
-        );
-    } else {
-      PlatformAddMemoryRangeHob (BASE_1MB, PlatformInfoHob->LowMemory);
-    }
-
+  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
     //
     // If QEMU presents an E820 map, then create memory HOBs for the >=4GB RAM
     // entries. Otherwise, create a single memory HOB with the flat >=4GB

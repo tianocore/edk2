@@ -1,7 +1,7 @@
 /** @file
   This module implements Tcg2 Protocol.
 
-Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/EventExitBootServiceFailed.h>
 #include <Guid/ImageAuthentication.h>
 #include <Guid/TpmInstance.h>
+#include <Guid/DeviceAuthentication.h>
 
 #include <Protocol/DevicePath.h>
 #include <Protocol/MpService.h>
@@ -811,11 +812,16 @@ Is800155Event (
 {
   if ((((TCG_PCR_EVENT2_HDR *)NewEventHdr)->EventType == EV_NO_ACTION) &&
       (NewEventSize >= sizeof (TCG_Sp800_155_PlatformId_Event2)) &&
-      (CompareMem (
-         NewEventData,
-         TCG_Sp800_155_PlatformId_Event2_SIGNATURE,
-         sizeof (TCG_Sp800_155_PlatformId_Event2_SIGNATURE) - 1
-         ) == 0))
+      ((CompareMem (
+          NewEventData,
+          TCG_Sp800_155_PlatformId_Event2_SIGNATURE,
+          sizeof (TCG_Sp800_155_PlatformId_Event2_SIGNATURE) - 1
+          ) == 0) ||
+       (CompareMem (
+          NewEventData,
+          TCG_Sp800_155_PlatformId_Event3_SIGNATURE,
+          sizeof (TCG_Sp800_155_PlatformId_Event3_SIGNATURE) - 1
+          ) == 0)))
   {
     return TRUE;
   }
@@ -1230,10 +1236,25 @@ TcgDxeHashLogExtendEvent (
     //
     // Do not do TPM extend for EV_NO_ACTION
     //
-    Status = EFI_SUCCESS;
-    InitNoActionEvent (&NoActionEvent, NewEventHdr->EventSize);
-    if ((Flags & EFI_TCG2_EXTEND_ONLY) == 0) {
-      Status = TcgDxeLogHashEvent (&(NoActionEvent.Digests), NewEventHdr, NewEventData);
+    if (NewEventHdr->PCRIndex <= MAX_PCR_INDEX) {
+      Status = EFI_SUCCESS;
+      InitNoActionEvent (&NoActionEvent, NewEventHdr->EventSize);
+      if ((Flags & EFI_TCG2_EXTEND_ONLY) == 0) {
+        Status = TcgDxeLogHashEvent (&(NoActionEvent.Digests), NewEventHdr, NewEventData);
+      }
+    } else {
+      //
+      // Extend to NvIndex
+      //
+      Status = HashAndExtend (
+                 NewEventHdr->PCRIndex,
+                 HashData,
+                 (UINTN)HashDataLen,
+                 &DigestList
+                 );
+      if (!EFI_ERROR (Status)) {
+        Status = TcgDxeLogHashEvent (&DigestList, NewEventHdr, NewEventData);
+      }
     }
 
     return Status;
@@ -1317,7 +1338,7 @@ Tcg2HashLogExtendEvent (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Event->Header.PCRIndex > MAX_PCR_INDEX) {
+  if ((Event->Header.EventType != EV_NO_ACTION) && (Event->Header.PCRIndex > MAX_PCR_INDEX)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2063,7 +2084,7 @@ MeasureVariable (
       );
   }
 
-  if (EventType == EV_EFI_VARIABLE_DRIVER_CONFIG) {
+  if ((EventType == EV_EFI_VARIABLE_DRIVER_CONFIG) || (EventType == EV_EFI_SPDM_DEVICE_POLICY)) {
     //
     // Digest is the event data (UEFI_VARIABLE_DATA)
     //
@@ -2317,6 +2338,37 @@ MeasureAllSecureVariables (
     FreePool (Data);
   } else {
     DEBUG ((DEBUG_INFO, "Skip measuring variable %s since it's deleted\n", EFI_IMAGE_SECURITY_DATABASE2));
+  }
+
+  //
+  // Meaurement UEFI device signature database
+  //
+  if ((PcdGet32 (PcdTcgPfpMeasurementRevision) >= TCG_EfiSpecIDEventStruct_SPEC_ERRATA_TPM2_REV_106) &&
+      (PcdGet8 (PcdEnableSpdmDeviceAuthentication) != 0))
+  {
+    Status = GetVariable2 (EFI_DEVICE_SECURITY_DATABASE, &gEfiDeviceSignatureDatabaseGuid, &Data, &DataSize);
+    if (Status == EFI_SUCCESS) {
+      Status = MeasureVariable (
+                 PCR_INDEX_FOR_SIGNATURE_DB,
+                 EV_EFI_SPDM_DEVICE_POLICY,
+                 EFI_DEVICE_SECURITY_DATABASE,
+                 &gEfiDeviceSignatureDatabaseGuid,
+                 Data,
+                 DataSize
+                 );
+      FreePool (Data);
+    } else if (Status == EFI_NOT_FOUND) {
+      Data     = NULL;
+      DataSize = 0;
+      Status   = MeasureVariable (
+                   PCR_INDEX_FOR_SIGNATURE_DB,
+                   EV_EFI_SPDM_DEVICE_POLICY,
+                   EFI_DEVICE_SECURITY_DATABASE,
+                   &gEfiDeviceSignatureDatabaseGuid,
+                   Data,
+                   DataSize
+                   );
+    }
   }
 
   return EFI_SUCCESS;

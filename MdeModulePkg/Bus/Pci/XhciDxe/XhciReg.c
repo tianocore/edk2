@@ -864,7 +864,7 @@ XhcResetHC (
     // Otherwise there may have the timeout case happened.
     // The below is a workaround to solve such problem.
     //
-    gBS->Stall (XHC_1_MILLISECOND);
+    gBS->Stall (PcdGet16 (PcdDelayXhciHCReset));
     Status = XhcWaitOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET, FALSE, Timeout);
 
     if (!EFI_ERROR (Status)) {

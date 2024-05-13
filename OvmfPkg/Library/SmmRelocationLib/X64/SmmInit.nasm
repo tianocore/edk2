@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 ; SPDX-License-Identifier: BSD-2-Clause-Patent
 ;
 ; Module Name:
@@ -18,11 +18,11 @@ extern ASM_PFX(SmmInitHandler)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
 
-global ASM_PFX(gPatchSmmCr3)
-global ASM_PFX(gPatchSmmCr4)
-global ASM_PFX(gPatchSmmCr0)
+global ASM_PFX(gPatchSmmInitCr3)
+global ASM_PFX(gPatchSmmInitCr4)
+global ASM_PFX(gPatchSmmInitCr0)
 global ASM_PFX(gPatchSmmInitStack)
-global ASM_PFX(gcSmiInitGdtr)
+global ASM_PFX(gcSmmInitGdtr)
 global ASM_PFX(gcSmmInitSize)
 global ASM_PFX(gcSmmInitTemplate)
 global ASM_PFX(gPatchRebasedFlagAddr32)
@@ -30,12 +30,67 @@ global ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32)
 
 %define LONG_MODE_CS 0x38
 
+    SECTION .data
+
+NullSeg: DQ 0                   ; reserved by architecture
+CodeSeg32:
+            DW      -1                  ; LimitLow
+            DW      0                   ; BaseLow
+            DB      0                   ; BaseMid
+            DB      0x9b
+            DB      0xcf                ; LimitHigh
+            DB      0                   ; BaseHigh
+ProtModeCodeSeg32:
+            DW      -1                  ; LimitLow
+            DW      0                   ; BaseLow
+            DB      0                   ; BaseMid
+            DB      0x9b
+            DB      0xcf                ; LimitHigh
+            DB      0                   ; BaseHigh
+ProtModeSsSeg32:
+            DW      -1                  ; LimitLow
+            DW      0                   ; BaseLow
+            DB      0                   ; BaseMid
+            DB      0x93
+            DB      0xcf                ; LimitHigh
+            DB      0                   ; BaseHigh
+DataSeg32:
+            DW      -1                  ; LimitLow
+            DW      0                   ; BaseLow
+            DB      0                   ; BaseMid
+            DB      0x93
+            DB      0xcf                ; LimitHigh
+            DB      0                   ; BaseHigh
+CodeSeg16:
+            DW      -1
+            DW      0
+            DB      0
+            DB      0x9b
+            DB      0x8f
+            DB      0
+DataSeg16:
+            DW      -1
+            DW      0
+            DB      0
+            DB      0x93
+            DB      0x8f
+            DB      0
+CodeSeg64:
+            DW      -1                  ; LimitLow
+            DW      0                   ; BaseLow
+            DB      0                   ; BaseMid
+            DB      0x9b
+            DB      0xaf                ; LimitHigh
+            DB      0                   ; BaseHigh
+GDT_SIZE equ $ -   NullSeg
+
+ASM_PFX(gcSmmInitGdtr):
+    DW      GDT_SIZE - 1
+    DQ      NullSeg
+
+
     DEFAULT REL
     SECTION .text
-
-ASM_PFX(gcSmiInitGdtr):
-            DW      0
-            DQ      0
 
 global ASM_PFX(SmmStartup)
 
@@ -45,11 +100,11 @@ ASM_PFX(SmmStartup):
     cpuid
     mov     ebx, edx                    ; rdmsr will change edx. keep it in ebx.
     mov     eax, strict dword 0         ; source operand will be patched
-ASM_PFX(gPatchSmmCr3):
+ASM_PFX(gPatchSmmInitCr3):
     mov     cr3, eax
-o32 lgdt    [cs:ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
+o32 lgdt    [cs:ebp + (ASM_PFX(gcSmmInitGdtr) - ASM_PFX(SmmStartup))]
     mov     eax, strict dword 0         ; source operand will be patched
-ASM_PFX(gPatchSmmCr4):
+ASM_PFX(gPatchSmmInitCr4):
     or      ah,  2                      ; enable XMM registers access
     mov     cr4, eax
     mov     ecx, 0xc0000080             ; IA32_EFER MSR
@@ -61,7 +116,7 @@ ASM_PFX(gPatchSmmCr4):
 .1:
     wrmsr
     mov     eax, strict dword 0         ; source operand will be patched
-ASM_PFX(gPatchSmmCr0):
+ASM_PFX(gPatchSmmInitCr0):
     mov     cr0, eax                    ; enable protected mode & paging
     jmp     LONG_MODE_CS : dword 0      ; offset will be patched to @LongMode
 @PatchLongModeOffset:
@@ -134,8 +189,8 @@ ASM_PFX(gPatchRebasedFlagAddr32):
 ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32):
 
 BITS 64
-global ASM_PFX(PiSmmCpuSmmInitFixupAddress)
-ASM_PFX(PiSmmCpuSmmInitFixupAddress):
+global ASM_PFX(SmmInitFixupAddress)
+ASM_PFX(SmmInitFixupAddress):
     lea    rax, [@LongMode]
     lea    rcx, [@PatchLongModeOffset - 6]
     mov    dword [rcx], eax
