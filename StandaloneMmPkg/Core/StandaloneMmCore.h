@@ -30,6 +30,7 @@
 #include <Guid/HobList.h>
 #include <Guid/MmFvDispatch.h>
 #include <Guid/MmramMemoryReserve.h>
+#include <Guid/MmCommBuffer.h>
 
 #include <Library/StandaloneMmCoreEntryPoint.h>
 #include <Library/BaseLib.h>
