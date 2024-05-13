@@ -50,7 +50,6 @@ BaseRngLibConstructor (
   // MSR. A non-zero value indicates that the processor supports the RNDR instruction.
   //
   Isar0 = ArmReadIdIsar0 ();
-  ASSERT ((Isar0 & RNDR_MASK) != 0);
 
   mRndrSupported = ((Isar0 & RNDR_MASK) != 0);
 
