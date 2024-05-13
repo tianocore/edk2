@@ -14,8 +14,6 @@
 #ifndef _PI_MM_CORE_MEMORY_ALLOCATION_SERVICES_H_
 #define _PI_MM_CORE_MEMORY_ALLOCATION_SERVICES_H_
 
-#include <Guid/MmCoreData.h>
-
 /**
   Called to initialize the memory service.
 
