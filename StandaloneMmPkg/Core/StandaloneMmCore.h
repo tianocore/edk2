@@ -175,9 +175,8 @@ typedef struct {
 //
 // MM Core Global Variables
 //
-extern MM_CORE_PRIVATE_DATA  *gMmCorePrivate;
-extern EFI_MM_SYSTEM_TABLE   gMmCoreMmst;
-extern LIST_ENTRY            gHandleList;
+extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
+extern LIST_ENTRY           gHandleList;
 
 /**
   Called to initialize the memory service.
