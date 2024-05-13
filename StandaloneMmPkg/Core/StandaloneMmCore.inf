@@ -63,7 +63,7 @@
 
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
-  gEfiEventDxeDispatchGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEventMmDispatchGuid                          ## PRODUCES             ## GUID # SmiHandlerRegister
   gEfiEndOfDxeEventGroupGuid                    ## PRODUCES             ## GUID # SmiHandlerRegister
   ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
   ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister
@@ -79,6 +79,7 @@
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
+  gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered    ##CONSUMES
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC
