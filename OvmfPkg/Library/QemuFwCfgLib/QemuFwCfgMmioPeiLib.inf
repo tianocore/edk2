@@ -1,0 +1,45 @@
+## @file
+#
+#  Stateful, implicitly initialized fw_cfg library.
+#
+#  Copyright (C) 2013 - 2014, Red Hat, Inc.
+#  Copyright (c) 2008 - 2012, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = QemuFwCfgPeiLib
+  FILE_GUID                      = CDF9A9D5-7422-4DCB-B41D-607151AD320B
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = QemuFwCfgLib|PEIM
+
+  CONSTRUCTOR                    = QemuFwCfgInitialize
+
+[Sources]
+  QemuFwCfgLibMmio.c
+  QemuFwCfgMmioPei.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  PcdLib
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+
+[Guids]
+  gQemuFirmwareResourceHobGuid

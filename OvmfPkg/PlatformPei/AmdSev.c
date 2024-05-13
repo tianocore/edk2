@@ -17,7 +17,7 @@
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <Pi/PrePiHob.h>
+#include <Pi/PiHob.h>
 #include <PiPei.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/SmramSaveStateMap.h>
@@ -149,7 +149,7 @@ AmdSevSnpInitialize (
 
       if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
         if (ResourceHob->PhysicalStart >= SIZE_4GB) {
-          ResourceHob->ResourceType = BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED;
+          ResourceHob->ResourceType = EFI_RESOURCE_MEMORY_UNACCEPTED;
           continue;
         }
 
