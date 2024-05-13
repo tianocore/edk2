@@ -3,12 +3,11 @@
   Functions and types shared by the SMM accessor PEI and DXE modules.
 
   Copyright (C) 2015, Red Hat, Inc.
+  Copyright (c) 2024 Intel Corporation.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-
-#include <Guid/AcpiS3Context.h>
 #include <IndustryStandard/Q35MchIch9.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
@@ -166,68 +165,43 @@ SmramAccessLock (
 
 EFI_STATUS
 SmramAccessGetCapabilities (
-  IN BOOLEAN                   LockState,
-  IN BOOLEAN                   OpenState,
   IN OUT UINTN                 *SmramMapSize,
   IN OUT EFI_SMRAM_DESCRIPTOR  *SmramMap
   )
 {
-  UINTN   OriginalSize;
-  UINT32  TsegMemoryBaseMb, TsegMemoryBase;
-  UINT64  CommonRegionState;
-  UINT8   TsegSizeBits;
+  UINTN                           BufferSize;
+  EFI_HOB_GUID_TYPE               *GuidHob;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
+  UINTN                           Index;
 
-  OriginalSize  = *SmramMapSize;
-  *SmramMapSize = DescIdxCount * sizeof *SmramMap;
-  if (OriginalSize < *SmramMapSize) {
+  //
+  // Get Hob list
+  //
+  GuidHob         = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
+  DescriptorBlock = GET_GUID_HOB_DATA (GuidHob);
+  ASSERT (DescriptorBlock);
+
+  BufferSize = DescriptorBlock->NumberOfSmmReservedRegions * sizeof (EFI_SMRAM_DESCRIPTOR);
+
+  if (*SmramMapSize < BufferSize) {
+    *SmramMapSize = BufferSize;
     return EFI_BUFFER_TOO_SMALL;
   }
 
   //
-  // Read the TSEG Memory Base register.
+  // Update SmramMapSize to real return SMRAM map size
   //
-  TsegMemoryBaseMb = PciRead32 (DRAMC_REGISTER_Q35 (MCH_TSEGMB));
-  TsegMemoryBase   = (TsegMemoryBaseMb >> MCH_TSEGMB_MB_SHIFT) << 20;
+  *SmramMapSize = BufferSize;
 
   //
-  // Precompute the region state bits that will be set for all regions.
+  // Use the hob to publish SMRAM capabilities
   //
-  CommonRegionState = (OpenState ? EFI_SMRAM_OPEN : EFI_SMRAM_CLOSED) |
-                      (LockState ? EFI_SMRAM_LOCKED : 0) |
-                      EFI_CACHEABLE;
-
-  //
-  // The first region hosts an SMM_S3_RESUME_STATE object. It is located at the
-  // start of TSEG. We round up the size to whole pages, and we report it as
-  // EFI_ALLOCATED, so that the SMM_CORE stays away from it.
-  //
-  SmramMap[DescIdxSmmS3ResumeState].PhysicalStart = TsegMemoryBase;
-  SmramMap[DescIdxSmmS3ResumeState].CpuStart      = TsegMemoryBase;
-  SmramMap[DescIdxSmmS3ResumeState].PhysicalSize  =
-    EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (sizeof (SMM_S3_RESUME_STATE)));
-  SmramMap[DescIdxSmmS3ResumeState].RegionState =
-    CommonRegionState | EFI_ALLOCATED;
-
-  //
-  // Get the TSEG size bits from the ESMRAMC register.
-  //
-  TsegSizeBits = PciRead8 (DRAMC_REGISTER_Q35 (MCH_ESMRAMC)) &
-                 MCH_ESMRAMC_TSEG_MASK;
-
-  //
-  // The second region is the main one, following the first.
-  //
-  SmramMap[DescIdxMain].PhysicalStart =
-    SmramMap[DescIdxSmmS3ResumeState].PhysicalStart +
-    SmramMap[DescIdxSmmS3ResumeState].PhysicalSize;
-  SmramMap[DescIdxMain].CpuStart     = SmramMap[DescIdxMain].PhysicalStart;
-  SmramMap[DescIdxMain].PhysicalSize =
-    (TsegSizeBits == MCH_ESMRAMC_TSEG_8MB ? SIZE_8MB :
-     TsegSizeBits == MCH_ESMRAMC_TSEG_2MB ? SIZE_2MB :
-     TsegSizeBits == MCH_ESMRAMC_TSEG_1MB ? SIZE_1MB :
-     mQ35TsegMbytes * SIZE_1MB) -
-    SmramMap[DescIdxSmmS3ResumeState].PhysicalSize;
-  SmramMap[DescIdxMain].RegionState = CommonRegionState;
+  for (Index = 0; Index < DescriptorBlock->NumberOfSmmReservedRegions; Index++) {
+    SmramMap[Index].PhysicalStart = DescriptorBlock->Descriptor[Index].PhysicalStart;
+    SmramMap[Index].CpuStart      = DescriptorBlock->Descriptor[Index].CpuStart;
+    SmramMap[Index].PhysicalSize  = DescriptorBlock->Descriptor[Index].PhysicalSize;
+    SmramMap[Index].RegionState   = DescriptorBlock->Descriptor[Index].RegionState;
+  }
 
   return EFI_SUCCESS;
 }

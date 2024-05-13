@@ -201,6 +201,8 @@
   UefiCpuPkg/Library/MmSaveStateLib/AmdMmSaveStateLib.inf
   UefiCpuPkg/Library/MmSaveStateLib/IntelMmSaveStateLib.inf
   UefiCpuPkg/Library/SmmCpuFeaturesLib/AmdSmmCpuFeaturesLib.inf
+  UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
+  UefiCpuPkg/Library/SmmRelocationLib/AmdSmmRelocationLib.inf
 
 [Components.X64]
   UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/DxeCpuExceptionHandlerLibUnitTest.inf

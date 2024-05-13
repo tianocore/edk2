@@ -169,6 +169,11 @@
   #
   ImagePropertiesRecordLib|Include/Library/ImagePropertiesRecordLib.h
 
+  ##  @libraryclass   Platform SPI Host Controller library which provides low-level
+  #                   control over the SPI hardware
+  #
+  SpiHcPlatformLib|Include/Library/SpiHcPlatformLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -1153,6 +1158,11 @@
   #   FALSE - UEFI will load at any address<BR>
   # @Prompt Enable large address image loading.
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageLargeAddressLoad|TRUE|BOOLEAN|0x30001059
+
+  ## Indicates time delay for XHCI registers access after it issues HCRST.
+  # Default is 2000, it represent delay is 2 ms.
+  # @Prompt Delay access XHCI register after it issues HCRST (us)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDelayXhciHCReset|2000|UINT16|0x30001060
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
@@ -2171,6 +2181,11 @@
   #       EV_EFI_PLATFORM_FIRMWARE_BLOB2 and EV_EFI_HANDOFF_TABLES2.
   # @Prompt TCG Platform Firmware Profile revision.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision|0|UINT32|0x00010077
+
+  ## Specify whether to enable the state of SPDM device authentication and measurement.<BR><BR>
+  #  0: Platform Firmware not supports SPDM device authentication and measurement.
+  #  1: Platform Firmware supports SPDM device authentication and measurement.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableSpdmDeviceAuthentication|0|UINT8|0x00010033
 
   ## Indicates if StatusCode is reported via Serial port.<BR><BR>
   #   TRUE  - Reports StatusCode via Serial port.<BR>

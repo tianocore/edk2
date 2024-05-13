@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #ifndef _CXL_MAIN_H_
 #define _CXL_MAIN_H_
 
-#include <IndustryStandard/Cxl20.h>
+#include <IndustryStandard/Cxl30.h>
 //
 // CXL assigned new Vendor ID
 //

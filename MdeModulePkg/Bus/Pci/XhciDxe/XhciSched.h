@@ -79,6 +79,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define TRB_COMPLETION_STOPPED_LENGTH_INVALID  27
 
 //
+// USB Transfer Results Internal Definition
+// Based on XHCI spec 4.8.3, software should do the reset endpoint while USB Transaction occur.
+// Add the error code for USB Transaction error since UEFI spec don't have the related definition.
+//
+#define EDKII_USB_ERR_TRANSACTION  0x200
+
+//
 // The topology string used to present usb device location
 //
 typedef struct _USB_DEV_TOPOLOGY {

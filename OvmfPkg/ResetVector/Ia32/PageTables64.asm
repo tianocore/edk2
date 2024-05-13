@@ -67,7 +67,7 @@ BITS    32
 ;
 ; Create page tables for 4-level paging
 ;
-; Argument: upper 32 bits of the page table entries
+; Argument: upper 32 bits of the leaf page table entries
 ;
 %macro CreatePageTables4Level 1
 
@@ -78,19 +78,19 @@ BITS    32
     ; Top level Page Directory Pointers (1 * 512GB entry)
     ;
     mov     dword[PT_ADDR (0)], PT_ADDR (0x1000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (4)], %1
+    mov     dword[PT_ADDR (4)], 0
 
     ;
     ; Next level Page Directory Pointers (4 * 1GB entries => 4GB)
     ;
     mov     dword[PT_ADDR (0x1000)], PT_ADDR (0x2000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x1004)], %1
+    mov     dword[PT_ADDR (0x1004)], 0
     mov     dword[PT_ADDR (0x1008)], PT_ADDR (0x3000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x100C)], %1
+    mov     dword[PT_ADDR (0x100C)], 0
     mov     dword[PT_ADDR (0x1010)], PT_ADDR (0x4000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x1014)], %1
+    mov     dword[PT_ADDR (0x1014)], 0
     mov     dword[PT_ADDR (0x1018)], PT_ADDR (0x5000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x101C)], %1
+    mov     dword[PT_ADDR (0x101C)], 0
 
     ;
     ; Page Table Entries (2048 * 2MB entries => 4GB)
@@ -141,7 +141,7 @@ BITS    32
 ;
 ; Create page tables for 5-level paging with gigabyte pages
 ;
-; Argument: upper 32 bits of the page table entries
+; Argument: upper 32 bits of the leaf page table entries
 ;
 ; We have 6 pages available for the early page tables,
 ; we use four of them:
@@ -164,15 +164,15 @@ BITS    32
 
     ; level 5
     mov     dword[PT_ADDR (0)], PT_ADDR (0x1000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (4)], %1
+    mov     dword[PT_ADDR (4)], 0
 
     ; level 4
     mov     dword[PT_ADDR (0x1000)], PT_ADDR (0x3000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x1004)], %1
+    mov     dword[PT_ADDR (0x1004)], 0
 
     ; level 3 (1x -> level 2, 3x 1GB)
     mov     dword[PT_ADDR (0x3000)], PT_ADDR (0x2000) + PAGE_PDE_DIRECTORY_ATTR
-    mov     dword[PT_ADDR (0x3004)], %1
+    mov     dword[PT_ADDR (0x3004)], 0
     mov     dword[PT_ADDR (0x3008)], (1 << 30) + PAGE_PDE_LARGEPAGE_ATTR
     mov     dword[PT_ADDR (0x300c)], %1
     mov     dword[PT_ADDR (0x3010)], (2 << 30) + PAGE_PDE_LARGEPAGE_ATTR

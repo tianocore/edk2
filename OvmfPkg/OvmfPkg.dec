@@ -167,6 +167,7 @@
   gUefiOvmfPkgTdxAcpiHobGuid            = {0x6a0c5870, 0xd4ed, 0x44f4, {0xa1, 0x35, 0xdd, 0x23, 0x8b, 0x6f, 0x0c, 0x8d}}
   gEfiNonCcFvGuid                       = {0xae047c6d, 0xbce9, 0x426c, {0xae, 0x03, 0xa6, 0x8e, 0x3b, 0x8a, 0x04, 0x88}}
   gOvmfVariableGuid                     = {0x50bea1e5, 0xa2c5, 0x46e9, {0x9b, 0x3a, 0x59, 0x59, 0x65, 0x16, 0xb0, 0x0a}}
+  gQemuFirmwareResourceHobGuid          = {0x3cc47b04, 0x0d3e, 0xaa64, {0x06, 0xa6, 0x4b, 0xdc, 0x9a, 0x2c, 0x61, 0x19}}
 
 [Ppis]
   # PPI whose presence in the PPI database signals that the TPM base address
@@ -276,6 +277,11 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbSize|0|UINT32|0x41
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupBase|0|UINT32|0x44
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecGhcbBackupSize|0|UINT32|0x45
+
+  ## Specify the extra page table needed to mark the APIC MMIO range as unencrypted.
+  #  The value should be a multiple of 4KB for each.
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableBase|0x0|UINT32|0x72
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfSecApicPageTableSize|0x0|UINT32|0x73
 
   ## The base address and size of the SEV Launch Secret Area provisioned
   #  after remote attestation.  If this is set in the .fdf, the platform
