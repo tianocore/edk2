@@ -88,6 +88,8 @@ MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
 
 UINTN                 mMmramRangeCount;
 EFI_MMRAM_DESCRIPTOR  *mMmramRanges;
+MM_COMM_BUFFER        *mMmCommunicationBuffer;
+VOID                  *mInternalCommBufferCopy;
 
 /**
   Place holder function until all the MM System Table Service are available.
@@ -398,6 +400,62 @@ MmCoreInstallLoadedImage (
 }
 
 /**
+  Prepare communication buffer for MMI.
+**/
+VOID
+MmCorePrepareCommunicationBuffer (
+  VOID
+  )
+{
+  EFI_STATUS            Status;
+  EFI_HOB_GUID_TYPE     *GuidHob;
+  EFI_PHYSICAL_ADDRESS  Buffer;
+
+  mMmCommunicationBuffer  = NULL;
+  mInternalCommBufferCopy = NULL;
+
+  GuidHob = GetFirstGuidHob (&gMmCommBufferHobGuid);
+  ASSERT (GuidHob != NULL);
+  if (GuidHob == NULL) {
+    return;
+  }
+
+  mMmCommunicationBuffer = (MM_COMM_BUFFER *)GET_GUID_HOB_DATA (GuidHob);
+  DEBUG ((
+    DEBUG_INFO,
+    "MM Communication Buffer is at %x, number of pages is %x\n",
+    mMmCommunicationBuffer->PhysicalStart,
+    mMmCommunicationBuffer->NumberOfPages
+    ));
+  ASSERT (mMmCommunicationBuffer->PhysicalStart != 0 && mMmCommunicationBuffer->NumberOfPages != 0);
+
+  if (!MmIsBufferOutsideMmValid (
+         mMmCommunicationBuffer->PhysicalStart,
+         EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)
+         ))
+  {
+    mMmCommunicationBuffer = NULL;
+    DEBUG ((DEBUG_ERROR, "MM Communication Buffer is invalid!\n"));
+    ASSERT (FALSE);
+    return;
+  }
+
+  Status = MmAllocatePages (
+             AllocateAnyPages,
+             EfiRuntimeServicesData,
+             mMmCommunicationBuffer->NumberOfPages,
+             &Buffer
+             );
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  mInternalCommBufferCopy = (VOID *)(UINTN)Buffer;
+  DEBUG ((DEBUG_INFO, "Internal Communication Buffer Copy is at %p\n", mInternalCommBufferCopy));
+}
+
+/**
   The main entry point to MM Foundation.
 
   Note: This function is only used by MMRAM invocation.  It is never used by DXE invocation.
@@ -414,6 +472,8 @@ MmEntryPoint (
 {
   EFI_STATUS                 Status;
   EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
+  MM_COMM_BUFFER_STATUS      *CommunicationStatus;
+  UINTN                      BufferSize;
 
   DEBUG ((DEBUG_INFO, "MmEntryPoint ...\n"));
 
@@ -440,33 +500,65 @@ MmEntryPoint (
   // Check to see if this is a Synchronous MMI sent through the MM Communication
   // Protocol or an Asynchronous MMI
   //
-  if (gMmCorePrivate->CommunicationBuffer != 0) {
-    //
-    // Synchronous MMI for MM Core or request from Communicate protocol
-    //
-    if (!MmIsBufferOutsideMmValid ((UINTN)gMmCorePrivate->CommunicationBuffer, gMmCorePrivate->BufferSize)) {
+  if ((mMmCommunicationBuffer != NULL) && (mInternalCommBufferCopy != NULL)) {
+    CommunicationStatus = (MM_COMM_BUFFER_STATUS *)(UINTN)mMmCommunicationBuffer->Status;
+    if (CommunicationStatus->IsCommBufferValid) {
       //
-      // If CommunicationBuffer is not in valid address scope, return EFI_INVALID_PARAMETER
+      // Synchronous MMI for MM Core or request from Communicate protocol
       //
-      gMmCorePrivate->CommunicationBuffer = 0;
-      gMmCorePrivate->ReturnStatus        = EFI_INVALID_PARAMETER;
-    } else {
-      CommunicateHeader           = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)gMmCorePrivate->CommunicationBuffer;
-      gMmCorePrivate->BufferSize -= OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
-      Status                      = MmiManage (
-                                      &CommunicateHeader->HeaderGuid,
-                                      NULL,
-                                      CommunicateHeader->Data,
-                                      (UINTN *)&gMmCorePrivate->BufferSize
-                                      );
-      //
-      // Update CommunicationBuffer, BufferSize and ReturnStatus
-      // Communicate service finished, reset the pointer to CommBuffer to NULL
-      //
-      gMmCorePrivate->BufferSize         += OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
-      gMmCorePrivate->CommunicationBuffer = 0;
-      gMmCorePrivate->ReturnStatus        = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
+      CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommunicationBuffer->PhysicalStart;
+      BufferSize        = OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+      if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
+        //
+        // Shadow the data from MM Communication Buffer to internal buffer
+        //
+        CopyMem (
+          mInternalCommBufferCopy,
+          (VOID *)(UINTN)mMmCommunicationBuffer->PhysicalStart,
+          BufferSize
+          );
+        ZeroMem (
+          (UINT8 *)mInternalCommBufferCopy + BufferSize,
+          EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages) - BufferSize
+          );
+
+        CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)mInternalCommBufferCopy;
+        BufferSize        = CommunicateHeader->MessageLength;
+        Status            = MmiManage (
+                              &CommunicateHeader->HeaderGuid,
+                              NULL,
+                              CommunicateHeader->Data,
+                              &BufferSize
+                              );
+
+        BufferSize = BufferSize + OFFSET_OF (EFI_MM_COMMUNICATE_HEADER, Data);
+        if (BufferSize <= EFI_PAGES_TO_SIZE (mMmCommunicationBuffer->NumberOfPages)) {
+          //
+          // Copy the data back to MM Communication Buffer
+          //
+          CopyMem (
+            (VOID *)(UINTN)mMmCommunicationBuffer->PhysicalStart,
+            mInternalCommBufferCopy,
+            BufferSize
+            );
+        } else {
+          DEBUG ((DEBUG_ERROR, "Returned buffer size is larger than the size of MM Communication Buffer\n"));
+          ASSERT (FALSE);
+        }
+
+        //
+        // Update CommunicationBuffer, BufferSize and ReturnStatus
+        // Communicate service finished, reset the pointer to CommBuffer to NULL
+        //
+        CommunicationStatus->ReturnBufferSize = BufferSize;
+        CommunicationStatus->ReturnStatus     = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
+      } else {
+        DEBUG ((DEBUG_ERROR, "Input buffer size is larger than the size of MM Communication Buffer\n"));
+        ASSERT (FALSE);
+      }
     }
+  } else {
+    DEBUG ((DEBUG_ERROR, "No valid communication buffer, no Synchronous MMI will be processed\n"));
   }
 
   //
@@ -737,6 +829,8 @@ StandaloneMmMain (
                );
     DEBUG ((DEBUG_INFO, "MmiHandlerRegister - GUID %g - Status %d\n", mMmCoreMmiHandlers[Index].HandlerType, Status));
   }
+
+  MmCorePrepareCommunicationBuffer ();
 
   //
   // Install Loaded Image Protocol form MM Core
