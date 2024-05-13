@@ -293,6 +293,10 @@
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
 
+  # whether to use HVC or SMC to issue monitor calls - this typically depends
+  # on the exception level at which the UEFI system firmware executes
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
+
   #
   # TPM2 support
   #
