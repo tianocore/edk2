@@ -177,6 +177,7 @@ typedef struct {
 //
 extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
 extern LIST_ENTRY           gHandleList;
+extern BOOLEAN              mMmEntryPointRegistered;
 
 /**
   Called to initialize the memory service.
