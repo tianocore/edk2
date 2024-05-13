@@ -26,7 +26,7 @@ ArmMonitorCall (
   IN OUT ARM_MONITOR_ARGS  *Args
   )
 {
-  if (FeaturePcdGet (PcdMonitorConduitHvc)) {
+  if (PcdGetBool (PcdMonitorConduitHvc)) {
     ArmCallHvc ((ARM_HVC_ARGS *)Args);
   } else {
     ArmCallSmc ((ARM_SMC_ARGS *)Args);
