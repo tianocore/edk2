@@ -76,6 +76,7 @@
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
   gMmCommBufferHobGuid
+  gEfiSmmSmramMemoryGuid
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES

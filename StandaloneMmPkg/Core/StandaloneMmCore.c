@@ -669,9 +669,12 @@ StandaloneMmMain (
   //
   // Extract the MMRAM ranges from the MMRAM descriptor HOB
   //
-  MmramRangesHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, HobStart);
+  MmramRangesHob = GetNextGuidHob (&gEfiSmmSmramMemoryGuid, HobStart);
   if (MmramRangesHob == NULL) {
-    return EFI_UNSUPPORTED;
+    MmramRangesHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, HobStart);
+    if (MmramRangesHob == NULL) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
