@@ -140,7 +140,7 @@ GasketSecGetTime (
   OUT EFI_TIME_CAPABILITIES  *Capabilities OPTIONAL
   );
 
-VOID
+EFI_STATUS
 EFIAPI
 GasketSecSetTime (
   IN  EFI_TIME  *Time
