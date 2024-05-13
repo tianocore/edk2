@@ -52,3 +52,4 @@
 
 [Guids]
   gEfiMmPeiMmramMemoryReserveGuid     ## SOMETIMES_CONSUMES ## HOB
+  gEfiSmmSmramMemoryGuid              ## SOMETIMES_CONSUMES ## HOB

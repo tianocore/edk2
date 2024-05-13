@@ -98,7 +98,10 @@ MmMemLibInternalPopulateMmramRanges (
   //
   MmramRangesHob = GetFirstGuidHob (&gEfiMmPeiMmramMemoryReserveGuid);
   if (MmramRangesHob == NULL) {
-    return EFI_UNSUPPORTED;
+    MmramRangesHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
+    if (MmramRangesHob == NULL) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
