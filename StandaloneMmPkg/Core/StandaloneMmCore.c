@@ -81,11 +81,9 @@ MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
   { NULL,                     NULL,                              NULL, FALSE },
 };
 
-BOOLEAN               mMmEntryPointRegistered = FALSE;
-UINTN                 mMmramRangeCount;
-EFI_MMRAM_DESCRIPTOR  *mMmramRanges;
-MM_COMM_BUFFER        *mMmCommunicationBuffer;
-VOID                  *mInternalCommBufferCopy;
+BOOLEAN         mMmEntryPointRegistered = FALSE;
+MM_COMM_BUFFER  *mMmCommunicationBuffer;
+VOID            *mInternalCommBufferCopy;
 
 /**
   Place holder function until all the MM System Table Service are available.
@@ -695,16 +693,6 @@ StandaloneMmMain (
       MmramRanges[Index].PhysicalSize
       ));
   }
-
-  //
-  // Copy the MMRAM ranges into private MMRAM
-  //
-  mMmramRangeCount = MmramRangeCount;
-  DEBUG ((DEBUG_INFO, "mMmramRangeCount - 0x%x\n", mMmramRangeCount));
-  mMmramRanges = AllocatePool (mMmramRangeCount * sizeof (EFI_MMRAM_DESCRIPTOR));
-  DEBUG ((DEBUG_INFO, "mMmramRanges - 0x%x\n", mMmramRanges));
-  ASSERT (mMmramRanges != NULL);
-  CopyMem (mMmramRanges, (VOID *)(UINTN)MmramRanges, mMmramRangeCount * sizeof (EFI_MMRAM_DESCRIPTOR));
 
   //
   // No need to initialize memory service.
