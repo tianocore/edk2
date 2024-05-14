@@ -31,6 +31,7 @@
 #include <Guid/MmFvDispatch.h>
 #include <Guid/MmramMemoryReserve.h>
 #include <Guid/MmCommBuffer.h>
+#include <Guid/PiSmmMemoryAttributesTable.h>
 
 #include <Library/StandaloneMmCoreEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -41,7 +42,8 @@
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-
+#include <Library/ImagePropertiesRecordLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/StandaloneMmMemLib.h>
 #include <Library/HobLib.h>
 
@@ -515,6 +517,38 @@ MmLocateHandle (
   );
 
 /**
+  Function returns an array of handles that support the requested protocol
+  in a buffer allocated from pool. This is a version of MmLocateHandle()
+  that allocates a buffer for the caller.
+
+  @param  SearchType             Specifies which handle(s) are to be returned.
+  @param  Protocol               Provides the protocol to search by.    This
+                                 parameter is only valid for SearchType
+                                 ByProtocol.
+  @param  SearchKey              Supplies the search key depending on the
+                                 SearchType.
+  @param  NumberHandles          The number of handles returned in Buffer.
+  @param  Buffer                 A pointer to the buffer to return the requested
+                                 array of  handles that support Protocol.
+
+  @retval EFI_SUCCESS            The result array of handles was returned.
+  @retval EFI_NOT_FOUND          No handles match the search.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the
+                                 matching results.
+  @retval EFI_INVALID_PARAMETER  One or more parameters are not valid.
+
+**/
+EFI_STATUS
+EFIAPI
+MmLocateHandleBuffer (
+  IN     EFI_LOCATE_SEARCH_TYPE  SearchType,
+  IN     EFI_GUID                *Protocol OPTIONAL,
+  IN     VOID                    *SearchKey OPTIONAL,
+  IN OUT UINTN                   *NumberHandles,
+  OUT    EFI_HANDLE              **Buffer
+  );
+
+/**
   Return the first Protocol Interface that matches the Protocol GUID. If
   Registration is passed in return a Protocol Instance that was just add
   to the system. If Registration is NULL return the first Protocol Interface
@@ -895,7 +929,56 @@ MmCoreFfsFindMmDriver (
   IN  UINT32                      Depth
   );
 
-extern UINTN                 mMmramRangeCount;
-extern EFI_MMRAM_DESCRIPTOR  *mMmramRanges;
+#define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
+  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
+
+/**
+  Initialize MemoryAttributesTable support.
+**/
+VOID
+EFIAPI
+MmCoreInitializeMemoryAttributesTable (
+  VOID
+  );
+
+/**
+  This function returns a copy of the current memory map. The map is an array of
+  memory descriptors, each of which describes a contiguous block of memory.
+
+  @param[in, out]  MemoryMapSize          A pointer to the size, in bytes, of the
+                                          MemoryMap buffer. On input, this is the size of
+                                          the buffer allocated by the caller.  On output,
+                                          it is the size of the buffer returned by the
+                                          firmware  if the buffer was large enough, or the
+                                          size of the buffer needed  to contain the map if
+                                          the buffer was too small.
+  @param[in, out]  MemoryMap              A pointer to the buffer in which firmware places
+                                          the current memory map.
+  @param[out]      MapKey                 A pointer to the location in which firmware
+                                          returns the key for the current memory map.
+  @param[out]      DescriptorSize         A pointer to the location in which firmware
+                                          returns the size, in bytes, of an individual
+                                          EFI_MEMORY_DESCRIPTOR.
+  @param[out]      DescriptorVersion      A pointer to the location in which firmware
+                                          returns the version number associated with the
+                                          EFI_MEMORY_DESCRIPTOR.
+
+  @retval EFI_SUCCESS            The memory map was returned in the MemoryMap
+                                 buffer.
+  @retval EFI_BUFFER_TOO_SMALL   The MemoryMap buffer was too small. The current
+                                 buffer size needed to hold the memory map is
+                                 returned in MemoryMapSize.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+
+**/
+EFI_STATUS
+EFIAPI
+MmCoreGetMemoryMap (
+  IN OUT UINTN                  *MemoryMapSize,
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  OUT UINTN                     *MapKey,
+  OUT UINTN                     *DescriptorSize,
+  OUT UINT32                    *DescriptorVersion
+  );
 
 #endif
