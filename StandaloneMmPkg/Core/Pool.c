@@ -40,12 +40,17 @@ MmInitializeMemoryServices (
 
   //
   // Initialize free MMRAM regions
+  // Need add Free memory at first, to let mMmMemoryMap record data
   //
   for (Index = 0; Index < MmramRangeCount; Index++) {
     //
     // BUGBUG: Add legacy MMRAM region is buggy.
     //
     if (MmramRanges[Index].CpuStart < BASE_1MB) {
+      continue;
+    }
+
+    if ((MmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
       continue;
     }
 
@@ -56,6 +61,26 @@ MmInitializeMemoryServices (
       MmramRanges[Index].CpuStart,
       MmramRanges[Index].PhysicalSize
       ));
+    MmAddMemoryRegion (
+      MmramRanges[Index].CpuStart,
+      MmramRanges[Index].PhysicalSize,
+      EfiConventionalMemory,
+      MmramRanges[Index].RegionState
+      );
+  }
+
+  for (Index = 0; Index < MmramRangeCount; Index++) {
+    //
+    // BUGBUG: Add legacy MMRAM region is buggy.
+    //
+    if (MmramRanges[Index].CpuStart < BASE_1MB) {
+      continue;
+    }
+
+    if ((MmramRanges[Index].RegionState & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) == 0) {
+      continue;
+    }
+
     MmAddMemoryRegion (
       MmramRanges[Index].CpuStart,
       MmramRanges[Index].PhysicalSize,
