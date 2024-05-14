@@ -13,7 +13,7 @@
 
   InitCommunicateBuffer() is really function to check the variable data size.
 
-Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -55,8 +55,6 @@ VARIABLE_STORE_HEADER           *mVariableRuntimeNvCacheBuffer       = NULL;
 VARIABLE_STORE_HEADER           *mVariableRuntimeVolatileCacheBuffer = NULL;
 UINTN                           mVariableBufferSize;
 UINTN                           mVariableRuntimeHobCacheBufferSize;
-UINTN                           mVariableRuntimeNvCacheBufferSize;
-UINTN                           mVariableRuntimeVolatileCacheBufferSize;
 UINTN                           mVariableBufferPayloadSize;
 BOOLEAN                         mVariableRuntimeCachePendingUpdate;
 BOOLEAN                         mVariableRuntimeCacheReadLock;
@@ -1691,6 +1689,8 @@ SmmVariableReady (
   )
 {
   EFI_STATUS  Status;
+  UINTN       RuntimeNvCacheSize;
+  UINTN       RuntimeVolatileCacheSize;
 
   Status = gBS->LocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **)&mSmmVariable);
   if (EFI_ERROR (Status)) {
@@ -1721,16 +1721,16 @@ SmmVariableReady (
     //
     Status =  GetRuntimeCacheInfo (
                 &mVariableRuntimeHobCacheBufferSize,
-                &mVariableRuntimeNvCacheBufferSize,
-                &mVariableRuntimeVolatileCacheBufferSize,
+                &RuntimeNvCacheSize,
+                &RuntimeVolatileCacheSize,
                 &mVariableAuthFormat
                 );
     if (!EFI_ERROR (Status)) {
       Status = InitVariableCache (&mVariableRuntimeHobCacheBuffer, &mVariableRuntimeHobCacheBufferSize);
       if (!EFI_ERROR (Status)) {
-        Status = InitVariableCache (&mVariableRuntimeNvCacheBuffer, &mVariableRuntimeNvCacheBufferSize);
+        Status = InitVariableCache (&mVariableRuntimeNvCacheBuffer, &RuntimeNvCacheSize);
         if (!EFI_ERROR (Status)) {
-          Status = InitVariableCache (&mVariableRuntimeVolatileCacheBuffer, &mVariableRuntimeVolatileCacheBufferSize);
+          Status = InitVariableCache (&mVariableRuntimeVolatileCacheBuffer, &RuntimeVolatileCacheSize);
           if (!EFI_ERROR (Status)) {
             Status = SendRuntimeVariableCacheContextToSmm ();
             if (!EFI_ERROR (Status)) {
