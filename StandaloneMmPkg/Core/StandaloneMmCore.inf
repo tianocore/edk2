@@ -59,6 +59,7 @@
   gEfiMmEndOfDxeProtocolGuid                   ## PRODUCES
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiMmConfigurationProtocolGuid               ## CONSUMES
+  gEfiMmEndOfPeiProtocol                        ## PRODUCES
 
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
