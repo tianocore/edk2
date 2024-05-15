@@ -41,14 +41,6 @@ RandomSeed (
   }
 
   //
-  // The software PRNG implementation built in OpenSSL depends on message digest algorithm.
-  // Make sure SHA-1 digest algorithm is available here.
-  //
-  if (EVP_add_digest (EVP_sha1 ()) == 0) {
-    return FALSE;
-  }
-
-  //
   // Seed the pseudorandom number generator with user-supplied value.
   // NOTE: A cryptographic PRNG must be seeded with unpredictable data.
   //
