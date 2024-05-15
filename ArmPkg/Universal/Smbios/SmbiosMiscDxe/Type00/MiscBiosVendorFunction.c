@@ -235,7 +235,7 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscBiosVendor) {
   //
   // Now update the BiosPhysicalSize
   //
-  BiosPhysicalSize = FixedPcdGet32 (PcdFdSize);
+  BiosPhysicalSize = OemGetPhysicalBiosSize ();
 
   //
   // Two zeros following the last string.

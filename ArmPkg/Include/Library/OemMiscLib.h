@@ -64,6 +64,12 @@ typedef enum {
   SmbiosHiiStringFieldMax
 } OEM_MISC_SMBIOS_HII_STRING_FIELD;
 
+UINT64
+EFIAPI
+OemGetPhysicalBiosSize (
+  VOID
+  );
+
 /*
  * The following are functions that the each platform needs to
  * implement in its OemMiscLib library.
