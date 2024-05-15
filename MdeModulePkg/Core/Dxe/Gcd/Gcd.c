@@ -26,7 +26,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                                        EFI_RESOURCE_ATTRIBUTE_16_BIT_IO           | \
                                        EFI_RESOURCE_ATTRIBUTE_32_BIT_IO           | \
                                        EFI_RESOURCE_ATTRIBUTE_64_BIT_IO           | \
-                                       EFI_RESOURCE_ATTRIBUTE_PERSISTENT          )
+                                       EFI_RESOURCE_ATTRIBUTE_PERSISTENT          | \
+                                       EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE     )
 
 #define TESTED_MEMORY_ATTRIBUTES  (EFI_RESOURCE_ATTRIBUTE_PRESENT     |     \
                                        EFI_RESOURCE_ATTRIBUTE_INITIALIZED | \
@@ -92,6 +93,7 @@ GCD_ATTRIBUTE_CONVERSION_ENTRY  mAttributeConversionTable[] = {
   { EFI_RESOURCE_ATTRIBUTE_TESTED,                  EFI_MEMORY_TESTED,        FALSE },
   { EFI_RESOURCE_ATTRIBUTE_PERSISTABLE,             EFI_MEMORY_NV,            TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE,           EFI_MEMORY_MORE_RELIABLE, TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE,         EFI_MEMORY_SP,            TRUE  },
   { 0,                                              0,                        FALSE }
 };
 
@@ -689,6 +691,10 @@ ConverToCpuArchAttributes (
     CpuArchAttributes |= EFI_MEMORY_UCE;
   } else if ((Attributes & EFI_MEMORY_WP) == EFI_MEMORY_WP) {
     CpuArchAttributes |= EFI_MEMORY_WP;
+  }
+
+  if ((Attributes & EFI_MEMORY_SP) == EFI_MEMORY_SP) {
+    CpuArchAttributes |= EFI_MEMORY_SP;
   }
 
   return CpuArchAttributes;
@@ -2653,6 +2659,10 @@ CoreInitializeGcdServices (
           }
 
           if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == PRESENT_MEMORY_ATTRIBUTES) {
+            GcdMemoryType = EfiGcdMemoryTypeReserved;
+          }
+
+          if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) == EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE) {
             GcdMemoryType = EfiGcdMemoryTypeReserved;
           }
 
