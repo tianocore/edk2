@@ -253,7 +253,7 @@ SMBIOS_MISC_TABLE_FUNCTION (MiscBiosVendor) {
   (VOID)CopyMem (SmbiosRecord, InputData, sizeof (SMBIOS_TABLE_TYPE0));
 
   SmbiosRecord->Hdr.Length  = sizeof (SMBIOS_TABLE_TYPE0);
-  SmbiosRecord->BiosSegment = (UINT16)(FixedPcdGet32 (PcdFdBaseAddress) / SIZE_64KB);
+  SmbiosRecord->BiosSegment = 0;
   if (BiosPhysicalSize < SIZE_16MB) {
     SmbiosRecord->BiosSize = Base2ToByteWith64KUnit (BiosPhysicalSize) - 1;
   } else {
