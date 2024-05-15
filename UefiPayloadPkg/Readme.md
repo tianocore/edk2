@@ -55,11 +55,13 @@ FIT Format URL: https://universalpayload.github.io/spec/chapter2-payload-image-f
     ```
   - FIT
     - Windows
+      ```
+      Download and install swig by https://swig.org/ and also set install path into environment variable
+      ```
       ```powershell
       Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
       choco install dtc-msys2
       pip3 install pefile
-      pip3 install swig
       pip3 install pylibfdt
       ```
     - Ubuntu
