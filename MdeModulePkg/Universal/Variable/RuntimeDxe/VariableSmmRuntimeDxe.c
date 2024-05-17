@@ -145,54 +145,6 @@ AtRuntime (
 }
 
 /**
-  Initialize the variable cache buffer as an empty variable store.
-
-  @param[out]     VariableCacheBuffer     A pointer to pointer of a cache variable store.
-  @param[in,out]  TotalVariableCacheSize  On input, the minimum size needed for the UEFI variable store cache
-                                          buffer that is allocated. On output, the actual size of the buffer allocated.
-                                          If TotalVariableCacheSize is zero, a buffer will not be allocated and the
-                                          function will return with EFI_SUCCESS.
-
-  @retval EFI_SUCCESS             The variable cache was allocated and initialized successfully.
-  @retval EFI_INVALID_PARAMETER   A given pointer is NULL or an invalid variable store size was specified.
-  @retval EFI_OUT_OF_RESOURCES    Insufficient resources are available to allocate the variable store cache buffer.
-
-**/
-EFI_STATUS
-InitVariableCache (
-  OUT    VARIABLE_STORE_HEADER  **VariableCacheBuffer,
-  IN OUT UINTN                  *TotalVariableCacheSize
-  )
-{
-  VARIABLE_STORE_HEADER  *VariableCacheStorePtr;
-  EFI_STATUS             Status;
-
-  if (TotalVariableCacheSize == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (*TotalVariableCacheSize == 0) {
-    return EFI_SUCCESS;
-  }
-
-  if ((VariableCacheBuffer == NULL) || (*TotalVariableCacheSize < sizeof (VARIABLE_STORE_HEADER))) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  *TotalVariableCacheSize = ALIGN_VALUE (*TotalVariableCacheSize, sizeof (UINT32));
-
-  VariableCacheStorePtr = *VariableCacheBuffer;
-  SetMem32 ((VOID *)VariableCacheStorePtr, *TotalVariableCacheSize, (UINT32)0xFFFFFFFF);
-
-  ZeroMem ((VOID *)VariableCacheStorePtr, sizeof (VARIABLE_STORE_HEADER));
-  VariableCacheStorePtr->Size   = (UINT32)*TotalVariableCacheSize;
-  VariableCacheStorePtr->Format = VARIABLE_STORE_FORMATTED;
-  VariableCacheStorePtr->State  = VARIABLE_STORE_HEALTHY;
-
-  return EFI_SUCCESS;
-}
-
-/**
   Initialize the communicate buffer using DataSize and Function.
 
   The communicate size is: SMM_COMMUNICATE_HEADER_SIZE + SMM_VARIABLE_COMMUNICATE_HEADER_SIZE +
@@ -1554,6 +1506,89 @@ Done:
 }
 
 /**
+  Initialize the variable cache buffer as an empty variable store.
+
+  @param[in]  VariableCacheBuffer     A pointer to pointer of a cache variable store.
+  @param[in]  TotalVariableCacheSize  The size needed for the UEFI variable store cache buffer that is allocated.
+
+**/
+VOID
+InitVariableStoreHeader (
+  IN  VARIABLE_STORE_HEADER  *VariableCacheBuffer,
+  IN  UINTN                  TotalVariableCacheSize
+  )
+{
+  if (TotalVariableCacheSize > 0) {
+    ASSERT ((VariableCacheBuffer != NULL) && (TotalVariableCacheSize >= sizeof (VARIABLE_STORE_HEADER)));
+
+    SetMem32 ((VOID *)VariableCacheBuffer, TotalVariableCacheSize, (UINT32)0xFFFFFFFF);
+    ZeroMem ((VOID *)VariableCacheBuffer, sizeof (VARIABLE_STORE_HEADER));
+    VariableCacheBuffer->Size   = (UINT32)TotalVariableCacheSize;
+    VariableCacheBuffer->Format = VARIABLE_STORE_FORMATTED;
+    VariableCacheBuffer->State  = VARIABLE_STORE_HEALTHY;
+  }
+}
+
+/**
+  Initialize the runtime variable cache related content.
+
+  @param[in]  RuntimeCacheInfoGuidHob     Pointer to the gEdkiiVariableRuntimeCacheInfoHobGuid HOB.
+
+  @retval EFI_SUCCESS    Initialize the runtime variable cache related content successfully.
+  @retval Others         Could not initialize the runtime variable cache related content successfully.
+
+**/
+EFI_STATUS
+InitVariableCache (
+  IN  EFI_HOB_GUID_TYPE  *RuntimeCacheInfoGuidHob
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        ExpectedHobCacheSize;
+  UINTN                        ExpectedNvCacheSize;
+  UINTN                        ExpectedVolatileCacheSize;
+  UINTN                        AllocatedHobCacheSize;
+  UINTN                        AllocatedNvCacheSize;
+  UINTN                        AllocatedVolatileCacheSize;
+  VARIABLE_RUNTIME_CACHE_INFO  *VariableRuntimeCacheInfo;
+
+  //
+  // Get needed runtime cache buffer size and check if auth variables are to be used from SMM
+  //
+  Status =  GetRuntimeCacheInfo (
+              &ExpectedHobCacheSize,
+              &ExpectedNvCacheSize,
+              &ExpectedVolatileCacheSize,
+              &mVariableAuthFormat
+              );
+  if (!EFI_ERROR (Status)) {
+    VariableRuntimeCacheInfo   = GET_GUID_HOB_DATA (RuntimeCacheInfoGuidHob);
+    AllocatedHobCacheSize      = EFI_PAGES_TO_SIZE ((UINTN)VariableRuntimeCacheInfo->RuntimeHobCachePages);
+    AllocatedNvCacheSize       = EFI_PAGES_TO_SIZE ((UINTN)VariableRuntimeCacheInfo->RuntimeNvCachePages);
+    AllocatedVolatileCacheSize = EFI_PAGES_TO_SIZE ((UINTN)VariableRuntimeCacheInfo->RuntimeVolatileCachePages);
+
+    ASSERT (
+      (AllocatedHobCacheSize >= ExpectedHobCacheSize) &&
+      (AllocatedNvCacheSize >= ExpectedNvCacheSize) &&
+      (AllocatedVolatileCacheSize >= ExpectedVolatileCacheSize)
+      );
+
+    mVariableRuntimeHobCacheBuffer      = (VARIABLE_STORE_HEADER *)(UINTN)VariableRuntimeCacheInfo->RuntimeHobCacheBuffer;
+    mVariableRuntimeNvCacheBuffer       = (VARIABLE_STORE_HEADER *)(UINTN)VariableRuntimeCacheInfo->RuntimeNvCacheBuffer;
+    mVariableRuntimeVolatileCacheBuffer = (VARIABLE_STORE_HEADER *)(UINTN)VariableRuntimeCacheInfo->RuntimeVolatileCacheBuffer;
+    mVariableRuntimeCachePendingUpdate  = &((CACHE_INFO_FLAG *)(UINTN)VariableRuntimeCacheInfo->CacheInfoFlagBuffer)->PendingUpdate;
+    mVariableRuntimeCacheReadLock       = &((CACHE_INFO_FLAG *)(UINTN)VariableRuntimeCacheInfo->CacheInfoFlagBuffer)->ReadLock;
+    mHobFlushComplete                   = &((CACHE_INFO_FLAG *)(UINTN)VariableRuntimeCacheInfo->CacheInfoFlagBuffer)->HobFlushComplete;
+
+    InitVariableStoreHeader (mVariableRuntimeHobCacheBuffer, AllocatedHobCacheSize);
+    InitVariableStoreHeader (mVariableRuntimeNvCacheBuffer, AllocatedNvCacheSize);
+    InitVariableStoreHeader (mVariableRuntimeVolatileCacheBuffer, AllocatedVolatileCacheSize);
+  }
+
+  return Status;
+}
+
+/**
   Sends the runtime variable cache context information to SMM.
 
   @retval EFI_SUCCESS               Retrieved the size successfully.
@@ -1639,15 +1674,8 @@ SmmVariableReady (
   IN  VOID       *Context
   )
 {
-  EFI_STATUS                   Status;
-  UINTN                        RuntimeNvCacheSize;
-  UINTN                        RuntimeVolatileCacheSize;
-  UINTN                        RuntimeHobCacheBufferSize;
-  UINTN                        AllocatedHobCacheSize;
-  UINTN                        AllocatedNvCacheSize;
-  UINTN                        AllocatedVolatileCacheSize;
-  EFI_HOB_GUID_TYPE            *GuidHob;
-  VARIABLE_RUNTIME_CACHE_INFO  *VariableRuntimeCacheInfo;
+  EFI_STATUS         Status;
+  EFI_HOB_GUID_TYPE  *GuidHob;
 
   Status = gBS->LocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **)&mSmmVariable);
   if (EFI_ERROR (Status)) {
@@ -1675,53 +1703,19 @@ SmmVariableReady (
   if (GuidHob != NULL) {
     mIsRuntimeCacheEnabled = TRUE;
     DEBUG ((DEBUG_INFO, "Variable driver runtime cache is enabled.\n"));
-    //
-    // Get needed runtime cache buffer size and check if auth variables are to be used from SMM
-    //
-    Status =  GetRuntimeCacheInfo (
-                &RuntimeHobCacheBufferSize,
-                &RuntimeNvCacheSize,
-                &RuntimeVolatileCacheSize,
-                &mVariableAuthFormat
-                );
+
+    Status = InitVariableCache (GuidHob);
     if (!EFI_ERROR (Status)) {
-      VariableRuntimeCacheInfo   = GET_GUID_HOB_DATA (GuidHob);
-      AllocatedHobCacheSize      = EFI_PAGES_TO_SIZE ((UINTN)VariableRuntimeCacheInfo->RuntimeHobCachePages);
-      AllocatedNvCacheSize       = EFI_PAGES_TO_SIZE ((UINTN)VariableRuntimeCacheInfo->RuntimeNvCachePages);
-      AllocatedVolatileCacheSize = EFI_PAGES_TO_SIZE ((UINTN)VariableRuntimeCacheInfo->RuntimeVolatileCachePages);
-
-      ASSERT (
-        (AllocatedHobCacheSize >= RuntimeHobCacheBufferSize) &&
-        (AllocatedNvCacheSize >= RuntimeNvCacheSize) &&
-        (AllocatedVolatileCacheSize >= RuntimeVolatileCacheSize)
-        );
-
-      mVariableRuntimeHobCacheBuffer      = (VARIABLE_STORE_HEADER *)(UINTN)VariableRuntimeCacheInfo->RuntimeHobCacheBuffer;
-      mVariableRuntimeNvCacheBuffer       = (VARIABLE_STORE_HEADER *)(UINTN)VariableRuntimeCacheInfo->RuntimeNvCacheBuffer;
-      mVariableRuntimeVolatileCacheBuffer = (VARIABLE_STORE_HEADER *)(UINTN)VariableRuntimeCacheInfo->RuntimeVolatileCacheBuffer;
-      mVariableRuntimeCachePendingUpdate  = &((CACHE_INFO_FLAG *)(UINTN)VariableRuntimeCacheInfo->CacheInfoFlagBuffer)->PendingUpdate;
-      mVariableRuntimeCacheReadLock       = &((CACHE_INFO_FLAG *)(UINTN)VariableRuntimeCacheInfo->CacheInfoFlagBuffer)->ReadLock;
-      mHobFlushComplete                   = &((CACHE_INFO_FLAG *)(UINTN)VariableRuntimeCacheInfo->CacheInfoFlagBuffer)->HobFlushComplete;
-
-      Status = InitVariableCache (&mVariableRuntimeHobCacheBuffer, &RuntimeHobCacheBufferSize);
+      Status = SendRuntimeVariableCacheContextToSmm ();
       if (!EFI_ERROR (Status)) {
-        Status = InitVariableCache (&mVariableRuntimeNvCacheBuffer, &RuntimeNvCacheSize);
-        if (!EFI_ERROR (Status)) {
-          Status = InitVariableCache (&mVariableRuntimeVolatileCacheBuffer, &RuntimeVolatileCacheSize);
-          if (!EFI_ERROR (Status)) {
-            Status = SendRuntimeVariableCacheContextToSmm ();
-            if (!EFI_ERROR (Status)) {
-              SyncRuntimeCache ();
-            }
-          }
-        }
+        SyncRuntimeCache ();
       }
+    }
 
-      if (EFI_ERROR (Status)) {
-        mVariableRuntimeHobCacheBuffer      = NULL;
-        mVariableRuntimeNvCacheBuffer       = NULL;
-        mVariableRuntimeVolatileCacheBuffer = NULL;
-      }
+    if (EFI_ERROR (Status)) {
+      mVariableRuntimeHobCacheBuffer      = NULL;
+      mVariableRuntimeNvCacheBuffer       = NULL;
+      mVariableRuntimeVolatileCacheBuffer = NULL;
     }
 
     ASSERT_EFI_ERROR (Status);
