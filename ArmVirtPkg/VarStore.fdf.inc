@@ -10,7 +10,7 @@
 ##
 
 [FD.QEMU_VARS]
-BaseAddress   = 0x04000000
+BaseAddress   = 0x00000000
 Size          = 0xc0000
 ErasePolarity = 1
 BlockSize     = 0x40000
@@ -18,7 +18,6 @@ NumBlocks     = 3
 
 
 0x00000000|0x00040000
-gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 #NV_VARIABLE_STORE
 DATA = {
   ## This is the EFI_FIRMWARE_VOLUME_HEADER
@@ -57,7 +56,6 @@ DATA = {
 
 
 0x00040000|0x00040000
-gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 #NV_FTW_WORKING
 DATA = {
   # EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER->Signature = gEdkiiWorkingBlockSignatureGuid         =
@@ -71,5 +69,4 @@ DATA = {
 }
 
 0x00080000|0x00040000
-gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 #NV_FTW_SPARE
