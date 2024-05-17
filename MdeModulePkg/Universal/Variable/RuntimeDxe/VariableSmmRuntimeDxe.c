@@ -44,25 +44,20 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PrivilegePolymorphic.h"
 #include "VariableParsing.h"
 
-EFI_HANDLE                      mHandle                              = NULL;
-EFI_SMM_VARIABLE_PROTOCOL       *mSmmVariable                        = NULL;
-EFI_EVENT                       mVirtualAddressChangeEvent           = NULL;
-EFI_MM_COMMUNICATION2_PROTOCOL  *mMmCommunication2                   = NULL;
-UINT8                           *mVariableBuffer                     = NULL;
-UINT8                           *mVariableBufferPhysical             = NULL;
-VARIABLE_INFO_ENTRY             *mVariableInfo                       = NULL;
-VARIABLE_STORE_HEADER           *mVariableRuntimeHobCacheBuffer      = NULL;
-VARIABLE_STORE_HEADER           *mVariableRuntimeNvCacheBuffer       = NULL;
-VARIABLE_STORE_HEADER           *mVariableRuntimeVolatileCacheBuffer = NULL;
+EFI_HANDLE                      mHandle                    = NULL;
+EFI_SMM_VARIABLE_PROTOCOL       *mSmmVariable              = NULL;
+EFI_EVENT                       mVirtualAddressChangeEvent = NULL;
+EFI_MM_COMMUNICATION2_PROTOCOL  *mMmCommunication2         = NULL;
+UINT8                           *mVariableBuffer           = NULL;
+UINT8                           *mVariableBufferPhysical   = NULL;
+VARIABLE_INFO_ENTRY             *mVariableInfo             = NULL;
 UINTN                           mVariableBufferSize;
 UINTN                           mVariableBufferPayloadSize;
-BOOLEAN                         *mVariableRuntimeCachePendingUpdate;
-BOOLEAN                         *mVariableRuntimeCacheReadLock;
 BOOLEAN                         mVariableAuthFormat;
-BOOLEAN                         *mHobFlushComplete;
 EFI_LOCK                        mVariableServicesLock;
 EDKII_VARIABLE_LOCK_PROTOCOL    mVariableLock;
 EDKII_VAR_CHECK_PROTOCOL        mVarCheck;
+VARIABLE_RUNTIME_CACHE_INFO     mVariableRtCacheInfo;
 BOOLEAN                         mIsRuntimeCacheEnabled = FALSE;
 
 /**
@@ -500,17 +495,21 @@ CheckForRuntimeCacheSync (
   VOID
   )
 {
-  if (*mVariableRuntimeCachePendingUpdate) {
+  CACHE_INFO_FLAG  *CacheInfoFlag;
+
+  CacheInfoFlag = (CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer;
+
+  if (CacheInfoFlag->PendingUpdate) {
     SyncRuntimeCache ();
   }
 
-  ASSERT (!(*mVariableRuntimeCachePendingUpdate));
+  ASSERT (!(CacheInfoFlag->PendingUpdate));
 
   //
   // The HOB variable data may have finished being flushed in the runtime cache sync update
   //
-  if ((*mHobFlushComplete) && (mVariableRuntimeHobCacheBuffer != NULL)) {
-    mVariableRuntimeHobCacheBuffer = NULL;
+  if ((CacheInfoFlag->HobFlushComplete) && (mVariableRtCacheInfo.RuntimeHobCacheBuffer != 0)) {
+    mVariableRtCacheInfo.RuntimeHobCacheBuffer = 0;
   }
 }
 
@@ -546,8 +545,10 @@ FindVariableInRuntimeCache (
   VARIABLE_POINTER_TRACK  RtPtrTrack;
   VARIABLE_STORE_TYPE     StoreType;
   VARIABLE_STORE_HEADER   *VariableStoreList[VariableStoreTypeMax];
+  CACHE_INFO_FLAG         *CacheInfoFlag;
 
-  Status = EFI_NOT_FOUND;
+  Status        = EFI_NOT_FOUND;
+  CacheInfoFlag = (CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer;
 
   if ((VariableName == NULL) || (VendorGuid == NULL) || (DataSize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -561,20 +562,20 @@ FindVariableInRuntimeCache (
   // a GetVariable () or GetNextVariable () call from being issued until a prior call has returned. The runtime
   // cache read lock should always be free when entering this function.
   //
-  ASSERT (!(*mVariableRuntimeCacheReadLock));
+  ASSERT (!(CacheInfoFlag->ReadLock));
 
-  *mVariableRuntimeCacheReadLock = TRUE;
+  CacheInfoFlag->ReadLock = TRUE;
   CheckForRuntimeCacheSync ();
 
-  if (!(*mVariableRuntimeCachePendingUpdate)) {
+  if (!(CacheInfoFlag->PendingUpdate)) {
     //
     // 0: Volatile, 1: HOB, 2: Non-Volatile.
     // The index and attributes mapping must be kept in this order as FindVariable
     // makes use of this mapping to implement search algorithm.
     //
-    VariableStoreList[VariableStoreTypeVolatile] = mVariableRuntimeVolatileCacheBuffer;
-    VariableStoreList[VariableStoreTypeHob]      = mVariableRuntimeHobCacheBuffer;
-    VariableStoreList[VariableStoreTypeNv]       = mVariableRuntimeNvCacheBuffer;
+    VariableStoreList[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeVolatileCacheBuffer;
+    VariableStoreList[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeHobCacheBuffer;
+    VariableStoreList[VariableStoreTypeNv]       = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeNvCacheBuffer;
 
     for (StoreType = (VARIABLE_STORE_TYPE)0; StoreType < VariableStoreTypeMax; StoreType++) {
       if (VariableStoreList[StoreType] == NULL) {
@@ -626,7 +627,7 @@ Done:
     }
   }
 
-  *mVariableRuntimeCacheReadLock = FALSE;
+  CacheInfoFlag->ReadLock = FALSE;
 
   return Status;
 }
@@ -840,8 +841,10 @@ GetNextVariableNameInRuntimeCache (
   UINTN                  VarNameSize;
   VARIABLE_HEADER        *VariablePtr;
   VARIABLE_STORE_HEADER  *VariableStoreHeader[VariableStoreTypeMax];
+  CACHE_INFO_FLAG        *CacheInfoFlag;
 
-  Status = EFI_NOT_FOUND;
+  Status        = EFI_NOT_FOUND;
+  CacheInfoFlag = (CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer;
 
   //
   // The UEFI specification restricts Runtime Services callers from invoking the same or certain other Runtime Service
@@ -849,20 +852,20 @@ GetNextVariableNameInRuntimeCache (
   // a GetVariable () or GetNextVariable () call from being issued until a prior call has returned. The runtime
   // cache read lock should always be free when entering this function.
   //
-  ASSERT (!(*mVariableRuntimeCacheReadLock));
+  ASSERT (!(CacheInfoFlag->ReadLock));
 
   CheckForRuntimeCacheSync ();
 
-  *mVariableRuntimeCacheReadLock = TRUE;
-  if (!(*mVariableRuntimeCachePendingUpdate)) {
+  CacheInfoFlag->ReadLock = TRUE;
+  if (!(CacheInfoFlag->PendingUpdate)) {
     //
     // 0: Volatile, 1: HOB, 2: Non-Volatile.
     // The index and attributes mapping must be kept in this order as FindVariable
     // makes use of this mapping to implement search algorithm.
     //
-    VariableStoreHeader[VariableStoreTypeVolatile] = mVariableRuntimeVolatileCacheBuffer;
-    VariableStoreHeader[VariableStoreTypeHob]      = mVariableRuntimeHobCacheBuffer;
-    VariableStoreHeader[VariableStoreTypeNv]       = mVariableRuntimeNvCacheBuffer;
+    VariableStoreHeader[VariableStoreTypeVolatile] = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeVolatileCacheBuffer;
+    VariableStoreHeader[VariableStoreTypeHob]      = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeHobCacheBuffer;
+    VariableStoreHeader[VariableStoreTypeNv]       = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeNvCacheBuffer;
 
     Status =  VariableServiceGetNextVariableInternal (
                 VariableName,
@@ -886,7 +889,7 @@ GetNextVariableNameInRuntimeCache (
     }
   }
 
-  *mVariableRuntimeCacheReadLock = FALSE;
+  CacheInfoFlag->ReadLock = FALSE;
 
   return Status;
 }
@@ -1341,12 +1344,10 @@ VariableAddressChangeEvent (
 {
   EfiConvertPointer (0x0, (VOID **)&mVariableBuffer);
   EfiConvertPointer (0x0, (VOID **)&mMmCommunication2);
-  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRuntimeHobCacheBuffer);
-  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRuntimeNvCacheBuffer);
-  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRuntimeVolatileCacheBuffer);
-  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRuntimeCachePendingUpdate);
-  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRuntimeCacheReadLock);
-  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mHobFlushComplete);
+  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.CacheInfoFlagBuffer);
+  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.RuntimeHobCacheBuffer);
+  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.RuntimeNvCacheBuffer);
+  EfiConvertPointer (EFI_OPTIONAL_PTR, (VOID **)&mVariableRtCacheInfo.RuntimeVolatileCacheBuffer);
 }
 
 /**
@@ -1573,16 +1574,10 @@ InitVariableCache (
       (AllocatedVolatileCacheSize >= ExpectedVolatileCacheSize)
       );
 
-    mVariableRuntimeHobCacheBuffer      = (VARIABLE_STORE_HEADER *)(UINTN)VariableRuntimeCacheInfo->RuntimeHobCacheBuffer;
-    mVariableRuntimeNvCacheBuffer       = (VARIABLE_STORE_HEADER *)(UINTN)VariableRuntimeCacheInfo->RuntimeNvCacheBuffer;
-    mVariableRuntimeVolatileCacheBuffer = (VARIABLE_STORE_HEADER *)(UINTN)VariableRuntimeCacheInfo->RuntimeVolatileCacheBuffer;
-    mVariableRuntimeCachePendingUpdate  = &((CACHE_INFO_FLAG *)(UINTN)VariableRuntimeCacheInfo->CacheInfoFlagBuffer)->PendingUpdate;
-    mVariableRuntimeCacheReadLock       = &((CACHE_INFO_FLAG *)(UINTN)VariableRuntimeCacheInfo->CacheInfoFlagBuffer)->ReadLock;
-    mHobFlushComplete                   = &((CACHE_INFO_FLAG *)(UINTN)VariableRuntimeCacheInfo->CacheInfoFlagBuffer)->HobFlushComplete;
-
-    InitVariableStoreHeader (mVariableRuntimeHobCacheBuffer, AllocatedHobCacheSize);
-    InitVariableStoreHeader (mVariableRuntimeNvCacheBuffer, AllocatedNvCacheSize);
-    InitVariableStoreHeader (mVariableRuntimeVolatileCacheBuffer, AllocatedVolatileCacheSize);
+    CopyMem (&mVariableRtCacheInfo, VariableRuntimeCacheInfo, sizeof (VARIABLE_RUNTIME_CACHE_INFO));
+    InitVariableStoreHeader ((VOID *)(UINTN)mVariableRtCacheInfo.RuntimeHobCacheBuffer, AllocatedHobCacheSize);
+    InitVariableStoreHeader ((VOID *)(UINTN)mVariableRtCacheInfo.RuntimeNvCacheBuffer, AllocatedNvCacheSize);
+    InitVariableStoreHeader ((VOID *)(UINTN)mVariableRtCacheInfo.RuntimeVolatileCacheBuffer, AllocatedVolatileCacheSize);
   }
 
   return Status;
@@ -1633,12 +1628,12 @@ SendRuntimeVariableCacheContextToSmm (
   SmmVariableFunctionHeader->Function = SMM_VARIABLE_FUNCTION_INIT_RUNTIME_VARIABLE_CACHE_CONTEXT;
   SmmRuntimeVarCacheContext           = (SMM_VARIABLE_COMMUNICATE_RUNTIME_VARIABLE_CACHE_CONTEXT *)SmmVariableFunctionHeader->Data;
 
-  SmmRuntimeVarCacheContext->RuntimeHobCache      = mVariableRuntimeHobCacheBuffer;
-  SmmRuntimeVarCacheContext->RuntimeVolatileCache = mVariableRuntimeVolatileCacheBuffer;
-  SmmRuntimeVarCacheContext->RuntimeNvCache       = mVariableRuntimeNvCacheBuffer;
-  SmmRuntimeVarCacheContext->PendingUpdate        = mVariableRuntimeCachePendingUpdate;
-  SmmRuntimeVarCacheContext->ReadLock             = mVariableRuntimeCacheReadLock;
-  SmmRuntimeVarCacheContext->HobFlushComplete     = mHobFlushComplete;
+  SmmRuntimeVarCacheContext->RuntimeHobCache      = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeHobCacheBuffer;
+  SmmRuntimeVarCacheContext->RuntimeVolatileCache = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeVolatileCacheBuffer;
+  SmmRuntimeVarCacheContext->RuntimeNvCache       = (VARIABLE_STORE_HEADER *)(UINTN)mVariableRtCacheInfo.RuntimeNvCacheBuffer;
+  SmmRuntimeVarCacheContext->PendingUpdate        = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->PendingUpdate;
+  SmmRuntimeVarCacheContext->ReadLock             = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->ReadLock;
+  SmmRuntimeVarCacheContext->HobFlushComplete     = &((CACHE_INFO_FLAG *)(UINTN)mVariableRtCacheInfo.CacheInfoFlagBuffer)->HobFlushComplete;
 
   //
   // Send data to SMM.
@@ -1713,9 +1708,7 @@ SmmVariableReady (
     }
 
     if (EFI_ERROR (Status)) {
-      mVariableRuntimeHobCacheBuffer      = NULL;
-      mVariableRuntimeNvCacheBuffer       = NULL;
-      mVariableRuntimeVolatileCacheBuffer = NULL;
+      ZeroMem (&mVariableRtCacheInfo, sizeof (VARIABLE_RUNTIME_CACHE_INFO));
     }
 
     ASSERT_EFI_ERROR (Status);
