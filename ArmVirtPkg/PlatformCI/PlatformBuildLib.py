@@ -240,6 +240,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         args += " -serial stdio"
         # Mount disk with startup.nsh
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk"
+        # Provides Rng services to the Guest VM
+        args += " -device virtio-rng-pci"
 
         # Conditional Args
         if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
