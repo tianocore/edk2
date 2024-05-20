@@ -1062,6 +1062,7 @@ InitializeQemuVideo (
   )
 {
   EFI_STATUS  Status;
+  EFI_EVENT   Event;
 
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
@@ -1071,6 +1072,16 @@ InitializeQemuVideo (
              &gQemuVideoComponentName,
              &gQemuVideoComponentName2
              );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  EndOfDxe,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &Event
+                  );
   ASSERT_EFI_ERROR (Status);
 
   return Status;
