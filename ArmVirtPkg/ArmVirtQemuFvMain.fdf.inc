@@ -178,6 +178,11 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   #
+  # Hash2 Protocol producer
+  #
+  INF SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+  #
   # TPM2 support
   #
 !if $(TPM2_ENABLE) == TRUE
