@@ -208,6 +208,8 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " -net none"                                                # turn off network
         args += " -smp 4"
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk" # Mount disk with startup.nsh
+        # Provides Rng services to the Guest VM
+        args += " -device virtio-rng-pci"
 
         if (self.env.GetValue("QEMU_HEADLESS").upper() == "TRUE"):
             args += " -display none"  # no graphics
