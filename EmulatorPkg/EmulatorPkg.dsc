@@ -127,9 +127,9 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
+  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
-  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
   PlatformSecureLib|SecurityPkg/Library/PlatformSecureLibNull/PlatformSecureLibNull.inf
@@ -397,6 +397,11 @@
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
   EmulatorPkg/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   EmulatorPkg/TimerDxe/Timer.inf
+
+  #
+  # Rng Protocol producer
+  #
+  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
