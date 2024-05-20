@@ -501,4 +501,11 @@ InstallVbeShim (
   IN EFI_PHYSICAL_ADDRESS  FrameBufferBase
   );
 
+VOID
+EFIAPI
+EndOfDxe (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
 #endif

@@ -37,6 +37,25 @@ typedef struct {
 //
 STATIC CONST CHAR8  mProductRevision[] = "OVMF Int10h (fake)";
 
+BOOLEAN  mEndOfDxe = FALSE;
+
+/**
+  Callback function executed when the EndOfDxe event group is signaled.
+
+  @param[in] Event      Event whose notification function is being invoked.
+  @param[in] Context    The pointer to the notification function's context, which
+                        is implementation-dependent.
+**/
+VOID
+EFIAPI
+EndOfDxe (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  mEndOfDxe = TRUE;
+}
+
 /**
   Install the VBE Info and VBE Mode Info structures, and the VBE service
   handler routine in the C segment. Point the real-mode Int10h interrupt vector
@@ -69,7 +88,14 @@ InstallVbeShim (
   UINTN                 Printed;
   VBE_MODE_INFO         *VbeModeInfo;
 
-  if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7)) == BIT0) {
+  //
+  // PcdNullPointerDetectionPropertyMask BIT7 will disable NULL pointer detection just after EndOfDxe
+  // Before EndOfDxe, installing VBE shim need to be skipped if PcdNullPointerDetectionPropertyMask BIT0 is set
+  // After EndOfDxe, VBM shim can be installed if PcdNullPointerDetectionPropertyMask BIT7 is set
+  //
+  if ((((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0|BIT7)) == BIT0) && (mEndOfDxe == TRUE)) ||
+      ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT0)) && (mEndOfDxe == FALSE)))
+  {
     DEBUG ((
       DEBUG_WARN,
       "%a: page 0 protected, not installing VBE shim\n",

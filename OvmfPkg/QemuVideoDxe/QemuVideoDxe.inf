@@ -56,6 +56,9 @@
   UefiDriverEntryPoint
   UefiLib
 
+[Guids]
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES           ## Event
+
 [Protocols]
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
