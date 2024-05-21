@@ -2,7 +2,7 @@
   Implement IP6 pseudo interface.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
-
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -89,6 +89,14 @@ Ip6SetAddress (
   IP6_PREFIX_LIST_ENTRY  *PrefixEntry;
   UINT64                 Delay;
   IP6_DELAY_JOIN_LIST    *DelayNode;
+  EFI_STATUS             Status;
+  UINT32                 Random;
+
+  Status = PseudoRandomU32 (&Random);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to generate random number: %r\n", __func__, Status));
+    return Status;
+  }
 
   NET_CHECK_SIGNATURE (Interface, IP6_INTERFACE_SIGNATURE);
 
@@ -164,7 +172,7 @@ Ip6SetAddress (
   // Thus queue the address to be processed in Duplicate Address Detection module
   // after the delay time (in milliseconds).
   //
-  Delay = (UINT64)NET_RANDOM (NetRandomInitSeed ());
+  Delay = (UINT64)Random;
   Delay = MultU64x32 (Delay, IP6_ONE_SECOND_IN_MS);
   Delay = RShiftU64 (Delay, 32);
 

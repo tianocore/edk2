@@ -1,6 +1,7 @@
 /** @file
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -555,6 +556,13 @@ Udp4DriverEntryPoint (
   )
 {
   EFI_STATUS  Status;
+  UINT32      Random;
+
+  Status = PseudoRandomU32 (&Random);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to generate random number: %r\n", __func__, Status));
+    return Status;
+  }
 
   //
   // Install the Udp4DriverBinding and Udp4ComponentName protocols.
@@ -571,7 +579,7 @@ Udp4DriverEntryPoint (
     //
     // Initialize the UDP random port.
     //
-    mUdp4RandomPort = (UINT16)(((UINT16)NetRandomInitSeed ()) % UDP4_PORT_KNOWN + UDP4_PORT_KNOWN);
+    mUdp4RandomPort = (UINT16)(((UINT16)Random) % UDP4_PORT_KNOWN + UDP4_PORT_KNOWN);
   }
 
   return Status;

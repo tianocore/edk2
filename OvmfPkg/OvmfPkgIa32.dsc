@@ -229,7 +229,6 @@
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
 
-
   #
   # Network libraries
   #
@@ -857,6 +856,11 @@
   MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
   MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+
+  #
+  # Hash2 Protocol producer
+  #
+  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 
   #
   # Network Support

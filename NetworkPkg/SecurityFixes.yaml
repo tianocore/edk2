@@ -122,3 +122,64 @@ CVE_2023_45235:
     - http://www.openwall.com/lists/oss-security/2024/01/16/2
     - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
     - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45236:
+  commit_titles:
+    - "NetworkPkg: TcpDxe: SECURITY PATCH CVE-2023-45236 Patch"
+  cve: CVE-2023-45236
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 08 - edk2/NetworkPkg: Predictable TCP Initial Sequence Numbers"
+  note:
+  files_impacted:
+    - NetworkPkg/Include/Library/NetLib.h
+    - NetworkPkg/TcpDxe/TcpDriver.c
+    - NetworkPkg/TcpDxe/TcpDxe.inf
+    - NetworkPkg/TcpDxe/TcpFunc.h
+    - NetworkPkg/TcpDxe/TcpInput.c
+    - NetworkPkg/TcpDxe/TcpMain.h
+    - NetworkPkg/TcpDxe/TcpMisc.c
+    - NetworkPkg/TcpDxe/TcpTimer.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4541
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45236
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html
+CVE_2023_45237:
+  commit_titles:
+    - "NetworkPkg:: SECURITY PATCH CVE 2023-45237"
+  cve: CVE-2023-45237
+  date_reported: 2023-08-28 13:56 UTC
+  description: "Bug 09 - Use of a Weak PseudoRandom Number Generator"
+  note:
+  files_impacted:
+    - NetworkPkg/Dhcp4Dxe/Dhcp4Driver.c
+    - NetworkPkg/Dhcp6Dxe/Dhcp6Driver.c
+    - NetworkPkg/DnsDxe/DnsDhcp.c
+    - NetworkPkg/DnsDxe/DnsImpl.c
+    - NetworkPkg/HttpBootDxe/HttpBootDhcp6.c
+    - NetworkPkg/IScsiDxe/IScsiCHAP.c
+    - NetworkPkg/IScsiDxe/IScsiMisc.c
+    - NetworkPkg/IScsiDxe/IScsiMisc.h
+    - NetworkPkg/Include/Library/NetLib.h
+    - NetworkPkg/Ip4Dxe/Ip4Driver.c
+    - NetworkPkg/Ip6Dxe/Ip6ConfigImpl.c
+    - NetworkPkg/Ip6Dxe/Ip6Driver.c
+    - NetworkPkg/Ip6Dxe/Ip6If.c
+    - NetworkPkg/Ip6Dxe/Ip6Mld.c
+    - NetworkPkg/Ip6Dxe/Ip6Nd.c
+    - NetworkPkg/Ip6Dxe/Ip6Nd.h
+    - NetworkPkg/Library/DxeNetLib/DxeNetLib.c
+    - NetworkPkg/Library/DxeNetLib/DxeNetLib.inf
+    - NetworkPkg/NetworkPkg.dec
+    - NetworkPkg/TcpDxe/TcpDriver.c
+    - NetworkPkg/Udp4Dxe/Udp4Driver.c
+    - NetworkPkg/Udp6Dxe/Udp6Driver.c
+    - NetworkPkg/UefiPxeBcDxe/PxeBcDhcp4.c
+    - NetworkPkg/UefiPxeBcDxe/PxeBcDhcp6.c
+    - NetworkPkg/UefiPxeBcDxe/PxeBcDriver.c
+  links:
+    - https://bugzilla.tianocore.org/show_bug.cgi?id=4542
+    - https://nvd.nist.gov/vuln/detail/CVE-2023-45237
+    - http://www.openwall.com/lists/oss-security/2024/01/16/2
+    - http://packetstormsecurity.com/files/176574/PixieFail-Proof-Of-Concepts.html
+    - https://blog.quarkslab.com/pixiefail-nine-vulnerabilities-in-tianocores-edk-ii-ipv6-network-stack.html

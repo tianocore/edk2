@@ -2,7 +2,7 @@
   Implementation of Neighbor Discovery support routines.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
-
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -16,17 +16,28 @@ EFI_MAC_ADDRESS  mZeroMacAddress;
 
   @param[in, out] IpSb     Points to the IP6_SERVICE.
 
+  @retval EFI_SUCCESS           ReachableTime Updated
+  @retval others                Failed to update ReachableTime
 **/
-VOID
+EFI_STATUS
 Ip6UpdateReachableTime (
   IN OUT IP6_SERVICE  *IpSb
   )
 {
-  UINT32  Random;
+  UINT32      Random;
+  EFI_STATUS  Status;
 
-  Random              = (NetRandomInitSeed () / 4294967295UL) * IP6_RANDOM_FACTOR_SCALE;
+  Status = PseudoRandomU32 (&Random);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to generate random number: %r\n", __func__, Status));
+    return Status;
+  }
+
+  Random              = (Random / 4294967295UL) * IP6_RANDOM_FACTOR_SCALE;
   Random              = Random + IP6_MIN_RANDOM_FACTOR_SCALED;
   IpSb->ReachableTime = (IpSb->BaseReachableTime * Random) / IP6_RANDOM_FACTOR_SCALE;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -972,9 +983,16 @@ Ip6InitDADProcess (
   IP6_SERVICE                               *IpSb;
   EFI_STATUS                                Status;
   UINT32                                    MaxDelayTick;
+  UINT32                                    Random;
 
   NET_CHECK_SIGNATURE (IpIf, IP6_INTERFACE_SIGNATURE);
   ASSERT (AddressInfo != NULL);
+
+  Status = PseudoRandomU32 (&Random);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to generate random number: %r\n", __func__, Status));
+    return Status;
+  }
 
   //
   // Do nothing if we have already started DAD on the address.
@@ -1014,7 +1032,7 @@ Ip6InitDADProcess (
   Entry->Transmit    = 0;
   Entry->Receive     = 0;
   MaxDelayTick       = IP6_MAX_RTR_SOLICITATION_DELAY / IP6_TIMER_INTERVAL_IN_MS;
-  Entry->RetransTick = (MaxDelayTick * ((NET_RANDOM (NetRandomInitSeed ()) % 5) + 1)) / 5;
+  Entry->RetransTick = (MaxDelayTick * ((Random % 5) + 1)) / 5;
   Entry->AddressInfo = AddressInfo;
   Entry->Callback    = Callback;
   Entry->Context     = Context;
@@ -2078,7 +2096,10 @@ Ip6ProcessRouterAdvertise (
     // in BaseReachableTime and recompute a ReachableTime.
     //
     IpSb->BaseReachableTime = ReachableTime;
-    Ip6UpdateReachableTime (IpSb);
+    Status                  = Ip6UpdateReachableTime (IpSb);
+    if (EFI_ERROR (Status)) {
+      goto Exit;
+    }
   }
 
   if (RetransTimer != 0) {

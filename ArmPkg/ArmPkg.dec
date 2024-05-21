@@ -139,11 +139,6 @@
   # Define if the GICv3 controller should use the GICv2 legacy
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
 
-  ## Define the conduit to use for monitor calls.
-  # Default PcdMonitorConduitHvc = FALSE, conduit = SMC
-  # If PcdMonitorConduitHvc = TRUE, conduit = HVC
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
-
   # Whether to remap all unused memory NX before installing the CPU arch
   # protocol driver. This is needed on platforms that map all DRAM with RWX
   # attributes initially, and can be disabled otherwise.
@@ -316,6 +311,11 @@
 
   gArmTokenSpaceGuid.PcdSystemBiosRelease|0xFFFF|UINT16|0x30000058
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0xFFFF|UINT16|0x30000059
+
+  ## Define the conduit to use for monitor calls.
+  # Default PcdMonitorConduitHvc = FALSE, conduit = SMC
+  # If PcdMonitorConduitHvc = TRUE, conduit = HVC
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
 
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
   #

@@ -2,7 +2,7 @@
   The driver binding and service binding protocol for the TCP driver.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
-
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -82,6 +82,12 @@ EFI_SERVICE_BINDING_PROTOCOL  gTcpServiceBinding = {
   TcpServiceBindingCreateChild,
   TcpServiceBindingDestroyChild
 };
+
+//
+// This is the handle for the Hash2ServiceBinding Protocol instance this driver produces
+// if the platform does not provide one.
+//
+EFI_HANDLE  mHash2ServiceHandle = NULL;
 
 /**
   Create and start the heartbeat timer for the TCP driver.
@@ -163,7 +169,30 @@ TcpDriverEntryPoint (
   )
 {
   EFI_STATUS  Status;
-  UINT32      Seed;
+  UINT32      Random;
+
+  //
+  // Initialize the Secret used for hashing TCP sequence numbers
+  //
+  // Normally this should be regenerated periodically, but since
+  // this is only used for UEFI networking and not a general purpose
+  // operating system, it is not necessary to regenerate it.
+  //
+  Status = PseudoRandomU32 (&mTcpGlobalSecret);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to generate random number: %r\n", __func__, Status));
+    return Status;
+  }
+
+  //
+  // Get a random number used to generate a random port number
+  // Intentionally not linking this to mTcpGlobalSecret to avoid leaking information about the secret
+  //
+  Status = PseudoRandomU32 (&Random);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a Failed to generate random number: %r\n", __func__, Status));
+    return Status;
+  }
 
   //
   // Install the TCP Driver Binding Protocol
@@ -201,11 +230,9 @@ TcpDriverEntryPoint (
   }
 
   //
-  // Initialize ISS and random port.
+  // Initialize the random port.
   //
-  Seed            = NetRandomInitSeed ();
-  mTcpGlobalIss   = NET_RANDOM (Seed) % mTcpGlobalIss;
-  mTcp4RandomPort = (UINT16)(TCP_PORT_KNOWN + (NET_RANDOM (Seed) % TCP_PORT_KNOWN));
+  mTcp4RandomPort = (UINT16)(TCP_PORT_KNOWN + (Random % TCP_PORT_KNOWN));
   mTcp6RandomPort = mTcp4RandomPort;
 
   return EFI_SUCCESS;
@@ -219,6 +246,8 @@ TcpDriverEntryPoint (
   @param[in]  IpVersion          IP_VERSION_4 or IP_VERSION_6.
 
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate some resources.
+  @retval EFI_UNSUPPORTED        Service Binding Protocols are unavailable.
+  @retval EFI_ALREADY_STARTED    The TCP driver is already started on the controller.
   @retval EFI_SUCCESS            A new IP6 service binding private was created.
 
 **/
@@ -229,11 +258,13 @@ TcpCreateService (
   IN UINT8       IpVersion
   )
 {
-  EFI_STATUS        Status;
-  EFI_GUID          *IpServiceBindingGuid;
-  EFI_GUID          *TcpServiceBindingGuid;
-  TCP_SERVICE_DATA  *TcpServiceData;
-  IP_IO_OPEN_DATA   OpenData;
+  EFI_STATUS                    Status;
+  EFI_GUID                      *IpServiceBindingGuid;
+  EFI_GUID                      *TcpServiceBindingGuid;
+  TCP_SERVICE_DATA              *TcpServiceData;
+  IP_IO_OPEN_DATA               OpenData;
+  EFI_SERVICE_BINDING_PROTOCOL  *Hash2ServiceBinding;
+  EFI_HASH2_PROTOCOL            *Hash2Protocol;
 
   if (IpVersion == IP_VERSION_4) {
     IpServiceBindingGuid  = &gEfiIp4ServiceBindingProtocolGuid;
@@ -265,6 +296,33 @@ TcpCreateService (
                   );
   if (EFI_ERROR (Status)) {
     return EFI_UNSUPPORTED;
+  }
+
+  Status = gBS->LocateProtocol (&gEfiHash2ProtocolGuid, NULL, (VOID **)&Hash2Protocol);
+  if (EFI_ERROR (Status)) {
+    //
+    // If we can't find the Hashing protocol, then we need to create one.
+    //
+
+    //
+    // Platform is expected to publish the hash service binding protocol to support TCP.
+    //
+    Status = gBS->LocateProtocol (
+                    &gEfiHash2ServiceBindingProtocolGuid,
+                    NULL,
+                    (VOID **)&Hash2ServiceBinding
+                    );
+    if (EFI_ERROR (Status) || (Hash2ServiceBinding == NULL) || (Hash2ServiceBinding->CreateChild == NULL)) {
+      return EFI_UNSUPPORTED;
+    }
+
+    //
+    // Create an instance of the hash protocol for this controller.
+    //
+    Status = Hash2ServiceBinding->CreateChild (Hash2ServiceBinding, &mHash2ServiceHandle);
+    if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
+    }
   }
 
   //
@@ -418,6 +476,7 @@ TcpDestroyService (
   EFI_STATUS                               Status;
   LIST_ENTRY                               *List;
   TCP_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
+  EFI_SERVICE_BINDING_PROTOCOL             *Hash2ServiceBinding;
 
   ASSERT ((IpVersion == IP_VERSION_4) || (IpVersion == IP_VERSION_6));
 
@@ -432,6 +491,30 @@ TcpDestroyService (
   NicHandle = NetLibGetNicHandle (Controller, IpProtocolGuid);
   if (NicHandle == NULL) {
     return EFI_SUCCESS;
+  }
+
+  //
+  // Destroy the Hash2ServiceBinding instance if it is created by Tcp driver.
+  //
+  if (mHash2ServiceHandle != NULL) {
+    Status = gBS->LocateProtocol (
+                    &gEfiHash2ServiceBindingProtocolGuid,
+                    NULL,
+                    (VOID **)&Hash2ServiceBinding
+                    );
+    if (EFI_ERROR (Status) || (Hash2ServiceBinding == NULL) || (Hash2ServiceBinding->DestroyChild == NULL)) {
+      return EFI_UNSUPPORTED;
+    }
+
+    //
+    // Destroy the instance of the hashing protocol for this controller.
+    //
+    Status = Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, &mHash2ServiceHandle);
+    if (EFI_ERROR (Status)) {
+      return EFI_UNSUPPORTED;
+    }
+
+    mHash2ServiceHandle = NULL;
   }
 
   Status = gBS->OpenProtocol (

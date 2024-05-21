@@ -5,6 +5,7 @@
 #
 # Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2020 Hewlett Packard Enterprise Development LP<BR>
+# Copyright (c) Microsoft Corporation
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -129,6 +130,12 @@
   # FALSE - Event being triggered upon ExitBootServices call will NOT be created
   # @Prompt Indicates whether SnpDxe creates event for ExitBootServices() call.
   gEfiNetworkPkgTokenSpaceGuid.PcdSnpCreateExitBootServicesEvent|TRUE|BOOLEAN|0x1000000C
+
+  ## Enforces the use of Secure UEFI spec defined RNG algorithms for all network connections.
+  # TRUE  - Enforce the use of Secure UEFI spec defined RNG algorithms.
+  # FALSE - Do not enforce and depend on the default implementation of RNG algorithm from the provider.
+  # @Prompt Enforce the use of Secure UEFI spec defined RNG algorithms.
+  gEfiNetworkPkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms|TRUE|BOOLEAN|0x1000000D
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).

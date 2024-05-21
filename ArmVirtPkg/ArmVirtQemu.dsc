@@ -49,9 +49,9 @@
 
 !include NetworkPkg/NetworkDefines.dsc.inc
 
-!include ArmVirtPkg/ArmVirt.dsc.inc
-
 !include MdePkg/MdeLibs.dsc.inc
+
+!include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -293,6 +293,10 @@
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
 
+  # whether to use HVC or SMC to issue monitor calls - this typically depends
+  # on the exception level at which the UEFI system firmware executes
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
+
   #
   # TPM2 support
   #
@@ -318,11 +322,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5
 
 [LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
-!if $(TPM2_ENABLE) == TRUE
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-!else
-  PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
-!endif
 
 ################################################################################
 #
@@ -339,11 +339,11 @@
   ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf
   ArmPkg/Drivers/CpuPei/CpuPei.inf
 
-!if $(TPM2_ENABLE) == TRUE
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   }
+!if $(TPM2_ENABLE) == TRUE
   MdeModulePkg/Universal/ResetSystemPei/ResetSystemPei.inf {
     <LibraryClasses>
       ResetSystemLib|ArmVirtPkg/Library/ArmVirtPsciResetSystemPeiLib/ArmVirtPsciResetSystemPeiLib.inf
@@ -432,6 +432,7 @@
       BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
   }
   MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
   #
   # Status Code Routing
@@ -553,6 +554,11 @@
   MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+
+  #
+  # Hash2 Protocol Support
+  #
+  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
 
   #
   # TPM2 support

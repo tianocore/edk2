@@ -3,7 +3,7 @@
 
   Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-
+  Copyright (c) Microsoft Corporation
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -316,7 +316,11 @@ Ip6CreateService (
   IpSb->CurHopLimit       = IP6_HOP_LIMIT;
   IpSb->LinkMTU           = IP6_MIN_LINK_MTU;
   IpSb->BaseReachableTime = IP6_REACHABLE_TIME;
-  Ip6UpdateReachableTime (IpSb);
+  Status                  = Ip6UpdateReachableTime (IpSb);
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
   //
   // RFC4861 RETRANS_TIMER: 1,000 milliseconds
   //
@@ -516,10 +520,17 @@ Ip6DriverBindingStart (
   EFI_STATUS               Status;
   EFI_IP6_CONFIG_PROTOCOL  *Ip6Cfg;
   IP6_CONFIG_DATA_ITEM     *DataItem;
+  UINT32                   Random;
 
   IpSb     = NULL;
   Ip6Cfg   = NULL;
   DataItem = NULL;
+
+  Status = PseudoRandomU32 (&Random);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to generate random number: %r\n", __func__, Status));
+    return Status;
+  }
 
   //
   // Test for the Ip6 service binding protocol
@@ -656,7 +667,7 @@ Ip6DriverBindingStart (
   //
   // Initialize the IP6 ID
   //
-  mIp6Id = NET_RANDOM (NetRandomInitSeed ());
+  mIp6Id = Random;
 
   return EFI_SUCCESS;
 

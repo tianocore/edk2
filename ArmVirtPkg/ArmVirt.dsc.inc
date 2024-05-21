@@ -156,7 +156,9 @@
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
 !endif
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
-  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
+  ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
+  ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
 
   #
   # Secure Boot dependencies
@@ -266,6 +268,7 @@
 
 [LibraryClasses.ARM]
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
+  RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 [BuildOptions]
   GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG

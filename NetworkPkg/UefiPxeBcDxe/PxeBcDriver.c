@@ -3,6 +3,7 @@
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -892,6 +893,13 @@ PxeBcCreateIp6Children (
   PXEBC_PRIVATE_PROTOCOL       *Id;
   EFI_SIMPLE_NETWORK_PROTOCOL  *Snp;
   UINTN                        Index;
+  UINT32                       Random;
+
+  Status = PseudoRandomU32 (&Random);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Failed to generate random number using EFI_RNG_PROTOCOL: %r\n", Status));
+    return Status;
+  }
 
   if (Private->Ip6Nic != NULL) {
     //
@@ -935,9 +943,9 @@ PxeBcCreateIp6Children (
   }
 
   //
-  // Generate a random IAID for the Dhcp6 assigned address.
+  // Set a random IAID for the Dhcp6 assigned address.
   //
-  Private->IaId = NET_RANDOM (NetRandomInitSeed ());
+  Private->IaId = Random;
   if (Private->Snp != NULL) {
     for (Index = 0; Index < Private->Snp->Mode->HwAddressSize; Index++) {
       Private->IaId |= (Private->Snp->Mode->CurrentAddress.Addr[Index] << ((Index << 3) & 31));
