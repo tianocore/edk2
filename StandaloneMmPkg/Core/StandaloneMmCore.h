@@ -40,7 +40,7 @@
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-
+#include <Library/HobPrintLib.h>
 #include <Library/StandaloneMmMemLib.h>
 #include <Library/HobLib.h>
 
