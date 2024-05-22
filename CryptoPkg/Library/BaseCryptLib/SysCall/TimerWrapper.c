@@ -205,3 +205,14 @@ sleep (
   gBS->Stall (seconds * 1000 * 1000);
   return 0;
 }
+
+int
+gettimeofday (
+  struct timeval   *tv,
+  struct timezone  *tz
+  )
+{
+  tv->tv_sec  = (long)time (NULL);
+  tv->tv_usec = 0;
+  return 0;
+}
