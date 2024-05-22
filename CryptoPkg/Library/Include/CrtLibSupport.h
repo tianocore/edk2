@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PrintLib.h>
+#include <Library/TimerLib.h>
 
 #define OPENSSLDIR  ""
 #define ENGINESDIR  ""
@@ -434,5 +435,6 @@ strcat (
 #define offsetof(type, member)  OFFSET_OF(type,member)
 #define atoi(nptr)              AsciiStrDecimalToUintn(nptr)
 #define gettimeofday(tvp, tz)   do { (tvp)->tv_sec = time(NULL); (tvp)->tv_usec = 0; } while (0)
+#define sleep(secs)             MicroSecondDelay(secs * 1000000)
 
 #endif
