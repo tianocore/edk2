@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Uefi.h>
 #include <CrtLibSupport.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
 //
@@ -194,4 +195,13 @@ gmtime (
   GmTime->tm_zone   = NULL;
 
   return GmTime;
+}
+
+unsigned int
+sleep (
+  unsigned int  seconds
+  )
+{
+  gBS->Stall (seconds * 1000 * 1000);
+  return 0;
 }
