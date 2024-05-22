@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PrintLib.h>
+#include <Library/TimerLib.h>
 
 #define OPENSSLDIR  ""
 #define ENGINESDIR  ""
@@ -332,6 +333,11 @@ time        (
 struct tm      *
 gmtime     (
   const time_t *
+  );
+
+unsigned int
+sleep (
+  unsigned int  seconds
   );
 
 uid_t

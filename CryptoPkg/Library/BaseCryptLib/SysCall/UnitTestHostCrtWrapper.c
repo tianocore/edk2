@@ -104,4 +104,12 @@ getegid (
   return 0;
 }
 
+unsigned int
+sleep (
+  unsigned int  seconds
+  )
+{
+  return 0;
+}
+
 int  errno = 0;
