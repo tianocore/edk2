@@ -515,3 +515,51 @@ tls_construct_stoc_psk (
 {
   return EXT_RETURN_FAIL;
 }
+
+EXT_RETURN
+tls_construct_stoc_client_cert_type (
+  SSL_CONNECTION  *sc,
+  WPACKET         *pkt,
+  unsigned int    context,
+  X509            *x,
+  size_t          chainidx
+  )
+{
+  return EXT_RETURN_FAIL;
+}
+
+int
+tls_parse_ctos_client_cert_type (
+  SSL_CONNECTION  *sc,
+  PACKET          *pkt,
+  unsigned int    context,
+  X509            *x,
+  size_t          chainidx
+  )
+{
+  return 0;
+}
+
+EXT_RETURN
+tls_construct_stoc_server_cert_type (
+  SSL_CONNECTION  *sc,
+  WPACKET         *pkt,
+  unsigned int    context,
+  X509            *x,
+  size_t          chainidx
+  )
+{
+  return EXT_RETURN_FAIL;
+}
+
+int
+tls_parse_ctos_server_cert_type (
+  SSL_CONNECTION  *sc,
+  PACKET          *pkt,
+  unsigned int    context,
+  X509            *x,
+  size_t          chainidx
+  )
+{
+  return 0;
+}
