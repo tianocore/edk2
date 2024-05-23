@@ -1,7 +1,7 @@
 /** @file
   CPU MP Initialize Library common functions.
 
-  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020 - 2024, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -114,6 +114,10 @@ FutureBSPProc (
   SaveVolatileRegisters (&DataInHob->APInfo.VolatileRegisters);
   AsmExchangeRole (&DataInHob->APInfo, &DataInHob->BSPInfo);
   RestoreVolatileRegisters (&DataInHob->APInfo.VolatileRegisters, FALSE);
+  //
+  // Update VolatileRegisters saved in CpuMpData->CpuData
+  //
+  CopyMem (&DataInHob->CpuData[DataInHob->BspNumber].VolatileRegisters, &DataInHob->APInfo.VolatileRegisters, sizeof (CPU_VOLATILE_REGISTERS));
 }
 
 /**
@@ -761,11 +765,11 @@ ApWakeupFunction (
       BistData     = (UINT32)ApStackData->Bist;
 
       //
-      // CpuMpData->CpuData[0].VolatileRegisters is initialized based on BSP environment,
+      // CpuMpData->CpuData[BspNumber].VolatileRegisters is initialized based on BSP environment,
       //   to initialize AP in InitConfig path.
-      // NOTE: IDTR.BASE stored in CpuMpData->CpuData[0].VolatileRegisters points to a different IDT shared by all APs.
+      // NOTE: IDTR.BASE stored in CpuMpData->CpuData[BspNumber].VolatileRegisters points to a different IDT shared by all APs.
       //
-      RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+      RestoreVolatileRegisters (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, FALSE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
     } else {
@@ -798,10 +802,10 @@ ApWakeupFunction (
         // 1. AP is re-enabled after it's disabled, in either PEI or DXE phase.
         // 2. AP is initialized in DXE phase.
         // In either case, use the volatile registers value derived from BSP.
-        // NOTE: IDTR.BASE stored in CpuMpData->CpuData[0].VolatileRegisters points to a
+        // NOTE: IDTR.BASE stored in CpuMpData->CpuData[BspNumber].VolatileRegisters points to a
         //   different IDT shared by all APs.
         //
-        RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+        RestoreVolatileRegisters (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, FALSE);
       } else {
         if (CpuMpData->ApLoopMode == ApInHltLoop) {
           //
@@ -927,7 +931,7 @@ DxeApEntryPoint (
     AsmWriteMsr64 (MSR_IA32_EFER, EferMsr.Uint64);
   }
 
-  RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+  RestoreVolatileRegisters (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, FALSE);
   InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
   PlaceAPInMwaitLoopOrRunLoop (
     CpuMpData->ApLoopMode,
@@ -2151,11 +2155,16 @@ MpInitLibInitialize (
   CpuMpData->BackupBufferSize = ApResetVectorSizeBelow1Mb;
   CpuMpData->WakeupBuffer     = (UINTN)-1;
   CpuMpData->CpuCount         = 1;
-  CpuMpData->BspNumber        = 0;
-  CpuMpData->WaitEvent        = NULL;
-  CpuMpData->SwitchBspFlag    = FALSE;
-  CpuMpData->CpuData          = (CPU_AP_DATA *)(CpuMpData + 1);
-  CpuMpData->CpuInfoInHob     = (UINT64)(UINTN)(CpuMpData->CpuData + MaxLogicalProcessorNumber);
+  if (FirstMpHandOff == NULL) {
+    CpuMpData->BspNumber = 0;
+  } else {
+    CpuMpData->BspNumber = GetBspNumber (FirstMpHandOff);
+  }
+
+  CpuMpData->WaitEvent     = NULL;
+  CpuMpData->SwitchBspFlag = FALSE;
+  CpuMpData->CpuData       = (CPU_AP_DATA *)(CpuMpData + 1);
+  CpuMpData->CpuInfoInHob  = (UINT64)(UINTN)(CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock (&CpuMpData->MpLock);
   CpuMpData->SevEsIsEnabled   = ConfidentialComputingGuestHas (CCAttrAmdSevEs);
   CpuMpData->SevSnpIsEnabled  = ConfidentialComputingGuestHas (CCAttrAmdSevSnp);
@@ -2186,11 +2195,11 @@ MpInitLibInitialize (
   // Don't pass BSP's TR to APs to avoid AP init failure.
   //
   VolatileRegisters.Tr = 0;
-  CopyMem (&CpuMpData->CpuData[0].VolatileRegisters, &VolatileRegisters, sizeof (VolatileRegisters));
+  CopyMem (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, &VolatileRegisters, sizeof (VolatileRegisters));
   //
   // Set BSP basic information
   //
-  InitializeApData (CpuMpData, 0, 0, CpuMpData->Buffer + ApStackSize);
+  InitializeApData (CpuMpData, CpuMpData->BspNumber, 0, CpuMpData->Buffer + ApStackSize * (CpuMpData->BspNumber + 1));
   //
   // Save assembly code information
   //
@@ -2245,9 +2254,8 @@ MpInitLibInitialize (
       AmdSevUpdateCpuMpData (CpuMpData);
     }
 
-    CpuMpData->CpuCount  = MaxLogicalProcessorNumber;
-    CpuMpData->BspNumber = GetBspNumber (FirstMpHandOff);
-    CpuInfoInHob         = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+    CpuMpData->CpuCount = MaxLogicalProcessorNumber;
+    CpuInfoInHob        = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
     for (MpHandOff = FirstMpHandOff;
          MpHandOff != NULL;
          MpHandOff = GetNextMpHandOffHob (MpHandOff))
@@ -2615,7 +2623,12 @@ SwitchBSPWorker (
   SaveVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters);
   AsmExchangeRole (&CpuMpData->BSPInfo, &CpuMpData->APInfo);
   RestoreVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters, FALSE);
-
+  //
+  // Update VolatileRegisters saved in CpuMpData->CpuData
+  // Don't pass BSP's TR to APs to avoid AP init failure.
+  //
+  CopyMem (&CpuMpData->CpuData[CpuMpData->NewBspNumber].VolatileRegisters, &CpuMpData->BSPInfo.VolatileRegisters, sizeof (CPU_VOLATILE_REGISTERS));
+  CpuMpData->CpuData[CpuMpData->NewBspNumber].VolatileRegisters.Tr = 0;
   //
   // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
   //
