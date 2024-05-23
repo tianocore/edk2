@@ -1,0 +1,39 @@
+## @file
+#  Library that implements the Arm CCA initialisation in PEI phase.
+#
+#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmCcaInitPeiLib
+  FILE_GUID                      = 9A8C3768-79ED-487E-8155-BBF4DD638296
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmCcaInitPeiLib
+
+[Sources]
+  ArmCcaInitPeiLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmCcaLib
+  ArmCcaRsiLib
+  ArmLib
+  ArmMmuLib
+  ArmVirtMemInfoLib
+  BaseLib
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+[Guids]
+  gArmCcaIpaWidthGuid
