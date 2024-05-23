@@ -118,7 +118,6 @@ typedef enum {
 //
 typedef enum {
   ApInitConfig   = 1,
-  ApInitReconfig = 2,
   ApInitDone     = 3
 } AP_INIT_STATE;
 
@@ -283,6 +282,7 @@ struct _CPU_MP_DATA {
   UINT8                            ApTargetCState;
   UINT16                           PmCodeSegment;
   UINT16                           Pm16CodeSegment;
+  CPU_AP_DATA                      *CpuDataInit;
   CPU_AP_DATA                      *CpuData;
   volatile MP_CPU_EXCHANGE_INFO    *MpCpuExchangeInfo;
 
