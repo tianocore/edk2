@@ -10,7 +10,7 @@
   Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction() and Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction()
   will receive untrusted input and do validation.
 
-Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -38,4 +38,18 @@ Tcg2PhysicalPresenceLibTraditionalConstructor (
   )
 {
   return Tcg2PhysicalPresenceLibCommonConstructor ();
+}
+
+/**
+  Check if Tcg2 PP version is lower than PP_INF_VERSION_1_3.
+
+  @retval TRUE    Tcg2 PP version is lower than PP_INF_VERSION_1_3.
+  @retval Other   Tcg2 PP version is not lower than PP_INF_VERSION_1_3.
+**/
+BOOLEAN
+IsTcg2PPVerLowerThan_1_3 (
+  VOID
+  )
+{
+  return (BOOLEAN)(AsciiStrnCmp (PP_INF_VERSION_1_2, (CHAR8 *)PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer), sizeof (PP_INF_VERSION_1_2) - 1) >= 0);
 }
