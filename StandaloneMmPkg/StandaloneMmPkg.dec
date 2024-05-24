@@ -29,6 +29,9 @@
   ##                 MM Memory Operation.
   MemLib|Include/Library/StandaloneMmMemLib.h
 
+[LibraryClasses.X64.PEIM]
+  MmPlatformHobProducerLib|Include/Library/MmPlatformHobProducerLib.h
+
 [LibraryClasses.AArch64, LibraryClasses.ARM]
   ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint for
   ##                 AArch64 and ARM.
