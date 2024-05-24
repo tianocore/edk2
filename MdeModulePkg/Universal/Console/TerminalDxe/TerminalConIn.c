@@ -95,6 +95,14 @@ TerminalConInReset (
       );
   }
 
+  //
+  // After resetting the console, ensure device is ready to recieve data
+  // by setting data terminal ready and request to send
+  //
+  if (!EFI_ERROR (Status)) {
+    Status = TerminalDevice->SerialIo->SetControl (TerminalDevice->SerialIo, EFI_SERIAL_DATA_TERMINAL_READY|EFI_SERIAL_REQUEST_TO_SEND);
+  }
+
   return Status;
 }
 
