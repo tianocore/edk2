@@ -1,7 +1,7 @@
 /** @file
   The module entry point for Tcg2 configuration module.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
+#include <Library/HobLib.h>
 
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/TpmInitialized.h>
@@ -73,6 +74,7 @@ Tcg2ConfigPeimEntryPoint (
   TCG2_CONFIGURATION               Tcg2Configuration;
   UINTN                            Index;
   UINT8                            TpmDevice;
+  VOID                             *Hob;
 
   Status = PeiServicesLocatePpi (&gEfiPeiReadOnlyVariable2PpiGuid, 0, NULL, (VOID **)&VariablePpi);
   ASSERT_EFI_ERROR (Status);
@@ -132,6 +134,26 @@ Tcg2ConfigPeimEntryPoint (
       break;
     }
   }
+
+  //
+  // Build Hob for PcdTpmInstanceGuid
+  //
+  Hob = BuildGuidDataHob (
+          &gEdkiiTpmInstanceHobGuid,
+          PcdGetPtr (PcdTpmInstanceGuid),
+          sizeof (EFI_GUID)
+          );
+  ASSERT (Hob != NULL);
+
+  //
+  // Build Hob for PcdTcgPhysicalPresenceInterfaceVer
+  //
+  Hob = BuildGuidDataHob (
+          &gEdkiiTcgPhysicalPresenceInterfaceVerHobGuid,
+          PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
+          AsciiStrSize ((CHAR8 *)PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
+          );
+  ASSERT (Hob != NULL);
 
   //
   // Selection done
