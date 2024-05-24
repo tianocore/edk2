@@ -285,7 +285,6 @@ READ_LOCK_STATUS   = TRUE
 #
 INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
 INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
-INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
 !if $(PVSCSI_ENABLE) == TRUE
 INF  OvmfPkg/PvScsiDxe/PvScsiDxe.inf
 !endif
@@ -326,6 +325,7 @@ INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
 INF  OvmfPkg/PlatformDxe/Platform.inf
 
 !include OvmfPkg/Include/Fdf/ShellDxe.fdf.inc
+!include OvmfPkg/Include/Fdf/OvmfRngDxe.fdf.inc
 
 ################################################################################
 
