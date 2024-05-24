@@ -9,7 +9,7 @@
 
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -56,6 +56,20 @@ IsBufferOutsideMmValid (
   )
 {
   return SmmIsBufferOutsideSmmValid (Buffer, Length);
+}
+
+/**
+  This function checks if the required DTPM instance is TPM 2.0.
+
+  @retval TRUE  The required DTPM instance is equal to gEfiTpmDeviceInstanceTpm20DtpmGuid.
+  @retval FALSE The required DTPM instance is not equal to gEfiTpmDeviceInstanceTpm20DtpmGuid.
+**/
+BOOLEAN
+IsTpm20Dtpm (
+  VOID
+  )
+{
+  return CompareGuid (PcdGetPtr (PcdTpmInstanceGuid), &gEfiTpmDeviceInstanceTpm20DtpmGuid);
 }
 
 /**
