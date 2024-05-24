@@ -1,0 +1,27 @@
+## @file
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = CheckRdrandX64Dxe
+  FILE_GUID                      = 32946a40-3fd8-404e-b1c4-7cec4072fd3f
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = CheckRdrandX64DxeEntryPoint
+
+[Sources]
+  CheckRdrandX64Dxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gOvmfCheckRdrandX64Guid
