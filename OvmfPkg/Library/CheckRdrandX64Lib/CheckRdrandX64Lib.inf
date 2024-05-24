@@ -1,0 +1,26 @@
+## @file
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = CheckRdRandX64Lib
+  FILE_GUID                      = b9b87e0b-de8f-4941-b648-6da12baa7246
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = CheckRdRandX64LibConstructor
+
+[Sources]
+  CheckRdrandX64Lib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[Depex]
+  gOvmfCheckRdrandX64Guid
