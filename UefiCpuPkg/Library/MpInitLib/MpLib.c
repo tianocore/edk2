@@ -761,11 +761,11 @@ ApWakeupFunction (
       BistData     = (UINT32)ApStackData->Bist;
 
       //
-      // CpuMpData->CpuData[0].VolatileRegisters is initialized based on BSP environment,
+      // CpuMpData->CpuDataInit->VolatileRegisters is initialized based on BSP environment,
       //   to initialize AP in InitConfig path.
-      // NOTE: IDTR.BASE stored in CpuMpData->CpuData[0].VolatileRegisters points to a different IDT shared by all APs.
+      // NOTE: IDTR.BASE stored in CpuMpData->CpuDataInit->VolatileRegisters points to a different IDT shared by all APs.
       //
-      RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+      RestoreVolatileRegisters (&CpuMpData->CpuDataInit->VolatileRegisters, FALSE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
     } else {
@@ -792,31 +792,7 @@ ApWakeupFunction (
         0
         );
 
-      if (CpuMpData->InitFlag == ApInitReconfig) {
-        //
-        // ApInitReconfig happens when:
-        // 1. AP is re-enabled after it's disabled, in either PEI or DXE phase.
-        // 2. AP is initialized in DXE phase.
-        // In either case, use the volatile registers value derived from BSP.
-        // NOTE: IDTR.BASE stored in CpuMpData->CpuData[0].VolatileRegisters points to a
-        //   different IDT shared by all APs.
-        //
-        RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
-      } else {
-        if (CpuMpData->ApLoopMode == ApInHltLoop) {
-          //
-          // Restore AP's volatile registers saved before AP is halted
-          //
-          RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
-        } else {
-          //
-          // The CPU driver might not flush TLB for APs on spot after updating
-          // page attributes. AP in mwait loop mode needs to take care of it when
-          // woken up.
-          //
-          CpuFlushTlb ();
-        }
-      }
+      RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
 
       if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateReady) {
         Procedure = (EFI_AP_PROCEDURE)CpuMpData->CpuData[ProcessorNumber].ApFunction;
@@ -867,12 +843,7 @@ ApWakeupFunction (
       }
     }
 
-    if (CpuMpData->ApLoopMode == ApInHltLoop) {
-      //
-      // Save AP volatile registers
-      //
-      SaveVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
-    }
+    SaveVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
 
     //
     // AP finished executing C code
@@ -927,7 +898,7 @@ DxeApEntryPoint (
     AsmWriteMsr64 (MSR_IA32_EFER, EferMsr.Uint64);
   }
 
-  RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+  RestoreVolatileRegisters (&CpuMpData->CpuDataInit->VolatileRegisters, FALSE);
   InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
   PlaceAPInMwaitLoopOrRunLoop (
     CpuMpData->ApLoopMode,
@@ -1674,7 +1645,6 @@ ResetProcessorToIdleState (
 
   CpuMpData = GetCpuMpData ();
 
-  CpuMpData->InitFlag = ApInitReconfig;
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL, TRUE);
   while (CpuMpData->FinishedCount < 1) {
     CpuPause ();
@@ -2114,6 +2084,7 @@ MpInitLibInitialize (
   BufferSize  = ALIGN_VALUE (BufferSize, 8);
   BufferSize += VolatileRegisters.Idtr.Limit + 1;
   BufferSize += sizeof (CPU_MP_DATA);
+  BufferSize += sizeof (CPU_AP_DATA);
   BufferSize += (sizeof (CPU_AP_DATA) + sizeof (CPU_INFO_IN_HOB))* MaxLogicalProcessorNumber;
   MpBuffer    = AllocatePages (EFI_SIZE_TO_PAGES (BufferSize));
   ASSERT (MpBuffer != NULL);
@@ -2135,6 +2106,8 @@ MpInitLibInitialize (
   //           AP IDT          All APs share one separate IDT.
   //    +--------------------+ <-- CpuMpData
   //         CPU_MP_DATA
+  //    +--------------------+ <-- CpuMpData->CpuDataInit
+  //        CPU_AP_DATA
   //    +--------------------+ <-- CpuMpData->CpuData
   //        CPU_AP_DATA (N)
   //    +--------------------+ <-- CpuMpData->CpuInfoInHob
@@ -2151,10 +2124,15 @@ MpInitLibInitialize (
   CpuMpData->BackupBufferSize = ApResetVectorSizeBelow1Mb;
   CpuMpData->WakeupBuffer     = (UINTN)-1;
   CpuMpData->CpuCount         = 1;
-  CpuMpData->BspNumber        = 0;
+  if (FirstMpHandOff == NULL) {
+    CpuMpData->BspNumber      = 0;
+  }else{
+    CpuMpData->BspNumber      = GetBspNumber (FirstMpHandOff);
+  }
   CpuMpData->WaitEvent        = NULL;
   CpuMpData->SwitchBspFlag    = FALSE;
-  CpuMpData->CpuData          = (CPU_AP_DATA *)(CpuMpData + 1);
+  CpuMpData->CpuDataInit      = (CPU_AP_DATA *)(CpuMpData + 1);
+  CpuMpData->CpuData          = CpuMpData->CpuDataInit + 1;
   CpuMpData->CpuInfoInHob     = (UINT64)(UINTN)(CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock (&CpuMpData->MpLock);
   CpuMpData->SevEsIsEnabled   = ConfidentialComputingGuestHas (CCAttrAmdSevEs);
@@ -2186,11 +2164,11 @@ MpInitLibInitialize (
   // Don't pass BSP's TR to APs to avoid AP init failure.
   //
   VolatileRegisters.Tr = 0;
-  CopyMem (&CpuMpData->CpuData[0].VolatileRegisters, &VolatileRegisters, sizeof (VolatileRegisters));
+  CopyMem (&CpuMpData->CpuDataInit->VolatileRegisters, &VolatileRegisters, sizeof (VolatileRegisters));
   //
   // Set BSP basic information
   //
-  InitializeApData (CpuMpData, 0, 0, CpuMpData->Buffer + ApStackSize);
+  InitializeApData (CpuMpData, CpuMpData->BspNumber, 0, CpuMpData->Buffer + ApStackSize * (CpuMpData->BspNumber + 1));
   //
   // Save assembly code information
   //
@@ -2246,7 +2224,6 @@ MpInitLibInitialize (
     }
 
     CpuMpData->CpuCount  = MaxLogicalProcessorNumber;
-    CpuMpData->BspNumber = GetBspNumber (FirstMpHandOff);
     CpuInfoInHob         = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
     for (MpHandOff = FirstMpHandOff;
          MpHandOff != NULL;
@@ -2281,6 +2258,23 @@ MpInitLibInitialize (
       MpHandOffConfig->WaitLoopExecutionMode,
       sizeof (VOID *)
       ));
+
+    //
+    // Copy volatile registers since current AP is still running in PEI context
+    //
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++){
+      CopyMem (&CpuMpData->CpuData[Index].VolatileRegisters, &CpuMpData->CpuDataInit->VolatileRegisters, sizeof (VolatileRegisters));
+      //
+      // Set DR as 0 to DR is set only for BSP.
+      //
+      CpuMpData->CpuData[Index].VolatileRegisters.Dr0 = 0;
+      CpuMpData->CpuData[Index].VolatileRegisters.Dr1 = 0;
+      CpuMpData->CpuData[Index].VolatileRegisters.Dr2 = 0;
+      CpuMpData->CpuData[Index].VolatileRegisters.Dr3 = 0;
+      CpuMpData->CpuData[Index].VolatileRegisters.Dr6 = 0;
+      CpuMpData->CpuData[Index].VolatileRegisters.Dr7 = 0;
+    }
+
     if (MpHandOffConfig->WaitLoopExecutionMode == sizeof (VOID *)) {
       ASSERT (CpuMpData->ApLoopMode != ApInHltLoop);
 
@@ -2346,15 +2340,6 @@ MpInitLibInitialize (
   // Wakeup APs to do some AP initialize sync (Microcode & MTRR)
   //
   if (CpuMpData->CpuCount > 1) {
-    if (FirstMpHandOff != NULL) {
-      //
-      // Only needs to use this flag for DXE phase to update the wake up
-      // buffer. Wakeup buffer allocated in PEI phase is no longer valid
-      // in DXE.
-      //
-      CpuMpData->InitFlag = ApInitReconfig;
-    }
-
     WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
     //
     // Wait for all APs finished initialization
