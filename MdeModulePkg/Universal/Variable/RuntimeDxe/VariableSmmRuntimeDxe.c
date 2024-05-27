@@ -54,7 +54,6 @@ VARIABLE_STORE_HEADER           *mVariableRuntimeHobCacheBuffer      = NULL;
 VARIABLE_STORE_HEADER           *mVariableRuntimeNvCacheBuffer       = NULL;
 VARIABLE_STORE_HEADER           *mVariableRuntimeVolatileCacheBuffer = NULL;
 UINTN                           mVariableBufferSize;
-UINTN                           mVariableRuntimeHobCacheBufferSize;
 UINTN                           mVariableBufferPayloadSize;
 BOOLEAN                         mVariableRuntimeCachePendingUpdate;
 BOOLEAN                         mVariableRuntimeCacheReadLock;
@@ -578,10 +577,6 @@ CheckForRuntimeCacheSync (
   // The HOB variable data may have finished being flushed in the runtime cache sync update
   //
   if (mHobFlushComplete && (mVariableRuntimeHobCacheBuffer != NULL)) {
-    if (!EfiAtRuntime ()) {
-      FreePages (mVariableRuntimeHobCacheBuffer, EFI_SIZE_TO_PAGES (mVariableRuntimeHobCacheBufferSize));
-    }
-
     mVariableRuntimeHobCacheBuffer = NULL;
   }
 }
@@ -1691,6 +1686,7 @@ SmmVariableReady (
   EFI_STATUS  Status;
   UINTN       RuntimeNvCacheSize;
   UINTN       RuntimeVolatileCacheSize;
+  UINTN       RuntimeHobCacheBufferSize;
 
   Status = gBS->LocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **)&mSmmVariable);
   if (EFI_ERROR (Status)) {
@@ -1720,13 +1716,13 @@ SmmVariableReady (
     // Allocate runtime variable cache memory buffers.
     //
     Status =  GetRuntimeCacheInfo (
-                &mVariableRuntimeHobCacheBufferSize,
+                &RuntimeHobCacheBufferSize,
                 &RuntimeNvCacheSize,
                 &RuntimeVolatileCacheSize,
                 &mVariableAuthFormat
                 );
     if (!EFI_ERROR (Status)) {
-      Status = InitVariableCache (&mVariableRuntimeHobCacheBuffer, &mVariableRuntimeHobCacheBufferSize);
+      Status = InitVariableCache (&mVariableRuntimeHobCacheBuffer, &RuntimeHobCacheBufferSize);
       if (!EFI_ERROR (Status)) {
         Status = InitVariableCache (&mVariableRuntimeNvCacheBuffer, &RuntimeNvCacheSize);
         if (!EFI_ERROR (Status)) {
