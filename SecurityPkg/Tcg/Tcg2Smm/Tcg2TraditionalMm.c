@@ -41,7 +41,9 @@ Tcg2NotifyMmReady (
 }
 
 /**
-  This function is an abstraction layer for implementation specific Mm buffer validation routine.
+  This function is for the Primary Buffer validation routine.
+  The Primary Buffer is the communication buffer requested from
+  Communicate protocol/PPI.
 
   @param Buffer  The buffer start address to be checked.
   @param Length  The buffer length to be checked.
@@ -50,7 +52,27 @@ Tcg2NotifyMmReady (
   @retval FALSE This buffer is not valid per processor architecture or overlap with SMRAM.
 **/
 BOOLEAN
-IsBufferOutsideMmValid (
+Tcg2IsPrimaryBufferValid (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  )
+{
+  return SmmIsBufferOutsideSmmValid (Buffer, Length);
+}
+
+/**
+  This function is for the NonPrimary Buffer validation routine.
+  The NonPrimary Buffer is the buffer which is pointed from the
+  communication buffer.
+
+  @param Buffer  The buffer start address to be checked.
+  @param Length  The buffer length to be checked.
+
+  @retval TRUE  This buffer is valid.
+  @retval FALSE This buffer is not valid.
+**/
+BOOLEAN
+Tcg2IsNonPrimaryBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   )
