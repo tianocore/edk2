@@ -1258,7 +1258,6 @@ WakeUpAP (
     AllocateResetVectorBelow1Mb (CpuMpData);
     AllocateSevEsAPMemory (CpuMpData);
     FillExchangeInfoData (CpuMpData);
-    SaveLocalApicTimerSetting (CpuMpData);
   }
 
   if (CpuMpData->ApLoopMode == ApInMwaitLoop) {
@@ -2236,6 +2235,7 @@ MpInitLibInitialize (
   // Enable the local APIC for Virtual Wire Mode.
   //
   ProgramVirtualWireMode ();
+  SaveLocalApicTimerSetting (CpuMpData);
 
   if (FirstMpHandOff == NULL) {
     if (MaxLogicalProcessorNumber > 1) {
@@ -2610,6 +2610,11 @@ SwitchBSPWorker (
   ApicBaseMsr.Uint64   = AsmReadMsr64 (MSR_IA32_APIC_BASE);
   ApicBaseMsr.Bits.BSP = 0;
   AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
+
+  //
+  // Save BSP's local APIC timer setting.
+  //
+  SaveLocalApicTimerSetting (CpuMpData);
 
   //
   // Need to wakeUp AP (future BSP).
