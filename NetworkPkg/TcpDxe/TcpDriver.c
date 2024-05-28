@@ -509,7 +509,7 @@ TcpDestroyService (
     //
     // Destroy the instance of the hashing protocol for this controller.
     //
-    Status = Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, &mHash2ServiceHandle);
+    Status = Hash2ServiceBinding->DestroyChild (Hash2ServiceBinding, mHash2ServiceHandle);
     if (EFI_ERROR (Status)) {
       return EFI_UNSUPPORTED;
     }
