@@ -434,6 +434,7 @@ AmdSevInitialize (
   )
 {
   UINT64         EncryptionMask;
+  UINT64         CCGuestAttr;
   RETURN_STATUS  PcdStatus;
 
   //
@@ -517,12 +518,18 @@ AmdSevInitialize (
   // technology is active.
   //
   if (MemEncryptSevSnpIsEnabled ()) {
-    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSevSnp);
+    CCGuestAttr = CCAttrAmdSevSnp;
   } else if (MemEncryptSevEsIsEnabled ()) {
-    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSevEs);
+    CCGuestAttr = CCAttrAmdSevEs;
   } else {
-    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSev);
+    CCGuestAttr = CCAttrAmdSev;
   }
+
+  if (MemEncryptSevEsDebugVirtualizationIsEnabled ()) {
+    CCGuestAttr |= CCAttrFeatureAmdSevEsDebugVirtualization;
+  }
+
+  PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCGuestAttr);
 
   ASSERT_RETURN_ERROR (PcdStatus);
 }
