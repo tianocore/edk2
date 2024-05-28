@@ -167,16 +167,19 @@ SaveLocalApicTimerSetting (
   IN CPU_MP_DATA  *CpuMpData
   )
 {
-  //
-  // Record the current local APIC timer setting of BSP
-  //
-  GetApicTimerState (
-    &CpuMpData->DivideValue,
-    &CpuMpData->PeriodicMode,
-    &CpuMpData->Vector
-    );
-  CpuMpData->CurrentTimerCount   = GetApicTimerCurrentCount ();
-  CpuMpData->TimerInterruptState = GetApicTimerInterruptState ();
+  CpuMpData->InitTimerCount = GetApicTimerInitCount ();
+  if (CpuMpData->InitTimerCount != 0) {
+    //
+    // Record the current local APIC timer setting of BSP
+    //
+    GetApicTimerState (
+      &CpuMpData->DivideValue,
+      &CpuMpData->PeriodicMode,
+      &CpuMpData->Vector
+      );
+
+    CpuMpData->TimerInterruptState = GetApicTimerInterruptState ();
+  }
 }
 
 /**
@@ -189,19 +192,21 @@ SyncLocalApicTimerSetting (
   IN CPU_MP_DATA  *CpuMpData
   )
 {
-  //
-  // Sync local APIC timer setting from BSP to AP
-  //
-  InitializeApicTimer (
-    CpuMpData->DivideValue,
-    CpuMpData->CurrentTimerCount,
-    CpuMpData->PeriodicMode,
-    CpuMpData->Vector
-    );
-  //
-  // Disable AP's local APIC timer interrupt
-  //
-  DisableApicTimerInterrupt ();
+  if (CpuMpData->InitTimerCount != 0) {
+    //
+    // Sync local APIC timer setting from BSP to AP
+    //
+    InitializeApicTimer (
+      CpuMpData->DivideValue,
+      CpuMpData->InitTimerCount,
+      CpuMpData->PeriodicMode,
+      CpuMpData->Vector
+      );
+    //
+    // Disable AP's local APIC timer interrupt
+    //
+    DisableApicTimerInterrupt ();
+  }
 }
 
 /**

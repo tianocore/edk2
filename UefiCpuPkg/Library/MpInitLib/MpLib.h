@@ -289,7 +289,7 @@ struct _CPU_MP_DATA {
   CPU_AP_DATA                      *CpuData;
   volatile MP_CPU_EXCHANGE_INFO    *MpCpuExchangeInfo;
 
-  UINT32                           CurrentTimerCount;
+  UINT32                           InitTimerCount;
   UINTN                            DivideValue;
   UINT8                            Vector;
   BOOLEAN                          PeriodicMode;
