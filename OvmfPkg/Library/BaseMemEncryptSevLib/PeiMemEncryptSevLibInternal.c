@@ -154,5 +154,9 @@ MemEncryptSevEsDebugVirtualizationIsEnabled (
   VOID
   )
 {
-  return FALSE;
+  MSR_SEV_STATUS_REGISTER  Msr;
+
+  Msr.Uint32 = InternalMemEncryptSevStatus ();
+
+  return Msr.Bits.DebugVirtualization ? TRUE : FALSE;
 }
