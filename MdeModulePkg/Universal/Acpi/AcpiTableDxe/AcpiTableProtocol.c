@@ -1279,16 +1279,16 @@ RemoveTableFromRsdt (
     {
       //
       // Found entry, so copy all following entries and shrink table
-      // We actually copy all + 1 to copy the initialized value of memory over
-      // the last entry.
       //
       if (Rsdt != NULL) {
-        CopyMem (CurrentRsdtEntry, CurrentRsdtEntry + 1, (*NumberOfTableEntries - Index) * sizeof (UINT32));
+        CopyMem (CurrentRsdtEntry, CurrentRsdtEntry + 1, (*NumberOfTableEntries - Index - 1) * sizeof (UINT32));
+        ZeroMem ((UINT8 *)Rsdt + sizeof (EFI_ACPI_DESCRIPTION_HEADER) + ((*NumberOfTableEntries - 1) * sizeof (UINT32)), sizeof (UINT32));
         Rsdt->Length = Rsdt->Length - sizeof (UINT32);
       }
 
       if (Xsdt != NULL) {
-        CopyMem (CurrentXsdtEntry, ((UINT64 *)CurrentXsdtEntry) + 1, (*NumberOfTableEntries - Index) * sizeof (UINT64));
+        CopyMem (CurrentXsdtEntry, ((UINT64 *)CurrentXsdtEntry) + 1, (*NumberOfTableEntries - Index - 1) * sizeof (UINT64));
+        ZeroMem ((UINT8 *)Xsdt + sizeof (EFI_ACPI_DESCRIPTION_HEADER) + ((*NumberOfTableEntries - 1) * sizeof (UINT64)), sizeof (UINT64));
         Xsdt->Length = Xsdt->Length - sizeof (UINT64);
       }
 
