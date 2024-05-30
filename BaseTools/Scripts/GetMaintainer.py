@@ -12,6 +12,7 @@ from collections import OrderedDict
 import argparse
 import os
 import re
+import sys
 import SetupGit
 
 EXPRESSIONS = {
@@ -163,6 +164,18 @@ def parse_maintainers_file(filename):
 
         return sectionlist
 
+def generate_codeowners(sections):
+    for section in sections:
+        idlist = []
+        for addr in section.get('maintainer', []):
+            if '[' in addr:
+                ghid = addr.split('[')[1].split(']')[0]
+                idlist.append(f'@{ghid}')
+        if not idlist:
+            continue
+        for pattern in section.get('file', []):
+            print(f'{pattern:40} {" ".join(idlist)}')
+
 def get_modified_files(repo, args):
     """Returns a list of the files modified by the commit specified in 'args'."""
     commit = repo.commit(args.commit)
@@ -179,6 +192,10 @@ if __name__ == '__main__':
     PARSER.add_argument('-l', '--lookup',
                         help='Find section matches for path LOOKUP',
                         required=False)
+    PARSER.add_argument('--codeowners',
+                        action='store_true',
+                        help='Generate CODEOWNERS file',
+                        required=False)
     ARGS = PARSER.parse_args()
 
     REPO = SetupGit.locate_repo()
@@ -186,6 +203,10 @@ if __name__ == '__main__':
     CONFIG_FILE = os.path.join(REPO.working_dir, 'Maintainers.txt')
 
     SECTIONS = parse_maintainers_file(CONFIG_FILE)
+
+    if ARGS.codeowners:
+        generate_codeowners(SECTIONS)
+        sys.exit(0)
 
     if ARGS.lookup:
         FILES = [ARGS.lookup.replace('\\','/')]
