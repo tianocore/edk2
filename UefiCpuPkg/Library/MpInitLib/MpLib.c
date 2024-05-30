@@ -119,10 +119,6 @@ FutureBSPProc (
   SaveVolatileRegisters (&DataInHob->APInfo.VolatileRegisters);
   AsmExchangeRole (&DataInHob->APInfo, &DataInHob->BSPInfo);
   RestoreVolatileRegisters (&DataInHob->APInfo.VolatileRegisters, FALSE);
-  //
-  // Update VolatileRegisters saved in CpuMpData->CpuData
-  //
-  CopyMem (&DataInHob->CpuData[DataInHob->BspNumber].VolatileRegisters, &DataInHob->APInfo.VolatileRegisters, sizeof (CPU_VOLATILE_REGISTERS));
 }
 
 /**
@@ -769,11 +765,11 @@ ApWakeupFunction (
       BistData     = (UINT32)ApStackData->Bist;
 
       //
-      // CpuMpData->CpuData[BspNumber].VolatileRegisters is initialized based on BSP environment,
+      // CpuMpData->CpuData[ProcessorNumber].VolatileRegisters is initialized based on BSP environment,
       //   to initialize AP in InitConfig path.
-      // NOTE: IDTR.BASE stored in CpuMpData->CpuData[BspNumber].VolatileRegisters points to a different IDT shared by all APs.
+      // NOTE: IDTR.BASE stored in CpuMpData->CpuData[ProcessorNumber].VolatileRegisters points to a different IDT shared by all APs.
       //
-      RestoreVolatileRegisters (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, FALSE);
+      RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, FALSE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
     } else {
@@ -800,31 +796,7 @@ ApWakeupFunction (
         0
         );
 
-      if (CpuMpData->InitFlag == ApInitReconfig) {
-        //
-        // ApInitReconfig happens when:
-        // 1. AP is re-enabled after it's disabled, in either PEI or DXE phase.
-        // 2. AP is initialized in DXE phase.
-        // In either case, use the volatile registers value derived from BSP.
-        // NOTE: IDTR.BASE stored in CpuMpData->CpuData[BspNumber].VolatileRegisters points to a
-        //   different IDT shared by all APs.
-        //
-        RestoreVolatileRegisters (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, FALSE);
-      } else {
-        if (CpuMpData->ApLoopMode == ApInHltLoop) {
-          //
-          // Restore AP's volatile registers saved before AP is halted
-          //
-          RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
-        } else {
-          //
-          // The CPU driver might not flush TLB for APs on spot after updating
-          // page attributes. AP in mwait loop mode needs to take care of it when
-          // woken up.
-          //
-          CpuFlushTlb ();
-        }
-      }
+      RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
 
       if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateReady) {
         Procedure = (EFI_AP_PROCEDURE)CpuMpData->CpuData[ProcessorNumber].ApFunction;
@@ -875,12 +847,7 @@ ApWakeupFunction (
       }
     }
 
-    if (CpuMpData->ApLoopMode == ApInHltLoop) {
-      //
-      // Save AP volatile registers
-      //
-      SaveVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
-    }
+    SaveVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
 
     //
     // AP finished executing C code
@@ -935,7 +902,7 @@ DxeApEntryPoint (
     AsmWriteMsr64 (MSR_IA32_EFER, EferMsr.Uint64);
   }
 
-  RestoreVolatileRegisters (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, FALSE);
+  RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, FALSE);
   InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
   PlaceAPInMwaitLoopOrRunLoop (
     CpuMpData->ApLoopMode,
@@ -2198,7 +2165,25 @@ MpInitLibInitialize (
   // Don't pass BSP's TR to APs to avoid AP init failure.
   //
   VolatileRegisters.Tr = 0;
-  CopyMem (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, &VolatileRegisters, sizeof (VolatileRegisters));
+  //
+  // Set DR as 0 since DR is set only for BSP.
+  //
+  VolatileRegisters.Dr0 = 0;
+  VolatileRegisters.Dr1 = 0;
+  VolatileRegisters.Dr2 = 0;
+  VolatileRegisters.Dr3 = 0;
+  VolatileRegisters.Dr6 = 0;
+  VolatileRegisters.Dr7 = 0;
+
+  //
+  // Copy volatile registers since either APs are the first time to bring up,
+  // or BSP is in DXE phase but APs are still running in PEI context.
+  // In both cases, APs need use volatile registers from BSP
+  //
+  for (Index = 0; Index < MaxLogicalProcessorNumber; Index++) {
+    CopyMem (&CpuMpData->CpuData[Index].VolatileRegisters, &VolatileRegisters, sizeof (VolatileRegisters));
+  }
+
   //
   // Set BSP basic information
   //
@@ -2632,12 +2617,6 @@ SwitchBSPWorker (
   SaveVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters);
   AsmExchangeRole (&CpuMpData->BSPInfo, &CpuMpData->APInfo);
   RestoreVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters, FALSE);
-  //
-  // Update VolatileRegisters saved in CpuMpData->CpuData
-  // Don't pass BSP's TR to APs to avoid AP init failure.
-  //
-  CopyMem (&CpuMpData->CpuData[CpuMpData->NewBspNumber].VolatileRegisters, &CpuMpData->BSPInfo.VolatileRegisters, sizeof (CPU_VOLATILE_REGISTERS));
-  CpuMpData->CpuData[CpuMpData->NewBspNumber].VolatileRegisters.Tr = 0;
   //
   // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
   //
