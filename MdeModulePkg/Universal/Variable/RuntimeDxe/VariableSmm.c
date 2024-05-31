@@ -864,7 +864,7 @@ SmmVariableHandler (
       // Verify runtime buffers do not overlap with SMRAM ranges.
       //
       if ((RuntimeVariableCacheContext->RuntimeHobCache != NULL) &&
-          !VariableSmmIsBufferOutsideSmmValid (
+          !VariableSmmIsNonPrimaryBufferValid (
              (UINTN)RuntimeVariableCacheContext->RuntimeHobCache,
              (UINTN)RuntimeVariableCacheContext->RuntimeHobCache->Size
              ))
@@ -874,7 +874,7 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      if (!VariableSmmIsBufferOutsideSmmValid (
+      if (!VariableSmmIsNonPrimaryBufferValid (
              (UINTN)RuntimeVariableCacheContext->RuntimeVolatileCache,
              (UINTN)RuntimeVariableCacheContext->RuntimeVolatileCache->Size
              ))
@@ -884,7 +884,7 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      if (!VariableSmmIsBufferOutsideSmmValid (
+      if (!VariableSmmIsNonPrimaryBufferValid (
              (UINTN)RuntimeVariableCacheContext->RuntimeNvCache,
              (UINTN)RuntimeVariableCacheContext->RuntimeNvCache->Size
              ))
@@ -894,7 +894,7 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      if (!VariableSmmIsBufferOutsideSmmValid (
+      if (!VariableSmmIsNonPrimaryBufferValid (
              (UINTN)RuntimeVariableCacheContext->PendingUpdate,
              sizeof (*(RuntimeVariableCacheContext->PendingUpdate))
              ))
@@ -904,7 +904,7 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      if (!VariableSmmIsBufferOutsideSmmValid (
+      if (!VariableSmmIsNonPrimaryBufferValid (
              (UINTN)RuntimeVariableCacheContext->ReadLock,
              sizeof (*(RuntimeVariableCacheContext->ReadLock))
              ))
@@ -914,7 +914,7 @@ SmmVariableHandler (
         goto EXIT;
       }
 
-      if (!VariableSmmIsBufferOutsideSmmValid (
+      if (!VariableSmmIsNonPrimaryBufferValid (
              (UINTN)RuntimeVariableCacheContext->HobFlushComplete,
              sizeof (*(RuntimeVariableCacheContext->HobFlushComplete))
              ))

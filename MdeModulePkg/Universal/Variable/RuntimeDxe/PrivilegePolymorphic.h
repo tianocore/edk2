@@ -123,7 +123,7 @@ MmVariableServiceInitialize (
   );
 
 /**
-  This function checks if the communication buffer is valid.
+  This function checks if the Primary Buffer (CommBuffer) is valid.
 
   @param Buffer The buffer start address to be checked.
   @param Length The buffer length to be checked.
@@ -150,7 +150,7 @@ VariableSmmIsPrimaryBufferValid (
                 with SMRAM.
 **/
 BOOLEAN
-VariableSmmIsBufferOutsideSmmValid (
+VariableSmmIsNonPrimaryBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   );
