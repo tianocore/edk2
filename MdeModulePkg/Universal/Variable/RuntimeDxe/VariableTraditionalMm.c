@@ -43,7 +43,7 @@ VariableSmmIsPrimaryBufferValid (
                 with SMRAM.
 **/
 BOOLEAN
-VariableSmmIsBufferOutsideSmmValid (
+VariableSmmIsNonPrimaryBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   )
