@@ -7,7 +7,7 @@
   vs. non-privileged driver code.
 
   Copyright (c) 2017, Red Hat, Inc.<BR>
-  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -120,6 +120,21 @@ EFI_STATUS
 EFIAPI
 MmVariableServiceInitialize (
   VOID
+  );
+
+/**
+  This function checks if the communication buffer is valid.
+
+  @param Buffer The buffer start address to be checked.
+  @param Length The buffer length to be checked.
+
+  @retval TRUE  This buffer is valid.
+  @retval FALSE This buffer is not valid.
+**/
+BOOLEAN
+VariableSmmIsCommBufferValid (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
   );
 
 /**
