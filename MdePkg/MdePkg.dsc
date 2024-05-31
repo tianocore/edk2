@@ -138,6 +138,7 @@
 
   MdePkg/Library/JedecJep106Lib/JedecJep106Lib.inf
   MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+  MdePkg/Library/PeiRngLib/PeiRngLib.inf
 
   MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
   MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
