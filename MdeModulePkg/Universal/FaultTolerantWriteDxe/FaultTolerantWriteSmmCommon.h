@@ -2,7 +2,7 @@
 
   The common header file for SMM FTW module and SMM FTW DXE Module.
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2011 - 2024, Intel Corporation. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -85,19 +85,16 @@ MmFaultTolerantWriteInitialize (
   );
 
 /**
-  This function checks if the buffer is valid per processor architecture and
-  does not overlap with SMRAM.
+  This function checks if the Primary Buffer is valid.
 
   @param Buffer The buffer start address to be checked.
   @param Length The buffer length to be checked.
 
-  @retval TRUE  This buffer is valid per processor architecture and does not
-                overlap with SMRAM.
-  @retval FALSE This buffer is not valid per processor architecture or overlaps
-                with SMRAM.
+  @retval TRUE  This buffer is valid.
+  @retval FALSE This buffer is not valid.
 **/
 BOOLEAN
-FtwSmmIsBufferOutsideSmmValid (
+FtwSmmIsPrimaryBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   );
