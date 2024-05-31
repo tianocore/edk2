@@ -2,7 +2,7 @@
 
   Parts of the SMM/MM implementation that are specific to traditional MM
 
-Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2011 - 2024, Intel Corporation. All rights reserved. <BR>
 Copyright (c) 2018, Linaro, Ltd. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -26,7 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
                 with SMRAM.
 **/
 BOOLEAN
-FtwSmmIsBufferOutsideSmmValid (
+FtwSmmIsCommBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   )
