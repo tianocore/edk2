@@ -18,7 +18,7 @@
 #  may not be modified without authorization. If platform fails to protect these resources,
 #  the authentication service provided in this driver will be broken, and the behavior is undefined.
 #
-# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -71,6 +71,7 @@
   BaseMemoryLib
   DebugLib
   HobLib
+  MemLib
   MemoryAllocationLib
   MmServicesTableLib
   SafeIntLib
