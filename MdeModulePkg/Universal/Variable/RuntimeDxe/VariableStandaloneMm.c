@@ -7,7 +7,7 @@ Copyright (c) 2018, Linaro, Ltd. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-
+#include <Library/StandaloneMmMemLib.h>
 #include "Variable.h"
 
 /**
@@ -46,7 +46,7 @@ VariableSmmIsBufferOutsideSmmValid (
   IN UINT64                Length
   )
 {
-  return TRUE;
+  return MmIsBufferOutsideMmValid (Buffer, Length);
 }
 
 /**
