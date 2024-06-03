@@ -80,6 +80,8 @@ typedef enum {
 #include "PciHotPlugSupport.h"
 #include "PciLib.h"
 
+#include "Protocol/PciDoe.h"
+
 #define VGABASE1   0x3B0
 #define VGALIMIT1  0x3BB
 
