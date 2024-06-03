@@ -41,8 +41,7 @@ SaveVolatileRegisters (
 **/
 VOID
 RestoreVolatileRegisters (
-  IN CPU_VOLATILE_REGISTERS  *VolatileRegisters,
-  IN BOOLEAN                 IsRestoreDr
+  IN CPU_VOLATILE_REGISTERS  *VolatileRegisters
   );
 
 /**
@@ -118,7 +117,7 @@ FutureBSPProc (
   //
   SaveVolatileRegisters (&DataInHob->APInfo.VolatileRegisters);
   AsmExchangeRole (&DataInHob->APInfo, &DataInHob->BSPInfo);
-  RestoreVolatileRegisters (&DataInHob->APInfo.VolatileRegisters, TRUE);
+  RestoreVolatileRegisters (&DataInHob->APInfo.VolatileRegisters);
 }
 
 /**
@@ -244,13 +243,11 @@ SaveVolatileRegisters (
   Restore the volatile registers following INIT IPI.
 
   @param[in]  VolatileRegisters   Pointer to volatile resisters
-  @param[in]  IsRestoreDr         TRUE:  Restore DRx if supported
-                                  FALSE: Do not restore DRx
+
 **/
 VOID
 RestoreVolatileRegisters (
-  IN CPU_VOLATILE_REGISTERS  *VolatileRegisters,
-  IN BOOLEAN                 IsRestoreDr
+  IN CPU_VOLATILE_REGISTERS  *VolatileRegisters
   )
 {
   CPUID_VERSION_INFO_EDX  VersionInfoEdx;
@@ -260,20 +257,18 @@ RestoreVolatileRegisters (
   AsmWriteCr4 (VolatileRegisters->Cr4);
   AsmWriteCr0 (VolatileRegisters->Cr0);
 
-  if (IsRestoreDr) {
-    AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &VersionInfoEdx.Uint32);
-    if (VersionInfoEdx.Bits.DE != 0) {
-      //
-      // If processor supports Debugging Extensions feature
-      // by CPUID.[EAX=01H]:EDX.BIT2
-      //
-      AsmWriteDr0 (VolatileRegisters->Dr0);
-      AsmWriteDr1 (VolatileRegisters->Dr1);
-      AsmWriteDr2 (VolatileRegisters->Dr2);
-      AsmWriteDr3 (VolatileRegisters->Dr3);
-      AsmWriteDr6 (VolatileRegisters->Dr6);
-      AsmWriteDr7 (VolatileRegisters->Dr7);
-    }
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &VersionInfoEdx.Uint32);
+  if (VersionInfoEdx.Bits.DE != 0) {
+    //
+    // If processor supports Debugging Extensions feature
+    // by CPUID.[EAX=01H]:EDX.BIT2
+    //
+    AsmWriteDr0 (VolatileRegisters->Dr0);
+    AsmWriteDr1 (VolatileRegisters->Dr1);
+    AsmWriteDr2 (VolatileRegisters->Dr2);
+    AsmWriteDr3 (VolatileRegisters->Dr3);
+    AsmWriteDr6 (VolatileRegisters->Dr6);
+    AsmWriteDr7 (VolatileRegisters->Dr7);
   }
 
   AsmWriteGdtr (&VolatileRegisters->Gdtr);
@@ -769,7 +764,7 @@ ApWakeupFunction (
       //   to initialize AP in InitConfig path.
       // NOTE: IDTR.BASE stored in CpuMpData->CpuData[ProcessorNumber].VolatileRegisters points to a different IDT shared by all APs.
       //
-      RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
+      RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
     } else {
@@ -796,7 +791,7 @@ ApWakeupFunction (
         0
         );
 
-      RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
+      RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
 
       if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateReady) {
         Procedure = (EFI_AP_PROCEDURE)CpuMpData->CpuData[ProcessorNumber].ApFunction;
@@ -902,7 +897,7 @@ DxeApEntryPoint (
     AsmWriteMsr64 (MSR_IA32_EFER, EferMsr.Uint64);
   }
 
-  RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
+  RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters);
   InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
   PlaceAPInMwaitLoopOrRunLoop (
     CpuMpData->ApLoopMode,
@@ -2607,7 +2602,7 @@ SwitchBSPWorker (
   //
   SaveVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters);
   AsmExchangeRole (&CpuMpData->BSPInfo, &CpuMpData->APInfo);
-  RestoreVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters, TRUE);
+  RestoreVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters);
   //
   // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
   //
