@@ -1612,14 +1612,16 @@ BuildVarCheckHiiBin (
 VOID
 EFIAPI
 VarCheckHiiGen (
-  VOID
+  IN OUT VAR_CHECK_HII_VARIABLE_HEADER  **VarCheckHiiBin,
+  IN OUT UINTN                          *VarCheckHiiBinSize
   )
 {
   VarCheckHiiGenFromHiiDatabase ();
   VarCheckHiiGenFromFv ();
 
-  mVarCheckHiiBin = BuildVarCheckHiiBin (&mVarCheckHiiBinSize);
-  if (mVarCheckHiiBin == NULL) {
+  *VarCheckHiiBin = BuildVarCheckHiiBin (VarCheckHiiBinSize);
+
+  if (*VarCheckHiiBin == NULL) {
     DEBUG ((DEBUG_INFO, "[VarCheckHii] This driver could be removed from *.dsc and *.fdf\n"));
     return;
   }
@@ -1631,7 +1633,7 @@ VarCheckHiiGen (
 
  #ifdef DUMP_VAR_CHECK_HII
   DEBUG_CODE (
-    DumpVarCheckHii (mVarCheckHiiBin, mVarCheckHiiBinSize);
+    DumpVarCheckHii (*VarCheckHiiBin, *VarCheckHiiBinSize);
     );
  #endif
 }

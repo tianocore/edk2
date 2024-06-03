@@ -606,6 +606,15 @@ DumpVarCheckHii (
 
 #endif
 
+VOID
+EFIAPI
+VarCheckHiiGenWrapper (
+  VOID
+  )
+{
+  VarCheckHiiGen (&mVarCheckHiiBin, &mVarCheckHiiBinSize);
+}
+
 /**
   Constructor function of VarCheckHiiLib to register var check HII handler.
 
@@ -622,7 +631,7 @@ VarCheckHiiLibNullClassConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VarCheckLibRegisterEndOfDxeCallback (VarCheckHiiGen);
+  VarCheckLibRegisterEndOfDxeCallback (VarCheckHiiGenWrapper);
   VarCheckLibRegisterAddressPointer ((VOID **)&mVarCheckHiiBin);
   VarCheckLibRegisterSetVariableCheckHandler (SetVariableCheckHandlerHii);
 

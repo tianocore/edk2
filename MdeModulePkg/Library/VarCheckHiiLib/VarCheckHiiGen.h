@@ -124,7 +124,8 @@ VarCheckHiiGenFromHiiDatabase (
 VOID
 EFIAPI
 VarCheckHiiGen (
-  VOID
+  IN OUT VAR_CHECK_HII_VARIABLE_HEADER  **VarCheckHiiBin,
+  IN OUT UINTN                          *VarCheckHiiBinSize
   );
 
 #endif
