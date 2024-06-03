@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Decompress.h>
 #include <Protocol/BusSpecificDriverOverride.h>
 #include <Protocol/IncompatiblePciDeviceSupport.h>
+#include <Protocol/PciDoe.h>
 #include <Protocol/PciOverride.h>
 #include <Protocol/PciEnumerationComplete.h>
 #include <Protocol/IoMmu.h>
