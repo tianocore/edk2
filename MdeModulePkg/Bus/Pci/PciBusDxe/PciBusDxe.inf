@@ -43,6 +43,8 @@
   PciDriverOverride.c
   PciPowerManagement.c
   PciPowerManagement.h
+  PciDoe.c
+  PciDoe.h
   PciDriverOverride.h
   PciRomTable.c
   PciHotPlugSupport.c

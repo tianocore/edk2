@@ -76,15 +76,15 @@ struct _EDKII_PCI_DOE_PROTOCOL {
   ///
   /// Check if a specific Vendor ID and Data Object Type is supported
   ///
-  EDKII_PCI_DOE_PROTOCOL_TYPE_CHECK         CheckType;
+  EDKII_PCI_DOE_PROTOCOL_TYPE_CHECK       CheckType;
   ///
   /// Send data to the DOE mailbox
   ///
-  EDKII_PCI_DOE_PROTOCOL_WRITE_MAILBOX       Send;
+  EDKII_PCI_DOE_PROTOCOL_WRITE_MAILBOX    Send;
   ///
   /// Receive data from the DOE mailbox
   ///
-  EDKII_PCI_DOE_PROTOCOL_READ_MAILBOX        Receive;
+  EDKII_PCI_DOE_PROTOCOL_READ_MAILBOX     Receive;
 };
 
 extern EFI_GUID  gPciDoeProtocolGuid;
