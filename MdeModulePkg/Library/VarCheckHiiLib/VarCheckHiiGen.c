@@ -12,6 +12,9 @@ LIST_ENTRY  mVarCheckHiiList = INITIALIZE_LIST_HEAD_VARIABLE (mVarCheckHiiList);
 
 #define VAR_CHECK_HII_VARIABLE_NODE_SIGNATURE  SIGNATURE_32 ('V', 'C', 'H', 'V')
 
+VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBinMmSend    = NULL;
+UINTN                          mVarCheckHiiBinMmSendSize = 0;
+
 typedef struct {
   UINTN                            Signature;
   LIST_ENTRY                       Link;
@@ -1511,7 +1514,7 @@ DestroyHiiVariableNode (
 **/
 VOID *
 BuildVarCheckHiiBin (
-  OUT UINTN  *Size
+  IN OUT UINTN  *Size
   )
 {
   VAR_CHECK_HII_VARIABLE_NODE  *HiiVariableNode;

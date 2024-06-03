@@ -51,7 +51,5 @@ DumpVarCheckHii (
   IN UINTN  VarCheckHiiBinSize
   );
 
-extern VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBin;
-extern UINTN                          mVarCheckHiiBinSize;
 
 #endif
