@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "VarCheckHii.h"
-
+#include "VarCheckHiiGen.h"
 GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  mVarCheckHiiHex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 /**
@@ -257,9 +257,6 @@ VarCheckHiiQuestion (
 
   return TRUE;
 }
-
-VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBin    = NULL;
-UINTN                          mVarCheckHiiBinSize = 0;
 
 #ifdef DUMP_VAR_CHECK_HII
 GLOBAL_REMOVE_IF_UNREFERENCED VAR_CHECK_HII_OPCODE_STRING  mHiiOpCodeStringTable[] = {

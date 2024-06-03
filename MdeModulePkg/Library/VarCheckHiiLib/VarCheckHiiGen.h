@@ -1,7 +1,7 @@
 /** @file
   Include file for Var Check Hii bin generation.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define _VAR_CHECK_HII_GEN_H_
 
 #include "VarCheckHii.h"
+extern VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBin;
+extern UINTN                          mVarCheckHiiBinSize;
 
 /**
   Dump Hii Package.
