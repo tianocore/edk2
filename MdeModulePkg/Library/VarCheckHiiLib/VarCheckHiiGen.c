@@ -7,10 +7,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "VarCheckHiiGen.h"
+#include "VarCheckHii.h"
 
 VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBin    = NULL;
 UINTN                          mVarCheckHiiBinSize = 0;
 LIST_ENTRY                     mVarCheckHiiList    = INITIALIZE_LIST_HEAD_VARIABLE (mVarCheckHiiList);
+
+EFI_GUID  gVarCheckReceivedHiiBinHandlerGuid = VAR_CHECK_RECEIVED_HII_BIN_HANDLER_GUID;
 
 #define VAR_CHECK_HII_VARIABLE_NODE_SIGNATURE  SIGNATURE_32 ('V', 'C', 'H', 'V')
 
