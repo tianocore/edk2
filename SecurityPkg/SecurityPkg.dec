@@ -238,6 +238,9 @@
   ## The GUIDed HOB contains the same value as PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer).
   gEdkiiTcgPhysicalPresenceInterfaceVerHobGuid = { 0x3979411a, 0x4e6d, 0x47e4, { 0x94, 0x4b, 0x0e, 0xcc, 0x6c, 0xf6, 0xc0, 0xcd } }
 
+  ## Include/Guid/Tcg2AcpiCommunicateBuffer.h
+  gEdkiiTcg2AcpiCommunicateBufferHobGuid = { 0xcefea14f, 0x9f1a, 0x4774, { 0x8d, 0x18, 0x79, 0x93, 0x8d, 0x48, 0xfe, 0x7d } }
+
 [Ppis]
   ## The PPI GUID for that TPM physical presence should be locked.
   # Include/Ppi/LockPhysicalPresence.h
