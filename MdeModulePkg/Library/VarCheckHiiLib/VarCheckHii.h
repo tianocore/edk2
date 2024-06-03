@@ -51,4 +51,11 @@ DumpVarCheckHii (
   IN UINTN  VarCheckHiiBinSize
   );
 
+#define VAR_CHECK_RECEIVED_HII_BIN_HANDLER_GUID \
+  { \
+    0xe63095c7, 0x2b34, 0x4163, { 0x80, 0x3d, 0xc8, 0x3c, 0x2e, 0xd6, 0xa0, 0x37 } \
+  }
+
+extern EFI_GUID  gVarCheckReceivedHiiBinHandlerGuid;
+
 #endif
