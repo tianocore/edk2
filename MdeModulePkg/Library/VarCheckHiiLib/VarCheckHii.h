@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
-
 #include <Guid/MdeModuleHii.h>
 
 #include <Protocol/HiiDatabase.h>
@@ -51,4 +50,11 @@ DumpVarCheckHii (
   IN UINTN  VarCheckHiiBinSize
   );
 
+#define VAR_CHECK_RECEIVED_HII_BIN_HANDLER_GUID \
+  { \
+    0xabcdef12, 0x3456, 0x7890, { 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90 } \
+  }
+
+extern EFI_GUID  gVarCheckReceivedHiiBinHandlerGuid;
+gVarCheckReceivedHiiBinHandlerGuid = VAR_CHECK_RECEIVED_HII_BIN_HANDLER_GUID;
 #endif

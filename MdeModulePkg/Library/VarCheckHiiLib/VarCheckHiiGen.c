@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "VarCheckHiiGen.h"
+#include "VarCheckHii.h"
 
 VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBin    = NULL;
 UINTN                          mVarCheckHiiBinSize = 0;
