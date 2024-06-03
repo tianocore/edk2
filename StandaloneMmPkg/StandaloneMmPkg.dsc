@@ -71,6 +71,7 @@
 
 [LibraryClasses.X64.PEIM]
   MmPlatformHobProducerLib|StandaloneMmPkg/Library/MmPlatformHobProducerLib/MmPlatformHobProducerLib.inf
+  VarCheckHiiLibMmDependency|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
 
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -130,6 +131,7 @@
   StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
   StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
   StandaloneMmPkg/Library/SmmLockBoxMmDependency/SmmLockBoxMmDependency.inf
+  MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
 
 [Components.AARCH64, Components.ARM]
   StandaloneMmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
