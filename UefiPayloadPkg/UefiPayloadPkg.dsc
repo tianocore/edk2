@@ -325,6 +325,7 @@
   SmmRelocationLib|UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
   BuildFdtLib|UefiPayloadPkg/Library/BuildFdtLib/BuildFdtLib.inf
+  CpuExceptionHookLib|UefiCpuPkg/Library/CpuExceptionHookLibNull/CpuExceptionHookLibNull.inf
 
 [LibraryClasses.common]
 !if $(BOOTSPLASH_IMAGE)
