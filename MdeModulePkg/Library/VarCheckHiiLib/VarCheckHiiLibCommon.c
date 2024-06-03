@@ -1,69 +1,263 @@
 /** @file
-  Var Check Hii generation from Hii Database.
+  Var Check Hii Lib Common logic
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#include <Uefi.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/MmServicesTableLib.h>
+#include <Protocol/MmCommunication.h>
+#include <Library/VarCheckLib.h>
 
-#include "VarCheckHiiGen.h"
+#include "VarCheckHii.h"
+#include "VarCheckHiiLibCommon.h"
+EFI_HANDLE                                 mEfiVariableCheckHiiHandle = NULL;
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  mVarCheckHiiHex[]          = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 /**
-  Generate from Hii Database.
-
+  Dump some hexadecimal data.
+  @param[in] Indent     How many spaces to indent the output.
+  @param[in] Offset     The offset of the dump.
+  @param[in] DataSize   The size in bytes of UserData.
+  @param[in] UserData   The data to dump.
 **/
 VOID
-VarCheckHiiGenFromHiiDatabase (
-  VOID
+VarCheckHiiInternalDumpHex (
+  IN UINTN  Indent,
+  IN UINTN  Offset,
+  IN UINTN  DataSize,
+  IN VOID   *UserData
   )
 {
-  EFI_STATUS                 Status;
-  UINTN                      BufferSize;
-  VOID                       *Buffer;
-  EFI_PHYSICAL_ADDRESS       BufferAddress;
-  EFI_HII_DATABASE_PROTOCOL  *HiiDatabase;
+  UINT8  *Data;
 
-  //
-  // Locate HII Database protocol
-  //
-  Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **)&HiiDatabase);
-  if (EFI_ERROR (Status)) {
-    return;
+  CHAR8  Val[50];
+
+  CHAR8  Str[20];
+
+  UINT8  TempByte;
+  UINTN  Size;
+  UINTN  Index;
+
+  Data = UserData;
+  while (DataSize != 0) {
+    Size = 16;
+    if (Size > DataSize) {
+      Size = DataSize;
+    }
+
+    for (Index = 0; Index < Size; Index += 1) {
+      TempByte           = Data[Index];
+      Val[Index * 3 + 0] = mVarCheckHiiHex[TempByte >> 4];
+      Val[Index * 3 + 1] = mVarCheckHiiHex[TempByte & 0xF];
+      Val[Index * 3 + 2] = (CHAR8)((Index == 7) ? '-' : ' ');
+      Str[Index]         = (CHAR8)((TempByte < ' ' || TempByte > 'z') ? '.' : TempByte);
+    }
+
+    Val[Index * 3] = 0;
+    Str[Index]     = 0;
+    DEBUG ((DEBUG_INFO, "%*a%08X: %-48a *%a*\r\n", Indent, "", Offset, Val, Str));
+
+    Data     += Size;
+    Offset   += Size;
+    DataSize -= Size;
+  }
+}
+
+/**
+  Var Check Hii Question.
+  @param[in] HiiQuestion    Pointer to Hii Question
+  @param[in] Data           Data pointer.
+  @param[in] DataSize       Size of Data to set.
+  @retval TRUE  Check pass
+  @retval FALSE Check fail.
+**/
+BOOLEAN
+VarCheckHiiQuestion (
+  IN VAR_CHECK_HII_QUESTION_HEADER  *HiiQuestion,
+  IN VOID                           *Data,
+  IN UINTN                          DataSize
+  )
+{
+  UINT64  OneData;
+  UINT64  Minimum;
+  UINT64  Maximum;
+  UINT64  OneValue;
+  UINT8   *Ptr;
+  UINT8   Index;
+  UINT8   MaxContainers;
+  UINT8   StartBit;
+  UINT8   EndBit;
+  UINT8   TotalBits;
+  UINT16  VarOffsetByteLevel;
+  UINT8   StorageWidthByteLevel;
+
+  if (HiiQuestion->BitFieldStore) {
+    VarOffsetByteLevel    = HiiQuestion->VarOffset / 8;
+    TotalBits             = HiiQuestion->VarOffset % 8 + HiiQuestion->StorageWidth;
+    StorageWidthByteLevel = (TotalBits % 8 == 0 ? TotalBits / 8 : TotalBits / 8 + 1);
+  } else {
+    VarOffsetByteLevel    = HiiQuestion->VarOffset;
+    StorageWidthByteLevel = HiiQuestion->StorageWidth;
   }
 
-  //
-  // Call first time with zero buffer length.
-  // Should fail with EFI_BUFFER_TOO_SMALL.
-  //
-  BufferSize = 0;
-  Buffer     = NULL;
-  Status     = HiiDatabase->ExportPackageLists (HiiDatabase, 0, &BufferSize, Buffer);
-  if (Status == EFI_BUFFER_TOO_SMALL) {
-    //
-    // Allocate buffer to hold the HII Database.
-    //
-    Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData, EFI_SIZE_TO_PAGES (BufferSize), &BufferAddress);
-    ASSERT_EFI_ERROR (Status);
-    Buffer = (VOID *)(UINTN)BufferAddress;
-
-    //
-    // Export HII Database into the buffer.
-    //
-    Status = HiiDatabase->ExportPackageLists (HiiDatabase, 0, &BufferSize, Buffer);
-    ASSERT_EFI_ERROR (Status);
-
-    DEBUG ((DEBUG_INFO, "VarCheckHiiGenDxeFromHii - HII Database exported at 0x%x, size = 0x%x\n", Buffer, BufferSize));
-
- #ifdef DUMP_HII_DATA
-    DEBUG_CODE (
-      DumpHiiDatabase (Buffer, BufferSize);
-      );
- #endif
-
-    VarCheckParseHiiDatabase (Buffer, BufferSize);
-
-    gBS->FreePages (BufferAddress, EFI_SIZE_TO_PAGES (BufferSize));
+  if (((UINT32)VarOffsetByteLevel + StorageWidthByteLevel) > DataSize) {
+    DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x)) > Size(0x%x)\n", VarOffsetByteLevel, StorageWidthByteLevel, DataSize));
+    return FALSE;
   }
+
+  OneData = 0;
+  CopyMem (&OneData, (UINT8 *)Data + VarOffsetByteLevel, StorageWidthByteLevel);
+  if (HiiQuestion->BitFieldStore) {
+    //
+    // Get the value from the bit field.
+    //
+    StartBit = HiiQuestion->VarOffset % 8;
+    EndBit   = StartBit + HiiQuestion->StorageWidth - 1;
+    OneData  = BitFieldRead64 (OneData, StartBit, EndBit);
+  }
+
+  switch (HiiQuestion->OpCode) {
+    case EFI_IFR_ONE_OF_OP:
+      Ptr = (UINT8 *)((VAR_CHECK_HII_QUESTION_ONEOF *)HiiQuestion + 1);
+      while ((UINTN)Ptr < (UINTN)HiiQuestion + HiiQuestion->Length) {
+        OneValue = 0;
+        if (HiiQuestion->BitFieldStore) {
+          //
+          // For OneOf stored in bit field, the value of options are saved as UINT32 type.
+          //
+          CopyMem (&OneValue, Ptr, sizeof (UINT32));
+        } else {
+          CopyMem (&OneValue, Ptr, HiiQuestion->StorageWidth);
+        }
+
+        if (OneData == OneValue) {
+          //
+          // Match
+          //
+          break;
+        }
+
+        if (HiiQuestion->BitFieldStore) {
+          Ptr += sizeof (UINT32);
+        } else {
+          Ptr += HiiQuestion->StorageWidth;
+        }
+      }
+
+      if ((UINTN)Ptr >= ((UINTN)HiiQuestion + HiiQuestion->Length)) {
+        //
+        // No match
+        //
+        DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: OneOf mismatch (0x%lx)\n", OneData));
+        DEBUG_CODE (
+          VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *)HiiQuestion);
+          );
+        return FALSE;
+      }
+
+      break;
+
+    case EFI_IFR_CHECKBOX_OP:
+      if ((OneData != 0) && (OneData != 1)) {
+        DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: CheckBox mismatch (0x%lx)\n", OneData));
+        DEBUG_CODE (
+          VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *)HiiQuestion);
+          );
+        return FALSE;
+      }
+
+      break;
+
+    case EFI_IFR_NUMERIC_OP:
+      Minimum = 0;
+      Maximum = 0;
+      Ptr     = (UINT8 *)((VAR_CHECK_HII_QUESTION_NUMERIC *)HiiQuestion + 1);
+      if (HiiQuestion->BitFieldStore) {
+        //
+        // For Numeric stored in bit field, the value of Maximum/Minimum are saved as UINT32 type.
+        //
+        CopyMem (&Minimum, Ptr, sizeof (UINT32));
+        Ptr += sizeof (UINT32);
+        CopyMem (&Maximum, Ptr, sizeof (UINT32));
+        Ptr += sizeof (UINT32);
+      } else {
+        CopyMem (&Minimum, Ptr, HiiQuestion->StorageWidth);
+        Ptr += HiiQuestion->StorageWidth;
+        CopyMem (&Maximum, Ptr, HiiQuestion->StorageWidth);
+        Ptr += HiiQuestion->StorageWidth;
+      }
+
+      //
+      // No need to check Step, because it is ONLY for UI.
+      //
+      if ((OneData < Minimum) || (OneData > Maximum)) {
+        DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: Numeric mismatch (0x%lx)\n", OneData));
+        DEBUG_CODE (
+          VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *)HiiQuestion);
+          );
+        return FALSE;
+      }
+
+      break;
+
+    case EFI_IFR_ORDERED_LIST_OP:
+      MaxContainers = ((VAR_CHECK_HII_QUESTION_ORDEREDLIST *)HiiQuestion)->MaxContainers;
+      if (((UINT32)HiiQuestion->VarOffset + HiiQuestion->StorageWidth * MaxContainers) > DataSize) {
+        DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: (VarOffset(0x%04x) + StorageWidth(0x%02x) * MaxContainers(0x%02x)) > Size(0x%x)\n", HiiQuestion->VarOffset, HiiQuestion->StorageWidth, MaxContainers, DataSize));
+        return FALSE;
+      }
+
+      for (Index = 0; Index < MaxContainers; Index++) {
+        OneData = 0;
+        CopyMem (&OneData, (UINT8 *)Data + HiiQuestion->VarOffset + HiiQuestion->StorageWidth * Index, HiiQuestion->StorageWidth);
+        if (OneData == 0) {
+          //
+          // The value of 0 is used to determine if a particular "slot" in the array is empty.
+          //
+          continue;
+        }
+
+        Ptr = (UINT8 *)((VAR_CHECK_HII_QUESTION_ORDEREDLIST *)HiiQuestion + 1);
+        while ((UINTN)Ptr < ((UINTN)HiiQuestion + HiiQuestion->Length)) {
+          OneValue = 0;
+          CopyMem (&OneValue, Ptr, HiiQuestion->StorageWidth);
+          if (OneData == OneValue) {
+            //
+            // Match
+            //
+            break;
+          }
+
+          Ptr += HiiQuestion->StorageWidth;
+        }
+
+        if ((UINTN)Ptr >= ((UINTN)HiiQuestion + HiiQuestion->Length)) {
+          //
+          // No match
+          //
+          DEBUG ((DEBUG_INFO, "VarCheckHiiQuestion fail: OrderedList mismatch\n"));
+          DEBUG_CODE (
+            VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->StorageWidth * MaxContainers, (UINT8 *)Data + HiiQuestion->VarOffset);
+            );
+          DEBUG_CODE (
+            VarCheckHiiInternalDumpHex (2, 0, HiiQuestion->Length, (UINT8 *)HiiQuestion);
+            );
+          return FALSE;
+        }
+      }
+
+      break;
+
+    default:
+      ASSERT (FALSE);
+      break;
+  }
+
+  return TRUE;
 }
 
 #ifdef DUMP_VAR_CHECK_HII
@@ -77,11 +271,8 @@ GLOBAL_REMOVE_IF_UNREFERENCED VAR_CHECK_HII_OPCODE_STRING  mHiiOpCodeStringTable
 
 /**
   HII opcode to string.
-
   @param[in] HiiOpCode  Hii OpCode.
-
   @return Pointer to string.
-
 **/
 CHAR8 *
 HiiOpCodeToStr (
@@ -101,9 +292,7 @@ HiiOpCodeToStr (
 
 /**
   Dump Hii Question.
-
   @param[in] HiiQuestion    Pointer to Hii Question.
-
 **/
 VOID
 DumpHiiQuestion (
@@ -248,9 +437,7 @@ DumpHiiQuestion (
 
 /**
   Dump Hii Variable.
-
   @param[in] HiiVariable    Pointer to Hii Variable.
-
 **/
 VOID
 DumpHiiVariable (
@@ -287,10 +474,8 @@ DumpHiiVariable (
 
 /**
   Dump Var Check HII.
-
   @param[in] VarCheckHiiBin     Pointer to VarCheckHiiBin.
   @param[in] VarCheckHiiBinSize VarCheckHiiBin size.
-
 **/
 VOID
 DumpVarCheckHii (
