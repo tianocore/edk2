@@ -839,7 +839,7 @@ X509GetTBSCert (
   Length = 0;
   Inf    = ASN1_get_object (&Temp, (long *)&Length, (int *)&Asn1Tag, (int *)&ObjClass, (long)CertSize);
 
-  if (((Inf & 0x80) == 0x80) && (Asn1Tag != V_ASN1_SEQUENCE)) {
+  if (((Inf & 0x80) == 0x80) || (Asn1Tag != V_ASN1_SEQUENCE)) {
     return FALSE;
   }
 
@@ -849,7 +849,7 @@ X509GetTBSCert (
   //
   // Verify the parsed TBSCertificate is one correct SEQUENCE data.
   //
-  if (((Inf & 0x80) == 0x80) && (Asn1Tag != V_ASN1_SEQUENCE)) {
+  if (((Inf & 0x80) == 0x80) || (Asn1Tag != V_ASN1_SEQUENCE)) {
     return FALSE;
   }
 
