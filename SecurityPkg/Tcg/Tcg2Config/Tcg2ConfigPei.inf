@@ -47,6 +47,7 @@
   Tpm12CommandLib
   Tpm12DeviceLib
   HobLib
+  MmUnblockMemoryLib
 
 [Guids]
   ## SOMETIMES_CONSUMES ## Variable:L"TCG2_CONFIGURATION"
@@ -56,10 +57,12 @@
   gEfiTpmDeviceInstanceNoneGuid       ## SOMETIMES_CONSUMES   ## GUID    # TPM device identifier
   gEdkiiTpmInstanceHobGuid
   gEdkiiTcgPhysicalPresenceInterfaceVerHobGuid
+  gEdkiiTcg2AcpiCommunicateBufferHobGuid
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid     ## CONSUMES
   gPeiTpmInitializationDonePpiGuid    ## SOMETIMES_PRODUCES
+  gEfiPeiMemoryDiscoveredPpiGuid
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PRODUCES
