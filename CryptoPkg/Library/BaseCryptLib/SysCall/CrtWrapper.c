@@ -271,7 +271,7 @@ strcpy (
   const char  *strSource
   )
 {
-  AsciiStrCpyS (strDest, MAX_STRING_SIZE, strSource);
+  AsciiStrCpyS (strDest, AsciiStrnSizeS (strSource, MAX_STRING_SIZE), strSource);
   return strDest;
 }
 
