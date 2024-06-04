@@ -40,6 +40,7 @@
 #include <OvmfPlatforms.h>
 
 #include "Platform.h"
+#include "PlatformId.h"
 
 EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
   {
@@ -363,6 +364,7 @@ InitializePlatform (
     MiscInitializationForMicrovm (PlatformInfoHob);
   } else {
     MiscInitialization (PlatformInfoHob);
+    PlatformIdInitialization (PeiServices);
   }
 
   IntelTdxInitialize ();
