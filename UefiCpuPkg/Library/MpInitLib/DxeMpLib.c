@@ -2,6 +2,7 @@
   MP initialize support functions for DXE phase.
 
   Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024, AMD Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -13,7 +14,7 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/CcExitLib.h>
-#include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/SevSnpMsr.h>
 #include <Register/Amd/Ghcb.h>
 
 #include <Protocol/Timer.h>

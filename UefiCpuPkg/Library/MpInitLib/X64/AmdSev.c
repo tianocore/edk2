@@ -11,7 +11,7 @@
 #include "MpLib.h"
 #include <Library/CcExitLib.h>
 #include <Library/AmdSvsmLib.h>
-#include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/SevSnpMsr.h>
 #include <Register/Amd/Ghcb.h>
 
 #define _IS_ALIGNED(x, y)  (ALIGN_POINTER((x), (y)) == (x))
