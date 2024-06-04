@@ -134,49 +134,75 @@ MmLoadImage (
     return Status;
   }
 
-  PageCount = (UINTN)EFI_SIZE_TO_PAGES ((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
-  DstBuffer = (UINTN)(-1);
+  PageCount = EFI_SIZE_TO_PAGES ((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
 
-  Status = MmAllocatePages (
-             AllocateMaxAddress,
-             EfiRuntimeServicesCode,
-             PageCount,
-             &DstBuffer
-             );
-  if (EFI_ERROR (Status)) {
-    return Status;
+  //
+  // XIP image that ImageAddress is same to Image handle.
+  //
+  if (ImageContext.ImageAddress == (EFI_PHYSICAL_ADDRESS)(UINTN)DriverEntry->Pe32Data) {
+    DstBuffer = (UINTN)ImageContext.ImageAddress;
+
+    //
+    // Load the image to our new buffer
+    //
+    Status = PeCoffLoaderLoadImage (&ImageContext);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    //
+    // Relocate the image in our new buffer
+    //
+    Status = PeCoffLoaderRelocateImage (&ImageContext);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  } else {
+    DstBuffer = (UINTN)(-1);
+
+    Status = MmAllocatePages (
+               AllocateMaxAddress,
+               EfiRuntimeServicesCode,
+               PageCount,
+               &DstBuffer
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "MmLoadImage failed to allocate memory\n"));
+
+      return Status;
+    }
+
+    ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)DstBuffer;
+
+    //
+    // Align buffer on section boundary
+    //
+    ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
+    ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
+
+    //
+    // Load the image to our new buffer
+    //
+    Status = PeCoffLoaderLoadImage (&ImageContext);
+    if (EFI_ERROR (Status)) {
+      MmFreePages (DstBuffer, PageCount);
+      return Status;
+    }
+
+    //
+    // Relocate the image in our new buffer
+    //
+    Status = PeCoffLoaderRelocateImage (&ImageContext);
+    if (EFI_ERROR (Status)) {
+      MmFreePages (DstBuffer, PageCount);
+      return Status;
+    }
+
+    //
+    // Flush the instruction cache so the image data is written before we execute it
+    //
+    InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
   }
-
-  ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)DstBuffer;
-
-  //
-  // Align buffer on section boundary
-  //
-  ImageContext.ImageAddress += ImageContext.SectionAlignment - 1;
-  ImageContext.ImageAddress &= ~((EFI_PHYSICAL_ADDRESS)(ImageContext.SectionAlignment - 1));
-
-  //
-  // Load the image to our new buffer
-  //
-  Status = PeCoffLoaderLoadImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    MmFreePages (DstBuffer, PageCount);
-    return Status;
-  }
-
-  //
-  // Relocate the image in our new buffer
-  //
-  Status = PeCoffLoaderRelocateImage (&ImageContext);
-  if (EFI_ERROR (Status)) {
-    MmFreePages (DstBuffer, PageCount);
-    return Status;
-  }
-
-  //
-  // Flush the instruction cache so the image data are written before we execute it
-  //
-  InvalidateInstructionCacheRange ((VOID *)(UINTN)ImageContext.ImageAddress, (UINTN)ImageContext.ImageSize);
 
   //
   // Save Image EntryPoint in DriverEntry
@@ -192,7 +218,10 @@ MmLoadImage (
                                               (VOID **)&DriverEntry->LoadedImage
                                               );
     if (EFI_ERROR (Status)) {
-      MmFreePages (DstBuffer, PageCount);
+      if (ImageContext.ImageAddress != (EFI_PHYSICAL_ADDRESS)(UINTN)DriverEntry->Pe32Data) {
+        MmFreePages (DstBuffer, PageCount);
+      }
+
       return Status;
     }
 
