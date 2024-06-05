@@ -199,10 +199,15 @@ LocatePciExpressCapabilityRegBlock (
   OUT UINT32            *NextRegBlock OPTIONAL
   )
 {
-  EFI_STATUS  Status;
-  UINT32      CapabilityPtr;
-  UINT32      CapabilityEntry;
-  UINT16      CapabilityID;
+  EFI_STATUS                       Status;
+  UINT32                           CapabilityPtr;
+  UINT32                           CapabilityEntry;
+  UINT16                           CapabilityID;
+  UINT32                           Seg;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo;
+
+  PciRootBridgeIo = PciIoDevice->PciRootBridgeIo;
+  Seg = PciRootBridgeIo->SegmentNumber;
 
   //
   // To check the capability of this device supports
@@ -236,8 +241,9 @@ LocatePciExpressCapabilityRegBlock (
     if (CapabilityEntry == MAX_UINT32) {
       DEBUG ((
         DEBUG_WARN,
-        "%a: [%02x|%02x|%02x] failed to access config space at offset 0x%x\n",
+        "%a: [%04x|%02x|%02x|%02x] failed to access config space at offset 0x%x\n",
         __func__,
+        Seg,
         PciIoDevice->BusNumber,
         PciIoDevice->DeviceNumber,
         PciIoDevice->FunctionNumber,
