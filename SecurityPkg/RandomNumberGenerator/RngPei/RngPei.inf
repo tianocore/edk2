@@ -1,0 +1,37 @@
+## @file
+#  Produces the Random Number Generator (RNG) PPI.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION         = 0x00010005
+  BASE_NAME           = RngPei
+  MODULE_UNI_FILE     = RngPei.uni
+  FILE_GUID           = D9B35295-D8BB-463E-B7EC-1FD05E5687C1
+  MODULE_TYPE         = PEIM
+  VERSION_STRING      = 1.0
+  ENTRY_POINT         = RngPeiEntryPoint
+
+[Sources]
+  RngPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PeimEntryPoint
+  PeiServicesLib
+  RngLib
+
+[Ppis]
+  gEfiRngPpiGuid    ## PRODUCES
+
+[Depex]
+  TRUE
