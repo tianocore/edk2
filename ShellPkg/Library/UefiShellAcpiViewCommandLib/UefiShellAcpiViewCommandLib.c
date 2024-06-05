@@ -58,6 +58,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_3_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE,                                              ParseAcpiFacs },
   { EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,                                                 ParseAcpiFadt },
   { EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,                                              ParseAcpiGtdt },
+  { EFI_ACPI_6_5_HARDWARE_ERROR_SOURCE_TABLE_SIGNATURE,                                                  ParseAcpiHest },
   { EFI_ACPI_6_4_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_SIGNATURE,                                         ParseAcpiHmat },
   { EFI_ACPI_6_5_HIGH_PRECISION_EVENT_TIMER_TABLE_SIGNATURE,                                             ParseAcpiHpet },
   { EFI_ACPI_6_2_IO_REMAPPING_TABLE_SIGNATURE,                                                           ParseAcpiIort },
