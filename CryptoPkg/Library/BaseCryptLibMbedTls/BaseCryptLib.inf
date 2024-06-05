@@ -27,34 +27,38 @@
 
 [Sources]
   InternalCryptLib.h
-  Cipher/CryptAeadAesGcmNull.c
-  Cipher/CryptAes.c
+  Hash/CryptMd5.c
+  Hash/CryptSha1.c
   Hash/CryptSha256.c
   Hash/CryptSha512.c
   Hash/CryptParallelHashNull.c
-  Hash/CryptSm3Null.c
-  Hash/CryptMd5.c
-  Hash/CryptSha1.c
+  Hash/CryptSm3.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
+  Cipher/CryptAes.c
+  Cipher/CryptAeadAesGcm.c
   Pk/CryptRsaBasic.c
-  Pk/CryptRsaExtNull.c
-  Pk/CryptRsaPss.c
-  Pk/CryptRsaPssSignNull.c
-  Bn/CryptBnNull.c
-  Pem/CryptPemNull.c
+  Pk/CryptRsaExt.c
+  Pk/CryptPkcs1Oaep.c
+  Pk/CryptPkcs5Pbkdf2.c
+  Pk/CryptPkcs7Sign.c
+  Pk/CryptPkcs7VerifyCommon.c
+  Pk/CryptPkcs7VerifyBase.c
+  Pk/CryptPkcs7VerifyEku.c
   Pk/CryptDhNull.c
+  Pk/CryptX509.c
+  Pk/CryptAuthenticode.c
+  Pk/CryptTs.c
+  Pk/CryptRsaPss.c
+  Pk/CryptRsaPssSign.c
   Pk/CryptEcNull.c
-  Pk/CryptPkcs1OaepNull.c
-  Pk/CryptPkcs5Pbkdf2Null.c
-  Pk/CryptPkcs7SignNull.c
-  Pk/CryptPkcs7VerifyNull.c
-  Pk/CryptPkcs7VerifyEkuNull.c
-  Pk/CryptX509Null.c
-  Pk/CryptAuthenticodeNull.c
-  Pk/CryptTsNull.c
-  Rand/CryptRandNull.c
+  Pem/CryptPem.c
+  Bn/CryptBnNull.c
+  Rand/CryptRand.c
+
   SysCall/CrtWrapper.c
+  SysCall/DummyOpensslSupport.c
+  SysCall/BaseMemAllocation.c
   SysCall/TimerWrapper.c
 
 [Packages]
@@ -68,6 +72,7 @@
   UefiRuntimeServicesTableLib
   DebugLib
   MbedTlsLib
+  OpensslLib
   PrintLib
   IntrinsicLib
   RngLib

@@ -141,6 +141,17 @@ static const OSSL_ALGORITHM_CAPABLE deflt_ciphers[] = {
     ALG(PROV_NAMES_AES_192_GCM, ossl_aes192gcm_functions),
     ALG(PROV_NAMES_AES_128_GCM, ossl_aes128gcm_functions),
 
+    ALGC (
+        PROV_NAMES_AES_128_CBC_HMAC_SHA256,
+        ossl_aes128cbc_hmac_sha256_functions,
+        ossl_cipher_capable_aes_cbc_hmac_sha256
+        ),
+    ALGC (
+        PROV_NAMES_AES_256_CBC_HMAC_SHA256,
+        ossl_aes256cbc_hmac_sha256_functions,
+        ossl_cipher_capable_aes_cbc_hmac_sha256
+        ),
+
     { { NULL, NULL, NULL }, NULL }
 };
 static OSSL_ALGORITHM exported_ciphers[OSSL_NELEM(deflt_ciphers)];
