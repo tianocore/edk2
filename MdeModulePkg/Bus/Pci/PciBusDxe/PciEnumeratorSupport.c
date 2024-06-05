@@ -220,18 +220,23 @@ PciSearchDevice (
   OUT PCI_IO_DEVICE  **PciDevice
   )
 {
-  PCI_IO_DEVICE  *PciIoDevice;
-  BOOLEAN        IgnoreOptionRom;
+  PCI_IO_DEVICE                    *PciIoDevice;
+  BOOLEAN                          IgnoreOptionRom;
+  UINT32                           Seg;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL  *PciRootBridgeIo;
 
   PciIoDevice     = NULL;
   IgnoreOptionRom = FALSE;
+  PciRootBridgeIo = Bridge->PciRootBridgeIo;
+  Seg = PciRootBridgeIo->SegmentNumber;
 
   DEBUG ((
     DEBUG_INFO,
-    "PciBus: Discovered %s @ [%02x|%02x|%02x]  [VID = 0x%x, DID = 0x%0x]\n",
+    "PciBus: Discovered %s @ [%04x|%02x|%02x|%02x]  [VID = 0x%x, DID = 0x%0x]\n",
     IS_PCI_BRIDGE (Pci) ?     L"PPB" :
     IS_CARDBUS_BRIDGE (Pci) ? L"P2C" :
     L"PCI",
+    Seg,
     Bus,
     Device,
     Func,
