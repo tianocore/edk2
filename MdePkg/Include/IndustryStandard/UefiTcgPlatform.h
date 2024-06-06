@@ -473,8 +473,6 @@ typedef struct tdTCG_Sp800_155_PlatformId_Event2 {
   // UINT8               PlatformModel[PlatformModelSize];
   // UINT8               PlatformVersionSize;
   // UINT8               PlatformVersion[PlatformVersionSize];
-  // UINT8               PlatformModelSize;
-  // UINT8               PlatformModel[PlatformModelSize];
   // UINT8               FirmwareManufacturerStrSize;
   // UINT8               FirmwareManufacturerStr[FirmwareManufacturerStrSize];
   // UINT32              FirmwareManufacturerId;
@@ -499,8 +497,6 @@ typedef struct tdTCG_Sp800_155_PlatformId_Event3 {
   // UINT8               PlatformModel[PlatformModelSize];
   // UINT8               PlatformVersionSize;
   // UINT8               PlatformVersion[PlatformVersionSize];
-  // UINT8               PlatformModelSize;
-  // UINT8               PlatformModel[PlatformModelSize];
   // UINT8               FirmwareManufacturerStrSize;
   // UINT8               FirmwareManufacturerStr[FirmwareManufacturerStrSize];
   // UINT32              FirmwareManufacturerId;
@@ -516,6 +512,18 @@ typedef struct tdTCG_Sp800_155_PlatformId_Event3 {
   // UINT32              PlatformCertLocatorLength;
   // UINT8               PlatformCertLocator[PlatformCertLocatorLength];
 } TCG_Sp800_155_PlatformId_Event3;
+
+/**
+ * TCG specifies a locator type with the following values
+ * 0 - Raw data in the locator itself.
+ * 1 - URI in rtf2396 format.
+ * 2 - local device path in EFI_DEVICE_PATH_PROTOCOL format.
+ * 3 - UEFI variable (16 byte EFI_GUID, then 00-terminated UCS2 string)
+**/
+#define TCG_LOCATOR_TYPE_RAW_DATA       0
+#define TCG_LOCATOR_TYPE_URI            1
+#define TCG_LOCATOR_TYPE_DEVICE_PATH    2
+#define TCG_LOCATOR_TYPE_UEFI_VARIABLE  3
 
 #define TCG_EfiStartupLocalityEvent_SIGNATURE  "StartupLocality"
 
