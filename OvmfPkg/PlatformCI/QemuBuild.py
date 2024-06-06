@@ -19,7 +19,7 @@ class CommonPlatform():
         for the different parts of stuart
     '''
     PackagesSupported = ("OvmfPkg",)
-    ArchSupported = ("RISCV64",)
+    ArchSupported = ("RISCV64","LOONGARCH64")
     TargetsSupported = ("DEBUG", "RELEASE", "NOOPT")
     Scopes = ('ovmf', 'edk2-build')
     WorkspaceRoot = os.path.realpath(os.path.join(
@@ -31,7 +31,11 @@ class CommonPlatform():
 
         ArchCsv: csv string containing all architectures to build
         '''
-        return "RiscVVirt/RiscVVirtQemu.dsc"
+        if "RISCV64" in ArchCsv.upper().split(","):
+            dsc = "RiscVVirt/RiscVVirtQemu.dsc"
+        if "LOONGARCH64" in ArchCsv.upper().split(","):
+            dsc = "LoongArchVirt/LoongArchVirtQemu.dsc"
+        return dsc
 
 import PlatformBuildLib
 PlatformBuildLib.CommonPlatform = CommonPlatform
