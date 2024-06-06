@@ -186,6 +186,15 @@ jobs:
             Run.Flags: "QEMU_SKIP=TRUE"
             Run: $(should_run)
 
+          QEMU_LOONGARCH64_DEBUG:
+            Build.File: "$(package)/PlatformCI/QemuBuild.py"
+            Build.Arch: "LOONGARCH64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            # this build is for LOONGARCH qemu virt not qemu-kvm
+            Run.Flags: "QEMU_SKIP=TRUE"
+            Run: $(should_run)
+
     workspace:
       clean: all
 
