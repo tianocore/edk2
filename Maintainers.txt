@@ -580,6 +580,12 @@ F: OvmfPkg/RiscVVirt
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
 R: Andrei Warkentin <andrei.warkentin@intel.com> [andreiw]
 
+OvmfPkg: LOONGARCH Qemu Virt Platform
+F: OvmfPkg/LoongArchVirt
+M: Chao Li <lichao@loongson.cn> [kilaterlee]
+M: Bibo Mao <maobibo@loongson.cn> [bibo-mao]
+R: Xianglai Li <lixianglai@loongson.cn> [lixianglai]
+
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
