@@ -92,6 +92,8 @@
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 !endif
 
+  ArmMonitorLib|ArmVirtPkg/Library/ArmVirtQemuMonitorLib/ArmVirtQemuMonitorLib.inf
+
 [LibraryClasses.AARCH64]
   ArmPlatformLib|ArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.inf
 
