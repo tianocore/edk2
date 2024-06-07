@@ -120,8 +120,6 @@
   gArmTokenSpaceGuid.PcdFdBaseAddress|0x0
   gArmTokenSpaceGuid.PcdFvBaseAddress|0x0
 
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
-
 [PcdsDynamicDefault.common]
 
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|0x0

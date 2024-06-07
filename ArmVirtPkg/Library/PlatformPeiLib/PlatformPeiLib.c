@@ -18,8 +18,6 @@
 #include <Library/FdtSerialPortAddressLib.h>
 #include <libfdt.h>
 
-#include <Chipset/AArch64.h>
-
 #include <Guid/EarlyPL011BaseAddress.h>
 #include <Guid/FdtHob.h>
 
