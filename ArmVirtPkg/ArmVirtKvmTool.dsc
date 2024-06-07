@@ -165,8 +165,6 @@
   #
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
 
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
-
 [PcdsPatchableInModule.common]
   #
   # This will be overridden in the code
