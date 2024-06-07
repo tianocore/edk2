@@ -9,6 +9,23 @@
 #include <AsmMacroIoLibV8.h>
 
 ASM_FUNC(_ModuleEntryPoint)
+  //
+  // If we are booting from RAM using the Linux kernel boot protocol, x0 will
+  // point to the DTB image in memory. Otherwise, use the default value defined
+  // by the platform.
+  //
+  cbnz  x0, 0f
+  ldr   x0, PcdGet64 (PcdDeviceTreeInitialBaseAddress)
+
+0:mov   x28, x0             // preserve DTB pointer
+  mov   x27, x1             // preserve base of image pointer
+
+#if (FixedPcdGet32 (PcdVFPEnabled))
+  // Enable Floating Point. This needs to be done before entering C code, which
+  // may use FP/SIMD registers.
+  bl    ArmEnableVFP
+#endif
+
   bl    ASM_PFX(DiscoverDramFromDt)
 
   // Get ID of this CPU in Multicore system
@@ -95,28 +112,18 @@ _NeverReturn:
 
 // VOID
 // DiscoverDramFromDt (
-//   VOID   *DeviceTreeBaseAddress,   // passed by loader in x0
-//   VOID   *ImageBase                // passed by FDF trampoline in x1
+//   VOID   *DeviceTreeBaseAddress,   // passed by loader in x0, preserved in x28
+//   VOID   *ImageBase                // passed by FDF trampoline in x1, preserved in x27
 //   );
 ASM_PFX(DiscoverDramFromDt):
-  //
-  // If we are booting from RAM using the Linux kernel boot protocol, x0 will
-  // point to the DTB image in memory. Otherwise, use the default value defined
-  // by the platform.
-  //
-  cbnz  x0, 0f
-  ldr   x0, PcdGet64 (PcdDeviceTreeInitialBaseAddress)
-
-0:mov   x29, x30            // preserve LR
-  mov   x28, x0             // preserve DTB pointer
-  mov   x27, x1             // preserve base of image pointer
+  mov   x29, x30            // preserve LR
 
   //
-  // The base of the runtime image has been preserved in x1. Check whether
+  // The base of the runtime image has been preserved in x27. Check whether
   // the expected magic number can be found in the header.
   //
   ldr   w8, .LArm64LinuxMagic
-  ldr   w9, [x1, #0x38]
+  ldr   w9, [x27, #0x38]
   cmp   w8, w9
   bne   .Lout
 
@@ -132,8 +139,8 @@ ASM_PFX(DiscoverDramFromDt):
   ldr   x6, [x8]
   ldr   x7, [x9]
   sub   x7, x7, x6
-  add   x7, x7, x1
-  str   x1, [x8]
+  add   x7, x7, x27
+  str   x27, [x8]
   str   x7, [x9]
 
   //
