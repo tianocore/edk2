@@ -14,7 +14,6 @@
 #include <Library/AcpiLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PL011UartLib.h>
 #include <Protocol/AcpiTable.h>
 #include <Protocol/SerialIo.h>
 
@@ -26,9 +25,11 @@
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
+#include "Dbg2Generator.h"
+
 /** ARM standard DBG2 Table Generator
 
-  Constructs the DBG2 table for PL011 or SBSA UART peripherals.
+  Constructs the DBG2 table for corresponding DBG2 peripheral.
 
 Requirements:
   The following Configuration Manager Object(s) are required by
@@ -169,7 +170,7 @@ DBG2_TABLE  AcpiDbg2 = {
     DBG2_DEBUG_PORT_DDI (
       0,                    // {Template}: Serial Port Subtype
       0,                    // {Template}: Serial Port Base Address
-      PL011_UART_LENGTH,
+      0,                    // {Template}: Serial Port Base Address Size
       NAMESPACE_STR_DBG_PORT0
       )
   }
@@ -186,7 +187,7 @@ GET_OBJECT_LIST (
   CM_ARCH_COMMON_SERIAL_PORT_INFO
   );
 
-/** Initialize the PL011/SBSA UART with the parameters obtained from
+/** Initialize the DBG2 UART with the parameters obtained from
     the Configuration Manager.
 
   @param [in]  SerialPortInfo Pointer to the Serial Port Information.
@@ -218,9 +219,8 @@ SetupDebugUart (
   StopBits         = (EFI_STOP_BITS_TYPE)FixedPcdGet8 (PcdUartDefaultStopBits);
 
   BaudRate = SerialPortInfo->BaudRate;
-  Status   = PL011UartInitializePort (
-               (UINTN)SerialPortInfo->BaseAddress,
-               SerialPortInfo->Clock,
+  Status   = Dbg2InitializePort (
+               SerialPortInfo,
                &BaudRate,
                &ReceiveFifoDepth,
                &Parity,
@@ -460,6 +460,9 @@ BuildDbg2TableEx (
       (SerialPortInfo->PortSubtype ==
        EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_SBSA_GENERIC_UART))
   {
+    // Setup the PL011 length.
+    AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].AddressSize = PL011_UART_LENGTH;
+
     // Initialize the serial port
     Status = SetupDebugUart (SerialPortInfo);
     if (EFI_ERROR (Status)) {
@@ -470,6 +473,13 @@ BuildDbg2TableEx (
         ));
       goto error_handler;
     }
+  } else if ((SerialPortInfo->PortSubtype ==
+              EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS))
+  {
+    AcpiDbg2.Dbg2DeviceInfo[INDEX_DBG_PORT0].AddressSize = SIZE_4KB;
+  } else {
+    // Try to catch other serial ports, but don't return an error.
+    ASSERT (0);
   }
 
   TableList[0] = (EFI_ACPI_DESCRIPTION_HEADER *)&AcpiDbg2;
