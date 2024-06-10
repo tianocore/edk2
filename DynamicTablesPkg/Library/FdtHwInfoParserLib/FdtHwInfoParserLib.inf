@@ -22,22 +22,22 @@
   FdtHwInfoParser.h
   FdtUtility.c
   FdtUtility.h
-  BootArch/ArmBootArchParser.c
-  BootArch/ArmBootArchParser.h
-  GenericTimer/ArmGenericTimerParser.c
-  GenericTimer/ArmGenericTimerParser.h
-  Gic/ArmGicCParser.c
-  Gic/ArmGicCParser.h
-  Gic/ArmGicDispatcher.c
-  Gic/ArmGicDispatcher.h
-  Gic/ArmGicDParser.c
-  Gic/ArmGicDParser.h
-  Gic/ArmGicItsParser.c
-  Gic/ArmGicItsParser.h
-  Gic/ArmGicMsiFrameParser.c
-  Gic/ArmGicMsiFrameParser.h
-  Gic/ArmGicRParser.c
-  Gic/ArmGicRParser.h
+  Arm/BootArch/ArmBootArchParser.c
+  Arm/BootArch/ArmBootArchParser.h
+  Arm/GenericTimer/ArmGenericTimerParser.c
+  Arm/GenericTimer/ArmGenericTimerParser.h
+  Arm/Gic/ArmGicCParser.c
+  Arm/Gic/ArmGicCParser.h
+  Arm/Gic/ArmGicDispatcher.c
+  Arm/Gic/ArmGicDispatcher.h
+  Arm/Gic/ArmGicDParser.c
+  Arm/Gic/ArmGicDParser.h
+  Arm/Gic/ArmGicItsParser.c
+  Arm/Gic/ArmGicItsParser.h
+  Arm/Gic/ArmGicMsiFrameParser.c
+  Arm/Gic/ArmGicMsiFrameParser.h
+  Arm/Gic/ArmGicRParser.c
+  Arm/Gic/ArmGicRParser.h
   Pci/ArmPciConfigSpaceParser.c
   Pci/ArmPciConfigSpaceParser.h
   Serial/ArmSerialPortParser.c
