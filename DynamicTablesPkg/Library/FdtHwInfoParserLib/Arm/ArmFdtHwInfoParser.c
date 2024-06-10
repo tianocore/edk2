@@ -10,7 +10,7 @@
 #include "Arm/GenericTimer/ArmGenericTimerParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
 #include "Pci/PciConfigSpaceParser.h"
-#include "Serial/ArmSerialPortParser.h"
+#include "Serial/SerialPortParser.h"
 
 /** Ordered table of parsers/dispatchers.
 
