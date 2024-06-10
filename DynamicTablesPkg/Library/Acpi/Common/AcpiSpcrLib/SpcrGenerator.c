@@ -26,7 +26,7 @@
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
-/** ARM standard SPCR Table Generator
+/** Standard SPCR Table Generator
 
   Constructs the SPCR table for PL011 or SBSA UART peripherals.
 
