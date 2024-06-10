@@ -18,6 +18,13 @@
 
 [Sources]
   FadtGenerator.c
+  FadtGenerator.h
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/ArmFadtGenerator.c
+
+[Sources.IA32, Sources.X64]
+  FadtGeneratorNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
