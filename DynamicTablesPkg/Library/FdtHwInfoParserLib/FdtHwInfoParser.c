@@ -6,9 +6,9 @@
 **/
 
 #include "FdtHwInfoParser.h"
-#include "BootArch/ArmBootArchParser.h"
-#include "GenericTimer/ArmGenericTimerParser.h"
-#include "Gic/ArmGicDispatcher.h"
+#include "Arm/BootArch/ArmBootArchParser.h"
+#include "Arm/GenericTimer/ArmGenericTimerParser.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
 #include "Pci/ArmPciConfigSpaceParser.h"
 #include "Serial/ArmSerialPortParser.h"
 

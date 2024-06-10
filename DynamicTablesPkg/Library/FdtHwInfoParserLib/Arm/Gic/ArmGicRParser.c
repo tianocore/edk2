@@ -10,8 +10,8 @@
 
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"
-#include "Gic/ArmGicDispatcher.h"
-#include "Gic/ArmGicRParser.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
+#include "Arm/Gic/ArmGicRParser.h"
 
 /** Parse a Gic compatible interrupt-controller node,
     extracting GicR information.
