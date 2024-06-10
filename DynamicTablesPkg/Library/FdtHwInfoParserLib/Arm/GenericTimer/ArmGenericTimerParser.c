@@ -10,8 +10,8 @@
 
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
-#include "GenericTimer/ArmGenericTimerParser.h"
-#include "Gic/ArmGicDispatcher.h"
+#include "Arm/GenericTimer/ArmGenericTimerParser.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
 
 /** List of "compatible" property values for timer nodes.
 

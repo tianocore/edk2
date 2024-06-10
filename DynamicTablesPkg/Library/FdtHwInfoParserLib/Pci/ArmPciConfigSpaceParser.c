@@ -17,7 +17,7 @@
 
 #include "FdtHwInfoParser.h"
 #include "Pci/ArmPciConfigSpaceParser.h"
-#include "Gic/ArmGicDispatcher.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
 
 /** List of "compatible" property values for host PCIe bridges nodes.
 
