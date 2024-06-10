@@ -8,7 +8,7 @@
 
 [Defines]
   INF_VERSION    = 0x00010019
-  BASE_NAME      = AcpiSpcrLibArm
+  BASE_NAME      = AcpiSpcrLib
   FILE_GUID      = 55088136-7B78-4974-B1EE-F630150D0DE7
   VERSION_STRING = 1.0
   MODULE_TYPE    = DXE_DRIVER
@@ -28,10 +28,3 @@
 [LibraryClasses]
   BaseLib
   SsdtSerialPortFixupLib
-
-[Pcd]
-
-[Protocols]
-
-[Guids]
-

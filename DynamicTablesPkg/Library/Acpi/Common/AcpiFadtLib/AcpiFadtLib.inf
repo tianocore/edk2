@@ -8,7 +8,7 @@
 
 [Defines]
   INF_VERSION    = 0x00010019
-  BASE_NAME      = AcpiFadtLibArm
+  BASE_NAME      = AcpiFadtLib
   FILE_GUID      = 686FE5FE-B944-485F-8B1C-7D60E0056487
   VERSION_STRING = 1.0
   MODULE_TYPE    = DXE_DRIVER
@@ -27,10 +27,3 @@
 
 [LibraryClasses]
   BaseLib
-
-[Pcd]
-
-[Protocols]
-
-[Guids]
-
