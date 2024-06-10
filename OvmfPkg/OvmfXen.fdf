@@ -314,6 +314,8 @@ INF  ShellPkg/Application/Shell/Shell.inf
 
 INF MdeModulePkg/Logo/LogoDxe.inf
 
+INF  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
 #
 # Hash2 Protocol producer
 #

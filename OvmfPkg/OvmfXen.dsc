@@ -642,6 +642,8 @@
   OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
   OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
 
+  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
   #
   # ISA Support
   #
