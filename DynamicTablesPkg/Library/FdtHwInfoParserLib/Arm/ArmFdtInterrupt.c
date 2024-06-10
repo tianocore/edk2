@@ -83,3 +83,36 @@ FdtGetInterruptFlags (
 
   return AcpiIrqFlags;
 }
+
+/** For relevant architectures, get the "#address-cells" and/or "#size-cells"
+    property of the node.
+
+  According to the Device Tree specification, s2.3.5 "#address-cells and
+  #size-cells":
+  "If missing, a client program should assume a default value of 2 for
+  #address-cells, and a value of 1 for #size-cells."
+
+  @param [in]  Fdt              Pointer to a Flattened Device Tree.
+  @param [in]  Node             Offset of the node having to get the
+                                "#address-cells" and "#size-cells"
+                                properties from.
+  @param [out] AddressCells     If success, number of address-cells.
+                                If the property is not available,
+                                default value is 2.
+  @param [out] SizeCells        If success, number of size-cells.
+                                If the property is not available,
+                                default value is 1.
+
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+FdtGetIntcAddressCells (
+  IN  CONST VOID *Fdt,
+  IN        INT32 Node,
+  OUT       INT32 *AddressCells, OPTIONAL
+  OUT       INT32     *SizeCells       OPTIONAL
+  )
+{
+  return FdtGetAddressInfo (Fdt, Node, AddressCells, SizeCells);
+}

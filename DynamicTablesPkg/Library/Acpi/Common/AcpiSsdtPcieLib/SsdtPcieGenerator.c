@@ -974,7 +974,7 @@ BuildSsdtPciTableEx (
   EFI_STATUS                            Status;
   CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO  *PciInfo;
   UINT32                                PciCount;
-  UINTN                                 Index;
+  UINT32                                Index;
   EFI_ACPI_DESCRIPTION_HEADER           **TableList;
   ACPI_PCI_GENERATOR                    *Generator;
   UINT32                                Uid;
