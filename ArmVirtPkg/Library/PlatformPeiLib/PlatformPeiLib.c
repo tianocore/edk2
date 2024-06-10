@@ -18,8 +18,6 @@
 #include <Library/FdtSerialPortAddressLib.h>
 #include <libfdt.h>
 
-#include <Chipset/AArch64.h>
-
 #include <Guid/EarlyPL011BaseAddress.h>
 #include <Guid/FdtHob.h>
 
@@ -225,18 +223,6 @@ PlatformPeim (
   }
 
   BuildFvHob (PcdGet64 (PcdFvBaseAddress), PcdGet32 (PcdFvSize));
-
- #ifdef MDE_CPU_AARCH64
-  //
-  // Set the SMCCC conduit to SMC if executing at EL2, which is typically the
-  // exception level that services HVCs rather than the one that invokes them.
-  //
-  if (ArmReadCurrentEL () == AARCH64_EL2) {
-    Status = PcdSetBoolS (PcdMonitorConduitHvc, FALSE);
-    ASSERT_EFI_ERROR (Status);
-  }
-
- #endif
 
   return EFI_SUCCESS;
 }
