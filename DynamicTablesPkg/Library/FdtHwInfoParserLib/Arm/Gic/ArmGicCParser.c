@@ -11,6 +11,7 @@
   - linux/Documentation/devicetree/bindings/arm/pmu.yaml
 **/
 
+#include <Library/ArmLib.h>
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
 #include "Arm/Gic/ArmGicCParser.h"
