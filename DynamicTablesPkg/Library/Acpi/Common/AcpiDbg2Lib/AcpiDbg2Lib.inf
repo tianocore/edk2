@@ -18,6 +18,13 @@
 
 [Sources]
   Dbg2Generator.c
+  Dbg2Generator.h
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/ArmDbg2Generator.c
+
+[Sources.IA32, Sources.X86]
+  Dbg2GeneratorNull.c
 
 [Packages.ARM, Packages.AARCH64]
   ArmPlatformPkg/ArmPlatformPkg.dec
