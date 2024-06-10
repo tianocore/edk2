@@ -25,37 +25,18 @@
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
 
+#include "SratGenerator.h"
+
 /**
-  ARM standard SRAT Generator
+  Standard SRAT Generator
 
   Requirements:
     The following Configuration Manager Object(s) are used by this Generator:
-    - EArmObjGicCInfo (REQUIRED)
-    - EArmObjGicItsInfo (OPTIONAL)
     - EArchCommonObjMemoryAffinityInfo (OPTIONAL)
     - EArchCommonObjGenericInitiatorAffinityInfo (OPTIONAL)
     - EArchCommonObjDeviceHandleAcpi (OPTIONAL)
     - EArchCommonObjDeviceHandlePci (OPTIONAL)
 */
-
-/** This macro expands to a function that retrieves the GIC
-    CPU interface Information from the Configuration Manager.
-*/
-GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjGicCInfo,
-  CM_ARM_GICC_INFO
-  );
-
-/** This macro expands to a function that retrieves the GIC
-    Interrupt Translation Service Information from the
-    Configuration Manager.
-*/
-GET_OBJECT_LIST (
-  EObjNameSpaceArm,
-  EArmObjGicItsInfo,
-  CM_ARM_GIC_ITS_INFO
-  );
 
 /**
   This macro expands to a function that retrieves the Memory Affinity
@@ -119,102 +100,6 @@ GetBdf (
   Bdf |= (DeviceHandlePci->DeviceNumber & 0x1F) << 3;
   Bdf |= DeviceHandlePci->FunctionNumber & 0x7;
   return Bdf;
-}
-
-/** Add the GICC Affinity Structures in the SRAT Table.
-
-  @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager
-                                Protocol Interface.
-  @param [in]  Srat             Pointer to the SRAT Table.
-  @param [in]  GicCAffOffset    Offset of the GICC Affinity
-                                information in the SRAT Table.
-  @param [in]  GicCInfo         Pointer to the GIC CPU Information list.
-  @param [in]  GicCCount        Count of GIC CPU Interfaces.
-
-  @retval EFI_SUCCESS           Table generated successfully.
-**/
-STATIC
-EFI_STATUS
-AddGICCAffinity (
-  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
-  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
-  IN CONST UINT32                                               GicCAffOffset,
-  IN CONST CM_ARM_GICC_INFO                                     *GicCInfo,
-  IN       UINT32                                               GicCCount
-  )
-{
-  EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE  *GicCAff;
-
-  ASSERT (Srat != NULL);
-  ASSERT (GicCInfo != NULL);
-
-  GicCAff = (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE *)((UINT8 *)Srat +
-                                                     GicCAffOffset);
-
-  while (GicCCount-- != 0) {
-    DEBUG ((DEBUG_INFO, "SRAT: GicCAff = 0x%p\n", GicCAff));
-
-    GicCAff->Type             = EFI_ACPI_6_3_GICC_AFFINITY;
-    GicCAff->Length           = sizeof (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE);
-    GicCAff->ProximityDomain  = GicCInfo->ProximityDomain;
-    GicCAff->AcpiProcessorUid = GicCInfo->AcpiProcessorUid;
-    GicCAff->Flags            = GicCInfo->AffinityFlags;
-    GicCAff->ClockDomain      = GicCInfo->ClockDomain;
-
-    // Next
-    GicCAff++;
-    GicCInfo++;
-  }// while
-
-  return EFI_SUCCESS;
-}
-
-/** Add the GIC ITS Affinity Structures in the SRAT Table.
-
-  @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager
-                                Protocol Interface.
-  @param [in]  Srat             Pointer to the SRAT Table.
-  @param [in]  GicItsAffOffset  Offset of the GIC ITS Affinity
-                                information in the SRAT Table.
-  @param [in]  GicItsInfo       Pointer to the GIC ITS Information list.
-  @param [in]  GicItsCount      Count of GIC ITS.
-
-  @retval EFI_SUCCESS           Table generated successfully.
-**/
-STATIC
-EFI_STATUS
-AddGICItsAffinity (
-  IN CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL         *CONST  CfgMgrProtocol,
-  IN EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER *CONST  Srat,
-  IN CONST UINT32                                               GicItsAffOffset,
-  IN CONST CM_ARM_GIC_ITS_INFO                                  *GicItsInfo,
-  IN       UINT32                                               GicItsCount
-  )
-{
-  EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE  *GicItsAff;
-
-  ASSERT (Srat != NULL);
-  ASSERT (GicItsInfo != NULL);
-
-  GicItsAff = (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE *)((UINT8 *)Srat +
-                                                          GicItsAffOffset);
-
-  while (GicItsCount-- != 0) {
-    DEBUG ((DEBUG_INFO, "SRAT: GicItsAff = 0x%p\n", GicItsAff));
-
-    GicItsAff->Type            = EFI_ACPI_6_3_GIC_ITS_AFFINITY;
-    GicItsAff->Length          = sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE);
-    GicItsAff->ProximityDomain = GicItsInfo->ProximityDomain;
-    GicItsAff->Reserved[0]     = EFI_ACPI_RESERVED_BYTE;
-    GicItsAff->Reserved[1]     = EFI_ACPI_RESERVED_BYTE;
-    GicItsAff->ItsId           = GicItsInfo->GicItsId;
-
-    // Next
-    GicItsAff++;
-    GicItsInfo++;
-  }// while
-
-  return EFI_SUCCESS;
 }
 
 /** Add the Memory Affinity Structures in the SRAT Table.
@@ -455,18 +340,12 @@ BuildSratTable (
 {
   EFI_STATUS  Status;
   UINT32      TableSize;
-  UINT32      GicCCount;
-  UINT32      GicItsCount;
   UINT32      MemAffCount;
   UINT32      GenInitiatorAffCount;
 
-  UINT32  GicCAffOffset;
-  UINT32  GicItsAffOffset;
   UINT32  MemAffOffset;
   UINT32  GenInitiatorAffOffset;
 
-  CM_ARM_GICC_INFO                                *GicCInfo;
-  CM_ARM_GIC_ITS_INFO                             *GicItsInfo;
   CM_ARCH_COMMON_MEMORY_AFFINITY_INFO             *MemAffInfo;
   CM_ARCH_COMMON_GENERIC_INITIATOR_AFFINITY_INFO  *GenInitiatorAffInfo;
 
@@ -496,46 +375,6 @@ BuildSratTable (
   }
 
   *Table = NULL;
-
-  Status = GetEArmObjGicCInfo (
-             CfgMgrProtocol,
-             CM_NULL_TOKEN,
-             &GicCInfo,
-             &GicCCount
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: SRAT: Failed to get GICC Info. Status = %r\n",
-      Status
-      ));
-    goto error_handler;
-  }
-
-  if (GicCCount == 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: SRAT: GIC CPU Interface information not provided.\n"
-      ));
-    ASSERT (0);
-    Status = EFI_INVALID_PARAMETER;
-    goto error_handler;
-  }
-
-  Status = GetEArmObjGicItsInfo (
-             CfgMgrProtocol,
-             CM_NULL_TOKEN,
-             &GicItsInfo,
-             &GicItsCount
-             );
-  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: SRAT: Failed to get GIC ITS Info. Status = %r\n",
-      Status
-      ));
-    goto error_handler;
-  }
 
   Status = GetEArchCommonObjMemoryAffinityInfo (
              CfgMgrProtocol,
@@ -571,13 +410,18 @@ BuildSratTable (
   // Calculate the size of the SRAT table
   TableSize = sizeof (EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_HEADER);
 
-  GicCAffOffset = TableSize;
-  TableSize    += (sizeof (EFI_ACPI_6_3_GICC_AFFINITY_STRUCTURE) * GicCCount);
-
-  if (GicItsCount != 0) {
-    GicItsAffOffset = TableSize;
-    TableSize      += (sizeof (EFI_ACPI_6_3_GIC_ITS_AFFINITY_STRUCTURE) *
-                       GicItsCount);
+  // Place the Arch specific subtables/structures first and
+  // reserve the offsets. The common subtables/structures
+  // are placed next.
+  Status = ArchReserveOffsets (CfgMgrProtocol, &TableSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR: SRAT: Failed to reserve arch offsets."
+      " Status = %r\n",
+      Status
+      ));
+    goto error_handler;
   }
 
   if (MemAffCount != 0) {
@@ -636,38 +480,14 @@ BuildSratTable (
   Srat->Reserved1 = 1;
   Srat->Reserved2 = EFI_ACPI_RESERVED_QWORD;
 
-  Status = AddGICCAffinity (
-             CfgMgrProtocol,
-             Srat,
-             GicCAffOffset,
-             GicCInfo,
-             GicCCount
-             );
+  Status = AddArchObjects (CfgMgrProtocol, Srat);
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "ERROR: SRAT: Failed to add GICC Affinity structures. Status = %r\n",
+      "ERROR: SRAT: Failed to add arch objects header. Status = %r\n",
       Status
       ));
     goto error_handler;
-  }
-
-  if (GicItsCount != 0) {
-    Status = AddGICItsAffinity (
-               CfgMgrProtocol,
-               Srat,
-               GicItsAffOffset,
-               GicItsInfo,
-               GicItsCount
-               );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "ERROR: SRAT: Failed to add GIC ITS Affinity structures. Status = %r\n",
-        Status
-        ));
-      goto error_handler;
-    }
   }
 
   if (MemAffCount != 0) {

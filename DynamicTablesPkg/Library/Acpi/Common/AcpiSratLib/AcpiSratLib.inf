@@ -18,6 +18,13 @@
 
 [Sources]
   SratGenerator.c
+  SratGenerator.h
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/ArmSratGenerator.c
+
+[Sources.IA32, Sources.X64]
+  SratGeneratorNull.c
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
