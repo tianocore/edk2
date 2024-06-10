@@ -9,7 +9,7 @@
 #include "Arm/BootArch/ArmBootArchParser.h"
 #include "Arm/GenericTimer/ArmGenericTimerParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
-#include "Pci/ArmPciConfigSpaceParser.h"
+#include "Pci/PciConfigSpaceParser.h"
 #include "Serial/ArmSerialPortParser.h"
 
 /** Ordered table of parsers/dispatchers.
@@ -25,7 +25,7 @@ STATIC CONST FDT_HW_INFO_PARSER_FUNC  HwInfoParserTable[] = {
   ArmBootArchInfoParser,
   ArmGenericTimerInfoParser,
   ArmGicDispatcher,
-  ArmPciConfigInfoParser,
+  PciConfigInfoParser,
   SerialPortDispatcher
 };
 
