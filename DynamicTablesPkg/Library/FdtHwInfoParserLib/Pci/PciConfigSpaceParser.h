@@ -1,5 +1,5 @@
 /** @file
-  Arm PCI Configuration Space Parser.
+  PCI Configuration Space Parser.
 
   Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -12,8 +12,8 @@
   - linux kernel code
 **/
 
-#ifndef ARM_PCI_CONFIG_SPACE_PARSER_H_
-#define ARM_PCI_CONFIG_SPACE_PARSER_H_
+#ifndef PCI_CONFIG_SPACE_PARSER_H_
+#define PCI_CONFIG_SPACE_PARSER_H_
 
 /** Read LEN bits at OFF offsets bits of the ADDR.
 
@@ -135,9 +135,9 @@ typedef struct PciParserTable {
 **/
 EFI_STATUS
 EFIAPI
-ArmPciConfigInfoParser (
+PciConfigInfoParser (
   IN  CONST FDT_HW_INFO_PARSER_HANDLE  FdtParserHandle,
   IN        INT32                      FdtBranch
   );
 
-#endif // ARM_PCI_CONFIG_SPACE_PARSER_H_
+#endif // PCI_CONFIG_SPACE_PARSER_H_
