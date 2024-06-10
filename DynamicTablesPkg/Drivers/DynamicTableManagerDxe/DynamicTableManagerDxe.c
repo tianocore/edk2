@@ -23,57 +23,15 @@
 #include <Protocol/DynamicTableFactoryProtocol.h>
 #include <SmbiosTableGenerator.h>
 
-///
-/// Bit definitions for acceptable ACPI table presence formats.
-/// Currently only ACPI tables present in the ACPI info list and
-/// already installed will count towards "Table Present" during
-/// verification routine.
-///
-#define ACPI_TABLE_PRESENT_INFO_LIST  BIT0
-#define ACPI_TABLE_PRESENT_INSTALLED  BIT1
-
-///
-/// Order of ACPI table being verified during presence inspection.
-///
-#define ACPI_TABLE_VERIFY_FADT   0
-#define ACPI_TABLE_VERIFY_MADT   1
-#define ACPI_TABLE_VERIFY_GTDT   2
-#define ACPI_TABLE_VERIFY_DSDT   3
-#define ACPI_TABLE_VERIFY_DBG2   4
-#define ACPI_TABLE_VERIFY_SPCR   5
-#define ACPI_TABLE_VERIFY_COUNT  6
-
-///
-/// Private data structure to verify the presence of mandatory
-/// or optional ACPI tables.
-///
-typedef struct {
-  /// ESTD ID for the ACPI table of interest.
-  ESTD_ACPI_TABLE_ID    EstdTableId;
-  /// Standard UINT32 ACPI signature.
-  UINT32                AcpiTableSignature;
-  /// 4 character ACPI table name (the 5th char8 is for null terminator).
-  CHAR8                 AcpiTableName[sizeof (UINT32) + 1];
-  /// Indicator on whether the ACPI table is required.
-  BOOLEAN               IsMandatory;
-  /// Formats of verified presences, as defined by ACPI_TABLE_PRESENT_*
-  /// This field should be initialized to 0 and will be populated during
-  /// verification routine.
-  UINT16                Presence;
-} ACPI_TABLE_PRESENCE_INFO;
+#include "DynamicTableManagerDxe.h"
 
 ///
 /// We require the FADT, MADT, GTDT and the DSDT tables to boot.
 /// This list also include optional ACPI tables: DBG2, SPCR.
 ///
-ACPI_TABLE_PRESENCE_INFO  mAcpiVerifyTables[ACPI_TABLE_VERIFY_COUNT] = {
-  { EStdAcpiTableIdFadt, EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,            "FADT", TRUE,  0 },
-  { EStdAcpiTableIdMadt, EFI_ACPI_6_2_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,         "MADT", TRUE,  0 },
-  { EStdAcpiTableIdGtdt, EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,         "GTDT", TRUE,  0 },
-  { EStdAcpiTableIdDsdt, EFI_ACPI_6_2_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE, "DSDT", TRUE,  0 },
-  { EStdAcpiTableIdDbg2, EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,                      "DBG2", FALSE, 0 },
-  { EStdAcpiTableIdSpcr, EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,   "SPCR", FALSE, 0 },
-};
+STATIC ACPI_TABLE_PRESENCE_INFO  *mAcpiVerifyTables;
+STATIC UINT32                    mAcpiVerifyTablesCount;
+STATIC INT32                     mAcpiVerifyTablesFadtIndex;
 
 /** This macro expands to a function that retrieves the ACPI Table
     List from the Configuration Manager.
@@ -472,7 +430,7 @@ VerifyMandatoryTablesArePresent (
 
   // Check against the statically initialized ACPI tables to see if they are in ACPI info list
   while (AcpiTableCount-- != 0) {
-    for (Index = 0; Index < ACPI_TABLE_VERIFY_COUNT; Index++) {
+    for (Index = 0; Index < mAcpiVerifyTablesCount; Index++) {
       if (AcpiTableInfo[AcpiTableCount].AcpiTableSignature == mAcpiVerifyTables[Index].AcpiTableSignature) {
         mAcpiVerifyTables[Index].Presence |= ACPI_TABLE_PRESENT_INFO_LIST;
         // Found this table, skip the rest.
@@ -491,7 +449,7 @@ VerifyMandatoryTablesArePresent (
       return Status;
     }
 
-    for (Index = 0; Index < ACPI_TABLE_VERIFY_COUNT; Index++) {
+    for (Index = 0; Index < mAcpiVerifyTablesCount; Index++) {
       Handle              = 0;
       InstalledTableIndex = 0;
       do {
@@ -511,7 +469,7 @@ VerifyMandatoryTablesArePresent (
 
   // Reset the return Status value to EFI_SUCCESS. We do not fully care if the table look up has failed.
   Status = EFI_SUCCESS;
-  for (Index = 0; Index < ACPI_TABLE_VERIFY_COUNT; Index++) {
+  for (Index = 0; Index < mAcpiVerifyTablesCount; Index++) {
     if (mAcpiVerifyTables[Index].Presence == 0) {
       if (mAcpiVerifyTables[Index].IsMandatory) {
         DEBUG ((DEBUG_ERROR, "ERROR: %a Table not found.\n", mAcpiVerifyTables[Index].AcpiTableName));
@@ -623,7 +581,9 @@ ProcessAcpiTables (
   }
 
   // Add the FADT Table first.
-  if ((mAcpiVerifyTables[ACPI_TABLE_VERIFY_FADT].Presence & ACPI_TABLE_PRESENT_INSTALLED) == 0) {
+  if ((mAcpiVerifyTablesFadtIndex >= 0) &&
+      ((mAcpiVerifyTables[mAcpiVerifyTablesFadtIndex].Presence & ACPI_TABLE_PRESENT_INSTALLED) == 0))
+  {
     // FADT is not yet installed
     for (Idx = 0; Idx < AcpiTableCount; Idx++) {
       if (CREATE_STD_ACPI_TABLE_GEN_ID (EStdAcpiTableIdFadt) ==
@@ -784,6 +744,16 @@ DynamicTableManagerDxeInitialize (
     CfgMfrInfo->OemId[4],
     CfgMfrInfo->OemId[5]
     ));
+
+  Status = GetAcpiTablePresenceInfo (
+             &mAcpiVerifyTables,
+             &mAcpiVerifyTablesCount,
+             &mAcpiVerifyTablesFadtIndex
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   Status = ProcessAcpiTables (TableFactoryProtocol, CfgMgrProtocol);
   if (EFI_ERROR (Status)) {
