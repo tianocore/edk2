@@ -20,6 +20,9 @@
   SsdtCpuTopologyGenerator.c
   SsdtCpuTopologyGenerator.h
 
+[Sources.ARM, Sources.AARCH64]
+  Arm/ArmSsdtCpuTopologyGenerator.c
+
 [Packages.ARM, Packages.AARCH64]
   ArmPlatformPkg/ArmPlatformPkg.dec
 
