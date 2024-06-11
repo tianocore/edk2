@@ -59,6 +59,7 @@
   StandaloneMmCoreEntryPoint|StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
   StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   VariableMmDependency|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
+  MmPlatformHobProducerLib|StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
 
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -117,6 +118,7 @@
   StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
   StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
   StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
+  StandaloneMmPkg/Library/MmPlatformHobProducerLibNull/MmPlatformHobProducerLibNull.inf
 
 [Components.AARCH64, Components.ARM]
   StandaloneMmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
