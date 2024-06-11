@@ -343,6 +343,11 @@ gettimeofday (
   struct timezone  *tz
   );
 
+time_t
+mktime (
+  struct tm  *t
+  );
+
 uid_t
 getuid      (
   void

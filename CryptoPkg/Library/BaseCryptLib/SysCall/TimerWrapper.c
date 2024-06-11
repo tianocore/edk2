@@ -140,6 +140,24 @@ time (
   return CalTime;
 }
 
+time_t
+mktime (
+  struct tm  *t
+  )
+{
+  EFI_TIME  Time = {
+    .Year     = t->tm_year,
+    .Month    = t->tm_mon,
+    .Day      = t->tm_mday,
+    .Hour     = t->tm_hour,
+    .Minute   = t->tm_min,
+    .Second   = t->tm_sec,
+    .TimeZone = EFI_UNSPECIFIED_TIMEZONE,
+  };
+
+  return CalculateTimeT (&Time);
+}
+
 //
 // Convert a time value from type time_t to struct tm.
 //
