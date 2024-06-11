@@ -160,6 +160,7 @@ struct sockaddr {
 //
 extern int   errno;
 extern FILE  *stderr;
+extern long  timezone;
 
 //
 // Function prototypes of CRT Library routines
