@@ -12,6 +12,7 @@
 # configuring it.
 #
 # Copyright (C) 2013, 2015, Red Hat, Inc.
+# Copyright (c) 2024, Intel Corporation. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -61,8 +62,9 @@
   gEfiSmmControl2ProtocolGuid   ## PRODUCES
 
 [Pcd]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout ## SOMETIMES_PRODUCES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode      ## SOMETIMES_PRODUCES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout  ## SOMETIMES_PRODUCES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2 ## SOMETIMES_PRODUCES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode       ## SOMETIMES_PRODUCES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
 
 [FeaturePcd]
