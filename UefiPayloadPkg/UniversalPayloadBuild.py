@@ -112,6 +112,8 @@ def RunCommand(cmd):
         raise Exception("ERROR: when run command: %s"%cmd)
 
 def BuildUniversalPayload(Args):
+    DscPath = os.path.normpath(Args.DscPath)
+    print("Building FIT for DSC file %s"%DscPath)
     BuildTarget = Args.Target
     ToolChain = Args.ToolChain
     Quiet     = "--quiet"  if Args.Quiet else ""
@@ -140,7 +142,6 @@ def BuildUniversalPayload(Args):
 
     EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, PayloadEntryToolChain), os.path.normpath("{}/UefiPayloadPkg/UefiPayloadEntry/{}/DEBUG/{}.dll".format (Args.Arch, UpldEntryFile, UpldEntryFile)))
     EntryModuleInf = os.path.normpath("UefiPayloadPkg/UefiPayloadEntry/{}.inf".format (UpldEntryFile))
-    DscPath = os.path.normpath("UefiPayloadPkg/UefiPayloadPkg.dsc")
     DxeFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))
     BdsFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/BDSFV.Fv"))
     NetworkFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/NETWORKFV.Fv"))
@@ -321,6 +322,7 @@ def main():
     parser.add_argument("-af", "--AddFv", type=ValidateAddFv, action='append', help='Add or replace specific FV into payload, Ex: uefi_fv=XXX.fv')
     parser.add_argument("-f", "--Fit", action='store_true', help='Build UniversalPayload file as UniversalPayload.fit', default=False)
     parser.add_argument('-l', "--LoadAddress", type=int, help='Specify payload load address', default =0x000800000)
+    parser.add_argument('-c', '--DscPath', type=str, default="UefiPayloadPkg/UefiPayloadPkg.dsc", help='Path to the DSC file')
 
     args = parser.parse_args()
 
