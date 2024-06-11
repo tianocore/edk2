@@ -43,6 +43,14 @@ gmtime (
   return NULL;
 }
 
+time_t
+mktime (
+  struct tm  *t
+  )
+{
+  return 0;
+}
+
 unsigned int
 sleep (
   unsigned int  seconds
