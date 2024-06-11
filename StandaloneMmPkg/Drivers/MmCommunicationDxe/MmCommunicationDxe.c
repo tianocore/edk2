@@ -16,6 +16,13 @@ EFI_MM_COMMUNICATION2_PROTOCOL  mMmCommunication2 = {
   MmCommunicate2
 };
 
+//
+// PI 1.7 MM Communication Protocol instance
+//
+EFI_MM_COMMUNICATION_PROTOCOL  mMmCommunication = {
+  MmCommunicate
+};
+
 MM_COMM_BUFFER             mMmCommonBuffer;
 EFI_SMM_CONTROL2_PROTOCOL  *mSmmControl2;
 
@@ -45,7 +52,7 @@ MmVariableAddressChangeEvent (
   Processes the communication buffer for Mm communication protocols.
 
   This function encapsulates the common logic for handling communication buffers
-  used by MmCommunicate2 functions.
+  used by MmCommunicate2 and MmCommunicate functions.
 
   @param[in, out] CommBuffer          Pointer to the MM communication buffer
   @param[in, out] CommSize            The size of the data buffer being passed in. On exit, the size of data
@@ -165,6 +172,40 @@ MmCommunicate2 (
 }
 
 /**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                     The EFI_MM_COMMUNICATION_PROTOCOL instance.
+  @param[in, out] CommBuffer          Pointer to the MM communication buffer
+  @param[in, out] CommSize            The size of the data buffer being passed in. On exit, the size of data
+                                      being returned. Zero if the handler does not wish to reply with any data.
+                                      This parameter is optional and may be NULL.
+
+  @retval EFI_SUCCESS                 The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER       The CommBuffer was NULL.
+  @retval EFI_BAD_BUFFER_SIZE         The buffer is too large for the MM implementation.
+                                      If this error is returned, the MessageLength field
+                                      in the CommBuffer header or the integer pointed by
+                                      CommSize, are updated to reflect the maximum payload
+                                      size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED           The CommunicateBuffer parameter or CommSize parameter,
+                                      if not omitted, are in address range that cannot be
+                                      accessed by the MM environment.
+
+**/
+EFI_STATUS
+EFIAPI
+MmCommunicate (
+  IN CONST EFI_MM_COMMUNICATION_PROTOCOL  *This,
+  IN OUT VOID                             *CommBuffer,
+  IN OUT UINTN                            *CommSize OPTIONAL
+  )
+{
+  return ProcessCommunicationBuffer (CommBuffer, CommSize);
+}
+
+/**
   The Entry Point for MmCommunicateDxe driver.
 
   @param  ImageHandle    The firmware allocated handle for the EFI image.
@@ -206,6 +247,14 @@ MmCommunicationEntryPoint (
                   &gEfiMmCommunication2ProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &mMmCommunication2
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->InstallProtocolInterface (
+                  &Handle,
+                  &gEfiMmCommunicationProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &mMmCommunication
                   );
   ASSERT_EFI_ERROR (Status);
 

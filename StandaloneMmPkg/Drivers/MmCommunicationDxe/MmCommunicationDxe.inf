@@ -45,6 +45,7 @@
 [Protocols]
   gEfiMmCommunication2ProtocolGuid
   gEfiSmmControl2ProtocolGuid
+  gEfiMmCommunicationProtocolGuid
 
 [Depex]
   gEfiSmmControl2ProtocolGuid
