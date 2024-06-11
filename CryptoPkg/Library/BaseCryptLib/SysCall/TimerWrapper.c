@@ -80,6 +80,37 @@ IsLeap (
   return (Remainder1 == 0 && (Remainder2 != 0 || Remainder3 == 0));
 }
 
+STATIC
+time_t
+CalculateTimeT (
+  EFI_TIME  *Time
+  )
+{
+  time_t  CalTime;
+  UINTN   Year;
+
+  //
+  // Years Handling
+  // UTime should now be set to 00:00:00 on Jan 1 of the current year.
+  //
+  for (Year = 1970, CalTime = 0; Year != Time->Year; Year++) {
+    CalTime = CalTime + (time_t)(CumulativeDays[IsLeap (Year)][13] * SECSPERDAY);
+  }
+
+  //
+  // Add in number of seconds for current Month, Day, Hour, Minute, Seconds, and TimeZone adjustment
+  //
+  CalTime = CalTime +
+            (time_t)((Time->TimeZone != EFI_UNSPECIFIED_TIMEZONE) ? (Time->TimeZone * 60) : 0) +
+            (time_t)(CumulativeDays[IsLeap (Time->Year)][Time->Month] * SECSPERDAY) +
+            (time_t)(((Time->Day > 0) ? Time->Day - 1 : 0) * SECSPERDAY) +
+            (time_t)(Time->Hour * SECSPERHOUR) +
+            (time_t)(Time->Minute * 60) +
+            (time_t)Time->Second;
+
+  return CalTime;
+}
+
 /* Get the system time as seconds elapsed since midnight, January 1, 1970. */
 // INTN time(
 //  INTN *timer
@@ -92,7 +123,6 @@ time (
   EFI_STATUS  Status;
   EFI_TIME    Time;
   time_t      CalTime;
-  UINTN       Year;
 
   //
   // Get the current time and date information
@@ -102,24 +132,7 @@ time (
     return 0;
   }
 
-  //
-  // Years Handling
-  // UTime should now be set to 00:00:00 on Jan 1 of the current year.
-  //
-  for (Year = 1970, CalTime = 0; Year != Time.Year; Year++) {
-    CalTime = CalTime + (time_t)(CumulativeDays[IsLeap (Year)][13] * SECSPERDAY);
-  }
-
-  //
-  // Add in number of seconds for current Month, Day, Hour, Minute, Seconds, and TimeZone adjustment
-  //
-  CalTime = CalTime +
-            (time_t)((Time.TimeZone != EFI_UNSPECIFIED_TIMEZONE) ? (Time.TimeZone * 60) : 0) +
-            (time_t)(CumulativeDays[IsLeap (Time.Year)][Time.Month] * SECSPERDAY) +
-            (time_t)(((Time.Day > 0) ? Time.Day - 1 : 0) * SECSPERDAY) +
-            (time_t)(Time.Hour * SECSPERHOUR) +
-            (time_t)(Time.Minute * 60) +
-            (time_t)Time.Second;
+  CalTime = CalculateTimeT (&Time);
 
   if (timer != NULL) {
     *timer = CalTime;
