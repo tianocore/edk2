@@ -19,13 +19,35 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiRuntimeLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 #include <Protocol/SmmControl2.h>
 #include <Protocol/MmCommunication2.h>
 #include <Protocol/MmCommunication.h>
+#include <Protocol/DxeMmReadyToLock.h>
+#include <Protocol/SmmAccess2.h>
 
 #include <Guid/MmCommBuffer.h>
 #include <Guid/EventGroup.h>
+
+typedef enum {
+  EventNotify,
+  ProtocolNotify,
+  EndNotify,
+} NOTIFICATION_TYPE;
+
+//
+// Data structure used to declare a table of protocol notifications and event
+// notifications required by the Standalone Mm environment
+//
+typedef struct {
+  NOTIFICATION_TYPE    NotificationType;
+  BOOLEAN              CloseOnLock;
+  EFI_GUID             *Guid;
+  EFI_EVENT_NOTIFY     NotifyFunction;
+  VOID                 *NotifyContext;
+  EFI_EVENT            Event;
+} MM_EVENT_NOTIFICATION;
 
 /**
   Communicates with a registered handler.
@@ -89,6 +111,66 @@ MmCommunicate (
   IN CONST EFI_MM_COMMUNICATION_PROTOCOL  *This,
   IN OUT VOID                             *CommBufferPhysical,
   IN OUT UINTN                            *CommSize OPTIONAL
+  );
+
+/**
+  Event notification that is fired every time a DxeSmmReadyToLock protocol is added
+  or if gEfiEventReadyToBootGuid is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MmReadyToLockEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
+/**
+  Event notification that is fired when GUIDed Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MmGuidedEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
+/**
+  Event notification that is fired when EndOfDxe Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MmEndOfDxeEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  );
+
+/**
+  Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE.
+
+  This is a notification function registered on EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
+  It convers pointer to new virtual address.
+
+  @param[in]  Event        Event whose notification function is being invoked.
+  @param[in]  Context      Pointer to the notification function's context.
+
+**/
+VOID
+EFIAPI
+MmVirtualAddressChangeEvent (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   );
 
 #endif
