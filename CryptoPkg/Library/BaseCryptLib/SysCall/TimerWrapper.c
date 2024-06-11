@@ -235,7 +235,7 @@ gettimeofday (
   struct timezone  *tz
   )
 {
-  tv->tv_sec  = time (NULL);
+  tv->tv_sec  = (long)time (NULL);
   tv->tv_usec = 0;
   return 0;
 }
