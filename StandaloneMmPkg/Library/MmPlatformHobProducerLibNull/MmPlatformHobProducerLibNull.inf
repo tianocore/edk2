@@ -1,0 +1,28 @@
+## @file
+# Null instance of MM Platform HOB Producer Library Class.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = MmPlatformHobProducerLibNull
+  FILE_GUID                      = DE6B5E7C-6636-4646-90F8-776408157750
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MmPlatformHobProducerLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  MmPlatformHobProducerLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
