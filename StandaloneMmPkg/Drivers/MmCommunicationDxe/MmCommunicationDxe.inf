@@ -37,15 +37,20 @@
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeLib
+  ReportStatusCodeLib
 
 [Guids]
   gEdkiiCommunicationBufferGuid
   gEfiEventVirtualAddressChangeGuid
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventExitBootServicesGuid
 
 [Protocols]
   gEfiMmCommunication2ProtocolGuid
   gEfiSmmControl2ProtocolGuid
   gEfiMmCommunicationProtocolGuid
+  gEfiDxeSmmReadyToLockProtocolGuid
+  gEfiSmmAccess2ProtocolGuid
 
 [Depex]
-  gEfiSmmControl2ProtocolGuid
+  gEfiSmmAccess2ProtocolGuid AND gEfiSmmControl2ProtocolGuid
