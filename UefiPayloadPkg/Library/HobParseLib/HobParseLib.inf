@@ -35,6 +35,6 @@
   PcdLib
   HobLib
 
-[Pcd.IA32,Pcd.X64]
+[Pcd.IA32,Pcd.X64,Pcd.RISCV64]
   gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
   gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable
