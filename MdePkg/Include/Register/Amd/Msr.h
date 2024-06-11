@@ -14,8 +14,8 @@
 
 **/
 
-#ifndef __AMD_MSR_H__
-#define __AMD_MSR_H__
+#ifndef AMD_MSR_H_
+#define AMD_MSR_H_
 
 #include <Register/Intel/ArchitecturalMsr.h>
 #include <Register/Amd/SevSnpMsr.h>
