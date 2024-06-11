@@ -123,4 +123,5 @@ gettimeofday (
   return 0;
 }
 
-int  errno = 0;
+int   errno = 0;
+long  timezone;
