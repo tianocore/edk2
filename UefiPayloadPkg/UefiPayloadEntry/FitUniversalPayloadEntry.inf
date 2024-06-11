@@ -82,7 +82,7 @@
 [FeaturePcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
 
-[Pcd.IA32,Pcd.X64]
+[Pcd.IA32,Pcd.X64,Pcd.RISCV64]
   gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
