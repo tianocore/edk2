@@ -69,3 +69,5 @@ gettimeofday (
   tv->tv_usec = 0;
   return 0;
 }
+
+long  timezone;

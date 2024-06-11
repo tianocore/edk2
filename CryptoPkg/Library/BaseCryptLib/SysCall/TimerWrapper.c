@@ -20,6 +20,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define SECSPERHOUR  (60 * 60)
 #define SECSPERDAY   (24 * SECSPERHOUR)
 
+long  timezone;
+
 //
 //  The arrays give the cumulative number of days up to the first of the
 //  month number used as the index (1 -> 12) for regular and leap years.
