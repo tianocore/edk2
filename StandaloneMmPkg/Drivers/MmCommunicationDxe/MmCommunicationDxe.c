@@ -25,6 +25,203 @@ EFI_MM_COMMUNICATION_PROTOCOL  mMmCommunication = {
 
 MM_COMM_BUFFER             mMmCommonBuffer;
 EFI_SMM_CONTROL2_PROTOCOL  *mSmmControl2;
+EFI_SMM_ACCESS2_PROTOCOL   *mSmmAccess;
+BOOLEAN                    mSmmLocked = FALSE;
+BOOLEAN                    mEndOfDxe  = FALSE;
+
+//
+// Data structure used to declare a table of protocol notifications and event
+// notifications required by the Standalone Mm environment
+//
+typedef struct {
+  BOOLEAN             Protocol;
+  BOOLEAN             CloseOnLock;
+  EFI_GUID            *Guid;
+  EFI_EVENT_NOTIFY    NotifyFunction;
+  VOID                *NotifyContext;
+  EFI_TPL             NotifyTpl;
+  EFI_EVENT           Event;
+} MM_EVENT_NOTIFICATION;
+
+//
+// Table of Protocol notification and GUIDed Event notifications that the Standalone Mm requires
+//
+MM_EVENT_NOTIFICATION  mMmEvents[] = {
+  //
+  // Declare protocol notification on DxeSmmReadyToLock protocols.  When this notification is established,
+  // the associated event is immediately signalled, so the notification function will be executed and the
+  // DXE SMM Ready To Lock Protocol will be found if it is already in the handle database.
+  //
+  { TRUE,  TRUE,  &gEfiDxeSmmReadyToLockProtocolGuid, MmReadyToLockEventNotify,     &gEfiDxeSmmReadyToLockProtocolGuid, TPL_CALLBACK, NULL },
+  //
+  // Declare event notification on EndOfDxe event.  When this notification is established,
+  // the associated event is immediately signalled, so the notification function will be executed and the
+  // SMM End Of Dxe Protocol will be found if it is already in the handle database.
+  //
+  { FALSE, TRUE,  &gEfiEndOfDxeEventGroupGuid,        MmGuidedEventNotify,          &gEfiEndOfDxeEventGroupGuid,        TPL_CALLBACK, NULL },
+  //
+  // Declare event notification on EndOfDxe event.  This is used to set EndOfDxe event signaled flag.
+  //
+  { FALSE, TRUE,  &gEfiEndOfDxeEventGroupGuid,        MmEndOfDxeEventNotify,        &gEfiEndOfDxeEventGroupGuid,        TPL_CALLBACK, NULL },
+  //
+  // Declare event notification on Ready To Boot Event Group.  This is an extra event notification that is
+  // used to make sure SMRAM is locked before any boot options are processed.
+  //
+  { FALSE, TRUE,  &gEfiEventReadyToBootGuid,          MmReadyToLockEventNotify,     &gEfiEventReadyToBootGuid,          TPL_CALLBACK, NULL },
+  //
+  // Declare event notification on Ready To Boot Event Group.  This is used to inform the SMM Core
+  // to notify SMM driver that system enter ready to boot.
+  //
+  { FALSE, FALSE, &gEfiEventReadyToBootGuid,          MmGuidedEventNotify,          &gEfiEventReadyToBootGuid,          TPL_CALLBACK, NULL },
+  //
+  // Declare event notification on Exit Boot Services Event Group.  This is used to inform the SMM Core
+  // to notify SMM driver that system enter exit boot services.
+  //
+  { FALSE, FALSE, &gEfiEventExitBootServicesGuid,     MmGuidedEventNotify,          &gEfiEventExitBootServicesGuid,     TPL_CALLBACK, NULL },
+  //
+  // Declare event notification on SetVirtualAddressMap() Event Group.  This is used to convert FixedCommBuffer
+  // and CommunicationInOut in mMmCommonBuffer, mSmmControl2 from physical addresses to virtual addresses.
+  //
+  { FALSE, FALSE, &gEfiEventVirtualAddressChangeGuid, MmVariableAddressChangeEvent, NULL,                               TPL_CALLBACK, NULL },
+  //
+  // Terminate the table of event notifications
+  //
+  { FALSE, FALSE, NULL,                               NULL,                         NULL,                               TPL_CALLBACK, NULL }
+};
+
+/**
+  Event notification that is fired when GUIDed Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MmGuidedEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  UINTN                      Size;
+  EFI_MM_COMMUNICATE_HEADER  *CommunicateHeader;
+
+  CommunicateHeader = (EFI_MM_COMMUNICATE_HEADER *)(UINTN)mMmCommonBuffer.FixedCommBuffer;
+
+  //
+  // Use Guid to initialize EFI_MM_COMMUNICATE_HEADER structure
+  //
+  CopyGuid (&CommunicateHeader->HeaderGuid, (EFI_GUID *)Context);
+  CommunicateHeader->MessageLength = 1;
+  CommunicateHeader->Data[0]       = 0;
+
+  //
+  // Generate the Software SMI and return the result
+  //
+  Size = sizeof (EFI_MM_COMMUNICATE_HEADER);
+  MmCommunicate2 (&mMmCommunication2, CommunicateHeader, CommunicateHeader, &Size);
+}
+
+/**
+  Event notification that is fired every time a DxeSmmReadyToLock protocol is added
+  or if gEfiEventReadyToBootGuid is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MmReadyToLockEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *Interface;
+  UINTN       Index;
+
+  //
+  // See if we are already locked
+  //
+  if (mSmmLocked) {
+    return;
+  }
+
+  //
+  // Make sure this notification is for this handler
+  //
+  if (CompareGuid ((EFI_GUID *)Context, &gEfiDxeSmmReadyToLockProtocolGuid)) {
+    Status = gBS->LocateProtocol (&gEfiDxeSmmReadyToLockProtocolGuid, NULL, &Interface);
+    if (EFI_ERROR (Status)) {
+      return;
+    }
+  } else {
+    //
+    // If SMM is not locked yet and we got here from gEfiEventReadyToBootGuid being
+    // signaled, then gEfiDxeSmmReadyToLockProtocolGuid was not installed as expected.
+    // Print a warning on debug builds.
+    //
+    DEBUG ((DEBUG_WARN, "DXE SMM Ready To Lock Protocol not installed before Ready To Boot signal\n"));
+  }
+
+  if (!mEndOfDxe) {
+    DEBUG ((DEBUG_ERROR, "EndOfDxe Event must be signaled before DxeSmmReadyToLock Protocol installation!\n"));
+    REPORT_STATUS_CODE (
+      EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED,
+      (EFI_SOFTWARE_SMM_DRIVER | EFI_SW_EC_ILLEGAL_SOFTWARE_STATE)
+      );
+    ASSERT (FALSE);
+  }
+
+  //
+  // Lock the SMRAM (Note: Locking SMRAM may not be supported on all platforms)
+  //
+  mSmmAccess->Lock (mSmmAccess);
+
+  //
+  // Close protocol and event notification events that do not apply after the
+  // DXE SMM Ready To Lock Protocol has been installed or the Ready To Boot
+  // event has been signalled.
+  //
+  for (Index = 0; mMmEvents[Index].NotifyFunction != NULL; Index++) {
+    if (mMmEvents[Index].CloseOnLock) {
+      gBS->CloseEvent (mMmEvents[Index].Event);
+    }
+  }
+
+  //
+  // Inform SMM Core that the DxeSmmReadyToLock protocol was installed
+  //
+  MmGuidedEventNotify (Event, (VOID *)&gEfiDxeSmmReadyToLockProtocolGuid);
+
+  //
+  // Print debug message that the SMRAM window is now locked.
+  //
+  DEBUG ((DEBUG_INFO, "MmCommunicationDxe locked SMRAM window\n"));
+
+  //
+  // Set flag so this operation will not be performed again
+  //
+  mSmmLocked = TRUE;
+}
+
+/**
+  Event notification that is fired when EndOfDxe Event Group is signaled.
+
+  @param  Event                 The Event that is being processed, not used.
+  @param  Context               Event Context, not used.
+
+**/
+VOID
+EFIAPI
+MmEndOfDxeEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  mEndOfDxe = TRUE;
+}
 
 /**
   Notification function of EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE.
@@ -226,6 +423,8 @@ MmCommunicationEntryPoint (
   EFI_HANDLE         Handle;
   EFI_HOB_GUID_TYPE  *GuidHob;
   MM_COMM_BUFFER     *MmCommonBuffer;
+  UINTN              Index;
+  VOID               *Registration;
 
   //
   // Locate gEdkiiCommunicationBufferGuid and cache the content
@@ -239,6 +438,12 @@ MmCommunicationEntryPoint (
   // Get SMM Control2 Protocol
   //
   Status = gBS->LocateProtocol (&gEfiSmmControl2ProtocolGuid, NULL, (VOID **)&mSmmControl2);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Get SMM Access Protocol
+  //
+  Status = gBS->LocateProtocol (&gEfiSmmAccess2ProtocolGuid, NULL, (VOID **)&mSmmAccess);
   ASSERT_EFI_ERROR (Status);
 
   Handle = NULL;
@@ -259,17 +464,29 @@ MmCommunicationEntryPoint (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Register the event to convert the pointer for runtime.
+  // Create the set of protocol and event notifications that the Standalone Mm requires
   //
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  MmVariableAddressChangeEvent,
-                  NULL,
-                  &gEfiEventVirtualAddressChangeGuid,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
+  for (Index = 0; mMmEvents[Index].NotifyFunction != NULL; Index++) {
+    if (mMmEvents[Index].Protocol) {
+      mMmEvents[Index].Event = EfiCreateProtocolNotifyEvent (
+                                 mMmEvents[Index].Guid,
+                                 mMmEvents[Index].NotifyTpl,
+                                 mMmEvents[Index].NotifyFunction,
+                                 mMmEvents[Index].NotifyContext,
+                                 &Registration
+                                 );
+    } else {
+      Status = gBS->CreateEventEx (
+                      EVT_NOTIFY_SIGNAL,
+                      mMmEvents[Index].NotifyTpl,
+                      mMmEvents[Index].NotifyFunction,
+                      mMmEvents[Index].NotifyContext,
+                      mMmEvents[Index].Guid,
+                      &mMmEvents[Index].Event
+                      );
+      ASSERT_EFI_ERROR (Status);
+    }
+  }
 
   return EFI_SUCCESS;
 }
