@@ -147,23 +147,34 @@ PiMmStandaloneMmCpuDriverEntry (
   NsCommBufferSize = ((EFI_MM_COMMUNICATE_HEADER *)NsCommBufferAddr)->MessageLength +
                      sizeof (EFI_MM_COMMUNICATE_HEADER);
 
-  GuidedEventContext = NULL;
-  // Now that the secure world can see the normal world buffer, allocate
-  // memory to copy the communication buffer to the secure world.
-  Status = mMmst->MmAllocatePool (
-                    EfiRuntimeServicesData,
-                    NsCommBufferSize,
-                    (VOID **)&GuidedEventContext
-                    );
+  if (FixedPcdGetBool (PcdRuntimeMemoryOnHeap)) {
+    //
+    // When runtime memory is allocated on the heap the buffer allocated by
+    // MmAllocatePool is within the MM 'secure world'. The MMI handler will
+    // assert as it checks again if the passed buffer is outside the 'secure world'.
+    // Thus drop the separate allocation and directly pass the NS buffer to
+    // the MMI handler.
+    //
+    GuidedEventContext = (VOID *)NsCommBufferAddr;
+  } else {
+    GuidedEventContext = NULL;
+    // Now that the secure world can see the normal world buffer, allocate
+    // memory to copy the communication buffer to the secure world.
+    Status = mMmst->MmAllocatePool (
+                      EfiRuntimeServicesData,
+                      NsCommBufferSize,
+                      (VOID **)&GuidedEventContext
+                      );
 
-  if (Status != EFI_SUCCESS) {
-    DEBUG ((DEBUG_ERROR, "Mem alloc failed - 0x%x\n", EventId));
-    return EFI_OUT_OF_RESOURCES;
+    if (Status != EFI_SUCCESS) {
+      DEBUG ((DEBUG_ERROR, "Mem alloc failed - 0x%x\n", EventId));
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    // X1 contains the VA of the normal world memory accessible from
+    // secure world.
+    CopyMem (GuidedEventContext, (CONST VOID *)NsCommBufferAddr, NsCommBufferSize);
   }
-
-  // X1 contains the VA of the normal world memory accessible from
-  // secure world.
-  CopyMem (GuidedEventContext, (CONST VOID *)NsCommBufferAddr, NsCommBufferSize);
 
   // Stash the pointer to the allocated Event Context for this CPU
   PerCpuGuidedEventContext[CpuNumber] = GuidedEventContext;
@@ -188,11 +199,14 @@ PiMmStandaloneMmCpuDriverEntry (
 
   // Free the memory allocation done earlier and reset the per-cpu context
   ASSERT (GuidedEventContext);
-  CopyMem ((VOID *)NsCommBufferAddr, (CONST VOID *)GuidedEventContext, NsCommBufferSize);
 
-  Status = mMmst->MmFreePool ((VOID *)GuidedEventContext);
-  if (Status != EFI_SUCCESS) {
-    return EFI_OUT_OF_RESOURCES;
+  if (!FixedPcdGetBool (PcdRuntimeMemoryOnHeap)) {
+    CopyMem ((VOID *)NsCommBufferAddr, (CONST VOID *)GuidedEventContext, NsCommBufferSize);
+
+    Status = mMmst->MmFreePool ((VOID *)GuidedEventContext);
+    if (Status != EFI_SUCCESS) {
+      return EFI_OUT_OF_RESOURCES;
+    }
   }
 
   PerCpuGuidedEventContext[CpuNumber] = NULL;

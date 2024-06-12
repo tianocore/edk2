@@ -53,3 +53,12 @@
   #  in the MM phase. Minimum value is 1. Sections nested more deeply are rejected.
   # @Prompt Maximum permitted FwVol section nesting depth (exclusive) in MM.
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth|0x10|UINT32|0x00000001
+  ## Use a fixed size memory buffer on the heap as free memory pool.
+  #  Using this option will increase the binary size, but removes the callers need
+  #  to provide a memory range in the 'secure world' that can be used for runtime
+  #  memory allocations.
+  #  You need at least PcdVariableStoreSize + MAX(PcdMaxVolatileVariableSize, PcdMaxVariableSize,
+  #  PcdMaxAuthVariableSize, PcdMaxHardwareErrorVariableSize) + NvVariableLength of memory.
+
+  gStandaloneMmPkgTokenSpaceGuid.PcdRuntimeMemoryOnHeap|FALSE|BOOLEAN|0x00000002
+  gStandaloneMmPkgTokenSpaceGuid.PcdRuntimeMemoryOnHeapSize|0x100000|UINT32|0x00000003

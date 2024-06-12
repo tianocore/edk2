@@ -78,6 +78,8 @@
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
+  gStandaloneMmPkgTokenSpaceGuid.PcdRuntimeMemoryOnHeap             ##CONSUMES
+  gStandaloneMmPkgTokenSpaceGuid.PcdRuntimeMemoryOnHeapSize         ##CONSUMES
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC

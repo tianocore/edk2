@@ -9,6 +9,20 @@
 
 #include "StandaloneMmCore.h"
 
+#if defined (__GNUC__)
+#define ALIGN_EFI_PAGE  __attribute__((aligned(EFI_PAGE_SIZE)))
+#elif defined (_MSC_VER)
+#define ALIGN_EFI_PAGE  __declspec(align(EFI_PAGE_SIZE))
+#elif defined (__SUNPRO_C)
+#define ALIGN_EFI_PAGE
+  #pragma align EFI_PAGE_SIZE(one,two80)
+#else
+/* not fatal, might waste a bit of memory */
+#define ALIGN_EFI_PAGE
+#endif
+
+ALIGN_EFI_PAGE STATIC UINT8  FreePoolOnHeap[FixedPcdGet32 (PcdRuntimeMemoryOnHeapSize)];
+
 LIST_ENTRY  mMmPoolLists[MAX_POOL_INDEX];
 //
 // To cache the MMRAM base since when Loading modules At fixed address feature is enabled,
@@ -61,6 +75,15 @@ MmInitializeMemoryServices (
       MmramRanges[Index].PhysicalSize,
       EfiConventionalMemory,
       MmramRanges[Index].RegionState
+      );
+  }
+
+  if (FixedPcdGetBool (PcdRuntimeMemoryOnHeap)) {
+    MmAddMemoryRegion (
+      (UINTN)FreePoolOnHeap,
+      sizeof (FreePoolOnHeap),
+      EfiConventionalMemory,
+      EFI_CACHEABLE
       );
   }
 }

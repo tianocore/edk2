@@ -37,6 +37,9 @@
   gEfiMmConfigurationProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
   gEfiMmCpuProtocolGuid                                  # PROTOCOL ALWAYS_PRODUCED
 
+[Pcd]
+  gStandaloneMmPkgTokenSpaceGuid.PcdRuntimeMemoryOnHeap ##CONSUMES
+
 [Guids]
   gEfiHobListGuid
   gEfiMmPeiMmramMemoryReserveGuid
