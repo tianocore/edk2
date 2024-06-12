@@ -389,7 +389,8 @@ createServiceEnumerator (
     goto ON_EXIT;
   }
 
-  ret->RestEx = RestEx;
+  if(ret)
+    ret->RestEx = RestEx;
 ON_EXIT:
   if (HttpUrl != NULL) {
     FreePool (HttpUrl);
