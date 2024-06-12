@@ -29,9 +29,22 @@
 
 [LibraryClasses]
   UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  HobLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeLib
 
 [Guids]
+  gMmCommBufferHobGuid
+  gEfiEventVirtualAddressChangeGuid
 
 [Protocols]
+  gEfiMmCommunication2ProtocolGuid
+  gEfiSmmControl2ProtocolGuid
 
 [Depex]
+  gEfiSmmControl2ProtocolGuid
