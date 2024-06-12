@@ -77,6 +77,16 @@
 [LibraryClasses.common.MM_STANDALONE]
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
 
+[LibraryClasses.common.DXE_RUNTIME_DRIVER]
+  UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+  MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+  UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
+  UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
+  UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
+  DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+
 ################################################################################
 #
 # Pcd Section - list of all EDK II PCD Entries defined by this Platform
@@ -118,6 +128,7 @@
   StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
   StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
   StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
+  StandaloneMmPkg/Drivers/MmCommunicationDxe/MmCommunicationDxe.inf
 
 [Components.AARCH64, Components.ARM]
   StandaloneMmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
