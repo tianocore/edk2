@@ -89,6 +89,7 @@ GetGuidedHobData (
                                   driver endpoint descriptor.
 **/
 EFI_STATUS
+EFIAPI
 StandaloneMmCpuInitialize (
   IN EFI_HANDLE           ImageHandle,   // not actual imagehandle
   IN EFI_MM_SYSTEM_TABLE  *SystemTable   // not actual systemtable

@@ -117,6 +117,7 @@ CheckBufferAddr (
   @retval   EFI_UNSUPPORTED         Operation not supported.
 **/
 EFI_STATUS
+EFIAPI
 PiMmStandaloneMmCpuDriverEntry (
   IN UINTN  EventId,
   IN UINTN  CpuNumber,
