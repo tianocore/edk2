@@ -23,7 +23,6 @@
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/RngLib.h>
 
 #include "RngDxeInternals.h"
 
@@ -44,12 +43,7 @@ GetAvailableAlgorithms (
   VOID
   )
 {
-  UINT64  RngTest;
-
-  if (GetRandomNumber64 (&RngTest)) {
-    mAvailableAlgoArrayCount = RNG_ALGORITHM_COUNT;
-  }
-
+  mAvailableAlgoArrayCount = RNG_ALGORITHM_COUNT;
   return EFI_SUCCESS;
 }
 
