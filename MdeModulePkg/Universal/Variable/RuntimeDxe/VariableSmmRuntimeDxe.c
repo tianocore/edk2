@@ -63,6 +63,7 @@ BOOLEAN                         *mHobFlushComplete;
 EFI_LOCK                        mVariableServicesLock;
 EDKII_VARIABLE_LOCK_PROTOCOL    mVariableLock;
 EDKII_VAR_CHECK_PROTOCOL        mVarCheck;
+BOOLEAN                         mIsRuntimeCacheEnabled = FALSE;
 
 /**
   The logic to initialize the VariablePolicy engine is in its own file.
@@ -840,7 +841,7 @@ RuntimeServiceGetVariable (
   }
 
   AcquireLockOnlyAtBootTime (&mVariableServicesLock);
-  if (FeaturePcdGet (PcdEnableVariableRuntimeCache)) {
+  if (mIsRuntimeCacheEnabled) {
     Status = FindVariableInRuntimeCache (VariableName, VendorGuid, Attributes, DataSize, Data);
   } else {
     Status = FindVariableInSmm (VariableName, VendorGuid, Attributes, DataSize, Data);
@@ -1106,7 +1107,7 @@ RuntimeServiceGetNextVariableName (
   }
 
   AcquireLockOnlyAtBootTime (&mVariableServicesLock);
-  if (FeaturePcdGet (PcdEnableVariableRuntimeCache)) {
+  if (mIsRuntimeCacheEnabled) {
     Status = GetNextVariableNameInRuntimeCache (VariableNameSize, VariableName, VendorGuid);
   } else {
     Status = GetNextVariableNameInSmm (VariableNameSize, VariableName, VendorGuid);
@@ -1358,7 +1359,7 @@ OnReadyToBoot (
   //
   // Install the system configuration table for variable info data captured
   //
-  if (FeaturePcdGet (PcdEnableVariableRuntimeCache) && FeaturePcdGet (PcdVariableCollectStatistics)) {
+  if (mIsRuntimeCacheEnabled && FeaturePcdGet (PcdVariableCollectStatistics)) {
     if (mVariableAuthFormat) {
       gBS->InstallConfigurationTable (&gEfiAuthenticatedVariableGuid, mVariableInfo);
     } else {
@@ -1670,7 +1671,9 @@ SmmVariableReady (
   //
   mVariableBufferPhysical = mVariableBuffer;
 
-  if (FeaturePcdGet (PcdEnableVariableRuntimeCache)) {
+  GuidHob = GetFirstGuidHob (&gEdkiiVariableRuntimeCacheInfoHobGuid);
+  if (GuidHob != NULL) {
+    mIsRuntimeCacheEnabled = TRUE;
     DEBUG ((DEBUG_INFO, "Variable driver runtime cache is enabled.\n"));
     //
     // Get needed runtime cache buffer size and check if auth variables are to be used from SMM
@@ -1682,8 +1685,6 @@ SmmVariableReady (
                 &mVariableAuthFormat
                 );
     if (!EFI_ERROR (Status)) {
-      GuidHob = GetFirstGuidHob (&gEdkiiVariableRuntimeCacheInfoHobGuid);
-      ASSERT (GuidHob != NULL);
       VariableRuntimeCacheInfo   = GET_GUID_HOB_DATA (GuidHob);
       AllocatedHobCacheSize      = EFI_PAGES_TO_SIZE ((UINTN)VariableRuntimeCacheInfo->RuntimeHobCachePages);
       AllocatedNvCacheSize       = EFI_PAGES_TO_SIZE ((UINTN)VariableRuntimeCacheInfo->RuntimeNvCachePages);
