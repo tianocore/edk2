@@ -138,6 +138,10 @@
 
   MdePkg/Library/JedecJep106Lib/JedecJep106Lib.inf
   MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+  MdePkg/Library/StackCheckLib/StackCheckLibStaticInit.inf
+  MdePkg/Library/StackCheckLib/StackCheckLibDynamicInit.inf
+  MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
+  MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
@@ -193,7 +197,6 @@
 
 [Components.ARM, Components.AARCH64]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicArmVirt.inf
-  MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
