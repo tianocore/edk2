@@ -1,0 +1,35 @@
+## @file
+#  Base library instance for ResetSystem library class for LoongArch
+#
+#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = ResetSystemLib
+  FILE_GUID                      = BA521997-9016-32B5-65DF-EA5F560A3837
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ResetSystemLib|SEC PEI_CORE PEIM DXE_CORE
+  CONSTRUCTOR                    = ResetSystemLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = LOONGARCH64
+#
+
+[Sources]
+  BaseResetSystemAcpiGed.c
+  ResetSystemAcpiGed.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  QemuFwCfgLib
