@@ -45,6 +45,7 @@ extern CONST UINT8  _gDriverUnloadImageCount;
                                      ProcessModuleEntryPointList().
 
 **/
+NO_STACK_COOKIE
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (

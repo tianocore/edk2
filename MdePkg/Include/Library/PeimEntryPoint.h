@@ -27,6 +27,7 @@ extern CONST UINT32  _gPeimRevision;
   @retval  EFI_SUCCESS   The PEIM executed normally.
   @retval  !EFI_SUCCESS  The PEIM failed to execute normally.
 **/
+NO_STACK_COOKIE
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
