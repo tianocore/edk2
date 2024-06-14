@@ -1,0 +1,35 @@
+## @file
+#  PEI Phase Early Platform Hook Library instance for 16550 Uart.
+#
+#  Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = EarlyFdt16550SerialPortHookLib
+  MODULE_UNI_FILE                = Fdt16550SerialPortHookLib.uni
+  FILE_GUID                      = 6A5FEBCB-C676-A7C1-A96C-B79D4860EEC5
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformHookLib|SEC PEI_CORE PEIM
+
+[Sources]
+  EarlyFdt16550SerialPortHookLib.c
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
