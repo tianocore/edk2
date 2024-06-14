@@ -8,6 +8,12 @@
 **/
 #include "TestBaseCryptLib.h"
 
+VOID
+EFIAPI
+ProcessLibraryConstructorList (
+  VOID
+  );
+
 /**
   Initialize the unit test framework, suite, and unit tests for the
   sample unit tests and run the unit tests.
@@ -76,5 +82,6 @@ main (
   char  *argv[]
   )
 {
+  ProcessLibraryConstructorList ();
   return UefiTestMain ();
 }
