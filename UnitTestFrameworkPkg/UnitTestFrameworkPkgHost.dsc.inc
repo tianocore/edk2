@@ -23,6 +23,7 @@
   UefiBootServicesTableLib|UnitTestFrameworkPkg/Library/UnitTestUefiBootServicesTableLib/UnitTestUefiBootServicesTableLib.inf
   PeiServicesTablePointerLib|UnitTestFrameworkPkg/Library/UnitTestPeiServicesTablePointerLib/UnitTestPeiServicesTablePointerLib.inf
   NULL|UnitTestFrameworkPkg/Library/UnitTestDebugAssertLib/UnitTestDebugAssertLibHost.inf
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS = /MT
