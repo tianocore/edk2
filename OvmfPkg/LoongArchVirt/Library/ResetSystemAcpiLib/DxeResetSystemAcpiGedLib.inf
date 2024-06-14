@@ -1,0 +1,41 @@
+## @file
+#  DXE library instance for ResetSystem library class for LoongArch.
+#
+#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = ResetSystemLib
+  FILE_GUID                      = F05197D5-5827-AA61-FB2D-BC69259F17A9
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ResetSystemLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = ResetSystemLibConstructor
+
+#
+#  VALID_ARCHITECTURES           = LOONGARCH64
+#
+
+[Sources]
+  DxeResetSystemAcpiGed.c
+  ResetSystemAcpiGed.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  DxeServicesTableLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeLib
+
+[Guids]
+  gEfiAcpi10TableGuid                           ## PRODUCES           ## SystemTable
+  gEfiAcpiTableGuid                             ## PRODUCES           ## SystemTable
