@@ -1,0 +1,50 @@
+## @file
+#  Provides the required functionality for checking the stack cookie.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = StackCheckLibStaticInit
+  FILE_GUID                      = 2b24dc50-e33d-4c9f-8b62-e826f06e483f
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+
+[Sources]
+  StackCheckLibCommon.c
+
+[Sources.IA32]
+  IA32/CheckCookieMsvc.nasm | MSFT
+
+[Sources.X64]
+  X64/CheckCookieMsvc.nasm | MSFT
+
+[Sources.IA32, Sources.X64]
+  IA32/StackCookieInterrupt.nasm
+
+[Sources.ARM]
+  Arm/StackCookieInterrupt.S   |GCC
+  Arm/StackCookieInterrupt.asm |MSFT
+
+[Sources.AARCH64]
+  AArch64/StackCookieInterrupt.S   |GCC
+  AArch64/StackCookieInterrupt.asm |MSFT
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  StackCheckFailureHookLib
+  BaseLib
+  DebugLib
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector
+
+# Disable LTO to ensure the linker doesn't optimize out the stack cookie
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -fno-lto
+  MSFT:*_*_*_CC_FLAGS = /GL-
