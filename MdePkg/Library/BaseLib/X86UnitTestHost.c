@@ -66,6 +66,15 @@ UnitTestHostBaseLibAsmCpuid (
   OUT     UINT32  *Edx   OPTIONAL
   )
 {
+  UINT32  RetEcx;
+
+  RetEcx = 0;
+  switch (Index) {
+    case 1:
+      RetEcx |= BIT30; /* RdRand */
+      break;
+  }
+
   if (Eax != NULL) {
     *Eax = 0;
   }
@@ -75,7 +84,7 @@ UnitTestHostBaseLibAsmCpuid (
   }
 
   if (Ecx != NULL) {
-    *Ecx = 0;
+    *Ecx = RetEcx;
   }
 
   if (Edx != NULL) {
