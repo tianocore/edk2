@@ -118,15 +118,14 @@
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
 
-  # Add support for stack protector
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
-
 [LibraryClasses.ARM]
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 
 [LibraryClasses.common.SEC]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+  # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
