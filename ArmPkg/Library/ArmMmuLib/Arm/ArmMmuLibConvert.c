@@ -11,7 +11,7 @@
 
 #include <Library/ArmLib.h>
 
-#include <Chipset/ArmV7.h>
+#include <Arm/AArch32.h>
 
 UINT32
 ConvertSectionAttributesToPageAttributes (

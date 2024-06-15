@@ -211,14 +211,15 @@ FileFindSection (
 
   if (IS_FFS_FILE2 (FileHeader)) {
     FileSize = FFS_FILE2_SIZE (FileHeader);
+    Section  = (EFI_COMMON_SECTION_HEADER *)(((EFI_FFS_FILE_HEADER2 *)FileHeader) + 1);
   } else {
     FileSize = FFS_FILE_SIZE (FileHeader);
+    Section  = (EFI_COMMON_SECTION_HEADER *)(FileHeader + 1);
   }
 
   FileSize -= sizeof (EFI_FFS_FILE_HEADER);
 
-  Section = (EFI_COMMON_SECTION_HEADER *)(FileHeader + 1);
-  Index   = 0;
+  Index = 0;
   while (Index < FileSize) {
     if (Section->Type == SectionType) {
       if (IS_SECTION2 (Section)) {
