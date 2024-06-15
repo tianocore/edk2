@@ -10,7 +10,7 @@
 #ifndef ARM_V7_H_
 #define ARM_V7_H_
 
-#include <Chipset/ArmV7Mmu.h>
+#include <Arm/AArch32Mmu.h>
 
 // ARM Interrupt ID in Exception Table
 #define ARM_ARCH_EXCEPTION_IRQ  EXCEPT_ARM_IRQ

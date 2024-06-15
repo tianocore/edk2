@@ -7,7 +7,7 @@
 
 #include <AsmMacroIoLib.h>
 
-#include <Chipset/ArmV7.h>
+#include <Arm/AArch32.h>
 
 ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
