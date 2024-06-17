@@ -25,6 +25,7 @@
 #define SBI_EXT_DBCN                 0x4442434E
 #define SBI_EXT_TIME                 0x54494D45
 #define SBI_EXT_SRST                 0x53525354
+#define SBI_EXT_MPXY                 0x4D505859
 
 /* SBI function IDs for base extension */
 #define SBI_EXT_BASE_SPEC_VERSION   0x0
@@ -45,6 +46,16 @@
 
 /* SBI function IDs for SRST extension */
 #define SBI_EXT_SRST_RESET  0x0
+
+/* SBI function IDs. for MPXY extension */
+#define SBI_EXT_MPXY_GET_SHMEM_SIZE           0x0
+#define SBI_EXT_MPXY_SET_SHMEM                0x1
+#define SBI_EXT_MPXY_GET_CHANNEL_IDS          0x2
+#define SBI_EXT_MPXY_READ_ATTRS               0x3
+#define SBI_EXT_MPXY_WRITE_ATTRS              0x4
+#define SBI_EXT_MPXY_SEND_MSG_WITH_RESP       0x5
+#define SBI_EXT_MPXY_SEND_MSG_NO_RESP         0x6
+#define SBI_EXT_MPXY_GET_NOTIFICATION_EVENTS  0x7
 
 #define SBI_SRST_RESET_TYPE_SHUTDOWN     0x0
 #define SBI_SRST_RESET_TYPE_COLD_REBOOT  0x1
