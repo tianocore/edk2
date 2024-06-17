@@ -2351,6 +2351,8 @@ Pkcs7FreeSigners (
   unchained to the signer's certificates.
   The input signed data could be wrapped in a ContentInfo structure.
 
+  Pkcs7GetCertificatesList has not been implemented in BaseCryptoLibMbedTls.
+
   @param[in]  P7Data            Pointer to the PKCS#7 message.
   @param[in]  P7Length          Length of the PKCS#7 message in bytes.
   @param[out] SignerChainCerts  Pointer to the certificates list chained to signer's
@@ -3138,6 +3140,8 @@ DhComputeKey (
   If Seed is not NULL, then the seed passed in is used.
   If Seed is NULL, then default seed is used.
   If this interface is not supported, then return FALSE.
+
+  RandomSeed has not been implemented in BaseCryptoLibMbedTls.
 
   @param[in]  Seed      Pointer to seed value.
                         If NULL, default seed is used.

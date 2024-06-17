@@ -66,6 +66,7 @@
 
 [Sources.AARCH64]
   AArch64/Atomics.S    | GCC
+  AArch64/ashlti3.S    | GCC
 
 [Packages]
   MdePkg/MdePkg.dec

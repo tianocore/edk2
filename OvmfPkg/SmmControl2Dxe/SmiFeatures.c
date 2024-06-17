@@ -3,6 +3,7 @@
   accordingly.
 
   Copyright (C) 2016-2017, Red Hat, Inc.
+  Copyright (c) 2024, Intel Corporation. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -187,6 +188,7 @@ NegotiateSmiFeatures (
     // the original QEMU behavior (i.e., unicast SMI) used to differ.
     //
     if (RETURN_ERROR (PcdSet64S (PcdCpuSmmApSyncTimeout, 1000000)) ||
+        RETURN_ERROR (PcdSet64S (PcdCpuSmmApSyncTimeout2, 1000000)) ||
         RETURN_ERROR (PcdSet8S (PcdCpuSmmSyncMode, 0x00)))
     {
       DEBUG ((

@@ -37,32 +37,35 @@
   Hash/CryptMd5.c
   Hash/CryptSha1.c
   Hash/CryptSha256.c
-  Hash/CryptSm3Null.c
   Hash/CryptSha512.c
   Hash/CryptParallelHashNull.c
+  Hash/CryptSm3.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
   Cipher/CryptAeadAesGcmNull.c
   Pk/CryptRsaBasic.c
   Pk/CryptRsaExtNull.c
-  Pk/CryptRsaPssNull.c
-  Pk/CryptRsaPssSignNull.c
-  Bn/CryptBnNull.c
-  Pem/CryptPemNull.c
-  Pk/CryptDhNull.c
-  Pk/CryptEcNull.c
   Pk/CryptPkcs1OaepNull.c
   Pk/CryptPkcs5Pbkdf2Null.c
   Pk/CryptPkcs7SignNull.c
-  Pk/CryptPkcs7VerifyNull.c
-  Pk/CryptPkcs7VerifyEkuNull.c
-  Pk/CryptX509Null.c
+  Pk/CryptPkcs7VerifyCommon.c
+  Pk/CryptPkcs7VerifyRuntime.c
+  Pk/CryptPkcs7VerifyEkuRuntime.c
+  Pk/CryptDhNull.c
+  Pk/CryptX509.c
   Pk/CryptAuthenticodeNull.c
   Pk/CryptTsNull.c
-  Rand/CryptRandNull.c
+  Pk/CryptRsaPssNull.c
+  Pk/CryptRsaPssSignNull.c
+  Pk/CryptEcNull.c
+  Pem/CryptPem.c
+  Bn/CryptBnNull.c
+  Rand/CryptRand.c
+
   SysCall/CrtWrapper.c
   SysCall/TimerWrapper.c
+  SysCall/DummyOpensslSupport.c
   SysCall/RuntimeMemAllocation.c
 
 [Packages]
@@ -75,8 +78,10 @@
   UefiRuntimeServicesTableLib
   DebugLib
   MbedTlsLib
+  OpensslLib
   IntrinsicLib
   PrintLib
+  RngLib
 
 #
 # Remove these [BuildOptions] after this library is cleaned up

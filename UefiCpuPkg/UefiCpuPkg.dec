@@ -1,7 +1,7 @@
 ## @file  UefiCpuPkg.dec
 # This Package provides UEFI compatible CPU modules and libraries.
 #
-# Copyright (c) 2007 - 2023, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.<BR>
 #
@@ -310,7 +310,7 @@
 
   ## Specifies if CPU features will be initialized during S3 resume.
   # @Prompt If CPU features will be initialized during S3 resume.
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume|FALSE|BOOLEAN|0x0000001D
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuFeaturesInitOnS3Resume|TRUE|BOOLEAN|0x0000001D
 
   ## Specifies CPUID Leaf 0x15 Time Stamp Counter and Nominal Core Crystal Clock Frequency.
   # TSC Frequency = ECX (core crystal clock frequency) * EBX/EAX.
@@ -366,9 +366,13 @@
   # @Prompt The specified AP target C-state for Mwait.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApTargetCstate|0|UINT8|0x00000007
 
-  ## Specifies timeout value in microseconds for the BSP in SMM to wait for all APs to come into SMM.
-  # @Prompt AP synchronization timeout value in SMM.
+  ## Specifies the 1st timeout value in microseconds for the BSP/AP in SMM to wait for one another to enter SMM.
+  # @Prompt The 1st BSP/AP synchronization timeout value in SMM.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|1000000|UINT64|0x32132104
+
+  ## Specifies the 2nd timeout value in microseconds for the BSP/AP in SMM to wait for one another to enter SMM.
+  # @Prompt The 2nd BSP/AP synchronization timeout value in SMM.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2|1000000|UINT64|0x32132115
 
   ## Indicates the CPU synchronization method used when processing an SMI.
   #   0x00  - Traditional CPU synchronization method.<BR>

@@ -1,10 +1,11 @@
 /** @file
 
- Copyright (c) 2014-2018, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2014-2018, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
 
- SPDX-License-Identifier: BSD-2-Clause-Patent
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
- **/
+**/
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -12,10 +13,12 @@
 #include <Library/VirtNorFlashPlatformLib.h>
 
 #include <Protocol/FdtClient.h>
+#include <stdbool.h>
 
 #define QEMU_NOR_BLOCK_SIZE  SIZE_256KB
+#define MAX_FLASH_BANKS      4
 
-#define MAX_FLASH_BANKS  4
+STATIC VIRT_NOR_FLASH_DESCRIPTION  mNorFlashDevices[MAX_FLASH_BANKS];
 
 EFI_STATUS
 VirtNorFlashPlatformInitialization (
@@ -24,8 +27,6 @@ VirtNorFlashPlatformInitialization (
 {
   return EFI_SUCCESS;
 }
-
-STATIC VIRT_NOR_FLASH_DESCRIPTION  mNorFlashDevices[MAX_FLASH_BANKS];
 
 EFI_STATUS
 VirtNorFlashPlatformGetDevices (
@@ -42,6 +43,7 @@ VirtNorFlashPlatformGetDevices (
   UINT32               Num;
   UINT64               Base;
   UINT64               Size;
+  BOOLEAN              Found;
 
   Status = gBS->LocateProtocol (
                   &gFdtClientProtocolGuid,
@@ -50,7 +52,8 @@ VirtNorFlashPlatformGetDevices (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  Num = 0;
+  Num   = 0;
+  Found = FALSE;
   for (FindNodeStatus = FdtClient->FindCompatibleNode (
                                      FdtClient,
                                      "cfi-flash",
@@ -94,8 +97,8 @@ VirtNorFlashPlatformGetDevices (
       // Disregard any flash devices that overlap with the primary FV.
       // The firmware is not updatable from inside the guest anyway.
       //
-      if ((PcdGet64 (PcdFvBaseAddress) + PcdGet32 (PcdFvSize) > Base) &&
-          ((Base + Size) > PcdGet64 (PcdFvBaseAddress)))
+      if ((PcdGet32 (PcdOvmfFdBaseAddress) + PcdGet32 (PcdOvmfFirmwareFdSize) > Base) &&
+          ((Base + Size) > PcdGet32 (PcdOvmfFdBaseAddress)))
       {
         continue;
       }
@@ -105,6 +108,32 @@ VirtNorFlashPlatformGetDevices (
       mNorFlashDevices[Num].Size              = (UINTN)Size;
       mNorFlashDevices[Num].BlockSize         = QEMU_NOR_BLOCK_SIZE;
       Num++;
+      if (!Found) {
+        //
+        // By default, the second available flash is stored as a non-volatile variable.
+        //
+        Status = PcdSet32S (PcdFlashNvStorageVariableBase, Base);
+        ASSERT_EFI_ERROR (Status);
+
+        //
+        // The Base is the value of PcdFlashNvStorageVariableBase,
+        // PcdFlashNvStorageFtwWorkingBase can be got by
+        // PcdFlashNvStorageVariableBase + PcdFlashNvStorageVariableSize
+        //
+        Base  += PcdGet32 (PcdFlashNvStorageVariableSize);
+        Status = PcdSet32S (PcdFlashNvStorageFtwWorkingBase, Base);
+        ASSERT_EFI_ERROR (Status);
+
+        //
+        // Now, the Base is the value of PcdFlashNvStorageFtwWorkingBase,
+        // PcdFlashNvStorageFtwSpareBase can be got by
+        // PcdFlashNvStorageFtwWorkingBase + PcdFlashNvStorageFtwWorkingSize.
+        //
+        Base  += PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
+        Status = PcdSet32S (PcdFlashNvStorageFtwSpareBase, Base);
+        ASSERT_EFI_ERROR (Status);
+        Found = TRUE;
+      }
     }
 
     //
