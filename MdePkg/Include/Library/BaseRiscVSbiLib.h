@@ -109,6 +109,19 @@ SbiSystemReset (
   );
 
 /**
+  Probe support for an extension in OpenSBI
+
+  Check if the extension is supported by SBI
+
+  @param    Extension   Extension ID to be probed
+**/
+EFI_STATUS
+EFIAPI
+SbiProbeExtension (
+  IN UINTN  Extension
+  );
+
+/**
   Make ECALL in assembly
 
   Switch to M-mode
