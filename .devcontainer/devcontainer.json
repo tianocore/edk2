@@ -1,6 +1,6 @@
 {
-  "image": "ghcr.io/tianocore/containers/fedora-35-dev:latest",
-  "postCreateCommand": "git config --global --add safe.directory * && pip install --upgrade -r pip-requirements.txt",
+  "image": "ghcr.io/tianocore/containers/fedora-39-dev:latest",
+  "postCreateCommand": "git config --global --add safe.directory '*' && pip install --upgrade -r pip-requirements.txt",
   "customizations": {
     "vscode": {
       "extensions": [
