@@ -127,6 +127,12 @@ typedef struct {
       )
 
 //
+// ACPI HOB produced by silicon initialization code will provide the RSDP structure.
+//
+typedef struct {
+  EFI_PHYSICAL_ADDRESS    Rsdp;
+} ACPI_SILICON_HOB;
+//
 // Protocol Constructor functions
 //
 
