@@ -1,0 +1,15 @@
+// @file
+// Instance of SBI MPXY library for RISC-V architecutre.
+//
+// MpxyLib.
+//
+// Copyright (c) Ventana Micro Systems, Inc.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+
+
+#string STR_MODULE_ABSTRACT     #language en-US "Instance of SbiMpxy Library"
+
+#string STR_MODULE_DESCRIPTION  #language en-US "Library that provides implementation of SBI Mpxy on RISC-V architecture"
+
