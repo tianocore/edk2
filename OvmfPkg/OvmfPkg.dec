@@ -449,3 +449,8 @@
 
   ## This feature flag indicates the firmware build supports secure boot.
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|FALSE|BOOLEAN|0x6d
+
+  ## Whether QemuVideoDxe should perform a EFI_MEMORY_WC remap of the PCI
+  #  framebuffer. This might be required on platforms that do not tolerate
+  #  misaligned accesses otherwise.
+  gUefiOvmfPkgTokenSpaceGuid.PcdRemapFrameBufferWriteCombine|FALSE|BOOLEAN|0x75

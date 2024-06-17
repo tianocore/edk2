@@ -13,7 +13,7 @@
 #ifndef _QEMU_H_
 #define _QEMU_H_
 
-#include <Uefi.h>
+#include <PiDxe.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/DriverSupportedEfiVersion.h>
