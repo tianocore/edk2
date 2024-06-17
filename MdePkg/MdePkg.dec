@@ -312,6 +312,10 @@
   #
   StackCheckLib|Include/Library/StackCheckLib.h
 
+  ##  @libraryclass Provides the RAS agent client to retrieve error source informations.
+  #
+  DxeRasAgentClientLib|Include/Library/DxeRasAgentClient.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
