@@ -540,5 +540,13 @@
   MdeModulePkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
   MdeModulePkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
+[Components.RISCV64]
+  MdeModulePkg/Universal/Acpi/AcpiHardwareErrorTableDxe/HardwareErrorSourceTableDxe.inf {
+    <LibraryClasses>
+      DxeRiscvMpxyLib|MdePkg/Library/DxeRiscvMpxyLib/DxeRiscvMpxy.inf
+      DxeRasAgentClientLib|MdePkg/Library/DxeRiscvRasAgentClientLib/DxeRiscvRasAgentClientLib.inf
+      RiscVSbiLib|MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf
+  }
+
 [BuildOptions]
 
