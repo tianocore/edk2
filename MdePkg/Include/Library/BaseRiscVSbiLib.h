@@ -135,4 +135,10 @@ RiscVSbiEcall (
   IN UINTN      Ext
   );
 
+EFI_STATUS
+EFIAPI
+SbiProbeExtension (
+  IN UINTN  Extension
+  );
+
 #endif
