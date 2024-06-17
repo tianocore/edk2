@@ -1,0 +1,30 @@
+# @file
+# Provides implementation of the library to communicate over SBI MPXY on RISCV architecture
+#
+# @copyright
+# Copyright (c) Ventana Micro Systems, Inc. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION     = 1.27
+  BASE_NAME       = DxeRiscvMpxyLib
+  MODULE_UNI_FILE = DxeRiscvMpxy.uni
+  FILE_GUID       = 8e992db5-4383-4023-a24e-7c99955bde80
+  MODULE_TYPE     = DXE_DRIVER
+  VERSION_STRING  = 1.0
+  LIBRARY_CLASS   = DxeRiscvMpxyLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR     = SbiMpxyLibConstructor
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Sources]
+  DxeRiscvMpxy.c
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+  RiscVSbiLib
+  SafeIntLib
