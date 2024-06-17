@@ -243,3 +243,25 @@ SetFirmwareContextPointer (
 {
   SetFirmwareContext (FirmwareContextPtr);
 }
+
+/**
+  Probe support for an extension in OpenSBI
+
+  Check if the extension is supported by SBI
+
+  @param    Extension   Extension ID to be probed
+**/
+EFI_STATUS
+EFIAPI
+SbiProbeExtension(
+  IN UINTN Extension)
+{
+  SBI_RET  Ret;
+  Ret = SbiCall (
+          SBI_EXT_BASE,
+          SBI_EXT_BASE_PROBE_EXT,
+          1,
+          Extension);
+
+  return TranslateError (Ret.Error);
+}
