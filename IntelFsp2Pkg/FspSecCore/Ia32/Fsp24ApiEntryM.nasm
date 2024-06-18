@@ -13,6 +13,7 @@
 extern   ASM_PFX(PcdGet32(PcdTemporaryRamBase))
 extern   ASM_PFX(PcdGet32(PcdFspTemporaryRamSize))
 extern   ASM_PFX(PcdGet8 (PcdFspHeapSizePercentage))
+extern   ASM_PFX(FeaturePcdGet (PcdFspSaveRestorePageTableEnable))
 
 struc FSPM_UPD_COMMON
     ; FSP_UPD_HEADER {
@@ -64,7 +65,7 @@ extern ASM_PFX(AsmGetFspInfoHeader)
 extern ASM_PFX(FspMultiPhaseMemInitApiHandler)
 
 STACK_SAVED_EAX_OFFSET       EQU   4 * 7 ; size of a general purpose register * eax index
-API_PARAM1_OFFSET            EQU   34h  ; ApiParam1 [ sub esp,8 + pushad + pushfd + push eax + call]
+API_PARAM1_OFFSET            EQU   44h  ; ApiParam1 [ sub esp,8 + push cr0/cr3/cr4/EFER + pushad + pushfd + push eax + call]
 FSP_HEADER_IMGBASE_OFFSET    EQU   1Ch
 FSP_HEADER_CFGREG_OFFSET     EQU   24h
 
@@ -152,6 +153,33 @@ NotMultiPhaseMemoryInitApi:
   pushfd     ; 2 pushf for 4 byte alignment
   cli
   pushad
+
+  ;
+  ; Allocate 4x4 bytes on the stack.
+  ;
+  sub     esp, 16
+  cmp     byte [dword ASM_PFX(FeaturePcdGet (PcdFspSaveRestorePageTableEnable))], 0
+  jz      SkipPagetableSave
+
+  add     esp, 16
+  ; Save EFER MSR lower 32 bits
+  push   ecx
+  push   eax
+  mov    ecx, 0xC0000080
+  rdmsr
+  mov    edx, eax
+  pop    eax
+  pop    ecx
+  push   edx
+
+  ; Save CR registers
+  mov    edx, cr4
+  push   edx
+  mov    edx, cr3
+  push   edx
+  mov    edx, cr0
+  push   edx
+SkipPagetableSave:
 
   ; Reserve 8 bytes for IDT save/restore
   sub     esp, 8
