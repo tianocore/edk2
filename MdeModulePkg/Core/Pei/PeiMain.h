@@ -1,7 +1,7 @@
 /** @file
   Definition of Pei Core Structures and Services
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Ppi/TemporaryRamDone.h>
 #include <Ppi/SecHobData.h>
 #include <Ppi/PeiCoreFvLocation.h>
+#include <Ppi/MigrateTempRam.h>
 #include <Library/DebugLib.h>
 #include <Library/PeiCoreEntryPoint.h>
 #include <Library/BaseLib.h>
