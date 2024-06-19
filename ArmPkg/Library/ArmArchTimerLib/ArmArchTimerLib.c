@@ -45,19 +45,6 @@ TimerConstructor (
       // Ref manual, lower bound of the frequency is in the range of 1-10MHz.
       //
       ASSERT (TICKS_PER_MICRO_SEC);
-
- #ifdef MDE_CPU_ARM
-      //
-      // Only set the frequency for ARMv7. We expect the secure firmware to
-      // have already done it.
-      // If the security extension is not implemented, set Timer Frequency
-      // here.
-      //
-      if (ArmHasSecurityExtensions ()) {
-        ArmGenericTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
-      }
-
- #endif
     }
 
     //
