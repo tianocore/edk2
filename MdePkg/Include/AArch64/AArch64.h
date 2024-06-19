@@ -234,11 +234,6 @@ ArmReadCurrentEL (
   VOID
   );
 
-UINTN
-ArmWriteCptr (
-  IN  UINT64  Cptr
-  );
-
 UINT32
 ArmReadCntHctl (
   VOID

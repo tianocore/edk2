@@ -515,42 +515,6 @@ ArmEnableVFP (
   VOID
   );
 
-/**
-  Get the Secure Configuration Register value
-
-  @return   Value read from the Secure Configuration Register
-
-**/
-UINT32
-EFIAPI
-ArmReadScr (
-  VOID
-  );
-
-/**
-  Set the Secure Configuration Register
-
-  @param Value   Value to write to the Secure Configuration Register
-
-**/
-VOID
-EFIAPI
-ArmWriteScr (
-  IN  UINT32  Value
-  );
-
-UINT32
-EFIAPI
-ArmReadMVBar (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmWriteMVBar (
-  IN  UINT32  VectorMonitorBase
-  );
-
 UINT32
 EFIAPI
 ArmReadSctlr (
