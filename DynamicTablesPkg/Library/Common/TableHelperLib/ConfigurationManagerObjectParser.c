@@ -3,6 +3,7 @@
 
   Copyright (c) 2021 - 2023, ARM Limited. All rights reserved.<BR>
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -17,7 +18,8 @@ VOID
 EFIAPI
 PrintString (
   CONST CHAR8  *Format,
-  UINT8        *Ptr
+  UINT8        *Ptr,
+  UINT32       Length
   );
 
 STATIC
@@ -25,31 +27,26 @@ VOID
 EFIAPI
 PrintStringPtr (
   CONST CHAR8  *Format,
-  UINT8        *Ptr
+  UINT8        *Ptr,
+  UINT32       Length
   );
 
 STATIC
 VOID
 EFIAPI
-PrintChar4 (
+PrintChars (
   CONST CHAR8  *Format,
-  UINT8        *Ptr
+  UINT8        *Ptr,
+  UINT32       Length
   );
 
 STATIC
 VOID
 EFIAPI
-PrintChar6 (
+HexDump (
   CONST CHAR8  *Format,
-  UINT8        *Ptr
-  );
-
-STATIC
-VOID
-EFIAPI
-PrintChar8 (
-  CONST CHAR8  *Format,
-  UINT8        *Ptr
+  UINT8        *Ptr,
+  UINT32       Length
   );
 
 /** A parser for EArmObjBootArchInfo.
@@ -859,20 +856,20 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
 /** A parser for EStdObjCfgMgrInfo.
 */
 STATIC CONST CM_OBJ_PARSER  StdObjCfgMgrInfoParser[] = {
-  { "Revision", 4, "0x%x",         NULL       },
-  { "OemId[6]", 6, "%c%c%c%c%c%c", PrintChar6 }
+  { "Revision", 4, "0x%x", NULL       },
+  { "OemId[6]", 6, NULL,   PrintChars }
 };
 
 /** A parser for EStdObjAcpiTableList.
 */
 STATIC CONST CM_OBJ_PARSER  StdObjAcpiTableInfoParser[] = {
-  { "AcpiTableSignature", 4,                                      "%c%c%c%c",         PrintChar4 },
-  { "AcpiTableRevision",  1,                                      "%d",               NULL       },
-  { "TableGeneratorId",   sizeof (ACPI_TABLE_GENERATOR_ID),       "0x%x",             NULL       },
-  { "AcpiTableData",      sizeof (EFI_ACPI_DESCRIPTION_HEADER *), "0x%p",             NULL       },
-  { "OemTableId",         8,                                      "%c%c%c%c%c%c%c%c", PrintChar8 },
-  { "OemRevision",        4,                                      "0x%x",             NULL       },
-  { "MinorRevision",      1,                                      "0x%x",             NULL       },
+  { "AcpiTableSignature", 4,                                      NULL,   PrintChars },
+  { "AcpiTableRevision",  1,                                      "%d",   NULL       },
+  { "TableGeneratorId",   sizeof (ACPI_TABLE_GENERATOR_ID),       "0x%x", NULL       },
+  { "AcpiTableData",      sizeof (EFI_ACPI_DESCRIPTION_HEADER *), "0x%p", NULL       },
+  { "OemTableId",         8,                                      NULL,   PrintChars },
+  { "OemRevision",        4,                                      "0x%x", NULL       },
+  { "MinorRevision",      1,                                      "0x%x", NULL       },
 };
 
 /** A parser for EStdObjSmbiosTableList.
@@ -897,13 +894,15 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  StdNamespaceObjectParser[] = {
 
   @param [in]  Format  Format to print the Ptr.
   @param [in]  Ptr     Pointer to the string.
+  @param [in]  Length  Length of the field
 **/
 STATIC
 VOID
 EFIAPI
 PrintString (
   IN CONST CHAR8  *Format,
-  IN UINT8        *Ptr
+  IN UINT8        *Ptr,
+  IN UINT32       Length
   )
 {
   if (Ptr == NULL) {
@@ -911,7 +910,7 @@ PrintString (
     return;
   }
 
-  DEBUG ((DEBUG_ERROR, "%a", Ptr));
+  DEBUG ((DEBUG_INFO, "%a", Ptr));
 }
 
 /** Print string from pointer.
@@ -920,13 +919,15 @@ PrintString (
 
   @param [in]  Format      Format to print the string.
   @param [in]  Ptr         Pointer to the string pointer.
+  @param [in]  Length      Length of the field
 **/
 STATIC
 VOID
 EFIAPI
 PrintStringPtr (
   IN CONST CHAR8  *Format,
-  IN UINT8        *Ptr
+  IN UINT8        *Ptr,
+  IN UINT32       Length
   )
 {
   UINT8  *String;
@@ -942,82 +943,51 @@ PrintStringPtr (
     String = (UINT8 *)"(NULLPTR)";
   }
 
-  PrintString (Format, String);
+  PrintString (Format, String, Length);
 }
 
-/** Print 4 characters.
+/** Print characters.
 
   @param [in]  Format  Format to print the Ptr.
   @param [in]  Ptr     Pointer to the characters.
+  @param [in]  Length  Length of the field
 **/
 STATIC
 VOID
 EFIAPI
-PrintChar4 (
+PrintChars (
   IN  CONST CHAR8  *Format,
-  IN  UINT8        *Ptr
+  IN  UINT8        *Ptr,
+  IN  UINT32       Length
   )
 {
-  DEBUG ((
-    DEBUG_ERROR,
-    (Format != NULL) ? Format : "%c%c%c%c",
-    Ptr[0],
-    Ptr[1],
-    Ptr[2],
-    Ptr[3]
-    ));
+  UINT32  Index;
+
+  for (Index = 0; Index < Length; Index++) {
+    DEBUG ((DEBUG_INFO, "%c", Ptr[Index]));
+  }
 }
 
-/** Print 6 characters.
+/** Dump data in Hex format
 
   @param [in]  Format  Format to print the Ptr.
-  @param [in]  Ptr     Pointer to the characters.
+  @param [in]  Ptr     Pointer to the string.
+  @param [in]  Length  Length of the field
 **/
 STATIC
 VOID
 EFIAPI
-PrintChar6 (
-  IN  CONST CHAR8  *Format,
-  IN  UINT8        *Ptr
+HexDump (
+  IN CONST CHAR8  *Format,
+  IN UINT8        *Ptr,
+  IN UINT32       Length
   )
 {
-  DEBUG ((
-    DEBUG_ERROR,
-    (Format != NULL) ? Format : "%c%c%c%c%c%c",
-    Ptr[0],
-    Ptr[1],
-    Ptr[2],
-    Ptr[3],
-    Ptr[4],
-    Ptr[5]
-    ));
-}
+  UINT32  Index;
 
-/** Print 8 characters.
-
-  @param [in]  Format  Format to print the Ptr.
-  @param [in]  Ptr     Pointer to the characters.
-**/
-STATIC
-VOID
-EFIAPI
-PrintChar8 (
-  IN  CONST CHAR8  *Format,
-  IN  UINT8        *Ptr
-  )
-{
-  DEBUG ((
-    DEBUG_ERROR,
-    (Format != NULL) ? Format : "%c%c%c%c%c%c%c%c",
-    Ptr[0],
-    Ptr[1],
-    Ptr[2],
-    Ptr[3],
-    Ptr[4],
-    Ptr[5],
-    Ptr[6],
-    Ptr[7]
-    ));
+  for (Index = 0; Index < Length; Index++) {
+    DEBUG ((DEBUG_INFO, "0x%02x ", *Ptr++));
+  }
 }
 
 /** Print fields of the objects.
@@ -1079,7 +1049,7 @@ PrintCmObjDesc (
       Parser[Index].NameStr
       ));
     if (Parser[Index].PrintFormatter != NULL) {
-      Parser[Index].PrintFormatter (Parser[Index].Format, Data);
+      Parser[Index].PrintFormatter (Parser[Index].Format, Data, Parser[Index].Length);
     } else if (Parser[Index].Format != NULL) {
       switch (Parser[Index].Length) {
         case 1:
