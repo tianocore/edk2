@@ -951,7 +951,7 @@ PseudoRandom (
         //
         // Secure Algorithm was not supported on this platform
         //
-        DEBUG ((DEBUG_ERROR, "Failed to generate random data using secure algorithm %d: %r\n", AlgorithmIndex, Status));
+        DEBUG ((DEBUG_VERBOSE, "Failed to generate random data using secure algorithm %d: %r\n", AlgorithmIndex, Status));
 
         //
         // Try the next secure algorithm
@@ -971,6 +971,7 @@ PseudoRandom (
     // If we get here, we failed to generate random data using any secure algorithm
     // Platform owner should ensure that at least one secure algorithm is supported
     //
+    DEBUG ((DEBUG_ERROR, "Failed to generate random data, no supported secure algorithm found\n"));
     ASSERT_EFI_ERROR (Status);
     return Status;
   }
