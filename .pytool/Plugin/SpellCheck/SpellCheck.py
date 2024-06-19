@@ -215,7 +215,7 @@ class SpellCheck(ICiBuildPlugin):
     def _check_spelling(self, abs_file_to_check: str, abs_config_file_to_use: str) -> []:
         output = StringIO()
         ret = RunCmd(
-            "cspell", f"--config {abs_config_file_to_use} {abs_file_to_check}", outstream=output)
+            "cspell", f"--config {abs_config_file_to_use} --no-color {abs_file_to_check}", outstream=output)
         if ret == 0:
             return []
         else:
