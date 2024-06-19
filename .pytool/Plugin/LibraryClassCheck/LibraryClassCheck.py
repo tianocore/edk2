@@ -101,7 +101,7 @@ class LibraryClassCheck(ICiBuildPlugin):
                 try:
                     tc.LogStdOut("Ignoring Library Header File {0}".format(a))
                     AllHeaderFiles.remove(a)
-                except:
+                except ValueError:
                     tc.LogStdError("LibraryClassCheck.IgnoreHeaderFile -> {0} not found.  Invalid Header File".format(a))
                     logging.info("LibraryClassCheck.IgnoreHeaderFile -> {0} not found.  Invalid Header File".format(a))
 

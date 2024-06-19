@@ -141,7 +141,7 @@ class GuidCheck(ICiBuildPlugin):
                     for b in gs[:]:
                         if b.guid == a.upper():
                             gs.remove(b)
-                except:
+                except Exception:
                     tc.LogStdError("GuidCheck.IgnoreGuid -> {0} not found.  Invalid ignore guid".format(a.upper()))
                     logging.info("GuidCheck.IgnoreGuid -> {0} not found.  Invalid ignore guid".format(a.upper()))
 
@@ -164,7 +164,7 @@ class GuidCheck(ICiBuildPlugin):
                             else:
                                 tc.LogStdError("GuidCheck.IgnoreGuidName -> {0} incomplete match.  Invalid ignore guid".format(a))
 
-                except:
+                except Exception:
                     tc.LogStdError("GuidCheck.IgnoreGuidName -> {0} not found.  Invalid ignore name".format(a))
                     logging.info("GuidCheck.IgnoreGuidName -> {0} not found.  Invalid ignore name".format(a))
 

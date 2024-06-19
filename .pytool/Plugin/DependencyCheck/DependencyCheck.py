@@ -68,7 +68,7 @@ class DependencyCheck(ICiBuildPlugin):
                 try:
                     INFFiles.remove(a)
                     tc.LogStdOut("IgnoreInf {0}".format(a))
-                except:
+                except ValueError:
                     logging.info("DependencyConfig.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
                     tc.LogStdError("DependencyConfig.IgnoreInf -> {0} not found in filesystem.  Invalid ignore file".format(a))
 
