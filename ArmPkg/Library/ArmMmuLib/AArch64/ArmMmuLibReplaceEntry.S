@@ -86,12 +86,10 @@ ASM_FUNC_ALIGN(ArmReplaceLiveTranslationEntry, 0x200)
   msr   daifset, #0xf
   isb
 
-  EL1_OR_EL2_OR_EL3(x5)
+  EL1_OR_EL2(x5)
 1:__replace_entry 1
   b     4f
 2:__replace_entry 2
-  b     4f
-3:__replace_entry 3
 
 4:msr   daif, x4
   ret

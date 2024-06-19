@@ -108,29 +108,12 @@ ASM_FUNC(ArmInvalidateTlb)
   isb
   bx      lr
 
-ASM_FUNC(ArmReadScr)
-  mrc     p15, 0, r0, c1, c1, 0
-  bx      lr
-
-ASM_FUNC(ArmWriteScr)
-  mcr     p15, 0, r0, c1, c1, 0
-  isb
-  bx      lr
-
 ASM_FUNC(ArmReadHVBar)
   mrc     p15, 4, r0, c12, c0, 0
   bx      lr
 
 ASM_FUNC(ArmWriteHVBar)
   mcr     p15, 4, r0, c12, c0, 0
-  bx      lr
-
-ASM_FUNC(ArmReadMVBar)
-  mrc     p15, 0, r0, c12, c0, 1
-  bx      lr
-
-ASM_FUNC(ArmWriteMVBar)
-  mcr     p15, 0, r0, c12, c0, 1
   bx      lr
 
 ASM_FUNC(ArmCallWFE)

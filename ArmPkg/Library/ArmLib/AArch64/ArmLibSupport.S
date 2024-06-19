@@ -54,12 +54,10 @@ ASM_FUNC(ArmReadAuxCr)
   ret
 
 ASM_FUNC(ArmSetTTBR0)
-  EL1_OR_EL2_OR_EL3(x1)
+  EL1_OR_EL2(x1)
 1:msr     ttbr0_el1, x0      // Translation Table Base Reg 0 (TTBR0)
   b       4f
 2:msr     ttbr0_el2, x0      // Translation Table Base Reg 0 (TTBR0)
-  b       4f
-3:msr     ttbr0_el3, x0      // Translation Table Base Reg 0 (TTBR0)
 4:isb
   ret
 
@@ -73,42 +71,34 @@ ASM_FUNC(ArmGetTTBR0BaseAddress)
   ret
 
 ASM_FUNC(ArmGetTCR)
-  EL1_OR_EL2_OR_EL3(x1)
+  EL1_OR_EL2(x1)
 1:mrs     x0, tcr_el1
   b       4f
 2:mrs     x0, tcr_el2
-  b       4f
-3:mrs     x0, tcr_el3
 4:isb
   ret
 
 ASM_FUNC(ArmSetTCR)
-  EL1_OR_EL2_OR_EL3(x1)
+  EL1_OR_EL2(x1)
 1:msr     tcr_el1, x0
   b       4f
 2:msr     tcr_el2, x0
-  b       4f
-3:msr     tcr_el3, x0
 4:isb
   ret
 
 ASM_FUNC(ArmGetMAIR)
-  EL1_OR_EL2_OR_EL3(x1)
+  EL1_OR_EL2(x1)
 1:mrs     x0, mair_el1
   b       4f
 2:mrs     x0, mair_el2
-  b       4f
-3:mrs     x0, mair_el3
 4:isb
   ret
 
 ASM_FUNC(ArmSetMAIR)
-  EL1_OR_EL2_OR_EL3(x1)
+  EL1_OR_EL2(x1)
 1:msr     mair_el1, x0
   b       4f
 2:msr     mair_el2, x0
-  b       4f
-3:msr     mair_el3, x0
 4:isb
   ret
 
@@ -122,15 +112,12 @@ ASM_FUNC(ArmSetMAIR)
 ASM_FUNC(ArmUpdateTranslationTableEntry)
    dsb     nshst
    lsr     x1, x1, #12
-   EL1_OR_EL2_OR_EL3(x2)
+   EL1_OR_EL2(x2)
 1: tlbi    vaae1, x1             // TLB Invalidate VA , EL1
    mrs     x2, sctlr_el1
    b       4f
 2: tlbi    vae2, x1              // TLB Invalidate VA , EL2
    mrs     x2, sctlr_el2
-   b       4f
-3: tlbi    vae3, x1              // TLB Invalidate VA , EL3
-   mrs     x2, sctlr_el3
 4: tbnz    x2, SCTLR_ELx_M_BIT_POS, 5f
    dc      ivac, x0              // invalidate in Dcache if MMU is still off
 5: dsb     nsh
@@ -138,28 +125,13 @@ ASM_FUNC(ArmUpdateTranslationTableEntry)
    ret
 
 ASM_FUNC(ArmInvalidateTlb)
-   EL1_OR_EL2_OR_EL3(x0)
+   EL1_OR_EL2(x0)
 1: tlbi  vmalle1
    b     4f
 2: tlbi  alle2
-   b     4f
-3: tlbi  alle3
 4: dsb   sy
    isb
    ret
-
-ASM_FUNC(ArmWriteCptr)
-  msr     cptr_el3, x0           // EL3 Coprocessor Trap Reg (CPTR)
-  ret
-
-ASM_FUNC(ArmWriteScr)
-  msr     scr_el3, x0            // Secure configuration register EL3
-  isb
-  ret
-
-ASM_FUNC(ArmWriteMVBar)
-  msr    vbar_el3, x0            // Exception Vector Base address for Monitor on EL3
-  ret
 
 ASM_FUNC(ArmCallWFE)
   wfe
@@ -180,22 +152,18 @@ ASM_FUNC(ArmWriteCpuActlr)
   ret
 
 ASM_FUNC(ArmReadSctlr)
-  EL1_OR_EL2_OR_EL3(x1)
+  EL1_OR_EL2(x1)
 1:mrs   x0, sctlr_el1
   ret
 2:mrs   x0, sctlr_el2
   ret
-3:mrs   x0, sctlr_el3
-4:ret
 
 ASM_FUNC(ArmWriteSctlr)
-  EL1_OR_EL2_OR_EL3(x1)
+  EL1_OR_EL2(x1)
 1:msr   sctlr_el1, x0
   ret
 2:msr   sctlr_el2, x0
   ret
-3:msr   sctlr_el3, x0
-4:ret
 
 ASM_FUNC(ArmGetPhysicalAddressBits)
   mrs   x0, id_aa64mmfr0_el1

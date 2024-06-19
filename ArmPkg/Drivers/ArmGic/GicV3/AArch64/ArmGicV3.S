@@ -17,7 +17,6 @@
 //
 #define ICC_SRE_EL1             S3_0_C12_C12_5
 #define ICC_SRE_EL2             S3_4_C12_C9_5
-#define ICC_SRE_EL3             S3_6_C12_C12_5
 #define ICC_IGRPEN1_EL1         S3_0_C12_C12_7
 #define ICC_EOIR1_EL1           S3_0_C12_C12_1
 #define ICC_IAR1_EL1            S3_0_C12_C12_0
@@ -32,12 +31,10 @@
 //  VOID
 //  );
 ASM_FUNC(ArmGicV3GetControlSystemRegisterEnable)
-        EL1_OR_EL2_OR_EL3(x1)
+        EL1_OR_EL2(x1)
 1:  mrs x0, ICC_SRE_EL1
         b       4f
 2:  mrs x0, ICC_SRE_EL2
-        b       4f
-3:  mrs x0, ICC_SRE_EL3
 4:  ret
 
 //VOID
@@ -46,12 +43,10 @@ ASM_FUNC(ArmGicV3GetControlSystemRegisterEnable)
 //  IN UINT32         ControlSystemRegisterEnable
 //  );
 ASM_FUNC(ArmGicV3SetControlSystemRegisterEnable)
-        EL1_OR_EL2_OR_EL3(x1)
+        EL1_OR_EL2(x1)
 1:  msr ICC_SRE_EL1, x0
         b       4f
 2:  msr ICC_SRE_EL2, x0
-        b       4f
-3:  msr ICC_SRE_EL3, x0
 4:  isb
         ret
 
