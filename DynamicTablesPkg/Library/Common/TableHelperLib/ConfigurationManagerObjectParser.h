@@ -16,8 +16,9 @@
   @param [in] Format  Format string for tracing the data as specified by
                       the 'Format' member of ACPI_PARSER.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field
 **/
-typedef VOID (EFIAPI *FNPTR_PRINT_FORMATTER)(CONST CHAR8 *Format, UINT8 *Ptr);
+typedef VOID (EFIAPI *FNPTR_PRINT_FORMATTER)(CONST CHAR8 *Format, UINT8 *Ptr, UINT32 Length);
 
 /**
   The CM_OBJ_PARSER structure describes the fields of an CmObject and
