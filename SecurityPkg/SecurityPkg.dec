@@ -8,6 +8,7 @@
 # Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
 # Copyright (c) Microsoft Corporation.<BR>
+# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -104,6 +105,10 @@
   ##  @libraryclass Perform SPDM (following SPDM spec) and measure data to TPM (following TCG PFP spec).
   ##
   SpdmSecurityLib|Include/Library/SpdmSecurityLib.h
+
+  ##  @libraryclass Provides platform-specific TCG event log
+  ##
+  DxePlatformTcgEventLogLib|Include/Library/DxePlatformTcgEventLogLib.h
 
 [Guids]
   ## Security package token space guid.

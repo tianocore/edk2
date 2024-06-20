@@ -5,6 +5,7 @@
 # (C) Copyright 2015-2020 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
 # Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
+# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -145,6 +146,7 @@
   Tpm12DeviceLib|SecurityPkg/Library/Tpm12DeviceLibTcg/Tpm12DeviceLibTcg.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibTcg2/Tpm2DeviceLibTcg2.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
+  PlatformTcgEventLogLib|SecurityPkg/Library/DxePlatformTcgEventLogLibNull/DxePlatformTcgEventLogLibNull.inf
 
 [LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.DXE_SAL_DRIVER,]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
@@ -286,6 +288,7 @@
   SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
   SecurityPkg/Library/TcgPpVendorLibNull/TcgPpVendorLibNull.inf
   SecurityPkg/Library/TcgEventLogRecordLib/TcgEventLogRecordLib.inf
+  SecurityPkg/Library/DxePlatformTcgEventLogLibNull/DxePlatformTcgEventLogLibNull.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   SecurityPkg/Library/AuthVariableLib/AuthVariableLib.inf
