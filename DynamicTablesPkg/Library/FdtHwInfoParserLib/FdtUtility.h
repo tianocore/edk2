@@ -62,9 +62,11 @@
 #define DT_SPI_IRQ  (0U)
 #define DT_IRQ_IS_EDGE_TRIGGERED(x)  ((((x) & (BIT0 | BIT1)) != 0))
 #define DT_IRQ_IS_ACTIVE_LOW(x)      ((((x) & (BIT1 | BIT3)) != 0))
-#define IRQ_TYPE_OFFSET    (0U)
-#define IRQ_NUMBER_OFFSET  (1U)
-#define IRQ_FLAGS_OFFSET   (2U)
+#define IRQ_TYPE_OFFSET          (0U)
+#define IRQ_NUMBER_OFFSET        (1U)
+#define IRQ_FLAGS_OFFSET         (2U)
+#define RISCV_IRQ_NUMBER_OFFSET  (0U)
+#define RISCV_IRQ_FLAGS_OFFSET   (1U)
 
 /** Get the interrupt Id of an interrupt described in a fdt.
 
@@ -483,6 +485,40 @@ FdtGetIntcAddressCells (
   IN        INT32 Node,
   OUT       INT32 *AddressCells, OPTIONAL
   OUT       INT32     *SizeCells       OPTIONAL
+  );
+
+/** Convert the IRQ number in DT to ACPI GSI number
+
+  In RISC-V, GSI space is divided among PLIC/APLICs. Hence, based
+  on the parent interrupt controller, the IRQ number need to be
+  converted into appropriate GSI number.
+
+  @param [in]  ExtIntcNode    Parent interrupt controller node.
+  @param [in]  Irq       Irq number to convert.
+
+**/
+UINT32
+FdtConvertToGsi (
+  IN INT32   ExtIntcNode,
+  IN UINT32  Irq
+  );
+
+/** Create list of external interrupt controllers.
+
+  In RISC-V, GSI space is divided among PLIC/APLICs. To convert
+  the IRQ number in DT of a device to appropriate GSI number,
+  create a list of external interrupt controllers.
+
+  @param [in]  ExtIntcNode    External interrupt controller node.
+  @param [in]  GsiBase        GSI base of the interrupt controller.
+
+  @retval EFI_SUCCESS           External interript controller node is added in the list.
+  @retval EFI_OUT_OF_RESOURCES  Failed to allocate memory for the list.
+**/
+EFI_STATUS
+FdtCreateExtIntcList (
+  INT32   ExtIntcNode,
+  UINT32  GsiBase
   );
 
 #endif // FDT_UTILITY_H_
