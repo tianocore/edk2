@@ -44,6 +44,12 @@ if /I "%1"=="/?" goto Usage
     set FORCE_REBUILD=TRUE
     goto loop
   )
+  if /I "%1"=="VS2022" (
+    shift
+    set VS2022=TRUE
+    set VSTool=VS2022
+    goto loop
+  )
   if /I "%1"=="VS2019" (
     shift
     set VS2019=TRUE
@@ -172,7 +178,9 @@ IF NOT exist "%EDK_TOOLS_PATH%\set_vsprefix_envs.bat" (
   @echo.
   goto end
 )
-if defined VS2019 (
+if defined VS2022 (
+  call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2022
+) else if defined VS2019 (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2019
 ) else if defined VS2017 (
   call %EDK_TOOLS_PATH%\set_vsprefix_envs.bat VS2017
@@ -437,12 +445,14 @@ if %ERRORLEVEL% EQU 0 (
   @echo         VS2015            Set the env for VS2015 build.
   @echo         VS2017            Set the env for VS2017 build.
   @echo         VS2019            Set the env for VS2019 build.
+  @echo         VS2022            Set the env for VS2022 build.
   @echo.
 
 :end
 set REBUILD=
 set FORCE_REBUILD=
 set RECONFIG=
+set VS2022=
 set VS2019=
 set VS2017=
 set VS2015=
