@@ -17,6 +17,7 @@
 #  buffer overflow, integer overflow.
 #
 # Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
+# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -64,6 +65,7 @@
   ReportStatusCodeLib
   Tcg2PhysicalPresenceLib
   PeCoffLib
+  PlatformTcgEventLogLib
 
 [Guids]
   ## SOMETIMES_CONSUMES     ## Variable:L"SecureBoot"
