@@ -50,6 +50,10 @@
 [Guids.Ia32, Guids.X64]
   gEfiRngAlgorithmSp80090Ctr256Guid
 
+[Sources.RISCV64]
+  Riscv/Rng.c
+  Riscv/Seed.S               | GCC
+
 [Packages]
   MdePkg/MdePkg.dec
 
@@ -59,3 +63,7 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+
+[Pcd.RISCV64]
+  # Does the CPU support the Zkr extension (for the `Seed` CSR)
+  gEfiMdePkgTokenSpaceGuid.PcdRiscVFeatureOverride           ## CONSUMES
