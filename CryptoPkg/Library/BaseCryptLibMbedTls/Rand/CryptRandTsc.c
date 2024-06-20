@@ -92,7 +92,7 @@ RandomBytes (
 /**
   The MbedTLS function f_rng, which MbedtlsRand implements.
 
-  @param[in]   RngState Not used, just for compatibility with mbedlts.
+  @param[in]   RngState Not used, just for compatibility with mbedtls.
   @param[out]  Output  Pointer to buffer to receive random value.
   @param[in]   Len    Size of random bytes to generate.
 

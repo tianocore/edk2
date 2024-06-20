@@ -288,7 +288,6 @@ IsEkuInCertificate (
   }
 
   Status = EFI_NOT_FOUND;
-  /*find the spdm hardware identity OID*/
   for (Index = 0; Index <= Len - EkuLen; Index++) {
     if (!CompareMem (Buffer + Index, EKU, EkuLen)) {
       // check sub EKU
