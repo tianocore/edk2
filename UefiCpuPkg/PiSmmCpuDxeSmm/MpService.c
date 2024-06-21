@@ -1,7 +1,7 @@
 /** @file
 SMM MP service implementation
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -268,7 +268,7 @@ SmmWaitForApArrival (
   // Sync with APs 1st timeout
   //
   for (Timer = StartSyncTimer ();
-       !IsSyncTimerTimeout (Timer) && !(LmceEn && LmceSignal);
+       !IsSyncTimerTimeout (Timer, mTimeoutTicker) && !(LmceEn && LmceSignal);
        )
   {
     mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmExceptBlockedDisabled ();
@@ -309,7 +309,7 @@ SmmWaitForApArrival (
     // Sync with APs 2nd timeout.
     //
     for (Timer = StartSyncTimer ();
-         !IsSyncTimerTimeout (Timer);
+         !IsSyncTimerTimeout (Timer, mTimeoutTicker2);
          )
     {
       mSmmMpSyncData->AllApArrivedWithException = AllCpusInSmmExceptBlockedDisabled ();
@@ -736,7 +736,7 @@ APHandler (
   // Timeout BSP
   //
   for (Timer = StartSyncTimer ();
-       !IsSyncTimerTimeout (Timer) &&
+       !IsSyncTimerTimeout (Timer, mTimeoutTicker) &&
        !(*mSmmMpSyncData->InsideSmm);
        )
   {
@@ -764,7 +764,7 @@ APHandler (
       // Now clock BSP for the 2nd time
       //
       for (Timer = StartSyncTimer ();
-           !IsSyncTimerTimeout (Timer) &&
+           !IsSyncTimerTimeout (Timer, mTimeoutTicker2) &&
            !(*mSmmMpSyncData->InsideSmm);
            )
       {

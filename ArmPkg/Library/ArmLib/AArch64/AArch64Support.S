@@ -9,7 +9,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <Chipset/AArch64.h>
+#include <AArch64/AArch64.h>
 #include <AsmMacroIoLibV8.h>
 
 .set CTRL_M_BIT,      (1 << 0)
@@ -67,14 +67,12 @@ ASM_FUNC(ArmInvalidateInstructionCache)
 
 
 ASM_FUNC(ArmEnableMmu)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1       // Read System control register EL1
    b       4f
 2: mrs     x0, sctlr_el2       // Read System control register EL2
-   b       4f
-3: mrs     x0, sctlr_el3       // Read System control register EL3
 4: orr     x0, x0, #CTRL_M_BIT // Set MMU enable bit
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: tlbi    vmalle1
    dsb     nsh
    isb
@@ -84,139 +82,107 @@ ASM_FUNC(ArmEnableMmu)
    dsb     nsh
    isb
    msr     sctlr_el2, x0       // Write back
-   b       4f
-3: tlbi    alle3
-   dsb     nsh
-   isb
-   msr     sctlr_el3, x0       // Write back
 4: isb
    ret
 
 
 ASM_FUNC(ArmDisableMmu)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1        // Read System Control Register EL1
    b       4f
 2: mrs     x0, sctlr_el2        // Read System Control Register EL2
-   b       4f
-3: mrs     x0, sctlr_el3        // Read System Control Register EL3
 4: and     x0, x0, #~CTRL_M_BIT  // Clear MMU enable bit
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: msr     sctlr_el1, x0        // Write back
    tlbi    vmalle1
    b       4f
 2: msr     sctlr_el2, x0        // Write back
    tlbi    alle2
-   b       4f
-3: msr     sctlr_el3, x0        // Write back
-   tlbi    alle3
 4: dsb     sy
    isb
    ret
 
 
 ASM_FUNC(ArmDisableCachesAndMmu)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1        // Get control register EL1
    b       4f
 2: mrs     x0, sctlr_el2        // Get control register EL2
-   b       4f
-3: mrs     x0, sctlr_el3        // Get control register EL3
 4: mov     x1, #~(CTRL_M_BIT | CTRL_C_BIT | CTRL_I_BIT)  // Disable MMU, D & I caches
    and     x0, x0, x1
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
 2: msr     sctlr_el2, x0        // Write back control register
-   b       4f
-3: msr     sctlr_el3, x0        // Write back control register
 4: dsb     sy
    isb
    ret
 
 
 ASM_FUNC(ArmMmuEnabled)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1        // Get control register EL1
    b       4f
 2: mrs     x0, sctlr_el2        // Get control register EL2
-   b       4f
-3: mrs     x0, sctlr_el3        // Get control register EL3
 4: and     x0, x0, #CTRL_M_BIT
    ret
 
 
 ASM_FUNC(ArmEnableDataCache)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1        // Get control register EL1
    b       4f
 2: mrs     x0, sctlr_el2        // Get control register EL2
-   b       4f
-3: mrs     x0, sctlr_el3        // Get control register EL3
 4: orr     x0, x0, #CTRL_C_BIT  // Set C bit
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
 2: msr     sctlr_el2, x0        // Write back control register
-   b       4f
-3: msr     sctlr_el3, x0        // Write back control register
 4: dsb     sy
    isb
    ret
 
 
 ASM_FUNC(ArmDisableDataCache)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1        // Get control register EL1
    b       4f
 2: mrs     x0, sctlr_el2        // Get control register EL2
-   b       4f
-3: mrs     x0, sctlr_el3        // Get control register EL3
 4: and     x0, x0, #~CTRL_C_BIT  // Clear C bit
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
 2: msr     sctlr_el2, x0        // Write back control register
-   b       4f
-3: msr     sctlr_el3, x0        // Write back control register
 4: dsb     sy
    isb
    ret
 
 
 ASM_FUNC(ArmEnableInstructionCache)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1        // Get control register EL1
    b       4f
 2: mrs     x0, sctlr_el2        // Get control register EL2
-   b       4f
-3: mrs     x0, sctlr_el3        // Get control register EL3
 4: orr     x0, x0, #CTRL_I_BIT  // Set I bit
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
 2: msr     sctlr_el2, x0        // Write back control register
-   b       4f
-3: msr     sctlr_el3, x0        // Write back control register
 4: dsb     sy
    isb
    ret
 
 
 ASM_FUNC(ArmDisableInstructionCache)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1        // Get control register EL1
    b       4f
 2: mrs     x0, sctlr_el2        // Get control register EL2
-   b       4f
-3: mrs     x0, sctlr_el3        // Get control register EL3
 4: and     x0, x0, #~CTRL_I_BIT  // Clear I bit
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
 2: msr     sctlr_el2, x0        // Write back control register
-   b       4f
-3: msr     sctlr_el3, x0        // Write back control register
 4: dsb     sy
    isb
    ret
@@ -238,19 +204,15 @@ ASM_FUNC(ArmEnableAlignmentCheck)
 
 
 ASM_FUNC(ArmDisableAlignmentCheck)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1        // Get control register EL1
    b       4f
 2: mrs     x0, sctlr_el2        // Get control register EL2
-   b       4f
-3: mrs     x0, sctlr_el3        // Get control register EL3
 4: and     x0, x0, #~CTRL_A_BIT  // Clear A (alignment check) bit
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
 2: msr     sctlr_el2, x0        // Write back control register
-   b       4f
-3: msr     sctlr_el3, x0        // Write back control register
 4: dsb     sy
    isb
    ret
@@ -271,19 +233,15 @@ ASM_FUNC(ArmEnableStackAlignmentCheck)
 
 
 ASM_FUNC(ArmDisableStackAlignmentCheck)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs     x0, sctlr_el1        // Get control register EL1
    b       4f
 2: mrs     x0, sctlr_el2        // Get control register EL2
-   b       4f
-3: mrs     x0, sctlr_el3        // Get control register EL3
 4: bic     x0, x0, #CTRL_SA_BIT // Clear SA (stack alignment check) bit
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: msr     sctlr_el1, x0        // Write back control register
    b       4f
 2: msr     sctlr_el2, x0        // Write back control register
-   b       4f
-3: msr     sctlr_el3, x0        // Write back control register
 4: dsb     sy
    isb
    ret
@@ -374,24 +332,19 @@ ASM_FUNC(ArmInstructionSynchronizationBarrier)
 
 
 ASM_FUNC(ArmWriteVBar)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: msr   vbar_el1, x0            // Set the Address of the EL1 Vector Table in the VBAR register
    b     4f
 2: msr   vbar_el2, x0            // Set the Address of the EL2 Vector Table in the VBAR register
-   b     4f
-3: msr   vbar_el3, x0            // Set the Address of the EL3 Vector Table in the VBAR register
 4: isb
    ret
 
 ASM_FUNC(ArmReadVBar)
-   EL1_OR_EL2_OR_EL3(x1)
+   EL1_OR_EL2(x1)
 1: mrs   x0, vbar_el1            // Set the Address of the EL1 Vector Table in the VBAR register
    ret
 2: mrs   x0, vbar_el2            // Set the Address of the EL2 Vector Table in the VBAR register
    ret
-3: mrs   x0, vbar_el3            // Set the Address of the EL3 Vector Table in the VBAR register
-   ret
-
 
 ASM_FUNC(ArmEnableVFP)
   // Check whether floating-point is implemented in the processor.
@@ -409,15 +362,11 @@ ASM_FUNC(ArmEnableVFP)
   orr   x0, x0, #CPACR_VFP_BITS // Disable FVP traps to EL1
   msr   cpacr_el1, x0           // Write back EL1 Coprocessor Access Control Register (CPACR)
   mov   x1, #AARCH64_CPTR_TFP   // TFP Bit for trapping VFP Exceptions
-  EL1_OR_EL2_OR_EL3(x2)
+  EL1_OR_EL2(x2)
 1:ret                           // Not configurable in EL1
 2:mrs   x0, cptr_el2            // Disable VFP traps to EL2
   bic   x0, x0, x1
   msr   cptr_el2, x0
-  ret
-3:mrs   x0, cptr_el3            // Disable VFP traps to EL3
-  bic   x0, x0, x1
-  msr   cptr_el3, x0
 4:ret
 
 

@@ -13,7 +13,7 @@
 #include <Library/ArmLib.h>
 #include <Library/DebugLib.h>
 
-#include <Chipset/AArch64.h>
+#include <AArch64/AArch64.h>
 
 #include "AArch64Lib.h"
 #include "ArmLibPrivate.h"
