@@ -513,11 +513,11 @@ if __name__ == '__main__':
                         raise argparse.ArgumentTypeError ('JSON field MonotonicCount must be an integer in range 0x0..0xffffffffffffffff')
                     else:
                         raise argparse.ArgumentTypeError ('--monotonic-count must be an integer in range 0x0..0xffffffffffffffff')
-                if self.UpdateImageIndex >0xFF:
+                if self.UpdateImageIndex < 0x1 or self.UpdateImageIndex > 0xFF:
                     if args.JsonFile:
-                        raise argparse.ArgumentTypeError ('JSON field UpdateImageIndex must be an integer in range 0x0..0xff')
+                        raise argparse.ArgumentTypeError ('JSON field UpdateImageIndex must be an integer in range 0x1..0xff')
                     else:
-                        raise argparse.ArgumentTypeError ('--update-image-index must be an integer in range 0x0..0xff')
+                        raise argparse.ArgumentTypeError ('--update-image-index must be an integer in range 0x1..0xff')
 
             if self.UseSignTool:
                 if self.SignToolPfxFile is not None:
