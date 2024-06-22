@@ -831,7 +831,7 @@ if __name__ == '__main__':
                             print ('--------')
                             print ('No EFI_FIRMWARE_IMAGE_AUTHENTICATION')
 
-                    PayloadSignature = struct.unpack ('<I', SinglePayloadDescriptor.Payload[0:4])
+                    (PayloadSignature,) = struct.unpack ('<I', SinglePayloadDescriptor.Payload[0:4])
                     if PayloadSignature != FmpPayloadHeader.Signature:
                         SinglePayloadDescriptor.UseDependency = True
                         try:
@@ -918,7 +918,7 @@ if __name__ == '__main__':
                         print ('--------')
                         print ('No EFI_FIRMWARE_IMAGE_AUTHENTICATION')
 
-                    PayloadSignature = struct.unpack ('<I', Result[0:4])
+                    (PayloadSignature,) = struct.unpack ('<I', Result[0:4])
                     if PayloadSignature != FmpPayloadHeader.Signature:
                         try:
                             Result = CapsuleDependency.Decode (Result)
