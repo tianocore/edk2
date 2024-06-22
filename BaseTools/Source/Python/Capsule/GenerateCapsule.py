@@ -580,7 +580,7 @@ if __name__ == '__main__':
             try:
                 SinglePayloadDescriptor.Validate (args)
             except Exception as Msg:
-                print ('GenerateCapsule: error:' + str(Msg))
+                print ('GenerateCapsule: error: ' + str(Msg))
                 sys.exit (1)
         for SinglePayloadDescriptor in PayloadDescriptorList:
             ImageCapsuleSupport = 0x0000000000000000
@@ -708,7 +708,7 @@ if __name__ == '__main__':
             try:
                 SinglePayloadDescriptor.Validate (args)
             except Exception as Msg:
-                print ('GenerateCapsule: error:' + str(Msg))
+                print ('GenerateCapsule: error: ' + str(Msg))
                 sys.exit (1)
         try:
             Result = UefiCapsuleHeader.Decode (Buffer)
