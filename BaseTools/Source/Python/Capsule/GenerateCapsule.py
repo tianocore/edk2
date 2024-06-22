@@ -873,8 +873,8 @@ if __name__ == '__main__':
                         print ('GenerateCapsule: error: can not write embedded driver file {File}'.format (File = EmbeddedDriverPath))
                         sys.exit (1)
 
-        except:
-            print ('GenerateCapsule: error: can not decode capsule')
+        except Exception as Msg:
+            print ('GenerateCapsule: error: can not decode capsule: ' + str(Msg))
             sys.exit (1)
         GenerateOutputJson(PayloadJsonDescriptorList)
         PayloadIndex = 0
