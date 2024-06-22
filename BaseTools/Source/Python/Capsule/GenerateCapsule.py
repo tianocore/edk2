@@ -519,6 +519,10 @@ if __name__ == '__main__':
                     else:
                         raise argparse.ArgumentTypeError ('--update-image-index must be an integer in range 0x1..0xff')
 
+            if args.Decode:
+                if args.OutputFile is None:
+                    raise argparse.ArgumentTypeError ('--decode requires --output')
+
             if self.UseSignTool:
                 if self.SignToolPfxFile is not None:
                     self.SignToolPfxFile.close()
