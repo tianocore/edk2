@@ -690,7 +690,7 @@ if __name__ == '__main__':
                                             args.HardwareInstance,
                                             args.UpdateImageIndex,
                                             args.SignToolPfxFile,
-                                            args.SignSubjectName,
+                                            args.SignToolSubjectName,
                                             args.OpenSslSignerPrivateCertFile,
                                             args.OpenSslOtherPublicCertFile,
                                             args.OpenSslTrustedPublicCertFile,
