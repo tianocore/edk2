@@ -87,8 +87,6 @@
 #define AML_DECREMENT_OP           0x76
 #define AML_MULTIPLY_OP            0x77
 #define AML_DIVIDE_OP              0x78
-#define AML_SHIFT_LEFT_OP          0x79
-#define AML_SHIFT_RIGHT_OP         0x7a
 #define AML_AND_OP                 0x7b
 #define AML_NAND_OP                0x7c
 #define AML_OR_OP                  0x7d
@@ -153,7 +151,6 @@
 #define AML_EXT_RELEASE_OP       0x27
 #define AML_EXT_FROM_BCD_OP      0x28
 #define AML_EXT_TO_BCD_OP        0x29
-#define AML_EXT_UNLOAD_OP        0x2a
 #define AML_EXT_REVISION_OP      0x30
 #define AML_EXT_DEBUG_OP         0x31
 #define AML_EXT_FATAL_OP         0x32
@@ -161,7 +158,6 @@
 #define AML_EXT_REGION_OP        0x80
 #define AML_EXT_FIELD_OP         0x81
 #define AML_EXT_DEVICE_OP        0x82
-#define AML_EXT_PROCESSOR_OP     0x83
 #define AML_EXT_POWER_RES_OP     0x84
 #define AML_EXT_THERMAL_ZONE_OP  0x85
 #define AML_EXT_INDEX_FIELD_OP   0x86
