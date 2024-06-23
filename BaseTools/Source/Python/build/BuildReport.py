@@ -2416,20 +2416,27 @@ class BuildReport(object):
                                 # Generate compile command for each c file
                                 #
                                 compile_command["file"] = source.Path
-                                compile_command["directory"] = source.Dir
+                                compile_command["directory"] = module.BuildDir
                                 build_command = module.BuildRules[source.Ext].CommandList[0]
+                                destination = os.path.join (module.OutputDir, os.path.join (source.SubDir, source.BaseName + ".obj"))
                                 build_command_variables = re.findall(r"\$\((.*?)\)", build_command)
-                                for var in build_command_variables:
+                                while build_command_variables:
+                                    var = build_command_variables.pop()
                                     var_tokens = var.split("_")
                                     var_main = var_tokens[0]
-                                    if len(var_tokens) == 1:
+                                    if var == "INC":
+                                        var_value = inc_flag + f" {inc_flag}".join(module.IncludePathList)
+                                    elif var in module.Macros:
+                                        var_value = module.Macros[var]
+                                    elif len(var_tokens) == 1:
                                         var_value = module.BuildOption[var_main]["PATH"]
                                     else:
                                         var_value = module.BuildOption[var_main][var_tokens[1]]
                                     build_command = build_command.replace(f"$({var})", var_value)
-                                    include_files = f" {inc_flag}".join(module.IncludePathList)
-                                    build_command = build_command.replace("${src}", include_files)
-                                    build_command = build_command.replace("${dst}", module.OutputDir)
+                                    build_command = build_command.replace("${src}", source.Path)
+                                    build_command = build_command.replace("${dst}", destination)
+                                    build_command = build_command.replace("$@", destination)
+                                    build_command_variables.extend (re.findall(r"\$\((.*?)\)", var_value))
 
                                 # Remove un defined macros
                                 compile_command["command"] = re.sub(r"\$\(.*?\)", "", build_command)

@@ -194,6 +194,16 @@ INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
 
 #
+# Rng Protocol producer
+#
+INF  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
+#
+# Hash2 Protocol producer
+#
+INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+#
 # Secure Boot Key Enroll
 #
 !if $(SECURE_BOOT_ENABLE) == TRUE
@@ -320,4 +330,3 @@ INF  ShellPkg/Application/Shell/Shell.inf
     UI        STRING="$(MODULE_NAME)" Optional
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
-

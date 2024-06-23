@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <Pi/PrePiDxeCis.h>
-#include <Pi/PrePiHob.h>
+#include <Pi/PiDxeCis.h>
+#include <Pi/PiHob.h>
 #include "DxeMain.h"
 #include "Gcd.h"
 #include "Mem/HeapGuard.h"
@@ -92,6 +92,7 @@ GCD_ATTRIBUTE_CONVERSION_ENTRY  mAttributeConversionTable[] = {
   { EFI_RESOURCE_ATTRIBUTE_TESTED,                  EFI_MEMORY_TESTED,        FALSE },
   { EFI_RESOURCE_ATTRIBUTE_PERSISTABLE,             EFI_MEMORY_NV,            TRUE  },
   { EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE,           EFI_MEMORY_MORE_RELIABLE, TRUE  },
+  { EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE,         EFI_MEMORY_SP,            TRUE  },
   { 0,                                              0,                        FALSE }
 };
 
@@ -105,7 +106,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8  *mGcdMemoryTypeNames[] = {
   "MMIO     ",  // EfiGcdMemoryTypeMemoryMappedIo
   "PersisMem",  // EfiGcdMemoryTypePersistent
   "MoreRelia",  // EfiGcdMemoryTypeMoreReliable
-  "Unaccepte",  // EFI_GCD_MEMORY_TYPE_UNACCEPTED
+  "Unaccepte",  // EfiGcdMemoryTypeUnaccepted
   "Unknown  "   // EfiGcdMemoryTypeMaximum
 };
 
@@ -2669,8 +2670,8 @@ CoreInitializeGcdServices (
         case EFI_RESOURCE_MEMORY_RESERVED:
           GcdMemoryType = EfiGcdMemoryTypeReserved;
           break;
-        case BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED:
-          GcdMemoryType = EFI_GCD_MEMORY_TYPE_UNACCEPTED;
+        case EFI_RESOURCE_MEMORY_UNACCEPTED:
+          GcdMemoryType = EfiGcdMemoryTypeUnaccepted;
           break;
         case EFI_RESOURCE_IO:
           GcdIoType = EfiGcdIoTypeIo;

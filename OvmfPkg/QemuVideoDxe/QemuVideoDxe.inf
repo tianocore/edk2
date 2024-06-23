@@ -33,10 +33,6 @@
   Initialize.c
   Qemu.h
 
-[Sources.Ia32, Sources.X64]
-  VbeShim.c
-  VbeShim.h
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -44,6 +40,7 @@
 
 [LibraryClasses]
   BaseMemoryLib
+  DxeServicesTableLib
   FrameBufferBltLib
   DebugLib
   DevicePathLib
@@ -60,6 +57,9 @@
   gEfiGraphicsOutputProtocolGuid                # PROTOCOL BY_START
   gEfiDevicePathProtocolGuid                    # PROTOCOL BY_START
   gEfiPciIoProtocolGuid                         # PROTOCOL TO_START
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdRemapFrameBufferWriteCombine
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId

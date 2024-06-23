@@ -13,7 +13,7 @@
 #  may not be modified without authorization. If platform fails to protect these resources,
 #  the authentication service provided in this driver will be broken, and the behavior is undefined.
 #
-# Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -60,7 +60,7 @@
   TpmMeasurementLib
   SafeIntLib
   PcdLib
-  MmUnblockMemoryLib
+  HobLib
 
 [Protocols]
   gEfiVariableWriteArchProtocolGuid             ## PRODUCES
@@ -75,11 +75,12 @@
   gEdkiiVariablePolicyProtocolGuid              ## PRODUCES
 
 [FeaturePcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache           ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableCollectStatistics            ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAllowVariablePolicyEnforcementDisable     ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTcgPfpMeasurementRevision                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableSpdmDeviceAuthentication             ## PRODUCES AND CONSUMES
 
 [Guids]
   ## PRODUCES             ## GUID # Signature of Variable store header
@@ -110,6 +111,8 @@
 
   gVarCheckPolicyLibMmiHandlerGuid
   gEfiEndOfDxeEventGroupGuid
+  gEfiDeviceSignatureDatabaseGuid
+  gEdkiiVariableRuntimeCacheInfoHobGuid
 
 [Depex]
   gEfiMmCommunication2ProtocolGuid

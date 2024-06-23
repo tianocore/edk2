@@ -4,9 +4,9 @@
 # This SMM driver performs SMM initialization, deploy SMM Entry Vector,
 # provides CPU specific services in SMM.
 #
-# Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
-# Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -47,27 +47,21 @@
   SmmMpPerf.c
 
 [Sources.Ia32]
-  Ia32/Semaphore.c
   Ia32/PageTbl.c
   Ia32/SmmFuncsArch.c
   Ia32/SmmProfileArch.c
   Ia32/SmmProfileArch.h
-  Ia32/SmmInit.nasm
   Ia32/SmiEntry.nasm
   Ia32/SmiException.nasm
-  Ia32/MpFuncs.nasm
   Ia32/Cet.nasm
 
 [Sources.X64]
-  X64/Semaphore.c
   X64/PageTbl.c
   X64/SmmFuncsArch.c
   X64/SmmProfileArch.c
   X64/SmmProfileArch.h
-  X64/SmmInit.nasm
   X64/SmiEntry.nasm
   X64/SmiException.nasm
-  X64/MpFuncs.nasm
   X64/Cet.nasm
 
 [Packages]
@@ -114,6 +108,7 @@
   gEdkiiSmmMemoryAttributeProtocolGuid     ## PRODUCES
   gEfiMmMpProtocolGuid                     ## PRODUCES
   gEdkiiSmmCpuRendezvousProtocolGuid       ## PRODUCES
+  gEfiMpServiceProtocolGuid                ## CONSUMES
 
 [Guids]
   gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.
@@ -139,7 +134,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize                   ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize                     ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout                 ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                    ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2                ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress               ## SOMETIMES_PRODUCES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES

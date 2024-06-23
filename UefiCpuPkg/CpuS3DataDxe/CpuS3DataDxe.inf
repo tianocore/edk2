@@ -9,7 +9,7 @@
 #  support hot plug CPUs.  This module can be copied into a CPU specific package
 #  and customized if these additional features are required.
 #
-#  Copyright (c) 2013-2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2013-2024, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2015, Red Hat, Inc.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -46,9 +46,11 @@
   BaseLib
   MtrrLib
   MemoryAllocationLib
+  LockBoxLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
+  gEdkiiS3MtrrSettingGuid
 
 [Protocols]
   gEfiMpServiceProtocolGuid          ## CONSUMES

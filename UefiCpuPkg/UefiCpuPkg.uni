@@ -3,7 +3,7 @@
 //
 // This Package provides UEFI compatible CPU modules and libraries.
 //
-// Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 //
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
@@ -128,9 +128,13 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmShadowStackSize_HELP   #language en-US "Specifies shadow stack size in bytes for each processor in SMM."
 
-#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmApSyncTimeout_PROMPT  #language en-US "AP synchronization timeout value in SMM"
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmApSyncTimeout_PROMPT  #language en-US "The 1st BSP/AP synchronization timeout value in SMM."
 
-#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmApSyncTimeout_HELP  #language en-US "Specifies timeout value in microseconds for the BSP in SMM to wait for all APs to come into SMM."
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmApSyncTimeout_HELP  #language en-US "Specifies the 1st timeout value in microseconds for the BSP/AP in SMM to wait for one another to enter SMM."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmApSyncTimeout2_PROMPT  #language en-US "The 2nd BSP/AP synchronization timeout value in SMM"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmApSyncTimeout2_HELP  #language en-US "Specifies the 2nd timeout value in microseconds for the BSP/AP in SMM to wait for one another to enter SMM."
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmCodeAccessCheckEnable_PROMPT  #language en-US "SMM Code Access Check"
 
