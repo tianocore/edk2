@@ -1524,7 +1524,7 @@ typedef struct {
   UINT8    AsyncSurpriseRemoval    : 1;
   UINT8    FlexbusSlotCxl10Capable : 1;
   UINT8    FlexbusSlotCxl20Capable : 1;
-  UINT8    Reserved                : 1; ///< Set to 0.
+  UINT8    FlexbusSlotCxl30Capable : 1; /// SMBIOS spec 3.7.0 updated CXL 3.0 support
 } MISC_SLOT_CHARACTERISTICS2;
 
 ///
@@ -2027,6 +2027,13 @@ typedef struct {
   //
   UINT32                                     ExtendedSpeed;
   UINT32                                     ExtendedConfiguredMemorySpeed;
+  //
+  // Add for smbios 3.7.0
+  //
+  UINT16                                     Pmic0ManufacturerID;
+  UINT16                                     Pmic0RevisionNumber;
+  UINT16                                     RcdManufacturerID;
+  UINT16                                     RcdRevisionNumber;
 } SMBIOS_TABLE_TYPE17;
 
 ///
