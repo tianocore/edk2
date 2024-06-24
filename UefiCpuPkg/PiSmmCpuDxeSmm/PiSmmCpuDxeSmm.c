@@ -232,7 +232,7 @@ SmmReadSaveState (
   //
   // Retrieve pointer to the specified CPU's SMM Save State buffer
   //
-  if ((CpuIndex >= gSmst->NumberOfCpus) || (Buffer == NULL)) {
+  if ((CpuIndex >= gMmst->NumberOfCpus) || (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -304,7 +304,7 @@ SmmWriteSaveState (
   //
   // Retrieve pointer to the specified CPU's SMM Save State buffer
   //
-  if ((CpuIndex >= gSmst->NumberOfCpus) || (Buffer == NULL)) {
+  if ((CpuIndex >= gMmst->NumberOfCpus) || (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1289,7 +1289,7 @@ PiCpuSmmEntry (
   //
   // Install the SMM CPU Protocol into SMM protocol database
   //
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &mSmmCpuHandle,
                     &gEfiSmmCpuProtocolGuid,
                     EFI_NATIVE_INTERFACE,
@@ -1300,7 +1300,7 @@ PiCpuSmmEntry (
   //
   // Install the SMM Memory Attribute Protocol into SMM protocol database
   //
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &mSmmCpuHandle,
                     &gEdkiiSmmMemoryAttributeProtocolGuid,
                     EFI_NATIVE_INTERFACE,
@@ -1321,7 +1321,7 @@ PiCpuSmmEntry (
   //
   // Install the SMM Mp Protocol into SMM protocol database
   //
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &mSmmCpuHandle,
                     &gEfiMmMpProtocolGuid,
                     EFI_NATIVE_INTERFACE,
@@ -1346,7 +1346,7 @@ PiCpuSmmEntry (
   //
   // register SMM Ready To Lock Protocol notification
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
+  Status = gMmst->MmRegisterProtocolNotify (
                     &gEfiSmmReadyToLockProtocolGuid,
                     SmmReadyToLockEventNotify,
                     &Registration
@@ -1591,7 +1591,7 @@ ConfigSmmCodeAccessCheck (
   //
   // Enable SMM Code Access Check feature for the APs.
   //
-  for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
+  for (Index = 0; Index < gMmst->NumberOfCpus; Index++) {
     if (Index != gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu) {
       if (gSmmCpuPrivate->ProcessorInfo[Index].ProcessorId == INVALID_APIC_ID) {
         //
@@ -1609,7 +1609,7 @@ ConfigSmmCodeAccessCheck (
       //
       // Call SmmStartupThisAp() to enable SMM Code Access Check on an AP.
       //
-      Status = gSmst->SmmStartupThisAp (ConfigSmmCodeAccessCheckOnCurrentProcessor, Index, &Index);
+      Status = gMmst->MmStartupThisAp (ConfigSmmCodeAccessCheckOnCurrentProcessor, Index, &Index);
       ASSERT_EFI_ERROR (Status);
 
       //
@@ -1648,7 +1648,7 @@ AllocateCodePages (
     return NULL;
   }
 
-  Status = gSmst->SmmAllocatePages (AllocateAnyPages, EfiRuntimeServicesCode, Pages, &Memory);
+  Status = gMmst->MmAllocatePages (AllocateAnyPages, EfiRuntimeServicesCode, Pages, &Memory);
   if (EFI_ERROR (Status)) {
     return NULL;
   }
