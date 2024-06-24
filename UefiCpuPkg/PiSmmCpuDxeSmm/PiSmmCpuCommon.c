@@ -433,38 +433,6 @@ ExecuteFirstSmiInit (
 }
 
 /**
-  SMM Ready To Lock event notification handler.
-
-  mSmmReadyToLock is set to perform additional lock actions that must be
-  performed from SMM on the next SMI.
-
-  @param[in] Protocol   Points to the protocol's unique identifier.
-  @param[in] Interface  Points to the interface instance.
-  @param[in] Handle     The handle on which the interface was installed.
-
-  @retval EFI_SUCCESS   Notification handler runs successfully.
- **/
-EFI_STATUS
-EFIAPI
-SmmReadyToLockEventNotify (
-  IN CONST EFI_GUID  *Protocol,
-  IN VOID            *Interface,
-  IN EFI_HANDLE      Handle
-  )
-{
-  //
-  // Cache a copy of UEFI memory map before we start profiling feature.
-  //
-  GetUefiMemoryMap ();
-
-  //
-  // Set SMM ready to lock flag and return
-  //
-  mSmmReadyToLock = TRUE;
-  return EFI_SUCCESS;
-}
-
-/**
   Function to compare 2 SMM_BASE_HOB_DATA pointer based on ProcessorIndex.
 
   @param[in] Buffer1            pointer to SMM_BASE_HOB_DATA poiner to compare
@@ -759,7 +727,6 @@ PiSmmCpuEntryCommon (
   UINTN       TileDataSize;
   UINTN       TileSize;
   UINT8       *Stacks;
-  VOID        *Registration;
   UINT32      RegEax;
   UINT32      RegEbx;
   UINT32      RegEcx;
@@ -1229,16 +1196,6 @@ PiSmmCpuEntryCommon (
   // Initialize SMM CPU Services Support
   //
   Status = InitializeSmmCpuServices (mSmmCpuHandle);
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // register SMM Ready To Lock Protocol notification
-  //
-  Status = gMmst->MmRegisterProtocolNotify (
-                    &gEfiSmmReadyToLockProtocolGuid,
-                    SmmReadyToLockEventNotify,
-                    &Registration
-                    );
   ASSERT_EFI_ERROR (Status);
 
   //
