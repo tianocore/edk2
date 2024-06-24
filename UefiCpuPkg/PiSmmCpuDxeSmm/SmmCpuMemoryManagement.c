@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -774,9 +774,9 @@ SmmGetSystemConfigurationTable (
   ASSERT (Table != NULL);
 
   *Table = NULL;
-  for (Index = 0; Index < gSmst->NumberOfTableEntries; Index++) {
-    if (CompareGuid (TableGuid, &(gSmst->SmmConfigurationTable[Index].VendorGuid))) {
-      *Table = gSmst->SmmConfigurationTable[Index].VendorTable;
+  for (Index = 0; Index < gMmst->NumberOfTableEntries; Index++) {
+    if (CompareGuid (TableGuid, &(gMmst->MmConfigurationTable[Index].VendorGuid))) {
+      *Table = gMmst->MmConfigurationTable[Index].VendorTable;
       return EFI_SUCCESS;
     }
   }
