@@ -1,14 +1,14 @@
 /** @file
 X64 processor specific functions to enable SMM profile.
 
-Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 #include "SmmProfileInternal.h"
 
 //
