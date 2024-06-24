@@ -270,6 +270,7 @@ extern UINT8  mSmmSaveStateRegisterLma;
 extern BOOLEAN  mBtsSupported;
 extern UINTN    mMsrDsAreaSize;
 extern BOOLEAN  mAcpiS3Enable;
+extern BOOLEAN  mSmmReadyToLock;
 
 #define PAGE_TABLE_POOL_ALIGNMENT   BASE_128KB
 #define PAGE_TABLE_POOL_UNIT_SIZE   BASE_128KB
