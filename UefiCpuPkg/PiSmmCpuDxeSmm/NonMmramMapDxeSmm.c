@@ -523,3 +523,81 @@ IsSmmCommBufferForbiddenAddress (
 
   return FALSE;
 }
+
+/**
+  Create extended protection MemoryRegion.
+  Return all MMIO ranges that are reported in GCD service at EndOfDxe.
+
+  The caller is responsible for freeing MemoryRegion via FreePool().
+
+  @param[out]     MemoryRegion         Returned Non-Mmram Memory regions.
+  @param[out]     MemoryRegionCount    A pointer to the number of Memory regions.
+**/
+VOID
+CreateExtendedProtectionRange (
+  OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
+  OUT UINTN                 *MemoryRegionCount
+  )
+{
+  UINTN                            Index;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  UINTN                            NumberOfSpaceDescriptors;
+  UINTN                            MemoryRegionIndex;
+  UINTN                            Count;
+
+  MemorySpaceMap           = NULL;
+  NumberOfSpaceDescriptors = 0;
+  Count                    = 0;
+
+  ASSERT (MemoryRegion != NULL && MemoryRegionCount != NULL);
+
+  *MemoryRegion      = NULL;
+  *MemoryRegionCount = 0;
+
+  //
+  // Get MMIO ranges from GCD.
+  //
+  gDS->GetMemorySpaceMap (
+         &NumberOfSpaceDescriptors,
+         &MemorySpaceMap
+         );
+  for (Index = 0; Index < NumberOfSpaceDescriptors; Index++) {
+    if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo)) {
+      if (ADDRESS_IS_ALIGNED (MemorySpaceMap[Index].BaseAddress, SIZE_4KB) &&
+          (MemorySpaceMap[Index].Length % SIZE_4KB == 0))
+      {
+        Count++;
+      } else {
+        //
+        // Skip the MMIO range that BaseAddress and Length are not 4k aligned since
+        // the minimum granularity of the page table is 4k
+        //
+        DEBUG ((
+          DEBUG_WARN,
+          "MMIO range [0x%lx, 0x%lx] is skipped since it is not 4k aligned.\n",
+          MemorySpaceMap[Index].BaseAddress,
+          MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length
+          ));
+      }
+    }
+  }
+
+  *MemoryRegionCount = Count;
+
+  *MemoryRegion = (MM_CPU_MEMORY_REGION *)AllocateZeroPool (sizeof (MM_CPU_MEMORY_REGION) * Count);
+  ASSERT (*MemoryRegion != NULL);
+
+  MemoryRegionIndex = 0;
+  for (Index = 0; Index < NumberOfSpaceDescriptors; Index++) {
+    if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
+        ADDRESS_IS_ALIGNED (MemorySpaceMap[Index].BaseAddress, SIZE_4KB) &&
+        (MemorySpaceMap[Index].Length % SIZE_4KB == 0))
+    {
+      (*MemoryRegion)[MemoryRegionIndex].Base   = MemorySpaceMap[Index].BaseAddress;
+      (*MemoryRegion)[MemoryRegionIndex].Length = MemorySpaceMap[Index].Length;
+      MemoryRegionIndex++;
+    }
+  }
+
+  return;
+}
