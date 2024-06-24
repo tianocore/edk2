@@ -12,6 +12,35 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuCommon.h"
 
 /**
+  Get SmmCpuSyncConfig data: RelaxedMode, SyncTimeout, SyncTimeout2.
+
+  @param[in,out] RelaxedMode   It indicates if Relaxed CPU synchronization method or
+                               traditional CPU synchronization method is used when processing an SMI.
+  @param[in,out] SyncTimeout   It indicates the 1st BSP/AP synchronization timeout value in SMM.
+  @param[in,out] SyncTimeout2  It indicates the 2nd BSP/AP synchronization timeout value in SMM.
+
+ **/
+VOID
+GetSmmCpuSyncConfigData (
+  IN OUT BOOLEAN *RelaxedMode, OPTIONAL
+  IN OUT UINT64  *SyncTimeout, OPTIONAL
+  IN OUT UINT64  *SyncTimeout2 OPTIONAL
+  )
+{
+  if (RelaxedMode != NULL) {
+    *RelaxedMode = (BOOLEAN)(PcdGet8 (PcdCpuSmmSyncMode) == SmmCpuSyncModeRelaxedAp);
+  }
+
+  if (SyncTimeout != NULL) {
+    *SyncTimeout = PcdGet64 (PcdCpuSmmApSyncTimeout);
+  }
+
+  if (SyncTimeout2 != NULL) {
+    *SyncTimeout2 = PcdGet64 (PcdCpuSmmApSyncTimeout2);
+  }
+}
+
+/**
   Get ACPI S3 enable flag.
 
 **/
