@@ -248,15 +248,3 @@ InitSmmS3ResumeState (
     InitSmmS3Cr3 ((UINTN *)&SmmS3ResumeState->SmmS3Cr3);
   }
 }
-
-/**
-  Get ACPI S3 enable flag.
-
-**/
-VOID
-GetAcpiS3EnableFlag (
-  VOID
-  )
-{
-  mAcpiS3Enable = PcdGetBool (PcdAcpiS3Enable);
-}

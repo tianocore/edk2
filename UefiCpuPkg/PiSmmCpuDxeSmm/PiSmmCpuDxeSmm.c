@@ -12,6 +12,18 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuCommon.h"
 
 /**
+  Get ACPI S3 enable flag.
+
+**/
+VOID
+GetAcpiS3EnableFlag (
+  VOID
+  )
+{
+  mAcpiS3Enable = PcdGetBool (PcdAcpiS3Enable);
+}
+
+/**
   Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION for all CPU from gEfiMpServiceProtocolGuid.
 
   @param[out] NumberOfCpus           Pointer to NumberOfCpus.
