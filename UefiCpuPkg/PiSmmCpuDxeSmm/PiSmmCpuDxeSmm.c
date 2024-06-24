@@ -58,9 +58,13 @@ PerformRemainingTasks (
     }
 
     //
-    // Create a mix of 2MB and 4KB page table. Update some memory ranges absent and execute-disable.
+    // Update Page Table
     //
-    InitPaging ();
+    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+      SmmProfileUpdateMemoryAttributes ();
+    } else {
+      UpdateUefiMemMapAttributes ();
+    }
 
     //
     // gEdkiiPiSmmMemoryAttributesTableGuid should have been published at EndOfDxe by SmmCore
@@ -77,11 +81,6 @@ PerformRemainingTasks (
     }
 
     if (IsRestrictedMemoryAccess ()) {
-      //
-      // For outside SMRAM, we only map SMM communication buffer or MMIO.
-      //
-      SetUefiMemMapAttributes ();
-
       //
       // Set page table itself to be read-only
       //
