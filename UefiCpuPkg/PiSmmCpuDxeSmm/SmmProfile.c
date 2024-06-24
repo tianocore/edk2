@@ -742,16 +742,25 @@ InitSmmProfileCallBack (
   IN EFI_HANDLE      Handle
   )
 {
+  EFI_STATUS                 Status;
+  EFI_SMM_VARIABLE_PROTOCOL  *SmmProfileVariable;
+
+  //
+  // Locate SmmVariableProtocol.
+  //
+  Status = gMmst->MmLocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **)&SmmProfileVariable);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Save to variable so that SMM profile data can be found.
   //
-  gRT->SetVariable (
-         SMM_PROFILE_NAME,
-         &gEfiCallerIdGuid,
-         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-         sizeof (mSmmProfileBase),
-         &mSmmProfileBase
-         );
+  SmmProfileVariable->SmmSetVariable (
+                        SMM_PROFILE_NAME,
+                        &gEfiCallerIdGuid,
+                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                        sizeof (mSmmProfileBase),
+                        &mSmmProfileBase
+                        );
 
   //
   // Get Software SMI from FADT
