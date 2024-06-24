@@ -30,6 +30,7 @@
 
 [Sources]
   PiSmmCpuDxeSmm.c
+  PiSmmCpuCommon.c
   PiSmmCpuCommon.h
   MpService.c
   SyncTimer.c
