@@ -479,6 +479,21 @@ extern UINT64  mAddressEncMask;
 extern UINT64  mTimeoutTicker;
 extern UINT64  mTimeoutTicker2;
 
+typedef struct {
+  ///
+  /// Address of the first byte in the memory region.
+  ///
+  EFI_PHYSICAL_ADDRESS    Base;
+  ///
+  /// Length in bytes of the memory region.
+  ///
+  UINT64                  Length;
+  ///
+  /// Attributes of the memory region
+  ///
+  UINT64                  Attribute;
+} MM_CPU_MEMORY_REGION;
+
 /**
   Create 4G PageTable in SMRAM.
 
@@ -938,6 +953,21 @@ GetSmmProfileData (
 BOOLEAN
 IsSmmCommBufferForbiddenAddress (
   IN UINT64  Address
+  );
+
+/*
+  Build extended protection MemoryRegion.
+
+  The caller is responsible for freeing MemoryRegion via FreePool().
+
+  @param[out]     MemoryRegion         Returned Non-Mmram Memory regions.
+  @param[out]     MemoryRegionCount    A pointer to the number of Memory regions.
+
+*/
+VOID
+CreateExtendedProtectionRange (
+  OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
+  OUT UINTN                 *MemoryRegionCount
   );
 
 /**
