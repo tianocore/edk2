@@ -130,5 +130,9 @@ extern BOOLEAN  mXdEnabled;
 // The flag indicates if #DB will be setup in #PF handler.
 //
 extern BOOLEAN  mSetupDebugTrap;
+//
+// SMI command port.
+//
+extern UINT32  mSmiCommandPort;
 
 #endif // _SMM_PROFILE_H_

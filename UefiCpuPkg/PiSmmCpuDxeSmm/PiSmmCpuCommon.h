@@ -40,8 +40,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/SmmCpuPlatformHookLib.h>
 #include <Library/MmServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/UefiLib.h>
 #include <Library/HobLib.h>
