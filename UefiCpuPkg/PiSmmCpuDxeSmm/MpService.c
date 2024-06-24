@@ -1924,6 +1924,7 @@ InitializeMpServiceData (
   CPUID_VERSION_INFO_EDX          RegEdx;
   UINT32                          MaxExtendedFunction;
   CPUID_VIR_PHY_ADDRESS_SIZE_EAX  VirPhyAddressSize;
+  BOOLEAN                         RelaxedMode;
 
   //
   // Determine if this CPU supports machine check
@@ -1943,7 +1944,10 @@ InitializeMpServiceData (
                        (sizeof (SMM_CPU_DATA_BLOCK) + sizeof (BOOLEAN)) * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
   mSmmMpSyncData = (SMM_DISPATCHER_MP_SYNC_DATA *)AllocatePages (EFI_SIZE_TO_PAGES (mSmmMpSyncDataSize));
   ASSERT (mSmmMpSyncData != NULL);
-  mCpuSmmSyncMode = (SMM_CPU_SYNC_MODE)PcdGet8 (PcdCpuSmmSyncMode);
+
+  RelaxedMode = FALSE;
+  GetSmmCpuSyncConfigData (&RelaxedMode, NULL, NULL);
+  mCpuSmmSyncMode = RelaxedMode ? SmmCpuSyncModeRelaxedAp : SmmCpuSyncModeTradition;
   InitializeMpSyncData ();
 
   //
