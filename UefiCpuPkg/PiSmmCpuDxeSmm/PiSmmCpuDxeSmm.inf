@@ -46,6 +46,7 @@
   SmmMp.c
   SmmMpPerf.h
   SmmMpPerf.c
+  NonMmramMapDxeSmm.c
 
 [Sources.Ia32]
   Ia32/PageTbl.c
