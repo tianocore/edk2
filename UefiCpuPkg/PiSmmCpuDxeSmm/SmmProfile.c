@@ -784,12 +784,11 @@ InitSmmProfileInternal (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Base;
-  VOID                  *Registration;
-  UINTN                 Index;
-  UINTN                 MsrDsAreaSizePerCpu;
-  UINTN                 TotalSize;
+  EFI_STATUS  Status;
+  VOID        *Registration;
+  UINTN       Index;
+  UINTN       MsrDsAreaSizePerCpu;
+  UINT64      SmmProfileSize;
 
   mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mMaxNumberOfCpus);
   ASSERT (mPFEntryCount != NULL);
@@ -802,29 +801,15 @@ InitSmmProfileInternal (
                                                            );
   ASSERT (mLastPFEntryPointer != NULL);
 
-  //
-  // Allocate memory for SmmProfile below 4GB.
-  // The base address
-  //
-  mSmmProfileSize = PcdGet32 (PcdCpuSmmProfileSize);
+  mSmmProfileSize = FixedPcdGet32 (PcdCpuSmmProfileSize);
   ASSERT ((mSmmProfileSize & 0xFFF) == 0);
 
-  if (mBtsSupported) {
-    TotalSize = mSmmProfileSize + mMsrDsAreaSize;
-  } else {
-    TotalSize = mSmmProfileSize;
-  }
-
-  Base   = 0xFFFFFFFF;
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  EFI_SIZE_TO_PAGES (TotalSize),
-                  &Base
-                  );
-  ASSERT_EFI_ERROR (Status);
-  ZeroMem ((VOID *)(UINTN)Base, TotalSize);
-  mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)Base;
+  //
+  // Get Smm Profile Base
+  //
+  mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)GetSmmProfileData (&SmmProfileSize);
+  DEBUG ((DEBUG_ERROR, "SmmProfileBase = 0x%016x.\n", (UINTN)mSmmProfileBase));
+  DEBUG ((DEBUG_ERROR, "SmmProfileSize = 0x%016x.\n", (UINTN)SmmProfileSize));
 
   //
   // Initialize SMM profile data header.
@@ -847,7 +832,7 @@ InitSmmProfileInternal (
     mMsrPEBSRecord = (PEBS_RECORD **)AllocateZeroPool (sizeof (PEBS_RECORD *) * mMaxNumberOfCpus);
     ASSERT (mMsrPEBSRecord != NULL);
 
-    mMsrDsAreaBase      = (MSR_DS_AREA_STRUCT *)((UINTN)Base + mSmmProfileSize);
+    mMsrDsAreaBase      = (MSR_DS_AREA_STRUCT *)((UINTN)mSmmProfileBase + mSmmProfileSize);
     MsrDsAreaSizePerCpu = mMsrDsAreaSize / mMaxNumberOfCpus;
     mBTSRecordNumber    = (MsrDsAreaSizePerCpu - sizeof (PEBS_RECORD) * PEBS_RECORD_NUMBER - sizeof (MSR_DS_AREA_STRUCT)) / sizeof (BRANCH_TRACE_RECORD);
     for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
@@ -880,7 +865,7 @@ InitSmmProfileInternal (
   // Update SMM profile entry.
   //
   mProtectionMemRange[1].Range.Base = (EFI_PHYSICAL_ADDRESS)(UINTN)mSmmProfileBase;
-  mProtectionMemRange[1].Range.Top  = (EFI_PHYSICAL_ADDRESS)(UINTN)mSmmProfileBase + TotalSize;
+  mProtectionMemRange[1].Range.Top  = (EFI_PHYSICAL_ADDRESS)(UINTN)mSmmProfileBase + SmmProfileSize;
 
   //
   // Allocate memory reserved for creating 4KB pages.

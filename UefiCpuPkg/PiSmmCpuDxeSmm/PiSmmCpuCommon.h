@@ -267,6 +267,9 @@ extern UINTN                 mSmmShadowStackSize;
 ///
 extern UINT8  mSmmSaveStateRegisterLma;
 
+extern BOOLEAN  mBtsSupported;
+extern UINTN    mMsrDsAreaSize;
+
 #define PAGE_TABLE_POOL_ALIGNMENT   BASE_128KB
 #define PAGE_TABLE_POOL_UNIT_SIZE   BASE_128KB
 #define PAGE_TABLE_POOL_UNIT_PAGES  EFI_SIZE_TO_PAGES (PAGE_TABLE_POOL_UNIT_SIZE)
@@ -908,6 +911,19 @@ SetMemMapAttributes (
 VOID
 SetUefiMemMapAttributes (
   VOID
+  );
+
+/**
+  Get SmmProfileData.
+
+  @param[in, out]     Size     Return Size of SmmProfileData.
+
+  @return Address of SmmProfileData
+
+**/
+EFI_PHYSICAL_ADDRESS
+GetSmmProfileData (
+  IN OUT  UINT64  *Size
   );
 
 /**
