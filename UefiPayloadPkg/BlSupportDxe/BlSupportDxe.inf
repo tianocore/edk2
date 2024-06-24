@@ -40,10 +40,13 @@
   BaseMemoryLib
   UefiLib
   HobLib
+  BlParseLib
+  MemoryAllocationLib
 
 [Guids]
   gUefiAcpiBoardInfoGuid
   gEfiGraphicsInfoHobGuid
+  gEfiSystemResourceTableGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
