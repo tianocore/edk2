@@ -424,6 +424,43 @@ SetUefiMemMapAttributes (
 }
 
 /**
+  Get SmmProfileData.
+
+  @param[in, out]     Size     Return Size of SmmProfileData.
+
+  @return Address of SmmProfileData
+
+**/
+EFI_PHYSICAL_ADDRESS
+GetSmmProfileData (
+  IN OUT  UINT64  *Size
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PHYSICAL_ADDRESS  Base;
+
+  ASSERT (Size != NULL);
+
+  if (mBtsSupported) {
+    *Size = PcdGet32 (PcdCpuSmmProfileSize) + mMsrDsAreaSize;
+  } else {
+    *Size = PcdGet32 (PcdCpuSmmProfileSize);
+  }
+
+  Base   = 0xFFFFFFFF;
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiReservedMemoryType,
+                  (UINTN)EFI_SIZE_TO_PAGES (*Size),
+                  &Base
+                  );
+  ASSERT_EFI_ERROR (Status);
+  ZeroMem ((VOID *)(UINTN)Base, (UINTN)*Size);
+
+  return Base;
+}
+
+/**
   Return if the Address is forbidden as SMM communication buffer.
 
   @param[in] Address the address to be checked
