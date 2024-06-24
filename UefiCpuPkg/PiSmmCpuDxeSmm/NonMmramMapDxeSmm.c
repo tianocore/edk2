@@ -523,3 +523,66 @@ IsSmmCommBufferForbiddenAddress (
 
   return FALSE;
 }
+
+/**
+  Create extended protection MemoryRegion.
+  Return all MMIO ranges that are reported in GCD service at EndOfDxe.
+
+  The caller is responsible for freeing MemoryRegion via FreePool().
+
+  @param[out]     MemoryRegion         Returned Non-Mmram Memory regions.
+  @param[out]     MemoryRegionCount    A pointer to the number of Memory regions.
+**/
+VOID
+CreateExtendedProtectionRange (
+  OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
+  OUT UINTN                 *MemoryRegionCount
+  )
+{
+  UINTN                            Index;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
+  UINTN                            NumberOfSpaceDescriptors;
+  UINTN                            MemoryRegionIndex;
+  UINTN                            Count;
+
+  MemorySpaceMap           = NULL;
+  NumberOfSpaceDescriptors = 0;
+  Count                    = 0;
+
+  ASSERT (MemoryRegion != NULL && MemoryRegionCount != NULL);
+
+  *MemoryRegion      = NULL;
+  *MemoryRegionCount = 0;
+
+  //
+  // Get MMIO ranges from GCD.
+  //
+  gDS->GetMemorySpaceMap (
+         &NumberOfSpaceDescriptors,
+         &MemorySpaceMap
+         );
+  for (Index = 0; Index < NumberOfSpaceDescriptors; Index++) {
+    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
+      Count++;
+    }
+  }
+
+  *MemoryRegionCount = Count;
+
+  *MemoryRegion = (MM_CPU_MEMORY_REGION *)AllocateZeroPool (sizeof (MM_CPU_MEMORY_REGION) * Count);
+  ASSERT (*MemoryRegion != NULL);
+
+  MemoryRegionIndex = 0;
+  for (Index = 0; Index < NumberOfSpaceDescriptors; Index++) {
+    if (MemorySpaceMap[Index].GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) {
+      continue;
+    }
+
+    (*MemoryRegion)[MemoryRegionIndex].Base   = MemorySpaceMap[Index].BaseAddress;
+    (*MemoryRegion)[MemoryRegionIndex].Length = MemorySpaceMap[Index].Length;
+
+    MemoryRegionIndex++;
+  }
+
+  return;
+}
