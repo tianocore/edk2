@@ -1282,7 +1282,6 @@ CpuSmramRangeCompare (
 }
 
 /**
-
   Find out SMRAM information including SMRR base and SMRR size.
 
   @param          SmrrBase          SMRR base
@@ -1295,35 +1294,24 @@ FindSmramInfo (
   OUT UINT32  *SmrrSize
   )
 {
-  EFI_STATUS                Status;
-  UINTN                     Size;
-  EFI_SMM_ACCESS2_PROTOCOL  *SmmAccess;
-  EFI_SMRAM_DESCRIPTOR      *CurrentSmramRange;
-  UINTN                     Index;
-  UINT64                    MaxSize;
-  BOOLEAN                   Found;
-  EFI_SMRAM_DESCRIPTOR      SmramDescriptor;
+  VOID                            *GuidHob;
+  EFI_SMRAM_HOB_DESCRIPTOR_BLOCK  *DescriptorBlock;
+  EFI_SMRAM_DESCRIPTOR            *CurrentSmramRange;
+  UINTN                           Index;
+  UINT64                          MaxSize;
+  BOOLEAN                         Found;
+  EFI_SMRAM_DESCRIPTOR            SmramDescriptor;
 
-  //
-  // Get SMM Access Protocol
-  //
-  Status = gBS->LocateProtocol (&gEfiSmmAccess2ProtocolGuid, NULL, (VOID **)&SmmAccess);
-  ASSERT_EFI_ERROR (Status);
+  ASSERT (SmrrBase != NULL && SmrrSize != NULL);
 
   //
   // Get SMRAM information
   //
-  Size   = 0;
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, NULL);
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-
-  mSmmCpuSmramRanges = (EFI_SMRAM_DESCRIPTOR *)AllocatePool (Size);
-  ASSERT (mSmmCpuSmramRanges != NULL);
-
-  Status = SmmAccess->GetCapabilities (SmmAccess, &Size, mSmmCpuSmramRanges);
-  ASSERT_EFI_ERROR (Status);
-
-  mSmmCpuSmramRangeCount = Size / sizeof (EFI_SMRAM_DESCRIPTOR);
+  GuidHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
+  ASSERT (GuidHob != NULL);
+  DescriptorBlock        = (EFI_SMRAM_HOB_DESCRIPTOR_BLOCK *)GET_GUID_HOB_DATA (GuidHob);
+  mSmmCpuSmramRangeCount = DescriptorBlock->NumberOfSmmReservedRegions;
+  mSmmCpuSmramRanges     = DescriptorBlock->Descriptor;
 
   //
   // Sort the mSmmCpuSmramRanges
@@ -1373,7 +1361,7 @@ FindSmramInfo (
     }
   } while (Found);
 
-  DEBUG ((DEBUG_INFO, "SMRR Base: 0x%x, SMRR Size: 0x%x\n", *SmrrBase, *SmrrSize));
+  DEBUG ((DEBUG_INFO, "%a: SMRR Base = 0x%x, SMRR Size = 0x%x\n", __func__, *SmrrBase, *SmrrSize));
 }
 
 /**
