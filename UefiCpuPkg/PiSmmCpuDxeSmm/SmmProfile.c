@@ -689,26 +689,6 @@ InitPaging (
 }
 
 /**
-  To get system port address of the SMI Command Port in FADT table.
-
-**/
-VOID
-GetSmiCommandPort (
-  VOID
-  )
-{
-  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE  *Fadt;
-
-  Fadt = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *)EfiLocateFirstAcpiTable (
-                                                        EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE
-                                                        );
-  ASSERT (Fadt != NULL);
-
-  mSmiCommandPort = Fadt->SmiCmd;
-  DEBUG ((DEBUG_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));
-}
-
-/**
   Updates page table to make some memory ranges (like system memory) absent
   and make some memory ranges (like MMIO) present and execute disable. It also
   update 2MB-page to 4KB-page for some memory ranges.
@@ -761,11 +741,6 @@ InitSmmProfileCallBack (
                         sizeof (mSmmProfileBase),
                         &mSmmProfileBase
                         );
-
-  //
-  // Get Software SMI from FADT
-  //
-  GetSmiCommandPort ();
 
   //
   // Initialize protected memory range for patching page table later.
