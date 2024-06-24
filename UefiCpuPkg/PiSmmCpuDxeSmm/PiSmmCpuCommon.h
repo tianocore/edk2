@@ -1490,4 +1490,30 @@ SmmWriteProtectReadOnlyPage (
     } \
   } while (FALSE)
 
+/**
+  Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION for all CPU from gEfiMpServiceProtocolGuid.
+
+  @param[out] NumberOfCpus           Pointer to NumberOfCpus.
+  @param[out] MaxNumberOfCpus        Pointer to MaxNumberOfCpus.
+
+  @retval ProcessorInfo              Pointer to EFI_PROCESSOR_INFORMATION buffer.
+**/
+EFI_PROCESSOR_INFORMATION *
+GetMpInformationFromMpServices (
+  OUT UINTN  *NumberOfCpus,
+  OUT UINTN  *MaxNumberOfCpus
+  );
+
+/**
+  The common Entry Point of the SMM CPU driver.
+
+  @retval EFI_SUCCESS    The common entry point is executed successfully.
+  @retval Other          Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+PiSmmCpuEntryCommon (
+  VOID
+  );
+
 #endif
