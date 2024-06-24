@@ -2,7 +2,7 @@
 # EFI/PI Reference Module Package for All Architectures
 #
 # (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-# Copyright (c) 2007 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #
@@ -178,6 +178,7 @@
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxStandaloneMmLib.inf
   MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
+  VarCheckHiiLibMmDependency|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
@@ -339,6 +340,7 @@
   MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
   MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
+  MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
   MdeModulePkg/Library/PlatformVarCleanupLib/PlatformVarCleanupLib.inf
   MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   MdeModulePkg/Library/DxeFileExplorerProtocol/DxeFileExplorerProtocol.inf
