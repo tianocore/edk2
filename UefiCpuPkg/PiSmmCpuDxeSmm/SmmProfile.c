@@ -892,7 +892,7 @@ InitSmmProfileInternal (
   //
   // Start SMM profile when SmmReadyToLock protocol is installed.
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
+  Status = gMmst->MmRegisterProtocolNotify (
                     &gEfiSmmReadyToLockProtocolGuid,
                     InitSmmProfileCallBack,
                     &Registration
@@ -1374,7 +1374,7 @@ SmmProfilePFHandler (
     // Indicate it is not software SMI
     //
     SmiCommand = 0xFFFFFFFFFFFFFFFFULL;
-    for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
+    for (Index = 0; Index < gMmst->NumberOfCpus; Index++) {
       Status = SmmReadSaveState (&mSmmCpu, sizeof (IoInfo), EFI_SMM_SAVE_STATE_REGISTER_IO, Index, &IoInfo);
       if (EFI_ERROR (Status)) {
         continue;
