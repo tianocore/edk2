@@ -102,7 +102,6 @@
   SmmCpuSyncLib
 
 [Protocols]
-  gEfiSmmAccess2ProtocolGuid               ## CONSUMES
   gEfiSmmConfigurationProtocolGuid         ## PRODUCES
   gEfiSmmCpuProtocolGuid                   ## PRODUCES
   gEfiSmmReadyToLockProtocolGuid           ## NOTIFY
@@ -118,6 +117,7 @@
   gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
   gSmmBaseHobGuid                          ## CONSUMES
   gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
+  gEfiSmmSmramMemoryGuid
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES
