@@ -23,6 +23,9 @@
 [Sources.ARM, Sources.AARCH64]
   Arm/ArmDbg2Generator.c
 
+[Sources.RISCV64]
+  RiscV/RiscVDbg2Generator.c
+
 [Sources.IA32, Sources.X86]
   Dbg2GeneratorNull.c
 
