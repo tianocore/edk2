@@ -80,7 +80,7 @@
   MtrrLib
   IoLib
   TimerLib
-  SmmServicesTableLib
+  MmServicesTableLib
   MemoryAllocationLib
   DebugAgentLib
   HobLib
