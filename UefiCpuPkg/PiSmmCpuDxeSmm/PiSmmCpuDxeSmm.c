@@ -12,6 +12,38 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuCommon.h"
 
 /**
+  SMM Ready To Lock event notification handler.
+
+  mSmmReadyToLock is set to perform additional lock actions that must be
+  performed from SMM on the next SMI.
+
+  @param[in] Protocol   Points to the protocol's unique identifier.
+  @param[in] Interface  Points to the interface instance.
+  @param[in] Handle     The handle on which the interface was installed.
+
+  @retval EFI_SUCCESS   Notification handler runs successfully.
+ **/
+EFI_STATUS
+EFIAPI
+SmmReadyToLockEventNotify (
+  IN CONST EFI_GUID  *Protocol,
+  IN VOID            *Interface,
+  IN EFI_HANDLE      Handle
+  )
+{
+  //
+  // Cache a copy of UEFI memory map before we start profiling feature.
+  //
+  GetUefiMemoryMap ();
+
+  //
+  // Set SMM ready to lock flag and return
+  //
+  mSmmReadyToLock = TRUE;
+  return EFI_SUCCESS;
+}
+
+/**
   Get SmmCpuSyncConfig data: RelaxedMode, SyncTimeout, SyncTimeout2.
 
   @param[in,out] RelaxedMode   It indicates if Relaxed CPU synchronization method or
@@ -149,6 +181,7 @@ PiCpuSmmEntry (
   )
 {
   EFI_STATUS  Status;
+  VOID        *Registration;
 
   //
   // Save the PcdPteMemoryEncryptionAddressOrMask value into a global variable.
@@ -181,6 +214,16 @@ PiCpuSmmEntry (
     Status = PcdSet64S (PcdCpuHotPlugDataAddress, (UINT64)(UINTN)&mCpuHotPlugData);
     ASSERT_EFI_ERROR (Status);
   }
+
+  //
+  // Register SMM Ready To Lock Protocol notification
+  //
+  Status = gMmst->MmRegisterProtocolNotify (
+                    &gEfiSmmReadyToLockProtocolGuid,
+                    SmmReadyToLockEventNotify,
+                    &Registration
+                    );
+  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
