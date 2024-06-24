@@ -1081,6 +1081,22 @@ RestoreSmmConfigurationInS3 (
   );
 
 /**
+  Get SmmCpuSyncConfig data: RelaxedMode, SyncTimeout, SyncTimeout2.
+
+  @param[in,out] RelaxedMode   It indicates if Relaxed CPU synchronization method or
+                               traditional CPU synchronization method is used when processing an SMI.
+  @param[in,out] SyncTimeout   It indicates the 1st BSP/AP synchronization timeout value in SMM.
+  @param[in,out] SyncTimeout2  It indicates the 2nd BSP/AP synchronization timeout value in SMM.
+
+ **/
+VOID
+GetSmmCpuSyncConfigData (
+  IN OUT BOOLEAN *RelaxedMode, OPTIONAL
+  IN OUT UINT64  *SyncTimeout, OPTIONAL
+  IN OUT UINT64  *SyncTimeout2 OPTIONAL
+  );
+
+/**
   Get ACPI S3 enable flag.
 
 **/
