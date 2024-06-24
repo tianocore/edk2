@@ -953,14 +953,6 @@ SetMemMapAttributes (
   );
 
 /**
-  This function sets UEFI memory attribute according to UEFI memory map.
-**/
-VOID
-SetUefiMemMapAttributes (
-  VOID
-  );
-
-/**
   Get SmmProfileData.
 
   @param[in, out]     Size     Return Size of SmmProfileData.
@@ -1029,6 +1021,15 @@ CreateNonMmramMemMap (
   IN  UINT8                 PhysicalAddressBits,
   OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
   OUT UINTN                 *MemoryRegionCount
+  );
+
+/**
+  This function updates UEFI memory attribute according to UEFI memory map.
+
+**/
+VOID
+UpdateUefiMemMapAttributes (
+  VOID
   );
 
 /**

@@ -311,116 +311,152 @@ GetUefiMemoryMap (
 }
 
 /**
-  This function sets UEFI memory attribute according to UEFI memory map.
+  This function updates UEFI memory attribute according to UEFI memory map.
 
-  The normal memory region is marked as not present, such as
-  EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
-  EfiUnusableMemory, EfiACPIReclaimMemory.
 **/
 VOID
-SetUefiMemMapAttributes (
+UpdateUefiMemMapAttributes (
   VOID
   )
 {
-  EFI_STATUS             Status;
-  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
-  UINTN                  MemoryMapEntryCount;
-  UINTN                  Index;
-  EFI_MEMORY_DESCRIPTOR  *Entry;
   BOOLEAN                WriteProtect;
   BOOLEAN                CetEnabled;
+  EFI_STATUS             Status;
+  UINTN                  Index;
+  UINT64                 Limit;
+  UINT64                 PreviousAddress;
+  UINT64                 Base;
+  UINT64                 MemoryAttr;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
+  UINTN                  MemoryMapEntryCount;
+  EFI_MEMORY_DESCRIPTOR  *Entry;
 
-  PERF_FUNCTION_BEGIN ();
-
-  DEBUG ((DEBUG_INFO, "SetUefiMemMapAttributes\n"));
+  DEBUG ((DEBUG_INFO, "UpdateUefiMemMapAttributes Start...\n"));
 
   WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
-  if (mUefiMemoryMap != NULL) {
-    MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
-    MemoryMap           = mUefiMemoryMap;
-    for (Index = 0; Index < MemoryMapEntryCount; Index++) {
-      if (IsUefiPageNotPresent (MemoryMap)) {
-        Status = SmmSetMemoryAttributes (
-                   MemoryMap->PhysicalStart,
-                   EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
-                   EFI_MEMORY_RP
-                   );
-        DEBUG ((
-          DEBUG_INFO,
-          "UefiMemory protection: 0x%lx - 0x%lx %r\n",
-          MemoryMap->PhysicalStart,
-          MemoryMap->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
-          Status
-          ));
-      }
-
-      MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, mUefiDescriptorSize);
-    }
+  if (sizeof (UINTN) == sizeof (UINT32)) {
+    Limit = BASE_4GB;
+  } else {
+    Limit = (IsRestrictedMemoryAccess ()) ? LShiftU64 (1, mPhysicalAddressBits) : BASE_4GB;
   }
 
   //
-  // Do not free mUefiMemoryMap, it will be checked in IsSmmCommBufferForbiddenAddress().
+  // [0, 4k] may be non-present.
   //
+  PreviousAddress = ((FixedPcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
 
-  //
-  // Set untested memory as not present.
-  //
-  if (mGcdMemSpace != NULL) {
-    for (Index = 0; Index < mGcdMemNumberOfDesc; Index++) {
-      Status = SmmSetMemoryAttributes (
-                 mGcdMemSpace[Index].BaseAddress,
-                 mGcdMemSpace[Index].Length,
-                 EFI_MEMORY_RP
-                 );
-      DEBUG ((
-        DEBUG_INFO,
-        "GcdMemory protection: 0x%lx - 0x%lx %r\n",
-        mGcdMemSpace[Index].BaseAddress,
-        mGcdMemSpace[Index].BaseAddress + mGcdMemSpace[Index].Length,
-        Status
-        ));
+  MemoryAttr = EFI_MEMORY_XP;
+  for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+    Base = mSmmCpuSmramRanges[Index].CpuStart;
+    if (Base > PreviousAddress) {
+      //
+      // Mark the ranges not in mSmmCpuSmramRanges as NX.
+      //
+      Status = SmmSetMemoryAttributes (PreviousAddress, Base - PreviousAddress, MemoryAttr);
+      ASSERT_RETURN_ERROR (Status);
     }
+
+    PreviousAddress = mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize;
   }
 
-  //
-  // Do not free mGcdMemSpace, it will be checked in IsSmmCommBufferForbiddenAddress().
-  //
+  if (PreviousAddress < Limit) {
+    Status = SmmSetMemoryAttributes (PreviousAddress, Limit - PreviousAddress, MemoryAttr);
+    ASSERT_RETURN_ERROR (Status);
+  }
 
-  //
-  // Set UEFI runtime memory with EFI_MEMORY_RO as not present.
-  //
-  if (mUefiMemoryAttributesTable != NULL) {
-    Entry = (EFI_MEMORY_DESCRIPTOR *)(mUefiMemoryAttributesTable + 1);
-    for (Index = 0; Index < mUefiMemoryAttributesTable->NumberOfEntries; Index++) {
-      if ((Entry->Type == EfiRuntimeServicesCode) || (Entry->Type == EfiRuntimeServicesData)) {
-        if ((Entry->Attribute & EFI_MEMORY_RO) != 0) {
+  if (IsRestrictedMemoryAccess ()) {
+    if (mUefiMemoryMap != NULL) {
+      MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
+      MemoryMap           = mUefiMemoryMap;
+      for (Index = 0; Index < MemoryMapEntryCount; Index++) {
+        if (IsUefiPageNotPresent (MemoryMap)) {
           Status = SmmSetMemoryAttributes (
-                     Entry->PhysicalStart,
-                     EFI_PAGES_TO_SIZE ((UINTN)Entry->NumberOfPages),
+                     MemoryMap->PhysicalStart,
+                     EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
                      EFI_MEMORY_RP
                      );
           DEBUG ((
             DEBUG_INFO,
-            "UefiMemoryAttribute protection: 0x%lx - 0x%lx %r\n",
-            Entry->PhysicalStart,
-            Entry->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE ((UINTN)Entry->NumberOfPages),
+            "UefiMemory protection: 0x%lx - 0x%lx %r\n",
+            MemoryMap->PhysicalStart,
+            MemoryMap->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages),
             Status
             ));
         }
-      }
 
-      Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mUefiMemoryAttributesTable->DescriptorSize);
+        MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, mUefiDescriptorSize);
+      }
     }
+
+    //
+    // Do not free mUefiMemoryMap, it will be checked in IsSmmCommBufferForbiddenAddress().
+    //
+
+    //
+    // Set untested memory as not present.
+    //
+    if (mGcdMemSpace != NULL) {
+      for (Index = 0; Index < mGcdMemNumberOfDesc; Index++) {
+        Status = SmmSetMemoryAttributes (
+                   mGcdMemSpace[Index].BaseAddress,
+                   mGcdMemSpace[Index].Length,
+                   EFI_MEMORY_RP
+                   );
+        DEBUG ((
+          DEBUG_INFO,
+          "GcdMemory protection: 0x%lx - 0x%lx %r\n",
+          mGcdMemSpace[Index].BaseAddress,
+          mGcdMemSpace[Index].BaseAddress + mGcdMemSpace[Index].Length,
+          Status
+          ));
+      }
+    }
+
+    //
+    // Do not free mGcdMemSpace, it will be checked in IsSmmCommBufferForbiddenAddress().
+    //
+
+    //
+    // Set UEFI runtime memory with EFI_MEMORY_RO as not present.
+    //
+    if (mUefiMemoryAttributesTable != NULL) {
+      Entry = (EFI_MEMORY_DESCRIPTOR *)(mUefiMemoryAttributesTable + 1);
+      for (Index = 0; Index < mUefiMemoryAttributesTable->NumberOfEntries; Index++) {
+        if ((Entry->Type == EfiRuntimeServicesCode) || (Entry->Type == EfiRuntimeServicesData)) {
+          if ((Entry->Attribute & EFI_MEMORY_RO) != 0) {
+            Status = SmmSetMemoryAttributes (
+                       Entry->PhysicalStart,
+                       EFI_PAGES_TO_SIZE ((UINTN)Entry->NumberOfPages),
+                       EFI_MEMORY_RP
+                       );
+            DEBUG ((
+              DEBUG_INFO,
+              "UefiMemoryAttribute protection: 0x%lx - 0x%lx %r\n",
+              Entry->PhysicalStart,
+              Entry->PhysicalStart + (UINT64)EFI_PAGES_TO_SIZE ((UINTN)Entry->NumberOfPages),
+              Status
+              ));
+          }
+        }
+
+        Entry = NEXT_MEMORY_DESCRIPTOR (Entry, mUefiMemoryAttributesTable->DescriptorSize);
+      }
+    }
+
+    //
+    // Do not free mUefiMemoryAttributesTable, it will be checked in IsSmmCommBufferForbiddenAddress().
+    //
   }
+
+  //
+  // Set execute-disable flag
+  //
+  mXdEnabled = TRUE;
 
   WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
-  //
-  // Do not free mUefiMemoryAttributesTable, it will be checked in IsSmmCommBufferForbiddenAddress().
-  //
-
-  PERF_FUNCTION_END ();
+  DEBUG ((DEBUG_INFO, "UpdateUefiMemMapAttributes Done.\n"));
 }
 
 /**
