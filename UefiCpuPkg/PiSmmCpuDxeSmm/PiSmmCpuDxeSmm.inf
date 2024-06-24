@@ -110,6 +110,7 @@
   gEfiMmMpProtocolGuid                     ## PRODUCES
   gEdkiiSmmCpuRendezvousProtocolGuid       ## PRODUCES
   gEfiMpServiceProtocolGuid                ## CONSUMES
+  gEfiSmmVariableProtocolGuid              ## CONSUMES
 
 [Guids]
   gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.
