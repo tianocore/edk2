@@ -10,6 +10,27 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include "PiSmmCpuCommon.h"
+#include <Library/UefiBootServicesTableLib.h>
+
+/**
+  To get system port address of the SMI Command Port in FADT table.
+
+**/
+VOID
+GetSmiCommandPort (
+  VOID
+  )
+{
+  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE  *Fadt;
+
+  Fadt = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *)EfiLocateFirstAcpiTable (
+                                                        EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE
+                                                        );
+  ASSERT (Fadt != NULL);
+
+  mSmiCommandPort = Fadt->SmiCmd;
+  DEBUG ((DEBUG_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));
+}
 
 /**
   SMM Ready To Lock event notification handler.
@@ -35,6 +56,16 @@ SmmReadyToLockEventNotify (
   // Cache a copy of UEFI memory map before we start profiling feature.
   //
   GetUefiMemoryMap ();
+
+  //
+  // Skip SMM profile initialization if feature is disabled
+  //
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    //
+    // Get Software SMI from FADT
+    //
+    GetSmiCommandPort ();
+  }
 
   //
   // Set SMM ready to lock flag and return
