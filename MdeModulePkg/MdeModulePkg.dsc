@@ -178,6 +178,7 @@
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxStandaloneMmLib.inf
   MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
+  VarCheckHiiLibMmDependency|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
@@ -216,6 +217,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"FVMAIN.FV"
 
 [Components]
+  MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   MdeModulePkg/Application/DumpDynPcd/DumpDynPcd.inf
   MdeModulePkg/Application/MemoryProfileInfo/MemoryProfileInfo.inf
