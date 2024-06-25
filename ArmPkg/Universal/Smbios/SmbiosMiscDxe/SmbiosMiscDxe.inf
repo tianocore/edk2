@@ -68,7 +68,6 @@
   gEfiSmbiosProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
 
 [Pcd]
-  gArmTokenSpaceGuid.PcdFdSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
   gArmTokenSpaceGuid.PcdSystemBiosRelease
