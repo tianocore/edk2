@@ -130,8 +130,8 @@ SortApicId (
         } else {
           for ( ; Index2 <= ApCount; Index2++) {
             if (CpuInfoInHob[Index2].ApicId == INVALID_APIC_ID) {
-              CopyMem (&CpuInfoInHob[Index2], &CpuInfoInHob[Index1], sizeof (CPU_INFO_IN_HOB));
-              CpuMpData->CpuData[Index2]  = CpuMpData->CpuData[Index1];
+              CopyMem (CpuInfoInHob + Index2, CpuInfoInHob + Index1, sizeof (CPU_INFO_IN_HOB));
+              CopyMem (CpuMpData->CpuData + Index2, CpuMpData->CpuData + Index1, sizeof (CPU_AP_DATA));
               CpuInfoInHob[Index1].ApicId = INVALID_APIC_ID;
               break;
             }
