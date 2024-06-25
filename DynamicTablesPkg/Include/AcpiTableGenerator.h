@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -99,6 +100,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdSsdtCpuTopology,               ///< SSDT Cpu Topology
   EStdAcpiTableIdSsdtPciExpress,                ///< SSDT Pci Express Generator
   EStdAcpiTableIdPcct,                          ///< PCCT Generator
+  EStdAcpiTableIdTpm2,                          ///< TPM2 Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
