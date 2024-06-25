@@ -665,6 +665,18 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonPsdInfoParser[] = {
   { "NumProc",   4, "0x%x", NULL },
 };
 
+/** A parser for EArchCommonObjTpm2InterfaceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonTpm2InterfaceInfo[] = {
+  { "PlatformClass",             sizeof (UINT16),                                               "0x%x",   NULL    },
+  { "AddressOfControlArea",      sizeof (UINT64),                                               "0x%llx", NULL    },
+  { "StartMethod",               sizeof (UINT32),                                               "0x%x",   NULL    },
+  { "StartMethodParametersSize", sizeof (UINT8),                                                "0x%x",   NULL    },
+  { "StartMethodParameters",     EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE, NULL,     HexDump },
+  { "Laml",                      sizeof (UINT32),                                               "0x%x",   NULL    },
+  { "Lasa",                      sizeof (UINT64),                                               "0x%llx", NULL    },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -694,6 +706,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType4Info,        CmArchCommonPccSubspaceType34InfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType5Info,        CmArchCommonPccSubspaceType5InfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPsdInfo,                     CmArchCommonPsdInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2InterfaceInfo,           CmArchCommonTpm2InterfaceInfo),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
