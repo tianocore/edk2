@@ -34,6 +34,7 @@ PopContext:
   //
   bl      DisableInterrupts
 
+  move    $a0, $s0                // Restore a0 parameter through s0(EFI_SYSTEM_CONTEXT)
   bl      GetExceptionType        // Get current exception type, and stored in register a0
 
   // Check whether the FPE is changed during interrupt handler, if ture restore it.
