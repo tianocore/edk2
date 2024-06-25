@@ -676,6 +676,17 @@ STATIC CONST CM_OBJ_PARSER  CmArmPsdInfoParser[] = {
   { "NumProc",   4, "0x%x", NULL },
 };
 
+/** A parser for EArmObjTpm2InterfaceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArmTpm2InterfaceInfo[] = {
+  { "PlatformClass",         sizeof (UINT16), "0x%x",   NULL    },
+  { "AddressOfControlArea",  sizeof (UINT64), "0x%llx", NULL    },
+  { "StartMethod",           sizeof (UINT32), "0x%x",   NULL    },
+  { "StartMethodParameters", 12,              NULL,     HexDump },
+  { "Laml",                  sizeof (UINT32), "0x%x",   NULL    },
+  { "Lasa",                  sizeof (UINT64), "0x%llx", NULL    },
+};
+
 /** A parser for Arm namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
@@ -776,6 +787,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
     ARRAY_SIZE (CmArmEtInfo) },
   { "EArmObjPsdInfo",                      CmArmPsdInfoParser,
     ARRAY_SIZE (CmArmPsdInfoParser) },
+  { "EArmObjTpm2InterfaceInfo",            CmArmTpm2InterfaceInfo,
+    ARRAY_SIZE (CmArmTpm2InterfaceInfo) },
   { "EArmObjMax",                          NULL,                                  0                                },
 };
 
