@@ -1,0 +1,39 @@
+## @file
+#  Arm Monitor Library that chooses the conduit based on the PSCI node in the
+#  device tree provided by QEMU
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2024, Google LLC. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = ArmVirtQemuMonitorLib
+  FILE_GUID                      = 09f50ee5-2aa2-42b9-a2a0-090faeefed2b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmMonitorLib|DXE_DRIVER DXE_RUNTIME_DRIVER
+  CONSTRUCTOR                    = ArmVirtQemuMonitorLibConstructor
+
+[Sources]
+  ArmVirtQemuMonitorLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmHvcLib
+  ArmSmcLib
+  BaseLib
+  DebugLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gFdtClientProtocolGuid                                ## CONSUMES
+
+[Depex]
+  gFdtClientProtocolGuid

@@ -10,12 +10,12 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
-  AMD64 Architecture Programming Manual volume 2, March 2017, Sections 15.34
+  AMD64 Architecture Programming Manual volume 2, March 2024
 
 **/
 
-#ifndef __FAM17_MSR_H__
-#define __FAM17_MSR_H__
+#ifndef SEV_SNP_MSR_H_
+#define SEV_SNP_MSR_H_
 
 /**
   Secure Encrypted Virtualization - Encrypted State (SEV-ES) GHCB register

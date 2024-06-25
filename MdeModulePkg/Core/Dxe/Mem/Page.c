@@ -1183,6 +1183,13 @@ CoreFindFreePagesI (
       continue;
     }
 
+    //
+    // Don't allocate out of Special-Purpose memory.
+    //
+    if ((Entry->Attribute & EFI_MEMORY_SP) != 0) {
+      continue;
+    }
+
     DescStart = Entry->Start;
     DescEnd   = Entry->End;
 
