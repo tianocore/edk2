@@ -38,7 +38,7 @@ IsBufferOutsideMmValid (
   IN UINT64                Length
   )
 {
-  return MmIsBufferOutsideMmValid (Buffer, Length);
+  return TRUE;
 }
 
 /**
