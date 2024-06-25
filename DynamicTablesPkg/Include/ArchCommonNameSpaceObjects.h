@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -15,6 +16,8 @@
 
 #include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
+
+#include <IndustryStandard/Tpm2Acpi.h>
 
 /** The EARCH_COMMON_OBJECT_ID enum describes the Object IDs
     in the Arch Common Namespace
@@ -46,6 +49,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPccSubspaceType4Info,           ///< 23 - Pcc Subspace Type 4 Info
   EArchCommonObjPccSubspaceType5Info,           ///< 24 - Pcc Subspace Type 5 Info
   EArchCommonObjPsdInfo,                        ///< 25 - P-State Dependency (PSD) Info
+  EArchCommonObjTpm2InterfaceInfo,              ///< 26 - TPM Interface Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -651,6 +655,41 @@ typedef struct CmArchCommonPccSubspaceType5Info {
     ID: EArchCommonObjPsdInfo
 */
 typedef AML_PSD_INFO CM_ARCH_COMMON_PSD_INFO;
+
+/** A structure that describes TPM interface and access method.
+
+  TCG ACPI Specification 2.0
+
+  ID: EArchCommonObjTpm2InterfaceInfo
+*/
+typedef struct CmArchCommonTpm2InterfaceInfo {
+  /** Platform Class
+        0: Client platform
+        1: Server platform
+  */
+  UINT16    PlatformClass;
+
+  /** Physical address of the Control Area */
+  UINT64    AddressOfControlArea;
+
+  /** The Start Method selector determines which mechanism the
+      device driver uses to notify the TPM 2.0 device that a
+      command is available for processing.
+  */
+  UINT32    StartMethod;
+
+  /** The number of bytes stored in StartMethodParameters[] */
+  UINT8     StartMethodParametersSize;
+
+  /** Start method specific parameters */
+  UINT8     StartMethodParameters[EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE];
+
+  /** Log Area Minimum Length */
+  UINT32    Laml;
+
+  /** Log Area Start Address */
+  UINT64    Lasa;
+} CM_ARCH_COMMON_TPM2_INTERFACE_INFO;
 
 #pragma pack()
 
