@@ -1,7 +1,7 @@
 /** @file
   Migrated FV information
 
-Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2020 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -50,7 +50,7 @@ typedef struct {
 
 typedef struct {
   UINT32    FvOrgBase;         // original FV address
-  UINT32    FvNewBase;         // new FV address
+  UINT32    FvNewBase;         // new FV address, 0 means rebased data is not copied
   UINT32    FvDataBase;        // original FV data, 0 means raw data is not copied
   UINT32    FvLength;          // Fv Length
 } EDKII_MIGRATED_FV_INFO;

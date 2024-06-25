@@ -45,7 +45,6 @@
 
 [Pcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress             ## SOMETIMES_PRODUCES
   gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
 

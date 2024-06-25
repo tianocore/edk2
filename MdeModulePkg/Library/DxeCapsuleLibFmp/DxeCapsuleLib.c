@@ -11,6 +11,7 @@
   performs basic validation.
 
   Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -47,6 +48,8 @@ BOOLEAN    mDxeCapsuleLibEndOfDxe      = FALSE;
 EFI_EVENT  mDxeCapsuleLibEndOfDxeEvent = NULL;
 
 EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL  *mFmpProgress = NULL;
+
+BOOLEAN  mDxeCapsuleLibReadyToBootEvent = FALSE;
 
 /**
   Initialize capsule related variables.
@@ -1402,6 +1405,16 @@ IsNestedFmpCapsule (
       }
     }
   } else {
+    if (mDxeCapsuleLibReadyToBootEvent) {
+      //
+      // The ESRT table (mEsrtTable) in the Configuration Table would be located
+      // at the ReadyToBoot event if it exists. Hence, it should return here to
+      // avoid a crash due to calling gBS->LocateProtocol () at runtime in case
+      // there is no ERST table installed.
+      //
+      return FALSE;
+    }
+
     //
     // Check ESRT protocol
     //

@@ -289,6 +289,8 @@
 
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
+
 [PcdsFeatureFlag.AARCH64]
   #
   # Activate AcpiSdtProtocol

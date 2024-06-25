@@ -461,6 +461,12 @@ F: MdePkg/Include/IndustryStandard/SpiNorFlashJedecSfdp.h
 M: Abner Chang <abner.chang@amd.com> [changab]
 R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
 
+MdePkg: ARM/AARCH64 standard interfaces
+F: MdePkg/Include/Library/ArmLib.h
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
+R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+
 NetworkPkg
 F: NetworkPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/NetworkPkg
@@ -573,6 +579,12 @@ OvmfPkg: RISC-V Qemu Virt Platform
 F: OvmfPkg/RiscVVirt
 M: Sunil V L <sunilvl@ventanamicro.com> [vlsunil]
 R: Andrei Warkentin <andrei.warkentin@intel.com> [andreiw]
+
+OvmfPkg: LOONGARCH Qemu Virt Platform
+F: OvmfPkg/LoongArchVirt
+M: Chao Li <lichao@loongson.cn> [kilaterlee]
+M: Bibo Mao <maobibo@loongson.cn> [bibo-mao]
+R: Xianglai Li <lixianglai@loongson.cn> [lixianglai]
 
 PcAtChipsetPkg
 F: PcAtChipsetPkg/
