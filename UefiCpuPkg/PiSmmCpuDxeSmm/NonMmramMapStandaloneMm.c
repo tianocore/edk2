@@ -47,6 +47,38 @@ GetSmmProfileData (
 }
 
 /**
+  Return if the Address is the NonMmram logging Address.
+
+  @param[in] Address the address to be checked
+
+  @return TRUE  The address is the NonMmram logging Address.
+  @return FALSE The address is not the NonMmram logging Address.
+**/
+BOOLEAN
+IsNonMmramLoggingAddress (
+  IN UINT64  Address
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  while (Hob.Raw != NULL) {
+    if ((Address >= Hob.ResourceDescriptor->PhysicalStart) && (Address < Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength)) {
+      if ((Hob.ResourceDescriptor->ResourceAttribute & MM_RESOURCE_ATTRIBUTE_LOGGING) != 0) {
+        return TRUE;
+      }
+
+      return FALSE;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+  }
+
+  return FALSE;
+}
+
+/**
   Return if the Address is forbidden as SMM communication buffer.
 
   @param[in] Address the address to be checked
