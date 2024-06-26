@@ -12,6 +12,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuCommon.h"
 #include <Library/UefiBootServicesTableLib.h>
 
+//
+// TRUE to indicate it's the MM_STANDALONE MM CPU driver.
+// FALSE to indicate it's the DXE_SMM_DRIVER SMM CPU driver.
+//
+const BOOLEAN  mIsStandaloneMm = FALSE;
+
 /**
   To get system port address of the SMI Command Port in FADT table.
 

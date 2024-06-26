@@ -9,6 +9,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "PiSmmCpuCommon.h"
 
+//
+// TRUE to indicate it's the MM_STANDALONE MM CPU driver.
+// FALSE to indicate it's the DXE_SMM_DRIVER SMM CPU driver.
+//
+const BOOLEAN  mIsStandaloneMm = TRUE;
+
 /**
   To get system port address of the SMI Command Port.
 
@@ -93,4 +99,23 @@ GetAcpiS3EnableFlag (
   if (MmAcpiS3EnableHob != NULL) {
     mAcpiS3Enable = MmAcpiS3EnableHob->AcpiS3Enable;
   }
+}
+
+/**
+  Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION.
+
+  @param[out] NumberOfCpus           Pointer to NumberOfCpus.
+  @param[out] MaxNumberOfCpus        Pointer to MaxNumberOfCpus.
+
+  @retval ProcessorInfo              Pointer to EFI_PROCESSOR_INFORMATION buffer.
+**/
+EFI_PROCESSOR_INFORMATION *
+GetMpInformationFromMpServices (
+  OUT UINTN  *NumberOfCpus,
+  OUT UINTN  *MaxNumberOfCpus
+  )
+{
+  ASSERT (FALSE);
+
+  return NULL;
 }
