@@ -30,6 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MpInformation2.h>
 #include <Guid/MmProfileData.h>
 #include <Guid/MmAcpiS3Enable.h>
+#include <Guid/MmCpuSyncConfig.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
