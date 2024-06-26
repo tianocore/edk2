@@ -39,9 +39,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // CPU generic definition
 //
-#define   CPUID1_EDX_XD_SUPPORT  0x100000
-#define   MSR_EFER               0xc0000080
-#define   MSR_EFER_XD            0x800
+#define   MSR_EFER     0xc0000080
+#define   MSR_EFER_XD  0x800
 
 #define   CPUID1_EDX_BTS_AVAILABLE  0x200000
 

@@ -959,7 +959,7 @@ IsSmmCommBufferForbiddenAddress (
   IN UINT64  Address
   );
 
-/*
+/**
   Build extended protection MemoryRegion.
 
   The caller is responsible for freeing MemoryRegion via FreePool().
@@ -967,9 +967,26 @@ IsSmmCommBufferForbiddenAddress (
   @param[out]     MemoryRegion         Returned Non-Mmram Memory regions.
   @param[out]     MemoryRegionCount    A pointer to the number of Memory regions.
 
-*/
+**/
 VOID
 CreateExtendedProtectionRange (
+  OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
+  OUT UINTN                 *MemoryRegionCount
+  );
+
+/**
+  Create the Non-Mmram Memory Region.
+
+  The caller is responsible for freeing MemoryRegion via FreePool().
+
+  @param[in]      PhysicalAddressBits  The bits of physical address to map.
+  @param[out]     MemoryRegion         Returned Non-Mmram Memory regions.
+  @param[out]     MemoryRegionCount    A pointer to the number of Memory regions.
+
+**/
+VOID
+CreateNonMmramMemMap (
+  IN  UINT8                 PhysicalAddressBits,
   OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
   OUT UINTN                 *MemoryRegionCount
   );
