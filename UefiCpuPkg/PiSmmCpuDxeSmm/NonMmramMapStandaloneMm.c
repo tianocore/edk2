@@ -45,3 +45,89 @@ GetSmmProfileData (
 
   return SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
 }
+
+/**
+  Build Memory Region from ResourceDescriptor HOBs by excluding Logging attribute range.
+
+  @param[out]     MemoryRegion            Returned Non-Mmram Memory regions.
+  @param[out]     MemoryRegionCount       A pointer to the number of Memory regions.
+**/
+VOID
+BuildMemoryMapFromResDescHobs (
+  OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
+  OUT UINTN                 *MemoryRegionCount
+  )
+{
+  EFI_PEI_HOB_POINTERS         Hob;
+  UINTN                        Count;
+  EFI_HOB_RESOURCE_DESCRIPTOR  *ResourceDescriptor;
+  UINTN                        Index;
+
+  ASSERT (MemoryRegion != NULL && MemoryRegionCount != NULL);
+
+  *MemoryRegion      = NULL;
+  *MemoryRegionCount = 0;
+
+  //
+  // Get the count.
+  //
+  Count   = 0;
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  while (Hob.Raw != NULL) {
+    ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
+    if ((ResourceDescriptor->ResourceAttribute & EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING) == 0) {
+      //
+      // Resource HOBs describe all accessible non-smram regions.
+      // Logging attribute range is treated as not present. Not-present ranges are not included in this memory map.
+      //
+      Count++;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+  }
+
+  *MemoryRegionCount = Count;
+
+  *MemoryRegion = (MM_CPU_MEMORY_REGION *)AllocateZeroPool (sizeof (MM_CPU_MEMORY_REGION) * Count);
+  ASSERT (*MemoryRegion != NULL);
+
+  Index   = 0;
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  while (Hob.Raw != NULL) {
+    ResourceDescriptor = (EFI_HOB_RESOURCE_DESCRIPTOR *)Hob.Raw;
+    if ((ResourceDescriptor->ResourceAttribute & EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING) == 0) {
+      ASSERT (Index < Count);
+      (*MemoryRegion)[Index].Base      = ResourceDescriptor->PhysicalStart;
+      (*MemoryRegion)[Index].Length    = ResourceDescriptor->ResourceLength;
+      (*MemoryRegion)[Index].Attribute = EFI_MEMORY_XP;
+      if (ResourceDescriptor->ResourceAttribute == EFI_RESOURCE_ATTRIBUTE_READ_ONLY_PROTECTED) {
+        (*MemoryRegion)[Index].Attribute |= EFI_MEMORY_RO;
+      }
+
+      Index++;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+  }
+
+  return;
+}
+
+/**
+  Build extended protection MemoryRegion.
+
+  The caller is responsible for freeing MemoryRegion via FreePool().
+
+  @param[out]     MemoryRegion         Returned Non-Mmram Memory regions.
+  @param[out]     MemoryRegionCount    A pointer to the number of Memory regions.
+**/
+VOID
+CreateExtendedProtectionRange (
+  OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
+  OUT UINTN                 *MemoryRegionCount
+  )
+{
+  BuildMemoryMapFromResDescHobs (MemoryRegion, MemoryRegionCount);
+}

@@ -434,6 +434,7 @@ InitProtectedMemRange (
   // Create extended protection MemoryRegion and add them into protected memory ranges.
   // Retrieve the accessible regions when SMM profile is enabled.
   // In SMM: only MMIO is accessible.
+  // In MM: all regions described by resource HOBs are accessible.
   //
   CreateExtendedProtectionRange (&MemoryRegion, &MemoryRegionCount);
   ASSERT (MemoryRegion != NULL);
@@ -481,7 +482,7 @@ InitProtectedMemRange (
   }
 
   //
-  // Create MMIO ranges which are set to present and execution-disable.
+  // Create protection ranges which are set to present and execution-disable.
   //
   for (Index = 0; Index < MemoryRegionCount; Index++) {
     mProtectionMemRange[NumberOfProtectRange].Range.Base = MemoryRegion[Index].Base;
@@ -511,7 +512,7 @@ InitProtectedMemRange (
   NumberOfProtectRange = mProtectionMemRangeCount;
   for (Index = 0; Index < NumberOfProtectRange; Index++) {
     //
-    // If MMIO base address is not 2MB alignment, make 2MB alignment for create 4KB page in page table.
+    // If base address is not 2MB alignment, make 2MB alignment for create 4KB page in page table.
     //
     ProtectBaseAddress = mProtectionMemRange[Index].Range.Base;
     ProtectEndAddress  = mProtectionMemRange[Index].Range.Top;
