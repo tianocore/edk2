@@ -10,6 +10,51 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuCommon.h"
 
 /**
+  Get SmmCpuSyncConfig data: RelaxedMode, SyncTimeout, SyncTimeout2.
+
+  @param[in,out] RelaxedMode   It indicates if Relaxed CPU synchronization method or
+                               traditional CPU synchronization method is used when processing an SMI.
+  @param[in,out] SyncTimeout   It indicates the 1st BSP/AP synchronization timeout value in SMM.
+  @param[in,out] SyncTimeout2  It indicates the 2nd BSP/AP synchronization timeout value in SMM.
+
+ **/
+VOID
+GetSmmCpuSyncConfigData (
+  IN OUT BOOLEAN *RelaxedMode, OPTIONAL
+  IN OUT UINT64  *SyncTimeout, OPTIONAL
+  IN OUT UINT64  *SyncTimeout2 OPTIONAL
+  )
+{
+  EFI_HOB_GUID_TYPE    *GuidHob;
+  SMM_CPU_SYNC_CONFIG  *SmmSyncModeInfoHob;
+
+  SmmSyncModeInfoHob = NULL;
+
+  //
+  // Get SMM_CPU_SYNC_CONFIG_HOB for Standalone MM init.
+  //
+  GuidHob = GetFirstGuidHob (&gEdkiiSmmCpuSyncConfigHobGuid);
+  ASSERT (GuidHob != NULL);
+  if (GuidHob != NULL) {
+    SmmSyncModeInfoHob = GET_GUID_HOB_DATA (GuidHob);
+  }
+
+  if (SmmSyncModeInfoHob != NULL) {
+    if (RelaxedMode != NULL) {
+      *RelaxedMode = SmmSyncModeInfoHob->RelaxedMode;
+    }
+
+    if (SyncTimeout != NULL) {
+      *SyncTimeout = SmmSyncModeInfoHob->SyncTimeout;
+    }
+
+    if (SyncTimeout2 != NULL) {
+      *SyncTimeout2 = SmmSyncModeInfoHob->SyncTimeout2;
+    }
+  }
+}
+
+/**
   Get ACPI S3 enable flag.
 
 **/
