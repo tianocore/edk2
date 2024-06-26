@@ -253,6 +253,8 @@ typedef struct {
   LIST_ENTRY                        *FirstFreeToken;
 } SMM_CPU_PRIVATE_DATA;
 
+extern const BOOLEAN  mIsStandaloneMm;
+
 extern SMM_CPU_PRIVATE_DATA  *gSmmCpuPrivate;
 extern CPU_HOT_PLUG_DATA     mCpuHotPlugData;
 extern UINTN                 mMaxNumberOfCpus;
