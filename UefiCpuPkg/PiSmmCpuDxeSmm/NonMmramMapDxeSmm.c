@@ -461,6 +461,24 @@ GetSmmProfileData (
 }
 
 /**
+  Return if the Address is the NonMmram logging Address.
+
+  @param[in] Address the address to be checked
+
+  @return TRUE  The address is the NonMmram logging Address.
+  @return FALSE The address is not the NonMmram logging Address.
+**/
+BOOLEAN
+IsNonMmramLoggingAddress (
+  IN UINT64  Address
+  )
+{
+  ASSERT (FALSE);
+
+  return TRUE;
+}
+
+/**
   Return if the Address is forbidden as SMM communication buffer.
 
   @param[in] Address the address to be checked
