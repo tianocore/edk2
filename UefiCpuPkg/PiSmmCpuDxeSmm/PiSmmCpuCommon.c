@@ -625,9 +625,14 @@ GetMpInformation (
   HobCount              = 0;
 
   FirstMpInfo2Hob = GetFirstGuidHob (&gMpInformation2HobGuid);
-  if (FirstMpInfo2Hob == NULL) {
-    DEBUG ((DEBUG_INFO, "%a: [INFO] gMpInformation2HobGuid HOB not found.\n", __func__));
-    return GetMpInformationFromMpServices (NumberOfCpus, MaxNumberOfCpus);
+
+  if (mIsStandaloneMm) {
+    ASSERT (FirstMpInfo2Hob != NULL);
+  } else {
+    if (FirstMpInfo2Hob == NULL) {
+      DEBUG ((DEBUG_INFO, "%a: [INFO] gMpInformation2HobGuid HOB not found.\n", __func__));
+      return GetMpInformationFromMpServices (NumberOfCpus, MaxNumberOfCpus);
+    }
   }
 
   GuidHob = FirstMpInfo2Hob;
