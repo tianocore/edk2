@@ -28,6 +28,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/SmramMemoryReserve.h>
 #include <Guid/SmmBaseHob.h>
 #include <Guid/MpInformation2.h>
+#include <Guid/MmProfileData.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
