@@ -10,6 +10,19 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuCommon.h"
 
 /**
+  To get system port address of the SMI Command Port.
+
+**/
+VOID
+GetSmiCommandPort (
+  VOID
+  )
+{
+  mSmiCommandPort = 0xB2;
+  DEBUG ((DEBUG_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));
+}
+
+/**
   Get SmmCpuSyncConfig data: RelaxedMode, SyncTimeout, SyncTimeout2.
 
   @param[in,out] RelaxedMode   It indicates if Relaxed CPU synchronization method or
