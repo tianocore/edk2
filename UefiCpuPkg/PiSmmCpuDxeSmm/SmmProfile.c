@@ -743,11 +743,6 @@ InitSmmProfileCallBack (
                         &mSmmProfileBase
                         );
 
-  //
-  // Initialize protected memory range for patching page table later.
-  //
-  InitProtectedMemRange ();
-
   return EFI_SUCCESS;
 }
 
