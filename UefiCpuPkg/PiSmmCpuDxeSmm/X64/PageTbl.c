@@ -821,6 +821,13 @@ SmiPFHandler (
   }
 
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    if (mIsStandaloneMm) {
+      //
+      // Only logging ranges shall run here in MM env.
+      //
+      ASSERT (IsNonMmramLoggingAddress (PFAddress));
+    }
+
     SmmProfilePFHandler (
       SystemContext.SystemContextX64->Rip,
       SystemContext.SystemContextX64->ExceptionData
