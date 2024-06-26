@@ -91,6 +91,15 @@ CheckFeatureSupported (
   );
 
 /**
+  Initialize the protected memory ranges and the 4KB-page mapped memory ranges.
+
+**/
+VOID
+InitProtectedMemRange (
+  VOID
+  );
+
+/**
   Update page table according to protected memory ranges and the 4KB-page mapped memory ranges.
 
 **/
