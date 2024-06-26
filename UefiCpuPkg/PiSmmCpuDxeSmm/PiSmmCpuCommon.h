@@ -30,6 +30,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/MpInformation2.h>
 #include <Guid/SmmProfileData.h>
 #include <Guid/AcpiS3Enable.h>
+#include <Guid/SmmCpuSyncConfig.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
@@ -398,12 +399,6 @@ typedef struct {
   PROCEDURE_TOKEN               *Token;
   EFI_STATUS                    *Status;
 } SMM_CPU_DATA_BLOCK;
-
-typedef enum {
-  SmmCpuSyncModeTradition,
-  SmmCpuSyncModeRelaxedAp,
-  SmmCpuSyncModeMax
-} SMM_CPU_SYNC_MODE;
 
 typedef struct {
   //
