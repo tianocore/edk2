@@ -15,6 +15,63 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 const BOOLEAN  mIsStandaloneMm = TRUE;
 
+//
+// RemainingTasks Done flag
+//
+BOOLEAN  mRemainingTasksDone = FALSE;
+
+/**
+  Perform the remaining tasks.
+
+**/
+VOID
+PerformRemainingTasks (
+  VOID
+  )
+{
+  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
+
+  if (!mRemainingTasksDone) {
+    PERF_FUNCTION_BEGIN ();
+
+    //
+    // gEdkiiPiSmmMemoryAttributesTableGuid should have been published after SmmCore dispatched all MM drivers (MmDriverDispatchHandler).
+    // Note: gEdkiiPiSmmMemoryAttributesTableGuid is not always installed since it depends on
+    //       the memory protection attribute setting in MM Core.
+    //
+    SmmGetSystemConfigurationTable (&gEdkiiPiSmmMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
+
+    //
+    // Set critical region attribute in page table according to the MemoryAttributesTable
+    //
+    if (MemoryAttributesTable != NULL) {
+      SetMemMapAttributes (MemoryAttributesTable);
+    }
+
+    if (IsRestrictedMemoryAccess ()) {
+      //
+      // Set page table itself to be read-only
+      //
+      SetPageTableAttributes ();
+    }
+
+    //
+    // Measure performance of SmmCpuFeaturesCompleteSmmReadyToLock() from caller side
+    // as the implementation is provided by platform.
+    //
+    PERF_START (NULL, "SmmCompleteReadyToLock", NULL, 0);
+    SmmCpuFeaturesCompleteSmmReadyToLock ();
+    PERF_END (NULL, "SmmCompleteReadyToLock", NULL, 0);
+
+    //
+    // Mark RemainingTasks Done flag to TRUE
+    //
+    mRemainingTasksDone = TRUE;
+
+    PERF_FUNCTION_END ();
+  }
+}
+
 /**
   To get system port address of the SMI Command Port.
 
