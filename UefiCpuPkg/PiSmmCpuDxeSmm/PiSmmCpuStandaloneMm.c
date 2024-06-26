@@ -221,6 +221,16 @@ PiCpuStandaloneMmEntry (
     // Get Software SMI
     //
     GetSmiCommandPort ();
+
+    //
+    // Initialize protected memory range for patching page table later.
+    //
+    InitProtectedMemRange ();
+
+    //
+    // Start SMM Profile feature
+    //
+    SmmProfileStart ();
   }
 
   //
