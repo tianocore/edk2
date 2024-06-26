@@ -32,6 +32,7 @@
 
 [Sources.X64]
   IntelTdx.c
+  X64/Paging.nasm
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
