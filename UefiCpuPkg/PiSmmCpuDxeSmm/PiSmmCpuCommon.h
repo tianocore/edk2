@@ -29,6 +29,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/SmmBaseHob.h>
 #include <Guid/MpInformation2.h>
 #include <Guid/SmmProfileData.h>
+#include <Guid/AcpiS3Enable.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
