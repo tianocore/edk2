@@ -1176,30 +1176,25 @@ EdkiiSmmClearMemoryAttributes (
   @param[in]       PagingMode          The paging mode.
   @param[in]       LinearAddress       The start of the linear address range.
   @param[in]       Length              The length of the linear address range.
+  @param[in]       MapAttribute        The MapAttribute of the linear address range
+  @param[in]       MapMask             The MapMask used for attribute. The corresponding field in Attribute is ignored if that in MapMask is 0.
 
 **/
 VOID
 GenPageTable (
-  IN OUT UINTN        *PageTable,
-  IN     PAGING_MODE  PagingMode,
-  IN     UINT64       LinearAddress,
-  IN     UINT64       Length
+  IN OUT UINTN               *PageTable,
+  IN     PAGING_MODE         PagingMode,
+  IN     UINT64              LinearAddress,
+  IN     UINT64              Length,
+  IN     IA32_MAP_ATTRIBUTE  MapAttribute,
+  IN     IA32_MAP_ATTRIBUTE  MapMask
   )
 {
-  RETURN_STATUS       Status;
-  UINTN               PageTableBufferSize;
-  VOID                *PageTableBuffer;
-  IA32_MAP_ATTRIBUTE  MapAttribute;
-  IA32_MAP_ATTRIBUTE  MapMask;
+  RETURN_STATUS  Status;
+  UINTN          PageTableBufferSize;
+  VOID           *PageTableBuffer;
 
-  MapMask.Uint64                   = MAX_UINT64;
-  MapAttribute.Uint64              = mAddressEncMask|LinearAddress;
-  MapAttribute.Bits.Present        = 1;
-  MapAttribute.Bits.ReadWrite      = 1;
-  MapAttribute.Bits.UserSupervisor = 1;
-  MapAttribute.Bits.Accessed       = 1;
-  MapAttribute.Bits.Dirty          = 1;
-  PageTableBufferSize              = 0;
+  PageTableBufferSize = 0;
 
   Status = PageTableMap (
              PageTable,
@@ -1213,7 +1208,6 @@ GenPageTable (
              NULL
              );
   if (Status == RETURN_BUFFER_TOO_SMALL) {
-    DEBUG ((DEBUG_INFO, "GenSMMPageTable: 0x%x bytes needed for initial SMM page table\n", PageTableBufferSize));
     PageTableBuffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (PageTableBufferSize));
     ASSERT (PageTableBuffer != NULL);
     Status = PageTableMap (
@@ -1248,37 +1242,97 @@ GenSmmPageTable (
   IN UINT8        PhysicalAddressBits
   )
 {
-  UINTN          PageTable;
-  RETURN_STATUS  Status;
-  UINTN          GuardPage;
-  UINTN          Index;
-  UINT64         Length;
-  PAGING_MODE    SmramPagingMode;
+  UINTN                 PageTable;
+  UINTN                 Index;
+  MM_CPU_MEMORY_REGION  *MemoryRegion;
+  UINTN                 MemoryRegionCount;
+  IA32_MAP_ATTRIBUTE    MapAttribute;
+  IA32_MAP_ATTRIBUTE    MapMask;
+  PAGING_MODE           SmramPagingMode;
+  RETURN_STATUS         Status;
+  UINTN                 GuardPage;
 
-  PageTable = 0;
-  Length    = LShiftU64 (1, PhysicalAddressBits);
-  ASSERT (Length > mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize);
-
-  if (sizeof (UINTN) == sizeof (UINT64)) {
-    SmramPagingMode = m5LevelPagingNeeded ? Paging5Level4KB : Paging4Level4KB;
-  } else {
-    SmramPagingMode = PagingPae4KB;
-  }
-
-  ASSERT (mCpuHotPlugData.SmrrBase % SIZE_4KB == 0);
-  ASSERT (mCpuHotPlugData.SmrrSize % SIZE_4KB == 0);
-  GenPageTable (&PageTable, PagingMode, 0, mCpuHotPlugData.SmrrBase);
+  PageTable         = 0;
+  MemoryRegion      = NULL;
+  MemoryRegionCount = 0;
+  MapMask.Uint64    = MAX_UINT64;
 
   //
+  // 1. Create NonMmram MemoryRegion
+  //
+  CreateNonMmramMemMap (PhysicalAddressBits, &MemoryRegion, &MemoryRegionCount);
+  ASSERT (MemoryRegion != NULL && MemoryRegionCount != 0);
+
+  //
+  // 2. Gen NonMmram MemoryRegion PageTable
+  //
+  for (Index = 0; Index < MemoryRegionCount; Index++) {
+    ASSERT (MemoryRegion[Index].Base % SIZE_4KB == 0);
+    ASSERT (MemoryRegion[Index].Length % EFI_PAGE_SIZE == 0);
+
+    //
+    // Set the MapAttribute
+    //
+    MapAttribute.Uint64              = mAddressEncMask|MemoryRegion[Index].Base;
+    MapAttribute.Bits.Present        = 1;
+    MapAttribute.Bits.ReadWrite      = 1;
+    MapAttribute.Bits.UserSupervisor = 1;
+    MapAttribute.Bits.Accessed       = 1;
+    MapAttribute.Bits.Dirty          = 1;
+
+    //
+    // Update the MapAttribute according MemoryRegion[Index].Attribute
+    //
+    if ((MemoryRegion[Index].Attribute & EFI_MEMORY_RO) != 0) {
+      MapAttribute.Bits.ReadWrite = 0;
+    }
+
+    if ((MemoryRegion[Index].Attribute & EFI_MEMORY_XP) != 0) {
+      if (mXdSupported) {
+        MapAttribute.Bits.Nx = 1;
+      }
+    }
+
+    GenPageTable (&PageTable, PagingMode, MemoryRegion[Index].Base, (UINTN)MemoryRegion[Index].Length, MapAttribute, MapMask);
+  }
+
+  //
+  // Free the MemoryRegion after usage
+  //
+  if (MemoryRegion != NULL) {
+    FreePool (MemoryRegion);
+  }
+
+  //
+  // 3. Gen MMRAM Range PageTable
   // Map smram range in 4K page granularity to avoid subsequent page split when smm ready to lock.
   // If BSP are splitting the 1G/2M paging entries to 512 2M/4K paging entries, and all APs are
   // still running in SMI at the same time, which might access the affected linear-address range
   // between the time of modification and the time of invalidation access. That will be a potential
   // problem leading exception happen.
   //
-  GenPageTable (&PageTable, SmramPagingMode, mCpuHotPlugData.SmrrBase, mCpuHotPlugData.SmrrSize);
+  if (sizeof (UINTN) == sizeof (UINT64)) {
+    SmramPagingMode = m5LevelPagingNeeded ? Paging5Level4KB : Paging4Level4KB;
+  } else {
+    SmramPagingMode = PagingPae4KB;
+  }
 
-  GenPageTable (&PageTable, PagingMode, mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize, Length - mCpuHotPlugData.SmrrBase - mCpuHotPlugData.SmrrSize);
+  for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+    ASSERT (mSmmCpuSmramRanges[Index].CpuStart % SIZE_4KB == 0);
+    ASSERT (mSmmCpuSmramRanges[Index].PhysicalSize % EFI_PAGE_SIZE == 0);
+
+    //
+    // Set the MapAttribute
+    //
+    MapAttribute.Uint64              = mAddressEncMask|mSmmCpuSmramRanges[Index].CpuStart;
+    MapAttribute.Bits.Present        = 1;
+    MapAttribute.Bits.ReadWrite      = 1;
+    MapAttribute.Bits.UserSupervisor = 1;
+    MapAttribute.Bits.Accessed       = 1;
+    MapAttribute.Bits.Dirty          = 1;
+
+    GenPageTable (&PageTable, SmramPagingMode, mSmmCpuSmramRanges[Index].CpuStart, mSmmCpuSmramRanges[Index].PhysicalSize, MapAttribute, MapMask);
+  }
 
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     //

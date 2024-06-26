@@ -889,33 +889,6 @@ CheckFeatureSupported (
     }
   }
 
-  if (mXdSupported) {
-    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
-    if (RegEax <= CPUID_EXTENDED_FUNCTION) {
-      //
-      // Extended CPUID functions are not supported on this processor.
-      //
-      mXdSupported = FALSE;
-      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
-    }
-
-    AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
-    if ((RegEdx & CPUID1_EDX_XD_SUPPORT) == 0) {
-      //
-      // Execute Disable Bit feature is not supported on this processor.
-      //
-      mXdSupported = FALSE;
-      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
-    }
-
-    if (StandardSignatureIsAuthenticAMD ()) {
-      //
-      // AMD processors do not support MSR_IA32_MISC_ENABLE
-      //
-      PatchInstructionX86 (gPatchMsrIa32MiscEnableSupported, FALSE, 1);
-    }
-  }
-
   if (mBtsSupported) {
     AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &RegEdx);
     if ((RegEdx & CPUID1_EDX_BTS_AVAILABLE) != 0) {

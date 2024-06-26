@@ -586,3 +586,68 @@ CreateExtendedProtectionRange (
 
   return;
 }
+
+/**
+  Create the Non-Mmram Memory Region.
+  Build MemoryRegion to cover [0, 2^PhysicalAddressBits) by excluding all Smram range, with XP bit set.
+
+  The caller is responsible for freeing MemoryRegion via FreePool().
+
+  @param[in]      PhysicalAddressBits  The bits of physical address to map.
+  @param[out]     MemoryRegion         Returned Non-Mmram Memory regions.
+  @param[out]     MemoryRegionCount    A pointer to the number of Memory regions.
+**/
+VOID
+CreateNonMmramMemMap (
+  IN  UINT8                 PhysicalAddressBits,
+  OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
+  OUT UINTN                 *MemoryRegionCount
+  )
+{
+  UINT64  MaxLength;
+  UINTN   Count;
+  UINTN   Index;
+  UINT64  PreviousAddress;
+  UINT64  Base;
+  UINT64  Length;
+
+  ASSERT (MemoryRegion != NULL && MemoryRegionCount != NULL);
+
+  *MemoryRegion      = NULL;
+  *MemoryRegionCount = 0;
+
+  MaxLength = LShiftU64 (1, PhysicalAddressBits);
+
+  //
+  // Build MemoryRegion to cover [0, 2^PhysicalAddressBits) by excluding all Smram range
+  //
+  Count = mSmmCpuSmramRangeCount + 1;
+
+  *MemoryRegionCount = Count;
+
+  *MemoryRegion = (MM_CPU_MEMORY_REGION *)AllocateZeroPool (sizeof (MM_CPU_MEMORY_REGION) * Count);
+  ASSERT (*MemoryRegion != NULL);
+
+  PreviousAddress = 0;
+  for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+    Base   = mSmmCpuSmramRanges[Index].CpuStart;
+    Length = mSmmCpuSmramRanges[Index].PhysicalSize;
+
+    ASSERT (MaxLength > Base +  Length);
+
+    if (Base > PreviousAddress) {
+      (*MemoryRegion)[Index].Base   = PreviousAddress;
+      (*MemoryRegion)[Index].Length = Base - PreviousAddress;
+    }
+
+    PreviousAddress = Base + Length;
+  }
+
+  //
+  // Set the last remaining range
+  //
+  if (PreviousAddress < MaxLength) {
+    (*MemoryRegion)[Index].Base   = PreviousAddress;
+    (*MemoryRegion)[Index].Length = MaxLength - PreviousAddress;
+  }
+}

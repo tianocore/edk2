@@ -728,19 +728,20 @@ PiSmmCpuEntryCommon (
   VOID
   )
 {
-  EFI_STATUS  Status;
-  UINTN       Index;
-  UINTN       TileCodeSize;
-  UINTN       TileDataSize;
-  UINTN       TileSize;
-  UINT8       *Stacks;
-  UINT32      RegEax;
-  UINT32      RegEbx;
-  UINT32      RegEcx;
-  UINT32      RegEdx;
-  UINTN       FamilyId;
-  UINTN       ModelId;
-  UINT32      Cr3;
+  EFI_STATUS                  Status;
+  UINTN                       Index;
+  UINTN                       TileCodeSize;
+  UINTN                       TileDataSize;
+  UINTN                       TileSize;
+  UINT8                       *Stacks;
+  UINT32                      RegEax;
+  UINT32                      RegEbx;
+  UINT32                      RegEcx;
+  UINT32                      RegEdx;
+  CPUID_EXTENDED_CPU_SIG_EDX  ExtendedRegEdx;
+  UINTN                       FamilyId;
+  UINTN                       ModelId;
+  UINT32                      Cr3;
 
   PERF_FUNCTION_BEGIN ();
 
@@ -926,6 +927,36 @@ PiSmmCpuEntryCommon (
   } else {
     mCetSupported = FALSE;
     PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+  }
+
+  //
+  // Check XD supported or not.
+  //
+  RegEax                = 0;
+  ExtendedRegEdx.Uint32 = 0;
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+  if (RegEax <= CPUID_EXTENDED_FUNCTION) {
+    //
+    // Extended CPUID functions are not supported on this processor.
+    //
+    mXdSupported = FALSE;
+    PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
+  }
+
+  AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &ExtendedRegEdx.Uint32);
+  if (ExtendedRegEdx.Bits.NX == 0) {
+    //
+    // Execute Disable Bit feature is not supported on this processor.
+    //
+    mXdSupported = FALSE;
+    PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
+  }
+
+  if (StandardSignatureIsAuthenticAMD ()) {
+    //
+    // AMD processors do not support MSR_IA32_MISC_ENABLE
+    //
+    PatchInstructionX86 (gPatchMsrIa32MiscEnableSupported, FALSE, 1);
   }
 
   //
