@@ -993,31 +993,29 @@ SetMemMapWithNonPresentRange (
 
 /**
   This function sets memory attribute according to MemoryAttributesTable.
+
+  @param  MemoryAttributesTable  A pointer to the buffer of SmmMemoryAttributesTable.
+
 **/
 VOID
 SetMemMapAttributes (
-  VOID
+  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable
   )
 {
-  EFI_MEMORY_DESCRIPTOR                 *MemoryMap;
-  EFI_MEMORY_DESCRIPTOR                 *MemoryMapStart;
-  UINTN                                 MemoryMapEntryCount;
-  UINTN                                 DescriptorSize;
-  UINTN                                 Index;
-  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
-  UINTN                                 PageTable;
-  EFI_STATUS                            Status;
-  IA32_MAP_ENTRY                        *Map;
-  UINTN                                 Count;
-  UINT64                                MemoryAttribute;
-  BOOLEAN                               WriteProtect;
-  BOOLEAN                               CetEnabled;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMap;
+  EFI_MEMORY_DESCRIPTOR  *MemoryMapStart;
+  UINTN                  MemoryMapEntryCount;
+  UINTN                  DescriptorSize;
+  UINTN                  Index;
+  UINTN                  PageTable;
+  EFI_STATUS             Status;
+  IA32_MAP_ENTRY         *Map;
+  UINTN                  Count;
+  UINT64                 MemoryAttribute;
+  BOOLEAN                WriteProtect;
+  BOOLEAN                CetEnabled;
 
-  SmmGetSystemConfigurationTable (&gEdkiiPiSmmMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
-  if (MemoryAttributesTable == NULL) {
-    DEBUG ((DEBUG_INFO, "MemoryAttributesTable - NULL\n"));
-    return;
-  }
+  ASSERT (MemoryAttributesTable != NULL);
 
   PERF_FUNCTION_BEGIN ();
 

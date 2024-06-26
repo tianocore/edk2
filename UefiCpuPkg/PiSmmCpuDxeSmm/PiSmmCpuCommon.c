@@ -97,11 +97,6 @@ UINTN  mMaxNumberOfCpus = 0;
 UINTN  mNumberOfCpus    = 0;
 
 //
-// SMM ready to lock flag
-//
-BOOLEAN  mSmmReadyToLock = FALSE;
-
-//
 // Global used to cache PCD for SMM Code Access Check enable
 //
 BOOLEAN  mSmmCodeAccessCheckEnable = FALSE;
@@ -1523,82 +1518,6 @@ AllocateCodePages (
   }
 
   return (VOID *)(UINTN)Memory;
-}
-
-/**
-  Perform the remaining tasks.
-
-**/
-VOID
-PerformRemainingTasks (
-  VOID
-  )
-{
-  if (mSmmReadyToLock) {
-    PERF_FUNCTION_BEGIN ();
-
-    //
-    // Check if all Aps enter SMM. In Relaxed-AP Sync Mode, BSP will not wait for
-    // all Aps arrive. However,PerformRemainingTasks() needs to wait all Aps arrive before calling
-    // SetMemMapAttributes() and ConfigSmmCodeAccessCheck() when mSmmReadyToLock
-    // is true. In SetMemMapAttributes(), SmmSetMemoryAttributesEx() will call
-    // FlushTlbForAll() that need to start up the aps. So it need to let all
-    // aps arrive. Same as SetMemMapAttributes(), ConfigSmmCodeAccessCheck()
-    // also will start up the aps.
-    //
-    if (EFI_ERROR (SmmCpuRendezvous (NULL, TRUE))) {
-      DEBUG ((DEBUG_ERROR, "PerformRemainingTasks: fail to wait for all AP check in SMM!\n"));
-    }
-
-    //
-    // Start SMM Profile feature
-    //
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-      SmmProfileStart ();
-    }
-
-    //
-    // Create a mix of 2MB and 4KB page table. Update some memory ranges absent and execute-disable.
-    //
-    InitPaging ();
-
-    //
-    // Mark critical region to be read-only in page table
-    //
-    SetMemMapAttributes ();
-
-    if (IsRestrictedMemoryAccess ()) {
-      //
-      // For outside SMRAM, we only map SMM communication buffer or MMIO.
-      //
-      SetUefiMemMapAttributes ();
-
-      //
-      // Set page table itself to be read-only
-      //
-      SetPageTableAttributes ();
-    }
-
-    //
-    // Configure SMM Code Access Check feature if available.
-    //
-    ConfigSmmCodeAccessCheck ();
-
-    //
-    // Measure performance of SmmCpuFeaturesCompleteSmmReadyToLock() from caller side
-    // as the implementation is provided by platform.
-    //
-    PERF_START (NULL, "SmmCompleteReadyToLock", NULL, 0);
-    SmmCpuFeaturesCompleteSmmReadyToLock ();
-    PERF_END (NULL, "SmmCompleteReadyToLock", NULL, 0);
-
-    //
-    // Clean SMM ready to lock flag
-    //
-    mSmmReadyToLock = FALSE;
-
-    PERF_FUNCTION_END ();
-  }
 }
 
 /**

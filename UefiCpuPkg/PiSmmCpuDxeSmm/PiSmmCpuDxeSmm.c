@@ -18,6 +18,98 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 const BOOLEAN  mIsStandaloneMm = FALSE;
 
+//
+// SMM ready to lock flag
+//
+BOOLEAN  mSmmReadyToLock = FALSE;
+
+/**
+  Perform the remaining tasks.
+
+**/
+VOID
+PerformRemainingTasks (
+  VOID
+  )
+{
+  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable;
+
+  if (mSmmReadyToLock) {
+    PERF_FUNCTION_BEGIN ();
+
+    //
+    // Start SMM Profile feature
+    //
+    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+      SmmProfileStart ();
+    }
+
+    //
+    // Check if all Aps enter SMM. In Relaxed-AP Sync Mode, BSP will not wait for
+    // all Aps arrive. However,PerformRemainingTasks() needs to wait all Aps arrive before calling
+    // SetMemMapAttributes() and ConfigSmmCodeAccessCheck() when mSmmReadyToLock
+    // is true. In SetMemMapAttributes(), SmmSetMemoryAttributesEx() will call
+    // FlushTlbForAll() that need to start up the aps. So it need to let all
+    // aps arrive. Same as SetMemMapAttributes(), ConfigSmmCodeAccessCheck()
+    // also will start up the aps.
+    //
+    if (EFI_ERROR (SmmCpuRendezvous (NULL, TRUE))) {
+      DEBUG ((DEBUG_ERROR, "PerformRemainingTasks: fail to wait for all AP check in SMM!\n"));
+    }
+
+    //
+    // Create a mix of 2MB and 4KB page table. Update some memory ranges absent and execute-disable.
+    //
+    InitPaging ();
+
+    //
+    // gEdkiiPiSmmMemoryAttributesTableGuid should have been published at EndOfDxe by SmmCore
+    // Note: gEdkiiPiSmmMemoryAttributesTableGuid is not always installed since it depends on
+    //       the memory protection attribute setting in MM Core.
+    //
+    SmmGetSystemConfigurationTable (&gEdkiiPiSmmMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
+
+    //
+    // Set critical region attribute in page table according to the MemoryAttributesTable
+    //
+    if (MemoryAttributesTable != NULL) {
+      SetMemMapAttributes (MemoryAttributesTable);
+    }
+
+    if (IsRestrictedMemoryAccess ()) {
+      //
+      // For outside SMRAM, we only map SMM communication buffer or MMIO.
+      //
+      SetUefiMemMapAttributes ();
+
+      //
+      // Set page table itself to be read-only
+      //
+      SetPageTableAttributes ();
+    }
+
+    //
+    // Configure SMM Code Access Check feature if available.
+    //
+    ConfigSmmCodeAccessCheck ();
+
+    //
+    // Measure performance of SmmCpuFeaturesCompleteSmmReadyToLock() from caller side
+    // as the implementation is provided by platform.
+    //
+    PERF_START (NULL, "SmmCompleteReadyToLock", NULL, 0);
+    SmmCpuFeaturesCompleteSmmReadyToLock ();
+    PERF_END (NULL, "SmmCompleteReadyToLock", NULL, 0);
+
+    //
+    // Clean SMM ready to lock flag
+    //
+    mSmmReadyToLock = FALSE;
+
+    PERF_FUNCTION_END ();
+  }
+}
+
 /**
   To get system port address of the SMI Command Port in FADT table.
 
