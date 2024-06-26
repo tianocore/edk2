@@ -474,6 +474,7 @@ extern EFI_SMRAM_DESCRIPTOR          *mSmmCpuSmramRanges;
 extern UINTN                         mSmmCpuSmramRangeCount;
 extern UINT8                         mPhysicalAddressBits;
 extern BOOLEAN                       mSmmDebugAgentSupport;
+extern BOOLEAN                       mSmmCodeAccessCheckEnable;
 
 //
 // Copy of the PcdPteMemoryEncryptionAddressOrMask
@@ -845,6 +846,18 @@ PerformPreTasks (
 VOID
 InitMsrSpinLockByIndex (
   IN UINT32  MsrIndex
+  );
+
+/**
+Configure SMM Code Access Check feature on an AP.
+SMM Feature Control MSR will be locked after configuration.
+
+@param[in,out] Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+ConfigSmmCodeAccessCheckOnCurrentProcessor (
+  IN OUT VOID  *Buffer
   );
 
 /**
