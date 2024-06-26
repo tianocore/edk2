@@ -83,10 +83,11 @@ PageFaultIdtHandlerSmmProfile (
 /**
   Check if feature is supported by a processor.
 
+  @param CpuIndex        The index of the CPU.
 **/
 VOID
 CheckFeatureSupported (
-  VOID
+  IN UINTN  CpuIndex
   );
 
 /**

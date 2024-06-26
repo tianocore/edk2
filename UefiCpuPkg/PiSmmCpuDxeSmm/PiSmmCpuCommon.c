@@ -362,7 +362,20 @@ InitializeSmm (
         //
         // Check XD and BTS features on each processor on normal boot
         //
-        CheckFeatureSupported ();
+        CheckFeatureSupported (Index);
+
+        if (mIsStandaloneMm) {
+          AcquireSpinLock (mConfigSmmCodeAccessCheckLock);
+
+          //
+          // Standalone MM does not allow call out to DXE at anytime.
+          // Code Access check can be enabled in the first SMI.
+          // While SMM needs to defer the enabling to EndOfDxe.
+          //
+          // Enable SMM Code Access Check feature.
+          //
+          ConfigSmmCodeAccessCheckOnCurrentProcessor (&Index);
+        }
       } else if (IsBsp) {
         //
         // BSP rebase is already done above.
@@ -409,6 +422,11 @@ ExecuteFirstSmiInit (
   // Reset the mSmmInitialized to false.
   //
   ZeroMem ((VOID *)mSmmInitialized, sizeof (BOOLEAN) * mMaxNumberOfCpus);
+
+  //
+  // Initialize the lock used to serialize the MSR programming in BSP and all APs
+  //
+  InitializeSpinLock (mConfigSmmCodeAccessCheckLock);
 
   //
   // Get the BSP ApicId.
@@ -1427,26 +1445,6 @@ ConfigSmmCodeAccessCheck (
   // Check to see if the Feature Control MSR is supported on this CPU
   //
   Index = gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu;
-  if (!SmmCpuFeaturesIsSmmRegisterSupported (Index, SmmRegFeatureControl)) {
-    mSmmCodeAccessCheckEnable = FALSE;
-    PERF_FUNCTION_END ();
-    return;
-  }
-
-  //
-  // Check to see if the CPU supports the SMM Code Access Check feature
-  // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
-  //
-  if ((AsmReadMsr64 (EFI_MSR_SMM_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) == 0) {
-    mSmmCodeAccessCheckEnable = FALSE;
-    PERF_FUNCTION_END ();
-    return;
-  }
-
-  //
-  // Initialize the lock used to serialize the MSR programming in BSP and all APs
-  //
-  InitializeSpinLock (mConfigSmmCodeAccessCheckLock);
 
   //
   // Acquire Config SMM Code Access Check spin lock.  The BSP will release the
