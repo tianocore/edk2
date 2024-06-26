@@ -47,6 +47,34 @@ GetSmmProfileData (
 }
 
 /**
+  Return if the Address is forbidden as SMM communication buffer.
+
+  @param[in] Address the address to be checked
+
+  @return TRUE  The address is forbidden as SMM communication buffer.
+  @return FALSE The address is allowed as SMM communication buffer.
+**/
+BOOLEAN
+IsSmmCommBufferForbiddenAddress (
+  IN UINT64  Address
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  while (Hob.Raw != NULL) {
+    if ((Address >= Hob.ResourceDescriptor->PhysicalStart) && (Address < Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength)) {
+      return FALSE;
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+  }
+
+  return TRUE;
+}
+
+/**
   Build Memory Region from ResourceDescriptor HOBs by excluding Logging attribute range.
 
   @param[out]     MemoryRegion            Returned Non-Mmram Memory regions.
