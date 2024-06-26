@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <stdio.h>
 
 //
-// We should alwasy add mbedtls/config.h here
+// We should always add mbedtls/config.h here
 // to ensure the config override takes effect.
 //
 #include <mbedtls/mbedtls_config.h>
@@ -25,7 +25,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 /**
   The MbedTLS function f_rng, which MbedtlsRand implements.
 
-  @param[in]   RngState Not used, just for compatibility with mbedlts.
+  @param[in]   RngState Not used, just for compatibility with mbedtls.
   @param[out]  Output  Pointer to buffer to receive random value.
   @param[in]   Len    Size of random bytes to generate.
 
