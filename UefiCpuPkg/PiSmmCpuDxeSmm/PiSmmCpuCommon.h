@@ -273,7 +273,6 @@ extern UINT8  mSmmSaveStateRegisterLma;
 extern BOOLEAN  mBtsSupported;
 extern UINTN    mMsrDsAreaSize;
 extern BOOLEAN  mAcpiS3Enable;
-extern BOOLEAN  mSmmReadyToLock;
 
 #define PAGE_TABLE_POOL_ALIGNMENT   BASE_128KB
 #define PAGE_TABLE_POOL_UNIT_SIZE   BASE_128KB
@@ -775,6 +774,24 @@ SmmClearMemoryAttributes (
   );
 
 /**
+  Retrieves a pointer to the system configuration table from the SMM System Table
+  based on a specified GUID.
+
+  @param[in]   TableGuid       The pointer to table's GUID type.
+  @param[out]  Table           The pointer to the table associated with TableGuid in the EFI System Table.
+
+  @retval EFI_SUCCESS     A configuration table matching TableGuid was found.
+  @retval EFI_NOT_FOUND   A configuration table matching TableGuid could not be found.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmGetSystemConfigurationTable (
+  IN  EFI_GUID  *TableGuid,
+  OUT VOID      **Table
+  );
+
+/**
   Initialize MP synchronization data.
 
 **/
@@ -926,10 +943,13 @@ DumpModuleInfoByIp (
 
 /**
   This function sets memory attribute according to MemoryAttributesTable.
+
+  @param  MemoryAttributesTable  A pointer to the buffer of SmmMemoryAttributesTable.
+
 **/
 VOID
 SetMemMapAttributes (
-  VOID
+  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable
   );
 
 /**
