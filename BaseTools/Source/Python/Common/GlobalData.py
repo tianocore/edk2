@@ -124,3 +124,4 @@ gSikpAutoGenCache = set()
 file_lock = None
 gStackCookieValues32 = []
 gStackCookieValues64 = []
+gLogLibraryMismatch = True
