@@ -31,7 +31,6 @@ GetHobList (
   VOID
   )
 {
-  ASSERT (mHobList != NULL);
   return mHobList;
 }
 
@@ -109,6 +108,7 @@ CreateHob (
   VOID                        *Hob;
 
   HandOffHob = GetHobList ();
+  ASSERT (HandOffHob != NULL);
 
   //
   // Check Length to avoid data overflow.
@@ -175,6 +175,7 @@ BuildResourceDescriptorHob (
   Hob->ResourceAttribute = ResourceAttribute;
   Hob->PhysicalStart     = PhysicalStart;
   Hob->ResourceLength    = NumberOfBytes;
+  ZeroMem (&(Hob->Owner), sizeof (EFI_GUID));
 }
 
 /**
@@ -239,6 +240,7 @@ GetFirstHob (
   VOID  *HobList;
 
   HobList = GetHobList ();
+  ASSERT (HobList != NULL);
   return GetNextHob (Type, HobList);
 }
 
@@ -305,6 +307,7 @@ GetFirstGuidHob (
   VOID  *HobList;
 
   HobList = GetHobList ();
+  ASSERT (HobList != NULL);
   return GetNextGuidHob (Guid, HobList);
 }
 
@@ -651,6 +654,7 @@ UpdateStackHob (
   EFI_PEI_HOB_POINTERS  Hob;
 
   Hob.Raw = GetHobList ();
+  ASSERT (Hob.Raw != NULL);
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
     if (CompareGuid (&gEfiHobMemoryAllocStackGuid, &(Hob.MemoryAllocationStack->AllocDescriptor.Name))) {
       //
@@ -709,6 +713,7 @@ BuildMemoryAllocationHob (
   }
 
   ZeroMem (&(Hob->AllocDescriptor.Name), sizeof (EFI_GUID));
+
   Hob->AllocDescriptor.MemoryBaseAddress = BaseAddress;
   Hob->AllocDescriptor.MemoryLength      = Length;
   Hob->AllocDescriptor.MemoryType        = MemoryType;

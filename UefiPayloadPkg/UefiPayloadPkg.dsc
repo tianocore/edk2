@@ -55,7 +55,7 @@
   # ELF: Build UniversalPayload file as UniversalPayload.elf
   # FIT: Build UniversalPayload file as UniversalPayload.fit
   #
-  DEFINE UNIVERSAL_PAYLOAD            = FALSE
+  DEFINE UNIVERSAL_PAYLOAD            = TRUE
   DEFINE UNIVERSAL_PAYLOAD_FORMAT     = ELF
 
   #
@@ -226,6 +226,7 @@
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
   HobLib|UefiPayloadPkg/Library/DxeHobLib/DxeHobLib.inf
+  CustomFdtNodeParserLib|UefiPayloadPkg/Library/CustomFdtNodeParserNullLib/CustomFdtNodeParserNullLib.inf
 
   #
   # UEFI & PI
@@ -316,7 +317,7 @@
   AmdSvsmLib|UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
-  SmmRelocationLib|UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
+  #SmmRelocationLib|UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
 
 [LibraryClasses.common]
 !if $(BOOTSPLASH_IMAGE)
@@ -470,6 +471,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
+  gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable|TRUE
+
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
   gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile|{ 0x57, 0x72, 0xcf, 0x80, 0xab, 0x87, 0xf9, 0x47, 0xa3, 0xfe, 0xD5, 0x0B, 0x76, 0xd8, 0x95, 0x41 }
@@ -513,7 +516,15 @@
 !endif
 !endif
 
+
 [PcdsPatchableInModule.X64]
+  #
+  # The following parameters are set by Library/PlatformHookLib
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x3F8
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate|$(BAUD_RATE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
 !endif
@@ -635,7 +646,13 @@
     !if $(UNIVERSAL_PAYLOAD_FORMAT) == "ELF"
       UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
     !elseif $(UNIVERSAL_PAYLOAD_FORMAT) == "FIT"
-      UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf
+      UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf {
+        <LibraryClasses>
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          CustomFdtNodeParserLib|UefiPayloadPkg/Library/CustomFdtNodeParserLib/CustomFdtNodeParserLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+      }
     !else
       UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
     !endif
@@ -648,7 +665,13 @@
     !if $(UNIVERSAL_PAYLOAD_FORMAT) == "ELF"
       UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
     !elseif $(UNIVERSAL_PAYLOAD_FORMAT) == "FIT"
-      UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf
+      UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf {
+        <LibraryClasses>
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          CustomFdtNodeParserLib|UefiPayloadPkg/Library/CustomFdtNodeParserLib/CustomFdtNodeParserLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
+          NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+      }
     !else
       UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
     !endif
