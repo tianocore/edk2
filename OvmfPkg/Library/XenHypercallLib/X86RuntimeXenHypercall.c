@@ -1,16 +1,19 @@
 /** @file
   Xen Hypercall Library implementation for Intel architecture
 
-Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2022, Citrix Systems, Inc.
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <PiDxe.h>
+
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Library/HobLib.h>
 #include <Library/CpuLib.h>
+#include <Library/XenHypercallLib.h>
 
 INTN            UseVmmCall = -1;
 static BOOLEAN  HypercallAvail;
@@ -53,8 +56,35 @@ XenHypercallIsAvailable (
   return HypercallAvail;
 }
 
+STATIC
+UINT32
+XenCpuidLeaf (
+  VOID
+  )
+{
+  UINT8   Signature[13];
+  UINT32  XenLeaf;
+
+  Signature[12] = '\0';
+  for (XenLeaf = 0x40000000; XenLeaf < 0x40010000; XenLeaf += 0x100) {
+    AsmCpuid (
+      XenLeaf,
+      NULL,
+      (UINT32 *)&Signature[0],
+      (UINT32 *)&Signature[4],
+      (UINT32 *)&Signature[8]
+      );
+
+    if (!AsciiStrCmp ((CHAR8 *)Signature, "XenVMMXenVMM")) {
+      return XenLeaf;
+    }
+  }
+
+  return 0;
+}
+
 /**
-  Library constructor: Check for gEfiXenInfoGuid HOB
+  Library constructor: Check for Xen
 **/
 RETURN_STATUS
 EFIAPI
@@ -62,12 +92,13 @@ XenHypercallLibInit (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE  *GuidHob;
-  CHAR8              sig[13];
+  UINT32  XenLeaf;
+  CHAR8   sig[13];
 
-  GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
-  if (GuidHob == NULL) {
-    return RETURN_NOT_FOUND;
+  XenLeaf = XenCpuidLeaf ();
+
+  if (XenLeaf == 0) {
+    return RETURN_UNSUPPORTED;
   }
 
   sig[12] = '\0';
@@ -96,6 +127,24 @@ XenHypercallLibInit (
 
   HypercallAvail = TRUE;
 
+  return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+EFIAPI
+XenHypercallRuntimeLibConstruct (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  XenHypercallLibInit ();
+
+  //
+  // We don't fail library construction, since that has catastrophic
+  // consequences for client modules (whereas those modules may easily be
+  // running on a non-Xen platform). Instead, XenHypercallIsAvailable()
+  // will return FALSE.
+  //
   return RETURN_SUCCESS;
 }
 

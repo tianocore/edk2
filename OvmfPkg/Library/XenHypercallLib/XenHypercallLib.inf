@@ -52,6 +52,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses.IA32, LibraryClasses.X64]
+  CpuLib
   BaseLib
   HobLib
   DebugLib
