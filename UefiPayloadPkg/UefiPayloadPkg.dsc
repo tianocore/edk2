@@ -278,8 +278,15 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
   !if $(CAPSULE_SUPPORT) == TRUE
-  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
   BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
+    !if $(BOOTSPLASH_IMAGE)
+    # Note, however, that DisplayUpdateProgressLibGraphics aborts firmware
+    # update if GOP is missing, so text progress works in more environments.
+    DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibGraphics/DisplayUpdateProgressLibGraphics.inf
+    !else
+    DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibText/DisplayUpdateProgressLibText.inf
+    !endif
   !else
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   !endif
@@ -496,6 +503,9 @@
 !if $(PERFORMANCE_MEASUREMENT_ENABLE)
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
 !endif
+!if $(CAPSULE_SUPPORT) == TRUE
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
+!endif
 
 [LibraryClasses.common.UEFI_DRIVER,LibraryClasses.common.UEFI_APPLICATION]
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -554,6 +564,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE
+  ## Whether capsules are allowed to persist across reset.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportUpdateCapsuleReset|$(CAPSULE_SUPPORT)
 
 [PcdsFeatureFlag.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
@@ -591,6 +603,9 @@
   gUefiPayloadPkgTokenSpaceGuid.PcdBootManagerEscape|$(BOOT_MANAGER_ESCAPE)
 
   gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength|1800000
+
+  ## Whether FMP capsules are enabled.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport|$(CAPSULE_SUPPORT)
 
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
 !if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
@@ -944,6 +959,9 @@
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
   }
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
+!if $(CAPSULE_SUPPORT) == TRUE
+  MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+!endif
 
 
   MdeModulePkg/Universal/Metronome/Metronome.inf
