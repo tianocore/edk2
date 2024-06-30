@@ -365,6 +365,13 @@ INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 INF ShellPkg/Application/Shell/Shell.inf
 !endif
 
+#
+# Capsules
+#
+!if $(CAPSULE_SUPPORT) == TRUE
+INF MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+!endif
+
 !if $(UNIVERSAL_PAYLOAD) == TRUE
 !if $(SECURE_BOOT_ENABLE) == TRUE
 
