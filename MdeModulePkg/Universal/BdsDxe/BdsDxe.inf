@@ -97,6 +97,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable              ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleOnDiskSupport              ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleFmpSupport                 ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPlatformRecoverySupport           ## CONSUMES
 
 [Depex]
