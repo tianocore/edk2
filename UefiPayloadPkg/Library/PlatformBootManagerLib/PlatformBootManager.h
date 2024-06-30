@@ -26,6 +26,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PrintLib.h>
 #include <Library/DxeServicesLib.h>
 #include <Library/BootLogoLib.h>
+#include <Library/CapsuleLib.h>
+#include <Library/HobLib.h>
 #include <Protocol/SmmAccess2.h>
 
 typedef struct {
