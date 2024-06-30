@@ -405,6 +405,7 @@ _ModuleEntryPoint (
   EFI_PEI_HOB_POINTERS                Hob;
   SERIAL_PORT_INFO                    SerialPortInfo;
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *UniversalSerialPort;
+  EFI_HOB_HANDOFF_INFO_TABLE          *HobInfo;
 
   Status = PcdSet64S (PcdBootloaderParameter, BootloaderParameter);
   ASSERT_EFI_ERROR (Status);
@@ -417,7 +418,7 @@ _ModuleEntryPoint (
   HobMemBase = ALIGN_VALUE (MemBase + PcdGet32 (PcdPayloadFdMemSize), SIZE_1MB);
   HobMemTop  = HobMemBase + FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
 
-  HobConstructor ((VOID *)MemBase, (VOID *)HobMemTop, (VOID *)HobMemBase, (VOID *)HobMemTop);
+  HobInfo = HobConstructor ((VOID *)MemBase, (VOID *)HobMemTop, (VOID *)HobMemBase, (VOID *)HobMemTop);
 
   //
   // Build serial port info
@@ -470,6 +471,13 @@ _ModuleEntryPoint (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Error when importing update capsules, Status = %r\n", Status));
     return Status;
+  }
+
+  //
+  // Switch to update mode if there is at least one capsule.
+  //
+  if (GetFirstHob (EFI_HOB_TYPE_UEFI_CAPSULE) != NULL) {
+    HobInfo->BootMode = BOOT_ON_FLASH_UPDATE;
   }
 
   //
