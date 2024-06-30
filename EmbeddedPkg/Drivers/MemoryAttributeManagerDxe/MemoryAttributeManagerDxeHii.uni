@@ -1,0 +1,17 @@
+/** @file
+
+  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US  "English"
+
+#string STR_NULL_STRING                                    #language en-US ""
+
+#string STR_FORM_SET_TITLE                                 #language en-US "EFI Memory Attribute Protocol"
+#string STR_FORM_SET_TITLE_HELP                            #language en-US "Configure the state of the EFI Memory Attribute Protocol.\n\n"
+                                                                           "Some old OS loader versions (e.g. as found in CentOS Stream 9) do not properly support the protocol and may cause a Synchronous Exception. This security feature can be disabled to work around the issue; otherwise it should be kept enabled."
+
+#string STR_ENABLE_PROTOCOL_PROMPT                         #language en-US "Enable Protocol"

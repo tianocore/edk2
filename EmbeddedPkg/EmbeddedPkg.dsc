@@ -239,6 +239,8 @@
   EmbeddedPkg/Drivers/DtPlatformDxe/DtPlatformDxe.inf
   EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
 
+  EmbeddedPkg/Drivers/MemoryAttributeManagerDxe/MemoryAttributeManagerDxe.inf
+
   EmbeddedPkg/Drivers/NonCoherentIoMmuDxe/NonCoherentIoMmuDxe.inf {
     <LibraryClasses>
       DmaLib|EmbeddedPkg/Library/NonCoherentDmaLib/NonCoherentDmaLib.inf
