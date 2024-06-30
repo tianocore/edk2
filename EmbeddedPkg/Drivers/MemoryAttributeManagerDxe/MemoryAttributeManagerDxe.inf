@@ -1,0 +1,49 @@
+## @file
+#  EFI Memory Attribute Protocol state manager
+#
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = MemoryAttributeManagerDxe
+  FILE_GUID                      = 5319346b-66ad-433a-9a91-f7fc286bc9a1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MemoryAttributeManagerInitialize
+
+[Sources]
+  MemoryAttributeManagerDxe.c
+  MemoryAttributeManagerDxe.h
+  MemoryAttributeManagerDxeHii.uni
+  MemoryAttributeManagerDxeHii.vfr
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  DevicePathLib
+  HiiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gMemoryAttributeManagerFormSetGuid
+
+[Protocols]
+  gEfiMemoryAttributeProtocolGuid
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdMemoryAttributeEnabledDefault
+
+[Depex]
+  gEfiVariableArchProtocolGuid        AND
+  gEfiVariableWriteArchProtocolGuid   AND
+  gEfiMemoryAttributeProtocolGuid
