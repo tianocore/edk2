@@ -764,6 +764,21 @@ SecMtrrSetup (
     return;
   }
 
+ #if defined (TDX_GUEST_SUPPORTED)
+  if (CcProbe () == CcGuestTypeIntelTdx) {
+    //
+    // According to TDX Spec, the default MTRR type is enforced to WB
+    // and CR0.CD is enforced to 0.
+    // The TD guest has to disable MTRR otherwise it tries to
+    // program MTRRs to disable caching. CR0.CD=1 results in the
+    // unexpected #VE.
+    //
+    DEBUG ((DEBUG_INFO, "%a: Skip TD-Guest\n", __func__));
+    return;
+  }
+
+ #endif
+
   DefType.Uint64    = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
   DefType.Bits.Type = MSR_IA32_MTRR_CACHE_WRITE_BACK;
   DefType.Bits.E    = 1; /* enable */
