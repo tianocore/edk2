@@ -102,6 +102,22 @@ GetAcpiS3EnableFlag (
 }
 
 /**
+  Get the maximum number of logical processors supported by the system.
+
+  @retval The maximum number of logical processors supported by the system
+          is indicated by the return value.
+**/
+UINTN
+GetSupportedMaxLogicalProcessorNumber (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+
+  return 0;
+}
+
+/**
   Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION.
 
   @param[out] NumberOfCpus           Pointer to NumberOfCpus.

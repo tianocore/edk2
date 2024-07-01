@@ -652,15 +652,17 @@ GetMpInformation (
     GuidHob        = GetNextGuidHob (&gMpInformation2HobGuid, GET_NEXT_HOB (GuidHob));
   }
 
-  ASSERT (*NumberOfCpus <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+  *MaxNumberOfCpus = *NumberOfCpus;
 
-  //
-  // If support CPU hot plug, we need to allocate resources for possibly hot-added processors
-  //
-  if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
-    *MaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
-  } else {
-    *MaxNumberOfCpus = *NumberOfCpus;
+  if (!mIsStandaloneMm) {
+    ASSERT (*NumberOfCpus <= GetSupportedMaxLogicalProcessorNumber ());
+
+    //
+    // If support CPU hot plug, we need to allocate resources for possibly hot-added processors
+    //
+    if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
+      *MaxNumberOfCpus = GetSupportedMaxLogicalProcessorNumber ();
+    }
   }
 
   MpInfo2Hobs = AllocatePool (sizeof (MP_INFORMATION2_HOB_DATA *) * HobCount);

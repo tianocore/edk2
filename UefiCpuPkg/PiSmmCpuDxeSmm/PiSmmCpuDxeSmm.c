@@ -122,6 +122,20 @@ GetAcpiS3EnableFlag (
 }
 
 /**
+  Get the maximum number of logical processors supported by the system.
+
+  @retval The maximum number of logical processors supported by the system
+          is indicated by the return value.
+**/
+UINTN
+GetSupportedMaxLogicalProcessorNumber (
+  VOID
+  )
+{
+  return PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+}
+
+/**
   Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION for all CPU from gEfiMpServiceProtocolGuid.
 
   @param[out] NumberOfCpus           Pointer to NumberOfCpus.
@@ -165,7 +179,7 @@ GetMpInformationFromMpServices (
     return NULL;
   }
 
-  ASSERT (NumberOfProcessors <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+  ASSERT (NumberOfProcessors <= GetSupportedMaxLogicalProcessorNumber ());
 
   /// Allocate buffer for processor information
   ProcessorInfo = AllocateZeroPool (sizeof (EFI_PROCESSOR_INFORMATION) * NumberOfProcessors);
@@ -187,12 +201,12 @@ GetMpInformationFromMpServices (
 
   *NumberOfCpus = NumberOfEnabledProcessors;
 
-  ASSERT (*NumberOfCpus <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
+  ASSERT (*NumberOfCpus <= GetSupportedMaxLogicalProcessorNumber ());
   //
   // If support CPU hot plug, we need to allocate resources for possibly hot-added processors
   //
   if (FeaturePcdGet (PcdCpuHotPlugSupport)) {
-    *MaxNumberOfCpus = PcdGet32 (PcdCpuMaxLogicalProcessorNumber);
+    *MaxNumberOfCpus = GetSupportedMaxLogicalProcessorNumber ();
   } else {
     *MaxNumberOfCpus = *NumberOfCpus;
   }
