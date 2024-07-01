@@ -1559,6 +1559,17 @@ SmmWriteProtectReadOnlyPage (
   } while (FALSE)
 
 /**
+  Get the maximum number of logical processors supported by the system.
+
+  @retval The maximum number of logical processors supported by the system
+          is indicated by the return value.
+**/
+UINTN
+GetSupportedMaxLogicalProcessorNumber (
+  VOID
+  );
+
+/**
   Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION for all CPU from gEfiMpServiceProtocolGuid.
 
   @param[out] NumberOfCpus           Pointer to NumberOfCpus.
