@@ -118,7 +118,7 @@ FutureBSPProc (
   //
   SaveVolatileRegisters (&DataInHob->APInfo.VolatileRegisters);
   AsmExchangeRole (&DataInHob->APInfo, &DataInHob->BSPInfo);
-  RestoreVolatileRegisters (&DataInHob->APInfo.VolatileRegisters, FALSE);
+  RestoreVolatileRegisters (&DataInHob->APInfo.VolatileRegisters, TRUE);
 }
 
 /**
@@ -769,7 +769,7 @@ ApWakeupFunction (
       //   to initialize AP in InitConfig path.
       // NOTE: IDTR.BASE stored in CpuMpData->CpuData[ProcessorNumber].VolatileRegisters points to a different IDT shared by all APs.
       //
-      RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, FALSE);
+      RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
     } else {
@@ -902,7 +902,7 @@ DxeApEntryPoint (
     AsmWriteMsr64 (MSR_IA32_EFER, EferMsr.Uint64);
   }
 
-  RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, FALSE);
+  RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
   InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
   PlaceAPInMwaitLoopOrRunLoop (
     CpuMpData->ApLoopMode,
@@ -2607,7 +2607,7 @@ SwitchBSPWorker (
   //
   SaveVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters);
   AsmExchangeRole (&CpuMpData->BSPInfo, &CpuMpData->APInfo);
-  RestoreVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters, FALSE);
+  RestoreVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters, TRUE);
   //
   // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
   //
