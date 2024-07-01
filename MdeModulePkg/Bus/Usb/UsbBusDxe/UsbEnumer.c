@@ -234,6 +234,9 @@ UsbCreateDevice (
   Device->ParentPort = ParentPort;
   Device->Tier       = (UINT8)(ParentIf->Device->Tier + 1);
   Device->EnumScript = 0;
+  Device->Connected  = TRUE;
+  DEBUG ((DEBUG_INFO, "UsbCreateDevice: ParentIf %p port %d Connected\n", ParentIf, ParentPort));
+
   return Device;
 }
 
@@ -595,6 +598,8 @@ UsbRemoveDevice (
     return ReturnStatus;
   }
 
+  Device->Connected = FALSE;
+  DEBUG ((DEBUG_INFO, "UsbRemoveDevice: ParentIf %p port %d Disonnected\n", Device->ParentIf, Device->ParentPort));
   Status = UsbRemoveConfig (Device);
 
   if (!EFI_ERROR (Status)) {
