@@ -156,6 +156,7 @@ InitializePciSioSerial (
 /**
   Return whether the controller is a SIO serial controller.
 
+  @param  This         A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param  Controller   The controller handle.
 
   @retval EFI_SUCCESS  The controller is a SIO serial controller.
@@ -163,7 +164,8 @@ InitializePciSioSerial (
 **/
 EFI_STATUS
 IsSioSerialController (
-  EFI_HANDLE  Controller
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  EFI_HANDLE                      Controller
   )
 {
   EFI_STATUS                Status;
@@ -178,7 +180,7 @@ IsSioSerialController (
                   Controller,
                   &gEfiSioProtocolGuid,
                   (VOID **)&Sio,
-                  gSerialControllerDriver.DriverBindingHandle,
+                  This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
@@ -193,7 +195,7 @@ IsSioSerialController (
     gBS->CloseProtocol (
            Controller,
            &gEfiSioProtocolGuid,
-           gSerialControllerDriver.DriverBindingHandle,
+           This->DriverBindingHandle,
            Controller
            );
 
@@ -201,7 +203,7 @@ IsSioSerialController (
                     Controller,
                     &gEfiDevicePathProtocolGuid,
                     (VOID **)&DevicePath,
-                    gSerialControllerDriver.DriverBindingHandle,
+                    This->DriverBindingHandle,
                     Controller,
                     EFI_OPEN_PROTOCOL_BY_DRIVER
                     );
@@ -228,7 +230,7 @@ IsSioSerialController (
     gBS->CloseProtocol (
            Controller,
            &gEfiDevicePathProtocolGuid,
-           gSerialControllerDriver.DriverBindingHandle,
+           This->DriverBindingHandle,
            Controller
            );
   }
@@ -239,14 +241,16 @@ IsSioSerialController (
 /**
   Return whether the controller is a PCI serial controller.
 
-  @param  Controller   The controller handle.
+  @param  This            A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller      The controller handle.
 
   @retval EFI_SUCCESS  The controller is a PCI serial controller.
   @retval others       The controller is not a PCI serial controller.
 **/
 EFI_STATUS
 IsPciSerialController (
-  EFI_HANDLE  Controller
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  EFI_HANDLE                      Controller
   )
 {
   EFI_STATUS                Status;
@@ -262,7 +266,7 @@ IsPciSerialController (
                   Controller,
                   &gEfiPciIoProtocolGuid,
                   (VOID **)&PciIo,
-                  gSerialControllerDriver.DriverBindingHandle,
+                  This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
@@ -301,7 +305,7 @@ IsPciSerialController (
     gBS->CloseProtocol (
            Controller,
            &gEfiPciIoProtocolGuid,
-           gSerialControllerDriver.DriverBindingHandle,
+           This->DriverBindingHandle,
            Controller
            );
   }
@@ -317,7 +321,7 @@ IsPciSerialController (
                   Controller,
                   &gEfiDevicePathProtocolGuid,
                   (VOID **)&DevicePath,
-                  gSerialControllerDriver.DriverBindingHandle,
+                  This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
@@ -329,7 +333,7 @@ IsPciSerialController (
   gBS->CloseProtocol (
          Controller,
          &gEfiDevicePathProtocolGuid,
-         gSerialControllerDriver.DriverBindingHandle,
+         This->DriverBindingHandle,
          Controller
          );
 
@@ -348,12 +352,11 @@ IsPciSerialController (
 **/
 EFI_STATUS
 EFIAPI
-SerialControllerDriverSupported (
+SerialDriverSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-
 {
   EFI_STATUS                     Status;
   UART_DEVICE_PATH               *Uart;
@@ -393,17 +396,40 @@ SerialControllerDriverSupported (
     }
   }
 
-  Status = IsSioSerialController (Controller);
+  Status = IsSioSerialController (This, Controller);
   if (EFI_ERROR (Status)) {
-    Status = IsPciSerialController (Controller);
+    Status = IsPciSerialController (This, Controller);
   }
 
   return Status;
 }
 
 /**
+  Check to see if this driver supports the given controller
+
+  @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller           The handle of the controller to test.
+  @param  RemainingDevicePath  A pointer to the remaining portion of a device path.
+
+  @return EFI_SUCCESS          This driver can support the given controller
+
+**/
+EFI_STATUS
+EFIAPI
+SerialControllerDriverSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  )
+
+{
+  return SerialDriverSupported (This, Controller, RemainingDevicePath);
+}
+
+/**
   Create the child serial device instance.
 
+  @param  This                A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param Controller           The parent controller handle.
   @param Uart                 Pointer to the UART device path node in RemainingDevicePath,
                               or NULL if RemainingDevicePath is NULL.
@@ -423,14 +449,15 @@ SerialControllerDriverSupported (
 **/
 EFI_STATUS
 CreateSerialDevice (
-  IN EFI_HANDLE                Controller,
-  IN UART_DEVICE_PATH          *Uart,
-  IN EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath,
-  IN BOOLEAN                   CreateControllerNode,
-  IN UINT32                    Instance,
-  IN PARENT_IO_PROTOCOL_PTR    ParentIo,
-  IN PCI_SERIAL_PARAMETER      *PciSerialParameter  OPTIONAL,
-  IN PCI_DEVICE_INFO           *PciDeviceInfo       OPTIONAL
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN UART_DEVICE_PATH             *Uart,
+  IN EFI_DEVICE_PATH_PROTOCOL     *ParentDevicePath,
+  IN BOOLEAN                      CreateControllerNode,
+  IN UINT32                       Instance,
+  IN PARENT_IO_PROTOCOL_PTR       ParentIo,
+  IN PCI_SERIAL_PARAMETER         *PciSerialParameter  OPTIONAL,
+  IN PCI_DEVICE_INFO              *PciDeviceInfo       OPTIONAL
   )
 {
   EFI_STATUS                                  Status;
@@ -685,7 +712,7 @@ CreateSerialDevice (
                   Controller,
                   PciSerialParameter != NULL ? &gEfiPciIoProtocolGuid : &gEfiSioProtocolGuid,
                   (VOID **)&ParentIo,
-                  gSerialControllerDriver.DriverBindingHandle,
+                  This->DriverBindingHandle,
                   SerialDevice->Handle,
                   EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                   );
@@ -720,6 +747,7 @@ CreateError:
 /**
   Returns an array of pointers containing all the child serial device pointers.
 
+  @param  This           A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param Controller      The parent controller handle.
   @param IoProtocolGuid  The protocol GUID, either equals to gEfiSioProtocolGuid
                          or equals to gEfiPciIoProtocolGuid.
@@ -729,9 +757,10 @@ CreateError:
 **/
 SERIAL_DEV **
 GetChildSerialDevices (
-  IN EFI_HANDLE  Controller,
-  IN EFI_GUID    *IoProtocolGuid,
-  OUT UINTN      *Count
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_GUID                     *IoProtocolGuid,
+  OUT UINTN                       *Count
   )
 {
   EFI_STATUS                           Status;
@@ -768,7 +797,7 @@ GetChildSerialDevices (
                       OpenInfoBuffer[Index].ControllerHandle,
                       &gEfiSerialIoProtocolGuid,
                       (VOID **)&SerialIo,
-                      gSerialControllerDriver.DriverBindingHandle,
+                      This->DriverBindingHandle,
                       Controller,
                       EFI_OPEN_PROTOCOL_GET_PROTOCOL
                       );
@@ -778,7 +807,7 @@ GetChildSerialDevices (
     }
 
     if ((OpenInfoBuffer[Index].Attributes & EFI_OPEN_PROTOCOL_BY_DRIVER) != 0) {
-      ASSERT (OpenInfoBuffer[Index].AgentHandle == gSerialControllerDriver.DriverBindingHandle);
+      ASSERT (OpenInfoBuffer[Index].AgentHandle == This->DriverBindingHandle);
       OpenByDriver = TRUE;
     }
   }
@@ -793,7 +822,7 @@ GetChildSerialDevices (
 }
 
 /**
-  Start to management the controller passed in
+  Start to manage the controller passed in
 
   @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param  Controller           The handle of the controller to test.
@@ -803,7 +832,7 @@ GetChildSerialDevices (
 **/
 EFI_STATUS
 EFIAPI
-SerialControllerDriverStart (
+SerialDriverStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
@@ -890,7 +919,7 @@ SerialControllerDriverStart (
 
   ControllerNumber       = 0;
   ContainsControllerNode = FALSE;
-  SerialDevices          = GetChildSerialDevices (Controller, IoProtocolGuid, &SerialDeviceCount);
+  SerialDevices          = GetChildSerialDevices (This, Controller, IoProtocolGuid, &SerialDeviceCount);
 
   if (SerialDeviceCount != 0) {
     if (RemainingDevicePath == NULL) {
@@ -991,7 +1020,7 @@ SerialControllerDriverStart (
         Node = NextDevicePathNode (Node);
       } while (!IsDevicePathEnd (Node));
 
-      Status = CreateSerialDevice (Controller, Uart, ParentDevicePath, FALSE, Acpi->UID, ParentIo, NULL, NULL);
+      Status = CreateSerialDevice (This, Controller, Uart, ParentDevicePath, FALSE, Acpi->UID, ParentIo, NULL, NULL);
       DEBUG ((DEBUG_INFO, "PciSioSerial: Create SIO child serial device - %r\n", Status));
     }
   } else {
@@ -1073,7 +1102,7 @@ SerialControllerDriverStart (
             PciSerialParameter = PcdGetPtr (PcdPciSerialParameters);
           }
 
-          Status = CreateSerialDevice (Controller, Uart, ParentDevicePath, FALSE, 0, ParentIo, PciSerialParameter, PciDeviceInfo);
+          Status = CreateSerialDevice (This, Controller, Uart, ParentDevicePath, FALSE, 0, ParentIo, PciSerialParameter, PciDeviceInfo);
           DEBUG ((DEBUG_INFO, "PciSioSerial: Create PCI child serial device (single) - %r\n", Status));
           if (!EFI_ERROR (Status)) {
             PciDeviceInfo->ChildCount++;
@@ -1094,7 +1123,7 @@ SerialControllerDriverStart (
               //
               // Create controller node when PCI serial device contains multiple UARTs
               //
-              Status = CreateSerialDevice (Controller, Uart, ParentDevicePath, TRUE, PciSerialCount, ParentIo, PciSerialParameter, PciDeviceInfo);
+              Status = CreateSerialDevice (This, Controller, Uart, ParentDevicePath, TRUE, PciSerialCount, ParentIo, PciSerialParameter, PciDeviceInfo);
               PciSerialCount++;
               DEBUG ((DEBUG_INFO, "PciSioSerial: Create PCI child serial device (multiple) - %r\n", Status));
               if (!EFI_ERROR (Status)) {
@@ -1145,6 +1174,91 @@ SerialControllerDriverStart (
   }
 
   return Status;
+}
+
+/**
+  Start to manage the controller passed in
+
+  @param  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param  Controller           The handle of the controller to test.
+  @param  RemainingDevicePath  A pointer to the remaining portion of a device path.
+
+  @return EFI_SUCCESS   Driver is started successfully
+**/
+EFI_STATUS
+EFIAPI
+SerialControllerDriverStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  )
+{
+  return SerialDriverStart (This, Controller, RemainingDevicePath);
+}
+
+/**
+  Initialize Serial driver in DXE phase
+
+  @param ImageHandle  Handle for the image of this driver.
+  @param SystemTable  Pointer to the EFI System Table.
+
+  @return EFI_SUCCESS   Driver is started successfully
+**/
+EFI_STATUS
+EFIAPI
+DxePciSioSerialDriverEntrypoint (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS                   Status;
+  EFI_DEVICE_PATH_PROTOCOL     *EfiDevicePath;
+  EFI_HANDLE                   *HandleBuffer;
+  UINTN                        NumberOfHandles;
+  EFI_DRIVER_BINDING_PROTOCOL  *SerialControllerDriver;
+  UINTN                        Index;
+
+  EfiDevicePath = NULL;
+  HandleBuffer  = NULL;
+  //
+  // Initialize the serial controller instance
+  //
+  SerialControllerDriver = AllocateCopyPool (sizeof (EFI_DRIVER_BINDING_PROTOCOL), &gSerialControllerDriver);
+  ASSERT (SerialControllerDriver != NULL);
+
+  SerialControllerDriver->DriverBindingHandle = ImageHandle;
+  //
+  // Initialize UART default setting in gSerialDevTemplate
+  //
+  gSerialDevTemplate.SerialMode.BaudRate     = PcdGet64 (PcdUartDefaultBaudRate);
+  gSerialDevTemplate.SerialMode.DataBits     = PcdGet8 (PcdUartDefaultDataBits);
+  gSerialDevTemplate.SerialMode.Parity       = PcdGet8 (PcdUartDefaultParity);
+  gSerialDevTemplate.SerialMode.StopBits     = PcdGet8 (PcdUartDefaultStopBits);
+  gSerialDevTemplate.UartDevicePath.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
+  gSerialDevTemplate.UartDevicePath.DataBits = PcdGet8 (PcdUartDefaultDataBits);
+  gSerialDevTemplate.UartDevicePath.Parity   = PcdGet8 (PcdUartDefaultParity);
+  gSerialDevTemplate.UartDevicePath.StopBits = PcdGet8 (PcdUartDefaultStopBits);
+  gSerialDevTemplate.ClockRate               = PcdGet32 (PcdSerialClockRate);
+
+  // Check all handles for compatible Device Path and appropriate I/O Protocol
+  Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiDevicePathProtocolGuid, NULL, &NumberOfHandles, &HandleBuffer);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  for (Index = 0; Index < NumberOfHandles; Index++) {
+    EfiDevicePath = DevicePathFromHandle (HandleBuffer[Index]);
+    Status        = SerialDriverSupported (SerialControllerDriver, HandleBuffer[Index], EfiDevicePath);
+    DEBUG ((DEBUG_INFO, "SerialDriverSupported status: %r\n", Status));
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    Status = SerialDriverStart (SerialControllerDriver, HandleBuffer[Index], EfiDevicePath);
+    DEBUG ((DEBUG_INFO, "SerialDriverStart status: %r\n", Status));
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**

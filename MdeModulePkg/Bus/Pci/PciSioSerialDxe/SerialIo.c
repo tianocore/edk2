@@ -1367,7 +1367,13 @@ SerialReadRegister (
   EFI_STATUS  Status;
 
   if (SerialDev->PciDeviceInfo == NULL) {
-    return IoRead8 ((UINTN)SerialDev->BaseAddress + Offset * SerialDev->RegisterStride);
+    if (SerialDev->MmioAccess)
+    {
+      return MmioRead8((UINTN)SerialDev->BaseAddress + Offset * SerialDev->RegisterStride);
+    }
+    else {
+      return IoRead8 ((UINTN)SerialDev->BaseAddress + Offset * SerialDev->RegisterStride);
+    }
   } else {
     if (SerialDev->MmioAccess) {
       Status = SerialDev->PciDeviceInfo->PciIo->Mem.Read (
@@ -1411,7 +1417,13 @@ SerialWriteRegister (
   EFI_STATUS  Status;
 
   if (SerialDev->PciDeviceInfo == NULL) {
-    IoWrite8 ((UINTN)SerialDev->BaseAddress + Offset * SerialDev->RegisterStride, Data);
+    if (SerialDev->MmioAccess)
+    {
+      MmioWrite8((UINTN)SerialDev->BaseAddress + Offset * SerialDev->RegisterStride, Data);
+    }
+    else {
+      IoWrite8 ((UINTN)SerialDev->BaseAddress + Offset * SerialDev->RegisterStride, Data);
+    }
   } else {
     if (SerialDev->MmioAccess) {
       Status = SerialDev->PciDeviceInfo->PciIo->Mem.Write (

@@ -1,0 +1,81 @@
+## @file
+# Serial driver for standard UARTS on a SIO chip or PCI/PCIE card.
+#
+# Produces the Serial I/O protocol for standard UARTS using Super I/O or PCI I/O.
+#
+# This is Early DXE version of Serial driver. It's intended use is for debug purposes
+# in early DXE. There is added dependency on either Super I/O Protocol or PCI I/O Protocol.
+#
+# Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciSioSerialDxeEarly
+  MODULE_UNI_FILE                = PciSioSerialDxe.uni
+  FILE_GUID                      = E47C4BFB-9CCC-47B6-A3C1-79C3FBF8B6C8
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DxePciSioSerialDriverEntrypoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+#  DRIVER_BINDING                =  gSerialControllerDriver
+#  COMPONENT_NAME                =  gPciSioSerialComponentName
+#  COMPONENT_NAME2               =  gPciSioSerialComponentName2
+#
+
+[Sources]
+  ComponentName.c
+  SerialIo.c
+  Serial.h
+  Serial.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  PcdLib
+  ReportStatusCodeLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  DevicePathLib
+  UefiLib
+  UefiDriverEntryPoint
+  DebugLib
+  IoLib
+
+[Guids]
+  gEfiUartDevicePathGuid                        ## SOMETIMES_CONSUMES   ## GUID
+
+[Protocols]
+  gEfiSioProtocolGuid                           ## TO_START
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiSerialIoProtocolGuid                      ## BY_START
+  gEfiDevicePathProtocolGuid                    ## BY_START
+
+[FeaturePcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHalfHandshake|FALSE   ## CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|115200    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|8         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|1           ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|1         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate|1843200 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters     ## CONSUMES
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  PciSioSerialDxeExtra.uni
+
+[Depex]
+  gEfiSioProtocolGuid OR gEfiPciIoProtocolGuid
