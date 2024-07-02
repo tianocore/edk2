@@ -31,6 +31,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   PeimEntryPoint
@@ -48,6 +49,11 @@
   gMmCommBufferHobGuid
   gEfiSmmSmramMemoryGuid
   gEventMmDispatchGuid
+  gSmmBaseHobGuid
+  gMpInformation2HobGuid
+  gEfiAcpiVariableGuid
+  gMmAcpiS3EnableHobGuid
+  gMmCpuSyncConfigHobGuid
 
 [Ppis]
   gEfiPeiMmControlPpiGuid
@@ -59,6 +65,10 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout                 ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2                ## CONSUMES
 
 [Depex]
-  gEfiPeiMmControlPpiGuid
+  gEfiPeiMmControlPpiGuid AND gEfiPeiMpServicesPpiGuid
