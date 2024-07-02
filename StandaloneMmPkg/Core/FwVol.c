@@ -11,18 +11,6 @@
 #include <Library/FvLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 
-//
-// List of file types supported by dispatcher
-//
-EFI_FV_FILETYPE  mMmFileTypes[] = {
-  EFI_FV_FILETYPE_MM,
-  0xE, // EFI_FV_FILETYPE_MM_STANDALONE,
-       //
-       // Note: DXE core will process the FV image file, so skip it in MM core
-       // EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE
-       //
-};
-
 EFI_STATUS
 MmAddToDriverList (
   IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
@@ -72,12 +60,10 @@ MmCoreFfsFindMmDriver (
   EFI_STATUS                  Status;
   EFI_STATUS                  DepexStatus;
   EFI_FFS_FILE_HEADER         *FileHeader;
-  EFI_FV_FILETYPE             FileType;
   VOID                        *Pe32Data;
   UINTN                       Pe32DataSize;
   VOID                        *Depex;
   UINTN                       DepexSize;
-  UINTN                       Index;
   EFI_COMMON_SECTION_HEADER   *Section;
   VOID                        *SectionData;
   UINTN                       SectionDataSize;
@@ -224,22 +210,19 @@ MmCoreFfsFindMmDriver (
     }
   } while (TRUE);
 
-  for (Index = 0; Index < sizeof (mMmFileTypes) / sizeof (mMmFileTypes[0]); Index++) {
-    DEBUG ((DEBUG_INFO, "Check MmFileTypes - 0x%x\n", mMmFileTypes[Index]));
-    FileType   = mMmFileTypes[Index];
-    FileHeader = NULL;
-    do {
-      Status = FfsFindNextFile (FileType, FwVolHeader, &FileHeader);
-      if (!EFI_ERROR (Status)) {
-        Status = FfsFindSectionData (EFI_SECTION_PE32, FileHeader, &Pe32Data, &Pe32DataSize);
-        DEBUG ((DEBUG_INFO, "Find PE data - 0x%x\n", Pe32Data));
-        DepexStatus = FfsFindSectionData (EFI_SECTION_MM_DEPEX, FileHeader, &Depex, &DepexSize);
-        if (!EFI_ERROR (DepexStatus)) {
-          MmAddToDriverList (FwVolHeader, Pe32Data, Pe32DataSize, Depex, DepexSize, &FileHeader->Name);
-        }
+  DEBUG ((DEBUG_INFO, "Check MmFileTypes - 0x%x\n", EFI_FV_FILETYPE_MM_STANDALONE));
+  FileHeader = NULL;
+  do {
+    Status = FfsFindNextFile (EFI_FV_FILETYPE_MM_STANDALONE, FwVolHeader, &FileHeader);
+    if (!EFI_ERROR (Status)) {
+      Status = FfsFindSectionData (EFI_SECTION_PE32, FileHeader, &Pe32Data, &Pe32DataSize);
+      DEBUG ((DEBUG_INFO, "Find PE data - 0x%x\n", Pe32Data));
+      DepexStatus = FfsFindSectionData (EFI_SECTION_MM_DEPEX, FileHeader, &Depex, &DepexSize);
+      if (!EFI_ERROR (DepexStatus)) {
+        MmAddToDriverList (FwVolHeader, Pe32Data, Pe32DataSize, Depex, DepexSize, &FileHeader->Name);
       }
-    } while (!EFI_ERROR (Status));
-  }
+    }
+  } while (!EFI_ERROR (Status));
 
   return EFI_SUCCESS;
 

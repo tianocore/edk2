@@ -471,6 +471,9 @@
   ## Include/Guid/VariableRuntimeCacheInfo.h
   gEdkiiVariableRuntimeCacheInfoHobGuid = { 0x0f472f7d, 0x6713, 0x4915, { 0x96, 0x14, 0x5d, 0xda, 0x28, 0x40, 0x10, 0x56 }}
 
+  ## Include/Guid/MmCommBuffer.h
+  gEdkiiCommunicationBufferGuid  = { 0x6c2a2520, 0x0131, 0x4aee, { 0xa7, 0x50, 0xcc, 0x38, 0x4a, 0xac, 0xe8, 0xc6 }}
+
 [Ppis]
   ## Include/Ppi/FirmwareVolumeShadowPpi.h
   gEdkiiPeiFirmwareVolumeShadowPpiGuid = { 0x7dfe756c, 0xed8d, 0x4d77, {0x9e, 0xc4, 0x39, 0x9a, 0x8a, 0x81, 0x51, 0x16 } }
@@ -1172,6 +1175,10 @@
   # Default is 2000, it represent delay is 2 ms.
   # @Prompt Delay access XHCI register after it issues HCRST (us)
   gEfiMdeModulePkgTokenSpaceGuid.PcdDelayXhciHCReset|2000|UINT16|0x30001060
+
+  ## The pages for MM communication buffer, buffer size default is 512K (128 Pages).
+  # @Prompt The value of pages,  Default value is 128.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFixedCommBufferPages|128|UINT32|0x30001061
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.

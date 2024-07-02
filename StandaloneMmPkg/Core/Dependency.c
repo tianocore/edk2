@@ -231,13 +231,6 @@ MmIsSchedulable (
         CopyMem (&DriverGuid, Iterator + 1, sizeof (EFI_GUID));
 
         Status = MmLocateProtocol (&DriverGuid, NULL, &Interface);
-        if (EFI_ERROR (Status) && (mEfiSystemTable != NULL)) {
-          //
-          // For MM Driver, it may depend on uefi protocols
-          //
-          Status = mEfiSystemTable->BootServices->LocateProtocol (&DriverGuid, NULL, &Interface);
-        }
-
         if (EFI_ERROR (Status)) {
           DEBUG ((DEBUG_DISPATCH, "  PUSH GUID(%g) = FALSE\n", &DriverGuid));
           Status = PushBool (FALSE);
