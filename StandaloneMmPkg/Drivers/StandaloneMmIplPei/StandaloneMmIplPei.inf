@@ -55,6 +55,7 @@
   gMmAcpiS3EnableHobGuid
   gMmCpuSyncConfigHobGuid
   gMmProfileDataHobGuid
+  gMmUnblockRegionHobGuid
 
 [Ppis]
   gEfiPeiMmControlPpiGuid
@@ -72,6 +73,9 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2                ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileEnable                 ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize                   ## CONSUMES
+
+[Pcd.X64]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess        ## CONSUMES
 
 [Depex]
   gEfiPeiMmControlPpiGuid AND gEfiPeiMpServicesPpiGuid
