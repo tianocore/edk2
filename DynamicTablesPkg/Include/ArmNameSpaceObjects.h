@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -73,6 +74,7 @@ typedef enum ArmObjectID {
   EArmObjPccSubspaceType5Info,                                 ///< 48 - Pcc Subspace Type 5 Info
   EArmObjEtInfo,                                               ///< 49 - Embedded Trace Extension/Module Info
   EArmObjPsdInfo,                                              ///< 50 - P-State Dependency (PSD) Info
+  EArmObjTpm2InterfaceInfo,                                    ///< 51 - TPM Interface Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -1344,6 +1346,38 @@ typedef struct CmArmEtInfo {
     ID: EArmObjPsdInfo
 */
 typedef AML_PSD_INFO CM_ARM_PSD_INFO;
+
+/** A structure that describes TPM interface and access method.
+
+  TCG ACPI Specification 2.0
+
+  ID: EArmObjTpm2InterfaceInfo,
+*/
+typedef struct CmArmTpm2InterfaceInfo {
+  /** Platform Class
+        0: Client platform
+        1: Server platform
+  */
+  UINT16    PlatformClass;
+
+  /** Physical address of the Control Area */
+  UINT64    AddressOfControlArea;
+
+  /** The Start Method selector determines which mechanism the
+      device driver uses to notify the TPM 2.0 device that a
+      command is available for processing.
+  */
+  UINT32    StartMethod;
+
+  /** Start method specific parameters */
+  UINT8     StartMethodParameters[12];
+
+  /** Log Area Minimum Length */
+  UINT32    Laml;
+
+  /** Log Area Start Address */
+  UINT64    Lasa;
+} CM_ARM_TPM2_INTERFACE_INFO;
 
 #pragma pack()
 
