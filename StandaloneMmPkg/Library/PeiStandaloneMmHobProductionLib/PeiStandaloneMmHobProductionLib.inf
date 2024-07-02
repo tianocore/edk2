@@ -1,0 +1,44 @@
+## @file
+#  Standalone MM HOB Production Library.
+#
+#  This PEI NULL class library instance installs HOBs whose data can be acquired
+#  using Specification defined interfaces in PEI. This data is consumed during the
+#  initialization of the Standalone MM environment.
+#
+#  Copyright (c) Microsoft Corporation
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION         = 0x00010017
+  BASE_NAME           = PeiStandaloneMmProductionLib
+  FILE_GUID           = 446CC2F6-780A-4BA1-A19F-0544EDAB0AE5
+  VERSION_STRING      = 1.0
+  MODULE_TYPE         = PEIM
+  LIBRARY_CLASS       = NULL
+  CONSTRUCTOR         = PeiStandaloneMmHobProductionLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  PeiStandaloneMmHobProductionLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PeiServicesLib
+
+[Guids]
+  gMpInformationHobGuid             ## PRODUCES
+
+[Ppis]
+  gEfiPeiMpServicesPpiGuid          ## CONSUMES
