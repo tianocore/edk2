@@ -74,5 +74,8 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileEnable                 ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize                   ## CONSUMES
 
+[Pcd.X64]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess        ## CONSUMES
+
 [Depex]
   gPeiSmmControlPpiGuid AND gEfiPeiMpServicesPpiGuid

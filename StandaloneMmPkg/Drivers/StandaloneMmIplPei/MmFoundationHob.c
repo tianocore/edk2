@@ -12,6 +12,7 @@
 #include <Guid/AcpiS3Enable.h>
 #include <Guid/SmmCpuSyncConfig.h>
 #include <Guid/SmmProfileData.h>
+#include <Guid/UnblockRegion.h>
 #include <Register/Intel/Cpuid.h>
 #include <Register/Intel/ArchitecturalMsr.h>
 
@@ -20,6 +21,11 @@
 //
 #define SMM_PROFILE_DTS_SIZE      (4 * 1024 * 1024)  // 4M
 #define CPUID1_EDX_BTS_AVAILABLE  0x200000
+
+typedef struct {
+  EFI_PHYSICAL_ADDRESS    Base;
+  UINT64                  Length;
+} MM_IPL_MEMORY_REGION;
 
 /**
   Add a new HOB to the HOB List.
@@ -380,6 +386,274 @@ MmIplBuildSmmProfileHobs (
 }
 
 /**
+
+  Build resource Hobs from unblocked memory regions
+
+  This function builds resource HOBs for all unblocked memory regions.
+
+  @param[in]       HobBuffer      The pointer of new HOB buffer.
+  @param[in, out]  HobBufferSize  The total size of the same GUID HOBs when as output.
+
+**/
+VOID
+MmIplBuildResourceHobForUnblockedRegion (
+  IN UINT8      *HobBuffer,
+  IN OUT UINTN  *HobBufferSize
+  )
+{
+  MM_UNBLOCK_REGION       *UnblockRegion;
+  EFI_HOB_GENERIC_HEADER  *GuidHob;
+  UINTN                   UsedSize;
+
+  UsedSize = 0;
+
+  GuidHob = GetFirstGuidHob (&gMmUnblockRegionHobGuid);
+  while (GuidHob != NULL) {
+    if (*HobBufferSize >= UsedSize + sizeof (EFI_HOB_RESOURCE_DESCRIPTOR)) {
+      UnblockRegion = GET_GUID_HOB_DATA (GuidHob);
+      MmIplBuildMemoryResourceHob (
+        (EFI_HOB_RESOURCE_DESCRIPTOR *)(HobBuffer + UsedSize),
+        EFI_RESOURCE_SYSTEM_MEMORY,
+        0,
+        UnblockRegion->MemoryDescriptor.PhysicalStart,
+        EFI_PAGES_TO_SIZE (UnblockRegion->MemoryDescriptor.NumberOfPages),
+        &UnblockRegion->IdentifierGuid
+        );
+    }
+
+    UsedSize += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+    GuidHob   = GetNextGuidHob (&gMmUnblockRegionHobGuid, GET_NEXT_HOB (GuidHob));
+  }
+
+  *HobBufferSize = UsedSize;
+}
+
+/**
+  Create MMIO memory map according to platform HOB.
+
+  @param[in]       PlatformHobList    Platform HOB list.
+  @param[in]       PlatformHobSize    Platform HOB size.
+  @param[in, out]  MemoryRegion       Memory regions.
+  @param[in, out]  MemoryRegionCount  Count of MMIO regions
+**/
+VOID
+CollectPlatformMemoryRegions (
+  IN UINT8                     *PlatformHobList,
+  IN UINTN                     PlatformHobSize,
+  IN OUT MM_IPL_MEMORY_REGION  *MemoryRegion,
+  IN OUT UINTN                 *MemoryRegionCount
+  )
+{
+  UINTN                 Index;
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  ASSERT (MemoryRegionCount != NULL);
+  ASSERT (*MemoryRegionCount == 0 || MemoryRegion != NULL);
+
+  Index = 0;
+  //
+  // Get the HOB list for processing
+  //
+  Hob.Raw = PlatformHobList;
+
+  //
+  // Collect memory ranges
+  //
+  while (Hob.Raw < PlatformHobList + PlatformHobSize) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if (  (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO)
+         || (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY)
+         || (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_FIRMWARE_DEVICE)
+         || (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED))
+      {
+        if (Index < *MemoryRegionCount) {
+          MemoryRegion[Index].Base   = Hob.ResourceDescriptor->PhysicalStart;
+          MemoryRegion[Index].Length = Hob.ResourceDescriptor->ResourceLength;
+        }
+
+        Index++;
+      }
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+  }
+
+  *MemoryRegionCount = Index;
+}
+
+/**
+  Function to compare 2 MM_IPL_MEMORY_REGION pointer based on Base.
+
+  @param[in] Buffer1            pointer to MM_IPL_MEMORY_REGION pointer to compare
+  @param[in] Buffer2            pointer to second MM_IPL_MEMORY_REGION pointer to compare
+
+  @retval 0                     Buffer1 equal to Buffer2
+  @retval <0                    Buffer1 is less than Buffer2
+  @retval >0                    Buffer1 is greater than Buffer2
+**/
+INTN
+EFIAPI
+MemoryRegionBaseAddressCompare (
+  IN CONST VOID  *Buffer1,
+  IN CONST VOID  *Buffer2
+  )
+{
+  if (((MM_IPL_MEMORY_REGION *)Buffer1)->Base > ((MM_IPL_MEMORY_REGION *)Buffer2)->Base) {
+    return 1;
+  } else if (((MM_IPL_MEMORY_REGION *)Buffer1)->Base < ((MM_IPL_MEMORY_REGION *)Buffer2)->Base) {
+    return -1;
+  }
+
+  return 0;
+}
+
+/**
+  Calculate the maximum support address.
+
+  @return the maximum support address.
+**/
+UINT8
+MmIplCalculateMaximumSupportAddress (
+  VOID
+  )
+{
+  UINT32  RegEax;
+  UINT8   PhysicalAddressBits;
+  VOID    *Hob;
+
+  //
+  // Get physical address bits supported.
+  //
+  Hob = GetFirstHob (EFI_HOB_TYPE_CPU);
+  if (Hob != NULL) {
+    PhysicalAddressBits = ((EFI_HOB_CPU *)Hob)->SizeOfMemorySpace;
+  } else {
+    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+      AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &RegEax, NULL, NULL, NULL);
+      PhysicalAddressBits = (UINT8)RegEax;
+    } else {
+      PhysicalAddressBits = 36;
+    }
+  }
+
+  return PhysicalAddressBits;
+}
+
+/**
+  Build resource HOB to cover [0, PhysicalAddressBits length] by excluding
+  all Mmram ranges, SmmProfile data and MMIO ranges.
+
+  @param[in]       HobBuffer      The pointer of new HOB buffer.
+  @param[in, out]  HobBufferSize  The total size of the same GUID HOBs when as output.
+  @param[in]      PlatformHobList    Platform HOB list.
+  @param[in]      PlatformHobSize    Platform HOB size.
+  @param[in]      Block              Pointer of MMRAM descriptor block.
+  @param[in]      SmmProfileDataHob  Pointer to smm profile data HOB.
+
+**/
+VOID
+MmIplBuildResourceHobForAllSystemMemory (
+  IN UINT8                           *HobBuffer,
+  IN OUT UINTN                       *HobBufferSize,
+  IN VOID                            *PlatformHobList,
+  IN UINTN                           PlatformHobSize,
+  IN EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *Block,
+  IN EFI_HOB_MEMORY_ALLOCATION       *SmmProfileDataHob
+  )
+{
+  UINTN                 Index;
+  UINTN                 Count;
+  UINTN                 PlatformRegionCount;
+  UINTN                 UsedSize;
+  UINT64                PreviousAddress;
+  UINT64                MaxAddress;
+  MM_IPL_MEMORY_REGION  *MemoryRegions;
+  MM_IPL_MEMORY_REGION  SortBuffer;
+
+  MaxAddress = LShiftU64 (1, MmIplCalculateMaximumSupportAddress ());
+
+  //
+  // Get the count of platform memory regions
+  //
+  PlatformRegionCount = 0;
+  if ((PlatformHobList != NULL) && (PlatformHobSize != 0)) {
+    CollectPlatformMemoryRegions (PlatformHobList, PlatformHobSize, NULL, &PlatformRegionCount);
+  }
+
+  //
+  // Allocate buffer for platform memory regions, SmmProfile data, MMRam ranges, an extra terminator.
+  //
+  Count         = PlatformRegionCount + Block->NumberOfMmReservedRegions + ((SmmProfileDataHob != NULL) ? 1 : 0) + 1;
+  MemoryRegions = AllocatePages (EFI_SIZE_TO_PAGES (Count * sizeof (*MemoryRegions)));
+  ASSERT (MemoryRegions != NULL);
+  if (MemoryRegions == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a:%d - No enough memory\n", __func__, __LINE__));
+    CpuDeadLoop ();
+    return;
+  }
+
+  //
+  // The very last region is the terminator
+  //
+  MemoryRegions[Count - 1].Base   = MaxAddress;
+  MemoryRegions[Count - 1].Length = 0;
+
+  //
+  // Collect platform memory regions
+  //
+  if (PlatformRegionCount != 0) {
+    CollectPlatformMemoryRegions (PlatformHobList, PlatformHobSize, MemoryRegions, &PlatformRegionCount);
+  }
+
+  //
+  // Collect SMRAM regions
+  //
+  for (Index = 0; Index < Block->NumberOfMmReservedRegions; Index++) {
+    MemoryRegions[PlatformRegionCount + Index].Base   = Block->Descriptor[Index].CpuStart;
+    MemoryRegions[PlatformRegionCount + Index].Length = Block->Descriptor[Index].PhysicalSize;
+  }
+
+  //
+  // Collect SMM profile database region
+  //
+  if (SmmProfileDataHob != NULL) {
+    MemoryRegions[PlatformRegionCount + Block->NumberOfMmReservedRegions].Base   = SmmProfileDataHob->AllocDescriptor.MemoryBaseAddress;
+    MemoryRegions[PlatformRegionCount + Block->NumberOfMmReservedRegions].Length = SmmProfileDataHob->AllocDescriptor.MemoryLength;
+  }
+
+  //
+  // Build system memory resource HOBs excluding platform memory regions, SMRAM regions, SmmProfile database.
+  //
+  QuickSort (MemoryRegions, Count, sizeof (*MemoryRegions), MemoryRegionBaseAddressCompare, &SortBuffer);
+  UsedSize        = 0;
+  PreviousAddress = 0;
+  for (Index = 0; Index < Count; Index++) {
+    ASSERT (MaxAddress >= MemoryRegions[Index].Base + MemoryRegions[Index].Length);
+
+    if (MemoryRegions[Index].Base > PreviousAddress) {
+      if (*HobBufferSize >= UsedSize + sizeof (EFI_HOB_RESOURCE_DESCRIPTOR)) {
+        MmIplBuildMemoryResourceHob (
+          (EFI_HOB_RESOURCE_DESCRIPTOR *)(HobBuffer + UsedSize),
+          EFI_RESOURCE_SYSTEM_MEMORY,
+          PcdGetBool (PcdCpuSmmProfileEnable) ? EDKII_MM_RESOURCE_ATTRIBUTE_LOGGING : 0,
+          PreviousAddress,
+          MemoryRegions[Index].Base - PreviousAddress,
+          &gEfiCallerIdGuid
+          );
+      }
+
+      UsedSize += sizeof (EFI_HOB_RESOURCE_DESCRIPTOR);
+    }
+
+    PreviousAddress = MemoryRegions[Index].Base + MemoryRegions[Index].Length;
+  }
+
+  *HobBufferSize = UsedSize;
+  FreePages (MemoryRegions, EFI_SIZE_TO_PAGES (Count * sizeof (EFI_MEMORY_DESCRIPTOR)));
+}
+
+/**
   Get remaining size for building HOBs.
 
   @param[in] TotalHobSize    Total size of foundation HOBs.
@@ -455,6 +729,16 @@ CreateMmFoundationHobList (
     ((*FoundationHobSize != 0) && (FoundationHobList != NULL)) ||
     ((*FoundationHobSize == 0) && (FoundationHobList == NULL))
     );
+
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    //
+    // When SmmProfile is enabled, all DRAM is accessible from SMM drivers' perspective.
+    // However, underline Cpu SMM driver does not map the DRAM so that every access to it triggers #PF.
+    // #PF handler records the access then sets up the mapping in the page table to allow the temporary access by current instruction.
+    // The mapping is revoked before next instruction runs.
+    //
+    ASSERT (!FixedPcdGetBool (PcdCpuSmmRestrictedMemoryAccess));
+  }
 
   RemainingSize = 0;
   UsedSize      = 0;
@@ -548,6 +832,24 @@ CreateMmFoundationHobList (
 
     UsedSize += HobLength;
   }
+
+  RemainingSize = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  if (FixedPcdGetBool (PcdCpuSmmRestrictedMemoryAccess)) {
+    //
+    // Only unblocked memory regions are accessible
+    //
+    MmIplBuildResourceHobForUnblockedRegion (FoundationHobList + UsedSize, &RemainingSize);
+  } else {
+    //
+    // All system memory (DRAM) is accessible.
+    // When SMM Profile is enabled:
+    //   * Access to regions reported from MmPlatformHobProducerLib do not require logging.
+    //   * Access to other system memory requires logging.
+    //
+    MmIplBuildResourceHobForAllSystemMemory (FoundationHobList + UsedSize, &RemainingSize, PlatformHobList, PlatformHobSize, Block, SmmProfileDataHob);
+  }
+
+  UsedSize += RemainingSize;
 
   if (*FoundationHobSize < UsedSize) {
     Status = RETURN_BUFFER_TOO_SMALL;
