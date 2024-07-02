@@ -33,6 +33,12 @@
 #define IPRIORITY_ADDRESS(base, offset)  ((base) +\
           ARM_GICR_CTLR_FRAME_SIZE + ARM_GIC_ICDIPR + 4 * (offset))
 
+#define ISPENDR_ADDRESS(base, offset)  ((base) +\
+          ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_ISPENDR + 4 * (offset))
+
+#define ICPENDR_ADDRESS(base, offset)  ((base) +\
+          ARM_GICR_CTLR_FRAME_SIZE + ARM_GICR_ICPENDR + 4 * (offset))
+
 /**
  *
  * Return whether the Source interrupt index refers to a shared interrupt (SPI)
@@ -142,16 +148,56 @@ EFIAPI
 ArmGicSendSgiTo (
   IN  UINTN  GicDistributorBase,
   IN  UINT8  TargetListFilter,
-  IN  UINT8  CPUTargetList,
+  IN  UINTN  CPUTargetList,
   IN  UINT8  SgiId
   )
 {
-  MmioWrite32 (
-    GicDistributorBase + ARM_GIC_ICDSGIR,
-    ((TargetListFilter & 0x3) << 24) |
-    ((CPUTargetList & 0xFF) << 16)   |
-    (SgiId & 0xF)
-    );
+  ARM_GIC_ARCH_REVISION  Revision;
+  UINT32                 ApplicableTargets;
+  UINT32                 AFF3;
+  UINT32                 AFF2;
+  UINT32                 AFF1;
+  UINT32                 AFF0;
+  UINT32                 Irm;
+  UINT64                 SGIValue;
+
+  Revision = ArmGicGetSupportedArchRevision ();
+  if (Revision == ARM_GIC_ARCH_REVISION_2) {
+    MmioWrite32 (
+      GicDistributorBase + ARM_GIC_ICDSGIR,
+      ((TargetListFilter & 0x3) << 24) |
+      ((CPUTargetList & 0xFF) << 16)   |
+      (SgiId & 0xF)
+      );
+  } else {
+    // Below routine is adopted from gicv3_raise_secure_g0_sgi in TF-A
+
+    /* Extract affinity fields from target */
+    AFF0 = GET_MPIDR_AFF0 (CPUTargetList);
+    AFF1 = GET_MPIDR_AFF1 (CPUTargetList);
+    AFF2 = GET_MPIDR_AFF2 (CPUTargetList);
+    AFF3 = GET_MPIDR_AFF3 (CPUTargetList);
+
+    /*
+     * Make target list from affinity 0, and ensure GICv3 SGI can target
+     * this PE.
+     */
+    ApplicableTargets = (1 << AFF0);
+
+    /*
+     * Evaluate the filter to see if this is for the target or all others
+     */
+    Irm = (TargetListFilter == ARM_GIC_ICDSGIR_FILTER_EVERYONEELSE) ? SGIR_IRM_TO_OTHERS : SGIR_IRM_TO_AFF;
+
+    /* Raise SGI to PE specified by its affinity */
+    SGIValue = GICV3_SGIR_VALUE (AFF3, AFF2, AFF1, SgiId, Irm, ApplicableTargets);
+
+    /*
+     * Ensure that any shared variable updates depending on out of band
+     * interrupt trigger are observed before raising SGI.
+     */
+    ArmGicV3SendNsG1Sgi (SGIValue);
+  }
 }
 
 /*
@@ -394,6 +440,59 @@ ArmGicIsInterruptEnabled (
     // Read set-enable register
     Interrupts = MmioRead32 (
                    ISENABLER_ADDRESS (GicCpuRedistributorBase, RegOffset)
+                   );
+  }
+
+  return ((Interrupts & (1 << RegShift)) != 0);
+}
+
+/**
+  Check if an interrupt is pending in GIC.
+
+  @param GicDistributorBase    Base address of platform GIC Distributor.
+  @param GicRedistributorBase  Base address of platform GIC Redistributor.
+  @param Source                Interrupt source ID.
+
+  @return BOOLEAN   TRUE if the interrupt is pending, FALSE otherwise.
+**/
+BOOLEAN
+EFIAPI
+ArmGicIsInterruptPending (
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
+  )
+{
+  UINT32                 RegOffset;
+  UINTN                  RegShift;
+  ARM_GIC_ARCH_REVISION  Revision;
+  UINTN                  GicCpuRedistributorBase;
+  UINT32                 Interrupts;
+
+  // Calculate enable register offset and bit position
+  RegOffset = (UINT32)(Source / 32);
+  RegShift  = Source % 32;
+
+  Revision = ArmGicGetSupportedArchRevision ();
+  if ((Revision == ARM_GIC_ARCH_REVISION_2) ||
+      FeaturePcdGet (PcdArmGicV3WithV2Legacy) ||
+      SourceIsSpi (Source))
+  {
+    Interrupts = MmioRead32 (
+                   GicDistributorBase + ARM_GIC_ICDSPR + (4 * RegOffset)
+                   );
+  } else {
+    GicCpuRedistributorBase = GicGetCpuRedistributorBase (
+                                GicRedistributorBase,
+                                Revision
+                                );
+    if (GicCpuRedistributorBase == 0) {
+      return 0;
+    }
+
+    // Read set-enable register
+    Interrupts = MmioRead32 (
+                   ISPENDR_ADDRESS (GicCpuRedistributorBase, RegOffset)
                    );
   }
 

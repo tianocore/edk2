@@ -78,6 +78,8 @@
 // GIC SGI & PPI Redistributor frame
 #define ARM_GICR_ISENABLER  0x0100      // Interrupt Set-Enable Registers
 #define ARM_GICR_ICENABLER  0x0180      // Interrupt Clear-Enable Registers
+#define ARM_GICR_ISPENDR    0x0200      // Interrupt Set-Pending Registers
+#define ARM_GICR_ICPENDR    0x0280      // Interrupt Clear-Pending Registers
 
 // GIC Cpu interface
 #define ARM_GIC_ICCICR   0x00         // CPU Interface Control Register
@@ -109,6 +111,28 @@
 
 // Bit Mask for
 #define ARM_GIC_ICCIAR_ACKINTID  0x3FF
+
+/* ICC SGI macros */
+#define SGIR_TGT_MASK     ((UINT64)0xffff)
+#define SGIR_AFF1_SHIFT   16
+#define SGIR_INTID_SHIFT  24
+#define SGIR_INTID_MASK   ((UINT64)0xf)
+#define SGIR_AFF2_SHIFT   32
+#define SGIR_IRM_SHIFT    40
+#define SGIR_IRM_MASK     ((UINT64)0x1)
+#define SGIR_AFF3_SHIFT   48
+#define SGIR_AFF_MASK     ((UINT64)0xff)
+
+#define SGIR_IRM_TO_AFF     0
+#define SGIR_IRM_TO_OTHERS  1
+
+#define GICV3_SGIR_VALUE(_aff3, _aff2, _aff1, _intid, _irm, _tgt) \
+  ((((UINT64) (_aff3) & SGIR_AFF_MASK) << SGIR_AFF3_SHIFT) | \
+   (((UINT64) (_irm) & SGIR_IRM_MASK) << SGIR_IRM_SHIFT) | \
+   (((UINT64) (_aff2) & SGIR_AFF_MASK) << SGIR_AFF2_SHIFT) | \
+   (((_intid) & SGIR_INTID_MASK) << SGIR_INTID_SHIFT) | \
+   (((_aff1) & SGIR_AFF_MASK) << SGIR_AFF1_SHIFT) | \
+   ((_tgt) & SGIR_TGT_MASK))
 
 UINT32
 EFIAPI
@@ -145,6 +169,23 @@ ArmGicDisableInterruptInterface (
   IN  UINTN  GicInterruptInterfaceBase
   );
 
+/**
+  Check if an interrupt is pending in GIC.
+
+  @param GicDistributorBase    Base address of platform GIC Distributor.
+  @param GicRedistributorBase  Base address of platform GIC Redistributor.
+  @param Source                Interrupt source ID.
+
+  @return BOOLEAN   TRUE if the interrupt is pending, FALSE otherwise.
+**/
+BOOLEAN
+EFIAPI
+ArmGicIsInterruptPending (
+  IN UINTN  GicDistributorBase,
+  IN UINTN  GicRedistributorBase,
+  IN UINTN  Source
+  );
+
 VOID
 EFIAPI
 ArmGicEnableDistributor (
@@ -168,7 +209,7 @@ EFIAPI
 ArmGicSendSgiTo (
   IN  UINTN  GicDistributorBase,
   IN  UINT8  TargetListFilter,
-  IN  UINT8  CPUTargetList,
+  IN  UINTN  CPUTargetList,
   IN  UINT8  SgiId
   );
 
@@ -330,6 +371,11 @@ ArmGicV3SetBinaryPointer (
 VOID
 ArmGicV3SetPriorityMask (
   IN UINTN  Priority
+  );
+
+VOID
+ArmGicV3SendNsG1Sgi (
+  IN UINT64  SgiVal
   );
 
 #endif // ARMGIC_H_
