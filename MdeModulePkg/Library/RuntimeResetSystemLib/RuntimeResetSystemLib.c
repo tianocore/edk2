@@ -12,8 +12,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 
-EFI_EVENT             mRuntimeResetSystemLibVirtualAddressChangeEvent;
-EFI_RUNTIME_SERVICES  *mInternalRT;
+EFI_EVENT                    mRuntimeResetSystemLibVirtualAddressChangeEvent;
+static EFI_RUNTIME_SERVICES  *mInternalRT;
 
 /**
   This function causes a system-wide reset (cold reset), in which
