@@ -880,7 +880,103 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonMemoryCacheInfo[] = {
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonObjSpcrInfoParser[] = {
   { "InterruptType", 1, "0x%x", NULL },
-  { "TerminalType",  1, "0x%x", NULL }
+  { "TerminalType",  1, "0x%x", NULL },
+};
+
+/** A parser for ERiscVObjRintcInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmRiscVRintcInfoParser[] = {
+  { "Version",              1,                        "0x%x",   NULL },
+  { "Flags",                4,                        "0x%x",   NULL },
+  { "HartId",               8,                        "0x%llx", NULL },
+  { "AcpiProcessorUid",     4,                        "0x%x",   NULL },
+  { "ExtIntcId",            4,                        "0x%x",   NULL },
+  { "ImsicBaseAddress",     8,                        "0x%llx", NULL },
+  { "ImsicSize",            4,                        "0x%llx", NULL },
+  { "ProximityDomain",      4,                        "0x%llx", NULL },
+  { "ClockDomain",          4,                        "0x%llx", NULL },
+  { "AffinityFlags",        4,                        "0x%llx", NULL },
+  { "CmoToken",             sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "IsaStringToken",       sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "MmuToken",             sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "CpcToken",             sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "ProximityDomainToken", sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+  { "ClockDomainToken",     sizeof (CM_OBJECT_TOKEN), "0x%p",   NULL },
+};
+
+/** A parser for ERiscVObjImsicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmRiscVImsicInfoParser[] = {
+  { "Version",         1, "0x%x", NULL },
+  { "Flags",           4, "0x%x", NULL },
+  { "NumSmodeIds",     2, "0x%x", NULL },
+  { "NumGmodeIds",     2, "0x%x", NULL },
+  { "GuestIndexBits",  1, "0x%x", NULL },
+  { "HartIndexBits",   1, "0x%x", NULL },
+  { "GroupIndexBits",  1, "0x%x", NULL },
+  { "GroupIndexShift", 1, "0x%x", NULL },
+};
+
+/** A parser for PLIC_APLIC_COMMON_INFO.
+*/
+STATIC CONST CM_OBJ_PARSER  CmPlicAplicCommonInfoParser[] = {
+  { "Version",    1, "0x%x",  NULL       },
+  { "Id",         1, "0x%x",  NULL       },
+  { "NumIrqs",    2, "0x%x",  NULL       },
+  { "Flags",      4, "0x%x",  NULL       },
+  { "HardwareId", 8, NULL,    PrintChars },
+  { "Address",    8, "0x%lx", NULL       },
+  { "Size",       4, "0x%x",  NULL       },
+  { "GsiBase",    4, "0x%x",  NULL       },
+};
+
+/** A parser for ERiscVObjAplicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmRiscVAplicInfoParser[] = {
+  { "Aplic",   sizeof (PLIC_APLIC_COMMON_INFO),
+    NULL, NULL, CmPlicAplicCommonInfoParser,
+    ARRAY_SIZE (CmPlicAplicCommonInfoParser) },
+  { "NumIdcs", 2,                              "0x%x",NULL },
+};
+
+/** A parser for ERiscVObjPlicInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmRiscVPlicInfoParser[] = {
+  { "Plic",        sizeof (PLIC_APLIC_COMMON_INFO),
+    NULL, NULL, CmPlicAplicCommonInfoParser,
+    ARRAY_SIZE (CmPlicAplicCommonInfoParser) },
+  { "MaxPriority", 2,                              "0x%x",NULL },
+};
+
+/** A parser for ERiscVObjIsaStringInfo
+*/
+STATIC CONST CM_OBJ_PARSER  CmRiscVIsaStringInfoParser[] = {
+  { "Token",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL        },
+  { "ISA Length", 2,                        "0x%x", NULL        },
+  { "Isa String", MAX_ISA_STRING_LENGTH,    NULL,   PrintString },
+};
+
+/** A parser for ERiscVObjCmoInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmRiscVCmoInfoParser[] = {
+  { "Token",           sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "CBOM Block Size", 1,                        "0x%x", NULL },
+  { "CBOP Block Size", 1,                        "0x%x", NULL },
+  { "CBOZ Block Size", 1,                        "0x%x", NULL },
+};
+
+/** A parser for ERiscVObjMmuInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmRiscVMmuInfoParser[] = {
+  { "Token",    sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "MMU Type", 1,                        "0x%x", NULL },
+};
+
+/** A parser for ERiscVObjTimerInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmRiscVTimerInfoParser[] = {
+  { "Flags",                4, "0x%x",  NULL },
+  { "Timer Base Frequency", 8, "0x%lx", NULL },
 };
 
 /** A Parser for EArchCommonObjTpm2DeviceInfo.
@@ -1202,6 +1298,21 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjMax)
 };
 
+/** A parser for RISC-V namespace objects.
+*/
+STATIC CONST CM_OBJ_PARSER_ARRAY  RiscVNamespaceObjectParser[] = {
+  CM_PARSER_ADD_OBJECT_RESERVED (ERiscVObjReserved),
+  CM_PARSER_ADD_OBJECT (ERiscVObjRintcInfo,         CmRiscVRintcInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjImsicInfo,         CmRiscVImsicInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjAplicInfo,         CmRiscVAplicInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjPlicInfo,          CmRiscVPlicInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjIsaStringInfo,     CmRiscVIsaStringInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjCmoInfo,           CmRiscVCmoInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjMmuInfo,           CmRiscVMmuInfoParser),
+  CM_PARSER_ADD_OBJECT (ERiscVObjTimerInfo,         CmRiscVTimerInfoParser),
+  CM_PARSER_ADD_OBJECT_RESERVED (ERiscVObjMax)
+};
+
 /** A parser for EStdObjCfgMgrInfo.
 */
 STATIC CONST CM_OBJ_PARSER  StdObjCfgMgrInfoParser[] = {
@@ -1500,6 +1611,21 @@ ParseCmObjDesc (
       }
 
       ParserArray = &ArmNamespaceObjectParser[ObjId];
+      break;
+
+    case EObjNameSpaceRiscV:
+      if (ObjId >= ERiscVObjMax) {
+        ASSERT (0);
+        return;
+      }
+
+      if (ObjId >= ARRAY_SIZE (RiscVNamespaceObjectParser)) {
+        DEBUG ((DEBUG_ERROR, "ObjId 0x%x is missing from the RiscVNamespaceObjectParser array\n", ObjId));
+        ASSERT (0);
+        return;
+      }
+
+      ParserArray = &RiscVNamespaceObjectParser[ObjId];
       break;
 
     case EObjNameSpaceArchCommon:
