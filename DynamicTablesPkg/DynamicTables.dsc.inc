@@ -30,11 +30,31 @@
   #
   DynamicTablesPkg/Drivers/DynamicTableManagerDxe/DynamicTableManagerDxe.inf
 
+  #
+  # Generators
+  #
+  DynamicTablesPkg/Library/Acpi/AcpiFadtLib/AcpiFadtLib.inf
+  DynamicTablesPkg/Library/Acpi/AcpiHpetLib/AcpiHpetLib.inf
+  DynamicTablesPkg/Library/Acpi/AcpiWsmtLib/AcpiWsmtLib.inf
+  DynamicTablesPkg/Library/Acpi/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
+
 [Components.IA32, Components.X64]
+  #
+  # Generators
+  #
+  DynamicTablesPkg/Library/Acpi/X64/AcpiMadtLibX64/AcpiMadtLibX64.inf
+
   #
   # Dynamic Table Factory Dxe
   #
-  DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf
+  DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf {
+    <LibraryClasses>
+      NULL|DynamicTablesPkg/Library/Acpi/AcpiFadtLib/AcpiFadtLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/AcpiHpetLib/AcpiHpetLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/AcpiWsmtLib/AcpiWsmtLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiMadtLibX64/AcpiMadtLibX64.inf
+  }
 
 [Components.ARM, Components.AARCH64]
   #

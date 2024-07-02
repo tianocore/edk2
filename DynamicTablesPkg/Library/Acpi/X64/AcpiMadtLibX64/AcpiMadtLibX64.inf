@@ -1,0 +1,27 @@
+## @file
+#  MADT Acpi table generator
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION     = 1.27
+  BASE_NAME       = AcpiMadtLibX64
+  FILE_GUID       = BF8A63EC-21B9-4531-9866-F3F1593282EC
+  VERSION_STRING  = 1.0
+  MODULE_TYPE     = DXE_DRIVER
+  LIBRARY_CLASS   = NULL|DXE_DRIVER
+  CONSTRUCTOR     = AcpiMadtLibX64Constructor
+  DESTRUCTOR      = AcpiMadtLibX64Destructor
+
+[Sources]
+  MadtGenerator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+
