@@ -1,12 +1,12 @@
 /** @file
 Implementation of SMM CPU Services Protocol.
 
-Copyright (c) 2011 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 //
 // SMM CPU Service Protocol instance
@@ -98,7 +98,7 @@ SmmSwitchBsp (
   }
 
   if ((gSmmCpuPrivate->Operation[ProcessorNumber] != SmmCpuNone) ||
-      (gSmst->CurrentlyExecutingCpu == ProcessorNumber))
+      (gMmst->CurrentlyExecutingCpu == ProcessorNumber))
   {
     return EFI_UNSUPPORTED;
   }
@@ -376,7 +376,7 @@ InitializeSmmCpuServices (
 {
   EFI_STATUS  Status;
 
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &Handle,
                     &gEfiSmmCpuServiceProtocolGuid,
                     EFI_NATIVE_INTERFACE,
@@ -387,7 +387,7 @@ InitializeSmmCpuServices (
     return Status;
   }
 
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &Handle,
                     &gEdkiiSmmCpuRendezvousProtocolGuid,
                     EFI_NATIVE_INTERFACE,
