@@ -113,8 +113,8 @@ typedef struct {
 typedef struct {
   UINT64    Gpaw;
   UINT64    Attributes;
-  UINT32    MaxVcpus;
   UINT32    NumVcpus;
+  UINT32    MaxVcpus;
   UINT64    Resv[3];
 } TDCALL_INFO_RETURN_DATA;
 
