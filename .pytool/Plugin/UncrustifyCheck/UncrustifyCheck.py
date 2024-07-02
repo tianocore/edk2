@@ -563,26 +563,26 @@ class UncrustifyCheck(ICiBuildPlugin):
         self._formatted_file_error_count = len(formatted_files)
 
         if self._formatted_file_error_count > 0:
-            logging.error(
+            logging.warning(f'Uncrustify found {self._formatted_file_error_count} files with formatting errors')
+            self._tc.LogStdError(f"Uncrustify found {self._formatted_file_error_count} files with formatting errors:\n")
+            logging.critical(
                 "Visit the following instructions to learn "
                 "how to find the detailed formatting errors in Azure "
                 "DevOps CI: "
                 "https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-Formatting#how-to-find-uncrustify-formatting-errors-in-continuous-integration-ci")
-            self._tc.LogStdError("Files with formatting errors:\n")
 
             if self._output_file_diffs:
                 logging.info("Calculating file diffs. This might take a while...")
 
         for formatted_file in formatted_files:
-            pre_formatted_file = formatted_file[:-
-                                                len(UncrustifyCheck.FORMATTED_FILE_EXTENSION)]
-            logging.error(pre_formatted_file)
+            pre_formatted_file = formatted_file[:-len(UncrustifyCheck.FORMATTED_FILE_EXTENSION)]
+
+            self._tc.LogStdError(f"Formatting errors in {os.path.relpath(pre_formatted_file, self._abs_package_path)}\n")
+            logging.info(f"Formatting errors in {os.path.relpath(pre_formatted_file, self._abs_package_path)}")
 
             if (self._output_file_diffs or
                     self._file_template_contents is not None or
                     self._func_template_contents is not None):
-                self._tc.LogStdError(
-                    f"Formatting errors in {os.path.relpath(pre_formatted_file, self._abs_package_path)}\n")
 
                 with open(formatted_file) as ff:
                     formatted_file_text = ff.read()
@@ -603,8 +603,6 @@ class UncrustifyCheck(ICiBuildPlugin):
                             self._tc.LogStdError(line)
 
                         self._tc.LogStdError('\n')
-            else:
-                self._tc.LogStdError(pre_formatted_file)
 
     def _remove_tree(self, dir_path: str, ignore_errors: bool = False) -> None:
         """
