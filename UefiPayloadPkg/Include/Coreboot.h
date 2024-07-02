@@ -59,7 +59,7 @@ struct cbmem_root {
   UINT32                num_entries;
   UINT32                locked;
   UINT32                size;
-  struct cbmem_entry    entries[0];
+  struct cbmem_entry    entries[];
 };
 
 struct imd_entry {
@@ -75,7 +75,7 @@ struct imd_root {
   UINT32              flags;
   UINT32              entry_align;
   UINT32              max_offset;
-  struct imd_entry    entries[0];
+  struct imd_entry    entries[];
 };
 
 struct cbuint64 {
@@ -119,7 +119,7 @@ struct cb_memory_range {
 struct cb_memory {
   UINT32                    tag;
   UINT32                    size;
-  struct cb_memory_range    map[0];
+  struct cb_memory_range    map[];
 };
 
 #define CB_TAG_MAINBOARD  0x0003
@@ -129,7 +129,7 @@ struct cb_mainboard {
   UINT32    size;
   UINT8     vendor_idx;
   UINT8     part_number_idx;
-  UINT8     strings[0];
+  UINT8     strings[];
 };
 
 #define CB_TAG_VERSION         0x0004
@@ -146,7 +146,7 @@ struct cb_mainboard {
 struct cb_string {
   UINT32    tag;
   UINT32    size;
-  UINT8     string[0];
+  UINT8     string[];
 };
 
 #define CB_TAG_SERIAL  0x000f
