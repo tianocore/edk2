@@ -105,28 +105,29 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 shell_env.set_shell_var(
                     'GTEST_OUTPUT', "xml:" + test + ".GTEST." + arch + ".result.xml")
 
-                # Run the test.
-                ret = RunCmd('"' + test + '"', "", workingdir=cp)
-                if ret != 0:
-                    logging.error("UnitTest Execution Error: " +
-                                  os.path.basename(test))
-                else:
-                    logging.info("UnitTest Completed: " +
-                                 os.path.basename(test))
-                    file_match_pattern = test + ".*." + arch + ".result.xml"
-                    xml_results_list = glob.glob(file_match_pattern)
-                    for xml_result_file in xml_results_list:
-                        root = xml.etree.ElementTree.parse(
-                            xml_result_file).getroot()
-                        for suite in root:
-                            for case in suite:
-                                for result in case:
-                                    if result.tag == 'failure':
-                                        logging.warning(
-                                            "%s Test Failed" % os.path.basename(test))
-                                        logging.warning(
-                                            "  %s - %s" % (case.attrib['name'], result.text))
-                                        failure_count += 1
+                if thebuilder.env.GetValue("CODE_COVERAGE") == "FALSE":
+                    # If "CODE_COVERAGE" equal "FALSE" then run unit test.
+                    ret = RunCmd('"' + test + '"', "", workingdir=cp)
+                    if ret != 0:
+                        logging.error("UnitTest Execution Error: " +
+                                      os.path.basename(test))
+                    else:
+                        logging.info("UnitTest Completed: " +
+                                     os.path.basename(test))
+                        file_match_pattern = test + ".*." + arch + ".result.xml"
+                        xml_results_list = glob.glob(file_match_pattern)
+                        for xml_result_file in xml_results_list:
+                            root = xml.etree.ElementTree.parse(
+                                xml_result_file).getroot()
+                            for suite in root:
+                                for case in suite:
+                                    for result in case:
+                                        if result.tag == 'failure':
+                                            logging.warning(
+                                                "%s Test Failed" % os.path.basename(test))
+                                            logging.warning(
+                                                "  %s - %s" % (case.attrib['name'], result.text))
+                                            failure_count += 1
 
             if thebuilder.env.GetValue("CODE_COVERAGE") != "FALSE":
                 if thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
