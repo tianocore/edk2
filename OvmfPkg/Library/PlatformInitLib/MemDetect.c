@@ -917,7 +917,12 @@ PlatformSetupPagingLevel (
 
   Cr4.UintN = AsmReadCr4 ();
   if (!Cr4.Bits.LA57) {
-    DEBUG ((DEBUG_INFO, "%a: using 4-level paging (la57 not supported)\n", __func__));
+    if (!PcdGetBool (PcdUse5LevelPageTable)) {
+      DEBUG ((DEBUG_INFO, "%a: using 4-level paging (PcdUse5LevelPageTable disabled)\n", __func__));
+    } else {
+      DEBUG ((DEBUG_INFO, "%a: using 4-level paging (la57 not supported by cpu)\n", __func__));
+    }
+
     return;
   }
 
