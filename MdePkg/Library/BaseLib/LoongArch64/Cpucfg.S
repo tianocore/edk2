@@ -20,7 +20,7 @@ ASM_GLOBAL ASM_PFX(AsmCpucfg)
 
 ASM_PFX(AsmCpucfg):
   cpucfg  $t0, $a0
-  stptr.d $t0, $a1, 0
+  stptr.w $t0, $a1, 0
 
   jirl    $zero, $ra, 0
   .end

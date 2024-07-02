@@ -50,10 +50,6 @@
   #
   ArmHvcLib|Include/Library/ArmHvcLib.h
 
-  ##  @libraryclass  Provides an interface to Arm registers.
-  #
-  ArmLib|Include/Library/ArmLib.h
-
   ##  @libraryclass  Provides a Mmu interface.
   #
   ArmMmuLib|Include/Library/ArmMmuLib.h
@@ -318,11 +314,6 @@
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0xFFFF|UINT16|0x30000059
 
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
-  #
-  # ARM Architectural Timer
-  #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
-
   # ARM Architectural Timer Interrupt(GIC PPI) numbers
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036

@@ -22,7 +22,7 @@
 #  This driver will have external input - variable and ACPINvs data in SMM mode.
 #  This external input must be validated carefully to avoid security issue.
 #
-# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -57,12 +57,13 @@
   Tpm2CommandLib
   Tcg2PhysicalPresenceLib
   PcdLib
-  MmUnblockMemoryLib
+  HobLib
 
 [Guids]
   gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES           ## GUID       # TPM device identifier
   gTpmNvsMmGuid                                                 ## CONSUMES
   gEdkiiPiSmmCommunicationRegionTableGuid                       ## CONSUMES
+  gEdkiiTcg2AcpiCommunicateBufferHobGuid
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                                     ## CONSUMES

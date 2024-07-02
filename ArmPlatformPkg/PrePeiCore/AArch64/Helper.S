@@ -6,7 +6,7 @@
 #=======================================================================================
 
 #include <AsmMacroIoLibV8.h>
-#include <Chipset/AArch64.h>
+#include <AArch64/AArch64.h>
 
 // Setup EL1 while in EL1
 ASM_FUNC(SetupExceptionLevel1)

@@ -372,7 +372,7 @@ FixupCmn600Info (
   }
 
   // Update the CMN600 Device's name.
-  Status = AmlDeviceOpUpdateName (DeviceNode, (CHAR8 *)Name);
+  Status = AmlDeviceOpUpdateName (DeviceNode, Name);
   if (EFI_ERROR (Status)) {
     goto error_handler;
   }
