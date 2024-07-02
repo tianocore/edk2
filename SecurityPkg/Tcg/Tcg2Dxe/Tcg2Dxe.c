@@ -3,6 +3,7 @@
 
 Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -45,7 +46,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PerformanceLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
-
+#include <Library/PlatformTcgEventLogLib.h>
 #define PERF_ID_TCG2_DXE  0x3120
 
 typedef struct {
@@ -1641,136 +1642,144 @@ SetupEventLog (
       //
       // Create first entry for Log Header Entry Data
       //
-      if (mTcg2EventInfo[Index].LogFormat != EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2) {
-        //
-        // TcgEfiSpecIdEventStruct
-        //
-        TcgEfiSpecIdEventStruct = (TCG_EfiSpecIDEventStruct *)TempBuf;
-        CopyMem (TcgEfiSpecIdEventStruct->signature, TCG_EfiSpecIDEventStruct_SIGNATURE_03, sizeof (TcgEfiSpecIdEventStruct->signature));
-        TcgEfiSpecIdEventStruct->platformClass    = PcdGet8 (PcdTpmPlatformClass);
-        TcgEfiSpecIdEventStruct->specVersionMajor = TCG_EfiSpecIDEventStruct_SPEC_VERSION_MAJOR_TPM2;
-        TcgEfiSpecIdEventStruct->specVersionMinor = TCG_EfiSpecIDEventStruct_SPEC_VERSION_MINOR_TPM2;
-        TcgEfiSpecIdEventStruct->specErrata       = (UINT8)PcdGet32 (PcdTcgPfpMeasurementRevision);
-        TcgEfiSpecIdEventStruct->uintnSize        = sizeof (UINTN)/sizeof (UINT32);
-        NumberOfAlgorithms                        = 0;
-        DigestSize                                = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof (*TcgEfiSpecIdEventStruct) + sizeof (NumberOfAlgorithms));
-        if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA1) != 0) {
-          TempDigestSize              = DigestSize;
-          TempDigestSize             += NumberOfAlgorithms;
-          TempDigestSize->algorithmId = TPM_ALG_SHA1;
-          TempDigestSize->digestSize  = SHA1_DIGEST_SIZE;
-          NumberOfAlgorithms++;
+      if (PlatformTcgEventLogProvided ()) {
+        Status = PlatformTcgSetupEventLog ();
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "ERROR: Fails to setup the platform TCG event log\n"));
+          return Status;
         }
-
-        if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA256) != 0) {
-          TempDigestSize              = DigestSize;
-          TempDigestSize             += NumberOfAlgorithms;
-          TempDigestSize->algorithmId = TPM_ALG_SHA256;
-          TempDigestSize->digestSize  = SHA256_DIGEST_SIZE;
-          NumberOfAlgorithms++;
-        }
-
-        if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA384) != 0) {
-          TempDigestSize              = DigestSize;
-          TempDigestSize             += NumberOfAlgorithms;
-          TempDigestSize->algorithmId = TPM_ALG_SHA384;
-          TempDigestSize->digestSize  = SHA384_DIGEST_SIZE;
-          NumberOfAlgorithms++;
-        }
-
-        if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA512) != 0) {
-          TempDigestSize              = DigestSize;
-          TempDigestSize             += NumberOfAlgorithms;
-          TempDigestSize->algorithmId = TPM_ALG_SHA512;
-          TempDigestSize->digestSize  = SHA512_DIGEST_SIZE;
-          NumberOfAlgorithms++;
-        }
-
-        if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SM3_256) != 0) {
-          TempDigestSize              = DigestSize;
-          TempDigestSize             += NumberOfAlgorithms;
-          TempDigestSize->algorithmId = TPM_ALG_SM3_256;
-          TempDigestSize->digestSize  = SM3_256_DIGEST_SIZE;
-          NumberOfAlgorithms++;
-        }
-
-        CopyMem (TcgEfiSpecIdEventStruct + 1, &NumberOfAlgorithms, sizeof (NumberOfAlgorithms));
-        TempDigestSize  = DigestSize;
-        TempDigestSize += NumberOfAlgorithms;
-        VendorInfoSize  = (UINT8 *)TempDigestSize;
-        *VendorInfoSize = 0;
-
-        SpecIdEvent.PCRIndex  = 0;
-        SpecIdEvent.EventType = EV_NO_ACTION;
-        ZeroMem (&SpecIdEvent.Digest, sizeof (SpecIdEvent.Digest));
-        SpecIdEvent.EventSize = (UINT32)GetTcgEfiSpecIdEventStructSize (TcgEfiSpecIdEventStruct);
-
-        //
-        // Log TcgEfiSpecIdEventStruct as the first Event. Event format is TCG_PCR_EVENT.
-        //   TCG EFI Protocol Spec. Section 5.3 Event Log Header
-        //   TCG PC Client PFP spec. Section 9.2 Measurement Event Entries and Log
-        //
-        Status = TcgDxeLogEvent (
-                   mTcg2EventInfo[Index].LogFormat,
-                   &SpecIdEvent,
-                   sizeof (SpecIdEvent),
-                   (UINT8 *)TcgEfiSpecIdEventStruct,
-                   SpecIdEvent.EventSize
-                   );
-        //
-        // record the offset at the end of 800-155 event.
-        // the future 800-155 event can be inserted here.
-        //
-        mTcgDxeData.EventLogAreaStruct[Index].Next800155EventOffset = \
-          mTcgDxeData.EventLogAreaStruct[Index].EventLogSize;
-
-        //
-        // Tcg800155PlatformIdEvent. Event format is TCG_PCR_EVENT2
-        //
-        GuidHob.Guid = GetFirstGuidHob (&gTcg800155PlatformIdEventHobGuid);
-        while (GuidHob.Guid != NULL) {
-          InitNoActionEvent (&NoActionEvent, GET_GUID_HOB_DATA_SIZE (GuidHob.Guid));
-
-          Status = TcgDxeLogEvent (
-                     mTcg2EventInfo[Index].LogFormat,
-                     &NoActionEvent,
-                     sizeof (NoActionEvent.PCRIndex) + sizeof (NoActionEvent.EventType) + GetDigestListBinSize (&NoActionEvent.Digests) + sizeof (NoActionEvent.EventSize),
-                     GET_GUID_HOB_DATA (GuidHob.Guid),
-                     GET_GUID_HOB_DATA_SIZE (GuidHob.Guid)
-                     );
-
-          GuidHob.Guid = GET_NEXT_HOB (GuidHob);
-          GuidHob.Guid = GetNextGuidHob (&gTcg800155PlatformIdEventHobGuid, GuidHob.Guid);
-        }
-
-        //
-        // EfiStartupLocalityEvent. Event format is TCG_PCR_EVENT2
-        //
-        GuidHob.Guid = GetFirstGuidHob (&gTpm2StartupLocalityHobGuid);
-        if (GuidHob.Guid != NULL) {
+      } else {
+        if ((mTcg2EventInfo[Index].LogFormat != EFI_TCG2_EVENT_LOG_FORMAT_TCG_1_2)) {
           //
-          // Get Locality Indicator from StartupLocality HOB
+          // TcgEfiSpecIdEventStruct
           //
-          StartupLocalityEvent.StartupLocality = *(UINT8 *)(GET_GUID_HOB_DATA (GuidHob.Guid));
-          CopyMem (StartupLocalityEvent.Signature, TCG_EfiStartupLocalityEvent_SIGNATURE, sizeof (StartupLocalityEvent.Signature));
-          DEBUG ((DEBUG_INFO, "SetupEventLog: Set Locality from HOB into StartupLocalityEvent 0x%02x\n", StartupLocalityEvent.StartupLocality));
+          TcgEfiSpecIdEventStruct = (TCG_EfiSpecIDEventStruct *)TempBuf;
+          CopyMem (TcgEfiSpecIdEventStruct->signature, TCG_EfiSpecIDEventStruct_SIGNATURE_03, sizeof (TcgEfiSpecIdEventStruct->signature));
+          TcgEfiSpecIdEventStruct->platformClass    = PcdGet8 (PcdTpmPlatformClass);
+          TcgEfiSpecIdEventStruct->specVersionMajor = TCG_EfiSpecIDEventStruct_SPEC_VERSION_MAJOR_TPM2;
+          TcgEfiSpecIdEventStruct->specVersionMinor = TCG_EfiSpecIDEventStruct_SPEC_VERSION_MINOR_TPM2;
+          TcgEfiSpecIdEventStruct->specErrata       = (UINT8)PcdGet32 (PcdTcgPfpMeasurementRevision);
+          TcgEfiSpecIdEventStruct->uintnSize        = sizeof (UINTN)/sizeof (UINT32);
+          NumberOfAlgorithms                        = 0;
+          DigestSize                                = (TCG_EfiSpecIdEventAlgorithmSize *)((UINT8 *)TcgEfiSpecIdEventStruct + sizeof (*TcgEfiSpecIdEventStruct) + sizeof (NumberOfAlgorithms));
+          if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA1) != 0) {
+            TempDigestSize              = DigestSize;
+            TempDigestSize             += NumberOfAlgorithms;
+            TempDigestSize->algorithmId = TPM_ALG_SHA1;
+            TempDigestSize->digestSize  = SHA1_DIGEST_SIZE;
+            NumberOfAlgorithms++;
+          }
+
+          if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA256) != 0) {
+            TempDigestSize              = DigestSize;
+            TempDigestSize             += NumberOfAlgorithms;
+            TempDigestSize->algorithmId = TPM_ALG_SHA256;
+            TempDigestSize->digestSize  = SHA256_DIGEST_SIZE;
+            NumberOfAlgorithms++;
+          }
+
+          if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA384) != 0) {
+            TempDigestSize              = DigestSize;
+            TempDigestSize             += NumberOfAlgorithms;
+            TempDigestSize->algorithmId = TPM_ALG_SHA384;
+            TempDigestSize->digestSize  = SHA384_DIGEST_SIZE;
+            NumberOfAlgorithms++;
+          }
+
+          if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SHA512) != 0) {
+            TempDigestSize              = DigestSize;
+            TempDigestSize             += NumberOfAlgorithms;
+            TempDigestSize->algorithmId = TPM_ALG_SHA512;
+            TempDigestSize->digestSize  = SHA512_DIGEST_SIZE;
+            NumberOfAlgorithms++;
+          }
+
+          if ((mTcgDxeData.BsCap.ActivePcrBanks & EFI_TCG2_BOOT_HASH_ALG_SM3_256) != 0) {
+            TempDigestSize              = DigestSize;
+            TempDigestSize             += NumberOfAlgorithms;
+            TempDigestSize->algorithmId = TPM_ALG_SM3_256;
+            TempDigestSize->digestSize  = SM3_256_DIGEST_SIZE;
+            NumberOfAlgorithms++;
+          }
+
+          CopyMem (TcgEfiSpecIdEventStruct + 1, &NumberOfAlgorithms, sizeof (NumberOfAlgorithms));
+          TempDigestSize  = DigestSize;
+          TempDigestSize += NumberOfAlgorithms;
+          VendorInfoSize  = (UINT8 *)TempDigestSize;
+          *VendorInfoSize = 0;
+
+          SpecIdEvent.PCRIndex  = 0;
+          SpecIdEvent.EventType = EV_NO_ACTION;
+          ZeroMem (&SpecIdEvent.Digest, sizeof (SpecIdEvent.Digest));
+          SpecIdEvent.EventSize = (UINT32)GetTcgEfiSpecIdEventStructSize (TcgEfiSpecIdEventStruct);
 
           //
-          // Initialize StartupLocalityEvent
-          //
-          InitNoActionEvent (&NoActionEvent, sizeof (StartupLocalityEvent));
-
-          //
-          // Log EfiStartupLocalityEvent as the second Event
-          //   TCG PC Client PFP spec. Section 9.3.4.3 Startup Locality Event
+          // Log TcgEfiSpecIdEventStruct as the first Event. Event format is TCG_PCR_EVENT.
+          //   TCG EFI Protocol Spec. Section 5.3 Event Log Header
+          //   TCG PC Client PFP spec. Section 9.2 Measurement Event Entries and Log
           //
           Status = TcgDxeLogEvent (
                      mTcg2EventInfo[Index].LogFormat,
-                     &NoActionEvent,
-                     sizeof (NoActionEvent.PCRIndex) + sizeof (NoActionEvent.EventType) + GetDigestListBinSize (&NoActionEvent.Digests) + sizeof (NoActionEvent.EventSize),
-                     (UINT8 *)&StartupLocalityEvent,
-                     sizeof (StartupLocalityEvent)
+                     &SpecIdEvent,
+                     sizeof (SpecIdEvent),
+                     (UINT8 *)TcgEfiSpecIdEventStruct,
+                     SpecIdEvent.EventSize
                      );
+          //
+          // record the offset at the end of 800-155 event.
+          // the future 800-155 event can be inserted here.
+          //
+          mTcgDxeData.EventLogAreaStruct[Index].Next800155EventOffset = \
+            mTcgDxeData.EventLogAreaStruct[Index].EventLogSize;
+
+          //
+          // Tcg800155PlatformIdEvent. Event format is TCG_PCR_EVENT2
+          //
+          GuidHob.Guid = GetFirstGuidHob (&gTcg800155PlatformIdEventHobGuid);
+          while (GuidHob.Guid != NULL) {
+            InitNoActionEvent (&NoActionEvent, GET_GUID_HOB_DATA_SIZE (GuidHob.Guid));
+
+            Status = TcgDxeLogEvent (
+                       mTcg2EventInfo[Index].LogFormat,
+                       &NoActionEvent,
+                       sizeof (NoActionEvent.PCRIndex) + sizeof (NoActionEvent.EventType) + GetDigestListBinSize (&NoActionEvent.Digests) + sizeof (NoActionEvent.EventSize),
+                       GET_GUID_HOB_DATA (GuidHob.Guid),
+                       GET_GUID_HOB_DATA_SIZE (GuidHob.Guid)
+                       );
+
+            GuidHob.Guid = GET_NEXT_HOB (GuidHob);
+            GuidHob.Guid = GetNextGuidHob (&gTcg800155PlatformIdEventHobGuid, GuidHob.Guid);
+          }
+
+          //
+          // EfiStartupLocalityEvent. Event format is TCG_PCR_EVENT2
+          //
+          GuidHob.Guid = GetFirstGuidHob (&gTpm2StartupLocalityHobGuid);
+          if (GuidHob.Guid != NULL) {
+            //
+            // Get Locality Indicator from StartupLocality HOB
+            //
+            StartupLocalityEvent.StartupLocality = *(UINT8 *)(GET_GUID_HOB_DATA (GuidHob.Guid));
+            CopyMem (StartupLocalityEvent.Signature, TCG_EfiStartupLocalityEvent_SIGNATURE, sizeof (StartupLocalityEvent.Signature));
+            DEBUG ((DEBUG_INFO, "SetupEventLog: Set Locality from HOB into StartupLocalityEvent 0x%02x\n", StartupLocalityEvent.StartupLocality));
+
+            //
+            // Initialize StartupLocalityEvent
+            //
+            InitNoActionEvent (&NoActionEvent, sizeof (StartupLocalityEvent));
+
+            //
+            // Log EfiStartupLocalityEvent as the second Event
+            //   TCG PC Client PFP spec. Section 9.3.4.3 Startup Locality Event
+            //
+            Status = TcgDxeLogEvent (
+                       mTcg2EventInfo[Index].LogFormat,
+                       &NoActionEvent,
+                       sizeof (NoActionEvent.PCRIndex) + sizeof (NoActionEvent.EventType) + GetDigestListBinSize (&NoActionEvent.Digests) + sizeof (NoActionEvent.EventSize),
+                       (UINT8 *)&StartupLocalityEvent,
+                       sizeof (StartupLocalityEvent)
+                       );
+          }
         }
       }
     }
