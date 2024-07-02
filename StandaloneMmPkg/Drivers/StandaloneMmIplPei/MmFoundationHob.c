@@ -7,6 +7,10 @@
 **/
 
 #include <StandaloneMmIplPei.h>
+#include <Guid/MpInformation2.h>
+#include <Guid/AcpiS3Context.h>
+#include <Guid/MmAcpiS3Enable.h>
+#include <Guid/MmCpuSyncConfig.h>
 
 /**
   Add a new HOB to the HOB List.
@@ -74,6 +78,85 @@ MmIplBuildFvHob (
     FvHob              = (EFI_HOB_FIRMWARE_VOLUME *)Hob;
     FvHob->BaseAddress = BaseAddress;
     FvHob->Length      = Length;
+  }
+
+  *HobBufferSize = HobLength;
+}
+
+/**
+  Builds MM ACPI S3 Enable HOB.
+
+  This function builds MM ACPI S3 Enable HOB.
+  It can only be invoked during PEI phase;
+  If new HOB buffer is NULL, then ASSERT().
+
+  @param[in]       Hob            The pointer of new HOB buffer.
+  @param[in, out]  HobBufferSize  The available size of the HOB buffer when as input.
+                                  The used size of when as output.
+
+**/
+VOID
+MmIplBuildMmAcpiS3EnableHob (
+  IN UINT8      *Hob,
+  IN OUT UINTN  *HobBufferSize
+  )
+{
+  EFI_HOB_GUID_TYPE  *GuidHob;
+  MM_ACPI_S3_ENABLE  *MmAcpiS3Enable;
+  UINT16             HobLength;
+
+  ASSERT (Hob != NULL);
+
+  HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_ACPI_S3_ENABLE), 8);
+  if (*HobBufferSize >= HobLength) {
+    MmIplCreateHob (Hob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
+
+    GuidHob = (EFI_HOB_GUID_TYPE *)Hob;
+    CopyGuid (&GuidHob->Name, &gMmAcpiS3EnableHobGuid);
+
+    MmAcpiS3Enable               = (MM_ACPI_S3_ENABLE *)(GuidHob + 1);
+    MmAcpiS3Enable->AcpiS3Enable = PcdGetBool (PcdAcpiS3Enable);
+  }
+
+  *HobBufferSize = HobLength;
+}
+
+/**
+  Builds MM cpu sync configuration HOB.
+
+  This function builds smm cpu sync configuration HOB.
+  It can only be invoked during PEI phase;
+  If new HOB buffer is NULL, then ASSERT().
+
+  @param[in]       Hob            The pointer of new HOB buffer.
+  @param[in, out]  HobBufferSize  The available size of the HOB buffer when as input.
+                                  The used size of when as output.
+
+**/
+VOID
+MmIplBuildMmCpuSyncConfigHob (
+  IN UINT8      *Hob,
+  IN OUT UINTN  *HobBufferSize
+  )
+{
+  EFI_HOB_GUID_TYPE   *GuidHob;
+  MM_CPU_SYNC_CONFIG  *MmSyncModeInfoHob;
+  UINT16              HobLength;
+
+  ASSERT (Hob != NULL);
+
+  GuidHob = (EFI_HOB_GUID_TYPE *)(UINTN)Hob;
+
+  HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_CPU_SYNC_CONFIG), 8);
+  if (*HobBufferSize >= HobLength) {
+    MmIplCreateHob (GuidHob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
+
+    CopyGuid (&GuidHob->Name, &gMmCpuSyncConfigHobGuid);
+
+    MmSyncModeInfoHob                = (MM_CPU_SYNC_CONFIG *)(UINTN)(GuidHob + 1);
+    MmSyncModeInfoHob->RelaxedApMode = (BOOLEAN)(PcdGet8 (PcdCpuSmmSyncMode) == MmCpuSyncModeRelaxedAp);
+    MmSyncModeInfoHob->Timeout       = PcdGet64 (PcdCpuSmmApSyncTimeout);
+    MmSyncModeInfoHob->Timeout2      = PcdGet64 (PcdCpuSmmApSyncTimeout2);
   }
 
   *HobBufferSize = HobLength;
@@ -279,6 +362,48 @@ CreateMmFoundationHobList (
   //
   HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
   MmIplBuildFvHob (FoundationHobList + UsedSize, &HobLength, MmFvBase, MmFvSize);
+  UsedSize += HobLength;
+
+  //
+  // Build MM ACPI S3 Enable HOB
+  //
+  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplBuildMmAcpiS3EnableHob (FoundationHobList + UsedSize, &HobLength);
+  UsedSize += HobLength;
+
+  //
+  // Build MM CPU sync configuration HOB
+  //
+  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplBuildMmCpuSyncConfigHob (FoundationHobList + UsedSize, &HobLength);
+  UsedSize += HobLength;
+
+  //
+  // Build CPU SMM base HOB in MM HOB list
+  //
+  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gSmmBaseHobGuid, TRUE);
+  UsedSize += HobLength;
+
+  //
+  // Build SMRAM memory Hob in MM HOB list
+  //
+  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gEfiSmmSmramMemoryGuid, FALSE);
+  UsedSize += HobLength;
+
+  //
+  // Build Mp Information2 Hob in MM HOB list
+  //
+  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gMpInformation2HobGuid, TRUE);
+  UsedSize += HobLength;
+
+  //
+  // Build ACPI variable HOB
+  //
+  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gEfiAcpiVariableGuid, FALSE);
   UsedSize += HobLength;
 
   if (*FoundationHobSize < UsedSize) {
