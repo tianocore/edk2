@@ -8,6 +8,7 @@
 **/
 
 #include <PiPei.h>
+#include <Library/PlatformInitLib.h>
 
 /**
   In Tdx guest, the system memory is passed in TdHob by host VMM. So
@@ -23,4 +24,36 @@ PlatformTdxPublishRamRegions (
   VOID
   )
 {
+}
+
+/**
+  Find in TdHob and store first address (above 4G) not used
+  in PlatformInfoHob->FirstNonAddress.
+
+  @retval EFI_SUCCESS    Successfully found in TdHob.
+  @retval EFI_NOT_FOUND  Not found in TdHob.
+  @retval Others         Other errors as indicated.
+**/
+EFI_STATUS
+PlatformTdxGetFirstNonAddressFromTdHob (
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+/**
+  Find in TdHob and store the low (below 4G) memory in
+  PlatformInfoHob->LowMemory.
+
+  @retval EFI_SUCCESS    Successfully found in TdHob.
+  @retval EFI_NOT_FOUND  Not found in TdHob.
+  @retval Others         Other errors as indicated.
+**/
+EFI_STATUS
+PlatformTdxGetLowMemFromTdHob (
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  return EFI_UNSUPPORTED;
 }

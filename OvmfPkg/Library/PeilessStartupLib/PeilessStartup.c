@@ -109,7 +109,6 @@ InitializePlatform (
   if (TdIsEnabled ()) {
     PlatformInfoHob->PcdConfidentialComputingGuestAttr = CCAttrIntelTdx;
     PlatformInfoHob->PcdTdxSharedBitMask               = TdSharedPageMask ();
-    PlatformInfoHob->PcdSetNxForStack                  = TRUE;
   }
 
   PlatformMiscInitialization (PlatformInfoHob);

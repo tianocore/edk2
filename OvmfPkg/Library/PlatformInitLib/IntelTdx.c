@@ -20,6 +20,7 @@
 #include <Pi/PiHob.h>
 #include <WorkArea.h>
 #include <ConfidentialComputingGuestAttr.h>
+#include <Library/PlatformInitLib.h>
 
 /**
  * Build ResourceDescriptorHob for the unaccepted memory region.
@@ -180,4 +181,101 @@ PlatformTdxPublishRamRegions (
       EfiBootServicesData
       );
   }
+}
+
+/**
+  Find in TdHob and store first address (above 4G) not used
+  in PlatformInfoHob->FirstNonAddress.
+
+  @retval EFI_SUCCESS    Successfully found in TdHob.
+  @retval EFI_NOT_FOUND  Not found in TdHob.
+  @retval Others         Other errors as indicated.
+**/
+EFI_STATUS
+PlatformTdxGetFirstNonAddressFromTdHob (
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  UINT64                Candidate;
+
+  Hob.Raw   = (UINT8 *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase);
+  Candidate = 0;
+
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      Candidate = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+      if ((Candidate > BASE_4GB) && (Candidate > PlatformInfoHob->FirstNonAddress)) {
+        PlatformInfoHob->FirstNonAddress = Candidate;
+      }
+    }
+
+    Hob.Raw = (UINT8 *)(Hob.Raw + Hob.Header->HobLength);
+  }
+
+  if (Candidate == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: Not found memory resource descriptor in TdHob\n", __func__));
+    return EFI_NOT_FOUND;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: FirstNonAddress=0x%Lx (%Ld GB)\n",
+    __func__,
+    PlatformInfoHob->FirstNonAddress,
+    RShiftU64 (PlatformInfoHob->FirstNonAddress, 30)
+    ));
+  return EFI_SUCCESS;
+}
+
+/**
+  Find in TdHob and store the low (below 4G) memory in
+  PlatformInfoHob->LowMemory.
+
+  @retval EFI_SUCCESS    Successfully found in TdHob.
+  @retval EFI_NOT_FOUND  Not found in TdHob.
+  @retval Others         Other errors as indicated.
+**/
+EFI_STATUS
+PlatformTdxGetLowMemFromTdHob (
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  UINT64                Candidate;
+
+  Hob.Raw   = (UINT8 *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase);
+  Candidate = 0;
+
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_MAPPED_IO) {
+        if (Hob.ResourceDescriptor->PhysicalStart < BASE_4GB) {
+          PlatformInfoHob->LowMemory = (UINT32)Candidate;
+          break;
+        }
+      } else {
+        Candidate = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+        if ((Candidate < BASE_4GB) && (Candidate > PlatformInfoHob->LowMemory)) {
+          PlatformInfoHob->LowMemory = (UINT32)Candidate;
+        }
+      }
+    }
+
+    Hob.Raw = (UINT8 *)(Hob.Raw + Hob.Header->HobLength);
+  }
+
+  if (Candidate == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: Not found memory resource descriptor in TdHob\n", __func__));
+    return EFI_NOT_FOUND;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: LowMemory=0x%Lx (%Ld GB)\n",
+    __func__,
+    PlatformInfoHob->LowMemory,
+    RShiftU64 (PlatformInfoHob->LowMemory, 30)
+    ));
+  return EFI_SUCCESS;
 }
