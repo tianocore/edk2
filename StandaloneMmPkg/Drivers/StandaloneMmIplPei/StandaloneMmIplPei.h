@@ -102,6 +102,7 @@ MmIplCreateHob (
   @param[in]      MmCoreImageAddress  Image address of MM core dirver.
   @param[in]      MmCoreImageSize     Image size of MM core dirver.
   @param[in]      MmCoreEntryPoint    Entry pinter of MM core dirver.
+  @param[in]      MmProfileDataHob    Pointer to MM profile data HOB.
   @param[in]      Block               Pointer of MMRAM descriptor block.
 
   @retval RETURN_BUFFER_TOO_SMALL     The buffer is too small for HOB creation.
@@ -123,6 +124,7 @@ CreateMmFoundationHobList (
   IN EFI_PHYSICAL_ADDRESS            MmCoreImageAddress,
   IN UINT64                          MmCoreImageSize,
   IN EFI_PHYSICAL_ADDRESS            MmCoreEntryPoint,
+  IN EFI_HOB_MEMORY_ALLOCATION       *MmProfileDataHob,
   IN EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *Block
   );
 
