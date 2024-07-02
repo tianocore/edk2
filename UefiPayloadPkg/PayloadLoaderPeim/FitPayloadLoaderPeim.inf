@@ -35,7 +35,6 @@
 
 [LibraryClasses]
   PcdLib
-  MemoryAllocationLib
   BaseMemoryLib
   PeiServicesLib
   HobLib
@@ -46,14 +45,28 @@
 
 [Ppis]
   gEfiPeiLoadFilePpiGuid                 ## PRODUCES
+  gUplReadyToPayloadPpiGuid              ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid              ## CONSUMES
+  gEdkiiPeiPciDevicePpiGuid              ## CONSUMES
 
 [Pcd]
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister
+  gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiMdePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion
 
 [Guids]
-  gUniversalPayloadExtraDataGuid         ## PRODUCES
   gUniversalPayloadBaseGuid              ## PRODUCES
+  gUniversalPayloadDeviceTreeGuid        ## CONSUMES
+  gEfiGraphicsInfoHobGuid                ## CONSUMES
+  gUniversalPayloadPciRootBridgeInfoGuid ## CONSUMES
+  gUniversalPayloadAcpiTableGuid         ## CONSUMES
 
 [Depex]
   TRUE
