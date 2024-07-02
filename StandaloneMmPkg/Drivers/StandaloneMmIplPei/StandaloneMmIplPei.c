@@ -238,12 +238,13 @@ CreatMmHobList (
   IN  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *Block
   )
 {
-  EFI_STATUS  Status;
-  VOID        *HobList;
-  VOID        *PlatformHobList;
-  UINTN       PlatformHobSize;
-  UINTN       BufferSize;
-  UINTN       FoundationHobSize;
+  EFI_STATUS                 Status;
+  VOID                       *HobList;
+  VOID                       *PlatformHobList;
+  UINTN                      PlatformHobSize;
+  UINTN                      BufferSize;
+  UINTN                      FoundationHobSize;
+  EFI_HOB_MEMORY_ALLOCATION  *MmProfileDataHob;
 
   //
   // Get platform HOBs
@@ -269,6 +270,14 @@ CreatMmHobList (
   }
 
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Build memory allocation HOB in PEI HOB list for MM profile data.
+  //
+  MmProfileDataHob = NULL;
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    MmProfileDataHob = BuildMmProfileDataHobInPeiHobList ();
+  }
 
   //
   // Get size of foundation HOBs

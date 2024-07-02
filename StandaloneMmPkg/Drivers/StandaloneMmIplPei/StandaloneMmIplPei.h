@@ -126,4 +126,18 @@ CreateMmFoundationHobList (
   IN EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *Block
   );
 
+/**
+  Build memory allocation HOB in PEI HOB list for MM profile data.
+
+  This function is to allocate memory for MM profile data.
+
+  @return          NULL if MM profile data memory allocation HOB build fail.
+  @return          Pointer of MM profile data memory allocation HOB if build successfully.
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+BuildMmProfileDataHobInPeiHobList (
+  VOID
+  );
+
 #endif

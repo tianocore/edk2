@@ -11,6 +11,9 @@
 #include <Guid/AcpiS3Context.h>
 #include <Guid/MmAcpiS3Enable.h>
 #include <Guid/MmCpuSyncConfig.h>
+#include <Guid/MmProfileData.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/ArchitecturalMsr.h>
 
 /**
   Add a new HOB to the HOB List.
@@ -42,6 +45,45 @@ MmIplCreateHob (
   ((EFI_HOB_GENERIC_HEADER *)Hob)->Reserved  = 0;
 
   return Hob;
+}
+
+/**
+  Builds a HOB that describes a chunk of system memory.
+
+  This function builds a HOB that describes a chunk of system memory.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param[in]  Hob                 The pointer of new HOB buffer.
+  @param[in]  ResourceType        The type of resource described by this HOB.
+  @param[in]  ResourceAttribute   The resource attributes of the memory described by this HOB.
+  @param[in]  PhysicalStart       The 64 bit physical address of memory described by this HOB.
+  @param[in]  NumberOfBytes       The length of the memory described by this HOB in bytes.
+  @param[in]  Owner               The pointer of GUID.
+
+**/
+VOID
+MmIplBuildMemoryResourceHob (
+  IN EFI_HOB_RESOURCE_DESCRIPTOR  *Hob,
+  IN EFI_RESOURCE_TYPE            ResourceType,
+  IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute,
+  IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
+  IN UINT64                       NumberOfBytes,
+  IN EFI_GUID                     *Owner
+  )
+{
+  ASSERT (Hob != NULL);
+  MmIplCreateHob (Hob, EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
+
+  Hob->ResourceType      = EFI_RESOURCE_SYSTEM_MEMORY;
+  Hob->ResourceAttribute = ResourceAttribute;
+  Hob->PhysicalStart     = PhysicalStart;
+  Hob->ResourceLength    = NumberOfBytes;
+
+  if (Owner != NULL) {
+    CopyGuid (&Hob->Owner, Owner);
+  } else {
+    ZeroMem (&Hob->Owner, sizeof (EFI_GUID));
+  }
 }
 
 /**
@@ -261,6 +303,105 @@ MmIplBuildMmCoreModuleHob (
 }
 
 /**
+  Build memory allocation HOB in PEI HOB list for MM profile data.
+
+  This function is to allocate memory for MM profile data.
+
+  @return          NULL if MM profile data memory allocation HOB build fail.
+  @return          Pointer of MM profile data memory allocation HOB if build successfully.
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+BuildMmProfileDataHobInPeiHobList (
+  VOID
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 TotalSize;
+  VOID                  *Alloc;
+
+  TotalSize = PcdGet32 (PcdCpuSmmProfileSize);
+  Alloc     = AllocateReservedPages (EFI_SIZE_TO_PAGES (TotalSize));
+  if (Alloc == NULL) {
+    return NULL;
+  }
+
+  ZeroMem (Alloc, TotalSize);
+
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+  while (Hob.Raw != NULL) {
+    if (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == (EFI_PHYSICAL_ADDRESS)(UINTN)Alloc) {
+      //
+      // Find the HOB just created and change the Name to gMmProfileDataHobGuid in PEI HOB list
+      //
+      CopyGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, &gMmProfileDataHobGuid);
+      return Hob.MemoryAllocation;
+    }
+
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (Hob));
+  }
+
+  return NULL;
+}
+
+/**
+  Build memory allocation and resource HOB for MM profile data
+
+  This function builds HOBs for MM profile data, one is memory
+  allocation HOB, another is resource HOB.
+
+  @param[in]       HobBuffer      The pointer of new HOB buffer.
+  @param[in, out]  HobBufferSize  The total size of the same GUID HOBs when as input.
+                                  The size will be 0 for output when build HOB fail.
+
+**/
+VOID
+MmIplBuildMmProfileHobs (
+  IN UINT8      *HobBuffer,
+  IN OUT UINTN  *HobBufferSize
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 HobLength;
+
+  Hob.MemoryAllocation = NULL;
+  HobLength            = ALIGN_VALUE (sizeof (EFI_HOB_MEMORY_ALLOCATION), 8) + ALIGN_VALUE (sizeof (EFI_HOB_RESOURCE_DESCRIPTOR), 8);
+
+  if (*HobBufferSize >= HobLength) {
+    Hob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+    while (Hob.Raw != NULL) {
+      if (CompareGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, &gMmProfileDataHobGuid)) {
+        break;
+      }
+
+      Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (Hob));
+    }
+
+    ASSERT (Hob.MemoryAllocation != NULL);
+
+    //
+    // Build memory allocation HOB
+    //
+    ASSERT (Hob.MemoryAllocation->Header.HobLength == ALIGN_VALUE (sizeof (EFI_HOB_MEMORY_ALLOCATION), 8));
+    CopyMem (HobBuffer, Hob.Raw, Hob.MemoryAllocation->Header.HobLength);
+
+    //
+    // Build resource HOB
+    //
+    MmIplBuildMemoryResourceHob (
+      (EFI_HOB_RESOURCE_DESCRIPTOR *)(HobBuffer + Hob.MemoryAllocation->Header.HobLength),
+      EFI_RESOURCE_SYSTEM_MEMORY,
+      0,
+      Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,
+      Hob.MemoryAllocation->AllocDescriptor.MemoryLength,
+      &gMmProfileDataHobGuid
+      );
+  }
+
+  *HobBufferSize = HobLength;
+}
+
+/**
   Get remaining size for building HOBs.
 
   @param[in] TotalHobSize    Total size of foundation HOBs.
@@ -405,6 +546,15 @@ CreateMmFoundationHobList (
   HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
   MmIplCopyGuidHob (FoundationHobList + UsedSize, &HobLength, &gEfiAcpiVariableGuid, FALSE);
   UsedSize += HobLength;
+
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    //
+    // Build memory allocation and resource HOB for MM profile data
+    //
+    HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+    MmIplBuildMmProfileHobs (FoundationHobList + UsedSize, &HobLength);
+    UsedSize += HobLength;
+  }
 
   if (*FoundationHobSize < UsedSize) {
     Status = RETURN_BUFFER_TOO_SMALL;
