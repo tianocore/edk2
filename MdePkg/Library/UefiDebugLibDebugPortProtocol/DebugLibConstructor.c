@@ -34,6 +34,7 @@ EFI_BOOT_SERVICES  *mDebugBS;
   @param  Context      Pointer to the notification function's context.
 
 **/
+STATIC
 VOID
 EFIAPI
 ExitBootServicesCallback (
