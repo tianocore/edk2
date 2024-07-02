@@ -404,7 +404,8 @@ HiiCreateRamDisk (
           );
       } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 
-      return EFI_DEVICE_ERROR;
+      Status = EFI_DEVICE_ERROR;
+      goto ErrorExit;
     }
   }
 
@@ -431,7 +432,7 @@ HiiCreateRamDisk (
         );
     } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 
-    return Status;
+    goto ErrorExit;
   }
 
   //
@@ -442,6 +443,10 @@ HiiCreateRamDisk (
   PrivateData->CreateMethod = RamDiskCreateHii;
 
   return EFI_SUCCESS;
+
+ErrorExit:
+  gBS->FreePool (StartingAddr);
+  return Status;
 }
 
 /**
