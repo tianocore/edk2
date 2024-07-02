@@ -257,19 +257,24 @@ def LaunchCommand(Command, WorkingDir,ModuleAuto = None):
     if Proc.stdout:
         StdOutThread.join()
 
-    # check the return code of the program
-    if Proc.returncode != 0:
-        if not isinstance(Command, type("")):
-            Command = " ".join(Command)
-        # print out the Response file and its content when make failure
-        RespFile = os.path.join(WorkingDir, 'OUTPUT', 'respfilelist.txt')
-        if os.path.isfile(RespFile):
-            f = open(RespFile)
-            RespContent = f.read()
-            f.close()
-            EdkLogger.info(RespContent)
+    RespFile = os.path.join(WorkingDir, 'OUTPUT', 'respfilelist.txt')
+    if os.path.isfile(RespFile):
+        f = open(RespFile)
+        RespContent = f.read().splitlines()
+        f.close()
 
+        EdkLogger.info("Built with Respfile ... %s", WorkingDir)
+
+        for i in range(0, len(RespContent), 2):
+            cmd = RespContent[i]
+            cmd = cmd[cmd.find("OUTPUT")+7 : cmd.find("_resp.txt")]
+            flags = RespContent[i+1]
+            EdkLogger.info("  \"%s_FLAGS\" : %s" % (cmd.upper(), flags))
+
+    if Proc.returncode != 0:
+        Command = " ".join(Command)
         EdkLogger.error("build", COMMAND_FAILURE, ExtraData="%s [%s]" % (Command, WorkingDir))
+
     if ModuleAuto:
         iau = IncludesAutoGen(WorkingDir,ModuleAuto)
         if ModuleAuto.ToolChainFamily == TAB_COMPILER_MSFT:
