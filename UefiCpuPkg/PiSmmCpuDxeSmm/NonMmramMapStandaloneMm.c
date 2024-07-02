@@ -8,21 +8,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "PiSmmCpuCommon.h"
 
 /**
-  Get SmmProfileData.
+  Check SmmProfile is enabled or not.
 
-  @param[in, out]     Size     Return Size of SmmProfileData.
+  @param[in, out]     BaseAddress     Return BaseAddress of SmmProfileData.
+  @param[in, out]     Size            Return Size of SmmProfileData.
 
-  @return Address of SmmProfileData
+  @return TRUE     SmmProfile is enabled.
+          FALSE    SmmProfile is not enabled.
 
 **/
-EFI_PHYSICAL_ADDRESS
-GetSmmProfileData (
-  IN OUT  UINT64  *Size
+BOOLEAN
+IsSmmProfileEnabled (
+  IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress  OPTIONAL,
+  IN OUT  UINT64                *Size         OPTIONAL
   )
 {
   EFI_PEI_HOB_POINTERS  SmmProfileDataHob;
-
-  ASSERT (Size != NULL);
 
   //
   // Get Smm Profile Base from Memory Allocation HOB
@@ -39,11 +40,19 @@ GetSmmProfileData (
     SmmProfileDataHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (SmmProfileDataHob));
   }
 
-  ASSERT (SmmProfileDataHob.Raw != NULL);
+  if (SmmProfileDataHob.Raw != NULL) {
+    if (BaseAddress != NULL) {
+      *BaseAddress = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+    }
 
-  *Size = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength;
+    if (Size != NULL) {
+      *Size = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength;
+    }
 
-  return SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+    return TRUE;
+  }
+
+  return FALSE;
 }
 
 /**

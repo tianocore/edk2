@@ -1506,7 +1506,7 @@ IfReadOnlyPageTableNeeded (
   //
   if (!IsRestrictedMemoryAccess () ||
       ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
-      FeaturePcdGet (PcdCpuSmmProfileEnable))
+      IsSmmProfileEnabled (NULL, NULL))
   {
     if (sizeof (UINTN) == sizeof (UINT64)) {
       //
@@ -1520,7 +1520,7 @@ IfReadOnlyPageTableNeeded (
       //
       // Restriction on access to non-SMRAM memory and SMM profile could not be enabled at the same time.
       //
-      ASSERT (!(IsRestrictedMemoryAccess () && FeaturePcdGet (PcdCpuSmmProfileEnable)));
+      ASSERT (!(IsRestrictedMemoryAccess () && IsSmmProfileEnabled (NULL, NULL)));
     }
 
     return FALSE;

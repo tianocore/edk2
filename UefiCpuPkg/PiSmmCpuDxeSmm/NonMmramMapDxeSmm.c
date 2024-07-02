@@ -460,40 +460,48 @@ UpdateUefiMemMapAttributes (
 }
 
 /**
-  Get SmmProfileData.
+  Check SmmProfile is enabled or not.
 
-  @param[in, out]     Size     Return Size of SmmProfileData.
+  @param[in, out]     BaseAddress     Return BaseAddress of SmmProfileData.
+  @param[in, out]     Size            Return Size of SmmProfileData.
 
-  @return Address of SmmProfileData
+  @return TRUE     SmmProfile is enabled.
+          FALSE    SmmProfile is not enabled.
 
 **/
-EFI_PHYSICAL_ADDRESS
-GetSmmProfileData (
-  IN OUT  UINT64  *Size
+BOOLEAN
+IsSmmProfileEnabled (
+  IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress  OPTIONAL,
+  IN OUT  UINT64                *Size         OPTIONAL
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Base;
+  EFI_STATUS  Status;
 
-  ASSERT (Size != NULL);
-
-  if (mBtsSupported) {
-    *Size = PcdGet32 (PcdCpuSmmProfileSize) + mMsrDsAreaSize;
-  } else {
-    *Size = PcdGet32 (PcdCpuSmmProfileSize);
+  if (!FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    return FALSE;
   }
 
-  Base   = 0xFFFFFFFF;
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  (UINTN)EFI_SIZE_TO_PAGES (*Size),
-                  &Base
-                  );
-  ASSERT_EFI_ERROR (Status);
-  ZeroMem ((VOID *)(UINTN)Base, (UINTN)*Size);
+  if (Size != NULL) {
+    if (mBtsSupported) {
+      *Size = PcdGet32 (PcdCpuSmmProfileSize) + mMsrDsAreaSize;
+    } else {
+      *Size = PcdGet32 (PcdCpuSmmProfileSize);
+    }
+  }
 
-  return Base;
+  if (BaseAddress != NULL) {
+    *BaseAddress = 0xFFFFFFFF;
+    Status       = gBS->AllocatePages (
+                          AllocateMaxAddress,
+                          EfiReservedMemoryType,
+                          (UINTN)EFI_SIZE_TO_PAGES (*Size),
+                          BaseAddress
+                          );
+    ASSERT_EFI_ERROR (Status);
+    ZeroMem ((VOID *)(UINTN)*BaseAddress, (UINTN)*Size);
+  }
+
+  return TRUE;
 }
 
 /**
