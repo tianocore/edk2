@@ -29,7 +29,7 @@
   devices still depends on the implementation of the PCI bus driver. The PCI bus
   driver may fully, partially, or not even support these incompatible devices.
 
-  During PCI bus enumeration, the PCI bus driver will probe the PCI Base Address
+  During PCI bus enumeration, the PCI bus driver will probe the PCI Base Addressa
   Registers (BARs) for each PCI device regardless of whether the PCI device is
   incompatible or not to determine the resource requirements so that the PCI bus
   driver can invoke the proper PCI resources for them.  Generally, this resource
@@ -77,6 +77,15 @@
   { \
     0xeb23f55a, 0x7863, 0x4ac2, {0x8d, 0x3d, 0x95, 0x65, 0x35, 0xde, 0x03, 0x75} \
   }
+
+///
+/// Extension to Acpi10.h for describing the ROM BAR as the incompatible BAR.
+///
+/// Specifying the ROM bar as incompatible indicates to the PciBusDxe driver to
+/// ignore the ROM BAR altogether.  Currently, ACPI only defines 0x01-0x03 for
+/// MEM, IO, BUS.
+///
+#define INCOMPATIBLE_ACPI_ADDRESS_SPACE_TYPE_ROM  0x0F
 
 ///
 /// Forward declaration for EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL
