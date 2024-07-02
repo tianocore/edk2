@@ -87,7 +87,7 @@ FindFfsSectionInSections (
   @param  FfsFileHeader   Pointer to the current file to search.
   @param  SectionData     Pointer to the Section matching SectionType in FfsFileHeader.
                           NULL if section not found
-  @param  SectionDataSize The size of SectionData
+  @param  SectionDataSize The size of SectionData, excluding the section header.
 
   @retval  EFI_NOT_FOUND  No files matching the search criteria were found
   @retval  EFI_SUCCESS
