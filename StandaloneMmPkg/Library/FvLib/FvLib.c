@@ -338,11 +338,11 @@ FfsFindSection (
   Given the input file pointer, search for the next matching section in the
   FFS volume.
 
-  @param  SearchType      Filter to find only sections of this type.
-  @param  FfsFileHeader   Pointer to the current file to search.
-  @param  SectionData     Pointer to the Section matching SectionType in FfsFileHeader.
-                          NULL if section not found
-  @param  SectionDataSize The size of SectionData
+  @param[in]      SectionType     Filter to find only sections of this type.
+  @param[in]      FfsFileHeader   Pointer to the current file to search.
+  @param[in,out]  SectionData     Pointer to the Section matching SectionType in FfsFileHeader.
+                                  NULL if section not found
+  @param[in,out]  SectionDataSize The size of SectionData, excluding the section header.
 
   @retval  EFI_NOT_FOUND  No files matching the search criteria were found
   @retval  EFI_SUCCESS
@@ -380,10 +380,10 @@ FfsFindSectionData (
     if (Section->Type == SectionType) {
       if (IS_SECTION2 (Section)) {
         *SectionData     = (VOID *)((EFI_COMMON_SECTION_HEADER2 *)Section + 1);
-        *SectionDataSize = SECTION2_SIZE (Section);
+        *SectionDataSize = SECTION2_SIZE (Section) - sizeof (EFI_COMMON_SECTION_HEADER2);
       } else {
         *SectionData     = (VOID *)(Section + 1);
-        *SectionDataSize = SECTION_SIZE (Section);
+        *SectionDataSize = SECTION_SIZE (Section) - sizeof (EFI_COMMON_SECTION_HEADER);
       }
 
       return EFI_SUCCESS;
