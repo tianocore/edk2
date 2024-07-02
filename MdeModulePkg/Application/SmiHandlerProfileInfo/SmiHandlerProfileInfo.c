@@ -667,7 +667,7 @@ SmiHandlerProfileInfoEntrypoint (
   //
   // Dump all image
   //
-  Print (L"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
+  Print (L"<?xml version=\"1.0\" encoding=\"utf-16\"?>\n");
   Print (L"<SmiHandlerProfile>\n");
   Print (L"<ImageDatabase>\n");
   Print (L"  <!-- SMM image loaded -->\n");
