@@ -164,5 +164,10 @@
   # @Prompt RTC Update Timeout Value.
   gPcAtChipsetPkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout|100000|UINT32|0x00000020
 
+[PcdsFixedAtBuild]
+  ## Defines the UART base address.
+  # @Prompt UART IO Port Base Address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdUartIoPortBaseAddress|0x3F8|UINT16|0x00000024
+
 [UserExtensions.TianoCore."ExtraFiles"]
   PcAtChipsetPkgExtra.uni
