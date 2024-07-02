@@ -11,6 +11,15 @@
 #include <Guid/AcpiS3Context.h>
 #include <Guid/AcpiS3Enable.h>
 #include <Guid/SmmCpuSyncConfig.h>
+#include <Guid/SmmProfileData.h>
+#include <Register/Intel/Cpuid.h>
+#include <Register/Intel/ArchitecturalMsr.h>
+
+//
+// Configure the SMM_PROFILE DTS region size
+//
+#define SMM_PROFILE_DTS_SIZE      (4 * 1024 * 1024)  // 4M
+#define CPUID1_EDX_BTS_AVAILABLE  0x200000
 
 /**
   Add a new HOB to the HOB List.
@@ -42,6 +51,45 @@ MmIplCreateHob (
   ((EFI_HOB_GENERIC_HEADER *)Hob)->Reserved  = 0;
 
   return Hob;
+}
+
+/**
+  Builds a HOB that describes a chunk of system memory.
+
+  This function builds a HOB that describes a chunk of system memory.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param[in]  Hob                 The pointer of new HOB buffer.
+  @param[in]  ResourceType        The type of resource described by this HOB.
+  @param[in]  ResourceAttribute   The resource attributes of the memory described by this HOB.
+  @param[in]  PhysicalStart       The 64 bit physical address of memory described by this HOB.
+  @param[in]  NumberOfBytes       The length of the memory described by this HOB in bytes.
+  @param[in]  Owner               The pointer of GUID.
+
+**/
+VOID
+MmIplBuildMemoryResourceHob (
+  IN EFI_HOB_RESOURCE_DESCRIPTOR  *Hob,
+  IN EFI_RESOURCE_TYPE            ResourceType,
+  IN EFI_RESOURCE_ATTRIBUTE_TYPE  ResourceAttribute,
+  IN EFI_PHYSICAL_ADDRESS         PhysicalStart,
+  IN UINT64                       NumberOfBytes,
+  IN EFI_GUID                     *Owner
+  )
+{
+  ASSERT (Hob != NULL);
+  MmIplCreateHob (Hob, EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, sizeof (EFI_HOB_RESOURCE_DESCRIPTOR));
+
+  Hob->ResourceType      = EFI_RESOURCE_SYSTEM_MEMORY;
+  Hob->ResourceAttribute = ResourceAttribute;
+  Hob->PhysicalStart     = PhysicalStart;
+  Hob->ResourceLength    = NumberOfBytes;
+
+  if (Owner != NULL) {
+    CopyGuid (&Hob->Owner, Owner);
+  } else {
+    ZeroMem (&Hob->Owner, sizeof (EFI_GUID));
+  }
 }
 
 /**
@@ -227,6 +275,111 @@ MmIplBuildMmCoreModuleHob (
 }
 
 /**
+  Build memory allocation and resource HOB for smm profile data
+
+  This function builds HOBs for smm profile data, one is memory
+  allocation HOB, another is resource HOB.
+
+  @param[in]       HobBuffer      The pointer of new HOB buffer.
+  @param[in, out]  HobBufferSize  The total size of the same GUID HOBs when as input.
+                                  The size will be 0 for output when build HOB fail.
+
+  @return          NULL if smm profile data memory allocation HOB not found.
+  @return          Pointer of smm profile data memory allocation HOB if found.
+
+**/
+EFI_HOB_MEMORY_ALLOCATION *
+MmIplBuildSmmProfileHobs (
+  IN     UINT8   *HobBuffer,
+  IN OUT UINT16  *HobBufferSize
+  )
+{
+  BOOLEAN                        BtsSupported;
+  UINT32                         RegEdx;
+  MSR_IA32_MISC_ENABLE_REGISTER  MiscEnableMsr;
+  UINTN                          TotalSize;
+  VOID                           *Alloc;
+  EFI_PEI_HOB_POINTERS           Hob;
+
+  //
+  // Check if processor support BTS
+  //
+  BtsSupported = TRUE;
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &RegEdx);
+  if ((RegEdx & CPUID1_EDX_BTS_AVAILABLE) != 0) {
+    //
+    // Per IA32 manuals:
+    // When CPUID.1:EDX[21] is set, the following BTS facilities are available:
+    // 1. The BTS_UNAVAILABLE flag in the IA32_MISC_ENABLE MSR indicates the
+    //    availability of the BTS facilities, including the ability to set the BTS and
+    //    BTINT bits in the MSR_DEBUGCTLA MSR.
+    // 2. The IA32_DS_AREA MSR can be programmed to point to the DS save area.
+    //
+    MiscEnableMsr.Uint64 = AsmReadMsr64 (MSR_IA32_MISC_ENABLE);
+    if (MiscEnableMsr.Bits.BTS == 1) {
+      //
+      // BTS facilities is not supported if MSR_IA32_MISC_ENABLE.BTS bit is set.
+      //
+      BtsSupported = FALSE;
+    }
+  }
+
+  if (BtsSupported) {
+    TotalSize =  PcdGet32 (PcdCpuSmmProfileSize) + SMM_PROFILE_DTS_SIZE;
+  } else {
+    TotalSize =  PcdGet32 (PcdCpuSmmProfileSize);
+  }
+
+  Alloc = AllocateReservedPages (EFI_SIZE_TO_PAGES (TotalSize));
+  if (Alloc == NULL) {
+    return NULL;
+  }
+
+  ZeroMem ((VOID *)(UINTN)Alloc, TotalSize);
+
+  //
+  // Find the HOB just created, change the name to gEdkiiSmmProfileDataGuid,
+  // then build memory allocation HOB and resource HOB for smm profile data
+  //
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+  while (Hob.Raw != NULL) {
+    if (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == (UINTN)Alloc) {
+      CopyGuid (&Hob.MemoryAllocation->AllocDescriptor.Name, &gEdkiiSmmProfileDataGuid);
+
+      if (*HobBufferSize >= Hob.MemoryAllocation->Header.HobLength + sizeof (EFI_HOB_RESOURCE_DESCRIPTOR)) {
+        //
+        // Build memory allocation HOB
+        //
+        CopyMem (HobBuffer, Hob.Raw, Hob.MemoryAllocation->Header.HobLength);
+
+        //
+        // Build resource HOB
+        //
+        MmIplBuildMemoryResourceHob (
+          (EFI_HOB_RESOURCE_DESCRIPTOR *)(HobBuffer + Hob.MemoryAllocation->Header.HobLength),
+          EFI_RESOURCE_SYSTEM_MEMORY,
+          0,
+          Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress,
+          Hob.MemoryAllocation->AllocDescriptor.MemoryLength,
+          &gEdkiiSmmProfileDataGuid
+          );
+      }
+
+      ASSERT (*HobBufferSize == (Hob.MemoryAllocation->Header.HobLength + sizeof (EFI_HOB_RESOURCE_DESCRIPTOR)));
+      return Hob.MemoryAllocation;
+    }
+
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (Hob));
+  }
+
+  FreePages (Alloc, EFI_SIZE_TO_PAGES (TotalSize));
+
+  *HobBufferSize = 0;
+
+  return NULL;
+}
+
+/**
   Get remaining size for building HOBs.
 
   @param[in] TotalHobSize    Total size of foundation HOBs.
@@ -292,6 +445,7 @@ CreateMmFoundationHobList (
 {
   UINTN                      RemainingSize;
   UINTN                      UsedSize;
+  EFI_HOB_MEMORY_ALLOCATION  *SmmProfileDataHob;
   RETURN_STATUS              Status;
   UINT16                     HobLength;
 
@@ -382,6 +536,18 @@ CreateMmFoundationHobList (
   RemainingSize = GetRemainingHobSize (*FoundationHobSize, UsedSize);
   MmIplCopyGuidHob (FoundationHobList + UsedSize, &RemainingSize, &gEfiAcpiVariableGuid, FALSE);
   UsedSize += RemainingSize;
+
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    //
+    // Build memory allocation and resource HOB for smm profile data
+    //
+    HobLength = (UINT16)((sizeof (EFI_HOB_MEMORY_ALLOCATION) + sizeof (EFI_HOB_RESOURCE_DESCRIPTOR) + 0x7) & (~0x7));
+    if (*FoundationHobSize >= UsedSize + HobLength) {
+      SmmProfileDataHob = MmIplBuildSmmProfileHobs (FoundationHobList + UsedSize, &HobLength);
+    }
+
+    UsedSize += HobLength;
+  }
 
   if (*FoundationHobSize < UsedSize) {
     Status = RETURN_BUFFER_TOO_SMALL;
