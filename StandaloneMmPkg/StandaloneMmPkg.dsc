@@ -59,6 +59,7 @@
   StandaloneMmCoreEntryPoint|StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
   StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   VariableMmDependency|StandaloneMmPkg/Library/VariableMmDependency/VariableMmDependency.inf
+  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf

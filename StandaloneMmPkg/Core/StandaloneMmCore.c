@@ -512,6 +512,10 @@ StandaloneMmMain (
 
   DEBUG ((DEBUG_INFO, "MmMain - 0x%x\n", HobStart));
 
+  DEBUG_CODE (
+    PrintHobList (HobStart, NULL);
+    );
+
   //
   // Determine if the caller has passed a reference to a MM_CORE_PRIVATE_DATA
   // structure in the Hoblist. This choice will govern how boot information is

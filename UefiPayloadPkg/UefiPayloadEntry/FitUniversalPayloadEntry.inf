@@ -54,6 +54,7 @@
   PeCoffLib
   CpuLib
   FdtLib
+  HobPrintLib
 
 [Guids]
   gEfiMemoryTypeInformationGuid
