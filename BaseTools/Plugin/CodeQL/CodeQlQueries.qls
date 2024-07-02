@@ -2,7 +2,7 @@
 - description: C++ queries
 
 - queries: '.'
-  from: codeql/cpp-queries
+  from: codeql/cpp-queries@0.9.12
 
 ##########################################################################################
 # Queries
