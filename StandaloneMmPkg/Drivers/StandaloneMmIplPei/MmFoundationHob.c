@@ -7,6 +7,10 @@
 **/
 
 #include <StandaloneMmIplPei.h>
+#include <Guid/MpInformation2.h>
+#include <Guid/AcpiS3Context.h>
+#include <Guid/AcpiS3Enable.h>
+#include <Guid/SmmCpuSyncConfig.h>
 
 /**
   Add a new HOB to the HOB List.
@@ -68,6 +72,72 @@ MmIplBuildFvHob (
 
   Hob->BaseAddress = BaseAddress;
   Hob->Length      = Length;
+}
+
+/**
+  Builds an ACPI S3 Enable HOB.
+
+  This function builds an ACPI S3 Enable HOB.
+  It can only be invoked during PEI phase;
+  If new HOB buffer is NULL, then ASSERT().
+
+  @param[in]  HobPtr        The pointer of new HOB buffer.
+  @param[in]  HobLength     The size of the HOB.
+
+**/
+VOID
+MmIplBuildAcpiS3EnableHob (
+  IN UINT8   *HobPtr,
+  IN UINT16  HobLength
+  )
+{
+  EFI_HOB_GUID_TYPE  *Hob;
+  ACPI_S3_ENABLE     *AcpiS3EnableHob;
+
+  ASSERT (HobPtr != NULL);
+
+  Hob = (EFI_HOB_GUID_TYPE *)(UINTN)HobPtr;
+
+  MmIplCreateHob (Hob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
+
+  CopyGuid (&Hob->Name, &gEdkiiAcpiS3EnableHobGuid);
+
+  AcpiS3EnableHob               = (ACPI_S3_ENABLE *)(UINTN)(Hob + 1);
+  AcpiS3EnableHob->AcpiS3Enable = PcdGetBool (PcdAcpiS3Enable);
+}
+
+/**
+  Builds smm cpu sync configuration HOB.
+
+  This function builds smm cpu sync configuration HOB.
+  It can only be invoked during PEI phase;
+  If new HOB buffer is NULL, then ASSERT().
+
+  @param[in]  HobPtr        The pointer of new HOB buffer.
+  @param[in]  HobLength     The size of the HOB.
+
+**/
+VOID
+MmIplBuildSmmCpuSyncConfigHob (
+  IN UINT8   *HobPtr,
+  IN UINT16  HobLength
+  )
+{
+  EFI_HOB_GUID_TYPE    *Hob;
+  SMM_CPU_SYNC_CONFIG  *SmmSyncModeInfoHob;
+
+  ASSERT (HobPtr != NULL);
+
+  Hob = (EFI_HOB_GUID_TYPE *)(UINTN)HobPtr;
+
+  MmIplCreateHob (Hob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
+
+  CopyGuid (&Hob->Name, &gEdkiiSmmCpuSyncConfigHobGuid);
+
+  SmmSyncModeInfoHob               = (SMM_CPU_SYNC_CONFIG *)(UINTN)(Hob + 1);
+  SmmSyncModeInfoHob->RelaxedMode  = (BOOLEAN)(PcdGet8 (PcdCpuSmmSyncMode) == SmmCpuSyncModeRelaxedAp);
+  SmmSyncModeInfoHob->SyncTimeout  = PcdGet64 (PcdCpuSmmApSyncTimeout);
+  SmmSyncModeInfoHob->SyncTimeout2 = PcdGet64 (PcdCpuSmmApSyncTimeout2);
 }
 
 /**
@@ -223,6 +293,7 @@ CreateMmFoundationHobList (
   UINTN                      RemainingSize;
   UINTN                      UsedSize;
   RETURN_STATUS              Status;
+  UINT16                     HobLength;
 
   ASSERT (FoundationHobSize != NULL);
 
@@ -263,6 +334,54 @@ CreateMmFoundationHobList (
   }
 
   UsedSize += sizeof (EFI_HOB_FIRMWARE_VOLUME);
+
+  //
+  // Build ACPI S3 Enable HOB
+  //
+  HobLength = (UINT16)((sizeof (EFI_HOB_GUID_TYPE) + sizeof (ACPI_S3_ENABLE) + 0x7) & (~0x7));
+  if (*FoundationHobSize >= UsedSize + HobLength) {
+    MmIplBuildAcpiS3EnableHob (FoundationHobList + UsedSize, HobLength);
+  }
+
+  UsedSize += HobLength;
+
+  //
+  // Build SMM CPU sync configuration HOB
+  //
+  HobLength = (UINT16)((sizeof (EFI_HOB_GUID_TYPE) + sizeof (SMM_CPU_SYNC_CONFIG) + 0x7) & (~0x7));
+  if (*FoundationHobSize >= UsedSize + HobLength) {
+    MmIplBuildSmmCpuSyncConfigHob (FoundationHobList + UsedSize, HobLength);
+  }
+
+  UsedSize += HobLength;
+
+  //
+  // Build CPU SMM base HOB in MM HOB list
+  //
+  RemainingSize = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplCopyGuidHob (FoundationHobList + UsedSize, &RemainingSize, &gSmmBaseHobGuid, TRUE);
+  UsedSize += RemainingSize;
+
+  //
+  // Build SMRAM memory Hob in MM HOB list
+  //
+  RemainingSize = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplCopyGuidHob (FoundationHobList + UsedSize, &RemainingSize, &gEfiSmmSmramMemoryGuid, FALSE);
+  UsedSize += RemainingSize;
+
+  //
+  // Build Mp Information2 Hob in MM HOB list
+  //
+  RemainingSize = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplCopyGuidHob (FoundationHobList + UsedSize, &RemainingSize, &gMpInformation2HobGuid, TRUE);
+  UsedSize += RemainingSize;
+
+  //
+  // Build ACPI variable HOB
+  //
+  RemainingSize = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+  MmIplCopyGuidHob (FoundationHobList + UsedSize, &RemainingSize, &gEfiAcpiVariableGuid, FALSE);
+  UsedSize += RemainingSize;
 
   if (*FoundationHobSize < UsedSize) {
     Status = RETURN_BUFFER_TOO_SMALL;

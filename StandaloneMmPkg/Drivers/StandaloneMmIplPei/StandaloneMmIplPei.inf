@@ -67,6 +67,10 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFixedCommBufferPages
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout                 ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2                ## CONSUMES
 
 [Depex]
-  gPeiSmmControlPpiGuid
+  gPeiSmmControlPpiGuid AND gEfiPeiMpServicesPpiGuid
