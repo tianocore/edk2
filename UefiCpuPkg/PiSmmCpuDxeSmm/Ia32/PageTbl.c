@@ -33,7 +33,7 @@ SmmInitPageTable (
   mPhysicalAddressBits = 32;
   mPagingMode          = PagingPae;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (IsSmmProfileEnabled (NULL, NULL) ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -189,7 +189,7 @@ SmiPFHandler (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (IsSmmProfileEnabled (NULL, NULL)) {
     SmmProfilePFHandler (
       SystemContext.SystemContextIa32->Eip,
       SystemContext.SystemContextIa32->ExceptionData

@@ -112,7 +112,6 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection             ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport                   ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileEnable                 ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileRingBuffer             ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock         ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode         ## CONSUMES

@@ -267,7 +267,7 @@ SmmInitPageTable (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (IsSmmProfileEnabled (NULL, NULL) ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -975,7 +975,7 @@ SmiPFHandler (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (IsSmmProfileEnabled (NULL, NULL)) {
     if (mIsStandaloneMm) {
       //
       // Only logging ranges shall run here in MM env.

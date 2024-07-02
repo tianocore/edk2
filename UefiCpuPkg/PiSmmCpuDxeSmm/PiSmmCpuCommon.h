@@ -953,16 +953,19 @@ SetMemMapAttributes (
   );
 
 /**
-  Get SmmProfileData.
+  Check SmmProfile is enabled or not.
 
-  @param[in, out]     Size     Return Size of SmmProfileData.
+  @param[in, out]     BaseAddress     Return BaseAddress of SmmProfileData.
+  @param[in, out]     Size            Return Size of SmmProfileData.
 
-  @return Address of SmmProfileData
+  @return TRUE     SmmProfile is enabled.
+          FALSE    SmmProfile is not enabled.
 
 **/
-EFI_PHYSICAL_ADDRESS
-GetSmmProfileData (
-  IN OUT  UINT64  *Size
+BOOLEAN
+IsSmmProfileEnabled (
+  IN OUT  EFI_PHYSICAL_ADDRESS  *BaseAddress  OPTIONAL,
+  IN OUT  UINT64                *Size         OPTIONAL
   );
 
 /**

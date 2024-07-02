@@ -216,7 +216,7 @@ PiCpuStandaloneMmEntry (
 
   ASSERT_EFI_ERROR (Status);
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (IsSmmProfileEnabled (NULL, NULL)) {
     //
     // Get Software SMI
     //

@@ -40,7 +40,7 @@ PerformRemainingTasks (
     //
     // Start SMM Profile feature
     //
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    if (IsSmmProfileEnabled (NULL, NULL)) {
       SmmProfileStart ();
     }
 
@@ -60,7 +60,7 @@ PerformRemainingTasks (
     //
     // Update Page Table
     //
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    if (IsSmmProfileEnabled (NULL, NULL)) {
       SmmProfileUpdateMemoryAttributes ();
     } else {
       UpdateUefiMemMapAttributes ();
@@ -157,7 +157,7 @@ SmmReadyToLockEventNotify (
   //
   // Skip SMM profile initialization if feature is disabled
   //
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (IsSmmProfileEnabled (NULL, NULL)) {
     //
     // Get Software SMI from FADT
     //

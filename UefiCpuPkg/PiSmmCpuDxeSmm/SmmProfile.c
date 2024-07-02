@@ -312,7 +312,7 @@ IsAddressValid (
 {
   UINTN  Index;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (IsSmmProfileEnabled (NULL, NULL)) {
     //
     // Check configuration
     //
@@ -348,7 +348,7 @@ IsAddressSplit (
 {
   UINTN  Index;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (IsSmmProfileEnabled (NULL, NULL)) {
     //
     // Check configuration
     //
@@ -747,9 +747,10 @@ InitSmmProfileInternal (
   ASSERT ((mSmmProfileSize & 0xFFF) == 0);
 
   //
-  // Get Smm Profile Base
+  // Get Smm Profile Base and Size
   //
-  mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)GetSmmProfileData (&SmmProfileSize);
+  IsSmmProfileEnabled ((EFI_PHYSICAL_ADDRESS *)&mSmmProfileBase, &SmmProfileSize);
+
   DEBUG ((DEBUG_ERROR, "SmmProfileBase = 0x%016x.\n", (UINTN)mSmmProfileBase));
   DEBUG ((DEBUG_ERROR, "SmmProfileSize = 0x%016x.\n", (UINTN)SmmProfileSize));
 
@@ -1018,7 +1019,7 @@ InitSmmProfile (
   //
   // Skip SMM profile initialization if feature is disabled
   //
-  if (!FeaturePcdGet (PcdCpuSmmProfileEnable) &&
+  if (!IsSmmProfileEnabled (NULL, NULL) &&
       !HEAP_GUARD_NONSTOP_MODE &&
       !NULL_DETECTION_NONSTOP_MODE)
   {
