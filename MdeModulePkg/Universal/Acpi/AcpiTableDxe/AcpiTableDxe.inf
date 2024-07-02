@@ -57,6 +57,7 @@
   gEfiAcpi10TableGuid                           ## PRODUCES           ## SystemTable
   gEfiAcpiTableGuid                             ## PRODUCES           ## SystemTable
   gUniversalPayloadAcpiTableGuid                ## SOMETIMES_CONSUMES ## HOB
+  gAcpiTableHobGuid                             ## SOMETIMES_CONSUMES ## HOB
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol  ## CONSUMES
