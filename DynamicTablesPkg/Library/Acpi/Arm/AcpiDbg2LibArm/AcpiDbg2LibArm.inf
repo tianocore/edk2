@@ -29,6 +29,7 @@
 [LibraryClasses]
   BaseLib
   PL011UartLib
+  PrintLib
   SsdtSerialPortFixupLib
 
 [FixedPcd]
