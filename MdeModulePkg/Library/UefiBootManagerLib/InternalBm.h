@@ -18,6 +18,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <IndustryStandard/Atapi.h>
 #include <IndustryStandard/Scsi.h>
 #include <IndustryStandard/Nvme.h>
+#include <IndustryStandard/Sd.h>
+#include <IndustryStandard/Emmc.h>
 
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/BlockIo.h>
