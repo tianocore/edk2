@@ -178,6 +178,7 @@
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxStandaloneMmLib.inf
   MemLib|StandaloneMmPkg/Library/StandaloneMmMemLib/StandaloneMmMemLib.inf
+  VarCheckHiiLib|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibStandaloneMM.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
@@ -216,6 +217,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdRecoveryFileName|L"FVMAIN.FV"
 
 [Components]
+  MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibMmDependency.inf
   MdeModulePkg/Application/HelloWorld/HelloWorld.inf
   MdeModulePkg/Application/DumpDynPcd/DumpDynPcd.inf
   MdeModulePkg/Application/MemoryProfileInfo/MemoryProfileInfo.inf
@@ -353,6 +355,7 @@
   MdeModulePkg/Library/DisplayUpdateProgressLibGraphics/DisplayUpdateProgressLibGraphics.inf
   MdeModulePkg/Library/DisplayUpdateProgressLibText/DisplayUpdateProgressLibText.inf
   MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
   MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
@@ -505,6 +508,8 @@
   MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSmm.inf
   MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterStandaloneMm.inf
   MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
+  MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLibStandaloneMM.inf
+  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBoxStandaloneMm.inf
   MdeModulePkg/Library/SmmMemoryAllocationProfileLib/SmmMemoryAllocationProfileLib.inf
   MdeModulePkg/Library/PiSmmCoreMemoryAllocationLib/PiSmmCoreMemoryAllocationProfileLib.inf
   MdeModulePkg/Library/PiSmmCoreMemoryAllocationLib/PiSmmCoreMemoryAllocationLib.inf

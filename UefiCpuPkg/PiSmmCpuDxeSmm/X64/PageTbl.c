@@ -1,14 +1,14 @@
 /** @file
 Page Fault (#PF) handler for X64 processors
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 #define PAGE_TABLE_PAGES  8
 #define ACC_MAX_BIT       BIT3
@@ -267,7 +267,7 @@ SmmInitPageTable (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (IsSmmProfileEnabled (NULL, NULL) ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -975,7 +975,14 @@ SmiPFHandler (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (IsSmmProfileEnabled (NULL, NULL)) {
+    if (mIsStandaloneMm) {
+      //
+      // Only logging ranges shall run here in MM env.
+      //
+      ASSERT (IsNonMmramLoggingAddress (PFAddress));
+    }
+
     SmmProfilePFHandler (
       SystemContext.SystemContextX64->Rip,
       SystemContext.SystemContextX64->ExceptionData

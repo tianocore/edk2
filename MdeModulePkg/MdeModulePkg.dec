@@ -174,6 +174,10 @@
   #
   SpiHcPlatformLib|Include/Library/SpiHcPlatformLib.h
 
+  ##  @libraryclass   Provides services to prints all HOB information.
+  #
+  HobPrintLib|Include/Library/HobPrintLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -234,6 +238,9 @@
   ## Guid acted as variable store header's signature and to specify the variable list entries put in the EFI system table.
   #  Include/Guid/VariableFormat.h
   gEfiVariableGuid           = { 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}
+
+  ## Guid for checking HII variable and communication to SMM environment
+  gEfiVariableCheckHiiCommunicationGuid  = { 0xabcdef12, 0x3456, 0x7890, { 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90 }}
 
   ## Guid acted as the authenticated variable store header's signature, and to specify the variable list entries put in the EFI system table.
   #  Include/Guid/AuthenticatedVariableFormat.h
@@ -470,6 +477,9 @@
 
   ## Include/Guid/VariableRuntimeCacheInfo.h
   gEdkiiVariableRuntimeCacheInfoHobGuid = { 0x0f472f7d, 0x6713, 0x4915, { 0x96, 0x14, 0x5d, 0xda, 0x28, 0x40, 0x10, 0x56 }}
+
+  ## Include/Guid/MmCommBuffer.h
+  gEdkiiCommunicationBufferGuid  = { 0x6c2a2520, 0x0131, 0x4aee, { 0xa7, 0x50, 0xcc, 0x38, 0x4a, 0xac, 0xe8, 0xc6 }}
 
 [Ppis]
   ## Include/Ppi/FirmwareVolumeShadowPpi.h
@@ -1172,6 +1182,10 @@
   # Default is 2000, it represent delay is 2 ms.
   # @Prompt Delay access XHCI register after it issues HCRST (us)
   gEfiMdeModulePkgTokenSpaceGuid.PcdDelayXhciHCReset|2000|UINT16|0x30001060
+
+  ## The pages for MM communication buffer, buffer size default is 512K (128 Pages).
+  # @Prompt The value of pages,  Default value is 128.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFixedCommBufferPages|128|UINT32|0x30001061
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.

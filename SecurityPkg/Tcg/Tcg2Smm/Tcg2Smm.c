@@ -73,16 +73,28 @@ TpmNvsCommunciate (
     return EFI_ACCESS_DENIED;
   }
 
-  if (!IsBufferOutsideMmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+  CommParams = (TPM_NVS_MM_COMM_BUFFER *)CommBuffer;
+
+  //
+  // The Primary Buffer validation
+  //
+  if (!Tcg2IsPrimaryBufferValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((DEBUG_ERROR, "[%a] - MM Communication buffer in invalid location!\n", __func__));
+    return EFI_ACCESS_DENIED;
+  }
+
+  //
+  // The Secondary Buffer validation
+  //
+  if (!Tcg2IsSecondaryBufferValid (CommParams->TargetAddress, EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (sizeof (TCG_NVS))))) {
+    DEBUG ((DEBUG_ERROR, "[%a] - MM Secondary buffer pointed from Communication buffer in invalid location!\n", __func__));
     return EFI_ACCESS_DENIED;
   }
 
   //
   // Farm out the job to individual functions based on what was requested.
   //
-  CommParams = (TPM_NVS_MM_COMM_BUFFER *)CommBuffer;
-  Status     = EFI_SUCCESS;
+  Status = EFI_SUCCESS;
   switch (CommParams->Function) {
     case TpmNvsMmExchangeInfo:
       DEBUG ((DEBUG_VERBOSE, "[%a] - Function requested: MM_EXCHANGE_NVS_INFO\n", __func__));

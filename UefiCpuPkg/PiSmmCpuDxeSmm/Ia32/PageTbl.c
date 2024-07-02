@@ -1,14 +1,14 @@
 /** @file
 Page table manipulation functions for IA-32 processors
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 /**
   Create PageTable for SMM use.
@@ -33,7 +33,7 @@ SmmInitPageTable (
   mPhysicalAddressBits = 32;
   mPagingMode          = PagingPae;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (IsSmmProfileEnabled (NULL, NULL) ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -189,7 +189,7 @@ SmiPFHandler (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (IsSmmProfileEnabled (NULL, NULL)) {
     SmmProfilePFHandler (
       SystemContext.SystemContextIa32->Eip,
       SystemContext.SystemContextIa32->ExceptionData

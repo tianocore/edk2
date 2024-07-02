@@ -1,7 +1,7 @@
 /** @file
   Include file for Var Check Hii handler and bin.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -50,8 +50,5 @@ DumpVarCheckHii (
   IN VOID   *VarCheckHiiBin,
   IN UINTN  VarCheckHiiBinSize
   );
-
-extern VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBin;
-extern UINTN                          mVarCheckHiiBinSize;
 
 #endif
