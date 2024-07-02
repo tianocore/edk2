@@ -294,6 +294,7 @@ CreatMmHobList (
                         MmCoreImageAddress,
                         MmCoreImageSize,
                         MmCoreEntryPoint,
+                        MmProfileDataHob,
                         Block
                         );
   FreePages (PlatformHobList, EFI_SIZE_TO_PAGES (PlatformHobSize));
@@ -331,6 +332,7 @@ CreatMmHobList (
              MmCoreImageAddress,
              MmCoreImageSize,
              MmCoreEntryPoint,
+             MmProfileDataHob,
              Block
              );
   ASSERT_EFI_ERROR (Status);
