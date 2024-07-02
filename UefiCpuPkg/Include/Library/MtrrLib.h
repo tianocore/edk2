@@ -9,6 +9,8 @@
 #ifndef  _MTRR_LIB_H_
 #define  _MTRR_LIB_H_
 
+#include <Register/Intel/ArchitecturalMsr.h>
+
 //
 // According to IA32 SDM, MTRRs number and MSR offset are always consistent
 // for IA32 processor family
@@ -82,20 +84,20 @@ typedef struct _MTRR_SETTINGS_ {
 // Memory cache types
 //
 typedef enum {
-  CacheUncacheable    = 0,
-  CacheWriteCombining = 1,
-  CacheWriteThrough   = 4,
-  CacheWriteProtected = 5,
-  CacheWriteBack      = 6,
-  CacheInvalid        = 7
+  CacheUncacheable    = MSR_IA32_MTRR_CACHE_UNCACHEABLE,
+  CacheWriteCombining = MSR_IA32_MTRR_CACHE_WRITE_COMBINING,
+  CacheWriteThrough   = MSR_IA32_MTRR_CACHE_WRITE_THROUGH,
+  CacheWriteProtected = MSR_IA32_MTRR_CACHE_WRITE_PROTECTED,
+  CacheWriteBack      = MSR_IA32_MTRR_CACHE_WRITE_BACK,
+  CacheInvalid        = MSR_IA32_MTRR_CACHE_INVALID_TYPE,
 } MTRR_MEMORY_CACHE_TYPE;
 
-#define  MTRR_CACHE_UNCACHEABLE      0
-#define  MTRR_CACHE_WRITE_COMBINING  1
-#define  MTRR_CACHE_WRITE_THROUGH    4
-#define  MTRR_CACHE_WRITE_PROTECTED  5
-#define  MTRR_CACHE_WRITE_BACK       6
-#define  MTRR_CACHE_INVALID_TYPE     7
+#define  MTRR_CACHE_UNCACHEABLE      MSR_IA32_MTRR_CACHE_UNCACHEABLE
+#define  MTRR_CACHE_WRITE_COMBINING  MSR_IA32_MTRR_CACHE_WRITE_COMBINING
+#define  MTRR_CACHE_WRITE_THROUGH    MSR_IA32_MTRR_CACHE_WRITE_THROUGH
+#define  MTRR_CACHE_WRITE_PROTECTED  MSR_IA32_MTRR_CACHE_WRITE_PROTECTED
+#define  MTRR_CACHE_WRITE_BACK       MSR_IA32_MTRR_CACHE_WRITE_BACK
+#define  MTRR_CACHE_INVALID_TYPE     MSR_IA32_MTRR_CACHE_INVALID_TYPE
 
 typedef struct {
   UINT64                    BaseAddress;

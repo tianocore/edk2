@@ -10,13 +10,12 @@ BinToPcd
 '''
 from __future__ import print_function
 
-import sys
 import argparse
-import re
-import xdrlib
 import io
-import struct
 import math
+import re
+import struct
+import sys
 
 #
 # Globals for help information

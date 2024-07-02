@@ -10,13 +10,15 @@
   Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction() and Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction()
   will receive untrusted input and do validation.
 
-Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include <PiMm.h>
+
+#include <Library/HobLib.h>
 
 #include "MmTcg2PhysicalPresenceLibCommon.h"
 
@@ -39,4 +41,27 @@ Tcg2PhysicalPresenceLibStandaloneMmConstructor (
   )
 {
   return Tcg2PhysicalPresenceLibCommonConstructor ();
+}
+
+/**
+  Check if Tcg2 PP version is lower than PP_INF_VERSION_1_3.
+
+  @retval TRUE    Tcg2 PP version is lower than PP_INF_VERSION_1_3.
+  @retval Other   Tcg2 PP version is not lower than PP_INF_VERSION_1_3.
+**/
+BOOLEAN
+IsTcg2PPVerLowerThan_1_3 (
+  VOID
+  )
+{
+  VOID  *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&gEdkiiTcgPhysicalPresenceInterfaceVerHobGuid);
+  ASSERT (GuidHob != NULL);
+
+  if (AsciiStrnCmp (PP_INF_VERSION_1_2, (CHAR8 *)GET_GUID_HOB_DATA (GuidHob), sizeof (PP_INF_VERSION_1_2) - 1) >= 0) {
+    return TRUE;
+  }
+
+  return FALSE;
 }

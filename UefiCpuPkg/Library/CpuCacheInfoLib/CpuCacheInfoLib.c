@@ -348,7 +348,8 @@ CpuCacheInfoCollectCpuCacheInfoData (
       if ((LocalCacheInfo[CacheInfoIndex].Package    == ProcessorInfo[Index / MAX_NUM_OF_CACHE_PARAMS_LEAF].Package) &&
           (LocalCacheInfo[CacheInfoIndex].CoreType   == ProcessorInfo[Index / MAX_NUM_OF_CACHE_PARAMS_LEAF].CoreType) &&
           (LocalCacheInfo[CacheInfoIndex].CacheLevel == CacheData[Index].CacheLevel) &&
-          (LocalCacheInfo[CacheInfoIndex].CacheType  == CacheData[Index].CacheType))
+          (LocalCacheInfo[CacheInfoIndex].CacheType  == CacheData[Index].CacheType) &&
+          (LocalCacheInfo[CacheInfoIndex].CacheSizeinKB  == CacheData[Index].CacheSizeinKB))
       {
         LocalCacheInfo[CacheInfoIndex].CacheCount++;
         break;

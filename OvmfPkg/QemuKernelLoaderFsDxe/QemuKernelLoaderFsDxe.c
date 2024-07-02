@@ -1042,6 +1042,7 @@ QemuKernelLoaderFsDxeEntrypoint (
   KERNEL_BLOB  *CurrentBlob;
   KERNEL_BLOB  *KernelBlob;
   EFI_STATUS   Status;
+  EFI_STATUS   FetchStatus;
   EFI_HANDLE   FileSystemHandle;
   EFI_HANDLE   InitrdLoadFile2Handle;
 
@@ -1060,15 +1061,13 @@ QemuKernelLoaderFsDxeEntrypoint (
   //
   for (BlobType = 0; BlobType < KernelBlobTypeMax; ++BlobType) {
     CurrentBlob = &mKernelBlob[BlobType];
-    Status      = FetchBlob (CurrentBlob);
-    if (EFI_ERROR (Status)) {
-      goto FreeBlobs;
-    }
+    FetchStatus = FetchBlob (CurrentBlob);
 
     Status = VerifyBlob (
                CurrentBlob->Name,
                CurrentBlob->Data,
-               CurrentBlob->Size
+               CurrentBlob->Size,
+               FetchStatus
                );
     if (EFI_ERROR (Status)) {
       goto FreeBlobs;

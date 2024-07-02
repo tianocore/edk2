@@ -22,17 +22,20 @@
   @param[in] BlobName           The name of the blob
   @param[in] Buf                The data of the blob
   @param[in] BufSize            The size of the blob in bytes
+  @param[in] FetchStatus        The status of fetching this blob
 
-  @retval EFI_SUCCESS           The blob was verified successfully.
-  @retval EFI_ACCESS_DENIED     The blob could not be verified, and therefore
-                                should be considered non-secure.
+  @retval EFI_SUCCESS           The blob was verified successfully or was not
+                                found in the hash table.
+  @retval EFI_ACCESS_DENIED     Kernel hashes not supported but the boot can
+                                continue safely.
 **/
 EFI_STATUS
 EFIAPI
 VerifyBlob (
   IN  CONST CHAR16  *BlobName,
   IN  CONST VOID    *Buf,
-  IN  UINT32        BufSize
+  IN  UINT32        BufSize,
+  IN  EFI_STATUS    FetchStatus
   );
 
 #endif

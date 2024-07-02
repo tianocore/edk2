@@ -157,11 +157,6 @@
 !endif
 
   #
-  # ARM Virtual Architectural Timer -- fetch frequency from QEMU (TCG) or KVM
-  #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0
-
-  #
   # Network Pcds
   #
 !include NetworkPkg/NetworkPcds.dsc.inc

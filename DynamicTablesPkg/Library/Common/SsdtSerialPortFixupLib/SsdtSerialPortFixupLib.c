@@ -381,7 +381,7 @@ FixupName (
   }
 
   // Update the Device's name.
-  return AmlDeviceOpUpdateName (DeviceNode, (CHAR8 *)Name);
+  return AmlDeviceOpUpdateName (DeviceNode, Name);
 }
 
 /** Fixup the Serial Port Information in the AML tree.

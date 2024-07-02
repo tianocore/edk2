@@ -744,12 +744,12 @@ X509VerifyCert (
   @param[in]      RootCertLength    Trusted Root Certificate buffer length
   @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
                                     where the first certificate is signed by the Root
-                                    Certificate or is the Root Cerificate itself. and
-                                    subsequent cerificate is signed by the preceding
-                                    cerificate.
+                                    Certificate or is the Root Certificate itself. and
+                                    subsequent certificate is signed by the preceding
+                                    certificate.
   @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
 
-  @retval  TRUE   All cerificates was issued by the first certificate in X509Certchain.
+  @retval  TRUE   All certificates was issued by the first certificate in X509Certchain.
   @retval  FALSE  Invalid certificate or the certificate was not issued by the given
                   trusted CA.
 **/
@@ -816,9 +816,9 @@ X509VerifyCertChain (
 
   @param[in]      CertChain         One or more ASN.1 DER-encoded X.509 certificates
                                     where the first certificate is signed by the Root
-                                    Certificate or is the Root Cerificate itself. and
-                                    subsequent cerificate is signed by the preceding
-                                    cerificate.
+                                    Certificate or is the Root Certificate itself. and
+                                    subsequent certificate is signed by the preceding
+                                    certificate.
   @param[in]      CertChainLength   Total length of the certificate chain, in bytes.
 
   @param[in]      CertIndex         Index of certificate.
@@ -1592,7 +1592,7 @@ X509GetKeyUsage (
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
   @param[out]     Usage            Key Usage bytes.
-  @param[in, out] UsageSize        Key Usage buffer sizs in bytes.
+  @param[in, out] UsageSize        Key Usage buffer size in bytes.
 
   @retval TRUE                     The Usage bytes retrieve successfully.
   @retval FALSE                    If Cert is NULL.
@@ -1841,7 +1841,7 @@ X509CompareDateTime (
   @param[in]      Cert                     Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize                 size of the X509 certificate in bytes.
   @param[out]     BasicConstraints         basic constraints bytes.
-  @param[in, out] BasicConstraintsSize     basic constraints buffer sizs in bytes.
+  @param[in, out] BasicConstraintsSize     basic constraints buffer size in bytes.
 
   @retval TRUE                     The basic constraints retrieve successfully.
   @retval FALSE                    If cert is NULL.

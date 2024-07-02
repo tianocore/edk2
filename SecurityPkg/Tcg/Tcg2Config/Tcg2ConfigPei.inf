@@ -4,7 +4,7 @@
 #  This module initializes TPM device type based on variable and detection.
 #  NOTE: This module is only for reference only, each platform should have its own setup page.
 #
-# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -46,6 +46,8 @@
   TimerLib
   Tpm12CommandLib
   Tpm12DeviceLib
+  HobLib
+  MmUnblockMemoryLib
 
 [Guids]
   ## SOMETIMES_CONSUMES ## Variable:L"TCG2_CONFIGURATION"
@@ -53,15 +55,20 @@
   gTcg2ConfigFormSetGuid
   gEfiTpmDeviceSelectedGuid           ## PRODUCES             ## GUID    # Used as a PPI GUID
   gEfiTpmDeviceInstanceNoneGuid       ## SOMETIMES_CONSUMES   ## GUID    # TPM device identifier
+  gEdkiiTpmInstanceHobGuid
+  gEdkiiTcgPhysicalPresenceInterfaceVerHobGuid
+  gEdkiiTcg2AcpiCommunicateBufferHobGuid
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid     ## CONSUMES
   gPeiTpmInitializationDonePpiGuid    ## SOMETIMES_PRODUCES
+  gEfiPeiMemoryDiscoveredPpiGuid
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy         ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection                ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid AND

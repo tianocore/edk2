@@ -18,7 +18,7 @@
   FILE_GUID                      = D6494E1B-E06F-4ab5-B64D-48B25AA9EB33
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = SmmCpuPlatformHookLib
+  LIBRARY_CLASS                  = SmmCpuPlatformHookLib|DXE_SMM_DRIVER MM_STANDALONE
 
 #
 # The following information is for reference only and not required by the build tools.

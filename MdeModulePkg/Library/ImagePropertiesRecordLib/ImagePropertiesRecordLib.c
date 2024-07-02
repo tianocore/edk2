@@ -1052,7 +1052,7 @@ CreateImagePropertiesRecord (
 
   PdbPointer = PeCoffLoaderGetPdbPointer ((VOID *)(UINTN)ImageBase);
   if (PdbPointer != NULL) {
-    DEBUG ((DEBUG_ERROR, " Image - %a\n", PdbPointer));
+    DEBUG ((DEBUG_VERBOSE, " Image - %a\n", PdbPointer));
   }
 
   // Check PE/COFF image

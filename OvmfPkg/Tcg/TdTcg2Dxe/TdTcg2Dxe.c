@@ -23,7 +23,6 @@
 #include <Protocol/VariableWrite.h>
 #include <Protocol/Tcg2Protocol.h>
 #include <Protocol/TrEEProtocol.h>
-#include <Protocol/ResetNotification.h>
 #include <Protocol/AcpiTable.h>
 
 #include <Library/DebugLib.h>
@@ -2355,7 +2354,6 @@ InstallAcpiTable (
   UINTN                    TableKey;
   EFI_STATUS               Status;
   EFI_ACPI_TABLE_PROTOCOL  *AcpiTable;
-  UINT64                   OemTableId;
 
   Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **)&AcpiTable);
   if (EFI_ERROR (Status)) {
@@ -2366,8 +2364,7 @@ InstallAcpiTable (
   mTdxEventlogAcpiTemplate.Laml = (UINT64)PcdGet32 (PcdCcEventlogAcpiTableLaml);
   mTdxEventlogAcpiTemplate.Lasa = PcdGet64 (PcdCcEventlogAcpiTableLasa);
   CopyMem (mTdxEventlogAcpiTemplate.Header.OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (mTdxEventlogAcpiTemplate.Header.OemId));
-  OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
-  CopyMem (&mTdxEventlogAcpiTemplate.Header.OemTableId, &OemTableId, sizeof (UINT64));
+  mTdxEventlogAcpiTemplate.Header.OemTableId      = PcdGet64 (PcdAcpiDefaultOemTableId);
   mTdxEventlogAcpiTemplate.Header.OemRevision     = PcdGet32 (PcdAcpiDefaultOemRevision);
   mTdxEventlogAcpiTemplate.Header.CreatorId       = PcdGet32 (PcdAcpiDefaultCreatorId);
   mTdxEventlogAcpiTemplate.Header.CreatorRevision = PcdGet32 (PcdAcpiDefaultCreatorRevision);

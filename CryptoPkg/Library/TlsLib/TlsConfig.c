@@ -500,6 +500,24 @@ TlsSetVerifyHost (
     return EFI_INVALID_PARAMETER;
   }
 
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "%a:%a: SNI hostname: %a\n",
+    gEfiCallerBaseName,
+    __func__,
+    HostName
+    ));
+
+  if (!SSL_set_tlsext_host_name (TlsConn->Ssl, HostName)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a:%a: Could not set hostname %a for SNI\n",
+      gEfiCallerBaseName,
+      __func__,
+      HostName
+      ));
+  }
+
   SSL_set_hostflags (TlsConn->Ssl, Flags);
 
   VerifyParam = SSL_get0_param (TlsConn->Ssl);
