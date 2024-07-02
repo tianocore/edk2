@@ -143,6 +143,25 @@ MemEncryptSevGetEncryptionMask (
 }
 
 /**
+  Returns a boolean to indicate whether DebugVirtualization is enabled.
+
+  @retval TRUE           DebugVirtualization is enabled
+  @retval FALSE          DebugVirtualization is not enabled
+**/
+BOOLEAN
+EFIAPI
+MemEncryptSevEsDebugVirtualizationIsEnabled (
+  VOID
+  )
+{
+  MSR_SEV_STATUS_REGISTER  Msr;
+
+  Msr.Uint32 = InternalMemEncryptSevStatus ();
+
+  return Msr.Bits.DebugVirtualization ? TRUE : FALSE;
+}
+
+/**
   Locate the page range that covers the initial (pre-SMBASE-relocation) SMRAM
   Save State Map.
 
