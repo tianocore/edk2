@@ -379,10 +379,12 @@ AddSubspaceStructType1 (
   Doorbell      = &GenericPccCmObj->DoorbellReg;
   ChannelTiming = &GenericPccCmObj->ChannelTiming;
 
+  ASSERT ((PccCmObj->PlatIrq.Flags & ~MAX_UINT8) == 0);
+
   PccAcpi->Type                   = GenericPccCmObj->Type;
   PccAcpi->Length                 = sizeof (EFI_ACPI_6_4_PCCT_SUBSPACE_1_HW_REDUCED_COMMUNICATIONS);
   PccAcpi->PlatformInterrupt      = PccCmObj->PlatIrq.Interrupt;
-  PccAcpi->PlatformInterruptFlags = PccCmObj->PlatIrq.Flags;
+  PccAcpi->PlatformInterruptFlags = (UINT8)PccCmObj->PlatIrq.Flags;
   PccAcpi->Reserved               = EFI_ACPI_RESERVED_BYTE;
   PccAcpi->BaseAddress            = GenericPccCmObj->BaseAddress;
   PccAcpi->AddressLength          = GenericPccCmObj->AddressLength;
@@ -441,10 +443,12 @@ AddSubspaceStructType2 (
   PlatIrqAck    = &PccCmObj->PlatIrqAckReg;
   ChannelTiming = &GenericPccCmObj->ChannelTiming;
 
+  ASSERT ((PccCmObj->PlatIrq.Flags & ~MAX_UINT8) == 0);
+
   PccAcpi->Type                   = GenericPccCmObj->Type;
   PccAcpi->Length                 = sizeof (EFI_ACPI_6_4_PCCT_SUBSPACE_2_HW_REDUCED_COMMUNICATIONS);
   PccAcpi->PlatformInterrupt      = PccCmObj->PlatIrq.Interrupt;
-  PccAcpi->PlatformInterruptFlags = PccCmObj->PlatIrq.Flags;
+  PccAcpi->PlatformInterruptFlags = (UINT8)PccCmObj->PlatIrq.Flags;
   PccAcpi->BaseAddress            = GenericPccCmObj->BaseAddress;
   PccAcpi->Reserved               = EFI_ACPI_RESERVED_BYTE;
   PccAcpi->BaseAddress            = GenericPccCmObj->BaseAddress;
@@ -519,13 +523,16 @@ AddSubspaceStructType34 (
   ErrorStatus       = &PccCmObj->ErrorStatusReg;
   ChannelTiming     = &GenericPccCmObj->ChannelTiming;
 
+  ASSERT ((PccCmObj->PlatIrq.Flags & ~MAX_UINT8) == 0);
+  ASSERT ((GenericPccCmObj->AddressLength & ~MAX_UINT32) == 0);
+
   PccAcpi->Type                   = GenericPccCmObj->Type;
   PccAcpi->Length                 = sizeof (EFI_ACPI_6_4_PCCT_SUBSPACE_3_EXTENDED_PCC);
   PccAcpi->PlatformInterrupt      = PccCmObj->PlatIrq.Interrupt;
-  PccAcpi->PlatformInterruptFlags = PccCmObj->PlatIrq.Flags;
+  PccAcpi->PlatformInterruptFlags = (UINT8)PccCmObj->PlatIrq.Flags;
   PccAcpi->Reserved               = EFI_ACPI_RESERVED_BYTE;
   PccAcpi->BaseAddress            = GenericPccCmObj->BaseAddress;
-  PccAcpi->AddressLength          = GenericPccCmObj->AddressLength;
+  PccAcpi->AddressLength          = (UINT32)GenericPccCmObj->AddressLength;
 
   CopyMem (
     &PccAcpi->DoorbellRegister,
