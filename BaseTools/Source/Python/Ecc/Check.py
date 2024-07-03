@@ -250,12 +250,41 @@ class Check(object):
                     IndexOfLine = 0
                     for Line in op:
                         IndexOfLine += 1
-                        IndexOfChar = 0
-                        for Char in Line:
-                            IndexOfChar += 1
-                            if ord(Char) > 126:
-                                OtherMsg = "File %s has Non-ASCII char at line %s column %s" % (Record[1], IndexOfLine, IndexOfChar)
-                                EccGlobalData.gDb.TblReport.Insert(ERROR_GENERAL_CHECK_NON_ASCII, OtherMsg=OtherMsg, BelongsToTable='File', BelongsToItem=Record[0])
+                        NonAsciiChars = []
+
+                        def HasNonAsciiException(String, Idx):
+                            End = String[Idx:].find(" ") + Idx
+                            Start = String[0:Idx].rfind(" ")
+                            if End == -1:
+                                End = String.length() - 1
+                            if Start == -1:
+                                Start = Idx
+                            else:
+                                Start = Start + 1
+                            Word = String[Start:End]
+
+                            if (EccGlobalData.gException.IsException(ERROR_GENERAL_CHECK_NON_ASCII, Word)):
+                                return True
+                            return False
+
+                        def HasNonAsciiChar(Line, Offset):
+                            try:
+                                Chars = bytes(Line[Offset:], "utf-8")
+                                Chars.decode("ascii")
+                            except UnicodeDecodeError as err:
+                                ErrIdx = err.start + Offset
+                                if not HasNonAsciiException(Line, ErrIdx):
+                                    Retval = HasNonAsciiChar(Line, ErrIdx + 1)
+                                    return [ErrIdx] + Retval
+
+                            else:
+                                return []
+
+                        NonAsciiChars = HasNonAsciiChar(Line, 0)
+
+                        if NonAsciiChars:
+                            OtherMsg = "File %s has Non-ASCII char at line %s column(s) %s" % (Record[1], IndexOfLine, NonAsciiChars)
+                            EccGlobalData.gDb.TblReport.Insert(ERROR_GENERAL_CHECK_NON_ASCII, OtherMsg=OtherMsg, BelongsToTable='File', BelongsToItem=Record[0])
 
     # C Function Layout Checking
     def FunctionLayoutCheck(self):
