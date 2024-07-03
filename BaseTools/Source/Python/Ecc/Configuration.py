@@ -59,7 +59,7 @@ _ConfigFileToInternalTranslation = {
     "GeneralCheckNoProgma":"GeneralCheckNoProgma",
     "GeneralCheckNoTab":"GeneralCheckNoTab",
     "GeneralCheckNo_Asm":"GeneralCheckNo_Asm",
-    "GeneralCheckNonAcsii":"GeneralCheckNonAcsii",
+    "GeneralCheckNonAscii":"GeneralCheckNonAscii",
     "GeneralCheckTabWidth":"GeneralCheckTabWidth",
     "GeneralCheckTrailingWhiteSpaceLine":"GeneralCheckTrailingWhiteSpaceLine",
     "GeneralCheckUni":"GeneralCheckUni",
@@ -179,8 +179,8 @@ class Configuration(object):
         self.GeneralCheckCarriageReturn = 1
         # Check whether the file exists
         self.GeneralCheckFileExistence = 1
-        # Check whether file has non ACSII char
-        self.GeneralCheckNonAcsii = 1
+        # Check whether file has non ASCII char
+        self.GeneralCheckNonAscii = 1
         # Check whether UNI file is valid
         self.GeneralCheckUni = 1
         # Check Only use CRLF (Carriage Return Line Feed) line endings.
