@@ -553,11 +553,11 @@ DmaAllocateAlignedBuffer (
 
   InsertHeadList (&UncachedAllocationList, &Alloc->Link);
 
-  // Remap the region with the new attributes
+  // Remap the region with the new attributes and mark it non-executable
   Status = gDS->SetMemorySpaceAttributes (
                   (PHYSICAL_ADDRESS)(UINTN)Allocation,
                   EFI_PAGES_TO_SIZE (Pages),
-                  MemType
+                  MemType | EFI_MEMORY_XP
                   );
   if (EFI_ERROR (Status)) {
     goto FreeAlloc;
