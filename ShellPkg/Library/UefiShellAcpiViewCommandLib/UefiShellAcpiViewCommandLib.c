@@ -3,6 +3,7 @@
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2016 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -75,6 +76,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { RSDP_TABLE_INFO,                                                                                     ParseAcpiRsdp },
   { EFI_ACPI_6_2_SYSTEM_LOCALITY_INFORMATION_TABLE_SIGNATURE,                                            ParseAcpiSlit },
   { EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,                                        ParseAcpiSpcr },
+  { EFI_ACPI_6_5_SERVER_PLATFORM_MANAGEMENT_INTERFACE_TABLE_SIGNATURE,                                   ParseAcpiSpmi },
   { EFI_ACPI_6_2_SYSTEM_RESOURCE_AFFINITY_TABLE_SIGNATURE,                                               ParseAcpiSrat },
   { EFI_ACPI_6_2_SECONDARY_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,                                           ParseAcpiSsdt },
   { EFI_ACPI_6_5_WINDOWS_SMM_SECURITY_MITIGATION_TABLE_SIGNATURE,                                        ParseAcpiWsmt },
