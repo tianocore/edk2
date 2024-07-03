@@ -1026,7 +1026,8 @@ CreateAmlCpuTopologyTree (
         if (Generator->ProcNodeList[Index].OverrideNameUidEnabled) {
           Name = Generator->ProcNodeList[Index].OverrideName;
         } else {
-          Name = CpuIndex;
+          ASSERT ((CpuIndex & ~MAX_UINT16) == 0);
+          Name = (UINT16)CpuIndex;
         }
 
         Status = CreateAmlCpuFromProcHierarchy (
@@ -1061,7 +1062,8 @@ CreateAmlCpuTopologyTree (
           Name = Generator->ProcNodeList[Index].OverrideName;
           Uid  = Generator->ProcNodeList[Index].OverrideUid;
         } else {
-          Name = ProcContainerName;
+          ASSERT ((ProcContainerName & ~MAX_UINT16) == 0);
+          Name = (UINT16)ProcContainerName;
           Uid  = *ProcContainerIndex;
         }
 

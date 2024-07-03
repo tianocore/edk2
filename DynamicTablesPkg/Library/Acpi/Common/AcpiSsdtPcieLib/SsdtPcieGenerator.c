@@ -311,7 +311,7 @@ GeneratePrt (
   )
 {
   EFI_STATUS                             Status;
-  INT32                                  Index;
+  UINT32                                 Index;
   AML_OBJECT_NODE_HANDLE                 PrtNode;
   CM_ARCH_COMMON_OBJ_REF                 *RefInfo;
   UINT32                                 RefCount;
@@ -561,6 +561,11 @@ GeneratePciCrs (
         break;
 
       case PCI_SS_M32:
+        ASSERT ((AddrMapInfo->PciAddress & ~MAX_UINT32) == 0);
+        ASSERT (((AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1) & ~MAX_UINT32) == 0);
+        ASSERT (((Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0) & ~MAX_UINT32) == 0);
+        ASSERT ((AddrMapInfo->AddressSize & ~MAX_UINT32) == 0);
+
         Status = AmlCodeGenRdDWordMemory (
                    FALSE,
                    IsPosDecode,
@@ -569,10 +574,10 @@ GeneratePciCrs (
                    AmlMemoryCacheable,
                    TRUE,
                    0,
-                   AddrMapInfo->PciAddress,
-                   AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1,
-                   Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0,
-                   AddrMapInfo->AddressSize,
+                   (UINT32)(AddrMapInfo->PciAddress),
+                   (UINT32)(AddrMapInfo->PciAddress + AddrMapInfo->AddressSize - 1),
+                   (UINT32)(Translation ? AddrMapInfo->CpuAddress - AddrMapInfo->PciAddress : 0),
+                   (UINT32)(AddrMapInfo->AddressSize),
                    0,
                    NULL,
                    AmlAddressRangeMemory,
