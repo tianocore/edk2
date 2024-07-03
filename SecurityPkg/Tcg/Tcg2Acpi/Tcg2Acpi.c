@@ -641,7 +641,7 @@ UpdateHID (
         CopyMem (DataPtr, Hid, TPM_HID_ACPI_SIZE);
       }
 
-      DEBUG ((DEBUG_INFO, "TPM2 ACPI _HID is patched to %a\n", DataPtr));
+      DEBUG ((DEBUG_INFO, "TPM2 ACPI _HID is patched to %a\n", Hid));
 
       return Status;
     }
