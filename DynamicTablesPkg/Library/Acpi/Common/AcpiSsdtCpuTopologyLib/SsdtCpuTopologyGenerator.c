@@ -1313,6 +1313,7 @@ exit_handler:
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreeSsdtCpuTopologyTableResources (
   IN      CONST ACPI_TABLE_GENERATOR                  *CONST  This,
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,

@@ -1075,6 +1075,7 @@ error_handler:
 **/
 STATIC
 EFI_STATUS
+EFIAPI
 FreePcctTableResources (
   IN      CONST ACPI_TABLE_GENERATOR                  *CONST  This,
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO            *CONST  AcpiTableInfo,
