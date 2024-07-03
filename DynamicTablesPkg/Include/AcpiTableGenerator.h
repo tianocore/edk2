@@ -214,7 +214,7 @@ typedef struct AcpiTableGenerator           ACPI_TABLE_GENERATOR;
   @return  EFI_SUCCESS If the table is generated successfully or other
                         failure codes as returned by the generator.
 **/
-typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_BUILD_TABLE) (
+typedef EFI_STATUS (EFIAPI *ACPI_TABLE_GENERATOR_BUILD_TABLE)(
   IN  CONST ACPI_TABLE_GENERATOR                           *This,
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
@@ -234,7 +234,7 @@ typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_BUILD_TABLE) (
   @return EFI_SUCCESS  If freed successfully or other failure codes
                         as returned by the generator.
 **/
-typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_FREE_TABLE) (
+typedef EFI_STATUS (EFIAPI *ACPI_TABLE_GENERATOR_FREE_TABLE)(
   IN      CONST ACPI_TABLE_GENERATOR                   *CONST  This,
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
@@ -257,7 +257,7 @@ typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_FREE_TABLE) (
   @return  EFI_SUCCESS If the table is generated successfully or other
                         failure codes as returned by the generator.
 **/
-typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_BUILD_TABLEEX) (
+typedef EFI_STATUS (EFIAPI *ACPI_TABLE_GENERATOR_BUILD_TABLEEX)(
   IN  CONST ACPI_TABLE_GENERATOR                           *This,
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
@@ -280,7 +280,7 @@ typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_BUILD_TABLEEX) (
   @return EFI_SUCCESS  If freed successfully or other failure codes
                         as returned by the generator.
 **/
-typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_FREE_TABLEEX) (
+typedef EFI_STATUS (EFIAPI *ACPI_TABLE_GENERATOR_FREE_TABLEEX)(
   IN      CONST ACPI_TABLE_GENERATOR                   *CONST  This,
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
