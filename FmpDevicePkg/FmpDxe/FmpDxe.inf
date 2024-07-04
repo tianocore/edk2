@@ -5,6 +5,7 @@
 #
 #  Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
 #  Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -78,7 +79,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                            ## SOMETIMES_PRODUCES
 
 [Depex]
-  gEfiVariableWriteArchProtocolGuid AND gEdkiiVariableLockProtocolGuid
+  gEfiVariableWriteArchProtocolGuid AND gEdkiiVariablePolicyProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   FmpDxeExtra.uni
