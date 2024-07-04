@@ -86,7 +86,7 @@ struct MockHobLib {
     VOID *,
     BuildGuidDataHob,
     (IN CONST EFI_GUID  *Guid,
-     IN VOID            *Data,
+     IN CONST VOID      *Data,
      IN UINTN           DataLength)
     );
   MOCK_FUNCTION_DECLARATION (
