@@ -320,7 +320,7 @@ VOID *
 EFIAPI
 BuildGuidDataHob (
   IN CONST EFI_GUID  *Guid,
-  IN VOID            *Data,
+  IN CONST VOID      *Data,
   IN UINTN           DataLength
   )
 {
