@@ -190,7 +190,7 @@ Tcg2ConfigPeimEntryPoint (
   //
   Hob = BuildGuidDataHob (
           &gEdkiiTpmInstanceHobGuid,
-          PcdGetPtr (PcdTpmInstanceGuid),
+          (VOID *)PcdGetPtr (PcdTpmInstanceGuid),
           sizeof (EFI_GUID)
           );
   ASSERT (Hob != NULL);
@@ -200,7 +200,7 @@ Tcg2ConfigPeimEntryPoint (
   //
   Hob = BuildGuidDataHob (
           &gEdkiiTcgPhysicalPresenceInterfaceVerHobGuid,
-          PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
+          (VOID *)PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
           AsciiStrSize ((CHAR8 *)PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
           );
   ASSERT (Hob != NULL);
