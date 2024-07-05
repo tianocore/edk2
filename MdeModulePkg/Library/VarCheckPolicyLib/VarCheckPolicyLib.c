@@ -2,6 +2,7 @@
 This is a NULL library instance that leverages the VarCheck interface
 and the business logic behind the VariablePolicy code to make its decisions.
 
+Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -105,13 +106,15 @@ VarCheckPolicyLibMmiHandler (
     return EFI_INVALID_PARAMETER;
   }
 
-  // Make sure that the buffer does not overlap SMM.
+  //
+  // Make sure that the buffer is valid.
   // This should be covered by the SmiManage infrastructure, but just to be safe...
+  //
   InternalCommBufferSize = *CommBufferSize;
   if ((InternalCommBufferSize > VAR_CHECK_POLICY_MM_COMM_BUFFER_SIZE) ||
-      !VarCheckPolicyIsBufferOutsideValid ((UINTN)CommBuffer, (UINT64)InternalCommBufferSize))
+      !VarCheckPolicyIsPrimaryBufferValid ((UINTN)CommBuffer, (UINT64)InternalCommBufferSize))
   {
-    DEBUG ((DEBUG_ERROR, "%a - Invalid CommBuffer supplied! 0x%016lX[0x%016lX]\n", __func__, CommBuffer, InternalCommBufferSize));
+    DEBUG ((DEBUG_ERROR, "%a - Invalid Primary Buffer (CommBuffer) supplied! 0x%016lX[0x%016lX]\n", __func__, CommBuffer, InternalCommBufferSize));
     return EFI_INVALID_PARAMETER;
   }
 

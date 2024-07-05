@@ -1,6 +1,7 @@
 /** @file -- VarCheckPolicyLibTraditional.c
 This is an instance of a VarCheck lib constructor for traditional SMM.
 
+Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -31,7 +32,7 @@ VarCheckPolicyLibTraditionalConstructor (
 }
 
 /**
-  This function is wrapper function to validate the buffer.
+  This function is wrapper function to validate the Primary Buffer (CommBuffer).
 
   @param Buffer  The buffer start address to be checked.
   @param Length  The buffer length to be checked.
@@ -41,7 +42,7 @@ VarCheckPolicyLibTraditionalConstructor (
 **/
 BOOLEAN
 EFIAPI
-VarCheckPolicyIsBufferOutsideValid (
+VarCheckPolicyIsPrimaryBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   )
