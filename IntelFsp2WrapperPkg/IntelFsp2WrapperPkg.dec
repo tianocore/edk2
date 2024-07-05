@@ -90,23 +90,6 @@
   # @Prompt Skip FSP API from FSP wrapper.
   gIntelFsp2WrapperTokenSpaceGuid.PcdSkipFspApi|0x00000000|UINT32|0x40000009
 
-  ## This PCD decides how FSP is measured
-  # 1) The BootGuard ACM may already measured the FSP component, such as FSPT/FSPM.
-  # We need a flag (PCD) to indicate if there is need to do such FSP measurement or NOT.
-  # 2) The FSP binary includes FSP code and FSP UPD region. The UPD region is considered
-  # as configuration block, and it may be updated by OEM by design.
-  # This flag (PCD) is to indicate if we need isolate the UPD region from the FSP code region.
-  # BIT0: Need measure FSP. (for FSP1.x) - reserved in FSP2.
-  # BIT1: Need measure FSPT. (for FSP 2.x)
-  # BIT2: Need measure FSPM. (for FSP 2.x)
-  # BIT3: Need measure FSPS. (for FSP 2.x)
-  # BIT4~30: reserved.
-  # BIT31: Need isolate UPD region measurement.
-    #0: measure FSP[T|M|S] as one binary in one record (PCR0).
-    #1: measure FSP UPD region in one record (PCR1), the FSP code without UPD in another record (PCR0).
-  #
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig|0x00000000|UINT32|0x4000000B
-
 [PcdsFixedAtBuild, PcdsPatchableInModule,PcdsDynamic,PcdsDynamicEx]
   ## This PCD decides how Wrapper code utilizes FSP
   # 0: DISPATCH mode (FSP Wrapper will load PeiCore from FSP without calling FSP API)
@@ -137,3 +120,20 @@
   # Non-0 means PcdFspsUpdDataAddress will be ignored, otherwise PcdFspsUpdDataAddress will be used.
   #
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress64|0x00000000|UINT64|0x50000003
+
+  ## This PCD decides how FSP is measured
+  # 1) The BootGuard ACM may already measured the FSP component, such as FSPT/FSPM.
+  # We need a flag (PCD) to indicate if there is need to do such FSP measurement or NOT.
+  # 2) The FSP binary includes FSP code and FSP UPD region. The UPD region is considered
+  # as configuration block, and it may be updated by OEM by design.
+  # This flag (PCD) is to indicate if we need isolate the UPD region from the FSP code region.
+  # BIT0: Need measure FSP. (for FSP1.x) - reserved in FSP2.
+  # BIT1: Need measure FSPT. (for FSP 2.x)
+  # BIT2: Need measure FSPM. (for FSP 2.x)
+  # BIT3: Need measure FSPS. (for FSP 2.x)
+  # BIT4~30: reserved.
+  # BIT31: Need isolate UPD region measurement.
+    #0: measure FSP[T|M|S] as one binary in one record (PCR0).
+    #1: measure FSP UPD region in one record (PCR1), the FSP code without UPD in another record (PCR0).
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig|0x00000000|UINT32|0x50000004
