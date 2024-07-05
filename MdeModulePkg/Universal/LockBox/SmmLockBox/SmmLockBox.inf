@@ -40,7 +40,7 @@
 [LibraryClasses]
   UefiDriverEntryPoint
   UefiBootServicesTableLib
-  SmmServicesTableLib
+  MmServicesTableLib
   BaseLib
   BaseMemoryLib
   DebugLib

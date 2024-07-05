@@ -19,7 +19,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/LockBoxLib.h>
 #include <Library/MmServicesTableLib.h>
-#include <Library/SmmServicesTableLib.h>
 
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmCommunication.h>

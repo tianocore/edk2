@@ -394,7 +394,7 @@ SmmLockBoxEntryPointCommon (
   //
   // Register LockBox communication handler
   //
-  Status = gSmst->MmiHandlerRegister (
+  Status = gMmst->MmiHandlerRegister (
                     SmmLockBoxHandler,
                     &gEfiSmmLockBoxCommunicationGuid,
                     &DispatchHandle
@@ -407,7 +407,7 @@ SmmLockBoxEntryPointCommon (
   //
   // Register SMM Ready To Lock Protocol notification
   //
-  Status = gSmst->MmRegisterProtocolNotify (
+  Status = gMmst->MmRegisterProtocolNotify (
                     &gEfiSmmReadyToLockProtocolGuid,
                     SmmReadyToLockEventNotify,
                     &Registration
