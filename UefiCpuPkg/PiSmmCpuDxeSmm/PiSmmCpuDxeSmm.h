@@ -471,9 +471,6 @@ extern BOOLEAN                       mSmmDebugAgentSupport;
 //
 extern UINT64  mAddressEncMask;
 
-extern UINT64  mTimeoutTicker;
-extern UINT64  mTimeoutTicker2;
-
 /**
   Create 4G PageTable in SMRAM.
 
@@ -536,17 +533,15 @@ StartSyncTimer (
   );
 
 /**
-  Check if the SMM AP Sync Timer is timeout specified by Timeout.
+  Check if the SMM AP Sync timer is timeout.
 
-  @param Timer    The start timer from the begin.
-  @param Timeout  The timeout ticker to wait.
+  @param Timer  The start timer from the begin.
 
 **/
 BOOLEAN
 EFIAPI
 IsSyncTimerTimeout (
-  IN      UINT64  Timer,
-  IN      UINT64  Timeout
+  IN      UINT64  Timer
   );
 
 /**
