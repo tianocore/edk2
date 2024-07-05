@@ -1516,7 +1516,7 @@ DestroyHiiVariableNode (
 **/
 VOID *
 BuildVarCheckHiiBin (
-  OUT UINTN  *Size
+  IN OUT UINTN  *Size
   )
 {
   VAR_CHECK_HII_VARIABLE_NODE  *HiiVariableNode;
