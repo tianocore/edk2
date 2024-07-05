@@ -1,7 +1,7 @@
 /** @file
 Enable SMM profile.
 
-Copyright (c) 2012 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -594,6 +594,7 @@ InitPaging (
   UINT64         Limit;
   UINT64         PreviousAddress;
   UINT64         MemoryAttrMask;
+  BOOLEAN        IsSet;
   BOOLEAN        WriteProtect;
   BOOLEAN        CetEnabled;
 
@@ -616,19 +617,38 @@ InitPaging (
   DEBUG ((DEBUG_INFO, "Patch page table start ...\n"));
   if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
     for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
-      MemoryAttrMask = 0;
-      if (mProtectionMemRange[Index].Nx == TRUE) {
+      Base   = mProtectionMemRange[Index].Range.Base;
+      Length = mProtectionMemRange[Index].Range.Top - Base;
+
+      MemoryAttrMask = EFI_MEMORY_RP;
+      if (!mProtectionMemRange[Index].Present) {
+        //
+        // Config the EFI_MEMORY_RP attribute to make it non-present.
+        //
+        IsSet = TRUE;
+      } else {
+        //
+        // Clear the EFI_MEMORY_RP attribute to make it present.
+        //
+        IsSet = FALSE;
+
+        //
+        // Config the range as writable and executable when mapping a range as present.
+        //
+        MemoryAttrMask |= EFI_MEMORY_RO;
         MemoryAttrMask |= EFI_MEMORY_XP;
       }
 
-      if (mProtectionMemRange[Index].Present == FALSE) {
-        MemoryAttrMask = EFI_MEMORY_RP;
-      }
+      Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttrMask, IsSet, NULL);
+      ASSERT_RETURN_ERROR (Status);
 
-      Base   = mProtectionMemRange[Index].Range.Base;
-      Length = mProtectionMemRange[Index].Range.Top - Base;
-      if (MemoryAttrMask != 0) {
-        Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttrMask, TRUE, NULL);
+      if (mProtectionMemRange[Index].Present && mProtectionMemRange[Index].Nx) {
+        //
+        // Since EFI_MEMORY_XP has already been cleared above, only handle the case to disable execution.
+        // Config the EFI_MEMORY_XP attribute to disable execution.
+        //
+        MemoryAttrMask = EFI_MEMORY_XP;
+        Status         = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttrMask, TRUE, NULL);
         ASSERT_RETURN_ERROR (Status);
       }
 
