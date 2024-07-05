@@ -19,7 +19,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/SmmServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -66,28 +65,11 @@ SmmLockBoxEntryPoint (
   )
 {
   EFI_STATUS  Status;
-  EFI_HANDLE  DispatchHandle;
-  VOID        *Registration;
 
-  //
-  // Register LockBox communication handler
-  //
-  Status = gSmst->SmiHandlerRegister (
-                    SmmLockBoxHandler,
-                    &gEfiSmmLockBoxCommunicationGuid,
-                    &DispatchHandle
-                    );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Register SMM Ready To Lock Protocol notification
-  //
-  Status = gSmst->SmmRegisterProtocolNotify (
-                    &gEfiSmmReadyToLockProtocolGuid,
-                    SmmReadyToLockEventNotify,
-                    &Registration
-                    );
-  ASSERT_EFI_ERROR (Status);
+  Status = SmmLockBoxEntryPointCommon ();
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Install NULL to DXE data base as notify

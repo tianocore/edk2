@@ -376,3 +376,42 @@ SmmReadyToLockEventNotify (
   mLocked = TRUE;
   return EFI_SUCCESS;
 }
+
+/**
+  Common function for LockBox (MM) driver.
+  @retval EFI_SUCEESS
+  @return Others          Some error occurs.
+**/
+EFI_STATUS
+SmmLockBoxEntryPointCommon (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  DispatchHandle;
+  VOID        *Registration;
+
+  //
+  // Register LockBox communication handler
+  //
+  Status = gSmst->MmiHandlerRegister (
+                    SmmLockBoxHandler,
+                    &gEfiSmmLockBoxCommunicationGuid,
+                    &DispatchHandle
+                    );
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Register SMM Ready To Lock Protocol notification
+  //
+  Status = gSmst->MmRegisterProtocolNotify (
+                    &gEfiSmmReadyToLockProtocolGuid,
+                    SmmReadyToLockEventNotify,
+                    &Registration
+                    );
+  ASSERT_EFI_ERROR (Status);
+  return Status;
+}

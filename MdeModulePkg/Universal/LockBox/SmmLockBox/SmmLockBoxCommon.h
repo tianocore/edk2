@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/LockBoxLib.h>
 #include <Library/MmServicesTableLib.h>
+#include <Library/SmmServicesTableLib.h>
 
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmCommunication.h>
@@ -127,6 +128,16 @@ SmmReadyToLockEventNotify (
   IN CONST EFI_GUID  *Protocol,
   IN VOID            *Interface,
   IN EFI_HANDLE      Handle
+  );
+
+/**
+  Common function for LockBox (MM) driver.
+  @retval EFI_SUCEESS
+  @return Others          Some error occurs.
+**/
+EFI_STATUS
+SmmLockBoxEntryPointCommon (
+  VOID
   );
 
 #endif
