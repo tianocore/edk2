@@ -130,6 +130,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdSmmApPerfLogEnable                  ## CONSUMES
 
 [Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2                ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber        ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize                   ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize                     ## CONSUMES
