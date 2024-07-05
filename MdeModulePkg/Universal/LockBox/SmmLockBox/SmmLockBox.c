@@ -34,6 +34,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "SmmLockBoxCommon.h"
 
 /**
+  This function is an abstraction layer for implementation specific Mm buffer validation routine.
+  @param Buffer  The buffer start address to be checked.
+  @param Length  The buffer length to be checked.
+  @retval TRUE  This buffer is valid per processor architecture and not overlap with SMRAM.
+  @retval FALSE This buffer is not valid per processor architecture or overlap with SMRAM.
+**/
+BOOLEAN
+IsBufferValid (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  )
+{
+  return SmmIsBufferOutsideSmmValid (Buffer, Length);
+}
+
+/**
   Entry Point for LockBox SMM driver.
 
   @param[in] ImageHandle  Image handle of this driver.

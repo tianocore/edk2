@@ -54,7 +54,7 @@ SmmLockBoxSave (
   //
   // Sanity check
   //
-  if (!SmmIsBufferOutsideSmmValid ((UINTN)TempLockBoxParameterSave.Buffer, (UINTN)TempLockBoxParameterSave.Length)) {
+  if (!IsBufferValid ((UINTN)TempLockBoxParameterSave.Buffer, (UINTN)TempLockBoxParameterSave.Length)) {
     DEBUG ((DEBUG_ERROR, "SmmLockBox Save address in SMRAM or buffer overflow!\n"));
     LockBoxParameterSave->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return;
@@ -144,7 +144,7 @@ SmmLockBoxUpdate (
   //
   // Sanity check
   //
-  if (!SmmIsBufferOutsideSmmValid ((UINTN)TempLockBoxParameterUpdate.Buffer, (UINTN)TempLockBoxParameterUpdate.Length)) {
+  if (!IsBufferValid ((UINTN)TempLockBoxParameterUpdate.Buffer, (UINTN)TempLockBoxParameterUpdate.Length)) {
     DEBUG ((DEBUG_ERROR, "SmmLockBox Update address in SMRAM or buffer overflow!\n"));
     LockBoxParameterUpdate->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return;
@@ -191,7 +191,7 @@ SmmLockBoxRestore (
   //
   // Sanity check
   //
-  if (!SmmIsBufferOutsideSmmValid ((UINTN)TempLockBoxParameterRestore.Buffer, (UINTN)TempLockBoxParameterRestore.Length)) {
+  if (!IsBufferValid ((UINTN)TempLockBoxParameterRestore.Buffer, (UINTN)TempLockBoxParameterRestore.Length)) {
     DEBUG ((DEBUG_ERROR, "SmmLockBox Restore address in SMRAM or buffer overflow!\n"));
     LockBoxParameterRestore->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return;
@@ -288,7 +288,7 @@ SmmLockBoxHandler (
     return EFI_SUCCESS;
   }
 
-  if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+  if (!IsBufferValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((DEBUG_ERROR, "SmmLockBox Command Buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
