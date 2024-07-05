@@ -18,7 +18,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // 1: FV raw data will be copied to permanent memory for later phase use (such as
 //    FV measurement).
 //
-#define FLAGS_FV_RAW_DATA_COPY  BIT0
+#define FLAGS_FV_RAW_DATA_COPY                    BIT0
+#define FLAGS_FV_MIGRATE_BEFORE_PEI_CORE_REENTRY  BIT1
 
 ///
 /// In real use cases, not all FVs need migrate to permanent memory before TempRam tears
