@@ -134,7 +134,6 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize                   ## SOMETIMES_CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize                     ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout                 ## CONSUMES
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2                ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugDataAddress               ## SOMETIMES_PRODUCES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable         ## CONSUMES
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
