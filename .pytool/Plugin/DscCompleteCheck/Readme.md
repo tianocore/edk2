@@ -29,4 +29,5 @@ Path to DSC to consider platform dsc
 
 ### IgnoreInf
 
-Ignore error if Inf file is not listed in DSC file
+A list of paths in git ignore syntax to ignore in the check. These can include directory and file paths. The path is
+relative to the directory that contains the package.
