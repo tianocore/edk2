@@ -177,11 +177,14 @@ Get (
   EFI_STATUS  Status;
   UINTN       Index, Offset, RegisterBase;
 
-  Status = PL061Locate (Gpio, &Index, &Offset, &RegisterBase);
-  ASSERT_EFI_ERROR (Status);
-
   if (Value == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  Status = PL061Locate (Gpio, &Index, &Offset, &RegisterBase);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   }
 
   if (PL061GetPins (RegisterBase, GPIO_PIN_MASK (Offset)) != 0) {
@@ -223,7 +226,10 @@ Set (
   UINTN       Index, Offset, RegisterBase;
 
   Status = PL061Locate (Gpio, &Index, &Offset, &RegisterBase);
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
 
   switch (Mode) {
     case GPIO_MODE_INPUT:
@@ -285,12 +291,15 @@ GetMode (
   EFI_STATUS  Status;
   UINTN       Index, Offset, RegisterBase;
 
-  Status = PL061Locate (Gpio, &Index, &Offset, &RegisterBase);
-  ASSERT_EFI_ERROR (Status);
-
   // Check for errors
   if (Mode == NULL) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  Status = PL061Locate (Gpio, &Index, &Offset, &RegisterBase);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
   }
 
   // Check if it is input or output
