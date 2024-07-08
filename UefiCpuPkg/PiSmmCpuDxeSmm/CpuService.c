@@ -431,7 +431,7 @@ SmmCpuRendezvous (
     goto ON_EXIT;
   }
 
-  if ((mSmmMpSyncData->EffectiveSyncMode != SmmCpuSyncModeTradition) && !SmmCpuFeaturesNeedConfigureMtrrs ()) {
+  if ((mSmmMpSyncData->EffectiveSyncMode != MmCpuSyncModeTradition) && !SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // There are some APs outside SMM, Wait for all avaiable APs to arrive.
     //

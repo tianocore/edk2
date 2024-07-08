@@ -401,28 +401,22 @@ typedef struct {
   EFI_STATUS                    *Status;
 } SMM_CPU_DATA_BLOCK;
 
-typedef enum {
-  SmmCpuSyncModeTradition,
-  SmmCpuSyncModeRelaxedAp,
-  SmmCpuSyncModeMax
-} SMM_CPU_SYNC_MODE;
-
 typedef struct {
   //
   // Pointer to an array. The array should be located immediately after this structure
   // so that UC cache-ability can be set together.
   //
-  SMM_CPU_DATA_BLOCK            *CpuData;
-  volatile UINT32               BspIndex;
-  volatile BOOLEAN              *InsideSmm;
-  volatile BOOLEAN              *AllCpusInSync;
-  volatile SMM_CPU_SYNC_MODE    EffectiveSyncMode;
-  volatile BOOLEAN              SwitchBsp;
-  volatile BOOLEAN              *CandidateBsp;
-  volatile BOOLEAN              AllApArrivedWithException;
-  EFI_AP_PROCEDURE              StartupProcedure;
-  VOID                          *StartupProcArgs;
-  SMM_CPU_SYNC_CONTEXT          *SyncContext;
+  SMM_CPU_DATA_BLOCK           *CpuData;
+  volatile UINT32              BspIndex;
+  volatile BOOLEAN             *InsideSmm;
+  volatile BOOLEAN             *AllCpusInSync;
+  volatile MM_CPU_SYNC_MODE    EffectiveSyncMode;
+  volatile BOOLEAN             SwitchBsp;
+  volatile BOOLEAN             *CandidateBsp;
+  volatile BOOLEAN             AllApArrivedWithException;
+  EFI_AP_PROCEDURE             StartupProcedure;
+  VOID                         *StartupProcArgs;
+  SMM_CPU_SYNC_CONTEXT         *SyncContext;
 } SMM_DISPATCHER_MP_SYNC_DATA;
 
 #define SMM_PSD_OFFSET  0xfb00
