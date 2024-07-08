@@ -24,6 +24,21 @@ const BOOLEAN  mIsStandaloneMm = FALSE;
 BOOLEAN  mSmmReadyToLock = FALSE;
 
 /**
+  Check SmmProfile is enabled or not.
+
+  @return TRUE     SmmProfile is enabled.
+          FALSE    SmmProfile is not enabled.
+
+**/
+BOOLEAN
+IsSmmProfileEnabled (
+  VOID
+  )
+{
+  return FeaturePcdGet (PcdCpuSmmProfileEnable);
+}
+
+/**
   Perform the remaining tasks.
 
 **/
@@ -40,7 +55,7 @@ PerformRemainingTasks (
     //
     // Start SMM Profile feature
     //
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    if (mSmmProfileEnabled) {
       SmmProfileStart ();
     }
 
@@ -60,7 +75,7 @@ PerformRemainingTasks (
     //
     // Update Page Table for outside SMRAM.
     //
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    if (mSmmProfileEnabled) {
       SmmProfileUpdateMemoryAttributes ();
     } else {
       UpdateUefiMemMapAttributes ();
@@ -157,7 +172,7 @@ SmmReadyToLockEventNotify (
   //
   // Skip SMM profile initialization if feature is disabled
   //
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     //
     // Get Software SMI from FADT
     //

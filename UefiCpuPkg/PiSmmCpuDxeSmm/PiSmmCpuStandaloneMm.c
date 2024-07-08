@@ -21,6 +21,28 @@ const BOOLEAN  mIsStandaloneMm = TRUE;
 BOOLEAN  mRemainingTasksDone = FALSE;
 
 /**
+  Check SmmProfile is enabled or not.
+
+  @return TRUE     SmmProfile is enabled.
+          FALSE    SmmProfile is not enabled.
+
+**/
+BOOLEAN
+IsSmmProfileEnabled (
+  VOID
+  )
+{
+  UINT64  SmmProfileSize;
+
+  GetSmmProfileData (&SmmProfileSize);
+  if (SmmProfileSize == 0) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
   Perform the remaining tasks.
 
 **/
@@ -216,7 +238,7 @@ PiCpuStandaloneMmEntry (
 
   ASSERT_EFI_ERROR (Status);
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     //
     // Get Software SMI
     //
