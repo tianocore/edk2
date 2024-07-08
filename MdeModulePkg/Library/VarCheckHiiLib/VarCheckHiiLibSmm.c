@@ -604,7 +604,7 @@ DumpVarCheckHii (
 #endif
 
 /**
-  Constructor function of VarCheckHiiLib to register var check HII handler.
+  Constructor function of VarCheckHiiLibSmm to register var check HII handler.
 
   @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
@@ -614,7 +614,7 @@ DumpVarCheckHii (
 **/
 EFI_STATUS
 EFIAPI
-VarCheckHiiLibNullClassConstructor (
+VarCheckHiiLibSmmConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
