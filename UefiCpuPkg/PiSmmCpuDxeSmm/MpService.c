@@ -20,7 +20,7 @@ UINTN                        mSmmMpSyncDataSize;
 SMM_CPU_SEMAPHORES           mSmmCpuSemaphores;
 UINTN                        mSemaphoreSize;
 SPIN_LOCK                    *mPFLock = NULL;
-SMM_CPU_SYNC_MODE            mCpuSmmSyncMode;
+MM_CPU_SYNC_MODE             mCpuSmmSyncMode;
 BOOLEAN                      mMachineCheckSupported = FALSE;
 MM_COMPLETION                mSmmStartupThisApToken;
 
@@ -454,8 +454,8 @@ ResetTokens (
 **/
 VOID
 BSPHandler (
-  IN      UINTN              CpuIndex,
-  IN      SMM_CPU_SYNC_MODE  SyncMode
+  IN      UINTN             CpuIndex,
+  IN      MM_CPU_SYNC_MODE  SyncMode
   )
 {
   UINTN          CpuCount;
@@ -504,7 +504,7 @@ BSPHandler (
   //
   // If Traditional Sync Mode or need to configure MTRRs: gather all available APs.
   //
-  if ((SyncMode == SmmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
+  if ((SyncMode == MmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Wait for APs to arrive
     //
@@ -594,7 +594,7 @@ BSPHandler (
   // make those APs to exit SMI synchronously. APs which arrive later will be excluded and
   // will run through freely.
   //
-  if ((SyncMode != SmmCpuSyncModeTradition) && !SmmCpuFeaturesNeedConfigureMtrrs ()) {
+  if ((SyncMode != MmCpuSyncModeTradition) && !SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Lock door for late coming CPU checkin and retrieve the Arrived number of APs
     //
@@ -722,9 +722,9 @@ BSPHandler (
 **/
 VOID
 APHandler (
-  IN      UINTN              CpuIndex,
-  IN      BOOLEAN            ValidSmi,
-  IN      SMM_CPU_SYNC_MODE  SyncMode
+  IN      UINTN             CpuIndex,
+  IN      BOOLEAN           ValidSmi,
+  IN      MM_CPU_SYNC_MODE  SyncMode
   )
 {
   UINT64         Timer;
@@ -801,7 +801,7 @@ APHandler (
   //
   *(mSmmMpSyncData->CpuData[CpuIndex].Present) = TRUE;
 
-  if ((SyncMode == SmmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
+  if ((SyncMode == MmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Notify BSP of arrival at this point
     //
@@ -1131,7 +1131,7 @@ InternalSmmStartupThisAp (
   }
 
   if (!(*(mSmmMpSyncData->CpuData[CpuIndex].Present))) {
-    if (mSmmMpSyncData->EffectiveSyncMode == SmmCpuSyncModeTradition) {
+    if (mSmmMpSyncData->EffectiveSyncMode == MmCpuSyncModeTradition) {
       DEBUG ((DEBUG_ERROR, "!mSmmMpSyncData->CpuData[%d].Present\n", CpuIndex));
     }
 
@@ -1947,7 +1947,7 @@ InitializeMpServiceData (
 
   RelaxedMode = FALSE;
   GetSmmCpuSyncConfigData (&RelaxedMode, NULL, NULL);
-  mCpuSmmSyncMode = RelaxedMode ? SmmCpuSyncModeRelaxedAp : SmmCpuSyncModeTradition;
+  mCpuSmmSyncMode = RelaxedMode ? MmCpuSyncModeRelaxedAp : MmCpuSyncModeTradition;
   InitializeMpSyncData ();
 
   //
