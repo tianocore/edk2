@@ -342,7 +342,7 @@ IsAddressSplit (
 {
   UINTN  Index;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (IsSmmProfileEnabled ()) {
     //
     // Check configuration
     //
@@ -1020,7 +1020,7 @@ InitSmmProfile (
   //
   // Skip SMM profile initialization if feature is disabled
   //
-  if (!FeaturePcdGet (PcdCpuSmmProfileEnable) &&
+  if (!IsSmmProfileEnabled () &&
       !HEAP_GUARD_NONSTOP_MODE &&
       !NULL_DETECTION_NONSTOP_MODE)
   {
