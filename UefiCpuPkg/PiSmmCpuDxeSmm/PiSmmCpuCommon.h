@@ -831,6 +831,18 @@ SmiPFHandler (
   );
 
 /**
+  Check SmmProfile is enabled or not.
+
+  @return TRUE     SmmProfile is enabled.
+          FALSE    SmmProfile is not enabled.
+
+**/
+BOOLEAN
+IsSmmProfileEnabled (
+  VOID
+  );
+
+/**
   Perform the remaining tasks.
 
 **/
