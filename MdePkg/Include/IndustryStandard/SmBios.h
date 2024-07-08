@@ -865,7 +865,7 @@ typedef enum {
   ProcessorUpgradeSocketLGA2422   = 0x46,
   ProcessorUpgradeSocketLGA5773   = 0x47,
   ProcessorUpgradeSocketBGA5773   = 0x48,
-  ProcessorUpgradeSocketAM5       = 0x49, 
+  ProcessorUpgradeSocketAM5       = 0x49,
   ProcessorUpgradeSocketSP5       = 0x4A,
   ProcessorUpgradeSocketSP6       = 0x4B,
   ProcessorUpgradeSocketBGA883    = 0x4C,
@@ -1479,15 +1479,15 @@ typedef enum {
 /// System Slots - Slot Length.
 ///
 typedef enum {
-//**************** AMI PORTING BEGIN  *****************************
+  // **************** AMI PORTING BEGIN  *****************************
   SlotLengthOther   = 0x01,
   SlotLengthUnknown = 0x02,
   SlotLengthShort   = 0x03,
-  SlotLengthLong                  = 0x04,
+  SlotLengthLong    = 0x04,
   // Added for Smbios 3.4.0 Spec
   SlotLength2_5_Drive_Form_Factor = 0x05, // 2.5" drive form factor
   SlotLength3_5_Drive_Form_Factor = 0x06  // 3.5" drive form factor
-//**************** AMI PORTING END  *****************************
+                                          // **************** AMI PORTING END  *****************************
 } MISC_SLOT_LENGTH;
 
 ///
@@ -1514,7 +1514,7 @@ typedef struct {
   UINT8    AsyncSurpriseRemoval    : 1;
   UINT8    FlexbusSlotCxl10Capable : 1;
   UINT8    FlexbusSlotCxl20Capable : 1;
-  UINT8    FlexbusSlotCxl30Capable : 1; 
+  UINT8    FlexbusSlotCxl30Capable : 1;
 } MISC_SLOT_CHARACTERISTICS2;
 
 ///
