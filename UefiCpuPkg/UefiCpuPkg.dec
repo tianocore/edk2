@@ -281,7 +281,7 @@
 
   ## Specifies buffer size in bytes to save SMM profile data. The value should be a multiple of 4KB.
   # @Prompt SMM profile data buffer size.
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize|0x200000|UINT32|0x32132107
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize|0x600000|UINT32|0x32132107
 
   ## Specifies stack size in bytes for each processor in SMM.
   # @Prompt Processor stack size in SMM.
