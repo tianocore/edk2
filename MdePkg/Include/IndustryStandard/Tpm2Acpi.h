@@ -3,6 +3,7 @@
 
 Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved. <BR>
 Copyright (c) 2021, Ampere Computing LLC. All rights reserved. <BR>
+Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -17,6 +18,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define EFI_TPM2_ACPI_TABLE_REVISION_3  3
 #define EFI_TPM2_ACPI_TABLE_REVISION_4  4
 #define EFI_TPM2_ACPI_TABLE_REVISION    EFI_TPM2_ACPI_TABLE_REVISION_4
+
+#define EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_4  12
+#define EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE             EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE_REVISION_4
 
 typedef struct {
   EFI_ACPI_DESCRIPTION_HEADER    Header;
