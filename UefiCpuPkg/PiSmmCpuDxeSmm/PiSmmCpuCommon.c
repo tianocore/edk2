@@ -1154,6 +1154,11 @@ PiSmmCpuEntryCommon (
   InitializeSmmTimer ();
 
   //
+  // Initialize mSmmProfileEnabled
+  //
+  mSmmProfileEnabled = IsSmmProfileEnabled ();
+
+  //
   // Initialize MP globals
   //
   Cr3 = InitializeMpServiceData (Stacks, mSmmStackSize, mSmmShadowStackSize);

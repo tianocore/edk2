@@ -1616,7 +1616,7 @@ SmiRendezvous (
       InitializeSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
     }
 
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    if (mSmmProfileEnabled) {
       ActivateSmmProfile (CpuIndex);
     }
 
@@ -1677,7 +1677,7 @@ SmiRendezvous (
           }
         }
 
-        if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+        if (mSmmProfileEnabled) {
           SmmProfileRecordSmiNum ();
         }
 

@@ -41,6 +41,11 @@ BOOLEAN  mXdEnabled = FALSE;
 BOOLEAN  mBtsSupported = TRUE;
 
 //
+// The flag indicates if SMM profile is enabled.
+//
+BOOLEAN  mSmmProfileEnabled = FALSE;
+
+//
 // The flag indicates if SMM profile starts to record data.
 //
 BOOLEAN  mSmmProfileStart = FALSE;
@@ -342,7 +347,7 @@ IsAddressSplit (
 {
   UINTN  Index;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     //
     // Check configuration
     //
@@ -1018,7 +1023,7 @@ InitSmmProfile (
   //
   // Skip SMM profile initialization if feature is disabled
   //
-  if (!FeaturePcdGet (PcdCpuSmmProfileEnable) &&
+  if (!mSmmProfileEnabled &&
       !HEAP_GUARD_NONSTOP_MODE &&
       !NULL_DETECTION_NONSTOP_MODE)
   {

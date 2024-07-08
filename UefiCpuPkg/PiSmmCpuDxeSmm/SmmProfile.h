@@ -137,6 +137,10 @@ extern BOOLEAN  mXdSupported;
 //
 extern BOOLEAN  mXdEnabled;
 //
+// The flag indicates if SMM profile is enabled.
+//
+extern BOOLEAN  mSmmProfileEnabled;
+//
 // The flag indicates if #DB will be setup in #PF handler.
 //
 extern BOOLEAN  mSetupDebugTrap;

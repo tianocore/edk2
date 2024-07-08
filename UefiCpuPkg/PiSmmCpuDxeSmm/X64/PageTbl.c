@@ -228,7 +228,7 @@ SmmInitPageTable (
   //
   PageTable = GenSmmPageTable (mPagingMode, mPhysicalAddressBits);
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     if (m5LevelPagingNeeded) {
       Pml5Entry = (UINT64 *)PageTable;
       //
@@ -264,7 +264,7 @@ SmmInitPageTable (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (mSmmProfileEnabled ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -820,7 +820,7 @@ SmiPFHandler (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     if (mIsStandaloneMm) {
       //
       // Only logging ranges shall run here in MM env.
