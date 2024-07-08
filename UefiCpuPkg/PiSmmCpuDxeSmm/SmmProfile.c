@@ -748,15 +748,21 @@ InitSmmProfileInternal (
                                                            );
   ASSERT (mLastPFEntryPointer != NULL);
 
-  mSmmProfileSize = FixedPcdGet32 (PcdCpuSmmProfileSize);
-  ASSERT ((mSmmProfileSize & 0xFFF) == 0);
-
   //
   // Get Smm Profile Base
   //
   mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)GetSmmProfileData (&SmmProfileSize);
   DEBUG ((DEBUG_ERROR, "SmmProfileBase = 0x%016x.\n", (UINTN)mSmmProfileBase));
   DEBUG ((DEBUG_ERROR, "SmmProfileSize = 0x%016x.\n", (UINTN)SmmProfileSize));
+
+  if (mBtsSupported) {
+    ASSERT (SmmProfileSize > mMsrDsAreaSize);
+    mSmmProfileSize = (UINTN)SmmProfileSize - mMsrDsAreaSize;
+  } else {
+    mSmmProfileSize = (UINTN)SmmProfileSize;
+  }
+
+  ASSERT ((mSmmProfileSize & 0xFFF) == 0);
 
   //
   // Initialize SMM profile data header.
