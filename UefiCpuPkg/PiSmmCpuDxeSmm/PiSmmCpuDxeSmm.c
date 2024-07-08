@@ -193,7 +193,7 @@ GetSmmCpuSyncConfigData (
   )
 {
   if (RelaxedMode != NULL) {
-    *RelaxedMode = (BOOLEAN)(PcdGet8 (PcdCpuSmmSyncMode) == SmmCpuSyncModeRelaxedAp);
+    *RelaxedMode = (BOOLEAN)(PcdGet8 (PcdCpuSmmSyncMode) == MmCpuSyncModeRelaxedAp);
   }
 
   if (SyncTimeout != NULL) {
