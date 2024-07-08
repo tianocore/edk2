@@ -495,11 +495,7 @@ GetSmmProfileData (
 
   ASSERT (Size != NULL);
 
-  if (mBtsSupported) {
-    *Size = PcdGet32 (PcdCpuSmmProfileSize) + mMsrDsAreaSize;
-  } else {
-    *Size = PcdGet32 (PcdCpuSmmProfileSize);
-  }
+  *Size = PcdGet32 (PcdCpuSmmProfileSize);
 
   Base   = 0xFFFFFFFF;
   Status = gBS->AllocatePages (
