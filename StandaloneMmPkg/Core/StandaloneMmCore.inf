@@ -52,6 +52,7 @@
   PeCoffLib
   ReportStatusCodeLib
   StandaloneMmCoreEntryPoint
+  HobPrintLib
 
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister

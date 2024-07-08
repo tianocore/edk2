@@ -513,11 +513,15 @@ if __name__ == '__main__':
                         raise argparse.ArgumentTypeError ('JSON field MonotonicCount must be an integer in range 0x0..0xffffffffffffffff')
                     else:
                         raise argparse.ArgumentTypeError ('--monotonic-count must be an integer in range 0x0..0xffffffffffffffff')
-                if self.UpdateImageIndex >0xFF:
+                if self.UpdateImageIndex < 0x1 or self.UpdateImageIndex > 0xFF:
                     if args.JsonFile:
-                        raise argparse.ArgumentTypeError ('JSON field UpdateImageIndex must be an integer in range 0x0..0xff')
+                        raise argparse.ArgumentTypeError ('JSON field UpdateImageIndex must be an integer in range 0x1..0xff')
                     else:
-                        raise argparse.ArgumentTypeError ('--update-image-index must be an integer in range 0x0..0xff')
+                        raise argparse.ArgumentTypeError ('--update-image-index must be an integer in range 0x1..0xff')
+
+            if args.Decode:
+                if args.OutputFile is None:
+                    raise argparse.ArgumentTypeError ('--decode requires --output')
 
             if self.UseSignTool:
                 if self.SignToolPfxFile is not None:
@@ -576,7 +580,7 @@ if __name__ == '__main__':
             try:
                 SinglePayloadDescriptor.Validate (args)
             except Exception as Msg:
-                print ('GenerateCapsule: error:' + str(Msg))
+                print ('GenerateCapsule: error: ' + str(Msg))
                 sys.exit (1)
         for SinglePayloadDescriptor in PayloadDescriptorList:
             ImageCapsuleSupport = 0x0000000000000000
@@ -690,7 +694,7 @@ if __name__ == '__main__':
                                             args.HardwareInstance,
                                             args.UpdateImageIndex,
                                             args.SignToolPfxFile,
-                                            args.SignSubjectName,
+                                            args.SignToolSubjectName,
                                             args.OpenSslSignerPrivateCertFile,
                                             args.OpenSslOtherPublicCertFile,
                                             args.OpenSslTrustedPublicCertFile,
@@ -704,7 +708,7 @@ if __name__ == '__main__':
             try:
                 SinglePayloadDescriptor.Validate (args)
             except Exception as Msg:
-                print ('GenerateCapsule: error:' + str(Msg))
+                print ('GenerateCapsule: error: ' + str(Msg))
                 sys.exit (1)
         try:
             Result = UefiCapsuleHeader.Decode (Buffer)
@@ -827,7 +831,7 @@ if __name__ == '__main__':
                             print ('--------')
                             print ('No EFI_FIRMWARE_IMAGE_AUTHENTICATION')
 
-                    PayloadSignature = struct.unpack ('<I', SinglePayloadDescriptor.Payload[0:4])
+                    (PayloadSignature,) = struct.unpack ('<I', SinglePayloadDescriptor.Payload[0:4])
                     if PayloadSignature != FmpPayloadHeader.Signature:
                         SinglePayloadDescriptor.UseDependency = True
                         try:
@@ -873,8 +877,8 @@ if __name__ == '__main__':
                         print ('GenerateCapsule: error: can not write embedded driver file {File}'.format (File = EmbeddedDriverPath))
                         sys.exit (1)
 
-        except:
-            print ('GenerateCapsule: error: can not decode capsule')
+        except Exception as Msg:
+            print ('GenerateCapsule: error: can not decode capsule: ' + str(Msg))
             sys.exit (1)
         GenerateOutputJson(PayloadJsonDescriptorList)
         PayloadIndex = 0
@@ -914,7 +918,7 @@ if __name__ == '__main__':
                         print ('--------')
                         print ('No EFI_FIRMWARE_IMAGE_AUTHENTICATION')
 
-                    PayloadSignature = struct.unpack ('<I', Result[0:4])
+                    (PayloadSignature,) = struct.unpack ('<I', Result[0:4])
                     if PayloadSignature != FmpPayloadHeader.Signature:
                         try:
                             Result = CapsuleDependency.Decode (Result)
