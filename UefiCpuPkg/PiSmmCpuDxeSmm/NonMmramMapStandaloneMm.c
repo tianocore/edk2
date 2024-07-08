@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   Get SmmProfileData.
 
   @param[in, out]     Size     Return Size of SmmProfileData.
+                               0 means the gMmProfileDataHobGuid does not exist.
 
   @return Address of SmmProfileData
 
@@ -39,7 +40,10 @@ GetSmmProfileData (
     SmmProfileDataHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (SmmProfileDataHob));
   }
 
-  ASSERT (SmmProfileDataHob.Raw != NULL);
+  if (SmmProfileDataHob.Raw == NULL) {
+    *Size = 0;
+    return 0;
+  }
 
   *Size = SmmProfileDataHob.MemoryAllocation->AllocDescriptor.MemoryLength;
 
