@@ -1,7 +1,7 @@
 /** @file
   Definitions for data structures used in S3 resume.
 
-Copyright (c) 2011 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2024, Intel Corporation. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -30,7 +30,6 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS    ReturnContext1;
   EFI_PHYSICAL_ADDRESS    ReturnContext2;
   EFI_PHYSICAL_ADDRESS    ReturnStackPointer;
-  EFI_PHYSICAL_ADDRESS    MpService2Ppi;
   EFI_PHYSICAL_ADDRESS    Smst;
 } SMM_S3_RESUME_STATE;
 

@@ -8,7 +8,7 @@
 **/
 
 #include <Uefi.h>
-#include <Chipset/ArmV7.h>
+#include <Arm/AArch32.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/MemoryAllocationLib.h>

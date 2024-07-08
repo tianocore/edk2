@@ -98,7 +98,7 @@ UnsupportedExit (
   Validate that the MMIO memory access is not to encrypted memory.
 
   Examine the pagetable entry for the memory specified. MMIO should not be
-  performed against encrypted memory. MMIO to the APIC page is always allowed.
+  performed against encrypted memory.
 
   @param[in] Ghcb           Pointer to the Guest-Hypervisor Communication Block
   @param[in] MemoryAddress  Memory address to validate
@@ -118,16 +118,6 @@ ValidateMmioMemory (
 {
   MEM_ENCRYPT_SEV_ADDRESS_RANGE_STATE  State;
   GHCB_EVENT_INJECTION                 GpEvent;
-  UINTN                                Address;
-
-  //
-  // Allow APIC accesses (which will have the encryption bit set during
-  // SEC and PEI phases).
-  //
-  Address = MemoryAddress & ~(SIZE_4KB - 1);
-  if (Address == GetLocalApicBaseAddress ()) {
-    return 0;
-  }
 
   State = MemEncryptSevGetAddressRangeState (
             0,
@@ -1619,6 +1609,10 @@ Dr7WriteExit (
   UINT64                     *Register;
   UINT64                     Status;
 
+  if (MemEncryptSevEsDebugVirtualizationIsEnabled ()) {
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
+
   Ext       = &InstructionData->Ext;
   SevEsData = (SEV_ES_PER_CPU_DATA *)(Ghcb + 1);
 
@@ -1668,6 +1662,10 @@ Dr7ReadExit (
   CC_INSTRUCTION_OPCODE_EXT  *Ext;
   SEV_ES_PER_CPU_DATA        *SevEsData;
   UINT64                     *Register;
+
+  if (MemEncryptSevEsDebugVirtualizationIsEnabled ()) {
+    return UnsupportedExit (Ghcb, Regs, InstructionData);
+  }
 
   Ext       = &InstructionData->Ext;
   SevEsData = (SEV_ES_PER_CPU_DATA *)(Ghcb + 1);

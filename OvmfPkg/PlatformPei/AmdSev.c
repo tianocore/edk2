@@ -17,7 +17,7 @@
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <Pi/PrePiHob.h>
+#include <Pi/PiHob.h>
 #include <PiPei.h>
 #include <Register/Amd/Msr.h>
 #include <Register/Intel/SmramSaveStateMap.h>
@@ -149,7 +149,7 @@ AmdSevSnpInitialize (
 
       if (ResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
         if (ResourceHob->PhysicalStart >= SIZE_4GB) {
-          ResourceHob->ResourceType = BZ3937_EFI_RESOURCE_MEMORY_UNACCEPTED;
+          ResourceHob->ResourceType = EFI_RESOURCE_MEMORY_UNACCEPTED;
           continue;
         }
 
@@ -434,6 +434,7 @@ AmdSevInitialize (
   )
 {
   UINT64         EncryptionMask;
+  UINT64         CCGuestAttr;
   RETURN_STATUS  PcdStatus;
 
   //
@@ -517,12 +518,18 @@ AmdSevInitialize (
   // technology is active.
   //
   if (MemEncryptSevSnpIsEnabled ()) {
-    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSevSnp);
+    CCGuestAttr = CCAttrAmdSevSnp;
   } else if (MemEncryptSevEsIsEnabled ()) {
-    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSevEs);
+    CCGuestAttr = CCAttrAmdSevEs;
   } else {
-    PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrAmdSev);
+    CCGuestAttr = CCAttrAmdSev;
   }
+
+  if (MemEncryptSevEsDebugVirtualizationIsEnabled ()) {
+    CCGuestAttr |= CCAttrFeatureAmdSevEsDebugVirtualization;
+  }
+
+  PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCGuestAttr);
 
   ASSERT_RETURN_ERROR (PcdStatus);
 }

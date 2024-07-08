@@ -139,7 +139,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 AmlCodeGenString (
-  IN  CHAR8            *String,
+  IN  CONST CHAR8      *String,
   OUT AML_OBJECT_NODE  **NewObjectNode
   )
 {
@@ -664,7 +664,7 @@ EFI_STATUS
 EFIAPI
 AmlCodeGenNameString (
   IN  CONST CHAR8            *NameString,
-  IN        CHAR8            *String,
+  IN  CONST CHAR8            *String,
   IN        AML_NODE_HEADER  *ParentNode      OPTIONAL,
   OUT       AML_OBJECT_NODE  **NewObjectNode   OPTIONAL
   )
@@ -2615,7 +2615,7 @@ AmlAddLpiState (
   IN  UINT64                                  Integer                     OPTIONAL,
   IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *ResidencyCounterRegister    OPTIONAL,
   IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *UsageCounterRegister        OPTIONAL,
-  IN  CHAR8                                   *StateName                   OPTIONAL,
+  IN  CONST CHAR8                             *StateName                   OPTIONAL,
   IN  AML_OBJECT_NODE_HANDLE                  LpiNode
   )
 {
@@ -3204,7 +3204,7 @@ error_handler:
 EFI_STATUS
 EFIAPI
 AmlAddNameIntegerPackage (
-  IN CHAR8                   *Name,
+  IN CONST CHAR8             *Name,
   IN UINT64                  Value,
   IN AML_OBJECT_NODE_HANDLE  PackageNode
   )
@@ -3800,7 +3800,7 @@ error_handler:
 EFI_STATUS
 EFIAPI
 AmlAddNameStringToNamedPackage (
-  IN CHAR8                   *NameString,
+  IN CONST CHAR8             *NameString,
   IN AML_OBJECT_NODE_HANDLE  NamedNode
   )
 {
@@ -3866,6 +3866,73 @@ AmlAddNameStringToNamedPackage (
 exit_handler:
   if (AmlNameString != NULL) {
     FreePool (AmlNameString);
+  }
+
+  return Status;
+}
+
+/** Add an integer value to the named package node.
+
+  AmlCodeGenNamePackage ("_CID", NULL, &PackageNode);
+  AmlGetEisaIdFromString ("PNP0A03", &EisaId);
+  AmlAddIntegerToNamedPackage (EisaId, NameNode);
+  AmlGetEisaIdFromString ("PNP0A08", &EisaId);
+  AmlAddIntegerToNamedPackage (EisaId, NameNode);
+
+  equivalent of the following ASL code:
+  Name (_CID, Package (0x02)  // _CID: Compatible ID
+  {
+      EisaId ("PNP0A03"),
+      EisaId ("PNP0A08")
+  })
+
+  The package is added at the tail of the list of the input package node
+  name:
+    Name ("NamePackageNode", Package () {
+      [Pre-existing package entries],
+      [Newly created integer entry]
+    })
+
+
+  @ingroup CodeGenApis
+
+  @param [in]       Integer       Integer value that need to be added to package node.
+  @param [in, out]  NameNode      Package named node to add the object to.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval Others                  Error occurred during the operation.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddIntegerToNamedPackage (
+  IN        UINT32                  Integer,
+  IN  OUT   AML_OBJECT_NODE_HANDLE  NameNode
+  )
+{
+  EFI_STATUS       Status;
+  AML_OBJECT_NODE  *PackageNode;
+
+  if (NameNode == NULL) {
+    ASSERT_EFI_ERROR (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  PackageNode = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                          NameNode,
+                                          EAmlParseIndexTerm1
+                                          );
+  if ((PackageNode == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PackageNode) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (PackageNode, AML_PACKAGE_OP, 0)))
+  {
+    ASSERT_EFI_ERROR (FALSE);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlAddRegisterOrIntegerToPackage (NULL, Integer, PackageNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
   }
 
   return Status;

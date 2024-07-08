@@ -126,8 +126,6 @@
   # Use MMIO for accessing RTC controller registers.
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcUseMmio|TRUE
 
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
-
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000000F
 
@@ -148,11 +146,6 @@
   # TTY Terminal Type
   # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
-
-  #
-  # ARM Virtual Architectural Timer -- fetch frequency from KVM
-  #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0
 
   # Use MMIO for accessing Serial port registers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|TRUE

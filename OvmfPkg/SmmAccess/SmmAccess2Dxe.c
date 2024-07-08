@@ -6,7 +6,7 @@
   driver.
 
   Copyright (C) 2013, 2015, Red Hat, Inc.<BR>
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -115,8 +115,6 @@ SmmAccess2DxeGetCapabilities (
   )
 {
   return SmramAccessGetCapabilities (
-           This->LockState,
-           This->OpenState,
            SmramMapSize,
            SmramMap
            );

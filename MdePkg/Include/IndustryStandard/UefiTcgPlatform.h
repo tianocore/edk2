@@ -451,6 +451,7 @@ typedef struct tdTCG_PCClientTaggedEvent {
 
 #define TCG_Sp800_155_PlatformId_Event_SIGNATURE   "SP800-155 Event"
 #define TCG_Sp800_155_PlatformId_Event2_SIGNATURE  "SP800-155 Event2"
+#define TCG_Sp800_155_PlatformId_Event3_SIGNATURE  "SP800-155 Event3"
 
 typedef struct tdTCG_Sp800_155_PlatformId_Event2 {
   UINT8       Signature[16];
@@ -472,14 +473,57 @@ typedef struct tdTCG_Sp800_155_PlatformId_Event2 {
   // UINT8               PlatformModel[PlatformModelSize];
   // UINT8               PlatformVersionSize;
   // UINT8               PlatformVersion[PlatformVersionSize];
-  // UINT8               PlatformModelSize;
-  // UINT8               PlatformModel[PlatformModelSize];
   // UINT8               FirmwareManufacturerStrSize;
   // UINT8               FirmwareManufacturerStr[FirmwareManufacturerStrSize];
   // UINT32              FirmwareManufacturerId;
   // UINT8               FirmwareVersion;
-  // UINT8               FirmwareVersion[FirmwareVersionSize]];
+  // UINT8               FirmwareVersion[FirmwareVersionSize];
 } TCG_Sp800_155_PlatformId_Event2;
+
+typedef struct tdTCG_Sp800_155_PlatformId_Event3 {
+  UINT8       Signature[16];
+  //
+  // Where Vendor ID is an integer defined
+  // at http://www.iana.org/assignments/enterprisenumbers
+  //
+  UINT32      VendorId;
+  //
+  // 16-byte identifier of a given platform's static configuration of code
+  //
+  EFI_GUID    ReferenceManifestGuid;
+  // UINT8               PlatformManufacturerStrSize;
+  // UINT8               PlatformManufacturerStr[PlatformManufacturerStrSize];
+  // UINT8               PlatformModelSize;
+  // UINT8               PlatformModel[PlatformModelSize];
+  // UINT8               PlatformVersionSize;
+  // UINT8               PlatformVersion[PlatformVersionSize];
+  // UINT8               FirmwareManufacturerStrSize;
+  // UINT8               FirmwareManufacturerStr[FirmwareManufacturerStrSize];
+  // UINT32              FirmwareManufacturerId;
+  // UINT8               FirmwareVersion;
+  // UINT8               FirmwareVersion[FirmwareVersionSize];
+  //
+  // Below structure is newly added in TCG_Sp800_155_PlatformId_Event3
+  //
+  // UINT32              RimLocatorType;
+  // UINT32              RimLocatorLength;
+  // UINT8               RimLocator[RimLocatorLength];
+  // UINT32              PlatformCertLocatorType;
+  // UINT32              PlatformCertLocatorLength;
+  // UINT8               PlatformCertLocator[PlatformCertLocatorLength];
+} TCG_Sp800_155_PlatformId_Event3;
+
+/**
+ * TCG specifies a locator type with the following values
+ * 0 - Raw data in the locator itself.
+ * 1 - URI in rtf2396 format.
+ * 2 - local device path in EFI_DEVICE_PATH_PROTOCOL format.
+ * 3 - UEFI variable (16 byte EFI_GUID, then 00-terminated UCS2 string)
+**/
+#define TCG_LOCATOR_TYPE_RAW_DATA       0
+#define TCG_LOCATOR_TYPE_URI            1
+#define TCG_LOCATOR_TYPE_DEVICE_PATH    2
+#define TCG_LOCATOR_TYPE_UEFI_VARIABLE  3
 
 #define TCG_EfiStartupLocalityEvent_SIGNATURE  "StartupLocality"
 

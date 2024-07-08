@@ -1,7 +1,7 @@
 /** @file
   The module entry point for Tcg2 configuration module.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <PiPei.h>
 
 #include <Guid/TpmInstance.h>
+#include <Guid/Tcg2AcpiCommunicateBuffer.h>
+#include <Guid/TpmNvsMm.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -16,6 +18,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/PcdLib.h>
+#include <Library/HobLib.h>
+#include <Library/MmUnblockMemoryLib.h>
 
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/TpmInitialized.h>
@@ -51,6 +55,53 @@ DetectTpmDevice (
   );
 
 /**
+  Build gEdkiiTcg2AcpiCommunicateBufferHobGuid.
+
+  @param[in] PeiServices          General purpose services available to every PEIM.
+  @param[in] NotifyDescriptor     The notification structure this PEIM registered on install.
+  @param[in] Ppi                  The memory discovered PPI.  Not used.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval others                  Failed to build Tcg2AcpiCommunicateBuffer Hob.
+
+**/
+EFI_STATUS
+EFIAPI
+BuildTcg2AcpiCommunicateBufferHob (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  TCG2_ACPI_COMMUNICATE_BUFFER  *Tcg2AcpiCommunicateBufferHob;
+  EFI_STATUS                    Status;
+  VOID                          *Buffer;
+  UINTN                         Pages;
+
+  Pages  = sizeof (TCG_NVS);
+  Buffer = AllocateRuntimePages (Pages);
+  ASSERT (Buffer != NULL);
+
+  Status = MmUnblockMemoryRequest ((UINTN)Buffer, Pages);
+  if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Tcg2AcpiCommunicateBufferHob = BuildGuidHob (&gEdkiiTcg2AcpiCommunicateBufferHobGuid, sizeof (TCG2_ACPI_COMMUNICATE_BUFFER));
+  ASSERT (Tcg2AcpiCommunicateBufferHob != NULL);
+  Tcg2AcpiCommunicateBufferHob->Tcg2AcpiCommunicateBuffer = (UINTN)Buffer;
+  Tcg2AcpiCommunicateBufferHob->Pages                     = Pages;
+
+  return EFI_SUCCESS;
+}
+
+EFI_PEI_NOTIFY_DESCRIPTOR  mPostMemNotifyList = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiMemoryDiscoveredPpiGuid,
+  BuildTcg2AcpiCommunicateBufferHob
+};
+
+/**
   The entry point for Tcg2 configuration driver.
 
   @param  FileHandle  Handle of the file being invoked.
@@ -73,6 +124,7 @@ Tcg2ConfigPeimEntryPoint (
   TCG2_CONFIGURATION               Tcg2Configuration;
   UINTN                            Index;
   UINT8                            TpmDevice;
+  VOID                             *Hob;
 
   Status = PeiServicesLocatePpi (&gEfiPeiReadOnlyVariable2PpiGuid, 0, NULL, (VOID **)&VariablePpi);
   ASSERT_EFI_ERROR (Status);
@@ -132,6 +184,28 @@ Tcg2ConfigPeimEntryPoint (
       break;
     }
   }
+
+  //
+  // Build Hob for PcdTpmInstanceGuid
+  //
+  Hob = BuildGuidDataHob (
+          &gEdkiiTpmInstanceHobGuid,
+          (VOID *)PcdGetPtr (PcdTpmInstanceGuid),
+          sizeof (EFI_GUID)
+          );
+  ASSERT (Hob != NULL);
+
+  //
+  // Build Hob for PcdTcgPhysicalPresenceInterfaceVer
+  //
+  Hob = BuildGuidDataHob (
+          &gEdkiiTcgPhysicalPresenceInterfaceVerHobGuid,
+          (VOID *)PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer),
+          AsciiStrSize ((CHAR8 *)PcdGetPtr (PcdTcgPhysicalPresenceInterfaceVer))
+          );
+  ASSERT (Hob != NULL);
+
+  PeiServicesNotifyPpi (&mPostMemNotifyList);
 
   //
   // Selection done

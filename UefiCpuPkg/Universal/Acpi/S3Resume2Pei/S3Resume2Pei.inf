@@ -5,7 +5,7 @@
 # This module will excute the boot script saved during last boot and after that,
 # control is passed to OS waking up handler.
 #
-# Copyright (c) 2010 - 2023, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -67,6 +67,7 @@
   LocalApicLib
   ReportStatusCodeLib
   LockBoxLib
+  MtrrLib
 
 [Guids]
   gEfiBootScriptExecutorVariableGuid            ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
@@ -79,6 +80,7 @@
   ## SOMETIMES_PRODUCES ## UNDEFINED # Install PPI
   ## SOMETIMES_CONSUMES ## UNDEFINED # Used to do smm communication
   gEdkiiS3SmmInitDoneGuid
+  gEdkiiS3MtrrSettingGuid
 
 [Ppis]
   gEfiPeiS3Resume2PpiGuid                       ## PRODUCES

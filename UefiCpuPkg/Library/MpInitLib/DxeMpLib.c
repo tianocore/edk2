@@ -1,7 +1,8 @@
 /** @file
   MP initialize support functions for DXE phase.
 
-  Copyright (c) 2016 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024, AMD Inc. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -13,22 +14,18 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/CcExitLib.h>
-#include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/SevSnpMsr.h>
 #include <Register/Amd/Ghcb.h>
 
 #include <Protocol/Timer.h>
 
 #define  AP_SAFE_STACK_SIZE  128
 
-CPU_MP_DATA             *mCpuMpData                  = NULL;
-EFI_EVENT               mCheckAllApsEvent            = NULL;
-EFI_EVENT               mMpInitExitBootServicesEvent = NULL;
-EFI_EVENT               mLegacyBootEvent             = NULL;
-volatile BOOLEAN        mStopCheckAllApsStatus       = TRUE;
-RELOCATE_AP_LOOP_ENTRY  mReservedApLoop;
-UINTN                   mReservedTopOfApStack;
-volatile UINT32         mNumberToFinish = 0;
-UINTN                   mApPageTable;
+CPU_MP_DATA       *mCpuMpData                  = NULL;
+EFI_EVENT         mCheckAllApsEvent            = NULL;
+EFI_EVENT         mMpInitExitBootServicesEvent = NULL;
+EFI_EVENT         mLegacyBootEvent             = NULL;
+volatile BOOLEAN  mStopCheckAllApsStatus       = TRUE;
 
 //
 // Begin wakeup buffer allocation below 0x88000
@@ -369,57 +366,58 @@ GetProtectedModeCS (
 }
 
 /**
-  Do sync on APs.
+  Allocate buffer for ApLoopCode.
 
-  @param[in, out] Buffer  Pointer to private data buffer.
+  @param[in]      Pages    Number of pages to allocate.
+  @param[in, out] Address  Pointer to the allocated buffer.
 **/
 VOID
-EFIAPI
-RelocateApLoop (
-  IN OUT VOID  *Buffer
+AllocateApLoopCodeBuffer (
+  IN UINTN                     Pages,
+  IN OUT EFI_PHYSICAL_ADDRESS  *Address
   )
 {
-  CPU_MP_DATA  *CpuMpData;
-  BOOLEAN      MwaitSupport;
-  UINTN        ProcessorNumber;
-  UINTN        StackStart;
+  EFI_STATUS  Status;
 
-  MpInitLibWhoAmI (&ProcessorNumber);
-  CpuMpData    = GetCpuMpData ();
-  MwaitSupport = IsMwaitSupport ();
-  if (CpuMpData->UseSevEsAPMethod) {
-    //
-    // 64-bit AMD processors with SEV-ES
-    //
-    StackStart = CpuMpData->SevEsAPResetStackStart;
-    mReservedApLoop.AmdSevEntry (
-                      MwaitSupport,
-                      CpuMpData->ApTargetCState,
-                      CpuMpData->PmCodeSegment,
-                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
-                      (UINTN)&mNumberToFinish,
-                      CpuMpData->Pm16CodeSegment,
-                      CpuMpData->SevEsAPBuffer,
-                      CpuMpData->WakeupBuffer
-                      );
-  } else {
-    //
-    // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or 64-bit AMD processors without SEV-ES
-    //
-    StackStart = mReservedTopOfApStack;
-    mReservedApLoop.GenericEntry (
-                      MwaitSupport,
-                      CpuMpData->ApTargetCState,
-                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
-                      (UINTN)&mNumberToFinish,
-                      mApPageTable
-                      );
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiReservedMemoryType,
+                  Pages,
+                  Address
+                  );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
+  Remove Nx protection for the range specific by BaseAddress and Length.
+
+  The PEI implementation uses CpuPageTableLib to change the attribute.
+  The DXE implementation uses gDS to change the attribute.
+
+  @param[in] BaseAddress  BaseAddress of the range.
+  @param[in] Length       Length of the range.
+**/
+VOID
+RemoveNxprotection (
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINTN                 Length
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
+
+  //
+  // TODO: Check EFI_MEMORY_XP bit set or not once it's available in DXE GCD
+  //       service.
+  //
+  Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &MemDesc);
+  if (!EFI_ERROR (Status)) {
+    gDS->SetMemorySpaceAttributes (
+           BaseAddress,
+           Length,
+           MemDesc.Attributes & (~EFI_MEMORY_XP)
+           );
   }
-
-  //
-  // It should never reach here
-  //
-  ASSERT (FALSE);
 }
 
 /**
@@ -477,16 +475,10 @@ InitMpGlobalData (
   )
 {
   EFI_STATUS                       Status;
-  EFI_PHYSICAL_ADDRESS             Address;
   UINTN                            Index;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  MemDesc;
   UINTN                            StackBase;
   CPU_INFO_IN_HOB                  *CpuInfoInHob;
-  MP_ASSEMBLY_ADDRESS_MAP          *AddressMap;
-  UINT8                            *ApLoopFunc;
-  UINTN                            ApLoopFuncSize;
-  UINTN                            StackPages;
-  UINTN                            FuncPages;
 
   SaveCpuMpData (CpuMpData);
 
@@ -541,81 +533,7 @@ InitMpGlobalData (
     }
   }
 
-  AddressMap = &CpuMpData->AddressMap;
-  if (CpuMpData->UseSevEsAPMethod) {
-    //
-    // 64-bit AMD processors with SEV-ES
-    //
-    Address        = BASE_4GB - 1;
-    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddressAmdSev;
-    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeAmdSev;
-  } else {
-    //
-    // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or 64-bit AMD processors without SEV-ES
-    //
-    Address        = MAX_ADDRESS;
-    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddressGeneric;
-    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeGeneric;
-  }
-
-  //
-  // Avoid APs access invalid buffer data which allocated by BootServices,
-  // so we will allocate reserved data for AP loop code. We also need to
-  // allocate this buffer below 4GB due to APs may be transferred to 32bit
-  // protected mode on long mode DXE.
-  // Allocating it in advance since memory services are not available in
-  // Exit Boot Services callback function.
-  //
-  // +------------+ (TopOfApStack)
-  // |  Stack * N |
-  // +------------+ (stack base, 4k aligned)
-  // |  Padding   |
-  // +------------+
-  // |  Ap Loop   |
-  // +------------+ ((low address, 4k-aligned)
-  //
-
-  StackPages = EFI_SIZE_TO_PAGES (CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
-  FuncPages  = EFI_SIZE_TO_PAGES (ApLoopFuncSize);
-
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  StackPages + FuncPages,
-                  &Address
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Make sure that the buffer memory is executable if NX protection is enabled
-  // for EfiReservedMemoryType.
-  //
-  // TODO: Check EFI_MEMORY_XP bit set or not once it's available in DXE GCD
-  //       service.
-  //
-  Status = gDS->GetMemorySpaceDescriptor (Address, &MemDesc);
-  if (!EFI_ERROR (Status)) {
-    gDS->SetMemorySpaceAttributes (
-           Address,
-           EFI_PAGES_TO_SIZE (FuncPages),
-           MemDesc.Attributes & (~EFI_MEMORY_XP)
-           );
-  }
-
-  mReservedTopOfApStack = (UINTN)Address + EFI_PAGES_TO_SIZE (StackPages+FuncPages);
-  ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
-  mReservedApLoop.Data = (VOID *)(UINTN)Address;
-  ASSERT (mReservedApLoop.Data != NULL);
-  CopyMem (mReservedApLoop.Data, ApLoopFunc, ApLoopFuncSize);
-  if (!CpuMpData->UseSevEsAPMethod) {
-    //
-    // processors without SEV-ES
-    //
-    mApPageTable = CreatePageTable (
-                     (UINTN)Address,
-                     EFI_PAGES_TO_SIZE (StackPages+FuncPages)
-                     );
-  }
+  PrepareApLoopCode (CpuMpData);
 
   Status = gBS->CreateEvent (
                   EVT_TIMER | EVT_NOTIFY_SIGNAL,

@@ -14,7 +14,7 @@ VERSION_STRING = 1.0
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]
@@ -23,6 +23,7 @@ VERSION_STRING = 1.0
   PxeBcDhcp6GoogleTest.h
   ../PxeBcDhcp6.c
   ../PxeBcSupport.c
+  ../../../MdePkg/Test/Mock/Library/GoogleTest/Protocol/MockRng.cpp
 
 [Packages]
   MdePkg/MdePkg.dec

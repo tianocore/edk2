@@ -1,0 +1,34 @@
+## @file
+#  Library class that prints all HOBs.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HobPrintLib
+  FILE_GUID                      = 6b6f69c4-4272-4e8f-9c7f-747e7eed3ba8
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = HobPrintLib
+
+[Sources]
+  HobPrintLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  HobLib
+
+[Guids]
+  gEfiHobMemoryAllocBspStoreGuid
+  gEfiHobMemoryAllocStackGuid
+  gEfiMemoryTypeInformationGuid

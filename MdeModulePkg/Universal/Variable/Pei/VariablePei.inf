@@ -3,7 +3,7 @@
 #
 #  This module implements ReadOnly Variable Services required by PEIM and installs PEI ReadOnly Varaiable2 PPI.
 #
-#  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -41,6 +41,8 @@
   PeiServicesLib
   SafeIntLib
   VariableFlashInfoLib
+  MmUnblockMemoryLib
+  MemoryAllocationLib
 
 [Guids]
   ## CONSUMES             ## GUID # Variable store header
@@ -56,12 +58,16 @@
   ## SOMETIMES_CONSUMES   ## HOB
   ## CONSUMES             ## GUID # Dependence
   gEdkiiFaultTolerantWriteGuid
+  gEdkiiVariableRuntimeCacheInfoHobGuid
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid   ## PRODUCES
+  gEfiPeiMemoryDiscoveredPpiGuid    ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable         ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEnableVariableRuntimeCache      ## CONSUMES
 
 [Depex]
   gEdkiiFaultTolerantWriteGuid

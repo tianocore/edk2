@@ -2,7 +2,7 @@
   AML Lib.
 
   Copyright (c) 2019 - 2023, Arm Limited. All rights reserved.<BR>
-  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -339,7 +339,7 @@ EFI_STATUS
 EFIAPI
 AmlFindNode (
   IN  AML_NODE_HANDLE  ReferenceNode,
-  IN  CHAR8            *AslPath,
+  IN  CONST CHAR8      *AslPath,
   OUT AML_NODE_HANDLE  *OutNode
   );
 
@@ -374,7 +374,7 @@ EFI_STATUS
 EFIAPI
 AmlDeviceOpUpdateName (
   IN  AML_OBJECT_NODE_HANDLE  DeviceOpNode,
-  IN  CHAR8                   *NewNameString
+  IN  CONST CHAR8             *NewNameString
   );
 
 /** Update an integer value defined by a NameOp object node.
@@ -1090,7 +1090,7 @@ EFI_STATUS
 EFIAPI
 AmlCodeGenNameString (
   IN  CONST CHAR8                   *NameString,
-  IN        CHAR8                   *String,
+  IN  CONST CHAR8                   *String,
   IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   );
@@ -1613,7 +1613,7 @@ AmlAddLpiState (
   IN  UINT64                                  Integer                     OPTIONAL,
   IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *ResidencyCounterRegister    OPTIONAL,
   IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *UsageCounterRegister        OPTIONAL,
-  IN  CHAR8                                   *StateName                   OPTIONAL,
+  IN  CONST CHAR8                             *StateName                   OPTIONAL,
   IN  AML_OBJECT_NODE_HANDLE                  LpiNode
   );
 
@@ -1668,7 +1668,7 @@ AmlAddDeviceDataDescriptorPackage (
 EFI_STATUS
 EFIAPI
 AmlAddNameIntegerPackage (
-  IN CHAR8                   *Name,
+  IN CONST CHAR8             *Name,
   IN UINT64                  Value,
   IN AML_OBJECT_NODE_HANDLE  PackageNode
   );
@@ -1739,8 +1739,47 @@ AmlCreateCpcNode (
 EFI_STATUS
 EFIAPI
 AmlAddNameStringToNamedPackage (
-  IN CHAR8                   *NameString,
+  IN CONST CHAR8             *NameString,
   IN AML_OBJECT_NODE_HANDLE  NamedNode
+  );
+
+/** Add an integer value to the named package node.
+
+  AmlCodeGenNamePackage ("_CID", NULL, &PackageNode);
+  AmlGetEisaIdFromString ("PNP0A03", &EisaId);
+  AmlAddIntegerToNamedPackage (EisaId, NameNode);
+  AmlGetEisaIdFromString ("PNP0A08", &EisaId);
+  AmlAddIntegerToNamedPackage (EisaId, NameNode);
+
+  equivalent of the following ASL code:
+  Name (_CID, Package (0x02)  // _CID: Compatible ID
+  {
+      EisaId ("PNP0A03"),
+      EisaId ("PNP0A08")
+  })
+
+  The package is added at the tail of the list of the input package node
+  name:
+    Name ("NamePackageNode", Package () {
+      [Pre-existing package entries],
+      [Newly created integer entry]
+    })
+
+
+  @ingroup CodeGenApis
+
+  @param [in]       Integer       Integer value that need to be added to package node.
+  @param [in, out]  NameNode      Package named node to add the object to.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval Others                  Error occurred during the operation.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddIntegerToNamedPackage (
+  IN        UINT32                  Integer,
+  IN  OUT   AML_OBJECT_NODE_HANDLE  NameNode
   );
 
 /** AML code generation to invoke/call another method.

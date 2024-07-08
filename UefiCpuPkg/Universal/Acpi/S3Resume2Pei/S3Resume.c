@@ -4,7 +4,7 @@
   This module will execute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -39,6 +39,7 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/ReportStatusCodeLib.h>
+#include <Library/MtrrLib.h>
 
 #include <Library/HobLib.h>
 #include <Library/LockBoxLib.h>
@@ -256,6 +257,12 @@ EFI_PEI_PPI_DESCRIPTOR  mPpiListEndOfPeiTable = {
 EFI_PEI_PPI_DESCRIPTOR  mPpiListS3SmmInitDoneTable = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEdkiiS3SmmInitDoneGuid,
+  0
+};
+
+EFI_PEI_PPI_DESCRIPTOR  mPpiListEndOfS3ResumeTable = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiEndOfS3ResumeGuid,
   0
 };
 
@@ -489,6 +496,13 @@ S3ResumeBootOs (
   PERF_INMODULE_BEGIN ("EndOfS3Resume");
 
   DEBUG ((DEBUG_INFO, "Signal EndOfS3Resume\n"));
+
+  //
+  // Install EndOfS3Resume.
+  //
+  Status = PeiServicesInstallPpi (&mPpiListEndOfS3ResumeTable);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Signal EndOfS3Resume to SMM.
   //
@@ -939,6 +953,20 @@ S3ResumeExecuteBootScript (
 }
 
 /**
+  Sync up the MTRR values for all processors.
+
+  @param[in] MtrrTable  Address of MTRR setting.
+**/
+VOID
+EFIAPI
+LoadMtrrData (
+  IN VOID  *MtrrTable
+  )
+{
+  MtrrSetAllMtrrs (MtrrTable);
+}
+
+/**
   Restores the platform to its preboot configuration for an S3 resume and
   jumps to the OS waking vector.
 
@@ -990,6 +1018,7 @@ S3RestoreConfig2 (
   BOOLEAN                        InterruptStatus;
   IA32_CR0                       Cr0;
   EDKII_PEI_MP_SERVICES2_PPI     *MpService2Ppi;
+  MTRR_SETTINGS                  MtrrTable;
 
   TempAcpiS3Context                 = 0;
   TempEfiBootScriptExecutorVariable = 0;
@@ -1082,6 +1111,39 @@ S3RestoreConfig2 (
       Status = SmmAccess->Open ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
     }
 
+    //
+    // Get MP Services2 Ppi to pass it to Smm S3.
+    //
+    Status = PeiServicesLocatePpi (
+               &gEdkiiPeiMpServices2PpiGuid,
+               0,
+               NULL,
+               (VOID **)&MpService2Ppi
+               );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Restore MTRR setting
+    //
+    VarSize = sizeof (MTRR_SETTINGS);
+    Status  = RestoreLockBox (
+                &gEdkiiS3MtrrSettingGuid,
+                &MtrrTable,
+                &VarSize
+                );
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Sync up the MTRR values for all processors.
+    //
+    Status = MpService2Ppi->StartupAllCPUs (
+                              MpService2Ppi,
+                              (EFI_AP_PROCEDURE)LoadMtrrData,
+                              0,
+                              (VOID *)&MtrrTable
+                              );
+    ASSERT_EFI_ERROR (Status);
+
     SmramDescriptor  = (EFI_SMRAM_DESCRIPTOR *)GET_GUID_HOB_DATA (GuidHob);
     SmmS3ResumeState = (SMM_S3_RESUME_STATE *)(UINTN)SmramDescriptor->CpuStart;
 
@@ -1090,7 +1152,6 @@ S3RestoreConfig2 (
     SmmS3ResumeState->ReturnContext1     = (EFI_PHYSICAL_ADDRESS)(UINTN)AcpiS3Context;
     SmmS3ResumeState->ReturnContext2     = (EFI_PHYSICAL_ADDRESS)(UINTN)EfiBootScriptExecutorVariable;
     SmmS3ResumeState->ReturnStackPointer = (EFI_PHYSICAL_ADDRESS)STACK_ALIGN_DOWN (&Status);
-    SmmS3ResumeState->MpService2Ppi      = 0;
 
     DEBUG ((DEBUG_INFO, "SMM S3 Signature                = %x\n", SmmS3ResumeState->Signature));
     DEBUG ((DEBUG_INFO, "SMM S3 Stack Base               = %x\n", SmmS3ResumeState->SmmS3StackBase));
@@ -1119,19 +1180,6 @@ S3RestoreConfig2 (
     if (((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_32) && (sizeof (UINTN) == sizeof (UINT32))) ||
         ((SmmS3ResumeState->Signature == SMM_S3_RESUME_SMM_64) && (sizeof (UINTN) == sizeof (UINT64))))
     {
-      //
-      // Get MP Services2 Ppi to pass it to Smm S3.
-      //
-      Status = PeiServicesLocatePpi (
-                 &gEdkiiPeiMpServices2PpiGuid,
-                 0,
-                 NULL,
-                 (VOID **)&MpService2Ppi
-                 );
-      ASSERT_EFI_ERROR (Status);
-      SmmS3ResumeState->MpService2Ppi = (EFI_PHYSICAL_ADDRESS)(UINTN)MpService2Ppi;
-      DEBUG ((DEBUG_INFO, "SMM S3 MpService2Ppi Point = %lx\n", SmmS3ResumeState->MpService2Ppi));
-
       SwitchStack (
         (SWITCH_STACK_ENTRY_POINT)(UINTN)SmmS3ResumeState->SmmS3ResumeEntryPoint,
         (VOID *)AcpiS3Context,

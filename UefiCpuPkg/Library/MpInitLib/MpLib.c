@@ -1,7 +1,7 @@
 /** @file
   CPU MP Initialize Library common functions.
 
-  Copyright (c) 2016 - 2022, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2020 - 2024, AMD Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -10,12 +10,17 @@
 
 #include "MpLib.h"
 #include <Library/CcExitLib.h>
-#include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/SevSnpMsr.h>
 #include <Register/Amd/Ghcb.h>
 
 EFI_GUID  mCpuInitMpLibHobGuid = CPU_INIT_MP_LIB_HOB_GUID;
 EFI_GUID  mMpHandOffGuid       = MP_HANDOFF_GUID;
 EFI_GUID  mMpHandOffConfigGuid = MP_HANDOFF_CONFIG_GUID;
+
+RELOCATE_AP_LOOP_ENTRY  mReservedApLoop;
+UINTN                   mReservedTopOfApStack;
+volatile UINT32         mNumberToFinish = 0;
+UINTN                   mApPageTable;
 
 /**
   Save the volatile registers required to be restored following INIT IPI.
@@ -114,6 +119,10 @@ FutureBSPProc (
   SaveVolatileRegisters (&DataInHob->APInfo.VolatileRegisters);
   AsmExchangeRole (&DataInHob->APInfo, &DataInHob->BSPInfo);
   RestoreVolatileRegisters (&DataInHob->APInfo.VolatileRegisters, FALSE);
+  //
+  // Update VolatileRegisters saved in CpuMpData->CpuData
+  //
+  CopyMem (&DataInHob->CpuData[DataInHob->BspNumber].VolatileRegisters, &DataInHob->APInfo.VolatileRegisters, sizeof (CPU_VOLATILE_REGISTERS));
 }
 
 /**
@@ -761,11 +770,11 @@ ApWakeupFunction (
       BistData     = (UINT32)ApStackData->Bist;
 
       //
-      // CpuMpData->CpuData[0].VolatileRegisters is initialized based on BSP environment,
+      // CpuMpData->CpuData[BspNumber].VolatileRegisters is initialized based on BSP environment,
       //   to initialize AP in InitConfig path.
-      // NOTE: IDTR.BASE stored in CpuMpData->CpuData[0].VolatileRegisters points to a different IDT shared by all APs.
+      // NOTE: IDTR.BASE stored in CpuMpData->CpuData[BspNumber].VolatileRegisters points to a different IDT shared by all APs.
       //
-      RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+      RestoreVolatileRegisters (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, FALSE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
       ApStartupSignalBuffer = CpuMpData->CpuData[ProcessorNumber].StartupApSignal;
     } else {
@@ -798,10 +807,10 @@ ApWakeupFunction (
         // 1. AP is re-enabled after it's disabled, in either PEI or DXE phase.
         // 2. AP is initialized in DXE phase.
         // In either case, use the volatile registers value derived from BSP.
-        // NOTE: IDTR.BASE stored in CpuMpData->CpuData[0].VolatileRegisters points to a
+        // NOTE: IDTR.BASE stored in CpuMpData->CpuData[BspNumber].VolatileRegisters points to a
         //   different IDT shared by all APs.
         //
-        RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+        RestoreVolatileRegisters (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, FALSE);
       } else {
         if (CpuMpData->ApLoopMode == ApInHltLoop) {
           //
@@ -927,7 +936,7 @@ DxeApEntryPoint (
     AsmWriteMsr64 (MSR_IA32_EFER, EferMsr.Uint64);
   }
 
-  RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
+  RestoreVolatileRegisters (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, FALSE);
   InterlockedIncrement ((UINT32 *)&CpuMpData->FinishedCount);
   PlaceAPInMwaitLoopOrRunLoop (
     CpuMpData->ApLoopMode,
@@ -2151,11 +2160,16 @@ MpInitLibInitialize (
   CpuMpData->BackupBufferSize = ApResetVectorSizeBelow1Mb;
   CpuMpData->WakeupBuffer     = (UINTN)-1;
   CpuMpData->CpuCount         = 1;
-  CpuMpData->BspNumber        = 0;
-  CpuMpData->WaitEvent        = NULL;
-  CpuMpData->SwitchBspFlag    = FALSE;
-  CpuMpData->CpuData          = (CPU_AP_DATA *)(CpuMpData + 1);
-  CpuMpData->CpuInfoInHob     = (UINT64)(UINTN)(CpuMpData->CpuData + MaxLogicalProcessorNumber);
+  if (FirstMpHandOff == NULL) {
+    CpuMpData->BspNumber = 0;
+  } else {
+    CpuMpData->BspNumber = GetBspNumber (FirstMpHandOff);
+  }
+
+  CpuMpData->WaitEvent     = NULL;
+  CpuMpData->SwitchBspFlag = FALSE;
+  CpuMpData->CpuData       = (CPU_AP_DATA *)(CpuMpData + 1);
+  CpuMpData->CpuInfoInHob  = (UINT64)(UINTN)(CpuMpData->CpuData + MaxLogicalProcessorNumber);
   InitializeSpinLock (&CpuMpData->MpLock);
   CpuMpData->SevEsIsEnabled   = ConfidentialComputingGuestHas (CCAttrAmdSevEs);
   CpuMpData->SevSnpIsEnabled  = ConfidentialComputingGuestHas (CCAttrAmdSevSnp);
@@ -2186,11 +2200,11 @@ MpInitLibInitialize (
   // Don't pass BSP's TR to APs to avoid AP init failure.
   //
   VolatileRegisters.Tr = 0;
-  CopyMem (&CpuMpData->CpuData[0].VolatileRegisters, &VolatileRegisters, sizeof (VolatileRegisters));
+  CopyMem (&CpuMpData->CpuData[CpuMpData->BspNumber].VolatileRegisters, &VolatileRegisters, sizeof (VolatileRegisters));
   //
   // Set BSP basic information
   //
-  InitializeApData (CpuMpData, 0, 0, CpuMpData->Buffer + ApStackSize);
+  InitializeApData (CpuMpData, CpuMpData->BspNumber, 0, CpuMpData->Buffer + ApStackSize * (CpuMpData->BspNumber + 1));
   //
   // Save assembly code information
   //
@@ -2245,9 +2259,8 @@ MpInitLibInitialize (
       AmdSevUpdateCpuMpData (CpuMpData);
     }
 
-    CpuMpData->CpuCount  = MaxLogicalProcessorNumber;
-    CpuMpData->BspNumber = GetBspNumber (FirstMpHandOff);
-    CpuInfoInHob         = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
+    CpuMpData->CpuCount = MaxLogicalProcessorNumber;
+    CpuInfoInHob        = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
     for (MpHandOff = FirstMpHandOff;
          MpHandOff != NULL;
          MpHandOff = GetNextMpHandOffHob (MpHandOff))
@@ -2615,7 +2628,12 @@ SwitchBSPWorker (
   SaveVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters);
   AsmExchangeRole (&CpuMpData->BSPInfo, &CpuMpData->APInfo);
   RestoreVolatileRegisters (&CpuMpData->BSPInfo.VolatileRegisters, FALSE);
-
+  //
+  // Update VolatileRegisters saved in CpuMpData->CpuData
+  // Don't pass BSP's TR to APs to avoid AP init failure.
+  //
+  CopyMem (&CpuMpData->CpuData[CpuMpData->NewBspNumber].VolatileRegisters, &CpuMpData->BSPInfo.VolatileRegisters, sizeof (CPU_VOLATILE_REGISTERS));
+  CpuMpData->CpuData[CpuMpData->NewBspNumber].VolatileRegisters.Tr = 0;
   //
   // Set the BSP bit of MSR_IA32_APIC_BASE on new BSP
   //
@@ -3178,19 +3196,25 @@ AmdMemEncryptionAttrCheck (
   IN  CONFIDENTIAL_COMPUTING_GUEST_ATTR  Attr
   )
 {
+  UINT64  CurrentLevel;
+
+  CurrentLevel = CurrentAttr & CCAttrTypeMask;
+
   switch (Attr) {
     case CCAttrAmdSev:
       //
       // SEV is automatically enabled if SEV-ES or SEV-SNP is active.
       //
-      return CurrentAttr >= CCAttrAmdSev;
+      return CurrentLevel >= CCAttrAmdSev;
     case CCAttrAmdSevEs:
       //
       // SEV-ES is automatically enabled if SEV-SNP is active.
       //
-      return CurrentAttr >= CCAttrAmdSevEs;
+      return CurrentLevel >= CCAttrAmdSevEs;
     case CCAttrAmdSevSnp:
-      return CurrentAttr == CCAttrAmdSevSnp;
+      return CurrentLevel == CCAttrAmdSevSnp;
+    case CCAttrFeatureAmdSevEsDebugVirtualization:
+      return !!(CurrentAttr & CCAttrFeatureAmdSevEsDebugVirtualization);
     default:
       return FALSE;
   }
@@ -3226,4 +3250,141 @@ ConfidentialComputingGuestHas (
   }
 
   return (CurrentAttr == Attr);
+}
+
+/**
+  Do sync on APs.
+
+  @param[in, out] Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+RelocateApLoop (
+  IN OUT VOID  *Buffer
+  )
+{
+  CPU_MP_DATA  *CpuMpData;
+  BOOLEAN      MwaitSupport;
+  UINTN        ProcessorNumber;
+  UINTN        StackStart;
+
+  MpInitLibWhoAmI (&ProcessorNumber);
+  CpuMpData    = GetCpuMpData ();
+  MwaitSupport = IsMwaitSupport ();
+  if (CpuMpData->UseSevEsAPMethod) {
+    //
+    // 64-bit AMD processors with SEV-ES
+    //
+    StackStart = CpuMpData->SevEsAPResetStackStart;
+    mReservedApLoop.AmdSevEntry (
+                      MwaitSupport,
+                      CpuMpData->ApTargetCState,
+                      CpuMpData->PmCodeSegment,
+                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+                      (UINTN)&mNumberToFinish,
+                      CpuMpData->Pm16CodeSegment,
+                      CpuMpData->SevEsAPBuffer,
+                      CpuMpData->WakeupBuffer
+                      );
+  } else {
+    //
+    // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or 64-bit AMD processors without SEV-ES
+    //
+    StackStart = mReservedTopOfApStack;
+    mReservedApLoop.GenericEntry (
+                      MwaitSupport,
+                      CpuMpData->ApTargetCState,
+                      StackStart - ProcessorNumber * AP_SAFE_STACK_SIZE,
+                      (UINTN)&mNumberToFinish,
+                      mApPageTable
+                      );
+  }
+
+  //
+  // It should never reach here
+  //
+  ASSERT (FALSE);
+}
+
+/**
+  Prepare ApLoopCode.
+
+  @param[in] CpuMpData  Pointer to CpuMpData.
+**/
+VOID
+PrepareApLoopCode (
+  IN CPU_MP_DATA  *CpuMpData
+  )
+{
+  EFI_PHYSICAL_ADDRESS     Address;
+  MP_ASSEMBLY_ADDRESS_MAP  *AddressMap;
+  UINT8                    *ApLoopFunc;
+  UINTN                    ApLoopFuncSize;
+  UINTN                    StackPages;
+  UINTN                    FuncPages;
+  IA32_CR0                 Cr0;
+
+  AddressMap = &CpuMpData->AddressMap;
+  if (CpuMpData->UseSevEsAPMethod) {
+    //
+    // 64-bit AMD processors with SEV-ES
+    //
+    Address        = BASE_4GB - 1;
+    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddressAmdSev;
+    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeAmdSev;
+  } else {
+    //
+    // Intel processors (32-bit or 64-bit), 32-bit AMD processors, or 64-bit AMD processors without SEV-ES
+    //
+    Address        = MAX_ADDRESS;
+    ApLoopFunc     = AddressMap->RelocateApLoopFuncAddressGeneric;
+    ApLoopFuncSize = AddressMap->RelocateApLoopFuncSizeGeneric;
+  }
+
+  //
+  // Avoid APs access invalid buffer data which allocated by BootServices,
+  // so we will allocate reserved data for AP loop code. We also need to
+  // allocate this buffer below 4GB due to APs may be transferred to 32bit
+  // protected mode on long mode DXE.
+  // Allocating it in advance since memory services are not available in
+  // Exit Boot Services callback function.
+  //
+  // +------------+ (TopOfApStack)
+  // |  Stack * N |
+  // +------------+ (stack base, 4k aligned)
+  // |  Padding   |
+  // +------------+
+  // |  Ap Loop   |
+  // +------------+ ((low address, 4k-aligned)
+  //
+
+  StackPages = EFI_SIZE_TO_PAGES (CpuMpData->CpuCount * AP_SAFE_STACK_SIZE);
+  FuncPages  = EFI_SIZE_TO_PAGES (ApLoopFuncSize);
+
+  AllocateApLoopCodeBuffer (StackPages + FuncPages, &Address);
+  ASSERT (Address != 0);
+
+  Cr0.UintN = AsmReadCr0 ();
+  if (Cr0.Bits.PG != 0) {
+    //
+    // Make sure that the buffer memory is executable if NX protection is enabled
+    // for EfiReservedMemoryType.
+    //
+    RemoveNxprotection (Address, EFI_PAGES_TO_SIZE (FuncPages));
+  }
+
+  mReservedTopOfApStack = (UINTN)Address + EFI_PAGES_TO_SIZE (StackPages+FuncPages);
+  ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
+  mReservedApLoop.Data = (VOID *)(UINTN)Address;
+  ASSERT (mReservedApLoop.Data != NULL);
+  CopyMem (mReservedApLoop.Data, ApLoopFunc, ApLoopFuncSize);
+  if (!CpuMpData->UseSevEsAPMethod) {
+    //
+    // processors without SEV-ES and paging is enabled
+    //
+    mApPageTable = CreatePageTable (
+                     (UINTN)Address,
+                     EFI_PAGES_TO_SIZE (StackPages+FuncPages)
+                     );
+  }
 }

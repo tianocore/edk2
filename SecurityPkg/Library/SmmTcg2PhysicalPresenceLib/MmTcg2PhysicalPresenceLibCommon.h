@@ -10,13 +10,25 @@
   Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction() and Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction()
   will receive untrusted input and do validation.
 
-Copyright (c) 2015 - 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #ifndef _MM_TCG2_PHYSICAL_PRESENCE_LIB_COMMON_H_
 #define _MM_TCG2_PHYSICAL_PRESENCE_LIB_COMMON_H_
+
+#include <Guid/Tcg2PhysicalPresenceData.h>
+
+#include <Protocol/SmmVariable.h>
+
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/Tcg2PpVendorLib.h>
+#include <Library/MmServicesTableLib.h>
+
+#define   PP_INF_VERSION_1_2  "1.2"
 
 /**
   The constructor function locates MmVariable protocol.
@@ -28,6 +40,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 EFI_STATUS
 Tcg2PhysicalPresenceLibCommonConstructor (
+  VOID
+  );
+
+/**
+  Check if Tcg2 PP version is lower than PP_INF_VERSION_1_3.
+
+  @retval TRUE    Tcg2 PP version is lower than PP_INF_VERSION_1_3.
+  @retval Other   Tcg2 PP version is not lower than PP_INF_VERSION_1_3.
+**/
+BOOLEAN
+IsTcg2PPVerLowerThan_1_3 (
   VOID
   );
 

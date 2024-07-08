@@ -2103,6 +2103,13 @@ typedef union {
 #define MSR_IA32_MTRR_PHYSBASE9  0x00000212
 /// @}
 
+#define MSR_IA32_MTRR_CACHE_UNCACHEABLE      0
+#define MSR_IA32_MTRR_CACHE_WRITE_COMBINING  1
+#define MSR_IA32_MTRR_CACHE_WRITE_THROUGH    4
+#define MSR_IA32_MTRR_CACHE_WRITE_PROTECTED  5
+#define MSR_IA32_MTRR_CACHE_WRITE_BACK       6
+#define MSR_IA32_MTRR_CACHE_INVALID_TYPE     7
+
 /**
   MSR information returned for MSR indexes #MSR_IA32_MTRR_PHYSBASE0 to
   #MSR_IA32_MTRR_PHYSBASE9
@@ -5733,9 +5740,9 @@ typedef union {
     /// [Bit 7:4] TME Policy/Encryption Algorithm: Only algorithms enumerated in
     /// IA32_TME_CAPABILITY are allowed.
     /// For example:
-    ///   0000 – AES-XTS-128.
-    ///   0001 – AES-XTS-128 with integrity.
-    ///   0010 – AES-XTS-256.
+    ///   0000 - AES-XTS-128.
+    ///   0001 - AES-XTS-128 with integrity.
+    ///   0010 - AES-XTS-256.
     ///   Other values are invalid.
     ///
     UINT32    TmePolicy : 4;
@@ -5756,7 +5763,7 @@ typedef union {
     /// Similar to enumeration, this is an encoded value.
     /// Writing a value greater than MK_TME_MAX_KEYID_BITS will result in #GP.
     /// Writing a non-zero value to this field will #GP if bit 1 of EAX (Hardware
-    /// Encryption Enable) is not also set to ‘1, as encryption hardware must be
+    /// Encryption Enable) is not also set to 1, as encryption hardware must be
     /// enabled to use MKTME.
     /// Example: To support 255 keys, this field would be set to a value of 8.
     ///

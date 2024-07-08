@@ -696,7 +696,15 @@ Ip6UpdateDelayTimer (
   IN OUT IP6_MLD_GROUP  *Group
   )
 {
-  UINT32  Delay;
+  UINT32      Delay;
+  EFI_STATUS  Status;
+  UINT32      Random;
+
+  Status = PseudoRandomU32 (&Random);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a failed to generate random number: %r\n", __func__, Status));
+    return Status;
+  }
 
   //
   // If the Query packet specifies a Maximum Response Delay of zero, perform timer
@@ -715,7 +723,7 @@ Ip6UpdateDelayTimer (
   // is less than the remaining value of the running timer.
   //
   if ((Group->DelayTimer == 0) || (Delay < Group->DelayTimer)) {
-    Group->DelayTimer = Delay / 4294967295UL * NET_RANDOM (NetRandomInitSeed ());
+    Group->DelayTimer = Delay / 4294967295UL * Random;
   }
 
   return EFI_SUCCESS;
