@@ -554,7 +554,7 @@ typedef enum {
   ProcessorFamilyM2                              = 0x13,
   ProcessorFamilyIntelCeleronM                   = 0x14,
   ProcessorFamilyIntelPentium4Ht                 = 0x15,
-  ProcessorFamilyIntel                           = 0x16,///SMBIOS spec 3.7.0 updated
+  ProcessorFamilyIntel                           = 0x16,
   ProcessorFamilyAmdDuron                        = 0x18,
   ProcessorFamilyK5                              = 0x19,
   ProcessorFamilyK6                              = 0x1A,
@@ -865,7 +865,7 @@ typedef enum {
   ProcessorUpgradeSocketLGA2422   = 0x46,
   ProcessorUpgradeSocketLGA5773   = 0x47,
   ProcessorUpgradeSocketBGA5773   = 0x48,
-  ProcessorUpgradeSocketAM5       = 0x49, ///SMBIOS spec 3.7.0 updated
+  ProcessorUpgradeSocketAM5       = 0x49, 
   ProcessorUpgradeSocketSP5       = 0x4A,
   ProcessorUpgradeSocketSP6       = 0x4B,
   ProcessorUpgradeSocketBGA883    = 0x4C,
@@ -1514,7 +1514,7 @@ typedef struct {
   UINT8    AsyncSurpriseRemoval    : 1;
   UINT8    FlexbusSlotCxl10Capable : 1;
   UINT8    FlexbusSlotCxl20Capable : 1;
-  UINT8    FlexbusSlotCxl30Capable : 1; ///SMBIOS spec 3.7.0 updated CXL 3.0 support
+  UINT8    FlexbusSlotCxl30Capable : 1; 
 } MISC_SLOT_CHARACTERISTICS2;
 
 ///

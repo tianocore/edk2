@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>mu-uncrustify-debug</id>
+    <version>73.0.8</version>
+    <authors>Project Mu Uncrustify Fork</authors>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/uncrustify/uncrustify/blob/master/COPYING</licenseUrl>
+    <projectUrl>https://dev.azure.com/projectmu/Uncrustify</projectUrl>
+    <description>Project Mu fork of the Uncrustify project.</description>
+    <copyright>Copyright (c) 2023</copyright>
+  </metadata>
+</package>
