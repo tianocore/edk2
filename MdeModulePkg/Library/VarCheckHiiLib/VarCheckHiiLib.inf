@@ -25,6 +25,8 @@
   VarCheckHiiGen.c
   VarCheckHiiGen.h
   InternalVarCheckStructure.h
+  VarCheckHiiLibCommon.c
+  VarCheckHiiLibCommon.h
 
 [Packages]
   MdePkg/MdePkg.dec
