@@ -43,7 +43,7 @@
   Caution: This module requires additional review when modified.
   This driver need to make sure the CommBuffer is not in the SMRAM range.
 
-Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -332,8 +332,8 @@ SmmFaultTolerantWriteHandler (
 
   CommBufferPayloadSize = TempCommBufferSize - SMM_FTW_COMMUNICATE_HEADER_SIZE;
 
-  if (!FtwSmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
-    DEBUG ((DEBUG_ERROR, "SmmFtwHandler: SMM communication buffer in SMRAM or overflow!\n"));
+  if (!FtwSmmIsPrimaryBufferValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+    DEBUG ((DEBUG_ERROR, "SmmFtwHandler: SMM Primary(communication buffer) is not valid!\n"));
     return EFI_SUCCESS;
   }
 
