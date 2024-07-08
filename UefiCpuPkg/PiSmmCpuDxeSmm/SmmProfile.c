@@ -573,11 +573,11 @@ InitProtectedMemRange (
 }
 
 /**
-  Update page table according to protected memory ranges and the 4KB-page mapped memory ranges.
+  This function updates memory attribute according to mProtectionMemRangeCount.
 
 **/
 VOID
-InitPaging (
+SmmProfileUpdateMemoryAttributes (
   VOID
   )
 {
@@ -592,91 +592,67 @@ InitPaging (
   BOOLEAN        WriteProtect;
   BOOLEAN        CetEnabled;
 
-  PERF_FUNCTION_BEGIN ();
+  DEBUG ((DEBUG_INFO, "SmmProfileUpdateMemoryAttributes Start...\n"));
+
+  WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
   PageTable = AsmReadCr3 ();
   Limit     = LShiftU64 (1, mPhysicalAddressBits);
-
-  WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
   //
   // [0, 4k] may be non-present.
   //
   PreviousAddress = ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
 
-  DEBUG ((DEBUG_INFO, "Patch page table start ...\n"));
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-    for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
-      MemoryAttrMask = 0;
-      if (mProtectionMemRange[Index].Nx == TRUE) {
-        MemoryAttrMask |= EFI_MEMORY_XP;
-      }
-
-      if (mProtectionMemRange[Index].Present == FALSE) {
-        MemoryAttrMask = EFI_MEMORY_RP;
-      }
-
-      Base   = mProtectionMemRange[Index].Range.Base;
-      Length = mProtectionMemRange[Index].Range.Top - Base;
-      if (MemoryAttrMask != 0) {
-        Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttrMask, TRUE, NULL);
-        ASSERT_RETURN_ERROR (Status);
-      }
-
-      if (Base > PreviousAddress) {
-        //
-        // Mark the ranges not in mProtectionMemRange as non-present.
-        //
-        MemoryAttrMask = EFI_MEMORY_RP;
-        Status         = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, MemoryAttrMask, TRUE, NULL);
-        ASSERT_RETURN_ERROR (Status);
-      }
-
-      PreviousAddress = Base + Length;
+  for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
+    MemoryAttrMask = 0;
+    if (mProtectionMemRange[Index].Nx == TRUE) {
+      MemoryAttrMask = EFI_MEMORY_XP;
     }
 
-    //
-    // This assignment is for setting the last remaining range
-    //
-    MemoryAttrMask = EFI_MEMORY_RP;
-  } else {
-    MemoryAttrMask = EFI_MEMORY_XP;
-    for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
-      Base = mSmmCpuSmramRanges[Index].CpuStart;
-      if (Base > PreviousAddress) {
-        //
-        // Mark the ranges not in mSmmCpuSmramRanges as NX.
-        //
-        Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, MemoryAttrMask, TRUE, NULL);
-        ASSERT_RETURN_ERROR (Status);
-      }
-
-      PreviousAddress = mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize;
+    if (mProtectionMemRange[Index].Present == FALSE) {
+      MemoryAttrMask = EFI_MEMORY_RP;
     }
+
+    Base   = mProtectionMemRange[Index].Range.Base;
+    Length = mProtectionMemRange[Index].Range.Top - Base;
+    if (MemoryAttrMask != 0) {
+      Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttrMask, TRUE, NULL);
+      ASSERT_RETURN_ERROR (Status);
+    }
+
+    if (Base > PreviousAddress) {
+      //
+      // Mark the ranges not in mProtectionMemRange as non-present.
+      //
+      Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, EFI_MEMORY_RP, TRUE, NULL);
+      ASSERT_RETURN_ERROR (Status);
+    }
+
+    PreviousAddress = Base + Length;
   }
 
+  //
+  // Set the last remaining range
+  //
   if (PreviousAddress < Limit) {
-    //
-    // Set the last remaining range to EFI_MEMORY_RP/EFI_MEMORY_XP.
-    // This path applies to both SmmProfile enable/disable case.
-    //
-    Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Limit - PreviousAddress, MemoryAttrMask, TRUE, NULL);
+    Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Limit - PreviousAddress, EFI_MEMORY_RP, TRUE, NULL);
     ASSERT_RETURN_ERROR (Status);
   }
-
-  WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
   //
   // Flush TLB
   //
   CpuFlushTlb ();
-  DEBUG ((DEBUG_INFO, "Patch page table done!\n"));
+
   //
   // Set execute-disable flag
   //
   mXdEnabled = TRUE;
 
-  PERF_FUNCTION_END ();
+  WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
+
+  DEBUG ((DEBUG_INFO, "SmmProfileUpdateMemoryAttributes Done.\n"));
 }
 
 /**
