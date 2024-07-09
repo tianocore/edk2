@@ -9,13 +9,13 @@
 <_Delete lines in \<\> tags before creating the PR._>
 
 - [ ] Breaking change?
-  - **Breaking change** - Will this cause a break in build or boot behavior?
-  - Examples: Add a new library class or move a module to a different repo.
+  - **Breaking change** - Does this PR cause a break in build or boot behavior?
+  - Examples: Does it add a new library class or move a module to a different repo.
 - [ ] Impacts security?
-  - **Security** - Does the change have a direct security impact?
+  - **Security** - Does this PR have a direct security impact?
   - Examples: Crypto algorithm change or buffer overflow fix.
 - [ ] Includes tests?
-  - **Tests** - Does the change include any explicit test code?
+  - **Tests** - Does this PR include any explicit test code?
   - Examples: Unit tests or integration tests.
 
 ## How This Was Tested
