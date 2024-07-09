@@ -249,6 +249,26 @@ struct cb_cbmem_tab {
   UINT64    cbmem_tab;
 };
 
+/*
+ * Machine-friendly version of a system firmware component.  A component is
+ * identified by a GUID.  coreboot is an obvious main component but there could
+ * be others (like EC) which should get their own instances of the tag.
+ *
+ * The main consumer of this information is UEFI firmware but something else
+ * could reuse it too.
+ *
+ * Larger number in a version field corresponds to a more recent version.
+ */
+#define CB_TAG_FW_INFO  0x0045
+struct lb_efi_fw_info {
+  UINT32    tag;
+  UINT32    size;
+  UINT8     guid[16];                 /* Called "firmware class" in UEFI */
+  UINT32    version;                  /* Current version */
+  UINT32    lowest_supported_version; /* Lowest allowed version */
+  UINT32    fw_size;                  /* Size of firmware in bytes */
+} __attribute__ ((packed));
+
 /* Helpful macros */
 
 #define MEM_RANGE_COUNT(_rec) \
