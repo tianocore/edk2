@@ -99,7 +99,7 @@ class LinuxGcc5ToolChain(IUefiBuildPlugin):
         return 0
 
     def _check_riscv64(self):
-        # now check for install dir.  If set then set the Prefix
+        # now check for install dir.  If set then set the Prefix
         install_path = shell_environment.GetEnvironment(
         ).get_shell_var("GCC5_RISCV64_INSTALL")
         if install_path is None:
