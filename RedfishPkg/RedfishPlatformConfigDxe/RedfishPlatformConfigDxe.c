@@ -2483,7 +2483,7 @@ HiiStringProtocolInstalled (
                   (VOID **)&mRedfishPlatformConfigPrivate->HiiString
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: locate EFI_HII_STRING_PROTOCOL failure: %r\n", __func__, Status));
+    DEBUG ((DEBUG_INFO, "%a: locate EFI_HII_STRING_PROTOCOL failure: %r\n", __func__, Status));
     return;
   }
 
@@ -2518,7 +2518,7 @@ HiiDatabaseProtocolInstalled (
                   (VOID **)&mRedfishPlatformConfigPrivate->HiiDatabase
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: locate EFI_HII_DATABASE_PROTOCOL failure: %r\n", __func__, Status));
+    DEBUG ((DEBUG_INFO, "%a: locate EFI_HII_DATABASE_PROTOCOL failure: %r\n", __func__, Status));
     return;
   }
 
@@ -2581,7 +2581,7 @@ RegexProtocolInstalled (
                   (VOID **)&mRedfishPlatformConfigPrivate->RegularExpressionProtocol
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: locate EFI_REGULAR_EXPRESSION_PROTOCOL failure: %r\n", __func__, Status));
+    DEBUG ((DEBUG_INFO, "%a: locate EFI_REGULAR_EXPRESSION_PROTOCOL failure: %r\n", __func__, Status));
     return;
   }
 
