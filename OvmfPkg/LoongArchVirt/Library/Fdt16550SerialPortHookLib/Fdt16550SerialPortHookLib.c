@@ -26,13 +26,13 @@ PlatformHookSerialPortInitialize (
   VOID
   )
 {
-  UINT64  *UartBase;
+  UINT64  UartBase;
 
   if (PcdGet64 (PcdSerialRegisterBase) != 0) {
     return RETURN_SUCCESS;
   }
 
-  *UartBase = CsrRead (LOONGARCH_CSR_KS1);
+  UartBase = CsrRead (LOONGARCH_CSR_KS1);
 
-  return (RETURN_STATUS)PcdSet64S (PcdSerialRegisterBase, (UINTN)*UartBase);
+  return (RETURN_STATUS)PcdSet64S (PcdSerialRegisterBase, (UINTN)UartBase);
 }
