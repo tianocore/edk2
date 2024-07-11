@@ -2,6 +2,7 @@
     Implementation of resetting a network adapter.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-FileCopyrightText: Copyright (c) 2024 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -93,10 +94,12 @@ SnpUndi32Reset (
   EFI_STATUS  Status;
 
   //
-  // Resolve Warning 4 unreferenced parameter problem
+  // There is no support when ExtendedVerification is set to FALSE.
   //
-  ExtendedVerification = 0;
-  DEBUG ((DEBUG_WARN, "ExtendedVerification = %d is not implemented!\n", ExtendedVerification));
+  if (!ExtendedVerification) {
+    DEBUG ((DEBUG_WARN, "ExtendedVerification = %d is not implemented!\n", ExtendedVerification));
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
