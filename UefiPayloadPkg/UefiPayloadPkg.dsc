@@ -43,9 +43,17 @@
   DEFINE USE_CBMEM_FOR_CONSOLE        = FALSE
   DEFINE BOOTSPLASH_IMAGE             = FALSE
   DEFINE NVME_ENABLE                  = TRUE
-  DEFINE CAPSULE_SUPPORT              = FALSE
   DEFINE LOCKBOX_SUPPORT              = FALSE
   DEFINE LOAD_OPTION_ROMS             = FALSE
+
+  #
+  # Capsule updates
+  #
+  # CAPSULE_MAIN_FW_GUID specifies GUID to be used by FmpDxe when
+  # CAPSULE_SUPPORT is set to TRUE
+  #
+  DEFINE CAPSULE_SUPPORT              = FALSE
+  DEFINE CAPSULE_MAIN_FW_GUID         =
 
   #
   # Crypto Support
@@ -287,6 +295,14 @@
     !else
     DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibText/DisplayUpdateProgressLibText.inf
     !endif
+  # If there are no specific checks to do, null-library suffices
+  CapsuleUpdatePolicyLib|FmpDevicePkg/Library/CapsuleUpdatePolicyLibNull/CapsuleUpdatePolicyLibNull.inf
+  FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
+  FmpDependencyCheckLib|FmpDevicePkg/Library/FmpDependencyCheckLib/FmpDependencyCheckLib.inf
+  # No need to save/restore FMP dependencies unless they are utilized
+  FmpDependencyDeviceLib|FmpDevicePkg/Library/FmpDependencyDeviceLibNull/FmpDependencyDeviceLibNull.inf
+  FmpDependencyLib|FmpDevicePkg/Library/FmpDependencyLib/FmpDependencyLib.inf
+  FmpPayloadHeaderLib|FmpDevicePkg/Library/FmpPayloadHeaderLibV1/FmpPayloadHeaderLibV1.inf
   !else
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   !endif
@@ -960,6 +976,24 @@
   }
   MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 !if $(CAPSULE_SUPPORT) == TRUE
+  # Build FmpDxe meant for the inclusion into an update capsule as an embedded driver.
+  FmpDevicePkg/FmpDxe/FmpDxe.inf {
+    <Defines>
+      # FmpDxe interprets its FILE_GUID as firmware GUID.  This allows including
+      # multiple FmpDxe instances along each other targeting different
+      # components.
+      FILE_GUID = $(CAPSULE_MAIN_FW_GUID)
+    <PcdsFixedAtBuild>
+      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName|L"System Firmware"
+      # Public certificate used for validation of UEFI capsules
+      #
+      # See BaseTools/Source/Python/Pkcs7Sign/Readme.md for more details on such
+      # PCDs and include files.
+      !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+    <LibraryClasses>
+      # TODO: provide platform-specific implementation of firmware flashing
+      FmpDeviceLib|FmpDevicePkg/Library/FmpDeviceLibNull/FmpDeviceLibNull.inf
+  }
   MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
 !endif
 
