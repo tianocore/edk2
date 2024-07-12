@@ -759,6 +759,11 @@ SmmProfileStart (
   // The flag indicates SMM profile starts to work.
   //
   mSmmProfileStart = TRUE;
+
+  //
+  // Tell #PF handler to prepare a #DB subsequently.
+  //
+  mSetupDebugTrap = TRUE;
 }
 
 /**
@@ -1146,11 +1151,6 @@ InitSmmProfile (
   // Initialize profile IDT.
   //
   InitIdtr ();
-
-  //
-  // Tell #PF handler to prepare a #DB subsequently.
-  //
-  mSetupDebugTrap = TRUE;
 }
 
 /**

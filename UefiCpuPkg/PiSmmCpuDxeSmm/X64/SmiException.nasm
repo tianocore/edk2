@@ -13,6 +13,7 @@
 ;-------------------------------------------------------------------------------
 
 extern  ASM_PFX(SmiPFHandler)
+extern  ASM_PFX(mSetupDebugTrap)
 
 global  ASM_PFX(gcSmiIdtr)
 global  ASM_PFX(gcSmiGdtr)
@@ -369,9 +370,14 @@ ASM_PFX(PageFaultIdtHandlerSmmProfile):
 
     mov     rsp, rbp
 
+; Check if mSetupDebugTrap is TRUE (non-zero)
+    cmp     byte [dword ASM_PFX(mSetupDebugTrap)], 0
+    jz      SkipSettingTF
+
 ; Enable TF bit after page fault handler runs
     bts     dword [rsp + 40], 8  ;RFLAGS
 
+SkipSettingTF:
     pop     rbp
     add     rsp, 16           ; skip INT# & ErrCode
     iretq
