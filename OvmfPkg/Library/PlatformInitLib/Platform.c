@@ -895,6 +895,16 @@ PlatformReserveEmuVariableNvStore (
   return VariableStore;
 }
 
+#define WRITE_BYTE_CMD           0x10
+#define BLOCK_ERASE_CMD          0x20
+#define CLEAR_STATUS_CMD         0x50
+#define READ_STATUS_CMD          0x70
+#define READ_DEVID_CMD           0x90
+#define BLOCK_ERASE_CONFIRM_CMD  0xd0
+#define READ_ARRAY_CMD           0xff
+
+#define CLEARED_ARRAY_STATUS  0x00
+
 /**
  When OVMF is lauched with -bios parameter, UEFI variables will be
  partially emulated, and non-volatile variables may lose their contents
@@ -927,6 +937,43 @@ PlatformInitEmuVariableNvStore (
   Base = (UINT8 *)(UINTN)PcdGet32 (PcdOvmfFlashNvStorageVariableBase);
   Size = (UINT32)PcdGet32 (PcdFlashNvStorageVariableSize);
   ASSERT (Size < EmuVariableNvStoreSize);
+
+  //
+  // If launch a VM without OvmfFlashNvStorage device, then we'll fail
+  // to check the integrity of NvVarStore and trigger ASSERT (FALSE).
+  // So, we should detect the OvmfFlashNvStorage before calls to
+  // PlatformValidateNvVarStore(). If fail to detect OvmfFlashNvStorage,
+  // we should return and don't initialize the EmuVariableNvStore,
+  // otherwise calls to PlatformValidateNvVarStore() and initialize the
+  // EmuVariableNvStore when succeed to check the integrity of
+  // NvVarStore.
+  //
+  // This method to detect the OvmfFlashNvStorage here references
+  // OvmfPkg/QemuFlashFvbServicesRuntimeDxe/QemuFlash.c.
+  //
+  volatile UINT8  *Ptr;
+
+  UINTN  BlockSize;
+  UINTN  Offset;
+  UINT8  ProbeUint8;
+
+  BlockSize = PcdGet32 (PcdOvmfFirmwareBlockSize);
+
+  for (Offset = 0; Offset < BlockSize; Offset++) {
+    Ptr        = Base + Offset;
+    ProbeUint8 = *Ptr;
+    if ((ProbeUint8 != CLEAR_STATUS_CMD) &&
+        (ProbeUint8 != READ_STATUS_CMD) &&
+        (ProbeUint8 != CLEARED_ARRAY_STATUS))
+    {
+      break;
+    }
+  }
+
+  if (Offset >= BlockSize) {
+    DEBUG ((DEBUG_INFO, "OvmfFlashNvStorage: Failed to find probe location\n"));
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (!PlatformValidateNvVarStore (Base, PcdGet32 (PcdCfvRawDataSize))) {
     ASSERT (FALSE);
