@@ -32,8 +32,6 @@ VARIABLE_TYPE  mMorVariableType[] = {
   { MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME, &gEfiMemoryOverwriteRequestControlLockGuid },
 };
 
-BOOLEAN  mMorPassThru = FALSE;
-
 #define MOR_LOCK_DATA_UNLOCKED            0x0
 #define MOR_LOCK_DATA_LOCKED_WITHOUT_KEY  0x1
 #define MOR_LOCK_DATA_LOCKED_WITH_KEY     0x2
@@ -380,13 +378,6 @@ SetVariableCheckHandlerMor (
   //
 
   //
-  // Permit deletion for passthru request.
-  //
-  if (((Attributes == 0) || (DataSize == 0)) && mMorPassThru) {
-    return EFI_SUCCESS;
-  }
-
-  //
   // Basic Check
   //
   if ((Attributes != (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)) ||
@@ -466,77 +457,17 @@ MorLockInitAtEndOfDxe (
 
   if (MorStatus == EFI_BUFFER_TOO_SMALL) {
     //
-    // The MOR variable exists.
+    // The MOR variable exists; set the MOR Control Lock variable to report the
+    // capability to the OS.
     //
-    // Some OSes don't follow the TCG's Platform Reset Attack Mitigation spec
-    // in that the OS should never create the MOR variable, only read and write
-    // it -- these OSes (unintentionally) create MOR if the platform firmware
-    // does not produce it. Whether this is the case (from the last OS boot)
-    // can be deduced from the absence of the TCG / TCG2 protocols, as edk2's
-    // MOR implementation depends on (one of) those protocols.
-    //
-    if (VariableHaveTcgProtocols ()) {
-      //
-      // The MOR variable originates from the platform firmware; set the MOR
-      // Control Lock variable to report the locking capability to the OS.
-      //
-      SetMorLockVariable (0);
-      return;
-    }
-
-    //
-    // The MOR variable's origin is inexplicable; delete it.
-    //
-    DEBUG ((
-      DEBUG_WARN,
-      "%a: deleting unexpected / unsupported variable %g:%s\n",
-      __func__,
-      &gEfiMemoryOverwriteControlDataGuid,
-      MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME
-      ));
-
-    mMorPassThru = TRUE;
-    VariableServiceSetVariable (
-      MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
-      &gEfiMemoryOverwriteControlDataGuid,
-      0,                                      // Attributes
-      0,                                      // DataSize
-      NULL                                    // Data
-      );
-    mMorPassThru = FALSE;
+    SetMorLockVariable (0);
+    return;
   }
 
   //
-  // The MOR variable is absent; the platform firmware does not support it.
-  // Lock the variable so that no other module may create it.
-  //
-  NewPolicy = NULL;
-  Status    = CreateBasicVariablePolicy (
-                &gEfiMemoryOverwriteControlDataGuid,
-                MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME,
-                VARIABLE_POLICY_NO_MIN_SIZE,
-                VARIABLE_POLICY_NO_MAX_SIZE,
-                VARIABLE_POLICY_NO_MUST_ATTR,
-                VARIABLE_POLICY_NO_CANT_ATTR,
-                VARIABLE_POLICY_TYPE_LOCK_NOW,
-                &NewPolicy
-                );
-  if (!EFI_ERROR (Status)) {
-    Status = RegisterVariablePolicy (NewPolicy);
-  }
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a - Failed to lock variable %s! %r\n", __func__, MEMORY_OVERWRITE_REQUEST_VARIABLE_NAME, Status));
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  if (NewPolicy != NULL) {
-    FreePool (NewPolicy);
-  }
-
-  //
-  // Delete the MOR Control Lock variable too (should it exists for some
-  // reason) and prevent other modules from creating it.
+  // The platform does not support the MOR variable. Delete the MOR Control
+  // Lock variable (should it exists for some reason) and prevent other modules
+  // from creating it.
   //
   mMorLockPassThru = TRUE;
   VariableServiceSetVariable (

@@ -111,38 +111,3 @@ VariableServiceInitialize (
 {
   return MmVariableServiceInitialize ();
 }
-
-/**
-  Whether the TCG or TCG2 protocols are installed in the UEFI protocol database.
-  This information is used by the MorLock code to infer whether an existing
-  MOR variable is legitimate or not.
-
-  @retval TRUE  Either the TCG or TCG2 protocol is installed in the UEFI
-                protocol database
-  @retval FALSE Neither the TCG nor the TCG2 protocol is installed in the UEFI
-                protocol database
-**/
-BOOLEAN
-VariableHaveTcgProtocols (
-  VOID
-  )
-{
-  EFI_STATUS  Status;
-  VOID        *Interface;
-
-  Status = gBS->LocateProtocol (
-                  &gEfiTcg2ProtocolGuid,
-                  NULL,                     // Registration
-                  &Interface
-                  );
-  if (!EFI_ERROR (Status)) {
-    return TRUE;
-  }
-
-  Status = gBS->LocateProtocol (
-                  &gEfiTcgProtocolGuid,
-                  NULL,                     // Registration
-                  &Interface
-                  );
-  return !EFI_ERROR (Status);
-}

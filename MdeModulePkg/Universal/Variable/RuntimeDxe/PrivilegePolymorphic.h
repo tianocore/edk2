@@ -155,19 +155,4 @@ VariableSmmIsNonPrimaryBufferValid (
   IN UINT64                Length
   );
 
-/**
-  Whether the TCG or TCG2 protocols are installed in the UEFI protocol database.
-  This information is used by the MorLock code to infer whether an existing
-  MOR variable is legitimate or not.
-
-  @retval TRUE  Either the TCG or TCG2 protocol is installed in the UEFI
-                protocol database
-  @retval FALSE Neither the TCG nor the TCG2 protocol is installed in the UEFI
-                protocol database
-**/
-BOOLEAN
-VariableHaveTcgProtocols (
-  VOID
-  );
-
 #endif
