@@ -552,12 +552,12 @@
   #
   # Network Support
   #
-#!include NetworkPkg/NetworkComponents.dsc.inc
+!include NetworkPkg/NetworkComponents.dsc.inc
 
-#  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
-#    <LibraryClasses>
-#      NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
-#  }
+  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
+  }
 
 !if $(NETWORK_TLS_ENABLE) == TRUE
   NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
