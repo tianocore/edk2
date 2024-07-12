@@ -70,8 +70,6 @@
 - include:
     id: cpp/unused-local-variable
 - include:
-    id: cpp/unused-static-function
-- include:
     id: cpp/unused-static-variable
 
 # Note: Some queries above are not active by default with the below filter.
