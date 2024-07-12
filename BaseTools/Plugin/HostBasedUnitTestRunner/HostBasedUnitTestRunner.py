@@ -110,6 +110,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 if ret != 0:
                     logging.error("UnitTest Execution Error: " +
                                   os.path.basename(test))
+                    failure_count += 1
                 else:
                     logging.info("UnitTest Completed: " +
                                  os.path.basename(test))
