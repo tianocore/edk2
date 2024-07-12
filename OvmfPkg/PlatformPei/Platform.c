@@ -224,6 +224,12 @@ ReserveEmuVariableNvStore (
   PcdStatus     = PcdSet64S (PcdEmuVariableNvStoreReserved, VariableStore);
 
   if (FeaturePcdGet (PcdSecureBootSupported)) {
+    // update mapping of FlashNvVarStore address range
+    SevFlashNvVarStoreUpdateMapping (
+                                     PcdGet32 (PcdOvmfFlashNvStorageVariableBase),
+                                     2 * PcdGet32 (PcdFlashNvStorageFtwSpareSize)
+                                     );
+
     // restore emulated VarStore from pristine ROM copy
     PlatformInitEmuVariableNvStore ((VOID *)(UINTN)VariableStore);
   }

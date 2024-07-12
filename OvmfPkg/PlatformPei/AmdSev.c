@@ -575,3 +575,108 @@ SevInitializeRam (
       );
   }
 }
+
+/**
+  Prepared for FlashNvVarStore access.
+
+  **/
+VOID
+SevFlashNvVarStoreUpdateMapping (
+  IN UINTN  NvVarStoreBase,
+  IN UINTN  NvVarStoreSize
+  )
+{
+  volatile UINT8  *Ptr;
+
+  RETURN_STATUS  DecEncStatus;
+  UINT8          Offset;
+
+  DEBUG ((DEBUG_INFO, "%a\n", __func__));
+
+  if (!MemEncryptSevIsEnabled ()) {
+    return;
+  }
+
+  //
+  // In the case of launch a SEV-ES VM with just OVMF_CODE.fd, the
+  // validation process in PlatformValidateNvVarStore will trigger MMIO
+  // NPF, and the #VC handler will detect that mmio access is invalid
+  // because the mmio address range of FlashNvVarStore is mapped as
+  // encrypted. So, first we should update the mapping of address range
+  // of FlashNvVarStore as decrypted.
+  //
+  DEBUG (
+         (
+          DEBUG_INFO,
+          "%a: mapping FlashNvVarStore address range unencrypted [0x%p - 0x%p]\n",
+          __func__,
+          (UINT8 *)NvVarStoreBase,
+          (UINT8 *)NvVarStoreBase + NvVarStoreSize - 1
+         )
+         );
+
+  DecEncStatus = MemEncryptSevClearMmioPageEncMask (
+                                                    0,
+                                                    NvVarStoreBase,
+                                                    EFI_SIZE_TO_PAGES (NvVarStoreSize)
+                                                    );
+  if (RETURN_ERROR (DecEncStatus)) {
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "%a: failed to map FlashNvStorage address range unencrypted\n",
+            __func__
+           )
+           );
+    ASSERT_RETURN_ERROR (DecEncStatus);
+  }
+
+  //
+  // Here, the first 16 bytes of FlashNvVarStore will be all zeros in
+  // the following cases:
+  //     a. Launch VM with just OVMF_CODE.fd
+  //     b. Launch VM with OVMF_CODE.fd and OVMF_VARS.fd
+  // In these cases, the access of FlashNvVarStore will be as expected.
+  //
+  // But if launch VM with just OVMF.fd, the first 16 bytes of
+  // FlashNvVarStore will be scrambled data because the data of
+  // FlashNvVarStore are encrypted by SEV API. In this case, we need
+  // mapping FlashNvVarStore address range as encrypted again, otherwise
+  // the validation of FlashNvVarStore will fail and trigger
+  // ASSERT (FALSE).
+  //
+  for (Offset = 0; Offset < 16; Offset++) {
+    Ptr = (UINT8 *)NvVarStoreBase + Offset;
+    if (*Ptr) {
+      break;
+    }
+  }
+
+  if (Offset == 16) {
+    return;
+  }
+
+  DEBUG (
+         (
+          DEBUG_INFO,
+          "%a: mapping FlashNvStorage address range encrypted\n",
+          __func__
+         )
+         );
+
+  DecEncStatus = MemEncryptSevSetPageEncMask (
+                                              0,
+                                              NvVarStoreBase,
+                                              EFI_SIZE_TO_PAGES (NvVarStoreSize)
+                                              );
+  if (RETURN_ERROR (DecEncStatus)) {
+    DEBUG (
+           (
+            DEBUG_ERROR,
+            "%a: failed to map FlashNvStorage address range encrypted\n",
+            __func__
+           )
+           );
+    ASSERT_RETURN_ERROR (DecEncStatus);
+  }
+}
