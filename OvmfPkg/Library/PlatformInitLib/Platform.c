@@ -905,6 +905,8 @@ PlatformReserveEmuVariableNvStore (
 
 #define CLEARED_ARRAY_STATUS  0x00
 
+#define ERASED_UINT8  0xff
+
 /**
  When OVMF is lauched with -bios parameter, UEFI variables will be
  partially emulated, and non-volatile variables may lose their contents
@@ -982,6 +984,24 @@ PlatformInitEmuVariableNvStore (
 
   DEBUG ((DEBUG_INFO, "Init EmuVariableNvStore with the content in FlashNvStorage\n"));
 
+  //
+  // Init the whole EmuVariableNvStore before copy the content from
+  // FlashNvStorage to the EmuVariableNvStore.
+  //
+  // In the case launch with just OVMF.fd, if we just init part of the
+  // EmuVariableNvStore, then EmuVariableFvbRuntimeDxe will skip the
+  // initialize process of the EmuVariableNvStore and the Ftw (Fault
+  // Tolerant Write) part of the EmuVariableNvStore will not be
+  // initialized before the Ftw part is accessed. When we launch a SEV
+  // guest, the FaultTolerantWriteDxe will get scrambled data when read
+  // Ftw part of the EmuVariableNvStore, the FaultToleranteWriteDxe
+  // access address specified by the scrambled data will cause invalid
+  // address access and crash.
+  //
+  // The method to init EmuVariableNvStore here references
+  // OvmfPkg/EmuVariableFvbRuntimeDxe/Fvb.c.
+  //
+  SetMem (EmuVariableNvStore, EmuVariableNvStoreSize, ERASED_UINT8);
   CopyMem (EmuVariableNvStore, Base, Size);
 
   return EFI_SUCCESS;
