@@ -1997,6 +1997,20 @@ def CreateHeaderCode(Info, AutoGenC, AutoGenH):
     AutoGenH.Append("#define EFI_CALLER_ID_GUID \\\n  %s\n" % GuidStringToGuidStructureString(Info.Guid))
     AutoGenH.Append("#define EDKII_DSC_PLATFORM_GUID \\\n  %s\n" % GuidStringToGuidStructureString(Info.PlatformInfo.Guid))
 
+    decimal_version_pattern = r'^[0-9]+(\.[0-9]+)?$'
+    # Handle SPEC keywords in [Defines] section
+    spec_key_regex = re.compile(r'^SPEC\s+([a-zA-Z_]\w*)$')
+    for k,v in Info.Module._Defs.items():
+        match = re.match(spec_key_regex, k)
+        if match:
+            # If value matches expected format, append a #define statement to AutoGen.h
+            if re.match(decimal_version_pattern, v):
+                AutoGenH.Append("\n#define %s %s\n" % (match.group(1), v))
+            else:
+                # If v does not match the <DecimalVersion> pattern log an error and exit gracefully
+                EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "Refer to <DecimalVersion> pattern for SPEC keyword in Defines section", match.group(1))
+                return
+
     if Info.IsLibrary:
         return
     # C file header
