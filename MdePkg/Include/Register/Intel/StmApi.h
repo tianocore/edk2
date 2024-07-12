@@ -18,6 +18,8 @@
 
 #pragma pack (1)
 
+#define STM_SMM_REV_ID  0x80010100
+
 /**
   STM Header Structures
 **/
