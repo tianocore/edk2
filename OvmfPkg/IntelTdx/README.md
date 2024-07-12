@@ -61,8 +61,8 @@ Build
 cd /path/to/edk2
 source edksetup.sh
 
-## without CC_MEASUREMENT enabled
-build -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t GCC5 -b RELEASE
+## CC_MEASUREMENT disabled
+build -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t GCC5 -D CC_MEASUREMENT_ENABLE=FALSE -b RELEASE
 
 ## CC_MEASUREMENT enabled
 build -p OvmfPkg/OvmfPkgX64.dsc -a X64 -t GCC5 -D CC_MEASUREMENT_ENABLE=TRUE -b RELEASE
