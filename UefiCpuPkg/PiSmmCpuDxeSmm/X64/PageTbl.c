@@ -823,15 +823,6 @@ SmiDefaultPFHandler (
     }
 
     PTIndex = BitFieldRead64 (PFAddress, StartBit, StartBit + 8);
-    if ((PageTable[PTIndex] & IA32_PG_P) != 0) {
-      //
-      // Check if the entry has already existed, this issue may occur when the different
-      // size page entries created under the same entry
-      //
-      DEBUG ((DEBUG_ERROR, "PageTable = %lx, PTIndex = %x, PageTable[PTIndex] = %lx\n", PageTable, PTIndex, PageTable[PTIndex]));
-      DEBUG ((DEBUG_ERROR, "New page table overlapped with old page table!\n"));
-      ASSERT (FALSE);
-    }
 
     //
     // Fill the new entry
