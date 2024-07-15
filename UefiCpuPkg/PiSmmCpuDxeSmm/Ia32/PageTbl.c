@@ -1,7 +1,7 @@
 /** @file
 Page table manipulation functions for IA-32 processors
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -64,6 +64,22 @@ SmmInitPageTable (
   }
 
   return GenSmmPageTable (PagingPae, mPhysicalAddressBits);
+}
+
+/**
+  Allocate free Page for PageFault handler use.
+
+  @return Page address.
+
+**/
+UINT64
+AllocPage (
+  VOID
+  )
+{
+  CpuDeadLoop ();
+
+  return 0;
 }
 
 /**
