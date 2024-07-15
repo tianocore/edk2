@@ -1202,6 +1202,21 @@ RestorePageTableBelow4G (
   // PDPTE
   //
   PTIndex = (UINTN)BitFieldRead64 (PFAddress, 30, 38);
+
+  if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
+    //
+    // For 32-bit case, because a full map page table for 0-4G is created by default,
+    // and since the PDPTE must be one non-leaf entry, the PDPTE must always be present.
+    // So, ASSERT it must be the 64-bit case running here.
+    //
+    ASSERT (sizeof (UINT64) == sizeof (UINTN));
+
+    //
+    // If the entry is not present, allocate one page from page pool for it
+    //
+    PageTable[PTIndex] = AllocPage () | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+  }
+
   ASSERT (PageTable[PTIndex] != 0);
   PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
 
@@ -1209,9 +1224,9 @@ RestorePageTableBelow4G (
   // PD
   //
   PTIndex = (UINTN)BitFieldRead64 (PFAddress, 21, 29);
-  if ((PageTable[PTIndex] & IA32_PG_PS) != 0) {
+  if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
     //
-    // Large page
+    // A 2M page size will be used directly when the 2M entry is marked as non-present.
     //
 
     //
@@ -1238,7 +1253,8 @@ RestorePageTableBelow4G (
     }
   } else {
     //
-    // Small page
+    // If the 2M entry is marked as present, a 4K page size will be utilized.
+    // In this scenario, the 2M entry must be a non-leaf entry.
     //
     ASSERT (PageTable[PTIndex] != 0);
     PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);

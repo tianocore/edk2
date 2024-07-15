@@ -1,7 +1,7 @@
 /** @file
 SMM profile internal header file.
 
-Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2020, AMD Incorporated. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -140,6 +140,17 @@ BOOLEAN
 IsAddressValid (
   IN EFI_PHYSICAL_ADDRESS  Address,
   IN BOOLEAN               *Nx
+  );
+
+/**
+  Allocate free Page for PageFault handler use.
+
+  @return Page address.
+
+**/
+UINT64
+AllocPage (
+  VOID
   );
 
 /**
