@@ -412,7 +412,7 @@ AcquireRedfishServiceOnNetworkInterfaceCallback (
         EFI_ERROR (ThisRedfishDiscoveredToken->DiscoverList.RedfishInstances->Status))
     {
       gBS->CloseEvent (ThisRedfishDiscoveredToken->Event);
-      DEBUG ((DEBUG_ERROR, "%a: Free Redfish discovered token - %x.\n", __func__, ThisRedfishDiscoveredToken));
+      DEBUG ((DEBUG_MANAGEABILITY, "%a: Free Redfish discovered token - %x.\n", __func__, ThisRedfishDiscoveredToken));
       FreePool (ThisRedfishDiscoveredToken);
     }
 
