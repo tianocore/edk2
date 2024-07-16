@@ -100,8 +100,7 @@ DirMapCsrRd:
   jirl     $zero, $t0, 0
 
 ReadSelNumErr:
-  addi.d   $a0, $zero, -1
-  jirl     $zero, $ra, 0
+  break    0
 
 BasicCsrRead:
   CsrSel = LOONGARCH_CSR_CRMD
@@ -230,8 +229,7 @@ DirMapCsrWr:
   jirl     $zero, $t0, 0
 
 WriteSelNumErr:
-  addi.d   $a0, $zero, -1
-  jirl     $zero, $ra, 0
+  break    0
 
 BasicCsrWrite:
   CsrSel = LOONGARCH_CSR_CRMD
@@ -368,8 +366,7 @@ DirMapCsrXchg:
   jirl     $zero, $t0, 0
 
 XchgSelNumErr:
-  addi.d   $a0, $zero, -1
-  jirl     $zero, $ra, 0
+  break    0
 
 BasicCsrXchange:
   CsrSel = LOONGARCH_CSR_CRMD
