@@ -29,7 +29,8 @@ AsmCsrXChg (
 
   @param[in]  Select   CSR read instruction select values.
 
-  @return     The return value of csrrd instruction, return -1 means Select is out of support.
+  @return     The return value of csrrd instruction,
+              if a break exception is triggered, the Select is out of support.
 **/
 UINTN
 EFIAPI
@@ -47,7 +48,7 @@ CsrRead (
   @param[in, out]  Value   The csrwr will write the value.
 
   @return     The return value of csrwr instruction, that is, store the old value of
-              the register, return -1 means Select is out of support.
+              the register, if a break exception is triggered, the Select is out of support.
 **/
 UINTN
 EFIAPI
@@ -67,7 +68,7 @@ CsrWrite (
   @param[in]       Mask     The csrxchg mask value.
 
   @return     The return value of csrxchg instruction, that is, store the old value of
-              the register, return -1 means Select is out of support.
+              the register, if a break exception is triggered, the Select is out of support.
 **/
 UINTN
 EFIAPI
