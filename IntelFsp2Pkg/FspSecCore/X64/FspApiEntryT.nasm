@@ -30,7 +30,7 @@ extern ASM_PFX(SecCarInit)
 ; Define the data length that we saved on the stack top
 ;
 DATA_LEN_OF_PER0         EQU   18h
-DATA_LEN_OF_MCUD         EQU   18h
+DATA_LEN_OF_MCUD         EQU   28h
 DATA_LEN_AT_STACK_TOP    EQU   (DATA_LEN_OF_PER0 + DATA_LEN_OF_MCUD + 4)
 
 ;
