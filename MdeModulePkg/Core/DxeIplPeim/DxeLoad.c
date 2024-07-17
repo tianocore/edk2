@@ -3,7 +3,7 @@
   Responsibility of this module is to load the DXE Core from a Firmware Volume.
 
 Copyright (c) 2016 HP Development Company, L.P.
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -487,9 +487,9 @@ DxeIplFindDxeCore (
     //
     if (EFI_ERROR (Status)) {
       REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_CORE_EC_DXE_CORRUPT));
+      ASSERT_EFI_ERROR (Status);
+      break;
     }
-
-    ASSERT_EFI_ERROR (Status);
 
     //
     // Find the DxeCore file type from the beginning in this firmware volume.
@@ -509,6 +509,13 @@ DxeIplFindDxeCore (
     //
     Instance++;
   }
+
+  //
+  // DxeCore cannot find in any firmware volume.
+  //
+  CpuDeadLoop ();
+
+  return NULL;
 }
 
 /**
