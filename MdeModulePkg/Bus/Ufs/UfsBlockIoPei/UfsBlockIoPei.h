@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -31,7 +31,8 @@
 
 #define UFS_PEIM_HC_SIG  SIGNATURE_32 ('U', 'F', 'S', 'H')
 
-#define UFS_PEIM_MAX_LUNS  8
+#define UFS_PEIM_MAX_LUNS            8
+#define UFS_INIT_COMPLETION_TIMEOUT  600000
 
 typedef struct {
   UINT8     Lun[UFS_PEIM_MAX_LUNS];
@@ -224,6 +225,25 @@ EFI_STATUS
 UfsSetFlag (
   IN  UFS_PEIM_HC_PRIVATE_DATA  *Private,
   IN  UINT8                     FlagId
+  );
+
+/**
+  Read specified flag from a UFS device.
+
+  @param[in]  Private           The pointer to the UFS_PEIM_HC_PRIVATE_DATA data structure.
+  @param[in]  FlagId            The ID of flag to be read.
+  @param[out] Value             The flag's value.
+
+  @retval EFI_SUCCESS           The flag was read successfully.
+  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to read the flag.
+  @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of reading the flag.
+
+**/
+EFI_STATUS
+UfsReadFlag (
+  IN  UFS_PEIM_HC_PRIVATE_DATA  *Private,
+  IN  UINT8                     FlagId,
+  OUT UINT8                     *Value
   );
 
 /**
