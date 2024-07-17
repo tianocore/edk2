@@ -1489,7 +1489,7 @@ DisplayBiosCharacteristics (
   }
 
   if (BIT (Chara, 5) != 0) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MSA_SUPPORTED), gShellDebug1HiiHandle);
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_MCA_SUPPORTED), gShellDebug1HiiHandle);
   }
 
   if (BIT (Chara, 6) != 0) {
@@ -1600,7 +1600,7 @@ DisplayBiosCharacteristics (
   // Just print the Reserved
   //
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BITS_32_47), gShellDebug1HiiHandle);
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BITS_48_64), gShellDebug1HiiHandle);
+  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BITS_48_63), gShellDebug1HiiHandle);
 }
 
 /**
