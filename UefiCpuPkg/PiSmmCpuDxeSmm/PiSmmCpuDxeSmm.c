@@ -1359,7 +1359,7 @@ PiCpuSmmEntry (
   InitSmmProfile (Cr3);
 
   GetAcpiS3EnableFlag ();
-  InitSmmS3ResumeState (Cr3);
+  InitSmmS3ResumeState ();
 
   DEBUG ((DEBUG_INFO, "SMM CPU Module exit from SMRAM with EFI_SUCCESS\n"));
 
