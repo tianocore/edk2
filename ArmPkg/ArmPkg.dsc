@@ -116,7 +116,6 @@
   ArmPkg/Library/SemiHostingDebugLib/SemiHostingDebugLib.inf
   ArmPkg/Library/SemiHostingSerialPortLib/SemiHostingSerialPortLib.inf
   ArmPkg/Library/SemihostLib/SemihostLib.inf
-  ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
   ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
   ArmPkg/Library/ArmExceptionLib/ArmRelocateExceptionLib.inf
 
