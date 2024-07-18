@@ -187,12 +187,10 @@ SmmRestoreCpu (
 /**
   Initialize SMM S3 resume state structure used during S3 Resume.
 
-  @param[in] Cr3    The base address of the page tables to use in SMM.
-
 **/
 VOID
 InitSmmS3ResumeState (
-  IN UINT32  Cr3
+  VOID
   )
 {
   VOID                  *GuidHob;
@@ -233,7 +231,6 @@ InitSmmS3ResumeState (
     }
 
     SmmS3ResumeState->SmmS3Cr0 = (UINT32)AsmReadCr0 ();
-    SmmS3ResumeState->SmmS3Cr3 = Cr3;
     SmmS3ResumeState->SmmS3Cr4 = (UINT32)AsmReadCr4 ();
 
     if (sizeof (UINTN) == sizeof (UINT64)) {

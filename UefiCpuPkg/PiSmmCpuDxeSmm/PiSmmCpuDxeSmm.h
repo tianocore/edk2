@@ -1045,12 +1045,10 @@ extern BOOLEAN  mSmmS3Flag;
 /**
   Initialize SMM S3 resume state structure used during S3 Resume.
 
-  @param[in] Cr3    The base address of the page tables to use in SMM.
-
 **/
 VOID
 InitSmmS3ResumeState (
-  IN UINT32  Cr3
+  VOID
   );
 
 /**
