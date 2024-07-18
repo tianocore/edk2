@@ -34,7 +34,8 @@
         "AcceptableDependencies": [
             "MdePkg/MdePkg.dec",
             "PcAtChipsetPkg/PcAtChipsetPkg.dec",
-            "UefiCpuPkg/UefiCpuPkg.dec"
+            "UefiCpuPkg/UefiCpuPkg.dec",
+            "MdeModulePkg/MdeModulePkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[],
