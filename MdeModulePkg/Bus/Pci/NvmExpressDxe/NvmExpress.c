@@ -3,6 +3,7 @@
   NVM Express specification.
 
   Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -182,6 +183,26 @@ EnumerateNvmeDevNamespace (
     InitializeListHead (&Device->AsyncQueue);
 
     //
+    // Create Media Sanitize Protocol instance
+    //
+    Device->MediaSanitize.Revision    = MEDIA_SANITIZE_PROTOCOL_REVISION;
+    Device->MediaSanitize.Media       = &Device->Media;
+    Device->MediaSanitize.MediaClear  = NvmExpressMediaClear;
+    Device->MediaSanitize.MediaPurge  = NvmExpressMediaPurge;
+    Device->MediaSanitize.MediaFormat = NvmExpressMediaFormat;
+
+    ASSERT (
+      sizeof (Device->MediaSanitize.SanitizeCapabilities) ==
+      sizeof (Device->Controller->ControllerData->Sanicap)
+      );
+
+    CopyMem (
+      &(Device->MediaSanitize.SanitizeCapabilities),
+      &(Device->Controller->ControllerData->Sanicap),
+      sizeof (Device->MediaSanitize.SanitizeCapabilities)
+      );
+
+    //
     // Create StorageSecurityProtocol Instance
     //
     Device->StorageSecurity.ReceiveData = NvmeStorageSecurityReceiveData;
@@ -241,6 +262,8 @@ EnumerateNvmeDevNamespace (
                     &Device->BlockIo2,
                     &gEfiDiskInfoProtocolGuid,
                     &Device->DiskInfo,
+                    &gMediaSanitizeProtocolGuid,
+                    &Device->MediaSanitize,
                     NULL
                     );
 
@@ -269,6 +292,8 @@ EnumerateNvmeDevNamespace (
                &Device->BlockIo2,
                &gEfiDiskInfoProtocolGuid,
                &Device->DiskInfo,
+               &gMediaSanitizeProtocolGuid,
+               &Device->MediaSanitize,
                NULL
                );
         goto Exit;
@@ -468,6 +493,8 @@ UnregisterNvmeNamespace (
                   &Device->BlockIo2,
                   &gEfiDiskInfoProtocolGuid,
                   &Device->DiskInfo,
+                  &gMediaSanitizeProtocolGuid,
+                  &Device->MediaSanitize,
                   NULL
                   );
 
