@@ -44,7 +44,7 @@ KvmtoolRtcMapMemory (
                   EfiGcdMemoryTypeMemoryMappedIo,
                   RtcPageBase,
                   EFI_PAGE_SIZE,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((
@@ -80,7 +80,7 @@ KvmtoolRtcMapMemory (
   Status = gDS->SetMemorySpaceAttributes (
                   RtcPageBase,
                   EFI_PAGE_SIZE,
-                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME | EFI_MEMORY_XP
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((
