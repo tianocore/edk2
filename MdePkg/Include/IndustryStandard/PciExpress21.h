@@ -40,7 +40,7 @@ typedef union {
     UINT16    SlotImplemented        : 1;
     UINT16    InterruptMessageNumber : 5;
     UINT16    Undefined              : 1;
-    UINT16    Reserved               : 1;
+    UINT16    FlitModeSupported      : 1;
   } Bits;
   UINT16    Uint16;
 } PCI_REG_PCIE_CAPABILITY;
@@ -64,11 +64,13 @@ typedef union {
     UINT32    EndpointL1AcceptableLatency  : 3;
     UINT32    Undefined                    : 3;
     UINT32    RoleBasedErrorReporting      : 1;
-    UINT32    Reserved                     : 2;
+    UINT32    ErrCorSubclassCapable        : 1;
+    UINT32    RxMpsFixed                   : 1;
     UINT32    CapturedSlotPowerLimitValue  : 8;
     UINT32    CapturedSlotPowerLimitScale  : 2;
     UINT32    FunctionLevelReset           : 1;
-    UINT32    Reserved2                    : 3;
+    UINT32    MixedMpsSupported            : 1;
+    UINT32    Reserved2                    : 2;
   } Bits;
   UINT32    Uint32;
 } PCI_REG_PCIE_DEVICE_CAPABILITY;
@@ -111,13 +113,14 @@ typedef union {
 
 typedef union {
   struct {
-    UINT16    CorrectableError    : 1;
-    UINT16    NonFatalError       : 1;
-    UINT16    FatalError          : 1;
-    UINT16    UnsupportedRequest  : 1;
-    UINT16    AuxPower            : 1;
-    UINT16    TransactionsPending : 1;
-    UINT16    Reserved            : 10;
+    UINT16    CorrectableError                : 1;
+    UINT16    NonFatalError                   : 1;
+    UINT16    FatalError                      : 1;
+    UINT16    UnsupportedRequest              : 1;
+    UINT16    AuxPower                        : 1;
+    UINT16    TransactionsPending             : 1;
+    UINT16    EmergencyPowerReductionDetected : 1;
+    UINT16    Reserved                        : 9;
   } Bits;
   UINT16    Uint16;
 } PCI_REG_PCIE_DEVICE_STATUS;
@@ -146,7 +149,7 @@ typedef union {
 typedef union {
   struct {
     UINT16    AspmControl                      : 2;
-    UINT16    Reserved                         : 1;
+    UINT16    PtmPropagationDelayB             : 1;
     UINT16    ReadCompletionBoundary           : 1;
     UINT16    LinkDisable                      : 1;
     UINT16    RetrainLink                      : 1;
@@ -156,6 +159,9 @@ typedef union {
     UINT16    HardwareAutonomousWidthDisable   : 1;
     UINT16    LinkBandwidthManagementInterrupt : 1;
     UINT16    LinkAutonomousBandwidthInterrupt : 1;
+    UINT16    SrisClocking                     : 1;
+    UINT16    FlitModeDisable                  : 1;
+    UINT16    DrsSignalingControl              : 2;
   } Bits;
   UINT16    Uint16;
 } PCI_REG_PCIE_LINK_CONTROL;
@@ -205,7 +211,9 @@ typedef union {
     UINT16    PowerController            : 1;
     UINT16    ElectromechanicalInterlock : 1;
     UINT16    DataLinkLayerStateChanged  : 1;
-    UINT16    Reserved                   : 3;
+    UINT16    AutoSlotPowerLimitDisable  : 1;
+    UINT16    InbandPdDisable            : 1;
+    UINT16    Reserved                   : 1;
   } Bits;
   UINT16    Uint16;
 } PCI_REG_PCIE_SLOT_CONTROL;
@@ -233,7 +241,8 @@ typedef union {
     UINT16    SystemErrorOnFatalError       : 1;
     UINT16    PmeInterrupt                  : 1;
     UINT16    CrsSoftwareVisibility         : 1;
-    UINT16    Reserved                      : 11;
+    UINT16    NoNfmSubtree                  : 1;
+    UINT16    Reserved                      : 10;
   } Bits;
   UINT16    Uint16;
 } PCI_REG_PCIE_ROOT_CONTROL;
@@ -268,7 +277,7 @@ typedef union {
     UINT32    NoRoEnabledPrPrPassing                        : 1;
     UINT32    LtrMechanism                                  : 1;
     UINT32    TphCompleter                                  : 2;
-    UINT32    LnSystemCLS                                   : 2;
+    UINT32    Reserved                                      : 2;
     UINT32    TenBitTagCompleterSupported                   : 1;
     UINT32    TenBitTagRequesterSupported                   : 1;
     UINT32    Obff                                          : 2;
@@ -277,7 +286,9 @@ typedef union {
     UINT32    MaxEndEndTlpPrefixes                          : 2;
     UINT32    EmergencyPowerReductionSupported              : 2;
     UINT32    EmergencyPowerReductionInitializationRequired : 1;
-    UINT32    Reserved3                                     : 4;
+    UINT32    Reserved2                                     : 1;
+    UINT32    DmwrCompleter                                 : 1;
+    UINT32    DmwrLengths                                   : 2;
     UINT32    FrsSupported                                  : 1;
   } Bits;
   UINT32    Uint32;
@@ -330,10 +341,15 @@ typedef union {
 
 typedef union {
   struct {
-    UINT32    Reserved         : 1;
-    UINT32    LinkSpeedsVector : 7;
-    UINT32    Crosslink        : 1;
-    UINT32    Reserved2        : 23;
+    UINT32    Reserved                  : 1;
+    UINT32    LinkSpeedsVector          : 7;
+    UINT32    Crosslink                 : 1;
+    UINT32    LowerSkpOsGeneration      : 7;
+    UINT32    LowerSkpOsReception       : 7;
+    UINT32    RetimerPresenceDetect     : 1;
+    UINT32    TwoRetimersPresenceDetect : 1;
+    UINT32    Reserved2                 : 6;
+    UINT32    DrsSupported              : 1;
   } Bits;
   UINT32    Uint32;
 } PCI_REG_PCIE_LINK_CAPABILITY2;
@@ -360,10 +376,24 @@ typedef union {
     UINT16    EqualizationPhase2Successful : 1;
     UINT16    EqualizationPhase3Successful : 1;
     UINT16    LinkEqualizationRequest      : 1;
-    UINT16    Reserved                     : 10;
+    UINT16    RetimerPresence              : 1;
+    UINT16    TwoRetimersPresence          : 1;
+    UINT16    CrosslinkResolution          : 2;
+    UINT16    FlitModeStatus               : 1;
+    UINT16    Reserved                     : 1;
+    UINT16    DownstreamComponentPresence  : 3;
+    UINT16    DRSMessageReceived           : 1;
   } Bits;
   UINT16    Uint16;
 } PCI_REG_PCIE_LINK_STATUS2;
+
+typedef union {
+  struct {
+    UINT32    InbandPdDisable : 1;
+    UINT32    Reserved        : 30;
+  } Bits;
+  UINT32    Uint32;
+} PCI_REG_PCIE_SLOT_CAPABILITY2;
 
 typedef struct {
   EFI_PCI_CAPABILITY_HDR             Hdr;
@@ -386,7 +416,7 @@ typedef struct {
   PCI_REG_PCIE_LINK_CAPABILITY2      LinkCapability2;
   PCI_REG_PCIE_LINK_CONTROL2         LinkControl2;
   PCI_REG_PCIE_LINK_STATUS2          LinkStatus2;
-  UINT32                             SlotCapability2;
+  PCI_REG_PCIE_SLOT_CAPABILITY2      SlotCapability2;
   UINT16                             SlotControl2;
   UINT16                             SlotStatus2;
 } PCI_CAPABILITY_PCIEXP;
