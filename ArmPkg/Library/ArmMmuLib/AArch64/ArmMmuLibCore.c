@@ -382,6 +382,13 @@ UpdateRegionMapping (
   UINTN  T0SZ;
 
   if (((RegionStart | RegionLength) & EFI_PAGE_MASK) != 0) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a RegionStart: 0x%llx or RegionLength: 0x%llx are not page aligned!\n",
+      __func__,
+      RegionStart,
+      RegionLength
+      ));
     return EFI_INVALID_PARAMETER;
   }
 
