@@ -377,6 +377,13 @@ SetMemoryAttributes (
   BOOLEAN     FlushTlbs;
 
   if (BaseAddress > (UINT64)MAX_ADDRESS) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a BaseAddress: 0x%llx is greater than MAX_ADDRESS: 0x%llx, fail to apply attributes!\n",
+      __func__,
+      BaseAddress,
+      (UINT64)MAX_ADDRESS
+      ));
     return EFI_UNSUPPORTED;
   }
 
@@ -437,6 +444,14 @@ SetMemoryAttributes (
     }
 
     if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a failed to update attributes with status %r for BaseAddress 0x%llx of length 0x%llx\n",
+        __func__,
+        Status,
+        BaseAddress,
+        ChunkLength
+        ));
       break;
     }
 
