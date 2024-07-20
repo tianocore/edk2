@@ -1,6 +1,7 @@
 /** @file  SmmStoreLib.h
 
   Copyright (c) 2022, 9elements GmbH<BR>
+  Copyright (c) 2025, 3mdeb Sp. z o.o.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -67,6 +68,25 @@ SmmStoreLibRead (
   );
 
 /**
+  Read from an arbitrary flash location.  The whole flash is represented as a
+  sequence of blocks.
+
+  @param[in] Lba      The starting logical block index to read from.
+  @param[in] Offset   Offset into the block at which to begin reading.
+  @param[in] NumBytes On input, indicates the requested read size. On
+                      output, indicates the actual number of bytes read
+  @param[in] Buffer   Pointer to the buffer to read into.
+
+**/
+EFI_STATUS
+SmmStoreLibReadAnyBlock (
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer
+  );
+
+/**
   Write to SmmStore
 
   @param[in] Lba      The starting logical block index to write to.
@@ -85,6 +105,25 @@ SmmStoreLibWrite (
   );
 
 /**
+  Write to an arbitrary flash location.  The whole flash is represented as a
+  sequence of blocks.
+
+  @param[in] Lba      The starting logical block index to write to.
+  @param[in] Offset   Offset into the block at which to begin writing.
+  @param[in] NumBytes On input, indicates the requested write size. On
+                      output, indicates the actual number of bytes written
+  @param[in] Buffer   Pointer to the data to write.
+
+**/
+EFI_STATUS
+SmmStoreLibWriteAnyBlock (
+  IN        EFI_LBA  Lba,
+  IN        UINTN    Offset,
+  IN        UINTN    *NumBytes,
+  IN        UINT8    *Buffer
+  );
+
+/**
   Erase a block using the SmmStore
 
   @param Lba    The logical block index to erase.
@@ -92,6 +131,18 @@ SmmStoreLibWrite (
 **/
 EFI_STATUS
 SmmStoreLibEraseBlock (
+  IN         EFI_LBA  Lba
+  );
+
+/**
+  Erase an arbitrary block of the flash.  The whole flash is represented as a
+  sequence of blocks.
+
+  @param Lba    The logical block index to erase.
+
+**/
+EFI_STATUS
+SmmStoreLibEraseAnyBlock (
   IN         EFI_LBA  Lba
   );
 
