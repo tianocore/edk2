@@ -714,3 +714,27 @@ ParseCapsules (
 
   return RETURN_SUCCESS;
 }
+
+/**
+  Parse information in a string form identified by a number
+
+  @param  Id  String identifier.
+
+  @retval NULL       The requested information wasn't found.
+  @retval Otherwise  A pointer to a static string.
+**/
+CONST CHAR8 *
+EFIAPI
+ParseInfoString (
+  IN UINTN  Id
+  )
+{
+  struct cb_string  *CbString;
+
+  CbString = FindCbTag (Id);
+  if (CbString == NULL) {
+    return NULL;
+  }
+
+  return (CONST CHAR8 *)CbString->string;
+}
