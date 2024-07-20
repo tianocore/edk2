@@ -336,6 +336,23 @@ ParseCapsules (
 }
 
 /**
+  Parse information in a string form identified by a number
+
+  @param  Id  String identifier.
+
+  @retval NULL       The requested information wasn't found.
+  @retval Otherwise  A pointer to a static string.
+**/
+CONST CHAR8 *
+EFIAPI
+ParseInfoString (
+  IN UINTN  Id
+  )
+{
+  return NULL;
+}
+
+/**
   Find the SmmStore HOB.
 
   @param  SmmStoreInfo       Pointer to the SMMSTORE_INFO structure
