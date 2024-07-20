@@ -983,8 +983,7 @@
       # PCDs and include files.
       !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
     <LibraryClasses>
-      # TODO: provide real implementation of firmware flashing
-      FmpDeviceLib|FmpDevicePkg/Library/FmpDeviceLibNull/FmpDeviceLibNull.inf
+      FmpDeviceLib|UefiPayloadPkg/Library/FmpDeviceSmmLib/FmpDeviceSmmLib.inf
   }
   MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
 !endif
