@@ -77,14 +77,14 @@ typedef struct {
 /// Definition of REDFISH_HTTP_CACHE_PRIVATE
 ///
 typedef struct {
-  UINT32                               Signature;
-  EFI_HANDLE                           ImageHandle;
-  BOOLEAN                              CacheDisabled;
-  EFI_EVENT                            NotifyEvent;
-  REDFISH_HTTP_CACHE_LIST              CacheList;
-  EDKII_REDFISH_HTTP_PROTOCOL          Protocol;
-  EDKII_REDFISH_CREDENTIAL_PROTOCOL    *CredentialProtocol;
-  REDFISH_HTTP_RETRY_SETTING           RetrySetting;
+  UINT32                                Signature;
+  EFI_HANDLE                            ImageHandle;
+  BOOLEAN                               CacheDisabled;
+  EFI_EVENT                             NotifyEvent;
+  REDFISH_HTTP_CACHE_LIST               CacheList;
+  EDKII_REDFISH_HTTP_PROTOCOL           Protocol;
+  EDKII_REDFISH_CREDENTIAL2_PROTOCOL    *CredentialProtocol;
+  REDFISH_HTTP_RETRY_SETTING            RetrySetting;
 } REDFISH_HTTP_CACHE_PRIVATE;
 
 #define REDFISH_HTTP_CACHE_PRIVATE_FROM_THIS(a)  CR (a, REDFISH_HTTP_CACHE_PRIVATE, Protocol, REDFISH_HTTP_DRIVER_SIGNATURE)

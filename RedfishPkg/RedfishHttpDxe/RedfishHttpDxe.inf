@@ -56,7 +56,7 @@
 
 [Protocols]
   gEdkIIRedfishHttpProtocolGuid             ## PRODUCED
-  gEdkIIRedfishCredentialProtocolGuid       ## CONSUMES
+  gEdkIIRedfishCredential2ProtocolGuid      ## CONSUMES
   gEfiRestExProtocolGuid                    ## CONSUEMS
 
 [Pcd]
