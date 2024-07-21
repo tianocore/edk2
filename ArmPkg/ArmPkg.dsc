@@ -109,6 +109,7 @@
 [Components.common]
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
+  ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
   ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   ArmPkg/Library/DebugAgentSymbolsBaseLib/DebugAgentSymbolsBaseLib.inf
   ArmPkg/Library/DebugPeCoffExtraActionLib/DebugPeCoffExtraActionLib.inf
