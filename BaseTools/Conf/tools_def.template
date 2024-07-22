@@ -926,7 +926,7 @@ DEFINE GCC_IA32_RC_FLAGS           = -I binary -O elf32-i386          -B i386   
 DEFINE GCC_X64_RC_FLAGS            = -I binary -O elf64-x86-64        -B i386        --rename-section .data=.hii
 DEFINE GCC_ARM_RC_FLAGS            = -I binary -O elf32-littlearm     -B arm         --rename-section .data=.hii
 DEFINE GCC_AARCH64_RC_FLAGS        = -I binary -O elf64-littleaarch64 -B aarch64     --rename-section .data=.hii
-DEFINE GCC_AARCH64_RC_BTI_FLAGS    = --add-section .note.gnu.property=$(WORKSPACE)/ArmPkg/Library/GnuNoteBti.bin --set-section-flags .note.gnu.property=alloc,readonly
+DEFINE GCC_AARCH64_RC_BTI_FLAGS    = --add-section .note.gnu.property=$(WORKSPACE)/BaseTools/Bin/GnuNoteBti.bin --set-section-flags .note.gnu.property=alloc,readonly
 DEFINE GCC_RISCV64_RC_FLAGS        = -I binary -O elf64-littleriscv   -B riscv       --rename-section .data=.hii
 DEFINE GCC_LOONGARCH64_RC_FLAGS    = -I binary -O elf64-loongarch     -B loongarch64 --rename-section .data=.hii
 
