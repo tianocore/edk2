@@ -1562,10 +1562,10 @@ RELEASE_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
 *_GCC5_ARM_CC_XIPFLAGS           = DEF(GCC5_ARM_CC_XIPFLAGS)
 
   DEBUG_GCC5_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-  DEBUG_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
+  DEBUG_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
 RELEASE_GCC5_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-RELEASE_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
+RELEASE_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
   NOOPT_GCC5_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -O0
   NOOPT_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -O0
@@ -1596,11 +1596,11 @@ RELEASE_GCC5_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKS
 *_GCC5_AARCH64_CC_XIPFLAGS       = DEF(GCC5_AARCH64_CC_XIPFLAGS)
 
   DEBUG_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-  DEBUG_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
+  DEBUG_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
   DEBUG_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
 RELEASE_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-RELEASE_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
+RELEASE_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
 RELEASE_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
   NOOPT_GCC5_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -O0
@@ -1779,10 +1779,10 @@ RELEASE_GCC_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
 *_GCC_ARM_CC_XIPFLAGS           = DEF(GCC5_ARM_CC_XIPFLAGS)
 
   DEBUG_GCC_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-  DEBUG_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
+  DEBUG_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
 RELEASE_GCC_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-RELEASE_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
+RELEASE_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm
 
   NOOPT_GCC_ARM_CC_FLAGS        = DEF(GCC5_ARM_CC_FLAGS) -O0
   NOOPT_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -O0
@@ -1813,11 +1813,11 @@ RELEASE_GCC_ARM_DLINK_FLAGS     = DEF(GCC5_ARM_DLINK_FLAGS) -flto -Os -L$(WORKSP
 *_GCC_AARCH64_CC_XIPFLAGS       = DEF(GCC5_AARCH64_CC_XIPFLAGS)
 
   DEBUG_GCC_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-  DEBUG_GCC_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
+  DEBUG_GCC_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
   DEBUG_GCC_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
 RELEASE_GCC_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-RELEASE_GCC_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
+RELEASE_GCC_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wno-lto-type-mismatch
 RELEASE_GCC_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 
   NOOPT_GCC_AARCH64_CC_FLAGS    = DEF(GCC5_AARCH64_CC_FLAGS) -O0
@@ -2127,11 +2127,11 @@ DEFINE CLANGDWARF_ARM_DLINK_FLAGS   = DEF(CLANGDWARF_ARM_TARGET) DEF(GCC_ARM_DLI
 *_CLANGDWARF_ARM_CC_XIPFLAGS        = DEF(GCC_ARM_CC_XIPFLAGS)
 
   DEBUG_CLANGDWARF_ARM_CC_FLAGS     = DEF(CLANGDWARF_ARM_CC_FLAGS) $(PLATFORM_FLAGS) -flto -O1
-  DEBUG_CLANGDWARF_ARM_DLINK_FLAGS  = DEF(CLANGDWARF_ARM_DLINK_FLAGS) -flto -Wl,-O1 -fuse-ld=lld -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm -Wl,--no-pie,--no-relax
+  DEBUG_CLANGDWARF_ARM_DLINK_FLAGS  = DEF(CLANGDWARF_ARM_DLINK_FLAGS) -flto -Wl,-O1 -fuse-ld=lld -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm -Wl,--no-pie,--no-relax
   NOOPT_CLANGDWARF_ARM_CC_FLAGS     = DEF(CLANGDWARF_ARM_CC_FLAGS) $(PLATFORM_FLAGS) -O0
   NOOPT_CLANGDWARF_ARM_DLINK_FLAGS  = DEF(CLANGDWARF_ARM_DLINK_FLAGS) -fuse-ld=lld -Wl,--no-pie,--no-relax
 RELEASE_CLANGDWARF_ARM_CC_FLAGS     = DEF(CLANGDWARF_ARM_CC_FLAGS) $(PLATFORM_FLAGS) -flto -O3
-RELEASE_CLANGDWARF_ARM_DLINK_FLAGS  = DEF(CLANGDWARF_ARM_DLINK_FLAGS) -flto -Wl,-O3 -fuse-ld=lld -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm -Wl,--no-pie,--no-relax
+RELEASE_CLANGDWARF_ARM_DLINK_FLAGS  = DEF(CLANGDWARF_ARM_DLINK_FLAGS) -flto -Wl,-O3 -fuse-ld=lld -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-arm -Wl,-plugin-opt=-pass-through=-llto-arm -Wl,--no-pie,--no-relax
 
 ##################
 # CLANGDWARF AARCH64 definitions
@@ -2173,11 +2173,11 @@ DEFINE CLANGDWARF_AARCH64_DLINK_FLAGS  = DEF(CLANGDWARF_AARCH64_TARGET) DEF(GCC_
 *_CLANGDWARF_AARCH64_CC_XIPFLAGS    = -mstrict-align
 
   DEBUG_CLANGDWARF_AARCH64_CC_FLAGS    = DEF(CLANGDWARF_AARCH64_CC_FLAGS) $(PLATFORM_FLAGS) -flto -O1
-  DEBUG_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -flto -Wl,-O1 -fuse-ld=lld -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wl,--no-pie,--no-relax
+  DEBUG_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -flto -Wl,-O1 -fuse-ld=lld -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wl,--no-pie,--no-relax
   NOOPT_CLANGDWARF_AARCH64_CC_FLAGS    = DEF(CLANGDWARF_AARCH64_CC_FLAGS) $(PLATFORM_FLAGS) -O0
   NOOPT_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -fuse-ld=lld -Wl,--no-pie,--no-relax
 RELEASE_CLANGDWARF_AARCH64_CC_FLAGS    = DEF(CLANGDWARF_AARCH64_CC_FLAGS) $(PLATFORM_FLAGS) -flto -O3
-RELEASE_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -flto -Wl,-O3 -fuse-ld=lld -L$(WORKSPACE)/ArmPkg/Library/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wl,--no-pie,--no-relax
+RELEASE_CLANGDWARF_AARCH64_DLINK_FLAGS = DEF(CLANGDWARF_AARCH64_DLINK_FLAGS) -flto -Wl,-O3 -fuse-ld=lld -L$(WORKSPACE)/BaseTools/Bin/GccLto -llto-aarch64 -Wl,-plugin-opt=-pass-through=-llto-aarch64 -Wl,--no-pie,--no-relax
 
 ##################
 # CLANGDWARF RISCV64 definitions
