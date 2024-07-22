@@ -3,6 +3,7 @@
 
   Copyright (c) 2016 - 2023, ARM Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
+  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -326,6 +327,92 @@ STATIC CONST ACPI_PARSER  LocalX2ApicNmi[] = {
 };
 
 /**
+  An ACPI_PARSER array describing the Core Pragrammable Interrupt Controller (CORE PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  CorePic[] = {
+  { L"Type",                  1, 0,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Length",                1, 1,  L"%d",   NULL, NULL, NULL, NULL },
+  { L"Version",               1, 2,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"ACPI Processor ID",     4, 3,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Physical Processor ID", 4, 7,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Flags",                 4, 11, L"0x%x", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the Leagcy I/O Programmable Interrupt Controller (LIO PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  LegacyIoPic[] = {
+  { L"Type",                   1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",                 1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",                1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Base Address",           8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Size",                   2, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade Vector",         2, 13, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade vector mapping", 8, 15, L"0x%lx", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the HyperTransport Programmable Interrupt Controller (HT PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  HyperTransportPic[] = {
+  { L"Type",           1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",         1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",        1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Base Address",   8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Size",           2, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade Vector", 8, 13, L"0x%lx", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the Extend I/0 Programmable Interrupt Controller (EIO PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  ExtendIoPic[] = {
+  { L"Type",           1, 0, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",         1, 1, L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",        1, 2, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade Vector", 1, 3, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Node",           1, 4, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Node Map",       8, 5, L"0x%lx", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the MSI Programmable Interrupt Controller (MSI PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  MsiPic[] = {
+  { L"Type",            1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",          1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",         1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Message Address", 8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Start",           4, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Count",           4, 15, L"0x%x",  NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the Bridge I/O Programmable Interrupt Controller (BIO PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  BridgeIoPic[] = {
+  { L"Type",         1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",       1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",      1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Base Address", 8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Size",         2, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Hardware ID",  2, 13, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"GSI base",     2, 15, L"0x%x",  NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the LPC Programmable Interrupt Controller (LPC PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  LpcPic[] = {
+  { L"Type",           1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",         1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",        1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Base Address",   8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Size",           2, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade vector", 2, 13, L"0x%x",  NULL, NULL, NULL, NULL }
+};
+
+/**
   An ACPI_PARSER array describing the ACPI MADT Table.
 **/
 STATIC CONST ACPI_PARSER  MadtParser[] = {
@@ -568,6 +655,97 @@ ParseAcpiMadt (
           InterruptContollerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (LocalX2ApicNmi)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_CORE_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "CORE PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (CorePic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_LIO_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "LIO PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (LegacyIoPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_HT_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "HT PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (HyperTransportPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_EIO_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "EIO PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (ExtendIoPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_MSI_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "MSI PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (MsiPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_BIO_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "BIO PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (BridgeIoPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_LPC_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "LPC PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (LpcPic)
           );
         break;
       }
