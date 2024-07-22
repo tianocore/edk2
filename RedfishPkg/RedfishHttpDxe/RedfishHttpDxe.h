@@ -28,7 +28,7 @@
 
 #include <Protocol/Http.h>
 #include <Protocol/EdkIIRedfishHttpProtocol.h>
-#include <Protocol/EdkIIRedfishCredential.h>
+#include <Protocol/EdkIIRedfishCredential2.h>
 #include <Protocol/RestEx.h>
 
 #define IS_EMPTY_STRING(a)  ((a) == NULL || (a)[0] == '\0')

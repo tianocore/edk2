@@ -313,10 +313,10 @@ RedfishCreateRedfishService (
                                             &Username,
                                             &Password
                                             );
-    if (EFI_ERROR (Status) || IS_EMPTY_STRING (Username) || IS_EMPTY_STRING (Password)) {
+    if (EFI_ERROR (Status) || ((AuthMethod != AuthMethodNone) && (IS_EMPTY_STRING (Username) || IS_EMPTY_STRING (Password)))) {
       DEBUG ((DEBUG_ERROR, "%a: cannot get authentication information: %r\n", __func__, Status));
       goto ON_RELEASE;
-    } else {
+    } else if (AuthMethod != AuthMethodNone) {
       DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Auth method: 0x%x username: %a password: %a\n", __func__, AuthMethod, Username, Password));
 
       //
@@ -371,6 +371,14 @@ RedfishCreateRedfishService (
   NewService = CreateRedfishService (Host, AsciiLocation, EncodedAuthString, NULL, RestEx);
   if (NewService == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: CreateRedfishService\n", __func__));
+    goto ON_RELEASE;
+  }
+
+  if (Private->CredentialProtocol != NULL) {
+    Status = Private->CredentialProtocol->RegisterRedfishService (Private->CredentialProtocol, NewService);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to register Redfish service - %r\n", __func__, Status));
+    }
   }
 
 ON_RELEASE:
@@ -424,15 +432,31 @@ RedfishFreeRedfishService (
   IN  REDFISH_SERVICE              RedfishService
   )
 {
-  REDFISH_SERVICE_PRIVATE  *Service;
+  EFI_STATUS                  Status;
+  REDFISH_SERVICE_PRIVATE     *Service;
+  REDFISH_HTTP_CACHE_PRIVATE  *Private;
 
   if ((This == NULL) || (RedfishService == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  Private = REDFISH_HTTP_CACHE_PRIVATE_FROM_THIS (This);
+
   Service = (REDFISH_SERVICE_PRIVATE *)RedfishService;
   if (Service->Signature != REDFISH_HTTP_SERVICE_SIGNATURE) {
     DEBUG ((DEBUG_ERROR, "%a: signature check failure\n", __func__));
+  }
+
+  if (Private->CredentialProtocol != NULL) {
+    Status = Private->CredentialProtocol->UnregisterRedfishService (Private->CredentialProtocol, RedfishService);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to unregister Redfish service - %r\n", __func__, Status));
+    } else {
+      if (Service->RestEx != NULL) {
+        Status = Service->RestEx->Configure (Service->RestEx, NULL);
+        DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: release RestEx instance: %r\n", __func__, Status));
+      }
+    }
   }
 
   return ReleaseRedfishService (Service);
@@ -1245,10 +1269,10 @@ CredentialProtocolInstalled (
   }
 
   //
-  // Locate HII database protocol.
+  // Locate HII credential protocol.
   //
   Status = gBS->LocateProtocol (
-                  &gEdkIIRedfishCredentialProtocolGuid,
+                  &gEdkIIRedfishCredential2ProtocolGuid,
                   NULL,
                   (VOID **)&Private->CredentialProtocol
                   );
@@ -1327,14 +1351,14 @@ RedfishHttpEntryPoint (
   // Install protocol notification if credential protocol is installed.
   //
   mRedfishHttpCachePrivate->NotifyEvent = EfiCreateProtocolNotifyEvent (
-                                            &gEdkIIRedfishCredentialProtocolGuid,
+                                            &gEdkIIRedfishCredential2ProtocolGuid,
                                             TPL_CALLBACK,
                                             CredentialProtocolInstalled,
                                             mRedfishHttpCachePrivate,
                                             &Registration
                                             );
   if (mRedfishHttpCachePrivate->NotifyEvent == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to create protocol notification for gEdkIIRedfishCredentialProtocolGuid\n", __func__));
+    DEBUG ((DEBUG_ERROR, "%a: failed to create protocol notification for gEdkIIRedfishCredential2ProtocolGuid\n", __func__));
     ASSERT (FALSE);
     RedfishHttpDriverUnload (ImageHandle);
     return Status;
