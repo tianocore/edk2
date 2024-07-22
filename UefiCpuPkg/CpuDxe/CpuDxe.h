@@ -293,7 +293,8 @@ PageFaultExceptionHandler (
   IN EFI_SYSTEM_CONTEXT  SystemContext
   );
 
-extern BOOLEAN  mIsAllocatingPageTable;
-extern UINTN    mNumberOfProcessors;
+extern BOOLEAN     mIsAllocatingPageTable;
+extern UINTN       mNumberOfProcessors;
+extern EFI_HANDLE  mCpuHandle;
 
 #endif

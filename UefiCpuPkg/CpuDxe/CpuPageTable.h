@@ -10,6 +10,7 @@
 #define _PAGE_TABLE_LIB_H_
 
 #include <IndustryStandard/PeImage.h>
+#include <Protocol/MemoryAttribute.h>
 
 #define PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PSE              BIT0
 #define PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAE              BIT1
@@ -151,6 +152,14 @@ GetPagingDetails (
   IN  PAGE_TABLE_LIB_PAGING_CONTEXT_DATA  *PagingContextData,
   OUT UINTN                               **PageTableBase     OPTIONAL,
   OUT UINT32                              **Attributes        OPTIONAL
+  );
+
+/**
+  Install Efi Memory Attribute Protocol.
+**/
+VOID
+InstallEfiMemoryAttributeProtocol (
+  VOID
   );
 
 #endif
