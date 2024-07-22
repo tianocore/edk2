@@ -824,6 +824,8 @@ NvmExpressPassThru (
     //
     CopyMem (Packet->NvmeCompletion, (VOID *)Cq, sizeof (EFI_NVM_EXPRESS_COMPLETION));
   } else {
+    ReportStatusCode ((EFI_ERROR_MAJOR | EFI_ERROR_CODE), (EFI_IO_BUS_SCSI | EFI_IOB_EC_INTERFACE_ERROR));
+
     //
     // Timeout occurs for an NVMe command. Reset the controller to abort the
     // outstanding commands.
