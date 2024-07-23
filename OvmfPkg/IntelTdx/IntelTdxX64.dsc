@@ -240,6 +240,9 @@
   PeilessStartupLib|OvmfPkg/Library/PeilessStartupLib/PeilessStartupLib.inf
   CcProbeLib|OvmfPkg/Library/CcProbeLib/SecPeiCcProbeLib.inf
 
+  # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   DxeCoreEntryPoint|MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
