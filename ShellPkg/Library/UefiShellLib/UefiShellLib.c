@@ -4009,7 +4009,8 @@ InternalShellStrHexToUint64 (
   IN CONST BOOLEAN  StopAtSpace
   )
 {
-  UINT64  Result;
+  UINT64   Result;
+  BOOLEAN  LeadingZero;
 
   if ((String == NULL) || (StrSize (String) == 0) || (Value == NULL)) {
     return (EFI_INVALID_PARAMETER);
@@ -4025,12 +4026,14 @@ InternalShellStrHexToUint64 (
   //
   // Ignore leading Zeros after the spaces
   //
+  LeadingZero = FALSE;
   while (*String == L'0') {
     String++;
+    LeadingZero = TRUE;
   }
 
   if (CharToUpper (*String) == L'X') {
-    if (*(String - 1) != L'0') {
+    if (!LeadingZero) {
       return 0;
     }
 
