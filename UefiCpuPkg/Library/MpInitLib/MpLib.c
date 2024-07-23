@@ -1224,7 +1224,7 @@ WakeUpAP (
   ResetVectorRequired      = FALSE;
 
   if (CpuMpData->WakeUpByInitSipiSipi ||
-      (CpuMpData->InitFlag   != ApInitDone))
+      (CpuMpData->InitFlag == ApInitConfig))
   {
     ResetVectorRequired = TRUE;
     AllocateResetVectorBelow1Mb (CpuMpData);
@@ -1258,7 +1258,7 @@ WakeUpAP (
         CpuData->ApFunction         = (UINTN)Procedure;
         CpuData->ApFunctionArgument = (UINTN)ProcedureArgument;
         SetApState (CpuData, CpuStateReady);
-        if (CpuMpData->InitFlag != ApInitConfig) {
+        if (CpuMpData->InitFlag == ApInitDone) {
           *(UINT32 *)CpuData->StartupApSignal = WAKEUP_AP_SIGNAL;
         }
       }
@@ -1376,7 +1376,7 @@ WakeUpAP (
     //
     // Wakeup specified AP
     //
-    ASSERT (CpuMpData->InitFlag != ApInitConfig);
+    ASSERT (CpuMpData->InitFlag == ApInitDone);
     *(UINT32 *)CpuData->StartupApSignal = WAKEUP_AP_SIGNAL;
     if (ResetVectorRequired) {
       CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
@@ -1648,13 +1648,11 @@ ResetProcessorToIdleState (
 
   CpuMpData = GetCpuMpData ();
 
-  CpuMpData->InitFlag = ApInitReconfig;
+  CpuMpData->WakeUpByInitSipiSipi = TRUE;
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL, TRUE);
   while (CpuMpData->FinishedCount < 1) {
     CpuPause ();
   }
-
-  CpuMpData->InitFlag = ApInitDone;
 
   SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
 }
@@ -2315,6 +2313,12 @@ MpInitLibInitialize (
       //
       InitMpGlobalData (CpuMpData);
       return EFI_SUCCESS;
+    } else {
+      //
+      // PEI and DXE are in different Execution Mode
+      // Use Init Sipi Sipi for the first AP wake up in DXE phase.
+      //
+      CpuMpData->WakeUpByInitSipiSipi = TRUE;
     }
   }
 
@@ -2343,15 +2347,6 @@ MpInitLibInitialize (
   // Wakeup APs to do some AP initialize sync (Microcode & MTRR)
   //
   if (CpuMpData->CpuCount > 1) {
-    if (FirstMpHandOff != NULL) {
-      //
-      // Only needs to use this flag for DXE phase to update the wake up
-      // buffer. Wakeup buffer allocated in PEI phase is no longer valid
-      // in DXE.
-      //
-      CpuMpData->InitFlag = ApInitReconfig;
-    }
-
     WakeUpAP (CpuMpData, TRUE, 0, ApInitializeSync, CpuMpData, TRUE);
     //
     // Wait for all APs finished initialization
