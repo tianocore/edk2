@@ -1,0 +1,30 @@
+## @file
+# Ssdt PLIC/APLIC Generator
+#
+#  Copyright (c) 2024, Ventana Micro Systems Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SsdtPlicAplicLib
+  FILE_GUID      = 5f9983fc-7dd3-552c-8580-d6d5b4a9a40e
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSsdtPlicAplicLibConstructor
+  DESTRUCTOR     = AcpiSsdtPlicAplicLibDestructor
+
+[Sources]
+  SsdtPlicAplicGenerator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib
