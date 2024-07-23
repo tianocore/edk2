@@ -1,7 +1,7 @@
 /** @file
   Library that implements the Arm CCA Realm Service Interface calls.
 
-  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2022 - 2024, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac5
+   - Realm Management Monitor (RMM) Specification, version 1.0-rel0
      (https://developer.arm.com/documentation/den0137/)
 
 **/
@@ -375,8 +375,11 @@ exit_handler:
 /**
   Returns the IPA state for the page pointed by the address.
 
-  @param [in]   Address     Address to retrive IPA state.
-  @param [out]  State       The RIPAS state for the address specified.
+  @param [in]       Base        Base of target IPA region.
+  @param [in, out]  Top         End  of target IPA region on input.
+                                Top of IPA region which has the
+                                reported RIPAS value on return.
+  @param [out]  State           The RIPAS state for the address specified.
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
@@ -384,25 +387,32 @@ exit_handler:
 RETURN_STATUS
 EFIAPI
 RsiGetIpaState (
-  IN   UINT64  *Address,
-  OUT  RIPAS   *State
+  IN      UINT64  *Base,
+  IN OUT  UINT64  **Top,
+  OUT     RIPAS   *State
   )
 {
   RETURN_STATUS  Status;
   ARM_SMC_ARGS   SmcCmd;
 
-  if ((State == NULL) || (!AddrIsGranuleAligned (Address))) {
+  if ((State == NULL) ||
+      (!AddrIsGranuleAligned (Base)) ||
+      (!AddrIsGranuleAligned (*Top)) ||
+      (*Top < Base))
+  {
     return RETURN_INVALID_PARAMETER;
   }
 
   ZeroMem (&SmcCmd, sizeof (SmcCmd));
   SmcCmd.Arg0 = FID_RSI_IPA_STATE_GET;
-  SmcCmd.Arg1 = (UINTN)Address;
+  SmcCmd.Arg1 = (UINTN)Base;
+  SmcCmd.Arg2 = (UINTN)*Top;
 
   ArmCallSmc (&SmcCmd);
   Status = RsiCmdStatusToEfiStatus (SmcCmd.Arg0);
   if (!RETURN_ERROR (Status)) {
-    *State = (RIPAS)(SmcCmd.Arg1 & RIPAS_TYPE_MASK);
+    *Top   = (UINT64 *)SmcCmd.Arg1;
+    *State = (RIPAS)(SmcCmd.Arg2 & RIPAS_TYPE_MASK);
   }
 
   return Status;

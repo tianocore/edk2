@@ -223,8 +223,11 @@ RsiFreeAttestationToken (
 /**
   Returns the IPA state for the page pointed by the address.
 
-  @param [in]   Address     Address to retrive IPA state.
-  @param [out]  State       The RIPAS state for the address specified.
+  @param [in]       Base        Base of target IPA region.
+  @param [in, out]  Top         End  of target IPA region on input.
+                                Top of IPA region which has the
+                                reported RIPAS value on return.
+  @param [out]  State           The RIPAS state for the address specified.
 
   @retval RETURN_SUCCESS            Success.
   @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
@@ -232,8 +235,9 @@ RsiFreeAttestationToken (
 RETURN_STATUS
 EFIAPI
 RsiGetIpaState (
-  IN   UINT64  *Address,
-  OUT  RIPAS   *State
+  IN      UINT64  *Base,
+  IN OUT  UINT64  **Top,
+  OUT     RIPAS   *State
   );
 
 /**
