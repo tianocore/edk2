@@ -2237,6 +2237,7 @@ MpInitLibInitialize (
     // APs have been wakeup before, just get the CPU Information
     // from HOB
     //
+    CpuMpData->InitFlag = ApInitDone;
     if (CpuMpData->UseSevEsAPMethod) {
       AmdSevUpdateCpuMpData (CpuMpData);
     }
@@ -2280,7 +2281,6 @@ MpInitLibInitialize (
       ASSERT (CpuMpData->ApLoopMode != ApInHltLoop);
 
       CpuMpData->FinishedCount                        = 0;
-      CpuMpData->InitFlag                             = ApInitDone;
       CpuMpData->EnableExecuteDisableForSwitchContext = IsBspExecuteDisableEnabled ();
       SaveCpuMpData (CpuMpData);
       //
@@ -2353,10 +2353,6 @@ MpInitLibInitialize (
     //
     while (CpuMpData->FinishedCount < (CpuMpData->CpuCount - 1)) {
       CpuPause ();
-    }
-
-    if (FirstMpHandOff != NULL) {
-      CpuMpData->InitFlag = ApInitDone;
     }
 
     for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
