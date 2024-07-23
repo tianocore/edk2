@@ -4234,15 +4234,17 @@ ShellConvertStringToUint64 (
     Status = InternalShellStrDecimalToUint64 (Walker, &RetVal, StopAtSpace);
   }
 
-  if ((Value == NULL) && !EFI_ERROR (Status)) {
-    return (EFI_NOT_FOUND);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  if (Value != NULL) {
-    *Value = RetVal;
+  if (Value == NULL) {
+    return EFI_NOT_FOUND;
   }
 
-  return (Status);
+  *Value = RetVal;
+
+  return EFI_SUCCESS;
 }
 
 /**
