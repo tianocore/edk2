@@ -4235,7 +4235,7 @@ ShellConvertStringToUint64 (
     return (EFI_NOT_FOUND);
   }
 
-  if (Value != NULL) {
+  if ((Value != NULL) && !EFI_ERROR (Status)) {
     *Value = RetVal;
   }
 
