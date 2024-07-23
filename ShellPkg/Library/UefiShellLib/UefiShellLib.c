@@ -3894,6 +3894,10 @@ InternalShellIsHexOrDecimalNumber (
     Hex = FALSE;
   }
 
+  if ((*String == CHAR_NULL) && LeadingZero) {
+    return (TRUE);
+  }
+
   //
   // loop through the remaining characters and use the lib function
   //
@@ -4041,16 +4045,16 @@ InternalShellStrHexToUint64 (
     // Skip the 'X'
     //
     String++;
+
+    //
+    // there is a space where there should't be
+    //
+    if (*String == L' ') {
+      return (EFI_INVALID_PARAMETER);
+    }
   }
 
   Result = 0;
-
-  //
-  // there is a space where there should't be
-  //
-  if (*String == L' ') {
-    return (EFI_INVALID_PARAMETER);
-  }
 
   while (ShellIsHexaDecimalDigitCharacter (*String)) {
     //
