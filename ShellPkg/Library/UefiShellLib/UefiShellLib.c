@@ -4009,7 +4009,7 @@ InternalShellStrHexToUint64 (
   UINT64   Result;
   BOOLEAN  LeadingZero;
 
-  if ((String == NULL) || (StrSize (String) == 0) || (Value == NULL)) {
+  if ((String == NULL) || (StrSize (String) == sizeof (*String)) || (Value == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -4113,7 +4113,7 @@ InternalShellStrDecimalToUint64 (
 {
   UINT64  Result;
 
-  if ((String == NULL) || (StrSize (String) == 0) || (Value == NULL)) {
+  if ((String == NULL) || (StrSize (String) == sizeof (*String)) || (Value == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
