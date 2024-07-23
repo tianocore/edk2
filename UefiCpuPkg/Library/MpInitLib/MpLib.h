@@ -120,9 +120,8 @@ typedef enum {
 // AP initialization state during APs wakeup
 //
 typedef enum {
-  ApInitConfig   = 1,
-  ApInitReconfig = 2,
-  ApInitDone     = 3
+  ApInitConfig = 1,
+  ApInitDone   = 2
 } AP_INIT_STATE;
 
 //
