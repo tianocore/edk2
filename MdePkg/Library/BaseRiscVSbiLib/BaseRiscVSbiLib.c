@@ -115,6 +115,21 @@ TranslateError (
     case SBI_ERR_ALREADY_AVAILABLE:
       return EFI_ALREADY_STARTED;
       break;
+    case SBI_ERR_NO_SHMEM:
+      return EFI_OUT_OF_RESOURCES;
+      break;
+    case SBI_ERR_INVALID_STATE:
+      return EFI_ABORTED;
+      break;
+    case SBI_ERR_BAD_RANGE:
+      return EFI_NOT_FOUND;
+      break;
+    case SBI_ERR_NOT_IMPLEMENTED:
+      return EFI_UNSUPPORTED;
+      break;
+    case SBI_ERR_TIMEOUT:
+      return EFI_TIMEOUT;
+      break;
     default:
       //
       // Reaches here only if SBI has defined a new error type
