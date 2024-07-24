@@ -239,10 +239,5 @@
         ],
         "AdditionalIncludePaths": [] # Additional paths to spell check
                                      # (wildcards supported)
-    },
-
-    # options defined in .pytool/Plugin/UncrustifyCheck
-    "UncrustifyCheck": {
-        "AuditOnly": True
     }
 }
