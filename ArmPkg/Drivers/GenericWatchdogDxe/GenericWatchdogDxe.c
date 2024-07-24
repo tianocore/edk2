@@ -360,35 +360,37 @@ GenericWatchdogEntry (
   EFI_STATUS  Status;
   EFI_HANDLE  Handle;
 
-  Status = gBS->LocateProtocol (
-                  &gHardwareInterrupt2ProtocolGuid,
-                  NULL,
-                  (VOID **)&mInterruptProtocol
-                  );
-  ASSERT_EFI_ERROR (Status);
+  if (FixedPcdGetBool (PcdGenericWatchdogInstallInterruptHandler)) {
+    Status = gBS->LocateProtocol (
+                    &gHardwareInterrupt2ProtocolGuid,
+                    NULL,
+                    (VOID **)&mInterruptProtocol
+                    );
+    ASSERT_EFI_ERROR (Status);
 
-  /* Make sure the Watchdog Timer Architectural Protocol has not been installed
-     in the system yet.
-     This will avoid conflicts with the universal watchdog */
-  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiWatchdogTimerArchProtocolGuid);
+    /* Make sure the Watchdog Timer Architectural Protocol has not been installed
+      in the system yet.
+      This will avoid conflicts with the universal watchdog */
+    ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiWatchdogTimerArchProtocolGuid);
 
-  // Install interrupt handler
-  Status = mInterruptProtocol->RegisterInterruptSource (
-                                 mInterruptProtocol,
-                                 FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
-                                 WatchdogInterruptHandler
-                                 );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+    // Install interrupt handler
+    Status = mInterruptProtocol->RegisterInterruptSource (
+                                   mInterruptProtocol,
+                                   FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
+                                   WatchdogInterruptHandler
+                                   );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-  Status = mInterruptProtocol->SetTriggerType (
-                                 mInterruptProtocol,
-                                 FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
-                                 EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING
-                                 );
-  if (EFI_ERROR (Status)) {
-    goto UnregisterHandler;
+    Status = mInterruptProtocol->SetTriggerType (
+                                   mInterruptProtocol,
+                                   FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
+                                   EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING
+                                   );
+    if (EFI_ERROR (Status)) {
+      goto UnregisterHandler;
+    }
   }
 
   // Install the Timer Architectural Protocol onto a new handle
@@ -418,11 +420,14 @@ GenericWatchdogEntry (
   return EFI_SUCCESS;
 
 UnregisterHandler:
-  // Unregister the handler
-  mInterruptProtocol->RegisterInterruptSource (
-                        mInterruptProtocol,
-                        FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
-                        NULL
-                        );
+  if (FixedPcdGetBool (PcdGenericWatchdogInstallInterruptHandler)) {
+    // Unregister the handler
+    mInterruptProtocol->RegisterInterruptSource (
+                          mInterruptProtocol,
+                          FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
+                          NULL
+                          );
+  }
+
   return Status;
 }
