@@ -289,8 +289,6 @@
 
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|TRUE
 
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
-
 [PcdsFeatureFlag.AARCH64]
   #
   # Activate AcpiSdtProtocol
@@ -298,6 +296,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
 
 [PcdsFixedAtBuild.common]
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
+
 !ifdef $(FIRMWARE_VER)
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
 !endif
