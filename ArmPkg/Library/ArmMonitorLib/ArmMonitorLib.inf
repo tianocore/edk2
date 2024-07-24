@@ -14,16 +14,15 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmMonitorLib
 
-[Sources]
-  ArmMonitorLib.c
+[Sources.ARM]
+  Arm/ArmMonitorLib.S
+
+[Sources.AARCH64]
+  AArch64/ArmMonitorLib.S
 
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
-
-[LibraryClasses]
-  ArmHvcLib
-  ArmSmcLib
 
 [Pcd]
   gArmTokenSpaceGuid.PcdMonitorConduitHvc
