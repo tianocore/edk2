@@ -12,6 +12,15 @@ PCCTS_H=$(PCCTS_HOME)\h
 # Support directories
 SET=$(PCCTS_HOME)\support\set
 
+!IFNDEF HOST_ARCH
+HOST_ARCH = IA32
+!ENDIF
+
+!IF "$(HOST_ARCH)"=="IA32" || "$(HOST_ARCH)"=="ARM"
+SYS_BIN_PATH=$(EDK_TOOLS_PATH)\Bin\Win32
+!ELSE
+SYS_BIN_PATH=$(EDK_TOOLS_PATH)\Bin\Win64
+!ENDIF
 
 # Compiler stuff
 CC = cl
@@ -26,10 +35,10 @@ SUPPORT_OBJS = set.obj
 
 # Dependencies
 
-$(EDK_TOOLS_PATH)\Bin\Win32\dlg.exe: $(DLG_OBJS) $(SUPPORT_OBJS)
+$(SYS_BIN_PATH)\dlg.exe: $(DLG_OBJS) $(SUPPORT_OBJS)
     $(CC) $(CFLAGS) -Fedlg.exe $(DLG_OBJS) $(SUPPORT_OBJS)
-    -@if not exist $(EDK_TOOLS_PATH)\Bin\Win32 mkdir $(EDK_TOOLS_PATH)\Bin\Win32
-		copy dlg.exe $(EDK_TOOLS_PATH)\Bin\Win32
+    -@if not exist $(SYS_BIN_PATH) mkdir $(SYS_BIN_PATH)
+		copy dlg.exe $(SYS_BIN_PATH)
 
 dlg_p.obj: $(DLG_SRC)\dlg_p.c \
 					$(PCCTS_H)\antlr.h \
