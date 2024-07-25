@@ -10,6 +10,7 @@
 #include <IndustryStandard/Acpi.h>
 #include <libfdt.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/HiiLib.h>
