@@ -179,6 +179,10 @@ if __name__ == '__main__':
     PARSER.add_argument('-l', '--lookup',
                         help='Find section matches for path LOOKUP',
                         required=False)
+    PARSER.add_argument('-g', '--github',
+                        action='store_true',
+                        help='Include GitHub usernames in output',
+                        required=False)
     ARGS = PARSER.parse_args()
 
     REPO = SetupGit.locate_repo()
@@ -203,5 +207,8 @@ if __name__ == '__main__':
 
     for address in ADDRESSES:
         if '<' in address and '>' in address:
-            address = address.split('>', 1)[0] + '>'
-        print('  %s' % address)
+            address, github_id = address.split('>', 1)
+            address = address + '>'
+            github_id = github_id.strip() if ARGS.github else ''
+
+        print('  %s %s' % (address, github_id))
