@@ -228,26 +228,26 @@ SmmInitPageTable (
   //
   PageTable = GenSmmPageTable (mPagingMode, mPhysicalAddressBits);
 
-  if (m5LevelPagingNeeded) {
-    Pml5Entry = (UINT64 *)PageTable;
-    //
-    // Set Pml5Entry sub-entries number for smm PF handler usage.
-    //
-    SetSubEntriesNum (Pml5Entry, 1);
-    Pml4Entry = (UINT64 *)((*Pml5Entry) & ~mAddressEncMask & gPhyMask);
-  } else {
-    Pml4Entry = (UINT64 *)PageTable;
-  }
+  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    if (m5LevelPagingNeeded) {
+      Pml5Entry = (UINT64 *)PageTable;
+      //
+      // Set Pml5Entry sub-entries number for smm PF handler usage.
+      //
+      SetSubEntriesNum (Pml5Entry, 1);
+      Pml4Entry = (UINT64 *)((*Pml5Entry) & ~mAddressEncMask & gPhyMask);
+    } else {
+      Pml4Entry = (UINT64 *)PageTable;
+    }
 
-  //
-  // Set IA32_PG_PMNT bit to mask first 4 PdptEntry.
-  //
-  PdptEntry = (UINT64 *)((*Pml4Entry) & ~mAddressEncMask & gPhyMask);
-  for (Index = 0; Index < 4; Index++) {
-    PdptEntry[Index] |= IA32_PG_PMNT;
-  }
+    //
+    // Set IA32_PG_PMNT bit to mask first 4 PdptEntry.
+    //
+    PdptEntry = (UINT64 *)((*Pml4Entry) & ~mAddressEncMask & gPhyMask);
+    for (Index = 0; Index < 4; Index++) {
+      PdptEntry[Index] |= IA32_PG_PMNT;
+    }
 
-  if (!mCpuSmmRestrictedMemoryAccess) {
     //
     // Set Pml4Entry sub-entries number for smm PF handler usage.
     //
