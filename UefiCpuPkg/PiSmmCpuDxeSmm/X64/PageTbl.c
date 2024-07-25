@@ -201,7 +201,6 @@ SmmInitPageTable (
   UINT64                    *PdptEntry;
   UINT64                    *Pml4Entry;
   UINT64                    *Pml5Entry;
-  UINT8                     PhysicalAddressBits;
 
   //
   // Initialize spin lock
@@ -226,10 +225,8 @@ SmmInitPageTable (
 
   //
   // Generate initial SMM page table.
-  // Only map [0, 4G] when PcdCpuSmmRestrictedMemoryAccess is FALSE.
   //
-  PhysicalAddressBits = mCpuSmmRestrictedMemoryAccess ? mPhysicalAddressBits : 32;
-  PageTable           = GenSmmPageTable (mPagingMode, PhysicalAddressBits);
+  PageTable = GenSmmPageTable (mPagingMode, mPhysicalAddressBits);
 
   if (m5LevelPagingNeeded) {
     Pml5Entry = (UINT64 *)PageTable;
