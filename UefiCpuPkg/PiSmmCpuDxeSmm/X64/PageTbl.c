@@ -1,7 +1,7 @@
 /** @file
 Page Fault (#PF) handler for X64 processors
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -982,7 +982,8 @@ SmiPFHandler (
       SystemContext.SystemContextX64->ExceptionData
       );
   } else {
-    SmiDefaultPFHandler ();
+    DumpCpuContext (InterruptType, SystemContext);
+    CpuDeadLoop ();
   }
 
 Exit:
