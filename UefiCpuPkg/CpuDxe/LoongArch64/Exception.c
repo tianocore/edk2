@@ -137,7 +137,7 @@ InitializeExceptions (
   //
   Status = UpdateExceptionStartEntry ();
   if (EFI_ERROR (Status)) {
-    DebugPrint (EFI_D_ERROR, "[%a]: Exception start entry code out of bounds!\n", __func__);
+    DebugPrint (DEBUG_ERROR, "[%a]: Exception start entry code out of bounds!\n", __func__);
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -150,7 +150,7 @@ InitializeExceptions (
   //
   // Enable interrupts
   //
-  DebugPrint (EFI_D_INFO, "InitializeExceptions,IrqEnabled = %x\n", IrqEnabled);
+  DebugPrint (DEBUG_INFO, "InitializeExceptions,IrqEnabled = %x\n", IrqEnabled);
   if (!IrqEnabled) {
     Status = Cpu->EnableInterrupt (Cpu);
   }
