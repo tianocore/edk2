@@ -99,6 +99,7 @@ UpdateOptionalData (
   UINT8       *OriginalData;
   UINTN       NewSize;
   UINT8       *NewData;
+  UINTN       TmpSize;
   UINTN       OriginalOptionDataSize;
 
   UnicodeSPrint (VariableName, sizeof (VariableName), L"%s%04x", Target == BcfgTargetBootOrder ? L"Boot" : L"Driver", Index);
@@ -135,11 +136,14 @@ UpdateOptionalData (
     // Allocate new struct and discard old optional data.
     //
     ASSERT (OriginalData != NULL);
-    OriginalOptionDataSize  = sizeof (UINT32) + sizeof (UINT16) + StrSize (((CHAR16 *)(OriginalData + sizeof (UINT32) + sizeof (UINT16))));
-    OriginalOptionDataSize += (*(UINT16 *)(OriginalData + sizeof (UINT32)));
-    OriginalOptionDataSize -= OriginalSize;
-    NewSize                 = OriginalSize - OriginalOptionDataSize + DataSize;
-    NewData                 = AllocatePool (NewSize);
+    // Length of Attributes, FilePathListLength, Description fields
+    TmpSize = sizeof (UINT32) + sizeof (UINT16) + StrSize (((CHAR16 *)(OriginalData + sizeof (UINT32) + sizeof (UINT16))));
+    // Length of FilePathList field
+    TmpSize += (*(UINT16 *)(OriginalData + sizeof (UINT32)));
+    // What remains is the original OptionalData field
+    OriginalOptionDataSize = OriginalSize - TmpSize;
+    NewSize                = OriginalSize - OriginalOptionDataSize + DataSize;
+    NewData                = AllocatePool (NewSize);
     if (NewData == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
     } else {
