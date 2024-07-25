@@ -89,7 +89,7 @@ FreeResources:
 
 FailedAllocate:
   DEBUG ((
-    EFI_D_ERROR,
+    DEBUG_ERROR,
     "%a: Failed to allocate memory for hardware info\n",
     __func__
     ));
