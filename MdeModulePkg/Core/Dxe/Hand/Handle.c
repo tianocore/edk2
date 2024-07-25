@@ -68,7 +68,7 @@ CoreValidateHandle (
 
   ASSERT_LOCKED (&gProtocolDatabaseLock);
 
-  for (Link = gHandleList.BackLink; Link != &gHandleList; Link = Link->BackLink) {
+  for (Link = gHandleList.ForwardLink; Link != &gHandleList; Link = Link->ForwardLink) {
     Handle = CR (Link, IHANDLE, AllHandles, EFI_HANDLE_SIGNATURE);
     if (Handle == (IHANDLE *)UserHandle) {
       return EFI_SUCCESS;
