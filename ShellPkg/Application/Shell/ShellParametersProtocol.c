@@ -1447,7 +1447,7 @@ UpdateArgcArgv (
     *OldArgc = ShellParameters->Argc;
   }
 
-  if (OldArgc != NULL) {
+  if (OldArgv != NULL) {
     *OldArgv = ShellParameters->Argv;
   }
 
