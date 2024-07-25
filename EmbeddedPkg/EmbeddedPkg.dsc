@@ -66,7 +66,6 @@
 
   SerialPortLib|MdePkg/Library/BaseSerialPortLibNull/BaseSerialPortLibNull.inf
   RealTimeClockLib|EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
-  EfiResetSystemLib|EmbeddedPkg/Library/TemplateResetSystemLib/TemplateResetSystemLib.inf
   GdbSerialLib|EmbeddedPkg/Library/GdbSerialLib/GdbSerialLib.inf
 
 
@@ -211,7 +210,6 @@
   EmbeddedPkg/Library/GdbSerialLib/GdbSerialLib.inf
   EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
-  EmbeddedPkg/Library/TemplateResetSystemLib/TemplateResetSystemLib.inf
   EmbeddedPkg/Library/TemplateRealTimeClockLib/TemplateRealTimeClockLib.inf
   EmbeddedPkg/Library/CoherentDmaLib/CoherentDmaLib.inf
   EmbeddedPkg/Library/NonCoherentDmaLib/NonCoherentDmaLib.inf
@@ -220,7 +218,6 @@
 
   EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
-  EmbeddedPkg/ResetRuntimeDxe/ResetRuntimeDxe.inf
   EmbeddedPkg/SimpleTextInOutSerial/SimpleTextInOutSerial.inf
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf {
     <LibraryClasses>
