@@ -39,37 +39,47 @@ def leave_pr_comment(
     response.raise_for_status()
 
 
-def get_reviewers_for_current_branch(
-    workspace_path: str, maintainer_file_path: str, target_branch: str = "master"
+def get_reviewers_for_range(
+    workspace_path: str,
+    maintainer_file_path: str,
+    range_start: str = "master",
+    range_end: str = "HEAD",
 ) -> List[str]:
     """Get the reviewers for the current branch.
+
+       To get the reviewers for a single commit, set `range_start` and
+       `range_end` to the commit SHA.
 
     Args:
         workspace_path (str): The workspace path.
         maintainer_file_path (str): The maintainer file path.
-        target_branch (str, optional): The name of the target branch that the
-          current HEAD will merge to. Defaults to "master".
+        range_start (str, optional): The range start ref. Defaults to "master".
+        range_end (str, optional): The range end ref. Defaults to "HEAD".
 
     Returns:
         List[str]: A list of GitHub usernames.
     """
 
-    commit_stream_buffer = StringIO()
-    cmd_ret = RunCmd(
-        "git",
-        f"log --format=format:%H {target_branch}..HEAD",
-        workingdir=workspace_path,
-        outstream=commit_stream_buffer,
-        logging_level=logging.INFO,
-    )
-    if cmd_ret != 0:
-        print(
-            f"::error title=Commit Lookup Error!::Error getting branch commits: [{cmd_ret}]: {commit_stream_buffer.getvalue()}"
+    if range_start == range_end:
+        commits = [range_start]
+    else:
+        commit_stream_buffer = StringIO()
+        cmd_ret = RunCmd(
+            "git",
+            f"log --format=format:%H {range_start}..{range_end}",
+            workingdir=workspace_path,
+            outstream=commit_stream_buffer,
+            logging_level=logging.INFO,
         )
-        return []
+        if cmd_ret != 0:
+            print(
+                f"::error title=Commit Lookup Error!::Error getting branch commits: [{cmd_ret}]: {commit_stream_buffer.getvalue()}"
+            )
+            return []
+        commits = commit_stream_buffer.getvalue().splitlines()
 
     raw_reviewers = []
-    for commit_sha in commit_stream_buffer.getvalue().splitlines():
+    for commit_sha in commits:
         reviewer_stream_buffer = StringIO()
         cmd_ret = RunPythonScript(
             maintainer_file_path,
@@ -102,6 +112,44 @@ def get_reviewers_for_current_branch(
     print(f"::debug title=Total Reviewer Set::{', '.join(reviewers)}")
 
     return reviewers
+
+
+def get_pr_sha(token: str, owner: str, repo: str, pr_number: str) -> str:
+    """Returns the commit SHA of given PR branch.
+
+       This returns the SHA of the merge commit that GitHub creates from a
+       PR branch. This commit contains all of the files in the PR branch in
+       a single commit.
+
+    Args:
+        token (str): The GitHub token to use for authentication.
+        owner (str): The GitHub owner (organization) name.
+        repo (str): The GitHub repository name (e.g. 'edk2').
+        pr_number (str): The pull request number.
+
+    Returns:
+        str: The commit SHA of the PR branch. An empty string is returned
+             if the request fails.
+    """
+    url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github.v3+json",
+    }
+    response = requests.get(url, headers=headers)
+    try:
+        response.raise_for_status()
+    except requests.exceptions.HTTPError:
+        print(
+            f"::error title=HTTP Error!::Error getting PR Commit Info: {response.reason}"
+        )
+        return ""
+
+    commit_sha = response.json()["merge_commit_sha"]
+
+    print(f"::debug title=PR {pr_number} Commit SHA::{commit_sha}")
+
+    return commit_sha
 
 
 def download_gh_file(github_url: str, local_path: str, token=None):
