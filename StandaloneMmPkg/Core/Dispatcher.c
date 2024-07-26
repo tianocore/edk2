@@ -655,7 +655,10 @@ FvIsBeingProcessed (
   DEBUG ((DEBUG_INFO, "FvIsBeingProcessed - 0x%08x\n", FwVolHeader));
 
   KnownFwVol = AllocatePool (sizeof (KNOWN_FWVOL));
-  ASSERT (KnownFwVol != NULL);
+  if (KnownFwVol == NULL) {
+    ASSERT (FALSE);
+    return;
+  }
 
   KnownFwVol->Signature   = KNOWN_FWVOL_SIGNATURE;
   KnownFwVol->FwVolHeader = FwVolHeader;
