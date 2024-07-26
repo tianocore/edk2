@@ -1,0 +1,56 @@
+## @file
+# MmCommunicationDxe driver produces MmCommunication protocol and
+# create the notifications of some protocols and event.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = MmCommunicationDxe
+  FILE_GUID                      = 8d4b8bc7-e66b-4be2-add8-4988e08743ed
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = MmCommunicationEntryPoint
+
+[Sources]
+  MmCommunicationDxe.c
+  MmCommunicationDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  HobLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeLib
+  ReportStatusCodeLib
+
+[Guids]
+  gMmCommBufferHobGuid
+  gEfiEventVirtualAddressChangeGuid
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventExitBootServicesGuid
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid
+  gEfiSmmControl2ProtocolGuid
+  gEfiMmCommunicationProtocolGuid
+  gEfiDxeMmReadyToLockProtocolGuid
+  gEfiSmmAccess2ProtocolGuid
+
+[Depex]
+  gEfiSmmAccess2ProtocolGuid AND gEfiSmmControl2ProtocolGuid
