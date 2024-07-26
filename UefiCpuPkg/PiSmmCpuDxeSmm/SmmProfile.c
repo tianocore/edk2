@@ -438,8 +438,23 @@ InitProtectedMemRange (
          &MemorySpaceMap
          );
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
-      NumberOfAddedDescriptors++;
+    if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo)) {
+      if (ADDRESS_IS_ALIGNED (MemorySpaceMap[Index].BaseAddress, SIZE_4KB) &&
+          (MemorySpaceMap[Index].Length % SIZE_4KB == 0))
+      {
+        NumberOfAddedDescriptors++;
+      } else {
+        //
+        // Skip the MMIO range that BaseAddress and Length are not 4k aligned since
+        // the minimum granularity of the page table is 4k
+        //
+        DEBUG ((
+          DEBUG_WARN,
+          "MMIO range [0x%lx, 0x%lx] is skipped since it is not 4k aligned.\n",
+          MemorySpaceMap[Index].BaseAddress,
+          MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length
+          ));
+      }
     }
   }
 
@@ -486,15 +501,16 @@ InitProtectedMemRange (
     // Create MMIO ranges which are set to present and execution-disable.
     //
     for (Index = 0; Index < NumberOfDescriptors; Index++) {
-      if (MemorySpaceMap[Index].GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) {
-        continue;
+      if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
+          ADDRESS_IS_ALIGNED (MemorySpaceMap[Index].BaseAddress, SIZE_4KB) &&
+          (MemorySpaceMap[Index].Length % SIZE_4KB == 0))
+      {
+        mProtectionMemRange[NumberOfProtectRange].Range.Base = MemorySpaceMap[Index].BaseAddress;
+        mProtectionMemRange[NumberOfProtectRange].Range.Top  = MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length;
+        mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
+        mProtectionMemRange[NumberOfProtectRange].Nx         = TRUE;
+        NumberOfProtectRange++;
       }
-
-      mProtectionMemRange[NumberOfProtectRange].Range.Base = MemorySpaceMap[Index].BaseAddress;
-      mProtectionMemRange[NumberOfProtectRange].Range.Top  = MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length;
-      mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
-      mProtectionMemRange[NumberOfProtectRange].Nx         = TRUE;
-      NumberOfProtectRange++;
     }
 
     //
