@@ -89,10 +89,10 @@ GetFspGlobalDataPointer (
   VOID
   )
 {
-  FSP_GLOBAL_DATA  *FspData;
+  UINT32  FspDataAddress;
 
-  FspData = *(FSP_GLOBAL_DATA  **)(UINTN)PcdGet32 (PcdGlobalDataPointerAddress);
-  return FspData;
+  FspDataAddress = *(UINT32 *)(UINTN)PcdGet32 (PcdGlobalDataPointerAddress);
+  return (FSP_GLOBAL_DATA *)(UINTN)FspDataAddress;
 }
 
 /**
