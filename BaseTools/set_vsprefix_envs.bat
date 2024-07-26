@@ -35,10 +35,10 @@ if defined VS140COMNTOOLS (
     set "VS2015_PREFIX=%VS140COMNTOOLS:~0,-14%"
   )
   if not defined WINSDK81_PREFIX (
-    if exist "%ProgramFiles%\Windows Kits\8.1\bin" (
-      set "WINSDK81_PREFIX=%ProgramFiles%\Windows Kits\8.1\bin\"
-    ) else if exist "%ProgramFiles(x86)%\Windows Kits\8.1\bin" (
+    if exist "%ProgramFiles(x86)%\Windows Kits\8.1\bin" (
       set "WINSDK81_PREFIX=%ProgramFiles(x86)%\Windows Kits\8.1\bin\"
+    ) else if exist "%ProgramFiles%\Windows Kits\8.1\bin" (
+      set "WINSDK81_PREFIX=%ProgramFiles%\Windows Kits\8.1\bin\"
     )
   )
   if not defined WINSDK81x86_PREFIX (
