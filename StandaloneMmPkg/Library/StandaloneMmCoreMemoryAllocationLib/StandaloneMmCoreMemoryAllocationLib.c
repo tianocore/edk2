@@ -845,9 +845,6 @@ MemoryAllocationLibConstructor (
   IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
   )
 {
-  MM_CORE_PRIVATE_DATA            *MmCorePrivate;
-  EFI_HOB_GUID_TYPE               *GuidHob;
-  MM_CORE_DATA_HOB_DATA           *DataInHob;
   VOID                            *HobStart;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
@@ -858,35 +855,29 @@ MemoryAllocationLibConstructor (
   DEBUG ((DEBUG_INFO, "StandaloneMmCoreMemoryAllocationLibConstructor - 0x%x\n", HobStart));
 
   //
-  // Extract MM Core Private context from the Hob. If absent search for
-  // a Hob containing the MMRAM ranges
+  // Search for a Hob containing the MMRAM ranges
   //
-  GuidHob = GetNextGuidHob (&gMmCoreDataHobGuid, HobStart);
-  if (GuidHob == NULL) {
+  MmramRangesHob = GetNextGuidHob (&gEfiSmmSmramMemoryGuid, HobStart);
+  if (MmramRangesHob == NULL) {
     MmramRangesHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, HobStart);
     if (MmramRangesHob == NULL) {
       return EFI_UNSUPPORTED;
     }
+  }
 
-    MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
-    if (MmramRangesHobData == NULL) {
-      return EFI_UNSUPPORTED;
-    }
+  MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
+  if (MmramRangesHobData == NULL) {
+    return EFI_UNSUPPORTED;
+  }
 
-    MmramRanges = MmramRangesHobData->Descriptor;
-    if (MmramRanges == NULL) {
-      return EFI_UNSUPPORTED;
-    }
+  MmramRanges = MmramRangesHobData->Descriptor;
+  if (MmramRanges == NULL) {
+    return EFI_UNSUPPORTED;
+  }
 
-    MmramRangeCount = (UINTN)MmramRangesHobData->NumberOfMmReservedRegions;
-    if (MmramRanges == NULL) {
-      return EFI_UNSUPPORTED;
-    }
-  } else {
-    DataInHob       = GET_GUID_HOB_DATA (GuidHob);
-    MmCorePrivate   = (MM_CORE_PRIVATE_DATA *)(UINTN)DataInHob->Address;
-    MmramRanges     = (EFI_MMRAM_DESCRIPTOR *)(UINTN)MmCorePrivate->MmramRanges;
-    MmramRangeCount = (UINTN)MmCorePrivate->MmramRangeCount;
+  MmramRangeCount = (UINTN)MmramRangesHobData->NumberOfMmReservedRegions;
+  if (MmramRanges == NULL) {
+    return EFI_UNSUPPORTED;
   }
 
   {

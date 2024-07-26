@@ -185,44 +185,30 @@ MmLoadImage (
   DriverEntry->ImageBuffer     = DstBuffer;
   DriverEntry->NumberOfPage    = PageCount;
 
-  if (mEfiSystemTable != NULL) {
-    Status = mEfiSystemTable->BootServices->AllocatePool (
-                                              EfiBootServicesData,
-                                              sizeof (EFI_LOADED_IMAGE_PROTOCOL),
-                                              (VOID **)&DriverEntry->LoadedImage
-                                              );
-    if (EFI_ERROR (Status)) {
-      MmFreePages (DstBuffer, PageCount);
-      return Status;
-    }
+  //
+  // Fill in the remaining fields of the Loaded Image Protocol instance.
+  // Note: ImageBase is an SMRAM address that can not be accessed outside of SMRAM if SMRAM window is closed.
+  //
+  DriverEntry->LoadedImage.Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
+  DriverEntry->LoadedImage.ParentHandle = NULL;
+  DriverEntry->LoadedImage.SystemTable  = NULL;
+  DriverEntry->LoadedImage.DeviceHandle = NULL;
+  DriverEntry->LoadedImage.FilePath     = NULL;
 
-    ZeroMem (DriverEntry->LoadedImage, sizeof (EFI_LOADED_IMAGE_PROTOCOL));
-    //
-    // Fill in the remaining fields of the Loaded Image Protocol instance.
-    // Note: ImageBase is an SMRAM address that can not be accessed outside of SMRAM if SMRAM window is closed.
-    //
-    DriverEntry->LoadedImage->Revision     = EFI_LOADED_IMAGE_PROTOCOL_REVISION;
-    DriverEntry->LoadedImage->ParentHandle = NULL;
-    DriverEntry->LoadedImage->SystemTable  = mEfiSystemTable;
-    DriverEntry->LoadedImage->DeviceHandle = NULL;
-    DriverEntry->LoadedImage->FilePath     = NULL;
+  DriverEntry->LoadedImage.ImageBase     = (VOID *)(UINTN)DriverEntry->ImageBuffer;
+  DriverEntry->LoadedImage.ImageSize     = ImageContext.ImageSize;
+  DriverEntry->LoadedImage.ImageCodeType = EfiRuntimeServicesCode;
+  DriverEntry->LoadedImage.ImageDataType = EfiRuntimeServicesData;
 
-    DriverEntry->LoadedImage->ImageBase     = (VOID *)(UINTN)DriverEntry->ImageBuffer;
-    DriverEntry->LoadedImage->ImageSize     = ImageContext.ImageSize;
-    DriverEntry->LoadedImage->ImageCodeType = EfiRuntimeServicesCode;
-    DriverEntry->LoadedImage->ImageDataType = EfiRuntimeServicesData;
-
-    //
-    // Create a new image handle in the UEFI handle database for the MM Driver
-    //
-    DriverEntry->ImageHandle = NULL;
-    Status                   = mEfiSystemTable->BootServices->InstallMultipleProtocolInterfaces (
-                                                                &DriverEntry->ImageHandle,
-                                                                &gEfiLoadedImageProtocolGuid,
-                                                                DriverEntry->LoadedImage,
-                                                                NULL
-                                                                );
-  }
+  //
+  // Install Loaded Image protocol into MM handle database for the MM Driver
+  //
+  MmInstallProtocolInterface (
+    &DriverEntry->ImageHandle,
+    &gEfiLoadedImageProtocolGuid,
+    EFI_NATIVE_INTERFACE,
+    &DriverEntry->LoadedImage
+    );
 
   //
   // Print the load address and the PDB file name if it is available
@@ -398,6 +384,7 @@ MmDispatcher (
   LIST_ENTRY           *Link;
   EFI_MM_DRIVER_ENTRY  *DriverEntry;
   BOOLEAN              ReadyToRun;
+  BOOLEAN              PreviousMmEntryPointRegistered;
 
   DEBUG ((DEBUG_INFO, "MmDispatcher\n"));
 
@@ -462,22 +449,41 @@ MmDispatcher (
       RemoveEntryList (&DriverEntry->ScheduledLink);
 
       //
+      // Cache state of MmEntryPointRegistered before calling entry point
+      //
+      PreviousMmEntryPointRegistered = mMmEntryPointRegistered;
+
+      //
       // For each MM driver, pass NULL as ImageHandle
       //
-      if (mEfiSystemTable == NULL) {
-        DEBUG ((DEBUG_INFO, "StartImage - 0x%x (Standalone Mode)\n", DriverEntry->ImageEntryPoint));
-        Status = ((MM_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, &gMmCoreMmst);
-      } else {
-        DEBUG ((DEBUG_INFO, "StartImage - 0x%x (Tradition Mode)\n", DriverEntry->ImageEntryPoint));
-        Status = ((EFI_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(
-  DriverEntry->ImageHandle,
-  mEfiSystemTable
-  );
-      }
-
+      DEBUG ((DEBUG_INFO, "StartImage - 0x%x (Standalone Mode)\n", DriverEntry->ImageEntryPoint));
+      Status = ((MM_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, &gMmCoreMmst);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_INFO, "StartImage Status - %r\n", Status));
         MmFreePages (DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);
+        if (DriverEntry->ImageHandle != NULL) {
+          MmUninstallProtocolInterface (
+            DriverEntry->ImageHandle,
+            &gEfiLoadedImageProtocolGuid,
+            &DriverEntry->LoadedImage
+            );
+        }
+      }
+
+      if (!PreviousMmEntryPointRegistered && mMmEntryPointRegistered) {
+        if (FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
+          //
+          // Return immediately if the MM Entry Point was registered by the MM
+          // Driver that was just dispatched. The MM IPL will reinvoke the MM
+          // Core Dispatcher. This is required so MM Mode may be enabled as soon
+          // as all the dependent MM Drivers for MM Mode have been dispatched.
+          // Once the MM Entry Point has been registered, then MM Mode will be
+          // used.
+          //
+          gRequestDispatch   = TRUE;
+          gDispatcherRunning = FALSE;
+          return EFI_NOT_READY;
+        }
       }
     }
 
@@ -705,6 +711,57 @@ MmAddToDriverList (
 
   InsertTailList (&mDiscoveredList, &DriverEntry->Link);
   gRequestDispatch = TRUE;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Event notification that is fired MM IPL to dispatch the previously discovered MM drivers.
+
+  @param[in]       DispatchHandle  The unique handle assigned to this handler by MmiHandlerRegister().
+  @param[in]       Context         Points to an optional handler context which was specified when the
+                                   handler was registered.
+  @param[in, out]  CommBuffer      A pointer to a collection of data in memory that will
+                                   be conveyed from a non-MM environment into an MM environment.
+  @param[in, out]  CommBufferSize  The size of the CommBuffer.
+
+  @return EFI_SUCCESS              Dispatcher is executed.
+
+**/
+EFI_STATUS
+EFIAPI
+MmDriverDispatchHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context         OPTIONAL,
+  IN OUT VOID        *CommBuffer      OPTIONAL,
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+
+  DEBUG ((DEBUG_INFO, "MmDriverDispatchHandler\n"));
+
+  //
+  // Execute the MM Dispatcher on MM drivers that have been discovered
+  // previously but not dispatched.
+  //
+  Status = MmDispatcher ();
+
+  //
+  // Check to see if CommBuffer and CommBufferSize are valid
+  //
+  if ((CommBuffer != NULL) && (CommBufferSize != NULL)) {
+    if (*CommBufferSize > sizeof (EFI_STATUS)) {
+      //
+      // Set the status of MmDispatcher to CommBuffer
+      //
+      *(EFI_STATUS *)CommBuffer = Status;
+    }
+  }
+
+  MmCoreInitializeMemoryAttributesTable ();
+
+  MmiHandlerUnRegister (DispatchHandle);
 
   return EFI_SUCCESS;
 }
