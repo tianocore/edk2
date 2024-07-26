@@ -90,6 +90,9 @@ jobs:
       extra_install_step: ${{ parameters.extra_install_step }}
 
 - job: Build_${{ parameters.tool_chain_tag }}_TARGET_CODE_COVERAGE
+  # Disable this job from running in PR gatees. It causes the entire pipeline run to wait while the job is requeued
+  # causing runs take several hours.
+  condition: false
   dependsOn: Build_${{ parameters.tool_chain_tag }}
   workspace:
     clean: all
