@@ -41,8 +41,13 @@
   NvmExpressHci.h
   NvmExpressPassthru.c
 
+[Guids]
+  gNVMeEnableStartEventGroupGuid
+  gNVMeEnableCompleteEventGroupGuid
+
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
