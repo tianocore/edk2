@@ -759,6 +759,7 @@ UfsFinishDeviceInitialization (
   UINT32      Timeout;
 
   DeviceInitStatus = 0xFF;
+  Timeout          = PcdGet32 (PcdUfsInitialCompletionTimeout);
 
   //
   // The host enables the device initialization completion by setting fDeviceInit flag.
@@ -768,10 +769,6 @@ UfsFinishDeviceInitialization (
     return Status;
   }
 
-  //
-  // There are cards that can take upto 600ms to clear fDeviceInit flag.
-  //
-  Timeout = UFS_INIT_COMPLETION_TIMEOUT;
   do {
     Status = UfsReadFlag (Private, UfsFlagDevInit, &DeviceInitStatus);
     if (EFI_ERROR (Status)) {
