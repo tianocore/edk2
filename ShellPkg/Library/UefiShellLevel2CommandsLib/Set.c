@@ -62,11 +62,13 @@ ShellCommandRunSet (
   LIST_ENTRY    *Package;
   CONST CHAR16  *KeyName;
   CONST CHAR16  *Value;
+  CHAR16        *CleanValue;
   CHAR16        *ProblemParam;
   SHELL_STATUS  ShellStatus;
 
   ProblemParam = NULL;
   ShellStatus  = SHELL_SUCCESS;
+  CleanValue   = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -134,10 +136,19 @@ ShellCommandRunSet (
         //
         // assigning one
         //
-        Status = ShellSetEnvironmentVariable (KeyName, Value, ShellCommandLineGetFlag (Package, L"-v"));
+
+        Status = ShellLevel2StripQuotes (Value, &CleanValue);
         if (EFI_ERROR (Status)) {
           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SET_ERROR_SET), gShellLevel2HiiHandle, L"set", KeyName);
           ShellStatus = (SHELL_STATUS)(Status & (~MAX_BIT));
+        } else {
+          Status = ShellSetEnvironmentVariable (KeyName, CleanValue, ShellCommandLineGetFlag (Package, L"-v"));
+          if (EFI_ERROR (Status)) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SET_ERROR_SET), gShellLevel2HiiHandle, L"set", KeyName);
+            ShellStatus = (SHELL_STATUS)(Status & (~MAX_BIT));
+          }
+
+          FreePool (CleanValue);
         }
       } else {
         if (KeyName != NULL) {
