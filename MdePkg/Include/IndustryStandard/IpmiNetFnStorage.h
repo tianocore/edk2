@@ -76,7 +76,7 @@ typedef struct {
 typedef struct {
   UINT8    CompletionCode;
   UINT8    CountReturned;
-  UINT8    Data[0];
+  UINT8    Data[];
 } IPMI_READ_FRU_DATA_RESPONSE;
 
 //
@@ -95,7 +95,7 @@ typedef struct {
 typedef struct {
   UINT8     DeviceId;
   UINT16    InventoryOffset;
-  UINT8     Data[0];
+  UINT8     Data[];
 } IPMI_WRITE_FRU_DATA_REQUEST;
 
 typedef struct {
@@ -594,7 +594,7 @@ typedef struct {
   UINT16    RecordId;
   UINT8     OffsetIntoRecord;
   UINT8     InProgress;
-  UINT8     RecordData[0];
+  UINT8     RecordData[];
 } IPMI_PARTIAL_ADD_SEL_ENTRY_REQUEST;
 
 typedef struct {
