@@ -41,6 +41,8 @@
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/ReportStatusCodeLib.h>
 
+#include <Guid/NVMeEventGroup.h>
+
 typedef struct _NVME_CONTROLLER_PRIVATE_DATA  NVME_CONTROLLER_PRIVATE_DATA;
 typedef struct _NVME_DEVICE_PRIVATE_DATA      NVME_DEVICE_PRIVATE_DATA;
 
