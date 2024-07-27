@@ -22,6 +22,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
+#include <Library/PcdLib.h>
 #include <Library/PeiServicesLib.h>
 
 #include <IndustryStandard/Scsi.h>
@@ -31,8 +32,7 @@
 
 #define UFS_PEIM_HC_SIG  SIGNATURE_32 ('U', 'F', 'S', 'H')
 
-#define UFS_PEIM_MAX_LUNS            8
-#define UFS_INIT_COMPLETION_TIMEOUT  600000
+#define UFS_PEIM_MAX_LUNS  8
 
 typedef struct {
   UINT8     Lun[UFS_PEIM_MAX_LUNS];
