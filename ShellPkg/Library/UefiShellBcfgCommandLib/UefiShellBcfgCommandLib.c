@@ -588,6 +588,7 @@ BcfgAdd (
   EFI_SHELL_FILE_INFO       *Arg;
   EFI_SHELL_FILE_INFO       *FileList;
   CHAR16                    OptionStr[40];
+  CHAR16                    *ClosingQuote;
   UINTN                     DescSize, FilePathSize;
   BOOLEAN                   Found;
   UINTN                     TargetLocation;
@@ -794,6 +795,19 @@ BcfgAdd (
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_TARGET_NF), gShellBcfgHiiHandle, L"bcfg");
     } else {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_BCFG_TARGET), gShellBcfgHiiHandle, TargetLocation);
+    }
+  }
+
+  if (ShellStatus == SHELL_SUCCESS) {
+    //
+    // Remove quotes from description string
+    //
+    if (*Desc == L'\"') {
+      Desc         = &Desc[1];
+      ClosingQuote = StrStr (Desc, L"\"");
+      if (ClosingQuote) {
+        *ClosingQuote = CHAR_NULL;
+      }
     }
   }
 
