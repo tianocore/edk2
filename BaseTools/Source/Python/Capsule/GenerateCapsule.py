@@ -252,7 +252,7 @@ if __name__ == '__main__':
             HardwareInstance             = ConvertJsonValue (Config, 'HardwareInstance', ValidateUnsignedInteger, Required = False, Default = 0)
             MonotonicCount               = ConvertJsonValue (Config, 'MonotonicCount', ValidateUnsignedInteger, Required = False, Default = 0)
             SignToolPfxFile              = ConvertJsonValue (Config, 'SignToolPfxFile', os.path.expandvars, Required = False, Default = None, Open = True)
-            SignToolSubjectName          = ConvertJsonValue (Config, 'SignToolSubjectName', os.path.expandvars, Required = False, Default = None, Open = True)
+            SignToolSubjectName          = ConvertJsonValue (Config, 'SignToolSubjectName', str, Required = False, Default = None, Open = False)
             OpenSslSignerPrivateCertFile = ConvertJsonValue (Config, 'OpenSslSignerPrivateCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
             OpenSslOtherPublicCertFile   = ConvertJsonValue (Config, 'OpenSslOtherPublicCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
             OpenSslTrustedPublicCertFile = ConvertJsonValue (Config, 'OpenSslTrustedPublicCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
@@ -308,7 +308,7 @@ if __name__ == '__main__':
             UpdateImageIndex             = ConvertJsonValue (Config, 'UpdateImageIndex', ValidateUnsignedInteger, Required = False, Default = 1)
             MonotonicCount               = ConvertJsonValue (Config, 'MonotonicCount', ValidateUnsignedInteger, Required = False, Default = 0)
             SignToolPfxFile              = ConvertJsonValue (Config, 'SignToolPfxFile', os.path.expandvars, Required = False, Default = None, Open = True)
-            SignToolSubjectName          = ConvertJsonValue (Config, 'SignToolSubjectName', os.path.expandvars, Required = False, Default = None, Open = True)
+            SignToolSubjectName          = ConvertJsonValue (Config, 'SignToolSubjectName', str, Required = False, Default = None, Open = False)
             OpenSslSignerPrivateCertFile = ConvertJsonValue (Config, 'OpenSslSignerPrivateCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
             OpenSslOtherPublicCertFile   = ConvertJsonValue (Config, 'OpenSslOtherPublicCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
             OpenSslTrustedPublicCertFile = ConvertJsonValue (Config, 'OpenSslTrustedPublicCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
@@ -413,7 +413,7 @@ if __name__ == '__main__':
             print ('GenerateCapsule: error: Argument --pfx-file conflicts with Argument -j')
             sys.exit (1)
         if args.SignToolSubjectName:
-            print ('GenerateCapsule: error: Argument --SubjectName conflicts with Argument -j')
+            print ('GenerateCapsule: error: Argument --subject-name conflicts with Argument -j')
             sys.exit (1)
         if args.OpenSslSignerPrivateCertFile:
             print ('GenerateCapsule: error: Argument --signer-private-cert conflicts with Argument -j')
