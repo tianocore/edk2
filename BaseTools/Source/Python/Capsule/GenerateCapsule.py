@@ -75,7 +75,7 @@ def SignPayloadSignTool (Payload, ToolPath, PfxFile, SubjectName, Verbose = Fals
     if PfxFile is not None:
         Command = Command + '/f {PfxFile} '.format (PfxFile = PfxFile)
     if SubjectName is not None:
-        Command = Command + '/n {SubjectName} '.format (SubjectName = SubjectName)
+        Command = Command + '/n "{SubjectName}" '.format (SubjectName = SubjectName)
     Command = Command + TempFileName
     if Verbose:
         print (Command)
