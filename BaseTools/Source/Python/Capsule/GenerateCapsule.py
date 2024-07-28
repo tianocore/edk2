@@ -751,7 +751,9 @@ if __name__ == '__main__':
                     for Index in range (0, FmpCapsuleHeader.PayloadItemCount):
                         if Index > 0:
                             PayloadDecodeFile = FmpCapsuleHeader.GetFmpCapsuleImageHeader (Index).Payload
-                            PayloadDescriptorList.append (PayloadDescriptor (PayloadDecodeFile,
+                            PayloadDescriptorList.append (PayloadDescriptor (
+                                                            PayloadDecodeFile,
+                                                            None,
                                                             None,
                                                             None,
                                                             None,
