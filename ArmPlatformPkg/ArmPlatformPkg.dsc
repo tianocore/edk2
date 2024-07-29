@@ -123,7 +123,6 @@
   ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf
   ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
 
-  ArmPlatformPkg/PrePi/PeiMPCore.inf
   ArmPlatformPkg/PrePi/PeiUniCore.inf
 
   ArmPlatformPkg/Library/ArmMaliDp/ArmMaliDp.inf
