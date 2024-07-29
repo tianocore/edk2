@@ -18,7 +18,6 @@
 [Sources]
   PrePi.h
   PrePi.c
-  MainUniCore.c
 
 [Sources.ARM]
   Arm/ArchPrePi.c
