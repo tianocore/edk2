@@ -55,9 +55,6 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
 
-[FeaturePcd]
-  gArmPlatformTokenSpaceGuid.PcdSendSgiToBringUpSecondaryCores
-
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
