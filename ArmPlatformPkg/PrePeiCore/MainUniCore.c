@@ -10,15 +10,6 @@
 
 VOID
 EFIAPI
-SecondaryMain (
-  IN UINTN  MpId
-  )
-{
-  ASSERT (FALSE);
-}
-
-VOID
-EFIAPI
 PrimaryMain (
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   )

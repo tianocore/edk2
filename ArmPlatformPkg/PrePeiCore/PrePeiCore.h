@@ -52,21 +52,6 @@ PrimaryMain (
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   );
 
-/*
- * This is the main function for secondary cores. They loop around until a non Null value is written to
- * SYS_FLAGS register.The SYS_FLAGS register is platform specific.
- * Note:The secondary cores, while executing secondary_main, assumes that:
- *      : SGI 0 is configured as Non-secure interrupt
- *      : Priority Mask is configured to allow SGI 0
- *      : Interrupt Distributor and CPU interfaces are enabled
- *
- */
-VOID
-EFIAPI
-SecondaryMain (
-  IN UINTN  MpId
-  );
-
 VOID
 PeiCommonExceptionEntry (
   IN UINT32  Entry,
