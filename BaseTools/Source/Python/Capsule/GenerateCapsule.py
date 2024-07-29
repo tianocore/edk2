@@ -10,7 +10,7 @@
 # keep the tool as simple as possible, it has the following limitations:
 #   * Do not support vendor code bytes in a capsule.
 #
-# Copyright (c) 2018 - 2022, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2018 - 2024, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
@@ -38,11 +38,16 @@ from Common.Edk2.Capsule.FmpPayloadHeader  import FmpPayloadHeaderClass
 # Globals for help information
 #
 __prog__        = 'GenerateCapsule'
-__version__     = '0.10'
-__copyright__   = 'Copyright (c) 2022, Intel Corporation. All rights reserved.'
+__version__     = '0.11'
+__copyright__   = 'Copyright (c) 2024, Intel Corporation. All rights reserved.'
 __description__ = 'Generate a capsule.\n'
 
-def SignPayloadSignTool (Payload, ToolPath, PfxFile, SubjectName, Verbose = False):
+#
+# Globals definitions
+#
+DEFAULT_HASH_ALGORITHM = 'sha256'
+
+def SignPayloadSignTool (Payload, ToolPath, PfxFile, SubjectName, HashAlgorithm = DEFAULT_HASH_ALGORITHM, Verbose = False):
     #
     # Create a temporary directory
     #
@@ -70,7 +75,7 @@ def SignPayloadSignTool (Payload, ToolPath, PfxFile, SubjectName, Verbose = Fals
         ToolPath = ''
     Command = ''
     Command = Command + '"{Path}" '.format (Path = os.path.join (ToolPath, 'signtool.exe'))
-    Command = Command + 'sign /fd sha256 /p7ce DetachedSignedData /p7co 1.2.840.113549.1.7.2 '
+    Command = Command + 'sign /fd {HashAlgorithm} /p7ce DetachedSignedData /p7co 1.2.840.113549.1.7.2 '.format (HashAlgorithm = HashAlgorithm)
     Command = Command + '/p7 {TempDir} '.format (TempDir = TempDirectoryName)
     if PfxFile is not None:
         Command = Command + '/f {PfxFile} '.format (PfxFile = PfxFile)
@@ -108,11 +113,11 @@ def SignPayloadSignTool (Payload, ToolPath, PfxFile, SubjectName, Verbose = Fals
     shutil.rmtree (TempDirectoryName)
     return Signature
 
-def VerifyPayloadSignTool (Payload, CertData, ToolPath, PfxFile, SubjectName, Verbose = False):
+def VerifyPayloadSignTool (Payload, CertData, ToolPath, PfxFile, SubjectName, HashAlgorithm = DEFAULT_HASH_ALGORITHM, Verbose = False):
     print ('signtool verify is not supported.')
     raise ValueError ('GenerateCapsule: error: signtool verify is not supported.')
 
-def SignPayloadOpenSsl (Payload, ToolPath, SignerPrivateCertFile, OtherPublicCertFile, TrustedPublicCertFile, Verbose = False):
+def SignPayloadOpenSsl (Payload, ToolPath, SignerPrivateCertFile, OtherPublicCertFile, TrustedPublicCertFile, HashAlgorithm = DEFAULT_HASH_ALGORITHM, Verbose = False):
     #
     # Build openssl command
     #
@@ -120,7 +125,7 @@ def SignPayloadOpenSsl (Payload, ToolPath, SignerPrivateCertFile, OtherPublicCer
         ToolPath = ''
     Command = ''
     Command = Command + '"{Path}" '.format (Path = os.path.join (ToolPath, 'openssl'))
-    Command = Command + 'smime -sign -binary -outform DER -md sha256 '
+    Command = Command + 'smime -sign -binary -outform DER -md {HashAlgorithm} '.format (HashAlgorithm = HashAlgorithm)
     Command = Command + '-signer "{Private}" -certfile "{Public}"'.format (Private = SignerPrivateCertFile, Public = OtherPublicCertFile)
     if Verbose:
         print (Command)
@@ -141,7 +146,7 @@ def SignPayloadOpenSsl (Payload, ToolPath, SignerPrivateCertFile, OtherPublicCer
 
     return Signature
 
-def VerifyPayloadOpenSsl (Payload, CertData, ToolPath, SignerPrivateCertFile, OtherPublicCertFile, TrustedPublicCertFile, Verbose = False):
+def VerifyPayloadOpenSsl (Payload, CertData, ToolPath, SignerPrivateCertFile, OtherPublicCertFile, TrustedPublicCertFile, HashAlgorithm = DEFAULT_HASH_ALGORITHM, Verbose = False):
     #
     # Create a temporary directory
     #
@@ -251,6 +256,7 @@ if __name__ == '__main__':
             LowestSupportedVersion       = ConvertJsonValue (Config, 'LowestSupportedVersion', ValidateUnsignedInteger, Required = False)
             HardwareInstance             = ConvertJsonValue (Config, 'HardwareInstance', ValidateUnsignedInteger, Required = False, Default = 0)
             MonotonicCount               = ConvertJsonValue (Config, 'MonotonicCount', ValidateUnsignedInteger, Required = False, Default = 0)
+            HashAlgorithm                = ConvertJsonValue (Config, 'HashAlgorithm', str, Required = False, Default = DEFAULT_HASH_ALGORITHM)
             SignToolPfxFile              = ConvertJsonValue (Config, 'SignToolPfxFile', os.path.expandvars, Required = False, Default = None, Open = True)
             SignToolSubjectName          = ConvertJsonValue (Config, 'SignToolSubjectName', str, Required = False, Default = None, Open = False)
             OpenSslSignerPrivateCertFile = ConvertJsonValue (Config, 'OpenSslSignerPrivateCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
@@ -267,6 +273,7 @@ if __name__ == '__main__':
                                             MonotonicCount,
                                             HardwareInstance,
                                             UpdateImageIndex,
+                                            HashAlgorithm,
                                             SignToolPfxFile,
                                             SignToolSubjectName,
                                             OpenSslSignerPrivateCertFile,
@@ -307,6 +314,7 @@ if __name__ == '__main__':
             HardwareInstance             = ConvertJsonValue (Config, 'HardwareInstance', ValidateUnsignedInteger, Required = False, Default = 0)
             UpdateImageIndex             = ConvertJsonValue (Config, 'UpdateImageIndex', ValidateUnsignedInteger, Required = False, Default = 1)
             MonotonicCount               = ConvertJsonValue (Config, 'MonotonicCount', ValidateUnsignedInteger, Required = False, Default = 0)
+            HashAlgorithm                = ConvertJsonValue (Config, 'HashAlgorithm', str, Required = False, Default = DEFAULT_HASH_ALGORITHM)
             SignToolPfxFile              = ConvertJsonValue (Config, 'SignToolPfxFile', os.path.expandvars, Required = False, Default = None, Open = True)
             SignToolSubjectName          = ConvertJsonValue (Config, 'SignToolSubjectName', str, Required = False, Default = None, Open = False)
             OpenSslSignerPrivateCertFile = ConvertJsonValue (Config, 'OpenSslSignerPrivateCertFile', os.path.expandvars, Required = False, Default = None, Open = True)
@@ -334,6 +342,7 @@ if __name__ == '__main__':
                                             MonotonicCount,
                                             HardwareInstance,
                                             UpdateImageIndex,
+                                            HashAlgorithm,
                                             SignToolPfxFile,
                                             SignToolSubjectName,
                                             OpenSslSignerPrivateCertFile,
@@ -354,6 +363,7 @@ if __name__ == '__main__':
                                   "Payload": PayloadDescriptor.Payload,
                                   "HardwareInstance": str(PayloadDescriptor.HardwareInstance),
                                   "UpdateImageIndex": str(PayloadDescriptor.UpdateImageIndex),
+                                  "HashAlgorithm": str(PayloadDescriptor.HashAlgorithm),
                                   "SignToolPfxFile": str(PayloadDescriptor.SignToolPfxFile),
                                   "SignToolSubjectName": str(PayloadDescriptor.SignToolSubjectName),
                                   "OpenSslSignerPrivateCertFile": str(PayloadDescriptor.OpenSslSignerPrivateCertFile),
@@ -409,6 +419,9 @@ if __name__ == '__main__':
         if args.HardwareInstance:
             print ('GenerateCapsule: error: Argument --hardware-instance conflicts with Argument -j')
             sys.exit (1)
+        if args.HashAlgorithm:
+            print ('GenerateCapsule: error: Argument --hash-algorithm conflicts with Argument -j')
+            sys.exit (1)
         if args.SignToolPfxFile:
             print ('GenerateCapsule: error: Argument --pfx-file conflicts with Argument -j')
             sys.exit (1)
@@ -437,6 +450,7 @@ if __name__ == '__main__':
                      MonotonicCount               = 0,
                      HardwareInstance             = 0,
                      UpdateImageIndex             = 1,
+                     HashAlgorithm                = None,
                      SignToolPfxFile              = None,
                      SignToolSubjectName          = None,
                      OpenSslSignerPrivateCertFile = None,
@@ -452,6 +466,7 @@ if __name__ == '__main__':
             self.MonotonicCount               = MonotonicCount
             self.HardwareInstance             = HardwareInstance
             self.UpdateImageIndex             = UpdateImageIndex
+            self.HashAlgorithm                = HashAlgorithm
             self.SignToolPfxFile              = SignToolPfxFile
             self.SignToolSubjectName          = SignToolSubjectName
             self.OpenSslSignerPrivateCertFile = OpenSslSignerPrivateCertFile
@@ -523,6 +538,9 @@ if __name__ == '__main__':
                 if args.OutputFile is None:
                     raise argparse.ArgumentTypeError ('--decode requires --output')
 
+            if self.HashAlgorithm is None:
+                self.HashAlgorithm = DEFAULT_HASH_ALGORITHM
+
             if self.UseSignTool:
                 if self.SignToolPfxFile is not None:
                     self.SignToolPfxFile.close()
@@ -568,6 +586,7 @@ if __name__ == '__main__':
                                             args.MonotonicCount,
                                             args.HardwareInstance,
                                             args.UpdateImageIndex,
+                                            args.HashAlgorithm,
                                             args.SignToolPfxFile,
                                             args.SignToolSubjectName,
                                             args.OpenSslSignerPrivateCertFile,
@@ -613,6 +632,7 @@ if __name__ == '__main__':
                             SinglePayloadDescriptor.SigningToolPath,
                             SinglePayloadDescriptor.SignToolPfxFile,
                             SinglePayloadDescriptor.SignToolSubjectName,
+                            HashAlgorithm = SinglePayloadDescriptor.HashAlgorithm,
                             Verbose = args.Verbose
                         )
                     else:
@@ -622,6 +642,7 @@ if __name__ == '__main__':
                             SinglePayloadDescriptor.OpenSslSignerPrivateCertFile,
                             SinglePayloadDescriptor.OpenSslOtherPublicCertFile,
                             SinglePayloadDescriptor.OpenSslTrustedPublicCertFile,
+                            HashAlgorithm = SinglePayloadDescriptor.HashAlgorithm,
                             Verbose = args.Verbose
                         )
                 except Exception as Msg:
@@ -693,6 +714,7 @@ if __name__ == '__main__':
                                             args.MonotonicCount,
                                             args.HardwareInstance,
                                             args.UpdateImageIndex,
+                                            args.HashAlgorithm,
                                             args.SignToolPfxFile,
                                             args.SignToolSubjectName,
                                             args.OpenSslSignerPrivateCertFile,
@@ -738,6 +760,7 @@ if __name__ == '__main__':
                                                                 None,
                                                                 HardwareInstance,
                                                                 UpdateImageIndex,
+                                                                PayloadDescriptorList[Index].HashAlgorithm,
                                                                 PayloadDescriptorList[Index].SignToolPfxFile,
                                                                 PayloadDescriptorList[Index].SignToolSubjectName,
                                                                 PayloadDescriptorList[Index].OpenSslSignerPrivateCertFile,
@@ -765,6 +788,7 @@ if __name__ == '__main__':
                                                             None,
                                                             None,
                                                             None,
+                                                            None,
                                                             None
                                                             ))
                         GUID = FmpCapsuleHeader.GetFmpCapsuleImageHeader (Index).UpdateImageTypeId
@@ -779,6 +803,7 @@ if __name__ == '__main__':
                                                             None,
                                                             HardwareInstance,
                                                             UpdateImageIndex,
+                                                            PayloadDescriptorList[Index].HashAlgorithm,
                                                             PayloadDescriptorList[Index].SignToolPfxFile,
                                                             PayloadDescriptorList[Index].SignToolSubjectName,
                                                             PayloadDescriptorList[Index].OpenSslSignerPrivateCertFile,
@@ -814,6 +839,7 @@ if __name__ == '__main__':
                                            SinglePayloadDescriptor.SigningToolPath,
                                            SinglePayloadDescriptor.SignToolPfxFile,
                                            SinglePayloadDescriptor.SignToolSubjectName,
+                                           HashAlgorithm = SinglePayloadDescriptor.HashAlgorithm,
                                            Verbose = args.Verbose
                                            )
                           else:
@@ -824,6 +850,7 @@ if __name__ == '__main__':
                                            SinglePayloadDescriptor.OpenSslSignerPrivateCertFile,
                                            SinglePayloadDescriptor.OpenSslOtherPublicCertFile,
                                            SinglePayloadDescriptor.OpenSslTrustedPublicCertFile,
+                                           HashAlgorithm = SinglePayloadDescriptor.HashAlgorithm,
                                            Verbose = args.Verbose
                                            )
                         except Exception as Msg:
@@ -994,6 +1021,9 @@ if __name__ == '__main__':
                          help = "The 32-bit version of the binary payload (e.g. 0x11223344 or 5678).  Required for encode operations.")
     parser.add_argument ("--lsv", dest = 'LowestSupportedVersion', type = ValidateUnsignedInteger,
                          help = "The 32-bit lowest supported version of the binary payload (e.g. 0x11223344 or 5678).  Required for encode operations.")
+
+    parser.add_argument ("--hash-algorithm", dest = 'HashAlgorithm', type = str,
+                         help = "Hash algorithm for the payload digest.")
 
     parser.add_argument ("--pfx-file", dest='SignToolPfxFile', type=argparse.FileType('rb'),
                          help="signtool PFX certificate filename.")
