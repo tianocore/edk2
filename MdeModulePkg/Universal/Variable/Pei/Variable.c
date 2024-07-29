@@ -1336,6 +1336,7 @@ CalculateHobVariableCacheSize (
   VARIABLE_STORE_HEADER  *VariableStoreHeader;
 
   VariableStoreHeader = NULL;
+  ZeroMem (&StoreInfo, sizeof (VARIABLE_STORE_INFO));
   GetHobVariableStore (&StoreInfo, &VariableStoreHeader);
 
   if (VariableStoreHeader == NULL) {
