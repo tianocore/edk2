@@ -148,3 +148,26 @@ steps:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
     artifactName: 'Build Logs $(System.JobName)'
   condition: succeededOrFailed()
+
+- powershell: if (Test-Path -Path Build/coverage.xml) {Write-Host "##vso[task.setvariable variable=is_code_coverage]1"}
+  displayName: Check coverage.xml exist or not
+
+- task: UseDotNet@2
+  displayName: Install dotnet
+  inputs:
+    version: 7.0.x
+  condition: eq(variables.is_code_coverage, 1)
+
+- task: CmdLine@2
+  displayName: Create Code Coverage Report
+  inputs:
+    script: |
+      dotnet tool install -g dotnet-reportgenerator-globaltool
+      reportgenerator -reports:$(Build.ArtifactStagingDirectory)/**/coverage.xml -targetdir:$(Build.ArtifactStagingDirectory)/Coverage -reporttypes:Cobertura -filefilters:-*Build*;-*UnitTest*;-*Mock*;-*usr*
+  condition: eq(variables.is_code_coverage, 1)
+
+- task: PublishCodeCoverageResults@2
+  displayName: 'Publish code coverage'
+  inputs:
+    summaryFileLocation: '$(Build.ArtifactStagingDirectory)/Coverage/Cobertura.xml'
+  condition: eq(variables.is_code_coverage, 1)
