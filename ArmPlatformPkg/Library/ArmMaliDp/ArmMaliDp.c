@@ -287,7 +287,7 @@ LcdInitialize (
   return EFI_SUCCESS;
 }
 
-/** Set ARM Mali DP in cofiguration mode.
+/** Set ARM Mali DP in configuration mode.
 
   The ARM Mali DP must be in the configuration mode for
   configuration of the H_INTERVALS, V_INTERVALS, SYNC_CONTROL
