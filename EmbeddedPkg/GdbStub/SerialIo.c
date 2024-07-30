@@ -457,7 +457,7 @@ GDB_SERIAL_DEV  gdbSerialDevTemplate = {
     0, // ControlMask
     0, // Timeout
     0, // BaudRate
-    1, // RceiveFifoDepth
+    1, // ReceiveFifoDepth
     0, // DataBits
     0, // Parity
     0  // StopBits
