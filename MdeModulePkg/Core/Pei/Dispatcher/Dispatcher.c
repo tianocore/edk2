@@ -1205,16 +1205,21 @@ EvacuateTempRam (
     PeiCoreFvHandle.FvHandle = (EFI_PEI_FV_HANDLE)SecCoreData->BootFirmwareVolumeBase;
   }
 
-  for (FvIndex = 0; FvIndex < Private->FvCount; FvIndex++) {
-    if (Private->Fv[FvIndex].FvHandle == PeiCoreFvHandle.FvHandle) {
-      CopyMem (&PeiCoreFvHandle, &Private->Fv[FvIndex], sizeof (PEI_CORE_FV_HANDLE));
-      break;
+  if (Private->PeimDispatcherReenter) {
+    //
+    // PEI_CORE should be migrated after dispatcher re-enters from main memory.
+    //
+    for (FvIndex = 0; FvIndex < Private->FvCount; FvIndex++) {
+      if (Private->Fv[FvIndex].FvHandle == PeiCoreFvHandle.FvHandle) {
+        CopyMem (&PeiCoreFvHandle, &Private->Fv[FvIndex], sizeof (PEI_CORE_FV_HANDLE));
+        break;
+      }
     }
+
+    Status = EFI_SUCCESS;
+
+    ConvertPeiCorePpiPointers (Private, &PeiCoreFvHandle);
   }
-
-  Status = EFI_SUCCESS;
-
-  ConvertPeiCorePpiPointers (Private, &PeiCoreFvHandle);
 
   Hob.Raw = GetFirstGuidHob (&gEdkiiMigrationInfoGuid);
   if (Hob.Raw != NULL) {
@@ -1237,6 +1242,14 @@ EvacuateTempRam (
         )
     {
       if ((MigrationInfo == NULL) || (MigrationInfo->MigrateAll == TRUE)) {
+        if (!Private->PeimDispatcherReenter) {
+          //
+          // Migration before dispatcher reentery is supported only when gEdkiiMigrationInfoGuid
+          // HOB is built for selective FV migration.
+          //
+          return EFI_SUCCESS;
+        }
+
         //
         // Migrate all FVs and copy raw data
         //
@@ -1253,9 +1266,17 @@ EvacuateTempRam (
           }
         }
 
-        if (Index == MigrationInfo->ToMigrateFvCount) {
+        if ((Index == MigrationInfo->ToMigrateFvCount) ||
+            ((!Private->PeimDispatcherReenter) &&
+             (((FvMigrationFlags & FLAGS_FV_MIGRATE_BEFORE_PEI_CORE_REENTRY) == 0) ||
+              (FvHeader == PeiCoreFvHandle.FvHandle))))
+        {
           //
           // This FV is not expected to migrate
+          //
+          // FV should not be migrated before dispatcher reentry if any of the below condition is true:
+          // a. MigrationInfo HOB is not built with flag FLAGS_FV_MIGRATE_BEFORE_PEI_CORE_REENTRY.
+          // b. FV contains currently executing PEI Core.
           //
           continue;
         }
