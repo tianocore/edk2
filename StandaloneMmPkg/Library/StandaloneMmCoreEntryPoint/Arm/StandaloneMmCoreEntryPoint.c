@@ -128,7 +128,7 @@ GetAndPrintBootinformation (
 
   @param [in] Status          edk2 status code.
 
-  @retval ARM_SVC_SPM_RET_*   return value correspond to EFI_STATUS.
+  @retval ARM_SPM_MM_RET_*    return value correspond to EFI_STATUS.
 
 **/
 STATIC
@@ -140,15 +140,15 @@ EfiStatusToSpmMmStatus (
 {
   switch (Status) {
     case EFI_SUCCESS:
-      return ARM_SVC_SPM_RET_SUCCESS;
+      return ARM_SPM_MM_RET_SUCCESS;
     case EFI_INVALID_PARAMETER:
-      return ARM_SVC_SPM_RET_INVALID_PARAMS;
+      return ARM_SPM_MM_RET_INVALID_PARAMS;
     case EFI_ACCESS_DENIED:
-      return ARM_SVC_SPM_RET_DENIED;
+      return ARM_SPM_MM_RET_DENIED;
     case EFI_OUT_OF_RESOURCES:
-      return ARM_SVC_SPM_RET_NO_MEMORY;
+      return ARM_SPM_MM_RET_NO_MEMORY;
     default:
-      return ARM_SVC_SPM_RET_NOT_SUPPORTED;
+      return ARM_SPM_MM_RET_NOT_SUPPORTED;
   }
 }
 
@@ -207,10 +207,10 @@ SetEventCompleteSvcArgs (
     EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP;
     EventCompleteSvcArgs->Arg1 = 0;
     EventCompleteSvcArgs->Arg2 = 0;
-    EventCompleteSvcArgs->Arg3 = ARM_SVC_ID_SP_EVENT_COMPLETE;
+    EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
     EventCompleteSvcArgs->Arg4 = EfiStatusToFfaStatus (Status);
   } else {
-    EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_SP_EVENT_COMPLETE;
+    EventCompleteSvcArgs->Arg0 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
     EventCompleteSvcArgs->Arg1 = EfiStatusToSpmMmStatus (Status);
   }
 }
@@ -320,7 +320,7 @@ GetSpmVersion (
     CallerSpmMajorVer    = mSpmMajorVerFfa;
     CallerSpmMinorVer    = mSpmMinorVerFfa;
   } else {
-    SpmVersionArgs.Arg0 = ARM_SVC_ID_SPM_VERSION_AARCH32;
+    SpmVersionArgs.Arg0 = ARM_FID_SPM_MM_VERSION_AARCH32;
     CallerSpmMajorVer   = mSpmMajorVer;
     CallerSpmMinorVer   = mSpmMinorVer;
   }
