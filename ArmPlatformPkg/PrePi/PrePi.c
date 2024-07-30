@@ -28,6 +28,15 @@
 UINT64  mSystemMemoryEnd = FixedPcdGet64 (PcdSystemMemoryBase) +
                            FixedPcdGet64 (PcdSystemMemorySize) - 1;
 
+/**
+  Obtain a PPI from the list of PPIs provided by the platform code.
+
+  @param[in]  PpiGuid   GUID of the PPI to obtain
+  @param[out] Ppi       Address of GUID pointer to return the PPI
+
+  @return     Whether the PPI was obtained successfully
+**/
+STATIC
 EFI_STATUS
 GetPlatformPpi (
   IN  EFI_GUID  *PpiGuid,
@@ -52,6 +61,14 @@ GetPlatformPpi (
   return EFI_NOT_FOUND;
 }
 
+/**
+  SEC main routine.
+
+  @param[in]  UefiMemoryBase  Start of the PI/UEFI memory region
+  @param[in]  StacksBase      Start of the stack
+  @param[in]  StartTimeStamp  Timer value at start of execution
+**/
+STATIC
 VOID
 PrePiMain (
   IN  UINTN   UefiMemoryBase,
