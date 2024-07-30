@@ -13,7 +13,7 @@
 #include <Library/BaseMemoryLib.h>
 
 //
-// BOOLEAN value to indicate if it is at the post ExitBootServices pahse
+// BOOLEAN value to indicate if it is at the post ExitBootServices phase
 //
 BOOLEAN  mPostEBS = FALSE;
 
