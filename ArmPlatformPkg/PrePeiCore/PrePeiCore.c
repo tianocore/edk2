@@ -81,7 +81,6 @@ PrintFirmwareVersion (
 
 VOID
 CEntryPoint (
-  IN  UINTN                     MpId,
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   )
 {
@@ -128,7 +127,7 @@ CEntryPoint (
   SaveAndSetDebugTimerInterrupt (TRUE);
 
   // Initialize the platform specific controllers
-  ArmPlatformInitialize (MpId);
+  ArmPlatformInitialize (ArmReadMpidr ());
 
   // Goto primary Main.
   PrimaryMain (PeiCoreEntryPoint);
