@@ -330,8 +330,7 @@ Tcg2UserConfirm (
   UINTN                             BufSize;
   BOOLEAN                           CautionKey;
   BOOLEAN                           NoPpiInfo;
-  UINT16                            Index;
-  CHAR16                            DstStr[81];
+  BOOLEAN                           Result;
   CHAR16                            TempBuffer[1024];
   CHAR16                            TempBuffer2[1024];
   EFI_TCG2_PROTOCOL                 *Tcg2Protocol;
@@ -533,18 +532,14 @@ Tcg2UserConfirm (
   BufSize -= StrSize (ConfirmText);
   UnicodeSPrint (ConfirmText + StrLen (ConfirmText), BufSize, TmpStr1, TmpStr2);
 
-  DstStr[80] = L'\0';
-  for (Index = 0; Index < StrLen (ConfirmText); Index += 80) {
-    StrnCpyS (DstStr, sizeof (DstStr) / sizeof (CHAR16), ConfirmText + Index, sizeof (DstStr) / sizeof (CHAR16) - 1);
-    Print (DstStr);
-  }
+  Result = PromptForUserConfirmation (ConfirmText);
 
   FreePool (TmpStr1);
   FreePool (TmpStr2);
   FreePool (ConfirmText);
   HiiRemovePackages (mTcg2PpStringPackHandle);
 
-  return FALSE;
+  return Result;
 }
 
 /**
