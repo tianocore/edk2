@@ -24,30 +24,6 @@
 #define MULT_U64_X_N  MultU64x64
 #endif
 
-RETURN_STATUS
-EFIAPI
-TimerConstructor (
-  VOID
-  )
-{
-  //
-  // Check if the ARM Generic Timer Extension is implemented.
-  //
-  if (ArmIsArchTimerImplemented ()) {
-    //
-    // Architectural Timer Frequency must be set in Secure privileged
-    // mode (if secure extension is supported).
-    // If the reset value (0) is returned, just ASSERT.
-    //
-    ASSERT (ArmGenericTimerGetTimerFreq () != 0);
-  } else {
-    DEBUG ((DEBUG_ERROR, "ARM Architectural Timer is not available in the CPU, hence this library cannot be used.\n"));
-    ASSERT (0);
-  }
-
-  return RETURN_SUCCESS;
-}
-
 /**
   A local utility function that returns the PCD value, if specified.
   Otherwise it defaults to ArmGenericTimerGetTimerFreq.
@@ -64,6 +40,8 @@ GetPlatformTimerFreq (
   UINTN  TimerFreq;
 
   TimerFreq = ArmGenericTimerGetTimerFreq ();
+
+  ASSERT (TimerFreq != 0);
 
   return TimerFreq;
 }
