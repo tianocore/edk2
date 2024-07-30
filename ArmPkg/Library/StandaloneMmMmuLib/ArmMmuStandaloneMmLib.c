@@ -1,7 +1,7 @@
 /** @file
   File managing the MMU for ARMv8 architecture in S-EL0
 
-  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2021, Linaro Limited
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -24,6 +24,33 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+
+/**
+  Convert FFA return code to EFI_STATUS.
+
+  @param [in] SpmMmStatus           SPM_MM return code
+
+  @retval EFI_STATUS             correspond EFI_STATUS to SpmMmStatus
+**/
+STATIC
+EFI_STATUS
+SpmMmStatusToEfiStatus (
+  IN UINTN  SpmMmStatus
+  )
+{
+  switch (SpmMmStatus) {
+    case ARM_SPM_MM_RET_SUCCESS:
+      return EFI_SUCCESS;
+    case ARM_SPM_MM_RET_INVALID_PARAMS:
+      return EFI_INVALID_PARAMETER;
+    case ARM_SPM_MM_RET_DENIED:
+      return EFI_ACCESS_DENIED;
+    case ARM_SPM_MM_RET_NO_MEMORY:
+      return EFI_OUT_OF_RESOURCES;
+    default:
+      return EFI_UNSUPPORTED;
+  }
+}
 
 /** Send memory permission request to target.
 
@@ -106,24 +133,7 @@ SendMemoryPermissionRequest (
     // Bit 31 set means there is an error returned
     // See [1], Section 13.5.5.1 MM_SP_MEMORY_ATTRIBUTES_GET_AARCH64 and
     // Section 13.5.5.2 MM_SP_MEMORY_ATTRIBUTES_SET_AARCH64.
-    switch (*RetVal) {
-      case ARM_SVC_SPM_RET_NOT_SUPPORTED:
-        return EFI_UNSUPPORTED;
-
-      case ARM_SVC_SPM_RET_INVALID_PARAMS:
-        return EFI_INVALID_PARAMETER;
-
-      case ARM_SVC_SPM_RET_DENIED:
-        return EFI_ACCESS_DENIED;
-
-      case ARM_SVC_SPM_RET_NO_MEMORY:
-        return EFI_OUT_OF_RESOURCES;
-
-      default:
-        // Undefined error code received.
-        ASSERT (0);
-        return EFI_INVALID_PARAMETER;
-    }
+    SpmMmStatusToEfiStatus (*RetVal);
   }
 
   return EFI_SUCCESS;
@@ -168,10 +178,10 @@ GetMemoryPermissions (
     SvcArgs.Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ;
     SvcArgs.Arg1 = ARM_FFA_DESTINATION_ENDPOINT_ID;
     SvcArgs.Arg2 = 0;
-    SvcArgs.Arg3 = ARM_SVC_ID_SP_GET_MEM_ATTRIBUTES;
+    SvcArgs.Arg3 = ARM_FID_SPM_MM_SP_GET_MEM_ATTRIBUTES;
     SvcArgs.Arg4 = BaseAddress;
   } else {
-    SvcArgs.Arg0 = ARM_SVC_ID_SP_GET_MEM_ATTRIBUTES;
+    SvcArgs.Arg0 = ARM_FID_SPM_MM_SP_GET_MEM_ATTRIBUTES;
     SvcArgs.Arg1 = BaseAddress;
     SvcArgs.Arg2 = 0;
     SvcArgs.Arg3 = 0;
@@ -223,12 +233,12 @@ RequestMemoryPermissionChange (
     SvcArgs.Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ;
     SvcArgs.Arg1 = ARM_FFA_DESTINATION_ENDPOINT_ID;
     SvcArgs.Arg2 = 0;
-    SvcArgs.Arg3 = ARM_SVC_ID_SP_SET_MEM_ATTRIBUTES;
+    SvcArgs.Arg3 = ARM_FID_SPM_MM_SP_SET_MEM_ATTRIBUTES;
     SvcArgs.Arg4 = BaseAddress;
     SvcArgs.Arg5 = EFI_SIZE_TO_PAGES (Length);
     SvcArgs.Arg6 = Permissions;
   } else {
-    SvcArgs.Arg0 = ARM_SVC_ID_SP_SET_MEM_ATTRIBUTES;
+    SvcArgs.Arg0 = ARM_FID_SPM_MM_SP_SET_MEM_ATTRIBUTES;
     SvcArgs.Arg1 = BaseAddress;
     SvcArgs.Arg2 = EFI_SIZE_TO_PAGES (Length);
     SvcArgs.Arg3 = Permissions;
@@ -249,7 +259,9 @@ ArmSetMemoryRegionNoExec (
 
   Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
-    CodePermission = SET_MEM_ATTR_CODE_PERM_XN << SET_MEM_ATTR_CODE_PERM_SHIFT;
+    CodePermission =
+      (ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN <<
+       ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_SHIFT);
     return RequestMemoryPermissionChange (
              BaseAddress,
              Length,
@@ -272,7 +284,9 @@ ArmClearMemoryRegionNoExec (
 
   Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
-    CodePermission = SET_MEM_ATTR_CODE_PERM_XN << SET_MEM_ATTR_CODE_PERM_SHIFT;
+    CodePermission =
+      (ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN <<
+       ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_SHIFT);
     return RequestMemoryPermissionChange (
              BaseAddress,
              Length,
@@ -295,7 +309,9 @@ ArmSetMemoryRegionReadOnly (
 
   Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
-    DataPermission = SET_MEM_ATTR_DATA_PERM_RO << SET_MEM_ATTR_DATA_PERM_SHIFT;
+    DataPermission =
+      (ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RO <<
+       ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_SHIFT);
     return RequestMemoryPermissionChange (
              BaseAddress,
              Length,
@@ -318,8 +334,8 @@ ArmClearMemoryRegionReadOnly (
 
   Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
-    PermissionRequest = SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                          SET_MEM_ATTR_DATA_PERM_RW,
+    PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                          ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RW,
                           MemoryAttributes
                           );
     return RequestMemoryPermissionChange (
