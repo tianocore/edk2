@@ -1,0 +1,78 @@
+## @file
+#  SEC driver for PEI-less ARM platforms.
+#
+#  Copyright (C) 2015 Hewlett-Packard Development Company, L.P.<BR>
+#  Copyright (c) 2011-2017, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2020, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = PeilessSec
+  FILE_GUID                      = d90b03a8-2df5-4174-9ec1-c6e5b12b334b
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  PeilessSec.h
+  PeilessSec.c
+
+[Sources.ARM]
+  Arm/ArchPeilessSec.c
+  Arm/ModuleEntryPoint.S
+
+[Sources.AArch64]
+  AArch64/ArchPeilessSec.c
+  AArch64/ModuleEntryPoint.S
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmPlatformLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  DebugAgentLib
+  DebugLib
+  HobLib
+  MemoryInitPeiLib
+  PerformanceLib
+  PlatformPeiLib
+  PrePiHobListPointerLib
+  PrePiLib
+  PrintLib
+  SerialPortLib
+  TimerLib
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid
+
+[Guids]
+  gArmMpCoreInfoGuid
+  gEfiFirmwarePerformanceGuid
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+  gArmTokenSpaceGuid.PcdFdSize
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvSize
+  gArmTokenSpaceGuid.PcdVFPEnabled
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
