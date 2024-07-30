@@ -13,7 +13,7 @@
   Find the board related info from ACPI table
 
   @param  AcpiTableBase          ACPI table start address in memory
-  @param  AcpiBoardInfo          Pointer to the acpi board info strucutre
+  @param  AcpiBoardInfo          Pointer to the acpi board info structure
 
   @retval RETURN_SUCCESS     Successfully find out all the required information.
   @retval RETURN_NOT_FOUND   Failed to find the required info.
