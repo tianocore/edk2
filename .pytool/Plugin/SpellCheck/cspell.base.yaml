@@ -291,6 +291,7 @@
         "unenrolling",
         "unconfigure",
         "Loongson",
-        "LOONGARCH"
+        "LOONGARCH",
+        "MPIDR"
     ]
 }
