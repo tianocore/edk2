@@ -22,12 +22,6 @@
 
 #define SerialPrint(txt)  SerialPortWrite (txt, AsciiStrLen(txt)+1);
 
-RETURN_STATUS
-EFIAPI
-TimerConstructor (
-  VOID
-  );
-
 VOID
 PrePiMain (
   IN  UINTN   UefiMemoryBase,
