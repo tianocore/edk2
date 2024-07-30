@@ -121,5 +121,6 @@
   ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
 
   ArmPlatformPkg/PrePi/PeiUniCore.inf
+  ArmPlatformPkg/PeilessSec/PeilessSec.inf
 
   ArmPlatformPkg/Library/ArmMaliDp/ArmMaliDp.inf
