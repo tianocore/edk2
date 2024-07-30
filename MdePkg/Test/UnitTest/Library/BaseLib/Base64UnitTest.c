@@ -390,7 +390,7 @@ SafeStringContraintCheckTest (
 }
 
 /**
-  Initialze the unit test framework, suite, and unit tests for the
+  Initialize the unit test framework, suite, and unit tests for the
   Base64 conversion APIs of BaseLib and run the unit tests.
 
   @retval  EFI_SUCCESS           All test cases were dispatched.
