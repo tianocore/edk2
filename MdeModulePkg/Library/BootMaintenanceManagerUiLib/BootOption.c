@@ -813,7 +813,7 @@ GetBootOrder (
   )
 {
   BMM_FAKE_NV_DATA  *BmmConfig;
-  UINT16            Index;
+  UINTN             Index;
   UINT16            OptionOrderIndex;
   UINTN             DeviceType;
   BM_MENU_ENTRY     *NewMenuEntry;
@@ -860,8 +860,8 @@ GetDriverOrder (
   )
 {
   BMM_FAKE_NV_DATA  *BmmConfig;
-  UINT16            Index;
-  UINT16            OptionOrderIndex;
+  UINTN             Index;
+  UINTN             OptionOrderIndex;
   UINTN             DeviceType;
   BM_MENU_ENTRY     *NewMenuEntry;
   BM_LOAD_CONTEXT   *NewLoadContext;
