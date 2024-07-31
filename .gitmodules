@@ -1,7 +1,7 @@
 [submodule "CryptoPkg/Library/OpensslLib/openssl"]
 	path = CryptoPkg/Library/OpensslLib/openssl
 	url = https://github.com/openssl/openssl
-[submodule "SoftFloat"]
+[submodule "ArmPkg/Library/ArmSoftFloatLib/SoftFloat"]
 	path = ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3
 	url = https://github.com/ucb-bar/berkeley-softfloat-3.git
 [submodule "UnitTestFrameworkPkg/Library/CmockaLib/cmocka"]
