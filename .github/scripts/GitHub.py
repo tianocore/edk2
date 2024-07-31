@@ -5,12 +5,13 @@
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
+import git
 import logging
 import re
 import requests
 
 from collections import OrderedDict
-from edk2toollib.utility_functions import RunCmd, RunPythonScript
+from edk2toollib.utility_functions import RunPythonScript
 from io import StringIO
 from typing import List
 
@@ -59,24 +60,15 @@ def get_reviewers_for_range(
     Returns:
         List[str]: A list of GitHub usernames.
     """
-
     if range_start == range_end:
         commits = [range_start]
     else:
-        commit_stream_buffer = StringIO()
-        cmd_ret = RunCmd(
-            "git",
-            f"log --format=format:%H {range_start}..{range_end}",
-            workingdir=workspace_path,
-            outstream=commit_stream_buffer,
-            logging_level=logging.INFO,
-        )
-        if cmd_ret != 0:
-            print(
-                f"::error title=Commit Lookup Error!::Error getting branch commits: [{cmd_ret}]: {commit_stream_buffer.getvalue()}"
+        commits = [
+            c.hexsha
+            for c in git.Repo(workspace_path).iter_commits(
+                f"{range_start}..{range_end}"
             )
-            return []
-        commits = commit_stream_buffer.getvalue().splitlines()
+        ]
 
     raw_reviewers = []
     for commit_sha in commits:

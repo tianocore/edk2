@@ -65,12 +65,10 @@ jobs:
           TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
           WORKSPACE_PATH: ${{ github.workspace }}
         run: |
-            import logging
+            import git
             import os
             import sys
             sys.path.append(os.path.join(os.environ['WORKSPACE_PATH'], ".github"))
-            from edk2toollib.utility_functions import RunCmd
-            from io import StringIO
             from scripts import GitHub
 
             WORKSPACE_PATH = os.environ['WORKSPACE_PATH']
@@ -82,19 +80,7 @@ jobs:
 
             print(f"::notice title=PR Commit SHA::Looking at files in consolidated PR commit: {pr_commit_sha}")
 
-            out_stream_buffer = StringIO()
-            cmd_ret = RunCmd(
-                "git",
-                f"fetch origin {pr_commit_sha}",
-                workingdir=WORKSPACE_PATH,
-                outstream=out_stream_buffer,
-                logging_level=logging.INFO,
-            )
-            if cmd_ret != 0:
-                print(
-                    f"::error title=Commit Fetch Error!::Error fetching PR commit: [{cmd_ret}]: {out_stream_buffer.getvalue()}"
-                )
-                sys.exit(1)
+            git.Repo(WORKSPACE_PATH).remotes.origin.fetch(pr_commit_sha, depth=1)
 
             reviewers = GitHub.get_reviewers_for_range(WORKSPACE_PATH, GET_MAINTAINER_LOCAL_PATH, pr_commit_sha, pr_commit_sha)
             if not reviewers:
