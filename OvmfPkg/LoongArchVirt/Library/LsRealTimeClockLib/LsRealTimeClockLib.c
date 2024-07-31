@@ -49,7 +49,7 @@ InitRtc (
       MmioWrite32 (mRtcBase + RTC_CTRL_REG, Val);
       mInitialized = TRUE;
     } else {
-      DebugPrint (EFI_D_INFO, "RTC register address not found!\n");
+      DebugPrint (DEBUG_INFO, "RTC register address not found!\n");
       ASSERT (FALSE);
     }
   }
