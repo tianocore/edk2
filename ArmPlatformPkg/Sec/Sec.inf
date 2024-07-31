@@ -1,0 +1,65 @@
+## @file
+#  Generic SEC driver for ARM platforms
+#
+#  Copyright (c) 2011, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = Sec
+  FILE_GUID                      = 4c97830a-8e18-4aa6-9fd0-837b089910e2
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+
+[Sources.common]
+  Sec.h
+  Sec.c
+
+[Sources.ARM]
+  Arm/ArchSec.c
+  Arm/Exception.S
+  Arm/ModuleEntryPoint.S
+  Arm/SwitchStack.S
+
+[Sources.AARCH64]
+  AArch64/ArchSec.c
+  AArch64/Exception.S
+  AArch64/Helper.S
+  AArch64/ModuleEntryPoint.S
+  AArch64/SwitchStack.S
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmPlatformLib
+  BaseLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  DebugAgentLib
+  DebugLib
+  PrintLib
+  SerialPortLib
+
+[Ppis]
+  gEfiTemporaryRamSupportPpiGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvSize
+  gArmTokenSpaceGuid.PcdVFPEnabled
+
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
