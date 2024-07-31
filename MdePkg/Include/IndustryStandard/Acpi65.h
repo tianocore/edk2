@@ -1949,7 +1949,7 @@ typedef struct {
 ///
 /// HEST Version (as defined in ACPI 6.5 spec.)
 ///
-#define EFI_ACPI_6_5_HARDWARE_ERROR_SOURCE_TABLE_REVISION  0x01
+#define EFI_ACPI_6_5_HARDWARE_ERROR_SOURCE_TABLE_REVISION  0x02
 
 //
 // Error Source structure types.

@@ -11,7 +11,7 @@
 name: Add Pull Request Reviewers
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - master
     types: [opened, ready_for_review, reopened, synchronize]
@@ -55,15 +55,38 @@ jobs:
           TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
           WORKSPACE_PATH: ${{ github.workspace }}
         run: |
+            import logging
             import os
             import sys
             sys.path.append(os.path.join(os.environ['WORKSPACE_PATH'], ".github"))
+            from edk2toollib.utility_functions import RunCmd
+            from io import StringIO
             from scripts import GitHub
 
             WORKSPACE_PATH = os.environ['WORKSPACE_PATH']
             GET_MAINTAINER_LOCAL_PATH = os.path.join(WORKSPACE_PATH, os.environ['GET_MAINTAINER_REL_PATH'])
 
-            reviewers = GitHub.get_reviewers_for_current_branch(WORKSPACE_PATH, GET_MAINTAINER_LOCAL_PATH, f"origin/{os.environ['TARGET_BRANCH']}")
+            pr_commit_sha = GitHub.get_pr_sha(os.environ['GH_TOKEN'], os.environ['ORG_NAME'], os.environ['REPO_NAME'], os.environ['PR_NUMBER'])
+            if not pr_commit_sha:
+                sys.exit(1)
+
+            print(f"::notice title=PR Commit SHA::Looking at files in consolidated PR commit: {pr_commit_sha}")
+
+            out_stream_buffer = StringIO()
+            cmd_ret = RunCmd(
+                "git",
+                f"fetch origin {pr_commit_sha}",
+                workingdir=WORKSPACE_PATH,
+                outstream=out_stream_buffer,
+                logging_level=logging.INFO,
+            )
+            if cmd_ret != 0:
+                print(
+                    f"::error title=Commit Fetch Error!::Error fetching PR commit: [{cmd_ret}]: {out_stream_buffer.getvalue()}"
+                )
+                sys.exit(1)
+
+            reviewers = GitHub.get_reviewers_for_range(WORKSPACE_PATH, GET_MAINTAINER_LOCAL_PATH, pr_commit_sha, pr_commit_sha)
             if not reviewers:
                 print("::notice title=No Reviewers Found!::No reviewers found for this PR.")
                 sys.exit(1)

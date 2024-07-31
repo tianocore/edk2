@@ -20,59 +20,38 @@
 
 /** The EARM_OBJECT_ID enum describes the Object IDs
     in the ARM Namespace
+
+  Note: Whenever an entry in this enum is updated,
+        the following data structures must also be
+        updated:
+        - CM_OBJECT_TOKEN_FIXER TokenFixer[] in
+          Library\Common\DynamicPlatRepoLib\CmObjectTokenFixer.c
 */
 typedef enum ArmObjectID {
   EArmObjReserved,                                             ///<  0 - Reserved
   EArmObjBootArchInfo,                                         ///<  1 - Boot Architecture Info
-  EArmObjCpuInfo,                                              ///<  2 - CPU Info
-  EArmObjPowerManagementProfileInfo,                           ///<  3 - Power Management Profile Info
-  EArmObjGicCInfo,                                             ///<  4 - GIC CPU Interface Info
-  EArmObjGicDInfo,                                             ///<  5 - GIC Distributor Info
-  EArmObjGicMsiFrameInfo,                                      ///<  6 - GIC MSI Frame Info
-  EArmObjGicRedistributorInfo,                                 ///<  7 - GIC Redistributor Info
-  EArmObjGicItsInfo,                                           ///<  8 - GIC ITS Info
-  EArmObjSerialConsolePortInfo,                                ///<  9 - Serial Console Port Info
-  EArmObjSerialDebugPortInfo,                                  ///< 10 - Serial Debug Port Info
-  EArmObjGenericTimerInfo,                                     ///< 11 - Generic Timer Info
-  EArmObjPlatformGTBlockInfo,                                  ///< 12 - Platform GT Block Info
-  EArmObjGTBlockTimerFrameInfo,                                ///< 13 - Generic Timer Block Frame Info
-  EArmObjPlatformGenericWatchdogInfo,                          ///< 14 - Platform Generic Watchdog
-  EArmObjPciConfigSpaceInfo,                                   ///< 15 - PCI Configuration Space Info
-  EArmObjHypervisorVendorIdentity,                             ///< 16 - Hypervisor Vendor Id
-  EArmObjFixedFeatureFlags,                                    ///< 17 - Fixed feature flags for FADT
-  EArmObjItsGroup,                                             ///< 18 - ITS Group
-  EArmObjNamedComponent,                                       ///< 19 - Named Component
-  EArmObjRootComplex,                                          ///< 20 - Root Complex
-  EArmObjSmmuV1SmmuV2,                                         ///< 21 - SMMUv1 or SMMUv2
-  EArmObjSmmuV3,                                               ///< 22 - SMMUv3
-  EArmObjPmcg,                                                 ///< 23 - PMCG
-  EArmObjGicItsIdentifierArray,                                ///< 24 - GIC ITS Identifier Array
-  EArmObjIdMappingArray,                                       ///< 25 - ID Mapping Array
-  EArmObjSmmuInterruptArray,                                   ///< 26 - SMMU Interrupt Array
-  EArmObjProcHierarchyInfo,                                    ///< 27 - Processor Hierarchy Info
-  EArmObjCacheInfo,                                            ///< 28 - Cache Info
-  EArmObjReserved29,                                           ///< 29 - Reserved
-  EArmObjCmRef,                                                ///< 30 - CM Object Reference
-  EArmObjMemoryAffinityInfo,                                   ///< 31 - Memory Affinity Info
-  EArmObjDeviceHandleAcpi,                                     ///< 32 - Device Handle Acpi
-  EArmObjDeviceHandlePci,                                      ///< 33 - Device Handle Pci
-  EArmObjGenericInitiatorAffinityInfo,                         ///< 34 - Generic Initiator Affinity
-  EArmObjSerialPortInfo,                                       ///< 35 - Generic Serial Port Info
-  EArmObjCmn600Info,                                           ///< 36 - CMN-600 Info
-  EArmObjLpiInfo,                                              ///< 37 - Lpi Info
-  EArmObjPciAddressMapInfo,                                    ///< 38 - Pci Address Map Info
-  EArmObjPciInterruptMapInfo,                                  ///< 39 - Pci Interrupt Map Info
-  EArmObjRmr,                                                  ///< 40 - Reserved Memory Range Node
-  EArmObjMemoryRangeDescriptor,                                ///< 41 - Memory Range Descriptor
-  EArmObjCpcInfo,                                              ///< 42 - Continuous Performance Control Info
-  EArmObjPccSubspaceType0Info,                                 ///< 43 - Pcc Subspace Type 0 Info
-  EArmObjPccSubspaceType1Info,                                 ///< 44 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType2Info,                                 ///< 45 - Pcc Subspace Type 2 Info
-  EArmObjPccSubspaceType3Info,                                 ///< 46 - Pcc Subspace Type 3 Info
-  EArmObjPccSubspaceType4Info,                                 ///< 47 - Pcc Subspace Type 4 Info
-  EArmObjPccSubspaceType5Info,                                 ///< 48 - Pcc Subspace Type 5 Info
-  EArmObjEtInfo,                                               ///< 49 - Embedded Trace Extension/Module Info
-  EArmObjPsdInfo,                                              ///< 50 - P-State Dependency (PSD) Info
+  EArmObjGicCInfo,                                             ///<  2 - GIC CPU Interface Info
+  EArmObjGicDInfo,                                             ///<  3 - GIC Distributor Info
+  EArmObjGicMsiFrameInfo,                                      ///<  4 - GIC MSI Frame Info
+  EArmObjGicRedistributorInfo,                                 ///<  5 - GIC Redistributor Info
+  EArmObjGicItsInfo,                                           ///<  6 - GIC ITS Info
+  EArmObjGenericTimerInfo,                                     ///<  7 - Generic Timer Info
+  EArmObjPlatformGTBlockInfo,                                  ///<  8 - Platform GT Block Info
+  EArmObjGTBlockTimerFrameInfo,                                ///<  9 - Generic Timer Block Frame Info
+  EArmObjPlatformGenericWatchdogInfo,                          ///< 10 - Platform Generic Watchdog
+  EArmObjItsGroup,                                             ///< 11 - ITS Group
+  EArmObjNamedComponent,                                       ///< 12 - Named Component
+  EArmObjRootComplex,                                          ///< 13 - Root Complex
+  EArmObjSmmuV1SmmuV2,                                         ///< 14 - SMMUv1 or SMMUv2
+  EArmObjSmmuV3,                                               ///< 15 - SMMUv3
+  EArmObjPmcg,                                                 ///< 16 - PMCG
+  EArmObjGicItsIdentifierArray,                                ///< 17 - GIC ITS Identifier Array
+  EArmObjIdMappingArray,                                       ///< 18 - ID Mapping Array
+  EArmObjSmmuInterruptArray,                                   ///< 19 - SMMU Interrupt Array
+  EArmObjCmn600Info,                                           ///< 20 - CMN-600 Info
+  EArmObjRmr,                                                  ///< 21 - Reserved Memory Range Node
+  EArmObjMemoryRangeDescriptor,                                ///< 22 - Memory Range Descriptor
+  EArmObjEtInfo,                                               ///< 23 - Embedded Trace Extension/Module Info
   EArmObjMax
 } EARM_OBJECT_ID;
 
@@ -87,18 +66,6 @@ typedef struct CmArmBootArchInfo {
   */
   UINT16    BootArchFlags;
 } CM_ARM_BOOT_ARCH_INFO;
-
-/** A structure that describes the
-    Power Management Profile Information for the Platform.
-
-    ID: EArmObjPowerManagementProfileInfo
-*/
-typedef struct CmArmPowerManagementProfileInfo {
-  /** This is the Preferred_PM_Profile field of the FADT Table
-      described in the ACPI Specification
-  */
-  UINT8    PowerManagementProfile;
-} CM_ARM_POWER_MANAGEMENT_PROFILE_INFO;
 
 /** A structure that describes the
     GIC CPU Interface for the Platform.
@@ -202,7 +169,7 @@ typedef struct CmArmGicCInfo {
   UINT32             AffinityFlags;
 
   /** Optional field: Reference Token for the Cpc info of this processor.
-      i.e. a token referencing a CM_ARM_CPC_INFO object.
+      i.e. a token referencing a CM_ARCH_COMMON_CPC_INFO object.
   */
   CM_OBJECT_TOKEN    CpcToken;
 
@@ -220,7 +187,7 @@ typedef struct CmArmGicCInfo {
   CM_OBJECT_TOKEN    EtToken;
 
   /** Optional field: Reference Token for the Psd info of this processor.
-      i.e. a token referencing a CM_ARM_PSD_INFO object.
+      i.e. a token referencing a CM_ARCH_COMMON_PSD_INFO object.
   */
   CM_OBJECT_TOKEN    PsdToken;
 } CM_ARM_GICC_INFO;
@@ -305,39 +272,6 @@ typedef struct CmArmGicItsInfo {
   */
   UINT32    ProximityDomain;
 } CM_ARM_GIC_ITS_INFO;
-
-/** A structure that describes the
-    Serial Port information for the Platform.
-
-    ID: EArmObjSerialConsolePortInfo or
-        EArmObjSerialDebugPortInfo or
-        EArmObjSerialPortInfo
-*/
-typedef struct CmArmSerialPortInfo {
-  /// The physical base address for the serial port
-  UINT64    BaseAddress;
-
-  /** The serial port interrupt.
-      0 indicates that the serial port does not
-      have an interrupt wired.
-  */
-  UINT32    Interrupt;
-
-  /// The serial port baud rate
-  UINT64    BaudRate;
-
-  /// The serial port clock
-  UINT32    Clock;
-
-  /// Serial Port subtype
-  UINT16    PortSubtype;
-
-  /// The Base address length
-  UINT64    BaseAddressLength;
-
-  /// The access size
-  UINT8     AccessSize;
-} CM_ARM_SERIAL_PORT_INFO;
 
 /** A structure that describes the
     Generic Timer information for the Platform.
@@ -455,53 +389,6 @@ typedef struct CmArmGenericWatchdogInfo {
   */
   UINT32    Flags;
 } CM_ARM_GENERIC_WATCHDOG_INFO;
-
-/** A structure that describes the
-    PCI Configuration Space information for the Platform.
-
-    ID: EArmObjPciConfigSpaceInfo
-*/
-typedef struct CmArmPciConfigSpaceInfo {
-  /// The physical base address for the PCI segment
-  UINT64             BaseAddress;
-
-  /// The PCI segment group number
-  UINT16             PciSegmentGroupNumber;
-
-  /// The start bus number
-  UINT8              StartBusNumber;
-
-  /// The end bus number
-  UINT8              EndBusNumber;
-
-  /// Optional field: Reference Token for address mapping.
-  /// Token identifying a CM_ARM_OBJ_REF structure.
-  CM_OBJECT_TOKEN    AddressMapToken;
-
-  /// Optional field: Reference Token for interrupt mapping.
-  /// Token identifying a CM_ARM_OBJ_REF structure.
-  CM_OBJECT_TOKEN    InterruptMapToken;
-} CM_ARM_PCI_CONFIG_SPACE_INFO;
-
-/** A structure that describes the
-    Hypervisor Vendor ID information for the Platform.
-
-    ID: EArmObjHypervisorVendorIdentity
-*/
-typedef struct CmArmHypervisorVendorId {
-  /// The hypervisor Vendor ID
-  UINT64    HypervisorVendorId;
-} CM_ARM_HYPERVISOR_VENDOR_ID;
-
-/** A structure that describes the
-    Fixed feature flags for the Platform.
-
-    ID: EArmObjFixedFeatureFlags
-*/
-typedef struct CmArmFixedFeatureFlags {
-  /// The Fixed feature flags
-  UINT32    Flags;
-} CM_ARM_FIXED_FEATURE_FLAGS;
 
 /** A structure that describes the
     ITS Group node for the Platform.
@@ -729,21 +616,6 @@ typedef struct CmArmIdMapping {
   UINT32             Flags;
 } CM_ARM_ID_MAPPING;
 
-/** A structure that describes the Arm
-    Generic Interrupts.
-*/
-typedef struct CmArmGenericInterrupt {
-  /// Interrupt number
-  UINT32    Interrupt;
-
-  /// Flags
-  /// BIT0: 0: Interrupt is Level triggered
-  ///       1: Interrupt is Edge triggered
-  /// BIT1: 0: Interrupt is Active high
-  ///       1: Interrupt is Active low
-  UINT32    Flags;
-} CM_ARM_GENERIC_INTERRUPT;
-
 /** A structure that describes the SMMU interrupts for the Platform.
 
     Interrupt   Interrupt number.
@@ -751,7 +623,7 @@ typedef struct CmArmGenericInterrupt {
 
     ID: EArmObjSmmuInterruptArray
 */
-typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
+typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
 
 /** A structure that describes the AML Extended Interrupts.
 
@@ -761,162 +633,7 @@ typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_SMMU_INTERRUPT;
                 resource descriptor.
                 See EFI_ACPI_EXTENDED_INTERRUPT_FLAG_xxx in Acpi10.h
 */
-typedef CM_ARM_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
-
-/** A structure that describes the Processor Hierarchy Node (Type 0) in PPTT
-
-    ID: EArmObjProcHierarchyInfo
-*/
-typedef struct CmArmProcHierarchyInfo {
-  /// A unique token used to identify this object
-  CM_OBJECT_TOKEN    Token;
-  /// Processor structure flags (ACPI 6.3 - January 2019, PPTT, Table 5-155)
-  UINT32             Flags;
-  /// Token for the parent CM_ARM_PROC_HIERARCHY_INFO object in the processor
-  /// topology. A value of CM_NULL_TOKEN means this node has no parent.
-  CM_OBJECT_TOKEN    ParentToken;
-  /// Token of the associated CM_ARM_GICC_INFO object which has the
-  /// corresponding ACPI Processor ID. A value of CM_NULL_TOKEN means this
-  /// node represents a group of associated processors and it does not have an
-  /// associated GIC CPU interface.
-  CM_OBJECT_TOKEN    GicCToken;
-  /// Number of resources private to this Node
-  UINT32             NoOfPrivateResources;
-  /// Token of the array which contains references to the resources private to
-  /// this CM_ARM_PROC_HIERARCHY_INFO instance. This field is ignored if
-  /// the NoOfPrivateResources is 0, in which case it is recommended to set
-  /// this field to CM_NULL_TOKEN.
-  CM_OBJECT_TOKEN    PrivateResourcesArrayToken;
-  /// Optional field: Reference Token for the Lpi state of this processor.
-  /// Token identifying a CM_ARM_OBJ_REF structure, itself referencing
-  /// CM_ARM_LPI_INFO objects.
-  CM_OBJECT_TOKEN    LpiToken;
-  /// Set to TRUE if UID should override index for name and _UID
-  /// for processor container nodes and name of processors.
-  /// This should be consistently set for containers or processors to avoid
-  /// duplicate values
-  BOOLEAN            OverrideNameUidEnabled;
-  /// If OverrideNameUidEnabled is TRUE then this value will be used for name of
-  /// processors and processor containers.
-  UINT16             OverrideName;
-  /// If OverrideNameUidEnabled is TRUE then this value will be used for
-  /// the UID of processor containers.
-  UINT32             OverrideUid;
-} CM_ARM_PROC_HIERARCHY_INFO;
-
-/** A structure that describes the Cache Type Structure (Type 1) in PPTT
-
-    ID: EArmObjCacheInfo
-*/
-typedef struct CmArmCacheInfo {
-  /// A unique token used to identify this object
-  CM_OBJECT_TOKEN    Token;
-  /// Reference token for the next level of cache that is private to the same
-  /// CM_ARM_PROC_HIERARCHY_INFO instance. A value of CM_NULL_TOKEN means this
-  /// entry represents the last cache level appropriate to the processor
-  /// hierarchy node structures using this entry.
-  CM_OBJECT_TOKEN    NextLevelOfCacheToken;
-  /// Size of the cache in bytes
-  UINT32             Size;
-  /// Number of sets in the cache
-  UINT32             NumberOfSets;
-  /// Integer number of ways. The maximum associativity supported by
-  /// ACPI Cache type structure is limited to MAX_UINT8. However,
-  /// the maximum number of ways supported by the architecture is
-  /// PPTT_ARM_CCIDX_CACHE_ASSOCIATIVITY_MAX. Therfore this field
-  /// is 32-bit wide.
-  UINT32             Associativity;
-  /// Cache attributes (ACPI 6.4 - January 2021, PPTT, Table 5.140)
-  UINT8              Attributes;
-  /// Line size in bytes
-  UINT16             LineSize;
-  /// Unique ID for the cache
-  UINT32             CacheId;
-} CM_ARM_CACHE_INFO;
-
-/** A structure that describes a reference to another Configuration Manager
-    object.
-
-    This is useful for creating an array of reference tokens. The framework
-    can then query the configuration manager for these arrays using the
-    object ID EArmObjCmRef.
-
-    This can be used is to represent one-to-many relationships between objects.
-
-    ID: EArmObjCmRef
-*/
-typedef struct CmArmObjRef {
-  /// Token of the CM object being referenced
-  CM_OBJECT_TOKEN    ReferenceToken;
-} CM_ARM_OBJ_REF;
-
-/** A structure that describes the Memory Affinity Structure (Type 1) in SRAT
-
-    ID: EArmObjMemoryAffinityInfo
-*/
-typedef struct CmArmMemoryAffinityInfo {
-  /// The proximity domain to which the "range of memory" belongs.
-  UINT32    ProximityDomain;
-
-  /// Base Address
-  UINT64    BaseAddress;
-
-  /// Length
-  UINT64    Length;
-
-  /// Flags
-  UINT32    Flags;
-} CM_ARM_MEMORY_AFFINITY_INFO;
-
-/** A structure that describes the ACPI Device Handle (Type 0) in the
-    Generic Initiator Affinity structure in SRAT
-
-    ID: EArmObjDeviceHandleAcpi
-*/
-typedef struct CmArmDeviceHandleAcpi {
-  /// Hardware ID
-  UINT64    Hid;
-
-  /// Unique Id
-  UINT32    Uid;
-} CM_ARM_DEVICE_HANDLE_ACPI;
-
-/** A structure that describes the PCI Device Handle (Type 1) in the
-    Generic Initiator Affinity structure in SRAT
-
-    ID: EArmObjDeviceHandlePci
-*/
-typedef struct CmArmDeviceHandlePci {
-  /// PCI Segment Number
-  UINT16    SegmentNumber;
-
-  /// PCI Bus Number - Max 256 busses (Bits 15:8 of BDF)
-  UINT8     BusNumber;
-
-  /// PCI Device Number - Max 32 devices (Bits 7:3 of BDF)
-  UINT8     DeviceNumber;
-
-  /// PCI Function Number - Max 8 functions (Bits 2:0 of BDF)
-  UINT8     FunctionNumber;
-} CM_ARM_DEVICE_HANDLE_PCI;
-
-/** A structure that describes the Generic Initiator Affinity structure in SRAT
-
-    ID: EArmObjGenericInitiatorAffinityInfo
-*/
-typedef struct CmArmGenericInitiatorAffinityInfo {
-  /// The proximity domain to which the generic initiator belongs.
-  UINT32             ProximityDomain;
-
-  /// Flags
-  UINT32             Flags;
-
-  /// Device Handle Type
-  UINT8              DeviceHandleType;
-
-  /// Reference Token for the Device Handle
-  CM_OBJECT_TOKEN    DeviceHandleToken;
-} CM_ARM_GENERIC_INITIATOR_AFFINITY_INFO;
+typedef CM_ARCH_COMMON_GENERIC_INTERRUPT CM_ARM_EXTENDED_INTERRUPT;
 
 /** A structure that describes the CMN-600 hardware.
 
@@ -949,133 +666,6 @@ typedef struct CmArmCmn600Info {
   /// constant and does not vary with the DTC count.
   CM_ARM_EXTENDED_INTERRUPT    DtcInterrupt[4];
 } CM_ARM_CMN_600_INFO;
-
-/** A structure that describes the Lpi information.
-
-  The Low Power Idle states are described in DSDT/SSDT and associated
-  to cpus/clusters in the cpu topology.
-
-  ID: EArmObjLpiInfo
-*/
-typedef struct CmArmLpiInfo {
-  /** Minimum Residency. Time in microseconds after which a
-      state becomes more energy efficient than any shallower state.
-  */
-  UINT32                                    MinResidency;
-
-  /** Worst case time in microseconds from a wake interrupt
-      being asserted to the return to a running state
-  */
-  UINT32                                    WorstCaseWakeLatency;
-
-  /** Flags.
-  */
-  UINT32                                    Flags;
-
-  /** Architecture specific context loss flags.
-  */
-  UINT32                                    ArchFlags;
-
-  /** Residency counter frequency in cycles-per-second (Hz).
-  */
-  UINT32                                    ResCntFreq;
-
-  /** Every shallower power state in the parent is also enabled.
-  */
-  UINT32                                    EnableParentState;
-
-  /** The EntryMethod _LPI field can be described as an integer
-      or in a Register resource data descriptor.
-
-  If IsInteger is TRUE, the IntegerEntryMethod field is used.
-  If IsInteger is FALSE, the RegisterEntryMethod field is used.
-  */
-  BOOLEAN                                   IsInteger;
-
-  /** EntryMethod described as an Integer.
-  */
-  UINT64                                    IntegerEntryMethod;
-
-  /** EntryMethod described as a EFI_ACPI_GENERIC_REGISTER_DESCRIPTOR.
-  */
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    RegisterEntryMethod;
-
-  /** Residency counter register.
-  */
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    ResidencyCounterRegister;
-
-  /** Usage counter register.
-  */
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE    UsageCounterRegister;
-
-  /** String representing the Lpi state
-  */
-  CHAR8                                     StateName[16];
-} CM_ARM_LPI_INFO;
-
-/** A structure that describes a PCI Address Map.
-
-  The memory-ranges used by the PCI bus are described by this object.
-
-  ID: EArmObjPciAddressMapInfo
-*/
-typedef struct CmArmPciAddressMapInfo {
-  /** Pci address space code
-
-  Available values are:
-   - 0: Configuration Space
-   - 1: I/O Space
-   - 2: 32-bit-address Memory Space
-   - 3: 64-bit-address Memory Space
-  */
-  UINT8     SpaceCode;
-
-  /// PCI address
-  UINT64    PciAddress;
-
-  /// Cpu address
-  UINT64    CpuAddress;
-
-  /// Address size
-  UINT64    AddressSize;
-} CM_ARM_PCI_ADDRESS_MAP_INFO;
-
-/** A structure that describes a PCI Interrupt Map.
-
-  The legacy PCI interrupts used by PCI devices are described by this object.
-
-  Cf Devicetree Specification - Release v0.3
-  s2.4.3 "Interrupt Nexus Properties"
-
-  ID: EArmObjPciInterruptMapInfo
-*/
-typedef struct CmArmPciInterruptMapInfo {
-  /// Pci Bus.
-  /// Value on 8 bits (max 255).
-  UINT8    PciBus;
-
-  /// Pci Device.
-  /// Value on 5 bits (max 31).
-  UINT8    PciDevice;
-
-  /** PCI interrupt
-
-  ACPI bindings are used:
-  Cf. ACPI 6.4, s6.2.13 _PRT (PCI Routing Table):
-      "0-INTA, 1-INTB, 2-INTC, 3-INTD"
-
-  Device-tree bindings are shifted by 1:
-      "INTA=1, INTB=2, INTC=3, INTD=4"
-  */
-  UINT8                       PciInterrupt;
-
-  /** Interrupt controller interrupt.
-
-  Cf Devicetree Specification - Release v0.3
-  s2.4.3 "Interrupt Nexus Properties": "parent interrupt specifier"
-  */
-  CM_ARM_GENERIC_INTERRUPT    IntcInterrupt;
-} CM_ARM_PCI_INTERRUPT_MAP_INFO;
 
 /** A structure that describes the
     RMR node for the Platform.
@@ -1117,209 +707,6 @@ typedef struct CmArmRmrDescriptor {
   UINT64    Length;
 } CM_ARM_MEMORY_RANGE_DESCRIPTOR;
 
-/** A structure that describes the Cpc information.
-
-  Continuous Performance Control is described in DSDT/SSDT and associated
-  to cpus/clusters in the cpu topology.
-
-  Unsupported Optional registers should be encoded with NULL resource
-  Register {(SystemMemory, 0, 0, 0, 0)}
-
-  For values that support Integer or Buffer, integer will be used
-  if buffer is NULL resource.
-  If resource is not NULL then Integer must be 0
-
-  Cf. ACPI 6.4, s8.4.7.1 _CPC (Continuous Performance Control)
-
-  ID: EArmObjCpcInfo
-*/
-typedef AML_CPC_INFO CM_ARM_CPC_INFO;
-
-/** A structure that describes a
-    PCC Mailbox Register.
-*/
-typedef struct PccMailboxRegisterInfo {
-  /// GAS describing the Register.
-  EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE    Register;
-
-  /** Mask of bits to preserve when writing.
-
-    This mask is also used for registers. The Register is only read
-    and there is no write mask required. E.g.:
-    - Error Status mask (Cf. PCC Subspace types 3/4/5).
-    - Command Complete Check mask (Cf. PCC Subspace types 3/4/5).
-  */
-  UINT64    PreserveMask;
-
-  /// Mask of bits to set when writing.
-  UINT64    WriteMask;
-} PCC_MAILBOX_REGISTER_INFO;
-
-/** A structure that describes the
-    PCC Subspace CHannel Timings.
-*/
-typedef struct PccSubspaceChannelTimingInfo {
-  /// Expected latency to process a command, in microseconds.
-  UINT32    NominalLatency;
-
-  /** Maximum number of periodic requests that the subspace channel can
-      support, reported in commands per minute. 0 indicates no limitation.
-
-    This field is ignored for the PCC Subspace type 5 (HW Registers based).
-  */
-  UINT32    MaxPeriodicAccessRate;
-
-  /** Minimum amount of time that OSPM must wait after the completion
-      of a command before issuing the next command, in microseconds.
-  */
-  UINT16    MinRequestTurnaroundTime;
-} PCC_SUBSPACE_CHANNEL_TIMING_INFO;
-
-/** A structure that describes a
-    Generic PCC Subspace (Type 0).
-*/
-typedef struct CmArmPccSubspaceGenericInfo {
-  /** Subspace Id.
-
-  Cf. ACPI 6.4, s14.7 Referencing the PCC address space
-  Cf. s14.1.2 Platform Communications Channel Subspace Structures
-      The subspace ID of a PCC subspace is its index in the array of
-      subspace structures, starting with subspace 0.
-
-  At most 256 subspaces are supported.
-  */
-  UINT8                               SubspaceId;
-
-  /// Table type (or subspace).
-  UINT8                               Type;
-
-  /// Base address of the shared memory range.
-  /// This field is ignored for the PCC Subspace type 5 (HW Registers based).
-  UINT64                              BaseAddress;
-
-  /// Address length.
-  UINT64                              AddressLength;
-
-  /// Doorbell Register.
-  PCC_MAILBOX_REGISTER_INFO           DoorbellReg;
-
-  /// Mailbox Timings.
-  PCC_SUBSPACE_CHANNEL_TIMING_INFO    ChannelTiming;
-} PCC_SUBSPACE_GENERIC_INFO;
-
-/** A structure that describes a
-    PCC Subspace of type 0 (Generic).
-
-    ID: EArmObjPccSubspaceType0Info
-*/
-typedef PCC_SUBSPACE_GENERIC_INFO CM_ARM_PCC_SUBSPACE_TYPE0_INFO;
-
-/** A structure that describes a
-    PCC Subspace of type 1 (HW-Reduced).
-
-    ID: EArmObjPccSubspaceType1Info
-*/
-typedef struct CmArmPccSubspaceType1Info {
-  /** Generic Pcc information.
-
-    The Subspace of Type0 contains information that can be re-used
-    in other Subspace types.
-  */
-  PCC_SUBSPACE_GENERIC_INFO    GenericPccInfo;
-
-  /// Platform Interrupt.
-  CM_ARM_GENERIC_INTERRUPT     PlatIrq;
-} CM_ARM_PCC_SUBSPACE_TYPE1_INFO;
-
-/** A structure that describes a
-    PCC Subspace of type 2 (HW-Reduced).
-
-    ID: EArmObjPccSubspaceType2Info
-*/
-typedef struct CmArmPccSubspaceType2Info {
-  /** Generic Pcc information.
-
-    The Subspace of Type0 contains information that can be re-used
-    in other Subspace types.
-  */
-  PCC_SUBSPACE_GENERIC_INFO    GenericPccInfo;
-
-  /// Platform Interrupt.
-  CM_ARM_GENERIC_INTERRUPT     PlatIrq;
-
-  /// Platform Interrupt Register.
-  PCC_MAILBOX_REGISTER_INFO    PlatIrqAckReg;
-} CM_ARM_PCC_SUBSPACE_TYPE2_INFO;
-
-/** A structure that describes a
-    PCC Subspace of type 3 (Extended)
-
-    ID: EArmObjPccSubspaceType3Info
-*/
-typedef struct CmArmPccSubspaceType3Info {
-  /** Generic Pcc information.
-
-    The Subspace of Type0 contains information that can be re-used
-    in other Subspace types.
-  */
-  PCC_SUBSPACE_GENERIC_INFO    GenericPccInfo;
-
-  /// Platform Interrupt.
-  CM_ARM_GENERIC_INTERRUPT     PlatIrq;
-
-  /// Platform Interrupt Register.
-  PCC_MAILBOX_REGISTER_INFO    PlatIrqAckReg;
-
-  /// Command Complete Check Register.
-  /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO    CmdCompleteCheckReg;
-
-  /// Command Complete Update Register.
-  PCC_MAILBOX_REGISTER_INFO    CmdCompleteUpdateReg;
-
-  /// Error Status Register.
-  /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO    ErrorStatusReg;
-} CM_ARM_PCC_SUBSPACE_TYPE3_INFO;
-
-/** A structure that describes a
-    PCC Subspace of type 4 (Extended)
-
-    ID: EArmObjPccSubspaceType4Info
-*/
-typedef CM_ARM_PCC_SUBSPACE_TYPE3_INFO CM_ARM_PCC_SUBSPACE_TYPE4_INFO;
-
-/** A structure that describes a
-    PCC Subspace of type 5 (HW-Registers).
-
-    ID: EArmObjPccSubspaceType5Info
-*/
-typedef struct CmArmPccSubspaceType5Info {
-  /** Generic Pcc information.
-
-    The Subspace of Type0 contains information that can be re-used
-    in other Subspace types.
-
-    MaximumPeriodicAccessRate doesn't need to be populated for
-    this structure.
-  */
-  PCC_SUBSPACE_GENERIC_INFO    GenericPccInfo;
-
-  /// Version.
-  UINT16                       Version;
-
-  /// Platform Interrupt.
-  CM_ARM_GENERIC_INTERRUPT     PlatIrq;
-
-  /// Command Complete Check Register.
-  /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO    CmdCompleteCheckReg;
-
-  /// Error Status Register.
-  /// The WriteMask field is not used.
-  PCC_MAILBOX_REGISTER_INFO    ErrorStatusReg;
-} CM_ARM_PCC_SUBSPACE_TYPE5_INFO;
-
 /** An enum describing the Arm Embedded Trace device type.
 */
 typedef enum ArmEtType {
@@ -1335,15 +722,6 @@ typedef enum ArmEtType {
 typedef struct CmArmEtInfo {
   ARM_ET_TYPE    EtType;
 } CM_ARM_ET_INFO;
-
-/** A structure that describes a
-    P-State Dependency (PSD) Info.
-
-    Cf. ACPI 6.5, s8.4.5.5 _PSD (P-State Dependency).
-
-    ID: EArmObjPsdInfo
-*/
-typedef AML_PSD_INFO CM_ARM_PSD_INFO;
 
 #pragma pack()
 
