@@ -77,7 +77,11 @@ ReferFontInfoLocally (
   // EFI_FONT_INFO uniquely in whole hii database.
   //
   LocalFont = (HII_FONT_INFO *)AllocateZeroPool (sizeof (HII_FONT_INFO));
-  ASSERT (LocalFont != NULL);
+
+  if (LocalFont == NULL) {
+    ASSERT (LocalFont != NULL);
+    return TRUE;
+  }
 
   LocalFont->Signature   = HII_FONT_INFO_SIGNATURE;
   LocalFont->FontId      = FontId;
@@ -2083,13 +2087,24 @@ HiiCompareLanguage (
   //
   StrLen = AsciiStrSize (Language1);
   Lan1   = AllocateZeroPool (StrLen);
-  ASSERT (Lan1 != NULL);
+
+  if (Lan1 == NULL) {
+    ASSERT (Lan1 != NULL);
+    return FALSE;
+  }
+
   AsciiStrCpyS (Lan1, StrLen / sizeof (CHAR8), Language1);
   AsciiHiiToLower (Lan1);
 
   StrLen = AsciiStrSize (Language2);
   Lan2   = AllocateZeroPool (StrLen);
-  ASSERT (Lan2 != NULL);
+
+  if (Lan2 == NULL) {
+    ASSERT (Lan2 != NULL);
+    FreePool (Lan1);
+    return FALSE;
+  }
+
   AsciiStrCpyS (Lan2, StrLen / sizeof (CHAR8), Language2);
   AsciiHiiToLower (Lan2);
 

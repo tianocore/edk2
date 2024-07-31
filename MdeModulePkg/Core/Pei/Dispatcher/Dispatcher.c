@@ -442,7 +442,13 @@ DiscoverPeimsAndOrderWithApriori (
         TempFileHandles = AllocatePool (
                             sizeof (EFI_PEI_FILE_HANDLE) * (Private->TempPeimCount + TEMP_FILE_GROWTH_STEP)
                             );
-        ASSERT (TempFileHandles != NULL);
+        if (TempFileHandles == NULL) {
+          ASSERT (TempFileHandles != NULL);
+          Status = EFI_OUT_OF_RESOURCES;
+          // Let the error naturally break out of the loop
+          continue;
+        }
+
         CopyMem (
           TempFileHandles,
           Private->TempFileHandles,
@@ -452,7 +458,13 @@ DiscoverPeimsAndOrderWithApriori (
         TempFileGuid             = AllocatePool (
                                      sizeof (EFI_GUID) * (Private->TempPeimCount + TEMP_FILE_GROWTH_STEP)
                                      );
-        ASSERT (TempFileGuid != NULL);
+        if (TempFileGuid == NULL) {
+          ASSERT (TempFileGuid != NULL);
+          Status = EFI_OUT_OF_RESOURCES;
+          // Let the error naturally break out of the loop
+          continue;
+        }
+
         CopyMem (
           TempFileGuid,
           Private->TempFileGuid,
@@ -1363,7 +1375,8 @@ PeiCheckAndSwitchStack (
   @param PeimFileHandle       Pointer to the FFS file header of the image.
   @param MigratedFileHandle   Pointer to the FFS file header of the migrated image.
 
-  @retval EFI_SUCCESS         Successfully migrated the PEIM to permanent memory.
+  @retval EFI_SUCCESS           Successfully migrated the PEIM to permanent memory.
+  @retval EFI_OUT_OF_RESOURCES  Insufficient memory resources for necessary internal memory allocations.
 
 **/
 EFI_STATUS
@@ -1390,6 +1403,11 @@ MigratePeim (
   if (ImageAddress != NULL) {
     DEBUG_CODE_BEGIN ();
     AsciiString = PeCoffLoaderGetPdbPointer (ImageAddress);
+    if (AsciiString == NULL) {
+      ASSERT_EFI_ERROR (EFI_OUT_OF_RESOURCES);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     for (Index = 0; AsciiString[Index] != 0; Index++) {
       if ((AsciiString[Index] == '\\') || (AsciiString[Index] == '/')) {
         AsciiString = AsciiString + Index + 1;
@@ -1781,7 +1799,7 @@ PeiDispatcher (
 {
   EFI_STATUS              Status;
   UINT32                  Index1;
-  UINT32                  Index2;
+  UINTN                   Index2;
   CONST EFI_PEI_SERVICES  **PeiServices;
   EFI_PEI_FILE_HANDLE     PeimFileHandle;
   UINTN                   FvCount;
@@ -1904,7 +1922,10 @@ PeiDispatcher (
 
     for (FvCount = Private->CurrentPeimFvCount; FvCount < Private->FvCount; FvCount++) {
       CoreFvHandle = FindNextCoreFvHandle (Private, FvCount);
-      ASSERT (CoreFvHandle != NULL);
+      if (CoreFvHandle == NULL) {
+        ASSERT (CoreFvHandle != NULL);
+        continue;
+      }
 
       //
       // If the FV has corresponding EFI_PEI_FIRMWARE_VOLUME_PPI instance, then dispatch it.

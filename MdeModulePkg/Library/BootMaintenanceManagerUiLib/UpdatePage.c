@@ -200,7 +200,7 @@ UpdateConCOMPage (
 
   UpdatePageStart (CallbackData);
 
-  for (Index = 0; Index < TerminalMenu.MenuNumber; Index++) {
+  for (Index = 0; (UINTN)Index < TerminalMenu.MenuNumber; Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (&TerminalMenu, Index);
 
     HiiCreateGotoOpCode (
@@ -230,7 +230,7 @@ UpdateBootDelPage (
 {
   BM_MENU_ENTRY    *NewMenuEntry;
   BM_LOAD_CONTEXT  *NewLoadContext;
-  UINT16           Index;
+  UINTN            Index;
 
   CallbackData->BmmAskSaveOrNot = TRUE;
 
@@ -291,7 +291,7 @@ UpdateDrvAddHandlePage (
 
   UpdatePageStart (CallbackData);
 
-  for (Index = 0; Index < DriverMenu.MenuNumber; Index++) {
+  for (Index = 0; (UINTN)Index < DriverMenu.MenuNumber; Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (&DriverMenu, Index);
 
     HiiCreateGotoOpCode (
@@ -328,7 +328,7 @@ UpdateDrvDelPage (
   UpdatePageStart (CallbackData);
 
   ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.DriverOptionDel) / sizeof (CallbackData->BmmFakeNvData.DriverOptionDel[0])));
-  for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
+  for (Index = 0; (UINTN)Index < DriverOptionMenu.MenuNumber; Index++) {
     NewMenuEntry = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
 
     NewLoadContext          = (BM_LOAD_CONTEXT *)NewMenuEntry->VariableContext;
@@ -488,7 +488,7 @@ UpdateConsolePage (
 
   ASSERT (ConsoleCheck != NULL);
 
-  for (Index = 0; ((Index < ConsoleMenu->MenuNumber) && \
+  for (Index = 0; (((UINTN)Index < ConsoleMenu->MenuNumber) && \
                    (Index < MAX_MENU_NUMBER)); Index++)
   {
     CheckFlags        = 0;
@@ -514,7 +514,7 @@ UpdateConsolePage (
       );
   }
 
-  for (Index2 = 0; ((Index2 < TerminalMenu.MenuNumber) && \
+  for (Index2 = 0; (((UINTN)Index2 < TerminalMenu.MenuNumber) && \
                     (Index2 < MAX_MENU_NUMBER)); Index2++)
   {
     CheckFlags         = 0;
@@ -571,7 +571,7 @@ UpdateOrderPage (
   )
 {
   BM_MENU_ENTRY    *NewMenuEntry;
-  UINT16           Index;
+  UINTN            Index;
   UINT16           OptionIndex;
   VOID             *OptionsOpCodeHandle;
   BOOLEAN          BootOptionFound;

@@ -372,7 +372,10 @@ Split2MPageTo4K (
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PageTableEntry = AllocatePageTableMemory (1);
-  ASSERT (PageTableEntry != NULL);
+  if (PageTableEntry == NULL) {
+    ASSERT (PageTableEntry != NULL);
+    return;
+  }
 
   //
   // Fill in 2M page entry.
@@ -454,7 +457,10 @@ Split1GPageTo2M (
   AddressEncMask = PcdGet64 (PcdPteMemoryEncryptionAddressOrMask) & PAGING_1G_ADDRESS_MASK_64;
 
   PageDirectoryEntry = AllocatePageTableMemory (1);
-  ASSERT (PageDirectoryEntry != NULL);
+  if (PageDirectoryEntry == NULL) {
+    ASSERT (PageDirectoryEntry != NULL);
+    return;
+  }
 
   //
   // Fill in 1G page entry.
@@ -583,7 +589,10 @@ SetPageTablePoolReadOnly (
       ASSERT (Level > 1);
 
       NewPageTable = AllocatePageTableMemory (1);
-      ASSERT (NewPageTable != NULL);
+      if (NewPageTable == NULL) {
+        ASSERT (NewPageTable != NULL);
+        return;
+      }
 
       PhysicalAddress = PageAttr & LevelMask[Level];
       for (EntryIndex = 0;

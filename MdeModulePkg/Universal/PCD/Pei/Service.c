@@ -397,7 +397,10 @@ LocateExPcdBinary (
   ASSERT (FileHandle != NULL);
 
   Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb);
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return NULL;
+  }
 
   //
   // Check the first bytes (Header Signature Guid) and build version.
@@ -423,6 +426,7 @@ BuildPcdDatabase (
   IN EFI_PEI_FILE_HANDLE  FileHandle
   )
 {
+  VOID              *Hob;
   PEI_PCD_DATABASE  *Database;
   PEI_PCD_DATABASE  *PeiPcdDbBinary;
   VOID              *CallbackFnTable;
@@ -433,9 +437,25 @@ BuildPcdDatabase (
   //
   PeiPcdDbBinary = LocateExPcdBinary (FileHandle);
 
-  ASSERT (PeiPcdDbBinary != NULL);
+  if (PeiPcdDbBinary == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed To locate the Pcd Db binary.\n", __func__));
+    ASSERT (PeiPcdDbBinary != NULL);
+    return NULL;
+  }
 
-  Database = BuildGuidHob (&gPcdDataBaseHobGuid, PeiPcdDbBinary->Length + PeiPcdDbBinary->UninitDataBaseSize);
+  // Check to see if the Hob already exists because we can error out of this function when
+  // creating the CallbackFnTable Hob and call into this function again.
+  Hob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
+  if (Hob == NULL) {
+    Database = BuildGuidHob (&gPcdDataBaseHobGuid, PeiPcdDbBinary->Length + PeiPcdDbBinary->UninitDataBaseSize);
+  } else {
+    Database = (PEI_PCD_DATABASE *)GET_GUID_HOB_DATA (Hob);
+  }
+
+  if (Database == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to build the PCD Database guid hob.\n", __func__));
+    return NULL;
+  }
 
   ZeroMem (Database, PeiPcdDbBinary->Length  + PeiPcdDbBinary->UninitDataBaseSize);
 
@@ -447,6 +467,11 @@ BuildPcdDatabase (
   SizeOfCallbackFnTable = Database->LocalTokenCount * sizeof (PCD_PPI_CALLBACK) * PcdGet32 (PcdMaxPeiPcdCallBackNumberPerPcdEntry);
 
   CallbackFnTable = BuildGuidHob (&gEfiCallerIdGuid, SizeOfCallbackFnTable);
+
+  if (CallbackFnTable == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to build the CallbackFnTable guid hob.\n", __func__));
+    return NULL;
+  }
 
   ZeroMem (CallbackFnTable, SizeOfCallbackFnTable);
 
