@@ -130,7 +130,13 @@ TcpSynBuildOption (
              NET_BUF_HEAD
              );
 
-    ASSERT (Data != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (Data == NULL) {
+      ASSERT (Data != NULL);
+      return 0;  // Returning Len of 0 if we fail allocating space
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
     Len += TCP_OPTION_TS_ALIGNED_LEN;
 
     TcpPutUint32 (Data, TCP_OPTION_TS_FAST);
@@ -154,7 +160,13 @@ TcpSynBuildOption (
              NET_BUF_HEAD
              );
 
-    ASSERT (Data != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (Data == NULL) {
+      ASSERT (Data != NULL);
+      return 0; // Returning Len of 0 if we fail allocating space
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
     Len += TCP_OPTION_WS_ALIGNED_LEN;
     TcpPutUint32 (Data, TCP_OPTION_WS_FAST | TcpComputeScale (Tcb));
@@ -164,7 +176,13 @@ TcpSynBuildOption (
   // Build the MSS option.
   //
   Data = NetbufAllocSpace (Nbuf, TCP_OPTION_MSS_LEN, 1);
-  ASSERT (Data != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (Data == NULL) {
+    ASSERT (Data != NULL);
+    return 0; // Returning Len of 0 if we fail allocating space
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
   Len += TCP_OPTION_MSS_LEN;
   TcpPutUint32 (Data, TCP_OPTION_MSS_FAST | Tcb->RcvMss);
@@ -206,7 +224,13 @@ TcpBuildOption (
              NET_BUF_HEAD
              );
 
-    ASSERT (Data != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (Data == NULL) {
+      ASSERT (Data != NULL);
+      return 0;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
     Len += TCP_OPTION_TS_ALIGNED_LEN;
 
     TcpPutUint32 (Data, TCP_OPTION_TS_FAST);

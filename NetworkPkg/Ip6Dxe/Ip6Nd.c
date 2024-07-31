@@ -1175,7 +1175,14 @@ Ip6SendRouterSolicit (
   //
 
   IcmpHead = (IP6_ICMP_INFORMATION_HEAD *)NetbufAllocSpace (Packet, sizeof (IP6_ICMP_INFORMATION_HEAD), FALSE);
-  ASSERT (IcmpHead != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (IcmpHead == NULL) {
+    ASSERT (IcmpHead != NULL);
+    NetbufFree (Packet);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   ZeroMem (IcmpHead, sizeof (IP6_ICMP_INFORMATION_HEAD));
   IcmpHead->Head.Type = ICMP_V6_ROUTER_SOLICIT;
   IcmpHead->Head.Code = 0;
@@ -1187,7 +1194,14 @@ Ip6SendRouterSolicit (
                                                  sizeof (IP6_ETHER_ADDR_OPTION),
                                                  FALSE
                                                  );
-    ASSERT (LinkLayerOption != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (LinkLayerOption == NULL) {
+      ASSERT (LinkLayerOption != NULL);
+      NetbufFree (Packet);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
     LinkLayerOption->Type   = Ip6OptionEtherSource;
     LinkLayerOption->Length = (UINT8)sizeof (IP6_ETHER_ADDR_OPTION);
     CopyMem (LinkLayerOption->EtherAddr, SourceLinkAddress, 6);
@@ -1281,7 +1295,14 @@ Ip6SendNeighborAdvertise (
   //
 
   IcmpHead = (IP6_ICMP_INFORMATION_HEAD *)NetbufAllocSpace (Packet, sizeof (IP6_ICMP_INFORMATION_HEAD), FALSE);
-  ASSERT (IcmpHead != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (IcmpHead == NULL) {
+    ASSERT (IcmpHead != NULL);
+    NetbufFree (Packet);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   ZeroMem (IcmpHead, sizeof (IP6_ICMP_INFORMATION_HEAD));
   IcmpHead->Head.Type = ICMP_V6_NEIGHBOR_ADVERTISE;
   IcmpHead->Head.Code = 0;
@@ -1299,7 +1320,14 @@ Ip6SendNeighborAdvertise (
   }
 
   Target = (EFI_IPv6_ADDRESS *)NetbufAllocSpace (Packet, sizeof (EFI_IPv6_ADDRESS), FALSE);
-  ASSERT (Target != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (Target == NULL) {
+    ASSERT (Target != NULL);
+    NetbufFree (Packet);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   IP6_COPY_ADDRESS (Target, TargetIp6Address);
 
   LinkLayerOption = (IP6_ETHER_ADDR_OPTION *)NetbufAllocSpace (
@@ -1307,7 +1335,14 @@ Ip6SendNeighborAdvertise (
                                                sizeof (IP6_ETHER_ADDR_OPTION),
                                                FALSE
                                                );
-  ASSERT (LinkLayerOption != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (LinkLayerOption == NULL) {
+    ASSERT (LinkLayerOption != NULL);
+    NetbufFree (Packet);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   LinkLayerOption->Type   = Ip6OptionEtherTarget;
   LinkLayerOption->Length = 1;
   CopyMem (LinkLayerOption->EtherAddr, TargetLinkAddress, 6);
@@ -1415,13 +1450,26 @@ Ip6SendNeighborSolicit (
   // Fill in the ICMP header, Target address, and Source link-layer address.
   //
   IcmpHead = (IP6_ICMP_INFORMATION_HEAD *)NetbufAllocSpace (Packet, sizeof (IP6_ICMP_INFORMATION_HEAD), FALSE);
-  ASSERT (IcmpHead != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (IcmpHead == NULL) {
+    ASSERT (IcmpHead != NULL);
+    NetbufFree (Packet);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   ZeroMem (IcmpHead, sizeof (IP6_ICMP_INFORMATION_HEAD));
   IcmpHead->Head.Type = ICMP_V6_NEIGHBOR_SOLICIT;
   IcmpHead->Head.Code = 0;
 
   Target = (EFI_IPv6_ADDRESS *)NetbufAllocSpace (Packet, sizeof (EFI_IPv6_ADDRESS), FALSE);
-  ASSERT (Target != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (Target == NULL) {
+    ASSERT (Target != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
   IP6_COPY_ADDRESS (Target, TargetIp6Address);
 
   LinkLayerOption = NULL;
@@ -1434,7 +1482,14 @@ Ip6SendNeighborSolicit (
                                                  sizeof (IP6_ETHER_ADDR_OPTION),
                                                  FALSE
                                                  );
-    ASSERT (LinkLayerOption != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (LinkLayerOption == NULL) {
+      ASSERT (LinkLayerOption != NULL);
+      NetbufFree (Packet);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
     LinkLayerOption->Type   = Ip6OptionEtherSource;
     LinkLayerOption->Length = 1;
     CopyMem (LinkLayerOption->EtherAddr, SourceLinkAddress, 6);
@@ -1523,7 +1578,13 @@ Ip6ProcessNeighborSolicit (
     OptionLen = (UINT16)(Head->PayloadLength - IP6_ND_LENGTH);
     if (OptionLen != 0) {
       Option = NetbufGetByte (Packet, IP6_ND_LENGTH, NULL);
-      ASSERT (Option != NULL);
+      // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+      if (Option == NULL) {
+        ASSERT (Option != NULL);
+        goto Exit;
+      }
+
+      // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
       //
       // All included options should have a length that is greater than zero.
@@ -1754,8 +1815,15 @@ Ip6ProcessNeighborAdvertise (
   } else {
     OptionLen = (UINT16)(Head->PayloadLength - IP6_ND_LENGTH);
     if (OptionLen != 0) {
+      // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
       Option = NetbufGetByte (Packet, IP6_ND_LENGTH, NULL);
-      ASSERT (Option != NULL);
+      if (Option == NULL) {
+        ASSERT (Option != NULL);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Exit;
+      }
+
+      // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
       //
       // All included options should have a length that is greater than zero.
@@ -2012,8 +2080,13 @@ Ip6ProcessRouterAdvertise (
   OptionLen = (UINT16)(Head->PayloadLength - IP6_RA_LENGTH);
   if (OptionLen != 0) {
     Option = NetbufGetByte (Packet, IP6_RA_LENGTH, NULL);
-    ASSERT (Option != NULL);
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+    if (Option == NULL) {
+      ASSERT (Option != NULL);
+      goto Exit;
+    }
 
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
     if (!Ip6IsNDOptionValid (Option, OptionLen)) {
       goto Exit;
     }
@@ -2478,8 +2551,15 @@ Ip6ProcessRedirect (
   //
   OptionLen = (UINT16)(Head->PayloadLength - IP6_REDITECT_LENGTH);
   if (OptionLen != 0) {
+    // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
     Option = NetbufGetByte (Packet, IP6_REDITECT_LENGTH, NULL);
-    ASSERT (Option != NULL);
+    if (Option == NULL) {
+      ASSERT (Option != NULL);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto Exit;
+    }
+
+    // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
     if (!Ip6IsNDOptionValid (Option, OptionLen)) {
       goto Exit;

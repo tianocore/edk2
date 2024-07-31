@@ -705,7 +705,14 @@ Ip6SendFrame (
   //
 
   NeighborCache = Ip6FindNeighborEntry (IpSb, NextHop);
-  ASSERT (NeighborCache != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (NeighborCache == NULL) {
+    ASSERT (NeighborCache != NULL);
+    Status = EFI_NOT_FOUND;
+    goto Error;
+  }
+
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
 
   if (NeighborCache->Interface == NULL) {
     NeighborCache->Interface = Interface;

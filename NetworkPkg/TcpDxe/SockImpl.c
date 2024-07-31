@@ -110,7 +110,13 @@ SockTcpDataToRcv (
   // Get the first socket receive buffer
   //
   RcvBufEntry = SockBufFirst (SockBuffer);
-  ASSERT (RcvBufEntry != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (RcvBufEntry == NULL) {
+    ASSERT (RcvBufEntry != NULL);
+    return 0;
+  }
+
+  // MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
   TcpRsvData = (TCP_RSV_DATA *)RcvBufEntry->ProtoData;
 

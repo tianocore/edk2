@@ -563,7 +563,14 @@ Udp4Transmit (
   *((UINTN *)&Packet->ProtoData[0]) = (UINTN)(Udp4Service->IpIo);
 
   Udp4Header = (EFI_UDP_HEADER *)NetbufAllocSpace (Packet, UDP4_HEADER_SIZE, TRUE);
-  ASSERT (Udp4Header != NULL);
+  // MU_CHANGE Start - CodeQL Change - unguardednullreturndereference
+  if (Udp4Header == NULL) {
+    ASSERT (Udp4Header != NULL);
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+
+  /// MU_CHANGE End - CodeQL Change - unguardednullreturndereference
 
   ConfigData = &Instance->ConfigData;
 
