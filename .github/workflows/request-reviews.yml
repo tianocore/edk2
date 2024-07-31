@@ -32,10 +32,18 @@ jobs:
       pull-requests: write
 
     steps:
+      # Reduce checkout time with sparse-checkout
+      #   - .github: Contains the scripts to interact with Github and add reviewers
+      #   - BaseTools/Scripts: Contains the GetMaintainer.py script
+      #   - Maintainers.txt: Contains the list of maintainers for the repository
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+            BaseTools/Scripts
+            Maintainers.txt
 
       - name: Set up Python
         uses: actions/setup-python@v5
