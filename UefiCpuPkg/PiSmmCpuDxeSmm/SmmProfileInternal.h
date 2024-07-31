@@ -153,11 +153,11 @@ AllocPage (
   );
 
 /**
-  Page Fault handler for SMM use.
+  Create new entry in page table for page fault address in SmmProfilePFHandler.
 
 **/
 VOID
-SmiDefaultPFHandler (
+SmmProfileMapPFAddress (
   VOID
   );
 

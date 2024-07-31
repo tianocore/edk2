@@ -76,3 +76,15 @@ ClearTrapFlag (
 {
   SystemContext.SystemContextIa32->Eflags &= (UINTN) ~BIT8;
 }
+
+/**
+  Create new entry in page table for page fault address in SmmProfilePFHandler.
+
+**/
+VOID
+SmmProfileMapPFAddress (
+  VOID
+  )
+{
+  CpuDeadLoop ();
+}

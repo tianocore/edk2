@@ -1337,7 +1337,7 @@ SmmProfilePFHandler (
     //
     // If SMM profile does not start, call original page fault handler.
     //
-    SmiDefaultPFHandler ();
+    SmmProfileMapPFAddress ();
     return;
   }
 

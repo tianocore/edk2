@@ -83,18 +83,6 @@ AllocPage (
 }
 
 /**
-  Page Fault handler for SMM use.
-
-**/
-VOID
-SmiDefaultPFHandler (
-  VOID
-  )
-{
-  CpuDeadLoop ();
-}
-
-/**
   ThePage Fault handler wrapper for SMM use.
 
   @param  InterruptType    Defines the type of interrupt or exception that
