@@ -15,9 +15,8 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
+#include <Library/MmServicesTableLib.h>
 #include "StandaloneMmCoreMemoryAllocationServices.h"
-
-EFI_MM_SYSTEM_TABLE  *gMmst = NULL;
 
 /**
   Allocates one or more 4KB pages of a certain memory type.

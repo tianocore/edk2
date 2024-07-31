@@ -1,0 +1,25 @@
+## @file
+# Standalone MM Services Table Library.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = StandaloneMmServicesTableLibCore
+  FILE_GUID                      = A9E61A64-FDD4-4162-9321-C6769FB96E3B
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MmServicesTableLib|MM_CORE_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  StandaloneMmServicesTableLibCore.c
+
+[Packages]
+  MdePkg/MdePkg.dec

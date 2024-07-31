@@ -39,6 +39,7 @@
   BaseMemoryLib
   DebugLib
   HobLib
+  MmServicesTableLib
 
 [Guids]
   gEfiMmPeiMmramMemoryReserveGuid
