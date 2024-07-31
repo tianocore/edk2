@@ -12,14 +12,56 @@ import requests
 
 from collections import OrderedDict
 from edk2toollib.utility_functions import RunPythonScript
+from github import Auth, Github, GithubException
 from io import StringIO
 from typing import List
+
 
 """GitHub API helper functions."""
 
 
+def _authenticate(token: str):
+    """Authenticate to GitHub using a token.
+
+    Returns a GitHub instance that is authenticated using the provided
+    token.
+
+    Args:
+        token (str): The GitHub token to use for authentication.
+
+    Returns:
+        Github: A GitHub instance.
+    """
+    auth = Auth.Token(token)
+    return Github(auth=auth)
+
+
+def _get_pr(token: str, owner: str, repo: str, pr_number: int):
+    """Get the PR object from GitHub.
+
+    Args:
+        token (str): The GitHub token to use for authentication.
+        owner (str): The GitHub owner (organization) name.
+        repo (str): The GitHub repository name (e.g. 'edk2').
+        pr_number (int): The pull request number.
+
+    Returns:
+        PullRequest: A PyGithub PullRequest object for the given pull request
+                     or None if the attempt to get the PR fails.
+    """
+    try:
+        g = _authenticate(token)
+        return g.get_repo(f"{owner}/{repo}").get_pull(pr_number)
+    except GithubException as ge:
+        print(
+            f"::error title=Error Getting PR {pr_number} Info!::"
+            f"{ge.data['message']}"
+        )
+        return None
+
+
 def leave_pr_comment(
-    token: str, owner: str, repo: str, pr_number: str, comment_body: str
+    token: str, owner: str, repo: str, pr_number: int, comment_body: str
 ):
     """Leaves a comment on a PR.
 
@@ -27,17 +69,17 @@ def leave_pr_comment(
         token (str): The GitHub token to use for authentication.
         owner (str): The GitHub owner (organization) name.
         repo (str): The GitHub repository name (e.g. 'edk2').
-        pr_number (str): The pull request number.
+        pr_number (int): The pull request number.
         comment_body (str): The comment text. Markdown is supported.
     """
-    url = f"https://api.github.com/repos/{owner}/{repo}/issues/{pr_number}/comments"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github.v3+json",
-    }
-    data = {"body": comment_body}
-    response = requests.post(url, json=data, headers=headers)
-    response.raise_for_status()
+    if pr := _get_pr(token, owner, repo, pr_number):
+        try:
+            pr.create_issue_comment(comment_body)
+        except GithubException as ge:
+            print(
+                f"::error title=Error Commenting on PR {pr_number}!::"
+                f"{ge.data['message']}"
+            )
 
 
 def get_reviewers_for_range(
@@ -106,7 +148,7 @@ def get_reviewers_for_range(
     return reviewers
 
 
-def get_pr_sha(token: str, owner: str, repo: str, pr_number: str) -> str:
+def get_pr_sha(token: str, owner: str, repo: str, pr_number: int) -> str:
     """Returns the commit SHA of given PR branch.
 
        This returns the SHA of the merge commit that GitHub creates from a
@@ -117,31 +159,18 @@ def get_pr_sha(token: str, owner: str, repo: str, pr_number: str) -> str:
         token (str): The GitHub token to use for authentication.
         owner (str): The GitHub owner (organization) name.
         repo (str): The GitHub repository name (e.g. 'edk2').
-        pr_number (str): The pull request number.
+        pr_number (int): The pull request number.
 
     Returns:
         str: The commit SHA of the PR branch. An empty string is returned
              if the request fails.
     """
-    url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}"
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github.v3+json",
-    }
-    response = requests.get(url, headers=headers)
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        print(
-            f"::error title=HTTP Error!::Error getting PR Commit Info: {response.reason}"
-        )
-        return ""
+    if pr := _get_pr(token, owner, repo, pr_number):
+        merge_commit_sha = pr.merge_commit_sha
+        print(f"::debug title=PR {pr_number} Merge Commit SHA::{merge_commit_sha}")
+        return merge_commit_sha
 
-    commit_sha = response.json()["merge_commit_sha"]
-
-    print(f"::debug title=PR {pr_number} Commit SHA::{commit_sha}")
-
-    return commit_sha
+    return ""
 
 
 def download_gh_file(github_url: str, local_path: str, token=None):
@@ -171,57 +200,58 @@ def download_gh_file(github_url: str, local_path: str, token=None):
 
 
 def add_reviewers_to_pr(
-    token: str, owner: str, repo: str, pr_number: str, user_names: List[str]
-):
+    token: str, owner: str, repo: str, pr_number: int, user_names: List[str]
+) -> List[str]:
     """Adds the set of GitHub usernames as reviewers to the PR.
 
     Args:
         token (str): The GitHub token to use for authentication.
         owner (str): The GitHub owner (organization) name.
         repo (str): The GitHub repository name (e.g. 'edk2').
-        pr_number (str): The pull request number.
+        pr_number (int): The pull request number.
         user_names (List[str]): List of GitHub usernames to add as reviewers.
-    """
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github.v3+json",
-    }
-    pr_author_url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}"
-    url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/requested_reviewers"
 
-    response = requests.get(pr_author_url, headers=headers)
-    if response.status_code != 200:
-        print(f"::error title=HTTP Error!::Error getting PR author: {response.reason}")
-        return
-    pr_author = response.json().get("user").get("login").strip()
+    Returns:
+        List[str]: A list of GitHub usernames that were successfully added as
+                   reviewers to the PR. This list will exclude any reviewers
+                   from the list provided if they are not relevant to the PR.
+    """
+    try:
+        g = _authenticate(token)
+        repo_gh = g.get_repo(f"{owner}/{repo}")
+        pr = repo_gh.get_pull(pr_number)
+    except GithubException as ge:
+        print(
+            f"::error title=Error Getting PR {pr_number} Info!::"
+            f"{ge.data['message']}"
+        )
+        return None
+
+    pr_author = pr.user.login.strip()
+
     while pr_author in user_names:
         user_names.remove(pr_author)
-    data = {"reviewers": user_names}
-    response = requests.post(url, json=data, headers=headers)
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        if (
-            response.status_code == 422
-            and "Reviews may only be requested from collaborators"
-            in response.json().get("message")
-        ):
-            print(
-                f"::error title=User is not a Collaborator!::{response.json().get('message')}"
+
+    repo_collaborators = [c.login.strip() for c in repo_gh.get_collaborators()]
+    non_collaborators = [u for u in user_names if u not in repo_collaborators]
+
+    if non_collaborators:
+        print(
+            f"::error title=User is not a Collaborator!::{', '.join(non_collaborators)}"
             )
-            leave_pr_comment(
-                token,
-                owner,
-                repo,
-                pr_number,
-                f"&#9888; **WARNING: Cannot add reviewers**: A user specified as a "
-                f"reviewer for this PR is not a collaborator "
-                f"of the edk2 repository. Please add them as a collaborator to the "
-                f"repository and re-request the review.\n\n"
-                f"Users requested:\n{', '.join(user_names)}",
-            )
-        elif response.status_code == 422:
-            print(
-                "::error title=Invalid Request!::The request is invalid. "
-                "Verify the API request string."
-            )
+
+        leave_pr_comment(
+            token,
+            owner,
+            repo,
+            pr_number,
+            f"&#9888; **WARNING: Cannot add reviewers**: A user specified as a "
+            f"reviewer for this PR is not a collaborator "
+            f"of the edk2 repository. Please add them as a collaborator to the "
+            f"repository and re-request the review.\n\n"
+            f"Users requested:\n{', '.join(user_names)}",
+        )
+
+    pr.create_review_request(reviewers=user_names)
+
+    return user_names
