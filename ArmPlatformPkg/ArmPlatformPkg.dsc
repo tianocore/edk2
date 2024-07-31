@@ -119,6 +119,7 @@
   ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
 
   ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
 
   ArmPlatformPkg/PrePi/PeiUniCore.inf
   ArmPlatformPkg/PeilessSec/PeilessSec.inf
