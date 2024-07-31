@@ -221,30 +221,40 @@ def add_reviewers_to_pr(
             f"::error title=User is not a Collaborator!::{', '.join(non_collaborators)}"
             )
 
-        repo_admins = [
-            a.login for a in repo_gh.get_collaborators(permission="admin")
-        ]
+        for comment in pr.get_issue_comments():
+            # If a comment has already been made for these non-collaborators,
+            # do not make another comment.
+            if (
+                comment.user.login == "github-actions[bot]"
+                and "WARNING: Cannot add some reviewers" in comment.body
+                and all(u in comment.body for u in non_collaborators)
+            ):
+                break
+        else:
+            repo_admins = [
+                a.login for a in repo_gh.get_collaborators(permission="admin")
+            ]
 
-        leave_pr_comment(
-            token,
-            owner,
-            repo,
-            pr_number,
-            f"&#9888; **WARNING: Cannot add some reviewers**: A user  "
-            f"specified as a reviewer for this PR is not a collaborator "
-            f"of the repository. Please add them as a collaborator to "
-            f"the repository so they can be requested in the future.\n\n"
-            f"Non-collaborators requested:\n"
-            f"{'\n'.join([f'- @{c}' for c in non_collaborators])}"
-            f"\n\nAttn Admins:\n"
-            f"{'\n'.join([f'- @{a}' for a in repo_admins])}\n---\n"
-            f"**Admin Instructions:**\n"
-            f"- Add the non-collaborators as collaborators to the "
-            f"appropriate team(s) listed in "
-            f"[teams](https://github.com/orgs/tianocore/teams)\n"
-            f"- If they are no longer needed as reviewers, remove them "
-            f"from [`Maintainers.txt`](https://github.com/tianocore/edk2/blob/HEAD/Maintainers.txt)",
-        )
+            leave_pr_comment(
+                token,
+                owner,
+                repo,
+                pr_number,
+                f"&#9888; **WARNING: Cannot add some reviewers**: A user  "
+                f"specified as a reviewer for this PR is not a collaborator "
+                f"of the repository. Please add them as a collaborator to "
+                f"the repository so they can be requested in the future.\n\n"
+                f"Non-collaborators requested:\n"
+                f"{'\n'.join([f'- @{c}' for c in non_collaborators])}"
+                f"\n\nAttn Admins:\n"
+                f"{'\n'.join([f'- @{a}' for a in repo_admins])}\n---\n"
+                f"**Admin Instructions:**\n"
+                f"- Add the non-collaborators as collaborators to the "
+                f"appropriate team(s) listed in "
+                f"[teams](https://github.com/orgs/tianocore/teams)\n"
+                f"- If they are no longer needed as reviewers, remove them "
+                f"from [`Maintainers.txt`](https://github.com/tianocore/edk2/blob/HEAD/Maintainers.txt)",
+            )
 
     # Add any new reviewers to the PR if needed.
     if new_pr_reviewers:
