@@ -103,6 +103,10 @@ IsSystemFmp (
   Guid  = PcdGetPtr (PcdSystemFmpCapsuleImageTypeIdGuid);
   Count = PcdGetSize (PcdSystemFmpCapsuleImageTypeIdGuid) / sizeof (GUID);
 
+  if (Guid == NULL) {
+    return FALSE;
+  }
+
   for (Index = 0; Index < Count; Index++, Guid++) {
     if (CompareGuid (&FmpImageInfo->ImageTypeId, Guid)) {
       return TRUE;
@@ -313,14 +317,14 @@ FmpGetFirmwareImageDescriptor (
 
   ImageInfoSize = 0;
   Status        = Fmp->GetImageInfo (
-                         Fmp,                       // FMP Pointer
-                         &ImageInfoSize,            // Buffer Size (in this case 0)
-                         NULL,                      // NULL so we can get size
-                         FmpImageInfoDescriptorVer, // DescriptorVersion
-                         FmpImageInfoCount,         // DescriptorCount
-                         DescriptorSize,            // DescriptorSize
-                         &PackageVersion,           // PackageVersion
-                         &PackageVersionName        // PackageVersionName
+                         Fmp,                         // FMP Pointer
+                         &ImageInfoSize,              // Buffer Size (in this case 0)
+                         NULL,                        // NULL so we can get size
+                         FmpImageInfoDescriptorVer,   // DescriptorVersion
+                         FmpImageInfoCount,           // DescriptorCount
+                         DescriptorSize,              // DescriptorSize
+                         &PackageVersion,             // PackageVersion
+                         &PackageVersionName          // PackageVersionName
                          );
   if (Status != EFI_BUFFER_TOO_SMALL) {
     DEBUG ((DEBUG_ERROR, "EsrtFmpDxe: Unexpected Failure in GetImageInfo.  Status = %r\n", Status));
@@ -335,14 +339,14 @@ FmpGetFirmwareImageDescriptor (
 
   PackageVersionName = NULL;
   Status             = Fmp->GetImageInfo (
-                              Fmp,                       // FMP Pointer
-                              &ImageInfoSize,            // ImageInfoSize
-                              FmpImageInfoBuf,           // ImageInfo
-                              FmpImageInfoDescriptorVer, // DescriptorVersion
-                              FmpImageInfoCount,         // DescriptorCount
-                              DescriptorSize,            // DescriptorSize
-                              &PackageVersion,           // PackageVersion
-                              &PackageVersionName        // PackageVersionName
+                              Fmp,                         // FMP Pointer
+                              &ImageInfoSize,              // ImageInfoSize
+                              FmpImageInfoBuf,             // ImageInfo
+                              FmpImageInfoDescriptorVer,   // DescriptorVersion
+                              FmpImageInfoCount,           // DescriptorCount
+                              DescriptorSize,              // DescriptorSize
+                              &PackageVersion,             // PackageVersion
+                              &PackageVersionName          // PackageVersionName
                               );
   if (PackageVersionName != NULL) {
     FreePool (PackageVersionName);

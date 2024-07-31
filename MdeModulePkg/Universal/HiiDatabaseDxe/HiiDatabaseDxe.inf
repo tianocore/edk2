@@ -54,6 +54,7 @@
   PcdLib
   UefiRuntimeServicesTableLib
   PrintLib
+  SafeIntLib
 
 [Protocols]
   gEfiDevicePathProtocolGuid                                            ## SOMETIMES_CONSUMES

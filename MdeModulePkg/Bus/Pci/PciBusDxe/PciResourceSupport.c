@@ -448,13 +448,15 @@ GetResourceFromDevice (
                  (PciDev->PciBar)[Index].BarType,
                  PciResUsageTypical
                  );
+        if (Node != NULL) {
+          InsertResourceNode (
+            Mem32Node,
+            Node
+            );
 
-        InsertResourceNode (
-          Mem32Node,
-          Node
-          );
+          ResourceRequested = TRUE;
+        }
 
-        ResourceRequested = TRUE;
         break;
 
       case PciBarTypeMem64:
@@ -467,13 +469,15 @@ GetResourceFromDevice (
                  PciBarTypeMem64,
                  PciResUsageTypical
                  );
+        if (Node != NULL) {
+          InsertResourceNode (
+            Mem64Node,
+            Node
+            );
 
-        InsertResourceNode (
-          Mem64Node,
-          Node
-          );
+          ResourceRequested = TRUE;
+        }
 
-        ResourceRequested = TRUE;
         break;
 
       case PciBarTypePMem64:
@@ -486,13 +490,15 @@ GetResourceFromDevice (
                  PciBarTypePMem64,
                  PciResUsageTypical
                  );
+        if (Node != NULL) {
+          InsertResourceNode (
+            PMem64Node,
+            Node
+            );
 
-        InsertResourceNode (
-          PMem64Node,
-          Node
-          );
+          ResourceRequested = TRUE;
+        }
 
-        ResourceRequested = TRUE;
         break;
 
       case PciBarTypePMem32:
@@ -505,12 +511,14 @@ GetResourceFromDevice (
                  PciBarTypePMem32,
                  PciResUsageTypical
                  );
+        if (Node != NULL) {
+          InsertResourceNode (
+            PMem32Node,
+            Node
+            );
+          ResourceRequested = TRUE;
+        }
 
-        InsertResourceNode (
-          PMem32Node,
-          Node
-          );
-        ResourceRequested = TRUE;
         break;
 
       case PciBarTypeIo16:
@@ -524,12 +532,14 @@ GetResourceFromDevice (
                  PciBarTypeIo16,
                  PciResUsageTypical
                  );
+        if (Node != NULL) {
+          InsertResourceNode (
+            IoNode,
+            Node
+            );
+          ResourceRequested = TRUE;
+        }
 
-        InsertResourceNode (
-          IoNode,
-          Node
-          );
-        ResourceRequested = TRUE;
         break;
 
       case PciBarTypeUnknown:
@@ -555,11 +565,12 @@ GetResourceFromDevice (
                  PciBarTypeMem32,
                  PciResUsageTypical
                  );
-
-        InsertResourceNode (
-          Mem32Node,
-          Node
-          );
+        if (Node != NULL) {
+          InsertResourceNode (
+            Mem32Node,
+            Node
+            );
+        }
 
         break;
 
@@ -573,11 +584,12 @@ GetResourceFromDevice (
                  PciBarTypeMem64,
                  PciResUsageTypical
                  );
-
-        InsertResourceNode (
-          Mem64Node,
-          Node
-          );
+        if (Node != NULL) {
+          InsertResourceNode (
+            Mem64Node,
+            Node
+            );
+        }
 
         break;
 
@@ -591,11 +603,12 @@ GetResourceFromDevice (
                  PciBarTypePMem64,
                  PciResUsageTypical
                  );
-
-        InsertResourceNode (
-          PMem64Node,
-          Node
-          );
+        if (Node != NULL) {
+          InsertResourceNode (
+            PMem64Node,
+            Node
+            );
+        }
 
         break;
 
@@ -609,11 +622,13 @@ GetResourceFromDevice (
                  PciBarTypePMem32,
                  PciResUsageTypical
                  );
+        if (Node != NULL) {
+          InsertResourceNode (
+            PMem32Node,
+            Node
+            );
+        }
 
-        InsertResourceNode (
-          PMem32Node,
-          Node
-          );
         break;
 
       case PciBarTypeIo16:
@@ -819,6 +834,32 @@ CreateResourceMap (
                        PciBarTypePMem64,
                        PciResUsageTypical
                        );
+
+      if ((IoBridge == NULL) || (Mem32Bridge == NULL) || (PMem32Bridge == NULL) ||
+          (Mem64Bridge == NULL) || (PMem64Bridge == NULL))
+      {
+        if (IoBridge != NULL) {
+          FreePool (IoBridge);
+        }
+
+        if (Mem32Bridge != NULL) {
+          FreePool (Mem32Bridge);
+        }
+
+        if (PMem32Bridge != NULL) {
+          FreePool (PMem32Bridge);
+        }
+
+        if (Mem64Bridge != NULL) {
+          FreePool (Mem64Bridge);
+        }
+
+        if (PMem64Bridge != NULL) {
+          FreePool (PMem64Bridge);
+        }
+
+        return;
+      }
 
       //
       // Recursively create resource map on this bridge
@@ -1813,11 +1854,13 @@ ResourcePaddingForCardBusBridge (
            PciBarTypeMem32,
            PciResUsagePadding
            );
-
-  InsertResourceNode (
-    Mem32Node,
-    Node
-    );
+  ASSERT (Node != NULL);
+  if (Node != NULL) {
+    InsertResourceNode (
+      Mem32Node,
+      Node
+      );
+  }
 
   //
   // Memory Base/Limit Register 1
@@ -1832,10 +1875,13 @@ ResourcePaddingForCardBusBridge (
            PciResUsagePadding
            );
 
-  InsertResourceNode (
-    PMem32Node,
-    Node
-    );
+  ASSERT (Node != NULL);
+  if (Node != NULL) {
+    InsertResourceNode (
+      PMem32Node,
+      Node
+      );
+  }
 
   //
   // Io Base/Limit
@@ -1850,10 +1896,13 @@ ResourcePaddingForCardBusBridge (
            PciResUsagePadding
            );
 
-  InsertResourceNode (
-    IoNode,
-    Node
-    );
+  ASSERT (Node != NULL);
+  if (Node != NULL) {
+    InsertResourceNode (
+      IoNode,
+      Node
+      );
+  }
 
   //
   // Io Base/Limit
@@ -1868,10 +1917,13 @@ ResourcePaddingForCardBusBridge (
            PciResUsagePadding
            );
 
-  InsertResourceNode (
-    IoNode,
-    Node
-    );
+  ASSERT (Node != NULL);
+  if (Node != NULL) {
+    InsertResourceNode (
+      IoNode,
+      Node
+      );
+  }
 }
 
 /**
@@ -2142,10 +2194,13 @@ ApplyResourcePadding (
                  PciBarTypeIo16,
                  PciResUsagePadding
                  );
-        InsertResourceNode (
-          IoNode,
-          Node
-          );
+
+        if (Node != NULL) {
+          InsertResourceNode (
+            IoNode,
+            Node
+            );
+        }
       }
 
       Ptr++;
@@ -2167,10 +2222,12 @@ ApplyResourcePadding (
                      PciBarTypePMem32,
                      PciResUsagePadding
                      );
-            InsertResourceNode (
-              PMem32Node,
-              Node
-              );
+            if (Node != NULL) {
+              InsertResourceNode (
+                PMem32Node,
+                Node
+                );
+            }
           }
 
           Ptr++;
@@ -2190,10 +2247,12 @@ ApplyResourcePadding (
                      PciBarTypeMem32,
                      PciResUsagePadding
                      );
-            InsertResourceNode (
-              Mem32Node,
-              Node
-              );
+            if (Node != NULL) {
+              InsertResourceNode (
+                Mem32Node,
+                Node
+                );
+            }
           }
 
           Ptr++;
@@ -2215,10 +2274,12 @@ ApplyResourcePadding (
                      PciBarTypePMem64,
                      PciResUsagePadding
                      );
-            InsertResourceNode (
-              PMem64Node,
-              Node
-              );
+            if (Node != NULL) {
+              InsertResourceNode (
+                PMem64Node,
+                Node
+                );
+            }
           }
 
           Ptr++;
@@ -2238,10 +2299,12 @@ ApplyResourcePadding (
                      PciBarTypeMem64,
                      PciResUsagePadding
                      );
-            InsertResourceNode (
-              Mem64Node,
-              Node
-              );
+            if (Node != NULL) {
+              InsertResourceNode (
+                Mem64Node,
+                Node
+                );
+            }
           }
 
           Ptr++;
