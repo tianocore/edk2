@@ -1449,6 +1449,8 @@ InternalFindFile (
   CHAR16                          FoundFileName[UDF_FILENAME_LENGTH];
   VOID                            *CompareFileEntry;
 
+  CompareFileEntry = NULL;
+
   //
   // Check if both Parent->FileIdentifierDesc and Icb are NULL.
   //

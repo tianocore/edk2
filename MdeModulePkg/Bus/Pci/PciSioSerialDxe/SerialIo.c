@@ -1234,7 +1234,7 @@ SerialRead (
   )
 {
   SERIAL_DEV  *SerialDevice;
-  UINT32      Index;
+  UINTN       Index;
   UINT8       *CharBuffer;
   UINTN       Elapsed;
   EFI_STATUS  Status;
