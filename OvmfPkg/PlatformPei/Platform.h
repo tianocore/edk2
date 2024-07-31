@@ -111,4 +111,10 @@ SevInitializeRam (
   VOID
   );
 
+VOID
+SevFlashNvVarStoreUpdateMapping (
+  IN UINTN  NvVarStoreBase,
+  IN UINTN  NvVarStoreSize
+  );
+
 #endif // _PLATFORM_PEI_H_INCLUDED_
