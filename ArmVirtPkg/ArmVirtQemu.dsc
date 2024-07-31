@@ -345,7 +345,7 @@
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   ArmVirtPkg/MemoryInitPei/MemoryInitPeim.inf
