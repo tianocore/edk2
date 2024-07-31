@@ -89,8 +89,11 @@ def get_reviewers_for_range(
 ) -> List[str]:
     """Get the reviewers for the current branch.
 
-       To get the reviewers for a single commit, set `range_start` and
-       `range_end` to the commit SHA.
+    !!! note
+        This function accepts a range of commits and returns the reviewers
+        for that set of commits as a single list of GitHub usernames. To get
+        the reviewers for a single commit, set `range_start` and `range_end`
+        to the commit SHA.
 
     Args:
         workspace_path (str): The workspace path.
@@ -150,9 +153,9 @@ def get_reviewers_for_range(
 def get_pr_sha(token: str, owner: str, repo: str, pr_number: int) -> str:
     """Returns the commit SHA of given PR branch.
 
-       This returns the SHA of the merge commit that GitHub creates from a
-       PR branch. This commit contains all of the files in the PR branch in
-       a single commit.
+    This returns the SHA of the merge commit that GitHub creates from a
+    PR branch. This commit contains all of the files in the PR branch in
+    a single commit.
 
     Args:
         token (str): The GitHub token to use for authentication.
@@ -189,6 +192,13 @@ def add_reviewers_to_pr(
                    reviewers to the PR. This list will exclude any reviewers
                    from the list provided if they are not relevant to the PR.
     """
+    if not user_names:
+        print(
+            "::debug title=No PR Reviewers Requested!::"
+            "The list of PR reviewers is empty so not adding any reviewers."
+        )
+        return []
+
     try:
         g = _authenticate(token)
         repo_gh = g.get_repo(f"{owner}/{repo}")
@@ -200,8 +210,10 @@ def add_reviewers_to_pr(
         )
         return None
 
+    # The pull request author cannot be a reviewer.
     pr_author = pr.user.login.strip()
 
+    # The current PR reviewers do not need to be requested again.
     current_pr_requested_reviewers = [
         r.login.strip() for r in pr.get_review_requests()[0]
     ]
@@ -210,15 +222,17 @@ def add_reviewers_to_pr(
         set(current_pr_requested_reviewers + current_pr_reviewed_reviewers)
     )
 
+    # A user can only be added if they are a collaborator of the repository.
     repo_collaborators = [c.login.strip() for c in repo_gh.get_collaborators()]
     non_collaborators = [u for u in user_names if u not in repo_collaborators]
 
     excluded_pr_reviewers = [pr_author] + current_pr_reviewers + non_collaborators
     new_pr_reviewers = [u for u in user_names if u not in excluded_pr_reviewers]
 
+    # Notify the admins of the repository if non-collaborators are requested.
     if non_collaborators:
         print(
-            f"::error title=User is not a Collaborator!::{', '.join(non_collaborators)}"
+            f"::warning title=Non-Collaborator Reviewers Found!::{', '.join(non_collaborators)}"
             )
 
         for comment in pr.get_issue_comments():

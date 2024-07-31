@@ -74,14 +74,17 @@ jobs:
             WORKSPACE_PATH = os.environ['WORKSPACE_PATH']
             GET_MAINTAINER_LOCAL_PATH = os.path.join(WORKSPACE_PATH, os.environ['GET_MAINTAINER_REL_PATH'])
 
+            # Step 1: Get the GitHub created PR commit SHA (contains all changes in a single commit)
             pr_commit_sha = GitHub.get_pr_sha(os.environ['GH_TOKEN'], os.environ['ORG_NAME'], os.environ['REPO_NAME'], int(os.environ['PR_NUMBER']))
             if not pr_commit_sha:
                 sys.exit(1)
 
             print(f"::notice title=PR Commit SHA::Looking at files in consolidated PR commit: {pr_commit_sha}")
 
+            # Step 2: Fetch only the PR commit to get the files changed in the PR
             git.Repo(WORKSPACE_PATH).remotes.origin.fetch(pr_commit_sha, depth=1)
 
+            # Step 3: Get the list of reviewers for the PR
             reviewers = GitHub.get_reviewers_for_range(WORKSPACE_PATH, GET_MAINTAINER_LOCAL_PATH, pr_commit_sha, pr_commit_sha)
             if not reviewers:
                 print("::notice title=No New Reviewers Found!::No reviewers found for this PR.")
@@ -92,6 +95,8 @@ jobs:
                 f"PR {os.environ['PR_NUMBER']}: {', '.join(reviewers)}"
             )
 
+            # Step 4: Add the reviewers to the PR
+            #         Note the final requested reviewer list in the workflow run for reference
             new_reviewers = GitHub.add_reviewers_to_pr(
                 os.environ["GH_TOKEN"],
                 os.environ["ORG_NAME"],
