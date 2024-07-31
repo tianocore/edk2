@@ -421,6 +421,7 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 | 0000b | Standard                          | |
 | 0001b | Arch Common                       | |
 | 0010b | ARM                               | |
+| 0011b | X64                               | |
 | 1111b | Custom/OEM                        | |
 | `*`   | All other values are reserved.    | |
 
@@ -498,3 +499,9 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  25   | P-State Dependency (PSD) Info             | |
 |  `*`  | All other values are reserved.            | |
 
+#### Object ID's in the X64 Namespace:
+
+|  ID   |  Description                              | Comments |
+| ---:  | :--------------------------               | :---     |
+|   0   | Reserved                                  | |
+|  `*`  | All other values are reserved.            | |
