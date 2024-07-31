@@ -195,13 +195,7 @@ SmiPFHandler (
     }
 
     if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
-      DumpCpuContext (InterruptType, SystemContext);
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%x)!\n", PFAddress));
-      DEBUG_CODE (
-        DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
-        );
-      CpuDeadLoop ();
-      goto Exit;
     }
   }
 
@@ -212,6 +206,9 @@ SmiPFHandler (
       );
   } else {
     DumpCpuContext (InterruptType, SystemContext);
+    DEBUG_CODE (
+      DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
+      );
     CpuDeadLoop ();
   }
 
