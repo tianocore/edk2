@@ -126,7 +126,9 @@ def get_reviewers_for_range(
         )
         if cmd_ret != 0:
             print(
-                f"::error title=Reviewer Lookup Error!::Error calling GetMaintainer.py: [{cmd_ret}]: {reviewer_stream_buffer.getvalue()}"
+                f"::error title=Reviewer Lookup Error!::Error calling "
+                f"GetMaintainer.py: [{cmd_ret}]: "
+                f"{reviewer_stream_buffer.getvalue()}"
             )
             return []
 
@@ -138,7 +140,8 @@ def get_reviewers_for_range(
             return []
 
         print(
-            f"::debug title=Commit {commit_sha[:7]} Reviewer(s)::{', '.join(matches)}"
+            f"::debug title=Commit {commit_sha[:7]} "
+            f"Reviewer(s)::{', '.join(matches)}"
         )
 
         raw_reviewers.extend(matches)
@@ -232,8 +235,9 @@ def add_reviewers_to_pr(
     # Notify the admins of the repository if non-collaborators are requested.
     if non_collaborators:
         print(
-            f"::warning title=Non-Collaborator Reviewers Found!::{', '.join(non_collaborators)}"
-            )
+            f"::warning title=Non-Collaborator Reviewers Found!::"
+            f"{', '.join(non_collaborators)}"
+        )
 
         for comment in pr.get_issue_comments():
             # If a comment has already been made for these non-collaborators,
