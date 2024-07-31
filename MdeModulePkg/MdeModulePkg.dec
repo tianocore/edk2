@@ -1704,6 +1704,11 @@
   # @Prompt SPI NOR Flash Operation Delay in Microseconds (16 us)
   gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashOperationDelayMicroseconds|0x00000010|UINT32|0x00000035
 
+  ## Indicate the default timeout value for UFS device initial completetion in microseconds.
+  #
+  # @Prompt UFS device initial completion timoeout (us), default value is 600ms.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUfsInitialCompletionTimeout|600000|UINT32|0x00000036
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
