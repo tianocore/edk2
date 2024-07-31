@@ -45,13 +45,15 @@ jobs:
             BaseTools/Scripts
             Maintainers.txt
 
-      - name: Set up Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+          cache: 'pip'
+          cache-dependency-path: '.github/scripts/requirements.txt'
 
       - name: Install PIP Modules
-        run: pip install edk2-pytool-library edk2-pytool-extensions requests
+        run: pip install -r .github/scripts/requirements.txt --upgrade
 
       - name: Add Reviewers to Pull Request
         shell: python
