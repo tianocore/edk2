@@ -8,7 +8,6 @@
 import git
 import logging
 import re
-import requests
 
 from collections import OrderedDict
 from edk2toollib.utility_functions import RunPythonScript
@@ -171,32 +170,6 @@ def get_pr_sha(token: str, owner: str, repo: str, pr_number: int) -> str:
         return merge_commit_sha
 
     return ""
-
-
-def download_gh_file(github_url: str, local_path: str, token=None):
-    """Downloads a file from GitHub.
-
-    Args:
-        github_url (str): The GitHub raw file URL.
-        local_path (str): A local path to write the file contents to.
-        token (_type_, optional): A GitHub authentication token.
-            Only needed for a private repo. Defaults to None.
-    """
-    headers = {}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
-
-    try:
-        response = requests.get(github_url, headers=headers)
-        response.raise_for_status()
-    except requests.exceptions.HTTPError:
-        print(
-            f"::error title=HTTP Error!::Error downloading {github_url}: {response.reason}"
-        )
-        return
-
-    with open(local_path, "w", encoding="utf-8") as file:
-        file.write(response.text)
 
 
 def add_reviewers_to_pr(
