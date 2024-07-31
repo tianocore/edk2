@@ -2,6 +2,7 @@
   Configuration Manager Object parser.
 
   Copyright (c) 2021 - 2023, ARM Limited. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -729,6 +730,13 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
+/** A parser for X64 namespace objects.
+*/
+STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
+  CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjReserved),
+  CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjMax)
+};
+
 /** A parser for EStdObjCfgMgrInfo.
 */
 STATIC CONST CM_OBJ_PARSER  StdObjCfgMgrInfoParser[] = {
@@ -1070,6 +1078,22 @@ ParseCmObjDesc (
 
       ParserArray = &ArchCommonNamespaceObjectParser[ObjId];
       break;
+
+    case EObjNameSpaceX64:
+      if (ObjId >= EX64ObjMax) {
+        ASSERT (0);
+        return;
+      }
+
+      if (ObjId >= ARRAY_SIZE (X64NamespaceObjectParser)) {
+        DEBUG ((DEBUG_ERROR, "ObjId 0x%x is missing from the X64NamespaceObjectParser array\n", ObjId));
+        ASSERT (0);
+        return;
+      }
+
+      ParserArray = &X64NamespaceObjectParser[ObjId];
+      break;
+
     default:
       // Not supported
       DEBUG ((DEBUG_ERROR, "NameSpaceId 0x%x, ObjId 0x%x is not supported by the parser\n", NameSpaceId, ObjId));
