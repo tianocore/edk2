@@ -202,11 +202,19 @@ def add_reviewers_to_pr(
 
     pr_author = pr.user.login.strip()
 
-    while pr_author in user_names:
-        user_names.remove(pr_author)
+    current_pr_requested_reviewers = [
+        r.login.strip() for r in pr.get_review_requests()[0]
+    ]
+    current_pr_reviewed_reviewers = [r.user.login.strip() for r in pr.get_reviews()]
+    current_pr_reviewers = list(
+        set(current_pr_requested_reviewers + current_pr_reviewed_reviewers)
+    )
 
     repo_collaborators = [c.login.strip() for c in repo_gh.get_collaborators()]
     non_collaborators = [u for u in user_names if u not in repo_collaborators]
+
+    excluded_pr_reviewers = [pr_author] + current_pr_reviewers + non_collaborators
+    new_pr_reviewers = [u for u in user_names if u not in excluded_pr_reviewers]
 
     if non_collaborators:
         print(
@@ -225,6 +233,12 @@ def add_reviewers_to_pr(
             f"Users requested:\n{', '.join(user_names)}",
         )
 
-    pr.create_review_request(reviewers=user_names)
+    # Add any new reviewers to the PR if needed.
+    if new_pr_reviewers:
+        print(
+            f"::debug title=Adding New PR Reviewers::" f"{', '.join(new_pr_reviewers)}"
+        )
 
-    return user_names
+        pr.create_review_request(reviewers=new_pr_reviewers)
+
+    return new_pr_reviewers
