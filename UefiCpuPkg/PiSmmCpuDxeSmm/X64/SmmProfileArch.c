@@ -110,6 +110,156 @@ AcquirePage (
 }
 
 /**
+  Create new entry in page table for page fault address in SmmProfilePFHandler.
+
+**/
+VOID
+SmmProfileMapPFAddress (
+  VOID
+  )
+{
+  UINT64              *PageTable;
+  UINT64              *PageTableTop;
+  UINT64              PFAddress;
+  UINTN               StartBit;
+  UINTN               EndBit;
+  UINT64              PTIndex;
+  UINTN               Index;
+  SMM_PAGE_SIZE_TYPE  PageSize;
+  UINTN               NumOfPages;
+  UINTN               PageAttribute;
+  EFI_STATUS          Status;
+  UINT64              *UpperEntry;
+  BOOLEAN             Enable5LevelPaging;
+  IA32_CR4            Cr4;
+
+  //
+  // Set default SMM page attribute
+  //
+  PageSize      = SmmPageSize2M;
+  NumOfPages    = 1;
+  PageAttribute = 0;
+
+  EndBit       = 0;
+  PageTableTop = (UINT64 *)(AsmReadCr3 () & gPhyMask);
+  PFAddress    = AsmReadCr2 ();
+
+  Cr4.UintN          = AsmReadCr4 ();
+  Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 != 0);
+
+  Status = GetPlatformPageTableAttribute (PFAddress, &PageSize, &NumOfPages, &PageAttribute);
+  //
+  // If platform not support page table attribute, set default SMM page attribute
+  //
+  if (Status != EFI_SUCCESS) {
+    PageSize      = SmmPageSize2M;
+    NumOfPages    = 1;
+    PageAttribute = 0;
+  }
+
+  if (PageSize >= MaxSmmPageSizeType) {
+    PageSize = SmmPageSize2M;
+  }
+
+  if (NumOfPages > 512) {
+    NumOfPages = 512;
+  }
+
+  switch (PageSize) {
+    case SmmPageSize4K:
+      //
+      // BIT12 to BIT20 is Page Table index
+      //
+      EndBit = 12;
+      break;
+    case SmmPageSize2M:
+      //
+      // BIT21 to BIT29 is Page Directory index
+      //
+      EndBit         = 21;
+      PageAttribute |= (UINTN)IA32_PG_PS;
+      break;
+    case SmmPageSize1G:
+      if (!m1GPageTableSupport) {
+        DEBUG ((DEBUG_ERROR, "1-GByte pages is not supported!"));
+        ASSERT (FALSE);
+      }
+
+      //
+      // BIT30 to BIT38 is Page Directory Pointer Table index
+      //
+      EndBit         = 30;
+      PageAttribute |= (UINTN)IA32_PG_PS;
+      break;
+    default:
+      ASSERT (FALSE);
+  }
+
+  //
+  // If execute-disable is enabled, set NX bit
+  //
+  if (mXdEnabled) {
+    PageAttribute |= IA32_PG_NX;
+  }
+
+  for (Index = 0; Index < NumOfPages; Index++) {
+    PageTable  = PageTableTop;
+    UpperEntry = NULL;
+    for (StartBit = Enable5LevelPaging ? 48 : 39; StartBit > 12; StartBit -= 9) {
+      PTIndex = BitFieldRead64 (PFAddress, StartBit, StartBit + 8);
+
+      //
+      // Iterate through the page table to find the appropriate page table entry for page creation if one of the following cases is met:
+      // 1) StartBit > EndBit: The PageSize of current entry is bigger than the platform-specified PageSize granularity.
+      // 2) IA32_PG_P bit is 0 & IA32_PG_PS bit is not 0: The current entry is present and it's a non-leaf entry.
+      //
+      if ((StartBit > EndBit) || ((((PageTable[PTIndex] & IA32_PG_P) != 0) && ((PageTable[PTIndex] & IA32_PG_PS) == 0)))) {
+        if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
+          //
+          // If the entry is not present, allocate one page from page pool for it
+          //
+          PageTable[PTIndex] = AllocPage () | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+        } else {
+          //
+          // Save the upper entry address
+          //
+          UpperEntry = PageTable + PTIndex;
+        }
+
+        //
+        // BIT9 to BIT11 of entry is used to save access record,
+        // initialize value is 7
+        //
+        PageTable[PTIndex] |= (UINT64)IA32_PG_A;
+        SetAccNum (PageTable + PTIndex, 7);
+        PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & gPhyMask);
+      } else {
+        //
+        // Found the appropriate entry.
+        //
+        break;
+      }
+    }
+
+    PTIndex = BitFieldRead64 (PFAddress, StartBit, StartBit + 8);
+
+    //
+    // Fill the new entry
+    //
+    PageTable[PTIndex] = ((PFAddress | mAddressEncMask) & gPhyMask & ~((1ull << StartBit) - 1)) |
+                         PageAttribute | IA32_PG_A | PAGE_ATTRIBUTE_BITS;
+    if (UpperEntry != NULL) {
+      SetSubEntriesNum (UpperEntry, (GetSubEntriesNum (UpperEntry) + 1) & 0x1FF);
+    }
+
+    //
+    // Get the next page address if we need to create more page tables
+    //
+    PFAddress += (1ull << StartBit);
+  }
+}
+
+/**
   Update page table to map the memory correctly in order to make the instruction
   which caused page fault execute successfully. And it also save the original page
   table to be restored in single-step exception.
@@ -220,7 +370,7 @@ RestorePageTableAbove4G (
     //
     // Create one entry in page table for page fault address.
     //
-    SmiDefaultPFHandler ();
+    SmmProfileMapPFAddress ();
     //
     // Find the page table entry created just now.
     //
