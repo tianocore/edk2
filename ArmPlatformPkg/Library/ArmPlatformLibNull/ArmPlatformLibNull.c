@@ -90,10 +90,6 @@ ArmPlatformInitialize (
   IN  UINTN  MpId
   )
 {
-  if (!ArmPlatformIsPrimaryCore (MpId)) {
-    return RETURN_SUCCESS;
-  }
-
   // TODO: Implement me
 
   return RETURN_SUCCESS;
