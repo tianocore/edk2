@@ -1,7 +1,7 @@
 /** @file
   AEST table parser
 
-  Copyright (c) 2020, Arm Limited.
+  Copyright (c) 2020 - 2024, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -33,6 +33,7 @@ STATIC UINT8                         *ProcessorResourceType;
   Validate Processor Flags.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -40,8 +41,9 @@ STATIC
 VOID
 EFIAPI
 ValidateProcessorFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   // If the global or shared node flag is set then the ACPI Processor ID
@@ -59,6 +61,7 @@ ValidateProcessorFlags (
   Validate GIC Interface Type.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -66,8 +69,9 @@ STATIC
 VOID
 EFIAPI
 ValidateGicInterfaceType (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT32  GicInterfaceType;
@@ -83,6 +87,7 @@ ValidateGicInterfaceType (
   Validate Interface Type.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -90,8 +95,9 @@ STATIC
 VOID
 EFIAPI
 ValidateInterfaceType (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*Ptr > 1) {
@@ -104,6 +110,7 @@ ValidateInterfaceType (
   Validate Interrupt Type.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -111,8 +118,9 @@ STATIC
 VOID
 EFIAPI
 ValidateInterruptType (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*Ptr > 1) {
@@ -125,6 +133,7 @@ ValidateInterruptType (
   Validate interrupt flags.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -132,8 +141,9 @@ STATIC
 VOID
 EFIAPI
 ValidateInterruptFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if ((*Ptr & 0xfe) != 0) {
@@ -147,12 +157,14 @@ ValidateInterruptFlags (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 DumpVendorSpecificData (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
