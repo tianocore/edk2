@@ -225,10 +225,10 @@ ArmGicEndOfInterrupt (
 VOID
 EFIAPI
 ArmGicSetInterruptPriority (
-  IN UINTN  GicDistributorBase,
-  IN UINTN  GicRedistributorBase,
-  IN UINTN  Source,
-  IN UINTN  Priority
+  IN UINTN   GicDistributorBase,
+  IN UINTN   GicRedistributorBase,
+  IN UINTN   Source,
+  IN UINT32  Priority
   )
 {
   UINT32                 RegOffset;
