@@ -653,5 +653,10 @@
   # @Prompt Require PK to be self-signed
   gEfiMdeModulePkgTokenSpaceGuid.PcdRequireSelfSignedPk|FALSE|BOOLEAN|0x00010027
 
+  ## Disallow persistent clear permissions for PPI flags
+  # TRUE  - Flags disabled - permission disallowed
+  # FALSE - Flags enabled - permission allowed
+  gEfiSecurityPkgTokenSpaceGuid.PcdDisallowPPIPersistentClearPermissions|TRUE|BOOLEAN|0x00010028
+
 [UserExtensions.TianoCore."ExtraFiles"]
   SecurityPkgExtra.uni

@@ -116,6 +116,17 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
     goto EXIT;
   }
 
+  if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
+    if ((*OperationRequest == TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_CHANGE_PCRS_FALSE) ||
+        (*OperationRequest == TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_CHANGE_EPS_FALSE) ||
+        (*OperationRequest == TCG2_PHYSICAL_PRESENCE_SET_PP_REQUIRED_FOR_TURN_OFF_FALSE))
+    {
+      DEBUG ((DEBUG_ERROR, "[TPM2] Refusing to process PPI flags request in production!\n"));
+      ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_BLOCKED_BY_BIOS_SETTINGS;
+      goto EXIT;
+    }
+  }
+
   if ((*OperationRequest > TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) &&
       (*OperationRequest < TCG2_PHYSICAL_PRESENCE_STORAGE_MANAGEMENT_BEGIN))
   {

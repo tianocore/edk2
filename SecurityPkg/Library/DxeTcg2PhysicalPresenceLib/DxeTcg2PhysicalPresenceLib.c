@@ -603,15 +603,19 @@ Tcg2HaveValidTpmRequest  (
       break;
 
     case TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS:
-      if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_PCRS) == 0) {
-        *RequestConfirmed = TRUE;
+      if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
+        if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_PCRS) == 0) {
+          *RequestConfirmed = TRUE;
+        }
       }
 
       break;
 
     case TCG2_PHYSICAL_PRESENCE_CHANGE_EPS:
-      if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_EPS) == 0) {
-        *RequestConfirmed = TRUE;
+      if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
+        if ((Flags.PPFlags & TCG2_BIOS_TPM_MANAGEMENT_FLAG_PP_REQUIRED_FOR_CHANGE_EPS) == 0) {
+          *RequestConfirmed = TRUE;
+        }
       }
 
       break;
@@ -621,15 +625,19 @@ Tcg2HaveValidTpmRequest  (
       break;
 
     case TCG2_PHYSICAL_PRESENCE_ENABLE_BLOCK_SID:
-      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) == 0) {
-        *RequestConfirmed = TRUE;
+      if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
+        if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID) == 0) {
+          *RequestConfirmed = TRUE;
+        }
       }
 
       break;
 
     case TCG2_PHYSICAL_PRESENCE_DISABLE_BLOCK_SID:
-      if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) == 0) {
-        *RequestConfirmed = TRUE;
+      if (PcdGetBool (PcdDisallowPPIPersistentClearPermissions)) {
+        if ((Flags.PPFlags & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID) == 0) {
+          *RequestConfirmed = TRUE;
+        }
       }
 
       break;
