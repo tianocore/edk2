@@ -19,6 +19,7 @@
   LIBRARY_CLASS                  = IntrinsicLib
 
 [Sources]
+  strcmp.c
   memcpy.c             | GCC
   memset.c             | GCC
 
