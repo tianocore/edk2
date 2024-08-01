@@ -11,11 +11,6 @@ ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
 
-  // Get ID of this CPU in multi-core system
-  bl    ASM_PFX(ArmReadMpidr)
-  // Keep a copy of the MpId register value
-  mov   x10, x0
-
 _SetSVCMode:
 // Check if we can install the stack at the top of the System Memory or if we need
 // to install the stacks at the bottom of the Firmware Device (case the FD is located
@@ -71,31 +66,16 @@ _GetBaseUefiMemory:
   sub   x11, x1, x4
 
 _GetStackBase:
-  // r1 = The top of the Mpcore Stacks
+  // r1 = The top of the stack
+  mov   sp, x1
+
   // Stack for the primary core = PrimaryCoreStack
   MOV32 (x2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
   sub   x12, x1, x2
 
-  // Stack for the secondary core = Number of Cores - 1
-  MOV32 (x1, (FixedPcdGet32(PcdCoreCount) - 1) * FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
-  sub   x12, x12, x1
+  // Get ID of this CPU in multi-core system
+  bl    ASM_PFX(ArmReadMpidr)
 
-  // x12 = The base of the MpCore Stacks (primary stack & secondary stacks)
-  mov   x0, x12
-  mov   x1, x10
-  //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
-  MOV32 (x2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
-  MOV32 (x3, FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
-  bl    ASM_PFX(ArmPlatformStackSet)
-
-  // Is it the Primary Core ?
-  mov   x0, x10
-  bl    ASM_PFX(ArmPlatformIsPrimaryCore)
-  cmp   x0, #1
-  bne   _PrepareArguments
-
-_PrepareArguments:
-  mov   x0, x10
   mov   x1, x11
   mov   x2, x12
 

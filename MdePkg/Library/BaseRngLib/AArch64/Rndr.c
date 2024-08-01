@@ -21,11 +21,6 @@
 
 STATIC BOOLEAN  mRndrSupported;
 
-//
-// Bit mask used to determine if RNDR instruction is supported.
-//
-#define RNDR_MASK  ((UINT64)MAX_UINT16 << 60U)
-
 /**
   The constructor function checks whether or not RNDR instruction is supported
   by the host hardware.
@@ -49,9 +44,8 @@ BaseRngLibConstructor (
   // Determine RNDR support by examining bits 63:60 of the ISAR0 register returned by
   // MSR. A non-zero value indicates that the processor supports the RNDR instruction.
   //
-  Isar0 = ArmReadIdIsar0 ();
-
-  mRndrSupported = ((Isar0 & RNDR_MASK) != 0);
+  Isar0          = ArmReadIdAA64Isar0Reg ();
+  mRndrSupported = !!((Isar0 >> ARM_ID_AA64ISAR0_EL1_RNDR_SHIFT) & ARM_ID_AA64ISAR0_EL1_RNDR_MASK);
 
   return EFI_SUCCESS;
 }
