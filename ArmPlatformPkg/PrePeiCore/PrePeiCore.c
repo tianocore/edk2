@@ -81,7 +81,6 @@ PrintFirmwareVersion (
 
 VOID
 CEntryPoint (
-  IN  UINTN                     MpId,
   IN  EFI_PEI_CORE_ENTRY_POINT  PeiCoreEntryPoint
   )
 {
@@ -117,26 +116,21 @@ CEntryPoint (
 
   // Note: The MMU will be enabled by MemoryPeim. Only the primary core will have the MMU on.
 
-  // If not primary Jump to Secondary Main
-  if (ArmPlatformIsPrimaryCore (MpId)) {
-    // Invoke "ProcessLibraryConstructorList" to have all library constructors
-    // called.
-    ProcessLibraryConstructorList ();
+  // Invoke "ProcessLibraryConstructorList" to have all library constructors
+  // called.
+  ProcessLibraryConstructorList ();
 
-    PrintFirmwareVersion ();
+  PrintFirmwareVersion ();
 
-    // Initialize the Debug Agent for Source Level Debugging
-    InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
-    SaveAndSetDebugTimerInterrupt (TRUE);
+  // Initialize the Debug Agent for Source Level Debugging
+  InitializeDebugAgent (DEBUG_AGENT_INIT_POSTMEM_SEC, NULL, NULL);
+  SaveAndSetDebugTimerInterrupt (TRUE);
 
-    // Initialize the platform specific controllers
-    ArmPlatformInitialize (MpId);
+  // Initialize the platform specific controllers
+  ArmPlatformInitialize (ArmReadMpidr ());
 
-    // Goto primary Main.
-    PrimaryMain (PeiCoreEntryPoint);
-  } else {
-    SecondaryMain (MpId);
-  }
+  // Goto primary Main.
+  PrimaryMain (PeiCoreEntryPoint);
 
   // PEI Core should always load and never return
   ASSERT (FALSE);

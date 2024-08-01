@@ -1,7 +1,7 @@
 /** @file
   HMAT table parser
 
-  Copyright (c) 2020, Arm Limited.
+  Copyright (c) 2020 - 2024, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -54,6 +54,7 @@ STATIC CONST CHAR16  *SllbiNames[] = {
   This function validates the Cache Attributes field.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -61,8 +62,9 @@ STATIC
 VOID
 EFIAPI
 ValidateCacheAttributes (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES *
@@ -109,13 +111,15 @@ ValidateCacheAttributes (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpCacheAttributes (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   EFI_ACPI_6_4_HMAT_STRUCTURE_MEMORY_SIDE_CACHE_INFO_CACHE_ATTRIBUTES *

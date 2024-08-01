@@ -1,7 +1,7 @@
 /** @file
   FADT table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -57,6 +57,7 @@ GetAcpiXsdtHeaderInfo (
   This function validates the Firmware Control Field.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -64,8 +65,9 @@ STATIC
 VOID
 EFIAPI
 ValidateFirmwareCtrl (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
  #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
@@ -83,6 +85,7 @@ ValidateFirmwareCtrl (
   This function validates the X_Firmware Control Field.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -90,8 +93,9 @@ STATIC
 VOID
 EFIAPI
 ValidateXFirmwareCtrl (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
  #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
@@ -109,6 +113,7 @@ ValidateXFirmwareCtrl (
   This function validates the flags.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -116,8 +121,9 @@ STATIC
 VOID
 EFIAPI
 ValidateFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
  #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
@@ -163,12 +169,14 @@ STATIC CONST ACPI_PARSER  FadtFlagParser[] = {
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 DumpFadtFlags (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
