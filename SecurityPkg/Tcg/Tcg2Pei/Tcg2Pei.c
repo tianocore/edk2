@@ -1092,6 +1092,8 @@ PeimEntryMA (
       }
 
       if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Tcg2Pei::%a - TPM failed Startup!\n", __func__));
+        ASSERT_EFI_ERROR (Status);
         goto Done;
       }
     }
@@ -1124,6 +1126,7 @@ PeimEntryMA (
       if (PcdGet8 (PcdTpm2SelfTestPolicy) == 1) {
         Status = Tpm2SelfTest (NO);
         if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "Tcg2Pei::%a - TPM failed Startup!\n", __func__));
           goto Done;
         }
       }
