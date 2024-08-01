@@ -23,19 +23,6 @@
 
 extern UINT64  mSystemMemoryEnd;
 
-RETURN_STATUS
-EFIAPI
-TimerConstructor (
-  VOID
-  );
-
-VOID
-PrePiMain (
-  IN  UINTN   UefiMemoryBase,
-  IN  UINTN   StacksBase,
-  IN  UINT64  StartTimeStamp
-  );
-
 EFI_STATUS
 EFIAPI
 MemoryPeim (
@@ -49,28 +36,10 @@ PlatformPeim (
   VOID
   );
 
-VOID
-PrimaryMain (
-  IN  UINTN   UefiMemoryBase,
-  IN  UINTN   StacksBase,
-  IN  UINT64  StartTimeStamp
-  );
-
-VOID
-SecondaryMain (
-  IN  UINTN  MpId
-  );
-
 // Either implemented by PrePiLib or by MemoryInitPei
 VOID
 BuildMemoryTypeInformationHob (
   VOID
-  );
-
-EFI_STATUS
-GetPlatformPpi (
-  IN  EFI_GUID  *PpiGuid,
-  OUT VOID      **Ppi
   );
 
 // Initialize the Architecture specific controllers

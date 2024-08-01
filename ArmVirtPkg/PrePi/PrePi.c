@@ -109,8 +109,6 @@ CEntryPoint (
   UINT64  StartTimeStamp;
 
   if (PerformanceMeasurementEnabled ()) {
-    // Initialize the Timer Library to setup the Timer HW controller
-    TimerConstructor ();
     // We cannot call yet the PerformanceLib because the HOB List has not been initialized
     StartTimeStamp = GetPerformanceCounter ();
   } else {

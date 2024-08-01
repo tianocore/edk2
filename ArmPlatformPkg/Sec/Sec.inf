@@ -1,51 +1,50 @@
-#/** @file
-#  Pre PeiCore - Hand-off to PEI Core in Normal World
+## @file
+#  Generic SEC driver for ARM platforms
 #
 #  Copyright (c) 2011, ARM Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
-#**/
+##
 
 [Defines]
   INF_VERSION                    = 1.30
-  BASE_NAME                      = ArmPlatformPrePeiCore
-  FILE_GUID                      = 469fc080-aec1-11df-927c-0002a5d5c51b
+  BASE_NAME                      = Sec
+  FILE_GUID                      = 4c97830a-8e18-4aa6-9fd0-837b089910e2
   MODULE_TYPE                    = SEC
   VERSION_STRING                 = 1.0
 
 [Sources.common]
-  PrePeiCore.h
-  PrePeiCore.c
-  MainUniCore.c
+  Sec.h
+  Sec.c
 
 [Sources.ARM]
-  Arm/ArchPrePeiCore.c
-  Arm/PrePeiCoreEntryPoint.S   | GCC
-  Arm/SwitchStack.S        | GCC
-  Arm/Exception.S          | GCC
+  Arm/ArchSec.c
+  Arm/Exception.S
+  Arm/ModuleEntryPoint.S
+  Arm/SwitchStack.S
 
 [Sources.AARCH64]
-  AArch64/ArchPrePeiCore.c
-  AArch64/PrePeiCoreEntryPoint.S
-  AArch64/SwitchStack.S
+  AArch64/ArchSec.c
   AArch64/Exception.S
   AArch64/Helper.S
+  AArch64/ModuleEntryPoint.S
+  AArch64/SwitchStack.S
 
 [Packages]
-  MdePkg/MdePkg.dec
-  MdeModulePkg/MdeModulePkg.dec
-  ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
 
 [LibraryClasses]
   ArmLib
   ArmPlatformLib
-  CacheMaintenanceLib
   BaseLib
-  DebugLib
+  BaseMemoryLib
+  CacheMaintenanceLib
   DebugAgentLib
-  IoLib
+  DebugLib
   PrintLib
   SerialPortLib
 

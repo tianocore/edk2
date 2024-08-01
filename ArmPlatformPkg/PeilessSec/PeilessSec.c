@@ -6,21 +6,7 @@
 
 **/
 
-#include <PiPei.h>
-
-#include <Library/CacheMaintenanceLib.h>
-#include <Library/DebugAgentLib.h>
-#include <Library/PrePiLib.h>
-#include <Library/PrintLib.h>
-#include <Library/PrePiHobListPointerLib.h>
-#include <Library/TimerLib.h>
-#include <Library/PerformanceLib.h>
-
-#include <Ppi/GuidedSectionExtraction.h>
-#include <Ppi/ArmMpCoreInfo.h>
-#include <Ppi/SecPerformance.h>
-
-#include "PrePi.h"
+#include "PeilessSec.h"
 
 #define IS_XIP()  (((UINT64)FixedPcdGet64 (PcdFdBaseAddress) > mSystemMemoryEnd) ||\
                   ((FixedPcdGet64 (PcdFdBaseAddress) + FixedPcdGet32 (PcdFdSize)) <= FixedPcdGet64 (PcdSystemMemoryBase)))
@@ -65,14 +51,14 @@ GetPlatformPpi (
   SEC main routine.
 
   @param[in]  UefiMemoryBase  Start of the PI/UEFI memory region
-  @param[in]  StacksBase      Start of the stack
+  @param[in]  StackBase      Start of the stack
   @param[in]  StartTimeStamp  Timer value at start of execution
 **/
 STATIC
 VOID
-PrePiMain (
+SecMain (
   IN  UINTN   UefiMemoryBase,
-  IN  UINTN   StacksBase,
+  IN  UINTN   StackBase,
   IN  UINT64  StartTimeStamp
   )
 {
@@ -117,7 +103,7 @@ PrePiMain (
               (VOID *)UefiMemoryBase,
               FixedPcdGet32 (PcdSystemMemoryUefiRegionSize),
               (VOID *)UefiMemoryBase,
-              (VOID *)StacksBase // The top of the UEFI Memory is reserved for the stacks
+              (VOID *)StackBase // The top of the UEFI Memory is reserved for the stack
               );
   PrePeiSetHobList (HobList);
 
@@ -127,7 +113,7 @@ PrePiMain (
 
   // Create the Stacks HOB
   StacksSize = PcdGet32 (PcdCPUCorePrimaryStackSize);
-  BuildStackHob (StacksBase, StacksSize);
+  BuildStackHob (StackBase, StacksSize);
 
   // TODO: Call CpuPei as a library
   BuildCpuHob (ArmGetPhysicalAddressBits (), PcdGet8 (PcdPrePiCpuIoSize));
@@ -176,17 +162,22 @@ PrePiMain (
   ASSERT_EFI_ERROR (Status);
 }
 
+/**
+  C entrypoint into the SEC driver.
+
+  @param[in]  UefiMemoryBase  Start of the PI/UEFI memory region
+  @param[in]  StackBase       Start of the stack
+**/
 VOID
 CEntryPoint (
-  IN  UINTN  MpId,
   IN  UINTN  UefiMemoryBase,
-  IN  UINTN  StacksBase
+  IN  UINTN  StackBase
   )
 {
   UINT64  StartTimeStamp;
 
   // Initialize the platform specific controllers
-  ArmPlatformInitialize (MpId);
+  ArmPlatformInitialize (ArmReadMpidr ());
 
   if (PerformanceMeasurementEnabled ()) {
     // We cannot call yet the PerformanceLib because the HOB List has not been initialized
@@ -207,7 +198,7 @@ CEntryPoint (
     FixedPcdGet32 (PcdSystemMemoryUefiRegionSize)
     );
 
-  PrePiMain (UefiMemoryBase, StacksBase, StartTimeStamp);
+  SecMain (UefiMemoryBase, StackBase, StartTimeStamp);
 
   // DXE Core should always load and never return
   ASSERT (FALSE);

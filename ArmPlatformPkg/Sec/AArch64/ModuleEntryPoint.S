@@ -54,5 +54,4 @@ ASM_PFX(MainEntryPoint):
 
   // Jump to PrePeiCore C code
   //    x0 = pei_core_address
-  mov   x0, x5
   blr   x3

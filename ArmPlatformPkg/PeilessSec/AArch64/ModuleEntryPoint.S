@@ -36,7 +36,7 @@ _SetupStackPosition:
 
   // Calculate how much space there is between the top of the Firmware and the Top of the System Memory
   subs  x0, x1, x3   // x0 = SystemMemoryTop - FdTop
-  b.mi  _SetupStack  // Jump if negative (FdTop > SystemMemoryTop). Case when the PrePi is in XIP memory outside of the DRAM
+  b.mi  _SetupStack  // Jump if negative (FdTop > SystemMemoryTop). Case when SEC is in XIP memory outside of the DRAM
   cmp   x0, x4
   b.ge  _SetupStack
 
@@ -63,7 +63,7 @@ _SetupOverflowStack:
 
 _GetBaseUefiMemory:
   // Calculate the Base of the UEFI Memory
-  sub   x11, x1, x4
+  sub   x0, x1, x4
 
 _GetStackBase:
   // r1 = The top of the stack
@@ -71,13 +71,7 @@ _GetStackBase:
 
   // Stack for the primary core = PrimaryCoreStack
   MOV32 (x2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
-  sub   x12, x1, x2
-
-  // Get ID of this CPU in multi-core system
-  bl    ASM_PFX(ArmReadMpidr)
-
-  mov   x1, x11
-  mov   x2, x12
+  sub   x1, x1, x2
 
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
@@ -86,10 +80,9 @@ _GetStackBase:
   // Set the frame pointer to NULL so any backtraces terminate here
   mov   x29, xzr
 
-  // Jump to PrePiCore C code
-  //    x0 = MpId
-  //    x1 = UefiMemoryBase
-  //    x2 = StacksBase
+  // Jump to SEC C code
+  //    x0 = UefiMemoryBase
+  //    x1 = StacksBase
   blr   x4
 
 _NeverReturn:
