@@ -37,6 +37,6 @@
 #define PL061_GPIO_PINS  8
 
 // All bits low except one bit high, native bit length
-#define GPIO_PIN_MASK(Pin)  (1UL << ((UINTN)(Pin)))
+#define GPIO_PIN_MASK(Pin)  (LShiftU64(1UL, Pin))
 
 #endif // __PL061_GPIO_H__
