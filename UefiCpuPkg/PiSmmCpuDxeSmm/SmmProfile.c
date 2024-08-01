@@ -1333,14 +1333,6 @@ SmmProfilePFHandler (
   UINT8                       SoftSmiValue;
   EFI_SMM_SAVE_STATE_IO_INFO  IoInfo;
 
-  if (!mSmmProfileStart) {
-    //
-    // If SMM profile does not start, call original page fault handler.
-    //
-    SmmProfileMapPFAddress ();
-    return;
-  }
-
   if (mBtsSupported) {
     DisableBTS ();
   }
