@@ -2845,6 +2845,7 @@ DriverEntry (
   // Get supported PCR and current Active PCRs
   //
   Status = Tpm2GetCapabilitySupportedAndActivePcrs (&TpmHashAlgorithmBitmap, &ActivePCRBanks);
+  DEBUG ((DEBUG_INFO, "TpmHashAlgorithmBitmap = 0x%X, ActivePCRBanks = 0x%X\n", TpmHashAlgorithmBitmap, ActivePCRBanks));
   ASSERT_EFI_ERROR (Status);
 
   mTcgDxeData.BsCap.HashAlgorithmBitmap = TpmHashAlgorithmBitmap & PcdGet32 (PcdTcg2HashAlgorithmBitmap);
