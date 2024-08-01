@@ -1,7 +1,7 @@
 /** @file
 X64 processor specific functions to enable SMM profile.
 
-Copyright (c) 2012 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -29,20 +29,21 @@ UINT64  *mPFPageUplink[MAX_PF_PAGE_COUNT];
 /**
   Create SMM page table for S3 path.
 
+  @param[out] Cr3    The base address of the page tables.
+
 **/
 VOID
 InitSmmS3Cr3 (
-  VOID
+  OUT UINTN  *Cr3
   )
 {
+  ASSERT (Cr3 != NULL);
+
   //
   // Generate level4 page table for the first 4GB memory space
   // Return the address of PML4 (to set CR3)
   //
-  //
-  // The SmmS3Cr3 is only used by S3Resume PEIM to switch CPU from 32bit to 64bit
-  //
-  mSmmS3ResumeState->SmmS3Cr3 = (UINT32)GenSmmPageTable (Paging4Level, 32);
+  *Cr3 = GenSmmPageTable (Paging4Level, 32);
 
   return;
 }

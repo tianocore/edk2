@@ -243,8 +243,9 @@ InitSmmS3ResumeState (
 
     //
     // Patch SmmS3ResumeState->SmmS3Cr3
+    // The SmmS3Cr3 is only used by S3Resume PEIM to switch CPU from 32bit to 64bit
     //
-    InitSmmS3Cr3 ();
+    InitSmmS3Cr3 ((UINTN *)&SmmS3ResumeState->SmmS3Cr3);
   }
 }
 
