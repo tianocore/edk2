@@ -29,7 +29,7 @@
   MSFT:*_*_*_CC_FLAGS     == /c -DHAVE_VSNPRINTF -DHAVE_SNPRINTF /Zi
   MSFT:NOOPT_*_*_CC_FLAGS =  /Od
 
-  GCC:*_*_*_CC_FLAGS     == -g -DHAVE_SIGNAL_H
+  GCC:*_*_*_CC_FLAGS     == -g -DHAVE_SIGNAL_H -DHAVE_STRSIGNAL
   GCC:NOOPT_*_*_CC_FLAGS =  -O0
   GCC:*_*_IA32_CC_FLAGS  =  -m32
   GCC:*_*_X64_CC_FLAGS   =  -m64

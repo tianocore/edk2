@@ -1634,8 +1634,8 @@ We don't know if these types will exist or be applicable yet, but if you write a
 
 Code/Test                                   | Location
 ---------                                   | --------
-Host-Based Library Implementations                 | Host-Based Implementations of common libraries (eg. MemoryAllocationLibHost) should live in the same package that declares the library interface in its .DEC file in the `*Pkg/HostLibrary` directory. Should have 'Host' in the name.
-Host-Based Mocks and Stubs  | Mock and Stub libraries should live in the `UefiTestFrameworkPkg/StubLibrary` with either 'Mock' or 'Stub' in the library name.
+Host-Based Library Implementations                 | Host-Based Implementations of common libraries (eg. MemoryAllocationLibHost) should live in the same package that declares the library interface in its .DEC file in the `*Pkg/Test/Library` directory. Should have 'Host' in the name.
+Host-Based Mocks and Stubs  | Mock and Stub libraries that require test infrastructure should live in the `UefiTestFrameworkPkg/Library` with either 'Mock' or 'Stub' in the library name.
 
 ### If still in doubt...
 
