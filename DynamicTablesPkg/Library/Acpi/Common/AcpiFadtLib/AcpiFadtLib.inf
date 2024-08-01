@@ -24,7 +24,7 @@
   Arm/ArmFadtGenerator.c
 
 [Sources.IA32, Sources.X64]
-  FadtGeneratorNull.c
+  X64/X64FadtGenerator.c
 
 [Packages]
   MdePkg/MdePkg.dec

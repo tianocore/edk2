@@ -730,10 +730,129 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
+/** A parser for EX64ObjFadtSciInterrupt.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtSciInterruptParser[] = {
+  { "SciInterrupt", 2, "0x%x", NULL }
+};
+
+/** A parser for EX64ObjFadtSciCmdInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtSciCmdInfoParser[] = {
+  { "SciCmd",      4, "0x%x", NULL },
+  { "AcpiEnable",  1, "0x%x", NULL },
+  { "AcpiDisable", 1, "0x%x", NULL },
+  { "S4BiosReq",   1, "0x%x", NULL },
+  { "PstateCnt",   1, "0x%x", NULL },
+  { "CstCnt",      1, "0x%x", NULL }
+};
+
+/** A parser for EX64ObjFadtPmBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtPmBlockInfoParser[] = {
+  { "Pm1aEvtBlk", 4, "0x%x", NULL },
+  { "Pm1bEvtBlk", 4, "0x%x", NULL },
+  { "Pm1aCntBlk", 4, "0x%x", NULL },
+  { "Pm1bCntBlk", 4, "0x%x", NULL },
+  { "Pm2CntBlk",  4, "0x%x", NULL },
+  { "PmTmrBlk",   4, "0x%x", NULL },
+  { "Pm1EvtLen",  1, "0x%x", NULL },
+  { "Pm1CntLen",  1, "0x%x", NULL },
+  { "Pm2CntLen",  1, "0x%x", NULL },
+  { "PmTmrLen",   1, "0x%x", NULL }
+};
+
+/** A parser for EX64ObjFadtGpeBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtGpeBlockInfoParser[] = {
+  { "Gpe0Blk",    4, "0x%x", NULL },
+  { "Gpe1Blk",    4, "0x%x", NULL },
+  { "Gpe0BlkLen", 1, "0x%x", NULL },
+  { "Gpe1BlkLen", 1, "0x%x", NULL },
+  { "Gpe1Base",   1, "0x%x", NULL }
+};
+
+/** A parser for EX64ObjFadtXpmBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtXpmBlockInfoParser[] = {
+  { "XPm1aEvtBlk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPm1bEvtBlk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPm1aCntBlk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPm1bCntBlk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPm2CntBlk",  sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPmTmrBlk",   sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) }
+};
+
+/** A parser for EX64ObjFadtXgpeBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtXgpeBlockInfoParser[] = {
+  { "XGpe0Blk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XGpe1Blk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) }
+};
+
+/** A parser for EX64ObjFadtSleepBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtSleepBlockInfoParser[] = {
+  { "SleepControlReg", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "SleepStatusReg",  sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) }
+};
+
+/** A parser for EX64ObjFadtResetBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtResetBlockInfoParser[] = {
+  { "ResetReg",   sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "ResetValue", 1,                                              "0x%x",NULL }
+};
+
+/** A parser for EX64ObjFadtMiscInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtMiscInfoParser[] = {
+  { "PLvl2Lat",    2, "0x%x", NULL },
+  { "PLvl3Lat",    2, "0x%x", NULL },
+  { "FlushSize",   2, "0x%x", NULL },
+  { "FlushStride", 2, "0x%x", NULL },
+  { "DutyOffset",  1, "0x%x", NULL },
+  { "DutyWidth",   1, "0x%x", NULL },
+  { "DayAlrm",     1, "0x%x", NULL },
+  { "MonAlrm",     1, "0x%x", NULL },
+  { "Century",     1, "0x%x", NULL }
+};
+
 /** A parser for X64 namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjReserved),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtSciInterrupt,  CmX64ObjFadtSciInterruptParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtSciCmdInfo,    CmX64ObjFadtSciCmdInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtPmBlockInfo,   CmX64ObjFadtPmBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtGpeBlockInfo,  CmX64ObjFadtGpeBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtXpmBlockInfo,  CmX64ObjFadtXpmBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtXgpeBlockInfo, CmX64ObjFadtXgpeBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtSleepBlockInfo,CmX64ObjFadtSleepBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtResetBlockInfo,CmX64ObjFadtResetBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtMiscInfo,      CmX64ObjFadtMiscInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjMax)
 };
 

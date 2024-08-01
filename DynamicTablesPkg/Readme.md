@@ -504,4 +504,13 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  ID   |  Description                              | Comments |
 | ---:  | :--------------------------               | :---     |
 |   0   | Reserved                                  | |
+|   1   | SCI Interrupt Info                        | |
+|   2   | SCI Command Info                          | |
+|   3   | Legacy Power Management Block Info        | |
+|   4   | Legacy GPE Block Info                     | |
+|   5   | Power Management Block Info               | |
+|   6   | GPE Block Info                            | |
+|   7   | Sleep Block Info                          | |
+|   8   | Reset Block Info                          | |
+|   9   | Miscellaneous Block Info                  | |
 |  `*`  | All other values are reserved.            | |
