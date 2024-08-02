@@ -799,44 +799,48 @@ SmiDefaultPFHandler (
   for (Index = 0; Index < NumOfPages; Index++) {
     PageTable  = PageTableTop;
     UpperEntry = NULL;
-    for (StartBit = Enable5LevelPaging ? 48 : 39; StartBit > EndBit; StartBit -= 9) {
+    for (StartBit = Enable5LevelPaging ? 48 : 39; StartBit > 12; StartBit -= 9) {
       PTIndex = BitFieldRead64 (PFAddress, StartBit, StartBit + 8);
-      if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
-        //
-        // If the entry is not present, allocate one page from page pool for it
-        //
-        PageTable[PTIndex] = AllocPage () | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
-      } else {
-        //
-        // Save the upper entry address
-        //
-        UpperEntry = PageTable + PTIndex;
-      }
 
       //
-      // BIT9 to BIT11 of entry is used to save access record,
-      // initialize value is 7
+      // Iterate through the page table to find the appropriate page table entry for page creation if one of the following cases is met:
+      // 1) StartBit > EndBit: The PageSize of current entry is bigger than the platform-specified PageSize granularity.
+      // 2) IA32_PG_P bit is 0 & IA32_PG_PS bit is not 0: The current entry is present and it's a non-leaf entry.
       //
-      PageTable[PTIndex] |= (UINT64)IA32_PG_A;
-      SetAccNum (PageTable + PTIndex, 7);
-      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & gPhyMask);
+      if ((StartBit > EndBit) || ((((PageTable[PTIndex] & IA32_PG_P) != 0) && ((PageTable[PTIndex] & IA32_PG_PS) == 0)))) {
+        if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
+          //
+          // If the entry is not present, allocate one page from page pool for it
+          //
+          PageTable[PTIndex] = AllocPage () | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+        } else {
+          //
+          // Save the upper entry address
+          //
+          UpperEntry = PageTable + PTIndex;
+        }
+
+        //
+        // BIT9 to BIT11 of entry is used to save access record,
+        // initialize value is 7
+        //
+        PageTable[PTIndex] |= (UINT64)IA32_PG_A;
+        SetAccNum (PageTable + PTIndex, 7);
+        PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & gPhyMask);
+      } else {
+        //
+        // Found the appropriate entry.
+        //
+        break;
+      }
     }
 
     PTIndex = BitFieldRead64 (PFAddress, StartBit, StartBit + 8);
-    if ((PageTable[PTIndex] & IA32_PG_P) != 0) {
-      //
-      // Check if the entry has already existed, this issue may occur when the different
-      // size page entries created under the same entry
-      //
-      DEBUG ((DEBUG_ERROR, "PageTable = %lx, PTIndex = %x, PageTable[PTIndex] = %lx\n", PageTable, PTIndex, PageTable[PTIndex]));
-      DEBUG ((DEBUG_ERROR, "New page table overlapped with old page table!\n"));
-      ASSERT (FALSE);
-    }
 
     //
     // Fill the new entry
     //
-    PageTable[PTIndex] = ((PFAddress | mAddressEncMask) & gPhyMask & ~((1ull << EndBit) - 1)) |
+    PageTable[PTIndex] = ((PFAddress | mAddressEncMask) & gPhyMask & ~((1ull << StartBit) - 1)) |
                          PageAttribute | IA32_PG_A | PAGE_ATTRIBUTE_BITS;
     if (UpperEntry != NULL) {
       SetSubEntriesNum (UpperEntry, (GetSubEntriesNum (UpperEntry) + 1) & 0x1FF);
@@ -845,7 +849,7 @@ SmiDefaultPFHandler (
     //
     // Get the next page address if we need to create more page tables
     //
-    PFAddress += (1ull << EndBit);
+    PFAddress += (1ull << StartBit);
   }
 }
 

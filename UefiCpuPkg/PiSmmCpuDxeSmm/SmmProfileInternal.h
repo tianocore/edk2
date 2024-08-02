@@ -142,6 +142,17 @@ IsAddressValid (
   );
 
 /**
+  Allocate free Page for PageFault handler use.
+
+  @return Page address.
+
+**/
+UINT64
+AllocPage (
+  VOID
+  );
+
+/**
   Page Fault handler for SMM use.
 
 **/
