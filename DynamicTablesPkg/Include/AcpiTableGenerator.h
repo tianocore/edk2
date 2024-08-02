@@ -2,6 +2,7 @@
 
   Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -156,8 +157,13 @@ typedef enum StdAcpiTableId {
             TableId                           \
             )
 
-/** The Creator ID for the ACPI tables generated using
+/** The generic creator ID for the ACPI tables generated using
   the standard ACPI table generators.
+*/
+#define TABLE_GENERATOR_CREATOR_ID  SIGNATURE_32('D', 'Y', 'N', 'T')
+
+/** The Creator ID for the ACPI tables generated using
+  the standard ACPI table generators for ARM.
 */
 #define TABLE_GENERATOR_CREATOR_ID_ARM  SIGNATURE_32('A', 'R', 'M', 'H')
 
