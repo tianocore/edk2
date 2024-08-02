@@ -19,6 +19,8 @@ LIST_ENTRY  mProtocolDatabase     = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolData
 LIST_ENTRY  gHandleList           = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
 EFI_LOCK    gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
 UINT64      gHandleDatabaseKey    = 0;
+UINT64      gHandleIndex = 0;
+UINT64      gHandleArray[MAX_HANDLE_NUMBER] = {0};
 
 /**
   Acquire lock on gProtocolDatabaseLock.
@@ -59,23 +61,59 @@ CoreValidateHandle (
   IN  EFI_HANDLE  UserHandle
   )
 {
-  IHANDLE     *Handle;
-  LIST_ENTRY  *Link;
+  UINTN   Index;
 
-  if (UserHandle == NULL) {
+  if ((UserHandle == NULL) || (((IHANDLE *)UserHandle)->Signature != EFI_HANDLE_SIGNATURE)) {
     return EFI_INVALID_PARAMETER;
   }
 
   ASSERT_LOCKED (&gProtocolDatabaseLock);
 
-  for (Link = gHandleList.BackLink; Link != &gHandleList; Link = Link->BackLink) {
-    Handle = CR (Link, IHANDLE, AllHandles, EFI_HANDLE_SIGNATURE);
-    if (Handle == (IHANDLE *)UserHandle) {
+  for (Index = 0; Index < gHandleIndex; Index++) {
+    if ((UINT64)(UINTN)UserHandle == gHandleArray[Index]) {
       return EFI_SUCCESS;
     }
   }
 
   return EFI_INVALID_PARAMETER;
+}
+
+/**
+  Check whether a handle is in gHandleArray
+  The gProtocolDatabaseLock must be owned
+
+  @param  UserHandle             The handle to find
+  @param  Delete                 Whether to delete the handle in gHandleArray
+
+  @retval EFI_INVALID_PARAMETER  The handle is NULL or not a valid EFI_HANDLE.
+  @retval EFI_SUCCESS            The handle is in gHandleArray.
+  @retval EFI_NOT_FOUND          The handle is not in gHandleArray.
+
+**/
+EFI_STATUS
+FindHandle (
+  IN  EFI_HANDLE  UserHandle,
+  IN  BOOLEAN     Delete
+  )
+{
+  UINTN   Index;
+
+  if ((UserHandle == NULL) || (((IHANDLE *)UserHandle)->Signature != EFI_HANDLE_SIGNATURE)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ASSERT_LOCKED (&gProtocolDatabaseLock);
+
+  for (Index = 0; Index < gHandleIndex; Index++) {
+    if ((UINT64)(UINTN)UserHandle == gHandleArray[Index]) {
+      if (Delete) {
+        gHandleArray[Index] = 0;
+      }
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
 }
 
 /**
@@ -469,7 +507,36 @@ CoreInstallProtocolInterfaceNotify (
     // in the system
     //
     InsertTailList (&gHandleList, &Handle->AllHandles);
+
+    Status = FindHandle (Handle, FALSE);
+    if (Status == EFI_NOT_FOUND) {
+      //
+      // Add the handle into gHandleArray
+      //
+      if (gHandleIndex < MAX_HANDLE_NUMBER) {
+        gHandleArray[gHandleIndex] = (UINT64)(UINTN)Handle;
+        gHandleIndex++;
+      } else {
+        ASSERT (FALSE);
+        DEBUG ((DEBUG_ERROR, "Maximum handle number reached!\n"));
+        goto Done;
+      }
+    }
   } else {
+    Status = FindHandle (Handle, FALSE);
+    if (Status == EFI_NOT_FOUND) {
+      //
+      // Add the handle into gHandleArray
+      //
+      if (gHandleIndex < MAX_HANDLE_NUMBER) {
+        gHandleArray[gHandleIndex] = (UINT64)(UINTN)Handle;
+        gHandleIndex++;
+      } else {
+        ASSERT (FALSE);
+        DEBUG ((DEBUG_ERROR, "Maximum handle number reached!\n"));
+        goto Done;
+      }
+    }
     Status = CoreValidateHandle (Handle);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "InstallProtocolInterface: input handle at 0x%x is invalid\n", Handle));
@@ -824,6 +891,7 @@ CoreUninstallProtocolInterface (
   // If there are no more handlers for the handle, free the handle
   //
   if (IsListEmpty (&Handle->Protocols)) {
+    FindHandle (Handle, TRUE);
     Handle->Signature = 0;
     RemoveEntryList (&Handle->AllHandles);
     CoreFreePool (Handle);

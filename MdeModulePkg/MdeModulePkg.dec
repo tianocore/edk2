@@ -2253,6 +2253,9 @@
   # @Prompt The value is use for Usb Network rate limiting supported.
   gEfiMdeModulePkgTokenSpaceGuid.PcdUsbNetworkRateLimitingFactor|100|UINT32|0x10000028
 
+  ## The maximum handle number of the EFI handle database. Platform could override the value accordingly.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHandleNumber|0x2000|UINT32|0x10000029
+
 [PcdsPatchableInModule]
   ## Specify memory size with page number for PEI code when
   #  Loading Module at Fixed Address feature is enabled.
