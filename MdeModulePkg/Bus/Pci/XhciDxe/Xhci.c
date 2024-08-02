@@ -2077,7 +2077,12 @@ XhcDriverBindingStart (
 
   XhcSetBiosOwnership (Xhc);
 
-  XhcResetHC (Xhc, XHC_RESET_TIMEOUT);
+  Status = XhcResetHC (Xhc, XHC_RESET_TIMEOUT);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to reset HC\n", __func__));
+    goto FREE_POOL;
+  }
+
   ASSERT (XhcIsHalt (Xhc));
 
   //
