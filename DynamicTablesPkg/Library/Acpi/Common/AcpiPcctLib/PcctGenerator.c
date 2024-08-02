@@ -1121,7 +1121,7 @@ ACPI_PCCT_GENERATOR  PcctGenerator = {
     // Minimum ACPI Table Revision supported by this Generator
     EFI_ACPI_6_4_PLATFORM_COMMUNICATION_CHANNEL_TABLE_REVISION,
     // Creator ID
-    TABLE_GENERATOR_CREATOR_ID_ARM,
+    TABLE_GENERATOR_CREATOR_ID,
     // Creator Revision
     PCCT_GENERATOR_REVISION,
     // Build Table function

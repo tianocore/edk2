@@ -1168,7 +1168,7 @@ ACPI_PCI_GENERATOR  SsdtPcieGenerator = {
     // Minimum ACPI Table Revision - Unused
     0,
     // Creator ID
-    TABLE_GENERATOR_CREATOR_ID_ARM,
+    TABLE_GENERATOR_CREATOR_ID,
     // Creator Revision
     SSDT_PCI_GENERATOR_REVISION,
     // Build table function. Use the extended version instead.

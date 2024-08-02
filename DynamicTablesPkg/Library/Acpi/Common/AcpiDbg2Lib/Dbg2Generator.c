@@ -534,7 +534,7 @@ ACPI_TABLE_GENERATOR  Dbg2Generator = {
   // Minimum supported ACPI Table Revision
   EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION,
   // Creator ID
-  TABLE_GENERATOR_CREATOR_ID_ARM,
+  TABLE_GENERATOR_CREATOR_ID,
   // Creator Revision
   DBG2_GENERATOR_REVISION,
   // Build table function. Use the extended version instead.

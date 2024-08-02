@@ -1403,7 +1403,7 @@ ACPI_PPTT_GENERATOR  PpttGenerator = {
     // Minimum supported ACPI Table Revision
     EFI_ACPI_6_3_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_REVISION,
     // Creator ID
-    TABLE_GENERATOR_CREATOR_ID_ARM,
+    TABLE_GENERATOR_CREATOR_ID,
     // Creator Revision
     PPTT_GENERATOR_REVISION,
     // Build Table function
