@@ -2,7 +2,7 @@
   ERST table parser
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
-  Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -70,6 +70,7 @@ STATIC CONST CHAR16  *ErstInstructionTable[] = {
   Validate Erst action.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -77,8 +78,9 @@ STATIC
 VOID
 EFIAPI
 ValidateErstAction (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*Ptr > EFI_ACPI_6_4_ERST_GET_EXECUTE_OPERATION_TIMINGS) {
@@ -91,6 +93,7 @@ ValidateErstAction (
   Validate Erst instruction.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -98,8 +101,9 @@ STATIC
 VOID
 EFIAPI
 ValidateErstInstruction (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*Ptr > EFI_ACPI_6_4_ERST_MOVE_DATA) {
@@ -112,6 +116,7 @@ ValidateErstInstruction (
   Validate Erst flags.
 
   @param [in] Ptr       Pointer to the start of the field data.
+  @param [in] Length    Length of the field.
   @param [in] Context   Pointer to context specific information e.g. this
                         could be a pointer to the ACPI table header.
 **/
@@ -119,8 +124,9 @@ STATIC
 VOID
 EFIAPI
 ValidateErstFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if ((*Ptr & 0xfe) != 0) {
@@ -165,13 +171,15 @@ FormatByte (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the Action byte.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpErstAction (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   FormatByte (ErstActionTable, *Ptr, ARRAY_SIZE (ErstActionTable));
@@ -182,13 +190,15 @@ DumpErstAction (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the Instruction byte.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpErstInstruction (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   FormatByte (ErstInstructionTable, *Ptr, ARRAY_SIZE (ErstInstructionTable));

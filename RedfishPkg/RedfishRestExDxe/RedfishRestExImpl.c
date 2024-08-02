@@ -110,7 +110,7 @@ RedfishCheckHttpReceiveStatus (
   if the write to URL is permitted by Redfish service. This function
   checks if the HTTP request has Content-length in HTTP header. If yes,
   set HTTP body to NULL and then send to service. Check the HTTP status
-  for the firther actions.
+  for the further actions.
 
   @param[in]  This                    Pointer to EFI_REST_EX_PROTOCOL instance for a particular
                                       REST service.

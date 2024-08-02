@@ -171,7 +171,7 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0
 
 #
-# Optinal feature to help prevent EFI memory map fragments
+# Optional feature to help prevent EFI memory map fragments
 # Turned on and off via: PcdPrePiProduceMemoryTypeInformationHob
 # Values are in EFI Pages (4K). DXE Core will make sure that
 # at least this much of each type of memory can be allocated
