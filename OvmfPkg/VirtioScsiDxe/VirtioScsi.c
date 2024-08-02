@@ -610,7 +610,7 @@ VirtioScsiPassThru (
   VirtioAppendDesc (
     &Dev->Ring,
     RequestDeviceAddress,
-    sizeof Request,
+    sizeof (*Request),
     VRING_DESC_F_NEXT,
     &Indices
     );
