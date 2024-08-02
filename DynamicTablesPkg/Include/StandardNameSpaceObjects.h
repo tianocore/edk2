@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -113,6 +114,18 @@ typedef struct CmAStdObjAcpiTableInfo {
   /// e.g. This field can be used to specify the minor revision to be set
   /// for the FADT table.
   UINT8     MinorRevision;
+
+  /// The creator ID of the ACPI table.
+  /// Note: If this field is not populated (has value of Zero), then the
+  /// Generators shall populate this information based on the generator's
+  /// CreeaterId. This is the ID for the ASL Compiler.
+  UINT32    CreatorId;
+
+  /// The creator revision of the ACPI table.
+  /// Note: If this field is not populated (has value of Zero), then the
+  /// Generators shall populate this information based on the generator's
+  /// CreeaterRevision. This is the revision of the ASL Compiler.
+  UINT32    CreatorRevision;
 } CM_STD_OBJ_ACPI_TABLE_INFO;
 
 /** A structure used to describe the SMBIOS table generators to be invoked.

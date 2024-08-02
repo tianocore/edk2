@@ -184,9 +184,18 @@ AddAcpiHeader (
   }
 
   // UINT32  CreatorId
-  AcpiHeader->CreatorId = Generator->CreatorId;
+  if (AcpiTableInfo->CreatorId != 0) {
+    AcpiHeader->CreatorId = AcpiTableInfo->CreatorId;
+  } else {
+    AcpiHeader->CreatorId = Generator->CreatorId;
+  }
+
   // UINT32  CreatorRevision
-  AcpiHeader->CreatorRevision = Generator->CreatorRevision;
+  if (AcpiTableInfo->CreatorRevision != 0) {
+    AcpiHeader->CreatorRevision = AcpiTableInfo->CreatorRevision;
+  } else {
+    AcpiHeader->CreatorRevision = Generator->CreatorRevision;
+  }
 
 error_handler:
   return Status;
