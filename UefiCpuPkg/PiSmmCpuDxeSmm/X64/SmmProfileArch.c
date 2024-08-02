@@ -358,7 +358,7 @@ RestorePageTableAbove4G (
   // If page entry does not existed in page table at all, create a new entry.
   //
   if (!Existed) {
-    if (IsAddressValid (PFAddress, &Nx)) {
+    if (IsSmmProfilePFAddressAbove4GValid (PFAddress, &Nx)) {
       //
       // If page fault address above 4GB is in protected range but it causes a page fault exception,
       // Will create a page entry for this page fault address, make page table entry as present/rw and execution-disable.
@@ -401,7 +401,7 @@ RestorePageTableAbove4G (
       PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & PHYSICAL_ADDRESS_MASK);
       for (Index = 0; Index < 512; Index++) {
         PageTable[Index] = Address | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
-        if (!IsAddressValid (Address, &Nx)) {
+        if (!IsSmmProfilePFAddressAbove4GValid (Address, &Nx)) {
           PageTable[Index] = PageTable[Index] & (INTN)(INT32)(~PAGE_ATTRIBUTE_BITS);
         }
 
@@ -419,7 +419,7 @@ RestorePageTableAbove4G (
       //
       // Update 2MB page entry.
       //
-      if (!IsAddressValid (Address, &Nx)) {
+      if (!IsSmmProfilePFAddressAbove4GValid (Address, &Nx)) {
         //
         // Patch to remove present flag and rw flag.
         //

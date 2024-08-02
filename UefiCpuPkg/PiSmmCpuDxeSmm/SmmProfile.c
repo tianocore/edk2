@@ -298,41 +298,35 @@ IsInSmmRanges (
 }
 
 /**
-  Check if the memory address will be mapped by 4KB-page.
+  Check if the SMM profile page fault address above 4GB is in protected range or not.
 
-  @param  Address  The address of Memory.
-  @param  Nx       The flag indicates if the memory is execute-disable.
+  @param[in]   Address  The address of Memory.
+  @param[out]  Nx       The flag indicates if the memory is execute-disable.
+
+  @retval TRUE     The input address is in protected range.
+  @retval FALSE    The input address is not in protected range.
 
 **/
 BOOLEAN
-IsAddressValid (
-  IN EFI_PHYSICAL_ADDRESS  Address,
-  IN BOOLEAN               *Nx
+IsSmmProfilePFAddressAbove4GValid (
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  OUT BOOLEAN               *Nx
   )
 {
   UINTN  Index;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-    //
-    // Check configuration
-    //
-    for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
-      if ((Address >= mProtectionMemRange[Index].Range.Base) && (Address < mProtectionMemRange[Index].Range.Top)) {
-        *Nx = mProtectionMemRange[Index].Nx;
-        return mProtectionMemRange[Index].Present;
-      }
+  //
+  // Check configuration
+  //
+  for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
+    if ((Address >= mProtectionMemRange[Index].Range.Base) && (Address < mProtectionMemRange[Index].Range.Top)) {
+      *Nx = mProtectionMemRange[Index].Nx;
+      return mProtectionMemRange[Index].Present;
     }
-
-    *Nx = TRUE;
-    return FALSE;
-  } else {
-    *Nx = TRUE;
-    if (IsInSmmRanges (Address)) {
-      *Nx = FALSE;
-    }
-
-    return TRUE;
   }
+
+  *Nx = TRUE;
+  return FALSE;
 }
 
 /**
