@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define  _HAND_H_
 
 #define EFI_HANDLE_SIGNATURE  SIGNATURE_32('h','n','d','l')
+#define MAX_HANDLE_NUMBER     FixedPcdGet32 (PcdMaxHandleNumber)
 
 ///
 /// IHANDLE - contains a list of protocol handles
