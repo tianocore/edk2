@@ -443,8 +443,12 @@ ParseIrqMap (
     // Interrupt controller interrupt and flags
     PciInterruptMapInfo[Index].IntcInterrupt.Interrupt =
       FdtGetInterruptId ((UINT32 *)&Data[Offset]);
-    PciInterruptMapInfo[Index].IntcInterrupt.Flags =
-      FdtGetInterruptFlags ((UINT32 *)&Data[Offset]);
+    if (IntcCells > 1) {
+      PciInterruptMapInfo[Index].IntcInterrupt.Flags =
+        FdtGetInterruptFlags ((UINT32 *)&Data[Offset]);
+    } else {
+      PciInterruptMapInfo[Index].IntcInterrupt.Flags = 0x0;
+    }
   } // for
 
   PciInfo->Mapping[PciMappingTableInterrupt].ObjectId =
