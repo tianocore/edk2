@@ -443,6 +443,16 @@ ParseIrqMap (
     // Interrupt controller interrupt and flags
     PciInterruptMapInfo[Index].IntcInterrupt.Interrupt =
       FdtGetInterruptId ((UINT32 *)&Data[Offset]);
+
+    /*
+     * In RISC-V, GSI space can be divided among multiple APLIC/PLICs.
+     * So, convert the interrupt number in DT to appropriate GSI number
+     * using the parent interrupt controller information.
+     */
+ #if defined (MDE_CPU_RISCV64)
+    PciInterruptMapInfo[Index].IntcInterrupt.Interrupt =
+      FdtConvertToGsi (IntcNode, PciInterruptMapInfo[Index].IntcInterrupt.Interrupt);
+ #endif
     if (IntcCells > 1) {
       PciInterruptMapInfo[Index].IntcInterrupt.Flags =
         FdtGetInterruptFlags ((UINT32 *)&Data[Offset]);
