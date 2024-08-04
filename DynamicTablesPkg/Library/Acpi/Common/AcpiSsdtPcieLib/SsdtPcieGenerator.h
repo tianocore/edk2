@@ -16,6 +16,13 @@
 #ifndef SSDT_PCIE_GENERATOR_H_
 #define SSDT_PCIE_GENERATOR_H_
 
+UINT32
+ArchGetGsiIrqId (
+  IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN UINT32                                                   IrqId,
+  IN INT32                                                    IntcPhandle
+  );
+
 /** Pci address attributes.
 
   This can also be denoted as space code, address space or ss.

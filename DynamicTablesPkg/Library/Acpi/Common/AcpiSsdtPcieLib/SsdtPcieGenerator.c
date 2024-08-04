@@ -379,6 +379,14 @@ GeneratePrt (
 
  #endif
 
+ #if defined (MDE_CPU_RISCV64)
+    IrqMapInfo->IntcInterrupt.Interrupt = ArchGetGsiIrqId (
+                                            CfgMgrProtocol,
+                                            IrqMapInfo->IntcInterrupt.Interrupt,
+                                            IrqMapInfo->IntcInterrupt.Phandle
+                                            );
+ #endif
+
     // Add the device to the DeviceTable.
     MappingTableAdd (&Generator->DeviceTable, IrqMapInfo->PciDevice);
 
