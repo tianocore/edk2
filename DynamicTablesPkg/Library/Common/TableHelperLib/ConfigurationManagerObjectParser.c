@@ -317,7 +317,8 @@ STATIC CONST CM_OBJ_PARSER  CmArmIdMappingParser[] = {
 */
 STATIC CONST CM_OBJ_PARSER  CmArchCommonGenericInterruptParser[] = {
   { "Interrupt", 4, "0x%x", NULL },
-  { "Flags",     4, "0x%x", NULL }
+  { "Flags",     4, "0x%x", NULL },
+  { "Phandle",   4, "0x%x", NULL }
 };
 
 /** A parser for EArchCommonObjProcHierarchyInfo.

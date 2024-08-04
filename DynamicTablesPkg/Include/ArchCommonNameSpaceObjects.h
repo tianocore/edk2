@@ -203,6 +203,9 @@ typedef struct CmArchCommonGenericInterrupt {
   /// BIT1: 0: Interrupt is Active high
   ///       1: Interrupt is Active low
   UINT32    Flags;
+
+  // Phandle
+  INT32     Phandle;
 } CM_ARCH_COMMON_GENERIC_INTERRUPT;
 
 /** A structure that describes a PCI Interrupt Map.

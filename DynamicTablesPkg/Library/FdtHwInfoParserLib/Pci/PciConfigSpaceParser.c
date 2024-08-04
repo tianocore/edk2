@@ -432,6 +432,7 @@ ParseIrqMap (
     PciInterruptMapInfo[Index].PciInterrupt -= 1;
     Offset                                  += PCI_INTERRUPTS_CELLS * sizeof (UINT32);
 
+    PciInterruptMapInfo[Index].IntcInterrupt.Phandle = fdt32_to_cpu (*(UINT32 *)&Data[Offset]);
     // PHandle (skip it)
     Offset += sizeof (UINT32);
 
