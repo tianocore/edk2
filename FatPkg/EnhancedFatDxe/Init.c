@@ -61,6 +61,30 @@ FatAllocateVolume (
   //
   Volume->RootDirEnt.FileString       = Volume->RootFileString;
   Volume->RootDirEnt.Entry.Attributes = FAT_ATTRIBUTE_DIRECTORY;
+
+  //
+  // Check to see if the underlying block device's BlockSize meets what the FAT spec requires
+  //
+  if ((BlockIo == NULL) || (BlockIo->Media == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a BlockIo or BlockIo is NULL!\n", __func__));
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if ((BlockIo->Media->BlockSize > (1 << MAX_BLOCK_ALIGNMENT)) ||
+      (BlockIo->Media->BlockSize < (1 << MIN_BLOCK_ALIGNMENT)))
+  {
+    Status = EFI_UNSUPPORTED;
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a invalid BlockIo BlockSize %u for FAT filesystem on MediaId %u. Min 512b, max 4kb\n",
+      __func__,
+      BlockIo->Media->BlockSize,
+      BlockIo->Media->MediaId
+      ));
+    goto Done;
+  }
+
   //
   // Check to see if there's a file system on the volume
   //
