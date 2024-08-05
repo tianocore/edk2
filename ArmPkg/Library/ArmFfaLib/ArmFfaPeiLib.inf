@@ -1,0 +1,45 @@
+## @file
+#  Provides FF-A ABI Library used in PEI Driver.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmFfaPeiLib
+  FILE_GUID                      = 6e21912a-5f50-11ef-a3ae-dfe665fd4fc0
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmFfaLib|PEIM
+  CONSTRUCTOR                    = ArmFfaPeiLibConstructor
+
+[Sources]
+  ArmFfaCommon.h
+  ArmFfaCommon.c
+  ArmFfaRxTxMap.h
+  ArmFfaRxTxMap.c
+  ArmFfaPeiLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+  ArmSvcLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdFfaLibConduitSmc
+  gArmTokenSpaceGuid.PcdFfaTxBuffer
+  gArmTokenSpaceGuid.PcdFfaRxBuffer
+  gArmTokenSpaceGuid.PcdFfaTxRxPageCount
+  gArmTokenSpaceGuid.PcdFfaExitBootEventRegistered
+
+[Guids]
+  gArmFfaRxTxBufferInfoGuid

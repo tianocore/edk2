@@ -106,6 +106,7 @@
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
 
 [Components.common]
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
@@ -139,6 +140,7 @@
   ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
   ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+  ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
   ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
