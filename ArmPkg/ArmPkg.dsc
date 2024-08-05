@@ -70,6 +70,7 @@
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
+  ArmSvcLib|ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   OpteeLib|ArmPkg/Library/OpteeLib/OpteeLib.inf
@@ -87,6 +88,7 @@
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
   ArmMtlLib|ArmPkg/Library/ArmMtlNullLib/ArmMtlNullLib.inf
 
@@ -135,6 +137,7 @@
   ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
   ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+  ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
