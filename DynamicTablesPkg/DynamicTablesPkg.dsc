@@ -35,7 +35,6 @@
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
   PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
 

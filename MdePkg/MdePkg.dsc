@@ -194,6 +194,7 @@
 [Components.ARM, Components.AARCH64]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicArmVirt.inf
   MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
+  MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
 [Components.RISCV64]
   MdePkg/Library/BaseRiscVSbiLib/BaseRiscVSbiLib.inf

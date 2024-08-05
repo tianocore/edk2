@@ -73,7 +73,6 @@
   DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 [LibraryClasses.common.PEIM]
