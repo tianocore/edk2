@@ -20,6 +20,13 @@
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
 
+[LibraryClasses.ARM]
+  #
+  # This library provides software defined floating point functionality for ARM
+  # which is used by OpenSSL.
+  #
+  SoftFloatLib|MdePkg/Library/SoftFloatLib/SoftFloatLib.inf
+
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
   # It is not possible to prevent the ARM compiler for generic intrinsic functions.

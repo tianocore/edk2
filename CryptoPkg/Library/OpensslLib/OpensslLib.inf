@@ -667,7 +667,7 @@
   RngLib
 
 [LibraryClasses.ARM]
-  ArmSoftFloatLib
+  SoftFloatLib
 
 [BuildOptions]
   #

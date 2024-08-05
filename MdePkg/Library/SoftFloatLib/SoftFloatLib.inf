@@ -11,11 +11,11 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001B
-  BASE_NAME                      = ArmSoftFloatLib
-  FILE_GUID                      = a485f921-749e-41a0-9f91-62f09a38721c
+  BASE_NAME                      = SoftFloatLib
+  FILE_GUID                      = C32116FA-C639-406D-950F-FE9B691122A8
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ArmSoftFloatLib
+  LIBRARY_CLASS                  = SoftFloatLib
 
 #
 #  VALID_ARCHITECTURES           = ARM
@@ -82,7 +82,7 @@
   berkeley-softfloat-3/source/ui64_to_f32.c
   berkeley-softfloat-3/source/ui64_to_f64.c
 
-  ArmSoftFloatLib.c
+  SoftFloatLib.c
   platform.h
 
 [Packages]
