@@ -32,6 +32,13 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Generate Token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.TIANOCORE_ASSIGN_REVIEWERS_APPLICATION_ID }}
+          private-key: ${{ secrets.TIANOCORE_ASSIGN_REVIEWERS_APPLICATION_PRIVATE_KEY }}
+
       # Reduce checkout time with sparse-checkout
       #   - .github: Contains the scripts to interact with Github and add reviewers
       #   - BaseTools/Scripts: Contains the GetMaintainer.py script
@@ -57,7 +64,7 @@ jobs:
 
       - name: Add Reviewers to Pull Request
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
           ORG_NAME: ${{ github.repository_owner }}
           PR_NUMBER: ${{ github.event.number}}
           REPO_NAME: ${{ github.event.pull_request.base.repo.name }}
