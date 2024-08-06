@@ -23,9 +23,6 @@
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
 
-[FeaturePcd.ARM, FeaturePcd.AARCH64]
-  gArmTokenSpaceGuid.PcdFfaEnable
-
 [LibraryClasses]
   ArmLib
   CacheMaintenanceLib
