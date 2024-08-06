@@ -1058,7 +1058,7 @@ typedef UINTN RETURN_STATUS;
   @retval FALSE         The high bit of StatusCode is clear.
 
 **/
-#define RETURN_ERROR(StatusCode)  (((INTN)(RETURN_STATUS)(StatusCode)) < 0)
+#define RETURN_ERROR(StatusCode)  (((RETURN_STATUS)(StatusCode)) >= MAX_BIT)
 
 ///
 /// The operation completed successfully.
