@@ -76,6 +76,12 @@ SvsmCaa:
   DD  SVSM_CAA_SIZE
   DD  OVMF_SECTION_TYPE_SVSM_CAA
 
+; Region need to be pre-validated by the hypervisor
+PreValidate3:
+  DD  SNP_SEC_MEM_BASE_DESC_3
+  DD  SNP_SEC_MEM_SIZE_DESC_3
+  DD  OVMF_SECTION_TYPE_SNP_SEC_MEM
+
 %if (SEV_SNP_KERNEL_HASHES_BASE > 0)
 ; Kernel hashes for measured direct boot, or zero page if
 ; there are no kernel hashes / SEV secrets
@@ -85,10 +91,5 @@ SevSnpKernelHashes:
   DD  OVMF_SECTION_TYPE_KERNEL_HASHES
 %endif
 
-; Region need to be pre-validated by the hypervisor
-PreValidate3:
-  DD  SNP_SEC_MEM_BASE_DESC_3
-  DD  SNP_SEC_MEM_SIZE_DESC_3
-  DD  OVMF_SECTION_TYPE_SNP_SEC_MEM
 OvmfSevGuidedStructureEnd:
   ALIGN   16
