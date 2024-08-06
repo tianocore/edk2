@@ -6,7 +6,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 
 /*
   Semihosting operation request mechanism

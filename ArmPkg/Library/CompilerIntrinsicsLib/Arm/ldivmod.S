@@ -6,7 +6,7 @@
 //
 //------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 
 //
 // A pair of (unsigned) long longs is returned in {{r0, r1}, {r2, r3}},

@@ -6,7 +6,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 
 ASM_FUNC(__divsi3)
   eor  r3, r0, r0, asr #31

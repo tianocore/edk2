@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 
 ASM_FUNC(ArmReadMidr)
   mrc     p15,0,R0,c0,c0,0
