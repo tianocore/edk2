@@ -6,7 +6,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
+#include <Arm/AsmMacroIoLib.h>
 
 ASM_FUNC(__divdi3)
   @ args = 0, pretend = 0, frame = 0

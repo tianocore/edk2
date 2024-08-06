@@ -7,7 +7,7 @@
 .text
 .align 3
 
-#include <AsmMacroIoLibV8.h>
+#include <AArch64/AsmMacroIoLibV8.h>
 #include <IndustryStandard/ArmStdSmc.h>
 #include <Library/ArmLib.h>
 

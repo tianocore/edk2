@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLibV8.h>
+#include <AArch64/AsmMacroIoLibV8.h>
 
 ASM_FUNC(GccSemihostCall)
   hlt     #0xf000

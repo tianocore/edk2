@@ -6,7 +6,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
+#include <Arm/AsmMacroIoLib.h>
 
 ASM_FUNC(__ashrdi3)
   cmp  r2, #31

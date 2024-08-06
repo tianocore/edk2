@@ -5,7 +5,7 @@
 //
 //
 
-#include <AsmMacroIoLib.h>
+#include <Arm/AsmMacroIoLib.h>
 
 ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
