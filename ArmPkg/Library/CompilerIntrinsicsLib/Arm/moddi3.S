@@ -6,7 +6,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 
 ASM_FUNC(__moddi3)
   stmfd  sp!, {r4, r5, r7, lr}

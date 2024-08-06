@@ -6,7 +6,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 
 ASM_FUNC(__clzsi2)
   @ frame_needed = 1, uses_anonymous_args = 0
