@@ -810,12 +810,18 @@ FtwGetLastWriteHeader (
   FtwHeader       = (EFI_FAULT_TOLERANT_WRITE_HEADER *)(FtwWorkSpaceHeader + 1);
   Offset          = sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER);
 
+  if (!CompareGuid (&FtwWorkSpaceHeader->Signature, &gEdkiiWorkingBlockSignatureGuid)) {
+    *FtwWriteHeader = FtwHeader;
+    return EFI_ABORTED;
+  }
+
   while (FtwHeader->Complete == FTW_VALID_STATE) {
     Offset += FTW_WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites, FtwHeader->PrivateDataSize);
     //
     // If Offset exceed the FTW work space boudary, return error.
     //
-    if (Offset >= FtwWorkSpaceSize) {
+
+    if ((Offset + sizeof (EFI_FAULT_TOLERANT_WRITE_HEADER)) >= FtwWorkSpaceSize) {
       *FtwWriteHeader = FtwHeader;
       return EFI_ABORTED;
     }
