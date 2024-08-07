@@ -923,6 +923,9 @@ HttpBootGetBootFileCallback (
                                    BufferSize has been updated with the size needed to complete
                                    the request.
   @retval EFI_ACCESS_DENIED        The server needs to authenticate the client.
+  @retval EFI_NOT_READY            Data transfer has timed-out, call HttpBootGetBootFile again to resume
+                                   the download operation using HTTP Range headers.
+  @retval EFI_UNSUPPORTED          Some HTTP response header is not supported.
   @retval Others                   Unexpected error happened.
 
 **/
@@ -955,6 +958,9 @@ HttpBootGetBootFile (
   CHAR8                    BaseAuthValue[80];
   EFI_HTTP_HEADER          *HttpHeader;
   CHAR8                    *Data;
+  UINTN                    HeadersCount;
+  BOOLEAN                  ResumingOperation;
+  CHAR8                    *ContentRangeResponseValue;
 
   ASSERT (Private != NULL);
   ASSERT (Private->HttpCreated);
@@ -983,6 +989,16 @@ HttpBootGetBootFile (
       FreePool (Url);
       return Status;
     }
+  }
+
+  // Check if this is a previous download that has failed and need to be resumed
+  if ((HeaderOnly == FALSE) &&
+      (Private->PartialTransferredSize > 0) &&
+      (Private->BootFileSize == *BufferSize))
+  {
+    ResumingOperation = TRUE;
+  } else {
+    ResumingOperation = FALSE;
   }
 
   //
@@ -1014,8 +1030,23 @@ HttpBootGetBootFile (
   //       Accept
   //       User-Agent
   //       [Authorization]
+  //       [Range]
+  //       [If-Match]|[If-Unmodified-Since]
   //
-  HttpIoHeader = HttpIoCreateHeader ((Private->AuthData != NULL) ? 4 : 3);
+  HeadersCount = 3;
+  if (Private->AuthData != NULL) {
+    HeadersCount++;
+  }
+
+  if (ResumingOperation) {
+    HeadersCount++;
+    if (Private->LastModifiedOrEtag) {
+      HeadersCount++;
+    }
+  }
+
+  HttpIoHeader = HttpIoCreateHeader (HeadersCount);
+
   if (HttpIoHeader == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ERROR_2;
@@ -1094,6 +1125,55 @@ HttpBootGetBootFile (
                );
     if (EFI_ERROR (Status)) {
       goto ERROR_3;
+    }
+  }
+
+  //
+  // Add HTTP header field 5 (optional): Range
+  //
+  if (ResumingOperation) {
+    // Resuming a failed download. Prepare the HTTP Range Header
+    AsciiSPrint (
+      BaseAuthValue,
+      sizeof (BaseAuthValue),
+      "bytes=%lu-%lu",
+      Private->PartialTransferredSize,
+      Private->BootFileSize - 1
+      );
+
+    Status = HttpIoSetHeader (HttpIoHeader, "Range", BaseAuthValue);
+    if (EFI_ERROR (Status)) {
+      goto ERROR_3;
+    }
+
+    DEBUG (
+      (DEBUG_WARN | DEBUG_INFO,
+       "HttpBootGetBootFile: Resuming failed download. Range: %a\n",
+       BaseAuthValue)
+      );
+
+    // Add If-Unmodified-Since header with the value got from the first request when resuming a download!
+    if (Private->LastModifiedOrEtag) {
+      if (Private->LastModifiedOrEtag[0] == '"') {
+        // ETag starts with "
+        DEBUG (
+          (DEBUG_WARN | DEBUG_INFO,
+           "HttpBootGetBootFile: If-Match=%a\n",
+           Private->LastModifiedOrEtag)
+          );
+        Status = HttpIoSetHeader (HttpIoHeader, HTTP_HEADER_IF_MATCH, Private->LastModifiedOrEtag);
+      } else {
+        DEBUG (
+          (DEBUG_WARN | DEBUG_INFO,
+           "HttpBootGetBootFile: If-Unmodified-Since=%a\n",
+           Private->LastModifiedOrEtag)
+          );
+        Status = HttpIoSetHeader (HttpIoHeader, "If-Unmodified-Since", Private->LastModifiedOrEtag);
+      }
+
+      if (EFI_ERROR (Status)) {
+        goto ERROR_3;
+      }
     }
   }
 
@@ -1245,6 +1325,62 @@ HttpBootGetBootFile (
     Cache->ImageType    = *ImageType;
   }
 
+  // Cache ETag or Last-Modified response header value to
+  // be used when resuming an interrupted download.
+  HttpHeader = HttpFindHeader (
+                 ResponseData->HeaderCount,
+                 ResponseData->Headers,
+                 HTTP_HEADER_ETAG
+                 );
+  if (HttpHeader == NULL) {
+    HttpHeader = HttpFindHeader (
+                   ResponseData->HeaderCount,
+                   ResponseData->Headers,
+                   "Last-Modified"
+                   );
+  }
+
+  if (HttpHeader) {
+    if (Private->LastModifiedOrEtag) {
+      FreePool (Private->LastModifiedOrEtag);
+    }
+
+    Private->LastModifiedOrEtag = AllocateCopyPool (AsciiStrSize (HttpHeader->FieldValue), HttpHeader->FieldValue);
+  }
+
+  //
+  // 3.2.2 Validate the range response. If operation is being resumed,
+  // server must respond with Content-Range.
+  //
+  if (ResumingOperation) {
+    HttpHeader = HttpFindHeader (
+                   ResponseData->HeaderCount,
+                   ResponseData->Headers,
+                   "Content-Range"
+                   );
+    if ((HttpHeader == NULL) ||
+        (AsciiStrnCmp (HttpHeader->FieldValue, "bytes", 5) != 0))
+    {
+      Status = EFI_UNSUPPORTED;
+      goto ERROR_5;
+    }
+
+    // Gets the total size of ranged data (Content-Range: <unit> <range-start>-<range-end>/<size>)
+    // and check if it remains the same
+    ContentRangeResponseValue = AsciiStrStr (HttpHeader->FieldValue, "/");
+    if (ContentRangeResponseValue == NULL) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ERROR_5;
+    }
+
+    ContentRangeResponseValue++;
+    ContentLength = AsciiStrDecimalToUintn (ContentRangeResponseValue);
+    if (ContentLength != *BufferSize) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ERROR_5;
+    }
+  }
+
   //
   // 3.3 Init a message-body parser from the header information.
   //
@@ -1295,10 +1431,15 @@ HttpBootGetBootFile (
       // In identity transfer-coding there is no need to parse the message body,
       // just download the message body to the user provided buffer directly.
       //
+      if (ResumingOperation && ((ContentLength + Private->PartialTransferredSize) > *BufferSize)) {
+        Status = EFI_INVALID_PARAMETER;
+        goto ERROR_6;
+      }
+
       ReceivedSize = 0;
       while (ReceivedSize < ContentLength) {
-        ResponseBody.Body       = (CHAR8 *)Buffer + ReceivedSize;
-        ResponseBody.BodyLength = *BufferSize - ReceivedSize;
+        ResponseBody.Body       = (CHAR8 *)Buffer + (ReceivedSize + Private->PartialTransferredSize);
+        ResponseBody.BodyLength = *BufferSize - (ReceivedSize + Private->PartialTransferredSize);
         Status                  = HttpIoRecvResponse (
                                     &Private->HttpIo,
                                     FALSE,
@@ -1307,6 +1448,21 @@ HttpBootGetBootFile (
         if (EFI_ERROR (Status) || EFI_ERROR (ResponseBody.Status)) {
           if (EFI_ERROR (ResponseBody.Status)) {
             Status = ResponseBody.Status;
+          }
+
+          if ((Status == EFI_TIMEOUT) || (Status == EFI_DEVICE_ERROR)) {
+            // Indicate to the caller that operation may be retried to resume the download.
+            // We will not check if server sent Accept-Ranges header, because some back-ends
+            // do not report this header, even when supporting it. Know example: CloudFlare CDN Cache.
+            Status                          = EFI_NOT_READY;
+            Private->PartialTransferredSize = ReceivedSize;
+            DEBUG (
+              (
+               DEBUG_WARN | DEBUG_INFO,
+               "HttpBootGetBootFile: Transfer error. Bytes transferred so far: %lu.\n",
+               ReceivedSize
+              )
+              );
           }
 
           goto ERROR_6;
@@ -1326,6 +1482,9 @@ HttpBootGetBootFile (
           }
         }
       }
+
+      // download completed, there is no more partial data
+      Private->PartialTransferredSize = 0;
     } else {
       //
       // In "chunked" transfer-coding mode, so we need to parse the received
@@ -1385,9 +1544,13 @@ HttpBootGetBootFile (
   //
   // 3.5 Message-body receive & parse is completed, we should be able to get the file size now.
   //
-  Status = HttpGetEntityLength (Parser, &ContentLength);
-  if (EFI_ERROR (Status)) {
-    goto ERROR_6;
+  if (ResumingOperation == FALSE) {
+    Status = HttpGetEntityLength (Parser, &ContentLength);
+    if (EFI_ERROR (Status)) {
+      goto ERROR_6;
+    }
+  } else {
+    ContentLength = Private->BootFileSize;
   }
 
   if (*BufferSize < ContentLength) {
