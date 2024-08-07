@@ -277,6 +277,12 @@ DxeMain (
   MemoryProfileInit (HobStart);
 
   //
+  // Start the Handle Services.
+  //
+  Status = CoreInitializeHandleServices ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
   // Start the Image Services.
   //
   Status = CoreInitializeImageServices (HobStart);

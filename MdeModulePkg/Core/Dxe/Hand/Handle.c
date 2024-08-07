@@ -15,10 +15,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // gProtocolDatabaseLock - Lock to protect the mProtocolDatabase
 // gHandleDatabaseKey    -  The Key to show that the handle has been created/modified
 //
-LIST_ENTRY  mProtocolDatabase     = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
-LIST_ENTRY  gHandleList           = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
-EFI_LOCK    gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
-UINT64      gHandleDatabaseKey    = 0;
+LIST_ENTRY          mProtocolDatabase     = INITIALIZE_LIST_HEAD_VARIABLE (mProtocolDatabase);
+LIST_ENTRY          gHandleList           = INITIALIZE_LIST_HEAD_VARIABLE (gHandleList);
+EFI_LOCK            gProtocolDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE (TPL_NOTIFY);
+UINT64              gHandleDatabaseKey    = 0;
+ORDERED_COLLECTION  *gOrderedHandleList   = NULL;
 
 /**
   Acquire lock on gProtocolDatabaseLock.
@@ -45,6 +46,60 @@ CoreReleaseProtocolLock (
 }
 
 /**
+  Comparator function for two opaque pointers, ordering on (unsigned) pointer
+  value itself.
+  Can be used as both Key and UserStruct comparator.
+
+  @param[in] Pointer1  First pointer.
+
+  @param[in] Pointer2  Second pointer.
+
+  @retval <0  If Pointer1 compares less than Pointer2.
+
+  @retval  0  If Pointer1 compares equal to Pointer2.
+
+  @retval >0  If Pointer1 compares greater than Pointer2.
+**/
+STATIC
+INTN
+EFIAPI
+PointerCompare (
+  IN CONST VOID  *Pointer1,
+  IN CONST VOID  *Pointer2
+  )
+{
+  if (Pointer1 == Pointer2) {
+    return 0;
+  }
+
+  if ((UINTN)Pointer1 < (UINTN)Pointer2) {
+    return -1;
+  }
+
+  return 1;
+}
+
+/**
+  Initializes "handle" support.
+
+  @return Status code.
+
+**/
+EFI_STATUS
+CoreInitializeHandleServices (
+  VOID
+  )
+{
+  gOrderedHandleList = OrderedCollectionInit (PointerCompare, PointerCompare);
+
+  if (gOrderedHandleList == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Check whether a handle is a valid EFI_HANDLE
   The gProtocolDatabaseLock must be owned
 
@@ -59,8 +114,7 @@ CoreValidateHandle (
   IN  EFI_HANDLE  UserHandle
   )
 {
-  IHANDLE     *Handle;
-  LIST_ENTRY  *Link;
+  ORDERED_COLLECTION_ENTRY  *Entry;
 
   if (UserHandle == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -68,11 +122,9 @@ CoreValidateHandle (
 
   ASSERT_LOCKED (&gProtocolDatabaseLock);
 
-  for (Link = gHandleList.BackLink; Link != &gHandleList; Link = Link->BackLink) {
-    Handle = CR (Link, IHANDLE, AllHandles, EFI_HANDLE_SIGNATURE);
-    if (Handle == (IHANDLE *)UserHandle) {
-      return EFI_SUCCESS;
-    }
+  Entry = OrderedCollectionFind (gOrderedHandleList, UserHandle);
+  if (Entry != NULL) {
+    return EFI_SUCCESS;
   }
 
   return EFI_INVALID_PARAMETER;
@@ -453,6 +505,16 @@ CoreInstallProtocolInterfaceNotify (
     }
 
     //
+    // Add this handle to the ordered list of all handles
+    // in the system
+    //
+    Status = OrderedCollectionInsert (gOrderedHandleList, NULL, Handle);
+    if (EFI_ERROR (Status)) {
+      CoreFreePool (Handle);
+      goto Done;
+    }
+
+    //
     // Initialize new handler structure
     //
     Handle->Signature = EFI_HANDLE_SIGNATURE;
@@ -825,6 +887,11 @@ CoreUninstallProtocolInterface (
   //
   if (IsListEmpty (&Handle->Protocols)) {
     Handle->Signature = 0;
+    OrderedCollectionDelete (
+      gOrderedHandleList,
+      OrderedCollectionFind (gOrderedHandleList, Handle),
+      NULL
+      );
     RemoveEntryList (&Handle->AllHandles);
     CoreFreePool (Handle);
   }
