@@ -11,6 +11,7 @@
 #include <Protocol/SmmBase2.h>
 #include <Protocol/SmmCommunication.h>
 #include <Protocol/MmCommunication2.h>
+#include <Protocol/MmCommunication3.h>
 #include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmConfiguration.h>
 #include <Protocol/SmmControl2.h>
@@ -147,6 +148,37 @@ SmmCommunicationMmCommunicate2 (
   );
 
 /**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                     The EFI_MM_COMMUNICATION3_PROTOCOL instance.
+  @param[in, out] CommBufferPhysical  Physical address of the MM communication buffer, of which content must
+                                      start with EFI_MM_COMMUNICATE_HEADER_V3.
+  @param[in, out] CommBufferVirtual   Virtual address of the MM communication buffer, of which content must
+                                      start with EFI_MM_COMMUNICATE_HEADER_V3.
+
+  @retval EFI_SUCCESS                 The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER       CommBufferPhysical was NULL or CommBufferVirtual was NULL.
+  @retval EFI_BAD_BUFFER_SIZE         The buffer is too large for the MM implementation.
+                                      If this error is returned, the MessageLength field
+                                      in the CommBuffer header or the integer pointed by
+                                      CommSize, are updated to reflect the maximum payload
+                                      size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED           The CommunicateBuffer parameter or CommSize parameter,
+                                      if not omitted, are in address range that cannot be
+                                      accessed by the MM environment.
+
+**/
+EFI_STATUS
+EFIAPI
+MmCommunicationMmCommunicate3 (
+  IN CONST EFI_MM_COMMUNICATION3_PROTOCOL  *This,
+  IN OUT VOID                              *CommBufferPhysical,
+  IN OUT VOID                              *CommBufferVirtual
+  );
+
+/**
   Event notification that is fired every time a gEfiSmmConfigurationProtocol installs.
 
   @param  Event                 The Event that is being processed, not used.
@@ -273,6 +305,13 @@ EFI_SMM_COMMUNICATION_PROTOCOL  mSmmCommunication = {
 //
 EFI_MM_COMMUNICATION2_PROTOCOL  mMmCommunication2 = {
   SmmCommunicationMmCommunicate2
+};
+
+//
+// PI 1.9 MM Communication Protocol 3 instance
+//
+EFI_MM_COMMUNICATION3_PROTOCOL  mMmCommunication3 = {
+  MmCommunicationMmCommunicate3
 };
 
 //
@@ -511,10 +550,12 @@ SmmCommunicationCommunicate (
   IN OUT UINTN                             *CommSize OPTIONAL
   )
 {
-  EFI_STATUS                  Status;
-  EFI_SMM_COMMUNICATE_HEADER  *CommunicateHeader;
-  BOOLEAN                     OldInSmm;
-  UINTN                       TempCommSize;
+  EFI_STATUS                    Status;
+  EFI_SMM_COMMUNICATE_HEADER    *CommunicateHeader;
+  EFI_MM_COMMUNICATE_HEADER_V3  *CommunicateHeaderV3 = NULL;
+  BOOLEAN                       OldInSmm;
+  UINTN                         TempCommSize;
+  UINTN                         CommHeaderSize;
 
   //
   // Check parameters
@@ -524,17 +565,28 @@ SmmCommunicationCommunicate (
   }
 
   CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommBuffer;
-
-  if (CommSize == NULL) {
-    TempCommSize = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
-  } else {
-    TempCommSize = *CommSize;
-    //
-    // CommSize must hold HeaderGuid and MessageLength
-    //
-    if (TempCommSize < OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)) {
+  if (CompareGuid (&CommunicateHeader->HeaderGuid, &gEfiMmCommunicateHeaderV3Guid)) {
+    CommunicateHeaderV3 = (EFI_MM_COMMUNICATE_HEADER_V3 *)CommBuffer;
+    if (CommunicateHeaderV3->BufferSize < sizeof (EFI_MM_COMMUNICATE_HEADER_V3) + CommunicateHeaderV3->MessageSize) {
       return EFI_INVALID_PARAMETER;
     }
+
+    TempCommSize   = (UINTN)CommunicateHeaderV3->BufferSize;
+    CommHeaderSize = sizeof (EFI_MM_COMMUNICATE_HEADER_V3);
+  } else {
+    if (CommSize == NULL) {
+      TempCommSize = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data) + CommunicateHeader->MessageLength;
+    } else {
+      TempCommSize = *CommSize;
+      //
+      // CommSize must hold HeaderGuid and MessageLength
+      //
+      if (TempCommSize < OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data)) {
+        return EFI_INVALID_PARAMETER;
+      }
+    }
+
+    CommHeaderSize = OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
   }
 
   //
@@ -591,16 +643,20 @@ SmmCommunicationCommunicate (
   //
   // Before SetVirtualAddressMap(), we are in SMM or SMRAM is open and unlocked, call SmiManage() directly.
   //
-  TempCommSize -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+  TempCommSize -= CommHeaderSize;
   Status        = gSmmCorePrivate->Smst->SmiManage (
                                            &CommunicateHeader->HeaderGuid,
                                            NULL,
                                            CommunicateHeader->Data,
                                            &TempCommSize
                                            );
-  TempCommSize += OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
+  TempCommSize += CommHeaderSize;
   if (CommSize != NULL) {
     *CommSize = TempCommSize;
+  }
+
+  if (CommunicateHeaderV3 != NULL) {
+    CommunicateHeaderV3->BufferSize = TempCommSize;
   }
 
   //
@@ -648,6 +704,46 @@ SmmCommunicationMmCommunicate2 (
            &mSmmCommunication,
            CommBufferPhysical,
            CommSize
+           );
+}
+
+/**
+  Communicates with a registered handler.
+
+  This function provides a service to send and receive messages from a registered UEFI service.
+
+  @param[in] This                     The EFI_MM_COMMUNICATION3_PROTOCOL instance.
+  @param[in, out] CommBufferPhysical  Physical address of the MM communication buffer, of which content must
+                                      start with EFI_MM_COMMUNICATE_HEADER_V3.
+  @param[in, out] CommBufferVirtual   Virtual address of the MM communication buffer, of which content must
+                                      start with EFI_MM_COMMUNICATE_HEADER_V3.
+  @param[out] CommSize                The size of data being returned. Zero if the handler does not wish to
+                                      reply with any data. This parameter is optional and may be NULL.
+
+  @retval EFI_SUCCESS                 The message was successfully posted.
+  @retval EFI_INVALID_PARAMETER       CommBufferPhysical was NULL or CommBufferVirtual was NULL.
+  @retval EFI_BAD_BUFFER_SIZE         The buffer is too large for the MM implementation.
+                                      If this error is returned, the MessageLength field
+                                      in the CommBuffer header or the integer pointed by
+                                      CommSize, are updated to reflect the maximum payload
+                                      size the implementation can accommodate.
+  @retval EFI_ACCESS_DENIED           The CommunicateBuffer parameter or CommSize parameter,
+                                      if not omitted, are in address range that cannot be
+                                      accessed by the MM environment.
+
+**/
+EFI_STATUS
+EFIAPI
+MmCommunicationMmCommunicate3 (
+  IN CONST EFI_MM_COMMUNICATION3_PROTOCOL  *This,
+  IN OUT VOID                              *CommBufferPhysical,
+  IN OUT VOID                              *CommBufferVirtual
+  )
+{
+  return SmmCommunicationCommunicate (
+           &mSmmCommunication,
+           CommBufferPhysical,
+           NULL
            );
 }
 
@@ -1878,6 +1974,8 @@ SmmIplEntry (
                   &mSmmCommunication,
                   &gEfiMmCommunication2ProtocolGuid,
                   &mMmCommunication2,
+                  &gEfiMmCommunication3ProtocolGuid,
+                  &mMmCommunication3,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
