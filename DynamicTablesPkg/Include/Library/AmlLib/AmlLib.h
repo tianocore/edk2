@@ -1028,6 +1028,48 @@ AmlCodeGenRdInterrupt (
   OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
   );
 
+/** Code generation for the "IO ()" ASL function.
+
+  The Resource Data effectively created is a IO Resource
+  Data. Cf ACPI 6.5:
+   - s19.6.65 IO (IO Resource Descriptor Macro)
+   - s6.4.2.5 I/O Port Descriptor
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param [in]  IsDecoder16          Decoder parameter.
+                                    TRUE if 16-bit decoder.
+                                    FALSE if 10-bit decoder.
+  @param [in]  AddressMinimum       Minimum address.
+  @param [in]  AddressMaximum       Maximum address.
+  @param [in]  Alignment            Alignment.
+  @param [in]  RangeLength          Range length.
+  @param [in]  NameOpNode           NameOp object node defining a named object.
+                                    If provided, append the new resource data
+                                    node to the list of resource data elements
+                                    of this node.
+  @param [out] NewRdNode            If provided and success,
+                                    contain the created node.
+
+  @retval EFI_SUCCESS               The function completed successfully.
+  @retval EFI_INVALID_PARAMETER     Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdIo (
+  IN  BOOLEAN IsDecoder16,
+  IN  UINT16 AddressMinimum,
+  IN  UINT16 AddressMaximum,
+  IN  UINT8 Alignment,
+  IN  UINT8 RangeLength,
+  IN  AML_OBJECT_NODE_HANDLE NameOpNode, OPTIONAL
+  OUT AML_DATA_NODE_HANDLE  *NewRdNode  OPTIONAL
+  );
+
 /** AML code generation for DefinitionBlock.
 
   Create a Root Node handle.
