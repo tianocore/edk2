@@ -52,6 +52,7 @@
   gEfiSmmBase2ProtocolGuid                      ## PRODUCES
   gEfiSmmCommunicationProtocolGuid              ## PRODUCES
   gEfiMmCommunication2ProtocolGuid              ## PRODUCES
+  gEfiMmCommunication3ProtocolGuid              ## PRODUCES
   gEfiSmmAccess2ProtocolGuid                    ## CONSUMES
   ## NOTIFY
   ## CONSUMES
@@ -80,6 +81,7 @@
   gEfiEventVirtualAddressChangeGuid             ## CONSUMES             ## Event
   gEfiEndOfDxeEventGroupGuid                    ## CONSUMES             ## Event
   gLoadFixedAddressConfigurationTableGuid       ## SOMETIMES_CONSUMES   ## SystemTable
+  gEfiMmCommunicateHeaderV3Guid                 ## SOMETIMES_CONSUMES   ## UNDEFINED # MM communication v3
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressSmmCodePageNumber     ## SOMETIMES_CONSUMES
