@@ -2616,6 +2616,17 @@ OnExitBootServicesFailed (
   EFI_STATUS  Status;
 
   //
+  // Measure invocation of ExitBootServices,
+  //
+  Status = TcgMeasureAction (
+             5,
+             EFI_EXIT_BOOT_SERVICES_INVOCATION
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a not Measured. Error!\n", EFI_EXIT_BOOT_SERVICES_INVOCATION));
+  }
+
+  //
   // Measure Failure of ExitBootServices,
   //
   Status = TcgMeasureAction (
