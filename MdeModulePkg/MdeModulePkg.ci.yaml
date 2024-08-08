@@ -23,6 +23,7 @@
             "8005", "UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE.UID",
             "8005", "UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE.HID",
             "8001", "UefiSortLibUnitTestMain",
+            "8001", "MediaSanitizeUnitTestMain",
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
