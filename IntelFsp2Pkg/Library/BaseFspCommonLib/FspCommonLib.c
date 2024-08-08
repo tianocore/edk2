@@ -90,8 +90,18 @@ GetFspGlobalDataPointer (
   )
 {
   FSP_GLOBAL_DATA  *FspData;
+  UINT32           FspDataAddress;
 
   FspData = *(FSP_GLOBAL_DATA  **)(UINTN)PcdGet32 (PcdGlobalDataPointerAddress);
+  //
+  // Due to set FspGlobalDatapointer with 32bit data. So get FspGlobalDatapointer
+  // should with low 32bit data and ignore high 32bit data under X64 build.
+  //
+  if (sizeof (UINTN) == sizeof (UINT64)) {
+    FspDataAddress = (UINT32)(UINTN)FspData;
+    FspData        = (FSP_GLOBAL_DATA *)(UINTN)FspDataAddress;
+  }
+
   return FspData;
 }
 
