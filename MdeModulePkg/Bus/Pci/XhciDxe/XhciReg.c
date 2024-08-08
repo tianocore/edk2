@@ -29,6 +29,8 @@ XhcReadCapReg8 (
   UINT8       Data;
   EFI_STATUS  Status;
 
+  Data = 0;
+
   Status = Xhc->PciIo->Mem.Read (
                              Xhc->PciIo,
                              EfiPciIoWidthUint8,
