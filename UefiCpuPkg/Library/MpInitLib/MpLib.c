@@ -502,33 +502,20 @@ GetProcessorNumber (
 }
 
 /**
-  This function will get CPU count in the system.
+  Enable x2APIC mode if
+  1. Number of CPU is greater than 255; or
+  2. There are any logical processors reporting an Initial APIC ID of 255 or greater.
 
   @param[in] CpuMpData        Pointer to PEI CPU MP Data
-
-  @return  CPU count detected
 **/
-UINTN
-CollectProcessorCount (
+VOID
+AutoEnableX2Apic (
   IN CPU_MP_DATA  *CpuMpData
   )
 {
+  BOOLEAN          X2Apic;
   UINTN            Index;
   CPU_INFO_IN_HOB  *CpuInfoInHob;
-  BOOLEAN          X2Apic;
-
-  //
-  // Send 1st broadcast IPI to APs to wakeup APs
-  //
-  CpuMpData->InitFlag = ApInitConfig;
-  WakeUpAP (CpuMpData, TRUE, 0, NULL, NULL, TRUE);
-  CpuMpData->InitFlag = ApInitDone;
-  //
-  // When InitFlag == ApInitConfig, WakeUpAP () guarantees all APs are checked in.
-  // FinishedCount is the number of check-in APs.
-  //
-  CpuMpData->CpuCount = CpuMpData->FinishedCount + 1;
-  ASSERT (CpuMpData->CpuCount <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
 
   //
   // Enable x2APIC mode if
@@ -577,12 +564,32 @@ CollectProcessorCount (
   }
 
   DEBUG ((DEBUG_INFO, "APIC MODE is %d\n", GetApicMode ()));
-  //
-  // Sort BSP/Aps by CPU APIC ID in ascending order
-  //
-  SortApicId (CpuMpData);
+}
 
-  DEBUG ((DEBUG_INFO, "MpInitLib: Find %d processors in system.\n", CpuMpData->CpuCount));
+/**
+  This function will get CPU count in the system.
+
+  @param[in] CpuMpData        Pointer to PEI CPU MP Data
+
+  @return  CPU count detected
+**/
+UINTN
+CollectProcessorCount (
+  IN CPU_MP_DATA  *CpuMpData
+  )
+{
+  //
+  // Send 1st broadcast IPI to APs to wakeup APs
+  //
+  CpuMpData->InitFlag = ApInitConfig;
+  WakeUpAP (CpuMpData, TRUE, 0, NULL, NULL, TRUE);
+  CpuMpData->InitFlag = ApInitDone;
+  //
+  // When InitFlag == ApInitConfig, WakeUpAP () guarantees all APs are checked in.
+  // FinishedCount is the number of check-in APs.
+  //
+  CpuMpData->CpuCount = CpuMpData->FinishedCount + 1;
+  ASSERT (CpuMpData->CpuCount <= PcdGet32 (PcdCpuMaxLogicalProcessorNumber));
 
   return CpuMpData->CpuCount;
 }
@@ -751,6 +758,12 @@ ApWakeupFunction (
   CurrentApicMode = GetApicMode ();
   while (TRUE) {
     if (CpuMpData->InitFlag == ApInitConfig) {
+      //
+      // Synchronize APIC mode with BSP in the first time AP wakeup ONLY.
+      //
+      SetApicMode (CpuMpData->InitialBspApicMode);
+      CurrentApicMode = CpuMpData->InitialBspApicMode;
+
       ProcessorNumber = ApIndex;
       //
       // This is first time AP wakeup, get BIST information from AP stack
@@ -2215,6 +2228,11 @@ MpInitLibInitialize (
   DEBUG ((DEBUG_INFO, "AP Vector: non-16-bit = %p/%x\n", CpuMpData->WakeupBufferHigh, ApResetVectorSizeAbove1Mb));
 
   //
+  // Save APIC mode for AP to sync
+  //
+  CpuMpData->InitialBspApicMode = GetApicMode ();
+
+  //
   // Enable the local APIC for Virtual Wire Mode.
   //
   ProgramVirtualWireMode ();
@@ -2226,6 +2244,20 @@ MpInitLibInitialize (
       // Wakeup all APs and calculate the processor count in system
       //
       CollectProcessorCount (CpuMpData);
+
+      //
+      // Enable X2APIC if needed.
+      //
+      if (CpuMpData->InitialBspApicMode == LOCAL_APIC_MODE_XAPIC) {
+        AutoEnableX2Apic (CpuMpData);
+      }
+
+      //
+      // Sort BSP/Aps by CPU APIC ID in ascending order
+      //
+      SortApicId (CpuMpData);
+
+      DEBUG ((DEBUG_INFO, "MpInitLib: Find %d processors in system.\n", CpuMpData->CpuCount));
     }
   } else {
     //
