@@ -2569,6 +2569,10 @@ DisplayProcessorFamily2 (
       Print (L"ARMv8\n");
       break;
 
+    case 0x102:
+      Print (L"ARMv9\n");
+      break;
+
     case 0x104:
       Print (L"SH-3\n");
       break;
