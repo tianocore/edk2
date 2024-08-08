@@ -16,7 +16,7 @@
 #define EDKII_SD_MMC_OVERRIDE_PROTOCOL_GUID \
   { 0xeaf9e3c1, 0xc9cd, 0x46db, { 0xa5, 0xe5, 0x5a, 0x12, 0x4c, 0x83, 0x23, 0x23 } }
 
-#define EDKII_SD_MMC_OVERRIDE_PROTOCOL_VERSION  0x3
+#define EDKII_SD_MMC_OVERRIDE_PROTOCOL_VERSION  0x4
 
 typedef struct _EDKII_SD_MMC_OVERRIDE EDKII_SD_MMC_OVERRIDE;
 
@@ -84,13 +84,19 @@ typedef enum {
 } SD_MMC_BUS_MODE;
 
 typedef enum {
+  SdMmcSignalingVoltage33,
+  SdMmcSignalingVoltage18
+} SD_MMC_SIGNALING_VOLTAGE;
+
+typedef enum {
   EdkiiSdMmcResetPre,
   EdkiiSdMmcResetPost,
   EdkiiSdMmcInitHostPre,
   EdkiiSdMmcInitHostPost,
   EdkiiSdMmcUhsSignaling,
   EdkiiSdMmcSwitchClockFreqPost,
-  EdkiiSdMmcGetOperatingParam
+  EdkiiSdMmcGetOperatingParam,
+  EdkiiSdMmcSetSignalingVoltage
 } EDKII_SD_MMC_PHASE_TYPE;
 
 /**

@@ -1215,6 +1215,7 @@ SdCardIdentification (
   EFI_STATUS                     Status;
   EFI_PCI_IO_PROTOCOL            *PciIo;
   EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru;
+  EFI_HANDLE                     ControllerHandle;
   UINT32                         Ocr;
   UINT16                         Rca;
   BOOLEAN                        Xpc;
@@ -1223,7 +1224,6 @@ SdCardIdentification (
   UINT16                         ControllerVer;
   UINT8                          PowerCtrl;
   UINT32                         PresentState;
-  UINT8                          HostCtrl2;
   UINTN                          Retry;
   BOOLEAN                        ForceVoltage33;
   BOOLEAN                        SdVersion1;
@@ -1231,10 +1231,22 @@ SdCardIdentification (
   ForceVoltage33 = FALSE;
   SdVersion1     = FALSE;
 
-  PciIo    = Private->PciIo;
-  PassThru = &Private->PassThru;
+  PciIo            = Private->PciIo;
+  PassThru         = &Private->PassThru;
+  ControllerHandle = Private->ControllerHandle;
 
 Voltage33Retry:
+  //
+  // Start at 3.3V.
+  // Note that if we got here from a failed 1.8V switching attempt,
+  // the card should've been power cycled to reset its own voltage level.
+  //
+  Status = SdMmcHcSetSignalingVoltage (ControllerHandle, PciIo, Slot, SdMmcSignalingVoltage33);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "SdCardIdentification: Couldn't set 3.3V signaling: %r\n", Status));
+    return Status;
+  }
+
   //
   // 1. Send Cmd0 to the device
   //
@@ -1371,16 +1383,10 @@ Voltage33Retry:
         goto Error;
       }
 
-      HostCtrl2 = BIT3;
-      SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
-
-      gBS->Stall (5000);
-
-      SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, TRUE, sizeof (HostCtrl2), &HostCtrl2);
-      if ((HostCtrl2 & BIT3) == 0) {
-        DEBUG ((DEBUG_ERROR, "SdCardIdentification: SwitchVoltage fails with HostCtrl2 = 0x%x\n", HostCtrl2));
-        Status = EFI_DEVICE_ERROR;
-        goto Error;
+      Status = SdMmcHcSetSignalingVoltage (ControllerHandle, PciIo, Slot, SdMmcSignalingVoltage18);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "SdCardIdentification: Couldn't set 1.8V signaling: %r\n", Status));
+        return Status;
       }
 
       Status = SdMmcHcStartSdClock (PciIo, Slot);
