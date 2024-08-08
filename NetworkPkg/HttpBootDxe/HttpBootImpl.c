@@ -306,6 +306,7 @@ HttpBootLoadFile (
   )
 {
   EFI_STATUS  Status;
+  UINTN       Retries;
 
   if ((Private == NULL) || (ImageType == NULL) || (BufferSize == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -400,13 +401,37 @@ HttpBootLoadFile (
   //
   // Load the boot file into Buffer
   //
-  Status = HttpBootGetBootFile (
-             Private,
-             FALSE,
-             BufferSize,
-             Buffer,
-             ImageType
-             );
+  for (Retries = 0; Retries < 30; Retries++) {
+    Status = HttpBootGetBootFile (
+               Private,
+               FALSE,
+               BufferSize,
+               Buffer,
+               ImageType
+               );
+    if (!EFI_ERROR (Status) || (Status != EFI_NOT_READY)) {
+      break;
+    }
+
+    //
+    // HttpBootGetBootFile returned EFI_NOT_READY, we may attempt to resume
+    // the interrupted download.
+    //
+
+    Private->HttpCreated = FALSE;
+    HttpIoDestroyIo (&Private->HttpIo);
+    Status = HttpBootCreateHttpIo (Private);
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    DEBUG ((DEBUG_WARN | DEBUG_INFO, "HttpBootLoadFile: Download interrupted, will try to resume the operation.\n"));
+    gBS->Stall (1000 * 1000 * 3);
+  }
+
+  if (Status == EFI_NOT_READY) {
+    Status = EFI_TIMEOUT;
+  }
 
 ON_EXIT:
   HttpBootUninstallCallback (Private);
@@ -467,12 +492,13 @@ HttpBootStop (
   ZeroMem (&Private->StationIp, sizeof (EFI_IP_ADDRESS));
   ZeroMem (&Private->SubnetMask, sizeof (EFI_IP_ADDRESS));
   ZeroMem (&Private->GatewayIp, sizeof (EFI_IP_ADDRESS));
-  Private->Port              = 0;
-  Private->BootFileUri       = NULL;
-  Private->BootFileUriParser = NULL;
-  Private->BootFileSize      = 0;
-  Private->SelectIndex       = 0;
-  Private->SelectProxyType   = HttpOfferTypeMax;
+  Private->Port                   = 0;
+  Private->BootFileUri            = NULL;
+  Private->BootFileUriParser      = NULL;
+  Private->BootFileSize           = 0;
+  Private->SelectIndex            = 0;
+  Private->SelectProxyType        = HttpOfferTypeMax;
+  Private->PartialTransferredSize = 0;
 
   if (!Private->UsingIpv6) {
     //
@@ -520,6 +546,11 @@ HttpBootStop (
     HttpUrlFreeParser (Private->FilePathUriParser);
     Private->FilePathUri       = NULL;
     Private->FilePathUriParser = NULL;
+  }
+
+  if (Private->LastModifiedOrEtag != NULL) {
+    FreePool (Private->LastModifiedOrEtag);
+    Private->LastModifiedOrEtag = NULL;
   }
 
   ZeroMem (Private->OfferBuffer, sizeof (Private->OfferBuffer));
@@ -710,7 +741,8 @@ HttpBootCallback (
       if (Data != NULL) {
         HttpMessage = (EFI_HTTP_MESSAGE *)Data;
         if ((HttpMessage->Data.Request->Method == HttpMethodGet) &&
-            (HttpMessage->Data.Request->Url != NULL))
+            (HttpMessage->Data.Request->Url != NULL) &&
+            (Private->PartialTransferredSize == 0))
         {
           Print (L"\n  URI: %s\n", HttpMessage->Data.Request->Url);
         }
@@ -740,6 +772,16 @@ HttpBootCallback (
 
             break;
           }
+        }
+
+        // If download was resumed, do not change progress variables
+        HttpHeader = HttpFindHeader (
+                       HttpMessage->HeaderCount,
+                       HttpMessage->Headers,
+                       "Content-Range"
+                       );
+        if (HttpHeader) {
+          break;
         }
 
         HttpHeader = HttpFindHeader (
