@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLibV8.h>
+#include <AArch64/AsmMacroIoLibV8.h>
 
 ASM_FUNC(ArmReadCntFrq)
   mrs   x0, cntfrq_el0           // Read CNTFRQ

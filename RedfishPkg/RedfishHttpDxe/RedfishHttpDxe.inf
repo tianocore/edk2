@@ -37,7 +37,7 @@
   RedfishPkg/RedfishPkg.dec
 
 [LibraryClasses.ARM]
-  ArmSoftFloatLib
+  SoftFloatLib
 
 [LibraryClasses]
   BaseLib
