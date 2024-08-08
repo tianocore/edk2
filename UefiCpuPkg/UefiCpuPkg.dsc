@@ -128,6 +128,7 @@
   UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
   UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
   UefiCpuPkg/MicrocodeMeasurementDxe/MicrocodeMeasurementDxe.inf
+  UefiCpuPkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLib.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuDxe/CpuDxe.inf
