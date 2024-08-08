@@ -16,17 +16,21 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <Protocol/SmmConfiguration.h>
 #include <Protocol/SmmCpu.h>
-#include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Protocol/SmmCpuService.h>
 #include <Protocol/SmmMemoryAttribute.h>
 #include <Protocol/MmMp.h>
+#include <Protocol/SmmVariable.h>
 
 #include <Guid/AcpiS3Context.h>
 #include <Guid/MemoryAttributesTable.h>
 #include <Guid/PiSmmMemoryAttributesTable.h>
+#include <Guid/SmramMemoryReserve.h>
 #include <Guid/SmmBaseHob.h>
 #include <Guid/MpInformation2.h>
+#include <Guid/MmProfileData.h>
+#include <Guid/MmAcpiS3Enable.h>
+#include <Guid/MmCpuSyncConfig.h>
 
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
@@ -37,10 +41,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PcdLib.h>
 #include <Library/MtrrLib.h>
 #include <Library/SmmCpuPlatformHookLib.h>
-#include <Library/SmmServicesTableLib.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/UefiLib.h>
 #include <Library/HobLib.h>
@@ -251,6 +253,8 @@ typedef struct {
   LIST_ENTRY                        *FirstFreeToken;
 } SMM_CPU_PRIVATE_DATA;
 
+extern const BOOLEAN  mIsStandaloneMm;
+
 extern SMM_CPU_PRIVATE_DATA  *gSmmCpuPrivate;
 extern CPU_HOT_PLUG_DATA     mCpuHotPlugData;
 extern UINTN                 mMaxNumberOfCpus;
@@ -265,6 +269,8 @@ extern UINTN                 mSmmShadowStackSize;
 /// The mode of the CPU at the time an SMI occurs
 ///
 extern UINT8  mSmmSaveStateRegisterLma;
+
+extern BOOLEAN  mAcpiS3Enable;
 
 #define PAGE_TABLE_POOL_ALIGNMENT   BASE_128KB
 #define PAGE_TABLE_POOL_UNIT_SIZE   BASE_128KB
@@ -393,28 +399,22 @@ typedef struct {
   EFI_STATUS                    *Status;
 } SMM_CPU_DATA_BLOCK;
 
-typedef enum {
-  SmmCpuSyncModeTradition,
-  SmmCpuSyncModeRelaxedAp,
-  SmmCpuSyncModeMax
-} SMM_CPU_SYNC_MODE;
-
 typedef struct {
   //
   // Pointer to an array. The array should be located immediately after this structure
   // so that UC cache-ability can be set together.
   //
-  SMM_CPU_DATA_BLOCK            *CpuData;
-  volatile UINT32               BspIndex;
-  volatile BOOLEAN              *InsideSmm;
-  volatile BOOLEAN              *AllCpusInSync;
-  volatile SMM_CPU_SYNC_MODE    EffectiveSyncMode;
-  volatile BOOLEAN              SwitchBsp;
-  volatile BOOLEAN              *CandidateBsp;
-  volatile BOOLEAN              AllApArrivedWithException;
-  EFI_AP_PROCEDURE              StartupProcedure;
-  VOID                          *StartupProcArgs;
-  SMM_CPU_SYNC_CONTEXT          *SyncContext;
+  SMM_CPU_DATA_BLOCK           *CpuData;
+  volatile UINT32              BspIndex;
+  volatile BOOLEAN             *InsideSmm;
+  volatile BOOLEAN             *AllCpusInSync;
+  volatile MM_CPU_SYNC_MODE    EffectiveSyncMode;
+  volatile BOOLEAN             SwitchBsp;
+  volatile BOOLEAN             *CandidateBsp;
+  volatile BOOLEAN             AllApArrivedWithException;
+  EFI_AP_PROCEDURE             StartupProcedure;
+  VOID                         *StartupProcArgs;
+  SMM_CPU_SYNC_CONTEXT         *SyncContext;
 } SMM_DISPATCHER_MP_SYNC_DATA;
 
 #define SMM_PSD_OFFSET  0xfb00
@@ -465,6 +465,7 @@ extern EFI_SMRAM_DESCRIPTOR          *mSmmCpuSmramRanges;
 extern UINTN                         mSmmCpuSmramRangeCount;
 extern UINT8                         mPhysicalAddressBits;
 extern BOOLEAN                       mSmmDebugAgentSupport;
+extern BOOLEAN                       mSmmCodeAccessCheckEnable;
 
 //
 // Copy of the PcdPteMemoryEncryptionAddressOrMask
@@ -473,6 +474,21 @@ extern UINT64  mAddressEncMask;
 
 extern UINT64  mTimeoutTicker;
 extern UINT64  mTimeoutTicker2;
+
+typedef struct {
+  ///
+  /// Address of the first byte in the memory region.
+  ///
+  EFI_PHYSICAL_ADDRESS    Base;
+  ///
+  /// Length in bytes of the memory region.
+  ///
+  UINT64                  Length;
+  ///
+  /// Attributes of the memory region
+  ///
+  UINT64                  Attribute;
+} MM_CPU_MEMORY_REGION;
 
 /**
   Create 4G PageTable in SMRAM.
@@ -756,6 +772,24 @@ SmmClearMemoryAttributes (
   );
 
 /**
+  Retrieves a pointer to the system configuration table from the SMM System Table
+  based on a specified GUID.
+
+  @param[in]   TableGuid       The pointer to table's GUID type.
+  @param[out]  Table           The pointer to the table associated with TableGuid in the EFI System Table.
+
+  @retval EFI_SUCCESS     A configuration table matching TableGuid was found.
+  @retval EFI_NOT_FOUND   A configuration table matching TableGuid could not be found.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmGetSystemConfigurationTable (
+  IN  EFI_GUID  *TableGuid,
+  OUT VOID      **Table
+  );
+
+/**
   Initialize MP synchronization data.
 
 **/
@@ -795,6 +829,18 @@ SmiPFHandler (
   );
 
 /**
+  Check SmmProfile is enabled or not.
+
+  @return TRUE     SmmProfile is enabled.
+          FALSE    SmmProfile is not enabled.
+
+**/
+BOOLEAN
+IsSmmProfileEnabled (
+  VOID
+  );
+
+/**
   Perform the remaining tasks.
 
 **/
@@ -821,6 +867,18 @@ PerformPreTasks (
 VOID
 InitMsrSpinLockByIndex (
   IN UINT32  MsrIndex
+  );
+
+/**
+Configure SMM Code Access Check feature on an AP.
+SMM Feature Control MSR will be locked after configuration.
+
+@param[in,out] Buffer  Pointer to private data buffer.
+**/
+VOID
+EFIAPI
+ConfigSmmCodeAccessCheckOnCurrentProcessor (
+  IN OUT VOID  *Buffer
   );
 
 /**
@@ -895,18 +953,39 @@ DumpModuleInfoByIp (
 
 /**
   This function sets memory attribute according to MemoryAttributesTable.
+
+  @param  MemoryAttributesTable  A pointer to the buffer of SmmMemoryAttributesTable.
+
 **/
 VOID
 SetMemMapAttributes (
-  VOID
+  EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE  *MemoryAttributesTable
   );
 
 /**
-  This function sets UEFI memory attribute according to UEFI memory map.
+  Get SmmProfileData.
+
+  @param[in, out]     Size     Return Size of SmmProfileData.
+
+  @return Address of SmmProfileData
+
 **/
-VOID
-SetUefiMemMapAttributes (
-  VOID
+EFI_PHYSICAL_ADDRESS
+GetSmmProfileData (
+  IN OUT  UINT64  *Size
+  );
+
+/**
+  Return if the Address is the NonMmram logging Address.
+
+  @param[in] Address the address to be checked
+
+  @return TRUE  The address is the NonMmram logging Address.
+  @return FALSE The address is not the NonMmram logging Address.
+**/
+BOOLEAN
+IsNonMmramLoggingAddress (
+  IN UINT64  Address
   );
 
 /**
@@ -920,6 +999,47 @@ SetUefiMemMapAttributes (
 BOOLEAN
 IsSmmCommBufferForbiddenAddress (
   IN UINT64  Address
+  );
+
+/**
+  Build extended protection MemoryRegion.
+
+  The caller is responsible for freeing MemoryRegion via FreePool().
+
+  @param[out]     MemoryRegion         Returned Non-Mmram Memory regions.
+  @param[out]     MemoryRegionCount    A pointer to the number of Memory regions.
+
+**/
+VOID
+CreateExtendedProtectionRange (
+  OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
+  OUT UINTN                 *MemoryRegionCount
+  );
+
+/**
+  Create the Non-Mmram Memory Region.
+
+  The caller is responsible for freeing MemoryRegion via FreePool().
+
+  @param[in]      PhysicalAddressBits  The bits of physical address to map.
+  @param[out]     MemoryRegion         Returned Non-Mmram Memory regions.
+  @param[out]     MemoryRegionCount    A pointer to the number of Memory regions.
+
+**/
+VOID
+CreateNonMmramMemMap (
+  IN  UINT8                 PhysicalAddressBits,
+  OUT MM_CPU_MEMORY_REGION  **MemoryRegion,
+  OUT UINTN                 *MemoryRegionCount
+  );
+
+/**
+  This function updates UEFI memory attribute according to UEFI memory map.
+
+**/
+VOID
+UpdateUefiMemMapAttributes (
+  VOID
   );
 
 /**
@@ -1058,6 +1178,22 @@ InitSmmS3ResumeState (
 VOID
 RestoreSmmConfigurationInS3 (
   VOID
+  );
+
+/**
+  Get SmmCpuSyncConfig data: RelaxedMode, SyncTimeout, SyncTimeout2.
+
+  @param[in,out] RelaxedMode   It indicates if Relaxed CPU synchronization method or
+                               traditional CPU synchronization method is used when processing an SMI.
+  @param[in,out] SyncTimeout   It indicates the 1st BSP/AP synchronization timeout value in SMM.
+  @param[in,out] SyncTimeout2  It indicates the 2nd BSP/AP synchronization timeout value in SMM.
+
+ **/
+VOID
+GetSmmCpuSyncConfigData (
+  IN OUT BOOLEAN *RelaxedMode, OPTIONAL
+  IN OUT UINT64  *SyncTimeout, OPTIONAL
+  IN OUT UINT64  *SyncTimeout2 OPTIONAL
   );
 
 /**
@@ -1489,5 +1625,42 @@ SmmWriteProtectReadOnlyPage (
       EnableCet (); \
     } \
   } while (FALSE)
+
+/**
+  Get the maximum number of logical processors supported by the system.
+
+  @retval The maximum number of logical processors supported by the system
+          is indicated by the return value.
+**/
+UINTN
+GetSupportedMaxLogicalProcessorNumber (
+  VOID
+  );
+
+/**
+  Extract NumberOfCpus, MaxNumberOfCpus and EFI_PROCESSOR_INFORMATION for all CPU from gEfiMpServiceProtocolGuid.
+
+  @param[out] NumberOfCpus           Pointer to NumberOfCpus.
+  @param[out] MaxNumberOfCpus        Pointer to MaxNumberOfCpus.
+
+  @retval ProcessorInfo              Pointer to EFI_PROCESSOR_INFORMATION buffer.
+**/
+EFI_PROCESSOR_INFORMATION *
+GetMpInformationFromMpServices (
+  OUT UINTN  *NumberOfCpus,
+  OUT UINTN  *MaxNumberOfCpus
+  );
+
+/**
+  The common Entry Point of the SMM CPU driver.
+
+  @retval EFI_SUCCESS    The common entry point is executed successfully.
+  @retval Other          Some error occurs when executing this entry point.
+
+**/
+EFI_STATUS
+PiSmmCpuEntryCommon (
+  VOID
+  );
 
 #endif

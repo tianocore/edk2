@@ -1,0 +1,19 @@
+/** @file
+  CPU SMM driver.
+  This Standalone MM driver performs SMM initialization, deploy SMM Entry Vector,
+  provides CPU specific services in SMM.
+
+  @copyright
+  INTEL CONFIDENTIAL
+  Copyright (C) 2024 Intel Corporation
+
+//
+//
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "CPU Standalone MM driver"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This Standalone MM driver performs SMM initialization, deploys SMM Entry Vector, and provides CPU-specific services in SMM."
