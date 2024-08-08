@@ -7,6 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Library/BaseLib.h>
 #include <Library/QemuFwCfgLib.h>
 #include <Library/QemuFwCfgS3Lib.h>
 
@@ -31,6 +32,13 @@ QemuFwCfgS3Enabled (
   FIRMWARE_CONFIG_ITEM  FwCfgItem;
   UINTN                 FwCfgSize;
   UINT8                 SystemStates[6];
+
+ #ifdef MDE_CPU_X64
+  if (TdIsEnabled ()) {
+    return FALSE;
+  }
+
+ #endif
 
   Status = QemuFwCfgFindFile ("etc/system-states", &FwCfgItem, &FwCfgSize);
   if ((Status != RETURN_SUCCESS) || (FwCfgSize != sizeof SystemStates)) {
