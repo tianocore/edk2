@@ -11,6 +11,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define HTTP_BOOT_CHECK_MEDIA_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(20)
 
+typedef enum {
+  GetBootFileHead,
+  GetBootFileGet,
+  LoadBootFile,
+  GetBootFileError
+} HTTP_GET_BOOT_FILE_STATE;
+
 /**
   Attempt to complete a DHCPv4 D.O.R.A or DHCPv6 S.R.A.A sequence to retrieve the boot resource information.
 
