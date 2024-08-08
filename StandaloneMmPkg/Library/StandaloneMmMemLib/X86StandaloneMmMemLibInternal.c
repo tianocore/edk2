@@ -20,7 +20,6 @@
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 
-#include <Guid/MmCoreData.h>
 #include <Guid/MmramMemoryReserve.h>
 
 //
@@ -87,9 +86,6 @@ MmMemLibInternalPopulateMmramRanges (
   )
 {
   VOID                            *HobStart;
-  EFI_HOB_GUID_TYPE               *GuidHob;
-  MM_CORE_DATA_HOB_DATA           *DataInHob;
-  MM_CORE_PRIVATE_DATA            *MmCorePrivateData;
   EFI_HOB_GUID_TYPE               *MmramRangesHob;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
   EFI_MMRAM_DESCRIPTOR            *MmramDescriptors;
@@ -98,37 +94,23 @@ MmMemLibInternalPopulateMmramRanges (
   DEBUG ((DEBUG_INFO, "%a - 0x%x\n", __func__, HobStart));
 
   //
-  // Extract MM Core Private context from the Hob. If absent search for
-  // a Hob containing the MMRAM ranges
+  // Search for a Hob containing the MMRAM ranges
   //
-  GuidHob = GetNextGuidHob (&gMmCoreDataHobGuid, HobStart);
-  if (GuidHob == NULL) {
+  MmramRangesHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
+  if (MmramRangesHob == NULL) {
     MmramRangesHob = GetFirstGuidHob (&gEfiMmPeiMmramMemoryReserveGuid);
     if (MmramRangesHob == NULL) {
       return EFI_UNSUPPORTED;
     }
-
-    MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
-    if ((MmramRangesHobData == NULL) || (MmramRangesHobData->Descriptor == NULL)) {
-      return EFI_UNSUPPORTED;
-    }
-
-    mMmMemLibInternalMmramCount = MmramRangesHobData->NumberOfMmReservedRegions;
-    MmramDescriptors            = MmramRangesHobData->Descriptor;
-  } else {
-    DataInHob = GET_GUID_HOB_DATA (GuidHob);
-    if (DataInHob == NULL) {
-      return EFI_UNSUPPORTED;
-    }
-
-    MmCorePrivateData = (MM_CORE_PRIVATE_DATA *)(UINTN)DataInHob->Address;
-    if ((MmCorePrivateData == NULL) || (MmCorePrivateData->MmramRanges == 0)) {
-      return EFI_UNSUPPORTED;
-    }
-
-    mMmMemLibInternalMmramCount = (UINTN)MmCorePrivateData->MmramRangeCount;
-    MmramDescriptors            = (EFI_MMRAM_DESCRIPTOR *)(UINTN)MmCorePrivateData->MmramRanges;
   }
+
+  MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
+  if ((MmramRangesHobData == NULL) || (MmramRangesHobData->Descriptor == NULL)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  mMmMemLibInternalMmramCount = MmramRangesHobData->NumberOfMmReservedRegions;
+  MmramDescriptors            = MmramRangesHobData->Descriptor;
 
   mMmMemLibInternalMmramRanges = AllocatePool (mMmMemLibInternalMmramCount * sizeof (EFI_MMRAM_DESCRIPTOR));
   if (mMmMemLibInternalMmramRanges) {

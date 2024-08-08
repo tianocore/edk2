@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 #include <PiPei.h>
 
 BOOLEAN  mRestoreSmmConfigurationInS3 = FALSE;
@@ -41,13 +41,13 @@ RestoreSmmConfigurationInS3 (
   //
   if (mRestoreSmmConfigurationInS3) {
     //
-    // Need make sure gSmst is correct because below function may use them.
+    // Need make sure gMmst is correct because below function may use them.
     //
-    gSmst->SmmStartupThisAp      = gSmmCpuPrivate->SmmCoreEntryContext.SmmStartupThisAp;
-    gSmst->CurrentlyExecutingCpu = gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu;
-    gSmst->NumberOfCpus          = gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
-    gSmst->CpuSaveStateSize      = gSmmCpuPrivate->SmmCoreEntryContext.CpuSaveStateSize;
-    gSmst->CpuSaveState          = gSmmCpuPrivate->SmmCoreEntryContext.CpuSaveState;
+    gMmst->MmStartupThisAp       = gSmmCpuPrivate->SmmCoreEntryContext.SmmStartupThisAp;
+    gMmst->CurrentlyExecutingCpu = gSmmCpuPrivate->SmmCoreEntryContext.CurrentlyExecutingCpu;
+    gMmst->NumberOfCpus          = gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
+    gMmst->CpuSaveStateSize      = gSmmCpuPrivate->SmmCoreEntryContext.CpuSaveStateSize;
+    gMmst->CpuSaveState          = gSmmCpuPrivate->SmmCoreEntryContext.CpuSaveState;
 
     //
     // Configure SMM Code Access Check feature if available.
@@ -220,7 +220,7 @@ InitSmmS3ResumeState (
     ZeroMem (SmmS3ResumeState, sizeof (SMM_S3_RESUME_STATE));
 
     mSmmS3ResumeState      = SmmS3ResumeState;
-    SmmS3ResumeState->Smst = (EFI_PHYSICAL_ADDRESS)(UINTN)gSmst;
+    SmmS3ResumeState->Smst = (EFI_PHYSICAL_ADDRESS)(UINTN)gMmst;
 
     SmmS3ResumeState->SmmS3ResumeEntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)SmmRestoreCpu;
 
@@ -247,16 +247,4 @@ InitSmmS3ResumeState (
     //
     InitSmmS3Cr3 ((UINTN *)&SmmS3ResumeState->SmmS3Cr3);
   }
-}
-
-/**
-  Get ACPI S3 enable flag.
-
-**/
-VOID
-GetAcpiS3EnableFlag (
-  VOID
-  )
-{
-  mAcpiS3Enable = PcdGetBool (PcdAcpiS3Enable);
 }
