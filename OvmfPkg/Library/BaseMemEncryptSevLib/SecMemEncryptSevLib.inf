@@ -50,6 +50,7 @@
   PcdLib
   CcExitLib
   AmdSvsmLib
+  CpuPageTableLib
 
 [FixedPcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsWorkAreaBase
