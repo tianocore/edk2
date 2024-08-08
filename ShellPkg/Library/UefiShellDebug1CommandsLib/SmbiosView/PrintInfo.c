@@ -3173,25 +3173,23 @@ DisplaySystemSlotId (
     //
     case 0x04:
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_LOGICAL_MICRO_CHAN), gShellDebug1HiiHandle);
-      if ((SlotId > 0) && (SlotId < 15)) {
+      if ((SlotId > 0) && (SlotId <= 15)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ONE_VAR_D), gShellDebug1HiiHandle, SlotId);
       } else {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ERROR_NOT_1_15), gShellDebug1HiiHandle);
       }
-
       break;
 
     //
-    // EISA
+    // Slot Type: EISA
     //
     case 0x05:
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_LOGICAL_EISA_NUM), gShellDebug1HiiHandle);
-      if ((SlotId > 0) && (SlotId < 15)) {
+      if ((SlotId > 0) && (SlotId <= 15)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ONE_VAR_D), gShellDebug1HiiHandle, SlotId);
       } else {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ERROR_NOT_1_15), gShellDebug1HiiHandle);
       }
-
       break;
 
     //
@@ -3202,21 +3200,20 @@ DisplaySystemSlotId (
       break;
 
     //
-    // PCMCIA
+    // Slot Type: PCMCIA
     //
     case 0x07:
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_IDENTIFIES_ADAPTER_NUM), gShellDebug1HiiHandle, SlotId);
       break;
 
     //
-    // Slot Type: PCI-E
+    // Slot Type: PCI 66MHz Capable, AGP, PCI-E, etc
     //
-    case 0xA5:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_VALUE_PRESENT), gShellDebug1HiiHandle, SlotId);
-      break;
-
     default:
-      if (((SlotType >= 0x0E) && (SlotType <= 0x12)) || ((SlotType >= 0xA6) && (SlotType <= 0xC4))) {
+      if (((SlotType >= 0x0E) && (SlotType <= 0x13)) ||   // PCI 66MHz Capable, AGP
+          ((SlotType >= 0x1F) && (SlotType <= 0x25)) ||   // U.2, PCI-E Mini
+          ((SlotType >= 0xA5) && (SlotType <= 0xC6)))     // PCI-E
+      {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_VALUE_PRESENT), gShellDebug1HiiHandle, SlotId);
       } else {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_UNDEFINED_SLOT_ID), gShellDebug1HiiHandle);
