@@ -38,6 +38,7 @@
   gArmTokenSpaceGuid.PcdGenericWatchdogControlBase
   gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase
   gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum
+  gArmTokenSpaceGuid.PcdGenericWatchdogInstallInterruptHandler
 
 [Protocols]
   gEfiWatchdogTimerArchProtocolGuid       ## ALWAYS_PRODUCES
