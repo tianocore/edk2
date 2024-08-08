@@ -44,6 +44,7 @@
     "DependencyCheck": {
         "AcceptableDependencies": [
             "CryptoPkg/CryptoPkg.dec",
+            "DynamicTablesPkg/DynamicTablesPkg.dec",
             "MdePkg/MdePkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "OvmfPkg/OvmfPkg.dec",

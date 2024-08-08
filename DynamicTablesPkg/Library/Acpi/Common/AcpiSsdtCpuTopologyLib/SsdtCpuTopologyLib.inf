@@ -23,6 +23,9 @@
 [Sources.ARM, Sources.AARCH64]
   Arm/ArmSsdtCpuTopologyGenerator.c
 
+[Sources.RISCV64]
+  RiscV/RiscVSsdtCpuTopologyGenerator.c
+
 [Packages.ARM, Packages.AARCH64]
   ArmPlatformPkg/ArmPlatformPkg.dec
 

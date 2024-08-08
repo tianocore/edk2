@@ -364,6 +364,7 @@ GeneratePrt (
       goto exit_handler;
     }
 
+ #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
     // Check that the interrupts flags are SPIs, level high.
     // Cf. Arm BSA v1.0, sE.6 "Legacy interrupts"
     if ((Index > 0)   &&
@@ -375,6 +376,16 @@ GeneratePrt (
       ASSERT_EFI_ERROR (Status);
       goto exit_handler;
     }
+
+ #endif
+
+ #if defined (MDE_CPU_RISCV64)
+    IrqMapInfo->IntcInterrupt.Interrupt = ArchGetGsiIrqId (
+                                            CfgMgrProtocol,
+                                            IrqMapInfo->IntcInterrupt.Interrupt,
+                                            IrqMapInfo->IntcInterrupt.Phandle
+                                            );
+ #endif
 
     // Add the device to the DeviceTable.
     MappingTableAdd (&Generator->DeviceTable, IrqMapInfo->PciDevice);
