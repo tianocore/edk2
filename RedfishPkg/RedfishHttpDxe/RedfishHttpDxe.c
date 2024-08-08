@@ -94,6 +94,67 @@ RedfishRetryRequired (
 
 /**
 
+  This function follows below sections in Redfish specification to
+  check HTTP status code and see if this is success response or not.
+
+  7.5.2 Modification success responses
+  7.11 POST (action)
+
+  @param[in]  Method          HTTP method of this status code.
+  @param[in]  StatusCode      HTTP status code.
+
+  @retval     BOOLEAN         Return true when this is success response.
+                              Return false when this is not success response.
+
+**/
+BOOLEAN
+RedfishSuccessResponse (
+  IN EFI_HTTP_METHOD       Method,
+  IN EFI_HTTP_STATUS_CODE  *StatusCode
+  )
+{
+  BOOLEAN  SuccessResponse;
+
+  if (StatusCode == NULL) {
+    return TRUE;
+  }
+
+  SuccessResponse = FALSE;
+  switch (Method) {
+    case HttpMethodPost:
+      if ((*StatusCode ==   HTTP_STATUS_200_OK) ||
+          (*StatusCode ==   HTTP_STATUS_201_CREATED) ||
+          (*StatusCode == HTTP_STATUS_202_ACCEPTED) ||
+          (*StatusCode == HTTP_STATUS_204_NO_CONTENT))
+      {
+        SuccessResponse = TRUE;
+      }
+
+      break;
+    case HttpMethodPatch:
+    case HttpMethodPut:
+    case HttpMethodDelete:
+      if ((*StatusCode ==   HTTP_STATUS_200_OK) ||
+          (*StatusCode == HTTP_STATUS_202_ACCEPTED) ||
+          (*StatusCode == HTTP_STATUS_204_NO_CONTENT))
+      {
+        SuccessResponse = TRUE;
+      }
+
+      break;
+    default:
+      //
+      // Return true for unsupported method to prevent false alarm.
+      //
+      SuccessResponse = TRUE;
+      break;
+  }
+
+  return SuccessResponse;
+}
+
+/**
+
   Convert Unicode string to ASCII string. It's call responsibility to release returned buffer.
 
   @param[in]  UnicodeStr      Unicode string to convert.
@@ -824,7 +885,7 @@ RedfishPatchResource (
   DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Resource is updated, expire URI: %s\n", __func__, Uri));
   RedfishExpireResponse (This, Uri);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || !RedfishSuccessResponse (HttpMethodPatch, Response->StatusCode)) {
     DEBUG_CODE (
       DumpRedfishResponse (NULL, DEBUG_ERROR, Response);
       );
@@ -941,7 +1002,7 @@ RedfishPutResource (
   DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Resource is updated, expire URI: %s\n", __func__, Uri));
   RedfishExpireResponse (This, Uri);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || !RedfishSuccessResponse (HttpMethodPut, Response->StatusCode)) {
     DEBUG_CODE (
       DumpRedfishResponse (NULL, DEBUG_ERROR, Response);
       );
@@ -1058,7 +1119,7 @@ RedfishPostResource (
   DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Resource is updated, expire URI: %s\n", __func__, Uri));
   RedfishExpireResponse (This, Uri);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || !RedfishSuccessResponse (HttpMethodPost, Response->StatusCode)) {
     DEBUG_CODE (
       DumpRedfishResponse (NULL, DEBUG_ERROR, Response);
       );
@@ -1177,7 +1238,7 @@ RedfishDeleteResource (
   DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Resource is updated, expire URI: %s\n", __func__, Uri));
   RedfishExpireResponse (This, Uri);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || !RedfishSuccessResponse (HttpMethodDelete, Response->StatusCode)) {
     DEBUG_CODE (
       DumpRedfishResponse (NULL, DEBUG_ERROR, Response);
       );
