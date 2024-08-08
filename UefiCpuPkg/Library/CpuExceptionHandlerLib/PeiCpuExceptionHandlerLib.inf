@@ -53,6 +53,7 @@
   PrintLib
   SerialPortLib
   SynchronizationLib
+  CpuExceptionHookLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard    # CONSUMES
