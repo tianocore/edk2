@@ -122,4 +122,4 @@ gEnableGenfdsMultiThread = True
 gSikpAutoGenCache = set()
 # Common lock for the file access in multiple process AutoGens
 file_lock = None
-
+gLogLibraryMismatch = True
