@@ -718,6 +718,7 @@
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       NULL|OvmfPkg/IntelTdx/TdxHelperLib/SecTdxHelperLib.inf
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
+      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
   }
 
   #

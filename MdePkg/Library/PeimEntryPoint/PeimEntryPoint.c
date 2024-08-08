@@ -24,6 +24,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
   @retval  EFI_SUCCESS   The PEIM executed normally.
   @retval  !EFI_SUCCESS  The PEIM failed to execute normally.
 **/
+NO_STACK_COOKIE
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (

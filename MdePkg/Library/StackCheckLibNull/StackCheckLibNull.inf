@@ -1,0 +1,33 @@
+## @file
+#  Null library instance for StackCheckLib which can be included
+#  when a build needs to include stack check functions but does
+#  not want to generate stack check failures.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = StackCheckLibNull
+  FILE_GUID                      = f6ef2763-ca3b-4c6f-a931-2a48de3ce352
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = StackCheckLib
+
+[Sources]
+  StackCheckLibNull.c
+
+[Sources.IA32]
+  IA32/StackCheckFunctionsMsvc.nasm | MSFT
+
+[Sources.X64]
+  X64/StackCheckFunctionsMsvc.nasm | MSFT
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+# Disable LTO to ensure the linker doesn't optimize out the stack cookie
+[BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -fno-lto
+  MSFT:*_*_*_CC_FLAGS = /GL-

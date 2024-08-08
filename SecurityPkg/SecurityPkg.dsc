@@ -89,6 +89,10 @@
   PlatformLibWrapper|SecurityPkg/DeviceSecurity/OsStub/PlatformLibWrapper/PlatformLibWrapper.inf
   MemLibWrapper|SecurityPkg/DeviceSecurity/OsStub/MemLibWrapper/MemLibWrapper.inf
 
+# StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
+[LibraryClasses.common.SEC]
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #
   # It is not possible to prevent the ARM compiler for generic intrinsic functions.
@@ -96,9 +100,6 @@
   # And NULL mean link this library into all ARM images.
   #
   NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-  # Add support for GCC stack protector
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 

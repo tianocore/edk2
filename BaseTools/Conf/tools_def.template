@@ -21,8 +21,9 @@
 #      - Add GCC and GCCNOLTO
 #      - Deprecate GCC48, GCC49 and GCC5.
 # 3.01 - Add toolchain for VS2022
+# 3.02 - Enable stack cookies for IA32, X64, ARM, and AARCH64 builds for GCC and MSVC
 #
-#!VERSION=3.01
+#!VERSION=3.02
 
 IDENTIFIER = Default TOOL_CHAIN_CONF
 
@@ -635,9 +636,9 @@ NOOPT_VS2017_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2019_IA32_PP_PATH      = DEF(VS2019_BIN_IA32)\cl.exe
 *_VS2019_IA32_ASM_PATH     = DEF(VS2019_BIN_IA32)\ml.exe
 
-  DEBUG_VS2019_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Gw
-RELEASE_VS2019_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2019_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Od
+  DEBUG_VS2019_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Gw
+RELEASE_VS2019_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw
+NOOPT_VS2019_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Od
 
   DEBUG_VS2019_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2019_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -665,9 +666,9 @@ NOOPT_VS2019_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /O
 *_VS2019_X64_DLINK_PATH    = DEF(VS2019_BIN_X64)\link.exe
 *_VS2019_X64_ASLDLINK_PATH = DEF(VS2019_BIN_X64)\link.exe
 
-  DEBUG_VS2019_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Gw
-RELEASE_VS2019_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2019_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Od
+  DEBUG_VS2019_X64_CC_FLAGS     = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Gw
+RELEASE_VS2019_X64_CC_FLAGS     = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Gw
+NOOPT_VS2019_X64_CC_FLAGS       = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Od
 
   DEBUG_VS2019_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
 RELEASE_VS2019_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
@@ -695,9 +696,9 @@ NOOPT_VS2019_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:428
 *_VS2019_ARM_ASLPP_PATH           = DEF(VS2019_BIN_ARM)\cl.exe
 *_VS2019_ARM_ASLDLINK_PATH        = DEF(VS2019_BIN_ARM)\link.exe
 
-  DEBUG_VS2019_ARM_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gw /Oi-
-RELEASE_VS2019_ARM_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw /Oi-
-NOOPT_VS2019_ARM_CC_FLAGS         = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Od /Oi-
+  DEBUG_VS2019_ARM_CC_FLAGS       = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gw /Oi-
+RELEASE_VS2019_ARM_CC_FLAGS       = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw /Oi-
+NOOPT_VS2019_ARM_CC_FLAGS         = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Od /Oi-
 
   DEBUG_VS2019_ARM_ASM_FLAGS      = /nologo /g
 RELEASE_VS2019_ARM_ASM_FLAGS      = /nologo
@@ -721,9 +722,9 @@ NOOPT_VS2019_ARM_DLINK_FLAGS      = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF 
 *_VS2019_AARCH64_ASLPP_PATH        = DEF(VS2019_BIN_AARCH64)\cl.exe
 *_VS2019_AARCH64_ASLDLINK_PATH     = DEF(VS2019_BIN_AARCH64)\link.exe
 
-  DEBUG_VS2019_AARCH64_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gw /Oi-
-RELEASE_VS2019_AARCH64_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw /Oi-
-NOOPT_VS2019_AARCH64_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Od /Oi-
+  DEBUG_VS2019_AARCH64_CC_FLAGS    = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gw /Oi-
+RELEASE_VS2019_AARCH64_CC_FLAGS    = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw /Oi-
+NOOPT_VS2019_AARCH64_CC_FLAGS      = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Od /Oi-
 
   DEBUG_VS2019_AARCH64_ASM_FLAGS   = /nologo /g
 RELEASE_VS2019_AARCH64_ASM_FLAGS   = /nologo
@@ -778,9 +779,9 @@ NOOPT_VS2019_AARCH64_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF
 *_VS2022_IA32_ASM_PATH     = DEF(VS2022_BIN_IA32)\ml.exe
 
       *_VS2022_IA32_MAKE_FLAGS  = /nologo
-  DEBUG_VS2022_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Gw
-RELEASE_VS2022_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2022_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Od
+  DEBUG_VS2022_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Gw
+RELEASE_VS2022_IA32_CC_FLAGS    = /nologo /arch:IA32 /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw
+NOOPT_VS2022_IA32_CC_FLAGS      = /nologo /arch:IA32 /c /WX /GS /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Z7 /Od
 
   DEBUG_VS2022_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
 RELEASE_VS2022_IA32_ASM_FLAGS   = /nologo /c /WX /W3 /Cx /coff /Zd
@@ -808,9 +809,9 @@ NOOPT_VS2022_IA32_DLINK_FLAGS   = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /O
 *_VS2022_X64_DLINK_PATH    = DEF(VS2022_BIN_X64)\link.exe
 *_VS2022_X64_ASLDLINK_PATH = DEF(VS2022_BIN_X64)\link.exe
 
-  DEBUG_VS2022_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Gw
-RELEASE_VS2022_X64_CC_FLAGS     = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Gw
-NOOPT_VS2022_X64_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Od
+  DEBUG_VS2022_X64_CC_FLAGS     = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Gw
+RELEASE_VS2022_X64_CC_FLAGS     = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2s /GL /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Gw
+NOOPT_VS2022_X64_CC_FLAGS       = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /Gy /FIAutoGen.h /EHs-c- /GR- /GF /Z7 /Od
 
   DEBUG_VS2022_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd /Zi
 RELEASE_VS2022_X64_ASM_FLAGS    = /nologo /c /WX /W3 /Cx /Zd
@@ -839,9 +840,9 @@ NOOPT_VS2022_X64_DLINK_FLAGS    = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:428
 *_VS2022_ARM_ASLDLINK_PATH        = DEF(VS2022_BIN_ARM)\link.exe
 
       *_VS2022_ARM_MAKE_FLAGS     = /nologo
-  DEBUG_VS2022_ARM_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gw /Oi-
-RELEASE_VS2022_ARM_CC_FLAGS       = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw /Oi-
-NOOPT_VS2022_ARM_CC_FLAGS         = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Od /Oi-
+  DEBUG_VS2022_ARM_CC_FLAGS       = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gw /Oi-
+RELEASE_VS2022_ARM_CC_FLAGS       = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw /Oi-
+NOOPT_VS2022_ARM_CC_FLAGS         = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Od /Oi-
 
   DEBUG_VS2022_ARM_ASM_FLAGS      = /nologo /g
 RELEASE_VS2022_ARM_ASM_FLAGS      = /nologo
@@ -866,9 +867,9 @@ NOOPT_VS2022_ARM_DLINK_FLAGS      = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF 
 *_VS2022_AARCH64_ASLDLINK_PATH     = DEF(VS2022_BIN_AARCH64)\link.exe
 
       *_VS2022_AARCH64_MAKE_FLAGS  = /nologo
-  DEBUG_VS2022_AARCH64_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gw /Oi-
-RELEASE_VS2022_AARCH64_CC_FLAGS    = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw /Oi-
-NOOPT_VS2022_AARCH64_CC_FLAGS      = /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Od /Oi-
+  DEBUG_VS2022_AARCH64_CC_FLAGS    = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gw /Oi-
+RELEASE_VS2022_AARCH64_CC_FLAGS    = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gw /Oi-
+NOOPT_VS2022_AARCH64_CC_FLAGS      = /nologo /c /WX /GS /W4 /Gs32768 /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Od /Oi-
 
   DEBUG_VS2022_AARCH64_ASM_FLAGS   = /nologo /g
 RELEASE_VS2022_AARCH64_ASM_FLAGS   = /nologo
@@ -894,11 +895,13 @@ NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink="$(DEBUG_DIR)/$(MODULE_
 *_*_*_DTCPP_PATH                   = DEF(DTCPP_BIN)
 *_*_*_DTC_PATH                     = DEF(DTC_BIN)
 
-DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -include AutoGen.h -fno-common
-DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -mabi=aapcs -fno-short-enums -funsigned-char -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address -mthumb -fno-pic -fno-pie
+# All supported GCC archs except LOONGARCH64 support -mstack-protector-guard=global, so set that on everything except LOONGARCH64
+DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -include AutoGen.h -fno-common -fstack-protector
+DEFINE GCC_IA32_X64_CC_FLAGS       = -mstack-protector-guard=global
+DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -mabi=aapcs -fno-short-enums -funsigned-char -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address -mthumb -fno-pic -fno-pie -mstack-protector-guard=global
 DEFINE GCC_LOONGARCH64_CC_FLAGS    = DEF(GCC_ALL_CC_FLAGS) -mabi=lp64d -fno-asynchronous-unwind-tables -Wno-address -fno-short-enums -fsigned-char -ffunction-sections -fdata-sections
 DEFINE GCC_ARM_CC_XIPFLAGS         = -mno-unaligned-access
-DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-short-enums -fverbose-asm -funsigned-char  -ffunction-sections -fdata-sections -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-pic -fno-pie -ffixed-x18
+DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-short-enums -fverbose-asm -funsigned-char  -ffunction-sections -fdata-sections -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-pic -fno-pie -ffixed-x18 -mstack-protector-guard=global
 DEFINE GCC_AARCH64_CC_XIPFLAGS     = -mstrict-align -mgeneral-regs-only
 DEFINE GCC_RISCV64_CC_XIPFLAGS     = -mstrict-align -mgeneral-regs-only
 DEFINE GCC_DLINK_FLAGS_COMMON      = -nostdlib --pie
@@ -935,8 +938,8 @@ DEFINE GCC_DEPS_FLAGS              = -MMD -MF $@.deps
 
 DEFINE GCC48_ALL_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -ffunction-sections -fdata-sections -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 DEFINE GCC48_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x20
-DEFINE GCC48_IA32_CC_FLAGS           = DEF(GCC48_ALL_CC_FLAGS) -m32 -march=i586 -malign-double -fno-stack-protector -D EFI32 -fno-asynchronous-unwind-tables -Wno-address -fno-omit-frame-pointer
-DEFINE GCC48_X64_CC_FLAGS            = DEF(GCC48_ALL_CC_FLAGS) -m64 -fno-stack-protector "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables -Wno-address  -fno-omit-frame-pointer
+DEFINE GCC48_IA32_CC_FLAGS           = DEF(GCC48_ALL_CC_FLAGS) DEF(GCC_IA32_X64_CC_FLAGS) -m32 -march=i586 -malign-double -D EFI32 -fno-asynchronous-unwind-tables -Wno-address -fno-omit-frame-pointer
+DEFINE GCC48_X64_CC_FLAGS            = DEF(GCC48_ALL_CC_FLAGS) DEF(GCC_IA32_X64_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables -Wno-address  -fno-omit-frame-pointer
 DEFINE GCC48_IA32_X64_ASLDLINK_FLAGS = DEF(GCC48_IA32_X64_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE GCC48_IA32_X64_DLINK_FLAGS    = DEF(GCC48_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive
 DEFINE GCC48_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(GCC_DLINK2_FLAGS_COMMON)
@@ -945,7 +948,7 @@ DEFINE GCC48_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x228 DEF
 DEFINE GCC48_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 DEFINE GCC48_ARM_ASM_FLAGS           = $(PLATFORM_FLAGS) DEF(GCC_ASM_FLAGS) -mlittle-endian
 DEFINE GCC48_AARCH64_ASM_FLAGS       = $(PLATFORM_FLAGS) DEF(GCC_ASM_FLAGS) -mlittle-endian
-DEFINE GCC48_ARM_CC_FLAGS            = $(PLATFORM_FLAGS) DEF(GCC_ARM_CC_FLAGS) -fstack-protector -mword-relocations
+DEFINE GCC48_ARM_CC_FLAGS            = $(PLATFORM_FLAGS) DEF(GCC_ARM_CC_FLAGS) -mword-relocations
 DEFINE GCC48_ARM_CC_XIPFLAGS         = DEF(GCC_ARM_CC_XIPFLAGS)
 DEFINE GCC48_AARCH64_CC_FLAGS        = $(PLATFORM_FLAGS) -mcmodel=large DEF(GCC_AARCH64_CC_FLAGS)
 DEFINE GCC48_AARCH64_CC_XIPFLAGS     = DEF(GCC_AARCH64_CC_XIPFLAGS)

@@ -45,6 +45,10 @@
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
 
+# StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
+[LibraryClasses.common.SEC]
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+
 [Components]
   PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
   PcAtChipsetPkg/Bus/Pci/IdeControllerDxe/IdeControllerDxe.inf

@@ -31,6 +31,7 @@ extern CONST UINT32  _gUefiDriverRevision;
   @retval  Other                     Return value from ProcessModuleEntryPointList().
 
 **/
+NO_STACK_COOKIE
 EFI_STATUS
 EFIAPI
 _ModuleEntryPoint (
