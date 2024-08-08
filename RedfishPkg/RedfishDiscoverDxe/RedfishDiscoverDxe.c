@@ -1855,6 +1855,7 @@ BuildupNetworkInterface (
   ListCount                    = (sizeof (mRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL));
   NewNetworkInterfaceInstalled = FALSE;
   Index                        = 0;
+  RestExInstance               = NULL;
 
   for (Index = 0; Index < ListCount; Index++) {
     Status = gBS->OpenProtocol (
