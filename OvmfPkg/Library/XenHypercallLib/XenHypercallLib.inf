@@ -13,11 +13,6 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   CONSTRUCTOR                    = XenHypercallLibConstruct
-
-[Defines.IA32, Defines.X64]
-  LIBRARY_CLASS                  = XenHypercallLib|PEIM DXE_DRIVER UEFI_DRIVER
-
-[Defines.ARM, Defines.AARCH64]
   LIBRARY_CLASS                  = XenHypercallLib
 
 #
@@ -52,6 +47,7 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses.IA32, LibraryClasses.X64]
+  CpuLib
   BaseLib
   HobLib
   DebugLib

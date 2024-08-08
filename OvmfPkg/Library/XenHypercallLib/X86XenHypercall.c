@@ -7,11 +7,31 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <PiDxe.h>
-#include <Library/HobLib.h>
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Guid/XenInfo.h>
+#include <Library/CpuLib.h>
 
-STATIC VOID  *HyperPage;
+static INTN     mUseVmmCall = -1;
+static BOOLEAN  mHypercallAvail;
+
+//
+// Interface exposed by the ASM implementation of the core hypercall
+//
+INTN
+EFIAPI
+__XenVmmcall2 (
+  IN     INTN  HypercallNum,
+  IN OUT INTN  Arg1,
+  IN OUT INTN  Arg2
+  );
+
+INTN
+EFIAPI
+__XenVmcall2 (
+  IN     INTN  HypercallNum,
+  IN OUT INTN  Arg1,
+  IN OUT INTN  Arg2
+  );
 
 /**
   Check if the Xen Hypercall library is able to make calls to the Xen
@@ -29,23 +49,38 @@ XenHypercallIsAvailable (
   VOID
   )
 {
-  return HyperPage != NULL;
+  return mHypercallAvail;
 }
 
-//
-// Interface exposed by the ASM implementation of the core hypercall
-//
-INTN
-EFIAPI
-__XenHypercall2 (
-  IN     VOID  *HypercallAddr,
-  IN OUT INTN  Arg1,
-  IN OUT INTN  Arg2
-  );
+STATIC
+UINT32
+XenCpuidLeaf (
+  VOID
+  )
+{
+  UINT8   Signature[13];
+  UINT32  XenLeaf;
+
+  Signature[12] = '\0';
+  for (XenLeaf = 0x40000000; XenLeaf < 0x40010000; XenLeaf += 0x100) {
+    AsmCpuid (
+      XenLeaf,
+      NULL,
+      (UINT32 *)&Signature[0],
+      (UINT32 *)&Signature[4],
+      (UINT32 *)&Signature[8]
+      );
+
+    if (!AsciiStrCmp ((CHAR8 *)Signature, "XenVMMXenVMM")) {
+      return XenLeaf;
+    }
+  }
+
+  return 0;
+}
 
 /**
-  Library constructor: retrieves the Hyperpage address
-  from the gEfiXenInfoGuid HOB
+  Library constructor: Check for Xen leaf in CPUID
 **/
 RETURN_STATUS
 EFIAPI
@@ -53,16 +88,41 @@ XenHypercallLibInit (
   VOID
   )
 {
-  EFI_HOB_GUID_TYPE  *GuidHob;
-  EFI_XEN_INFO       *XenInfo;
+  UINT32  XenLeaf;
+  CHAR8   sig[13];
 
-  GuidHob = GetFirstGuidHob (&gEfiXenInfoGuid);
-  if (GuidHob == NULL) {
+  XenLeaf = XenCpuidLeaf ();
+  if (XenLeaf == 0) {
     return RETURN_NOT_FOUND;
   }
 
-  XenInfo   = (EFI_XEN_INFO *)GET_GUID_HOB_DATA (GuidHob);
-  HyperPage = XenInfo->HyperPages;
+  sig[12] = '\0';
+  AsmCpuid (
+    0,
+    NULL,
+    (UINT32 *)&sig[0],
+    (UINT32 *)&sig[8],
+    (UINT32 *)&sig[4]
+    );
+
+  DEBUG ((DEBUG_INFO, "Detected CPU \"%12a\"\n", sig));
+
+  if ((AsciiStrCmp ("AuthenticAMD", sig) == 0) ||
+      (AsciiStrCmp ("HygonGenuine", sig) == 0))
+  {
+    mUseVmmCall = TRUE;
+  } else if ((AsciiStrCmp ("GenuineIntel", sig) == 0) ||
+             (AsciiStrCmp ("CentaurHauls", sig) == 0) ||
+             (AsciiStrCmp ("  Shanghai  ", sig) == 0))
+  {
+    mUseVmmCall = FALSE;
+  } else {
+    DEBUG ((DEBUG_ERROR, "Unsupported CPU vendor\n"));
+    return RETURN_NOT_FOUND;
+  }
+
+  mHypercallAvail = TRUE;
+
   return RETURN_SUCCESS;
 }
 
@@ -84,7 +144,9 @@ XenHypercall2 (
   IN OUT INTN   Arg2
   )
 {
-  ASSERT (HyperPage != NULL);
-
-  return __XenHypercall2 ((UINT8 *)HyperPage + HypercallID * 32, Arg1, Arg2);
+  if (mUseVmmCall) {
+    return __XenVmmcall2 (HypercallID, Arg1, Arg2);
+  } else {
+    return __XenVmcall2 (HypercallID, Arg1, Arg2);
+  }
 }
