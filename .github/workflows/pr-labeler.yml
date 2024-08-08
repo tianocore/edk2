@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Apply Labels Based on PR Description
-        uses: github/issue-labeler@v3.1
+        uses: github/issue-labeler@v3.4
         with:
           configuration-path: .github/workflows/pr-labeler/regex.yml
           enable-versioned-regex: 0
