@@ -97,6 +97,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                     """).strip())
                 return 0
 
+            error_messages = []
             for test in testList:
                 # Configure output name if test uses cmocka.
                 shell_env.set_shell_var(
@@ -119,7 +120,18 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                     for xml_result_file in xml_results_list:
                         root = xml.etree.ElementTree.parse(
                             xml_result_file).getroot()
+                        if len(root) == 0:
+                            error_messages.append(f'{os.path.basename(test)} did not generate a test suite(s).')
+                            error_messages.append(' Review source code to ensure Test suites are created and tests '
+                                                  ' are registered!')
+                            failure_count += 1
                         for suite in root:
+                            if len(suite) == 0:
+                                error_messages.append(f'TestSuite [{suite.attrib["name"]}] for test {test} did not '
+                                                      'contain a test case(s).')
+                                error_messages.append(' Review source code to ensure test cases are registered to '
+                                                      'the suite!')
+                                failure_count += 1
                             for case in suite:
                                 for result in case:
                                     if result.tag == 'failure':
@@ -129,7 +141,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                                             "  %s - %s" % (case.attrib['name'], result.text))
                                         failure_count += 1
 
-            if thebuilder.env.GetValue("CODE_COVERAGE") != "FALSE":
+            if thebuilder.env.GetValue("CODE_COVERAGE", "FALSE") == "TRUE":
                 if thebuilder.env.GetValue("TOOL_CHAIN_TAG") == "GCC5":
                     ret = self.gen_code_coverage_gcc(thebuilder)
                     if ret != 0:
@@ -141,6 +153,8 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
                 else:
                     logging.info("Skipping code coverage. Currently, support GCC and MSVC compiler.")
 
+        for error in error_messages:
+            logging.error(error)
         return failure_count
 
     def gen_code_coverage_gcc(self, thebuilder):
@@ -148,6 +162,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
 
         buildOutputBase = thebuilder.env.GetValue("BUILD_OUTPUT_BASE")
         workspace = thebuilder.env.GetValue("WORKSPACE")
+        regex_exclude = r"^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG"
 
         # Generate base code coverage for all source files
         ret = RunCmd("lcov", f"--no-external --capture --initial --directory {buildOutputBase} --output-file {buildOutputBase}/cov-base.info --rc lcov_branch_coverage=1")
@@ -174,7 +189,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
             return 1
 
         # Filter out auto-generated and test code
-        ret = RunCmd("lcov_cobertura",f"{buildOutputBase}/total-coverage.info --excludes ^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG -o {buildOutputBase}/coverage.xml")
+        ret = RunCmd("lcov_cobertura",f"{buildOutputBase}/total-coverage.info --excludes {regex_exclude} -o {buildOutputBase}/coverage.xml")
         if ret != 0:
             logging.error("UnitTest Coverage: Failed generate filtered coverage XML.")
             return 1
@@ -193,7 +208,10 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         # Generate and XML file if requested.for all package
         if os.path.isfile(f"{workspace}/Build/coverage.xml"):
             os.remove(f"{workspace}/Build/coverage.xml")
-        ret = RunCmd("lcov_cobertura",f"{workspace}/Build/all-coverage.info --excludes ^.*UnitTest\|^.*MU\|^.*Mock\|^.*DEBUG -o {workspace}/Build/coverage.xml")
+        ret = RunCmd("lcov_cobertura",f"{workspace}/Build/all-coverage.info --excludes {regex_exclude} -o {workspace}/Build/coverage.xml")
+        if ret != 0:
+            logging.error("UnitTest Coverage: Failed generate all coverage XML.")
+            return 1
 
         return 0
 
@@ -210,7 +228,7 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
         # Generate coverage file
         coverageFile = ""
         for testFile in testList:
-            ret = RunCmd("OpenCppCoverage", f"--source {workspace} --export_type binary:{testFile}.cov -- {testFile}")
+            ret = RunCmd("OpenCppCoverage", f"--source {workspace} --export_type binary:{testFile}.cov -- {testFile}", workingdir=f"{workspace}Build/")
             if ret != 0:
                 logging.error("UnitTest Coverage: Failed to collect coverage data.")
                 return 1

@@ -1483,9 +1483,24 @@ GTEST_OUTPUT=xml:<absolute or relative path to output file>
 
 This mode is used by the test running plugin to aggregate the results for CI test status reporting in the web view.
 
+### XML Reporting Test Consolidation
+
+There exists multiple tools for consolidating and generating consolidated test results from the
+test xml files that are generated. The arguably most convenient tool available is the
+`xunit-viewer` node package, installed via `npm install -g xunit-viewer`. This tool can
+consolidate all generated xml reports and create an html or cli summary of test results.
+
+The following command will generate a consolidated report at `<report_name>.html` and
+also print summary overview of the test results to the command line:
+
+`xunit-viewer --results Build --output <report_name>.html --console`
+
 ### Code Coverage
 
-Host based Unit Tests will automatically enable coverage data.
+Code coverage can be enabled for Host based Unit Tests with `CODE_COVERAGE=TRUE`, which generates a cobertura report
+per package tested, and combined cobertura report for all packages tested. The per-package cobertura report will be
+present at `Build/<Pkg>/HostTest/<Target_Toolchain>/<Pkg>_coverage.xml`. The overall cobertura report will be present
+at `Build/coverage.xml`
 
 For Windows, this is primarily leveraged for pipeline builds, but this can be leveraged locally using the
 OpenCppCoverage windows tool to parse coverage data to cobertura xml format.
