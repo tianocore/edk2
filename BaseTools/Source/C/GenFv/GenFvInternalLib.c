@@ -3537,6 +3537,7 @@ Returns:
     case EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER:
     case EFI_FV_FILETYPE_DRIVER:
     case EFI_FV_FILETYPE_DXE_CORE:
+    case EFI_FV_FILETYPE_MM_STANDALONE:
       break;
     case EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE:
       //
@@ -3698,6 +3699,7 @@ Returns:
 
       case EFI_FV_FILETYPE_DRIVER:
       case EFI_FV_FILETYPE_DXE_CORE:
+      case EFI_FV_FILETYPE_MM_STANDALONE:
         //
         // Check if section-alignment and file-alignment match or not
         //
