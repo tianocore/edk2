@@ -1202,6 +1202,7 @@ CheckBmcUsbNic (
   DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry, the registration key - 0x%08x.\n", __func__, Registration));
 
   Handle = NULL;
+  HandleBuffer = NULL;
   Status = EFI_SUCCESS;
 
   do {
