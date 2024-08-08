@@ -107,6 +107,12 @@ BlDxeEntryPoint (
   EFI_HOB_GUID_TYPE          *GuidHob;
   EFI_PEI_GRAPHICS_INFO_HOB  *GfxInfo;
   ACPI_BOARD_INFO            *AcpiBoardInfo;
+  EFI_GUID                   FwGuid;
+  UINT32                     FwVersion;
+  UINT32                     FwLsv;
+  UINT32                     FwSize;
+  EFI_SYSTEM_RESOURCE_TABLE  *Esrt;
+  EFI_SYSTEM_RESOURCE_ENTRY  *Esre;
 
   Status = EFI_SUCCESS;
   //
@@ -141,6 +147,25 @@ BlDxeEntryPoint (
     Status        = PcdSet64S (PcdPciExpressBaseAddress, AcpiBoardInfo->PcieBaseAddress);
     ASSERT_EFI_ERROR (Status);
     Status = PcdSet64S (PcdPciExpressBaseSize, AcpiBoardInfo->PcieBaseSize);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Status = ParseFwInfo (&FwGuid, &FwVersion, &FwLsv, &FwSize);
+  if (!EFI_ERROR (Status)) {
+    Esrt = AllocateZeroPool (sizeof (EFI_SYSTEM_RESOURCE_TABLE) + sizeof (EFI_SYSTEM_RESOURCE_ENTRY));
+    ASSERT (Esrt != NULL);
+
+    Esrt->FwResourceVersion  = EFI_SYSTEM_RESOURCE_TABLE_FIRMWARE_RESOURCE_VERSION;
+    Esrt->FwResourceCount    = 1;
+    Esrt->FwResourceCountMax = 1;
+
+    Esre = (EFI_SYSTEM_RESOURCE_ENTRY *)&Esrt[1];
+    CopyMem (&Esre->FwClass, &FwGuid, sizeof (EFI_GUID));
+    Esre->FwType                   = ESRT_FW_TYPE_SYSTEMFIRMWARE;
+    Esre->FwVersion                = FwVersion;
+    Esre->LowestSupportedFwVersion = FwLsv;
+
+    Status = gBS->InstallConfigurationTable (&gEfiSystemResourceTableGuid, Esrt);
     ASSERT_EFI_ERROR (Status);
   }
 
