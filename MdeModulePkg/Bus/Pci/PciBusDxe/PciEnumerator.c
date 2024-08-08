@@ -934,6 +934,8 @@ PciHostBridgeAdjustAllocation (
   UINTN                                          ResType;
   EFI_STATUS                                     Status;
   EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD  AllocFailExtendedData;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL                *PciRootBridgeIo;
+  UINT32                                         Seg;
 
   PciResNode = NULL;
   ZeroMem (RemovedPciDev, 5 * sizeof (PCI_IO_DEVICE *));
@@ -973,6 +975,9 @@ PciHostBridgeAdjustAllocation (
       continue;
     }
 
+    PciRootBridgeIo = PciResNode->PciDev->PciRootBridgeIo;
+    Seg = PciRootBridgeIo->SegmentNumber;
+
     //
     // Check if the device has been removed before
     //
@@ -993,7 +998,8 @@ PciHostBridgeAdjustAllocation (
     if (Status == EFI_SUCCESS) {
       DEBUG ((
         DEBUG_ERROR,
-        "PciBus: [%02x|%02x|%02x] was rejected due to resource confliction.\n",
+        "PciBus: [%04x|%02x|%02x|%02x] was rejected due to resource confliction.\n",
+        Seg,
         PciResNode->PciDev->BusNumber,
         PciResNode->PciDev->DeviceNumber,
         PciResNode->PciDev->FunctionNumber
