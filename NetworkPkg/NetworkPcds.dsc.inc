@@ -11,6 +11,8 @@
 #
 ##
 
+!if $(NETWORK_ENABLE) == TRUE
 !if $(NETWORK_ALLOW_HTTP_CONNECTIONS) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
+!endif
 !endif
