@@ -95,8 +95,6 @@
   gEfiSmmVariableProtocolGuid
   gEfiMmEndOfDxeProtocolGuid                    ## NOTIFY
   gEdkiiSmmVarCheckProtocolGuid                 ## PRODUCES
-  gEfiTcgProtocolGuid                           ## SOMETIMES_CONSUMES
-  gEfiTcg2ProtocolGuid                          ## SOMETIMES_CONSUMES
 
 [Guids]
   ## SOMETIMES_CONSUMES   ## GUID # Signature of Variable store header
