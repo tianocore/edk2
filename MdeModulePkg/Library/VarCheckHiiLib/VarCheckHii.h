@@ -1,7 +1,7 @@
 /** @file
   Include file for Var Check Hii handler and bin.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -51,7 +51,11 @@ DumpVarCheckHii (
   IN UINTN  VarCheckHiiBinSize
   );
 
-extern VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBin;
-extern UINTN                          mVarCheckHiiBinSize;
+#define VAR_CHECK_RECEIVED_HII_BIN_HANDLER_GUID \
+  { \
+    0xabcdef12, 0x3456, 0x7890, { 0xab, 0xcd, 0xef, 0x12, 0x34, 0x56, 0x78, 0x90 } \
+  }
+
+extern EFI_GUID  gVarCheckReceivedHiiBinHandlerGuid;
 
 #endif
