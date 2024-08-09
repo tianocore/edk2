@@ -84,6 +84,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DxeServicesLib.h>
 #include <Library/DebugAgentLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
+#include <Library/OrderedCollectionLib.h>
 
 //
 // attributes for reserved memory before it is promoted to system memory
@@ -2788,6 +2789,17 @@ MergeMemoryMap (
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
   IN OUT UINTN                  *MemoryMapSize,
   IN UINTN                      DescriptorSize
+  );
+
+/**
+  Initializes "handle" support.
+
+  @return Status code.
+
++**/
+EFI_STATUS
+CoreInitializeHandleServices (
+  VOID
   );
 
 #endif
