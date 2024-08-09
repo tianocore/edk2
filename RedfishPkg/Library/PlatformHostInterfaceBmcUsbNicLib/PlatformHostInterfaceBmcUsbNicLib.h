@@ -21,7 +21,6 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/IpmiLib.h>
 #include <Library/IpmiCommandLib.h>
 #include <Library/RedfishHostInterfaceLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -29,6 +28,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/RedfishDebugLib.h>
 
+#include <Protocol/EdkIIRedfishCredential2.h>
 #include <Protocol/SimpleNetwork.h>
 #include <Protocol/UsbIo.h>
 
