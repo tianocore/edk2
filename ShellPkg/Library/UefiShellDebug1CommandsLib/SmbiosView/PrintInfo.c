@@ -3209,12 +3209,8 @@ DisplaySystemSlotId (
       break;
 
     //
-    // Slot Type: PCI-E
+    // Slot Type: PCI 66MHz Capable, AGP, PCI-E, etc
     //
-    case 0xA5:
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_VALUE_PRESENT), gShellDebug1HiiHandle, SlotId);
-      break;
-
     default:
       if (((SlotType >= 0x0E) && (SlotType <= 0x12)) || ((SlotType >= 0xA6) && (SlotType <= 0xC4))) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_VALUE_PRESENT), gShellDebug1HiiHandle, SlotId);
