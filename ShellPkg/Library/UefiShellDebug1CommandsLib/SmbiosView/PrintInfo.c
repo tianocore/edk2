@@ -3182,7 +3182,7 @@ DisplaySystemSlotId (
       break;
 
     //
-    // EISA
+    // Slot Type: EISA
     //
     case 0x05:
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_LOGICAL_EISA_NUM), gShellDebug1HiiHandle);
@@ -3202,7 +3202,7 @@ DisplaySystemSlotId (
       break;
 
     //
-    // PCMCIA
+    // Slot Type: PCMCIA
     //
     case 0x07:
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_IDENTIFIES_ADAPTER_NUM), gShellDebug1HiiHandle, SlotId);
