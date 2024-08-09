@@ -3173,7 +3173,7 @@ DisplaySystemSlotId (
     //
     case 0x04:
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_LOGICAL_MICRO_CHAN), gShellDebug1HiiHandle);
-      if ((SlotId > 0) && (SlotId < 15)) {
+      if ((SlotId > 0) && (SlotId <= 15)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ONE_VAR_D), gShellDebug1HiiHandle, SlotId);
       } else {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ERROR_NOT_1_15), gShellDebug1HiiHandle);
@@ -3186,7 +3186,7 @@ DisplaySystemSlotId (
     //
     case 0x05:
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_LOGICAL_EISA_NUM), gShellDebug1HiiHandle);
-      if ((SlotId > 0) && (SlotId < 15)) {
+      if ((SlotId > 0) && (SlotId <= 15)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ONE_VAR_D), gShellDebug1HiiHandle, SlotId);
       } else {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_ERROR_NOT_1_15), gShellDebug1HiiHandle);

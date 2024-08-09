@@ -1924,7 +1924,7 @@ TABLE_ITEM  SystemSlotHeightTable[] = {
   },
   {
     0x02,
-    L" Unknown"
+    L" Unkown"
   },
   {
     0x03,
