@@ -3,7 +3,7 @@
 #
 # Provides drivers and definitions to create uefi payload for bootloaders.
 #
-# Copyright (c) 2014 - 2023, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -159,6 +159,15 @@
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS     = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS      = /D MDEPKG_NDEBUG
+!endif
+
+#
+# Enable source level debugging for RELEASE build
+#
+!if $(TARGET) == "RELEASE"
+  MSFT:*_*_*_ASM_FLAGS   = /Zi
+  MSFT:*_*_*_CC_FLAGS    = /Zi
+  MSFT:*_*_*_DLINK_FLAGS = /DEBUG
 !endif
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
