@@ -1,0 +1,65 @@
+## @file
+#  Flat Device Tree Table Build Library.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BuildFdtLib
+  FILE_GUID                      = 5DA69A29-C990-49EE-A4E6-BA5311A1ADAF
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BuildFdtLib
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  X86_BuildFdtLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+  HobLib
+  FdtLib
+
+[Guids]
+  gUniversalPayloadDeviceTreeGuid
+  gEfiGraphicsInfoHobGuid
+  gEfiGraphicsDeviceInfoHobGuid
+  gUniversalPayloadAcpiTableGuid
+  gUniversalPayloadSerialPortInfoGuid
+  gEfiHobMemoryAllocModuleGuid
+  gEfiHobMemoryAllocStackGuid
+  gEfiHobMemoryAllocBspStoreGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+[Ppis]
+  gEdkiiPeiPciDevicePpiGuid              ## CONSUMES
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /wd4305
+  GCC:*_*_IA32_CC_FLAGS    = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_X64_CC_FLAGS     = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_ARM_CC_FLAGS     = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_AARCH64_CC_FLAGS = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_RISCV64_CC_FLAGS = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_LOONGARCH64_CC_FLAGS = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast

@@ -16,4 +16,6 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS                Entry;
 } UNIVERSAL_PAYLOAD_BASE;
 
+#define UNIVERSAL_PAYLOAD_BASE_REVISION  1
+
 #endif // UNIVERSAL_PAYLOAD_BASE_H_

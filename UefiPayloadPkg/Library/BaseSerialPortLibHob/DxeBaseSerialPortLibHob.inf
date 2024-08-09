@@ -6,7 +6,6 @@
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
-
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DxeBaseSerialPortLibHob
@@ -15,7 +14,6 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = SerialPortLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = DxeBaseSerialPortLibHobConstructor
-
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -25,7 +23,7 @@
   IoLib
   HobLib
   TimerLib
-
+  PlatformHookLib
 [Sources]
   DxeBaseSerialPortLibHob.c
   BaseSerialPortLibHob.c
@@ -36,6 +34,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialExtendedTxFifoSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseHardwareFlowControl
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio                 ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase            ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate                ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride          ## CONSUMES
+
+
 
 [Guids]
   gUniversalPayloadSerialPortInfoGuid
