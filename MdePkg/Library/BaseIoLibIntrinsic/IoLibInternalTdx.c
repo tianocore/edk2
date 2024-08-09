@@ -85,6 +85,12 @@ TdIoRead16 (
   UINT64  Status;
   UINT64  Val;
 
+  DEBUG_CODE (
+    if ((Port & 1) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid port: %lx\n", __func__, Port));
+    }
+    );
+
   ASSERT ((Port & 1) == 0);
 
   Status = TdVmCall (TDVMCALL_IO, TDVMCALL_ACCESS_SIZE_2, TDVMCALL_ACCESS_READ, Port, 0, &Val);
@@ -113,6 +119,12 @@ TdIoRead32 (
 {
   UINT64  Status;
   UINT64  Val;
+
+  DEBUG_CODE (
+    if ((Port & 3) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid port: %lx\n", __func__, Port));
+    }
+    );
 
   ASSERT ((Port & 3) == 0);
 
@@ -175,6 +187,12 @@ TdIoWrite16 (
   UINT64  Status;
   UINT64  Val;
 
+  DEBUG_CODE (
+    if ((Port & 1) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid port: %lx\n", __func__, Port));
+    }
+    );
+
   ASSERT ((Port & 1) == 0);
   Val    = Value;
   Status = TdVmCall (TDVMCALL_IO, TDVMCALL_ACCESS_SIZE_2, TDVMCALL_ACCESS_WRITE, Port, Val, 0);
@@ -205,6 +223,12 @@ TdIoWrite32 (
 {
   UINT64  Status;
   UINT64  Val;
+
+  DEBUG_CODE (
+    if ((Port & 3) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid port: %lx\n", __func__, Port));
+    }
+    );
 
   ASSERT ((Port & 3) == 0);
   Val    = Value;
@@ -321,6 +345,12 @@ TdMmioWrite16 (
   UINT64  Val;
   UINT64  Status;
 
+  DEBUG_CODE (
+    if ((Address & 1) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", __func__, Address));
+    }
+    );
+
   ASSERT ((Address & 1) == 0);
 
   Val    = Value;
@@ -380,6 +410,12 @@ TdMmioWrite32 (
   UINT64  Val;
   UINT64  Status;
 
+  DEBUG_CODE (
+    if ((Address & 3) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", __func__, Address));
+    }
+    );
+
   ASSERT ((Address & 3) == 0);
 
   Val    = Value;
@@ -436,6 +472,12 @@ TdMmioWrite64 (
 {
   UINT64  Status;
   UINT64  Val;
+
+  DEBUG_CODE (
+    if ((Address & 7) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", __func__, Address));
+    }
+    );
 
   ASSERT ((Address & 7) == 0);
 

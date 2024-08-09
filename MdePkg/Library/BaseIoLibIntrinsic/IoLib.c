@@ -174,6 +174,12 @@ MmioRead16 (
   UINT16   Value;
   BOOLEAN  Flag;
 
+  DEBUG_CODE (
+    if ((Address & 1) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", __func__, Address));
+    }
+    );
+
   ASSERT ((Address & 1) == 0);
   Flag = FilterBeforeMmIoRead (FilterWidth16, Address, &Value);
   if (Flag) {
@@ -220,6 +226,12 @@ MmioWrite16 (
 {
   BOOLEAN  Flag;
 
+  DEBUG_CODE (
+    if ((Address & 1) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", __func__, Address));
+    }
+    );
+
   ASSERT ((Address & 1) == 0);
 
   Flag = FilterBeforeMmIoWrite (FilterWidth16, Address, &Value);
@@ -265,6 +277,12 @@ MmioRead32 (
 {
   UINT32   Value;
   BOOLEAN  Flag;
+
+  DEBUG_CODE (
+    if ((Address & 3) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", __func__, Address));
+    }
+    );
 
   ASSERT ((Address & 3) == 0);
 
@@ -313,6 +331,12 @@ MmioWrite32 (
 {
   BOOLEAN  Flag;
 
+  DEBUG_CODE (
+    if ((Address & 3) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", __func__, Address));
+    }
+    );
+
   ASSERT ((Address & 3) == 0);
 
   Flag = FilterBeforeMmIoWrite (FilterWidth32, Address, &Value);
@@ -359,6 +383,12 @@ MmioRead64 (
   UINT64   Value;
   BOOLEAN  Flag;
 
+  DEBUG_CODE (
+    if ((Address & 7) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", __func__, Address));
+    }
+    );
+
   ASSERT ((Address & 7) == 0);
 
   Flag = FilterBeforeMmIoRead (FilterWidth64, Address, &Value);
@@ -403,6 +433,12 @@ MmioWrite64 (
   )
 {
   BOOLEAN  Flag;
+
+  DEBUG_CODE (
+    if ((Address & 7) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", __func__, Address));
+    }
+    );
 
   ASSERT ((Address & 7) == 0);
 
