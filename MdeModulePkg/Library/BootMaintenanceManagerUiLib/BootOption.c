@@ -356,6 +356,11 @@ BOpt_GetBootOptions (
       continue;
     }
 
+    if (!BmValidateOption (LoadOptionFromVar, BootOptionSize)) {
+      FreePool (LoadOptionFromVar);
+      continue;
+    }
+
     if (BootNext != NULL) {
       BootNextFlag = (BOOLEAN)(*BootNext == BootOrderList[Index]);
     } else {
