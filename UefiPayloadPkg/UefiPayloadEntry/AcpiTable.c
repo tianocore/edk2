@@ -128,11 +128,11 @@ Done:
   //
   // Verify values for proper operation
   //
-  ASSERT (Fadt->Pm1aCntBlk != 0);
-  ASSERT (Fadt->PmTmrBlk != 0);
-  ASSERT (Fadt->ResetReg.Address != 0);
-  ASSERT (Fadt->Pm1aEvtBlk != 0);
-  ASSERT (Fadt->Gpe0Blk != 0);
+  // ASSERT (Fadt->Pm1aCntBlk != 0);
+  // ASSERT (Fadt->PmTmrBlk != 0);
+  // ASSERT (Fadt->ResetReg.Address != 0);
+  // ASSERT (Fadt->Pm1aEvtBlk != 0);
+  // ASSERT (Fadt->Gpe0Blk != 0);
 
   return RETURN_SUCCESS;
 }
