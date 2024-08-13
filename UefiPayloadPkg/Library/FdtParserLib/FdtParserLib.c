@@ -30,6 +30,7 @@
 #include <Library/FdtLib.h>
 #include <Protocol/PciHostBridgeResourceAllocation.h>
 #include <Protocol/PciIo.h>
+#include <Guid/PciSegmentInfoGuid.h>
 
 typedef enum {
   ReservedMemory = 1,
@@ -62,6 +63,7 @@ extern VOID                         *mHobList;
 UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *mPciRootBridgeInfo = NULL;
 INT32                               mNode[0x500]        = { 0 };
 UINT32                              mNodeIndex          = 0;
+UPL_PCI_SEGMENT_INFO_HOB            *mUplPciSegmentInfoHob;
 
 /**
   Build a Handoff Information Table HOB
@@ -656,8 +658,12 @@ ParsePciRootBridge (
   UINTN               HobDataSize;
   UINT8               Base;
 
+  if (RootBridgeCount == 0) {
+    return;
+  }
+
   RbIndex     = *index;
-  HobDataSize = sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES) + RootBridgeCount *sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE);
+  HobDataSize = sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES) + (RootBridgeCount * sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGE));
   //
   // Create PCI Root Bridge Info Hob.
   //
@@ -669,10 +675,21 @@ ParsePciRootBridge (
     }
 
     ZeroMem (mPciRootBridgeInfo, HobDataSize);
-    mPciRootBridgeInfo->Header.Length    = sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES);
+    mPciRootBridgeInfo->Header.Length    = (UINT16)HobDataSize;
     mPciRootBridgeInfo->Header.Revision  = UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES_REVISION;
     mPciRootBridgeInfo->Count            = RootBridgeCount;
     mPciRootBridgeInfo->ResourceAssigned = FALSE;
+  }
+
+  if (mUplPciSegmentInfoHob == NULL) {
+    HobDataSize           = sizeof (UPL_PCI_SEGMENT_INFO_HOB) + ((RootBridgeCount) * sizeof (UPL_SEGMENT_INFO));
+    mUplPciSegmentInfoHob = BuildGuidHob (&gUplPciSegmentInfoHobGuid, HobDataSize);
+    if (mUplPciSegmentInfoHob != NULL) {
+      ZeroMem (mUplPciSegmentInfoHob, HobDataSize);
+      mUplPciSegmentInfoHob->Header.Revision = UNIVERSAL_PAYLOAD_PCI_SEGMENT_INFO_REVISION;
+      mUplPciSegmentInfoHob->Header.Length   = (UINT16)HobDataSize;
+      mUplPciSegmentInfoHob->Count           = RootBridgeCount;
+    }
   }
 
   for (SubNode = FdtFirstSubnode (Fdt, Node); SubNode >= 0; SubNode = FdtNextSubnode (Fdt, SubNode)) {
@@ -693,8 +710,6 @@ ParsePciRootBridge (
       ParseSerialPort (Fdt, SubNode);
     }
   }
-
-  DEBUG ((DEBUG_INFO, " RbIndex :%x \n", RbIndex));
 
   for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
     PropertyPtr = FdtGetPropertyByOffset (Fdt, Property, &TempLen);
@@ -717,15 +732,12 @@ ParsePciRootBridge (
         DEBUG ((DEBUG_INFO, "  Base :%x \n", Base));
         MemType = Fdt32ToCpu (*(Data32 + Base));
         if (((MemType) & (SS_64BIT_MEMORY_SPACE)) == SS_64BIT_MEMORY_SPACE) {
-          DEBUG ((DEBUG_INFO, "  To program 64 mm \n"));
           mPciRootBridgeInfo->RootBridge[RbIndex].MemAbove4G.Base  = Fdt32ToCpu (*(Data32 + Base + 2)) + LShiftU64 (Fdt32ToCpu (*(Data32 + Base + 1)), 32);
           mPciRootBridgeInfo->RootBridge[RbIndex].MemAbove4G.Limit = mPciRootBridgeInfo->RootBridge[RbIndex].MemAbove4G.Base + LShiftU64 (Fdt32ToCpu (*(Data32 + Base + 5)), 32) +  Fdt32ToCpu (*(Data32 + Base + 6)) -1;
         } else if (((MemType) & (SS_32BIT_MEMORY_SPACE)) == SS_32BIT_MEMORY_SPACE) {
-          DEBUG ((DEBUG_INFO, "  To program 32 mem \n"));
           mPciRootBridgeInfo->RootBridge[RbIndex].Mem.Base  = Fdt32ToCpu (*(Data32 + Base + 2));
           mPciRootBridgeInfo->RootBridge[RbIndex].Mem.Limit = mPciRootBridgeInfo->RootBridge[RbIndex].Mem.Base + Fdt32ToCpu (*(Data32 + Base + 6)) -1;
         } else if (((MemType) & (SS_IO_SPACE)) == SS_IO_SPACE) {
-          DEBUG ((DEBUG_INFO, "  To program Io\n"));
           mPciRootBridgeInfo->RootBridge[RbIndex].Io.Base  = Fdt32ToCpu (*(Data32 + Base + 2));
           mPciRootBridgeInfo->RootBridge[RbIndex].Io.Limit = mPciRootBridgeInfo->RootBridge[RbIndex].Io.Base + Fdt32ToCpu (*(Data32 +  Base + 6)) -1;
         }
@@ -743,9 +755,13 @@ ParsePciRootBridge (
       DEBUG ((DEBUG_INFO, "PciRootBridge->Io.limit %llx, \n", mPciRootBridgeInfo->RootBridge[RbIndex].Io.Limit));
     }
 
-    if (AsciiStrCmp (TempStr, "bus-range") == 0) {
-      DEBUG ((DEBUG_INFO, "  Found bus-range Property TempLen (%08X)\n", TempLen));
+    if (AsciiStrCmp (TempStr, "reg") == 0) {
+      UINT64  *Data64 = (UINT64 *)(PropertyPtr->Data);
+      mUplPciSegmentInfoHob->SegmentInfo[RbIndex].BaseAddress = Fdt64ToCpu (*Data64);
+      DEBUG ((DEBUG_INFO, "PciRootBridge->Ecam.Base %llx, \n", mUplPciSegmentInfoHob->SegmentInfo[RbIndex].BaseAddress));
+    }
 
+    if (AsciiStrCmp (TempStr, "bus-range") == 0) {
       Data32                                                  = (UINT32 *)(PropertyPtr->Data);
       mPciRootBridgeInfo->RootBridge[RbIndex].Bus.Base        = Fdt32ToCpu (*Data32) & 0xFF;
       mPciRootBridgeInfo->RootBridge[RbIndex].Bus.Limit       = Fdt32ToCpu (*(Data32 + 1)) & 0xFF;
@@ -760,7 +776,6 @@ ParsePciRootBridge (
     RbIndex--;
   }
 
-  DEBUG ((DEBUG_INFO, "After updated RbIndex :%x \n", RbIndex));
   *index = RbIndex;
 }
 
@@ -797,11 +812,15 @@ ParseDtb (
   UINTN                 NewHobList;
   UINT8                 RootBridgeCount;
   UINT8                 index;
-  UINTN                 HobDataSize;
   UINT8                 PciEnumDone;
   UINT8                 NodeType;
   EFI_BOOT_MODE         BootMode;
   CHAR8                 *GmaStr;
+  UINT16                SegmentNumber;
+  UINT64                CurrentPciBaseAddress;
+  UINT64                NextPciBaseAddress;
+  UINT8                 *RbSegNumAlreadyAssigned;
+  UINT8                 NumberOfRbSegNumAlreadyAssigned;
 
   Fdt               = FdtBase;
   Depth             = 0;
@@ -810,10 +829,11 @@ ParseDtb (
   NewHobList        = 0;
   RootBridgeCount   = 0;
   index             = 0;
-  HobDataSize       = 0;
-  PciEnumDone       = 0;
-  BootMode          = 0;
-  NodeType          = 0;
+  // TODO: This value comes from FDT. Currently there is a bug in implementation
+  // which assumes node ordering. Which requires a fix.
+  PciEnumDone = 1;
+  BootMode    = 0;
+  NodeType    = 0;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
   DEBUG ((DEBUG_INFO, "Start parsing DTB data\n"));
@@ -893,11 +913,13 @@ ParseDtb (
         GmaStr = ParseFrameBuffer (Fdt, Node);
         break;
       case PciRootBridge:
-        DEBUG ((DEBUG_INFO, "ParsePciRootBridge, index :%x\n", index));
+        DEBUG ((DEBUG_INFO, "ParsePciRootBridge, index :%x \n", index));
         ParsePciRootBridge (Fdt, Node, RootBridgeCount, GmaStr, &index);
         DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index :%x\n", index));
         break;
       case Options:
+        // FIXME: Need to ensure this node gets parsed first so that it gets
+        // correct options to feed into other init like PciEnumDone etc.
         DEBUG ((DEBUG_INFO, "ParseOptions\n"));
         ParseOptions (Fdt, Node, &PciEnumDone, &BootMode);
         break;
@@ -910,6 +932,44 @@ ParseDtb (
   // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
   // may not be good idea. Instead have this prop part of RB
   mPciRootBridgeInfo->ResourceAssigned = (BOOLEAN)PciEnumDone;
+
+  //
+  // Assign PCI Segment number after all root bridge info ready
+  //
+  SegmentNumber                   = 0;
+  RbSegNumAlreadyAssigned         = AllocateZeroPool (sizeof (UINT8) * RootBridgeCount);
+  NextPciBaseAddress              = 0;
+  NumberOfRbSegNumAlreadyAssigned = 0;
+
+  //
+  // Always assign first root bridge segment number as 0
+  //
+  CurrentPciBaseAddress                               = mUplPciSegmentInfoHob->SegmentInfo[0].BaseAddress & ~0xFFFFFFF;
+  NextPciBaseAddress                                  = CurrentPciBaseAddress;
+  mUplPciSegmentInfoHob->SegmentInfo[0].SegmentNumber = SegmentNumber;
+  mPciRootBridgeInfo->RootBridge[0].Segment           = SegmentNumber;
+  RbSegNumAlreadyAssigned[0]                          = 1;
+  NumberOfRbSegNumAlreadyAssigned++;
+
+  while (NumberOfRbSegNumAlreadyAssigned < RootBridgeCount) {
+    for (index = 1; index < RootBridgeCount; index++) {
+      if (RbSegNumAlreadyAssigned[index] == 1) {
+        continue;
+      }
+
+      if (CurrentPciBaseAddress == (mUplPciSegmentInfoHob->SegmentInfo[index].BaseAddress & ~0xFFFFFFF)) {
+        mUplPciSegmentInfoHob->SegmentInfo[index].SegmentNumber = SegmentNumber;
+        mPciRootBridgeInfo->RootBridge[index].Segment           = SegmentNumber;
+        RbSegNumAlreadyAssigned[index]                          = 1;
+        NumberOfRbSegNumAlreadyAssigned++;
+      } else if (CurrentPciBaseAddress == NextPciBaseAddress) {
+        NextPciBaseAddress = mUplPciSegmentInfoHob->SegmentInfo[index].BaseAddress & ~0xFFFFFFF;
+      }
+    }
+
+    SegmentNumber++;
+    CurrentPciBaseAddress = NextPciBaseAddress;
+  }
 
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;
   DEBUG ((DEBUG_INFO, "\n"));
