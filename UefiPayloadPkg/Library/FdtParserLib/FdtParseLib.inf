@@ -41,6 +41,7 @@
   gEfiGraphicsDeviceInfoHobGuid
   gUniversalPayloadAcpiTableGuid
   gUniversalPayloadSerialPortInfoGuid
+  gUplPciSegmentInfoHobGuid
 
 [Pcd.IA32,Pcd.X64,Pcd.RISCV64]
   gUefiPayloadPkgTokenSpaceGuid.PcdPayloadFdMemSize
