@@ -816,6 +816,9 @@ ParseDtb (
   UINT8                 NodeType;
   EFI_BOOT_MODE         BootMode;
   CHAR8                 *GmaStr;
+  INTN                  NumRsv;
+  EFI_PHYSICAL_ADDRESS  Addr;
+  UINT64                Size;
   UINT16                SegmentNumber;
   UINT64                CurrentPciBaseAddress;
   UINT64                NextPciBaseAddress;
@@ -884,6 +887,16 @@ ParseDtb (
         RootBridgeCount++;
       }
     }
+  }
+
+  NumRsv = FdtNumRsv (Fdt);
+  /* Look for an existing entry and add it to the efi mem map. */
+  for (index = 0; index < NumRsv; index++) {
+    if (FdtGetMemRsv (Fdt, index, &Addr, &Size) != 0) {
+      continue;
+    }
+
+    BuildMemoryAllocationHob (Addr, Size, EfiReservedMemoryType);
   }
 
   index = RootBridgeCount - 1;
