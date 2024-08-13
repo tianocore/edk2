@@ -935,11 +935,11 @@ CheckProcNode (
 
   // Check Leaf specific flags.
   if (IsLeaf) {
-    InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != PPTT_LEAF_MASK);
+    InvalidFlags |= ((NodeFlags & PPTT_VALID_LEAF_MASK) != PPTT_VALID_LEAF_MASK);
     // Must have Physical Package flag somewhere in the hierarchy
     InvalidFlags |= !(HasPhysicalPackageBit || PackageNodeSeen);
   } else {
-    InvalidFlags |= ((NodeFlags & PPTT_LEAF_MASK) != 0);
+    InvalidFlags |= ((NodeFlags & PPTT_LEAF_FLAG_MASK) != 0);
   }
 
   if (InvalidFlags) {
@@ -957,7 +957,7 @@ CheckProcNode (
 
 /** Create an AML representation of the Cpu topology.
 
-  A processor container is by extension any non-leave device in the cpu topology.
+  A processor container is by extension any non-leaf device in the cpu topology.
 
   @param [in] Generator               The SSDT Cpu Topology generator.
   @param [in] CfgMgrProtocol          Pointer to the Configuration Manager
