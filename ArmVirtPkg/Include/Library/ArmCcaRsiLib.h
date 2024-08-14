@@ -1,7 +1,7 @@
 /** @file
   Library that implements the Arm CCA Realm Service Interface calls.
 
-  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2022 - 2024, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
     - Rsi or RSI   - Realm Service Interface
@@ -11,7 +11,7 @@
     - REM          - Realm Extensible Measurement
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac5
+   - Realm Management Monitor (RMM) Specification, version 1.0-rel0
      (https://developer.arm.com/documentation/den0137/)
 **/
 
@@ -110,12 +110,13 @@
 #define RSI_RESPONSE_MASK  BIT0
 
 /** An enum describing the RSI RIPAS.
-   See Section A5.2.2 Realm IPA state, RMM Specification, version 1.0-eac2
+   See Section A5.2.2 Realm IPA state, RMM Specification, version 1.0-rel0
 */
 typedef enum Ripas {
   RipasEmpty,      ///< Unused IPA location.
   RipasRam,        ///< Private code or data owned by the Realm.
   RipasDestroyed,  ///< An address which is inaccessible to the Realm.
+  RipasDev,        ///< MMIO address where an assigned Realm device is mapped.
   RipasMax         ///< A valid RIPAS type value is less than RipasMax.
 } RIPAS;
 
