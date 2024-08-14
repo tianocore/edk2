@@ -10,7 +10,7 @@
     - RIPAS        - Realm IPA state
 
   @par Reference(s):
-   - Realm Management Monitor (RMM) Specification, version 1.0-eac5
+   - Realm Management Monitor (RMM) Specification, version 1.0-rel0
      (https://developer.arm.com/documentation/den0137/)
 **/
 
@@ -30,13 +30,14 @@
 #define FID_RSI_VERSION                     0xC4000190
 
 /** RSI Command Return codes
-   See Section B4.4.1, RMM Specification, version A-bet0.
+   See Section B5.4.1, RMM Specification, version 1.0-rel0.
    The width of the RsiCommandReturnCode enumeration is 64 bits.
 */
-#define RSI_SUCCESS      0ULL
-#define RSI_ERROR_INPUT  1ULL
-#define RSI_ERROR_STATE  2ULL
-#define RSI_INCOMPLETE   3ULL
+#define RSI_SUCCESS        0ULL
+#define RSI_ERROR_INPUT    1ULL
+#define RSI_ERROR_STATE    2ULL
+#define RSI_INCOMPLETE     3ULL
+#define RSI_ERROR_UNKNOWN  4ULL
 
 /** RSI interface Version
    See Section B4.4.3,  RMM Specification, version A-bet0.
