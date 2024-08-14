@@ -221,7 +221,7 @@ FatOpenDevice (
   Status = DiskIo->ReadDisk (DiskIo, Volume->MediaId, 0, sizeof (FatBs), &FatBs);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INIT, "FatOpenDevice: read of part_lba failed %r\n", Status));
+    DEBUG ((DEBUG_VERBOSE, "%a: read of part_lba failed %r\n", __func__, Status));
     return Status;
   }
 
