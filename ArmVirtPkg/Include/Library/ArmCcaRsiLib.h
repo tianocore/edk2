@@ -120,19 +120,39 @@ typedef enum Ripas {
   RipasMax         ///< A valid RIPAS type value is less than RipasMax.
 } RIPAS;
 
+/* The maximum length of the Realm Personalisation Value (RPV).
+*/
+#define REALM_CFG_RPV_SIZE  64
+
+/* The size of the Realm Config is 4KB.
+*/
+#define REALM_CFG_SIZE  SIZE_4KB
+
+/* Helper macros to define the RealmConfig structure.
+*/
+#define REALM_CFG_OFFSET_IPA_WIDTH  0
+#define REALM_CFG_OFFSET_HASH_ALGO  (REALM_CFG_OFFSET_IPA_WIDTH + sizeof (UINT64))
+#define REALM_CFG_OFFSET_RESERVED   (REALM_CFG_OFFSET_HASH_ALGO + sizeof (UINT8))
+#define REALM_CFG_OFFSET_RPV        0x200
+#define REALM_CFG_OFFSET_RESERVED1  (REALM_CFG_OFFSET_RPV + REALM_CFG_RPV_SIZE)
+
 #pragma pack(1)
 
 /** A structure describing the Realm Configuration.
-  See Section B4.4.5 RsiRealmConfig type, RMM Specification, version 1.0-eac2
+  See Section B5.4.5 RsiRealmConfig type, RMM Specification, version 1.0-rel0
   The width of the RsiRealmConfig structure is 4096 (0x1000) bytes.
 */
 typedef struct RealmConfig {
-  // Width of IPA in bits.
+  /// Width of IPA in bits.
   UINT64    IpaWidth;
-  // Width of the RsiHashAlgorithm enumeration is 8 bits.
+  /// Width of the RsiHashAlgorithm enumeration is 8 bits.
   UINT8     HashAlgorithm;
-  // Unused bits of the RsiRealmConfig structure should be zero.
-  UINT8     Reserved[SIZE_4KB - (sizeof (UINT64) + sizeof (UINT8))];
+  /// Reserved
+  UINT8     Reserved[REALM_CFG_OFFSET_RPV - REALM_CFG_OFFSET_RESERVED];
+  /// Realm Personalisation Value
+  UINT8     Rpv[REALM_CFG_RPV_SIZE];
+  /// Unused bits of the RsiRealmConfig structure should be zero.
+  UINT8     Reserved1[REALM_CFG_SIZE - REALM_CFG_OFFSET_RESERVED1];
 } REALM_CONFIG;
 
 /** A structure describing the Host Call arguments

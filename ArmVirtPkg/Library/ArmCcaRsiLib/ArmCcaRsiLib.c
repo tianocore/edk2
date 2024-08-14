@@ -596,6 +596,24 @@ RsiGetRealmConfig (
     return RETURN_INVALID_PARAMETER;
   }
 
+  // Add static asserts to check that the Realm Config is as what we expect.
+  STATIC_ASSERT (sizeof (REALM_CONFIG) == SIZE_4KB);
+  STATIC_ASSERT (
+    OFFSET_OF (REALM_CONFIG, IpaWidth) == REALM_CFG_OFFSET_IPA_WIDTH
+    );
+  STATIC_ASSERT (
+    OFFSET_OF (REALM_CONFIG, HashAlgorithm) == REALM_CFG_OFFSET_HASH_ALGO
+    );
+  STATIC_ASSERT (
+    OFFSET_OF (REALM_CONFIG, Reserved) == REALM_CFG_OFFSET_RESERVED
+    );
+  STATIC_ASSERT (
+    OFFSET_OF (REALM_CONFIG, Rpv) == REALM_CFG_OFFSET_RPV
+    );
+  STATIC_ASSERT (
+    OFFSET_OF (REALM_CONFIG, Reserved1) == REALM_CFG_OFFSET_RESERVED1
+    );
+
   ZeroMem (&SmcCmd, sizeof (SmcCmd));
   SmcCmd.Arg0 = FID_RSI_REALM_CONFIG;
   SmcCmd.Arg1 = (UINTN)Config;
