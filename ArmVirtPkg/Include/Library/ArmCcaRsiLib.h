@@ -215,6 +215,8 @@ typedef struct HostCallArgs {
   @retval RETURN_ABORTED            The operation was aborted as the state
                                     of the Realm or REC does not match the
                                     state expected by the command.
+                                    Or the Token generation failed for an
+                                    unknown or IMPDEF reason.
   @retval RETURN_NOT_READY          The operation requested by the command
                                     is not complete.
 **/

@@ -54,6 +54,7 @@ RsiCmdStatusToEfiStatus (
     case RSI_ERROR_INPUT:
       return RETURN_INVALID_PARAMETER;
     case RSI_ERROR_STATE:
+    case RSI_ERROR_UNKNOWN:
       return RETURN_ABORTED;
     case RSI_INCOMPLETE:
       return RETURN_NOT_READY;
@@ -105,6 +106,8 @@ AddrIsGranuleAligned (
   @retval RETURN_ABORTED            The operation was aborted as the state
                                     of the Realm or REC does not match the
                                     state expected by the command.
+                                    Or the Token generation failed for an
+                                    unknown or IMPDEF reason.
   @retval RETURN_NOT_READY          The operation requested by the command
                                     is not complete.
  **/
@@ -256,6 +259,8 @@ RsiFreeAttestationToken (
   @retval RETURN_ABORTED            The operation was aborted as the state
                                     of the Realm or REC does not match the
                                     state expected by the command.
+                                    Or the Token generation failed for an
+                                    unknown or IMPDEF reason.
   @retval RETURN_NOT_READY          The operation requested by the command
                                     is not complete.
 **/
