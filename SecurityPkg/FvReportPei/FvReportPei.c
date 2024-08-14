@@ -150,6 +150,16 @@ VerifyHashedFv (
   HashValue = AllocateZeroPool (AlgInfo->HashSize * (FvNumber + 1));
   ASSERT (HashValue != NULL);
 
+  Status = PeiServicesLocatePpi (
+             &gEdkiiPeiFirmwareVolumeShadowPpiGuid,
+             0,
+             NULL,
+             (VOID **)&FvShadowPpi
+             );
+  if (EFI_ERROR (Status)) {
+    FvShadowPpi = NULL;
+  }
+
   //
   // Calculate hash value for each FV first.
   //
@@ -194,14 +204,8 @@ VerifyHashedFv (
     FvBuffer = AllocatePages (EFI_SIZE_TO_PAGES ((UINTN)FvInfo[FvIndex].Length));
 
     ASSERT (FvBuffer != NULL);
-    Status = PeiServicesLocatePpi (
-               &gEdkiiPeiFirmwareVolumeShadowPpiGuid,
-               0,
-               NULL,
-               (VOID **)&FvShadowPpi
-               );
 
-    if (!EFI_ERROR (Status)) {
+    if (FvShadowPpi != NULL) {
       Status = FvShadowPpi->FirmwareVolumeShadow (
                               (EFI_PHYSICAL_ADDRESS)FvInfo[FvIndex].Base,
                               FvBuffer,
@@ -209,7 +213,7 @@ VerifyHashedFv (
                               );
     }
 
-    if (EFI_ERROR (Status)) {
+    if ((FvShadowPpi == NULL) || (EFI_ERROR (Status))) {
       CopyMem (
         FvBuffer,
         (CONST VOID *)(UINTN)FvInfo[FvIndex].Base,
