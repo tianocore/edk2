@@ -411,6 +411,7 @@ AdjustPciDeviceBarSize (
   BOOLEAN        Adjusted;
   UINTN          Offset;
   UINTN          BarIndex;
+  EFI_STATUS     Status;
 
   Adjusted    = FALSE;
   CurrentLink = RootBridgeDev->ChildList.ForwardLink;
@@ -423,6 +424,16 @@ AdjustPciDeviceBarSize (
         Adjusted = TRUE;
       }
     } else {
+      Status = LocatePciExpressCapabilityRegBlock (
+                 PciIoDevice,
+                 PCI_EXPRESS_EXTENDED_CAPABILITY_RESIZABLE_BAR_ID,
+                 &PciIoDevice->ResizableBarOffset,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        continue;
+      }
+
       if (PciIoDevice->ResizableBarOffset != 0) {
         DEBUG ((
           DEBUG_ERROR,
