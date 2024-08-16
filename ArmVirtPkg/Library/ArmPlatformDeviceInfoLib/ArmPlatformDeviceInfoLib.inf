@@ -16,6 +16,14 @@
   LIBRARY_CLASS                  = ArmPlatformDeviceInfoLib
 
 [Sources]
+  HwInfoParser/Arm/Gic/ArmGicCParser.c
+  HwInfoParser/Arm/Gic/ArmGicCParser.h
+  HwInfoParser/Arm/Gic/ArmGicDispatcher.c
+  HwInfoParser/Arm/Gic/ArmGicDispatcher.h
+  HwInfoParser/Arm/Gic/ArmGicDParser.c
+  HwInfoParser/Arm/Gic/ArmGicDParser.h
+  HwInfoParser/Arm/Gic/ArmGicRParser.c
+  HwInfoParser/Arm/Gic/ArmGicRParser.h
   HwInfoParser/FdtInfoParser.c
   HwInfoParser/FdtInfoParser.h
   HwInfoParser/FdtUtility.c
