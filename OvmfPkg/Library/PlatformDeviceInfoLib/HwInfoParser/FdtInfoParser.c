@@ -12,6 +12,7 @@
 
 #include "FdtUtility.h"
 #include "FdtInfoParser.h"
+#include "Arm/Gic/ArmGicDispatcher.h"
 
 /** Function pointer to a parser function.
 
@@ -41,6 +42,7 @@ EFI_STATUS
   is not parsing a Device Tree but calling other parsers.
 */
 STATIC CONST FDT_HW_INFO_PARSER_FUNC  HwInfoParserTable[] = {
+  ArmGicDispatcher,
 };
 
 /** Main dispatcher: sequentially call the parsers/dispatchers
