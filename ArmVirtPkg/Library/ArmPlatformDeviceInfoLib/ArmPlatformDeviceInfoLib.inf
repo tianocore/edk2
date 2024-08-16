@@ -1,0 +1,34 @@
+## @file
+#  Arm Platform Device Info library.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmPlatformDeviceInfoLib
+  FILE_GUID                      = 7f5f99e7-4022-4b56-8d68-c0dc8f41aab2
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformDeviceInfoLib
+
+[Sources]
+  HwInfoParser/FdtInfoParser.c
+  HwInfoParser/FdtInfoParser.h
+  HwInfoParser/FdtUtility.c
+  HwInfoParser/FdtUtility.h
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[Pcd]
+  gArmVirtTokenSpaceGuid.PcdMaxPlatDeviceCount

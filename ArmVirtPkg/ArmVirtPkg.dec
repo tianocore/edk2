@@ -29,6 +29,7 @@
   ArmCcaInitPeiLib|Include/Library/ArmCcaInitPeiLib.h
   ArmCcaLib|Include/Library/ArmCcaLib.h
   ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
+  ArmPlatformDeviceInfoLib|Include/Library/ArmPlatformDeviceInfoLib.h
   ArmVirtMemInfoLib|Include/Library/ArmVirtMemInfoLib.h
 
 [Guids.common]
@@ -53,3 +54,9 @@
   # Cloud Hypervisor has no other way to pass Rsdp address to the guest except use a PCD.
   #
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x0|UINT64|0x00000005
+
+[PcdsFixedAtBuild]
+  #
+  # Maximum number of platform devices that can be discovered from a FDT.
+  #
+  gArmVirtTokenSpaceGuid.PcdMaxPlatDeviceCount|0x10|UINT64|0x00000006
