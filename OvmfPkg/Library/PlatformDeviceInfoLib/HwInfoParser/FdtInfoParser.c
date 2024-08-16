@@ -14,6 +14,7 @@
 #include "FdtInfoParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
 #include "PciConfigSpaceParser.h"
+#include "SerialPortParser.h"
 
 /** Function pointer to a parser function.
 
@@ -45,6 +46,7 @@ EFI_STATUS
 STATIC CONST FDT_HW_INFO_PARSER_FUNC  HwInfoParserTable[] = {
   ArmGicDispatcher,
   PciConfigInfoParser,
+  SerialPortDispatcher,
 };
 
 /** Main dispatcher: sequentially call the parsers/dispatchers
