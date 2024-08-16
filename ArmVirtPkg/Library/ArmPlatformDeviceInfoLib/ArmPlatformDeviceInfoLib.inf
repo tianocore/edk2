@@ -32,6 +32,8 @@
   HwInfoParser/FdtUtility.h
   HwInfoParser/Pci/PciConfigSpaceParser.c
   HwInfoParser/Pci/PciConfigSpaceParser.h
+  HwInfoParser/Serial/SerialPortParser.c
+  HwInfoParser/Serial/SerialPortParser.h
 
 [Packages]
   ArmVirtPkg/ArmVirtPkg.dec
