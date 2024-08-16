@@ -87,6 +87,8 @@
   ArmMonitorLib|ArmVirtPkg/Library/ArmVirtMonitorLib/ArmVirtMonitorLib.inf
   ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
 
+  ArmPlatformDeviceInfoLib|ArmVirtPkg/Library/ArmPlatformDeviceInfoLib/ArmPlatformDeviceInfoLib.inf
+
 [LibraryClasses.AARCH64]
   ArmCcaLib|ArmVirtPkg/Library/ArmCcaLib/ArmCcaLib.inf
   ArmCcaRsiLib|ArmVirtPkg/Library/ArmCcaRsiLib/ArmCcaRsiLib.inf
