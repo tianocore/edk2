@@ -24,6 +24,8 @@
   HwInfoParser/Arm/Gic/ArmGicDParser.h
   HwInfoParser/Arm/Gic/ArmGicRParser.c
   HwInfoParser/Arm/Gic/ArmGicRParser.h
+  HwInfoParser/Common/DeviceParser.c
+  HwInfoParser/Common/DeviceParser.h
   HwInfoParser/FdtInfoParser.c
   HwInfoParser/FdtInfoParser.h
   HwInfoParser/FdtUtility.c
