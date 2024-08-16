@@ -475,7 +475,7 @@ MorLockInitAtEndOfDxe (
     // can be deduced from the absence of the TCG / TCG2 protocols, as edk2's
     // MOR implementation depends on (one of) those protocols.
     //
-    if (VariableHaveTcgProtocols ()) {
+    if (VariableIsMorVariableLegitimate ()) {
       //
       // The MOR variable originates from the platform firmware; set the MOR
       // Control Lock variable to report the locking capability to the OS.

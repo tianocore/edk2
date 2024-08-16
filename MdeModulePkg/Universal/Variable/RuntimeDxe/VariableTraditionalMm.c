@@ -118,12 +118,12 @@ VariableServiceInitialize (
   MOR variable is legitimate or not.
 
   @retval TRUE  Either the TCG or TCG2 protocol is installed in the UEFI
-                protocol database
+                protocol database. MOR variable is legitimate.
   @retval FALSE Neither the TCG nor the TCG2 protocol is installed in the UEFI
-                protocol database
+                protocol database. MOR variable is not legitimate.
 **/
 BOOLEAN
-VariableHaveTcgProtocols (
+VariableIsMorVariableLegitimate (
   VOID
   )
 {
