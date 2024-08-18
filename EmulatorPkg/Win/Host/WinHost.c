@@ -1131,13 +1131,7 @@ PeCoffLoaderRelocateImageExtraAction (
 
     if ((Library != NULL) && (DllEntryPoint != NULL)) {
       Status = AddModHandle (ImageContext, Library);
-      if (Status == EFI_ALREADY_STARTED) {
-        //
-        // If the DLL has already been loaded before, then this instance of the DLL can not be debugged.
-        //
-        ImageContext->PdbPointer = NULL;
-        SecPrint ("WARNING: DLL already loaded.  No source level debug %S.\n\r", DllFileName);
-      } else {
+      if (Status == EFI_SUCCESS) {
         //
         // This DLL is not already loaded, so source level debugging is supported.
         //
