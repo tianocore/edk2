@@ -369,7 +369,7 @@ SetBootMode (
 
   Hob.Raw                               = GetHobList ();
   Hob.HandoffInformationTable->BootMode = BootMode;
-  return BootMode;
+  return EFI_SUCCESS;
 }
 
 /**
