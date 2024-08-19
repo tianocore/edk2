@@ -29,6 +29,8 @@
 #include <Ppi/MpInitLibDep.h>
 #include <Library/TdxHelperLib.h>
 #include <Library/CcProbeLib.h>
+#include <Register/Intel/ArchitecturalMsr.h>
+#include <Register/Intel/Cpuid.h>
 #include "AmdSev.h"
 
 #define SEC_IDT_ENTRY_COUNT  34
@@ -743,6 +745,46 @@ FindAndReportEntryPoints (
   return;
 }
 
+//
+// Enable MTRR early, set default type to write back.
+// Needed to make sure caching is enabled,
+// without this lzma decompress can be very slow.
+//
+STATIC
+VOID
+SecMtrrSetup (
+  VOID
+  )
+{
+  CPUID_VERSION_INFO_EDX           Edx;
+  MSR_IA32_MTRR_DEF_TYPE_REGISTER  DefType;
+
+  AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &Edx.Uint32);
+  if (!Edx.Bits.MTRR) {
+    return;
+  }
+
+ #if defined (TDX_GUEST_SUPPORTED)
+  if (CcProbe () == CcGuestTypeIntelTdx) {
+    //
+    // According to TDX Spec, the default MTRR type is enforced to WB
+    // and CR0.CD is enforced to 0.
+    // The TD guest has to disable MTRR otherwise it tries to
+    // program MTRRs to disable caching. CR0.CD=1 results in the
+    // unexpected #VE.
+    //
+    DEBUG ((DEBUG_INFO, "%a: Skip TD-Guest\n", __func__));
+    return;
+  }
+
+ #endif
+
+  DefType.Uint64    = AsmReadMsr64 (MSR_IA32_MTRR_DEF_TYPE);
+  DefType.Bits.Type = MSR_IA32_MTRR_CACHE_WRITE_BACK;
+  DefType.Bits.E    = 1; /* enable */
+  AsmWriteMsr64 (MSR_IA32_MTRR_DEF_TYPE, DefType.Uint64);
+}
+
 VOID
 EFIAPI
 SecCoreStartupWithStack (
@@ -941,6 +983,11 @@ SecCoreStartupWithStack (
   SecMapApicBaseUnencrypted ();
   InitializeApicTimer (0, MAX_UINT32, TRUE, 5);
   DisableApicTimerInterrupt ();
+
+  //
+  // Initialize MTRR
+  //
+  SecMtrrSetup ();
 
   //
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.

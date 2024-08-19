@@ -65,10 +65,10 @@ ValidateCmn600Info (
   IN  CONST UINT32               Cmn600Count
   )
 {
-  UINT32                          Index;
-  UINT32                          DtcIndex;
-  CONST CM_ARM_CMN_600_INFO       *Cmn600Info;
-  CONST CM_ARM_GENERIC_INTERRUPT  *DtcInterrupt;
+  UINT32                                  Index;
+  UINT32                                  DtcIndex;
+  CONST CM_ARM_CMN_600_INFO               *Cmn600Info;
+  CONST CM_ARCH_COMMON_GENERIC_INTERRUPT  *DtcInterrupt;
 
   if ((Cmn600InfoList == NULL) ||
       (Cmn600Count == 0))
@@ -231,10 +231,10 @@ FixupCmn600Info (
   OUT       EFI_ACPI_DESCRIPTION_HEADER  **Table
   )
 {
-  EFI_STATUS                      Status;
-  EFI_STATUS                      Status1;
-  UINT8                           Index;
-  CONST CM_ARM_GENERIC_INTERRUPT  *DtcInt;
+  EFI_STATUS                              Status;
+  EFI_STATUS                              Status1;
+  UINT8                                   Index;
+  CONST CM_ARCH_COMMON_GENERIC_INTERRUPT  *DtcInt;
 
   EFI_ACPI_DESCRIPTION_HEADER  *SsdtCmn600Template;
   AML_ROOT_NODE_HANDLE         RootNodeHandle;
@@ -372,7 +372,7 @@ FixupCmn600Info (
   }
 
   // Update the CMN600 Device's name.
-  Status = AmlDeviceOpUpdateName (DeviceNode, (CHAR8 *)Name);
+  Status = AmlDeviceOpUpdateName (DeviceNode, Name);
   if (EFI_ERROR (Status)) {
     goto error_handler;
   }

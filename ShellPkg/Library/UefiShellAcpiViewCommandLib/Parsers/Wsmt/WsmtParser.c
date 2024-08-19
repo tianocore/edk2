@@ -1,6 +1,7 @@
 /** @file
   WSMT table parser
 
+  Copyright (c) 2024, Arm Limited. All rights reserved.
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -17,7 +18,8 @@ STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
 /**
   This function validates the WSMT Protection flag.
 
-  @param [in] Ptr  Pointer to the start of the buffer.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 
@@ -26,8 +28,9 @@ STATIC
 VOID
 EFIAPI
 ValidateWsmtProtectionFlag (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT32  ProtectionFlag;
@@ -49,7 +52,8 @@ ValidateWsmtProtectionFlag (
 /**
   This function validates the reserved bits in the WSMT Protection flag.
 
-  @param [in] Ptr  Pointer to the start of the buffer.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -57,8 +61,9 @@ STATIC
 VOID
 EFIAPI
 ValidateReserved (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT32  ProtectionFlag;
@@ -92,7 +97,8 @@ VOID
 EFIAPI
 DumpWsmtProtectionFlag (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {

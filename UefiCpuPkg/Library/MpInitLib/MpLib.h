@@ -120,9 +120,8 @@ typedef enum {
 // AP initialization state during APs wakeup
 //
 typedef enum {
-  ApInitConfig   = 1,
-  ApInitReconfig = 2,
-  ApInitDone     = 3
+  ApInitConfig = 1,
+  ApInitDone   = 2
 } AP_INIT_STATE;
 
 //
@@ -289,7 +288,7 @@ struct _CPU_MP_DATA {
   CPU_AP_DATA                      *CpuData;
   volatile MP_CPU_EXCHANGE_INFO    *MpCpuExchangeInfo;
 
-  UINT32                           CurrentTimerCount;
+  UINT32                           InitTimerCount;
   UINTN                            DivideValue;
   UINT8                            Vector;
   BOOLEAN                          PeriodicMode;

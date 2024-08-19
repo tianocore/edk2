@@ -1,7 +1,7 @@
 /** @file
 Enable SMM profile.
 
-Copyright (c) 2012 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017 - 2020, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -298,41 +298,35 @@ IsInSmmRanges (
 }
 
 /**
-  Check if the memory address will be mapped by 4KB-page.
+  Check if the SMM profile page fault address above 4GB is in protected range or not.
 
-  @param  Address  The address of Memory.
-  @param  Nx       The flag indicates if the memory is execute-disable.
+  @param[in]   Address  The address of Memory.
+  @param[out]  Nx       The flag indicates if the memory is execute-disable.
+
+  @retval TRUE     The input address is in protected range.
+  @retval FALSE    The input address is not in protected range.
 
 **/
 BOOLEAN
-IsAddressValid (
-  IN EFI_PHYSICAL_ADDRESS  Address,
-  IN BOOLEAN               *Nx
+IsSmmProfilePFAddressAbove4GValid (
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  OUT BOOLEAN               *Nx
   )
 {
   UINTN  Index;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-    //
-    // Check configuration
-    //
-    for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
-      if ((Address >= mProtectionMemRange[Index].Range.Base) && (Address < mProtectionMemRange[Index].Range.Top)) {
-        *Nx = mProtectionMemRange[Index].Nx;
-        return mProtectionMemRange[Index].Present;
-      }
+  //
+  // Check configuration
+  //
+  for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
+    if ((Address >= mProtectionMemRange[Index].Range.Base) && (Address < mProtectionMemRange[Index].Range.Top)) {
+      *Nx = mProtectionMemRange[Index].Nx;
+      return mProtectionMemRange[Index].Present;
     }
-
-    *Nx = TRUE;
-    return FALSE;
-  } else {
-    *Nx = TRUE;
-    if (IsInSmmRanges (Address)) {
-      *Nx = FALSE;
-    }
-
-    return TRUE;
   }
+
+  *Nx = TRUE;
+  return FALSE;
 }
 
 /**
@@ -438,8 +432,23 @@ InitProtectedMemRange (
          &MemorySpaceMap
          );
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
-      NumberOfAddedDescriptors++;
+    if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo)) {
+      if (ADDRESS_IS_ALIGNED (MemorySpaceMap[Index].BaseAddress, SIZE_4KB) &&
+          (MemorySpaceMap[Index].Length % SIZE_4KB == 0))
+      {
+        NumberOfAddedDescriptors++;
+      } else {
+        //
+        // Skip the MMIO range that BaseAddress and Length are not 4k aligned since
+        // the minimum granularity of the page table is 4k
+        //
+        DEBUG ((
+          DEBUG_WARN,
+          "MMIO range [0x%lx, 0x%lx] is skipped since it is not 4k aligned.\n",
+          MemorySpaceMap[Index].BaseAddress,
+          MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length
+          ));
+      }
     }
   }
 
@@ -486,15 +495,16 @@ InitProtectedMemRange (
     // Create MMIO ranges which are set to present and execution-disable.
     //
     for (Index = 0; Index < NumberOfDescriptors; Index++) {
-      if (MemorySpaceMap[Index].GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) {
-        continue;
+      if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
+          ADDRESS_IS_ALIGNED (MemorySpaceMap[Index].BaseAddress, SIZE_4KB) &&
+          (MemorySpaceMap[Index].Length % SIZE_4KB == 0))
+      {
+        mProtectionMemRange[NumberOfProtectRange].Range.Base = MemorySpaceMap[Index].BaseAddress;
+        mProtectionMemRange[NumberOfProtectRange].Range.Top  = MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length;
+        mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
+        mProtectionMemRange[NumberOfProtectRange].Nx         = TRUE;
+        NumberOfProtectRange++;
       }
-
-      mProtectionMemRange[NumberOfProtectRange].Range.Base = MemorySpaceMap[Index].BaseAddress;
-      mProtectionMemRange[NumberOfProtectRange].Range.Top  = MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length;
-      mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
-      mProtectionMemRange[NumberOfProtectRange].Nx         = TRUE;
-      NumberOfProtectRange++;
     }
 
     //
@@ -600,11 +610,7 @@ InitPaging (
   PERF_FUNCTION_BEGIN ();
 
   PageTable = AsmReadCr3 ();
-  if (sizeof (UINTN) == sizeof (UINT32)) {
-    Limit = BASE_4GB;
-  } else {
-    Limit = (IsRestrictedMemoryAccess ()) ? LShiftU64 (1, mPhysicalAddressBits) : BASE_4GB;
-  }
+  Limit     = LShiftU64 (1, mPhysicalAddressBits);
 
   WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
@@ -723,6 +729,11 @@ SmmProfileStart (
   // The flag indicates SMM profile starts to work.
   //
   mSmmProfileStart = TRUE;
+
+  //
+  // Tell #PF handler to prepare a #DB subsequently.
+  //
+  mSetupDebugTrap = TRUE;
 }
 
 /**
@@ -1110,11 +1121,6 @@ InitSmmProfile (
   // Initialize profile IDT.
   //
   InitIdtr ();
-
-  //
-  // Tell #PF handler to prepare a #DB subsequently.
-  //
-  mSetupDebugTrap = TRUE;
 }
 
 /**
@@ -1166,6 +1172,21 @@ RestorePageTableBelow4G (
   // PDPTE
   //
   PTIndex = (UINTN)BitFieldRead64 (PFAddress, 30, 38);
+
+  if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
+    //
+    // For 32-bit case, because a full map page table for 0-4G is created by default,
+    // and since the PDPTE must be one non-leaf entry, the PDPTE must always be present.
+    // So, ASSERT it must be the 64-bit case running here.
+    //
+    ASSERT (sizeof (UINT64) == sizeof (UINTN));
+
+    //
+    // If the entry is not present, allocate one page from page pool for it
+    //
+    PageTable[PTIndex] = AllocPage () | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+  }
+
   ASSERT (PageTable[PTIndex] != 0);
   PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
 
@@ -1173,9 +1194,9 @@ RestorePageTableBelow4G (
   // PD
   //
   PTIndex = (UINTN)BitFieldRead64 (PFAddress, 21, 29);
-  if ((PageTable[PTIndex] & IA32_PG_PS) != 0) {
+  if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
     //
-    // Large page
+    // A 2M page size will be used directly when the 2M entry is marked as non-present.
     //
 
     //
@@ -1202,7 +1223,8 @@ RestorePageTableBelow4G (
     }
   } else {
     //
-    // Small page
+    // If the 2M entry is marked as present, a 4K page size will be utilized.
+    // In this scenario, the 2M entry must be a non-leaf entry.
     //
     ASSERT (PageTable[PTIndex] != 0);
     PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
@@ -1304,14 +1326,6 @@ SmmProfilePFHandler (
   EFI_STATUS                  Status;
   UINT8                       SoftSmiValue;
   EFI_SMM_SAVE_STATE_IO_INFO  IoInfo;
-
-  if (!mSmmProfileStart) {
-    //
-    // If SMM profile does not start, call original page fault handler.
-    //
-    SmiDefaultPFHandler ();
-    return;
-  }
 
   if (mBtsSupported) {
     DisableBTS ();

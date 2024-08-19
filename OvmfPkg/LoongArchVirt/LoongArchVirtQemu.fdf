@@ -159,7 +159,7 @@ INF  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
 
 #
 # Network modules
-#!include NetworkPkg/Network.fdf.inc
+!include NetworkPkg/Network.fdf.inc
 
 #
 # File system

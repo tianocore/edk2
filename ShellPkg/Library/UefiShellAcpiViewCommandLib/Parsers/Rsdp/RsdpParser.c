@@ -1,7 +1,7 @@
 /** @file
   RSDP table parser
 
-  Copyright (c) 2016 - 2019, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -19,6 +19,7 @@ STATIC CONST UINT64  *XsdtAddress;
   This function validates the RSDT Address.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -26,8 +27,9 @@ STATIC
 VOID
 EFIAPI
 ValidateRsdtAddress (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
  #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
@@ -55,6 +57,7 @@ ValidateRsdtAddress (
   This function validates the XSDT Address.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -62,8 +65,9 @@ STATIC
 VOID
 EFIAPI
 ValidateXsdtAddress (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
  #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)

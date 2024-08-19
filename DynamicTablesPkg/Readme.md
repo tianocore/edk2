@@ -402,3 +402,116 @@ Refer to the following presentation from *UEFI Plugfest Seattle 2018*:
 
 [Dynamic Tables Framework: A Step Towards Automatic Generation of Advanced Configuration and Power Interface (ACPI) & System Management BIOS (SMBIOS) Tables](http://www.uefi.org/sites/default/files/resources/Arm_Dynamic%20Tables%20Framework%20A%20Step%20Towards%20Automatic%20Generation%20of%20Advanced%20Configuration%20and%20Power%20Interface%20%28ACPI%29%20%26%20System%20Management%20BIOS%20%28SMBIOS%29%20Tables%20_0.pdf)
 
+## Configuration Manager Objects
+
+The CM_OBJECT_ID type is used to identify the Configuration Manager
+    objects.
+
+## Description of Configuration Manager Object ID
+
+| 31     -     28 | 27 - 8 | 7    -    0 |
+| :-------------: | :----: | :---------: |
+| `Name Space ID` |    0   | `Object ID` |
+------------------------------------------
+
+### Name Space ID: Bits [31:28]
+
+|  ID   |  Description                      | Comments |
+| ---:  | :--------------------------       | :---     |
+| 0000b | Standard                          | |
+| 0001b | Arch Common                       | |
+| 0010b | ARM                               | |
+| 0011b | X64                               | |
+| 1111b | Custom/OEM                        | |
+| `*`   | All other values are reserved.    | |
+
+### Bits: [27:8] - Reserved, must be zero.
+
+### Bits: [7:0] - Object ID
+
+#### Object ID's in the Standard Namespace:
+
+|  ID   |  Description                      | Comments |
+| ---:  | :--------------------------       | :---     |
+|   0   | Configuration Manager Revision    | |
+|   1   | ACPI Table List                   | |
+|   2   | SMBIOS Table List                 | |
+
+#### Object ID's in the ARM Namespace:
+
+|  ID   |  Description                              | Comments |
+| ---:  | :--------------------------               | :---     |
+|   0   | Reserved                                  | |
+|   1   | Boot Architecture Info                    | |
+|   2   | GICC Info                                 | |
+|   3   | GICD Info                                 | |
+|   4   | GIC MSI Frame Info                        | |
+|   5   | GIC Redistributor Info                    | |
+|   6   | GIC ITS Info                              | |
+|   7   | Generic Timer Info                        | |
+|   8   | Platform GT Block Info                    | |
+|   9   | Generic Timer Block Frame Info            | |
+|  10   | Platform Generic Watchdog                 | |
+|  11   | ITS Group                                 | |
+|  12   | Named Component                           | |
+|  13   | Root Complex                              | |
+|  14   | SMMUv1 or SMMUv2                          | |
+|  15   | SMMUv3                                    | |
+|  16   | PMCG                                      | |
+|  17   | GIC ITS Identifier Array                  | |
+|  18   | ID Mapping Array                          | |
+|  19   | SMMU Interrupt Array                      | |
+|  20   | CMN 600 Info                              | |
+|  21   | Reserved Memory Range Node                | |
+|  22   | Memory Range Descriptor                   | |
+|  23   | Embedded Trace Extension/Module Info      | |
+|  `*`  | All other values are reserved.            | |
+
+#### Object ID's in the Arch Common Namespace:
+
+|  ID   |  Description                              | Comments |
+| ---:  | :--------------------------               | :---     |
+|   0   |  Reserved                                 | |
+|   1   | Power Management Profile Info             | |
+|   2   | Serial Port Info                          | |
+|   3   | Serial Console Port Info                  | |
+|   4   | Serial Debug Port Info                    | |
+|   5   | Hypervisor Vendor Id                      | |
+|   6   | Fixed feature flags for FADT              | |
+|   7   | CM Object Reference                       | |
+|   8   | PCI Configuration Space Info              | |
+|   9   | PCI Address Map Info                      | |
+|  10   | PCI Interrupt Map Info                    | |
+|  11   | Memory Affinity Info                      | |
+|  12   | Device Handle Acpi                        | |
+|  13   | Device Handle PCI                         | |
+|  14   | Generic Initiator Affinity Info           | |
+|  15   | Low Power Idle State Info                 | |
+|  16   | Processor Hierarchy Info                  | |
+|  17   | Cache Info                                | |
+|  18   | Continuous Performance Control Info       | |
+|  19   | Pcc Subspace Type 0 Info                  | |
+|  20   | Pcc Subspace Type 1 Info                  | |
+|  21   | Pcc Subspace Type 2 Info                  | |
+|  22   | Pcc Subspace Type 3 Info                  | |
+|  23   | Pcc Subspace Type 4 Info                  | |
+|  24   | Pcc Subspace Type 5 Info                  | |
+|  25   | P-State Dependency (PSD) Info             | |
+|  26   | TPM Interface Info                        | |
+|  `*`  | All other values are reserved.            | |
+
+#### Object ID's in the X64 Namespace:
+
+|  ID   |  Description                              | Comments |
+| ---:  | :--------------------------               | :---     |
+|   0   | Reserved                                  | |
+|   1   | SCI Interrupt Info                        | |
+|   2   | SCI Command Info                          | |
+|   3   | Legacy Power Management Block Info        | |
+|   4   | Legacy GPE Block Info                     | |
+|   5   | Power Management Block Info               | |
+|   6   | GPE Block Info                            | |
+|   7   | Sleep Block Info                          | |
+|   8   | Reset Block Info                          | |
+|   9   | Miscellaneous Block Info                  | |
+|  `*`  | All other values are reserved.            | |

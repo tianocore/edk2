@@ -13,7 +13,7 @@
 #include <Library/BaseMemoryLib.h>
 
 //
-// BOOLEAN value to indicate if it is at the post ExitBootServices pahse
+// BOOLEAN value to indicate if it is at the post ExitBootServices phase
 //
 BOOLEAN  mPostEBS = FALSE;
 
@@ -34,9 +34,10 @@ EFI_BOOT_SERVICES  *mDebugBS;
   @param  Context      Pointer to the notification function's context.
 
 **/
+static
 VOID
 EFIAPI
-ExitBootServicesCallback (
+UefiDebugLibDebugPortProtocolExitBootServicesCallback (
   EFI_EVENT  Event,
   VOID       *Context
   )
@@ -67,7 +68,7 @@ DxeDebugLibConstructor (
   mDebugBS->CreateEvent (
               EVT_SIGNAL_EXIT_BOOT_SERVICES,
               TPL_NOTIFY,
-              ExitBootServicesCallback,
+              UefiDebugLibDebugPortProtocolExitBootServicesCallback,
               NULL,
               &mExitBootServicesEvent
               );

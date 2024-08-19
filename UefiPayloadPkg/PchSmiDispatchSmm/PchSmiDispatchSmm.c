@@ -25,7 +25,7 @@ LIST_ENTRY            mSmmSwDispatch2Queue = INITIALIZE_LIST_HEAD_VARIABLE (mSmm
 /**
   Find SmmSwDispatch2Context by SwSmiInputValue.
 
-  @param[in] SwSmiInputValue      The value to indentify the SmmSwDispatch2 context
+  @param[in] SwSmiInputValue      The value to identify the SmmSwDispatch2 context
 
   @return Pointer to EFI_SMM_SW_DISPATCH2_CONTEXT context
 **/
@@ -51,7 +51,7 @@ FindContextBySwSmiInputValue (
 /**
   Find SmmSwDispatch2Context by DispatchHandle.
 
-  @param DispatchHandle    The handle to indentify the SmmSwDispatch2 context
+  @param DispatchHandle    The handle to identify the SmmSwDispatch2 context
 
   @return Pointer to EFI_SMM_SW_DISPATCH2_CONTEXT context
 **/
@@ -178,7 +178,7 @@ End:
 /**
 Check the SwSmiInputValue is already used
 
-@param[in]  SwSmiInputValue      To indentify the SmmSwDispatch2 context
+@param[in]  SwSmiInputValue      To identify the SmmSwDispatch2 context
 
 @retval EFI_SUCCESS              SwSmiInputValue could be used.
 @retval EFI_INVALID_PARAMETER    SwSmiInputValue is already be used.

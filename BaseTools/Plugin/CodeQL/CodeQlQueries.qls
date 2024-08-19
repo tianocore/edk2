@@ -2,7 +2,7 @@
 - description: C++ queries
 
 - queries: '.'
-  from: codeql/cpp-queries
+  from: codeql/cpp-queries@1.1.0
 
 ##########################################################################################
 # Queries
@@ -69,8 +69,6 @@
     id: cpp/missing-header-guard
 - include:
     id: cpp/unused-local-variable
-- include:
-    id: cpp/unused-static-function
 - include:
     id: cpp/unused-static-variable
 

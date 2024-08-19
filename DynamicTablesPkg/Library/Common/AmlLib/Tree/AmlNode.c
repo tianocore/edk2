@@ -573,7 +573,7 @@ AmlIsMethodDefinitionNode (
 {
   AML_DATA_NODE  *ObjectType;
 
-  // Node is checked to be an object node aswell.
+  // Node is checked to be an object node as well.
   if (AmlNodeCompareOpCode (Node, AML_METHOD_OP, 0)) {
     return TRUE;
   } else if (AmlNodeCompareOpCode (Node, AML_EXTERNAL_OP, 0)) {

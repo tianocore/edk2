@@ -135,11 +135,6 @@
   # Define if the GICv3 controller should use the GICv2 legacy
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
 
-  ## Define the conduit to use for monitor calls.
-  # Default PcdMonitorConduitHvc = FALSE, conduit = SMC
-  # If PcdMonitorConduitHvc = TRUE, conduit = HVC
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
-
   # Whether to remap all unused memory NX before installing the CPU arch
   # protocol driver. This is needed on platforms that map all DRAM with RWX
   # attributes initially, and can be disabled otherwise.
@@ -229,6 +224,11 @@
   #
   gArmTokenSpaceGuid.PcdUefiShellDefaultBootEnable|FALSE|BOOLEAN|0x0000052
 
+  ## Define the conduit to use for monitor calls.
+  # Default PcdMonitorConduitHvc = FALSE, conduit = SMC
+  # If PcdMonitorConduitHvc = TRUE, conduit = HVC
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
+
 [PcdsFixedAtBuild.common, PcdsPatchableInModule.common]
   gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B
   gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT64|0x0000002D
@@ -314,11 +314,6 @@
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0xFFFF|UINT16|0x30000059
 
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
-  #
-  # ARM Architectural Timer
-  #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
-
   # ARM Architectural Timer Interrupt(GIC PPI) numbers
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036

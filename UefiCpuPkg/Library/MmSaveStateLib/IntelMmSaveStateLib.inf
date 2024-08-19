@@ -16,7 +16,7 @@
   FILE_GUID                      = 37E8137B-9F74-4250-8951-7A970A3C39C0
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = MmSaveStateLib
+  LIBRARY_CLASS                  = MmSaveStateLib|DXE_SMM_DRIVER MM_STANDALONE
 
 [Sources]
   MmSaveState.h
