@@ -7,6 +7,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "PrEval": {
+        "DscPath": "NetworkPkg.dsc",
+    },
     "LicenseCheck": {
         "IgnoreFiles": []
     },
