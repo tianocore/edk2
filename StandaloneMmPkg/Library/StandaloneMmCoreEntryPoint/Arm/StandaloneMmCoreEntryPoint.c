@@ -10,9 +10,13 @@
               with management services running from an isolated Secure Partitions
               at S-EL0, and the communication protocol is the Management Mode(MM)
               interface.
+    - FF-A - Firmware Framework for Arm A-profile
 
   @par Reference(s):
-  - Secure Partition Manager [https://trustedfirmware-a.readthedocs.io/en/latest/components/secure-partition-manager-mm.html].
+    - Secure Partition Manager
+        [https://trustedfirmware-a.readthedocs.io/en/latest/components/secure-partition-manager-mm.html]
+    - Arm Firmware Framework for Arm A-Profile
+        [https://developer.arm.com/documentation/den0077/latest]
 
 **/
 
@@ -22,11 +26,11 @@
 
 #include <PiPei.h>
 #include <Guid/MmramMemoryReserve.h>
-#include <Guid/MmCoreData.h>
 #include <Guid/MpInformation.h>
 
 #include <Library/ArmLib.h>
 #include <Library/ArmSvcLib.h>
+#include <Library/ArmFfaLib.h>
 #include <Library/ArmTransferListLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
@@ -39,6 +43,7 @@
 #include <IndustryStandard/ArmStdSmc.h>
 #include <IndustryStandard/ArmMmSvc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
+#include <IndustryStandard/ArmFfaBootInfo.h>
 
 #include <Protocol/PiMmCpuDriverEp.h>
 
@@ -46,43 +51,43 @@ extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
 
 VOID  *gHobList = NULL;
 
-STATIC PI_MM_CPU_DRIVER_ENTRYPOINT  CpuDriverEntryPoint = NULL;
-STATIC MP_INFORMATION_HOB_DATA      *mMpInfo            = NULL;
+STATIC PI_MM_CPU_DRIVER_ENTRYPOINT  CpuDriverEntryPoint       = NULL;
+STATIC MP_INFORMATION_HOB_DATA      *mMpInfo                  = NULL;
+STATIC MISC_MM_COMMUNICATE_BUFFER   *mMiscMmCommunicateBuffer = NULL;
 
 /**
-  Get ABI protocol.
+  Get communication ABI protocol.
 
-  @retval         AbiProtocolSpmMm         SPM_MM ABI
-  @retval         AbiProtocolFfa           FF-A ABI
-  @retval         AbiProtocolUnknown       Invalid ABI.
+  @retval         CommProtocolSpmMm        SPM_MM ABI
+  @retval         CommProtocolFfa           FF-A ABI
+  @retval         CommProtocolUnknown       Invalid ABI.
 
 **/
 STATIC
-ABI_PROTOCOL
+EFI_STATUS
 EFIAPI
-GetAbiProtocol (
-  IN VOID
+GetCommProtocol (
+  IN COMM_PROTOCOL  *CommProtocol
   )
 {
+  EFI_STATUS    Status;
   UINT16        RequestMajorVersion;
   UINT16        RequestMinorVersion;
   UINT16        CurrentMajorVersion;
   UINT16        CurrentMinorVersion;
   ARM_SVC_ARGS  SvcArgs;
-  ABI_PROTOCOL  AbiProtocol;
 
-  ZeroMem (&SvcArgs, sizeof (ARM_SVC_ARGS));
-  SvcArgs.Arg0 = ARM_SVC_ID_FFA_VERSION_AARCH32;
-  SvcArgs.Arg1 = ((SPM_MAJOR_VERSION_FFA <<  16) | (SPM_MINOR_VERSION_FFA));
+  RequestMajorVersion = ARM_FFA_MAJOR_VERSION;
+  RequestMinorVersion = ARM_FFA_MINOR_VERSION;
 
-  ArmCallSvc (&SvcArgs);
-
-  if (SvcArgs.Arg0 != ARM_FFA_SPM_RET_NOT_SUPPORTED) {
-    AbiProtocol         = AbiProtocolFfa;
-    RequestMajorVersion = SPM_MAJOR_VERSION_FFA;
-    RequestMinorVersion = SPM_MINOR_VERSION_FFA;
-    CurrentMajorVersion = ((SvcArgs.Arg0 >> 16) & 0xffff);
-    CurrentMinorVersion = (SvcArgs.Arg0 & 0xffff);
+  Status = ArmFfaLibVersion (
+             RequestMajorVersion,
+             RequestMinorVersion,
+             &CurrentMajorVersion,
+             &CurrentMinorVersion
+             );
+  if (!EFI_ERROR (Status)) {
+    *CommProtocol = CommProtocolFfa;
   } else {
     ZeroMem (&SvcArgs, sizeof (ARM_SVC_ARGS));
     SvcArgs.Arg0 = ARM_FID_SPM_MM_VERSION_AARCH32;
@@ -90,10 +95,11 @@ GetAbiProtocol (
     ArmCallSvc (&SvcArgs);
 
     if (SvcArgs.Arg0 == ARM_SPM_MM_RET_NOT_SUPPORTED) {
-      return AbiProtocolUnknown;
+      *CommProtocol = CommProtocolUnknown;
+      return EFI_UNSUPPORTED;
     }
 
-    AbiProtocol         = AbiProtocolSpmMm;
+    *CommProtocol       = CommProtocolSpmMm;
     RequestMajorVersion = ARM_SPM_MM_SUPPORT_MAJOR_VERSION;
     RequestMinorVersion = ARM_SPM_MM_SUPPORT_MINOR_VERSION;
     CurrentMajorVersion =
@@ -117,53 +123,51 @@ GetAbiProtocol (
       "Incompatible %s Versions.\n" \
       "Request Version: Major=0x%x, Minor>=0x%x.\n" \
       "Current Version: Major=0x%x, Minor=0x%x.\n",
-      (AbiProtocol == AbiProtocolFfa) ? L"FF-A" : L"SPM_MM",
+      (*CommProtocol == CommProtocolFfa) ? L"FF-A" : L"SPM_MM",
       RequestMajorVersion,
       RequestMinorVersion,
       CurrentMajorVersion,
       CurrentMinorVersion
       ));
-    AbiProtocol = AbiProtocolUnknown;
-  } else {
-    DEBUG ((
-      DEBUG_INFO,
-      "%s Version: Major=0x%x, Minor=0x%x\n",
-      (AbiProtocol == AbiProtocolFfa) ? L"FF-A" : L"SPM_MM",
-      CurrentMajorVersion,
-      CurrentMinorVersion
-      ));
+
+    return EFI_UNSUPPORTED;
   }
 
-  return AbiProtocol;
+  DEBUG ((
+    DEBUG_INFO,
+    "%s Version: Major=0x%x, Minor=0x%x\n",
+    (*CommProtocol == CommProtocolFfa) ? L"FF-A" : L"SPM_MM",
+    CurrentMajorVersion,
+    CurrentMinorVersion
+    ));
+
+  return EFI_SUCCESS;
 }
 
 /**
-  Get Boot protocol.
+  Validate Boot information when using SpmMm.
+  It should use Transfer list according to firmware handoff specification.
 
-  @param[in]      Arg0     Arg0 passed from firmware
-  @param[in]      Arg1     Arg1 passed from firmware
-  @param[in]      Arg2     Arg2 passed from firmware
-  @param[in]      Arg3     Arg3 passed from firmware
+  @param  [in]  Arg0          Should be 0x00 because we don't use device tree
+  @param  [in]  Fields        Signature and register convention version
+  @param  [in]  Arg2          Should be 0x00 because we don't use device tree
+  @param  [in]  TlhAddr       Address of transfer list
 
-  @retval         BootProtocolTl64            64 bits register convention transfer list
-  @retval         BootProtocolTl32            32 bits register convention transfer list
-  @retval         BootProtocolUnknown         Invalid Boot protocol
+  @retval EFI_SUCCESS             Valid boot information
+  @retval EFI_INVALID_PARAMETER   Invalid boot information
 
 **/
 STATIC
-BOOT_PROTOCOL
+EFI_STATUS
 EFIAPI
-GetBootProtocol (
-  IN UINTN  Arg0,
-  IN UINTN  Arg1,
-  IN UINTN  Arg2,
-  IN UINTN  Arg3
+ValidateSpmMmBootInfo (
+  IN UINTN   Arg0,
+  IN UINT64  Fields,
+  IN UINTN   Arg2,
+  IN UINTN   TlhAddr
   )
 {
-  UINTN  RegVersion;
-  UINT64 Fields;
-
-  Fields = Arg1;
+  UINT64  RegVersion;
 
   /*
    * The signature value in x1's [23:0] bits is the same regardless of
@@ -182,27 +186,106 @@ GetBootProtocol (
       RegVersion = (Fields >> REGISTER_CONVENTION_VERSION_SHIFT_64) &
                    REGISTER_CONVENTION_VERSION_MASK;
 
-      if ((RegVersion != 1) || (Arg2 != 0x00) || (Arg3 == 0x00)) {
-        goto err_out;
+      if ((RegVersion != 1) || (Arg2 != 0x00) || (TlhAddr == 0x00)) {
+        return EFI_INVALID_PARAMETER;
       }
-
-      return BootProtocolTl64;
     } else {
       RegVersion = (Fields >> REGISTER_CONVENTION_VERSION_SHIFT_32) &
                    REGISTER_CONVENTION_VERSION_MASK;
 
-      if ((RegVersion != 1) || (Arg0 != 0x00) || (Arg3 == 0x00)) {
-        goto err_out;
+      if ((RegVersion != 1) || (Arg0 != 0x00) || (TlhAddr == 0x00)) {
+        return EFI_INVALID_PARAMETER;
       }
-
-      return BootProtocolTl32;
     }
+
+    return EFI_SUCCESS;
   }
 
-err_out:
-  DEBUG ((DEBUG_ERROR, "Error: Failed to get boot protocol!\n"));
+  return EFI_INVALID_PARAMETER;
+}
 
-  return BootProtocolUnknown;
+/**
+  Validate Boot information when using FF-A.
+
+  @param  [in]  FfaBootInfoHeaderAddr       Address of FF-A boot information
+
+  @retval EFI_SUCCESS             Valid boot information
+  @retval EFI_INVALID_PARAMETER   Invalid boot information
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+ValidateFfaBootInfo (
+  IN UINTN  FfaBootInfoHeaderAddr
+  )
+{
+  EFI_FFA_BOOT_INFO_HEADER  *FfaBootInfoHeader;
+
+  FfaBootInfoHeader = (EFI_FFA_BOOT_INFO_HEADER *)FfaBootInfoHeaderAddr;
+  if (FfaBootInfoHeader == NULL) {
+    DEBUG ((DEBUG_ERROR, "Error: No FF-A boot information...\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((FfaBootInfoHeader->Magic != FFA_BOOT_INFO_SIGNATURE) ||
+      (ARM_FFA_MAJOR_VERSION_GET (FfaBootInfoHeader->Version) <
+       ARM_FFA_MAJOR_VERSION) ||
+      (ARM_FFA_MINOR_VERSION_GET (FfaBootInfoHeader->Version) <
+       ARM_FFA_MINOR_VERSION))
+  {
+    DEBUG ((DEBUG_ERROR, "Error: Invalid FF-A boot information...\n"));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Validate Boot information.
+
+  @param  [in]  CommProtocol  Communication ABI protocol
+  @param  [in]  Arg0          In case of FF-A, address of FF-A boot information
+                              In case of SPM_MM, 0x00
+  @param  [in]  Arg1          In case of FF-A, 0x00
+                              In case of SPM_MM, Signature and register convention version
+  @param  [in]  Arg2          should be 0x00
+  @param  [in]  Arg3          In case of FF-A, it's 0x00
+                              In case of SPM_MM, address of transfer list
+
+  @retval EFI_SUCCESS             Valid boot information
+  @retval EFI_INVALID_PARAMETER   Invalid boot information
+
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+ValidateBootInfo (
+  IN COMM_PROTOCOL  CommProtocol,
+  IN UINTN          Arg0,
+  IN UINTN          Arg1,
+  IN UINTN          Arg2,
+  IN UINTN          Arg3
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = EFI_INVALID_PARAMETER;
+
+  if (CommProtocol == CommProtocolSpmMm) {
+    Status = ValidateSpmMmBootInfo (Arg0, Arg1, Arg2, Arg3);
+  } else if (CommProtocol == CommProtocolFfa) {
+    /*
+     * In case of FF-A, Arg0 is set as FFA_BOOT_INFO address.
+     */
+    Status = ValidateFfaBootInfo (Arg0);
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error: Failed to validate boot information!\n"));
+  }
+
+  return Status;
 }
 
 /**
@@ -240,9 +323,147 @@ GetPhitHobFromTransferList (
 }
 
 /**
-  Get logical Cpu Number.
+  Get PHIT hob information from FF-A boot information.
 
-  @param  [in] AbiProtocol            Abi Protocol.
+  @param[in]      FfaBootInfoHeaderAddr   FF-A boot information header address
+
+  @retval         NULL                    Failed to get PHIT hob
+  @retval         Address                 PHIT hob address
+
+**/
+STATIC
+VOID *
+EFIAPI
+GetPhitHobFromFfaBootInfo (
+  IN UINTN  FfaBootInfoHeaderAddr
+  )
+{
+  EFI_FFA_BOOT_INFO_HEADER  *FfaBootInfoHeader;
+  EFI_FFA_BOOT_INFO_DESC    *FfaBootInfoDesc;
+  UINT32                    Idx;
+
+  FfaBootInfoHeader = (EFI_FFA_BOOT_INFO_HEADER *)FfaBootInfoHeaderAddr;
+
+  for (Idx = 0; Idx  < FfaBootInfoHeader->CountBootInfoDesc; Idx++) {
+    FfaBootInfoDesc = (EFI_FFA_BOOT_INFO_DESC *)((FfaBootInfoHeaderAddr +
+                                                  FfaBootInfoHeader->OffsetBootInfoDesc) +
+                                                 (Idx * FfaBootInfoHeader->SizeBootInfoDesc));
+
+    if ((FFA_BOOT_INFO_TYPE (FfaBootInfoDesc->Type) != FFA_BOOT_INFO_TYPE_STD) ||
+        (FFA_BOOT_INFO_TYPE_ID (FfaBootInfoDesc->Type) != FFA_BOOT_INFO_TYPE_ID_HOB) ||
+        (FFA_BOOT_INFO_FLAG_CONTENT (FfaBootInfoDesc->Flags) != FFA_BOOT_INFO_FLAG_CONTENT_ADDR))
+    {
+      continue;
+    }
+
+    return (VOID *)(UINTN)FfaBootInfoDesc->Content;
+  }
+
+  DEBUG ((DEBUG_ERROR, "Error: No Phit hob is present in FfaBootInfo...\n"));
+
+  return NULL;
+}
+
+/**
+  Get PHIT Hob from Boot information.
+
+  @param  [in]  CommProtocol  Communication ABI protocol
+  @param  [in]  Arg0          In case of FF-A, address of FF-A boot information
+                              In case of SPM_MM, 0x00 because we don't use device tree.
+  @param  [in]  Arg1          In case of FF-A, 0x00
+                              In case of SPM_MM, Signature and register convention version
+  @param  [in]  Arg2          Should be 0x00 because we don't use device tree.
+  @param  [in]  Arg3          In case of FF-A, it's 0x00
+                              In case of SPM_MM, address of transfer list
+
+  @retval         NULL                    Failed to get PHIT hob
+  @retval         Address                 PHIT hob address
+
+**/
+STATIC
+VOID *
+EFIAPI
+GetPhitHobFromBootInfo (
+  IN COMM_PROTOCOL  CommProtocol,
+  IN UINTN          Arg0,
+  IN UINTN          Arg1,
+  IN UINTN          Arg2,
+  IN UINTN          Arg3
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *HobStart;
+
+  Status = ValidateBootInfo (CommProtocol, Arg0, Arg1, Arg2, Arg3);
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  if (CommProtocol == CommProtocolFfa) {
+    HobStart = GetPhitHobFromFfaBootInfo (Arg0);
+  } else {
+    HobStart = GetPhitHobFromTransferList (Arg3);
+  }
+
+  return HobStart;
+}
+
+/**
+  Get service type.
+  When using FF-A ABI, there're ways to request service to StandaloneMm
+      - FF-A with MmCommunication protocol.
+      - FF-A service with each specification.
+   MmCommunication Protocol can use FFA_MSG_SEND_DIRECT_REQ or REQ2,
+   Other FF-A services should use FFA_MSG_SEND_DIRECT_REQ2.
+   In case of FF-A with MmCommunication protocol via FFA_MSG_SEND_DIRECT_REQ,
+   register x3 saves Communication Buffer with gEfiMmCommunication2ProtocolGuid.
+   In case of FF-A with MmCommunication protocol via FFA_MSG_SEND_DIRECT_REQ2,
+   register x2/x3 save gEfiMmCommunication2ProtocolGuid and
+   register x4 saves Communication Buffer with Service Guid.
+
+   Other FF-A services (ServiceTypeMisc) delivers register values according to
+   there own service specification.
+   That means it doesn't use MmCommunication Buffer with MmCommunication Header
+   format.
+   (i.e) Tpm service via FF-A or Firmware Update service via FF-A.
+   To support latter services by StandaloneMm, it defines SERVICE_TYPE_MISC.
+   So that StandaloneMmEntryPointCore.c generates MmCommunication Header
+   with delivered register values to dispatch service provided StandaloneMmCore.
+   So that service handler can get proper information from delivered register.
+
+   In case of SPM_MM Abi, it only supports MmCommunication service.
+
+
+  @param[in]      ServiceGuid                   Service Guid
+
+  @retval         ServiceTypeMmCommunication    Mm communication service
+  @retval         ServiceTypeMisc               Service via implemented defined
+                                                register ABI.
+                                                This will generate internal
+                                                MmCommunication Header
+                                                to dispatch service implemented
+                                                in standaloneMm
+  @retval         ServiceTypeUnknown            Not supported service.
+
+**/
+STATIC
+SERVICE_TYPE
+EFIAPI
+GetServiceType (
+  IN EFI_GUID  *ServiceGuid
+  )
+{
+  if (CompareGuid (ServiceGuid, &gEfiMmCommunication2ProtocolGuid)) {
+    return ServiceTypeMmCommunication;
+  }
+
+  return ServiceTypeMisc;
+}
+
+/**
+  Get logical Cpu Number based on MpInformation hob data.
+
+  @param  [in] CommProtocol            Abi Protocol.
   @param  [in] EventCompleteSvcArgs   Pointer to the event completion arguments.
 
   @retval         CpuNumber               Cpu Number
@@ -251,16 +472,21 @@ STATIC
 UINTN
 EFIAPI
 GetCpuNumber (
-  IN ABI_PROTOCOL  AbiProtocol,
-  IN ARM_SVC_ARGS  *EventCompleteSvcArgs
+  IN COMM_PROTOCOL  CommProtocol,
+  IN ARM_SVC_ARGS   *EventCompleteSvcArgs
   )
 {
   UINTN  Idx;
 
-  if (AbiProtocol == AbiProtocolSpmMm) {
+  if (CommProtocol == CommProtocolSpmMm) {
     Idx = EventCompleteSvcArgs->Arg3;
   } else {
-    Idx = EventCompleteSvcArgs->Arg6;
+    /*
+     * There's no way to find out CPU number in StandaloneMm via FF-A v1.2.
+     * Because StandaloneMm is S-EL0 partition, it couldn't read mpidr.
+     * Currently, StandaloneMm is UP migratable SP so, just return idx 0.
+     */
+    Idx = 0;
   }
 
   ASSERT (Idx < mMpInfo->NumberOfProcessors);
@@ -433,7 +659,7 @@ DumpPhitHob (
 }
 
 /**
-  Convert EFI_STATUS to SPM_MM return code.
+  Convert EFI_STATUS to MM SPM return code.
 
   @param [in] Status          edk2 status code.
 
@@ -462,44 +688,57 @@ EfiStatusToSpmMmStatus (
 }
 
 /**
-  Convert EFI_STATUS to FFA return code.
+  Set svc arguments to report initialization status of StandaloneMm.
 
-  @param [in] Status          edk2 status code.
-
-  @retval ARM_FFA_SPM_RET_*   return value correspond to EFI_STATUS.
+  @param[in]      CommProtocol              ABI Protocol.
+  @param[in]      Status                    Result of initializing StandaloneMm.
+  @param[out]     EventCompleteSvcArgs      Args structure.
 
 **/
 STATIC
-UINTN
-EFIAPI
-EfiStatusToFfaStatus (
-  IN EFI_STATUS  Status
+VOID
+ReturnInitStatusToSpmc (
+  IN COMM_PROTOCOL  CommProtocol,
+  IN EFI_STATUS     Status,
+  OUT ARM_SVC_ARGS  *EventCompleteSvcArgs
   )
 {
-  switch (Status) {
-    case EFI_SUCCESS:
-      return ARM_FFA_SPM_RET_SUCCESS;
-    case EFI_INVALID_PARAMETER:
-      return ARM_FFA_SPM_RET_INVALID_PARAMETERS;
-    case EFI_OUT_OF_RESOURCES:
-      return ARM_FFA_SPM_RET_NO_MEMORY;
-    case EFI_ALREADY_STARTED:
-      return ARM_FFA_SPM_RET_BUSY;
-    case EFI_INTERRUPT_PENDING:
-      return ARM_FFA_SPM_RET_INTERRUPTED;
-    case EFI_ACCESS_DENIED:
-      return ARM_FFA_SPM_RET_DENIED;
-    case EFI_ABORTED:
-      return ARM_FFA_SPM_RET_ABORTED;
-    default:
-      return ARM_FFA_SPM_RET_NOT_SUPPORTED;
+  ZeroMem (EventCompleteSvcArgs, sizeof (ARM_SVC_ARGS));
+
+  if (CommProtocol == CommProtocolFfa) {
+    if (EFI_ERROR (Status)) {
+      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_ERROR;
+
+      /*
+       * In case SvcConduit, this must be zero.
+       */
+      EventCompleteSvcArgs->Arg1 = 0x00;
+      EventCompleteSvcArgs->Arg2 = EfiStatusToFfaStatus (Status);
+    } else {
+      /*
+       * For completion of initialization, It should use FFA_MSG_WAIT.
+       * See FF-A specification 5.5 Protocol for completing execution context
+       * initialization
+       */
+      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_WAIT;
+    }
+  } else if (CommProtocol == CommProtocolSpmMm) {
+    EventCompleteSvcArgs->Arg0 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
+    EventCompleteSvcArgs->Arg1 = EfiStatusToSpmMmStatus (Status);
+  } else {
+    /*
+     * We don't know what communication abi protocol is using.
+     * Set Arg0 as MAX_UINTN to make SPMC know it's error situation.
+     */
+    EventCompleteSvcArgs->Arg0 = MAX_UINTN;
   }
 }
 
 /**
   Set Event Complete arguments to be returned via SVC call.
 
-  @param[in]      AbiProtocol               ABI Protocol.
+  @param[in]      CommProtocol              Communication Protocol.
+  @param[in]      CommData                  Communication Abi specific data.
   @param[in]      Status                    Result of StandaloneMm service.
   @param[out]     EventCompleteSvcArgs      Args structure.
 
@@ -507,17 +746,50 @@ EfiStatusToFfaStatus (
 STATIC
 VOID
 SetEventCompleteSvcArgs (
-  IN ABI_PROTOCOL   AbiProtocol,
+  IN COMM_PROTOCOL  CommProtocol,
+  IN VOID           *CommData,
   IN EFI_STATUS     Status,
   OUT ARM_SVC_ARGS  *EventCompleteSvcArgs
   )
 {
+  FFA_MSG_INFO  *FfaMsgInfo;
+
   ZeroMem (EventCompleteSvcArgs, sizeof (ARM_SVC_ARGS));
 
-  if (AbiProtocol == AbiProtocolFfa) {
-    EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP;
-    EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
-    EventCompleteSvcArgs->Arg4 = EfiStatusToFfaStatus (Status);
+  if (CommProtocol == CommProtocolFfa) {
+    FfaMsgInfo = CommData;
+
+    if (EFI_ERROR (Status)) {
+      EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_ERROR;
+
+      /*
+       * StandaloneMm is secure instance. So set as 0x00.
+       */
+      EventCompleteSvcArgs->Arg1 = 0x00;
+      EventCompleteSvcArgs->Arg2 = EfiStatusToFfaStatus (Status);
+    } else {
+      if (FfaMsgInfo->DirectMsgVersion == DirectMsgV1) {
+        EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP;
+        EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
+      } else {
+        EventCompleteSvcArgs->Arg0 = ARM_FID_FFA_MSG_SEND_DIRECT_RESP2;
+
+        if (FfaMsgInfo->ServiceType == ServiceTypeMisc) {
+          EventCompleteSvcArgs->Arg4 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg0;
+          EventCompleteSvcArgs->Arg5 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg1;
+          EventCompleteSvcArgs->Arg6 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg2;
+          EventCompleteSvcArgs->Arg7 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg3;
+        }
+      }
+
+      /*
+       * Swap source & dest partition id.
+       */
+      EventCompleteSvcArgs->Arg1 = PACK_PARTITION_ID_INFO (
+                                     FfaMsgInfo->DestPartId,
+                                     FfaMsgInfo->SourcePartId
+                                     );
+    }
   } else {
     EventCompleteSvcArgs->Arg0 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
     EventCompleteSvcArgs->Arg1 = EfiStatusToSpmMmStatus (Status);
@@ -525,9 +797,40 @@ SetEventCompleteSvcArgs (
 }
 
 /**
-  A loop to delegated events.
+  Wrap Misc service buffer with MmCommunication Header to
+  patch event handler via MmCommunication protocol.
 
-  @param  [in] AbiProtocol            Abi Protocol.
+  @param[in]      EventSvcArgs              Passed arguments
+  @param[in]      ServiceGuid               Service Guid
+  @param[out]     Buffer                    Misc service data
+                                            wrapped with MmCommunication Header.
+
+**/
+STATIC
+VOID
+InitializeMiscMmCommunicateBuffer (
+  IN ARM_SVC_ARGS                 *EventSvcArgs,
+  IN EFI_GUID                     *ServiceGuid,
+  OUT MISC_MM_COMMUNICATE_BUFFER  *Buffer
+  )
+{
+  ZeroMem (Buffer, sizeof (MISC_MM_COMMUNICATE_BUFFER));
+
+  Buffer->MessageLength      = sizeof (DIRECT_MSG_ARGS);
+  Buffer->DirectMsgArgs.Arg0 = EventSvcArgs->Arg4;
+  Buffer->DirectMsgArgs.Arg1 = EventSvcArgs->Arg5;
+  Buffer->DirectMsgArgs.Arg2 = EventSvcArgs->Arg6;
+  Buffer->DirectMsgArgs.Arg3 = EventSvcArgs->Arg7;
+  CopyGuid (&Buffer->HeaderGuid, ServiceGuid);
+}
+
+/**
+  A loop to delegate events from SPMC.
+  DelegatedEventLoop() calls ArmCallSvc() to exit to SPMC.
+  When an event is delegated to StandaloneMm the SPMC returns control
+  to StandaloneMm by returning from the SVC call.
+
+  @param  [in] CommProtocol            Abi Protocol.
   @param  [in] EventCompleteSvcArgs   Pointer to the event completion arguments.
 
 **/
@@ -535,16 +838,25 @@ STATIC
 VOID
 EFIAPI
 DelegatedEventLoop (
-  IN ABI_PROTOCOL  AbiProtocol,
-  IN ARM_SVC_ARGS  *EventCompleteSvcArgs
+  IN COMM_PROTOCOL  CommProtocol,
+  IN ARM_SVC_ARGS   *EventCompleteSvcArgs
   )
 {
-  EFI_STATUS  Status;
-  UINTN       CpuNumber;
-  UINTN       CommBufferAddr;
+  EFI_STATUS    Status;
+  UINTN         CpuNumber;
+  UINT64        Uuid[2];
+  VOID          *CommData;
+  FFA_MSG_INFO  FfaMsgInfo;
+  EFI_GUID      ServiceGuid;
+  SERVICE_TYPE  ServiceType;
+  UINTN         CommBufferAddr;
+
+  CommData = NULL;
 
   while (TRUE) {
+    // Exit to SPMC.
     ArmCallSvc (EventCompleteSvcArgs);
+    // Enter from SPMC.
 
     DEBUG ((DEBUG_INFO, "Received delegated event\n"));
     DEBUG ((DEBUG_INFO, "X0 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg0));
@@ -556,22 +868,60 @@ DelegatedEventLoop (
     DEBUG ((DEBUG_INFO, "X6 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg6));
     DEBUG ((DEBUG_INFO, "X7 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg7));
 
-    CpuNumber = GetCpuNumber (AbiProtocol, EventCompleteSvcArgs);
+    CpuNumber = GetCpuNumber (CommProtocol, EventCompleteSvcArgs);
     DEBUG ((DEBUG_INFO, "CpuNumber: %d\n", CpuNumber));
 
-    if (AbiProtocol == AbiProtocolFfa) {
-      if (EventCompleteSvcArgs->Arg0 != ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ) {
+    if (CommProtocol == CommProtocolFfa) {
+      FfaMsgInfo.SourcePartId = GET_SOURCE_PARTITION_ID (EventCompleteSvcArgs->Arg1);
+      FfaMsgInfo.DestPartId   = GET_DEST_PARTITION_ID (EventCompleteSvcArgs->Arg1);
+      CommData                = &FfaMsgInfo;
+
+      if (EventCompleteSvcArgs->Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_REQ) {
+        FfaMsgInfo.DirectMsgVersion = DirectMsgV1;
+        ServiceType                 = ServiceTypeMmCommunication;
+      } else if (EventCompleteSvcArgs->Arg0 == ARM_FID_FFA_MSG_SEND_DIRECT_REQ2) {
+        FfaMsgInfo.DirectMsgVersion = DirectMsgV2;
+        Uuid[0]                     = EventCompleteSvcArgs->Arg2;
+        Uuid[1]                     = EventCompleteSvcArgs->Arg3;
+        CopyGuid (&ServiceGuid, (EFI_GUID *)Uuid);
+        ServiceType = GetServiceType (&ServiceGuid);
+      } else {
         Status = EFI_INVALID_PARAMETER;
         DEBUG ((
           DEBUG_ERROR,
           "Error: Unrecognized FF-A Id: 0x%x\n",
           EventCompleteSvcArgs->Arg0
           ));
-        goto event_complete;
+        goto ExitHandler;
       }
 
-      CommBufferAddr = EventCompleteSvcArgs->Arg3;
+      FfaMsgInfo.ServiceType = ServiceType;
+
+      if (ServiceType == ServiceTypeMmCommunication) {
+        if (FfaMsgInfo.DirectMsgVersion == DirectMsgV1) {
+          CommBufferAddr = EventCompleteSvcArgs->Arg3;
+        } else {
+          CommBufferAddr = EventCompleteSvcArgs->Arg4;
+        }
+      } else if (ServiceType == ServiceTypeMisc) {
+        /*
+         * In case of Misc service, generate mm communication header
+         * to dispatch service via StandaloneMmCore.
+         */
+        InitializeMiscMmCommunicateBuffer (
+          EventCompleteSvcArgs,
+          &ServiceGuid,
+          mMiscMmCommunicateBuffer
+          );
+        CommBufferAddr = (UINTN)mMiscMmCommunicateBuffer;
+      } else {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((DEBUG_ERROR, "Error: Invalid FF-A Service...\n"));
+        goto ExitHandler;
+      }
     } else {
+      // CommProtocol == ComProtocolSpmMm.
+
       /*
        * Register Convention for SPM_MM
        *   Arg0: ARM_SMC_ID_MM_COMMUNICATE
@@ -588,13 +938,14 @@ DelegatedEventLoop (
           "Error: Unrecognized SPM_MM Id: 0x%x\n",
           EventCompleteSvcArgs->Arg0
           ));
-        goto event_complete;
+        goto ExitHandler;
       }
 
       CommBufferAddr = EventCompleteSvcArgs->Arg1;
+      ServiceType    = ServiceTypeMmCommunication;
     }
 
-    Status = CpuDriverEntryPoint (EventCompleteSvcArgs->Arg0, CpuNumber, CommBufferAddr);
+    Status = CpuDriverEntryPoint ((UINTN)ServiceType, CpuNumber, CommBufferAddr);
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
@@ -604,22 +955,30 @@ DelegatedEventLoop (
         ));
     }
 
-event_complete:
+ExitHandler:
     SetEventCompleteSvcArgs (
-      AbiProtocol,
+      CommProtocol,
+      CommData,
       Status,
       EventCompleteSvcArgs
       );
-  }
+  } // while
 }
 
 /**
-  The entry point of Standalone MM Foundation.
+  The handoff between the SPMC to StandaloneMM depends on the
+  communication interface between the SPMC and StandaloneMM.
+  When SpmMM is used, the handoff is implemented using the
+  Firmware Handoff protocol. When FF-A is used the FF-A boot
+  protocol is used.
 
-  @param  [in]  Arg0        Boot information passed according to boot protocol.
-  @param  [in]  Arg1        Boot information passed according to boot protocol.
-  @param  [in]  Arg2        Boot information passed according to boot protocol.
-  @param  [in]  Arg3        Boot information passed according to boot protocol.
+  @param  [in]  Arg0        In case of FF-A, address of FF-A boot information
+                            In case of SPM_MM, this parameter must be zero
+  @param  [in]  Arg1        In case of FF-A, this parameter must be zero
+                            In case of SPM_MM, Signature and register convention version
+  @param  [in]  Arg2        Must be zero
+  @param  [in]  Arg3        In case of FF-A, this parameter must be zero
+                            In case of SPM_MM, address of transfer list
 
 **/
 VOID
@@ -636,8 +995,7 @@ _ModuleEntryPoint (
   EFI_STATUS                          Status;
   UINT32                              SectionHeaderOffset;
   UINT16                              NumberOfSections;
-  BOOT_PROTOCOL                       BootProtocol;
-  ABI_PROTOCOL                        AbiProtocol;
+  COMM_PROTOCOL                       CommProtocol;
   VOID                                *HobStart;
   VOID                                *TeData;
   UINTN                               TeDataSize;
@@ -648,22 +1006,12 @@ _ModuleEntryPoint (
   EFI_CONFIGURATION_TABLE             *ConfigurationTable;
   UINTN                               Idx;
 
-  AbiProtocol = GetAbiProtocol ();
-  if (AbiProtocol == AbiProtocolUnknown) {
-    Status = EFI_UNSUPPORTED;
+  Status = GetCommProtocol (&CommProtocol);
+  if (EFI_ERROR (Status)) {
     goto finish;
   }
 
-  /**
-   * Check boot information
-   */
-  BootProtocol = GetBootProtocol (Arg0, Arg1, Arg2, Arg3);
-  if (BootProtocol == BootProtocolUnknown) {
-    Status = EFI_UNSUPPORTED;
-    goto finish;
-  }
-
-  HobStart = GetPhitHobFromTransferList (Arg3);
+  HobStart = GetPhitHobFromBootInfo (CommProtocol, Arg0, Arg1, Arg2, Arg3);
   if (HobStart == NULL) {
     Status = EFI_UNSUPPORTED;
     goto finish;
@@ -800,7 +1148,24 @@ _ModuleEntryPoint (
     CpuDriverEntryPoint
     ));
 
+  if (CommProtocol == CommProtocolFfa) {
+    Status = gMmCoreMmst.MmAllocatePool (
+                           EfiRuntimeServicesData,
+                           sizeof (MISC_MM_COMMUNICATE_BUFFER),
+                           (VOID **)&mMiscMmCommunicateBuffer
+                           );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "Error: Failed to allocate misc mm communication buffer...\n"
+        ));
+      goto finish;
+    }
+  }
+
 finish:
-  SetEventCompleteSvcArgs (AbiProtocol, Status, &EventCompleteSvcArgs);
-  DelegatedEventLoop (AbiProtocol, &EventCompleteSvcArgs);
+  ReturnInitStatusToSpmc (CommProtocol, Status, &EventCompleteSvcArgs);
+
+  // Call DelegateEventLoop(), this function never returns.
+  DelegatedEventLoop (CommProtocol, &EventCompleteSvcArgs);
 }
