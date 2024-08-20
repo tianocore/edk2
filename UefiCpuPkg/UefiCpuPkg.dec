@@ -424,7 +424,7 @@
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess|TRUE|BOOLEAN|0x3213210F
 
 [PcdsFixedAtBuild.RISCV64]
-  ## Indicate the maximum SATP mode allowed.
+  ## Indicate the maximum SATP mode allowed.  
   #  0 - Bare mode.
   #  8 - 39bit mode.
   #  9 - 48bit mode.
