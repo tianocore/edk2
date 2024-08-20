@@ -25,6 +25,7 @@
 
 [LibraryClasses]
   ArmLib
+  ArmFfaLib
   CacheMaintenanceLib
   MemoryAllocationLib
 
