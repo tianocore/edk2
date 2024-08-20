@@ -45,6 +45,13 @@
 #define CXL_HDM_6_WAY_INTERLEAVING   0x9
 #define CXL_HDM_12_WAY_INTERLEAVING  0xA
 
+///
+/// "CEDT" CXL Early Discovery Table
+///
+#define CEDT_TYPE_CFMWS    0x1
+#define CEDT_TYPE_CXIMS    0x2
+#define CEDT_TYPE_RDPAS    0x3
+
 //
 // Ensure proper structure formats
 //
@@ -310,6 +317,45 @@ typedef struct {
   CXL_3_0_CXL_TIMEOUT_AND_ISOLATION_CONTROL       TimeoutAndIsolationControl;
   CXL_3_0_CXL_TIMEOUT_AND_ISOLATION_STATUS        TimeoutAndIsolationStatus;
 } CXL_3_0_CXL_TIMEOUT_AND_ISOLATION_CAPABILITY_STRUCTURE;
+
+///
+/// Definition for CXL Fixed Memory Window Structure (CFMWS)
+///
+typedef struct {
+  CEDT_STRUCTURE                       Header;
+  UINT32                               Reserved;
+  UINT64                               BaseHPA;
+  UINT64                               WindowSize;
+  UINT8                                InterleaveMembers;
+  UINT8                                InterleaveArithmetic;
+  UINT16                               Reserved1;
+  UINT32                               Granularity;
+  UINT16                               Restrictions;
+  UINT16                               QtgId;
+  UINT32                               TargetList[16];
+} CXL_FIXED_MEMORY_WINDOW_STRUCTURE;
+
+///
+/// Definition for CXL XOR Interleave Math Structure (CXIMS)
+///
+typedef struct {
+  CEDT_STRUCTURE                       Header;
+  UINT16                               Reserved;
+  UINT8                                HBIG;
+  UINT8                                NIB;
+  UINT64                               XORMAPLIST[4];
+} CXL_XOR_INTERLEAVE_MATH_STRUCTURE;
+
+///
+/// Definition for RCEC Downstream Port Association Structure (RDPAS)
+///
+typedef struct {
+  CEDT_STRUCTURE                       Header;
+  UINT16                               SegmentNumber;
+  UINT16                               BDF;
+  UINT8                                ProtocolType;
+  UINT64                               BaseAddress;
+} RCEC_DOWNSTREAM_PORT_ASSOCIATION_STRUCTURE;
 
 #pragma pack()
 

@@ -14,6 +14,7 @@
 #define CXL20_H_
 
 #include <IndustryStandard/Cxl11.h>
+#include <IndustryStandard/Acpi.h>
 
 //
 // CXL DVSEC IDs
@@ -101,6 +102,15 @@
 #define CXL_MEM_DEVICE_MEDIA_STATUS_READY      0x1
 #define CXL_MEM_DEVICE_MEDIA_STATUS_ERROR      0x2
 #define CXL_MEM_DEVICE_MEDIA_STATUS_DISABLED   0x3
+
+///
+/// "CEDT" CXL Early Discovery Table
+///
+#define CXL_EARLY_DISCOVERY_TABLE_SIGNATURE  SIGNATURE_32 ('C', 'E', 'D', 'T')
+
+#define CXL_EARLY_DISCOVERY_TABLE_REVISION_01  0x1
+
+#define CEDT_TYPE_CHBS     0x0
 
 //
 // Ensure proper structure formats
@@ -457,6 +467,34 @@ typedef union {
   } Bits;
   UINT64    Uint64;
 } CXL_MEMORY_DEVICE_STATUS_REGISTER;
+
+///
+/// CEDT header
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+} CXL_EARLY_DISCOVERY_TABLE;
+
+///
+/// Node header definition shared by all CEDT structure types
+///
+typedef struct {
+  UINT8     Type;
+  UINT8     Reserved;
+  UINT16    Length;
+} CEDT_STRUCTURE;
+
+///
+/// Definition for CXL Host Bridge Structure (CHBS)
+///
+typedef struct {
+  CEDT_STRUCTURE                   Header;
+  UINT32                           UID;
+  UINT32                           CXLVersion;
+  UINT32                           Reserved;
+  UINT64                           Base;
+  UINT64                           Length;
+} CXL_HOST_BRIDGE_STRUCTURE;
 
 #pragma pack()
 
