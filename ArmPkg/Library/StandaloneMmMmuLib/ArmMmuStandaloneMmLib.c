@@ -9,8 +9,10 @@
   - [1] SPM based on the MM interface.
         (https://trustedfirmware-a.readthedocs.io/en/latest/components/
          secure-partition-manager-mm.html)
-  - [2] Arm Firmware Framework for Armv8-A, DEN0077A, version 1.0
-        (https://developer.arm.com/documentation/den0077/a)
+  - [2] Arm Firmware Framework for Armv8-A, DEN0077, version 1.2
+        (https://developer.arm.com/documentation/den0077/latest/)
+  - [3] Arm Firmware Framework for Armv8-A, DEN0140, version 1.2
+        (https://developer.arm.com/documentation/den0140/latest/)
 **/
 
 #include <Uefi.h>
@@ -19,11 +21,47 @@
 
 #include <Library/ArmLib.h>
 #include <Library/ArmMmuLib.h>
+#include <Library/ArmFfaLib.h>
 #include <Library/ArmSvcLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+
+/**
+  Utility function to determine whether ABIs in FF-A to set and get
+  memory permissions can be used. Ideally, this should be invoked once in the
+  library constructor and set a flag that can be used at runtime. However, the
+  StMM Core invokes this library before constructors are called and before the
+  StMM image itself is relocated.
+
+  @retval TRUE            Use FF-A MemPerm ABIs.
+  @retval FALSE           Use MM MemPerm ABIs.
+
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsFfaMemoryAbiSupported (
+  IN VOID
+  )
+{
+  EFI_STATUS  Status;
+  UINT16      CurrentMajorVersion;
+  UINT16      CurrentMinorVersion;
+
+  Status = ArmFfaLibVersion (
+             ARM_FFA_MAJOR_VERSION,
+             ARM_FFA_MINOR_VERSION,
+             &CurrentMajorVersion,
+             &CurrentMinorVersion
+             );
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
 
 /**
   Convert FFA return code to EFI_STATUS.
@@ -52,8 +90,9 @@ SpmMmStatusToEfiStatus (
   }
 }
 
-/** Send memory permission request to target.
+/** Send a request the target to get/set the memory permission.
 
+  @param [in]       UseFfaAbis  Use FF-A abis or not.
   @param [in, out]  SvcArgs     Pointer to SVC arguments to send. On
                                 return it contains the response parameters.
   @param [out]      RetVal      Pointer to return the response value.
@@ -72,8 +111,9 @@ SpmMmStatusToEfiStatus (
 STATIC
 EFI_STATUS
 SendMemoryPermissionRequest (
+  IN      BOOLEAN       UseFfaAbis,
   IN OUT  ARM_SVC_ARGS  *SvcArgs,
-  OUT  INT32            *RetVal
+  OUT     INT32         *RetVal
   )
 {
   if ((SvcArgs == NULL) || (RetVal == NULL)) {
@@ -81,59 +121,23 @@ SendMemoryPermissionRequest (
   }
 
   ArmCallSvc (SvcArgs);
-  if (FeaturePcdGet (PcdFfaEnable)) {
-    // Get/Set memory attributes is an atomic call, with
-    // StandaloneMm at S-EL0 being the caller and the SPM
-    // core being the callee. Thus there won't be a
-    // FFA_INTERRUPT or FFA_SUCCESS response to the Direct
-    // Request sent above. This will have to be considered
-    // for other Direct Request calls which are not atomic
-    // We therefore check only for Direct Response by the
-    // callee.
-    if (SvcArgs->Arg0 == ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP) {
-      // A Direct Response means FF-A success
-      // Now check the payload for errors
-      // The callee sends back the return value
-      // in Arg3
-      *RetVal = SvcArgs->Arg3;
-    } else {
-      // If Arg0 is not a Direct Response, that means we
-      // have an FF-A error. We need to check Arg2 for the
-      // FF-A error code.
-      // See [2], Table 10.8: FFA_ERROR encoding.
-      *RetVal = SvcArgs->Arg2;
-      switch (*RetVal) {
-        case ARM_FFA_SPM_RET_INVALID_PARAMETERS:
-          return EFI_INVALID_PARAMETER;
 
-        case ARM_FFA_SPM_RET_DENIED:
-          return EFI_ACCESS_DENIED;
-
-        case ARM_FFA_SPM_RET_NOT_SUPPORTED:
-          return EFI_UNSUPPORTED;
-
-        case ARM_FFA_SPM_RET_BUSY:
-          return EFI_NOT_READY;
-
-        case ARM_FFA_SPM_RET_ABORTED:
-          return EFI_ABORTED;
-
-        default:
-          // Undefined error code received.
-          ASSERT (0);
-          return EFI_INVALID_PARAMETER;
-      }
+  if (UseFfaAbis) {
+    if (IS_FID_FFA_ERROR (SvcArgs->Arg0)) {
+      return FfaStatusToEfiStatus (SvcArgs->Arg2);
     }
-  } else {
-    *RetVal = SvcArgs->Arg0;
-  }
 
-  // Check error response from Callee.
-  if ((*RetVal & BIT31) != 0) {
+    *RetVal = SvcArgs->Arg2;
+  } else {
+    // Check error response from Callee.
     // Bit 31 set means there is an error returned
     // See [1], Section 13.5.5.1 MM_SP_MEMORY_ATTRIBUTES_GET_AARCH64 and
     // Section 13.5.5.2 MM_SP_MEMORY_ATTRIBUTES_SET_AARCH64.
-    SpmMmStatusToEfiStatus (*RetVal);
+    if ((SvcArgs->Arg0 & BIT31) != 0) {
+      return SpmMmStatusToEfiStatus (SvcArgs->Arg0);
+    }
+
+    *RetVal = SvcArgs->Arg0;
   }
 
   return EFI_SUCCESS;
@@ -141,6 +145,7 @@ SendMemoryPermissionRequest (
 
 /** Request the permission attributes of a memory region from S-EL0.
 
+  @param [in]   UseFfaAbis           Use FF-A abis or not.
   @param [in]   BaseAddress          Base address for the memory region.
   @param [out]  MemoryAttributes     Pointer to return the memory attributes.
 
@@ -158,6 +163,7 @@ SendMemoryPermissionRequest (
 STATIC
 EFI_STATUS
 GetMemoryPermissions (
+  IN  BOOLEAN               UseFfaAbis,
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   OUT UINT32                *MemoryAttributes
   )
@@ -165,6 +171,7 @@ GetMemoryPermissions (
   EFI_STATUS    Status;
   INT32         Ret;
   ARM_SVC_ARGS  SvcArgs;
+  UINTN         Fid;
 
   if (MemoryAttributes == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -172,33 +179,23 @@ GetMemoryPermissions (
 
   // Prepare the message parameters.
   // See [1], Section 13.5.5.1 MM_SP_MEMORY_ATTRIBUTES_GET_AARCH64.
+  // See [3], Section 2.8 FFA_MEM_PERM_GET
+  Fid = (UseFfaAbis) ? ARM_FID_FFA_MEM_PERM_GET : ARM_FID_SPM_MM_SP_GET_MEM_ATTRIBUTES;
+
   ZeroMem (&SvcArgs, sizeof (ARM_SVC_ARGS));
-  if (FeaturePcdGet (PcdFfaEnable)) {
-    // See [2], Section 10.2 FFA_MSG_SEND_DIRECT_REQ.
-    SvcArgs.Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ;
-    SvcArgs.Arg1 = ARM_FFA_DESTINATION_ENDPOINT_ID;
-    SvcArgs.Arg2 = 0;
-    SvcArgs.Arg3 = ARM_FID_SPM_MM_SP_GET_MEM_ATTRIBUTES;
-    SvcArgs.Arg4 = BaseAddress;
-  } else {
-    SvcArgs.Arg0 = ARM_FID_SPM_MM_SP_GET_MEM_ATTRIBUTES;
-    SvcArgs.Arg1 = BaseAddress;
-    SvcArgs.Arg2 = 0;
-    SvcArgs.Arg3 = 0;
-  }
+  SvcArgs.Arg0 = Fid;
+  SvcArgs.Arg1 = BaseAddress;
 
-  Status = SendMemoryPermissionRequest (&SvcArgs, &Ret);
-  if (EFI_ERROR (Status)) {
-    *MemoryAttributes = 0;
-    return Status;
-  }
+  Status = SendMemoryPermissionRequest (UseFfaAbis, &SvcArgs, &Ret);
 
-  *MemoryAttributes = Ret;
+  *MemoryAttributes = (EFI_ERROR (Status)) ? 0 : Ret;
+
   return Status;
 }
 
-/** Set the permission attributes of a memory region from S-EL0.
+/** Request the permission attributes of the S-EL0 memory region to be updated.
 
+  @param [in]  UseFfaAbis      Use FF-A abis or not.
   @param [in]  BaseAddress     Base address for the memory region.
   @param [in]  Length          Length of the memory region.
   @param [in]  Permissions     Memory access controls attributes.
@@ -217,6 +214,7 @@ GetMemoryPermissions (
 STATIC
 EFI_STATUS
 RequestMemoryPermissionChange (
+  IN  BOOLEAN               UseFfaAbis,
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN  UINT64                Length,
   IN  UINT32                Permissions
@@ -224,27 +222,21 @@ RequestMemoryPermissionChange (
 {
   INT32         Ret;
   ARM_SVC_ARGS  SvcArgs;
+  UINTN         Fid;
 
   // Prepare the message parameters.
   // See [1], Section 13.5.5.2 MM_SP_MEMORY_ATTRIBUTES_SET_AARCH64.
-  ZeroMem (&SvcArgs, sizeof (ARM_SVC_ARGS));
-  if (FeaturePcdGet (PcdFfaEnable)) {
-    // See [2], Section 10.2 FFA_MSG_SEND_DIRECT_REQ.
-    SvcArgs.Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ;
-    SvcArgs.Arg1 = ARM_FFA_DESTINATION_ENDPOINT_ID;
-    SvcArgs.Arg2 = 0;
-    SvcArgs.Arg3 = ARM_FID_SPM_MM_SP_SET_MEM_ATTRIBUTES;
-    SvcArgs.Arg4 = BaseAddress;
-    SvcArgs.Arg5 = EFI_SIZE_TO_PAGES (Length);
-    SvcArgs.Arg6 = Permissions;
-  } else {
-    SvcArgs.Arg0 = ARM_FID_SPM_MM_SP_SET_MEM_ATTRIBUTES;
-    SvcArgs.Arg1 = BaseAddress;
-    SvcArgs.Arg2 = EFI_SIZE_TO_PAGES (Length);
-    SvcArgs.Arg3 = Permissions;
-  }
+  // See [3], Section 2.9 FFA_MEM_PERM_SET
+  Fid = (UseFfaAbis) ? ARM_FID_FFA_MEM_PERM_SET : ARM_FID_SPM_MM_SP_SET_MEM_ATTRIBUTES;
 
-  return SendMemoryPermissionRequest (&SvcArgs, &Ret);
+  ZeroMem (&SvcArgs, sizeof (ARM_SVC_ARGS));
+
+  SvcArgs.Arg0 = Fid;
+  SvcArgs.Arg1 = BaseAddress;
+  SvcArgs.Arg2 = EFI_SIZE_TO_PAGES (Length);
+  SvcArgs.Arg3 = Permissions;
+
+  return SendMemoryPermissionRequest (UseFfaAbis, &SvcArgs, &Ret);
 }
 
 EFI_STATUS
@@ -255,17 +247,30 @@ ArmSetMemoryRegionNoExec (
 {
   EFI_STATUS  Status;
   UINT32      MemoryAttributes;
-  UINT32      CodePermission;
+  UINT32      PermissionRequest;
+  BOOLEAN     UseFfaAbis;
 
-  Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
+  UseFfaAbis = IsFfaMemoryAbiSupported ();
+
+  Status = GetMemoryPermissions (UseFfaAbis, BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
-    CodePermission =
-      (ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN <<
-       ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_SHIFT);
+    if (UseFfaAbis) {
+      PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                            MemoryAttributes,
+                            ARM_FFA_SET_MEM_ATTR_CODE_PERM_XN
+                            );
+    } else {
+      PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                            MemoryAttributes,
+                            ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN
+                            );
+    }
+
     return RequestMemoryPermissionChange (
+             UseFfaAbis,
              BaseAddress,
              Length,
-             MemoryAttributes | CodePermission
+             PermissionRequest
              );
   }
 
@@ -280,17 +285,30 @@ ArmClearMemoryRegionNoExec (
 {
   EFI_STATUS  Status;
   UINT32      MemoryAttributes;
-  UINT32      CodePermission;
+  UINT32      PermissionRequest;
+  BOOLEAN     UseFfaAbis;
 
-  Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
+  UseFfaAbis = IsFfaMemoryAbiSupported ();
+
+  Status = GetMemoryPermissions (UseFfaAbis, BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
-    CodePermission =
-      (ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_XN <<
-       ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_SHIFT);
+    if (UseFfaAbis) {
+      PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                            MemoryAttributes,
+                            ARM_FFA_SET_MEM_ATTR_CODE_PERM_X
+                            );
+    } else {
+      PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                            MemoryAttributes,
+                            ARM_SPM_MM_SET_MEM_ATTR_CODE_PERM_X
+                            );
+    }
+
     return RequestMemoryPermissionChange (
+             UseFfaAbis,
              BaseAddress,
              Length,
-             MemoryAttributes & ~CodePermission
+             PermissionRequest
              );
   }
 
@@ -305,17 +323,30 @@ ArmSetMemoryRegionReadOnly (
 {
   EFI_STATUS  Status;
   UINT32      MemoryAttributes;
-  UINT32      DataPermission;
+  UINT32      PermissionRequest;
+  BOOLEAN     UseFfaAbis;
 
-  Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
+  UseFfaAbis = IsFfaMemoryAbiSupported ();
+
+  Status = GetMemoryPermissions (UseFfaAbis, BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
-    DataPermission =
-      (ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RO <<
-       ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_SHIFT);
+    if (UseFfaAbis) {
+      PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                            ARM_FFA_SET_MEM_ATTR_DATA_PERM_RO,
+                            MemoryAttributes
+                            );
+    } else {
+      PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                            ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RO,
+                            MemoryAttributes
+                            );
+    }
+
     return RequestMemoryPermissionChange (
+             UseFfaAbis,
              BaseAddress,
              Length,
-             MemoryAttributes | DataPermission
+             PermissionRequest
              );
   }
 
@@ -331,14 +362,26 @@ ArmClearMemoryRegionReadOnly (
   EFI_STATUS  Status;
   UINT32      MemoryAttributes;
   UINT32      PermissionRequest;
+  BOOLEAN     UseFfaAbis;
 
-  Status = GetMemoryPermissions (BaseAddress, &MemoryAttributes);
+  UseFfaAbis = IsFfaMemoryAbiSupported ();
+
+  Status = GetMemoryPermissions (UseFfaAbis, BaseAddress, &MemoryAttributes);
   if (!EFI_ERROR (Status)) {
-    PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
-                          ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RW,
-                          MemoryAttributes
-                          );
+    if (UseFfaAbis) {
+      PermissionRequest = ARM_FFA_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                            ARM_FFA_SET_MEM_ATTR_DATA_PERM_RW,
+                            MemoryAttributes
+                            );
+    } else {
+      PermissionRequest = ARM_SPM_MM_SET_MEM_ATTR_MAKE_PERM_REQUEST (
+                            ARM_SPM_MM_SET_MEM_ATTR_DATA_PERM_RW,
+                            MemoryAttributes
+                            );
+    }
+
     return RequestMemoryPermissionChange (
+             UseFfaAbis,
              BaseAddress,
              Length,
              PermissionRequest
