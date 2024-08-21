@@ -78,7 +78,7 @@ BuildTcg2AcpiCommunicateBufferHob (
   VOID                          *Buffer;
   UINTN                         Pages;
 
-  Pages  = sizeof (TCG_NVS);
+  Pages  = EFI_SIZE_TO_PAGES (sizeof (TCG_NVS));
   Buffer = AllocateRuntimePages (Pages);
   ASSERT (Buffer != NULL);
 
