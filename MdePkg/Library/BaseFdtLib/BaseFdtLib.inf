@@ -57,6 +57,9 @@
   BaseMemoryLib
 
 [BuildOptions]
-  MSFT:*_*_IA32_CC_FLAGS = /wd4146 /wd4245
-  MSFT:*_*_X64_CC_FLAGS  = /wd4146 /wd4244 /wd4245 /wd4267
+# warning C4706: assignment within conditional expression
+# if ((err = fdt_splice_(fdt, p, oldlen, newlen)))
+# in BaseFdtLib\libfdt\libfdt\fdt_rw.c (wait for sub module update to remove this)
+  MSFT:*_*_IA32_CC_FLAGS = /wd4146 /wd4245 /wd4706
+  MSFT:*_*_X64_CC_FLAGS  = /wd4146 /wd4244 /wd4245 /wd4267 /wd4706
 
