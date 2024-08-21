@@ -24,7 +24,6 @@
 [Sources.AARCH64, Sources.ARM]
   Arm/StandaloneMmCoreEntryPoint.c
   Arm/SetPermissions.c
-  Arm/CreateHobList.c
 
 [Sources.X64]
   X64/StandaloneMmCoreEntryPoint.c
@@ -44,11 +43,15 @@
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   StandaloneMmMmuLib
   ArmSvcLib
+  ArmTransferListLib
 
 [Guids]
   gMpInformationHobGuid
   gEfiMmPeiMmramMemoryReserveGuid
   gEfiStandaloneMmNonSecureBufferGuid
+
+[Guids.ARM, Guids.AARCH64]
+  gEfiHobListGuid
 
 [Protocols.ARM, Protocols.AARCH64]
   gEdkiiPiMmCpuDriverEpProtocolGuid

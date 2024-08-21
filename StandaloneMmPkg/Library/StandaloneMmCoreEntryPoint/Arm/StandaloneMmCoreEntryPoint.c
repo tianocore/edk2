@@ -22,10 +22,12 @@
 
 #include <PiPei.h>
 #include <Guid/MmramMemoryReserve.h>
+#include <Guid/MmCoreData.h>
 #include <Guid/MpInformation.h>
 
-#include <StandaloneMmCpu.h>
+#include <Library/ArmLib.h>
 #include <Library/ArmSvcLib.h>
+#include <Library/ArmTransferListLib.h>
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/BaseLib.h>
@@ -40,87 +42,389 @@
 
 #include <Protocol/PiMmCpuDriverEp.h>
 
-#define SPM_MAJOR_VER_MASK   0xFFFF0000
-#define SPM_MINOR_VER_MASK   0x0000FFFF
-#define SPM_MAJOR_VER_SHIFT  16
-#define FFA_NOT_SUPPORTED    -1
-
-#define BOOT_PAYLOAD_VERSION  1
-
 extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
 
-STATIC CONST UINT32  mSpmMajorVer = SPM_MAJOR_VERSION;
-STATIC CONST UINT32  mSpmMinorVer = SPM_MINOR_VERSION;
+VOID  *gHobList = NULL;
 
-STATIC CONST UINT32  mSpmMajorVerFfa = SPM_MAJOR_VERSION_FFA;
-STATIC CONST UINT32  mSpmMinorVerFfa = SPM_MINOR_VERSION_FFA;
+STATIC MP_INFORMATION_HOB_DATA  *mMpInfo = NULL;
 
 /**
-  Retrieve a pointer to and print the boot information passed by privileged
-  secure firmware.
+  Get ABI protocol.
 
-  @param  [in] SharedBufAddress   The pointer memory shared with privileged
-                                  firmware.
+  @retval         AbiProtocolSpmMm         SPM_MM ABI
+  @retval         AbiProtocolFfa           FF-A ABI
+  @retval         AbiProtocolUnknown       Invalid ABI.
 
 **/
-EFI_SECURE_PARTITION_BOOT_INFO *
-GetAndPrintBootinformation (
-  IN VOID  *SharedBufAddress
+STATIC
+ABI_PROTOCOL
+EFIAPI
+GetAbiProtocol (
+  IN VOID
   )
 {
-  EFI_SECURE_PARTITION_BOOT_INFO  *PayloadBootInfo;
-  EFI_SECURE_PARTITION_CPU_INFO   *PayloadCpuInfo;
-  UINTN                           Index;
+  UINT16        RequestMajorVersion;
+  UINT16        RequestMinorVersion;
+  UINT16        CurrentMajorVersion;
+  UINT16        CurrentMinorVersion;
+  ARM_SVC_ARGS  SvcArgs;
+  ABI_PROTOCOL  AbiProtocol;
 
-  PayloadBootInfo = (EFI_SECURE_PARTITION_BOOT_INFO *)SharedBufAddress;
+  ZeroMem (&SvcArgs, sizeof (ARM_SVC_ARGS));
+  SvcArgs.Arg0 = ARM_SVC_ID_FFA_VERSION_AARCH32;
+  SvcArgs.Arg1 = ((SPM_MAJOR_VERSION_FFA <<  16) | (SPM_MINOR_VERSION_FFA));
 
-  if (PayloadBootInfo == NULL) {
-    DEBUG ((DEBUG_ERROR, "PayloadBootInfo NULL\n"));
-    return NULL;
+  ArmCallSvc (&SvcArgs);
+
+  if (SvcArgs.Arg0 != ARM_FFA_SPM_RET_NOT_SUPPORTED) {
+    AbiProtocol         = AbiProtocolFfa;
+    RequestMajorVersion = SPM_MAJOR_VERSION_FFA;
+    RequestMinorVersion = SPM_MINOR_VERSION_FFA;
+    CurrentMajorVersion = ((SvcArgs.Arg0 >> 16) & 0xffff);
+    CurrentMinorVersion = (SvcArgs.Arg0 & 0xffff);
+  } else {
+    ZeroMem (&SvcArgs, sizeof (ARM_SVC_ARGS));
+    SvcArgs.Arg0 = ARM_FID_SPM_MM_VERSION_AARCH32;
+
+    ArmCallSvc (&SvcArgs);
+
+    if (SvcArgs.Arg0 == ARM_SPM_MM_RET_NOT_SUPPORTED) {
+      return AbiProtocolUnknown;
+    }
+
+    AbiProtocol         = AbiProtocolSpmMm;
+    RequestMajorVersion = ARM_SPM_MM_SUPPORT_MAJOR_VERSION;
+    RequestMinorVersion = ARM_SPM_MM_SUPPORT_MINOR_VERSION;
+    CurrentMajorVersion =
+      ((SvcArgs.Arg0 >> ARM_SPM_MM_MAJOR_VERSION_SHIFT) & ARM_SPM_MM_VERSION_MASK);
+    CurrentMinorVersion =
+      ((SvcArgs.Arg0 >> ARM_SPM_MM_MINOR_VERSION_SHIFT) & ARM_SPM_MM_VERSION_MASK);
   }
 
-  if (PayloadBootInfo->Header.Version != BOOT_PAYLOAD_VERSION) {
+  // Different major revision values indicate possibly incompatible functions.
+  // For two revisions, A and B, for which the major revision values are
+  // identical, if the minor revision value of revision B is greater than
+  // the minor revision value of revision A, then every function in
+  // revision A must work in a compatible way with revision B.
+  // However, it is possible for revision B to have a higher
+  // function count than revision A
+  if ((RequestMajorVersion != CurrentMajorVersion) ||
+      (RequestMinorVersion > CurrentMinorVersion))
+  {
     DEBUG ((
-      DEBUG_ERROR,
-      "Boot Information Version Mismatch. Current=0x%x, Expected=0x%x.\n",
-      PayloadBootInfo->Header.Version,
-      BOOT_PAYLOAD_VERSION
+      DEBUG_INFO,
+      "Incompatible %s Versions.\n" \
+      "Request Version: Major=0x%x, Minor>=0x%x.\n" \
+      "Current Version: Major=0x%x, Minor=0x%x.\n",
+      (AbiProtocol == AbiProtocolFfa) ? L"FF-A" : L"SPM_MM",
+      RequestMajorVersion,
+      RequestMinorVersion,
+      CurrentMajorVersion,
+      CurrentMinorVersion
       ));
+    AbiProtocol = AbiProtocolUnknown;
+  } else {
+    DEBUG ((
+      DEBUG_INFO,
+      "%s Version: Major=0x%x, Minor=0x%x\n",
+      (AbiProtocol == AbiProtocolFfa) ? L"FF-A" : L"SPM_MM",
+      CurrentMajorVersion,
+      CurrentMinorVersion
+      ));
+  }
+
+  return AbiProtocol;
+}
+
+/**
+  Get Boot protocol.
+
+  @param[in]      Arg0     Arg0 passed from firmware
+  @param[in]      Arg1     Arg1 passed from firmware
+  @param[in]      Arg2     Arg2 passed from firmware
+  @param[in]      Arg3     Arg3 passed from firmware
+
+  @retval         BootProtocolTl64            64 bits register convention transfer list
+  @retval         BootProtocolTl32            32 bits register convention transfer list
+  @retval         BootProtocolUnknown         Invalid Boot protocol
+
+**/
+STATIC
+BOOT_PROTOCOL
+EFIAPI
+GetBootProtocol (
+  IN UINTN  Arg0,
+  IN UINTN  Arg1,
+  IN UINTN  Arg2,
+  IN UINTN  Arg3
+  )
+{
+  UINTN   RegVersion;
+  UINT64  Fields;
+
+  Fields = Arg1;
+
+  /*
+   * The signature value in x1's [23:0] bits is the same regardless of
+   * architecture when using Transfer list.
+   * That's why it need to check signature value in x1 again with [31:0] bits
+   * to discern 32 or 64 bits architecture after checking x1 value in [23:0].
+   * Please see:
+   *     https://github.com/FirmwareHandoff/firmware_handoff/blob/main/source/register_conventions.rst
+   */
+  if ((Fields & TRANSFER_LIST_SIGNATURE_MASK_32) == TRANSFER_LIST_SIGNATURE_32) {
+    if ((Fields & TRANSFER_LIST_SIGNATURE_MASK_64) == TRANSFER_LIST_SIGNATURE_64) {
+      RegVersion = (Fields >> REGISTER_CONVENTION_VERSION_SHIFT_64) &
+                   REGISTER_CONVENTION_VERSION_MASK;
+
+      if ((RegVersion != 1) || (Arg2 != 0x00) || (Arg3 == 0x00)) {
+        goto err_out;
+      }
+
+      return BootProtocolTl64;
+    } else {
+      RegVersion = (Fields >> REGISTER_CONVENTION_VERSION_SHIFT_32) &
+                   REGISTER_CONVENTION_VERSION_MASK;
+
+      if ((RegVersion != 1) || (Arg0 != 0x00) || (Arg3 == 0x00)) {
+        goto err_out;
+      }
+
+      return BootProtocolTl32;
+    }
+  }
+
+err_out:
+  DEBUG ((DEBUG_ERROR, "Error: Failed to get boot protocol!\n"));
+
+  return BootProtocolUnknown;
+}
+
+/**
+  Get PHIT hob information from firmware handoff transfer list protocol.
+
+  @param[in]      TlhAddr     Transfer list header address
+
+  @retval         NULL                    Failed to get PHIT hob
+  @retval         Address                 PHIT hob address
+
+**/
+STATIC
+VOID *
+EFIAPI
+GetPhitHobFromTransferList (
+  IN UINTN  TlhAddr
+  )
+{
+  TRANSFER_LIST_HEADER   *Tlh;
+  TRANSFER_ENTRY_HEADER  *Te;
+  VOID                   *HobStart;
+
+  Tlh = (TRANSFER_LIST_HEADER *)TlhAddr;
+
+  Te = TlFindFirstEntry (Tlh, TRANSFER_ENTRY_TAG_ID_HOB_LIST);
+  if (Te == NULL) {
+    DEBUG ((DEBUG_ERROR, "Error: No Phit hob is present in transfer list...\n"));
+
     return NULL;
   }
 
-  DEBUG ((DEBUG_INFO, "NumSpMemRegions - 0x%x\n", PayloadBootInfo->NumSpMemRegions));
-  DEBUG ((DEBUG_INFO, "SpMemBase       - 0x%lx\n", PayloadBootInfo->SpMemBase));
-  DEBUG ((DEBUG_INFO, "SpMemLimit      - 0x%lx\n", PayloadBootInfo->SpMemLimit));
-  DEBUG ((DEBUG_INFO, "SpImageBase     - 0x%lx\n", PayloadBootInfo->SpImageBase));
-  DEBUG ((DEBUG_INFO, "SpStackBase     - 0x%lx\n", PayloadBootInfo->SpStackBase));
-  DEBUG ((DEBUG_INFO, "SpHeapBase      - 0x%lx\n", PayloadBootInfo->SpHeapBase));
-  DEBUG ((DEBUG_INFO, "SpNsCommBufBase - 0x%lx\n", PayloadBootInfo->SpNsCommBufBase));
-  DEBUG ((DEBUG_INFO, "SpSharedBufBase - 0x%lx\n", PayloadBootInfo->SpSharedBufBase));
+  HobStart = TlGetEntryData (Te);
 
-  DEBUG ((DEBUG_INFO, "SpImageSize     - 0x%x\n", PayloadBootInfo->SpImageSize));
-  DEBUG ((DEBUG_INFO, "SpPcpuStackSize - 0x%x\n", PayloadBootInfo->SpPcpuStackSize));
-  DEBUG ((DEBUG_INFO, "SpHeapSize      - 0x%x\n", PayloadBootInfo->SpHeapSize));
-  DEBUG ((DEBUG_INFO, "SpNsCommBufSize - 0x%x\n", PayloadBootInfo->SpNsCommBufSize));
-  DEBUG ((DEBUG_INFO, "SpSharedBufSize - 0x%x\n", PayloadBootInfo->SpSharedBufSize));
+  return HobStart;
+}
 
-  DEBUG ((DEBUG_INFO, "NumCpus         - 0x%x\n", PayloadBootInfo->NumCpus));
-  DEBUG ((DEBUG_INFO, "CpuInfo         - 0x%p\n", PayloadBootInfo->CpuInfo));
+/**
+  Get logical Cpu Number.
 
-  PayloadCpuInfo = (EFI_SECURE_PARTITION_CPU_INFO *)PayloadBootInfo->CpuInfo;
+  @param  [in] AbiProtocol            Abi Protocol.
+  @param  [in] EventCompleteSvcArgs   Pointer to the event completion arguments.
 
-  if (PayloadCpuInfo == NULL) {
-    DEBUG ((DEBUG_ERROR, "PayloadCpuInfo NULL\n"));
-    return NULL;
+  @retval         CpuNumber               Cpu Number
+**/
+STATIC
+UINTN
+EFIAPI
+GetCpuNumber (
+  IN ABI_PROTOCOL  AbiProtocol,
+  IN ARM_SVC_ARGS  *EventCompleteSvcArgs
+  )
+{
+  UINTN  Idx;
+
+  if (AbiProtocol == AbiProtocolSpmMm) {
+    Idx = EventCompleteSvcArgs->Arg3;
+  } else {
+    Idx = EventCompleteSvcArgs->Arg6;
   }
 
-  for (Index = 0; Index < PayloadBootInfo->NumCpus; Index++) {
-    DEBUG ((DEBUG_INFO, "Mpidr           - 0x%lx\n", PayloadCpuInfo[Index].Mpidr));
-    DEBUG ((DEBUG_INFO, "LinearId        - 0x%x\n", PayloadCpuInfo[Index].LinearId));
-    DEBUG ((DEBUG_INFO, "Flags           - 0x%x\n", PayloadCpuInfo[Index].Flags));
+  ASSERT (Idx < mMpInfo->NumberOfProcessors);
+
+  return Idx;
+}
+
+/**
+  Dump mp information descriptor.
+
+  @param[in]      ProcessorInfo       Mp information
+  @param[in]      Idx                 Cpu index
+
+**/
+STATIC
+VOID
+EFIAPI
+DumpMpInfoDescriptor (
+  EFI_PROCESSOR_INFORMATION  *ProcessorInfo,
+  UINTN                      Idx
+  )
+{
+  if (ProcessorInfo == NULL) {
+    return;
   }
 
-  return PayloadBootInfo;
+  DEBUG ((
+    DEBUG_INFO,
+    "CPU[%d]: MpIdr - 0x%lx\n",
+    Idx,
+    ProcessorInfo->ProcessorId
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "CPU[%d]: StatusFlag - 0x%lx\n",
+    Idx,
+    ProcessorInfo->StatusFlag
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "CPU[%d]: Location[P:C:T] - :%d:%d:%d\n",
+    Idx,
+    ProcessorInfo->Location.Package,
+    ProcessorInfo->Location.Core,
+    ProcessorInfo->Location.Thread
+    ));
+}
+
+/**
+  Dump mmram descriptor.
+
+  @param[in]      Name                Name
+  @param[in]      MmramDesc           Mmram descriptor
+
+**/
+STATIC
+VOID
+EFIAPI
+DumpMmramDescriptor (
+  IN CHAR16                *Name,
+  IN EFI_MMRAM_DESCRIPTOR  *MmramDesc
+  )
+{
+  if (MmramDesc == NULL) {
+    return;
+  }
+
+  if (Name == NULL) {
+    Name = L"Unknown";
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "MmramDescriptor[%s]: PhysicalStart - 0x%lx\n",
+    Name,
+    MmramDesc->PhysicalStart
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "MmramDescriptors[%s]: CpuStart - 0x%lx\n",
+    Name,
+    MmramDesc->CpuStart
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "MmramDescriptors[%s]: PhysicalSize - %ld\n",
+    Name,
+    MmramDesc->PhysicalSize
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "MmramDescriptors[%s]: RegionState - 0x%lx\n",
+    Name,
+    MmramDesc->RegionState
+    ));
+}
+
+/**
+  Dump PHIT hob information.
+
+  @param[in]      HobStart            PHIT hob start address.
+
+**/
+STATIC
+VOID
+EFIAPI
+DumpPhitHob (
+  IN VOID  *HobStart
+  )
+{
+  EFI_HOB_FIRMWARE_VOLUME         *FvHob;
+  EFI_HOB_GUID_TYPE               *GuidHob;
+  MP_INFORMATION_HOB_DATA         *MpInfo;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
+  EFI_MMRAM_DESCRIPTOR            *MmramDesc;
+  UINTN                           Idx;
+
+  FvHob = GetNextHob (EFI_HOB_TYPE_FV, HobStart);
+  if (FvHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "Error: No Firmware Volume Hob is present.\n"));
+    return;
+  }
+
+  DEBUG ((DEBUG_INFO, "FvHob: BaseAddress - 0x%lx\n", FvHob->BaseAddress));
+  DEBUG ((DEBUG_INFO, "FvHob: Length - %ld\n", FvHob->Length));
+
+  GuidHob = GetNextGuidHob (&gMpInformationHobGuid, HobStart);
+  if (GuidHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "Error: No MpInformation Guid Hob is present.\n"));
+    return;
+  }
+
+  MpInfo = GET_GUID_HOB_DATA (GuidHob);
+  DEBUG ((DEBUG_INFO, "Number of Cpus - %d\n", MpInfo->NumberOfProcessors));
+  DEBUG ((
+    DEBUG_INFO,
+    "Number of Enabled Cpus - %d\n",
+    MpInfo->NumberOfEnabledProcessors
+    ));
+  for (Idx = 0; Idx < MpInfo->NumberOfProcessors; Idx++) {
+    DumpMpInfoDescriptor (&MpInfo->ProcessorInfoBuffer[Idx], Idx);
+  }
+
+  GuidHob = GetNextGuidHob (&gEfiStandaloneMmNonSecureBufferGuid, HobStart);
+  if (GuidHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "Error: No Ns Buffer Guid Hob is present.\n"));
+    return;
+  }
+
+  DumpMmramDescriptor (L"NsBuffer", GET_GUID_HOB_DATA (GuidHob));
+
+  GuidHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, HobStart);
+  if (GuidHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "Error: No Pei Mmram Memory Reserved Guid Hob is present.\n"));
+    return;
+  }
+
+  MmramRangesHobData = GET_GUID_HOB_DATA (GuidHob);
+  if ((MmramRangesHobData == NULL) ||
+      (MmramRangesHobData->NumberOfMmReservedRegions == 0))
+  {
+    DEBUG ((DEBUG_ERROR, "Error: No Pei Mmram Memory Reserved information is present.\n"));
+    return;
+  }
+
+  for (Idx = 0; Idx < MmramRangesHobData->NumberOfMmReservedRegions; Idx++) {
+    MmramDesc = &MmramRangesHobData->Descriptor[Idx];
+    DumpMmramDescriptor (L"PeiMemReserved", MmramDesc);
+  }
 }
 
 /**
@@ -188,25 +492,25 @@ EfiStatusToFfaStatus (
 }
 
 /**
-  Initialise Event Complete arguments to be returned via SVC call.
+  Set Event Complete arguments to be returned via SVC call.
 
-  @param[in]      FfaEnabled                Ffa enabled.
-  @param[in]      Status                    Result of StMm.
+  @param[in]      AbiProtocol               ABI Protocol.
+  @param[in]      Status                    Result of StandaloneMm service.
   @param[out]     EventCompleteSvcArgs      Args structure.
 
 **/
 STATIC
 VOID
 SetEventCompleteSvcArgs (
-  IN BOOLEAN        FfaEnabled,
+  IN ABI_PROTOCOL   AbiProtocol,
   IN EFI_STATUS     Status,
   OUT ARM_SVC_ARGS  *EventCompleteSvcArgs
   )
 {
-  if (FfaEnabled) {
+  ZeroMem (EventCompleteSvcArgs, sizeof (ARM_SVC_ARGS));
+
+  if (AbiProtocol == AbiProtocolFfa) {
     EventCompleteSvcArgs->Arg0 = ARM_SVC_ID_FFA_MSG_SEND_DIRECT_RESP;
-    EventCompleteSvcArgs->Arg1 = 0;
-    EventCompleteSvcArgs->Arg2 = 0;
     EventCompleteSvcArgs->Arg3 = ARM_FID_SPM_MM_SP_EVENT_COMPLETE;
     EventCompleteSvcArgs->Arg4 = EfiStatusToFfaStatus (Status);
   } else {
@@ -218,21 +522,23 @@ SetEventCompleteSvcArgs (
 /**
   A loop to delegated events.
 
+  @param  [in] AbiProtocol            Abi Protocol.
   @param  [in] CpuDriverEntryPoint    Entry point to handle request.
   @param  [in] EventCompleteSvcArgs   Pointer to the event completion arguments.
 
 **/
+STATIC
 VOID
 EFIAPI
 DelegatedEventLoop (
+  IN ABI_PROTOCOL                       AbiProtocol,
   IN EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT  CpuDriverEntryPoint,
   IN ARM_SVC_ARGS                       *EventCompleteSvcArgs
   )
 {
-  BOOLEAN     FfaEnabled;
   EFI_STATUS  Status;
-
-  FfaEnabled = FeaturePcdGet (PcdFfaEnable);
+  UINTN       CpuNumber;
+  UINTN       CommBufferAddr;
 
   while (TRUE) {
     ArmCallSvc (EventCompleteSvcArgs);
@@ -247,174 +553,137 @@ DelegatedEventLoop (
     DEBUG ((DEBUG_INFO, "X6 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg6));
     DEBUG ((DEBUG_INFO, "X7 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg7));
 
-    //
-    // ARM TF passes SMC FID of the MM_COMMUNICATE interface as the Event ID upon
-    // receipt of a synchronous MM request. Use the Event ID to distinguish
-    // between synchronous and asynchronous events.
-    //
-    if ((ARM_SMC_ID_MM_COMMUNICATE != (UINT32)EventCompleteSvcArgs->Arg0) &&
-        (ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ != (UINT32)EventCompleteSvcArgs->Arg0))
-    {
-      DEBUG ((DEBUG_ERROR, "UnRecognized Event - 0x%x\n", (UINT32)EventCompleteSvcArgs->Arg0));
-      Status = EFI_INVALID_PARAMETER;
-    } else {
-      if (FfaEnabled) {
-        Status = CpuDriverEntryPoint (
-                   EventCompleteSvcArgs->Arg0,
-                   EventCompleteSvcArgs->Arg6,
-                   EventCompleteSvcArgs->Arg3
-                   );
-        if (EFI_ERROR (Status)) {
-          DEBUG ((
-            DEBUG_ERROR,
-            "Failed delegated event 0x%x, Status 0x%x\n",
-            EventCompleteSvcArgs->Arg3,
-            Status
-            ));
-        }
-      } else {
-        Status = CpuDriverEntryPoint (
-                   EventCompleteSvcArgs->Arg0,
-                   EventCompleteSvcArgs->Arg3,
-                   EventCompleteSvcArgs->Arg1
-                   );
-        if (EFI_ERROR (Status)) {
-          DEBUG ((
-            DEBUG_ERROR,
-            "Failed delegated event 0x%x, Status 0x%x\n",
-            EventCompleteSvcArgs->Arg0,
-            Status
-            ));
-        }
+    CpuNumber = GetCpuNumber (AbiProtocol, EventCompleteSvcArgs);
+    DEBUG ((DEBUG_INFO, "CpuNumber: %d\n", CpuNumber));
+
+    if (AbiProtocol == AbiProtocolFfa) {
+      if (EventCompleteSvcArgs->Arg0 != ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "Error: Unrecognized FF-A Id: 0x%x\n",
+          EventCompleteSvcArgs->Arg0
+          ));
+        goto event_complete;
       }
+
+      CommBufferAddr = EventCompleteSvcArgs->Arg3;
+    } else {
+      /*
+       * Register Convention for SPM_MM
+       *   Arg0: ARM_SMC_ID_MM_COMMUNICATE
+       *   Arg1: Communication Buffer
+       *   Arg2: Size of Communication Buffer
+       *   Arg3: Cpu number where StandaloneMm running on.
+       *
+       *   See tf-a/services/std_svc/spm/spm_mm/spm_mm_main.c
+       */
+      if (EventCompleteSvcArgs->Arg0 != ARM_SMC_ID_MM_COMMUNICATE) {
+        Status = EFI_INVALID_PARAMETER;
+        DEBUG ((
+          DEBUG_ERROR,
+          "Error: Unrecognized SPM_MM Id: 0x%x\n",
+          EventCompleteSvcArgs->Arg0
+          ));
+        goto event_complete;
+      }
+
+      CommBufferAddr = EventCompleteSvcArgs->Arg1;
     }
 
-    SetEventCompleteSvcArgs (FfaEnabled, Status, EventCompleteSvcArgs);
+    Status = CpuDriverEntryPoint (EventCompleteSvcArgs->Arg0, CpuNumber, CommBufferAddr);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "Error: Failed delegated event 0x%x, Status 0x%x\n",
+        CommBufferAddr,
+        Status
+        ));
+    }
+
+event_complete:
+    SetEventCompleteSvcArgs (
+      AbiProtocol,
+      Status,
+      EventCompleteSvcArgs
+      );
   }
-}
-
-/**
-  Query the SPM version, check compatibility and return success if compatible.
-
-  @retval EFI_SUCCESS       SPM versions compatible.
-  @retval EFI_UNSUPPORTED   SPM versions not compatible.
-**/
-STATIC
-EFI_STATUS
-GetSpmVersion (
-  VOID
-  )
-{
-  EFI_STATUS    Status;
-  UINT16        CalleeSpmMajorVer;
-  UINT16        CallerSpmMajorVer;
-  UINT16        CalleeSpmMinorVer;
-  UINT16        CallerSpmMinorVer;
-  UINT32        SpmVersion;
-  ARM_SVC_ARGS  SpmVersionArgs;
-
-  if (FeaturePcdGet (PcdFfaEnable)) {
-    SpmVersionArgs.Arg0  = ARM_SVC_ID_FFA_VERSION_AARCH32;
-    SpmVersionArgs.Arg1  = mSpmMajorVerFfa << SPM_MAJOR_VER_SHIFT;
-    SpmVersionArgs.Arg1 |= mSpmMinorVerFfa;
-    CallerSpmMajorVer    = mSpmMajorVerFfa;
-    CallerSpmMinorVer    = mSpmMinorVerFfa;
-  } else {
-    SpmVersionArgs.Arg0 = ARM_FID_SPM_MM_VERSION_AARCH32;
-    CallerSpmMajorVer   = mSpmMajorVer;
-    CallerSpmMinorVer   = mSpmMinorVer;
-  }
-
-  ArmCallSvc (&SpmVersionArgs);
-
-  SpmVersion = SpmVersionArgs.Arg0;
-  if (SpmVersion == FFA_NOT_SUPPORTED) {
-    return EFI_UNSUPPORTED;
-  }
-
-  CalleeSpmMajorVer = ((SpmVersion & SPM_MAJOR_VER_MASK) >> SPM_MAJOR_VER_SHIFT);
-  CalleeSpmMinorVer = ((SpmVersion & SPM_MINOR_VER_MASK) >> 0);
-
-  // Different major revision values indicate possibly incompatible functions.
-  // For two revisions, A and B, for which the major revision values are
-  // identical, if the minor revision value of revision B is greater than
-  // the minor revision value of revision A, then every function in
-  // revision A must work in a compatible way with revision B.
-  // However, it is possible for revision B to have a higher
-  // function count than revision A.
-  if ((CalleeSpmMajorVer == CallerSpmMajorVer) &&
-      (CalleeSpmMinorVer >= CallerSpmMinorVer))
-  {
-    DEBUG ((
-      DEBUG_INFO,
-      "SPM Version: Major=0x%x, Minor=0x%x\n",
-      CalleeSpmMajorVer,
-      CalleeSpmMinorVer
-      ));
-    Status = EFI_SUCCESS;
-  } else {
-    DEBUG ((
-      DEBUG_INFO,
-      "Incompatible SPM Versions.\n Callee Version: Major=0x%x, Minor=0x%x.\n Caller: Major=0x%x, Minor>=0x%x.\n",
-      CalleeSpmMajorVer,
-      CalleeSpmMinorVer,
-      CallerSpmMajorVer,
-      CallerSpmMinorVer
-      ));
-    Status = EFI_UNSUPPORTED;
-  }
-
-  return Status;
 }
 
 /**
   The entry point of Standalone MM Foundation.
 
-  @param  [in]  SharedBufAddress  Pointer to the Buffer between SPM and SP.
-  @param  [in]  SharedBufSize     Size of the shared buffer.
-  @param  [in]  cookie1           Cookie 1
-  @param  [in]  cookie2           Cookie 2
+  @param  [in]  Arg0        Boot information passed according to boot protocol.
+  @param  [in]  Arg1        Boot information passed according to boot protocol.
+  @param  [in]  Arg2        Boot information passed according to boot protocol.
+  @param  [in]  Arg3        Boot information passed according to boot protocol.
 
 **/
 VOID
 EFIAPI
 _ModuleEntryPoint (
-  IN VOID    *SharedBufAddress,
-  IN UINT64  SharedBufSize,
-  IN UINT64  cookie1,
-  IN UINT64  cookie2
+  IN UINTN  Arg0,
+  IN UINTN  Arg1,
+  IN UINTN  Arg2,
+  IN UINTN  Arg3
   )
 {
   PE_COFF_LOADER_IMAGE_CONTEXT        ImageContext;
-  EFI_SECURE_PARTITION_BOOT_INFO      *PayloadBootInfo;
   ARM_SVC_ARGS                        EventCompleteSvcArgs;
   EFI_STATUS                          Status;
   UINT32                              SectionHeaderOffset;
   UINT16                              NumberOfSections;
+  BOOT_PROTOCOL                       BootProtocol;
+  ABI_PROTOCOL                        AbiProtocol;
   VOID                                *HobStart;
   VOID                                *TeData;
   UINTN                               TeDataSize;
   EFI_PHYSICAL_ADDRESS                ImageBase;
   EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL  *PiMmCpuDriverEpProtocol;
   EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT   CpuDriverEntryPoint;
+  EFI_HOB_FIRMWARE_VOLUME             *FvHob;
+  EFI_HOB_GUID_TYPE                   *GuidHob;
+  EFI_CONFIGURATION_TABLE             *ConfigurationTable;
+  UINTN                               Idx;
 
   CpuDriverEntryPoint = NULL;
 
-  // Get Secure Partition Manager Version Information
-  Status = GetSpmVersion ();
-  if (EFI_ERROR (Status)) {
+  AbiProtocol = GetAbiProtocol ();
+  if (AbiProtocol == AbiProtocolUnknown) {
+    Status = EFI_UNSUPPORTED;
     goto finish;
   }
 
-  PayloadBootInfo = GetAndPrintBootinformation (SharedBufAddress);
-  if (PayloadBootInfo == NULL) {
+  /**
+   * Check boot information
+   */
+  BootProtocol = GetBootProtocol (Arg0, Arg1, Arg2, Arg3);
+  if (BootProtocol == BootProtocolUnknown) {
     Status = EFI_UNSUPPORTED;
+    goto finish;
+  }
+
+  HobStart = GetPhitHobFromTransferList (Arg3);
+  if (HobStart == NULL) {
+    Status = EFI_UNSUPPORTED;
+    goto finish;
+  }
+
+  DEBUG ((DEBUG_INFO, "Start Dump Hob: %lx\n", (unsigned long)HobStart));
+  DumpPhitHob (HobStart);
+  DEBUG ((DEBUG_INFO, "End Dump Hob: %lx\n", (unsigned long)HobStart));
+
+  FvHob = GetNextHob (EFI_HOB_TYPE_FV, HobStart);
+  if (FvHob == NULL) {
+    DEBUG ((DEBUG_ERROR, "Error: No Firmware Volume Hob is present.\n"));
+    Status = EFI_INVALID_PARAMETER;
+
     goto finish;
   }
 
   // Locate PE/COFF File information for the Standalone MM core module
   Status = LocateStandaloneMmCorePeCoffData (
-             (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PayloadBootInfo->SpImageBase,
+             (EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)FvHob->BaseAddress,
              &TeData,
              &TeDataSize
              );
@@ -457,7 +726,6 @@ _ModuleEntryPoint (
              ArmSetMemoryRegionReadOnly,
              ArmClearMemoryRegionReadOnly
              );
-
   if (EFI_ERROR (Status)) {
     goto finish;
   }
@@ -471,15 +739,45 @@ _ModuleEntryPoint (
     ASSERT_EFI_ERROR (Status);
   }
 
-  //
-  // Create Hoblist based upon boot information passed by privileged software
-  //
-  HobStart = CreateHobListFromBootInfo (PayloadBootInfo);
+  gHobList = HobStart;
 
   //
   // Call the MM Core entry point
   //
   ProcessModuleEntryPointList (HobStart);
+
+  //
+  // Find HobList to check gEfiHobList is installed.
+  //
+  Status             = EFI_NOT_FOUND;
+  ConfigurationTable = gMmCoreMmst.MmConfigurationTable;
+  for (Idx = 0; Idx < gMmCoreMmst.NumberOfTableEntries; Idx++) {
+    if (CompareGuid (&gEfiHobListGuid, &ConfigurationTable[Idx].VendorGuid)) {
+      Status = EFI_SUCCESS;
+      break;
+    }
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error: Hoblist not found in MmConfigurationTable\n"));
+    goto finish;
+  }
+
+  //
+  // Find MpInformation Hob in HobList.
+  // It couldn't save address of mp information in gHobList
+  // because that memory area will be reused after StandaloneMm finishing
+  // initialization.
+  //
+  HobStart = ConfigurationTable[Idx].VendorTable;
+  GuidHob  = GetNextGuidHob (&gMpInformationHobGuid, HobStart);
+  if (GuidHob == NULL) {
+    Status = EFI_NOT_FOUND;
+    DEBUG ((DEBUG_ERROR, "Error: No MpInformation hob ...\n"));
+    goto finish;
+  }
+
+  mMpInfo = GET_GUID_HOB_DATA (GuidHob);
 
   //
   // Find out cpu driver entry point used in DelegatedEventLoop
@@ -503,11 +801,6 @@ _ModuleEntryPoint (
     ));
 
 finish:
-  ZeroMem (&EventCompleteSvcArgs, sizeof (EventCompleteSvcArgs));
-  SetEventCompleteSvcArgs (
-    FeaturePcdGet (PcdFfaEnable),
-    Status,
-    &EventCompleteSvcArgs
-    );
-  DelegatedEventLoop (CpuDriverEntryPoint, t&EventCompleteSvcArgs);
+  SetEventCompleteSvcArgs (AbiProtocol, Status, &EventCompleteSvcArgs);
+  DelegatedEventLoop (AbiProtocol, CpuDriverEntryPoint, &EventCompleteSvcArgs);
 }
