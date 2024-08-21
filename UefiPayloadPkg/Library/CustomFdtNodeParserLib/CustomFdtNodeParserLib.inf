@@ -1,0 +1,46 @@
+## @file
+#  Custom FDT Node Parse Library.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CustomFdtNodeParserLib
+  FILE_GUID                      = 732B2B8F-65AD-4BF8-A98F-6E0D330F7A60
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CustomFdtNodeParserLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  CustomFdtNodeParserLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiPayloadPkg/UefiPayloadPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  FdtLib
+  HobLib
+  PcdLib
+
+[Guids]
+  gUniversalPayloadPciRootBridgeInfoGuid
+  gUniversalPayloadSerialPortInfoGuid
+  gUniversalPayloadDeviceTreeGuid
+  gUniversalPayloadAcpiTableGuid
+  gEfiHobMemoryAllocModuleGuid
+
+[Pcd]
+  gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable

@@ -318,6 +318,7 @@
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
   SmmRelocationLib|UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
   HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
+  BuildFdtLib|UefiPayloadPkg/Library/BuildFdtLib/BuildFdtLib.inf
 
 [LibraryClasses.common]
 !if $(BOOTSPLASH_IMAGE)
