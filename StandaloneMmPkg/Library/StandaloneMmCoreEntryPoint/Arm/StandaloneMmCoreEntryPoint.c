@@ -1031,7 +1031,7 @@ ExitHandler:
 **/
 VOID
 EFIAPI
-_ModuleEntryPoint (
+CEntryPoint (
   IN UINTN  Arg0,
   IN UINTN  Arg1,
   IN UINTN  Arg2,
