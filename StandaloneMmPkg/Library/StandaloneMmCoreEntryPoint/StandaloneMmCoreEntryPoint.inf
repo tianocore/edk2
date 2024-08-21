@@ -25,6 +25,12 @@
   Arm/StandaloneMmCoreEntryPoint.c
   Arm/SetPermissions.c
 
+[Sources.AARCH64]
+  Arm/ModuleEntryPoint64.S
+
+[Sources.ARM]
+  Arm/ModuleEntryPoint32.S
+
 [Sources.X64]
   X64/StandaloneMmCoreEntryPoint.c
 
@@ -57,6 +63,9 @@
 [Protocols.ARM, Protocols.AARCH64]
   gEdkiiPiMmCpuDriverEpProtocolGuid
   gEfiMmCommunication2ProtocolGuid
+
+[FixedPcd.ARM, FixedPcd.AARCH64]
+  gArmTokenSpaceGuid.PcdStMmStackSize
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC
