@@ -2,19 +2,65 @@
   Entry point to the Standalone MM Foundation when initialized during the SEC
   phase on ARM platforms
 
-Copyright (c) 2017 - 2021, Arm Ltd. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2017 - 2024, Arm Ltd. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  @par Glossary:
+    - SPM_MM - An implementation where the Secure Partition Manager resides at EL3
+              with management services running from an isolated Secure Partitions
+              at S-EL0, and the communication protocol is the Management Mode(MM)
+              interface.
+    - FF-A - Firmware Framework for Arm A-profile
+    - TL   - Transfer List
+
+  @par Reference(s):
+    - Transfer List [https://github.com/FirmwareHandoff/firmware_handoff]
+    - Secure Partition Manager [https://trustedfirmware-a.readthedocs.io/en/latest/components/secure-partition-manager-mm.html].
+    - Arm Firmware Framework for Arm A-Profile [https://developer.arm.com/documentation/den0077/j/?lang=en]
 
 **/
 
 #ifndef __STANDALONEMMCORE_ENTRY_POINT_H__
 #define __STANDALONEMMCORE_ENTRY_POINT_H__
 
-#include <StandaloneMmCpu.h>
 #include <Library/PeCoffLib.h>
 #include <Library/FvLib.h>
 
 #define CPU_INFO_FLAG_PRIMARY_CPU  0x00000001
+
+/*
+ * BOOT protocol used to boot StandaloneMm
+ */
+typedef enum {
+  /// Unknown Boot protocol.
+  BootProtocolUnknown,
+
+  /// Boot information delivered via Transfer List
+  /// with 32 bits register convention
+  BootProtocolTl32,
+
+  /// Boot information delivered via Transfer List
+  /// with 64 bits register convention
+  BootProtocolTl64,
+
+  BootProtocolMax,
+} BOOT_PROTOCOL;
+
+/*
+ * Communication ABI protocol to communicate between normal/secure partition.
+ */
+typedef enum {
+  /// Unknown Communication ABI protocol
+  AbiProtocolUnknown,
+
+  /// Communicate via SPM_MM ABI protocol
+  AbiProtocolSpmMm,
+
+  /// Communicate via FF-A ABI protocol
+  AbiProtocolFfa,
+
+  AbiProtocolMax,
+} ABI_PROTOCOL;
 
 typedef struct {
   UINT8     Type;    /* type of the structure */
@@ -22,31 +68,6 @@ typedef struct {
   UINT16    Size;    /* size of this structure in bytes */
   UINT32    Attr;    /* attributes: unused bits SBZ */
 } EFI_PARAM_HEADER;
-
-typedef struct {
-  UINT64    Mpidr;
-  UINT32    LinearId;
-  UINT32    Flags;
-} EFI_SECURE_PARTITION_CPU_INFO;
-
-typedef struct {
-  EFI_PARAM_HEADER                 Header;
-  UINT64                           SpMemBase;
-  UINT64                           SpMemLimit;
-  UINT64                           SpImageBase;
-  UINT64                           SpStackBase;
-  UINT64                           SpHeapBase;
-  UINT64                           SpNsCommBufBase;
-  UINT64                           SpSharedBufBase;
-  UINT64                           SpImageSize;
-  UINT64                           SpPcpuStackSize;
-  UINT64                           SpHeapSize;
-  UINT64                           SpNsCommBufSize;
-  UINT64                           SpSharedBufSize;
-  UINT32                           NumSpMemRegions;
-  UINT32                           NumCpus;
-  EFI_SECURE_PARTITION_CPU_INFO    *CpuInfo;
-} EFI_SECURE_PARTITION_BOOT_INFO;
 
 typedef RETURN_STATUS (*REGION_PERMISSION_UPDATE_FUNC) (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
@@ -123,35 +144,21 @@ LocateStandaloneMmCorePeCoffData (
   );
 
 /**
-  Use the boot information passed by privileged firmware to populate a HOB list
-  suitable for consumption by the MM Core and drivers.
-
-  @param  [in]      PayloadBootInfo       Boot information passed by privileged
-                                          firmware
-
-**/
-VOID *
-EFIAPI
-CreateHobListFromBootInfo (
-  IN       EFI_SECURE_PARTITION_BOOT_INFO  *PayloadBootInfo
-  );
-
-/**
   The entry point of Standalone MM Foundation.
 
-  @param  [in]  SharedBufAddress  Pointer to the Buffer between SPM and SP.
-  @param  [in]  SharedBufSize     Size of the shared buffer.
-  @param  [in]  cookie1           Cookie 1
-  @param  [in]  cookie2           Cookie 2
+  @param  [in]  Arg0        Boot information passed according to boot protocol.
+  @param  [in]  Arg1        Boot information passed according to boot protocol.
+  @param  [in]  Arg2        Boot information passed according to boot protocol.
+  @param  [in]  Arg3        Boot information passed according to boot protocol.
 
 **/
 VOID
 EFIAPI
 _ModuleEntryPoint (
-  IN VOID    *SharedBufAddress,
-  IN UINT64  SharedBufSize,
-  IN UINT64  cookie1,
-  IN UINT64  cookie2
+  IN UINTN  Arg0,
+  IN UINTN  Arg1,
+  IN UINTN  Arg2,
+  IN UINTN  Arg3
   );
 
 /**
