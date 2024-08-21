@@ -6,7 +6,7 @@
 **/
 
 #ifndef BUILD_FDT_LIB_H_
-#define BUILD_FDT__LIB_H_
+#define BUILD_FDT_LIB_H_
 
 /**
   It will build FDT for UPL consumed.
@@ -14,7 +14,7 @@
   @retval EFI_SUCCESS        If it completed successfully.
   @retval Others             If it failed to build required FDT.
 **/
-
+EFI_STATUS
 BuildFdtForUPL (
   IN     VOID  *FdtBase
   );
