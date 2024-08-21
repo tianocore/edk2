@@ -76,6 +76,10 @@ PrintFirmwareVersion (
                 __TIME__,
                 __DATE__
                 );
+
+  // Because we are directly bit banging the serial port instead of going through the DebugLib, we need to make sure
+  // the serial port is initialized before we write to it
+  SerialPortInitialize ();
   SerialPortWrite ((UINT8 *)Buffer, CharCount);
 }
 
