@@ -9,6 +9,7 @@
 
 #include <Base.h>
 #include <Library/ArmCcaLib.h>
+#include <Library/ArmCcaRsiLib.h>
 #include <Library/ArmLib.h>
 #include <Library/ArmMmuLib.h>
 #include <Library/ArmPlatformDeviceInfoLib.h>
@@ -123,10 +124,10 @@ ArmVirtGetMemoryMap (
   *VirtualMemoryMap = VirtualMemoryTable;
 }
 
-/**
-  Configure the MMIO regions as shared with the VMM.
+/** Configure the MMIO regions as shared with the VMM.
 
-  Set the protection attribute for the MMIO regions as Unprotected IPA.
+  Set the protection attribute for the MMIO regions that do not belong to
+  the Realm Device as Unprotected IPA.
 
   @param[in]    IpaWidth  IPA width of the Realm.
 
@@ -141,19 +142,44 @@ ArmCcaConfigureMmio (
   )
 {
   RETURN_STATUS  Status;
+  UINTN          Devices;
+  UINT64         BaseAddress;
+  UINT64         Length;
+  BOOLEAN        IsProtectedMmio;
 
   if (!IsRealm ()) {
     return RETURN_UNSUPPORTED;
   }
 
-  // Set the protection attribute for the Peripheral memory.
-  // Peripheral space before DRAM
-  Status = ArmCcaSetMemoryProtectAttribute (
-             0,
-             PcdGet64 (PcdSystemMemoryBase),
-             IpaWidth,
-             TRUE
-             );
-  ASSERT_RETURN_ERROR (Status);
+  for (Devices = 0; Devices < mPlatInfo.MaxDevices; Devices++) {
+    BaseAddress = mPlatInfo.Dev[Devices].BaseAddress;
+    Length      = ALIGN_VALUE (mPlatInfo.Dev[Devices].Length, EFI_PAGE_SIZE);
+
+    Status = ArmCcaMemRangeIsProtectedMmio (
+               BaseAddress,
+               Length,
+               &IsProtectedMmio
+               );
+    if (RETURN_ERROR (Status)) {
+      break;
+    }
+
+    if (IsProtectedMmio) {
+      // The Realm Device memory is not shared with the host. So skip.
+      continue;
+    }
+
+    // Set the protection attribute for the Peripheral memory as host shared.
+    Status = ArmCcaSetMemoryProtectAttribute (
+               BaseAddress,
+               Length,
+               IpaWidth,
+               TRUE
+               );
+    if (RETURN_ERROR (Status)) {
+      break;
+    }
+  } // for
+
   return Status;
 }
