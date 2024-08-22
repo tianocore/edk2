@@ -41,7 +41,7 @@ GetArmTrngVersion (
   OUT UINT16  *MinorRevision
   )
 {
-  ASSERT (FALSE);
+  DEBUG ((DEBUG_ERROR, "ArmTrng Backend not found\n"));
   return RETURN_UNSUPPORTED;
 }
 
