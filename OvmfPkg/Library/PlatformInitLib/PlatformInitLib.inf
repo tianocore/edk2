@@ -48,6 +48,7 @@
   HobLib
   QemuFwCfgLib
   QemuFwCfgSimpleParserLib
+  LocalApicLib
   MemEncryptSevLib
   MemoryAllocationLib
   MtrrLib

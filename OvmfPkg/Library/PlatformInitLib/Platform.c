@@ -30,6 +30,7 @@
 #include <Library/QemuFwCfgS3Lib.h>
 #include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/PciLib.h>
+#include <Library/LocalApicLib.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/VariableFormat.h>
 #include <OvmfPlatforms.h>
@@ -719,6 +720,11 @@ PlatformMaxCpuCountInitialization (
     MaxCpuCount
     ));
   ASSERT (BootCpuCount <= MaxCpuCount);
+
+  if (MaxCpuCount > 255) {
+    DEBUG ((DEBUG_INFO, "%a: enable x2apic mode\n", __func__));
+    SetApicMode (LOCAL_APIC_MODE_X2APIC);
+  }
 
   PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber  = MaxCpuCount;
   PlatformInfoHob->PcdCpuBootLogicalProcessorNumber = BootCpuCount;
