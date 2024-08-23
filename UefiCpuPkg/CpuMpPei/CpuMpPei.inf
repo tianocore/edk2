@@ -47,6 +47,7 @@
   CpuLib
   MemoryAllocationLib
   CpuPageTableLib
+  PanicLib
 
 [Guids]
   gEdkiiMigratedFvInfoGuid                                             ## SOMETIMES_CONSUMES     ## HOB

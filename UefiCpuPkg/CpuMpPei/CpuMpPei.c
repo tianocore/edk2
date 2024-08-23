@@ -437,8 +437,15 @@ InitializeExceptionStackSwitchHandlers (
 {
   EXCEPTION_STACK_SWITCH_CONTEXT  *SwitchStackData;
   UINTN                           Index;
+  EFI_STATUS                      Status;
 
-  MpInitLibWhoAmI (&Index);
+  Status = MpInitLibWhoAmI (&Index);
+
+  if (EFI_ERROR (Status)) {
+    PANIC ("Failed to get processor number when initializing the stack switch exception handlers.");
+    return;
+  }
+
   SwitchStackData = (EXCEPTION_STACK_SWITCH_CONTEXT *)Buffer;
 
   //
