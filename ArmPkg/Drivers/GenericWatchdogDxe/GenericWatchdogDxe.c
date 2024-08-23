@@ -391,6 +391,8 @@ GenericWatchdogEntry (
     goto UnregisterHandler;
   }
 
+  WatchdogDisable ();
+
   // Install the Timer Architectural Protocol onto a new handle
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
@@ -412,8 +414,6 @@ GenericWatchdogEntry (
                   &mEfiExitBootServicesEvent
                   );
   ASSERT_EFI_ERROR (Status);
-
-  WatchdogDisable ();
 
   return EFI_SUCCESS;
 
