@@ -33,7 +33,7 @@
   #
   # This flag is to enable or disable the whole network stack.
   #
-  DEFINE NETWORK_ENABLE = TRUE
+  DEFINE NETWORK_ENABLE = FALSE
 !endif
 
 !ifndef NETWORK_SNP_ENABLE
