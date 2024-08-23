@@ -847,6 +847,7 @@ DiskIo2ReadWriteDisk (
   DISK_IO_SUBTASK         *Subtask;
   DISK_IO2_TASK           *Task;
   EFI_TPL                 OldTpl;
+  EFI_TPL                 OldTpl1;
   BOOLEAN                 Blocking;
   BOOLEAN                 SubtaskBlocking;
   LIST_ENTRY              *SubtasksPtr;
@@ -977,7 +978,7 @@ DiskIo2ReadWriteDisk (
     }
   }
 
-  gBS->RaiseTPL (TPL_NOTIFY);
+  OldTpl1 = gBS->RaiseTPL (TPL_NOTIFY);
 
   //
   // Remove all the remaining subtasks when failure.
@@ -1012,6 +1013,7 @@ DiskIo2ReadWriteDisk (
     FreePool (Task);
   }
 
+  gBS->RestoreTPL (OldTpl1);
   gBS->RestoreTPL (OldTpl);
 
   return Status;
