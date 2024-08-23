@@ -356,12 +356,12 @@ GetBootMode (
 }
 
 /**
-  Get the Boot Mode from the HOB list.
+  Set the Boot Mode in PHIT HOB in HOB list.
 
-  This function returns the system boot mode information from the
+  This function sets the system boot mode information in the
   PHIT HOB in HOB list.
 
-  @param  VOID
+  @param  BootMode The BootMode value to set.
 
   @return The Boot Mode.
 
