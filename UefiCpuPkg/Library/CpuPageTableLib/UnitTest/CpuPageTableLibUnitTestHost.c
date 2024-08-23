@@ -838,7 +838,8 @@ UefiTestMain (
   EFI_STATUS                  Status;
   UNIT_TEST_FRAMEWORK_HANDLE  Framework;
   UNIT_TEST_SUITE_HANDLE      ManualTestCase;
-  UNIT_TEST_SUITE_HANDLE      RandomTestCase;
+
+  // UNIT_TEST_SUITE_HANDLE      RandomTestCase;
 
   Framework = NULL;
 
@@ -874,12 +875,12 @@ UefiTestMain (
   //
   // Populate the Random Test Cases.
   //
-  Status = CreateUnitTestSuite (&RandomTestCase, Framework, "Random Test Cases", "CpuPageTableLib.Random", NULL, NULL);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestSuite for Random Test Cases\n"));
-    Status = EFI_OUT_OF_RESOURCES;
-    goto EXIT;
-  }
+  // Status = CreateUnitTestSuite (&RandomTestCase, Framework, "Random Test Cases", "CpuPageTableLib.Random", NULL, NULL);
+  // if (EFI_ERROR (Status)) {
+  //   DEBUG ((DEBUG_ERROR, "Failed in CreateUnitTestSuite for Random Test Cases\n"));
+  //   Status = EFI_OUT_OF_RESOURCES;
+  //   goto EXIT;
+  // }
 
   // AddTestCase (RandomTestCase, "Random Test for Paging4Level", "Random Test Case1", TestCaseforRandomTest, NULL, NULL, &mTestContextPaging4Level);
   // AddTestCase (RandomTestCase, "Random Test for Paging4Level1G", "Random Test Case2", TestCaseforRandomTest, NULL, NULL, &mTestContextPaging4Level1GB);
