@@ -14,6 +14,7 @@ import sys
 import string
 import re
 import os.path as path
+from Common import EdkLogger
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Common.BuildToolError import *
