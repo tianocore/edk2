@@ -95,6 +95,10 @@ TerminalConInReset (
       );
   }
 
+  if (!EFI_ERROR (Status)) {
+    Status = TerminalDevice->SerialIo->SetControl (TerminalDevice->SerialIo, EFI_SERIAL_DATA_TERMINAL_READY|EFI_SERIAL_REQUEST_TO_SEND);
+  }
+
   return Status;
 }
 
