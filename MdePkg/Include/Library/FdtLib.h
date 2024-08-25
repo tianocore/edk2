@@ -432,4 +432,21 @@ FdtNodeDepth (
   IN INT32       NodeOffset
   );
 
+/**
+  Find nodes with a given 'compatible' value.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] StartOffset    Only find nodes after this offset.
+  @param[in] Compatible     The string to match against.
+
+  @retval The offset of the first node after StartOffset.
+**/
+INT32
+EFIAPI
+FdtNodeOffsetByCompatible (
+  IN CONST VOID   *Fdt,
+  IN INT32        StartOffset,
+  IN CONST CHAR8  *Compatible
+  );
+
 #endif /* FDT_LIB_H_ */
