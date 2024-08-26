@@ -447,16 +447,23 @@ EnforceMemoryMapAttribute (
   MemoryMapEntry = MemoryMap;
   MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + MemoryMapSize);
   while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
-    switch (MemoryMapEntry->Type) {
-      case EfiRuntimeServicesCode:
-        // do nothing
-        break;
-      case EfiRuntimeServicesData:
-        MemoryMapEntry->Attribute |= EFI_MEMORY_XP;
-        break;
-      case EfiReservedMemoryType:
-      case EfiACPIMemoryNVS:
-        break;
+    if ((MemoryMapEntry->Attribute & EFI_MEMORY_ACCESS_MASK) == 0) {
+      switch (MemoryMapEntry->Type) {
+        case EfiRuntimeServicesCode:
+          // If at this point the attributes have not been set on an EfiRuntimeServicesCode
+          // region, the memory range must not contain a loaded image. It's possible these
+          // non-image EfiRuntimeServicesCode regions are part of the unused memory bucket.
+          // It could also be that this region was explicitly allocated outside of the PE
+          // loader but the UEFI spec requires that all EfiRuntimeServicesCode regions contain
+          // EFI modules. In either case, set the attributes to RO and XP.
+          MemoryMapEntry->Attribute |= (EFI_MEMORY_RO | EFI_MEMORY_XP);
+          break;
+        case EfiRuntimeServicesData:
+          MemoryMapEntry->Attribute |= EFI_MEMORY_XP;
+          break;
+        default:
+          break;
+      }
     }
 
     MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
