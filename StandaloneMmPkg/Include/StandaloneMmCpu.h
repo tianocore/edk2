@@ -17,6 +17,7 @@
 
 typedef
 EFI_STATUS
+EFIAPI
 (*PI_MM_CPU_DRIVER_ENTRYPOINT) (
   IN UINTN  EventId,
   IN UINTN  CpuNumber,
@@ -59,6 +60,7 @@ extern EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig;
   @retval   EFI_OUT_OF_RESOURCES    Out of resources.
   @retval   EFI_UNSUPPORTED         Operation not supported.
 **/
+EFIAPI
 EFI_STATUS
 PiMmStandaloneMmCpuDriverEntry (
   IN UINTN  EventId,
