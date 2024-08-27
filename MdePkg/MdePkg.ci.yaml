@@ -61,7 +61,9 @@
             "7007", "_EFI_SPI_NOR_FLASH_PROTOCOL",
             "7007", "_EFI_SPI_HC_PROTOCOL",
             "8002", "aligned (",
-            "4002", "_ReturnAddress"
+            "4002", "_ReturnAddress",
+            "8005", "__security_cookie",
+            "8006", "__stack_chk_fail"
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
