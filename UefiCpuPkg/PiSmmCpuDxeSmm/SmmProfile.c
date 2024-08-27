@@ -41,6 +41,11 @@ BOOLEAN  mXdEnabled = FALSE;
 BOOLEAN  mBtsSupported = TRUE;
 
 //
+// The flag indicates if MSR_IA32_MISC_ENABLE is supported by processor
+//
+BOOLEAN  mMsrIa32MiscEnableSupported = TRUE;
+
+//
 // The flag indicates if SMM profile starts to record data.
 //
 BOOLEAN  mSmmProfileStart = FALSE;
@@ -915,18 +920,25 @@ CheckFeatureSupported (
   UINT32                         RegEcx;
   UINT32                         RegEdx;
   MSR_IA32_MISC_ENABLE_REGISTER  MiscEnableMsr;
+  BOOLEAN                        PatchingNeeded;
+
+  PatchingNeeded = FALSE;
 
   if ((PcdGet32 (PcdControlFlowEnforcementPropertyMask) != 0) && mCetSupported) {
     AsmCpuid (CPUID_SIGNATURE, &RegEax, NULL, NULL, NULL);
     if (RegEax >= CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS) {
       AsmCpuidEx (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO, NULL, NULL, &RegEcx, NULL);
       if ((RegEcx & CPUID_CET_SS) == 0) {
-        mCetSupported = FALSE;
-        PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+        if (mCetSupported) {
+          mCetSupported  = FALSE;
+          PatchingNeeded = TRUE;
+        }
       }
     } else {
-      mCetSupported = FALSE;
-      PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+      if (mCetSupported) {
+        mCetSupported  = FALSE;
+        PatchingNeeded = TRUE;
+      }
     }
   }
 
@@ -936,8 +948,10 @@ CheckFeatureSupported (
       //
       // Extended CPUID functions are not supported on this processor.
       //
-      mXdSupported = FALSE;
-      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
+      if (mXdSupported) {
+        mXdSupported   = FALSE;
+        PatchingNeeded = TRUE;
+      }
     }
 
     AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
@@ -945,15 +959,20 @@ CheckFeatureSupported (
       //
       // Execute Disable Bit feature is not supported on this processor.
       //
-      mXdSupported = FALSE;
-      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
+      if (mXdSupported) {
+        mXdSupported   = FALSE;
+        PatchingNeeded = TRUE;
+      }
     }
 
     if (StandardSignatureIsAuthenticAMD ()) {
       //
       // AMD processors do not support MSR_IA32_MISC_ENABLE
       //
-      PatchInstructionX86 (gPatchMsrIa32MiscEnableSupported, FALSE, 1);
+      if (mMsrIa32MiscEnableSupported) {
+        mMsrIa32MiscEnableSupported = FALSE;
+        PatchingNeeded              = TRUE;
+      }
     }
   }
 
@@ -975,6 +994,20 @@ CheckFeatureSupported (
         //
         mBtsSupported = FALSE;
       }
+    }
+  }
+
+  if (PatchingNeeded) {
+    if (!mCetSupported) {
+      PatchInstructionX86 (mPatchCetSupported, mCetSupported, 1);
+    }
+
+    if (!mXdSupported) {
+      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
+    }
+
+    if (!mMsrIa32MiscEnableSupported) {
+      PatchInstructionX86 (gPatchMsrIa32MiscEnableSupported, FALSE, 1);
     }
   }
 }
