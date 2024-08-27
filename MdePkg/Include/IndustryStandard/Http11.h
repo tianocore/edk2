@@ -248,6 +248,34 @@
 ///
 #define  HTTP_EXPECT_100_CONTINUE  "100-continue"
 
+///
+/// Content-Range Response Header
+/// The Content-Range response HTTP header indicates where in a
+/// full body message a partial message belongs.
+///
+#define HTTP_HEADER_CONTENT_RANGE  "Content-Range"
+
+///
+/// Last-Modified Response Header
+/// The Last-Modified response HTTP header contains a date and time when
+/// the origin server believes the resource was last modified. It is used
+/// as a validator to determine if the resource is the same as the
+/// previously stored one. Less accurate than an ETag header,
+/// it is a fallback mechanism. Conditional requests containing
+/// If-Modified-Since or If-Unmodified-Since headers make use of this field.
+///
+#define HTTP_HEADER_LAST_MODIFIED  "Last-Modified"
+
+///
+/// If Unmodified Since Request Header
+/// Makes the request for the resource conditional: the server will send
+/// the requested resource or accept it in the case of a POST or another
+/// non-safe method only if the resource has not been modified after the
+/// date specified by this HTTP header. If the resource has been modified
+/// after the specified date, the response will be a 412 Precondition Failed error.
+///
+#define HTTP_HEADER_IF_UNMODIFIED_SINCE  "If-Unmodified-Since"
+
 #pragma pack()
 
 #endif
