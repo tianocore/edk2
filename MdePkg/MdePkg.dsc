@@ -141,6 +141,7 @@
 
   MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
   MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  MdePkg/Library/StackCheckLib/StackCheckLibStaticInit.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
