@@ -225,7 +225,6 @@ M: Duggapu Chinni B <chinni.b.duggapu@intel.com> [cbduggap]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
-R: Susovan Mohapatra <susovan.mohapatra@intel.com> [susovanmohapatra]
 
 IntelFsp2WrapperPkg
 F: IntelFsp2WrapperPkg/
@@ -237,7 +236,6 @@ M: Chen Gang C <gang.c.chen@intel.com> [chengangc]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
 R: Ted Kuo <ted.kuo@intel.com> [tedkuo1]
 R: Ashraf Ali S <ashraf.ali.s@intel.com> [AshrafAliS]
-R: Susovan Mohapatra <susovan.mohapatra@intel.com> [susovanmohapatra]
 
 MdeModulePkg
 F: MdeModulePkg/
