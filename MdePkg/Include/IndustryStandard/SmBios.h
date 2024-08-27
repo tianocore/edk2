@@ -1020,6 +1020,10 @@ typedef struct {
   // Add for smbios 3.6
   //
   UINT16                 ThreadEnabled;
+  //
+  // Add for smbios 3.8
+  //
+  SMBIOS_TABLE_STRING    SocketType;
 } SMBIOS_TABLE_TYPE4;
 
 ///
