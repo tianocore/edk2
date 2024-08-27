@@ -78,7 +78,6 @@
   gArmTokenSpaceGuid.PcdBaseBoardManufacturer
   gArmTokenSpaceGuid.PcdBaseBoardProductName
   gArmTokenSpaceGuid.PcdBaseBoardVersion
-  gArmTokenSpaceGuid.PcdFdBaseAddress
 
 [Guids]
   gEfiGenericVariableGuid

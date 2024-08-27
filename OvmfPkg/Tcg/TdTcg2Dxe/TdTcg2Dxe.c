@@ -23,7 +23,6 @@
 #include <Protocol/VariableWrite.h>
 #include <Protocol/Tcg2Protocol.h>
 #include <Protocol/TrEEProtocol.h>
-#include <Protocol/ResetNotification.h>
 #include <Protocol/AcpiTable.h>
 
 #include <Library/DebugLib.h>
@@ -2161,11 +2160,17 @@ OnReadyToBoot (
 
     //
     // 2. Draw a line between pre-boot env and entering post-boot env.
-    // PCR[7] (is RTMR[0]) is already done.
     //
-    Status = MeasureSeparatorEvent (1);
+    // According to UEFI Spec 2.10 Section 38.4.1 the mapping between MrIndex and Intel
+    // TDX Measurement Register is:
+    //    MrIndex 0   <--> MRTD
+    //    MrIndex 1-3 <--> RTMR[0-2]
+    // RTMR[0] (i.e. MrIndex 1) is already done. So SepartorEvent shall be extended to
+    // RTMR[1] (i.e. MrIndex 2) as well.
+    //
+    Status = MeasureSeparatorEvent (CC_MR_INDEX_2_RTMR1);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Separator Event not Measured. Error!\n"));
+      DEBUG ((DEBUG_ERROR, "Separator Event not Measured to RTMR[1]. Error!\n"));
     }
 
     //
@@ -2355,7 +2360,6 @@ InstallAcpiTable (
   UINTN                    TableKey;
   EFI_STATUS               Status;
   EFI_ACPI_TABLE_PROTOCOL  *AcpiTable;
-  UINT64                   OemTableId;
 
   Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **)&AcpiTable);
   if (EFI_ERROR (Status)) {
@@ -2366,8 +2370,7 @@ InstallAcpiTable (
   mTdxEventlogAcpiTemplate.Laml = (UINT64)PcdGet32 (PcdCcEventlogAcpiTableLaml);
   mTdxEventlogAcpiTemplate.Lasa = PcdGet64 (PcdCcEventlogAcpiTableLasa);
   CopyMem (mTdxEventlogAcpiTemplate.Header.OemId, PcdGetPtr (PcdAcpiDefaultOemId), sizeof (mTdxEventlogAcpiTemplate.Header.OemId));
-  OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
-  CopyMem (&mTdxEventlogAcpiTemplate.Header.OemTableId, &OemTableId, sizeof (UINT64));
+  mTdxEventlogAcpiTemplate.Header.OemTableId      = PcdGet64 (PcdAcpiDefaultOemTableId);
   mTdxEventlogAcpiTemplate.Header.OemRevision     = PcdGet32 (PcdAcpiDefaultOemRevision);
   mTdxEventlogAcpiTemplate.Header.CreatorId       = PcdGet32 (PcdAcpiDefaultCreatorId);
   mTdxEventlogAcpiTemplate.Header.CreatorRevision = PcdGet32 (PcdAcpiDefaultCreatorRevision);

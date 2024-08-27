@@ -9,7 +9,7 @@
   This driver will have external input - variable and ACPINvs data in SMM mode.
   This external input must be validated carefully to avoid security issue.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,6 +22,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Guid/TpmInstance.h>
 #include <Guid/TpmNvsMm.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
+#include <Guid/Tcg2AcpiCommunicateBuffer.h>
 
 #include <Protocol/AcpiTable.h>
 #include <Protocol/Tcg2Protocol.h>
@@ -38,7 +39,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/Tpm2CommandLib.h>
 #include <Library/UefiLib.h>
-#include <Library/MmUnblockMemoryLib.h>
+#include <Library/HobLib.h>
 
 //
 // Physical Presence Interface Version supported by Platform
@@ -116,7 +117,7 @@ TCG_NVS  *mTcgNvs;
   @param[in]      Name           The name string to find in TPM table.
   @param[in]      Size           The size of the region to find.
 
-  @return                        The allocated address for the found region.
+  @return                        The Acpi Communicate Buffer for the found region.
 
 **/
 VOID *
@@ -126,9 +127,10 @@ AssignOpRegion (
   UINT16                       Size
   )
 {
-  EFI_STATUS            Status;
-  AML_OP_REGION_32_8    *OpRegion;
-  EFI_PHYSICAL_ADDRESS  MemoryAddress;
+  AML_OP_REGION_32_8            *OpRegion;
+  EFI_PHYSICAL_ADDRESS          MemoryAddress;
+  EFI_HOB_GUID_TYPE             *GuidHob;
+  TCG2_ACPI_COMMUNICATE_BUFFER  *Tcg2AcpiCommunicateBufferHob;
 
   MemoryAddress = SIZE_4GB - 1;
 
@@ -144,16 +146,16 @@ AssignOpRegion (
         (OpRegion->DWordPrefix == AML_DWORD_PREFIX) &&
         (OpRegion->BytePrefix  == AML_BYTE_PREFIX))
     {
-      Status = gBS->AllocatePages (AllocateMaxAddress, EfiACPIMemoryNVS, EFI_SIZE_TO_PAGES (Size), &MemoryAddress);
-      ASSERT_EFI_ERROR (Status);
+      GuidHob = GetFirstGuidHob (&gEdkiiTcg2AcpiCommunicateBufferHobGuid);
+      ASSERT (GuidHob != NULL);
+      Tcg2AcpiCommunicateBufferHob = GET_GUID_HOB_DATA (GuidHob);
+      MemoryAddress                = Tcg2AcpiCommunicateBufferHob->Tcg2AcpiCommunicateBuffer;
+      ASSERT (MemoryAddress != 0);
+      ASSERT (EFI_PAGES_TO_SIZE (Tcg2AcpiCommunicateBufferHob->Pages) >= Size);
+
       ZeroMem ((VOID *)(UINTN)MemoryAddress, Size);
       OpRegion->RegionOffset = (UINT32)(UINTN)MemoryAddress;
       OpRegion->RegionLen    = (UINT8)Size;
-      // Request to unblock this region from MM core
-      Status = MmUnblockMemoryRequest (MemoryAddress, EFI_SIZE_TO_PAGES (Size));
-      if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
-        ASSERT_EFI_ERROR (Status);
-      }
 
       break;
     }
@@ -639,7 +641,7 @@ UpdateHID (
         CopyMem (DataPtr, Hid, TPM_HID_ACPI_SIZE);
       }
 
-      DEBUG ((DEBUG_INFO, "TPM2 ACPI _HID is patched to %a\n", DataPtr));
+      DEBUG ((DEBUG_INFO, "TPM2 ACPI _HID is patched to %a\n", Hid));
 
       return Status;
     }

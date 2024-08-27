@@ -317,6 +317,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
   SmmRelocationLib|UefiCpuPkg/Library/SmmRelocationLib/SmmRelocationLib.inf
+  HobPrintLib|MdeModulePkg/Library/HobPrintLib/HobPrintLib.inf
 
 [LibraryClasses.common]
 !if $(BOOTSPLASH_IMAGE)
@@ -574,6 +575,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode|1

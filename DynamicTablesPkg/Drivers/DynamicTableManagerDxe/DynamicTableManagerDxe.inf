@@ -2,6 +2,7 @@
 # Module that drives the table generation and installation process.
 #
 #  Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+#  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
@@ -22,6 +23,13 @@
 
 [Sources]
   DynamicTableManagerDxe.c
+  DynamicTableManagerDxe.h
+
+[Sources.ARM, Sources.AARCH64]
+  Arm/ArmDynamicTableManager.c
+
+[Sources.IA32, Sources.X64]
+  X64/X64DynamicTableManager.c
 
 [Packages]
   MdePkg/MdePkg.dec

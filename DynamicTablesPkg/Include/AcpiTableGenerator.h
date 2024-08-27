@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -99,6 +100,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdSsdtCpuTopology,               ///< SSDT Cpu Topology
   EStdAcpiTableIdSsdtPciExpress,                ///< SSDT Pci Express Generator
   EStdAcpiTableIdPcct,                          ///< PCCT Generator
+  EStdAcpiTableIdTpm2,                          ///< TPM2 Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
@@ -214,7 +216,7 @@ typedef struct AcpiTableGenerator           ACPI_TABLE_GENERATOR;
   @return  EFI_SUCCESS If the table is generated successfully or other
                         failure codes as returned by the generator.
 **/
-typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_BUILD_TABLE) (
+typedef EFI_STATUS (EFIAPI *ACPI_TABLE_GENERATOR_BUILD_TABLE)(
   IN  CONST ACPI_TABLE_GENERATOR                           *This,
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
@@ -234,7 +236,7 @@ typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_BUILD_TABLE) (
   @return EFI_SUCCESS  If freed successfully or other failure codes
                         as returned by the generator.
 **/
-typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_FREE_TABLE) (
+typedef EFI_STATUS (EFIAPI *ACPI_TABLE_GENERATOR_FREE_TABLE)(
   IN      CONST ACPI_TABLE_GENERATOR                   *CONST  This,
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
@@ -257,7 +259,7 @@ typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_FREE_TABLE) (
   @return  EFI_SUCCESS If the table is generated successfully or other
                         failure codes as returned by the generator.
 **/
-typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_BUILD_TABLEEX) (
+typedef EFI_STATUS (EFIAPI *ACPI_TABLE_GENERATOR_BUILD_TABLEEX)(
   IN  CONST ACPI_TABLE_GENERATOR                           *This,
   IN  CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,
@@ -280,7 +282,7 @@ typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_BUILD_TABLEEX) (
   @return EFI_SUCCESS  If freed successfully or other failure codes
                         as returned by the generator.
 **/
-typedef EFI_STATUS (*ACPI_TABLE_GENERATOR_FREE_TABLEEX) (
+typedef EFI_STATUS (EFIAPI *ACPI_TABLE_GENERATOR_FREE_TABLEEX)(
   IN      CONST ACPI_TABLE_GENERATOR                   *CONST  This,
   IN      CONST CM_STD_OBJ_ACPI_TABLE_INFO             *CONST  AcpiTableInfo,
   IN      CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL   *CONST  CfgMgrProtocol,

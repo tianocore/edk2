@@ -10,15 +10,15 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
-  AMD64 Architecture Programming Manual volume 2, March 2017, Sections 15.34
+  AMD64 Architecture Programming Manual volume 2, March 2024
 
 **/
 
-#ifndef __AMD_MSR_H__
-#define __AMD_MSR_H__
+#ifndef AMD_MSR_H_
+#define AMD_MSR_H_
 
 #include <Register/Intel/ArchitecturalMsr.h>
-#include <Register/Amd/Fam17Msr.h>
+#include <Register/Amd/SevSnpMsr.h>
 #include <Register/Amd/SvsmMsr.h>
 
 #endif

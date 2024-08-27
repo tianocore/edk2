@@ -39,7 +39,7 @@ AllocatePages (
     return NULL;
   }
 
-  // Make sure allocation address is page alligned.
+  // Make sure allocation address is page aligned.
   Offset = HobTable->EfiFreeMemoryTop & EFI_PAGE_MASK;
   if (Offset != 0) {
     HobTable->EfiFreeMemoryTop -= Offset;

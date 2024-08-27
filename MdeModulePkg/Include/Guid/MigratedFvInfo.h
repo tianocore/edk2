@@ -1,7 +1,7 @@
 /** @file
   Migrated FV information
 
-Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2020 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -18,7 +18,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // 1: FV raw data will be copied to permanent memory for later phase use (such as
 //    FV measurement).
 //
-#define FLAGS_FV_RAW_DATA_COPY  BIT0
+#define FLAGS_FV_RAW_DATA_COPY                    BIT0
+#define FLAGS_FV_MIGRATE_BEFORE_PEI_CORE_REENTRY  BIT1
 
 ///
 /// In real use cases, not all FVs need migrate to permanent memory before TempRam tears
@@ -50,7 +51,7 @@ typedef struct {
 
 typedef struct {
   UINT32    FvOrgBase;         // original FV address
-  UINT32    FvNewBase;         // new FV address
+  UINT32    FvNewBase;         // new FV address, 0 means rebased data is not copied
   UINT32    FvDataBase;        // original FV data, 0 means raw data is not copied
   UINT32    FvLength;          // Fv Length
 } EDKII_MIGRATED_FV_INFO;

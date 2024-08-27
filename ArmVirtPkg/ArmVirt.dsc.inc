@@ -114,7 +114,7 @@
 
   PlatformPeiLib|ArmVirtPkg/Library/PlatformPeiLib/PlatformPeiLib.inf
   MemoryInitPeiLib|ArmVirtPkg/Library/ArmVirtMemoryInitPeiLib/ArmVirtMemoryInitPeiLib.inf
-  ResetSystemLib|ArmVirtPkg/Library/ArmVirtPsciResetSystemLib/ArmVirtPsciResetSystemLib.inf
+  ResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
 
   # ARM PL031 RTC Driver
   RealTimeClockLib|ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
@@ -296,6 +296,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
 
 [PcdsFixedAtBuild.common]
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
+
 !ifdef $(FIRMWARE_VER)
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
 !endif

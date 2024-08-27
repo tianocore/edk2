@@ -77,29 +77,48 @@ FindBlobEntryGuid (
 /**
   Verify blob from an external source.
 
+  If a non-secure configuration is detected this function will enter a
+  dead loop to prevent a boot.
+
   @param[in] BlobName           The name of the blob
   @param[in] Buf                The data of the blob
   @param[in] BufSize            The size of the blob in bytes
+  @param[in] FetchStatus        The status of the previous blob fetch
 
-  @retval EFI_SUCCESS           The blob was verified successfully.
-  @retval EFI_ACCESS_DENIED     The blob could not be verified, and therefore
-                                should be considered non-secure.
+  @retval EFI_SUCCESS           The blob was verified successfully or was not
+                                found in the hash table.
+  @retval EFI_ACCESS_DENIED     Kernel hashes not supported, but the boot
+                                can continue safely.
 **/
 EFI_STATUS
 EFIAPI
 VerifyBlob (
   IN  CONST CHAR16  *BlobName,
   IN  CONST VOID    *Buf,
-  IN  UINT32        BufSize
+  IN  UINT32        BufSize,
+  IN  EFI_STATUS    FetchStatus
   )
 {
   CONST GUID  *Guid;
   INT32       Remaining;
   HASH_TABLE  *Entry;
 
-  if ((mHashesTable == NULL) || (mHashesTableSize == 0)) {
+  // Enter a dead loop if the fetching of this blob
+  // failed. This prevents a malicious host from
+  // circumventing the following checks.
+  if (EFI_ERROR (FetchStatus)) {
     DEBUG ((
       DEBUG_ERROR,
+      "%a: Fetching blob failed.\n",
+      __func__
+      ));
+
+    CpuDeadLoop ();
+  }
+
+  if ((mHashesTable == NULL) || (mHashesTableSize == 0)) {
+    DEBUG ((
+      DEBUG_WARN,
       "%a: Verifier called but no hashes table discoverd in MEMFD\n",
       __func__
       ));
@@ -114,7 +133,8 @@ VerifyBlob (
       __func__,
       BlobName
       ));
-    return EFI_ACCESS_DENIED;
+
+    CpuDeadLoop ();
   }
 
   //
@@ -139,7 +159,7 @@ VerifyBlob (
     EntrySize = Entry->Len - sizeof Entry->Guid - sizeof Entry->Len;
     if (EntrySize != SHA256_DIGEST_SIZE) {
       DEBUG ((
-        DEBUG_ERROR,
+        DEBUG_WARN,
         "%a: Hash has the wrong size %d != %d\n",
         __func__,
         EntrySize,
@@ -170,18 +190,24 @@ VerifyBlob (
         __func__,
         BlobName
         ));
+
+      CpuDeadLoop ();
     }
 
     return Status;
   }
 
+  //
+  // If the GUID is not in the hash table, execution can still continue.
+  // This blob will not be measured, but at least one blob must be.
+  //
   DEBUG ((
     DEBUG_ERROR,
     "%a: Hash GUID %g not found in table\n",
     __func__,
     Guid
     ));
-  return EFI_ACCESS_DENIED;
+  return EFI_SUCCESS;
 }
 
 /**

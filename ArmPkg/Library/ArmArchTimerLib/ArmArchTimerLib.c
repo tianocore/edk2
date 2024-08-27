@@ -15,7 +15,7 @@
 #include <Library/PcdLib.h>
 #include <Library/ArmGenericTimerCounterLib.h>
 
-#define TICKS_PER_MICRO_SEC  (PcdGet32 (PcdArmArchTimerFreqInHz)/1000000U)
+#define TICKS_PER_MICRO_SEC  (ArmGenericTimerGetTimerFreq ()/1000000U)
 
 // Select appropriate multiply function for platform architecture.
 #ifdef MDE_CPU_ARM
@@ -23,56 +23,6 @@
 #else
 #define MULT_U64_X_N  MultU64x64
 #endif
-
-RETURN_STATUS
-EFIAPI
-TimerConstructor (
-  VOID
-  )
-{
-  //
-  // Check if the ARM Generic Timer Extension is implemented.
-  //
-  if (ArmIsArchTimerImplemented ()) {
-    //
-    // Check if Architectural Timer frequency is pre-determined by the platform
-    // (ie. nonzero).
-    //
-    if (PcdGet32 (PcdArmArchTimerFreqInHz) != 0) {
-      //
-      // Check if ticks/uS is not 0. The Architectural timer runs at constant
-      // frequency, irrespective of CPU frequency. According to Generic Timer
-      // Ref manual, lower bound of the frequency is in the range of 1-10MHz.
-      //
-      ASSERT (TICKS_PER_MICRO_SEC);
-
- #ifdef MDE_CPU_ARM
-      //
-      // Only set the frequency for ARMv7. We expect the secure firmware to
-      // have already done it.
-      // If the security extension is not implemented, set Timer Frequency
-      // here.
-      //
-      if (ArmHasSecurityExtensions ()) {
-        ArmGenericTimerSetTimerFreq (PcdGet32 (PcdArmArchTimerFreqInHz));
-      }
-
- #endif
-    }
-
-    //
-    // Architectural Timer Frequency must be set in Secure privileged
-    // mode (if secure extension is supported).
-    // If the reset value (0) is returned, just ASSERT.
-    //
-    ASSERT (ArmGenericTimerGetTimerFreq () != 0);
-  } else {
-    DEBUG ((DEBUG_ERROR, "ARM Architectural Timer is not available in the CPU, hence this library cannot be used.\n"));
-    ASSERT (0);
-  }
-
-  return RETURN_SUCCESS;
-}
 
 /**
   A local utility function that returns the PCD value, if specified.
@@ -89,10 +39,9 @@ GetPlatformTimerFreq (
 {
   UINTN  TimerFreq;
 
-  TimerFreq = PcdGet32 (PcdArmArchTimerFreqInHz);
-  if (TimerFreq == 0) {
-    TimerFreq = ArmGenericTimerGetTimerFreq ();
-  }
+  TimerFreq = ArmGenericTimerGetTimerFreq ();
+
+  ASSERT (TimerFreq != 0);
 
   return TimerFreq;
 }

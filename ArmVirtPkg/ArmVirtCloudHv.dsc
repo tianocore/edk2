@@ -201,9 +201,6 @@
 [PcdsDynamicHii]
   gUefiOvmfPkgTokenSpaceGuid.PcdForceNoAcpi|L"ForceNoAcpi"|gOvmfVariableGuid|0x0|FALSE|NV,BS
 
-[PcdsPatchableInModule.common]
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
-
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
@@ -213,7 +210,7 @@
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Universal/PCD/Pei/Pcd.inf {
     <LibraryClasses>

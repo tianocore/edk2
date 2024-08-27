@@ -1,7 +1,7 @@
 ## @file
 #  EFI/Framework Open Virtual Machine Firmware (OVMF) platform
 #
-#  Copyright (c) 2006 - 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #  Copyright (c) Microsoft Corporation.
 #
@@ -32,7 +32,7 @@
   DEFINE SECURE_BOOT_ENABLE      = FALSE
   DEFINE SMM_REQUIRE             = FALSE
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
-  DEFINE CC_MEASUREMENT_ENABLE   = FALSE
+  DEFINE CC_MEASUREMENT_ENABLE   = TRUE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
 
@@ -683,6 +683,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdQ35SmramAtDefaultSmbase|FALSE
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode|0x01
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout|100000
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2|100000
 !endif
 
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x00
@@ -866,7 +867,6 @@
   OvmfPkg/Virtio10Dxe/Virtio10.inf
   OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
   OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
-  OvmfPkg/VirtioRngDxe/VirtioRng.inf
   OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
 !if $(PVSCSI_ENABLE) == TRUE
   OvmfPkg/PvScsiDxe/PvScsiDxe.inf
@@ -963,6 +963,8 @@
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
+!include OvmfPkg/Include/Dsc/MorLock.dsc.inc
+!include OvmfPkg/Include/Dsc/OvmfRngComponents.dsc.inc
 
 !if $(SECURE_BOOT_ENABLE) == TRUE
   SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf

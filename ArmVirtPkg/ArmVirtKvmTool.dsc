@@ -147,11 +147,6 @@
   # 0-PCANSI, 1-VT100, 2-VT00+, 3-UTF8, 4-TTYTERM
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
 
-  #
-  # ARM Virtual Architectural Timer -- fetch frequency from KVM
-  #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0
-
   # Use MMIO for accessing Serial port registers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialPciDeviceInfo|{0xFF}
@@ -164,8 +159,6 @@
   # BuildCpuHob().
   #
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
-
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
 
 [PcdsPatchableInModule.common]
   #

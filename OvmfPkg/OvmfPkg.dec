@@ -148,6 +148,10 @@
   #
   HardwareInfoLib|Include/Library/HardwareInfoLib.h
 
+  ##  @libraryclass  CPU MMU Initialization library.
+  #
+  CpuMmuInitLib|Include/Library/CpuMmuInitLib.h
+
 [Guids]
   gUefiOvmfPkgTokenSpaceGuid            = {0x93bb96af, 0xb9f2, 0x4eb8, {0x94, 0x62, 0xe0, 0xba, 0x74, 0x56, 0x42, 0x36}}
   gEfiXenInfoGuid                       = {0xd3b46f3b, 0xd441, 0x1244, {0x9a, 0x12, 0x0, 0x12, 0x27, 0x3f, 0xc1, 0x4d}}
@@ -168,6 +172,7 @@
   gEfiNonCcFvGuid                       = {0xae047c6d, 0xbce9, 0x426c, {0xae, 0x03, 0xa6, 0x8e, 0x3b, 0x8a, 0x04, 0x88}}
   gOvmfVariableGuid                     = {0x50bea1e5, 0xa2c5, 0x46e9, {0x9b, 0x3a, 0x59, 0x59, 0x65, 0x16, 0xb0, 0x0a}}
   gQemuFirmwareResourceHobGuid          = {0x3cc47b04, 0x0d3e, 0xaa64, {0x06, 0xa6, 0x4b, 0xdc, 0x9a, 0x2c, 0x61, 0x19}}
+  gRtcRegisterBaseAddressHobGuid        = {0x40435d97, 0xeb37, 0x4a4b, {0x7f, 0xad, 0xb7, 0xed, 0x72, 0xa1, 0x43, 0xc5}}
 
 [Ppis]
   # PPI whose presence in the PPI database signals that the TPM base address
@@ -444,3 +449,8 @@
 
   ## This feature flag indicates the firmware build supports secure boot.
   gUefiOvmfPkgTokenSpaceGuid.PcdSecureBootSupported|FALSE|BOOLEAN|0x6d
+
+  ## Whether QemuVideoDxe should perform a EFI_MEMORY_WC remap of the PCI
+  #  framebuffer. This might be required on platforms that do not tolerate
+  #  misaligned accesses otherwise.
+  gUefiOvmfPkgTokenSpaceGuid.PcdRemapFrameBufferWriteCombine|FALSE|BOOLEAN|0x75

@@ -50,10 +50,6 @@
   #
   ArmHvcLib|Include/Library/ArmHvcLib.h
 
-  ##  @libraryclass  Provides an interface to Arm registers.
-  #
-  ArmLib|Include/Library/ArmLib.h
-
   ##  @libraryclass  Provides a Mmu interface.
   #
   ArmMmuLib|Include/Library/ArmMmuLib.h
@@ -228,6 +224,11 @@
   #
   gArmTokenSpaceGuid.PcdUefiShellDefaultBootEnable|FALSE|BOOLEAN|0x0000052
 
+  ## Define the conduit to use for monitor calls.
+  # Default PcdMonitorConduitHvc = FALSE, conduit = SMC
+  # If PcdMonitorConduitHvc = TRUE, conduit = HVC
+  gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
+
 [PcdsFixedAtBuild.common, PcdsPatchableInModule.common]
   gArmTokenSpaceGuid.PcdFdBaseAddress|0|UINT64|0x0000002B
   gArmTokenSpaceGuid.PcdFvBaseAddress|0|UINT64|0x0000002D
@@ -312,17 +313,7 @@
   gArmTokenSpaceGuid.PcdSystemBiosRelease|0xFFFF|UINT16|0x30000058
   gArmTokenSpaceGuid.PcdEmbeddedControllerFirmwareRelease|0xFFFF|UINT16|0x30000059
 
-  ## Define the conduit to use for monitor calls.
-  # Default PcdMonitorConduitHvc = FALSE, conduit = SMC
-  # If PcdMonitorConduitHvc = TRUE, conduit = HVC
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|FALSE|BOOLEAN|0x00000047
-
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
-  #
-  # ARM Architectural Timer
-  #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0|UINT32|0x00000034
-
   # ARM Architectural Timer Interrupt(GIC PPI) numbers
   gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29|UINT32|0x00000035
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30|UINT32|0x00000036

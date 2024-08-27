@@ -7,16 +7,11 @@
 
 #include <AsmMacroIoLib.h>
 
-#include <Chipset/ArmV7.h>
+#include <Arm/AArch32.h>
 
 ASM_FUNC(_ModuleEntryPoint)
   // Do early platform specific actions
   bl    ASM_PFX(ArmPlatformPeiBootAction)
-
-  // Get ID of this CPU in multi-core system
-  bl    ASM_PFX(ArmReadMpidr)
-  // Keep a copy of the MpId register value
-  mov   r8, r0
 
 _SetSVCMode:
   // Enter SVC mode, Disable FIQ and IRQ
@@ -81,34 +76,18 @@ _GetBaseUefiMemory:
   sub   r9, r1, r4
 
 _GetStackBase:
-  // r1 = The top of the Mpcore Stacks
+  // r1 = The top of the stack
+  mov   sp, r1
+
   // Stack for the primary core = PrimaryCoreStack
   MOV32 (r2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
   sub   r10, r1, r2
 
-  // Stack for the secondary core = Number of Cores - 1
-  MOV32 (r1, (FixedPcdGet32(PcdCoreCount) - 1) * FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
-  sub   r10, r10, r1
+  // Get ID of this CPU in multi-core system
+  bl    ASM_PFX(ArmReadMpidr)
 
-  // r10 = The base of the MpCore Stacks (primary stack & secondary stacks)
-  mov   r0, r10
-  mov   r1, r8
-  //ArmPlatformStackSet(StackBase, MpId, PrimaryStackSize, SecondaryStackSize)
-  MOV32 (r2, FixedPcdGet32(PcdCPUCorePrimaryStackSize))
-  MOV32 (r3, FixedPcdGet32(PcdCPUCoreSecondaryStackSize))
-  bl    ASM_PFX(ArmPlatformStackSet)
-
-  // Is it the Primary Core ?
-  mov   r0, r8
-  bl    ASM_PFX(ArmPlatformIsPrimaryCore)
-  cmp   r0, #1
-  bne   _PrepareArguments
-
-_PrepareArguments:
-  mov   r0, r8
   mov   r1, r9
   mov   r2, r10
-  mov   r3, sp
 
   // Move sec startup address into a data register
   // Ensure we're jumping to FV version of the code (not boot remapped alias)

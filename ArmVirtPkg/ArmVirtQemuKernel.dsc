@@ -65,7 +65,7 @@
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoLib.inf
 
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
-  VirtNorFlashPlatformLib|ArmVirtPkg/Library/NorFlashQemuLib/NorFlashQemuLib.inf
+  VirtNorFlashPlatformLib|OvmfPkg/Library/FdtNorFlashQemuLib/FdtNorFlashQemuLib.inf
 
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
@@ -81,6 +81,8 @@
   PciHostBridgeUtilityLib|OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
+
+  ArmMonitorLib|ArmVirtPkg/Library/ArmVirtQemuMonitorLib/ArmVirtQemuMonitorLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
   AcpiPlatformLib|OvmfPkg/Library/AcpiPlatformLib/DxeAcpiPlatformLib.inf
@@ -120,6 +122,8 @@
   gArmTokenSpaceGuid.PcdVFPEnabled|1
 !endif
 
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress|0x00000000
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize|$(FD_SIZE)
   gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
@@ -153,11 +157,6 @@
 !endif
 
   #
-  # ARM Virtual Architectural Timer -- fetch frequency from QEMU (TCG) or KVM
-  #
-  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz|0
-
-  #
   # Network Pcds
   #
 !include NetworkPkg/NetworkPcds.dsc.inc
@@ -181,6 +180,10 @@
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|3
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x20000
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize   | 0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize   | 0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize | 0x40000
+
 [PcdsPatchableInModule.common]
   # we need to provide a resolution for this PCD that supports PcdSet64()
   # being called from ArmVirtPkg/Library/PlatformPeiLib/PlatformPeiLib.c,
@@ -203,10 +206,15 @@
   gArmTokenSpaceGuid.PcdFdBaseAddress|0x0
   gArmTokenSpaceGuid.PcdFvBaseAddress|0x0
 
-  gArmTokenSpaceGuid.PcdMonitorConduitHvc|TRUE
-
 [PcdsDynamicDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|3
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase     | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64   | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64   | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase     | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase   | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64 | 0
 
   ## If TRUE, OvmfPkg/AcpiPlatformDxe will not wait for PCI
   #  enumeration to complete before installing ACPI tables.
@@ -313,7 +321,10 @@
   MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 !endif
   MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
+  }
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {

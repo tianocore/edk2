@@ -11,7 +11,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Specification Reference:
-  AMD64 Architecture Programming Manual volume 2, March 2017, Sections 15.34
+  AMD64 Architecture Programming Manual volume 2, March 2024
 
 **/
 
@@ -46,9 +46,9 @@ CPUID Signature Information
   CPUID Extended Topology Enumeration
 
   @note
-  Reference: AMD64 Architecture Programmer’s Manual Volume 3: General-Purpose and System Instructions,
+  Reference: AMD64 Architecture Programmer's Manual Volume 3: General-Purpose and System Instructions,
              Revision 3.35 Appendix E,
-  E.4.24 Function 8000_0026—Extended CPU Topology:
+  E.4.24 Function 8000_0026-Extended CPU Topology:
     CPUID Fn8000_0026 reports extended topology information for logical processors, including
     asymmetric and heterogenous topology descriptions. Individual logical processors may report
     different values in systems with asynchronous and heterogeneous topologies.

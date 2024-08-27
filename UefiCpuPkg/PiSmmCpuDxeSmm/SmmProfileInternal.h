@@ -1,7 +1,7 @@
 /** @file
 SMM profile internal header file.
 
-Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2020, AMD Incorporated. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -96,12 +96,11 @@ typedef struct {
   UINT64    SmiCmd;
 } SMM_PROFILE_ENTRY;
 
-extern SMM_S3_RESUME_STATE  *mSmmS3ResumeState;
-extern UINTN                gSmiExceptionHandlers[];
-extern BOOLEAN              mXdSupported;
-X86_ASSEMBLY_PATCH_LABEL    gPatchXdSupported;
-X86_ASSEMBLY_PATCH_LABEL    gPatchMsrIa32MiscEnableSupported;
-extern UINTN                *mPFEntryCount;
+extern UINTN              gSmiExceptionHandlers[];
+extern BOOLEAN            mXdSupported;
+X86_ASSEMBLY_PATCH_LABEL  gPatchXdSupported;
+X86_ASSEMBLY_PATCH_LABEL  gPatchMsrIa32MiscEnableSupported;
+extern UINTN              *mPFEntryCount;
 extern UINT64 (*mLastPFEntryValue)[MAX_PF_ENTRY_COUNT];
 extern UINT64                    *(*mLastPFEntryPointer)[MAX_PF_ENTRY_COUNT];
 
@@ -130,24 +129,38 @@ IsAddressSplit (
   );
 
 /**
-  Check if the memory address will be mapped by 4KB-page.
+  Check if the SMM profile page fault address above 4GB is in protected range or not.
 
-  @param  Address  The address of Memory.
-  @param  Nx       The flag indicates if the memory is execute-disable.
+  @param[in]   Address  The address of Memory.
+  @param[out]  Nx       The flag indicates if the memory is execute-disable.
+
+  @retval TRUE     The input address is in protected range.
+  @retval FALSE    The input address is not in protected range.
 
 **/
 BOOLEAN
-IsAddressValid (
-  IN EFI_PHYSICAL_ADDRESS  Address,
-  IN BOOLEAN               *Nx
+IsSmmProfilePFAddressAbove4GValid (
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  OUT BOOLEAN               *Nx
   );
 
 /**
-  Page Fault handler for SMM use.
+  Allocate free Page for PageFault handler use.
+
+  @return Page address.
+
+**/
+UINT64
+AllocPage (
+  VOID
+  );
+
+/**
+  Create new entry in page table for page fault address in SmmProfilePFHandler.
 
 **/
 VOID
-SmiDefaultPFHandler (
+SmmProfileMapPFAddress (
   VOID
   );
 

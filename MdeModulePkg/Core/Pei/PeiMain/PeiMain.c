@@ -1,7 +1,7 @@
 /** @file
   Pei Core Main Entry Point
 
-Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -11,6 +11,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 EFI_PEI_PPI_DESCRIPTOR  mMemoryDiscoveredPpi = {
   (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
   &gEfiPeiMemoryDiscoveredPpiGuid,
+  NULL
+};
+EFI_PEI_PPI_DESCRIPTOR  mMigrateTempRamPpi = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiPeiMigrateTempRamPpiGuid,
   NULL
 };
 
@@ -318,6 +323,21 @@ PeiCore (
       //
       OldCoreData->PeiMemoryInstalled = TRUE;
 
+      if (PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes)) {
+        DEBUG ((DEBUG_VERBOSE, "Early Migration - PPI lists before temporary RAM evacuation:\n"));
+        DumpPpiList (OldCoreData);
+
+        //
+        // Migrate installed content from Temporary RAM to Permanent RAM at this
+        // stage when PEI core still runs from a cached location.
+        // FVs that doesn't contain PEI_CORE should be migrated here.
+        //
+        EvacuateTempRam (OldCoreData, SecCoreData);
+
+        DEBUG ((DEBUG_VERBOSE, "Early Migration - PPI lists after temporary RAM evacuation:\n"));
+        DumpPpiList (OldCoreData);
+      }
+
       //
       // Indicate that PeiCore reenter
       //
@@ -446,8 +466,12 @@ PeiCore (
 
       //
       // Migrate installed content from Temporary RAM to Permanent RAM
+      // FVs containing PEI_CORE should be migrated here.
       //
       EvacuateTempRam (&PrivateData, SecCoreData);
+
+      Status = PeiServicesInstallPpi (&mMigrateTempRamPpi);
+      ASSERT_EFI_ERROR (Status);
 
       DEBUG ((DEBUG_VERBOSE, "PPI lists after temporary RAM evacuation:\n"));
       DumpPpiList (&PrivateData);

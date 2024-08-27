@@ -2,6 +2,7 @@
 This internal header file defines the common interface of constructor for
 VarCheckPolicyLib.
 
+Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation. All rights reserved.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -24,17 +25,17 @@ VarCheckPolicyLibCommonConstructor (
   );
 
 /**
-  This function is wrapper function to validate the buffer.
+  This function is wrapper function to validate the Primary Buffer (CommBuffer).
 
   @param Buffer  The buffer start address to be checked.
   @param Length  The buffer length to be checked.
 
-  @retval TRUE  This buffer is valid per processor architecture and not overlap with SMRAM/MMRAM.
-  @retval FALSE This buffer is not valid per processor architecture or overlap with SMRAM/MMRAM.
+  @retval TRUE  This buffer is valid.
+  @retval FALSE This buffer is not valid.
 **/
 BOOLEAN
 EFIAPI
-VarCheckPolicyIsBufferOutsideValid (
+VarCheckPolicyIsPrimaryBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   );

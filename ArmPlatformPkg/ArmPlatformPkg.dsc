@@ -120,10 +120,10 @@
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
 
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreMPCore.inf
   ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
+  ArmPlatformPkg/Sec/Sec.inf
 
-  ArmPlatformPkg/PrePi/PeiMPCore.inf
   ArmPlatformPkg/PrePi/PeiUniCore.inf
+  ArmPlatformPkg/PeilessSec/PeilessSec.inf
 
   ArmPlatformPkg/Library/ArmMaliDp/ArmMaliDp.inf

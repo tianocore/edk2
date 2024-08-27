@@ -1,0 +1,313 @@
+## @file
+#
+#  Copyright (c) 2024 Loongson Technology Corporation Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+#####################################################################################################
+[Defines]
+!include LoongArchVirt.fdf.inc
+
+#####################################################################################################
+[FD.QEMU_EFI]
+BaseAddress   = $(FW_BASE_ADDRESS)|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFdBaseAddress
+Size          = $(FW_SIZE)|gUefiOvmfPkgTokenSpaceGuid.PcdOvmfFirmwareFdSize
+ErasePolarity = 1
+BlockSize     = $(BLOCK_SIZE)
+NumBlocks     = $(FW_BLOCKS)
+
+0x0|$(FVMAIN_SIZE)
+FV = FVMAIN_COMPACT
+
+!include VarStore.fdf.inc
+
+#####################################################################################################
+[FV.DXEFV]
+FvNameGuid         = 5d19a5b3-130f-459b-a292-9270a9e6bc62
+BlockSize          = $(BLOCK_SIZE)
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+
+APRIORI DXE {
+  INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+}
+
+#
+# DXE Phase modules
+#
+INF  MdeModulePkg/Core/Dxe/DxeMain.inf
+
+INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
+INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
+INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+INF  OvmfPkg/LoongArchVirt/Drivers/StableTimerDxe/TimerDxe.inf
+INF  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+INF  MdeModulePkg/Universal/Metronome/Metronome.inf
+INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+INF  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+
+#
+# Variable
+#
+INF  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf
+INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+#
+# PCI
+#
+INF  UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
+INF  EmbeddedPkg/Drivers/FdtClientDxe/FdtClientDxe.inf
+INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+INF  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+INF  OvmfPkg/Virtio10Dxe/Virtio10.inf
+
+#
+# Platform Driver
+#
+INF  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+INF  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+INF  OvmfPkg/VirtioRngDxe/VirtioRng.inf
+INF  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+
+#
+# Console
+#
+INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
+INF  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+
+#
+#Video
+#
+INF  OvmfPkg/QemuVideoDxe/QemuVideoDxe.inf
+INF  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
+INF  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+INF  OvmfPkg/PlatformDxe/Platform.inf
+
+#
+# SATA/SCSI
+#
+INF  MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
+INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+
+#
+# NVME
+#
+INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+
+#
+# Usb Support
+#
+INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+INF  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+INF  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+
+#
+#BDS
+#
+INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF  MdeModulePkg/Logo/LogoDxe.inf
+INF  MdeModulePkg/Application/UiApp/UiApp.inf
+INF  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf
+
+#
+#Smbios
+#
+INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+INF  OvmfPkg/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+
+#
+#Acpi
+#
+INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+INF  OvmfPkg/AcpiPlatformDxe/AcpiPlatformDxe.inf
+
+#
+# Network modules
+!include NetworkPkg/Network.fdf.inc
+
+#
+# File system
+#
+INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+INF  FatPkg/EnhancedFatDxe/Fat.inf
+INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+INF  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
+
+#
+#Boot OS
+#
+INF ShellPkg/Application/Shell/Shell.inf
+
+#####################################################################################################
+[FV.FVMAIN_COMPACT]
+FvNameGuid         = af8c3fe8-9ce8-4548-884a-e3f4dd91f040
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+#
+#
+#  PEI Phase priori modules
+#
+APRIORI PEI {
+  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+}
+
+#
+#  SEC Phase modules
+#
+INF  OvmfPkg/LoongArchVirt/Sec/SecMain.inf
+
+#
+#  PEI Phase modules
+#
+INF  MdeModulePkg/Core/Pei/PeiMain.inf
+INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+INF  OvmfPkg/LoongArchVirt/PlatformPei/PlatformPei.inf
+INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+
+#
+# DXE Phase modules
+#
+FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
+   SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+     SECTION FV_IMAGE = DXEFV
+   }
+ }
+
+#####################################################################################################
+[Rule.Common.SEC]
+  FILE SEC = $(NAMED_GUID) {
+    TE       TE Align = Auto   $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING ="$(MODULE_NAME)" Optional
+  }
+
+#####################################################################################################
+[Rule.Common.PEI_CORE]
+  FILE PEI_CORE = $(NAMED_GUID) {
+    TE       TE   Align=Auto    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING ="$(MODULE_NAME)" Optional
+  }
+
+#####################################################################################################
+[Rule.Common.PEIM]
+  FILE PEIM = $(NAMED_GUID) {
+     PEI_DEPEX PEI_DEPEX Optional        $(INF_OUTPUT)/$(MODULE_NAME).depex
+     PE32      PE32   Align=Auto         $(INF_OUTPUT)/$(MODULE_NAME).efi
+     UI        STRING="$(MODULE_NAME)" Optional
+  }
+
+#####################################################################################################
+[Rule.Common.DXE_CORE]
+  FILE DXE_CORE = $(NAMED_GUID) {
+    PE32     PE32           $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+  }
+
+#####################################################################################################
+[Rule.Common.DXE_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional      $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32         PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+    RAW          ACPI  Optional            |.acpi
+    RAW          ASL   Optional            |.aml
+  }
+
+#####################################################################################################
+[Rule.Common.DXE_RUNTIME_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX     Optional $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32         PE32                   $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI           STRING="$(MODULE_NAME)" Optional
+  }
+
+#####################################################################################################
+[Rule.Common.UEFI_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX    DXE_DEPEX Optional  $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+  }
+
+#####################################################################################################
+[Rule.Common.UEFI_DRIVER.BINARY]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional      |.depex
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+#####################################################################################################
+[Rule.Common.UEFI_APPLICATION]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32     PE32                    $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI       STRING="$(MODULE_NAME)" Optional
+  }
+
+#####################################################################################################
+[Rule.Common.UEFI_APPLICATION.BINARY]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32      PE32                    |.efi
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }
+
+#####################################################################################################
+[Rule.Common.USER_DEFINED.ACPITABLE]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW ACPI               |.acpi
+    RAW ASL                |.aml
+  }

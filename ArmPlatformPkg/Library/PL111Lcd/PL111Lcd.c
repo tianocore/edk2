@@ -19,7 +19,7 @@
   @retval EFI_SUCCESS          Returns success if platform implements a
                                PL111 controller.
 
-  @retval EFI_NOT_FOUND        PL111 display controller not found the plaform.
+  @retval EFI_NOT_FOUND        PL111 display controller not found the platform.
 **/
 EFI_STATUS
 LcdIdentify (
@@ -71,9 +71,9 @@ LcdInitialize (
 
 /** Set requested mode of the display.
 
-  @param[in] ModeNumbe           Display mode number.
+  @param[in] ModeNumber          Display mode number.
 
-  @retval EFI_SUCCESS            Display mode set successfuly.
+  @retval EFI_SUCCESS            Display mode set successfully.
   @retval !(EFI_SUCCESS)         Other errors.
 **/
 EFI_STATUS

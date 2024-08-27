@@ -33,7 +33,6 @@
 [LibraryClasses.common]
   PrePiLib|Include/Library/PrePiLib.h
   RealTimeClockLib|Include/Library/RealTimeClockLib.h
-  EfiResetSystemLib|Include/Library/EfiResetSystemLib.h
   GdbSerialLib|Include/Library/GdbSerialLib.h
   DebugAgentTimerLib|Include/Library/DebugAgentTimerLib.h
   NorFlashInfoLib|Include/Library/NorFlashInfoLib.h
@@ -72,6 +71,9 @@
 
   ## Include/Guid/NvVarStoreFormatted.h
   gEdkiiNvVarStoreFormattedGuid = { 0xd1a86e3f, 0x0707, 0x4c35, { 0x83, 0xcd, 0xdc, 0x2c, 0x29, 0xc8, 0x91, 0xa3 } }
+
+  # Include/Guid/MemoryAttributeManagerFormSet.h
+  gMemoryAttributeManagerFormSetGuid = { 0xefab3427, 0x4793, 0x4e9e, { 0xaa, 0x29, 0x88, 0x0c, 0x9a, 0x77, 0x5b, 0x5f } }
 
 [Protocols.common]
   gHardwareInterruptProtocolGuid =  { 0x2890B3EA, 0x053D, 0x1643, { 0xAD, 0x0C, 0xD6, 0x48, 0x08, 0xDA, 0x3F, 0xF1 } }
@@ -192,3 +194,8 @@
   # Expected Overflow Android Kernel Command Line Characters
   #
   gEmbeddedTokenSpaceGuid.PcdAndroidKernelCommandLineOverflow|0|UINT32|0x000005C
+
+  #
+  # EFI Memory Attribute Protocol default enable state
+  #
+  gEmbeddedTokenSpaceGuid.PcdMemoryAttributeEnabledDefault|TRUE|BOOLEAN|0x00000060

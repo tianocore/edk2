@@ -1,0 +1,35 @@
+/** @file
+
+  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <Uefi/UefiMultiPhase.h>
+#include <Guid/HiiPlatformSetupFormset.h>
+
+#include "MemoryAttributeManagerDxe.h"
+
+formset
+  guid      = MEMORY_ATTRIBUTE_MANAGER_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  efivarstore MEMORY_ATTRIBUTE_MANAGER_VARSTORE_DATA,
+  attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+  name  = MemoryAttributeManagerData,
+  guid  = MEMORY_ATTRIBUTE_MANAGER_FORMSET_GUID;
+
+  form formid = 1,
+    title  = STRING_TOKEN(STR_FORM_SET_TITLE);
+
+    checkbox varid = MemoryAttributeManagerData.Enabled,
+      prompt      = STRING_TOKEN(STR_ENABLE_PROTOCOL_PROMPT),
+      help        = STRING_TOKEN(STR_NULL_STRING),
+      flags       = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG | RESET_REQUIRED,
+      default     = PROTOCOL_ENABLED_DEFAULT,
+    endcheckbox;
+  endform;
+endformset;

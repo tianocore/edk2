@@ -633,6 +633,7 @@ PlatformAddressWidthFromCpuid (
 {
   UINT32    RegEax, RegEbx, RegEcx, RegEdx, Max;
   UINT8     PhysBits;
+  UINT8     GuestPhysBits;
   CHAR8     Signature[13];
   IA32_CR4  Cr4;
   BOOLEAN   Valid         = FALSE;
@@ -655,12 +656,16 @@ PlatformAddressWidthFromCpuid (
 
   if (Max >= 0x80000008) {
     AsmCpuid (0x80000008, &RegEax, NULL, NULL, NULL);
-    PhysBits = (UINT8)RegEax;
+    PhysBits      = (UINT8)RegEax;
+    GuestPhysBits = (UINT8)(RegEax >> 16);
   } else {
-    PhysBits = 36;
+    PhysBits      = 36;
+    GuestPhysBits = 0;
   }
 
   if (!QemuQuirk) {
+    Valid = TRUE;
+  } else if (GuestPhysBits) {
     Valid = TRUE;
   } else if (PhysBits >= 41) {
     Valid = TRUE;
@@ -678,14 +683,20 @@ PlatformAddressWidthFromCpuid (
 
   DEBUG ((
     DEBUG_INFO,
-    "%a: Signature: '%a', PhysBits: %d, QemuQuirk: %a, la57: %a, Valid: %a\n",
+    "%a: Signature: '%a', PhysBits: %d, GuestPhysBits: %d, QemuQuirk: %a, la57: %a, Valid: %a\n",
     __func__,
     Signature,
     PhysBits,
+    GuestPhysBits,
     QemuQuirk ? "On" : "Off",
     Cr4.Bits.LA57 ? "On" : "Off",
     Valid ? "Yes" : "No"
     ));
+
+  if (GuestPhysBits && (PhysBits > GuestPhysBits)) {
+    DEBUG ((DEBUG_INFO, "%a: limit PhysBits to %d (GuestPhysBits)\n", __func__, GuestPhysBits));
+    PhysBits = GuestPhysBits;
+  }
 
   if (Valid) {
     /*
@@ -695,7 +706,7 @@ PlatformAddressWidthFromCpuid (
      * and a 56 bit wide address space with 5 paging levels.
      */
     if (Cr4.Bits.LA57) {
-      if (PhysBits > 48) {
+      if ((PhysBits > 48) && !GuestPhysBits) {
         /*
          * Some Intel CPUs support 5-level paging, have more than 48
          * phys-bits but support only 4-level EPT, which effectively
@@ -705,11 +716,11 @@ PlatformAddressWidthFromCpuid (
          * problem: They can handle guest phys-bits larger than 48
          * only in case the host runs in 5-level paging mode.
          *
-         * Until we have some way to communicate that kind of
-         * limitations from hypervisor to guest, limit phys-bits
-         * to 48 unconditionally.
+         * GuestPhysBits is used to communicate that kind of
+         * limitations from hypervisor to guest.  If GuestPhysBits is
+         * not set play safe and limit phys-bits to 48.
          */
-        DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 48 (5-level paging)\n", __func__));
+        DEBUG ((DEBUG_INFO, "%a: limit PhysBits to 48 (5-level paging, no GuestPhysBits)\n", __func__));
         PhysBits = 48;
       }
     } else {
@@ -1164,18 +1175,18 @@ PlatformQemuInitializeRam (
     MtrrGetAllMtrrs (&MtrrSettings);
 
     //
-    // MTRRs disabled, fixed MTRRs disabled, default type is uncached
+    // See SecMtrrSetup(), default type should be write back
     //
-    ASSERT ((MtrrSettings.MtrrDefType & BIT11) == 0);
+    ASSERT ((MtrrSettings.MtrrDefType & BIT11) != 0);
     ASSERT ((MtrrSettings.MtrrDefType & BIT10) == 0);
-    ASSERT ((MtrrSettings.MtrrDefType & 0xFF) == 0);
+    ASSERT ((MtrrSettings.MtrrDefType & 0xFF) == MTRR_CACHE_WRITE_BACK);
 
     //
     // flip default type to writeback
     //
-    SetMem (&MtrrSettings.Fixed, sizeof MtrrSettings.Fixed, 0x06);
+    SetMem (&MtrrSettings.Fixed, sizeof MtrrSettings.Fixed, MTRR_CACHE_WRITE_BACK);
     ZeroMem (&MtrrSettings.Variables, sizeof MtrrSettings.Variables);
-    MtrrSettings.MtrrDefType |= BIT11 | BIT10 | 6;
+    MtrrSettings.MtrrDefType |= BIT10;
     MtrrSetAllMtrrs (&MtrrSettings);
 
     //

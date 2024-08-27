@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
@@ -471,6 +471,9 @@ extern BOOLEAN                       mSmmDebugAgentSupport;
 //
 extern UINT64  mAddressEncMask;
 
+extern UINT64  mTimeoutTicker;
+extern UINT64  mTimeoutTicker2;
+
 /**
   Create 4G PageTable in SMRAM.
 
@@ -533,15 +536,17 @@ StartSyncTimer (
   );
 
 /**
-  Check if the SMM AP Sync timer is timeout.
+  Check if the SMM AP Sync Timer is timeout specified by Timeout.
 
-  @param Timer  The start timer from the begin.
+  @param Timer    The start timer from the begin.
+  @param Timeout  The timeout ticker to wait.
 
 **/
 BOOLEAN
 EFIAPI
 IsSyncTimerTimeout (
-  IN      UINT64  Timer
+  IN      UINT64  Timer,
+  IN      UINT64  Timeout
   );
 
 /**
@@ -1040,20 +1045,9 @@ extern BOOLEAN  mSmmS3Flag;
 /**
   Initialize SMM S3 resume state structure used during S3 Resume.
 
-  @param[in] Cr3    The base address of the page tables to use in SMM.
-
 **/
 VOID
 InitSmmS3ResumeState (
-  IN UINT32  Cr3
-  );
-
-/**
-  Get ACPI CPU data.
-
-**/
-VOID
-GetAcpiCpuData (
   VOID
   );
 
@@ -1073,21 +1067,6 @@ RestoreSmmConfigurationInS3 (
 VOID
 GetAcpiS3EnableFlag (
   VOID
-  );
-
-/**
-  Transfer AP to safe hlt-loop after it finished restore CPU features on S3 patch.
-
-  @param[in] ApHltLoopCode          The address of the safe hlt-loop function.
-  @param[in] TopOfStack             A pointer to the new stack to use for the ApHltLoopCode.
-  @param[in] NumberToFinishAddress  Address of Semaphore of APs finish count.
-
-**/
-VOID
-TransferApToSafeState (
-  IN UINTN  ApHltLoopCode,
-  IN UINTN  TopOfStack,
-  IN UINTN  NumberToFinishAddress
   );
 
 /**

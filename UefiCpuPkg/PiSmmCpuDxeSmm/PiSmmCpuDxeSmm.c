@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 
@@ -435,8 +435,8 @@ ExecuteFirstSmiInit (
 /**
   SMM Ready To Lock event notification handler.
 
-  The CPU S3 data is copied to SMRAM for security and mSmmReadyToLock is set to
-  perform additional lock actions that must be performed from SMM on the next SMI.
+  mSmmReadyToLock is set to perform additional lock actions that must be
+  performed from SMM on the next SMI.
 
   @param[in] Protocol   Points to the protocol's unique identifier.
   @param[in] Interface  Points to the interface instance.
@@ -452,8 +452,6 @@ SmmReadyToLockEventNotify (
   IN EFI_HANDLE      Handle
   )
 {
-  GetAcpiCpuData ();
-
   //
   // Cache a copy of UEFI memory map before we start profiling feature.
   //
@@ -1361,7 +1359,7 @@ PiCpuSmmEntry (
   InitSmmProfile (Cr3);
 
   GetAcpiS3EnableFlag ();
-  InitSmmS3ResumeState (Cr3);
+  InitSmmS3ResumeState ();
 
   DEBUG ((DEBUG_INFO, "SMM CPU Module exit from SMRAM with EFI_SUCCESS\n"));
 

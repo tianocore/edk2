@@ -1647,70 +1647,6 @@ EdkiiSmmClearMemoryAttributes (
 }
 
 /**
-  Create page table based on input PagingMode, LinearAddress and Length.
-
-  @param[in, out]  PageTable           The pointer to the page table.
-  @param[in]       PagingMode          The paging mode.
-  @param[in]       LinearAddress       The start of the linear address range.
-  @param[in]       Length              The length of the linear address range.
-
-**/
-VOID
-GenPageTable (
-  IN OUT UINTN        *PageTable,
-  IN     PAGING_MODE  PagingMode,
-  IN     UINT64       LinearAddress,
-  IN     UINT64       Length
-  )
-{
-  RETURN_STATUS       Status;
-  UINTN               PageTableBufferSize;
-  VOID                *PageTableBuffer;
-  IA32_MAP_ATTRIBUTE  MapAttribute;
-  IA32_MAP_ATTRIBUTE  MapMask;
-
-  MapMask.Uint64                   = MAX_UINT64;
-  MapAttribute.Uint64              = mAddressEncMask|LinearAddress;
-  MapAttribute.Bits.Present        = 1;
-  MapAttribute.Bits.ReadWrite      = 1;
-  MapAttribute.Bits.UserSupervisor = 1;
-  MapAttribute.Bits.Accessed       = 1;
-  MapAttribute.Bits.Dirty          = 1;
-  PageTableBufferSize              = 0;
-
-  Status = PageTableMap (
-             PageTable,
-             PagingMode,
-             NULL,
-             &PageTableBufferSize,
-             LinearAddress,
-             Length,
-             &MapAttribute,
-             &MapMask,
-             NULL
-             );
-  if (Status == RETURN_BUFFER_TOO_SMALL) {
-    DEBUG ((DEBUG_INFO, "GenSMMPageTable: 0x%x bytes needed for initial SMM page table\n", PageTableBufferSize));
-    PageTableBuffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (PageTableBufferSize));
-    ASSERT (PageTableBuffer != NULL);
-    Status = PageTableMap (
-               PageTable,
-               PagingMode,
-               PageTableBuffer,
-               &PageTableBufferSize,
-               LinearAddress,
-               Length,
-               &MapAttribute,
-               &MapMask,
-               NULL
-               );
-  }
-
-  ASSERT (Status == RETURN_SUCCESS);
-  ASSERT (PageTableBufferSize == 0);
-}
-
-/**
   Create page table based on input PagingMode and PhysicalAddressBits in smm.
 
   @param[in]      PagingMode           The paging mode.
@@ -1725,37 +1661,35 @@ GenSmmPageTable (
   IN UINT8        PhysicalAddressBits
   )
 {
-  UINTN          PageTable;
-  RETURN_STATUS  Status;
-  UINTN          GuardPage;
-  UINTN          Index;
-  UINT64         Length;
-  PAGING_MODE    SmramPagingMode;
+  UINTN               PageTableBufferSize;
+  UINTN               PageTable;
+  VOID                *PageTableBuffer;
+  IA32_MAP_ATTRIBUTE  MapAttribute;
+  IA32_MAP_ATTRIBUTE  MapMask;
+  RETURN_STATUS       Status;
+  UINTN               GuardPage;
+  UINTN               Index;
+  UINT64              Length;
 
-  PageTable = 0;
-  Length    = LShiftU64 (1, PhysicalAddressBits);
-  ASSERT (Length > mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize);
+  Length                           = LShiftU64 (1, PhysicalAddressBits);
+  PageTable                        = 0;
+  PageTableBufferSize              = 0;
+  MapMask.Uint64                   = MAX_UINT64;
+  MapAttribute.Uint64              = mAddressEncMask;
+  MapAttribute.Bits.Present        = 1;
+  MapAttribute.Bits.ReadWrite      = 1;
+  MapAttribute.Bits.UserSupervisor = 1;
+  MapAttribute.Bits.Accessed       = 1;
+  MapAttribute.Bits.Dirty          = 1;
 
-  if (sizeof (UINTN) == sizeof (UINT64)) {
-    SmramPagingMode = m5LevelPagingNeeded ? Paging5Level4KB : Paging4Level4KB;
-  } else {
-    SmramPagingMode = PagingPae4KB;
-  }
-
-  ASSERT (mCpuHotPlugData.SmrrBase % SIZE_4KB == 0);
-  ASSERT (mCpuHotPlugData.SmrrSize % SIZE_4KB == 0);
-  GenPageTable (&PageTable, PagingMode, 0, mCpuHotPlugData.SmrrBase);
-
-  //
-  // Map smram range in 4K page granularity to avoid subsequent page split when smm ready to lock.
-  // If BSP are splitting the 1G/2M paging entries to 512 2M/4K paging entries, and all APs are
-  // still running in SMI at the same time, which might access the affected linear-address range
-  // between the time of modification and the time of invalidation access. That will be a potential
-  // problem leading exception happen.
-  //
-  GenPageTable (&PageTable, SmramPagingMode, mCpuHotPlugData.SmrrBase, mCpuHotPlugData.SmrrSize);
-
-  GenPageTable (&PageTable, PagingMode, mCpuHotPlugData.SmrrBase + mCpuHotPlugData.SmrrSize, Length - mCpuHotPlugData.SmrrBase - mCpuHotPlugData.SmrrSize);
+  Status = PageTableMap (&PageTable, PagingMode, NULL, &PageTableBufferSize, 0, Length, &MapAttribute, &MapMask, NULL);
+  ASSERT (Status == RETURN_BUFFER_TOO_SMALL);
+  DEBUG ((DEBUG_INFO, "GenSMMPageTable: 0x%x bytes needed for initial SMM page table\n", PageTableBufferSize));
+  PageTableBuffer = AllocatePageTableMemory (EFI_SIZE_TO_PAGES (PageTableBufferSize));
+  ASSERT (PageTableBuffer != NULL);
+  Status = PageTableMap (&PageTable, PagingMode, PageTableBuffer, &PageTableBufferSize, 0, Length, &MapAttribute, &MapMask, NULL);
+  ASSERT (Status == RETURN_SUCCESS);
+  ASSERT (PageTableBufferSize == 0);
 
   if (FeaturePcdGet (PcdCpuSmmStackGuard)) {
     //
