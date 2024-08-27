@@ -26,9 +26,10 @@
 
 queue_rules:
   - name: default
-    conditions:
+    queue_conditions:
       - base~=(^main|^master|^stable/)
       - label=push
+    merge_method: rebase
 
 pull_request_rules:
   - name: Automatically merge a PR when all required checks pass and 'push' label is present
@@ -37,7 +38,6 @@ pull_request_rules:
       - label=push
     actions:
       queue:
-        method: rebase
         name: default
 
   - name: Post a comment on a PR that can not be merged due to a merge conflict
