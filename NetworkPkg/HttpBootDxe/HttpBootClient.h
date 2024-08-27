@@ -108,6 +108,7 @@ HttpBootCreateHttpIo (
                                    BufferSize has been updated with the size needed to complete
                                    the request.
   @retval EFI_ACCESS_DENIED        The server needs to authenticate the client.
+  @retval EFI_UNSUPPORTED          Some HTTP response header is not supported.
   @retval Others                   Unexpected error happened.
 
 **/
