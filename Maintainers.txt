@@ -175,7 +175,6 @@ F: CryptoPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 M: Yi Li <yi1.li@intel.com> [liyi77]
-R: Wenxing Hou <wenxing.hou@intel.com> [Wenxing-hou]
 
 DynamicTablesPkg
 F: DynamicTablesPkg/
@@ -257,22 +256,7 @@ F: MdeModulePkg/Universal/DevicePathDxe/
 F: MdeModulePkg/Universal/DriverHealthManagerDxe/
 F: MdeModulePkg/Universal/LoadFileOnFv2/
 F: MdeModulePkg/Universal/SecurityStubDxe/Defer3rdPartyImageLoad.*
-R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
-
-MdeModulePkg: Console and Graphics modules
-F: MdeModulePkg/*Logo*/
-F: MdeModulePkg/Include/*Logo*.h
-F: MdeModulePkg/Include/Guid/ConnectConInEvent.h
-F: MdeModulePkg/Include/Guid/Console*.h
-F: MdeModulePkg/Include/Guid/StandardErrorDevice.h
-F: MdeModulePkg/Include/Guid/TtyTerm.h
-F: MdeModulePkg/Include/Library/BmpSupportLib.h
-F: MdeModulePkg/Include/Library/FrameBufferBltLib.h
-F: MdeModulePkg/Library/BaseBmpSupportLib/
-F: MdeModulePkg/Library/FrameBufferBltLib/
-F: MdeModulePkg/Universal/Console/
-R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 
 MdeModulePkg: Core services (PEI, DXE and Runtime) modules
 F: MdeModulePkg/*Mem*/
@@ -322,7 +306,6 @@ R: Ray Ni <ray.ni@intel.com> [niruiyu]
 MdeModulePkg: Disk modules
 F: MdeModulePkg/Universal/Disk/
 R: Ray Ni <ray.ni@intel.com> [niruiyu]
-R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 
 MdeModulePkg: Firmware Update modules
 F: MdeModulePkg/*Capsule*/
@@ -364,22 +347,11 @@ MdeModulePkg: Pei Core
 F: MdeModulePkg/Core/Pei/
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
-MdeModulePkg: Reset modules
-F: MdeModulePkg/*Reset*/
-F: MdeModulePkg/Include/*Reset*.h
-R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
-
-MdeModulePkg: Serial modules
-F: MdeModulePkg/*Serial*/
-F: MdeModulePkg/Include/*SerialPort*.h
-R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
-
 MdeModulePkg: SMBIOS modules
 F: MdeModulePkg/Universal/Smbios*/
 R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
 R: Dandan Bi <dandan.bi@intel.com> [dandanbi]
 R: Star Zeng <star.zeng@intel.com> [lzeng14]
-R: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 
 MdeModulePkg: UEFI Variable modules
 F: MdeModulePkg/*Var*/
@@ -434,7 +406,6 @@ F: MdePkg/Include/Library/TraceHubDebugSysTLib.h
 F: MdePkg/Include/Library/MipiSysTLib.h
 M: Gua Guo <gua.guo@intel.com> [gguo11837463]
 M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakashan@intel.com> [kprakas2]
-R: Chan Laura <laura.chan@intel.com> [lauracha]
 R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
 
 MdePkg: FDT related library instance
@@ -621,7 +592,6 @@ R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 ShellPkg
 F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
-M: Zhichao Gao <zhichao.gao@intel.com> [ZhichaoGao]
 
 SignedCapsulePkg
 F: SignedCapsulePkg/
@@ -645,11 +615,6 @@ M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
-
-UefiCpuPkg: Sec related modules
-F: UefiCpuPkg/SecCore/
-F: UefiCpuPkg/ResetVector/
-R: Catharine West <catharine.west@intel.com> [catharine-intl]
 
 UefiCpuPkg: AMD related files
 F: UefiCpuPkg/Library/MmSaveStateLib/*Amd*.*
