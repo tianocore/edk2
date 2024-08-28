@@ -33,6 +33,7 @@
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/VariableFormat.h>
 #include <OvmfPlatforms.h>
+#include <Library/TdxLib.h>
 
 #include <Library/PlatformInitLib.h>
 
@@ -562,6 +563,20 @@ PlatformMaxCpuCountInitialization (
 {
   UINT16  BootCpuCount = 0;
   UINT32  MaxCpuCount;
+
+  if (TdIsEnabled ()) {
+    BootCpuCount = (UINT16)TdVCpuNum ();
+    MaxCpuCount  = TdMaxVCpuNum ();
+
+    if (BootCpuCount > MaxCpuCount) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed with BootCpuCount (%d) more than MaxCpuCount(%u) \n", __func__, BootCpuCount, MaxCpuCount));
+      ASSERT (FALSE);
+    }
+
+    PlatformInfoHob->PcdCpuMaxLogicalProcessorNumber  = MaxCpuCount;
+    PlatformInfoHob->PcdCpuBootLogicalProcessorNumber = BootCpuCount;
+    return;
+  }
 
   //
   // Try to fetch the boot CPU count.
