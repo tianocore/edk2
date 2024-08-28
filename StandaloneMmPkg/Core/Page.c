@@ -9,14 +9,446 @@
 
 #include "StandaloneMmCore.h"
 
-#define NEXT_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
-  ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) + (Size)))
-
 #define TRUNCATE_TO_PAGES(a)  ((a) >> EFI_PAGE_SHIFT)
 
 LIST_ENTRY  mMmMemoryMap = INITIALIZE_LIST_HEAD_VARIABLE (mMmMemoryMap);
 
 UINTN  mMapKey;
+
+//
+// For GetMemoryMap()
+//
+
+#define MEMORY_MAP_SIGNATURE  SIGNATURE_32('m','m','a','p')
+typedef struct {
+  UINTN              Signature;
+  LIST_ENTRY         Link;
+
+  BOOLEAN            FromStack;
+  EFI_MEMORY_TYPE    Type;
+  UINT64             Start;
+  UINT64             End;
+} MEMORY_MAP;
+
+LIST_ENTRY  gMemoryMap = INITIALIZE_LIST_HEAD_VARIABLE (gMemoryMap);
+
+#define MAX_MAP_DEPTH  6
+
+///
+/// mMapDepth - depth of new descriptor stack
+///
+UINTN  mMapDepth = 0;
+///
+/// mMapStack - space to use as temp storage to build new map descriptors
+///
+MEMORY_MAP  mMapStack[MAX_MAP_DEPTH];
+UINTN       mFreeMapStack = 0;
+///
+/// This list maintain the free memory map list
+///
+LIST_ENTRY  mFreeMemoryMapEntryList = INITIALIZE_LIST_HEAD_VARIABLE (mFreeMemoryMapEntryList);
+
+/**
+  Allocates pages from the memory map.
+
+  @param[in]   Type                   The type of allocation to perform.
+  @param[in]   MemoryType             The type of memory to turn the allocated pages
+                                      into.
+  @param[in]   NumberOfPages          The number of pages to allocate.
+  @param[out]  Memory                 A pointer to receive the base allocated memory
+                                      address.
+  @param[in]   AddRegion              If this memory is new added region.
+
+  @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in spec.
+  @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
+  @retval EFI_OUT_OF_RESOURCES   No enough pages to allocate.
+  @retval EFI_SUCCESS            Pages successfully allocated.
+
+**/
+EFI_STATUS
+MmInternalAllocatePagesEx (
+  IN  EFI_ALLOCATE_TYPE     Type,
+  IN  EFI_MEMORY_TYPE       MemoryType,
+  IN  UINTN                 NumberOfPages,
+  OUT EFI_PHYSICAL_ADDRESS  *Memory,
+  IN  BOOLEAN               AddRegion
+  );
+
+/**
+  Internal function.  Deque a descriptor entry from the mFreeMemoryMapEntryList.
+  If the list is empty, then allocate a new page to refuel the list.
+  Please Note this algorithm to allocate the memory map descriptor has a property
+  that the memory allocated for memory entries always grows, and will never really be freed.
+
+  @return The Memory map descriptor dequeued from the mFreeMemoryMapEntryList
+
+**/
+MEMORY_MAP *
+AllocateMemoryMapEntry (
+  VOID
+  )
+{
+  EFI_PHYSICAL_ADDRESS  Mem;
+  EFI_STATUS            Status;
+  MEMORY_MAP            *FreeDescriptorEntries;
+  MEMORY_MAP            *Entry;
+  UINTN                 Index;
+
+  // DEBUG((DEBUG_INFO, "AllocateMemoryMapEntry\n"));
+
+  if (IsListEmpty (&mFreeMemoryMapEntryList)) {
+    // DEBUG((DEBUG_INFO, "mFreeMemoryMapEntryList is empty\n"));
+    //
+    // The list is empty, to allocate one page to refuel the list
+    //
+    Status = MmInternalAllocatePagesEx (
+               AllocateAnyPages,
+               EfiRuntimeServicesData,
+               EFI_SIZE_TO_PAGES (RUNTIME_PAGE_ALLOCATION_GRANULARITY),
+               &Mem,
+               TRUE
+               );
+    ASSERT_EFI_ERROR (Status);
+    if (!EFI_ERROR (Status)) {
+      FreeDescriptorEntries = (MEMORY_MAP *)(UINTN)Mem;
+      // DEBUG((DEBUG_INFO, "New FreeDescriptorEntries - 0x%x\n", FreeDescriptorEntries));
+      //
+      // Enqueue the free memory map entries into the list
+      //
+      for (Index = 0; Index < RUNTIME_PAGE_ALLOCATION_GRANULARITY / sizeof (MEMORY_MAP); Index++) {
+        FreeDescriptorEntries[Index].Signature = MEMORY_MAP_SIGNATURE;
+        InsertTailList (&mFreeMemoryMapEntryList, &FreeDescriptorEntries[Index].Link);
+      }
+    } else {
+      return NULL;
+    }
+  }
+
+  //
+  // dequeue the first descriptor from the list
+  //
+  Entry = CR (mFreeMemoryMapEntryList.ForwardLink, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+  RemoveEntryList (&Entry->Link);
+
+  return Entry;
+}
+
+/**
+  Internal function.  Moves any memory descriptors that are on the
+  temporary descriptor stack to heap.
+
+**/
+VOID
+CoreFreeMemoryMapStack (
+  VOID
+  )
+{
+  MEMORY_MAP  *Entry;
+
+  //
+  // If already freeing the map stack, then return
+  //
+  if (mFreeMapStack != 0) {
+    ASSERT (FALSE);
+    return;
+  }
+
+  //
+  // Move the temporary memory descriptor stack into pool
+  //
+  mFreeMapStack += 1;
+
+  while (mMapDepth != 0) {
+    //
+    // Deque an memory map entry from mFreeMemoryMapEntryList
+    //
+    Entry = AllocateMemoryMapEntry ();
+    ASSERT (Entry);
+    if (Entry == NULL) {
+      return;
+    }
+
+    //
+    // Update to proper entry
+    //
+    mMapDepth -= 1;
+
+    if (mMapStack[mMapDepth].Link.ForwardLink != NULL) {
+      CopyMem (Entry, &mMapStack[mMapDepth], sizeof (MEMORY_MAP));
+      Entry->FromStack = FALSE;
+
+      //
+      // Move this entry to general memory
+      //
+      InsertTailList (&mMapStack[mMapDepth].Link, &Entry->Link);
+      RemoveEntryList (&mMapStack[mMapDepth].Link);
+      mMapStack[mMapDepth].Link.ForwardLink = NULL;
+    }
+  }
+
+  mFreeMapStack -= 1;
+}
+
+/**
+  Insert new entry from memory map.
+
+  @param[in]  Link       The old memory map entry to be linked.
+  @param[in]  Start      The start address of new memory map entry.
+  @param[in]  End        The end address of new memory map entry.
+  @param[in]  Type       The type of new memory map entry.
+  @param[in]  Next       If new entry is inserted to the next of old entry.
+  @param[in]  AddRegion  If this memory is new added region.
+**/
+VOID
+InsertNewEntry (
+  IN LIST_ENTRY       *Link,
+  IN UINT64           Start,
+  IN UINT64           End,
+  IN EFI_MEMORY_TYPE  Type,
+  IN BOOLEAN          Next,
+  IN BOOLEAN          AddRegion
+  )
+{
+  MEMORY_MAP  *Entry;
+
+  Entry      = &mMapStack[mMapDepth];
+  mMapDepth += 1;
+  ASSERT (mMapDepth < MAX_MAP_DEPTH);
+  Entry->FromStack = TRUE;
+
+  Entry->Signature = MEMORY_MAP_SIGNATURE;
+  Entry->Type      = Type;
+  Entry->Start     = Start;
+  Entry->End       = End;
+  if (Next) {
+    InsertHeadList (Link, &Entry->Link);
+  } else {
+    InsertTailList (Link, &Entry->Link);
+  }
+}
+
+/**
+  Remove old entry from memory map.
+
+  @param[in] Entry Memory map entry to be removed.
+**/
+VOID
+RemoveOldEntry (
+  IN MEMORY_MAP  *Entry
+  )
+{
+  RemoveEntryList (&Entry->Link);
+  Entry->Link.ForwardLink = NULL;
+
+  if (!Entry->FromStack) {
+    InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
+  }
+}
+
+/**
+  Update MM memory map entry.
+
+  @param[in]  Type                   The type of allocation to perform.
+  @param[in]  Memory                 The base of memory address.
+  @param[in]  NumberOfPages          The number of pages to allocate.
+  @param[in]  AddRegion              If this memory is new added region.
+**/
+VOID
+ConvertMmMemoryMapEntry (
+  IN EFI_MEMORY_TYPE       Type,
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages,
+  IN BOOLEAN               AddRegion
+  )
+{
+  LIST_ENTRY            *Link;
+  MEMORY_MAP            *Entry;
+  MEMORY_MAP            *NextEntry;
+  LIST_ENTRY            *NextLink;
+  MEMORY_MAP            *PreviousEntry;
+  LIST_ENTRY            *PreviousLink;
+  EFI_PHYSICAL_ADDRESS  Start;
+  EFI_PHYSICAL_ADDRESS  End;
+
+  Start = Memory;
+  End   = Memory + EFI_PAGES_TO_SIZE (NumberOfPages) - 1;
+
+  //
+  // Exclude memory region
+  //
+  Link = gMemoryMap.ForwardLink;
+  while (Link != &gMemoryMap) {
+    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+    Link  = Link->ForwardLink;
+
+    //
+    // ---------------------------------------------------
+    // |  +----------+   +------+   +------+   +------+  |
+    // ---|gMemoryMep|---|Entry1|---|Entry2|---|Entry3|---
+    //    +----------+ ^ +------+   +------+   +------+
+    //                 |
+    //              +------+
+    //              |EntryX|
+    //              +------+
+    //
+    if (Entry->Start > End) {
+      if ((Entry->Start == End + 1) && (Entry->Type == Type)) {
+        Entry->Start = Start;
+        return;
+      }
+
+      InsertNewEntry (
+        &Entry->Link,
+        Start,
+        End,
+        Type,
+        FALSE,
+        AddRegion
+        );
+      return;
+    }
+
+    if ((Entry->Start <= Start) && (Entry->End >= End)) {
+      if (Entry->Type != Type) {
+        if (Entry->Start < Start) {
+          //
+          // ---------------------------------------------------
+          // |  +----------+   +------+   +------+   +------+  |
+          // ---|gMemoryMep|---|Entry1|---|EntryX|---|Entry3|---
+          //    +----------+   +------+ ^ +------+   +------+
+          //                            |
+          //                         +------+
+          //                         |EntryA|
+          //                         +------+
+          //
+          InsertNewEntry (
+            &Entry->Link,
+            Entry->Start,
+            Start - 1,
+            Entry->Type,
+            FALSE,
+            AddRegion
+            );
+        }
+
+        if (Entry->End > End) {
+          //
+          // ---------------------------------------------------
+          // |  +----------+   +------+   +------+   +------+  |
+          // ---|gMemoryMep|---|Entry1|---|EntryX|---|Entry3|---
+          //    +----------+   +------+   +------+ ^ +------+
+          //                                       |
+          //                                    +------+
+          //                                    |EntryZ|
+          //                                    +------+
+          //
+          InsertNewEntry (
+            &Entry->Link,
+            End + 1,
+            Entry->End,
+            Entry->Type,
+            TRUE,
+            AddRegion
+            );
+        }
+
+        //
+        // Update this node
+        //
+        Entry->Start = Start;
+        Entry->End   = End;
+        Entry->Type  = Type;
+
+        //
+        // Check adjacent
+        //
+        NextLink = Entry->Link.ForwardLink;
+        if (NextLink != &gMemoryMap) {
+          NextEntry = CR (NextLink, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+          //
+          // ---------------------------------------------------
+          // |  +----------+   +------+   +-----------------+  |
+          // ---|gMemoryMep|---|Entry1|---|EntryX     Entry3|---
+          //    +----------+   +------+   +-----------------+
+          //
+          if ((Entry->Type == NextEntry->Type) && (Entry->End + 1 == NextEntry->Start)) {
+            Entry->End = NextEntry->End;
+            RemoveOldEntry (NextEntry);
+          }
+        }
+
+        PreviousLink = Entry->Link.BackLink;
+        if (PreviousLink != &gMemoryMap) {
+          PreviousEntry = CR (PreviousLink, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+          //
+          // ---------------------------------------------------
+          // |  +----------+   +-----------------+   +------+  |
+          // ---|gMemoryMep|---|Entry1     EntryX|---|Entry3|---
+          //    +----------+   +-----------------+   +------+
+          //
+          if ((PreviousEntry->Type == Entry->Type) && (PreviousEntry->End + 1 == Entry->Start)) {
+            PreviousEntry->End = Entry->End;
+            RemoveOldEntry (Entry);
+          }
+        }
+      }
+
+      return;
+    }
+  }
+
+  //
+  // ---------------------------------------------------
+  // |  +----------+   +------+   +------+   +------+  |
+  // ---|gMemoryMep|---|Entry1|---|Entry2|---|Entry3|---
+  //    +----------+   +------+   +------+   +------+ ^
+  //                                                  |
+  //                                               +------+
+  //                                               |EntryX|
+  //                                               +------+
+  //
+  Link = gMemoryMap.BackLink;
+  if (Link != &gMemoryMap) {
+    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+    if ((Entry->End + 1 == Start) && (Entry->Type == Type)) {
+      Entry->End = End;
+      return;
+    }
+  }
+
+  InsertNewEntry (
+    &gMemoryMap,
+    Start,
+    End,
+    Type,
+    FALSE,
+    AddRegion
+    );
+  return;
+}
+
+/**
+  Return the count of Mm memory map entry.
+
+  @return The count of Mm memory map entry.
+**/
+UINTN
+GetMmMemoryMapEntryCount (
+  VOID
+  )
+{
+  LIST_ENTRY  *Link;
+  UINTN       Count;
+
+  Count = 0;
+  Link  = gMemoryMap.ForwardLink;
+  while (Link != &gMemoryMap) {
+    Link = Link->ForwardLink;
+    Count++;
+  }
+
+  return Count;
+}
 
 /**
   Internal Function. Allocate n pages from given free page node.
@@ -136,12 +568,13 @@ InternalAllocAddress (
 /**
   Allocates pages from the memory map.
 
-  @param  Type                   The type of allocation to perform.
-  @param  MemoryType             The type of memory to turn the allocated pages
-                                 into.
-  @param  NumberOfPages          The number of pages to allocate.
-  @param  Memory                 A pointer to receive the base allocated memory
-                                 address.
+  @param[in]   Type                   The type of allocation to perform.
+  @param[in]   MemoryType             The type of memory to turn the allocated pages
+                                      into.
+  @param[in]   NumberOfPages          The number of pages to allocate.
+  @param[out]  Memory                 A pointer to receive the base allocated memory
+                                      address.
+  @param[in]   AddRegion              If this memory is new added region.
 
   @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in spec.
   @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
@@ -150,12 +583,12 @@ InternalAllocAddress (
 
 **/
 EFI_STATUS
-EFIAPI
-MmInternalAllocatePages (
+MmInternalAllocatePagesEx (
   IN  EFI_ALLOCATE_TYPE     Type,
   IN  EFI_MEMORY_TYPE       MemoryType,
   IN  UINTN                 NumberOfPages,
-  OUT EFI_PHYSICAL_ADDRESS  *Memory
+  OUT EFI_PHYSICAL_ADDRESS  *Memory,
+  IN  BOOLEAN               AddRegion
   )
 {
   UINTN  RequestedAddress;
@@ -203,7 +636,49 @@ MmInternalAllocatePages (
       return EFI_INVALID_PARAMETER;
   }
 
+  //
+  // Update MmMemoryMap here.
+  //
+  ConvertMmMemoryMapEntry (MemoryType, *Memory, NumberOfPages, AddRegion);
+  if (!AddRegion) {
+    CoreFreeMemoryMapStack ();
+  }
+
   return EFI_SUCCESS;
+}
+
+/**
+  Allocates pages from the memory map.
+
+  @param[in]   Type                   The type of allocation to perform.
+  @param[in]   MemoryType             The type of memory to turn the allocated pages
+                                      into.
+  @param[in]   NumberOfPages          The number of pages to allocate.
+  @param[out]  Memory                 A pointer to receive the base allocated memory
+                                      address.
+
+  @retval EFI_INVALID_PARAMETER  Parameters violate checking rules defined in spec.
+  @retval EFI_NOT_FOUND          Could not allocate pages match the requirement.
+  @retval EFI_OUT_OF_RESOURCES   No enough pages to allocate.
+  @retval EFI_SUCCESS            Pages successfully allocated.
+
+**/
+EFI_STATUS
+EFIAPI
+MmInternalAllocatePages (
+  IN  EFI_ALLOCATE_TYPE     Type,
+  IN  EFI_MEMORY_TYPE       MemoryType,
+  IN  UINTN                 NumberOfPages,
+  OUT EFI_PHYSICAL_ADDRESS  *Memory
+  )
+{
+  return MmInternalAllocatePagesEx (
+           Type,
+           MemoryType,
+           NumberOfPages,
+           Memory,
+           FALSE
+           );
 }
 
 /**
@@ -269,19 +744,20 @@ InternalMergeNodes (
 /**
   Frees previous allocated pages.
 
-  @param  Memory                 Base address of memory being freed.
-  @param  NumberOfPages          The number of pages to free.
+  @param[in]  Memory                 Base address of memory being freed.
+  @param[in]  NumberOfPages          The number of pages to free.
+  @param[in]  AddRegion              If this memory is new added region.
 
   @retval EFI_NOT_FOUND          Could not find the entry that covers the range.
-  @retval EFI_INVALID_PARAMETER  Address not aligned.
+  @retval EFI_INVALID_PARAMETER  Address not aligned, Address is zero or NumberOfPages is zero.
   @return EFI_SUCCESS            Pages successfully freed.
 
 **/
 EFI_STATUS
-EFIAPI
-MmInternalFreePages (
+MmInternalFreePagesEx (
   IN EFI_PHYSICAL_ADDRESS  Memory,
-  IN UINTN                 NumberOfPages
+  IN UINTN                 NumberOfPages,
+  IN BOOLEAN               AddRegion
   )
 {
   LIST_ENTRY      *Node;
@@ -329,7 +805,36 @@ MmInternalFreePages (
     InternalMergeNodes (Pages);
   }
 
+  //
+  // Update MmMemoryMap here.
+  //
+  ConvertMmMemoryMapEntry (EfiConventionalMemory, Memory, NumberOfPages, AddRegion);
+  if (!AddRegion) {
+    CoreFreeMemoryMapStack ();
+  }
+
   return EFI_SUCCESS;
+}
+
+/**
+  Frees previous allocated pages.
+
+  @param[in]  Memory                 Base address of memory being freed.
+  @param[in]  NumberOfPages          The number of pages to free.
+
+  @retval EFI_NOT_FOUND          Could not find the entry that covers the range.
+  @retval EFI_INVALID_PARAMETER  Address not aligned, Address is zero or NumberOfPages is zero.
+  @return EFI_SUCCESS            Pages successfully freed.
+
+**/
+EFI_STATUS
+EFIAPI
+MmInternalFreePages (
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages
+  )
+{
+  return MmInternalFreePagesEx (Memory, NumberOfPages, FALSE);
 }
 
 /**
@@ -339,7 +844,7 @@ MmInternalFreePages (
   @param  NumberOfPages          The number of pages to free.
 
   @retval EFI_NOT_FOUND          Could not find the entry that covers the range.
-  @retval EFI_INVALID_PARAMETER  Address not aligned.
+  @retval EFI_INVALID_PARAMETER  Address not aligned, Address is zero or NumberOfPages is zero.
   @return EFI_SUCCESS            Pages successfully freed.
 
 **/
@@ -376,10 +881,12 @@ MmAddMemoryRegion (
   UINTN  AlignedMemBase;
 
   //
-  // Do not add memory regions that is already allocated, needs testing, or needs ECC initialization
+  // Add EfiRuntimeServicesData for memory regions that is already allocated, needs testing, or needs ECC initialization
   //
   if ((Attributes & (EFI_ALLOCATED | EFI_NEEDS_TESTING | EFI_NEEDS_ECC_INITIALIZATION)) != 0) {
-    return;
+    Type = EfiRuntimeServicesData;
+  } else {
+    Type = EfiConventionalMemory;
   }
 
   //
@@ -387,5 +894,102 @@ MmAddMemoryRegion (
   //
   AlignedMemBase = (UINTN)(MemBase + EFI_PAGE_MASK) & ~EFI_PAGE_MASK;
   MemLength     -= AlignedMemBase - MemBase;
-  MmFreePages (AlignedMemBase, TRUNCATE_TO_PAGES ((UINTN)MemLength));
+  if (Type == EfiConventionalMemory) {
+    MmInternalFreePagesEx (AlignedMemBase, TRUNCATE_TO_PAGES ((UINTN)MemLength), TRUE);
+  } else {
+    ConvertMmMemoryMapEntry (EfiRuntimeServicesData, AlignedMemBase, TRUNCATE_TO_PAGES ((UINTN)MemLength), TRUE);
+  }
+
+  CoreFreeMemoryMapStack ();
+}
+
+/**
+  This function returns a copy of the current memory map. The map is an array of
+  memory descriptors, each of which describes a contiguous block of memory.
+
+  @param[in, out]  MemoryMapSize          A pointer to the size, in bytes, of the
+                                          MemoryMap buffer. On input, this is the size of
+                                          the buffer allocated by the caller.  On output,
+                                          it is the size of the buffer returned by the
+                                          firmware  if the buffer was large enough, or the
+                                          size of the buffer needed  to contain the map if
+                                          the buffer was too small.
+  @param[in, out]  MemoryMap              A pointer to the buffer in which firmware places
+                                          the current memory map.
+  @param[out]      MapKey                 A pointer to the location in which firmware
+                                          returns the key for the current memory map.
+  @param[out]      DescriptorSize         A pointer to the location in which firmware
+                                          returns the size, in bytes, of an individual
+                                          EFI_MEMORY_DESCRIPTOR.
+  @param[out]      DescriptorVersion      A pointer to the location in which firmware
+                                          returns the version number associated with the
+                                          EFI_MEMORY_DESCRIPTOR.
+
+  @retval EFI_SUCCESS            The memory map was returned in the MemoryMap
+                                 buffer.
+  @retval EFI_BUFFER_TOO_SMALL   The MemoryMap buffer was too small. The current
+                                 buffer size needed to hold the memory map is
+                                 returned in MemoryMapSize.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+
+**/
+EFI_STATUS
+EFIAPI
+MmCoreGetMemoryMap (
+  IN OUT UINTN                  *MemoryMapSize,
+  IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
+  OUT UINTN                     *MapKey,
+  OUT UINTN                     *DescriptorSize,
+  OUT UINT32                    *DescriptorVersion
+  )
+{
+  UINTN       Count;
+  LIST_ENTRY  *Link;
+  MEMORY_MAP  *Entry;
+  UINTN       Size;
+  UINTN       BufferSize;
+
+  Size = sizeof (EFI_MEMORY_DESCRIPTOR);
+
+  //
+  // Make sure Size != sizeof(EFI_MEMORY_DESCRIPTOR). This will
+  // prevent people from having pointer math bugs in their code.
+  // now you have to use *DescriptorSize to make things work.
+  //
+  Size += sizeof (UINT64) - (Size % sizeof (UINT64));
+
+  if (DescriptorSize != NULL) {
+    *DescriptorSize = Size;
+  }
+
+  if (DescriptorVersion != NULL) {
+    *DescriptorVersion = EFI_MEMORY_DESCRIPTOR_VERSION;
+  }
+
+  Count      = GetMmMemoryMapEntryCount ();
+  BufferSize = Size * Count;
+  if (*MemoryMapSize < BufferSize) {
+    *MemoryMapSize = BufferSize;
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  *MemoryMapSize = BufferSize;
+  if (MemoryMap == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ZeroMem (MemoryMap, BufferSize);
+  Link = gMemoryMap.ForwardLink;
+  while (Link != &gMemoryMap) {
+    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+    Link  = Link->ForwardLink;
+
+    MemoryMap->Type          = Entry->Type;
+    MemoryMap->PhysicalStart = Entry->Start;
+    MemoryMap->NumberOfPages = RShiftU64 (Entry->End - Entry->Start + 1, EFI_PAGE_SHIFT);
+
+    MemoryMap = NEXT_MEMORY_DESCRIPTOR (MemoryMap, Size);
+  }
+
+  return EFI_SUCCESS;
 }

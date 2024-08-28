@@ -141,6 +141,12 @@ ConfigureMemoryManagementUnit (
     return EFI_UNSUPPORTED;
   }
 
+  //
+  // Clear PGD series registers.
+  //
+  CsrWrite (LOONGARCH_CSR_PGDL, 0x0);
+  CsrWrite (LOONGARCH_CSR_PGDH, 0x0);
+
   PageTable = 0;
   while (MemoryTable->NumberOfPages != 0) {
     DEBUG ((
