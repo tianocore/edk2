@@ -35,7 +35,6 @@
 
 [LibraryClasses]
   PcdLib
-  MemoryAllocationLib
   BaseMemoryLib
   PeiServicesLib
   HobLib
@@ -43,17 +42,27 @@
   PeimEntryPoint
   DebugLib
   FdtLib
+##for testing, remove this for HandOffFdtEnable == FALSE scenario: BuildFdtLib
+##Hook this lib to FitPayloadLoaderPeim.inf in platform DSC when HandOffFdtEnable == TRUE.
 
 [Ppis]
   gEfiPeiLoadFilePpiGuid                 ## PRODUCES
+  gUplReadyToPayloadPpiGuid              ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid              ## CONSUMES
 
 [Pcd]
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister
+  gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable
+  gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize
 
 [Guids]
-  gUniversalPayloadExtraDataGuid         ## PRODUCES
   gUniversalPayloadBaseGuid              ## PRODUCES
+  gUniversalPayloadDeviceTreeGuid        ## CONSUMES
+  gEfiGraphicsInfoHobGuid                ## CONSUMES
+  gUniversalPayloadPciRootBridgeInfoGuid ## CONSUMES
+  gUniversalPayloadAcpiTableGuid         ## CONSUMES
+  gUniversalPayloadSerialPortParentDeviceInfoGuid
 
 [Depex]
   TRUE
