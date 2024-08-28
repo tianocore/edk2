@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 //
 // Slots for all MTRR( FIXED MTRR + VARIABLE MTRR + MTRR_LIB_IA32_MTRR_DEF_TYPE)
@@ -20,7 +20,7 @@ UINTN                        mSmmMpSyncDataSize;
 SMM_CPU_SEMAPHORES           mSmmCpuSemaphores;
 UINTN                        mSemaphoreSize;
 SPIN_LOCK                    *mPFLock = NULL;
-SMM_CPU_SYNC_MODE            mCpuSmmSyncMode;
+MM_CPU_SYNC_MODE             mCpuSmmSyncMode;
 BOOLEAN                      mMachineCheckSupported = FALSE;
 MM_COMPLETION                mSmmStartupThisApToken;
 
@@ -454,8 +454,8 @@ ResetTokens (
 **/
 VOID
 BSPHandler (
-  IN      UINTN              CpuIndex,
-  IN      SMM_CPU_SYNC_MODE  SyncMode
+  IN      UINTN             CpuIndex,
+  IN      MM_CPU_SYNC_MODE  SyncMode
   )
 {
   UINTN          CpuCount;
@@ -504,7 +504,7 @@ BSPHandler (
   //
   // If Traditional Sync Mode or need to configure MTRRs: gather all available APs.
   //
-  if ((SyncMode == SmmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
+  if ((SyncMode == MmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Wait for APs to arrive
     //
@@ -594,7 +594,7 @@ BSPHandler (
   // make those APs to exit SMI synchronously. APs which arrive later will be excluded and
   // will run through freely.
   //
-  if ((SyncMode != SmmCpuSyncModeTradition) && !SmmCpuFeaturesNeedConfigureMtrrs ()) {
+  if ((SyncMode != MmCpuSyncModeTradition) && !SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Lock door for late coming CPU checkin and retrieve the Arrived number of APs
     //
@@ -722,9 +722,9 @@ BSPHandler (
 **/
 VOID
 APHandler (
-  IN      UINTN              CpuIndex,
-  IN      BOOLEAN            ValidSmi,
-  IN      SMM_CPU_SYNC_MODE  SyncMode
+  IN      UINTN             CpuIndex,
+  IN      BOOLEAN           ValidSmi,
+  IN      MM_CPU_SYNC_MODE  SyncMode
   )
 {
   UINT64         Timer;
@@ -801,7 +801,7 @@ APHandler (
   //
   *(mSmmMpSyncData->CpuData[CpuIndex].Present) = TRUE;
 
-  if ((SyncMode == SmmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
+  if ((SyncMode == MmCpuSyncModeTradition) || SmmCpuFeaturesNeedConfigureMtrrs ()) {
     //
     // Notify BSP of arrival at this point
     //
@@ -1131,7 +1131,7 @@ InternalSmmStartupThisAp (
   }
 
   if (!(*(mSmmMpSyncData->CpuData[CpuIndex].Present))) {
-    if (mSmmMpSyncData->EffectiveSyncMode == SmmCpuSyncModeTradition) {
+    if (mSmmMpSyncData->EffectiveSyncMode == MmCpuSyncModeTradition) {
       DEBUG ((DEBUG_ERROR, "!mSmmMpSyncData->CpuData[%d].Present\n", CpuIndex));
     }
 
@@ -1616,7 +1616,7 @@ SmiRendezvous (
       InitializeSpinLock (mSmmMpSyncData->CpuData[CpuIndex].Busy);
     }
 
-    if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+    if (mSmmProfileEnabled) {
       ActivateSmmProfile (CpuIndex);
     }
 
@@ -1677,7 +1677,7 @@ SmiRendezvous (
           }
         }
 
-        if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+        if (mSmmProfileEnabled) {
           SmmProfileRecordSmiNum ();
         }
 
@@ -1924,6 +1924,7 @@ InitializeMpServiceData (
   CPUID_VERSION_INFO_EDX          RegEdx;
   UINT32                          MaxExtendedFunction;
   CPUID_VIR_PHY_ADDRESS_SIZE_EAX  VirPhyAddressSize;
+  BOOLEAN                         RelaxedMode;
 
   //
   // Determine if this CPU supports machine check
@@ -1943,7 +1944,10 @@ InitializeMpServiceData (
                        (sizeof (SMM_CPU_DATA_BLOCK) + sizeof (BOOLEAN)) * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
   mSmmMpSyncData = (SMM_DISPATCHER_MP_SYNC_DATA *)AllocatePages (EFI_SIZE_TO_PAGES (mSmmMpSyncDataSize));
   ASSERT (mSmmMpSyncData != NULL);
-  mCpuSmmSyncMode = (SMM_CPU_SYNC_MODE)PcdGet8 (PcdCpuSmmSyncMode);
+
+  RelaxedMode = FALSE;
+  GetSmmCpuSyncConfigData (&RelaxedMode, NULL, NULL);
+  mCpuSmmSyncMode = RelaxedMode ? MmCpuSyncModeRelaxedAp : MmCpuSyncModeTradition;
   InitializeMpSyncData ();
 
   //
