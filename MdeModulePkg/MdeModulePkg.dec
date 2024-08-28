@@ -485,6 +485,9 @@
   ## HOB GUID to get ACPI table after FSP is done. The ACPI table that related SOC will be pass by this HOB.
   gAcpiTableHobGuid = { 0xf9886b57, 0x8a35, 0x455e, { 0xbb, 0xb1, 0x14, 0x65, 0x5e, 0x7b, 0xe7, 0xec }}
 
+  ## Include/Guid/MmCommBuffer.h
+  gMmCommBufferHobGuid  = { 0x6c2a2520, 0x0131, 0x4aee, { 0xa7, 0x50, 0xcc, 0x38, 0x4a, 0xac, 0xe8, 0xc6 }}
+
 [Ppis]
   ## Include/Ppi/FirmwareVolumeShadowPpi.h
   gEdkiiPeiFirmwareVolumeShadowPpiGuid = { 0x7dfe756c, 0xed8d, 0x4d77, {0x9e, 0xc4, 0x39, 0x9a, 0x8a, 0x81, 0x51, 0x16 } }
@@ -1186,6 +1189,10 @@
   # Default is 2000, it represent delay is 2 ms.
   # @Prompt Delay access XHCI register after it issues HCRST (us)
   gEfiMdeModulePkgTokenSpaceGuid.PcdDelayXhciHCReset|2000|UINT16|0x30001060
+
+  ## Specifies the page count allocated for the MM communication buffer.
+  # @Prompt Defines the page allocation for the MM communication buffer; default is 128 pages (512KB).
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages|128|UINT32|0x30001061
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.

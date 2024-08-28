@@ -1,0 +1,81 @@
+## @file
+#  This module provide a Standalone MM compliant implementation of MM IPL PEIM.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StandaloneMmIplPei
+  FILE_GUID                      = 578A0D17-2DC0-4C7D-A121-D8D771923BB0
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = StandaloneMmIplPeiEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  StandaloneMmIplPei.c
+  StandaloneMmIplPei.h
+  MmFoundationHob.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  MmUnblockMemoryLib
+  BaseMemoryLib
+  PeCoffLib
+  CacheMaintenanceLib
+  MmPlatformHobProducerLib
+
+[Guids]
+  gMmCommBufferHobGuid
+  gEfiSmmSmramMemoryGuid
+  gEventMmDispatchGuid
+  gSmmBaseHobGuid
+  gMpInformation2HobGuid
+  gEfiAcpiVariableGuid
+  gMmAcpiS3EnableHobGuid
+  gMmCpuSyncConfigHobGuid
+  gMmProfileDataHobGuid
+  gMmUnblockRegionHobGuid
+
+[Ppis]
+  gEfiPeiMmControlPpiGuid
+  gEfiPeiMmCommunicationPpiGuid
+  gEfiEndOfPeiSignalPpiGuid
+
+[Protocols]
+  gEfiMmEndOfPeiProtocol
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable                   ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmSyncMode                      ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout                 ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmApSyncTimeout2                ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileEnable                 ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize                   ## CONSUMES
+
+[Pcd.X64]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess        ## CONSUMES
+
+[Depex]
+  gEfiPeiMmControlPpiGuid AND gEfiPeiMpServicesPpiGuid
