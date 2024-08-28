@@ -22,10 +22,10 @@
 #include <Library/MemoryAllocationLib.h>
 
 extern EFI_SYSTEM_RESOURCE_TABLE  *mEsrtTable;
+extern BOOLEAN                    mDxeCapsuleLibIsExitBootService;
 EFI_EVENT                         mDxeRuntimeCapsuleLibVirtualAddressChangeEvent = NULL;
 EFI_EVENT                         mDxeRuntimeCapsuleLibSystemResourceTableEvent  = NULL;
-EFI_EVENT                         mDxeRuntimeCapsuleLibReadyToBootEvent          = NULL;
-extern BOOLEAN                    mDxeCapsuleLibReadyToBootEvent;
+EFI_EVENT                         mDxeRuntimeCapsuleLibExitBootServiceEvent      = NULL;
 
 /**
   Convert EsrtTable physical address to virtual address.
@@ -107,7 +107,7 @@ DxeCapsuleLibSystemResourceTableInstallEventNotify (
 }
 
 /**
-  Notify function for event group EFI_EVENT_GROUP_READY_TO_BOOT.
+  Notify function for event of exit boot service.
 
   @param[in]  Event    The Event that is being processed.
   @param[in]  Context  The Event Context.
@@ -116,12 +116,12 @@ DxeCapsuleLibSystemResourceTableInstallEventNotify (
 STATIC
 VOID
 EFIAPI
-DxeCapsuleLibReadyToBootEventNotify (
+DxeCapsuleLibExitBootServiceEventNotify (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
 {
-  mDxeCapsuleLibReadyToBootEvent = TRUE;
+  mDxeCapsuleLibIsExitBootService = TRUE;
 }
 
 /**
@@ -168,15 +168,15 @@ DxeRuntimeCapsuleLibConstructor (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Register notify function to indicate the event is signaled at ReadyToBoot.
+  // Register notify function to indicate the event is signaled at ExitBootService.
   //
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
-                  DxeCapsuleLibReadyToBootEventNotify,
+                  DxeCapsuleLibExitBootServiceEventNotify,
                   NULL,
-                  &gEfiEventReadyToBootGuid,
-                  &mDxeRuntimeCapsuleLibReadyToBootEvent
+                  &gEfiEventExitBootServicesGuid,
+                  &mDxeRuntimeCapsuleLibExitBootServiceEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -213,9 +213,9 @@ DxeRuntimeCapsuleLibDestructor (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Close the ReadyToBoot event.
+  // Close the ExitBootService event.
   //
-  Status = gBS->CloseEvent (mDxeRuntimeCapsuleLibReadyToBootEvent);
+  Status = gBS->CloseEvent (mDxeRuntimeCapsuleLibExitBootServiceEvent);
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
