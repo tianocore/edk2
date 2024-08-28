@@ -29,6 +29,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/CpuPageTableLib.h>
+#include <Library/PanicLib.h>
 
 #include <Guid/MpInformation2.h>
 

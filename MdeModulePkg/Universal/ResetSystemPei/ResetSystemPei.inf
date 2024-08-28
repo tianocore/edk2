@@ -37,6 +37,7 @@
   DebugLib
   PeiServicesLib
   HobLib
+  PanicLib
   PeimEntryPoint
   ResetSystemLib
   ReportStatusCodeLib

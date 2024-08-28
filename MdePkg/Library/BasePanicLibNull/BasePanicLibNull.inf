@@ -1,0 +1,26 @@
+## @file
+#  Panic Library with empty functions.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BasePanicLibNull
+  FILE_GUID                      = 0A097ABB-3869-4CF8-B5C0-AE798F135C46
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PanicLib
+
+
+#
+#  VALID_ARCHITECTURES           = ANY
+#
+
+[Sources]
+  BasePanicLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec

@@ -33,6 +33,7 @@
   HobLib
   MemoryAllocationLib
   MpInitLib
+  PanicLib
   PeCoffGetEntryPointLib
   ReportStatusCodeLib
   TimerLib

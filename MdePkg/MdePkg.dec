@@ -303,6 +303,10 @@
   #
   TraceHubDebugSysTLib|Include/Library/TraceHubDebugSysTLib.h
 
+  ##  @libraryclass  Provides panic functionality.
+  #
+  PanicLib|Include/Library/PanicLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
