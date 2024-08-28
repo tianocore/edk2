@@ -1,0 +1,41 @@
+## @file
+#  Lib to include if using floats
+#
+# Copyright (C) Microsoft Corporation. All rights reserved..
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FltUsedLib
+  FILE_GUID                      = C004F180-9FE2-4D2B-8318-BADC2A231774
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FltUsedLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
+#
+
+[Sources]
+  FltUsedLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+
+[Guids]
+
+[Protocols]
+
+[BuildOptions]
+  # Disable GL due to linker error LNK1237
+  # https://docs.microsoft.com/en-us/cpp/error-messages/tool-errors/linker-tools-error-lnk1237?view=vs-2017
+  MSFT:*_*_*_CC_FLAGS = /GL-
+
+[Depex]
+  TRUE
+

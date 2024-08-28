@@ -115,7 +115,9 @@
 
     ## options defined ci/Plugin/DscCompleteCheck
     "DscCompleteCheck": {
-        "IgnoreInf": [""],
+        "IgnoreInf": [
+            "MdePkg/Library/FltUsedLib/FltUsedLib.inf"
+        ],
         "DscPath": "MdePkg.dsc"
     },
 
