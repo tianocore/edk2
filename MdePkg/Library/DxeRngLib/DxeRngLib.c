@@ -197,11 +197,13 @@ GenerateRandomNumberViaNist800Algorithm (
     }
   }
 
-  // If all the other methods have failed, use the default method from the RngProtocol
-  Status = mRngProtocol->GetRNG (mRngProtocol, NULL, BufferSize, Buffer);
-  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm default - Status = %r\n", __func__, Status));
-  if (!EFI_ERROR (Status)) {
-    return Status;
+  if (!PcdGetBool (PcdEnforceSecureRngAlgorithms)) {
+    // If all the other methods have failed, use the default method from the RngProtocol
+    Status = mRngProtocol->GetRNG (mRngProtocol, NULL, BufferSize, Buffer);
+    DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm default - Status = %r\n", __func__, Status));
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   // If we get to this point, we have failed
