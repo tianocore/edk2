@@ -226,15 +226,16 @@ ParseReservedMemory (
   IN INT32  Node
   )
 {
-  INT32                         SubNode;
-  INT32                         TempLen;
-  CONST CHAR8                   *TempStr;
-  CONST FDT_PROPERTY            *PropertyPtr;
-  UINT64                        *Data64;
-  UINT64                        StartAddress;
-  UINT64                        NumberOfBytes;
-  UNIVERSAL_PAYLOAD_ACPI_TABLE  *PlatformAcpiTable;
-  FDT_NODE_HEADER               *NodePtr;
+  INT32                           SubNode;
+  INT32                           TempLen;
+  CONST CHAR8                     *TempStr;
+  CONST FDT_PROPERTY              *PropertyPtr;
+  UINT64                          *Data64;
+  UINT64                          StartAddress;
+  UINT64                          NumberOfBytes;
+  UNIVERSAL_PAYLOAD_ACPI_TABLE    *PlatformAcpiTable;
+  UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *SmbiosTable;
+  FDT_NODE_HEADER                 *NodePtr;
 
   PlatformAcpiTable = NULL;
 
@@ -281,6 +282,15 @@ ParseReservedMemory (
           PlatformAcpiTable->Rsdp            = (EFI_PHYSICAL_ADDRESS)(UINTN)StartAddress;
           PlatformAcpiTable->Header.Revision = UNIVERSAL_PAYLOAD_ACPI_TABLE_REVISION;
           PlatformAcpiTable->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE);
+        }
+      } else if (AsciiStrnCmp (TempStr, "smbios", AsciiStrLen ("smbios")) == 0) {
+        DEBUG ((DEBUG_INFO, " build smbios, NumberOfBytes:%x", NumberOfBytes));
+        BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiBootServicesData);
+        SmbiosTable = BuildGuidHob (&gUniversalPayloadSmbios3TableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
+        if (SmbiosTable != NULL) {
+          SmbiosTable->Header.Revision  = UNIVERSAL_PAYLOAD_SMBIOS_TABLE_REVISION;
+          SmbiosTable->Header.Length    = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
+          SmbiosTable->SmBiosEntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)(StartAddress);
         }
       } else if (AsciiStrnCmp (TempStr, "acpi-nvs", AsciiStrLen ("acpi-nvs")) == 0) {
         DEBUG ((DEBUG_INFO, "  acpi-nvs"));
@@ -840,9 +850,11 @@ ParseDtb (
     } // end of memory node
     else {
       PropertyPtr = FdtGetProperty (Fdt, Node, "compatible", &TempLen);
-      if (PropertyPtr == NULL)
+      if (PropertyPtr == NULL) {
         continue;
-      TempStr     = (CHAR8 *)(PropertyPtr->Data);
+      }
+
+      TempStr = (CHAR8 *)(PropertyPtr->Data);
       if (AsciiStrnCmp (TempStr, "pci-rb", AsciiStrLen ("pci-rb")) == 0) {
         RootBridgeCount++;
       }
