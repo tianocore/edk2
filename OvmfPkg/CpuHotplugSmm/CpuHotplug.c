@@ -355,6 +355,11 @@ EjectCpu (
   //
   QemuSelector = mCpuHotEjectData->QemuSelectorMap[ProcessorNum];
   if (QemuSelector == CPU_EJECT_QEMU_SELECTOR_INVALID) {
+    /* wait until BSP is done */
+    while (mCpuHotEjectData->Handler != NULL) {
+      CpuPause ();
+    }
+
     return;
   }
 
