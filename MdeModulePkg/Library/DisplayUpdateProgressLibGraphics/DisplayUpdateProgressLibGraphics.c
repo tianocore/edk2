@@ -76,10 +76,10 @@ const EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  mLogoDetectionColorMask = {
 //
 const EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  mProgressBarBackgroundColor = {
   {
-    0x80,  // Blue
-    0x80,  // Green
-    0x80,  // Red
-    0x00   // Reserved
+    ((UINT32)FixedPcdGet32 (PcdProgressBarBackgroundColor) >> 0)  & 0xFF, // Blue
+    ((UINT32)FixedPcdGet32 (PcdProgressBarBackgroundColor) >> 8)  & 0xFF, // Green
+    ((UINT32)FixedPcdGet32 (PcdProgressBarBackgroundColor) >> 16) & 0xFF, // Red
+    ((UINT32)FixedPcdGet32 (PcdProgressBarBackgroundColor) >> 24) & 0xFF  // Reserved
   }
 };
 
