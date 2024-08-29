@@ -63,3 +63,10 @@
   #   FALSE - Do not restart MM Dispatcher once MM Entry Point is registered.<BR>
   # @Prompt Restart MM Dispatcher once MM Entry Point is registered.
   gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered|FALSE|BOOLEAN|0x00000002
+
+[PcdsFeatureFlag.X64]
+  ## Indicates if restart MM Dispatcher once MM Entry Point is registered.<BR><BR>
+  #   TRUE  - Restart MM Dispatcher once MM Entry Point is registered.<BR>
+  #   FALSE - Do not restart MM Dispatcher once MM Entry Point is registered.<BR>
+  # @Prompt Restart MM Dispatcher once MM Entry Point is registered.
+  gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered|TRUE|BOOLEAN|0x00000002
