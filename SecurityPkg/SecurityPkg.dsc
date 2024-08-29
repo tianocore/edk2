@@ -90,8 +90,6 @@
   MemLibWrapper|SecurityPkg/DeviceSecurity/OsStub/MemLibWrapper/MemLibWrapper.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
-
   ArmTrngLib|MdePkg/Library/BaseArmTrngLibNull/BaseArmTrngLibNull.inf
 
 [LibraryClasses.ARM]
