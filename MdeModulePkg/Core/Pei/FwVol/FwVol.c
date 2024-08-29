@@ -819,6 +819,10 @@ ProcessSection (
       if (!IsFfs3Fv) {
         DEBUG ((DEBUG_ERROR, "Found a FFS3 formatted section in a non-FFS3 formatted FV.\n"));
         SectionLength = SECTION2_SIZE (Section);
+        if (SectionLength == 0) {
+          break;
+        }
+
         //
         // SectionLength is adjusted it is 4 byte aligned.
         // Go to the next section
@@ -852,6 +856,10 @@ ProcessSection (
           SectionLength = SECTION2_SIZE (Section);
         } else {
           SectionLength = SECTION_SIZE (Section);
+        }
+
+        if (SectionLength == 0) {
+          break;
         }
 
         //
@@ -989,6 +997,10 @@ ProcessSection (
       SectionLength = SECTION2_SIZE (Section);
     } else {
       SectionLength = SECTION_SIZE (Section);
+    }
+
+    if (SectionLength == 0) {
+      break;
     }
 
     //
