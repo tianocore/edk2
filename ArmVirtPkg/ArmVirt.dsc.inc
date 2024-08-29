@@ -263,7 +263,6 @@
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 
 [LibraryClasses.ARM]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/BaseCryptLib.inf
   MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf

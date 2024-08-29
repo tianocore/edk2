@@ -71,9 +71,6 @@
   DebugLib|MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
 
-[LibraryClasses.ARM, LibraryClasses.AARCH64]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
-
 [LibraryClasses.ARM]
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
