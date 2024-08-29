@@ -260,7 +260,7 @@ IpiInterruptHandler (
     //
     // Set $a0 as APIC ID and $a1 as parameter value.
     //
-    SystemContext.SystemContextLoongArch64->R4 = CsrRead (LOONGARCH_CSR_CPUNUM);
+    SystemContext.SystemContextLoongArch64->R4 = CsrRead (LOONGARCH_CSR_CPUID);
     SystemContext.SystemContextLoongArch64->R5 = Parameter;
   }
 

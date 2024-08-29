@@ -60,7 +60,7 @@ GetApicId (
 {
   UINTN  CpuNum;
 
-  CpuNum = CsrRead (LOONGARCH_CSR_CPUNUM);
+  CpuNum = CsrRead (LOONGARCH_CSR_CPUID);
 
   return CpuNum & 0x3ff;
 }
