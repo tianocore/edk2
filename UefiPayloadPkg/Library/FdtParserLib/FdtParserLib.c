@@ -236,6 +236,7 @@ ParseReservedMemory (
   UNIVERSAL_PAYLOAD_ACPI_TABLE    *PlatformAcpiTable;
   UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *SmbiosTable;
   FDT_NODE_HEADER                 *NodePtr;
+  UINT32                          Attribute;
 
   PlatformAcpiTable = NULL;
 
@@ -273,6 +274,10 @@ ParseReservedMemory (
       } else if (AsciiStrnCmp (TempStr, "runtime-data", AsciiStrLen ("runtime-data")) == 0) {
         DEBUG ((DEBUG_INFO, "  runtime-data"));
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiRuntimeServicesData);
+      } else if (AsciiStrnCmp (TempStr, "special-purpose", AsciiStrLen ("special-purpose")) == 0) {
+        Attribute = MEMORY_ATTRIBUTE_DEFAULT | EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE;
+        DEBUG ((DEBUG_INFO, "  special-purpose memory"));
+        BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, Attribute, StartAddress, NumberOfBytes);
       } else if (AsciiStrnCmp (TempStr, "acpi", AsciiStrLen ("acpi")) == 0) {
         DEBUG ((DEBUG_INFO, "  acpi, StartAddress:%x, NumberOfBytes:%x", StartAddress, NumberOfBytes));
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiBootServicesData);
