@@ -840,6 +840,8 @@ ParseDtb (
     } // end of memory node
     else {
       PropertyPtr = FdtGetProperty (Fdt, Node, "compatible", &TempLen);
+      if (PropertyPtr == NULL)
+        continue;
       TempStr     = (CHAR8 *)(PropertyPtr->Data);
       if (AsciiStrnCmp (TempStr, "pci-rb", AsciiStrLen ("pci-rb")) == 0) {
         RootBridgeCount++;
