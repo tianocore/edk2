@@ -2266,6 +2266,12 @@
   ## This PCD specifies the interrupt vector for stack cookie check failures
   gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector|0x42|UINT8|0x30001019
 
+  ## Enforces the use of Secure UEFI spec defined RNG algorithms.
+  # TRUE  - Enforce the use of Secure UEFI spec defined RNG algorithms.
+  # FALSE - Do not enforce and depend on the default implementation of RNG algorithm from the provider.
+  # @Prompt Enforce the use of Secure UEFI spec defined RNG algorithms.
+  gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms|TRUE|BOOLEAN|0x1000000D
+
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Indicates the maximum length of unicode string used in the following
   #  BaseLib functions: StrLen(), StrSize(), StrCmp(), StrnCmp(), StrCpy(), StrnCpy()<BR><BR>
