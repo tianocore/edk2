@@ -486,6 +486,7 @@ Pkcs7Sign (
     return FALSE;
   }
 
+  Buffer     = NULL;
   BufferSize = 4096;
 
   SignatureLen = MAX_SIGNATURE_SIZE;
