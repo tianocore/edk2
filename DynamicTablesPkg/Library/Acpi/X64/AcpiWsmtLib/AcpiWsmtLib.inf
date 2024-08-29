@@ -1,0 +1,35 @@
+## @file
+#  WSMT Table Generator
+#
+#  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 1.30
+  BASE_NAME      = AcpiWsmtLib
+  FILE_GUID      = FA6B175A-0AAF-4BFA-843A-1D885206C070
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiWsmtLibConstructor
+  DESTRUCTOR     = AcpiWsmtLibDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.IA32, Sources.X64]
+  WsmtGenerator.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
