@@ -50,12 +50,12 @@ TlbCsrRd:
   jirl     $zero, $t0, 0
 
 CfgCsrRd:
-  li.w     $t0, LOONGARCH_CSR_CPUNUM
+  li.w     $t0, LOONGARCH_CSR_CPUID
   bltu     $a0, $t0, ReadSelNumErr
   li.w     $t0, LOONGARCH_CSR_PRCFG3
   bltu     $t0, $a0, KcsCsrRd
   la.pcrel $t0, CfgCsrRead
-  addi.w   $t1, $a0, -LOONGARCH_CSR_CPUNUM
+  addi.w   $t1, $a0, -LOONGARCH_CSR_CPUID
   alsl.d   $t0, $t1, $t0, 3
   jirl     $zero, $t0, 0
 
@@ -117,8 +117,8 @@ TlbCsrRead:
   .endr
 
 CfgCsrRead:
-  CsrSel = LOONGARCH_CSR_CPUNUM
-  .rept LOONGARCH_CSR_PRCFG3 - LOONGARCH_CSR_CPUNUM + 1
+  CsrSel = LOONGARCH_CSR_CPUID
+  .rept LOONGARCH_CSR_PRCFG3 - LOONGARCH_CSR_CPUID + 1
     AsmCsrRd CsrSel
     CsrSel = CsrSel + 1
   .endr
@@ -174,12 +174,12 @@ TlbCsrWr:
   jirl     $zero, $t0, 0
 
 CfgCsrWr:
-  li.w     $t0, LOONGARCH_CSR_CPUNUM
+  li.w     $t0, LOONGARCH_CSR_CPUID
   bltu     $a0, $t0, WriteSelNumErr
   li.w     $t0, LOONGARCH_CSR_PRCFG3
   bltu     $t0, $a0, KcsCsrWr
   la.pcrel $t0, CfgCsrWrite
-  addi.w   $t1, $a0, -LOONGARCH_CSR_CPUNUM
+  addi.w   $t1, $a0, -LOONGARCH_CSR_CPUID
   alsl.d   $t0, $t1, $t0, 3
   move     $a0, $a1
   jirl     $zero, $t0, 0
@@ -246,8 +246,8 @@ TlbCsrWrite:
   .endr
 
 CfgCsrWrite:
-  CsrSel = LOONGARCH_CSR_CPUNUM
-  .rept LOONGARCH_CSR_PRCFG3 - LOONGARCH_CSR_CPUNUM + 1
+  CsrSel = LOONGARCH_CSR_CPUID
+  .rept LOONGARCH_CSR_PRCFG3 - LOONGARCH_CSR_CPUID + 1
     AsmCsrWr CsrSel
     CsrSel = CsrSel + 1
   .endr
@@ -306,12 +306,12 @@ TlbCsrXchg:
   jirl     $zero, $t0, 0
 
 CfgCsrXchg:
-  li.w     $t0, LOONGARCH_CSR_CPUNUM
+  li.w     $t0, LOONGARCH_CSR_CPUID
   bltu     $a0, $t0, XchgSelNumErr
   li.w     $t0, LOONGARCH_CSR_PRCFG3
   bltu     $t0, $a0, KcsCsrXchg
   la.pcrel $t0, CfgCsrXchange
-  addi.w   $t1, $a0, -LOONGARCH_CSR_CPUNUM
+  addi.w   $t1, $a0, -LOONGARCH_CSR_CPUID
   alsl.d   $t0, $t1, $t0, 3
   move     $a0, $a1
   move     $a1, $a2
@@ -383,8 +383,8 @@ TlbCsrXchange:
   .endr
 
 CfgCsrXchange:
-  CsrSel = LOONGARCH_CSR_CPUNUM
-  .rept LOONGARCH_CSR_PRCFG3 - LOONGARCH_CSR_CPUNUM + 1
+  CsrSel = LOONGARCH_CSR_CPUID
+  .rept LOONGARCH_CSR_PRCFG3 - LOONGARCH_CSR_CPUID + 1
     AsmCsrXChange CsrSel
     CsrSel = CsrSel + 1
   .endr
