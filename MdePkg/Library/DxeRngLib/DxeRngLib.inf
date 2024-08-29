@@ -39,3 +39,6 @@
   gEfiRngAlgorithmSp80090Hash256Guid
   gEfiRngAlgorithmSp80090Hmac256Guid
   gEfiRngAlgorithmRaw
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms ## CONSUMES
