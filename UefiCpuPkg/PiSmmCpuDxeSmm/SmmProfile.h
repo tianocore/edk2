@@ -83,18 +83,28 @@ PageFaultIdtHandlerSmmProfile (
 /**
   Check if feature is supported by a processor.
 
+  @param CpuIndex        The index of the CPU.
 **/
 VOID
 CheckFeatureSupported (
+  IN UINTN  CpuIndex
+  );
+
+/**
+  Initialize the protected memory ranges and the 4KB-page mapped memory ranges.
+
+**/
+VOID
+InitProtectedMemRange (
   VOID
   );
 
 /**
-  Update page table according to protected memory ranges and the 4KB-page mapped memory ranges.
+  This function updates memory attribute according to mProtectionMemRangeCount.
 
 **/
 VOID
-InitPaging (
+SmmProfileUpdateMemoryAttributes (
   VOID
   );
 
@@ -127,8 +137,16 @@ extern BOOLEAN  mXdSupported;
 //
 extern BOOLEAN  mXdEnabled;
 //
+// The flag indicates if SMM profile is enabled.
+//
+extern BOOLEAN  mSmmProfileEnabled;
+//
 // The flag indicates if #DB will be setup in #PF handler.
 //
 extern BOOLEAN  mSetupDebugTrap;
+//
+// SMI command port.
+//
+extern UINT32  mSmiCommandPort;
 
 #endif // _SMM_PROFILE_H_

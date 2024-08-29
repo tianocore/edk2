@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 #define PAGE_TABLE_PAGES  8
 #define ACC_MAX_BIT       BIT3
@@ -228,7 +228,7 @@ SmmInitPageTable (
   //
   PageTable = GenSmmPageTable (mPagingMode, mPhysicalAddressBits);
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     if (m5LevelPagingNeeded) {
       Pml5Entry = (UINT64 *)PageTable;
       //
@@ -264,7 +264,7 @@ SmmInitPageTable (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (mSmmProfileEnabled ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -820,7 +820,14 @@ SmiPFHandler (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
+    if (mIsStandaloneMm) {
+      //
+      // Only logging ranges shall run here in MM env.
+      //
+      ASSERT (IsNonMmramLoggingAddress (PFAddress));
+    }
+
     SmmProfilePFHandler (
       SystemContext.SystemContextX64->Rip,
       SystemContext.SystemContextX64->ExceptionData
