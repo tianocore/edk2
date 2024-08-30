@@ -14,10 +14,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 typedef struct {
   ///
-  /// Beginning of the hypercall page.
-  ///
-  VOID      *HyperPages;
-  ///
   /// Hypervisor major version.
   ///
   UINT16    VersionMajor;
