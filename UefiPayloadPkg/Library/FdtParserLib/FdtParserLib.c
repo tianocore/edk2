@@ -623,7 +623,6 @@ VOID
 ParsePciRootBridge (
   IN VOID   *Fdt,
   IN INT32  Node,
-  IN UINT8  PciEnumDone,
   IN UINT8  RootBridgeCount,
   IN CHAR8  *GmaStr,
   IN UINT8  *index
@@ -658,7 +657,7 @@ ParsePciRootBridge (
     mPciRootBridgeInfo->Header.Length    = sizeof (UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES);
     mPciRootBridgeInfo->Header.Revision  = UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES_REVISION;
     mPciRootBridgeInfo->Count            = RootBridgeCount;
-    mPciRootBridgeInfo->ResourceAssigned = (BOOLEAN)PciEnumDone;
+    mPciRootBridgeInfo->ResourceAssigned = FALSE;
   }
 
   for (SubNode = FdtFirstSubnode (Fdt, Node); SubNode >= 0; SubNode = FdtNextSubnode (Fdt, SubNode)) {
@@ -876,7 +875,7 @@ ParseDtb (
         break;
       case PciRootBridge:
         DEBUG ((DEBUG_INFO, "ParsePciRootBridge, index :%x\n", index));
-        ParsePciRootBridge (Fdt, Node, PciEnumDone, RootBridgeCount, GmaStr, &index);
+        ParsePciRootBridge (Fdt, Node, RootBridgeCount, GmaStr, &index);
         DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index :%x\n", index));
         break;
       case Options:
@@ -888,6 +887,10 @@ ParseDtb (
         break;
     }
   }
+
+  // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
+  // may not be good idea. Instead have this prop part of RB
+  mPciRootBridgeInfo->ResourceAssigned = (BOOLEAN)PciEnumDone;
 
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;
   DEBUG ((DEBUG_INFO, "\n"));
