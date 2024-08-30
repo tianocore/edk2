@@ -614,7 +614,7 @@ DumpVarCheckHii (
 **/
 EFI_STATUS
 EFIAPI
-VarCheckHiiLibNullClassConstructor (
+VarCheckHiiLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
