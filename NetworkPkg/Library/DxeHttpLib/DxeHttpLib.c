@@ -1927,6 +1927,11 @@ HttpGenRequestMessage (
         CopyMem (RequestPtr, HTTP_METHOD_DELETE, StrLength);
         RequestPtr += StrLength;
         break;
+      case HttpMethodConnect:
+        StrLength = sizeof (HTTP_METHOD_CONNECT) - 1;
+        CopyMem (RequestPtr, HTTP_METHOD_CONNECT, StrLength);
+        RequestPtr += StrLength;
+        break;
       default:
         ASSERT (FALSE);
         Status = EFI_INVALID_PARAMETER;

@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 /**
   Create PageTable for SMM use.
@@ -33,7 +33,7 @@ SmmInitPageTable (
   mPhysicalAddressBits = 32;
   mPagingMode          = PagingPae;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (mSmmProfileEnabled ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -80,18 +80,6 @@ AllocPage (
   CpuDeadLoop ();
 
   return 0;
-}
-
-/**
-  Page Fault handler for SMM use.
-
-**/
-VOID
-SmiDefaultPFHandler (
-  VOID
-  )
-{
-  CpuDeadLoop ();
 }
 
 /**
@@ -195,24 +183,21 @@ SmiPFHandler (
     }
 
     if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
-      DumpCpuContext (InterruptType, SystemContext);
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%x)!\n", PFAddress));
-      DEBUG_CODE (
-        DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
-        );
-      CpuDeadLoop ();
-      goto Exit;
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     SmmProfilePFHandler (
       SystemContext.SystemContextIa32->Eip,
       SystemContext.SystemContextIa32->ExceptionData
       );
   } else {
     DumpCpuContext (InterruptType, SystemContext);
-    SmiDefaultPFHandler ();
+    DEBUG_CODE (
+      DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
+      );
+    CpuDeadLoop ();
   }
 
 Exit:

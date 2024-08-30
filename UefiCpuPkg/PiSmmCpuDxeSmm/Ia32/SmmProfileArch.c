@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 #include "SmmProfileInternal.h"
 
 /**
@@ -75,4 +75,16 @@ ClearTrapFlag (
   )
 {
   SystemContext.SystemContextIa32->Eflags &= (UINTN) ~BIT8;
+}
+
+/**
+  Create new entry in page table for page fault address in SmmProfilePFHandler.
+
+**/
+VOID
+SmmProfileMapPFAddress (
+  VOID
+  )
+{
+  CpuDeadLoop ();
 }

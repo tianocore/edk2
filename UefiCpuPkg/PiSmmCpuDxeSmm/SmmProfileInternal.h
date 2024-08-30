@@ -11,8 +11,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define _SMM_PROFILE_INTERNAL_H_
 
 #include <Protocol/SmmReadyToLock.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/DxeServicesTableLib.h>
 #include <Library/CpuLib.h>
 #include <IndustryStandard/Acpi.h>
 
@@ -41,9 +39,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // CPU generic definition
 //
-#define   CPUID1_EDX_XD_SUPPORT  0x100000
-#define   MSR_EFER               0xc0000080
-#define   MSR_EFER_XD            0x800
+#define   MSR_EFER     0xc0000080
+#define   MSR_EFER_XD  0x800
 
 #define   CPUID1_EDX_BTS_AVAILABLE  0x200000
 
@@ -129,16 +126,19 @@ IsAddressSplit (
   );
 
 /**
-  Check if the memory address will be mapped by 4KB-page.
+  Check if the SMM profile page fault address above 4GB is in protected range or not.
 
-  @param  Address  The address of Memory.
-  @param  Nx       The flag indicates if the memory is execute-disable.
+  @param[in]   Address  The address of Memory.
+  @param[out]  Nx       The flag indicates if the memory is execute-disable.
+
+  @retval TRUE     The input address is in protected range.
+  @retval FALSE    The input address is not in protected range.
 
 **/
 BOOLEAN
-IsAddressValid (
-  IN EFI_PHYSICAL_ADDRESS  Address,
-  IN BOOLEAN               *Nx
+IsSmmProfilePFAddressAbove4GValid (
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  OUT BOOLEAN               *Nx
   );
 
 /**
@@ -153,11 +153,11 @@ AllocPage (
   );
 
 /**
-  Page Fault handler for SMM use.
+  Create new entry in page table for page fault address in SmmProfilePFHandler.
 
 **/
 VOID
-SmiDefaultPFHandler (
+SmmProfileMapPFAddress (
   VOID
   );
 
