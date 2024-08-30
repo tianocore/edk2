@@ -112,7 +112,7 @@
 //
 // Config CSR registers
 //
-#define LOONGARCH_CSR_CPUNUM  0x20    // CPU core number
+#define LOONGARCH_CSR_CPUID   0x20    // CPU core ID
 #define LOONGARCH_CSR_PRCFG1  0x21    // Config1
 #define LOONGARCH_CSR_PRCFG2  0x22    // Config2
 #define LOONGARCH_CSR_PRCFG3  0x23    // Config3
