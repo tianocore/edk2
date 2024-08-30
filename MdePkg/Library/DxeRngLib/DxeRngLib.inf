@@ -40,5 +40,8 @@
   gEfiRngAlgorithmSp80090Hmac256Guid
   gEfiRngAlgorithmRaw
 
+[Guids.AARCH64]
+  gEfiRngAlgorithmArmRndr
+
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms ## CONSUMES
