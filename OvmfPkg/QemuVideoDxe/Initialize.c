@@ -293,6 +293,8 @@ QemuVideoBochsEdid (
   )
 {
   EFI_STATUS  Status;
+  UINT32      X;
+  UINT32      Y;
 
   if (Private->Variant != QEMU_VIDEO_BOCHS_MMIO) {
     return;
@@ -344,15 +346,23 @@ QemuVideoBochsEdid (
     return;
   }
 
-  *XRes = Private->Edid[56] | ((Private->Edid[58] & 0xf0) << 4);
-  *YRes = Private->Edid[59] | ((Private->Edid[61] & 0xf0) << 4);
+  X = Private->Edid[56] | ((Private->Edid[58] & 0xf0) << 4);
+  Y = Private->Edid[59] | ((Private->Edid[61] & 0xf0) << 4);
   DEBUG ((
     DEBUG_INFO,
     "%a: default resolution: %dx%d\n",
     __func__,
-    *XRes,
-    *YRes
+    X,
+    Y
     ));
+
+  if ((X < 640) || (Y < 480)) {
+    /* ignore hint, GraphicsConsoleDxe needs 640x480 or larger */
+    return;
+  }
+
+  *XRes = X;
+  *YRes = Y;
 
   if (PcdGet8 (PcdVideoResolutionSource) == 0) {
     Status = PcdSet32S (PcdVideoHorizontalResolution, *XRes);
