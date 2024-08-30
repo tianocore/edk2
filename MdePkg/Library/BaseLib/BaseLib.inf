@@ -339,6 +339,7 @@
   Ebc/SpeculationBarrier.c
   Unaligned.c
   Math64.c
+  IntelTdxNull.c
 
 [Sources.ARM]
   Arm/InternalSwitchStack.c
@@ -364,6 +365,7 @@
   Arm/CpuBreakpoint.S           | GCC
   Arm/MemoryFence.S             | GCC
   Arm/SpeculationBarrier.S      | GCC
+  IntelTdxNull.c
 
 [Sources.AARCH64]
   Arm/InternalSwitchStack.c
@@ -391,6 +393,7 @@
   AArch64/SpeculationBarrier.asm    | MSFT
   AArch64/ArmReadCntPctReg.asm      | MSFT
   AArch64/ArmReadIdAA64Isar0Reg.asm     | MSFT
+  IntelTdxNull.c
 
 [Sources.RISCV64]
   Math64.c
@@ -412,6 +415,7 @@
   RiscV64/ReadTimer.S               | GCC
   RiscV64/RiscVMmu.S                | GCC
   RiscV64/SpeculationBarrier.S      | GCC
+  IntelTdxNull.c
 
 [Sources.LOONGARCH64]
   Math64.c
@@ -432,6 +436,7 @@
   LoongArch64/ExceptionBase.S       | GCC
   LoongArch64/Cpucfg.S              | GCC
   LoongArch64/ReadStableCounter.S   | GCC
+  IntelTdxNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
