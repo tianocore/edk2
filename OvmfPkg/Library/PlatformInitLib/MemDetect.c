@@ -898,6 +898,111 @@ PlatformScanHostProvided64BitPciMmioEnd (
   return EFI_NOT_FOUND;
 }
 
+VOID
+EFIAPI
+Switch4Level (
+  VOID
+  );
+
+/**
+   Configure x64 paging levels.
+
+
+   The OVMF ResetVector code will enter long mode with 5-level paging if the
+   following conditions are true:
+
+     (1) OVMF has been built with PcdUse5LevelPageTable = TRUE, and
+     (2) the CPU supports 5-level paging (aka la57), and
+     (3) the CPU supports gigabyte pages, and
+     (4) the VM is not running in SEV mode.
+
+   Condition (4) is a temporary stopgap for BaseMemEncryptSevLib not supporting
+   5-level paging yet.
+
+
+   This function looks at the virtual machine configuration, then decides
+   whenever it will continue to use 5-level paging or downgrade to 4-level
+   paging for better compatibility with older guest OS versions.
+
+   There is a fw_cfg config option to explicitly request 4 or 5-level paging
+   using 'qemu -fw_cfg name=opt/org.tianocode/PagingLevel,string=4|5'.  If the
+   option is present the requested paging level will be used.
+
+   Should that not be the case the function checks the size of the address space
+   needed, which is the RAM installed plus fw_cfg reservations.  The downgrade
+   to 4-level paging will happen for small guests where the address space needed
+   is lower than 1TB.
+
+
+   This function will also log the paging level used and the reason for that.
+**/
+STATIC
+VOID
+PlatformSetupPagingLevel (
+  IN OUT EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+ #ifdef MDE_CPU_X64
+  UINT32      PagingLevel;
+  EFI_STATUS  Status;
+  IA32_CR4    Cr4;
+
+  Cr4.UintN = AsmReadCr4 ();
+  if (!Cr4.Bits.LA57) {
+    /* The OvmfPkg ResetVector has NOT turned on 5-level paging, log the reason. */
+    if (!PcdGetBool (PcdUse5LevelPageTable)) {
+      DEBUG ((DEBUG_INFO, "%a: using 4-level paging (PcdUse5LevelPageTable disabled)\n", __func__));
+    } else {
+      DEBUG ((DEBUG_INFO, "%a: using 4-level paging (la57 not supported by cpu)\n", __func__));
+    }
+
+    return;
+  }
+
+  Status = QemuFwCfgParseUint32 (
+             "opt/org.tianocode/PagingLevel",
+             FALSE,
+             &PagingLevel
+             );
+  switch (Status) {
+    case EFI_NOT_FOUND:
+      if (PlatformInfoHob->FirstNonAddress < (1ll << 40)) {
+        //
+        // If the highest address actually used is below 1TB switch back into
+        // 4-level paging mode for better compatibility with older guests.
+        //
+        DEBUG ((DEBUG_INFO, "%a: using 4-level paging (default for small guest)\n", __func__));
+        PagingLevel = 4;
+      } else {
+        DEBUG ((DEBUG_INFO, "%a: using 5-level paging (default for large guest)\n", __func__));
+        PagingLevel = 5;
+      }
+
+      break;
+    case EFI_SUCCESS:
+      if ((PagingLevel != 4) && (PagingLevel != 5)) {
+        DEBUG ((DEBUG_INFO, "%a: invalid paging level in fw_cfg: %d\n", __func__, PagingLevel));
+        return;
+      }
+
+      DEBUG ((DEBUG_INFO, "%a: using %d-level paging (fw_cfg override)\n", __func__, PagingLevel));
+      break;
+    default:
+      DEBUG ((DEBUG_WARN, "%a: QemuFwCfgParseUint32: %r\n", __func__, Status));
+      return;
+  }
+
+  if (PagingLevel == 4) {
+    Switch4Level ();
+  }
+
+  if (PagingLevel == 5) {
+    /* The OvmfPkg ResetVector has turned on 5-level paging, nothing to do here. */
+  }
+
+ #endif
+}
+
 /**
   Initialize the PhysMemAddressWidth field in PlatformInfoHob based on guest RAM size.
 **/
@@ -945,6 +1050,8 @@ PlatformAddressWidthInitialization (
     //
     PlatformGetFirstNonAddress (PlatformInfoHob);
   }
+
+  PlatformSetupPagingLevel (PlatformInfoHob);
 
   PlatformAddressWidthFromCpuid (PlatformInfoHob, TRUE);
   if (PlatformInfoHob->PhysMemAddressWidth != 0) {
