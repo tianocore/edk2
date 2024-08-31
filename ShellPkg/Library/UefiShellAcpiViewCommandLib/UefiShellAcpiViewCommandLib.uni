@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.<BR>
+// Copyright (c) 2016 - 2023, Arm Limited. All rights reserved.<BR>
 // SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Module Name:
@@ -89,6 +89,7 @@
 "       HMAT  - Heterogeneous Memory Attributes Table\r\n"
 "       IORT  - IO Remapping Table\r\n"
 "       MCFG  - Memory Mapped Config Space Base Address Description Table\r\n"
+"       MPAM  - Memory System Resource Partitioning and Monitoring Table\r\n"
 "       PPTT  - Processor Properties Topology Table\r\n"
 "       RSDP  - Root System Description Pointer\r\n"
 "       SLIT  - System Locality Information Table\r\n"

@@ -42,3 +42,4 @@
 
 [Guids]
   gEfiMmPeiMmramMemoryReserveGuid
+  gEfiSmmSmramMemoryGuid

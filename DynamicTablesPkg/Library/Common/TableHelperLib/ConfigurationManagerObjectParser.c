@@ -2,6 +2,8 @@
   Configuration Manager Object parser.
 
   Copyright (c) 2021 - 2023, ARM Limited. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -16,7 +18,8 @@ VOID
 EFIAPI
 PrintString (
   CONST CHAR8  *Format,
-  UINT8        *Ptr
+  UINT8        *Ptr,
+  UINT32       Length
   );
 
 STATIC
@@ -24,31 +27,26 @@ VOID
 EFIAPI
 PrintStringPtr (
   CONST CHAR8  *Format,
-  UINT8        *Ptr
+  UINT8        *Ptr,
+  UINT32       Length
   );
 
 STATIC
 VOID
 EFIAPI
-PrintChar4 (
+PrintChars (
   CONST CHAR8  *Format,
-  UINT8        *Ptr
+  UINT8        *Ptr,
+  UINT32       Length
   );
 
 STATIC
 VOID
 EFIAPI
-PrintChar6 (
+HexDump (
   CONST CHAR8  *Format,
-  UINT8        *Ptr
-  );
-
-STATIC
-VOID
-EFIAPI
-PrintChar8 (
-  CONST CHAR8  *Format,
-  UINT8        *Ptr
+  UINT8        *Ptr,
+  UINT32       Length
   );
 
 /** A parser for EArmObjBootArchInfo.
@@ -667,6 +665,18 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonPsdInfoParser[] = {
   { "NumProc",   4, "0x%x", NULL },
 };
 
+/** A parser for EArchCommonObjTpm2InterfaceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonTpm2InterfaceInfo[] = {
+  { "PlatformClass",             sizeof (UINT16),                                               "0x%x",   NULL    },
+  { "AddressOfControlArea",      sizeof (UINT64),                                               "0x%llx", NULL    },
+  { "StartMethod",               sizeof (UINT32),                                               "0x%x",   NULL    },
+  { "StartMethodParametersSize", sizeof (UINT8),                                                "0x%x",   NULL    },
+  { "StartMethodParameters",     EFI_TPM2_ACPI_TABLE_START_METHOD_SPECIFIC_PARAMETERS_MAX_SIZE, NULL,     HexDump },
+  { "Laml",                      sizeof (UINT32),                                               "0x%x",   NULL    },
+  { "Lasa",                      sizeof (UINT64),                                               "0x%llx", NULL    },
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -696,6 +706,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType4Info,        CmArchCommonPccSubspaceType34InfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType5Info,        CmArchCommonPccSubspaceType5InfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPsdInfo,                     CmArchCommonPsdInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2InterfaceInfo,           CmArchCommonTpm2InterfaceInfo),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -729,23 +740,149 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArmNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT_RESERVED (EArmObjMax)
 };
 
+/** A parser for EX64ObjFadtSciInterrupt.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtSciInterruptParser[] = {
+  { "SciInterrupt", 2, "0x%x", NULL }
+};
+
+/** A parser for EX64ObjFadtSciCmdInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtSciCmdInfoParser[] = {
+  { "SciCmd",      4, "0x%x", NULL },
+  { "AcpiEnable",  1, "0x%x", NULL },
+  { "AcpiDisable", 1, "0x%x", NULL },
+  { "S4BiosReq",   1, "0x%x", NULL },
+  { "PstateCnt",   1, "0x%x", NULL },
+  { "CstCnt",      1, "0x%x", NULL }
+};
+
+/** A parser for EX64ObjFadtPmBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtPmBlockInfoParser[] = {
+  { "Pm1aEvtBlk", 4, "0x%x", NULL },
+  { "Pm1bEvtBlk", 4, "0x%x", NULL },
+  { "Pm1aCntBlk", 4, "0x%x", NULL },
+  { "Pm1bCntBlk", 4, "0x%x", NULL },
+  { "Pm2CntBlk",  4, "0x%x", NULL },
+  { "PmTmrBlk",   4, "0x%x", NULL },
+  { "Pm1EvtLen",  1, "0x%x", NULL },
+  { "Pm1CntLen",  1, "0x%x", NULL },
+  { "Pm2CntLen",  1, "0x%x", NULL },
+  { "PmTmrLen",   1, "0x%x", NULL }
+};
+
+/** A parser for EX64ObjFadtGpeBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtGpeBlockInfoParser[] = {
+  { "Gpe0Blk",    4, "0x%x", NULL },
+  { "Gpe1Blk",    4, "0x%x", NULL },
+  { "Gpe0BlkLen", 1, "0x%x", NULL },
+  { "Gpe1BlkLen", 1, "0x%x", NULL },
+  { "Gpe1Base",   1, "0x%x", NULL }
+};
+
+/** A parser for EX64ObjFadtXpmBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtXpmBlockInfoParser[] = {
+  { "XPm1aEvtBlk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPm1bEvtBlk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPm1aCntBlk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPm1bCntBlk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPm2CntBlk",  sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XPmTmrBlk",   sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) }
+};
+
+/** A parser for EX64ObjFadtXgpeBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtXgpeBlockInfoParser[] = {
+  { "XGpe0Blk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "XGpe1Blk", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) }
+};
+
+/** A parser for EX64ObjFadtSleepBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtSleepBlockInfoParser[] = {
+  { "SleepControlReg", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "SleepStatusReg",  sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) }
+};
+
+/** A parser for EX64ObjFadtResetBlockInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtResetBlockInfoParser[] = {
+  { "ResetReg",   sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser,
+    ARRAY_SIZE (AcpiGenericAddressParser) },
+  { "ResetValue", 1,                                              "0x%x",NULL }
+};
+
+/** A parser for EX64ObjFadtMiscInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtMiscInfoParser[] = {
+  { "PLvl2Lat",    2, "0x%x", NULL },
+  { "PLvl3Lat",    2, "0x%x", NULL },
+  { "FlushSize",   2, "0x%x", NULL },
+  { "FlushStride", 2, "0x%x", NULL },
+  { "DutyOffset",  1, "0x%x", NULL },
+  { "DutyWidth",   1, "0x%x", NULL },
+  { "DayAlrm",     1, "0x%x", NULL },
+  { "MonAlrm",     1, "0x%x", NULL },
+  { "Century",     1, "0x%x", NULL }
+};
+
+/** A parser for X64 namespace objects.
+*/
+STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
+  CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjReserved),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtSciInterrupt,  CmX64ObjFadtSciInterruptParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtSciCmdInfo,    CmX64ObjFadtSciCmdInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtPmBlockInfo,   CmX64ObjFadtPmBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtGpeBlockInfo,  CmX64ObjFadtGpeBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtXpmBlockInfo,  CmX64ObjFadtXpmBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtXgpeBlockInfo, CmX64ObjFadtXgpeBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtSleepBlockInfo,CmX64ObjFadtSleepBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtResetBlockInfo,CmX64ObjFadtResetBlockInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjFadtMiscInfo,      CmX64ObjFadtMiscInfoParser),
+  CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjMax)
+};
+
 /** A parser for EStdObjCfgMgrInfo.
 */
 STATIC CONST CM_OBJ_PARSER  StdObjCfgMgrInfoParser[] = {
-  { "Revision", 4, "0x%x",         NULL       },
-  { "OemId[6]", 6, "%c%c%c%c%c%c", PrintChar6 }
+  { "Revision", 4, "0x%x", NULL       },
+  { "OemId[6]", 6, NULL,   PrintChars }
 };
 
 /** A parser for EStdObjAcpiTableList.
 */
 STATIC CONST CM_OBJ_PARSER  StdObjAcpiTableInfoParser[] = {
-  { "AcpiTableSignature", 4,                                      "%c%c%c%c",         PrintChar4 },
-  { "AcpiTableRevision",  1,                                      "%d",               NULL       },
-  { "TableGeneratorId",   sizeof (ACPI_TABLE_GENERATOR_ID),       "0x%x",             NULL       },
-  { "AcpiTableData",      sizeof (EFI_ACPI_DESCRIPTION_HEADER *), "0x%p",             NULL       },
-  { "OemTableId",         8,                                      "%c%c%c%c%c%c%c%c", PrintChar8 },
-  { "OemRevision",        4,                                      "0x%x",             NULL       },
-  { "MinorRevision",      1,                                      "0x%x",             NULL       },
+  { "AcpiTableSignature", 4,                                      NULL,   PrintChars },
+  { "AcpiTableRevision",  1,                                      "%d",   NULL       },
+  { "TableGeneratorId",   sizeof (ACPI_TABLE_GENERATOR_ID),       "0x%x", NULL       },
+  { "AcpiTableData",      sizeof (EFI_ACPI_DESCRIPTION_HEADER *), "0x%p", NULL       },
+  { "OemTableId",         8,                                      NULL,   PrintChars },
+  { "OemRevision",        4,                                      "0x%x", NULL       },
+  { "MinorRevision",      1,                                      "0x%x", NULL       },
 };
 
 /** A parser for EStdObjSmbiosTableList.
@@ -770,13 +907,15 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  StdNamespaceObjectParser[] = {
 
   @param [in]  Format  Format to print the Ptr.
   @param [in]  Ptr     Pointer to the string.
+  @param [in]  Length  Length of the field
 **/
 STATIC
 VOID
 EFIAPI
 PrintString (
   IN CONST CHAR8  *Format,
-  IN UINT8        *Ptr
+  IN UINT8        *Ptr,
+  IN UINT32       Length
   )
 {
   if (Ptr == NULL) {
@@ -784,7 +923,7 @@ PrintString (
     return;
   }
 
-  DEBUG ((DEBUG_ERROR, "%a", Ptr));
+  DEBUG ((DEBUG_INFO, "%a", Ptr));
 }
 
 /** Print string from pointer.
@@ -793,13 +932,15 @@ PrintString (
 
   @param [in]  Format      Format to print the string.
   @param [in]  Ptr         Pointer to the string pointer.
+  @param [in]  Length      Length of the field
 **/
 STATIC
 VOID
 EFIAPI
 PrintStringPtr (
   IN CONST CHAR8  *Format,
-  IN UINT8        *Ptr
+  IN UINT8        *Ptr,
+  IN UINT32       Length
   )
 {
   UINT8  *String;
@@ -815,82 +956,51 @@ PrintStringPtr (
     String = (UINT8 *)"(NULLPTR)";
   }
 
-  PrintString (Format, String);
+  PrintString (Format, String, Length);
 }
 
-/** Print 4 characters.
+/** Print characters.
 
   @param [in]  Format  Format to print the Ptr.
   @param [in]  Ptr     Pointer to the characters.
+  @param [in]  Length  Length of the field
 **/
 STATIC
 VOID
 EFIAPI
-PrintChar4 (
+PrintChars (
   IN  CONST CHAR8  *Format,
-  IN  UINT8        *Ptr
+  IN  UINT8        *Ptr,
+  IN  UINT32       Length
   )
 {
-  DEBUG ((
-    DEBUG_ERROR,
-    (Format != NULL) ? Format : "%c%c%c%c",
-    Ptr[0],
-    Ptr[1],
-    Ptr[2],
-    Ptr[3]
-    ));
+  UINT32  Index;
+
+  for (Index = 0; Index < Length; Index++) {
+    DEBUG ((DEBUG_INFO, "%c", Ptr[Index]));
+  }
 }
 
-/** Print 6 characters.
+/** Dump data in Hex format
 
   @param [in]  Format  Format to print the Ptr.
-  @param [in]  Ptr     Pointer to the characters.
+  @param [in]  Ptr     Pointer to the string.
+  @param [in]  Length  Length of the field
 **/
 STATIC
 VOID
 EFIAPI
-PrintChar6 (
-  IN  CONST CHAR8  *Format,
-  IN  UINT8        *Ptr
+HexDump (
+  IN CONST CHAR8  *Format,
+  IN UINT8        *Ptr,
+  IN UINT32       Length
   )
 {
-  DEBUG ((
-    DEBUG_ERROR,
-    (Format != NULL) ? Format : "%c%c%c%c%c%c",
-    Ptr[0],
-    Ptr[1],
-    Ptr[2],
-    Ptr[3],
-    Ptr[4],
-    Ptr[5]
-    ));
-}
+  UINT32  Index;
 
-/** Print 8 characters.
-
-  @param [in]  Format  Format to print the Ptr.
-  @param [in]  Ptr     Pointer to the characters.
-**/
-STATIC
-VOID
-EFIAPI
-PrintChar8 (
-  IN  CONST CHAR8  *Format,
-  IN  UINT8        *Ptr
-  )
-{
-  DEBUG ((
-    DEBUG_ERROR,
-    (Format != NULL) ? Format : "%c%c%c%c%c%c%c%c",
-    Ptr[0],
-    Ptr[1],
-    Ptr[2],
-    Ptr[3],
-    Ptr[4],
-    Ptr[5],
-    Ptr[6],
-    Ptr[7]
-    ));
+  for (Index = 0; Index < Length; Index++) {
+    DEBUG ((DEBUG_INFO, "0x%02x ", *Ptr++));
+  }
 }
 
 /** Print fields of the objects.
@@ -952,7 +1062,7 @@ PrintCmObjDesc (
       Parser[Index].NameStr
       ));
     if (Parser[Index].PrintFormatter != NULL) {
-      Parser[Index].PrintFormatter (Parser[Index].Format, Data);
+      Parser[Index].PrintFormatter (Parser[Index].Format, Data, Parser[Index].Length);
     } else if (Parser[Index].Format != NULL) {
       switch (Parser[Index].Length) {
         case 1:
@@ -1070,6 +1180,22 @@ ParseCmObjDesc (
 
       ParserArray = &ArchCommonNamespaceObjectParser[ObjId];
       break;
+
+    case EObjNameSpaceX64:
+      if (ObjId >= EX64ObjMax) {
+        ASSERT (0);
+        return;
+      }
+
+      if (ObjId >= ARRAY_SIZE (X64NamespaceObjectParser)) {
+        DEBUG ((DEBUG_ERROR, "ObjId 0x%x is missing from the X64NamespaceObjectParser array\n", ObjId));
+        ASSERT (0);
+        return;
+      }
+
+      ParserArray = &X64NamespaceObjectParser[ObjId];
+      break;
+
     default:
       // Not supported
       DEBUG ((DEBUG_ERROR, "NameSpaceId 0x%x, ObjId 0x%x is not supported by the parser\n", NameSpaceId, ObjId));
