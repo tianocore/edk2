@@ -118,7 +118,6 @@ ImageTimestampVerify (
   OUT EFI_TIME     *SigningTime
   )
 {
-  BOOLEAN  Status;
   UINT8    *Ptr;
   UINT8    *End;
   INT32    Len;
@@ -374,8 +373,8 @@ ImageTimestampVerify (
   //
   if (SigningTime != NULL) {
     SetMem (SigningTime, sizeof (EFI_TIME), 0);
-    Status = ConvertAsn1TimeToEfiTime (Ptr, SigningTime);
+    return ConvertAsn1TimeToEfiTime (Ptr, SigningTime);
   }
 
-  return Status;
+  return FALSE;
 }

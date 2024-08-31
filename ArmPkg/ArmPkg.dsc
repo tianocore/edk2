@@ -149,7 +149,6 @@
   ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
   ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmPkg/Library/ArmMtlNullLib/ArmMtlNullLib.inf
-  ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
   ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   ArmPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   ArmPkg/Library/LinuxBootBootManagerLib/LinuxBootBootManagerLib.inf
