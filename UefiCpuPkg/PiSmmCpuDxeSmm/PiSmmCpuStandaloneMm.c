@@ -70,12 +70,10 @@ PerformRemainingTasks (
       SetMemMapAttributes (MemoryAttributesTable);
     }
 
-    if (IsRestrictedMemoryAccess ()) {
-      //
-      // Set page table itself to be read-only
-      //
-      SetPageTableAttributes ();
-    }
+    //
+    // Set page table itself to be read-only
+    //
+    SetPageTableAttributes ();
 
     //
     // Measure performance of SmmCpuFeaturesCompleteSmmReadyToLock() from caller side
