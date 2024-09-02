@@ -7,6 +7,8 @@ Copyright (c) 2018, Linaro, Ltd. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
+#include <Library/MmServicesTableLib.h>
 #include <Library/StandaloneMmMemLib.h>
 #include "Variable.h"
 
@@ -67,6 +69,17 @@ VariableNotifySmmWriteReady (
   VOID
   )
 {
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+
+  Handle = NULL;
+  Status = gMmst->MmInstallProtocolInterface (
+                    &Handle,
+                    &gSmmVariableWriteGuid,
+                    EFI_NATIVE_INTERFACE,
+                    NULL
+                    );
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**
@@ -89,19 +102,15 @@ VariableServiceInitialize (
 }
 
 /**
-  Whether the TCG or TCG2 protocols are installed in the UEFI protocol database.
-  This information is used by the MorLock code to infer whether an existing
-  MOR variable is legitimate or not.
+  Whether the MOR variable is legitimate or not.
 
-  @retval TRUE  Either the TCG or TCG2 protocol is installed in the UEFI
-                protocol database
-  @retval FALSE Neither the TCG nor the TCG2 protocol is installed in the UEFI
-                protocol database
+  @retval TRUE  MOR Variable is legitimate.
+  @retval FALSE MOR Variable in not legitimate.
 **/
 BOOLEAN
-VariableHaveTcgProtocols (
+VariableIsMorVariableLegitimate (
   VOID
   )
 {
-  return FALSE;
+  return TRUE;
 }

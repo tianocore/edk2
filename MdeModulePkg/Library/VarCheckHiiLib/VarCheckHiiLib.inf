@@ -1,5 +1,5 @@
 ## @file
-#  NULL class library to register var check HII handler.
+#  VarCheckHiiLib library to register var check HII handler.
 #
 #  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
 #
@@ -15,16 +15,18 @@
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NULL|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
-  CONSTRUCTOR                    = VarCheckHiiLibNullClassConstructor
+  CONSTRUCTOR                    = VarCheckHiiLibConstructor
 
 [Sources]
-  VarCheckHiiLibNullClass.c
+  VarCheckHiiLib.c
   VarCheckHii.h
   VarCheckHiiGenFromFv.c
   VarCheckHiiGenFromHii.c
   VarCheckHiiGen.c
   VarCheckHiiGen.h
   InternalVarCheckStructure.h
+  VarCheckHiiLibCommon.c
+  VarCheckHiiLibCommon.h
 
 [Packages]
   MdePkg/MdePkg.dec

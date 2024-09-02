@@ -12,7 +12,6 @@
 ;
 ;-------------------------------------------------------------------------------
 
-extern  ASM_PFX(FeaturePcdGet (PcdCpuSmmProfileEnable))
 extern  ASM_PFX(SmiPFHandler)
 extern  ASM_PFX(mSetupDebugTrap)
 

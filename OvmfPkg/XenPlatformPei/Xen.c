@@ -128,9 +128,6 @@ EFI_STATUS
 XenConnect (
   )
 {
-  UINT32             Index;
-  UINT32             TransferReg;
-  UINT32             TransferPages;
   UINT32             XenVersion;
   EFI_XEN_OVMF_INFO  *Info;
   CHAR8              Sig[sizeof (Info->Signature) + 1];
@@ -138,24 +135,6 @@ XenConnect (
   RETURN_STATUS      Status;
 
   ASSERT (mXenLeaf != 0);
-
-  //
-  // Prepare HyperPages to be able to make hypercalls
-  //
-
-  AsmCpuid (mXenLeaf + 2, &TransferPages, &TransferReg, NULL, NULL);
-  mXenInfo.HyperPages = AllocatePages (TransferPages);
-  if (!mXenInfo.HyperPages) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  for (Index = 0; Index < TransferPages; Index++) {
-    AsmWriteMsr64 (
-      TransferReg,
-      (UINTN)mXenInfo.HyperPages +
-      (Index << EFI_PAGE_SHIFT) + Index
-      );
-  }
 
   //
   // Find out the Xen version
@@ -283,7 +262,7 @@ XenPvhDetected (
   //
   // This function should only be used after XenConnect
   //
-  ASSERT (mXenInfo.HyperPages != NULL);
+  ASSERT (mXenInfo.VersionMajor);
 
   return mXenHvmloaderInfo == NULL;
 }
