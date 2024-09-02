@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 LIST_ENTRY                mPagePool           = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                   m1GPageTableSupport = FALSE;
-BOOLEAN                   mCpuSmmRestrictedMemoryAccess;
 X86_ASSEMBLY_PATCH_LABEL  gPatch5LevelPagingNeeded;
 
 /**
@@ -207,10 +206,9 @@ SmmInitPageTable (
   //
   InitializeSpinLock (mPFLock);
 
-  mCpuSmmRestrictedMemoryAccess = PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
-  m1GPageTableSupport           = Is1GPageSupport ();
-  m5LevelPagingNeeded           = Is5LevelPagingNeeded ();
-  mPhysicalAddressBits          = CalculateMaximumSupportAddress (m5LevelPagingNeeded);
+  m1GPageTableSupport  = Is1GPageSupport ();
+  m5LevelPagingNeeded  = Is5LevelPagingNeeded ();
+  mPhysicalAddressBits = CalculateMaximumSupportAddress (m5LevelPagingNeeded);
   PatchInstructionX86 (gPatch5LevelPagingNeeded, m5LevelPagingNeeded, 1);
   if (m5LevelPagingNeeded) {
     mPagingMode = m1GPageTableSupport ? Paging5Level1GB : Paging5Level;
@@ -220,7 +218,6 @@ SmmInitPageTable (
 
   DEBUG ((DEBUG_INFO, "5LevelPaging Needed             - %d\n", m5LevelPagingNeeded));
   DEBUG ((DEBUG_INFO, "1GPageTable Support             - %d\n", m1GPageTableSupport));
-  DEBUG ((DEBUG_INFO, "PcdCpuSmmRestrictedMemoryAccess - %d\n", mCpuSmmRestrictedMemoryAccess));
   DEBUG ((DEBUG_INFO, "PhysicalAddressBits             - %d\n", mPhysicalAddressBits));
 
   //
@@ -881,5 +878,5 @@ IsRestrictedMemoryAccess (
   VOID
   )
 {
-  return mCpuSmmRestrictedMemoryAccess;
+  return PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
 }
