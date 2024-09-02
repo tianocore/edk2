@@ -31,6 +31,9 @@
 [Sources.IA32, Sources.X64]
   X64/X64DynamicTableManager.c
 
+[Sources.RISCV64]
+  RiscV/RiscVDynamicTableManagerDxe.c
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec

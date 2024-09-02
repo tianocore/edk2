@@ -20,6 +20,9 @@
   SsdtPcieGenerator.c
   SsdtPcieGenerator.h
 
+[Sources.RISCV64]
+  RiscV/RiscVSsdtPcieGenerator.c
+
 [Packages]
   DynamicTablesPkg/DynamicTablesPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec

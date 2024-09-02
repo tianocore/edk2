@@ -432,6 +432,7 @@ ParseIrqMap (
     PciInterruptMapInfo[Index].PciInterrupt -= 1;
     Offset                                  += PCI_INTERRUPTS_CELLS * sizeof (UINT32);
 
+    PciInterruptMapInfo[Index].IntcInterrupt.Phandle = fdt32_to_cpu (*(UINT32 *)&Data[Offset]);
     // PHandle (skip it)
     Offset += sizeof (UINT32);
 
@@ -441,8 +442,12 @@ ParseIrqMap (
     // Interrupt controller interrupt and flags
     PciInterruptMapInfo[Index].IntcInterrupt.Interrupt =
       FdtGetInterruptId ((UINT32 *)&Data[Offset]);
-    PciInterruptMapInfo[Index].IntcInterrupt.Flags =
-      FdtGetInterruptFlags ((UINT32 *)&Data[Offset]);
+    if (IntcCells > 1) {
+      PciInterruptMapInfo[Index].IntcInterrupt.Flags =
+        FdtGetInterruptFlags ((UINT32 *)&Data[Offset]);
+    } else {
+      PciInterruptMapInfo[Index].IntcInterrupt.Flags = 0x0;
+    }
   } // for
 
   PciInfo->Mapping[PciMappingTableInterrupt].ObjectId =
