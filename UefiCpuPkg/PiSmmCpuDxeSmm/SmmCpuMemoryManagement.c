@@ -1486,31 +1486,14 @@ IfReadOnlyPageTableNeeded (
 {
   //
   // Don't mark page table memory as read-only if
-  //  - no restriction on access to non-SMRAM memory; or
   //  - SMM heap guard feature enabled; or
   //      BIT2: SMM page guard enabled
   //      BIT3: SMM pool guard enabled
   //  - SMM profile feature enabled
   //
-  if (!IsRestrictedMemoryAccess () ||
-      ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
+  if (((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
       mSmmProfileEnabled)
   {
-    if (sizeof (UINTN) == sizeof (UINT64)) {
-      //
-      // Restriction on access to non-SMRAM memory and heap guard could not be enabled at the same time.
-      //
-      ASSERT (
-        !(IsRestrictedMemoryAccess () &&
-          (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0)
-        );
-
-      //
-      // Restriction on access to non-SMRAM memory and SMM profile could not be enabled at the same time.
-      //
-      ASSERT (!(IsRestrictedMemoryAccess () && mSmmProfileEnabled));
-    }
-
     return FALSE;
   }
 
