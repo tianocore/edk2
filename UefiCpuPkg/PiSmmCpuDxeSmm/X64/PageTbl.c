@@ -866,17 +866,3 @@ RestoreCr2 (
 {
   AsmWriteCr2 (Cr2);
 }
-
-/**
-  Return whether access to non-SMRAM is restricted.
-
-  @retval TRUE  Access to non-SMRAM is restricted.
-  @retval FALSE Access to non-SMRAM is not restricted.
-**/
-BOOLEAN
-IsRestrictedMemoryAccess (
-  VOID
-  )
-{
-  return PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
-}
