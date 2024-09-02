@@ -42,6 +42,9 @@ CryptoNidToOpensslNid (
     case CRYPTO_NID_SECP521R1:
       Nid = NID_secp521r1;
       break;
+    case CRYPTO_NID_BRAINPOOLP512R1:
+      Nid = NID_brainpoolP512r1;
+      break;
     default:
       return -1;
   }
@@ -833,6 +836,9 @@ EcDsaSign (
     case NID_secp521r1:
       HalfSize = 66;
       break;
+    case NID_brainpoolP512r1:
+      HalfSize = 64;
+      break;
     default:
       return FALSE;
   }
@@ -960,6 +966,9 @@ EcDsaVerify (
       break;
     case NID_secp521r1:
       HalfSize = 66;
+      break;
+    case NID_brainpoolP512r1:
+      HalfSize = 64;
       break;
     default:
       return FALSE;

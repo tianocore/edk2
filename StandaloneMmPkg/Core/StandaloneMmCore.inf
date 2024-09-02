@@ -33,6 +33,7 @@
   Mmi.c
   InstallConfigurationTable.c
   FwVol.c
+  MemoryAttributesTable.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -53,6 +54,7 @@
   ReportStatusCodeLib
   StandaloneMmCoreEntryPoint
   HobPrintLib
+  ImagePropertiesRecordLib
 
 [Protocols]
   gEfiDxeMmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
@@ -60,10 +62,11 @@
   gEfiMmEndOfDxeProtocolGuid                   ## PRODUCES
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiMmConfigurationProtocolGuid               ## CONSUMES
+  gEfiMmEndOfPeiProtocol                        ## PRODUCES
 
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
-  gEfiEventDxeDispatchGuid                      ## PRODUCES             ## GUID # SmiHandlerRegister
+  gEventMmDispatchGuid                          ## PRODUCES             ## GUID # SmiHandlerRegister
   gEfiEndOfDxeEventGroupGuid                    ## PRODUCES             ## GUID # SmiHandlerRegister
   ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
   ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister
@@ -71,14 +74,17 @@
   gZeroGuid                                     ## SOMETIMES_CONSUMES   ## GUID
   gEfiHobListGuid
   gEfiHobMemoryAllocModuleGuid
-  gMmCoreDataHobGuid
   gMmFvDispatchGuid
   gEfiEventLegacyBootGuid
   gEfiEventExitBootServicesGuid
   gEfiEventReadyToBootGuid
+  gMmCommBufferHobGuid
+  gEfiSmmSmramMemoryGuid
+  gEdkiiPiSmmMemoryAttributesTableGuid
 
 [Pcd]
   gStandaloneMmPkgTokenSpaceGuid.PcdFwVolMmMaxEncapsulationDepth    ##CONSUMES
+  gStandaloneMmPkgTokenSpaceGuid.PcdRestartMmDispatcherOnceMmEntryRegistered    ##CONSUMES
 
 #
 # This configuration fails for CLANGPDB, which does not support PIE in the GCC
