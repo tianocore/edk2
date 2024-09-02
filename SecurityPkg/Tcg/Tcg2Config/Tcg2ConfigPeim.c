@@ -75,21 +75,25 @@ BuildTcg2AcpiCommunicateBufferHob (
 {
   TCG2_ACPI_COMMUNICATE_BUFFER  *Tcg2AcpiCommunicateBufferHob;
   EFI_STATUS                    Status;
-  VOID                          *Buffer;
+  EFI_PHYSICAL_ADDRESS          Buffer;
   UINTN                         Pages;
 
-  Pages  = sizeof (TCG_NVS);
-  Buffer = AllocateRuntimePages (Pages);
-  ASSERT (Buffer != NULL);
+  Pages  = EFI_SIZE_TO_PAGES (sizeof (TCG_NVS));
+  Status = PeiServicesAllocatePages (
+             EfiACPIMemoryNVS,
+             Pages,
+             &Buffer
+             );
+  ASSERT_EFI_ERROR (Status);
 
-  Status = MmUnblockMemoryRequest ((UINTN)Buffer, Pages);
+  Status = MmUnblockMemoryRequest (Buffer, Pages);
   if ((Status != EFI_UNSUPPORTED) && EFI_ERROR (Status)) {
     return Status;
   }
 
   Tcg2AcpiCommunicateBufferHob = BuildGuidHob (&gEdkiiTcg2AcpiCommunicateBufferHobGuid, sizeof (TCG2_ACPI_COMMUNICATE_BUFFER));
   ASSERT (Tcg2AcpiCommunicateBufferHob != NULL);
-  Tcg2AcpiCommunicateBufferHob->Tcg2AcpiCommunicateBuffer = (UINTN)Buffer;
+  Tcg2AcpiCommunicateBufferHob->Tcg2AcpiCommunicateBuffer = Buffer;
   Tcg2AcpiCommunicateBufferHob->Pages                     = Pages;
 
   return EFI_SUCCESS;

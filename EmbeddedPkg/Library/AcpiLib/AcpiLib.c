@@ -52,6 +52,9 @@ LocateAndInstallAcpiFromFvConditional (
   UINTN                          AcpiTableSize;
   UINTN                          AcpiTableKey;
   BOOLEAN                        Valid;
+  BOOLEAN                        FoundAcpiFile;
+
+  FoundAcpiFile = FALSE;
 
   // Ensure the ACPI Table is present
   Status = gBS->LocateProtocol (
@@ -107,47 +110,48 @@ LocateAndInstallAcpiFromFvConditional (
                              &SectionSize,
                              &FvStatus
                              );
-      if (!EFI_ERROR (Status)) {
-        AcpiTableKey  = 0;
-        AcpiTableSize = ((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Length;
-        ASSERT (SectionSize >= AcpiTableSize);
 
-        DEBUG ((
-          DEBUG_ERROR,
-          "- Found '%c%c%c%c' ACPI Table\n",
-          (((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature & 0xFF),
-          ((((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature >> 8) & 0xFF),
-          ((((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature >> 16) & 0xFF),
-          ((((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature >> 24) & 0xFF)
-          ));
-
-        // Is the ACPI table valid?
-        if (CheckAcpiTableFunction) {
-          Valid = CheckAcpiTableFunction ((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable);
-        } else {
-          Valid = TRUE;
-        }
-
-        // Install the ACPI Table
-        if (Valid) {
-          Status = AcpiProtocol->InstallAcpiTable (
-                                   AcpiProtocol,
-                                   AcpiTable,
-                                   AcpiTableSize,
-                                   &AcpiTableKey
-                                   );
-        }
-
-        // Free memory allocated by ReadSection
-        gBS->FreePool (AcpiTable);
-
-        if (EFI_ERROR (Status)) {
-          break;
-        }
-
-        // Increment the section instance
-        SectionInstance++;
+      if (EFI_ERROR (Status)) {
+        break;
       }
+
+      FoundAcpiFile = TRUE;
+
+      AcpiTableKey  = 0;
+      AcpiTableSize = ((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Length;
+      ASSERT (SectionSize >= AcpiTableSize);
+
+      DEBUG ((
+        DEBUG_ERROR,
+        "- Found '%c%c%c%c' ACPI Table\n",
+        (((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature & 0xFF),
+        ((((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature >> 8) & 0xFF),
+        ((((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature >> 16) & 0xFF),
+        ((((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable)->Signature >> 24) & 0xFF)
+        ));
+
+      // Is the ACPI table valid?
+      if (CheckAcpiTableFunction != NULL) {
+        Valid = CheckAcpiTableFunction ((EFI_ACPI_DESCRIPTION_HEADER *)AcpiTable);
+      } else {
+        Valid = TRUE;
+      }
+
+      // Install the ACPI Table
+      if (Valid) {
+        Status = AcpiProtocol->InstallAcpiTable (
+                                 AcpiProtocol,
+                                 AcpiTable,
+                                 AcpiTableSize,
+                                 &AcpiTableKey
+                                 );
+      }
+
+      // Free memory allocated by ReadSection
+      gBS->FreePool (AcpiTable);
+
+      // Increment the section instance
+      SectionInstance++;
     }
   }
 
@@ -157,7 +161,7 @@ FREE_HANDLE_BUFFER:
   //
   gBS->FreePool (HandleBuffer);
 
-  return EFI_SUCCESS;
+  return (FoundAcpiFile ? EFI_SUCCESS : EFI_NOT_FOUND);
 }
 
 /**
