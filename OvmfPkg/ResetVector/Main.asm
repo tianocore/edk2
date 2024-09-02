@@ -50,9 +50,10 @@ BITS    32
 Main32:
     OneTimeCall InitTdx
 
+%endif
+
 SearchBfv:
 
-%endif
 
     ;
     ; Search for the Boot Firmware Volume (BFV)
