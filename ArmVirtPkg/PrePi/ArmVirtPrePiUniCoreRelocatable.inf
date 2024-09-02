@@ -46,7 +46,6 @@
   TimerLib
   SerialPortLib
   ExtractGuidedSectionLib
-  LzmaDecompressLib
   PeCoffLib
   PrePiLib
   MemoryAllocationLib

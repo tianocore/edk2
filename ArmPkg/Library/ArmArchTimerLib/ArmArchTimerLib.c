@@ -62,6 +62,8 @@ MicroSecondDelay (
 {
   UINT64  TimerTicks64;
   UINT64  SystemCounterVal;
+  UINT64  PreviousSystemCounterVal;
+  UINT64  DeltaCounterVal;
 
   // Calculate counter ticks that represent requested delay:
   //  = MicroSeconds x TICKS_PER_MICRO_SEC
@@ -75,13 +77,17 @@ MicroSecondDelay (
                    );
 
   // Read System Counter value
-  SystemCounterVal = ArmGenericTimerGetSystemCount ();
-
-  TimerTicks64 += SystemCounterVal;
+  PreviousSystemCounterVal = ArmGenericTimerGetSystemCount ();
 
   // Wait until delay count expires.
-  while (SystemCounterVal < TimerTicks64) {
+  while (TimerTicks64 > 0) {
     SystemCounterVal = ArmGenericTimerGetSystemCount ();
+    // Get how much we advanced this tick. Wrap around still has delta correct
+    DeltaCounterVal = (SystemCounterVal - PreviousSystemCounterVal)
+                      & (MAX_UINT64 >> 8); // Account for a lesser (minimum) size
+    // Never wrap back around below zero by choosing the min and thus stop at 0
+    TimerTicks64            -= MIN (TimerTicks64, DeltaCounterVal);
+    PreviousSystemCounterVal = SystemCounterVal;
   }
 
   return MicroSeconds;

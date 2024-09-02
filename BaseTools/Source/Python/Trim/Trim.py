@@ -248,6 +248,23 @@ def TrimPreprocessedVfr(Source, Target):
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Target)
 
+# Create a banner to indicate the start and
+# end of the included ASL file. Banner looks like:-
+#
+#   /*************************************
+#   *               @param               *
+#   *************************************/
+#
+# @param Pathname       File pathname to be included in the banner
+#
+def AddIncludeHeader(Pathname):
+    StartLine = "/*" + '*' * (len(Pathname) + 4)
+    EndLine = '*' * (len(Pathname) + 4) + "*/"
+    Banner = '\n' + StartLine
+    Banner += '\n' + ('{0}  {1}  {0}'.format('*', Pathname))
+    Banner += '\n' + EndLine + '\n'
+    return Banner
+
 ## Read the content  ASL file, including ASL included, recursively
 #
 # @param  Source            File to be read
@@ -276,16 +293,18 @@ def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None, Inclu
                 try:
                     with open(IncludeFile, "r") as File:
                         F = File.readlines()
-                except:
+                except Exception:
                     with codecs.open(IncludeFile, "r", encoding='utf-8') as File:
                         F = File.readlines()
                 break
         else:
-            EdkLogger.error("Trim", "Failed to find include file %s" % Source)
+            EdkLogger.error("Trim", FILE_NOT_FOUND, ExtraData="Failed to find include file %s" % Source)
             return []
-    except:
-        EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
-        return []
+    except Exception as e:
+        if str(e) == str(FILE_NOT_FOUND):
+            raise
+        else:
+            EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
 
 
     # avoid A "include" B and B "include" A
@@ -312,7 +331,9 @@ def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None, Inclu
                     LocalSearchPath = os.path.dirname(IncludeFile)
             CurrentIndent = Indent + Result[0][0]
             IncludedFile = Result[0][1]
+            NewFileContent.append(AddIncludeHeader(IncludedFile+" --START"))
             NewFileContent.extend(DoInclude(IncludedFile, CurrentIndent, IncludePathList, LocalSearchPath,IncludeFileList,filetype))
+            NewFileContent.append(AddIncludeHeader(IncludedFile+" --END"))
             NewFileContent.append("\n")
         elif filetype == "ASM":
             Result = gIncludePattern.findall(Line)
@@ -324,7 +345,9 @@ def DoInclude(Source, Indent='', IncludePathList=[], LocalSearchPath=None, Inclu
 
             IncludedFile = IncludedFile.strip()
             IncludedFile = os.path.normpath(IncludedFile)
+            NewFileContent.append(AddIncludeHeader(IncludedFile+" --START"))
             NewFileContent.extend(DoInclude(IncludedFile, '', IncludePathList, LocalSearchPath,IncludeFileList,filetype))
+            NewFileContent.append(AddIncludeHeader(IncludedFile+" --END"))
             NewFileContent.append("\n")
 
     gIncludedAslFile.pop()

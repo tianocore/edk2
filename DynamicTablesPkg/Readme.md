@@ -514,4 +514,5 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |   7   | Sleep Block Info                          | |
 |   8   | Reset Block Info                          | |
 |   9   | Miscellaneous Block Info                  | |
+|  10   | Windows protection flag Info              | |
 |  `*`  | All other values are reserved.            | |
