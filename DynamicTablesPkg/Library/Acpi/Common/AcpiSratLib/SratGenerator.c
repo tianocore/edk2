@@ -599,7 +599,7 @@ ACPI_TABLE_GENERATOR  SratGenerator = {
   // Minimum supported ACPI Table Revision
   EFI_ACPI_6_3_SYSTEM_RESOURCE_AFFINITY_TABLE_REVISION,
   // Creator ID
-  TABLE_GENERATOR_CREATOR_ID_ARM,
+  TABLE_GENERATOR_CREATOR_ID,
   // Creator Revision
   SRAT_GENERATOR_REVISION,
   // Build Table function

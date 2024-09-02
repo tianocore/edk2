@@ -7,6 +7,8 @@ Copyright (c) 2018, Linaro, Ltd. All rights reserved. <BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+
+#include <Library/MmServicesTableLib.h>
 #include <Library/StandaloneMmMemLib.h>
 #include "Variable.h"
 
@@ -67,6 +69,17 @@ VariableNotifySmmWriteReady (
   VOID
   )
 {
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+
+  Handle = NULL;
+  Status = gMmst->MmInstallProtocolInterface (
+                    &Handle,
+                    &gSmmVariableWriteGuid,
+                    EFI_NATIVE_INTERFACE,
+                    NULL
+                    );
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**
