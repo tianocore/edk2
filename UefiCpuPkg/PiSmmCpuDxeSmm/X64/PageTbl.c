@@ -845,7 +845,7 @@ Exit:
 }
 
 /**
-  This function reads CR2 register when on-demand paging is enabled.
+  This function reads CR2 register.
 
   @param[out]  *Cr2  Pointer to variable to hold CR2 register value.
 **/
@@ -854,16 +854,11 @@ SaveCr2 (
   OUT UINTN  *Cr2
   )
 {
-  if (!mCpuSmmRestrictedMemoryAccess) {
-    //
-    // On-demand paging is enabled when access to non-SMRAM is not restricted.
-    //
-    *Cr2 = AsmReadCr2 ();
-  }
+  *Cr2 = AsmReadCr2 ();
 }
 
 /**
-  This function restores CR2 register when on-demand paging is enabled.
+  This function restores CR2 register.
 
   @param[in]  Cr2  Value to write into CR2 register.
 **/
@@ -872,12 +867,7 @@ RestoreCr2 (
   IN UINTN  Cr2
   )
 {
-  if (!mCpuSmmRestrictedMemoryAccess) {
-    //
-    // On-demand paging is enabled when access to non-SMRAM is not restricted.
-    //
-    AsmWriteCr2 (Cr2);
-  }
+  AsmWriteCr2 (Cr2);
 }
 
 /**
