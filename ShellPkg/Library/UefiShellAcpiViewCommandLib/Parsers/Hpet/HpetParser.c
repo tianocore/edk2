@@ -1,6 +1,7 @@
 /** @file
   HPET table parser
 
+  Copyright (c) 2024, Arm Limited. All rights reserved.
   Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -24,7 +25,8 @@ VOID
 EFIAPI
 DumpHpetPageProtectionFlag (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
@@ -71,7 +73,8 @@ VOID
 EFIAPI
 DumpHpetFlag (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
@@ -101,7 +104,8 @@ VOID
 EFIAPI
 DumpCounterSize (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
@@ -121,6 +125,7 @@ DumpCounterSize (
   This function validates the flags.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -128,8 +133,9 @@ STATIC
 VOID
 EFIAPI
 ValidateHpetRevId (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if ((*(UINT8 *)Ptr) == 0) {
@@ -163,7 +169,8 @@ VOID
 EFIAPI
 DumpHpetEventTimerBlockId (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {

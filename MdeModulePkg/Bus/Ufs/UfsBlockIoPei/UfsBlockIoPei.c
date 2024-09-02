@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2021, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -1017,6 +1017,55 @@ UfsEndOfPei (
 }
 
 /**
+  Finishes device initialization by setting fDeviceInit flag and waiting until device responds by
+  clearing it.
+
+  @param[in] Private  Pointer to the UFS_PEIM_HC_PRIVATE_DATA.
+
+  @retval EFI_SUCCESS  The operation succeeds.
+  @retval Others       The operation fails.
+
+**/
+EFI_STATUS
+UfsFinishDeviceInitialization (
+  IN UFS_PEIM_HC_PRIVATE_DATA  *Private
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       DeviceInitStatus;
+  UINT32      Timeout;
+
+  DeviceInitStatus = 0xFF;
+  Timeout          = PcdGet32 (PcdUfsInitialCompletionTimeout);
+
+  //
+  // The host enables the device initialization completion by setting fDeviceInit flag.
+  //
+  Status = UfsSetFlag (Private, UfsFlagDevInit);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  do {
+    Status = UfsReadFlag (Private, UfsFlagDevInit, &DeviceInitStatus);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    MicroSecondDelay (1);
+    Timeout--;
+  } while (DeviceInitStatus != 0 && Timeout != 0);
+
+  if (Timeout == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: DeviceInitStatus = %x EFI_TIMEOUT \n", __func__, DeviceInitStatus));
+    return EFI_TIMEOUT;
+  } else {
+    DEBUG ((DEBUG_INFO, "%a: Timeout left = %x EFI_SUCCESS \n", __func__, Timeout));
+    return EFI_SUCCESS;
+  }
+}
+
+/**
   The user code starts with this function.
 
   @param  FileHandle             Handle of the file being invoked.
@@ -1116,11 +1165,11 @@ InitializeUfsBlockIoPeim (
     }
 
     //
-    // The host enables the device initialization completion by setting fDeviceInit flag.
+    // Check the UFS device is initialized completed.
     //
-    Status = UfsSetFlag (Private, UfsFlagDevInit);
+    Status = UfsFinishDeviceInitialization (Private);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Ufs Set fDeviceInit Flag Error, Status = %r\n", Status));
+      DEBUG ((DEBUG_ERROR, "Device failed to finish initialization, Status = %r\n", Status));
       Controller++;
       continue;
     }

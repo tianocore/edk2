@@ -1,7 +1,7 @@
 /** @file
   SRAT table parser
 
-  Copyright (c) 2016 - 2020, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -25,6 +25,7 @@ STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
   This function validates the Reserved field in the SRAT table header.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -32,8 +33,9 @@ STATIC
 VOID
 EFIAPI
 ValidateSratReserved (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*(UINT32 *)Ptr != 1) {
@@ -47,6 +49,7 @@ ValidateSratReserved (
   Affinity Structure.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -54,8 +57,9 @@ STATIC
 VOID
 EFIAPI
 ValidateSratDeviceHandleType (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  DeviceHandleType;
@@ -77,13 +81,15 @@ ValidateSratDeviceHandleType (
 
   @param [in] Format  Format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpSratPciBdfNumber (
   IN CONST CHAR16  *Format,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   CHAR16  Buffer[OUTPUT_FIELD_COLUMN_WIDTH];
@@ -165,13 +171,15 @@ STATIC CONST ACPI_PARSER  SratDeviceHandlePciParser[] = {
 
   @param [in] Format  Format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpSratDeviceHandle (
   IN CONST CHAR16  *Format,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (SratDeviceHandleType == NULL) {
@@ -208,13 +216,15 @@ DumpSratDeviceHandle (
 
   @param [in] Format  Format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpSratApicProximity (
   IN CONST CHAR16  *Format,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   UINT32  ProximityDomain;

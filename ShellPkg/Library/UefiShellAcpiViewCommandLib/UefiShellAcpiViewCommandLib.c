@@ -2,7 +2,7 @@
   Main file for 'acpiview' Shell command function.
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
-  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2023, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -54,16 +54,19 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_2_DEBUG_PORT_2_TABLE_SIGNATURE,                                                           ParseAcpiDbg2 },
   { EFI_ACPI_6_2_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
     ParseAcpiDsdt },
+  { EFI_ACPI_6_5_ERROR_INJECTION_TABLE_SIGNATURE,                                                        ParseAcpiEinj },
   { EFI_ACPI_6_4_ERROR_RECORD_SERIALIZATION_TABLE_SIGNATURE,                                             ParseAcpiErst },
   { EFI_ACPI_6_3_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE,                                              ParseAcpiFacs },
   { EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,                                                 ParseAcpiFadt },
   { EFI_ACPI_6_4_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,                                              ParseAcpiGtdt },
+  { EFI_ACPI_6_5_HARDWARE_ERROR_SOURCE_TABLE_SIGNATURE,                                                  ParseAcpiHest },
   { EFI_ACPI_6_4_HETEROGENEOUS_MEMORY_ATTRIBUTE_TABLE_SIGNATURE,                                         ParseAcpiHmat },
   { EFI_ACPI_6_5_HIGH_PRECISION_EVENT_TIMER_TABLE_SIGNATURE,                                             ParseAcpiHpet },
   { EFI_ACPI_6_2_IO_REMAPPING_TABLE_SIGNATURE,                                                           ParseAcpiIort },
   { EFI_ACPI_6_2_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,                                              ParseAcpiMadt },
   { EFI_ACPI_6_2_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
     ParseAcpiMcfg },
+  { EFI_ACPI_MEMORY_SYSTEM_RESOURCE_PARTITIONING_AND_MONITORING_TABLE_SIGNATURE,                         ParseAcpiMpam },
   { EFI_ACPI_6_4_PLATFORM_COMMUNICATIONS_CHANNEL_TABLE_SIGNATURE,
     ParseAcpiPcct },
   { EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,

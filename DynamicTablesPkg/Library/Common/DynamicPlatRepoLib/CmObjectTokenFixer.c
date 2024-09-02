@@ -145,44 +145,28 @@ CONST
 CM_OBJECT_TOKEN_FIXER  TokenFixer[EArmObjMax] = {
   NULL,                             ///<  0 - Reserved
   NULL,                             ///<  1 - Boot Architecture Info
-  NULL,                             ///<  2 - CPU Info
-  NULL,                             ///<  3 - Power Management Profile Info
-  NULL,                             ///<  4 - GIC CPU Interface Info
-  NULL,                             ///<  5 - GIC Distributor Info
-  NULL,                             ///<  6 - GIC MSI Frame Info
-  NULL,                             ///<  7 - GIC Redistributor Info
-  NULL,                             ///<  8 - GIC ITS Info
-  NULL,                             ///<  9 - Serial Console Port Info
-  NULL,                             ///< 10 - Serial Debug Port Info
-  NULL,                             ///< 11 - Generic Timer Info
-  NULL,                             ///< 12 - Platform GT Block Info
-  NULL,                             ///< 13 - Generic Timer Block Frame Info
-  NULL,                             ///< 14 - Platform Generic Watchdog
-  NULL,                             ///< 15 - PCI Configuration Space Info
-  NULL,                             ///< 16 - Hypervisor Vendor Id
-  NULL,                             ///< 17 - Fixed feature flags for FADT
-  TokenFixerItsGroup,               ///< 18 - ITS Group
-  TokenFixerNamedComponentNode,     ///< 19 - Named Component
-  TokenFixerRootComplexNode,        ///< 20 - Root Complex
-  TokenFixerNotImplemented,         ///< 21 - SMMUv1 or SMMUv2
-  TokenFixerSmmuV3Node,             ///< 22 - SMMUv3
-  TokenFixerNotImplemented,         ///< 23 - PMCG
-  NULL,                             ///< 24 - GIC ITS Identifier Array
-  NULL,                             ///< 25 - ID Mapping Array
-  NULL,                             ///< 26 - SMMU Interrupt Array
-  TokenFixerNotImplemented,         ///< 27 - Processor Hierarchy Info
-  TokenFixerNotImplemented,         ///< 28 - Cache Info
-  TokenFixerNotImplemented,         ///< 29 - Processor Node ID Info
-  NULL,                             ///< 30 - CM Object Reference
-  NULL,                             ///< 31 - Memory Affinity Info
-  NULL,                             ///< 32 - Device Handle Acpi
-  NULL,                             ///< 33 - Device Handle Pci
-  NULL,                             ///< 34 - Generic Initiator Affinity
-  NULL,                             ///< 35 - Generic Serial Port Info
-  NULL,                             ///< 36 - CMN-600 Info
-  NULL,                             ///< 37 - Lpi Info
-  NULL,                             ///< 38 - Pci Address Map Info
-  NULL,                             ///< 39 - Pci Interrupt Map Info
+  NULL,                             ///<  2 - GIC CPU Interface Info
+  NULL,                             ///<  3 - GIC Distributor Info
+  NULL,                             ///<  4 - GIC MSI Frame Info
+  NULL,                             ///<  5 - GIC Redistributor Info
+  NULL,                             ///<  6 - GIC ITS Info
+  NULL,                             ///<  7 - Generic Timer Info
+  NULL,                             ///<  8 - Platform GT Block Info
+  NULL,                             ///<  9 - Generic Timer Block Frame Info
+  NULL,                             ///< 10 - Platform Generic Watchdog
+  TokenFixerItsGroup,               ///< 11 - ITS Group
+  TokenFixerNamedComponentNode,     ///< 12 - Named Component
+  TokenFixerRootComplexNode,        ///< 13 - Root Complex
+  TokenFixerNotImplemented,         ///< 14 - SMMUv1 or SMMUv2
+  TokenFixerSmmuV3Node,             ///< 15 - SMMUv3
+  TokenFixerNotImplemented,         ///< 16 - PMCG
+  NULL,                             ///< 17 - GIC ITS Identifier Array
+  NULL,                             ///< 18 - ID Mapping Array
+  NULL,                             ///< 19 - SMMU Interrupt Array
+  NULL,                             ///< 20 - CMN-600 Info
+  NULL,                             ///< 21 - Reserved Memory Range Node
+  NULL,                             ///< 22 - Memory Range Descriptor
+  NULL                              ///< 23 - Embedded Trace Extension/Module Info
 };
 
 /** CmObj token fixer.
@@ -209,12 +193,15 @@ FixupCmObjectSelfToken (
   CM_OBJECT_TOKEN_FIXER  TokenFixerFunc;
   CM_OBJECT_ID           ArmNamespaceObjId;
 
-  // Only support Arm objects for now.
-  if ((CmObjDesc == NULL)   ||
-      (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceArm))
-  {
+  if (CmObjDesc == NULL) {
     ASSERT (0);
     return EFI_INVALID_PARAMETER;
+  }
+
+  // Only support Arm objects for now.
+  if (GET_CM_NAMESPACE_ID (CmObjDesc->ObjectId) != EObjNameSpaceArm) {
+    ASSERT (0);
+    return EFI_UNSUPPORTED;
   }
 
   ArmNamespaceObjId = GET_CM_OBJECT_ID (CmObjDesc->ObjectId);

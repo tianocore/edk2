@@ -2,7 +2,7 @@
   Header file for ACPI parser
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
-  Copyright (c) 2016 - 2020, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -130,12 +130,14 @@ DumpUint64 (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump3Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -146,12 +148,14 @@ Dump3Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump4Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -162,12 +166,14 @@ Dump4Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump6Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -178,12 +184,14 @@ Dump6Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump8Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -194,12 +202,70 @@ Dump8Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump12Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN       UINT8   *Ptr
+  IN       UINT8   *Ptr,
+  IN UINT32        Length
+  );
+
+/**
+  This function traces 16 characters which can be optionally
+  formated using the format string if specified.
+
+  If no format string is specified the Format must be NULL.
+
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
+**/
+VOID
+EFIAPI
+Dump16Chars (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
+  );
+
+/**
+  This function traces reserved fields up to 8 bytes in length.
+
+  Format string is ignored by this function as the reserved field is printed
+  byte by byte with intermittent spacing <eg: 0 0 0 0>. Use DumpxChars for any
+  other use case.
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
+**/
+VOID
+EFIAPI
+DumpReserved (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
+  );
+
+/**
+  This function traces reserved fields up to 64 bits in length.
+
+  Format string is ignored by this function as the reserved field is printed
+  byte by byte with intermittent spacing. eg: <0 0 0 0>. When the field length
+  isn't a multiple of 8, the number of bytes are "ceil"-ed by one. eg for 27
+  bits <0 0 0 0>
+
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field as number of bits.
+**/
+VOID
+EFIAPI
+DumpReservedBits (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -227,18 +293,24 @@ PrintFieldName (
   @param [in] Format  Format string for tracing the data as specified by
                       the 'Format' member of ACPI_PARSER.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
-typedef VOID (EFIAPI *FNPTR_PRINT_FORMATTER)(CONST CHAR16 *Format, UINT8 *Ptr);
+typedef VOID (EFIAPI *FNPTR_PRINT_FORMATTER)(CONST CHAR16 *Format, UINT8 *Ptr, UINT32 Length);
 
 /**
   This function pointer is the template for validating an ACPI table field.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information as specified by
                       the 'Context' member of the ACPI_PARSER.
                       e.g. this could be a pointer to the ACPI table header.
 **/
-typedef VOID (EFIAPI *FNPTR_FIELD_VALIDATOR)(UINT8 *Ptr, VOID *Context);
+typedef VOID (EFIAPI *FNPTR_FIELD_VALIDATOR)(
+  UINT8 *Ptr,
+  UINT32 Length,
+  VOID *Context
+  );
 
 /**
   The ACPI_PARSER structure describes the fields of an ACPI table and
@@ -468,12 +540,14 @@ DumpGasStruct (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 DumpGas (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   );
 
 /**
@@ -617,6 +691,27 @@ ParseAcpiDsdt (
   );
 
 /**
+  This function parses the EINJ table.
+  When trace is enabled this function parses the EINJ table and
+  traces the ACPI table fields.
+
+  This function also performs validation of the ACPI table fields.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiEinj (
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
+  );
+
+/**
   This function parses the ACPI ERST table.
   When trace is enabled this function parses the ERST table and
   traces the ACPI table fields.
@@ -698,6 +793,27 @@ ParseAcpiFadt (
 VOID
 EFIAPI
 ParseAcpiGtdt (
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
+  );
+
+/**
+  This function parses the ACPI HEST table.
+  When trace is enabled this function parses the HEST table and
+  traces the ACPI table fields.
+
+  This function also performs validation of the ACPI table fields.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiHest (
   IN BOOLEAN  Trace,
   IN UINT8    *Ptr,
   IN UINT32   AcpiTableLength,
@@ -820,6 +936,27 @@ ParseAcpiMadt (
 VOID
 EFIAPI
 ParseAcpiMcfg (
+  IN BOOLEAN  Trace,
+  IN UINT8    *Ptr,
+  IN UINT32   AcpiTableLength,
+  IN UINT8    AcpiTableRevision
+  );
+
+/**
+  This function parses the ACPI MPAM table.
+  When trace is enabled this function parses the MPAM table and
+  traces the ACPI table fields.
+
+  This function also performs validation of the ACPI table fields.
+
+  @param [in] Trace              If TRUE, trace the ACPI fields.
+  @param [in] Ptr                Pointer to the start of the buffer.
+  @param [in] AcpiTableLength    Length of the ACPI table.
+  @param [in] AcpiTableRevision  Revision of the ACPI table.
+**/
+VOID
+EFIAPI
+ParseAcpiMpam (
   IN BOOLEAN  Trace,
   IN UINT8    *Ptr,
   IN UINT32   AcpiTableLength,

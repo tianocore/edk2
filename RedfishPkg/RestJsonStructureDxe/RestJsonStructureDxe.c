@@ -373,7 +373,7 @@ InterpreterInstanceDestoryJsonStruct (
 
   Status = EFI_UNSUPPORTED;
   //
-  // Check if the namesapce and version is supported by this interpreter.
+  // Check if the namespace and version is supported by this interpreter.
   //
   ThisSupportedRsrcTypeId = InterpreterInstance->SupportedRsrcIndentifier;
   for (Index = 0; Index < InterpreterInstance->NumberOfNameSpaceToConvert; Index++) {

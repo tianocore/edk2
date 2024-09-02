@@ -52,6 +52,8 @@
 
 [Ppis]
   gEfiPeiLoadFilePpiGuid                 ## PRODUCES
+  gEfiEndOfPeiSignalPpiGuid              ## CONSUMES
+  gUplReadyToPayloadPpiGuid              ## PRODUCES
 
 [Pcd]
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister
@@ -59,6 +61,16 @@
 
 [Guids]
   gUniversalPayloadExtraDataGuid         ## PRODUCES
+  gUniversalPayloadBaseGuid              ## PRODUCES
 
 [Depex]
   TRUE
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /wd4244
+  GCC:*_*_IA32_CC_FLAGS    = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_X64_CC_FLAGS     = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_ARM_CC_FLAGS     = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_AARCH64_CC_FLAGS = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_RISCV64_CC_FLAGS = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast
+  GCC:*_*_LOONGARCH64_CC_FLAGS = -Wno-error=pointer-to-int-cast -Wno-error=int-to-pointer-cast

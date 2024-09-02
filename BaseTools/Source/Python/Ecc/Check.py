@@ -181,7 +181,6 @@ class Check(object):
 
     # General Checking
     def GeneralCheck(self):
-        self.GeneralCheckNonAcsii()
         self.UniCheck()
         self.GeneralCheckNoTab()
         self.GeneralCheckLineEnding()
@@ -237,25 +236,6 @@ class Check(object):
                         if Line.replace('\r', '').replace('\n', '').endswith(' '):
                             OtherMsg = "File %s has trailing white spaces at line %s" % (Record[1], IndexOfLine)
                             EccGlobalData.gDb.TblReport.Insert(ERROR_GENERAL_CHECK_TRAILING_WHITE_SPACE_LINE, OtherMsg=OtherMsg, BelongsToTable='File', BelongsToItem=Record[0])
-
-    # Check whether file has non ACSII char
-    def GeneralCheckNonAcsii(self):
-        if EccGlobalData.gConfig.GeneralCheckNonAcsii == '1' or EccGlobalData.gConfig.GeneralCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
-            EdkLogger.quiet("Checking Non-ACSII char in file ...")
-            SqlCommand = """select ID, FullPath, ExtName from File where ExtName in ('.dec', '.inf', '.dsc', 'c', 'h')"""
-            RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
-            for Record in RecordSet:
-                if Record[2].upper() not in EccGlobalData.gConfig.BinaryExtList:
-                    op = open(Record[1]).readlines()
-                    IndexOfLine = 0
-                    for Line in op:
-                        IndexOfLine += 1
-                        IndexOfChar = 0
-                        for Char in Line:
-                            IndexOfChar += 1
-                            if ord(Char) > 126:
-                                OtherMsg = "File %s has Non-ASCII char at line %s column %s" % (Record[1], IndexOfLine, IndexOfChar)
-                                EccGlobalData.gDb.TblReport.Insert(ERROR_GENERAL_CHECK_NON_ACSII, OtherMsg=OtherMsg, BelongsToTable='File', BelongsToItem=Record[0])
 
     # C Function Layout Checking
     def FunctionLayoutCheck(self):

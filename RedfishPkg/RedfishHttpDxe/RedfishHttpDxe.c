@@ -94,6 +94,67 @@ RedfishRetryRequired (
 
 /**
 
+  This function follows below sections in Redfish specification to
+  check HTTP status code and see if this is success response or not.
+
+  7.5.2 Modification success responses
+  7.11 POST (action)
+
+  @param[in]  Method          HTTP method of this status code.
+  @param[in]  StatusCode      HTTP status code.
+
+  @retval     BOOLEAN         Return true when this is success response.
+                              Return false when this is not success response.
+
+**/
+BOOLEAN
+RedfishSuccessResponse (
+  IN EFI_HTTP_METHOD       Method,
+  IN EFI_HTTP_STATUS_CODE  *StatusCode
+  )
+{
+  BOOLEAN  SuccessResponse;
+
+  if (StatusCode == NULL) {
+    return TRUE;
+  }
+
+  SuccessResponse = FALSE;
+  switch (Method) {
+    case HttpMethodPost:
+      if ((*StatusCode ==   HTTP_STATUS_200_OK) ||
+          (*StatusCode ==   HTTP_STATUS_201_CREATED) ||
+          (*StatusCode == HTTP_STATUS_202_ACCEPTED) ||
+          (*StatusCode == HTTP_STATUS_204_NO_CONTENT))
+      {
+        SuccessResponse = TRUE;
+      }
+
+      break;
+    case HttpMethodPatch:
+    case HttpMethodPut:
+    case HttpMethodDelete:
+      if ((*StatusCode ==   HTTP_STATUS_200_OK) ||
+          (*StatusCode == HTTP_STATUS_202_ACCEPTED) ||
+          (*StatusCode == HTTP_STATUS_204_NO_CONTENT))
+      {
+        SuccessResponse = TRUE;
+      }
+
+      break;
+    default:
+      //
+      // Return true for unsupported method to prevent false alarm.
+      //
+      SuccessResponse = TRUE;
+      break;
+  }
+
+  return SuccessResponse;
+}
+
+/**
+
   Convert Unicode string to ASCII string. It's call responsibility to release returned buffer.
 
   @param[in]  UnicodeStr      Unicode string to convert.
@@ -313,10 +374,10 @@ RedfishCreateRedfishService (
                                             &Username,
                                             &Password
                                             );
-    if (EFI_ERROR (Status) || IS_EMPTY_STRING (Username) || IS_EMPTY_STRING (Password)) {
+    if (EFI_ERROR (Status) || ((AuthMethod != AuthMethodNone) && (IS_EMPTY_STRING (Username) || IS_EMPTY_STRING (Password)))) {
       DEBUG ((DEBUG_ERROR, "%a: cannot get authentication information: %r\n", __func__, Status));
       goto ON_RELEASE;
-    } else {
+    } else if (AuthMethod != AuthMethodNone) {
       DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Auth method: 0x%x username: %a password: %a\n", __func__, AuthMethod, Username, Password));
 
       //
@@ -371,6 +432,14 @@ RedfishCreateRedfishService (
   NewService = CreateRedfishService (Host, AsciiLocation, EncodedAuthString, NULL, RestEx);
   if (NewService == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: CreateRedfishService\n", __func__));
+    goto ON_RELEASE;
+  }
+
+  if (Private->CredentialProtocol != NULL) {
+    Status = Private->CredentialProtocol->RegisterRedfishService (Private->CredentialProtocol, NewService);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to register Redfish service - %r\n", __func__, Status));
+    }
   }
 
 ON_RELEASE:
@@ -424,15 +493,31 @@ RedfishFreeRedfishService (
   IN  REDFISH_SERVICE              RedfishService
   )
 {
-  REDFISH_SERVICE_PRIVATE  *Service;
+  EFI_STATUS                  Status;
+  REDFISH_SERVICE_PRIVATE     *Service;
+  REDFISH_HTTP_CACHE_PRIVATE  *Private;
 
   if ((This == NULL) || (RedfishService == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
+  Private = REDFISH_HTTP_CACHE_PRIVATE_FROM_THIS (This);
+
   Service = (REDFISH_SERVICE_PRIVATE *)RedfishService;
   if (Service->Signature != REDFISH_HTTP_SERVICE_SIGNATURE) {
     DEBUG ((DEBUG_ERROR, "%a: signature check failure\n", __func__));
+  }
+
+  if (Private->CredentialProtocol != NULL) {
+    Status = Private->CredentialProtocol->UnregisterRedfishService (Private->CredentialProtocol, RedfishService);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to unregister Redfish service - %r\n", __func__, Status));
+    } else {
+      if (Service->RestEx != NULL) {
+        Status = Service->RestEx->Configure (Service->RestEx, NULL);
+        DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: release RestEx instance: %r\n", __func__, Status));
+      }
+    }
   }
 
   return ReleaseRedfishService (Service);
@@ -800,7 +885,7 @@ RedfishPatchResource (
   DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Resource is updated, expire URI: %s\n", __func__, Uri));
   RedfishExpireResponse (This, Uri);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || !RedfishSuccessResponse (HttpMethodPatch, Response->StatusCode)) {
     DEBUG_CODE (
       DumpRedfishResponse (NULL, DEBUG_ERROR, Response);
       );
@@ -917,7 +1002,7 @@ RedfishPutResource (
   DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Resource is updated, expire URI: %s\n", __func__, Uri));
   RedfishExpireResponse (This, Uri);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || !RedfishSuccessResponse (HttpMethodPut, Response->StatusCode)) {
     DEBUG_CODE (
       DumpRedfishResponse (NULL, DEBUG_ERROR, Response);
       );
@@ -1034,7 +1119,7 @@ RedfishPostResource (
   DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Resource is updated, expire URI: %s\n", __func__, Uri));
   RedfishExpireResponse (This, Uri);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || !RedfishSuccessResponse (HttpMethodPost, Response->StatusCode)) {
     DEBUG_CODE (
       DumpRedfishResponse (NULL, DEBUG_ERROR, Response);
       );
@@ -1153,7 +1238,7 @@ RedfishDeleteResource (
   DEBUG ((REDFISH_HTTP_CACHE_DEBUG, "%a: Resource is updated, expire URI: %s\n", __func__, Uri));
   RedfishExpireResponse (This, Uri);
 
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || !RedfishSuccessResponse (HttpMethodDelete, Response->StatusCode)) {
     DEBUG_CODE (
       DumpRedfishResponse (NULL, DEBUG_ERROR, Response);
       );
@@ -1245,10 +1330,10 @@ CredentialProtocolInstalled (
   }
 
   //
-  // Locate HII database protocol.
+  // Locate HII credential protocol.
   //
   Status = gBS->LocateProtocol (
-                  &gEdkIIRedfishCredentialProtocolGuid,
+                  &gEdkIIRedfishCredential2ProtocolGuid,
                   NULL,
                   (VOID **)&Private->CredentialProtocol
                   );
@@ -1327,14 +1412,14 @@ RedfishHttpEntryPoint (
   // Install protocol notification if credential protocol is installed.
   //
   mRedfishHttpCachePrivate->NotifyEvent = EfiCreateProtocolNotifyEvent (
-                                            &gEdkIIRedfishCredentialProtocolGuid,
+                                            &gEdkIIRedfishCredential2ProtocolGuid,
                                             TPL_CALLBACK,
                                             CredentialProtocolInstalled,
                                             mRedfishHttpCachePrivate,
                                             &Registration
                                             );
   if (mRedfishHttpCachePrivate->NotifyEvent == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to create protocol notification for gEdkIIRedfishCredentialProtocolGuid\n", __func__));
+    DEBUG ((DEBUG_ERROR, "%a: failed to create protocol notification for gEdkIIRedfishCredential2ProtocolGuid\n", __func__));
     ASSERT (FALSE);
     RedfishHttpDriverUnload (ImageHandle);
     return Status;

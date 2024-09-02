@@ -28,6 +28,7 @@
   Copyright (C) 2012, Red Hat, Inc.
   Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
+  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -430,7 +431,7 @@ VirtioScsiPassThru (
   VSCSI_DEV                  *Dev;
   UINT16                     TargetValue;
   EFI_STATUS                 Status;
-  volatile VIRTIO_SCSI_REQ   Request;
+  volatile VIRTIO_SCSI_REQ   *Request;
   volatile VIRTIO_SCSI_RESP  *Response;
   VOID                       *ResponseBuffer;
   DESC_INDICES               Indices;
@@ -455,7 +456,10 @@ VirtioScsiPassThru (
   InDataDeviceAddress  = 0;
   OutDataDeviceAddress = 0;
 
-  ZeroMem ((VOID *)&Request, sizeof (Request));
+  Request = AllocateZeroPool (sizeof (*Request));
+  if (Request == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   Dev = VIRTIO_SCSI_FROM_PASS_THRU (This);
   CopyMem (&TargetValue, Target, sizeof TargetValue);
@@ -464,9 +468,9 @@ VirtioScsiPassThru (
   OutDataBufferIsMapped = FALSE;
   InDataNumPages        = 0;
 
-  Status = PopulateRequest (Dev, TargetValue, Lun, Packet, &Request);
+  Status = PopulateRequest (Dev, TargetValue, Lun, Packet, Request);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto FreeScsiRequest;
   }
 
   //
@@ -475,13 +479,14 @@ VirtioScsiPassThru (
   Status = VirtioMapAllBytesInSharedBuffer (
              Dev->VirtIo,
              VirtioOperationBusMasterRead,
-             (VOID *)&Request,
-             sizeof Request,
+             (VOID *)Request,
+             sizeof (*Request),
              &RequestDeviceAddress,
              &RequestMapping
              );
   if (EFI_ERROR (Status)) {
-    return ReportHostAdapterError (Packet);
+    Status = ReportHostAdapterError (Packet);
+    goto FreeScsiRequest;
   }
 
   //
@@ -605,7 +610,7 @@ VirtioScsiPassThru (
   VirtioAppendDesc (
     &Dev->Ring,
     RequestDeviceAddress,
-    sizeof Request,
+    sizeof (*Request),
     VRING_DESC_F_NEXT,
     &Indices
     );
@@ -701,6 +706,9 @@ FreeInDataBuffer:
 
 UnmapRequestBuffer:
   Dev->VirtIo->UnmapSharedBuffer (Dev->VirtIo, RequestMapping);
+
+FreeScsiRequest:
+  FreePool ((VOID *)Request);
 
   return Status;
 }
