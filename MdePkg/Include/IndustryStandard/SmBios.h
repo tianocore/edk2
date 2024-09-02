@@ -887,7 +887,8 @@ typedef enum {
   ProcessorUpgradeSocketBGA2551   = 0x54,
   ProcessorUpgradeSocketLGA1851   = 0x55,
   ProcessorUpgradeSocketBGA2114   = 0x56,
-  ProcessorUpgradeSocketBGA2833   = 0x57
+  ProcessorUpgradeSocketBGA2833   = 0x57,
+  ProcessorUpgradeInvalid         = 0xFF
 } PROCESSOR_UPGRADE;
 
 ///
