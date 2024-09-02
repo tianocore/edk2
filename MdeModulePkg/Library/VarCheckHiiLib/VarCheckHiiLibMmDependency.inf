@@ -1,0 +1,53 @@
+## @file
+#  VarCheckHiiLib Dependency library.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = VarCheckHiiLibMmDependency
+  FILE_GUID                      = DF61C3DC-B08C-44B7-B771-9E4BCBBE0811
+  MODULE_TYPE                    = DXE_DRIVER
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = VarCheckHiiLibMmDependencyConstructor
+
+[Sources]
+  VarCheckHiiLibMmDependency.c
+  VarCheckHii.h
+  VarCheckHiiGenFromFv.c
+  VarCheckHiiGenFromHii.c
+  VarCheckHiiGen.c
+  VarCheckHiiGen.h
+  InternalVarCheckStructure.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  UefiLib
+  PcdLib
+
+[Guids]
+  gEdkiiIfrBitVarstoreGuid
+  gEfiEndOfDxeEventGroupGuid
+  gEdkiiPiSmmCommunicationRegionTableGuid
+
+[Protocols]
+  gEfiMmEndOfDxeProtocolGuid
+  gEfiMmCommunicationProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid           ## SOMETIMES_CONSUMES
+  gEfiFirmwareVolumeBlock2ProtocolGuid      ## SOMETIMES_CONSUMES
+  gEfiHiiDatabaseProtocolGuid               ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVarCheckVfrDriverGuidArray   ## SOMETIMES_CONSUMES
