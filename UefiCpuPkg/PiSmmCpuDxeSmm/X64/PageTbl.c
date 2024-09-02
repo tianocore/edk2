@@ -815,7 +815,7 @@ SmiPFHandler (
       goto Exit;
     }
 
-    if (mCpuSmmRestrictedMemoryAccess && IsSmmCommBufferForbiddenAddress (PFAddress)) {
+    if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%lx)!\n", PFAddress));
     }
   }
