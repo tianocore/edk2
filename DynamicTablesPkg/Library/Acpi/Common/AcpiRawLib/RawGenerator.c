@@ -81,7 +81,7 @@ ACPI_TABLE_GENERATOR  RawGenerator = {
   // Minimum ACPI Table Revision - Unused
   0,
   // Creator ID
-  TABLE_GENERATOR_CREATOR_ID_ARM,
+  TABLE_GENERATOR_CREATOR_ID,
   // Creator Revision
   RAW_GENERATOR_REVISION,
   // Build Table function

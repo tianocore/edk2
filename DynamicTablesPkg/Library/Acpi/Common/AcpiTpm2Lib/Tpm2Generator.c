@@ -341,7 +341,7 @@ ACPI_TABLE_GENERATOR  Tpm2Generator = {
   // Minimum supported ACPI Table Revision
   EFI_TPM2_ACPI_TABLE_REVISION_4,
   // Creator ID
-  TABLE_GENERATOR_CREATOR_ID_ARM,
+  TABLE_GENERATOR_CREATOR_ID,
   // Creator Revision
   TPM2_GENERATOR_REVISION,
   // Build Table function
