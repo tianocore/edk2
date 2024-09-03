@@ -53,6 +53,11 @@
 
 [Components.IA32, Components.X64]
   #
+  # Generators (IA32/X64 specific)
+  #
+  DynamicTablesPkg/Library/Acpi/X64/AcpiWsmtLib/AcpiWsmtLib.inf
+
+  #
   # Dynamic Table Factory Dxe
   #
   DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf {
@@ -60,6 +65,7 @@
       # Generators
       #   Common
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiFadtLib/AcpiFadtLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiWsmtLib/AcpiWsmtLib.inf
   }
 
 [Components.ARM, Components.AARCH64]

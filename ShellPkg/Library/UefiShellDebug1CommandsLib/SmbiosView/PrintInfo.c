@@ -524,6 +524,10 @@ SmbiosPrintStructure (
         ShellPrintEx (-1, -1, L"Thread Enabled: %u\n", Struct->Type4->ThreadEnabled);
       }
 
+      if (AE_SMBIOS_VERSION (0x3, 0x8) && (Struct->Hdr->Length > 0x30)) {
+        ShellPrintEx (-1, -1, L"Socket Type: %a\n", LibGetSmbiosString (Struct, Struct->Type4->SocketType));
+      }
+
       break;
 
     //
