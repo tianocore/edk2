@@ -116,7 +116,7 @@ AmlCodeGenDefinitionBlock (
   CopyMem (&AcpiHeader.OemId, OemId, 6);
   CopyMem (&AcpiHeader.OemTableId, OemTableId, 8);
   AcpiHeader.OemRevision     = OemRevision;
-  AcpiHeader.CreatorId       = TABLE_GENERATOR_CREATOR_ID_ARM;
+  AcpiHeader.CreatorId       = TABLE_GENERATOR_CREATOR_ID;
   AcpiHeader.CreatorRevision = CREATE_REVISION (1, 0);
 
   Status = AmlCreateRootNode (&AcpiHeader, NewRootNode);
