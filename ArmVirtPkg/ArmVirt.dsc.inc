@@ -87,10 +87,6 @@
 
   # Networking Requirements
 !include NetworkPkg/NetworkLibs.dsc.inc
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
-!endif
-
 
   #
   # It is not possible to prevent the ARM compiler from inserting calls to intrinsic functions.
@@ -155,7 +151,6 @@
 !else
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
 !endif
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
   ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
   ArmMonitorLib|ArmPkg/Library/ArmMonitorLib/ArmMonitorLib.inf
@@ -262,12 +257,20 @@
 !endif
   VariablePolicyLib|MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
 
-!if $(SECURE_BOOT_ENABLE) == TRUE
+[LibraryClasses.AARCH64.DXE_RUNTIME_DRIVER]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
-!endif
+
+[LibraryClasses.ARM.DXE_RUNTIME_DRIVER]
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/RuntimeCryptLib.inf
+
+[LibraryClasses.AARCH64]
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
+  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 
 [LibraryClasses.ARM]
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/BaseCryptLib.inf
+  MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
 
 [BuildOptions]
