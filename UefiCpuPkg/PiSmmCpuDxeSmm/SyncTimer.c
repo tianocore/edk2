@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 UINT64  mTimeoutTicker = 0;
 
@@ -31,16 +31,22 @@ InitializeSmmTimer (
   )
 {
   UINT64  TimerFrequency;
+  UINT64  SyncTimeout;
+  UINT64  SyncTimeout2;
   UINT64  Start;
   UINT64  End;
 
+  SyncTimeout  = 0;
+  SyncTimeout2 = 0;
+  GetSmmCpuSyncConfigData (NULL, &SyncTimeout, &SyncTimeout2);
+
   TimerFrequency = GetPerformanceCounterProperties (&Start, &End);
   mTimeoutTicker = DivU64x32 (
-                     MultU64x64 (TimerFrequency, PcdGet64 (PcdCpuSmmApSyncTimeout)),
+                     MultU64x64 (TimerFrequency, SyncTimeout),
                      1000 * 1000
                      );
   mTimeoutTicker2 = DivU64x32 (
-                      MultU64x64 (TimerFrequency, PcdGet64 (PcdCpuSmmApSyncTimeout2)),
+                      MultU64x64 (TimerFrequency, SyncTimeout2),
                       1000 * 1000
                       );
   if (End < Start) {

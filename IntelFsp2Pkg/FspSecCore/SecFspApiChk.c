@@ -31,7 +31,7 @@ FspApiCallingCheck (
     //
     // NotifyPhase check
     //
-    if ((FspData == NULL) || ((UINTN)FspData == MAX_ADDRESS) || ((UINTN)FspData == MAX_UINT32)) {
+    if ((FspData == NULL) || ((UINT32)(UINTN)FspData == MAX_UINT32)) {
       Status = EFI_UNSUPPORTED;
     } else {
       if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
@@ -42,7 +42,7 @@ FspApiCallingCheck (
     //
     // FspMemoryInit check
     //
-    if (((UINTN)FspData != MAX_ADDRESS) && ((UINTN)FspData != MAX_UINT32)) {
+    if ((UINT32)(UINTN)FspData != MAX_UINT32) {
       Status = EFI_UNSUPPORTED;
     } else if (ApiParam == NULL) {
       Status = EFI_SUCCESS;
@@ -53,7 +53,7 @@ FspApiCallingCheck (
     //
     // TempRamExit check
     //
-    if ((FspData == NULL) || ((UINTN)FspData == MAX_ADDRESS) || ((UINTN)FspData == MAX_UINT32)) {
+    if ((FspData == NULL) || ((UINT32)(UINTN)FspData == MAX_UINT32)) {
       Status = EFI_UNSUPPORTED;
     } else {
       if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
@@ -64,7 +64,7 @@ FspApiCallingCheck (
     //
     // FspSiliconInit check
     //
-    if ((FspData == NULL) || ((UINTN)FspData == MAX_ADDRESS) || ((UINTN)FspData == MAX_UINT32)) {
+    if ((FspData == NULL) || ((UINT32)(UINTN)FspData == MAX_UINT32)) {
       Status = EFI_UNSUPPORTED;
     } else {
       if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {
@@ -83,14 +83,14 @@ FspApiCallingCheck (
       }
     }
   } else if (ApiIdx == FspMultiPhaseMemInitApiIndex) {
-    if ((FspData == NULL) || ((UINTN)FspData == MAX_ADDRESS) || ((UINTN)FspData == MAX_UINT32)) {
+    if ((FspData == NULL) || ((UINT32)(UINTN)FspData == MAX_UINT32)) {
       Status = EFI_UNSUPPORTED;
     }
   } else if (ApiIdx == FspSmmInitApiIndex) {
     //
     // FspSmmInitApiIndex check
     //
-    if ((FspData == NULL) || ((UINTN)FspData == MAX_ADDRESS) || ((UINTN)FspData == MAX_UINT32)) {
+    if ((FspData == NULL) || ((UINT32)(UINTN)FspData == MAX_UINT32)) {
       Status = EFI_UNSUPPORTED;
     } else {
       if (FspData->Signature != FSP_GLOBAL_DATA_SIGNATURE) {

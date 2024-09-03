@@ -19,7 +19,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
+#include <Library/HobLib.h>
 #include <Library/UefiLib.h>
+#include <Guid/MmCommBuffer.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
 
 #define DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES  4
@@ -44,8 +46,11 @@ SmmCommunicationBufferEntryPoint (
   UINT32                                   DescriptorSize;
   EDKII_PI_SMM_COMMUNICATION_REGION_TABLE  *PiSmmCommunicationRegionTable;
   EFI_MEMORY_DESCRIPTOR                    *Entry;
+  EFI_HOB_GUID_TYPE                        *GuidHob;
+  MM_COMM_BUFFER                           *MmCommBuffer;
 
   DescriptorSize = sizeof (EFI_MEMORY_DESCRIPTOR);
+
   //
   // Make sure Size != sizeof(EFI_MEMORY_DESCRIPTOR). This will
   // prevent people from having pointer math bugs in their code.
@@ -65,11 +70,21 @@ SmmCommunicationBufferEntryPoint (
   PiSmmCommunicationRegionTable->DescriptorSize  = DescriptorSize;
   Entry                                          = (EFI_MEMORY_DESCRIPTOR *)(PiSmmCommunicationRegionTable + 1);
   Entry->Type                                    = EfiConventionalMemory;
-  Entry->PhysicalStart                           = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedPages (DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES);
+
+  GuidHob = GetFirstGuidHob (&gMmCommBufferHobGuid);
+
+  if (GuidHob == NULL) {
+    Entry->PhysicalStart = (EFI_PHYSICAL_ADDRESS)(UINTN)AllocateReservedPages (DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES);
+    Entry->NumberOfPages = DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES;
+  } else {
+    MmCommBuffer         = GET_GUID_HOB_DATA (GuidHob);
+    Entry->PhysicalStart = MmCommBuffer->PhysicalStart;
+    Entry->NumberOfPages = MmCommBuffer->NumberOfPages;
+  }
+
   ASSERT (Entry->PhysicalStart != 0);
-  Entry->VirtualStart  = 0;
-  Entry->NumberOfPages = DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES;
-  Entry->Attribute     = 0;
+  Entry->VirtualStart = 0;
+  Entry->Attribute    = 0;
 
   DEBUG ((DEBUG_INFO, "PiSmmCommunicationRegionTable:(0x%x)\n", PiSmmCommunicationRegionTable));
   DEBUG ((DEBUG_INFO, "  Version         - 0x%x\n", PiSmmCommunicationRegionTable->Version));
