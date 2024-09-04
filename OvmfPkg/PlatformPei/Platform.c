@@ -316,6 +316,12 @@ InitializePlatform (
     TdxHelperBuildGuidHobForTdxMeasurement ();
   }
 
+  Status = PlatformInitFwCfgCachedItems ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "PlatformInitFwCfgCachedItems Failed!\n"));
+    return Status;
+  }
+
   PlatformInfoHob->SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
   PlatformInfoHob->SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
   PlatformInfoHob->PcdPciMmio64Size    = PcdGet64 (PcdPciMmio64Size);
