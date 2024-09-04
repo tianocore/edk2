@@ -90,6 +90,9 @@
   ## Include/Protocol/EdkIIRedfishCredential.h
   gEdkIIRedfishCredentialProtocolGuid = { 0x8804377, 0xaf7a, 0x4496, { 0x8a, 0x7b, 0x17, 0x59, 0x0, 0xe9, 0xab, 0x46 } }
 
+  ## Include/Protocol/EdkIIRedfishCredential.h
+  gEdkIIRedfishCredential2ProtocolGuid = { 0x936b81dc, 0x348c, 0x42e3, { 0x9e, 0x82, 0x2, 0x91, 0x4f, 0xd3, 0x48, 0x86 } }
+
   ## Include/Protocol/Edk2RedfishConfigHandler.h
   gEdkIIRedfishConfigHandlerProtocolGuid = { 0xbc0fe6bb, 0x2cc9, 0x463e, { 0x90, 0x82, 0xfa, 0x11, 0x76, 0xfc, 0x67, 0xde } }
 
@@ -208,3 +211,7 @@
   #
   # Redfish RedfishPlatformConfigDxe feature Properties
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishPlatformConfigFeatureProperty|0|UINT32|0x00001014
+  ## This is used to disable a deletion of the bootstrap account.
+  gEfiRedfishPkgTokenSpaceGuid.PcdRedfishCredentialDeleteAccount|TRUE|BOOLEAN|0x00001015
+  ## Default Redfish version string
+  gEfiRedfishPkgTokenSpaceGuid.PcdDefaultRedfishVersion|L"v1"|VOID*|0x00001016

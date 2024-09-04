@@ -1,12 +1,14 @@
 /** @file
 
   Copyright (c) 2017 - 2024, Arm Limited. All rights reserved.
+  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Glossary:
     - Cm or CM   - Configuration Manager
     - Obj or OBJ - Object
+    - X64 or x64 - X64 Architecture
 **/
 
 #ifndef CONFIGURATION_MANAGER_OBJECT_H_
@@ -15,6 +17,7 @@
 #include <ArchCommonNameSpaceObjects.h>
 #include <ArmNameSpaceObjects.h>
 #include <StandardNameSpaceObjects.h>
+#include <X64NameSpaceObjects.h>
 
 #pragma pack(1)
 
@@ -32,6 +35,7 @@ Bits: [31:28] - Name Space ID
                 0000 - Standard
                 0001 - Arch Common
                 0010 - ARM
+                0011 - X64
                 1111 - Custom/OEM
                 All other values are reserved.
 
@@ -83,6 +87,7 @@ typedef enum ObjectNameSpaceID {
   EObjNameSpaceStandard,          ///< Standard Objects Namespace
   EObjNameSpaceArchCommon,        ///< Arch Common Objects Namespace
   EObjNameSpaceArm,               ///< ARM Objects Namespace
+  EObjNameSpaceX64,               ///< X64 Objects Namespace
   EObjNameSpaceOem = 0xF,         ///< OEM Objects Namespace
   EObjNameSpaceMax,
 } EOBJECT_NAMESPACE_ID;
@@ -177,5 +182,15 @@ typedef struct CmObjDescriptor {
 **/
 #define CREATE_CM_OEM_OBJECT_ID(ObjectId) \
           (CREATE_CM_OBJECT_ID (EObjNameSpaceOem, ObjectId))
+
+/** This macro returns a Configuration Manager Object ID
+    in the X64 Object Namespace.
+
+  @param [in] ObjectId    The Object ID.
+
+  @retval Returns X64 Configuration Manager Object ID.
+**/
+#define CREATE_CM_X64_OBJECT_ID(ObjectId) \
+          (CREATE_CM_OBJECT_ID (EObjNameSpaceX64, ObjectId))
 
 #endif // CONFIGURATION_MANAGER_OBJECT_H_

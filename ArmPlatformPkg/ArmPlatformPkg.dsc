@@ -40,7 +40,6 @@
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmPlatformLib|ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
-  ArmPlatformStackLib|ArmPlatformPkg/Library/ArmPlatformStackLib/ArmPlatformStackLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -52,7 +51,6 @@
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   LcdHwLib|ArmPlatformPkg/Library/LcdHwNullLib/LcdHwNullLib.inf
   LcdPlatformLib|ArmPlatformPkg/Library/LcdPlatformNullLib/LcdPlatformNullLib.inf
-  LzmaDecompressLib|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
@@ -103,7 +101,6 @@
   ArmPlatformPkg/Drivers/SP805WatchdogDxe/SP805WatchdogDxe.inf
 
   ArmPlatformPkg/Library/ArmPlatformLibNull/ArmPlatformLibNull.inf
-  ArmPlatformPkg/Library/ArmPlatformStackLib/ArmPlatformStackLib.inf
   ArmPlatformPkg/Library/HdLcd/HdLcd.inf
   ArmPlatformPkg/Library/LcdHwNullLib/LcdHwNullLib.inf
   ArmPlatformPkg/Library/LcdPlatformNullLib/LcdPlatformNullLib.inf
@@ -120,10 +117,7 @@
   ArmPlatformPkg/PlatformPei/PlatformPeim.inf
   ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
 
-  ArmPlatformPkg/PrePeiCore/PrePeiCoreUniCore.inf
   ArmPlatformPkg/Sec/Sec.inf
-
-  ArmPlatformPkg/PrePi/PeiUniCore.inf
   ArmPlatformPkg/PeilessSec/PeilessSec.inf
 
   ArmPlatformPkg/Library/ArmMaliDp/ArmMaliDp.inf

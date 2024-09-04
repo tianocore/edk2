@@ -1,24 +1,28 @@
 /** @file
 IA-32 processor specific functions to enable SMM profile.
 
-Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 #include "SmmProfileInternal.h"
 
 /**
   Create SMM page table for S3 path.
 
+  @param[out] Cr3    The base address of the page tables.
+
 **/
 VOID
 InitSmmS3Cr3 (
-  VOID
+  OUT UINTN  *Cr3
   )
 {
-  mSmmS3ResumeState->SmmS3Cr3 = GenSmmPageTable (PagingPae, mPhysicalAddressBits);
+  ASSERT (Cr3 != NULL);
+
+  *Cr3 = GenSmmPageTable (PagingPae, mPhysicalAddressBits);
 
   return;
 }
@@ -71,4 +75,16 @@ ClearTrapFlag (
   )
 {
   SystemContext.SystemContextIa32->Eflags &= (UINTN) ~BIT8;
+}
+
+/**
+  Create new entry in page table for page fault address in SmmProfilePFHandler.
+
+**/
+VOID
+SmmProfileMapPFAddress (
+  VOID
+  )
+{
+  CpuDeadLoop ();
 }

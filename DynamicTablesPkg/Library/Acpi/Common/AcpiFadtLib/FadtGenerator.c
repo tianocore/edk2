@@ -582,7 +582,7 @@ ACPI_TABLE_GENERATOR  FadtGenerator = {
   // Minimum supported ACPI Table Revision
   EFI_ACPI_6_2_FIXED_ACPI_DESCRIPTION_TABLE_REVISION,
   // Creator ID
-  TABLE_GENERATOR_CREATOR_ID_ARM,
+  TABLE_GENERATOR_CREATOR_ID,
   // Creator Revision
   FADT_GENERATOR_REVISION,
   // Build Table function

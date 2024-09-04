@@ -4987,6 +4987,23 @@ CalculateCrc32c (
   IN UINT32      InitialValue
   );
 
+/**
+  Calculates the CRC16-CCITT-FALSE checksum of the given buffer.
+
+  @param[in]      Buffer        Pointer to the buffer.
+  @param[in]      Length        Length of the buffer, in bytes.
+  @param[in]      InitialValue  Initial value of the CRC.
+
+  @return The CRC16-CCITT-FALSE checksum.
+**/
+UINT16
+EFIAPI
+CalculateCrc16CcittF (
+  IN CONST VOID  *Buffer,
+  IN UINTN       Length,
+  IN UINT16      InitialValue
+  );
+
 //
 // Base Library CPU Functions
 //
