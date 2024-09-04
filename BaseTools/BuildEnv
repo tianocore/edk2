@@ -198,16 +198,7 @@ AddEdkToolsToPath() {
 
   EDK_TOOLS_PATH_BIN=`GetEdkToolsPathBinDirectory`
 
-  # check if the edk2basetools pip package is available
-  if $PYTHON_COMMAND -c "import edk2basetools" > /dev/null 2>&1; then
-    # if it is, use the pip version of the wrappers
-    echo "Using Pip Basetools"
-    AddDirToStartOfPath $EDK_TOOLS_PATH/BinPipWrappers/PosixLike
-  else
-    echo "Using EDK2 in-source Basetools"
-    AddDirToStartOfPath $EDK_TOOLS_PATH/BinWrappers/PosixLike
-  fi
-
+  AddDirToStartOfPath $EDK_TOOLS_PATH/BinWrappers/PosixLike
 
   AddDirToStartOfPath $EDK_TOOLS_PATH_BIN
 
