@@ -44,6 +44,27 @@ InternalBuildGuidHobForTdxMeasurement (
   );
 
 /**
+ * Calculate the sha384 of input Data and extend it to RTMR register.
+ *
+ * @param RtmrIndex       Index of the RTMR register
+ * @param DataToHash      Data to be hashed
+ * @param DataToHashLen   Length of the data
+ * @param Digest          Hash value of the input data
+ * @param DigestLen       Length of the hash value
+ *
+ * @retval EFI_SUCCESS    Successfully hash and extend to RTMR
+ * @retval Others         Other errors as indicated
+ */
+EFI_STATUS
+HashAndExtendToRtmr (
+  IN UINT32  RtmrIndex,
+  IN VOID    *DataToHash,
+  IN UINTN   DataToHashLen,
+  OUT UINT8  *Digest,
+  IN  UINTN  DigestLen
+  );
+
+/**
   This function will be called to accept pages. Only BSP accepts pages.
 
   TDCALL(ACCEPT_PAGE) supports the accept page size of 4k and 2M. To
@@ -803,58 +824,6 @@ TdxHelperProcessTdHob (
   //
   Status = ProcessHobList (TdHob);
 
-  return Status;
-}
-
-/**
- * Calculate the sha384 of input Data and extend it to RTMR register.
- *
- * @param RtmrIndex       Index of the RTMR register
- * @param DataToHash      Data to be hashed
- * @param DataToHashLen   Length of the data
- * @param Digest          Hash value of the input data
- * @param DigestLen       Length of the hash value
- *
- * @retval EFI_SUCCESS    Successfully hash and extend to RTMR
- * @retval Others         Other errors as indicated
- */
-STATIC
-EFI_STATUS
-HashAndExtendToRtmr (
-  IN UINT32  RtmrIndex,
-  IN VOID    *DataToHash,
-  IN UINTN   DataToHashLen,
-  OUT UINT8  *Digest,
-  IN  UINTN  DigestLen
-  )
-{
-  EFI_STATUS  Status;
-
-  if ((DataToHash == NULL) || (DataToHashLen == 0)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if ((Digest == NULL) || (DigestLen != SHA384_DIGEST_SIZE)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Calculate the sha384 of the data
-  //
-  if (!Sha384HashAll (DataToHash, DataToHashLen, Digest)) {
-    return EFI_ABORTED;
-  }
-
-  //
-  // Extend to RTMR
-  //
-  Status = TdExtendRtmr (
-             (UINT32 *)Digest,
-             SHA384_DIGEST_SIZE,
-             (UINT8)RtmrIndex
-             );
-
-  ASSERT (!EFI_ERROR (Status));
   return Status;
 }
 

@@ -67,4 +67,21 @@ TdxHelperBuildGuidHobForTdxMeasurement (
   VOID
   );
 
+/**
+ * In Tdx guest, OVMF uses FW_CFG_SELECTOR(0x510) and FW_CFG_IO_DATA(0x511)
+ * to get configuration infomation from QEMU. From the security perspective
+ * these information shall be measured before they're consumed.
+
+  @retval EFI_SUCCESS  The measurement is successful
+  @retval Others       Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+TdxHelperMeasureFwCfgData (
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
+  );
+
 #endif
