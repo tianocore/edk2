@@ -275,4 +275,24 @@ PlatformInitEmuVariableNvStore (
   IN VOID  *EmuVariableNvStore
   );
 
+/**
+ OVMF reads configuration data from QEMU via fw_cfg.
+ For Td-Guest VMM is out of TCB and the configuration data is untrusted.
+ From the security perpective the configuration data shall be measured
+ before it is consumed.
+
+ This function reads the fw_cfg items and cached them. In the meanwhile these
+ fw_cfg items are measured as well. This is to avoid changing the order when
+ reading the fw_cfg process, which depends on multiple factors(depex, order in
+ the Firmware volume).
+
+ @retval  EFI_SUCCESS   - Successfully cache with measurement
+ @retval  Others        - As the error code indicates
+ */
+EFI_STATUS
+EFIAPI
+PlatformInitFwCfgCachedItems (
+  VOID
+  );
+
 #endif // PLATFORM_INIT_LIB_H_
