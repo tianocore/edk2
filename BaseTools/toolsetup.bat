@@ -350,25 +350,9 @@ if %ERRORLEVEL% NEQ 0 (
 
 endlocal
 
-%PYTHON_COMMAND% -c "import edk2basetools" >NUL 2>NUL
-if %ERRORLEVEL% EQU 0 (
-  goto use_pip_basetools
-) else (
-  REM reset ERRORLEVEL
-  type nul>nul
-  goto use_builtin_basetools
-)
-
-:use_builtin_basetools
   @echo Using EDK2 in-source Basetools
   if defined BASETOOLS_PYTHON_SOURCE goto print_python_info
   set "PATH=%BASE_TOOLS_PATH%\BinWrappers\WindowsLike;%PATH%"
-  set PYTHONPATH=%BASE_TOOLS_PATH%\Source\Python;%PYTHONPATH%
-  goto print_python_info
-
-:use_pip_basetools
-  @echo Using Pip Basetools
-  set "PATH=%BASE_TOOLS_PATH%\BinPipWrappers\WindowsLike;%PATH%"
   set PYTHONPATH=%BASE_TOOLS_PATH%\Source\Python;%PYTHONPATH%
   goto print_python_info
 
