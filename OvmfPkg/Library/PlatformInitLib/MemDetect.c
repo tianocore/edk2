@@ -107,6 +107,36 @@ typedef VOID (*E820_SCAN_CALLBACK) (
   EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
   );
 
+STATIC
+EFI_STATUS
+PlatformScanE820Tdx (
+  IN      E820_SCAN_CALLBACK     Callback,
+  IN OUT  EFI_HOB_PLATFORM_INFO  *PlatformInfoHob
+  )
+{
+  EFI_E820_ENTRY64      E820Entry;
+  EFI_PEI_HOB_POINTERS  Hob;
+
+  Hob.Raw = (UINT8 *)(UINTN)FixedPcdGet32 (PcdOvmfSecGhcbBase);
+
+  while (!END_OF_HOB_LIST (Hob)) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_UNACCEPTED) ||
+          (Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY))
+      {
+        E820Entry.BaseAddr = Hob.ResourceDescriptor->PhysicalStart;
+        E820Entry.Length   = Hob.ResourceDescriptor->ResourceLength;
+        E820Entry.Type     = EfiAcpiAddressRangeMemory;
+        Callback (&E820Entry, PlatformInfoHob);
+      }
+    }
+
+    Hob.Raw = (UINT8 *)(Hob.Raw + Hob.Header->HobLength);
+  }
+
+  return EFI_SUCCESS;
+}
+
 /**
   Store first address not used by e820 RAM entries in
   PlatformInfoHob->FirstNonAddress
@@ -345,6 +375,10 @@ PlatformScanE820 (
 
   if (PlatformInfoHob->HostBridgeDevId == CLOUDHV_DEVICE_ID) {
     return PlatformScanE820Pvh (Callback, PlatformInfoHob);
+  }
+
+  if (TdIsEnabled ()) {
+    return PlatformScanE820Tdx (Callback, PlatformInfoHob);
   }
 
   Status = QemuFwCfgFindFile ("etc/e820", &FwCfgItem, &FwCfgSize);
