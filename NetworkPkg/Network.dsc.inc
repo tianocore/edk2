@@ -28,6 +28,9 @@
 [PcdsFixedAtBuild]
 !include NetworkPkg/NetworkPcds.dsc.inc
 
+[PcdsDynamicDefault]
+!include NetworkPkg/NetworkDynamicPcds.dsc.inc
+
 [LibraryClasses]
 !include NetworkPkg/NetworkLibs.dsc.inc
 
