@@ -62,6 +62,15 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  Sha512Digest[SHA512_DIGEST_SIZE] = {
   0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 0xe8, 0x0e, 0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f
 };
 
+//
+// Result for SM3("abc"). (From "A.1 Example 1" of
+// http://www.gmbz.org.cn/upload/2018-07-24/1532401392982079739.pdf)
+//
+GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT8  Sm3Digest[SM3_256_DIGEST_SIZE] = {
+  0x66, 0xc7, 0xf0, 0xf4, 0x62, 0xee, 0xed, 0xd9, 0xd1, 0xf2, 0xd4, 0x6b, 0xdc, 0x10, 0xe4, 0xe2,
+  0x41, 0x67, 0xc4, 0x87, 0x5c, 0xf2, 0xf7, 0xa2, 0x29, 0x7d, 0xa0, 0x2b, 0x8f, 0x4b, 0xa8, 0xe0
+};
+
 typedef
 UINTN
 (EFIAPI *EFI_HASH_GET_CONTEXT_SIZE)(
@@ -123,6 +132,7 @@ HASH_TEST_CONTEXT  mSha1TestCtx   = { SHA1_DIGEST_SIZE, Sha1GetContextSize, Sha1
 HASH_TEST_CONTEXT  mSha256TestCtx = { SHA256_DIGEST_SIZE, Sha256GetContextSize, Sha256Init, Sha256Update, Sha256Duplicate, Sha256Final, Sha256HashAll, Sha256Digest };
 HASH_TEST_CONTEXT  mSha384TestCtx = { SHA384_DIGEST_SIZE, Sha384GetContextSize, Sha384Init, Sha384Update, Sha384Duplicate, Sha384Final, Sha384HashAll, Sha384Digest };
 HASH_TEST_CONTEXT  mSha512TestCtx = { SHA512_DIGEST_SIZE, Sha512GetContextSize, Sha512Init, Sha512Update, Sha512Duplicate, Sha512Final, Sha512HashAll, Sha512Digest };
+HASH_TEST_CONTEXT  mSm3TestCtx    = { SM3_256_DIGEST_SIZE, Sm3GetContextSize, Sm3Init, Sm3Update, Sm3Duplicate, Sm3Final, Sm3HashAll, Sm3Digest };
 
 UNIT_TEST_STATUS
 EFIAPI
@@ -220,6 +230,7 @@ TEST_DESC  mHashTest[] = {
   { "TestVerifySha256()", "CryptoPkg.BaseCryptLib.Hash", TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSha256TestCtx },
   { "TestVerifySha384()", "CryptoPkg.BaseCryptLib.Hash", TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSha384TestCtx },
   { "TestVerifySha512()", "CryptoPkg.BaseCryptLib.Hash", TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSha512TestCtx },
+  { "TestVerifySm3()",    "CryptoPkg.BaseCryptLib.Hash", TestVerifyHash, TestVerifyHashPreReq, TestVerifyHashCleanUp, &mSm3TestCtx    },
 };
 
 UINTN  mHashTestNum = ARRAY_SIZE (mHashTest);
