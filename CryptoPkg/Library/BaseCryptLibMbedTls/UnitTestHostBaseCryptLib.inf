@@ -1,0 +1,72 @@
+## @file
+#  Cryptographic Library Instance for host based unit tests
+#
+#  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) Microsoft Corporation.
+#  Copyright (c) Google LLC
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = BaseCryptLib
+  FILE_GUID                      = dda098dd-856d-4a71-abf9-37607e2b5791
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BaseCryptLib|HOST_APPLICATION
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  InternalCryptLib.h
+  Hash/CryptMd5.c
+  Hash/CryptSha1.c
+  Hash/CryptSha256.c
+  Hash/CryptSha512.c
+  Hash/CryptSm3.c
+  Hash/CryptParallelHashNull.c
+  Hmac/CryptHmac.c
+  Kdf/CryptHkdf.c
+  Cipher/CryptAes.c
+  Cipher/CryptAeadAesGcm.c
+  Pk/CryptRsaBasic.c
+  Pk/CryptRsaExt.c
+  Pk/CryptPkcs1Oaep.c
+  Pk/CryptPkcs5Pbkdf2.c
+  Pk/CryptPkcs7Sign.c
+  Pk/CryptPkcs7VerifyCommon.c
+  Pk/CryptPkcs7VerifyBase.c
+  Pk/CryptPkcs7VerifyEku.c
+  Pk/CryptDhNull.c
+  Pk/CryptX509.c
+  Pk/CryptAuthenticode.c
+  Pk/CryptTs.c
+  Pem/CryptPem.c
+  Pk/CryptRsaPss.c
+  Pk/CryptRsaPssSign.c
+  Bn/CryptBnNull.c
+  Pk/CryptEcNull.c
+
+[Sources.Ia32]
+  Rand/CryptRandTsc.c
+
+[Sources.X64]
+  Rand/CryptRandTsc.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MbedTlsLib
+  MemoryAllocationLib
+  PrintLib
+  RngLib
