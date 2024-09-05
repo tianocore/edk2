@@ -57,8 +57,6 @@
   Rand/CryptRand.c
 
   SysCall/CrtWrapper.c
-  SysCall/DummyOpensslSupport.c
-  SysCall/BaseMemAllocation.c
   SysCall/TimerWrapper.c
 
 [Packages]
@@ -72,7 +70,6 @@
   UefiRuntimeServicesTableLib
   DebugLib
   MbedTlsLib
-  OpensslLib
   PrintLib
   IntrinsicLib
   RngLib

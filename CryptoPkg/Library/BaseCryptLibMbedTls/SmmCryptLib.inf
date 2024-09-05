@@ -63,8 +63,6 @@
   Rand/CryptRand.c
 
   SysCall/CrtWrapper.c
-  SysCall/DummyOpensslSupport.c
-  SysCall/BaseMemAllocation.c
   SysCall/ConstantTimeClock.c
 
 [Packages]
@@ -76,7 +74,6 @@
   BaseMemoryLib
   MemoryAllocationLib
   MbedTlsLib
-  OpensslLib
   IntrinsicLib
   PrintLib
   MmServicesTableLib

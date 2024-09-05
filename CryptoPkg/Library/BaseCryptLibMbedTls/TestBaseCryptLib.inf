@@ -56,7 +56,6 @@
   Pk/CryptEcNull.c
   Rand/CryptRand.c
   SysCall/CrtWrapper.c
-  SysCall/UnitTestHostCrtWrapper.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -69,7 +68,6 @@
   UefiRuntimeServicesTableLib
   DebugLib
   MbedTlsLib
-  OpensslLib
   PrintLib
   RngLib
 
