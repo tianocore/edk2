@@ -1,13 +1,14 @@
 /** @file
-  SM3 Digest Wrapper Implementations over openssl.
+  SM3 Digest Implementations for MbedTLS based BaseCryptLib.
 
 Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, Google LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "InternalCryptLib.h"
-#include "internal/sm3.h"
+#include "Sm3Core.h"
 
 /**
   Retrieves the size, in bytes, of the context buffer required for SM3 hash operations.
@@ -119,6 +120,11 @@ Sm3Update (
   IN      UINTN       DataSize
   )
 {
+  SM3_CTX      *Ctx;
+  CONST UINT8  *Input;
+  UINTN        NumBytes;
+  UINTN        NumBlocks;
+
   //
   // Check input parameters.
   //
@@ -126,17 +132,49 @@ Sm3Update (
     return FALSE;
   }
 
+  Input                = Data;
+  Ctx                  = (SM3_CTX *)Sm3Context;
+  Ctx->TotalInputSize += DataSize;
+
   //
-  // Check invalid parameters, in case that only DataLength was checked in Openssl
+  // Combine the already buffered input with the presented input to
+  // fill a full block.
   //
-  if ((Data == NULL) && (DataSize != 0)) {
-    return FALSE;
+  if (Ctx->NumBufferedBytes > 0) {
+    NumBytes = MIN (DataSize, SM3_CBLOCK - Ctx->NumBufferedBytes);
+    CopyMem (&Ctx->Buffer[Ctx->NumBufferedBytes], Input, NumBytes);
+    Ctx->NumBufferedBytes += NumBytes;
+
+    if (Ctx->NumBufferedBytes < SM3_CBLOCK) {
+      return TRUE;
+    }
+
+    ossl_sm3_block_data_order (Ctx, Ctx->Buffer, 1);
+    Ctx->NumBufferedBytes = 0;
+
+    Input    += NumBytes;
+    DataSize -= NumBytes;
   }
 
   //
-  // Openssl SM3 Hash Update
+  // Apply the SM3 transform directly on as much input data as we can consume
+  // as full blocks
   //
-  ossl_sm3_update ((SM3_CTX *)Sm3Context, Data, DataSize);
+  if (DataSize >= SM3_CBLOCK) {
+    NumBlocks = DataSize / SM3_CBLOCK;
+    ossl_sm3_block_data_order (Ctx, Input, NumBlocks);
+
+    Input    += NumBlocks * SM3_CBLOCK;
+    DataSize %= SM3_CBLOCK;
+  }
+
+  //
+  // Copy the remaining data into the buffer
+  //
+  if (DataSize > 0) {
+    CopyMem (Ctx->Buffer, Input, DataSize);
+    Ctx->NumBufferedBytes = DataSize;
+  }
 
   return TRUE;
 }
@@ -168,6 +206,9 @@ Sm3Final (
   OUT     UINT8  *HashValue
   )
 {
+  SM3_CTX  *Ctx;
+  UINTN    AvailableBytes;
+
   //
   // Check input parameters.
   //
@@ -175,10 +216,38 @@ Sm3Final (
     return FALSE;
   }
 
-  //
-  // Openssl SM3 Hash Finalization
-  //
-  ossl_sm3_final (HashValue, (SM3_CTX *)Sm3Context);
+  Ctx = (SM3_CTX *)Sm3Context;
+
+  // The buffer is always processed directly once it is full, so we must have
+  // at least one byte of space when we end up heere
+  ASSERT (Ctx->NumBufferedBytes < SM3_CBLOCK);
+
+  // Apply the input termination
+  Ctx->Buffer[Ctx->NumBufferedBytes++] = 0x80;
+
+  // Check if there is space left for a single UINT64 carrying the size of the
+  // entire input
+  AvailableBytes = SM3_CBLOCK - Ctx->NumBufferedBytes;
+  if (AvailableBytes < sizeof (UINT64)) {
+    ZeroMem (&Ctx->Buffer[Ctx->NumBufferedBytes], AvailableBytes);
+    ossl_sm3_block_data_order (Ctx, Ctx->Buffer, 1);
+
+    AvailableBytes        = SM3_CBLOCK;
+    Ctx->NumBufferedBytes = 0;
+  }
+
+  ZeroMem (&Ctx->Buffer[Ctx->NumBufferedBytes], AvailableBytes - sizeof (UINT64));
+  *(UINT64 *)&Ctx->Buffer[SM3_CBLOCK - sizeof (UINT64)] = SwapBytes64 (Ctx->TotalInputSize << 3);
+  ossl_sm3_block_data_order (Ctx, Ctx->Buffer, 1);
+
+  WriteUnaligned32 (&((UINT32 *)HashValue)[0], SwapBytes32 (Ctx->A));
+  WriteUnaligned32 (&((UINT32 *)HashValue)[1], SwapBytes32 (Ctx->B));
+  WriteUnaligned32 (&((UINT32 *)HashValue)[2], SwapBytes32 (Ctx->C));
+  WriteUnaligned32 (&((UINT32 *)HashValue)[3], SwapBytes32 (Ctx->D));
+  WriteUnaligned32 (&((UINT32 *)HashValue)[4], SwapBytes32 (Ctx->E));
+  WriteUnaligned32 (&((UINT32 *)HashValue)[5], SwapBytes32 (Ctx->F));
+  WriteUnaligned32 (&((UINT32 *)HashValue)[6], SwapBytes32 (Ctx->G));
+  WriteUnaligned32 (&((UINT32 *)HashValue)[7], SwapBytes32 (Ctx->H));
 
   return TRUE;
 }
@@ -211,25 +280,5 @@ Sm3HashAll (
 {
   SM3_CTX  Ctx;
 
-  //
-  // Check input parameters.
-  //
-  if (HashValue == NULL) {
-    return FALSE;
-  }
-
-  if ((Data == NULL) && (DataSize != 0)) {
-    return FALSE;
-  }
-
-  //
-  // SM3 Hash Computation.
-  //
-  ossl_sm3_init (&Ctx);
-
-  ossl_sm3_update (&Ctx, Data, DataSize);
-
-  ossl_sm3_final (HashValue, &Ctx);
-
-  return TRUE;
+  return Sm3Init (&Ctx) && Sm3Update (&Ctx, Data, DataSize) && Sm3Final (&Ctx, HashValue);
 }
