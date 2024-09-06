@@ -1477,6 +1477,10 @@ int ossl_param_find_pidx(const char *s)
                             }
                         }
                         break;
+                    case 'd':
+                        if (strcmp("erive-from-pq", s + 5) == 0)
+                            return PIDX_PKEY_PARAM_RSA_DERIVE_FROM_PQ;
+                        break;
                     case 'e':
                         switch(s[5]) {
                         default:

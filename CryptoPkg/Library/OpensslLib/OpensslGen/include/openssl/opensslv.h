@@ -28,8 +28,8 @@ extern "C" {
  * These macros express version number MAJOR.MINOR.PATCH exactly
  */
 # define OPENSSL_VERSION_MAJOR  3
-# define OPENSSL_VERSION_MINOR  2
-# define OPENSSL_VERSION_PATCH  3
+# define OPENSSL_VERSION_MINOR  3
+# define OPENSSL_VERSION_PATCH  2
 
 /*
  * Additional version information
@@ -74,8 +74,8 @@ extern "C" {
  * longer variant with OPENSSL_VERSION_PRE_RELEASE_STR and
  * OPENSSL_VERSION_BUILD_METADATA_STR appended.
  */
-# define OPENSSL_VERSION_STR "3.2.3"
-# define OPENSSL_FULL_VERSION_STR "3.2.3"
+# define OPENSSL_VERSION_STR "3.3.2"
+# define OPENSSL_FULL_VERSION_STR "3.3.2"
 
 /*
  * SECTION 3: ADDITIONAL METADATA
@@ -88,7 +88,7 @@ extern "C" {
  * SECTION 4: BACKWARD COMPATIBILITY
  */
 
-# define OPENSSL_VERSION_TEXT "OpenSSL 3.2.3 3 Sep 2024"
+# define OPENSSL_VERSION_TEXT "OpenSSL 3.3.2 3 Sep 2024"
 
 /* Synthesize OPENSSL_VERSION_NUMBER with the layout 0xMNN00PPSL */
 # ifdef OPENSSL_VERSION_PRE_RELEASE

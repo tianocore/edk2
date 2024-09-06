@@ -679,6 +679,7 @@
   $(OPENSSL_PATH)/ssl/record/methods/tls_common.c
   $(OPENSSL_PATH)/ssl/record/methods/tls_multib.c
   $(OPENSSL_PATH)/ssl/record/methods/tlsany_meth.c
+  $(OPENSSL_PATH)/ssl/rio/poll_immediate.c
   $(OPENSSL_PATH)/ssl/statem/extensions.c
   $(OPENSSL_PATH)/ssl/statem/extensions_clnt.c
   $(OPENSSL_PATH)/ssl/statem/extensions_cust.c
@@ -1338,6 +1339,7 @@
   $(OPENSSL_PATH)/ssl/record/methods/tls_common.c
   $(OPENSSL_PATH)/ssl/record/methods/tls_multib.c
   $(OPENSSL_PATH)/ssl/record/methods/tlsany_meth.c
+  $(OPENSSL_PATH)/ssl/rio/poll_immediate.c
   $(OPENSSL_PATH)/ssl/statem/extensions.c
   $(OPENSSL_PATH)/ssl/statem/extensions_clnt.c
   $(OPENSSL_PATH)/ssl/statem/extensions_cust.c
@@ -2016,6 +2018,7 @@
   $(OPENSSL_PATH)/ssl/record/methods/tls_common.c
   $(OPENSSL_PATH)/ssl/record/methods/tls_multib.c
   $(OPENSSL_PATH)/ssl/record/methods/tlsany_meth.c
+  $(OPENSSL_PATH)/ssl/rio/poll_immediate.c
   $(OPENSSL_PATH)/ssl/statem/extensions.c
   $(OPENSSL_PATH)/ssl/statem/extensions_clnt.c
   $(OPENSSL_PATH)/ssl/statem/extensions_cust.c
