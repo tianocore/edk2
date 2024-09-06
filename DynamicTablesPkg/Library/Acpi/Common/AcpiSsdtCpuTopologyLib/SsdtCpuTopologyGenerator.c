@@ -1359,7 +1359,7 @@ ACPI_CPU_TOPOLOGY_GENERATOR  SsdtCpuTopologyGenerator = {
     // Minimum ACPI Table Revision - Unused
     0,
     // Creator ID
-    TABLE_GENERATOR_CREATOR_ID_ARM,
+    TABLE_GENERATOR_CREATOR_ID,
     // Creator Revision
     SSDT_CPU_TOPOLOGY_GENERATOR_REVISION,
     // Build Table function

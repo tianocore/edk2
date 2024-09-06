@@ -301,7 +301,7 @@ ACPI_TABLE_GENERATOR  SsdtSerialPortGenerator = {
   // Minimum ACPI Table Revision - Unused
   0,
   // Creator ID
-  TABLE_GENERATOR_CREATOR_ID_ARM,
+  TABLE_GENERATOR_CREATOR_ID,
   // Creator Revision
   SSDT_SERIAL_GENERATOR_REVISION,
   // Build table function. Use the extended version instead.
