@@ -2,6 +2,7 @@
   Debug Agent library implementation for Dxe Core and Dxr modules.
 
   Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) Microsoft Corporation.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -534,6 +535,11 @@ InitializeDebugAgent (
         //
         CpuBreakpoint ();
       }
+
+      break;
+
+    case DEBUG_AGENT_INIT_REINITIALIZE:
+    case DEBUG_AGENT_INIT_DXE_CORE_LATE:
 
       break;
 
