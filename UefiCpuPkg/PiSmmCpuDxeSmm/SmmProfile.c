@@ -889,15 +889,13 @@ CheckFeatureSupported (
   }
 
   if (mSmmCodeAccessCheckEnable) {
-    if (!SmmCpuFeaturesIsSmmRegisterSupported (CpuIndex, SmmRegFeatureControl)) {
-      mSmmCodeAccessCheckEnable = FALSE;
-    }
-
     //
     // Check to see if the CPU supports the SMM Code Access Check feature
     // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
     //
-    if ((AsmReadMsr64 (EFI_MSR_SMM_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) == 0) {
+    if (!SmmCpuFeaturesIsSmmRegisterSupported (CpuIndex, SmmRegFeatureControl) ||
+        ((AsmReadMsr64 (EFI_MSR_SMM_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) == 0))
+    {
       mSmmCodeAccessCheckEnable = FALSE;
     }
   }
