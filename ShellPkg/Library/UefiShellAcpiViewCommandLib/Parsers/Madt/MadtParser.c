@@ -147,32 +147,97 @@ ValidateTrbeInterrupt (
 }
 
 /**
+  This function dumps the GICC Flags fields.
+  Format string is 2 fields separated by a \0 mapping to 0 or > 0 of
+  the buffer field bit.
+
+  @param [in] Format Format string that is the list of strings to
+                     map values to.
+  @param [in] Ptr    Pointer to the start of the buffer.
+  @param [in] Length Length of the field.
+**/
+STATIC
+VOID
+EFIAPI
+DumpValue (
+  IN CONST CHAR16  *Format,
+  IN UINT8         *Ptr,
+  IN UINT32        Length OPTIONAL
+  )
+{
+  UINT32        Value;
+  UINTN         Len;
+  CONST CHAR16  *Format_Alt;
+
+  Len        = StrLen (Format);
+  Format_Alt = Format + Len + 1;
+  Value      = *(UINT32 *)Ptr;
+
+  Print (L"%s", Value ? Format : Format_Alt);
+}
+
+STATIC CONST ACPI_PARSER  GICCFlagParser[] = {
+  { L"Enabled",                      1,  0, L"%d",                              NULL,      NULL, NULL, NULL },
+  { L"Performance Inter. Mode",      1,  1, L"Level Triggered\0Edge Triggered", DumpValue, NULL, NULL, NULL },
+  { L"VGIC Maintenance Inter. Mode", 1,  2, L"Level Triggered\0Edge Triggered", DumpValue, NULL, NULL, NULL },
+  { L"Online Capable",               1,  3, L"%d",                              NULL,      NULL, NULL, NULL },
+  { L"Reserved",                     28, 4, L"%d",                              NULL,      NULL, NULL, NULL }
+};
+
+/**
+  This function dumps the GICC Flags fields.
+  Format string is unused.
+
+  @param [in] Format Unused
+  @param [in] Ptr    Pointer to the start of the buffer.
+  @param [in] Length Length of the field.
+**/
+STATIC
+VOID
+EFIAPI
+DumpGicCFlags (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length OPTIONAL
+  )
+{
+  Print (L"0x%X\n", *(UINT32 *)Ptr);
+  ParseAcpiBitFields (
+    TRUE,
+    2,
+    NULL,
+    Ptr,
+    4,
+    PARSER_PARAMS (GICCFlagParser)
+    );
+}
+
+/**
   An ACPI_PARSER array describing the GICC Interrupt Controller Structure.
 **/
 STATIC CONST ACPI_PARSER  GicCParser[] = {
-  { L"Type",                             1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"Length",                           1, 1,  L"%d",    NULL, NULL, NULL, NULL },
-  { L"Reserved",                         2, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Type",                             1, 0,  L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"Length",                           1, 1,  L"%d",    NULL,          NULL, NULL, NULL },
+  { L"Reserved",                         2, 2,  L"0x%x",  NULL,          NULL, NULL, NULL },
 
-  { L"CPU Interface Number",             4, 4,  L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"ACPI Processor UID",               4, 8,  L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"Flags",                            4, 12, L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"Parking Protocol Version",         4, 16, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"CPU Interface Number",             4, 4,  L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"ACPI Processor UID",               4, 8,  L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"Flags",                            4, 12, NULL,     DumpGicCFlags, NULL, NULL, NULL },
+  { L"Parking Protocol Version",         4, 16, L"0x%x",  NULL,          NULL, NULL, NULL },
 
-  { L"Performance Interrupt GSIV",       4, 20, L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"Parked Address",                   8, 24, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"Physical Base Address",            8, 32, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"GICV",                             8, 40, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"GICH",                             8, 48, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"VGIC Maintenance interrupt",       4, 56, L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"GICR Base Address",                8, 60, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"MPIDR",                            8, 68, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"Processor Power Efficiency Class", 1, 76, L"0x%x",  NULL, NULL, NULL,
-    NULL },
-  { L"Reserved",                         1, 77, L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"SPE overflow Interrupt",           2, 78, L"0x%x",  NULL, NULL,
+  { L"Performance Interrupt GSIV",       4, 20, L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"Parked Address",                   8, 24, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"Physical Base Address",            8, 32, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"GICV",                             8, 40, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"GICH",                             8, 48, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"VGIC Maintenance interrupt",       4, 56, L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"GICR Base Address",                8, 60, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"MPIDR",                            8, 68, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"Processor Power Efficiency Class", 1, 76, L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"Reserved",                         1, 77, L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"SPE overflow Interrupt",           2, 78, L"0x%x",  NULL,          NULL,
     ValidateSpeOverflowInterrupt, NULL },
-  { L"TRBE Interrupt",                   2, 80, L"0x%x",  NULL, NULL,
+  { L"TRBE Interrupt",                   2, 80, L"0x%x",  NULL,          NULL,
     ValidateTrbeInterrupt, NULL }
 };
 
