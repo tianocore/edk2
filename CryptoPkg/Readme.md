@@ -267,7 +267,7 @@ TLS services are not typically used in SEC.
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  IntrinsicLib|MdePkg/Library/IntrinsicLib/IntrinsicLib.inf
 ```
 
 ### PEI Phase Library Mappings
@@ -283,7 +283,7 @@ TlsLib because TLS services are not typically used in PEI.
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  IntrinsicLib|MdePkg/Library/IntrinsicLib/IntrinsicLib.inf
 ```
 
 If dynamic linking is used, then all PEIMs except CryptoPei use the following
@@ -300,7 +300,7 @@ library mappings. The CryptoPei module uses the static linking settings.
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-      IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+      IntrinsicLib|MdePkg/Library/IntrinsicLib/IntrinsicLib.inf
   }
 ```
 
@@ -318,7 +318,7 @@ OpensslLib instance can be used.
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  IntrinsicLib|MdePkg/Library/IntrinsicLib/IntrinsicLib.inf
 ```
 
 If dynamic linking is used, then all DXE Drivers except CryptoDxe use the
@@ -336,7 +336,7 @@ settings.
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
-      IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+      IntrinsicLib|MdePkg/Library/IntrinsicLib/IntrinsicLib.inf
   }
 ```
 
@@ -353,7 +353,7 @@ TlsLib.
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  IntrinsicLib|MdePkg/Library/IntrinsicLib/IntrinsicLib.inf
 ```
 
 If dynamic linking is used, then all SMM Drivers except CryptoSmm use the
@@ -371,7 +371,7 @@ settings.
       BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
       TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-      IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+      IntrinsicLib|MdePkg/Library/IntrinsicLib/IntrinsicLib.inf
   }
 ```
 
@@ -388,7 +388,7 @@ TlsLib because TLS services are not typically used at runtime.
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-  IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
+  IntrinsicLib|MdePkg/Library/IntrinsicLib/IntrinsicLib.inf
 ```
 
 ### PCD Configuration Settings
