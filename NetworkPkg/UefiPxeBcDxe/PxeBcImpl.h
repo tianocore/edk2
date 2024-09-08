@@ -48,6 +48,7 @@
 #include <Library/DpcLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 typedef struct _PXEBC_PRIVATE_DATA      PXEBC_PRIVATE_DATA;
 typedef struct _PXEBC_PRIVATE_PROTOCOL  PXEBC_PRIVATE_PROTOCOL;
