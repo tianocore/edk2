@@ -16,6 +16,7 @@
 
 [Sources]
   FspCommonLib.c
+  ReturnStatus.c
 
 [Packages]
   MdePkg/MdePkg.dec
