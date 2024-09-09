@@ -109,6 +109,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef UINTN   size_t;
 typedef UINTN   off_t;
 typedef UINTN   u_int;
+typedef UINTN   intptr_t;
 typedef INTN    ptrdiff_t;
 typedef INTN    ssize_t;
 typedef INT64   time_t;
