@@ -160,7 +160,7 @@ Sha3Final (
 
   (void)SHA3_absorb (Context->A, Context->buf, BlockSize, BlockSize);
 
-  SHA3_squeeze (Context->A, MessageDigest, Context->md_size, BlockSize);
+  SHA3_squeeze (Context->A, MessageDigest, Context->md_size, BlockSize, 0);
 
   return 1;
 }
