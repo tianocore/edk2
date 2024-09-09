@@ -162,6 +162,13 @@ MtrrLibIsMtrrSupported (
   MSR_IA32_MTRRCAP_REGISTER  MtrrCap;
 
   //
+  // MTRR is not supported in TD-Guest.
+  //
+  if (TdIsEnabled ()) {
+    return FALSE;
+  }
+
+  //
   // Check CPUID(1).EDX[12] for MTRR capability
   //
   AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &Edx.Uint32);
