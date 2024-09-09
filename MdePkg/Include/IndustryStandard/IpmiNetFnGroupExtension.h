@@ -4,6 +4,12 @@
   Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  @par Revision Reference:
+    - Arm Server Base Manageability Requirements (SBMR) Specification
+      Revision 2.0d, Section F
+      https://developer.arm.com/documentation/den0069
+
 **/
 
 #ifndef _IPMI_NET_FN_GROUP_EXTENSION_H_
@@ -27,6 +33,7 @@
 /// https://developer.arm.com/documentation/den0069
 ///
 
+#pragma pack(1)
 //
 // Definitions for send progress code command
 //
@@ -85,5 +92,6 @@ typedef struct {
   UINT8                                             DefiningBody;
   IPMI_GROUP_EXTENSION_BOOT_PROGRESS_CODE_FORMAT    BootProgressCode;
 } IPMI_GROUP_EXTENSION_BOOT_PROGRESS_CODE_GET_RESPONSE;
+#pragma pack()
 
 #endif
