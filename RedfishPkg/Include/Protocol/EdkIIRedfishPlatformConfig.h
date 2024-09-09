@@ -13,6 +13,11 @@
 
 typedef struct _EDKII_REDFISH_PLATFORM_CONFIG_PROTOCOL EDKII_REDFISH_PLATFORM_CONFIG_PROTOCOL;
 
+//
+// Redfish Platform Config Protocol interface version.
+//
+#define REDFISH_PLATFORM_CONFIG_VERSION  0x00010000
+
 ///
 /// Definition of EDKII_REDFISH_TYPE_VALUE
 ///
