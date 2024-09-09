@@ -28,8 +28,8 @@ extern "C" {
  * These macros express version number MAJOR.MINOR.PATCH exactly
  */
 # define OPENSSL_VERSION_MAJOR  3
-# define OPENSSL_VERSION_MINOR  2
-# define OPENSSL_VERSION_PATCH  3
+# define OPENSSL_VERSION_MINOR  4
+# define OPENSSL_VERSION_PATCH  0
 
 /*
  * Additional version information
@@ -39,7 +39,7 @@ extern "C" {
  */
 
 /* Could be: #define OPENSSL_VERSION_PRE_RELEASE "-alpha.1" */
-# define OPENSSL_VERSION_PRE_RELEASE ""
+# define OPENSSL_VERSION_PRE_RELEASE "-alpha1"
 /* Could be: #define OPENSSL_VERSION_BUILD_METADATA "+fips" */
 /* Could be: #define OPENSSL_VERSION_BUILD_METADATA "+vendor.1" */
 # define OPENSSL_VERSION_BUILD_METADATA ""
@@ -74,21 +74,21 @@ extern "C" {
  * longer variant with OPENSSL_VERSION_PRE_RELEASE_STR and
  * OPENSSL_VERSION_BUILD_METADATA_STR appended.
  */
-# define OPENSSL_VERSION_STR "3.2.3"
-# define OPENSSL_FULL_VERSION_STR "3.2.3"
+# define OPENSSL_VERSION_STR "3.4.0"
+# define OPENSSL_FULL_VERSION_STR "3.4.0-alpha1"
 
 /*
  * SECTION 3: ADDITIONAL METADATA
  *
  * These strings are defined separately to allow them to be parsable.
  */
-# define OPENSSL_RELEASE_DATE "3 Sep 2024"
+# define OPENSSL_RELEASE_DATE "5 Sep 2024"
 
 /*
  * SECTION 4: BACKWARD COMPATIBILITY
  */
 
-# define OPENSSL_VERSION_TEXT "OpenSSL 3.2.3 3 Sep 2024"
+# define OPENSSL_VERSION_TEXT "OpenSSL 3.4.0-alpha1 5 Sep 2024"
 
 /* Synthesize OPENSSL_VERSION_NUMBER with the layout 0xMNN00PPSL */
 # ifdef OPENSSL_VERSION_PRE_RELEASE

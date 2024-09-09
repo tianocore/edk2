@@ -627,8 +627,7 @@ $L$ossl_rsaz_amm52x40_x1_ifma256_epilogue:
         DB      0F3h,0C3h               ;repret
 
 $L$SEH_end_ossl_rsaz_amm52x40_x1_ifma256:
-section .data data align=8
-
+section .rdata rdata align=32
 ALIGN   32
 $L$mask52x4:
         DQ      0xfffffffffffff
@@ -1413,8 +1412,7 @@ $L$loop_320:
         DB      0F3h,0C3h               ;repret
 
 
-section .data data align=8
-
+section .rdata rdata align=32
 ALIGN   32
 $L$ones:
         DQ      1,1,1,1

@@ -298,6 +298,7 @@
   $(OPENSSL_PATH)/crypto/ffc/ffc_params.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_generate.c
   $(OPENSSL_PATH)/crypto/ffc/ffc_params_validate.c
+  $(OPENSSL_PATH)/crypto/hashtable/hashtable.c
   $(OPENSSL_PATH)/crypto/hmac/hmac.c
   $(OPENSSL_PATH)/crypto/hpke/hpke.c
   $(OPENSSL_PATH)/crypto/hpke/hpke_util.c
@@ -309,6 +310,7 @@
   $(OPENSSL_PATH)/crypto/lhash/lhash.c
   $(OPENSSL_PATH)/crypto/asn1_dsa.c
   $(OPENSSL_PATH)/crypto/bsearch.c
+  $(OPENSSL_PATH)/crypto/comp_methods.c
   $(OPENSSL_PATH)/crypto/context.c
   $(OPENSSL_PATH)/crypto/core_algorithm.c
   $(OPENSSL_PATH)/crypto/core_fetch.c
@@ -318,11 +320,13 @@
   $(OPENSSL_PATH)/crypto/cryptlib.c
   $(OPENSSL_PATH)/crypto/ctype.c
   $(OPENSSL_PATH)/crypto/cversion.c
+  $(OPENSSL_PATH)/crypto/defaults.c
   $(OPENSSL_PATH)/crypto/der_writer.c
   $(OPENSSL_PATH)/crypto/deterministic_nonce.c
   $(OPENSSL_PATH)/crypto/ebcdic.c
   $(OPENSSL_PATH)/crypto/ex_data.c
   $(OPENSSL_PATH)/crypto/getenv.c
+  $(OPENSSL_PATH)/crypto/indicator_core.c
   $(OPENSSL_PATH)/crypto/info.c
   $(OPENSSL_PATH)/crypto/init.c
   $(OPENSSL_PATH)/crypto/initthread.c
@@ -459,14 +463,18 @@
   $(OPENSSL_PATH)/crypto/x509/pcy_map.c
   $(OPENSSL_PATH)/crypto/x509/pcy_node.c
   $(OPENSSL_PATH)/crypto/x509/pcy_tree.c
+  $(OPENSSL_PATH)/crypto/x509/t_acert.c
   $(OPENSSL_PATH)/crypto/x509/t_crl.c
   $(OPENSSL_PATH)/crypto/x509/t_req.c
   $(OPENSSL_PATH)/crypto/x509/t_x509.c
+  $(OPENSSL_PATH)/crypto/x509/v3_ac_tgt.c
   $(OPENSSL_PATH)/crypto/x509/v3_addr.c
   $(OPENSSL_PATH)/crypto/x509/v3_admis.c
   $(OPENSSL_PATH)/crypto/x509/v3_akeya.c
   $(OPENSSL_PATH)/crypto/x509/v3_akid.c
   $(OPENSSL_PATH)/crypto/x509/v3_asid.c
+  $(OPENSSL_PATH)/crypto/x509/v3_audit_id.c
+  $(OPENSSL_PATH)/crypto/x509/v3_battcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bcons.c
   $(OPENSSL_PATH)/crypto/x509/v3_bitst.c
   $(OPENSSL_PATH)/crypto/x509/v3_conf.c
@@ -480,6 +488,7 @@
   $(OPENSSL_PATH)/crypto/x509/v3_ind_iss.c
   $(OPENSSL_PATH)/crypto/x509/v3_info.c
   $(OPENSSL_PATH)/crypto/x509/v3_int.c
+  $(OPENSSL_PATH)/crypto/x509/v3_iobo.c
   $(OPENSSL_PATH)/crypto/x509/v3_ist.c
   $(OPENSSL_PATH)/crypto/x509/v3_lib.c
   $(OPENSSL_PATH)/crypto/x509/v3_ncons.c
@@ -493,14 +502,17 @@
   $(OPENSSL_PATH)/crypto/x509/v3_prn.c
   $(OPENSSL_PATH)/crypto/x509/v3_purp.c
   $(OPENSSL_PATH)/crypto/x509/v3_san.c
+  $(OPENSSL_PATH)/crypto/x509/v3_sda.c
   $(OPENSSL_PATH)/crypto/x509/v3_single_use.c
   $(OPENSSL_PATH)/crypto/x509/v3_skid.c
   $(OPENSSL_PATH)/crypto/x509/v3_soa_id.c
   $(OPENSSL_PATH)/crypto/x509/v3_sxnet.c
   $(OPENSSL_PATH)/crypto/x509/v3_tlsf.c
+  $(OPENSSL_PATH)/crypto/x509/v3_usernotice.c
   $(OPENSSL_PATH)/crypto/x509/v3_utf8.c
   $(OPENSSL_PATH)/crypto/x509/v3_utl.c
   $(OPENSSL_PATH)/crypto/x509/v3err.c
+  $(OPENSSL_PATH)/crypto/x509/x509_acert.c
   $(OPENSSL_PATH)/crypto/x509/x509_att.c
   $(OPENSSL_PATH)/crypto/x509/x509_cmp.c
   $(OPENSSL_PATH)/crypto/x509/x509_d2.c
@@ -518,6 +530,7 @@
   $(OPENSSL_PATH)/crypto/x509/x509_v3.c
   $(OPENSSL_PATH)/crypto/x509/x509_vfy.c
   $(OPENSSL_PATH)/crypto/x509/x509_vpm.c
+  $(OPENSSL_PATH)/crypto/x509/x509aset.c
   $(OPENSSL_PATH)/crypto/x509/x509cset.c
   $(OPENSSL_PATH)/crypto/x509/x509name.c
   $(OPENSSL_PATH)/crypto/x509/x509rset.c
@@ -527,6 +540,7 @@
   $(OPENSSL_PATH)/crypto/x509/x_attrib.c
   $(OPENSSL_PATH)/crypto/x509/x_crl.c
   $(OPENSSL_PATH)/crypto/x509/x_exten.c
+  $(OPENSSL_PATH)/crypto/x509/x_ietfatt.c
   $(OPENSSL_PATH)/crypto/x509/x_name.c
   $(OPENSSL_PATH)/crypto/x509/x_pubkey.c
   $(OPENSSL_PATH)/crypto/x509/x_req.c
@@ -600,6 +614,7 @@
   $(OPENSSL_PATH)/providers/implementations/rands/drbg_hash.c
   $(OPENSSL_PATH)/providers/implementations/rands/drbg_hmac.c
   $(OPENSSL_PATH)/providers/implementations/rands/seed_src.c
+  $(OPENSSL_PATH)/providers/implementations/rands/seed_src_jitter.c
   $(OPENSSL_PATH)/providers/implementations/rands/test_rng.c
   $(OPENSSL_PATH)/providers/implementations/rands/seeding/rand_cpu_x86.c
   $(OPENSSL_PATH)/providers/implementations/rands/seeding/rand_tsc.c
