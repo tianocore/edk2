@@ -4,17 +4,19 @@ for AMD based platforms.
 
 Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.<BR>
-Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
+#include <Guid/SmmBaseHob.h>
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Uefi/UefiBaseType.h>
 #include <Register/Amd/SmramSaveStateMap.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MmSaveStateLib.h>
+#include <Library/HobLib.h>
 
 // EFER register LMA bit
 #define LMA  BIT10
@@ -26,6 +28,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 // The mode of the CPU at the time an SMI occurs
 STATIC UINT8  mSmmSaveStateRegisterLma;
+
+//
+// Indicate SmBase for each Processors has been relocated or not. If TRUE,
+// means no need to do the relocation in SmmCpuFeaturesInitializeProcessor().
+//
+BOOLEAN  mSmmCpuFeaturesSmmRelocated;
 
 /**
   Performs library initialization.
@@ -46,6 +54,12 @@ CpuFeaturesLibInitialization (
   if (LMAValue) {
     mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
   }
+
+  //
+  // If gSmmBaseHobGuid found, means SmBase info has been relocated and recorded
+  // in the SmBase array.
+  //
+  mSmmCpuFeaturesSmmRelocated = (BOOLEAN)(GetFirstGuidHob (&gSmmBaseHobGuid) != NULL);
 }
 
 /**
@@ -85,10 +99,15 @@ SmmCpuFeaturesInitializeProcessor (
   UINT32                    LMAValue;
 
   //
-  // Configure SMBASE.
+  // No need to configure SMBASE if SmBase relocation has been done.
   //
-  CpuState             = (AMD_SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
-  CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  if (!mSmmCpuFeaturesSmmRelocated) {
+    //
+    // Configure SMBASE.
+    //
+    CpuState             = (AMD_SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
+    CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
+  }
 
   // Re-initialize the value of mSmmSaveStateRegisterLma flag which might have been changed in PiCpuSmmDxeSmm Driver
   // Entry point, to make sure correct value on AMD platform is assigned to be used by SmmCpuFeaturesLib.

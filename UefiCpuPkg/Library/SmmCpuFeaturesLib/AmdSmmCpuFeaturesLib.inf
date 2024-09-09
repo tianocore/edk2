@@ -2,7 +2,7 @@
 #  The CPU specific programming for PiSmmCpuDxeSmm module.
 #
 #  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-#  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+#  Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -32,6 +32,10 @@
   MemoryAllocationLib
   DebugLib
   MmSaveStateLib
+  HobLib
+
+[Guids]
+  gSmmBaseHobGuid                ## CONSUMES
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdSmrrEnable               ## CONSUMES
