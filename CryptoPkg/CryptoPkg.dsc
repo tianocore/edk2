@@ -472,6 +472,7 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
   }
 !endif
 
@@ -538,6 +539,7 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
   }
   #
   # CryptoSmm with OpensslLib instance with no SSL or EC services
@@ -591,6 +593,7 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
   }
   #
   # CryptoStandaloneMm with OpensslLib instance with no SSL or EC services
