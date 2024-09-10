@@ -520,16 +520,19 @@ BSPHandler (
     ApCount = CpuCount - 1;
 
     //
-    // Wait for all APs to get ready for programming MTRRs
+    // Wait for all APs of arrival at this point
     //
     SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #1: Wait APs
 
+    //
+    // Signal all APs it's time for:
+    // 1. Backup MTRRs if needed.
+    // 2. Perform SMM CPU Platform Hook before executing MMI Handler.
+    //
+    ReleaseAllAPs (); /// #2: Signal APs
+
     if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
       //
-      // Signal all APs it's time for backup MTRRs
-      //
-      ReleaseAllAPs (); /// #2: Signal APs
-
       //
       // SmmCpuSyncWaitForAPs() may wait for ever if an AP happens to enter SMM at
       // exactly this point. Please make sure PcdCpuSmmMaxSyncLoops has been set
@@ -563,6 +566,11 @@ BSPHandler (
       SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex); /// #5: Wait APs
     }
   }
+
+  //
+  // Perform SMM CPU Platform Hook before executing MMI Handler
+  //
+  SmmCpuPlatformHookBeforeMmiHandler ();
 
   //
   // The BUSY lock is initialized to Acquired state
@@ -806,14 +814,16 @@ APHandler (
     // Notify BSP of arrival at this point
     //
     SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #1: Signal BSP
+
+    //
+    // Wait for the signal from BSP to:
+    // 1. Backup MTRRs if needed.
+    // 2. Perform SMM CPU Platform Hook before executing MMI Handler.
+    //
+    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #2: Wait BSP
   }
 
   if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
-    //
-    // Wait for the signal from BSP to backup MTRRs
-    //
-    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #2: Wait BSP
-
     //
     // Backup OS MTRRs
     //
@@ -839,6 +849,11 @@ APHandler (
     //
     SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex); /// #5: Signal BSP
   }
+
+  //
+  // Perform SMM CPU Platform Hook before executing MMI Handler
+  //
+  SmmCpuPlatformHookBeforeMmiHandler ();
 
   while (TRUE) {
     //
