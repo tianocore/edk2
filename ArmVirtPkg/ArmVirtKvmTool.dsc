@@ -27,6 +27,11 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtKvmTool.fdf
 
+  #
+  # Shell can be useful for debugging but should not be enabled for production
+  #
+  DEFINE BUILD_SHELL             = TRUE
+
 [Defines.AARCH64]
   DEFINE ACPIVIEW_ENABLE         = TRUE
 

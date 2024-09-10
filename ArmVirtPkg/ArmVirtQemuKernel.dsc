@@ -31,6 +31,11 @@
   DEFINE SECURE_BOOT_ENABLE      = FALSE
 
   #
+  # Shell can be useful for debugging but should not be enabled for production
+  #
+  DEFINE BUILD_SHELL             = TRUE
+
+  #
   # Network definition
   #
   DEFINE NETWORK_IP6_ENABLE              = FALSE
@@ -410,16 +415,18 @@
   #
 !include NetworkPkg/NetworkComponents.dsc.inc
 
+!if $(NETWORK_ENABLE) == TRUE
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
   }
 
-!if $(NETWORK_TLS_ENABLE) == TRUE
-  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
-    <LibraryClasses>
-      NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
-  }
+  !if $(NETWORK_TLS_ENABLE) == TRUE
+    NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
+      <LibraryClasses>
+        NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
+    }
+  !endif
 !endif
 
   #
