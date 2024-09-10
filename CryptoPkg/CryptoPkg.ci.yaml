@@ -114,6 +114,7 @@
             "Library/OpensslLib/OpensslGen/include/openssl/bio.h",
             "Library/OpensslLib/OpensslGen/include/openssl/cmp.h",
             "Library/OpensslLib/OpensslGen/include/openssl/cms.h",
+            "Library/OpensslLib/OpensslGen/include/openssl/comp.h",
             "Library/OpensslLib/OpensslGen/include/openssl/conf.h",
             "Library/OpensslLib/OpensslGen/include/openssl/configuration-ec.h",
             "Library/OpensslLib/OpensslGen/include/openssl/configuration-noec.h",
