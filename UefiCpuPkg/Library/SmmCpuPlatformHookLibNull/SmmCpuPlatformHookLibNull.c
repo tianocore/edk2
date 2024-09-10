@@ -1,7 +1,7 @@
 /** @file
 SMM CPU Platform Hook NULL library instance.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -96,6 +96,24 @@ GetPlatformPageTableAttribute (
   IN OUT SMM_PAGE_SIZE_TYPE  *PageSize,
   IN OUT UINTN               *NumOfPages,
   IN OUT UINTN               *PageAttribute
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+/**
+  SMM CPU Platform Hook before executing MMI Handler.
+
+  This function can be used to perform the platform specific items before executing MMI Handler.
+
+  @retval EFI_SUCCESS      The smm cpu platform hook before executing MMI Handler is executed successfully.
+  @retval EFI_UNSUPPORTED  The smm cpu platform hook before executing MMI Handler is unsupported.
+
+**/
+EFI_STATUS
+EFIAPI
+SmmCpuPlatformHookBeforeMmiHandler (
+  VOID
   )
 {
   return EFI_UNSUPPORTED;
