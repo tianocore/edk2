@@ -524,12 +524,14 @@ BSPHandler (
     //
     SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex);
 
-    if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
-      //
-      // Signal all APs it's time for backup MTRRs
-      //
-      ReleaseAllAPs ();
+    //
+    // Signal all APs it's time for:
+    // 1. Backup MTRRs if needed.
+    // 2. Perform SMM CPU Platform Hook before executing MMI Handler.
+    //
+    ReleaseAllAPs ();
 
+    if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
       //
       // SmmCpuSyncWaitForAPs() may wait for ever if an AP happens to enter SMM at
       // exactly this point. Please make sure PcdCpuSmmMaxSyncLoops has been set
@@ -563,6 +565,11 @@ BSPHandler (
       SmmCpuSyncWaitForAPs (mSmmMpSyncData->SyncContext, ApCount, CpuIndex);
     }
   }
+
+  //
+  // Perform SMM CPU Platform Hook before executing MMI Handler
+  //
+  SmmCpuPlatformHookBeforeMmiHandler ();
 
   //
   // The BUSY lock is initialized to Acquired state
@@ -806,14 +813,16 @@ APHandler (
     // Notify BSP of arrival at this point
     //
     SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex);
+
+    //
+    // Wait for the signal from BSP to:
+    // 1. Backup MTRRs if needed.
+    // 2. Perform SMM CPU Platform Hook before executing MMI Handler.
+    //
+    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex);
   }
 
   if (SmmCpuFeaturesNeedConfigureMtrrs ()) {
-    //
-    // Wait for the signal from BSP to backup MTRRs
-    //
-    SmmCpuSyncWaitForBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex);
-
     //
     // Backup OS MTRRs
     //
@@ -839,6 +848,11 @@ APHandler (
     //
     SmmCpuSyncReleaseBsp (mSmmMpSyncData->SyncContext, CpuIndex, BspIndex);
   }
+
+  //
+  // Perform SMM CPU Platform Hook before executing MMI Handler
+  //
+  SmmCpuPlatformHookBeforeMmiHandler ();
 
   while (TRUE) {
     //
