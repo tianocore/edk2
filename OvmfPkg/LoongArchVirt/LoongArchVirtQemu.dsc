@@ -554,6 +554,7 @@
   #
 !include NetworkPkg/NetworkComponents.dsc.inc
 
+!if $(NETWORK_ENABLE) == TRUE
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
@@ -564,6 +565,7 @@
     <LibraryClasses>
       NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
   }
+!endif
 !endif
   OvmfPkg/VirtioNetDxe/VirtioNet.inf
 
@@ -660,7 +662,9 @@
       NULL|ShellPkg/Library/UefiShellDriver1CommandsLib/UefiShellDriver1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
+!if ($(NETWORK_ENABLE) == TRUE) AND ($(NETWORK_IP4_ENABLE) == TRUE)
       NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
+!endif
       HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
       ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
       FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf

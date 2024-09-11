@@ -393,6 +393,7 @@
       NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
   }
 
+!if $(NETWORK_ENABLE) == TRUE
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
@@ -403,6 +404,7 @@
     <LibraryClasses>
       NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
   }
+!endif
 !endif
 
   #
