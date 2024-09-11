@@ -340,7 +340,7 @@ GetProcessorInfo (
 
   CopyMem (
     ProcessorInfoBuffer,
-    &mCpuMpData.CpuData[ProcessorIndex],
+    &mCpuMpData.CpuData[ProcessorIndex].Info,
     sizeof (EFI_PROCESSOR_INFORMATION)
     );
   return EFI_SUCCESS;
