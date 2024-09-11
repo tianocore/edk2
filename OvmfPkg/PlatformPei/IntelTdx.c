@@ -40,15 +40,11 @@ IntelTdxInitialize (
     return;
   }
 
-  TdxHelperBuildGuidHobForTdxMeasurement ();
-
   PcdStatus = PcdSet64S (PcdConfidentialComputingGuestAttr, CCAttrIntelTdx);
   ASSERT_RETURN_ERROR (PcdStatus);
 
   PcdStatus = PcdSet64S (PcdTdxSharedBitMask, TdSharedPageMask ());
   ASSERT_RETURN_ERROR (PcdStatus);
 
-  PcdStatus = PcdSetBoolS (PcdSetNxForStack, TRUE);
-  ASSERT_RETURN_ERROR (PcdStatus);
  #endif
 }

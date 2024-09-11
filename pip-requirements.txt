@@ -8,13 +8,12 @@
 #
 # https://pypi.org/project/pip/
 # https://pip.pypa.io/en/stable/user_guide/#requirements-files
-# https://pip.pypa.io/en/stable/reference/pip_install/#requirements-file-format
+# https://pip.pypa.io/en/stable/reference/requirements-file-format
 # https://www.python.org/dev/peps/pep-0440/#version-specifiers
 ##
 
-edk2-pytool-library==0.21.8
-edk2-pytool-extensions==0.27.6
-edk2-basetools==0.1.51
-antlr4-python3-runtime==4.7.1
+edk2-pytool-library~=0.21.9
+edk2-pytool-extensions~=0.27.10
+antlr4-python3-runtime>=4.7.1
 lcov-cobertura==2.0.2
-regex==2024.5.15
+regex==2024.7.24

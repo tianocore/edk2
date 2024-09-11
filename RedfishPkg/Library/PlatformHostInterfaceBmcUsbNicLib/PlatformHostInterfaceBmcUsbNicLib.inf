@@ -29,7 +29,6 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
-  IpmiLib
   IpmiCommandLib
   MemoryAllocationLib
   UefiLib
@@ -39,6 +38,7 @@
   gEfiSimpleNetworkProtocolGuid                 ## CONSUMED
   gEfiUsbIoProtocolGuid                         ## CONSUMED
   gEfiDevicePathProtocolGuid                    ## CONSUMED
+  gEdkIIRedfishCredential2ProtocolGuid          ## CONSUMED
 
 [Pcd]
   gEfiRedfishPkgTokenSpaceGuid.PcdRedfishHostName     ## CONSUMED
@@ -47,3 +47,4 @@
 
 [Depex]
   gIpmiProtocolGuid
+  AND gEdkIIRedfishCredential2ProtocolGuid

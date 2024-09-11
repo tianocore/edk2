@@ -419,7 +419,7 @@ ACPI_TABLE_GENERATOR  SpcrGenerator = {
   // Minimum supported ACPI Table Revision
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION,
   // Creator ID
-  TABLE_GENERATOR_CREATOR_ID_ARM,
+  TABLE_GENERATOR_CREATOR_ID,
   // Creator Revision
   SPCR_GENERATOR_REVISION,
   // Build table function. Use the extended version instead.
