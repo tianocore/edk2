@@ -102,8 +102,10 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
 
   INF ShellPkg/Application/Shell/Shell.inf
+!if $(NETWORK_ENABLE) == TRUE
   INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
   INF ShellPkg/DynamicCommand/HttpDynamicCommand/HttpDynamicCommand.inf
+!endif
   INF ShellPkg/DynamicCommand/VariablePolicyDynamicCommand/VariablePolicyDynamicCommand.inf
   INF OvmfPkg/LinuxInitrdDynamicShellCommand/LinuxInitrdDynamicShellCommand.inf
 
