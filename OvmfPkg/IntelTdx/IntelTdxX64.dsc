@@ -31,10 +31,7 @@
   #
   DEFINE SECURE_BOOT_ENABLE      = FALSE
 
-  #
-  # Shell can be useful for debugging but should not be enabled for production
-  #
-  DEFINE BUILD_SHELL             = TRUE
+!include OvmfPkg/Include/Dsc/ShellDefines.dsc.inc
 
   #
   # Device drivers

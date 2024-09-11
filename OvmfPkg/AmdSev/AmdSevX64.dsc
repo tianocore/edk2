@@ -34,11 +34,7 @@
   DEFINE SOURCE_DEBUG_ENABLE     = FALSE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
-
-  #
-  # Shell can be useful for debugging but should not be enabled for production
-  #
-  DEFINE BUILD_SHELL             = FALSE
+!include OvmfPkg/Include/Dsc/ShellDefines.dsc.inc
 
   #
   # Device drivers
