@@ -30,7 +30,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64 RISCV64 LOONGARCH64
 #
 
 [Sources]
@@ -40,7 +40,6 @@
   Hash/CryptSha256.c
   Hash/CryptSha512.c
   Hash/CryptParallelHashNull.c
-  Hash/CryptSm3.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
@@ -65,9 +64,12 @@
   Bn/CryptBnNull.c
 
   SysCall/CrtWrapper.c
+  SysCall/ConstantTimeClock.c
+
+[Sources.IA32, Sources.X64, Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
+  Hash/CryptSm3.c
   SysCall/DummyOpensslSupport.c
   SysCall/BaseMemAllocation.c
-  SysCall/ConstantTimeClock.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -79,12 +81,14 @@
   MemoryAllocationLib
   DebugLib
   MbedTlsLib
-  OpensslLib
   IntrinsicLib
   PrintLib
   PeiServicesTablePointerLib
   PeiServicesLib
   SynchronizationLib
+
+[LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64, LibraryClasses.RISCV64, LibraryClasses.LOONGARCH64]
+  OpensslLib
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid
