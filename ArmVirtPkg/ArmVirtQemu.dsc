@@ -34,11 +34,6 @@
   DEFINE CAVIUM_ERRATUM_27456    = FALSE
 
   #
-  # Shell can be useful for debugging but should not be enabled for production
-  #
-  DEFINE BUILD_SHELL             = TRUE
-
-  #
   # Network definition
   #
   DEFINE NETWORK_IP6_ENABLE              = FALSE

@@ -23,11 +23,6 @@
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = ArmVirtPkg/ArmVirtXen.fdf
 
-  #
-  # Shell can be useful for debugging but should not be enabled for production
-  #
-  DEFINE BUILD_SHELL             = TRUE
-
 !include MdePkg/MdeLibs.dsc.inc
 
 !include ArmVirtPkg/ArmVirt.dsc.inc

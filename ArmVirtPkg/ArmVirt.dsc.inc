@@ -9,6 +9,9 @@
 #
 
 [Defines]
+
+!include OvmfPkg/Include/Dsc/ShellDefines.dsc.inc
+
   DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x8000004F
 
 !if $(TARGET) != NOOPT

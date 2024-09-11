@@ -35,11 +35,7 @@
   DEFINE LOAD_X64_ON_IA32_ENABLE = FALSE
 
 !include OvmfPkg/Include/Dsc/OvmfTpmDefines.dsc.inc
-
-  #
-  # Shell can be useful for debugging but should not be enabled for production
-  #
-  DEFINE BUILD_SHELL             = TRUE
+!include OvmfPkg/Include/Dsc/ShellDefines.dsc.inc
 
   #
   # Network definition
