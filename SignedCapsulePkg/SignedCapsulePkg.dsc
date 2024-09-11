@@ -17,6 +17,9 @@
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
+[Defines.ARM]
+  DEFINE CONTINUOUS_INTEGRATION  = TRUE
+
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses]
@@ -94,9 +97,6 @@
   IniParsingLib|SignedCapsulePkg/Library/IniParsingLib/IniParsingLib.inf
   PlatformFlashAccessLib|SignedCapsulePkg/Library/PlatformFlashAccessLibNull/PlatformFlashAccessLibNull.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
-
-[LibraryClasses.ARM]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 
 [LibraryClasses.AARCH64, LibraryClasses.ARM]
   #
