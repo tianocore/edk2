@@ -25,7 +25,7 @@
   DEFINE OPENSSL_FLAGS_NOASM     =
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]
@@ -621,9 +621,6 @@
   BaseLib
   DebugLib
   RngLib
-
-[LibraryClasses.ARM]
-  ArmSoftFloatLib
 
 [BuildOptions]
   #
