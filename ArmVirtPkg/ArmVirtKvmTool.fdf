@@ -174,7 +174,9 @@ READ_LOCK_STATUS   = TRUE
   INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
 
   INF ShellPkg/Application/Shell/Shell.inf
+!if $(NETWORK_ENABLE) == TRUE
   INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
+!endif
 
   #
   # Bds
