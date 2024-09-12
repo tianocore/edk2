@@ -1,4 +1,4 @@
-/** @file This file is copied from CryptoPkg/Library/IntrinsicLib/Ia32/MathFtol.c
+/** @file This file is copied from MdePkg/Library/IntrinsicLib/Ia32/MathFtol.c
   64-bit Math Worker Function.
   The 32-bit versions of C compiler generate calls to library routines
   to handle 64-bit math. These functions use non-standard calling conventions.
