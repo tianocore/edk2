@@ -182,24 +182,6 @@ ArmIsMpCore (
 
 VOID
 EFIAPI
-ArmInvalidateDataCache (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmCleanInvalidateDataCache (
-  VOID
-  );
-
-VOID
-EFIAPI
-ArmCleanDataCache (
-  VOID
-  );
-
-VOID
-EFIAPI
 ArmInvalidateInstructionCache (
   VOID
   );
