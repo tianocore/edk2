@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 
 .set DC_ON, (0x1<<2)
 .set IC_ON, (0x1<<12)
