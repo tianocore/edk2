@@ -5,7 +5,7 @@
 #
 #
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 #include <Base.h>
 #include <AutoGen.h>
 

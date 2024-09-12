@@ -5,7 +5,7 @@
 #
 #=======================================================================================
 
-#include <AsmMacroIoLibV8.h>
+#include <AsmMacroLib.h>
 #include <AArch64/AArch64.h>
 
 // Setup EL1 while in EL1
