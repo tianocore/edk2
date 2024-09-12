@@ -18,61 +18,6 @@
 #include "AArch64Lib.h"
 #include "ArmLibPrivate.h"
 
-VOID
-AArch64DataCacheOperation (
-  IN  AARCH64_CACHE_OPERATION  DataCacheOperation
-  )
-{
-  UINTN  SavedInterruptState;
-
-  SavedInterruptState = ArmGetInterruptState ();
-  ArmDisableInterrupts ();
-
-  AArch64AllDataCachesOperation (DataCacheOperation);
-
-  ArmDataSynchronizationBarrier ();
-
-  if (SavedInterruptState) {
-    ArmEnableInterrupts ();
-  }
-}
-
-VOID
-EFIAPI
-ArmInvalidateDataCache (
-  VOID
-  )
-{
-  ASSERT (!ArmMmuEnabled ());
-
-  ArmDataSynchronizationBarrier ();
-  AArch64DataCacheOperation (ArmInvalidateDataCacheEntryBySetWay);
-}
-
-VOID
-EFIAPI
-ArmCleanInvalidateDataCache (
-  VOID
-  )
-{
-  ASSERT (!ArmMmuEnabled ());
-
-  ArmDataSynchronizationBarrier ();
-  AArch64DataCacheOperation (ArmCleanInvalidateDataCacheEntryBySetWay);
-}
-
-VOID
-EFIAPI
-ArmCleanDataCache (
-  VOID
-  )
-{
-  ASSERT (!ArmMmuEnabled ());
-
-  ArmDataSynchronizationBarrier ();
-  AArch64DataCacheOperation (ArmCleanDataCacheEntryBySetWay);
-}
-
 /**
   Check whether the CPU supports the GIC system register interface (any version)
 

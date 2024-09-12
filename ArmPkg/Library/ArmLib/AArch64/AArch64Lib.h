@@ -11,33 +11,6 @@
 #ifndef AARCH64_LIB_H_
 #define AARCH64_LIB_H_
 
-typedef VOID (*AARCH64_CACHE_OPERATION)(
-  UINTN
-  );
-
-VOID
-AArch64AllDataCachesOperation (
-  IN  AARCH64_CACHE_OPERATION  DataCacheOperation
-  );
-
-VOID
-EFIAPI
-ArmInvalidateDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanInvalidateDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
 UINTN
 EFIAPI
 ArmReadIdAA64Dfr0 (
