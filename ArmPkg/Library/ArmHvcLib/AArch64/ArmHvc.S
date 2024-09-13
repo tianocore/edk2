@@ -6,7 +6,7 @@
 //
 //
 
-#include <AsmMacroIoLibV8.h>
+#include <AsmMacroLib.h>
 
 ASM_FUNC(ArmCallHvc)
   // Push x0 on the stack - The stack must always be quad-word aligned
