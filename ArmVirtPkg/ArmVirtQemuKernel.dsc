@@ -260,11 +260,13 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
+!if $(NETWORK_ENABLE) == TRUE
   #
   # IPv4 and IPv6 PXE Boot support.
   #
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
+!endif
 
 ################################################################################
 #
@@ -278,7 +280,7 @@
   ArmVirtPkg/PrePi/ArmVirtPrePiUniCoreRelocatable.inf {
     <LibraryClasses>
       ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
-      LzmaDecompressLib|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
       PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
       HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
       PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf

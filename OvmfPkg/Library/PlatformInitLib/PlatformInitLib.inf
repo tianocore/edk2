@@ -32,6 +32,7 @@
 
 [Sources.X64]
   IntelTdx.c
+  X64/Paging.nasm
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -52,8 +53,6 @@
   PcdLib
   PciLib
   PeiHardwareInfoLib
-
-[LibraryClasses.X64]
   TdxLib
 
 [Guids]
@@ -63,6 +62,7 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUse5LevelPageTable
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

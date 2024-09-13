@@ -1268,5 +1268,12 @@ ON_EXIT:
     AsciiPrint ("\n  PXE-E99: Unexpected network error.\n");
   }
 
+  REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
+    EFI_ERROR_CODE,
+    (EFI_STATUS_CODE_VALUE)(EFI_IO_BUS_IP_NETWORK | EFI_OEM_SPECIFIC | ((EFI_STATUS_CODE_VALUE)(Status & 0x1F))),
+    (VOID *)&(PxeBcMode->UsingIpv6),
+    sizeof (PxeBcMode->UsingIpv6)
+    );
+
   return Status;
 }

@@ -23,33 +23,6 @@
 #define ID_MMFR0_SHR_IMP_HW_COHERENT  1
 #define ID_MMFR0_SHR_IGNORED          0xf
 
-typedef VOID (*ARM_V7_CACHE_OPERATION)(
-  UINT32
-  );
-
-VOID
-ArmV7AllDataCachesOperation (
-  IN  ARM_V7_CACHE_OPERATION  DataCacheOperation
-  );
-
-VOID
-EFIAPI
-ArmInvalidateDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
-VOID
-EFIAPI
-ArmCleanInvalidateDataCacheEntryBySetWay (
-  IN  UINTN  SetWayFormat
-  );
-
 /** Reads the ID_MMFR4 register.
 
    @return The contents of the ID_MMFR4 register.

@@ -30,7 +30,8 @@
 
 [Sources]
   PiSmmCpuDxeSmm.c
-  PiSmmCpuDxeSmm.h
+  PiSmmCpuCommon.c
+  PiSmmCpuCommon.h
   MpService.c
   SyncTimer.c
   CpuS3.c
@@ -45,6 +46,7 @@
   SmmMp.c
   SmmMpPerf.h
   SmmMpPerf.c
+  NonMmramMapDxeSmm.c
 
 [Sources.Ia32]
   Ia32/PageTbl.c
@@ -54,6 +56,7 @@
   Ia32/SmiEntry.nasm
   Ia32/SmiException.nasm
   Ia32/Cet.nasm
+  Ia32/SmmFuncsArchDxeSmm.c
 
 [Sources.X64]
   X64/PageTbl.c
@@ -63,6 +66,7 @@
   X64/SmiEntry.nasm
   X64/SmiException.nasm
   X64/Cet.nasm
+  X64/SmmFuncsArchDxeSmm.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -80,7 +84,7 @@
   MtrrLib
   IoLib
   TimerLib
-  SmmServicesTableLib
+  MmServicesTableLib
   MemoryAllocationLib
   DebugAgentLib
   HobLib
@@ -100,7 +104,6 @@
   SmmCpuSyncLib
 
 [Protocols]
-  gEfiSmmAccess2ProtocolGuid               ## CONSUMES
   gEfiSmmConfigurationProtocolGuid         ## PRODUCES
   gEfiSmmCpuProtocolGuid                   ## PRODUCES
   gEfiSmmReadyToLockProtocolGuid           ## NOTIFY
@@ -109,6 +112,7 @@
   gEfiMmMpProtocolGuid                     ## PRODUCES
   gEdkiiSmmCpuRendezvousProtocolGuid       ## PRODUCES
   gEfiMpServiceProtocolGuid                ## CONSUMES
+  gEfiSmmVariableProtocolGuid              ## CONSUMES
 
 [Guids]
   gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.
@@ -116,6 +120,7 @@
   gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
   gSmmBaseHobGuid                          ## CONSUMES
   gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
+  gEfiSmmSmramMemoryGuid
 
 [FeaturePcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES

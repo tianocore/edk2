@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLibV8.h>
+#include <AsmMacroLib.h>
 
 .set DAIF_RD_FIQ_BIT,   (1 << 6)
 .set DAIF_RD_IRQ_BIT,   (1 << 7)

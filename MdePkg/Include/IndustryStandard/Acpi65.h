@@ -1057,6 +1057,26 @@ typedef struct {
 #define EFI_ACPI_6_5_RASF_PATROL_SCRUB_COMMAND_STOP_PATROL_SCRUBBER   0x03
 
 ///
+/// ACPI RAS2 PCC Descriptor
+///
+typedef struct {
+  UINT8     PccId;
+  UINT8     Reserved[2];
+  UINT8     RasFeatureType;
+  UINT32    Instance;
+} EFI_ACPI_RAS2_PCC_DESCRIPTOR;
+
+///
+/// ACPI RAS2 Feature Table definition.
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  UINT16                         Reserved;
+  UINT16                         PccCount;
+  // EFI_ACPI_RAS2_PCC_DESCRIPTOR Descriptors[PccCount];
+} EFI_ACPI_6_5_RAS2_FEATURE_TABLE;
+
+///
 /// Memory Power State Table definition.
 ///
 typedef struct {
@@ -2944,6 +2964,54 @@ typedef struct {
 #define EFI_ACPI_6_5_PHAT_FIRMWARE_HEALTH_DATA_RECORD_UNKNOWN          0x02
 #define EFI_ACPI_6_5_PHAT_FIRMWARE_HEALTH_DATA_RECORD_ADVISORY         0x03
 
+///
+/// Reset Reason Health Record Vendor Data Entry
+///
+typedef struct {
+  GUID      VendorDataID;
+  UINT16    Length;
+  UINT16    Revision;
+  // UINTN   Data[];
+} EFI_ACPI_6_5_PHAT_RESET_REASON_HEALTH_RECORD_VENDOR_DATA_ENTRY;
+
+///
+/// Reset Reason Health Record Structure
+///
+typedef struct {
+  UINT8     SupportedSources;
+  UINT8     Source;
+  UINT8     SubSource;
+  UINT8     Reason;
+  UINT16    VendorCount;
+  // EFI_ACPI_6_5_PHAT_RESET_REASON_HEALTH_RECORD_VENDOR_DATA_ENTRY   VendorSpecificResetReasonEntry[];
+} EFI_ACPI_6_5_PHAT_RESET_REASON_HEALTH_RECORD_STRUCTURE;
+
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_HEADER_GUID  { 0x7a014ce2, 0xf263, 0x4b77, { 0xb8, 0x8a, 0xe6, 0x33, 0x6b, 0x78, 0x2c, 0x14 }}
+
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SUPPORTED_SOURCES_UNKNOWN     BIT0
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SUPPORTED_SOURCES_HARDWARE    BIT1
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SUPPORTED_SOURCES_FIRMWARE    BIT2
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SUPPORTED_SOURCES_SOFTWARE    BIT3
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SUPPORTED_SOURCES_SUPERVISOR  BIT4
+
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SOURCES_UNKNOWN     BIT0
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SOURCES_HARDWARE    BIT1
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SOURCES_FIRMWARE    BIT2
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SOURCES_SOFTWARE    BIT3
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_SOURCES_SUPERVISOR  BIT4
+
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_UNKNOWN           0x00
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_COLD_BOOT         0x01
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_COLD_RESET        0x02
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_WARM_RESET        0x03
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_UPDATE            0x04
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_UNEXPECTED_RESET  0x20
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_FAULT             0x21
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_TIMEOUT           0x22
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_THERMAL           0x23
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_POWER_LOSS        0x24
+#define EFI_ACPI_6_5_PHAT_RESET_REASON_REASON_POWER_BUTTON      0x25
+
 //
 // Known table signatures
 //
@@ -3072,6 +3140,11 @@ typedef struct {
 /// "PSDT" Persistent System Description Table
 ///
 #define EFI_ACPI_6_5_PERSISTENT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('P', 'S', 'D', 'T')
+
+///
+/// "RAS2" ACPI RAS2 Feature Table
+///
+#define EFI_ACPI_6_5_ACPI_RAS2_FEATURE_TABLE_SIGNATURE  SIGNATURE_32('R', 'A', 'S', '2')
 
 ///
 /// "RASF" ACPI RAS Feature Table

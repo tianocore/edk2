@@ -251,6 +251,7 @@
   AmdSvsmLib|UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   CcExitLib|UefiCpuPkg/Library/CcExitLibNull/CcExitLibNull.inf
+  TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
   TdxMailboxLib|OvmfPkg/Library/TdxMailboxLib/TdxMailboxLibNull.inf
 
 [LibraryClasses.common.SEC]
@@ -658,9 +659,11 @@
 
 !include OvmfPkg/Include/Dsc/OvmfTpmPcds.dsc.inc
 
+!if $(NETWORK_ENABLE) == TRUE
   # IPv4 and IPv6 PXE Boot support.
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
+!endif
 
   # Set ConfidentialComputing defaults
   gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr|0
@@ -684,6 +687,7 @@
   OvmfPkg/Sec/SecMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
   }
 
   #
@@ -704,7 +708,10 @@
   }
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 
-  OvmfPkg/PlatformPei/PlatformPei.inf
+  OvmfPkg/PlatformPei/PlatformPei.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/IntelTdx/TdxHelperLib/TdxHelperLibNull.inf
+  }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
     <LibraryClasses>
 !if $(SMM_REQUIRE) == TRUE

@@ -69,6 +69,8 @@
   UnitTestPersistenceLib|UnitTestFrameworkPkg/Library/UnitTestPersistenceLibNull/UnitTestPersistenceLibNull.inf
   UnitTestResultReportLib|UnitTestFrameworkPkg/Library/UnitTestResultReportLib/UnitTestResultReportLibDebugLib.inf
   LockBoxLib|MdeModulePkg/Library/SmmLockBoxLib/SmmLockBoxDxeLib.inf
+  HobLib|MdeModulePkg/Library/BaseHobLibNull/BaseHobLibNull.inf
+  MemoryAllocationLib|MdeModulePkg/Library/BaseMemoryAllocationLibNull/BaseMemoryAllocationLibNull.inf
 
 [LibraryClasses.common.SEC]
   PlatformSecLib|UefiCpuPkg/Library/PlatformSecLibNull/PlatformSecLibNull.inf
@@ -102,11 +104,14 @@
   MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   MemoryAllocationLib|MdePkg/Library/SmmMemoryAllocationLib/SmmMemoryAllocationLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
-  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
-  MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/IntelMmSaveStateLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
   MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
+  SmmCpuFeaturesLib|UefiCpuPkg/Library/SmmCpuFeaturesLib/StandaloneMmCpuFeaturesLib.inf
+
+[LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.DXE_SMM_DRIVER]
+  CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/SmmCpuExceptionHandlerLib.inf
+  MmSaveStateLib|UefiCpuPkg/Library/MmSaveStateLib/IntelMmSaveStateLib.inf
 
 [LibraryClasses.common.UEFI_APPLICATION]
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
@@ -128,6 +133,7 @@
   UefiCpuPkg/Library/CpuCacheInfoLib/PeiCpuCacheInfoLib.inf
   UefiCpuPkg/Library/CpuCacheInfoLib/DxeCpuCacheInfoLib.inf
   UefiCpuPkg/MicrocodeMeasurementDxe/MicrocodeMeasurementDxe.inf
+  UefiCpuPkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLib.inf
 
 [Components.IA32, Components.X64]
   UefiCpuPkg/CpuDxe/CpuDxe.inf
@@ -167,8 +173,14 @@
   UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
-  UefiCpuPkg/SecCore/SecCore.inf
-  UefiCpuPkg/SecCore/SecCoreNative.inf
+  UefiCpuPkg/SecCore/SecCore.inf {
+    <LibraryClasses>
+      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  }
+  UefiCpuPkg/SecCore/SecCoreNative.inf {
+    <LibraryClasses>
+      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+  }
   UefiCpuPkg/SecMigrationPei/SecMigrationPei.inf
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf {
@@ -206,6 +218,7 @@
   UefiCpuPkg/Library/SmmRelocationLib/AmdSmmRelocationLib.inf
 
 [Components.X64]
+  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuStandaloneMm.inf
   UefiCpuPkg/Library/CpuExceptionHandlerLib/UnitTest/DxeCpuExceptionHandlerLibUnitTest.inf
 
 [Components.RISCV64]

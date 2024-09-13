@@ -303,6 +303,10 @@
   #
   TraceHubDebugSysTLib|Include/Library/TraceHubDebugSysTLib.h
 
+  ##  @libraryclass  Provides a hook called when a stack cookie check fails.
+  #
+  StackCheckFailureHookLib|Include/Library/StackCheckFailureHookLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
@@ -1385,6 +1389,10 @@
   ## Include/Protocol/MmCommunication.h
   gEfiMmCommunicationProtocolGuid  = { 0xc68ed8e2, 0x9dc6, 0x4cbd, { 0x9d, 0x94, 0xdb, 0x65, 0xac, 0xc5, 0xc3, 0x32 }}
 
+  ## This protocol is a MM protocol published by a standalone MM Foundation code if MM Foundation is loaded in PEI phase.
+  ## This protocol should be installed immediately after DXE IPL installs EFI_PEI_END_OF_PEI_PHASE_PPI
+  gEfiMmEndOfPeiProtocol           = { 0xf33e1bf3, 0x980b, 0x4bfb, { 0xa2, 0x9a, 0xb2, 0x9c, 0x86, 0x45, 0x37, 0x32 }}
+
   #
   # Protocols defined in PI 1.6.
   #
@@ -2254,6 +2262,15 @@
   #   Other - reserved
   # @Prompt Speculation Barrier Type.
   gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType|0x01|UINT8|0x30001018
+
+  ## This PCD specifies the interrupt vector for stack cookie check failures
+  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector|0x42|UINT8|0x30001019
+
+  ## Enforces the use of Secure UEFI spec defined RNG algorithms.
+  # TRUE  - Enforce the use of Secure UEFI spec defined RNG algorithms.
+  # FALSE - Do not enforce and depend on the default implementation of RNG algorithm from the provider.
+  # @Prompt Enforce the use of Secure UEFI spec defined RNG algorithms.
+  gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms|TRUE|BOOLEAN|0x1000000D
 
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Indicates the maximum length of unicode string used in the following

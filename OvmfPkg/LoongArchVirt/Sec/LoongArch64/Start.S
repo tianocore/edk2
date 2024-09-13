@@ -105,7 +105,7 @@ ASM_PFX(EnableIPI):
 #     )
 #**/
 ASM_PFX(GetApicId):
-  csrrd $a0, LOONGARCH_CSR_CPUNUM
+  csrrd $a0, LOONGARCH_CSR_CPUID
   andi  $a0, $a0, 0x3ff
   jirl  $zero, $ra, 0
 # End of GetApicId
