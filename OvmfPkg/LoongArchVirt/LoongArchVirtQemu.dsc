@@ -417,8 +417,10 @@
   #
   # IPv4 and IPv6 PXE Boot support.
   #
+!if $(NETWORK_ENABLE) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport                       | 0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport                       | 0x01
+!endif
 
   #
   # SMBIOS entry point version
