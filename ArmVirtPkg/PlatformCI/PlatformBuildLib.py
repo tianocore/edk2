@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 import os
+import shutil
 import logging
 import io
 
@@ -206,7 +207,8 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
     def FlashRomImage(self):
         VirtualDrive = os.path.join(self.env.GetValue(
             "BUILD_OUTPUT_BASE"), "VirtualDrive")
-        os.makedirs(VirtualDrive, exist_ok=True)
+        VirtualDriveBoot = os.path.join(VirtualDrive, "EFI", "BOOT")
+        os.makedirs(VirtualDriveBoot, exist_ok=True)
         OutputPath_FV = os.path.join(
             self.env.GetValue("BUILD_OUTPUT_BASE"), "FV")
         Built_FV = os.path.join(OutputPath_FV, "QEMU_EFI.fd")
@@ -216,6 +218,15 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             fvfile.seek(0, os.SEEK_END)
             additional = b'\0' * ((64 * 1024 * 1024)-fvfile.tell())
             fvfile.write(additional)
+
+        # copy shell to VirtualDrive
+        for arch in self.env.GetValue("TARGET_ARCH").split():
+            src = os.path.join(self.env.GetValue(
+                "BUILD_OUTPUT_BASE"), arch, "Shell.efi")
+            dst = os.path.join(VirtualDriveBoot, f'BOOT{arch}.EFI')
+            if os.path.exists(src):
+                logging.info("copy %s -> %s", src, dst)
+                shutil.copyfile(src, dst)
 
         # QEMU must be on that path
 
