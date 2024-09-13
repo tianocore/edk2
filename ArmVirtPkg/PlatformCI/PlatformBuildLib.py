@@ -224,6 +224,7 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
             src = os.path.join(self.env.GetValue(
                 "BUILD_OUTPUT_BASE"), arch, "Shell.efi")
             dst = os.path.join(VirtualDriveBoot, f'BOOT{arch}.EFI')
+            logging.info("MIKE copy %s -> %s", src, dst)
             if os.path.exists(src):
                 logging.info("copy %s -> %s", src, dst)
                 shutil.copyfile(src, dst)
