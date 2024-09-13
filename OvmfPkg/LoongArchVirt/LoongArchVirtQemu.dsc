@@ -102,9 +102,6 @@
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 !endif
 
-  # For stack protector support
-  NULL                             | MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
-
   BaseLib                          | MdePkg/Library/BaseLib/BaseLib.inf
   SafeIntLib                       | MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   TimeBaseLib                      | EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
@@ -196,6 +193,9 @@
   PeiServicesTablePointerLib       | MdePkg/Library/PeiServicesTablePointerLibKs0/PeiServicesTablePointerLibKs0.inf
   PlatformHookLib                  | OvmfPkg/LoongArchVirt/Library/Fdt16550SerialPortHookLib/EarlyFdt16550SerialPortHookLib.inf
   CpuExceptionHandlerLib           | UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
+
+  # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
+  NULL                             | MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.common.PEI_CORE]
   PcdLib                           | MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -417,8 +417,10 @@
   #
   # IPv4 and IPv6 PXE Boot support.
   #
+!if $(NETWORK_ENABLE) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport                       | 0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport                       | 0x01
+!endif
 
   #
   # SMBIOS entry point version

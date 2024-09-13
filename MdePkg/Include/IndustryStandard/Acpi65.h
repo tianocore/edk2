@@ -1057,6 +1057,26 @@ typedef struct {
 #define EFI_ACPI_6_5_RASF_PATROL_SCRUB_COMMAND_STOP_PATROL_SCRUBBER   0x03
 
 ///
+/// ACPI RAS2 PCC Descriptor
+///
+typedef struct {
+  UINT8     PccId;
+  UINT8     Reserved[2];
+  UINT8     RasFeatureType;
+  UINT32    Instance;
+} EFI_ACPI_RAS2_PCC_DESCRIPTOR;
+
+///
+/// ACPI RAS2 Feature Table definition.
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  UINT16                         Reserved;
+  UINT16                         PccCount;
+  // EFI_ACPI_RAS2_PCC_DESCRIPTOR Descriptors[PccCount];
+} EFI_ACPI_6_5_RAS2_FEATURE_TABLE;
+
+///
 /// Memory Power State Table definition.
 ///
 typedef struct {
@@ -3120,6 +3140,11 @@ typedef struct {
 /// "PSDT" Persistent System Description Table
 ///
 #define EFI_ACPI_6_5_PERSISTENT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE  SIGNATURE_32('P', 'S', 'D', 'T')
+
+///
+/// "RAS2" ACPI RAS2 Feature Table
+///
+#define EFI_ACPI_6_5_ACPI_RAS2_FEATURE_TABLE_SIGNATURE  SIGNATURE_32('R', 'A', 'S', '2')
 
 ///
 /// "RASF" ACPI RAS Feature Table
