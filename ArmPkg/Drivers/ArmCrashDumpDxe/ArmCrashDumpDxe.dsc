@@ -43,7 +43,5 @@
   UefiLib|MdePkg/Library/UefiLib/UefiLib.inf
   UefiRuntimeServicesTableLib|MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.inf
 
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
-
 [Components.common]
   ArmPkg/Drivers/ArmCrashDumpDxe/ArmCrashDumpDxe.inf
