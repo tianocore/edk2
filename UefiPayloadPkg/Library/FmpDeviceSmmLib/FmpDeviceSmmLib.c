@@ -14,7 +14,7 @@
 
   Copyright (c) Microsoft Corporation.<BR>
   Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
-  Copyright (c) 2025, 3mdeb Sp. z o.o. All rights reserved.<BR>
+  Copyright (c) 2025 - 2026, 3mdeb Sp. z o.o. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -31,6 +31,20 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Coreboot.h>
+
+/**
+  Context structure for tracking progress during a firmware update.
+**/
+typedef struct {
+  // External callback for progress reporting or NULL if there is none.
+  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS    Callback;
+  // Total number of flashing steps.
+  UINTN                                            TotalSteps;
+  // Current step number.
+  UINTN                                            CurrentStep;
+  // A flag indicating whether progress needs to be reported via the external callback.
+  BOOLEAN                                          ShouldReport;
+} PROGRESS_CONTEXT;
 
 /**
   This function requests firmware information on the first call, caches it and
@@ -700,36 +714,28 @@ FmpDeviceSetImage (
   Advances progress of the operation by a single step, converts the steps to
   percents and invokes a callback if there is one.
 
-  @param[in]      Callback              External callback for progress reporting
-                                        or NULL if there is none.
-  @param[in]      TotalSteps            Total number of flashing steps.
-  @param[in, out] Step                  Current step number.
-  @param[in, out] ShouldReportProgress  A flag indicating whether progress needs
-                                        to be reported.
+  @param[in, out] Ctx  Progress context to update and report from.
 **/
 STATIC
 VOID
 IncrementProgress (
-  IN      EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Callback OPTIONAL,
-  IN      UINTN                                          TotalSteps,
-  IN OUT  UINTN                                          *Step,
-  IN OUT  BOOLEAN                                        *ShouldReportProgress
+  IN OUT PROGRESS_CONTEXT  *Ctx
   )
 {
   EFI_STATUS  Status;
   UINTN       Progress;
 
-  if (!*ShouldReportProgress) {
+  if (!Ctx->ShouldReport) {
     return;
   }
 
-  if (Callback == NULL) {
-    *ShouldReportProgress = FALSE;
+  if (Ctx->Callback == NULL) {
+    Ctx->ShouldReport = FALSE;
     return;
   }
 
-  ++*Step;
-  Progress = (*Step * 100) / TotalSteps;
+  ++Ctx->CurrentStep;
+  Progress = (Ctx->CurrentStep * 100) / Ctx->TotalSteps;
 
   //
   // Value of 0 means "progress reporting is not supported", so avoid using it.
@@ -738,11 +744,70 @@ IncrementProgress (
     Progress = 1;
   }
 
-  Status = Callback (Progress);
+  Status = Ctx->Callback (Progress);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "%a(): progress callback failed with: %r\n", __func__, Status));
-    *ShouldReportProgress = FALSE;
+    Ctx->ShouldReport = FALSE;
   }
+}
+
+/**
+  Reads current firmware in full and return as a newly allocated pool memory.
+
+  @param[in]      BlockSize    Size of a single block.
+  @param[in]      BlockCount   Total number of blocks.
+  @param[in, out] ProgressCtx  Progress-tracking context.
+
+  @retval NULL   On error.
+  @retval other  Current firmware image.
+**/
+STATIC
+VOID *
+EFIAPI
+ReadCurrentFirmware (
+  IN     UINTN             BlockSize,
+  IN     UINTN             BlockCount,
+  IN OUT PROGRESS_CONTEXT  *ProgressCtx
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       *Image;
+  UINTN       Block;
+  UINTN       NumBytes;
+
+  Image = AllocatePool (BlockCount * BlockSize);
+  if (Image == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a(): failed to allocate current image buffer.\n", __func__));
+    return NULL;
+  }
+
+  for (Block = 0; Block < BlockCount; Block++) {
+    NumBytes = BlockSize;
+    Status   = SmmStoreLibReadAnyBlock (
+                 Block,
+                 0,
+                 &NumBytes,
+                 Image + Block * BlockSize
+                 );
+    if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a(): read %d out of %d bytes of flash at 0x%x (%r).\n",
+        __func__,
+        NumBytes,
+        BlockSize,
+        Block * BlockSize,
+        Status
+        ));
+
+      FreePool (Image);
+      return NULL;
+    }
+
+    IncrementProgress (ProgressCtx);
+  }
+
+  return Image;
 }
 
 /**
@@ -941,16 +1006,14 @@ FmpDeviceSetImageWithStatus (
   OUT UINT32                                         *LastAttemptStatus
   )
 {
-  EFI_STATUS   Status;
-  UINTN        BlockSize;
-  UINTN        BlockCount;
-  UINTN        Block;
-  UINTN        NumBytes;
-  UINTN        TotalSteps;
-  UINTN        Step;
-  BOOLEAN      ShouldReportProgress;
-  VOID         *ReadBuffer;
-  CONST UINT8  *WriteNext;
+  EFI_STATUS        Status;
+  UINTN             BlockSize;
+  UINTN             BlockCount;
+  UINTN             Block;
+  UINTN             NumBytes;
+  UINT8             *CurrentImage;
+  UINTN             Offset;
+  PROGRESS_CONTEXT  ProgressCtx;
 
   *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
 
@@ -971,12 +1034,6 @@ FmpDeviceSetImageWithStatus (
     return Status;
   }
 
-  ReadBuffer = AllocatePool (BlockSize);
-  if (ReadBuffer == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a(): failed to allocate read buffer\n", __func__));
-    return EFI_OUT_OF_RESOURCES;
-  }
-
   BlockCount = ImageSize / BlockSize;
   DEBUG ((
     DEBUG_INFO,
@@ -986,29 +1043,31 @@ FmpDeviceSetImageWithStatus (
     BlockSize
     ));
 
-  ShouldReportProgress = TRUE;
-  TotalSteps           = BlockCount * 2; // Erase and write of each block.
-  Step                 = 0;
-  WriteNext            = Image;
+  //
+  // Initialize progress context.
+  //
+  ProgressCtx.Callback     = Progress;
+  ProgressCtx.CurrentStep  = 0;
+  ProgressCtx.TotalSteps   = BlockCount * 3;  // Worst case: read, erase and write each block.
+  ProgressCtx.ShouldReport = TRUE;
 
-  for (Block = 0; Block < BlockCount; Block++, WriteNext += BlockSize) {
+  CurrentImage = ReadCurrentFirmware (BlockSize, BlockCount, &ProgressCtx);
+  if (CurrentImage == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a(): failed to read current firmware.\n", __func__));
+    return EFI_END_OF_MEDIA;
+  }
+
+  for (Block = 0, Offset = 0; Block < BlockCount; Block++, Offset += BlockSize) {
     //
     // Save the flash and time by only writing a block if new contents differs
     // from the old one.
     //
-    // This is an optimization, so ignore read errors (if they are indicative of
-    // a serious problem, erasing or writing will fail as well).
-    //
-    NumBytes = BlockSize;
-    Status   = SmmStoreLibReadAnyBlock (Block, 0, &NumBytes, ReadBuffer);
-    if (!EFI_ERROR (Status) && (NumBytes == BlockSize)) {
-      if (CompareMem (ReadBuffer, WriteNext, BlockSize) == 0) {
-        // Erase step.
-        IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
-        // Write step.
-        IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
-        continue;
-      }
+    if (CompareMem (CurrentImage + Offset, (UINT8 *)Image + Offset, BlockSize) == 0) {
+      // Erase step.
+      IncrementProgress (&ProgressCtx);
+      // Write step.
+      IncrementProgress (&ProgressCtx);
+      continue;
     }
 
     Status = SmmStoreLibEraseAnyBlock (Block);
@@ -1016,18 +1075,18 @@ FmpDeviceSetImageWithStatus (
       goto IoError;
     }
 
-    IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
+    IncrementProgress (&ProgressCtx);
 
     NumBytes = BlockSize;
-    Status   = SmmStoreLibWriteAnyBlock (Block, 0, &NumBytes, (VOID *)WriteNext);
+    Status   = SmmStoreLibWriteAnyBlock (Block, 0, &NumBytes, (UINT8 *)Image + Offset);
     if (EFI_ERROR (Status) || (NumBytes != BlockSize)) {
       goto IoError;
     }
 
-    IncrementProgress (Progress, TotalSteps, &Step, &ShouldReportProgress);
+    IncrementProgress (&ProgressCtx);
   }
 
-  FreePool (ReadBuffer);
+  FreePool (CurrentImage);
 
   *LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
 
@@ -1088,7 +1147,7 @@ IoError:
   // If the firmware ends up unbootable, then, in general, external flashing
   // via a programmer needs to be employed to recover the device.
   //
-  FreePool (ReadBuffer);
+  FreePool (CurrentImage);
   DEBUG ((
     DEBUG_ERROR,
     "%a(): flashing has failed at block 0x%x/0x%x: %r\n",
