@@ -223,13 +223,14 @@ class PlatformBuilder(UefiBuilder, BuildSettingsManager):
         for arch in self.env.GetValue("TARGET_ARCH").split():
             src = os.path.join(self.env.GetValue(
                 "BUILD_OUTPUT_BASE"), arch, "Shell.efi")
-            dst = os.path.join(VirtualDriveBoot, f'BOOT{arch}.EFI')
+            dst = os.path.join(VirtualDriveBoot,
+                f'BOOT{"AA64" if arch == "AARCH64" else arch}.EFI')
             logging.info("MIKE copy %s -> %s", src, dst)
             if os.path.exists(src):
                 logging.info("copy %s -> %s", src, dst)
                 shutil.copyfile(src, dst)
 
-        # QEMU must be on that path
+        # QEMU must be on the path
 
         # Unique Command and Args parameters per ARCH
         if (self.env.GetValue("TARGET_ARCH").upper() == "AARCH64"):
