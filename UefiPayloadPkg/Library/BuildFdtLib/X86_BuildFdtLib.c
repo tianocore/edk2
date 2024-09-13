@@ -404,6 +404,7 @@ BuildFdtForPciRootBridge (
   UINT32                                            RegTmp[2];
   UINT32                                            RegData[21];
   UINT32                                            DMARegData[8];
+  UINT64                                            Reg64Data[2];
   UINT32                                            Data32;
   UINT64                                            Data64;
   UINT8                                             BusNumber;
@@ -611,11 +612,14 @@ BuildFdtForPciRootBridge (
       Status = FdtSetProperty (Fdt, TempNode, "dma-ranges", &DMARegData, sizeof (DMARegData));
       ASSERT_EFI_ERROR (Status);
 
-      Data32 = CpuToFdt32 (2);
-      Status = FdtSetProperty (Fdt, TempNode, "#size-cells", &Data32, sizeof (UINT32));
+      ASSERT (PciRootBridgeInfo->RootBridge[Index].Bus.Base <= 0xFF);
+      ASSERT (PciRootBridgeInfo->RootBridge[Index].Bus.Limit <= 0xFF);
 
-      Data32 = CpuToFdt32 (3);
-      Status = FdtSetProperty (Fdt, TempNode, "#address-cells", &Data32, sizeof (UINT32));
+      Reg64Data[0] = CpuToFdt64 (PciExpressBaseAddress + LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Base, 20));
+      Reg64Data[1] = CpuToFdt64 (LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Limit +1, 20));
+
+      Status = FdtSetProperty (Fdt, TempNode, "reg", &Reg64Data, sizeof (Reg64Data));
+      ASSERT_EFI_ERROR (Status);
 
       BusNumber = PciRootBridgeInfo->RootBridge[Index].Bus.Base & 0xFF;
       RegTmp[0] = CpuToFdt32 (BusNumber);
@@ -626,6 +630,12 @@ BuildFdtForPciRootBridge (
 
       Status = FdtSetProperty (Fdt, TempNode, "bus-range", &RegTmp, sizeof (RegTmp));
       ASSERT_EFI_ERROR (Status);
+
+      Data32 = CpuToFdt32 (2);
+      Status = FdtSetProperty (Fdt, TempNode, "#size-cells", &Data32, sizeof (UINT32));
+
+      Data32 = CpuToFdt32 (3);
+      Status = FdtSetProperty (Fdt, TempNode, "#address-cells", &Data32, sizeof (UINT32));
 
       Status = FdtSetProperty (Fdt, TempNode, "compatible", "pci-rb", (UINT32)(AsciiStrLen ("pci-rb")+1));
       ASSERT_EFI_ERROR (Status);
