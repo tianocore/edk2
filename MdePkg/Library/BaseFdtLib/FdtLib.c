@@ -7,6 +7,7 @@
 **/
 
 #include <libfdt/libfdt/libfdt.h>
+#include <Uefi/UefiBaseType.h>
 
 /**
   Convert UINT16 data of the FDT blob to little-endian
@@ -203,6 +204,46 @@ FdtNextSubnode (
   )
 {
   return fdt_next_subnode (Fdt, Offset);
+}
+
+/**
+  Returns number of reserved mem nodes
+
+  @param[in] Fdt            The pointer to FDT blob.
+
+  @return total reserved mem nodes
+
+**/
+INTN
+EFIAPI
+FdtNumRsv (
+  IN CONST VOID  *Fdt
+  )
+{
+  return fdt_num_mem_rsv (Fdt);
+}
+
+/**
+  Returns reserved ranges.
+
+  @param[in] *Fdt            The pointer to FDT blob.
+  @param[in] Index           Reserved entry index in the table.
+  @param[out] Addr           Address returned
+  @param[out] *Size          Pointer to size of the address range
+
+  @return Returns reserved range.
+
+**/
+INTN
+EFIAPI
+FdtGetMemRsv (
+  IN CONST VOID             *Fdt,
+  IN INTN                   Index,
+  OUT EFI_PHYSICAL_ADDRESS  *Addr,
+  OUT UINT64                *Size
+  )
+{
+  return fdt_get_mem_rsv (Fdt, Index, Addr, Size);
 }
 
 /**

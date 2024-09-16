@@ -104,6 +104,16 @@
   # @Prompt Max size of total HTTP chunk transfer. the default value is 12MB.
   gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpChunkTransfer|0x0C00000|UINT32|0x0000000E
 
+  ## The maximum number of retries while attempting to resume an
+  # interrupted HTTP download using a HTTP Range request header.
+  # @Prompt Max number of HTTP download resume retries. Default value is 5.
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpResumeRetries|0x00000005|UINT32|0x00000012
+
+  ## Delay in seconds between each attempt to resume an
+  # interrupted HTTP download.
+  # @Prompt Delay in seconds between each HTTP resume retry. Default value is 2s.
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDelayBetweenResumeRetries|0x00000002|UINT32|0x00000013
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Indicates whether HTTP connections (i.e., unsecured) are permitted or not.
   # TRUE  - HTTP connections are allowed. Both the "https://" and "http://" URI schemes are permitted.
@@ -130,12 +140,6 @@
   # FALSE - Event being triggered upon ExitBootServices call will NOT be created
   # @Prompt Indicates whether SnpDxe creates event for ExitBootServices() call.
   gEfiNetworkPkgTokenSpaceGuid.PcdSnpCreateExitBootServicesEvent|TRUE|BOOLEAN|0x1000000C
-
-  ## Enforces the use of Secure UEFI spec defined RNG algorithms for all network connections.
-  # TRUE  - Enforce the use of Secure UEFI spec defined RNG algorithms.
-  # FALSE - Do not enforce and depend on the default implementation of RNG algorithm from the provider.
-  # @Prompt Enforce the use of Secure UEFI spec defined RNG algorithms.
-  gEfiNetworkPkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms|TRUE|BOOLEAN|0x1000000D
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).
