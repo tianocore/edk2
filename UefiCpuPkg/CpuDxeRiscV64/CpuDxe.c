@@ -360,6 +360,12 @@ InitializeCpu (
   ASSERT_EFI_ERROR (Status);
 
   //
+  // Initialize FPU
+  //
+  Status = RiscVInitializeFpu ();
+  ASSERT_EFI_ERROR (Status);
+
+  //
   // Install Boot protocol
   //
   Status = gBS->InstallProtocolInterface (
