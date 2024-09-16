@@ -20,6 +20,7 @@
 #define MSTATUS_SPP         (1UL << MSTATUS_SPP_SHIFT)
 #define MSTATUS_MPP_SHIFT   11
 #define MSTATUS_MPP         (3UL << MSTATUS_MPP_SHIFT)
+#define MSTATUS_FS          0x00006000UL
 
 #define SSTATUS_SIE         MSTATUS_SIE
 #define SSTATUS_SPIE_SHIFT  MSTATUS_SPIE_SHIFT
@@ -75,6 +76,9 @@
 /* User Counters/Timers */
 #define CSR_CYCLE  0xc00
 #define CSR_TIME   0xc01
+
+/* Floating-Point */
+#define CSR_FCSR  0x003
 
 /* Supervisor Trap Setup */
 #define CSR_SSTATUS  0x100
