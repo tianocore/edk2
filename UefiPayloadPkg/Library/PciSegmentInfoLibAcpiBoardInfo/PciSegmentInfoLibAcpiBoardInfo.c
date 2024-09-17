@@ -68,8 +68,6 @@ RetrieveMultiSegmentInfoFromHob (
     mPciSegments[Index].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Base;
     mPciSegments[Index].EndBusNumber   = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Limit;
   }
-
-  return;
 }
 
 /**
