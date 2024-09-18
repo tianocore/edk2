@@ -69,11 +69,11 @@ def GuidStringToGuidStructureString(Guid):
 def CheckGuidRegFormat(GuidValue):
     ## Regular expression used to find out register format of GUID
     #
-    RegFormatGuidPattern = re.compile("^\s*([0-9a-fA-F]){8}-"
+    RegFormatGuidPattern = re.compile(r"^\s*([0-9a-fA-F]){8}-"
                                        "([0-9a-fA-F]){4}-"
                                        "([0-9a-fA-F]){4}-"
                                        "([0-9a-fA-F]){4}-"
-                                       "([0-9a-fA-F]){12}\s*$")
+                                       r"([0-9a-fA-F]){12}\s*$")
 
     if RegFormatGuidPattern.match(GuidValue):
         return True
@@ -837,8 +837,8 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
                          ST.ERR_FILE_OPEN_FAILURE,
                          File=FullFileName)
 
-        ReFileGuidPattern = re.compile("^\s*FILE_GUID\s*=.*$")
-        ReVerStringPattern = re.compile("^\s*VERSION_STRING\s*=.*$")
+        ReFileGuidPattern = re.compile(r"^\s*FILE_GUID\s*=.*$")
+        ReVerStringPattern = re.compile(r"^\s*VERSION_STRING\s*=.*$")
 
         FileLinesList = ProcessLineExtender(FileLinesList)
 
@@ -978,7 +978,7 @@ def ValidateUNIFilePath(Path):
     #
     # Check if the file name is valid according to the DEC and INF specification
     #
-    Pattern = '[a-zA-Z0-9_][a-zA-Z0-9_\-\.]*'
+    Pattern = r'[a-zA-Z0-9_][a-zA-Z0-9_\-\.]*'
     FileName = Path.replace(Suffix, '')
     InvalidCh = re.sub(Pattern, '', FileName)
     if InvalidCh:

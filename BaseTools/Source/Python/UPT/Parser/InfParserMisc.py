@@ -109,7 +109,7 @@ def InfExpandMacro(Content, LineInfo, GlobalMacros=None, SectionMacros=None, Fla
         return Content
     else:
         for Macro in MacroUsed:
-            gQuotedMacro = re.compile(".*\".*\$\(%s\).*\".*"%(Macro))
+            gQuotedMacro = re.compile(r".*\".*\$\(%s\).*\".*"%(Macro))
             if not gQuotedMacro.match(Content):
                 #
                 # Still have MACROs can't be expanded.
@@ -130,8 +130,8 @@ def IsBinaryInf(FileLineList):
     if not FileLineList:
         return False
 
-    ReIsSourcesSection = re.compile("^\s*\[Sources.*\]\s.*$", re.IGNORECASE)
-    ReIsBinarySection = re.compile("^\s*\[Binaries.*\]\s.*$", re.IGNORECASE)
+    ReIsSourcesSection = re.compile(r"^\s*\[Sources.*\]\s.*$", re.IGNORECASE)
+    ReIsBinarySection = re.compile(r"^\s*\[Binaries.*\]\s.*$", re.IGNORECASE)
     BinarySectionFoundFlag = False
 
     for Line in FileLineList:
@@ -155,7 +155,7 @@ def IsBinaryInf(FileLineList):
 # @return Flag
 #
 def IsLibInstanceInfo(String):
-    ReIsLibInstance = re.compile("^\s*##\s*@LIB_INSTANCES\s*$")
+    ReIsLibInstance = re.compile(r"^\s*##\s*@LIB_INSTANCES\s*$")
     if ReIsLibInstance.match(String):
         return True
     else:
@@ -171,7 +171,7 @@ def IsLibInstanceInfo(String):
 # @return Flag
 #
 def IsAsBuildOptionInfo(String):
-    ReIsAsBuildInstance = re.compile("^\s*##\s*@AsBuilt\s*$")
+    ReIsAsBuildInstance = re.compile(r"^\s*##\s*@AsBuilt\s*$")
     if ReIsAsBuildInstance.match(String):
         return True
     else:

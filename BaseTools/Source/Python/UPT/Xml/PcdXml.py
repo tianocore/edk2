@@ -100,11 +100,11 @@ class PcdErrorXml(object):
     def TransferValidRange2Expr(self, TokenSpaceGuidCName, CName, ValidRange):
         if self.Expression:
             pass
-        INT_RANGE_PATTERN1 = '[\t\s]*[0-9]+[\t\s]*-[\t\s]*[0-9]+'
-        INT_RANGE_PATTERN2 = '[\t\s]*(LT|GT|LE|GE|XOR|EQ)[\t\s]+\d+[\t\s]*'
+        INT_RANGE_PATTERN1 = r'[\t\s]*[0-9]+[\t\s]*-[\t\s]*[0-9]+'
+        INT_RANGE_PATTERN2 = r'[\t\s]*(LT|GT|LE|GE|XOR|EQ)[\t\s]+\d+[\t\s]*'
         HEX_RANGE_PATTERN1 = \
-            '[\t\s]*0[xX][a-fA-F0-9]+[\t\s]*-[\t\s]*0[xX][a-fA-F0-9]+'
-        HEX_RANGE_PATTERN2 = '[\t\s]*(LT|GT|LE|GE|XOR|EQ)[\t\s]+0[xX][a-fA-F0-9]+[\t\s]*'
+            r'[\t\s]*0[xX][a-fA-F0-9]+[\t\s]*-[\t\s]*0[xX][a-fA-F0-9]+'
+        HEX_RANGE_PATTERN2 = r'[\t\s]*(LT|GT|LE|GE|XOR|EQ)[\t\s]+0[xX][a-fA-F0-9]+[\t\s]*'
         IntMatch1 = re.compile(INT_RANGE_PATTERN1)
         IntMatch2 = re.compile(INT_RANGE_PATTERN2)
         HexMatch1 = re.compile(HEX_RANGE_PATTERN1)
@@ -158,18 +158,18 @@ class PcdErrorXml(object):
             pass
 
         PCD_PATTERN = \
-        '[\t\s]*[_a-zA-Z][a-zA-Z0-9_]*[\t\s]*\.[\t\s]*[_a-zA-Z][a-zA-Z0-9_]*[\t\s]*'
+        r'[\t\s]*[_a-zA-Z][a-zA-Z0-9_]*[\t\s]*\.[\t\s]*[_a-zA-Z][a-zA-Z0-9_]*[\t\s]*'
         IntPattern1 = \
-        '[\t\s]*\([\t\s]*'+PCD_PATTERN+'[\t\s]+GE[\t\s]+\d+[\t\s]*\)[\t\s]+AND[\t\s]+\([\t\s]*'+\
-        PCD_PATTERN+'[\t\s]+LE[\t\s]+\d+[\t\s]*\)'
+        r'[\t\s]*\([\t\s]*'+PCD_PATTERN+r'[\t\s]+GE[\t\s]+\d+[\t\s]*\)[\t\s]+AND[\t\s]+\([\t\s]*'+\
+        PCD_PATTERN+r'[\t\s]+LE[\t\s]+\d+[\t\s]*\)'
         IntPattern1 = IntPattern1.replace(' ', '')
-        IntPattern2 = '[\t\s]*'+PCD_PATTERN+'[\t\s]+(LT|GT|LE|GE|XOR|EQ)[\t\s]+\d+[\t\s]*'
+        IntPattern2 = r'[\t\s]*'+PCD_PATTERN+r'[\t\s]+(LT|GT|LE|GE|XOR|EQ)[\t\s]+\d+[\t\s]*'
 
         HexPattern1 = \
-        '[\t\s]*\([\t\s]*'+PCD_PATTERN+'[\t\s]+GE[\t\s]+0[xX][0-9a-fA-F]+[\t\s]*\)[\t\s]+AND[\t\s]+\([\t\s]*'+\
-        PCD_PATTERN+'[\t\s]+LE[\t\s]+0[xX][0-9a-fA-F]+[\t\s]*\)'
+        r'[\t\s]*\([\t\s]*'+PCD_PATTERN+r'[\t\s]+GE[\t\s]+0[xX][0-9a-fA-F]+[\t\s]*\)[\t\s]+AND[\t\s]+\([\t\s]*'+\
+        PCD_PATTERN+r'[\t\s]+LE[\t\s]+0[xX][0-9a-fA-F]+[\t\s]*\)'
         HexPattern1 = HexPattern1.replace(' ', '')
-        HexPattern2 = '[\t\s]*'+PCD_PATTERN+'[\t\s]+(LT|GT|LE|GE|XOR|EQ)[\t\s]+0[xX][0-9a-zA-Z]+[\t\s]*'
+        HexPattern2 = r'[\t\s]*'+PCD_PATTERN+r'[\t\s]+(LT|GT|LE|GE|XOR|EQ)[\t\s]+0[xX][0-9a-zA-Z]+[\t\s]*'
 
         #
         # Do the Hex1 conversion
@@ -180,7 +180,7 @@ class PcdErrorXml(object):
             #
             # To match items on both sides of '-'
             #
-            RangeItemList = re.compile('[\t\s]*0[xX][0-9a-fA-F]+[\t\s]*').findall(HexMatchedItem)
+            RangeItemList = re.compile(r'[\t\s]*0[xX][0-9a-fA-F]+[\t\s]*').findall(HexMatchedItem)
             if RangeItemList and len(RangeItemList) == 2:
                 HexRangeDict[HexMatchedItem] = RangeItemList
 
@@ -204,7 +204,7 @@ class PcdErrorXml(object):
             #
             # To match items on both sides of '-'
             #
-            RangeItemList = re.compile('[\t\s]*\d+[\t\s]*').findall(MatchedItem)
+            RangeItemList = re.compile(r'[\t\s]*\d+[\t\s]*').findall(MatchedItem)
             if RangeItemList and len(RangeItemList) == 2:
                 IntRangeDict[MatchedItem] = RangeItemList
 

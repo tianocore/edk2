@@ -200,9 +200,9 @@ def ValidateRegValues(Key, Value):
             ('[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}'
             '-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}',
             ST.ERR_GUID_VALUE % Value),
-        'Version'   :   ('[0-9]+(\.[0-9]+)?', ST.ERR_VERSION_VALUE % \
+        'Version'   :   (r'[0-9]+(\.[0-9]+)?', ST.ERR_VERSION_VALUE % \
                          (Key, Value)),
-        'XmlSpecification' : ('1\.1', ST.ERR_VERSION_XMLSPEC % Value)
+        'XmlSpecification' : (r'1\.1', ST.ERR_VERSION_XMLSPEC % Value)
     }
     if Key not in ValidateMap:
         return True, ''

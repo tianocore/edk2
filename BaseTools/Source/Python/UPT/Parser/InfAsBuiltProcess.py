@@ -53,12 +53,12 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo, CurrentInfFileName):
     #
     # To deal with library instance specified by GUID and version
     #
-    RegFormatGuidPattern = re.compile("\s*([0-9a-fA-F]){8}-"
+    RegFormatGuidPattern = re.compile(r"\s*([0-9a-fA-F]){8}-"
                                        "([0-9a-fA-F]){4}-"
                                        "([0-9a-fA-F]){4}-"
                                        "([0-9a-fA-F]){4}-"
-                                       "([0-9a-fA-F]){12}\s*")
-    VersionPattern = re.compile('[\t\s]*\d+(\.\d+)?[\t\s]*')
+                                       r"([0-9a-fA-F]){12}\s*")
+    VersionPattern = re.compile(r'[\t\s]*\d+(\.\d+)?[\t\s]*')
     GuidMatchedObj = RegFormatGuidPattern.search(String)
 
     if String.upper().startswith('GUID') and GuidMatchedObj and 'Version' in String:
@@ -75,8 +75,8 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo, CurrentInfFileName):
     FileLinesList = GetFileLineContent(String, WorkSpace, LineNo, OriginalString)
 
 
-    ReFindFileGuidPattern = re.compile("^\s*FILE_GUID\s*=.*$")
-    ReFindVerStringPattern = re.compile("^\s*VERSION_STRING\s*=.*$")
+    ReFindFileGuidPattern = re.compile(r"^\s*FILE_GUID\s*=.*$")
+    ReFindVerStringPattern = re.compile(r"^\s*VERSION_STRING\s*=.*$")
 
     for Line in FileLinesList:
         if ReFindFileGuidPattern.match(Line):
@@ -106,8 +106,8 @@ def GetPackageListInfo(FileNameString, WorkSpace, LineNo):
 
     FileLinesList = GetFileLineContent(FileNameString, WorkSpace, LineNo, '')
 
-    RePackageHeader = re.compile('^\s*\[Packages.*\].*$')
-    ReDefineHeader = re.compile('^\s*\[Defines].*$')
+    RePackageHeader = re.compile(r'^\s*\[Packages.*\].*$')
+    ReDefineHeader = re.compile(r'^\s*\[Defines].*$')
 
     PackageHederFlag = False
     DefineHeaderFlag = False
@@ -255,8 +255,8 @@ def GetGuidVerFormLibInstance(Guid, Version, WorkSpace, CurrentInfFileName):
             FileLinesList = InfFileObj.readlines()
             FileLinesList = ProcessLineExtender(FileLinesList)
 
-            ReFindFileGuidPattern = re.compile("^\s*FILE_GUID\s*=.*$")
-            ReFindVerStringPattern = re.compile("^\s*VERSION_STRING\s*=.*$")
+            ReFindFileGuidPattern = re.compile(r"^\s*FILE_GUID\s*=.*$")
+            ReFindVerStringPattern = re.compile(r"^\s*VERSION_STRING\s*=.*$")
 
             for Line in FileLinesList:
                 if ReFindFileGuidPattern.match(Line):

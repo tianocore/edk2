@@ -54,7 +54,7 @@ def GetArrayPattern():
 #  @return p:    the pattern of function pointer
 #
 def GetTypedefFuncPointerPattern():
-    p = re.compile('[_\w\s]*\([\w\s]*\*+\s*[_\w]+\s*\)\s*\(.*\)', re.DOTALL)
+    p = re.compile(r'[_\w\s]*\([\w\s]*\*+\s*[_\w]+\s*\)\s*\(.*\)', re.DOTALL)
     return p
 
 ## GetDB() method
