@@ -6,15 +6,13 @@
   all MMRAM range via MM_ACCESS_PROTOCOL, including the range for firmware (like MM Core
   and MM driver) and/or specific dedicated hardware.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
+#include "StandaloneMmMemLibInternal.h"
 //
 // Maximum support address used to check input buffer
 //
@@ -25,7 +23,7 @@ extern EFI_PHYSICAL_ADDRESS  mMmMemLibInternalMaximumSupportAddress;
 
 **/
 VOID
-MmMemLibInternalCalculateMaximumSupportAddress (
+MmMemLibCalculateMaximumSupportAddress (
   VOID
   )
 {

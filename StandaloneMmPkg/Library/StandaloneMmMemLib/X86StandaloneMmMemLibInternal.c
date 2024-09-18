@@ -6,18 +6,16 @@
   all MMRAM range via MM_ACCESS_PROTOCOL, including the range for firmware (like MM Core
   and MM driver) and/or specific dedicated hardware.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#include "StandaloneMmMemLibInternal.h"
 #include <PiMm.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 
 #include <Guid/MmramMemoryReserve.h>
@@ -34,7 +32,7 @@ extern UINTN                 mMmMemLibInternalMmramCount;
 
 **/
 VOID
-MmMemLibInternalCalculateMaximumSupportAddress (
+MmMemLibCalculateMaximumSupportAddress (
   VOID
   )
 {
