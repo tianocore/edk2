@@ -274,7 +274,7 @@ typedef struct {
   NetDebugOutput ( \
     NETDEBUG_LEVEL_TRACE, \
     Module, \
-    __FILE__, \
+    __FILE_NAME__, \
     DEBUG_LINE_NUMBER, \
     NetDebugASPrint PrintArg \
     )
@@ -283,7 +283,7 @@ typedef struct {
   NetDebugOutput ( \
     NETDEBUG_LEVEL_WARNING, \
     Module, \
-    __FILE__, \
+    __FILE_NAME__, \
     DEBUG_LINE_NUMBER, \
     NetDebugASPrint PrintArg \
     )
@@ -292,7 +292,7 @@ typedef struct {
   NetDebugOutput ( \
     NETDEBUG_LEVEL_ERROR, \
     Module, \
-    __FILE__, \
+    __FILE_NAME__, \
     DEBUG_LINE_NUMBER, \
     NetDebugASPrint PrintArg \
     )
@@ -308,7 +308,7 @@ typedef struct {
          NetDebugOutput (
            NETDEBUG_LEVEL_TRACE,
            "Tcp",
-           __FILE__,
+           __FILE_NAME__,
            DEBUG_LINE_NUMBER,
            NetDebugASPrint ("State transit to %a\n", Name)
          )
