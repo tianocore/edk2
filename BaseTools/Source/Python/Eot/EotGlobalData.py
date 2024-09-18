@@ -11,7 +11,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 gEFI_SOURCE = ''
 gEDK_SOURCE = ''
 gWORKSPACE = ''
-gSHELL_INF = 'Application\Shell'
+gSHELL_INF = r'Application\Shell'
 gMAKE_FILE = ''
 gDSC_FILE = ''
 gFV_FILE = []
