@@ -137,18 +137,19 @@ ArmPkg
 F: ArmPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
-R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 ArmVirtPkg
 F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
+M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
-R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 
 BaseTools
@@ -428,7 +429,7 @@ R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
 MdePkg: ARM/AARCH64 standard interfaces
 F: MdePkg/Include/Library/ArmLib.h
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
-R: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
+M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 NetworkPkg
 F: NetworkPkg/
