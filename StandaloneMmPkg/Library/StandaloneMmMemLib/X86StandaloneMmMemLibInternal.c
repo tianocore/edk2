@@ -13,11 +13,9 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#include <StandaloneMmMemLib.h>
 #include <PiMm.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 
 #include <Guid/MmramMemoryReserve.h>

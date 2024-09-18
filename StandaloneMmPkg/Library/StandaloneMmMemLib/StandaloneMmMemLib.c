@@ -6,18 +6,14 @@
   all MMRAM range via MM_ACCESS_PROTOCOL, including the range for firmware (like MM Core
   and MM driver) and/or specific dedicated hardware.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include <PiMm.h>
-
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/DebugLib.h>
+#include <StandaloneMmMemLib.h>
 
 EFI_MMRAM_DESCRIPTOR  *mMmMemLibInternalMmramRanges;
 UINTN                 mMmMemLibInternalMmramCount;
@@ -26,36 +22,6 @@ UINTN                 mMmMemLibInternalMmramCount;
 // Maximum support address used to check input buffer
 //
 EFI_PHYSICAL_ADDRESS  mMmMemLibInternalMaximumSupportAddress = 0;
-
-/**
-  Calculate and save the maximum support address.
-
-**/
-VOID
-MmMemLibInternalCalculateMaximumSupportAddress (
-  VOID
-  );
-
-/**
-  Initialize cached Mmram Ranges from HOB.
-
-  @retval EFI_UNSUPPORTED   The routine is unable to extract MMRAM information.
-  @retval EFI_SUCCESS       MmRanges are populated successfully.
-
-**/
-EFI_STATUS
-MmMemLibInternalPopulateMmramRanges (
-  VOID
-  );
-
-/**
-  Deinitialize cached Mmram Ranges.
-
-**/
-VOID
-MmMemLibInternalFreeMmramRanges (
-  VOID
-  );
 
 /**
   This function check if the buffer is valid per processor architecture and not overlap with MMRAM.
