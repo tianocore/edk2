@@ -114,6 +114,14 @@
   #
   gIntelFsp2PkgTokenSpaceGuid.PcdFspPrivateTemporaryRamSize |0x00000000|UINT32|0x10000006
 
+[PcdsFeatureFlag]
+  #
+  # Indicates if the FSP will save and restore page table. Only works in FSP API mode
+  #   TRUE  - FSP will save and restore page table
+  #   FALSE - FSP will not save and restore page table
+  #
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspSaveRestorePageTableEnable |FALSE|BOOLEAN|0x10000007
+
 [PcdsFixedAtBuild,PcdsDynamic,PcdsDynamicEx]
   gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedMemoryLength  |0x00100000|UINT32|0x46530000
   gIntelFsp2PkgTokenSpaceGuid.PcdBootLoaderEntry          |0xFFFFFFE4|UINT32|0x46530100

@@ -131,6 +131,3 @@
 
 [Depex]
   TRUE
-
-[Pcd.X64]
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmRestrictedMemoryAccess        ## CONSUMES

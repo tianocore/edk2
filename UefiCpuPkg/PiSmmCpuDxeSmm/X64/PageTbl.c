@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 LIST_ENTRY                mPagePool           = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                   m1GPageTableSupport = FALSE;
-BOOLEAN                   mCpuSmmRestrictedMemoryAccess;
 X86_ASSEMBLY_PATCH_LABEL  gPatch5LevelPagingNeeded;
 
 /**
@@ -207,10 +206,9 @@ SmmInitPageTable (
   //
   InitializeSpinLock (mPFLock);
 
-  mCpuSmmRestrictedMemoryAccess = PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
-  m1GPageTableSupport           = Is1GPageSupport ();
-  m5LevelPagingNeeded           = Is5LevelPagingNeeded ();
-  mPhysicalAddressBits          = CalculateMaximumSupportAddress (m5LevelPagingNeeded);
+  m1GPageTableSupport  = Is1GPageSupport ();
+  m5LevelPagingNeeded  = Is5LevelPagingNeeded ();
+  mPhysicalAddressBits = CalculateMaximumSupportAddress (m5LevelPagingNeeded);
   PatchInstructionX86 (gPatch5LevelPagingNeeded, m5LevelPagingNeeded, 1);
   if (m5LevelPagingNeeded) {
     mPagingMode = m1GPageTableSupport ? Paging5Level1GB : Paging5Level;
@@ -220,7 +218,6 @@ SmmInitPageTable (
 
   DEBUG ((DEBUG_INFO, "5LevelPaging Needed             - %d\n", m5LevelPagingNeeded));
   DEBUG ((DEBUG_INFO, "1GPageTable Support             - %d\n", m1GPageTableSupport));
-  DEBUG ((DEBUG_INFO, "PcdCpuSmmRestrictedMemoryAccess - %d\n", mCpuSmmRestrictedMemoryAccess));
   DEBUG ((DEBUG_INFO, "PhysicalAddressBits             - %d\n", mPhysicalAddressBits));
 
   //
@@ -726,7 +723,7 @@ SmiPFHandler (
 
   PFAddress = AsmReadCr2 ();
 
-  if (mCpuSmmRestrictedMemoryAccess && (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1)))) {
+  if (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1))) {
     DumpCpuContext (InterruptType, SystemContext);
     DEBUG ((DEBUG_ERROR, "Do not support address 0x%lx by processor!\n", PFAddress));
     CpuDeadLoop ();
@@ -815,7 +812,7 @@ SmiPFHandler (
       goto Exit;
     }
 
-    if (mCpuSmmRestrictedMemoryAccess && IsSmmCommBufferForbiddenAddress (PFAddress)) {
+    if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%lx)!\n", PFAddress));
     }
   }
@@ -845,7 +842,7 @@ Exit:
 }
 
 /**
-  This function reads CR2 register when on-demand paging is enabled.
+  This function reads CR2 register.
 
   @param[out]  *Cr2  Pointer to variable to hold CR2 register value.
 **/
@@ -854,16 +851,11 @@ SaveCr2 (
   OUT UINTN  *Cr2
   )
 {
-  if (!mCpuSmmRestrictedMemoryAccess) {
-    //
-    // On-demand paging is enabled when access to non-SMRAM is not restricted.
-    //
-    *Cr2 = AsmReadCr2 ();
-  }
+  *Cr2 = AsmReadCr2 ();
 }
 
 /**
-  This function restores CR2 register when on-demand paging is enabled.
+  This function restores CR2 register.
 
   @param[in]  Cr2  Value to write into CR2 register.
 **/
@@ -872,24 +864,5 @@ RestoreCr2 (
   IN UINTN  Cr2
   )
 {
-  if (!mCpuSmmRestrictedMemoryAccess) {
-    //
-    // On-demand paging is enabled when access to non-SMRAM is not restricted.
-    //
-    AsmWriteCr2 (Cr2);
-  }
-}
-
-/**
-  Return whether access to non-SMRAM is restricted.
-
-  @retval TRUE  Access to non-SMRAM is restricted.
-  @retval FALSE Access to non-SMRAM is not restricted.
-**/
-BOOLEAN
-IsRestrictedMemoryAccess (
-  VOID
-  )
-{
-  return mCpuSmmRestrictedMemoryAccess;
+  AsmWriteCr2 (Cr2);
 }
