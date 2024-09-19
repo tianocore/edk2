@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Decompression algorithm begins here
 //
-#define UINT8_MAX 0xff
 #define BITBUFSIZ 32
 #define MAXMATCH  256
 #define THRESHOLD 3
