@@ -534,7 +534,10 @@ UnitTestDebugAssert (
   are not included in a module.
 
 **/
-#define DEBUG_CODE_BEGIN()  do { if (DebugCodeEnabled ()) { UINT8  __DebugCodeLocal
+#define DEBUG_CODE_BEGIN()     \
+  do {                         \
+    if (DebugCodeEnabled ()) { \
+      do { } while (FALSE)
 
 /**
   The macro that marks the end of debug source code.
@@ -545,7 +548,9 @@ UnitTestDebugAssert (
   are not included in a module.
 
 **/
-#define DEBUG_CODE_END()  __DebugCodeLocal = 0; __DebugCodeLocal++; } } while (FALSE)
+#define DEBUG_CODE_END()         \
+    }                            \
+  } while (FALSE)
 
 /**
   The macro that declares a section of debug source code.
