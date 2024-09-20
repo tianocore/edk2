@@ -441,7 +441,7 @@
   #
   # Network Pcds
   #
-!include NetworkPkg/NetworkPcds.dsc.inc
+!include NetworkPkg/NetworkFixedPcds.dsc.inc
 
 !ifdef $(DEBUG_ON_HYPERVISOR_CONSOLE)
   ## Set Xen's debug IO port for PlatformDebugLibIoPort
