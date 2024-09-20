@@ -658,7 +658,26 @@ ParsePciRootBridge (
   UINTN               HobDataSize;
   UINT8               Base;
 
+  // Parse serial port and graphic device nodes if "pci-rb" node is not
+  // compatbile to "pci-rb" property type.
+  //
+  // With serial port and graphic device nodes parsed,  debug trace log
+  // can be enabled and graphic device can be worked as expected before
+  // UPL scan Host PCI Root Bridge.
   if (RootBridgeCount == 0) {
+    for (SubNode = FdtFirstSubnode (Fdt, Node); SubNode >= 0; SubNode = FdtNextSubnode (Fdt, SubNode)) {
+      NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + SubNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
+      DEBUG ((DEBUG_INFO, "\n      SubNode(%08X)  %a", SubNode, NodePtr->Name));
+
+      if (AsciiStrnCmp (NodePtr->Name, "serial@", AsciiStrLen ("serial@")) == 0) {
+        ParseSerialPort (Fdt, SubNode);
+      }
+
+      if (AsciiStrnCmp (NodePtr->Name, GmaStr, AsciiStrLen (GmaStr)) == 0) {
+        DEBUG ((DEBUG_INFO, "  Found gma@ node \n"));
+        ParsegraphicNode (Fdt, SubNode);
+      }
+    }
     return;
   }
 
