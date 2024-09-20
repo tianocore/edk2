@@ -15,9 +15,6 @@
 
 #include <StandaloneMmMemLib.h>
 
-EFI_MMRAM_DESCRIPTOR  *mMmMemLibInternalMmramRanges;
-UINTN                 mMmMemLibInternalMmramCount;
-
 //
 // Maximum support address used to check input buffer
 //
@@ -39,8 +36,6 @@ MmIsBufferOutsideMmValid (
   IN UINT64                Length
   )
 {
-  UINTN  Index;
-
   //
   // Check override.
   // NOTE: (B:0->L:4G) is invalid for IA32, but (B:1->L:4G-1)/(B:4G-1->L:1) is valid.
@@ -60,28 +55,6 @@ MmIsBufferOutsideMmValid (
       mMmMemLibInternalMaximumSupportAddress
       ));
     return FALSE;
-  }
-
-  for (Index = 0; Index < mMmMemLibInternalMmramCount; Index++) {
-    if (((Buffer >= mMmMemLibInternalMmramRanges[Index].CpuStart) &&
-         (Buffer < mMmMemLibInternalMmramRanges[Index].CpuStart + mMmMemLibInternalMmramRanges[Index].PhysicalSize)) ||
-        ((mMmMemLibInternalMmramRanges[Index].CpuStart >= Buffer) &&
-         (mMmMemLibInternalMmramRanges[Index].CpuStart < Buffer + Length)))
-    {
-      DEBUG ((
-        DEBUG_ERROR,
-        "MmIsBufferOutsideMmValid: Overlap: Buffer (0x%lx) - Length (0x%lx), ",
-        Buffer,
-        Length
-        ));
-      DEBUG ((
-        DEBUG_ERROR,
-        "CpuStart (0x%lx) - PhysicalSize (0x%lx)\n",
-        mMmMemLibInternalMmramRanges[Index].CpuStart,
-        mMmMemLibInternalMmramRanges[Index].PhysicalSize
-        ));
-      return FALSE;
-    }
   }
 
   return MmMemLibInternalIsValidNonMmramRange (Buffer, Length);
@@ -254,8 +227,6 @@ MemLibConstructor (
   IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
   )
 {
-  EFI_STATUS  Status;
-
   //
   // Calculate and save maximum support address
   //
@@ -266,12 +237,7 @@ MemLibConstructor (
   //
   MmMemLibInternalPopulateValidNonMmramRanges ();
 
-  //
-  // Initialize cached Mmram Ranges from HOB.
-  //
-  Status = MmMemLibInternalPopulateMmramRanges ();
-
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -290,11 +256,6 @@ MemLibDestructor (
   IN EFI_MM_SYSTEM_TABLE  *MmSystemTable
   )
 {
-  //
-  // Deinitialize cached Mmram Ranges.
-  //
-  MmMemLibInternalFreeMmramRanges ();
-
   //
   // Deinitialize cached non-Mmram Ranges.
   //

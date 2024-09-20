@@ -27,8 +27,6 @@ UINTN              mValidNonMmramCount;
 // Maximum support address used to check input buffer
 //
 extern EFI_PHYSICAL_ADDRESS  mMmMemLibInternalMaximumSupportAddress;
-extern EFI_MMRAM_DESCRIPTOR  *mMmMemLibInternalMmramRanges;
-extern UINTN                 mMmMemLibInternalMmramCount;
 
 /**
   Calculate and save the maximum support address.
@@ -72,71 +70,6 @@ MmMemLibInternalCalculateMaximumSupportAddress (
   //
   mMmMemLibInternalMaximumSupportAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)(LShiftU64 (1, PhysicalAddressBits) - 1);
   DEBUG ((DEBUG_INFO, "mMmMemLibInternalMaximumSupportAddress = 0x%lx\n", mMmMemLibInternalMaximumSupportAddress));
-}
-
-/**
-  Initialize cached Mmram Ranges from HOB.
-
-  @retval EFI_UNSUPPORTED   The routine is unable to extract MMRAM information.
-  @retval EFI_SUCCESS       MmRanges are populated successfully.
-
-**/
-EFI_STATUS
-MmMemLibInternalPopulateMmramRanges (
-  VOID
-  )
-{
-  VOID                            *HobStart;
-  EFI_HOB_GUID_TYPE               *MmramRangesHob;
-  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
-  EFI_MMRAM_DESCRIPTOR            *MmramDescriptors;
-
-  HobStart = GetHobList ();
-  DEBUG ((DEBUG_INFO, "%a - 0x%x\n", __func__, HobStart));
-
-  //
-  // Search for a Hob containing the MMRAM ranges
-  //
-  MmramRangesHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
-  if (MmramRangesHob == NULL) {
-    MmramRangesHob = GetFirstGuidHob (&gEfiMmPeiMmramMemoryReserveGuid);
-    if (MmramRangesHob == NULL) {
-      return EFI_UNSUPPORTED;
-    }
-  }
-
-  MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
-  if ((MmramRangesHobData == NULL) || (MmramRangesHobData->Descriptor == NULL)) {
-    return EFI_UNSUPPORTED;
-  }
-
-  mMmMemLibInternalMmramCount = MmramRangesHobData->NumberOfMmReservedRegions;
-  MmramDescriptors            = MmramRangesHobData->Descriptor;
-
-  mMmMemLibInternalMmramRanges = AllocatePool (mMmMemLibInternalMmramCount * sizeof (EFI_MMRAM_DESCRIPTOR));
-  if (mMmMemLibInternalMmramRanges) {
-    CopyMem (
-      mMmMemLibInternalMmramRanges,
-      MmramDescriptors,
-      mMmMemLibInternalMmramCount * sizeof (EFI_MMRAM_DESCRIPTOR)
-      );
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-  Deinitialize cached Mmram Ranges.
-
-**/
-VOID
-MmMemLibInternalFreeMmramRanges (
-  VOID
-  )
-{
-  if (mMmMemLibInternalMmramRanges != NULL) {
-    FreePool (mMmMemLibInternalMmramRanges);
-  }
 }
 
 /**
