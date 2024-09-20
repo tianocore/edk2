@@ -142,6 +142,8 @@
   ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
   ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
   ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
+  ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
+  ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
