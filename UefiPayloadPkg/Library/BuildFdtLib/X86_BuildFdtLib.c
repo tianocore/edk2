@@ -19,6 +19,7 @@
 #include <UniversalPayload/UniversalPayload.h>
 #include <UniversalPayload/AcpiTable.h>
 #include <UniversalPayload/SerialPortInfo.h>
+#include <UniversalPayload/SmbiosTable.h>
 #include <UniversalPayload/PciRootBridges.h>
 #include <Guid/GraphicsInfoHob.h>
 #include <Guid/UniversalPayloadSerialPortDeviceParentInfo.h>
@@ -142,19 +143,22 @@ BuildFdtForMemAlloc (
   IN     VOID  *FdtBase
   )
 {
-  EFI_STATUS            Status;
-  EFI_PEI_HOB_POINTERS  Hob;
-  VOID                  *HobStart;
-  VOID                  *Fdt;
-  INT32                 ParentNode;
-  INT32                 TempNode;
-  CHAR8                 TempStr[32];
-  UINT64                RegTmp[2];
-  UINT32                AllocMemType;
-  EFI_GUID              *AllocMemName;
-  UINT8                 IsStackHob;
-  UINT8                 IsBspStore;
-  UINT32                Data32;
+  EFI_STATUS                      Status;
+  EFI_PEI_HOB_POINTERS            Hob;
+  VOID                            *HobStart;
+  VOID                            *Fdt;
+  INT32                           ParentNode;
+  INT32                           TempNode;
+  CHAR8                           TempStr[32];
+  UINT64                          RegTmp[2];
+  UINT32                          AllocMemType;
+  EFI_GUID                        *AllocMemName;
+  UINT8                           IsStackHob;
+  UINT8                           IsBspStore;
+  UINT32                          Data32;
+  UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *SmbiosTable;
+  UNIVERSAL_PAYLOAD_ACPI_TABLE    *AcpiTable;
+  EFI_HOB_GUID_TYPE               *GuidHob;
 
   Fdt = FdtBase;
 
@@ -164,6 +168,25 @@ BuildFdtForMemAlloc (
   Data32 = CpuToFdt32 (2);
   Status = FdtSetProperty (Fdt, ParentNode, "#address-cells", &Data32, sizeof (UINT32));
   Status = FdtSetProperty (Fdt, ParentNode, "#size-cells", &Data32, sizeof (UINT32));
+
+  GuidHob     = NULL;
+  SmbiosTable = NULL;
+  GuidHob     = GetFirstGuidHob (&gUniversalPayloadSmbios3TableGuid);
+  if (GuidHob != NULL) {
+    SmbiosTable = GET_GUID_HOB_DATA (GuidHob);
+    DEBUG ((DEBUG_INFO, "To build Smbios memory FDT ,SmbiosTable :%lx, SmBiosEntryPoint :%lx\n", (UINTN)SmbiosTable, SmbiosTable->SmBiosEntryPoint));
+    Status = AsciiSPrint (TempStr, sizeof (TempStr), "memory@%lX", SmbiosTable->SmBiosEntryPoint);
+    DEBUG ((DEBUG_INFO, "To build Smbios memory FDT #2, SmbiosTable->Header.Length  :%x\n", SmbiosTable->Header.Length));
+    TempNode = 0;
+    TempNode = FdtAddSubnode (Fdt, ParentNode, TempStr);
+    DEBUG ((DEBUG_INFO, "FdtAddSubnode %x", TempNode));
+    RegTmp[0] = CpuToFdt64 (SmbiosTable->SmBiosEntryPoint);
+    RegTmp[1] = CpuToFdt64 (SmbiosTable->Header.Length);
+    FdtSetProperty (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
+    ASSERT_EFI_ERROR (Status);
+    FdtSetProperty (Fdt, TempNode, "compatible", "smbios", (UINT32)(AsciiStrLen ("smbios")+1));
+    ASSERT_EFI_ERROR (Status);
+  }
 
   HobStart = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
   //
