@@ -33,34 +33,6 @@ MmMemLibInternalCalculateMaximumSupportAddress (
 }
 
 /**
-  Initialize cached Mmram Ranges from HOB.
-
-  @retval EFI_UNSUPPORTED   The routine is unable to extract MMRAM information.
-  @retval EFI_SUCCESS       MmRanges are populated successfully.
-
-**/
-EFI_STATUS
-MmMemLibInternalPopulateMmramRanges (
-  VOID
-  )
-{
-  // Not implemented for AARCH64.
-  return EFI_SUCCESS;
-}
-
-/**
-  Deinitialize cached Mmram Ranges.
-
-**/
-VOID
-MmMemLibInternalFreeMmramRanges (
-  VOID
-  )
-{
-  // Not implemented for AARCH64.
-}
-
-/**
   Initialize valid non-Mmram Ranges from Resource HOB.
 
 **/
