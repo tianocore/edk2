@@ -734,12 +734,13 @@ LogPerformanceMeasurement (
   Otherwise, the source lines between PERF_CODE_BEGIN() and PERF_CODE_END() are not included in a module.
 
 **/
-#define PERF_CODE_BEGIN()            \
-  do {                               \
-    BOOLEAN  __PerformanceCodeLocal; \
-    __PerformanceCodeLocal = FALSE;  \
-    do {                             \
-      if (PerformanceMeasurementEnabled ()) {
+#define PERF_CODE_BEGIN()                     \
+  do {                                        \
+    BOOLEAN  __PerformanceCodeLocal;          \
+    __PerformanceCodeLocal = FALSE;           \
+    do {                                      \
+      if (PerformanceMeasurementEnabled ()) { \
+        (VOID) __PerformanceCodeLocal
 
 /**
   Macro that marks the end of performance measurement source code.

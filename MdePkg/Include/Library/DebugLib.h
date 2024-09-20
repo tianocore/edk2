@@ -534,12 +534,13 @@ UnitTestDebugAssert (
   are not included in a module.
 
 **/
-#define DEBUG_CODE_BEGIN()      \
-  do {                          \
-    BOOLEAN  __DebugCodeLocal;  \
-    __DebugCodeLocal = FALSE;   \
-    do {                        \
-      if (DebugCodeEnabled ()) {
+#define DEBUG_CODE_BEGIN()       \
+  do {                           \
+    BOOLEAN  __DebugCodeLocal;   \
+    __DebugCodeLocal = FALSE;    \
+    do {                         \
+      if (DebugCodeEnabled ()) { \
+        (VOID) __DebugCodeLocal
 
 /**
   The macro that marks the end of debug source code.
