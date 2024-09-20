@@ -84,7 +84,7 @@ MmIsBufferOutsideMmValid (
     }
   }
 
-  return TRUE;
+  return MmMemLibIsValidNonMmramRange (Buffer, Length);
 }
 
 /**
@@ -262,6 +262,11 @@ MemLibConstructor (
   MmMemLibCalculateMaximumSupportAddress ();
 
   //
+  // Initialize valid non-Mmram Ranges from Resource HOB.
+  //
+  MmMemLibInitializeValidNonMmramRanges ();
+
+  //
   // Initialize cached Mmram Ranges from HOB.
   //
   Status = MmMemLibInternalPopulateMmramRanges ();
@@ -290,5 +295,9 @@ MemLibDestructor (
   //
   MmMemLibInternalFreeMmramRanges ();
 
+  //
+  // Deinitialize cached non-Mmram Ranges.
+  //
+  MmMemLibFreeValidNonMmramRanges ();
   return EFI_SUCCESS;
 }
