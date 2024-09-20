@@ -6,7 +6,7 @@
 #
 
 #include <AArch64/AArch64.h>
-#include <AsmMacroIoLibV8.h>
+#include <AsmMacroLib.h>
 #include <Base.h>
 #include <AutoGen.h>
 

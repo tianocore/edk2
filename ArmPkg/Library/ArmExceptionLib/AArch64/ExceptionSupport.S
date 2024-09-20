@@ -9,7 +9,7 @@
 
 #include <AArch64/AArch64.h>
 #include <Library/PcdLib.h>
-#include <AsmMacroIoLibV8.h>
+#include <AsmMacroLib.h>
 #include <Protocol/DebugSupport.h> // for exception type definitions
 
 /*

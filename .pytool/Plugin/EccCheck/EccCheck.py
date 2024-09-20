@@ -182,6 +182,11 @@ class EccCheck(ICiBuildPlugin):
             #
             file_dir = os.path.dirname(file_path[-1])
             #
+            # strip the prefix path till the package name
+            #
+            if pkg in file_dir:
+                file_dir = file_dir[file_dir.find(pkg):]
+            #
             # Skip directory names that do not start with the package being scanned.
             #
             if file_dir.split('/')[0] != pkg:
