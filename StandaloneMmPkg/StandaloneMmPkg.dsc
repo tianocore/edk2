@@ -82,6 +82,7 @@
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
 
 [LibraryClasses.common.MM_STANDALONE]
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
