@@ -45,4 +45,37 @@ MmMemLibInternalFreeMmramRanges (
   VOID
   );
 
+/**
+  Initialize valid non-Mmram Ranges from Resource HOB.
+
+**/
+VOID
+MmMemLibInitializeValidNonMmramRanges (
+  VOID
+  );
+
+/**
+  Deinitialize cached non-Mmram Ranges.
+
+**/
+VOID
+MmMemLibFreeValidNonMmramRanges (
+  VOID
+  );
+
+/**
+  This function check if the buffer is valid non-MMRAM memory range.
+
+  @param[in] Buffer  The buffer start address to be checked.
+  @param[in] Length  The buffer length to be checked.
+
+  @retval TRUE  This buffer is valid non-MMRAM memory range.
+  @retval FALSE This buffer is not valid non-MMRAM memory range.
+**/
+BOOLEAN
+MmMemLibIsValidNonMmramRange (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  );
+
 #endif
