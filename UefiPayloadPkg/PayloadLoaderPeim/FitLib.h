@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/FdtLib.h>
 
 typedef struct {
-  UINT64    RelocateType;
   UINT64    Offset;
+  UINT64    RelocateType;
 } FIT_RELOCATE_ITEM;
 
 typedef struct {

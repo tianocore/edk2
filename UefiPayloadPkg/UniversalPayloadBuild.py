@@ -269,7 +269,7 @@ def BuildUniversalPayload(Args):
                     continue
                 Type = entry.type
                 Offset = entry.rva + fit_image_info_header.DataOffset
-                RelocBinary += Type.to_bytes (8, 'little') + Offset.to_bytes (8, 'little')
+                RelocBinary += Offset.to_bytes (8, 'little') + Type.to_bytes (8, 'little')
         RelocBinary += b'\x00' * (0x1000 - (len(RelocBinary) % 0x1000))
 
         #
