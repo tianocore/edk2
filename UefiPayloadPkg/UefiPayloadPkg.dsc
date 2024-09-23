@@ -43,6 +43,7 @@
   DEFINE NVME_ENABLE                  = TRUE
   DEFINE CAPSULE_SUPPORT              = FALSE
   DEFINE LOCKBOX_SUPPORT              = FALSE
+  DEFINE DISABLE_MMX_SSE              = TRUE
 
   #
   # Crypto Support
@@ -144,13 +145,13 @@
   # For recent X86 CPU, 0x15 CPUID instruction will return Time Stamp Counter Frequence.
   # This is how BaseCpuTimerLib works, and a recommended way to get Frequence, so set the default value as TRUE.
   # Note: for emulation platform such as QEMU, this may not work and should set it as FALSE
-  DEFINE CPU_TIMER_LIB_ENABLE  = TRUE
+  DEFINE CPU_TIMER_LIB_ENABLE  = FALSE
 
   #
   # HPET:  UEFI Payload will use HPET timer
   # LAPIC: UEFI Payload will use local APIC timer
   #
-  DEFINE TIMER_SUPPORT      = HPET
+  DEFINE TIMER_SUPPORT      = LAPIC
 
   DEFINE MULTIPLE_DEBUG_PORT_SUPPORT = FALSE
 
@@ -165,6 +166,9 @@
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS     = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS      = /D MDEPKG_NDEBUG
+!endif
+!if $(DISABLE_MMX_SSE)
+  *_*_*_CC_FLAGS                 = -mno-mmx -mno-sse
 !endif
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
@@ -499,7 +503,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
-  gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable|FALSE
+  gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable|TRUE
 
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
