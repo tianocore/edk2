@@ -5,7 +5,7 @@
 //
 //
 
-#include <AsmMacroIoLibV8.h>
+#include <AsmMacroLib.h>
 
   .macro mov_i, reg:req, imm:req
   movz   \reg, :abs_g1:\imm
@@ -101,28 +101,3 @@ ASM_FUNC(ArmPlatformPeiBootAction)
   isb
 
 0:b      ArmEnableVFP            // enable SIMD before entering C code
-
-//UINTN
-//ArmPlatformGetCorePosition (
-//  IN UINTN MpId
-//  );
-// With this function: CorePos = (ClusterId * 4) + CoreId
-ASM_FUNC(ArmPlatformGetCorePosition)
-  mov   x0, xzr
-  ret
-
-//UINTN
-//ArmPlatformGetPrimaryCoreMpId (
-//  VOID
-//  );
-ASM_FUNC(ArmPlatformGetPrimaryCoreMpId)
-  MOV32  (w0, FixedPcdGet32 (PcdArmPrimaryCore))
-  ret
-
-//UINTN
-//ArmPlatformIsPrimaryCore (
-//  IN UINTN MpId
-//  );
-ASM_FUNC(ArmPlatformIsPrimaryCore)
-  mov   x0, #1
-  ret

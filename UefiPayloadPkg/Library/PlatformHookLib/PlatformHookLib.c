@@ -51,6 +51,10 @@ PlatformHookSerialPortInitialize (
   UINT8                               *GuidHob;
   UNIVERSAL_PAYLOAD_GENERIC_HEADER    *GenericHeader;
 
+  if (GetHobList () == NULL) {
+    return RETURN_SUCCESS;
+  }
+
   GuidHob = GetFirstGuidHob (&gUniversalPayloadSerialPortInfoGuid);
   if (GuidHob == NULL) {
     return EFI_NOT_FOUND;

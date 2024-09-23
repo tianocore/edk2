@@ -95,8 +95,10 @@
   gEfiAdapterInfoUndiIpv6SupportGuid             ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd]
-  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES
-  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout              ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections           ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpIoTimeout                  ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdMaxHttpResumeRetries           ## CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdHttpDelayBetweenResumeRetries  ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpBootDxeExtra.uni

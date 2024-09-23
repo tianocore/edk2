@@ -35,6 +35,7 @@
 #include <UniversalPayload/UniversalPayload.h>
 #include <UniversalPayload/ExtraData.h>
 #include <UniversalPayload/SerialPortInfo.h>
+#include <UniversalPayload/DeviceTree.h>
 #include <Guid/PcdDataBaseSignatureGuid.h>
 
 #define LEGACY_8259_MASK_REGISTER_MASTER  0x21
@@ -135,6 +136,31 @@ UniversalLoadDxeCore (
   );
 
 /**
+  It will Parse FDT -node based on information.
+  @param[in]  FdtBase   The starting memory address of FdtBase
+  @retval HobList   The base address of Hoblist.
+
+**/
+UINT64
+EFIAPI
+FdtNodeParser (
+  IN VOID  *FdtBase
+  );
+
+/**
+  It will Parse FDT -custom node based on information.
+  @param[in]  FdtBase The starting memory address of FdtBase
+  @param[in]  HostList The starting memory address of New Hob list.
+
+**/
+UINTN
+EFIAPI
+CustomFdtNodeParser (
+  IN VOID  *FdtBase,
+  IN VOID  *HostList
+  );
+
+/**
    Transfers control to DxeCore.
 
    This function performs a CPU architecture specific operations to execute
@@ -204,6 +230,48 @@ FvFindFileByTypeGuid (
 ACPI_BOARD_INFO *
 BuildHobFromAcpi (
   IN   UINT64  AcpiTableBase
+  );
+
+/**
+  Allocates one or more pages .
+
+  Allocates the number of pages of MemoryType and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a 4KB boundary.
+  If Pages is 0, then NULL is returned.
+  If there is not enough memory availble to satisfy the request, then NULL
+  is returned.
+
+  @param   Pages                 The number of 4 KB pages to allocate.
+  @param   MemoryType            The Memorytype
+  @return  A pointer to the allocated buffer or NULL if allocation fails.
+**/
+VOID *
+EFIAPI
+PayloadAllocatePages (
+  IN UINTN            Pages,
+  IN EFI_MEMORY_TYPE  MemoryType
+  );
+
+/**
+  Entry point to the C language phase of UEFI payload.
+  @param[in]   FdtPrt  The starting address of FDT .
+  @retval      It will not return if SUCCESS, and return error when passing bootloader parameter.
+**/
+EFI_STATUS
+EFIAPI
+FitUplEntryPoint (
+  IN UINTN  BootloaderParameter
+  );
+
+/**
+  Entry point to the C language phase of UEFI payload.
+  @param[in]   BootloaderParameter    The starting address of bootloader parameter block.
+  @retval      It will not return if SUCCESS, and return error when passing bootloader parameter.
+**/
+EFI_STATUS
+EFIAPI
+UplEntryPoint (
+  IN UINTN  BootloaderParameter
   );
 
 #endif

@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 /**
   Create PageTable for SMM use.
@@ -33,7 +33,7 @@ SmmInitPageTable (
   mPhysicalAddressBits = 32;
   mPagingMode          = PagingPae;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (mSmmProfileEnabled ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -187,7 +187,7 @@ SmiPFHandler (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     SmmProfilePFHandler (
       SystemContext.SystemContextIa32->Eip,
       SystemContext.SystemContextIa32->ExceptionData
@@ -228,18 +228,4 @@ RestoreCr2 (
   )
 {
   return;
-}
-
-/**
-  Return whether access to non-SMRAM is restricted.
-
-  @retval TRUE  Access to non-SMRAM is restricted.
-  @retval FALSE Access to non-SMRAM is not restricted.
-**/
-BOOLEAN
-IsRestrictedMemoryAccess (
-  VOID
-  )
-{
-  return TRUE;
 }

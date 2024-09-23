@@ -250,11 +250,23 @@ typedef struct {
 // in assembly code.
 //
 struct _CPU_MP_DATA {
-  UINT64                           CpuInfoInHob;
-  UINT32                           CpuCount;
-  UINT32                           BspNumber;
-  SPIN_LOCK                        MpLock;
-  UINTN                            Buffer;
+  UINT64       CpuInfoInHob;
+  UINT32       CpuCount;
+  UINT32       BspNumber;
+  SPIN_LOCK    MpLock;
+  UINTN        Buffer;
+
+  //
+  // InitialBspApicMode stores the initial BSP APIC mode.
+  // It is used to synchronize the BSP APIC mode with APs
+  // in the first time APs wake up.
+  // Its value doesn't reflect the current APIC mode since there are
+  // two cases the APIC mode is changed:
+  // 1. MpLib explicitly switches to X2 APIC mode because number of threads is greater than 255,
+  //    or there are any logical processors reporting an initial APIC ID of 255 or greater.
+  // 2. Some code switches to X2 APIC mode in all threads through MP services PPI/Protocol.
+  //
+  UINTN                            InitialBspApicMode;
   UINTN                            CpuApStackSize;
   MP_ASSEMBLY_ADDRESS_MAP          AddressMap;
   UINTN                            WakeupBuffer;

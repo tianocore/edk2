@@ -23,7 +23,7 @@ static LIST_ENTRY  mBmcIpmiLan;
   Bootstrapping.
 
   @retval TRUE   Yes, it is supported.
-          TRUE   No, it is not supported.
+          FALSE  No, it is not supported.
 
 **/
 BOOLEAN
@@ -31,47 +31,53 @@ ProbeRedfishCredentialBootstrap (
   VOID
   )
 {
-  EFI_STATUS                                  Status;
-  IPMI_BOOTSTRAP_CREDENTIALS_COMMAND_DATA     CommandData;
-  IPMI_BOOTSTRAP_CREDENTIALS_RESULT_RESPONSE  ResponseData;
-  UINT32                                      ResponseSize;
-  BOOLEAN                                     ReturnBool;
+  EDKII_REDFISH_AUTH_METHOD           AuthMethod;
+  EDKII_REDFISH_CREDENTIAL2_PROTOCOL  *CredentialProtocol;
+  CHAR8                               *UserName;
+  CHAR8                               *Password;
+  BOOLEAN                             ReturnBool;
+  EFI_STATUS                          Status;
 
   DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry\n", __func__));
 
+  ReturnBool = FALSE;
   //
-  // IPMI callout to NetFn 2C, command 02
-  //    Request data:
-  //      Byte 1: REDFISH_IPMI_GROUP_EXTENSION
-  //      Byte 2: DisableBootstrapControl
+  // Locate HII credential protocol.
   //
-  CommandData.GroupExtensionId        = REDFISH_IPMI_GROUP_EXTENSION;
-  CommandData.DisableBootstrapControl = REDFISH_IPMI_BOOTSTRAP_CREDENTIAL_ENABLE;
-  ResponseData.CompletionCode         = IPMI_COMP_CODE_UNSPECIFIED;
-  ResponseSize                        = sizeof (ResponseData);
-  //
-  //  Response data: Ignored.
-  //
-  Status = IpmiSubmitCommand (
-             IPMI_NETFN_GROUP_EXT,
-             REDFISH_IPMI_GET_BOOTSTRAP_CREDENTIALS_CMD,
-             (UINT8 *)&CommandData,
-             sizeof (CommandData),
-             (UINT8 *)&ResponseData,
-             &ResponseSize
-             );
-  if (!EFI_ERROR (Status) &&
-      ((ResponseData.CompletionCode == IPMI_COMP_CODE_NORMAL) ||
-       (ResponseData.CompletionCode == REDFISH_IPMI_COMP_CODE_BOOTSTRAP_CREDENTIAL_DISABLED)
-      ))
-  {
-    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credential Bootstrapping is supported\n"));
-    ReturnBool = TRUE;
-  } else {
-    DEBUG ((DEBUG_REDFISH_HOST_INTERFACE, "    Redfish Credential Bootstrapping is not supported\n"));
-    ReturnBool = FALSE;
+  Status = gBS->LocateProtocol (
+                  &gEdkIIRedfishCredential2ProtocolGuid,
+                  NULL,
+                  (VOID **)&CredentialProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return FALSE;
   }
 
+  Status = CredentialProtocol->GetAuthInfo (
+                                 CredentialProtocol,
+                                 &AuthMethod,
+                                 &UserName,
+                                 &Password
+                                 );
+  if (!EFI_ERROR (Status)) {
+    ZeroMem (Password, AsciiStrSize (Password));
+    FreePool (Password);
+    ZeroMem (UserName, AsciiStrSize (UserName));
+    FreePool (UserName);
+    ReturnBool = TRUE;
+  } else {
+    if (Status == EFI_ACCESS_DENIED) {
+      // bootstrap credential support was disabled
+      ReturnBool = TRUE;
+    }
+  }
+
+  DEBUG ((
+    DEBUG_REDFISH_HOST_INTERFACE,
+    "    Redfish Credential Bootstrapping is %a\n",
+    ReturnBool ? "supported" : "not supported"
+    ));
   return ReturnBool;
 }
 
@@ -1201,8 +1207,9 @@ CheckBmcUsbNic (
 
   DEBUG ((DEBUG_MANAGEABILITY, "%a: Entry, the registration key - 0x%08x.\n", __func__, Registration));
 
-  Handle = NULL;
-  Status = EFI_SUCCESS;
+  Handle       = NULL;
+  HandleBuffer = NULL;
+  Status       = EFI_SUCCESS;
 
   do {
     BufferSize = 0;

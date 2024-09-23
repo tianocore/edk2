@@ -1,14 +1,17 @@
 /** @file
   Var Check Hii bin generation.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "VarCheckHiiGen.h"
+#include "VarCheckHii.h"
 
-LIST_ENTRY  mVarCheckHiiList = INITIALIZE_LIST_HEAD_VARIABLE (mVarCheckHiiList);
+VAR_CHECK_HII_VARIABLE_HEADER  *mVarCheckHiiBin    = NULL;
+UINTN                          mVarCheckHiiBinSize = 0;
+LIST_ENTRY                     mVarCheckHiiList    = INITIALIZE_LIST_HEAD_VARIABLE (mVarCheckHiiList);
 
 #define VAR_CHECK_HII_VARIABLE_NODE_SIGNATURE  SIGNATURE_32 ('V', 'C', 'H', 'V')
 
@@ -1511,7 +1514,7 @@ DestroyHiiVariableNode (
 **/
 VOID *
 BuildVarCheckHiiBin (
-  OUT UINTN  *Size
+  IN OUT UINTN  *Size
   )
 {
   VAR_CHECK_HII_VARIABLE_NODE  *HiiVariableNode;

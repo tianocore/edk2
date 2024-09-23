@@ -30,8 +30,10 @@ typedef enum X64ObjectID {
   EX64ObjFadtXgpeBlockInfo,      ///<  6 - FADT 64-bit GPE block info
   EX64ObjFadtSleepBlockInfo,     ///<  7 - FADT Sleep block info
   EX64ObjFadtResetBlockInfo,     ///<  8 - FADT Reset block info
-  EX64ObjFadtMiscInfo,           ///<  0 - FADT Legacy fields info
-  EX64ObjMax                     ///< 10 - Maximum Object ID
+  EX64ObjFadtMiscInfo,           ///<  9 - FADT Legacy fields info
+  EX64ObjWsmtFlagsInfo,          ///< 10 - WSMT protection flags info
+  EX64ObjHpetInfo,               ///< 11 - HPET device info
+  EX64ObjMax                     ///< 12 - Maximum Object ID
 } EX64_OBJECT_ID;
 
 /** A structure that describes the
@@ -167,4 +169,23 @@ typedef struct CmX64FadtFadtMiscInfo {
   UINT8     Century;
 } CM_X64_FADT_MISC_INFO;
 
+/**
+  A structure that describes the WSMT protection flags information.
+
+  ID: EX64ObjWsmtFlagsInfo
+*/
+typedef struct CmX64WsmtFlagsInfo {
+  UINT32    ProtectionFlags;
+} CM_X64_WSMT_FLAGS_INFO;
+
+/**
+  A structure that describes the HPET device information.
+
+  ID: EX64ObjHpetInfo
+*/
+typedef struct CmX64HpetInfo {
+  UINT32    BaseAddressLower32Bit;
+  UINT16    MainCounterMinimumClockTickInPeriodicMode;
+  UINT8     PageProtectionAndOemAttribute;
+} CM_X64_HPET_INFO;
 #endif // X64_NAMESPACE_OBJECTS_H_
