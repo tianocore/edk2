@@ -25,7 +25,7 @@ from Library.ExpressionValidate import IsValidStringTest
 from Library.Misc import CheckGuidRegFormat
 
 TOOL_NAME = 'DecParser'
-VERSION_PATTERN = '[0-9]+(\.[0-9]+)?'
+VERSION_PATTERN = r'[0-9]+(\.[0-9]+)?'
 CVAR_PATTERN = '[_a-zA-Z][a-zA-Z0-9_]*'
 PCD_TOKEN_PATTERN = '(0[xX]0*[a-fA-F0-9]{1,8})|([0-9]+)'
 MACRO_PATTERN = '[A-Z][_A-Z0-9]*'
