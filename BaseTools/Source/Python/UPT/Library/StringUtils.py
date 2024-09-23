@@ -23,7 +23,7 @@ from Logger import StringTable as ST
 #
 # Regular expression for matching macro used in DSC/DEC/INF file inclusion
 #
-gMACRO_PATTERN = re.compile("\$\(([_A-Z][_A-Z0-9]*)\)", re.UNICODE)
+gMACRO_PATTERN = re.compile(r"\$\(([_A-Z][_A-Z0-9]*)\)", re.UNICODE)
 
 ## GetSplitValueList
 #

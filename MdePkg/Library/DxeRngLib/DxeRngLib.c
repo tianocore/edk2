@@ -1,16 +1,135 @@
 /** @file
  Provides an implementation of the library class RngLib that uses the Rng protocol.
 
- Copyright (c) 2023, Arm Limited. All rights reserved.
+ Copyright (c) 2023 - 2024, Arm Limited. All rights reserved.
  Copyright (c) Microsoft Corporation. All rights reserved.
  SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include <Uefi.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/RngLib.h>
 #include <Protocol/Rng.h>
+
+STATIC EFI_RNG_PROTOCOL  *mRngProtocol;
+STATIC UINTN             mFirstAlgo = MAX_UINTN;
+
+typedef struct {
+  /// Guid of the secure algorithm.
+  EFI_GUID       *Guid;
+
+  /// Algorithm name.
+  CONST CHAR8    *Name;
+
+  /// The algorithm is available for use.
+  BOOLEAN        Available;
+} SECURE_RNG_ALGO_ARRAY;
+
+//
+// These represent UEFI SPEC defined algorithms that should be supported by
+// the RNG protocol and are generally considered secure.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED SECURE_RNG_ALGO_ARRAY  mSecureHashAlgorithms[] = {
+ #ifdef MDE_CPU_AARCH64
+  {
+    &gEfiRngAlgorithmArmRndr, // unspecified SP800-90A DRBG (through RNDR instr.)
+    "ARM-RNDR",
+    FALSE,
+  },
+ #endif
+  {
+    &gEfiRngAlgorithmSp80090Ctr256Guid,  // SP800-90A DRBG CTR using AES-256
+    "DRBG-CTR",
+    FALSE,
+  },
+  {
+    &gEfiRngAlgorithmSp80090Hmac256Guid, // SP800-90A DRBG HMAC using SHA-256
+    "DRBG-HMAC",
+    FALSE,
+  },
+  {
+    &gEfiRngAlgorithmSp80090Hash256Guid, // SP800-90A DRBG Hash using SHA-256
+    "DRBG-Hash",
+    FALSE,
+  },
+  {
+    &gEfiRngAlgorithmRaw, // Raw data from NRBG (or TRNG)
+    "TRNG",
+    FALSE,
+  },
+};
+
+/**
+  Constructor routine to probe the available secure Rng algorithms.
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+
+  @retval EFI_SUCCESS           Success.
+  @retval EFI_NOT_FOUND         Not found.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+DxeRngLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS         Status;
+  UINTN              RngArraySize;
+  UINTN              RngArrayCnt;
+  UINT32             Index;
+  UINT32             Index1;
+  EFI_RNG_ALGORITHM  *RngArray;
+
+  Status = gBS->LocateProtocol (&gEfiRngProtocolGuid, NULL, (VOID **)&mRngProtocol);
+  if (EFI_ERROR (Status) || (mRngProtocol == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a: Could not locate RNG protocol, Status = %r\n", __func__, Status));
+    return Status;
+  }
+
+  RngArraySize = 0;
+
+  Status = mRngProtocol->GetInfo (mRngProtocol, &RngArraySize, NULL);
+  if (EFI_ERROR (Status) && (Status != EFI_BUFFER_TOO_SMALL)) {
+    return Status;
+  } else if (RngArraySize == 0) {
+    return EFI_NOT_FOUND;
+  }
+
+  RngArrayCnt = RngArraySize / sizeof (*RngArray);
+
+  RngArray = AllocateZeroPool (RngArraySize);
+  if (RngArray == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = mRngProtocol->GetInfo (mRngProtocol, &RngArraySize, RngArray);
+  if (EFI_ERROR (Status)) {
+    goto ExitHandler;
+  }
+
+  for (Index = 0; Index < RngArrayCnt; Index++) {
+    for (Index1 = 0; Index1 < ARRAY_SIZE (mSecureHashAlgorithms); Index1++) {
+      if (CompareGuid (&RngArray[Index], mSecureHashAlgorithms[Index1].Guid)) {
+        mSecureHashAlgorithms[Index1].Available = TRUE;
+        if (mFirstAlgo == MAX_UINTN) {
+          mFirstAlgo = Index1;
+        }
+
+        break;
+      }
+    }
+  }
+
+ExitHandler:
+  FreePool (RngArray);
+  return Status;
+}
 
 /**
   Routine Description:
@@ -32,55 +151,70 @@ GenerateRandomNumberViaNist800Algorithm (
   IN  UINTN  BufferSize
   )
 {
-  EFI_STATUS        Status;
-  EFI_RNG_PROTOCOL  *RngProtocol;
-
-  RngProtocol = NULL;
+  EFI_STATUS             Status;
+  UINTN                  Index;
+  SECURE_RNG_ALGO_ARRAY  *Algo;
 
   if (Buffer == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: Buffer == NULL.\n", __func__));
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = gBS->LocateProtocol (&gEfiRngProtocolGuid, NULL, (VOID **)&RngProtocol);
-  if (EFI_ERROR (Status) || (RngProtocol == NULL)) {
-    DEBUG ((DEBUG_ERROR, "%a: Could not locate RNG prototocol, Status = %r\n", __func__, Status));
-    return Status;
+  if (mRngProtocol == NULL) {
+    return EFI_NOT_FOUND;
   }
 
-  Status = RngProtocol->GetRNG (RngProtocol, &gEfiRngAlgorithmSp80090Ctr256Guid, BufferSize, Buffer);
-  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm CTR-256 - Status = %r\n", __func__, Status));
-  if (!EFI_ERROR (Status)) {
-    return Status;
+  // Try the first available algorithm.
+  if (mFirstAlgo != MAX_UINTN) {
+    Algo   = &mSecureHashAlgorithms[mFirstAlgo];
+    Status = mRngProtocol->GetRNG (mRngProtocol, Algo->Guid, BufferSize, Buffer);
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: GetRNG algorithm %a - Status = %r\n",
+      __func__,
+      Algo->Name,
+      Status
+      ));
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    Index = mFirstAlgo + 1;
+  } else {
+    Index = 0;
   }
 
-  Status = RngProtocol->GetRNG (RngProtocol, &gEfiRngAlgorithmSp80090Hmac256Guid, BufferSize, Buffer);
-  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm HMAC-256 - Status = %r\n", __func__, Status));
-  if (!EFI_ERROR (Status)) {
-    return Status;
+  // Iterate over other available algorithms.
+  for ( ; Index < ARRAY_SIZE (mSecureHashAlgorithms); Index++) {
+    Algo = &mSecureHashAlgorithms[Index];
+    if (!Algo->Available) {
+      continue;
+    }
+
+    Status = mRngProtocol->GetRNG (mRngProtocol, Algo->Guid, BufferSize, Buffer);
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: GetRNG algorithm %a - Status = %r\n",
+      __func__,
+      Algo->Name,
+      Status
+      ));
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
-  Status = RngProtocol->GetRNG (RngProtocol, &gEfiRngAlgorithmSp80090Hash256Guid, BufferSize, Buffer);
-  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm Hash-256 - Status = %r\n", __func__, Status));
-  if (!EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = RngProtocol->GetRNG (RngProtocol, &gEfiRngAlgorithmRaw, BufferSize, Buffer);
-  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm Raw - Status = %r\n", __func__, Status));
-  if (!EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  // If all the other methods have failed, use the default method from the RngProtocol
-  Status = RngProtocol->GetRNG (RngProtocol, NULL, BufferSize, Buffer);
-  DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm default - Status = %r\n", __func__, Status));
-  if (!EFI_ERROR (Status)) {
-    return Status;
+  if (!PcdGetBool (PcdEnforceSecureRngAlgorithms)) {
+    // If all the other methods have failed, use the default method from the RngProtocol
+    Status = mRngProtocol->GetRNG (mRngProtocol, NULL, BufferSize, Buffer);
+    DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm default - Status = %r\n", __func__, Status));
+    if (!EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   // If we get to this point, we have failed
-  DEBUG ((DEBUG_ERROR, "%a: GetRNG() failed, staus = %r\n", __func__, Status));
+  DEBUG ((DEBUG_ERROR, "%a: GetRNG() failed, Status = %r\n", __func__, Status));
 
   return Status;
 }// GenerateRandomNumberViaNist800Algorithm()
