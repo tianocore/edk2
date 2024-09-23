@@ -360,6 +360,21 @@ ParseFrameBuffer (
     } else if (AsciiStrCmp (TempStr, "height") == 0) {
       Data32                                        = (UINT32 *)(PropertyPtr->Data);
       GraphicsInfo->GraphicsMode.VerticalResolution = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "redmask") == 0) {
+      Data32                                              = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelInformation.RedMask = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "greenmask") == 0) {
+      Data32                                                = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelInformation.GreenMask = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "bluemask") == 0) {
+      Data32                                               = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelInformation.BlueMask = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "reservedmask") == 0) {
+      Data32                                                   = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelInformation.ReservedMask = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "pixelsperscanline") == 0) {
+      Data32                                       = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelsPerScanLine = Fdt32ToCpu (*Data32);
     } else if (AsciiStrCmp (TempStr, "format") == 0) {
       TempStr = (CHAR8 *)(PropertyPtr->Data);
       if (AsciiStrCmp (TempStr, "a8r8g8b8") == 0) {
