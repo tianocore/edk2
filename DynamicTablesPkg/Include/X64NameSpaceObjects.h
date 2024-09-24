@@ -32,7 +32,8 @@ typedef enum X64ObjectID {
   EX64ObjFadtResetBlockInfo,     ///<  8 - FADT Reset block info
   EX64ObjFadtMiscInfo,           ///<  9 - FADT Legacy fields info
   EX64ObjWsmtFlagsInfo,          ///< 10 - WSMT protection flags info
-  EX64ObjMax                     ///< 11 - Maximum Object ID
+  EX64ObjHpetInfo,               ///< 11 - HPET device info
+  EX64ObjMax                     ///< 12 - Maximum Object ID
 } EX64_OBJECT_ID;
 
 /** A structure that describes the
@@ -177,4 +178,14 @@ typedef struct CmX64WsmtFlagsInfo {
   UINT32    ProtectionFlags;
 } CM_X64_WSMT_FLAGS_INFO;
 
+/**
+  A structure that describes the HPET device information.
+
+  ID: EX64ObjHpetInfo
+*/
+typedef struct CmX64HpetInfo {
+  UINT32    BaseAddressLower32Bit;
+  UINT16    MainCounterMinimumClockTickInPeriodicMode;
+  UINT8     PageProtectionAndOemAttribute;
+} CM_X64_HPET_INFO;
 #endif // X64_NAMESPACE_OBJECTS_H_
