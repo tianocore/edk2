@@ -36,7 +36,9 @@
 
 **/
 
+#include "Library/DebugLib.h"
 #include "StandaloneMmCore.h"
+#include "Uefi/UefiBaseType.h"
 
 //
 // MM Dispatcher Data structures
@@ -96,6 +98,51 @@ BOOLEAN  gDispatcherRunning = FALSE;
 // Flag for the MM Dispacher.  TRUE if there is one or more MM drivers ready to be dispatched
 //
 BOOLEAN  gRequestDispatch = FALSE;
+
+/**
+  Unload an EFI image if it fails to Start
+
+  @param DriverEntry             EFI_MM_DRIVER_ENTRY instance
+
+  @return EFI_STATUS
+ */
+EFI_STATUS
+EFIAPI
+MmUnloadImage (
+  IN EFI_MM_DRIVER_ENTRY  *DriverEntry
+  )
+{
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+  EFI_STATUS                    Status;
+
+  DEBUG ((DEBUG_INFO, "%a MmUnLoadImage - %g %p\n", __func__, &DriverEntry->FileName, DriverEntry));
+  DEBUG ((
+    DEBUG_INFO,
+    "%a MmUnLoadImage - ImageAddress:%p Size:%u\n",
+    __func__,
+    DriverEntry->ImageBuffer,
+    DriverEntry->NumberOfPage
+    ));
+
+  ImageContext.Handle    = DriverEntry->Pe32Data;
+  ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
+
+  //
+  // Get information about the image being loaded
+  //
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  ImageContext.ImageAddress = DriverEntry->ImageBuffer;
+  ImageContext.ImageSize    = EFI_PAGES_TO_SIZE (DriverEntry->NumberOfPage);
+
+  Status = PeCoffLoaderUnloadImage (&ImageContext);
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
+}
 
 /**
   Loads an EFI image into SMRAM.
@@ -460,6 +507,7 @@ MmDispatcher (
       Status = ((MM_IMAGE_ENTRY_POINT)(UINTN)DriverEntry->ImageEntryPoint)(DriverEntry->ImageHandle, &gMmCoreMmst);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_INFO, "StartImage Status - %r\n", Status));
+        MmUnloadImage (DriverEntry);
         MmFreePages (DriverEntry->ImageBuffer, DriverEntry->NumberOfPage);
         if (DriverEntry->ImageHandle != NULL) {
           MmUninstallProtocolInterface (
