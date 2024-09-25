@@ -395,11 +395,14 @@ MergeMemoryMap (
   NewMemoryMapEntry = MemoryMap;
   MemoryMapEnd      = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + *MemoryMapSize);
   while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
-    CopyMem (NewMemoryMapEntry, MemoryMapEntry, sizeof (EFI_MEMORY_DESCRIPTOR));
+    CopyMem (NewMemoryMapEntry, MemoryMapEntry, DescriptorSize);
     NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
 
     do {
-      MergeGuardPages (NewMemoryMapEntry, NextMemoryMapEntry->PhysicalStart);
+      if ((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) {
+        MergeGuardPages (NewMemoryMapEntry, NextMemoryMapEntry->PhysicalStart);
+      }
+
       MemoryBlockLength = LShiftU64 (NewMemoryMapEntry->NumberOfPages, EFI_PAGE_SHIFT);
       if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
           (NewMemoryMapEntry->Type == NextMemoryMapEntry->Type) &&

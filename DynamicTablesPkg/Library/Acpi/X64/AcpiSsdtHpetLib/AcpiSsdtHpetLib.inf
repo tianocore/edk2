@@ -1,0 +1,31 @@
+## @file
+#  Creates ACPI SSDT HPET device for AMD platforms.
+#
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION       = 1.30
+  BASE_NAME         = AcpiSsdtHpetLib
+  FILE_GUID         = CEC214FF-A9F1-4C3F-B084-BC8AFBEE7EA2
+  MODULE_TYPE       = DXE_DRIVER
+  VERSION_STRING    = 1.0
+  LIBRARY_CLASS     = NULL|DXE_DRIVER
+  CONSTRUCTOR       = AcpiSsdtHpetLibConstructor
+  DESTRUCTOR        = AcpiSsdtHpetLibDestructor
+
+[Sources]
+  AcpiSsdtHpetLib.c
+
+[Packages]
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib

@@ -546,6 +546,10 @@ IsSmmCommBufferForbiddenAddress (
   UINTN                  Index;
   EFI_MEMORY_DESCRIPTOR  *Entry;
 
+  if (!IsRestrictedMemoryAccess ()) {
+    return FALSE;
+  }
+
   if (mUefiMemoryMap != NULL) {
     MemoryMap           = mUefiMemoryMap;
     MemoryMapEntryCount = mUefiMemoryMapSize/mUefiDescriptorSize;
