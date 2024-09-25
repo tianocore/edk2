@@ -19,6 +19,7 @@ The plugin has a few configuration options to support the UEFI codebase.
       "AuditOnly": False,          # If True, log all errors and then mark as skipped
       "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
       "ExtendWords": [],           # words to extend to the dictionary for this package
+      "ExtraDictionaries": []      # Extra dictionary files for lots of custom words
       "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
       "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
   }
@@ -44,6 +45,17 @@ This supports .gitignore file and folder matching strings including wildcards
 
 This list allows words to be added to the dictionary for the spell checker when
 this package is tested.  These follow the rules of the cspell config words field.
+
+### ExtraDictionaries
+
+This list allows dictionary files to be added to the dictionary for the spell
+checker when this package is tested. Dictionary files contain one word per line.
+Dictionary paths interpreted from workspace root. All words in custom dictionary
+files are added to the cspell config words field for simplicity. Useful if you
+have a lot of custom words and allows integration with other cspell plugins
+(ex: vscode's Code Spell Checker plugin). Comments are not supported; if a word
+requires a comment it should be added to the `ExtendWords` config where comments
+can be added.
 
 ### IgnoreStandardPaths
 
