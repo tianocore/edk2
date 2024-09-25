@@ -193,6 +193,7 @@ static const OSSL_ALGORITHM deflt_signature[] = {
 #ifndef OPENSSL_NO_EC
     { PROV_NAMES_ECDSA, "provider=default", ossl_ecdsa_signature_functions },
 #endif
+    { PROV_NAMES_HMAC, "provider=default", ossl_mac_legacy_hmac_signature_functions },
 
     { NULL, NULL, NULL }
 };
@@ -222,6 +223,8 @@ static const OSSL_ALGORITHM deflt_keymgmt[] = {
       PROV_DESCS_TLS1_PRF_SIGN },
     { PROV_NAMES_HKDF, "provider=default", ossl_kdf_keymgmt_functions,
       PROV_DESCS_HKDF_SIGN },
+    { PROV_NAMES_HMAC, "provider=default", ossl_mac_legacy_keymgmt_functions,
+      PROV_DESCS_HMAC_SIGN },
 
     { NULL, NULL, NULL }
 };
