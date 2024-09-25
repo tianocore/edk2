@@ -2,6 +2,7 @@
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -50,6 +51,8 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPccSubspaceType5Info,           ///< 24 - Pcc Subspace Type 5 Info
   EArchCommonObjPsdInfo,                        ///< 25 - P-State Dependency (PSD) Info
   EArchCommonObjTpm2InterfaceInfo,              ///< 26 - TPM Interface Info
+  EArchCommonObjSpmiInterfaceInfo,              ///< 27 - SPMI Interface Info
+  EArchCommonObjSpmiInterruptDeviceInfo,        ///< 28 - SPMI Interrupt and Device Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -691,6 +694,40 @@ typedef struct CmArchCommonTpm2InterfaceInfo {
   UINT64    Lasa;
 } CM_ARCH_COMMON_TPM2_INTERFACE_INFO;
 
+/** A structure that describes the
+    SPMI (Service Processor Management Interface) Info.
+
+    ID: EArchCommonObjSpmiInterfaceInfo
+*/
+typedef struct CmArchCommonObjSpmiInterfaceInfo {
+  /** Interface type */
+  UINT8                                     InterfaceType;
+
+  /** Base address */
+  EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE    BaseAddress;
+} CM_ARCH_COMMON_SPMI_INTERFACE_INFO;
+
+/** A structure that describes the
+    SPMI (Service Processor Management Interface) Interrupt and Device Info.
+
+    ID: EArchCommonObjSpmiInterruptDeviceInfo
+*/
+typedef struct CmArchCommonObjSpmiInterruptDeviceInfo {
+  /** Interrupt type */
+  UINT8     InterruptType;
+
+  /** GPE number */
+  UINT8     Gpe;
+
+  /** PCI device flag */
+  UINT8     PciDeviceFlag;
+
+  /** GSI number */
+  UINT32    GlobalSystemInterrupt;
+
+  /** Uid of the device */
+  UINT32    DeviceId;
+} CM_ARCH_COMMON_SPMI_INTERRUPT_DEVICE_INFO;
 #pragma pack()
 
 #endif // ARCH_COMMON_NAMESPACE_OBJECTS_H_

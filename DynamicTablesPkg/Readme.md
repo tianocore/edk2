@@ -498,6 +498,8 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  24   | Pcc Subspace Type 5 Info                  | |
 |  25   | P-State Dependency (PSD) Info             | |
 |  26   | TPM Interface Info                        | |
+|  27   | SPMI Interface Info                       | |
+|  28   | SPMI Interrupt and Device/Uid Info        | |
 |  `*`  | All other values are reserved.            | |
 
 #### Object ID's in the X64 Namespace:
