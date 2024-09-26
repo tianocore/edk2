@@ -593,8 +593,12 @@ UnitTestDebugAssert (
   If MDEPKG_NDEBUG is defined or the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit
   of PcdDebugProperyMask is clear, then this macro computes the offset, in bytes,
   of the field specified by Field from the beginning of the data structure specified
-  by TYPE.  This offset is subtracted from Record, and is used to return a pointer
-  to a data structure of the type specified by TYPE.
+  by TYPE.  This offset is subtracted from Record, and is used to compute a pointer
+  to a data structure of the type specified by TYPE.  The Signature field of the
+  data structure specified by TYPE is compared to TestSignature.  If the signatures
+  match, then a pointer to the pointer to a data structure of the type specified by
+  TYPE is returned.  If the signatures do not match, then NULL is returned to
+  signify that the passed in data structure is invalid.
 
   If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit
   of PcdDebugProperyMask is set, then this macro computes the offset, in bytes,
@@ -628,9 +632,13 @@ UnitTestDebugAssert (
 #define CR(Record, TYPE, Field, TestSignature)                                              \
     (DebugAssertEnabled () && (BASE_CR (Record, TYPE, Field)->Signature != TestSignature)) ?  \
     (TYPE *) (_ASSERT (CR has Bad Signature), Record) :                                       \
+    (BASE_CR (Record, TYPE, Field)->Signature != TestSignature) ?                             \
+    NULL :                                                                                    \
     BASE_CR (Record, TYPE, Field)
 #else
 #define CR(Record, TYPE, Field, TestSignature)                                              \
+    (BASE_CR (Record, TYPE, Field)->Signature != TestSignature) ?                           \
+    NULL :                                                                                  \
     BASE_CR (Record, TYPE, Field)
 #endif
 
