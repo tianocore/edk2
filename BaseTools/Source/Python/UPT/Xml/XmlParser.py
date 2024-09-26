@@ -281,33 +281,33 @@ class DistributionPackageXml(object):
             #
             XmlContent = \
             re.sub(r'[\s\r\n]*SupArchList[\s\r\n]*=[\s\r\n]*"[\s\r\n]*COMMON'
-            '[\s\r\n]*"', '', XmlContent)
+            r'[\s\r\n]*"', '', XmlContent)
             XmlContent = \
             re.sub(r'[\s\r\n]*SupArchList[\s\r\n]*=[\s\r\n]*"[\s\r\n]*common'
-            '[\s\r\n]*"', '', XmlContent)
+            r'[\s\r\n]*"', '', XmlContent)
             #
             # Remove <SupArchList> COMMON </SupArchList>
             #
             XmlContent = \
             re.sub(r'[\s\r\n]*<SupArchList>[\s\r\n]*COMMON[\s\r\n]*'
-            '</SupArchList>[\s\r\n]*', '', XmlContent)
+            r'</SupArchList>[\s\r\n]*', '', XmlContent)
 
             #
             # Remove <SupArchList> common </SupArchList>
             #
             XmlContent = \
             re.sub(r'[\s\r\n]*<SupArchList>[\s\r\n]*'
-            'common[\s\r\n]*</SupArchList>[\s\r\n]*', '', XmlContent)
+            r'common[\s\r\n]*</SupArchList>[\s\r\n]*', '', XmlContent)
 
             #
             # Remove SupModList="COMMON" or "common"
             #
             XmlContent = \
             re.sub(r'[\s\r\n]*SupModList[\s\r\n]*=[\s\r\n]*"[\s\r\n]*COMMON'
-            '[\s\r\n]*"', '', XmlContent)
+            r'[\s\r\n]*"', '', XmlContent)
             XmlContent = \
             re.sub(r'[\s\r\n]*SupModList[\s\r\n]*=[\s\r\n]*"[\s\r\n]*common'
-            '[\s\r\n]*"', '', XmlContent)
+            r'[\s\r\n]*"', '', XmlContent)
 
             return XmlContent
 

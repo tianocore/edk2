@@ -1841,14 +1841,14 @@ class DecParser(MetaFileParser):
 
         if EccGlobalData.gConfig.UniCheckPCDInfo == '1' or EccGlobalData.gConfig.UniCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             # check Description, Prompt information
-            PatternDesc = re.compile('##\s*([\x21-\x7E\s]*)', re.S)
-            PatternPrompt = re.compile('#\s+@Prompt\s+([\x21-\x7E\s]*)', re.S)
+            PatternDesc = re.compile(r'##\s*([\x21-\x7E\s]*)', re.S)
+            PatternPrompt = re.compile(r'#\s+@Prompt\s+([\x21-\x7E\s]*)', re.S)
             Description = None
             Prompt = None
             # check @ValidRange, @ValidList and @Expression format valid
             ErrorCodeValid = '0x0 <= %s <= 0xFFFFFFFF'
-            PatternValidRangeIn = '(NOT)?\s*(\d+\s*-\s*\d+|0[xX][a-fA-F0-9]+\s*-\s*0[xX][a-fA-F0-9]+|LT\s*\d+|LT\s*0[xX][a-fA-F0-9]+|GT\s*\d+|GT\s*0[xX][a-fA-F0-9]+|LE\s*\d+|LE\s*0[xX][a-fA-F0-9]+|GE\s*\d+|GE\s*0[xX][a-fA-F0-9]+|XOR\s*\d+|XOR\s*0[xX][a-fA-F0-9]+|EQ\s*\d+|EQ\s*0[xX][a-fA-F0-9]+)'
-            PatternValidRng = re.compile('^' + '(NOT)?\s*' + PatternValidRangeIn + '$')
+            PatternValidRangeIn = r'(NOT)?\s*(\d+\s*-\s*\d+|0[xX][a-fA-F0-9]+\s*-\s*0[xX][a-fA-F0-9]+|LT\s*\d+|LT\s*0[xX][a-fA-F0-9]+|GT\s*\d+|GT\s*0[xX][a-fA-F0-9]+|LE\s*\d+|LE\s*0[xX][a-fA-F0-9]+|GE\s*\d+|GE\s*0[xX][a-fA-F0-9]+|XOR\s*\d+|XOR\s*0[xX][a-fA-F0-9]+|EQ\s*\d+|EQ\s*0[xX][a-fA-F0-9]+)'
+            PatternValidRng = re.compile('^' + r'(NOT)?\s*' + PatternValidRangeIn + '$')
             for Comment in self._Comments:
                 Comm = Comment[0].strip()
                 if not Comm:
@@ -2071,7 +2071,7 @@ class UniParser(object):
     def CheckKeyValid(self, Key, Contents=None):
         if not Contents:
             Contents = self.FileIn
-        KeyPattern = re.compile('#string\s+%s\s+.*?#language.*?".*?"' % Key, re.S)
+        KeyPattern = re.compile(r'#string\s+%s\s+.*?#language.*?".*?"' % Key, re.S)
         if KeyPattern.search(Contents):
             return True
         return False
