@@ -10,6 +10,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/FdtLib.h>
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
 #include "Arm/BootArch/ArmBootArchParser.h"
@@ -69,7 +70,7 @@ PsciNodeParser (
   // Default to parking protocol
   BootArchInfo->BootArchFlags = 0;
 
-  Data = fdt_getprop (Fdt, PsciNode, "method", &DataSize);
+  Data = FdtGetProp (Fdt, PsciNode, "method", &DataSize);
   if ((Data == NULL) || (DataSize < 0)) {
     ASSERT (0);
     return EFI_ABORTED;

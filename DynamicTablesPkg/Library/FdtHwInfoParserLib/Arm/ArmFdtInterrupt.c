@@ -10,6 +10,7 @@
   - linux//Documentation/devicetree/bindings/interrupt-controller/arm%2Cgic.yaml
 **/
 
+#include <Library/FdtLib.h>
 #include <FdtHwInfoParserInclude.h>
 #include "FdtUtility.h"
 
@@ -34,8 +35,8 @@ FdtGetInterruptId (
 
   ASSERT (Data != NULL);
 
-  IrqType = fdt32_to_cpu (Data[IRQ_TYPE_OFFSET]);
-  IrqId   = fdt32_to_cpu (Data[IRQ_NUMBER_OFFSET]);
+  IrqType = Fdt32ToCpu (Data[IRQ_TYPE_OFFSET]);
+  IrqId   = Fdt32ToCpu (Data[IRQ_NUMBER_OFFSET]);
 
   switch (IrqType) {
     case DT_SPI_IRQ:
@@ -76,7 +77,7 @@ FdtGetInterruptFlags (
 
   ASSERT (Data != NULL);
 
-  IrqFlags = fdt32_to_cpu (Data[IRQ_FLAGS_OFFSET]);
+  IrqFlags = Fdt32ToCpu (Data[IRQ_FLAGS_OFFSET]);
 
   AcpiIrqFlags  = DT_IRQ_IS_EDGE_TRIGGERED (IrqFlags) ? BIT0 : 0;
   AcpiIrqFlags |= DT_IRQ_IS_ACTIVE_LOW (IrqFlags) ? BIT1 : 0;

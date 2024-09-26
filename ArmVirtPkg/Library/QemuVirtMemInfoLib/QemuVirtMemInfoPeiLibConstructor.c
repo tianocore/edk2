@@ -10,8 +10,8 @@
 #include <Pi/PiMultiPhase.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLib.h>
 #include <Library/HobLib.h>
-#include <libfdt.h>
 
 RETURN_STATUS
 EFIAPI
@@ -37,13 +37,13 @@ QemuVirtMemInfoPeiLibConstructor (
   //
   // Make sure we have a valid device tree blob
   //
-  ASSERT (fdt_check_header (DeviceTreeBase) == 0);
+  ASSERT (FdtCheckHeader (DeviceTreeBase) == 0);
 
   //
   // Look for the lowest memory node
   //
   for (Prev = 0; ; Prev = Node) {
-    Node = fdt_next_node (DeviceTreeBase, Prev, NULL);
+    Node = FdtNextNode (DeviceTreeBase, Prev, NULL);
     if (Node < 0) {
       break;
     }
@@ -51,16 +51,16 @@ QemuVirtMemInfoPeiLibConstructor (
     //
     // Check for memory node
     //
-    Type = fdt_getprop (DeviceTreeBase, Node, "device_type", &Len);
+    Type = FdtGetProp (DeviceTreeBase, Node, "device_type", &Len);
     if (Type && (AsciiStrnCmp (Type, "memory", Len) == 0)) {
       //
       // Get the 'reg' property of this node. For now, we will assume
       // two 8 byte quantities for base and size, respectively.
       //
-      RegProp = fdt_getprop (DeviceTreeBase, Node, "reg", &Len);
+      RegProp = FdtGetProp (DeviceTreeBase, Node, "reg", &Len);
       if ((RegProp != 0) && (Len == (2 * sizeof (UINT64)))) {
-        CurBase = fdt64_to_cpu (ReadUnaligned64 (RegProp));
-        CurSize = fdt64_to_cpu (ReadUnaligned64 (RegProp + 1));
+        CurBase = Fdt64ToCpu (ReadUnaligned64 (RegProp));
+        CurSize = Fdt64ToCpu (ReadUnaligned64 (RegProp + 1));
 
         DEBUG ((
           DEBUG_INFO,

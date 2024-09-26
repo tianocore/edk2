@@ -90,7 +90,7 @@
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
 
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
-  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
+  FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
 
   # Shell libraries
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf

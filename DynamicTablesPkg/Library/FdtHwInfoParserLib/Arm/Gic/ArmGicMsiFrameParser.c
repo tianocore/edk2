@@ -10,6 +10,7 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
+#include <Library/FdtLib.h>
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"
 #include "Arm/Gic/ArmGicDispatcher.h"
@@ -77,7 +78,7 @@ MsiFrameNodeParser (
     return EFI_ABORTED;
   }
 
-  Data = fdt_getprop (Fdt, MsiFrameNode, "reg", &DataSize);
+  Data = FdtGetProp (Fdt, MsiFrameNode, "reg", &DataSize);
   if ((Data == NULL) || (DataSize < (INT32)(AddressCells * sizeof (UINT32)))) {
     // If error or not enough space.
     ASSERT (0);
@@ -85,9 +86,9 @@ MsiFrameNodeParser (
   }
 
   if (AddressCells == 2) {
-    MsiFrameInfo->PhysicalBaseAddress = fdt64_to_cpu (*(UINT64 *)Data);
+    MsiFrameInfo->PhysicalBaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
   } else {
-    MsiFrameInfo->PhysicalBaseAddress = fdt32_to_cpu (*(UINT32 *)Data);
+    MsiFrameInfo->PhysicalBaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
   }
 
   MsiFrameInfo->GicMsiFrameId = MsiFrameId;
