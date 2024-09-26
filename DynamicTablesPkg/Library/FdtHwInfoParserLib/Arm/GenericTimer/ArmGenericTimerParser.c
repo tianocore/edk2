@@ -8,6 +8,7 @@
   - linux/Documentation/devicetree/bindings/timer/arm,arch_timer.yaml
 **/
 
+#include <Library/BaseMemoryLib.h>
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
 #include "Arm/GenericTimer/ArmGenericTimerParser.h"

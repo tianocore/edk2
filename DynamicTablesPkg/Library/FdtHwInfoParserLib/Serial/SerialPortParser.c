@@ -12,6 +12,8 @@
 **/
 
 #include <IndustryStandard/DebugPort2Table.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 
 #include "CmObjectDescUtility.h"
 #include "FdtHwInfoParser.h"

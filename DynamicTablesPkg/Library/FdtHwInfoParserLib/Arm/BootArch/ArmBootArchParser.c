@@ -8,6 +8,8 @@
   - linux/Documentation/devicetree/bindings/arm/psci.yaml
 **/
 
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
 #include "Arm/BootArch/ArmBootArchParser.h"
