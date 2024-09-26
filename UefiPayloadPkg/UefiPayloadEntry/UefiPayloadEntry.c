@@ -359,6 +359,7 @@ BuildGenericHob (
   BuildMemoryAllocationHob (PcdGet32 (PcdPayloadFdMemBase), PcdGet32 (PcdPayloadFdMemSize), EfiBootServicesData);
 
   PhysicalAddressBits = ArchGetPhysicalAddressBits ();
+
   BuildCpuHob (PhysicalAddressBits, 16);
 
   //
