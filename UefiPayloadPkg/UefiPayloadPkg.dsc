@@ -5,6 +5,7 @@
 #
 # Copyright (c) 2014 - 2023, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
+# Copyright (c) 2024, Google LLC.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -19,7 +20,7 @@
   PLATFORM_GUID                       = F71608AB-D63D-4491-B744-A99998C8CD96
   PLATFORM_VERSION                    = 0.1
   DSC_SPECIFICATION                   = 0x00010005
-  SUPPORTED_ARCHITECTURES             = IA32|X64
+  SUPPORTED_ARCHITECTURES             = IA32|X64|AARCH64
   BUILD_TARGETS                       = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER                    = DEFAULT
   OUTPUT_DIRECTORY                    = Build/UefiPayloadPkg$(BUILD_ARCH)
@@ -160,19 +161,31 @@
   DEFINE SECURE_BOOT_ENABLE       = FALSE
 
 [BuildOptions]
+!if "AARCH64" in "$(ARCH)"
+# AARCH compile flags
+  GCC:*_*_*_CC_FLAGS             = -mcmodel=tiny -mstrict-align
+!else
+# IA32 and AMD64 compile flags
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
 !if $(USE_CBMEM_FOR_CONSOLE) == FALSE
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
   INTEL:RELEASE_*_*_CC_FLAGS     = /D MDEPKG_NDEBUG
   MSFT:RELEASE_*_*_CC_FLAGS      = /D MDEPKG_NDEBUG
 !endif
+!endif
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
+!if "AARCH64" in "$(ARCH)"
+# AARCH link flags
+  GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x10000
+!else
+# IA32 and AMD64 link flags
   GCC:*_*_*_DLINK_FLAGS      = -z common-page-size=0x1000
   XCODE:*_*_*_DLINK_FLAGS    = -seg1addr 0x1000 -segalign 0x1000
   XCODE:*_*_*_MTOC_FLAGS     = -align 0x1000
   CLANGPDB:*_*_*_DLINK_FLAGS = /ALIGN:4096
   MSFT:*_*_*_DLINK_FLAGS     = /ALIGN:4096
+!endif
 
 ################################################################################
 #
@@ -202,23 +215,14 @@
   # Basic
   #
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
-  BaseMemoryLib|MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
   CpuLib|MdePkg/Library/BaseCpuLib/BaseCpuLib.inf
   IoLib|MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-!if $(PCIE_BASE_SUPPORT) == FALSE
-  PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
-  PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
-!else
-  PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
-  PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
-!endif
   PciSegmentLib|MdePkg/Library/PciSegmentLibSegmentInfo/BasePciSegmentLibSegmentInfo.inf
   PciSegmentInfoLib|UefiPayloadPkg/Library/PciSegmentInfoLibAcpiBoardInfo/PciSegmentInfoLibAcpiBoardInfo.inf
   PeCoffLib|MdePkg/Library/BasePeCoffLib/BasePeCoffLib.inf
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
-  CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   DxeHobListLib|UefiPayloadPkg/Library/DxeHobListLib/DxeHobListLib.inf
 !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
@@ -346,8 +350,17 @@
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
 !endif
+  BaseMemoryLib|MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
+!if $(PCIE_BASE_SUPPORT) == FALSE
+  PciLib|MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+  PciCf8Lib|MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
+!else
+  PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
+  PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
+!endif
 
 [LibraryClasses.X64]
+  CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   #
   # CPU
   #
@@ -362,6 +375,59 @@
 !endif
   CpuExceptionHandlerLib|UefiCpuPkg/Library/CpuExceptionHandlerLib/DxeCpuExceptionHandlerLib.inf
   CpuPageTableLib|UefiCpuPkg/Library/CpuPageTableLib/CpuPageTableLib.inf
+
+[LibraryClasses.AARCH64]
+  ArmHvcLib|ArmPkg/Library/ArmHvcLib/ArmHvcLib.inf
+  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
+
+  BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
+  EfiResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
+  PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
+  PL011UartClockLib|ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
+  PlatformBootManagerLib|UefiPayloadPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  SerialPortLib|ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
+
+  QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioDxeLib.inf
+  QemuFwCfgS3Lib|OvmfPkg/Library/QemuFwCfgS3Lib/BaseQemuFwCfgS3LibNull.inf
+  QemuFwCfgSimpleParserLib|OvmfPkg/Library/QemuFwCfgSimpleParserLib/QemuFwCfgSimpleParserLib.inf
+  QemuLoadImageLib|OvmfPkg/Library/GenericQemuLoadImageLib/GenericQemuLoadImageLib.inf
+
+  TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
+  VirtNorFlashPlatformLib|OvmfPkg/Library/FdtNorFlashQemuLib/FdtNorFlashQemuLib.inf
+
+  # ARM Architectural Libraries
+  ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
+  ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
+  ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
+  ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
+  CpuExceptionHandlerLib|ArmPkg/Library/ArmExceptionLib/ArmExceptionLib.inf
+  DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
+
+  # ARM PL031 RTC Driver
+  RealTimeClockLib|ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
+  TimeBaseLib|EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
+
+  DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+  DebugAgentLib|MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+  DebugAgentTimerLib|EmbeddedPkg/Library/DebugAgentTimerLibNull/DebugAgentTimerLibNull.inf
+
+  OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
+  PeiHardwareInfoLib|OvmfPkg/Library/HardwareInfoLib/PeiHardwareInfoLib.inf
+  QemuBootOrderLib|OvmfPkg/Library/QemuBootOrderLib/QemuBootOrderLib.inf
+
+  # PCI Libraries
+  DxeHardwareInfoLib|OvmfPkg/Library/HardwareInfoLib/DxeHardwareInfoLib.inf
+  PciCapLib|OvmfPkg/Library/BasePciCapLib/BasePciCapLib.inf
+  PciCapPciSegmentLib|OvmfPkg/Library/BasePciCapPciSegmentLib/BasePciCapPciSegmentLib.inf
+  PciCapPciIoLib|OvmfPkg/Library/UefiPciCapPciIoLib/UefiPciCapPciIoLib.inf
+  PciPcdProducerLib|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+
+  ArmPlatformLib|ArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.inf
+  VirtioMmioDeviceLib|OvmfPkg/Library/VirtioMmioDeviceLib/VirtioMmioDeviceLib.inf
+  VirtioLib|OvmfPkg/Library/VirtioLib/VirtioLib.inf
 
 [LibraryClasses.common.SEC]
   HobLib|UefiPayloadPkg/Library/PayloadEntryHobLib/HobLib.inf
@@ -473,14 +539,19 @@
 [PcdsFeatureFlag]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutUgaSupport|FALSE
+
+[PcdsFeatureFlag.X64]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection|FALSE
   ## This PCD specified whether ACPI SDT protocol is installed.
   gEfiMdeModulePkgTokenSpaceGuid.PcdInstallAcpiSdtProtocol|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdHiiOsRuntimeSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom|FALSE
 
-[PcdsFeatureFlag.X64]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode|TRUE
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection|FALSE
+[PcdsFeatureFlag.AARCH64]
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderPciTranslation|TRUE
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuBootOrderMmioTranslation|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTurnOffUsbLegacySupport|TRUE
 
 [PcdsFixedAtBuild]
   gEfiMdePkgTokenSpaceGuid.PcdHardwareErrorRecordLevel|1
@@ -497,7 +568,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseMemory|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable|TRUE
   gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable|FALSE
-
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
   gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile|{ 0x57, 0x72, 0xcf, 0x80, 0xab, 0x87, 0xf9, 0x47, 0xa3, 0xfe, 0xD5, 0x0B, 0x76, 0xd8, 0x95, 0x41 }
@@ -549,6 +619,74 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdRemovableMediaImageVerificationPolicy|0x04
 !endif
 
+[PcdsFixedAtBuild.AARCH64]
+  gArmTokenSpaceGuid.PcdVFPEnabled|1
+
+  # System Memory Base -- fixed at 0x4000_0000
+  gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
+
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase|0x4007c000
+  gArmPlatformTokenSpaceGuid.PcdCPUCorePrimaryStackSize|0x4000
+
+  # Size of the region used by UEFI in permanent memory (Reserved 64MB)
+  gArmPlatformTokenSpaceGuid.PcdSystemMemoryUefiRegionSize|0x04000000
+
+  #
+  # ARM General Interrupt Controller
+  #
+  gArmTokenSpaceGuid.PcdGicDistributorBase|0x8000000
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase|0x80a0000
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase|0x8080000
+
+  #
+  # Enable NX memory protection for all non-code regions, including OEM and OS
+  # reserved ones, with the exception of LoaderData regions, of which OS loaders
+  # (i.e., GRUB) may assume that its contents are executable.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD1
+
+  # initial location of the device tree blob passed by QEMU -- base of DRAM
+  gUefiOvmfPkgTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress|0x40000000
+
+  #
+  # The maximum physical I/O addressability of the processor, set with
+  # BuildCpuHob().
+  #
+  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
+
+  #
+  # Enable the non-executable DXE stack. (This gets set up by DxeIpl)
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
+
+  # Shadowing PEI modules is absolutely pointless when the NOR flash is emulated
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot|FALSE
+
+  # System Memory Size -- 128 MB initially, actual size will be fetched from DT
+  gArmTokenSpaceGuid.PcdSystemMemorySize|0x8000000
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize   | 0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize   | 0x40000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize | 0x40000
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x9000000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciSerialParameters|$(PCI_SERIAL_PARAMETERS)
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosEntryPointProvideMethod|0x2
+
+  #
+  # AARCH64 use PL011 Serial Port device instead of UniversalPayload Serial
+  #
+  gUefiPayloadPkgTokenSpaceGuid.PcdUseUniversalPayloadSerialPort|FALSE
+
+[PcdsPatchableInModule.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
+  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x7
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|$(MAX_SIZE_NON_POPULATE_CAPSULE)
+
 [PcdsPatchableInModule.X64]
 !if $(NETWORK_DRIVER_ENABLE) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|TRUE
@@ -556,10 +694,14 @@
   gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace|16
   gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize|8
 
-[PcdsPatchableInModule.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
-  gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x7
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000004F
+  #
+  # The following parameters are set by Library/PlatformHookLib
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x3F8
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate|$(BAUD_RATE)
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
+
 !if $(USE_CBMEM_FOR_CONSOLE) == FALSE
   !if $(SOURCE_DEBUG_ENABLE)
     gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
@@ -573,14 +715,20 @@
     gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x03
   !endif
 !endif
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxSizeNonPopulateCapsule|$(MAX_SIZE_NON_POPULATE_CAPSULE)
-  #
-  # The following parameters are set by Library/PlatformHookLib
-  #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|FALSE
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x3F8
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate|$(BAUD_RATE)
+
+[PcdsPatchableInModule.AARCH64]
+  gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace|16
+  gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize|8
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialUseMmio|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|0x9000000
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterStride|1
+
+!if $(TARGET) == DEBUG
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x07
+!else
+   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x03
+!endif
 
   #
   # Enable these parameters to be set on the command line
@@ -603,11 +751,7 @@
 #
 ################################################################################
 
-[PcdsDynamicExDefault]
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|$(UART_DEFAULT_BAUD_RATE)
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|$(UART_DEFAULT_DATA_BITS)
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|$(UART_DEFAULT_PARITY)
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|$(UART_DEFAULT_STOP_BITS)
+[PcdsDynamicExDefault.common]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|$(DEFAULT_TERMINAL_TYPE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport|FALSE
@@ -638,6 +782,23 @@
   # Disable SMM S3 script
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed|FALSE
+  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
+
+[PcdsDynamicExDefault.X64]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|$(UART_DEFAULT_BAUD_RATE)
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|$(UART_DEFAULT_DATA_BITS)
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity|$(UART_DEFAULT_PARITY)
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits|$(UART_DEFAULT_STOP_BITS)
+
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|$(RTC_INDEX_REGISTER)
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|$(RTC_TARGET_REGISTER)
+
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0
+
   ## This PCD defines the video horizontal resolution.
   #  This PCD could be set to 0 then video resolution could be at highest resolution.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
@@ -649,18 +810,55 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|0
   ## The PCD is used to specify the video vertical resolution of text setup.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|0
-
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|31
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|100
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed|FALSE
-  gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration|TRUE
 
-  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|$(RTC_INDEX_REGISTER)
-  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|$(RTC_TARGET_REGISTER)
+[PcdsDynamicExDefault.AARCH64]
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase     | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64   | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64   | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase     | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase   | 0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64 | 0
+
+  # Timer IRQs
+  # PPI #13
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum|29
+  # PPI #14
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum|30
+  # PPI #11 -- Not used in QEMU platform
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum|0
+  # PPI #10
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum|26
+  gArmTokenSpaceGuid.PcdArmArchTimerHypVirtIntrNum|0x0
+
+  # PL031 RealTimeClock
+  gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0x9010000
+
+  # set PcdPciExpressBaseAddress to MAX_UINT64, which signifies that this
+  # PCD and PcdPciDisableBusEnumeration above have not been assigned yet
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0x4010000000
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseSize|0xfffffff
+  gEfiMdePkgTokenSpaceGuid.PcdPciIoTranslation|0x0
+
+  #
+  # Set video resolution for boot options and for text setup.
+  # PlatformDxe can set the former at runtime.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|1280
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|800
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution|640
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution|480
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
+
+  #
+  # SMBIOS entry point version
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosVersion|0x0300
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
+  gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
 ################################################################################
 #
@@ -689,7 +887,7 @@
   !else
     UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
   !endif
-!else
+!elseif "X64" in "$(ARCH)"
   [Components.X64]
   !if $(UNIVERSAL_PAYLOAD) == TRUE
     !if $(UNIVERSAL_PAYLOAD_FORMAT) == "ELF"
@@ -710,6 +908,29 @@
   !else
     UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
   !endif
+!else
+  [Components.AARCH64]
+
+  !if $(UNIVERSAL_PAYLOAD) == TRUE
+    !if $(UNIVERSAL_PAYLOAD_FORMAT) == "ELF"
+      UefiPayloadPkg/UefiPayloadEntry/UniversalPayloadEntry.inf
+    !elseif $(UNIVERSAL_PAYLOAD_FORMAT) == "FIT"
+      UefiPayloadPkg/UefiPayloadEntry/FitUniversalPayloadEntry.inf {
+      <LibraryClasses>
+        !if gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable == TRUE
+          FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
+          CustomFdtNodeParserLib|UefiPayloadPkg/Library/CustomFdtNodeParserLib/CustomFdtNodeParserLib.inf
+          NULL|UefiPayloadPkg/Library/FdtParserLib/FdtParseLib.inf
+        !endif
+      NULL|UefiPayloadPkg/Library/HobParseLib/HobParseLib.inf
+    }
+    !else
+      UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
+    !endif
+  !else
+    UefiPayloadPkg/UefiPayloadEntry/UefiPayloadEntry.inf
+  !endif
+
 !endif
 
 #
@@ -842,6 +1063,7 @@
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   FatPkg/EnhancedFatDxe/Fat.inf
+
 !if $(ATA_ENABLE) == TRUE
   MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
@@ -951,6 +1173,224 @@
 !endif
 !endif
 
+[Components.AARCH64]
+  #
+  # DXE
+  #
+  MdeModulePkg/Core/Dxe/DxeMain.inf
+
+  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
+
+  #
+  # Architectural Protocols
+  #
+  ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
+  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
+
+!if $(MEMORY_TEST) == "GENERIC"
+  MdeModulePkg/Universal/MemoryTest/GenericMemoryTestDxe/GenericMemoryTestDxe.inf
+!elseif $(MEMORY_TEST) == "NULL"
+  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+!endif
+
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf {
+    <LibraryClasses>
+      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
+  }
+  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf
+  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
+  MdeModulePkg/Universal/Metronome/Metronome.inf
+
+  #
+  # Console Support
+  #
+  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+!if $(DISABLE_SERIAL_TERMINAL) == FALSE
+  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+!endif
+  UefiPayloadPkg/GraphicsOutputDxe/GraphicsOutputDxe.inf
+
+  #
+  # ISA Support
+  #
+!if $(SERIAL_DRIVER_ENABLE) == TRUE
+  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+!endif
+!if $(SIO_BUS_ENABLE) == TRUE
+  OvmfPkg/SioBusDxe/SioBusDxe.inf
+!endif
+!if $(PS2_KEYBOARD_ENABLE) == TRUE
+  MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
+!endif
+!if $(PS2_MOUSE_ENABLE) == TRUE
+  MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
+!endif
+
+  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+
+  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  ArmPkg/Drivers/TimerDxe/TimerDxe.inf
+  OvmfPkg/VirtNorFlashDxe/VirtNorFlashDxe.inf {
+    <LibraryClasses>
+      # don't use unaligned CopyMem () on the UEFI varstore NOR flash region
+      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  }
+  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+
+  SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
+
+  #
+  # Status Code Routing
+  #
+  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
+
+  #
+  # Platform Driver
+  #
+  OvmfPkg/PlatformDxe/Platform.inf
+  OvmfPkg/Fdt/VirtioFdtDxe/VirtioFdtDxe.inf
+  OvmfPkg/Fdt/HighMemDxe/HighMemDxe.inf
+  OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+  OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+  OvmfPkg/VirtioRngDxe/VirtioRng.inf
+  OvmfPkg/VirtioSerialDxe/VirtioSerial.inf
+
+  #
+  # FAT filesystem + GPT/MBR partitioning + UDF filesystem + virtio-fs
+  #
+  FatPkg/EnhancedFatDxe/Fat.inf
+  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+  OvmfPkg/VirtioFsDxe/VirtioFsDxe.inf
+
+  #
+  # Bds
+  #
+  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf {
+    <LibraryClasses>
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  }
+
+  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
+  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf {
+    <LibraryClasses>
+      BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  }
+
+  MdeModulePkg/Logo/LogoDxe.inf
+  MdeModulePkg/Application/UiApp/UiApp.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/DeviceManagerUiLib/DeviceManagerUiLib.inf
+      NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
+      NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
+  }
+  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
+  OvmfPkg/QemuKernelLoaderFsDxe/QemuKernelLoaderFsDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Library/BlobVerifierLibNull/BlobVerifierLibNull.inf
+  }
+
+  #
+  # SCSI Bus and Disk Driver
+  #
+  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+
+!if $(ATA_ENABLE) == TRUE
+  MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
+  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+!endif
+  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+!if $(NVME_ENABLE) == TRUE
+  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+!endif
+
+!if $(RAM_DISK_ENABLE) == TRUE
+  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+!endif
+  #
+  # SD/eMMC Support
+  #
+!if $(SD_ENABLE) == TRUE
+  MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
+  MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
+  MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
+!endif
+
+  #
+  # SMBIOS Support
+  #
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Library/SmbiosVersionLib/DetectSmbiosVersionLib.inf
+  }
+
+  #
+  # PCI support
+  #
+  UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Fdt/FdtPciPcdProducerLib/FdtPciPcdProducerLib.inf
+  }
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
+    <LibraryClasses>
+      PciHostBridgeLib|UefiPayloadPkg/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  }
+  OvmfPkg/PciHotPlugInitDxe/PciHotPlugInit.inf
+  OvmfPkg/VirtioPciDeviceDxe/VirtioPciDeviceDxe.inf
+  OvmfPkg/Virtio10Dxe/Virtio10.inf
+
+  #
+  # Video support
+  #
+  OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
+  OvmfPkg/VirtioGpuDxe/VirtioGpu.inf
+
+  #
+  # USB Support
+  #
+  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
+
+  #
+  # Hash2 Protocol Support
+  #
+  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
+
+  #
+  # ACPI Support
+  #
+  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  OvmfPkg/PlatformHasAcpiDtDxe/PlatformHasAcpiDtDxe.inf
+
+
   #------------------------------
   #  Build the shell
   #------------------------------
@@ -982,6 +1422,52 @@
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
   }
 !endif
+  ShellPkg/Application/Shell/Shell.inf {
+    <PcdsFixedAtBuild>
+      ## This flag is used to control initialization of the shell library
+      #  This should be FALSE for compiling the shell application itself only.
+      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+
+    #------------------------------
+    #  Basic commands
+    #------------------------------
+
+    <LibraryClasses>
+      NULL|ShellPkg/Library/UefiShellLevel1CommandsLib/UefiShellLevel1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellLevel3CommandsLib/UefiShellLevel3CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellDriver1CommandsLib/UefiShellDriver1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
+
+    #------------------------------
+    #  Networking commands
+    #------------------------------
+
+    <LibraryClasses>
+      NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
+
+    #------------------------------
+    #  Support libraries
+    #------------------------------
+
+    <LibraryClasses>
+      DevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+      HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
+      OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+      ShellCEntryLib|ShellPkg/Library/UefiShellCEntryLib/UefiShellCEntryLib.inf
+      ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
+      SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
+  }
+
+[Components.AARCH64]
+  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf {
+    <PcdsFixedAtBuild>
+      ## This flag is used to control initialization of the shell library
+      #  This should be FALSE for compiling the dynamic command.
+      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+  }
   ShellPkg/Application/Shell/Shell.inf {
     <PcdsFixedAtBuild>
       ## This flag is used to control initialization of the shell library
