@@ -61,6 +61,7 @@
 !include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common.PEIM]
+  PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   ArmVirtMemInfoLib|ArmVirtPkg/Library/CloudHvVirtMemInfoLib/CloudHvVirtMemInfoPeiLib.inf
 
 [LibraryClasses.common.DXE_DRIVER]
