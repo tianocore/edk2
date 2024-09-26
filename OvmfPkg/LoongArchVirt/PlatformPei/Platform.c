@@ -21,6 +21,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/CpuMmuInitLib.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/MpInitLib.h>
@@ -29,7 +30,6 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/PlatformHookLib.h>
 #include <Library/QemuFwCfgLib.h>
-#include <libfdt.h>
 #include <Ppi/MasterBootMode.h>
 #include <Register/LoongArch64/Cpucfg.h>
 #include <Register/LoongArch64/Csr.h>
@@ -176,13 +176,13 @@ GetRtcAddress (
   CONST UINT64  *RegProp;
   EFI_STATUS    Status;
 
-  if ((Fdt == NULL) || (fdt_check_header (Fdt) != 0)) {
+  if ((Fdt == NULL) || (FdtCheckHeader (Fdt) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
   Status = EFI_NOT_FOUND;
   for (Prev = 0; ; Prev = Node) {
-    Node = fdt_next_node (Fdt, Prev, NULL);
+    Node = FdtNextNode (Fdt, Prev, NULL);
     if (Node < 0) {
       break;
     }
@@ -190,13 +190,13 @@ GetRtcAddress (
     //
     // Check for memory node
     //
-    Type = fdt_getprop (Fdt, Node, "compatible", &Len);
+    Type = FdtGetProp (Fdt, Node, "compatible", &Len);
     if ((Type) && (AsciiStrnCmp (Type, "loongson,ls7a-rtc", Len) == 0)) {
       //
       // Get the 'reg' property of this node. For now, we will assume
       // two 8 byte quantities for base and size, respectively.
       //
-      RegProp = fdt_getprop (Fdt, Node, "reg", &Len);
+      RegProp = FdtGetProp (Fdt, Node, "reg", &Len);
       if ((RegProp != 0) && (Len == (2 * sizeof (UINT64)))) {
         *RtcBaseAddress = SwapBytes64 (RegProp[0]);
         Status          = RETURN_SUCCESS;
@@ -274,11 +274,11 @@ AddFdtHob (
 
   SaveRtcRegisterAddressHob (RtcBaseAddress);
 
-  FdtSize  = fdt_totalsize (Base) + PcdGet32 (PcdDeviceTreeAllocationPadding);
+  FdtSize  = FdtTotalSize (Base) + PcdGet32 (PcdDeviceTreeAllocationPadding);
   FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
   NewBase  = AllocatePages (FdtPages);
   ASSERT (NewBase != NULL);
-  fdt_open_into (Base, NewBase, EFI_PAGES_TO_SIZE (FdtPages));
+  FdtOpenInto (Base, NewBase, EFI_PAGES_TO_SIZE (FdtPages));
 
   FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof *FdtHobData);
   ASSERT (FdtHobData != NULL);

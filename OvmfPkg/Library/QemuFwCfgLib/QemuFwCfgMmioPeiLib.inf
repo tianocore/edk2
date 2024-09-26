@@ -33,6 +33,7 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  FdtLib
   HobLib
   IoLib
   MemoryAllocationLib

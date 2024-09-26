@@ -15,6 +15,7 @@
 #include "CmObjectDescUtility.h"
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/FdtLib.h>
 
 #include "FdtHwInfoParser.h"
 #include "Pci/PciConfigSpaceParser.h"
@@ -72,7 +73,7 @@ GetPciSegGroup (
     return EFI_INVALID_PARAMETER;
   }
 
-  Data = fdt_getprop (Fdt, HostPciNode, "linux,pci-domain", &DataSize);
+  Data = FdtGetProp (Fdt, HostPciNode, "linux,pci-domain", &DataSize);
   if ((Data == NULL) || (DataSize < 0)) {
     // Did not find property, assign the DomainIds ourselves.
     if (LocalSegGroup < 0) {
@@ -98,7 +99,7 @@ GetPciSegGroup (
   // nodes must have it.
   LocalSegGroup = -1;
 
-  *SegGroup = fdt32_to_cpu (*(UINT32 *)Data);
+  *SegGroup = Fdt32ToCpu (*(UINT32 *)Data);
   return EFI_SUCCESS;
 }
 
@@ -134,15 +135,15 @@ PopulateBusRange (
     return EFI_INVALID_PARAMETER;
   }
 
-  Data = fdt_getprop (Fdt, HostPciNode, "bus-range", &DataSize);
+  Data = FdtGetProp (Fdt, HostPciNode, "bus-range", &DataSize);
   if ((Data == NULL) || (DataSize < 0)) {
     // No evidence this property is mandatory. Use default values.
     StartBus = 0;
     EndBus   = 255;
   } else if (DataSize == (2 * sizeof (UINT32))) {
     // If available, the property is on two integers.
-    StartBus = fdt32_to_cpu (((UINT32 *)Data)[0]);
-    EndBus   = fdt32_to_cpu (((UINT32 *)Data)[1]);
+    StartBus = Fdt32ToCpu (((UINT32 *)Data)[0]);
+    EndBus   = Fdt32ToCpu (((UINT32 *)Data)[1]);
   } else {
     ASSERT (0);
     return EFI_ABORTED;
@@ -195,7 +196,7 @@ ParseAddressMap (
   AddressMapSize = (PCI_ADDRESS_CELLS + AddressCells + PCI_SIZE_CELLS) *
                    sizeof (UINT32);
 
-  Data = fdt_getprop (Fdt, HostPciNode, "ranges", &DataSize);
+  Data = FdtGetProp (Fdt, HostPciNode, "ranges", &DataSize);
   if ((Data == NULL) ||
       (DataSize < 0) ||
       ((DataSize % AddressMapSize) != 0))
@@ -219,29 +220,29 @@ ParseAddressMap (
     Offset = Index * AddressMapSize;
 
     // Pci address attributes
-    PciAddressAttr                     = fdt32_to_cpu (*(UINT32 *)&Data[Offset]);
+    PciAddressAttr                     = Fdt32ToCpu (*(UINT32 *)&Data[Offset]);
     PciAddressMapInfo[Index].SpaceCode = READ_PCI_SS (PciAddressAttr);
     Offset                            += sizeof (UINT32);
 
     // Pci address
     PciAddressMapInfo[Index].PciAddress =
-      fdt64_to_cpu (*(UINT64 *)&Data[Offset]);
+      Fdt64ToCpu (*(UINT64 *)&Data[Offset]);
     Offset += (PCI_ADDRESS_CELLS - 1) * sizeof (UINT32);
 
     // Cpu address
     if (AddressCells == 2) {
       PciAddressMapInfo[Index].CpuAddress =
-        fdt64_to_cpu (*(UINT64 *)&Data[Offset]);
+        Fdt64ToCpu (*(UINT64 *)&Data[Offset]);
     } else {
       PciAddressMapInfo[Index].CpuAddress =
-        fdt32_to_cpu (*(UINT32 *)&Data[Offset]);
+        Fdt32ToCpu (*(UINT32 *)&Data[Offset]);
     }
 
     Offset += AddressCells * sizeof (UINT32);
 
     // Address size
     PciAddressMapInfo[Index].AddressSize =
-      fdt64_to_cpu (*(UINT64 *)&Data[Offset]);
+      Fdt64ToCpu (*(UINT64 *)&Data[Offset]);
     Offset += PCI_SIZE_CELLS * sizeof (UINT32);
   } // for
 
@@ -313,7 +314,7 @@ ParseIrqMap (
   CM_ARCH_COMMON_PCI_INTERRUPT_MAP_INFO  *PciInterruptMapInfo;
   UINT32                                 BufferSize;
 
-  Data = fdt_getprop (Fdt, HostPciNode, "interrupt-map", &DataSize);
+  Data = FdtGetProp (Fdt, HostPciNode, "interrupt-map", &DataSize);
   if ((Data == NULL) || (DataSize <= 0)) {
     DEBUG ((
       DEBUG_WARN,
@@ -337,7 +338,7 @@ ParseIrqMap (
     return EFI_ABORTED;
   }
 
-  IrqMapMask = fdt_getprop (
+  IrqMapMask = FdtGetProp (
                  Fdt,
                  HostPciNode,
                  "interrupt-map-mask",
@@ -358,8 +359,8 @@ ParseIrqMap (
     return EFI_ABORTED;
   }
 
-  IntcPhandle = fdt32_to_cpu (*(UINT32 *)&Data[PHandleOffset]);
-  IntcNode    = fdt_node_offset_by_phandle (Fdt, IntcPhandle);
+  IntcPhandle = Fdt32ToCpu (*(UINT32 *)&Data[PHandleOffset]);
+  IntcNode    = FdtNodeOffsetByPhandle (Fdt, IntcPhandle);
   if (IntcNode < 0) {
     ASSERT (0);
     return EFI_ABORTED;
@@ -394,7 +395,7 @@ ParseIrqMap (
   // We assume the same interrupt-controller is used for all the mappings.
   // Check this is correct.
   for (Index = 0; Index < IrqMapCount; Index++) {
-    if (IntcPhandle != fdt32_to_cpu (
+    if (IntcPhandle != Fdt32ToCpu (
                          *(UINT32 *)&Data[(Index * IrqMapSize) + PHandleOffset]
                          ))
     {
@@ -416,7 +417,7 @@ ParseIrqMap (
     Offset = Index * IrqMapSize;
 
     // Pci address attributes
-    PciAddressAttr = fdt32_to_cpu (
+    PciAddressAttr = Fdt32ToCpu (
                        (*(UINT32 *)&Data[Offset]) &
                        (*(UINT32 *)&IrqMapMask[0])
                        );
@@ -425,7 +426,7 @@ ParseIrqMap (
     Offset                              += PCI_ADDRESS_CELLS * sizeof (UINT32);
 
     // Pci irq
-    PciInterruptMapInfo[Index].PciInterrupt = fdt32_to_cpu (
+    PciInterruptMapInfo[Index].PciInterrupt = Fdt32ToCpu (
                                                 (*(UINT32 *)&Data[Offset]) &
                                                 (*(UINT32 *)&IrqMapMask[3 * sizeof (UINT32)])
                                                 );
@@ -527,7 +528,7 @@ PciNodeParser (
     return EFI_ABORTED;
   }
 
-  Data = fdt_getprop (Fdt, HostPciNode, "reg", &DataSize);
+  Data = FdtGetProp (Fdt, HostPciNode, "reg", &DataSize);
   if ((Data == NULL) ||
       (DataSize != ((AddressCells + SizeCells) * sizeof (UINT32))))
   {
@@ -538,9 +539,9 @@ PciNodeParser (
 
   // Base address
   if (AddressCells == 2) {
-    PciInfo->PciConfigSpaceInfo.BaseAddress = fdt64_to_cpu (*(UINT64 *)Data);
+    PciInfo->PciConfigSpaceInfo.BaseAddress = Fdt64ToCpu (*(UINT64 *)Data);
   } else {
-    PciInfo->PciConfigSpaceInfo.BaseAddress = fdt32_to_cpu (*(UINT32 *)Data);
+    PciInfo->PciConfigSpaceInfo.BaseAddress = Fdt32ToCpu (*(UINT32 *)Data);
   }
 
   // Address map
