@@ -154,7 +154,7 @@
   VariablePolicyLib                | MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLib.inf
   VariablePolicyHelperLib          | MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
   SortLib                          | MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
-  FdtLib                           | EmbeddedPkg/Library/FdtLib/FdtLib.inf
+  FdtLib                           | MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
   PciSegmentLib                    | MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib                 | OvmfPkg/Fdt/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
   PciHostBridgeUtilityLib          | OvmfPkg/Library/PciHostBridgeUtilityLib/PciHostBridgeUtilityLib.inf

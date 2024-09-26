@@ -9,6 +9,7 @@
 **/
 
 #include <Library/BaseMemoryLib.h>
+#include <Library/FdtLib.h>
 #include "FdtHwInfoParser.h"
 #include "CmObjectDescUtility.h"
 #include "Arm/GenericTimer/ArmGenericTimerParser.h"
@@ -64,7 +65,7 @@ TimerNodeParser (
     return EFI_INVALID_PARAMETER;
   }
 
-  Data = fdt_getprop (Fdt, TimerNode, "always-on", &DataSize);
+  Data = FdtGetProp (Fdt, TimerNode, "always-on", &DataSize);
   if ((Data == NULL) || (DataSize < 0)) {
     AlwaysOnTimer = FALSE;
   } else {
@@ -97,7 +98,7 @@ TimerNodeParser (
     return Status;
   }
 
-  Data = fdt_getprop (Fdt, TimerNode, "interrupts", &DataSize);
+  Data = FdtGetProp (Fdt, TimerNode, "interrupts", &DataSize);
   if ((Data == NULL) ||
       (DataSize != (FdtMaxTimerItem * IntCells * sizeof (UINT32))))
   {

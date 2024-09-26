@@ -8,11 +8,11 @@
 
 #include <Uefi.h>
 #include <IndustryStandard/Acpi.h>
-#include <libfdt.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/FdtLib.h>
 #include <Library/HiiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -123,18 +123,18 @@ RemoveDtStdoutPath (
     return;
   }
 
-  Node = fdt_path_offset (Dtb, "/chosen");
+  Node = FdtPathOffset (Dtb, "/chosen");
   if (Node < 0) {
     return;
   }
 
-  Error = fdt_delprop (Dtb, Node, "stdout-path");
+  Error = FdtDelProp (Dtb, Node, "stdout-path");
   if (Error) {
     DEBUG ((
       DEBUG_INFO,
       "%a: Failed to delete 'stdout-path' property: %a\n",
       __func__,
-      fdt_strerror (Error)
+      FdtStrerror (Error)
       ));
   }
 }

@@ -9,7 +9,6 @@
 #define FDT_HW_INFO_PARSER_INCLUDE_H_
 
 #include <Base.h>
-#include <libfdt.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 

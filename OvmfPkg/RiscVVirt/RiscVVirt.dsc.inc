@@ -93,7 +93,7 @@
   DebugAgentTimerLib|EmbeddedPkg/Library/DebugAgentTimerLibNull/DebugAgentTimerLibNull.inf
 
   # Flattened Device Tree (FDT) access library
-  FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
+  FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
 
   # PCI Libraries
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
