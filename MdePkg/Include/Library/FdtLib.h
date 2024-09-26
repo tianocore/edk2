@@ -421,6 +421,24 @@ FdtSubnodeOffsetNameLen (
   );
 
 /**
+  Returns a offset of first node which matches the given name.
+
+  @param[in] Fdt             The pointer to FDT blob.
+  @param[in] ParentOffset    The offset to the node which start find under.
+  @param[in] Name            The name to search the node with the name.
+
+  @return The offset to node offset with given node name.
+
+ **/
+INT32
+EFIAPI
+FdtSubnodeOffset (
+  IN CONST VOID   *Fdt,
+  IN INT32        ParentOffset,
+  IN CONST CHAR8  *Name
+  );
+
+/**
   Returns the number of memory reserve map entries.
 
   @param[in] Fdt             The pointer to FDT blob.
