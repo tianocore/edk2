@@ -243,7 +243,7 @@ def add_reviewers_to_pr(
             # If a comment has already been made for these non-collaborators,
             # do not make another comment.
             if (
-                comment.user.login == "github-actions[bot]"
+                comment.user.login == "tianocore-assign-reviewers[bot]"
                 and "WARNING: Cannot add some reviewers" in comment.body
                 and all(u in comment.body for u in non_collaborators)
             ):
