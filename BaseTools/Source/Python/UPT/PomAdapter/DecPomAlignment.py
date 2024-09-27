@@ -747,12 +747,12 @@ class DecPomAlignment(PackageObject):
         #
         # deal with "NOT EQ", "NOT LT", "NOT GT", "NOT LE", "NOT GE", "NOT NOT"
         #
-        NOTNOT_Pattern = '[\t\s]*NOT[\t\s]+NOT[\t\s]*'
-        NOTGE_Pattern = '[\t\s]*NOT[\t\s]+GE[\t\s]*'
-        NOTLE_Pattern = '[\t\s]*NOT[\t\s]+LE[\t\s]*'
-        NOTGT_Pattern = '[\t\s]*NOT[\t\s]+GT[\t\s]*'
-        NOTLT_Pattern = '[\t\s]*NOT[\t\s]+LT[\t\s]*'
-        NOTEQ_Pattern = '[\t\s]*NOT[\t\s]+EQ[\t\s]*'
+        NOTNOT_Pattern = r'[\t\s]*NOT[\t\s]+NOT[\t\s]*'
+        NOTGE_Pattern = r'[\t\s]*NOT[\t\s]+GE[\t\s]*'
+        NOTLE_Pattern = r'[\t\s]*NOT[\t\s]+LE[\t\s]*'
+        NOTGT_Pattern = r'[\t\s]*NOT[\t\s]+GT[\t\s]*'
+        NOTLT_Pattern = r'[\t\s]*NOT[\t\s]+LT[\t\s]*'
+        NOTEQ_Pattern = r'[\t\s]*NOT[\t\s]+EQ[\t\s]*'
         ReplaceValue = re.compile(NOTNOT_Pattern).sub('', ReplaceValue)
         ReplaceValue = re.compile(NOTLT_Pattern).sub('x >= ', ReplaceValue)
         ReplaceValue = re.compile(NOTGT_Pattern).sub('x <= ', ReplaceValue)
@@ -785,7 +785,7 @@ class DecPomAlignment(PackageObject):
         if ReplaceValue.find('!') >= 0 and ReplaceValue[ReplaceValue.index('!') + 1] != '=':
             ReplaceValue = ReplaceValue.replace('!', ' not ')
         if '.' in ReplaceValue:
-            Pattern = '[a-zA-Z0-9]{1,}\.[a-zA-Z0-9]{1,}'
+            Pattern = r'[a-zA-Z0-9]{1,}\.[a-zA-Z0-9]{1,}'
             MatchedList = re.findall(Pattern, ReplaceValue)
             for MatchedItem in MatchedList:
                 if MatchedItem not in self.PcdDefaultValueDict:
@@ -814,7 +814,7 @@ class DecPomAlignment(PackageObject):
                     #
                     # Delete the 'L' prefix of a quoted string, this operation is for eval()
                     #
-                    QUOTED_PATTERN = '[\t\s]*L?"[^"]*"'
+                    QUOTED_PATTERN = r'[\t\s]*L?"[^"]*"'
                     QuotedMatchedObj = re.search(QUOTED_PATTERN, Expression)
                     if QuotedMatchedObj:
                         MatchedStr = QuotedMatchedObj.group().strip()
@@ -847,7 +847,7 @@ class DecPomAlignment(PackageObject):
             #
             # Delete the 'L' prefix of a quoted string, this operation is for eval()
             #
-            QUOTED_PATTERN = '[\t\s]*L?"[^"]*"'
+            QUOTED_PATTERN = r'[\t\s]*L?"[^"]*"'
             QuotedMatchedObj = re.search(QUOTED_PATTERN, DefaultValue)
             if QuotedMatchedObj:
                 MatchedStr = QuotedMatchedObj.group().strip()

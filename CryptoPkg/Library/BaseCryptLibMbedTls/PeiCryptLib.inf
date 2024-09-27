@@ -99,8 +99,7 @@
   #
   MSFT:*_*_*_CC_FLAGS = /wd4090 /wd4718
 
-  GCC:*_CLANG35_*_CC_FLAGS = -std=c99
-  GCC:*_CLANG38_*_CC_FLAGS = -std=c99
+  GCC:*_CLANGDWARF_*_CC_FLAGS = -std=gnu99
   GCC:*_CLANGPDB_*_CC_FLAGS = -std=c99 -Wno-error=incompatible-pointer-types
 
   XCODE:*_*_*_CC_FLAGS = -std=c99
