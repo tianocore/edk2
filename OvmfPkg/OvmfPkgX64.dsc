@@ -343,6 +343,7 @@
 
   MemEncryptSevLib|OvmfPkg/Library/BaseMemEncryptSevLib/PeiMemEncryptSevLib.inf
   CcProbeLib|OvmfPkg/Library/CcProbeLib/SecPeiCcProbeLib.inf
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
 
 [LibraryClasses.common.DXE_CORE]
   HobLib|MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
