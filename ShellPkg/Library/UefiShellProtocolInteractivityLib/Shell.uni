@@ -1,0 +1,28 @@
+// *++
+//
+// (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
+// Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved. <BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+// ShellStrings.uni
+//
+// Abstract:
+//
+// String definitions for the main UEFI Shell 2.0 application
+//
+// Revision History:
+//
+// --*/
+
+/=#
+
+#langdef   en-US "English"
+
+#string STR_SHELL_ENTER_TO_CONT       #language en-US "%NPress ENTER to continue:%E"
+#string STR_SHELL_QUIT_CONT           #language en-US "%NPress ENTER to continue or 'Q' break:%E"
+
+#string STR_SHELL_INVALID_REDIR       #language en-US "Unable to redirect file.\r\n"
+#string STR_SHELL_REDUNDA_REDIR       #language en-US "Redundant redirection specified.\r\n"
+

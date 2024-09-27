@@ -1,0 +1,43 @@
+##  @file
+#  This library implements the shell protocols interactivity layer.
+#
+#  (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = ShellProtocolInteractivityLibNull
+  FILE_GUID                      = EEC8C4F3-E234-4344-B103-1F313234ADE6
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ShellProtocolInteractivityLib|UEFI_APPLICATION UEFI_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  UefiShellProtocolInteractivityLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+
+
+[Guids]
+
+
+[Protocols]
+
+
+[Pcd]
+
