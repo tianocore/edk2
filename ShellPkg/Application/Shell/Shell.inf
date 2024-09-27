@@ -26,22 +26,9 @@
 [Sources]
   Shell.c
   Shell.h
-  ShellParametersProtocol.c
-  ShellParametersProtocol.h
   ShellProtocol.c
   ShellProtocol.h
-  FileHandleWrappers.c
-  FileHandleWrappers.h
-  FileHandleInternal.h
-  ShellEnvVar.c
-  ShellEnvVar.h
-  ShellManParser.c
-  ShellManParser.h
   Shell.uni
-  ConsoleLogger.c
-  ConsoleLogger.h
-  ConsoleWrappers.c
-  ConsoleWrappers.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -66,6 +53,8 @@
   SortLib
   HandleParsingLib
   UefiHiiServicesLib
+  ShellProtocolInteractivityLib
+  ShellProtocolsLib
 
 [Guids]
   gShellVariableGuid                                      ## SOMETIMES_CONSUMES ## GUID
@@ -73,10 +62,8 @@
   gShellAliasGuid                                         ## SOMETIMES_PRODUCES ## GUID
 
 [Protocols]
-  gEfiShellProtocolGuid                                   ## PRODUCES
-                                                          ## SOMETIMES_CONSUMES
-  gEfiShellParametersProtocolGuid                         ## PRODUCES
-                                                          ## SOMETIMES_CONSUMES
+  gEfiShellProtocolGuid                                   ## SOMETIMES_CONSUMES
+  gEfiShellParametersProtocolGuid                         ## SOMETIMES_CONSUMES
 
 #  gEfiShellEnvironment2Guid                              ## SOMETIMES_PRODUCES
 #  gEfiShellInterfaceGuid                                 ## SOMETIMES_PRODUCES
@@ -89,7 +76,6 @@
   gEfiComponentName2ProtocolGuid                          ## SOMETIMES_CONSUMES
   gEfiUnicodeCollation2ProtocolGuid                       ## CONSUMES
   gEfiDevicePathProtocolGuid                              ## CONSUMES
-  gEfiHiiPackageListProtocolGuid                          ## SOMETIMES_PRODUCES
 
 [Pcd]
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel           ## CONSUMES
