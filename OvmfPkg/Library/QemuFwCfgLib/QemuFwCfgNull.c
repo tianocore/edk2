@@ -197,3 +197,12 @@ QemuFwCfgFindFile (
 {
   return RETURN_UNSUPPORTED;
 }
+
+RETURN_STATUS
+EFIAPI
+QemuFwCfgInitCache (
+  VOID
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
