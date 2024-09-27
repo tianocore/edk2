@@ -1993,6 +1993,7 @@ NOOPT_CLANGPDB_X64_GENFW_FLAGS      = --keepexceptiontable
 #
 ####################################################################################
 *_CLANGDWARF_*_*_FAMILY             = GCC
+*_CLANGDWARF_*_*_BUILDRULEFAMILY    = CLANGDWARF
 
 *_CLANGDWARF_*_MAKE_PATH            = ENV(CLANG_HOST_BIN)make
 *_CLANGDWARF_*_*_DLL                = ENV(CLANGDWARF_DLL)
