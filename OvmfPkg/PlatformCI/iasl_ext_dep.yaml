@@ -13,9 +13,11 @@
 {
   "id": "iasl-ovmf-1",
   "scope": "ovmf",
-  "type": "nuget",
-  "name": "iasl",
-  "source": "https://api.nuget.org/v3/index.json",
-  "version": "20190215.0.0",
+  "type": "web",
+  "name": "edk2-acpica-iasl",
+  "source": "https://github.com/mikebeaton/edk2_ci_tools/releases/download/edk2-acpica-iasl/edk2-acpica-iasl.20230628.0.1.zip",
+  "version": "20230628.0.1",
+  "internal_path": "/edk2-acpica-iasl",
+  "compression_type": "zip",
   "flags": ["set_path", "host_specific"],
 }
