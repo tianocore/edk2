@@ -33,6 +33,16 @@
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !endif
 
+!if $(TPM2_ENABLE) == TRUE || $(CC_MEASUREMENT_ENABLE) == TRUE
+  #
+  # PeiTpmMeasurementLib supports measurement functions for both TPM and Confidential Computing.
+  # It should be controlled by TPM2_ENABLE and CC_MEASUREMENT_ENABLE.
+  #
+  TpmMeasurementLib|SecurityPkg/Library/PeiTpmMeasurementLib/PeiTpmMeasurementLib.inf
+!else
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+!endif
+
 [LibraryClasses.common.DXE_DRIVER]
 !if $(TPM2_ENABLE) == TRUE
 !if $(TPM1_ENABLE) == TRUE
