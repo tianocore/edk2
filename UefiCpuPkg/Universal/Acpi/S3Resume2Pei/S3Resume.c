@@ -871,7 +871,7 @@ S3ResumeExecuteBootScript (
     SignalToSmmByCommunication (&gEdkiiS3SmmInitDoneGuid);
   }
 
-  if ((FeaturePcdGet (PcdDxeIplSwitchToLongMode)) || (sizeof (UINTN) == sizeof (UINT64))) {
+  if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     AsmWriteCr3 ((UINTN)AcpiS3Context->S3NvsPageTableAddress);
   }
 
@@ -1083,7 +1083,7 @@ S3RestoreConfig2 (
     CpuDeadLoop ();
   }
 
-  if ((FeaturePcdGet (PcdDxeIplSwitchToLongMode)) || (sizeof (UINTN) == sizeof (UINT64))) {
+  if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     //
     // Need reconstruct page table here, since we do not trust ACPINvs.
     //
@@ -1217,7 +1217,9 @@ S3RestoreConfig2 (
         AsmWriteCr0 (Cr0.UintN);
       }
 
-      AsmWriteCr3 ((UINTN)SmmS3ResumeState->SmmS3Cr3);
+      if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
+        AsmWriteCr3 ((UINTN)SmmS3ResumeState->SmmS3Cr3);
+      }
 
       //
       // Disable interrupt of Debug timer, since IDT table cannot work in long mode.
