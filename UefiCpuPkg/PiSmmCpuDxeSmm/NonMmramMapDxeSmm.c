@@ -634,7 +634,7 @@ CreateExtendedProtectionRange (
          &MemorySpaceMap
          );
   for (Index = 0; Index < NumberOfSpaceDescriptors; Index++) {
-    if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo)) {
+    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
       if (ADDRESS_IS_ALIGNED (MemorySpaceMap[Index].BaseAddress, SIZE_4KB) &&
           (MemorySpaceMap[Index].Length % SIZE_4KB == 0))
       {
