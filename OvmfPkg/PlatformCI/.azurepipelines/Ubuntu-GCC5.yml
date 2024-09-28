@@ -212,3 +212,6 @@ jobs:
         build_flags: $(Build.Flags)
         run_flags: $(Run.Flags)
         usePythonVersion: ''  # use default Python from the vm image
+        extra_install_step:
+        - bash: brew install qemu
+          displayName: Install qemu
