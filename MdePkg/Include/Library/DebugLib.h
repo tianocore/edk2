@@ -403,7 +403,12 @@ UnitTestDebugAssert (
       }                             \
     } while (FALSE)
 #else
-#define ASSERT(Expression)
+#define ASSERT(Expression)       \
+    do {                           \
+      if (FALSE) {                 \
+        (VOID) (Expression);       \
+      }                            \
+    } while (FALSE)
 #endif
 
 /**
@@ -426,7 +431,12 @@ UnitTestDebugAssert (
       }                            \
     } while (FALSE)
 #else
-#define DEBUG(Expression)
+#define DEBUG(Expression)        \
+    do {                           \
+      if (FALSE) {                 \
+        _DEBUGLIB_DEBUG (Expression);       \
+      }                            \
+    } while (FALSE)
 #endif
 
 /**
@@ -452,7 +462,12 @@ UnitTestDebugAssert (
       }                                                                                  \
     } while (FALSE)
 #else
-#define ASSERT_EFI_ERROR(StatusParameter)
+#define ASSERT_EFI_ERROR(StatusParameter)                                             \
+    do {                                                                                \
+      if (FALSE) {                                                                      \
+        (VOID) (StatusParameter);                                                       \
+      }                                                                                 \
+    } while (FALSE)
 #endif
 
 /**
@@ -479,7 +494,12 @@ UnitTestDebugAssert (
       }                                                                 \
     } while (FALSE)
 #else
-#define ASSERT_RETURN_ERROR(StatusParameter)
+#define ASSERT_RETURN_ERROR(StatusParameter)                          \
+    do {                                                                \
+      if (FALSE) {                                                      \
+        (VOID) (StatusParameter);                                       \
+      }                                                                 \
+    } while (FALSE)
 #endif
 
 /**
