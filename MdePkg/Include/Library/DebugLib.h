@@ -8,6 +8,13 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
+  The implementations of the macros used when MDEPKG_NDEBUG is defined rely on the fact that
+  directly unreachable code is pruned, even with compiler optimization disabled (which has
+  been confirmed by generated code size tests on supported compilers). The advantage of
+  implementations which consume their arguments within directly unreachable code is that
+  compilers understand this, and stop warning about variables which would become unused when
+  MDEPKG_NDEBUG is defined if the macros had completely empty definitions.
+
 Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -403,7 +410,12 @@ UnitTestDebugAssert (
       }                             \
     } while (FALSE)
 #else
-#define ASSERT(Expression)
+#define ASSERT(Expression)       \
+    do {                           \
+      if (FALSE) {                 \
+        (VOID) (Expression);       \
+      }                            \
+    } while (FALSE)
 #endif
 
 /**
@@ -426,7 +438,12 @@ UnitTestDebugAssert (
       }                            \
     } while (FALSE)
 #else
-#define DEBUG(Expression)
+#define DEBUG(Expression)        \
+    do {                           \
+      if (FALSE) {                 \
+        _DEBUGLIB_DEBUG (Expression);       \
+      }                            \
+    } while (FALSE)
 #endif
 
 /**
@@ -452,7 +469,12 @@ UnitTestDebugAssert (
       }                                                                                  \
     } while (FALSE)
 #else
-#define ASSERT_EFI_ERROR(StatusParameter)
+#define ASSERT_EFI_ERROR(StatusParameter)                                             \
+    do {                                                                                \
+      if (FALSE) {                                                                      \
+        (VOID) (StatusParameter);                                                       \
+      }                                                                                 \
+    } while (FALSE)
 #endif
 
 /**
@@ -479,7 +501,12 @@ UnitTestDebugAssert (
       }                                                                 \
     } while (FALSE)
 #else
-#define ASSERT_RETURN_ERROR(StatusParameter)
+#define ASSERT_RETURN_ERROR(StatusParameter)                          \
+    do {                                                                \
+      if (FALSE) {                                                      \
+        (VOID) (StatusParameter);                                       \
+      }                                                                 \
+    } while (FALSE)
 #endif
 
 /**
