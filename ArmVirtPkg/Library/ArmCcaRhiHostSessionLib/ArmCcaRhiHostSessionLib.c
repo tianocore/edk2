@@ -1,0 +1,165 @@
+/** @file
+  Library that implements the Realm Host Interface Host Session protocol.
+
+  Copyright (c) 2024 - 2026, Arm Limited. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  @par Glossary:
+    - Rhi or RHI   - Realm Host Interface
+    - Rsi or RSI   - Realm Service Interface
+    - IPA          - Intermediate Physical Address
+    - RIPAS        - Realm IPA state
+
+  @par Reference(s):
+   - Realm Management Monitor (RMM) Specification, version 1.0-rel0
+     (https://developer.arm.com/documentation/den0137/)
+   - Realm Host Interface (RHI) Specification, version 1.0-bet0
+     (https://developer.arm.com/documentation/den0148/)
+**/
+
+#include <Base.h>
+
+#include <IndustryStandard/ArmStdSmc.h>
+#include <Library/ArmCcaRsiLib.h>
+#include <Library/ArmLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/ArmCcaRhiHostSessionLib.h>
+
+STATIC CONST CHAR8  *ArmCcaRhiSessionCmds[] = {
+  "ARM_CCA_FID_RHI_SESSION_VERSION",
+  "ARM_CCA_FID_RHI_SESSION_FEATURES",
+  "ARM_CCA_FID_RHI_SESSION_OPEN",
+  "ARM_CCA_FID_RHI_SESSION_CLOSE",
+  "ARM_CCA_FID_RHI_SESSION_SEND",
+  "ARM_CCA_FID_RHI_SESSION_RECEIVE",
+};
+
+/** A macro to print the RSI Session Error and call arguments.
+
+  @param[in] RhiFid   Fid for the RHI protocol call.
+  @param[in] Status   The status code returned by the RSI Host Call.
+  @param[in] Args     Pointer to the Host Call arguments.
+*/
+#define ARM_CCA_RHI_PRINT_ERROR(Fid, Status, Args)                        \
+          DEBUG ((                                                        \
+            DEBUG_ERROR,                                                  \
+            "Error: RsiHost Call %a Returned %r, "                        \
+            "Args: Gprs0 = 0x%lx, Gprs1 = 0x%lx, "                        \
+            "Gprs2 = 0x%lx, Gprs3 = 0x%lx\n",                             \
+            ArmCcaRhiSessionCmds[Fid - ARM_CCA_FID_RHI_SESSION_VERSION],  \
+            Status,                                                       \
+            Args->Gprs0,                                                  \
+            Args->Gprs1,                                                  \
+            Args->Gprs2,                                                  \
+            Args->Gprs3                                                   \
+            ));
+
+/**
+  Get the RHI Host Session protocol version information.
+
+  @param[out] ProtocolVersion       The version of the protocol.
+
+  @retval RETURN_UNSUPPORTED         RHI Host Session protocol not supported.
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionVersion (
+  OUT UINT64  *ProtocolVersion
+  )
+{
+  RETURN_STATUS               Status;
+  ARM_CCA_RSI_HOST_CALL_ARGS  *Args;
+
+  if (ProtocolVersion == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Args = AllocateAlignedPages (
+           EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)),
+           ARM_CCA_REALM_GRANULE_SIZE
+           );
+  if (Args == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  ZeroMem (Args, sizeof (ARM_CCA_RSI_HOST_CALL_ARGS));
+  Args->Gprs0 = ARM_CCA_FID_RHI_SESSION_VERSION;
+
+  Status = ArmCcaRsiHostCall (Args);
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_VERSION, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  if (Args->Gprs0 == ARM_SMC_MM_RET_NOT_SUPPORTED) {
+    Status = EFI_UNSUPPORTED;
+  } else {
+    // Protocol version
+    *ProtocolVersion = Args->Gprs0;
+  }
+
+exit_handler:
+  FreeAlignedPages (Args, EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)));
+  return Status;
+}
+
+/**
+  Perform RHI Host Session protocol feature discovery.
+
+  @param[out] AbiSupportBitmap      A bitmap of supported ABI calls.
+  @param[out] ConnectionModeBitmap  A bitmap of supported Connection modes.
+
+  @retval RETURN_INVALID_PARAMETER   A parameter was invalid.
+  @retval RETURN_OUT_OF_RESOURCES    Insufficient memory.
+  @retval RETURN_SUCCESS             Success.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaRhiSessionFeatures (
+  OUT UINT64  *AbiSupportBitmap,
+  OUT UINT64  *ConnectionModeBitmap
+  )
+{
+  RETURN_STATUS               Status;
+  ARM_CCA_RSI_HOST_CALL_ARGS  *Args;
+
+  if ((AbiSupportBitmap == NULL) ||
+      (ConnectionModeBitmap == NULL))
+  {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Args = AllocateAlignedPages (
+           EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)),
+           ARM_CCA_REALM_GRANULE_SIZE
+           );
+  if (Args == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  ZeroMem (Args, sizeof (ARM_CCA_RSI_HOST_CALL_ARGS));
+  Args->Gprs0 = ARM_CCA_FID_RHI_SESSION_FEATURES;
+
+  Status = ArmCcaRsiHostCall (Args);
+  if (RETURN_ERROR (Status)) {
+    ARM_CCA_RHI_PRINT_ERROR (ARM_CCA_FID_RHI_SESSION_FEATURES, Status, Args);
+    ASSERT (0);
+    goto exit_handler;
+  }
+
+  // ABI call support bitmap
+  *AbiSupportBitmap = Args->Gprs0;
+
+  // Connection Mode support bitmap
+  *ConnectionModeBitmap = Args->Gprs1 & ARM_CCA_RHI_SESSION_CONNECTION_MODE_MASK;
+
+exit_handler:
+  FreeAlignedPages (Args, EFI_SIZE_TO_PAGES (sizeof (ARM_CCA_RSI_HOST_CALL_ARGS)));
+  return Status;
+}
