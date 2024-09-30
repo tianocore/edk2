@@ -56,7 +56,8 @@
             "PcAtChipsetPkg/PcAtChipsetPkg.dec",
             "SecurityPkg/SecurityPkg.dec",
             "UefiCpuPkg/UefiCpuPkg.dec",
-            "ShellPkg/ShellPkg.dec"  #Is this ok?
+            "ShellPkg/ShellPkg.dec",  #Is this ok?
+            "CryptoPkg/CryptoPkg.dec"
         ],
         # For host based unit tests
         "AcceptableDependencies-HOST_APPLICATION":[
