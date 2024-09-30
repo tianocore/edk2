@@ -484,3 +484,207 @@ MlDsaGetPrivateKeyFromPem (
 
   return TRUE;
 }
+
+/**
+  Retrieve the EC Public Key from PEM key data.
+
+  @param[in]  PemData      Pointer to the PEM-encoded key data to be retrieved.
+  @param[in]  PemSize      Size of the PEM key data in bytes.
+  @param[in]  Password     NULL-terminated passphrase used for encrypted
+                           PEM key data.
+  @param[out] EcContext    Pointer to new-generated EC DSA context which
+                           contain the retrieved EC public key component.
+                           Use EcFree() function to free the resource.
+
+  If PemData is NULL, then return FALSE.
+  If EcContext is NULL, then return FALSE.
+
+  @retval  TRUE   EC Public Key was retrieved successfully.
+  @retval  FALSE  Invalid PEM key data or incorrect password.
+
+**/
+BOOLEAN
+EFIAPI
+EcGetPublicKeyFromPem (
+  IN   CONST UINT8  *PemData,
+  IN   UINTN        PemSize,
+  IN   CONST CHAR8  *Password,
+  OUT  VOID         **EcContext
+  )
+{
+  BOOLEAN     Status;
+  BIO         *PemBio;
+  EC_CONTEXT  *EcCtx;
+
+  //
+  // Check input parameters.
+  //
+  if ((PemData == NULL) || (EcContext == NULL) || (PemSize > INT_MAX)) {
+    return FALSE;
+  }
+
+  *EcContext = NULL;
+
+  //
+  // Add possible block-cipher descriptor for PEM data decryption.
+  // NOTE: Only support most popular ciphers AES for the encrypted PEM.
+  //
+  if (EVP_add_cipher (EVP_aes_128_cbc ()) == 0) {
+    return FALSE;
+  }
+
+  if (EVP_add_cipher (EVP_aes_192_cbc ()) == 0) {
+    return FALSE;
+  }
+
+  if (EVP_add_cipher (EVP_aes_256_cbc ()) == 0) {
+    return FALSE;
+  }
+
+  Status = FALSE;
+
+  EcCtx = (EC_CONTEXT *)OPENSSL_zalloc (sizeof (EC_CONTEXT));
+  if (EcCtx == NULL) {
+    return FALSE;
+  }
+
+  //
+  // Read PEM Data.
+  //
+  PemBio = BIO_new (BIO_s_mem ());
+  if (PemBio == NULL) {
+    goto _Exit;
+  }
+
+  if (BIO_write (PemBio, PemData, (int)PemSize) <= 0) {
+    goto _Exit;
+  }
+
+  //
+  // Retrieve EC Public Key from PEM data.
+  //
+  EcCtx->EvpPkey = PEM_read_bio_PUBKEY (PemBio, NULL, (pem_password_cb *)&PasswordCallback, (void *)Password);
+  if (EcCtx->EvpPkey == NULL) {
+    goto _Exit;
+  }
+
+  if (EVP_PKEY_id (EcCtx->EvpPkey) != EVP_PKEY_EC) {
+    EVP_PKEY_free (EcCtx->EvpPkey);
+    EcCtx->EvpPkey = NULL;
+    goto _Exit;
+  }
+
+  Status     = TRUE;
+  *EcContext = EcCtx;
+  EcCtx      = NULL;
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  BIO_free (PemBio);
+
+  if (EcCtx != NULL) {
+    OPENSSL_free (EcCtx);
+  }
+
+  return Status;
+}
+
+/**
+  Convert the EC Public Key to PEM key data.
+
+  @param[in]      EcContext   Pointer to EC DSA context.
+  @param[out]     PemData     Pointer to the PEM-encoded key data to be
+                              retrieved.
+  @param[in, out] PemSize     On input, size of PemData in bytes.
+                              On output, size of data returned or required size.
+
+  If EcContext is NULL, then return FALSE.
+  If PemSize is NULL, then return FALSE.
+  If PemData is NULL and *PemSize is zero, then return FALSE and set
+  *PemSize to the required size of the PemData buffer.
+  If PemData is NULL and *PemSize is not zero, then return FALSE.
+  If PemData is not NULL and *PemSize is too small, then return FALSE and
+  set *PemSize to the required size of the PemData buffer.
+
+  @retval  TRUE   EC Public Key was converted to the PEM data successfully.
+  @retval  FALSE  Invalid EC Context.
+
+**/
+BOOLEAN
+EFIAPI
+EcPublicKeyToPEM (
+  IN  VOID      *EcContext,
+  OUT UINT8     *PemData,
+  IN OUT UINTN  *PemSize
+  )
+{
+  BOOLEAN     Status;
+  BIO         *PemBio;
+  UINTN       KeyDataSize;
+  EC_CONTEXT  *EcCtx;
+
+  //
+  // Check input parameters.
+  //
+  if ((EcContext == NULL) || (PemSize == NULL)) {
+    return FALSE;
+  }
+
+  EcCtx = (EC_CONTEXT *)EcContext;
+  if (EcCtx->EvpPkey == NULL) {
+    return FALSE;
+  }
+
+  if ((PemData == NULL) && (*PemSize != 0)) {
+    return FALSE;
+  }
+
+  //
+  // Allocate memory for PEM Data.
+  //
+  PemBio = BIO_new (BIO_s_mem ());
+  if (PemBio == NULL) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Write the EC Public in PEM format.
+  //
+  if (PEM_write_bio_PUBKEY (PemBio, EcCtx->EvpPkey) <= 0) {
+    Status = FALSE;
+    goto _Exit;
+  }
+
+  //
+  // Check if the output buffer is large enough to store the EC Public key.
+  //
+  KeyDataSize = (UINTN)BIO_number_written (PemBio);
+  if (*PemSize < KeyDataSize) {
+    *PemSize = KeyDataSize;
+    Status   = FALSE;
+    goto _Exit;
+  } else {
+    //
+    // Copy the PEM formatted EC PublicKey to the output buffer.
+    //
+    if (BIO_read_ex (PemBio, PemData, *PemSize, &KeyDataSize) <= 0) {
+      Status = FALSE;
+      goto _Exit;
+    }
+
+    *PemSize = KeyDataSize;
+    Status   = TRUE;
+  }
+
+_Exit:
+  //
+  // Release Resources.
+  //
+  BIO_free (PemBio);
+
+  return Status;
+}
+
