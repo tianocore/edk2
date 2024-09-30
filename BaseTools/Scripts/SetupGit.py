@@ -150,7 +150,7 @@ if __name__ == '__main__':
                         action='store_true',
                         required=False)
     PARSER.add_argument('-n', '--name', type=str, metavar='repo',
-                        choices=['edk2', 'edk2-platforms', 'edk2-non-osi'],
+                        choices=['edk2', 'edk2-platforms', 'edk2-non-osi', 'edk2-test'],
                         help='set the repo name to configure for, if not '
                              'detected automatically',
                         required=False)
