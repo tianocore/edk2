@@ -408,6 +408,7 @@ MdePkg: FDT related library instance
 F: MdePkg/Library/BaseFdtLib/*
 F: MdePkg/Include/Library/FdtLib.h
 M: Benny Lin <benny.lin@intel.com> [Benny3345678]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 R: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: James Lu <james.lu@intel.com> [jameslu8]
