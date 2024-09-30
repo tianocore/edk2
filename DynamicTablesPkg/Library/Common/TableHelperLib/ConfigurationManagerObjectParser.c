@@ -856,6 +856,14 @@ STATIC CONST CM_OBJ_PARSER  CmX64ObjWsmtFlagsInfoParser[] = {
   { "WsmtFlags", 4, "0x%x", NULL }
 };
 
+/** A parser for EX64ObjHpetInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjHpetInfoParser[] = {
+  { "BaseAddressLower32Bit",                     4, "0x%x", NULL },
+  { "MainCounterMinimumClockTickInPeriodicMode", 2, "0x%x", NULL },
+  { "PageProtectionAndOemAttribute",             1, "0x%x", NULL }
+};
+
 /** A parser for X64 namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
@@ -870,6 +878,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EX64ObjFadtResetBlockInfo,CmX64ObjFadtResetBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EX64ObjFadtMiscInfo,      CmX64ObjFadtMiscInfoParser),
   CM_PARSER_ADD_OBJECT (EX64ObjWsmtFlagsInfo,     CmX64ObjWsmtFlagsInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjHpetInfo,          CmX64ObjHpetInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjMax)
 };
 

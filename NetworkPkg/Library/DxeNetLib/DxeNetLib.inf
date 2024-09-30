@@ -67,7 +67,7 @@
   gEfiRngProtocolGuid                           ## CONSUMES
 
 [FixedPcd]
-  gEfiNetworkPkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms ## CONSUMES
 
 [Depex]
   gEfiRngProtocolGuid

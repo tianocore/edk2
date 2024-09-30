@@ -88,15 +88,6 @@
   # Networking Requirements
 !include NetworkPkg/NetworkLibs.dsc.inc
 
-  #
-  # It is not possible to prevent the ARM compiler from inserting calls to intrinsic functions.
-  # This library provides the instrinsic functions such a compiler may generate calls to.
-  #
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-  # Add support for GCC stack protector
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
-
   # ARM Architectural Libraries
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   DefaultExceptionHandlerLib|ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLib.inf
@@ -190,6 +181,9 @@
 !if $(TARGET) != RELEASE
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartFlash.inf
 !endif
+
+  # ARM platforms have SEC modules with standard entry points, so we can generically link StackCheckLib
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.common.PEI_CORE]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
@@ -387,8 +381,10 @@
 
   #
   # Enable NX memory protection for all non-code regions, including OEM and OS
-  # reserved ones, with the exception of LoaderData regions, of which OS loaders
-  # (i.e., GRUB) may assume that its contents are executable.
+  # reserved ones.
+  # By passing --pcd PcdDxeNxMemoryProtectionPolicy=0xC000000000007FD1 on the
+  # build command line you can allow code execution in EfiLoaderData. This is
+  # required when using some outdated GRUB versions.
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD5
 

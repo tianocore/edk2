@@ -5,7 +5,7 @@
 //
 //
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 #include <Library/ArmLib.h>
 
 ASM_FUNC(ArmPlatformPeiBootAction)

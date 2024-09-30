@@ -95,19 +95,12 @@
   PlatformFlashAccessLib|SignedCapsulePkg/Library/PlatformFlashAccessLibNull/PlatformFlashAccessLibNull.inf
   RngLib|MdePkg/Library/BaseRngLib/BaseRngLib.inf
 
+# StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
+[LibraryClasses.common.SEC]
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+
 [LibraryClasses.ARM]
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
-
-[LibraryClasses.AARCH64, LibraryClasses.ARM]
-  #
-  # It is not possible to prevent the ARM compiler for generic intrinsic functions.
-  # This library provides the instrinsic functions generate by a given compiler.
-  # And NULL mean link this library into all ARM images.
-  #
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-  # Add support for GCC stack protector
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 [LibraryClasses.ARM]
   RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf

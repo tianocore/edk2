@@ -5,7 +5,7 @@
 //
 //
 
-#include <AsmMacroIoLibV8.h>
+#include <AsmMacroLib.h>
 
   .macro mov_i, reg:req, imm:req
   movz   \reg, :abs_g1:\imm

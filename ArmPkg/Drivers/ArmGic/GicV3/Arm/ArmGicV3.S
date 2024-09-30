@@ -5,7 +5,7 @@
 #
 #
 
-#include <AsmMacroIoLib.h>
+#include <AsmMacroLib.h>
 #include <Library/ArmLib.h>
 
 // For the moment we assume this will run in SVC mode on ARMv7
