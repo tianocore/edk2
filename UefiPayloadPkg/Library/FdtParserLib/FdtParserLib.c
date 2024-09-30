@@ -889,10 +889,10 @@ ParseDtb (
     }
   }
 
-  NumRsv = FdtNumRsv (Fdt);
+  NumRsv = FdtGetNumberOfReserveMapEntries (Fdt);
   /* Look for an existing entry and add it to the efi mem map. */
   for (index = 0; index < NumRsv; index++) {
-    if (FdtGetMemRsv (Fdt, index, &Addr, &Size) != 0) {
+    if (FdtGetReserveMapEntry (Fdt, index, &Addr, &Size) != 0) {
       continue;
     }
 
