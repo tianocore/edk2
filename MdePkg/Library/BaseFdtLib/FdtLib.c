@@ -503,3 +503,14 @@ FdtNodeOffsetByCompatible (
 {
   return fdt_node_offset_by_compatible (Fdt, StartOffset, Compatible);
 }
+
+/* Debug functions. */
+CONST
+CHAR8
+*
+FdtStrerror (
+  IN INT32  ErrVal
+  )
+{
+  return fdt_strerror (ErrVal);
+}
