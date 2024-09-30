@@ -3,6 +3,7 @@
     Manage Usb Descriptor List
 
 Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -222,6 +223,15 @@ UsbIoClearFeature (
   IN  UINTN                Target,
   IN  UINT16               Feature,
   IN  UINT16               Index
+  );
+
+/**
+  Usb UsbIo interface to update descriptor information.
+  @param  UsbDev                The Usb device.
+**/
+VOID
+UsbUpdateDescriptors (
+  IN USB_DEVICE  *UsbDev
   );
 
 #endif
