@@ -283,7 +283,7 @@ FdtSubnodeOffsetNameLen (
 **/
 INT32
 EFIAPI
-FdtNodeOffsetByPropValue (
+FdtNodeOffsetByPropertyValue (
   IN CONST VOID   *Fdt,
   IN INT32        StartOffset,
   IN CONST CHAR8  *PropertyName,
@@ -433,7 +433,7 @@ FdtAddSubnode (
 **/
 INT32
 EFIAPI
-FdtSetProp (
+FdtSetProperty (
   IN VOID         *Fdt,
   IN INT32        NodeOffset,
   IN CONST CHAR8  *Name,
