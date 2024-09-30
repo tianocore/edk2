@@ -1,0 +1,32 @@
+## @file
+#  Library that implements the Arm CCA RHI Host Session protocol interfaces.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmCcaRhiHostSessionLib
+  FILE_GUID                      = CC712FC2-B6D6-44BF-BA27-EE95CCB6C459
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmCcaRhiHostSessionLib
+
+[Sources]
+  ArmCcaRhiHostSessionLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmCcaRsiLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib

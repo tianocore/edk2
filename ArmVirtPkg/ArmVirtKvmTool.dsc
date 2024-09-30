@@ -93,6 +93,7 @@
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
 
   ArmCcaBootSyncCryptoLib|ArmVirtPkg/Library/ArmCcaBootSyncCryptoLib/ArmCcaBootSyncCryptoLib.inf
+  ArmCcaRhiHostSessionLib|ArmVirtPkg/Library/ArmCcaRhiHostSessionLib/ArmCcaRhiHostSessionLib.inf
 
 [LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM]
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
