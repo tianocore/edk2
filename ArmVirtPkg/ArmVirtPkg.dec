@@ -26,6 +26,7 @@
   Include                        # Root include for the package
 
 [LibraryClasses]
+  ArmCcaBootSyncCryptoLib|Include/Library/ArmCcaBootSyncCryptoLib.h
   ArmCcaInitPeiLib|Include/Library/ArmCcaInitPeiLib.h
   ArmCcaLib|Include/Library/ArmCcaLib.h
   ArmCcaRsiLib|Include/Library/ArmCcaRsiLib.h
