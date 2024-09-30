@@ -207,16 +207,16 @@ FdtNextSubnode (
 }
 
 /**
-  Returns number of reserved mem nodes
+  Returns the number of memory reserve map entries.
 
-  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] Fdt             The pointer to FDT blob.
 
-  @return total reserved mem nodes
+  @return The number of entries in the reserve map.
 
 **/
 INTN
 EFIAPI
-FdtNumRsv (
+FdtGetNumberOfReserveMapEntries (
   IN CONST VOID  *Fdt
   )
 {
@@ -224,19 +224,19 @@ FdtNumRsv (
 }
 
 /**
-  Returns reserved ranges.
+  Returns a memory reserve map entry.
 
   @param[in] *Fdt            The pointer to FDT blob.
-  @param[in] Index           Reserved entry index in the table.
-  @param[out] Addr           Address returned
-  @param[out] *Size          Pointer to size of the address range
+  @param[in] Index           Index of reserve map entry.
+  @param[out] Addr           Pointer to 64-bit variable to hold the start address
+  @param[out] *Size          Pointer to 64-bit variable to hold size of reservation
 
-  @return Returns reserved range.
+  @return 0 on success, or negative error code.
 
 **/
 INTN
 EFIAPI
-FdtGetMemRsv (
+FdtGetReserveMapEntry (
   IN CONST VOID             *Fdt,
   IN INTN                   Index,
   OUT EFI_PHYSICAL_ADDRESS  *Addr,
