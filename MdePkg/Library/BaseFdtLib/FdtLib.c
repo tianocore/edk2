@@ -7,6 +7,7 @@
 **/
 
 #include <libfdt/libfdt/libfdt.h>
+#include <Library/FdtLib.h>
 #include <Uefi/UefiBaseType.h>
 
 /**
@@ -306,7 +307,7 @@ FdtNodeOffsetByPropertyValue (
           come from FDT blob, it's encoding with big-endian.
 
 **/
-CONST struct fdt_property *
+CONST FDT_PROPERTY *
 EFIAPI
 FdtGetProperty (
   IN CONST VOID   *Fdt,
@@ -315,7 +316,7 @@ FdtGetProperty (
   IN INT32        *Length
   )
 {
-  return fdt_get_property (Fdt, NodeOffset, Name, Length);
+  return (FDT_PROPERTY *)fdt_get_property (Fdt, NodeOffset, Name, Length);
 }
 
 /**
@@ -366,7 +367,7 @@ FdtNextPropertyOffset (
   @return The property to the structure of the given property offset.
 
 **/
-CONST struct fdt_property *
+CONST FDT_PROPERTY *
 EFIAPI
 FdtGetPropertyByOffset (
   IN CONST VOID  *Fdt,
@@ -374,7 +375,7 @@ FdtGetPropertyByOffset (
   IN INT32       *Length
   )
 {
-  return fdt_get_property_by_offset (Fdt, Offset, Length);
+  return (FDT_PROPERTY *)fdt_get_property_by_offset (Fdt, Offset, Length);
 }
 
 /**
