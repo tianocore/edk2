@@ -405,7 +405,7 @@ M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakasha
 R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
 
 MdePkg: FDT related library instance
-F: MdePkg/Library/BaseFdtLib/FdtLib.c
+F: MdePkg/Library/BaseFdtLib/*
 F: MdePkg/Include/Library/FdtLib.h
 M: Benny Lin <benny.lin@intel.com> [Benny3345678]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
