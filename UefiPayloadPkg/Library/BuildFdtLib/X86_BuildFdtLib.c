@@ -188,6 +188,11 @@ BuildFdtForMemAlloc (
     ASSERT_EFI_ERROR (Status);
   }
 
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadAcpiTableGuid);
+  if (GuidHob != NULL) {
+    AcpiTable = (UNIVERSAL_PAYLOAD_ACPI_TABLE *)GET_GUID_HOB_DATA (GuidHob);
+  }
+
   HobStart = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
   //
   // Scan memory allocation hobs to set memory type
@@ -265,7 +270,23 @@ BuildFdtForMemAlloc (
       Status    = FdtSetProperty (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
       ASSERT_EFI_ERROR (Status);
 
-      if (!(AsciiStrCmp (mMemoryAllocType[AllocMemType], "mmio") == 0)) {
+      if ((AsciiStrCmp (mMemoryAllocType[AllocMemType], "mmio") == 0)) {
+        continue;
+      }
+
+      if (!(AsciiStrCmp (mMemoryAllocType[AllocMemType], "acpi-nvs") == 0) && (AsciiStrCmp (mMemoryAllocType[AllocMemType], "acpi") == 0)) {
+        DEBUG ((DEBUG_INFO, "find acpi memory hob MemoryBaseAddress:%x , AcpiTable->Rsdp :%x\n", Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress, AcpiTable->Rsdp));
+        if (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == AcpiTable->Rsdp) {
+          DEBUG ((DEBUG_INFO, "keep acpi memory hob  \n"));
+          Status = FdtSetProperty (Fdt, TempNode, "compatible", mMemoryAllocType[AllocMemType], (UINT32)(AsciiStrLen (mMemoryAllocType[AllocMemType])+1));
+          ASSERT_EFI_ERROR (Status);
+        } else {
+          DEBUG ((DEBUG_INFO, "change acpi memory hob  \n"));
+          Status = FdtSetProperty (Fdt, TempNode, "compatible", mMemoryAllocType[4], (UINT32)(AsciiStrLen (mMemoryAllocType[4])+1));
+          ASSERT_EFI_ERROR (Status);
+        }
+      } else {
+        DEBUG ((DEBUG_INFO, "other memory hob  \n"));
         Status = FdtSetProperty (Fdt, TempNode, "compatible", mMemoryAllocType[AllocMemType], (UINT32)(AsciiStrLen (mMemoryAllocType[AllocMemType])+1));
         ASSERT_EFI_ERROR (Status);
       }
