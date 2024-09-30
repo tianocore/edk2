@@ -299,8 +299,8 @@ FdtPpiNotifyCallback (
 
   // Set cell property of root node
   Data32 = CpuToFdt32 (2);
-  Status = FdtSetProp (FdtBase, 0, "#address-cells", &Data32, sizeof (UINT32));
-  Status = FdtSetProp (FdtBase, 0, "#size-cells", &Data32, sizeof (UINT32));
+  Status = FdtSetProperty (FdtBase, 0, "#address-cells", &Data32, sizeof (UINT32));
+  Status = FdtSetProperty (FdtBase, 0, "#size-cells", &Data32, sizeof (UINT32));
 
   Status = BuildFdtForUPL (FdtBase);
   ASSERT_EFI_ERROR (Status);
