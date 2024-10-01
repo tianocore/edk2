@@ -172,6 +172,22 @@ typedef struct {
   CHAR8     Data[];
 } FDT_PROPERTY;
 
+#ifndef FDT_TAGSIZE
+#define FDT_TAGSIZE  sizeof(UINT32)
+#endif
+#ifndef FDT_MAX_NCELLS
+#define FDT_MAX_NCELLS  4
+#endif
+
+#define FdtGetHeader(Fdt, Field) \
+  (Fdt32ToCpu (((const FDT_HEADER *)(Fdt))->Field))
+#define FdtTotalSize(Fdt)  (FdtGetHeader ((Fdt), TotalSize))
+
+#define FdtForEachSubnode(Node, Fdt, Parent) \
+  for (Node = FdtFirstSubnode (Fdt, Parent); \
+       Node >= 0;                            \
+       Node = FdtNextSubnode (Fdt, Node))
+
 /**
   Convert UINT16 data of the FDT blob to little-endian
 
