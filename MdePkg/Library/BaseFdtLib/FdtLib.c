@@ -186,6 +186,26 @@ FdtPack (
 }
 
 /**
+  Returns a pointer to the node at a given offset.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] Offset         The offset to node.
+  @param[in] Length         Maximum length of node.
+
+  @return pointer to node.
+**/
+CONST VOID *
+EFIAPI
+FdtOffsetPointer (
+  IN CONST VOID  *Fdt,
+  IN INT32       Offset,
+  IN UINT32      Length
+  )
+{
+  return fdt_offset_ptr (Fdt, Offset, Length);
+}
+
+/**
   Returns a offset of next node from the given node.
 
   @param[in] Fdt            The pointer to FDT blob.
@@ -308,6 +328,45 @@ FdtSubnodeOffsetNameLen (
 }
 
 /**
+  Returns a offset of first node which matches the given name.
+
+  @param[in] Fdt             The pointer to FDT blob.
+  @param[in] ParentOffset    The offset to the node which start find under.
+  @param[in] Name            The name to search the node with the name.
+
+  @return The offset to node offset with given node name.
+
+ **/
+INT32
+EFIAPI
+FdtSubnodeOffset (
+  IN CONST VOID   *Fdt,
+  IN INT32        ParentOffset,
+  IN CONST CHAR8  *Name
+  )
+{
+  return fdt_subnode_offset (Fdt, ParentOffset, Name);
+}
+
+/**
+  Find the parent of a given node.
+
+  @param[in] Fdt             The pointer to FDT blob.
+  @param[in] NodeOffset      The offset to the node to find the parent for.
+
+  @return Structure block offset, or negative return value.
+**/
+INT32
+EFIAPI
+FdtParentOffset (
+  IN CONST VOID  *Fdt,
+  IN INT32       NodeOffset
+  )
+{
+  return fdt_parent_offset (Fdt, NodeOffset);
+}
+
+/**
   Returns a offset of first node which includes the given property name and value.
 
   @param[in] Fdt             The pointer to FDT blob.
@@ -333,6 +392,44 @@ FdtNodeOffsetByPropertyValue (
 }
 
 /**
+  Returns a offset of first node which includes the given property name and value.
+
+  @param[in] Fdt             The pointer to FDT blob.
+  @param[in] Phandle         Phandle value to search for.
+
+  @return The offset to node with matching Phandle value.
+**/
+INT32
+EFIAPI
+FdtNodeOffsetByPhandle (
+  IN CONST VOID  *Fdt,
+  IN UINT32      Phandle
+  )
+{
+  return fdt_node_offset_by_phandle (Fdt, Phandle);
+}
+
+/**
+  Look for a string in  a stringlist
+
+  @param[in] StringList     Pointer to stringlist to search.
+  @param[in] ListLength     Length of StringList.
+  @param[in] String         Pointer to string to search for.
+
+  @return 1 if found.
+**/
+INT32
+EFIAPI
+FdtStringListContains (
+  IN CONST CHAR8  *StringList,
+  IN INT32        ListLength,
+  IN CONST CHAR8  *String
+  )
+{
+  return fdt_stringlist_contains (StringList, ListLength, String);
+}
+
+/**
   Returns a property with the given name from the given node.
 
   @param[in] Fdt            The pointer to FDT blob.
@@ -354,6 +451,28 @@ FdtGetProperty (
   )
 {
   return (FDT_PROPERTY *)fdt_get_property (Fdt, NodeOffset, Name, Length);
+}
+
+/**
+  Returns a pointer to a node mapped to an alias matching a substring.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] Name           The alias name string.
+  @param[in] Length         The length to the size of the property found.
+
+  @return A pointer to the expansion of the alias matching the substring,
+          or NULL if alias not found.
+
+**/
+CONST CHAR8 *
+EFIAPI
+FdtGetAliasNameLen (
+  IN CONST VOID   *Fdt,
+  IN CONST CHAR8  *Name,
+  IN INT32        Length
+  )
+{
+  return fdt_get_alias_namelen (Fdt, Name, Length);
 }
 
 /**
@@ -555,6 +674,44 @@ FdtDelProp (
   )
 {
   return fdt_delprop (Fdt, NodeOffset, Name);
+}
+
+/**
+  Finds a tree node by substring
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] Path           Full path of the node to locate.
+  @param[in] NameLength      The length of the name to check only.
+
+  @return structure block offset of the node with the requested path (>=0), on success
+**/
+INT32
+EFIAPI
+FdtPathOffsetNameLen (
+  IN CONST VOID   *Fdt,
+  IN CONST CHAR8  *Path,
+  IN INT32        NameLength
+  )
+{
+  return fdt_path_offset_namelen (Fdt, Path, NameLength);
+}
+
+/**
+  Finds a tree node by its full path.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] Path           Full path of the node to locate.
+
+  @return structure block offset of the node with the requested path (>=0), on success
+**/
+INT32
+EFIAPI
+FdtPathOffset (
+  IN CONST VOID   *Fdt,
+  IN CONST CHAR8  *Path
+  )
+{
+  return fdt_path_offset (Fdt, Path);
 }
 
 /**
