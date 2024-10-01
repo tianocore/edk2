@@ -14,9 +14,6 @@
 #include "AcpiParser.h"
 #include "AcpiView.h"
 
-// Maximum Memory Domain matrix print size.
-#define MAX_MEMORY_DOMAIN_TARGET_PRINT_MATRIX  10
-
 // Local variables
 STATIC CONST UINT16  *Ras2PccDescriptors;
 
