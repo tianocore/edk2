@@ -574,7 +574,7 @@ IsEfiVarStoreQuestion (
 
   @return Pointer to the matched variable header or NULL if not found.
 **/
-VARIABLE_HEADER *
+AUTHENTICATED_VARIABLE_HEADER *
 FindVariableData (
   IN  VARIABLE_STORE_HEADER  *VariableStorage,
   IN  EFI_GUID               *VarGuid,
@@ -582,12 +582,12 @@ FindVariableData (
   IN  CHAR16                 *VarName
   )
 {
-  VARIABLE_HEADER  *VariableHeader;
-  VARIABLE_HEADER  *VariableEnd;
+  AUTHENTICATED_VARIABLE_HEADER  *VariableHeader;
+  AUTHENTICATED_VARIABLE_HEADER  *VariableEnd;
 
-  VariableEnd    = (VARIABLE_HEADER *)((UINT8 *)VariableStorage + VariableStorage->Size);
-  VariableHeader = (VARIABLE_HEADER *)(VariableStorage + 1);
-  VariableHeader = (VARIABLE_HEADER *)HEADER_ALIGN (VariableHeader);
+  VariableEnd    = (AUTHENTICATED_VARIABLE_HEADER *)((UINT8 *)VariableStorage + VariableStorage->Size);
+  VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *)(VariableStorage + 1);
+  VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *)HEADER_ALIGN (VariableHeader);
   while (VariableHeader < VariableEnd) {
     if (CompareGuid (&VariableHeader->VendorGuid, VarGuid) &&
         (VariableHeader->Attributes == VarAttribute) &&
@@ -596,8 +596,8 @@ FindVariableData (
       return VariableHeader;
     }
 
-    VariableHeader = (VARIABLE_HEADER *)((UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + VariableHeader->DataSize);
-    VariableHeader = (VARIABLE_HEADER *)HEADER_ALIGN (VariableHeader);
+    VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *)((UINT8 *)VariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + VariableHeader->NameSize + VariableHeader->DataSize);
+    VariableHeader = (AUTHENTICATED_VARIABLE_HEADER *)HEADER_ALIGN (VariableHeader);
   }
 
   return NULL;
@@ -626,25 +626,25 @@ FindQuestionDefaultSetting (
   IN  BOOLEAN                  BitFieldQuestion
   )
 {
-  VARIABLE_HEADER          *VariableHeader;
-  VARIABLE_STORE_HEADER    *VariableStorage;
-  LIST_ENTRY               *Link;
-  VARSTORAGE_DEFAULT_DATA  *Entry;
-  VARIABLE_STORE_HEADER    *NvStoreBuffer;
-  UINT8                    *DataBuffer;
-  UINT8                    *BufferEnd;
-  BOOLEAN                  IsFound;
-  UINTN                    Index;
-  UINT32                   BufferValue;
-  UINT32                   BitFieldVal;
-  UINTN                    BitOffset;
-  UINTN                    ByteOffset;
-  UINTN                    BitWidth;
-  UINTN                    StartBit;
-  UINTN                    EndBit;
-  PCD_DEFAULT_DATA         *DataHeader;
-  PCD_DEFAULT_INFO         *DefaultInfo;
-  PCD_DATA_DELTA           *DeltaData;
+  AUTHENTICATED_VARIABLE_HEADER  *VariableHeader;
+  VARIABLE_STORE_HEADER          *VariableStorage;
+  LIST_ENTRY                     *Link;
+  VARSTORAGE_DEFAULT_DATA        *Entry;
+  VARIABLE_STORE_HEADER          *NvStoreBuffer;
+  UINT8                          *DataBuffer;
+  UINT8                          *BufferEnd;
+  BOOLEAN                        IsFound;
+  UINTN                          Index;
+  UINT32                         BufferValue;
+  UINT32                         BitFieldVal;
+  UINTN                          BitOffset;
+  UINTN                          ByteOffset;
+  UINTN                          BitWidth;
+  UINTN                          StartBit;
+  UINTN                          EndBit;
+  PCD_DEFAULT_DATA               *DataHeader;
+  PCD_DEFAULT_INFO               *DefaultInfo;
+  PCD_DATA_DELTA                 *DeltaData;
 
   if (gSkuId == 0xFFFFFFFFFFFFFFFF) {
     gSkuId = LibPcdGetSku ();
@@ -779,11 +779,11 @@ FindQuestionDefaultSetting (
   //
   if (ValueBuffer != NULL) {
     if (BitFieldQuestion) {
-      CopyMem (&BufferValue, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + ByteOffset, Width);
+      CopyMem (&BufferValue, (UINT8 *)VariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + VariableHeader->NameSize + ByteOffset, Width);
       BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
       CopyMem (ValueBuffer, &BitFieldVal, Width);
     } else {
-      CopyMem (ValueBuffer, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
+      CopyMem (ValueBuffer, (UINT8 *)VariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + VariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
     }
   }
 
