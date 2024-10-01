@@ -589,6 +589,68 @@ FdtSetProperty (
   );
 
 /**
+  Set a property to a 64-bit integer.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the node offset which want to add in.
+  @param[in] Name           The name to name the property.
+  @param[in] Value          The value (big-endian) to the property value.
+
+  @return  Zero for successfully, otherwise failed.
+
+ **/
+INT32
+EFIAPI
+FdtSetPropU64 (
+  IN VOID         *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN UINT64       Value
+  );
+
+/**
+  Append or create a property in the given node.
+
+  @param[in] Fdt            The pointer to FDT blob.
+  @param[in] NodeOffset     The offset to the node offset which want to add in.
+  @param[in] Name           The name to name the property.
+  @param[in] Value          The value (big-endian) to the property value.
+  @param[in] Length         The length to the size of the property.
+
+  @return  Zero for successfully, otherwise failed.
+
+ **/
+INT32
+EFIAPI
+FdtAppendProp (
+  IN VOID         *Fdt,
+  IN INT32        NodeOffset,
+  IN CONST CHAR8  *Name,
+  IN CONST VOID   *Value,
+  IN UINT32       Length
+  );
+
+/**
+  Delete a property.
+
+  This function will delete data from the blob, and will therefore
+  change the offsets of some existing nodes.
+
+  @param[in][out] Fdt         Pointer to the device tree blob.
+  @param[in]      NodeOffset  Offset of the node whose property to nop.
+  @param[in]      Name        Name of the property to nop.
+
+  @return  Zero for successfully, otherwise failed.
+
+**/
+INT32
+FdtDelProp (
+  IN OUT VOID         *Fdt,
+  IN     INT32        NodeOffset,
+  IN     CONST CHAR8  *Name
+  );
+
+/**
   Returns the name of a given node.
 
   @param[in] Fdt            The pointer to FDT blob.
