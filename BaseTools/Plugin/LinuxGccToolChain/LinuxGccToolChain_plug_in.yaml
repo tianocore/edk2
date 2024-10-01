@@ -1,0 +1,12 @@
+## @file
+# This plugin sets environment variables used in tools_def.template to specify the GCC compiler
+# for the requested build architecture.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "scope": "global-nix",
+  "name": "Linux GCC Tool Chain Support",
+  "module": "LinuxGccToolChain"
+}
