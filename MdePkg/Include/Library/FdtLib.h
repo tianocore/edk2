@@ -287,6 +287,37 @@ FdtCheckHeader (
   );
 
 /**
+  Unpack FDT blob into new buffer
+
+  @param[in]  Fdt            The pointer to FDT blob.
+  @param[out] Buffer         Pointer to destination buffer.
+  @param[in]  BufferSize     The size of destination buffer.
+
+  @return Zero for successfully, otherwise failed.
+
+ **/
+INT32
+EFIAPI
+FdtOpenInto (
+  IN  CONST VOID  *Fdt,
+  OUT VOID        *Buffer,
+  IN  INT32       BufferSize
+  );
+
+/**
+  Pack FDT blob in place.
+
+  @param[in][out]  Fdt            The pointer to FDT blob.
+
+  @return Zero.
+**/
+INT32
+EFIAPI
+FdtPack (
+  IN OUT VOID  *Fdt
+  );
+
+/**
   Create a empty Flattened Device Tree.
 
   @param[in] Buffer         The pointer to allocate a pool for FDT blob.
