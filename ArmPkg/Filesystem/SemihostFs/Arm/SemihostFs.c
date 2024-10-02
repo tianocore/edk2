@@ -1158,7 +1158,7 @@ FileSetInfo (
 
     Buffer = SystemInfo->VolumeLabel;
 
-    if (StrSize (Buffer) > 0) {
+    if (StrLen (Buffer) > 0) {
       VolumeLabel = AllocateCopyPool (StrSize (Buffer), Buffer);
       if (VolumeLabel != NULL) {
         FreePool (mSemihostFsLabel);
