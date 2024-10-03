@@ -3820,7 +3820,10 @@ ShellPromptForResponseHii (
 
   Prompt = HiiGetString (HiiFormatHandle, HiiFormatStringId, NULL);
   Status = ShellPromptForResponse (Type, Prompt, Response);
-  FreePool (Prompt);
+  if (Prompt != NULL) {
+    FreePool (Prompt);
+  }
+
   return (Status);
 }
 

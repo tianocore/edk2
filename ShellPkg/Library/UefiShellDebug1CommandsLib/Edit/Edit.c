@@ -103,7 +103,7 @@ ShellCommandRunEdit (
           TempParam = ShellCommandLineGetRawValue (Package, 1);
           if (TempParam == NULL) {
             ASSERT (TempParam != NULL);
-            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"edit");
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"edit");
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
             FileBufferSetFileName (TempParam);

@@ -205,7 +205,8 @@ CopySingleFile (
       DestVolumeInfo = AllocateZeroPool (DestVolumeInfoSize);
       if (DestVolumeInfo == NULL) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"cp");
-        return (SHELL_OUT_OF_RESOURCES);
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+        goto Done;
       }
 
       Status = DestVolumeFP->GetInfo (
@@ -256,6 +257,7 @@ CopySingleFile (
     SHELL_FREE_NON_NULL (DestVolumeInfo);
   }
 
+Done:
   //
   // close files
   //
