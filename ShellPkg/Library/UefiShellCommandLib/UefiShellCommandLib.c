@@ -1142,7 +1142,7 @@ DeleteScriptFileStruct (
   IN SCRIPT_FILE  *Script
   )
 {
-  UINT8  LoopVar;
+  UINTN  LoopVar;
 
   if (Script == NULL) {
     return;
@@ -1263,6 +1263,10 @@ ShellCommandCreateNewMappingName (
   String = NULL;
 
   String = AllocateZeroPool (PcdGet8 (PcdShellMapNameLength) * sizeof (String[0]));
+  if (String == NULL) {
+    return (NULL);
+  }
+
   UnicodeSPrint (
     String,
     PcdGet8 (PcdShellMapNameLength) * sizeof (String[0]),
@@ -1459,29 +1463,39 @@ ShellCommandCreateInitialMappingsAndPaths (
     //
     PerformQuickSort (DevicePathList, Count, sizeof (EFI_DEVICE_PATH_PROTOCOL *), DevicePathCompare);
 
-    if (!EFI_ERROR (ShellCommandConsistMappingInitialize (&ConsistMappingTable))) {
-      //
-      // Assign new Mappings to all...
-      //
-      for (Count = 0; HandleList[Count] != NULL; Count++) {
-        //
-        // Get default name first
-        //
-        NewDefaultName = ShellCommandCreateNewMappingName (MappingTypeFileSystem);
-        ASSERT (NewDefaultName != NULL);
-        Status = ShellCommandAddMapItemAndUpdatePath (NewDefaultName, DevicePathList[Count], 0, TRUE);
-        ASSERT_EFI_ERROR (Status);
-        FreePool (NewDefaultName);
+    Status = ShellCommandConsistMappingInitialize (&ConsistMappingTable);
+    if (EFI_ERROR (Status)) {
+      SHELL_FREE_NON_NULL (HandleList);
+      SHELL_FREE_NON_NULL (DevicePathList);
+      return Status;
+    }
 
-        //
-        // Now do consistent name
-        //
-        NewConsistName = ShellCommandConsistMappingGenMappingName (DevicePathList[Count], ConsistMappingTable);
-        if (NewConsistName != NULL) {
-          Status = ShellCommandAddMapItemAndUpdatePath (NewConsistName, DevicePathList[Count], 0, FALSE);
-          ASSERT_EFI_ERROR (Status);
-          FreePool (NewConsistName);
-        }
+    //
+    // Assign new Mappings to all...
+    //
+    for (Count = 0; HandleList[Count] != NULL; Count++) {
+      //
+      // Get default name first
+      //
+      NewDefaultName = ShellCommandCreateNewMappingName (MappingTypeFileSystem);
+      if (NewDefaultName == NULL) {
+        ASSERT (NewDefaultName != NULL);
+        Status = EFI_OUT_OF_RESOURCES;
+        break;
+      }
+
+      Status = ShellCommandAddMapItemAndUpdatePath (NewDefaultName, DevicePathList[Count], 0, TRUE);
+      ASSERT_EFI_ERROR (Status);
+      FreePool (NewDefaultName);
+
+      //
+      // Now do consistent name
+      //
+      NewConsistName = ShellCommandConsistMappingGenMappingName (DevicePathList[Count], ConsistMappingTable);
+      if (NewConsistName != NULL) {
+        Status = ShellCommandAddMapItemAndUpdatePath (NewConsistName, DevicePathList[Count], 0, FALSE);
+        ASSERT_EFI_ERROR (Status);
+        FreePool (NewConsistName);
       }
     }
 
@@ -1561,7 +1575,13 @@ ShellCommandCreateInitialMappingsAndPaths (
       // Get default name first
       //
       NewDefaultName = ShellCommandCreateNewMappingName (MappingTypeBlockIo);
-      ASSERT (NewDefaultName != NULL);
+      if (NewDefaultName == NULL) {
+        ASSERT (NewDefaultName != NULL);
+        SHELL_FREE_NON_NULL (HandleList);
+        SHELL_FREE_NON_NULL (DevicePathList);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
       Status = ShellCommandAddMapItemAndUpdatePath (NewDefaultName, DevicePathList[Count], 0, FALSE);
       ASSERT_EFI_ERROR (Status);
       FreePool (NewDefaultName);
@@ -1631,6 +1651,11 @@ ShellCommandUpdateMapping (
     PerformQuickSort (DevicePathList, Count, sizeof (EFI_DEVICE_PATH_PROTOCOL *), DevicePathCompare);
 
     Status = ShellCommandConsistMappingInitialize (&ConsistMappingTable);
+    if (EFI_ERROR (Status)) {
+      SHELL_FREE_NON_NULL (HandleList);
+      SHELL_FREE_NON_NULL (DevicePathList);
+      return Status;
+    }
 
     //
     // Assign new Mappings to remainders
