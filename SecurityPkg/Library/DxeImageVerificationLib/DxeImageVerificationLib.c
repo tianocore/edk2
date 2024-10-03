@@ -642,7 +642,7 @@ HashPeImageByType (
     //    This field has the fixed offset (+32) in final Authenticode ASN.1 data.
     //    Fixed offset (+32) is calculated based on two bytes of length encoding.
     //
-    if ((*(AuthData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) {
+    if ((AuthDataSize > 1) && ((*(AuthData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE)) {
       //
       // Only support two bytes of Long Form of Length Encoding.
       //
