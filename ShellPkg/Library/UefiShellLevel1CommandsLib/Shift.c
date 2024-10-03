@@ -35,7 +35,10 @@ ShellCommandRunShift (
   }
 
   CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
-  ASSERT (CurrentScriptFile != NULL);
+  if (CurrentScriptFile == NULL) {
+    ASSERT (CurrentScriptFile != NULL);
+    return (SHELL_INVALID_PARAMETER);
+  }
 
   if (CurrentScriptFile->Argc < 2) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel1HiiHandle, L"shift");
