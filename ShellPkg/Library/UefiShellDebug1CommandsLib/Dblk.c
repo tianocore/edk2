@@ -111,6 +111,8 @@ ShellCommandRunDblk (
   UINT64                    BlockCount;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
 
+  Lba         = 0;
+  BlockCount  = 0;
   ShellStatus = SHELL_SUCCESS;
   Status      = EFI_SUCCESS;
 
@@ -186,7 +188,7 @@ ShellCommandRunDblk (
         //
         // do the work if we have a valid block identifier
         //
-        if (gEfiShellProtocol->GetDevicePathFromMap (BlockName) == NULL) {
+        if ((BlockName == NULL) || (gEfiShellProtocol->GetDevicePathFromMap (BlockName) == NULL)) {
           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dblk", BlockName);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {

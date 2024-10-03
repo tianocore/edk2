@@ -280,7 +280,13 @@ ShellCommandRunComp (
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       TempParam = ShellCommandLineGetRawValue (Package, 1);
-      ASSERT (TempParam != NULL);
+      if (TempParam == NULL) {
+        ASSERT (TempParam != NULL);
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"comp", TempParam);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        return (ShellStatus);
+      }
+
       FileName1 = ShellFindFilePath (TempParam);
       if (FileName1 == NULL) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
@@ -294,7 +300,13 @@ ShellCommandRunComp (
       }
 
       TempParam = ShellCommandLineGetRawValue (Package, 2);
-      ASSERT (TempParam != NULL);
+      if (TempParam == NULL) {
+        ASSERT (TempParam != NULL);
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"comp", TempParam);
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        return (ShellStatus);
+      }
+
       FileName2 = ShellFindFilePath (TempParam);
       if (FileName2 == NULL) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"comp", TempParam);
@@ -367,7 +379,7 @@ ShellCommandRunComp (
       }
 
       if (ShellStatus == SHELL_SUCCESS) {
-        while (DiffPointNumber < DifferentCount) {
+        while ((UINT64)DiffPointNumber < DifferentCount) {
           DataSizeFromFile1 = 1;
           DataSizeFromFile2 = 1;
           OneByteFromFile1  = 0;

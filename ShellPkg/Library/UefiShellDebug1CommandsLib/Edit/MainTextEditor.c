@@ -1378,7 +1378,9 @@ MainCommandDisplayHelp (
   //
   for (CurrentLine = 0; 0 != MainMenuHelpInfo[CurrentLine]; CurrentLine++) {
     InfoString = HiiGetString (gShellDebug1HiiHandle, MainMenuHelpInfo[CurrentLine], NULL);
-    ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);
+    if (InfoString != NULL) {
+      ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);
+    }
   }
 
   //
