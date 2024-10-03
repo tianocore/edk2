@@ -691,6 +691,8 @@ ShellCommandRunFor (
 
       TempString = AllocateZeroPool (50*sizeof (CHAR16));
       if (TempString == NULL) {
+        SHELL_FREE_NON_NULL (ArgSet);
+        SHELL_FREE_NON_NULL (Info);
         return (SHELL_OUT_OF_RESOURCES);
       }
 
