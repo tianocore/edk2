@@ -1331,7 +1331,7 @@ DoStartupScript (
     }
 
     Status = RunShellCommand (FileStringPath, &CalleeStatus);
-    if ((!EFI_ERROR (Status)) && (ShellInfoObject.ShellInitSettings.BitUnion.Bits.Exit == TRUE)) {
+    if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.Exit == TRUE) {
       ShellCommandRegisterExit (gEfiShellProtocol->BatchIsActive (), (UINT64)CalleeStatus);
     }
 

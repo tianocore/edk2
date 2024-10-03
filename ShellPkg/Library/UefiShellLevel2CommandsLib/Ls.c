@@ -74,6 +74,7 @@ PrintSfoVolumeInfoTableEntry (
     if (Status == EFI_BUFFER_TOO_SMALL) {
       SysInfo = AllocateZeroPool (SysInfoSize);
       if (SysInfo == NULL) {
+        gEfiShellProtocol->CloseFile (ShellFileHandle);
         return (EFI_OUT_OF_RESOURCES);
       }
 

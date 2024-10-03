@@ -48,6 +48,7 @@ ShellCommandRunEfiCompress (
   InShellFileHandle  = NULL;
   OutShellFileHandle = NULL;
   InBuffer           = NULL;
+  Package            = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)
@@ -83,6 +84,7 @@ ShellCommandRunEfiCompress (
         ASSERT (TempParam != NULL);
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"eficompress");
         ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Exit;
       }
 
       InFileName  = ShellFindFilePath (TempParam);
@@ -152,6 +154,11 @@ ShellCommandRunEfiCompress (
       }
     }
 
+    ShellCommandLineFreeVarList (Package);
+  }
+
+Exit:
+  if ((ShellStatus != SHELL_SUCCESS) && (Package != NULL)) {
     ShellCommandLineFreeVarList (Package);
   }
 

@@ -89,7 +89,7 @@ ShellCommandRunEfiDecompress (
         ASSERT (TempParam != NULL);
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"efidecompress");
         ShellStatus = SHELL_INVALID_PARAMETER;
-        return (ShellStatus);
+        goto Done;
       }
 
       InFileName  = ShellFindFilePath (TempParam);
