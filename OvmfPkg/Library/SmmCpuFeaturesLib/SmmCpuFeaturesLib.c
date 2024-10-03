@@ -2,6 +2,7 @@
   The CPU specific programming for PiSmmCpuDxeSmm module.
 
   Copyright (c) 2010 - 2023, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -108,11 +109,8 @@ SmmCpuFeaturesInitializeProcessor (
                                                    SMM_DEFAULT_SMBASE +
                                                    SMRAM_SAVE_STATE_MAP_OFFSET
                                                    );
-    if ((CpuState->x86.SMMRevId & 0xFFFF) == 0) {
-      CpuState->x86.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
-    } else {
-      CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
-    }
+
+    CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
   }
 
   //
@@ -164,31 +162,21 @@ SmmCpuFeaturesHookReturnFromSmm (
   AMD_SMRAM_SAVE_STATE_MAP  *CpuSaveState;
 
   CpuSaveState = (AMD_SMRAM_SAVE_STATE_MAP *)CpuState;
-  if ((CpuSaveState->x86.SMMRevId & 0xFFFF) == 0) {
-    OriginalInstructionPointer = (UINT64)CpuSaveState->x86._EIP;
-    CpuSaveState->x86._EIP     = (UINT32)NewInstructionPointer;
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((CpuSaveState->x86.AutoHALTRestart & BIT0) != 0) {
-      CpuSaveState->x86.AutoHALTRestart &= ~BIT0;
-    }
-  } else {
-    OriginalInstructionPointer = CpuSaveState->x64._RIP;
-    if ((CpuSaveState->x64.EFER & LMA) == 0) {
-      CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer32;
-    } else {
-      CpuSaveState->x64._RIP = (UINT32)NewInstructionPointer;
-    }
 
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((CpuSaveState->x64.AutoHALTRestart & BIT0) != 0) {
-      CpuSaveState->x64.AutoHALTRestart &= ~BIT0;
-    }
+  OriginalInstructionPointer = CpuSaveState->x64._RIP;
+
+  if ((CpuSaveState->x64.EFER & LMA) == 0) {
+    CpuSaveState->x64._RIP = NewInstructionPointer32;
+  } else {
+    CpuSaveState->x64._RIP = NewInstructionPointer;
+  }
+
+  //
+  // Clear the auto HALT restart flag so the RSM instruction returns
+  // program control to the instruction following the HLT instruction.
+  //
+  if ((CpuSaveState->x64.AutoHALTRestart & BIT0) != 0) {
+    CpuSaveState->x64.AutoHALTRestart &= ~BIT0;
   }
 
   return OriginalInstructionPointer;
