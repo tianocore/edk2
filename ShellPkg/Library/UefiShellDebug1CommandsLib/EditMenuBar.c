@@ -107,6 +107,9 @@ MenuBarRefresh (
   //
   for (Item = MenuItems; Item != NULL && Item->Function != NULL; Item++) {
     NameString = HiiGetString (gShellDebug1HiiHandle, Item->NameToken, NULL);
+    if (NameString == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
 
     Width = MAX ((StrLen (NameString) + 6), 20);
     if (((Col + Width) > LastCol)) {
@@ -115,6 +118,10 @@ MenuBarRefresh (
     }
 
     FunctionKeyString = HiiGetString (gShellDebug1HiiHandle, Item->FunctionKeyToken, NULL);
+    if (FunctionKeyString == NULL) {
+      FreePool (NameString);
+      return EFI_INVALID_PARAMETER;
+    }
 
     ShellPrintEx ((INT32)(Col) - 1, (INT32)(Row) - 1, L"%E%s%N  %H%s%N  ", FunctionKeyString, NameString);
 

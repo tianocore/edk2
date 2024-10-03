@@ -65,6 +65,8 @@
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
 
+  SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
+
 # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
 [LibraryClasses.common.SEC]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf

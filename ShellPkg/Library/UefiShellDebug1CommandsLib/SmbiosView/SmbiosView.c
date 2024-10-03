@@ -790,7 +790,7 @@ InitSmbios64BitTableStatistics (
   //
   Handle = INVALID_HANDLE;
   LibGetSmbios64BitStructure (&Handle, NULL, NULL);
-  for (Index = 1; Index <= mNumberOfSmbios64BitStructures; Index++) {
+  for (Index = 1; (UINTN)Index <= mNumberOfSmbios64BitStructures; Index++) {
     //
     // If reach the end of table, break..
     //
