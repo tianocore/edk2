@@ -35,6 +35,43 @@ EFI_PEI_PPI_DESCRIPTOR  mEndOfPeiSignalPpi = {
   NULL
 };
 
+#if (FixedPcdGetBool (PcdHandOffFdtEnable) == 0)
+
+/**
+  Notify ReadyToPayLoad signal.
+  @param[in] PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
+  @param[in] NotifyDescriptor  Address of the notification descriptor data structure.
+  @param[in] Ppi               Address of the PPI that was installed.
+  @retval EFI_SUCCESS          Hobs data is discovered.
+  @return Others               No Hobs data is discovered.
+**/
+EFI_STATUS
+EFIAPI
+EndOfPeiPpiNotifyCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // Ready to Payload phase signal
+  //
+  Status = PeiServicesInstallPpi (&gReadyToPayloadSignalPpi);
+
+  return Status;
+}
+
+EFI_PEI_NOTIFY_DESCRIPTOR  mEndOfPeiNotifyList[] = {
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiEndOfPeiSignalPpiGuid,
+    EndOfPeiPpiNotifyCallback
+  }
+};
+#endif
+
 /**
   The wrapper function of PeiLoadImageLoadImage().
   @param This            - Pointer to EFI_PEI_LOAD_FILE_PPI.
@@ -144,13 +181,14 @@ PeiLoadFileLoadPayload (
   *ImageSizeArg    = Context.PayloadSize;
   *EntryPoint      = Context.PayloadEntryPoint;
 
+ #if (FixedPcdGetBool (PcdHandOffFdtEnable))
+
   Status = PeiServicesInstallPpi (&mEndOfPeiSignalPpi);
   ASSERT_EFI_ERROR (Status);
 
   Status = PeiServicesInstallPpi (&gReadyToPayloadSignalPpi);
   ASSERT_EFI_ERROR (Status);
 
- #if (FixedPcdGetBool (PcdHandOffFdtEnable))
   Hob = GetFirstGuidHob (&gUniversalPayloadDeviceTreeGuid);
   if (Hob != NULL) {
     Fdt =  (UNIVERSAL_PAYLOAD_DEVICE_TREE *)GET_GUID_HOB_DATA (Hob);
@@ -178,6 +216,9 @@ PeiLoadFileLoadPayload (
     NULL,
     TopOfStack
     );
+ #else
+  Status = PeiServicesNotifyPpi (&mEndOfPeiNotifyList[0]);
+  ASSERT_EFI_ERROR (Status);
  #endif
 
   return EFI_SUCCESS;
