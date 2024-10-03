@@ -405,6 +405,7 @@ ShellCommandRunSetVar (
     } else {
       VariableName = ShellCommandLineGetRawValue (Package, 1);
       if (VariableName == NULL) {
+        ShellCommandLineFreeVarList (Package);
         return SHELL_INVALID_PARAMETER;
       }
 
@@ -416,6 +417,7 @@ ShellCommandRunSetVar (
           RStatus = StrToGuid (StringGuid, &Guid);
         } else {
           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);
+          ShellCommandLineFreeVarList (Package);
           return SHELL_INVALID_PARAMETER;
         }
 
@@ -434,6 +436,7 @@ ShellCommandRunSetVar (
           Buffer = AllocateZeroPool (Size);
           if (Buffer == NULL) {
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
+            ShellCommandLineFreeVarList (Package);
             return SHELL_OUT_OF_RESOURCES;
           }
 
@@ -460,6 +463,7 @@ ShellCommandRunSetVar (
           Buffer = AllocateZeroPool (Size);
           if (Buffer == NULL) {
             ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
+            ShellCommandLineFreeVarList (Package);
             return SHELL_OUT_OF_RESOURCES;
           }
 

@@ -325,7 +325,6 @@ Done:
   SHELL_FREE_NON_NULL (ChildHandleList);
   SHELL_FREE_NON_NULL (Language);
   SHELL_FREE_NON_NULL (OutBuffer);
-  SHELL_FREE_NON_NULL (ErrorType);
 
   return (Status2);
 }
@@ -367,10 +366,9 @@ ShellCommandRunDrvDiag (
   EFI_HANDLE          Handle3;
   UINT64              Intermediate;
 
-  Intermediate = 0;
-  ShellStatus  = SHELL_SUCCESS;
-  Mode         = TestModeMax;
-  Language     = NULL;
+  ShellStatus = SHELL_SUCCESS;
+  Mode        = TestModeMax;
+  Language    = NULL;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)

@@ -284,7 +284,7 @@ ShellCommandRunComp (
         ASSERT (TempParam != NULL);
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"comp", TempParam);
         ShellStatus = SHELL_INVALID_PARAMETER;
-        return (ShellStatus);
+        goto Exit;
       }
 
       FileName1 = ShellFindFilePath (TempParam);
@@ -304,7 +304,7 @@ ShellCommandRunComp (
         ASSERT (TempParam != NULL);
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"comp", TempParam);
         ShellStatus = SHELL_INVALID_PARAMETER;
-        return (ShellStatus);
+        goto Exit;
       }
 
       FileName2 = ShellFindFilePath (TempParam);
@@ -511,6 +511,7 @@ ShellCommandRunComp (
     ShellCommandLineFreeVarList (Package);
   }
 
+Exit:
   SHELL_FREE_NON_NULL (FileName1);
   SHELL_FREE_NON_NULL (FileName2);
 
