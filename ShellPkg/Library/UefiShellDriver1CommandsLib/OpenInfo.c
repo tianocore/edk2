@@ -125,7 +125,7 @@ TraverseHandleDatabase (
               OpenTypeString,
               Name
               );
-          } else if (Name != NULL) {
+          } else {
             ShellPrintHiiEx (
               -1,
               -1,
@@ -135,7 +135,7 @@ TraverseHandleDatabase (
               HandleIndex,
               OpenInfo[OpenInfoIndex].OpenCount,
               OpenTypeString,
-              Name
+              Name ? Name : L""
               );
           }
         }

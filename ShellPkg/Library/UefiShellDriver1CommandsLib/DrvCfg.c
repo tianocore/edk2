@@ -250,6 +250,19 @@ ConfigToFile (
     }
 
     Status = HiiDatabase->ExportPackageLists (HiiDatabase, HiiHandle, &MainBufferSize, MainBuffer);
+    if (EFI_ERROR (Status)) {
+      SHELL_FREE_NON_NULL (MainBuffer);
+      ShellPrintHiiEx (
+        -1,
+        -1,
+        NULL,
+        STRING_TOKEN (STR_GEN_OUT_MEM),
+        gShellDriver1HiiHandle,
+        L"drvcfg"
+        );
+      ShellCloseFile (&FileHandle);
+      return (SHELL_DEVICE_ERROR);
+    }
   }
 
   Status = ShellWriteFile (FileHandle, &MainBufferSize, MainBuffer);
