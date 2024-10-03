@@ -395,7 +395,11 @@ RunTftp (
   }
 
   RemoteFilePath = ShellCommandLineGetRawValue (CheckPackage, 2);
-  ASSERT (RemoteFilePath != NULL);
+  if (RemoteFilePath == NULL) {
+    ASSERT (RemoteFilePath != NULL);
+    goto Error;
+  }
+
   FilePathSize        = StrLen (RemoteFilePath) + 1;
   AsciiRemoteFilePath = AllocatePool (FilePathSize);
   if (AsciiRemoteFilePath == NULL) {
