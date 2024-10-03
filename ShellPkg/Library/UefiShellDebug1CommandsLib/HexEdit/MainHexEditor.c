@@ -115,7 +115,9 @@ HMainCommandDisplayHelp (
                               ,
                    NULL
                    );
-    ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);
+    if (InfoString != NULL) {
+      ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);
+    }
   }
 
   //
