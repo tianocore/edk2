@@ -25,6 +25,9 @@ DumpLoadedImageProtocolInfo (
   CHAR16  *TheString;
 
   TheString = GetProtocolInformationDump (TheHandle, &gEfiLoadedImageProtocolGuid, TRUE);
+  if (TheString == NULL) {
+    return (EFI_INVALID_PARAMETER);
+  }
 
   ShellPrintEx (-1, -1, L"%s", TheString);
 
