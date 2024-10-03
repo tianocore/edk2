@@ -195,6 +195,12 @@ ShellCommandRunDevTree (
     Lang = ShellCommandLineGetValue (Package, L"-l");
     if (Lang != NULL) {
       Language = AllocateZeroPool (StrSize (Lang));
+      if (Language == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDriver1HiiHandle, L"devtree");
+        ShellCommandLineFreeVarList (Package);
+        return (SHELL_OUT_OF_RESOURCES);
+      }
+
       AsciiSPrint (Language, StrSize (Lang), "%S", Lang);
     } else if (!ShellCommandLineGetFlag (Package, L"-l")) {
       ASSERT (Language == NULL);
@@ -211,6 +217,13 @@ ShellCommandRunDevTree (
 
     Lang      = ShellCommandLineGetRawValue (Package, 1);
     HiiString = HiiGetString (gShellDriver1HiiHandle, STRING_TOKEN (STR_DEV_TREE_OUTPUT), Language);
+
+    if (HiiString == NULL) {
+      ASSERT (HiiString != NULL);
+      SHELL_FREE_NON_NULL (Language);
+      ShellCommandLineFreeVarList (Package);
+      return (SHELL_INVALID_PARAMETER);
+    }
 
     if (Lang == NULL) {
       for (LoopVar = 1; ; LoopVar++) {
