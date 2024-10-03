@@ -111,6 +111,7 @@
   SortLib
   PrintLib
   BcfgCommandLib
+  SafeIntLib
 
 [Pcd]
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize        ## CONSUMES
