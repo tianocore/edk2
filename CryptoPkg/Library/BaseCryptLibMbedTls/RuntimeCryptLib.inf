@@ -40,6 +40,8 @@
   Hash/CryptSha512.c
   Hash/CryptParallelHashNull.c
   Hash/CryptSm3.c
+  Hash/Sm3Core.c
+  Hash/Sm3Core.h
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
@@ -65,7 +67,6 @@
 
   SysCall/CrtWrapper.c
   SysCall/TimerWrapper.c
-  SysCall/DummyOpensslSupport.c
   SysCall/RuntimeMemAllocation.c
 
 [Packages]
@@ -78,7 +79,6 @@
   UefiRuntimeServicesTableLib
   DebugLib
   MbedTlsLib
-  OpensslLib
   IntrinsicLib
   PrintLib
   RngLib

@@ -41,6 +41,8 @@
   Hash/CryptSha512.c
   Hash/CryptParallelHashNull.c
   Hash/CryptSm3.c
+  Hash/Sm3Core.c
+  Hash/Sm3Core.h
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
   Cipher/CryptAes.c
@@ -65,8 +67,6 @@
   Bn/CryptBnNull.c
 
   SysCall/CrtWrapper.c
-  SysCall/DummyOpensslSupport.c
-  SysCall/BaseMemAllocation.c
   SysCall/ConstantTimeClock.c
 
 [Packages]
@@ -79,7 +79,6 @@
   MemoryAllocationLib
   DebugLib
   MbedTlsLib
-  OpensslLib
   IntrinsicLib
   PrintLib
   PeiServicesTablePointerLib
