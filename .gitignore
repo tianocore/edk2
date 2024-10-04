@@ -5,3 +5,4 @@ Build/
 __pycache__/
 tags/
 .vscode/
+.venv/
