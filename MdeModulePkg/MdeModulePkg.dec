@@ -413,6 +413,13 @@
   ## Include/Guid/EndofS3Resume.h
   gEdkiiEndOfS3ResumeGuid = { 0x96f5296d, 0x05f7, 0x4f3c, {0x84, 0x67, 0xe4, 0x56, 0x89, 0x0e, 0x0c, 0xb5 } }
 
+  #
+  # Guids for NVMe Timeout Events
+  # {4754469d-6528-4dfc-84aa-8c8a03a2158b}
+  gNVMeEnableStartEventGroupGuid = { 0x4754469d, 0x6528, 0x4dfc, { 0x84, 0xaa, 0x8c, 0x8a, 0x03, 0xa2, 0x15, 0x8b } }
+  # {da383315-906b-486f-80db-847f268451e4}
+  gNVMeEnableCompleteEventGroupGuid = { 0xda383315, 0x906b, 0x486f, { 0x80, 0xdb, 0x84, 0x7f, 0x26, 0x84, 0x51, 0xe4 } }
+
   ## Used (similar to Variable Services) to communicate policies to the enforcement engine.
   # {DA1B0D11-D1A7-46C4-9DC9-F3714875C6EB}
   gVarCheckPolicyLibMmiHandlerGuid = { 0xda1b0d11, 0xd1a7, 0x46c4, { 0x9d, 0xc9, 0xf3, 0x71, 0x48, 0x75, 0xc6, 0xeb }}
@@ -474,6 +481,12 @@
 
   ## Include/Guid/VariableRuntimeCacheInfo.h
   gEdkiiVariableRuntimeCacheInfoHobGuid = { 0x0f472f7d, 0x6713, 0x4915, { 0x96, 0x14, 0x5d, 0xda, 0x28, 0x40, 0x10, 0x56 }}
+
+  ## HOB GUID to get ACPI table after FSP is done. The ACPI table that related SOC will be pass by this HOB.
+  gAcpiTableHobGuid = { 0xf9886b57, 0x8a35, 0x455e, { 0xbb, 0xb1, 0x14, 0x65, 0x5e, 0x7b, 0xe7, 0xec }}
+
+  ## Include/Guid/MmCommBuffer.h
+  gMmCommBufferHobGuid  = { 0x6c2a2520, 0x0131, 0x4aee, { 0xa7, 0x50, 0xcc, 0x38, 0x4a, 0xac, 0xe8, 0xc6 }}
 
 [Ppis]
   ## Include/Ppi/FirmwareVolumeShadowPpi.h
@@ -575,6 +588,10 @@
   # Include/Protocol/Print2.h
   gEfiPrint2ProtocolGuid          = { 0xf05976ef, 0x83f1, 0x4f3d, { 0x86, 0x19, 0xf7, 0x59, 0x5d, 0x41, 0xe5, 0x38 } }
   gEfiPrint2SProtocolGuid         = { 0xcc252d2, 0xc106, 0x4661, { 0xb5, 0xbd, 0x31, 0x47, 0xa4, 0xf8, 0x1f, 0x92 } }
+
+  ## This protocol defines the Media Clear and Sanitize operations defined by NIST
+  # Include/Protocol/MediaSanitize.h
+  gMediaSanitizeProtocolGuid = { 0x0d799a99, 0x25af, 0x429e, {0x92, 0x72, 0xd0, 0xb2, 0x7d, 0x6d, 0x5f, 0x14 } }
 
   ## This protocol defines the generic memory test interfaces in Dxe phase.
   # Include/Protocol/GenericMemoryTest.h
@@ -1177,6 +1194,10 @@
   # @Prompt Delay access XHCI register after it issues HCRST (us)
   gEfiMdeModulePkgTokenSpaceGuid.PcdDelayXhciHCReset|2000|UINT16|0x30001060
 
+  ## Specifies the page count allocated for the MM communication buffer.
+  # @Prompt Defines the page allocation for the MM communication buffer; default is 128 pages (512KB).
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages|128|UINT32|0x30001061
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
@@ -1693,6 +1714,11 @@
   #
   # @Prompt SPI NOR Flash Operation Delay in Microseconds (16 us)
   gEfiMdeModulePkgTokenSpaceGuid.PcdSpiNorFlashOperationDelayMicroseconds|0x00000010|UINT32|0x00000035
+
+  ## Indicate the default timeout value for UFS device initial completetion in microseconds.
+  #
+  # @Prompt UFS device initial completion timoeout (us), default value is 600ms.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUfsInitialCompletionTimeout|600000|UINT32|0x00000036
 
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.

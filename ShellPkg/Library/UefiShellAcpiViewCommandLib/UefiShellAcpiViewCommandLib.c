@@ -2,7 +2,7 @@
   Main file for 'acpiview' Shell command function.
 
   Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
-  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
+  Copyright (c) 2016 - 2023, Arm Limited. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -66,10 +66,13 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_2_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,                                              ParseAcpiMadt },
   { EFI_ACPI_6_2_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
     ParseAcpiMcfg },
+  { EFI_ACPI_MEMORY_SYSTEM_RESOURCE_PARTITIONING_AND_MONITORING_TABLE_SIGNATURE,                         ParseAcpiMpam },
   { EFI_ACPI_6_4_PLATFORM_COMMUNICATIONS_CHANNEL_TABLE_SIGNATURE,
     ParseAcpiPcct },
   { EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,
     ParseAcpiPptt },
+  { EFI_ACPI_6_5_ACPI_RAS2_FEATURE_TABLE_SIGNATURE,                                                      ParseAcpiRas2 },
+  { EFI_ACPI_6_5_ACPI_RAS_FEATURE_TABLE_SIGNATURE,                                                       ParseAcpiRasf },
   { RSDP_TABLE_INFO,                                                                                     ParseAcpiRsdp },
   { EFI_ACPI_6_2_SYSTEM_LOCALITY_INFORMATION_TABLE_SIGNATURE,                                            ParseAcpiSlit },
   { EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,                                        ParseAcpiSpcr },

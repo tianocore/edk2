@@ -11,6 +11,7 @@
 #define EDKII_REDFISH_HTTP_DXE_H_
 
 #include <Uefi.h>
+#include <RedfishCommon.h>
 #include <IndustryStandard/Http11.h>
 
 #include <Library/UefiLib.h>
@@ -28,10 +29,9 @@
 
 #include <Protocol/Http.h>
 #include <Protocol/EdkIIRedfishHttpProtocol.h>
-#include <Protocol/EdkIIRedfishCredential.h>
+#include <Protocol/EdkIIRedfishCredential2.h>
 #include <Protocol/RestEx.h>
 
-#define IS_EMPTY_STRING(a)  ((a) == NULL || (a)[0] == '\0')
 #define REDFISH_HTTP_CACHE_LIST_SIZE      0x80
 #define REDFISH_ERROR_MSG_MAX             128
 #define REDFISH_DEBUG_STRING_LENGTH       200

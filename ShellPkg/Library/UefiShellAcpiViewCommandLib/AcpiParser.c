@@ -1,7 +1,7 @@
 /** @file
   ACPI parser
 
-  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -319,12 +319,14 @@ DumpUint64 (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump3Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -343,12 +345,14 @@ Dump3Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump4Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -368,12 +372,14 @@ Dump4Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump6Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -395,12 +401,14 @@ Dump6Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump8Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -424,12 +432,14 @@ Dump8Chars (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 Dump12Chars (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN       UINT8   *Ptr
+  IN       UINT8   *Ptr,
+  IN UINT32        Length
   )
 {
   Print (
@@ -447,6 +457,171 @@ Dump12Chars (
     Ptr[10],
     Ptr[11]
     );
+}
+
+/**
+  This function traces 16 characters which can be optionally
+  formated using the format string if specified.
+
+  If no format string is specified the Format must be NULL.
+
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
+**/
+VOID
+EFIAPI
+Dump16Chars (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
+  )
+{
+  Print (
+    (Format != NULL) ? Format : L"%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+    Ptr[0],
+    Ptr[1],
+    Ptr[2],
+    Ptr[3],
+    Ptr[4],
+    Ptr[5],
+    Ptr[6],
+    Ptr[7],
+    Ptr[8],
+    Ptr[9],
+    Ptr[10],
+    Ptr[11],
+    Ptr[12],
+    Ptr[13],
+    Ptr[14],
+    Ptr[15]
+    );
+}
+
+/**
+  This function traces reserved fields up to 8 bytes in length.
+
+  Format string is ignored by this function as the reserved field is printed
+  byte by byte with intermittent spacing <eg: 0 0 0 0>. Use DumpxChars for any
+  other use case.
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
+**/
+VOID
+EFIAPI
+DumpReserved (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
+  )
+{
+  switch (Length) {
+    case 8:
+      Print (
+        L"%u %u %u %u %u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3],
+        Ptr[4],
+        Ptr[5],
+        Ptr[6],
+        Ptr[7]
+        );
+      break;
+    case 7:
+      Print (
+        L"%u %u %u %u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3],
+        Ptr[4],
+        Ptr[5],
+        Ptr[6]
+        );
+      break;
+    case 6:
+      Print (
+        L"%u %u %u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3],
+        Ptr[4],
+        Ptr[5]
+        );
+      break;
+    case 5:
+      Print (
+        L"%u %u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3],
+        Ptr[4]
+        );
+      break;
+    case 4:
+      Print (
+        L"%u %u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2],
+        Ptr[3]
+        );
+      break;
+    case 3:
+      Print (
+        L"%u %u %u",
+        Ptr[0],
+        Ptr[1],
+        Ptr[2]
+        );
+      break;
+    case 2:
+      Print (
+        L"%u %u",
+        Ptr[0],
+        Ptr[1]
+        );
+      break;
+    case 1:
+      Print (
+        L"%u",
+        Ptr[0]
+        );
+      break;
+    default:
+      return;
+  }
+}
+
+/**
+  This function traces reserved fields up to 64 bits in length.
+
+  Format string is ignored by this function as the reserved field is printed
+  byte by byte with intermittent spacing. eg: <0 0 0 0>. When the field length
+  isn't a multiple of 8, the number of bytes are "ceil"-ed by one. eg for 27
+  bits <0 0 0 0>
+
+  @param [in] Format  Optional format string for tracing the data.
+  @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field as number of bits.
+**/
+VOID
+EFIAPI
+DumpReservedBits (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length
+  )
+{
+  UINT32  ByteLength;
+
+  ByteLength = (Length + 7) >> 3;
+  DumpReserved (Format, Ptr, ByteLength);
 }
 
 /**
@@ -587,7 +762,7 @@ ParseAcpi (
       // the Format for printing
       PrintFieldName (2, Parser[Index].NameStr);
       if (Parser[Index].PrintFormatter != NULL) {
-        Parser[Index].PrintFormatter (Parser[Index].Format, Ptr);
+        Parser[Index].PrintFormatter (Parser[Index].Format, Ptr, Parser[Index].Length);
       } else if (Parser[Index].Format != NULL) {
         switch (Parser[Index].Length) {
           case 1:
@@ -616,7 +791,11 @@ ParseAcpi (
       if (GetConsistencyChecking () &&
           (Parser[Index].FieldValidator != NULL))
       {
-        Parser[Index].FieldValidator (Ptr, Parser[Index].Context);
+        Parser[Index].FieldValidator (
+                        Ptr,
+                        Parser[Index].Length,
+                        Parser[Index].Context
+                        );
       }
 
       Print (L"\n");
@@ -681,12 +860,14 @@ DumpGasStruct (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 DumpGas (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   DumpGasStruct (Ptr, 2, sizeof (EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE));
@@ -892,7 +1073,7 @@ ParseAcpiBitFields (
       // the Format for printing
       PrintFieldName (2, Parser[Index].NameStr);
       if (Parser[Index].PrintFormatter != NULL) {
-        Parser[Index].PrintFormatter (Parser[Index].Format, (UINT8 *)&Data);
+        Parser[Index].PrintFormatter (Parser[Index].Format, (UINT8 *)&Data, Parser[Index].Length);
       } else if (Parser[Index].Format != NULL) {
         // convert bit length to byte length
         switch ((Parser[Index].Length + 7) >> 3) {
@@ -927,7 +1108,11 @@ ParseAcpiBitFields (
       if (GetConsistencyChecking () &&
           (Parser[Index].FieldValidator != NULL))
       {
-        Parser[Index].FieldValidator ((UINT8 *)&Data, Parser[Index].Context);
+        Parser[Index].FieldValidator (
+                        (UINT8 *)&Data,
+                        Parser[Index].Length,
+                        Parser[Index].Context
+                        );
       }
 
       Print (L"\n");

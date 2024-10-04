@@ -1,21 +1,20 @@
 /** @file
 Page Fault (#PF) handler for X64 processors
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 #define PAGE_TABLE_PAGES  8
 #define ACC_MAX_BIT       BIT3
 
 LIST_ENTRY                mPagePool           = INITIALIZE_LIST_HEAD_VARIABLE (mPagePool);
 BOOLEAN                   m1GPageTableSupport = FALSE;
-BOOLEAN                   mCpuSmmRestrictedMemoryAccess;
 X86_ASSEMBLY_PATCH_LABEL  gPatch5LevelPagingNeeded;
 
 /**
@@ -201,17 +200,15 @@ SmmInitPageTable (
   UINT64                    *PdptEntry;
   UINT64                    *Pml4Entry;
   UINT64                    *Pml5Entry;
-  UINT8                     PhysicalAddressBits;
 
   //
   // Initialize spin lock
   //
   InitializeSpinLock (mPFLock);
 
-  mCpuSmmRestrictedMemoryAccess = PcdGetBool (PcdCpuSmmRestrictedMemoryAccess);
-  m1GPageTableSupport           = Is1GPageSupport ();
-  m5LevelPagingNeeded           = Is5LevelPagingNeeded ();
-  mPhysicalAddressBits          = CalculateMaximumSupportAddress (m5LevelPagingNeeded);
+  m1GPageTableSupport  = Is1GPageSupport ();
+  m5LevelPagingNeeded  = Is5LevelPagingNeeded ();
+  mPhysicalAddressBits = CalculateMaximumSupportAddress (m5LevelPagingNeeded);
   PatchInstructionX86 (gPatch5LevelPagingNeeded, m5LevelPagingNeeded, 1);
   if (m5LevelPagingNeeded) {
     mPagingMode = m1GPageTableSupport ? Paging5Level1GB : Paging5Level;
@@ -221,36 +218,33 @@ SmmInitPageTable (
 
   DEBUG ((DEBUG_INFO, "5LevelPaging Needed             - %d\n", m5LevelPagingNeeded));
   DEBUG ((DEBUG_INFO, "1GPageTable Support             - %d\n", m1GPageTableSupport));
-  DEBUG ((DEBUG_INFO, "PcdCpuSmmRestrictedMemoryAccess - %d\n", mCpuSmmRestrictedMemoryAccess));
   DEBUG ((DEBUG_INFO, "PhysicalAddressBits             - %d\n", mPhysicalAddressBits));
 
   //
   // Generate initial SMM page table.
-  // Only map [0, 4G] when PcdCpuSmmRestrictedMemoryAccess is FALSE.
   //
-  PhysicalAddressBits = mCpuSmmRestrictedMemoryAccess ? mPhysicalAddressBits : 32;
-  PageTable           = GenSmmPageTable (mPagingMode, PhysicalAddressBits);
+  PageTable = GenSmmPageTable (mPagingMode, mPhysicalAddressBits);
 
-  if (m5LevelPagingNeeded) {
-    Pml5Entry = (UINT64 *)PageTable;
+  if (mSmmProfileEnabled) {
+    if (m5LevelPagingNeeded) {
+      Pml5Entry = (UINT64 *)PageTable;
+      //
+      // Set Pml5Entry sub-entries number for smm PF handler usage.
+      //
+      SetSubEntriesNum (Pml5Entry, 1);
+      Pml4Entry = (UINT64 *)((*Pml5Entry) & ~mAddressEncMask & gPhyMask);
+    } else {
+      Pml4Entry = (UINT64 *)PageTable;
+    }
+
     //
-    // Set Pml5Entry sub-entries number for smm PF handler usage.
+    // Set IA32_PG_PMNT bit to mask first 4 PdptEntry.
     //
-    SetSubEntriesNum (Pml5Entry, 1);
-    Pml4Entry = (UINT64 *)((*Pml5Entry) & ~mAddressEncMask & gPhyMask);
-  } else {
-    Pml4Entry = (UINT64 *)PageTable;
-  }
+    PdptEntry = (UINT64 *)((*Pml4Entry) & ~mAddressEncMask & gPhyMask);
+    for (Index = 0; Index < 4; Index++) {
+      PdptEntry[Index] |= IA32_PG_PMNT;
+    }
 
-  //
-  // Set IA32_PG_PMNT bit to mask first 4 PdptEntry.
-  //
-  PdptEntry = (UINT64 *)((*Pml4Entry) & ~mAddressEncMask & gPhyMask);
-  for (Index = 0; Index < 4; Index++) {
-    PdptEntry[Index] |= IA32_PG_PMNT;
-  }
-
-  if (!mCpuSmmRestrictedMemoryAccess) {
     //
     // Set Pml4Entry sub-entries number for smm PF handler usage.
     //
@@ -267,7 +261,7 @@ SmmInitPageTable (
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (mSmmProfileEnabled ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -704,152 +698,6 @@ AllocPage (
 }
 
 /**
-  Page Fault handler for SMM use.
-
-**/
-VOID
-SmiDefaultPFHandler (
-  VOID
-  )
-{
-  UINT64              *PageTable;
-  UINT64              *PageTableTop;
-  UINT64              PFAddress;
-  UINTN               StartBit;
-  UINTN               EndBit;
-  UINT64              PTIndex;
-  UINTN               Index;
-  SMM_PAGE_SIZE_TYPE  PageSize;
-  UINTN               NumOfPages;
-  UINTN               PageAttribute;
-  EFI_STATUS          Status;
-  UINT64              *UpperEntry;
-  BOOLEAN             Enable5LevelPaging;
-  IA32_CR4            Cr4;
-
-  //
-  // Set default SMM page attribute
-  //
-  PageSize      = SmmPageSize2M;
-  NumOfPages    = 1;
-  PageAttribute = 0;
-
-  EndBit       = 0;
-  PageTableTop = (UINT64 *)(AsmReadCr3 () & gPhyMask);
-  PFAddress    = AsmReadCr2 ();
-
-  Cr4.UintN          = AsmReadCr4 ();
-  Enable5LevelPaging = (BOOLEAN)(Cr4.Bits.LA57 != 0);
-
-  Status = GetPlatformPageTableAttribute (PFAddress, &PageSize, &NumOfPages, &PageAttribute);
-  //
-  // If platform not support page table attribute, set default SMM page attribute
-  //
-  if (Status != EFI_SUCCESS) {
-    PageSize      = SmmPageSize2M;
-    NumOfPages    = 1;
-    PageAttribute = 0;
-  }
-
-  if (PageSize >= MaxSmmPageSizeType) {
-    PageSize = SmmPageSize2M;
-  }
-
-  if (NumOfPages > 512) {
-    NumOfPages = 512;
-  }
-
-  switch (PageSize) {
-    case SmmPageSize4K:
-      //
-      // BIT12 to BIT20 is Page Table index
-      //
-      EndBit = 12;
-      break;
-    case SmmPageSize2M:
-      //
-      // BIT21 to BIT29 is Page Directory index
-      //
-      EndBit         = 21;
-      PageAttribute |= (UINTN)IA32_PG_PS;
-      break;
-    case SmmPageSize1G:
-      if (!m1GPageTableSupport) {
-        DEBUG ((DEBUG_ERROR, "1-GByte pages is not supported!"));
-        ASSERT (FALSE);
-      }
-
-      //
-      // BIT30 to BIT38 is Page Directory Pointer Table index
-      //
-      EndBit         = 30;
-      PageAttribute |= (UINTN)IA32_PG_PS;
-      break;
-    default:
-      ASSERT (FALSE);
-  }
-
-  //
-  // If execute-disable is enabled, set NX bit
-  //
-  if (mXdEnabled) {
-    PageAttribute |= IA32_PG_NX;
-  }
-
-  for (Index = 0; Index < NumOfPages; Index++) {
-    PageTable  = PageTableTop;
-    UpperEntry = NULL;
-    for (StartBit = Enable5LevelPaging ? 48 : 39; StartBit > EndBit; StartBit -= 9) {
-      PTIndex = BitFieldRead64 (PFAddress, StartBit, StartBit + 8);
-      if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
-        //
-        // If the entry is not present, allocate one page from page pool for it
-        //
-        PageTable[PTIndex] = AllocPage () | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
-      } else {
-        //
-        // Save the upper entry address
-        //
-        UpperEntry = PageTable + PTIndex;
-      }
-
-      //
-      // BIT9 to BIT11 of entry is used to save access record,
-      // initialize value is 7
-      //
-      PageTable[PTIndex] |= (UINT64)IA32_PG_A;
-      SetAccNum (PageTable + PTIndex, 7);
-      PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & ~mAddressEncMask & gPhyMask);
-    }
-
-    PTIndex = BitFieldRead64 (PFAddress, StartBit, StartBit + 8);
-    if ((PageTable[PTIndex] & IA32_PG_P) != 0) {
-      //
-      // Check if the entry has already existed, this issue may occur when the different
-      // size page entries created under the same entry
-      //
-      DEBUG ((DEBUG_ERROR, "PageTable = %lx, PTIndex = %x, PageTable[PTIndex] = %lx\n", PageTable, PTIndex, PageTable[PTIndex]));
-      DEBUG ((DEBUG_ERROR, "New page table overlapped with old page table!\n"));
-      ASSERT (FALSE);
-    }
-
-    //
-    // Fill the new entry
-    //
-    PageTable[PTIndex] = ((PFAddress | mAddressEncMask) & gPhyMask & ~((1ull << EndBit) - 1)) |
-                         PageAttribute | IA32_PG_A | PAGE_ATTRIBUTE_BITS;
-    if (UpperEntry != NULL) {
-      SetSubEntriesNum (UpperEntry, (GetSubEntriesNum (UpperEntry) + 1) & 0x1FF);
-    }
-
-    //
-    // Get the next page address if we need to create more page tables
-    //
-    PFAddress += (1ull << EndBit);
-  }
-}
-
-/**
   ThePage Fault handler wrapper for SMM use.
 
   @param  InterruptType    Defines the type of interrupt or exception that
@@ -875,7 +723,7 @@ SmiPFHandler (
 
   PFAddress = AsmReadCr2 ();
 
-  if (mCpuSmmRestrictedMemoryAccess && (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1)))) {
+  if (PFAddress >= LShiftU64 (1, (mPhysicalAddressBits - 1))) {
     DumpCpuContext (InterruptType, SystemContext);
     DEBUG ((DEBUG_ERROR, "Do not support address 0x%lx by processor!\n", PFAddress));
     CpuDeadLoop ();
@@ -964,24 +812,29 @@ SmiPFHandler (
       goto Exit;
     }
 
-    if (mCpuSmmRestrictedMemoryAccess && IsSmmCommBufferForbiddenAddress (PFAddress)) {
-      DumpCpuContext (InterruptType, SystemContext);
+    if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%lx)!\n", PFAddress));
-      DEBUG_CODE (
-        DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextX64->Rip);
-        );
-      CpuDeadLoop ();
-      goto Exit;
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
+    if (mIsStandaloneMm) {
+      //
+      // Only logging ranges shall run here in MM env.
+      //
+      ASSERT (IsNonMmramLoggingAddress (PFAddress));
+    }
+
     SmmProfilePFHandler (
       SystemContext.SystemContextX64->Rip,
       SystemContext.SystemContextX64->ExceptionData
       );
   } else {
-    SmiDefaultPFHandler ();
+    DumpCpuContext (InterruptType, SystemContext);
+    DEBUG_CODE (
+      DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextX64->Rip);
+      );
+    CpuDeadLoop ();
   }
 
 Exit:
@@ -989,7 +842,7 @@ Exit:
 }
 
 /**
-  This function reads CR2 register when on-demand paging is enabled.
+  This function reads CR2 register.
 
   @param[out]  *Cr2  Pointer to variable to hold CR2 register value.
 **/
@@ -998,16 +851,11 @@ SaveCr2 (
   OUT UINTN  *Cr2
   )
 {
-  if (!mCpuSmmRestrictedMemoryAccess) {
-    //
-    // On-demand paging is enabled when access to non-SMRAM is not restricted.
-    //
-    *Cr2 = AsmReadCr2 ();
-  }
+  *Cr2 = AsmReadCr2 ();
 }
 
 /**
-  This function restores CR2 register when on-demand paging is enabled.
+  This function restores CR2 register.
 
   @param[in]  Cr2  Value to write into CR2 register.
 **/
@@ -1016,24 +864,5 @@ RestoreCr2 (
   IN UINTN  Cr2
   )
 {
-  if (!mCpuSmmRestrictedMemoryAccess) {
-    //
-    // On-demand paging is enabled when access to non-SMRAM is not restricted.
-    //
-    AsmWriteCr2 (Cr2);
-  }
-}
-
-/**
-  Return whether access to non-SMRAM is restricted.
-
-  @retval TRUE  Access to non-SMRAM is restricted.
-  @retval FALSE Access to non-SMRAM is not restricted.
-**/
-BOOLEAN
-IsRestrictedMemoryAccess (
-  VOID
-  )
-{
-  return mCpuSmmRestrictedMemoryAccess;
+  AsmWriteCr2 (Cr2);
 }

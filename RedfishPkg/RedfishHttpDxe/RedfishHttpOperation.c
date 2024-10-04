@@ -493,6 +493,7 @@ ParseResponseMessage (
   EFI_STATUS        Status;
   EDKII_JSON_VALUE  JsonData;
   EFI_HTTP_HEADER   *ContentEncodedHeader;
+  EFI_HTTP_HEADER   *ContentTypeHeader;
   VOID              *DecodedBody;
   UINTN             DecodedLength;
 
@@ -545,6 +546,17 @@ ParseResponseMessage (
   //
   if ((ResponseMsg->BodyLength != 0) && (ResponseMsg->Body != NULL)) {
     DEBUG ((REDFISH_HTTP_CACHE_DEBUG_REQUEST, "%a: body length: %d\n", __func__, ResponseMsg->BodyLength));
+
+    //
+    // We expect to see JSON body
+    //
+    ContentTypeHeader = HttpFindHeader (RedfishResponse->HeaderCount, RedfishResponse->Headers, HTTP_HEADER_CONTENT_TYPE);
+    if (ContentTypeHeader != NULL) {
+      if (AsciiStrCmp (ContentTypeHeader->FieldValue, HTTP_CONTENT_TYPE_APP_JSON) != 0) {
+        DEBUG ((DEBUG_WARN, "%a: body is not in %a format\n", __func__, HTTP_CONTENT_TYPE_APP_JSON));
+      }
+    }
+
     //
     // Check if data is encoded.
     //

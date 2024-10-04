@@ -13,7 +13,7 @@
   Find the board related info from ACPI table
 
   @param  AcpiTableBase          ACPI table start address in memory
-  @param  AcpiBoardInfo          Pointer to the acpi board info strucutre
+  @param  AcpiBoardInfo          Pointer to the acpi board info structure
 
   @retval RETURN_SUCCESS     Successfully find out all the required information.
   @retval RETURN_NOT_FOUND   Failed to find the required info.
@@ -124,15 +124,6 @@ Done:
   DEBUG ((DEBUG_INFO, "PmGpeEn Reg 0x%lx\n", AcpiBoardInfo->PmGpeEnBase));
   DEBUG ((DEBUG_INFO, "PcieBaseAddr 0x%lx\n", AcpiBoardInfo->PcieBaseAddress));
   DEBUG ((DEBUG_INFO, "PcieBaseSize 0x%lx\n", AcpiBoardInfo->PcieBaseSize));
-
-  //
-  // Verify values for proper operation
-  //
-  ASSERT (Fadt->Pm1aCntBlk != 0);
-  ASSERT (Fadt->PmTmrBlk != 0);
-  ASSERT (Fadt->ResetReg.Address != 0);
-  ASSERT (Fadt->Pm1aEvtBlk != 0);
-  ASSERT (Fadt->Gpe0Blk != 0);
 
   return RETURN_SUCCESS;
 }

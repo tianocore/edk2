@@ -31,6 +31,7 @@ STATIC CONST CHAR16  *InstNameTable[] = {
   This function validates the flags field in the EINJ injection header.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -38,8 +39,9 @@ STATIC
 VOID
 EFIAPI
 ValidateInjectionFlags (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  Flags;
@@ -72,6 +74,7 @@ STATIC CONST ACPI_PARSER  EinjParser[] = {
   the EINJ injection instruction entry.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -79,8 +82,9 @@ STATIC
 VOID
 EFIAPI
 ValidateInjectionAction (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  InjectionAction;
@@ -113,6 +117,7 @@ ValidateInjectionAction (
   the EINJ injection instruction entry.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -120,8 +125,9 @@ STATIC
 VOID
 EFIAPI
 ValidateInstruction (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT8  Inst;
@@ -141,6 +147,7 @@ ValidateInstruction (
   the EINJ injection instruction entry.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -148,8 +155,9 @@ STATIC
 VOID
 EFIAPI
 ValidateRegisterRegion (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE  *RegisterRegion;
@@ -169,13 +177,15 @@ ValidateRegisterRegion (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpInjectionInstAction (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   UINT8         InjectionAction;
@@ -236,13 +246,15 @@ DumpInjectionInstAction (
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 STATIC
 VOID
 EFIAPI
 DumpInstruction (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   UINT8         Inst;

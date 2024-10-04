@@ -40,17 +40,6 @@
   Ia32/SetMem16.nasm
   Ia32/SetMem.nasm
   Ia32/CopyMem.nasm
-  Ia32/ScanMem64.nasm
-  Ia32/ScanMem32.nasm
-  Ia32/ScanMem16.nasm
-  Ia32/ScanMem8.nasm
-  Ia32/CompareMem.nasm
-  Ia32/ZeroMem.nasm
-  Ia32/SetMem64.nasm
-  Ia32/SetMem32.nasm
-  Ia32/SetMem16.nasm
-  Ia32/SetMem.nasm
-  Ia32/CopyMem.nasm
   Ia32/IsZeroBuffer.nasm
   MemLibGuid.c
 
@@ -103,6 +92,7 @@
   ScanMem8Wrapper.c
   ZeroMemWrapper.c
   CompareMemWrapper.c
+  SetMemNWrapper.c
   SetMem64Wrapper.c
   SetMem32Wrapper.c
   SetMem16Wrapper.c

@@ -1,7 +1,7 @@
 /** @file
   Capsule library runtime support.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2024, Ampere Computing LLC. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -22,9 +22,10 @@
 #include <Library/MemoryAllocationLib.h>
 
 extern EFI_SYSTEM_RESOURCE_TABLE  *mEsrtTable;
+extern BOOLEAN                    mDxeCapsuleLibIsExitBootService;
 EFI_EVENT                         mDxeRuntimeCapsuleLibVirtualAddressChangeEvent = NULL;
-EFI_EVENT                         mDxeRuntimeCapsuleLibReadyToBootEvent          = NULL;
-extern BOOLEAN                    mDxeCapsuleLibReadyToBootEvent;
+EFI_EVENT                         mDxeRuntimeCapsuleLibSystemResourceTableEvent  = NULL;
+EFI_EVENT                         mDxeRuntimeCapsuleLibExitBootServiceEvent      = NULL;
 
 /**
   Convert EsrtTable physical address to virtual address.
@@ -44,16 +45,16 @@ DxeCapsuleLibVirtualAddressChangeEvent (
 }
 
 /**
-  Notify function for event group EFI_EVENT_GROUP_READY_TO_BOOT.
+  Notify function for event of system resource table installation.
 
-  @param[in]  Event   The Event that is being processed.
-  @param[in]  Context The Event Context.
+  @param[in]  Event    The Event that is being processed.
+  @param[in]  Context  The Event Context.
 
 **/
 STATIC
 VOID
 EFIAPI
-DxeCapsuleLibReadyToBootEventNotify (
+DxeCapsuleLibSystemResourceTableInstallEventNotify (
   IN EFI_EVENT  Event,
   IN VOID       *Context
   )
@@ -79,6 +80,14 @@ DxeCapsuleLibReadyToBootEventNotify (
   //
   if (Index < gST->NumberOfTableEntries) {
     //
+    // Free the pool to remove the cached ESRT table.
+    //
+    if (mEsrtTable != NULL) {
+      FreePool ((VOID *)mEsrtTable);
+      mEsrtTable = NULL;
+    }
+
+    //
     // Search Esrt to check given capsule is qualified
     //
     EsrtTable = (EFI_SYSTEM_RESOURCE_TABLE *)ConfigEntry->VendorTable;
@@ -95,12 +104,28 @@ DxeCapsuleLibReadyToBootEventNotify (
     //
     mEsrtTable->FwResourceCountMax = mEsrtTable->FwResourceCount;
   }
-
-  mDxeCapsuleLibReadyToBootEvent = TRUE;
 }
 
 /**
-  The constructor function hook VirtualAddressChange event to use ESRT table as capsule routing table.
+  Notify function for event of exit boot service.
+
+  @param[in]  Event    The Event that is being processed.
+  @param[in]  Context  The Event Context.
+
+**/
+STATIC
+VOID
+EFIAPI
+DxeCapsuleLibExitBootServiceEventNotify (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  mDxeCapsuleLibIsExitBootService = TRUE;
+}
+
+/**
+  The constructor function for the file of DxeCapsuleRuntime.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
@@ -130,15 +155,28 @@ DxeRuntimeCapsuleLibConstructor (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Register notify function to cache the FMP capsule GUIDs at ReadyToBoot.
+  // Register notify function to cache the FMP capsule GUIDs when system resource table installed.
   //
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
-                  DxeCapsuleLibReadyToBootEventNotify,
+                  DxeCapsuleLibSystemResourceTableInstallEventNotify,
                   NULL,
-                  &gEfiEventReadyToBootGuid,
-                  &mDxeRuntimeCapsuleLibReadyToBootEvent
+                  &gEfiSystemResourceTableGuid,
+                  &mDxeRuntimeCapsuleLibSystemResourceTableEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Register notify function to indicate the event is signaled at ExitBootService.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  DxeCapsuleLibExitBootServiceEventNotify,
+                  NULL,
+                  &gEfiEventExitBootServicesGuid,
+                  &mDxeRuntimeCapsuleLibExitBootServiceEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -146,7 +184,7 @@ DxeRuntimeCapsuleLibConstructor (
 }
 
 /**
-  The destructor function closes the VirtualAddressChange event.
+  The destructor function for the file of DxeCapsuleRuntime.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
@@ -169,9 +207,15 @@ DxeRuntimeCapsuleLibDestructor (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Close the ReadyToBoot event.
+  // Close the system resource table installed event.
   //
-  Status = gBS->CloseEvent (mDxeRuntimeCapsuleLibReadyToBootEvent);
+  Status = gBS->CloseEvent (mDxeRuntimeCapsuleLibSystemResourceTableEvent);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Close the ExitBootService event.
+  //
+  Status = gBS->CloseEvent (mDxeRuntimeCapsuleLibExitBootServiceEvent);
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;

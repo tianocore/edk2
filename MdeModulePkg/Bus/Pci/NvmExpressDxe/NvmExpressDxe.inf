@@ -5,7 +5,7 @@
 #  NVM Express specification.
 #
 #  Copyright (c) 2013 - 2019, Intel Corporation. All rights reserved.<BR>
-#
+#  Copyright (c) Microsoft Corporation.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -40,9 +40,16 @@
   NvmExpressHci.c
   NvmExpressHci.h
   NvmExpressPassthru.c
+  NvmExpressMediaSanitize.c
+  NvmExpressMediaSanitize.h
+
+[Guids]
+  gNVMeEnableStartEventGroupGuid
+  gNVMeEnableCompleteEventGroupGuid
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
@@ -67,6 +74,7 @@
   gEfiDiskInfoProtocolGuid                    ## BY_START
   gEfiStorageSecurityCommandProtocolGuid      ## BY_START
   gEfiDriverSupportedEfiVersionProtocolGuid   ## PRODUCES
+  gMediaSanitizeProtocolGuid                  ## PRODUCES
   gEfiResetNotificationProtocolGuid           ## CONSUMES
 
 # [Event]

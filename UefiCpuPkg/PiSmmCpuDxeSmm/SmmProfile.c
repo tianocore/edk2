@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 #include "SmmProfileInternal.h"
 
 UINT32  mSmmProfileCr3;
@@ -39,6 +39,11 @@ BOOLEAN  mXdEnabled = FALSE;
 // The flag indicates if BTS is supported by processor.
 //
 BOOLEAN  mBtsSupported = TRUE;
+
+//
+// The flag indicates if SMM profile is enabled.
+//
+BOOLEAN  mSmmProfileEnabled = FALSE;
 
 //
 // The flag indicates if SMM profile starts to record data.
@@ -298,41 +303,35 @@ IsInSmmRanges (
 }
 
 /**
-  Check if the memory address will be mapped by 4KB-page.
+  Check if the SMM profile page fault address above 4GB is in protected range or not.
 
-  @param  Address  The address of Memory.
-  @param  Nx       The flag indicates if the memory is execute-disable.
+  @param[in]   Address  The address of Memory.
+  @param[out]  Nx       The flag indicates if the memory is execute-disable.
+
+  @retval TRUE     The input address is in protected range.
+  @retval FALSE    The input address is not in protected range.
 
 **/
 BOOLEAN
-IsAddressValid (
-  IN EFI_PHYSICAL_ADDRESS  Address,
-  IN BOOLEAN               *Nx
+IsSmmProfilePFAddressAbove4GValid (
+  IN  EFI_PHYSICAL_ADDRESS  Address,
+  OUT BOOLEAN               *Nx
   )
 {
   UINTN  Index;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-    //
-    // Check configuration
-    //
-    for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
-      if ((Address >= mProtectionMemRange[Index].Range.Base) && (Address < mProtectionMemRange[Index].Range.Top)) {
-        *Nx = mProtectionMemRange[Index].Nx;
-        return mProtectionMemRange[Index].Present;
-      }
+  //
+  // Check configuration
+  //
+  for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
+    if ((Address >= mProtectionMemRange[Index].Range.Base) && (Address < mProtectionMemRange[Index].Range.Top)) {
+      *Nx = mProtectionMemRange[Index].Nx;
+      return mProtectionMemRange[Index].Present;
     }
-
-    *Nx = TRUE;
-    return FALSE;
-  } else {
-    *Nx = TRUE;
-    if (IsInSmmRanges (Address)) {
-      *Nx = FALSE;
-    }
-
-    return TRUE;
   }
+
+  *Nx = TRUE;
+  return FALSE;
 }
 
 /**
@@ -348,7 +347,7 @@ IsAddressSplit (
 {
   UINTN  Index;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     //
     // Check configuration
     //
@@ -410,99 +409,100 @@ InitProtectedMemRange (
   VOID
   )
 {
-  UINTN                            Index;
-  UINTN                            NumberOfDescriptors;
-  UINTN                            NumberOfAddedDescriptors;
-  UINTN                            NumberOfProtectRange;
-  UINTN                            NumberOfSpliteRange;
-  EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
-  UINTN                            TotalSize;
-  EFI_PHYSICAL_ADDRESS             ProtectBaseAddress;
-  EFI_PHYSICAL_ADDRESS             ProtectEndAddress;
-  EFI_PHYSICAL_ADDRESS             Top2MBAlignedAddress;
-  EFI_PHYSICAL_ADDRESS             Base2MBAlignedAddress;
-  UINT64                           High4KBPageSize;
-  UINT64                           Low4KBPageSize;
-  MEMORY_PROTECTION_RANGE          MemProtectionRange;
+  UINTN                    Index;
+  MM_CPU_MEMORY_REGION     *MemoryRegion;
+  UINTN                    MemoryRegionCount;
+  UINTN                    NumberOfAddedDescriptors;
+  UINTN                    NumberOfProtectRange;
+  UINTN                    NumberOfSpliteRange;
+  UINTN                    TotalSize;
+  EFI_PHYSICAL_ADDRESS     ProtectBaseAddress;
+  EFI_PHYSICAL_ADDRESS     ProtectEndAddress;
+  EFI_PHYSICAL_ADDRESS     Top2MBAlignedAddress;
+  EFI_PHYSICAL_ADDRESS     Base2MBAlignedAddress;
+  UINT64                   High4KBPageSize;
+  UINT64                   Low4KBPageSize;
+  MEMORY_PROTECTION_RANGE  MemProtectionRange;
 
-  NumberOfDescriptors      = 0;
+  MemoryRegion             = NULL;
+  MemoryRegionCount        = 0;
   NumberOfAddedDescriptors = mSmmCpuSmramRangeCount;
   NumberOfSpliteRange      = 0;
-  MemorySpaceMap           = NULL;
 
   //
-  // Get MMIO ranges from GCD and add them into protected memory ranges.
+  // Create extended protection MemoryRegion and add them into protected memory ranges.
+  // Retrieve the accessible regions when SMM profile is enabled.
+  // In SMM: only MMIO is accessible.
+  // In MM: all regions described by resource HOBs are accessible.
   //
-  gDS->GetMemorySpaceMap (
-         &NumberOfDescriptors,
-         &MemorySpaceMap
-         );
-  for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) {
-      NumberOfAddedDescriptors++;
+  CreateExtendedProtectionRange (&MemoryRegion, &MemoryRegionCount);
+  ASSERT (MemoryRegion != NULL);
+
+  NumberOfAddedDescriptors += MemoryRegionCount;
+
+  ASSERT (NumberOfAddedDescriptors != 0);
+
+  TotalSize           = NumberOfAddedDescriptors * sizeof (MEMORY_PROTECTION_RANGE) + sizeof (mProtectionMemRangeTemplate);
+  mProtectionMemRange = (MEMORY_PROTECTION_RANGE *)AllocateZeroPool (TotalSize);
+  ASSERT (mProtectionMemRange != NULL);
+  mProtectionMemRangeCount = TotalSize / sizeof (MEMORY_PROTECTION_RANGE);
+
+  //
+  // Copy existing ranges.
+  //
+  CopyMem (mProtectionMemRange, mProtectionMemRangeTemplate, sizeof (mProtectionMemRangeTemplate));
+
+  //
+  // Create split ranges which come from protected ranges.
+  //
+  TotalSize      = (TotalSize / sizeof (MEMORY_PROTECTION_RANGE)) * sizeof (MEMORY_RANGE);
+  mSplitMemRange = (MEMORY_RANGE *)AllocateZeroPool (TotalSize);
+  ASSERT (mSplitMemRange != NULL);
+
+  //
+  // Create SMM ranges which are set to present and execution-enable.
+  //
+  NumberOfProtectRange = sizeof (mProtectionMemRangeTemplate) / sizeof (MEMORY_PROTECTION_RANGE);
+  for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
+    if ((mSmmCpuSmramRanges[Index].CpuStart >= mProtectionMemRange[0].Range.Base) &&
+        (mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize < mProtectionMemRange[0].Range.Top))
+    {
+      //
+      // If the address have been already covered by mCpuHotPlugData.SmrrBase/mCpuHotPlugData.SmrrSiz
+      //
+      break;
     }
+
+    mProtectionMemRange[NumberOfProtectRange].Range.Base = mSmmCpuSmramRanges[Index].CpuStart;
+    mProtectionMemRange[NumberOfProtectRange].Range.Top  = mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize;
+    mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
+    mProtectionMemRange[NumberOfProtectRange].Nx         = FALSE;
+    NumberOfProtectRange++;
   }
 
-  if (NumberOfAddedDescriptors != 0) {
-    TotalSize           = NumberOfAddedDescriptors * sizeof (MEMORY_PROTECTION_RANGE) + sizeof (mProtectionMemRangeTemplate);
-    mProtectionMemRange = (MEMORY_PROTECTION_RANGE *)AllocateZeroPool (TotalSize);
-    ASSERT (mProtectionMemRange != NULL);
-    mProtectionMemRangeCount = TotalSize / sizeof (MEMORY_PROTECTION_RANGE);
-
-    //
-    // Copy existing ranges.
-    //
-    CopyMem (mProtectionMemRange, mProtectionMemRangeTemplate, sizeof (mProtectionMemRangeTemplate));
-
-    //
-    // Create split ranges which come from protected ranges.
-    //
-    TotalSize      = (TotalSize / sizeof (MEMORY_PROTECTION_RANGE)) * sizeof (MEMORY_RANGE);
-    mSplitMemRange = (MEMORY_RANGE *)AllocateZeroPool (TotalSize);
-    ASSERT (mSplitMemRange != NULL);
-
-    //
-    // Create SMM ranges which are set to present and execution-enable.
-    //
-    NumberOfProtectRange = sizeof (mProtectionMemRangeTemplate) / sizeof (MEMORY_PROTECTION_RANGE);
-    for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
-      if ((mSmmCpuSmramRanges[Index].CpuStart >= mProtectionMemRange[0].Range.Base) &&
-          (mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize < mProtectionMemRange[0].Range.Top))
-      {
-        //
-        // If the address have been already covered by mCpuHotPlugData.SmrrBase/mCpuHotPlugData.SmrrSiz
-        //
-        break;
-      }
-
-      mProtectionMemRange[NumberOfProtectRange].Range.Base = mSmmCpuSmramRanges[Index].CpuStart;
-      mProtectionMemRange[NumberOfProtectRange].Range.Top  = mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize;
-      mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
-      mProtectionMemRange[NumberOfProtectRange].Nx         = FALSE;
-      NumberOfProtectRange++;
-    }
-
-    //
-    // Create MMIO ranges which are set to present and execution-disable.
-    //
-    for (Index = 0; Index < NumberOfDescriptors; Index++) {
-      if (MemorySpaceMap[Index].GcdMemoryType != EfiGcdMemoryTypeMemoryMappedIo) {
-        continue;
-      }
-
-      mProtectionMemRange[NumberOfProtectRange].Range.Base = MemorySpaceMap[Index].BaseAddress;
-      mProtectionMemRange[NumberOfProtectRange].Range.Top  = MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length;
-      mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
-      mProtectionMemRange[NumberOfProtectRange].Nx         = TRUE;
-      NumberOfProtectRange++;
-    }
-
-    //
-    // Check and updated actual protected memory ranges count
-    //
-    ASSERT (NumberOfProtectRange <= mProtectionMemRangeCount);
-    mProtectionMemRangeCount = NumberOfProtectRange;
+  //
+  // Create protection ranges which are set to present and execution-disable.
+  //
+  for (Index = 0; Index < MemoryRegionCount; Index++) {
+    mProtectionMemRange[NumberOfProtectRange].Range.Base = MemoryRegion[Index].Base;
+    mProtectionMemRange[NumberOfProtectRange].Range.Top  = MemoryRegion[Index].Base +  MemoryRegion[Index].Length;
+    mProtectionMemRange[NumberOfProtectRange].Present    = TRUE;
+    mProtectionMemRange[NumberOfProtectRange].Nx         = TRUE;
+    NumberOfProtectRange++;
   }
+
+  //
+  // Free the MemoryRegion
+  //
+  if (MemoryRegion != NULL) {
+    FreePool (MemoryRegion);
+  }
+
+  //
+  // Check and updated actual protected memory ranges count
+  //
+  ASSERT (NumberOfProtectRange <= mProtectionMemRangeCount);
+  mProtectionMemRangeCount = NumberOfProtectRange;
 
   //
   // According to protected ranges, create the ranges which will be mapped by 2KB page.
@@ -511,7 +511,7 @@ InitProtectedMemRange (
   NumberOfProtectRange = mProtectionMemRangeCount;
   for (Index = 0; Index < NumberOfProtectRange; Index++) {
     //
-    // If MMIO base address is not 2MB alignment, make 2MB alignment for create 4KB page in page table.
+    // If base address is not 2MB alignment, make 2MB alignment for create 4KB page in page table.
     //
     ProtectBaseAddress = mProtectionMemRange[Index].Range.Base;
     ProtectEndAddress  = mProtectionMemRange[Index].Range.Top;
@@ -578,11 +578,11 @@ InitProtectedMemRange (
 }
 
 /**
-  Update page table according to protected memory ranges and the 4KB-page mapped memory ranges.
+  This function updates memory attribute according to mProtectionMemRangeCount.
 
 **/
 VOID
-InitPaging (
+SmmProfileUpdateMemoryAttributes (
   VOID
   )
 {
@@ -594,138 +594,70 @@ InitPaging (
   UINT64         Limit;
   UINT64         PreviousAddress;
   UINT64         MemoryAttrMask;
-  BOOLEAN        IsSet;
   BOOLEAN        WriteProtect;
   BOOLEAN        CetEnabled;
 
-  PERF_FUNCTION_BEGIN ();
-
-  PageTable = AsmReadCr3 ();
-  if (sizeof (UINTN) == sizeof (UINT32)) {
-    Limit = BASE_4GB;
-  } else {
-    Limit = (IsRestrictedMemoryAccess ()) ? LShiftU64 (1, mPhysicalAddressBits) : BASE_4GB;
-  }
+  DEBUG ((DEBUG_INFO, "SmmProfileUpdateMemoryAttributes Start...\n"));
 
   WRITE_UNPROTECT_RO_PAGES (WriteProtect, CetEnabled);
+
+  PageTable = AsmReadCr3 ();
+  Limit     = LShiftU64 (1, mPhysicalAddressBits);
 
   //
   // [0, 4k] may be non-present.
   //
   PreviousAddress = ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT1) != 0) ? BASE_4KB : 0;
 
-  DEBUG ((DEBUG_INFO, "Patch page table start ...\n"));
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
-    for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
-      Base   = mProtectionMemRange[Index].Range.Base;
-      Length = mProtectionMemRange[Index].Range.Top - Base;
+  for (Index = 0; Index < mProtectionMemRangeCount; Index++) {
+    MemoryAttrMask = 0;
+    if (mProtectionMemRange[Index].Nx == TRUE) {
+      MemoryAttrMask = EFI_MEMORY_XP;
+    }
 
+    if (mProtectionMemRange[Index].Present == FALSE) {
       MemoryAttrMask = EFI_MEMORY_RP;
-      if (!mProtectionMemRange[Index].Present) {
-        //
-        // Config the EFI_MEMORY_RP attribute to make it non-present.
-        //
-        IsSet = TRUE;
-      } else {
-        //
-        // Clear the EFI_MEMORY_RP attribute to make it present.
-        //
-        IsSet = FALSE;
+    }
 
-        //
-        // Config the range as writable and executable when mapping a range as present.
-        //
-        MemoryAttrMask |= EFI_MEMORY_RO;
-        MemoryAttrMask |= EFI_MEMORY_XP;
-      }
-
-      Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttrMask, IsSet, NULL);
+    Base   = mProtectionMemRange[Index].Range.Base;
+    Length = mProtectionMemRange[Index].Range.Top - Base;
+    if (MemoryAttrMask != 0) {
+      Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttrMask, TRUE, NULL);
       ASSERT_RETURN_ERROR (Status);
-
-      if (mProtectionMemRange[Index].Present && mProtectionMemRange[Index].Nx) {
-        //
-        // Since EFI_MEMORY_XP has already been cleared above, only handle the case to disable execution.
-        // Config the EFI_MEMORY_XP attribute to disable execution.
-        //
-        MemoryAttrMask = EFI_MEMORY_XP;
-        Status         = ConvertMemoryPageAttributes (PageTable, mPagingMode, Base, Length, MemoryAttrMask, TRUE, NULL);
-        ASSERT_RETURN_ERROR (Status);
-      }
-
-      if (Base > PreviousAddress) {
-        //
-        // Mark the ranges not in mProtectionMemRange as non-present.
-        //
-        MemoryAttrMask = EFI_MEMORY_RP;
-        Status         = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, MemoryAttrMask, TRUE, NULL);
-        ASSERT_RETURN_ERROR (Status);
-      }
-
-      PreviousAddress = Base + Length;
     }
 
-    //
-    // This assignment is for setting the last remaining range
-    //
-    MemoryAttrMask = EFI_MEMORY_RP;
-  } else {
-    MemoryAttrMask = EFI_MEMORY_XP;
-    for (Index = 0; Index < mSmmCpuSmramRangeCount; Index++) {
-      Base = mSmmCpuSmramRanges[Index].CpuStart;
-      if (Base > PreviousAddress) {
-        //
-        // Mark the ranges not in mSmmCpuSmramRanges as NX.
-        //
-        Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, MemoryAttrMask, TRUE, NULL);
-        ASSERT_RETURN_ERROR (Status);
-      }
-
-      PreviousAddress = mSmmCpuSmramRanges[Index].CpuStart + mSmmCpuSmramRanges[Index].PhysicalSize;
+    if (Base > PreviousAddress) {
+      //
+      // Mark the ranges not in mProtectionMemRange as non-present.
+      //
+      Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Base - PreviousAddress, EFI_MEMORY_RP, TRUE, NULL);
+      ASSERT_RETURN_ERROR (Status);
     }
+
+    PreviousAddress = Base + Length;
   }
 
+  //
+  // Set the last remaining range
+  //
   if (PreviousAddress < Limit) {
-    //
-    // Set the last remaining range to EFI_MEMORY_RP/EFI_MEMORY_XP.
-    // This path applies to both SmmProfile enable/disable case.
-    //
-    Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Limit - PreviousAddress, MemoryAttrMask, TRUE, NULL);
+    Status = ConvertMemoryPageAttributes (PageTable, mPagingMode, PreviousAddress, Limit - PreviousAddress, EFI_MEMORY_RP, TRUE, NULL);
     ASSERT_RETURN_ERROR (Status);
   }
-
-  WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
   //
   // Flush TLB
   //
   CpuFlushTlb ();
-  DEBUG ((DEBUG_INFO, "Patch page table done!\n"));
+
   //
   // Set execute-disable flag
   //
   mXdEnabled = TRUE;
 
-  PERF_FUNCTION_END ();
-}
+  WRITE_PROTECT_RO_PAGES (WriteProtect, CetEnabled);
 
-/**
-  To get system port address of the SMI Command Port in FADT table.
-
-**/
-VOID
-GetSmiCommandPort (
-  VOID
-  )
-{
-  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE  *Fadt;
-
-  Fadt = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *)EfiLocateFirstAcpiTable (
-                                                        EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE
-                                                        );
-  ASSERT (Fadt != NULL);
-
-  mSmiCommandPort = Fadt->SmiCmd;
-  DEBUG ((DEBUG_INFO, "mSmiCommandPort = %x\n", mSmiCommandPort));
+  DEBUG ((DEBUG_INFO, "SmmProfileUpdateMemoryAttributes Done.\n"));
 }
 
 /**
@@ -743,6 +675,11 @@ SmmProfileStart (
   // The flag indicates SMM profile starts to work.
   //
   mSmmProfileStart = TRUE;
+
+  //
+  // Tell #PF handler to prepare a #DB subsequently.
+  //
+  mSetupDebugTrap = TRUE;
 }
 
 /**
@@ -762,26 +699,25 @@ InitSmmProfileCallBack (
   IN EFI_HANDLE      Handle
   )
 {
+  EFI_STATUS                 Status;
+  EFI_SMM_VARIABLE_PROTOCOL  *SmmProfileVariable;
+
+  //
+  // Locate SmmVariableProtocol.
+  //
+  Status = gMmst->MmLocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID **)&SmmProfileVariable);
+  ASSERT_EFI_ERROR (Status);
+
   //
   // Save to variable so that SMM profile data can be found.
   //
-  gRT->SetVariable (
-         SMM_PROFILE_NAME,
-         &gEfiCallerIdGuid,
-         EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-         sizeof (mSmmProfileBase),
-         &mSmmProfileBase
-         );
-
-  //
-  // Get Software SMI from FADT
-  //
-  GetSmiCommandPort ();
-
-  //
-  // Initialize protected memory range for patching page table later.
-  //
-  InitProtectedMemRange ();
+  SmmProfileVariable->SmmSetVariable (
+                        SMM_PROFILE_NAME,
+                        &gEfiCallerIdGuid,
+                        EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
+                        sizeof (mSmmProfileBase),
+                        &mSmmProfileBase
+                        );
 
   return EFI_SUCCESS;
 }
@@ -795,12 +731,11 @@ InitSmmProfileInternal (
   VOID
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Base;
-  VOID                  *Registration;
-  UINTN                 Index;
-  UINTN                 MsrDsAreaSizePerCpu;
-  UINTN                 TotalSize;
+  EFI_STATUS  Status;
+  VOID        *Registration;
+  UINTN       Index;
+  UINTN       MsrDsAreaSizePerCpu;
+  UINT64      SmmProfileSize;
 
   mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mMaxNumberOfCpus);
   ASSERT (mPFEntryCount != NULL);
@@ -814,28 +749,20 @@ InitSmmProfileInternal (
   ASSERT (mLastPFEntryPointer != NULL);
 
   //
-  // Allocate memory for SmmProfile below 4GB.
-  // The base address
+  // Get Smm Profile Base
   //
-  mSmmProfileSize = PcdGet32 (PcdCpuSmmProfileSize);
-  ASSERT ((mSmmProfileSize & 0xFFF) == 0);
+  mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)GetSmmProfileData (&SmmProfileSize);
+  DEBUG ((DEBUG_ERROR, "SmmProfileBase = 0x%016x.\n", (UINTN)mSmmProfileBase));
+  DEBUG ((DEBUG_ERROR, "SmmProfileSize = 0x%016x.\n", (UINTN)SmmProfileSize));
 
   if (mBtsSupported) {
-    TotalSize = mSmmProfileSize + mMsrDsAreaSize;
+    ASSERT (SmmProfileSize > mMsrDsAreaSize);
+    mSmmProfileSize = (UINTN)SmmProfileSize - mMsrDsAreaSize;
   } else {
-    TotalSize = mSmmProfileSize;
+    mSmmProfileSize = (UINTN)SmmProfileSize;
   }
 
-  Base   = 0xFFFFFFFF;
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  EFI_SIZE_TO_PAGES (TotalSize),
-                  &Base
-                  );
-  ASSERT_EFI_ERROR (Status);
-  ZeroMem ((VOID *)(UINTN)Base, TotalSize);
-  mSmmProfileBase = (SMM_PROFILE_HEADER *)(UINTN)Base;
+  ASSERT ((mSmmProfileSize & 0xFFF) == 0);
 
   //
   // Initialize SMM profile data header.
@@ -858,7 +785,7 @@ InitSmmProfileInternal (
     mMsrPEBSRecord = (PEBS_RECORD **)AllocateZeroPool (sizeof (PEBS_RECORD *) * mMaxNumberOfCpus);
     ASSERT (mMsrPEBSRecord != NULL);
 
-    mMsrDsAreaBase      = (MSR_DS_AREA_STRUCT *)((UINTN)Base + mSmmProfileSize);
+    mMsrDsAreaBase      = (MSR_DS_AREA_STRUCT *)((UINTN)mSmmProfileBase + mSmmProfileSize);
     MsrDsAreaSizePerCpu = mMsrDsAreaSize / mMaxNumberOfCpus;
     mBTSRecordNumber    = (MsrDsAreaSizePerCpu - sizeof (PEBS_RECORD) * PEBS_RECORD_NUMBER - sizeof (MSR_DS_AREA_STRUCT)) / sizeof (BRANCH_TRACE_RECORD);
     for (Index = 0; Index < mMaxNumberOfCpus; Index++) {
@@ -891,7 +818,7 @@ InitSmmProfileInternal (
   // Update SMM profile entry.
   //
   mProtectionMemRange[1].Range.Base = (EFI_PHYSICAL_ADDRESS)(UINTN)mSmmProfileBase;
-  mProtectionMemRange[1].Range.Top  = (EFI_PHYSICAL_ADDRESS)(UINTN)mSmmProfileBase + TotalSize;
+  mProtectionMemRange[1].Range.Top  = (EFI_PHYSICAL_ADDRESS)(UINTN)mSmmProfileBase + SmmProfileSize;
 
   //
   // Allocate memory reserved for creating 4KB pages.
@@ -901,7 +828,7 @@ InitSmmProfileInternal (
   //
   // Start SMM profile when SmmReadyToLock protocol is installed.
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
+  Status = gMmst->MmRegisterProtocolNotify (
                     &gEfiSmmReadyToLockProtocolGuid,
                     InitSmmProfileCallBack,
                     &Registration
@@ -914,10 +841,11 @@ InitSmmProfileInternal (
 /**
   Check if feature is supported by a processor.
 
+  @param CpuIndex        The index of the CPU.
 **/
 VOID
 CheckFeatureSupported (
-  VOID
+  IN UINTN  CpuIndex
   )
 {
   UINT32                         RegEax;
@@ -939,33 +867,6 @@ CheckFeatureSupported (
     }
   }
 
-  if (mXdSupported) {
-    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
-    if (RegEax <= CPUID_EXTENDED_FUNCTION) {
-      //
-      // Extended CPUID functions are not supported on this processor.
-      //
-      mXdSupported = FALSE;
-      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
-    }
-
-    AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
-    if ((RegEdx & CPUID1_EDX_XD_SUPPORT) == 0) {
-      //
-      // Execute Disable Bit feature is not supported on this processor.
-      //
-      mXdSupported = FALSE;
-      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
-    }
-
-    if (StandardSignatureIsAuthenticAMD ()) {
-      //
-      // AMD processors do not support MSR_IA32_MISC_ENABLE
-      //
-      PatchInstructionX86 (gPatchMsrIa32MiscEnableSupported, FALSE, 1);
-    }
-  }
-
   if (mBtsSupported) {
     AsmCpuid (CPUID_VERSION_INFO, NULL, NULL, NULL, &RegEdx);
     if ((RegEdx & CPUID1_EDX_BTS_AVAILABLE) != 0) {
@@ -984,6 +885,18 @@ CheckFeatureSupported (
         //
         mBtsSupported = FALSE;
       }
+    }
+  }
+
+  if (mSmmCodeAccessCheckEnable) {
+    //
+    // Check to see if the CPU supports the SMM Code Access Check feature
+    // Do not access this MSR unless the CPU supports the SmmRegFeatureControl
+    //
+    if (!SmmCpuFeaturesIsSmmRegisterSupported (CpuIndex, SmmRegFeatureControl) ||
+        ((AsmReadMsr64 (EFI_MSR_SMM_MCA_CAP) & SMM_CODE_ACCESS_CHK_BIT) == 0))
+    {
+      mSmmCodeAccessCheckEnable = FALSE;
     }
   }
 }
@@ -1114,7 +1027,7 @@ InitSmmProfile (
   //
   // Skip SMM profile initialization if feature is disabled
   //
-  if (!FeaturePcdGet (PcdCpuSmmProfileEnable) &&
+  if (!mSmmProfileEnabled &&
       !HEAP_GUARD_NONSTOP_MODE &&
       !NULL_DETECTION_NONSTOP_MODE)
   {
@@ -1130,11 +1043,6 @@ InitSmmProfile (
   // Initialize profile IDT.
   //
   InitIdtr ();
-
-  //
-  // Tell #PF handler to prepare a #DB subsequently.
-  //
-  mSetupDebugTrap = TRUE;
 }
 
 /**
@@ -1186,6 +1094,21 @@ RestorePageTableBelow4G (
   // PDPTE
   //
   PTIndex = (UINTN)BitFieldRead64 (PFAddress, 30, 38);
+
+  if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
+    //
+    // For 32-bit case, because a full map page table for 0-4G is created by default,
+    // and since the PDPTE must be one non-leaf entry, the PDPTE must always be present.
+    // So, ASSERT it must be the 64-bit case running here.
+    //
+    ASSERT (sizeof (UINT64) == sizeof (UINTN));
+
+    //
+    // If the entry is not present, allocate one page from page pool for it
+    //
+    PageTable[PTIndex] = AllocPage () | mAddressEncMask | PAGE_ATTRIBUTE_BITS;
+  }
+
   ASSERT (PageTable[PTIndex] != 0);
   PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
 
@@ -1193,9 +1116,9 @@ RestorePageTableBelow4G (
   // PD
   //
   PTIndex = (UINTN)BitFieldRead64 (PFAddress, 21, 29);
-  if ((PageTable[PTIndex] & IA32_PG_PS) != 0) {
+  if ((PageTable[PTIndex] & IA32_PG_P) == 0) {
     //
-    // Large page
+    // A 2M page size will be used directly when the 2M entry is marked as non-present.
     //
 
     //
@@ -1222,7 +1145,8 @@ RestorePageTableBelow4G (
     }
   } else {
     //
-    // Small page
+    // If the 2M entry is marked as present, a 4K page size will be utilized.
+    // In this scenario, the 2M entry must be a non-leaf entry.
     //
     ASSERT (PageTable[PTIndex] != 0);
     PageTable = (UINT64 *)(UINTN)(PageTable[PTIndex] & PHYSICAL_ADDRESS_MASK);
@@ -1325,14 +1249,6 @@ SmmProfilePFHandler (
   UINT8                       SoftSmiValue;
   EFI_SMM_SAVE_STATE_IO_INFO  IoInfo;
 
-  if (!mSmmProfileStart) {
-    //
-    // If SMM profile does not start, call original page fault handler.
-    //
-    SmiDefaultPFHandler ();
-    return;
-  }
-
   if (mBtsSupported) {
     DisableBTS ();
   }
@@ -1380,7 +1296,7 @@ SmmProfilePFHandler (
     // Indicate it is not software SMI
     //
     SmiCommand = 0xFFFFFFFFFFFFFFFFULL;
-    for (Index = 0; Index < gSmst->NumberOfCpus; Index++) {
+    for (Index = 0; Index < gMmst->NumberOfCpus; Index++) {
       Status = SmmReadSaveState (&mSmmCpu, sizeof (IoInfo), EFI_SMM_SAVE_STATE_REGISTER_IO, Index, &IoInfo);
       if (EFI_ERROR (Status)) {
         continue;

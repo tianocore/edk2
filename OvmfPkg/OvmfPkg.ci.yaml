@@ -11,7 +11,8 @@
 {
     ## options defined .pytool/Plugin/LicenseCheck
     "LicenseCheck": {
-        "IgnoreFiles": []
+        ## Imported from Xen and MIT licensed.
+        "IgnoreFiles": ["OvmfPkg/Include/IndustryStandard/Xen"]
     },
     "EccCheck": {
         ## Exception sample looks like below:

@@ -2,7 +2,7 @@
  *
  *  Implement virtual EFI RealTimeClock runtime services.
  *
- *  Coypright (c) 2019, Pete Batard <pete@akeo.ie>
+ *  Copyright (c) 2019, Pete Batard <pete@akeo.ie>
  *  Copyright (c) 2018, Andrei Warkentin <andrey.warkentin@gmail.com>
  *  Copyright (c) 2011-2021, ARM Ltd. All rights reserved.
  *  Copyright (c) 2008-2010, Apple Inc. All rights reserved.

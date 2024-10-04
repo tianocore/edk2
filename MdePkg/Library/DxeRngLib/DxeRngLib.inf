@@ -15,6 +15,7 @@
   MODULE_TYPE     = DXE_DRIVER
   VERSION_STRING  = 1.0
   LIBRARY_CLASS   = RngLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR     = DxeRngLibConstructor
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -24,6 +25,7 @@
 
 [LibraryClasses]
   DebugLib
+  MemoryAllocationLib
   UefiBootServicesTableLib
 
 [Protocols]
@@ -37,3 +39,9 @@
   gEfiRngAlgorithmSp80090Hash256Guid
   gEfiRngAlgorithmSp80090Hmac256Guid
   gEfiRngAlgorithmRaw
+
+[Guids.AARCH64]
+  gEfiRngAlgorithmArmRndr
+
+[FixedPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms ## CONSUMES

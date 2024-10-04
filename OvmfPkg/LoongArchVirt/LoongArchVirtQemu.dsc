@@ -102,9 +102,6 @@
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 !endif
 
-  # For stack protector support
-  NULL                             | MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
-
   BaseLib                          | MdePkg/Library/BaseLib/BaseLib.inf
   SafeIntLib                       | MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   TimeBaseLib                      | EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
@@ -131,7 +128,6 @@
   FdtSerialPortAddressLib          | OvmfPkg/Library/FdtSerialPortAddressLib/FdtSerialPortAddressLib.inf
   PlatformHookLib                  | OvmfPkg/LoongArchVirt/Library/Fdt16550SerialPortHookLib/Fdt16550SerialPortHookLib.inf
   SerialPortLib                    | OvmfPkg/LoongArchVirt/Library/EarlyFdtSerialPortLib16550/EarlyFdtSerialPortLib16550.inf
-  EfiResetSystemLib                | OvmfPkg/LoongArchVirt/Library/ResetSystemAcpiLib/BaseResetSystemAcpiGedLib.inf
   ResetSystemLib                   | OvmfPkg/LoongArchVirt/Library/ResetSystemAcpiLib/BaseResetSystemAcpiGedLib.inf
 
   UefiLib                          | MdePkg/Library/UefiLib/UefiLib.inf
@@ -198,6 +194,9 @@
   PlatformHookLib                  | OvmfPkg/LoongArchVirt/Library/Fdt16550SerialPortHookLib/EarlyFdt16550SerialPortHookLib.inf
   CpuExceptionHandlerLib           | UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
 
+  # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
+  NULL                             | MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+
 [LibraryClasses.common.PEI_CORE]
   PcdLib                           | MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   HobLib                           | MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -248,7 +247,6 @@
   RealTimeClockLib                 | OvmfPkg/LoongArchVirt/Library/LsRealTimeClockLib/LsRealTimeClockLib.inf
   VariablePolicyLib                | MdeModulePkg/Library/VariablePolicyLib/VariablePolicyLibRuntimeDxe.inf
   QemuFwCfgLib                     | OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgMmioDxeLib.inf
-  EfiResetSystemLib                | OvmfPkg/LoongArchVirt/Library/ResetSystemAcpiLib/DxeResetSystemAcpiGedLib.inf
   ResetSystemLib                   | OvmfPkg/LoongArchVirt/Library/ResetSystemAcpiLib/DxeResetSystemAcpiGedLib.inf
 !if $(TARGET) != RELEASE
   DebugLib                         | MdePkg/Library/DxeRuntimeDebugLibSerialPort/DxeRuntimeDebugLibSerialPort.inf
@@ -419,8 +417,10 @@
   #
   # IPv4 and IPv6 PXE Boot support.
   #
+!if $(NETWORK_ENABLE) == TRUE
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport                       | 0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport                       | 0x01
+!endif
 
   #
   # SMBIOS entry point version
