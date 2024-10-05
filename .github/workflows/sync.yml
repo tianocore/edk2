@@ -1,0 +1,33 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: false
+
+    - name: Set up Git
+      run: |
+        git config user.name "Damien-Chen"
+        git config user.email "inkfan130924783@gmail.com"
+
+    - name: Add upstream remote
+      run: git remote add upstream https://github.com/tianocore/edk2.git
+
+    - name: Fetch upstream
+      run: git fetch upstream
+
+    - name: Merge upstream into fork's default branch
+      run: git merge upstream/main --allow-unrelated-histories
+
+    - name: Push changes to forked repo
+      run: git push origin master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
