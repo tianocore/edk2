@@ -3,6 +3,7 @@
     Usb bus enumeration support.
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -42,6 +43,41 @@ UsbGetEndpointDesc (
 }
 
 /**
+  Check if given Usb interface belongs to any Usb association.
+
+  @param[in]  Device    The device may have the interface association descriptor.
+  @param[in]  IfDesc    The interface descriptor to check for.
+  @param[out] IfAssoc   The USB association device pointer.
+
+  @retval EFI_SUCCESS   IfDesc is found within associations, IfAssoc has valid pointer.
+  @retval EFI_NOT_FOUND IfDesc does no belong to any association.
+
+**/
+EFI_STATUS
+GetInterfaceAssociation (
+  IN USB_DEVICE          *Device,
+  IN USB_INTERFACE_DESC  *IfDesc,
+  OUT USB_ASSOCIATION    **IfAssoc
+  )
+{
+  UINTN            Index;
+  UINTN            i;
+  USB_ASSOCIATION  *Ia;
+
+  for (Index = 0; Index < Device->NumOfAssociation; Index++) {
+    Ia = Device->Associations[Index];
+    for (i = 0; i < Ia->IaDesc->Desc.InterfaceCount; i++) {
+      if (IfDesc->Settings[0]->Desc.InterfaceNumber == Ia->IaDesc->Interfaces[i]->Settings[0]->Desc.InterfaceNumber) {
+        *IfAssoc = Ia;
+        return EFI_SUCCESS;
+      }
+    }
+  }
+
+  return EFI_NOT_FOUND;
+}
+
+/**
   Free the resource used by USB interface.
 
   @param  UsbIf                 The USB interface to free.
@@ -54,9 +90,25 @@ UsbFreeInterface (
   IN USB_INTERFACE  *UsbIf
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS       Status;
+  USB_ASSOCIATION  *UsbIa;
 
-  UsbCloseHostProtoByChild (UsbIf->Device->Bus, UsbIf->Handle);
+  Status = GetInterfaceAssociation (UsbIf->Device, UsbIf->IfDesc, &UsbIa);
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // Close USB Interface Association Protocol by Child
+    //
+    Status = gBS->CloseProtocol (
+                    UsbIa->Handle,
+                    &gEfiUsbIaProtocolGuid,
+                    mUsbBusDriverBinding.DriverBindingHandle,
+                    UsbIf->Handle
+                    );
+    DEBUG ((DEBUG_INFO, "UsbFreeInterface: close IAD protocol by child, %r\n", Status));
+  } else {
+    UsbCloseHostProtoByChild (UsbIf->Device->Bus, UsbIf->Handle);
+  }
 
   Status = gBS->UninstallMultipleProtocolInterfaces (
                   UsbIf->Handle,
@@ -73,7 +125,66 @@ UsbFreeInterface (
 
     FreePool (UsbIf);
   } else {
-    UsbOpenHostProtoByChild (UsbIf->Device->Bus, UsbIf->Handle);
+    Status = GetInterfaceAssociation (UsbIf->Device, UsbIf->IfDesc, &UsbIa);
+
+    if (!EFI_ERROR (Status)) {
+      //
+      // Reopen USB Interface Assiciation Protocol by Child
+      //
+      Status = gBS->OpenProtocol (
+                      UsbIa->Handle,
+                      &gEfiUsbIaProtocolGuid,
+                      (VOID **)&UsbIa,
+                      mUsbBusDriverBinding.DriverBindingHandle,
+                      UsbIf->Handle,
+                      EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                      );
+      DEBUG ((DEBUG_INFO, "UsbFreeInterface: reopen IAD for child, Status = %r\n", Status));
+    } else {
+      //
+      // Reopen USB Host Controller Protocol by Child
+      //
+      Status = UsbOpenHostProtoByChild (UsbIf->Device->Bus, UsbIf->Handle);
+      DEBUG ((DEBUG_INFO, "UsbFreeInterface: reopen host controller for child, Status = %r\n", Status));
+    }
+  }
+
+  return Status;
+}
+
+/**
+  Free the resource used by USB association.
+
+  @param  UsbIa                 The USB association to free.
+
+  @retval EFI_ACCESS_DENIED     The Usb association resource is still occupied.
+  @retval EFI_SUCCESS           The Usb association resource is freed.
+
+**/
+EFI_STATUS
+UsbFreeAssociation (
+  IN USB_ASSOCIATION  *UsbIa
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  UsbIa->Handle,
+                  &gEfiDevicePathProtocolGuid,
+                  UsbIa->DevicePath,
+                  &gEfiUsbIaProtocolGuid,
+                  &UsbIa->UsbIa,
+                  NULL
+                  );
+
+  if (!EFI_ERROR (Status)) {
+    if (UsbIa->DevicePath != NULL) {
+      FreePool (UsbIa->DevicePath);
+    }
+
+    FreePool (UsbIa);
+  } else {
+    UsbOpenHostProtoByChild (UsbIa->Device->Bus, UsbIa->Handle);
   }
 
   return Status;
@@ -82,6 +193,7 @@ UsbFreeInterface (
 /**
   Create an interface for the descriptor IfDesc. Each
   device's configuration can have several interfaces.
+  Interface may belong to interface association.
 
   @param  Device                The device has the interface descriptor.
   @param  IfDesc                The interface descriptor.
@@ -95,10 +207,12 @@ UsbCreateInterface (
   IN USB_INTERFACE_DESC  *IfDesc
   )
 {
-  USB_DEVICE_PATH  UsbNode;
-  USB_INTERFACE    *UsbIf;
-  USB_INTERFACE    *HubIf;
-  EFI_STATUS       Status;
+  USB_DEVICE_PATH           UsbNode;
+  USB_INTERFACE             *UsbIf;
+  USB_INTERFACE             *HubIf;
+  USB_ASSOCIATION           *UsbIa;
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePathProtocol;
+  EFI_STATUS                Status;
 
   UsbIf = AllocateZeroPool (sizeof (USB_INTERFACE));
 
@@ -128,10 +242,17 @@ UsbCreateInterface (
 
   SetDevicePathNodeLength (&UsbNode.Header, sizeof (UsbNode));
 
-  HubIf = Device->ParentIf;
-  ASSERT (HubIf != NULL);
+  Status = GetInterfaceAssociation (Device, IfDesc, &UsbIa);
 
-  UsbIf->DevicePath = AppendDevicePathNode (HubIf->DevicePath, &UsbNode.Header);
+  if (!EFI_ERROR (Status)) {
+    DevicePathProtocol = UsbIa->DevicePath;
+  } else {
+    HubIf = Device->ParentIf;
+    ASSERT (HubIf != NULL);
+    DevicePathProtocol = HubIf->DevicePath;
+  }
+
+  UsbIf->DevicePath = AppendDevicePathNode (DevicePathProtocol, &UsbNode.Header);
 
   if (UsbIf->DevicePath == NULL) {
     DEBUG ((DEBUG_ERROR, "UsbCreateInterface: failed to create device path\n"));
@@ -154,10 +275,28 @@ UsbCreateInterface (
     goto ON_ERROR;
   }
 
-  //
-  // Open USB Host Controller Protocol by Child
-  //
-  Status = UsbOpenHostProtoByChild (Device->Bus, UsbIf->Handle);
+  Status = GetInterfaceAssociation (Device, IfDesc, &UsbIa);
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // Open USB Interface Assiciation Protocol by Child
+    //
+    Status = gBS->OpenProtocol (
+                    UsbIa->Handle,
+                    &gEfiUsbIaProtocolGuid,
+                    (VOID **)&UsbIa,
+                    mUsbBusDriverBinding.DriverBindingHandle,
+                    UsbIf->Handle,
+                    EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+                    );
+    DEBUG ((DEBUG_INFO, "UsbCreateInterface: open IAD for child, Status = %r\n", Status));
+  } else {
+    //
+    // Open USB Host Controller Protocol by Child
+    //
+    Status = UsbOpenHostProtoByChild (Device->Bus, UsbIf->Handle);
+    DEBUG ((DEBUG_INFO, "UsbCreateInterface: open host controller for child, Status = %r\n", Status));
+  }
 
   if (EFI_ERROR (Status)) {
     gBS->UninstallMultipleProtocolInterfaces (
@@ -181,6 +320,112 @@ ON_ERROR:
   }
 
   FreePool (UsbIf);
+  return NULL;
+}
+
+/**
+  Create an interface association instance and install protocols to manage it.
+
+  @param  Device        The Usb device that has the interface association.
+  @param  Index         The interface association index within Device.
+  @param  IfAssocDesc   The interface association descriptor.
+
+  @return The created USB interface association, or NULL.
+
+**/
+USB_ASSOCIATION *
+UsbCreateAssociation (
+  IN USB_DEVICE                      *Device,
+  IN UINT8                           Index,
+  IN USB_INTERFACE_ASSOCIATION_DESC  *IfAssocDesc
+  )
+{
+  USB_DEVICE_PATH  UsbNode;
+  USB_ASSOCIATION  *UsbAssoc;
+  EFI_STATUS       Status;
+
+  UsbAssoc = AllocateZeroPool (sizeof (USB_ASSOCIATION));
+
+  if (UsbAssoc == NULL) {
+    return NULL;
+  }
+
+  UsbAssoc->Signature = USB_ASSOCIATION_SIGNATURE;
+  UsbAssoc->Device    = Device;
+  UsbAssoc->IaDesc    = IfAssocDesc;
+
+  CopyMem (
+    &(UsbAssoc->UsbIa),
+    &mUsbIaProtocol,
+    sizeof (EFI_USB_IA_PROTOCOL)
+    );
+
+  //
+  // Install USB association protocols
+  //
+  // Device path protocol for the association has the USB node similar to the
+  // one installed for USB interface.
+  //
+
+  UsbNode.Header.Type      = MESSAGING_DEVICE_PATH;
+  UsbNode.Header.SubType   = MSG_USB_DP;
+  UsbNode.ParentPortNumber = Device->ParentPort;
+  UsbNode.InterfaceNumber  = Index;
+
+  SetDevicePathNodeLength (&UsbNode.Header, sizeof (UsbNode));
+
+  ASSERT (Device->ParentIf != NULL);
+
+  UsbAssoc->DevicePath = AppendDevicePathNode (Device->ParentIf->DevicePath, &UsbNode.Header);
+
+  if (UsbAssoc->DevicePath == NULL) {
+    DEBUG ((DEBUG_ERROR, "UsbCreateAssociation: failed to create device path\n"));
+
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_ERROR;
+  }
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &UsbAssoc->Handle,
+                  &gEfiDevicePathProtocolGuid,
+                  UsbAssoc->DevicePath,
+                  &gEfiUsbIaProtocolGuid,
+                  &UsbAssoc->UsbIa,
+                  NULL
+                  );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "UsbCreateAssociation: failed to install UsbIa - %r\n", Status));
+    goto ON_ERROR;
+  }
+
+  //
+  // Open USB Host Controller Protocol by Child
+  //
+  Status = UsbOpenHostProtoByChild (Device->Bus, UsbAssoc->Handle);
+
+  if (EFI_ERROR (Status)) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           UsbAssoc->Handle,
+           &gEfiDevicePathProtocolGuid,
+           UsbAssoc->DevicePath,
+           &gEfiUsbIaProtocolGuid,
+           &UsbAssoc->UsbIa,
+           NULL
+           );
+
+    DEBUG ((DEBUG_ERROR, "UsbCreateAssociation: failed to open host for child - %r\n", Status));
+    goto ON_ERROR;
+  }
+
+  return UsbAssoc;
+
+ON_ERROR:
+  if (UsbAssoc->DevicePath != NULL) {
+    FreePool (UsbAssoc->DevicePath);
+  }
+
+  FreePool (UsbAssoc);
   return NULL;
 }
 
@@ -237,6 +482,41 @@ UsbCreateDevice (
 }
 
 /**
+  Connect USB controller at TPL_CALLBACK
+
+  This function is called in both UsbIoControlTransfer and
+  the timer callback in hub enumeration. So, at least it is
+  called at TPL_CALLBACK. Some driver sitting on USB has
+  twisted TPL used. It should be no problem for us to connect
+  or disconnect at CALLBACK.
+
+  @param  Handle        Controller handle to be connected
+
+**/
+EFI_STATUS
+UsbConnectController (
+  EFI_HANDLE  Handle
+  )
+{
+  EFI_STATUS  Status;
+  EFI_TPL     OldTpl;
+
+  OldTpl = UsbGetCurrentTpl ();
+  DEBUG ((DEBUG_INFO, "UsbConnectDriver: TPL before connect is %d, %p\n", (UINT32)OldTpl, Handle));
+
+  gBS->RestoreTPL (TPL_CALLBACK);
+
+  Status = gBS->ConnectController (Handle, NULL, NULL, TRUE);
+
+  DEBUG ((DEBUG_INFO, "UsbConnectDriver: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl ()));
+  ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
+
+  gBS->RaiseTPL (OldTpl);
+
+  return Status;
+}
+
+/**
   Connect the USB interface with its driver. EFI USB bus will
   create a USB interface for each separate interface descriptor.
 
@@ -252,7 +532,6 @@ UsbConnectDriver (
   )
 {
   EFI_STATUS  Status;
-  EFI_TPL     OldTpl;
 
   Status = EFI_SUCCESS;
 
@@ -265,29 +544,11 @@ UsbConnectDriver (
     Status = mUsbHubApi.Init (UsbIf);
   } else {
     //
-    // This function is called in both UsbIoControlTransfer and
-    // the timer callback in hub enumeration. So, at least it is
-    // called at TPL_CALLBACK. Some driver sitting on USB has
-    // twisted TPL used. It should be no problem for us to connect
-    // or disconnect at CALLBACK.
-    //
-
-    //
     // Only recursively wanted usb child device
     //
     if (UsbBusIsWantedUsbIO (UsbIf->Device->Bus, UsbIf)) {
-      OldTpl = UsbGetCurrentTpl ();
-      DEBUG ((DEBUG_INFO, "UsbConnectDriver: TPL before connect is %d, %p\n", (UINT32)OldTpl, UsbIf->Handle));
-
-      gBS->RestoreTPL (TPL_CALLBACK);
-
-      Status           = gBS->ConnectController (UsbIf->Handle, NULL, NULL, TRUE);
+      Status           = UsbConnectController (UsbIf->Handle);
       UsbIf->IsManaged = (BOOLEAN) !EFI_ERROR (Status);
-
-      DEBUG ((DEBUG_INFO, "UsbConnectDriver: TPL after connect is %d\n", (UINT32)UsbGetCurrentTpl ()));
-      ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
-
-      gBS->RaiseTPL (OldTpl);
     }
   }
 
@@ -378,6 +639,12 @@ UsbSelectConfig (
   USB_INTERFACE       *UsbIf;
   EFI_STATUS          Status;
   UINT8               Index;
+  USB_ASSOCIATION     *UsbIa;
+
+  ASSERT (Device != NULL);
+  if (Device == NULL) {
+    return EFI_NOT_FOUND;
+  }
 
   //
   // Locate the active config, then set the device's pointer
@@ -393,7 +660,7 @@ UsbSelectConfig (
     }
   }
 
-  if (Index == DevDesc->Desc.NumConfigurations) {
+  if ((Index == DevDesc->Desc.NumConfigurations) || (ConfigDesc == NULL)) {
     return EFI_NOT_FOUND;
   }
 
@@ -405,6 +672,24 @@ UsbSelectConfig (
     ConfigValue,
     Device->Address
     ));
+
+  //
+  // Create interfaces for each USB interface association descriptor.
+  //
+  Device->NumOfAssociation = ConfigDesc->NumOfIads;
+
+  for (Index = 0; Index < ConfigDesc->NumOfIads; Index++) {
+    DEBUG ((DEBUG_INFO, "UsbSelectConfig: process IAD %d\n", Index));
+
+    UsbIa = UsbCreateAssociation (Device, Index, ConfigDesc->Iads[Index]);
+    ASSERT (UsbIa != NULL);
+    if (UsbIa == NULL) {
+      return EFI_NOT_FOUND;
+    }
+
+    ASSERT (Index < USB_MAX_ASSOCIATION);
+    Device->Associations[Index] = UsbIa;
+  }
 
   //
   // Create interfaces for each USB interface descriptor.
@@ -448,7 +733,53 @@ UsbSelectConfig (
 
   Device->NumOfInterface = Index;
 
+  //
+  // Connect association device drivers. Connection may fail if if device driver has been already
+  // started for any UsbIo that belongs to the association.
+  //
+  for (Index = 0; Index < Device->NumOfAssociation; Index++) {
+    Status                                 = gBS->ConnectController (Device->Associations[Index]->Handle, NULL, NULL, TRUE);
+    Device->Associations[Index]->IsManaged = (BOOLEAN) !EFI_ERROR (Status);
+
+    DEBUG ((DEBUG_INFO, "UsbSelectConfig: association driver connect: %r\n", Status));
+  }
+
   return EFI_SUCCESS;
+}
+
+/**
+  Disconnect USB controller at TPL_CALLBACK
+
+  This function is called in both UsbIoControlTransfer and
+  the timer callback in hub enumeration. So, at least it is
+  called at TPL_CALLBACK. Some driver sitting on USB has
+  twisted TPL used. It should be no problem for us to connect
+  or disconnect at CALLBACK.
+
+  @param  Handle        Controller handle to be disconnected
+
+**/
+EFI_STATUS
+UsbDisconnectController (
+  EFI_HANDLE  Handle
+  )
+{
+  EFI_TPL     OldTpl;
+  EFI_STATUS  Status;
+
+  OldTpl = UsbGetCurrentTpl ();
+  DEBUG ((DEBUG_INFO, "UsbDisconnectDriver: old TPL is %d, %p\n", (UINT32)OldTpl, Handle));
+
+  gBS->RestoreTPL (TPL_CALLBACK);
+
+  Status = gBS->DisconnectController (Handle, NULL, NULL);
+
+  DEBUG ((DEBUG_INFO, "UsbDisconnectDriver: TPL after disconnect is %d, %d\n", (UINT32)UsbGetCurrentTpl (), Status));
+  ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
+
+  gBS->RaiseTPL (OldTpl);
+
+  return Status;
 }
 
 /**
@@ -462,7 +793,6 @@ UsbDisconnectDriver (
   IN USB_INTERFACE  *UsbIf
   )
 {
-  EFI_TPL     OldTpl;
   EFI_STATUS  Status;
 
   //
@@ -473,27 +803,11 @@ UsbDisconnectDriver (
   if (UsbIf->IsHub) {
     Status = UsbIf->HubApi->Release (UsbIf);
   } else if (UsbIf->IsManaged) {
-    //
-    // This function is called in both UsbIoControlTransfer and
-    // the timer callback in hub enumeration. So, at least it is
-    // called at TPL_CALLBACK. Some driver sitting on USB has
-    // twisted TPL used. It should be no problem for us to connect
-    // or disconnect at CALLBACK.
-    //
-    OldTpl = UsbGetCurrentTpl ();
-    DEBUG ((DEBUG_INFO, "UsbDisconnectDriver: old TPL is %d, %p\n", (UINT32)OldTpl, UsbIf->Handle));
+    Status = UsbDisconnectController (UsbIf->Handle);
 
-    gBS->RestoreTPL (TPL_CALLBACK);
-
-    Status = gBS->DisconnectController (UsbIf->Handle, NULL, NULL);
     if (!EFI_ERROR (Status)) {
       UsbIf->IsManaged = FALSE;
     }
-
-    DEBUG ((DEBUG_INFO, "UsbDisconnectDriver: TPL after disconnect is %d, %d\n", (UINT32)UsbGetCurrentTpl (), Status));
-    ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
-
-    gBS->RaiseTPL (OldTpl);
   }
 
   return Status;
@@ -510,10 +824,11 @@ UsbRemoveConfig (
   IN USB_DEVICE  *Device
   )
 {
-  USB_INTERFACE  *UsbIf;
-  UINTN          Index;
-  EFI_STATUS     Status;
-  EFI_STATUS     ReturnStatus;
+  USB_INTERFACE    *UsbIf;
+  USB_ASSOCIATION  *UsbIa;
+  UINTN            Index;
+  EFI_STATUS       Status;
+  EFI_STATUS       ReturnStatus;
 
   //
   // Remove each interface of the device
@@ -543,6 +858,35 @@ UsbRemoveConfig (
   }
 
   Device->ActiveConfig = NULL;
+
+  if (EFI_ERROR (ReturnStatus)) {
+    return ReturnStatus;
+  }
+
+  // ReturnStatus is EFI_SUCCESS
+
+  //
+  // Remove each interface association
+  //
+  for (Index = 0; Index < Device->NumOfAssociation; Index++) {
+    UsbIa = Device->Associations[Index];
+
+    Status = UsbDisconnectController (UsbIa->Handle);
+    if (!EFI_ERROR (Status)) {
+      Status = UsbFreeAssociation (UsbIa);
+      DEBUG ((DEBUG_INFO, "UsbRemoveConfig: free association: %r\n", Status));
+      if (EFI_ERROR (Status)) {
+        UsbConnectController (UsbIa->Handle);
+      }
+    }
+
+    if (!EFI_ERROR (Status)) {
+      Device->Associations[Index] = NULL;
+    } else {
+      ReturnStatus = Status;
+    }
+  }
+
   return ReturnStatus;
 }
 

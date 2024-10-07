@@ -11,6 +11,7 @@
 # Copyright (c) 2021 - 2022, Arm Limited. All rights reserved.<BR>
 # Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
 # Copyright (c) 2023, Ampere Computing LLC. All rights reserved.<BR>
+# Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -1590,6 +1591,9 @@
 
   ## Include/Protocol/UsbIo.h
   gEfiUsbIoProtocolGuid          = { 0x2B2F68D6, 0x0CD2, 0x44CF, { 0x8E, 0x8B, 0xBB, 0xA2, 0x0B, 0x1B, 0x5B, 0x75 }}
+
+  ## Include/Protocol/UsbIad.h
+  gEfiUsbIaProtocolGuid          = { 0xf4279fb1, 0xef1e, 0x4346, { 0xab, 0x32, 0x3f, 0xe3, 0x86, 0xee, 0xb4, 0x52 }}
 
   ## Include/Protocol/AcpiTable.h
   gEfiAcpiTableProtocolGuid      = { 0xFFE06BDD, 0x6107, 0x46A6, { 0x7B, 0xB2, 0x5A, 0x9C, 0x7E, 0xC5, 0x27, 0x5C }}
