@@ -98,10 +98,11 @@
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection|0x00000001|UINT8|0x4000000A
 
   #
-  ## These are the base address of FSP-M/S
+  ## These are the base address of FSP-M/S/I
   #
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00001000
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00001001
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiBaseAddress|0x00000000|UINT32|0x00001002
   #
   # To provide flexibility for platform to pre-allocate FSP UPD buffer
   #
