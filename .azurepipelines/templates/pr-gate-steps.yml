@@ -32,6 +32,11 @@ steps:
     architecture: "x64"
   condition: ne('${{ parameters.usePythonVersion }}', '')
 
+- bash: |
+    echo "----------"
+    echo "ID : $(id)"
+    echo "----------"
+
 - script: pip install -r pip-requirements.txt --upgrade
   displayName: 'Install/Upgrade pip modules'
 
