@@ -30,20 +30,33 @@
   PeimEntryPoint
   PeiServicesLib
   PeiServicesTablePointerLib
+  BaseMemoryLib
+  TimerLib
   DebugLib
+  HobLib
   MemoryAllocationLib
+  FspWrapperPlatformLib
+  FspWrapperHobProcessLib
+  PerformanceLib
+  FspWrapperApiLib
+  FspWrapperApiTestLib
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
   IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
 
 [Ppis]
 
 [Pcd]
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspiBaseAddress       ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection      ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiUpdDataAddress    ## CONSUMES
 
 [Guids]
+  gFspHobGuid                           ## CONSUMES ## HOB
+  gFspApiPerformanceGuid                ## SOMETIMES_CONSUMES ## GUID
 
 [Sources]
   FspiWrapperPeim.c

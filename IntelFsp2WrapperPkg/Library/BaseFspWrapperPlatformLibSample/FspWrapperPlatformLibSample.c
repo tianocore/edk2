@@ -95,3 +95,17 @@ CallFspWrapperResetSystem (
 
   CpuDeadLoop ();
 }
+
+/**
+  This function overrides the default configurations in the FSP-I UPD data region.
+
+  @param[in,out] FspUpdRgnPtr   A pointer to the UPD data region data structure.
+
+**/
+VOID
+EFIAPI
+UpdateFspiUpdData (
+  IN OUT VOID  *FspUpdRgnPtr
+  )
+{
+}
