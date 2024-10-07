@@ -30,14 +30,20 @@
   PeimEntryPoint
   PeiServicesLib
   PeiServicesTablePointerLib
+  DebugLib
+  MemoryAllocationLib
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
 
 [Ppis]
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid    ## PRODUCES
 
 [Pcd]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiBaseAddress       ## CONSUMES
 
 [Guids]
 
@@ -45,4 +51,4 @@
   FspiWrapperPeim.c
 
 [Depex]
-  TRUE
+  gEfiPeiMemoryDiscoveredPpiGuid
