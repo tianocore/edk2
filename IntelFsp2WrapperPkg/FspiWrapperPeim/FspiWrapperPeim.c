@@ -10,7 +10,37 @@
 
 #include <PiPei.h>
 #include <Library/PeimEntryPoint.h>
+#include <Library/PeiServicesLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
+
+/**
+  Do FSP SMM initialization in Dispatch mode.
+
+  @retval FSP SMM initialization status.
+**/
+EFI_STATUS
+EFIAPI
+FspiWrapperInitDispatchMode (
+  VOID
+  )
+{
+
+  //
+  // FSP-I Wrapper running in Dispatch mode and reports FSP-I FV to PEI dispatcher.
+  //
+  PeiServicesInstallFvInfoPpi (
+    &((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspiBaseAddress))->FileSystemGuid,
+    (VOID *)(UINTN)PcdGet32 (PcdFspiBaseAddress),
+    (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspiBaseAddress))->FvLength,
+    NULL,
+    NULL
+    );
+
+  return EFI_SUCCESS;
+}
 
 /**
   This is the entrypoint of PEIM.
@@ -27,6 +57,11 @@ FspiWrapperPeimEntryPoint (
   IN CONST EFI_PEI_SERVICES     **PeiServices
   )
 {
+  EFI_STATUS  Status;
 
-  return EFI_SUCCESS;
+  DEBUG ((DEBUG_INFO, "FspiWrapperPeimEntryPoint\n"));
+
+  Status = FspiWrapperInitDispatchMode ();
+
+  return Status;
 }
