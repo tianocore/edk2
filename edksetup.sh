@@ -103,14 +103,22 @@ SetupEnv()
   fi
 }
 
-SetupPython3()
+SetupPythonCommand()
 {
+  #
+  # If PYTHON_COMMAND is already set, then we can return right now
+  #
+  if [ -n "$PYTHON_COMMAND" ]
+  then
+    return 0
+  fi
+
   export PYTHON_COMMAND=python3
 }
 
 SourceEnv()
 {
-  SetupPython3
+  SetupPythonCommand
   SetWorkspace
   SetupEnv
 }
