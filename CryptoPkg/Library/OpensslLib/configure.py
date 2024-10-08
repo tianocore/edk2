@@ -95,6 +95,9 @@ def openssl_configure(openssldir, target, ec = True):
     ]
     if not ec:
         cmdline += [ 'no-ec', ]
+    else:
+        cmdline.remove('no-camellia')
+        cmdline.remove('no-cmac')
     print('')
     print(f'# -*-  configure openssl for {target} (ec={ec})  -*-')
     rc = subprocess.run(cmdline, cwd = openssldir,
