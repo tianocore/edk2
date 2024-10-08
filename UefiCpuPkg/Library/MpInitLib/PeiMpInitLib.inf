@@ -87,7 +87,6 @@
   gEdkiiPeiShadowMicrocodePpiGuid        ## SOMETIMES_CONSUMES
 
 [Guids]
-  gEdkiiS3SmmInitDoneGuid
   gEdkiiMicrocodePatchHobGuid
   gGhcbApicIdsGuid                       ## SOMETIMES_CONSUMES
   gEdkiiEndOfS3ResumeGuid
