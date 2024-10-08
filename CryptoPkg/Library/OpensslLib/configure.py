@@ -24,11 +24,9 @@ def openssl_configure(openssldir, target, ec = True):
         'no-autoload-config',
         'no-bf',
         'no-blake2',
-        'no-camellia',
         'no-capieng',
         'no-cast',
         'no-chacha',
-        'no-cmac',
         'no-cmp',
         'no-cms',
         'no-ct',
@@ -94,7 +92,7 @@ def openssl_configure(openssldir, target, ec = True):
         'disable-legacy',
     ]
     if not ec:
-        cmdline += [ 'no-ec', ]
+        cmdline += [ 'no-ec', 'no-camellia', 'no-cmac' ]
     print('')
     print(f'# -*-  configure openssl for {target} (ec={ec})  -*-')
     rc = subprocess.run(cmdline, cwd = openssldir,
