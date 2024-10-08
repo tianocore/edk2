@@ -3891,6 +3891,10 @@ InternalShellIsHexOrDecimalNumber (
     Hex = FALSE;
   }
 
+  if ((*String == CHAR_NULL) && LeadingZero) {
+    return (TRUE);
+  }
+
   //
   // loop through the remaining characters and use the lib function
   //
@@ -4006,9 +4010,10 @@ InternalShellStrHexToUint64 (
   IN CONST BOOLEAN  StopAtSpace
   )
 {
-  UINT64  Result;
+  UINT64   Result;
+  BOOLEAN  LeadingZero;
 
-  if ((String == NULL) || (StrSize (String) == 0) || (Value == NULL)) {
+  if ((String == NULL) || (*String == CHAR_NULL) || (Value == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -4022,12 +4027,14 @@ InternalShellStrHexToUint64 (
   //
   // Ignore leading Zeros after the spaces
   //
+  LeadingZero = FALSE;
   while (*String == L'0') {
     String++;
+    LeadingZero = TRUE;
   }
 
   if (CharToUpper (*String) == L'X') {
-    if (*(String - 1) != L'0') {
+    if (!LeadingZero) {
       return 0;
     }
 
@@ -4035,16 +4042,16 @@ InternalShellStrHexToUint64 (
     // Skip the 'X'
     //
     String++;
+
+    //
+    // there is a space where there should't be
+    //
+    if (*String == L' ') {
+      return (EFI_INVALID_PARAMETER);
+    }
   }
 
   Result = 0;
-
-  //
-  // there is a space where there should't be
-  //
-  if (*String == L' ') {
-    return (EFI_INVALID_PARAMETER);
-  }
 
   while (ShellIsHexaDecimalDigitCharacter (*String)) {
     //
@@ -4110,7 +4117,7 @@ InternalShellStrDecimalToUint64 (
 {
   UINT64  Result;
 
-  if ((String == NULL) || (StrSize (String) == 0) || (Value == NULL)) {
+  if ((String == NULL) || (*String == CHAR_NULL) || (Value == NULL)) {
     return (EFI_INVALID_PARAMETER);
   }
 
@@ -4232,7 +4239,7 @@ ShellConvertStringToUint64 (
     return (EFI_NOT_FOUND);
   }
 
-  if (Value != NULL) {
+  if ((Value != NULL) && !EFI_ERROR (Status)) {
     *Value = RetVal;
   }
 
