@@ -20,6 +20,56 @@
   is returned.
 
   @param   Pages                 The number of 4 KB pages to allocate.
+  @param   MemoryType            The MemoryType
+  @return  A pointer to the allocated buffer or NULL if allocation fails.
+**/
+VOID *
+EFIAPI
+PayloadAllocatePages (
+  IN UINTN            Pages,
+  IN EFI_MEMORY_TYPE  MemoryType
+  )
+{
+  EFI_PEI_HOB_POINTERS        Hob;
+  EFI_PHYSICAL_ADDRESS        Offset;
+  EFI_HOB_HANDOFF_INFO_TABLE  *HobTable;
+
+  Hob.Raw  = GetHobList ();
+  HobTable = Hob.HandoffInformationTable;
+
+  if (Pages == 0) {
+    return NULL;
+  }
+
+  // Make sure allocation address is page alligned.
+  Offset = HobTable->EfiFreeMemoryTop & EFI_PAGE_MASK;
+  if (Offset != 0) {
+    HobTable->EfiFreeMemoryTop -= Offset;
+  }
+
+  //
+  // Check available memory for the allocation
+  //
+  if (HobTable->EfiFreeMemoryTop - ((Pages * EFI_PAGE_SIZE) + sizeof (EFI_HOB_MEMORY_ALLOCATION)) < HobTable->EfiFreeMemoryBottom) {
+    return NULL;
+  }
+
+  HobTable->EfiFreeMemoryTop -= Pages * EFI_PAGE_SIZE;
+  BuildMemoryAllocationHob (HobTable->EfiFreeMemoryTop, Pages * EFI_PAGE_SIZE, MemoryType);
+
+  return (VOID *)(UINTN)HobTable->EfiFreeMemoryTop;
+}
+
+/**
+  Allocates one or more pages of type EfiBootServicesData.
+
+  Allocates the number of pages of MemoryType and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a 4KB boundary.
+  If Pages is 0, then NULL is returned.
+  If there is not enough memory availble to satisfy the request, then NULL
+  is returned.
+
+  @param   Pages                 The number of 4 KB pages to allocate.
   @return  A pointer to the allocated buffer or NULL if allocation fails.
 **/
 VOID *
@@ -39,7 +89,7 @@ AllocatePages (
     return NULL;
   }
 
-  // Make sure allocation address is page alligned.
+  // Make sure allocation address is page aligned.
   Offset = HobTable->EfiFreeMemoryTop & EFI_PAGE_MASK;
   if (Offset != 0) {
     HobTable->EfiFreeMemoryTop -= Offset;

@@ -2,6 +2,8 @@
   Definition of Redfish Credential DXE driver.
 
   (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2024 American Megatrends International LLC<BR>
+  Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -10,7 +12,8 @@
 #ifndef EDKII_REDFISH_CREDENTIAL_DXE_H_
 #define EDKII_REDFISH_CREDENTIAL_DXE_H_
 
-#include <Protocol/EdkIIRedfishCredential.h>
+#include <RedfishCommon.h>
+#include <Protocol/EdkIIRedfishCredential2.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -18,60 +21,36 @@
 #include <Library/RedfishCredentialLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/RedfishHttpLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/RedfishDebugLib.h>
 
-/**
-  Retrieve platform's Redfish authentication information.
+#define REDFISH_CREDENTIAL_DEBUG                DEBUG_VERBOSE
+#define REDFISH_MANAGER_ACCOUNT_COLLECTION_URI  L"AccountService/Accounts"
+#define REDFISH_URI_LENGTH                      128
 
-  This functions returns the Redfish authentication method together with the user Id and
-  password.
-  - For AuthMethodNone, the UserId and Password could be used for HTTP header authentication
-    as defined by RFC7235.
-  - For AuthMethodRedfishSession, the UserId and Password could be used for Redfish
-    session login as defined by  Redfish API specification (DSP0266).
+///
+/// Definition of REDFISH_SERVICE_LIST
+///
+typedef struct {
+  LIST_ENTRY         NextInstance;
+  REDFISH_SERVICE    RedfishService;
+} REDFISH_SERVICE_LIST;
 
-  Callers are responsible for and freeing the returned string storage.
-
-  @param[in]   This                Pointer to EDKII_REDFISH_CREDENTIAL_PROTOCOL instance.
-  @param[out]  AuthMethod          Type of Redfish authentication method.
-  @param[out]  UserId              The pointer to store the returned UserId string.
-  @param[out]  Password            The pointer to store the returned Password string.
-
-  @retval EFI_SUCCESS              Get the authentication information successfully.
-  @retval EFI_ACCESS_DENIED        SecureBoot is disabled after EndOfDxe.
-  @retval EFI_INVALID_PARAMETER    This or AuthMethod or UserId or Password is NULL.
-  @retval EFI_OUT_OF_RESOURCES     There are not enough memory resources.
-  @retval EFI_UNSUPPORTED          Unsupported authentication method is found.
-
-**/
-EFI_STATUS
-EFIAPI
-RedfishCredentialGetAuthInfo (
-  IN  EDKII_REDFISH_CREDENTIAL_PROTOCOL  *This,
-  OUT EDKII_REDFISH_AUTH_METHOD          *AuthMethod,
-  OUT CHAR8                              **UserId,
-  OUT CHAR8                              **Password
-  );
-
-/**
-  Notify the Redfish service provide to stop provide configuration service to this platform.
-
-  This function should be called when the platfrom is about to leave the safe environment.
-  It will notify the Redfish service provider to abort all logined session, and prohibit
-  further login with original auth info. GetAuthInfo() will return EFI_UNSUPPORTED once this
-  function is returned.
-
-  @param[in]   This                Pointer to EDKII_REDFISH_CREDENTIAL_PROTOCOL instance.
-
-  @retval EFI_SUCCESS              Service has been stoped successfully.
-  @retval EFI_INVALID_PARAMETER    This is NULL.
-  @retval Others                   Some error happened.
-
-**/
-EFI_STATUS
-EFIAPI
-RedfishCredentialStopService (
-  IN     EDKII_REDFISH_CREDENTIAL_PROTOCOL           *This,
-  IN     EDKII_REDFISH_CREDENTIAL_STOP_SERVICE_TYPE  ServiceStopType
-  );
+//
+// Definitions of REDFISH_BOOTSTRAP_ACCOUNT_PRIVATE
+//
+typedef struct {
+  EFI_HANDLE                            Handle;
+  EFI_EVENT                             EndOfDxeEvent;
+  EFI_EVENT                             ExitBootServiceEvent;
+  EDKII_REDFISH_AUTH_METHOD             AuthMethod;
+  CHAR8                                 *AccountName;
+  EDKII_REDFISH_CREDENTIAL_PROTOCOL     RedfishCredentialProtocol;
+  EDKII_REDFISH_CREDENTIAL2_PROTOCOL    RedfishCredential2Protocol;
+  LIST_ENTRY                            RedfishServiceList;
+} REDFISH_CREDENTIAL_PRIVATE;
 
 #endif

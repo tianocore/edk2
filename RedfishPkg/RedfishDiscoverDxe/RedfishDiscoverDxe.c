@@ -570,9 +570,9 @@ DiscoverRedfishHostInterface (
     }
 
     if (MacCompareStatus != 0) {
-      DEBUG ((DEBUG_ERROR, "%a: MAC address is not matched.\n", __func__));
+      DEBUG ((DEBUG_MANAGEABILITY, "%a: MAC address is not matched.\n", __func__));
       DEBUG ((
-        DEBUG_ERROR,
+        DEBUG_MANAGEABILITY,
         "    NetworkInterface: %02x %02x %02x %02x %02x %02x.\n",
         Instance->NetworkInterface->MacAddress.Addr[0],
         Instance->NetworkInterface->MacAddress.Addr[1],
@@ -582,7 +582,7 @@ DiscoverRedfishHostInterface (
         Instance->NetworkInterface->MacAddress.Addr[5]
         ));
       DEBUG ((
-        DEBUG_ERROR,
+        DEBUG_MANAGEABILITY,
         "    Redfish Host interface: %02x %02x %02x %02x %02x %02x.\n",
         DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress[0],
         DeviceDescriptor->DeviceDescriptor.UsbDeviceV2.MacAddress[1],
@@ -1559,7 +1559,7 @@ RedfishServiceAcquireService (
           FreePool ((VOID *)Instance);
         }
 
-        DEBUG ((DEBUG_ERROR, "%a:Something wrong on Redfish service discovery Status1=%r.\n", __func__, Status1));
+        DEBUG ((DEBUG_MANAGEABILITY, "%a:Something wrong on Redfish service discovery Status1=%r.\n", __func__, Status1));
       } else {
         if (NewInstance) {
           InsertTailList (&mRedfishDiscoverList, &Instance->Entry);
@@ -1855,6 +1855,7 @@ BuildupNetworkInterface (
   ListCount                    = (sizeof (mRequiredProtocol) / sizeof (REDFISH_DISCOVER_REQUIRED_PROTOCOL));
   NewNetworkInterfaceInstalled = FALSE;
   Index                        = 0;
+  RestExInstance               = NULL;
 
   for (Index = 0; Index < ListCount; Index++) {
     Status = gBS->OpenProtocol (

@@ -5,6 +5,7 @@
 #  Copyright (c) 2009 - 2022, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2020, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
 #  Copyright (c) 2022, Loongson Technology Corporation Limited. All rights reserved.<BR>
+#  Copyright (c) 2023, Arm Limited. All rights reserved.<BR>
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -116,16 +117,6 @@
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-  #
-  # It is not possible to prevent the ARM compiler for generic intrinsic functions.
-  # This library provides the instrinsic functions generate by a given compiler.
-  # [LibraryClasses.ARM, LibraryClasses.AARCH64] and NULL mean link this library
-  # into all ARM and AARCH64 images.
-  #
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-  # Add support for stack protector
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 [LibraryClasses.ARM]
   ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
@@ -133,6 +124,8 @@
 [LibraryClasses.common.SEC]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
   TlsLib|CryptoPkg/Library/TlsLibNull/TlsLibNull.inf
+  # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.common.PEIM]
   PeimEntryPoint|MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
@@ -327,7 +320,7 @@
       MSFT:NOOPT_*_*_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /BASE:0x10000
   }
 
-[Components.IA32, Components.X64]
+[Components.IA32, Components.X64, Components.AARCH64]
   CryptoPkg/Test/UnitTest/Library/BaseCryptLib/TestBaseCryptLibShell.inf {
     <Defines>
       FILE_GUID = B91B9A95-4D52-4501-A98F-A1711C14ED93
@@ -379,6 +372,7 @@
   CryptoPkg/Library/OpensslLib/OpensslLibCrypto.inf
   CryptoPkg/Library/OpensslLib/OpensslLib.inf
   CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
+  CryptoPkg/Library/OpensslLib/OpensslLibSm3.inf
   CryptoPkg/Library/BaseHashApiLib/BaseHashApiLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/PeiCryptLib.inf
   CryptoPkg/Library/BaseCryptLibOnProtocolPpi/DxeCryptLib.inf
@@ -396,9 +390,9 @@
       TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
   }
 
-[Components.IA32, Components.X64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
-  # Build verification of IA32/X64 specific libraries
+  # Build verification of IA32/X64/AARCH64 specific libraries
   #
   CryptoPkg/Library/OpensslLib/OpensslLibAccel.inf
   CryptoPkg/Library/OpensslLib/OpensslLibFullAccel.inf
@@ -439,9 +433,9 @@
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
   }
 
-[Components.IA32, Components.X64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
-  # CryptoPei with IA32/X64 performance optimized OpensslLib instance without EC services
+  # CryptoPei with IA32/X64/AARCH64 performance optimized OpensslLib instance without EC services
   # IA32/X64 assembly optimizations required larger alignments
   #
   CryptoPkg/Driver/CryptoPei.inf {
@@ -455,7 +449,7 @@
   }
 
   #
-  # CryptoPei with IA32/X64 performance optimized OpensslLib instance all services
+  # CryptoPei with IA32/X64/AARCH64 performance optimized OpensslLib instance all services
   # IA32/X64 assembly optimizations required larger alignments
   #
   CryptoPkg/Driver/CryptoPei.inf {
@@ -505,9 +499,9 @@
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
   }
 
-[Components.IA32, Components.X64]
+[Components.IA32, Components.X64, Components.AARCH64]
   #
-  # CryptoDxe with IA32/X64 performance optimized OpensslLib instance with no EC services
+  # CryptoDxe with IA32/X64/AARCH64 performance optimized OpensslLib instance with no EC services
   # with TLS feature enabled.
   # IA32/X64 assembly optimizations required larger alignments
   #
@@ -521,7 +515,7 @@
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
   }
   #
-  # CryptoDxe with IA32/X64 performance optimized OpensslLib instance with all services.
+  # CryptoDxe with IA32/X64/AARCH64 performance optimized OpensslLib instance with all services.
   # IA32/X64 assembly optimizations required larger alignments
   #
   CryptoPkg/Driver/CryptoDxe.inf {
@@ -561,7 +555,7 @@
       OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLibFull.inf
   }
   #
-  # CryptoSmm with IA32/X64 performance optimized OpensslLib instance with no EC services
+  # CryptoSmm with IA32/X64/AARCH64 performance optimized OpensslLib instance with no EC services
   # IA32/X64 assembly optimizations required larger alignments
   #
   CryptoPkg/Driver/CryptoSmm.inf {
@@ -574,7 +568,7 @@
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:256
   }
   #
-  # CryptoSmm with IA32/X64 performance optimized OpensslLib instance with all services
+  # CryptoSmm with IA32/X64/AARCH64 performance optimized OpensslLib instance with all services
   # IA32/X64 assembly optimizations required larger alignments
   #
   CryptoPkg/Driver/CryptoSmm.inf {

@@ -1216,8 +1216,8 @@ AnsiRawDataToUnicode (
 Putty function key map:
   +=========+======+===========+=============+=============+=============+=========+
   |         | EFI  |           |             |             |             |         |
-  |         | Scan |           |             |  Normal     |             |         |
-  |   KEY   | Code |  VT100+   | Xterm R6    |  VT400      | Linux       | SCO     |
+  |         | Scan |  VT100+   |             |  Normal     |             |         |
+  |   KEY   | Code |  VTUTF8   | Xterm R6    |  VT400      | Linux       | SCO     |
   +=========+======+===========+=============+=============+=============+=========+
   | F1      | 0x0B | ESC O P   | ESC O P     | ESC [ 1 1 ~ | ESC [ [ A   | ESC [ M |
   | F2      | 0x0C | ESC O Q   | ESC O Q     | ESC [ 1 2 ~ | ESC [ [ B   | ESC [ N |

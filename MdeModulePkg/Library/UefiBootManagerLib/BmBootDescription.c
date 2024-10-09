@@ -17,6 +17,64 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 CONST UINT16  mBmUsbLangId    = 0x0409; // English
 CHAR16        mBmUefiPrefix[] = L"UEFI ";
 
+CHAR16  mBootDescGenericManufacturer[] = L"Generic";
+CHAR16  mBootDescSd[]                  = L"SD Device";
+CHAR16  mBootDescEmmc[]                = L"eMMC Device";
+CHAR16  mBootDescEmmcUserData[]        = L"eMMC User Data";
+CHAR16  mBootDescEmmcBoot1[]           = L"eMMC Boot 1";
+CHAR16  mBootDescEmmcBoot2[]           = L"eMMC Boot 2";
+CHAR16  mBootDescEmmcGp1[]             = L"eMMC GP 1";
+CHAR16  mBootDescEmmcGp2[]             = L"eMMC GP 2";
+CHAR16  mBootDescEmmcGp3[]             = L"eMMC GP 3";
+CHAR16  mBootDescEmmcGp4[]             = L"eMMC GP 4";
+
+typedef struct {
+  UINT8     Id;
+  CHAR16    *Name;
+} BM_SDMMC_MANUFACTURER;
+
+BM_SDMMC_MANUFACTURER  mSdManufacturers[] = {
+  { 0x01, L"Panasonic"               },
+  { 0x02, L"Toshiba/Kingston/Viking" },
+  { 0x03, L"SanDisk"                 },
+  { 0x08, L"Silicon Power"           },
+  { 0x18, L"Infineon"                },
+  { 0x1b, L"Transcend/Samsung"       },
+  { 0x1c, L"Transcend"               },
+  { 0x1d, L"Corsair/AData"           },
+  { 0x1e, L"Transcend"               },
+  { 0x1f, L"Kingston"                },
+  { 0x27, L"Delkin/Phison"           },
+  { 0x28, L"Lexar"                   },
+  { 0x30, L"SanDisk"                 },
+  { 0x31, L"Silicon Power"           },
+  { 0x33, L"STMicroelectronics"      },
+  { 0x41, L"Kingston"                },
+  { 0x6f, L"STMicroelectronics"      },
+  { 0x74, L"Transcend"               },
+  { 0x76, L"Patriot"                 },
+  { 0x82, L"Gobe/Sony"               },
+  { 0x9c, L"Angelbird/Hoodman"       },
+};
+
+BM_SDMMC_MANUFACTURER  mMmcManufacturers[] = {
+  { 0x00, L"SanDisk"          },
+  { 0x02, L"Kingston/SanDisk" },
+  { 0x03, L"Toshiba"          },
+  { 0x11, L"Toshiba"          },
+  { 0x13, L"Micron"           },
+  { 0x15, L"Samsung"          },
+  { 0x37, L"KingMax"          },
+  { 0x44, L"ATP"              },
+  { 0x45, L"SanDisk"          },
+  { 0x2c, L"Kingston"         },
+  { 0x70, L"Kingston"         },
+  { 0x88, L"Foresee"          },
+  { 0x9b, L"YMTC"             },
+  { 0xd6, L"Foresee"          },
+  { 0xfe, L"Micron"           },
+};
+
 LIST_ENTRY  mPlatformBootDescriptionHandlers = INITIALIZE_LIST_HEAD_VARIABLE (mPlatformBootDescriptionHandlers);
 
 /**
@@ -128,6 +186,150 @@ BmEliminateExtraSpaces (
 }
 
 /**
+  Swap a byte array.
+
+  @param    Source     Input byte array.
+  @param    Length     The size of Source in bytes.
+**/
+VOID
+BmSwapBytes (
+  IN UINT8  *Source,
+  IN UINTN  Length
+  )
+{
+  UINTN  Index;
+  UINT8  Temp;
+  UINTN  Count;
+
+  Count = Length / 2;
+  for (Index = 0; Index < Count; ++Index) {
+    Temp                       = Source[Index];
+    Source[Index]              = Source[Length - 1 - Index];
+    Source[Length - 1 - Index] = Temp;
+  }
+}
+
+/**
+  Get the SD/MMC manufacturer name from an ID.
+
+  @param    Id         Manufacturer ID.
+  @param    IsMmc      Boolean indicating whether the ID is for SD or eMMC.
+
+  @return  The manufacturer string.
+**/
+CHAR16 *
+BmGetSdMmcManufacturerName (
+  IN UINT8    Id,
+  IN BOOLEAN  IsMmc
+  )
+{
+  BM_SDMMC_MANUFACTURER  *List;
+  UINT8                  Count;
+  UINTN                  Index;
+
+  List  = IsMmc ? mMmcManufacturers : mSdManufacturers;
+  Count = IsMmc ? ARRAY_SIZE (mMmcManufacturers)
+                : ARRAY_SIZE (mSdManufacturers);
+
+  for (Index = 0; Index < Count; ++Index) {
+    if (List[Index].Id == Id) {
+      return List[Index].Name;
+    }
+  }
+
+  return mBootDescGenericManufacturer;
+}
+
+/**
+  Get the eMMC partition type from a controller path.
+
+  @param    DevicePath       Pointer to a CONTROLLER_DEVICE_PATH.
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetEmmcTypeDescription (
+  CONTROLLER_DEVICE_PATH  *DevicePath
+  )
+{
+  switch (DevicePath->ControllerNumber) {
+    case EmmcPartitionUserData:
+      return mBootDescEmmcUserData;
+    case EmmcPartitionBoot1:
+      return mBootDescEmmcBoot1;
+    case EmmcPartitionBoot2:
+      return mBootDescEmmcBoot2;
+    case EmmcPartitionGP1:
+      return mBootDescEmmcGp1;
+    case EmmcPartitionGP2:
+      return mBootDescEmmcGp2;
+    case EmmcPartitionGP3:
+      return mBootDescEmmcGp3;
+    case EmmcPartitionGP4:
+      return mBootDescEmmcGp4;
+    default:
+      break;
+  }
+
+  return mBootDescEmmc;
+}
+
+/**
+  Get an SD/MMC boot description.
+
+  @param    ManufacturerName           Manufacturer name string.
+  @param    ProductName                Product name from CID.
+  @param    ProductNameLength          Length of ProductName.
+  @param    SerialNumber               Serial number from CID.
+  @param    DeviceType                 Device type string (e.g. SD or an eMMC partition).
+
+  @return  The description string.
+**/
+CHAR16 *
+BmGetSdMmcDescription (
+  IN CHAR16  *ManufacturerName,
+  IN UINT8   *ProductName,
+  IN UINT8   ProductNameLength,
+  IN UINT8   SerialNumber[4],
+  IN CHAR16  *DeviceType
+  )
+{
+  CHAR16  *Desc;
+  UINTN   DescSize;
+
+  DescSize = StrSize (ManufacturerName) - sizeof (CHAR16)             // "Samsung"
+             + sizeof (CHAR16)                                        // " "
+             + ProductNameLength * sizeof (CHAR16)                    // "BJTD4R"
+             + sizeof (CHAR16)                                        // " "
+             + sizeof (UINT32) * 2 * sizeof (CHAR16)                  // "00000000"
+             + sizeof (CHAR16)                                        // " "
+             + StrSize (DeviceType);                                  // "eMMC User Data\0"
+
+  Desc = AllocateZeroPool (DescSize);
+  if (Desc == NULL) {
+    return NULL;
+  }
+
+  BmSwapBytes (ProductName, ProductNameLength);
+
+  UnicodeSPrint (
+    Desc,
+    DescSize,
+    L"%s %.*a %02x%02x%02x%02x %s",
+    ManufacturerName,
+    ProductNameLength,
+    ProductName,
+    SerialNumber[0],
+    SerialNumber[1],
+    SerialNumber[2],
+    SerialNumber[3],
+    DeviceType
+    );
+
+  return Desc;
+}
+
+/**
   Try to get the controller's ATA/ATAPI description.
 
   @param Handle                Controller handle.
@@ -145,6 +347,8 @@ BmGetDescriptionFromDiskInfo (
   UINT32                    BufferSize;
   EFI_ATAPI_IDENTIFY_DATA   IdentifyData;
   EFI_SCSI_INQUIRY_DATA     InquiryData;
+  SD_CID                    SdCid;
+  EMMC_CID                  EmmcCid;
   CHAR16                    *Description;
   UINTN                     Length;
   CONST UINTN               ModelNameLength    = 40;
@@ -245,9 +449,40 @@ BmGetDescriptionFromDiskInfo (
     }
 
     if (DevicePathSubType (DevicePath) == MSG_SD_DP) {
-      Description = L"SD Device";
+      BufferSize = sizeof (SD_CID);
+      Status     = DiskInfo->Inquiry (DiskInfo, &SdCid, &BufferSize);
+      if (EFI_ERROR (Status)) {
+        return NULL;
+      }
+
+      Description = BmGetSdMmcDescription (
+                      BmGetSdMmcManufacturerName (SdCid.ManufacturerId, FALSE),
+                      SdCid.ProductName,
+                      ARRAY_SIZE (SdCid.ProductName),
+                      SdCid.ProductSerialNumber,
+                      mBootDescSd
+                      );
     } else if (DevicePathSubType (DevicePath) == MSG_EMMC_DP) {
-      Description = L"eMMC Device";
+      BufferSize = sizeof (EMMC_CID);
+      Status     = DiskInfo->Inquiry (DiskInfo, &EmmcCid, &BufferSize);
+      if (EFI_ERROR (Status)) {
+        return NULL;
+      }
+
+      Description = mBootDescEmmc;
+
+      DevicePath = NextDevicePathNode (DevicePath);
+      if (DevicePath->SubType == HW_CONTROLLER_DP) {
+        Description = BmGetEmmcTypeDescription ((CONTROLLER_DEVICE_PATH *)DevicePath);
+      }
+
+      Description = BmGetSdMmcDescription (
+                      BmGetSdMmcManufacturerName (EmmcCid.ManufacturerId, TRUE),
+                      EmmcCid.ProductName,
+                      ARRAY_SIZE (EmmcCid.ProductName),
+                      EmmcCid.ProductSerialNumber,
+                      Description
+                      );
     } else {
       return NULL;
     }

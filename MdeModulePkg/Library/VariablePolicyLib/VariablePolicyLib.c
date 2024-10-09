@@ -178,7 +178,7 @@ IsValidVariablePolicyStructure (
     WildcardCount = 0;
     while (*CheckChar != CHAR_NULL) {
       // Make sure there aren't excessive wildcards.
-      if (*CheckChar == '#') {
+      if (*CheckChar == L'#') {
         WildcardCount++;
         if (WildcardCount > MATCH_PRIORITY_MIN) {
           return FALSE;
@@ -263,7 +263,7 @@ EvaluatePolicyMatch (
   // Keep going until the end of both strings.
   while (PolicyName[Index] != CHAR_NULL || VariableName[Index] != CHAR_NULL) {
     // If we don't have a match...
-    if ((PolicyName[Index] != VariableName[Index]) || (PolicyName[Index] == '#')) {
+    if ((PolicyName[Index] != VariableName[Index]) || (PolicyName[Index] == L'#')) {
       // If this is a numerical wildcard, we can consider
       // it a match if we alter the priority.
       if ((PolicyName[Index] == L'#') &&
@@ -918,7 +918,7 @@ GetLockOnVariableStateVariablePolicyInfo (
     LocalLockOnVarStatePolicy = (VARIABLE_LOCK_ON_VAR_STATE_POLICY *)(MatchPolicy + 1);
     CopyMem (VariablePolicy, LocalLockOnVarStatePolicy, sizeof (*LocalLockOnVarStatePolicy));
 
-    if ((VariableLockPolicyVariableNameBufferSize == NULL)) {
+    if (VariableLockPolicyVariableNameBufferSize == NULL) {
       if (VariableLockPolicyVariableName != NULL) {
         return EFI_INVALID_PARAMETER;
       }

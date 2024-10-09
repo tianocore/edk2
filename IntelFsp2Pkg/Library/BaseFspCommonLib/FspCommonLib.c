@@ -15,21 +15,14 @@
 
 #pragma pack(1)
 
-//
-//   API Parameter                +0x34
-//   API return address           +0x30
-//
-//   push    FspInfoHeader        +0x2C
-//   pushfd                       +0x28
-//   cli
-//   pushad                       +0x24
-//   sub     esp, 8               +0x00
-//   sidt    fword ptr [esp]
-//
 typedef struct {
   UINT16    IdtrLimit;
   UINT32    IdtrBase;
   UINT16    Reserved;
+  UINT32    Cr0;
+  UINT32    Cr3;
+  UINT32    Cr4;
+  UINT32    Efer;           // lower 32-bit of EFER since only NXE bit (BIT11) need to be restored.
   UINT32    Registers[8];   // General Purpose Registers: Edi, Esi, Ebp, Esp, Ebx, Edx, Ecx and Eax
   UINT16    Flags[2];
   UINT32    FspInfoHeader;
@@ -37,20 +30,12 @@ typedef struct {
   UINT32    ApiParam[2];
 } CONTEXT_STACK;
 
-//
-//   API return address           +0xB8
-//   Reserved                     +0xB0
-//   push    API Parameter2       +0xA8
-//   push    API Parameter1       +0xA0
-//   push    FspInfoHeader        +0x98
-//   pushfq                       +0x90
-//   cli
-//   PUSHA_64                     +0x10
-//   sub     rsp, 16              +0x00
-//   sidt    [rsp]
-//
 typedef struct {
   UINT64    Idtr[2];        // IDTR Limit - bit0:bi15, IDTR Base - bit16:bit79
+  UINT64    Cr0;
+  UINT64    Cr3;
+  UINT64    Cr4;
+  UINT64    Efer;
   UINT64    Registers[16];  // General Purpose Registers: RDI, RSI, RBP, RSP, RBX, RDX, RCX, RAX, and R15 to R8
   UINT32    Flags[2];
   UINT64    FspInfoHeader;
@@ -89,10 +74,10 @@ GetFspGlobalDataPointer (
   VOID
   )
 {
-  FSP_GLOBAL_DATA  *FspData;
+  UINT32  FspDataAddress;
 
-  FspData = *(FSP_GLOBAL_DATA  **)(UINTN)PcdGet32 (PcdGlobalDataPointerAddress);
-  return FspData;
+  FspDataAddress = *(UINT32 *)(UINTN)PcdGet32 (PcdGlobalDataPointerAddress);
+  return (FSP_GLOBAL_DATA *)(UINTN)FspDataAddress;
 }
 
 /**
@@ -565,34 +550,4 @@ SetPhaseStatusCode (
 
   FspData             = GetFspGlobalDataPointer ();
   FspData->StatusCode = StatusCode;
-}
-
-/**
-  This function updates the return status of the FSP API with requested reset type and returns to Boot Loader.
-
-  @param[in] FspResetType     Reset type that needs to returned as API return status
-
-**/
-VOID
-EFIAPI
-FspApiReturnStatusReset (
-  IN EFI_STATUS  FspResetType
-  )
-{
-  volatile BOOLEAN  LoopUntilReset;
-
-  LoopUntilReset = TRUE;
-  DEBUG ((DEBUG_INFO, "FSP returning control to Bootloader with reset required return status %x\n", FspResetType));
-  if (GetFspGlobalDataPointer ()->FspMode == FSP_IN_API_MODE) {
-    ///
-    /// Below code is not an infinite loop.The control will go back to API calling function in BootLoader each time BootLoader
-    /// calls the FSP API without honoring the reset request by FSP
-    ///
-    do {
-      SetFspApiReturnStatus (FspResetType);
-      Pei2LoaderSwitchStack ();
-      DEBUG ((DEBUG_ERROR, "!!!ERROR: FSP has requested BootLoader for reset. But BootLoader has not honored the reset\n"));
-      DEBUG ((DEBUG_ERROR, "!!!ERROR: Please add support in BootLoader to honor the reset request from FSP\n"));
-    } while (LoopUntilReset);
-  }
 }

@@ -40,7 +40,7 @@ EFI_STATUS
 EFIAPI
 AmlDeviceOpUpdateName (
   IN  AML_OBJECT_NODE_HANDLE  DeviceOpNode,
-  IN  CHAR8                   *NewNameString
+  IN  CONST CHAR8             *NewNameString
   )
 {
   EFI_STATUS  Status;

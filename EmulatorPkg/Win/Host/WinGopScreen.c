@@ -808,6 +808,7 @@ WinNtGraphicsWindowOpen (
 
   GopPrivateCreateQ (Private, &Private->QueueForRead);
 
+  Private->Signature                          = GRAPHICS_PRIVATE_DATA_SIGNATURE;
   Private->GraphicsWindowIo.Size              = WinNtWndSize;
   Private->GraphicsWindowIo.CheckKey          = WinNtWndCheckKey;
   Private->GraphicsWindowIo.GetKey            = WinNtWndGetKey;

@@ -2311,7 +2311,7 @@ fdt_del_node (
  * returns:
  *      0, on success
  *      -FDT_ERR_NOSPACE, there's not enough space in the base device tree
- *      -FDT_ERR_NOTFOUND, the overlay points to some inexistant nodes or
+ *      -FDT_ERR_NOTFOUND, the overlay points to some nonexistant nodes or
  *              properties in the base DT
  *      -FDT_ERR_BADPHANDLE,
  *      -FDT_ERR_BADOVERLAY,

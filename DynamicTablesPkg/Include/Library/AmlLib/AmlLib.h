@@ -339,7 +339,7 @@ EFI_STATUS
 EFIAPI
 AmlFindNode (
   IN  AML_NODE_HANDLE  ReferenceNode,
-  IN  CHAR8            *AslPath,
+  IN  CONST CHAR8      *AslPath,
   OUT AML_NODE_HANDLE  *OutNode
   );
 
@@ -374,7 +374,7 @@ EFI_STATUS
 EFIAPI
 AmlDeviceOpUpdateName (
   IN  AML_OBJECT_NODE_HANDLE  DeviceOpNode,
-  IN  CHAR8                   *NewNameString
+  IN  CONST CHAR8             *NewNameString
   );
 
 /** Update an integer value defined by a NameOp object node.
@@ -1028,6 +1028,48 @@ AmlCodeGenRdInterrupt (
   OUT AML_DATA_NODE_HANDLE    *NewRdNode  OPTIONAL
   );
 
+/** Code generation for the "IO ()" ASL function.
+
+  The Resource Data effectively created is a IO Resource
+  Data. Cf ACPI 6.5:
+   - s19.6.65 IO (IO Resource Descriptor Macro)
+   - s6.4.2.5 I/O Port Descriptor
+
+  The created resource data node can be:
+   - appended to the list of resource data elements of the NameOpNode.
+     In such case NameOpNode must be defined by a the "Name ()" ASL statement
+     and initially contain a "ResourceTemplate ()".
+   - returned through the NewRdNode parameter.
+
+  @param [in]  IsDecoder16          Decoder parameter.
+                                    TRUE if 16-bit decoder.
+                                    FALSE if 10-bit decoder.
+  @param [in]  AddressMinimum       Minimum address.
+  @param [in]  AddressMaximum       Maximum address.
+  @param [in]  Alignment            Alignment.
+  @param [in]  RangeLength          Range length.
+  @param [in]  NameOpNode           NameOp object node defining a named object.
+                                    If provided, append the new resource data
+                                    node to the list of resource data elements
+                                    of this node.
+  @param [out] NewRdNode            If provided and success,
+                                    contain the created node.
+
+  @retval EFI_SUCCESS               The function completed successfully.
+  @retval EFI_INVALID_PARAMETER     Invalid parameter.
+**/
+EFI_STATUS
+EFIAPI
+AmlCodeGenRdIo (
+  IN  BOOLEAN IsDecoder16,
+  IN  UINT16 AddressMinimum,
+  IN  UINT16 AddressMaximum,
+  IN  UINT8 Alignment,
+  IN  UINT8 RangeLength,
+  IN  AML_OBJECT_NODE_HANDLE NameOpNode, OPTIONAL
+  OUT AML_DATA_NODE_HANDLE  *NewRdNode  OPTIONAL
+  );
+
 /** AML code generation for DefinitionBlock.
 
   Create a Root Node handle.
@@ -1090,7 +1132,7 @@ EFI_STATUS
 EFIAPI
 AmlCodeGenNameString (
   IN  CONST CHAR8                   *NameString,
-  IN        CHAR8                   *String,
+  IN  CONST CHAR8                   *String,
   IN        AML_NODE_HANDLE         ParentNode      OPTIONAL,
   OUT       AML_OBJECT_NODE_HANDLE  *NewObjectNode   OPTIONAL
   );
@@ -1613,7 +1655,7 @@ AmlAddLpiState (
   IN  UINT64                                  Integer                     OPTIONAL,
   IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *ResidencyCounterRegister    OPTIONAL,
   IN  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  *UsageCounterRegister        OPTIONAL,
-  IN  CHAR8                                   *StateName                   OPTIONAL,
+  IN  CONST CHAR8                             *StateName                   OPTIONAL,
   IN  AML_OBJECT_NODE_HANDLE                  LpiNode
   );
 
@@ -1668,7 +1710,7 @@ AmlAddDeviceDataDescriptorPackage (
 EFI_STATUS
 EFIAPI
 AmlAddNameIntegerPackage (
-  IN CHAR8                   *Name,
+  IN CONST CHAR8             *Name,
   IN UINT64                  Value,
   IN AML_OBJECT_NODE_HANDLE  PackageNode
   );
@@ -1739,7 +1781,7 @@ AmlCreateCpcNode (
 EFI_STATUS
 EFIAPI
 AmlAddNameStringToNamedPackage (
-  IN CHAR8                   *NameString,
+  IN CONST CHAR8             *NameString,
   IN AML_OBJECT_NODE_HANDLE  NamedNode
   );
 

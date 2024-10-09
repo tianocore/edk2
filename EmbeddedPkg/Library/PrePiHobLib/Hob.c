@@ -333,14 +333,10 @@ GetFirstGuidHob (
 }
 
 /**
-  Get the Boot Mode from the HOB list.
+  This service enables PEIMs to ascertain the present value of the boot mode.
 
-  This function returns the system boot mode information from the
-  PHIT HOB in HOB list.
 
-  @param  VOID
-
-  @return The Boot Mode.
+  @retval BootMode
 
 **/
 EFI_BOOT_MODE
@@ -356,14 +352,11 @@ GetBootMode (
 }
 
 /**
-  Get the Boot Mode from the HOB list.
+  This service enables PEIMs to update the boot mode variable.
 
-  This function returns the system boot mode information from the
-  PHIT HOB in HOB list.
+  @param  BootMode              The value of the boot mode to set.
 
-  @param  VOID
-
-  @return The Boot Mode.
+  @retval EFI_SUCCESS           The value was successfully updated
 
 **/
 EFI_STATUS
@@ -376,7 +369,7 @@ SetBootMode (
 
   Hob.Raw                               = GetHobList ();
   Hob.HandoffInformationTable->BootMode = BootMode;
-  return BootMode;
+  return EFI_SUCCESS;
 }
 
 /**

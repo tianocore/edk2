@@ -1,7 +1,7 @@
 /** @file
   The header file for Tcg2 SMM driver.
 
-Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -55,16 +55,35 @@ Tcg2NotifyMmReady (
   );
 
 /**
-  This function is an abstraction layer for implementation specific Mm buffer validation routine.
+  This function is for the Primary Buffer validation routine.
+  The Primary Buffer is the communication buffer requested from
+  Communicate protocol/PPI.
 
   @param Buffer  The buffer start address to be checked.
   @param Length  The buffer length to be checked.
 
-  @retval TRUE  This buffer is valid per processor architecture and not overlap with SMRAM.
-  @retval FALSE This buffer is not valid per processor architecture or overlap with SMRAM.
+  @retval TRUE  This buffer is valid.
+  @retval FALSE This buffer is not valid.
 **/
 BOOLEAN
-IsBufferOutsideMmValid (
+Tcg2IsPrimaryBufferValid (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  );
+
+/**
+  This function is for the NonPrimary Buffer validation routine.
+  The NonPrimary Buffer is the buffer which might be pointed from the
+  communication buffer.
+
+  @param Buffer  The buffer start address to be checked.
+  @param Length  The buffer length to be checked.
+
+  @retval TRUE  This buffer is valid.
+  @retval FALSE This buffer is not valid.
+**/
+BOOLEAN
+Tcg2IsNonPrimaryBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   );
@@ -81,6 +100,17 @@ IsBufferOutsideMmValid (
 **/
 EFI_STATUS
 InitializeTcgCommon (
+  VOID
+  );
+
+/**
+  This function checks if the required DTPM instance is TPM 2.0.
+
+  @retval TRUE  The required DTPM instance is equal to gEfiTpmDeviceInstanceTpm20DtpmGuid.
+  @retval FALSE The required DTPM instance is not equal to gEfiTpmDeviceInstanceTpm20DtpmGuid.
+**/
+BOOLEAN
+IsTpm20Dtpm (
   VOID
   );
 

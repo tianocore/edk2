@@ -1,8 +1,9 @@
 /** @file
   MADT table parser
 
-  Copyright (c) 2016 - 2023, ARM Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (c) 2022, AMD Incorporated. All rights reserved.
+  Copyright (c) 2024, Loongson Technology Corporation Limited. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -28,6 +29,7 @@ STATIC ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
   This function validates the System Vector Base in the GICD.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -35,8 +37,9 @@ STATIC
 VOID
 EFIAPI
 ValidateGICDSystemVectorBase (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   if (*(UINT32 *)Ptr != 0) {
@@ -51,6 +54,7 @@ ValidateGICDSystemVectorBase (
   This function validates the SPE Overflow Interrupt in the GICC.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -58,8 +62,9 @@ STATIC
 VOID
 EFIAPI
 ValidateSpeOverflowInterrupt (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT16  SpeOverflowInterrupt;
@@ -101,6 +106,7 @@ ValidateSpeOverflowInterrupt (
   This function validates the TRBE Interrupt in the GICC.
 
   @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Length  Length of the field.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
 **/
@@ -108,8 +114,9 @@ STATIC
 VOID
 EFIAPI
 ValidateTrbeInterrupt (
-  IN UINT8  *Ptr,
-  IN VOID   *Context
+  IN UINT8   *Ptr,
+  IN UINT32  Length,
+  IN VOID    *Context
   )
 {
   UINT16  TrbeInterrupt;
@@ -140,32 +147,97 @@ ValidateTrbeInterrupt (
 }
 
 /**
+  This function dumps the GICC Flags fields.
+  Format string is 2 fields separated by a \0 mapping to 0 or > 0 of
+  the buffer field bit.
+
+  @param [in] Format Format string that is the list of strings to
+                     map values to.
+  @param [in] Ptr    Pointer to the start of the buffer.
+  @param [in] Length Length of the field.
+**/
+STATIC
+VOID
+EFIAPI
+DumpValue (
+  IN CONST CHAR16  *Format,
+  IN UINT8         *Ptr,
+  IN UINT32        Length OPTIONAL
+  )
+{
+  UINT32        Value;
+  UINTN         Len;
+  CONST CHAR16  *Format_Alt;
+
+  Len        = StrLen (Format);
+  Format_Alt = Format + Len + 1;
+  Value      = *(UINT32 *)Ptr;
+
+  Print (L"%s", Value ? Format : Format_Alt);
+}
+
+STATIC CONST ACPI_PARSER  GICCFlagParser[] = {
+  { L"Enabled",                      1,  0, L"%d",                              NULL,      NULL, NULL, NULL },
+  { L"Performance Inter. Mode",      1,  1, L"Level Triggered\0Edge Triggered", DumpValue, NULL, NULL, NULL },
+  { L"VGIC Maintenance Inter. Mode", 1,  2, L"Level Triggered\0Edge Triggered", DumpValue, NULL, NULL, NULL },
+  { L"Online Capable",               1,  3, L"%d",                              NULL,      NULL, NULL, NULL },
+  { L"Reserved",                     28, 4, L"%d",                              NULL,      NULL, NULL, NULL }
+};
+
+/**
+  This function dumps the GICC Flags fields.
+  Format string is unused.
+
+  @param [in] Format Unused
+  @param [in] Ptr    Pointer to the start of the buffer.
+  @param [in] Length Length of the field.
+**/
+STATIC
+VOID
+EFIAPI
+DumpGicCFlags (
+  IN CONST CHAR16  *Format OPTIONAL,
+  IN UINT8         *Ptr,
+  IN UINT32        Length OPTIONAL
+  )
+{
+  Print (L"0x%X\n", *(UINT32 *)Ptr);
+  ParseAcpiBitFields (
+    TRUE,
+    2,
+    NULL,
+    Ptr,
+    4,
+    PARSER_PARAMS (GICCFlagParser)
+    );
+}
+
+/**
   An ACPI_PARSER array describing the GICC Interrupt Controller Structure.
 **/
 STATIC CONST ACPI_PARSER  GicCParser[] = {
-  { L"Type",                             1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"Length",                           1, 1,  L"%d",    NULL, NULL, NULL, NULL },
-  { L"Reserved",                         2, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Type",                             1, 0,  L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"Length",                           1, 1,  L"%d",    NULL,          NULL, NULL, NULL },
+  { L"Reserved",                         2, 2,  L"0x%x",  NULL,          NULL, NULL, NULL },
 
-  { L"CPU Interface Number",             4, 4,  L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"ACPI Processor UID",               4, 8,  L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"Flags",                            4, 12, L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"Parking Protocol Version",         4, 16, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"CPU Interface Number",             4, 4,  L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"ACPI Processor UID",               4, 8,  L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"Flags",                            4, 12, NULL,     DumpGicCFlags, NULL, NULL, NULL },
+  { L"Parking Protocol Version",         4, 16, L"0x%x",  NULL,          NULL, NULL, NULL },
 
-  { L"Performance Interrupt GSIV",       4, 20, L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"Parked Address",                   8, 24, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"Physical Base Address",            8, 32, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"GICV",                             8, 40, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"GICH",                             8, 48, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"VGIC Maintenance interrupt",       4, 56, L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"GICR Base Address",                8, 60, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"MPIDR",                            8, 68, L"0x%lx", NULL, NULL, NULL, NULL },
-  { L"Processor Power Efficiency Class", 1, 76, L"0x%x",  NULL, NULL, NULL,
-    NULL },
-  { L"Reserved",                         1, 77, L"0x%x",  NULL, NULL, NULL, NULL },
-  { L"SPE overflow Interrupt",           2, 78, L"0x%x",  NULL, NULL,
+  { L"Performance Interrupt GSIV",       4, 20, L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"Parked Address",                   8, 24, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"Physical Base Address",            8, 32, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"GICV",                             8, 40, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"GICH",                             8, 48, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"VGIC Maintenance interrupt",       4, 56, L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"GICR Base Address",                8, 60, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"MPIDR",                            8, 68, L"0x%lx", NULL,          NULL, NULL, NULL },
+  { L"Processor Power Efficiency Class", 1, 76, L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"Reserved",                         1, 77, L"0x%x",  NULL,          NULL, NULL, NULL },
+  { L"SPE overflow Interrupt",           2, 78, L"0x%x",  NULL,          NULL,
     ValidateSpeOverflowInterrupt, NULL },
-  { L"TRBE Interrupt",                   2, 80, L"0x%x",  NULL, NULL,
+  { L"TRBE Interrupt",                   2, 80, L"0x%x",  NULL,          NULL,
     ValidateTrbeInterrupt, NULL }
 };
 
@@ -263,12 +335,14 @@ STATIC CONST ACPI_PARSER  LocalApicFlags[] = {
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
+  @param [in] Length  Length of the field.
 **/
 VOID
 EFIAPI
 DumpLocalApicBitFlags (
   IN CONST CHAR16  *Format OPTIONAL,
-  IN UINT8         *Ptr
+  IN UINT8         *Ptr,
+  IN UINT32        Length
   )
 {
   if (Format != NULL) {
@@ -323,6 +397,92 @@ STATIC CONST ACPI_PARSER  LocalX2ApicNmi[] = {
   { L"ACPI Processor UID", 4, 4, L"0x%x",     NULL,       NULL, NULL, NULL },
   { L"Local x2APIC LINT#", 1, 8, L"0x%x",     NULL,       NULL, NULL, NULL },
   { L"Reserved",           3, 9, L"0x%x%x%x", Dump3Chars, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the Core Pragrammable Interrupt Controller (CORE PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  CorePic[] = {
+  { L"Type",                  1, 0,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Length",                1, 1,  L"%d",   NULL, NULL, NULL, NULL },
+  { L"Version",               1, 2,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"ACPI Processor ID",     4, 3,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Physical Processor ID", 4, 7,  L"0x%x", NULL, NULL, NULL, NULL },
+  { L"Flags",                 4, 11, L"0x%x", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the Leagcy I/O Programmable Interrupt Controller (LIO PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  LegacyIoPic[] = {
+  { L"Type",                   1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",                 1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",                1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Base Address",           8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Size",                   2, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade Vector",         2, 13, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade vector mapping", 8, 15, L"0x%lx", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the HyperTransport Programmable Interrupt Controller (HT PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  HyperTransportPic[] = {
+  { L"Type",           1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",         1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",        1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Base Address",   8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Size",           2, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade Vector", 8, 13, L"0x%lx", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the Extend I/0 Programmable Interrupt Controller (EIO PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  ExtendIoPic[] = {
+  { L"Type",           1, 0, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",         1, 1, L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",        1, 2, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade Vector", 1, 3, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Node",           1, 4, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Node Map",       8, 5, L"0x%lx", NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the MSI Programmable Interrupt Controller (MSI PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  MsiPic[] = {
+  { L"Type",            1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",          1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",         1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Message Address", 8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Start",           4, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Count",           4, 15, L"0x%x",  NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the Bridge I/O Programmable Interrupt Controller (BIO PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  BridgeIoPic[] = {
+  { L"Type",         1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",       1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",      1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Base Address", 8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Size",         2, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Hardware ID",  2, 13, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"GSI base",     2, 15, L"0x%x",  NULL, NULL, NULL, NULL }
+};
+
+/**
+  An ACPI_PARSER array describing the LPC Programmable Interrupt Controller (LPC PIC) Structure.
+**/
+STATIC CONST ACPI_PARSER  LpcPic[] = {
+  { L"Type",           1, 0,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Length",         1, 1,  L"%d",    NULL, NULL, NULL, NULL },
+  { L"Version",        1, 2,  L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Base Address",   8, 3,  L"0x%lx", NULL, NULL, NULL, NULL },
+  { L"Size",           2, 11, L"0x%x",  NULL, NULL, NULL, NULL },
+  { L"Cascade vector", 2, 13, L"0x%x",  NULL, NULL, NULL, NULL }
 };
 
 /**
@@ -568,6 +728,97 @@ ParseAcpiMadt (
           InterruptContollerPtr,
           *MadtInterruptControllerLength,
           PARSER_PARAMS (LocalX2ApicNmi)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_CORE_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "CORE PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (CorePic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_LIO_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "LIO PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (LegacyIoPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_HT_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "HT PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (HyperTransportPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_EIO_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "EIO PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (ExtendIoPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_MSI_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "MSI PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (MsiPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_BIO_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "BIO PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (BridgeIoPic)
+          );
+        break;
+      }
+
+      case EFI_ACPI_6_5_LPC_PIC:
+      {
+        ParseAcpi (
+          TRUE,
+          2,
+          "LPC PIC",
+          InterruptContollerPtr,
+          *MadtInterruptControllerLength,
+          PARSER_PARAMS (LpcPic)
           );
         break;
       }

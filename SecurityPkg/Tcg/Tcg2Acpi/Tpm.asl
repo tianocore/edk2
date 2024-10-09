@@ -241,26 +241,10 @@ DefinitionBlock (
       Method (PTS, 1, Serialized)
       {
         //
-        // Detect Sx state for MOR, only S4, S5 need to handle
+        // _PTS is deprecated for being security deficient
+        // this implementation simply returns to maintain
+        // compatibility with older OSes using it.
         //
-        If (LAnd (LLess (Arg0, 6), LGreater (Arg0, 3)))
-        {
-          //
-          // Bit4 -- DisableAutoDetect. 0 -- Firmware MAY autodetect.
-          //
-          If (LNot (And (MORD, 0x10)))
-          {
-            //
-            // Trigger the SMI through ACPI _PTS method.
-            //
-            Store (0x02, MCIP)
-
-            //
-            // Trigger the SMI interrupt
-            //
-            Store (MCIN, IOPN)
-          }
-        }
         Return (0)
       }
 
@@ -446,43 +430,6 @@ DefinitionBlock (
         Return (1)
       }
 
-      Method (TMCI, 2, Serialized, 0, IntObj, {UnknownObj, UnknownObj}) // IntObj, PkgObj
-      {
-        //
-        // Switch by function index
-        //
-        Switch (ToInteger (Arg0))
-        {
-          Case (0)
-          {
-            //
-            // Standard query, supports function 1-1
-            //
-            Return (Buffer () {0x03})
-          }
-          Case (1)
-          {
-            //
-            // Save the Operation Value of the Request to MORD (reserved memory)
-            //
-            Store (DerefOf (Index (Arg1, 0x00)), MORD)
-
-            //
-            // Trigger the SMI through ACPI _DSM method.
-            //
-            Store (0x01, MCIP)
-
-            //
-            // Trigger the SMI interrupt
-            //
-            Store (MCIN, IOPN)
-            Return (MRET)
-          }
-          Default {BreakPoint}
-        }
-        Return (1)
-      }
-
       Method (_DSM, 4, Serialized, 0, UnknownObj, {BuffObj, IntObj, IntObj, PkgObj})
       {
 
@@ -503,12 +450,8 @@ DefinitionBlock (
         }
 
         //
-        // TCG Memory Clear Interface
+        // _DSM Memory Clear is deprecated, so not called
         //
-        If(LEqual(Arg0, ToUUID ("376054ed-cc13-4675-901c-4756d7f2d45d")))
-        {
-          Return (TMCI (Arg2, Arg3))
-        }
 
         Return (Buffer () {0})
       }

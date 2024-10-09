@@ -500,9 +500,11 @@ DmaAllocateAlignedBuffer (
 {
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR  GcdDescriptor;
   VOID                             *Allocation;
-  UINT64                           MemType;
+  UINT64                           Attributes;
   UNCACHED_ALLOCATION              *Alloc;
   EFI_STATUS                       Status;
+
+  Attributes = EFI_MEMORY_XP;
 
   if (Alignment == 0) {
     Alignment = EFI_PAGE_SIZE;
@@ -534,9 +536,9 @@ DmaAllocateAlignedBuffer (
 
   // Choose a suitable uncached memory type that is supported by the region
   if (GcdDescriptor.Capabilities & EFI_MEMORY_WC) {
-    MemType = EFI_MEMORY_WC;
+    Attributes |= EFI_MEMORY_WC;
   } else if (GcdDescriptor.Capabilities & EFI_MEMORY_UC) {
-    MemType = EFI_MEMORY_UC;
+    Attributes |= EFI_MEMORY_UC;
   } else {
     Status = EFI_UNSUPPORTED;
     goto FreeBuffer;
@@ -553,11 +555,37 @@ DmaAllocateAlignedBuffer (
 
   InsertHeadList (&UncachedAllocationList, &Alloc->Link);
 
-  // Remap the region with the new attributes
+  // Ensure that EFI_MEMORY_XP is in the capability set
+  if ((GcdDescriptor.Capabilities & EFI_MEMORY_XP) != EFI_MEMORY_XP) {
+    Status = gDS->SetMemorySpaceCapabilities (
+                    (PHYSICAL_ADDRESS)(UINTN)Allocation,
+                    EFI_PAGES_TO_SIZE (Pages),
+                    GcdDescriptor.Capabilities | EFI_MEMORY_XP
+                    );
+
+    // if we were to fail setting the capability, this would indicate an internal failure of the GCD code. We should
+    // assert here to let a platform know something went crazy, but for a release build we can let the allocation occur
+    // without the EFI_MEMORY_XP bit set, as that was the existing behavior
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a failed to set EFI_MEMORY_XP capability on 0x%llx for length 0x%llx. Attempting to allocate without XP set.\n",
+        __func__,
+        Allocation,
+        EFI_PAGES_TO_SIZE (Pages)
+        ));
+
+      ASSERT_EFI_ERROR (Status);
+
+      Attributes &= ~EFI_MEMORY_XP;
+    }
+  }
+
+  // Remap the region with the new attributes and mark it non-executable
   Status = gDS->SetMemorySpaceAttributes (
                   (PHYSICAL_ADDRESS)(UINTN)Allocation,
                   EFI_PAGES_TO_SIZE (Pages),
-                  MemType
+                  Attributes
                   );
   if (EFI_ERROR (Status)) {
     goto FreeAlloc;

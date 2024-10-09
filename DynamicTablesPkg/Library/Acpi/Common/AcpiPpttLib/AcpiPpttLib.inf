@@ -1,0 +1,30 @@
+## @file
+#  PPTT Table Generator
+#
+#  Copyright (c) 2019, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = AcpiPpttLib
+  FILE_GUID      = FA102D52-5A92-4F95-A097-1D53F9CF5959
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiPpttLibConstructor
+  DESTRUCTOR     = AcpiPpttLibDestructor
+
+[Sources]
+  PpttGenerator.c
+  PpttGenerator.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib

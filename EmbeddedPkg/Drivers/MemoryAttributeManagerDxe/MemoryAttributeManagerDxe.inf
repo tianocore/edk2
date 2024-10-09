@@ -1,0 +1,62 @@
+## @file
+#  EFI Memory Attribute Protocol state manager
+#
+#  This driver allows users to disable the EFI Memory Attribute protocol
+#  through an HII setup option, in order to work around a broken version
+#  of rhboot's shim used in some distros (e.g. CentOS Stream 9) which
+#  incorrectly invokes the protocol and results in a Synchronous Exception.
+#
+#  It is only applicable to ARM64 and there isn't any other technical
+#  reason for disabling this security feature.
+#
+#  See:
+#    - https://github.com/microsoft/mu_silicon_arm_tiano/issues/124
+#    - https://edk2.groups.io/g/devel/topic/99631663
+#    - https://github.com/tianocore/edk2/pull/5840
+#
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = MemoryAttributeManagerDxe
+  FILE_GUID                      = 5319346b-66ad-433a-9a91-f7fc286bc9a1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MemoryAttributeManagerInitialize
+
+[Sources]
+  MemoryAttributeManagerDxe.c
+  MemoryAttributeManagerDxe.h
+  MemoryAttributeManagerDxeHii.uni
+  MemoryAttributeManagerDxeHii.vfr
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  DevicePathLib
+  HiiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gMemoryAttributeManagerFormSetGuid
+
+[Protocols]
+  gEfiMemoryAttributeProtocolGuid
+
+[Pcd]
+  gEmbeddedTokenSpaceGuid.PcdMemoryAttributeEnabledDefault
+
+[Depex]
+  gEfiVariableArchProtocolGuid        AND
+  gEfiVariableWriteArchProtocolGuid   AND
+  gEfiMemoryAttributeProtocolGuid
