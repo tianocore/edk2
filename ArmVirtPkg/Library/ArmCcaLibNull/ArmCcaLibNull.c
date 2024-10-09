@@ -115,3 +115,28 @@ GetIpaWidth (
 {
   return RETURN_UNSUPPORTED;
 }
+
+/** Check if the address range is protected MMIO
+
+  @param [in]   BaseAddress      Base address of the device MMIO region.
+  @param [in]   Length           Length of the device MMIO region.
+  @param [out]  IsProtectedMmio  TRUE - if the RIPAS for the address range is
+                                        protected MMIO.
+                                 FALSE - if the RIPAS for the address range is
+                                         not protected MMIO.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_UNSUPPORTED        The request is not initiated in a
+                                    Realm.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaMemRangeIsProtectedMmio (
+  IN  UINT64   BaseAddress,
+  IN  UINT64   Length,
+  OUT BOOLEAN  *IsProtectedMmio
+  )
+{
+  return RETURN_UNSUPPORTED;
+}
