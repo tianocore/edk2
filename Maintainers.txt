@@ -405,9 +405,10 @@ M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakasha
 R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
 
 MdePkg: FDT related library instance
-F: MdePkg/Library/BaseFdtLib/FdtLib.c
+F: MdePkg/Library/BaseFdtLib/*
 F: MdePkg/Include/Library/FdtLib.h
 M: Benny Lin <benny.lin@intel.com> [Benny3345678]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 R: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: James Lu <james.lu@intel.com> [jameslu8]
@@ -621,6 +622,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
+M: Benjamin Doron <benjamin.doron@9elements.com> [benjamindoron]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 S: Maintained
 

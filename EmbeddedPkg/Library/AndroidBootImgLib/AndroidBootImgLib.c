@@ -9,6 +9,7 @@
 
 #include <libfdt.h>
 #include <Library/AndroidBootImgLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>

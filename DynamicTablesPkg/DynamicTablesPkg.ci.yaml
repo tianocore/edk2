@@ -104,6 +104,7 @@
            "CCIDX",
            "CCSIDR",
            "countof",
+           "deviceid",
            "EArch",
            "edynamic",
            "EOBJECT",
