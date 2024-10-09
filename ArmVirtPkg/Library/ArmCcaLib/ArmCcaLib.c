@@ -225,3 +225,63 @@ ArmCcaGetIpaWidth (
 
   return RETURN_SUCCESS;
 }
+
+/** Check if the address range is protected MMIO
+
+  @param [in]   BaseAddress      Base address of the device MMIO region.
+  @param [in]   Length           Length of the device MMIO region.
+  @param [out]  IsProtectedMmio  TRUE - if the RIPAS for the address range is
+                                        protected MMIO.
+                                 FALSE - if the RIPAS for the address range is
+                                         not protected MMIO.
+
+  @retval RETURN_SUCCESS            Success.
+  @retval RETURN_INVALID_PARAMETER  A parameter is invalid.
+  @retval RETURN_UNSUPPORTED        The request is not initiated in a
+                                    Realm.
+**/
+RETURN_STATUS
+EFIAPI
+ArmCcaMemRangeIsProtectedMmio (
+  IN  UINT64   BaseAddress,
+  IN  UINT64   Length,
+  OUT BOOLEAN  *IsProtectedMmio
+  )
+{
+  RETURN_STATUS  RetStatus;
+  UINT64         *Base;
+  UINT64         *Top;
+  UINT64         *End;
+  ARM_CCA_RIPAS  State;
+
+  if ((Length == 0) || (IsProtectedMmio == NULL)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  Base = (UINT64 *)BaseAddress;
+  End  = (UINT64 *)(BaseAddress + Length);
+
+  while (Base < End) {
+    Top       = End;
+    RetStatus = ArmCcaRsiGetIpaState (
+                  Base,
+                  &Top,
+                  &State
+                  );
+    if (RETURN_ERROR (RetStatus)) {
+      // An error occurred.
+      return RetStatus;
+    }
+
+    if (State != RipasDev) {
+      // The address range is not protected MMIO.
+      *IsProtectedMmio = FALSE;
+      return RetStatus;
+    }
+
+    Base = Top;
+  } // while
+
+  *IsProtectedMmio = TRUE;
+  return RETURN_SUCCESS;
+}
