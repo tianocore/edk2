@@ -638,7 +638,7 @@ PeiAllocatePages (
   // Verify that there is sufficient memory to satisfy the allocation.
   //
   RemainingMemory = (UINTN)(*FreeMemoryTop - *FreeMemoryBottom);
-  RemainingPages  = RemainingMemory >> EFI_PAGE_SHIFT;
+  RemainingPages  = (UINTN)(RShiftU64 (RemainingMemory, EFI_PAGE_SHIFT));
   //
   // The number of remaining pages needs to be greater than or equal to that of
   // the request pages. In addition, there should be enough space left to hold a
