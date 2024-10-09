@@ -1,0 +1,35 @@
+## @file
+# Ssdt Serial Port Table Generator
+#
+#  Copyright (c) 2019 - 2021, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = SsdtSerialPortLib
+  FILE_GUID      = D1F92325-2DFB-435C-9B4C-A6B864F19230
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = DXE_DRIVER
+  LIBRARY_CLASS  = NULL|DXE_DRIVER
+  CONSTRUCTOR    = AcpiSsdtSerialPortLibConstructor
+  DESTRUCTOR     = AcpiSsdtSerialPortLibDestructor
+
+[Sources]
+  SsdtSerialPortGenerator.c
+
+[Packages.ARM, Packages.AARCH64]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+
+[LibraryClasses]
+  AcpiHelperLib
+  AmlLib
+  BaseLib
+  SsdtSerialPortFixupLib

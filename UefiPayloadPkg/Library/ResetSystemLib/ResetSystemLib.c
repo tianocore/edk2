@@ -40,6 +40,12 @@ ResetSystemLibConstructor (
   AcpiBoardInfoPtr = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob);
   CopyMem (&mAcpiBoardInfo, AcpiBoardInfoPtr, sizeof (ACPI_BOARD_INFO));
 
+  ASSERT (mAcpiBoardInfo.ResetRegAddress != 0);
+  ASSERT (mAcpiBoardInfo.ResetValue != 0);
+  ASSERT (mAcpiBoardInfo.PmGpeEnBase != 0);
+  ASSERT (mAcpiBoardInfo.PmEvtBase != 0);
+  ASSERT (mAcpiBoardInfo.PmCtrlRegBase != 0);
+
   return EFI_SUCCESS;
 }
 

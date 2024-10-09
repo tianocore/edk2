@@ -1,0 +1,133 @@
+## @file
+# PiSmmCpuStandaloneMm driver.
+# This Standalone MM driver performs SMM initialization, deploy SMM Entry Vector,
+# provides CPU specific services in SMM.
+#
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PiSmmCpuStandaloneMm
+  FILE_GUID                      = d88f894b-9287-4706-8b28-f716ae4d35c7
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = PiCpuStandaloneMmEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  PiSmmCpuStandaloneMm.c
+  PiSmmCpuCommon.c
+  PiSmmCpuCommon.h
+  MpService.c
+  SyncTimer.c
+  CpuS3.c
+  CpuService.c
+  CpuService.h
+  SmmProfile.c
+  SmmProfile.h
+  SmmProfileInternal.h
+  SmramSaveState.c
+  SmmCpuMemoryManagement.c
+  SmmMp.h
+  SmmMp.c
+  SmmMpPerf.h
+  SmmMpPerf.c
+  NonMmramMapStandaloneMm.c
+
+[Sources.X64]
+  X64/PageTbl.c
+  X64/SmmFuncsArch.c
+  X64/SmmProfileArch.c
+  X64/SmmProfileArch.h
+  X64/SmiEntry.nasm
+  X64/SmiException.nasm
+  X64/Cet.nasm
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  StandaloneMmDriverEntryPoint
+  PcdLib
+  DebugLib
+  BaseLib
+  SynchronizationLib
+  BaseMemoryLib
+  MtrrLib
+  IoLib
+  TimerLib
+  MmServicesTableLib
+  MemoryAllocationLib
+  DebugAgentLib
+  HobLib
+  PciLib
+  LocalApicLib
+  SmmCpuPlatformHookLib
+  CpuExceptionHandlerLib
+  CpuLib
+  ReportStatusCodeLib
+  SmmCpuFeaturesLib
+  PeCoffGetEntryPointLib
+  PerformanceLib
+  CpuPageTableLib
+  MmSaveStateLib
+  SmmCpuSyncLib
+
+[Protocols]
+  gEfiSmmConfigurationProtocolGuid         ## PRODUCES
+  gEfiSmmCpuProtocolGuid                   ## PRODUCES
+  gEfiSmmReadyToLockProtocolGuid           ## NOTIFY
+  gEfiSmmCpuServiceProtocolGuid            ## PRODUCES
+  gEdkiiSmmMemoryAttributeProtocolGuid     ## PRODUCES
+  gEfiMmMpProtocolGuid                     ## PRODUCES
+  gEdkiiSmmCpuRendezvousProtocolGuid       ## PRODUCES
+  gEfiSmmVariableProtocolGuid              ## CONSUMES
+
+[Guids]
+  gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.
+  gEdkiiPiSmmMemoryAttributesTableGuid     ## CONSUMES ## SystemTable
+  gSmmBaseHobGuid                          ## CONSUMES
+  gMpInformation2HobGuid                   ## CONSUMES # Assume the HOB must has been created
+  gEfiSmmSmramMemoryGuid
+  gMmProfileDataHobGuid
+  gMmAcpiS3EnableHobGuid
+  gMmCpuSyncConfigHobGuid
+
+[FeaturePcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmDebug                         ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmBlockStartupThisAp            ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmEnableBspElection             ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuHotPlugSupport                   ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackGuard                    ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileEnable                 ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileRingBuffer             ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock         ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplSwitchToLongMode         ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdSmmApPerfLogEnable                  ## CONSUMES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmProfileSize                   ## SOMETIMES_CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize                     ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable         ## CONSUMES
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmShadowStackSize               ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdControlFlowEnforcementPropertyMask        ## CONSUMES
+
+[FixedPcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmMpTokenCountPerChunk               ## CONSUMES
+
+[Depex]
+  TRUE

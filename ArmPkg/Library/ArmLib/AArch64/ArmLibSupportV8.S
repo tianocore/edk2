@@ -8,7 +8,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AsmMacroIoLibV8.h>
+#include <AsmMacroLib.h>
 
 .set MPIDR_U_BIT,    (30)
 .set MPIDR_U_MASK,   (1 << MPIDR_U_BIT)

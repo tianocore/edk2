@@ -38,8 +38,10 @@
 #include <IndustryStandard/QemuCpuHotplug.h>
 #include <Library/MemEncryptSevLib.h>
 #include <OvmfPlatforms.h>
+#include <Library/TdxHelperLib.h>
 
 #include "Platform.h"
+#include "PlatformId.h"
 
 EFI_PEI_PPI_DESCRIPTOR  mPpiBootMode[] = {
   {
@@ -310,6 +312,10 @@ InitializePlatform (
   DEBUG ((DEBUG_INFO, "Platform PEIM Loaded\n"));
   PlatformInfoHob = BuildPlatformInfoHob ();
 
+  if (TdIsEnabled ()) {
+    TdxHelperBuildGuidHobForTdxMeasurement ();
+  }
+
   PlatformInfoHob->SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
   PlatformInfoHob->SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
   PlatformInfoHob->PcdPciMmio64Size    = PcdGet64 (PcdPciMmio64Size);
@@ -363,6 +369,7 @@ InitializePlatform (
     MiscInitializationForMicrovm (PlatformInfoHob);
   } else {
     MiscInitialization (PlatformInfoHob);
+    PlatformIdInitialization (PeiServices);
   }
 
   IntelTdxInitialize ();

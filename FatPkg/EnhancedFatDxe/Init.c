@@ -61,6 +61,32 @@ FatAllocateVolume (
   //
   Volume->RootDirEnt.FileString       = Volume->RootFileString;
   Volume->RootDirEnt.Entry.Attributes = FAT_ATTRIBUTE_DIRECTORY;
+
+  if ((BlockIo == NULL) || (BlockIo->Media == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a BlockIo or BlockIo is NULL!\n", __func__));
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  //
+  // Check to see if the underlying block device's BlockSize meets what the FAT spec requires
+  //
+  if ((BlockIo->Media->BlockSize != 512) &&
+      (BlockIo->Media->BlockSize != SIZE_1KB) &&
+      (BlockIo->Media->BlockSize != SIZE_2KB) &&
+      (BlockIo->Media->BlockSize != SIZE_4KB))
+  {
+    Status = EFI_UNSUPPORTED;
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a invalid BlockIo BlockSize %u for FAT filesystem on MediaId %u. Must be 512B, 1KB, 2KB, or 4KB\n",
+      __func__,
+      BlockIo->Media->BlockSize,
+      BlockIo->Media->MediaId
+      ));
+    goto Done;
+  }
+
   //
   // Check to see if there's a file system on the volume
   //
@@ -221,7 +247,7 @@ FatOpenDevice (
   Status = DiskIo->ReadDisk (DiskIo, Volume->MediaId, 0, sizeof (FatBs), &FatBs);
 
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_INIT, "FatOpenDevice: read of part_lba failed %r\n", Status));
+    DEBUG ((DEBUG_VERBOSE, "%a: read of part_lba failed %r\n", __func__, Status));
     return Status;
   }
 

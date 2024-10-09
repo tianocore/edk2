@@ -888,7 +888,8 @@ typedef enum {
   ProcessorUpgradeSocketBGA2551   = 0x54,
   ProcessorUpgradeSocketLGA1851   = 0x55,
   ProcessorUpgradeSocketBGA2114   = 0x56,
-  ProcessorUpgradeSocketBGA2833   = 0x57
+  ProcessorUpgradeSocketBGA2833   = 0x57,
+  ProcessorUpgradeInvalid         = 0xFF
 } PROCESSOR_UPGRADE;
 
 ///
@@ -1021,6 +1022,10 @@ typedef struct {
   // Add for smbios 3.6
   //
   UINT16                 ThreadEnabled;
+  //
+  // Add for smbios 3.8
+  //
+  SMBIOS_TABLE_STRING    SocketType;
 } SMBIOS_TABLE_TYPE4;
 
 ///
@@ -1525,7 +1530,7 @@ typedef struct {
   UINT8    AsyncSurpriseRemoval    : 1;
   UINT8    FlexbusSlotCxl10Capable : 1;
   UINT8    FlexbusSlotCxl20Capable : 1;
-  UINT8    Reserved                : 1; ///< Set to 0.
+  UINT8    FlexbusSlotCxl30Capable : 1; /// SMBIOS spec 3.7.0 updated CXL 3.0 support
 } MISC_SLOT_CHARACTERISTICS2;
 
 ///
@@ -2028,6 +2033,13 @@ typedef struct {
   //
   UINT32                                     ExtendedSpeed;
   UINT32                                     ExtendedConfiguredMemorySpeed;
+  //
+  // Add for smbios 3.7.0
+  //
+  UINT16                                     Pmic0ManufacturerID;
+  UINT16                                     Pmic0RevisionNumber;
+  UINT16                                     RcdManufacturerID;
+  UINT16                                     RcdRevisionNumber;
 } SMBIOS_TABLE_TYPE17;
 
 ///

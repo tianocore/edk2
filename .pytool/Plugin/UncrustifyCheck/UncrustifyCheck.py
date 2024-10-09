@@ -373,9 +373,9 @@ class UncrustifyCheck(ICiBuildPlugin):
                 file_template_path = pathlib.Path(os.path.join(self._plugin_path, file_template_name))
                 self._file_template_contents = file_template_path.read_text()
         except KeyError:
-            logging.warning("A file header template is not specified in the config file.")
+            logging.info("A file header template is not specified in the config file.")
         except FileNotFoundError:
-            logging.warning("The specified file header template file was not found.")
+            logging.info("The specified file header template file was not found.")
         try:
             func_template_name = parser["dummy_section"]["cmt_insert_func_header"]
 
@@ -385,9 +385,9 @@ class UncrustifyCheck(ICiBuildPlugin):
                 func_template_path = pathlib.Path(os.path.join(self._plugin_path, func_template_name))
                 self._func_template_contents = func_template_path.read_text()
         except KeyError:
-            logging.warning("A function header template is not specified in the config file.")
+            logging.info("A function header template is not specified in the config file.")
         except FileNotFoundError:
-            logging.warning("The specified function header template file was not found.")
+            logging.info("The specified function header template file was not found.")
 
     def _initialize_app_info(self) -> None:
         """
@@ -563,36 +563,37 @@ class UncrustifyCheck(ICiBuildPlugin):
         self._formatted_file_error_count = len(formatted_files)
 
         if self._formatted_file_error_count > 0:
-            logging.error(
+            logging.error(f'Uncrustify found {self._formatted_file_error_count} files with formatting errors\n')
+            self._tc.LogStdError(f"Uncrustify found {self._formatted_file_error_count} files with formatting errors:\n")
+            logging.warning(
                 "Visit the following instructions to learn "
-                "how to find the detailed formatting errors in Azure "
-                "DevOps CI: "
-                "https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-Formatting#how-to-find-uncrustify-formatting-errors-in-continuous-integration-ci")
-            self._tc.LogStdError("Files with formatting errors:\n")
+                "more about uncrustify setup instructions and CI:"
+                "https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Code-Formatting\n")
 
             if self._output_file_diffs:
                 logging.info("Calculating file diffs. This might take a while...")
 
         for formatted_file in formatted_files:
-            pre_formatted_file = formatted_file[:-
-                                                len(UncrustifyCheck.FORMATTED_FILE_EXTENSION)]
-            logging.error(pre_formatted_file)
+            pre_formatted_file = formatted_file[:-len(UncrustifyCheck.FORMATTED_FILE_EXTENSION)]
+
+            logging.error(f"Formatting errors in {os.path.relpath(pre_formatted_file, self._abs_package_path)}")
+            self._tc.LogStdError(f"Formatting errors in {os.path.relpath(pre_formatted_file, self._abs_package_path)}\n")
 
             if (self._output_file_diffs or
                     self._file_template_contents is not None or
                     self._func_template_contents is not None):
-                self._tc.LogStdError(
-                    f"Formatting errors in {os.path.relpath(pre_formatted_file, self._abs_package_path)}\n")
 
                 with open(formatted_file) as ff:
                     formatted_file_text = ff.read()
 
                     if (self._file_template_contents is not None and
                             self._file_template_contents in formatted_file_text):
+                        logging.info(f"File header is missing in {os.path.relpath(pre_formatted_file, self._abs_package_path)}")
                         self._tc.LogStdError(f"File header is missing in {os.path.relpath(pre_formatted_file, self._abs_package_path)}\n")
 
                     if (self._func_template_contents is not None and
                             self._func_template_contents in formatted_file_text):
+                        logging.info(f"A function header is missing in {os.path.relpath(pre_formatted_file, self._abs_package_path)}")
                         self._tc.LogStdError(f"A function header is missing in {os.path.relpath(pre_formatted_file, self._abs_package_path)}\n")
 
                     if self._output_file_diffs:
@@ -600,11 +601,11 @@ class UncrustifyCheck(ICiBuildPlugin):
                             pre_formatted_file_text = pf.read()
 
                         for line in difflib.unified_diff(pre_formatted_file_text.split('\n'), formatted_file_text.split('\n'), fromfile=pre_formatted_file, tofile=formatted_file, n=3):
+                            logging.error(line)
                             self._tc.LogStdError(line)
 
+                        logging.error('\n')
                         self._tc.LogStdError('\n')
-            else:
-                self._tc.LogStdError(pre_formatted_file)
 
     def _remove_tree(self, dir_path: str, ignore_errors: bool = False) -> None:
         """

@@ -7,7 +7,7 @@
   vs. non-privileged driver code.
 
   Copyright (c) 2017, Red Hat, Inc.<BR>
-  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2024, Intel Corporation. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -123,6 +123,21 @@ MmVariableServiceInitialize (
   );
 
 /**
+  This function checks if the Primary Buffer (CommBuffer) is valid.
+
+  @param Buffer The buffer start address to be checked.
+  @param Length The buffer length to be checked.
+
+  @retval TRUE  This buffer is valid.
+  @retval FALSE This buffer is not valid.
+**/
+BOOLEAN
+VariableSmmIsPrimaryBufferValid (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  );
+
+/**
   This function checks if the buffer is valid per processor architecture and
   does not overlap with SMRAM.
 
@@ -135,23 +150,19 @@ MmVariableServiceInitialize (
                 with SMRAM.
 **/
 BOOLEAN
-VariableSmmIsBufferOutsideSmmValid (
+VariableSmmIsNonPrimaryBufferValid (
   IN EFI_PHYSICAL_ADDRESS  Buffer,
   IN UINT64                Length
   );
 
 /**
-  Whether the TCG or TCG2 protocols are installed in the UEFI protocol database.
-  This information is used by the MorLock code to infer whether an existing
-  MOR variable is legitimate or not.
+  Whether the MOR variable is legitimate or not.
 
-  @retval TRUE  Either the TCG or TCG2 protocol is installed in the UEFI
-                protocol database
-  @retval FALSE Neither the TCG nor the TCG2 protocol is installed in the UEFI
-                protocol database
+  @retval TRUE  MOR Variable is legitimate.
+  @retval FALSE MOR Variable in not legitimate.
 **/
 BOOLEAN
-VariableHaveTcgProtocols (
+VariableIsMorVariableLegitimate (
   VOID
   );
 

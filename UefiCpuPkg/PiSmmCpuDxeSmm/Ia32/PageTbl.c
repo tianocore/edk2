@@ -1,14 +1,14 @@
 /** @file
 Page table manipulation functions for IA-32 processors
 
-Copyright (c) 2009 - 2023, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2024, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-#include "PiSmmCpuDxeSmm.h"
+#include "PiSmmCpuCommon.h"
 
 /**
   Create PageTable for SMM use.
@@ -33,7 +33,7 @@ SmmInitPageTable (
   mPhysicalAddressBits = 32;
   mPagingMode          = PagingPae;
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable) ||
+  if (mSmmProfileEnabled ||
       HEAP_GUARD_NONSTOP_MODE ||
       NULL_DETECTION_NONSTOP_MODE)
   {
@@ -67,15 +67,19 @@ SmmInitPageTable (
 }
 
 /**
-  Page Fault handler for SMM use.
+  Allocate free Page for PageFault handler use.
+
+  @return Page address.
 
 **/
-VOID
-SmiDefaultPFHandler (
+UINT64
+AllocPage (
   VOID
   )
 {
   CpuDeadLoop ();
+
+  return 0;
 }
 
 /**
@@ -179,24 +183,21 @@ SmiPFHandler (
     }
 
     if (IsSmmCommBufferForbiddenAddress (PFAddress)) {
-      DumpCpuContext (InterruptType, SystemContext);
       DEBUG ((DEBUG_ERROR, "Access SMM communication forbidden address (0x%x)!\n", PFAddress));
-      DEBUG_CODE (
-        DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
-        );
-      CpuDeadLoop ();
-      goto Exit;
     }
   }
 
-  if (FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (mSmmProfileEnabled) {
     SmmProfilePFHandler (
       SystemContext.SystemContextIa32->Eip,
       SystemContext.SystemContextIa32->ExceptionData
       );
   } else {
     DumpCpuContext (InterruptType, SystemContext);
-    SmiDefaultPFHandler ();
+    DEBUG_CODE (
+      DumpModuleInfoByIp ((UINTN)SystemContext.SystemContextIa32->Eip);
+      );
+    CpuDeadLoop ();
   }
 
 Exit:
@@ -227,18 +228,4 @@ RestoreCr2 (
   )
 {
   return;
-}
-
-/**
-  Return whether access to non-SMRAM is restricted.
-
-  @retval TRUE  Access to non-SMRAM is restricted.
-  @retval FALSE Access to non-SMRAM is not restricted.
-**/
-BOOLEAN
-IsRestrictedMemoryAccess (
-  VOID
-  )
-{
-  return TRUE;
 }

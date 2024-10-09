@@ -156,16 +156,6 @@ VerifyBlob (
 
     DEBUG ((DEBUG_INFO, "%a: Found GUID %g in table\n", __func__, Guid));
 
-    if (BufSize == 0) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: Blob Specified in Hash Table was not Provided",
-        __func__
-        ));
-
-      CpuDeadLoop ();
-    }
-
     EntrySize = Entry->Len - sizeof Entry->Guid - sizeof Entry->Len;
     if (EntrySize != SHA256_DIGEST_SIZE) {
       DEBUG ((

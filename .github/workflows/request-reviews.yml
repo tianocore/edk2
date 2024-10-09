@@ -1,0 +1,73 @@
+
+# This workflow automatically adds the appropriate reviewers to a pull request.
+#
+# The workflow directly reuses logic in the BaseTools/Scripts/GetMaintainer.py script
+# to determine the appropriate reviewers, so it matches what a user would see running
+# the script locally.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+
+name: Add Pull Request Reviewers
+
+on:
+  pull_request_target:
+    branches:
+      - master
+    types: [opened, ready_for_review, reopened, synchronize]
+
+env:
+  GET_MAINTAINER_REL_PATH: "BaseTools/Scripts/GetMaintainer.py"
+
+jobs:
+  auto-request-review:
+    name: Add Pull Request Reviewers
+    # Do not run on draft PRs and only run on PRs in the tianocore organization
+    if: ${{ github.event.pull_request.draft == false && github.repository_owner == 'tianocore' }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Generate Token
+        id: generate-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.TIANOCORE_ASSIGN_REVIEWERS_APPLICATION_ID }}
+          private-key: ${{ secrets.TIANOCORE_ASSIGN_REVIEWERS_APPLICATION_PRIVATE_KEY }}
+
+      # Reduce checkout time with sparse-checkout
+      #   - .github: Contains the scripts to interact with Github and add reviewers
+      #   - BaseTools/Scripts: Contains the GetMaintainer.py script
+      #   - Maintainers.txt: Contains the list of maintainers for the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            .github
+            BaseTools/Scripts
+            Maintainers.txt
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+          cache: 'pip'
+          cache-dependency-path: '.github/scripts/requirements.txt'
+
+      - name: Install PIP Modules
+        run: pip install -r .github/scripts/requirements.txt --upgrade
+
+      - name: Add Reviewers to Pull Request
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          ORG_NAME: ${{ github.repository_owner }}
+          PR_NUMBER: ${{ github.event.number}}
+          REPO_NAME: ${{ github.event.pull_request.base.repo.name }}
+          TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}
+          WORKSPACE_PATH: ${{ github.workspace }}
+        run: python .github/scripts/RequestPrReviewers.py

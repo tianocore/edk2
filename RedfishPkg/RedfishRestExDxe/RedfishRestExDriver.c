@@ -660,7 +660,7 @@ RestExHttpCallback (
                          then a new handle is created. If it is a pointer to an existing UEFI handle,
                          then the protocol is added to the existing UEFI handle.
 
-  @retval EFI_SUCCES            The protocol was added to ChildHandle.
+  @retval EFI_SUCCESS           The protocol was added to ChildHandle.
   @retval EFI_INVALID_PARAMETER ChildHandle is NULL.
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to create
                                 the child
@@ -762,7 +762,7 @@ RedfishRestExServiceBindingCreateChild (
     goto ON_ERROR;
   }
 
-  // Initial HTTP callback funciton on this REST EX instance
+  // Initial HTTP callback function on this REST EX instance
   Instance->HttpCallbakFunction.Callback = RestExHttpCallback;
   Status                                 = gBS->InstallProtocolInterface (
                                                   &Instance->HttpIo.Handle,
@@ -771,7 +771,7 @@ RedfishRestExServiceBindingCreateChild (
                                                   &Instance->HttpCallbakFunction
                                                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Fail to install HttpCallbakFunction.\n", __func__));
+    DEBUG ((DEBUG_ERROR, "%a: Fail to install HttpCallbackFunction.\n", __func__));
     goto ON_ERROR;
   }
 
@@ -803,7 +803,7 @@ ON_ERROR:
   @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param[in] ChildHandle Handle of the child to destroy
 
-  @retval EFI_SUCCES            The protocol was removed from ChildHandle.
+  @retval EFI_SUCCESS           The protocol was removed from ChildHandle.
   @retval EFI_UNSUPPORTED       ChildHandle does not support the protocol that is being removed.
   @retval EFI_INVALID_PARAMETER Child handle is NULL.
   @retval EFI_ACCESS_DENIED     The protocol could not be removed from the ChildHandle

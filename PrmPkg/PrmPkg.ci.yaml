@@ -49,7 +49,6 @@
     ## options defined .pytool/Plugin/DependencyCheck
     "DependencyCheck": {
         "AcceptableDependencies": [
-            "ArmPkg/ArmPkg.dec",
             "MdeModulePkg/MdeModulePkg.dec",
             "MdePkg/MdePkg.dec",
             "PrmPkg/PrmPkg.dec",

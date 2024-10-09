@@ -303,6 +303,10 @@
   #
   TraceHubDebugSysTLib|Include/Library/TraceHubDebugSysTLib.h
 
+  ##  @libraryclass  Provides a hook called when a stack cookie check fails.
+  #
+  StackCheckFailureHookLib|Include/Library/StackCheckFailureHookLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64, LibraryClasses.AARCH64]
   ##  @libraryclass  Provides services to generate random number.
   #
@@ -750,6 +754,16 @@
   ## GUID used to specify section with devdb content
   ## Include/Guid/DeviceAuthentication.h
   gEfiDeviceSignatureDatabaseGuid  = { 0xb9c2b4f4, 0xbf5f, 0x462d, {0x8a, 0xdf, 0xc5, 0xc7, 0xa, 0xc3, 0x5d, 0xad }}
+
+  ## Include/Guid/ConformanceProfiles.h
+  gEfiConfProfilesTableGuid        = { 0x36122546, 0xf7e7, 0x4c8f, { 0xbd, 0x9b, 0xeb, 0x85, 0x25, 0xb5, 0x0c, 0x0b }}
+  gEfiConfProfilesUefiSpecGuid     = { 0x523c91af, 0xa195, 0x4382, { 0x81, 0x8d, 0x29, 0x5f, 0xe4, 0x00, 0x64, 0x65 }}
+
+  # GUIDs defined in EBBR
+  #
+  ## Include/Guid/ConformanceProfiles.h
+  gEfiConfProfilesEbbrSpec21Guid     = { 0xcce33c35, 0x74ac, 0x4087, { 0xbc, 0xe7, 0x8b, 0x29, 0xb0, 0x2e, 0xeb, 0x27 }}
+  gEfiConfProfilesEbbrSpec22Guid     = { 0x9073eed4, 0xe50d, 0x11ee, { 0xb8, 0xb0, 0x8b, 0x68, 0xda, 0x62, 0xfc, 0x80 }}
 
   #
   # GUID defined in PI1.0
@@ -1374,6 +1388,10 @@
 
   ## Include/Protocol/MmCommunication.h
   gEfiMmCommunicationProtocolGuid  = { 0xc68ed8e2, 0x9dc6, 0x4cbd, { 0x9d, 0x94, 0xdb, 0x65, 0xac, 0xc5, 0xc3, 0x32 }}
+
+  ## This protocol is a MM protocol published by a standalone MM Foundation code if MM Foundation is loaded in PEI phase.
+  ## This protocol should be installed immediately after DXE IPL installs EFI_PEI_END_OF_PEI_PHASE_PPI
+  gEfiMmEndOfPeiProtocol           = { 0xf33e1bf3, 0x980b, 0x4bfb, { 0xa2, 0x9a, 0xb2, 0x9c, 0x86, 0x45, 0x37, 0x32 }}
 
   #
   # Protocols defined in PI 1.6.
@@ -2245,6 +2263,15 @@
   # @Prompt Speculation Barrier Type.
   gEfiMdePkgTokenSpaceGuid.PcdSpeculationBarrierType|0x01|UINT8|0x30001018
 
+  ## This PCD specifies the interrupt vector for stack cookie check failures
+  gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector|0x42|UINT8|0x30001019
+
+  ## Enforces the use of Secure UEFI spec defined RNG algorithms.
+  # TRUE  - Enforce the use of Secure UEFI spec defined RNG algorithms.
+  # FALSE - Do not enforce and depend on the default implementation of RNG algorithm from the provider.
+  # @Prompt Enforce the use of Secure UEFI spec defined RNG algorithms.
+  gEfiMdePkgTokenSpaceGuid.PcdEnforceSecureRngAlgorithms|TRUE|BOOLEAN|0x1000000D
+
 [PcdsFixedAtBuild,PcdsPatchableInModule]
   ## Indicates the maximum length of unicode string used in the following
   #  BaseLib functions: StrLen(), StrSize(), StrCmp(), StrnCmp(), StrCpy(), StrnCpy()<BR><BR>
@@ -2419,6 +2446,8 @@
   # BIT 1 = Supervisor Time Compare (Sstc). This bit is relevant only if
   # previous stage has feature enabled and user wants to disable it.
   # BIT 2 = Page-Based Memory Types (Pbmt). This bit is relevant only if
+  # previous stage has feature enabled and user wants to disable it.
+  # BIT 3 = Zkr extension.This bit is relevant only if
   # previous stage has feature enabled and user wants to disable it.
   #
   gEfiMdePkgTokenSpaceGuid.PcdRiscVFeatureOverride|0xFFFFFFFFFFFFFFFF|UINT64|0x69

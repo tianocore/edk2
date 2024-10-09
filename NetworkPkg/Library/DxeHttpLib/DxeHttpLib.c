@@ -1927,6 +1927,11 @@ HttpGenRequestMessage (
         CopyMem (RequestPtr, HTTP_METHOD_DELETE, StrLength);
         RequestPtr += StrLength;
         break;
+      case HttpMethodConnect:
+        StrLength = sizeof (HTTP_METHOD_CONNECT) - 1;
+        CopyMem (RequestPtr, HTTP_METHOD_CONNECT, StrLength);
+        RequestPtr += StrLength;
+        break;
       default:
         ASSERT (FALSE);
         Status = EFI_INVALID_PARAMETER;
@@ -1989,6 +1994,9 @@ Exit:
 /**
   Translate the status code in HTTP message to EFI_HTTP_STATUS_CODE defined
   in UEFI 2.5 specification.
+
+  The official HTTP status codes can be found here:
+  https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 
   @param[in]  StatusCode         The status code value in HTTP message.
 
@@ -2072,6 +2080,8 @@ HttpMappingToStatusCode (
       return HTTP_STATUS_416_REQUESTED_RANGE_NOT_SATISFIED;
     case 417:
       return HTTP_STATUS_417_EXPECTATION_FAILED;
+    case 429:
+      return HTTP_STATUS_429_TOO_MANY_REQUESTS;
     case 500:
       return HTTP_STATUS_500_INTERNAL_SERVER_ERROR;
     case 501:

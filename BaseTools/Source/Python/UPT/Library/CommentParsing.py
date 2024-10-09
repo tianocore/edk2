@@ -238,7 +238,7 @@ def ParseDecPcdGenericComment (GenericComment, ContainerFile, TokenSpaceGuidCNam
         #
         # To replace Macro
         #
-        MACRO_PATTERN = '[\t\s]*\$\([A-Z][_A-Z0-9]*\)'
+        MACRO_PATTERN = r'[\t\s]*\$\([A-Z][_A-Z0-9]*\)'
         MatchedStrs =  re.findall(MACRO_PATTERN, Comment)
         for MatchedStr in MatchedStrs:
             if MatchedStr:

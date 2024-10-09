@@ -38,10 +38,8 @@
   AArch64/Rndr.c
   AArch64/ArmRng.h
 
-  AArch64/ArmReadIdIsar0.S   | GCC
   AArch64/ArmRng.S           | GCC
 
-  AArch64/ArmReadIdIsar0.asm | MSFT
   AArch64/ArmRng.asm         | MSFT
 
 [Guids.AARCH64]
@@ -49,6 +47,10 @@
 
 [Guids.Ia32, Guids.X64]
   gEfiRngAlgorithmSp80090Ctr256Guid
+
+[Sources.RISCV64]
+  Riscv/Rng.c
+  Riscv/Seed.S               | GCC
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -59,3 +61,7 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+
+[Pcd.RISCV64]
+  # Does the CPU support the Zkr extension (for the `Seed` CSR)
+  gEfiMdePkgTokenSpaceGuid.PcdRiscVFeatureOverride           ## CONSUMES

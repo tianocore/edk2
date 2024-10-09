@@ -186,13 +186,14 @@ class SpellCheck(ICiBuildPlugin):
         # Helper - Log the syntax needed to add these words to dictionary
         if len(EasyFix) > 0:
             EasyFix = sorted(set(a.lower() for a in EasyFix))
+            logging.error(f'SpellCheck found {len(EasyFix)} failing words. See CI log for details.')
             tc.LogStdOut("\n Easy fix:")
             OneString = "If these are not errors add this to your ci.yaml file.\n"
             OneString += '"SpellCheck": {\n  "ExtendWords": ['
             for a in EasyFix:
                 tc.LogStdOut(f'\n"{a}",')
                 OneString += f'\n    "{a}",'
-            logging.info(OneString.rstrip(",") + '\n  ]\n}')
+            logging.critical(OneString.rstrip(",") + '\n ]\n}')
 
         # add result to test case
         overall_status = len(Errors)
