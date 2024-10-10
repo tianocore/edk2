@@ -67,11 +67,7 @@ typedef struct _EFI_MM_SX_DISPATCH_PROTOCOL EFI_MM_SX_DISPATCH_PROTOCOL;
                                  The caller fills this context in before calling
                                  the register function to indicate to the register
                                  function which Sx state type and phase the caller
-                                 wishes to be called back on. For this intertace,
-                                 the Sx driver will call the registered handlers for
-                                 all Sx type and phases, so the Sx state handler(s)
-                                 must check the Type and Phase field of the Dispatch
-                                 context and act accordingly.
+                                 wishes to be called back on.
   @param[out]  DispatchHandle    Handle of dispatch function, for when interfacing
                                  with the parent Sx state MM driver.
 
