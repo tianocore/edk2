@@ -155,7 +155,7 @@ R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 BaseTools
 F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
-M: Rebecca Cran <rebecca@bsdio.com> [bcran]
+M: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Bob Feng <bob.c.feng@intel.com> [BobCF]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
@@ -374,7 +374,7 @@ MdeModulePkg: USB Network modules
 F: MdeModulePkg/Bus/Usb/UsbNetwork
 F: MdeModulePkg/Include/Protocol/UsbEthernetProtocol.h
 M: Richard Ho <richardho@ami.com> [richardho]
-R: Rebecca Cran <rebecca@bsdio.com> [bcran]
+R: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 
 MdeModulePkg: Manageability modules
 F: MdeModulePkg/Include/*Ipmi*.*
@@ -456,7 +456,7 @@ F: OvmfPkg/Library/PciHostBridgeLibScan/
 F: OvmfPkg/Library/PlatformBootManagerLibBhyve/
 F: OvmfPkg/Library/ResetSystemLib/BaseResetShutdownBhyve.c
 F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
-R: Rebecca Cran <rebecca@bsdio.com> [bcran]
+R: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 R: Corvin Köhne <corvink@freebsd.org> [corvink]
 
 OvmfPkg: cloudhv-related modules
