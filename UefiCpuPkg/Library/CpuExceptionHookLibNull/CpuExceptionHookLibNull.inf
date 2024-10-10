@@ -1,0 +1,21 @@
+## @file
+#  Library which provides a hook that is called when a cpu exception occurs
+#
+#  Copyright (c) Microsoft Corporation. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpuExceptionHookLibNull
+  FILE_GUID                      = 34979EC6-7182-4C62-924D-C0955C9B0EE6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpuExceptionHookLib
+
+[Sources]
+  CpuExceptionHookLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
