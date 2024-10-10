@@ -2,7 +2,7 @@
   Header file contains code for USB Ethernet Protocol
   definitions
 
-  Copyright (c) 2023, American Megatrends International LLC. All rights reserved.<BR>
+  Copyright (c) 2023 - 2024, American Megatrends International LLC. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -27,10 +27,6 @@ typedef struct _EDKII_USB_ETHERNET_PROTOCOL EDKII_USB_ETHERNET_PROTOCOL;
 #define USB_MISC_CLASS               0xEF
 #define USB_RNDIS_SUBCLASS           0x04
 #define USB_RNDIS_ETHERNET_PROTOCOL  0x01
-
-// Type Values for the DescriptorType Field
-#define CS_INTERFACE  0x24
-#define CS_ENDPOINT   0x25
 
 // Descriptor SubType in Functional Descriptors
 #define HEADER_FUN_DESCRIPTOR    0x00

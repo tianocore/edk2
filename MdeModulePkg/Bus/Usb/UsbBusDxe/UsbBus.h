@@ -3,6 +3,7 @@
     Usb Bus Driver Binding and Bus IO Protocol.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -15,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Usb2HostController.h>
 #include <Protocol/UsbHostController.h>
 #include <Protocol/UsbIo.h>
+#include <Protocol/UsbAssociationIo.h>
 #include <Protocol/DevicePath.h>
 
 #include <Library/BaseLib.h>
@@ -29,15 +31,17 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/Usb.h>
 
-typedef struct _USB_DEVICE     USB_DEVICE;
-typedef struct _USB_INTERFACE  USB_INTERFACE;
-typedef struct _USB_BUS        USB_BUS;
-typedef struct _USB_HUB_API    USB_HUB_API;
+typedef struct _USB_DEVICE       USB_DEVICE;
+typedef struct _USB_INTERFACE    USB_INTERFACE;
+typedef struct _USB_BUS          USB_BUS;
+typedef struct _USB_HUB_API      USB_HUB_API;
+typedef struct _USB_ASSOCIATION  USB_ASSOCIATION;
 
 #include "UsbUtility.h"
 #include "UsbDesc.h"
 #include "UsbHub.h"
 #include "UsbEnumer.h"
+#include "UsbIntfAssoc.h"
 
 //
 // USB bus timeout experience values
@@ -132,14 +136,18 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 //
 #define  USB_BUS_TPL  TPL_NOTIFY
 
-#define  USB_INTERFACE_SIGNATURE  SIGNATURE_32 ('U', 'S', 'B', 'I')
-#define  USB_BUS_SIGNATURE        SIGNATURE_32 ('U', 'S', 'B', 'B')
+#define  USB_INTERFACE_SIGNATURE    SIGNATURE_32 ('U', 'S', 'B', 'I')
+#define  USB_BUS_SIGNATURE          SIGNATURE_32 ('U', 'S', 'B', 'B')
+#define  USB_ASSOCIATION_SIGNATURE  SIGNATURE_32 ('U', 'S', 'B', 'A')
 
 #define USB_BIT(a)                 ((UINTN)(1 << (a)))
 #define USB_BIT_IS_SET(Data, Bit)  ((BOOLEAN)(((Data) & (Bit)) == (Bit)))
 
 #define USB_INTERFACE_FROM_USBIO(a) \
           CR(a, USB_INTERFACE, UsbIo, USB_INTERFACE_SIGNATURE)
+
+#define USB_ASSOCIATION_FROM_USBIA(a) \
+          CR(a, USB_ASSOCIATION, UsbIa, USB_ASSOCIATION_SIGNATURE)
 
 #define USB_BUS_FROM_THIS(a) \
           CR(a, USB_BUS, BusId, USB_BUS_SIGNATURE)
@@ -175,6 +183,9 @@ struct _USB_DEVICE {
 
   UINT16                                LangId[USB_MAX_LANG_ID];
   UINT16                                TotalLangId;
+
+  UINT8                                 NumOfAssociation;
+  USB_ASSOCIATION                       *Associations[USB_MAX_ASSOCIATION];
 
   UINT8                                 NumOfInterface;
   USB_INTERFACE                         *Interfaces[USB_MAX_INTERFACE];
@@ -228,6 +239,23 @@ struct _USB_INTERFACE {
   // connected to EHCI.
   //
   UINT8                       MaxSpeed;
+};
+
+//
+// Stands for a function implemented using interface association
+//
+struct _USB_ASSOCIATION {
+  UINTN                             Signature;
+  USB_DEVICE                        *Device;
+  USB_INTERFACE_ASSOCIATION_DESC    *IaDesc;
+
+  //
+  // Handles and protocols
+  //
+  EFI_HANDLE                        Handle;
+  EFI_USB_IA_PROTOCOL               UsbIa;
+  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  BOOLEAN                           IsManaged;
 };
 
 //

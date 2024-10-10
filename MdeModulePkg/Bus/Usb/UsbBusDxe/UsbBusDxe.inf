@@ -2,6 +2,7 @@
 #  The Usb Bus Dxe driver is used to enumerate and manage all attached usb devices.
 #
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -40,6 +41,8 @@
   UsbUtility.c
   UsbDesc.h
   UsbBus.h
+  UsbIntfAssoc.c
+  UsbIntfAssoc.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -58,6 +61,7 @@
 
 [Protocols]
   gEfiUsbIoProtocolGuid                         ## BY_START
+  gEfiUsbIaProtocolGuid
   ## TO_START
   ## BY_START
   gEfiDevicePathProtocolGuid
