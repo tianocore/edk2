@@ -1,0 +1,19 @@
+## @file
+# Download Mach-O to PE/COFF binary converter
+# - macOS specific
+# Put the tool on the path
+#
+# Copyright (c) Microsoft Corporation and contributors
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+{
+  "id": "mtoc-1",
+  "scope": "edk2-build",
+  "type": "web",
+  "name": "mtoc",
+  "source": "https://github.com/mikebeaton/edk2_ci_tools/releases/download/mtoc/mtoc.1.0.3.zip",
+  "version": "1.0.3",
+  "internal_path": "/mtoc",
+  "compression_type": "zip",
+  "flags": ["set_path", "host_specific"]
+}

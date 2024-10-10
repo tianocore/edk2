@@ -6,6 +6,6 @@
 ##
 {
   "id": "binwrappers",
-  "scope": "global-nix",
+  "scope": "global",
   "flags": ["set_path"]
 }

@@ -10,9 +10,11 @@
 {
   "id": "nasm-1",
   "scope": "edk2-build",
-  "type": "nuget",
+  "type": "web",
   "name": "mu_nasm",
-  "source": "https://api.nuget.org/v3/index.json",
-  "version": "2.15.5",
+  "source": "https://github.com/mikebeaton/edk2_ci_tools/releases/download/mu_nasm/mu_nasm.20016.1.1.zip",
+  "version": "20016.1.1",
+  "internal_path": "/mu_nasm",
+  "compression_type": "zip",
   "flags": ["set_path", "host_specific"]
 }
