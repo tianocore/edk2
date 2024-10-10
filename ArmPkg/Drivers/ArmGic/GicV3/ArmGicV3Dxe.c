@@ -374,7 +374,6 @@ GicV3DxeInitialize (
 {
   EFI_STATUS  Status;
   UINTN       Index;
-  UINT64      CpuTarget;
   UINT64      MpId;
 
   // Make sure the Interrupt Controller Protocol is not already installed in
@@ -406,6 +405,8 @@ GicV3DxeInitialize (
   // Targets the interrupts to the Primary Cpu
 
   if (FeaturePcdGet (PcdArmGicV3WithV2Legacy)) {
+    UINT32  CpuTarget;
+
     // Only Primary CPU will run this code. We can identify our GIC CPU ID by
     // reading the GIC Distributor Target register. The 8 first
     // GICD_ITARGETSRn are banked to each connected CPU. These 8 registers
@@ -428,6 +429,8 @@ GicV3DxeInitialize (
       }
     }
   } else {
+    UINT64  CpuTarget;
+
     MpId      = ArmReadMpidr ();
     CpuTarget = MpId &
                 (ARM_CORE_AFF0 | ARM_CORE_AFF1 | ARM_CORE_AFF2 | ARM_CORE_AFF3);
