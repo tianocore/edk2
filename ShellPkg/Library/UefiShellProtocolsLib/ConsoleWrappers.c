@@ -67,9 +67,7 @@ FileBasedSimpleTextInReset (
   @param[in] This      A pointer to the SimpleTextIn structure.
   @param[in, out] Key  A pointer to the Key structure to fill.
 
-  @retval EFI_SUCCESS      The read was successful.
-  @retval EFI_UNSUPPORTED  The device does not support the ability to read
-                           keystroke data.
+  @retval   EFI_SUCCESS The read was successful.
 **/
 EFI_STATUS
 EFIAPI
@@ -113,11 +111,11 @@ FileBasedSimpleTextInReadKeyStroke (
   }
 
   Key->ScanCode = 0;
-  return (ShellInfoObject.NewEfiShellProtocol->ReadFile (
-                                                 ((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)This)->FileHandle,
-                                                 &Size,
-                                                 &Key->UnicodeChar
-                                                 ));
+  return (ShellProtocolsInfoObject.NewEfiShellProtocol->ReadFile (
+                                                          ((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)This)->FileHandle,
+                                                          &Size,
+                                                          &Key->UnicodeChar
+                                                          ));
 }
 
 /**
@@ -417,11 +415,11 @@ FileBasedSimpleTextOutOutputString (
   UINTN  Size;
 
   Size = StrLen (WString) * sizeof (CHAR16);
-  return (ShellInfoObject.NewEfiShellProtocol->WriteFile (
-                                                 ((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *)This)->FileHandle,
-                                                 &Size,
-                                                 WString
-                                                 ));
+  return (ShellProtocolsInfoObject.NewEfiShellProtocol->WriteFile (
+                                                          ((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *)This)->FileHandle,
+                                                          &Size,
+                                                          WString
+                                                          ));
 }
 
 /**

@@ -7,6 +7,7 @@
 **/
 
 #include "Shell.h"
+#include "ShellEnvVar.h"
 
 #define INIT_NAME_BUFFER_SIZE  128
 #define INIT_DATA_BUFFER_SIZE  1024
