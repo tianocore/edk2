@@ -65,7 +65,7 @@
   NetLib
 
 [Guids]
-  gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event
+  gEfiEventBeforeExitBootServicesGuid           ## SOMETIMES_CONSUMES ## Event
 
 [Protocols]
   gEfiSimpleNetworkProtocolGuid                 ## BY_START
