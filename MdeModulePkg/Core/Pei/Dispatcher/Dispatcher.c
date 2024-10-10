@@ -3,14 +3,382 @@
 
 Copyright (c) 2006 - 2024, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
 #include "PeiMain.h"
 
-/**
+//
+// Utility global variables
+//
 
+/**
+  DelayedDispatchDispatcher
+
+  Delayed Dispach cycle (ie one pass) through each entry, calling functions when their
+  time has expired.  When DelayedGroupId is specified, if there are any of the specified entries
+  in the dispatch queue during dispatch, repeat the DelayedDispatch cycle.
+
+  @param DelayedDispatchTable  Pointer to dispatch table
+  @param OPTIONAL              DelayedGroupId used to insure particular time is met.
+
+  @return BOOLEAN
+**/
+BOOLEAN
+DelayedDispatchDispatcher (
+  IN DELAYED_DISPATCH_TABLE  *DelayedDispatchTable,
+  IN EFI_GUID                *DelayedGroupId  OPTIONAL
+  );
+
+/**
+  DelayedDispatch End of PEI callback function. Insure that all of the delayed dispatch
+  entries are complete before exiting PEI.
+
+  @param[in] PeiServices   - Pointer to PEI Services Table.
+  @param[in] NotifyDesc    - Pointer to the descriptor for the Notification event that
+                             caused this function to execute.
+  @param[in] Ppi           - Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS       - Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+PeiDelayedDispatchOnEndOfPei (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
+  );
+
+EFI_DELAYED_DISPATCH_PPI  mDelayedDispatchPpi  = { PeiDelayedDispatchRegister, PeiDelayedDispatchWaitOnEvent };
+EFI_PEI_PPI_DESCRIPTOR    mDelayedDispatchDesc = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEfiPeiDelayedDispatchPpiGuid,
+  &mDelayedDispatchPpi
+};
+
+EFI_PEI_NOTIFY_DESCRIPTOR  mDelayedDispatchNotifyDesc = {
+  EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+  &gEfiEndOfPeiSignalPpiGuid,
+  PeiDelayedDispatchOnEndOfPei
+};
+
+/**
+  Helper function to look up DELAYED_DISPATCH_TABLE published in HOB.
+
+  @return Pointer to DELAYED_DISPATCH_TABLE from HOB
+**/
+DELAYED_DISPATCH_TABLE *
+GetDelayedDispatchTable (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE  *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&gEfiDelayedDispatchTableGuid);
+  if (GuidHob == NULL) {
+    // There is something off about the build if this happens. We do want to
+    // assert here to catch it during development.
+    DEBUG ((DEBUG_ERROR, "%a - Delayed Dispatch Hob not available.\n", __func__));
+    ASSERT (FALSE);
+    return NULL;
+  }
+
+  return (DELAYED_DISPATCH_TABLE *)GET_GUID_HOB_DATA (GuidHob);
+}
+
+/**
+  Register a callback to be called after a minimum delay has occurred.
+
+  This service is the single member function of the EFI_DELAYED_DISPATCH_PPI
+
+  @param[in] This           Pointer to the EFI_DELAYED_DISPATCH_PPI instance
+  @param[in] Function       Function to call back
+  @param[in] Context        Context data
+  @param[in] DelayedGroupId GUID for this Delayed Dispatch request.
+  @param[in] Delay          Delay interval
+
+  @retval EFI_SUCCESS               Function successfully loaded
+  @retval EFI_INVALID_PARAMETER     One of the Arguments is not supported
+  @retval EFI_OUT_OF_RESOURCES      No more entries
+
+**/
+EFI_STATUS
+EFIAPI
+PeiDelayedDispatchRegister (
+  IN  EFI_DELAYED_DISPATCH_PPI       *This,
+  IN  EFI_DELAYED_DISPATCH_FUNCTION  Function,
+  IN  UINT64                         Context,
+  IN  EFI_GUID                       *DelayedGroupId   OPTIONAL,
+  IN  UINT32                         Delay
+  )
+{
+  DELAYED_DISPATCH_TABLE  *DelayedDispatchTable;
+  DELAYED_DISPATCH_ENTRY  *Entry;
+  EFI_STATUS              Status;
+
+  // Check input parameters
+  if ((Function == NULL) || (Delay > FixedPcdGet32 (PcdDelayedDispatchMaxDelayUs)) || (This == NULL)) {
+    DEBUG ((DEBUG_ERROR, "%a Invalid parameter. Function: %Lx, Delay: %u, This: %p\n", __func__, (UINT64)(UINTN)Function, Delay, This));
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
+  }
+
+  // Get delayed dispatch table
+  DelayedDispatchTable = GetDelayedDispatchTable ();
+  if (DelayedDispatchTable == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a Unable to locate dispatch table\n", __func__));
+    Status = EFI_UNSUPPORTED;
+    goto Exit;
+  }
+
+  // Check for available entry slots
+  ASSERT (DelayedDispatchTable->Count <= DELAYED_DISPATCH_MAX_ENTRIES);
+  if (DelayedDispatchTable->Count == DELAYED_DISPATCH_MAX_ENTRIES) {
+    DEBUG ((DEBUG_ERROR, "%a Too many entries requested\n", __func__));
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Exit;
+  }
+
+  Entry           = &DelayedDispatchTable->Entry[DelayedDispatchTable->Count];
+  Entry->Function = Function;
+  Entry->Context  = Context;
+  Status          = SafeUint64Add (GET_TIME_IN_US (), Delay, &Entry->DispatchTime);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a Delay overflow\n", __func__));
+    Status = EFI_INVALID_PARAMETER;
+    goto Exit;
+  }
+
+  if (DelayedGroupId == NULL) {
+    ZeroMem (&Entry->DelayedGroupId, sizeof (EFI_GUID));
+  } else {
+    CopyGuid (&Entry->DelayedGroupId, DelayedGroupId);
+  }
+
+  Entry->MicrosecondDelay = Delay;
+  DelayedDispatchTable->Count++;
+
+  DEBUG ((DEBUG_INFO, "%a  Adding dispatch Entry\n", __func__));
+  DEBUG ((DEBUG_INFO, "    Requested Delay = %d\n", Delay));
+  DEBUG ((DEBUG_INFO, "    Trigger Time = %d\n", Entry->DispatchTime));
+  DEBUG ((DEBUG_INFO, "    Context = 0x%016lx\n", Entry->Context));
+  DEBUG ((DEBUG_INFO, "    Function = %Lx\n", (UINT64)(UINTN)Entry->Function));
+  DEBUG ((DEBUG_INFO, "    DelayedGroupId = %g\n", &Entry->DelayedGroupId));
+
+  if (Delay == 0) {
+    // Force early dispatch point
+    DelayedDispatchDispatcher (DelayedDispatchTable, NULL);
+  }
+
+  Status = EFI_SUCCESS;
+
+Exit:
+  return Status;
+}
+
+/**
+  DelayedDispatchDispatcher
+
+  Delayed Dispach cycle (ie one pass) through each entry, calling functions when their
+  time has expired.  When DelayedGroupId is specified, if there are any of the specified entries
+  in the dispatch queue during dispatch, repeat the DelayedDispatch cycle.
+
+  @param DelayedDispatchTable  Pointer to dispatch table
+  @param OPTIONAL              DelayedGroupId used to insure particular time is met.
+
+  @return BOOLEAN
+**/
+BOOLEAN
+DelayedDispatchDispatcher (
+  IN DELAYED_DISPATCH_TABLE  *DelayedDispatchTable,
+  IN EFI_GUID                *DelayedGroupId           OPTIONAL
+  )
+{
+  BOOLEAN                 Dispatched;
+  UINT64                  TimeCurrent;
+  UINT64                  MaxDispatchTime;
+  UINTN                   Index1;
+  BOOLEAN                 DelayedGroupIdPresent;
+  DELAYED_DISPATCH_ENTRY  *Entry;
+  EFI_STATUS              Status;
+
+  Dispatched            = FALSE;
+  DelayedGroupIdPresent = TRUE;
+  Status                = SafeUint64Add (GET_TIME_IN_US (), FixedPcdGet32 (PcdDelayedDispatchCompletionTimeoutUs), &MaxDispatchTime);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a Delay overflow\n", __func__));
+    return FALSE;
+  }
+
+  while ((DelayedDispatchTable->Count > 0) && (DelayedGroupIdPresent)) {
+    DelayedGroupIdPresent = FALSE;
+    DelayedDispatchTable->DispCount++;
+
+    // If dispatching is messed up, clear DelayedDispatchTable and exit.
+    TimeCurrent =  GET_TIME_IN_US ();
+    if (TimeCurrent > MaxDispatchTime) {
+      DEBUG ((DEBUG_ERROR, "%a - DelayedDispatch Completion timeout!\n", __func__));
+      ReportStatusCode ((EFI_ERROR_MAJOR | EFI_ERROR_CODE), (EFI_SOFTWARE_PEI_CORE | EFI_SW_EC_ABORTED));
+      ASSERT (FALSE);
+      DelayedDispatchTable->Count = 0;
+      break;
+    }
+
+    // Check each entry in the table for possible dispatch
+    for (Index1 = 0; Index1 < DelayedDispatchTable->Count;) {
+      Entry = &DelayedDispatchTable->Entry[Index1];
+      // If DelayedGroupId is present, insure there is an additional check of the table.
+      if (DelayedGroupId != NULL) {
+        if (CompareGuid (DelayedGroupId, &Entry->DelayedGroupId)) {
+          DelayedGroupIdPresent = TRUE;
+        }
+      }
+
+      TimeCurrent =  GET_TIME_IN_US ();
+      if (TimeCurrent >= Entry->DispatchTime) {
+        // Time expired, invoked the function
+        DEBUG ((
+          DEBUG_ERROR,
+          "Delayed dispatch entry %d @ %p, Target=%d, Act=%d Disp=%d\n",
+          Index1,
+          Entry->Function,
+          Entry->DispatchTime,
+          TimeCurrent,
+          DelayedDispatchTable->DispCount
+          ));
+        Dispatched              = TRUE;
+        Entry->MicrosecondDelay = 0;
+        Entry->Function (
+                 &Entry->Context,
+                 &Entry->MicrosecondDelay
+                 );
+        DEBUG ((DEBUG_ERROR, "Delayed dispatch Function returned delay=%d\n", Entry->MicrosecondDelay));
+        if (Entry->MicrosecondDelay == 0) {
+          // NewTime = 0 = delete this entry from the table
+          DelayedDispatchTable->Count--;
+          CopyMem (Entry, Entry+1, sizeof (DELAYED_DISPATCH_ENTRY) * (DelayedDispatchTable->Count - Index1));
+        } else {
+          if (Entry->MicrosecondDelay > FixedPcdGet32 (PcdDelayedDispatchMaxDelayUs)) {
+            DEBUG ((DEBUG_ERROR, "%a Illegal new delay %d requested\n", __func__, Entry->MicrosecondDelay));
+            ASSERT (FALSE);
+            Entry->MicrosecondDelay = FixedPcdGet32 (PcdDelayedDispatchMaxDelayUs);
+          }
+
+          // NewTime != 0 - update the time from us to Dispatch time
+          Status = SafeUint64Add (GET_TIME_IN_US (), Entry->MicrosecondDelay, &Entry->DispatchTime);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "%a Delay overflow, this event will likely never be fired...\n", __func__));
+            Entry->DispatchTime = MAX_UINT64;
+          }
+
+          Index1++;
+        }
+      } else {
+        Index1++;
+      }
+    }
+  }
+
+  return Dispatched;
+}
+
+/**
+  Wait on a registered Delayed Dispatch unit that has a DelayedGroupId. Continue
+  to dispatch all registered delayed dispatch entries until *ALL* entries with
+  DelayedGroupId have completed.
+
+  Example usage:
+  1. Register a Delayed Dispatch entry with a DelayedGroupId.
+  2. Call this function with the DelayedGroupId
+  3. The registered function in #1 will be called after the specified delay.
+  4. This function will wait until all entries with the DelayedGroupId have completed.
+
+  @param[in]  This            The Delayed Dispatch PPI pointer.
+  @param[in]  DelayedGroupId  Delayed dispatch request ID the caller will wait on
+
+  @retval EFI_SUCCESS            The operation succeeds.
+  @retval EFI_INVALID_PARAMETER  The parameters are invalid.
+
+**/
+EFI_STATUS
+EFIAPI
+PeiDelayedDispatchWaitOnEvent (
+  IN  EFI_DELAYED_DISPATCH_PPI  *This,
+  IN  EFI_GUID                  DelayedGroupId
+  )
+{
+  PERF_FUNCTION_BEGIN ();
+  EFI_STATUS              Status;
+  DELAYED_DISPATCH_TABLE  *DelayedDispatchTable;
+
+  // Get delayed dispatch table
+  DelayedDispatchTable = GetDelayedDispatchTable ();
+  if (DelayedDispatchTable == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a Unable to locate dispatch table\n", __func__));
+    Status = EFI_UNSUPPORTED;
+    goto Exit;
+  }
+
+  if (IsZeroGuid (&DelayedGroupId)) {
+    DEBUG ((DEBUG_ERROR, "%a Delayed Group ID is a null GUID\n", __func__));
+    Status = EFI_UNSUPPORTED;
+    goto Exit;
+  }
+
+  DEBUG ((DEBUG_INFO, "Delayed dispatch on %g. Count=%d, DispatchCount=%d\n", &DelayedGroupId, DelayedDispatchTable->Count, DelayedDispatchTable->DispCount));
+  PERF_EVENT_SIGNAL_BEGIN (&DelayedGroupId);
+  DelayedDispatchDispatcher (DelayedDispatchTable, &DelayedGroupId);
+  PERF_EVENT_SIGNAL_END (&DelayedGroupId);
+
+  Status = EFI_SUCCESS;
+
+Exit:
+  PERF_FUNCTION_END ();
+  return Status;
+}
+
+/**
+  DelayedDispatch End of PEI callback function. Insure that all of the delayed dispatch
+  entries are complete before exiting PEI.
+
+  @param[in] PeiServices   - Pointer to PEI Services Table.
+  @param[in] NotifyDesc    - Pointer to the descriptor for the Notification event that
+                             caused this function to execute.
+  @param[in] Ppi           - Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS       - Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+PeiDelayedDispatchOnEndOfPei (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
+  )
+{
+  DELAYED_DISPATCH_TABLE  *DelayedDispatchTable;
+
+  // Get delayed dispatch table
+  DelayedDispatchTable = GetDelayedDispatchTable ();
+  if (DelayedDispatchTable == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a Unable to locate dispatch table\n", __func__));
+    return EFI_UNSUPPORTED;
+  }
+
+  PERF_INMODULE_BEGIN ("PerfDelayedDispatchEndOfPei");
+  while (DelayedDispatchTable->Count > 0) {
+    DelayedDispatchDispatcher (DelayedDispatchTable, NULL);
+  }
+
+  DEBUG ((DEBUG_ERROR, "%a Count of dispatch cycles is %d\n", __func__, DelayedDispatchTable->DispCount));
+  PERF_INMODULE_END ("PerfDelayedDispatchEndOfPei");
+
+  return EFI_SUCCESS;
+}
+
+/**
   Discover all PEIMs and optional Apriori file in one FV. There is at most one
   Apriori file in one FV.
 
@@ -347,7 +715,7 @@ PeiLoadFixAddressHook (
           // Note: Here is a assumption that system memory should always be healthy even without test.
           //
           if ((NextResourceHob->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) &&
-              (((NextResourceHob->ResourceAttribute^ResourceHob->ResourceAttribute)&(~EFI_RESOURCE_ATTRIBUTE_TESTED)) == 0))
+              (((NextResourceHob->ResourceAttribute^ResourceHob->ResourceAttribute) & (~EFI_RESOURCE_ATTRIBUTE_TESTED)) == 0))
           {
             //
             // See if the memory range described in ResourceHob and NextResourceHob is adjacent
@@ -1426,11 +1794,37 @@ PeiDispatcher (
   EFI_PEI_FILE_HANDLE     SaveCurrentFileHandle;
   EFI_FV_FILE_INFO        FvFileInfo;
   PEI_CORE_FV_HANDLE      *CoreFvHandle;
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  UINT32                  TableSize;
 
   PeiServices    = (CONST EFI_PEI_SERVICES **)&Private->Ps;
   PeimEntryPoint = NULL;
   PeimFileHandle = NULL;
   EntryPoint     = 0;
+
+  if (Private->DelayedDispatchTable == NULL) {
+    GuidHob = GetFirstGuidHob (&gEfiDelayedDispatchTableGuid);
+    if (GuidHob != NULL) {
+      Private->DelayedDispatchTable = (DELAYED_DISPATCH_TABLE *)(GET_GUID_HOB_DATA (GuidHob));
+    } else {
+      TableSize                     = sizeof (DELAYED_DISPATCH_TABLE) + ((DELAYED_DISPATCH_MAX_ENTRIES - 1) * sizeof (DELAYED_DISPATCH_ENTRY));
+      Private->DelayedDispatchTable = BuildGuidHob (&gEfiDelayedDispatchTableGuid, TableSize);
+      if (Private->DelayedDispatchTable != NULL) {
+        ZeroMem (Private->DelayedDispatchTable, TableSize);
+        Status = PeiServicesInstallPpi (&mDelayedDispatchDesc);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "%a Failed to install Delayed Dispatch PPI: %r!\n", __func__, Status));
+          ASSERT_EFI_ERROR (Status);
+        } else {
+          Status = PeiServicesNotifyPpi (&mDelayedDispatchNotifyDesc);
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "%a Failed to notify Delayed Dispatch on End of Pei: %r!\n", __func__, Status));
+            ASSERT_EFI_ERROR (Status);
+          }
+        }
+      }
+    }
+  }
 
   if ((Private->PeiMemoryInstalled) &&
       (PcdGetBool (PcdMigrateTemporaryRamFirmwareVolumes) ||
@@ -1682,6 +2076,13 @@ PeiDispatcher (
             }
           }
         }
+
+        // Dispatch pending delalyed dispatch requests
+        if (Private->DelayedDispatchTable != NULL) {
+          if (DelayedDispatchDispatcher (Private->DelayedDispatchTable, NULL)) {
+            ProcessDispatchNotifyList (Private);
+          }
+        }
       }
 
       //
@@ -1708,7 +2109,10 @@ PeiDispatcher (
     //  pass. If we did not dispatch a PEIM/FV there is no point in trying again
     //  as it will fail the next time too (nothing has changed).
     //
-  } while (Private->PeimNeedingDispatch && Private->PeimDispatchOnThisPass);
+    // Also continue dispatch loop if there are outstanding delay-
+    // dispatch registrations still running.
+  } while ((Private->PeimNeedingDispatch && Private->PeimDispatchOnThisPass) ||
+           (Private->DelayedDispatchTable->Count > 0));
 }
 
 /**
