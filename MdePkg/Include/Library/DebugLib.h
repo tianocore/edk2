@@ -4,9 +4,23 @@
   The Debug library supports debug print and asserts based on a combination of macros and code.
   The debug library can be turned on and off so that the debug code does not increase the size of an image.
 
-  Note that a reserved macro named MDEPKG_NDEBUG is introduced for the intention
+  Note that a reserved macro named MDEPKG_NDEBUG is introduced with the intention
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
+
+  Current NULL implementations of these macros rely on the fact that directly unreachable
+  code is pruned even without compiler optimization (which has been confirmed by generated
+  code size tests on supported compilers). The advantage of NULL implementations which consume
+  their arguments within directly unreachable code is that compilers understand this, and stop
+  warning about variables which would become unused when MDEPKG_NDEBUG is defined if the macros
+  had completely empty definitions. This approach allows additional compiler warnings to be
+  enabled and/or removes the need for MDEPKG_NDEBUG dependent code in C files purely to avoid
+  such warnings.
+
+  Note that macros here and elsewhere in EDK II use the standard approach of adding
+  `do { ... } while (FALSE)` wrapping to ensure that they behave correctly with
+  surrounding code (e.g. requiring a following ';' and not combining in unexpected ways
+  with nearby conditionals).
 
 Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -403,7 +417,12 @@ UnitTestDebugAssert (
       }                             \
     } while (FALSE)
 #else
-#define ASSERT(Expression)
+#define ASSERT(Expression)       \
+    do {                           \
+      if (FALSE) {                 \
+        (VOID) (Expression);       \
+      }                            \
+    } while (FALSE)
 #endif
 
 /**
@@ -426,7 +445,12 @@ UnitTestDebugAssert (
       }                            \
     } while (FALSE)
 #else
-#define DEBUG(Expression)
+#define DEBUG(Expression)        \
+    do {                           \
+      if (FALSE) {                 \
+        _DEBUGLIB_DEBUG (Expression);       \
+      }                            \
+    } while (FALSE)
 #endif
 
 /**
@@ -452,7 +476,12 @@ UnitTestDebugAssert (
       }                                                                                  \
     } while (FALSE)
 #else
-#define ASSERT_EFI_ERROR(StatusParameter)
+#define ASSERT_EFI_ERROR(StatusParameter)                                             \
+    do {                                                                                \
+      if (FALSE) {                                                                      \
+        (VOID) (StatusParameter);                                                       \
+      }                                                                                 \
+    } while (FALSE)
 #endif
 
 /**
@@ -479,7 +508,12 @@ UnitTestDebugAssert (
       }                                                                 \
     } while (FALSE)
 #else
-#define ASSERT_RETURN_ERROR(StatusParameter)
+#define ASSERT_RETURN_ERROR(StatusParameter)                          \
+    do {                                                                \
+      if (FALSE) {                                                      \
+        (VOID) (StatusParameter);                                       \
+      }                                                                 \
+    } while (FALSE)
 #endif
 
 /**
