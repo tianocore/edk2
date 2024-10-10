@@ -537,7 +537,13 @@ ShellCommandRunMm (
       goto Done;
     }
 
-    Temp   = ShellCommandLineGetRawValue (Package, 1);
+    Temp = ShellCommandLineGetRawValue (Package, 1);
+    if (Temp == NULL) {
+      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"mm", L"NULL");
+      ShellStatus = SHELL_INVALID_PARAMETER;
+      goto Done;
+    }
+
     Status = ShellConvertStringToUint64 (Temp, &Address, TRUE, FALSE);
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"mm", Temp);

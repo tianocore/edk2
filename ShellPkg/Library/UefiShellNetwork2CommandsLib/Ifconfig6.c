@@ -468,7 +468,10 @@ IfConfig6ParseManualAddressList (
   }
 
   AddrBuf = AllocateZeroPool (AddrCnt * sizeof (EFI_IP6_CONFIG_MANUAL_ADDRESS));
-  ASSERT (AddrBuf != NULL);
+  if (AddrBuf == NULL) {
+    ASSERT (AddrBuf != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   AddrCnt = 0;
   VarArg  = *Arg;
@@ -569,7 +572,10 @@ IfConfig6ParseGwDnsAddressList (
   }
 
   AddrBuf = AllocateZeroPool (AddrCnt * sizeof (EFI_IPv6_ADDRESS));
-  ASSERT (AddrBuf != NULL);
+  if (AddrBuf == NULL) {
+    ASSERT (AddrBuf != NULL);
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   AddrCnt = 0;
   VarArg  = *Arg;
@@ -1194,7 +1200,7 @@ IfConfig6SetInterfaceInfo (
   BOOLEAN         IsAddressOk;
 
   UINTN                          DataSize;
-  UINT32                         Index;
+  UINTN                          Index;
   UINT32                         Index2;
   BOOLEAN                        IsAddressSet;
   EFI_IP6_CONFIG_INTERFACE_INFO  *IfInfo;

@@ -288,7 +288,13 @@ ShellCommandRunSerMode (
           goto Done;
       }
 
-      Temp  = ShellCommandLineGetRawValue (Package, 5);
+      Temp = ShellCommandLineGetRawValue (Package, 5);
+      if (Temp == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"sermode");
+        ShellStatus = SHELL_INVALID_PARAMETER;
+        goto Done;
+      }
+
       Value = ShellStrToUintn (Temp);
       switch (Value) {
         case 0:

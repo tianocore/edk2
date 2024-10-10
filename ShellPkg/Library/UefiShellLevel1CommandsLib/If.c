@@ -99,7 +99,11 @@ IsValidProfile (
   CONST CHAR16  *TempLocation;
 
   ProfilesString = ShellGetEnvironmentVariable (L"profiles");
-  ASSERT (ProfilesString != NULL);
+  if (ProfilesString == NULL) {
+    ASSERT (ProfilesString != NULL);
+    return (FALSE);
+  }
+
   TempLocation = StrStr (ProfilesString, String);
   if ((TempLocation != NULL) && (*(TempLocation-1) == L';') && (*(TempLocation+StrLen (String)) == L';')) {
     return (TRUE);
@@ -895,6 +899,10 @@ ShellCommandRunIf (
   // Make sure that an End exists.
   //
   CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
+  if (CurrentScriptFile == NULL) {
+    return (SHELL_INVALID_PARAMETER);
+  }
+
   if (!MoveToTag (GetNextNode, L"endif", L"if", NULL, CurrentScriptFile, TRUE, TRUE, FALSE)) {
     ShellPrintHiiEx (
       -1,
@@ -1076,6 +1084,9 @@ ShellCommandRunElse (
   }
 
   CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
+  if (CurrentScriptFile == NULL) {
+    return (SHELL_INVALID_PARAMETER);
+  }
 
   if (!MoveToTag (GetPreviousNode, L"if", L"endif", NULL, CurrentScriptFile, FALSE, TRUE, FALSE)) {
     ShellPrintHiiEx (
@@ -1158,6 +1169,10 @@ ShellCommandRunEndIf (
   }
 
   CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
+  if (CurrentScriptFile == NULL) {
+    return (SHELL_INVALID_PARAMETER);
+  }
+
   if (!MoveToTag (GetPreviousNode, L"if", L"endif", NULL, CurrentScriptFile, FALSE, TRUE, FALSE)) {
     ShellPrintHiiEx (
       -1,
