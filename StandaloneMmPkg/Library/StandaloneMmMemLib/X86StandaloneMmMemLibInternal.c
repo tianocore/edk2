@@ -13,21 +13,20 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
+#include <StandaloneMmMemLib.h>
 #include <PiMm.h>
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 
 #include <Guid/MmramMemoryReserve.h>
+
+NON_MM_MEMORY_MAP  *mValidNonMmramRanges;
+UINTN              mValidNonMmramCount;
 
 //
 // Maximum support address used to check input buffer
 //
 extern EFI_PHYSICAL_ADDRESS  mMmMemLibInternalMaximumSupportAddress;
-extern EFI_MMRAM_DESCRIPTOR  *mMmMemLibInternalMmramRanges;
-extern UINTN                 mMmMemLibInternalMmramCount;
 
 /**
   Calculate and save the maximum support address.
@@ -74,66 +73,197 @@ MmMemLibInternalCalculateMaximumSupportAddress (
 }
 
 /**
-  Initialize cached Mmram Ranges from HOB.
+  Merge continuous memory map entries whose type is
+  EfiLoaderCode/Data, EfiBootServicesCode/Data, EfiConventionalMemory,
+  EfiUnusableMemory, EfiACPIReclaimMemory, because the memory described by
+  these entries will be set as NOT present in SMM page table.
 
-  @retval EFI_UNSUPPORTED   The routine is unable to extract MMRAM information.
-  @retval EFI_SUCCESS       MmRanges are populated successfully.
-
+  @param[in, out]  MemoryMap              A pointer to the buffer in which firmware places
+                                          the current memory map.
+  @param[in, out]  MemoryMapSize          A pointer to the size, in bytes, of the
+                                          MemoryMap buffer. On input, this is the size of
+                                          the current memory map.  On output,
+                                          it is the size of new memory map after merge.
+  @param[in]       DescriptorSize         Size, in bytes, of an individual NON_MM_MEMORY_MAP.
 **/
-EFI_STATUS
-MmMemLibInternalPopulateMmramRanges (
-  VOID
+STATIC
+VOID
+MergeOverlappedOrContinuousRanges (
+  IN OUT NON_MM_MEMORY_MAP  *MemoryMap,
+  IN OUT UINTN              *MemoryMapSize,
+  IN UINTN                  DescriptorSize
   )
 {
-  VOID                            *HobStart;
-  EFI_HOB_GUID_TYPE               *MmramRangesHob;
-  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
-  EFI_MMRAM_DESCRIPTOR            *MmramDescriptors;
+  NON_MM_MEMORY_MAP     *MemoryMapEntry;
+  NON_MM_MEMORY_MAP     *MemoryMapEnd;
+  NON_MM_MEMORY_MAP     *NewMemoryMapEntry;
+  NON_MM_MEMORY_MAP     *NextMemoryMapEntry;
+  EFI_PHYSICAL_ADDRESS  End;
 
-  HobStart = GetHobList ();
-  DEBUG ((DEBUG_INFO, "%a - 0x%x\n", __func__, HobStart));
+  MemoryMapEntry    = MemoryMap;
+  NewMemoryMapEntry = MemoryMap;
+  MemoryMapEnd      = (NON_MM_MEMORY_MAP *)((UINT8 *)MemoryMap + *MemoryMapSize);
+  while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
+    NextMemoryMapEntry = NEXT_NON_MM_MEMORY_MAP (MemoryMapEntry, DescriptorSize);
 
-  //
-  // Search for a Hob containing the MMRAM ranges
-  //
-  MmramRangesHob = GetFirstGuidHob (&gEfiSmmSmramMemoryGuid);
-  if (MmramRangesHob == NULL) {
-    MmramRangesHob = GetFirstGuidHob (&gEfiMmPeiMmramMemoryReserveGuid);
-    if (MmramRangesHob == NULL) {
-      return EFI_UNSUPPORTED;
-    }
+    do {
+      if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
+          ((MemoryMapEntry->Base + MemoryMapEntry->Length) >= NextMemoryMapEntry->Base))
+      {
+        //
+        // Merge the overlapped or continuous ranges.
+        //
+        End = MAX (
+                MemoryMapEntry->Base + MemoryMapEntry->Length,
+                NextMemoryMapEntry->Base + NextMemoryMapEntry->Length
+                );
+        MemoryMapEntry->Length = End - MemoryMapEntry->Base;
+
+        NextMemoryMapEntry = NEXT_NON_MM_MEMORY_MAP (NextMemoryMapEntry, DescriptorSize);
+        continue;
+      } else {
+        //
+        // Copy the processed independent range to the new index location.
+        //
+        CopyMem (NewMemoryMapEntry, MemoryMapEntry, sizeof (NON_MM_MEMORY_MAP));
+        break;
+      }
+    } while (TRUE);
+
+    MemoryMapEntry    = NextMemoryMapEntry;
+    NewMemoryMapEntry = NEXT_NON_MM_MEMORY_MAP (NewMemoryMapEntry, DescriptorSize);
   }
 
-  MmramRangesHobData = GET_GUID_HOB_DATA (MmramRangesHob);
-  if ((MmramRangesHobData == NULL) || (MmramRangesHobData->Descriptor == NULL)) {
-    return EFI_UNSUPPORTED;
-  }
-
-  mMmMemLibInternalMmramCount = MmramRangesHobData->NumberOfMmReservedRegions;
-  MmramDescriptors            = MmramRangesHobData->Descriptor;
-
-  mMmMemLibInternalMmramRanges = AllocatePool (mMmMemLibInternalMmramCount * sizeof (EFI_MMRAM_DESCRIPTOR));
-  if (mMmMemLibInternalMmramRanges) {
-    CopyMem (
-      mMmMemLibInternalMmramRanges,
-      MmramDescriptors,
-      mMmMemLibInternalMmramCount * sizeof (EFI_MMRAM_DESCRIPTOR)
-      );
-  }
-
-  return EFI_SUCCESS;
+  *MemoryMapSize = (UINTN)NewMemoryMapEntry - (UINTN)MemoryMap;
 }
 
 /**
-  Deinitialize cached Mmram Ranges.
+  Function to compare 2 NON_MM_MEMORY_MAP pointer based on Base.
+
+  @param[in] Buffer1            pointer to NON_MM_MEMORY_MAP pointer to compare
+  @param[in] Buffer2            pointer to second NON_MM_MEMORY_MAP pointer to compare
+
+  @retval 0                     Buffer1 equal to Buffer2
+  @retval <0                    Buffer1 is less than Buffer2
+  @retval >0                    Buffer1 is greater than Buffer2
+**/
+INTN
+EFIAPI
+NonMmMapCompare (
+  IN  CONST VOID  *Buffer1,
+  IN  CONST VOID  *Buffer2
+  )
+{
+  if (((NON_MM_MEMORY_MAP *)Buffer1)->Base > ((NON_MM_MEMORY_MAP *)Buffer2)->Base) {
+    return 1;
+  } else if (((NON_MM_MEMORY_MAP *)Buffer1)->Base < ((NON_MM_MEMORY_MAP *)Buffer2)->Base) {
+    return -1;
+  }
+
+  return 0;
+}
+
+/**
+  Initialize valid non-Mmram Ranges from Resource HOB.
 
 **/
 VOID
-MmMemLibInternalFreeMmramRanges (
+MmMemLibInternalPopulateValidNonMmramRanges (
   VOID
   )
 {
-  if (mMmMemLibInternalMmramRanges != NULL) {
-    FreePool (mMmMemLibInternalMmramRanges);
+  EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 Count;
+  UINTN                 Index;
+  UINTN                 RangeSize;
+  NON_MM_MEMORY_MAP     SortBuffer;
+
+  mValidNonMmramRanges = NULL;
+  mValidNonMmramCount  = 0;
+
+  Count     = 0;
+  Index     = 0;
+  RangeSize = 0;
+
+  //
+  // 1. Get the count.
+  //
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  while (Hob.Raw != NULL) {
+    Count++;
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
   }
+
+  //
+  // 2. Store the initial data.
+  //
+  RangeSize            = sizeof (NON_MM_MEMORY_MAP) * Count;
+  mValidNonMmramRanges = (NON_MM_MEMORY_MAP *)AllocateZeroPool (RangeSize);
+  ASSERT (mValidNonMmramRanges != NULL);
+
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR);
+  while (Hob.Raw != NULL) {
+    mValidNonMmramRanges[Index].Base   = Hob.ResourceDescriptor->PhysicalStart;
+    mValidNonMmramRanges[Index].Length = Hob.ResourceDescriptor->ResourceLength;
+    Index++;
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, Hob.Raw);
+  }
+
+  ASSERT (Index == Count);
+
+  //
+  // 3. Sort the data.
+  //
+  QuickSort (mValidNonMmramRanges, Count, sizeof (NON_MM_MEMORY_MAP), (BASE_SORT_COMPARE)NonMmMapCompare, &SortBuffer);
+
+  //
+  // 4. Merge the overlapped or continuous ranges.
+  //
+  MergeOverlappedOrContinuousRanges (mValidNonMmramRanges, &RangeSize, sizeof (NON_MM_MEMORY_MAP));
+  mValidNonMmramCount = RangeSize/sizeof (NON_MM_MEMORY_MAP);
+}
+
+/**
+  Deinitialize cached non-Mmram Ranges.
+
+**/
+VOID
+MmMemLibInternalFreeNonMmramRanges (
+  VOID
+  )
+{
+  if (mValidNonMmramRanges != NULL) {
+    FreePool (mValidNonMmramRanges);
+  }
+}
+
+/**
+  This function check if the buffer is valid non-MMRAM memory range.
+
+  @param[in] Buffer  The buffer start address to be checked.
+  @param[in] Length  The buffer length to be checked.
+
+  @retval TRUE  This buffer is valid non-MMRAM memory range.
+  @retval FALSE This buffer is not valid non-MMRAM memory range.
+**/
+BOOLEAN
+MmMemLibInternalIsValidNonMmramRange (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < mValidNonMmramCount; Index++) {
+    if ((Buffer >= mValidNonMmramRanges[Index].Base) &&
+        (Buffer + Length <= mValidNonMmramRanges[Index].Base + mValidNonMmramRanges[Index].Length))
+    {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
 }
