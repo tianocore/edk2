@@ -183,6 +183,12 @@ IoRead16 (
   UINT16   Value;
   BOOLEAN  Flag;
 
+  DEBUG_CODE (
+    if ((Port & 1) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid port: %lx\n", __func__, Port));
+    }
+    );
+
   ASSERT ((Port & 1) == 0);
 
   Flag = FilterBeforeIoRead (FilterWidth16, Port, &Value);
@@ -228,6 +234,12 @@ IoWrite16 (
 {
   BOOLEAN  Flag;
 
+  DEBUG_CODE (
+    if ((Port & 1) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid port: %lx\n", __func__, Port));
+    }
+    );
+
   ASSERT ((Port & 1) == 0);
 
   Flag = FilterBeforeIoWrite (FilterWidth16, Port, &Value);
@@ -271,6 +283,12 @@ IoRead32 (
 {
   UINT32   Value;
   BOOLEAN  Flag;
+
+  DEBUG_CODE (
+    if ((Port & 3) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid port: %lx\n", __func__, Port));
+    }
+    );
 
   ASSERT ((Port & 3) == 0);
 
@@ -316,6 +334,12 @@ IoWrite32 (
   )
 {
   BOOLEAN  Flag;
+
+  DEBUG_CODE (
+    if ((Port & 3) != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid port: %lx\n", __func__, Port));
+    }
+    );
 
   ASSERT ((Port & 3) == 0);
 
