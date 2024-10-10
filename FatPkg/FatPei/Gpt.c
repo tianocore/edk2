@@ -110,7 +110,6 @@ PartitionCheckGptHeader (
 {
   PEI_FAT_BLOCK_DEVICE  *ParentBlockDev;
   EFI_PEI_LBA           Lba;
-  EFI_PEI_LBA           AlternateLba;
   EFI_PEI_LBA           EntryArrayLastLba;
 
   UINT64  PartitionEntryArraySize;
@@ -120,46 +119,15 @@ PartitionCheckGptHeader (
   ParentBlockDev = &(PrivateData->BlockDevice[ParentBlockDevNo]);
 
   if (IsPrimaryHeader) {
-    Lba          = PRIMARY_PART_HEADER_LBA;
-    AlternateLba = ParentBlockDev->LastBlock;
+    Lba = PRIMARY_PART_HEADER_LBA;
   } else {
-    Lba          = ParentBlockDev->LastBlock;
-    AlternateLba = PRIMARY_PART_HEADER_LBA;
+    Lba = ParentBlockDev->LastBlock;
   }
 
   if ((PartHdr->Header.Signature != EFI_PTAB_HEADER_ID) ||
-      (PartHdr->Header.Revision != 0x00010000) ||
-      (PartHdr->Header.HeaderSize < 92) ||
-      (PartHdr->Header.HeaderSize > ParentBlockDev->BlockSize) ||
       (!PartitionCheckGptHeaderCRC (PartHdr)) ||
-      (PartHdr->Header.Reserved != 0)
-      )
-  {
-    DEBUG ((DEBUG_ERROR, "Invalid efi partition table header\n"));
-    return FALSE;
-  }
-
-  //
-  // |    Block0    |    Block1    |Block2 ~ FirstUsableLBA - 1|FirstUsableLBA, ... ,LastUsableLBA|LastUsableLBA+1 ~ LastBlock-1|  LastBlock  |
-  // |Protective MBR|Primary Header|Entry Array(At Least 16384)|             Partition            | Entry Array(At Least 16384) |BackUp Header|
-  //
-  // 1. Protective MBR is fixed at Block 0.
-  // 2. Primary Header is fixed at Block 1.
-  // 3. Backup Header is fixed at LastBlock.
-  // 4. Must be remain 128*128 bytes for primary entry array.
-  // 5. Must be remain 128*128 bytes for backup entry array.
-  // 6. SizeOfPartitionEntry must be equals to 128 * 2^n.
-  //
-  if ((PartHdr->MyLBA != Lba) ||
-      (PartHdr->AlternateLBA != AlternateLba) ||
-      (PartHdr->FirstUsableLBA < 2 + EFI_SIZE_TO_BLOCKS (EFI_GPT_PART_ENTRY_MIN_SIZE, ParentBlockDev->BlockSize)) ||
-      (PartHdr->LastUsableLBA  > ParentBlockDev->LastBlock - 1 - EFI_SIZE_TO_BLOCKS (EFI_GPT_PART_ENTRY_MIN_SIZE, ParentBlockDev->BlockSize)) ||
-      (PartHdr->FirstUsableLBA > PartHdr->LastUsableLBA) ||
-      (PartHdr->PartitionEntryLBA < 2) ||
-      (PartHdr->PartitionEntryLBA > ParentBlockDev->LastBlock - 1) ||
-      ((PartHdr->PartitionEntryLBA >= PartHdr->FirstUsableLBA) && (PartHdr->PartitionEntryLBA <= PartHdr->LastUsableLBA)) ||
-      (PartHdr->SizeOfPartitionEntry%128 != 0) ||
-      (PartHdr->SizeOfPartitionEntry != sizeof (EFI_PARTITION_ENTRY))
+      (PartHdr->MyLBA != Lba) ||
+      (PartHdr->SizeOfPartitionEntry < sizeof (EFI_PARTITION_ENTRY))
       )
   {
     DEBUG ((DEBUG_ERROR, "Invalid efi partition table header\n"));
