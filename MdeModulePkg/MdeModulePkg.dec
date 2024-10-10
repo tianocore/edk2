@@ -1198,6 +1198,10 @@
   # @Prompt Defines the page allocation for the MM communication buffer; default is 128 pages (512KB).
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages|128|UINT32|0x30001061
 
+  ## Support for the alternative queue size.
+  # @Prompt TRUE to enable support for alternative queue size in NVME driver.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSupportAlternativeQueueSize|FALSE|BOOLEAN|0x40000151
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
