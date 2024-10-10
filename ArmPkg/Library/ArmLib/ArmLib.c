@@ -71,15 +71,15 @@ ArmInstructionCacheLineLength (
   return 4 << (ArmCacheInfo () & 0xf); // CTR_EL0.IminLine
 }
 
-UINTN
+UINT32
 EFIAPI
 ArmCacheWritebackGranule (
   VOID
   )
 {
-  UINTN  CWG;
+  UINT32  CWG;
 
-  CWG = (ArmCacheInfo () >> 24) & 0xf; // CTR_EL0.CWG
+  CWG = (UINT32)((ArmCacheInfo () >> 24) & 0xf); // CTR_EL0.CWG
 
   if (CWG == 0) {
     return SIZE_2KB;
