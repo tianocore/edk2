@@ -128,7 +128,7 @@ DescribeInstructionOrDataAbort (
 STATIC
 VOID
 DescribeExceptionSyndrome (
-  IN UINT32  Esr
+  IN UINT64  Esr
   )
 {
   CHAR8  *Message;
