@@ -5,7 +5,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 Module Name:
 
-  WinNtThunk.c
+  WinThunk.c
 
 Abstract:
 
@@ -28,6 +28,8 @@ STATIC DWORD    mOldStdInMode;
 #if defined (NTDDI_VERSION) && defined (NTDDI_WIN10_TH2) && (NTDDI_VERSION > NTDDI_WIN10_TH2)
 STATIC DWORD  mOldStdOutMode;
 #endif
+
+STATIC UINT64  mPerformanceFrequency = 0;
 
 UINTN
 SecWriteStdErr (
@@ -451,8 +453,13 @@ SecQueryPerformanceFrequency (
   VOID
   )
 {
-  // Hard code to nanoseconds
-  return 1000000000ULL;
+  if (mPerformanceFrequency) {
+    return mPerformanceFrequency;
+  }
+
+  QueryPerformanceFrequency ((LARGE_INTEGER *)&mPerformanceFrequency);
+
+  return mPerformanceFrequency;
 }
 
 UINT64
@@ -460,7 +467,11 @@ SecQueryPerformanceCounter (
   VOID
   )
 {
-  return 0;
+  UINT64  PerformanceCount;
+
+  QueryPerformanceCounter ((LARGE_INTEGER *)&PerformanceCount);
+
+  return PerformanceCount;
 }
 
 VOID
