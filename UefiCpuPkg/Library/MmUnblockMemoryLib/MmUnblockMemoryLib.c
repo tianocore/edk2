@@ -18,6 +18,7 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Base.h>
+#include <PiPei.h>
 
 /**
   This API provides a way to unblock certain data pages to be accessible inside MM environment.
@@ -32,6 +33,7 @@
   @retval RETURN_SECURITY_VIOLATION   The requested address failed to pass security check for
                                       unblocking.
   @retval RETURN_INVALID_PARAMETER    Input address either NULL pointer or not page aligned.
+                                      Input address range to unblock is free memory or BS memory.
   @retval RETURN_ACCESS_DENIED        The request is rejected due to system has passed certain boot
                                       phase.
 **/
@@ -45,10 +47,62 @@ MmUnblockMemoryRequest (
   EFI_STATUS                    Status;
   MM_UNBLOCK_REGION             *MmUnblockMemoryHob;
   EFI_PEI_MM_COMMUNICATION_PPI  *MmCommunicationPpi;
+  EFI_PEI_HOB_POINTERS          Hob;
+  EFI_PHYSICAL_ADDRESS          HobBase;
+  EFI_PHYSICAL_ADDRESS          HobEnd;
+  EFI_PHYSICAL_ADDRESS          UnblockBase;
+  EFI_PHYSICAL_ADDRESS          UnblockEnd;
+  BOOLEAN                       Flag;
 
   if (!IS_ALIGNED (UnblockAddress, SIZE_4KB)) {
     DEBUG ((DEBUG_ERROR, "Error: UnblockAddress is not 4KB aligned: %p\n", UnblockAddress));
     return EFI_INVALID_PARAMETER;
+  }
+
+  Flag        =  FALSE;
+  UnblockBase = UnblockAddress;
+  UnblockEnd  = UnblockAddress + EFI_PAGES_TO_SIZE (NumberOfPages);
+
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+  while (Hob.Raw != NULL) {
+    HobBase = Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress;
+    HobEnd  = Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress +
+              Hob.MemoryAllocation->AllocDescriptor.MemoryLength;
+    if ((UnblockBase < HobEnd) && (UnblockEnd > HobBase)) {
+      if (!((Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiRuntimeServicesData) ||
+            (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiACPIMemoryNVS) ||
+            (Hob.MemoryAllocation->AllocDescriptor.MemoryType == EfiReservedMemoryType)))
+      {
+        //
+        // Make sure the range to be unblocked belongs to the specific three types memory.
+        //
+        DEBUG ((DEBUG_ERROR, "Error: UnblockAddress range contains free memory or BS memory\n"));
+        return RETURN_INVALID_PARAMETER;
+      }
+
+      //
+      // Remove overlapped range from unblock range.
+      //
+      if (UnblockBase < HobBase) {
+        UnblockEnd = HobBase;
+      } else if (UnblockEnd > HobEnd) {
+        UnblockBase = HobEnd;
+      } else {
+        //
+        // The buffer range to check is covered by current resource HOB
+        //
+        Flag = TRUE;
+        break;
+      }
+    }
+
+    Hob.Raw = GET_NEXT_HOB (Hob);
+    Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw);
+  }
+
+  if (Flag == FALSE) {
+    DEBUG ((DEBUG_ERROR, "Error: UnblockAddress range contains invalid memory range which doesn't belong to any memory allocation HOB\n"));
+    return RETURN_INVALID_PARAMETER;
   }
 
   //
