@@ -2,19 +2,138 @@
   Entry point to the Standalone MM Foundation when initialized during the SEC
   phase on ARM platforms
 
-Copyright (c) 2017 - 2021, Arm Ltd. All rights reserved.<BR>
-SPDX-License-Identifier: BSD-2-Clause-Patent
+  Copyright (c) 2017 - 2024, Arm Ltd. All rights reserved.<BR>
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  @par Glossary:
+    - SPM_MM - An implementation where the Secure Partition Manager resides at EL3
+              with management services running from an isolated Secure Partitions
+              at S-EL0, and the communication protocol is the Management Mode(MM)
+              interface.
+    - FF-A - Firmware Framework for Arm A-profile
+    - TL   - Transfer List
+
+  @par Reference(s):
+    - Transfer List [https://github.com/FirmwareHandoff/firmware_handoff]
+    - Secure Partition Manager [https://trustedfirmware-a.readthedocs.io/en/latest/components/secure-partition-manager-mm.html].
+    - Arm Firmware Framework for Arm A-Profile [https://developer.arm.com/documentation/den0077/latest]
 
 **/
 
 #ifndef __STANDALONEMMCORE_ENTRY_POINT_H__
 #define __STANDALONEMMCORE_ENTRY_POINT_H__
 
-#include <StandaloneMmCpu.h>
+#include <Library/ArmSvcLib.h>
+#include <Library/ArmFfaLib.h>
 #include <Library/PeCoffLib.h>
 #include <Library/FvLib.h>
 
 #define CPU_INFO_FLAG_PRIMARY_CPU  0x00000001
+
+/*
+ * Communication ABI protocol to communicate between normal/secure partition.
+ */
+typedef enum {
+  /// Unknown Communication ABI protocol
+  CommProtocolUnknown,
+
+  /// Communicate via SPM_MM ABI protocol
+  CommProtocolSpmMm,
+
+  /// Communicate via FF-A ABI protocol
+  CommProtocolFfa,
+
+  CommProtocolMax,
+} COMM_PROTOCOL;
+
+/** When using FF-A ABI, there're ways to request service to StandaloneMm
+      - FF-A with MmCommunication protocol.
+      - FF-A service with each specification.
+   MmCommunication Protocol can use FFA_MSG_SEND_DIRECT_REQ or REQ2,
+   Other FF-A services should use FFA_MSG_SEND_DIRECT_REQ2.
+   In case of FF-A with MmCommunication protocol via FFA_MSG_SEND_DIRECT_REQ,
+   register x3 saves Communication Buffer with gEfiMmCommunication2ProtocolGuid.
+   In case of FF-A with MmCommunication protocol via FFA_MSG_SEND_DIRECT_REQ2,
+   register x2/x3 save gEfiMmCommunication2ProtocolGuid and
+   register x4 saves Communication Buffer with Service Guid.
+
+   Other FF-A services (ServiceTypeMisc) delivers register values according to
+   there own service specification.
+   That means it doesn't use MmCommunication Buffer with MmCommunication Header
+   format.
+   (i.e) Tpm service via FF-A or Firmware Update service via FF-A.
+   To support latter services by StandaloneMm, it defines SERVICE_TYPE_MISC.
+   So that StandaloneMmEntryPointCore.c generates MmCommunication Header
+   with delivered register values to dispatch service provided StandaloneMmCore.
+   So that service handler can get proper information from delivered register.
+
+   In case of SPM_MM Abi, it only supports MmCommunication service.
+ */
+typedef enum {
+  /// Unknown
+  ServiceTypeUnknown,
+
+  /// MmCommunication services
+  ServiceTypeMmCommunication,
+
+  /// Misc services
+  ServiceTypeMisc,
+
+  ServiceTypeMax,
+} SERVICE_TYPE;
+
+/** Direct message request/response version
+ */
+typedef enum {
+  /// Direct message version 1. Use FFA_DIRECT_MSG_REQ/RESP
+  DirectMsgV1,
+
+  /// Direct message version 2. Use FFA_DIRECT_MSG_REQ2/RESP2
+  DirectMsgV2,
+
+  DirectMsgMax,
+} DIRECT_MSG_VERSION;
+
+/** Service table entry to return service type matched with service guid
+ */
+typedef struct ServiceTableEntry {
+  /// Service Guid
+  EFI_GUID        *ServiceGuid;
+
+  /// Service Type
+  SERVICE_TYPE    ServiceType;
+} SERVICE_TABLE_ENTRY;
+
+/** Ffa Abi data used in FFA_MSG_SEND_DIRECT_RESP/RESP2.
+ */
+typedef struct FfaMsgInfo {
+  /// Source partition id
+  UINT16                SourcePartId;
+
+  /// Destination partition id
+  UINT16                DestPartId;
+
+  /// Direct Message version
+  DIRECT_MSG_VERSION    DirectMsgVersion;
+
+  /// Service Type
+  SERVICE_TYPE          ServiceType;
+} FFA_MSG_INFO;
+
+/** MmCommunication Header for Misc service.
+    Misc service doesn't use MmCommunication Buffer.
+    This structure is used to dispatch Misc services by StandaloneMm.
+ */
+typedef struct {
+  /// Service guid
+  EFI_GUID           HeaderGuid;
+
+  /// Length of Message. In case of misc service, sizeof (EventSvcArgs)
+  UINTN              MessageLength;
+
+  /// Delivered register values.
+  DIRECT_MSG_ARGS    DirectMsgArgs;
+} MISC_MM_COMMUNICATE_BUFFER;
 
 typedef struct {
   UINT8     Type;    /* type of the structure */
@@ -22,31 +141,6 @@ typedef struct {
   UINT16    Size;    /* size of this structure in bytes */
   UINT32    Attr;    /* attributes: unused bits SBZ */
 } EFI_PARAM_HEADER;
-
-typedef struct {
-  UINT64    Mpidr;
-  UINT32    LinearId;
-  UINT32    Flags;
-} EFI_SECURE_PARTITION_CPU_INFO;
-
-typedef struct {
-  EFI_PARAM_HEADER                 Header;
-  UINT64                           SpMemBase;
-  UINT64                           SpMemLimit;
-  UINT64                           SpImageBase;
-  UINT64                           SpStackBase;
-  UINT64                           SpHeapBase;
-  UINT64                           SpNsCommBufBase;
-  UINT64                           SpSharedBufBase;
-  UINT64                           SpImageSize;
-  UINT64                           SpPcpuStackSize;
-  UINT64                           SpHeapSize;
-  UINT64                           SpNsCommBufSize;
-  UINT64                           SpSharedBufSize;
-  UINT32                           NumSpMemRegions;
-  UINT32                           NumCpus;
-  EFI_SECURE_PARTITION_CPU_INFO    *CpuInfo;
-} EFI_SECURE_PARTITION_BOOT_INFO;
 
 typedef RETURN_STATUS (*REGION_PERMISSION_UPDATE_FUNC) (
   IN  EFI_PHYSICAL_ADDRESS  BaseAddress,
@@ -123,43 +217,34 @@ LocateStandaloneMmCorePeCoffData (
   );
 
 /**
-  Use the boot information passed by privileged firmware to populate a HOB list
-  suitable for consumption by the MM Core and drivers.
+  The handoff between the SPMC to StandaloneMM depends on the
+  communication interface between the SPMC and StandaloneMM.
+  When SpmMM is used, the handoff is implemented using the
+  Firmware Handoff protocol. When FF-A is used the FF-A boot
+  protocol is used.
 
-  @param  [in, out] CpuDriverEntryPoint   Address of MM CPU driver entrypoint
-  @param  [in]      PayloadBootInfo       Boot information passed by privileged
-                                          firmware
-
-**/
-VOID *
-EFIAPI
-CreateHobListFromBootInfo (
-  IN  OUT  PI_MM_CPU_DRIVER_ENTRYPOINT     *CpuDriverEntryPoint,
-  IN       EFI_SECURE_PARTITION_BOOT_INFO  *PayloadBootInfo
-  );
-
-/**
-  The entry point of Standalone MM Foundation.
-
-  @param  [in]  SharedBufAddress  Pointer to the Buffer between SPM and SP.
-  @param  [in]  SharedBufSize     Size of the shared buffer.
-  @param  [in]  cookie1           Cookie 1
-  @param  [in]  cookie2           Cookie 2
+  @param  [in]  Arg0        In case of FF-A, address of FF-A boot information
+                            In case of SPM_MM, this parameter must be zero
+  @param  [in]  Arg1        In case of FF-A, this parameter must be zero
+                            In case of SPM_MM, Signature and register convention version
+  @param  [in]  Arg2        Must be zero
+  @param  [in]  Arg3        In case of FF-A, this parameter must be zero
+                            In case of SPM_MM, address of transfer list
 
 **/
 VOID
 EFIAPI
-_ModuleEntryPoint (
-  IN VOID    *SharedBufAddress,
-  IN UINT64  SharedBufSize,
-  IN UINT64  cookie1,
-  IN UINT64  cookie2
+CEntryPoint (
+  IN UINTN  Arg0,
+  IN UINTN  Arg1,
+  IN UINTN  Arg2,
+  IN UINTN  Arg3
   );
 
 /**
   Auto generated function that calls the library constructors for all of the module's dependent libraries.
 
-  This function must be called by _ModuleEntryPoint().
+  This function must be called by CEntryPoint().
   This function calls the set of library constructors for the set of library instances
   that a module depends on.  This includes library instances that a module depends on
   directly and library instances that a module depends on indirectly through other
@@ -182,7 +267,7 @@ ProcessLibraryConstructorList (
 /**
   Auto generated function that calls a set of module entry points.
 
-  This function must be called by _ModuleEntryPoint().
+  This function must be called by CEntryPoint().
   This function calls the set of module entry points.
   This function is auto generated by build tools and those build tools are responsible
   for collecting the module entry points and calling them in a specified order.

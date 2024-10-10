@@ -48,7 +48,6 @@
 [Guids]
   gMmCommBufferHobGuid
   gEfiSmmSmramMemoryGuid
-  gEventMmDispatchGuid
   gSmmBaseHobGuid
   gMpInformation2HobGuid
   gEfiAcpiVariableGuid
@@ -64,6 +63,7 @@
 
 [Protocols]
   gEfiMmEndOfPeiProtocol
+  gEventMmDispatchGuid
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages
