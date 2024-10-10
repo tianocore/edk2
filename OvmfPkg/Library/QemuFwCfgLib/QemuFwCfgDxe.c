@@ -29,6 +29,8 @@ STATIC BOOLEAN  mQemuFwCfgDmaSupported;
 
 STATIC EDKII_IOMMU_PROTOCOL  *mIoMmuProtocol;
 
+STATIC FW_CFG_CACHE_WORK_AREA  mFwCfgCacheWorkArea = { 0 };
+
 /**
   Returns a boolean indicating if the firmware configuration interface
   is available or not.
@@ -491,4 +493,55 @@ InternalQemuFwCfgDmaBytes (
   if (DataMapping != NULL) {
     UnmapFwCfgDmaDataBuffer (DataMapping);
   }
+}
+
+/**
+  Check if fw_cfg cache is ready.
+
+  @retval    TRUE   Cache is ready
+  @retval    FALSE  Cache is not ready
+**/
+BOOLEAN
+InternalQemuFwCfgCacheEnable (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  FW_CFG_CACHE_WORK_AREA  *FwCfgCacheWrokArea;
+
+  GuidHob = GetFirstGuidHob (&gOvmfFwCfgInfoHobGuid);
+  if (GuidHob == NULL) {
+    return FALSE;
+  }
+
+  FwCfgCacheWrokArea = (FW_CFG_CACHE_WORK_AREA *)GET_GUID_HOB_DATA (GuidHob);
+  return FwCfgCacheWrokArea->CacheReady;
+}
+
+/**
+  Get the pointer to the FW_CFG_CACHE_WORK_AREA. This data is used as the
+  workarea to record the onging fw_cfg item and offset.
+
+  @retval   FW_CFG_CACHE_WORK_AREA  Pointer to the FW_CFG_CACHE_WORK_AREA
+  @retval   NULL                FW_CFG_CACHE_WORK_AREA doesn't exist
+**/
+FW_CFG_CACHE_WORK_AREA *
+InternalQemuFwCfgCacheGetWorkArea (
+  VOID
+  )
+{
+  if (!InternalQemuFwCfgCacheEnable ()) {
+    return NULL;
+  }
+
+  return &mFwCfgCacheWorkArea;
+}
+
+RETURN_STATUS
+EFIAPI
+QemuFwCfgInitCache (
+  VOID
+  )
+{
+  return RETURN_UNSUPPORTED;
 }
