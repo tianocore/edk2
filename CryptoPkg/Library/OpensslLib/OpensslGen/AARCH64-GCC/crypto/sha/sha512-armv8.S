@@ -4,57 +4,6 @@
 // this file except in compliance with the License.  You can obtain a copy
 // in the file LICENSE in the source distribution or at
 // https://www.openssl.org/source/license.html
-
-// ====================================================================
-// Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
-// project. The module is, however, dual licensed under OpenSSL and
-// CRYPTOGAMS licenses depending on where you obtain it. For further
-// details see http://www.openssl.org/~appro/cryptogams/.
-//
-// Permission to use under GPLv2 terms is granted.
-// ====================================================================
-//
-// SHA256/512 for ARMv8.
-//
-// Performance in cycles per processed byte and improvement coefficient
-// over code generated with "default" compiler:
-//
-//              SHA256-hw       SHA256(*)       SHA512
-// Apple A7     1.97            10.5 (+33%)     6.73 (-1%(**))
-// Cortex-A53   2.38            15.5 (+115%)    10.0 (+150%(***))
-// Cortex-A57   2.31            11.6 (+86%)     7.51 (+260%(***))
-// Denver       2.01            10.5 (+26%)     6.70 (+8%)
-// X-Gene                       20.0 (+100%)    12.8 (+300%(***))
-// Mongoose     2.36            13.0 (+50%)     8.36 (+33%)
-// Kryo         1.92            17.4 (+30%)     11.2 (+8%)
-// ThunderX2    2.54            13.2 (+40%)     8.40 (+18%)
-//
-// (*)  Software SHA256 results are of lesser relevance, presented
-//      mostly for informational purposes.
-// (**) The result is a trade-off: it's possible to improve it by
-//      10% (or by 1 cycle per round), but at the cost of 20% loss
-//      on Cortex-A53 (or by 4 cycles per round).
-// (***)        Super-impressive coefficients over gcc-generated code are
-//      indication of some compiler "pathology", most notably code
-//      generated with -mgeneral-regs-only is significantly faster
-//      and the gap is only 40-90%.
-//
-// October 2016.
-//
-// Originally it was reckoned that it makes no sense to implement NEON
-// version of SHA256 for 64-bit processors. This is because performance
-// improvement on most wide-spread Cortex-A5x processors was observed
-// to be marginal, same on Cortex-A53 and ~10% on A57. But then it was
-// observed that 32-bit NEON SHA256 performs significantly better than
-// 64-bit scalar version on *some* of the more recent processors. As
-// result 64-bit NEON version of SHA256 was added to provide best
-// all-round performance. For example it executes ~30% faster on X-Gene
-// and Mongoose. [For reference, NEON version of SHA512 is bound to
-// deliver much less improvement, likely *negative* on Cortex-A5x.
-// Which is why NEON support is limited to SHA256.]
-
-// $output is the last argument if it looks like a file (it has an extension)
-// $flavour is the first argument if it doesn't look like a file
 #ifndef __KERNEL__
 # include "arm_arch.h"
 

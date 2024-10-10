@@ -17,8 +17,8 @@ DEFINE FD_SIZE     = 0x00850000
 DEFINE NUM_BLOCKS  = 0x850
 !else
 
-DEFINE FD_SIZE     = 0x00590000
-DEFINE NUM_BLOCKS  = 0x590
+DEFINE FD_SIZE     = 0x00700000
+DEFINE NUM_BLOCKS  = 0x700
 !endif
 
 ################################################################################
@@ -208,6 +208,12 @@ INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
 !endif
 
+!if $(UNIVERSAL_PAYLOAD) == FALSE
+  !if $(SECURE_BOOT_ENABLE) == TRUE
+    INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+  !endif
+!endif
+
 INF UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
 INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
 !if $(MEMORY_TEST) == "GENERIC"
@@ -331,6 +337,35 @@ INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 !endif
 INF ShellPkg/Application/Shell/Shell.inf
+!endif
+
+!if $(UNIVERSAL_PAYLOAD) == TRUE
+!if $(SECURE_BOOT_ENABLE) == TRUE
+
+[FV.SECFV]
+FvNameGuid         = 2700E2F3-19D2-4E2D-9F13-BC891B9FC62C
+BlockSize          = $(FD_BLOCK_SIZE)
+FvForceRebase      = FALSE
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+INF SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+
+!endif
 !endif
 
 

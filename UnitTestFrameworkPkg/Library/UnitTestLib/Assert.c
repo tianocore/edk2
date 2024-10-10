@@ -33,7 +33,7 @@ AddUnitTestFailure (
   UnitTest->FailureType = FailureType;
   AsciiStrCpyS (
     &UnitTest->FailureMessage[0],
-    UNIT_TEST_TESTFAILUREMSG_LENGTH,
+    UNIT_TEST_MAX_STRING_LENGTH,
     FailureMessage
     );
 
@@ -50,7 +50,7 @@ UnitTestLogFailure (
   )
 {
   UNIT_TEST_FRAMEWORK_HANDLE  FrameworkHandle;
-  CHAR8                       LogString[UNIT_TEST_TESTFAILUREMSG_LENGTH];
+  CHAR8                       LogString[UNIT_TEST_MAX_STRING_LENGTH];
   VA_LIST                     Marker;
 
   //

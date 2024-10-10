@@ -144,6 +144,7 @@ def BuildUniversalPayload(Args):
     EntryModuleInf = os.path.normpath("UefiPayloadPkg/UefiPayloadEntry/{}.inf".format (UpldEntryFile))
     DxeFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))
     BdsFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/BDSFV.Fv"))
+    SecFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/SECFV.Fv"))
     NetworkFvOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/NETWORKFV.Fv"))
     PayloadReportPath = os.path.join(BuildDir, "UefiUniversalPayload.txt")
     ModuleReportPath = os.path.join(BuildDir, "UefiUniversalPayloadEntry.txt")
@@ -212,6 +213,7 @@ def BuildUniversalPayload(Args):
         MultiFvList = [
             ['uefi_fv',        os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/DXEFV.Fv"))    ],
             ['bds_fv',         os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/BDSFV.Fv"))    ],
+            ['sec_fv',         os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/SECFV.Fv"))    ],
             ['network_fv',     os.path.join(BuildDir, "{}_{}".format (BuildTarget, ToolChain), os.path.normpath("FV/NETWORKFV.Fv"))],
         ]
 
@@ -234,6 +236,7 @@ def BuildUniversalPayload(Args):
         fit_image_info_header.TargetPath    = os.path.join(BuildDir, 'UniversalPayload.fit')
         fit_image_info_header.UefifvPath    = DxeFvOutputDir
         fit_image_info_header.BdsfvPath     = BdsFvOutputDir
+        fit_image_info_header.SecfvPath     = SecFvOutputDir
         fit_image_info_header.NetworkfvPath = NetworkFvOutputDir
         fit_image_info_header.DataOffset    = 0x1000
         fit_image_info_header.LoadAddr      = Args.LoadAddress
