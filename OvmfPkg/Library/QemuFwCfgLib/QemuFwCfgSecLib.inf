@@ -28,6 +28,8 @@
   QemuFwCfgLibInternal.h
   QemuFwCfgLib.c
   QemuFwCfgSec.c
+  QemuFwCfgCache.c
+  QemuFwCfgCacheInit.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -39,4 +41,10 @@
   DebugLib
   IoLib
   MemoryAllocationLib
+  HobLib
 
+[Guids]
+  gOvmfFwCfgInfoHobGuid
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

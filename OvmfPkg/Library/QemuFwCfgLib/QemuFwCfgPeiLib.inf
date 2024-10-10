@@ -30,6 +30,8 @@
   QemuFwCfgLibInternal.h
   QemuFwCfgLib.c
   QemuFwCfgPei.c
+  QemuFwCfgCache.c
+  QemuFwCfgCacheInit.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -45,6 +47,7 @@
 
 [Guids]
   gUefiOvmfPkgPlatformInfoGuid
+  gOvmfFwCfgInfoHobGuid
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
