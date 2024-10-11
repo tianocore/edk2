@@ -19,7 +19,8 @@
 
 /**
   The PI Standalone MM entry point for handling mm communication request
-  Here is an example of how the PI_MM_CPU_DRIVER_EP_PROTOCOL is utilized in ARM:
+  Here is an example of how the EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL
+  is utilized in ARM:
     1. StandaloneMmCoreEntryPoint loads StandaloneMmCore.
     2. StandaloneMmCore dispatches all MM drivers,
        including the StandaloneMmCpu driver.
@@ -33,7 +34,6 @@
   See StandaloneMmPkg/StandaloneMmCoreEntryPoint/Arm/StandaloneMmCoreEntryPoint.c
 
   @param  [in] EventId            The event Id based on firmware.
-  @param  [in] CpuNumber          The CPU number.
   @param  [in] CommBufferAddr     Address of the communication buffer.
 
   @retval   EFI_SUCCESS             Success.
@@ -46,7 +46,6 @@ typedef
 EFI_STATUS
 (EFIAPI *EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT)(
   IN UINTN  EventId,
-  IN UINTN  CpuNumber,
   IN UINTN  CommBufferAddr
   );
 
