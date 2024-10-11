@@ -13,13 +13,14 @@
 
 #include <PiMm.h>
 
-#define PI_MM_CPU_DRIVER_EP_GUID  { \
+#define EDKII_PI_MM_CPU_DRIVER_EP_GUID  { \
   0x6ecbd5a1, 0xc0f8, 0x4702, { 0x83, 0x01, 0x4f, 0xc2, 0xc5, 0x47, 0x0a, 0x51 } \
   }
 
 /**
   The PI Standalone MM entry point for handling mm communication request
-  Here is an example of how the PI_MM_CPU_DRIVER_EP_PROTOCOL is utilized in ARM:
+  Here is an example of how the EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL
+  is utilized in ARM:
     1. StandaloneMmCoreEntryPoint loads StandaloneMmCore.
     2. StandaloneMmCore dispatches all MM drivers,
        including the StandaloneMmCpu driver.
@@ -33,7 +34,6 @@
   See StandaloneMmPkg/StandaloneMmCoreEntryPoint/Arm/StandaloneMmCoreEntryPoint.c
 
   @param  [in] EventId            The event Id based on firmware.
-  @param  [in] CpuNumber          The CPU number.
   @param  [in] CommBufferAddr     Address of the communication buffer.
 
   @retval   EFI_SUCCESS             Success.
@@ -44,16 +44,15 @@
 **/
 typedef
 EFI_STATUS
-(EFIAPI *PI_MM_CPU_DRIVER_ENTRYPOINT)(
+(EFIAPI *EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT)(
   IN UINTN  EventId,
-  IN UINTN  CpuNumber,
   IN UINTN  CommBufferAddr
   );
 
 typedef struct _EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL;
 
 struct _EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL {
-  PI_MM_CPU_DRIVER_ENTRYPOINT    PiMmCpuDriverEntryPoint;
+  EDKII_PI_MM_CPU_DRIVER_ENTRYPOINT    PiMmCpuDriverEntryPoint;
 };
 
 extern EFI_GUID  gEdkiiPiMmCpuDriverEpProtocolGuid;
