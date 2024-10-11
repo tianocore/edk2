@@ -46,6 +46,7 @@
 #include <IndustryStandard/ArmFfaBootInfo.h>
 
 #include <Protocol/PiMmCpuDriverEp.h>
+#include <Protocol/MmCommunication.h>
 
 extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
 
@@ -53,6 +54,8 @@ VOID  *gHobList = NULL;
 
 STATIC MP_INFORMATION_HOB_DATA     *mMpInfo                  = NULL;
 STATIC MISC_MM_COMMUNICATE_BUFFER  *mMiscMmCommunicateBuffer = NULL;
+STATIC EFI_MMRAM_DESCRIPTOR        *mNsCommBuffer            = NULL;
+STATIC EFI_MMRAM_DESCRIPTOR        *mSCommBuffer             = NULL;
 
 /**
   Get communication ABI protocol.
@@ -482,6 +485,59 @@ GetCpuNumber (
   ASSERT (Idx < mMpInfo->NumberOfProcessors);
 
   return Idx;
+}
+
+/**
+  Perform bounds check for the Ns and Secure Communication buffer.
+
+  NOTE: We do not need to validate the Misc Communication buffer as
+  we are initialising that in StandaloneMm.
+
+  @param  [in] CommBufferAddr   Address of the common buffer.
+
+  @retval   EFI_SUCCESS             Success.
+  @retval   EFI_ACCESS_DENIED       Access not permitted.
+**/
+STATIC
+EFI_STATUS
+ValidateMmCommBufferAddr (
+  IN UINTN  CommBufferAddr
+  )
+{
+  UINT64  NsCommBufferEnd;
+  UINT64  SCommBufferEnd;
+  UINT64  CommBufferEnd;
+  UINT64  CommBufferRange;
+
+  NsCommBufferEnd = mNsCommBuffer->PhysicalStart + mNsCommBuffer->PhysicalSize;
+  SCommBufferEnd  = mSCommBuffer->PhysicalStart + mSCommBuffer->PhysicalSize;
+
+  if ((CommBufferAddr >= mNsCommBuffer->PhysicalStart) &&
+      (CommBufferAddr < NsCommBufferEnd))
+  {
+    CommBufferEnd = NsCommBufferEnd;
+  } else if ((CommBufferAddr >= mSCommBuffer->PhysicalStart) &&
+             (CommBufferAddr < SCommBufferEnd))
+  {
+    CommBufferEnd = SCommBufferEnd;
+  } else {
+    return EFI_ACCESS_DENIED;
+  }
+
+  CommBufferRange = CommBufferEnd - CommBufferAddr;
+
+  if (CommBufferRange < sizeof (EFI_MM_COMMUNICATE_HEADER)) {
+    return EFI_ACCESS_DENIED;
+  }
+
+  // perform bounds check.
+  if ((CommBufferRange - sizeof (EFI_MM_COMMUNICATE_HEADER)) <
+      ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength)
+  {
+    return EFI_ACCESS_DENIED;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -993,6 +1049,18 @@ DelegatedEventLoop (
       ServiceType    = ServiceTypeMmCommunication;
     }
 
+    if (ServiceType == ServiceTypeMmCommunication) {
+      Status = ValidateMmCommBufferAddr (CommBufferAddr);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "Error: Failed to validate Communication Buffer address(0x%x)...\n",
+          CommBufferAddr
+          ));
+        goto ExitHandler;
+      }
+    }
+
     Status = CpuDriverEntryPoint ((UINTN)ServiceType, CpuNumber, CommBufferAddr);
     if (EFI_ERROR (Status)) {
       DEBUG ((
@@ -1054,6 +1122,7 @@ CEntryPoint (
   EFI_HOB_GUID_TYPE                   *GuidHob;
   EFI_CONFIGURATION_TABLE             *ConfigurationTable;
   UINTN                               Idx;
+  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK      *MmramRangesHob;
 
   CpuDriverEntryPoint = NULL;
 
@@ -1186,6 +1255,44 @@ CEntryPoint (
   }
 
   mMpInfo = GET_GUID_HOB_DATA (GuidHob);
+
+  // Find the descriptor that contains the whereabouts of the buffer for
+  // communication with the Normal world.
+  GuidHob = GetNextGuidHob (&gEfiStandaloneMmNonSecureBufferGuid, gHobList);
+  if (GuidHob == NULL) {
+    Status = EFI_NOT_FOUND;
+    DEBUG ((DEBUG_ERROR, "Error: No NsCommBuffer hob ...\n"));
+    goto finish;
+  }
+
+  mNsCommBuffer = GET_GUID_HOB_DATA (GuidHob);
+  if (mNsCommBuffer == NULL) {
+    Status = EFI_NOT_FOUND;
+    DEBUG ((DEBUG_ERROR, "Error: No NsCommBuffer hob data...\n"));
+    goto finish;
+  }
+
+  //
+  // The base and size of buffer shared with
+  // privileged Secure world software is in PeiMmramMemoryReservedGuid Hob.
+  //
+  GuidHob = GetNextGuidHob (&gEfiMmPeiMmramMemoryReserveGuid, gHobList);
+  if (GuidHob == NULL) {
+    Status = EFI_NOT_FOUND;
+    DEBUG ((DEBUG_ERROR, "Error: No PeiMmramMemoryReserved hob ...\n"));
+    goto finish;
+  }
+
+  MmramRangesHob = GET_GUID_HOB_DATA (GuidHob);
+  if ((MmramRangesHob == NULL) ||
+      (MmramRangesHob->NumberOfMmReservedRegions < MMRAM_DESC_MIN_COUNT))
+  {
+    Status = EFI_NOT_FOUND;
+    DEBUG ((DEBUG_ERROR, "Error: Failed to get shared comm buffer ...\n"));
+    goto finish;
+  }
+
+  mSCommBuffer = &MmramRangesHob->Descriptor[MMRAM_DESC_IDX_SECURE_SHARED_BUFFER];
 
   //
   // Find out cpu driver entry point used in DelegatedEventLoop

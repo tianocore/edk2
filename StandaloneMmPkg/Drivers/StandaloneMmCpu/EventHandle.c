@@ -43,10 +43,6 @@ MmFoundationEntryRegister (
 //
 EFI_MM_COMMUNICATE_HEADER  **PerCpuGuidedEventContext = NULL;
 
-// Descriptor with whereabouts of memory used for communication with the normal world
-EFI_MMRAM_DESCRIPTOR  mNsCommBuffer;
-EFI_MMRAM_DESCRIPTOR  mSCommBuffer;
-
 MP_INFORMATION_HOB_DATA  *mMpInformationHobData;
 
 EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig = {
@@ -59,53 +55,6 @@ EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL  mPiMmCpuDriverEpProtocol = {
 };
 
 STATIC EFI_MM_ENTRY_POINT  mMmEntryPoint = NULL;
-
-/**
-  Perform bounds check on the common buffer.
-
-  @param  [in] BufferAddr   Address of the common buffer.
-
-  @retval   EFI_SUCCESS             Success.
-  @retval   EFI_ACCESS_DENIED       Access not permitted.
-**/
-STATIC
-EFI_STATUS
-CheckBufferAddr (
-  IN UINTN  BufferAddr
-  )
-{
-  UINT64  NsCommBufferEnd;
-  UINT64  SCommBufferEnd;
-  UINT64  CommBufferEnd;
-
-  NsCommBufferEnd = mNsCommBuffer.PhysicalStart + mNsCommBuffer.PhysicalSize;
-  SCommBufferEnd  = mSCommBuffer.PhysicalStart + mSCommBuffer.PhysicalSize;
-
-  if ((BufferAddr >= mNsCommBuffer.PhysicalStart) &&
-      (BufferAddr < NsCommBufferEnd))
-  {
-    CommBufferEnd = NsCommBufferEnd;
-  } else if ((BufferAddr >= mSCommBuffer.PhysicalStart) &&
-             (BufferAddr < SCommBufferEnd))
-  {
-    CommBufferEnd = SCommBufferEnd;
-  } else {
-    return EFI_ACCESS_DENIED;
-  }
-
-  if ((CommBufferEnd - BufferAddr) < sizeof (EFI_MM_COMMUNICATE_HEADER)) {
-    return EFI_ACCESS_DENIED;
-  }
-
-  // perform bounds check.
-  if ((CommBufferEnd - BufferAddr - sizeof (EFI_MM_COMMUNICATE_HEADER)) <
-      ((EFI_MM_COMMUNICATE_HEADER *)BufferAddr)->MessageLength)
-  {
-    return EFI_ACCESS_DENIED;
-  }
-
-  return EFI_SUCCESS;
-}
 
 /**
   The PI Standalone MM entry point for the CPU driver.
@@ -139,12 +88,6 @@ PiMmStandaloneMmCpuDriverEntry (
   // Perform parameter validation of NsCommBufferAddr
   if (NsCommBufferAddr == (UINTN)NULL) {
     return EFI_INVALID_PARAMETER;
-  }
-
-  Status = CheckBufferAddr (NsCommBufferAddr);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Check Buffer failed: %r\n", Status));
-    return Status;
   }
 
   // Find out the size of the buffer passed
