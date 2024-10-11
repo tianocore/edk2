@@ -26,7 +26,6 @@
 
 #include <PiPei.h>
 #include <Guid/MmramMemoryReserve.h>
-#include <Guid/MpInformation.h>
 
 #include <Library/ArmLib.h>
 #include <Library/ArmSvcLib.h>
@@ -52,7 +51,6 @@ extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
 
 VOID  *gHobList = NULL;
 
-STATIC MP_INFORMATION_HOB_DATA     *mMpInfo                  = NULL;
 STATIC MISC_MM_COMMUNICATE_BUFFER  *mMiscMmCommunicateBuffer = NULL;
 STATIC EFI_MMRAM_DESCRIPTOR        *mNsCommBuffer            = NULL;
 STATIC EFI_MMRAM_DESCRIPTOR        *mSCommBuffer             = NULL;
@@ -454,40 +452,6 @@ GetServiceType (
 }
 
 /**
-  Get logical Cpu Number based on MpInformation hob data.
-
-  @param  [in] CommProtocol            Abi Protocol.
-  @param  [in] EventCompleteSvcArgs   Pointer to the event completion arguments.
-
-  @retval         CpuNumber               Cpu Number
-**/
-STATIC
-UINTN
-EFIAPI
-GetCpuNumber (
-  IN COMM_PROTOCOL  CommProtocol,
-  IN ARM_SVC_ARGS   *EventCompleteSvcArgs
-  )
-{
-  UINTN  Idx;
-
-  if (CommProtocol == CommProtocolSpmMm) {
-    Idx = EventCompleteSvcArgs->Arg3;
-  } else {
-    /*
-     * There's no way to find out CPU number in StandaloneMm via FF-A v1.2.
-     * Because StandaloneMm is S-EL0 partition, it couldn't read mpidr.
-     * Currently, StandaloneMm is UP migratable SP so, just return idx 0.
-     */
-    Idx = 0;
-  }
-
-  ASSERT (Idx < mMpInfo->NumberOfProcessors);
-
-  return Idx;
-}
-
-/**
   Perform bounds check for the Ns and Secure Communication buffer.
 
   NOTE: We do not need to validate the Misc Communication buffer as
@@ -531,54 +495,14 @@ ValidateMmCommBufferAddr (
   }
 
   // perform bounds check.
-  if ((CommBufferRange - sizeof (EFI_MM_COMMUNICATE_HEADER)) <
-      ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength)
+  if (((CommBufferAddr + sizeof (EFI_MM_COMMUNICATE_HEADER) +
+        ((EFI_MM_COMMUNICATE_HEADER *)CommBufferAddr)->MessageLength)) >
+      CommBufferEnd)
   {
     return EFI_ACCESS_DENIED;
   }
 
   return EFI_SUCCESS;
-}
-
-/**
-  Dump mp information descriptor.
-
-  @param[in]      ProcessorInfo       Mp information
-  @param[in]      Idx                 Cpu index
-
-**/
-STATIC
-VOID
-EFIAPI
-DumpMpInfoDescriptor (
-  EFI_PROCESSOR_INFORMATION  *ProcessorInfo,
-  UINTN                      Idx
-  )
-{
-  if (ProcessorInfo == NULL) {
-    return;
-  }
-
-  DEBUG ((
-    DEBUG_INFO,
-    "CPU[%d]: MpIdr - 0x%lx\n",
-    Idx,
-    ProcessorInfo->ProcessorId
-    ));
-  DEBUG ((
-    DEBUG_INFO,
-    "CPU[%d]: StatusFlag - 0x%lx\n",
-    Idx,
-    ProcessorInfo->StatusFlag
-    ));
-  DEBUG ((
-    DEBUG_INFO,
-    "CPU[%d]: Location[P:C:T] - :%d:%d:%d\n",
-    Idx,
-    ProcessorInfo->Location.Package,
-    ProcessorInfo->Location.Core,
-    ProcessorInfo->Location.Thread
-    ));
 }
 
 /**
@@ -645,7 +569,6 @@ DumpPhitHob (
 {
   EFI_HOB_FIRMWARE_VOLUME         *FvHob;
   EFI_HOB_GUID_TYPE               *GuidHob;
-  MP_INFORMATION_HOB_DATA         *MpInfo;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
   EFI_MMRAM_DESCRIPTOR            *MmramDesc;
   UINTN                           Idx;
@@ -658,23 +581,6 @@ DumpPhitHob (
 
   DEBUG ((DEBUG_INFO, "FvHob: BaseAddress - 0x%lx\n", FvHob->BaseAddress));
   DEBUG ((DEBUG_INFO, "FvHob: Length - %ld\n", FvHob->Length));
-
-  GuidHob = GetNextGuidHob (&gMpInformationHobGuid, HobStart);
-  if (GuidHob == NULL) {
-    DEBUG ((DEBUG_ERROR, "Error: No MpInformation Guid Hob is present.\n"));
-    return;
-  }
-
-  MpInfo = GET_GUID_HOB_DATA (GuidHob);
-  DEBUG ((DEBUG_INFO, "Number of Cpus - %d\n", MpInfo->NumberOfProcessors));
-  DEBUG ((
-    DEBUG_INFO,
-    "Number of Enabled Cpus - %d\n",
-    MpInfo->NumberOfEnabledProcessors
-    ));
-  for (Idx = 0; Idx < MpInfo->NumberOfProcessors; Idx++) {
-    DumpMpInfoDescriptor (&MpInfo->ProcessorInfoBuffer[Idx], Idx);
-  }
 
   GuidHob = GetNextGuidHob (&gEfiStandaloneMmNonSecureBufferGuid, HobStart);
   if (GuidHob == NULL) {
@@ -937,7 +843,6 @@ DelegatedEventLoop (
   )
 {
   EFI_STATUS    Status;
-  UINTN         CpuNumber;
   UINT64        Uuid[2];
   VOID          *CommData;
   FFA_MSG_INFO  FfaMsgInfo;
@@ -961,9 +866,6 @@ DelegatedEventLoop (
     DEBUG ((DEBUG_INFO, "X5 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg5));
     DEBUG ((DEBUG_INFO, "X6 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg6));
     DEBUG ((DEBUG_INFO, "X7 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg7));
-
-    CpuNumber = GetCpuNumber (CommProtocol, EventCompleteSvcArgs);
-    DEBUG ((DEBUG_INFO, "CpuNumber: %d\n", CpuNumber));
 
     if (CommProtocol == CommProtocolFfa) {
       /*
@@ -1061,7 +963,7 @@ DelegatedEventLoop (
       }
     }
 
-    Status = CpuDriverEntryPoint ((UINTN)ServiceType, CpuNumber, CommBufferAddr);
+    Status = CpuDriverEntryPoint ((UINTN)ServiceType, CommBufferAddr);
     if (EFI_ERROR (Status)) {
       DEBUG ((
         DEBUG_ERROR,
@@ -1238,23 +1140,7 @@ CEntryPoint (
     goto finish;
   }
 
-  // Set the gHobList to point to the HOB list saved in ConfigurationTable[].
   gHobList = ConfigurationTable[Idx].VendorTable;
-
-  //
-  // Find MpInformation Hob in HobList.
-  // It couldn't save address of mp information in gHobList
-  // because that memory area will be reused after StandaloneMm finishing
-  // initialization.
-  //
-  GuidHob = GetNextGuidHob (&gMpInformationHobGuid, gHobList);
-  if (GuidHob == NULL) {
-    Status = EFI_NOT_FOUND;
-    DEBUG ((DEBUG_ERROR, "Error: No MpInformation hob ...\n"));
-    goto finish;
-  }
-
-  mMpInfo = GET_GUID_HOB_DATA (GuidHob);
 
   // Find the descriptor that contains the whereabouts of the buffer for
   // communication with the Normal world.
