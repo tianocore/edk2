@@ -32,6 +32,8 @@
   Hash/CryptSha256.c
   Hash/CryptSha512.c
   Hash/CryptSm3.c
+  Hash/Sm3Core.c
+  Hash/Sm3Core.h
   Hash/CryptParallelHashNull.c
   Hmac/CryptHmac.c
   Kdf/CryptHkdf.c
@@ -56,7 +58,6 @@
   Pk/CryptEcNull.c
   Rand/CryptRand.c
   SysCall/CrtWrapper.c
-  SysCall/UnitTestHostCrtWrapper.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -69,7 +70,6 @@
   UefiRuntimeServicesTableLib
   DebugLib
   MbedTlsLib
-  OpensslLib
   PrintLib
   RngLib
 
