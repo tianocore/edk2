@@ -13,7 +13,10 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PcdLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <PiPei.h>
+#include <WorkArea.h>
 
 #include "QemuFwCfgLibInternal.h"
 
@@ -118,4 +121,64 @@ InternalQemuFwCfgDmaBytes (
   //
   ASSERT (FALSE);
   CpuDeadLoop ();
+}
+
+/**
+  Get the pointer to the FW_CFG_CACHE_WORK_AREA. This data is used as the
+  workarea to record the onging fw_cfg item and offset.
+
+  @retval   FW_CFG_CACHE_WORK_AREA  Pointer to the FW_CFG_CACHE_WORK_AREA
+  @retval   NULL                FW_CFG_CACHE_WORK_AREA doesn't exist
+**/
+FW_CFG_CACHE_WORK_AREA *
+QemuFwCfgCacheGetWorkArea (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE  *GuidHob;
+
+  if (!QemuFwCfgCacheEnable ()) {
+    return NULL;
+  }
+
+  GuidHob = GetFirstGuidHob (&gOvmfFwCfgInfoHobGuid);
+  ASSERT (GuidHob);
+
+  return (FW_CFG_CACHE_WORK_AREA *)(VOID *)GET_GUID_HOB_DATA (GuidHob);
+}
+
+/**
+  Check if fw_cfg cache is ready.
+
+  @retval    TRUE   Cache is ready
+  @retval    FALSE  Cache is not ready
+**/
+BOOLEAN
+QemuFwCfgCacheEnable (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  FW_CFG_CACHE_WORK_AREA  *FwCfgCacheWrokArea;
+  TDX_WORK_AREA           *TdxWorkArea;
+
+  // QemuFwCfgCacheEnable in QemuFwCfgSecLib might be called in a very early
+  // stage (at that moment HobList may not be set). So an additional check
+  // to the HobList is needed.
+  TdxWorkArea = (TDX_WORK_AREA *)(UINTN)FixedPcdGet32 (PcdOvmfWorkAreaBase);
+  if (TdxWorkArea == NULL) {
+    return FALSE;
+  }
+
+  if (TdxWorkArea->SecTdxWorkArea.HobList == 0) {
+    return FALSE;
+  }
+
+  GuidHob = GetFirstGuidHob (&gOvmfFwCfgInfoHobGuid);
+  if (GuidHob == NULL) {
+    return FALSE;
+  }
+
+  FwCfgCacheWrokArea = (FW_CFG_CACHE_WORK_AREA *)GET_GUID_HOB_DATA (GuidHob);
+  return FwCfgCacheWrokArea->CacheReady;
 }

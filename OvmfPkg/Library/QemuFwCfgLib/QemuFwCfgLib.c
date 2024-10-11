@@ -35,6 +35,13 @@ QemuFwCfgSelectItem (
   )
 {
   DEBUG ((DEBUG_INFO, "Select Item: 0x%x\n", (UINT16)(UINTN)QemuFwCfgItem));
+
+  if(QemuFwCfgCacheSelectItem (QemuFwCfgItem)) {
+    return;
+  } else {
+    QemuFwCfgCacheResetWorkArea();
+  }
+
   IoWrite16 (FW_CFG_IO_SELECTOR, (UINT16)(UINTN)QemuFwCfgItem);
 }
 
@@ -52,6 +59,11 @@ InternalQemuFwCfgReadBytes (
   IN VOID   *Buffer  OPTIONAL
   )
 {
+  if (QemuFwCfgCacheEnable () && QemuFwCfgCacheReading()) {
+    QemuFwCfgCacheReadBytes (Size, Buffer);
+    return;
+  }
+
   if (InternalQemuFwCfgDmaIsAvailable () && (Size <= MAX_UINT32)) {
     InternalQemuFwCfgDmaBytes ((UINT32)Size, Buffer, FW_CFG_DMA_CTL_READ);
     return;
@@ -258,6 +270,10 @@ QemuFwCfgFindFile (
 
   if (!InternalQemuFwCfgIsAvailable ()) {
     return RETURN_UNSUPPORTED;
+  }
+
+  if (!EFI_ERROR (QemuFwCfgItemInCacheList (Name, Item, Size))) {
+    return RETURN_SUCCESS;
   }
 
   QemuFwCfgSelectItem (QemuFwCfgItemFileDir);

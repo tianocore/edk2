@@ -92,6 +92,21 @@ typedef struct {
   UINT32    Length;
   UINT64    Address;
 } FW_CFG_DMA_ACCESS;
+
+typedef struct {
+  CHAR8                   FileName[QEMU_FW_CFG_FNAME_SIZE];
+  FIRMWARE_CONFIG_ITEM    FwCfgItem;
+  UINTN                   DataSize;
+  // UINT8  *data
+} FW_CFG_CACHED_ITEM;
+
+typedef struct {
+  BOOLEAN                 CacheReady;
+  FIRMWARE_CONFIG_ITEM    FwCfgItem;
+  UINTN                   Offset;
+  BOOLEAN                 Reading;
+} FW_CFG_CACHE_WORK_AREA;
+
 #pragma pack ()
 
 #endif
