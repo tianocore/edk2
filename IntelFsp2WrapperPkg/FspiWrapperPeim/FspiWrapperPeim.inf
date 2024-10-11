@@ -40,19 +40,24 @@
   PerformanceLib
   FspWrapperApiLib
   FspWrapperApiTestLib
+  FspMeasurementLib
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   IntelFsp2Pkg/IntelFsp2Pkg.dec
+  SecurityPkg/SecurityPkg.dec
   IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
 
 [Ppis]
+  gEdkiiTcgPpiGuid                                       ## NOTIFY
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid    ## PRODUCES
 
 [Pcd]
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspiBaseAddress       ## CONSUMES
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection      ## CONSUMES
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspiUpdDataAddress    ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig  ## CONSUMES
 
 [Guids]
   gFspHobGuid                           ## CONSUMES ## HOB

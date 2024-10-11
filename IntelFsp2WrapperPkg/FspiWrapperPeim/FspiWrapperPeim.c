@@ -26,6 +26,9 @@
 #include <Library/FspWrapperApiLib.h>
 #include <Library/FspWrapperHobProcessLib.h>
 #include <Library/FspWrapperApiTestLib.h>
+#include <Library/FspMeasurementLib.h>
+#include <Ppi/Tcg.h>
+#include <Ppi/FirmwareVolumeInfoMeasurementExcluded.h>
 
 /**
   Call FspSmmInit API.
@@ -135,6 +138,30 @@ FspiWrapperInitDispatchMode (
   VOID
   )
 {
+  EFI_STATUS                                             Status;
+  EFI_PEI_FIRMWARE_VOLUME_INFO_MEASUREMENT_EXCLUDED_PPI  *MeasurementExcludedFvPpi;
+  EFI_PEI_PPI_DESCRIPTOR                                 *MeasurementExcludedPpiList;
+
+  MeasurementExcludedFvPpi = AllocatePool (sizeof (*MeasurementExcludedFvPpi));
+  if (MeasurementExcludedFvPpi != NULL) {
+    MeasurementExcludedFvPpi->Count          = 1;
+    MeasurementExcludedFvPpi->Fv[0].FvBase   = PcdGet32 (PcdFspiBaseAddress);
+    MeasurementExcludedFvPpi->Fv[0].FvLength = ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspiBaseAddress))->FvLength;
+  } else {
+    ASSERT (MeasurementExcludedFvPpi != NULL);
+  }
+
+  MeasurementExcludedPpiList = AllocatePool (sizeof (*MeasurementExcludedPpiList));
+  if (MeasurementExcludedPpiList != NULL) {
+    MeasurementExcludedPpiList->Flags = EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST;
+    MeasurementExcludedPpiList->Guid  = &gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid;
+    MeasurementExcludedPpiList->Ppi   = MeasurementExcludedFvPpi;
+
+    Status = PeiServicesInstallPpi (MeasurementExcludedPpiList);
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    ASSERT (MeasurementExcludedPpiList != NULL);
+  }
 
   //
   // FSP-I Wrapper running in Dispatch mode and reports FSP-I FV to PEI dispatcher.
@@ -146,6 +173,66 @@ FspiWrapperInitDispatchMode (
     NULL,
     NULL
     );
+
+  return EFI_SUCCESS;
+}
+
+/**
+  This function is called after TCG installed PPI.
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+TcgPpiNotify (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
+  );
+
+EFI_PEI_NOTIFY_DESCRIPTOR  mTcgPpiNotifyDesc = {
+  (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiTcgPpiGuid,
+  TcgPpiNotify
+};
+
+/**
+  This function is called after TCG installed PPI.
+
+  @param[in] PeiServices    Pointer to PEI Services Table.
+  @param[in] NotifyDesc     Pointer to the descriptor for the Notification event that
+                            caused this function to execute.
+  @param[in] Ppi            Pointer to the PPI data associated with this function.
+
+  @retval EFI_STATUS        Always return EFI_SUCCESS
+**/
+EFI_STATUS
+EFIAPI
+TcgPpiNotify (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDesc,
+  IN VOID                       *Ppi
+  )
+{
+  UINT32  FspMeasureMask;
+
+  DEBUG ((DEBUG_INFO, "TcgPpiNotify FSPI\n"));
+
+  FspMeasureMask = PcdGet32 (PcdFspMeasurementConfig);
+
+  if ((FspMeasureMask & FSP_MEASURE_FSPI) != 0) {
+    MeasureFspFirmwareBlob (
+      0,
+      "FSPI",
+      PcdGet32 (PcdFspiBaseAddress),
+      (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)PcdGet32 (PcdFspiBaseAddress))->FvLength
+      );
+  }
 
   return EFI_SUCCESS;
 }
@@ -168,6 +255,9 @@ FspiWrapperPeimEntryPoint (
   EFI_STATUS  Status;
 
   DEBUG ((DEBUG_INFO, "FspiWrapperPeimEntryPoint\n"));
+
+  Status = PeiServicesNotifyPpi (&mTcgPpiNotifyDesc);
+  ASSERT_EFI_ERROR (Status);
 
   if (PcdGet8 (PcdFspModeSelection) == 1) {
     Status = FspiWrapperInitApiMode ();
