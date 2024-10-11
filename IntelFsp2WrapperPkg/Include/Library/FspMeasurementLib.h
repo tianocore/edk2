@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define FSP_MEASURE_FSPT    BIT1
 #define FSP_MEASURE_FSPM    BIT2
 #define FSP_MEASURE_FSPS    BIT3
+#define FSP_MEASURE_FSPI    BIT4
 #define FSP_MEASURE_FSPUPD  BIT31
 
 /**
