@@ -73,6 +73,16 @@ jobs:
             ArchList: "IA32,X64"
           - Package: "UnitTestFrameworkPkg"
             ArchList: "IA32,X64"
+          - Package: "EmbeddedPkg"
+            ArchList: "IA32,X64"
+          - Package: "ArmVirtPkg"
+            ArchList: "IA32,X64"
+          - Package: "EmulatorPkg"
+            ArchList: "IA32,X64"
+          - Package: "ArmVirtPkg"
+            ArchList: "IA32,X64"
+          - Package: "OvmfPkg"
+            ArchList: "IA32,X64"
 
     steps:
     - name: Checkout repository
