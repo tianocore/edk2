@@ -86,7 +86,7 @@ LibGetTime (
     // If you are attempting to use this library on such an environment, please
     // contact the edk2 mailing list, so we can try to add support for it.
     //
-    // EpochSeconds = BUILD_EPOCH;
+    EpochSeconds = BUILD_EPOCH;
     DEBUG ((
       DEBUG_INFO,
       "LibGetTime: %s non volatile variable was not found - Using compilation time epoch.\n",
@@ -103,7 +103,7 @@ LibGetTime (
   }
 
   Counter       = GetPerformanceCounter ();
-  EpochSeconds += (UINTN)DivU64x64Remainder (Counter, Freq, &Remainder);
+  EpochSeconds += DivU64x64Remainder (Counter, Freq, &Remainder);
 
   // Get the current time zone information from non-volatile storage
   Size   = sizeof (TimeZone);
@@ -277,7 +277,7 @@ LibSetTime (
   if (Freq != 0) {
     Counter = GetPerformanceCounter ();
     if (EpochSeconds > DivU64x64Remainder (Counter, Freq, &Remainder)) {
-      EpochSeconds -= (UINTN)DivU64x64Remainder (Counter, Freq, &Remainder);
+      EpochSeconds -= DivU64x64Remainder (Counter, Freq, &Remainder);
     }
   }
 
