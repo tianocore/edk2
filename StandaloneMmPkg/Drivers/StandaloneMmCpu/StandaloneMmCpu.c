@@ -95,16 +95,14 @@ StandaloneMmCpuInitialize (
   IN EFI_MM_SYSTEM_TABLE  *SystemTable   // not actual systemtable
   )
 {
-  EFI_CONFIGURATION_TABLE         *ConfigurationTable;
-  MP_INFORMATION_HOB_DATA         *MpInformationHobData;
-  EFI_MMRAM_DESCRIPTOR            *NsCommBufMmramRange;
-  EFI_STATUS                      Status;
-  EFI_HANDLE                      DispatchHandle;
-  UINT32                          MpInfoSize;
-  UINTN                           Index;
-  UINTN                           ArraySize;
-  VOID                            *HobStart;
-  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHob;
+  EFI_CONFIGURATION_TABLE  *ConfigurationTable;
+  MP_INFORMATION_HOB_DATA  *MpInformationHobData;
+  EFI_STATUS               Status;
+  EFI_HANDLE               DispatchHandle;
+  UINT32                   MpInfoSize;
+  UINTN                    Index;
+  UINTN                    ArraySize;
+  VOID                     *HobStart;
 
   ASSERT (SystemTable != NULL);
   mMmst = SystemTable;
@@ -159,44 +157,6 @@ StandaloneMmCpuInitialize (
   }
 
   HobStart = ConfigurationTable[Index].VendorTable;
-
-  // Find the descriptor that contains the whereabouts of the buffer for
-  // communication with the Normal world.
-  Status = GetGuidedHobData (
-             HobStart,
-             &gEfiStandaloneMmNonSecureBufferGuid,
-             (VOID **)&NsCommBufMmramRange
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "NsCommBufMmramRange HOB data extraction failed - 0x%x\n", Status));
-    return Status;
-  }
-
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalStart - 0x%lx\n", (UINTN)NsCommBufMmramRange->PhysicalStart));
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalSize - 0x%lx\n", (UINTN)NsCommBufMmramRange->PhysicalSize));
-
-  CopyMem (&mNsCommBuffer, NsCommBufMmramRange, sizeof (EFI_MMRAM_DESCRIPTOR));
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer: 0x%016lx - 0x%lx\n", mNsCommBuffer.CpuStart, mNsCommBuffer.PhysicalSize));
-
-  Status = GetGuidedHobData (
-             HobStart,
-             &gEfiMmPeiMmramMemoryReserveGuid,
-             (VOID **)&MmramRangesHob
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "MmramRangesHob data extraction failed - 0x%x\n", Status));
-    return Status;
-  }
-
-  //
-  // As CreateHobListFromBootInfo(), the base and size of buffer shared with
-  // privileged Secure world software is in second one.
-  //
-  CopyMem (
-    &mSCommBuffer,
-    &MmramRangesHob->Descriptor[0] + 1,
-    sizeof (EFI_MMRAM_DESCRIPTOR)
-    );
 
   //
   // Extract the MP information from the Hoblist

@@ -31,6 +31,16 @@
 #define CPU_INFO_FLAG_PRIMARY_CPU  0x00000001
 
 /*
+ * Index information for mm range descriptors in
+ * gEfiMmPeiMmramMemoryReserveGuid Guid Hob.
+ */
+#define MMRAM_DESC_IDX_IMAGE                 0
+#define MMRAM_DESC_IDX_SECURE_SHARED_BUFFER  1
+#define MMRAM_DESC_IDX_NORMAL_SHARED_BUFFER  2
+#define MMRAM_DESC_IDX_HEAP                  3
+#define MMRAM_DESC_MIN_COUNT                 4
+
+/*
  * Communication ABI protocol to communicate between normal/secure partition.
  */
 typedef enum {
