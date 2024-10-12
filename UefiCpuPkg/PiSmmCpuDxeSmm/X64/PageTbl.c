@@ -851,7 +851,15 @@ SaveCr2 (
   OUT UINTN  *Cr2
   )
 {
-  *Cr2 = AsmReadCr2 ();
+  //
+  // A page fault (#PF) that triggers an update to the page
+  // table only occurs if SmiProfile is enabled. Therefore, it is
+  // necessary to save the CR2 register if SmiProfile is
+  // configured to be enabled.
+  //
+  if (mSmmProfileEnabled) {
+    *Cr2 = AsmReadCr2 ();
+  }
 }
 
 /**
@@ -864,5 +872,13 @@ RestoreCr2 (
   IN UINTN  Cr2
   )
 {
-  AsmWriteCr2 (Cr2);
+  //
+  // A page fault (#PF) that triggers an update to the page
+  // table only occurs if SmiProfile is enabled. Therefore, it is
+  // necessary to restore the CR2 register if SmiProfile is
+  // configured to be enabled.
+  //
+  if (mSmmProfileEnabled) {
+    AsmWriteCr2 (Cr2);
+  }
 }
