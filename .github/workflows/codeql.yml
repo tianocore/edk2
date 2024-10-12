@@ -25,7 +25,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-24.04
+    runs-on: windows-2022
     permissions:
       actions: read
       contents: read
