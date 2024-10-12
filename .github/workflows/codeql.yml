@@ -25,7 +25,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: windows-2019
+    runs-on: ubuntu-24.04
     permissions:
       actions: read
       contents: read
@@ -205,7 +205,7 @@ jobs:
         if-no-files-found: ignore
 
     - name: Build Tools From Source
-      run: python BaseTools/Edk2ToolsBuild.py -t VS2022
+      run: python BaseTools/Edk2ToolsBuild.py -t VS2019
 
     - name: Find CodeQL Plugin Directory
       id: find_dir
