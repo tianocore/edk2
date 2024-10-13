@@ -11,4 +11,8 @@
 
 #include <openssl/opensslv.h>
 
+#if defined(_M_IX86)
+#pragma comment(linker, "/alternatename:__ftoul2_legacy=__ftol2")
+#endif
+
 #endif
