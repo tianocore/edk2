@@ -5,12 +5,14 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 trigger:
-- master
-- stable/*
+  branches:
+    include:
+      - "*"
 
 pr:
-- master
-- stable/*
+  branches:
+    include:
+      - "*"
 
 variables:
   - template: templates/defaults.yml
