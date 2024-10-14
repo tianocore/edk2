@@ -34,6 +34,7 @@
 #include <Guid/VariableFormat.h>
 #include <OvmfPlatforms.h>
 #include <Library/TdxLib.h>
+#include <Library/MemEncryptSevLib.h>
 
 #include <Library/PlatformInitLib.h>
 
@@ -774,6 +775,8 @@ PlatformValidateNvVarStore (
   EFI_FIRMWARE_VOLUME_HEADER     *NvVarStoreFvHeader;
   VARIABLE_STORE_HEADER          *NvVarStoreHeader;
   AUTHENTICATED_VARIABLE_HEADER  *VariableHeader;
+  BOOLEAN                        Retry;
+  EFI_STATUS                     Status;
 
   static EFI_GUID  FvHdrGUID       = EFI_SYSTEM_NV_DATA_FV_GUID;
   static EFI_GUID  VarStoreHdrGUID = EFI_AUTHENTICATED_VARIABLE_GUID;
@@ -792,6 +795,15 @@ PlatformValidateNvVarStore (
   //
   NvVarStoreFvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)NvVarStoreBase;
 
+  //
+  // SEV and SEV-ES can use separate flash devices for OVMF code and
+  // OVMF variables. In this case, the OVMF variables will need to be
+  // mapped unencrypted. If the initial validation fails, remap the
+  // NV variable store as unencrypted and retry the validation.
+  //
+  Retry = MemEncryptSevIsEnabled ();
+
+RETRY:
   if ((!IsZeroBuffer (NvVarStoreFvHeader->ZeroVector, 16)) ||
       (!CompareGuid (&FvHdrGUID, &NvVarStoreFvHeader->FileSystemGuid)) ||
       (NvVarStoreFvHeader->Signature != EFI_FVH_SIGNATURE) ||
@@ -801,8 +813,24 @@ PlatformValidateNvVarStore (
       (NvVarStoreFvHeader->FvLength != NvVarStoreSize)
       )
   {
-    DEBUG ((DEBUG_ERROR, "NvVarStore FV headers were invalid.\n"));
-    return FALSE;
+    if (!Retry) {
+      DEBUG ((DEBUG_ERROR, "NvVarStore FV headers were invalid.\n"));
+      return FALSE;
+    }
+
+    DEBUG ((DEBUG_INFO, "Remapping NvVarStore as shared\n"));
+    Status = MemEncryptSevClearMmioPageEncMask (
+               0,
+               (UINTN)NvVarStoreBase,
+               EFI_SIZE_TO_PAGES (NvVarStoreSize)
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failed to map NvVarStore as shared\n"));
+      return FALSE;
+    }
+
+    Retry = FALSE;
+    goto RETRY;
   }
 
   //
