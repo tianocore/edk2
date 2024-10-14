@@ -67,6 +67,11 @@ RetrieveMultiSegmentInfoFromHob (
     mPciSegments[Index].SegmentNumber  = (UINT16)(PciRootBridgeInfo->RootBridge[Index].Segment);
     mPciSegments[Index].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Base;
     mPciSegments[Index].EndBusNumber   = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Limit;
+
+    // Above logic may cause different EndBusNumber from the exactly same Segment when multiple bridges sharing the same Segment.
+    // Current idea is to assign every Segment to its maximum 0xFF EndBusNumber regardless bridges consuming all of them or not.
+    //
+    mPciSegments[Index].EndBusNumber = 0xFF;
   }
 
   return;
