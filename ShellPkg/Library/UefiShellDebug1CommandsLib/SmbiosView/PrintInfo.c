@@ -2423,6 +2423,10 @@ DisplayProcessorFamily (
       Print (L"Intel Core i9 processor\n");
       break;
 
+    case 0xD0:
+      Print (L"Intel Xeon D Processor\n");
+      break;
+
     case 0xD2:
       Print (L"ViaC7M\n");
       break;
