@@ -46,6 +46,13 @@
 #define CXL_HDM_12_WAY_INTERLEAVING  0xA
 
 //
+// CXL RAS Capability Structure Uncorrectable Error Status IDE error bits
+// Compute Express Link Specification Revision 3.0 - Chapter 8.2.4.16.1
+//
+#define CXL_IDE_TX_ERROR  BIT15
+#define CXL_IDE_RX_ERROR  BIT16
+
+//
 // Ensure proper structure formats
 //
 #pragma pack(1)
@@ -310,6 +317,269 @@ typedef struct {
   CXL_3_0_CXL_TIMEOUT_AND_ISOLATION_CONTROL       TimeoutAndIsolationControl;
   CXL_3_0_CXL_TIMEOUT_AND_ISOLATION_STATUS        TimeoutAndIsolationStatus;
 } CXL_3_0_CXL_TIMEOUT_AND_ISOLATION_CAPABILITY_STRUCTURE;
+
+///
+/// CXL Event Record structures
+/// Compute Express Link Specification Revision 3.0  - Chapter 8.2.9.2
+///@{
+
+//
+// Common Event Record
+//
+typedef struct {
+  EFI_GUID    EventRecordIdentifier;
+  UINT8       EventRecordLength;
+  UINT8       EventRecordFlags[3];
+  UINT16      EventRecordHandle;
+  UINT16      RelatedEventRecordHandle;
+  UINT64      EventRecordTimestamp;
+  UINT8       MaintenanceOperationClass;
+  UINT8       Reserved[15];
+} CXL_EVENT_RECORD_COMMON;
+
+//
+// General Media Event Record
+//
+typedef struct {
+  UINT64    PhysicalAddress;
+  UINT8     MemoryEventDescriptor;
+  UINT8     MemoryEventType;
+  UINT8     TransactionType;
+  UINT16    ValidityFlags;
+  UINT8     Channel;
+  UINT8     Rank;
+  UINT8     Device[3];
+  UINT8     ComponentIdentifier[16];
+  UINT8     Reserved[46];
+} CXL_GENERAL_MEDIA_EVENT_RECORD_SPECIFIC;
+
+typedef struct {
+  CXL_EVENT_RECORD_COMMON                    Common;
+  CXL_GENERAL_MEDIA_EVENT_RECORD_SPECIFIC    Specific;
+} CXL_GENERAL_MEDIA_EVENT_RECORD;
+
+//
+// DRAM Event Record
+//
+typedef struct {
+  UINT64    PhysicalAddress;
+  UINT8     MemoryEventDescriptor;
+  UINT8     MemoryEventType;
+  UINT8     TransactionType;
+  UINT16    ValidityFlags;
+  UINT8     Channel;
+  UINT8     Rank;
+  UINT8     NibbleMask[3];
+  UINT8     BankGroup;
+  UINT8     Bank;
+  UINT8     Row[3];
+  UINT16    Column;
+  UINT8     CorrectionMask[32];
+  UINT8     Reserved[23];
+} CXL_DRAM_EVENT_RECORD_SPECIFIC;
+
+typedef struct {
+  CXL_EVENT_RECORD_COMMON           Common;
+  CXL_DRAM_EVENT_RECORD_SPECIFIC    Specific;
+} CXL_DRAM_EVENT_RECORD;
+
+//
+// Device Health info used in memory module event record
+//
+typedef struct {
+  UINT8     HealthStatus;
+  UINT8     MediaStatus;
+  UINT8     AdditionalStatus;
+  UINT8     LifeUsed;
+  UINT16    DeviceTemperature;
+  UINT32    DirtyShutdownCount;
+  UINT32    CorrectedVolatileErrorCount;
+  UINT32    CorrectedPersistentErrorCount;
+} CXL_DEVICE_HEALTH_INFORMATION;
+
+//
+// Memory Module Event Record
+//
+typedef struct {
+  UINT8                            DeviceEventType;
+  CXL_DEVICE_HEALTH_INFORMATION    DeviceHealthInformation;
+  UINT8                            Reserved[61];
+} CXL_MEMORY_MODULE_EVENT_RECORD_SPECIFIC;
+
+typedef struct {
+  CXL_EVENT_RECORD_COMMON                    Common;
+  CXL_MEMORY_MODULE_EVENT_RECORD_SPECIFIC    Specific;
+} CXL_MEMORY_MODULE_EVENT_RECORD;
+
+//
+// Generic CXL event record of 128 bytes
+// Common Event Record - 48 bytes
+// Remaining part of event record - 80 bytes
+//
+typedef struct {
+  UINT8    Data[80];
+} CXL_EVENT_RECORD_SPECIFIC;
+
+typedef struct {
+  CXL_EVENT_RECORD_COMMON      Common;
+  CXL_EVENT_RECORD_SPECIFIC    Specific;
+} CXL_EVENT_RECORD;
+
+typedef struct {
+  CXL_EVENT_RECORD_COMMON    Common;
+  union {
+    CXL_EVENT_RECORD_SPECIFIC                  EventRecord;
+    CXL_GENERAL_MEDIA_EVENT_RECORD_SPECIFIC    GeneralMediaEventRecord;
+    CXL_DRAM_EVENT_RECORD_SPECIFIC             DramEventRecord;
+    CXL_MEMORY_MODULE_EVENT_RECORD_SPECIFIC    MemoryModuleEventRecord;
+  } RecordSpecific;
+} CXL_COMMON_EVENT_RECORD;
+
+///@}
+
+///
+/// Media and Poison Management structures
+/// Compute Express Link Specification Revision 3.0  - Chapter 8.2.9.8.4
+///@{
+
+//
+// Get Poison List input payload structure
+//
+typedef struct {
+  UINT64    PhysAddr;               // The starting DPA to retrieve the Poison List for
+  UINT64    PhysAddrLen;            // The range of physical addresses to retrieve the Poison List for.  In units of 64 bytes.
+} CXL_GET_POISON_LIST_INPUT_PAYLOAD;
+
+//
+// Get Poison List output payload structures
+//
+typedef union {
+  struct {
+    UINT8    MoreMediaErrorRecords : 1; // bit 0
+    UINT8    PoisonListOverflow    : 1; // bit 1
+    UINT8    ScanMediaInProgress   : 1; // bit 2
+    UINT8    Rsvd                  : 5; // bit 3..7
+  } Bits;
+  UINT8    Data8;
+} CXL_POISON_LIST_FLAGS;
+
+typedef union {
+  struct {
+    union {
+      struct {
+        UINT8    ErrorSource : 3;
+        UINT8    Rsvd        : 3;
+        UINT8    Dpa0_1      : 2;
+      } Bits;
+      UINT8    Data8;
+    } Byte0;
+    UINT8    Dpa[0x7];        // The range of physical addresses to retrieve the Poison List for.  In units of 64 bytes.
+  } Bits;
+  UINT64    Data64;
+} CXL_MEDIA_ERROR_ADDRESS;
+
+typedef struct {
+  CXL_MEDIA_ERROR_ADDRESS    MediaErrorAddr; // DPA of the memory error and error source
+  UINT32                     MediaErrorLen;  // Number of adjacent DPAs in this media error record
+  UINT32                     Rsvd;
+} CXL_MEDIA_ERROR_RECORD;
+
+typedef struct {
+  CXL_POISON_LIST_FLAGS     PoisonListFlags;  // Flags that describe the returned list
+  UINT8                     Rsvd0;
+  UINT64                    OverflowTimestamp; // The time the device determined the poison list overflowed
+  UINT16                    MedErrRecCnt;      // Number of records in the media error records list
+  UINT8                     Rsvd1[0x14];
+  CXL_MEDIA_ERROR_RECORD    MediaErrorRecords[0x10]; // The list of media error records
+} CXL_GET_POISON_LIST_OUTPUT_PAYLOAD;
+
+//
+// Get Scan Media Capabilities input payload structure
+//
+typedef struct {
+  UINT64    PhysAddr;                   // The starting DPA from where to retrieve Scan Media capabilities
+  UINT64    PhysAddrLen;                // The range of physical addresses to retrieve the Scan Media capabilities for.  In units of 64 bytes.
+} CXL_GET_SCAN_MEDIA_CAP_INPUT_PAYLOAD;
+
+//
+// Get Scan Media Capabilities output payload structure
+//
+typedef struct {
+  UINT32    EstScanMediaTime;           // Device estimate to complete scan request in ms
+} CXL_GET_SCAN_MEDIA_CAP_OUTPUT_PAYLOAD;
+
+//
+// Scan Media input payload structures
+//
+typedef union {
+  struct {
+    UINT8    NoEventLog : 1;      // bit 0
+    UINT8    Rsvd       : 7;      // bit 1..7
+  } Bits;
+  UINT8    Data8;
+} CXL_SCAN_MEDIA_FLAGS;
+
+typedef struct {
+  UINT64                  PhysAddr;       // The starting DPA to retrieve the Poison List for
+  UINT64                  PhysAddrLen;    // The range of physical addresses to retrieve the Poison List for.  In units of 64 bytes.
+  CXL_SCAN_MEDIA_FLAGS    ScanMediaFlags; // Flags that describe the scan media input payload
+} CXL_SCAN_MEDIA_INPUT_PAYLOAD;
+
+//
+// Get Scan Media results output payload structures
+//
+typedef union {
+  struct {
+    UINT8    MoreMediaErrorRecords  : 1; // bit 0
+    UINT8    ScanStoppedPrematurely : 1; // bit 1
+    UINT8    Rsvd                   : 6; // bit 2..7
+  } Bits;
+  UINT8    Data8;
+} CXL_GET_SCAN_MEDIA_FLAGS;
+
+typedef struct {
+  UINT64                      PhysAddr;          // The location where the host should restart the scan media operation
+  UINT64                      PhysAddrLen;       // The remaining range to scan if the device could not complete the requested scan
+  CXL_GET_SCAN_MEDIA_FLAGS    GetScanMediaFlags; // Flags that describe the scan media results
+  UINT8                       Rsvd0;
+  UINT16                      MedErrRecCnt;     // Number of records in the media error records list
+  UINT8                       Rsvd1[0xC];
+  CXL_MEDIA_ERROR_RECORD      MediaErrorRecords[0x10]; // The list of media error records
+} CXL_GET_SCAN_MEDIA_RESULTS_OUTPUT_PAYLOAD;
+
+///@}
+
+//
+// Get Event Interrupt Policy payload
+// Compute Express Link Specification Revision 3.0  - Chapter 8.2.9.2.4
+//
+typedef struct {
+  UINT8    InformationalEventLogInterruptSettings;
+  UINT8    WarningEventLogInterruptSettings;
+  UINT8    FailureEventLogInterruptSettings;
+  UINT8    FatalEventLogInterruptSettings;
+  UINT8    DynamicCapacityEventLogInterruptSettings;
+} CXL_3_0_EVENT_INTERRUPT_POLICY_PAYLOAD;
+
+//
+// Device Event Status Register
+// Compute Express Link Specification Revision 3.0  - Chapter 8.2.8.3.1
+//
+typedef union {
+  struct {
+    UINT8    InformationalEventLog   : 1; // bit 0
+    UINT8    WarningEventLog         : 1; // bit 1
+    UINT8    FailureEventLog         : 1; // bit 2
+    UINT8    FatalEventLog           : 1; // bit 3
+    UINT8    DynamicCapacityEventLog : 1; // bit 4
+    UINT8    Rsvd                    : 3; // bit 5..7
+    UINT8    Reserved[7];                 // bit 8..63
+  } Bits;
+  struct {
+    UINT32    Lo;
+    UINT32    Hi;
+  } Data64;
+} CXL_DEVICE_EVENT_STATUS_REGISTER;
 
 #pragma pack()
 

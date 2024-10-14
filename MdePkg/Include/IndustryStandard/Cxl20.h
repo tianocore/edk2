@@ -458,6 +458,17 @@ typedef union {
   UINT64    Uint64;
 } CXL_MEMORY_DEVICE_STATUS_REGISTER;
 
+//
+// Get Event Interrupt Policy payload
+// Compute Express Link Specification Revision 2.0  - Chapter 8.2.9.1.4
+//
+typedef struct {
+  UINT8    InformationalEventLogInterruptSettings;
+  UINT8    WarningEventLogInterruptSettings;
+  UINT8    FailureEventLogInterruptSettings;
+  UINT8    FatalEventLogInterruptSettings;
+} CXL_2_0_EVENT_INTERRUPT_POLICY_PAYLOAD;
+
 #pragma pack()
 
 #endif
