@@ -135,7 +135,7 @@ typedef struct {
 
 ///
 /// Standard Interface Association Descriptor
-/// USB Engineering Change Note "Interface Association Descriptors" Revision 2.0, Page 4
+/// USB 3.0 spec, Section 9.6.4
 ///
 typedef struct {
   UINT8    Length;
