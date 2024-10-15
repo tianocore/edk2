@@ -381,8 +381,10 @@
 
   #
   # Enable NX memory protection for all non-code regions, including OEM and OS
-  # reserved ones, with the exception of LoaderData regions, of which OS loaders
-  # (i.e., GRUB) may assume that its contents are executable.
+  # reserved ones.
+  # By passing --pcd PcdDxeNxMemoryProtectionPolicy=0xC000000000007FD1 on the
+  # build command line you can allow code execution in EfiLoaderData. This is
+  # required when using some outdated GRUB versions.
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD5
 

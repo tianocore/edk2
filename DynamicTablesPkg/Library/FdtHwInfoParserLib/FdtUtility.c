@@ -10,6 +10,7 @@
   - linux//Documentation/devicetree/bindings/interrupt-controller/arm%2Cgic.yaml
 **/
 
+#include <Library/BaseLib.h>
 #include <FdtHwInfoParserInclude.h>
 #include "FdtUtility.h"
 
