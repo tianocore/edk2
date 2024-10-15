@@ -3,6 +3,7 @@
 # A build plugin that analyzes a CodeQL database.
 #
 # Copyright (c) Microsoft Corporation. All rights reserved.
+# Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -78,6 +79,11 @@ class CodeQlAnalyzePlugin(IUefiBuildPlugin):
         # Packages are allowed to specify package-specific query specifiers
         # in the package CI YAML file that override the global query specifier.
         audit_only = False
+        global_audit_only = builder.env.GetValue("STUART_CODEQL_AUDIT_ONLY")
+        if global_audit_only:
+            if global_audit_only.strip().lower() == "true":
+                audit_only = True
+
         query_specifiers = None
         package_config_file = Path(os.path.join(
                                 self.package_path, self.package + ".ci.yaml"))
@@ -93,11 +99,6 @@ class CodeQlAnalyzePlugin(IUefiBuildPlugin):
                         logging.debug(f"Loading CodeQL query specifiers in "
                                       f"{str(package_config_file)}")
                         query_specifiers = plugin_data["QuerySpecifiers"]
-
-        global_audit_only = builder.env.GetValue("STUART_CODEQL_AUDIT_ONLY")
-        if global_audit_only:
-            if global_audit_only.strip().lower() == "true":
-                audit_only = True
 
         if audit_only:
             logging.info(f"CodeQL Analyze plugin is in audit only mode for "
