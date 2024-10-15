@@ -561,6 +561,7 @@ PcRtcSetTime (
 {
   EFI_STATUS      Status;
   EFI_TIME        RtcTime;
+  RTC_REGISTER_A  RegisterA;
   RTC_REGISTER_B  RegisterB;
   UINT32          TimerVar;
 
@@ -638,6 +639,11 @@ PcRtcSetTime (
   RegisterB.Bits.Set = 1;
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
+  RegisterA.Data = RtcRead (RTC_ADDRESS_REGISTER_A);
+  //
+  // Set Divider in Reset status, RTC stops
+  //
+  RtcWrite (RTC_ADDRESS_REGISTER_A, RegisterA.Data | RTC_DIV_RESET);
   //
   // Store the century value to RTC before converting to BCD format.
   //
@@ -660,6 +666,10 @@ PcRtcSetTime (
   RegisterB.Bits.Set = 0;
   RtcWrite (RTC_ADDRESS_REGISTER_B, RegisterB.Data);
 
+  //
+  // Restore Divider status
+  //
+  RtcWrite (RTC_ADDRESS_REGISTER_A, RegisterA.Data);
   //
   // Release RTC Lock.
   //
