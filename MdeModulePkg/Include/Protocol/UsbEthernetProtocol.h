@@ -28,10 +28,6 @@ typedef struct _EDKII_USB_ETHERNET_PROTOCOL EDKII_USB_ETHERNET_PROTOCOL;
 #define USB_RNDIS_SUBCLASS           0x04
 #define USB_RNDIS_ETHERNET_PROTOCOL  0x01
 
-// Type Values for the DescriptorType Field
-#define CS_INTERFACE  0x24
-#define CS_ENDPOINT   0x25
-
 // Descriptor SubType in Functional Descriptors
 #define HEADER_FUN_DESCRIPTOR    0x00
 #define UNION_FUN_DESCRIPTOR     0x06
