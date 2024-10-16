@@ -1082,13 +1082,17 @@ InitializeUfsBlockIoPeim (
   IN CONST EFI_PEI_SERVICES  **PeiServices
   )
 {
-  EFI_STATUS                     Status;
-  UFS_PEIM_HC_PRIVATE_DATA       *Private;
-  EDKII_UFS_HOST_CONTROLLER_PPI  *UfsHcPpi;
-  UINT32                         Index;
-  UINTN                          MmioBase;
-  UINT8                          Controller;
-  UFS_UNIT_DESC                  UnitDescriptor;
+  EFI_STATUS                              Status;
+  UFS_PEIM_HC_PRIVATE_DATA                *Private;
+  EDKII_UFS_HOST_CONTROLLER_PPI           *UfsHcPpi;
+  UINT32                                  Index;
+  UINTN                                   MmioBase;
+  UINT8                                   Controller;
+  UFS_UNIT_DESC                           UnitDescriptor;
+  EDKII_UFS_HC_PLATFORM_PPI               *UfsHcPlatformPpi = NULL;
+  UFS_DEV_DESC                            DeviceDescriptor;
+  UINT8                                   RefClkAttr;
+  EDKII_UFS_CARD_REF_CLK_FREQ_ATTRIBUTE   Attributes;
 
   //
   // Shadow this PEIM to run from memory
@@ -1108,6 +1112,18 @@ InitializeUfsBlockIoPeim (
              );
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Locate ufs host controller platform PPI
+  //
+  Status = PeiServicesLocatePpi(
+                      &gEdkiiUfsHcPlatformPpiGuid,
+                      0,
+                      NULL,
+                      (VOID**)&UfsHcPlatformPpi );
+  if (EFI_ERROR(Status)) {
+    DEBUG((DEBUG_ERROR, "LocatePpi gEdkiiUfsHcPlatformPpiGuid Status :%r\n", Status ));
   }
 
   IoMmuInit ();
@@ -1145,7 +1161,7 @@ InitializeUfsBlockIoPeim (
     //
     // Initialize UFS Host Controller H/W.
     //
-    Status = UfsControllerInit (Private);
+    Status = UfsControllerInit (UfsHcPlatformPpi, Private);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "UfsDevicePei: Host Controller Initialization Error, Status = %r\n", Status));
       Controller++;
@@ -1174,6 +1190,52 @@ InitializeUfsBlockIoPeim (
       continue;
     }
 
+    if ((UfsHcPlatformPpi != NULL) &&
+       ((UfsHcPlatformPpi->RefClkFreq == EdkiiUfsCardRefClkFreq19p2Mhz) ||
+        (UfsHcPlatformPpi->RefClkFreq == EdkiiUfsCardRefClkFreq26Mhz) ||
+        (UfsHcPlatformPpi->RefClkFreq == EdkiiUfsCardRefClkFreq38p4Mhz)))
+    {
+      RefClkAttr = UfsAttrRefClkFreq;
+      Attributes = EdkiiUfsCardRefClkFreqObsolete;
+
+      Status = UfsRwAttributes (Private, TRUE, RefClkAttr, 0, 0, (UINT32 *)&Attributes);
+      DEBUG ((DEBUG_INFO, "UfsRwAttributes #1 Status = %r \n",Status));
+      if (!EFI_ERROR (Status)) {
+        if (Attributes != UfsHcPlatformPpi->RefClkFreq) {
+            Attributes = UfsHcPlatformPpi->RefClkFreq;
+            DEBUG (
+              (DEBUG_INFO,
+               "Setting bRefClkFreq attribute(%x) to %x\n  0 -> 19.2 Mhz\n  1 -> 26 Mhz\n  2 -> 38.4 Mhz\n  3 -> Obsolete\n",
+               RefClkAttr,
+               Attributes)
+              );
+            Status = UfsRwAttributes (Private, FALSE, RefClkAttr, 0, 0, (UINT32 *)&Attributes);
+            DEBUG ((DEBUG_INFO, "UfsRwAttributes #2 Status = %r \n",Status));
+            if (EFI_ERROR (Status)) {
+                DEBUG (
+               (DEBUG_ERROR,
+                 "Failed to Change Reference Clock Attribute to, Status = %r \n",
+                 Status)
+               );
+            }
+        }
+      } else {
+        DEBUG (
+          (DEBUG_ERROR,
+           "Failed to Read Reference Clock Attribute, Status = %r \n",
+           Status)
+          );
+      }
+    }
+
+    if((UfsHcPlatformPpi != NULL) && (UfsHcPlatformPpi->Callback != NULL)) {
+      Status = UfsHcPlatformPpi->Callback(&Private->UfsHcBase, EdkiiUfsHcPostLinkStartup);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPostLinkStartup, Status = %r\n", Status));
+        Controller++;
+        continue;
+      }
+
     //
     // Check if 8 common luns are active and set corresponding bit mask.
     //
@@ -1190,10 +1252,25 @@ InitializeUfsBlockIoPeim (
       }
     }
 
+    //
+    // Get Ufs Device's Lun Info by reading Configuration Descriptor.
+    //
+    Status = UfsRwDeviceDesc (Private, TRUE, UfsConfigDesc, 0, 0, &DeviceDescriptor, sizeof (UFS_DEV_DESC));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Ufs Get Configuration Descriptor Error, Status = %r\n", Status));
+      Controller++;
+      continue;
+    }
+
+    if (DeviceDescriptor.SecurityLun == 0x1) {
+      DEBUG ((DEBUG_INFO, "UFS WLUN RPMB is supported\n"));
+      Private->Luns.BitMask |= BIT11;
+    }
+
     PeiServicesInstallPpi (&Private->BlkIoPpiList);
     PeiServicesNotifyPpi (&Private->EndOfPeiNotifyList);
     Controller++;
+    }
   }
-
   return EFI_SUCCESS;
 }
