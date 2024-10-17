@@ -25,7 +25,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 #define PI_SPECIFICATION_MAJOR_REVISION  1
 #define PI_SPECIFICATION_MINOR_REVISION  80
-#define PI_SPECIFICATION_VERSION         ((PI_SPECIFICATION_MAJOR_REVISION << 16) | (PI_SPECIFICATION_MINOR_REVISION))
+#ifndef PI_SPECIFICATION_VERSION
+#define PI_SPECIFICATION_VERSION  ((PI_SPECIFICATION_MAJOR_REVISION << 16) | (PI_SPECIFICATION_MINOR_REVISION))
+#endif
 
 /**
   Produces an error code in the range reserved for use by the Platform Initialization
