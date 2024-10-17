@@ -63,10 +63,10 @@
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiMmConfigurationProtocolGuid               ## CONSUMES
   gEfiMmEndOfPeiProtocol                        ## PRODUCES
+  gEventMmDispatchGuid                          ## PRODUCES             ## GUID # SmiHandlerRegister
 
 [Guids]
   gAprioriGuid                                  ## SOMETIMES_CONSUMES   ## File
-  gEventMmDispatchGuid                          ## PRODUCES             ## GUID # SmiHandlerRegister
   gEfiEndOfDxeEventGroupGuid                    ## PRODUCES             ## GUID # SmiHandlerRegister
   ## SOMETIMES_CONSUMES   ## GUID # Locate protocol
   ## SOMETIMES_PRODUCES   ## GUID # SmiHandlerRegister
