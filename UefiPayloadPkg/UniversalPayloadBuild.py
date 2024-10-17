@@ -137,6 +137,9 @@ def BuildUniversalPayload(Args):
     elif Args.Arch == 'RISCV64':
         BuildArch      = "RISCV64"
         FitArch        = "RISCV64"
+    elif Args.Arch == 'AARCH64':
+        BuildArch      = "AARCH64"
+        FitArch        = "AARCH64"
     else:
         print("Incorrect arch option provided")
 
@@ -261,19 +264,20 @@ def BuildUniversalPayload(Args):
               TargetRebaseFile,
             ))
 
-        #
-        # Open PECOFF relocation table binary.
-        #
-        RelocBinary     = b''
         PeCoff = pefile.PE (TargetRebaseFile)
-        for reloc in PeCoff.DIRECTORY_ENTRY_BASERELOC:
-            for entry in reloc.entries:
-                if (entry.type == 0):
-                    continue
-                Type = entry.type
-                Offset = entry.rva + fit_image_info_header.DataOffset
-                RelocBinary += Offset.to_bytes (8, 'little') + Type.to_bytes (8, 'little')
-        RelocBinary += b'\x00' * (0x1000 - (len(RelocBinary) % 0x1000))
+        if Args.Arch == 'IA32' or Args.Arch == 'X64' or Args.Arch == 'RISCV64':
+            #
+            # Open PECOFF relocation table binary.
+            #
+            RelocBinary     = b''
+            for reloc in PeCoff.DIRECTORY_ENTRY_BASERELOC:
+                for entry in reloc.entries:
+                    if (entry.type == 0):
+                        continue
+                    Type = entry.type
+                    Offset = entry.rva + fit_image_info_header.DataOffset
+                    RelocBinary += Offset.to_bytes (8, 'little') + Type.to_bytes (8, 'little')
+            RelocBinary += b'\x00' * (0x1000 - (len(RelocBinary) % 0x1000))
 
         #
         # Output UniversalPayload.entry
@@ -282,7 +286,11 @@ def BuildUniversalPayload(Args):
         TianoBinary = TempBinary.read ()
         TempBinary.close ()
 
-        TianoEntryBinary = TianoBinary + RelocBinary
+        if Args.Arch == 'IA32' or Args.Arch == 'X64' or Args.Arch == 'RISCV64':
+            TianoEntryBinary = TianoBinary + RelocBinary
+        else:
+            TianoEntryBinary = TianoBinary
+
         TianoEntryBinary += (b'\x00' * (0x1000 - (len(TianoBinary) % 0x1000)))
         TianoEntryBinarySize = len (TianoEntryBinary)
 
@@ -311,7 +319,7 @@ def main():
     parser = argparse.ArgumentParser(description='For building Universal Payload')
     parser.add_argument('-t', '--ToolChain')
     parser.add_argument('-b', '--Target', default='DEBUG')
-    parser.add_argument('-a', '--Arch', choices=['IA32', 'X64', 'RISCV64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
+    parser.add_argument('-a', '--Arch', choices=['IA32', 'X64', 'RISCV64', 'AARCH64'], help='Specify the ARCH for payload entry module. Default build X64 image.', default ='X64')
     parser.add_argument("-D", "--Macro", action="append", default=["UNIVERSAL_PAYLOAD=TRUE"])
     parser.add_argument('-i', '--ImageId', type=str, help='Specify payload ID (16 bytes maximal).', default ='UEFI')
     parser.add_argument('-q', '--Quiet', action='store_true', help='Disable all build messages except FATAL ERRORS.')

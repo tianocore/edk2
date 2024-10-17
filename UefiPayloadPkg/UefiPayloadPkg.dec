@@ -103,3 +103,8 @@ gUefiPayloadPkgTokenSpaceGuid.PcdPciReservedPMemAbove4GBLimit|0x0000000000000000
 
 gUefiPayloadPkgTokenSpaceGuid.SizeOfIoSpace|0|UINT8|0x0000002B
 gUefiPayloadPkgTokenSpaceGuid.PcdFDTPageSize|8|UINT8|0x0000002C
+
+## Indicates if Universal payload Serial Port feature is used
+#-  PcdUseUniversalPayloadSerialPort is TRUE, serial port paramters will be udpated
+#-  PcdUseUniversalPayloadSerialPort is FALSE, serial port parameters are fixed
+gUefiPayloadPkgTokenSpaceGuid.PcdUseUniversalPayloadSerialPort|TRUE|BOOLEAN|0x0000002D

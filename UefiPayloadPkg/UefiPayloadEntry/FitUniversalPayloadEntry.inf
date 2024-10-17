@@ -2,6 +2,7 @@
 #  This is the first module for UEFI payload.
 #
 #  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2024, NewFW Limited. All rights reserved.
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -17,7 +18,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64
+#  VALID_ARCHITECTURES           = IA32 X64 AARCH64
 #
 
 [Sources]
@@ -41,6 +42,10 @@
 [Sources.RISCV64]
   RiscV64/DxeLoadFunc.c
   RiscV64/DxeLoadFuncFit.c
+
+[Sources.AARCH64]
+  AArch64/DxeHandoff.c
+  AArch64/DxeLoadFuncFit.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -86,7 +91,7 @@
 [FeaturePcd.X64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeIplBuildPageTables       ## CONSUMES
 
-[Pcd.IA32,Pcd.X64,Pcd.RISCV64]
+[Pcd.IA32,Pcd.X64,Pcd.RISCV64,Pcd.AARCH64]
   gUefiPayloadPkgTokenSpaceGuid.PcdPcdDriverFile
   gEfiMdeModulePkgTokenSpaceGuid.PcdUse1GPageTable                      ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
