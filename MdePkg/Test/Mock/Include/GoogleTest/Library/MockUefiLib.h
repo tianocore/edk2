@@ -34,6 +34,7 @@ struct MockUefiLib {
      OUT VOID         **Value,
      OUT UINTN        *Size OPTIONAL)
     );
+
   MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
     EfiGetSystemConfigurationTable,
