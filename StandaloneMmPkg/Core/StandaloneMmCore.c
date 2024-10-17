@@ -703,24 +703,41 @@ MigrateMemoryAllocationHobs (
   }
 }
 
-/** Returns the HOB list size.
+/**
+  Check if the MmramRanges don't overlap with all the ranges ranges
+  reported by resource HOB. Also, the HOB list size is returned.
 
-  @param [in]  HobStart   Pointer to the start of the HOB list.
+  @param [in]  HobStart     Pointer to the start of the HOB list.
+  @param [in]  MmramRanges  Pointer to the Mmram ranges.
+  @param [in]  HobStart     Count of Mmram ranges.
 
   @retval Size of the HOB list.
 **/
 UINTN
-GetHobListSize (
-  IN VOID  *HobStart
+CheckResourceHobAndMmramRanges (
+  IN VOID                  *HobStart,
+  IN EFI_MMRAM_DESCRIPTOR  *MmramRanges,
+  IN UINTN                 MmramRangeCount
   )
 {
   EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 Index;
 
   ASSERT (HobStart != NULL);
 
   Hob.Raw = (UINT8 *)HobStart;
   while (!END_OF_HOB_LIST (Hob)) {
     Hob.Raw = GET_NEXT_HOB (Hob);
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      for (Index = 0; Index < MmramRangeCount; Index++) {
+        if ((MmramRanges[Index].PhysicalStart < Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength) &&
+            (MmramRanges[Index].PhysicalStart + MmramRanges[Index].PhysicalSize > Hob.ResourceDescriptor->PhysicalStart)
+            )
+        {
+          CpuDeadLoop ();
+        }
+      }
+    }
   }
 
   //
@@ -809,7 +826,7 @@ StandaloneMmMain (
   //
   // Install HobList
   //
-  HobSize = GetHobListSize (HobStart);
+  HobSize = CheckResourceHobAndMmramRanges (HobStart, MmramRanges, MmramRangeCount);
   DEBUG ((DEBUG_INFO, "HobSize - 0x%x\n", HobSize));
   MmHobStart = AllocatePool (HobSize);
   DEBUG ((DEBUG_INFO, "MmHobStart - 0x%x\n", MmHobStart));
