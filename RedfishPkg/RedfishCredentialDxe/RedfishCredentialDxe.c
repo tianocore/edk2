@@ -567,6 +567,7 @@ RedfishGetAuthConfig (
 **/
 EFI_STATUS
 ClearRedfishServiceList (
+  VOID
   )
 {
   REDFISH_SERVICE_LIST  *Instance;
@@ -917,7 +918,7 @@ ReleaseCredentialPrivate (
       mCredentialPrivate->AccountName = NULL;
     }
 
-    ClearRedfishServiceList (mCredentialPrivate);
+    ClearRedfishServiceList ();
   }
 
   return EFI_SUCCESS;
