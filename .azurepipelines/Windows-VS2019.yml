@@ -5,12 +5,14 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 trigger:
-- master
-- stable/*
+  branches:
+    include:
+      - "*"
 
 pr:
-- master
-- stable/*
+  branches:
+    include:
+      - "*"
 
 variables:
   - template: templates/defaults.yml
@@ -18,8 +20,8 @@ variables:
 jobs:
 - template: templates/pr-gate-build-job.yml
   parameters:
-    tool_chain_tag: 'VS2019'
-    vm_image: 'windows-2019'
+    tool_chain_tag: 'VS2022'
+    vm_image: 'windows-2022'
     arch_list: "IA32,X64"
     usePythonVersion: ${{ variables.default_python_version }}
     extra_install_step:
