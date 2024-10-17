@@ -6,7 +6,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #ifndef __GNUC__
+#define RUNTIME_FUNCTION  _WINNT_DUP_RUNTIME_FUNCTION
 #include <windows.h>
+#undef RUNTIME_FUNCTION
 #include <io.h>
 #include <sys/types.h>
 #include <sys/stat.h>
