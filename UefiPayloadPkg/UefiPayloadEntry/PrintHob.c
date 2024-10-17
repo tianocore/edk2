@@ -271,7 +271,9 @@ PrintMemoryTypeInfoGuidHob (
 //
 GUID_HOB_PRINT_HANDLE  GuidHobPrintHandleTable[] = {
   { &gUniversalPayloadAcpiTableGuid,         PrintAcpiGuidHob,              "gUniversalPayloadAcpiTableGuid(ACPI table Guid)"             },
+#if FixedPcdGetBool (PcdUseUniversalPayloadSerialPort) == 1
   { &gUniversalPayloadSerialPortInfoGuid,    PrintSerialGuidHob,            "gUniversalPayloadSerialPortInfoGuid(Serial Port Info)"       },
+#endif
   { &gUniversalPayloadSmbios3TableGuid,      PrintSmbios3GuidHob,           "gUniversalPayloadSmbios3TableGuid(SmBios Guid)"              },
   { &gUniversalPayloadSmbiosTableGuid,       PrintSmbiosTablGuidHob,        "gUniversalPayloadSmbiosTableGuid(SmBios Guid)"               },
   { &gUefiAcpiBoardInfoGuid,                 PrintAcpiBoardInfoGuidHob,     "gUefiAcpiBoardInfoGuid(Acpi Guid)"                           },
