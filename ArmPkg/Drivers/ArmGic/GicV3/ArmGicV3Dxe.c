@@ -423,7 +423,7 @@ GicV3DxeInitialize (
       for (Index = 8; Index < (mGicNumInterrupts / 4); Index++) {
         MmioWrite32 (
           mGicDistributorBase + ARM_GIC_ICDIPTR + (Index * 4),
-          CpuTarget
+          (UINT32)CpuTarget
           );
       }
     }
