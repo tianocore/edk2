@@ -1,0 +1,34 @@
+## @file VariablePolicyUnitTest.inf
+# Unit test for the business logic of Variable Policy enforcement.
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION       = 0x00010006
+  BASE_NAME         = VariablePolicyUnitTest
+  FILE_GUID         = 1200A2E4-D756-418C-9768-528C2D181A98
+  MODULE_TYPE       = HOST_APPLICATION
+  VERSION_STRING    = 1.0
+
+[Sources]
+  VariablePolicyUnitTest.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PrintLib
+  UnitTestLib
+  VariablePolicyLib
+
+[BuildOptions]
+  MSFT:NOOPT_*_*_CC_FLAGS   = -DINTERNAL_UNIT_TEST
+  GCC:NOOPT_*_*_CC_FLAGS    = -DINTERNAL_UNIT_TEST
