@@ -47,6 +47,7 @@
   MdePkg/Test/Mock/Library/GoogleTest/MockPeiServicesLib/MockPeiServicesLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockHobLib/MockHobLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockFdtLib/MockFdtLib.inf
+  MdePkg/Test/Mock/Library/GoogleTest/MockPostCodeLib/MockPostCodeLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockSmmServicesTableLib/MockSmmServicesTableLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockCpuLib/MockCpuLib.inf
   MdePkg/Test/Mock/Library/GoogleTest/MockPciSegmentLib/MockPciSegmentLib.inf
