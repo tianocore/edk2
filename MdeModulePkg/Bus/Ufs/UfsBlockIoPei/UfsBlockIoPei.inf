@@ -52,6 +52,7 @@
   gEdkiiPeiUfsHostControllerPpiGuid             ## CONSUMES
   gEdkiiIoMmuPpiGuid                            ## CONSUMES
   gEfiEndOfPeiSignalPpiGuid                     ## CONSUMES
+  gEdkiiUfsHcPlatformPpiGuid                    ## SOMETIMES CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdUfsInitialCompletionTimeout  ## CONSUMES
