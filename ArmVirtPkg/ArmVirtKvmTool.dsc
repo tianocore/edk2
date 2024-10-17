@@ -94,6 +94,7 @@
 !if $(TARGET) != RELEASE
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
 !endif
+  ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuPeiLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
 !if $(TARGET) != RELEASE
