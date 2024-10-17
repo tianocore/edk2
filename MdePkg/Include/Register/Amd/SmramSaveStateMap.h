@@ -6,7 +6,7 @@
     Volume 2, System Programming, Section 10.2 SMM Resources
 
   Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
-  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved .<BR>
+  Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved .<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -28,47 +28,6 @@
 #define AMD_SMM_MIN_REV_ID_X64  0x30064
 
 #pragma pack (1)
-
-///
-/// 32-bit SMRAM Save State Map
-///
-typedef struct {
-  // Padded an extra 0x200 bytes to match Intel/EDK2
-  UINT8     Reserved[0x200]; // fc00h
-  // AMD Save State area starts @ 0xfe00
-  UINT8     Reserved1[0xf8]; // fe00h
-  UINT32    SMBASE;          // fef8h
-  UINT32    SMMRevId;        // fefch
-  UINT16    IORestart;       // ff00h
-  UINT16    AutoHALTRestart; // ff02h
-  UINT8     Reserved2[0x84]; // ff04h
-  UINT32    GDTBase;         // ff88h
-  UINT64    Reserved3;       // ff8ch
-  UINT32    IDTBase;         // ff94h
-  UINT8     Reserved4[0x10]; // ff98h
-  UINT32    _ES;             // ffa8h
-  UINT32    _CS;             // ffach
-  UINT32    _SS;             // ffb0h
-  UINT32    _DS;             // ffb4h
-  UINT32    _FS;             // ffb8h
-  UINT32    _GS;             // ffbch
-  UINT32    LDTBase;         // ffc0h
-  UINT32    _TR;             // ffc4h
-  UINT32    _DR7;            // ffc8h
-  UINT32    _DR6;            // ffcch
-  UINT32    _EAX;            // ffd0h
-  UINT32    _ECX;            // ffd4h
-  UINT32    _EDX;            // ffd8h
-  UINT32    _EBX;            // ffdch
-  UINT32    _ESP;            // ffe0h
-  UINT32    _EBP;            // ffe4h
-  UINT32    _ESI;            // ffe8h
-  UINT32    _EDI;            // ffech
-  UINT32    _EIP;            // fff0h
-  UINT32    _EFLAGS;         // fff4h
-  UINT32    _CR3;            // fff8h
-  UINT32    _CR0;            // fffch
-} AMD_SMRAM_SAVE_STATE_MAP32;
 
 ///
 /// 64-bit SMRAM Save State Map
@@ -182,10 +141,15 @@ typedef struct {
 } AMD_SMRAM_SAVE_STATE_MAP64;
 
 ///
-/// Union of 32-bit and 64-bit SMRAM Save State Maps
+//  Per AMD64 Architecture Programmer's Manual Volume 2: System
+//  Programming - 10.2.3 SMRAM State-Save Area (Rev 24593), the AMD64
+//  architecture does not use the legacy SMM state-save area format
+//  (Table 10-2) for 32-bit SMRAM Save State Map.
+//
+//  Use AMD_SMRAM_SAVE_STATE_MAP structure for compatibility with the
+//  existing core files that are refer to it.
 ///
-typedef union  {
-  AMD_SMRAM_SAVE_STATE_MAP32    x86;
+typedef struct  {
   AMD_SMRAM_SAVE_STATE_MAP64    x64;
 } AMD_SMRAM_SAVE_STATE_MAP;
 
