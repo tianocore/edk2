@@ -552,8 +552,8 @@ UfsCreateDMCommandDesc (
   }
 
   if (((Opcode != UtpQueryFuncOpcodeRdFlag) && (Opcode != UtpQueryFuncOpcodeSetFlag) &&
-       (Opcode != UtpQueryFuncOpcodeClrFlag) && (Opcode != UtpQueryFuncOpcodeTogFlag)) &&
-      ((DataSize == 0) || (Data == NULL)))
+       (Opcode != UtpQueryFuncOpcodeClrFlag) && (Opcode != UtpQueryFuncOpcodeTogFlag) &&
+       (Opcode != UtpQueryFuncOpcodeRdAttr)) && ((DataSize == 0) || (Data == NULL)))
   {
     return EFI_INVALID_PARAMETER;
   }
@@ -759,6 +759,7 @@ UfsGetReturnDataFromQueryResponse (
   )
 {
   UINT16  ReturnDataSize;
+  UINT32  ReturnData;
 
   ReturnDataSize = 0;
 
@@ -799,6 +800,16 @@ UfsGetReturnDataFromQueryResponse (
       //
       *((UINT8 *)(Packet->OutDataBuffer)) = *((UINT8 *)&(QueryResp->Tsf.Value) + 3);
       break;
+    case UtpQueryFuncOpcodeRdAttr:
+      ReturnData = QueryResp->Tsf.Value;
+      SwapLittleEndianToBigEndian ((UINT8 *)&ReturnData, sizeof (UINT32));
+      CopyMem (Packet->InDataBuffer, &ReturnData, sizeof (UINT32));
+      break;
+    case UtpQueryFuncOpcodeWrAttr:
+      ReturnData = QueryResp->Tsf.Value;
+      SwapLittleEndianToBigEndian ((UINT8 *)&ReturnData, sizeof (UINT32));
+      CopyMem (Packet->OutDataBuffer, &ReturnData, sizeof (UINT32));
+      break;
     default:
       return EFI_INVALID_PARAMETER;
   }
@@ -833,7 +844,9 @@ UfsSendDmRequestRetry (
   UINT8                *CmdDescBase;
   UINT32               CmdDescSize;
 
-  //
+  // Workaround: Adding this one second for reading descriptor
+  MicroSecondDelay (1 * 1000 * 1000); // delay 1 seconds
+
   // Find out which slot of transfer request list is available.
   //
   Status = UfsFindAvailableSlotInTrl (Private, &Slot);
@@ -978,6 +991,56 @@ UfsRwDeviceDesc (
 
   Status = UfsSendDmRequest (Private, &Packet);
   return Status;
+}
+
+/**
+  Read or write specified attribute of a UFS device.
+
+  @param[in]      Private       The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
+  @param[in]      Read          The boolean variable to show r/w direction.
+  @param[in]      AttrId        The ID of Attribute.
+  @param[in]      Index         The Index of Attribute.
+  @param[in]      Selector      The Selector of Attribute.
+  @param[in, out] Attributes    The value of Attribute to be read or written.
+
+  @retval EFI_SUCCESS           The Attribute was read/written successfully.
+  @retval EFI_INVALID_PARAMETER AttrId, Index and Selector are invalid combination to point to a
+                                type of UFS device descriptor.
+  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to r/w the Attribute.
+  @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of r/w the Attribute.
+
+**/
+EFI_STATUS
+UfsRwAttributes (
+  IN     UFS_PEIM_HC_PRIVATE_DATA  *Private,
+  IN     BOOLEAN                   Read,
+  IN     UINT8                     AttrId,
+  IN     UINT8                     Index,
+  IN     UINT8                     Selector,
+  IN OUT UINT32                    *Attributes
+  )
+{
+  UFS_DEVICE_MANAGEMENT_REQUEST_PACKET  Packet;
+
+  ZeroMem (&Packet, sizeof (UFS_DEVICE_MANAGEMENT_REQUEST_PACKET));
+
+  if (Read) {
+    Packet.DataDirection = UfsDataIn;
+    Packet.Opcode        = UtpQueryFuncOpcodeRdAttr;
+    Packet.InDataBuffer  = Attributes;
+  } else {
+    Packet.DataDirection     = UfsDataOut;
+    Packet.Opcode            = UtpQueryFuncOpcodeWrAttr;
+    Packet.OutDataBuffer     = Attributes;
+    Packet.OutTransferLength = sizeof (UINT32);
+  }
+
+  Packet.DescId   = AttrId;
+  Packet.Index    = Index;
+  Packet.Selector = Selector;
+  Packet.Timeout  = UFS_TIMEOUT;
+
+  return UfsSendDmRequest (Private, &Packet);
 }
 
 /**
@@ -1387,6 +1450,7 @@ UfsExecUicCommands (
 /**
   Enable the UFS host controller for accessing.
 
+  @param[in] UfsHcPlatformPpi        The pointer to the EDKII_UFS_HC_PLATFORM_PPI data structure
   @param[in] Private                 The pointer to the UFS_PEIM_HC_PRIVATE_DATA data structure.
 
   @retval EFI_SUCCESS                The UFS host controller enabling was executed successfully.
@@ -1395,12 +1459,21 @@ UfsExecUicCommands (
 **/
 EFI_STATUS
 UfsEnableHostController (
-  IN  UFS_PEIM_HC_PRIVATE_DATA  *Private
+  IN  EDKII_UFS_HC_PLATFORM_PPI  *UfsHcPlatformPpi,
+  IN  UFS_PEIM_HC_PRIVATE_DATA   *Private
   )
 {
   EFI_STATUS  Status;
   UINTN       Address;
   UINT32      Data;
+
+  if ((UfsHcPlatformPpi != NULL) && (UfsHcPlatformPpi->Callback != NULL)) {
+    Status = UfsHcPlatformPpi->Callback (&Private->UfsHcBase, EdkiiUfsHcPreHce);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPreHce, Status = %r\n", Status));
+      return Status;
+    }
+  }
 
   //
   // UFS 2.0 spec section 7.1.1 - Host Controller Initialization
@@ -1435,6 +1508,14 @@ UfsEnableHostController (
     return EFI_DEVICE_ERROR;
   }
 
+  if ((UfsHcPlatformPpi != NULL) && (UfsHcPlatformPpi->Callback != NULL)) {
+    Status = UfsHcPlatformPpi->Callback (&Private->UfsHcBase, EdkiiUfsHcPostHce);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPostHce, Status = %r\n", Status));
+      return Status;
+    }
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -1450,13 +1531,22 @@ UfsEnableHostController (
 **/
 EFI_STATUS
 UfsDeviceDetection (
-  IN  UFS_PEIM_HC_PRIVATE_DATA  *Private
+  IN  EDKII_UFS_HC_PLATFORM_PPI  *UfsHcPlatformPpi,
+  IN  UFS_PEIM_HC_PRIVATE_DATA   *Private
   )
 {
   UINTN       Retry;
   UINTN       Address;
   UINT32      Data;
   EFI_STATUS  Status;
+
+  if ((UfsHcPlatformPpi != NULL) && (UfsHcPlatformPpi->Callback != NULL)) {
+    Status = UfsHcPlatformPpi->Callback (&Private->UfsHcBase, EdkiiUfsHcPreLinkStartup);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failure from platform driver during EdkiiUfsHcPreLinkStartup, Status = %r\n", Status));
+      return Status;
+    }
+  }
 
   //
   // Start UFS device detection.
@@ -1625,6 +1715,7 @@ UfsInitTransferRequestList (
 /**
   Initialize the UFS host controller.
 
+  @param[in] UfsHcPlatformPpi        The pointer to the EDKII_UFS_HC_PLATFORM_PPI data structure.    // APTIOV_OVERRIDE
   @param[in] Private                 The pointer to the UFS_PEIM_HC_PRIVATE_DATA data structure.
 
   @retval EFI_SUCCESS                The Ufs Host Controller is initialized successfully.
@@ -1633,18 +1724,19 @@ UfsInitTransferRequestList (
 **/
 EFI_STATUS
 UfsControllerInit (
-  IN  UFS_PEIM_HC_PRIVATE_DATA  *Private
+  IN  EDKII_UFS_HC_PLATFORM_PPI  *UfsHcPlatformPpi,
+  IN  UFS_PEIM_HC_PRIVATE_DATA   *Private
   )
 {
   EFI_STATUS  Status;
 
-  Status = UfsEnableHostController (Private);
+  Status = UfsEnableHostController (UfsHcPlatformPpi, Private);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "UfsDevicePei: Enable Host Controller Fails, Status = %r\n", Status));
     return Status;
   }
 
-  Status = UfsDeviceDetection (Private);
+  Status = UfsDeviceDetection (UfsHcPlatformPpi, Private);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "UfsDevicePei: Device Detection Fails, Status = %r\n", Status));
     return Status;
