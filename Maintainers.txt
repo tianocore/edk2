@@ -155,7 +155,7 @@ R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 BaseTools
 F: BaseTools/
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
-M: Rebecca Cran <rebecca@bsdio.com> [bcran]
+M: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 M: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 R: Bob Feng <bob.c.feng@intel.com> [BobCF]
 R: Yuwei Chen <yuwei.chen@intel.com> [YuweiChen1110]
@@ -374,7 +374,7 @@ MdeModulePkg: USB Network modules
 F: MdeModulePkg/Bus/Usb/UsbNetwork
 F: MdeModulePkg/Include/Protocol/UsbEthernetProtocol.h
 M: Richard Ho <richardho@ami.com> [richardho]
-R: Rebecca Cran <rebecca@bsdio.com> [bcran]
+R: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 
 MdeModulePkg: Manageability modules
 F: MdeModulePkg/Include/*Ipmi*.*
@@ -405,9 +405,10 @@ M: Prakashan Krishnadas Veliyathuparambil <krishnadas.veliyathuparambil.prakasha
 R: K N Karthik <karthik.k.n@intel.com> [karthikkabbigere1]
 
 MdePkg: FDT related library instance
-F: MdePkg/Library/BaseFdtLib/FdtLib.c
+F: MdePkg/Library/BaseFdtLib/*
 F: MdePkg/Include/Library/FdtLib.h
 M: Benny Lin <benny.lin@intel.com> [Benny3345678]
+M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 R: Chasel Chiu <chasel.chiu@intel.com> [ChaselChiu]
 R: James Lu <james.lu@intel.com> [jameslu8]
@@ -455,7 +456,7 @@ F: OvmfPkg/Library/PciHostBridgeLibScan/
 F: OvmfPkg/Library/PlatformBootManagerLibBhyve/
 F: OvmfPkg/Library/ResetSystemLib/BaseResetShutdownBhyve.c
 F: OvmfPkg/Library/ResetSystemLib/BaseResetSystemLibBhyve.inf
-R: Rebecca Cran <rebecca@bsdio.com> [bcran]
+R: Rebecca Cran <rebecca@bsdio.com> [bexcran]
 R: Corvin Köhne <corvink@freebsd.org> [corvink]
 
 OvmfPkg: cloudhv-related modules
@@ -621,6 +622,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/UefiPayloadPkg
 M: Guo Dong <guo.dong@intel.com> [gdong1]
 M: Sean Rhodes <sean@starlabs.systems> [Sean-StarLabs]
 M: James Lu <james.lu@intel.com> [jameslu8]
+M: Benjamin Doron <benjamin.doron@9elements.com> [benjamindoron]
 R: Gua Guo <gua.guo@intel.com> [gguo11837463]
 S: Maintained
 

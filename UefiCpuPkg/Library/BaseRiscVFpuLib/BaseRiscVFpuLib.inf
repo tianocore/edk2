@@ -1,0 +1,26 @@
+## @file
+#  RISC-V FPU library.
+#
+#  Copyright (c) 2024, Canonical Services Ltd
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION         = 0x0001001b
+  BASE_NAME           = BaseRiscVFpuLib
+  FILE_GUID           = e600fe4d-8595-40f3-90a0-5f043ce155c2
+  MODULE_TYPE         = BASE
+  VERSION_STRING      = 1.0
+  LIBRARY_CLASS       = RiscVFpuLib
+
+[Sources]
+  RiscVFpuCore.S
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
