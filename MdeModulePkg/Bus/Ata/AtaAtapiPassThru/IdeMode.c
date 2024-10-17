@@ -943,7 +943,7 @@ AtaPioDataInOut (
   IN     ATA_NONBLOCK_TASK      *Task
   )
 {
-  UINTN       WordCount;
+  UINT64      WordCount;
   UINTN       Increment;
   UINT16      *Buffer16;
   EFI_STATUS  Status;

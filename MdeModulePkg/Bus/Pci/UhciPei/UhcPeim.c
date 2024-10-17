@@ -272,7 +272,8 @@ UhcControlTransfer (
 
   StatusReg = UhcDev->UsbHostControllerBaseAddress + USBSTS;
 
-  PktID = INPUT_PACKET_ID;
+  PktID   = INPUT_PACKET_ID;
+  DataMap = NULL;
 
   RequestMap = NULL;
 
@@ -546,6 +547,7 @@ UhcBulkTransfer (
   PtrTD      = NULL;
   PtrFirstTD = NULL;
   PtrPreTD   = NULL;
+  DataMap    = NULL;
   DataLen    = 0;
 
   ShortPacketEnable = FALSE;
@@ -2848,6 +2850,8 @@ InitializeMemoryManagement (
   EFI_STATUS            Status;
   UINTN                 MemPages;
 
+  MemoryHeader = NULL;
+
   MemPages = NORMAL_MEMORY_BLOCK_UNIT_IN_PAGES;
   Status   = CreateMemoryBlock (UhcDev, &MemoryHeader, MemPages);
   if (EFI_ERROR (Status)) {
@@ -2885,6 +2889,8 @@ UhcAllocatePool (
   EFI_STATUS            Status;
 
   *Pool = NULL;
+
+  NewMemoryHeader = NULL;
 
   MemoryHeader = UhcDev->Header1;
 
