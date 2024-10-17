@@ -17,6 +17,8 @@
 #include <Library/PrintLib.h>
 #include <Library/TcgEventLogRecordLib.h>
 #include <WorkArea.h>
+#include <Library/TdxLib.h>
+#include <Library/BaseCryptLib.h>
 
 #pragma pack(1)
 
@@ -32,6 +34,57 @@ typedef struct {
 
 #define FV_HANDOFF_TABLE_DESC  "Fv(XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)"
 typedef PLATFORM_FIRMWARE_BLOB2_STRUCT CFV_HANDOFF_TABLE_POINTERS2;
+
+/**
+ * Calculate the sha384 of input Data and extend it to RTMR register.
+ *
+ * @param RtmrIndex       Index of the RTMR register
+ * @param DataToHash      Data to be hashed
+ * @param DataToHashLen   Length of the data
+ * @param Digest          Hash value of the input data
+ * @param DigestLen       Length of the hash value
+ *
+ * @retval EFI_SUCCESS    Successfully hash and extend to RTMR
+ * @retval Others         Other errors as indicated
+ */
+EFI_STATUS
+HashAndExtendToRtmr (
+  IN UINT32  RtmrIndex,
+  IN VOID    *DataToHash,
+  IN UINTN   DataToHashLen,
+  OUT UINT8  *Digest,
+  IN  UINTN  DigestLen
+  )
+{
+  EFI_STATUS  Status;
+
+  if ((DataToHash == NULL) || (DataToHashLen == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Digest == NULL) || (DigestLen != SHA384_DIGEST_SIZE)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Calculate the sha384 of the data
+  //
+  if (!Sha384HashAll (DataToHash, DataToHashLen, Digest)) {
+    return EFI_ABORTED;
+  }
+
+  //
+  // Extend to RTMR
+  //
+  Status = TdExtendRtmr (
+             (UINT32 *)Digest,
+             SHA384_DIGEST_SIZE,
+             (UINT8)RtmrIndex
+             );
+
+  ASSERT (!EFI_ERROR (Status));
+  return Status;
+}
 
 /**
  * Build GuidHob for Tdx measurement.
@@ -51,7 +104,6 @@ typedef PLATFORM_FIRMWARE_BLOB2_STRUCT CFV_HANDOFF_TABLE_POINTERS2;
  * @retval EFI_SUCCESS  Successfully build the GuidHobs
  * @retval Others       Other error as indicated
  */
-STATIC
 EFI_STATUS
 BuildTdxMeasurementGuidHob (
   UINT32  RtmrIndex,
@@ -256,4 +308,61 @@ InternalBuildGuidHobForTdxMeasurement (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+ * In Tdx guest, OVMF uses FW_CFG_SELECTOR(0x510) and FW_CFG_IO_DATA(0x511)
+ * to get configuration infomation from QEMU. From the security perspective
+ * these information shall be measured before they're consumed.
+
+  @retval EFI_SUCCESS  The measurement is successful
+  @retval Others       Other errors as indicated
+**/
+EFI_STATUS
+EFIAPI
+TdxHelperMeasureFwCfgData (
+  IN VOID    *EventLog,
+  IN UINT32  LogLen,
+  IN VOID    *HashData,
+  IN UINT64  HashDataLen
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       Digest[SHA384_DIGEST_SIZE];
+
+  if ((EventLog == NULL) || (HashData == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (!TdIsEnabled ()) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Status = HashAndExtendToRtmr (
+             0,
+             (UINT8 *)HashData,
+             (UINTN)HashDataLen,
+             Digest,
+             SHA384_DIGEST_SIZE
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: HashAndExtendToRtmr failed with %r\n", __func__, Status));
+    return Status;
+  }
+
+  Status = BuildTdxMeasurementGuidHob (
+             0,
+             EV_PLATFORM_CONFIG_FLAGS,
+             EventLog,
+             LogLen,
+             Digest,
+             SHA384_DIGEST_SIZE
+             );
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: BuildTdxMeasurementGuidHob failed with %r\n", __func__, Status));
+  }
+
+  return Status;
 }
