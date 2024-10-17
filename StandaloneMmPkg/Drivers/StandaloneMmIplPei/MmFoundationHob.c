@@ -568,6 +568,49 @@ MemoryRegionBaseAddressCompare (
 }
 
 /**
+  The routine returns TRUE when CPU supports it (CPUID[7,0].ECX.BIT[16] is set) and
+  the max physical address bits is bigger than 48. Because 4-level paging can support
+  to address physical address up to 2^48 - 1, there is no need to enable 5-level paging
+  with max physical address bits <= 48.
+
+  @retval TRUE  5-level paging enabling is needed.
+  @retval FALSE 5-level paging enabling is not needed.
+**/
+BOOLEAN
+MmIplIs5LevelPagingNeeded (
+  VOID
+  )
+{
+  CPUID_VIR_PHY_ADDRESS_SIZE_EAX               VirPhyAddressSize;
+  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  ExtFeatureEcx;
+  UINT32                                       MaxExtendedFunctionId;
+
+  AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunctionId, NULL, NULL, NULL);
+  if (MaxExtendedFunctionId >= CPUID_VIR_PHY_ADDRESS_SIZE) {
+    AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
+  } else {
+    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+  }
+
+  AsmCpuidEx (
+    CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
+    CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_SUB_LEAF_INFO,
+    NULL,
+    NULL,
+    &ExtFeatureEcx.Uint32,
+    NULL
+    );
+
+  if ((VirPhyAddressSize.Bits.PhysicalAddressBits > 4 * 9 + 12) &&
+      (ExtFeatureEcx.Bits.FiveLevelPage == 1))
+  {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+/**
   Calculate the maximum support address.
 
   @return the maximum support address.
@@ -595,6 +638,18 @@ MmIplCalculateMaximumSupportAddress (
     } else {
       PhysicalAddressBits = 36;
     }
+  }
+
+  //
+  // 4-level paging supports translating 48-bit linear addresses to 52-bit physical addresses.
+  // Since linear addresses are sign-extended, the linear-address space of 4-level paging is:
+  // [0, 2^47-1] and [0xffff8000_00000000, 0xffffffff_ffffffff].
+  // So only [0, 2^47-1] linear-address range maps to the identical physical-address range when
+  // 5-Level paging is disabled.
+  //
+  ASSERT (PhysicalAddressBits <= 52);
+  if (!MmIplIs5LevelPagingNeeded () && (PhysicalAddressBits > 47)) {
+    PhysicalAddressBits = 47;
   }
 
   return PhysicalAddressBits;
