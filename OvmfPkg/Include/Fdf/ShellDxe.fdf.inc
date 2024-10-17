@@ -2,6 +2,10 @@
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
+#
+# Built shell can be useful even when not included here, and is used in CI:
+# https://github.com/tianocore/edk2/commit/bc982869dd3e69ffd374fd968d378b5d954f66e8
+#
 !if $(BUILD_SHELL) == TRUE && $(SECURE_BOOT_ENABLE) == FALSE
 
 !if $(TOOL_CHAIN_TAG) != "XCODE5"
