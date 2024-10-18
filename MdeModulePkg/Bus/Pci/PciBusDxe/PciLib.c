@@ -1797,34 +1797,60 @@ PciProgramResizableBar (
 {
   EFI_PCI_IO_PROTOCOL                                    *PciIo;
   UINT64                                                 Capabilities;
+  UINT64                                                 CapabilitiesMask;
   UINT32                                                 Index;
   UINT32                                                 Offset;
   INTN                                                   Bit;
-  UINTN                                                  ResizableBarNumber;
   EFI_STATUS                                             Status;
   PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY  Entries[PCI_MAX_BAR];
 
   ASSERT (PciIoDevice->ResizableBarOffset != 0);
-
+  //
+  // PCIE SPEC v6.0 section 7.8.6.3 Resizable BAR Control Register
+  // Bits[13:8] BAR Size define 43(8 EB) as maximum
+  //
+  CapabilitiesMask = LShiftU64 (1, MIN (PcdGet8 (PcdPcieResizableMaxBarSize), 43) + 1) - 1;
   DEBUG ((
     DEBUG_INFO,
-    "   Programs Resizable BAR register, offset: 0x%08x, number: %d\n",
+    "   Programs Resizable BAR register, offset: 0x%08x, number: %d, PcdPcieResizableMaxBarSize: %d\n",
     PciIoDevice->ResizableBarOffset,
-    PciIoDevice->ResizableBarNumber
+    PciIoDevice->ResizableBarNumber,
+    PcdGet8 (PcdPcieResizableMaxBarSize)
     ));
+  if ((PciIoDevice->ResizableBarNumber > PCI_MAX_BAR) || (PciIoDevice->ResizableBarNumber == 0)) {
+    DEBUG ((DEBUG_ERROR, "ERROR: Resizable BAR register ResizableBarNumber=0x%X is illegal\n", PciIoDevice->ResizableBarNumber));
+    return EFI_DEVICE_ERROR;
+  }
 
-  ResizableBarNumber = MIN (PciIoDevice->ResizableBarNumber, PCI_MAX_BAR);
-  PciIo              = &PciIoDevice->PciIo;
-  Status             = PciIo->Pci.Read (
-                                    PciIo,
-                                    EfiPciIoWidthUint8,
-                                    PciIoDevice->ResizableBarOffset + sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER),
-                                    sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY) * ResizableBarNumber,
-                                    (VOID *)(&Entries)
-                                    );
+  PciIo  = &PciIoDevice->PciIo;
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint8,
+                        PciIoDevice->ResizableBarOffset + sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_HEADER),
+                        sizeof (PCI_EXPRESS_EXTENDED_CAPABILITIES_RESIZABLE_BAR_ENTRY) * PciIoDevice->ResizableBarNumber,
+                        (VOID *)(&Entries)
+                        );
   ASSERT_EFI_ERROR (Status);
 
-  for (Index = 0; Index < ResizableBarNumber; Index++) {
+  for (Index = 0; Index < PciIoDevice->ResizableBarNumber; Index++) {
+    //
+    // BAR index: encoded value
+    // 0          BAR located at offset 10h
+    // 1          BAR located at offset 14h
+    // 2          BAR located at offset 18h
+    // 3          BAR located at offset 1ch
+    // 4          BAR located at offset 20h
+    // 5          BAR located at offset 24h
+    // Others     Reserved.
+    // Do not configure anything if some BAR info is wrong.
+    //
+    if (Entries[Index].ResizableBarControl.Bits.BarIndex >= PCI_MAX_BAR ) {
+      DEBUG ((DEBUG_ERROR, "ERROR: Resizable BAR Entry[%x].BarIndex=%x is illegal\n", Index, Entries[Index].ResizableBarControl.Bits.BarIndex));
+      return EFI_DEVICE_ERROR;
+    }
+  }
+
+  for (Index = 0; Index < PciIoDevice->ResizableBarNumber; Index++) {
     //
     // When the bit of Capabilities Set, indicates that the Function supports
     // operating with the BAR sized to (2^Bit) MB.
@@ -1832,9 +1858,22 @@ PciProgramResizableBar (
     // Bit 0 is set: supports operating with the BAR sized to 1 MB
     // Bit 1 is set: supports operating with the BAR sized to 2 MB
     // Bit n is set: supports operating with the BAR sized to (2^n) MB
+    // Platform may impose limitation on the BAR size it supports using PcdPcieResizableMaxBarSize.
     //
     Capabilities = LShiftU64 (Entries[Index].ResizableBarControl.Bits.BarSizeCapability, 28)
                    | Entries[Index].ResizableBarCapability.Bits.BarSizeCapability;
+    Capabilities &= CapabilitiesMask;
+
+    if (Capabilities == 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        " WARNING: Resizable BAR Entry[%d] skip, Capabilities=0x%llx CapabilitiesMask=0x%llx\n",
+        Index,
+        Entries[Index].ResizableBarCapability.Bits.BarSizeCapability,
+        CapabilitiesMask
+        ));
+      continue;
+    }
 
     if (ResizableBarOp == PciResizableBarMax) {
       Bit = HighBitSet64 (Capabilities);
