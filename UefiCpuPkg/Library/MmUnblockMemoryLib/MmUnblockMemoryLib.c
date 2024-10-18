@@ -18,6 +18,84 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/PeiServicesLib.h>
 #include <Base.h>
+#include <PiPei.h>
+
+/**
+  This function checks if the input buffer range [UnblockBase, UnblockEnd] to unblock is
+  valid. The input range should be covered by EfiRuntimeServicesData, EfiACPIMemoryNVS or
+  EfiReservedMemoryType memory allocation HOB.
+
+  @param[in]  MemoryAllocationHob         Pointer to a memory allocation lib.
+  @param[in]  UnblockAddress              Base address of the range to unblock.
+  @param[in]  UnblockEnd                  End address of the range to unblock.
+
+  @retval RETURN_SUCCESS              The range to unblock is valid.
+  @retval RETURN_INVALID_PARAMETER    The range to unblock contains invalid memory.
+**/
+EFI_STATUS
+CheckIsUnblockRangeValid (
+  IN EFI_HOB_MEMORY_ALLOCATION  *MemoryAllocationHob,
+  IN EFI_PHYSICAL_ADDRESS       UnblockBase,
+  IN EFI_PHYSICAL_ADDRESS       UnblockEnd
+  )
+{
+  EFI_PHYSICAL_ADDRESS  HobBase;
+  EFI_PHYSICAL_ADDRESS  HobEnd;
+  EFI_STATUS            Status;
+
+  while (MemoryAllocationHob != NULL) {
+    HobBase = MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress;
+    HobEnd  = MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress +
+              MemoryAllocationHob->AllocDescriptor.MemoryLength;
+    if ((UnblockBase < HobEnd) && (UnblockEnd > HobBase)) {
+      if (!((MemoryAllocationHob->AllocDescriptor.MemoryType == EfiRuntimeServicesData) ||
+            (MemoryAllocationHob->AllocDescriptor.MemoryType == EfiACPIMemoryNVS) ||
+            (MemoryAllocationHob->AllocDescriptor.MemoryType == EfiReservedMemoryType)))
+      {
+        //
+        // The overlapped memory allocation HOB type must be one of the three specific types.
+        //
+        DEBUG ((DEBUG_ERROR, "Error: range [0x%lx, 0x%lx] to unblock contains invalid type memory\n", UnblockBase, UnblockEnd));
+        return RETURN_INVALID_PARAMETER;
+      }
+
+      if (UnblockBase < HobBase) {
+        //
+        // Recursively call to check [UnblockBase, HobBase]
+        //
+        Status = CheckIsUnblockRangeValid (
+                   (EFI_HOB_MEMORY_ALLOCATION *)GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (MemoryAllocationHob)),
+                   UnblockBase,
+                   HobBase
+                   );
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+      }
+
+      if (UnblockEnd > HobEnd) {
+        //
+        // Recursively call to check [HobEnd, UnblockEnd]
+        //
+        Status = CheckIsUnblockRangeValid (
+                   (EFI_HOB_MEMORY_ALLOCATION *)GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (MemoryAllocationHob)),
+                   HobEnd,
+                   UnblockEnd
+                   );
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+      }
+
+      return EFI_SUCCESS;
+    }
+
+    MemoryAllocationHob = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, GET_NEXT_HOB (MemoryAllocationHob));
+  }
+
+  DEBUG ((DEBUG_ERROR, "Error: range [0x%lx, 0x%lx] to unblock doesn't belong to any memory allocation HOB\n", UnblockBase, UnblockEnd));
+  return RETURN_INVALID_PARAMETER;
+}
 
 /**
   This API provides a way to unblock certain data pages to be accessible inside MM environment.
@@ -32,6 +110,10 @@
   @retval RETURN_SECURITY_VIOLATION   The requested address failed to pass security check for
                                       unblocking.
   @retval RETURN_INVALID_PARAMETER    Input address either NULL pointer or not page aligned.
+  @retval RETURN_INVALID_PARAMETER    Input range to unblock contains invalid types memory other than
+                                      EfiRuntimeServicesData, EfiACPIMemoryNVS, and EfiReservedMemory.
+  @retval RETURN_INVALID_PARAMETER    Input range to unblock contains memory that doesn't belong to
+                                      any memory allocation HOB.
   @retval RETURN_ACCESS_DENIED        The request is rejected due to system has passed certain boot
                                       phase.
 **/
@@ -45,10 +127,18 @@ MmUnblockMemoryRequest (
   EFI_STATUS                    Status;
   MM_UNBLOCK_REGION             *MmUnblockMemoryHob;
   EFI_PEI_MM_COMMUNICATION_PPI  *MmCommunicationPpi;
+  EFI_PEI_HOB_POINTERS          Hob;
 
   if (!IS_ALIGNED (UnblockAddress, SIZE_4KB)) {
     DEBUG ((DEBUG_ERROR, "Error: UnblockAddress is not 4KB aligned: %p\n", UnblockAddress));
     return EFI_INVALID_PARAMETER;
+  }
+
+  Hob.Raw = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
+  ASSERT (Hob.Raw != NULL);
+  Status = CheckIsUnblockRangeValid (Hob.MemoryAllocation, UnblockAddress, UnblockAddress + EFI_PAGES_TO_SIZE (NumberOfPages));
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   //
