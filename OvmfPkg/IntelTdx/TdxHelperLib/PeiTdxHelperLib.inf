@@ -27,6 +27,7 @@
   TdxMeasurementHob.c
 
 [Packages]
+  CryptoPkg/CryptoPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
@@ -37,6 +38,8 @@
   DebugLib
   HobLib
   PcdLib
+  TdxLib
+  BaseCryptLib
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase
