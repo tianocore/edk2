@@ -63,10 +63,17 @@ EfiIp6GetModeData (
 
   OldTpl     = gBS->RaiseTPL (TPL_CALLBACK);
   IpInstance = IP6_INSTANCE_FROM_PROTOCOL (This);
-  IpSb       = IpInstance->Service;
-  IpIf       = IpInstance->Interface;
+
+  if (IpInstance == NULL) {
+    gBS->RestoreTPL (OldTpl);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  IpSb = IpInstance->Service;
+  IpIf = IpInstance->Interface;
 
   if (IpSb->LinkLocalDadFail) {
+    gBS->RestoreTPL (OldTpl);
     return EFI_INVALID_PARAMETER;
   }
 
