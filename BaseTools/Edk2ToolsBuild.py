@@ -1,7 +1,7 @@
 # @file Edk2ToolsBuild.py
 # Invocable class that builds the basetool c files.
 #
-# Supports VS2017, VS2019, and GCC5
+# Supports VS2017, VS2019, GCC5 and XCODE5
 ##
 # Copyright (c) Microsoft Corporation
 #
@@ -146,7 +146,7 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
             self.WritePathEnvFile(self.OutputDir)
             return ret
 
-        elif self.tool_chain_tag.lower().startswith("gcc"):
+        elif self.tool_chain_tag.lower().startswith("gcc") or self.tool_chain_tag.lower().startswith("xcode"):
             cpu_count = self.GetCpuThreads()
 
             output_stream = edk2_logging.create_output_stream()
