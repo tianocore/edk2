@@ -74,6 +74,9 @@
   ## @libraryclass   Provides functions for SMM Relocation Operation.
   SmmRelocationLib|Include/Library/SmmRelocationLib.h
 
+  ## @libraryclass   Library to inject functionality for when a CPU exception occurs
+  CpuExceptionHookLib|Include/Library/CpuExceptionHookLib.h
+
 [LibraryClasses.RISCV64]
   ##  @libraryclass  Provides function to initialize the FPU.
   RiscVFpuLib|Include/Library/BaseRiscVFpuLib.h
