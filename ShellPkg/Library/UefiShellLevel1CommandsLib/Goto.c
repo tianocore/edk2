@@ -71,6 +71,11 @@ ShellCommandRunGoto (
       ASSERT ((CompareString == NULL && Size == 0) || (CompareString != NULL));
       CompareString = StrnCatGrow (&CompareString, &Size, L":", 0);
       CompareString = StrnCatGrow (&CompareString, &Size, ShellCommandLineGetRawValue (Package, 1), 0);
+      if (CompareString == NULL) {
+        ShellCommandLineFreeVarList (Package);
+        return SHELL_OUT_OF_RESOURCES;
+      }
+
       //
       // Check forwards and then backwards for a label...
       //

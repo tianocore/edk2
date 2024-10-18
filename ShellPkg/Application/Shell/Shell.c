@@ -576,6 +576,11 @@ UefiMain (
 
     Size       = 100;
     TempString = AllocateZeroPool (Size);
+    if (TempString == NULL) {
+      ASSERT (TempString != NULL);
+      Status = EFI_OUT_OF_RESOURCES;
+      goto FreeResources;
+    }
 
     UnicodeSPrint (TempString, Size, L"%d", PcdGet8 (PcdShellSupportLevel));
     Status = InternalEfiShellSetEnv (L"uefishellsupport", TempString, TRUE);
@@ -2609,10 +2614,15 @@ RunCommandOrFile (
         CommandWithPath = ShellFindFilePathEx (FirstParameter, mExecutableExtensions);
       }
 
-      //
-      // This should be impossible now.
-      //
-      ASSERT (CommandWithPath != NULL);
+      if (CommandWithPath == NULL) {
+        //
+        // This should be impossible now.
+        //
+        ASSERT (CommandWithPath != NULL);
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_SHELL_NOT_FOUND), ShellInfoObject.HiiHandle, FirstParameter);
+        SetLastError (SHELL_NOT_FOUND);
+        return EFI_NOT_FOUND;
+      }
 
       //
       // Make sure that path is not just a directory (or not found)
@@ -3330,8 +3340,8 @@ FindFirstCharacter (
   IN CONST CHAR16  EscapeCharacter
   )
 {
-  UINT32  WalkChar;
-  UINT32  WalkStr;
+  UINTN  WalkChar;
+  UINTN  WalkStr;
 
   for (WalkStr = 0; WalkStr < StrLen (String); WalkStr++) {
     if (String[WalkStr] == EscapeCharacter) {

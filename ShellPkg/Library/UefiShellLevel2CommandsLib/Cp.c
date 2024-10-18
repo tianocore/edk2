@@ -203,12 +203,18 @@ CopySingleFile (
 
     if (Status == EFI_BUFFER_TOO_SMALL) {
       DestVolumeInfo = AllocateZeroPool (DestVolumeInfoSize);
-      Status         = DestVolumeFP->GetInfo (
-                                       DestVolumeFP,
-                                       &gEfiFileSystemInfoGuid,
-                                       &DestVolumeInfoSize,
-                                       DestVolumeInfo
-                                       );
+      if (DestVolumeInfo == NULL) {
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellLevel2HiiHandle, L"cp");
+        ShellStatus = SHELL_OUT_OF_RESOURCES;
+        goto Done;
+      }
+
+      Status = DestVolumeFP->GetInfo (
+                               DestVolumeFP,
+                               &gEfiFileSystemInfoGuid,
+                               &DestVolumeInfoSize,
+                               DestVolumeInfo
+                               );
     }
 
     //
@@ -251,6 +257,7 @@ CopySingleFile (
     SHELL_FREE_NON_NULL (DestVolumeInfo);
   }
 
+Done:
   //
   // close files
   //
