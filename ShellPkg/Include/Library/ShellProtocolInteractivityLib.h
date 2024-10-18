@@ -1,14 +1,16 @@
 /** @file
-  Provides interface to shell console logger.
+  Provides interface to the shell protocols interactivity layer.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024, 9elements GmbH.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
-#ifndef _CONSOLE_LOGGER_HEADER_
-#define _CONSOLE_LOGGER_HEADER_
+#ifndef __SHELL_PROTOCOL_INTERACTIVITY_LIB__
+#define __SHELL_PROTOCOL_INTERACTIVITY_LIB__
 
-#include "Shell.h"
+#include <Uefi.h>
+#include <Library/ShellCommandLib.h>
 
 #define CONSOLE_LOGGER_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('c', 'o', 'P', 'D')
 
@@ -313,4 +315,95 @@ ConsoleLoggerResetBuffers (
   IN CONSOLE_LOGGER_PRIVATE_DATA  *ConsoleInfo
   );
 
-#endif //_CONSOLE_LOGGER_HEADER_
+/**
+  Move the cursor position one character backward.
+
+  @param[in] LineLength       Length of a line. Get it by calling QueryMode
+  @param[in, out] Column      Current column of the cursor position
+  @param[in, out] Row         Current row of the cursor position
+**/
+VOID
+MoveCursorBackward (
+  IN     UINTN  LineLength,
+  IN OUT UINTN  *Column,
+  IN OUT UINTN  *Row
+  );
+
+/**
+  Move the cursor position one character forward.
+
+  @param[in] LineLength       Length of a line.
+  @param[in] TotalRow         Total row of a screen
+  @param[in, out] Column      Current column of the cursor position
+  @param[in, out] Row         Current row of the cursor position
+**/
+VOID
+MoveCursorForward (
+  IN     UINTN  LineLength,
+  IN     UINTN  TotalRow,
+  IN OUT UINTN  *Column,
+  IN OUT UINTN  *Row
+  );
+
+/**
+  Prints out each previously typed command in the command list history log.
+
+  When each screen is full it will pause for a key before continuing.
+
+  @param[in] TotalCols    How many columns are on the screen
+  @param[in] TotalRows    How many rows are on the screen
+  @param[in] StartColumn  which column to start at
+**/
+VOID
+PrintCommandHistory (
+  IN CONST UINTN  TotalCols,
+  IN CONST UINTN  TotalRows,
+  IN CONST UINTN  StartColumn
+  );
+
+typedef struct {
+  BUFFER_LIST    CommandHistory;
+  UINTN          VisibleRowNumber;
+  UINTN          OriginalVisibleRowNumber;
+  BOOLEAN        InsertMode;                        ///< Is the current typing mode insert (FALSE = overwrite).
+} SHELL_VIEWING_SETTINGS;
+
+typedef struct {
+  BOOLEAN                      PageBreakEnabled;
+  SHELL_VIEWING_SETTINGS       ViewingSettings;
+  EFI_HII_HANDLE               HiiHandle;           ///< Handle from HiiLib.
+  UINTN                        LogScreenCount;      ///< How many screens of log information to save.
+  EFI_DEVICE_PATH_PROTOCOL     *ImageDevPath;       ///< DevicePath for ourselves.
+  EFI_DEVICE_PATH_PROTOCOL     *FileDevPath;        ///< DevicePath for ourselves.
+  CONSOLE_LOGGER_PRIVATE_DATA  *ConsoleInfo;        ///< Pointer for ConsoleInformation.
+  VOID                         *CtrlCNotifyHandle1; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlCNotifyHandle2; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlCNotifyHandle3; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlCNotifyHandle4; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlSNotifyHandle1; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlSNotifyHandle2; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlSNotifyHandle3; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlSNotifyHandle4; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  BOOLEAN                      HaltOutput;          ///< TRUE to start a CTRL-S halt.
+} SHELL_PROTOCOL_INTERACTIVITY_INFO;
+
+extern SHELL_PROTOCOL_INTERACTIVITY_INFO  ShellProtocolInteractivityInfoObject;
+
+/**
+  Determine if the UEFI Shell is currently running with nesting enabled or disabled.
+
+  @retval FALSE   nesting is required
+  @retval other   nesting is enabled
+**/
+BOOLEAN
+EFIAPI
+NestingEnabled (
+  VOID
+  );
+
+EFI_STATUS
+CleanUpInteractiveShellEnvironment (
+  VOID
+  );
+
+#endif

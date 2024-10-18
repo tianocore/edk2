@@ -1,0 +1,82 @@
+##  @file
+#  This library implements the shell protocols.
+#
+#  (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = ShellProtocolsLib
+  FILE_GUID                      = 0A59C527-47EE-40F8-A122-5D469C322EF4
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = UefiShellProtocolsLibConstructor
+  DESTRUCTOR                     = UefiShellProtocolsLibDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  Shell.c
+  ShellParametersProtocol.c
+  ShellParametersProtocol.h
+  ShellProtocol.c
+  ShellProtocol.h
+  FileHandleWrappers.c
+  ShellEnvVar.c
+  ShellEnvVar.h
+  ShellManParser.c
+  ShellManParser.h
+  Shell.uni
+  ConsoleWrappers.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FileHandleLib
+  HandleParsingLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+  ShellCommandLib
+  ShellLib
+  ShellProtocolInteractivityLib
+  SortLib
+  UefiBootServicesTableLib
+  UefiHiiServicesLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gShellVariableGuid                                      ## SOMETIMES_CONSUMES ## GUID
+  gShellAliasGuid                                         ## SOMETIMES_CONSUMES ## GUID
+  gShellProtocolsHiiGuid
+
+[Protocols]
+  gEfiShellProtocolGuid                                   ## PRODUCES
+  gEfiShellParametersProtocolGuid                         ## PRODUCES
+
+#  gEfiShellEnvironment2Guid                              ## SOMETIMES_PRODUCES
+#  gEfiShellInterfaceGuid                                 ## SOMETIMES_PRODUCES
+
+  gEfiLoadedImageProtocolGuid                             ## CONSUMES
+  gEfiComponentName2ProtocolGuid                          ## SOMETIMES_CONSUMES
+  gEfiHiiPackageListProtocolGuid                          ## SOMETIMES_PRODUCES
+
+[Pcd]
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportLevel           ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellSupportOldProtocols    ## CONSUMES
+  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize        ## CONSUMES

@@ -7,7 +7,14 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
-#include "Shell.h"
+#include <Uefi.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/ShellLib.h>
+#include <Library/ShellProtocolInteractivityLib.h>
+#include <Library/ShellProtocolsLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 /**
   Install our intermediate ConOut into the system table to
@@ -655,10 +662,10 @@ ConsoleLoggerDoPageBreak (
   EFI_STATUS             Status;
 
   Resp = NULL;
-  ASSERT (ShellInfoObject.PageBreakEnabled);
-  ShellInfoObject.PageBreakEnabled = FALSE;
-  Status                           = ShellPromptForResponseHii (ShellPromptResponseTypeQuitContinue, STRING_TOKEN (STR_SHELL_QUIT_CONT), ShellInfoObject.HiiHandle, (VOID **)&Resp);
-  ShellInfoObject.PageBreakEnabled = TRUE;
+  ASSERT (ShellProtocolInteractivityInfoObject.PageBreakEnabled);
+  ShellProtocolInteractivityInfoObject.PageBreakEnabled = FALSE;
+  Status                           = ShellPromptForResponseHii (ShellPromptResponseTypeQuitContinue, STRING_TOKEN (STR_SHELL_QUIT_CONT), ShellProtocolInteractivityInfoObject.HiiHandle, (VOID **)&Resp);
+  ShellProtocolInteractivityInfoObject.PageBreakEnabled = TRUE;
   ASSERT (Resp != NULL);
   if (Resp == NULL) {
     return (EFI_NOT_FOUND);
@@ -674,18 +681,18 @@ ConsoleLoggerDoPageBreak (
 
   if (*Resp == ShellPromptResponseContinue) {
     FreePool (Resp);
-    ShellInfoObject.ConsoleInfo->RowCounter = 0;
-    //    ShellInfoObject.ConsoleInfo->OurConOut.Mode->CursorRow    = 0;
-    //    ShellInfoObject.ConsoleInfo->OurConOut.Mode->CursorColumn = 0;
+    ShellProtocolInteractivityInfoObject.ConsoleInfo->RowCounter = 0;
+    //    ShellProtocolInteractivityInfoObject.ConsoleInfo->OurConOut.Mode->CursorRow    = 0;
+    //    ShellProtocolInteractivityInfoObject.ConsoleInfo->OurConOut.Mode->CursorColumn = 0;
 
     return (EFI_SUCCESS);
   } else if (*Resp == ShellPromptResponseQuit) {
     FreePool (Resp);
-    ShellInfoObject.ConsoleInfo->Enabled = FALSE;
+    ShellProtocolInteractivityInfoObject.ConsoleInfo->Enabled = FALSE;
     //
     // When user wants to quit, the shell should stop running the command.
     //
-    gBS->SignalEvent (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak);
+    gBS->SignalEvent (ShellProtocolsInfoObject.NewEfiShellProtocol->ExecutionBreak);
     return (EFI_DEVICE_ERROR);
   } else {
     ASSERT (FALSE);
@@ -764,7 +771,7 @@ ConsoleLoggerPrintWithPageBreak (
         //
         // increment row count
         //
-        ShellInfoObject.ConsoleInfo->RowCounter++;
+        ShellProtocolInteractivityInfoObject.ConsoleInfo->RowCounter++;
         ConsoleInfo->OurConOut.Mode->CursorRow++;
 
         break;
@@ -811,7 +818,7 @@ ConsoleLoggerPrintWithPageBreak (
           //
           // increment row count and zero the column
           //
-          ShellInfoObject.ConsoleInfo->RowCounter++;
+          ShellProtocolInteractivityInfoObject.ConsoleInfo->RowCounter++;
           ConsoleInfo->OurConOut.Mode->CursorRow++;
           ConsoleInfo->OurConOut.Mode->CursorColumn = 0;
         } // last column on line
@@ -822,7 +829,7 @@ ConsoleLoggerPrintWithPageBreak (
     //
     // check if that was the last printable row.  If yes handle PageBreak mode
     //
-    if ((ConsoleInfo->RowsPerScreen) -1 == ShellInfoObject.ConsoleInfo->RowCounter) {
+    if ((ConsoleInfo->RowsPerScreen) -1 == ShellProtocolInteractivityInfoObject.ConsoleInfo->RowCounter) {
       if (EFI_ERROR (ConsoleLoggerDoPageBreak ())) {
         //
         // We got an error which means 'break' and halt the printing
@@ -871,16 +878,16 @@ ConsoleLoggerOutputString (
   CONSOLE_LOGGER_PRIVATE_DATA        *ConsoleInfo;
 
   ConsoleInfo = CONSOLE_LOGGER_PRIVATE_DATA_FROM_THIS (This);
-  if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleOut) {
+  if (ShellProtocolsInfoObject.ShellProtocolBitUnion.Bits.NoConsoleOut) {
     return (EFI_UNSUPPORTED);
   }
 
-  ASSERT (ShellInfoObject.ConsoleInfo == ConsoleInfo);
+  ASSERT (ShellProtocolInteractivityInfoObject.ConsoleInfo == ConsoleInfo);
 
   Status = gBS->HandleProtocol (gST->ConsoleInHandle, &gEfiSimpleTextInputExProtocolGuid, (VOID **)&TxtInEx);
   if (!EFI_ERROR (Status)) {
-    while (ShellInfoObject.HaltOutput) {
-      ShellInfoObject.HaltOutput = FALSE;
+    while (ShellProtocolInteractivityInfoObject.HaltOutput) {
+      ShellProtocolInteractivityInfoObject.HaltOutput = FALSE;
       //
       // just get some key
       //
@@ -897,14 +904,14 @@ ConsoleLoggerOutputString (
           )
           )
       {
-        ShellInfoObject.HaltOutput = TRUE;
+        ShellProtocolInteractivityInfoObject.HaltOutput = TRUE;
       }
     }
   }
 
-  if (!ShellInfoObject.ConsoleInfo->Enabled) {
+  if (!ShellProtocolInteractivityInfoObject.ConsoleInfo->Enabled) {
     return (EFI_DEVICE_ERROR);
-  } else if (ShellInfoObject.PageBreakEnabled) {
+  } else if (ShellProtocolInteractivityInfoObject.PageBreakEnabled) {
     return (ConsoleLoggerPrintWithPageBreak (WString, ConsoleInfo));
   } else {
     return (ConsoleLoggerOutputStringSplit (WString, ConsoleInfo));
@@ -1089,7 +1096,7 @@ ConsoleLoggerClearScreen (
   UINTN                        Column;
   CONSOLE_LOGGER_PRIVATE_DATA  *ConsoleInfo;
 
-  if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleOut) {
+  if (ShellProtocolsInfoObject.ShellProtocolBitUnion.Bits.NoConsoleOut) {
     return (EFI_UNSUPPORTED);
   }
 
@@ -1159,7 +1166,7 @@ ConsoleLoggerSetCursorPosition (
   EFI_STATUS                   Status;
   CONSOLE_LOGGER_PRIVATE_DATA  *ConsoleInfo;
 
-  if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleOut) {
+  if (ShellProtocolsInfoObject.ShellProtocolBitUnion.Bits.NoConsoleOut) {
     return (EFI_UNSUPPORTED);
   }
 
