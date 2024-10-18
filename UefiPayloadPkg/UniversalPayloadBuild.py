@@ -127,7 +127,6 @@ def BuildUniversalPayload(Args):
         Args.Macro.append("UNIVERSAL_PAYLOAD_FORMAT=ELF")
         UpldEntryFile = "UniversalPayloadEntry"
 
-    BuildDir     = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkg{}").format (Args.Arch))
     if Args.Arch == 'X64':
         BuildArch      = "X64"
         FitArch        = "x86_64"
@@ -139,6 +138,11 @@ def BuildUniversalPayload(Args):
         FitArch        = "RISCV64"
     else:
         print("Incorrect arch option provided")
+
+    if "X64" in BuildArch:
+        BuildDir   = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkgX64"))
+    else:
+        BuildDir   = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkg{}").format (Args.Arch))
 
     EntryOutputDir = os.path.join(BuildDir, "{}_{}".format (BuildTarget, PayloadEntryToolChain), os.path.normpath("{}/UefiPayloadPkg/UefiPayloadEntry/{}/DEBUG/{}.dll".format (Args.Arch, UpldEntryFile, UpldEntryFile)))
     EntryModuleInf = os.path.normpath("UefiPayloadPkg/UefiPayloadEntry/{}.inf".format (UpldEntryFile))
