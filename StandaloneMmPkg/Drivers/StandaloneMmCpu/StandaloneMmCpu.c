@@ -2,7 +2,7 @@
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Copyright (c) 2016 HP Development Company, L.P.
-  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.
+  Copyright (c) 2016 - 2024, Arm Limited. All rights reserved.
   Copyright (c) 2023, Ventana Micro System Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -22,14 +22,11 @@
 
 #include <StandaloneMmCpu.h>
 
-// GUID to identify HOB with whereabouts of communication buffer with Normal
-// World
-extern EFI_GUID  gEfiStandaloneMmNonSecureBufferGuid;
-
-// GUID to identify HOB where the entry point of this CPU driver will be
-// populated to allow the entry point driver to invoke it upon receipt of an
-// event
-extern EFI_GUID  gEfiMmCpuDriverEpDescriptorGuid;
+//
+// mPiMmCpuDriverEpProtocol for Cpu driver entry point to handle
+// mm communication event.
+//
+extern EDKII_PI_MM_CPU_DRIVER_EP_PROTOCOL  mPiMmCpuDriverEpProtocol;
 
 //
 // Private copy of the MM system table for future use
@@ -40,42 +37,6 @@ EFI_MM_SYSTEM_TABLE  *mMmst = NULL;
 // Globals used to initialize the protocol
 //
 STATIC EFI_HANDLE  mMmCpuHandle = NULL;
-
-/** Returns the HOB data for the matching HOB GUID.
-
-  @param  [in]  HobList  Pointer to the HOB list.
-  @param  [in]  HobGuid  The GUID for the HOB.
-  @param  [out] HobData  Pointer to the HOB data.
-
-  @retval  EFI_SUCCESS            The function completed successfully.
-  @retval  EFI_INVALID_PARAMETER  Invalid parameter.
-  @retval  EFI_NOT_FOUND          Could not find HOB with matching GUID.
-**/
-EFI_STATUS
-GetGuidedHobData (
-  IN  VOID            *HobList,
-  IN  CONST EFI_GUID  *HobGuid,
-  OUT VOID            **HobData
-  )
-{
-  EFI_HOB_GUID_TYPE  *Hob;
-
-  if ((HobList == NULL) || (HobGuid == NULL) || (HobData == NULL)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  Hob = GetNextGuidHob (HobGuid, HobList);
-  if (Hob == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  *HobData = GET_GUID_HOB_DATA (Hob);
-  if (*HobData == NULL) {
-    return EFI_NOT_FOUND;
-  }
-
-  return EFI_SUCCESS;
-}
 
 /** Entry point for the Standalone MM CPU driver.
 
@@ -94,17 +55,8 @@ StandaloneMmCpuInitialize (
   IN EFI_MM_SYSTEM_TABLE  *SystemTable   // not actual systemtable
   )
 {
-  MM_CPU_DRIVER_EP_DESCRIPTOR     *CpuDriverEntryPointDesc;
-  EFI_CONFIGURATION_TABLE         *ConfigurationTable;
-  MP_INFORMATION_HOB_DATA         *MpInformationHobData;
-  EFI_MMRAM_DESCRIPTOR            *NsCommBufMmramRange;
-  EFI_STATUS                      Status;
-  EFI_HANDLE                      DispatchHandle;
-  UINT32                          MpInfoSize;
-  UINTN                           Index;
-  UINTN                           ArraySize;
-  VOID                            *HobStart;
-  EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHob;
+  EFI_STATUS  Status;
+  EFI_HANDLE  DispatchHandle;
 
   ASSERT (SystemTable != NULL);
   mMmst = SystemTable;
@@ -120,6 +72,19 @@ StandaloneMmCpuInitialize (
     return Status;
   }
 
+  // Install  entry point of this CPU driver to allow
+  // the entry point driver to be invoked upon receipt of an event in
+  // DelegatedEventLoop.
+  Status = mMmst->MmInstallProtocolInterface (
+                    &mMmCpuHandle,
+                    &gEdkiiPiMmCpuDriverEpProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    &mPiMmCpuDriverEpProtocol
+                    );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   // register the root MMI handler
   Status = mMmst->MmiHandlerRegister (
                     PiMmCpuTpFwRootMmiHandler,
@@ -127,150 +92,6 @@ StandaloneMmCpuInitialize (
                     &DispatchHandle
                     );
   if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  // Retrieve the Hoblist from the MMST to extract the details of the NS
-  // communication buffer that has been reserved for StandaloneMmPkg
-  ConfigurationTable = mMmst->MmConfigurationTable;
-  for (Index = 0; Index < mMmst->NumberOfTableEntries; Index++) {
-    if (CompareGuid (&gEfiHobListGuid, &(ConfigurationTable[Index].VendorGuid))) {
-      break;
-    }
-  }
-
-  // Bail out if the Hoblist could not be found
-  if (Index >= mMmst->NumberOfTableEntries) {
-    DEBUG ((DEBUG_ERROR, "Hoblist not found - 0x%x\n", Index));
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  HobStart = ConfigurationTable[Index].VendorTable;
-
-  //
-  // Locate the HOB with the buffer to populate the entry point of this driver
-  //
-  Status = GetGuidedHobData (
-             HobStart,
-             &gEfiMmCpuDriverEpDescriptorGuid,
-             (VOID **)&CpuDriverEntryPointDesc
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "MmCpuDriverEpDesc HOB data extraction failed - 0x%x\n", Status));
-    return Status;
-  }
-
-  // Share the entry point of the CPU driver
-  DEBUG ((
-    DEBUG_INFO,
-    "Sharing Cpu Driver EP *0x%lx = 0x%lx\n",
-    (UINTN)CpuDriverEntryPointDesc->MmCpuDriverEpPtr,
-    (UINTN)PiMmStandaloneMmCpuDriverEntry
-    ));
-  *(CpuDriverEntryPointDesc->MmCpuDriverEpPtr) = PiMmStandaloneMmCpuDriverEntry;
-
-  // Find the descriptor that contains the whereabouts of the buffer for
-  // communication with the Normal world.
-  Status = GetGuidedHobData (
-             HobStart,
-             &gEfiStandaloneMmNonSecureBufferGuid,
-             (VOID **)&NsCommBufMmramRange
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "NsCommBufMmramRange HOB data extraction failed - 0x%x\n", Status));
-    return Status;
-  }
-
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalStart - 0x%lx\n", (UINTN)NsCommBufMmramRange->PhysicalStart));
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer.PhysicalSize - 0x%lx\n", (UINTN)NsCommBufMmramRange->PhysicalSize));
-
-  CopyMem (&mNsCommBuffer, NsCommBufMmramRange, sizeof (EFI_MMRAM_DESCRIPTOR));
-  DEBUG ((DEBUG_INFO, "mNsCommBuffer: 0x%016lx - 0x%lx\n", mNsCommBuffer.CpuStart, mNsCommBuffer.PhysicalSize));
-
-  Status = GetGuidedHobData (
-             HobStart,
-             &gEfiMmPeiMmramMemoryReserveGuid,
-             (VOID **)&MmramRangesHob
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "MmramRangesHob data extraction failed - 0x%x\n", Status));
-    return Status;
-  }
-
-  //
-  // As CreateHobListFromBootInfo(), the base and size of buffer shared with
-  // privileged Secure world software is in second one.
-  //
-  CopyMem (
-    &mSCommBuffer,
-    &MmramRangesHob->Descriptor[0] + 1,
-    sizeof (EFI_MMRAM_DESCRIPTOR)
-    );
-
-  //
-  // Extract the MP information from the Hoblist
-  //
-  Status = GetGuidedHobData (
-             HobStart,
-             &gMpInformationHobGuid,
-             (VOID **)&MpInformationHobData
-             );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "MpInformationHob extraction failed - 0x%x\n", Status));
-    return Status;
-  }
-
-  //
-  // Allocate memory for the MP information and copy over the MP information
-  // passed by Trusted Firmware. Use the number of processors passed in the HOB
-  // to copy the processor information
-  //
-  MpInfoSize = sizeof (MP_INFORMATION_HOB_DATA) +
-               (sizeof (EFI_PROCESSOR_INFORMATION) *
-                MpInformationHobData->NumberOfProcessors);
-  Status = mMmst->MmAllocatePool (
-                    EfiRuntimeServicesData,
-                    MpInfoSize,
-                    (VOID **)&mMpInformationHobData
-                    );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "mMpInformationHobData mem alloc failed - 0x%x\n", Status));
-    return Status;
-  }
-
-  CopyMem (mMpInformationHobData, MpInformationHobData, MpInfoSize);
-
-  // Print MP information
-  DEBUG ((
-    DEBUG_INFO,
-    "mMpInformationHobData: 0x%016lx - 0x%lx\n",
-    mMpInformationHobData->NumberOfProcessors,
-    mMpInformationHobData->NumberOfEnabledProcessors
-    ));
-  for (Index = 0; Index < mMpInformationHobData->NumberOfProcessors; Index++) {
-    DEBUG ((
-      DEBUG_INFO,
-      "mMpInformationHobData[0x%lx]: %d, %d, %d\n",
-      mMpInformationHobData->ProcessorInfoBuffer[Index].ProcessorId,
-      mMpInformationHobData->ProcessorInfoBuffer[Index].Location.Package,
-      mMpInformationHobData->ProcessorInfoBuffer[Index].Location.Core,
-      mMpInformationHobData->ProcessorInfoBuffer[Index].Location.Thread
-      ));
-  }
-
-  //
-  // Allocate memory for a table to hold pointers to a
-  // EFI_MM_COMMUNICATE_HEADER for each CPU
-  //
-  ArraySize = sizeof (EFI_MM_COMMUNICATE_HEADER *) *
-              mMpInformationHobData->NumberOfEnabledProcessors;
-  Status = mMmst->MmAllocatePool (
-                    EfiRuntimeServicesData,
-                    ArraySize,
-                    (VOID **)&PerCpuGuidedEventContext
-                    );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "PerCpuGuidedEventContext mem alloc failed - 0x%x\n", Status));
     return Status;
   }
 
