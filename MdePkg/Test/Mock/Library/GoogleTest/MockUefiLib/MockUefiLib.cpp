@@ -49,7 +49,6 @@ MOCK_FUNCTION_DEFINITION (MockUefiLib, EfiLibInstallDriverBindingComponentName2,
 MOCK_FUNCTION_DEFINITION (MockUefiLib, EfiLibUninstallDriverBindingComponentName2, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiLib, EfiLibInstallAllDriverProtocols2, 10, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiLib, EfiLibUninstallAllDriverProtocols2, 7, EFIAPI);
-MOCK_FUNCTION_DEFINITION (MockUefiLib, CatVSPrint, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiLib, EfiLocateProtocolBuffer, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiLib, EfiOpenFileByDevicePath, 4, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockUefiLib, EfiLocateNextAcpiTable, 2, EFIAPI);

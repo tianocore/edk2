@@ -339,14 +339,6 @@ struct MockUefiLib {
     );
 
   MOCK_FUNCTION_DECLARATION (
-    CHAR16 *,
-    CatVSPrint,
-    (IN       CHAR16   *String OPTIONAL,
-     IN CONST CHAR16   *FormatString,
-     IN       VA_LIST  Marker)
-    );
-
-  MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
     EfiLocateProtocolBuffer,
     (IN  EFI_GUID  *Protocol,
