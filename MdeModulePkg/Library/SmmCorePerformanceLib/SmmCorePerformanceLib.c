@@ -694,14 +694,20 @@ InsertFpdtRecord (
     case PERF_INMODULE_END_ID:
     case PERF_CROSSMODULE_START_ID:
     case PERF_CROSSMODULE_END_ID:
-      GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+      Status = GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Failed to get Module Info from Handle! Status = %r\n", Status));
+      }
+
+      StringPtr = NULL;
+
       if (String != NULL) {
         StringPtr = String;
-      } else {
+      } else if (ModuleName != NULL) {
         StringPtr = ModuleName;
       }
 
-      if (AsciiStrLen (StringPtr) == 0) {
+      if ((StringPtr == NULL) || (AsciiStrLen (StringPtr) == 0)) {
         StringPtr = "unknown name";
       }
 
@@ -719,14 +725,20 @@ InsertFpdtRecord (
 
     default:
       if (Attribute != PerfEntry) {
-        GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+        Status = GetModuleInfoFromHandle ((EFI_HANDLE)CallerIdentifier, ModuleName, sizeof (ModuleName), &ModuleGuid);
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "Failed to get Module Info from Handle! Status = %r\n", Status));
+        }
+
+        StringPtr = NULL;
+
         if (String != NULL) {
           StringPtr = String;
-        } else {
+        } else if (ModuleName != NULL) {
           StringPtr = ModuleName;
         }
 
-        if (AsciiStrLen (StringPtr) == 0) {
+        if ((StringPtr == NULL) || (AsciiStrLen (StringPtr) == 0)) {
           StringPtr = "unknown name";
         }
 

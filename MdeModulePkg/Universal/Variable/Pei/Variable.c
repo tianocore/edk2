@@ -1164,7 +1164,7 @@ PeiGetNextVariableName (
   VariableHeader = NULL;
 
   Status = FindVariable (VariableName, VariableGuid, &Variable, &StoreInfo);
-  if ((Variable.CurrPtr == NULL) || (Status != EFI_SUCCESS)) {
+  if ((Status != EFI_SUCCESS) || (Variable.CurrPtr == NULL)) {
     return Status;
   }
 

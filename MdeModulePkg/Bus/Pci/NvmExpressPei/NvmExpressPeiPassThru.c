@@ -27,12 +27,12 @@ NvmeCreatePrpList (
   IN     UINTN                             Pages
   )
 {
-  UINTN                 PrpEntryNo;
+  UINT64                PrpEntryNo;
   UINTN                 PrpListNo;
   UINT64                PrpListBase;
   VOID                  *PrpListHost;
   UINTN                 PrpListIndex;
-  UINTN                 PrpEntryIndex;
+  UINT64                PrpEntryIndex;
   UINT64                Remainder;
   EFI_PHYSICAL_ADDRESS  PrpListPhyAddr;
   UINTN                 Bytes;
