@@ -8,6 +8,7 @@
 **/
 
 #include "Shell.h"
+#include "ShellManParser.h"
 
 #define SHELL_MAN_HII_GUID \
 { \
@@ -624,7 +625,7 @@ ProcessManFile (
     Status = SearchPathForFile (TempString, &FileHandle);
     if (EFI_ERROR (Status)) {
       FileDevPath = FileDevicePath (NULL, TempString);
-      DevPath     = AppendDevicePath (ShellInfoObject.ImageDevPath, FileDevPath);
+      DevPath     = AppendDevicePath (ShellProtocolInteractivityInfoObject.ImageDevPath, FileDevPath);
       Status      = InternalOpenFileDevicePath (DevPath, &FileHandle, EFI_FILE_MODE_READ, 0);
       SHELL_FREE_NON_NULL (FileDevPath);
       SHELL_FREE_NON_NULL (DevPath);
@@ -638,7 +639,7 @@ ProcessManFile (
         Status = ManFileFindSections (FileHandle, Sections, HelpText, &HelpSize, Ascii);
       }
 
-      ShellInfoObject.NewEfiShellProtocol->CloseFile (FileHandle);
+      ShellProtocolsInfoObject.NewEfiShellProtocol->CloseFile (FileHandle);
       if (!EFI_ERROR (Status)) {
         //
         // Get help text from .MAN file success.
@@ -666,7 +667,7 @@ ProcessManFile (
       goto Done;
     }
 
-    DevPath = ShellInfoObject.NewEfiShellProtocol->GetDevicePathFromFilePath (CmdFilePathName);
+    DevPath = ShellProtocolsInfoObject.NewEfiShellProtocol->GetDevicePathFromFilePath (CmdFilePathName);
     Status  = gBS->LoadImage (FALSE, gImageHandle, DevPath, NULL, 0, &CmdFileImgHandle);
     if (EFI_ERROR (Status)) {
       //
