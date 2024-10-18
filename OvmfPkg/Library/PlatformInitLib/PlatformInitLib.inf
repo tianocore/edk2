@@ -48,6 +48,7 @@
   HobLib
   QemuFwCfgLib
   QemuFwCfgSimpleParserLib
+  MemEncryptSevLib
   MemoryAllocationLib
   MtrrLib
   PcdLib
