@@ -279,8 +279,8 @@ PrintCpuHob (
   Hob.Raw = (UINT8 *)HobStart;
   ASSERT (HobLength >= sizeof (*Hob.Cpu));
 
-  DEBUG ((DEBUG_INFO, "   SizeOfMemorySpace = 0x%lx\n", Hob.Cpu->SizeOfMemorySpace));
-  DEBUG ((DEBUG_INFO, "   SizeOfIoSpace     = 0x%lx\n", Hob.Cpu->SizeOfIoSpace));
+  DEBUG ((DEBUG_INFO, "   SizeOfMemorySpace = 0x%x\n", Hob.Cpu->SizeOfMemorySpace));
+  DEBUG ((DEBUG_INFO, "   SizeOfIoSpace     = 0x%x\n", Hob.Cpu->SizeOfIoSpace));
   return EFI_SUCCESS;
 }
 
