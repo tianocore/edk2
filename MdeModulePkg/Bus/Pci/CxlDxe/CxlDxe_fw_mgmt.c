@@ -1,6 +1,7 @@
 /** @file
   Firmware Management Protocol - supports Get Fw Info, Sending/Receiving FMP commands
   supports Set Fw Image, Activate Fw image
+  SetPkgInfo, GetPkgInfo, CheckImg
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -167,9 +168,70 @@ CxlFirmwareMgmtSetImage (
   return Status;
 }
 
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtCheckImage (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL    *This,
+  IN  UINT8                               ImageIndex,
+  IN  CONST VOID                          *Image,
+  IN  UINTN                               ImageSize,
+  OUT UINT32                              *ImageUpdatable
+  )
+{
+  return EFI_UNSUPPORTED;
+}
+
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtGetPackageInfo (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL    *This,
+  OUT UINT32                              *PackageVersion,
+  OUT CHAR16                              **PackageVersionName,
+  OUT UINT32                              *PackageVersionNameMaxLen,
+  OUT UINT64                              *AttributesSupported,
+  OUT UINT64                              *AttributesSetting
+  )
+{
+  DEBUG((EFI_D_INFO, "CxlFirmwareMgmtGetPackageInfo: Entering CxlFirmwareMgmtGetPackageInfo...\n"));
+  CXL_CONTROLLER_PRIVATE_DATA  *Private;
+  Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT(This);
+
+  if (Private->PackageVersionName != NULL) {
+    StrCpyS(*PackageVersionName, CXL_STRING_BUFFER_WIDTH, Private->PackageVersionName);
+  }
+
+  *PackageVersion = Private->PackageVersion;
+  *AttributesSupported = Private->slotInfo.FwImageDescriptor[0].AttributesSupported;
+  *AttributesSetting = Private->slotInfo.FwImageDescriptor[0].AttributesSetting;
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtSetPackageInfo (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL    *This,
+  IN  CONST VOID                          *Image,
+  IN  UINTN                               ImageSize,
+  IN  CONST VOID                          *VendorCode,
+  IN  UINT32                              PackageVersion,
+  IN  CONST CHAR16                        *PackageVersionName
+  )
+{
+  DEBUG((EFI_D_INFO, "CxlFirmwareMgmtSetPackageInfo: Entering CxlFirmwareMgmtSetPackageInfo...\n"));
+  CXL_CONTROLLER_PRIVATE_DATA *Private;
+  Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT(This);
+  StrCpyS(Private->PackageVersionName, CXL_STRING_BUFFER_WIDTH, PackageVersionName);
+  Private->PackageVersion = PackageVersion;
+  return EFI_SUCCESS;
+}
+
 GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_FIRMWARE_MANAGEMENT_PROTOCOL gCxlFirmwareManagement = {
   CxlFirmwareMgmtGetImageInfo,
   CxlFirmwareMgmtGetImage,
   CxlFirmwareMgmtSetImage,
+  CxlFirmwareMgmtCheckImage,
+  CxlFirmwareMgmtGetPackageInfo,
+  CxlFirmwareMgmtSetPackageInfo
 };

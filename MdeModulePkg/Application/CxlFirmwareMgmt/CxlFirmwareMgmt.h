@@ -39,6 +39,7 @@
 #define CXL_FW_IMAGE_DESCRIPTOR_COUNT                   5
 #define CXL_FW_MAX_SLOTS                                5
 #define CXL_STRING_BUFFER_WIDTH                         256
+#define CXL_PACKAGE_VERSION_NAME_APP                    L"CXL Firmware Package Name Application"
 #define CXL_FW_SIZE                                     32768 /* 32 mb */
 #define CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT(a)    CR (a, CXL_CONTROLLER_PRIVATE_DATA, FirmwareMgmt, CXL_CONTROLLER_PRIVATE_DATA_SIGNATURE)
 #define CXL_FW_REVISION_LENGTH_IN_BYTES                 16
@@ -48,7 +49,10 @@ typedef enum {
   OpTypeListDevice,
   OpTypeFmpGetImgInfo,
   OpTypeGetImage,
-  OpTypeFmpSetImg
+  OpTypeSetPkgInfo,
+  OpTypeFmpSetImg,
+  OpTypeFmpCheckImg,
+  OpTypeFmpGetPkgInfo,
 } CXL_FMP_OPERATION_TYPE;
 
 struct cxl_reg_map {

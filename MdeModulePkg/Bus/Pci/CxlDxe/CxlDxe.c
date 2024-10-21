@@ -5,6 +5,7 @@
   supports Get Fw Info
   Sending/Receiving FMP commands
   Set Fw Image, Activate Fw image
+  SetPkgInfo, GetPkgInfo, CheckImg
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 

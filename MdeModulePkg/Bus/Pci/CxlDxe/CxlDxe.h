@@ -46,6 +46,11 @@
 #define CXL_QEMU                                      1
 #define CXL_FW_REVISION_LENGTH_IN_BYTES               16
 
+typedef struct {
+  UINT16    VendorID;
+  UINT16    DeviceID;
+} CXL_VENDORID;
+
 typedef enum {
   PCIE_EXT_CAP_HEADER,
   PCIE_DVSEC_HEADER_1,
