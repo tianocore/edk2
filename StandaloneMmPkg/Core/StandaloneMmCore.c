@@ -83,9 +83,10 @@ MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
   { NULL,                     NULL,                              NULL, FALSE },
 };
 
-BOOLEAN         mMmEntryPointRegistered = FALSE;
-MM_COMM_BUFFER  *mMmCommunicationBuffer;
-VOID            *mInternalCommBufferCopy;
+BOOLEAN                     mMmEntryPointRegistered = FALSE;
+MM_COMM_BUFFER              *mMmCommunicationBuffer;
+VOID                        *mInternalCommBufferCopy;
+EFI_FIRMWARE_VOLUME_HEADER  *mBfv = NULL;
 
 /**
   Place holder function until all the MM System Table Service are available.
@@ -843,9 +844,19 @@ StandaloneMmMain (
     // Dispatch standalone BFV
     //
     if (BfvHob->BaseAddress != 0) {
-      DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", BfvHob->BaseAddress));
-      MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)BfvHob->BaseAddress, 0);
-      MmDispatcher ();
+      //
+      // Shadow standalone BFV into MMRAM
+      //
+      mBfv = AllocatePool (BfvHob->Length);
+      if (mBfv != NULL) {
+        CopyMem ((VOID *)mBfv, (VOID *)(UINTN)BfvHob->BaseAddress, BfvHob->Length);
+        DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", mBfv));
+        MmCoreFfsFindMmDriver (mBfv, 0);
+        MmDispatcher ();
+        if (!FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
+          FreePool (mBfv);
+        }
+      }
     }
   }
 
