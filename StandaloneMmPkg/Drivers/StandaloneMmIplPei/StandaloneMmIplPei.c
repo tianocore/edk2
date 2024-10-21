@@ -514,14 +514,6 @@ ExecuteMmCoreFromMmram (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Unblock the MM FV range to be accessible from inside MM
-  //
-  if ((MmFvBase != 0) && (MmFvSize != 0)) {
-    Status = MmUnblockMemoryRequest (MmFvBase, EFI_SIZE_TO_PAGES (MmFvSize));
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  //
   // Initialize ImageContext
   //
   ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
