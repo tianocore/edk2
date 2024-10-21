@@ -699,17 +699,22 @@ MigrateMemoryAllocationHobs (
   }
 }
 
-/** Returns the HOB list size.
+/**
+  This function is responsible for initializing a new HOB list in MMRAM based on
+  the input HOB list.
 
-  @param [in]  HobStart   Pointer to the start of the HOB list.
+  @param [in]  HobStart          Pointer to the start of the HOB list.
 
-  @retval Size of the HOB list.
+  @retval Pointer to the new location of hob list in MMRAM.
 **/
-UINTN
-GetHobListSize (
+VOID *
+InitializeMmHobList (
   IN VOID  *HobStart
   )
 {
+  VOID                  *MmHobStart;
+  UINTN                 HobSize;
+  EFI_STATUS            Status;
   EFI_PEI_HOB_POINTERS  Hob;
 
   ASSERT (HobStart != NULL);
@@ -722,7 +727,21 @@ GetHobListSize (
   //
   // Need plus END_OF_HOB_LIST
   //
-  return (UINTN)Hob.Raw - (UINTN)HobStart + sizeof (EFI_HOB_GENERIC_HEADER);
+  HobSize = (UINTN)Hob.Raw - (UINTN)HobStart + sizeof (EFI_HOB_GENERIC_HEADER);
+  DEBUG ((DEBUG_INFO, "HobSize - 0x%x\n", HobSize));
+
+  MmHobStart = AllocatePool (HobSize);
+  DEBUG ((DEBUG_INFO, "MmHobStart - 0x%x\n", MmHobStart));
+  ASSERT (MmHobStart != NULL);
+  CopyMem (MmHobStart, HobStart, HobSize);
+
+  DEBUG ((DEBUG_INFO, "MmInstallConfigurationTable For HobList\n"));
+  Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
+  ASSERT_EFI_ERROR (Status);
+
+  MigrateMemoryAllocationHobs (MmHobStart);
+
+  return MmHobStart;
 }
 
 /**
@@ -746,8 +765,6 @@ StandaloneMmMain (
 {
   EFI_STATUS                      Status;
   UINTN                           Index;
-  VOID                            *MmHobStart;
-  UINTN                           HobSize;
   VOID                            *Registration;
   EFI_HOB_GUID_TYPE               *MmramRangesHob;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
@@ -800,21 +817,11 @@ StandaloneMmMain (
   // It is done in the constructor of StandaloneMmCoreMemoryAllocationLib(),
   // so that the library linked with StandaloneMmCore can use AllocatePool() in
   // the constructor.
-
-  DEBUG ((DEBUG_INFO, "MmInstallConfigurationTable For HobList\n"));
+  //
   //
   // Install HobList
   //
-  HobSize = GetHobListSize (HobStart);
-  DEBUG ((DEBUG_INFO, "HobSize - 0x%x\n", HobSize));
-  MmHobStart = AllocatePool (HobSize);
-  DEBUG ((DEBUG_INFO, "MmHobStart - 0x%x\n", MmHobStart));
-  ASSERT (MmHobStart != NULL);
-  CopyMem (MmHobStart, HobStart, HobSize);
-  Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
-  ASSERT_EFI_ERROR (Status);
-  MigrateMemoryAllocationHobs (MmHobStart);
-  gHobList = MmHobStart;
+  gHobList = InitializeMmHobList (HobStart);
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
