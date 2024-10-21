@@ -700,28 +700,60 @@ MigrateMemoryAllocationHobs (
 }
 
 /**
-  This function is responsible for initializing a new HOB list in MMRAM based on
-  the input HOB list.
+  This function is responsible for validating the input HOB list and
+  initializing a new HOB list in MMRAM based on the input HOB list.
 
   @param [in]  HobStart          Pointer to the start of the HOB list.
+  @param [in]  MmramRanges       Pointer to the Mmram ranges.
+  @param [in]  MmramRangeCount   Count of Mmram ranges.
 
   @retval Pointer to the new location of hob list in MMRAM.
 **/
 VOID *
 InitializeMmHobList (
-  IN VOID  *HobStart
+  IN VOID                  *HobStart,
+  IN EFI_MMRAM_DESCRIPTOR  *MmramRanges,
+  IN UINTN                 MmramRangeCount
   )
 {
   VOID                  *MmHobStart;
   UINTN                 HobSize;
   EFI_STATUS            Status;
   EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 Index;
+  EFI_PHYSICAL_ADDRESS  MmramBase;
+  EFI_PHYSICAL_ADDRESS  MmramEnd;
+  EFI_PHYSICAL_ADDRESS  ResourceHobBase;
+  EFI_PHYSICAL_ADDRESS  ResourceHobEnd;
 
   ASSERT (HobStart != NULL);
 
   Hob.Raw = (UINT8 *)HobStart;
   while (!END_OF_HOB_LIST (Hob)) {
     Hob.Raw = GET_NEXT_HOB (Hob);
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      ResourceHobBase = Hob.ResourceDescriptor->PhysicalStart;
+      ResourceHobEnd  = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+
+      for (Index = 0; Index < MmramRangeCount; Index++) {
+        MmramBase = MmramRanges[Index].PhysicalStart;
+        MmramEnd  = MmramRanges[Index].PhysicalStart + MmramRanges[Index].PhysicalSize;
+
+        if ((MmramBase < ResourceHobEnd) && (MmramEnd > ResourceHobBase)) {
+          //
+          // The Resource HOB is to describe the accessible non-Mmram range.
+          // All Resource HOB should not overlapp with any Mmram range.
+          //
+          DEBUG ((
+            DEBUG_ERROR,
+            "The resource HOB range [0x%lx, 0x%lx] overlaps with MMRAM range\n",
+            ResourceHobBase,
+            ResourceHobEnd
+            ));
+          CpuDeadLoop ();
+        }
+      }
+    }
   }
 
   //
@@ -821,7 +853,7 @@ StandaloneMmMain (
   //
   // Install HobList
   //
-  gHobList = InitializeMmHobList (HobStart);
+  gHobList = InitializeMmHobList (HobStart, MmramRanges, MmramRangeCount);
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
