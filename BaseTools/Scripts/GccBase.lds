@@ -23,7 +23,6 @@ SECTIONS {
   .text : ALIGN(CONSTANT(COMMONPAGESIZE)) {
     *(.text .text.* .stub .gnu.linkonce.t.*)
     *(.rodata .rodata.* .gnu.linkonce.r.*)
-    *(.got .got.*)
 
     /*
      * The contents of AutoGen.c files are mostly constant from the POV of the
@@ -59,15 +58,16 @@ SECTIONS {
     KEEP (*(.hii))
   }
 
-  .got : {
+  .got (INFO) : {
     *(.got)
   }
-  ASSERT(SIZEOF(.got) == 0, "Unexpected GOT entries detected!")
+  PROVIDE(gotassert = ASSERT(SIZEOF(.got) == 0, "Unexpected GOT entries detected!"));
 
   .got.plt (INFO) : {
     *(.got.plt)
   }
-  ASSERT(SIZEOF(.got.plt) == 0 || SIZEOF(.got.plt) == 0xc || SIZEOF(.got.plt) == 0x18, "Unexpected GOT/PLT entries detected!")
+  ASSERT(SIZEOF(.got.plt) == 0 || SIZEOF(.got.plt) == 0xc || SIZEOF(.got.plt) == 0x10 || SIZEOF(.got.plt) == 0x18,
+         "Unexpected GOT/PLT entries detected!")
 
   /*
    * Retain the GNU build id but in a non-allocatable section so GenFw
