@@ -6,19 +6,39 @@
 #ifndef _EFI_CXLDXE_H_
 #define _EFI_CXLDXE_H_
 
+#include <string.h>
 #include <Protocol/PciIo.h>
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Cxl20.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 
-#define CXL_MEMORY_CLASS                                0x05
-#define CXL_MEMORY_SUB_CLASS                            0x02
-#define CXL_MEMORY_PROGIF                               0x10
-#define CXL_PCIE_EXTENDED_CAP_NEXT(n)                   ((n) >> (CXL_PCIE_EXTENDED_NEXT_CAP_OFFSET_SHIFT))
-#define CXL_IS_DVSEC(n)                                 (((n) & (0xFFFF)) == CXL_PCI_DVSEC_VENDOR_ID)
+#define CXL_MEMORY_CLASS                              0x05
+#define CXL_MEMORY_SUB_CLASS                          0x02
+#define CXL_MEMORY_PROGIF                             0x10
+#define CXL_PCIE_EXTENDED_CAP_NEXT(n)                 ((n) >> (CXL_PCIE_EXTENDED_NEXT_CAP_OFFSET_SHIFT))
+#define CXL_IS_DVSEC(n)                               (((n) & (0xFFFF)) == CXL_PCI_DVSEC_VENDOR_ID)
+#define CXL_CONTROLLER_PRIVATE_DATA_SIGNATURE         SIGNATURE_32 ('C','X','L','X')
+#define CXL_PCI_EXT_CAP_ID(header)                    (header & 0x0000ffff)
+#define CXL_PCI_EXT_CAP_NEXT(header)                  ((header >> 20) & 0xffc)
+#define CXL_DEV_CAP_ARRAY_OFFSET                      0x0
+#define CXL_DEV_CAP_ARRAY_CAP_ID                      0
+#define CXL_BIT(nr)                                   ((UINT32)1 << nr)
+#define CXL_DEV_MBOX_CTRL_DOORBELL                    CXL_BIT(0)
+#define CXL_SZ_1M                                     0x00100000
+#define CXL_BITS_PER_LONG                             32
+#define CXL_UL                                        (UINTN)
+#define CXL_GENMASK(h, l)                             (((~CXL_UL(0)) - (CXL_UL(1) << (l)) + 1) & (~CXL_UL(0) >> (CXL_BITS_PER_LONG - 1 - (h))))
+
+typedef struct {
+  UINT16    VendorID;
+  UINT16    DeviceID;
+} CXL_VENDORID;
 
 typedef enum {
   PCIE_EXT_CAP_HEADER,
@@ -27,6 +47,51 @@ typedef enum {
   PCIE_DVSEC_HEADER_MAX
 } CXL_PCIE_DVSEC_HEADER_ENUM;
 
+/* Register Block Identifier (RBI) */
+enum cxl_regloc_type {
+  CXL_REGLOC_RBI_EMPTY = 0,
+  CXL_REGLOC_RBI_COMPONENT,
+  CXL_REGLOC_RBI_VIRT,
+  CXL_REGLOC_RBI_MEMDEV,
+  CXL_REGLOC_RBI_PMU,
+  CXL_REGLOC_RBI_TYPES
+};
+
+struct cxl_reg_map {
+  BOOLEAN          valid;
+  UINT32           id;
+  unsigned long    offset;
+  unsigned long    size;
+};
+
+struct cxl_device_reg_map {
+  struct    cxl_reg_map status;
+  struct    cxl_reg_map mbox;
+};
+
+struct cxl_register_map {
+  UINT32                reg_type;
+  UINT32                bar;
+  unsigned long long    regoffset;
+  unsigned long         mBoxoffset;
+};
+
+struct cxl_mbox_cmd {
+  UINT16    opcode;
+  void      *payload_in;
+  void      *payload_out;
+  UINT64    size_in;
+  UINT64    size_out;
+  UINT64    min_out;
+  UINT32    poll_count;
+  UINT32    poll_interval_ms;
+  UINT16    return_code;
+};
+
+struct cxl_memdev_state {
+  UINT32    payload_size;
+};
+
 typedef struct cxl_ctrl_private_data {
   UINT32                      Signature;
   EFI_HANDLE                  ControllerHandle;
@@ -34,6 +99,11 @@ typedef struct cxl_ctrl_private_data {
   EFI_HANDLE                  DriverBindingHandle;
   EFI_PCI_IO_PROTOCOL         *PciIo;
   EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath;
+
+  //MailBox Register
+  struct cxl_register_map     map;
+  struct cxl_memdev_state     mds;
+  struct cxl_mbox_cmd         mbox_cmd;
 
   //BDF Value
   UINTN                       Seg;
@@ -135,6 +205,7 @@ CxlDriverBindingSupported (
   @retval EFI_OUT_OF_RESOURCES     The request could not be completed due to a lack of resources.
 
   @retval Others                   The driver failded to start the device.
+
 **/
 
 EFI_STATUS
@@ -172,6 +243,7 @@ CxlDriverBindingStart(
   @retval EFI_SUCCESS            The device was stopped.
 
   @retval EFI_DEVICE_ERROR       The device could not be stopped due to a device error.
+
 **/
 
 EFI_STATUS
@@ -182,5 +254,29 @@ CxlDriverBindingStop(
   IN  UINTN                       NumberOfChildren,
   IN  EFI_HANDLE                  *ChildHandleBuffer
   );
+
+UINT64 minimumOfTwo(UINT64 a, UINT64 b);
+
+size_t minimumOfTwoSizes(size_t a, size_t b);
+
+UINT64 minimumOfThree(UINT64 a, UINT64 b, UINT64 c);
+
+UINT64 field_get(UINT64 reg, UINT32 p1, UINT32 p2);
+
+EFI_STATUS pci_uefi_read_config_word(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, UINT32 *val);
+
+EFI_STATUS pci_uefi_mem_read_32(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, UINT32 *val);
+
+EFI_STATUS pci_uefi_mem_read_64(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, UINT64 *val);
+
+EFI_STATUS pci_uefi_mem_read_n(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, CHAR8 Buffer[], UINT32 Size);
+
+EFI_STATUS pci_uefi_mem_write_32(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, UINT32 *val);
+
+EFI_STATUS pci_uefi_mem_write_64(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, UINT64 *val);
+
+EFI_STATUS pci_uefi_mem_write_n(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, CHAR8 Buffer[], UINT32 Size);
+
+EFI_STATUS cxl_pci_mbox_send(CXL_CONTROLLER_PRIVATE_DATA *Private);
 
 #endif // _EFI_CXLDXE_H_
