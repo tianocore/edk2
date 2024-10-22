@@ -34,7 +34,22 @@ GoogleTest requires less overhead to register test suites and test cases compare
 There are also a number of tools that layer on top of GoogleTest that improve developer productivity.
 One example is the VS Code extension
 [C++ TestMate](https://marketplace.visualstudio.com/items?itemName=matepek.vscode-catch2-test-adapter)
-that may be used to implement, run, and debug unit tests implemented using GoogleTest.
+that may be used to implement, run, and debug unit tests implemented using GoogleTest. The following
+is an example of the C++ TestMate JSON configuration to find unit tests and configure the environment
+for unit test execution.
+
+```
+"testMate.cpp.test.advancedExecutables": [
+    {
+        "pattern": "Build/**/*Test*",
+        "cwd": "${absDirpath}",
+        "env": {
+            "GTEST_CATCH_EXCEPTIONS": "0",
+            "ASAN_OPTIONS": "detect_leaks=0",
+        }
+    }
+],
+```
 
 If a component can be tested with host-based unit tests, then GoogleTest is recommended. The MdePkg
 contains a port of the BaseSafeIntLib unit tests in the GoogleTest style so the differences between
@@ -69,6 +84,7 @@ reviewed. The paths to the SecureBootVariableLib unit tests are:
 | JUNIT XML Reports           |    YES    |    YES     |
 | Execute subset of tests     |    NO     |    YES     |
 | VS Code Extensions          |    NO     |    YES     |
+| Address Sanitizer           |   Cmocka  |    YES     |
 
 ## Framework Libraries
 
@@ -1007,11 +1023,13 @@ See this example in `UnitTestFrameworkPkgHostTest.dsc`...
 
 Also, based on the type of tests that are being created, the associated DSC include file from the
 UnitTestFrameworkPkg for Host or Target based tests should also be included at the top of the DSC
-file.
+file. This provides the default defines and library class mappings requires for unit testing.
 
 ```
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 ```
+
+ > **NOTE**: DSC files for host based unit tests must **not** include default mappings from packages such as `MdePkg/MdeLibs.dsc.inc`. This DSC files provides default defines and  library mappings for firmware builds that may not be compatible with host based unit test builds. Instead, the DSC file for host based unit tests must provide all the settings required for host based unit tests.
 
 Lastly, in the case that the test build has specific dependent libraries associated with it,
 they should be added in the \<LibraryClasses\> sub-section for the INF file in the
@@ -1373,6 +1391,15 @@ stuart_update -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022
 stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -t NOOPT -p MdePkg
 ```
 
+#### Disabling Address Sanitizer
+
+By default, the address sanitizer feature is enabled for all host based unit test builds.  It can be disabled for
+development/debug purposes by setting the DSC define `UNIT_TESTING_ADDRESS_SANITIZER_ENABLE` to `FALSE`.
+
+```
+stuart_ci_build -c ./.pytool/CISettings.py TOOL_CHAIN_TAG=VS2022 -t NOOPT -p MdePkg BLD_*_UNIT_TESTING_ADDRESS_SANITIZER_ENABLE=FALSE
+```
+
 ### Evaluating the Results
 
 In your immediate output, any build failures will be highlighted. You can see these below as "WARNING" and "ERROR" messages.
@@ -1461,6 +1488,26 @@ c:\_uefi\MdePkg\Test\UnitTest\Library\BaseSafeIntLib\TestBaseSafeIntLib.c:35: er
     </testcase>
     <testcase name="Test SafeInt8ToUintn" time="0.000" >
     </testcase>
+```
+
+### Manually Running Unit Test Executables
+
+The host based unit test executed using `stuart_ci_build` sets up the environment to run host based unit tests
+including environment variable settings. If host based unit test executable are run manually either from a
+shell or using VS Code extensions such as `C++ TestMate`, then the environment must be setup correctly.
+
+#### Windows Environment Variable Settings
+
+```
+set GTEST_CATCH_EXCEPTIONS=0
+set ASAN_OPTIONS=detect_leaks=0
+```
+
+#### Linux Environment Variable Settings
+
+```
+export GTEST_CATCH_EXCEPTIONS=0
+export ASAN_OPTIONS=detect_leaks=0
 ```
 
 ### XML Reporting Mode
