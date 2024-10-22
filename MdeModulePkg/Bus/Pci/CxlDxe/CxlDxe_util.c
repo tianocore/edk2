@@ -34,6 +34,30 @@ inline UINT64 minimumOfThree(UINT64 a, UINT64 b, UINT64 c)
   }
 }
 
+void getChunkCnt(int filesize, int maxPayloadSize, int *chunkCnt, int *chunkSize) {
+
+  /*******************************************************************************
+  *   FW Transfer should take less time, so we made chunk size maximum
+  *   else chunk size can be CXL_FW_TRANSFER_ALIGNMENT
+  ********************************************************************************/
+
+  int cnt = 0, size = 0;
+  if (maxPayloadSize % CXL_FW_TRANSFER_ALIGNMENT == 0) {
+      size = maxPayloadSize;
+  } else {
+      size = (maxPayloadSize - (maxPayloadSize % CXL_FW_TRANSFER_ALIGNMENT));
+  }
+
+  cnt = (filesize / size);
+  if (filesize % size) {
+    //Add 1 to cnt for remaining chunk
+    cnt = cnt + 1;
+  }
+
+  *chunkCnt = cnt;
+  *chunkSize = size;
+}
+
 UINT64 field_get(UINT64 reg, UINT32 p1, UINT32 p2)
 {
   UINT32 X = p1 - p2 + 1;        //Num of bits

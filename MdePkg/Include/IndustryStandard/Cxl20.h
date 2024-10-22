@@ -103,7 +103,7 @@
 #define CXL_MEM_DEVICE_MEDIA_STATUS_DISABLED   0x3
 
 //
-// PCIe DVSEC for CXL Device
+// Register Locator DVSEC
 // Compute Express Link Specification Revision 2.0 - Chapter 8.1.9
 //
 #define CXL_PCIE_EXTENDED_CAP_OFFSET             0x100
@@ -117,6 +117,24 @@
 #define CXL_PCI_DVSEC_VENDOR_ID                  0x1E98
 
 //
+// Transfer FW
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.2
+//
+#define CXL_FW_TRANSFER_ALIGNMENT        128
+#define CXL_FW_TRANSFER_ACTION_FULL      0x0
+#define CXL_FW_TRANSFER_ACTION_INITIATE  0x1
+#define CXL_FW_TRANSFER_ACTION_CONTINUE  0x2
+#define CXL_FW_TRANSFER_ACTION_END       0x3
+#define CXL_FW_TRANSFER_ACTION_ABORT     0x4
+
+//
+// Activate FW
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.3
+//
+#define CXL_FW_ACTIVATE_METHOD_ONLINE              0x0
+#define CXL_FW_ACTIVATE_METHOD_ON_NEXT_COLD_RESET  0x1
+
+//
 // Get FW Info
 // Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.1
 //
@@ -124,8 +142,8 @@
 #define CXL_FW_IMAGE_DESCRIPTOR_COUNT  5
 
 //
-//Mailbox Registers
-//Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4
+// Mailbox Registers
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4
 //
 #define CXL_DEV_MBOX_CAPS_OFFSET           0x00
 #define CXL_DEV_MBOX_CTRL_OFFSET           0x04
@@ -136,8 +154,8 @@
 #define CXL_MAILBOX_TIMEOUT_MS             2000
 
 //
-//Command Return Codes
-//Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4.5.1
+// Command Return Codes
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4.5.1
 //
 #define CXL_MBOX_CMD_RC_SUCCESS                        0
 #define CXL_MBOX_CMD_RC_BACKGROUND                     1
@@ -535,6 +553,24 @@ struct cxl_mbox_get_fw_info {
   char     slot_2_revision[16];
   char     slot_3_revision[16];
   char     slot_4_revision[16];
+};
+#pragma pack()
+
+#pragma pack(1)
+struct cxl_mbox_transfer_fw {
+  UINT8     action;
+  UINT8     slot;
+  UINT8     reserved[2];
+  UINT32    offset;
+  UINT8     reserved2[0x78];
+  UINT8     data[];
+};
+#pragma pack()
+
+#pragma pack(1)
+struct cxl_mbox_activate_fw {
+  UINT8    action;
+  UINT8    slot;
 };
 #pragma pack()
 

@@ -4,6 +4,7 @@
   uefi driver name is added
   supports Get Fw Info
   Sending/Receiving FMP commands
+  Set Fw Image, Activate Fw image
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -236,6 +237,175 @@ EFI_STATUS cxl_mem_get_fw_info(CXL_CONTROLLER_PRIVATE_DATA  *Private)
   DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: FW Version slot 4 = %a\n", Private->mds.fw.fwRevisionslot4));
 
   Status = EFI_SUCCESS;
+  return Status;
+}
+
+EFI_STATUS cxl_mem_activate_fw(CXL_CONTROLLER_PRIVATE_DATA *Private)
+{
+  EFI_STATUS  Status;
+  DEBUG((EFI_D_INFO, "cxl_mem_activate_fw: UEFI Driver Activate FW (Opcode 0202h) get called!\n"));
+  struct cxl_mbox_activate_fw activate;
+
+  int slot = Private->mds.fw.next_slot;
+  if (slot == 0 || slot > Private->mds.fw.num_slots) {
+    DEBUG((EFI_D_ERROR, "[cxl_mem_activate_fw] Error, slot = %d, num of slots = %d \n", slot, Private->mds.fw.num_slots));
+    Status = EFI_INVALID_PARAMETER;
+    return Status;
+  }
+
+  /* Only offline activation supported for now */
+  activate.action = CXL_FW_ACTIVATE_METHOD_ON_NEXT_COLD_RESET;
+  activate.slot = slot;
+
+  Private->mbox_cmd = (struct cxl_mbox_cmd){
+    .opcode = CXL_MBOX_OP_ACTIVATE_FW,
+    .size_in = sizeof(activate),
+    .payload_in = &activate,
+  };
+
+  Status = cxl_internal_send_cmd(Private);
+  if (Status != EFI_SUCCESS) {
+    DEBUG((EFI_D_ERROR, "cxl_mem_activate_fw: Error cxl_internal_send_cmd\n"));
+    return Status;
+  }
+
+  Status = EFI_SUCCESS;
+  return Status;
+}
+
+EFI_STATUS cxl_mem_transfer_fw(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 nextslot, const UINT8 *data,
+    UINT32 offset, UINT32 size, UINT32 *written)
+{
+  DEBUG((EFI_D_INFO, "cxl_mem_transfer_fw: UEFI Driver Transfer FW (Opcode 0201h) get called!\n"));
+  struct cxl_mbox_transfer_fw *transfer;
+  UINT32 cur_size = 0, remaining = 0;
+  size_t size_in = 0;
+  EFI_STATUS Status;
+  int chunkCnt = 0;
+  int chunkSize = 0;
+  BOOLEAN isLastChunk = FALSE;
+  *written = 0;
+
+  /* Offset has to be aligned to 128B */
+  if (!IS_ALIGNED(offset, CXL_FW_TRANSFER_ALIGNMENT)) {
+    DEBUG((EFI_D_ERROR, "[cxl_mem_transfer_fw] Error, misaligned offset for FW transfer slice (%u) \n", offset));
+    Status = EFI_LOAD_ERROR;
+    return Status;
+  }
+
+  Private->mds.fw.oneshot = ((sizeof(*transfer) + size) < (Private->mds.payload_size));
+  /*
+   * Pick transfer size based on mds.payload_size @size must bw 128-byte
+   * aligned, ->payload_size is a power of 2 starting at 256 bytes, and
+   * sizeof(*transfer) is 128.  These constraints imply that @cur_size
+   * will always be 128b aligned.
+   * sizeof(size_t) = 8
+   */
+
+  cur_size = minimumOfTwoSizes(size, Private->mds.payload_size - sizeof(*transfer));
+  remaining = size;
+  size_in = (sizeof(*transfer) + (sizeof(UINT8) * cur_size));
+
+  Private->mds.fw.next_slot = nextslot;
+
+  transfer = (struct cxl_mbox_transfer_fw*)AllocatePool(size_in);
+  if (!transfer) {
+    DEBUG((EFI_D_ERROR, "cxl_mem_transfer_fw: Error in AllocatePool\n"));
+    Status = EFI_LOAD_ERROR;
+    return Status;
+  }
+
+  if (Private->mds.fw.oneshot) {
+    transfer->offset = (offset / CXL_FW_TRANSFER_ALIGNMENT);
+    CopyMem(transfer->data, data + offset, cur_size);
+
+    transfer->action = CXL_FW_TRANSFER_ACTION_FULL;
+    transfer->slot = Private->mds.fw.next_slot;
+
+    ZeroMem(&Private->mbox_cmd, sizeof(struct cxl_mbox_cmd));
+    Private->mbox_cmd = (struct cxl_mbox_cmd){
+      .opcode = CXL_MBOX_OP_TRANSFER_FW,
+      .size_in = size_in,
+      .payload_in = transfer,
+      .poll_interval_ms = 1000,
+      .poll_count = 30,
+    };
+
+    Status = cxl_internal_send_cmd(Private);
+    if (Status != EFI_SUCCESS) {
+      DEBUG((EFI_D_ERROR, "cxl_mem_transfer_fw: Error returned from func cxl_internal_send_cmd()\n"));
+      goto OUT_FREE;
+    }
+  } else {
+      getChunkCnt(size, cur_size, &chunkCnt, &chunkSize);
+      for (int i = 0; i < chunkCnt; i++)
+      {
+        if (offset == 0) {
+          transfer->action = CXL_FW_TRANSFER_ACTION_INITIATE;
+        } else if (remaining < chunkSize) {
+          isLastChunk = TRUE;
+          transfer->action = CXL_FW_TRANSFER_ACTION_END;
+        } else {
+          transfer->action = CXL_FW_TRANSFER_ACTION_CONTINUE;
+        }
+
+        transfer->slot = Private->mds.fw.next_slot;
+
+        //This is done as offset is multiplied by CXL_FW_TRANSFER_ALIGNMENT in Qemu or hw
+        transfer->offset = (offset / CXL_FW_TRANSFER_ALIGNMENT);
+        CopyMem(transfer->data, data + offset, cur_size);
+
+        ZeroMem(&Private->mbox_cmd, sizeof(struct cxl_mbox_cmd));
+        Private->mbox_cmd = (struct cxl_mbox_cmd){
+          .opcode = CXL_MBOX_OP_TRANSFER_FW,
+          .size_in = size_in,
+          .payload_in = transfer,
+          .poll_interval_ms = 1000,
+          .poll_count = 30,
+        };
+
+        Status = cxl_internal_send_cmd(Private);
+        if (Status != EFI_SUCCESS) {
+          DEBUG((EFI_D_ERROR, "cxl_mem_transfer_fw: Error returned from func cxl_internal_send_cmd()\n"));
+          goto OUT_FREE;
+        }
+
+        if (isLastChunk == TRUE) {
+          offset = 0;
+          remaining = 0;
+          break;
+        }
+
+        offset = offset + chunkSize;
+        remaining = remaining - chunkSize;
+        if (CXL_QEMU) {
+          gBS->Stall(1000000);
+        }
+      }
+    }
+
+  DEBUG((EFI_D_INFO, "[cxl_mem_transfer_fw] Transfer Fw completed on slot = %d\n", Private->mds.fw.next_slot));
+  *written = cur_size;
+
+  /* Activate FW if oneshot or if the last slice was written */
+  if (Private->mds.fw.oneshot || remaining == 0) {
+    DEBUG((EFI_D_INFO, "[cxl_mem_transfer_fw] Activating firmware on slot: %d\n", Private->mds.fw.next_slot));
+    if (CXL_QEMU) {
+      gBS->Stall(10000000);
+    }
+
+    Status = cxl_mem_activate_fw(Private);
+    if (Status != EFI_SUCCESS) {
+      goto OUT_FREE;
+    }
+  }
+  Status = EFI_SUCCESS;
+
+OUT_FREE:
+
+  if (transfer) {
+    FreePool(transfer);
+  }
   return Status;
 }
 

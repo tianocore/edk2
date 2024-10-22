@@ -85,6 +85,8 @@ struct cxl_register_map {
 enum cxl_opcode {
   CXL_MBOX_OP_INVALID     = 0x0000,
   CXL_MBOX_OP_GET_FW_INFO = 0x0200,
+  CXL_MBOX_OP_TRANSFER_FW = 0x0201,
+  CXL_MBOX_OP_ACTIVATE_FW = 0x0202,
   CXL_MBOX_OP_MAX         = 0x10000
 };
 
@@ -325,6 +327,8 @@ size_t minimumOfTwoSizes(size_t a, size_t b);
 
 UINT64 minimumOfThree(UINT64 a, UINT64 b, UINT64 c);
 
+void getChunkCnt(int filesize, int maxPayloadSize, int *chunkCnt, int *chunkSize);
+
 UINT64 field_get(UINT64 reg, UINT32 p1, UINT32 p2);
 
 void InitializeFwImageDescriptor(CXL_CONTROLLER_PRIVATE_DATA *Private);
@@ -344,6 +348,10 @@ EFI_STATUS pci_uefi_mem_write_64(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 st
 EFI_STATUS pci_uefi_mem_write_n(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, CHAR8 Buffer[], UINT32 Size);
 
 EFI_STATUS cxl_mem_get_fw_info(CXL_CONTROLLER_PRIVATE_DATA *Private);
+
+EFI_STATUS cxl_mem_transfer_fw(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 nextslot, const UINT8 *data, UINT32 offset, UINT32 size, UINT32 *written);
+
+EFI_STATUS cxl_mem_activate_fw(CXL_CONTROLLER_PRIVATE_DATA *Private);
 
 EFI_STATUS cxl_pci_mbox_send(CXL_CONTROLLER_PRIVATE_DATA *Private);
 #endif // _EFI_CXLDXE_H_

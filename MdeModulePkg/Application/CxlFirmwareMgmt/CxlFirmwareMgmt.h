@@ -6,6 +6,7 @@
 #ifndef _CXL_FIRMWARE_MGMT_H_
 #define _CXL_FIRMWARE_MGMT_H_
 
+#include <string.h>
 #include <stdbool.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/FirmwareManagement.h>
@@ -45,6 +46,9 @@
 typedef enum {
   OpTypeDisplayHelp,
   OpTypeListDevice,
+  OpTypeFmpGetImgInfo,
+  OpTypeGetImage,
+  OpTypeFmpSetImg
 } CXL_FMP_OPERATION_TYPE;
 
 struct cxl_reg_map {

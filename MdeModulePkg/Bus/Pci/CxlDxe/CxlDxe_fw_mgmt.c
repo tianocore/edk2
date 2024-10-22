@@ -1,5 +1,6 @@
 /** @file
   Firmware Management Protocol - supports Get Fw Info, Sending/Receiving FMP commands
+  supports Set Fw Image, Activate Fw image
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -88,7 +89,87 @@ CxlFirmwareMgmtGetImageInfo (
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtGetImage (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *This,
+  IN  UINT8                             ImageIndex,
+  IN  OUT  VOID                         *Image,
+  IN  OUT  UINTN                        *ImageSize
+  )
+{
+  EFI_STATUS  Status = EFI_SUCCESS;
+  CXL_CONTROLLER_PRIVATE_DATA *Private = NULL;
+
+  Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT(This);
+  if (ImageIndex > Private->slotInfo.num_slots || Private->slotInfo.isSetImageDone[ImageIndex] != TRUE)
+  {
+    DEBUG((EFI_D_ERROR, "[%a]: ImageIndex = %d, num_slots = %d, isSetImageDone = %d \n", __func__, ImageIndex, Private->slotInfo.num_slots, Private->slotInfo.isSetImageDone[ImageIndex]));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (Private->slotInfo.imageFileSize[ImageIndex] > *ImageSize) {
+    *ImageSize = Private->slotInfo.imageFileSize[ImageIndex];
+    return EFI_BUFFER_TOO_SMALL;
+  }
+
+  if (Image != NULL) {
+    CopyMem(Image, Private->slotInfo.imageFileBuffer[ImageIndex], sizeof(*ImageSize));
+  } else {
+      *ImageSize = Private->slotInfo.imageFileSize[ImageIndex];
+      return EFI_BUFFER_TOO_SMALL;
+  }
+  return Status;
+}
+
+EFI_STATUS
+EFIAPI
+CxlFirmwareMgmtSetImage (
+  IN  EFI_FIRMWARE_MANAGEMENT_PROTOCOL                 *This,
+  IN  UINT8                                            ImageIndex,
+  IN  CONST VOID                                       *Image,
+  IN  UINTN                                            ImageSize,
+  IN  CONST VOID                                       *VendorCode,
+  IN  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS    Progress,
+  OUT CHAR16                                           **AbortReason
+  )
+{
+  EFI_STATUS Status;
+  CXL_CONTROLLER_PRIVATE_DATA *Private = NULL;
+  UINT32 written;
+
+  Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT(This);
+  if (ImageIndex > Private->slotInfo.num_slots) {
+    DEBUG((EFI_D_ERROR, "CxlFirmwareMgmtSetImage: ImageIndex = %d is greater then Total slots = %d \n", ImageIndex, Private->slotInfo.num_slots));
+    Status = EFI_INVALID_PARAMETER;
+    return Status;
+  }
+
+  Status = cxl_mem_transfer_fw(Private, ImageIndex, Image, 0, ImageSize, &written);
+
+  if (Status != EFI_SUCCESS) {
+    DEBUG((EFI_D_ERROR, "CxlFirmwareMgmtSetImage: UEFI Driver Transfer FW (Opcode 0201h) Failed!\n"));
+    return Status;
+  }
+
+  Private->slotInfo.imageFileBuffer[ImageIndex] = AllocateZeroPool(ImageSize);
+  if (Private->slotInfo.imageFileBuffer[ImageIndex] == NULL) {
+    DEBUG((EFI_D_ERROR, "CxlFirmwareMgmtSetImage: AllocateZeroPool failed!\n"));
+    Status = EFI_OUT_OF_RESOURCES;
+    return Status;
+  }
+
+  Private->slotInfo.imageFileSize[ImageIndex] = ImageSize;
+  CopyMem(Private->slotInfo.imageFileBuffer[ImageIndex], Image, sizeof(ImageSize));
+  Private->slotInfo.isSetImageDone[ImageIndex] = TRUE;
+
+  DEBUG((EFI_D_INFO, "[CxlFirmwareMgmtSetImage] SetImage returns...%r\n", Status));
+  return Status;
+}
+
 GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_FIRMWARE_MANAGEMENT_PROTOCOL gCxlFirmwareManagement = {
-  CxlFirmwareMgmtGetImageInfo
+  CxlFirmwareMgmtGetImageInfo,
+  CxlFirmwareMgmtGetImage,
+  CxlFirmwareMgmtSetImage,
 };
