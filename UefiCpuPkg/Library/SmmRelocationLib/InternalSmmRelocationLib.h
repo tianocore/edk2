@@ -29,6 +29,7 @@
 #include <Guid/SmramMemoryReserve.h>
 #include <Guid/SmmBaseHob.h>
 #include <Register/Intel/Cpuid.h>
+#include <Register/Intel/Msr.h>
 #include <Register/Intel/SmramSaveStateMap.h>
 #include <Protocol/MmCpu.h>
 
@@ -50,11 +51,6 @@ X86_ASSEMBLY_PATCH_LABEL  gPatchSmmInitStack;
 #define BACK_BUF_SIZE  0x20
 
 #define CR4_CET_ENABLE  BIT23
-
-//
-// EFER register LMA bit
-//
-#define LMA  BIT10
 
 /**
   This function configures the SmBase on the currently executing CPU.

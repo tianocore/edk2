@@ -102,7 +102,8 @@ HookReturnFromSmm (
   IN     UINT64                NewInstructionPointer
   )
 {
-  UINT64  OriginalInstructionPointer;
+  UINT64                  OriginalInstructionPointer;
+  MSR_IA32_EFER_REGISTER  Msr;
 
   if (GetMmSaveStateRegisterLma () == EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT) {
     OriginalInstructionPointer = (UINT64)CpuState->x86._EIP;
@@ -117,7 +118,8 @@ HookReturnFromSmm (
     }
   } else {
     OriginalInstructionPointer = CpuState->x64._RIP;
-    if ((CpuState->x64.IA32_EFER & LMA) == 0) {
+    Msr.Uint64                 = CpuState->x64.IA32_EFER;
+    if (!Msr.Bits.LMA) {
       CpuState->x64._RIP = (UINT32)NewInstructionPointer32;
     } else {
       CpuState->x64._RIP = (UINT32)NewInstructionPointer;
