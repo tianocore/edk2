@@ -1,6 +1,7 @@
 /** @file
   CxlDxe driver is used to discover CXL devices
   supports Mailbox functionality
+  uefi driver name is added
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -891,6 +892,53 @@ EXIT:
   return Status;
 }
 
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  CxlDxeComponentName = {
+  CxlDxeComponentNameGetDriverName,
+  CxlDxeComponentNameGetControllerName,
+  "eng"
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  CxlDxeComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)CxlDxeComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)CxlDxeComponentNameGetControllerName,
+  "en"
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  CxlDxeDriverNameTable[] = {
+  { "eng;en", L"UEFI CXL Driver" },
+  { NULL,     NULL  }
+};
+
+EFI_STATUS
+EFIAPI
+CxlDxeComponentNameGetDriverName(
+  IN EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN CHAR8  *Language,
+  OUT CHAR16  **DriverName
+  )
+{
+  return LookupUnicodeString2(
+    Language,
+    This->SupportedLanguages,
+    CxlDxeDriverNameTable,
+    DriverName,
+    (BOOLEAN)(This == &CxlDxeComponentName)
+    );
+}
+
+EFI_STATUS
+EFIAPI
+CxlDxeComponentNameGetControllerName(
+  IN EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_HANDLE                   ChildHandle        OPTIONAL,
+  IN CHAR8                        *Language,
+  OUT CHAR16                      **ControllerName
+  )
+{
+  return EFI_SUCCESS;
+}
+
 EFI_STATUS
 EFIAPI
 CxlDxeEntryPoint (
@@ -906,8 +954,8 @@ CxlDxeEntryPoint (
              SystemTable,
              &gCxlDriverBinding,
              ImageHandle,
-             NULL,
-             NULL,
+             &CxlDxeComponentName,
+             &CxlDxeComponentName2,
              NULL,
              NULL,
              NULL,

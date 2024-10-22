@@ -112,6 +112,24 @@ typedef struct cxl_ctrl_private_data {
   UINTN                       Func;
 } CXL_CONTROLLER_PRIVATE_DATA;
 
+EFI_STATUS
+EFIAPI
+CxlDxeComponentNameGetDriverName(
+  IN EFI_COMPONENT_NAME_PROTOCOL    *This,
+  IN CHAR8                          *Language,
+  OUT CHAR16                        **DriverName
+  );
+
+EFI_STATUS
+EFIAPI
+CxlDxeComponentNameGetControllerName(
+  IN EFI_COMPONENT_NAME_PROTOCOL    *This,
+  IN EFI_HANDLE                     ControllerHandle,
+  IN EFI_HANDLE                     ChildHandle        OPTIONAL,
+  IN CHAR8                          *Language,
+  OUT CHAR16                        **ControllerName
+  );
+
 /**
   Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
