@@ -111,7 +111,7 @@ GetFunctionalDescriptor (
 
   for (Offset = 0; NextDescriptor (Config, &Offset);) {
     Interface = (EFI_USB_INTERFACE_DESCRIPTOR *)((UINT8 *)Config + Offset);
-    if (Interface->DescriptorType == CS_INTERFACE) {
+    if (Interface->DescriptorType == USB_DESC_TYPE_CS_INTERFACE) {
       if (((USB_HEADER_FUN_DESCRIPTOR *)Interface)->DescriptorSubtype == FunDescriptorType) {
         switch (FunDescriptorType) {
           case HEADER_FUN_DESCRIPTOR:
