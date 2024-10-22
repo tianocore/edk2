@@ -131,6 +131,59 @@ CompareFingerprints (
   return (CompareMem (FingerprintA, FingerprintB, UNIT_TEST_FINGERPRINT_SIZE) == 0);
 }
 
+STATIC
+VOID
+FreeUnitTestTestEntry (
+  IN UNIT_TEST_LIST_ENTRY  *TestEntry
+  )
+{
+  if (TestEntry) {
+    if (TestEntry->UT.Description) {
+      FreePool (TestEntry->UT.Description);
+    }
+
+    if (TestEntry->UT.Name) {
+      FreePool (TestEntry->UT.Name);
+    }
+
+    FreePool (TestEntry);
+  }
+}
+
+STATIC
+EFI_STATUS
+FreeUnitTestSuiteEntry (
+  IN UNIT_TEST_SUITE_LIST_ENTRY  *SuiteEntry
+  )
+{
+  UNIT_TEST_LIST_ENTRY  *TestCase;
+  UNIT_TEST_LIST_ENTRY  *NextTestCase;
+  LIST_ENTRY            *TestCaseList;
+
+  if (SuiteEntry) {
+    TestCaseList = &(SuiteEntry->UTS.TestCaseList);
+    TestCase     = (UNIT_TEST_LIST_ENTRY *)GetFirstNode (TestCaseList);
+    while (&TestCase->Entry != TestCaseList) {
+      NextTestCase = (UNIT_TEST_LIST_ENTRY *)GetNextNode (TestCaseList, &TestCase->Entry);
+      RemoveEntryList (&TestCase->Entry);
+      FreeUnitTestTestEntry (TestCase);
+      TestCase = NextTestCase;
+    }
+
+    if (SuiteEntry->UTS.Title) {
+      FreePool (SuiteEntry->UTS.Title);
+    }
+
+    if (SuiteEntry->UTS.Name) {
+      FreePool (SuiteEntry->UTS.Name);
+    }
+
+    FreePool (SuiteEntry);
+  }
+
+  return EFI_SUCCESS;
+}
+
 /**
   Cleanup a test framework.
 
@@ -151,27 +204,35 @@ FreeUnitTestFramework (
   IN UNIT_TEST_FRAMEWORK_HANDLE  FrameworkHandle
   )
 {
-  // TODO: Finish this function.
-  return EFI_SUCCESS;
-}
+  UNIT_TEST_FRAMEWORK         *Framework;
+  UNIT_TEST_SUITE_LIST_ENTRY  *Suite;
+  UNIT_TEST_SUITE_LIST_ENTRY  *NextSuite;
 
-STATIC
-EFI_STATUS
-FreeUnitTestSuiteEntry (
-  IN UNIT_TEST_SUITE_LIST_ENTRY  *SuiteEntry
-  )
-{
-  // TODO: Finish this function.
-  return EFI_SUCCESS;
-}
+  Framework = (UNIT_TEST_FRAMEWORK *)FrameworkHandle;
+  if (Framework) {
+    Suite = (UNIT_TEST_SUITE_LIST_ENTRY *)GetFirstNode (&Framework->TestSuiteList);
+    while ((LIST_ENTRY *)Suite != &Framework->TestSuiteList) {
+      NextSuite = (UNIT_TEST_SUITE_LIST_ENTRY *)GetNextNode (&Framework->TestSuiteList, (LIST_ENTRY *)Suite);
+      RemoveEntryList ((LIST_ENTRY *)Suite);
+      FreeUnitTestSuiteEntry (Suite);
+      Suite = NextSuite;
+    }
 
-STATIC
-EFI_STATUS
-FreeUnitTestTestEntry (
-  IN UNIT_TEST_LIST_ENTRY  *TestEntry
-  )
-{
-  // TODO: Finish this function.
+    if (Framework->Title) {
+      FreePool (Framework->Title);
+    }
+
+    if (Framework->ShortTitle) {
+      FreePool (Framework->ShortTitle);
+    }
+
+    if (Framework->VersionString) {
+      FreePool (Framework->VersionString);
+    }
+
+    FreePool (Framework);
+  }
+
   return EFI_SUCCESS;
 }
 
