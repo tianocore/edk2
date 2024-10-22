@@ -937,7 +937,7 @@ DEFINE GCC_LOONGARCH64_RC_FLAGS    = -I binary -O elf64-loongarch     -B loongar
 DEFINE GCC_DEPS_FLAGS              = -MMD -MF $@.deps
 
 DEFINE GCC48_ALL_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -ffunction-sections -fdata-sections -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
-DEFINE GCC48_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x20
+DEFINE GCC48_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,--gc-sections -z common-page-size=0x20
 DEFINE GCC48_IA32_CC_FLAGS           = DEF(GCC48_ALL_CC_FLAGS) DEF(GCC_IA32_X64_CC_FLAGS) -m32 -march=i586 -malign-double -D EFI32 -fno-asynchronous-unwind-tables -Wno-address -fno-omit-frame-pointer
 DEFINE GCC48_X64_CC_FLAGS            = DEF(GCC48_ALL_CC_FLAGS) DEF(GCC_IA32_X64_CC_FLAGS) -m64 "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables -Wno-address  -fno-omit-frame-pointer
 DEFINE GCC48_IA32_X64_ASLDLINK_FLAGS = DEF(GCC48_IA32_X64_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
@@ -962,7 +962,7 @@ DEFINE GCC48_ASLCC_FLAGS             = DEF(GCC_ASLCC_FLAGS)
 
 DEFINE GCC49_IA32_CC_FLAGS           = DEF(GCC48_IA32_CC_FLAGS) -fno-pic -fno-pie
 DEFINE GCC49_X64_CC_FLAGS            = DEF(GCC48_X64_CC_FLAGS)
-DEFINE GCC49_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x40
+DEFINE GCC49_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,--gc-sections -z common-page-size=0x40
 DEFINE GCC49_IA32_X64_ASLDLINK_FLAGS = DEF(GCC49_IA32_X64_DLINK_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0 DEF(GCC_DLINK2_FLAGS_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE GCC49_IA32_X64_DLINK_FLAGS    = DEF(GCC49_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive
 DEFINE GCC49_IA32_DLINK2_FLAGS       = DEF(GCC48_IA32_DLINK2_FLAGS)
@@ -1068,7 +1068,7 @@ DEFINE GCC5_LOONGARCH64_PP_FLAGS           = -mabi=lp64d -march=loongarch64 DEF(
 *_GCC48_IA32_ASLCC_FLAGS          = DEF(GCC48_ASLCC_FLAGS) -m32
 *_GCC48_IA32_ASLDLINK_FLAGS       = DEF(GCC48_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_i386
 *_GCC48_IA32_ASM_FLAGS            = DEF(GCC48_ASM_FLAGS) -m32 -march=i386
-*_GCC48_IA32_DLINK_FLAGS          = DEF(GCC48_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
+*_GCC48_IA32_DLINK_FLAGS          = DEF(GCC48_IA32_X64_DLINK_FLAGS) -Wl,-q,-m,elf_i386,--oformat=elf32-i386
 *_GCC48_IA32_DLINK2_FLAGS         = DEF(GCC48_IA32_DLINK2_FLAGS)
 *_GCC48_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
 *_GCC48_IA32_OBJCOPY_FLAGS        =
@@ -1205,7 +1205,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
 *_GCC49_IA32_ASLCC_FLAGS          = DEF(GCC49_ASLCC_FLAGS) -m32
 *_GCC49_IA32_ASLDLINK_FLAGS       = DEF(GCC49_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_i386
 *_GCC49_IA32_ASM_FLAGS            = DEF(GCC49_ASM_FLAGS) -m32 -march=i386
-*_GCC49_IA32_DLINK_FLAGS          = DEF(GCC49_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
+*_GCC49_IA32_DLINK_FLAGS          = DEF(GCC49_IA32_X64_DLINK_FLAGS) -Wl,-q,-m,elf_i386,--oformat=elf32-i386
 *_GCC49_IA32_DLINK2_FLAGS         = DEF(GCC49_IA32_DLINK2_FLAGS)
 *_GCC49_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
 *_GCC49_IA32_OBJCOPY_FLAGS        =
@@ -1349,7 +1349,7 @@ RELEASE_GCC49_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCCNOLTO_IA32_ASLCC_FLAGS          = DEF(GCC49_ASLCC_FLAGS) -m32
 *_GCCNOLTO_IA32_ASLDLINK_FLAGS       = DEF(GCC49_IA32_X64_ASLDLINK_FLAGS) -Wl,-m,elf_i386
 *_GCCNOLTO_IA32_ASM_FLAGS            = DEF(GCC49_ASM_FLAGS) -m32 -march=i386
-*_GCCNOLTO_IA32_DLINK_FLAGS          = DEF(GCC49_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
+*_GCCNOLTO_IA32_DLINK_FLAGS          = DEF(GCC49_IA32_X64_DLINK_FLAGS) -Wl,-q,-m,elf_i386,--oformat=elf32-i386
 *_GCCNOLTO_IA32_DLINK2_FLAGS         = DEF(GCC49_IA32_DLINK2_FLAGS)
 *_GCCNOLTO_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
 *_GCCNOLTO_IA32_OBJCOPY_FLAGS        =
@@ -1499,13 +1499,13 @@ RELEASE_GCCNOLTO_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_GCC5_IA32_NASM_FLAGS           = -f elf32
 
   DEBUG_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto
-  DEBUG_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
+  DEBUG_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-q,-m,elf_i386,--oformat=elf32-i386
 
 RELEASE_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-RELEASE_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
+RELEASE_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-q,-m,elf_i386,--oformat=elf32-i386
 
   NOOPT_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -O0
-  NOOPT_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386 -O0
+  NOOPT_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -Wl,-q,-m,elf_i386,--oformat=elf32-i386 -O0
 
 ##################
 # GCC5 X64 definitions
@@ -1716,13 +1716,13 @@ RELEASE_GCC5_LOONGARCH64_CC_FLAGS       = DEF(GCC5_LOONGARCH64_CC_FLAGS) -Wno-un
 *_GCC_IA32_NASM_FLAGS           = -f elf32
 
   DEBUG_GCC_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto
-  DEBUG_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
+  DEBUG_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-q,-m,elf_i386,--oformat=elf32-i386
 
 RELEASE_GCC_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto -Wno-unused-but-set-variable -Wno-unused-const-variable
-RELEASE_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
+RELEASE_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-q,-m,elf_i386,--oformat=elf32-i386
 
   NOOPT_GCC_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -O0
-  NOOPT_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386 -O0
+  NOOPT_GCC_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -Wl,-q,-m,elf_i386,--oformat=elf32-i386 -O0
 
 ##################
 # GCC X64 definitions
@@ -2007,11 +2007,11 @@ DEFINE CLANGDWARF_X64_PREFIX        = ENV(CLANG_BIN)
 
 # LLVM/CLANG doesn't support -n link option. So, it can't share the same IA32_X64_DLINK_COMMON flag.
 # LLVM/CLANG doesn't support common page size. So, it can't share the same GccBase.lds script.
-DEFINE CLANGDWARF_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-q,--gc-sections -z max-page-size=0x40
+DEFINE CLANGDWARF_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,--gc-sections -z max-page-size=0x40
 DEFINE CLANGDWARF_DLINK2_FLAGS_COMMON     = -Wl,--script=$(EDK_TOOLS_PATH)/Scripts/ClangBase.lds
 DEFINE CLANGDWARF_IA32_X64_ASLDLINK_FLAGS = DEF(CLANGDWARF_IA32_X64_DLINK_COMMON) -Wl,--defsym=PECOFF_HEADER_SIZE=0 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE CLANGDWARF_IA32_X64_DLINK_FLAGS    = DEF(CLANGDWARF_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive -Wl,-z,notext
-DEFINE CLANGDWARF_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
+DEFINE CLANGDWARF_IA32_DLINK2_FLAGS       = -Wl,-q,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
 DEFINE CLANGDWARF_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x228 DEF(CLANGDWARF_DLINK2_FLAGS_COMMON)
 
 DEFINE CLANGDWARF_IA32_TARGET             = -target i686-pc-linux-gnu
