@@ -831,6 +831,7 @@ ScanSections64 (
 
   CoffEntry = 0;
   mCoffOffset = 0;
+  mCoffSectionsOffset[0] = 0;
 
   //
   // Coff file start with a DOS header.
@@ -1901,15 +1902,32 @@ WriteRelocations64 (
   )
 {
   UINT32                           Index;
+  BOOLEAN                          UseDynRelaSection;
   EFI_IMAGE_OPTIONAL_HEADER_UNION  *NtHdr;
   EFI_IMAGE_DATA_DIRECTORY         *Dir;
   UINT32 RiscVRelType;
+
+  //
+  // Don't use the dynamic RELA section (sh_info == 0) unless it is the only
+  // RELA section available. Otherwise, use the static RELA sections that are
+  // emitted for each allocatable section (sh_info != 0)
+  //
+  UseDynRelaSection = TRUE;
+  for (Index = 0; Index < mEhdr->e_shnum; Index++) {
+    Elf_Shdr *RelShdr = GetShdrByIndex(Index);
+    if ((RelShdr->sh_type == SHT_REL) || (RelShdr->sh_type == SHT_RELA)) {
+      if (RelShdr->sh_info != 0) {
+        UseDynRelaSection = FALSE;
+      }
+      break;
+    }
+  }
 
   for (Index = 0; Index < mEhdr->e_shnum; Index++) {
     Elf_Shdr *RelShdr = GetShdrByIndex(Index);
     if ((RelShdr->sh_type == SHT_REL) || (RelShdr->sh_type == SHT_RELA)) {
       Elf_Shdr *SecShdr = GetShdrByIndex (RelShdr->sh_info);
-      if (IsTextShdr(SecShdr) || IsDataShdr(SecShdr)) {
+      if (UseDynRelaSection || IsTextShdr(SecShdr) || IsDataShdr(SecShdr)) {
         UINT64 RelIdx;
 
         for (RelIdx = 0; RelIdx < RelShdr->sh_size; RelIdx += RelShdr->sh_entsize) {
@@ -1925,6 +1943,7 @@ WriteRelocations64 (
             case R_X86_64_REX_GOTPCRELX:
               break;
             case R_X86_64_64:
+            case R_X86_64_RELATIVE:
               VerboseMsg ("EFI_IMAGE_REL_BASED_DIR64 Offset: 0x%08llX",
                 mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr));
               CoffAddFixup(
