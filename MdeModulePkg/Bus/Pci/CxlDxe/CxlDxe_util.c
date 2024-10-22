@@ -43,17 +43,38 @@ UINT64 field_get(UINT64 reg, UINT32 p1, UINT32 p2)
   return lastXbits;
 }
 
-void strCpy(CHAR16 *st1, char *st2)
+void
+InitializeFwImageDescriptor(CXL_CONTROLLER_PRIVATE_DATA *Private)
 {
-  if (st2[0] == '\0') {
-    return;
-  }
+  for (int i = 0; i < Private->slotInfo.num_slots; i++) {
+    Private->slotInfo.FwImageDescriptor[i].ImageIndex = i;    /* This should always be between 1 and CXL_FW_IMAGE_DESCRIPTOR_COUNT */
+    Private->slotInfo.FwImageDescriptor[i].ImageId = CXL_FW_IMAGE_ID;
+    Private->slotInfo.FwImageDescriptor[i].ImageIdName = CXL_FIRMWARE_IMAGE_ID_NAME;
+    Private->slotInfo.FwImageDescriptor[i].Version = CXL_FW_VERSION;
 
-  int i = 0;
-  for (i = 0; st2[i] != '\0'; i++) {
-    st1[i] = st2[i];
+    if (Private->slotInfo.firmware_version[i][0] != '\0') {
+      Private->slotInfo.FwImageDescriptor[i].VersionName = AllocateZeroPool(CXL_FW_REVISION_LENGTH_IN_BYTES);
+      if (Private->slotInfo.FwImageDescriptor[i].VersionName == NULL) {
+        DEBUG((EFI_D_ERROR, "InitializeFwImageDescriptor: AllocateZeroPool failed!\n"));
+        return;
+      }
+
+      StrnCpyS (
+        Private->slotInfo.FwImageDescriptor[i].VersionName,
+        CXL_FW_REVISION_LENGTH_IN_BYTES + 1,
+        Private->slotInfo.firmware_version[i],
+        StrLen(Private->slotInfo.firmware_version[i])
+      );
+    }
+
+    Private->slotInfo.FwImageDescriptor[i].Size = Private->slotInfo.imageFileSize[i];
+    Private->slotInfo.FwImageDescriptor[i].AttributesSupported = 1;
+    Private->slotInfo.FwImageDescriptor[i].AttributesSetting = IMAGE_ATTRIBUTE_IMAGE_UPDATABLE | IMAGE_ATTRIBUTE_RESET_REQUIRED;
+    Private->slotInfo.FwImageDescriptor[i].Compatibilities = IMAGE_COMPATIBILITY_CHECK_SUPPORTED;
+    Private->slotInfo.FwImageDescriptor[i].LowestSupportedImageVersion = 0;
+    Private->slotInfo.FwImageDescriptor[i].LastAttemptVersion = 0;
+    Private->slotInfo.FwImageDescriptor[i].LastAttemptStatus = EFI_SUCCESS;
   }
-  st1[i] = '\0';
 }
 
 EFI_STATUS pci_uefi_read_config_word(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, UINT32 *val) {

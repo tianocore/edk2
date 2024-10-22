@@ -2,6 +2,7 @@
   CxlDxe driver is used to discover CXL devices
   supports Mailbox functionality
   uefi driver name is added
+  supports Get Fw Info
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -157,6 +158,81 @@ EFI_STATUS cxl_internal_send_cmd(CXL_CONTROLLER_PRIVATE_DATA *Private)
     Status = EFI_LOAD_ERROR;
     return Status;
   }
+
+  Status = EFI_SUCCESS;
+  return Status;
+}
+
+EFI_STATUS cxl_mem_get_fw_info(CXL_CONTROLLER_PRIVATE_DATA  *Private)
+{
+  DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: UEFI Driver Get FW Info (Opcode 0200h) get called!\n"));
+  struct cxl_mbox_get_fw_info info;
+  EFI_STATUS  Status;
+
+  Private->mbox_cmd = (struct cxl_mbox_cmd) {
+    .opcode = CXL_MBOX_OP_GET_FW_INFO,
+    .size_out = sizeof(info),
+    .payload_out = &info,
+  };
+
+  Status = cxl_internal_send_cmd(Private);
+  if (Status != EFI_SUCCESS){
+    DEBUG((EFI_D_ERROR, "cxl_mem_get_fw_info: Error cxl_internal_send_cmd\n"));
+    return Status;
+  }
+
+  for (int i = 0; i < CXL_FW_MAX_SLOTS - 1; i++) {
+    Private->slotInfo.firmware_version[i] = AllocateZeroPool(CXL_FW_REVISION_LENGTH_IN_BYTES + 1);
+    if (Private->slotInfo.firmware_version[i] == NULL) {
+      DEBUG((EFI_D_ERROR, "[%a]: Resource, memory cannot be allocated\n", __func__));
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  Private->mds.fw.fwRevisionslot1 = AllocateZeroPool(CXL_FW_REVISION_LENGTH_IN_BYTES + 1);
+  Private->mds.fw.fwRevisionslot2 = AllocateZeroPool(CXL_FW_REVISION_LENGTH_IN_BYTES + 1);
+  Private->mds.fw.fwRevisionslot3 = AllocateZeroPool(CXL_FW_REVISION_LENGTH_IN_BYTES + 1);
+  Private->mds.fw.fwRevisionslot4 = AllocateZeroPool(CXL_FW_REVISION_LENGTH_IN_BYTES + 1);
+  if (Private->mds.fw.fwRevisionslot1 == NULL
+      || Private->mds.fw.fwRevisionslot2 == NULL
+      || Private->mds.fw.fwRevisionslot3 == NULL
+      || Private->mds.fw.fwRevisionslot4 == NULL) {
+      DEBUG((EFI_D_ERROR, "[%a]: Resource, memory cannot be allocated\n", __func__));
+      return EFI_INVALID_PARAMETER;
+  }
+
+  //FW Slots Supported
+  Private->mds.fw.num_slots = info.num_slots;
+  Private->slotInfo.num_slots = info.num_slots;
+
+  //FW Slot Info
+  Private->mds.fw.cur_slot = field_get(info.slot_info, 2, 0);
+  Private->mds.fw.next_slot = field_get(info.slot_info, 5, 3);
+
+  //FW Activation Capabilities
+  Private->mds.fw.fwActivationCap = field_get(info.slot_info, 0, 0);
+
+  //Slot 1-4 FW Revision
+  CopyMem(Private->mds.fw.fwRevisionslot1, info.slot_1_revision, sizeof(info.slot_1_revision));
+  CopyMem(Private->mds.fw.fwRevisionslot2, info.slot_2_revision, sizeof(info.slot_2_revision));
+  CopyMem(Private->mds.fw.fwRevisionslot3, info.slot_3_revision, sizeof(info.slot_3_revision));
+  CopyMem(Private->mds.fw.fwRevisionslot4, info.slot_4_revision, sizeof(info.slot_4_revision));
+
+  //Slot 1-4 FW Revision
+  CopyMem(Private->slotInfo.firmware_version[0], info.slot_1_revision, sizeof(info.slot_1_revision));
+  CopyMem(Private->slotInfo.firmware_version[1], info.slot_2_revision, sizeof(info.slot_2_revision));
+  CopyMem(Private->slotInfo.firmware_version[2], info.slot_3_revision, sizeof(info.slot_3_revision));
+  CopyMem(Private->slotInfo.firmware_version[3], info.slot_4_revision, sizeof(info.slot_4_revision));
+
+  DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: Total Slots = %u\n", Private->mds.fw.num_slots));
+  DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: Current Slots = %u\n", Private->mds.fw.cur_slot));
+  DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: Next Slots = %u\n", Private->mds.fw.next_slot));
+  DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: Activation Cap = %u\n", Private->mds.fw.fwActivationCap));
+
+  DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: FW Version slot 1 = %a\n", Private->mds.fw.fwRevisionslot1));
+  DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: FW Version slot 2 = %a\n", Private->mds.fw.fwRevisionslot2));
+  DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: FW Version slot 3 = %a\n", Private->mds.fw.fwRevisionslot3));
+  DEBUG((EFI_D_INFO, "cxl_mem_get_fw_info: FW Version slot 4 = %a\n", Private->mds.fw.fwRevisionslot4));
 
   Status = EFI_SUCCESS;
   return Status;
@@ -653,6 +729,18 @@ CxlMailBoxSetup(CXL_CONTROLLER_PRIVATE_DATA *Private)
     FreePool(Private);
     return Status;
   }
+
+  //Get FW Info
+  Status = cxl_mem_get_fw_info(Private);
+  if (Status != EFI_SUCCESS) {
+    DEBUG((EFI_D_ERROR, "[CxlMailBoxSetup]: Error cxl_mem_get_fw_info()\n"));
+    FreePool(Private);
+    return Status;
+  }
+
+  InitializeFwImageDescriptor(Private);
+
+  CopyMem(&Private->FirmwareMgmt, &gCxlFirmwareManagement, sizeof(EFI_FIRMWARE_MANAGEMENT_PROTOCOL));
   return Status;
 }
 
@@ -778,6 +866,45 @@ CxlDriverBindingStop(
   IN  EFI_HANDLE                   *ChildHandleBuffer
   )
 {
+  DEBUG((EFI_D_INFO, "CxlBindStop\n"));
+  EFI_STATUS                        Status = EFI_SUCCESS;
+  CXL_CONTROLLER_PRIVATE_DATA       *Private;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *FMP;
+
+  Status = gBS->OpenProtocol(
+             Controller,
+             &gEfiFirmwareManagementProtocolGuid,
+             (VOID**)&FMP,
+             This->DriverBindingHandle,
+             Controller,
+             EFI_OPEN_PROTOCOL_GET_PROTOCOL
+             );
+
+  if (!EFI_ERROR(Status)) {
+    Private = CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT(FMP);
+    gBS->UninstallMultipleProtocolInterfaces(
+      Controller,
+      &gEfiFirmwareManagementProtocolGuid,
+      FMP,
+      NULL,
+      NULL,
+      &gEfiFirmwareManagementProtocolGuid,
+      &Private->FirmwareMgmt,
+      NULL
+      );
+
+    for (int i = 0; i < CXL_FW_MAX_SLOTS - 1; i++) {
+      FreePool(Private->slotInfo.firmware_version[i]);
+    }
+
+    FreePool(Private->mds.fw.fwRevisionslot1);
+    FreePool(Private->mds.fw.fwRevisionslot2);
+    FreePool(Private->mds.fw.fwRevisionslot3);
+    FreePool(Private->mds.fw.fwRevisionslot4);
+
+    FreePool(Private);
+  }
+
   gBS->CloseProtocol (
          Controller,
          &gEfiPciIoProtocolGuid,
@@ -846,12 +973,21 @@ CxlDriverBindingStart(
       goto EXIT;
     }
 
+    Private->PackageVersionName = AllocateZeroPool(CXL_STRING_BUFFER_WIDTH);
+    if (Private->PackageVersionName == NULL) {
+        DEBUG((EFI_D_ERROR, "[%a]: Allocating for CXL PackageVersionName Data failed!\n", __func__));
+        Status = EFI_OUT_OF_RESOURCES;
+        goto EXIT;
+    }
+
     Private->Signature              = CXL_CONTROLLER_PRIVATE_DATA_SIGNATURE;
     Private->ControllerHandle       = Controller;
     Private->ImageHandle            = This->DriverBindingHandle;
     Private->DriverBindingHandle    = This->DriverBindingHandle;
     Private->PciIo                  = PciIo;
     Private->ParentDevicePath       = ParentDevicePath;
+    StrCpyS(Private->PackageVersionName, CXL_STRING_BUFFER_WIDTH, CXL_PACKAGE_VERSION_NAME);
+    Private->PackageVersion         = CXL_PACKAGE_VERSION_FFFFFFFE;
 
     DEBUG((EFI_D_ERROR, "[%a]: [CXL-%08X] Allocation Completed status = %r\n", __func__, Controller, Status));
 
@@ -869,7 +1005,22 @@ CxlDriverBindingStart(
       DEBUG((EFI_D_ERROR, "[%a]: Error in setting up MailBox\n", __func__));
       return Status;
     }
-    }
+
+    Status = gBS->InstallMultipleProtocolInterfaces(
+      &Private->ControllerHandle,
+      &gEfiFirmwareManagementProtocolGuid,
+      &Private->FirmwareMgmt,
+      NULL
+    );
+
+    if (EFI_ERROR(Status)) {
+      DEBUG((EFI_D_ERROR, "[CxlDriverBindingStart]: [CXL-%08X] Protocol Install failed status = %r\n", Controller, Status));
+      FreePool(Private);
+      goto EXIT;
+    } else {
+        DEBUG((EFI_D_INFO, "[CxlDriverBindingStart]: [CXL-%08X] Protocol Install completed status = %r\n", Controller, Status));
+      }
+  }
   return EFI_SUCCESS;
 
 EXIT:

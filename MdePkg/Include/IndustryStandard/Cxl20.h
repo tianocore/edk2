@@ -117,6 +117,13 @@
 #define CXL_PCI_DVSEC_VENDOR_ID                  0x1E98
 
 //
+// Get FW Info
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.1
+//
+#define CXL_FW_MAX_SLOTS               5
+#define CXL_FW_IMAGE_DESCRIPTOR_COUNT  5
+
+//
 //Mailbox Registers
 //Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4
 //
@@ -512,6 +519,23 @@ typedef union {
   UINT64    Uint64;
 } CXL_MEMORY_DEVICE_STATUS_REGISTER;
 
+#pragma pack()
+
+//
+// Firmware Update
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2
+//
+#pragma pack(1)
+struct cxl_mbox_get_fw_info {
+  UINT8    num_slots;
+  UINT8    slot_info;
+  UINT8    activation_cap;
+  UINT8    reserved[13];
+  char     slot_1_revision[16];
+  char     slot_2_revision[16];
+  char     slot_3_revision[16];
+  char     slot_4_revision[16];
+};
 #pragma pack()
 
 #endif

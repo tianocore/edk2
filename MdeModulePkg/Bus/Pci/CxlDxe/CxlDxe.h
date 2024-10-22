@@ -8,6 +8,7 @@
 
 #include <string.h>
 #include <Protocol/PciIo.h>
+#include <Protocol/FirmwareManagement.h>
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Cxl20.h>
 #include <Library/BaseLib.h>
@@ -31,14 +32,19 @@
 #define CXL_BIT(nr)                                   ((UINT32)1 << nr)
 #define CXL_DEV_MBOX_CTRL_DOORBELL                    CXL_BIT(0)
 #define CXL_SZ_1M                                     0x00100000
+#define CXL_STRING_BUFFER_WIDTH                       256
+#define CXL_FW_IMAGE_ID                               1
+#define CXL_FW_VERSION                                1
+#define CXL_PACKAGE_VERSION_FFFFFFFE                  0xFFFFFFFE
+#define CXL_FIRMWARE_IMAGE_ID_NAME                    L"CXL Firmware Version 1.0"
+#define CXL_PACKAGE_VERSION_NAME                      L"CXL Firmware Package Version Name UEFI Driver"
+#define CXL_FW_SIZE                                   32768    /* 32 mb */
 #define CXL_BITS_PER_LONG                             32
 #define CXL_UL                                        (UINTN)
 #define CXL_GENMASK(h, l)                             (((~CXL_UL(0)) - (CXL_UL(1) << (l)) + 1) & (~CXL_UL(0) >> (CXL_BITS_PER_LONG - 1 - (h))))
-
-typedef struct {
-  UINT16    VendorID;
-  UINT16    DeviceID;
-} CXL_VENDORID;
+#define CXL_CONTROLLER_PRIVATE_FROM_FIRMWARE_MGMT(a)  CR (a, CXL_CONTROLLER_PRIVATE_DATA, FirmwareMgmt, CXL_CONTROLLER_PRIVATE_DATA_SIGNATURE)
+#define CXL_QEMU                                      1
+#define CXL_FW_REVISION_LENGTH_IN_BYTES               16
 
 typedef enum {
   PCIE_EXT_CAP_HEADER,
@@ -76,6 +82,12 @@ struct cxl_register_map {
   unsigned long         mBoxoffset;
 };
 
+enum cxl_opcode {
+  CXL_MBOX_OP_INVALID     = 0x0000,
+  CXL_MBOX_OP_GET_FW_INFO = 0x0200,
+  CXL_MBOX_OP_MAX         = 0x10000
+};
+
 struct cxl_mbox_cmd {
   UINT16    opcode;
   void      *payload_in;
@@ -88,8 +100,31 @@ struct cxl_mbox_cmd {
   UINT16    return_code;
 };
 
+struct cxl_slot_info {
+  UINT8      num_slots;
+  UINTN      imageFileSize[CXL_FW_MAX_SLOTS];
+  CHAR16     *imageFileBuffer[CXL_FW_MAX_SLOTS];
+  BOOLEAN    isSetImageDone[CXL_FW_MAX_SLOTS];
+  CHAR16     *firmware_version[CXL_FW_MAX_SLOTS];
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR    FwImageDescriptor[CXL_FW_IMAGE_DESCRIPTOR_COUNT];
+};
+
+struct cxl_fw_state {
+  UINT32     state;
+  BOOLEAN    oneshot;
+  UINT32     num_slots;
+  UINT32     cur_slot;
+  UINT32     next_slot;
+  UINT8      fwActivationCap;
+  CHAR16     *fwRevisionslot1;
+  CHAR16     *fwRevisionslot2;
+  CHAR16     *fwRevisionslot3;
+  CHAR16     *fwRevisionslot4;
+};
+
 struct cxl_memdev_state {
   UINT32    payload_size;
+  struct    cxl_fw_state fw;
 };
 
 typedef struct cxl_ctrl_private_data {
@@ -105,12 +140,23 @@ typedef struct cxl_ctrl_private_data {
   struct cxl_memdev_state     mds;
   struct cxl_mbox_cmd         mbox_cmd;
 
+  //Image Info
+  struct cxl_slot_info        slotInfo;
+
   //BDF Value
   UINTN                       Seg;
   UINTN                       Bus;
   UINTN                       Dev;
   UINTN                       Func;
+
+  UINT32                      PackageVersion;
+  CHAR16                      *PackageVersionName;
+
+  // Produced protocols
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL    FirmwareMgmt;
 } CXL_CONTROLLER_PRIVATE_DATA;
+
+extern EFI_FIRMWARE_MANAGEMENT_PROTOCOL    gCxlFirmwareManagement;
 
 EFI_STATUS
 EFIAPI
@@ -281,6 +327,8 @@ UINT64 minimumOfThree(UINT64 a, UINT64 b, UINT64 c);
 
 UINT64 field_get(UINT64 reg, UINT32 p1, UINT32 p2);
 
+void InitializeFwImageDescriptor(CXL_CONTROLLER_PRIVATE_DATA *Private);
+
 EFI_STATUS pci_uefi_read_config_word(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, UINT32 *val);
 
 EFI_STATUS pci_uefi_mem_read_32(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, UINT32 *val);
@@ -295,6 +343,7 @@ EFI_STATUS pci_uefi_mem_write_64(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 st
 
 EFI_STATUS pci_uefi_mem_write_n(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 start, CHAR8 Buffer[], UINT32 Size);
 
-EFI_STATUS cxl_pci_mbox_send(CXL_CONTROLLER_PRIVATE_DATA *Private);
+EFI_STATUS cxl_mem_get_fw_info(CXL_CONTROLLER_PRIVATE_DATA *Private);
 
+EFI_STATUS cxl_pci_mbox_send(CXL_CONTROLLER_PRIVATE_DATA *Private);
 #endif // _EFI_CXLDXE_H_

@@ -16,6 +16,7 @@
 [Sources.common]
   CxlDxe.c
   CxlDxe.h
+  CxlDxe_fw_mgmt.c
   CxlDxe_util.c
 
 [Packages]
