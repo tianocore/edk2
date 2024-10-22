@@ -8,6 +8,9 @@
 
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgCommon.dsc.inc
 
+[Defines]
+  UNIT_TESTING_ADDRESS_SANITIZER_ENABLE = TRUE
+
 [LibraryClasses.common.HOST_APPLICATION]
   BaseLib|MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
   UnitTestHostBaseLib|MdePkg/Library/BaseLib/UnitTestHostBaseLib.inf
@@ -26,10 +29,18 @@
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNullHostApplication.inf
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS = /MT
+  MSFT:*_*_*_CC_FLAGS = /MTd
   GCC:*_*_*_CC_FLAGS = -fno-pie
+!if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
+  #
+  # Enable Address Sanitizer for VS2019, VS2022, and GCC
+  #
+  MSFT:*_VS2019_*_CC_FLAGS = /fsanitize=address
+  MSFT:*_VS2022_*_CC_FLAGS = /fsanitize=address
+  GCC:*_*_*_CC_FLAGS = -fsanitize=address
+!endif
 !ifdef $(UNIT_TESTING_DEBUG)
-  MSFT:*_*_*_CC_FLAGS  = /MTd -D UNIT_TESTING_DEBUG=1
+  MSFT:*_*_*_CC_FLAGS  = -D UNIT_TESTING_DEBUG=1
   GCC:*_*_*_CC_FLAGS   = -D UNIT_TESTING_DEBUG=1
   XCODE:*_*_*_CC_FLAGS = -D UNIT_TESTING_DEBUG=1
 !endif
@@ -56,6 +67,15 @@
   MSFT:*_VS2017_X64_DLINK_FLAGS     = /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
   MSFT:*_VS2019_X64_DLINK_FLAGS     = /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
   MSFT:*_VS2022_X64_DLINK_FLAGS     = /LIBPATH:"%VCToolsInstallDir%lib\x64" /LIBPATH:"%UniversalCRTSdkDir%lib\%UCRTVersion%\ucrt\x64" /LIBPATH:"%WindowsSdkDir%lib\%WindowsSDKLibVersion%\um\x64"
+!if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
+  #
+  # Enable Address Sanitizer for VS2019 and VS2022 for HOST_APPLICATION
+  #
+  MSFT:*_VS2019_IA32_DLINK_FLAGS    = /INFERASANLIBS:NO /WHOLEARCHIVE:clang_rt.asan_cxx_dbg-i386.lib /WHOLEARCHIVE:clang_rt.asan_dbg-i386.lib
+  MSFT:*_VS2022_IA32_DLINK_FLAGS    = /INFERASANLIBS:NO /WHOLEARCHIVE:clang_rt.asan_cxx_dbg-i386.lib /WHOLEARCHIVE:clang_rt.asan_dbg-i386.lib
+  MSFT:*_VS2019_X64_DLINK_FLAGS     = /INFERASANLIBS:NO /WHOLEARCHIVE:clang_rt.asan_cxx_dbg-x86_64.lib /WHOLEARCHIVE:clang_rt.asan_dbg-x86_64.lib
+  MSFT:*_VS2022_X64_DLINK_FLAGS     = /INFERASANLIBS:NO /WHOLEARCHIVE:clang_rt.asan_cxx_dbg-x86_64.lib /WHOLEARCHIVE:clang_rt.asan_dbg-x86_64.lib
+!endif
 
   #
   # GCC
@@ -68,6 +88,12 @@
   #
   GCC:*_*_*_DLINK_FLAGS    = -Wl,--whole-archive
   GCC:*_*_*_DLINK2_FLAGS   == -Wl,--no-whole-archive -lgcov -lpthread -lstdc++ -lm
+!if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
+  #
+  # Enable Address Sanitizer for GCC for HOST_APPLICATION
+  #
+  GCC:*_*_*_DLINK_FLAGS    = -fsanitize=address
+!endif
 
   #
   # Need to do this link via gcc and not ld as the pathing to libraries changes from OS version to OS version
