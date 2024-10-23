@@ -17,10 +17,12 @@
 
 [Sources]
   Common/BootSyncSecureChannel.c
+  Common/BootSyncProtocol.c
 
   TestUserContextService/TestUserContextService.c
   UserContext/BootSyncSessionUserContext.c
 
+  Include/BootSyncProtocol.h
   Include/BootSyncSecureChannel.h
   Include/BootSyncSession.h
   Include/BootSyncProtocolDefines.h
@@ -41,6 +43,8 @@
   RngLib
 
 [Guids]
+  gArmBootSyncFinGuid
+  gArmBootSyncNackGuid
 
 [Pcd]
   gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString

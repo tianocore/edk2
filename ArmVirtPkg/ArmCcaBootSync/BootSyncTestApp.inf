@@ -20,9 +20,11 @@
   BootSyncTestApp/BootSyncTestApp.c
 
   Common/BootSyncSecureChannel.c
+  Common/BootSyncProtocol.c
 
   Guest/BootSyncSessionGuest.c
 
+  Include/BootSyncProtocol.h
   Include/BootSyncSecureChannel.h
   Include/BootSyncSession.h
   Include/BootSyncProtocolDefines.h
@@ -48,6 +50,8 @@
   UefiLib
 
 [Guids]
+  gArmBootSyncFinGuid
+  gArmBootSyncNackGuid
 
 [Protocols]
   gEfiRealmApertureManagementProtocolGuid
