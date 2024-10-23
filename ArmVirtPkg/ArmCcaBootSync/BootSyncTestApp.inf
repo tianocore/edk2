@@ -18,23 +18,34 @@
 
 [Sources.common]
   BootSyncTestApp/BootSyncTestApp.c
+
+  Guest/BootSyncSessionGuest.c
+
   Include/BootSyncSecureChannel.h
   Include/BootSyncSession.h
 
 [Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  ArmCcaRsiLib
+  ArmCcaRhiHostSessionLib
   BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
   UefiApplicationEntryPoint
+  UefiBootServicesTableLib
   UefiLib
 
 [Guids]
 
 [Protocols]
+  gEfiRealmApertureManagementProtocolGuid
 
 [Pcd]
 
 [Depex]
-  TRUE
+  gEfiRealmApertureManagementProtocolGuid
 
