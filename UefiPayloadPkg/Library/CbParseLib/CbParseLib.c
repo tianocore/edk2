@@ -14,6 +14,7 @@
 #include <Library/PcdLib.h>
 #include <Library/IoLib.h>
 #include <Library/BlParseLib.h>
+#include <Library/SmmStoreParseLib.h>
 #include <IndustryStandard/Acpi.h>
 #include <Coreboot.h>
 
@@ -603,4 +604,146 @@ ParseMiscInfo (
   )
 {
   return RETURN_SUCCESS;
+}
+
+/**
+  Find the SmmStore HOB.
+
+  @param  SmmStoreInfo       Pointer to the SMMSTORE_INFO structure
+
+  @retval RETURN_SUCCESS     Successfully find the Smm store buffer information.
+  @retval RETURN_NOT_FOUND   Failed to find the Smm store buffer information .
+**/
+RETURN_STATUS
+EFIAPI
+ParseSmmStoreInfo (
+  OUT SMMSTORE_INFO  *SmmStoreInfo
+  )
+{
+  struct cb_smmstorev2  *CbSSRec;
+
+  if (SmmStoreInfo == NULL) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  CbSSRec = FindCbTag (CB_TAG_SMMSTOREV2);
+  if (CbSSRec == NULL) {
+    return RETURN_NOT_FOUND;
+  }
+
+  DEBUG ((DEBUG_INFO, "Found Smm Store information\n"));
+  DEBUG ((DEBUG_INFO, "block size: 0x%x\n", CbSSRec->block_size));
+  DEBUG ((DEBUG_INFO, "number of blocks: 0x%x\n", CbSSRec->num_blocks));
+  DEBUG ((DEBUG_INFO, "communication buffer: 0x%x\n", CbSSRec->com_buffer));
+  DEBUG ((DEBUG_INFO, "communication buffer size: 0x%x\n", CbSSRec->com_buffer_size));
+  DEBUG ((DEBUG_INFO, "MMIO address of store: 0x%x\n", CbSSRec->mmap_addr));
+
+  SmmStoreInfo->ComBuffer     = CbSSRec->com_buffer;
+  SmmStoreInfo->ComBufferSize = CbSSRec->com_buffer_size;
+  SmmStoreInfo->BlockSize     = CbSSRec->block_size;
+  SmmStoreInfo->NumBlocks     = CbSSRec->num_blocks;
+  SmmStoreInfo->MmioAddress   = CbSSRec->mmap_addr;
+  SmmStoreInfo->ApmCmd        = CbSSRec->apm_cmd;
+
+  return RETURN_SUCCESS;
+}
+
+/**
+  Parse firmware information passed in by bootloader
+
+  @param  Guid     Kind of the firmware.
+  @param  Version  Current version.
+  @param  Lsv      Lowest supported version.
+  @param  Size     Firmware size in bytes.
+
+  @retval RETURN_INVALID_PARAMETER  At least one of the parameters is NULL.
+  @retval RETURN_SUCCESS            Successfully parsed capsules.
+  @retval RETURN_NOT_FOUND          The information is missing.
+**/
+RETURN_STATUS
+EFIAPI
+ParseFwInfo (
+  OUT EFI_GUID  *Guid,
+  OUT UINT32    *Version,
+  OUT UINT32    *Lsv,
+  OUT UINT32    *Size
+  )
+{
+  struct lb_efi_fw_info  *FwInfo;
+
+  if ((Guid == NULL) || (Version == NULL) || (Lsv == NULL) || (Size == NULL)) {
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  FwInfo = FindCbTag (CB_TAG_FW_INFO);
+  if (FwInfo == NULL) {
+    return RETURN_NOT_FOUND;
+  }
+
+  CopyMem (Guid, &FwInfo->guid, sizeof (*Guid));
+  *Version = FwInfo->version;
+  *Lsv     = FwInfo->lowest_supported_version;
+  *Size    = FwInfo->fw_size;
+  return RETURN_SUCCESS;
+}
+
+/**
+  Parse update capsules passed in by bootloader
+
+  @param  CapsuleCallback   The callback routine invoked for each capsule.
+
+  @retval RETURN_SUCCESS    Successfully parsed capsules.
+  @retval RETURN_NOT_FOUND  Failed to look up the information.
+**/
+RETURN_STATUS
+EFIAPI
+ParseCapsules (
+  IN BL_CAPSULE_CALLBACK  CapsuleCallback
+  )
+{
+  struct cb_header  *Header;
+  struct cb_range   *Range;
+  UINT8             *TmpPtr;
+  UINTN             Idx;
+
+  Header = GetParameterBase ();
+  if (Header == NULL) {
+    return RETURN_NOT_FOUND;
+  }
+
+  TmpPtr = (UINT8 *)Header + Header->header_bytes;
+  for (Idx = 0; Idx < Header->table_entries; Idx++) {
+    Range = (struct cb_range *)TmpPtr;
+    if (Range->tag == CB_TAG_CAPSULE) {
+      CapsuleCallback (Range->range_start, Range->range_size);
+    }
+
+    TmpPtr += Range->size;
+  }
+
+  return RETURN_SUCCESS;
+}
+
+/**
+  Parse information in a string form identified by a number
+
+  @param  Id  String identifier.
+
+  @retval NULL       The requested information wasn't found.
+  @retval Otherwise  A pointer to a static string.
+**/
+CONST CHAR8 *
+EFIAPI
+ParseInfoString (
+  IN UINTN  Id
+  )
+{
+  struct cb_string  *CbString;
+
+  CbString = FindCbTag (Id);
+  if (CbString == NULL) {
+    return NULL;
+  }
+
+  return (CONST CHAR8 *)CbString->string;
 }
