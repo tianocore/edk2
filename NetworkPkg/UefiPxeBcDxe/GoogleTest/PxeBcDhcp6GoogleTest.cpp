@@ -26,6 +26,8 @@ extern "C" {
 #define PACKET_SIZE            (1500)
 #define REQUEST_OPTION_LENGTH  (120)
 
+MOCK_EFI_RNG_PROTOCOL_INSTANCE (gRngProtocol)
+
 typedef struct {
   UINT16    OptionCode;   // The option code for DHCP6_OPT_SERVER_ID (e.g., 0x03)
   UINT16    OptionLen;    // The length of the option (e.g., 16 bytes)
@@ -490,7 +492,7 @@ public:
 protected:
   MockUefiRuntimeServicesTableLib RtServicesMock;
   MockUefiBootServicesTableLib BsMock;
-  MockRng RngMock;
+  MockEfiRngProtocol RngMock;
 
   // Add any setup code if needed
   virtual void
