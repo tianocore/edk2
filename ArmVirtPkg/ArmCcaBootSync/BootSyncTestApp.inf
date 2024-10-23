@@ -19,6 +19,7 @@
 [Sources.common]
   BootSyncTestApp/BootSyncTestApp.c
   Include/BootSyncSecureChannel.h
+  Include/BootSyncSession.h
 
 [Packages]
   MdePkg/MdePkg.dec
