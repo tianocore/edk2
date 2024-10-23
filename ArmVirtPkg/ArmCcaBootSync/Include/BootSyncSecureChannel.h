@@ -70,8 +70,11 @@ typedef struct SecureChannel {
   /// Encryption Key Salt.
   UINT8                     SaltKeyEncryption[SALT_SIZE];
 
-  /// Initial vector.
-  UINT8                     Iv[IV_SIZE];
+  /// Initial vector prefix.
+  UINT32                    IvPrefix;
+
+  /// Initial vector Sequence No
+  UINT64                    IvSequenceNo;
 
   /// Binding Key.
   UINT8                     Kb[BINDING_KEY_SIZE];
