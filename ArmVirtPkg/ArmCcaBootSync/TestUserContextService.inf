@@ -18,6 +18,8 @@
 [Sources]
   TestUserContextService/TestUserContextService.c
 
+  Include/BootSyncSecureChannel.h
+
 [Packages]
   MdePkg/MdePkg.dec
 
