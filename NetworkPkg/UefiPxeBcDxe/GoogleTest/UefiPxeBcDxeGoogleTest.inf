@@ -23,7 +23,6 @@ VERSION_STRING = 1.0
   PxeBcDhcp6GoogleTest.h
   ../PxeBcDhcp6.c
   ../PxeBcSupport.c
-  ../../../MdePkg/Test/Mock/Library/GoogleTest/Protocol/MockRng.cpp
 
 [Packages]
   MdePkg/MdePkg.dec
