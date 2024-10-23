@@ -1482,9 +1482,18 @@ WriteSections64 (
               - (SecOffset - SecShdr->sh_addr));
             VerboseMsg ("Relocation:  0x%08X", *(UINT32 *)Targ);
             break;
+          case R_X86_64_REX_GOTPCRELX:
+            //
+            // This is a relaxable GOTPCREL relocation, and the linker may have
+            // applied this relaxation without updating the relocation type.
+            // In the position independent code model, only transformations
+            // from MOV to LEA are possible for REX-prefixed instructions.
+            //
+            if (Targ[-2] == 0x8d) { // LEA
+              break;
+            }
           case R_X86_64_GOTPCREL:
           case R_X86_64_GOTPCRELX:
-          case R_X86_64_REX_GOTPCRELX:
             VerboseMsg ("R_X86_64_GOTPCREL family");
             VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X",
               (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
