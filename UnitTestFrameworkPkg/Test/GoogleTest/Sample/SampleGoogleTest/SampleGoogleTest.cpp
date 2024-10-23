@@ -12,6 +12,7 @@ extern "C" {
   #include <Uefi.h>
   #include <Library/BaseLib.h>
   #include <Library/DebugLib.h>
+  #include <Library/MemoryAllocationLib.h>
 }
 
 /**
@@ -292,6 +293,144 @@ TEST (MacroTestsMessages, MacroTraceMessage) {
   // Always pass
   //
   ASSERT_TRUE (TRUE);
+}
+
+/**
+  Sample unit test that performs double free
+**/
+TEST (SanitizerTests, DoubleFreeDeathTest) {
+  UINT8  *Pointer;
+
+  Pointer = (UINT8 *)AllocatePool (100);
+  ASSERT_NE (Pointer, (UINT8 *)NULL);
+  FreePool (Pointer);
+  //
+  // Second free that should be caught by address sanitizer, log details, and exit
+  //
+  EXPECT_DEATH (FreePool (Pointer), "ERROR: AddressSanitizer: heap-use-after-free");
+}
+
+/**
+  Sample unit test that performs read past end of allocated buffer
+**/
+TEST (SanitizerTests, BufferOverflowReadDeathTest) {
+  UINT8  *Pointer;
+  UINT8  Value;
+
+  Pointer = (UINT8 *)AllocatePool (100);
+  ASSERT_NE (Pointer, (UINT8 *)NULL);
+
+  //
+  // Read past end of allocated buffer that should be caught by address sanitizer, log details, and exit
+  //
+  EXPECT_DEATH (Value = Pointer[110], "ERROR: AddressSanitizer: heap-buffer-overflow");
+  ASSERT_EQ (Value, Value);
+
+  FreePool (Pointer);
+}
+
+/**
+  Sample unit test that performs write past end of allocated buffer
+**/
+TEST (SanitizerTests, BufferOverflowWriteDeathTest) {
+  UINT8  *Pointer;
+
+  Pointer = (UINT8 *)AllocatePool (100);
+  ASSERT_NE (Pointer, (UINT8 *)NULL);
+
+  //
+  // Write past end of allocated buffer that should be caught by address sanitizer, log details, and exit
+  //
+  EXPECT_DEATH (Pointer[110] = 0, "ERROR: AddressSanitizer: heap-buffer-overflow");
+
+  FreePool (Pointer);
+}
+
+/**
+  Sample unit test that performs read before beginning of allocated buffer
+**/
+TEST (SanitizerTests, BufferUnderflowReadDeathTest) {
+  UINT8  *Pointer;
+  UINT8  Value;
+
+  Pointer = (UINT8 *)AllocatePool (100);
+  ASSERT_NE (Pointer, (UINT8 *)NULL);
+
+  //
+  // Read past end of allocated buffer that should be caught by address sanitizer, log details, and exit
+  //
+  EXPECT_DEATH (Value = Pointer[-10], "ERROR: AddressSanitizer: heap-buffer-overflow");
+  ASSERT_EQ (Value, Value);
+
+  FreePool (Pointer);
+}
+
+/**
+  Sample unit test that performs read from address 0 (NULL)
+**/
+TEST (SanitizerTests, NullPointerReadDeathTest) {
+  UINT8  Value;
+
+  //
+  // Read from address 0 should be caught by address sanitizer, log details, and exit
+  //
+  EXPECT_DEATH (Value = *(volatile UINT8 *)(NULL), "ERROR: AddressSanitizer: ");
+  ASSERT_EQ (Value, Value);
+}
+
+/**
+  Sample unit test that performs write to address 0 (NULL)
+**/
+TEST (SanitizerTests, NullPointerWriteDeathTest) {
+  //
+  // Write to address 0 should be caught by address sanitizer, log details, and exit
+  //
+  EXPECT_DEATH (*(volatile UINT8 *)(NULL) = 0, "ERROR: AddressSanitizer: ");
+}
+
+/**
+  Sample unit test that performs read from invalid address -1
+**/
+TEST (SanitizerTests, InvalidPointerReadDeathTest) {
+  UINT8  Value;
+
+  //
+  // Read from address -1 should be caught by address sanitizer, log details, and exit
+  //
+  EXPECT_DEATH (Value = *(volatile UINT8 *)(-1), "ERROR: AddressSanitizer: ");
+  ASSERT_EQ (Value, Value);
+}
+
+/**
+  Sample unit test that performs write to invalid address -1
+**/
+TEST (SanitizerTests, InvalidPointerWriteDeathTest) {
+  //
+  // Write to address -1 should be caught by address sanitizer, log details, and exit
+  //
+  EXPECT_DEATH (*(volatile UINT8 *)(-1) = 0, "ERROR: AddressSanitizer: ");
+}
+
+UINTN
+DivideWithNoParameterChecking (
+  UINTN  Dividend,
+  UINTN  Divisor
+  )
+{
+  //
+  // Perform integer division with no check for divide by zero
+  //
+  return (Dividend / Divisor);
+}
+
+/**
+  Sample unit test that performs a divide by 0
+**/
+TEST (SanitizerTests, DivideByZeroDeathTest) {
+  //
+  // Divide by 0 should be caught by address sanitizer, log details, and exit
+  //
+  EXPECT_DEATH (DivideWithNoParameterChecking (10, 0), "ERROR: AddressSanitizer: ");
 }
 
 int
