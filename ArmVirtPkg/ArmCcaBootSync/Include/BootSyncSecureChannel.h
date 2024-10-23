@@ -28,6 +28,20 @@
 */
 #define ENCRYPTION_KEY_SIZE  AES_KEY_SIZE
 
+/** An enum identifiying the session state.
+*/
+typedef enum SessionState {
+  UnConnected,                ///< Session - UnConnected
+  ConnectionEstablished       ///< Session - Connection Established
+} SESSION_STATE;
+
+/** An structure representing the Protocol state.
+*/
+typedef struct ProtocolStatus {
+  /// Session State
+  SESSION_STATE    SessionState;
+} PROTOCOL_STATUS;
+
 /**
   A structure for storing the data relevant for the Secure session.
 */
@@ -37,6 +51,9 @@ typedef struct SecureChannel {
 
   /// RHI Host Session Id
   ARM_CCA_RHI_SESSION_ID    SessionId;
+
+  /// Protocol Status
+  PROTOCOL_STATUS           ProtocolStatus;
 
   /// Pointer to the BSKEY_CONTEXT
   VOID                      *SessionCtx;
@@ -52,6 +69,9 @@ typedef struct SecureChannel {
 
   /// Encryption Key Salt.
   UINT8                     SaltKeyEncryption[SALT_SIZE];
+
+  /// Initial vector.
+  UINT8                     Iv[IV_SIZE];
 
   /// Binding Key.
   UINT8                     Kb[BINDING_KEY_SIZE];
