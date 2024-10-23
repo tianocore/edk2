@@ -1437,9 +1437,7 @@ AmlCodeGenRdRegister (
 
   // Cf. ACPI 6.4, s14.7 Referencing the PCC address space
   // The AccessSize represents the Subspace Id for the PCC address space.
-  if (((AddressSpace == EFI_ACPI_6_4_PLATFORM_COMMUNICATION_CHANNEL) &&
-       (AccessSize > 256)) ||
-      ((AddressSpace != EFI_ACPI_6_4_PLATFORM_COMMUNICATION_CHANNEL) &&
+  if (((AddressSpace != EFI_ACPI_6_4_PLATFORM_COMMUNICATION_CHANNEL) &&
        (AccessSize > EFI_ACPI_6_4_QWORD)) ||
       ((NameOpNode == NULL) && (NewRdNode == NULL)))
   {
