@@ -19,6 +19,8 @@
 [Sources.common]
   BootSyncTestApp/BootSyncTestApp.c
 
+  Common/BootSyncSecureChannel.c
+
   Guest/BootSyncSessionGuest.c
 
   Include/BootSyncSecureChannel.h
@@ -27,15 +29,19 @@
 
 [Packages]
   ArmVirtPkg/ArmVirtPkg.dec
+  CryptoPkg/CryptoPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  ArmCcaBootSyncCryptoLib
   ArmCcaRsiLib
   ArmCcaRhiHostSessionLib
   BaseLib
+  BaseCryptLib
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  RngLib
   UefiApplicationEntryPoint
   UefiBootServicesTableLib
   UefiLib

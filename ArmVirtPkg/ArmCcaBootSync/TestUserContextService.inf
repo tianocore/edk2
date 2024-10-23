@@ -16,6 +16,8 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
+  Common/BootSyncSecureChannel.c
+
   TestUserContextService/TestUserContextService.c
   UserContext/BootSyncSessionUserContext.c
 
@@ -25,10 +27,13 @@
 
 [Packages]
   ArmVirtPkg/ArmVirtPkg.dec
+  CryptoPkg/CryptoPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  ArmCcaBootSyncCryptoLib
   BaseLib
+  BaseCryptLib
   DebugLib
 
 [Guids]
