@@ -41,6 +41,7 @@
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  PcdLib
   RngLib
   UefiApplicationEntryPoint
   UefiBootServicesTableLib
@@ -52,6 +53,8 @@
   gEfiRealmApertureManagementProtocolGuid
 
 [Pcd]
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString
 
 [Depex]
   gEfiRealmApertureManagementProtocolGuid

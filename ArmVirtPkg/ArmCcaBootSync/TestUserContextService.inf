@@ -35,10 +35,14 @@
   BaseLib
   BaseCryptLib
   DebugLib
+  PcdLib
+  RngLib
 
 [Guids]
 
 [Pcd]
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString
 
 [BuildOptions]
 

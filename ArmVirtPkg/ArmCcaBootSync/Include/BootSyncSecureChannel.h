@@ -13,6 +13,22 @@
 #include "Include/BootSyncProtocolDefines.h"
 
 /**
+  A macro defining the size of the rolling hash of the app info for the
+  derived key(s) and the messages in bytes.
+*/
+#define ROLLING_MSG_HASH_SIZE  32
+
+/**
+  A macro defining the binding key size in bytes.
+*/
+#define BINDING_KEY_SIZE  (ARM_CCA_MAX_CHALLENGE_DATA_SIZE_BITS >> 3)
+
+/**
+  A macro defining the encryption key size in bytes.
+*/
+#define ENCRYPTION_KEY_SIZE  AES_KEY_SIZE
+
+/**
   A structure for storing the data relevant for the Secure session.
 */
 typedef struct SecureChannel {
@@ -27,6 +43,21 @@ typedef struct SecureChannel {
 
   /// Pointer to the peer BSKEY_CONTEXT
   VOID                      *PeerSessionCtx;
+
+  /// Rolling hash of the messages.
+  UINT8                     RmHash[ROLLING_MSG_HASH_SIZE];
+
+  /// Binding Key Salt.
+  UINT8                     SaltKeyBinding[SALT_SIZE];
+
+  /// Encryption Key Salt.
+  UINT8                     SaltKeyEncryption[SALT_SIZE];
+
+  /// Binding Key.
+  UINT8                     Kb[BINDING_KEY_SIZE];
+
+  /// Encryption Key.
+  UINT8                     Ke[ENCRYPTION_KEY_SIZE];
 } SECURE_CHANNEL;
 
 /**
@@ -50,6 +81,21 @@ SecureChannelComputeCommonKey (
   IN  SECURE_CHANNEL  *SecChannel,
   IN  UINT8           *PeerPubKeyPem,
   IN  UINTN           PeerPubKeyPemSize
+  );
+
+/**
+  Derive Binding Key and Encryption Key from the Common Key.
+
+  @param[in] SecChannel         Pointer to the secure channel.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_ABORTED             An operation failed.
+  @retval EFI_SUCCESS             Success.
+**/
+EFI_STATUS
+EFIAPI
+SecureChannelDeriveKeys (
+  IN SECURE_CHANNEL  *SecChannel
   );
 
 /**

@@ -53,3 +53,15 @@
   # Cloud Hypervisor has no other way to pass Rsdp address to the guest except use a PCD.
   #
   gArmVirtTokenSpaceGuid.PcdCloudHvAcpiRsdpBaseAddress|0x0|UINT64|0x00000005
+
+[PcdsFixedAtBuild]
+
+  #
+  # Null-terminated string that describes the Application Information used for deriving the Binding Key
+  # @Prompt Application Information for the Binding Key.
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString|""|VOID*|0x00000007
+
+  #
+  # Null-terminated string that describes the Application Information used for deriving the Encryption Key
+  # @Prompt Application Information for the Encryption Key.
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString|""|VOID*|0x00000008

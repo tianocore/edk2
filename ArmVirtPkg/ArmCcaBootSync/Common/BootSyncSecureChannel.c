@@ -45,9 +45,64 @@
 */
 
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/BaseCryptLib.h>
 #include <Library/DebugLib.h>
 
 #include "Include/BootSyncSecureChannel.h"
+
+/**
+  A helper function to update the rolling hash with the app info for the
+  derived key(s) and the messages in bytes.
+
+  @param[in] SecChannel   Pointer to the secure channel.
+  @param[in] Data         Pointer to the data for extending the hash.
+  @param[in] DataLen      Length of the data buffer.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_ABORTED             An operation failed.
+  @retval EFI_SUCCESS             Success.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+SecureChannelUpdateRollingHash (
+  IN SECURE_CHANNEL  *SecChannel,
+  IN UINT8           *Data,
+  IN UINTN           DataLen
+  )
+{
+  BOOLEAN  Result;
+  UINT8    InterimHash[ROLLING_MSG_HASH_SIZE*2];
+
+  if ((SecChannel == NULL) ||
+      (Data == NULL) ||
+      (DataLen == 0))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Copy the RmHash as the first part
+  CopyMem (InterimHash, SecChannel->RmHash, ROLLING_MSG_HASH_SIZE);
+
+  // Compute the hash of the data in the second part
+  Result = Sha256HashAll (Data, DataLen, &InterimHash[ROLLING_MSG_HASH_SIZE]);
+  if (!Result) {
+    return EFI_ABORTED;
+  }
+
+  // Compute the FinalHash = Hash (RmHash+DataHash)
+  Result = Sha256HashAll (
+             InterimHash,
+             sizeof (InterimHash),
+             SecChannel->RmHash
+             );
+  if (!Result) {
+    return EFI_ABORTED;
+  }
+
+  return EFI_SUCCESS;
+}
 
 /**
   Compute the common key using the peer public key PEM data.
@@ -105,6 +160,82 @@ SecureChannelComputeCommonKey (
 }
 
 /**
+  Derive Binding Key and Encryption Key from the Common Key.
+
+  @param[in] SecChannel         Pointer to the secure channel.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_ABORTED             An operation failed.
+  @retval EFI_SUCCESS             Success.
+**/
+EFI_STATUS
+EFIAPI
+SecureChannelDeriveKeys (
+  IN SECURE_CHANNEL  *SecChannel
+  )
+{
+  EFI_STATUS  Status;
+  BOOLEAN     Result;
+  UINT8       *AppInfo;
+
+  if (SecChannel == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  AppInfo = (UINT8 *)PcdGetPtr (PcdBootSyncAppInfoBindingKeyString);
+  // Extend the BindingKey App Info to the RmHash
+  Status = SecureChannelUpdateRollingHash (
+             SecChannel,
+             AppInfo,
+             AsciiStrSize ((CHAR8 *)AppInfo)
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Derive Binding Key
+  Result = ArmCcaBootSyncCryptoDeriveKey (
+             SecChannel->SessionCtx,
+             SecChannel->SaltKeyBinding,
+             SALT_SIZE,
+             SecChannel->RmHash,
+             sizeof (SecChannel->RmHash),
+             SecChannel->Kb,
+             BINDING_KEY_SIZE
+             );
+  if (!Result) {
+    return EFI_ABORTED;
+  }
+
+  AppInfo = (UINT8 *)PcdGetPtr (PcdBootSyncAppInfoEncryptionKeyString);
+  // Extend the BindingKey App Info to the RmHash
+  Status = SecureChannelUpdateRollingHash (
+             SecChannel,
+             AppInfo,
+             AsciiStrSize ((CHAR8 *)AppInfo)
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Derive Encryption Key
+  Result = ArmCcaBootSyncCryptoDeriveKey (
+             SecChannel->SessionCtx,
+             SecChannel->SaltKeyEncryption,
+             SALT_SIZE,
+             SecChannel->RmHash,
+             sizeof (SecChannel->RmHash),
+             SecChannel->Ke,
+             ENCRYPTION_KEY_SIZE
+             );
+  if (!Result) {
+    return EFI_ABORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Delete the secure channel keys.
 
   @param[in]    SecChannel  Pointer to the secure channel.
@@ -143,6 +274,21 @@ SecureChannelDeleteKeys (
 
     SecChannel->PeerSessionCtx = NULL;
   }
+
+  // Scrub the Rolling hash of the messages.
+  ZeroMem (SecChannel->RmHash, ROLLING_MSG_HASH_SIZE);
+
+  // Scrub the Binding Key Salt.
+  ZeroMem (SecChannel->SaltKeyBinding, SALT_SIZE);
+
+  // Scrub the Encryption Key Salt.
+  ZeroMem (SecChannel->SaltKeyEncryption, SALT_SIZE);
+
+  // Scrub the Binding Key.
+  ZeroMem (SecChannel->Kb, BINDING_KEY_SIZE);
+
+  // Scrub the Encryption Key.
+  ZeroMem (SecChannel->Ke, ENCRYPTION_KEY_SIZE);
 
   return Status;
 }
