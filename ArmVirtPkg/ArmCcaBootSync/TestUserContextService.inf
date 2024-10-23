@@ -21,6 +21,7 @@
 
   Include/BootSyncSecureChannel.h
   Include/BootSyncSession.h
+  Include/BootSyncProtocolDefines.h
 
 [Packages]
   ArmVirtPkg/ArmVirtPkg.dec
