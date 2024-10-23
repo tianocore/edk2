@@ -42,6 +42,11 @@
 #define ARM_CCA_RHI_SESSION_CONNECTION_MODE_BLOCKING      BIT0
 #define ARM_CCA_RHI_SESSION_CONNECTION_MODE_NON_BLOCKING  BIT1
 
+/**
+  A macro defining an invalid RHI session ID.
+*/
+#define ARM_CCA_RHI_SESSION_ID_INVALID  MAX_UINT64
+
 /** A type defining the RHI session ID.
 */
 typedef UINT64 ARM_CCA_RHI_SESSION_ID;

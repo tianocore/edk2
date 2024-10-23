@@ -17,15 +17,18 @@
 
 [Sources]
   TestUserContextService/TestUserContextService.c
+  UserContext/BootSyncSessionUserContext.c
 
   Include/BootSyncSecureChannel.h
   Include/BootSyncSession.h
 
 [Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
   BaseLib
+  DebugLib
 
 [Guids]
 
