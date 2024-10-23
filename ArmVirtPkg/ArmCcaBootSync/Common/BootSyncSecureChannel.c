@@ -48,8 +48,10 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include "Include/BootSyncSecureChannel.h"
+#include "Include/BootSyncSession.h"
 
 /**
   A helper function to update the rolling hash with the app info for the
@@ -290,5 +292,173 @@ SecureChannelDeleteKeys (
   // Scrub the Encryption Key.
   ZeroMem (SecChannel->Ke, ENCRYPTION_KEY_SIZE);
 
+  return Status;
+}
+
+/**
+  Send a message over an active session and update the rolling hash.
+
+  Note: This function does not encrypt the data.
+
+  @param[in]      SecChannel    Pointer to the secure channel.
+  @param[in]      Msg           Pointer to the message data to send.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_SUCCESS             Success.
+**/
+EFI_STATUS
+EFIAPI
+SecureChannelSendMessage (
+  IN  SECURE_CHANNEL       *SecChannel,
+  IN  BOOT_SYNC_GUID_BLOB  *Msg
+  )
+{
+  EFI_STATUS  Status;
+
+  if ((SecChannel == NULL) ||
+      (Msg == NULL) ||
+      (Msg->Length == 0))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "BootSyncSessionSendData: Msg = 0x%p, Len = 0x%x\n",
+    Msg,
+    Msg->Length
+    ));
+
+  Status = BootSyncSessionSendData (SecChannel, (UINT8 *)Msg, Msg->Length);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = SecureChannelUpdateRollingHash (
+             SecChannel,
+             (UINT8 *)Msg,
+             Msg->Length
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
+}
+
+/**
+  Get the response message and update the rolling hash.
+
+  Note: This function does not decypt the data.
+
+  @param[in]  SecChannel  Pointer to the secure channel.
+  @param[out] Resp        Pointer to a buffer to store the response message.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+  @retval EFI_SUCCESS             Success.
+**/
+EFI_STATUS
+EFIAPI
+SecureChannelGetMessage (
+  IN SECURE_CHANNEL        *SecChannel,
+  OUT BOOT_SYNC_GUID_BLOB  **Resp
+  )
+{
+  EFI_STATUS           Status;
+  BOOT_SYNC_GUID_BLOB  *Response;
+  UINTN                ResponseSize;
+  UINTN                RemainingSize;
+  UINT8                *RespData;
+  UINT8                *RemainingData;
+
+  if ((SecChannel == NULL) || (Resp == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // Step 1: Allocate memory for retriving the BOOT_SYNC_GUID_BLOB.
+  // Note: We always first read the BOOT_SYNC_GUID_BLOB as we do not know
+  // the response type. e.g. Even though we expect a KeyXchgResponse
+  // we could get a NACK response if the server is busy.
+  ResponseSize = sizeof (BOOT_SYNC_GUID_BLOB);
+  Response     = AllocateZeroPool (ResponseSize);
+  if (Response == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // Step 2: Read the BOOT_SYNC_GUID_BLOB.
+  Status = BootSyncSessionReceiveData (
+             SecChannel,
+             (UINT8 *)Response,
+             ResponseSize
+             );
+  if (EFI_ERROR (Status) || (ResponseSize < sizeof (BOOT_SYNC_GUID_BLOB))) {
+    goto exit_handler;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "ResponseSize = %d, Response->Length = %d, MSG {%g}\n",
+    ResponseSize,
+    Response->Length,
+    &Response->Name
+    ));
+
+  if (Response->Length < sizeof (BOOT_SYNC_GUID_BLOB)) {
+    Status = EFI_INVALID_PARAMETER;
+    goto exit_handler;
+  }
+
+  if (Response->Length > sizeof (BOOT_SYNC_GUID_BLOB)) {
+    // Step 3: Re allocate a buffer large enough to store the response
+    RespData = ReallocatePool (ResponseSize, Response->Length, Response);
+    if (RespData == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto exit_handler;
+    }
+
+    // Retarget the Response pointer after relloc as the old pointer
+    // is no longer valid.
+    Response = (BOOT_SYNC_GUID_BLOB *)RespData;
+
+    // Store the Response Size before relocating the buffer
+    ResponseSize = Response->Length;
+
+    // More data to be received.
+    RemainingSize = ResponseSize - sizeof (BOOT_SYNC_GUID_BLOB);
+    RemainingData = RespData + sizeof (BOOT_SYNC_GUID_BLOB);
+
+    DEBUG ((
+      DEBUG_INFO,
+      "ResponseSize = %d, RemainingSize = %d\n",
+      ResponseSize,
+      RemainingSize
+      ));
+
+    // Step 4: Read the remaining payload.
+    Status = BootSyncSessionReceiveData (
+               SecChannel,
+               (UINT8 *)RemainingData,
+               RemainingSize
+               );
+    if (EFI_ERROR (Status)) {
+      goto exit_handler;
+    }
+  }
+
+  // Step 5: Update the rolling hash
+  Status = SecureChannelUpdateRollingHash (
+             SecChannel,
+             (UINT8 *)Response,
+             ResponseSize
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    goto exit_handler;
+  }
+
+  *Resp = (BOOT_SYNC_GUID_BLOB *)Response;
+  return Status;
+
+exit_handler:
+  FreePool (Response);
   return Status;
 }

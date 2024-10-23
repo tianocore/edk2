@@ -113,3 +113,41 @@ EFIAPI
 SecureChannelDeleteKeys (
   IN SECURE_CHANNEL  *SecChannel
   );
+
+/**
+  Send a message over an active session and update the rolling hash.
+
+  Note: This function does not encrypt the data.
+
+  @param[in]      SecChannel    Pointer to the secure channel.
+  @param[in]      Msg           Pointer to the message data to send.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_SUCCESS             Success.
+**/
+EFI_STATUS
+EFIAPI
+SecureChannelSendMessage (
+  IN  SECURE_CHANNEL       *SecChannel,
+  IN  BOOT_SYNC_GUID_BLOB  *Msg
+  );
+
+/**
+  Get the response message and update the rolling hash.
+
+  Note: This function does not decypt the data.
+
+  @param[in]  SecChannel  Pointer to the secure channel.
+  @param[out] Resp        Pointer to a buffer to store the response message.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+  @retval EFI_ABORTED             An operation failed.
+  @retval EFI_SUCCESS             Success.
+**/
+EFI_STATUS
+EFIAPI
+SecureChannelGetMessage (
+  IN SECURE_CHANNEL        *SecChannel,
+  OUT BOOT_SYNC_GUID_BLOB  **Resp
+  );
