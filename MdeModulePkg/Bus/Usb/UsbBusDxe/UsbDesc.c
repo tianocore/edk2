@@ -3,6 +3,7 @@
     Manage Usb Descriptor List
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -31,6 +32,10 @@ UsbFreeInterfaceDesc (
       Ep = Setting->Endpoints[Index];
 
       if (Ep != NULL) {
+        if (Ep->CsDesc != NULL) {
+          FreePool (Ep->CsDesc);
+        }
+
         FreePool (Ep);
       }
     }
@@ -41,6 +46,10 @@ UsbFreeInterfaceDesc (
     if (Setting->Desc.NumEndpoints > 0) {
       FreePool (Setting->Endpoints);
     }
+  }
+
+  for (Index = 0; Index < Setting->NumOfCsDesc; Index++) {
+    FreePool (Setting->CsDesc[Index]);
   }
 
   FreePool (Setting);
@@ -231,6 +240,7 @@ UsbCreateDesc (
     return NULL;
   }
 
+  ASSERT (CtrlLen >= DescLen);
   CopyMem (Desc, Head, (UINTN)DescLen);
 
   *Consumed = Offset;
@@ -273,6 +283,36 @@ UsbParseInterfaceDesc (
   Offset = Used;
 
   //
+  // Check for CS interface descriptor(s)
+  // Assumptions:
+  //   1. CS descriptor(s) immediately follow interface descriptor
+  //   2. There are no more than USB_MAX_CS_INTERFACE descriptors per interface
+  //
+  for (Index = 0; Index < USB_MAX_CS_INTERFACE; Index++) {
+    if (*(DescBuf + Offset + 1) != USB_DESC_TYPE_CS_INTERFACE) {
+      break;
+    }
+
+    //
+    // Found CS inderface descriptor, save it
+    //
+    Setting->CsDesc[Index] = AllocateZeroPool (*(DescBuf + Offset));
+    CopyMem (Setting->CsDesc[Index], DescBuf + Offset, *(DescBuf + Offset));
+    Offset += *(DescBuf + Offset);
+  }
+
+  ASSERT (Index < USB_MAX_CS_INTERFACE);
+  Setting->NumOfCsDesc = Index;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "UsbParseInterfaceDesc: interface %d (setting %d) has %d CS interfaces\n",
+    Setting->Desc.InterfaceNumber,
+    Setting->Desc.AlternateSetting,
+    Index
+    ));
+
+  //
   // Create an array to hold the interface's endpoints
   //
   NumEp = Setting->Desc.NumEndpoints;
@@ -308,6 +348,19 @@ UsbParseInterfaceDesc (
 
     Setting->Endpoints[Index] = Ep;
     Offset                   += Used;
+    //
+    // Check for CS endpoint descriptor
+    //
+    if (*(DescBuf+Offset+1) == USB_DESC_TYPE_CS_ENDPOINT) {
+      Setting->Endpoints[Index]->CsDesc = AllocateZeroPool (*(DescBuf + Offset));
+      CopyMem (Setting->Endpoints[Index]->CsDesc, DescBuf + Offset, *(DescBuf + Offset));
+      DEBUG ((
+        DEBUG_INFO,
+        "UsbParseInterfaceDesc: interface %d (setting %d) has CS endpoint\n",
+        Setting->Desc.InterfaceNumber,
+        Setting->Desc.AlternateSetting
+        ));
+    }
   }
 
 ON_EXIT:

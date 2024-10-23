@@ -3,6 +3,7 @@
     Usb bus enumeration support.
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -64,6 +65,8 @@ UsbFreeInterface (
                   UsbIf->DevicePath,
                   &gEfiUsbIoProtocolGuid,
                   &UsbIf->UsbIo,
+                  &gEdkIIUsbIoExtProtocolGuid,
+                  &UsbIf->UsbIoExt,
                   NULL
                   );
   if (!EFI_ERROR (Status)) {
@@ -118,6 +121,12 @@ UsbCreateInterface (
     sizeof (EFI_USB_IO_PROTOCOL)
     );
 
+  CopyMem (
+    &(UsbIf->UsbIoExt),
+    &mUsbIoExtProtocol,
+    sizeof (EDKII_USBIO_EXT_PROTOCOL)
+    );
+
   //
   // Install protocols for USBIO and device path
   //
@@ -146,6 +155,8 @@ UsbCreateInterface (
                   UsbIf->DevicePath,
                   &gEfiUsbIoProtocolGuid,
                   &UsbIf->UsbIo,
+                  &gEdkIIUsbIoExtProtocolGuid,
+                  &UsbIf->UsbIoExt,
                   NULL
                   );
 
@@ -166,6 +177,8 @@ UsbCreateInterface (
            UsbIf->DevicePath,
            &gEfiUsbIoProtocolGuid,
            &UsbIf->UsbIo,
+           &gEdkIIUsbIoExtProtocolGuid,
+           &UsbIf->UsbIoExt,
            NULL
            );
 
