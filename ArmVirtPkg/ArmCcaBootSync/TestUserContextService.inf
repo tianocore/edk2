@@ -20,6 +20,7 @@
   Common/BootSyncProtocol.c
 
   TestUserContextService/TestUserContextService.c
+  UserContext/BootSyncKeyExchangeProtocolUserContext.c
   UserContext/BootSyncSessionUserContext.c
 
   Include/BootSyncProtocol.h
@@ -44,6 +45,8 @@
 
 [Guids]
   gArmBootSyncFinGuid
+  gArmBootSyncKeyXchgReqGuid
+  gArmBootSyncKeyXchgRespGuid
   gArmBootSyncNackGuid
 
 [Pcd]
