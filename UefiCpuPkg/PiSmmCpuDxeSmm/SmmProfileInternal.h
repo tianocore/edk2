@@ -39,20 +39,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // CPU generic definition
 //
-#define   MSR_EFER     0xc0000080
-#define   MSR_EFER_XD  0x800
+#define MSR_EFER_XD  0x800
 
-#define   CPUID1_EDX_BTS_AVAILABLE  0x200000
+#define CPUID1_EDX_BTS_AVAILABLE  0x200000
 
-#define   DR6_SINGLE_STEP  0x4000
-#define   RFLAG_TF         0x100
+#define DR6_SINGLE_STEP  0x4000
 
-#define MSR_DEBUG_CTL          0x1D9
-#define   MSR_DEBUG_CTL_LBR    0x1
-#define   MSR_DEBUG_CTL_TR     0x40
-#define   MSR_DEBUG_CTL_BTS    0x80
-#define   MSR_DEBUG_CTL_BTINT  0x100
-#define MSR_DS_AREA            0x600
+#define MSR_DS_AREA  0x600
 
 #define HEAP_GUARD_NONSTOP_MODE      \
         ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT6|BIT3|BIT2)) > BIT6)

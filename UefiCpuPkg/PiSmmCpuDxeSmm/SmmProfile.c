@@ -131,7 +131,13 @@ DisableBTS (
   VOID
   )
 {
-  AsmMsrAnd64 (MSR_DEBUG_CTL, ~((UINT64)(MSR_DEBUG_CTL_BTS | MSR_DEBUG_CTL_TR)));
+  MSR_IA32_DEBUGCTL_REGISTER  DebugCtl;
+
+  DebugCtl.Uint64   = AsmReadMsr64 (MSR_IA32_DEBUGCTL);
+  DebugCtl.Bits.BTS = 0;
+  DebugCtl.Bits.TR  = 0;
+
+  AsmWriteMsr64 (MSR_IA32_DEBUGCTL, DebugCtl);
 }
 
 /**
@@ -143,7 +149,13 @@ EnableBTS (
   VOID
   )
 {
-  AsmMsrOr64 (MSR_DEBUG_CTL, (MSR_DEBUG_CTL_BTS | MSR_DEBUG_CTL_TR));
+  MSR_IA32_DEBUGCTL_REGISTER  DebugCtl;
+
+  DebugCtl.Uint64   = AsmReadMsr64 (MSR_IA32_DEBUGCTL);
+  DebugCtl.Bits.BTS = 1;
+  DebugCtl.Bits.TR  = 1;
+
+  AsmWriteMsr64 (MSR_IA32_DEBUGCTL, DebugCtl);
 }
 
 /**
@@ -930,15 +942,15 @@ ActivateLBR (
   VOID
   )
 {
-  UINT64  DebugCtl;
+  MSR_IA32_DEBUGCTL_REGISTER  DebugCtl;
 
-  DebugCtl = AsmReadMsr64 (MSR_DEBUG_CTL);
-  if ((DebugCtl & MSR_DEBUG_CTL_LBR) != 0) {
+  DebugCtl.Uint64 = AsmReadMsr64 (MSR_IA32_DEBUGCTL);
+  if (DebugCtl.Bits.LBR) {
     return;
   }
 
-  DebugCtl |= MSR_DEBUG_CTL_LBR;
-  AsmWriteMsr64 (MSR_DEBUG_CTL, DebugCtl);
+  DebugCtl.Bits.LBR = 1;
+  AsmWriteMsr64 (MSR_IA32_DEBUGCTL, DebugCtl);
 }
 
 /**
@@ -952,17 +964,23 @@ ActivateBTS (
   IN      UINTN  CpuIndex
   )
 {
-  UINT64  DebugCtl;
+  MSR_IA32_DEBUGCTL_REGISTER  DebugCtl;
 
-  DebugCtl = AsmReadMsr64 (MSR_DEBUG_CTL);
-  if ((DebugCtl & MSR_DEBUG_CTL_BTS) != 0) {
+  DebugCtl.Uint64 = AsmReadMsr64 (MSR_IA32_DEBUGCTL);
+  if ((DebugCtl.Bits.BTS)) {
     return;
   }
 
   AsmWriteMsr64 (MSR_DS_AREA, (UINT64)(UINTN)mMsrDsArea[CpuIndex]);
-  DebugCtl |= (UINT64)(MSR_DEBUG_CTL_BTS | MSR_DEBUG_CTL_TR);
-  DebugCtl &= ~((UINT64)MSR_DEBUG_CTL_BTINT);
-  AsmWriteMsr64 (MSR_DEBUG_CTL, DebugCtl);
+
+  //
+  // Enable BTS
+  //
+  DebugCtl.Bits.BTS = 1;
+  DebugCtl.Bits.TR  = 1;
+
+  DebugCtl.Bits.BTINT = 0;
+  AsmWriteMsr64 (MSR_IA32_DEBUGCTL, DebugCtl);
 }
 
 /**

@@ -10,10 +10,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include "MmSaveState.h"
 #include <Register/Amd/SmramSaveStateMap.h>
 #include <Library/BaseLib.h>
+#include <Register/Amd/Msr.h>
 
-// EFER register LMA bit
-#define LMA                                        BIT10
-#define EFER_ADDRESS                               0xC0000080ul
 #define AMD_MM_SAVE_STATE_REGISTER_SMMREVID_INDEX  1
 #define AMD_MM_SAVE_STATE_REGISTER_MAX_INDEX       2
 
@@ -300,7 +298,10 @@ MmSaveStateGetRegisterLma (
 {
   UINT32  LMAValue;
 
-  LMAValue = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
+  MSR_IA32_EFER_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_EFER);
+  LMAValue   = Msr.Bits.LMA;
   if (LMAValue) {
     return EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
   }

@@ -9,8 +9,6 @@
 #include "InternalSmmRelocationLib.h"
 #include <Register/Amd/SmramSaveStateMap.h>
 
-#define EFER_ADDRESS  0XC0000080ul
-
 /**
   Get the mode of the CPU at the time an SMI occurs
 
@@ -23,13 +21,14 @@ GetMmSaveStateRegisterLma (
   VOID
   )
 {
-  UINT8   SmmSaveStateRegisterLma;
-  UINT32  LMAValue;
+  UINT8                   SmmSaveStateRegisterLma;
+  MSR_IA32_EFER_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_EFER);
 
   SmmSaveStateRegisterLma = (UINT8)EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT;
 
-  LMAValue = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
-  if (LMAValue) {
+  if (Msr.Bits.LMA) {
     SmmSaveStateRegisterLma = (UINT8)EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
   }
 
@@ -91,6 +90,7 @@ HookReturnFromSmm (
 {
   UINT64                    OriginalInstructionPointer;
   AMD_SMRAM_SAVE_STATE_MAP  *AmdCpuState;
+  MSR_IA32_EFER_REGISTER    Msr;
 
   AmdCpuState = (AMD_SMRAM_SAVE_STATE_MAP *)CpuState;
 
@@ -106,7 +106,8 @@ HookReturnFromSmm (
     }
   } else {
     OriginalInstructionPointer = AmdCpuState->x64._RIP;
-    if ((AmdCpuState->x64.EFER & LMA) == 0) {
+    Msr.Uint64                 = AmdCpuState->x64.EFER;
+    if (!Msr.Bits.LMA) {
       AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer32;
     } else {
       AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer;
