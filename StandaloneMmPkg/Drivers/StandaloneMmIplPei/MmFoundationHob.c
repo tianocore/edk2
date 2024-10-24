@@ -117,10 +117,9 @@ MmIplBuildFvHob (
   EFI_HOB_FIRMWARE_VOLUME  *FvHob;
   UINT16                   HobLength;
 
-  ASSERT (Hob != NULL);
-
   HobLength = ALIGN_VALUE (sizeof (EFI_HOB_FIRMWARE_VOLUME), 8);
   if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
     MmIplCreateHob (Hob, EFI_HOB_TYPE_FV, sizeof (EFI_HOB_FIRMWARE_VOLUME));
 
     FvHob              = (EFI_HOB_FIRMWARE_VOLUME *)Hob;
@@ -153,10 +152,9 @@ MmIplBuildMmAcpiS3EnableHob (
   MM_ACPI_S3_ENABLE  *MmAcpiS3Enable;
   UINT16             HobLength;
 
-  ASSERT (Hob != NULL);
-
   HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_ACPI_S3_ENABLE), 8);
   if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
     MmIplCreateHob (Hob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
 
     GuidHob = (EFI_HOB_GUID_TYPE *)Hob;
@@ -191,12 +189,11 @@ MmIplBuildMmCpuSyncConfigHob (
   MM_CPU_SYNC_CONFIG  *MmSyncModeInfoHob;
   UINT16              HobLength;
 
-  ASSERT (Hob != NULL);
-
   GuidHob = (EFI_HOB_GUID_TYPE *)(UINTN)Hob;
 
   HobLength = ALIGN_VALUE (sizeof (EFI_HOB_GUID_TYPE) + sizeof (MM_CPU_SYNC_CONFIG), 8);
   if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
     MmIplCreateHob (GuidHob, EFI_HOB_TYPE_GUID_EXTENSION, HobLength);
 
     CopyGuid (&GuidHob->Name, &gMmCpuSyncConfigHobGuid);
@@ -240,6 +237,7 @@ MmIplCopyGuidHob (
 
   while (GuidHob != NULL) {
     if (*HobBufferSize >= UsedSize + GuidHob->HobLength) {
+      ASSERT (HobBuffer != NULL);
       CopyMem (HobBuffer + UsedSize, GuidHob, GuidHob->HobLength);
     }
 
@@ -285,13 +283,13 @@ MmIplBuildMmCoreModuleHob (
   UINT16                            HobLength;
   EFI_HOB_MEMORY_ALLOCATION_MODULE  *MmCoreModuleHob;
 
-  ASSERT (Hob != NULL);
   ASSERT (ADDRESS_IS_ALIGNED (Base, EFI_PAGE_SIZE));
   ASSERT (IS_ALIGNED (Length, EFI_PAGE_SIZE));
   ASSERT (EntryPoint >= Base && EntryPoint < Base + Length);
 
   HobLength = ALIGN_VALUE (sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE), 8);
   if (*HobBufferSize >= HobLength) {
+    ASSERT (Hob != NULL);
     MmIplCreateHob (Hob, EFI_HOB_TYPE_MEMORY_ALLOCATION, sizeof (EFI_HOB_MEMORY_ALLOCATION_MODULE));
 
     MmCoreModuleHob = (EFI_HOB_MEMORY_ALLOCATION_MODULE *)Hob;
@@ -389,6 +387,7 @@ MmIplBuildMmProfileHobs (
     // Build memory allocation HOB
     //
     ASSERT (Hob.MemoryAllocation->Header.HobLength == ALIGN_VALUE (sizeof (EFI_HOB_MEMORY_ALLOCATION), 8));
+    ASSERT (HobBuffer != NULL);
     CopyMem (HobBuffer, Hob.Raw, Hob.MemoryAllocation->Header.HobLength);
 
     //
