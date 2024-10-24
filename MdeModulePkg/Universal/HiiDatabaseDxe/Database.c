@@ -867,6 +867,72 @@ FindQuestionDefaultSetting (
         CopyMem (ValueBuffer, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
       }
     }
+
+    StartBit   = 0;
+    EndBit     = 0;
+    ByteOffset = IfrQuestionHdr->VarStoreInfo.VarOffset;
+    if (BitFieldQuestion) {
+      BitOffset  = IfrQuestionHdr->VarStoreInfo.VarOffset;
+      ByteOffset = BitOffset / 8;
+      BitWidth   = Width;
+      StartBit   = BitOffset % 8;
+      EndBit     = StartBit + BitWidth - 1;
+      Width      = EndBit / 8 + 1;
+    }
+
+    if (AuthVariableHeader->DataSize < ByteOffset + Width) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // Copy the question value
+    //
+    if (ValueBuffer != NULL) {
+      if (BitFieldQuestion) {
+        CopyMem (&BufferValue, (UINT8 *)AuthVariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + AuthVariableHeader->NameSize + ByteOffset, Width);
+        BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
+        CopyMem (ValueBuffer, &BitFieldVal, Width);
+      } else {
+        CopyMem (ValueBuffer, (UINT8 *)AuthVariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + AuthVariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
+      }
+    }
+  } else {
+    //
+    // Find the question default value from the variable storage
+    //
+    VariableHeader = FindVariableData (VariableStorage, &EfiVarStore->Guid, EfiVarStore->Attributes, (CHAR16 *)EfiVarStore->Name);
+    if (VariableHeader == NULL) {
+      return EFI_NOT_FOUND;
+    }
+
+    StartBit   = 0;
+    EndBit     = 0;
+    ByteOffset = IfrQuestionHdr->VarStoreInfo.VarOffset;
+    if (BitFieldQuestion) {
+      BitOffset  = IfrQuestionHdr->VarStoreInfo.VarOffset;
+      ByteOffset = BitOffset / 8;
+      BitWidth   = Width;
+      StartBit   = BitOffset % 8;
+      EndBit     = StartBit + BitWidth - 1;
+      Width      = EndBit / 8 + 1;
+    }
+
+    if (VariableHeader->DataSize < ByteOffset + Width) {
+      return EFI_INVALID_PARAMETER;
+    }
+
+    //
+    // Copy the question value
+    //
+    if (ValueBuffer != NULL) {
+      if (BitFieldQuestion) {
+        CopyMem (&BufferValue, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + ByteOffset, Width);
+        BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
+        CopyMem (ValueBuffer, &BitFieldVal, Width);
+      } else {
+        CopyMem (ValueBuffer, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
+      }
+    }
   }
 
   return EFI_SUCCESS;
