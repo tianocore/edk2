@@ -696,6 +696,7 @@
   OvmfPkg/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
       NULL|OvmfPkg/IntelTdx/TdxHelperLib/TdxHelperLibNull.inf
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLibNull/BaseCryptLibNull.inf
   }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
   UefiCpuPkg/CpuMpPei/CpuMpPei.inf
