@@ -745,7 +745,7 @@ GetNextDifferentElementInSortedArray (
   UINT64  CurrentElement;
 
   CurrentElement = Array[Index];
-  while (CurrentElement == Array[Index] && Index < Count) {
+  while ((Index < Count) && (CurrentElement == Array[Index])) {
     Index++;
   }
 
