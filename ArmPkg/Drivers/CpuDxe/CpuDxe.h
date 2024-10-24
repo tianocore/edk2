@@ -31,6 +31,7 @@
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/MemoryAttribute.h>
+#include <Protocol/ArmPageTableMemoryAllocation.h>
 
 extern BOOLEAN  mIsFlushingGCD;
 
@@ -141,6 +142,21 @@ SetGcdMemorySpaceAttributes (
 UINT64
 RegionAttributeToGcdAttribute (
   IN UINTN  PageAttributes
+  );
+
+/**
+  Initialize the page table memory pool and produce the page table memory allocation
+  protocol.
+
+  @param[in] ImageHandle  Handle on which to install the protocol.
+
+  @retval EFI_SUCCESS           The page table pool was initialized and protocol produced.
+  @retval Others                The driver returned an error while initializing.
+**/
+EFI_STATUS
+EFIAPI
+InitializePageTableMemory (
+  IN EFI_HANDLE  ImageHandle
   );
 
 #endif // CPU_DXE_H_

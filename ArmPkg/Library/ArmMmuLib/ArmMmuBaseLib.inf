@@ -13,7 +13,8 @@
   FILE_GUID                      = da8f0232-fb14-42f0-922c-63104d2c70bd
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ArmMmuLib
+  # Can't be fully BASE, because it doesn't work in MM_STANDALONE.
+  LIBRARY_CLASS                  = ArmMmuLib | DXE_DRIVER DXE_CORE DXE_RUNTIME_DRIVER
 
 [Defines.AARCH64]
   CONSTRUCTOR                    = ArmMmuBaseLibConstructor
@@ -22,6 +23,7 @@
   ArmMmuLibInternal.h
   AArch64/ArmMmuLibCore.c
   AArch64/ArmMmuLibReplaceEntry.S
+  AArch64/ArmMmuLibPageTableAlloc.c
 
 [Sources.ARM]
   ArmMmuLibInternal.h
@@ -40,6 +42,7 @@
   CacheMaintenanceLib
   HobLib
   MemoryAllocationLib
+  UefiBootServicesTableLib
 
 [Guids]
   gArmMmuReplaceLiveTranslationEntryFuncGuid
