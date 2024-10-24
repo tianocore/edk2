@@ -18,6 +18,7 @@
 #include <Protocol/DriverBinding.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/IdeControllerInit.h>
+#include <Protocol/DevicePath.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>

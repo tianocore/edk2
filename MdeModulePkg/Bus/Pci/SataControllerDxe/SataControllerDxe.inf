@@ -45,6 +45,7 @@
 [Protocols]
   gEfiPciIoProtocolGuid                     ## TO_START
   gEfiIdeControllerInitProtocolGuid         ## BY_START
+  gEfiDevicePathProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   SataControllerDxeExtra.uni
