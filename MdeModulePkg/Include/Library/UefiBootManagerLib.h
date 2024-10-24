@@ -813,4 +813,21 @@ EfiBootManagerDispatchDeferredImages (
   VOID
   );
 
+/**
+  Validate the Boot####, Driver####, SysPrep#### and PlatformRecovery####
+  variable (VendorGuid/Name)
+
+  @param  Variable              The variable data.
+  @param  VariableSize          The variable size.
+
+  @retval TRUE                  The variable data is correct.
+  @retval FALSE                 The variable data is corrupted.
+
+**/
+BOOLEAN
+BmValidateOption (
+  UINT8  *Variable,
+  UINTN  VariableSize
+  );
+
 #endif
