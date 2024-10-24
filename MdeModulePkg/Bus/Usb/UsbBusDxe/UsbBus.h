@@ -3,6 +3,7 @@
     Usb Bus Driver Binding and Bus IO Protocol.
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -15,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Usb2HostController.h>
 #include <Protocol/UsbHostController.h>
 #include <Protocol/UsbIo.h>
+#include <Protocol/UsbIoExt.h>
 #include <Protocol/DevicePath.h>
 
 #include <Library/BaseLib.h>
@@ -141,6 +143,9 @@ typedef struct _USB_HUB_API    USB_HUB_API;
 #define USB_INTERFACE_FROM_USBIO(a) \
           CR(a, USB_INTERFACE, UsbIo, USB_INTERFACE_SIGNATURE)
 
+#define USB_INTERFACE_FROM_USBIO_EXT(a) \
+          CR(a, USB_INTERFACE, UsbIoExt, USB_INTERFACE_SIGNATURE)
+
 #define USB_BUS_FROM_THIS(a) \
           CR(a, USB_BUS, BusId, USB_BUS_SIGNATURE)
 
@@ -205,6 +210,7 @@ struct _USB_INTERFACE {
   //
   EFI_HANDLE                  Handle;
   EFI_USB_IO_PROTOCOL         UsbIo;
+  EDKII_USBIO_EXT_PROTOCOL    UsbIoExt;
   EFI_DEVICE_PATH_PROTOCOL    *DevicePath;
   BOOLEAN                     IsManaged;
 
@@ -752,6 +758,7 @@ UsbBusControllerDriverStop (
   );
 
 extern EFI_USB_IO_PROTOCOL           mUsbIoProtocol;
+extern EDKII_USBIO_EXT_PROTOCOL      mUsbIoExtProtocol;
 extern EFI_DRIVER_BINDING_PROTOCOL   mUsbBusDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   mUsbBusComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  mUsbBusComponentName2;

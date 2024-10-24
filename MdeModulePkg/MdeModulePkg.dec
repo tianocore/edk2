@@ -10,6 +10,7 @@
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (c) 2024 American Megatrends LLC. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -747,6 +748,9 @@
 
   ## Include/Protocol/UsbEthernetProtocol.h
   gEdkIIUsbEthProtocolGuid = { 0x8d8969cc, 0xfeb0, 0x4303, { 0xb2, 0x1a, 0x1f, 0x11, 0x6f, 0x38, 0x56, 0x43 } }
+
+  ## Include/Protocol/UsbIoExt.h
+  gEdkIIUsbIoExtProtocolGuid = { 0xf4279fb1, 0xef1e, 0x4346, { 0xab, 0x32, 0x3f, 0xe3, 0x86, 0xee, 0xb4, 0x52 }}
 
 [PcdsFeatureFlag]
   ## Indicates if the platform can support update capsule across a system reset.<BR><BR>

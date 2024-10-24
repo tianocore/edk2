@@ -3,6 +3,7 @@
     Manage Usb Descriptor List
 
 Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -11,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define _USB_DESCRIPTOR_H_
 
 #define USB_MAX_INTERFACE_SETTING  256
+#define USB_MAX_CS_INTERFACE       256
 
 //
 // The RequestType in EFI_USB_DEVICE_REQUEST is composed of
@@ -35,7 +37,9 @@ typedef struct {
 // Each USB device has a device descriptor. Each device may
 // have several configures. Each configure contains several
 // interfaces. Each interface may have several settings. Each
-// setting has several endpoints.
+// setting has several endpoints. Interfaces and endpoints may
+// be accompanied by class specific interface and endpoint
+// descriptors.
 //
 // EFI_USB_..._DESCRIPTOR must be the first member of the
 // structure.
@@ -43,10 +47,13 @@ typedef struct {
 typedef struct {
   EFI_USB_ENDPOINT_DESCRIPTOR    Desc;
   UINT8                          Toggle;
+  UINT8                          *CsDesc;
 } USB_ENDPOINT_DESC;
 
 typedef struct {
   EFI_USB_INTERFACE_DESCRIPTOR    Desc;
+  UINTN                           NumOfCsDesc;
+  UINT8                           *CsDesc[USB_MAX_CS_INTERFACE];
   USB_ENDPOINT_DESC               **Endpoints;
 } USB_INTERFACE_SETTING;
 
