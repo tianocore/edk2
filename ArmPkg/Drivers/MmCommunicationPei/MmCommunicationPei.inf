@@ -25,6 +25,7 @@
 [LibraryClasses]
   DebugLib
   ArmSmcLib
+  ArmFfaLib
   PeimEntryPoint
   PeiServicesLib
   HobLib
@@ -32,6 +33,9 @@
 [Pcd]
   gArmTokenSpaceGuid.PcdMmBufferBase
   gArmTokenSpaceGuid.PcdMmBufferSize
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid
 
 [Ppis]
   gEfiPeiMmCommunicationPpiGuid     ## PRODUCES

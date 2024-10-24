@@ -126,8 +126,6 @@ UpdateMmFoundationPeCoffPermissions (
     if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_EXECUTE) == 0) {
       Base = ImageBase + SectionHeader.VirtualAddress;
 
-      TextUpdater (Base, SectionHeader.Misc.VirtualSize);
-
       if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_WRITE) != 0) {
         ReadWriteUpdater (Base, SectionHeader.Misc.VirtualSize);
         DEBUG ((
@@ -146,6 +144,8 @@ UpdateMmFoundationPeCoffPermissions (
           ImageContext->ImageAddress
           ));
       }
+
+      TextUpdater (Base, SectionHeader.Misc.VirtualSize);
     } else {
       DEBUG ((
         DEBUG_INFO,

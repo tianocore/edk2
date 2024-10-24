@@ -93,6 +93,14 @@
   #
   StandaloneMmMmuLib|Include/Library/StandaloneMmMmuLib.h
 
+  ##  @libraryclass  Provides an interface for a Arm Transfer List.
+  #
+  ArmTransferListLib|Include/Library/ArmTransferListLib.h
+
+  ##  @libraryclass  Provides an interface for a Arm FF-A ABI.
+  #
+  ArmFfaLib|Include/Library/ArmFfaLib.h
+
 [Guids.common]
   gArmTokenSpaceGuid       = { 0xBB11ECFE, 0x820F, 0x4968, { 0xBB, 0xA6, 0xF7, 0x6A, 0xFE, 0x30, 0x25, 0x96 } }
 
@@ -101,6 +109,8 @@
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
 
   gArmMmuReplaceLiveTranslationEntryFuncGuid = { 0xa8b50ff3, 0x08ec, 0x4dd3, {0xbf, 0x04, 0x28, 0xbf, 0x71, 0x75, 0xc7, 0x4a} }
+
+  gArmFfaRxTxBufferInfoGuid = { 0x96fd3d26, 0x6fb1, 0x11ef, { 0x8c, 0x11, 0xf3, 0xc9, 0xc5, 0x02, 0x31, 0xab } }
 
 [Protocols.common]
   ## Arm System Control and Management Interface(SCMI) Base protocol
@@ -146,13 +156,6 @@
   # hardware coherency (i.e., no virtualization or cache coherent DMA)
   gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride|FALSE|BOOLEAN|0x00000043
 
-[PcdsFeatureFlag.AARCH64, PcdsFeatureFlag.ARM]
-  ## Used to select method for requesting services from S-EL1.<BR><BR>
-  #   TRUE  - Selects FF-A calls for communication between S-EL0 and SPMC.<BR>
-  #   FALSE - Selects SVC calls for communication between S-EL0 and SPMC.<BR>
-  # @Prompt Enable FF-A support.
-  gArmTokenSpaceGuid.PcdFfaEnable|FALSE|BOOLEAN|0x0000005B
-
 [PcdsFixedAtBuild.common]
   gArmTokenSpaceGuid.PcdTrustzoneSupport|FALSE|BOOLEAN|0x00000006
 
@@ -178,6 +181,11 @@
   gArmTokenSpaceGuid.PcdHypFdSize|0|UINT32|0x0000003B
   gArmTokenSpaceGuid.PcdHypFvBaseAddress|0|UINT32|0x0000003C
   gArmTokenSpaceGuid.PcdHypFvSize|0|UINT32|0x0000003D
+
+  #
+  # ARM StanaloneMm Stack size.
+  #
+  gArmTokenSpaceGuid.PcdStMmStackSize|0x2000|UINT32|0x0000005D
 
   # Use ClusterId + CoreId to identify the PrimaryCore
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask|0xF03|UINT32|0x00000031
@@ -397,9 +405,19 @@
   gArmTokenSpaceGuid.PcdPciBusMin|0x0|UINT32|0x00000059
   gArmTokenSpaceGuid.PcdPciBusMax|0x0|UINT32|0x0000005A
 
+  #
+  # Define the conduit to use ArmFfalib.
+  # Default PcdFfaLibConduitSmc == TRUE, conduit = SMC
+  # If PcdFfaLibConduitSvc == FALSE, conduit = SVC
+  gArmTokenSpaceGuid.PcdFfaLibConduitSmc|TRUE|BOOLEAN|0x00000063
+
 [PcdsDynamicEx]
   #
   # This dynamic PCD hold the GUID of a firmware FFS which contains
   # the LinuxBoot payload.
   #
   gArmTokenSpaceGuid.PcdLinuxBootFileGuid|{0x0}|VOID*|0x0000005C
+  gArmTokenSpaceGuid.PcdFfaTxBuffer|0x00|UINT64|0x0000005F
+  gArmTokenSpaceGuid.PcdFfaRxBuffer|0x00|UINT64|0x00000060
+  gArmTokenSpaceGuid.PcdFfaTxRxPageCount|1|UINT64|0x00000061
+  gArmTokenSpaceGuid.PcdFfaExitBootEventRegistered|FALSE|BOOLEAN|0x00000062
