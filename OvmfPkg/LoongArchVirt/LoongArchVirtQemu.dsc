@@ -185,6 +185,8 @@
   VariableFlashInfoLib             | MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   VirtNorFlashPlatformLib          | OvmfPkg/Library/FdtNorFlashQemuLib/FdtNorFlashQemuLib.inf
 
+  CpuExceptionHookLib              | UefiCpuPkg/Library/CpuExceptionHookLibNull/CpuExceptionHookLibNull.inf
+
 [LibraryClasses.common.SEC]
   PcdLib                           | MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   ReportStatusCodeLib              | MdeModulePkg/Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.inf
