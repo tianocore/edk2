@@ -473,11 +473,9 @@ TestAppendDevicePathInstance (
 
   Appended = AppendDevicePathInstance (NULL, NULL);
   UT_ASSERT_EQUAL ((uintptr_t)Appended, (uintptr_t)NULL);
-  FreePool (Appended);
 
   Appended = AppendDevicePathInstance ((EFI_DEVICE_PATH_PROTOCOL *)&mSimpleDevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&mInvalidSimpleDevicePath);
   UT_ASSERT_EQUAL ((uintptr_t)Appended, (uintptr_t)NULL);
-  FreePool (Appended);
 
   return UNIT_TEST_PASSED;
 }
