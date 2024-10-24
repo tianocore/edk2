@@ -262,6 +262,11 @@
   # @Prompt BSP Broadcast Method for the first-time wakeup of APs
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|TRUE|BOOLEAN|0x30002007
 
+  ## The initial size in bytes of page table will be created in permanent RAM.
+  #  The value of 0xFFFFFFFFFFFFFFFF, then firmware will map entire physical address space.
+  # @Prompt Configure initial size of page table in permanent RAM.
+  gUefiCpuPkgTokenSpaceGuid.PcdPageTableInPermanentRamInitSize|0xFFFFFFFFFFFFFFFF|UINT64|0x30002008
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
   # @Prompt Configure base address of CPU Local APIC

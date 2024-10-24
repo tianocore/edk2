@@ -73,16 +73,24 @@ MigrateGdt (
 }
 
 /**
-  Migrate page table to permanent memory mapping entire physical address space.
+  Initialize Page Table creation info including the buffer, PagingMode and supported
+  MaxAddressBits used for page table creation.
 
-  @retval   EFI_SUCCESS           The PageTable was migrated successfully.
-  @retval   EFI_UNSUPPORTED       Unsupport to migrate page table to permanent memory if IA-32e Mode not actived.
-  @retval   EFI_OUT_OF_RESOURCES  The PageTable could not be migrated due to lack of available memory.
+  @param[out]  Buffer         The buffer address will be used for page table creation.
+  @param[out]  BufferSize     The buffer size for page table creation.
+  @param[out]  PagingMode     The PagingMode for page table creation.
+  @param[out]  MaxAddressBits The max address Bits for page table needs to be supported.
+
+  @retval   EFI_SUCCESS           Initialize PageTable Info successfully.
+  @retval   EFI_OUT_OF_RESOURCES  Failed to initialize PageTable Info due to lack of available memory.
 
 **/
 EFI_STATUS
-MigratePageTable (
-  VOID
+InitPageTableCreationInfo (
+  OUT EFI_PHYSICAL_ADDRESS  *Buffer,
+  OUT UINTN                 *BufferSize,
+  OUT PAGING_MODE           *PagingMode,
+  OUT UINT32                *MaxAddressBits
   )
 {
   EFI_STATUS                      Status;
@@ -91,22 +99,21 @@ MigratePageTable (
   UINT32                          RegEax;
   CPUID_EXTENDED_CPU_SIG_EDX      RegEdx;
   BOOLEAN                         Page1GSupport;
-  PAGING_MODE                     PagingMode;
   CPUID_VIR_PHY_ADDRESS_SIZE_EAX  VirPhyAddressSize;
   UINT32                          MaxExtendedFunctionId;
   UINTN                           PageTable;
-  EFI_PHYSICAL_ADDRESS            Buffer;
-  UINTN                           BufferSize;
   IA32_MAP_ATTRIBUTE              MapAttribute;
   IA32_MAP_ATTRIBUTE              MapMask;
 
+  ASSERT (Buffer != NULL && BufferSize != NULL && PagingMode != NULL && MaxAddressBits != NULL);
+
   VirPhyAddressSize.Uint32    = 0;
   PageTable                   = 0;
-  BufferSize                  = 0;
+  *BufferSize                 = 0;
   MapAttribute.Uint64         = 0;
-  MapMask.Uint64              = MAX_UINT64;
   MapAttribute.Bits.Present   = 1;
   MapAttribute.Bits.ReadWrite = 1;
+  MapMask.Uint64              = MAX_UINT64;
 
   //
   // Check Page5Level Support or not.
@@ -130,9 +137,9 @@ MigratePageTable (
   // Decide Paging Mode according Page5LevelSupport & Page1GSupport.
   //
   if (Page5LevelSupport) {
-    PagingMode = Page1GSupport ? Paging5Level1GB : Paging5Level;
+    *PagingMode = Page1GSupport ? Paging5Level1GB : Paging5Level;
   } else {
-    PagingMode = Page1GSupport ? Paging4Level1GB : Paging4Level;
+    *PagingMode = Page1GSupport ? Paging4Level1GB : Paging4Level;
   }
 
   //
@@ -143,21 +150,22 @@ MigratePageTable (
   AsmCpuid (CPUID_EXTENDED_FUNCTION, &MaxExtendedFunctionId, NULL, NULL, NULL);
   if (MaxExtendedFunctionId >= CPUID_VIR_PHY_ADDRESS_SIZE) {
     AsmCpuid (CPUID_VIR_PHY_ADDRESS_SIZE, &VirPhyAddressSize.Uint32, NULL, NULL, NULL);
+    *MaxAddressBits = VirPhyAddressSize.Bits.PhysicalAddressBits;
   } else {
-    VirPhyAddressSize.Bits.PhysicalAddressBits = 36;
+    *MaxAddressBits = 36;
   }
 
-  if ((PagingMode == Paging4Level1GB) || (PagingMode == Paging4Level)) {
+  if ((*PagingMode == Paging4Level1GB) || (*PagingMode == Paging4Level)) {
     //
-    // The max lineaddress bits is 48 for 4 level page table.
+    // The max liner address bits is 48 for 4 level page table.
     //
-    VirPhyAddressSize.Bits.PhysicalAddressBits = MIN (VirPhyAddressSize.Bits.PhysicalAddressBits, 48);
+    *MaxAddressBits = MIN (VirPhyAddressSize.Bits.PhysicalAddressBits, 48);
   }
 
   //
   // Get required buffer size for the pagetable that will be created.
   //
-  Status = PageTableMap (&PageTable, PagingMode, 0, &BufferSize, 0, LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits), &MapAttribute, &MapMask, NULL);
+  Status = PageTableMap (&PageTable, *PagingMode, 0, BufferSize, 0, LShiftU64 (1, *MaxAddressBits), &MapAttribute, &MapMask, NULL);
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return Status;
@@ -168,34 +176,20 @@ MigratePageTable (
   //
   Status = PeiServicesAllocatePages (
              EfiBootServicesData,
-             EFI_SIZE_TO_PAGES (BufferSize),
-             &Buffer
+             EFI_SIZE_TO_PAGES (*BufferSize),
+             Buffer
              );
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  //
-  // Create PageTable in permanent memory.
-  //
-  Status = PageTableMap (&PageTable, PagingMode, (VOID *)(UINTN)Buffer, &BufferSize, 0, LShiftU64 (1, VirPhyAddressSize.Bits.PhysicalAddressBits), &MapAttribute, &MapMask, NULL);
-  ASSERT_EFI_ERROR (Status);
-  if (EFI_ERROR (Status) || (PageTable == 0)) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  //
-  // Write the Pagetable to CR3.
-  //
-  AsmWriteCr3 (PageTable);
-
   DEBUG ((
     DEBUG_INFO,
-    "MigratePageTable: Created PageTable = 0x%lx, BufferSize = %x, PagingMode = 0x%lx, Support Max Physical Address Bits = %d\n",
-    PageTable,
-    BufferSize,
-    (UINTN)PagingMode,
-    VirPhyAddressSize.Bits.PhysicalAddressBits
+    "InitPageTableCreationInfo: Buffer Address = 0x%lx, Buffer Size = 0x%x, PagingMode = 0x%lx, MaxAddressBits = %d\n",
+    *Buffer,
+    *BufferSize,
+    *PagingMode,
+    *MaxAddressBits
     ));
 
   return Status;
@@ -583,6 +577,22 @@ SecTemporaryRamDone (
   EFI_PEI_PPI_DESCRIPTOR  *PeiPpiDescriptor;
   REPUBLISH_SEC_PPI_PPI   *RepublishSecPpiPpi;
   IA32_CR0                Cr0;
+  UINTN                   PageTable;
+  EFI_PHYSICAL_ADDRESS    Buffer;
+  UINTN                   BufferSize;
+  PAGING_MODE             PagingMode;
+  UINT32                  MaxAddressBits;
+  UINT64                  Length;
+  UINT64                  Address;
+  IA32_MAP_ATTRIBUTE      MapAttribute;
+  IA32_MAP_ATTRIBUTE      MapMask;
+
+  PageTable                   = 0;
+  BufferSize                  = 0;
+  MapAttribute.Uint64         = 0;
+  MapAttribute.Bits.Present   = 1;
+  MapAttribute.Bits.ReadWrite = 1;
+  MapMask.Uint64              = MAX_UINT64;
 
   //
   // Republish Sec Platform Information(2) PPI
@@ -634,17 +644,56 @@ SecTemporaryRamDone (
     //
     ASSERT (sizeof (UINTN) == sizeof (UINT64));
 
-    Status = MigratePageTable ();
+    //
+    // Initialize page table creation info.
+    //
+    Status = InitPageTableCreationInfo (&Buffer, &BufferSize, &PagingMode, &MaxAddressBits);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "SecTemporaryRamDone: Failed to migrate page table to permanent memory: %r.\n", Status));
+      DEBUG ((DEBUG_ERROR, "SecTemporaryRamDone: Failed to initialize page table info: %r.\n", Status));
       CpuDeadLoop ();
     }
+
+    //
+    // Create initial range page table defined PcdPageTableInPermanentRamInitSize before Temporary RAM
+    // disabled and CPU cache is not enable for permanent ram.
+    //
+    if (FixedPcdGet64 (PcdPageTableInPermanentRamInitSize) == MAX_UINT64) {
+      Length = LShiftU64 (1, MaxAddressBits);
+    } else {
+      ASSERT (FixedPcdGet64 (PcdPageTableInPermanentRamInitSize) <= LShiftU64 (1, MaxAddressBits));
+      Length = FixedPcdGet64 (PcdPageTableInPermanentRamInitSize);
+    }
+
+    Status = PageTableMap (&PageTable, PagingMode, (VOID *)(UINTN)Buffer, &BufferSize, 0, Length, &MapAttribute, &MapMask, NULL);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "SecTemporaryRamDone: Failed to create initial range page table in permanent memory: %r.\n", Status));
+      CpuDeadLoop ();
+    }
+
+    AsmWriteCr3 (PageTable);
   }
 
   //
   // Disable Temporary RAM after Stack and Heap have been migrated at this point.
   //
   SecPlatformDisableTemporaryMemory ();
+
+  //
+  // Create remaining range page table after temporary RAM disabled and CPU cache is
+  // enable for permanent ram.
+  //
+  if ((Cr0.Bits.PG != 0) && (Length < LShiftU64 (1, MaxAddressBits))) {
+    Address = Length;
+    Length  = LShiftU64 (1, MaxAddressBits) - Length;
+
+    Status = PageTableMap (&PageTable, PagingMode, (VOID *)(UINTN)Buffer, &BufferSize, Address, Length, &MapAttribute, &MapMask, NULL);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "SecTemporaryRamDone: Failed to create full range page table in permanent memory: %r.\n", Status));
+      CpuDeadLoop ();
+    }
+
+    AsmWriteCr3 (PageTable);
+  }
 
   //
   // Restore original interrupt state
