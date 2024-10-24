@@ -744,6 +744,7 @@
   OvmfPkg/PlatformPei/PlatformPei.inf {
     <LibraryClasses>
       NULL|OvmfPkg/IntelTdx/TdxHelperLib/PeiTdxHelperLib.inf
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   }
   UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf {
     <LibraryClasses>
@@ -779,6 +780,17 @@
       MpInitLib|UefiCpuPkg/Library/MpInitLibUp/MpInitLibUp.inf
       NULL|OvmfPkg/Library/MpInitLibDepLib/PeiMpInitLibUpDepLib.inf
   }
+
+  #
+  # Cc Measurement Protocol for Td guest
+  #
+!if $(CC_MEASUREMENT_ENABLE) == TRUE
+  OvmfPkg/Tcg/TdTcg2Pei/TdTcg2Pei.inf {
+    <LibraryClasses>
+      BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
+      TdxLib|MdePkg/Library/TdxLib/TdxLib.inf
+  }
+!endif
 
 !include OvmfPkg/Include/Dsc/OvmfTpmComponentsPei.dsc.inc
 
