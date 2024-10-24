@@ -97,6 +97,9 @@ TerminalConInReset (
 
   if (!EFI_ERROR (Status)) {
     Status = TerminalDevice->SerialIo->SetControl (TerminalDevice->SerialIo, EFI_SERIAL_DATA_TERMINAL_READY|EFI_SERIAL_REQUEST_TO_SEND);
+    if (Status == EFI_UNSUPPORTED) {
+      Status = EFI_SUCCESS;
+    }
   }
 
   return Status;
