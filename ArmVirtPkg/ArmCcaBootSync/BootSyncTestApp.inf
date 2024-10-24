@@ -19,12 +19,14 @@
 [Sources.common]
   BootSyncTestApp/BootSyncTestApp.c
 
+  Common/BootSyncDebug.c
   Common/BootSyncSecureChannel.c
   Common/BootSyncProtocol.c
 
   Guest/BootSyncKeyExchangeProtocolGuest.c
   Guest/BootSyncSessionGuest.c
 
+  Include/BootSyncDebug.h
   Include/BootSyncProtocol.h
   Include/BootSyncSecureChannel.h
   Include/BootSyncSession.h

@@ -16,6 +16,7 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
+  Common/BootSyncDebug.c
   Common/BootSyncSecureChannel.c
   Common/BootSyncProtocol.c
 
@@ -23,6 +24,7 @@
   UserContext/BootSyncKeyExchangeProtocolUserContext.c
   UserContext/BootSyncSessionUserContext.c
 
+  Include/BootSyncDebug.h
   Include/BootSyncProtocol.h
   Include/BootSyncSecureChannel.h
   Include/BootSyncSession.h
