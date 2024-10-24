@@ -8,6 +8,41 @@
 
 #include "BaseIoLibIntrinsicInternal.h"
 
+STATIC
+VOID
+PrintErrorInfo (
+  IN       UINTN  Address,
+  IN       UINTN  Length,
+  IN CONST VOID   *Buffer,
+  IN       UINT16 AlignSize,
+  IN CONST CHAR8  *Prompt
+  )
+{
+  if ((Address & (AlignSize - 1)) != 0) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid address: %lx\n", Prompt, Address));
+  }
+
+  if ((Length - 1) > (MAX_ADDRESS - Address)) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid param, address: %lx len: %lx\n",
+      Prompt, Address, Length));
+  }
+
+  if ((Length - 1) > (MAX_ADDRESS - (UINTN)Buffer)) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid param, buffer: %lx len: %lx\n",
+      Prompt, (UINTN)Buffer, Length));
+  }
+
+  if ((Length & (AlignSize - 1)) != 0) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid len: %lx\n", Prompt, Length));
+  }
+
+  if (((UINTN)Buffer & (AlignSize - 1)) != 0) {
+    DEBUG ((DEBUG_ERROR, "%a: invalid buffer: %lx\n", Prompt, (UINTN)Buffer));
+  }
+
+  return;
+}
+
 /**
   Copy data from the MMIO region to system memory by using 8-bit access.
 
@@ -35,6 +70,18 @@ MmioReadBuffer8 (
   )
 {
   UINT8  *ReturnBuffer;
+
+  DEBUG_CODE (
+    if ((Length - 1) > (MAX_ADDRESS - StartAddress)) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid param, address: %lx len: %lx\n",
+        __func__, StartAddress, Length));
+    }
+
+    if ((Length - 1) > (MAX_ADDRESS - (UINTN)Buffer)) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid param, buffer: %lx len: %lx\n",
+        __func__, (UINTN)Buffer, Length));
+    }
+    );
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
@@ -79,6 +126,10 @@ MmioReadBuffer16 (
   )
 {
   UINT16  *ReturnBuffer;
+
+  DEBUG_CODE (
+    PrintErrorInfo (StartAddress, Length, Buffer, sizeof (UINT16), __func__);
+    );
 
   ASSERT ((StartAddress & (sizeof (UINT16) - 1)) == 0);
 
@@ -131,6 +182,10 @@ MmioReadBuffer32 (
 {
   UINT32  *ReturnBuffer;
 
+  DEBUG_CODE (
+    PrintErrorInfo (StartAddress, Length, Buffer, sizeof (UINT32), __func__);
+    );
+
   ASSERT ((StartAddress & (sizeof (UINT32) - 1)) == 0);
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
@@ -182,6 +237,10 @@ MmioReadBuffer64 (
 {
   UINT64  *ReturnBuffer;
 
+  DEBUG_CODE (
+    PrintErrorInfo (StartAddress, Length, Buffer, sizeof (UINT64), __func__);
+    );
+
   ASSERT ((StartAddress & (sizeof (UINT64) - 1)) == 0);
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
@@ -229,6 +288,18 @@ MmioWriteBuffer8 (
 {
   VOID  *ReturnBuffer;
 
+  DEBUG_CODE (
+    if ((Length - 1) > (MAX_ADDRESS - StartAddress)) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid param, address: %lx len: %lx\n",
+        __func__, StartAddress, Length));
+    }
+
+    if ((Length - 1) > (MAX_ADDRESS - (UINTN)Buffer)) {
+      DEBUG ((DEBUG_ERROR, "%a: invalid param, buffer: %lx len: %lx\n",
+        __func__, (UINTN)Buffer, Length));
+    }
+    );
+
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - (UINTN)Buffer));
 
@@ -273,6 +344,10 @@ MmioWriteBuffer16 (
   )
 {
   UINT16  *ReturnBuffer;
+
+  DEBUG_CODE (
+    PrintErrorInfo (StartAddress, Length, Buffer, sizeof (UINT16), __func__);
+    );
 
   ASSERT ((StartAddress & (sizeof (UINT16) - 1)) == 0);
 
@@ -327,6 +402,10 @@ MmioWriteBuffer32 (
 {
   UINT32  *ReturnBuffer;
 
+  DEBUG_CODE (
+    PrintErrorInfo (StartAddress, Length, Buffer, sizeof (UINT32), __func__);
+    );
+
   ASSERT ((StartAddress & (sizeof (UINT32) - 1)) == 0);
 
   ASSERT ((Length - 1) <=  (MAX_ADDRESS - StartAddress));
@@ -379,6 +458,10 @@ MmioWriteBuffer64 (
   )
 {
   UINT64  *ReturnBuffer;
+
+  DEBUG_CODE (
+    PrintErrorInfo (StartAddress, Length, Buffer, sizeof (UINT64), __func__);
+    );
 
   ASSERT ((StartAddress & (sizeof (UINT64) - 1)) == 0);
 
