@@ -178,9 +178,10 @@ typedef struct {
 //
 // MM Core Global Variables
 //
-extern EFI_MM_SYSTEM_TABLE  gMmCoreMmst;
-extern LIST_ENTRY           gHandleList;
-extern BOOLEAN              mMmEntryPointRegistered;
+extern EFI_MM_SYSTEM_TABLE         gMmCoreMmst;
+extern LIST_ENTRY                  gHandleList;
+extern BOOLEAN                     mMmEntryPointRegistered;
+extern EFI_FIRMWARE_VOLUME_HEADER  *mBfv;
 
 /**
   Called to initialize the memory service.
