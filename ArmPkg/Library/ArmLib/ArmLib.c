@@ -71,7 +71,7 @@ ArmInstructionCacheLineLength (
   return 4 << (ArmCacheInfo () & 0xf); // CTR_EL0.IminLine
 }
 
-UINTN
+UINT32
 EFIAPI
 ArmCacheWritebackGranule (
   VOID
