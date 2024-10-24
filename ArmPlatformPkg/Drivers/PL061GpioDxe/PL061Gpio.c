@@ -34,7 +34,7 @@ PL061Locate (
   OUT UINTN              *RegisterBase
   )
 {
-  UINT32  Index;
+  UINTN  Index;
 
   for (Index = 0; Index < mPL061PlatformGpio->GpioControllerCount; Index++) {
     if (  (Gpio >= mPL061PlatformGpio->GpioController[Index].GpioIndex)
@@ -100,7 +100,7 @@ PL061SetPins (
   IN UINTN  Value
   )
 {
-  MmioWrite8 (PL061EffectiveAddress (Address, Mask), Value);
+  MmioWrite8 (PL061EffectiveAddress (Address, Mask), (UINT8)Value);
 }
 
 /**
@@ -242,14 +242,14 @@ Set (
 
     case GPIO_MODE_OUTPUT_0:
       // Set the corresponding direction bit to HIGH for output
-      MmioOr8 (RegisterBase + PL061_GPIO_DIR_REG, GPIO_PIN_MASK (Offset));
+      MmioOr8 (RegisterBase + PL061_GPIO_DIR_REG, (UINT8)GPIO_PIN_MASK (Offset));
       // Set the corresponding data bit to LOW for 0
       PL061SetPins (RegisterBase, GPIO_PIN_MASK (Offset), 0);
       break;
 
     case GPIO_MODE_OUTPUT_1:
       // Set the corresponding direction bit to HIGH for output
-      MmioOr8 (RegisterBase + PL061_GPIO_DIR_REG, GPIO_PIN_MASK (Offset));
+      MmioOr8 (RegisterBase + PL061_GPIO_DIR_REG, (UINT8)GPIO_PIN_MASK (Offset));
       // Set the corresponding data bit to HIGH for 1
       PL061SetPins (RegisterBase, GPIO_PIN_MASK (Offset), 0xff);
       break;
