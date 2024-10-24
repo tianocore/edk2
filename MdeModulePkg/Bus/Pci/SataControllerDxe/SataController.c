@@ -306,6 +306,7 @@ SataControllerSupported (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
   ///
   /// Close the protocol because we don't use it here
   ///
