@@ -86,6 +86,7 @@
   gEfiHiiImageDecoderNameJpegGuid |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_CONSUMES ## GUID
   gEfiHiiImageDecoderNamePngGuid  |gEfiMdeModulePkgTokenSpaceGuid.PcdSupportHiiImageProtocol  ## SOMETIMES_CONSUMES ## GUID
   gEdkiiIfrBitVarstoreGuid                                                                    ## SOMETIMES_CONSUMES ## GUID
+  gEfiAuthenticatedVariableGuid                                                               ## CONSUMES ## GUID
 
 [Depex]
   TRUE
