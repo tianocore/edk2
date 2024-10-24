@@ -89,10 +89,13 @@ PlatformHookSerialPortInitialize (
       return Status;
     }
 
+ #if FixedPcdGetBool (PcdUseUniversalPayloadSerialPort) == 1
     Status = PcdSet32S (PcdSerialBaudRate, SerialPortInfo->BaudRate);
     if (RETURN_ERROR (Status)) {
       return Status;
     }
+
+ #endif
 
     return RETURN_SUCCESS;
   }
