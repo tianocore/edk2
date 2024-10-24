@@ -25,7 +25,9 @@
   Common/BootSyncSecureChannel.c
   Common/BootSyncProtocol.c
 
+  Guest/BootSyncAttestationProtocolGuest.c
   Guest/BootSyncKeyExchangeProtocolGuest.c
+  Guest/BootSyncProtocolGuest.h
   Guest/BootSyncSessionGuest.c
 
   Include/BootSyncBsbMsg.h
@@ -57,6 +59,10 @@
   UefiLib
 
 [Guids]
+  gArmBootSyncAttReport
+  gArmBootSyncAttReqGuid
+  gArmBootSyncAttRespGuid
+  gArmBootSyncAttResult
   gArmBootSyncFinGuid
   gArmBootSyncKeyEncData
   gArmBootSyncKeyXchgReqGuid
