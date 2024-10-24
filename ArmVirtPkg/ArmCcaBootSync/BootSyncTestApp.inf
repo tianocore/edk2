@@ -20,6 +20,7 @@
   BootSyncTestApp/BootSyncTestApp.c
 
   Common/BootSyncBsbMsg.c
+  Common/BootSyncBsbParser.c
   Common/BootSyncDebug.c
   Common/BootSyncSecureChannel.c
   Common/BootSyncProtocol.c
@@ -28,6 +29,7 @@
   Guest/BootSyncSessionGuest.c
 
   Include/BootSyncBsbMsg.h
+  Include/BootSyncBsbParser.h
   Include/BootSyncDebug.h
   Include/BootSyncProtocol.h
   Include/BootSyncSecureChannel.h
