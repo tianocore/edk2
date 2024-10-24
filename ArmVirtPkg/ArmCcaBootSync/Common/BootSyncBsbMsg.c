@@ -139,3 +139,178 @@ exit_handler:
   FreePool (EncMsg);
   return Status;
 }
+
+/**
+  Decrypt the BSB Message.
+
+  @param[in]  SecChannel  Pointer to the secure channel.
+  @param[in]  EncBsbMsg   Pointer to the encrypted message.
+  @param[out] DecMsg      Pointer to the decrypted BSB message.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+  @retval EFI_ABORTED             An operation failed.
+  @retval EFI_SUCCESS             Success.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+DecryptBsbMsg (
+  IN  SECURE_CHANNEL            *SecChannel,
+  IN  BOOT_SYNC_ENCRYPTED_DATA  *EncBsbMsg,
+  OUT BOOT_SYNC_BSB_HEADER      **DecMsg
+  )
+{
+  BOOLEAN     Result;
+  EFI_STATUS  Status;
+  UINT8       *EncData;
+  UINT8       *BsbData;
+  UINTN       BsbDataLen;
+
+  if ((SecChannel == NULL) ||
+      (EncBsbMsg == NULL) ||
+      (DecMsg == NULL))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((EncBsbMsg->Header.Length < sizeof (BOOT_SYNC_ENCRYPTED_DATA)) ||
+      (EncBsbMsg->Header.Length < (sizeof (BOOT_SYNC_ENCRYPTED_DATA) +
+                                   EncBsbMsg->EncDataLen)))
+  {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  BsbDataLen = EncBsbMsg->EncDataLen;
+  BsbData    = AllocateZeroPool (BsbDataLen);
+  if (BsbData == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  EncData = (UINT8 *)(EncBsbMsg + 1);
+  Result  = ArmCcaBootSyncCryptoDecrypt (
+              SecChannel->Ke,                            // Key
+              ENCRYPTION_KEY_SIZE,                       // KeySize
+              EncBsbMsg->Iv,                             // Iv
+              IV_SIZE,                                   // IvSize
+              (UINT8 *)EncBsbMsg,                        // AData
+              OFFSET_OF (BOOT_SYNC_ENCRYPTED_DATA, Tag), // ADataSize
+              EncData,                                   // DataIn
+              EncBsbMsg->EncDataLen,                     // DataInSize
+              EncBsbMsg->Tag,                            // Tag
+              TAG_SIZE,                                  // TagSize
+              BsbData,                                   // DataOut
+              &BsbDataLen                                // DataOutSize
+              );
+  if (!Result) {
+    Status = EFI_ABORTED;
+    goto error_handler;
+  }
+
+  // Validate that the decrypted data matches the length in the header.
+  if (((BOOT_SYNC_BSB_HEADER *)BsbData)->Header.Length != BsbDataLen) {
+    Status = EFI_ABORTED;
+    goto error_handler;
+  }
+
+  *DecMsg = (BOOT_SYNC_BSB_HEADER *)BsbData;
+  return EFI_SUCCESS;
+
+error_handler:
+  FreePool (BsbData);
+  return Status;
+}
+
+/**
+  Receive a message and decrypt if encrypted.
+
+  Note: Caller is expected to free the returned Message
+
+  @param[in]  SecChannel  Pointer to the secure channel.
+  @param[out] Message     Pointer to the received message.
+
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_PROTOCOL_ERROR      A protocol error was detected, resulting in
+                                  the connection being terminated.
+  @retval EFI_ABORTED             An operation failed.
+  @retval EFI_SUCCESS             Success.
+**/
+EFI_STATUS
+EFIAPI
+ReceiveDecryptBsbMsg (
+  IN  SECURE_CHANNEL       *SecChannel,
+  OUT BOOT_SYNC_GUID_BLOB  **Message
+  )
+{
+  EFI_STATUS           Status;
+  BOOT_SYNC_GUID_BLOB  *Msg;
+
+  if ((SecChannel == NULL) || (Message == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  *Message = NULL;
+
+  Status = SecureChannelGetMessage (SecChannel, &Msg);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Check if the message received is an Encrypted Data message.
+  if (!CompareGuid (&Msg->Name, &gArmBootSyncKeyEncData)) {
+    // The message is a protocol communication message
+    if (CompareGuid (&Msg->Name, &gArmBootSyncFinGuid)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "INFO: Communication termination requested (FIN), " \
+        "MSG GUID = %g, Reason = 0x%x\n",
+        &Msg->Name,
+        ((BOOT_SYNC_FIN *)Msg)->Reason
+        ));
+    } else if (CompareGuid (&Msg->Name, &gArmBootSyncNackGuid)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: NACK - Communication refused and terminated (NACK), " \
+        "MSG GUID = %g, Reason = 0x%x\n",
+        &Msg->Name,
+        ((BOOT_SYNC_NACK *)Msg)->Reason
+        ));
+    } else {
+      // Invalid message received over channel.
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: Communication terminated unexpectedly (PROTOCOL ERROR), " \
+        "MSG GUID = %g, Invalid Data received.\n",
+        &Msg->Name
+        ));
+      Status = EFI_PROTOCOL_ERROR;
+      ASSERT (FALSE);
+
+      // Free the message data
+      FreePool (Msg);
+      *Message = NULL;
+      goto exit_handler;
+    }
+
+    *Message = Msg;
+  } else {
+    // The Message is an encrypted BSB message, so decrypt it.
+    Status = DecryptBsbMsg (
+               SecChannel,
+               (BOOT_SYNC_ENCRYPTED_DATA *)Msg,
+               (BOOT_SYNC_BSB_HEADER **)Message
+               );
+    ASSERT_EFI_ERROR (Status);
+
+    // Free the encrypted message data
+    FreePool (Msg);
+  }
+
+  if (*Message != NULL) {
+    DBG_PRINT_MSGINFO (&(*Message)->Name, FALSE);
+    DBG_DUMP_RAW ("Recv Data", (UINT8 *)(*Message), (*Message)->Length);
+  }
+
+exit_handler:
+  return Status;
+}
