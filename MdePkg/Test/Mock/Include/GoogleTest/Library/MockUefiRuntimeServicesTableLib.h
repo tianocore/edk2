@@ -44,6 +44,15 @@ struct MockUefiRuntimeServicesTableLib {
     (OUT  EFI_TIME                    *Time,
      OUT  EFI_TIME_CAPABILITIES       *Capabilities OPTIONAL)
     );
+
+  MOCK_FUNCTION_DECLARATION (
+    VOID,
+    gRT_ResetSystem,
+    (IN EFI_RESET_TYPE           ResetType,
+     IN EFI_STATUS               ResetStatus,
+     IN UINTN                    DataSize,
+     IN VOID                     *ResetData OPTIONAL)
+    );
 };
 
 #endif

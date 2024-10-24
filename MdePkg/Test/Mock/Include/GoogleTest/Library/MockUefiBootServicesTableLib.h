@@ -49,10 +49,47 @@ struct MockUefiBootServicesTableLib {
 
   MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
+    gBS_InstallProtocolInterface,
+    (IN OUT EFI_HANDLE      *UserHandle,
+     IN EFI_GUID            *Protocol,
+     IN EFI_INTERFACE_TYPE  InterfaceType,
+     IN VOID                *Interface)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_UninstallProtocolInterface,
+    (IN EFI_HANDLE               Handle,
+     IN EFI_GUID                 *Protocol,
+     IN VOID                     *Interface)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
     gBS_HandleProtocol,
     (IN  EFI_HANDLE Handle,
      IN  EFI_GUID   *Protocol,
      OUT VOID       **Interface)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_RegisterProtocolNotify,
+    (IN  EFI_GUID                 *Protocol,
+     IN  EFI_EVENT                Event,
+     OUT VOID                     **Registration)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_LocateHandleBuffer,
+    (
+     IN     EFI_LOCATE_SEARCH_TYPE       SearchType,
+     IN     EFI_GUID                     *Protocol       OPTIONAL,
+     IN     VOID                         *SearchKey      OPTIONAL,
+     OUT    UINTN                        *NoHandles,
+     OUT    EFI_HANDLE                   **Buffer
+    )
     );
 
   MOCK_FUNCTION_DECLARATION (
@@ -72,6 +109,100 @@ struct MockUefiBootServicesTableLib {
      IN CONST VOID        *NotifyContext OPTIONAL,
      IN CONST EFI_GUID    *EventGroup OPTIONAL,
      OUT EFI_EVENT        *Event)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    VOID,
+    gBS_SetMem,
+    (IN VOID     *Buffer,
+     IN UINTN    Size,
+     IN UINT8    Value)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    VOID,
+    gBS_CopyMem,
+    (IN VOID     *Destination,
+     IN VOID     *Source,
+     IN UINTN    Length)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_OpenProtocol,
+    (IN  EFI_HANDLE                Handle,
+     IN  EFI_GUID                  *Protocol,
+     OUT VOID                      **Interface  OPTIONAL,
+     IN  EFI_HANDLE                AgentHandle,
+     IN  EFI_HANDLE                ControllerHandle,
+     IN  UINT32                    Attributes)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_CloseProtocol,
+    (IN EFI_HANDLE               Handle,
+     IN EFI_GUID                 *Protocol,
+     IN EFI_HANDLE               AgentHandle,
+     IN EFI_HANDLE               ControllerHandle)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_FreePool,
+    (IN  VOID                         *Buffer)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_LocateDevicePath,
+    (IN     EFI_GUID                         *Protocol,
+     IN OUT EFI_DEVICE_PATH_PROTOCOL         **DevicePath,
+     OUT    EFI_HANDLE                       *Device)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_ReinstallProtocolInterface,
+    (IN EFI_HANDLE               Handle,
+     IN EFI_GUID                 *Protocol,
+     IN VOID                     *OldInterface,
+     IN VOID                     *NewInterface)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_AllocatePool,
+    (IN  EFI_MEMORY_TYPE              PoolType,
+     IN  UINTN                        Size,
+     OUT VOID                         **Buffer)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_LocateHandle,
+    (IN     EFI_LOCATE_SEARCH_TYPE   SearchType,
+     IN     EFI_GUID                 *Protocol     OPTIONAL,
+     IN     VOID                     *SearchKey    OPTIONAL,
+     IN OUT UINTN                    *BufferSize,
+     OUT    EFI_HANDLE               *Buffer)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_ConnectController,
+    (IN  EFI_HANDLE                    ControllerHandle,
+     IN  EFI_HANDLE                    *DriverImageHandle    OPTIONAL,
+     IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath  OPTIONAL,
+     IN  BOOLEAN                       Recursive)
+    );
+
+  MOCK_FUNCTION_DECLARATION (
+    EFI_STATUS,
+    gBS_DisconnectController,
+    (IN  EFI_HANDLE                     ControllerHandle,
+     IN  EFI_HANDLE                     DriverImageHandle  OPTIONAL,
+     IN  EFI_HANDLE                     ChildHandle        OPTIONAL)
     );
 };
 
