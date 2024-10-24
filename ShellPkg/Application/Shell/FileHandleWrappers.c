@@ -2144,6 +2144,10 @@ FileInterfaceFileWrite (
     // Ascii
     //
     AsciiBuffer = AllocateZeroPool (*BufferSize);
+    if (AsciiBuffer == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     AsciiSPrint (AsciiBuffer, *BufferSize, "%S", Buffer);
     Size   = AsciiStrSize (AsciiBuffer) - 1; // (we dont need the null terminator)
     Status = (((EFI_FILE_PROTOCOL_FILE *)This)->Orig->Write (((EFI_FILE_PROTOCOL_FILE *)This)->Orig, &Size, AsciiBuffer));

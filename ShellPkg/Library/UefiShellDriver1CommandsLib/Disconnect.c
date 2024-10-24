@@ -98,7 +98,10 @@ ShellCommandRunDisconnect (
   UINT64        Intermediate2;
   UINT64        Intermediate3;
 
-  ShellStatus = SHELL_SUCCESS;
+  Intermediate1 = 0;
+  Intermediate2 = 0;
+  Intermediate3 = 0;
+  ShellStatus   = SHELL_SUCCESS;
 
   //
   // initialize the shell lib (we must be in non-auto-init...)

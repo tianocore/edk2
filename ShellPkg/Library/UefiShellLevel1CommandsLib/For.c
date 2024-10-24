@@ -334,7 +334,10 @@ ShellCommandRunFor (
   }
 
   CurrentScriptFile = ShellCommandGetCurrentScriptFile ();
-  ASSERT (CurrentScriptFile != NULL);
+  if (CurrentScriptFile == NULL) {
+    ASSERT (CurrentScriptFile != NULL);
+    return (SHELL_INVALID_PARAMETER);
+  }
 
   if ((CurrentScriptFile->CurrentCommand != NULL) && (CurrentScriptFile->CurrentCommand->Data == NULL)) {
     FirstPass = TRUE;
@@ -687,6 +690,12 @@ ShellCommandRunFor (
       }
 
       TempString = AllocateZeroPool (50*sizeof (CHAR16));
+      if (TempString == NULL) {
+        SHELL_FREE_NON_NULL (ArgSet);
+        SHELL_FREE_NON_NULL (Info);
+        return (SHELL_OUT_OF_RESOURCES);
+      }
+
       UnicodeSPrint (TempString, 50*sizeof (CHAR16), L"%d", Info->Current);
       InternalUpdateAliasOnList (Info->ReplacementName, TempString, &CurrentScriptFile->SubstList);
       FreePool (TempString);
