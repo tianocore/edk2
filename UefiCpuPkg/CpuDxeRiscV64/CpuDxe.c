@@ -7,7 +7,7 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
-
+#include <Library/HobLib.h>
 #include "CpuDxe.h"
 
 //
@@ -331,19 +331,16 @@ InitializeCpu (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                  Status;
-  EFI_RISCV_FIRMWARE_CONTEXT  *FirmwareContext;
+  EFI_STATUS         Status;
+  EFI_HOB_RISCV_CPU  *CpuHob;
 
-  GetFirmwareContextPointer (&FirmwareContext);
-  ASSERT (FirmwareContext != NULL);
-  if (FirmwareContext == NULL) {
-    DEBUG ((DEBUG_ERROR, "Failed to get the pointer of EFI_RISCV_FIRMWARE_CONTEXT\n"));
-    return EFI_NOT_FOUND;
-  }
+  //
+  // Get the number of address lines in the I/O and Memory space for the CPU
+  //
+  CpuHob = GetFirstHob (EFI_HOB_TYPE_RISCV_CPU);
+  ASSERT (CpuHob != NULL);
+  mBootHartId = CpuHob->CpuId;
 
-  DEBUG ((DEBUG_INFO, " %a: Firmware Context is at 0x%x.\n", __func__, FirmwareContext));
-
-  mBootHartId = FirmwareContext->BootHartId;
   DEBUG ((DEBUG_INFO, " %a: mBootHartId = 0x%x.\n", __func__, mBootHartId));
 
   InitializeCpuExceptionHandlers (NULL);
