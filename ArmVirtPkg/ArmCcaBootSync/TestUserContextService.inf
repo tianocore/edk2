@@ -16,6 +16,7 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
+  Common/BootSyncBsbMsg.c
   Common/BootSyncDebug.c
   Common/BootSyncSecureChannel.c
   Common/BootSyncProtocol.c
@@ -24,6 +25,7 @@
   UserContext/BootSyncKeyExchangeProtocolUserContext.c
   UserContext/BootSyncSessionUserContext.c
 
+  Include/BootSyncBsbMsg.h
   Include/BootSyncDebug.h
   Include/BootSyncProtocol.h
   Include/BootSyncSecureChannel.h
@@ -47,6 +49,7 @@
 
 [Guids]
   gArmBootSyncFinGuid
+  gArmBootSyncKeyEncData
   gArmBootSyncKeyXchgReqGuid
   gArmBootSyncKeyXchgRespGuid
   gArmBootSyncNackGuid

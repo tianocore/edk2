@@ -19,6 +19,7 @@
 [Sources.common]
   BootSyncTestApp/BootSyncTestApp.c
 
+  Common/BootSyncBsbMsg.c
   Common/BootSyncDebug.c
   Common/BootSyncSecureChannel.c
   Common/BootSyncProtocol.c
@@ -26,6 +27,7 @@
   Guest/BootSyncKeyExchangeProtocolGuest.c
   Guest/BootSyncSessionGuest.c
 
+  Include/BootSyncBsbMsg.h
   Include/BootSyncDebug.h
   Include/BootSyncProtocol.h
   Include/BootSyncSecureChannel.h
@@ -54,6 +56,7 @@
 
 [Guids]
   gArmBootSyncFinGuid
+  gArmBootSyncKeyEncData
   gArmBootSyncKeyXchgReqGuid
   gArmBootSyncKeyXchgRespGuid
   gArmBootSyncNackGuid

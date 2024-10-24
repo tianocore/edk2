@@ -21,6 +21,7 @@ STATIC struct {
   CHAR8       *Name;
 } MessageMap[] = {
   { &gArmBootSyncFinGuid,         "ArmBootSyncFinGuid"         },
+  { &gArmBootSyncKeyEncData,      "ArmBootSyncKeyEncData"      },
   { &gArmBootSyncKeyXchgReqGuid,  "ArmBootSyncKeyXchgReqGuid"  },
   { &gArmBootSyncKeyXchgRespGuid, "ArmBootSyncKeyXchgRespGuid" },
   { &gArmBootSyncNackGuid,        "ArmBootSyncNackGuid"        }
