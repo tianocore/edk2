@@ -49,7 +49,7 @@ BmmCreateBootNextMenu (
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
 
-  for (Index = 0; Index < BootOptionMenu.MenuNumber; Index++) {
+  for (Index = 0; (UINTN)Index < BootOptionMenu.MenuNumber; Index++) {
     NewMenuEntry   = BOpt_GetMenuEntry (&BootOptionMenu, Index);
     NewLoadContext = (BM_LOAD_CONTEXT *)NewMenuEntry->VariableContext;
 
@@ -305,6 +305,8 @@ IsRequiredDriver (
   UINTN             TempSize;
   BOOLEAN           RetVal;
 
+  Buffer = NULL;
+
   Status = HiiGetFormSetFromHiiHandle (HiiHandle, &Buffer, &BufferSize);
   if (EFI_ERROR (Status)) {
     return FALSE;
@@ -379,88 +381,98 @@ BmmListThirdPartyDrivers (
 
   HiiHandles = HiiGetHiiHandles (NULL);
   ASSERT (HiiHandles != NULL);
+  if (HiiHandles != NULL) {
+    gHiiDriverList = AllocateZeroPool (UI_HII_DRIVER_LIST_SIZE * sizeof (UI_HII_DRIVER_INSTANCE));
+    ASSERT (gHiiDriverList != NULL);
+    if (gHiiDriverList != NULL) {
+      DriverListPtr = gHiiDriverList;
+      CurrentSize   = UI_HII_DRIVER_LIST_SIZE;
 
-  gHiiDriverList = AllocateZeroPool (UI_HII_DRIVER_LIST_SIZE * sizeof (UI_HII_DRIVER_INSTANCE));
-  ASSERT (gHiiDriverList != NULL);
-  DriverListPtr = gHiiDriverList;
-  CurrentSize   = UI_HII_DRIVER_LIST_SIZE;
+      for (Index = 0, Count = 0; HiiHandles[Index] != NULL; Index++) {
+        if (!IsRequiredDriver (HiiHandles[Index], ClassGuid, &Token, &TokenHelp, &gHiiDriverList[Count].FormSetGuid)) {
+          continue;
+        }
 
-  for (Index = 0, Count = 0; HiiHandles[Index] != NULL; Index++) {
-    if (!IsRequiredDriver (HiiHandles[Index], ClassGuid, &Token, &TokenHelp, &gHiiDriverList[Count].FormSetGuid)) {
-      continue;
-    }
+        String = HiiGetString (HiiHandles[Index], Token, NULL);
+        if (String == NULL) {
+          String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
+          ASSERT (String != NULL);
+        } else if (SpecialHandlerFn != NULL) {
+          //
+          // Check whether need to rename the driver name.
+          //
+          EmptyLineAfter = FALSE;
+          if (SpecialHandlerFn (String, &NewName, &EmptyLineAfter)) {
+            FreePool (String);
+            String                              = NewName;
+            DriverListPtr[Count].EmptyLineAfter = EmptyLineAfter;
+          }
+        }
 
-    String = HiiGetString (HiiHandles[Index], Token, NULL);
-    if (String == NULL) {
-      String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
-      ASSERT (String != NULL);
-    } else if (SpecialHandlerFn != NULL) {
-      //
-      // Check whether need to rename the driver name.
-      //
-      EmptyLineAfter = FALSE;
-      if (SpecialHandlerFn (String, &NewName, &EmptyLineAfter)) {
-        FreePool (String);
-        String                              = NewName;
-        DriverListPtr[Count].EmptyLineAfter = EmptyLineAfter;
+        DriverListPtr[Count].PromptId = HiiSetString (HiiHandle, 0, String, NULL);
+        if (String != NULL) {
+          FreePool (String);
+        }
+
+        String = HiiGetString (HiiHandles[Index], TokenHelp, NULL);
+        if (String == NULL) {
+          String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
+          ASSERT (String != NULL);
+        }
+
+        DriverListPtr[Count].HelpId = HiiSetString (HiiHandle, 0, String, NULL);
+        if (String != NULL) {
+          FreePool (String);
+        }
+
+        DevicePathStr = ExtractDevicePathFromHandle (HiiHandles[Index]);
+        if (DevicePathStr != NULL) {
+          DriverListPtr[Count].DevicePathId = HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
+          FreePool (DevicePathStr);
+        } else {
+          DriverListPtr[Count].DevicePathId = 0;
+        }
+
+        Count++;
+        if (Count >= CurrentSize) {
+          DriverListPtr = ReallocatePool (
+                            CurrentSize * sizeof (UI_HII_DRIVER_INSTANCE),
+                            (Count + UI_HII_DRIVER_LIST_SIZE)
+                            * sizeof (UI_HII_DRIVER_INSTANCE),
+                            gHiiDriverList
+                            );
+          ASSERT (DriverListPtr != NULL);
+          if (DriverListPtr != NULL) {
+            gHiiDriverList = DriverListPtr;
+          }
+
+          CurrentSize += UI_HII_DRIVER_LIST_SIZE;
+        }
       }
     }
 
-    DriverListPtr[Count].PromptId = HiiSetString (HiiHandle, 0, String, NULL);
-    FreePool (String);
+    FreePool (HiiHandles);
 
-    String = HiiGetString (HiiHandles[Index], TokenHelp, NULL);
-    if (String == NULL) {
-      String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
-      ASSERT (String != NULL);
+    Index = 0;
+    while (gHiiDriverList[Index].PromptId != 0) {
+      HiiCreateGotoExOpCode (
+        StartOpCodeHandle,
+        0,
+        gHiiDriverList[Index].PromptId,
+        gHiiDriverList[Index].HelpId,
+        0,
+        0,
+        0,
+        &gHiiDriverList[Index].FormSetGuid,
+        gHiiDriverList[Index].DevicePathId
+        );
+
+      if (gHiiDriverList[Index].EmptyLineAfter) {
+        BmmCreateEmptyLine (HiiHandle, StartOpCodeHandle);
+      }
+
+      Index++;
     }
-
-    DriverListPtr[Count].HelpId = HiiSetString (HiiHandle, 0, String, NULL);
-    FreePool (String);
-
-    DevicePathStr = ExtractDevicePathFromHandle (HiiHandles[Index]);
-    if (DevicePathStr != NULL) {
-      DriverListPtr[Count].DevicePathId = HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
-      FreePool (DevicePathStr);
-    } else {
-      DriverListPtr[Count].DevicePathId = 0;
-    }
-
-    Count++;
-    if (Count >= CurrentSize) {
-      DriverListPtr = ReallocatePool (
-                        CurrentSize * sizeof (UI_HII_DRIVER_INSTANCE),
-                        (Count + UI_HII_DRIVER_LIST_SIZE)
-                        * sizeof (UI_HII_DRIVER_INSTANCE),
-                        gHiiDriverList
-                        );
-      ASSERT (DriverListPtr != NULL);
-      gHiiDriverList = DriverListPtr;
-      CurrentSize   += UI_HII_DRIVER_LIST_SIZE;
-    }
-  }
-
-  FreePool (HiiHandles);
-
-  Index = 0;
-  while (gHiiDriverList[Index].PromptId != 0) {
-    HiiCreateGotoExOpCode (
-      StartOpCodeHandle,
-      0,
-      gHiiDriverList[Index].PromptId,
-      gHiiDriverList[Index].HelpId,
-      0,
-      0,
-      0,
-      &gHiiDriverList[Index].FormSetGuid,
-      gHiiDriverList[Index].DevicePathId
-      );
-
-    if (gHiiDriverList[Index].EmptyLineAfter) {
-      BmmCreateEmptyLine (HiiHandle, StartOpCodeHandle);
-    }
-
-    Index++;
   }
 
   return EFI_SUCCESS;

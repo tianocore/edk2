@@ -739,7 +739,7 @@ UsbIoGetStringDescriptor (
   EFI_USB_STRING_DESCRIPTOR  *StrDesc;
   EFI_TPL                    OldTpl;
   UINT8                      *Buf;
-  UINT8                      Index;
+  UINT16                     Index;
   EFI_STATUS                 Status;
 
   if ((StringIndex == 0) || (LangID == 0)) {

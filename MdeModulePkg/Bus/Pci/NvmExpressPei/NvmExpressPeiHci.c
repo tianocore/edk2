@@ -564,14 +564,16 @@ NvmeControllerInit (
   //
   // Dump the NVME controller implementation version
   //
-  NVME_GET_VER (Private, &Ver);
-  DEBUG ((DEBUG_INFO, "NVME controller implementation version: %d.%d\n", Ver.Mjr, Ver.Mnr));
+  Status = NVME_GET_VER (Private, &Ver);
+  if (!EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "NVME controller implementation version: %d.%d\n", Ver.Mjr, Ver.Mnr));
+  }
 
   //
   // Read the controller Capabilities register and verify that the NVM command set is supported
   //
-  NVME_GET_CAP (Private, &Private->Cap);
-  if ((Private->Cap.Css & BIT0) == 0) {
+  Status = NVME_GET_CAP (Private, &Private->Cap);
+  if ( !EFI_ERROR (Status) && ((Private->Cap.Css & BIT0) == 0)) {
     DEBUG ((DEBUG_ERROR, "%a: The NVME controller doesn't support NVMe command set.\n", __func__));
     return EFI_UNSUPPORTED;
   }

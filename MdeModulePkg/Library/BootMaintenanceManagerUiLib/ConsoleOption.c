@@ -803,47 +803,49 @@ GetConsoleMenu (
   Index2          = 0;
   for (Index = 0; Index < AllCount; Index++) {
     DevicePathInst = GetNextDevicePathInstance (&MultiDevicePath, &Size);
+    ASSERT (DevicePathInst != NULL);
+    if (DevicePathInst != NULL) {
+      NewMenuEntry = BOpt_CreateMenuEntry (BM_CONSOLE_CONTEXT_SELECT);
+      if (NULL == NewMenuEntry) {
+        return EFI_OUT_OF_RESOURCES;
+      }
 
-    NewMenuEntry = BOpt_CreateMenuEntry (BM_CONSOLE_CONTEXT_SELECT);
-    if (NULL == NewMenuEntry) {
-      return EFI_OUT_OF_RESOURCES;
-    }
+      NewConsoleContext          = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
+      NewMenuEntry->OptionNumber = Index2;
 
-    NewConsoleContext          = (BM_CONSOLE_CONTEXT *)NewMenuEntry->VariableContext;
-    NewMenuEntry->OptionNumber = Index2;
+      NewConsoleContext->DevicePath = DuplicateDevicePath (DevicePathInst);
+      ASSERT (NewConsoleContext->DevicePath != NULL);
+      NewMenuEntry->DisplayString = EfiLibStrFromDatahub (NewConsoleContext->DevicePath);
+      if (NULL == NewMenuEntry->DisplayString) {
+        NewMenuEntry->DisplayString = UiDevicePathToStr (NewConsoleContext->DevicePath);
+      }
 
-    NewConsoleContext->DevicePath = DuplicateDevicePath (DevicePathInst);
-    ASSERT (NewConsoleContext->DevicePath != NULL);
-    NewMenuEntry->DisplayString = EfiLibStrFromDatahub (NewConsoleContext->DevicePath);
-    if (NULL == NewMenuEntry->DisplayString) {
-      NewMenuEntry->DisplayString = UiDevicePathToStr (NewConsoleContext->DevicePath);
-    }
+      NewMenuEntry->DisplayStringToken = HiiSetString (mBmmCallbackInfo->BmmHiiHandle, 0, NewMenuEntry->DisplayString, NULL);
 
-    NewMenuEntry->DisplayStringToken = HiiSetString (mBmmCallbackInfo->BmmHiiHandle, 0, NewMenuEntry->DisplayString, NULL);
+      if (NULL == NewMenuEntry->HelpString) {
+        NewMenuEntry->HelpStringToken = NewMenuEntry->DisplayStringToken;
+      } else {
+        NewMenuEntry->HelpStringToken = HiiSetString (mBmmCallbackInfo->BmmHiiHandle, 0, NewMenuEntry->HelpString, NULL);
+      }
 
-    if (NULL == NewMenuEntry->HelpString) {
-      NewMenuEntry->HelpStringToken = NewMenuEntry->DisplayStringToken;
-    } else {
-      NewMenuEntry->HelpStringToken = HiiSetString (mBmmCallbackInfo->BmmHiiHandle, 0, NewMenuEntry->HelpString, NULL);
-    }
+      NewConsoleContext->IsTerminal = IsTerminalDevicePath (
+                                        NewConsoleContext->DevicePath,
+                                        &Terminal,
+                                        &Com
+                                        );
 
-    NewConsoleContext->IsTerminal = IsTerminalDevicePath (
-                                      NewConsoleContext->DevicePath,
-                                      &Terminal,
-                                      &Com
+      NewConsoleContext->IsActive = MatchDevicePaths (
+                                      DevicePath,
+                                      NewConsoleContext->DevicePath
                                       );
 
-    NewConsoleContext->IsActive = MatchDevicePaths (
-                                    DevicePath,
-                                    NewConsoleContext->DevicePath
-                                    );
-
-    if (NewConsoleContext->IsTerminal) {
-      BOpt_DestroyMenuEntry (NewMenuEntry);
-    } else {
-      Index2++;
-      ConsoleMenu->MenuNumber++;
-      InsertTailList (&ConsoleMenu->Head, &NewMenuEntry->Link);
+      if (NewConsoleContext->IsTerminal) {
+        BOpt_DestroyMenuEntry (NewMenuEntry);
+      } else {
+        Index2++;
+        ConsoleMenu->MenuNumber++;
+        InsertTailList (&ConsoleMenu->Head, &NewMenuEntry->Link);
+      }
     }
   }
 
@@ -1019,7 +1021,7 @@ GetConsoleInCheck (
   IN  BMM_CALLBACK_DATA  *CallbackData
   )
 {
-  UINT16               Index;
+  UINTN                Index;
   BM_MENU_ENTRY        *NewMenuEntry;
   UINT8                *ConInCheck;
   BM_CONSOLE_CONTEXT   *NewConsoleContext;
@@ -1057,7 +1059,7 @@ GetConsoleOutCheck (
   IN  BMM_CALLBACK_DATA  *CallbackData
   )
 {
-  UINT16               Index;
+  UINTN                Index;
   BM_MENU_ENTRY        *NewMenuEntry;
   UINT8                *ConOutCheck;
   BM_CONSOLE_CONTEXT   *NewConsoleContext;
@@ -1094,7 +1096,7 @@ GetConsoleErrCheck (
   IN  BMM_CALLBACK_DATA  *CallbackData
   )
 {
-  UINT16               Index;
+  UINTN                Index;
   BM_MENU_ENTRY        *NewMenuEntry;
   UINT8                *ConErrCheck;
   BM_CONSOLE_CONTEXT   *NewConsoleContext;
@@ -1134,7 +1136,7 @@ GetTerminalAttribute (
   BMM_FAKE_NV_DATA     *CurrentFakeNVMap;
   BM_MENU_ENTRY        *NewMenuEntry;
   BM_TERMINAL_CONTEXT  *NewTerminalContext;
-  UINT16               TerminalIndex;
+  UINTN                TerminalIndex;
   UINT8                AttributeIndex;
 
   ASSERT (CallbackData != NULL);

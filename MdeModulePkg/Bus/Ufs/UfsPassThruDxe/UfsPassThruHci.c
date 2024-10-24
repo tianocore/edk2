@@ -405,7 +405,7 @@ UfsInitUtpPrdt (
   Remaining    = Buffer;
   PrdtNumber   = (UINTN)DivU64x32 ((UINT64)BufferSize + UFS_MAX_DATA_LEN_PER_PRD - 1, UFS_MAX_DATA_LEN_PER_PRD);
 
-  for (PrdtIndex = 0; PrdtIndex < PrdtNumber; PrdtIndex++) {
+  for (PrdtIndex = 0; (UINTN)PrdtIndex < PrdtNumber; PrdtIndex++) {
     if (RemainingLen < UFS_MAX_DATA_LEN_PER_PRD) {
       Prdt[PrdtIndex].DbCount = (UINT32)RemainingLen - 1;
     } else {
