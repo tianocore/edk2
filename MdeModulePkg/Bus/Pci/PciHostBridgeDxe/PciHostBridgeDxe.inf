@@ -21,7 +21,12 @@
   PciRootBridge.h
   PciHostBridge.c
   PciRootBridgeIo.c
+
+[Sources.EBC, Sources.ARM, Sources.AARCH64, Sources.RISCV64, Sources.LOONGARCH64]
   PciHostResource.h
+
+[Sources.IA32, Sources.X64]
+  X86PciHostResource.h
 
 [Packages]
   MdePkg/MdePkg.dec
