@@ -29,6 +29,7 @@ class SpellCheck(ICiBuildPlugin):
         "AuditOnly": False,          # Don't fail the build if there are errors.  Just log them
         "IgnoreFiles": [],           # use gitignore syntax to ignore errors in matching files
         "ExtendWords": [],           # words to extend to the dictionary for this package
+        "ExtraDictionaries": []      # Extra dictionary files for lots of custom words
         "IgnoreStandardPaths": [],   # Standard Plugin defined paths that should be ignore
         "AdditionalIncludePaths": [] # Additional paths to spell check (wildcards supported)
     }
@@ -148,6 +149,12 @@ class SpellCheck(ICiBuildPlugin):
 
         if("ExtendWords" in pkgconfig):
             config["words"].extend(pkgconfig["ExtendWords"])
+
+        if "ExtraDictionaries" in pkgconfig:
+            for path in pkgconfig["ExtraDictionaries"]:
+                with open(os.path.join(Edk2pathObj.WorkspacePath, path), 'r') as dictionary:
+                    config["words"].extend(dictionary.read().splitlines())
+
         with open(config_file_path, "w") as o:
             json.dump(config, o)  # output as json so compat with cspell
 
