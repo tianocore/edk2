@@ -2,6 +2,8 @@
   MCFG Table Generator
 
   Copyright (c) 2017 - 2019, ARM Limited. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -21,13 +23,14 @@
 #include <ConfigurationManagerHelper.h>
 #include <Library/TableHelperLib.h>
 #include <Protocol/ConfigurationManagerProtocol.h>
+#include <Library/PciSegmentInfoLib.h>
 
-/** ARM standard MCFG Generator
+/** Standard MCFG Generator
 
 Requirements:
   The following Configuration Manager Object(s) are required by
   this Generator:
-  - EArchCommonObjPciConfigSpaceInfo
+  - EArchCommonObjPciConfigSpaceInfo (OPTIONAL)
 */
 
 #pragma pack(1)
@@ -131,6 +134,10 @@ BuildMcfgTable (
   UINT32                                ConfigurationSpaceCount;
   CM_ARCH_COMMON_PCI_CONFIG_SPACE_INFO  *PciConfigSpaceInfoList;
   MCFG_TABLE                            *Mcfg;
+  UINTN                                 PciConfigurationSpaceCount;
+  PCI_SEGMENT_INFO                      *PciSegmentInfo;
+  UINTN                                 Index;
+  MCFG_CFG_SPACE_ADDR                   *McfgStructure;
 
   ASSERT (This != NULL);
   ASSERT (AcpiTableInfo != NULL);
@@ -153,7 +160,11 @@ BuildMcfgTable (
     return EFI_INVALID_PARAMETER;
   }
 
-  *Table = NULL;
+  *Table                     = NULL;
+  PciSegmentInfo             = NULL;
+  ConfigurationSpaceCount    = 0;
+  PciConfigurationSpaceCount = 0;
+
   Status = GetEArchCommonObjPciConfigSpaceInfo (
              CfgMgrProtocol,
              CM_NULL_TOKEN,
@@ -162,12 +173,21 @@ BuildMcfgTable (
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((
-      DEBUG_ERROR,
-      "ERROR: MCFG: Failed to get PCI Configuration Space Information." \
-      " Status = %r\n",
-      Status
+      DEBUG_INFO,
+      "INFO: MCFG: PCI Configuration Space Information not provided by platform." \
+      "          : Retrieving PCI configuration space details...\n"
       ));
-    goto error_handler;
+    PciSegmentInfo = GetPciSegmentInfo (&PciConfigurationSpaceCount);
+    if (PciSegmentInfo == NULL) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "ERROR: MCFG: Failed to get PCI Segment Information.\n"
+        ));
+      ASSERT (PciSegmentInfo != NULL);
+      goto error_handler;
+    }
+
+    ConfigurationSpaceCount = (UINT32)PciConfigurationSpaceCount;
   }
 
   if (ConfigurationSpaceCount == 0) {
@@ -230,12 +250,22 @@ BuildMcfgTable (
 
   Mcfg->Reserved = EFI_ACPI_RESERVED_QWORD;
 
-  AddPciConfigurationSpaceList (
-    Mcfg,
-    sizeof (MCFG_TABLE),
-    PciConfigSpaceInfoList,
-    ConfigurationSpaceCount
-    );
+  if (PciSegmentInfo != NULL) {
+    McfgStructure = (MCFG_CFG_SPACE_ADDR *)((UINT8 *)Mcfg + sizeof (MCFG_TABLE));
+    for (Index = 0; Index < ConfigurationSpaceCount; Index++) {
+      McfgStructure[Index].BaseAddress           = PciSegmentInfo[Index].BaseAddress;
+      McfgStructure[Index].PciSegmentGroupNumber = PciSegmentInfo[Index].SegmentNumber;
+      McfgStructure[Index].StartBusNumber        = PciSegmentInfo[Index].StartBusNumber;
+      McfgStructure[Index].EndBusNumber          = PciSegmentInfo[Index].EndBusNumber;
+    }
+  } else {
+    AddPciConfigurationSpaceList (
+      Mcfg,
+      sizeof (MCFG_TABLE),
+      PciConfigSpaceInfoList,
+      ConfigurationSpaceCount
+      );
+  }
 
   return EFI_SUCCESS;
 
