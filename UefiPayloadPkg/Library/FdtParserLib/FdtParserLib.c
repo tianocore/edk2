@@ -253,7 +253,7 @@ ParseReservedMemory (
       StartAddress  = Fdt64ToCpu (*Data64);
       NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
       DEBUG ((DEBUG_INFO, "\n         Property  %a", TempStr));
-      DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
+      DEBUG ((DEBUG_INFO, "  %016lX  %016lX\n", StartAddress, NumberOfBytes));
     }
 
     RecordMemoryNode (SubNode);
@@ -264,34 +264,38 @@ ParseReservedMemory (
     } else {
       PropertyPtr = FdtGetProperty (Fdt, SubNode, "compatible", &TempLen);
       TempStr     = (CHAR8 *)(PropertyPtr->Data);
+      DEBUG ((DEBUG_INFO, "compatible:  %a\n", TempStr));
       if (AsciiStrnCmp (TempStr, "boot-code", AsciiStrLen ("boot-code")) == 0) {
-        DEBUG ((DEBUG_INFO, "  boot-code"));
+        DEBUG ((DEBUG_INFO, "  boot-code\n"));
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiBootServicesCode);
       } else if (AsciiStrnCmp (TempStr, "boot-data", AsciiStrLen ("boot-data")) == 0) {
-        DEBUG ((DEBUG_INFO, "  boot-data"));
+        DEBUG ((DEBUG_INFO, "  boot-data\n"));
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiBootServicesData);
       } else if (AsciiStrnCmp (TempStr, "runtime-code", AsciiStrLen ("runtime-code")) == 0) {
-        DEBUG ((DEBUG_INFO, "  runtime-code"));
+        DEBUG ((DEBUG_INFO, "  runtime-code\n"));
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiRuntimeServicesCode);
       } else if (AsciiStrnCmp (TempStr, "runtime-data", AsciiStrLen ("runtime-data")) == 0) {
-        DEBUG ((DEBUG_INFO, "  runtime-data"));
+        DEBUG ((DEBUG_INFO, "  runtime-data\n"));
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiRuntimeServicesData);
       } else if (AsciiStrnCmp (TempStr, "special-purpose", AsciiStrLen ("special-purpose")) == 0) {
         Attribute = MEMORY_ATTRIBUTE_DEFAULT | EFI_RESOURCE_ATTRIBUTE_SPECIAL_PURPOSE;
-        DEBUG ((DEBUG_INFO, "  special-purpose memory"));
+        DEBUG ((DEBUG_INFO, "  special-purpose memory\n"));
         BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, Attribute, StartAddress, NumberOfBytes);
+      } else if (AsciiStrnCmp (TempStr, "acpi-nvs", AsciiStrLen ("acpi-nvs")) == 0) {
+        DEBUG ((DEBUG_INFO, "\n ********* acpi-nvs ********\n"));
+        BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiACPIMemoryNVS);
       } else if (AsciiStrnCmp (TempStr, "acpi", AsciiStrLen ("acpi")) == 0) {
-        DEBUG ((DEBUG_INFO, "  acpi, StartAddress:%x, NumberOfBytes:%x", StartAddress, NumberOfBytes));
+        DEBUG ((DEBUG_INFO, "  acpi, StartAddress:%x, NumberOfBytes:%x\n", StartAddress, NumberOfBytes));
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiBootServicesData);
         PlatformAcpiTable = BuildGuidHob (&gUniversalPayloadAcpiTableGuid, sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE));
         if (PlatformAcpiTable != NULL) {
-          DEBUG ((DEBUG_INFO, " build gUniversalPayloadAcpiTableGuid , NumberOfBytes:%x", NumberOfBytes));
+          DEBUG ((DEBUG_INFO, " build gUniversalPayloadAcpiTableGuid , NumberOfBytes:%x\n", NumberOfBytes));
           PlatformAcpiTable->Rsdp            = (EFI_PHYSICAL_ADDRESS)(UINTN)StartAddress;
           PlatformAcpiTable->Header.Revision = UNIVERSAL_PAYLOAD_ACPI_TABLE_REVISION;
           PlatformAcpiTable->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE);
         }
       } else if (AsciiStrnCmp (TempStr, "smbios", AsciiStrLen ("smbios")) == 0) {
-        DEBUG ((DEBUG_INFO, " build smbios, NumberOfBytes:%x", NumberOfBytes));
+        DEBUG ((DEBUG_INFO, " build smbios, NumberOfBytes:%x\n", NumberOfBytes));
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiBootServicesData);
         SmbiosTable = BuildGuidHob (&gUniversalPayloadSmbios3TableGuid, sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE));
         if (SmbiosTable != NULL) {
@@ -299,9 +303,6 @@ ParseReservedMemory (
           SmbiosTable->Header.Length    = sizeof (UNIVERSAL_PAYLOAD_SMBIOS_TABLE);
           SmbiosTable->SmBiosEntryPoint = (EFI_PHYSICAL_ADDRESS)(UINTN)(StartAddress);
         }
-      } else if (AsciiStrnCmp (TempStr, "acpi-nvs", AsciiStrLen ("acpi-nvs")) == 0) {
-        DEBUG ((DEBUG_INFO, "  acpi-nvs"));
-        BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiACPIMemoryNVS);
       } else {
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiReservedMemoryType);
       }
