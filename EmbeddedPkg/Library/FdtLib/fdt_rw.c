@@ -124,7 +124,7 @@ _fdt_splice (
   char  *p   = splicepoint;
   char  *end = (char *)fdt + _fdt_data_size (fdt);
 
-  if (((p + oldlen) < p) || ((p + oldlen) > end)) {
+  if ((oldlen > (uintptr_t)(end - p)) || (end < p)) {
     return -FDT_ERR_BADOFFSET;
   }
 
