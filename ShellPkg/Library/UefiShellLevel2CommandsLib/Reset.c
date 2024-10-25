@@ -138,7 +138,7 @@ ShellCommandRunReset (
         } else {
           String = ShellCommandLineGetValue (Package, L"-s");
           DEBUG_CODE (
-            ShellPrintEx (-1, -1, L"Reset with %s (%d bytes)", String, String != NULL ? StrSize (String) : 0);
+            ShellPrintEx (-1, -1, L"Reset with %s (%d bytes)\n", String, String != NULL ? StrSize (String) : 0);
             );
           if (String != NULL) {
             gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, StrSize (String), (VOID *)String);
