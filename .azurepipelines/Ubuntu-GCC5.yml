@@ -7,11 +7,14 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 trigger:
-- master
-- stable/*
+  branches:
+    include:
+      - '*'
+
 pr:
-- master
-- stable/*
+  branches:
+    include:
+      - '*'
 
 variables:
   - template: templates/defaults.yml
@@ -20,7 +23,7 @@ jobs:
 - template: templates/pr-gate-build-job.yml
   parameters:
     tool_chain_tag: 'GCC5'
-    vm_image: 'ubuntu-22.04'
+    vm_image: 'ubuntu-24.04'
     container: ${{ variables.default_linux_image }}
     arch_list: "IA32,X64,ARM,AARCH64,RISCV64,LOONGARCH64"
     usePythonVersion: ''  # use Python from the container image
