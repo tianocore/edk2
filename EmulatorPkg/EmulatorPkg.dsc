@@ -151,8 +151,6 @@
   PpiListLib|EmulatorPkg/Library/SecPpiListLib/SecPpiListLib.inf
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
   TimerLib|EmulatorPkg/Library/PeiTimerLib/PeiTimerLib.inf
-  # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.common.USER_DEFINED, LibraryClasses.common.BASE]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf

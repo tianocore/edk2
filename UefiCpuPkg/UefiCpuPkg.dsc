@@ -173,14 +173,8 @@
   UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
-  UefiCpuPkg/SecCore/SecCore.inf {
-    <LibraryClasses>
-      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-  }
-  UefiCpuPkg/SecCore/SecCoreNative.inf {
-    <LibraryClasses>
-      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-  }
+  UefiCpuPkg/SecCore/SecCore.inf
+  UefiCpuPkg/SecCore/SecCoreNative.inf
   UefiCpuPkg/SecMigrationPei/SecMigrationPei.inf
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf {

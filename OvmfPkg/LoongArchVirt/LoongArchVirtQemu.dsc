@@ -194,9 +194,6 @@
   PlatformHookLib                  | OvmfPkg/LoongArchVirt/Library/Fdt16550SerialPortHookLib/EarlyFdt16550SerialPortHookLib.inf
   CpuExceptionHandlerLib           | UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
 
-  # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
-  NULL                             | MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-
 [LibraryClasses.common.PEI_CORE]
   PcdLib                           | MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   HobLib                           | MdePkg/Library/PeiHobLib/PeiHobLib.inf
