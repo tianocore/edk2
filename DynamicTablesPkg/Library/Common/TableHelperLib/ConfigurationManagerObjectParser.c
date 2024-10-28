@@ -677,6 +677,24 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonTpm2InterfaceInfo[] = {
   { "Lasa",                      sizeof (UINT64),                                               "0x%llx", NULL    },
 };
 
+/** A parser for EArchCommonObjSpmiInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSpmiInterfaceInfoParser[] = {
+  { "InterfaceType", sizeof (UINT8),                                  "0x%x", NULL },
+  { "BaseAddress",   sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
+    NULL, NULL, AcpiGenericAddressParser }
+};
+
+/** A parser for EArchCommonObjSpmiInterruptDeviceInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonSpmiInterruptDeviceInfoParser[] = {
+  { "InterruptType",         sizeof (UINT8),  "0x%x", NULL },
+  { "GPE",                   sizeof (UINT8),  "0x%x", NULL },
+  { "PciDeviceFlag",         sizeof (UINT8),  "0x%x", NULL },
+  { "GlobalSystemInterrupt", sizeof (UINT32), "0x%x", NULL },
+  { "DeviceId",              sizeof (UINT32), "0x%x", NULL }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -707,6 +725,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPccSubspaceType5Info,        CmArchCommonPccSubspaceType5InfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPsdInfo,                     CmArchCommonPsdInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2InterfaceInfo,           CmArchCommonTpm2InterfaceInfo),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSpmiInterfaceInfo,           CmArchCommonSpmiInterfaceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjSpmiInterruptDeviceInfo,     CmArchCommonSpmiInterruptDeviceInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -850,6 +870,20 @@ STATIC CONST CM_OBJ_PARSER  CmX64ObjFadtMiscInfoParser[] = {
   { "Century",     1, "0x%x", NULL }
 };
 
+/** A parser for EX64ObjWsmtFlagsInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjWsmtFlagsInfoParser[] = {
+  { "WsmtFlags", 4, "0x%x", NULL }
+};
+
+/** A parser for EX64ObjHpetInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmX64ObjHpetInfoParser[] = {
+  { "BaseAddressLower32Bit",                     4, "0x%x", NULL },
+  { "MainCounterMinimumClockTickInPeriodicMode", 2, "0x%x", NULL },
+  { "PageProtectionAndOemAttribute",             1, "0x%x", NULL }
+};
+
 /** A parser for X64 namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
@@ -863,6 +897,8 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  X64NamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EX64ObjFadtSleepBlockInfo,CmX64ObjFadtSleepBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EX64ObjFadtResetBlockInfo,CmX64ObjFadtResetBlockInfoParser),
   CM_PARSER_ADD_OBJECT (EX64ObjFadtMiscInfo,      CmX64ObjFadtMiscInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjWsmtFlagsInfo,     CmX64ObjWsmtFlagsInfoParser),
+  CM_PARSER_ADD_OBJECT (EX64ObjHpetInfo,          CmX64ObjHpetInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EX64ObjMax)
 };
 

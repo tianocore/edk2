@@ -47,6 +47,7 @@ AcpiTimerLibConstructor (
   pAcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob);
 
   mPmTimerReg = (UINTN)pAcpiBoardInfo->PmTimerRegBase;
+  ASSERT (pAcpiBoardInfo->PmTimerRegBase != 0);
 
   return EFI_SUCCESS;
 }

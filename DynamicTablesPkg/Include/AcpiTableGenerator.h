@@ -2,6 +2,7 @@
 
   Copyright (c) 2017 - 2022, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
+  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -72,6 +73,11 @@ The Dynamic Tables Framework implements the following ACPI table generators:
             The SSDT Pci Express generator collates the Pci Express
             information from the Configuration Manager and generates a
             SSDT table describing a Pci Express bus.
+  - WSMT  : The WSMT generator collates the WSMT protection flag information
+            from the Configuration Manager and builds the WSMT table.
+  - SPMI  : The SPMI generator collects the SPMI interface and
+            optionally SPMI interrupt and deviceid (or uid) information from the
+            Configuration Manager and builds the SPMI table.
 */
 
 /** The ACPI_TABLE_GENERATOR_ID type describes ACPI table generator ID.
@@ -101,6 +107,10 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdSsdtPciExpress,                ///< SSDT Pci Express Generator
   EStdAcpiTableIdPcct,                          ///< PCCT Generator
   EStdAcpiTableIdTpm2,                          ///< TPM2 Generator
+  EStdAcpiTableIdWsmt,                          ///< WSMT Generator
+  EStdAcpiTableIdHpet,                          ///< HPET Generator
+  EStdAcpiTableIdSsdtHpet,                      ///< SSDT HPET Generator
+  EStdAcpiTableIdSpmi,                          ///< SPMI Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
@@ -156,8 +166,13 @@ typedef enum StdAcpiTableId {
             TableId                           \
             )
 
-/** The Creator ID for the ACPI tables generated using
+/** The generic creator ID for the ACPI tables generated using
   the standard ACPI table generators.
+*/
+#define TABLE_GENERATOR_CREATOR_ID  SIGNATURE_32('D', 'Y', 'N', 'T')
+
+/** The Creator ID for the ACPI tables generated using
+  the standard ACPI table generators for ARM.
 */
 #define TABLE_GENERATOR_CREATOR_ID_ARM  SIGNATURE_32('A', 'R', 'M', 'H')
 

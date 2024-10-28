@@ -1001,7 +1001,7 @@ Dhcp6AppendETOption (
     return EFI_INVALID_PARAMETER;
   }
 
-  if ((Elapsed == NULL)) {
+  if (Elapsed == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 

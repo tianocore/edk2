@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "PrEval": {
+        "DscPath": "ArmPkg.dsc",
+    },
     ## options defined .pytool/Plugin/LicenseCheck
     "LicenseCheck": {
         "IgnoreFiles": []
@@ -21,7 +24,6 @@
         "IgnoreFiles": [
             "Library/ArmSoftFloatLib/berkeley-softfloat-3",
             "Library/ArmSoftFloatLib/ArmSoftFloatLib.c",
-            "Library/CompilerIntrinsicsLib",
             "Universal/Smbios/SmbiosMiscDxe"
         ]
     },

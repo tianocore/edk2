@@ -846,7 +846,8 @@ DiskIo2ReadWriteDisk (
   LIST_ENTRY              Subtasks;
   DISK_IO_SUBTASK         *Subtask;
   DISK_IO2_TASK           *Task;
-  EFI_TPL                 OldTpl;
+  EFI_TPL                 SubtaskPerformTpl;
+  EFI_TPL                 SubtaskLockTpl;
   BOOLEAN                 Blocking;
   BOOLEAN                 SubtaskBlocking;
   LIST_ENTRY              *SubtasksPtr;
@@ -896,7 +897,7 @@ DiskIo2ReadWriteDisk (
 
   ASSERT (!IsListEmpty (SubtasksPtr));
 
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
+  SubtaskPerformTpl = gBS->RaiseTPL (TPL_CALLBACK);
   for ( Link = GetFirstNode (SubtasksPtr), NextLink = GetNextNode (SubtasksPtr, Link)
         ; !IsNull (SubtasksPtr, Link)
         ; Link = NextLink, NextLink = GetNextNode (SubtasksPtr, NextLink)
@@ -977,7 +978,7 @@ DiskIo2ReadWriteDisk (
     }
   }
 
-  gBS->RaiseTPL (TPL_NOTIFY);
+  SubtaskLockTpl = gBS->RaiseTPL (TPL_NOTIFY);
 
   //
   // Remove all the remaining subtasks when failure.
@@ -1012,7 +1013,8 @@ DiskIo2ReadWriteDisk (
     FreePool (Task);
   }
 
-  gBS->RestoreTPL (OldTpl);
+  gBS->RestoreTPL (SubtaskLockTpl);
+  gBS->RestoreTPL (SubtaskPerformTpl);
 
   return Status;
 }

@@ -1054,7 +1054,7 @@ PeCoffLoaderRelocateImage (
     RelocDir = &Hdr.Te->DataDirectory[0];
   }
 
-  if ((RelocDir != NULL) && (RelocDir->Size > 0)) {
+  if ((RelocDir != NULL) && (RelocDir->Size > 0) && ((RelocDir->Size - 1) < (MAX_UINT32 - RelocDir->VirtualAddress))) {
     RelocBase    = (EFI_IMAGE_BASE_RELOCATION *)PeCoffLoaderImageAddress (ImageContext, RelocDir->VirtualAddress, TeStrippedOffset);
     RelocBaseEnd = (EFI_IMAGE_BASE_RELOCATION *)PeCoffLoaderImageAddress (
                                                   ImageContext,

@@ -50,6 +50,8 @@
   Parsers/Pcct/PcctParser.h
   Parsers/Pptt/PpttParser.c
   Parsers/Pptt/PpttParser.h
+  Parsers/Ras2/Ras2Parser.c
+  Parsers/Rasf/RasfParser.c
   Parsers/Rsdp/RsdpParser.c
   Parsers/Slit/SlitParser.c
   Parsers/Spcr/SpcrParser.c

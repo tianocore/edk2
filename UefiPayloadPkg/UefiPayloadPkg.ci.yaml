@@ -5,6 +5,9 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 {
+    "PrEval": {
+        "DscPath": "UefiPayloadPkg.dsc",
+    },
     ## options defined .pytool/Plugin/LicenseCheck
     "LicenseCheck": {
         "IgnoreFiles": []
@@ -93,5 +96,6 @@
         "BLD_*_DISABLE_RESET_SYSTEM": "TRUE",
         "BLD_*_SERIAL_DRIVER_ENABLE": "FALSE",
         "BLD_*_BUILD_ARCH": "",
+        "BLD_*_SECURE_BOOT_ENABLE": "TRUE",
     }
 }

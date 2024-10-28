@@ -8,6 +8,13 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
+  The implementations of the macros used when MDEPKG_NDEBUG is defined rely on the fact that
+  directly unreachable code is pruned, even with compiler optimization disabled (which has
+  been confirmed by generated code size tests on supported compilers). The advantage of
+  implementations which consume their arguments within directly unreachable code is that
+  compilers understand this, and stop warning about variables which would become unused when
+  MDEPKG_NDEBUG is defined if the macros had completely empty definitions.
+
 Copyright (c) 2006 - 2020, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -342,13 +349,13 @@ UnitTestDebugAssert (
   #if defined (_ASSERT)
     #undef _ASSERT
   #endif
-  #if defined (__clang__) && defined (__FILE_NAME__)
+  #if defined (__FILE_NAME__)
 #define _ASSERT(Expression)  UnitTestDebugAssert (__FILE_NAME__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
   #else
 #define _ASSERT(Expression)  UnitTestDebugAssert (__FILE__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
   #endif
 #else
-  #if defined (__clang__) && defined (__FILE_NAME__)
+  #if defined (__FILE_NAME__)
 #define _ASSERT(Expression)  DebugAssert (__FILE_NAME__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
   #else
 #define _ASSERT(Expression)  DebugAssert (__FILE__, DEBUG_LINE_NUMBER, DEBUG_EXPRESSION_STRING (Expression))
@@ -403,7 +410,12 @@ UnitTestDebugAssert (
       }                             \
     } while (FALSE)
 #else
-#define ASSERT(Expression)
+#define ASSERT(Expression)       \
+    do {                           \
+      if (FALSE) {                 \
+        (VOID) (Expression);       \
+      }                            \
+    } while (FALSE)
 #endif
 
 /**
@@ -426,7 +438,12 @@ UnitTestDebugAssert (
       }                            \
     } while (FALSE)
 #else
-#define DEBUG(Expression)
+#define DEBUG(Expression)        \
+    do {                           \
+      if (FALSE) {                 \
+        _DEBUGLIB_DEBUG (Expression);       \
+      }                            \
+    } while (FALSE)
 #endif
 
 /**
@@ -452,7 +469,12 @@ UnitTestDebugAssert (
       }                                                                                  \
     } while (FALSE)
 #else
-#define ASSERT_EFI_ERROR(StatusParameter)
+#define ASSERT_EFI_ERROR(StatusParameter)                                             \
+    do {                                                                                \
+      if (FALSE) {                                                                      \
+        (VOID) (StatusParameter);                                                       \
+      }                                                                                 \
+    } while (FALSE)
 #endif
 
 /**
@@ -479,7 +501,12 @@ UnitTestDebugAssert (
       }                                                                 \
     } while (FALSE)
 #else
-#define ASSERT_RETURN_ERROR(StatusParameter)
+#define ASSERT_RETURN_ERROR(StatusParameter)                          \
+    do {                                                                \
+      if (FALSE) {                                                      \
+        (VOID) (StatusParameter);                                       \
+      }                                                                 \
+    } while (FALSE)
 #endif
 
 /**
@@ -534,7 +561,10 @@ UnitTestDebugAssert (
   are not included in a module.
 
 **/
-#define DEBUG_CODE_BEGIN()  do { if (DebugCodeEnabled ()) { UINT8  __DebugCodeLocal
+#define DEBUG_CODE_BEGIN()     \
+  do {                         \
+    if (DebugCodeEnabled ()) { \
+      do { } while (FALSE)
 
 /**
   The macro that marks the end of debug source code.
@@ -545,7 +575,9 @@ UnitTestDebugAssert (
   are not included in a module.
 
 **/
-#define DEBUG_CODE_END()  __DebugCodeLocal = 0; __DebugCodeLocal++; } } while (FALSE)
+#define DEBUG_CODE_END()         \
+    }                            \
+  } while (FALSE)
 
 /**
   The macro that declares a section of debug source code.
@@ -588,8 +620,12 @@ UnitTestDebugAssert (
   If MDEPKG_NDEBUG is defined or the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit
   of PcdDebugProperyMask is clear, then this macro computes the offset, in bytes,
   of the field specified by Field from the beginning of the data structure specified
-  by TYPE.  This offset is subtracted from Record, and is used to return a pointer
-  to a data structure of the type specified by TYPE.
+  by TYPE.  This offset is subtracted from Record, and is used to compute a pointer
+  to a data structure of the type specified by TYPE.  The Signature field of the
+  data structure specified by TYPE is compared to TestSignature.  If the signatures
+  match, then a pointer to the pointer to a data structure of the type specified by
+  TYPE is returned.  If the signatures do not match, then NULL is returned to
+  signify that the passed in data structure is invalid.
 
   If MDEPKG_NDEBUG is not defined and the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit
   of PcdDebugProperyMask is set, then this macro computes the offset, in bytes,
@@ -623,9 +659,13 @@ UnitTestDebugAssert (
 #define CR(Record, TYPE, Field, TestSignature)                                              \
     (DebugAssertEnabled () && (BASE_CR (Record, TYPE, Field)->Signature != TestSignature)) ?  \
     (TYPE *) (_ASSERT (CR has Bad Signature), Record) :                                       \
+    (BASE_CR (Record, TYPE, Field)->Signature != TestSignature) ?                             \
+    NULL :                                                                                    \
     BASE_CR (Record, TYPE, Field)
 #else
 #define CR(Record, TYPE, Field, TestSignature)                                              \
+    (BASE_CR (Record, TYPE, Field)->Signature != TestSignature) ?                           \
+    NULL :                                                                                  \
     BASE_CR (Record, TYPE, Field)
 #endif
 

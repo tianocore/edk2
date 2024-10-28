@@ -77,11 +77,19 @@ HttpBootUninstallCallback (
   IN HTTP_BOOT_PRIVATE_DATA  *Private
   )
 {
+  EFI_HANDLE  ControllerHandle;
+
   if (Private->HttpBootCallback == &Private->LoadFileCallback) {
+    if (!Private->UsingIpv6) {
+      ControllerHandle = Private->Ip4Nic->Controller;
+    } else {
+      ControllerHandle = Private->Ip6Nic->Controller;
+    }
+
     gBS->UninstallProtocolInterface (
-           Private->Controller,
+           ControllerHandle,
            &gEfiHttpBootCallbackProtocolGuid,
-           &Private->HttpBootCallback
+           Private->HttpBootCallback
            );
     Private->HttpBootCallback = NULL;
   }
@@ -304,6 +312,7 @@ HttpBootGetBootFileCaller (
 {
   HTTP_GET_BOOT_FILE_STATE  State;
   EFI_STATUS                Status;
+  UINT32                    Retries;
 
   if (Private->BootFileSize == 0) {
     State = GetBootFileHead;
@@ -370,13 +379,41 @@ HttpBootGetBootFileCaller (
         //
         // Load the boot file into Buffer
         //
-        Status = HttpBootGetBootFile (
-                   Private,
-                   FALSE,
-                   BufferSize,
-                   Buffer,
-                   ImageType
-                   );
+        for (Retries = 1; Retries <= PcdGet32 (PcdMaxHttpResumeRetries); Retries++) {
+          Status = HttpBootGetBootFile (
+                     Private,
+                     FALSE,
+                     BufferSize,
+                     Buffer,
+                     ImageType
+                     );
+          if (!EFI_ERROR (Status) ||
+              ((Status != EFI_TIMEOUT) && (Status != EFI_DEVICE_ERROR)) ||
+              (Retries >= PcdGet32 (PcdMaxHttpResumeRetries)))
+          {
+            break;
+          }
+
+          //
+          // HttpBootGetBootFile returned EFI_TIMEOUT or EFI_DEVICE_ERROR.
+          // We may attempt to resume the interrupted download.
+          //
+
+          Private->HttpCreated = FALSE;
+          HttpIoDestroyIo (&Private->HttpIo);
+          Status = HttpBootCreateHttpIo (Private);
+          if (EFI_ERROR (Status)) {
+            break;
+          }
+
+          DEBUG ((DEBUG_WARN | DEBUG_INFO, "HttpBootGetBootFileCaller: NBP file download interrupted, will try to resume the operation.\n"));
+          gBS->Stall (1000 * 1000 * PcdGet32 (PcdHttpDelayBetweenResumeRetries));
+        }
+
+        if (EFI_ERROR (Status) && (Retries >= PcdGet32 (PcdMaxHttpResumeRetries))) {
+          DEBUG ((DEBUG_ERROR, "HttpBootGetBootFileCaller: Error downloading NBP file, even after trying to resume %d times.\n", Retries));
+        }
+
         return Status;
 
       case GetBootFileError:
@@ -522,12 +559,13 @@ HttpBootStop (
   ZeroMem (&Private->StationIp, sizeof (EFI_IP_ADDRESS));
   ZeroMem (&Private->SubnetMask, sizeof (EFI_IP_ADDRESS));
   ZeroMem (&Private->GatewayIp, sizeof (EFI_IP_ADDRESS));
-  Private->Port              = 0;
-  Private->BootFileUri       = NULL;
-  Private->BootFileUriParser = NULL;
-  Private->BootFileSize      = 0;
-  Private->SelectIndex       = 0;
-  Private->SelectProxyType   = HttpOfferTypeMax;
+  Private->Port                   = 0;
+  Private->BootFileUri            = NULL;
+  Private->BootFileUriParser      = NULL;
+  Private->BootFileSize           = 0;
+  Private->SelectIndex            = 0;
+  Private->SelectProxyType        = HttpOfferTypeMax;
+  Private->PartialTransferredSize = 0;
 
   if (!Private->UsingIpv6) {
     //
@@ -575,6 +613,11 @@ HttpBootStop (
     HttpUrlFreeParser (Private->FilePathUriParser);
     Private->FilePathUri       = NULL;
     Private->FilePathUriParser = NULL;
+  }
+
+  if (Private->LastModifiedOrEtag != NULL) {
+    FreePool (Private->LastModifiedOrEtag);
+    Private->LastModifiedOrEtag = NULL;
   }
 
   ZeroMem (Private->OfferBuffer, sizeof (Private->OfferBuffer));
@@ -765,7 +808,8 @@ HttpBootCallback (
       if (Data != NULL) {
         HttpMessage = (EFI_HTTP_MESSAGE *)Data;
         if ((HttpMessage->Data.Request->Method == HttpMethodGet) &&
-            (HttpMessage->Data.Request->Url != NULL))
+            (HttpMessage->Data.Request->Url != NULL) &&
+            (Private->PartialTransferredSize == 0))
         {
           Print (L"\n  URI: %s\n", HttpMessage->Data.Request->Url);
         }
@@ -795,6 +839,16 @@ HttpBootCallback (
 
             break;
           }
+        }
+
+        // If download was resumed, do not change progress variables
+        HttpHeader = HttpFindHeader (
+                       HttpMessage->HeaderCount,
+                       HttpMessage->Headers,
+                       HTTP_HEADER_CONTENT_RANGE
+                       );
+        if (HttpHeader) {
+          break;
         }
 
         HttpHeader = HttpFindHeader (
