@@ -160,7 +160,7 @@ LDFLAGS += $(EXTRA_LDFLAGS)
 all:
 
 $(MAKEROOT)/libs:
-	mkdir $(MAKEROOT)/libs
+	mkdir $(MAKEROOT)$(SEP)libs
 
 $(MAKEROOT)/bin:
-	mkdir $(MAKEROOT)/bin
+	mkdir $(MAKEROOT)$(SEP)bin

@@ -105,10 +105,16 @@ $(APPFILE): $(APPLICATION)
 %s
 '''
 
-PcdGccMakefile = '''
-MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
-LIBS = -lCommon
-'''
+if(sys.platform == "win32"):
+    PcdGccMakefile = '''
+    MAKEROOT ?= $(EDK_TOOLS_PATH)\Source\C
+    LIBS = -lCommon
+    '''
+else:
+    PcdGccMakefile = '''
+    MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
+    LIBS = -lCommon
+    '''
 
 variablePattern = re.compile(r'[\t\s]*0[xX][a-fA-F0-9]+$')
 SkuIdPattern = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
