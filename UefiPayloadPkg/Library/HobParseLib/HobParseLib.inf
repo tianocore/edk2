@@ -9,9 +9,9 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = HobParseLib
   FILE_GUID                      = EFB05FE7-604B-40DA-9A59-E2F998528754
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = HobParseLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = HobParseLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -28,13 +28,5 @@
   UefiPayloadPkg/UefiPayloadPkg.dec
 
 [LibraryClasses]
-  BaseLib
   BaseMemoryLib
-  IoLib
-  DebugLib
-  PcdLib
   HobLib
-
-[Pcd.IA32,Pcd.X64,Pcd.RISCV64]
-  gUefiPayloadPkgTokenSpaceGuid.PcdSystemMemoryUefiRegionSize
-  gUefiPayloadPkgTokenSpaceGuid.PcdHandOffFdtEnable
