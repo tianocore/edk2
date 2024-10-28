@@ -1,0 +1,35 @@
+// *++
+//
+// (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
+// Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved. <BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Module Name:
+//
+// ShellStrings.uni
+//
+// Abstract:
+//
+// String definitions for the main UEFI Shell 2.0 application
+//
+// Revision History:
+//
+// --*/
+
+/=#
+
+#langdef   en-US "English"
+
+#string STR_SHELL_CURDIR              #language en-US "%E%s\> %N"
+#string STR_SHELL_SHELL               #language en-US "%EShell> %N"
+
+#string STR_SHELL_NOT_FOUND           #language en-US "%N'%E%s%N' is not recognized as an internal or external command, operable program, or script file.\r\n"
+
+#string STR_SHELL_ERROR               #language en-US  "%NCommand Error Status: %r\r\n"
+#string STR_SHELL_ERROR_SCRIPT        #language en-US  "%NScript Error Status: %r (line number %d)\r\n"
+
+#string STR_SHELL_INVALID_MAPPING     #language en-US "%N'%B%s%N' is not a valid mapping.\r\n"
+#string STR_SHELL_INVALID_SPLIT       #language en-US "Invalid use of pipe (%B|%N).\r\n"
+
+#string STR_SHELL_IMAGE_NOT_APP       #language en-US "The image is not an application.\r\n"
+

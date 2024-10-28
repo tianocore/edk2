@@ -10,7 +10,11 @@
 **/
 
 #include "Shell.h"
-#include "FileHandleInternal.h"
+#include <Library/FileHandleLib.h>
+#include <Library/ShellProtocolInteractivityLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include "ShellEnvVar.h"
+#include "ShellProtocol.h"
 
 #define MEM_WRITE_REALLOC_OVERHEAD  1024
 
@@ -154,7 +158,7 @@ FileInterfaceStdOutWrite (
   IN VOID               *Buffer
   )
 {
-  if (ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoConsoleOut) {
+  if (ShellProtocolsInfoObject.ShellProtocolBitUnion.Bits.NoConsoleOut) {
     return (EFI_UNSUPPORTED);
   }
 
@@ -366,7 +370,7 @@ CreateTabCompletionList (
     //
     // If file path doesn't contain ":", ...
     //
-    Cwd = ShellInfoObject.NewEfiShellProtocol->GetCurDir (NULL);
+    Cwd = ShellProtocolsInfoObject.NewEfiShellProtocol->GetCurDir (NULL);
     if (Cwd != NULL) {
       if (InputString[TabPos] != L'\\') {
         //
@@ -388,7 +392,7 @@ CreateTabCompletionList (
 
   StrnCatS (TabStr, (BufferSize) / sizeof (CHAR16), InputString + TabPos, StringLen - TabPos);
   StrnCatS (TabStr, (BufferSize) / sizeof (CHAR16), L"*", (BufferSize) / sizeof (CHAR16) - 1 - StrLen (TabStr));
-  Status = ShellInfoObject.NewEfiShellProtocol->FindFiles (TabStr, &FileList);
+  Status = ShellProtocolsInfoObject.NewEfiShellProtocol->FindFiles (TabStr, &FileList);
 
   //
   // Filter out the non-directory for "CD" command
@@ -419,7 +423,7 @@ CreateTabCompletionList (
   if ((FileList != NULL) && !IsListEmpty (&FileList->Link)) {
     Status = EFI_SUCCESS;
   } else {
-    ShellInfoObject.NewEfiShellProtocol->FreeFileList (&FileList);
+    ShellProtocolsInfoObject.NewEfiShellProtocol->FreeFileList (&FileList);
     Status = EFI_NOT_FOUND;
   }
 
@@ -505,7 +509,7 @@ FileInterfaceStdInRead (
   OutputLength    = 0;
   Update          = 0;
   Delete          = 0;
-  LinePos         = NewPos = (BUFFER_LIST *)(&ShellInfoObject.ViewingSettings.CommandHistory);
+  LinePos         = NewPos = (BUFFER_LIST *)(&ShellProtocolInteractivityInfoObject.ViewingSettings.CommandHistory);
   InScrolling     = FALSE;
   InTabScrolling  = FALSE;
   Status          = EFI_SUCCESS;
@@ -553,15 +557,15 @@ FileInterfaceStdInRead (
     //
     if ((Key.UnicodeChar == 0) && ((Key.ScanCode == SCAN_PAGE_UP) || (Key.ScanCode == SCAN_PAGE_DOWN))) {
       if (Key.ScanCode == SCAN_PAGE_UP) {
-        ConsoleLoggerDisplayHistory (FALSE, 0, ShellInfoObject.ConsoleInfo);
+        ConsoleLoggerDisplayHistory (FALSE, 0, ShellProtocolInteractivityInfoObject.ConsoleInfo);
       } else if (Key.ScanCode == SCAN_PAGE_DOWN) {
-        ConsoleLoggerDisplayHistory (TRUE, 0, ShellInfoObject.ConsoleInfo);
+        ConsoleLoggerDisplayHistory (TRUE, 0, ShellProtocolInteractivityInfoObject.ConsoleInfo);
       }
 
       InScrolling = TRUE;
     } else {
       if (InScrolling) {
-        ConsoleLoggerStopHistory (ShellInfoObject.ConsoleInfo);
+        ConsoleLoggerStopHistory (ShellProtocolInteractivityInfoObject.ConsoleInfo);
         InScrolling = FALSE;
       }
     }
@@ -571,7 +575,7 @@ FileInterfaceStdInRead (
     //
     if (InTabScrolling && (Key.UnicodeChar != CHAR_TAB)) {
       if (TabCompleteList != NULL) {
-        ShellInfoObject.NewEfiShellProtocol->FreeFileList (&TabCompleteList);
+        ShellProtocolsInfoObject.NewEfiShellProtocol->FreeFileList (&TabCompleteList);
         DEBUG_CODE (
           TabCompleteList = NULL;
           );
@@ -654,7 +658,7 @@ FileInterfaceStdInRead (
           //
           // If we are at the buffer's end, drop the key
           //
-          if ((StringLen == MaxStr - 1) && (ShellInfoObject.ViewingSettings.InsertMode || (StringCurPos == StringLen))) {
+          if ((StringLen == MaxStr - 1) && (ShellProtocolInteractivityInfoObject.ViewingSettings.InsertMode || (StringCurPos == StringLen))) {
             break;
           }
 
@@ -662,7 +666,7 @@ FileInterfaceStdInRead (
           // If in insert mode, make space by moving each other character 1
           // space higher in the array
           //
-          if (ShellInfoObject.ViewingSettings.InsertMode) {
+          if (ShellProtocolInteractivityInfoObject.ViewingSettings.InsertMode) {
             CopyMem (CurrentString + StringCurPos + 1, CurrentString + StringCurPos, (StringLen - StringCurPos)*sizeof (CurrentString[0]));
           }
 
@@ -693,9 +697,9 @@ FileInterfaceStdInRead (
             //
             // Prepare to print the previous command
             //
-            NewPos = (BUFFER_LIST *)GetPreviousNode (&ShellInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link);
-            if (IsNull (&ShellInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link)) {
-              NewPos = (BUFFER_LIST *)GetPreviousNode (&ShellInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link);
+            NewPos = (BUFFER_LIST *)GetPreviousNode (&ShellProtocolInteractivityInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link);
+            if (IsNull (&ShellProtocolInteractivityInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link)) {
+              NewPos = (BUFFER_LIST *)GetPreviousNode (&ShellProtocolInteractivityInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link);
             }
 
             break;
@@ -704,9 +708,9 @@ FileInterfaceStdInRead (
             //
             // Prepare to print the next command
             //
-            NewPos = (BUFFER_LIST *)GetNextNode (&ShellInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link);
-            if (NewPos == (BUFFER_LIST *)(&ShellInfoObject.ViewingSettings.CommandHistory)) {
-              NewPos = (BUFFER_LIST *)GetNextNode (&ShellInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link);
+            NewPos = (BUFFER_LIST *)GetNextNode (&ShellProtocolInteractivityInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link);
+            if (NewPos == (BUFFER_LIST *)(&ShellProtocolInteractivityInfoObject.ViewingSettings.CommandHistory)) {
+              NewPos = (BUFFER_LIST *)GetNextNode (&ShellProtocolInteractivityInfoObject.ViewingSettings.CommandHistory.Link, &LinePos->Link);
             }
 
             break;
@@ -769,7 +773,7 @@ FileInterfaceStdInRead (
             //
             // Toggle the SEnvInsertMode flag
             //
-            ShellInfoObject.ViewingSettings.InsertMode = (BOOLEAN) !ShellInfoObject.ViewingSettings.InsertMode;
+            ShellProtocolInteractivityInfoObject.ViewingSettings.InsertMode = (BOOLEAN) !ShellProtocolInteractivityInfoObject.ViewingSettings.InsertMode;
             break;
 
           case SCAN_F7:
@@ -835,12 +839,12 @@ FileInterfaceStdInRead (
     // If we have a new position, we are preparing to print a previous or
     // next command.
     //
-    if (NewPos != (BUFFER_LIST *)(&ShellInfoObject.ViewingSettings.CommandHistory)) {
+    if (NewPos != (BUFFER_LIST *)(&ShellProtocolInteractivityInfoObject.ViewingSettings.CommandHistory)) {
       Column = StartColumn;
       Row   -= (StringCurPos + StartColumn) / TotalColumn;
 
       LinePos = NewPos;
-      NewPos  = (BUFFER_LIST *)(&ShellInfoObject.ViewingSettings.CommandHistory);
+      NewPos  = (BUFFER_LIST *)(&ShellProtocolInteractivityInfoObject.ViewingSettings.CommandHistory);
 
       OutputLength = StrLen (LinePos->Buffer) < MaxStr - 1 ? StrLen (LinePos->Buffer) : MaxStr - 1;
       CopyMem (CurrentString, LinePos->Buffer, OutputLength * sizeof (CHAR16));
@@ -945,7 +949,7 @@ FileInterfaceStdInRead (
   // prevent memory leaks...
   //
   if (TabCompleteList != NULL) {
-    ShellInfoObject.NewEfiShellProtocol->FreeFileList (&TabCompleteList);
+    ShellProtocolsInfoObject.NewEfiShellProtocol->FreeFileList (&TabCompleteList);
   }
 
   ASSERT (TabCompleteList == NULL);
@@ -1031,8 +1035,6 @@ typedef struct {
   EFI_FILE_FLUSH           Flush;
   CHAR16                   Name[1];
 } EFI_FILE_PROTOCOL_ENVIRONMENT;
-// ANSI compliance helper to get size of the struct.
-#define SIZE_OF_EFI_FILE_PROTOCOL_ENVIRONMENT  EFI_FIELD_OFFSET (EFI_FILE_PROTOCOL_ENVIRONMENT, Name)
 
 /**
   File style interface for Environment Variable (Close).
@@ -1468,56 +1470,6 @@ MoveCursorForward (
     if ((*Row) < TotalRow - 1) {
       (*Row)++;
     }
-  }
-}
-
-/**
-  Prints out each previously typed command in the command list history log.
-
-  When each screen is full it will pause for a key before continuing.
-
-  @param[in] TotalCols    How many columns are on the screen
-  @param[in] TotalRows    How many rows are on the screen
-  @param[in] StartColumn  which column to start at
-**/
-VOID
-PrintCommandHistory (
-  IN CONST UINTN  TotalCols,
-  IN CONST UINTN  TotalRows,
-  IN CONST UINTN  StartColumn
-  )
-{
-  BUFFER_LIST  *Node;
-  UINTN        Index;
-  UINTN        LineNumber;
-  UINTN        LineCount;
-
-  ShellPrintEx (-1, -1, L"\n");
-  Index      = 0;
-  LineNumber = 0;
-  //
-  // go through history list...
-  //
-  for ( Node = (BUFFER_LIST *)GetFirstNode (&ShellInfoObject.ViewingSettings.CommandHistory.Link)
-        ; !IsNull (&ShellInfoObject.ViewingSettings.CommandHistory.Link, &Node->Link)
-        ; Node = (BUFFER_LIST *)GetNextNode (&ShellInfoObject.ViewingSettings.CommandHistory.Link, &Node->Link)
-        )
-  {
-    Index++;
-    LineCount = ((StrLen (Node->Buffer) + StartColumn + 1) / TotalCols) + 1;
-
-    if (LineNumber + LineCount >= TotalRows) {
-      ShellPromptForResponseHii (
-        ShellPromptResponseTypeEnterContinue,
-        STRING_TOKEN (STR_SHELL_ENTER_TO_CONT),
-        ShellInfoObject.HiiHandle,
-        NULL
-        );
-      LineNumber = 0;
-    }
-
-    ShellPrintEx (-1, -1, L"%2d. %s\n", Index, Node->Buffer);
-    LineNumber += LineCount;
   }
 }
 

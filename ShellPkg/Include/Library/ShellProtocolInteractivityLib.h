@@ -1,14 +1,18 @@
 /** @file
-  Provides interface to shell console logger.
+  Provides interface to the shell protocols interactivity layer.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2024, 9elements GmbH.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
+
 **/
 
-#ifndef _CONSOLE_LOGGER_HEADER_
-#define _CONSOLE_LOGGER_HEADER_
+#ifndef __SHELL_PROTOCOL_INTERACTIVITY_LIB__
+#define __SHELL_PROTOCOL_INTERACTIVITY_LIB__
 
-#include "Shell.h"
+#include <Uefi.h>
+#include <Library/ShellCommandLib.h>
+#include <Protocol/ShellParameters.h>
+#include <ShellInternals.h>
 
 #define CONSOLE_LOGGER_PRIVATE_DATA_SIGNATURE  SIGNATURE_32 ('c', 'o', 'P', 'D')
 
@@ -313,4 +317,148 @@ ConsoleLoggerResetBuffers (
   IN CONSOLE_LOGGER_PRIVATE_DATA  *ConsoleInfo
   );
 
-#endif //_CONSOLE_LOGGER_HEADER_
+/**
+  Move the cursor position one character backward.
+
+  @param[in] LineLength       Length of a line. Get it by calling QueryMode
+  @param[in, out] Column      Current column of the cursor position
+  @param[in, out] Row         Current row of the cursor position
+**/
+VOID
+MoveCursorBackward (
+  IN     UINTN  LineLength,
+  IN OUT UINTN  *Column,
+  IN OUT UINTN  *Row
+  );
+
+/**
+  Move the cursor position one character forward.
+
+  @param[in] LineLength       Length of a line.
+  @param[in] TotalRow         Total row of a screen
+  @param[in, out] Column      Current column of the cursor position
+  @param[in, out] Row         Current row of the cursor position
+**/
+VOID
+MoveCursorForward (
+  IN     UINTN  LineLength,
+  IN     UINTN  TotalRow,
+  IN OUT UINTN  *Column,
+  IN OUT UINTN  *Row
+  );
+
+/**
+  Prints out each previously typed command in the command list history log.
+
+  When each screen is full it will pause for a key before continuing.
+
+  @param[in] TotalCols    How many columns are on the screen
+  @param[in] TotalRows    How many rows are on the screen
+  @param[in] StartColumn  which column to start at
+**/
+VOID
+PrintCommandHistory (
+  IN CONST UINTN  TotalCols,
+  IN CONST UINTN  TotalRows,
+  IN CONST UINTN  StartColumn
+  );
+
+typedef struct {
+  LIST_ENTRY           Link;        ///< Standard linked list handler.
+  SHELL_FILE_HANDLE    SplitStdOut; ///< ConsoleOut for use in the split.
+  SHELL_FILE_HANDLE    SplitStdIn;  ///< ConsoleIn for use in the split.
+} SPLIT_LIST;
+
+typedef struct {
+  BUFFER_LIST    CommandHistory;
+  UINTN          VisibleRowNumber;
+  UINTN          OriginalVisibleRowNumber;
+  BOOLEAN        InsertMode;                        ///< Is the current typing mode insert (FALSE = overwrite).
+} SHELL_VIEWING_SETTINGS;
+
+typedef struct {
+  BOOLEAN                      PageBreakEnabled;
+  SHELL_VIEWING_SETTINGS       ViewingSettings;
+  EFI_HII_HANDLE               HiiHandle;           ///< Handle from HiiLib.
+  UINTN                        LogScreenCount;      ///< How many screens of log information to save.
+  EFI_DEVICE_PATH_PROTOCOL     *ImageDevPath;       ///< DevicePath for ourselves.
+  EFI_DEVICE_PATH_PROTOCOL     *FileDevPath;        ///< DevicePath for ourselves.
+  CONSOLE_LOGGER_PRIVATE_DATA  *ConsoleInfo;        ///< Pointer for ConsoleInformation.
+  SPLIT_LIST                   SplitList;           ///< List of Splits in FILO stack.
+  VOID                         *CtrlCNotifyHandle1; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlCNotifyHandle2; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlCNotifyHandle3; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlCNotifyHandle4; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlSNotifyHandle1; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlSNotifyHandle2; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlSNotifyHandle3; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  VOID                         *CtrlSNotifyHandle4; ///< The NotifyHandle returned from SimpleTextInputEx.RegisterKeyNotify.
+  BOOLEAN                      HaltOutput;          ///< TRUE to start a CTRL-S halt.
+} SHELL_PROTOCOL_INTERACTIVITY_INFO;
+
+extern SHELL_PROTOCOL_INTERACTIVITY_INFO  ShellProtocolInteractivityInfoObject;
+
+/**
+  Determine if the UEFI Shell is currently running with nesting enabled or disabled.
+
+  @retval FALSE   nesting is required
+  @retval other   nesting is enabled
+**/
+BOOLEAN
+EFIAPI
+NestingEnabled (
+  VOID
+  );
+
+EFI_STATUS
+CleanUpInteractiveShellEnvironment (
+  VOID
+  );
+
+/**
+  Function will replace the current StdIn and StdOut in the ShellParameters protocol
+  structure by parsing NewCommandLine.  The current values are returned to the
+  user.
+
+  This will also update the system table.
+
+  @param[in, out] ShellParameters        Pointer to parameter structure to modify.
+  @param[in] NewCommandLine              The new command line to parse and use.
+  @param[out] OldStdIn                   Pointer to old StdIn.
+  @param[out] OldStdOut                  Pointer to old StdOut.
+  @param[out] OldStdErr                  Pointer to old StdErr.
+  @param[out] SystemTableInfo            Pointer to old system table information.
+
+  @retval   EFI_SUCCESS                 Operation was successful, Argv and Argc are valid.
+  @retval   EFI_OUT_OF_RESOURCES        A memory allocation failed.
+**/
+EFI_STATUS
+UpdateStdInStdOutStdErr (
+  IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
+  IN CHAR16                             *NewCommandLine,
+  OUT SHELL_FILE_HANDLE                 *OldStdIn,
+  OUT SHELL_FILE_HANDLE                 *OldStdOut,
+  OUT SHELL_FILE_HANDLE                 *OldStdErr,
+  OUT SYSTEM_TABLE_INFO                 *SystemTableInfo
+  );
+
+/**
+  Function will replace the current StdIn and StdOut in the ShellParameters protocol
+  structure with StdIn and StdOut.  The current values are de-allocated.
+
+  @param[in, out] ShellParameters      Pointer to parameter structure to modify.
+  @param[in] OldStdIn                  Pointer to old StdIn.
+  @param[in] OldStdOut                 Pointer to old StdOut.
+  @param[in] OldStdErr                 Pointer to old StdErr.
+  @param[in] SystemTableInfo           Pointer to old system table information.
+**/
+EFI_STATUS
+RestoreStdInStdOutStdErr (
+  IN OUT EFI_SHELL_PARAMETERS_PROTOCOL  *ShellParameters,
+  IN  SHELL_FILE_HANDLE                 *OldStdIn,
+  IN  SHELL_FILE_HANDLE                 *OldStdOut,
+  IN  SHELL_FILE_HANDLE                 *OldStdErr,
+  IN  SYSTEM_TABLE_INFO                 *SystemTableInfo
+  );
+
+#endif
