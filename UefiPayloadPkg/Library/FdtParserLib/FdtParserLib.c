@@ -197,7 +197,7 @@ ParseMemory (
     if (AsciiStrCmp (TempStr, "reg") == 0) {
       Data64        = (UINT64 *)(PropertyPtr->Data);
       StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
-      NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
+      NumberOfBytes = Fdt32ToCpu (*(Data64 + 1));
     } else if (AsciiStrCmp (TempStr, "ecc-detection-bits") == 0) {
       Data32  = (UINT32 *)(PropertyPtr->Data);
       ECCData = Fdt32ToCpu (*Data32);
@@ -257,7 +257,7 @@ ParseReservedMemory (
     if (TempLen > 0) {
       Data64        = (UINT64 *)(PropertyPtr->Data);
       StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
-      NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
+      NumberOfBytes = Fdt32ToCpu (*(Data64 + 1));
       DEBUG ((DEBUG_INFO, "\n         Property  %a", TempStr));
       DEBUG ((DEBUG_INFO, "  %016lX  %016lX\n", StartAddress, NumberOfBytes));
     }
@@ -925,7 +925,7 @@ ParseDtb (
         if (AsciiStrCmp (TempStr, "reg") == 0) {
           Data64        = (UINT64 *)(PropertyPtr->Data);
           StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
-          NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
+          NumberOfBytes = Fdt32ToCpu (*(Data64 + 1));
           DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
           DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
           if (!IsHobConstructed) {
