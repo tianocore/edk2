@@ -1300,10 +1300,10 @@ typedef struct {
 // CXL Component Events Section
 //
 typedef struct {
-  UINT32                   Length;
-  UINT64                   ValidFields;
-  CXL_ERROR_PCIE_DEV_ID    CxlDeviceId;
-  UINT64                   DeviceSerialNo;
+  UINT32                       Length;
+  UINT64                       ValidFields;
+  EFI_CXL_ERROR_PCIE_DEV_ID    CxlDeviceId;
+  UINT64                       DeviceSerialNo;
 } EFI_CXL_COMPONENT_EVENT_LOG;
 
 #pragma pack()
