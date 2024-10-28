@@ -469,6 +469,7 @@ PrintGuidToBuffer (
 
 #ifdef __GNUC__
 
+#ifndef _WIN32
 size_t _filelength(int fd)
 {
   struct stat stat_buf;
@@ -485,6 +486,7 @@ char *strlwr(char *s)
   }
   return p;
 }
+#endif
 #endif
 #endif
 

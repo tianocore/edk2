@@ -17,8 +17,8 @@ endif
 ifndef PYTHON_COMMAND
 ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
 #
-# PYTHON_HOME is the old method of specifying a Python interperter on Windows.
-# Check if an interperter can be found using PYTHON_HOME.
+# PYTHON_HOME is the old method of specifying a Python interpreter on Windows.
+# Check if an interpreter can be found using PYTHON_HOME.
 #
 ifdef PYTHON_HOME
 ifndef (,$(wildcard $(PYTHON_HOME)$(SEP)python.exe)) # Make sure the file exists
@@ -27,17 +27,17 @@ endif
 endif
 ifndef PYTHON_COMMAND
 #
-# An interperter was not found using PYTHON_HOME. Next try using the
-# Python Launcher for Windows to find an interperter.
+# An interpreter was not found using PYTHON_HOME. Next try using the
+# Python Launcher for Windows to find an interpreter.
 #
 CHECK_PY := $(shell where py.exe || echo NotFound)
 ifeq ($(CHECK_PY),NotFound)
 undefine CHECK_PY
-$(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+$(error Unable to find a Python interpreter, if one is installed, set the PYTHON_COMMAND environment variable!)
 endif
 PYTHON_COMMAND := $(shell py -3 -c "import sys; print(sys.executable)")
 ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
-$(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+$(error Unable to find a Python interpreter, if one is installed, set the PYTHON_COMMAND environment variable!)
 endif
 endif
 else # UNIX
@@ -49,7 +49,7 @@ undefine PYTHON_COMMAND
 endif
 endif
 ifndef PYTHON_COMMAND
-$(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+$(error Unable to find a Python interpreter, if one is installed, set the PYTHON_COMMAND environment variable!)
 endif
 endif
 export PYTHON_COMMAND
@@ -120,14 +120,11 @@ else
 endif
 
 .PHONY: subdirs $(SUBDIRS)
-
 subdirs: $(SUBDIRS)
-
 $(SUBDIRS):
 	$(MAKE) -C $@
 
 .PHONY: $(patsubst %,%-clean,$(sort $(SUBDIRS)))
-
 $(patsubst %,%-clean,$(sort $(SUBDIRS))):
 	-$(MAKE) -C $(@:-clean=) clean
 

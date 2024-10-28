@@ -56,7 +56,7 @@ ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
   endif
 endif
 
-ifneq ($(findstring mingw,$(MAKE)),mingw)
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
   CYGWIN:=$(findstring CYGWIN, $(shell uname -s))
   LINUX:=$(findstring Linux, $(shell uname -s))
   DARWIN:=$(findstring Darwin, $(shell uname -s))
@@ -123,7 +123,7 @@ else
 CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -fwrapv \
 -fno-delete-null-pointer-checks -Wall -Werror \
 -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-restrict \
--Wno-unused-result -nostdlib -g
+-Wno-unused-result -nostdlib -Wno-unused-function -g
 endif
 endif
 ifneq ($(CLANG),)

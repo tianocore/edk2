@@ -105,16 +105,10 @@ $(APPFILE): $(APPLICATION)
 %s
 '''
 
-if(sys.platform == "win32"):
-    PcdGccMakefile = '''
-    MAKEROOT ?= $(EDK_TOOLS_PATH)\Source\C
-    LIBS = -lCommon
-    '''
-else:
-    PcdGccMakefile = '''
-    MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
-    LIBS = -lCommon
-    '''
+PcdGccMakefile = '''
+MAKEROOT ?= $(EDK_TOOLS_PATH)$(SEP)Source$(SEP)C
+LIBS = -lCommon
+'''
 
 variablePattern = re.compile(r'[\t\s]*0[xX][a-fA-F0-9]+$')
 SkuIdPattern = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
@@ -2973,7 +2967,7 @@ class DscBuildData(PlatformBuildClassObject):
         else:
             MakeApp = MakeApp + PcdGccMakefile
             MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o %s.o\n' % (self.OutputPath, PcdValueInitName, os.path.join(self.OutputPath, PcdValueCommonName)) + \
-            'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'TOOL_INCLUDE +='
+                      'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'TOOL_INCLUDE +='
         IncSearchList = []
         PlatformInc = OrderedDict()
         for Cache in self._Bdb._CACHE_.values():

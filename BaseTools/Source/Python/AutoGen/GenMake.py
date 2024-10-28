@@ -161,7 +161,7 @@ class BuildFile(object):
         WIN32_PLATFORM :   'if exist %(file)s "$(MAKE)" $(MAKE_FLAGS) -f %(file)s',
         POSIX_PLATFORM :   'test -e %(file)s && "$(MAKE)" $(MAKE_FLAGS) -f %(file)s'
     }
-    
+
     _INCLUDE_CMD_ = {
         NMAKE_FILETYPE :   '!INCLUDE',
         GMAKE_FILETYPE :   "include"
