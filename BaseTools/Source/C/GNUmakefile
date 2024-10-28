@@ -6,6 +6,44 @@
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
+#
+# PYTHON_HOME is the old method of specifying a Python interperter on Windows.
+# Check if an interperter can be found using PYTHON_HOME.
+#
+ifdef PYTHON_HOME
+ifndef (,$(wildcard $(PYTHON_HOME)$(SEP)python.exe)) # Make sure the file exists
+PYTHON_COMMAND := $(PYTHON_HOME)$(SEP)python.exe
+endif
+endif
+ifndef PYTHON_COMMAND
+#
+# An interperter was not found using PYTHON_HOME. Next try using the
+# Python Launcher for Windows to find an interperter.
+#
+CHECK_PY := $(shell where py.exe || echo NotFound)
+ifeq ($(CHECK_PY),NotFound)
+undefine CHECK_PY
+$(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+endif
+PYTHON_COMMAND := $(shell py -3 -c "import sys; print(sys.executable)")
+ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
+$(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+endif
+endif
+else # UNIX
+PYTHON_COMMAND := $(shell /usr/bin/env python3 -c "import sys; print(sys.executable)")
+ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
+PYTHON_COMMAND := $(shell /usr/bin/env python -c "import sys; print(sys.executable)")
+ifdef (,$(wildcard $(PYTHON_COMMAND))) # Make sure the file exists
+undefine PYTHON_COMMAND
+endif
+endif
+ifndef PYTHON_COMMAND
+$(error Unable to find a Python interperter, if one is installed, set the PYTHON_COMMAND environment variable!)
+endif
+endif
+export PYTHON_COMMAND
+endif
 ifndef HOST_ARCH
   #
   # If HOST_ARCH is not defined, then we use 'uname -m' to attempt
