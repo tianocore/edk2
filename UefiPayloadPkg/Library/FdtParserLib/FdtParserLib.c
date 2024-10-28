@@ -764,6 +764,8 @@ ParsePciRootBridge (
     }
   }
 
+  DEBUG ((DEBUG_INFO, "\n"));
+
   for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
     PropertyPtr = FdtGetPropertyByOffset (Fdt, Property, &TempLen);
     TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
@@ -869,6 +871,8 @@ ParseDtb (
   UINT8                 NodeType;
   EFI_BOOT_MODE         BootMode;
   CHAR8                 *GmaStr;
+  UINTN                 PciRbArrayIndex;
+  INT32                 *PciRbNodes;
   UINT8                 ReservedMemoryDepth;
   INTN                  NumRsv;
   EFI_PHYSICAL_ADDRESS  Addr;
@@ -893,6 +897,8 @@ ParseDtb (
   BootMode            = 0;
   NodeType            = 0;
   RootAddressCells    = 2;
+  GmaStr              = "<NULL>";
+  PciRbArrayIndex     = 0;
   ReservedMemoryDepth = 0xFF;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
@@ -968,6 +974,10 @@ ParseDtb (
     }
   }
 
+  if (RootBridgeCount) {
+    PciRbNodes = AllocateZeroPool (RootBridgeCount * sizeof (INT32));
+  }
+
   NumRsv = FdtGetNumberOfReserveMapEntries (Fdt);
   /* Look for an existing entry and add it to the efi mem map. */
   for (index = 0; index < NumRsv; index++) {
@@ -1004,13 +1014,14 @@ ParseDtb (
 
         break;
       case FrameBuffer:
+        // FIXME: Ensure this node gets parsed first so that it gets the
+        // correct options to feed into others (like GMA string)
         DEBUG ((DEBUG_INFO, "ParseFrameBuffer\n"));
         GmaStr = ParseFrameBuffer (Fdt, Node);
         break;
       case PciRootBridge:
-        DEBUG ((DEBUG_INFO, "ParsePciRootBridge, index :%x \n", index));
-        ParsePciRootBridge (Fdt, Node, RootBridgeCount, GmaStr, &index);
-        DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index :%x\n", index));
+        DEBUG ((DEBUG_INFO, "Found PciRootBridge\n"));
+        PciRbNodes[PciRbArrayIndex++] = Node;
         break;
       case Options:
         // FIXME: Need to ensure this node gets parsed first so that it gets
@@ -1023,6 +1034,26 @@ ParseDtb (
         break;
     }
   }
+
+  DEBUG ((DEBUG_INFO, "\n"));
+
+  // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
+  // may not be good idea. Instead standardise GMA string?
+  while (PciRbArrayIndex--) {
+    DEBUG ((DEBUG_INFO, "Before ParsePciRootBridge, index: %d\n", index));
+    ParsePciRootBridge (Fdt, PciRbNodes[PciRbArrayIndex], RootBridgeCount, GmaStr, &index);
+    DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index: %d\n", index));
+  }
+
+  if (!RootBridgeCount) {
+    DEBUG ((DEBUG_ERROR, "Platform Init violates the spec! No PCI root bridges found.\n"));
+    goto Done;
+  }
+
+  //
+  // UniversalPayloadEntry phase does not define FreePool(), so just continue.
+  //
+  // FreePool (PciRbNodes);
 
   if ((NULL != mPciRootBridgeInfo) && (NULL != mUplPciSegmentInfoHob)) {
     // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
@@ -1068,8 +1099,8 @@ ParseDtb (
     }
   }
 
+Done:
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;
-  DEBUG ((DEBUG_INFO, "\n"));
 
   return NewHobList;
 }
