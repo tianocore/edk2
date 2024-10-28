@@ -33,7 +33,9 @@
 #include <Guid/PciSegmentInfoGuid.h>
 
 typedef enum {
-  ReservedMemory = 1,
+  IsaSerial = 1,
+  MmioSerial,
+  ReservedMemory,
   Memory,
   FrameBuffer,
   PciRootBridge,
@@ -143,7 +145,11 @@ CheckNodeType (
   )
 {
   DEBUG ((DEBUG_INFO, "\n CheckNodeType  %a   \n", NodeString));
-  if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0 ) {
+  if (AsciiStrnCmp (NodeString, "isa", AsciiStrLen ("isa")) == 0 ) {
+    return IsaSerial;
+  } else if (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0 ) {
+    return MmioSerial;
+  } else if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0 ) {
     return ReservedMemory;
   } else if (AsciiStrnCmp (NodeString, "memory@", AsciiStrLen ("memory@")) == 0 ) {
     return Memory;
@@ -567,8 +573,9 @@ ParsegraphicNode (
 **/
 VOID
 ParseSerialPort (
-  IN VOID   *Fdt,
-  IN INT32  SubNode
+  IN VOID     *Fdt,
+  IN INT32    SubNode,
+  IN BOOLEAN  SerialOnIsa
   )
 {
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *Serial;
@@ -602,7 +609,7 @@ ParseSerialPort (
 
   PropertyPtr = FdtGetProperty (Fdt, SubNode, "compatible", &TempLen);
   TempStr     = (CHAR8 *)(PropertyPtr->Data);
-  if (AsciiStrnCmp (TempStr, "isa", AsciiStrLen ("isa")) == 0) {
+  if (SerialOnIsa) {
     DEBUG ((DEBUG_INFO, " find serial compatible isa \n"));
     Serial->UseMmio = 0;
     PropertyPtr     = FdtGetProperty (Fdt, SubNode, "reg", &TempLen);
@@ -648,7 +655,6 @@ ParsePciRootBridge (
 {
   INT32               SubNode;
   INT32               Property;
-  INT32               SSubNode;
   FDT_NODE_HEADER     *NodePtr;
   CONST FDT_PROPERTY  *PropertyPtr;
   INT32               TempLen;
@@ -702,13 +708,8 @@ ParsePciRootBridge (
       ParsegraphicNode (Fdt, SubNode);
     }
 
-    if (AsciiStrnCmp (NodePtr->Name, "isa", AsciiStrLen ("isa")) == 0) {
-      SSubNode = FdtFirstSubnode (Fdt, SubNode); // serial
-      ParseSerialPort (Fdt, SSubNode);
-    }
-
     if (AsciiStrnCmp (NodePtr->Name, "serial@", AsciiStrLen ("serial@")) == 0) {
-      ParseSerialPort (Fdt, SubNode);
+      ParseSerialPort (Fdt, SubNode, FALSE);
     }
   }
 
@@ -816,6 +817,7 @@ ParseDtb (
   UINT8                 PciEnumDone;
   UINT8                 NodeType;
   EFI_BOOT_MODE         BootMode;
+  INT32                 SSubNode;
   CHAR8                 *GmaStr;
   INT32                 PciRbNode;
   UINT8                 ReservedMemoryDepth;
@@ -930,6 +932,15 @@ ParseDtb (
     NodeType = CheckNodeType (NodePtr->Name, Depth);
     DEBUG ((DEBUG_INFO, "NodeType :0x%x\n", NodeType));
     switch (NodeType) {
+      case IsaSerial:
+        DEBUG ((DEBUG_INFO, "ParseIsaSerial\n"));
+        SSubNode = FdtFirstSubnode (Fdt, Node); // serial
+        ParseSerialPort (Fdt, SSubNode, TRUE);
+        break;
+      case MmioSerial:
+        DEBUG ((DEBUG_INFO, "ParseMmioSerial\n"));
+        ParseSerialPort (Fdt, Node, FALSE);
+        break;
       case ReservedMemory:
         DEBUG ((DEBUG_INFO, "ParseReservedMemory\n"));
         ParseReservedMemory (Fdt, Node);
