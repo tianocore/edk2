@@ -817,6 +817,7 @@ ParseDtb (
   UINT8                 NodeType;
   EFI_BOOT_MODE         BootMode;
   CHAR8                 *GmaStr;
+  INT32                 PciRbNode;
   UINT8                 ReservedMemoryDepth;
   INTN                  NumRsv;
   EFI_PHYSICAL_ADDRESS  Addr;
@@ -839,6 +840,8 @@ ParseDtb (
   PciEnumDone = 1;
   BootMode    = 0;
   NodeType    = 0;
+  GmaStr      = "<NULL>";
+  PciRbNode   = 0;
   ReservedMemoryDepth = 0xFF;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
@@ -945,9 +948,8 @@ ParseDtb (
         GmaStr = ParseFrameBuffer (Fdt, Node);
         break;
       case PciRootBridge:
-        DEBUG ((DEBUG_INFO, "ParsePciRootBridge, index :%x \n", index));
-        ParsePciRootBridge (Fdt, Node, RootBridgeCount, GmaStr, &index);
-        DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index :%x\n", index));
+        DEBUG ((DEBUG_INFO, "Found PciRootBridge\n"));
+        PciRbNode = Node;
         break;
       case Options:
         // FIXME: Need to ensure this node gets parsed first so that it gets
@@ -959,6 +961,14 @@ ParseDtb (
         DEBUG ((DEBUG_INFO, "ParseNothing\n"));
         break;
     }
+  }
+
+  // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
+  // may not be good idea
+  if (PciRbNode) {
+    DEBUG ((DEBUG_INFO, "ParsePciRootBridge, index :%x\n", index));
+    ParsePciRootBridge (Fdt, PciRbNode, RootBridgeCount, GmaStr, &index);
+    DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index :%x\n", index));
   }
 
   // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
