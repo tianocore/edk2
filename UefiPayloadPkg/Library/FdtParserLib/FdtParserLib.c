@@ -788,7 +788,7 @@ ParsePciRootBridge (
 
   @return   The address to the new hob list
 **/
-UINTN
+VOID *
 EFIAPI
 ParseDtb (
   IN VOID  *FdtBase
@@ -811,7 +811,6 @@ ParseDtb (
   EFI_PHYSICAL_ADDRESS  MemoryBottom;
   EFI_PHYSICAL_ADDRESS  MemoryTop;
   BOOLEAN               IsHobConstructed;
-  UINTN                 NewHobList;
   UINT8                 RootBridgeCount;
   UINT8                 index;
   UINT8                 PciEnumDone;
@@ -834,7 +833,6 @@ ParseDtb (
   Depth             = 0;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
   IsHobConstructed  = FALSE;
-  NewHobList        = 0;
   RootBridgeCount   = 0;
   index             = 0;
   // TODO: This value comes from FDT. Currently there is a bug in implementation
@@ -887,13 +885,12 @@ ParseDtb (
               FreeMemoryTop    = StartAddress + NumberOfBytes;
               MemoryTop        = FreeMemoryTop;
 
-              DEBUG ((DEBUG_INFO, "MemoryBottom :0x%llx\n", MemoryBottom));
+              DEBUG ((DEBUG_INFO, "\nMemoryBottom :0x%llx\n", MemoryBottom));
               DEBUG ((DEBUG_INFO, "FreeMemoryBottom :0x%llx\n", FreeMemoryBottom));
               DEBUG ((DEBUG_INFO, "FreeMemoryTop :0x%llx\n", FreeMemoryTop));
               DEBUG ((DEBUG_INFO, "MemoryTop :0x%llx\n", MemoryTop));
               mHobList         =  HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
               IsHobConstructed = TRUE;
-              NewHobList       = (UINTN)mHobList;
               break;
             }
           }
@@ -1027,7 +1024,7 @@ ParseDtb (
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;
   DEBUG ((DEBUG_INFO, "\n"));
 
-  return NewHobList;
+  return mHobList;
 }
 
 /**
@@ -1036,7 +1033,7 @@ ParseDtb (
   @retval HobList   The base address of Hoblist.
 
 **/
-UINTN
+VOID *
 EFIAPI
 FdtNodeParser (
   IN VOID  *FdtBase
@@ -1059,21 +1056,20 @@ UplInitHob (
   IN VOID  *FdtBase
   )
 {
-  UINTN  NHobAddress;
+  VOID  *NHobAddress;
 
-  NHobAddress = 0;
   //
-  // Check parameter type(
+  // Check parameter type
   //
   if (FdtCheckHeader (FdtBase) == 0) {
     DEBUG ((DEBUG_INFO, "%a() FDT blob\n", __func__));
     NHobAddress = FdtNodeParser ((VOID *)FdtBase);
+
+    return (UINTN)NHobAddress;
   } else {
-    DEBUG ((DEBUG_INFO, "%a() HOb list\n", __func__));
+    DEBUG ((DEBUG_INFO, "%a() HOB list\n", __func__));
     mHobList = FdtBase;
 
-    return (UINTN)(mHobList);
+    return (UINTN)mHobList;
   }
-
-  return NHobAddress;
 }
