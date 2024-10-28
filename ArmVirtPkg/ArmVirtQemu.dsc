@@ -50,9 +50,10 @@
 
 !include NetworkPkg/NetworkDefines.dsc.inc
 
-!include MdePkg/MdeLibs.dsc.inc
-
+# This comes before MdeLibs to ensure stack cookie configuration is chosen
 !include ArmVirtPkg/ArmVirt.dsc.inc
+
+!include MdePkg/MdeLibs.dsc.inc
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
