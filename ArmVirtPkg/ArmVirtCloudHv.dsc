@@ -28,6 +28,7 @@
   DEFINE TTY_TERMINAL            = FALSE
   DEFINE SECURE_BOOT_ENABLE      = FALSE
 
+# This comes before MdeLibs to ensure stack cookie configuration is chosen
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
 [LibraryClasses.common]

@@ -30,6 +30,8 @@
 [Defines.AARCH64]
   DEFINE ACPIVIEW_ENABLE         = TRUE
 
+
+# This comes before MdeLibs to ensure stack cookie configuration is chosen
 !include ArmVirtPkg/ArmVirt.dsc.inc
 
 !if $(ARCH) == AARCH64
