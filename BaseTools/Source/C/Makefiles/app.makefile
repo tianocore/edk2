@@ -16,6 +16,7 @@ all: $(MAKEROOT)/bin $(APPLICATION)
 
 $(APPLICATION): $(OBJECTS)
 	$(LINKER) -o $(APPLICATION) $(LDFLAGS) $(OBJECTS) -L$(MAKEROOT)/libs $(LIBS)
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
 
 $(OBJECTS): $(MAKEROOT)/Include/Common/BuildVersion.h
 

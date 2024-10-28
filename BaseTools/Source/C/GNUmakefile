@@ -1,11 +1,21 @@
 ## @file
 #  GNU/Linux makefile for C tools build.
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+MAKEROOT:=$(shell echo %CD%)
+SEP:=$(shell echo \)
+else
+MAKEROOT := .
+SEP:=/
+endif
+
+ifndef PYTHON_COMMAND
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
 #
 # PYTHON_HOME is the old method of specifying a Python interperter on Windows.
 # Check if an interperter can be found using PYTHON_HOME.
@@ -44,42 +54,35 @@ endif
 endif
 export PYTHON_COMMAND
 endif
+
 ifndef HOST_ARCH
-  #
-  # If HOST_ARCH is not defined, then we use 'uname -m' to attempt
-  # try to figure out the appropriate HOST_ARCH.
-  #
-  uname_m = $(shell uname -m)
-  $(info Attempting to detect HOST_ARCH from 'uname -m': $(uname_m))
-  ifneq (,$(strip $(filter $(uname_m), x86_64 amd64)))
-    HOST_ARCH=X64
-  endif
-  ifeq ($(patsubst i%86,IA32,$(uname_m)),IA32)
-    HOST_ARCH=IA32
-  endif
-  ifneq (,$(findstring aarch64,$(uname_m)))
-    HOST_ARCH=AARCH64
-  else ifneq (,$(findstring arm64,$(uname_m)))
-    HOST_ARCH=AARCH64
-  else ifneq (,$(findstring arm,$(uname_m)))
-    HOST_ARCH=ARM
-  endif
-  ifneq (,$(findstring riscv64,$(uname_m)))
-    HOST_ARCH=RISCV64
-  endif
-  ifneq (,$(findstring loongarch64,$(uname_m)))
-    HOST_ARCH=LOONGARCH64
-  endif
-  ifndef HOST_ARCH
-    $(info Could not detected HOST_ARCH from uname results)
-    $(error HOST_ARCH is not defined!)
-  endif
-  $(info Detected HOST_ARCH of $(HOST_ARCH) using uname.)
+#
+# If HOST_ARCH is not defined, then we use 'GetGnuHostArch.py' to attempt
+# try to figure out the appropriate HOST_ARCH.
+#
+GET_GNU_HOST_ARCH_PY:=$(MAKEROOT)$(SEP)Makefiles$(SEP)GetGnuHostArch.py
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+HOST_ARCH:=$(shell if defined PYTHON_COMMAND $(PYTHON_COMMAND) $(GET_GNU_HOST_ARCH_PY))
+ifeq ($(HOST_ARCH),)
+HOST_ARCH:=$(shell if not defined PYTHON_COMMAND if defined PYTHON_HOME $(PYTHON_HOME)\python.exe $(GET_GNU_HOST_ARCH_PY))
+endif
+else
+HOST_ARCH:=$(shell if command -v $(PYTHON_COMMAND) >/dev/null 1; then $(PYTHON_COMMAND) $(GET_GNU_HOST_ARCH_PY); else python $(GET_GNU_HOST_ARCH_PY); fi)
+endif
+ifeq ($(HOST_ARCH),)
+$(info HOST_ARCH detection failed.)
+undefine HOST_ARCH
+endif
+ifeq ($(HOST_ARCH),Unknown)
+$(info HOST_ARCH detection failed.)
+undefine HOST_ARCH
+endif
+endif
+ifndef HOST_ARCH
+$(error HOST_ARCH is not defined!)
 endif
 
 export HOST_ARCH
-
-MAKEROOT = .
 
 include Makefiles/header.makefile
 
@@ -109,14 +112,22 @@ $(APPLICATIONS): $(LIBRARIES) $(MAKEROOT)/bin $(VFRAUTOGEN)
 
 .PHONY: outputdirs
 makerootdir:
-	-mkdir -p $(MAKEROOT)
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+	$(shell if not exist "$(BIN_PATH)" mkdir "$(BIN_PATH)")
+	$(shell if not exist "$(MAKEROOT)" mkdir "$(MAKEROOT)")
+else
+	-$(MKDIR) $(MAKEROOT)
+endif
 
 .PHONY: subdirs $(SUBDIRS)
+
 subdirs: $(SUBDIRS)
+
 $(SUBDIRS):
 	$(MAKE) -C $@
 
 .PHONY: $(patsubst %,%-clean,$(sort $(SUBDIRS)))
+
 $(patsubst %,%-clean,$(sort $(SUBDIRS))):
 	-$(MAKE) -C $(@:-clean=) clean
 
@@ -128,7 +139,12 @@ clean:  $(patsubst %,%-clean,$(sort $(SUBDIRS)))
 clean: localClean
 
 localClean:
+ifeq (Windows, $(findstring Windows,$(MAKE_HOST)))
+	$(shell del /F $(MAKEROOT)$(SEP)bin$(SEP)*)
+	$(shell rmdir /S /Q $(MAKEROOT)$(SEP)libs $(MAKEROOT)$(SEP)bin)
+else
 	rm -f $(MAKEROOT)/bin/*
 	-rmdir $(MAKEROOT)/libs $(MAKEROOT)/bin
+endif
 
 include Makefiles/footer.makefile
