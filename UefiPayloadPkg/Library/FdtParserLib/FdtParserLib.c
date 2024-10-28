@@ -895,7 +895,6 @@ ParseDtb (
   EFI_PHYSICAL_ADDRESS  MemoryBottom;
   EFI_PHYSICAL_ADDRESS  MemoryTop;
   BOOLEAN               IsHobConstructed;
-  UINTN                 NewHobList;
   UINT8                 RootBridgeCount;
   UINT8                 index;
   UINT8                 PciEnumDone;
@@ -922,7 +921,6 @@ ParseDtb (
   Depth             = 0;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
   IsHobConstructed  = FALSE;
-  NewHobList        = 0;
   RootBridgeCount   = 0;
   index             = 0;
   // TODO: This value comes from FDT. Currently there is a bug in implementation
@@ -975,13 +973,13 @@ ParseDtb (
           StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
           NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
           DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
-          DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
+          DEBUG ((DEBUG_INFO, "  %016lX  %016lX\n", StartAddress, NumberOfBytes));
           // If parent node type is reserved-memory we are looking at special-purpose memory. Ignore it.
           ParentNode = FdtParentOffset (Fdt, Node);
           NodePtr    = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + ParentNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
           NodeType   = CheckNodeType (NodePtr->Name, Depth);
           if (!IsHobConstructed && (NodeType != ReservedMemory)) {
-            if (NumberOfBytes > MinimalNeededSize) {
+            if ((NumberOfBytes > MinimalNeededSize) && (StartAddress < BASE_4GB)) {
               MemoryBottom     = StartAddress + NumberOfBytes - MinimalNeededSize;
               FreeMemoryBottom = MemoryBottom;
               FreeMemoryTop    = StartAddress + NumberOfBytes;
@@ -993,7 +991,6 @@ ParseDtb (
               DEBUG ((DEBUG_INFO, "MemoryTop :0x%llx\n", MemoryTop));
               mHobList         = HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
               IsHobConstructed = TRUE;
-              NewHobList       = (UINTN)mHobList;
               break;
             }
           }
@@ -1156,7 +1153,7 @@ ParseDtb (
 Done:
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;
 
-  return NewHobList;
+  return (UINTN)mHobList;
 }
 
 /**
@@ -1191,19 +1188,18 @@ UplInitHob (
 {
   UINTN  NHobAddress;
 
-  NHobAddress = 0;
   //
   // Check parameter type
   //
   if (FdtCheckHeader (FdtBase) == 0) {
     DEBUG ((DEBUG_INFO, "%a() FDT blob\n", __func__));
     NHobAddress = FdtNodeParser ((VOID *)FdtBase);
+
+    return NHobAddress;
   } else {
-    DEBUG ((DEBUG_INFO, "%a() HOb list\n", __func__));
+    DEBUG ((DEBUG_INFO, "%a() HOB list\n", __func__));
     mHobList = FdtBase;
 
-    return (UINTN)(mHobList);
+    return (UINTN)mHobList;
   }
-
-  return NHobAddress;
 }
