@@ -2772,7 +2772,7 @@ class DscBuildData(PlatformBuildClassObject):
 
     def GetBuildOptionsValueList(self):
         CC_FLAGS = LinuxCFLAGS
-        if sys.platform == "win32":
+        if sys.platform == "win32" and os.environ.get('CLANG_MAKEFILE_TYPE')!='gnu':
             CC_FLAGS = WindowsCFLAGS
         BuildOptions = OrderedDict()
         for Options in self.BuildOptions:

@@ -148,7 +148,10 @@ if __name__ == '__main__':
   CommandLine.append('EXTRA_FLAGS="%s"' % (gArgs.Remaining))
   CommandLine.append(gArgs.BuildType)
   if sys.platform == "win32":
-    CommandLine = 'nmake /f %s' % (' '.join(CommandLine))
+    if ((os.environ.get('CLANG_MAKEFILE_TYPE') == 'gnu') and (not self.tool_chain_tag.lower().startswith("vs"))):
+      CommandLine = '{}make %s'.format(os.environ.get('CLANG_HOST_BIN')) % (' '.join(CommandLine))
+    else:
+      CommandLine = 'nmake /f %s' % (' '.join(CommandLine))
   else:
     CommandLine = 'make -f %s' % (' '.join(CommandLine))
 
