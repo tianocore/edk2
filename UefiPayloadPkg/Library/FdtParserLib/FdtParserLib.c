@@ -864,6 +864,7 @@ ParseDtb (
   UINT8                 NodeType;
   EFI_BOOT_MODE         BootMode;
   CHAR8                 *GmaStr;
+  UINT8                 ReservedMemoryDepth;
   INTN                  NumRsv;
   EFI_PHYSICAL_ADDRESS  Addr;
   UINT64                Size;
@@ -883,10 +884,11 @@ ParseDtb (
   index             = 0;
   // TODO: This value comes from FDT. Currently there is a bug in implementation
   // which assumes node ordering. Which requires a fix.
-  PciEnumDone      = 1;
-  BootMode         = 0;
-  NodeType         = 0;
-  RootAddressCells = 2;
+  PciEnumDone         = 1;
+  BootMode            = 0;
+  NodeType            = 0;
+  RootAddressCells    = 2;
+  ReservedMemoryDepth = 0xFF;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
   DEBUG ((DEBUG_INFO, "Start parsing DTB data\n"));
@@ -901,6 +903,23 @@ ParseDtb (
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x\n", Node, NodePtr->Name, Depth));
+
+    // Ensure we don't submit a child of reserved-memory as main memory block.
+    NodeType = CheckNodeType (NodePtr->Name, Depth);
+    // Already found reserved block.
+    if ((ReservedMemoryDepth != 0xFF) && (Depth > ReservedMemoryDepth)) {
+      DEBUG ((DEBUG_INFO, "Skipping reserved-memory block.\n"));
+      continue;
+    } else if ((ReservedMemoryDepth != 0xFF) && (Depth <= ReservedMemoryDepth)) {
+      ReservedMemoryDepth = 0xFF;
+    }
+
+    // Newly found reserved block.
+    if (NodeType == ReservedMemory) {
+      ReservedMemoryDepth = Depth;
+      continue;
+    }
+
     // memory node
     if (AsciiStrnCmp (NodePtr->Name, "memory@", AsciiStrLen ("memory@")) == 0) {
       for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
