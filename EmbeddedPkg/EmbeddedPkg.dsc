@@ -196,6 +196,7 @@
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
 
 [BuildOptions]
+  RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
   *_*_*_CC_FLAGS  = -DDISABLE_NEW_DEPRECATED_INTERFACES
 
 ################################################################################

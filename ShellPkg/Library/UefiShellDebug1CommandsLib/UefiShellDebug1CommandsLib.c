@@ -269,6 +269,10 @@ EditGetDefaultFileName (
 
   do {
     FileNameTmp = CatSPrint (NULL, L"NewFile%d.%s", Suffix, Extension);
+    if (FileNameTmp == NULL) {
+      ASSERT (FileNameTmp != NULL);
+      return NULL;
+    }
 
     //
     // after that filename changed to path
