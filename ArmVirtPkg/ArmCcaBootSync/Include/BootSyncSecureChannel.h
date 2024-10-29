@@ -43,6 +43,14 @@ typedef enum Attestation_State {
   AttFailed           ///< Attestation Failed
 } ATTESTATION_STATE;
 
+/** An enum identifiying the Boot Sync state.
+*/
+typedef enum BootSync_State {
+  BootSyncStateUnknown,   ///< Boot Sync state unknown
+  BootSyncNotDone,        ///< Boot Sync not done
+  BootSyncComplete        ///< Boot Sync Completed
+} BOOTSYNC_STATE;
+
 /** An structure representing the Protocol state.
 */
 typedef struct ProtocolStatus {
@@ -51,6 +59,9 @@ typedef struct ProtocolStatus {
 
   /// Attestation State
   ATTESTATION_STATE    AttestationState;
+
+  /// Boot Sync State
+  BOOTSYNC_STATE       BootSyncState;
 } PROTOCOL_STATUS;
 
 /**
