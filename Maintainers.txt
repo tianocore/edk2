@@ -85,6 +85,7 @@ ARM, AARCH64
 F: */AArch64/
 F: */Arm/
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 RISCV64
@@ -137,17 +138,20 @@ ArmPkg
 F: ArmPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPkg
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 ArmPlatformPkg
 F: ArmPlatformPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmPlatformPkg
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 ArmVirtPkg
 F: ArmVirtPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ArmVirtPkg
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 R: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
@@ -183,6 +187,7 @@ EmbeddedPkg
 F: EmbeddedPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Abner Chang <abner.chang@amd.com> [changab]
 
 EmulatorPkg
@@ -430,6 +435,7 @@ R: Brit Chesley <brit.chesley@amd.com> [BritChesley]
 MdePkg: ARM/AARCH64 standard interfaces
 F: MdePkg/Include/Library/ArmLib.h
 M: Leif Lindholm <quic_llindhol@quicinc.com> [leiflindholm]
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 
 NetworkPkg
@@ -441,6 +447,7 @@ R: Zachary Clark-williams <zachary.clark-williams@intel.com> [Zclarkwilliams]
 OvmfPkg
 F: OvmfPkg/
 W: http://www.tianocore.org/ovmf/
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Jiewen Yao <jiewen.yao@intel.com> [jyao1]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 S: Maintained
@@ -598,6 +605,7 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
 
 StandaloneMmPkg
 F: StandaloneMmPkg/
+M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
