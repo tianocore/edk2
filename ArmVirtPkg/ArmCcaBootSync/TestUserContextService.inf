@@ -25,6 +25,7 @@
   TestUserContextService/TestUserContextService.c
 
   UserContext/BootSyncAttestationProtocolUserContext.c
+  UserContext/BootSyncBibProtocolUserContext.c
   UserContext/BootSyncKeyExchangeProtocolUserContext.c
   UserContext/BootSyncProtocolUserContext.h
   UserContext/BootSyncSessionUserContext.c
@@ -57,11 +58,16 @@
   gArmBootSyncAttReqGuid
   gArmBootSyncAttRespGuid
   gArmBootSyncAttResult
+  gArmBootSyncBibReqGuid
+  gArmBootSyncBibRespGuid
   gArmBootSyncFinGuid
   gArmBootSyncKeyEncData
   gArmBootSyncKeyXchgReqGuid
   gArmBootSyncKeyXchgRespGuid
   gArmBootSyncNackGuid
+  gArmBootSyncRequestOptions
+  gArmBootSyncSecretData
+  gArmBootSyncVarData
 
 [Pcd]
   gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString
