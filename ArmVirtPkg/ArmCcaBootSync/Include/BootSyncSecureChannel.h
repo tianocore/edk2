@@ -35,11 +35,22 @@ typedef enum SessionState {
   ConnectionEstablished       ///< Session - Connection Established
 } SESSION_STATE;
 
+/** An enum identifiying the attestation state.
+*/
+typedef enum Attestation_State {
+  AttNotDone,         ///< Attestation Not Done
+  AttSuccess,         ///< Attestation Successful
+  AttFailed           ///< Attestation Failed
+} ATTESTATION_STATE;
+
 /** An structure representing the Protocol state.
 */
 typedef struct ProtocolStatus {
   /// Session State
-  SESSION_STATE    SessionState;
+  SESSION_STATE        SessionState;
+
+  /// Attestation State
+  ATTESTATION_STATE    AttestationState;
 } PROTOCOL_STATUS;
 
 /**

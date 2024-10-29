@@ -23,7 +23,10 @@
   Common/BootSyncProtocol.c
 
   TestUserContextService/TestUserContextService.c
+
+  UserContext/BootSyncAttestationProtocolUserContext.c
   UserContext/BootSyncKeyExchangeProtocolUserContext.c
+  UserContext/BootSyncProtocolUserContext.h
   UserContext/BootSyncSessionUserContext.c
 
   Include/BootSyncBsbMsg.h
@@ -50,6 +53,10 @@
   RngLib
 
 [Guids]
+  gArmBootSyncAttReport
+  gArmBootSyncAttReqGuid
+  gArmBootSyncAttRespGuid
+  gArmBootSyncAttResult
   gArmBootSyncFinGuid
   gArmBootSyncKeyEncData
   gArmBootSyncKeyXchgReqGuid
