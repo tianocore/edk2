@@ -753,10 +753,10 @@ FreeMadtTableResources (
   ASSERT (CfgMgrProtocol != NULL);
   ASSERT (AcpiTableInfo->TableGeneratorId == This->GeneratorID);
   ASSERT (AcpiTableInfo->AcpiTableSignature == This->AcpiTableSignature);
+  ASSERT (Table != NULL);
 
   if ((Table == NULL) || (*Table == NULL)) {
     DEBUG ((DEBUG_ERROR, "ERROR: MADT: Invalid Table Pointer\n"));
-    ASSERT ((Table != NULL) && (*Table != NULL));
     return EFI_INVALID_PARAMETER;
   }
 
