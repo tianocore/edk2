@@ -32,6 +32,8 @@
   UserContext/BootSyncKeyExchangeProtocolUserContext.c
   UserContext/BootSyncProtocolUserContext.h
   UserContext/BootSyncSessionUserContext.c
+  UserContext/BootSyncVerification.c
+  UserContext/BootSyncVerification.h
 
   Include/ArmCcaTokenParser.h
   Include/BootSyncBsbMsg.h

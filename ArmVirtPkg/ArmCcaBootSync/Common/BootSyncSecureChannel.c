@@ -292,6 +292,9 @@ SecureChannelDeleteKeys (
   // Scrub the Encryption Key.
   ZeroMem (SecChannel->Ke, ENCRYPTION_KEY_SIZE);
 
+  // Scrub the RPV.
+  ZeroMem (SecChannel->Rpv, ARM_CCA_REALM_CFG_RPV_SIZE);
+
   return Status;
 }
 

@@ -92,6 +92,9 @@ typedef struct SecureChannel {
 
   /// Encryption Key.
   UINT8                     Ke[ENCRYPTION_KEY_SIZE];
+
+  /// Realm Personalisation Value.
+  UINT8                     Rpv[ARM_CCA_REALM_CFG_RPV_SIZE];
 } SECURE_CHANNEL;
 
 /**

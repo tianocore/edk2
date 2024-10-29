@@ -13,6 +13,7 @@
 #include "Include/BootSyncBsbMsg.h"
 #include "Include/BootSyncBsbParser.h"
 #include "Include/BootSyncDebug.h"
+#include "BootSyncVerification.h"
 
 /*
   Attestation and verification protocol
@@ -183,10 +184,21 @@ BootSyncValidateAttestation (
   }
 
   // Step 3: Perform Verification
-  // Until the verfication support is added always return attestation
-  // verification result as successful and Boot Sync already completed as FALSE.
-  AttestationResult  = ATTESTATION_RESULT_VERIFY_SUCCESS;
-  *BootSyncCompleted = FALSE;
+  Status = BootSyncPerformVerification (
+             SecChannel,
+             AttReq,
+             &AttestationResult,
+             BootSyncCompleted
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Error: Verification - Status = %r, AttestationResult = %a\n",
+      Status,
+      ((AttestationResult == ATTESTATION_RESULT_VERIFY_SUCCESS) ?
+       "SUCCESS" : "FAILED")
+      ));
+  }
 
   // Step 4: Update the attestation status in the protocol status
   SecChannel->ProtocolStatus.AttestationState =
