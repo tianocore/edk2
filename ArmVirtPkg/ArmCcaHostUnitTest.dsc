@@ -54,3 +54,17 @@
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+
+[BuildOptions.common.EDKII.HOST_APPLICATION]
+# The following linker option is required when linking libqcbor with the
+# HostTestService.
+# The DLINK2_FLAGS are reset in the by the unit test framework dsc.inc
+# file UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
+# Furthermore, the Linker options when passed as the module options in
+# HostTestService.inc get overridden, see ApplyBuildOption(), line 625
+# in file BaseTools/Source/Python/AutoGen/ModuleAutoGenHelper.py
+# Therefore, specify the options as the module type (HOST_APPLICATION)
+# option in the DSC file.
+#
+  GCC:*_*_*_DLINK2_FLAGS = -lqcbor -L$(BIN_DIR)/$(MODULE_RELATIVE_DIR)/QcborLib/QcborLib/OUTPUT
+

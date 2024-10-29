@@ -16,6 +16,9 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
+  ArmCcaTokenParser/ArmCcaTokenDefs.h
+  ArmCcaTokenParser/ArmCcaTokenParser.c
+
   Common/BootSyncBsbMsg.c
   Common/BootSyncBsbParser.c
   Common/BootSyncDebug.c
@@ -30,6 +33,7 @@
   UserContext/BootSyncProtocolUserContext.h
   UserContext/BootSyncSessionUserContext.c
 
+  Include/ArmCcaTokenParser.h
   Include/BootSyncBsbMsg.h
   Include/BootSyncBsbParser.h
   Include/BootSyncDebug.h
@@ -74,4 +78,11 @@
   gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString
 
 [BuildOptions]
+  GCC:*_*_*_CC_FLAGS = -I$(MODULE_DIR)/QcborLib/qcbor/inc
+
+# The following option to link with libqcbor does not work as it gets
+# overridden in UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
+# Therefore, this has been specified as a module type option in the
+# DSC file.
+#  GCC:*_*_*_DLINK2_FLAGS = -lqcbor -L$(BIN_DIR)/$(MODULE_RELATIVE_DIR)/QcborLib/QcborLib/OUTPUT
 
