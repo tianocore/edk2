@@ -426,6 +426,8 @@ GetRecoveryCapsuleInfo (
   PEI_FILE_HANDLE       Handle;
   UINTN                 NumberRecoveryCapsules;
 
+  Handle = NULL;
+
   Status = GetNumberRecoveryCapsules (PeiServices, This, &NumberRecoveryCapsules);
 
   if (EFI_ERROR (Status)) {
@@ -550,6 +552,8 @@ LoadRecoveryCapsule (
   UINTN                 RecoveryCapsuleCount;
   PEI_FILE_HANDLE       Handle;
   UINTN                 NumberRecoveryCapsules;
+
+  Handle = NULL;
 
   Status = GetNumberRecoveryCapsules (PeiServices, This, &NumberRecoveryCapsules);
 
