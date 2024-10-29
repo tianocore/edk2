@@ -43,6 +43,9 @@
   RngLib|UnitTestFrameworkPkg/Library/UnitTestHostRngLib/UnitTestHostRngLib.inf
 
 [Components]
+  # libqcbor is used for parsing an Arm CCA Atestation Token.
+  ArmVirtPkg/ArmCcaBootSync/QcborLib/QcborLib.inf
+
   #
   # Build HOST_APPLICATION that tests the User Context side
   # of the Boot Sync Blocks Protocol.

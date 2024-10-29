@@ -1,0 +1,25 @@
+##  @file
+#  A makefile for building libqcbor.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+configure:
+	-@echo QcborLib: Configure.
+	-@cmake -DCMAKE_BUILD_TYPE=Release  -DBUILD_SHARED_LIBS=ON \
+		-B $(OUTPUT_DIR) -S $(MODULE_DIR)/qcbor
+
+all: configure
+	-@echo QcborLib: Build.
+	-@make -C $(OUTPUT_DIR) -f $(OUTPUT_DIR)/Makefile $@
+
+clean:
+	-@echo QcborLib: Clean.
+	-@make -C $(OUTPUT_DIR) -f $(OUTPUT_DIR)/Makefile $@
+
+cleanall: clean
+	-@echo QcborLib: Cleanall.
