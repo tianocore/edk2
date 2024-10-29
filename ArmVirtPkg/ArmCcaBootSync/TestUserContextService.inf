@@ -34,6 +34,8 @@
   UserContext/BootSyncSessionUserContext.c
   UserContext/BootSyncVerification.c
   UserContext/BootSyncVerification.h
+  UserContext/UserManagement.c
+  UserContext/UserManagement.h
 
   Include/ArmCcaTokenParser.h
   Include/BootSyncBsbMsg.h

@@ -13,6 +13,7 @@
 #include "Include/BootSyncBsbMsg.h"
 #include "Include/BootSyncDebug.h"
 #include "Include/BootSyncSecureChannel.h"
+#include "UserManagement.h"
 
 /**
   Boot Information Blocks protocol
@@ -86,52 +87,6 @@
       |  .Data[] = Secret Data.
       +-----------
 */
-
-/**
-  Get the UEFI Variable Data.
-
-  @param[in]   SecChannel          Pointer to the secure channel.
-  @param[out]  Data                UEFI Variable data.
-  @param[out]  DataSize            UEFI Variable data size.
-
-  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
-  @retval EFI_SUCCESS             Success.
-**/
-EFI_STATUS
-EFIAPI
-BootSyncGetVariableData (
-  IN  SECURE_CHANNEL  *SecChannel,
-  OUT UINT8           **Data,
-  OUT UINTN           *DataSize
-  )
-{
-  // Not implemented as yet.
-  ASSERT (0);
-  return EFI_UNSUPPORTED;
-}
-
-/**
-  Get the Secret Data.
-
-  @param[in]   SecChannel          Pointer to the secure channel.
-  @param[out]  Data                Secret data.
-  @param[out]  DataSize            Secret data size.
-
-  @retval EFI_INVALID_PARAMETER   A parameter is invalid.
-  @retval EFI_SUCCESS             Success.
-**/
-EFI_STATUS
-EFIAPI
-BootSyncGetSecretData (
-  IN SECURE_CHANNEL  *SecChannel,
-  OUT UINT8          **Data,
-  OUT UINTN          *DataSize
-  )
-{
-  // Not implemented as yet.
-  ASSERT (0);
-  return EFI_UNSUPPORTED;
-}
 
 /**
   Pack the response data element.
