@@ -31,8 +31,15 @@
   #
   NULL|MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
 
+#
 # Stack Cookies cannot be generically applied to SEC modules because they may not define _ModuleEntryPoint and when we
 # link a library in, we have to be able to define the entry point. SEC modules that do define _ModuleEntryPoint can
-# apply a library class override to get StackCheckLibNull.inf
+# apply a library class override to get StackCheckLibNull.inf.
+#
+# If CUSTOM_STACK_CHECK_LIB is set, MdeLibs.dsc.inc will not link StackCheckLibNull and it is expected that the
+# DSC being built is providing it's own implementation of StackCheckLib.
+#
 [LibraryClasses.common.PEI_CORE, LibraryClasses.common.PEIM, LibraryClasses.common.DXE_CORE, LibraryClasses.common.SMM_CORE, LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.DXE_DRIVER, LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.DXE_SMM_DRIVER, LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.UEFI_DRIVER, LibraryClasses.common.UEFI_APPLICATION]
+!ifndef CUSTOM_STACK_CHECK_LIB
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+!endif

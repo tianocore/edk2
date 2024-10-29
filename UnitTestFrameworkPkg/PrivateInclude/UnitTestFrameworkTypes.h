@@ -15,7 +15,7 @@
 ///
 /// The maximum length of a string stored in the unit test framework
 ///
-#define UNIT_TEST_MAX_STRING_LENGTH  (120)
+#define UNIT_TEST_MAX_STRING_LENGTH  (512)
 
 ///
 /// The size of a firngerprint used to save/resume execution of a unit test
@@ -23,12 +23,6 @@
 ///
 ///
 #define UNIT_TEST_FINGERPRINT_SIZE  (sizeof (UINT32))
-
-///
-/// The maximum length of a test failure message stored in the unit test
-/// framework
-///
-#define UNIT_TEST_TESTFAILUREMSG_LENGTH  (120)
 
 ///
 /// FAILURE_TYPE used to record the type of assert that was triggered by a unit
@@ -54,7 +48,7 @@ typedef struct {
   CHAR8                     *Name; // can't have spaces and should be short
   CHAR8                     *Log;
   FAILURE_TYPE              FailureType;
-  CHAR8                     FailureMessage[UNIT_TEST_TESTFAILUREMSG_LENGTH];
+  CHAR8                     FailureMessage[UNIT_TEST_MAX_STRING_LENGTH];
   UINT8                     Fingerprint[UNIT_TEST_FINGERPRINT_SIZE];
   UNIT_TEST_STATUS          Result;
   UNIT_TEST_FUNCTION        RunTest;
@@ -117,7 +111,7 @@ typedef struct {
 typedef struct {
   UINT32              Size;                                       // Size of the UNIT_TEST_SAVE_TEST including Log[]
   UINT8               Fingerprint[UNIT_TEST_FINGERPRINT_SIZE];    // Fingerprint of the test itself.
-  CHAR8               FailureMessage[UNIT_TEST_TESTFAILUREMSG_LENGTH];
+  CHAR8               FailureMessage[UNIT_TEST_MAX_STRING_LENGTH];
   FAILURE_TYPE        FailureType;
   UNIT_TEST_STATUS    Result;
   CHAR8               Log[];

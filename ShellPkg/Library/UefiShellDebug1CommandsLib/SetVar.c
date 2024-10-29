@@ -285,7 +285,10 @@ GetVariableDataFromParameter (
 
   for (Index = 2; Index < ShellCommandLineGetCount (Package); Index++) {
     TempData = ShellCommandLineGetRawValue (Package, Index);
-    ASSERT (TempData != NULL);
+    if (TempData == NULL) {
+      ASSERT (TempData != NULL);
+      return EFI_INVALID_PARAMETER;
+    }
 
     if (TempData[0] != L'=') {
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", TempData);
@@ -401,11 +404,23 @@ ShellCommandRunSetVar (
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       VariableName = ShellCommandLineGetRawValue (Package, 1);
+      if (VariableName == NULL) {
+        ShellCommandLineFreeVarList (Package);
+        return SHELL_INVALID_PARAMETER;
+      }
+
       if (!ShellCommandLineGetFlag (Package, L"-guid")) {
         CopyGuid (&Guid, &gEfiGlobalVariableGuid);
       } else {
         StringGuid = ShellCommandLineGetValue (Package, L"-guid");
-        RStatus    = StrToGuid (StringGuid, &Guid);
+        if (StringGuid != NULL) {
+          RStatus = StrToGuid (StringGuid, &Guid);
+        } else {
+          ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);
+          ShellCommandLineFreeVarList (Package);
+          return SHELL_INVALID_PARAMETER;
+        }
+
         if (RETURN_ERROR (RStatus) || (StringGuid[GUID_STRING_LENGTH] != L'\0')) {
           ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"setvar", StringGuid);
           ShellStatus = SHELL_INVALID_PARAMETER;
@@ -419,6 +434,12 @@ ShellCommandRunSetVar (
         Status = gRT->GetVariable ((CHAR16 *)VariableName, &Guid, &Attributes, &Size, Buffer);
         if (Status == EFI_BUFFER_TOO_SMALL) {
           Buffer = AllocateZeroPool (Size);
+          if (Buffer == NULL) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
+            ShellCommandLineFreeVarList (Package);
+            return SHELL_OUT_OF_RESOURCES;
+          }
+
           Status = gRT->GetVariable ((CHAR16 *)VariableName, &Guid, &Attributes, &Size, Buffer);
         }
 
@@ -440,6 +461,12 @@ ShellCommandRunSetVar (
         Status = gRT->GetVariable ((CHAR16 *)VariableName, &Guid, &Attributes, &Size, Buffer);
         if (Status == EFI_BUFFER_TOO_SMALL) {
           Buffer = AllocateZeroPool (Size);
+          if (Buffer == NULL) {
+            ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"setvar");
+            ShellCommandLineFreeVarList (Package);
+            return SHELL_OUT_OF_RESOURCES;
+          }
+
           Status = gRT->GetVariable ((CHAR16 *)VariableName, &Guid, &Attributes, &Size, Buffer);
         }
 

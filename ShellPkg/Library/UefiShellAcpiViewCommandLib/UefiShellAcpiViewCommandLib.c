@@ -72,6 +72,7 @@ ACPI_TABLE_PARSER  ParserList[] = {
   { EFI_ACPI_6_4_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,
     ParseAcpiPptt },
   { EFI_ACPI_6_5_ACPI_RAS2_FEATURE_TABLE_SIGNATURE,                                                      ParseAcpiRas2 },
+  { EFI_ACPI_6_5_ACPI_RAS_FEATURE_TABLE_SIGNATURE,                                                       ParseAcpiRasf },
   { RSDP_TABLE_INFO,                                                                                     ParseAcpiRsdp },
   { EFI_ACPI_6_2_SYSTEM_LOCALITY_INFORMATION_TABLE_SIGNATURE,                                            ParseAcpiSlit },
   { EFI_ACPI_6_2_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,                                        ParseAcpiSpcr },

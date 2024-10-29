@@ -24,7 +24,6 @@
         "IgnoreFiles": [
             "Library/ArmSoftFloatLib/berkeley-softfloat-3",
             "Library/ArmSoftFloatLib/ArmSoftFloatLib.c",
-            "Library/CompilerIntrinsicsLib",
             "Universal/Smbios/SmbiosMiscDxe"
         ]
     },

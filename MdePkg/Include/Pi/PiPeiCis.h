@@ -5,7 +5,7 @@ Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Revision Reference:
-  PI Version 1.7.
+  PI Version 1.8.A
 
 **/
 
@@ -846,8 +846,8 @@ EFI_STATUS
 //
 // PEI Specification Revision information
 //
-#define PEI_SPECIFICATION_MAJOR_REVISION  1
-#define PEI_SPECIFICATION_MINOR_REVISION  70
+#define PEI_SPECIFICATION_MAJOR_REVISION  PI_SPECIFICATION_MAJOR_REVISION
+#define PEI_SPECIFICATION_MINOR_REVISION  PI_SPECIFICATION_MINOR_REVISION
 ///
 /// Specification inconsistency here:
 /// In the PI1.0 spec, PEI_SERVICES_SIGNATURE is defined as 0x5652455320494550. But
