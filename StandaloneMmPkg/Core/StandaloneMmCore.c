@@ -575,11 +575,12 @@ MmEntryPoint (
         }
 
         //
-        // Update CommunicationBuffer, BufferSize and ReturnStatus
-        // Communicate service finished, reset the pointer to CommBuffer to NULL
+        // Update ReturnBufferSize and ReturnStatus
+        // Communicate service finished, reset IsCommBufferValid to FALSE
         //
-        CommunicationStatus->ReturnBufferSize = BufferSize;
-        CommunicationStatus->ReturnStatus     = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
+        CommunicationStatus->IsCommBufferValid = FALSE;
+        CommunicationStatus->ReturnBufferSize  = BufferSize;
+        CommunicationStatus->ReturnStatus      = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
       } else {
         DEBUG ((DEBUG_ERROR, "Input buffer size is larger than the size of MM Communication Buffer\n"));
         ASSERT (FALSE);
