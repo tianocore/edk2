@@ -35,6 +35,7 @@ BootSyncTestApp (
 {
   EFI_STATUS             Status;
   EFI_STATUS             Status2;
+  RETURN_STATUS          RetStatus;
   SECURE_CHANNEL         SecChannel;
   BOOT_SYNC_BSB_HEADER   *BibHeader;
   BOOT_SYNC_BSB_ELEMENT  *BsbElement;
@@ -110,6 +111,24 @@ BootSyncTestApp (
     (UINT8 *)(BsbElement + 1),
     (BsbElement->Header.Length - sizeof (BOOT_SYNC_BSB_ELEMENT))
     );
+
+  DBG_PRINT_HASH (&SecChannel);
+
+  // Extend the rolling hash to REM3 to indicate that the Boot Sync Data
+  // was received by the firmware.
+  RetStatus = ArmCcaRsiExtendMeasurement (
+                4,
+                SecChannel.RmHash,
+                sizeof (SecChannel.RmHash)
+                );
+  if (RETURN_ERROR (RetStatus)) {
+    Print (
+      L"Error: Failed to extend hash to REM3!, RetStatus = %r\n",
+      RetStatus
+      );
+  }
+
+  Print (L"---------------------------- END ----------------------------\n");
 
   // Send the FIN message to indicate End of Transmission.
   Status = SendFin (&SecChannel, BOOT_SYNC_COMM_END_REASON_EOT);
