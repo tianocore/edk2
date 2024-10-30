@@ -24,11 +24,14 @@ STATIC struct {
   { &gArmBootSyncAttReqGuid,      "ArmBootSyncAttReqGuid"      },
   { &gArmBootSyncAttRespGuid,     "ArmBootSyncAttRespGuid"     },
   { &gArmBootSyncAttResult,       "ArmBootSyncAttResult"       },
+  { &gArmBootSyncBibReqGuid,      "ArmBootSyncBibReqGuid"      },
+  { &gArmBootSyncBibRespGuid,     "ArmBootSyncBibRespGuid"     },
   { &gArmBootSyncFinGuid,         "ArmBootSyncFinGuid"         },
   { &gArmBootSyncKeyEncData,      "ArmBootSyncKeyEncData"      },
   { &gArmBootSyncKeyXchgReqGuid,  "ArmBootSyncKeyXchgReqGuid"  },
   { &gArmBootSyncKeyXchgRespGuid, "ArmBootSyncKeyXchgRespGuid" },
-  { &gArmBootSyncNackGuid,        "ArmBootSyncNackGuid"        }
+  { &gArmBootSyncNackGuid,        "ArmBootSyncNackGuid"        },
+  { &gArmBootSyncRequestOptions,  "ArmBootSyncRequestOptions"  }
 };
 
 /**
