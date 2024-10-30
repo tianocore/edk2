@@ -1,0 +1,32 @@
+##  @file
+#  Host based unit test User Context service.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001C
+  BASE_NAME                      = TestUserContextService
+  FILE_GUID                      = ACF605DA-929A-11EE-A408-E3768d49B61A
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  TestUserContextService/TestUserContextService.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+
+[Guids]
+
+[Pcd]
+
+[BuildOptions]
+
