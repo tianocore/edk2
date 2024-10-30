@@ -20,6 +20,10 @@ STATIC struct {
   EFI_GUID    *Guid;
   CHAR8       *Name;
 } MessageMap[] = {
+  { &gArmBootSyncAttReport,       "ArmBootSyncAttReport"       },
+  { &gArmBootSyncAttReqGuid,      "ArmBootSyncAttReqGuid"      },
+  { &gArmBootSyncAttRespGuid,     "ArmBootSyncAttRespGuid"     },
+  { &gArmBootSyncAttResult,       "ArmBootSyncAttResult"       },
   { &gArmBootSyncFinGuid,         "ArmBootSyncFinGuid"         },
   { &gArmBootSyncKeyEncData,      "ArmBootSyncKeyEncData"      },
   { &gArmBootSyncKeyXchgReqGuid,  "ArmBootSyncKeyXchgReqGuid"  },
