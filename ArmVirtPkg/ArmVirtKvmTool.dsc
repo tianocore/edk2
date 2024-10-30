@@ -29,6 +29,12 @@
 
   DEFINE ACPIVIEW_ENABLE         = TRUE
 
+  #
+  # Arm CCA Test Application
+  #  Note: These MUST NOT be enabled for production builds.
+  #
+  DEFINE ARMCCA_TEST_ENABLE      = FALSE
+
 # This comes at the beginning of includes to pick all relevant defines early on.
 !include ArmVirtPkg/ArmVirtStackCookies.dsc.inc
 
@@ -398,3 +404,14 @@
   # ACPI Support
   #
   ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
+
+!if $(ARMCCA_TEST_ENABLE) == TRUE
+  # FV Filesystem
+  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+
+  #
+  # Test Apps
+  #  Note: These MUST NOT be enabled for production builds.
+  #
+  ArmVirtPkg/ArmCcaBootSync/BootSyncTestApp.inf
+!endif

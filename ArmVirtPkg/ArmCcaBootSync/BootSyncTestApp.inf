@@ -1,0 +1,38 @@
+##  @file
+#  EFI application tests the RSI interface.
+#
+#  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001C
+  BASE_NAME                      = BootSyncTestApp
+  FILE_GUID                      = 2707AE9D-EBF7-40B4-BD08-774360E7C59C
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = BootSyncTestApp
+
+[Sources.common]
+  BootSyncTestApp/BootSyncTestApp.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiApplicationEntryPoint
+  UefiLib
+
+[Guids]
+
+[Protocols]
+
+[Pcd]
+
+[Depex]
+  TRUE
+
