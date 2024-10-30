@@ -13,6 +13,7 @@
 #include "Include/BootSyncDebug.h"
 #include "Include/BootSyncSecureChannel.h"
 #include "Include/BootSyncProtocol.h"
+#include "Guest/BootSyncProtocolGuest.h"
 
 /**
   Entrypoint for the Boot Sync Test application.
@@ -30,6 +31,7 @@ BootSyncTestApp (
   )
 {
   EFI_STATUS      Status;
+  EFI_STATUS      Status2;
   SECURE_CHANNEL  SecChannel;
 
   Print (L"Boot Sync Test Application\n");
@@ -49,13 +51,22 @@ BootSyncTestApp (
 
   DBG_DUMP_KEYS ("Sec", &SecChannel);
 
+  Status = BootSyncPerformAttestation (&SecChannel);
+  if (EFI_ERROR (Status)) {
+    Print (L"Error: Attestation Failed!, Status = %r\n", Status);
+    goto exit_handler;
+  }
+
+  Print (L"Attestation Status = %r\n", Status);
+
   // Send the FIN message to indicate End of Transmission.
   Status = SendFin (&SecChannel, BOOT_SYNC_COMM_END_REASON_EOT);
   ASSERT_EFI_ERROR (Status);
 
-  Status = TerminateSecureChannel (&SecChannel);
-  if (EFI_ERROR (Status)) {
-    Print (L"Error: Failed to Close Secure Session Status = %r\n", Status);
+exit_handler:
+  Status2 = TerminateSecureChannel (&SecChannel);
+  if (EFI_ERROR (Status2)) {
+    Print (L"Error: Failed to Close Secure Session Status2 = %r\n", Status2);
   }
 
   return Status;
