@@ -1164,7 +1164,10 @@ CalculateCertHash (
   //
   CtxSize = mHash[HashAlg].GetContextSize ();
   HashCtx = AllocatePool (CtxSize);
-  ASSERT (HashCtx != NULL);
+  if (HashCtx == NULL) {
+    ASSERT (HashCtx != NULL);
+    return FALSE;
+  }
 
   //
   // 2. Initialize a hash context.
@@ -1879,7 +1882,10 @@ HashPeImage (
   CtxSize = mHash[HashAlg].GetContextSize ();
 
   HashCtx = AllocatePool (CtxSize);
-  ASSERT (HashCtx != NULL);
+  if (HashCtx == NULL) {
+    ASSERT (HashCtx != NULL);
+    goto Done;
+  }
 
   // 1.  Load the image header into memory.
 
@@ -3508,9 +3514,19 @@ SecureBootExtractConfig (
     // followed by "&OFFSET=0&WIDTH=WWWWWWWWWWWWWWWW" followed by a Null-terminator
     //
     ConfigRequestHdr = HiiConstructConfigHdr (&gSecureBootConfigFormSetGuid, mSecureBootStorageName, PrivateData->DriverHandle);
-    Size             = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
-    ConfigRequest    = AllocateZeroPool (Size);
-    ASSERT (ConfigRequest != NULL);
+    if (ConfigRequestHdr == NULL) {
+      ASSERT (ConfigRequestHdr != NULL);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
+    Size          = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
+    ConfigRequest = AllocateZeroPool (Size);
+    if (ConfigRequest == NULL) {
+      ASSERT (ConfigRequest != NULL);
+      FreePool (ConfigRequestHdr);
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     AllocatedRequest = TRUE;
     UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
     FreePool (ConfigRequestHdr);

@@ -61,7 +61,11 @@ SecureBootFetchData (
   *SigListOut   = NULL;
   *SigListsSize = 0;
   CertInfo      = AllocatePool (sizeof (SECURE_BOOT_CERTIFICATE_INFO));
-  NewCertInfo   = CertInfo;
+  if (CertInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  NewCertInfo = CertInfo;
   while (1) {
     if (NewCertInfo == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
@@ -99,6 +103,9 @@ SecureBootFetchData (
                       sizeof (SECURE_BOOT_CERTIFICATE_INFO) * (KeyIndex + 1),
                       CertInfo
                       );
+      if (NewCertInfo == NULL) {
+        goto Cleanup;
+      }
     }
 
     if (Status == EFI_NOT_FOUND) {

@@ -621,6 +621,9 @@ GetMeasureBootProtocols (
   @retval EFI_SUCCESS             The file specified by DevicePath and non-NULL
                                   FileBuffer did authenticate, and the platform policy dictates
                                   that the DXE Foundation may use the file.
+
+  @retval EFI_OUT_OF_RESOURCES    A necessary memory buffer could not be allocated.
+
   @retval other error value
 **/
 EFI_STATUS
@@ -723,9 +726,16 @@ DxeTpm2MeasureBootHandler (
             }
           }
 
-          FreePool (OrigDevicePathNode);
+          if (OrigDevicePathNode != NULL) {
+            FreePool (OrigDevicePathNode);
+          }
+
           OrigDevicePathNode = DuplicateDevicePath (File);
-          ASSERT (OrigDevicePathNode != NULL);
+          if (OrigDevicePathNode == NULL) {
+            ASSERT (OrigDevicePathNode != NULL);
+            return EFI_OUT_OF_RESOURCES;
+          }
+
           break;
         }
       }

@@ -80,6 +80,11 @@ HashStart (
 
   for (Index = 0; Index < mHashInterfaceCount; Index++) {
     HashMask = Tpm2GetHashMaskFromAlgo (&mHashInterface[Index].HashGuid);
+    if (HashCtx == NULL) {
+      // If we fail to get the hash mask we don't have resources.
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     if ((HashMask & PcdGet32 (PcdTpm2HashMask)) != 0) {
       mHashInterface[Index].HashInit (&HashCtx[Index]);
     }
