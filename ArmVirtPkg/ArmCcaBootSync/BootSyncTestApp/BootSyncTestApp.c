@@ -10,6 +10,7 @@
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include "Include/BootSyncDebug.h"
 #include "Include/BootSyncSecureChannel.h"
 #include "Include/BootSyncProtocol.h"
@@ -30,9 +31,10 @@ BootSyncTestApp (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS      Status;
-  EFI_STATUS      Status2;
-  SECURE_CHANNEL  SecChannel;
+  EFI_STATUS            Status;
+  EFI_STATUS            Status2;
+  SECURE_CHANNEL        SecChannel;
+  BOOT_SYNC_BSB_HEADER  *BibHeader;
 
   Print (L"Boot Sync Test Application\n");
 
@@ -58,6 +60,17 @@ BootSyncTestApp (
   }
 
   Print (L"Attestation Status = %r\n", Status);
+
+  Status = BootSyncGetBib (&SecChannel, &BibHeader);
+  if (EFI_ERROR (Status)) {
+    Print (L"Error: Boot Sync Failed!, Status = %r\n", Status);
+    goto exit_handler;
+  }
+
+  Print (L"Boot Sync Status = %r\n", Status);
+
+  // Free the BIB
+  FreePool (BibHeader);
 
   // Send the FIN message to indicate End of Transmission.
   Status = SendFin (&SecChannel, BOOT_SYNC_COMM_END_REASON_EOT);
