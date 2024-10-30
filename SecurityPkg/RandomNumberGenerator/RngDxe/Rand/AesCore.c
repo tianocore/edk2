@@ -230,6 +230,8 @@ AesEncrypt (
   UINTN    NbIndex;
   UINTN    Round;
 
+  EFI_STATUS  Status;
+
   if ((Key == NULL) || (InData == NULL) || (OutData == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -237,7 +239,10 @@ AesEncrypt (
   //
   // Expands AES Key for encryption.
   //
-  AesExpandKey (Key, 128, &AesKey);
+  Status = AesExpandKey (Key, 128, &AesKey);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   Nr = AesKey.Nk + 6;
   Ek = AesKey.EncKey;
