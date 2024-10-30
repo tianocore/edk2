@@ -11,6 +11,8 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include "Include/BootSyncBsbMsg.h"
+#include "Include/BootSyncBsbParser.h"
 #include "Include/BootSyncDebug.h"
 #include "Include/BootSyncSecureChannel.h"
 #include "Include/BootSyncProtocol.h"
@@ -31,10 +33,11 @@ BootSyncTestApp (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS            Status;
-  EFI_STATUS            Status2;
-  SECURE_CHANNEL        SecChannel;
-  BOOT_SYNC_BSB_HEADER  *BibHeader;
+  EFI_STATUS             Status;
+  EFI_STATUS             Status2;
+  SECURE_CHANNEL         SecChannel;
+  BOOT_SYNC_BSB_HEADER   *BibHeader;
+  BOOT_SYNC_BSB_ELEMENT  *BsbElement;
 
   Print (L"Boot Sync Test Application\n");
 
@@ -69,12 +72,52 @@ BootSyncTestApp (
 
   Print (L"Boot Sync Status = %r\n", Status);
 
-  // Free the BIB
-  FreePool (BibHeader);
+  // Retrive the BIB elements.
+  Status = BsbGetElement (
+             BibHeader,
+             &gArmBootSyncVarData,
+             &BsbElement
+             );
+  if (EFI_ERROR (Status)) {
+    Print (
+      L"Error: Boot Sync to retrieve Variable Store Data!, Status = %r\n",
+      Status
+      );
+    goto exit_handler1;
+  }
+
+  DBG_DUMP_RAW (
+    "Variable Store Data",
+    (UINT8 *)(BsbElement + 1),
+    (BsbElement->Header.Length - sizeof (BOOT_SYNC_BSB_ELEMENT))
+    );
+
+  Status = BsbGetElement (
+             BibHeader,
+             &gArmBootSyncSecretData,
+             &BsbElement
+             );
+  if (EFI_ERROR (Status)) {
+    Print (
+      L"Error: Boot Sync to retrieve Disk Secret Key Data!, Status = %r\n",
+      Status
+      );
+    goto exit_handler1;
+  }
+
+  DBG_DUMP_RAW (
+    "Disk Secret Key Data",
+    (UINT8 *)(BsbElement + 1),
+    (BsbElement->Header.Length - sizeof (BOOT_SYNC_BSB_ELEMENT))
+    );
 
   // Send the FIN message to indicate End of Transmission.
   Status = SendFin (&SecChannel, BOOT_SYNC_COMM_END_REASON_EOT);
   ASSERT_EFI_ERROR (Status);
+
+exit_handler1:
+  // Free the BIB
+  FreePool (BibHeader);
 
 exit_handler:
   Status2 = TerminateSecureChannel (&SecChannel);

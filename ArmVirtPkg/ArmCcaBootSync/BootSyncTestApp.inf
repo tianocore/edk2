@@ -72,6 +72,8 @@
   gArmBootSyncKeyXchgRespGuid
   gArmBootSyncNackGuid
   gArmBootSyncRequestOptions
+  gArmBootSyncSecretData
+  gArmBootSyncVarData
 
 [Protocols]
   gEfiRealmApertureManagementProtocolGuid
