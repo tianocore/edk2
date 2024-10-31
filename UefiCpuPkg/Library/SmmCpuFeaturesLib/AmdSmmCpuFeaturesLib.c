@@ -47,13 +47,10 @@ CpuFeaturesLibInitialization (
   VOID
   )
 {
-  UINT32  LMAValue;
-
-  LMAValue                 = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
-  mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT;
-  if (LMAValue) {
-    mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
-  }
+  //
+  // AMD64 processors support EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT only
+  //
+  mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
 
   //
   // If gSmmBaseHobGuid found, means SmBase info has been relocated and recorded
@@ -96,7 +93,6 @@ SmmCpuFeaturesInitializeProcessor (
   )
 {
   AMD_SMRAM_SAVE_STATE_MAP  *CpuState;
-  UINT32                    LMAValue;
 
   //
   // No need to configure SMBASE if SmBase relocation has been done.
@@ -107,14 +103,6 @@ SmmCpuFeaturesInitializeProcessor (
     //
     CpuState             = (AMD_SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
     CpuState->x64.SMBASE = (UINT32)CpuHotPlugData->SmBase[CpuIndex];
-  }
-
-  // Re-initialize the value of mSmmSaveStateRegisterLma flag which might have been changed in PiCpuSmmDxeSmm Driver
-  // Entry point, to make sure correct value on AMD platform is assigned to be used by SmmCpuFeaturesLib.
-  LMAValue                 = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
-  mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT;
-  if (LMAValue) {
-    mSmmSaveStateRegisterLma = EFI_SMM_SAVE_STATE_REGISTER_LMA_64BIT;
   }
 
   //
@@ -193,31 +181,20 @@ SmmCpuFeaturesHookReturnFromSmm (
 
   AmdCpuState = (AMD_SMRAM_SAVE_STATE_MAP *)CpuState;
 
-  if (mSmmSaveStateRegisterLma == EFI_SMM_SAVE_STATE_REGISTER_LMA_32BIT) {
-    OriginalInstructionPointer = (UINT64)AmdCpuState->x86._EIP;
-    AmdCpuState->x86._EIP      = (UINT32)NewInstructionPointer;
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((AmdCpuState->x86.AutoHALTRestart & BIT0) != 0) {
-      AmdCpuState->x86.AutoHALTRestart &= ~BIT0;
-    }
-  } else {
-    OriginalInstructionPointer = AmdCpuState->x64._RIP;
-    if ((AmdCpuState->x64.EFER & LMA) == 0) {
-      AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer32;
-    } else {
-      AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer;
-    }
+  OriginalInstructionPointer = AmdCpuState->x64._RIP;
 
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((AmdCpuState->x64.AutoHALTRestart & BIT0) != 0) {
-      AmdCpuState->x64.AutoHALTRestart &= ~BIT0;
-    }
+  if ((AmdCpuState->x64.EFER & LMA) == 0) {
+    AmdCpuState->x64._RIP = NewInstructionPointer32;
+  } else {
+    AmdCpuState->x64._RIP = NewInstructionPointer;
+  }
+
+  //
+  // Clear the auto HALT restart flag so the RSM instruction returns
+  // program control to the instruction following the HLT instruction.
+  //
+  if ((AmdCpuState->x64.AutoHALTRestart & BIT0) != 0) {
+    AmdCpuState->x64.AutoHALTRestart &= ~BIT0;
   }
 
   return OriginalInstructionPointer;
