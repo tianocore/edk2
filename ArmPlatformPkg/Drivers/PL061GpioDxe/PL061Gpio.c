@@ -34,7 +34,7 @@ PL061Locate (
   OUT UINTN              *RegisterBase
   )
 {
-  UINT32  Index;
+  UINTN  Index;
 
   for (Index = 0; Index < mPL061PlatformGpio->GpioControllerCount; Index++) {
     if (  (Gpio >= mPL061PlatformGpio->GpioController[Index].GpioIndex)
@@ -74,18 +74,18 @@ UINTN
 EFIAPI
 PL061EffectiveAddress (
   IN UINTN  Address,
-  IN UINTN  Mask
+  IN UINT8  Mask
   )
 {
-  return ((Address + PL061_GPIO_DATA_REG_OFFSET) + (Mask << 2));
+  return ((Address + PL061_GPIO_DATA_REG_OFFSET) + (UINTN)(Mask << 2));
 }
 
 STATIC
-UINTN
+UINT8
 EFIAPI
 PL061GetPins (
   IN UINTN  Address,
-  IN UINTN  Mask
+  IN UINT8  Mask
   )
 {
   return MmioRead8 (PL061EffectiveAddress (Address, Mask));
@@ -96,8 +96,8 @@ VOID
 EFIAPI
 PL061SetPins (
   IN UINTN  Address,
-  IN UINTN  Mask,
-  IN UINTN  Value
+  IN UINT8  Mask,
+  IN UINT8  Value
   )
 {
   MmioWrite8 (PL061EffectiveAddress (Address, Mask), Value);
