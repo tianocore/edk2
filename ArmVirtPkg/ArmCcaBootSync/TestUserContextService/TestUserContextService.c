@@ -12,10 +12,162 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <pthread.h>
 
 #include <Base.h>
 #include <Library/ArmCcaBootSyncCryptoLib.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Uefi/UefiBaseType.h>
+
+#include "Include/BootSyncSecureChannel.h"
+
+/**
+  A structure describing the client connection.
+**/
+typedef struct {
+  /// The linked list node.
+  LIST_ENTRY        Node;
+  /// A handle to the service thread.
+  pthread_t         ThreadId;
+  /// A handle to the secure channel.
+  SECURE_CHANNEL    Channel;
+} CLIENT_CONNECTION;
+
+// The client connection linked list head.
+STATIC CLIENT_CONNECTION  mConnList;
+
+// A flag to signal the termination the server procedure.
+STATIC BOOLEAN  gExitLoop = FALSE;
+
+/**
+  A function that handles the attestation service requests.
+
+  @param[in]  arg  Pointer to the client connection.
+
+  @retval  A pointer to return when the thread terminates.
+**/
+void *
+ServiceProc (
+  void  *arg
+  )
+{
+  CLIENT_CONNECTION  *Conn;
+  SECURE_CHANNEL     *Channel;
+
+  printf ("Info: Service procedure.\n");
+
+  if (arg == NULL) {
+    printf ("Error: Invalid client connection\n");
+    return NULL;
+  }
+
+  Conn    = (CLIENT_CONNECTION *)arg;
+  Channel = &Conn->Channel;
+
+  // Shutdown client socket
+  shutdown (Channel->SessionId, SHUT_RDWR);
+  close (Channel->SessionId);
+
+  // Remove node from List.
+  RemoveEntryList (&Conn->Node);
+  free (Conn);
+
+  printf ("Info: Service session Closed.\n");
+  return NULL;
+}
+
+/**
+  A function that handles the incomming connections.
+
+  @param[in]  arg  Pointer to the server socked fd.
+
+  @retval  A pointer to return when the thread terminates.
+**/
+void *
+ServerProc (
+  void  *arg
+  )
+{
+  int                 Err;
+  CLIENT_CONNECTION   *Conn;
+  socklen_t           ClientAddrLen;
+  struct sockaddr_in  ClientAddr;
+  int                 ClientSockFd;
+  int                 ServerSockFd;
+
+  if (arg == NULL) {
+    printf ("Error: Invalid Server Socket\n");
+    return NULL;
+  }
+
+  ServerSockFd = *(int *)arg;
+
+  printf ("Info: ServerSockFd = %d\n", ServerSockFd);
+
+  InitializeListHead (&mConnList.Node);
+
+  listen (ServerSockFd, 5);
+
+  while (gExitLoop != TRUE) {
+    Conn = (CLIENT_CONNECTION *)malloc (sizeof (CLIENT_CONNECTION));
+    if (Conn == NULL) {
+      printf ("Error: Out of Memory\n");
+      return NULL;
+    }
+
+    ZeroMem (Conn, sizeof (CLIENT_CONNECTION));
+    ZeroMem (&ClientAddr, sizeof (ClientAddr));
+    ClientAddrLen = sizeof (ClientAddr);
+
+    // This is a blocking call that waits
+    // for an incomming connection.
+    ClientSockFd = accept (
+                     ServerSockFd,
+                     (struct sockaddr *)&ClientAddr,
+                     &ClientAddrLen
+                     );
+    if (ClientSockFd < 0) {
+      // if there was an error in accepting the
+      // connection, it would be either due to
+      // a network error in which case we log
+      // an error message and try to continue
+      // or
+      // shutdown was signalled, in which case
+      // we exit the loop.
+      if (gExitLoop != TRUE) {
+        printf ("Error: Failed to accept connection!\n");
+      }
+
+      free (Conn);
+      continue;
+    }
+
+    printf ("Info: ClientSockFd = %d\n", ClientSockFd);
+    Conn->Channel.SessionId = (UINT64)ClientSockFd;
+
+    // Add Connection to List.
+    InsertTailList (&mConnList.Node, &Conn->Node);
+
+    // Start the service thread.
+    Err = pthread_create (&Conn->ThreadId, NULL, ServiceProc, Conn);
+    if (Err != 0) {
+      printf ("Error: Failed to create thread :[%s]", strerror (Err));
+      // Shutdown client socket
+      shutdown (ClientSockFd, SHUT_RDWR);
+      close (ClientSockFd);
+
+      // Remove node from List.
+      RemoveEntryList (&Conn->Node);
+      free (Conn);
+      continue;
+    }
+
+    printf ("Info: Thread created successfully\n");
+  } // while
+
+  return NULL;
+}
 
 /**
   Create and initialise a server socket for the service.
@@ -36,6 +188,7 @@ CreateServer (
   int                 SockFd;
   int                 EnableOption;
   struct sockaddr_in  ServerAddr;
+  pthread_t           ThreadId;
 
   SockFd = socket (AF_INET, SOCK_STREAM, 0);
   if (SockFd < 0) {
@@ -73,6 +226,14 @@ CreateServer (
   }
 
   *ServerSockFd = SockFd;
+  Err           = pthread_create (&ThreadId, NULL, ServerProc, ServerSockFd);
+  if (Err != 0) {
+    printf ("Error: Failed to create ServerProc thread :[%s]", strerror (Err));
+    // return -1 as pthread_create returns 0 on success and
+    // on error, it returns an error number (which may be positive or negative).
+    return -1;
+  }
+
   return Err;
 
 ExitHandler:
@@ -126,6 +287,13 @@ main (
   }
 
   printf ("Info: Server scoket created fd = %d\n", ServerSockFd);
+
+  printf ("Info: PRESS x + Enter to stop server!\n");
+  while (getchar () != 'x') {
+    printf ("*");
+  }
+
+  gExitLoop = TRUE;
 
   printf ("Info: Shutting down.\n");
   // Shutdown and close the server socket.
