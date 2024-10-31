@@ -38,6 +38,7 @@
     INF  NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
   !endif
 
+  INF  SecurityPkg/Hash2DxeCrypto/Hash2DxeCrypto.inf
   INF  NetworkPkg/TcpDxe/TcpDxe.inf
   INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
 
