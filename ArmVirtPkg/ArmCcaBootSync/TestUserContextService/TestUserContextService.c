@@ -7,6 +7,10 @@
 
 #include <stdio.h>
 
+#include <Base.h>
+#include <Library/ArmCcaBootSyncCryptoLib.h>
+#include <Uefi/UefiBaseType.h>
+
 /**
   Entrypoint for the Test User Context service.
 
@@ -22,7 +26,18 @@ main (
   char  *argv[]
   )
 {
+  EFI_STATUS  Status;
+
   printf ("Test User Context Service.\n");
+
+  Status = ArmCcaBootSyncCryptoInit ();
+  if (EFI_ERROR (Status)) {
+    printf (
+      "Error: Failed to init Crypto interfaces!, Status = 0x%x\n",
+      Status
+      );
+    return -1;
+  }
 
   return 0;
 }
