@@ -263,6 +263,11 @@ ServiceProc (
         SendNack (Channel, EFI_ACCESS_DENIED);
         break;
       }
+    } else {
+      // Reject anything else
+      printf ("Error: Invalid message, send Nack.\n");
+      SendNack (Channel, EFI_INVALID_PARAMETER);
+      break;
     }
 
     // Free the received message
