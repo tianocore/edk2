@@ -665,13 +665,7 @@ MigrateMemoryAllocationHobs (
   Hob.Raw             = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, HobStart);
   while (Hob.Raw != NULL) {
     MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
-    if ((MemoryAllocationHob->AllocDescriptor.MemoryType == EfiBootServicesData) &&
-        (MmIsBufferOutsideMmValid (
-           MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress,
-           MemoryAllocationHob->AllocDescriptor.MemoryLength
-           ))
-        )
-    {
+    if (MemoryAllocationHob->AllocDescriptor.MemoryType == EfiBootServicesData) {
       if (!IsZeroGuid (&MemoryAllocationHob->AllocDescriptor.Name)) {
         MemoryInMmram = AllocatePages (EFI_SIZE_TO_PAGES (MemoryAllocationHob->AllocDescriptor.MemoryLength));
         if (MemoryInMmram != NULL) {
