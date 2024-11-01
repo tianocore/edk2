@@ -217,6 +217,16 @@ ServiceProc (
 
     PrintGuid (&Msg->Name);
 
+    if (CompareGuid (&Msg->Name, &gArmBootSyncFinGuid)) {
+      Channel->ProtocolStatus.SessionState = UnConnected;
+      printf ("Info: Received FIN. Disconnecting.\n");
+      break;
+    } else if (CompareGuid (&Msg->Name, &gArmBootSyncNackGuid)) {
+      Channel->ProtocolStatus.SessionState = UnConnected;
+      printf ("Error: Received NACK. Disconnecting.\n");
+      break;
+    }
+
     // Free the received message
     FreePool (Msg);
     Msg = NULL;
