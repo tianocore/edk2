@@ -26,6 +26,8 @@
 #include "Include/BootSyncSecureChannel.h"
 #include "Include/BootSyncProtocol.h"
 
+#include "BootSyncProtocolUserContext.h"
+
 /**
   A structure describing the client connection.
 **/
@@ -180,6 +182,7 @@ ServiceProc (
   CLIENT_CONNECTION    *Conn;
   SECURE_CHANNEL       *Channel;
   BOOT_SYNC_GUID_BLOB  *Msg;
+  BOOLEAN              BootSyncCompleted;
 
   printf ("Info: Service procedure.\n");
 
@@ -225,6 +228,19 @@ ServiceProc (
       Channel->ProtocolStatus.SessionState = UnConnected;
       printf ("Error: Received NACK. Disconnecting.\n");
       break;
+    } else if (CompareGuid (&Msg->Name, &gArmBootSyncAttReqGuid)) {
+      // Step 2: Perform Attestation Report verification.
+      BootSyncCompleted = FALSE;
+      Status            = BootSyncValidateAttestation (Channel, Msg, &BootSyncCompleted);
+      if (EFI_ERROR (Status)) {
+        printf ("Error: Attestation verification failed.");
+        SendFin (Channel, BOOT_SYNC_COMM_END_PROTOCOL_ERROR);
+        break;
+      }
+
+      // Update the Boot Sync Status.
+      Channel->ProtocolStatus.BootSyncState = BootSyncCompleted ?
+                                              BootSyncComplete : BootSyncNotDone;
     }
 
     // Free the received message
