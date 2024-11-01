@@ -41,6 +41,60 @@ STATIC CLIENT_CONNECTION  mConnList;
 STATIC BOOLEAN  gExitLoop = FALSE;
 
 /**
+  A string table describing the connection status.
+*/
+STATIC CHAR8  *SessionStateStr[] = {
+  "UnConnected",
+  "ConnectionEstablished"
+};
+
+/**
+  A string table describing the attestation status.
+*/
+STATIC CHAR8  *AttestationStateStr[] = {
+  "AttNotDone",
+  "AttSuccess",
+  "AttFailed"
+};
+
+/**
+  A string table describing the Boot Sync status.
+*/
+STATIC CHAR8  *BootSyncStateStr[] = {
+  "BootSyncStateUnknown",
+  "BootSyncNotDone",
+  "BootSyncComplete"
+};
+
+/**
+  A helper function to print the session status.
+
+  @param[in]  Channel  Pointer to the secure channel.
+
+**/
+VOID
+PrintProtocolStatus (
+  IN SECURE_CHANNEL  *Channel
+  )
+{
+  PROTOCOL_STATUS  *ProtocolStatus;
+
+  ProtocolStatus = &Channel->ProtocolStatus;
+  printf (
+    "Info: Session State: %s\n",
+    SessionStateStr[ProtocolStatus->SessionState]
+    );
+  printf (
+    "Info: Attestation State: %s\n",
+    AttestationStateStr[ProtocolStatus->AttestationState]
+    );
+  printf (
+    "Info: BootSync State: %s\n",
+    BootSyncStateStr[ProtocolStatus->BootSyncState]
+    );
+}
+
+/**
   A function that handles the attestation service requests.
 
   @param[in]  arg  Pointer to the client connection.
@@ -64,6 +118,8 @@ ServiceProc (
 
   Conn    = (CLIENT_CONNECTION *)arg;
   Channel = &Conn->Channel;
+
+  PrintProtocolStatus (Channel);
 
   // Shutdown client socket
   shutdown (Channel->SessionId, SHUT_RDWR);
