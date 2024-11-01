@@ -18,9 +18,11 @@
 #include <Library/ArmCcaBootSyncCryptoLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/DebugLib.h>
 #include <Uefi/UefiBaseType.h>
 
 #include "Include/BootSyncSecureChannel.h"
+#include "Include/BootSyncProtocol.h"
 
 /**
   A structure describing the client connection.
@@ -106,6 +108,7 @@ ServiceProc (
   void  *arg
   )
 {
+  EFI_STATUS         Status;
   CLIENT_CONNECTION  *Conn;
   SECURE_CHANNEL     *Channel;
 
@@ -121,9 +124,25 @@ ServiceProc (
 
   PrintProtocolStatus (Channel);
 
+  // Step 1: Establish a secure session
+  while ((Channel->ProtocolStatus.SessionState == UnConnected)) {
+    Status = EstablishSecureChannel (Channel);
+    if (EFI_ERROR (Status)) {
+      printf ("Error: Failed to establish secure channel.\n");
+      goto ExitHandler;
+    }
+  }
+
+  PrintProtocolStatus (Channel);
+
+  TerminateSecureChannel (Channel);
+
+ExitHandler:
   // Shutdown client socket
-  shutdown (Channel->SessionId, SHUT_RDWR);
-  close (Channel->SessionId);
+  if (Channel->SessionId != MAX_UINT64) {
+    shutdown (Channel->SessionId, SHUT_RDWR);
+    close (Channel->SessionId);
+  }
 
   // Remove node from List.
   RemoveEntryList (&Conn->Node);
