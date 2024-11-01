@@ -83,9 +83,10 @@ MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
   { NULL,                     NULL,                              NULL, FALSE },
 };
 
-BOOLEAN         mMmEntryPointRegistered = FALSE;
-MM_COMM_BUFFER  *mMmCommunicationBuffer;
-VOID            *mInternalCommBufferCopy;
+BOOLEAN                     mMmEntryPointRegistered = FALSE;
+MM_COMM_BUFFER              *mMmCommunicationBuffer;
+VOID                        *mInternalCommBufferCopy;
+EFI_FIRMWARE_VOLUME_HEADER  *mBfv = NULL;
 
 /**
   Place holder function until all the MM System Table Service are available.
@@ -574,11 +575,12 @@ MmEntryPoint (
         }
 
         //
-        // Update CommunicationBuffer, BufferSize and ReturnStatus
-        // Communicate service finished, reset the pointer to CommBuffer to NULL
+        // Update ReturnBufferSize and ReturnStatus
+        // Communicate service finished, reset IsCommBufferValid to FALSE
         //
-        CommunicationStatus->ReturnBufferSize = BufferSize;
-        CommunicationStatus->ReturnStatus     = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
+        CommunicationStatus->IsCommBufferValid = FALSE;
+        CommunicationStatus->ReturnBufferSize  = BufferSize;
+        CommunicationStatus->ReturnStatus      = (Status == EFI_SUCCESS) ? EFI_SUCCESS : EFI_NOT_FOUND;
       } else {
         DEBUG ((DEBUG_ERROR, "Input buffer size is larger than the size of MM Communication Buffer\n"));
         ASSERT (FALSE);
@@ -843,9 +845,19 @@ StandaloneMmMain (
     // Dispatch standalone BFV
     //
     if (BfvHob->BaseAddress != 0) {
-      DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", BfvHob->BaseAddress));
-      MmCoreFfsFindMmDriver ((EFI_FIRMWARE_VOLUME_HEADER *)(UINTN)BfvHob->BaseAddress, 0);
-      MmDispatcher ();
+      //
+      // Shadow standalone BFV into MMRAM
+      //
+      mBfv = AllocatePool (BfvHob->Length);
+      if (mBfv != NULL) {
+        CopyMem ((VOID *)mBfv, (VOID *)(UINTN)BfvHob->BaseAddress, BfvHob->Length);
+        DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", mBfv));
+        MmCoreFfsFindMmDriver (mBfv, 0);
+        MmDispatcher ();
+        if (!FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
+          FreePool (mBfv);
+        }
+      }
     }
   }
 

@@ -220,7 +220,7 @@ IsValidDeleteTarget (
   }
 
   TempLocation = StrStr (Node->FullName, L":");
-  if (StrLen (TempLocation) <= 2) {
+  if ((TempLocation == NULL) || (StrLen (TempLocation) <= 2)) {
     //
     // Deleting the root directory is invalid.
     //
@@ -242,6 +242,11 @@ IsValidDeleteTarget (
   Pattern      = StrnCatGrow (&Pattern, &Size, L"\\", 0);
   Size         = 0;
   SearchString = StrnCatGrow (&SearchString, &Size, Node->FullName, 0);
+  if (SearchString == NULL) {
+    RetVal = FALSE;
+    goto Done;
+  }
+
   if (!EFI_ERROR (ShellIsDirectory (SearchString))) {
     SearchString = StrnCatGrow (&SearchString, &Size, L"\\", 0);
     SearchString = StrnCatGrow (&SearchString, &Size, L"*", 0);
@@ -256,6 +261,7 @@ IsValidDeleteTarget (
     }
   }
 
+Done:
   SHELL_FREE_NON_NULL (Pattern);
   SHELL_FREE_NON_NULL (SearchString);
 
