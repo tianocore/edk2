@@ -241,6 +241,28 @@ ServiceProc (
       // Update the Boot Sync Status.
       Channel->ProtocolStatus.BootSyncState = BootSyncCompleted ?
                                               BootSyncComplete : BootSyncNotDone;
+    } else if (CompareGuid (&Msg->Name, &gArmBootSyncBibReqGuid)) {
+      // Step 3: Perform Boot Sync
+      // Note the Boot Sync Data must only be sent if attestation
+      // is successful and Boot Sync data has not been sent before.
+      if ((Channel->ProtocolStatus.AttestationState == AttSuccess) &&
+          (Channel->ProtocolStatus.BootSyncState == BootSyncNotDone))
+      {
+        Status = BootSyncPerformSync (Channel, Msg);
+        if (EFI_ERROR (Status)) {
+          printf ("Error: Boot Sync failed.\n");
+          SendFin (Channel, BOOT_SYNC_COMM_END_PROTOCOL_ERROR);
+          break;
+        }
+
+        // Set the status to Boot Sync Complete. Note after this point
+        // any request for the Boot Sync data must fail.
+        Channel->ProtocolStatus.BootSyncState = BootSyncComplete;
+      } else {
+        printf ("Error: Invalid state send Nack\n");
+        SendNack (Channel, EFI_ACCESS_DENIED);
+        break;
+      }
     }
 
     // Free the received message
