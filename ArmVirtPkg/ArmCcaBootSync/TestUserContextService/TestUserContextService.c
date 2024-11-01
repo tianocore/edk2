@@ -19,8 +19,10 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Uefi/UefiBaseType.h>
 
+#include "Include/BootSyncBsbMsg.h"
 #include "Include/BootSyncSecureChannel.h"
 #include "Include/BootSyncProtocol.h"
 
@@ -69,6 +71,29 @@ STATIC CHAR8  *BootSyncStateStr[] = {
 };
 
 /**
+  A string table describing the Boot Sync message GUIDs.
+*/
+STATIC struct {
+  EFI_GUID    *Guid;
+  CHAR8       *Name;
+} MessageMap[] = {
+  { &gArmBootSyncKeyEncData,      "ArmBootSyncKeyEncData"      },
+  { &gArmBootSyncKeyXchgReqGuid,  "ArmBootSyncKeyXchgReqGuid"  },
+  { &gArmBootSyncKeyXchgRespGuid, "ArmBootSyncKeyXchgRespGuid" },
+  { &gArmBootSyncAttReqGuid,      "ArmBootSyncAttReqGuid"      },
+  { &gArmBootSyncAttRespGuid,     "ArmBootSyncAttRespGuid"     },
+  { &gArmBootSyncAttReport,       "ArmBootSyncAttReport"       },
+  { &gArmBootSyncAttResult,       "ArmBootSyncAttResult"       },
+  { &gArmBootSyncBibReqGuid,      "ArmBootSyncBibReqGuid"      },
+  { &gArmBootSyncBibRespGuid,     "ArmBootSyncBibRespGuid"     },
+  { &gArmBootSyncRequestOptions,  "ArmBootSyncRequestOptions"  },
+  { &gArmBootSyncVarData,         "ArmBootSyncVarData"         },
+  { &gArmBootSyncSecretData,      "ArmBootSyncSecretData"      },
+  { &gArmBootSyncFinGuid,         "ArmBootSyncFinGuid"         },
+  { &gArmBootSyncNackGuid,        "ArmBootSyncNackGuid"        }
+};
+
+/**
   A helper function to print the session status.
 
   @param[in]  Channel  Pointer to the secure channel.
@@ -97,6 +122,49 @@ PrintProtocolStatus (
 }
 
 /**
+  A helper function to print the Boot Sync message GUIDs.
+
+  @param[in]  Guid  Message GUID.
+
+**/
+void
+PrintGuid (
+  EFI_GUID  *Guid
+  )
+{
+  int    Index;
+  CHAR8  *Msg;
+  CHAR8  GuidStr[37]; // 32 hex chars + 4 hyphens + null terminator
+
+  snprintf (
+    GuidStr,
+    sizeof (GuidStr),
+    "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+    Guid->Data1,
+    Guid->Data2,
+    Guid->Data3,
+    Guid->Data4[0],
+    Guid->Data4[1],
+    Guid->Data4[2],
+    Guid->Data4[3],
+    Guid->Data4[4],
+    Guid->Data4[5],
+    Guid->Data4[6],
+    Guid->Data4[7]
+    );
+
+  Msg = "Not Found";
+  for (Index = 0; Index < ARRAY_SIZE (MessageMap); Index++) {
+    if (CompareGuid (MessageMap[Index].Guid, Guid)) {
+      Msg = MessageMap[Index].Name;
+      break;
+    }
+  }
+
+  printf ("%s - %s\n", GuidStr, Msg);
+}
+
+/**
   A function that handles the attestation service requests.
 
   @param[in]  arg  Pointer to the client connection.
@@ -108,9 +176,10 @@ ServiceProc (
   void  *arg
   )
 {
-  EFI_STATUS         Status;
-  CLIENT_CONNECTION  *Conn;
-  SECURE_CHANNEL     *Channel;
+  EFI_STATUS           Status;
+  CLIENT_CONNECTION    *Conn;
+  SECURE_CHANNEL       *Channel;
+  BOOT_SYNC_GUID_BLOB  *Msg;
 
   printf ("Info: Service procedure.\n");
 
@@ -131,6 +200,30 @@ ServiceProc (
       printf ("Error: Failed to establish secure channel.\n");
       goto ExitHandler;
     }
+  }
+
+  Msg = NULL;
+  while (Channel->ProtocolStatus.SessionState == ConnectionEstablished) {
+    PrintProtocolStatus (Channel);
+
+    Status = ReceiveDecryptBsbMsg (
+               Channel,
+               (BOOT_SYNC_GUID_BLOB **)&Msg
+               );
+    if (EFI_ERROR (Status)) {
+      printf ("Error: Failed to receive message.\n");
+      break;
+    }
+
+    PrintGuid (&Msg->Name);
+
+    // Free the received message
+    FreePool (Msg);
+    Msg = NULL;
+  }   // while
+
+  if (Msg != NULL) {
+    FreePool (Msg);
   }
 
   PrintProtocolStatus (Channel);
