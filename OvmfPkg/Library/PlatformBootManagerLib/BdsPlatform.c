@@ -670,6 +670,8 @@ ConnectVirtioPciRng (
     if (EFI_ERROR (Status)) {
       goto Error;
     }
+
+    gDS->Dispatch ();
   }
 
   return EFI_SUCCESS;
