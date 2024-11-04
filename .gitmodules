@@ -25,7 +25,7 @@
 	url = https://github.com/google/googletest.git
 [submodule "UnitTestFrameworkPkg/Library/SubhookLib/subhook"]
 	path = UnitTestFrameworkPkg/Library/SubhookLib/subhook
-	url = https://github.com/Zeex/subhook.git
+	url = https://github.com/tianocore/edk2-subhook.git
 [submodule "MdePkg/Library/BaseFdtLib/libfdt"]
 	path = MdePkg/Library/BaseFdtLib/libfdt
 	url = https://github.com/devicetree-org/pylibfdt.git
