@@ -1,4 +1,4 @@
-/** @file
+/** @file MockUefiLib.h
   Google Test mocks for UefiLib
 
   Copyright (c) 2022, Intel Corporation. All rights reserved.
@@ -370,4 +370,4 @@ struct MockUefiLib {
     );
 };
 
-#endif
+#endif // MOCK_UEFI_LIB_H_

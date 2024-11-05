@@ -1,6 +1,7 @@
 /** @file MockSmmServicesTableLib.cpp
   Google Test mocks for SmmServicesTableLib
 
+  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   Copyright (c) Microsoft Corporation.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -23,7 +24,7 @@ MOCK_FUNCTION_DEFINITION (MockSmmServicesTableLib, gSmst_SmiManage, 4, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockSmmServicesTableLib, gSmst_SmmInterruptRegister, 3, EFIAPI);
 MOCK_FUNCTION_DEFINITION (MockSmmServicesTableLib, gSmst_SmmInterruptUnRegister, 1, EFIAPI);
 
-static EFI_SMM_SYSTEM_TABLE2  LocalSmst = {
+static EFI_SMM_SYSTEM_TABLE2  SmmSystemTable2Mock = {
   { 0, 0, 0, 0, 0 },                   // EFI_TABLE_HEADER
   NULL,                                // SmmFirmwareVendor
   0,                                   // SmmFirmwareRevision
@@ -52,5 +53,5 @@ static EFI_SMM_SYSTEM_TABLE2  LocalSmst = {
 };
 
 extern "C" {
-  EFI_SMM_SYSTEM_TABLE2  *gSmst = &LocalSmst;
+  EFI_SMM_SYSTEM_TABLE2  *gSmmSystemTable2Mock = &SmmSystemTable2Mock;
 }
