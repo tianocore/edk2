@@ -32,3 +32,4 @@
   gEfiHobMemoryAllocBspStoreGuid
   gEfiHobMemoryAllocStackGuid
   gEfiMemoryTypeInformationGuid
+  gEfiHobMemoryAllocModuleGuid
