@@ -229,6 +229,7 @@
   UefiCpuPkg/CpuMmio2Dxe/CpuMmio2Dxe.inf
 
 [Components.AARCH64]
+  UefiCpuPkg/CpuDxeAArch64/CpuDxeAArch64.inf
   UefiCpuPkg/Library/BaseArmLib/AArch64/AArch64LibSupport.inf
 
 [Components.LOONGARCH64]
