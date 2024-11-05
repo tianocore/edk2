@@ -1,18 +1,18 @@
-## @file MockUefiLib.inf
-# Google Test mocks for UefiLib
+## @file MockTimerLib.inf
+# Google Test mocks for TimerLib
 #
-# Copyright (c) 2024, Intel Corporation. All rights reserved.
 # Copyright (c) Microsoft Corporation.
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = MockUefiLib
-  FILE_GUID                      = 47211F7A-6D90-4DFB-BDF9-610B69197C2E
+  BASE_NAME                      = MockTimerLib
+  FILE_GUID                      = 9fb16e71-c0e0-560c-9acf-2f57a76a80aa
   MODULE_TYPE                    = HOST_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiLib
+  LIBRARY_CLASS                  = TimerLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -21,9 +21,10 @@
 #
 
 [Sources]
-  MockUefiLib.cpp
+  MockTimerLib.cpp
 
 [Packages]
+  MdePkg/MdePkg.dec
   MdePkg/MdePkg.dec
   UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
 
@@ -31,4 +32,4 @@
   GoogleTestLib
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS = /EHsc /bigobj
+  MSFT:*_*_*_CC_FLAGS = /EHs /bigobj

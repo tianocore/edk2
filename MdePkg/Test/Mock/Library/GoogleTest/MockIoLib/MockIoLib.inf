@@ -1,18 +1,18 @@
-## @file MockUefiLib.inf
-# Google Test mocks for UefiLib
+## @file MockIoLib.inf
+# Google Test mocks for IoLib
 #
-# Copyright (c) 2024, Intel Corporation. All rights reserved.
+# Copyright (c) 2023, Intel Corporation. All rights reserved.
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = MockUefiLib
-  FILE_GUID                      = 47211F7A-6D90-4DFB-BDF9-610B69197C2E
+  BASE_NAME                      = MockIoLib
+  FILE_GUID                      = C9BB51CC-F9CD-4CCF-8B11-B8E1C9C864F5
   MODULE_TYPE                    = HOST_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiLib
+  LIBRARY_CLASS                  = IoLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -21,7 +21,7 @@
 #
 
 [Sources]
-  MockUefiLib.cpp
+  MockIoLib.cpp
 
 [Packages]
   MdePkg/MdePkg.dec

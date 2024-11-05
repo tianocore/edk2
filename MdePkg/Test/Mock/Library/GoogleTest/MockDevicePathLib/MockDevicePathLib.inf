@@ -1,18 +1,18 @@
-## @file MockUefiLib.inf
-# Google Test mocks for UefiLib
+## @file MockDevicePathLib.inf
+# Google Test mocks for DevicePathLib
 #
-# Copyright (c) 2024, Intel Corporation. All rights reserved.
+# Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = MockUefiLib
-  FILE_GUID                      = 47211F7A-6D90-4DFB-BDF9-610B69197C2E
+  BASE_NAME                      = MockDevicePathLib
+  FILE_GUID                      = 23a521a1-06fd-5699-8208-efc1e9ab9cdb
   MODULE_TYPE                    = HOST_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiLib
+  LIBRARY_CLASS                  = DevicePathLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -21,7 +21,7 @@
 #
 
 [Sources]
-  MockUefiLib.cpp
+  MockDevicePathLib.cpp
 
 [Packages]
   MdePkg/MdePkg.dec

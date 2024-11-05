@@ -1,18 +1,17 @@
-## @file MockUefiLib.inf
-# Google Test mocks for UefiLib
+## @file MockPciLib.inf
+# Google Test mocks for PciLib
 #
-# Copyright (c) 2024, Intel Corporation. All rights reserved.
-# Copyright (c) Microsoft Corporation.
+# Copyright (c) 2023, Intel Corporation. All rights reserved.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = MockUefiLib
-  FILE_GUID                      = 47211F7A-6D90-4DFB-BDF9-610B69197C2E
+  BASE_NAME                      = MockPciLib
+  FILE_GUID                      = B64B61FF-8682-482E-A4DA-2BB8A7FB24AE
   MODULE_TYPE                    = HOST_APPLICATION
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiLib
+  LIBRARY_CLASS                  = PciLib
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -21,7 +20,7 @@
 #
 
 [Sources]
-  MockUefiLib.cpp
+  MockPciLib.cpp
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -31,4 +30,4 @@
   GoogleTestLib
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS = /EHsc /bigobj
+  MSFT:*_*_*_CC_FLAGS = /EHsc
