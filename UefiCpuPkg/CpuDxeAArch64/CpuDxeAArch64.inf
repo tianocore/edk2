@@ -1,0 +1,50 @@
+## @file
+#  AArch64 CPU DXE module.
+#
+#  Copyright (c) 2024, NewFW Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = CpuDxeAArch64
+  FILE_GUID                      = 406A632F-F39D-4267-80DA-52B8F98ED2E0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeCpu
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseMemoryLib
+  BaseLib
+  CpuLib
+  DebugLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  PcdLib
+
+[Sources]
+  CpuDxe.c
+  AArch64Support.S
+  ArmMmuLibCore.c
+  ArmCacheMaintenanceLib.c
+  ArmMmuLibReplaceEntry.S
+  ArmMmuLib.h
+
+[Pcd.common]
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+
+[Depex]
+  TRUE

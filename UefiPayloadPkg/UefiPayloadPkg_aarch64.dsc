@@ -818,6 +818,7 @@ GCC:*_*_*_CC_FLAGS          = -mcmodel=tiny -mstrict-align
   !include NetworkPkg/NetworkLibs.dsc.inc
 
 [Components.AARCH64]
+  UefiCpuPkg/CpuDxeAArch64/CpuDxeAArch64.inf
   UefiPayloadPkg/BlSupportDxe/BlSupportDxe.inf
   UefiPayloadPkg/Library/DxeHobListLib/DxeHobListLib.inf
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
