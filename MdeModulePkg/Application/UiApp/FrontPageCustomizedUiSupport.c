@@ -392,6 +392,8 @@ UiCreateLanguageMenu (
     OptionsOpCodeHandle,
     NULL
     );
+
+  HiiFreeOpCodeHandle (OptionsOpCodeHandle);
 }
 
 /**
