@@ -30,7 +30,8 @@ ASM_FUNC(SetupExceptionLevel2)
 
    // NB: We assume that we have not been entered on VHE systems with
    // HCR_EL2.E2H set.
-   msr     cptr_el2, xzr          // Enable architectural features
+   mov     x0, #AARCH64_CPTR_DEFAULT
+   msr     cptr_el2, x0           // Enable architectural features
 
    // Enable Timer access for non-secure EL1 and EL0
    // The cnthctl_el2 register bits are architecturally
