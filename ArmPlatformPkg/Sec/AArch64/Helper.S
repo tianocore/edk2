@@ -28,6 +28,8 @@ ASM_FUNC(SetupExceptionLevel2)
    orr     x0, x0, #(1 << 5)      // Enable EL2 SError and Abort
    msr     hcr_el2, x0            // Write back our settings
 
+   // NB: We assume that we have not been entered on VHE systems with
+   // HCR_EL2.E2H set.
    msr     cptr_el2, xzr          // Disable copro traps to EL2
 
    // Enable Timer access for non-secure EL1 and EL0
