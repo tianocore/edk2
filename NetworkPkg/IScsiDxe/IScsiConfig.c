@@ -1918,7 +1918,7 @@ IScsiConfigUpdateAttempt (
                                                NULL
                                                );
       if (AttemptConfigData->AttemptTitleToken == 0) {
-        return;
+        goto Exit;
       }
 
       HiiCreateGotoOpCode (
@@ -1940,6 +1940,7 @@ IScsiConfigUpdateAttempt (
     EndOpCodeHandle                  // Replace data
     );
 
+Exit:
   HiiFreeOpCodeHandle (StartOpCodeHandle);
   HiiFreeOpCodeHandle (EndOpCodeHandle);
 }
