@@ -650,6 +650,7 @@ DriverCallback (
 
       EndOpCodeHandle = HiiAllocateOpCodeHandle ();
       if (EndOpCodeHandle == NULL) {
+        HiiFreeOpCodeHandle (StartOpCodeHandle);
         return EFI_OUT_OF_RESOURCES;
       }
 
