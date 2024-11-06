@@ -22,7 +22,9 @@
 #define CPACR_DEFAULT    CPACR_FPEN_FULL
 
 // Coprocessor Trap Register (CPTR)
-#define AARCH64_CPTR_TFP  (1 << 10)
+#define AARCH64_CPTR_TFP      (1 << 10)
+#define AARCH64_CPTR_RES1     0x33ff
+#define AARCH64_CPTR_DEFAULT  AARCH64_CPTR_RES1
 
 // ID_AA64MMFR1 - AArch64 Memory Model Feature Register 0 definitions
 #define AARCH64_MMFR1_VH  (0xF << 8)
