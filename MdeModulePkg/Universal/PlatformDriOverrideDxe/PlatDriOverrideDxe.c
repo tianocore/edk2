@@ -421,6 +421,8 @@ UpdateDeviceSelectPage (
                                  &mDevicePathHandleBuffer
                                  );
   if (EFI_ERROR (Status) || (DevicePathHandleCount == 0)) {
+    HiiFreeOpCodeHandle (StartOpCodeHandle);
+    HiiFreeOpCodeHandle (EndOpCodeHandle);
     return EFI_SUCCESS;
   }
 
@@ -708,6 +710,8 @@ UpdateBindingDriverSelectPage (
                                   &mDriverImageHandleBuffer
                                   );
   if (EFI_ERROR (Status) || (DriverImageHandleCount == 0)) {
+    HiiFreeOpCodeHandle (StartOpCodeHandle);
+    HiiFreeOpCodeHandle (EndOpCodeHandle);
     return EFI_NOT_FOUND;
   }
 
