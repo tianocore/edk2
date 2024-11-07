@@ -689,6 +689,7 @@ MpInitLibSwitchBSP (
 /**
   This service lets the caller enable or disable an AP from this point onward.
   This service may only be called from the BSP.
+  If ProcessorNumber is all Fs, enable or disable all APs
 
   @param[in] ProcessorNumber   The handle number of AP.
                                The range is from 0 to the total number of

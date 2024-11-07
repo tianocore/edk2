@@ -564,6 +564,8 @@ EFI_STATUS
   If the enable or disable AP operation cannot be completed prior to the return
   from this service, then EFI_UNSUPPORTED must be returned.
 
+  If ProcessorNumber is all Fs, enable or disable all APs
+
   @param[in] This              A pointer to the EFI_MP_SERVICES_PROTOCOL instance.
   @param[in] ProcessorNumber   The handle number of AP.
                                The range is from 0 to the total number of

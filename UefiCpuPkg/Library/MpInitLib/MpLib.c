@@ -1645,6 +1645,8 @@ TimedWaitForApFinish (
   Any task being executed by the AP will be aborted and the AP
   will be waiting for a new task in Wait-For-SIPI state.
 
+  If ProcessorNumber is all Fs, reset all APs.
+
   @param[in] ProcessorNumber  The handle number of processor.
 **/
 VOID
@@ -1653,6 +1655,7 @@ ResetProcessorToIdleState (
   )
 {
   CPU_MP_DATA  *CpuMpData;
+  UINTN        Index;
 
   CpuMpData = GetCpuMpData ();
 
@@ -1662,12 +1665,20 @@ ResetProcessorToIdleState (
     return;
   }
 
-  WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL, TRUE);
-  while (CpuMpData->FinishedCount < 1) {
+  WakeUpAP (CpuMpData, ProcessorNumber == MAX_UINTN, ProcessorNumber, NULL, NULL, TRUE);
+  while (CpuMpData->FinishedCount < (ProcessorNumber == MAX_UINTN ? (CpuMpData->CpuCount - 1) : 1)) {
     CpuPause ();
   }
-
-  SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
+  if (ProcessorNumber == MAX_UINTN) {
+    for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+      if (Index == CpuMpData->BspNumber) {
+        continue;
+      }
+      SetApState (&CpuMpData->CpuData[Index], CpuStateIdle);
+    }
+  } else {
+    SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
+  }  
 }
 
 /**
@@ -2730,6 +2741,7 @@ SwitchBSPWorker (
 /**
   Worker function to let the caller enable or disable an AP from this point onward.
   This service may only be called from the BSP.
+  If ProcessorNumber is all Fs, enable or disable all APs
 
   @param[in] ProcessorNumber   The handle number of AP.
   @param[in] EnableAP          Specifies the new state for the processor for
@@ -2751,6 +2763,7 @@ EnableDisableApWorker (
   CPU_MP_DATA  *CpuMpData;
   UINTN        CallerNumber;
   EFI_STATUS   Status;
+  UINTN        Index;
 
   CpuMpData = GetCpuMpData ();
 
@@ -2777,12 +2790,21 @@ EnableDisableApWorker (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (ProcessorNumber >= CpuMpData->CpuCount) {
+  if ((ProcessorNumber >= CpuMpData->CpuCount) && ((ProcessorNumber != MAX_UINTN))) {
     return EFI_NOT_FOUND;
   }
 
   if (!EnableAP) {
-    SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateDisabled);
+    if (ProcessorNumber == MAX_UINTN) {
+      for (Index = 0; Index < CpuMpData->CpuCount; Index++) {
+        if (Index == CpuMpData->BspNumber) {
+          continue;
+        }
+        SetApState (&CpuMpData->CpuData[Index], CpuStateDisabled);
+      }
+    } else {
+      SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateDisabled);
+    }    
   } else {
     ResetProcessorToIdleState (ProcessorNumber);
   }
