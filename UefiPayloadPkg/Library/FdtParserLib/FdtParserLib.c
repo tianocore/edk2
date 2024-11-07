@@ -190,8 +190,8 @@ ParseMemory (
     TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
     if (AsciiStrCmp (TempStr, "reg") == 0) {
       Data64        = (UINT64 *)(PropertyPtr->Data);
-      StartAddress  = Fdt64ToCpu (*Data64);
-      NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+      StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
+      NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
     } else if (AsciiStrCmp (TempStr, "ecc-detection-bits") == 0) {
       Data32  = (UINT32 *)(PropertyPtr->Data);
       ECCData = Fdt32ToCpu (*Data32);
@@ -250,8 +250,8 @@ ParseReservedMemory (
     TempStr = (CHAR8 *)(PropertyPtr->Data);
     if (TempLen > 0) {
       Data64        = (UINT64 *)(PropertyPtr->Data);
-      StartAddress  = Fdt64ToCpu (*Data64);
-      NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+      StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
+      NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
       DEBUG ((DEBUG_INFO, "\n         Property  %a", TempStr));
       DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
     }
@@ -444,7 +444,7 @@ ParseOptions (
       ASSERT (TempLen > 0);
       if (TempLen > 0) {
         Data64       = (UINT64 *)(PropertyPtr->Data);
-        StartAddress = Fdt64ToCpu (*Data64);
+        StartAddress = Fdt64ToCpu (ReadUnaligned64 (Data64));
         DEBUG ((DEBUG_INFO, "\n         Property(00000000)  entry"));
         DEBUG ((DEBUG_INFO, "  %016lX\n", StartAddress));
 
@@ -791,7 +791,7 @@ ParsePciRootBridge (
 
     if (AsciiStrCmp (TempStr, "reg") == 0) {
       UINT64  *Data64 = (UINT64 *)(PropertyPtr->Data);
-      mUplPciSegmentInfoHob->SegmentInfo[RbIndex].BaseAddress = Fdt64ToCpu (*Data64);
+      mUplPciSegmentInfoHob->SegmentInfo[RbIndex].BaseAddress = Fdt64ToCpu (ReadUnaligned64 (Data64));
       DEBUG ((DEBUG_INFO, "PciRootBridge->Ecam.Base %llx, \n", mUplPciSegmentInfoHob->SegmentInfo[RbIndex].BaseAddress));
     }
 
@@ -878,7 +878,7 @@ ParseDtb (
 
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
-    DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x", Node, NodePtr->Name, Depth));
+    DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x\n", Node, NodePtr->Name, Depth));
     // memory node
     if (AsciiStrnCmp (NodePtr->Name, "memory@", AsciiStrLen ("memory@")) == 0) {
       for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
@@ -886,8 +886,8 @@ ParseDtb (
         TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
         if (AsciiStrCmp (TempStr, "reg") == 0) {
           Data64        = (UINT64 *)(PropertyPtr->Data);
-          StartAddress  = Fdt64ToCpu (*Data64);
-          NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+          StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
+          NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
           DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
           DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
           if (!IsHobConstructed) {
