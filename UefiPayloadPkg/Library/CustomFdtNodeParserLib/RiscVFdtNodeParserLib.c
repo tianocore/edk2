@@ -19,6 +19,34 @@
 #include <UniversalPayload/Ramdisk.h>
 
 /**
+  Build FDT HOB using infomation from FDT.
+
+  @param  FdtBase
+**/
+STATIC VOID
+EFIAPI
+BuildFdtHob (
+  IN VOID  *FdtBase
+  )
+{
+  VOID    *NewBase;
+  UINTN   FdtSize;
+  UINTN   FdtPages;
+  UINT64  *FdtHobData;
+
+  ASSERT (FdtCheckHeader (FdtBase) == 0);
+  FdtSize  = FdtTotalSize (FdtBase);
+  FdtPages = EFI_SIZE_TO_PAGES (FdtSize);
+  NewBase  = AllocatePages (FdtPages);
+  ASSERT (NewBase != NULL);
+  FdtOpenInto (FdtBase, NewBase, EFI_PAGES_TO_SIZE (FdtPages));
+
+  FdtHobData = BuildGuidHob (&gFdtHobGuid, sizeof *FdtHobData);
+  ASSERT (FdtHobData != NULL);
+  *FdtHobData = (UINTN)NewBase;
+}
+
+/**
   It will Parse FDT -custom node based on information from bootloaders.
   @param[in]  FdtBase The starting memory address of FdtBase
   @param[in]  HobList The starting memory address of New Hob list.
@@ -78,5 +106,6 @@ CustomFdtNodeParser (
     }
   }
 
+  BuildFdtHob (FdtBase);
   return EFI_SUCCESS;
 }
