@@ -32,7 +32,7 @@ typedef struct {
 // These represent UEFI SPEC defined algorithms that should be supported by
 // the RNG protocol and are generally considered secure.
 //
-GLOBAL_REMOVE_IF_UNREFERENCED SECURE_RNG_ALGO_ARRAY  mSecureHashAlgorithms[] = {
+static GLOBAL_REMOVE_IF_UNREFERENCED SECURE_RNG_ALGO_ARRAY  mSecureHashAlgorithms[] = {
  #ifdef MDE_CPU_AARCH64
   {
     &gEfiRngAlgorithmArmRndr, // unspecified SP800-90A DRBG (through RNDR instr.)
