@@ -33,6 +33,11 @@
     }
   !endif
 
-  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+  OvmfPkg/VirtioNetDxe/VirtioNet.inf {
+    <LibraryClasses>
+      UefiDriverEntryPoint|OvmfPkg/Library/UefiDriverEntryPointFwCfgOverrideLib/UefiDriverEntryPointFwCfgOverrideLib.inf
+    <PcdsFixedAtBuild>
+      gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|"opt/org.tianocore/VirtioNetSupport"
+  }
 
 !endif
