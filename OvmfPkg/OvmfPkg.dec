@@ -346,6 +346,10 @@
   #  check to decide whether to abort dispatch of the driver it is linked into.
   gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|""|VOID*|0x68
 
+  ## The default value UefiDriverEntryPointFwCfgOverrideLib will use in case
+  #  the QEMU fw_cfg variable is not present
+  gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideDefaultValue|"yes"|VOID*|0x76
+
   ## Restrict boot to EFI applications in firmware volumes.
   gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware|FALSE|BOOLEAN|0x6c
 
