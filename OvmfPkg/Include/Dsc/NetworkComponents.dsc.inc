@@ -34,4 +34,7 @@
         gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|"opt/org.tianocore/IPv6Support"
     }
   !endif
+
+  OvmfPkg/VirtioNetDxe/VirtioNet.inf
+
 !endif

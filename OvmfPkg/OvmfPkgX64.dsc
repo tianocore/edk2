@@ -949,8 +949,6 @@
 !include NetworkPkg/NetworkComponents.dsc.inc
 !include OvmfPkg/Include/Dsc/NetworkComponents.dsc.inc
 
-  OvmfPkg/VirtioNetDxe/VirtioNet.inf
-
   #
   # Usb Support
   #
