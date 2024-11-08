@@ -1,0 +1,41 @@
+## @file
+#  USB library instance used in DXE phase.
+#
+#  This library extends the functionality of UsbIo protocol.
+#
+#  - Report descriptors of USB interface's alternate settings without performing USB transfer.
+#  - Report class specific descriptors.
+#
+#  Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UsbExtLib
+  MODULE_UNI_FILE                = UsbExtLib.uni
+  FILE_GUID                      = 9738FCA0-5CAC-4AF7-8289-4123D7F4C808
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UsbExtLib|DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = UsbExtLibConstructor
+  DESTRUCTOR                     = UsbExtLibDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 RISCV AARCH64
+#
+
+[Sources]
+  UsbIoExtension.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib

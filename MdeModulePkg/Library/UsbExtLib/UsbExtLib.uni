@@ -1,0 +1,12 @@
+// /** @file
+// Instance of USB Extension Library.
+//
+// Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Instance of USB IO protocol extension."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "This library uses USB IO protocol to return USB class specific data."

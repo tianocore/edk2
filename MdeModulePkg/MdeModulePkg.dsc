@@ -5,6 +5,7 @@
 # Copyright (c) 2007 - 2024, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.
 # Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2024 American Megatrends International LLC. All rights reserved.<BR>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -108,6 +109,7 @@
   VariableFlashInfoLib|MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
   IpmiCommandLib|MdeModulePkg/Library/BaseIpmiCommandLibNull/BaseIpmiCommandLibNull.inf
   SpiHcPlatformLib|MdeModulePkg/Library/BaseSpiHcPlatformLibNull/BaseSpiHcPlatformLibNull.inf
+  UsbExtLib|MdeModulePkg/Library/UsbExtLib/UsbExtLib.inf
 
 # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
 [LibraryClasses.common.SEC]
@@ -455,6 +457,7 @@
   MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
   MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
   MdeModulePkg/Library/BaseVariableFlashInfoLib/BaseVariableFlashInfoLib.inf
+  MdeModulePkg/Library/UsbExtLib/UsbExtLib.inf
 
 [Components.IA32, Components.X64, Components.AARCH64]
   MdeModulePkg/Universal/EbcDxe/EbcDxe.inf

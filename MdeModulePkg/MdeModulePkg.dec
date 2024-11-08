@@ -10,6 +10,7 @@
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 # Copyright (c) Microsoft Corporation.<BR>
 # Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
+# Copyright (C) 2024 American Megatrends International LLC. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
@@ -177,6 +178,11 @@
   ##  @libraryclass   Provides services to prints all HOB information.
   #
   HobPrintLib|Include/Library/HobPrintLib.h
+
+  ##  @libraryclass  USB IO protocol extension
+  #
+  UsbExtLib|Include/Library/UsbExtLib.h
+
 
 [Guids]
   ## MdeModule package token space guid
