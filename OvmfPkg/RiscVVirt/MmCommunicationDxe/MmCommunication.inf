@@ -1,0 +1,60 @@
+#/** @file
+#
+#  DXE MM Communicate driver
+#
+#  Copyright (c) 2016 - 2021, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2023, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = RiscVMmCommunication
+  FILE_GUID                      = 09EE81D3-F15E-43F4-85B4-CB9873DA5D6B
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MmCommunication2Initialize
+
+#
+# The following is for reference only and not required by
+# build tools
+#
+# VALID_ARCHITECTURES            = RISCV64
+#
+
+[Sources.RISCV64]
+  MmCommunicate.h
+  MmCommunication.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  HobLib
+  UefiDriverEntryPoint
+  RiscVSbiLib
+  CommonRiscvMpxyLib
+
+[Protocols]
+  gEfiMmCommunication2ProtocolGuid              ## PRODUCES
+  gFdtClientProtocolGuid                        ## CONSUMES
+  gEfiSmmVariableProtocolGuid                   ## CONSUMES
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventExitBootServicesGuid
+  gEfiEventReadyToBootGuid
+  gMmHestGetErrorSourceInfoGuid
+  gVarCheckPolicyLibMmiHandlerGuid
+
+[Depex]
+  gEfiCpuArchProtocolGuid AND
+  gFdtClientProtocolGuid
