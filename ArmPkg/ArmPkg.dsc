@@ -102,6 +102,15 @@
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
 
+[LibraryClasses.common.MM_CORE_STANDALONE]
+  StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
+  HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
+
+[LibraryClasses.common.MM_STANDALONE]
+  StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
+  HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
+  MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
+
 [Components.common]
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
   ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
@@ -160,6 +169,12 @@
   ArmPkg/Universal/Smbios/OemMiscLibNull/OemMiscLibNull.inf
 
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
+
+[Components.common.MM_CORE_STANALONE]
+  ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
+
+[Components.common.MM_STANDALONE]
+  ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
 
 [Components.AARCH64]
   ArmPkg/Drivers/ArmCrashDumpDxe/ArmCrashDumpDxe.inf
