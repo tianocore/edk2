@@ -160,12 +160,12 @@ def BuildUniversalPayload(Args):
     if (Args.Macro != None):
         for MacroItem in Args.Macro:
             Defines += " -D {}".format (MacroItem)
-
+    BuildScript = os.path.join (os.environ['EDK_TOOLS_PATH'], 'Source', 'Python', 'build', 'build.py')
     #
     # Building DXE core and DXE drivers as DXEFV.
     #
     if Args.BuildEntryOnly == False:
-        BuildPayload = "build -p {} -b {} -a {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, ToolChain, PayloadReportPath, Quiet)
+        BuildPayload = "\"{}\" {} -p {} -b {} -a {} -t {} -y {} {}".format (sys.executable, BuildScript, DscPath, BuildTarget, BuildArch, ToolChain, PayloadReportPath, Quiet)
         BuildPayload += Pcds
         BuildPayload += Defines
         RunCommand(BuildPayload)
@@ -173,7 +173,7 @@ def BuildUniversalPayload(Args):
     # Building Universal Payload entry.
     #
     if Args.PreBuildUplBinary is None:
-        BuildModule = "build -p {} -b {} -a {} -m {} -t {} -y {} {}".format (DscPath, BuildTarget, BuildArch, EntryModuleInf, PayloadEntryToolChain, ModuleReportPath, Quiet)
+        BuildModule = "\"{}\" {} -p {} -b {} -a {} -m {} -t {} -y {} {}".format (sys.executable, BuildScript, DscPath, BuildTarget, BuildArch, EntryModuleInf, PayloadEntryToolChain, ModuleReportPath, Quiet)
         BuildModule += Pcds
         BuildModule += Defines
         RunCommand(BuildModule)
