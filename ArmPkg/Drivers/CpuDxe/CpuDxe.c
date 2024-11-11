@@ -291,14 +291,60 @@ RemapUnusedMemoryNx (
       ArmSetMemoryAttributes (
         MemoryMapEntry->PhysicalStart,
         EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages),
-        EFI_MEMORY_XP,
-        EFI_MEMORY_XP,
+        0,
+        0,
+        TRUE
+        );
+    }
+
+    MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
+  }
+
+  FreePool (MemoryMap);
+
+  MemoryMapSize = 0;
+  MemoryMap     = NULL;
+
+  Status = gBS->GetMemoryMap (
+                  &MemoryMapSize,
+                  MemoryMap,
+                  &MapKey,
+                  &DescriptorSize,
+                  &DescriptorVersion
+                  );
+  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  do {
+    MemoryMap = (EFI_MEMORY_DESCRIPTOR *)AllocatePool (MemoryMapSize);
+    ASSERT (MemoryMap != NULL);
+    Status = gBS->GetMemoryMap (
+                    &MemoryMapSize,
+                    MemoryMap,
+                    &MapKey,
+                    &DescriptorSize,
+                    &DescriptorVersion
+                    );
+    if (EFI_ERROR (Status)) {
+      FreePool (MemoryMap);
+    }
+  } while (Status == EFI_BUFFER_TOO_SMALL);
+
+  MemoryMapEntry = MemoryMap;
+  MemoryMapEnd   = (EFI_MEMORY_DESCRIPTOR *)((UINT8 *)MemoryMap + MemoryMapSize);
+  while ((UINTN)MemoryMapEntry < (UINTN)MemoryMapEnd) {
+    if (MemoryMapEntry->Type == EfiConventionalMemory) {
+      ArmSetMemoryAttributes (
+        MemoryMapEntry->PhysicalStart,
+        EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages),
+        EFI_MEMORY_RO | EFI_MEMORY_XP,
+        EFI_MEMORY_RO | EFI_MEMORY_XP,
         FALSE
         );
     }
 
     MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
   }
+
+  FreePool (MemoryMap);
 }
 
 EFI_STATUS
