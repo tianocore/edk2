@@ -1039,7 +1039,7 @@ ApplyMemoryProtectionPolicy (
   IN  UINT64                Length
   )
 {
-  UINT64  OldAttributes;
+//  UINT64  OldAttributes;
   UINT64  NewAttributes;
 
   //
@@ -1095,16 +1095,16 @@ ApplyMemoryProtectionPolicy (
   //
   NewAttributes = GetPermissionAttributeForMemoryType (NewType);
 
-  if (OldType != EfiMaxMemoryType) {
-    OldAttributes = GetPermissionAttributeForMemoryType (OldType);
-    if (OldAttributes == NewAttributes) {
-      // policy is the same between OldType and NewType
-      return EFI_SUCCESS;
-    }
-  } else if (NewAttributes == 0) {
-    // newly added region of a type that does not require protection
-    return EFI_SUCCESS;
-  }
+//  if (OldType != EfiMaxMemoryType) {
+//    OldAttributes = GetPermissionAttributeForMemoryType (OldType);
+//    if (OldAttributes == NewAttributes) {
+//      // policy is the same between OldType and NewType
+//      return EFI_SUCCESS;
+//    }
+//  } else if (NewAttributes == 0) {
+//    // newly added region of a type that does not require protection
+//    return EFI_SUCCESS;
+//  }
 
   return gCpu->SetMemoryAttributes (gCpu, Memory, Length, NewAttributes);
 }
