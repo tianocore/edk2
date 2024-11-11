@@ -22,12 +22,11 @@
 
 #include <PiMm.h>
 
-#include <Library/Arm/StandaloneMmCoreEntryPoint.h>
-
 #include <PiPei.h>
 #include <Guid/MmramMemoryReserve.h>
 
 #include <Library/ArmLib.h>
+#include <Library/ArmStandaloneMmCoreEntryPoint.h>
 #include <Library/ArmSvcLib.h>
 #include <Library/ArmFfaLib.h>
 #include <Library/ArmTransferListLib.h>
