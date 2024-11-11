@@ -292,7 +292,8 @@ RemapUnusedMemoryNx (
         MemoryMapEntry->PhysicalStart,
         EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages),
         EFI_MEMORY_XP,
-        EFI_MEMORY_XP
+        EFI_MEMORY_XP,
+        FALSE
         );
     }
 

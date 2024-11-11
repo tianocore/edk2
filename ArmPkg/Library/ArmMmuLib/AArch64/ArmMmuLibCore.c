@@ -206,7 +206,8 @@ UpdateRegionMappingRecursive (
   IN  UINT64   AttributeClearMask,
   IN  UINT64   *PageTable,
   IN  UINTN    Level,
-  IN  BOOLEAN  TableIsLive
+  IN  BOOLEAN  TableIsLive,
+  IN  BOOLEAN  PagesOnly
   )
 {
   UINTN       BlockShift;
@@ -252,7 +253,7 @@ UpdateRegionMappingRecursive (
     // mappings in that particular case.
     //
     if ((Level == 0) || (((RegionStart | BlockEnd) & BlockMask) != 0) ||
-        ((Level < 3) && (((UINT64)PageTable & ~BlockMask) == RegionStart)) ||
+        ((Level < 3) && (PagesOnly || (((UINT64)PageTable & ~BlockMask) == RegionStart))) ||
         IsTableEntry (*Entry, Level))
     {
       ASSERT (Level < 3);
@@ -262,7 +263,7 @@ UpdateRegionMappingRecursive (
         // If the region we are trying to map is already covered by a block
         // entry with the right attributes, don't bother splitting it up.
         //
-        if (IsBlockEntry (*Entry, Level) &&
+        if (!PagesOnly && IsBlockEntry (*Entry, Level) &&
             ((*Entry & TT_ATTRIBUTES_MASK & ~AttributeClearMask) == AttributeSetMask))
         {
           continue;
@@ -299,7 +300,8 @@ UpdateRegionMappingRecursive (
                      0,
                      TranslationTable,
                      Level + 1,
-                     FALSE
+                     FALSE,
+                     PagesOnly
                      );
           if (EFI_ERROR (Status)) {
             //
@@ -328,7 +330,8 @@ UpdateRegionMappingRecursive (
                  AttributeClearMask,
                  TranslationTable,
                  Level + 1,
-                 NextTableIsLive
+                 NextTableIsLive,
+                 PagesOnly
                  );
       if (EFI_ERROR (Status)) {
         if (!IsTableEntry (*Entry, Level)) {
@@ -376,7 +379,8 @@ UpdateRegionMapping (
   IN  UINT64   AttributeSetMask,
   IN  UINT64   AttributeClearMask,
   IN  UINT64   *RootTable,
-  IN  BOOLEAN  TableIsLive
+  IN  BOOLEAN  TableIsLive,
+  IN  BOOLEAN  PagesOnly
   )
 {
   UINTN  T0SZ;
@@ -401,7 +405,8 @@ UpdateRegionMapping (
            AttributeClearMask,
            RootTable,
            GetRootTableLevel (T0SZ),
-           TableIsLive
+           TableIsLive,
+           PagesOnly
            );
 }
 
@@ -418,6 +423,7 @@ FillTranslationTable (
            ArmMemoryAttributeToPageAttribute (MemoryRegion->Attributes) | TT_AF,
            0,
            RootTable,
+           FALSE,
            FALSE
            );
 }
@@ -493,6 +499,8 @@ GcdAttributeToPageAttribute (
   @param[in]  Length          The size in bytes of the memory region.
   @param[in]  Attributes      Mask of memory attributes to set.
   @param[in]  AttributeMask   Mask of memory attributes to take into account.
+  @param[in]  PagesOnly       Whether all mappings should be down to pages,
+                              even in cases where block mappings could be used.
 
   @retval EFI_SUCCESS           The attributes were set for the memory region.
   @retval EFI_INVALID_PARAMETER BaseAddress or Length is not suitably aligned.
@@ -507,7 +515,8 @@ ArmSetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
   IN UINT64                Attributes,
-  IN UINT64                AttributeMask
+  IN UINT64                AttributeMask,
+  IN BOOLEAN               PagesOnly
   )
 {
   UINT64  PageAttributes;
@@ -548,7 +557,8 @@ ArmSetMemoryAttributes (
            PageAttributes,
            PageAttributeMask,
            ArmGetTTBR0BaseAddress (),
-           TRUE
+           TRUE,
+           PagesOnly
            );
 }
 
