@@ -1,7 +1,7 @@
 /** @file
   Config SMRAM Save State for SmmBases Relocation.
 
-  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
   Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -94,31 +94,20 @@ HookReturnFromSmm (
 
   AmdCpuState = (AMD_SMRAM_SAVE_STATE_MAP *)CpuState;
 
-  if (GetMmSaveStateRegisterLma () == EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT) {
-    OriginalInstructionPointer = (UINT64)AmdCpuState->x86._EIP;
-    AmdCpuState->x86._EIP      = (UINT32)NewInstructionPointer;
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((AmdCpuState->x86.AutoHALTRestart & BIT0) != 0) {
-      AmdCpuState->x86.AutoHALTRestart &= ~BIT0;
-    }
-  } else {
-    OriginalInstructionPointer = AmdCpuState->x64._RIP;
-    if ((AmdCpuState->x64.EFER & LMA) == 0) {
-      AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer32;
-    } else {
-      AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer;
-    }
+  OriginalInstructionPointer = AmdCpuState->x64._RIP;
 
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((AmdCpuState->x64.AutoHALTRestart & BIT0) != 0) {
-      AmdCpuState->x64.AutoHALTRestart &= ~BIT0;
-    }
+  if ((AmdCpuState->x64.EFER & LMA) == 0) {
+    AmdCpuState->x64._RIP = NewInstructionPointer32;
+  } else {
+    AmdCpuState->x64._RIP = NewInstructionPointer;
+  }
+
+  //
+  // Clear the auto HALT restart flag so the RSM instruction returns
+  // program control to the instruction following the HLT instruction.
+  //
+  if ((AmdCpuState->x64.AutoHALTRestart & BIT0) != 0) {
+    AmdCpuState->x64.AutoHALTRestart &= ~BIT0;
   }
 
   return OriginalInstructionPointer;

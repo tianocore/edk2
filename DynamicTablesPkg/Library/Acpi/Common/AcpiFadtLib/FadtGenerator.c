@@ -2,6 +2,8 @@
   FADT Table Generator
 
   Copyright (c) 2017 - 2023, Arm Limited. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -64,6 +66,57 @@ Requirements:
           EFI_ACPI_6_5_FORCE_APIC_CLUSTER_MODEL             | \
           EFI_ACPI_6_5_FORCE_APIC_PHYSICAL_DESTINATION_MODE | \
           EFI_ACPI_6_5_HW_REDUCED_ACPI                      | \
+          EFI_ACPI_6_5_LOW_POWER_S0_IDLE_CAPABLE)
+
+/** This macro defines the valid mask for the FADT flag option
+    if HW_REDUCED_ACPI flag in the table is not set.
+
+  Invalid bits are: Bit 20 and 22-31 (reserved).
+
+  Valid bits are:
+    EFI_ACPI_6_5_WBINVD                                BIT0
+    EFI_ACPI_6_5_WBINVD_FLUSH                          BIT1
+    EFI_ACPI_6_5_PROC_C1                               BIT2
+    EFI_ACPI_6_5_P_LVL2_UP                             BIT3
+    EFI_ACPI_6_5_PWR_BUTTON                            BIT4
+    EFI_ACPI_6_5_SLP_BUTTON                            BIT5
+    EFI_ACPI_6_5_FIX_RTC                               BIT6
+    EFI_ACPI_6_5_RTC_S4                                BIT7
+    EFI_ACPI_6_5_TMR_VAL_EXT                           BIT8
+    EFI_ACPI_6_5_DCK_CAP                               BIT9
+    EFI_ACPI_6_5_RESET_REG_SUP                         BIT10
+    EFI_ACPI_6_5_SEALED_CASE                           BIT11
+    EFI_ACPI_6_5_HEADLESS                              BIT12
+    EFI_ACPI_6_5_CPU_SW_SLP                            BIT13
+    EFI_ACPI_6_5_PCI_EXP_WAK                           BIT14
+    EFI_ACPI_6_5_USE_PLATFORM_CLOCK                    BIT15
+    EFI_ACPI_6_5_S4_RTC_STS_VALID                      BIT16
+    EFI_ACPI_6_5_REMOTE_POWER_ON_CAPABLE               BIT17
+    EFI_ACPI_6_5_FORCE_APIC_CLUSTER_MODEL              BIT18
+    EFI_ACPI_6_5_FORCE_APIC_PHYSICAL_DESTINATION_MODE  BIT19
+    EFI_ACPI_6_5_LOW_POWER_S0_IDLE_CAPABLE             BIT21
+*/
+#define VALID_NON_HARDWARE_REDUCED_FLAG_MASK  (                               \
+          EFI_ACPI_6_5_WBINVD                               | \
+          EFI_ACPI_6_5_WBINVD_FLUSH                         | \
+          EFI_ACPI_6_5_PROC_C1                              | \
+          EFI_ACPI_6_5_P_LVL2_UP                            | \
+          EFI_ACPI_6_5_PWR_BUTTON                           | \
+          EFI_ACPI_6_5_SLP_BUTTON                           | \
+          EFI_ACPI_6_5_FIX_RTC                              | \
+          EFI_ACPI_6_5_RTC_S4                               | \
+          EFI_ACPI_6_5_TMR_VAL_EXT                          | \
+          EFI_ACPI_6_5_DCK_CAP                              | \
+          EFI_ACPI_6_5_RESET_REG_SUP                        | \
+          EFI_ACPI_6_5_SEALED_CASE                          | \
+          EFI_ACPI_6_5_HEADLESS                             | \
+          EFI_ACPI_6_5_CPU_SW_SLP                           | \
+          EFI_ACPI_6_5_PCI_EXP_WAK                          | \
+          EFI_ACPI_6_5_USE_PLATFORM_CLOCK                   | \
+          EFI_ACPI_6_5_S4_RTC_STS_VALID                     | \
+          EFI_ACPI_6_5_REMOTE_POWER_ON_CAPABLE              | \
+          EFI_ACPI_6_5_FORCE_APIC_CLUSTER_MODEL             | \
+          EFI_ACPI_6_5_FORCE_APIC_PHYSICAL_DESTINATION_MODE | \
           EFI_ACPI_6_5_LOW_POWER_S0_IDLE_CAPABLE)
 
 #pragma pack(1)
@@ -391,17 +444,31 @@ FadtAddFixedFeatureFlags (
     FixedFeatureFlags->Flags
     ));
 
-  if ((FixedFeatureFlags->Flags & ~(VALID_HARDWARE_REDUCED_FLAG_MASK)) != 0) {
-    DEBUG ((
-      DEBUG_WARN,
-      "FADT: Invalid Fixed feature flags defined by platform,"
-      "Invalid Flags bits are = 0x%x\n",
-      (FixedFeatureFlags->Flags & ~(VALID_HARDWARE_REDUCED_FLAG_MASK))
-      ));
-  }
+  if ((FixedFeatureFlags->Flags & EFI_ACPI_6_5_HW_REDUCED_ACPI) != 0) {
+    if ((FixedFeatureFlags->Flags & ~(VALID_HARDWARE_REDUCED_FLAG_MASK)) != 0) {
+      DEBUG ((
+        DEBUG_WARN,
+        "FADT: Invalid Fixed feature flags defined by platform,"
+        "Invalid Flags bits are = 0x%x\n",
+        (FixedFeatureFlags->Flags & ~(VALID_HARDWARE_REDUCED_FLAG_MASK))
+        ));
+    }
 
-  AcpiFadt.Flags |= (FixedFeatureFlags->Flags &
-                     VALID_HARDWARE_REDUCED_FLAG_MASK);
+    AcpiFadt.Flags |= (FixedFeatureFlags->Flags &
+                       VALID_HARDWARE_REDUCED_FLAG_MASK);
+  } else {
+    if ((FixedFeatureFlags->Flags & ~(VALID_NON_HARDWARE_REDUCED_FLAG_MASK)) != 0) {
+      DEBUG ((
+        DEBUG_WARN,
+        "FADT: Invalid Fixed feature flags defined for non-hardware reduced model,"
+        "Invalid Flags bits are = 0x%x\n",
+        (FixedFeatureFlags->Flags & ~(VALID_NON_HARDWARE_REDUCED_FLAG_MASK))
+        ));
+    }
+
+    AcpiFadt.Flags |= (FixedFeatureFlags->Flags &
+                       VALID_NON_HARDWARE_REDUCED_FLAG_MASK);
+  }
 
 error_handler:
   return Status;

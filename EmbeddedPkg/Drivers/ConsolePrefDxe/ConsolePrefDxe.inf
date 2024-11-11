@@ -32,6 +32,7 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
   DebugLib
   FdtLib
   HiiLib

@@ -388,7 +388,8 @@ HttpBootGetBootFileCaller (
                      ImageType
                      );
           if (!EFI_ERROR (Status) ||
-              ((Status != EFI_TIMEOUT) && (Status != EFI_DEVICE_ERROR)))
+              ((Status != EFI_TIMEOUT) && (Status != EFI_DEVICE_ERROR)) ||
+              (Retries >= PcdGet32 (PcdMaxHttpResumeRetries)))
           {
             break;
           }
