@@ -148,7 +148,6 @@
   StandaloneMmPkg/Library/StandaloneMmExtractGuidedSectionLib/StandaloneMmExtractGuidedSectionLib.inf
 
 [Components.AARCH64, Components.ARM]
-  StandaloneMmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
   StandaloneMmPkg/Library/StandaloneMmPeCoffExtraActionLib/StandaloneMmPeCoffExtraActionLib.inf
 
 [Components.X64]

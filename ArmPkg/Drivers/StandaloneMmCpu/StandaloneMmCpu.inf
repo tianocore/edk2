@@ -19,10 +19,12 @@
   ENTRY_POINT                    = StandaloneMmCpuInitialize
 
 [Sources]
-  StandaloneMmCpu.c
   EventHandle.c
+  StandaloneMmCpu.c
+  StandaloneMmCpu.h
 
 [Packages]
+  ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   StandaloneMmPkg/StandaloneMmPkg.dec
