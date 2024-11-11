@@ -33,11 +33,6 @@
 [LibraryClasses.X64.PEIM]
   MmPlatformHobProducerLib|Include/Library/MmPlatformHobProducerLib.h
 
-[LibraryClasses.AArch64, LibraryClasses.ARM]
-  ##  @libraryclass  Defines a set of interfaces for the MM core entrypoint for
-  ##                 AArch64 and ARM.
-  StandaloneMmCoreEntryPoint|Include/Library/Arm/StandaloneMmCoreEntryPoint.h
-
 [Guids]
   gStandaloneMmPkgTokenSpaceGuid           = { 0x18fe7632, 0xf5c8, 0x4e63, { 0x8d, 0xe8, 0x17, 0xa5, 0x5c, 0x59, 0x13, 0xbd }}
   gMpInformationHobGuid                    = { 0xba33f15d, 0x4000, 0x45c1, { 0x8e, 0x88, 0xf9, 0x16, 0x92, 0xd4, 0x57, 0xe3 }}
@@ -53,9 +48,6 @@
 
 [Ppis]
   gMmCoreFvLocationPpiGuid                 = { 0x47a00618, 0x237a, 0x4386, { 0x8f, 0xc5, 0x2a, 0x86, 0xd8, 0xac, 0x41, 0x05 }}
-
-[Protocols]
-  gEdkiiPiMmCpuDriverEpProtocolGuid          = { 0x6ecbd5a1, 0xc0f8, 0x4702, { 0x83, 0x01, 0x4f, 0xc2, 0xc5, 0x47, 0x0a, 0x51 }}
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Maximum permitted encapsulation levels of sections in a firmware volume,
