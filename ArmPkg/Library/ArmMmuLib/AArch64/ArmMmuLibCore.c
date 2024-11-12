@@ -22,6 +22,23 @@
 #include <Library/HobLib.h>
 #include "ArmMmuLibInternal.h"
 
+/**
+  Whether the current translation regime is either EL1&0 or EL2&0, and
+  therefore supports non-global, ASID-scoped memory mappings.
+ **/
+STATIC
+BOOLEAN
+TranslationRegimeIsDual (
+  VOID
+  )
+{
+  if (ArmReadCurrentEL () == AARCH64_EL2) {
+    return (ArmReadHcr () & ARM_HCR_E2H) != 0;
+  }
+
+  return TRUE;
+}
+
 STATIC
 UINT64
 ArmMemoryAttributeToPageAttribute (
@@ -37,7 +54,7 @@ ArmMemoryAttributeToPageAttribute (
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
     case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
-      if (ArmReadCurrentEL () == AARCH64_EL2) {
+      if (!TranslationRegimeIsDual ()) {
         Permissions = TT_XN_MASK;
       } else {
         Permissions = TT_UXN_MASK | TT_PXN_MASK;
@@ -49,9 +66,13 @@ ArmMemoryAttributeToPageAttribute (
       break;
   }
 
+  if (TranslationRegimeIsDual ()) {
+    Permissions |= TT_NG;
+  }
+
   switch (Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
-      return TT_ATTR_INDX_MEMORY_WRITE_BACK;
+      return TT_ATTR_INDX_MEMORY_WRITE_BACK | Permissions;
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
@@ -63,7 +84,7 @@ ArmMemoryAttributeToPageAttribute (
 
     // Uncached and device mappings are treated as outer shareable by default,
     case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
-      return TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
+      return TT_ATTR_INDX_MEMORY_NON_CACHEABLE | Permissions;
 
     default:
       ASSERT (0);
@@ -423,7 +444,7 @@ GcdAttributeToPageAttribute (
   if (((GcdAttributes & EFI_MEMORY_XP) != 0) ||
       ((GcdAttributes & EFI_MEMORY_CACHETYPE_MASK) == EFI_MEMORY_UC))
   {
-    if (ArmReadCurrentEL () == AARCH64_EL2) {
+    if (!TranslationRegimeIsDual ()) {
       PageAttributes |= TT_XN_MASK;
     } else {
       PageAttributes |= TT_UXN_MASK | TT_PXN_MASK;
@@ -436,6 +457,10 @@ GcdAttributeToPageAttribute (
 
   if ((GcdAttributes & EFI_MEMORY_RP) == 0) {
     PageAttributes |= TT_AF;
+  }
+
+  if (TranslationRegimeIsDual ()) {
+    PageAttributes |= TT_NG;
   }
 
   return PageAttributes;
