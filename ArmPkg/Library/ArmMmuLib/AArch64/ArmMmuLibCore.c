@@ -578,6 +578,8 @@ ArmConfigureMmu (
   UINT64      TCR;
   EFI_STATUS  Status;
 
+  ASSERT (ArmReadCurrentEL () < AARCH64_EL3);
+
   if (MemoryTable == NULL) {
     ASSERT (MemoryTable != NULL);
     return EFI_INVALID_PARAMETER;
@@ -627,7 +629,7 @@ ArmConfigureMmu (
       ASSERT (0); // Bigger than 48-bit memory space are not supported
       return EFI_UNSUPPORTED;
     }
-  } else if (ArmReadCurrentEL () == AARCH64_EL1) {
+  } else {
     // Due to Cortex-A57 erratum #822227 we must set TG1[1] == 1, regardless of EPD1.
     TCR = T0SZ | TCR_TG0_4KB | TCR_TG1_4KB | TCR_EPD1;
 
@@ -653,9 +655,6 @@ ArmConfigureMmu (
       ASSERT (0); // Bigger than 48-bit memory space are not supported
       return EFI_UNSUPPORTED;
     }
-  } else {
-    ASSERT (0); // UEFI is only expected to run at EL2 and EL1, not EL3.
-    return EFI_UNSUPPORTED;
   }
 
   //
