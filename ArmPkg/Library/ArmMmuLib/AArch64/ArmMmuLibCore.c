@@ -24,6 +24,23 @@
 
 STATIC  ARM_REPLACE_LIVE_TRANSLATION_ENTRY  mReplaceLiveEntryFunc = ArmReplaceLiveTranslationEntry;
 
+/**
+  Whether the current translation regime is either EL1&0 or EL2&0, and
+  therefore supports non-global, ASID-scoped memory mappings.
+ **/
+STATIC
+BOOLEAN
+TranslationRegimeIsDual (
+  VOID
+  )
+{
+  if (ArmReadCurrentEL () == AARCH64_EL2) {
+    return (ArmReadHcr () & ARM_HCR_E2H) != 0;
+  }
+
+  return TRUE;
+}
+
 STATIC
 UINT64
 ArmMemoryAttributeToPageAttribute (
@@ -39,7 +56,7 @@ ArmMemoryAttributeToPageAttribute (
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_XP:
     case ARM_MEMORY_REGION_ATTRIBUTE_DEVICE:
-      if (ArmReadCurrentEL () == AARCH64_EL2) {
+      if (!TranslationRegimeIsDual ()) {
         Permissions = TT_XN_MASK;
       } else {
         Permissions = TT_UXN_MASK | TT_PXN_MASK;
@@ -53,7 +70,7 @@ ArmMemoryAttributeToPageAttribute (
 
   switch (Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_NONSHAREABLE:
-      return TT_ATTR_INDX_MEMORY_WRITE_BACK;
+      return TT_ATTR_INDX_MEMORY_WRITE_BACK | Permissions;
 
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK_RO:
@@ -65,7 +82,7 @@ ArmMemoryAttributeToPageAttribute (
 
     // Uncached and device mappings are treated as outer shareable by default,
     case ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED:
-      return TT_ATTR_INDX_MEMORY_NON_CACHEABLE;
+      return TT_ATTR_INDX_MEMORY_NON_CACHEABLE | Permissions;
 
     default:
       ASSERT (0);
@@ -451,7 +468,7 @@ GcdAttributeToPageAttribute (
   if (((GcdAttributes & EFI_MEMORY_XP) != 0) ||
       ((GcdAttributes & EFI_MEMORY_CACHETYPE_MASK) == EFI_MEMORY_UC))
   {
-    if (ArmReadCurrentEL () == AARCH64_EL2) {
+    if (!TranslationRegimeIsDual ()) {
       PageAttributes |= TT_XN_MASK;
     } else {
       PageAttributes |= TT_UXN_MASK | TT_PXN_MASK;
@@ -594,9 +611,7 @@ ArmConfigureMmu (
   //
   // Set TCR that allows us to retrieve T0SZ in the subsequent functions
   //
-  // Ideally we will be running at EL2, but should support EL1 as well.
-  // UEFI should not run at EL3.
-  if (ArmReadCurrentEL () == AARCH64_EL2) {
+  if (!TranslationRegimeIsDual ()) {
     // Note: Bits 23 and 31 are reserved(RES1) bits in TCR_EL2
     TCR = T0SZ | (1UL << 31) | (1UL << 23) | TCR_TG0_4KB;
 
