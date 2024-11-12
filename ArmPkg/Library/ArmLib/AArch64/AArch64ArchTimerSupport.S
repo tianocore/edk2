@@ -10,8 +10,10 @@
 #include <AsmMacroLib.h>
 
 /* Special accessors for VHE */
+#define cntp_tval_el02          s3_5_c14_c2_0
 #define cntp_ctl_el02           s3_5_c14_c2_1
 #define cntp_cval_el02          s3_5_c14_c2_2
+#define cntv_tval_el02          s3_5_c14_c3_0
 #define cntv_ctl_el02           s3_5_c14_c3_1
 #define cntv_cval_el02          s3_5_c14_c3_2
 
@@ -35,7 +37,7 @@
         mrs     \tmp, CurrentEL
         tbz     \tmp, #3, .L\@
         mrs     \tmp, hcr_el2
-        tbz     \tmp, #34, .L\@
+        tbz     \tmp, #34, .L\@   // TCR.E2H
         msr     \altname, \reg
         ret
 .L\@:   msr     \sysreg, \reg
@@ -69,13 +71,11 @@ ASM_FUNC(ArmWriteCntkCtl)
 
 
 ASM_FUNC(ArmReadCntpTval)
-  mrs   x0, cntp_tval_el0        // Read CNTP_TVAL (PL1 physical timer value register)
-  ret
+  RVHE  (x0, cntp_tval_el0)      // Read CNTP_TVAL (PL1 physical timer value register)
 
 
 ASM_FUNC(ArmWriteCntpTval)
-  msr   cntp_tval_el0, x0        // Write to CNTP_TVAL (PL1 physical timer value register)
-  ret
+  WVHE  (cntp_tval_el0, x0, x1)  // Write to CNTP_TVAL (PL1 physical timer value register)
 
 
 ASM_FUNC(ArmReadCntpCtl)
@@ -87,13 +87,11 @@ ASM_FUNC(ArmWriteCntpCtl)
 
 
 ASM_FUNC(ArmReadCntvTval)
-  mrs   x0, cntv_tval_el0        // Read CNTV_TVAL (Virtual Timer Value register)
-  ret
+  RVHE  (x0, cntv_tval_el0)      // Read CNTV_TVAL (Virtual Timer Value register)
 
 
 ASM_FUNC(ArmWriteCntvTval)
-  msr   cntv_tval_el0, x0        // Write to CNTV_TVAL (Virtual Timer Value register)
-  ret
+  WVHE  (cntv_tval_el0, x0, x1) // Write to CNTV_TVAL (Virtual Timer Value register)
 
 
 ASM_FUNC(ArmReadCntvCtl)
