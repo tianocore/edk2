@@ -9,6 +9,39 @@
 
 #include <AsmMacroLib.h>
 
+/* Special accessors for VHE */
+#define cntp_ctl_el02           s3_5_c14_c2_1
+#define cntp_cval_el02          s3_5_c14_c2_2
+#define cntv_ctl_el02           s3_5_c14_c3_1
+#define cntv_cval_el02          s3_5_c14_c3_2
+
+#define RVHE(reg, sysreg)       rvhe reg, sysreg, sysreg ## 2
+#define WVHE(sysreg, reg, tmp)  wvhe sysreg, reg, sysreg ## 2, tmp
+
+        /* Read from 'altname' when running at EL2+VHE, or 'sysreg' otherwise */
+        .macro  rvhe, reg, sysreg, altname
+        mrs     \reg, CurrentEL
+        tbz     \reg, #3, .L\@
+        mrs     \reg, hcr_el2
+        tbz     \reg, #34, .L\@   // TCR.E2H
+        mrs     \reg, \altname
+        ret
+.L\@:   mrs     \reg, \sysreg
+        ret
+        .endm
+
+        /* Write to 'altname' when running at EL2+VHE, or 'sysreg' otherwise */
+        .macro  wvhe, sysreg, reg, altname, tmp
+        mrs     \tmp, CurrentEL
+        tbz     \tmp, #3, .L\@
+        mrs     \tmp, hcr_el2
+        tbz     \tmp, #34, .L\@
+        msr     \altname, \reg
+        ret
+.L\@:   msr     \sysreg, \reg
+        ret
+        .endm
+
 ASM_FUNC(ArmReadCntFrq)
   mrs   x0, cntfrq_el0           // Read CNTFRQ
   ret
@@ -46,13 +79,11 @@ ASM_FUNC(ArmWriteCntpTval)
 
 
 ASM_FUNC(ArmReadCntpCtl)
-  mrs   x0, cntp_ctl_el0         // Read CNTP_CTL (PL1 Physical Timer Control Register)
-  ret
+  RVHE  (x0, cntp_ctl_el0)       // Read CNTP_CTL (PL1 Physical Timer Control Register)
 
 
 ASM_FUNC(ArmWriteCntpCtl)
-  msr   cntp_ctl_el0, x0         // Write to  CNTP_CTL (PL1 Physical Timer Control Register)
-  ret
+  WVHE  (cntp_ctl_el0, x0, x1)   // Write to  CNTP_CTL (PL1 Physical Timer Control Register)
 
 
 ASM_FUNC(ArmReadCntvTval)
@@ -66,38 +97,31 @@ ASM_FUNC(ArmWriteCntvTval)
 
 
 ASM_FUNC(ArmReadCntvCtl)
-  mrs   x0, cntv_ctl_el0         // Read CNTV_CTL (Virtual Timer Control Register)
-  ret
+  RVHE  (x0, cntv_ctl_el0)       // Read CNTV_CTL (Virtual Timer Control Register)
 
 
 ASM_FUNC(ArmWriteCntvCtl)
-  msr   cntv_ctl_el0, x0         // Write to CNTV_CTL (Virtual Timer Control Register)
-  ret
+  WVHE  (cntv_ctl_el0, x0, x1)   // Write to CNTV_CTL (Virtual Timer Control Register)
 
 
 ASM_FUNC(ArmReadCntvCt)
   mrs  x0, cntvct_el0            // Read CNTVCT  (Virtual Count Register)
   ret
 
-
 ASM_FUNC(ArmReadCntpCval)
-  mrs   x0, cntp_cval_el0        // Read CNTP_CTVAL (Physical Timer Compare Value Register)
-  ret
+  RVHE  (x0, cntp_cval_el0)      // Read CNTP_CTVAL (Physical Timer Compare Value Register)
 
 
 ASM_FUNC(ArmWriteCntpCval)
-  msr   cntp_cval_el0, x0        // Write to CNTP_CTVAL (Physical Timer Compare Value Register)
-  ret
+  WVHE  (cntp_cval_el0, x0, x1)  // Write to CNTP_CTVAL (Physical Timer Compare Value Register)
 
 
 ASM_FUNC(ArmReadCntvCval)
-  mrs   x0, cntv_cval_el0        // Read CNTV_CTVAL (Virtual Timer Compare Value Register)
-  ret
+  RVHE  (x0, cntv_cval_el0)      // Read CNTV_CTVAL (Virtual Timer Compare Value Register)
 
 
 ASM_FUNC(ArmWriteCntvCval)
-  msr   cntv_cval_el0, x0        // write to  CNTV_CTVAL (Virtual Timer Compare Value Register)
-  ret
+  WVHE  (cntv_cval_el0, x0, x1)  // write to  CNTV_CTVAL (Virtual Timer Compare Value Register)
 
 
 ASM_FUNC(ArmReadCntvOff)
