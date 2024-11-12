@@ -632,6 +632,16 @@ ArmConfigureMmu (
   // Ideally we will be running at EL2, but should support EL1 as well.
   // UEFI should not run at EL3.
   if (ArmReadCurrentEL () == AARCH64_EL2) {
+
+    // Enable VHE if we can - if the MMU is already enabled, we cannot safely
+    // toggle HCR.E2H
+    if (!ArmMmuEnabled () && ArmHasVhe ()) {
+      ArmWriteHcr (ArmReadHcr () | ARM_HCR_E2H);
+      ArmWriteCpacr (CPACR_CP_FULL_ACCESS);
+    }
+  }
+
+  if (!TranslationRegimeIsDual ()) {
     // Note: Bits 23 and 31 are reserved(RES1) bits in TCR_EL2
     TCR = T0SZ | (1UL << 31) | (1UL << 23) | TCR_TG0_4KB;
 
