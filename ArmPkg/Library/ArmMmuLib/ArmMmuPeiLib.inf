@@ -20,7 +20,7 @@
   ArmMmuLibInternal.h
   AArch64/ArmMmuLibCore.c
   AArch64/ArmMmuPeiLibConstructor.c
-  AArch64/ArmMmuLibReplaceEntry.S
+  AArch64/ArmMmuLibSwitchTtbr.S
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -32,6 +32,3 @@
   CacheMaintenanceLib
   HobLib
   MemoryAllocationLib
-
-[Guids]
-  gArmMmuReplaceLiveTranslationEntryFuncGuid

@@ -21,7 +21,7 @@
 [Sources.AARCH64]
   ArmMmuLibInternal.h
   AArch64/ArmMmuLibCore.c
-  AArch64/ArmMmuLibReplaceEntry.S
+  AArch64/ArmMmuLibSwitchTtbr.S
 
 [Sources.ARM]
   ArmMmuLibInternal.h
@@ -40,9 +40,6 @@
   CacheMaintenanceLib
   HobLib
   MemoryAllocationLib
-
-[Guids]
-  gArmMmuReplaceLiveTranslationEntryFuncGuid
 
 [Pcd.ARM]
   gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride

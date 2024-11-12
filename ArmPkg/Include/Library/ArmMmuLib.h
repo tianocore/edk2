@@ -21,15 +21,6 @@ ArmConfigureMmu (
   OUT UINTN                         *TranslationTableSize  OPTIONAL
   );
 
-VOID
-EFIAPI
-ArmReplaceLiveTranslationEntry (
-  IN  UINT64   *Entry,
-  IN  UINT64   Value,
-  IN  UINT64   RegionStart,
-  IN  BOOLEAN  DisableMmu
-  );
-
 /**
   Set the requested memory permission attributes on a region of memory.
 

@@ -22,8 +22,6 @@
 #include <Library/HobLib.h>
 #include "ArmMmuLibInternal.h"
 
-STATIC  ARM_REPLACE_LIVE_TRANSLATION_ENTRY  mReplaceLiveEntryFunc = ArmReplaceLiveTranslationEntry;
-
 STATIC
 UINT64
 ArmMemoryAttributeToPageAttribute (
@@ -106,37 +104,12 @@ ReplaceTableEntry (
   IN  BOOLEAN  IsLiveBlockMapping
   )
 {
-  BOOLEAN  DisableMmu;
+  ASSERT (!IsLiveBlockMapping || !ArmMmuEnabled ());
 
-  //
-  // Replacing a live block entry with a table entry (or vice versa) requires a
-  // break-before-make sequence as per the architecture. This means the mapping
-  // must be made invalid and cleaned from the TLBs first, and this is a bit of
-  // a hassle if the mapping in question covers the code that is actually doing
-  // the mapping and the unmapping, and so we only bother with this if actually
-  // necessary.
-  //
-
-  if (!IsLiveBlockMapping || !ArmMmuEnabled ()) {
-    // If the mapping is not a live block mapping, or the MMU is not on yet, we
-    // can simply overwrite the entry.
-    *Entry = Value;
-    ArmUpdateTranslationTableEntry (Entry, (VOID *)(UINTN)RegionStart);
-  } else {
-    // If the mapping in question does not cover the code that updates the
-    // entry in memory, or the entry that we are intending to update, we can
-    // use an ordinary break before make. Otherwise, we will need to
-    // temporarily disable the MMU.
-    DisableMmu = FALSE;
-    if ((((RegionStart ^ (UINTN)mReplaceLiveEntryFunc) & ~BlockMask) == 0) ||
-        (((RegionStart ^ (UINTN)Entry) & ~BlockMask) == 0))
-    {
-      DisableMmu = TRUE;
-      DEBUG ((DEBUG_WARN, "%a: splitting block entry with MMU disabled\n", __func__));
-    }
-
-    mReplaceLiveEntryFunc (Entry, Value, RegionStart, DisableMmu);
-  }
+  // If the mapping is not a live block mapping, or the MMU is not on yet, we
+  // can simply overwrite the entry.
+  *Entry = Value;
+  ArmUpdateTranslationTableEntry (Entry, (VOID *)(UINTN)RegionStart);
 }
 
 STATIC
@@ -246,15 +219,8 @@ UpdateRegionMappingRecursive (
     // the next level. No block mappings are allowed at all at level 0,
     // so in that case, we have to recurse unconditionally.
     //
-    // One special case to take into account is any region that covers the page
-    // table itself: if we'd cover such a region with block mappings, we are
-    // more likely to end up in the situation later where we need to disable
-    // the MMU in order to update page table entries safely, so prefer page
-    // mappings in that particular case.
-    //
     if ((Level == 0) || (((RegionStart | BlockEnd) & BlockMask) != 0) ||
-        ((Level < 3) && (PagesOnly || (((UINT64)PageTable & ~BlockMask) == RegionStart))) ||
-        IsTableEntry (*Entry, Level))
+        ((Level < 3) && PagesOnly) || IsTableEntry (*Entry, Level))
     {
       ASSERT (Level < 3);
 
@@ -519,11 +485,20 @@ ArmSetMemoryAttributes (
   IN BOOLEAN               PagesOnly
   )
 {
-  UINT64  PageAttributes;
-  UINT64  PageAttributeMask;
+  UINT64      PageAttributes;
+  UINT64      PageAttributeMask;
+  UINT64      *ActiveTtbr;
+  UINT64      *PrimaryTtbr;
+  UINT64      *SecondaryTtbr;
+  EFI_STATUS  Status;
+  BOOLEAN     InterruptState;
 
   PageAttributes    = GcdAttributeToPageAttribute (Attributes);
   PageAttributeMask = 0;
+
+  ActiveTtbr    = ArmGetTTBR0BaseAddress ();
+  PrimaryTtbr   = (UINT64 *)((UINT64)ActiveTtbr & ~(UINT64)EFI_PAGE_SIZE);
+  SecondaryTtbr = (UINT64 *)((UINT64)ActiveTtbr | EFI_PAGE_SIZE);
 
   if ((Attributes & EFI_MEMORY_CACHETYPE_MASK) == 0) {
     //
@@ -549,17 +524,45 @@ ArmSetMemoryAttributes (
     if (AttributeMask != 0) {
       return EFI_INVALID_PARAMETER;
     }
+
+    if (Attributes & EFI_MEMORY_WB) {
+      Status = UpdateRegionMapping (
+                 BaseAddress,
+                 Length,
+                 GcdAttributeToPageAttribute (EFI_MEMORY_WB),
+                 0,
+                 SecondaryTtbr,
+                 (ActiveTtbr == SecondaryTtbr),
+                 FALSE
+                 );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    }
   }
 
-  return UpdateRegionMapping (
-           BaseAddress,
-           Length,
-           PageAttributes,
-           PageAttributeMask,
-           ArmGetTTBR0BaseAddress (),
-           TRUE,
-           PagesOnly
-           );
+  InterruptState = SaveAndDisableInterrupts ();
+  if (ActiveTtbr != SecondaryTtbr) {
+    ArmSwitchTtbr (SecondaryTtbr, 1);
+  }
+
+  Status = UpdateRegionMapping (
+             BaseAddress,
+             Length,
+             PageAttributes,
+             PageAttributeMask,
+             PrimaryTtbr,
+             FALSE,
+             PagesOnly
+             );
+
+  if (ActiveTtbr != SecondaryTtbr) {
+    ArmSwitchTtbr (ActiveTtbr, 0);
+  }
+
+  SetInterruptState (InterruptState);
+
+  return Status;
 }
 
 EFI_STATUS
@@ -570,7 +573,7 @@ ArmConfigureMmu (
   OUT UINTN                         *TranslationTableSize OPTIONAL
   )
 {
-  VOID        *TranslationTable;
+  UINT64 (*TranslationTable)[TT_ENTRY_COUNT];
   UINTN       MaxAddressBits;
   UINT64      MaxAddress;
   UINTN       T0SZ;
@@ -673,8 +676,8 @@ ArmConfigureMmu (
   // Set TCR
   ArmSetTCR (TCR);
 
-  // Allocate pages for translation table
-  TranslationTable = AllocatePages (1);
+  // Allocate pages for translation tables
+  TranslationTable = AllocateAlignedPages (2, 2 * EFI_PAGE_SIZE);
   if (TranslationTable == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -693,15 +696,21 @@ ArmConfigureMmu (
     // when populating the page tables.
     //
     InvalidateDataCacheRange (
-      TranslationTable,
+      TranslationTable[0],
+      RootTableEntryCount * sizeof (UINT64)
+      );
+    InvalidateDataCacheRange (
+      TranslationTable[1],
       RootTableEntryCount * sizeof (UINT64)
       );
   }
 
-  ZeroMem (TranslationTable, RootTableEntryCount * sizeof (UINT64));
+  ZeroMem (TranslationTable[0], RootTableEntryCount * sizeof (UINT64));
+  ZeroMem (TranslationTable[1], RootTableEntryCount * sizeof (UINT64));
 
   while (MemoryTable->Length != 0) {
-    Status = FillTranslationTable (TranslationTable, MemoryTable);
+    Status = FillTranslationTable (TranslationTable[0], MemoryTable) ?:
+             FillTranslationTable (TranslationTable[1], MemoryTable);
     if (EFI_ERROR (Status)) {
       goto FreeTranslationTable;
     }
@@ -722,7 +731,7 @@ ArmConfigureMmu (
     MAIR_ATTR (TT_ATTR_INDX_MEMORY_WRITE_BACK, MAIR_ATTR_NORMAL_MEMORY_WRITE_BACK)
     );
 
-  ArmSetTTBR0 (TranslationTable);
+  ArmSetTTBR0 (TranslationTable[0]);
 
   if (!ArmMmuEnabled ()) {
     ArmDisableAlignmentCheck ();
@@ -736,7 +745,7 @@ ArmConfigureMmu (
   return EFI_SUCCESS;
 
 FreeTranslationTable:
-  FreePages (TranslationTable, 1);
+  FreePages (TranslationTable, 2);
   return Status;
 }
 
@@ -746,22 +755,16 @@ ArmMmuBaseLibConstructor (
   VOID
   )
 {
-  extern UINT32  ArmReplaceLiveTranslationEntrySize;
-  VOID           *Hob;
+  extern UINT32  ArmSwitchTtbrSize;
 
-  Hob = GetFirstGuidHob (&gArmMmuReplaceLiveTranslationEntryFuncGuid);
-  if (Hob != NULL) {
-    mReplaceLiveEntryFunc = *(ARM_REPLACE_LIVE_TRANSLATION_ENTRY *)GET_GUID_HOB_DATA (Hob);
-  } else {
-    //
-    // The ArmReplaceLiveTranslationEntry () helper function may be invoked
-    // with the MMU off so we have to ensure that it gets cleaned to the PoC
-    //
-    WriteBackDataCacheRange (
-      (VOID *)(UINTN)ArmReplaceLiveTranslationEntry,
-      ArmReplaceLiveTranslationEntrySize
-      );
-  }
+  //
+  // The ArmSwitchTtbr () helper function may be invoked with the MMU off so we
+  // have to ensure that it gets cleaned to the PoC
+  //
+  WriteBackDataCacheRange (
+    (VOID *)(UINTN)ArmSwitchTtbr,
+    ArmSwitchTtbrSize
+    );
 
   return RETURN_SUCCESS;
 }
