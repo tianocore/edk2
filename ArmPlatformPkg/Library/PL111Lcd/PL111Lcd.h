@@ -108,7 +108,7 @@
 #define PL111_CTRL_LCD_16BPP_565  (6 << 1)
 #define PL111_CTRL_LCD_12BPP_444  (7 << 1)
 #define PL111_CTRL_LCD_BPP(Bpp)  ((Bpp) << 1)
-#define PL111_CTRL_LCD_EN  1
+#define PL111_CTRL_LCD_EN  1U
 
 /**********************************************************************/
 
