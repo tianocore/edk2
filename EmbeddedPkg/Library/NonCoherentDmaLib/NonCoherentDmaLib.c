@@ -639,8 +639,6 @@ DmaFreeBuffer (
   BOOLEAN              Found;
   EFI_STATUS           Status;
 
-  Alloc = NULL;
-
   if (HostAddress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -656,7 +654,7 @@ DmaFreeBuffer (
     }
   }
 
-  if (!Found || (Alloc == NULL)) {
+  if (!Found) {
     ASSERT (FALSE);
     return EFI_INVALID_PARAMETER;
   }

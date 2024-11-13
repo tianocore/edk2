@@ -385,10 +385,6 @@ overlay_update_local_node_references (
                                       );
     int  tree_child;
 
-    if (fixup_child_name == NULL) {
-      return -FDT_ERR_BADOVERLAY;
-    }
-
     tree_child = fdt_subnode_offset (
                    fdto,
                    tree_node,
@@ -762,7 +758,7 @@ overlay_apply_node (
              &name,
              &prop_len
              );
-    if ((prop == NULL) || (prop_len == -FDT_ERR_NOTFOUND)) {
+    if (prop_len == -FDT_ERR_NOTFOUND) {
       return -FDT_ERR_INTERNAL;
     }
 
@@ -780,10 +776,6 @@ overlay_apply_node (
     const char  *name = fdt_get_name (fdto, subnode, NULL);
     int         nnode;
     int         ret;
-
-    if (name == NULL) {
-      return -FDT_ERR_INTERNAL;
-    }
 
     nnode = fdt_add_subnode (fdt, target, name);
     if (nnode == -FDT_ERR_EXISTS) {
