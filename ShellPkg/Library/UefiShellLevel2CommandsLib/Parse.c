@@ -315,7 +315,11 @@ ShellCommandRunParse (
         ShellCommandInstance = ShellStrToUintn (ShellCommandLineGetValue (Package, L"-s"));
       }
 
-      ShellStatus = PerformParsing (FileName, TableName, ShellStrToUintn (ColumnString), TableNameInstance, ShellCommandInstance, StreamingUnicode);
+      if ((FileName != NULL) && (TableName != NULL) && (ColumnString != NULL)) {
+        ShellStatus = PerformParsing (FileName, TableName, ShellStrToUintn (ColumnString), TableNameInstance, ShellCommandInstance, StreamingUnicode);
+      } else {
+        ShellStatus = SHELL_INVALID_PARAMETER;
+      }
     }
   }
 

@@ -1208,6 +1208,104 @@ typedef struct {
   UINT64    PteL1;
 } EFI_IOMMU_DMAR_ERROR_DATA;
 
+///
+/// CXL Cachemem Event Log Valid bits
+///@{
+#define EFI_CXL_CACHMEM_AGENT_TYPE      BIT0  // CXL Agent Type field is valid
+#define EFI_CXL_CACHMEM_AGENT_ADDRESS   BIT1  // CXL Agent Address field is valid
+#define EFI_CXL_CACHMEM_DEVICE_ID       BIT2  // Device ID field is valid
+#define EFI_CXL_CACHMEM_DEVICE_SER_NUM  BIT3  // Device Serial Number field is valid
+#define EFI_CXL_CACHMEM_CAP_STRUCT      BIT4  // Capability structure field is valid
+#define EFI_CXL_CACHMEM_DVSEC           BIT5  // CXL DVSET field is valid
+#define EFI_CXL_CACHMEM_ERROR_LOG       BIT6  // CXL Error Log field is valid
+///@}
+
+//
+// CXL Agent Types
+///@{
+#define EFI_CXL_AGENT_CXL11_DEV          0    // CXL 1.1 Device
+#define EFI_CXL_AGENT_CXL11_DSP          1    // CXL 1.1 Downstream Port
+#define EFI_CXL_AGENT_CXL20_DEV          2    // CXL 2.0 Device
+#define EFI_CXL_AGENT_CXL20_LOGICAL_DEV  3    // CXL 2.0 Logical Device
+#define EFI_CXL_AGENT_CXL20_FMLD         4    // CXL 2.0 Fabric Manager managed Logical device
+#define EFI_CXL_AGENT_CXL20_RP           5    // CXL 2.0 Root Port
+#define EFI_CXL_AGENT_CXL20_DSP          6    // CXL 2.0 Downstream Switch Port
+#define EFI_CXL_AGENT_CXL20_USP          7    // CXL 2.0 Upstream Switch Port
+///@}
+
+//
+// CXL Mem Event Log Valid bits
+///@{
+#define EFI_CXL_MEM_DEVICE_ID       BIT0  // Device ID field is valid
+#define EFI_CXL_MEM_DEVICE_SER_NUM  BIT1  // Device Serial Number field is valid
+#define EFI_CXL_MEM_COMP_ERROR_LOG  BIT2  // CXL Component Error Log field is valid
+///@}
+
+//
+// CXL Agent Address
+//
+typedef union {
+  struct {
+    UINT64    Function : 8;
+    UINT64    Device   : 8;
+    UINT64    Bus      : 8;
+    UINT64    Segment  : 16;
+    UINT64    Rsvd     : 24;
+  } Bits;
+  struct {
+    UINT32    Low;
+    UINT32    High;
+  } RcrbBase;
+} EFI_CXL_AGENT_ADDRESS;
+
+//
+// CXL Device ID
+//
+typedef struct {
+  UINT16    VendorId;
+  UINT16    DeviceId;
+  UINT16    Svid;
+  UINT16    Sid;
+  UINT16    ClassCode;
+  struct {
+    UINT16    Rsvd : 3;
+    UINT16    Num  : 13;
+  } Slot;
+  UINT32    Rsvd;
+} EFI_CXL_AGENT_DEVICE_ID;
+
+//
+// CXL Device Serial Number
+//
+typedef struct {
+  UINT32    Lower;
+  UINT32    Upper;
+} EFI_CXL_DEVICE_SERIAL_NUM;
+
+//
+// PCIe device identifiers of CXL Component
+//
+typedef struct {
+  UINT16                        VendorId;
+  UINT16                        DeviceId;
+  UINT8                         Function;
+  UINT8                         Device;
+  UINT8                         Bus;
+  UINT16                        Segment;
+  EFI_GENERIC_ERROR_PCI_SLOT    Slot;
+  UINT8                         Resvd;
+} EFI_CXL_ERROR_PCIE_DEV_ID;
+
+//
+// CXL Component Events Section
+//
+typedef struct {
+  UINT32                       Length;
+  UINT64                       ValidFields;
+  EFI_CXL_ERROR_PCIE_DEV_ID    CxlDeviceId;
+  UINT64                       DeviceSerialNo;
+} EFI_CXL_COMPONENT_EVENT_LOG;
+
 #pragma pack()
 
 extern EFI_GUID  gEfiEventNotificationTypeCmcGuid;

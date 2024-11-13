@@ -19,6 +19,7 @@
 #include <UniversalPayload/UniversalPayload.h>
 #include <UniversalPayload/AcpiTable.h>
 #include <UniversalPayload/SerialPortInfo.h>
+#include <UniversalPayload/SmbiosTable.h>
 #include <UniversalPayload/PciRootBridges.h>
 #include <Guid/GraphicsInfoHob.h>
 #include <Guid/UniversalPayloadSerialPortDeviceParentInfo.h>
@@ -142,19 +143,22 @@ BuildFdtForMemAlloc (
   IN     VOID  *FdtBase
   )
 {
-  EFI_STATUS            Status;
-  EFI_PEI_HOB_POINTERS  Hob;
-  VOID                  *HobStart;
-  VOID                  *Fdt;
-  INT32                 ParentNode;
-  INT32                 TempNode;
-  CHAR8                 TempStr[32];
-  UINT64                RegTmp[2];
-  UINT32                AllocMemType;
-  EFI_GUID              *AllocMemName;
-  UINT8                 IsStackHob;
-  UINT8                 IsBspStore;
-  UINT32                Data32;
+  EFI_STATUS                      Status;
+  EFI_PEI_HOB_POINTERS            Hob;
+  VOID                            *HobStart;
+  VOID                            *Fdt;
+  INT32                           ParentNode;
+  INT32                           TempNode;
+  CHAR8                           TempStr[32];
+  UINT64                          RegTmp[2];
+  UINT32                          AllocMemType;
+  EFI_GUID                        *AllocMemName;
+  UINT8                           IsStackHob;
+  UINT8                           IsBspStore;
+  UINT32                          Data32;
+  UNIVERSAL_PAYLOAD_SMBIOS_TABLE  *SmbiosTable;
+  UNIVERSAL_PAYLOAD_ACPI_TABLE    *AcpiTable;
+  EFI_HOB_GUID_TYPE               *GuidHob;
 
   Fdt = FdtBase;
 
@@ -164,6 +168,30 @@ BuildFdtForMemAlloc (
   Data32 = CpuToFdt32 (2);
   Status = FdtSetProperty (Fdt, ParentNode, "#address-cells", &Data32, sizeof (UINT32));
   Status = FdtSetProperty (Fdt, ParentNode, "#size-cells", &Data32, sizeof (UINT32));
+
+  GuidHob     = NULL;
+  SmbiosTable = NULL;
+  GuidHob     = GetFirstGuidHob (&gUniversalPayloadSmbios3TableGuid);
+  if (GuidHob != NULL) {
+    SmbiosTable = GET_GUID_HOB_DATA (GuidHob);
+    DEBUG ((DEBUG_INFO, "To build Smbios memory FDT ,SmbiosTable :%lx, SmBiosEntryPoint :%lx\n", (UINTN)SmbiosTable, SmbiosTable->SmBiosEntryPoint));
+    Status = AsciiSPrint (TempStr, sizeof (TempStr), "memory@%lX", SmbiosTable->SmBiosEntryPoint);
+    DEBUG ((DEBUG_INFO, "To build Smbios memory FDT #2, SmbiosTable->Header.Length  :%x\n", SmbiosTable->Header.Length));
+    TempNode = 0;
+    TempNode = FdtAddSubnode (Fdt, ParentNode, TempStr);
+    DEBUG ((DEBUG_INFO, "FdtAddSubnode %x", TempNode));
+    RegTmp[0] = CpuToFdt64 (SmbiosTable->SmBiosEntryPoint);
+    RegTmp[1] = CpuToFdt64 (SmbiosTable->Header.Length);
+    FdtSetProperty (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
+    ASSERT_EFI_ERROR (Status);
+    FdtSetProperty (Fdt, TempNode, "compatible", "smbios", (UINT32)(AsciiStrLen ("smbios")+1));
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  GuidHob = GetFirstGuidHob (&gUniversalPayloadAcpiTableGuid);
+  if (GuidHob != NULL) {
+    AcpiTable = (UNIVERSAL_PAYLOAD_ACPI_TABLE *)GET_GUID_HOB_DATA (GuidHob);
+  }
 
   HobStart = GetFirstHob (EFI_HOB_TYPE_MEMORY_ALLOCATION);
   //
@@ -242,7 +270,23 @@ BuildFdtForMemAlloc (
       Status    = FdtSetProperty (Fdt, TempNode, "reg", &RegTmp, sizeof (RegTmp));
       ASSERT_EFI_ERROR (Status);
 
-      if (!(AsciiStrCmp (mMemoryAllocType[AllocMemType], "mmio") == 0)) {
+      if ((AsciiStrCmp (mMemoryAllocType[AllocMemType], "mmio") == 0)) {
+        continue;
+      }
+
+      if (!(AsciiStrCmp (mMemoryAllocType[AllocMemType], "acpi-nvs") == 0) && (AsciiStrCmp (mMemoryAllocType[AllocMemType], "acpi") == 0)) {
+        DEBUG ((DEBUG_INFO, "find acpi memory hob MemoryBaseAddress:%x , AcpiTable->Rsdp :%x\n", Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress, AcpiTable->Rsdp));
+        if (Hob.MemoryAllocation->AllocDescriptor.MemoryBaseAddress == AcpiTable->Rsdp) {
+          DEBUG ((DEBUG_INFO, "keep acpi memory hob  \n"));
+          Status = FdtSetProperty (Fdt, TempNode, "compatible", mMemoryAllocType[AllocMemType], (UINT32)(AsciiStrLen (mMemoryAllocType[AllocMemType])+1));
+          ASSERT_EFI_ERROR (Status);
+        } else {
+          DEBUG ((DEBUG_INFO, "change acpi memory hob  \n"));
+          Status = FdtSetProperty (Fdt, TempNode, "compatible", mMemoryAllocType[4], (UINT32)(AsciiStrLen (mMemoryAllocType[4])+1));
+          ASSERT_EFI_ERROR (Status);
+        }
+      } else {
+        DEBUG ((DEBUG_INFO, "other memory hob  \n"));
         Status = FdtSetProperty (Fdt, TempNode, "compatible", mMemoryAllocType[AllocMemType], (UINT32)(AsciiStrLen (mMemoryAllocType[AllocMemType])+1));
         ASSERT_EFI_ERROR (Status);
       }
@@ -404,6 +448,7 @@ BuildFdtForPciRootBridge (
   UINT32                                            RegTmp[2];
   UINT32                                            RegData[21];
   UINT32                                            DMARegData[8];
+  UINT64                                            Reg64Data[2];
   UINT32                                            Data32;
   UINT64                                            Data64;
   UINT8                                             BusNumber;
@@ -611,11 +656,14 @@ BuildFdtForPciRootBridge (
       Status = FdtSetProperty (Fdt, TempNode, "dma-ranges", &DMARegData, sizeof (DMARegData));
       ASSERT_EFI_ERROR (Status);
 
-      Data32 = CpuToFdt32 (2);
-      Status = FdtSetProperty (Fdt, TempNode, "#size-cells", &Data32, sizeof (UINT32));
+      ASSERT (PciRootBridgeInfo->RootBridge[Index].Bus.Base <= 0xFF);
+      ASSERT (PciRootBridgeInfo->RootBridge[Index].Bus.Limit <= 0xFF);
 
-      Data32 = CpuToFdt32 (3);
-      Status = FdtSetProperty (Fdt, TempNode, "#address-cells", &Data32, sizeof (UINT32));
+      Reg64Data[0] = CpuToFdt64 (PciExpressBaseAddress + LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Base, 20));
+      Reg64Data[1] = CpuToFdt64 (LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Limit +1, 20));
+
+      Status = FdtSetProperty (Fdt, TempNode, "reg", &Reg64Data, sizeof (Reg64Data));
+      ASSERT_EFI_ERROR (Status);
 
       BusNumber = PciRootBridgeInfo->RootBridge[Index].Bus.Base & 0xFF;
       RegTmp[0] = CpuToFdt32 (BusNumber);
@@ -626,6 +674,12 @@ BuildFdtForPciRootBridge (
 
       Status = FdtSetProperty (Fdt, TempNode, "bus-range", &RegTmp, sizeof (RegTmp));
       ASSERT_EFI_ERROR (Status);
+
+      Data32 = CpuToFdt32 (2);
+      Status = FdtSetProperty (Fdt, TempNode, "#size-cells", &Data32, sizeof (UINT32));
+
+      Data32 = CpuToFdt32 (3);
+      Status = FdtSetProperty (Fdt, TempNode, "#address-cells", &Data32, sizeof (UINT32));
 
       Status = FdtSetProperty (Fdt, TempNode, "compatible", "pci-rb", (UINT32)(AsciiStrLen ("pci-rb")+1));
       ASSERT_EFI_ERROR (Status);

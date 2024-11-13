@@ -436,7 +436,10 @@ EfiShellGetFilePathFromDevicePath (
         if ((DevicePathType (&FilePath->Header) != MEDIA_DEVICE_PATH) ||
             (DevicePathSubType (&FilePath->Header) != MEDIA_FILEPATH_DP))
         {
-          FreePool (PathForReturn);
+          if (PathForReturn != NULL) {
+            FreePool (PathForReturn);
+          }
+
           return NULL;
         }
 
@@ -447,7 +450,10 @@ EfiShellGetFilePathFromDevicePath (
 
         AlignedNode = AllocateCopyPool (DevicePathNodeLength (FilePath), FilePath);
         if (AlignedNode == NULL) {
-          FreePool (PathForReturn);
+          if (PathForReturn != NULL) {
+            FreePool (PathForReturn);
+          }
+
           return NULL;
         }
 
@@ -719,7 +725,11 @@ EfiShellGetDeviceName (
         continue;
       }
 
-      Lang   = GetBestLanguageForDriver (CompName2->SupportedLanguages, Language, FALSE);
+      Lang = GetBestLanguageForDriver (CompName2->SupportedLanguages, Language, FALSE);
+      if (Lang == NULL) {
+        continue;
+      }
+
       Status = CompName2->GetControllerName (CompName2, DeviceHandle, NULL, Lang, &DeviceNameToReturn);
       FreePool (Lang);
       Lang = NULL;
@@ -767,7 +777,11 @@ EfiShellGetDeviceName (
               continue;
             }
 
-            Lang   = GetBestLanguageForDriver (CompName2->SupportedLanguages, Language, FALSE);
+            Lang = GetBestLanguageForDriver (CompName2->SupportedLanguages, Language, FALSE);
+            if (Lang == NULL) {
+              continue;
+            }
+
             Status = CompName2->GetControllerName (CompName2, ParentControllerBuffer[LoopVar], DeviceHandle, Lang, &DeviceNameToReturn);
             FreePool (Lang);
             Lang = NULL;
@@ -1817,16 +1831,32 @@ EfiShellExecute (
     return (EFI_UNSUPPORTED);
   }
 
+  Temp = NULL;
   if (NestingEnabled ()) {
     DevPath = AppendDevicePath (ShellInfoObject.ImageDevPath, ShellInfoObject.FileDevPath);
+    if (DevPath == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     DEBUG_CODE_BEGIN ();
     Temp = ConvertDevicePathToText (ShellInfoObject.FileDevPath, TRUE, TRUE);
-    FreePool (Temp);
+    if (Temp != NULL) {
+      FreePool (Temp);
+    }
+
     Temp = ConvertDevicePathToText (ShellInfoObject.ImageDevPath, TRUE, TRUE);
-    FreePool (Temp);
-    Temp = ConvertDevicePathToText (DevPath, TRUE, TRUE);
-    FreePool (Temp);
+    if (Temp != NULL) {
+      FreePool (Temp);
+    }
+
+    if (DevPath != NULL) {
+      Temp = ConvertDevicePathToText (DevPath, TRUE, TRUE);
+    }
+
+    if (Temp != NULL) {
+      FreePool (Temp);
+    }
+
     DEBUG_CODE_END ();
 
     Temp = NULL;
@@ -2395,6 +2425,8 @@ ShellSearchHandle (
   CHAR16               *NewFullName;
   UINTN                Size;
 
+  NewShellNode = NULL;
+  FileInfo     = NULL;
   if (  (FilePattern      == NULL)
      || (UnicodeCollation == NULL)
      || (FileList         == NULL)
@@ -2434,14 +2466,17 @@ ShellSearchHandle (
       //
       // We want the root node.  create the node.
       //
-      FileInfo     = FileHandleGetInfo (FileHandle);
-      NewShellNode = CreateAndPopulateShellFileInfo (
-                       MapName,
-                       EFI_SUCCESS,
-                       L"\\",
-                       FileHandle,
-                       FileInfo
-                       );
+      FileInfo = FileHandleGetInfo (FileHandle);
+      if (FileInfo != NULL) {
+        NewShellNode = CreateAndPopulateShellFileInfo (
+                         MapName,
+                         EFI_SUCCESS,
+                         L"\\",
+                         FileHandle,
+                         FileInfo
+                         );
+      }
+
       SHELL_FREE_NON_NULL (FileInfo);
     } else {
       //
@@ -2631,6 +2666,9 @@ EfiShellFindFiles (
   }
 
   PatternCopy = PathCleanUpDirectories (PatternCopy);
+  if (PatternCopy == NULL) {
+    return (EFI_OUT_OF_RESOURCES);
+  }
 
   Count = StrStr (PatternCopy, L":") - PatternCopy + 1;
   ASSERT (Count <= StrLen (PatternCopy));
@@ -2715,6 +2753,10 @@ EfiShellOpenFileList (
   //
   if (StrStr (Path, L":") == NULL) {
     CurDir = EfiShellGetCurDir (NULL);
+    if (CurDir == NULL) {
+      return EFI_NOT_FOUND;
+    }
+
     ASSERT ((Path2 == NULL && Path2Size == 0) || (Path2 != NULL));
     StrnCatGrow (&Path2, &Path2Size, CurDir, 0);
     StrnCatGrow (&Path2, &Path2Size, L"\\", 0);
@@ -2855,6 +2897,10 @@ EfiShellGetEnvEx (
         // Allocate the space and recall the get function
         //
         Buffer = AllocateZeroPool (Size);
+        if (Buffer == NULL) {
+          return NULL;
+        }
+
         Status = SHELL_GET_ENVIRONMENT_VARIABLE_AND_ATTRIBUTES (Name, Attributes, &Size, Buffer);
       }
 
@@ -3122,7 +3168,10 @@ EfiShellSetCurDir (
   }
 
   DirectoryName = StrnCatGrow (&DirectoryName, NULL, Dir, 0);
-  ASSERT (DirectoryName != NULL);
+  if (DirectoryName == NULL) {
+    ASSERT (DirectoryName != NULL);
+    return (EFI_OUT_OF_RESOURCES);
+  }
 
   PathCleanUpDirectories (DirectoryName);
 
@@ -3500,6 +3549,11 @@ EfiShellGetAlias (
     Status  = gRT->GetVariable (AliasLower, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
     if (Status == EFI_BUFFER_TOO_SMALL) {
       RetVal = AllocateZeroPool (RetSize);
+      if (RetVal == NULL) {
+        FreePool (AliasLower);
+        return NULL;
+      }
+
       Status = gRT->GetVariable (AliasLower, &gShellAliasGuid, &Attribs, &RetSize, RetVal);
     }
 

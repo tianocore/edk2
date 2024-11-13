@@ -15,8 +15,7 @@
 #include <Library/PrintLib.h>
 #include <Library/PcdLib.h>
 
-#define UNIT_TEST_MAX_SINGLE_LOG_STRING_LENGTH  (512)
-#define UNIT_TEST_MAX_LOG_BUFFER                SIZE_16KB
+#define UNIT_TEST_MAX_LOG_BUFFER  SIZE_16KB
 
 struct _UNIT_TEST_LOG_PREFIX_STRING {
   UNIT_TEST_STATUS    LogLevel;
@@ -85,7 +84,7 @@ AddStringToUnitTestLog (
              UnitTest->Log,
              UNIT_TEST_MAX_LOG_BUFFER / sizeof (CHAR8),
              String,
-             UNIT_TEST_MAX_SINGLE_LOG_STRING_LENGTH
+             UNIT_TEST_MAX_STRING_LENGTH
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to add unit test log string.  Status = %r\n", Status));
@@ -160,8 +159,8 @@ UnitTestLog (
   )
 {
   UNIT_TEST_FRAMEWORK_HANDLE  FrameworkHandle;
-  CHAR8                       NewFormatString[UNIT_TEST_MAX_SINGLE_LOG_STRING_LENGTH];
-  CHAR8                       LogString[UNIT_TEST_MAX_SINGLE_LOG_STRING_LENGTH];
+  CHAR8                       NewFormatString[UNIT_TEST_MAX_STRING_LENGTH];
+  CHAR8                       LogString[UNIT_TEST_MAX_STRING_LENGTH];
   CONST CHAR8                 *LogTypePrefix;
   VA_LIST                     Marker;
 

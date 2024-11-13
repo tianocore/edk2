@@ -477,7 +477,11 @@ CreatePopUp (
   // Allocate a buffer for a single line of the popup with borders and a Null-terminator
   //
   Line = AllocateZeroPool ((MaxLength + 3) * sizeof (CHAR16));
-  ASSERT (Line != NULL);
+
+  if (Line == NULL) {
+    ASSERT (Line != NULL);
+    return;
+  }
 
   //
   // Draw top of popup box
@@ -513,7 +517,12 @@ CreatePopUp (
       //
       UefiLibGetStringWidth (String, TRUE, MaxLength, &Length);
       TmpString = AllocateZeroPool ((Length + 1) * sizeof (CHAR16));
-      ASSERT (TmpString != NULL);
+
+      if (TmpString == NULL) {
+        ASSERT (TmpString != NULL);
+        break;
+      }
+
       StrnCpyS (TmpString, Length + 1, String, Length - 3);
       StrCatS (TmpString, Length + 1, L"...");
 
