@@ -65,7 +65,11 @@ InternalPrint (
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
   Buffer = (CHAR16 *)AllocatePool (BufferSize);
-  ASSERT (Buffer != NULL);
+
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return 0;
+  }
 
   Return = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
 
@@ -199,7 +203,11 @@ AsciiInternalPrint (
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
   Buffer = (CHAR16 *)AllocatePool (BufferSize);
-  ASSERT (Buffer != NULL);
+
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return 0;
+  }
 
   Return = UnicodeVSPrintAsciiFormat (Buffer, BufferSize, Format, Marker);
 
@@ -419,7 +427,11 @@ InternalPrintGraphic (
   }
 
   Blt = (EFI_IMAGE_OUTPUT *)AllocateZeroPool (sizeof (EFI_IMAGE_OUTPUT));
-  ASSERT (Blt != NULL);
+
+  if (Blt == NULL) {
+    ASSERT (Blt != NULL);
+    goto Error;
+  }
 
   Blt->Width  = (UINT16)(HorizontalResolution);
   Blt->Height = (UINT16)(VerticalResolution);
@@ -625,7 +637,11 @@ PrintXY (
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
   Buffer = (CHAR16 *)AllocatePool (BufferSize);
-  ASSERT (Buffer != NULL);
+
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return 0;
+  }
 
   PrintNum = UnicodeVSPrint (Buffer, BufferSize, Format, Marker);
 
@@ -703,7 +719,11 @@ AsciiPrintXY (
   BufferSize = (PcdGet32 (PcdUefiLibMaxPrintBufferSize) + 1) * sizeof (CHAR16);
 
   Buffer = (CHAR16 *)AllocatePool (BufferSize);
-  ASSERT (Buffer != NULL);
+
+  if (Buffer == NULL) {
+    ASSERT (Buffer != NULL);
+    return 0;
+  }
 
   PrintNum = UnicodeSPrintAsciiFormat (Buffer, BufferSize, Format, Marker);
 

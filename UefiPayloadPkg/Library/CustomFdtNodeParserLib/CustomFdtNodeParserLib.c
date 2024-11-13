@@ -87,6 +87,10 @@ FitIsHobNeed (
     }
 
     if (Hob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION) {
+      if (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadSmbios3TableGuid)) {
+        return FALSE;
+      }
+
       if (CompareGuid (&Hob.Guid->Name, &gUniversalPayloadSerialPortInfoGuid)) {
         return FALSE;
       }

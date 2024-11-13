@@ -173,14 +173,8 @@
   UefiCpuPkg/Library/AmdSvsmLibNull/AmdSvsmLibNull.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
   UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
-  UefiCpuPkg/SecCore/SecCore.inf {
-    <LibraryClasses>
-      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-  }
-  UefiCpuPkg/SecCore/SecCoreNative.inf {
-    <LibraryClasses>
-      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-  }
+  UefiCpuPkg/SecCore/SecCore.inf
+  UefiCpuPkg/SecCore/SecCoreNative.inf
   UefiCpuPkg/SecMigrationPei/SecMigrationPei.inf
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
   UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf {
@@ -224,6 +218,7 @@
 [Components.RISCV64]
   UefiCpuPkg/Library/BaseRiscV64CpuExceptionHandlerLib/BaseRiscV64CpuExceptionHandlerLib.inf
   UefiCpuPkg/Library/BaseRiscV64CpuTimerLib/BaseRiscV64CpuTimerLib.inf
+  UefiCpuPkg/Library/BaseRiscVFpuLib/BaseRiscVFpuLib.inf
   UefiCpuPkg/Library/BaseRiscVMmuLib/BaseRiscVMmuLib.inf
   UefiCpuPkg/CpuTimerDxeRiscV64/CpuTimerDxeRiscV64.inf
   UefiCpuPkg/CpuDxeRiscV64/CpuDxeRiscV64.inf

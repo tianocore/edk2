@@ -9,17 +9,13 @@
 **/
 
 #include <Uefi.h>
-
+#include <RedfishCommon.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/RedfishDebugLib.h>
 #include <Library/RedfishHttpLib.h>
 #include <Library/UefiLib.h>
-
-#ifndef IS_EMPTY_STRING
-#define IS_EMPTY_STRING(a)  ((a) == NULL || (a)[0] == '\0')
-#endif
 
 #define REDFISH_JSON_STRING_LENGTH          200
 #define REDFISH_JSON_OUTPUT_FORMAT          (EDKII_JSON_COMPACT | EDKII_JSON_INDENT(2))

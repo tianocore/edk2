@@ -182,9 +182,6 @@
   DebugLib|ArmVirtPkg/Library/DebugLibFdtPL011Uart/DebugLibFdtPL011UartFlash.inf
 !endif
 
-  # ARM platforms have SEC modules with standard entry points, so we can generically link StackCheckLib
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-
 [LibraryClasses.common.PEI_CORE]
   PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
@@ -381,8 +378,10 @@
 
   #
   # Enable NX memory protection for all non-code regions, including OEM and OS
-  # reserved ones, with the exception of LoaderData regions, of which OS loaders
-  # (i.e., GRUB) may assume that its contents are executable.
+  # reserved ones.
+  # By passing --pcd PcdDxeNxMemoryProtectionPolicy=0xC000000000007FD1 on the
+  # build command line you can allow code execution in EfiLoaderData. This is
+  # required when using some outdated GRUB versions.
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdDxeNxMemoryProtectionPolicy|0xC000000000007FD5
 

@@ -1,15 +1,13 @@
 /** @file
   Config SMRAM Save State for SmmBases Relocation.
 
-  Copyright (C) 2023 Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
   Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 #include "InternalSmmRelocationLib.h"
 #include <Register/Amd/SmramSaveStateMap.h>
-
-#define EFER_ADDRESS  0XC0000080ul
 
 /**
   Get the mode of the CPU at the time an SMI occurs
@@ -23,13 +21,14 @@ GetMmSaveStateRegisterLma (
   VOID
   )
 {
-  UINT8   SmmSaveStateRegisterLma;
-  UINT32  LMAValue;
+  UINT8                   SmmSaveStateRegisterLma;
+  MSR_IA32_EFER_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_EFER);
 
   SmmSaveStateRegisterLma = (UINT8)EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT;
 
-  LMAValue = (UINT32)AsmReadMsr64 (EFER_ADDRESS) & LMA;
-  if (LMAValue) {
+  if (Msr.Bits.LMA) {
     SmmSaveStateRegisterLma = (UINT8)EFI_MM_SAVE_STATE_REGISTER_LMA_64BIT;
   }
 
@@ -91,34 +90,25 @@ HookReturnFromSmm (
 {
   UINT64                    OriginalInstructionPointer;
   AMD_SMRAM_SAVE_STATE_MAP  *AmdCpuState;
+  MSR_IA32_EFER_REGISTER    Msr;
 
   AmdCpuState = (AMD_SMRAM_SAVE_STATE_MAP *)CpuState;
 
-  if (GetMmSaveStateRegisterLma () == EFI_MM_SAVE_STATE_REGISTER_LMA_32BIT) {
-    OriginalInstructionPointer = (UINT64)AmdCpuState->x86._EIP;
-    AmdCpuState->x86._EIP      = (UINT32)NewInstructionPointer;
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((AmdCpuState->x86.AutoHALTRestart & BIT0) != 0) {
-      AmdCpuState->x86.AutoHALTRestart &= ~BIT0;
-    }
-  } else {
-    OriginalInstructionPointer = AmdCpuState->x64._RIP;
-    if ((AmdCpuState->x64.EFER & LMA) == 0) {
-      AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer32;
-    } else {
-      AmdCpuState->x64._RIP = (UINT32)NewInstructionPointer;
-    }
+  OriginalInstructionPointer = AmdCpuState->x64._RIP;
+  Msr.Uint64                 = AmdCpuState->x64.EFER;
 
-    //
-    // Clear the auto HALT restart flag so the RSM instruction returns
-    // program control to the instruction following the HLT instruction.
-    //
-    if ((AmdCpuState->x64.AutoHALTRestart & BIT0) != 0) {
-      AmdCpuState->x64.AutoHALTRestart &= ~BIT0;
-    }
+  if (!Msr.Bits.LMA) {
+    AmdCpuState->x64._RIP = NewInstructionPointer32;
+  } else {
+    AmdCpuState->x64._RIP = NewInstructionPointer;
+  }
+
+  //
+  // Clear the auto HALT restart flag so the RSM instruction returns
+  // program control to the instruction following the HLT instruction.
+  //
+  if ((AmdCpuState->x64.AutoHALTRestart & BIT0) != 0) {
+    AmdCpuState->x64.AutoHALTRestart &= ~BIT0;
   }
 
   return OriginalInstructionPointer;

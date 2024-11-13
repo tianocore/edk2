@@ -75,6 +75,8 @@
   SmmRelocationLib|Include/Library/SmmRelocationLib.h
 
 [LibraryClasses.RISCV64]
+  ##  @libraryclass  Provides function to initialize the FPU.
+  RiscVFpuLib|Include/Library/BaseRiscVFpuLib.h
   ##  @libraryclass  Provides functions to manage MMU features on RISCV64 CPUs.
   ##
   RiscVMmuLib|Include/Library/BaseRiscVMmuLib.h
@@ -259,6 +261,14 @@
   #
   # @Prompt BSP Broadcast Method for the first-time wakeup of APs
   gUefiCpuPkgTokenSpaceGuid.PcdFirstTimeWakeUpAPsBySipi|TRUE|BOOLEAN|0x30002007
+
+  ## The max mapping address in page table before Temp Ram Exit.
+  # After physical memory is initialized and before Temp Ram Exit, the physical memory is in UC state.
+  # The PCD controls the page table max mapping address in physical memory before Temp Ram Exit
+  # because creating a big page table in UC physical memory to cover the entire memory space
+  # is slow. The value of 0xFFFFFFFFFFFFFFFF, then firmware will map entire physical address space.
+  # @Prompt Configure max mapping address in page table before Temp Ram Exit.
+  gUefiCpuPkgTokenSpaceGuid.PcdMaxMappingAddressBeforeTempRamExit|0xFFFFFFFFFFFFFFFF|UINT64|0x30002008
 
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.

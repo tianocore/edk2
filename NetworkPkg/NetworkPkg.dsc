@@ -62,10 +62,6 @@
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
 
-# StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
-[LibraryClasses.common.SEC]
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-
 [LibraryClasses.common.UEFI_DRIVER]
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf

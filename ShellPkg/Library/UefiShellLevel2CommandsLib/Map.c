@@ -82,7 +82,11 @@ SearchList (
        )
   {
     TempList = StrnCatGrow (&TempList, NULL, ListWalker, 0);
-    ASSERT (TempList != NULL);
+    if (TempList == NULL) {
+      ASSERT (TempList != NULL);
+      return (FALSE);
+    }
+
     TempSpot = StrStr (TempList, Target);
     if (TempSpot != NULL) {
       *TempSpot = CHAR_NULL;
