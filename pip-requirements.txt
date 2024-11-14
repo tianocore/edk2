@@ -13,7 +13,7 @@
 ##
 
 edk2-pytool-library~=0.21.9
-edk2-pytool-extensions~=0.27.10
+edk2-pytool-extensions~=0.28.0
 antlr4-python3-runtime>=4.7.1
 lcov-cobertura==2.0.2
 regex==2024.7.24
