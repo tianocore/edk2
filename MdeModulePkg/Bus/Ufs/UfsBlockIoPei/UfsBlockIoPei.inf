@@ -28,7 +28,6 @@
   UfsBlockIoPei.c
   UfsBlockIoPei.h
   UfsHci.c
-  UfsHci.h
   UfsHcMem.c
   UfsHcMem.h
   DmaMem.c
