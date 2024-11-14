@@ -47,8 +47,8 @@ formset
           prompt = STRING_TOKEN(STR_TCG2_DEVICE_PROMPT),
           help   = STRING_TOKEN(STR_TCG2_DEVICE_HELP),
           flags  = INTERACTIVE,
-            option text = STRING_TOKEN(STR_TCG2_TPM_1_2),          value = TPM_DEVICE_1_2,          flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
-            option text = STRING_TOKEN(STR_TCG2_TPM_2_0_DTPM),     value = TPM_DEVICE_2_0_DTPM,     flags = RESET_REQUIRED;
+            option text = STRING_TOKEN(STR_TCG2_TPM_1_2),          value = TPM_DEVICE_1_2,          flags = RESET_REQUIRED;
+            option text = STRING_TOKEN(STR_TCG2_TPM_2_0_DTPM),     value = TPM_DEVICE_2_0_DTPM,     flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
     endoneof;
 
     suppressif ideqvallist TCG2_CONFIGURATION.TpmDevice == TPM_DEVICE_NULL TPM_DEVICE_1_2;
