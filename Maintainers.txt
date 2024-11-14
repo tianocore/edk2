@@ -609,11 +609,15 @@ M: Ard Biesheuvel <ardb+tianocore@kernel.org> [ardbiesheuvel]
 M: Sami Mujawar <sami.mujawar@arm.com> [samimujawar]
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
 R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
+R: Dun Tan <dun.tan@intel.com> [td36]
 
 UefiCpuPkg
 F: UefiCpuPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
+M: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
+R: Zhiguang Liu <zhiguang.liu@intel.com> [LiuZhiguang001]
+R: Dun Tan <dun.tan@intel.com> [td36]
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 R: Gerd Hoffmann <kraxel@redhat.com> [kraxel]
 R: Jiaxin Wu <jiaxin.wu@intel.com> [jiaxinwu]
