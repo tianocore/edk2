@@ -74,8 +74,12 @@
       #   X64 specific
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiHpetLib/AcpiHpetLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiMadtLib/AcpiMadtLib.inf
-      NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiWsmtLib/AcpiWsmtLib.inf
+      # AML Codegen
+      #  Common
+      NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSsdtCpuTopologyLib/SsdtCpuTopologyLib.inf
+      #  X64 specific
+      NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
   }
 
 [Components.ARM, Components.AARCH64]
