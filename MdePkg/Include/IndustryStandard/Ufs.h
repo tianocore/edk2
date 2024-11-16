@@ -8,8 +8,8 @@
 
   @par Revision Reference:
   JESD220 - Universal Flash Storage (UFS)
-  Version 2.0
-  https://www.jedec.org/system/files/docs/JESD220C-2_1.pdf
+  Version 4.0
+  https://www.jedec.org/system/files/docs/JESD220F.pdf
 --*/
 
 #ifndef __UFS_H__
@@ -33,7 +33,7 @@
 #pragma pack(1)
 
 //
-// UFS 2.0 Spec Section 10.5.3 - UTP Command UPIU
+// UFS 4.0 Spec Table 10.13 - UTP Command UPIU
 //
 typedef struct {
   //
@@ -50,16 +50,17 @@ typedef struct {
   // DW1
   //
   UINT8     CmdSet    : 4;    /* Command Set Type */
-  UINT8     Rsvd1     : 4;
+  UINT8     Iid       : 4;    /* Initiator ID */
+  UINT8     Rsvd1;
   UINT8     Rsvd2;
-  UINT8     Rsvd3;
-  UINT8     Rsvd4;
+  UINT8     Rsvd3     : 4;
+  UINT8     Ext_Iid   : 4;    /* Initiator ID Extended */
 
   //
   // DW2
   //
   UINT8     EhsLen;           /* Total EHS Length - 0x00 */
-  UINT8     Rsvd5;
+  UINT8     Rsvd4;
   UINT16    DataSegLen;       /* Data Segment Length - Big Endian - 0x0000 */
 
   //
@@ -74,7 +75,7 @@ typedef struct {
 } UTP_COMMAND_UPIU;
 
 //
-// UFS 2.0 Spec Section 10.5.4 - UTP Response UPIU
+// UFS 4.0 Spec Table 10.15 - UTP Response UPIU
 //
 typedef struct {
   //
@@ -91,8 +92,9 @@ typedef struct {
   // DW1
   //
   UINT8     CmdSet    : 4;    /* Command Set Type */
+  UINT8     Iid       : 4;    /* Initiator ID */
   UINT8     Rsvd1     : 4;
-  UINT8     Rsvd2;
+  UINT8     Ext_Iid   : 4;    /* Initiator ID Extended */
   UINT8     Response;         /* Response */
   UINT8     Status;           /* Status */
 
@@ -111,7 +113,7 @@ typedef struct {
   //
   // DW4 - DW7
   //
-  UINT8     Rsvd3[16];
+  UINT8     Rsvd2[16];
 
   //
   // Data Segment - Sense Data
@@ -121,7 +123,7 @@ typedef struct {
 } UTP_RESPONSE_UPIU;
 
 //
-// UFS 2.0 Spec Section 10.5.5 - UTP Data-Out UPIU
+// UFS 4.0 Spec Table 10.21 - UTP Data-Out UPIU
 //
 typedef struct {
   //
@@ -137,13 +139,17 @@ typedef struct {
   //
   // DW1
   //
-  UINT8     Rsvd1[4];
+  UINT8     Rsvd1     : 4;
+  UINT8     Iid       : 4;    /* Initiator ID */
+  UINT8     Rsvd2[2];
+  UINT8     Rsvd3     : 4;
+  UINT8     Ext_Iid   : 4;    /* Initiator ID Extended */
 
   //
   // DW2
   //
   UINT8     EhsLen;           /* Total EHS Length - 0x00 */
-  UINT8     Rsvd2;
+  UINT8     Rsvd4;
   UINT16    DataSegLen;       /* Data Segment Length - Big Endian */
 
   //
@@ -159,7 +165,7 @@ typedef struct {
   //
   // DW5 - DW7
   //
-  UINT8     Rsvd3[12];
+  UINT8     Rsvd5[12];
 
   //
   // Data Segment - Data to be sent out
@@ -168,7 +174,7 @@ typedef struct {
 } UTP_DATA_OUT_UPIU;
 
 //
-// UFS 2.0 Spec Section 10.5.6 - UTP Data-In UPIU
+// UFS 4.0 Spec Table 10.23 - UTP Data-In UPIU
 //
 typedef struct {
   //
@@ -184,13 +190,17 @@ typedef struct {
   //
   // DW1
   //
-  UINT8     Rsvd1[4];
+  UINT8     Rsvd1     : 4;
+  UINT8     Iid       : 4;    /* Initiator ID */
+  UINT8     Rsvd2     : 4;
+  UINT8     Ext_Iid   : 4;    /* Initiator ID Extended */
+  UINT8     Rsvd3[2];
 
   //
   // DW2
   //
   UINT8     EhsLen;           /* Total EHS Length - 0x00 */
-  UINT8     Rsvd2;
+  UINT8     Rsvd4;
   UINT16    DataSegLen;       /* Data Segment Length - Big Endian */
 
   //
@@ -204,9 +214,24 @@ typedef struct {
   UINT32    DataTranCount;    /* Data Transfer Count - Big Endian */
 
   //
-  // DW5 - DW7
+  // DW5
   //
-  UINT8     Rsvd3[12];
+  UINT8     HintControl : 4;  /* Hint Control */
+  UINT8     Rsvd5       : 4;
+  UINT8     HintIid     : 4;  /* Hint Initiator ID */
+  UINT8     HintExt_Iid : 4;  /* Hint Initiator ID Extended */
+  UINT8     HintLun;          /* Hint LUN */
+  UINT8     HintTaskTag;      /* Hint Task Tag */
+
+  //
+  // DW6
+  //
+  UINT32    HintDataBufOffset;  /* Hint Data Buffer Offset - Big Endian */
+
+  //
+  // DW7
+  //
+  UINT32    HintDataCount;    /* Hint Data Count - Big Endian */
 
   //
   // Data Segment - Data to be read
@@ -215,7 +240,7 @@ typedef struct {
 } UTP_DATA_IN_UPIU;
 
 //
-// UFS 2.0 Spec Section 10.5.7 - UTP Ready-To-Transfer UPIU
+// UFS 4.0 Spec Table 10.25 - UTP Ready-To-Transfer UPIU
 //
 typedef struct {
   //
@@ -231,13 +256,17 @@ typedef struct {
   //
   // DW1
   //
-  UINT8     Rsvd1[4];
+  UINT8     Rsvd1     : 4;
+  UINT8     Iid       : 4;    /* Initiator ID */
+  UINT8     Rsvd2     : 4;
+  UINT8     Ext_Iid   : 4;    /* Initiator ID Extended */
+  UINT8     Rsvd3[2];
 
   //
   // DW2
   //
   UINT8     EhsLen;           /* Total EHS Length - 0x00 */
-  UINT8     Rsvd2;
+  UINT8     Rsvd4;
   UINT16    DataSegLen;       /* Data Segment Length - Big Endian - 0x0000 */
 
   //
@@ -251,9 +280,24 @@ typedef struct {
   UINT32    DataTranCount;    /* Data Transfer Count - Big Endian */
 
   //
-  // DW5 - DW7
+  // DW5
   //
-  UINT8     Rsvd3[12];
+  UINT8     HintControl : 4;  /* Hint Control */
+  UINT8     Rsvd5       : 4;
+  UINT8     HintIid     : 4;  /* Hint Initiator ID */
+  UINT8     HintExt_Iid : 4;  /* Hint Initiator ID Extended */
+  UINT8     HintLun;          /* Hint LUN */
+  UINT8     HintTaskTag;      /* Hint Task Tag */
+
+  //
+  // DW6
+  //
+  UINT32    HintDataBufOffset;  /* Hint Data Buffer Offset - Big Endian */
+
+  //
+  // DW7
+  //
+  UINT32    HintDataCount;    /* Hint Data Count - Big Endian */
 
   //
   // Data Segment - Data to be read
@@ -262,7 +306,7 @@ typedef struct {
 } UTP_RDY_TO_TRAN_UPIU;
 
 //
-// UFS 2.0 Spec Section 10.5.8 - UTP Task Management Request UPIU
+// UFS 4.0 Spec Table 10.27 - UTP Task Management Request UPIU
 //
 typedef struct {
   //
@@ -278,15 +322,18 @@ typedef struct {
   //
   // DW1
   //
-  UINT8     Rsvd1;
+  UINT8     Rsvd1     : 4;
+  UINT8     Iid       : 4;    /* Initiator ID */
   UINT8     TskManFunc;       /* Task Management Function */
-  UINT8     Rsvd2[2];
+  UINT8     Rsvd2;
+  UINT8     Rsvd3     : 4;
+  UINT8     Ext_Iid   : 4;    /* Initiator ID Extended */
 
   //
   // DW2
   //
   UINT8     EhsLen;           /* Total EHS Length - 0x00 */
-  UINT8     Rsvd3;
+  UINT8     Rsvd4;
   UINT16    DataSegLen;       /* Data Segment Length - Big Endian - 0x0000 */
 
   //
@@ -307,11 +354,11 @@ typedef struct {
   //
   // DW6 - DW7
   //
-  UINT8     Rsvd4[8];
+  UINT8     Rsvd5[8];
 } UTP_TM_REQ_UPIU;
 
 //
-// UFS 2.0 Spec Section 10.5.9 - UTP Task Management Response UPIU
+// UFS 4.0 Spec Table 10.30 - UTP Task Management Response UPIU
 //
 typedef struct {
   //
@@ -327,15 +374,18 @@ typedef struct {
   //
   // DW1
   //
-  UINT8     Rsvd1[2];
+  UINT8     Rsvd1     : 4;
+  UINT8     Iid       : 4;    /* Initiator ID */
+  UINT8     Rsvd2     : 4;
+  UINT8     Ext_Iid   : 4;    /* Initiator ID Extended */
   UINT8     Resp;             /* Response */
-  UINT8     Rsvd2;
+  UINT8     Rsvd3;
 
   //
   // DW2
   //
   UINT8     EhsLen;           /* Total EHS Length - 0x00 */
-  UINT8     Rsvd3;
+  UINT8     Rsvd4;
   UINT16    DataSegLen;       /* Data Segment Length - Big Endian - 0x0000 */
 
   //
@@ -351,9 +401,12 @@ typedef struct {
   //
   // DW5 - DW7
   //
-  UINT8     Rsvd4[12];
+  UINT8     Rsvd5[12];
 } UTP_TM_RESP_UPIU;
 
+//
+// UFS 4.0 Spec Table 10.35 - 10.57 - Transaction Specific Fields for (Genericized) Opcode
+//
 typedef struct {
   UINT8     Opcode;
   UINT8     DescId;
@@ -366,7 +419,7 @@ typedef struct {
 } UTP_UPIU_TSF;
 
 //
-// UFS 2.0 Spec Section 10.5.10 - UTP Query Request UPIU
+// UFS 4.0 Spec Table 10.33 - UTP Query Request UPIU
 //
 typedef struct {
   //
@@ -412,6 +465,9 @@ typedef struct {
 #define QUERY_FUNC_STD_READ_REQ   0x01
 #define QUERY_FUNC_STD_WRITE_REQ  0x81
 
+//
+// UFS 4.0 Spec Table 10.36 - Query Function opcode values
+//
 typedef enum {
   UtpQueryFuncOpcodeNop     = 0x00,
   UtpQueryFuncOpcodeRdDesc  = 0x01,
@@ -425,7 +481,7 @@ typedef enum {
 } UTP_QUERY_FUNC_OPCODE;
 
 //
-// UFS 2.0 Spec Section 10.5.11 - UTP Query Response UPIU
+// UFS 4.0 Spec Table 10.46 - UTP Query Response UPIU
 //
 typedef struct {
   //
@@ -469,6 +525,9 @@ typedef struct {
   // UINT8      Data[];        /* Data to be transferred, maximum is 65535 bytes */
 } UTP_QUERY_RESP_UPIU;
 
+//
+// UFS 4.0 Spec Table 10.47 - Query Response Code
+//
 typedef enum {
   UfsUtpQueryResponseSuccess             = 0x00,
   UfsUtpQueryResponseParamNotReadable    = 0xF6,
@@ -484,7 +543,7 @@ typedef enum {
 } UTP_QUERY_RESP_CODE;
 
 //
-// UFS 2.0 Spec Section 10.5.12 - UTP Reject UPIU
+// UFS 4.0 Spec Table 10.58 - UTP Reject UPIU
 //
 typedef struct {
   //
@@ -500,9 +559,12 @@ typedef struct {
   //
   // DW1
   //
-  UINT8     Rsvd1[2];
+  UINT8     Rsvd1     : 4;
+  UINT8     Iid       : 4;    /* Initiator ID */
+  UINT8     Rsvd2     : 4;
+  UINT8     Ext_Iid   : 4;    /* Initiator ID Extended */
   UINT8     Response;         /* Response - 0x01 */
-  UINT8     Rsvd2;
+  UINT8     Rsvd3;
 
   //
   // DW2
@@ -515,18 +577,18 @@ typedef struct {
   // DW3
   //
   UINT8     HdrSts;           /* Basic Header Status */
-  UINT8     Rsvd3;
-  UINT8     E2ESts;           /* End-to-End Status */
   UINT8     Rsvd4;
+  UINT8     E2ESts;           /* End-to-End Status */
+  UINT8     Rsvd5;
 
   //
   // DW4 - DW7
   //
-  UINT8     Rsvd5[16];
+  UINT8     Rsvd6[16];
 } UTP_REJ_UPIU;
 
 //
-// UFS 2.0 Spec Section 10.5.13 - UTP NOP OUT UPIU
+// UFS 4.0 Spec Table 10.61 - UTP NOP OUT UPIU
 //
 typedef struct {
   //
@@ -558,7 +620,7 @@ typedef struct {
 } UTP_NOP_OUT_UPIU;
 
 //
-// UFS 2.0 Spec Section 10.5.14 - UTP NOP IN UPIU
+// UFS 4.0 Spec Table 10.62 - UTP NOP IN UPIU
 //
 typedef struct {
   //
@@ -592,7 +654,7 @@ typedef struct {
 } UTP_NOP_IN_UPIU;
 
 //
-// UFS Descriptors
+// UFS 4.0 Spec Table 14.1 - Descriptor identification values
 //
 typedef enum {
   UfsDeviceDesc    = 0x00,
@@ -601,11 +663,12 @@ typedef enum {
   UfsInterConnDesc = 0x04,
   UfsStringDesc    = 0x05,
   UfsGeometryDesc  = 0x07,
-  UfsPowerDesc     = 0x08
+  UfsPowerDesc     = 0x08,
+  UfsDevHealthDesc = 0x09
 } UFS_DESC_IDN;
 
 //
-// UFS 2.0 Spec Section 14.1.6.2 - Device Descriptor
+// UFS 4.0 Spec Table 14.4 - Device Descriptor
 //
 typedef struct {
   UINT8     Length;
@@ -635,14 +698,70 @@ typedef struct {
   UINT8     Ud0ConfParamLen;
   UINT8     DevRttCap;
   UINT16    PeriodicRtcUpdate;
-  UINT8     Rsvd1[17];
+  UINT8     UFSFeaturesSupport; // Deprecated, use ExtendedUFSFeaturesSupport
+  UINT8     FFUTimeout;
+  UINT8     QueueDepth;
+  UINT16    DeviceVersion;
+  UINT8     NumSecureWPArea;
+  UINT32    PSAMaxDataSize;
+  UINT8     PSAStateTimeout;
+  UINT8     ProductRevisionLevel;
+  UINT8     Rsvd1[5];
   UINT8     Rsvd2[16];
+  UINT8     Rsvd3[3];
+  UINT8     Rsvd4[12];
+  UINT32    ExtendedUFSFeaturesSupport;
+  UINT8     WriteBoosterBufPreserveUserSpaceEn;
+  UINT8     WriteBoosterBufType;
+  UINT32    NumSharedWriteBoosterAllocUnits;
 } UFS_DEV_DESC;
 
+//
+// UFS 4.0 Spec Table 14.4 (Offset 10h) - Specification version
+//
+typedef union {
+  struct {
+    UINT8    Suffix : 4;
+    UINT8    Minor  : 4;
+    UINT8    Major;
+  } Bits;
+  UINT16    Data;
+} UFS_SPEC_VERSION;
+
+//
+// UFS 4.0 Spec Table 14.4 (Offset 4Fh) - Extended UFS Features Support
+//
+typedef union {
+  struct {
+    UINT32    FFU                   : 1;
+    UINT32    PSA                   : 1;
+    UINT32    DeviceLifeSpan        : 1;
+    UINT32    RefreshOperation      : 1;
+    UINT32    TooHighTemp           : 1;
+    UINT32    TooLowTemp            : 1;
+    UINT32    ExtendedTemp          : 1;
+    UINT32    Rsvd1                 : 1;
+    UINT32    WriteBooster          : 1;
+    UINT32    PerformanceThrottling : 1;
+    UINT32    AdvancedRPMB          : 1;
+    UINT32    Rsvd2                 : 3;
+    UINT32    Barrier               : 1;
+    UINT32    ClearErrorHistory     : 1;
+    UINT32    Ext_Iid               : 1;
+    UINT32    Rsvd3                 : 1;
+    UINT32    Rsvd4                 : 14;
+  } Bits;
+  UINT32    Data;
+} EXTENDED_UFS_FEATURES_SUPPORT;
+
+//
+// UFS 4.0 Spec Table 14.10 - Configuration Descriptor Header (INDEX = 0)
+//  and Device Descriptor Configuration parameters
+//
 typedef struct {
   UINT8     Length;
   UINT8     DescType;
-  UINT8     Rsvd1;
+  UINT8     ConfDescContinue;
   UINT8     BootEn;
   UINT8     DescAccessEn;
   UINT8     InitPowerMode;
@@ -650,9 +769,29 @@ typedef struct {
   UINT8     SecureRemovalType;
   UINT8     InitActiveIccLevel;
   UINT16    PeriodicRtcUpdate;
-  UINT8     Rsvd2[5];
+  UINT8     Rsvd1;
+  UINT8     RpmbRegionEnable;
+  UINT8     RpmbRegion1Size;
+  UINT8     RpmbRegion2Size;
+  UINT8     RpmbRegion3Size;
+  UINT8     WriteBoosterBufPreserveUserSpaceEn;
+  UINT8     WriteBoosterBufType;
+  UINT32    NumSharedWriteBoosterAllocUnits;
 } UFS_CONFIG_DESC_GEN_HEADER;
 
+//
+// UFS 4.0 Spec Table 14.11 - Configuration Descriptor Header (INDEX = 1/2/3)
+//
+typedef struct {
+  UINT8    Length;
+  UINT8    DescType;
+  UINT8    ConfDescContinue;
+  UINT8    Rsvd1[19];
+} UFS_CONFIG_DESC_EXT_HEADER;
+
+//
+// UFS 4.0 Spec Table 14.12 - UNit Descriptor configurable parameters
+//
 typedef struct {
   UINT8     LunEn;
   UINT8     BootLunId;
@@ -664,10 +803,18 @@ typedef struct {
   UINT8     ProvisionType;
   UINT16    CtxCap;
   UINT8     Rsvd1[3];
+  UINT8     Rsvd2[6];
+  UINT32    LuNumWriteBoosterBufAllocUnits;
 } UFS_UNIT_DESC_CONFIG_PARAMS;
 
 //
-// UFS 2.0 Spec Section 14.1.6.3 - Configuration Descriptor
+// UFS 4.0 Spec Table 14.6 - Configuration Descriptor Format
+//
+// WARNING: This struct contains variable-size members! (across spec versions)
+// To maintain backward compatibility, UnitDescConfParams should not be
+// accessed as a struct member.
+// Instead, use `Ud0BaseOffset` and `Ud0ConfParamLen` from the Device
+// Descriptor to calculate the offset and location of the Unit Descriptors.
 //
 typedef struct {
   UFS_CONFIG_DESC_GEN_HEADER     Header;
@@ -675,7 +822,7 @@ typedef struct {
 } UFS_CONFIG_DESC;
 
 //
-// UFS 2.0 Spec Section 14.1.6.4 - Geometry Descriptor
+// UFS 4.0 Spec Table 14.13 - Geometry Descriptor
 //
 typedef struct {
   UINT8     Length;
@@ -683,7 +830,7 @@ typedef struct {
   UINT8     MediaTech;
   UINT8     Rsvd1;
   UINT64    TotalRawDevCapacity;
-  UINT8     Rsvd2;
+  UINT8     MaxNumberLu;
   UINT32    SegSize;
   UINT8     AllocUnitSize;
   UINT8     MinAddrBlkSize;
@@ -692,7 +839,7 @@ typedef struct {
   UINT8     MaxInBufSize;
   UINT8     MaxOutBufSize;
   UINT8     RpmbRwSize;
-  UINT8     Rsvd3;
+  UINT8     DynamicCapacityResourcePolicy;
   UINT8     DataOrder;
   UINT8     MaxCtxIdNum;
   UINT8     SysDataTagUnitSize;
@@ -711,10 +858,18 @@ typedef struct {
   UINT16    Enhance3CapAdjFac;
   UINT32    Enhance4MaxNumAllocUnits;
   UINT16    Enhance4CapAdjFac;
+  UINT32    OptLogicBlkSize;
+  UINT8     Rsvd2[5];
+  UINT8     Rsvd3[2];
+  UINT32    WriteBoosterBufMaxNumAllocUnits;
+  UINT8     DeviceMaxWriteBoosterLus;
+  UINT8     WriteBoosterBufCapAdjFac;
+  UINT8     SupWriteBoosterBufUserSpaceReductionTypes;
+  UINT8     SupWriteBoosterBufTypes;
 } UFS_GEOMETRY_DESC;
 
 //
-// UFS 2.0 Spec Section 14.1.6.5 - Unit Descriptor
+// UFS 4.0 Spec Table 14.14 - Unit Descriptor
 //
 typedef struct {
   UINT8     Length;
@@ -724,7 +879,7 @@ typedef struct {
   UINT8     BootLunId;
   UINT8     LunWriteProt;
   UINT8     LunQueueDep;
-  UINT8     Rsvd1;
+  UINT8     PsaSensitive;
   UINT8     MemType;
   UINT8     DataReliability;
   UINT8     LogicBlkSize;
@@ -734,10 +889,12 @@ typedef struct {
   UINT64    PhyMemResCount;
   UINT16    CtxCap;
   UINT8     LargeUnitGranularity;
+  UINT8     Rsvd1[6];
+  UINT32    LuNumWriteBoosterBufAllocUnits;
 } UFS_UNIT_DESC;
 
 //
-// UFS 2.0 Spec Section 14.1.6.6 - RPMB Unit Descriptor
+// UFS 4.0 Spec Table 14.15 - RPMB Unit Descriptor
 //
 typedef struct {
   UINT8     Length;
@@ -747,25 +904,31 @@ typedef struct {
   UINT8     BootLunId;
   UINT8     LunWriteProt;
   UINT8     LunQueueDep;
-  UINT8     Rsvd1;
+  UINT8     PsaSensitive;
   UINT8     MemType;
-  UINT8     Rsvd2;
+  UINT8     RpmbRegionEnable;
   UINT8     LogicBlkSize;
   UINT64    LogicBlkCount;
-  UINT32    EraseBlkSize;
+  UINT8     RpmbRegion0Size;
+  UINT8     RpmbRegion1Size;
+  UINT8     RpmbRegion2Size;
+  UINT8     RpmbRegion3Size;
   UINT8     ProvisionType;
   UINT64    PhyMemResCount;
   UINT8     Rsvd3[3];
 } UFS_RPMB_UNIT_DESC;
 
+//
+// UFS 4.0 Spec Table 7.13 - Format for Power Parameter element
+//
 typedef struct {
-  UINT16    Value : 10;
-  UINT16    Rsvd1 : 4;
+  UINT16    Value : 12;
+  UINT16    Rsvd1 : 2;
   UINT16    Unit  : 2;
 } UFS_POWER_PARAM_ELEMENT;
 
 //
-// UFS 2.0 Spec Section 14.1.6.7 - Power Parameter Descriptor
+// UFS 4.0 Spec Table 14.16 - Power Parameters Descriptor
 //
 typedef struct {
   UINT8                      Length;
@@ -776,7 +939,7 @@ typedef struct {
 } UFS_POWER_DESC;
 
 //
-// UFS 2.0 Spec Section 14.1.6.8 - InterConnect Descriptor
+// UFS 4.0 Spec Table 14.17 - Interconnect Descriptor
 //
 typedef struct {
   UINT8     Length;
@@ -786,7 +949,7 @@ typedef struct {
 } UFS_INTER_CONNECT_DESC;
 
 //
-// UFS 2.0 Spec Section 14.1.6.9 - 14.1.6.12 - String Descriptor
+// UFS 4.0 Spec Table 14.18 - 14.22 - String Descriptor
 //
 typedef struct {
   UINT8     Length;
@@ -795,40 +958,63 @@ typedef struct {
 } UFS_STRING_DESC;
 
 //
-// UFS 2.0 Spec Section 14.2 - Flags
+// UFS 4.0 Spec Table 14.26 - Flags
 //
 typedef enum {
-  UfsFlagDevInit         = 0x01,
-  UfsFlagPermWpEn        = 0x02,
-  UfsFlagPowerOnWpEn     = 0x03,
-  UfsFlagBgOpsEn         = 0x04,
-  UfsFlagPurgeEn         = 0x06,
-  UfsFlagPhyResRemoval   = 0x08,
-  UfsFlagBusyRtc         = 0x09,
-  UfsFlagPermDisFwUpdate = 0x0B
+  UfsFlagDevInit             = 0x01,
+  UfsFlagPermWpEn            = 0x02,
+  UfsFlagPowerOnWpEn         = 0x03,
+  UfsFlagBgOpsEn             = 0x04,
+  UfsFlagDevLifeSpanModeEn   = 0x05,
+  UfsFlagPurgeEn             = 0x06,
+  UfsFlagRefreshEn           = 0x07,
+  UfsFlagPhyResRemoval       = 0x08,
+  UfsFlagBusyRtc             = 0x09,
+  UfsFlagPermDisFwUpdate     = 0x0B,
+  UfsFlagWriteBoosterEn      = 0x0E,
+  UfsFlagWbBufFlushEn        = 0x0F,
+  UfsFlagWbBufFlushHibernate = 0x10
 } UFS_FLAGS_IDN;
 
 //
-// UFS 2.0 Spec Section 14.2 - Attributes
+// UFS 4.0 Spec Table 14.28 - Attributes
 //
 typedef enum {
-  UfsAttrBootLunEn        = 0x00,
-  UfsAttrCurPowerMode     = 0x02,
-  UfsAttrActiveIccLevel   = 0x03,
-  UfsAttrOutOfOrderDataEn = 0x04,
-  UfsAttrBgOpStatus       = 0x05,
-  UfsAttrPurgeStatus      = 0x06,
-  UfsAttrMaxDataInSize    = 0x07,
-  UfsAttrMaxDataOutSize   = 0x08,
-  UfsAttrDynCapNeeded     = 0x09,
-  UfsAttrRefClkFreq       = 0x0a,
-  UfsAttrConfigDescLock   = 0x0b,
-  UfsAttrMaxNumOfRtt      = 0x0c,
-  UfsAttrExceptionEvtCtrl = 0x0d,
-  UfsAttrExceptionEvtSts  = 0x0e,
-  UfsAttrSecondsPassed    = 0x0f,
-  UfsAttrContextConf      = 0x10,
-  UfsAttrCorrPrgBlkNum    = 0x11
+  UfsAttrBootLunEn                    = 0x00,
+  UfsAttrCurPowerMode                 = 0x02,
+  UfsAttrActiveIccLevel               = 0x03,
+  UfsAttrOutOfOrderDataEn             = 0x04,
+  UfsAttrBgOpStatus                   = 0x05,
+  UfsAttrPurgeStatus                  = 0x06,
+  UfsAttrMaxDataInSize                = 0x07,
+  UfsAttrMaxDataOutSize               = 0x08,
+  UfsAttrDynCapNeeded                 = 0x09,
+  UfsAttrRefClkFreq                   = 0x0a,
+  UfsAttrConfigDescLock               = 0x0b,
+  UfsAttrMaxNumOfRtt                  = 0x0c,
+  UfsAttrExceptionEvtCtrl             = 0x0d,
+  UfsAttrExceptionEvtSts              = 0x0e,
+  UfsAttrSecondsPassed                = 0x0f,
+  UfsAttrContextConf                  = 0x10,
+  UfsAttrDeviceFfuStatus              = 0x14,
+  UfsAttrPsaState                     = 0x15,
+  UfsAttrPsaDataSize                  = 0x16,
+  UfsAttrRefClkGatingWaitTime         = 0x17,
+  UfsAttrDeviceCaseRoughTemp          = 0x18,
+  UfsAttrDeviceTooHighTempBound       = 0x19,
+  UfsAttrDeviceTooLowTempBound        = 0x1a,
+  UfsAttrThrottlingStatus             = 0x1b,
+  UfsAttrWriteBoosterBufFlushStatus   = 0x1c,
+  UfsAttrAvailableWriteBoosterBufSize = 0x1d,
+  UfsAttrWriteBoosterBufLifeTimeEst   = 0x1e,
+  UfsAttrCurrentWriteBoosterBufSize   = 0x1f,
+  UfsAttrExtIidEn                     = 0x2a,
+  UfsAttrHostHintCacheSize            = 0x2b,
+  UfsAttrRefreshStatus                = 0x2c,
+  UfsAttrRefreshFreq                  = 0x2d,
+  UfsAttrRefreshUnit                  = 0x2e,
+  UfsAttrRefreshMethod                = 0x2f,
+  UfsAttrTimestamp                    = 0x30
 } UFS_ATTR_IDN;
 
 #pragma pack()
