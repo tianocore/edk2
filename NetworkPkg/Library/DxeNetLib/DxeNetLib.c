@@ -144,7 +144,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED VLAN_DEVICE_PATH  mNetVlanDevicePathTemplate = {
 // If your platform needs to use a specific algorithm for the random number
 // generator, then you should modify this array.
 //
-static GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID  *mSecureHashAlgorithms[] = {
+static EFI_GUID *CONST  mSecureHashAlgorithms[] = {
   &gEfiRngAlgorithmSp80090Ctr256Guid,  // SP800-90A DRBG CTR using AES-256
   &gEfiRngAlgorithmSp80090Hmac256Guid, // SP800-90A DRBG HMAC using SHA-256
   &gEfiRngAlgorithmSp80090Hash256Guid, // SP800-90A DRBG Hash using SHA-256
