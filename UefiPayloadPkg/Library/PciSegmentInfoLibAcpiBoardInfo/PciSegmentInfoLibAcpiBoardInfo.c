@@ -41,8 +41,10 @@ RetrieveMultiSegmentInfoFromHob (
   OUT UINTN                               *NumberOfRootBridges
   )
 {
-  UINTN  Size;
-  UINT8  Index;
+  UINTN             Size;
+  UINT8             Index;
+  UINT8             Index2;
+  PCI_SEGMENT_INFO  *pPciSegments;
 
   if (PciRootBridgeInfo == NULL) {
     mPciSegments = NULL;
@@ -55,19 +57,44 @@ RetrieveMultiSegmentInfoFromHob (
   mPciSegments = (PCI_SEGMENT_INFO *)AllocatePool (Size);
   ASSERT (mPciSegments != NULL);
   ZeroMem (mPciSegments, PciRootBridgeInfo->Count * sizeof (PCI_SEGMENT_INFO));
+  pPciSegments = (PCI_SEGMENT_INFO *)AllocatePool (Size);
+  ASSERT (pPciSegments != NULL);
+  ZeroMem (pPciSegments, PciRootBridgeInfo->Count * sizeof (PCI_SEGMENT_INFO));
 
   //
   // Create all root bridges with PciRootBridgeInfoHob
   //
   for (Index = 0; Index < PciRootBridgeInfo->Count; Index++) {
     if (UplSegmentInfo->SegmentInfo[Index].SegmentNumber == (UINT16)(PciRootBridgeInfo->RootBridge[Index].Segment)) {
-      mPciSegments[Index].BaseAddress = UplSegmentInfo->SegmentInfo[Index].BaseAddress;
+      pPciSegments[Index].BaseAddress = UplSegmentInfo->SegmentInfo[Index].BaseAddress;
     }
 
-    mPciSegments[Index].SegmentNumber  = (UINT16)(PciRootBridgeInfo->RootBridge[Index].Segment);
-    mPciSegments[Index].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Base;
-    mPciSegments[Index].EndBusNumber   = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Limit;
+    pPciSegments[Index].SegmentNumber  = (UINT16)(PciRootBridgeInfo->RootBridge[Index].Segment);
+    pPciSegments[Index].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Base;
+    pPciSegments[Index].EndBusNumber   = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Limit;
+
+    DEBUG ((DEBUG_INFO, "PciRootBridgeInfo->RootBridge[Index].Segment %x\n", PciRootBridgeInfo->RootBridge[Index].Segment));
+    DEBUG ((DEBUG_INFO, "UplSegmentInfo->SegmentInfo[Index].BaseAddress; %x\n", UplSegmentInfo->SegmentInfo[Index].BaseAddress));
+    DEBUG ((DEBUG_INFO, "PciRootBridgeInfo->RootBridge[Index].Bus.Base %x\n", PciRootBridgeInfo->RootBridge[Index].Bus.Base));
+    DEBUG ((DEBUG_INFO, "PciRootBridgeInfo->RootBridge[Index].Bus.Limit %x\n", PciRootBridgeInfo->RootBridge[Index].Bus.Limit));
   }
+
+  Index2 = 0;
+  CopyMem (&mPciSegments[0], &pPciSegments[0], sizeof (PCI_SEGMENT_INFO));
+
+  for (Index = 0; Index < PciRootBridgeInfo->Count; Index++) {
+    if (mPciSegments[Index2].SegmentNumber == pPciSegments[Index].SegmentNumber) {
+      mPciSegments[Index2].EndBusNumber =  pPciSegments[Index].EndBusNumber;
+    } else {
+      Index2++;
+      mPciSegments[Index2].SegmentNumber  = pPciSegments[Index].SegmentNumber;
+      mPciSegments[Index2].BaseAddress    = pPciSegments[Index].BaseAddress;
+      mPciSegments[Index2].StartBusNumber = pPciSegments[Index].StartBusNumber;
+      mPciSegments[Index2].EndBusNumber   = pPciSegments[Index].EndBusNumber;
+    }
+  }
+
+  *NumberOfRootBridges = Index2 == 0 ? 1 : Index2;
 
   return;
 }
@@ -159,6 +186,7 @@ Get_UPLSegInfo (
   UPL_PCI_SEGMENT_INFO_HOB          *UplSegmentInfo;
   EFI_HOB_GUID_TYPE                 *GuidHob;
   UNIVERSAL_PAYLOAD_GENERIC_HEADER  *GenericHeader;
+  ACPI_BOARD_INFO                   *AcpiBoardInfo;
 
   //
   // Find Universal Payload Segment Info hob
@@ -182,6 +210,14 @@ Get_UPLSegInfo (
   //
   UplSegmentInfo = (UPL_PCI_SEGMENT_INFO_HOB *)GET_GUID_HOB_DATA (GuidHob);
   if (UplSegmentInfo->Count <= (GET_GUID_HOB_DATA_SIZE (GuidHob) - sizeof (UPL_PCI_SEGMENT_INFO_HOB)) / sizeof (UPL_SEGMENT_INFO)) {
+    GuidHob = GetFirstGuidHob (&gUefiAcpiBoardInfoGuid);
+    if (GuidHob != NULL) {
+      AcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob);
+      if (UplSegmentInfo->SegmentInfo[0].BaseAddress == 0) {
+        UplSegmentInfo->SegmentInfo[0].BaseAddress = AcpiBoardInfo->PcieBaseAddress;
+      }
+    }
+
     return UplSegmentInfo;
   }
 
