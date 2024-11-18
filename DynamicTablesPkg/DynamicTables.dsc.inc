@@ -57,9 +57,10 @@
   #
   # Generators (IA32/X64 specific)
   #
-  DynamicTablesPkg/Library/Acpi/X64/AcpiWsmtLib/AcpiWsmtLib.inf
   DynamicTablesPkg/Library/Acpi/X64/AcpiHpetLib/AcpiHpetLib.inf
+  DynamicTablesPkg/Library/Acpi/X64/AcpiMadtLib/AcpiMadtLib.inf
   DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
+  DynamicTablesPkg/Library/Acpi/X64/AcpiWsmtLib/AcpiWsmtLib.inf
 
   #
   # Dynamic Table Factory Dxe
@@ -71,9 +72,10 @@
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiFadtLib/AcpiFadtLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/Common/AcpiSpmiLib/AcpiSpmiLib.inf
       #   X64 specific
-      NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiWsmtLib/AcpiWsmtLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiHpetLib/AcpiHpetLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiMadtLib/AcpiMadtLib.inf
       NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiSsdtHpetLib/AcpiSsdtHpetLib.inf
+      NULL|DynamicTablesPkg/Library/Acpi/X64/AcpiWsmtLib/AcpiWsmtLib.inf
   }
 
 [Components.ARM, Components.AARCH64]

@@ -518,4 +518,9 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |   9   | Miscellaneous Block Info                  | |
 |  10   | Windows protection flag Info              | |
 |  11   | HPET device Info                          | |
+|  12   | MADT Table Info                           | |
+|  13   | Local APIC and X2APIC info                | |
+|  14   | IO APIC info                              | |
+|  15   | Interrupt Source Override info            | |
+|  16   | Local APIC and X2APIC NMI info            | |
 |  `*`  | All other values are reserved.            | |
