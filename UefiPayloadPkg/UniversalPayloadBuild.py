@@ -266,13 +266,14 @@ def BuildUniversalPayload(Args):
         #
         RelocBinary     = b''
         PeCoff = pefile.PE (TargetRebaseFile)
-        for reloc in PeCoff.DIRECTORY_ENTRY_BASERELOC:
-            for entry in reloc.entries:
-                if (entry.type == 0):
-                    continue
-                Type = entry.type
-                Offset = entry.rva + fit_image_info_header.DataOffset
-                RelocBinary += Offset.to_bytes (8, 'little') + Type.to_bytes (8, 'little')
+        if hasattr(PeCoff, 'DIRECTORY_ENTRY_BASERELOC'):
+            for reloc in PeCoff.DIRECTORY_ENTRY_BASERELOC:
+                for entry in reloc.entries:
+                    if (entry.type == 0):
+                        continue
+                    Type = entry.type
+                    Offset = entry.rva + fit_image_info_header.DataOffset
+                    RelocBinary += Offset.to_bytes (8, 'little') + Type.to_bytes (8, 'little')
         RelocBinary += b'\x00' * (0x1000 - (len(RelocBinary) % 0x1000))
 
         #
