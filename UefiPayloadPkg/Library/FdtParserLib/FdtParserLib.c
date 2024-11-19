@@ -38,6 +38,7 @@ typedef enum {
   FrameBuffer,
   PciRootBridge,
   Options,
+  SerialPort,
   DoNothing
 } FDT_NODE_TYPE;
 
@@ -143,7 +144,9 @@ CheckNodeType (
   )
 {
   DEBUG ((DEBUG_INFO, "\n CheckNodeType  %a   \n", NodeString));
-  if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0 ) {
+  if (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0 ) {
+    return SerialPort;
+  } else if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0 ) {
     return ReservedMemory;
   } else if (AsciiStrnCmp (NodeString, "memory@", AsciiStrLen ("memory@")) == 0 ) {
     return Memory;
@@ -564,19 +567,20 @@ ParsegraphicNode (
 
   @param[in]  Fdt               Address of the Fdt data.
   @param[in]  SubNode           first Sub node of the PCI root bridge node.
+  @param[in]  AddressCells      #address-cells for serial port node 'reg' property.
 **/
 VOID
 ParseSerialPort (
-  IN VOID   *Fdt,
-  IN INT32  SubNode
+  IN VOID     *Fdt,
+  IN INT32    SubNode,
+  IN UINT32   AddressCells
   )
 {
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *Serial;
   CONST FDT_PROPERTY                  *PropertyPtr;
   INT32                               TempLen;
-  CONST CHAR8                         *TempStr;
   UINT32                              *Data32;
-  UINT32                              Attribute;
+  UINT32                              Value32;
 
   //
   // Create SerialPortInfo HOB.
@@ -590,41 +594,58 @@ ParseSerialPort (
   Serial->Header.Revision = UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO_REVISION;
   Serial->Header.Length   = sizeof (UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO);
   Serial->RegisterStride  = 1;
-  Serial->UseMmio         = 1;
+  Serial->UseMmio         = TRUE;
 
   PropertyPtr = FdtGetProperty (Fdt, SubNode, "current-speed", &TempLen);
   ASSERT (TempLen > 0);
   if (TempLen > 0) {
     Data32 = (UINT32 *)(PropertyPtr->Data);
-    DEBUG ((DEBUG_INFO, "  %X", Fdt32ToCpu (*Data32)));
     Serial->BaudRate = Fdt32ToCpu (*Data32);
   }
 
-  PropertyPtr = FdtGetProperty (Fdt, SubNode, "compatible", &TempLen);
-  TempStr     = (CHAR8 *)(PropertyPtr->Data);
-  if (AsciiStrnCmp (TempStr, "isa", AsciiStrLen ("isa")) == 0) {
-    DEBUG ((DEBUG_INFO, " find serial compatible isa \n"));
-    Serial->UseMmio = 0;
-    PropertyPtr     = FdtGetProperty (Fdt, SubNode, "reg", &TempLen);
-    ASSERT (TempLen > 0);
-    if (TempLen > 0) {
-      Data32               = (UINT32 *)(PropertyPtr->Data);
-      Attribute            = Fdt32ToCpu (*(Data32 + 0));
-      Serial->RegisterBase = Fdt32ToCpu (*(Data32 + 1));
-      Serial->UseMmio      = Attribute == 1 ? FALSE : TRUE;
-      DEBUG ((DEBUG_INFO, "\n in espi serial  Property()  %a", TempStr));
-      DEBUG ((DEBUG_INFO, " StartAddress   %016lX\n", Serial->RegisterBase));
-      DEBUG ((DEBUG_INFO, " Attribute      %016lX\n", Attribute));
-    }
-  } else {
-    DEBUG ((DEBUG_INFO, " NOT  serial compatible isa \n"));
-    PropertyPtr = FdtGetProperty (Fdt, SubNode, "reg", &TempLen);
-    ASSERT (TempLen > 0);
-    if (TempLen > 0) {
-      Data32               = (UINT32 *)(PropertyPtr->Data);
-      Serial->RegisterBase = Fdt32ToCpu (*Data32);
+  PropertyPtr = FdtGetProperty (Fdt, SubNode, "reg-shift", &TempLen);
+  if (TempLen > 0) {
+    Data32 = (UINT32 *)(PropertyPtr->Data);
+    Serial->RegisterStride = (UINT8) (1 << Fdt32ToCpu (*Data32));
+  }
+
+  PropertyPtr = FdtGetProperty (Fdt, SubNode, "reg", &TempLen);
+  ASSERT (TempLen > 0);
+  if (TempLen > 0) {
+    Data32  = (UINT32 *)(PropertyPtr->Data);
+    Value32 = Fdt32ToCpu (Data32[0]);
+    switch (AddressCells) {
+      case 1:
+        Serial->RegisterBase = Value32;
+        if (Value32 < SIZE_64KB) {
+          Serial->UseMmio = FALSE;
+        }
+        break;
+      case 2:
+        Serial->RegisterBase = Fdt32ToCpu (Data32[1]);
+        if (Value32 == 1) {
+          // IO type for Legacy serial
+          Serial->UseMmio = FALSE;
+        } else {
+          Serial->RegisterBase |= LShiftU64 (Value32, 32);
+        }
+        break;
+      case 3:
+        // First U32 format: npt000ss bbbbbbbb dddddfff rrrrrrrr
+        if ((Value32 & 0x03000000) == 0x01000000) {
+          Serial->UseMmio = FALSE;
+        }
+        Serial->RegisterBase = LShiftU64 ((UINT64)Fdt32ToCpu (Data32[1]), 32) | Fdt32ToCpu (Data32[2]);
+        break;
+      default:
+        DEBUG ((DEBUG_INFO, "ERROR: not supported address cells %d\n", AddressCells));
+        break;
     }
   }
+  DEBUG ((DEBUG_INFO, "Serial->UseMmio        = %x\n", Serial->UseMmio));
+  DEBUG ((DEBUG_INFO, "Serial->RegisterBase   = 0x%x\n", Serial->RegisterBase));
+  DEBUG ((DEBUG_INFO, "Serial->BaudRate       = %d\n", Serial->BaudRate));
+  DEBUG ((DEBUG_INFO, "Serial->RegisterStride = %x\n", Serial->RegisterStride));
 }
 
 /**
@@ -658,6 +679,7 @@ ParsePciRootBridge (
   UINT8               RbIndex;
   UINTN               HobDataSize;
   UINT8               Base;
+  UINT32              AddressCells;
 
   if (RootBridgeCount == 0) {
     return;
@@ -693,6 +715,12 @@ ParsePciRootBridge (
     }
   }
 
+  AddressCells = 3;
+  PropertyPtr = FdtGetProperty (Fdt, Node, "#address-cells", &TempLen);
+  if ((PropertyPtr != NULL) && (TempLen > 0)) {
+    AddressCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
+  }
+
   for (SubNode = FdtFirstSubnode (Fdt, Node); SubNode >= 0; SubNode = FdtNextSubnode (Fdt, SubNode)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + SubNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n      SubNode(%08X)  %a", SubNode, NodePtr->Name));
@@ -703,12 +731,17 @@ ParsePciRootBridge (
     }
 
     if (AsciiStrnCmp (NodePtr->Name, "isa", AsciiStrLen ("isa")) == 0) {
-      SSubNode = FdtFirstSubnode (Fdt, SubNode); // serial
-      ParseSerialPort (Fdt, SSubNode);
+      PropertyPtr = FdtGetProperty (Fdt, SubNode, "#address-cells", &TempLen);
+      if ((PropertyPtr != NULL) && (TempLen > 0)) {
+        AddressCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
+      }
+
+      SSubNode = FdtFirstSubnode (Fdt, SubNode);
+      ParseSerialPort (Fdt, SSubNode, AddressCells);
     }
 
     if (AsciiStrnCmp (NodePtr->Name, "serial@", AsciiStrLen ("serial@")) == 0) {
-      ParseSerialPort (Fdt, SubNode);
+      ParseSerialPort (Fdt, SubNode, AddressCells);
     }
   }
 
@@ -825,6 +858,7 @@ ParseDtb (
   UINT64                NextPciBaseAddress;
   UINT8                 *RbSegNumAlreadyAssigned;
   UINT8                 NumberOfRbSegNumAlreadyAssigned;
+  UINT32                RootAddressCells;
 
   Fdt               = FdtBase;
   Depth             = 0;
@@ -838,10 +872,17 @@ ParseDtb (
   PciEnumDone = 1;
   BootMode    = 0;
   NodeType    = 0;
+  RootAddressCells = 2;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
   DEBUG ((DEBUG_INFO, "Start parsing DTB data\n"));
   DEBUG ((DEBUG_INFO, "MinimalNeededSize :%x\n", MinimalNeededSize));
+
+  PropertyPtr = FdtGetProperty (Fdt, 0, "#address-cells", &TempLen);
+  if ((PropertyPtr != NULL) && (TempLen > 0)) {
+    RootAddressCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
+    DEBUG ((DEBUG_INFO, " root #address-cells = 0x%x\n", RootAddressCells));
+  }
 
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
@@ -909,6 +950,9 @@ ParseDtb (
     NodeType = CheckNodeType (NodePtr->Name, Depth);
     DEBUG ((DEBUG_INFO, "NodeType :0x%x\n", NodeType));
     switch (NodeType) {
+      case SerialPort:
+        ParseSerialPort (Fdt, Node, RootAddressCells);
+        break;
       case ReservedMemory:
         DEBUG ((DEBUG_INFO, "ParseReservedMemory\n"));
         ParseReservedMemory (Fdt, Node);
