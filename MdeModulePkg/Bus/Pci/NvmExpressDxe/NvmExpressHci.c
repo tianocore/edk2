@@ -352,6 +352,9 @@ NvmeDisableController (
 
   for (Index = (Timeout * 500); Index != 0; --Index) {
     gBS->Stall (1000);
+    if (Index % 500 == 0) {
+      DEBUG ((DEBUG_INFO, "Please wait Index to be 0, Index/Max:(%d/%d)\n", Index, Timeout*500));
+    }
 
     //
     // Check if the controller is initialized
