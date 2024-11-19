@@ -77,7 +77,9 @@ ParseAcpiInfo (
     Entry64    = (UINT64 *)(Xsdt + 1);
     Entry64Num = (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) >> 3;
     for (Idx = 0; Idx < Entry64Num; Idx++) {
-      Signature = (UINT32 *)(UINTN)Entry64[Idx];
+      // Use unalign read to access 64 bit address since ACPI description header address is
+      // 64 bit address aligned, however, length of ACPI description header 32-bit aligned.
+      Signature = (UINT32 *)ReadUnaligned64(&Entry64[Idx]);
       if (*Signature == EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
         Fadt = (EFI_ACPI_3_0_FIXED_ACPI_DESCRIPTION_TABLE *)Signature;
         DEBUG ((DEBUG_INFO, "Found Fadt in Xsdt\n"));
