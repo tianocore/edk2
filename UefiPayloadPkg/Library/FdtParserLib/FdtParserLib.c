@@ -976,6 +976,11 @@ ParseDtb (
     }
   }
 
+  if ((mPciRootBridgeInfo == NULL) || (mUplPciSegmentInfoHob == NULL)) {
+    DEBUG((DEBUG_INFO, "%a - %d SKIP PCI ROOT BRIDGE init\n", __FUNCTION__, __LINE__));
+    goto out;
+  }
+
   // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
   // may not be good idea. Instead have this prop part of RB
   mPciRootBridgeInfo->ResourceAssigned = (BOOLEAN)PciEnumDone;
@@ -1018,6 +1023,7 @@ ParseDtb (
     CurrentPciBaseAddress = NextPciBaseAddress;
   }
 
+out:
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;
   DEBUG ((DEBUG_INFO, "\n"));
 
