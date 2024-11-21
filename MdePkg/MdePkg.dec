@@ -2453,6 +2453,34 @@
   # @Prompt Time-out for a response, internal
   gEfiMdePkgTokenSpaceGuid.PcdIpmiSsifResponseRetryIntervalMicrosecond|60000|UINT32|0x00000036
 
+  ## This is requester's Software IDs for IPMI Serial.
+  #  This byte is 20h when the BMC is the requester (section 14.4.3).
+  # @Prompt IPMI Serial requester Software ID
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterAddress|0x20|UINT8|0x00000050
+
+  ## This is responder's Software IDs for IPMI Serial.
+  #  This byte is 20h when the BMC is the responder (section 14.4.3).
+  # @Prompt IPMI Serial responder Software ID
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderAddress|0x20|UINT8|0x00000051
+
+  ## This is requester's LUN for IPMI Serial.
+  # @Prompt IPMI Serial requester LUN
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequesterLun|0x0|UINT8|0x00000052
+
+  ## This is responder's LUN for IPMI Serial.
+  # @Prompt IPMI Serial responder LUN
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialResponderLun|0x0|UINT8|0x00000053
+
+  ## This is the maximum number of IPMI Serial request retries.
+  #  The IPMB specification specified min value is 5 (section 4).
+  # @Prompt Number of IPMI Serial request retries.
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequestRetryCount|5|UINT8|0x00000054
+
+  ## This is the required interval for each IPMI request retry.
+  #  The IPMB specification specified min value is 60ms (section 4).
+  # @Prompt Time-out for a request, internal
+  gEfiMdePkgTokenSpaceGuid.PcdIpmiSerialRequestRetryInterval|60000|UINT32|0x00000055
+
 [PcdsFixedAtBuild.AARCH64, PcdsPatchableInModule.AARCH64]
   ## GUID identifying the Rng algorithm implemented by CPU instruction.
   # @Prompt CPU Rng algorithm's GUID.
