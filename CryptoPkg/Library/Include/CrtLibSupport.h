@@ -79,8 +79,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Definitions for global constants used by CRT library routines
 //
+#define ENOENT         2
+#define EIO            5              /* I/O error */
+#define ENOMEM        11              /* Out of memory */
+#define EFAULT        14              /* Bad address */
 #define EINVAL        22              /* Invalid argument */
+#define ENOSYS        38              /* Function not implemented */
 #define EAFNOSUPPORT  47              /* Address family not supported by protocol family */
+#define GETENTROPY_MAX  256
 #define INT_MAX       0x7FFFFFFF      /* Maximum (signed) int value */
 #define INT_MIN       (-INT_MAX-1)    /* Minimum (signed) int value */
 #define LONG_MAX      0X7FFFFFFFL     /* max value for a long */
@@ -103,6 +109,35 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define NS_INADDRSZ   4   /*%< IPv4 T_A */
 #define NS_IN6ADDRSZ  16  /*%< IPv6 T_AAAA */
 
+/* Defines for Boringssl build */
+#define PRIx8     "x"
+#define PRIx16    "x"
+#define PRIx32    "x"
+#define PRIx64    __PRI64_PREFIX "x"
+#define PRIX32    "X"
+#define __PRI64_PREFIX  "l"
+#define PRIu64    __PRI64_PREFIX "u"
+
+#define INT32_MIN     -0x80000000
+#define INT32_MAX     0x7FFFFFFF
+#define PTRDIFF_MAX   0x7FFFFFFFFFFFFFFF
+#define INT64_C(c)    c ## L
+
+#ifndef __INT64_C
+#define __INT64_C(c)  c ## L
+#endif
+
+#define INT64_MIN     (-__INT64_C(0x7FFFFFFFFFFFFFFF)-1)
+#define INT64_MAX     (__INT64_C(0x7FFFFFFFFFFFFFFF))
+typedef int           int32_t;
+
+#ifndef UINT64_C
+#define UINT64_C(c)   c ## UL
+#endif
+
+#define __UINT64_C(c) c ## UL
+# define UINT64_MAX    (__UINT64_C(18446744073709551615))
+# define UINT32_MAX    (4294967295U)
 //
 // Basic types mapping
 //
@@ -119,6 +154,7 @@ typedef UINT8   u_char;
 typedef UINT32  uid_t;
 typedef UINT32  gid_t;
 typedef CHAR16  wchar_t;
+typedef short   int16_t;
 
 //
 // File operations are not required for EFI building,
@@ -437,6 +473,64 @@ strcat (
   const char  *strSource
   );
 
+int
+fflush (
+  FILE *stream
+  );
+
+int
+ferror (
+  FILE *fp
+  );
+
+int
+fseek (
+  FILE *stream,
+  long offset,
+  int whence
+  );
+
+int
+feof (
+  FILE *fp
+  );
+
+char *
+fgets (
+  char *str,
+  int n,
+  FILE *stream
+  );
+
+int
+ftell (
+  FILE *fp
+  );
+
+int
+fputs (
+  const char *str,
+  FILE *stream
+  );
+
+char *
+strdup (
+  char  *strSource
+  );
+
+void *
+bsearch (
+  const void *key,
+  const void *base,
+  size_t nel,
+  size_t width,
+  int (*cmp)(const void *, const void *)
+  );
+
+int getentropy (
+  void *buffer,
+  size_t length
+  );
 //
 // Macros that directly map functions to BaseLib, BaseMemoryLib, and DebugLib functions
 //

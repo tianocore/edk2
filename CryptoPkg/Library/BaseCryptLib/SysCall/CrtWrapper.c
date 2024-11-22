@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <CrtLibSupport.h>
+#include <Uefi/UefiBaseType.h>
+#include <Library/RngLib.h>
 
 int  errno = 0;
 
@@ -580,12 +582,156 @@ fopen (
 
 size_t
 fread (
-  void    *b,
-  size_t  c,
-  size_t  i,
-  FILE    *f
+  void *buffer,
+  size_t size,
+  size_t count,
+  FILE *stream
   )
 {
+  return 0;
+}
+
+int
+fputs (
+  const char *str,
+  FILE *stream
+  )
+{
+  return -1;
+}
+
+int
+fflush (
+  FILE *stream
+  )
+{
+  return -1;
+}
+
+int
+ferror (
+  FILE *fp
+  )
+{
+  return -1;
+}
+
+int
+fseek (
+  FILE *stream,
+  long offset,
+  int whence
+  )
+{
+  return -1;
+}
+
+int
+feof (
+  FILE *fp
+  )
+{
+  return -1;
+}
+
+int
+ftell (
+  FILE *fp
+  )
+{
+  return -1;
+}
+
+char *
+fgets (
+  char *str,
+  int n,
+  FILE *stream
+  )
+{
+  return NULL;
+}
+
+char *
+strdup (
+  char *strSource
+  )
+{
+  UINTN len;
+  VOID  *Buffer;
+
+  if (!strSource) {
+    return NULL;
+  }
+
+  len = strlen(strSource);
+
+  Buffer = malloc (len);
+  ASSERT (Buffer != NULL);
+  strncpy (Buffer, strSource, len);
+  return Buffer;
+}
+
+void *
+bsearch (
+  const void *key,
+  const void *base,
+  size_t nitems,
+  size_t width,
+  int (*cmp)(const void *, const void *)
+  )
+{
+  void *mid;
+  int sign;
+
+  if (!key || !base) {
+    return NULL;
+  }
+  while (nitems > 0) {
+    mid = (char *)base + width * (nitems/2);
+    sign = cmp(key, mid);
+    if (sign < 0) {
+      nitems /= 2;
+    }
+    else if (sign > 0) {
+      base = (char *)mid + width;
+      nitems -= nitems/2 + 1;
+    }
+    else {
+      return mid;
+    }
+  }
+  return NULL;
+}
+
+int
+getentropy (
+  void *buffer,
+  size_t length
+  )
+{
+  UINT8 *entropyBuffer = (UINT8 *)buffer;
+  UINTN  i;
+  UINT64 randNum;
+  UINTN copyLength;
+
+  if (length > GETENTROPY_MAX) {
+    errno = EIO;
+    return -1;
+  }
+  if (entropyBuffer == NULL || length == 0) {
+    errno = EFAULT;
+    return -1;
+  }
+
+  for (i = 0; i < length; i += sizeof(UINT64)) {
+    if (!GetRandomNumber64(&randNum)) {
+      errno = ENOSYS;
+      return -1;
+    }
+    copyLength = (length - i >= sizeof(UINT64)) ? sizeof(UINT64):(length - i);
+    CopyMem(entropyBuffer + i, &randNum, copyLength);
+  }
   return 0;
 }
 
