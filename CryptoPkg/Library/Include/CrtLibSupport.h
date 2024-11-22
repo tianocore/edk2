@@ -122,19 +122,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define INT32_MAX     0x7FFFFFFF
 #define PTRDIFF_MAX   0x7FFFFFFFFFFFFFFF
 #define INT64_C(c)    c ## L
-
-#ifndef __INT64_C
 #define __INT64_C(c)  c ## L
-#endif
-
 #define INT64_MIN     (-__INT64_C(0x7FFFFFFFFFFFFFFF)-1)
 #define INT64_MAX     (__INT64_C(0x7FFFFFFFFFFFFFFF))
 typedef int           int32_t;
-
-#ifndef UINT64_C
 #define UINT64_C(c)   c ## UL
-#endif
-
 #define __UINT64_C(c) c ## UL
 # define UINT64_MAX    (__UINT64_C(18446744073709551615))
 # define UINT32_MAX    (4294967295U)
