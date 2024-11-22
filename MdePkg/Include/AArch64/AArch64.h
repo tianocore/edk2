@@ -16,13 +16,15 @@
 #define ARM_ARCH_EXCEPTION_IRQ  EXCEPT_AARCH64_IRQ
 
 // CPACR - Coprocessor Access Control Register definitions
-#define CPACR_TTA_EN          (1UL << 28)
-#define CPACR_FPEN_EL1        (1UL << 20)
-#define CPACR_FPEN_FULL       (3UL << 20)
-#define CPACR_CP_FULL_ACCESS  0x300000
+#define CPACR_TTA_EN     (1UL << 28)
+#define CPACR_FPEN_EL1   (1UL << 20)
+#define CPACR_FPEN_FULL  (3UL << 20)
+#define CPACR_DEFAULT    CPACR_FPEN_FULL
 
 // Coprocessor Trap Register (CPTR)
-#define AARCH64_CPTR_TFP  (1 << 10)
+#define AARCH64_CPTR_TFP      (1 << 10)
+#define AARCH64_CPTR_RES1     0x33ff
+#define AARCH64_CPTR_DEFAULT  AARCH64_CPTR_RES1
 
 // ID_AA64MMFR1 - AArch64 Memory Model Feature Register 0 definitions
 #define AARCH64_MMFR1_VH  (0xF << 8)
