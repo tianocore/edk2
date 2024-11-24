@@ -3,10 +3,12 @@
 ##
 
 !if $(NETWORK_ENABLE) == TRUE
-  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
-    <LibraryClasses>
-      NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
-  }
+  !if $(NETWORK_PXE_BOOT_ENABLE) == TRUE
+    NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
+      <LibraryClasses>
+        NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
+    }
+  !endif
 
   !if $(NETWORK_TLS_ENABLE) == TRUE
     NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
