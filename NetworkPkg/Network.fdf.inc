@@ -39,7 +39,10 @@
   !endif
 
   INF  NetworkPkg/TcpDxe/TcpDxe.inf
-  INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
+
+  !if $(NETWORK_PXE_BOOT_ENABLE) == TRUE
+    INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
+  !endif
 
   !if $(NETWORK_TLS_ENABLE) == TRUE
     INF  NetworkPkg/TlsDxe/TlsDxe.inf

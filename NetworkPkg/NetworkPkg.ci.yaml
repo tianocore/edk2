@@ -83,5 +83,6 @@
         "BLD_*_NETWORK_HTTP_ENABLE": "FALSE",
         "BLD_*_NETWORK_HTTP_BOOT_ENABLE": "TRUE",
         "BLD_*_NETWORK_ISCSI_ENABLE": "TRUE",
+        "BLD_*_NETWORK_PXE_BOOT_ENABLE": "TRUE",
     }
 }
