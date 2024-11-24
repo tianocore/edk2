@@ -14,7 +14,7 @@
 #
 # IPv4 and IPv6 PXE Boot support.
 #
-!if $(NETWORK_ENABLE) == TRUE
+!if ($(NETWORK_ENABLE) == TRUE) AND ($(NETWORK_PXE_BOOT_ENABLE) == TRUE)
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
   gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
 !endif
