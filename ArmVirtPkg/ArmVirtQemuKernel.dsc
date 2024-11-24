@@ -39,6 +39,7 @@
   DEFINE NETWORK_TLS_ENABLE              = FALSE
   DEFINE NETWORK_ALLOW_HTTP_CONNECTIONS  = TRUE
   DEFINE NETWORK_ISCSI_ENABLE            = FALSE
+  DEFINE NETWORK_PXE_BOOT_ENABLE         = TRUE
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
   !error "NETWORK_SNP_ENABLE is IA32/X64/EBC only"
@@ -406,10 +407,12 @@
   #
 !include NetworkPkg/NetworkComponents.dsc.inc
 
+!if $(NETWORK_PXE_BOOT_ENABLE) == TRUE
   NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
     <LibraryClasses>
       NULL|OvmfPkg/Library/PxeBcPcdProducerLib/PxeBcPcdProducerLib.inf
   }
+!endif
 
 !if $(NETWORK_TLS_ENABLE) == TRUE
   NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
