@@ -5,6 +5,7 @@
   Copyright (c) 2014 - 2022, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   Copyright (c) 2020, ARM Ltd. All rights reserved.<BR>
+  Copyright (C) 2024, Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
@@ -12,6 +13,16 @@
 #define _ACPI_5_1_H_
 
 #include <IndustryStandard/Acpi50.h>
+
+///
+/// _CSD Revision for ACPI 5.1
+///
+#define EFI_ACPI_5_1_AML_CSD_REVISION  0
+
+///
+/// _CSD NumEntries for ACPI 5.1
+///
+#define EFI_ACPI_5_1_AML_CSD_NUM_ENTRIES  6
 
 ///
 /// _PSD Revision for ACPI 5.1
