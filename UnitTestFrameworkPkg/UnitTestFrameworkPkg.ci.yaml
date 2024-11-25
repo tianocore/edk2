@@ -96,6 +96,7 @@
             "Library/SubhookLib/subhook/**/*.*"  # not going to spell check a submodule
         ],
         "ExtendWords": [             # words to extend to the dictionary for this package
+            "noreplace",
             "Pointee",
             "gmock",
             "GMOCK",
