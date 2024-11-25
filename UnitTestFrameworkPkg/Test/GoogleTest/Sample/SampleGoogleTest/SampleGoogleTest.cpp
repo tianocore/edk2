@@ -13,6 +13,7 @@ extern "C" {
   #include <Library/BaseLib.h>
   #include <Library/DebugLib.h>
   #include <Library/MemoryAllocationLib.h>
+  #include <Library/HostMemoryAllocationBelowAddressLib.h>
 }
 
 /**
@@ -431,6 +432,176 @@ TEST (SanitizerTests, DivideByZeroDeathTest) {
   // Divide by 0 should be caught by address sanitizer, log details, and exit
   //
   EXPECT_DEATH (DivideWithNoParameterChecking (10, 0), "ERROR: AddressSanitizer: ");
+}
+
+/**
+  Sample unit test that allocates and frees buffers below 4GB
+**/
+TEST (MemoryAllocationTests, Below4GB) {
+  VOID   *Buffer1;
+  VOID   *Buffer2;
+  UINT8  EmptyBuffer[0x100];
+
+  //
+  // Length 0 always fails
+  //
+  Buffer1 = HostAllocatePoolBelowAddress ((VOID *)BASE_4GB, 0);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Length == Maximum Address always fails
+  //
+  Buffer1 = HostAllocatePoolBelowAddress ((VOID *)BASE_4GB, SIZE_4GB);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Length > Maximum Address always fails
+  //
+  Buffer1 = HostAllocatePoolBelowAddress ((VOID *)BASE_4GB, SIZE_8GB);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Maximum Address <= 64KB always fails
+  //
+  Buffer1 = HostAllocatePoolBelowAddress ((VOID *)NULL, SIZE_4KB);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Maximum Address <= 64KB always fails
+  //
+  Buffer1 = HostAllocatePoolBelowAddress ((VOID *)BASE_64KB, SIZE_4KB);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Allocation of 4KB buffer below 4GB must succeed
+  //
+  Buffer1 = HostAllocatePoolBelowAddress ((VOID *)BASE_4GB, SIZE_4KB);
+  ASSERT_NE (Buffer1, (VOID *)NULL);
+  ASSERT_LT ((UINTN)Buffer1, BASE_4GB);
+
+  //
+  // Allocated buffer must support read and write
+  //
+  *(UINT8 *)Buffer1 = 0x5A;
+  ASSERT_EQ (*(UINT8 *)Buffer1, 0x5A);
+
+  //
+  // Allocation of 1MB buffer below 4GB must succeed
+  //
+  Buffer2 = HostAllocatePoolBelowAddress ((VOID *)BASE_4GB, SIZE_1MB);
+  ASSERT_NE (Buffer2, (VOID *)NULL);
+  ASSERT_LT ((UINTN)Buffer2, BASE_4GB);
+
+  //
+  // Allocated buffer must support read and write
+  //
+  *(UINT8 *)Buffer2 = 0x5A;
+  ASSERT_EQ (*(UINT8 *)Buffer2, 0x5A);
+
+  //
+  // Allocations must return different values
+  //
+  ASSERT_NE (Buffer1, Buffer2);
+
+  //
+  // Free buffers below 4GB must not ASSERT
+  //
+  HostFreePoolBelowAddress (Buffer1);
+  HostFreePoolBelowAddress (Buffer2);
+
+  //
+  // Expect ASSERT() tests
+  //
+  EXPECT_ANY_THROW (HostFreePoolBelowAddress (NULL));
+  EXPECT_ANY_THROW (HostFreePoolBelowAddress (EmptyBuffer + 0x80));
+  Buffer1 = AllocatePool (0x100);
+  EXPECT_ANY_THROW (HostFreePoolBelowAddress (Buffer1));
+  FreePool (Buffer1);
+}
+
+/**
+  Sample unit test that allocates and frees aligned pages below 4GB
+**/
+TEST (MemoryAllocationTests, AlignedBelow4GB) {
+  VOID   *Buffer1;
+  VOID   *Buffer2;
+  UINT8  EmptyBuffer[0x100];
+
+  //
+  // Pages 0 always fails
+  //
+  Buffer1 = HostAllocateAlignedPagesBelowAddress ((VOID *)BASE_4GB, 0, SIZE_4KB);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Length == Maximum Address always fails
+  //
+  Buffer1 = HostAllocateAlignedPagesBelowAddress ((VOID *)BASE_4GB, EFI_SIZE_TO_PAGES (SIZE_4GB), SIZE_4KB);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Length > Maximum Address always fails
+  //
+  Buffer1 = HostAllocateAlignedPagesBelowAddress ((VOID *)BASE_4GB, EFI_SIZE_TO_PAGES (SIZE_8GB), SIZE_4KB);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Maximum Address <= 64KB always fails
+  //
+  Buffer1 = HostAllocateAlignedPagesBelowAddress ((VOID *)NULL, EFI_SIZE_TO_PAGES (SIZE_4KB), SIZE_4KB);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Maximum Address <= 64KB always fails
+  //
+  Buffer1 = HostAllocateAlignedPagesBelowAddress ((VOID *)BASE_64KB, EFI_SIZE_TO_PAGES (SIZE_4KB), SIZE_4KB);
+  ASSERT_EQ (Buffer1, (VOID *)NULL);
+
+  //
+  // Allocation of 4KB buffer below 4GB must succeed
+  //
+  Buffer1 = HostAllocateAlignedPagesBelowAddress ((VOID *)BASE_4GB, EFI_SIZE_TO_PAGES (SIZE_4KB), SIZE_4KB);
+  ASSERT_NE (Buffer1, (VOID *)NULL);
+  ASSERT_LT ((UINTN)Buffer1, BASE_4GB);
+
+  //
+  // Allocated buffer must support read and write
+  //
+  *(UINT8 *)Buffer1 = 0x5A;
+  ASSERT_EQ (*(UINT8 *)Buffer1, 0x5A);
+
+  //
+  // Allocation of 1MB buffer below 4GB must succeed
+  //
+  Buffer2 = HostAllocateAlignedPagesBelowAddress ((VOID *)BASE_4GB, EFI_SIZE_TO_PAGES (SIZE_1MB), SIZE_1MB);
+  ASSERT_NE (Buffer2, (VOID *)NULL);
+  ASSERT_LT ((UINTN)Buffer2, BASE_4GB);
+
+  //
+  // Allocated buffer must support read and write
+  //
+  *(UINT8 *)Buffer2 = 0x5A;
+  ASSERT_EQ (*(UINT8 *)Buffer2, 0x5A);
+
+  //
+  // Allocations must return different values
+  //
+  ASSERT_NE (Buffer1, Buffer2);
+
+  //
+  // Free buffers below 4GB must not ASSERT
+  //
+  HostFreeAlignedPagesBelowAddress (Buffer1, EFI_SIZE_TO_PAGES (SIZE_4KB));
+  HostFreeAlignedPagesBelowAddress (Buffer2, EFI_SIZE_TO_PAGES (SIZE_1MB));
+
+  //
+  // Expect ASSERT() tests
+  //
+  EXPECT_ANY_THROW (HostFreeAlignedPagesBelowAddress (NULL, 0));
+  EXPECT_ANY_THROW (HostFreeAlignedPagesBelowAddress (EmptyBuffer + 0x80, 1));
+  Buffer1 = AllocatePool (0x100);
+  EXPECT_ANY_THROW (HostFreeAlignedPagesBelowAddress ((UINT8 *)Buffer1 + 0x80, 1));
+  FreePool (Buffer1);
 }
 
 int
