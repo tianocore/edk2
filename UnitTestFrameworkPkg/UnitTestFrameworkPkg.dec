@@ -39,6 +39,11 @@
   SubhookLib|Include/Library/SubhookLib.h
   FunctionMockLib|Include/Library/FunctionMockLib.h
 
+  ## @libraryclass Host only memory allocation library that supports allocating
+  #  buffers below a specified address.
+  #
+  HostMemoryAllocationBelowAddressLib|Include/Library/HostMemoryAllocationBelowAddressLib.h
+
 [LibraryClasses.Common.Private]
   ## @libraryclass Provides a unit test result report
   #
