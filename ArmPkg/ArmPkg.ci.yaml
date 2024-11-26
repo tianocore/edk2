@@ -22,8 +22,6 @@
         ],
         ## Both file path and directory path are accepted.
         "IgnoreFiles": [
-            "Library/ArmSoftFloatLib/berkeley-softfloat-3",
-            "Library/ArmSoftFloatLib/ArmSoftFloatLib.c",
             "Universal/Smbios/SmbiosMiscDxe"
         ]
     },
@@ -90,10 +88,6 @@
     ## options defined .pytool/Plugin/SpellCheck
     "SpellCheck": {
         "AuditOnly": True,
-        "IgnoreFiles": [
-            "Library/ArmSoftFloatLib/berkeley-softfloat-3/**"
-        ],                           # use gitignore syntax to ignore errors
-                                     # in matching files
         "ExtendWords": [
           "api's",
           "ackintid",
