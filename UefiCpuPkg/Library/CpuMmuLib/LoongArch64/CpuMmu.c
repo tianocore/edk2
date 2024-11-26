@@ -595,6 +595,7 @@ EfiAttributeConverse (
       LoongArchAttributes &= ~PAGE_DIRTY;
       break;
     default:
+      LoongArchAttributes |= CACHE_CC;
       break;
   }
 
