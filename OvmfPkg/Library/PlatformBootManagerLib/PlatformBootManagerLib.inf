@@ -63,6 +63,7 @@
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId
   gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUefiShellCreateBootOption
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate         ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits         ## CONSUMES
