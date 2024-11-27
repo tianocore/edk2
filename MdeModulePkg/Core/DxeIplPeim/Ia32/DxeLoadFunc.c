@@ -166,7 +166,7 @@ Create4GPageTablesIa32Pae (
   // Protect the page table by marking the memory used for page table to be
   // read-only.
   //
-  EnablePageTableProtection ((UINTN)PageMap, FALSE);
+  EnablePageTableProtection ((UINTN)PageMap, 3);
 
   return (UINTN)PageMap;
 }

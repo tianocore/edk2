@@ -1,0 +1,45 @@
+## @file
+# Implements the BaseCryptLib and TlsLib using the services of the EDK II Crypto
+# SMM Protocol for Stdandalone MM.
+#
+# Copyright (c) 2024, American Megatrends International LLC. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = StandaloneMmCryptLib
+  MODULE_UNI_FILE                = CryptLib.uni
+  FILE_GUID                      = FA7EB4FD-7B3B-4FE4-BA95-1CE47CD0BE3E
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  MODULE_TYPE                    = MM_STANDALONE
+  LIBRARY_CLASS                  = BaseCryptLib | MM_STANDALONE
+  LIBRARY_CLASS                  = TlsLib       | MM_STANDALONE
+  CONSTRUCTOR                    = StandaloneMmCryptLibConstructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 ARM AARCH64
+#
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CryptoPkg/CryptoPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MmServicesTableLib
+
+[Sources]
+  StandaloneMmCryptLib.c
+  CryptLib.c
+
+[Protocols]
+  gEdkiiSmmCryptoProtocolGuid  ## CONSUMES
+
+[Depex]
+  gEdkiiSmmCryptoProtocolGuid
