@@ -730,6 +730,18 @@ SetEventCompleteSvcArgs (
           EventCompleteSvcArgs->Arg5 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg1;
           EventCompleteSvcArgs->Arg6 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg2;
           EventCompleteSvcArgs->Arg7 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg3;
+          if (FixedPcdGetBool (PcdSxcUse18Registers)) {
+            EventCompleteSvcArgs->Arg8  = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg4;
+            EventCompleteSvcArgs->Arg9  = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg5;
+            EventCompleteSvcArgs->Arg10 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg6;
+            EventCompleteSvcArgs->Arg11 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg7;
+            EventCompleteSvcArgs->Arg12 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg8;
+            EventCompleteSvcArgs->Arg13 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg9;
+            EventCompleteSvcArgs->Arg14 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg10;
+            EventCompleteSvcArgs->Arg15 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg11;
+            EventCompleteSvcArgs->Arg16 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg12;
+            EventCompleteSvcArgs->Arg17 = mMiscMmCommunicateBuffer->DirectMsgArgs.Arg13;
+          }
         }
       }
 
@@ -772,6 +784,19 @@ InitializeMiscMmCommunicateBuffer (
   Buffer->DirectMsgArgs.Arg1 = EventSvcArgs->Arg5;
   Buffer->DirectMsgArgs.Arg2 = EventSvcArgs->Arg6;
   Buffer->DirectMsgArgs.Arg3 = EventSvcArgs->Arg7;
+  if (FixedPcdGetBool (PcdSxcUse18Registers)) {
+    Buffer->DirectMsgArgs.Arg4  = EventSvcArgs->Arg8;
+    Buffer->DirectMsgArgs.Arg5  = EventSvcArgs->Arg9;
+    Buffer->DirectMsgArgs.Arg6  = EventSvcArgs->Arg10;
+    Buffer->DirectMsgArgs.Arg7  = EventSvcArgs->Arg11;
+    Buffer->DirectMsgArgs.Arg8  = EventSvcArgs->Arg12;
+    Buffer->DirectMsgArgs.Arg9  = EventSvcArgs->Arg13;
+    Buffer->DirectMsgArgs.Arg10 = EventSvcArgs->Arg14;
+    Buffer->DirectMsgArgs.Arg11 = EventSvcArgs->Arg15;
+    Buffer->DirectMsgArgs.Arg12 = EventSvcArgs->Arg16;
+    Buffer->DirectMsgArgs.Arg13 = EventSvcArgs->Arg17;
+  }
+
   CopyGuid (&Buffer->HeaderGuid, ServiceGuid);
 }
 
