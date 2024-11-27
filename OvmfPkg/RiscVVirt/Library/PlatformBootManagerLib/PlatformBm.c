@@ -965,11 +965,13 @@ PlatformBootManagerAfterConsole (
   //
   // Register UEFI Shell
   //
-  PlatformRegisterFvBootOption (
-    &gUefiShellFileGuid,
-    L"EFI Internal Shell",
-    LOAD_OPTION_ACTIVE
-    );
+  if (FixedPcdGetBool (PcdUefiShellCreateBootOption)) {
+    PlatformRegisterFvBootOption (
+      &gUefiShellFileGuid,
+      L"EFI Internal Shell",
+      LOAD_OPTION_ACTIVE
+      );
+  }
 
   RemoveStaleFvFileOptions ();
   SetBootOrderFromQemu ();
