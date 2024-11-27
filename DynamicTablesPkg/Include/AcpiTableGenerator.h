@@ -120,6 +120,7 @@ typedef enum StdAcpiTableId {
   EStdAcpiTableIdFacs,                          ///< FACS Generator
   EStdAcpiTableIdCedt,                          ///< CEDT Generator
   EStdAcpiTableIdSlit,                          ///< SLIT Generator
+  EStdAcpiTableIdRhct,                          ///< RHCT Generator
   EStdAcpiTableIdMax
 } ESTD_ACPI_TABLE_ID;
 
