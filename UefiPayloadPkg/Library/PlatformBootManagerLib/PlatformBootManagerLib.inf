@@ -62,6 +62,9 @@
   gEfiSerialIoProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
 
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUefiShellCreateBootOption
+
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport

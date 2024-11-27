@@ -314,7 +314,9 @@ PlatformBootManagerAfterConsole (
   //
   // Register UEFI Shell
   //
-  PlatformRegisterFvBootOption (&gUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE);
+  if (FixedPcdGetBool (PcdUefiShellCreateBootOption)) {
+    PlatformRegisterFvBootOption (&gUefiShellFileGuid, L"UEFI Shell", LOAD_OPTION_ACTIVE);
+  }
 
   if (FixedPcdGetBool (PcdBootManagerEscape)) {
     Print (
