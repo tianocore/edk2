@@ -114,6 +114,15 @@ ParseUpdateDataFile (
                &Num
                );
     if (EFI_ERROR (Status)) {
+      Status = GetHexUintnFromDataFile (
+                 Context,
+                 SectionName,
+                 "FirmwareType",
+                 &Num
+                 );
+    }
+
+    if (EFI_ERROR (Status)) {
       CloseIniFile (Context);
       DEBUG ((DEBUG_ERROR, "[%d] FirmwareType not found\n", Index));
       return EFI_NOT_FOUND;
