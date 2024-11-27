@@ -1059,9 +1059,11 @@ PlatformBootManagerAfterConsole (
   //
   // Register UEFI Shell
   //
-  Key.ScanCode    = SCAN_NULL;
-  Key.UnicodeChar = L's';
-  PlatformRegisterFvBootOption (&gUefiShellFileGuid, L"UEFI Shell", 0, &Key);
+  if (FixedPcdGetBool (PcdUefiShellCreateBootOption)) {
+    Key.ScanCode    = SCAN_NULL;
+    Key.UnicodeChar = L's';
+    PlatformRegisterFvBootOption (&gUefiShellFileGuid, L"UEFI Shell", 0, &Key);
+  }
 }
 
 /**

@@ -58,6 +58,7 @@
 [FixedPcd]
   gArmTokenSpaceGuid.PcdUefiShellDefaultBootEnable
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUefiShellCreateBootOption
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
