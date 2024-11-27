@@ -767,11 +767,21 @@ InitializeMiscMmCommunicateBuffer (
 {
   ZeroMem (Buffer, sizeof (MISC_MM_COMMUNICATE_BUFFER));
 
-  Buffer->MessageLength      = sizeof (DIRECT_MSG_ARGS);
-  Buffer->DirectMsgArgs.Arg0 = EventSvcArgs->Arg4;
-  Buffer->DirectMsgArgs.Arg1 = EventSvcArgs->Arg5;
-  Buffer->DirectMsgArgs.Arg2 = EventSvcArgs->Arg6;
-  Buffer->DirectMsgArgs.Arg3 = EventSvcArgs->Arg7;
+  Buffer->MessageLength       = sizeof (DIRECT_MSG_ARGS_EX);
+  Buffer->DirectMsgArgs.Arg0  = EventSvcArgs->Arg4;
+  Buffer->DirectMsgArgs.Arg1  = EventSvcArgs->Arg5;
+  Buffer->DirectMsgArgs.Arg2  = EventSvcArgs->Arg6;
+  Buffer->DirectMsgArgs.Arg3  = EventSvcArgs->Arg7;
+  Buffer->DirectMsgArgs.Arg4  = EventSvcArgs->Arg8;
+  Buffer->DirectMsgArgs.Arg5  = EventSvcArgs->Arg9;
+  Buffer->DirectMsgArgs.Arg6  = EventSvcArgs->Arg10;
+  Buffer->DirectMsgArgs.Arg7  = EventSvcArgs->Arg11;
+  Buffer->DirectMsgArgs.Arg8  = EventSvcArgs->Arg12;
+  Buffer->DirectMsgArgs.Arg9  = EventSvcArgs->Arg13;
+  Buffer->DirectMsgArgs.Arg10 = EventSvcArgs->Arg14;
+  Buffer->DirectMsgArgs.Arg11 = EventSvcArgs->Arg15;
+  Buffer->DirectMsgArgs.Arg12 = EventSvcArgs->Arg16;
+  Buffer->DirectMsgArgs.Arg13 = EventSvcArgs->Arg17;
   CopyGuid (&Buffer->HeaderGuid, ServiceGuid);
 }
 

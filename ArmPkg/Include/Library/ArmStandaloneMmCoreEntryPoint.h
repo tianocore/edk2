@@ -23,8 +23,10 @@
 #ifndef __STANDALONEMMCORE_ENTRY_POINT_H__
 #define __STANDALONEMMCORE_ENTRY_POINT_H__
 
+#include <Library/PcdLib.h>
 #include <Library/ArmSvcLib.h>
 #include <Library/ArmFfaLib.h>
+#include <Library/ArmFfaLibEx.h>
 #include <Library/PeCoffLib.h>
 #include <Library/FvLib.h>
 
@@ -136,13 +138,13 @@ typedef struct FfaMsgInfo {
  */
 typedef struct {
   /// Service guid
-  EFI_GUID           HeaderGuid;
+  EFI_GUID              HeaderGuid;
 
   /// Length of Message. In case of misc service, sizeof (EventSvcArgs)
-  UINTN              MessageLength;
+  UINTN                 MessageLength;
 
   /// Delivered register values.
-  DIRECT_MSG_ARGS    DirectMsgArgs;
+  DIRECT_MSG_ARGS       DirectMsgArgs;
 } MISC_MM_COMMUNICATE_BUFFER;
 
 typedef struct {

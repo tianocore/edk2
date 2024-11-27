@@ -17,7 +17,7 @@
 #
 #------------------------------------------------------------------------------
 
-#include <AArch64/AsmMacroLib.h>
+#include <AsmMacroIoLibV8.h>
 #include <IndustryStandard/ArmMmSvc.h>
 #include <IndustryStandard/ArmFfaSvc.h>
 #include <Uefi/UefiBaseType.h>
