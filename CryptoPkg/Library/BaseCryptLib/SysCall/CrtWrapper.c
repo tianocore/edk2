@@ -582,10 +582,10 @@ fopen (
 
 size_t
 fread (
-  void *buffer,
-  size_t size,
-  size_t count,
-  FILE *stream
+  void    *buffer,
+  size_t  size,
+  size_t  count,
+  FILE    *stream
   )
 {
   return 0;
@@ -593,8 +593,8 @@ fread (
 
 int
 fputs (
-  const char *str,
-  FILE *stream
+  const char  *str,
+  FILE        *stream
   )
 {
   return -1;
@@ -602,7 +602,7 @@ fputs (
 
 int
 fflush (
-  FILE *stream
+  FILE  *stream
   )
 {
   return -1;
@@ -610,7 +610,7 @@ fflush (
 
 int
 ferror (
-  FILE *fp
+  FILE  *fp
   )
 {
   return -1;
@@ -618,9 +618,9 @@ ferror (
 
 int
 fseek (
-  FILE *stream,
-  long offset,
-  int whence
+  FILE  *stream,
+  long  offset,
+  int   whence
   )
 {
   return -1;
@@ -636,7 +636,7 @@ feof (
 
 int
 ftell (
-  FILE *fp
+  FILE  *fp
   )
 {
   return -1;
@@ -644,9 +644,9 @@ ftell (
 
 char *
 fgets (
-  char *str,
-  int n,
-  FILE *stream
+  char  *str,
+  int   n,
+  FILE  *stream
   )
 {
   return NULL;
@@ -654,83 +654,85 @@ fgets (
 
 char *
 strdup (
-  char *strSource
+  char  *strSource
   )
 {
-  UINTN len;
-  VOID  *Buffer;
+  UINTN   len;
+  VOID    *Buffer;
 
   if (!strSource) {
     return NULL;
   }
 
-  len = strlen(strSource);
+  len = strlen (strSource);
 
   Buffer = malloc (len);
-  ASSERT (Buffer != NULL);
+  if (Buffer == NULL) {
+    return NULL;
+  }
   strncpy (Buffer, strSource, len);
   return Buffer;
 }
 
 void *
 bsearch (
-  const void *key,
-  const void *base,
-  size_t nitems,
-  size_t width,
-  int (*cmp)(const void *, const void *)
+  const void  *key,
+  const void  *base,
+  size_t      nitems,
+  size_t      width,
+  int         ( *cmp )(const void *, const void *)
   )
 {
-  void *mid;
-  int sign;
+  void  *mid;
+  int   sign;
 
   if (!key || !base) {
     return NULL;
   }
+
   while (nitems > 0) {
     mid = (char *)base + width * (nitems/2);
-    sign = cmp(key, mid);
+    sign = cmp (key, mid);
     if (sign < 0) {
       nitems /= 2;
-    }
-    else if (sign > 0) {
-      base = (char *)mid + width;
+    } else if (sign > 0) {
+      base    = (char *)mid + width;
       nitems -= nitems/2 + 1;
-    }
-    else {
+    } else {
       return mid;
     }
   }
+
   return NULL;
 }
 
 int
 getentropy (
-  void *buffer,
-  size_t length
+  void    *buffer,
+  size_t  length
   )
 {
-  UINT8 *entropyBuffer = (UINT8 *)buffer;
-  UINTN  i;
-  UINT64 randNum;
-  UINTN copyLength;
+  UINT8   *entropyBuffer = (UINT8 *)buffer;
+  UINTN   i;
+  UINT64  randNum;
+  UINTN   copyLength;
 
   if (length > GETENTROPY_MAX) {
     errno = EIO;
     return -1;
   }
-  if (entropyBuffer == NULL || length == 0) {
+  if ((entropyBuffer == NULL) || (length == 0)) {
     errno = EFAULT;
     return -1;
   }
 
-  for (i = 0; i < length; i += sizeof(UINT64)) {
-    if (!GetRandomNumber64(&randNum)) {
+  for (i = 0; i < length; i += sizeof (UINT64)) {
+    if (!GetRandomNumber64 (&randNum)) {
       errno = ENOSYS;
       return -1;
     }
-    copyLength = (length - i >= sizeof(UINT64)) ? sizeof(UINT64):(length - i);
-    CopyMem(entropyBuffer + i, &randNum, copyLength);
+    copyLength = (length - i >= sizeof (UINT64)) ? sizeof (UINT64) : (length - i);
+    CopyMem (entropyBuffer + i, &randNum, copyLength);
   }
   return 0;
 }

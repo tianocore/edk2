@@ -79,22 +79,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 //
 // Definitions for global constants used by CRT library routines
 //
-#define ENOENT         2
-#define EIO            5              /* I/O error */
-#define ENOMEM        11              /* Out of memory */
-#define EFAULT        14              /* Bad address */
-#define EINVAL        22              /* Invalid argument */
-#define ENOSYS        38              /* Function not implemented */
-#define EAFNOSUPPORT  47              /* Address family not supported by protocol family */
+#define ENOENT          2
+#define EIO             5              /* I/O error */
+#define ENOMEM          11              /* Out of memory */
+#define EFAULT          14              /* Bad address */
+#define EINVAL          22              /* Invalid argument */
+#define ENOSYS          38              /* Function not implemented */
+#define EAFNOSUPPORT    47              /* Address family not supported by protocol family */
 #define GETENTROPY_MAX  256
-#define INT_MAX       0x7FFFFFFF      /* Maximum (signed) int value */
-#define INT_MIN       (-INT_MAX-1)    /* Minimum (signed) int value */
-#define LONG_MAX      0X7FFFFFFFL     /* max value for a long */
-#define LONG_MIN      (-LONG_MAX-1)   /* min value for a long */
-#define UINT_MAX      0xFFFFFFFF      /* Maximum unsigned int value */
-#define ULONG_MAX     0xFFFFFFFF      /* Maximum unsigned long value */
-#define CHAR_BIT      8               /* Number of bits in a char */
-#define SIZE_MAX      0xFFFFFFFF      /* Maximum unsigned size_t */
+#define INT_MAX         0x7FFFFFFF      /* Maximum (signed) int value */
+#define INT_MIN         (-INT_MAX-1)    /* Minimum (signed) int value */
+#define LONG_MAX        0X7FFFFFFFL     /* max value for a long */
+#define LONG_MIN        (-LONG_MAX-1)   /* min value for a long */
+#define UINT_MAX        0xFFFFFFFF      /* Maximum unsigned int value */
+#define ULONG_MAX       0xFFFFFFFF      /* Maximum unsigned long value */
+#define CHAR_BIT        8               /* Number of bits in a char */
+#define SIZE_MAX        0xFFFFFFFF      /* Maximum unsigned size_t */
 
 //
 // Address families.
@@ -110,51 +110,50 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define NS_IN6ADDRSZ  16  /*%< IPv6 T_AAAA */
 
 /* Defines for Boringssl build */
-#define PRIx8     "x"
-#define PRIx16    "x"
-#define PRIx32    "x"
-#define PRIx64    __PRI64_PREFIX "x"
-#define PRIX32    "X"
+#define PRIx8           "x"
+#define PRIx16          "x"
+#define PRIx32          "x"
+#define PRIx64          __PRI64_PREFIX "x"
+#define PRIX32          "X"
 #define __PRI64_PREFIX  "l"
-#define PRIu64    __PRI64_PREFIX "u"
+#define PRIu64          __PRI64_PREFIX "u"
 
-#define INT32_MIN     -0x80000000
-#define INT32_MAX     0x7FFFFFFF
-#define PTRDIFF_MAX   0x7FFFFFFFFFFFFFFF
-#define INT64_C(c)    c ## L
+#define INT32_MIN   -0x80000000
+#define INT32_MAX   0x7FFFFFFF
+#define PTRDIFF_MAX 0x7FFFFFFFFFFFFFFF
+#define INT64_C(c)  c ## L
 
 #ifndef __INT64_C
 #define __INT64_C(c)  c ## L
 #endif
 
-#define INT64_MIN     (-__INT64_C(0x7FFFFFFFFFFFFFFF)-1)
-#define INT64_MAX     (__INT64_C(0x7FFFFFFFFFFFFFFF))
-typedef int           int32_t;
+#define INT64_MIN (-__INT64_C(0x7FFFFFFFFFFFFFFF)-1)
+#define INT64_MAX (__INT64_C(0x7FFFFFFFFFFFFFFF))
+typedef int int32_t;
 
 #ifndef UINT64_C
-#define UINT64_C(c)   c ## UL
+#define UINT64_C(c) c ## UL
 #endif
 
-#define __UINT64_C(c) c ## UL
-# define UINT64_MAX    (__UINT64_C(18446744073709551615))
-# define UINT32_MAX    (4294967295U)
+# define UINT64_MAX (__UINT64_C(18446744073709551615))
+# define UINT32_MAX (4294967295U)
 //
 // Basic types mapping
 //
-typedef UINTN   size_t;
-typedef UINTN   off_t;
-typedef UINTN   u_int;
-typedef UINTN   intptr_t;
-typedef INTN    ptrdiff_t;
-typedef INTN    ssize_t;
-typedef INT64   time_t;
-typedef UINT8   __uint8_t;
-typedef UINT8   sa_family_t;
-typedef UINT8   u_char;
-typedef UINT32  uid_t;
-typedef UINT32  gid_t;
-typedef CHAR16  wchar_t;
-typedef short   int16_t;
+typedef UINTN  size_t;
+typedef UINTN  off_t;
+typedef UINTN  u_int;
+typedef UINTN  intptr_t;
+typedef INTN   ptrdiff_t;
+typedef INTN   ssize_t;
+typedef INT64  time_t;
+typedef UINT8  __uint8_t;
+typedef UINT8  sa_family_t;
+typedef UINT8  u_char;
+typedef UINT32 uid_t;
+typedef UINT32 gid_t;
+typedef CHAR16 wchar_t;
+typedef short  int16_t;
 
 //
 // File operations are not required for EFI building,
@@ -475,42 +474,42 @@ strcat (
 
 int
 fflush (
-  FILE *stream
+  FILE  *stream
   );
 
 int
 ferror (
-  FILE *fp
+  FILE  *fp
   );
 
 int
 fseek (
-  FILE *stream,
-  long offset,
-  int whence
+  FILE  *stream,
+  long  offset,
+  int   whence
   );
 
 int
 feof (
-  FILE *fp
+  FILE  *fp
   );
 
 char *
 fgets (
-  char *str,
-  int n,
+  char  *str,
+  int   n,
   FILE *stream
   );
 
 int
 ftell (
-  FILE *fp
+  FILE  *fp
   );
 
 int
 fputs (
-  const char *str,
-  FILE *stream
+  const char  *str,
+  FILE        *stream
   );
 
 char *
@@ -520,16 +519,16 @@ strdup (
 
 void *
 bsearch (
-  const void *key,
-  const void *base,
-  size_t nel,
-  size_t width,
-  int (*cmp)(const void *, const void *)
+  const void  *key,
+  const void  *base,
+  size_t      nel,
+  size_t      width,
+  int         (*cmp)(const void *, const void *)
   );
 
 int getentropy (
-  void *buffer,
-  size_t length
+  void    *buffer,
+  size_t  length
   );
 //
 // Macros that directly map functions to BaseLib, BaseMemoryLib, and DebugLib functions
