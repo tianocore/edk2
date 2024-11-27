@@ -135,7 +135,6 @@ typedef int           int32_t;
 #define UINT64_C(c)   c ## UL
 #endif
 
-#define __UINT64_C(c) c ## UL
 # define UINT64_MAX    (__UINT64_C(18446744073709551615))
 # define UINT32_MAX    (4294967295U)
 //
