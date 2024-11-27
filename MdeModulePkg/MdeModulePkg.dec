@@ -1212,6 +1212,11 @@
   # @Prompt Defines the page allocation for the MM communication buffer; default is 128 pages (512KB).
   gEfiMdeModulePkgTokenSpaceGuid.PcdMmCommBufferPages|128|UINT32|0x30001061
 
+  ## Indicates if the Platform Boot Manager should add an entry for the UEFI Shell.
+  #  TRUE  - Boot Manager will add a Shell entry.<BR>
+  #  FALSE - Boot Manager will not add a Shell entry.<BR>
+  gEfiMdeModulePkgTokenSpaceGuid.PcdUefiShellCreateBootOption|TRUE|BOOLEAN|0x30001062
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Dynamic type PCD can be registered callback function for Pcd setting action.
   #  PcdMaxPeiPcdCallBackNumberPerPcdEntry indicates the maximum number of callback function
@@ -1684,7 +1689,7 @@
   #   TRUE  - Capsule On Disk is supported.<BR>
   #   FALSE - Capsule On Disk is not supported.<BR>
   #  If platform does not use this feature, this PCD should be set to FALSE.<BR><BR>
-  #  Two sulotions to deliver Capsule On Disk:<BR>
+  #  Two solutions to deliver Capsule On Disk:<BR>
   #    a) If PcdCapsuleInRamSupport = TRUE, Load Capsule On Disk image out of TCB, and reuse
   #       Capsule In Ram to deliver capsule.<BR>
   #    b) If PcdCapsuleInRamSupport = FALSE, Relocate Capsule On Disk image to RootDir out
