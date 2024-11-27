@@ -692,6 +692,8 @@ InitializeFvAndVariableStoreHeaders (
   //
   Fv           = (EFI_FIRMWARE_VOLUME_HEADER *)Ptr;
   Fv->Checksum = CalculateCheckSum16 (Ptr, Fv->HeaderLength);
+
+  DEBUG ((DEBUG_INFO, "EMU Variable FVB: Initialized FV using template structure\n"));
 }
 
 /**

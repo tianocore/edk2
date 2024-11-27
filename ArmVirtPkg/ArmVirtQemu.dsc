@@ -92,7 +92,7 @@
   TpmPlatformHierarchyLib|SecurityPkg/Library/PeiDxeTpmPlatformHierarchyLibNull/PeiDxeTpmPlatformHierarchyLib.inf
 !endif
 
-  ArmMonitorLib|ArmVirtPkg/Library/ArmVirtQemuMonitorLib/ArmVirtQemuMonitorLib.inf
+  ArmMonitorLib|ArmVirtPkg/Library/ArmVirtMonitorLib/ArmVirtMonitorLib.inf
 
 [LibraryClasses.AARCH64]
   ArmPlatformLib|ArmVirtPkg/Library/ArmPlatformLibQemu/ArmPlatformLibQemu.inf
@@ -102,7 +102,7 @@
 
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
-  ArmMonitorLib|ArmVirtPkg/Library/ArmVirtQemuMonitorPeiLib/ArmVirtQemuMonitorPeiLib.inf
+  ArmMonitorLib|ArmVirtPkg/Library/ArmVirtMonitorPeiLib/ArmVirtMonitorPeiLib.inf
   FdtLib|MdePkg/Library/BaseFdtLib/BaseFdtLib.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 
@@ -190,7 +190,7 @@
   #
   # Network Pcds
   #
-!include NetworkPkg/NetworkPcds.dsc.inc
+!include NetworkPkg/NetworkFixedPcds.dsc.inc
 
   # System Memory Base -- fixed at 0x4000_0000
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x40000000
@@ -297,13 +297,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSmbiosDocRev|0x0
   gUefiOvmfPkgTokenSpaceGuid.PcdQemuSmbiosValidated|FALSE
 
-!if $(NETWORK_ENABLE) == TRUE
-  #
-  # IPv4 and IPv6 PXE Boot support.
-  #
-  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4PXESupport|0x01
-  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6PXESupport|0x01
-!endif
+!include NetworkPkg/NetworkDynamicPcds.dsc.inc
 
   #
   # TPM2 support

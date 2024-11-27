@@ -122,8 +122,6 @@
 
 [LibraryClasses.common.SEC]
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
-  # StackCheckLib is not linked for SEC modules by default, this package can link it against its SEC modules
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf

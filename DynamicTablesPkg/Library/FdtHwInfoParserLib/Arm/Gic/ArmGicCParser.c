@@ -167,7 +167,8 @@ CpusNodeParser (
   IN  CONST VOID               *Fdt,
   IN        INT32              CpusNode,
   IN        UINT32             GicVersion,
-  OUT       CM_OBJ_DESCRIPTOR  **NewGicCmObjDesc
+  OUT       CM_OBJ_DESCRIPTOR  **NewGicCmObjDesc,
+  OUT       UINTN              *CpuCount
   )
 {
   EFI_STATUS  Status;
@@ -201,6 +202,8 @@ CpusNodeParser (
     ASSERT (0);
     return EFI_NOT_FOUND;
   }
+
+  *CpuCount = CpuNodeCount;
 
   // Allocate memory for CpuNodeCount CM_ARM_GICC_INFO structures.
   GicCInfoBufferSize = CpuNodeCount * sizeof (CM_ARM_GICC_INFO);
@@ -280,6 +283,7 @@ EFIAPI
 GicCIntcNodeParser (
   IN      CONST VOID               *Fdt,
   IN            INT32              GicIntcNode,
+  IN            UINTN              CpuCount,
   IN  OUT       CM_OBJ_DESCRIPTOR  *GicCCmObjDesc
   )
 {
@@ -289,6 +293,8 @@ GicCIntcNodeParser (
 
   CONST UINT8  *Data;
   INT32        DataSize;
+  UINT32       MaintenanceInterrupt;
+  UINT32       Flags;
 
   if (GicCCmObjDesc == NULL) {
     ASSERT (0);
@@ -308,14 +314,17 @@ GicCIntcNodeParser (
   // but it is assumed that only one Gic is available.
   Data = fdt_getprop (Fdt, GicIntcNode, "interrupts", &DataSize);
   if ((Data != NULL) && (DataSize == (IntCells * sizeof (UINT32)))) {
-    GicCInfo                           = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data;
-    GicCInfo->VGICMaintenanceInterrupt =
-      FdtGetInterruptId ((CONST UINT32 *)Data);
-    GicCInfo->Flags = DT_IRQ_IS_EDGE_TRIGGERED (
-                        fdt32_to_cpu (((UINT32 *)Data)[IRQ_FLAGS_OFFSET])
-                        ) ?
-                      EFI_ACPI_6_3_VGIC_MAINTENANCE_INTERRUPT_MODE_FLAGS :
-                      0;
+    MaintenanceInterrupt = FdtGetInterruptId ((CONST UINT32 *)Data);
+    Flags                = DT_IRQ_IS_EDGE_TRIGGERED (
+                             fdt32_to_cpu (((UINT32 *)Data)[IRQ_FLAGS_OFFSET])
+                             ) ?
+                           EFI_ACPI_6_3_VGIC_MAINTENANCE_INTERRUPT_MODE_FLAGS :
+                           0;
+    for (GicCInfo = (CM_ARM_GICC_INFO *)GicCCmObjDesc->Data; CpuCount--; GicCInfo++) {
+      GicCInfo->VGICMaintenanceInterrupt = MaintenanceInterrupt;
+      GicCInfo->Flags                   |= Flags;
+    }
+
     return Status;
   } else if (DataSize < 0) {
     // This property is optional and was not found. Just return.
@@ -816,6 +825,7 @@ ArmGicCInfoParser (
   UINT32             GicVersion;
   CM_OBJ_DESCRIPTOR  *NewCmObjDesc;
   VOID               *Fdt;
+  UINTN              CpuCount;
 
   if (FdtParserHandle == NULL) {
     ASSERT (0);
@@ -846,7 +856,7 @@ ArmGicCInfoParser (
 
   // Parse the "cpus" nodes and its children "cpu" nodes,
   // and create a CM_OBJ_DESCRIPTOR.
-  Status = CpusNodeParser (Fdt, FdtBranch, GicVersion, &NewCmObjDesc);
+  Status = CpusNodeParser (Fdt, FdtBranch, GicVersion, &NewCmObjDesc, &CpuCount);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     return Status;
@@ -878,7 +888,7 @@ ArmGicCInfoParser (
   }
 
   // Parse the Gic information common to Gic v2 and v3.
-  Status = GicCIntcNodeParser (Fdt, IntcNode, NewCmObjDesc);
+  Status = GicCIntcNodeParser (Fdt, IntcNode, CpuCount, NewCmObjDesc);
   if (EFI_ERROR (Status)) {
     ASSERT (0);
     goto exit_handler;

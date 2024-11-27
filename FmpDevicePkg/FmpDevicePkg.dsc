@@ -76,9 +76,6 @@
 [LibraryClasses.common.SEC]
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
-[LibraryClasses.ARM]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
-
 [PcdsPatchableInModule]
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageTypeIdGuid|{0}
 
