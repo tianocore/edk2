@@ -665,13 +665,7 @@ MigrateMemoryAllocationHobs (
   Hob.Raw             = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, HobStart);
   while (Hob.Raw != NULL) {
     MemoryAllocationHob = (EFI_HOB_MEMORY_ALLOCATION *)Hob.Raw;
-    if ((MemoryAllocationHob->AllocDescriptor.MemoryType == EfiBootServicesData) &&
-        (MmIsBufferOutsideMmValid (
-           MemoryAllocationHob->AllocDescriptor.MemoryBaseAddress,
-           MemoryAllocationHob->AllocDescriptor.MemoryLength
-           ))
-        )
-    {
+    if (MemoryAllocationHob->AllocDescriptor.MemoryType == EfiBootServicesData) {
       if (!IsZeroGuid (&MemoryAllocationHob->AllocDescriptor.Name)) {
         MemoryInMmram = AllocatePages (EFI_SIZE_TO_PAGES (MemoryAllocationHob->AllocDescriptor.MemoryLength));
         if (MemoryInMmram != NULL) {
@@ -705,30 +699,81 @@ MigrateMemoryAllocationHobs (
   }
 }
 
-/** Returns the HOB list size.
+/**
+  This function is responsible for validating the input HOB list and
+  initializing a new HOB list in MMRAM based on the input HOB list.
 
-  @param [in]  HobStart   Pointer to the start of the HOB list.
+  @param [in]  HobStart          Pointer to the start of the HOB list.
+  @param [in]  MmramRanges       Pointer to the Mmram ranges.
+  @param [in]  MmramRangeCount   Count of Mmram ranges.
 
-  @retval Size of the HOB list.
+  @retval Pointer to the new location of hob list in MMRAM.
 **/
-UINTN
-GetHobListSize (
-  IN VOID  *HobStart
+VOID *
+InitializeMmHobList (
+  IN VOID                  *HobStart,
+  IN EFI_MMRAM_DESCRIPTOR  *MmramRanges,
+  IN UINTN                 MmramRangeCount
   )
 {
+  VOID                  *MmHobStart;
+  UINTN                 HobSize;
+  EFI_STATUS            Status;
   EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 Index;
+  EFI_PHYSICAL_ADDRESS  MmramBase;
+  EFI_PHYSICAL_ADDRESS  MmramEnd;
+  EFI_PHYSICAL_ADDRESS  ResourceHobBase;
+  EFI_PHYSICAL_ADDRESS  ResourceHobEnd;
 
   ASSERT (HobStart != NULL);
 
   Hob.Raw = (UINT8 *)HobStart;
   while (!END_OF_HOB_LIST (Hob)) {
     Hob.Raw = GET_NEXT_HOB (Hob);
+    if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
+      ResourceHobBase = Hob.ResourceDescriptor->PhysicalStart;
+      ResourceHobEnd  = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
+
+      for (Index = 0; Index < MmramRangeCount; Index++) {
+        MmramBase = MmramRanges[Index].PhysicalStart;
+        MmramEnd  = MmramRanges[Index].PhysicalStart + MmramRanges[Index].PhysicalSize;
+
+        if ((MmramBase < ResourceHobEnd) && (MmramEnd > ResourceHobBase)) {
+          //
+          // The Resource HOB is to describe the accessible non-Mmram range.
+          // All Resource HOB should not overlapp with any Mmram range.
+          //
+          DEBUG ((
+            DEBUG_ERROR,
+            "The resource HOB range [0x%lx, 0x%lx] overlaps with MMRAM range\n",
+            ResourceHobBase,
+            ResourceHobEnd
+            ));
+          CpuDeadLoop ();
+        }
+      }
+    }
   }
 
   //
   // Need plus END_OF_HOB_LIST
   //
-  return (UINTN)Hob.Raw - (UINTN)HobStart + sizeof (EFI_HOB_GENERIC_HEADER);
+  HobSize = (UINTN)Hob.Raw - (UINTN)HobStart + sizeof (EFI_HOB_GENERIC_HEADER);
+  DEBUG ((DEBUG_INFO, "HobSize - 0x%x\n", HobSize));
+
+  MmHobStart = AllocatePool (HobSize);
+  DEBUG ((DEBUG_INFO, "MmHobStart - 0x%x\n", MmHobStart));
+  ASSERT (MmHobStart != NULL);
+  CopyMem (MmHobStart, HobStart, HobSize);
+
+  DEBUG ((DEBUG_INFO, "MmInstallConfigurationTable For HobList\n"));
+  Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
+  ASSERT_EFI_ERROR (Status);
+
+  MigrateMemoryAllocationHobs (MmHobStart);
+
+  return MmHobStart;
 }
 
 /**
@@ -752,8 +797,6 @@ StandaloneMmMain (
 {
   EFI_STATUS                      Status;
   UINTN                           Index;
-  VOID                            *MmHobStart;
-  UINTN                           HobSize;
   VOID                            *Registration;
   EFI_HOB_GUID_TYPE               *MmramRangesHob;
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
@@ -806,21 +849,11 @@ StandaloneMmMain (
   // It is done in the constructor of StandaloneMmCoreMemoryAllocationLib(),
   // so that the library linked with StandaloneMmCore can use AllocatePool() in
   // the constructor.
-
-  DEBUG ((DEBUG_INFO, "MmInstallConfigurationTable For HobList\n"));
+  //
   //
   // Install HobList
   //
-  HobSize = GetHobListSize (HobStart);
-  DEBUG ((DEBUG_INFO, "HobSize - 0x%x\n", HobSize));
-  MmHobStart = AllocatePool (HobSize);
-  DEBUG ((DEBUG_INFO, "MmHobStart - 0x%x\n", MmHobStart));
-  ASSERT (MmHobStart != NULL);
-  CopyMem (MmHobStart, HobStart, HobSize);
-  Status = MmInstallConfigurationTable (&gMmCoreMmst, &gEfiHobListGuid, MmHobStart, HobSize);
-  ASSERT_EFI_ERROR (Status);
-  MigrateMemoryAllocationHobs (MmHobStart);
-  gHobList = MmHobStart;
+  gHobList = InitializeMmHobList (HobStart, MmramRanges, MmramRangeCount);
 
   //
   // Register notification for EFI_MM_CONFIGURATION_PROTOCOL registration and
