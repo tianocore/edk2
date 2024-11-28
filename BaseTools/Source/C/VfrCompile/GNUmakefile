@@ -32,6 +32,9 @@ LINKER = $(CXX)
 
 EXTRA_CLEAN_OBJECTS = EfiVfrParser.cpp EfiVfrParser.h VfrParser.dlg VfrTokens.h VfrLexer.cpp VfrLexer.h VfrSyntax.cpp tokens.h
 
+CC_FOR_BUILD ?= $(CC)
+CXX_FOR_BUILD ?= $(CXX)
+
 MAKEROOT ?= ../..
 
 include $(MAKEROOT)/Makefiles/header.makefile
@@ -55,10 +58,10 @@ VfrLexer.cpp VfrLexer.h: Pccts/dlg/dlg VfrParser.dlg
 	Pccts/dlg/dlg -C2 -i -CC -cl VfrLexer -o . VfrParser.dlg
 
 Pccts/antlr/antlr:
-	BIN_DIR='.' $(MAKE) -C Pccts/antlr
+	BIN_DIR='.' $(MAKE) -C Pccts/antlr CC=$(CC_FOR_BUILD) CXX=$(CXX_FOR_BUILD)
 
 Pccts/dlg/dlg:
-	BIN_DIR='.' $(MAKE) -C Pccts/dlg
+	BIN_DIR='.' $(MAKE) -C Pccts/dlg CC=$(CC_FOR_BUILD) CXX=$(CXX_FOR_BUILD)
 
 ATokenBuffer.o: Pccts/h/ATokenBuffer.cpp
 	$(CXX) -c $(VFR_CPPFLAGS) $(INC) $(VFR_CXXFLAGS) $? -o $@
