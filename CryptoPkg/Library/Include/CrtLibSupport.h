@@ -118,10 +118,10 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define __PRI64_PREFIX  "l"
 #define PRIu64          __PRI64_PREFIX "u"
 
-#define INT32_MIN   -0x80000000
-#define INT32_MAX   0x7FFFFFFF
-#define PTRDIFF_MAX 0x7FFFFFFFFFFFFFFF
-#define INT64_C(c)  c ## L
+#define INT32_MIN     -0x80000000
+#define INT32_MAX     0x7FFFFFFF
+#define PTRDIFF_MAX   0x7FFFFFFFFFFFFFFF
+#define INT64_C(c)    c ## L
 
 #ifndef __INT64_C
 #define __INT64_C(c)  c ## L
@@ -135,8 +135,8 @@ typedef int int32_t;
 #define UINT64_C(c) c ## UL
 #endif
 
-# define UINT64_MAX (__UINT64_C(18446744073709551615))
-# define UINT32_MAX (4294967295U)
+# define UINT64_MAX    (__UINT64_C(18446744073709551615))
+# define UINT32_MAX    (4294967295U)
 //
 // Basic types mapping
 //
