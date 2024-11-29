@@ -2,7 +2,7 @@
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
-  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (C) 2024 - 2025, Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -53,6 +53,11 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTpm2InterfaceInfo,              ///< 26 - TPM Interface Info
   EArchCommonObjSpmiInterfaceInfo,              ///< 27 - SPMI Interface Info
   EArchCommonObjSpmiInterruptDeviceInfo,        ///< 28 - SPMI Interrupt and Device Info
+  EArchCommonObjCstInfo,                        ///< 29 - C-State Info
+  EArchCommonObjCsdInfo,                        ///< 30 - C-State Dependency (CSD) Info
+  EArchCommonObjPctInfo,                        ///< 31 - P-State control (PCT) Info
+  EArchCommonObjPssInfo,                        ///< 32 - P-State status (PSS) Info
+  EArchCommonObjPpcInfo,                        ///< 33 - P-State control (PPC) Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -728,6 +733,74 @@ typedef struct CmArchCommonObjSpmiInterruptDeviceInfo {
   /** Uid of the device */
   UINT32    DeviceId;
 } CM_ARCH_COMMON_SPMI_INTERRUPT_DEVICE_INFO;
+
+/** A structure that describes the Cst information.
+
+  Processor power state (C-state) is described in DSDT/SSDT and associated
+  to cpus/clusters in the cpu topology.
+
+  Unsupported Optional registers should be encoded with NULL resource
+  Register {(SystemMemory, 0, 0, 0, 0)}
+
+  For values that support Integer or Buffer, integer will be used
+  if buffer is NULL resource.
+  If resource is not NULL then Integer must be 0
+
+  Cf. ACPI 6.5, s8.4.1.1 _CST (C states)
+
+  ID: EArchCommonObjCstInfo
+*/
+typedef AML_CST_INFO CM_ARCH_COMMON_CST_INFO;
+
+/** A structure that describes the C-State Dependency (CSD) Info.
+
+    Cf. ACPI 6.5, s8.4.1.2 _CSD (C-State Dependency).
+
+    ID: EArchCommonObjCsdInfo
+*/
+typedef struct CmArchCommonObjCsdInfo {
+  /// The revision of the C-State dependency table.
+  UINT8              Revision;
+
+  /// The domain ID.
+  UINT32             Domain;
+
+  /// The coordination type.
+  UINT32             CoordType;
+
+  /// The number of processors in the domain.
+  UINT32             NumProcessors;
+
+  /// Token referencing the CST package of the CM object
+  CM_OBJECT_TOKEN    CstPkgRefToken;
+} CM_ARCH_COMMON_CSD_INFO;
+
+/** A structure that describes the P-State _PCT.
+
+    Cf. ACPI 6.5, s8.4.5.1 Processor Performance Control
+
+    ID: EArchCommonObjPctInfo
+*/
+typedef AML_PCT_INFO CM_ARCH_COMMON_PCT_INFO;
+
+/** A structure that describes the P-State _PSS.
+
+    Cf. ACPI 6.5, s8.4.5.2 Processor Performance Control
+
+    ID: EArchCommonObjPssInfo
+*/
+typedef AML_PSS_INFO CM_ARCH_COMMON_PSS_INFO;
+
+/** A structure that describes the P-State _PPC.
+
+    Cf. ACPI 6.5, s8.4.5.3 Processor Performance Control
+
+    ID: EArchCommonObjPpcInfo
+*/
+typedef struct CmArchCommonObjPpcInfo {
+  /// The number of performance states supported by the processor.
+  UINT32    PstateCount;
+} CM_ARCH_COMMON_PPC_INFO;
 #pragma pack()
 
 #endif // ARCH_COMMON_NAMESPACE_OBJECTS_H_
