@@ -695,6 +695,40 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonSpmiInterruptDeviceInfoParser[] = {
   { "DeviceId",              sizeof (UINT32), "0x%x", NULL }
 };
 
+/** A parser for EArchCommonObjCstInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonCstInfoParser[] = {
+  { "CstCount", 4,                           "0x%x", NULL },
+  { "CstPkg",   sizeof (AML_CST_PKG_INFO *), "0x%p", NULL }
+};
+
+/** A parser for EArchCommonObjCsdInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonCsdInfoParser[] = {
+  { "NumEntries",    4, "0x%x", NULL },
+  { "Revision",      1, "0x%x", NULL },
+  { "Domain",        4, "0x%x", NULL },
+  { "CoordType",     4, "0x%x", NULL },
+  { "NumProcessors", 4, "0x%x", NULL },
+  { "Index",         4, "0x%x", NULL }
+};
+
+/** A parser for EArchCommonObjPctInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPctInfoParser[] = {
+  { "ControlRegister", sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE), NULL, NULL, AcpiGenericAddressParser },
+  { "StatusRegister",  sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE), NULL, NULL, AcpiGenericAddressParser }
+};
+
+/** A parser for EArchCommonObjPstateInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonPstateInfoParser[] = {
+  { "Pct",              sizeof (AML_PCT_INFO), NULL,   NULL, CmArchCommonPctInfoParser, ARRAY_SIZE (CmArchCommonPctInfoParser) },
+  { "Pss",              sizeof (AML_PSS_INFO), NULL },
+  { "PssPackagesCount", 4,                     "0x%x", NULL },
+  { "Ppc",              4,                     "0x%x", NULL }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -727,6 +761,9 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjTpm2InterfaceInfo,           CmArchCommonTpm2InterfaceInfo),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSpmiInterfaceInfo,           CmArchCommonSpmiInterfaceInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjSpmiInterruptDeviceInfo,     CmArchCommonSpmiInterruptDeviceInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCstInfo,                     CmArchCommonCstInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjCsdInfo,                     CmArchCommonCsdInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjPstateInfo,                  CmArchCommonPstateInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
