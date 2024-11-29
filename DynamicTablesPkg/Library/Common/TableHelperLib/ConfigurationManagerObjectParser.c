@@ -937,7 +937,9 @@ STATIC CONST CM_OBJ_PARSER  CmX64ObjLocalApicX2ApicInfoParser[] = {
   { "AcpiProcessorUid", 4,                        "0x%x", NULL },
   { "CstToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "CsdToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "PstateToken",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL }
+  { "PstateToken",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "PsdToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "CpcToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL }
 };
 
 /** A parser for CmX64IoApicInfoParser.
