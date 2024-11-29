@@ -751,6 +751,12 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonPpcInfoParser[] = {
   { "PstateCount", 4, "0x%x", NULL }
 };
 
+/** A parser for EArchCommonObjStaInfo.
+*/
+STATIC CONST CM_OBJ_PARSER  CmArchCommonStaInfoParser[] = {
+  { "DeviceStatus", 4, "0x%x", NULL }
+};
+
 /** A parser for Arch Common namespace objects.
 */
 STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
@@ -788,6 +794,7 @@ STATIC CONST CM_OBJ_PARSER_ARRAY  ArchCommonNamespaceObjectParser[] = {
   CM_PARSER_ADD_OBJECT (EArchCommonObjPctInfo,                     CmArchCommonPctInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPssInfo,                     CmArchCommonPssInfoParser),
   CM_PARSER_ADD_OBJECT (EArchCommonObjPpcInfo,                     CmArchCommonPpcInfoParser),
+  CM_PARSER_ADD_OBJECT (EArchCommonObjStaInfo,                     CmArchCommonStaInfoParser),
   CM_PARSER_ADD_OBJECT_RESERVED (EArchCommonObjMax)
 };
 
@@ -965,7 +972,8 @@ STATIC CONST CM_OBJ_PARSER  CmX64ObjLocalApicX2ApicInfoParser[] = {
   { "PssToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "PpcToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
   { "PsdToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
-  { "CpcToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL }
+  { "CpcToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "StaToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL }
 };
 
 /** A parser for CmX64IoApicInfoParser.
