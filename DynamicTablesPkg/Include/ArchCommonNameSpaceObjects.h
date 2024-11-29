@@ -58,6 +58,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjPctInfo,                        ///< 31 - P-State control (PCT) Info
   EArchCommonObjPssInfo,                        ///< 32 - P-State status (PSS) Info
   EArchCommonObjPpcInfo,                        ///< 33 - P-State control (PPC) Info
+  EArchCommonObjStaInfo,                        ///< 34 - _STA (Device Status) Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -801,6 +802,16 @@ typedef struct CmArchCommonObjPpcInfo {
   /// The number of performance states supported by the processor.
   UINT32    PstateCount;
 } CM_ARCH_COMMON_PPC_INFO;
+
+/** A structure that describes the _STA (Device Status) Info.
+
+    ID: EArchCommonObjStaInfo
+*/
+typedef struct CmArchCommonStaInfo {
+  /// Device Status
+  UINT32    DeviceStatus;
+} CM_ARCH_COMMON_STA_INFO;
+
 #pragma pack()
 
 #endif // ARCH_COMMON_NAMESPACE_OBJECTS_H_
