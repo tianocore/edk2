@@ -2,7 +2,7 @@
   AML Code Generation.
 
   Copyright (c) 2020 - 2023, Arm Limited. All rights reserved.<BR>
-  Copyright (C) 2023 - 2024, Advanced Micro Devices, Inc. All rights reserved.<BR>
+  Copyright (C) 2023 - 2025, Advanced Micro Devices, Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -4389,6 +4389,701 @@ error_handler:
 
   if (PsdParentPackage != NULL) {
     AmlDeleteTree ((AML_NODE_HANDLE)PsdParentPackage);
+  }
+
+  return Status;
+}
+
+/** Create a _CST node.
+
+  AmlCreateCstNode ("_CST", 0, 1, ParentNode, &CstNode) is
+  equivalent of the following ASL code:
+    Name (_CST, Package (
+                  0   // Count
+                  ))
+
+  This function doesn't define any CST state. As shown above, the count
+  of _CST state is set to 0.
+  The AmlAddCstState () function allows to add CST states.
+
+  Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States)
+
+  @param [in]  CstNameString  The new CST 's object name.
+                              Must be a NULL-terminated ASL NameString
+                              e.g.: "_CST", "DEV0.CSTP", etc.
+                              The input string is copied.
+  @param [in]  ParentNode     If provided, set ParentNode as the parent
+                              of the node created.
+  @param [out] NewCstNode     If success, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreateCstNode (
+  IN  CONST CHAR8                   *CstNameString,
+  IN        AML_NODE_HANDLE         ParentNode   OPTIONAL,
+  OUT       AML_OBJECT_NODE_HANDLE  *NewCstNode   OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  PackageNode;
+  AML_OBJECT_NODE_HANDLE  IntegerNode;
+
+  if ((CstNameString == NULL)                           ||
+      ((ParentNode == NULL) && (NewCstNode == NULL)))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  IntegerNode = NULL;
+
+  Status = AmlCodeGenPackage (&PackageNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  // Create and attach Count. No CST state is added, so 0.
+  Status = AmlCodeGenInteger (0, &IntegerNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    IntegerNode = NULL;
+    goto error_handler;
+  }
+
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)IntegerNode
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  IntegerNode = NULL;
+
+  Status = AmlCodeGenName (CstNameString, PackageNode, ParentNode, NewCstNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  AmlDeleteTree ((AML_NODE_HANDLE)PackageNode);
+  if (IntegerNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)IntegerNode);
+  }
+
+  return Status;
+}
+
+/** Add an _CST state to a CST node created using AmlCreateCstNode.
+
+  AmlAddCstState increments the Count of CST states in the CST node by one,
+  and adds the following package:
+  Package {
+    Register  // Buffer (Resource Descriptor)
+    Type      // Integer (BYTE)
+    Latency   // Integer (WORD)
+    Power     // Integer (DWORD)
+  }
+
+  Cf ACPI 6.5 specification, s8.4.1.1 _CST (C States).
+
+  @param [in]  CstInfo                    CstInfo object
+  @param [in]  CstNode                    Cst node created with the function
+                                          AmlCreateCstNode to which the new CST
+                                          state is appended.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlAddCstState (
+  IN  AML_CST_INFO            *CstInfo,
+  IN  AML_OBJECT_NODE_HANDLE  CstNode
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  PackageNode;
+  AML_OBJECT_NODE_HANDLE  NewCstPackageNode;
+  AML_OBJECT_NODE_HANDLE  CountNode;
+  UINT64                  Count;
+
+  if ((CstInfo == NULL)                                             ||
+      (CstNode == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)CstNode) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (CstNode, AML_NAME_OP, 0)))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  // AmlCreateCstNode () created a CST container such as:
+  //  Name (_CST, Package (
+  //                0   // Count
+  //                ))
+  // Get the CST container, a PackageOp object node stored as the 2nd fixed
+  // argument (i.e. index 1) of CstNode.
+  PackageNode = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                          CstNode,
+                                          EAmlParseIndexTerm1
+                                          );
+  if ((PackageNode == NULL)                                             ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PackageNode) != EAmlNodeObject) ||
+      (!AmlNodeHasOpCode (PackageNode, AML_PACKAGE_OP, 0)))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  CountNode = NULL;
+  CountNode = (AML_OBJECT_NODE_HANDLE)AmlGetNextVariableArgument (
+                                        (AML_NODE_HANDLE)PackageNode,
+                                        (AML_NODE_HANDLE)CountNode
+                                        );
+  if (CountNode == NULL) {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlNodeGetIntegerValue (CountNode, &Count);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlCodeGenPackage (&NewCstPackageNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  Status = AmlAddRegisterToPackage (
+             (VOID *)&CstInfo->Register,
+             NewCstPackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  Status = AmlAddRegisterOrIntegerToPackage (
+             NULL,
+             CstInfo->Type,
+             NewCstPackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  Status = AmlAddRegisterOrIntegerToPackage (
+             NULL,
+             CstInfo->Latency,
+             NewCstPackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  Status = AmlAddRegisterOrIntegerToPackage (
+             NULL,
+             CstInfo->Power,
+             NewCstPackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  // Add the new CST state to the CstNode.
+  Status = AmlVarListAddTail (
+             (AML_NODE_HANDLE)PackageNode,
+             (AML_NODE_HANDLE)NewCstPackageNode
+             );
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  NewCstPackageNode = NULL;
+
+  Status = AmlUpdateInteger (CountNode, Count + 1);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  return Status;
+
+error_handler:
+  ASSERT_EFI_ERROR (Status);
+  if (NewCstPackageNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)NewCstPackageNode);
+  }
+
+  return Status;
+}
+
+/** Create a _CSD node.
+
+  Generates and optionally appends the following node:
+
+  Name (_CSD, Package()
+  {
+    Package () {
+      NumEntries,    // Integer
+      Revision,      // Integer (BYTE)
+      Domain,        // Integer (DWORD)
+      CoordType,     // Integer (DWORD)
+      NumProcessors, // Integer (DWORD)
+      Index          // Integer (DWORD)
+    }
+    Package () {
+      NumEntries,    // Integer
+      Revision,      // Integer (BYTE)
+      Domain,        // Integer (DWORD)
+      CoordType,     // Integer (DWORD)
+      NumProcessors, // Integer (DWORD)
+      Index          // Integer (DWORD)
+    }
+    ...
+  })
+  Cf. ACPI 6.5, s8.4.1.2 _CSD (C-State Dependency).
+
+  @ingroup CodeGenApis
+
+  @param [in]  CsdInfo      CsdInfo object
+  @param [in]  NumEntries   Number of packages to be created.
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewCsdNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreateCsdNode (
+  IN  AML_CSD_INFO            *CsdInfo,
+  IN  UINT32                  NumEntries,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewCsdNode   OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  CsdNode;
+  AML_OBJECT_NODE_HANDLE  CsdMainPackage;
+  AML_OBJECT_NODE_HANDLE  CsdPackage;
+  UINT32                  Index;
+
+  if ((CsdInfo == NULL) || (NumEntries == 0) ||
+      ((ParentNode == NULL) && (NewCsdNode == NULL)))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  for (Index = 0; Index < NumEntries; Index++) {
+    if ((CsdInfo[Index].Revision != EFI_ACPI_6_5_AML_CSD_REVISION) ||
+        ((CsdInfo[Index].CoordType != ACPI_AML_COORD_TYPE_SW_ALL) &&
+         (CsdInfo[Index].CoordType != ACPI_AML_COORD_TYPE_SW_ANY) &&
+         (CsdInfo[Index].CoordType != ACPI_AML_COORD_TYPE_HW_ALL)))
+    {
+      ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  Status = AmlCodeGenNamePackage ("_CSD", NULL, &CsdNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  CsdPackage = NULL;
+
+  // Get the Package object node of the _CSD node,
+  // which is the 2nd fixed argument (i.e. index 1).
+  CsdMainPackage = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                             CsdNode,
+                                             EAmlParseIndexTerm1
+                                             );
+  if ((CsdMainPackage == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)CsdMainPackage) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (CsdMainPackage, AML_PACKAGE_OP, 0)))
+  {
+    Status = EFI_INVALID_PARAMETER;
+    goto error_handler;
+  }
+
+  for (Index = 0; Index < NumEntries; Index++) {
+    Status = AmlCodeGenPackage (&CsdPackage);
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               EFI_ACPI_6_5_AML_CSD_NUM_ENTRIES,
+               CsdPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               CsdInfo[Index].Revision,
+               CsdPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               CsdInfo[Index].Domain,
+               CsdPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               CsdInfo[Index].CoordType,
+               CsdPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               CsdInfo[Index].NumProcessors,
+               CsdPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               CsdInfo[Index].Index,
+               CsdPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlVarListAddTail (
+               (AML_NODE_HANDLE)CsdMainPackage,
+               (AML_NODE_HANDLE)CsdPackage
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto error_handler;
+    }
+
+    CsdPackage = NULL;
+  }
+
+  Status = LinkNode (CsdNode, ParentNode, NewCsdNode);
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  ASSERT_EFI_ERROR (Status);
+  if (CsdPackage != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)CsdPackage);
+  }
+
+  if (CsdNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)CsdNode);
+  }
+
+  return Status;
+}
+
+/** Create _PCT node
+
+  Generates and optionally appends the following node:
+  Name (_PCT, Package()
+  {
+    ControlRegister   // Buffer (Resource Descriptor (Register))
+    StatusRegister    // Buffer (Resource Descriptor (Register))
+  })
+
+  Cf. ACPI 6.5, s8.4.5.1 _PCT (Processor Control).
+
+  @ingroup CodeGenApis
+
+  @param [in]  PctInfo      PctInfo object
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewPctNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+AmlCreatePctNode (
+  IN  AML_PCT_INFO            *PctInfo,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewPctNode   OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  PctNode;
+  AML_OBJECT_NODE_HANDLE  PctPackage;
+
+  if ((PctInfo == NULL) ||
+      ((ParentNode == NULL) && (NewPctNode == NULL)))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (IsNullGenericAddress ((VOID *)&PctInfo->ControlRegister) ||
+      IsNullGenericAddress ((VOID *)&PctInfo->StatusRegister))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlCodeGenNamePackage ("_PCT", NULL, &PctNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  // Get the Package object node of the _PCT node,
+  // which is the 2nd fixed argument (i.e. index 1).
+  PctPackage = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                         PctNode,
+                                         EAmlParseIndexTerm1
+                                         );
+  if ((PctPackage == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PctPackage) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (PctPackage, AML_PACKAGE_OP, 0)))
+  {
+    ASSERT (0);
+    Status = EFI_INVALID_PARAMETER;
+    goto error_handler;
+  }
+
+  Status = AmlAddRegisterToPackage (
+             (VOID *)&PctInfo->ControlRegister,
+             PctPackage
+             );
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  Status = AmlAddRegisterToPackage (
+             (VOID *)&PctInfo->StatusRegister,
+             PctPackage
+             );
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  Status = LinkNode (PctNode, ParentNode, NewPctNode);
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  ASSERT_EFI_ERROR (Status);
+  AmlDeleteTree ((AML_NODE_HANDLE)PctNode);
+
+  return Status;
+}
+
+/** Create _PSS node
+
+  Generates and optionally appends the following node:
+  Name (_PSS, Package()
+  {
+    Package () {
+      CoreFrequency     // Integer (DWORD)
+      Power             // Integer (DWORD)
+      Latency           // Integer (DWORD)
+      BusMasterLatency  // Integer (DWORD)
+      Control           // Integer (DWORD)
+      Status            // Integer (DWORD)
+    }
+    Package () {
+      CoreFrequency     // Integer (DWORD)
+      Power             // Integer (DWORD)
+      Latency           // Integer (DWORD)
+      BusMasterLatency  // Integer (DWORD)
+      Control           // Integer (DWORD)
+      Status            // Integer (DWORD)
+    }
+    ...
+  })
+
+  Cf. ACPI 6.5, s8.4.5.2 _PSS (Processor Supported Performance States).
+
+  @ingroup CodeGenApis
+
+  @param [in]  PssInfo      Array of PssInfo object
+  @param [in]  NumPackages  Number of packages to be created.
+  @param [in]  ParentNode   If provided, set ParentNode as the parent
+                            of the node created.
+  @param [out] NewPssNode   If success and provided, contains the created node.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+
+**/
+EFI_STATUS
+EFIAPI
+AmlCreatePssNode (
+  IN  AML_PSS_INFO            *PssInfo,
+  IN  UINT32                  NumPackages,
+  IN  AML_NODE_HANDLE         ParentNode    OPTIONAL,
+  OUT AML_OBJECT_NODE_HANDLE  *NewPssNode   OPTIONAL
+  )
+{
+  EFI_STATUS              Status;
+  AML_OBJECT_NODE_HANDLE  PssNode;
+  AML_OBJECT_NODE_HANDLE  PssPackage;
+  AML_OBJECT_NODE_HANDLE  PssMainPackage;
+  UINT32                  Index;
+
+  if ((PssInfo == NULL) || (NumPackages == 0) ||
+      ((ParentNode == NULL) && (NewPssNode == NULL)))
+  {
+    ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = AmlCodeGenNamePackage ("_PSS", NULL, &PssNode);
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  PssPackage = NULL;
+
+  // Get the Package object node of the _PSS node,
+  // which is the 2nd fixed argument (i.e. index 1).
+  PssMainPackage = (AML_OBJECT_NODE_HANDLE)AmlGetFixedArgument (
+                                             PssNode,
+                                             EAmlParseIndexTerm1
+                                             );
+  if ((PssMainPackage == NULL)                                              ||
+      (AmlGetNodeType ((AML_NODE_HANDLE)PssMainPackage) != EAmlNodeObject)  ||
+      (!AmlNodeHasOpCode (PssMainPackage, AML_PACKAGE_OP, 0)))
+  {
+    Status = EFI_INVALID_PARAMETER;
+    goto error_handler;
+  }
+
+  for (Index = 0; Index < NumPackages; Index++) {
+    Status = AmlCodeGenPackage (&PssPackage);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               PssInfo[Index].CoreFrequency,
+               PssPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               PssInfo[Index].Power,
+               PssPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               PssInfo[Index].Latency,
+               PssPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               PssInfo[Index].BusMasterLatency,
+               PssPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               PssInfo[Index].Control,
+               PssPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlAddRegisterOrIntegerToPackage (
+               NULL,
+               PssInfo[Index].Status,
+               PssPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    Status = AmlVarListAddTail (
+               (AML_NODE_HANDLE)PssMainPackage,
+               (AML_NODE_HANDLE)PssPackage
+               );
+    if (EFI_ERROR (Status)) {
+      goto error_handler;
+    }
+
+    PssPackage = NULL;
+  }
+
+  Status = LinkNode (PssNode, ParentNode, NewPssNode);
+  if (EFI_ERROR (Status)) {
+    goto error_handler;
+  }
+
+  return Status;
+
+error_handler:
+  ASSERT_EFI_ERROR (Status);
+  if (PssPackage != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)PssPackage);
+  }
+
+  if (PssNode != NULL) {
+    AmlDeleteTree ((AML_NODE_HANDLE)PssNode);
   }
 
   return Status;
