@@ -628,7 +628,7 @@ fseek (
 
 int
 feof (
-  FILE *fp
+  FILE  *fp
   )
 {
   return -1;
@@ -657,8 +657,8 @@ strdup (
   char *strSource
   )
 {
-  UINTN len;
-  VOID  *Buffer;
+  UINTN  len;
+  VOID   *Buffer;
 
   if (!strSource) {
     return NULL;
@@ -667,18 +667,22 @@ strdup (
   len = strlen(strSource);
 
   Buffer = malloc (len);
-  ASSERT (Buffer != NULL);
+  if (Buffer == NULL) {
+    return NULL;
+  }
+
   strncpy (Buffer, strSource, len);
   return Buffer;
 }
 
+/* Performs a binary search */
 void *
 bsearch (
   const void *key,
   const void *base,
   size_t nitems,
   size_t width,
-  int (*cmp)(const void *, const void *)
+  int         ( *cmp )(const void *, const void *)
   )
 {
   void *mid;
@@ -688,8 +692,8 @@ bsearch (
     return NULL;
   }
   while (nitems > 0) {
-    mid = (char *)base + width * (nitems/2);
-    sign = cmp(key, mid);
+    mid  = (char *)base + width * (nitems/2);
+    sign = cmp (key, mid);
     if (sign < 0) {
       nitems /= 2;
     }
@@ -704,6 +708,7 @@ bsearch (
   return NULL;
 }
 
+/* Returns entropy of requested length in provided buffer */
 int
 getentropy (
   void *buffer,
@@ -719,7 +724,8 @@ getentropy (
     errno = EIO;
     return -1;
   }
-  if (entropyBuffer == NULL || length == 0) {
+
+  if ((entropyBuffer == NULL) || (length == 0)) {
     errno = EFAULT;
     return -1;
   }
@@ -729,9 +735,12 @@ getentropy (
       errno = ENOSYS;
       return -1;
     }
-    copyLength = (length - i >= sizeof(UINT64)) ? sizeof(UINT64):(length - i);
-    CopyMem(entropyBuffer + i, &randNum, copyLength);
+
+    copyLength =
+        (length - i >= sizeof (UINT64)) ? sizeof (UINT64) : (length - i);
+    CopyMem (entropyBuffer + i, &randNum, copyLength);
   }
+
   return 0;
 }
 
