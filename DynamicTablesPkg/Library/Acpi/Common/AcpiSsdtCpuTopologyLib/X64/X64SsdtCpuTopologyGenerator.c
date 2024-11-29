@@ -729,6 +729,22 @@ CreateTopologyFromIntC (
         goto return_handler;
       }
     }
+
+    if (LocalApicX2ApicInfo[Index].PsdToken != CM_NULL_TOKEN) {
+      Status = CreateAmlPsdNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].PsdToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].CpcToken != CM_NULL_TOKEN) {
+      Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].CpcToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
   }
 
 return_handler:

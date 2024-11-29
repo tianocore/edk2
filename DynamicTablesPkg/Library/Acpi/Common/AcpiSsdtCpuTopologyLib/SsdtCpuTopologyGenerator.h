@@ -352,4 +352,48 @@ AddArchAmlCpuInfo (
   OUT  AML_OBJECT_NODE_HANDLE                             *CpuNode
   );
 
+/** Create and add an _PSD Node to Cpu Node.
+
+  For instance, transform an AML node from:
+  Device (C002)
+  {
+      Name (_UID, 2)
+      Name (_HID, "ACPI0007")
+  }
+
+  To:
+  Device (C002)
+  {
+      Name (_UID, 2)
+      Name (_HID, "ACPI0007")
+      Name (_PSD, Package()
+      {
+        NumEntries,      // Integer
+        Revision,        // Integer
+        Domain,          // Integer
+        CoordType,       // Integer
+        NumProcessors,   // Integer
+      })
+  }
+
+  @param [in]  Generator              The SSDT Cpu Topology generator.
+  @param [in]  CfgMgrProtocol         Pointer to the Configuration Manager
+                                      Protocol Interface.
+  @param [in]  PsdToken               Token to identify the Psd information.
+  @param [in]  Node                   CPU Node to which the _CPC node is
+                                      attached.
+
+  @retval EFI_SUCCESS             The function completed successfully.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+EFI_STATUS
+EFIAPI
+CreateAmlPsdNode (
+  IN  ACPI_CPU_TOPOLOGY_GENERATOR                         *Generator,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  CM_OBJECT_TOKEN                                     PsdToken,
+  IN  AML_OBJECT_NODE_HANDLE                              *Node
+  );
+
 #endif // SSDT_CPU_TOPOLOGY_GENERATOR_H_
