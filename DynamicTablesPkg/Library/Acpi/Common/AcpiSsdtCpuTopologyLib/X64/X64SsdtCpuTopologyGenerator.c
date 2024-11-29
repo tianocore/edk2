@@ -25,6 +25,19 @@
 
 #include "SsdtCpuTopologyGenerator.h"
 
+/** This macro defines the supported ACPI Processor Status bits.
+    The following bits are supported:
+    - ACPI_AML_STA_DEVICE_STATUS_PRESET
+    - ACPI_AML_STA_DEVICE_STATUS_ENABLED
+    - ACPI_AML_STA_DEVICE_STATUS_UI
+    - ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING
+*/
+#define ACPI_AML_STA_PROC_SUPPORTED  (    \
+  ACPI_AML_STA_DEVICE_STATUS_PRESET |     \
+  ACPI_AML_STA_DEVICE_STATUS_ENABLED |    \
+  ACPI_AML_STA_DEVICE_STATUS_UI |         \
+  ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING)
+
 /** This macro expands to a function that retrieves the
     Local APIC or X2APIC information from the Configuration Manager.
 */
@@ -77,6 +90,15 @@ GET_OBJECT_LIST (
   EObjNameSpaceArchCommon,
   EArchCommonObjPpcInfo,
   CM_ARCH_COMMON_PPC_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    _STA (Device Status) information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjStaInfo,
+  CM_ARCH_COMMON_STA_INFO
   );
 
 /**
@@ -625,6 +647,7 @@ CreateTopologyFromIntC (
   CM_ARCH_COMMON_PCT_INFO        *PctInfo;
   CM_ARCH_COMMON_PPC_INFO        *PpcInfo;
   CM_ARCH_COMMON_PSS_INFO        *PssInfo;
+  CM_ARCH_COMMON_STA_INFO        *StaInfo;
   CM_X64_LOCAL_APIC_X2APIC_INFO  *LocalApicX2ApicInfo;
   EFI_STATUS                     Status;
   TOKEN_TABLE                    CstTokenTable;
@@ -816,6 +839,35 @@ CreateTopologyFromIntC (
         ASSERT_EFI_ERROR (Status);
         return Status;
       }
+    }
+  }
+
+  if (LocalApicX2ApicInfo[Index].StaToken != CM_NULL_TOKEN) {
+    Status = GetEArchCommonObjStaInfo (
+               CfgMgrProtocol,
+               LocalApicX2ApicInfo[Index].StaToken,
+               &StaInfo,
+               NULL
+               );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
+    }
+
+    /// check STA bits
+    if ((StaInfo->DeviceStatus & ~(ACPI_AML_STA_PROC_SUPPORTED)) != 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "Unsupported STA bits set for processor %d\n",
+        LocalApicX2ApicInfo[Index].AcpiProcessorUid
+        ));
+      return EFI_UNSUPPORTED;
+    }
+
+    Status = AmlCodeGenMethodRetInteger ("_STA", StaInfo->DeviceStatus, 0, FALSE, 0, CpuNode, NULL);
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      return Status;
     }
   }
 
