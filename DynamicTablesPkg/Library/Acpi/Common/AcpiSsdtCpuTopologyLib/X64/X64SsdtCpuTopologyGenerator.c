@@ -453,6 +453,152 @@ CreateAmlCstMethod (
 }
 
 /**
+  Create a C-State Dependency (CSD) object.
+
+  @param [in]  CstTokenTable    Pointer to the TokenTable containing the C-State tokens.
+  @param [in]  CsdToken         C-State Dependency token to add to the CPU node.
+  @param [in]  CfgMgrProtocol   Pointer to the Configuration Manager
+                                Protocol Interface.
+  @param [in]  Node             CPU node handle.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_NOT_FOUND           No CSD information found.
+  @retval EFI_INVALID_PARAMETER   Invalid parameter.
+  @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+CreateAmlCsdObject (
+  IN  TOKEN_TABLE                                         *CstTokenTable,
+  IN  CM_OBJECT_TOKEN                                     CsdToken,
+  IN  CONST EDKII_CONFIGURATION_MANAGER_PROTOCOL  *CONST  CfgMgrProtocol,
+  IN  AML_OBJECT_NODE_HANDLE                              *Node
+  )
+{
+  AML_CSD_INFO             *CsdInfo;
+  CM_ARCH_COMMON_CSD_INFO  *CmCsdInfo;
+  CM_ARCH_COMMON_OBJ_REF   *CstPkgRefInfo;
+  CM_ARCH_COMMON_OBJ_REF   *CstRefInfo;
+  EFI_STATUS               Status;
+  UINT32                   CsdIndex;
+  UINT32                   CsdNumEntries;
+  UINT32                   CstIndex;
+  UINT32                   CstPkgIndex;
+  UINT32                   CstPkgRefIndex;
+  UINT32                   CstPkgRefInfoCount;
+  UINT32                   CstRefInfoCount;
+
+  Status = GetEArchCommonObjCsdInfo (
+             CfgMgrProtocol,
+             CsdToken,
+             &CmCsdInfo,
+             &CsdNumEntries
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return Status;
+  }
+
+  if (CsdNumEntries == 0) {
+    ASSERT_EFI_ERROR (EFI_NOT_FOUND);
+    return EFI_NOT_FOUND;
+  }
+
+  CsdInfo = AllocateZeroPool (sizeof (AML_CSD_INFO) * CsdNumEntries);
+  if (CsdInfo == NULL) {
+    ASSERT_EFI_ERROR (EFI_OUT_OF_RESOURCES);
+    Status = EFI_OUT_OF_RESOURCES;
+    return Status;
+  }
+
+  for (CsdIndex = 0; CsdIndex < CsdNumEntries; CsdIndex++) {
+    CsdInfo[CsdIndex].Revision      = CmCsdInfo[CsdIndex].Revision;
+    CsdInfo[CsdIndex].Domain        = CmCsdInfo[CsdIndex].Domain;
+    CsdInfo[CsdIndex].CoordType     = CmCsdInfo[CsdIndex].CoordType;
+    CsdInfo[CsdIndex].NumProcessors = CmCsdInfo[CsdIndex].NumProcessors;
+    if (CmCsdInfo[CsdIndex].CstPkgRefToken == CM_NULL_TOKEN) {
+      ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+      Status = EFI_INVALID_PARAMETER;
+      goto return_handler;
+    }
+
+    /// Initialize to maximum value until the reference token is found
+    CsdInfo[CsdIndex].Index = MAX_UINT32;
+    for (
+         CstIndex = 0;
+         ((CstIndex < CstTokenTable->LastIndex) && (CsdInfo[CsdIndex].Index == MAX_UINT32));
+         CstIndex++
+         )
+    {
+      Status = GetEArchCommonObjCmRef (
+                 CfgMgrProtocol,
+                 CstTokenTable->Table[CstIndex],
+                 &CstRefInfo,
+                 &CstRefInfoCount
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        goto return_handler;
+      }
+
+      for (
+           CstPkgIndex = 0;
+           ((CstPkgIndex < CstRefInfoCount) && (CsdInfo[CsdIndex].Index == MAX_UINT32));
+           CstPkgIndex++
+           )
+      {
+        Status = GetEArchCommonObjCmRef (
+                   CfgMgrProtocol,
+                   CstRefInfo[CstPkgIndex].ReferenceToken,
+                   &CstPkgRefInfo,
+                   &CstPkgRefInfoCount
+                   );
+        if (EFI_ERROR (Status)) {
+          ASSERT_EFI_ERROR (Status);
+          goto return_handler;
+        }
+
+        for (
+             CstPkgRefIndex = 0;
+             ((CstPkgRefIndex < CstPkgRefInfoCount) && (CsdInfo[CsdIndex].Index == MAX_UINT32));
+             CstPkgRefIndex++
+             )
+        {
+          if (CstPkgRefInfo[CstPkgRefIndex].ReferenceToken == CmCsdInfo[CsdIndex].CstPkgRefToken) {
+            CsdInfo[CsdIndex].Index = CstPkgIndex;
+            break;
+          }
+        }
+      }
+    }
+
+    if (CsdInfo[CsdIndex].Index == MAX_UINT32) {
+      ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
+      Status = EFI_INVALID_PARAMETER;
+      goto return_handler;
+    }
+  }
+
+  Status = AmlCreateCsdNode (
+             CsdInfo,
+             CsdNumEntries,
+             Node,
+             NULL
+             );
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+  }
+
+return_handler:
+  if (CsdInfo != NULL) {
+    FreePool (CsdInfo);
+  }
+
+  return Status;
+}
+
+/**
   Create a standard ACPI CPU node.
   Collect the information from the Configuration Manager.
   Optionally creates a C-State, P-State and _STA method.
@@ -474,25 +620,14 @@ CreateTopologyFromIntC (
   IN        AML_OBJECT_NODE_HANDLE                        ScopeNode
   )
 {
-  AML_CSD_INFO                   *CsdInfo;
   AML_OBJECT_NODE_HANDLE         CpuNode;
   AML_OBJECT_NODE_HANDLE         CstsScopeNode;
-  CM_ARCH_COMMON_CSD_INFO        *CmCsdInfo;
-  CM_ARCH_COMMON_OBJ_REF         *CstPkgRefInfo;
-  CM_ARCH_COMMON_OBJ_REF         *CstRefInfo;
   CM_ARCH_COMMON_PCT_INFO        *PctInfo;
   CM_ARCH_COMMON_PPC_INFO        *PpcInfo;
   CM_ARCH_COMMON_PSS_INFO        *PssInfo;
   CM_X64_LOCAL_APIC_X2APIC_INFO  *LocalApicX2ApicInfo;
   EFI_STATUS                     Status;
   TOKEN_TABLE                    CstTokenTable;
-  UINT32                         CsdIndex;
-  UINT32                         CsdNumEntries;
-  UINT32                         CstIndex;
-  UINT32                         CstPkgIndex;
-  UINT32                         CstPkgRefIndex;
-  UINT32                         CstPkgRefInfoCount;
-  UINT32                         CstRefInfoCount;
   UINT32                         Index;
   UINT32                         LocalApicX2ApicCount;
   UINT32                         PssNumEntries;
@@ -502,7 +637,6 @@ CreateTopologyFromIntC (
     return EFI_INVALID_PARAMETER;
   }
 
-  CsdInfo              = NULL;
   LocalApicX2ApicCount = 0;
   Status               = GetEX64ObjLocalApicX2ApicInfo (
                            CfgMgrProtocol,
@@ -570,82 +704,11 @@ CreateTopologyFromIntC (
       }
 
       if (LocalApicX2ApicInfo[Index].CsdToken != CM_NULL_TOKEN) {
-        Status = GetEArchCommonObjCsdInfo (
-                   CfgMgrProtocol,
+        Status = CreateAmlCsdObject (
+                   &CstTokenTable,
                    LocalApicX2ApicInfo[Index].CsdToken,
-                   &CmCsdInfo,
-                   &CsdNumEntries
-                   );
-        if (EFI_ERROR (Status)) {
-          ASSERT_EFI_ERROR (Status);
-          goto return_handler;
-        }
-
-        CsdInfo = AllocateZeroPool (sizeof (AML_CSD_INFO) * CsdNumEntries);
-        if (CsdInfo == NULL) {
-          ASSERT_EFI_ERROR (EFI_OUT_OF_RESOURCES);
-          Status = EFI_OUT_OF_RESOURCES;
-          goto return_handler;
-        }
-
-        for (CsdIndex = 0; CsdIndex < CsdNumEntries; CsdIndex++) {
-          CsdInfo[CsdIndex].Revision      = CmCsdInfo[CsdIndex].Revision;
-          CsdInfo[CsdIndex].Domain        = CmCsdInfo[CsdIndex].Domain;
-          CsdInfo[CsdIndex].CoordType     = CmCsdInfo[CsdIndex].CoordType;
-          CsdInfo[CsdIndex].NumProcessors = CmCsdInfo[CsdIndex].NumProcessors;
-          if (CmCsdInfo[CsdIndex].CstPkgRefToken == CM_NULL_TOKEN) {
-            ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
-            Status = EFI_INVALID_PARAMETER;
-            goto return_handler;
-          }
-
-          /// Initialize to maximum value until the CST package reference token is found
-          CsdInfo[CsdIndex].Index = MAX_UINT32;
-          for (CstIndex = 0; ((CstIndex < CstTokenTable.LastIndex) && (CsdInfo[CsdIndex].Index == MAX_UINT32)); CstIndex++) {
-            Status = GetEArchCommonObjCmRef (
-                       CfgMgrProtocol,
-                       CstTokenTable.Table[CstIndex],
-                       &CstRefInfo,
-                       &CstRefInfoCount
-                       );
-            if (EFI_ERROR (Status)) {
-              ASSERT_EFI_ERROR (Status);
-              goto return_handler;
-            }
-
-            for (CstPkgIndex = 0; ((CstPkgIndex < CstRefInfoCount) && (CsdInfo[CsdIndex].Index == MAX_UINT32)); CstPkgIndex++) {
-              Status = GetEArchCommonObjCmRef (
-                         CfgMgrProtocol,
-                         CstRefInfo[CstPkgIndex].ReferenceToken,
-                         &CstPkgRefInfo,
-                         &CstPkgRefInfoCount
-                         );
-              if (EFI_ERROR (Status)) {
-                ASSERT_EFI_ERROR (Status);
-                goto return_handler;
-              }
-
-              for (CstPkgRefIndex = 0; ((CstPkgRefIndex < CstPkgRefInfoCount) && (CsdInfo[CsdIndex].Index == MAX_UINT32)); CstPkgRefIndex++) {
-                if (CstPkgRefInfo[CstPkgRefIndex].ReferenceToken == CmCsdInfo[CsdIndex].CstPkgRefToken) {
-                  CsdInfo[CsdIndex].Index = CstPkgIndex;
-                  break;
-                }
-              }
-            }
-          }
-
-          if (CsdInfo[CsdIndex].Index == MAX_UINT32) {
-            ASSERT_EFI_ERROR (EFI_INVALID_PARAMETER);
-            Status = EFI_INVALID_PARAMETER;
-            goto return_handler;
-          }
-        }
-
-        Status = AmlCreateCsdNode (
-                   CsdInfo,
-                   CsdNumEntries,
-                   CpuNode,
-                   NULL
+                   CfgMgrProtocol,
+                   CpuNode
                    );
         if (EFI_ERROR (Status)) {
           ASSERT_EFI_ERROR (Status);
@@ -728,15 +791,36 @@ CreateTopologyFromIntC (
         ASSERT_EFI_ERROR (Status);
         goto return_handler;
       }
+    } else if ((LocalApicX2ApicInfo[Index].PctToken != CM_NULL_TOKEN) ||
+               (LocalApicX2ApicInfo[Index].PssToken != CM_NULL_TOKEN) ||
+               (LocalApicX2ApicInfo[Index].PpcToken != CM_NULL_TOKEN))
+    {
+      DEBUG ((
+        DEBUG_WARN,
+        "Missing PCT, PSS or PPC token for processor %d\n",
+        LocalApicX2ApicInfo[Index].AcpiProcessorUid
+        ));
+    }
+
+    if (LocalApicX2ApicInfo[Index].PsdToken != CM_NULL_TOKEN) {
+      Status = CreateAmlPsdNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].PsdToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].CpcToken != CM_NULL_TOKEN) {
+      Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].CpcToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
     }
   }
 
 return_handler:
   TokenTableFree (&CstTokenTable);
-  if (CsdInfo != NULL) {
-    FreePool (CsdInfo);
-  }
-
   return Status;
 }
 
