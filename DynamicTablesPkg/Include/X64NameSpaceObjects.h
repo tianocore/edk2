@@ -259,6 +259,16 @@ typedef struct CmX64LocalApicX2ApicInfo {
       i.e. a token referencing a CM_ARCH_COMMON_PPC_INFO object.
   */
   CM_OBJECT_TOKEN    PpcToken;
+
+  /** Optional field: Reference Token for the Psd info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_PSD_INFO object.
+  */
+  CM_OBJECT_TOKEN    PsdToken;
+
+  /** Optional field: Reference Token for the Cpc info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_CPC_INFO object.
+  */
+  CM_OBJECT_TOKEN    CpcToken;
 } CM_X64_LOCAL_APIC_X2APIC_INFO;
 
 /**
