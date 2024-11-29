@@ -610,7 +610,25 @@ fflush (
 
 int
 ferror (
-  FILE *fp
+  FILE  *fp
+  )
+{
+  return -1;
+}
+
+int
+fseek (
+  FILE  *stream,
+  long  offset,
+  int   whence
+  )
+{
+  return -1;
+}
+
+int
+feof (
+  FILE  *fp
   )
 {
   return -1;
@@ -736,8 +754,7 @@ getentropy (
       return -1;
     }
 
-    copyLength =
-        (length - i >= sizeof (UINT64)) ? sizeof (UINT64) : (length - i);
+    copyLength = (length - i >= sizeof (UINT64)) ? sizeof (UINT64) : (length - i);
     CopyMem (entropyBuffer + i, &randNum, copyLength);
   }
 
