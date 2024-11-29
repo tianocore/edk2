@@ -932,9 +932,12 @@ STATIC CONST CM_OBJ_PARSER  CmX64ObjMadtInfoParser[] = {
 /** A parser for CmArchCommonLocalApicX2ApicInfoParser.
 */
 STATIC CONST CM_OBJ_PARSER  CmX64ObjLocalApicX2ApicInfoParser[] = {
-  { "ApicId",           4, "0x%x", NULL },
-  { "Flags",            4, "0x%x", NULL },
-  { "AcpiProcessorUid", 4, "0x%x", NULL }
+  { "ApicId",           4,                        "0x%x", NULL },
+  { "Flags",            4,                        "0x%x", NULL },
+  { "AcpiProcessorUid", 4,                        "0x%x", NULL },
+  { "CstToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "CsdToken",         sizeof (CM_OBJECT_TOKEN), "0x%p", NULL },
+  { "PstateToken",      sizeof (CM_OBJECT_TOKEN), "0x%p", NULL }
 };
 
 /** A parser for CmX64IoApicInfoParser.
