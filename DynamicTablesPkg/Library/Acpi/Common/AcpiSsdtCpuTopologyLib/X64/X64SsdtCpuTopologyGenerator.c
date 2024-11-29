@@ -58,6 +58,15 @@ GET_OBJECT_LIST (
   CM_ARCH_COMMON_PSTATE_INFO
   );
 
+/** This macro expands to a function that retrieves the
+    _STA (Device Status) information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjStaInfo,
+  CM_ARCH_COMMON_STA_INFO
+  );
+
 /**
   Create the processor hierarchy AML tree from arch specific CM objects.
 
@@ -85,6 +94,7 @@ CreateTopologyFromIntC (
   CM_ARCH_COMMON_CSD_INFO        *CsdInfo;
   UINT32                         CsdNumEntries;
   CM_ARCH_COMMON_PSTATE_INFO     *PstateInfo;
+  CM_ARCH_COMMON_STA_INFO        *StaInfo;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -219,6 +229,25 @@ CreateTopologyFromIntC (
 
     if (LocalApicX2ApicInfo[Index].CpcToken != CM_NULL_TOKEN) {
       Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].CpcToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].StaToken != CM_NULL_TOKEN) {
+      Status = GetEArchCommonObjStaInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].StaToken,
+                 &StaInfo,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCodeGenMethodRetInteger ("_STA", StaInfo->DeviceStatus, 0, FALSE, 0, CpuNode, NULL);
       if (EFI_ERROR (Status)) {
         ASSERT_EFI_ERROR (Status);
         return Status;

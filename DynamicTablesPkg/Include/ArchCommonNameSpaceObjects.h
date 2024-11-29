@@ -56,6 +56,7 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjCstInfo,                        ///< 29 - C-State Info
   EArchCommonObjCsdInfo,                        ///< 30 - C-State Dependency (CSD) Info
   EArchCommonObjPstateInfo,                     ///< 31 - Processor P-State Info
+  EArchCommonObjStaInfo,                        ///< 32 - _STA (Device Status) Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -778,6 +779,15 @@ typedef struct CmArchCommonPstateInfo {
   /// P-State performance presense capability
   UINT32          Ppc;
 } CM_ARCH_COMMON_PSTATE_INFO;
+
+/** A structure that describes the _STA (Device Status) Info.
+
+    ID: EArchCommonObjStaInfo
+*/
+typedef struct CmArchCommonStaInfo {
+  /// Device Status
+  UINT32    DeviceStatus;
+} CM_ARCH_COMMON_STA_INFO;
 
 #pragma pack()
 

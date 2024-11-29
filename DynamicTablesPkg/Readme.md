@@ -504,6 +504,7 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  29   | Processor C-State Control Info            | |
 |  30   | Processor C-State Dependency Info         | |
 |  31   | Processor P-State Info                    | |
+|  32   | _STA Device Status Info                   | |
 |  `*`  | All other values are reserved.            | |
 
 #### Object ID's in the X64 Namespace:
