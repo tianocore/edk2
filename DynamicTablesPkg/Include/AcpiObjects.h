@@ -2,6 +2,7 @@
 
   Copyright (c) 2022, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
   Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
@@ -138,6 +139,107 @@ typedef struct AmlPsdInfo {
   /// Number of processors belonging to the Domain.
   UINT32    NumProc;
 } AML_PSD_INFO;
+
+/** A structure that describes a
+    processor power state control package Info.
+
+  Cf. ACPI 6.4, s8.4.2.1 _CST (Processor Power State Control).
+  Package {
+    Register  // Buffer (Resource Descriptor)
+    Type      // Integer (BYTE)
+    Latency   // Integer (WORD)
+    Power     // Integer (DWORD)
+  }
+*/
+typedef struct AmlCstPkgInfo {
+  EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE    Register;
+  UINT8                                     Type;
+  UINT16                                    Latency;
+  UINT32                                    Power;
+} AML_CST_PKG_INFO;
+
+/** A structure that describes a
+    processor power state control Info.
+
+  Cf. ACPI 6.4, s8.4.1.1 _CST (Processor Power State Control).
+  Package {
+    Count             // Integer
+    CStates[0]        // Package
+    ...
+    CStates[Count-1]  // Package
+  }
+  Where Package is defined as AML_CST_PKG_INFO:
+  Package {
+    Register    // Buffer (Resource Descriptor)
+    Type        // Integer (BYTE)
+    Latency     // Integer (WORD)
+    Power       // Integer (DWORD)
+  }
+*/
+typedef struct AmlCstInfo {
+  UINT32              Count;
+  AML_CST_PKG_INFO    *CStates;
+} AML_CST_INFO;
+
+/** A structure that describes a
+    C-State Dependency (_CSD) Info.
+
+  Cf. ACPI 6.4, s8.4.2.2 _CSD (C-State Dependency).
+  Package {
+    NumEntries    // Integer
+    Revision      // Integer (BYTE)
+    Domain        // Integer (DWORD)
+    CoordType     // Integer (DWORD)
+    NumProcessors // Integer (DWORD)
+    Index         // Integer (DWORD)
+  }
+*/
+typedef struct AmlCsdInfo {
+  UINT32    NumEntries;
+  UINT8     Revision;
+  UINT32    Domain;
+  UINT32    CoordType;
+  UINT32    NumProcessors;
+  UINT32    Index;
+} AML_CSD_INFO;
+
+/** A structure that describes a
+    Processor Performance control (_PCT) Info.
+
+  Cf. ACPI 6.4, s8.4.6.1 _PCT (Processor Control).
+
+  Package
+  {
+    ControlRegister   // Buffer (Resource Descriptor (Register))
+    StatusRegister    // Buffer (Resource Descriptor (Register))
+  }
+*/
+typedef struct AmlPctInfo {
+  EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE    ControlRegister;
+  EFI_ACPI_6_4_GENERIC_ADDRESS_STRUCTURE    StatusRegister;
+} AML_PCT_INFO;
+
+/** A structure that describes a
+    Processor Supported Performance States (_PSS) Info.
+
+  Cf. ACPI 6.4, s8.4.6.2 _PSS (Processor Supported Performance States).
+  Package {
+    CoreFrequency     // Integer (DWORD)
+    Power             // Integer (DWORD)
+    Latency           // Integer (DWORD)
+    BusMasterLatency  // Integer (DWORD)
+    Control           // Integer (DWORD)
+    Status            // Integer (DWORD)
+  }
+*/
+typedef struct AmlPssInfo {
+  UINT32    CoreFrequency;
+  UINT32    Power;
+  UINT32    Latency;
+  UINT32    BusMasterLatency;
+  UINT32    Control;
+  UINT32    Status;
+} AML_PSS_INFO;
 
 #pragma pack()
 
