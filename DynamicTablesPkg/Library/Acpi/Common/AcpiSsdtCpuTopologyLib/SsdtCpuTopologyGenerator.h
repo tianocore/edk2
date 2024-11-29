@@ -2,6 +2,7 @@
   SSDT Cpu Topology Table Generator.
 
   Copyright (c) 2021 - 2023, Arm Limited. All rights reserved.<BR>
+  Copyright (C) 2025, Advanced Micro Devices, Inc. All rights reserved.
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
   @par Reference(s):
@@ -51,6 +52,17 @@
 #define SB_SCOPE_PREFIX  SB_SCOPE "."
 /// Size of the SB_SCOPE_PREFIX string.
 #define SB_SCOPE_PREFIX_SIZE  sizeof (SB_SCOPE_PREFIX)
+
+/** C-state are stored in the ASL namspace at '\_SB_.CSTS.Cxxx',
+    where xxx represents the C-state index:
+    CSTx  - for C-state indices less than 0xF.
+    CSxx  - for C-state indices between 0xF and 0xFF.
+    Cxxx  - for C-state indices greater than 0xFF.
+*/
+#define CSTS_SCOPE         "CSTS"
+#define CSTS_SCOPE_PREFIX  SB_SCOPE_PREFIX CSTS_SCOPE "."
+/// Size of the CSTS_SCOPE_PREFIX string.
+#define CSTS_SCOPE_PREFIX_SIZE  sizeof (CSTS_SCOPE_PREFIX)
 
 /// HID for a processor device.
 #define ACPI_HID_PROCESSOR_DEVICE  "ACPI0007"
