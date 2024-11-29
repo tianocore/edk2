@@ -17,6 +17,7 @@
 
 #include <AcpiObjects.h>
 #include <StandardNameSpaceObjects.h>
+#include <ArchCommonNameSpaceObjects.h>
 
 #pragma pack(1)
 
@@ -228,9 +229,36 @@ typedef struct CmX64MadtInfo {
   ID: EX64ObjLocalApicX2ApicInfo
 */
 typedef struct CmX64LocalApicX2ApicInfo {
-  UINT32    ApicId;
-  UINT32    Flags;
-  UINT32    AcpiProcessorUid;
+  UINT32             ApicId;
+  UINT32             Flags;
+  UINT32             AcpiProcessorUid;
+
+  /** Optional field: Reference Token for the Cst info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_OBJ_REF,
+      which in turn refers to an array of CM_ARCH_COMMON_OBJ_REF objects,
+      each pointing to individual CM_ARCH_COMMON_CST_INFO objects.
+  */
+  CM_OBJECT_TOKEN    CstToken;
+
+  /** Optional field: Reference Token for the Csd info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_CSD_INFO object.
+  */
+  CM_OBJECT_TOKEN    CsdToken;
+
+  /** Optional field: Reference Token for the Pct info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_Pct_INFO object.
+  */
+  CM_OBJECT_TOKEN    PctToken;
+
+  /** Optional field: Reference Token for the Pss info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_PSS_INFO object.
+  */
+  CM_OBJECT_TOKEN    PssToken;
+
+  /** Optional field: Reference Token for the Ppc info of this processor.
+      i.e. a token referencing a CM_ARCH_COMMON_PPC_INFO object.
+  */
+  CM_OBJECT_TOKEN    PpcToken;
 } CM_X64_LOCAL_APIC_X2APIC_INFO;
 
 /**
