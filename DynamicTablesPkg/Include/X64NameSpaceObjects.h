@@ -15,7 +15,10 @@
 #ifndef X64_NAMESPACE_OBJECTS_H_
 #define X64_NAMESPACE_OBJECTS_H_
 
-#include <IndustryStandard/Acpi.h>
+#include <AcpiObjects.h>
+#include <StandardNameSpaceObjects.h>
+
+#pragma pack(1)
 
 /** The LOCAL_APIC_MODE enum describes the Local APIC
     mode in the X64 Namespace
@@ -262,4 +265,5 @@ typedef struct CmX64LocalApicX2ApicNmiInfo {
   UINT8     LocalApicLint;
 } CM_X64_LOCAL_APIC_X2APIC_NMI_INFO;
 
+#pragma pack()
 #endif // X64_NAMESPACE_OBJECTS_H_
