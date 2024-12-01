@@ -96,6 +96,11 @@ EmuBlockIo2ReadBlocksEx (
   Status = Private->Io->ReadBlocks (Private->Io, MediaId, LBA, Token, BufferSize, Buffer);
 
   gBS->RestoreTPL (OldTpl);
+
+  if (Token && Token->Event && !EFI_ERROR (Status)) {
+    gBS->SignalEvent (Token->Event);
+  }
+
   return Status;
 }
 
@@ -152,6 +157,11 @@ EmuBlockIo2WriteBlocksEx (
   Status = Private->Io->WriteBlocks (Private->Io, MediaId, LBA, Token, BufferSize, Buffer);
 
   gBS->RestoreTPL (OldTpl);
+
+  if (Token && Token->Event && !EFI_ERROR (Status)) {
+    gBS->SignalEvent (Token->Event);
+  }
+
   return Status;
 }
 
@@ -195,6 +205,11 @@ EmuBlockIo2Flush (
   Status = Private->Io->FlushBlocks (Private->Io, Token);
 
   gBS->RestoreTPL (OldTpl);
+
+  if (Token && Token->Event && !EFI_ERROR (Status)) {
+    gBS->SignalEvent (Token->Event);
+  }
+
   return Status;
 }
 
