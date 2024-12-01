@@ -2222,8 +2222,15 @@
   # @ValidList  0x80000003 | 0x3040003
   gEfiMdePkgTokenSpaceGuid.PcdStatusCodeValueDxeDriverEnd|0x3040003|UINT32|0x30001014
 
-  ## This flag is used to control build time optimization based on debug print level.
-  #  Its default value is 0xFFFFFFFF to expose all debug print level.
+  ## This flag is used to control fixed-at-build optimization of DEBUG_PRINT macros.<BR><BR>
+  #  The default value is 0xFFFFFFFF, meaning that DEBUG_PRINT (...) always evaluates
+  #  the macro arguments and always invokes DebugPrint (...). If you want to optimize
+  #  messages, you might set this to a more restrictive value like 0x80000002 (optimize-out
+  #  everything except errors and warnings).<BR><BR>
+  #  This flag is consumed by DebugLib's DebugPrintLevelEnabled (Level) function. The
+  #  DEBUG_PRINT (Level, Format, ...) macro in DebugLib.h calls DebugPrintLevelEnabled (Level)
+  #  to filter the output, and most implementations of DebugPrintLevelEnabled (Level) simply
+  #  return (Level & PcdFixedDebugPrintErrorLevel) != 0.<BR><BR>
   #  BIT0  - Initialization message.<BR>
   #  BIT1  - Warning message.<BR>
   #  BIT2  - Load Event message.<BR>
@@ -2307,17 +2314,30 @@
   gEfiMdePkgTokenSpaceGuid.PcdSpinLockTimeout|10000000|UINT32|0x00000004
 
   ## The mask is used to control DebugLib behavior.<BR><BR>
-  #  BIT0 - Enable Debug Assert.<BR>
-  #  BIT1 - Enable Debug Print.<BR>
-  #  BIT2 - Enable Debug Code.<BR>
-  #  BIT3 - Enable Clear Memory.<BR>
-  #  BIT4 - Enable BreakPoint as ASSERT.<BR>
-  #  BIT5 - Enable DeadLoop as ASSERT.<BR>
+  #  Note that if the MDEPKG_NDEBUG macro is defined, the ASSERT***, CR, and DEBUG macros will be
+  #  no-ops regardless of this value.<BR>
+  #  Note that MDEPKG_NDEBUG does not affect DEBUG_PRINT.<BR><BR>
+  #  BIT0 - ASSERT_ENABLED: Enable the ASSERT*** and CR macros.<BR>
+  #  BIT1 - PRINT_ENABLED: Enable the DEBUG macro (does not affect the DEBUG_PRINT macro).<BR>
+  #  BIT2 - CODE_ENABLED: Enable the DEBUG_CODE_BEGIN macro.<BR>
+  #  BIT3 - CLEAR_MEMORY_ENABLED: Enable the DEBUG_CLEAR_MEMORY macro.<BR>
+  #  BIT4 - ASSERT_BREAKPOINT_ENABLED: Enable BreakPoint for failed ASSERT.<BR>
+  #  BIT5 - ASSERT_DEADLOOP_ENABLED: Enable DeadLoop for failed ASSERT.<BR>
   # @Prompt Debug Property.
   # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask & 0xC0) == 0
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0|UINT8|0x00000005
 
-  ## This flag is used to control the print out Debug message.<BR><BR>
+  ## This flag is used to filter the output of the DEBUG_PRINT macro and DebugPrint functions.<BR><BR>
+  #  The default value is 0x80000000, meaning that DebugPrint returns immediately for anything
+  #  except errors. You might set this to a value like 0x80000002 to also enable warnings.<BR><BR>
+  #  This flag is consumed by the BaseDebugPrintErrorLevelLib implementation of
+  #  GetDebugPrintErrorLevel (). DebugLib's DebugPrint (Level, ...) functions return immediately if
+  #  (GetDebugPrintErrorLevel() & Level) == 0. Other implementations of DebugPrintErrorLevelLib
+  #  may provide different definitions of GetDebugPrintErrorLevel  ().<BR><BR>
+  #  Note that the DEBUG_PRINT macro also uses PcdFixedDebugPrintErrorLevel to determine whether
+  #  or not it calls the DebugPrint function, so your message level needs to be enabled in both
+  #  PcdFixedDebugPrintErrorLevel and PcdDebugPrintErrorLevel settings for the DEBUG_PRINT macro
+  #  to work.<BR><BR>
   #  BIT0  - Initialization message.<BR>
   #  BIT1  - Warning message.<BR>
   #  BIT2  - Load Event message.<BR>
