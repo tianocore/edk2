@@ -206,6 +206,7 @@ FatPkg
 F: FatPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/Edk2-fat-driver
 M: Ray Ni <ray.ni@intel.com> [niruiyu]
+M: Oliver Smith-Denny <osde@microsoft.com> [os-d]
 T: svn - https://svn.code.sf.net/p/edk2-fatdriver2/code/trunk/EnhancedFat
 T: git - https://github.com/tianocore/edk2-FatPkg.git
 
