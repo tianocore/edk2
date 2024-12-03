@@ -1,7 +1,7 @@
 # @file Edk2ToolsBuild.py
 # Invocable class that builds the basetool c files.
 #
-# Supports VS2017, VS2019, and GCC5
+# Supports VS2019, VS2022, and GCC5
 ##
 # Copyright (c) Microsoft Corporation
 #
@@ -24,7 +24,7 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
     def ParseCommandLineOptions(self):
         ''' parse arguments '''
         ParserObj = argparse.ArgumentParser()
-        ParserObj.add_argument("-t", "--tool_chain_tag", dest="tct", default="VS2017",
+        ParserObj.add_argument("-t", "--tool_chain_tag", dest="tct", default="VS2022",
                                help="Set the toolchain used to compile the build tools")
         args = ParserObj.parse_args()
         self.tool_chain_tag = args.tct
