@@ -33,6 +33,7 @@
 
 [Sources]
   Tpm2Tis.c
+  Tpm2Svsm.c
   Tpm2Ptp.c
   Tpm2DeviceLibDTpm.c
   Tpm2DeviceLibDTpmBase.c
@@ -41,6 +42,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   SecurityPkg/SecurityPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -49,6 +51,7 @@
   TimerLib
   DebugLib
   PcdLib
+  AmdSvsmLib
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress            ## CONSUMES
