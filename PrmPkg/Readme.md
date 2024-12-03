@@ -97,8 +97,8 @@ the package being built.
 Like a typical EDK II package, the PrmPkg binary build output can be found in the Build directory in the edk2
 workspace. The organization in that directory follows the same layout as other EDK II packages.
 
-For example, that path to PRM module sample binaries for a DEBUG VS2017 X64 build is: \
-``edk2/Build/Prm/DEBUG_VS2017/X64/PrmPkg/Samples``
+For example, that path to PRM module sample binaries for a DEBUG VS2022 X64 build is: \
+``edk2/Build/Prm/DEBUG_VS2022/X64/PrmPkg/Samples``
 
 ## Overview
 

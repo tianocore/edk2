@@ -21,11 +21,11 @@ https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 **You can use the following command to build.**
   * 32bit emulator in Windows:
 
-    `build -p EmulatorPkg\EmulatorPkg.dsc -t VS2017 -a IA32`
+    `build -p EmulatorPkg\EmulatorPkg.dsc -t VS2022 -a IA32`
 
   * 64bit emulator in Windows:
 
-    `build -p EmulatorPkg\EmulatorPkg.dsc -t VS2017 -a X64`
+    `build -p EmulatorPkg\EmulatorPkg.dsc -t VS2022 -a X64`
 
   * 32bit emulator in Linux:
 
@@ -38,11 +38,11 @@ https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 **You can start/run the emulator using the following command:**
   * 32bit emulator in Windows:
 
-    `cd Build\EmulatorIA32\DEBUG_VS2017\IA32\ && WinHost.exe`
+    `cd Build\EmulatorIA32\DEBUG_VS2022\IA32\ && WinHost.exe`
 
   * 64bit emulator in Windows:
 
-    `cd Build\EmulatorX64\DEBUG_VS2017\X64\ && WinHost.exe`
+    `cd Build\EmulatorX64\DEBUG_VS2022\X64\ && WinHost.exe`
 
   * 32bit emulator in Linux:
 
