@@ -51,7 +51,7 @@ TOOL_CHAIN_CONF       = Conf/tools_def.txt
 #  TAGNAME               List      Optional   Specify the name(s) of the tools_def.txt TagName to use.
 #                                             If not specified, all applicable TagName tools will be
 #                                             used for the build.  The list uses space character separation.
-TOOL_CHAIN_TAG        = VS2019
+TOOL_CHAIN_TAG        = VS2022
 
 # MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. If not specified or set
 #                                                 to zero, tool automatically detect number of processor
