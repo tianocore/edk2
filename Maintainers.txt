@@ -98,6 +98,7 @@ F: */LoongArch64/
 M: Chao Li <lichao@loongson.cn> [kilaterlee]
 M: Baoqi Zhang <zhangbaoqi@loongson.cn> [zhangbaoqi-ls]
 R: Dongyan Qian <qiandongyan@loongson.cn> [MarsDoge]
+R: Xiangdong Meng <mengxiangdong@loongson.cn> [AydenMeng]
 
 EDK II Continuous Integration:
 ------------------------------
