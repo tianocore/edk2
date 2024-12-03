@@ -3,7 +3,7 @@
 #
 # Platform: OVMF
 # OS: Windows
-# Toolchain: VS2019
+# Toolchain: VS2022
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -22,7 +22,7 @@ jobs:
   - job: Platform_CI
     variables:
       package: 'OvmfPkg'
-      vm_image: 'windows-2019'
+      vm_image: 'windows-2022'
       should_run: true
       run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE"
 
@@ -130,7 +130,7 @@ jobs:
     steps:
     - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
       parameters:
-        tool_chain_tag: VS2019
+        tool_chain_tag: VS2022
         build_pkg: $(package)
         build_target: $(Build.Target)
         build_arch: $(Build.Arch)
