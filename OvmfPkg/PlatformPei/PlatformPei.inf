@@ -71,6 +71,7 @@
   CcExitLib
   PlatformInitLib
   SmmRelocationLib
+  TdxHelperLib
 
 [Pcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfPeiMemFvBase
