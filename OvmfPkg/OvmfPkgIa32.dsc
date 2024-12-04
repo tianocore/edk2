@@ -869,17 +869,7 @@
   #
 !include NetworkPkg/NetworkComponents.dsc.inc
 !include OvmfPkg/Include/Dsc/NetworkComponents.dsc.inc
-
-  #
-  # Usb Support
-  #
-  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
-  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
-  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
-  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
-  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
-  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
-
+!include OvmfPkg/Include/Dsc/UsbComponents.dsc.inc
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 !include OvmfPkg/Include/Dsc/MorLock.dsc.inc
 !include OvmfPkg/Include/Dsc/OvmfRngComponents.dsc.inc
