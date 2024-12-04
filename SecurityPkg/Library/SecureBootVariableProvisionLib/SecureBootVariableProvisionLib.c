@@ -156,7 +156,7 @@ EnrollFromDefault (
   DataSize = 0;
   Status   = GetVariable2 (DefaultName, &gEfiGlobalVariableGuid, &Data, &DataSize);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "error: GetVariable (\"%s): %r\n", DefaultName, Status));
+    DEBUG ((DEBUG_ERROR, "Error: GetVariable (\"%s\"): %r\n", DefaultName, Status));
     return Status;
   }
 
