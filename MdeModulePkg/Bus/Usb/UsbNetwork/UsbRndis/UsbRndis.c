@@ -195,6 +195,14 @@ IsUsbRndis (
     return TRUE;
   }
 
+  // Check for Wireless Rndis
+  if ((InterfaceDescriptor.InterfaceClass == USB_WIRELESS_CONTROLLER_CLASS) &&
+      (InterfaceDescriptor.InterfaceSubClass == USB_RADIO_FREQUENCY_SUBCLASS) &&
+      (InterfaceDescriptor.InterfaceProtocol == USB_WIRELESS_RNDIS_PROTOCOL))
+  {
+    return TRUE;
+  }
+
   return FALSE;
 }
 
