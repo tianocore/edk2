@@ -5,6 +5,8 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
+import io
+import re
 import os
 import logging
 import glob
@@ -143,11 +145,27 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
 
         return failure_count
 
+    def get_lcov_version(self):
+        """Get lcov version number"""
+        lcov_ver = io.StringIO()
+        ret = RunCmd("lcov", "--version", outstream=lcov_ver)
+        if ret != 0:
+            return None
+        (major, _minor) = re.search(r"version (\d+)\.(\d+)", lcov_ver.getvalue()).groups()
+        return int(major)
+
+
     def gen_code_coverage_gcc(self, thebuilder):
         logging.info("Generating UnitTest code coverage")
 
         buildOutputBase = thebuilder.env.GetValue("BUILD_OUTPUT_BASE")
         workspace = thebuilder.env.GetValue("WORKSPACE")
+
+        lcov_version_major = self.get_lcov_version()
+        if not lcov_version_major:
+            logging.error("UnitTest Coverage: Failed to determine lcov version")
+            return 1
+        logging.info(f"Got lcov version {lcov_version_major}")
 
         # Generate base code coverage for all source files
         ret = RunCmd("lcov", f"--no-external --capture --initial --directory {buildOutputBase} --output-file {buildOutputBase}/cov-base.info --rc lcov_branch_coverage=1")
@@ -157,7 +175,8 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
 
         # Coverage data for tested files only
         # `--ignore-errors mismatch` needed to make lcov v2.0+/gcov work.
-        ret = RunCmd("lcov", f"--capture --directory {buildOutputBase}/ --output-file {buildOutputBase}/coverage-test.info --rc lcov_branch_coverage=1 --ignore-errors mismatch")
+        lcov_error_settings = "--ignore-errors mismatch" if lcov_version_major >= 2 else ""
+        ret = RunCmd("lcov", f"--capture --directory {buildOutputBase}/ --output-file {buildOutputBase}/coverage-test.info --rc lcov_branch_coverage=1 {lcov_error_settings}")
         if ret != 0:
             logging.error("UnitTest Coverage: Failed to build coverage data for tested files.")
             return 1
