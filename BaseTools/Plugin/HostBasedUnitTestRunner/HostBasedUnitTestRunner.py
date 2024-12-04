@@ -52,6 +52,12 @@ class HostBasedUnitTestRunner(IUefiBuildPlugin):
 
         failure_count = 0
 
+        # Do not catch exceptions in gtest so they are handled by address sanitizer
+        shell_env.set_shell_var('GTEST_CATCH_EXCEPTIONS', '0')
+
+        # Disable address sanitizer memory leak detection
+        shell_env.set_shell_var('ASAN_OPTIONS', 'detect_leaks=0')
+
         # Set up the reporting type for Cmocka.
         shell_env.set_shell_var('CMOCKA_MESSAGE_OUTPUT', 'xml')
 
