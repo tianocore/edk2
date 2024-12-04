@@ -1,6 +1,6 @@
 /** @file
   Arm Monitor Library that chooses the conduit based on the PSCI node in the
-  device tree provided by QEMU.
+  device tree provided by the VMM.
 
   Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024, Google LLC. All rights reserved.<BR>

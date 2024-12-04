@@ -353,10 +353,6 @@ InitializePlatform (
   InitializeRamRegions (PlatformInfoHob);
 
   if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
-    if (!PlatformInfoHob->SmmSmramRequire) {
-      ReserveEmuVariableNvStore ();
-    }
-
     PeiFvInitialization (PlatformInfoHob);
     MemTypeInfoInitialization (PlatformInfoHob);
     MemMapInitialization (PlatformInfoHob);
@@ -376,6 +372,16 @@ InitializePlatform (
   InstallFeatureControlCallback (PlatformInfoHob);
   if (PlatformInfoHob->SmmSmramRequire) {
     RelocateSmBase ();
+  }
+
+  //
+  // Performed after CoCo (SEV/TDX) initialization to allow the memory
+  // used to be validated before being used.
+  //
+  if (PlatformInfoHob->BootMode != BOOT_ON_S3_RESUME) {
+    if (!PlatformInfoHob->SmmSmramRequire) {
+      ReserveEmuVariableNvStore ();
+    }
   }
 
   return EFI_SUCCESS;

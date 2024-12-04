@@ -1,6 +1,6 @@
 ## @file
 #  Arm Monitor Library that chooses the conduit based on the PSCI node in the
-#  device tree provided by QEMU.
+#  device tree provided by the VMM.
 #
 #  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
 #  Copyright (c) 2024, Google LLC. All rights reserved.<BR>
@@ -10,14 +10,14 @@
 
 [Defines]
   INF_VERSION                    = 1.29
-  BASE_NAME                      = ArmVirtQemuMonitorPeiLib
+  BASE_NAME                      = ArmVirtMonitorPeiLib
   FILE_GUID                      = c610e0dc-dd7a-47c8-8fea-26c4710709ff
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmMonitorLib|PEIM
 
 [Sources]
-  ArmVirtQemuMonitorPeiLib.c
+  ArmVirtMonitorPeiLib.c
 
 [Packages]
   ArmPkg/ArmPkg.dec

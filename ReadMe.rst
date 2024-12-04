@@ -88,7 +88,6 @@ licenses:
 The EDK II open source project uses content from upstream projects as git submodules
 that are covered by additional licenses.
 
--  `ArmPkg/Library/ArmSoftFloatLib/berkeley-softfloat-3 <https://github.com/ucb-bar/berkeley-softfloat-3/blob/b64af41c3276f97f0e181920400ee056b9c88037/COPYING.txt>`__
 -  `BaseTools/Source/C/BrotliCompress/brotli <https://github.com/google/brotli/blob/666c3280cc11dc433c303d79a83d4ffbdd12cc8d/LICENSE>`__
 -  `CryptoPkg/Library/OpensslLib/openssl <https://github.com/openssl/openssl/blob/e2e09d9fba1187f8d6aafaa34d4172f56f1ffb72/LICENSE>`__
 -  `CryptoPkg/Library/MbedTlsLib/mbedtls <https://github.com/Mbed-TLS/mbedtls/blob/8c89224991adff88d53cd380f42a2baa36f91454/LICENSE>`__
@@ -274,12 +273,6 @@ submodules in above submodules. So using '--recursive' adds a
 dependency on being able to reach servers we do not actually want
 any code from, as well as needlessly downloading code we will not
 use.
-
-**Submodule Notes**
-
-ArmSoftFloatLib is required by OpensslLib. It's inevitable in openssl-1.1.1
-(since stable201905) for floating point parameter conversion, but should be
-dropped once there's no such need in future release of openssl.
 
 .. ===================================================================
 .. This is a bunch of directives to make the README file more readable

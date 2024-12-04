@@ -28,9 +28,11 @@ Current capabilities:
 Pre-requisites:
 * Build environment capable of build the edk2 MdeModulePkg.
 * A properly configured ASL compiler:
-  - Intel ASL compiler: Available from http://www.acpica.org
-  - Microsoft ASL compiler: Available from http://www.acpi.info
-* NASM: http://www.nasm.us/
+  - Intel ASL compiler: Available from
+    https://www.intel.com/content/www/us/en/developer/topic-technology/open/acpica/download.html
+  - Microsoft ASL compiler: Available from
+    https://learn.microsoft.com/en-us/windows-hardware/drivers/bringup/microsoft-asl-compiler
+* NASM: https://www.nasm.us/
 
 Update Conf/target.txt ACTIVE_PLATFORM for OVMF:
                              PEI arch   DXE arch   UEFI interfaces
