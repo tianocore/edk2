@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <CrtLibSupport.h>
 #include <Uefi/UefiBaseType.h>
 #include <Library/RngLib.h>
+#include <Library/SafeIntLib.h>
 
 int  errno = 0;
 
@@ -582,9 +583,9 @@ fopen (
 
 size_t
 fread (
-  void    *buffer,
+  void    *ptr,
   size_t  size,
-  size_t  count,
+  size_t  nmemb,
   FILE    *stream
   )
 {
@@ -593,7 +594,7 @@ fread (
 
 int
 fputs (
-  const char  *str,
+  const char  *s,
   FILE        *stream
   )
 {
@@ -610,7 +611,7 @@ fflush (
 
 int
 ferror (
-  FILE  *fp
+  FILE  *stream
   )
 {
   return -1;
@@ -628,7 +629,7 @@ fseek (
 
 int
 feof (
-  FILE  *fp
+  FILE  *stream
   )
 {
   return -1;
@@ -636,7 +637,7 @@ feof (
 
 int
 ftell (
-  FILE  *fp
+  FILE  *stream
   )
 {
   return -1;
@@ -644,8 +645,8 @@ ftell (
 
 char *
 fgets (
-  char  *str,
-  int   n,
+  char  *s,
+  int   size,
   FILE  *stream
   )
 {
@@ -654,24 +655,24 @@ fgets (
 
 char *
 strdup (
-  char  *strSource
+  char  *s
   )
 {
-  UINTN  len;
+  UINTN  Length;
   VOID   *Buffer;
 
-  if (!strSource) {
+  if (!s) {
     return NULL;
   }
 
-  len = strlen (strSource);
+  Length = strlen (s);
 
-  Buffer = malloc (len);
+  Buffer = malloc (Length);
   if (Buffer == NULL) {
     return NULL;
   }
 
-  strncpy (Buffer, strSource, len);
+  strncpy (Buffer, s, Length);
   return Buffer;
 }
 
@@ -680,28 +681,41 @@ void *
 bsearch (
   const void *key,
   const void *base,
-  size_t nitems,
-  size_t width,
-  int         ( *cmp )(const void *, const void *)
+  size_t nmemb,
+  size_t size,
+  int         ( *compar )(const void *, const void *)
   )
 {
-  void  *mid;
-  int   sign;
+  void  *Mid;
+  int   Sign;
+  RETURN_STATUS  Status = RETURN_INVALID_PARAMETER;
+  size_t Result;
 
-  if (!key || !base) {
+  if (!key || !base || !nmemb || !size) {
     return NULL;
   }
 
-  while (nitems > 0) {
-    mid  = (char *)base + width * (nitems/2);
-    sign = cmp (key, mid);
-    if (sign < 0) {
-      nitems /= 2;
-    } else if (sign > 0) {
-      base    = (char *)mid + width;
-      nitems -= nitems/2 + 1;
+  if (sizeof (size_t) == 32) {
+    Status = SafeUint32Mult ((UINT32) size, (UINT32) nmemb, (UINT32 *)&Result);
+  } else {
+    Status = SafeUint64Mult ((UINT64) size, (UINT64) nmemb, (UINT64 *)&Result);
+  }
+
+  if ((Status == RETURN_BUFFER_TOO_SMALL) ||
+      (Status == RETURN_INVALID_PARAMETER)) {
+    return NULL;
+  }
+
+  while (nmemb > 0) {
+    Mid  = (char *)base + size * (nmemb/2);
+    Sign = compar (key, Mid);
+    if (Sign < 0) {
+      nmemb /= 2;
+    } else if (Sign > 0) {
+      base    = (char *)Mid + size;
+      nmemb -= nmemb/2 + 1;
     } else {
-      return mid;
+      return Mid;
     }
   }
 
@@ -715,30 +729,30 @@ getentropy (
   size_t  length
   )
 {
-  UINT8   *entropyBuffer = (UINT8 *)buffer;
-  UINTN   i;
-  UINT64  randNum;
-  UINTN   copyLength;
+  UINT8   *EntropyBuffer = (UINT8 *)buffer;
+  UINTN   Index;
+  UINT64  RandNum;
+  UINTN   CopyLength;
 
   if (length > GETENTROPY_MAX) {
     errno = EIO;
     return -1;
   }
 
-  if ((entropyBuffer == NULL) || (length == 0)) {
+  if (EntropyBuffer == NULL) {
     errno = EFAULT;
     return -1;
   }
 
-  for (i = 0; i < length; i += sizeof (UINT64)) {
-    if (!GetRandomNumber64 (&randNum)) {
+  for (Index = 0; Index < length; Index += sizeof (UINT64)) {
+    if (!GetRandomNumber64 (&RandNum)) {
       errno = ENOSYS;
       return -1;
     }
 
-    copyLength =
-        (length - i >= sizeof (UINT64)) ? sizeof (UINT64) : (length - i);
-    CopyMem (entropyBuffer + i, &randNum, copyLength);
+    CopyLength =
+      (length - Index >= sizeof (UINT64)) ? sizeof (UINT64) : (length - Index);
+    CopyMem (EntropyBuffer + Index, &RandNum, CopyLength);
   }
 
   return 0;

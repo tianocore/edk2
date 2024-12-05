@@ -479,7 +479,7 @@ fflush (
 
 int
 ferror (
-  FILE  *fp
+  FILE  *stream
   );
 
 int
@@ -491,30 +491,30 @@ fseek (
 
 int
 feof (
-  FILE  *fp
+  FILE  *stream
   );
 
 char *
 fgets (
-  char  *str,
-  int   n,
+  char  *s,
+  int   size,
   FILE  *stream
   );
 
 int
 ftell (
-  FILE  *fp
+  FILE  *stream
   );
 
 int
 fputs (
-  const char  *str,
+  const char  *s,
   FILE        *stream
   );
 
 char *
 strdup (
-  char  *strSource
+  char  *s
   );
 
 void *
