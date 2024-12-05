@@ -80,9 +80,9 @@ GET_OBJECT_LIST (
 
 /** Return the PCI Device information in BDF format
 
-    PCI Bus Number - Max 256 busses (Bits 15:8 of BDF)
-    PCI Device Number - Max 32 devices (Bits 7:3 of BDF)
-    PCI Function Number - Max 8 functions (Bits 2:0 of BDF)
+    PCI Bus Number - Max 256 busses (Bits 7:0 of byte 0 of BDF)
+    PCI Device Number - Max 32 devices (Bits 7:3 of byte 1 of BDF)
+    PCI Function Number - Max 8 functions (Bits 2:0 of byte 1 BDF)
 
     @param [in]  DeviceHandlePci   Pointer to the PCI Device Handle.
 
@@ -94,12 +94,12 @@ GetBdf (
   IN CONST CM_ARCH_COMMON_DEVICE_HANDLE_PCI  *DeviceHandlePci
   )
 {
-  UINT16  Bdf;
+  UINT8  Bdf[2];
 
-  Bdf  = (UINT16)DeviceHandlePci->BusNumber << 8;
-  Bdf |= (DeviceHandlePci->DeviceNumber & 0x1F) << 3;
-  Bdf |= DeviceHandlePci->FunctionNumber & 0x7;
-  return Bdf;
+  Bdf[0]  = DeviceHandlePci->BusNumber;
+  Bdf[1]  = (DeviceHandlePci->DeviceNumber & 0x1F) << 3;
+  Bdf[1] |= DeviceHandlePci->FunctionNumber & 0x7;
+  return *(UINT16 *)Bdf;
 }
 
 /** Add the Memory Affinity Structures in the SRAT Table.
