@@ -417,7 +417,7 @@ endlocal
 
 :Usage
   @echo.
-  echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [base_tools_path [edk_tools_path]] [VS2019] [VS2017] [VS2015]"
+  echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [base_tools_path [edk_tools_path]] [VS2022] [VS2019] [VS2017] [VS2015]"
   @echo.
   @echo         base_tools_path   BaseTools project path, BASE_TOOLS_PATH will be set to this path.
   @echo         edk_tools_path    EDK_TOOLS_PATH will be set to this path.
