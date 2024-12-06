@@ -209,6 +209,8 @@
   Tcg2PhysicalPresenceLib|OvmfPkg/Library/Tcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLib.inf
   TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
 
+  CpuExceptionHookLib|UefiCpuPkg/Library/CpuExceptionHookLibNull/CpuExceptionHookLibNull.inf
+
 !include OvmfPkg/Include/Dsc/ShellLibs.dsc.inc
 
 [LibraryClasses.common]
