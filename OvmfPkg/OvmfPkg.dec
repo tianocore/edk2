@@ -346,6 +346,9 @@
   #  check to decide whether to abort dispatch of the driver it is linked into.
   gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|""|VOID*|0x68
 
+  ## Default error message to display when restring boot to a resource
+  gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideErrorMessage|""|VOID*|0x7A
+
   ## Restrict boot to EFI applications in firmware volumes.
   gUefiOvmfPkgTokenSpaceGuid.PcdBootRestrictToFirmware|FALSE|BOOLEAN|0x6c
 

@@ -1,0 +1,38 @@
+## @file
+# Module entry point library for UEFI Application. This version is specific to QEMU, and ties
+# dispatch of the application in question on the value of a QEMU fw_cfg boolean
+# variable which is referenced by name via a fixed pointer PCD.
+#
+# Copyright (c) 2024, Red Hat, Inc.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UefiApplicationEntryPointFwCfgOverrideLib
+  MODULE_UNI_FILE                = UefiApplicationEntryPointFwCfgOverrideLib.uni
+  FILE_GUID                      = 83676352-b0bd-11ef-9bff-607d09921b20
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UefiApplicationEntryPoint|UEFI_APPLICATION
+
+
+[Sources]
+  UefiApplicationEntryPointFwCfgOverrideLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiBootServicesTableLib
+  QemuFwCfgSimpleParserLib
+
+[FixedPcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName
+  gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideErrorMessage

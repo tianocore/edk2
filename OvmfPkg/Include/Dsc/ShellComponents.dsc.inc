@@ -34,6 +34,7 @@
       NULL|ShellPkg/Library/UefiShellDriver1CommandsLib/UefiShellDriver1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
+      UefiApplicationEntryPoint|OvmfPkg/Library/UefiApplicationEntryPointFwCfgOverrideLib/UefiApplicationEntryPointFwCfgOverrideLib.inf
 !if $(NETWORK_ENABLE) == TRUE
 !if $(NETWORK_IP4_ENABLE) == TRUE
       NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
@@ -50,6 +51,8 @@
       gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
       gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
       gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
+      gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideFwCfgVarName|"opt/org.tianocore/ShellSupport"
+      gUefiOvmfPkgTokenSpaceGuid.PcdEntryPointOverrideErrorMessage|"Running EFI Shell is blocked by host policy"
   }
 
 !endif

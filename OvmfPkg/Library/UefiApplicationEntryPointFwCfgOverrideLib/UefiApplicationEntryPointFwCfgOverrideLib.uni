@@ -1,0 +1,14 @@
+// /** @file
+// Module entry point library for UEFI Application. This version is specific to QEMU, and ties
+// dispatch of the application in question on the value of a QEMU fw_cfg boolean
+// variable which is referenced by name via a fixed pointer PCD.
+//
+// Copyright (c) 2024, Red Hat, Inc.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+
+#string STR_MODULE_ABSTRACT             #language en-US "Module entry point library for UEFI Application FwCfgOverride."
+
+#string STR_MODULE_DESCRIPTION          #language en-US "Module entry point library for UEFI Application FwCfgOverride."
