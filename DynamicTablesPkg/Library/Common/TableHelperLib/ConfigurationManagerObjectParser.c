@@ -682,7 +682,7 @@ STATIC CONST CM_OBJ_PARSER  CmArchCommonTpm2InterfaceInfo[] = {
 STATIC CONST CM_OBJ_PARSER  CmArchCommonSpmiInterfaceInfoParser[] = {
   { "InterfaceType", sizeof (UINT8),                                  "0x%x", NULL },
   { "BaseAddress",   sizeof (EFI_ACPI_6_5_GENERIC_ADDRESS_STRUCTURE),
-    NULL, NULL, AcpiGenericAddressParser }
+    NULL, NULL, AcpiGenericAddressParser, ARRAY_SIZE (AcpiGenericAddressParser) },
 };
 
 /** A parser for EArchCommonObjSpmiInterruptDeviceInfo.
@@ -887,9 +887,9 @@ STATIC CONST CM_OBJ_PARSER  CmX64ObjHpetInfoParser[] = {
 /** A parser for EX64ObjMadtInfo.
 */
 STATIC CONST CM_OBJ_PARSER  CmX64ObjMadtInfoParser[] = {
-  { "LocalApicAddress", 4, "0x%x", NULL },
-  { "Flags",            4, "0x%x", NULL },
-  { "ApicMode",         1, "0x%x", NULL }
+  { "LocalApicAddress", 4,                        "0x%x", NULL },
+  { "Flags",            4,                        "0x%x", NULL },
+  { "ApicMode",         sizeof (LOCAL_APIC_MODE), "0x%x", NULL }
 };
 
 /** A parser for CmArchCommonLocalApicX2ApicInfoParser.
