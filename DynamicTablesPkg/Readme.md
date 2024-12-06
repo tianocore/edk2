@@ -325,7 +325,8 @@ or
 
 Ensure that the latest ACPICA iASL compiler is used for building *Dynamic Tables Framework*.
 *Dynamic Tables Framework* has been tested using the following iASL compiler version:
-[Version 20200717](https://www.acpica.org/node/183), dated 17 July, 2020.
+[Version 20200717](https://www.intel.com/content/www/us/en/download/774849/774863/acpi-component-architecture-downloads-previous-releases-2020.html),
+dated 17 July, 2020.
 
 
 #Running CI builds locally
