@@ -1,7 +1,12 @@
 ## @file
-# UnitTestFrameworkPkg DSC file used to build host-based unit tests that archive
+# UnitTestFrameworkPkg DSC file used to build host-based unit tests that are
 # always expected to fail to demonstrate the format of the log file and reports
 # when failures occur.
+#
+# For Google Test based unit tests, in order to see full log of errors from the
+# sanitizer, the Google Test handling of exceptions must be disabled by either
+# setting the environment variable GTEST_CATCH_EXCEPTIONS=0 or passing
+# --gtest-catch-exceptions=0 on the command line when executing unit tests.
 #
 # Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -21,7 +26,7 @@
 !include UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc
 
 [PcdsPatchableInModule]
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x17
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x1F
 
 [Components]
   #
@@ -42,3 +47,12 @@
     <BuildOptions>
       MSFT:*_*_*_CC_FLAGS = /wd4723
   }
+
+  #
+  # Unit tests that perform illegal actions that are caught by a sanitizer
+  #
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestDoubleFree/SampleUnitTestDoubleFree.inf
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestBufferOverflow/SampleUnitTestBufferOverflow.inf
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestBufferUnderflow/SampleUnitTestBufferUnderflow.inf
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestNullAddress/SampleUnitTestNullAddress.inf
+  UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestInvalidAddress/SampleUnitTestInvalidAddress.inf
