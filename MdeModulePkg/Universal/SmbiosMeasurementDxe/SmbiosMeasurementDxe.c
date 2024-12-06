@@ -637,6 +637,10 @@ MeasureSmbiosTable (
     if (!EFI_ERROR (Status)) {
       gBS->CloseEvent (Event);
     }
+
+    if (TableAddress != NULL) {
+      FreePool (TableAddress);
+    }
   }
 
   return;
