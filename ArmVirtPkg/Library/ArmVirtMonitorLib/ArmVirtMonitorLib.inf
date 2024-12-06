@@ -1,6 +1,6 @@
 ## @file
 #  Arm Monitor Library that chooses the conduit based on the PSCI node in the
-#  device tree provided by QEMU
+#  device tree provided by the VMM
 #
 #  Copyright (c) 2022, Arm Limited. All rights reserved.<BR>
 #  Copyright (c) 2024, Google LLC. All rights reserved.<BR>
@@ -10,15 +10,15 @@
 
 [Defines]
   INF_VERSION                    = 1.29
-  BASE_NAME                      = ArmVirtQemuMonitorLib
+  BASE_NAME                      = ArmVirtMonitorLib
   FILE_GUID                      = 09f50ee5-2aa2-42b9-a2a0-090faeefed2b
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ArmMonitorLib|DXE_DRIVER DXE_RUNTIME_DRIVER
-  CONSTRUCTOR                    = ArmVirtQemuMonitorLibConstructor
+  CONSTRUCTOR                    = ArmVirtMonitorLibConstructor
 
 [Sources]
-  ArmVirtQemuMonitorLib.c
+  ArmVirtMonitorLib.c
 
 [Packages]
   ArmPkg/ArmPkg.dec

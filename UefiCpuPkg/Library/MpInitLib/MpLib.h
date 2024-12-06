@@ -34,6 +34,7 @@
 #include <Library/PcdLib.h>
 #include <Library/MicrocodeLib.h>
 #include <Library/CpuPageTableLib.h>
+#include <Library/SafeIntLib.h>
 #include <ConfidentialComputingGuestAttr.h>
 
 #include <Register/Amd/SevSnpMsr.h>
