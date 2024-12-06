@@ -87,6 +87,9 @@
 
   # Networking Requirements
 !include NetworkPkg/NetworkLibs.dsc.inc
+!if ($(NETWORK_TLS_ENABLE) == TRUE) AND ($(ARCH) == ARM)
+  !error "NETWORK_TLS_ENABLE is not supported on ARM build!"
+!endif
 
   # ARM Architectural Libraries
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
@@ -263,7 +266,6 @@
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
 
 [LibraryClasses.ARM]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLibMbedTls/BaseCryptLib.inf
   MbedTlsLib|CryptoPkg/Library/MbedTlsLib/MbedTlsLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf

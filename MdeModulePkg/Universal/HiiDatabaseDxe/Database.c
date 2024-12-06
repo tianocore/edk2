@@ -825,7 +825,7 @@ FindQuestionDefaultSetting (
       if (BitFieldQuestion) {
         CopyMem (&BufferValue, (UINT8 *)AuthVariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + AuthVariableHeader->NameSize + ByteOffset, Width);
         BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
-        CopyMem (ValueBuffer, &BitFieldVal, Width);
+        CopyMem (ValueBuffer, &BitFieldVal, sizeof (UINT32));
       } else {
         CopyMem (ValueBuffer, (UINT8 *)AuthVariableHeader + sizeof (AUTHENTICATED_VARIABLE_HEADER) + AuthVariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
       }
@@ -862,7 +862,7 @@ FindQuestionDefaultSetting (
       if (BitFieldQuestion) {
         CopyMem (&BufferValue, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + ByteOffset, Width);
         BitFieldVal = BitFieldRead32 (BufferValue, StartBit, EndBit);
-        CopyMem (ValueBuffer, &BitFieldVal, Width);
+        CopyMem (ValueBuffer, &BitFieldVal, sizeof (UINT32));
       } else {
         CopyMem (ValueBuffer, (UINT8 *)VariableHeader + sizeof (VARIABLE_HEADER) + VariableHeader->NameSize + IfrQuestionHdr->VarStoreInfo.VarOffset, Width);
       }
