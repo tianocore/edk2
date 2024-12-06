@@ -204,7 +204,10 @@ GenerateRandomNumberViaNist800Algorithm (
     }
   }
 
-  if (!PcdGetBool (PcdEnforceSecureRngAlgorithms)) {
+  if (PcdGetBool (PcdEnforceSecureRngAlgorithms)) {
+    // Platform does not permit the use of the default (insecure) algorithm.
+    Status = EFI_SECURITY_VIOLATION;
+  } else {
     // If all the other methods have failed, use the default method from the RngProtocol
     Status = mRngProtocol->GetRNG (mRngProtocol, NULL, BufferSize, Buffer);
     DEBUG ((DEBUG_INFO, "%a: GetRNG algorithm default - Status = %r\n", __func__, Status));
