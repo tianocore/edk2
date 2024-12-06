@@ -33,7 +33,9 @@
 #include <Guid/PciSegmentInfoGuid.h>
 
 typedef enum {
-  ReservedMemory = 1,
+  IsaSerial = 1,
+  MmioSerial,
+  ReservedMemory,
   Memory,
   FrameBuffer,
   PciRootBridge,
@@ -143,7 +145,11 @@ CheckNodeType (
   )
 {
   DEBUG ((DEBUG_INFO, "\n CheckNodeType  %a   \n", NodeString));
-  if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0 ) {
+  if (AsciiStrnCmp (NodeString, "isa", AsciiStrLen ("isa")) == 0 ) {
+    return IsaSerial;
+  } else if (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0 ) {
+    return MmioSerial;
+  } else if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0 ) {
     return ReservedMemory;
   } else if (AsciiStrnCmp (NodeString, "memory@", AsciiStrLen ("memory@")) == 0 ) {
     return Memory;
@@ -191,7 +197,7 @@ ParseMemory (
     if (AsciiStrCmp (TempStr, "reg") == 0) {
       Data64        = (UINT64 *)(PropertyPtr->Data);
       StartAddress  = Fdt64ToCpu (*Data64);
-      NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+      NumberOfBytes = Fdt32ToCpu (*(Data64 + 1));
     } else if (AsciiStrCmp (TempStr, "ecc-detection-bits") == 0) {
       Data32  = (UINT32 *)(PropertyPtr->Data);
       ECCData = Fdt32ToCpu (*Data32);
@@ -251,7 +257,7 @@ ParseReservedMemory (
     if (TempLen > 0) {
       Data64        = (UINT64 *)(PropertyPtr->Data);
       StartAddress  = Fdt64ToCpu (*Data64);
-      NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+      NumberOfBytes = Fdt32ToCpu (*(Data64 + 1));
       DEBUG ((DEBUG_INFO, "\n         Property  %a", TempStr));
       DEBUG ((DEBUG_INFO, "  %016lX  %016lX\n", StartAddress, NumberOfBytes));
     }
@@ -567,8 +573,9 @@ ParsegraphicNode (
 **/
 VOID
 ParseSerialPort (
-  IN VOID   *Fdt,
-  IN INT32  SubNode
+  IN VOID     *Fdt,
+  IN INT32    SubNode,
+  IN BOOLEAN  SerialOnIsa
   )
 {
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *Serial;
@@ -602,7 +609,7 @@ ParseSerialPort (
 
   PropertyPtr = FdtGetProperty (Fdt, SubNode, "compatible", &TempLen);
   TempStr     = (CHAR8 *)(PropertyPtr->Data);
-  if (AsciiStrnCmp (TempStr, "isa", AsciiStrLen ("isa")) == 0) {
+  if (SerialOnIsa) {
     DEBUG ((DEBUG_INFO, " find serial compatible isa \n"));
     Serial->UseMmio = 0;
     PropertyPtr     = FdtGetProperty (Fdt, SubNode, "reg", &TempLen);
@@ -648,7 +655,6 @@ ParsePciRootBridge (
 {
   INT32               SubNode;
   INT32               Property;
-  INT32               SSubNode;
   FDT_NODE_HEADER     *NodePtr;
   CONST FDT_PROPERTY  *PropertyPtr;
   INT32               TempLen;
@@ -702,13 +708,8 @@ ParsePciRootBridge (
       ParsegraphicNode (Fdt, SubNode);
     }
 
-    if (AsciiStrnCmp (NodePtr->Name, "isa", AsciiStrLen ("isa")) == 0) {
-      SSubNode = FdtFirstSubnode (Fdt, SubNode); // serial
-      ParseSerialPort (Fdt, SSubNode);
-    }
-
     if (AsciiStrnCmp (NodePtr->Name, "serial@", AsciiStrLen ("serial@")) == 0) {
-      ParseSerialPort (Fdt, SubNode);
+      ParseSerialPort (Fdt, SubNode, FALSE);
     }
   }
 
@@ -787,7 +788,7 @@ ParsePciRootBridge (
 
   @return   The address to the new hob list
 **/
-UINTN
+VOID *
 EFIAPI
 ParseDtb (
   IN VOID  *FdtBase
@@ -810,13 +811,15 @@ ParseDtb (
   EFI_PHYSICAL_ADDRESS  MemoryBottom;
   EFI_PHYSICAL_ADDRESS  MemoryTop;
   BOOLEAN               IsHobConstructed;
-  UINTN                 NewHobList;
   UINT8                 RootBridgeCount;
   UINT8                 index;
   UINT8                 PciEnumDone;
   UINT8                 NodeType;
   EFI_BOOT_MODE         BootMode;
+  INT32                 SSubNode;
   CHAR8                 *GmaStr;
+  INT32                 PciRbNode;
+  UINT8                 ReservedMemoryDepth;
   INTN                  NumRsv;
   EFI_PHYSICAL_ADDRESS  Addr;
   UINT64                Size;
@@ -830,7 +833,6 @@ ParseDtb (
   Depth             = 0;
   MinimalNeededSize = FixedPcdGet32 (PcdSystemMemoryUefiRegionSize);
   IsHobConstructed  = FALSE;
-  NewHobList        = 0;
   RootBridgeCount   = 0;
   index             = 0;
   // TODO: This value comes from FDT. Currently there is a bug in implementation
@@ -838,6 +840,9 @@ ParseDtb (
   PciEnumDone = 1;
   BootMode    = 0;
   NodeType    = 0;
+  GmaStr      = "<NULL>";
+  PciRbNode   = 0;
+  ReservedMemoryDepth = 0xFF;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
   DEBUG ((DEBUG_INFO, "Start parsing DTB data\n"));
@@ -846,6 +851,22 @@ ParseDtb (
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
     DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x", Node, NodePtr->Name, Depth));
+
+    // Ensure we don't submit a child of reserved-memory as main memory block.
+    NodeType = CheckNodeType (NodePtr->Name, Depth);
+    // Already found reserved block.
+    if (ReservedMemoryDepth != 0xFF && Depth > ReservedMemoryDepth) {
+      DEBUG ((DEBUG_INFO, "Skipping reserved-memory block.\n"));
+      continue;
+    } else if (ReservedMemoryDepth != 0xFF && Depth <= ReservedMemoryDepth) {
+      ReservedMemoryDepth = 0xFF;
+    }
+    // Newly found reserved block.
+    if (NodeType == ReservedMemory) {
+      ReservedMemoryDepth = Depth;
+      continue;
+    }
+
     // memory node
     if (AsciiStrnCmp (NodePtr->Name, "memory@", AsciiStrLen ("memory@")) == 0) {
       for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
@@ -854,7 +875,7 @@ ParseDtb (
         if (AsciiStrCmp (TempStr, "reg") == 0) {
           Data64        = (UINT64 *)(PropertyPtr->Data);
           StartAddress  = Fdt64ToCpu (*Data64);
-          NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+          NumberOfBytes = Fdt32ToCpu (*(Data64 + 1));
           DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
           DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
           if (!IsHobConstructed) {
@@ -864,13 +885,12 @@ ParseDtb (
               FreeMemoryTop    = StartAddress + NumberOfBytes;
               MemoryTop        = FreeMemoryTop;
 
-              DEBUG ((DEBUG_INFO, "MemoryBottom :0x%llx\n", MemoryBottom));
+              DEBUG ((DEBUG_INFO, "\nMemoryBottom :0x%llx\n", MemoryBottom));
               DEBUG ((DEBUG_INFO, "FreeMemoryBottom :0x%llx\n", FreeMemoryBottom));
               DEBUG ((DEBUG_INFO, "FreeMemoryTop :0x%llx\n", FreeMemoryTop));
               DEBUG ((DEBUG_INFO, "MemoryTop :0x%llx\n", MemoryTop));
               mHobList         =  HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
               IsHobConstructed = TRUE;
-              NewHobList       = (UINTN)mHobList;
               break;
             }
           }
@@ -909,6 +929,15 @@ ParseDtb (
     NodeType = CheckNodeType (NodePtr->Name, Depth);
     DEBUG ((DEBUG_INFO, "NodeType :0x%x\n", NodeType));
     switch (NodeType) {
+      case IsaSerial:
+        DEBUG ((DEBUG_INFO, "ParseIsaSerial\n"));
+        SSubNode = FdtFirstSubnode (Fdt, Node); // serial
+        ParseSerialPort (Fdt, SSubNode, TRUE);
+        break;
+      case MmioSerial:
+        DEBUG ((DEBUG_INFO, "ParseMmioSerial\n"));
+        ParseSerialPort (Fdt, Node, FALSE);
+        break;
       case ReservedMemory:
         DEBUG ((DEBUG_INFO, "ParseReservedMemory\n"));
         ParseReservedMemory (Fdt, Node);
@@ -927,9 +956,8 @@ ParseDtb (
         GmaStr = ParseFrameBuffer (Fdt, Node);
         break;
       case PciRootBridge:
-        DEBUG ((DEBUG_INFO, "ParsePciRootBridge, index :%x \n", index));
-        ParsePciRootBridge (Fdt, Node, RootBridgeCount, GmaStr, &index);
-        DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index :%x\n", index));
+        DEBUG ((DEBUG_INFO, "Found PciRootBridge\n"));
+        PciRbNode = Node;
         break;
       case Options:
         // FIXME: Need to ensure this node gets parsed first so that it gets
@@ -941,6 +969,14 @@ ParseDtb (
         DEBUG ((DEBUG_INFO, "ParseNothing\n"));
         break;
     }
+  }
+
+  // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
+  // may not be good idea
+  if (PciRbNode) {
+    DEBUG ((DEBUG_INFO, "ParsePciRootBridge, index :%x\n", index));
+    ParsePciRootBridge (Fdt, PciRbNode, RootBridgeCount, GmaStr, &index);
+    DEBUG ((DEBUG_INFO, "After ParsePciRootBridge, index :%x\n", index));
   }
 
   // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
@@ -988,7 +1024,7 @@ ParseDtb (
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;
   DEBUG ((DEBUG_INFO, "\n"));
 
-  return NewHobList;
+  return mHobList;
 }
 
 /**
@@ -997,7 +1033,7 @@ ParseDtb (
   @retval HobList   The base address of Hoblist.
 
 **/
-UINTN
+VOID *
 EFIAPI
 FdtNodeParser (
   IN VOID  *FdtBase
@@ -1020,21 +1056,20 @@ UplInitHob (
   IN VOID  *FdtBase
   )
 {
-  UINTN  NHobAddress;
+  VOID  *NHobAddress;
 
-  NHobAddress = 0;
   //
-  // Check parameter type(
+  // Check parameter type
   //
   if (FdtCheckHeader (FdtBase) == 0) {
     DEBUG ((DEBUG_INFO, "%a() FDT blob\n", __func__));
     NHobAddress = FdtNodeParser ((VOID *)FdtBase);
+
+    return (UINTN)NHobAddress;
   } else {
-    DEBUG ((DEBUG_INFO, "%a() HOb list\n", __func__));
+    DEBUG ((DEBUG_INFO, "%a() HOB list\n", __func__));
     mHobList = FdtBase;
 
-    return (UINTN)(mHobList);
+    return (UINTN)mHobList;
   }
-
-  return NHobAddress;
 }
