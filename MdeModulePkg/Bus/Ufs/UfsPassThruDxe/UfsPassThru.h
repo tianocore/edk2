@@ -27,7 +27,8 @@
 #include <Library/PcdLib.h>
 #include <Library/TimerLib.h>
 
-#include "UfsPassThruHci.h"
+#include <IndustryStandard/Ufs.h>
+#include <IndustryStandard/UfsHci.h>
 
 #define UFS_PASS_THRU_SIG  SIGNATURE_32 ('U', 'F', 'S', 'P')
 
