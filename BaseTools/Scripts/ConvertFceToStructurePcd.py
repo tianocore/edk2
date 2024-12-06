@@ -223,7 +223,7 @@ class Config(object):
     if 'DEFAULT_ID:' in read:
       all_txt = read.split('FCEKEY DEFAULT')
       for i in all_txt[1:]:
-        part = [] #save all infomation for DEFAULT_ID
+        part = [] #save all information for DEFAULT_ID
         str_id=''
         ids = ids_re.findall(i.replace(' ',''))
         for m in ids:
