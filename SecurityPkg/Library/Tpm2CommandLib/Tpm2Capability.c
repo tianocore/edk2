@@ -734,9 +734,9 @@ Tpm2TestParms (
           Buffer += sizeof (UINT16);
           break;
         case TPM_ALG_XOR:
-          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor.hashAlg));
+          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor_.hashAlg));
           Buffer += sizeof (UINT16);
-          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor.kdf));
+          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.keyedHashDetail.scheme.details.xor_.kdf));
           Buffer += sizeof (UINT16);
           break;
         default:
@@ -761,7 +761,7 @@ Tpm2TestParms (
           Buffer += sizeof (UINT16);
           break;
         case TPM_ALG_XOR:
-          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.xor));
+          WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (Parameters->parameters.symDetail.keyBits.xor_));
           Buffer += sizeof (UINT16);
           break;
         case TPM_ALG_NULL:

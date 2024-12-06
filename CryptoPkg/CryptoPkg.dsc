@@ -21,7 +21,7 @@
   PLATFORM_GUID                  = E1063286-6C8C-4c25-AEF0-67A9A5B6E6B6
   PLATFORM_VERSION               = 0.98
   DSC_SPECIFICATION              = 0x00010005
-  SUPPORTED_ARCHITECTURES        = IA32|X64|ARM|AARCH64|RISCV64|LOONGARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|AARCH64|RISCV64|LOONGARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -124,9 +124,6 @@
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
-
-[LibraryClasses.ARM]
-  ArmSoftFloatLib|ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
 
 [LibraryClasses.common.SEC]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SecCryptLib.inf
@@ -475,6 +472,7 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
   }
 !endif
 
@@ -541,6 +539,7 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
   }
   #
   # CryptoSmm with OpensslLib instance with no SSL or EC services
@@ -594,6 +593,7 @@
     <BuildOptions>
       MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:4096
       MSFT:*_*_X64_DLINK_FLAGS  = /ALIGN:4096
+      GCC:*_*_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x1000
   }
   #
   # CryptoStandaloneMm with OpensslLib instance with no SSL or EC services
