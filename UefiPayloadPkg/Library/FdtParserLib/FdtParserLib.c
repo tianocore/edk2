@@ -190,8 +190,8 @@ ParseMemory (
     TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
     if (AsciiStrCmp (TempStr, "reg") == 0) {
       Data64        = (UINT64 *)(PropertyPtr->Data);
-      StartAddress  = Fdt64ToCpu (*Data64);
-      NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+      StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
+      NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
     } else if (AsciiStrCmp (TempStr, "ecc-detection-bits") == 0) {
       Data32  = (UINT32 *)(PropertyPtr->Data);
       ECCData = Fdt32ToCpu (*Data32);
@@ -250,8 +250,8 @@ ParseReservedMemory (
     TempStr = (CHAR8 *)(PropertyPtr->Data);
     if (TempLen > 0) {
       Data64        = (UINT64 *)(PropertyPtr->Data);
-      StartAddress  = Fdt64ToCpu (*Data64);
-      NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+      StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
+      NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
       DEBUG ((DEBUG_INFO, "\n         Property  %a", TempStr));
       DEBUG ((DEBUG_INFO, "  %016lX  %016lX\n", StartAddress, NumberOfBytes));
     }
@@ -361,6 +361,21 @@ ParseFrameBuffer (
     } else if (AsciiStrCmp (TempStr, "height") == 0) {
       Data32                                        = (UINT32 *)(PropertyPtr->Data);
       GraphicsInfo->GraphicsMode.VerticalResolution = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "redmask") == 0) {
+      Data32                                              = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelInformation.RedMask = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "greenmask") == 0) {
+      Data32                                                = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelInformation.GreenMask = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "bluemask") == 0) {
+      Data32                                               = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelInformation.BlueMask = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "reservedmask") == 0) {
+      Data32                                                   = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelInformation.ReservedMask = Fdt32ToCpu (*Data32);
+    } else if (AsciiStrCmp (TempStr, "pixelsperscanline") == 0) {
+      Data32                                       = (UINT32 *)(PropertyPtr->Data);
+      GraphicsInfo->GraphicsMode.PixelsPerScanLine = Fdt32ToCpu (*Data32);
     } else if (AsciiStrCmp (TempStr, "format") == 0) {
       TempStr = (CHAR8 *)(PropertyPtr->Data);
       if (AsciiStrCmp (TempStr, "a8r8g8b8") == 0) {
@@ -430,7 +445,7 @@ ParseOptions (
       ASSERT (TempLen > 0);
       if (TempLen > 0) {
         Data64       = (UINT64 *)(PropertyPtr->Data);
-        StartAddress = Fdt64ToCpu (*Data64);
+        StartAddress = Fdt64ToCpu (ReadUnaligned64 (Data64));
         DEBUG ((DEBUG_INFO, "\n         Property(00000000)  entry"));
         DEBUG ((DEBUG_INFO, "  %016lX\n", StartAddress));
 
@@ -659,7 +674,26 @@ ParsePciRootBridge (
   UINTN               HobDataSize;
   UINT8               Base;
 
+  // Parse serial port and graphic device nodes if "pci-rb" node is not
+  // compatbile to "pci-rb" property type.
+  //
+  // With serial port and graphic device nodes parsed,  debug trace log
+  // can be enabled and graphic device can be worked as expected before
+  // UPL scan Host PCI Root Bridge.
   if (RootBridgeCount == 0) {
+    for (SubNode = FdtFirstSubnode (Fdt, Node); SubNode >= 0; SubNode = FdtNextSubnode (Fdt, SubNode)) {
+      NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + SubNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
+      DEBUG ((DEBUG_INFO, "\n      SubNode(%08X)  %a", SubNode, NodePtr->Name));
+
+      if (AsciiStrnCmp (NodePtr->Name, "serial@", AsciiStrLen ("serial@")) == 0) {
+        ParseSerialPort (Fdt, SubNode);
+      } else if (AsciiStrnCmp (NodePtr->Name, GmaStr, AsciiStrLen (GmaStr)) == 0) {
+        DEBUG ((DEBUG_INFO, "  Found gma@ node \n"));
+        ParsegraphicNode (Fdt, SubNode);
+      } else {
+		  continue;
+      }
+    }
     return;
   }
 
@@ -758,7 +792,7 @@ ParsePciRootBridge (
 
     if (AsciiStrCmp (TempStr, "reg") == 0) {
       UINT64  *Data64 = (UINT64 *)(PropertyPtr->Data);
-      mUplPciSegmentInfoHob->SegmentInfo[RbIndex].BaseAddress = Fdt64ToCpu (*Data64);
+      mUplPciSegmentInfoHob->SegmentInfo[RbIndex].BaseAddress = Fdt64ToCpu (ReadUnaligned64 (Data64));
       DEBUG ((DEBUG_INFO, "PciRootBridge->Ecam.Base %llx, \n", mUplPciSegmentInfoHob->SegmentInfo[RbIndex].BaseAddress));
     }
 
@@ -845,7 +879,7 @@ ParseDtb (
 
   for (Node = FdtNextNode (Fdt, 0, &Depth); Node >= 0; Node = FdtNextNode (Fdt, Node, &Depth)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + Node + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
-    DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x", Node, NodePtr->Name, Depth));
+    DEBUG ((DEBUG_INFO, "\n   Node(%08x)  %a   Depth %x\n", Node, NodePtr->Name, Depth));
     // memory node
     if (AsciiStrnCmp (NodePtr->Name, "memory@", AsciiStrLen ("memory@")) == 0) {
       for (Property = FdtFirstPropertyOffset (Fdt, Node); Property >= 0; Property = FdtNextPropertyOffset (Fdt, Property)) {
@@ -853,8 +887,8 @@ ParseDtb (
         TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
         if (AsciiStrCmp (TempStr, "reg") == 0) {
           Data64        = (UINT64 *)(PropertyPtr->Data);
-          StartAddress  = Fdt64ToCpu (*Data64);
-          NumberOfBytes = Fdt64ToCpu (*(Data64 + 1));
+          StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
+          NumberOfBytes = Fdt64ToCpu (ReadUnaligned64 (Data64 + 1));
           DEBUG ((DEBUG_INFO, "\n         Property(%08X)  %a", Property, TempStr));
           DEBUG ((DEBUG_INFO, "  %016lX  %016lX", StartAddress, NumberOfBytes));
           if (!IsHobConstructed) {
@@ -943,6 +977,11 @@ ParseDtb (
     }
   }
 
+  if ((mPciRootBridgeInfo == NULL) || (mUplPciSegmentInfoHob == NULL)) {
+    DEBUG((DEBUG_INFO, "%a - %d SKIP PCI ROOT BRIDGE init\n", __FUNCTION__, __LINE__));
+    goto out;
+  }
+
   // Post processing: TODO: Need to look into it. Such cross dependency on DT nodes
   // may not be good idea. Instead have this prop part of RB
   mPciRootBridgeInfo->ResourceAssigned = (BOOLEAN)PciEnumDone;
@@ -985,6 +1024,7 @@ ParseDtb (
     CurrentPciBaseAddress = NextPciBaseAddress;
   }
 
+out:
   ((EFI_HOB_HANDOFF_INFO_TABLE *)(mHobList))->BootMode = BootMode;
   DEBUG ((DEBUG_INFO, "\n"));
 

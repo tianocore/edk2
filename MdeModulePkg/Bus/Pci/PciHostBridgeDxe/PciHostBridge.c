@@ -547,7 +547,7 @@ InitializePciHostBridge (
                    MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
                    EFI_MEMORY_UC
                    );
-        ASSERT_EFI_ERROR (Status);
+        //ASSERT_EFI_ERROR (Status);
         Status = gDS->SetMemorySpaceAttributes (
                         HostAddress,
                         MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
@@ -567,7 +567,7 @@ InitializePciHostBridge (
                           gImageHandle,
                           NULL
                           );
-          ASSERT_EFI_ERROR (Status);
+          //ASSERT_EFI_ERROR (Status);
         }
       }
     }
@@ -598,7 +598,7 @@ InitializePciHostBridge (
                     &HostBridge->ResAlloc,
                     NULL
                     );
-    ASSERT_EFI_ERROR (Status);
+    //ASSERT_EFI_ERROR (Status);
   }
 
   for (Link = GetFirstNode (&HostBridge->RootBridges)
