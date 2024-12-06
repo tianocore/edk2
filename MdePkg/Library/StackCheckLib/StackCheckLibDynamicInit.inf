@@ -1,0 +1,43 @@
+## @file
+#  Provides the required functionality for creating a random stack cookie value at runtime.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = StackCheckLibDynamicInit
+  FILE_GUID                      = 443DB89E-E0E8-4771-BCA4-3F44D32A0F23
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = StackCheckEntryPointLib
+
+[Sources.IA32]
+  IA32/DynamicCookieGcc.nasm  | GCC
+  IA32/DynamicCookieMsvc.nasm | MSFT
+
+[Sources.X64]
+  X64/DynamicCookieGcc.nasm   | GCC
+  X64/DynamicCookieMsvc.nasm  | MSFT
+
+[Sources.AARCH64]
+  AArch64/DynamicCookieGcc.S | GCC
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+
+[BuildOptions]
+  # We cannot build the MSVC version with /GL (whole program optimization) because we run into linker error
+  # LNK1237, which is a failure to link against a symbol from a library compiled with /GL. The whole program
+  # optimization tries to do away with references to this symbol. The solution is to not compile the stack
+  # check libs with /GL
+  MSFT:*_*_*_CC_FLAGS = /GL-
+
+  # We cannot build the GCC version with LTO (link time optimization) because we run into linker errors where
+  # the stack cookie variable has been optimized away, as it looks to GCC like the variable is not used, because
+  # the compiler inserts the usage.
+  GCC:*_*_*_CC_FLAGS = -fno-lto

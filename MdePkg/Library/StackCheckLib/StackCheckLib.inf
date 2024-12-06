@@ -7,8 +7,8 @@
 
 [Defines]
   INF_VERSION                    = 1.29
-  BASE_NAME                      = StackCheckLibStaticInit
-  FILE_GUID                      = 2b24dc50-e33d-4c9f-8b62-e826f06e483f
+  BASE_NAME                      = StackCheckLib
+  FILE_GUID                      = 1C4CA056-8FEA-413C-89D2-59A7E22847B3
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NULL
@@ -39,8 +39,6 @@
 
 [LibraryClasses]
   StackCheckFailureHookLib
-  BaseLib
-  DebugLib
 
 [FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdStackCookieExceptionVector

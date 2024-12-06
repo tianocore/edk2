@@ -78,6 +78,7 @@
   MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
+  MdePkg/Library/DxeCoreEntryPoint/DxeCoreStackCheckEntryPointLibNull.inf
   MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
   MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
@@ -91,6 +92,7 @@
   MdePkg/Library/DxeRuntimePciExpressLib/DxeRuntimePciExpressLib.inf
   MdePkg/Library/DxeRuntimeDebugLibSerialPort/DxeRuntimeDebugLibSerialPort.inf
 
+  MdePkg/Library/PeiCoreEntryPoint/PeiCoreStackCheckEntryPointLibNull.inf
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
   MdePkg/Library/PeiExtractGuidedSectionLib/PeiExtractGuidedSectionLib.inf
@@ -98,6 +100,7 @@
   MdePkg/Library/PeiIoLibCpuIo/PeiIoLibCpuIo.inf
   MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   MdePkg/Library/PeiMemoryLib/PeiMemoryLib.inf
+  MdePkg/Library/PeimEntryPoint/PeimStackCheckEntryPointLibNull.inf
   MdePkg/Library/PeimEntryPoint/PeimEntryPoint.inf
   MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   MdePkg/Library/PeiResourcePublicationLib/PeiResourcePublicationLib.inf
@@ -107,6 +110,7 @@
   MdePkg/Library/PeiPciLibPciCfg2/PeiPciLibPciCfg2.inf
   MdePkg/Library/PeiPciSegmentLibPciCfg2/PeiPciSegmentLibPciCfg2.inf
 
+  MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationStackCheckEntryPointLibNull.inf
   MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
   MdePkg/Library/UefiDebugLibConOut/UefiDebugLibConOut.inf
@@ -117,6 +121,7 @@
   MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibStandaloneMm.inf
   MdePkg/Library/UefiDevicePathLib/UefiDevicePathLibOptionalDevicePathProtocol.inf
   MdePkg/Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.inf
+  MdePkg/Library/UefiDriverEntryPoint/UefiDriverStackCheckEntryPointLibNull.inf
   MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
   MdePkg/Library/UefiLib/UefiLib.inf
   MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
@@ -129,6 +134,7 @@
   MdePkg/Library/SmmLibNull/SmmLibNull.inf
   MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
 
+  MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverStackCheckEntryPointLibNull.inf
   MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
   MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
 
@@ -141,7 +147,7 @@
 
   MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
   MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-  MdePkg/Library/StackCheckLib/StackCheckLibStaticInit.inf
+  MdePkg/Library/StackCheckLib/StackCheckLib.inf
 
 [Components.IA32, Components.X64, Components.ARM, Components.AARCH64]
   #
