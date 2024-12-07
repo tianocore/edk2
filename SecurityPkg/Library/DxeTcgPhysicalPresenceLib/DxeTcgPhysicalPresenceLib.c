@@ -540,7 +540,7 @@ UserConfirm (
   CHAR16   *TmpStr2;
   UINTN    BufSize;
   BOOLEAN  CautionKey;
-  UINT16   Index;
+  UINTN    Index;
   CHAR16   DstStr[81];
 
   TmpStr2     = NULL;
