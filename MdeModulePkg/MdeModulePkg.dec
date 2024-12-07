@@ -1604,6 +1604,10 @@
   # @Prompt ACPI Reclaim memory is not available.
   gEfiMdeModulePkgTokenSpaceGuid.PcdNoACPIReclaimMemory|FALSE|BOOLEAN|0x0001008b
 
+  ## Indicates which Memory Attributes Table version exposed to the OS.
+  # @Prompt Exposed Memory Attributes Table version.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMemoryAttributesTableVersion|0x00000002|UINT32|0x12f85350
+
   ## This PCD defines the MAX repair count.
   #  The default value is 0 that means infinite.
   # @Prompt MAX repair count
