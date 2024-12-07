@@ -70,6 +70,7 @@
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
+  ArmSvcLib|ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   OpteeLib|ArmPkg/Library/OpteeLib/OpteeLib.inf
@@ -86,6 +87,8 @@
 
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
+  ArmTransferListLib|ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
 
   ArmMtlLib|ArmPkg/Library/ArmMtlNullLib/ArmMtlNullLib.inf
 
@@ -97,6 +100,16 @@
   MemoryAllocationLib|MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
   PeiServicesLib|MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
   PeiServicesTablePointerLib|MdePkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
+  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
+
+[LibraryClasses.common.MM_CORE_STANDALONE]
+  StandaloneMmCoreEntryPoint|ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
+  HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
+
+[LibraryClasses.common.MM_STANDALONE]
+  StandaloneMmDriverEntryPoint|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
+  HobLib|StandaloneMmPkg/Library/StandaloneMmHobLib/StandaloneMmHobLib.inf
+  MmServicesTableLib|MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
 
 [Components.common]
   ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
@@ -129,6 +142,11 @@
   ArmPkg/Library/ArmSmcLibNull/ArmSmcLibNull.inf
   ArmPkg/Library/ArmSvcLib/ArmSvcLib.inf
   ArmPkg/Library/OpteeLib/OpteeLib.inf
+  ArmPkg/Library/ArmTransferListLib/ArmTransferListLib.inf
+  ArmPkg/Library/ArmFfaLib/ArmFfaPeiLib.inf
+  ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf
+  ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmCoreLib.inf
+  ArmPkg/Library/ArmFfaLib/ArmFfaStandaloneMmLib.inf
 
   ArmPkg/Filesystem/SemihostFs/SemihostFs.inf
 
@@ -151,6 +169,12 @@
   ArmPkg/Universal/Smbios/OemMiscLibNull/OemMiscLibNull.inf
 
   ArmPkg/Drivers/MmCommunicationPei/MmCommunicationPei.inf
+
+[Components.common.MM_CORE_STANALONE]
+  ArmPkg/Library/ArmStandaloneMmCoreEntryPoint/ArmStandaloneMmCoreEntryPoint.inf
+
+[Components.common.MM_STANDALONE]
+  ArmPkg/Drivers/StandaloneMmCpu/StandaloneMmCpu.inf
 
 [Components.AARCH64]
   ArmPkg/Drivers/ArmCrashDumpDxe/ArmCrashDumpDxe.inf
