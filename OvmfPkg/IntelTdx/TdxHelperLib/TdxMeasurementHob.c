@@ -51,7 +51,6 @@ typedef PLATFORM_FIRMWARE_BLOB2_STRUCT CFV_HANDOFF_TABLE_POINTERS2;
  * @retval EFI_SUCCESS  Successfully build the GuidHobs
  * @retval Others       Other error as indicated
  */
-STATIC
 EFI_STATUS
 BuildTdxMeasurementGuidHob (
   UINT32  RtmrIndex,
