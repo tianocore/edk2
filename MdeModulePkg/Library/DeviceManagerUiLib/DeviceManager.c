@@ -557,10 +557,14 @@ CreateDeviceManagerForm (
     NewStringLen   = StrLen (mSelectedMacAddrString) * 2;
     NewStringLen  += (StrLen (String) + 2) * 2;
     NewStringTitle = AllocatePool (NewStringLen);
-    UnicodeSPrint (NewStringTitle, NewStringLen, L"%s %s", String, mSelectedMacAddrString);
-    HiiSetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NewStringTitle, NULL);
+
+    if (NewStringTitle != NULL) {
+      UnicodeSPrint (NewStringTitle, NewStringLen, L"%s %s", String, mSelectedMacAddrString);
+      HiiSetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NewStringTitle, NULL);
+      FreePool (NewStringTitle);
+    }
+
     FreePool (String);
-    FreePool (NewStringTitle);
   }
 
   //
@@ -568,184 +572,194 @@ CreateDeviceManagerForm (
   //
   StartOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (StartOpCodeHandle != NULL);
+  if (StartOpCodeHandle != NULL) {
+    EndOpCodeHandle = HiiAllocateOpCodeHandle ();
+    ASSERT (EndOpCodeHandle != NULL);
+    if (EndOpCodeHandle != NULL) {
+      //
+      // Create Hii Extend Label OpCode as the start opcode
+      //
+      StartLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+      StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+      //
+      // According to the next show Form id(mNextShowFormId) to decide which form need to update.
+      //
+      StartLabel->Number = (UINT16)(LABEL_FORM_ID_OFFSET + NextShowFormId);
 
-  EndOpCodeHandle = HiiAllocateOpCodeHandle ();
-  ASSERT (EndOpCodeHandle != NULL);
+      //
+      // Create Hii Extend Label OpCode as the end opcode
+      //
+      EndLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
+      EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
+      EndLabel->Number       = LABEL_END;
 
-  //
-  // Create Hii Extend Label OpCode as the start opcode
-  //
-  StartLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (StartOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-  StartLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-  //
-  // According to the next show Form id(mNextShowFormId) to decide which form need to update.
-  //
-  StartLabel->Number = (UINT16)(LABEL_FORM_ID_OFFSET + NextShowFormId);
+      //
+      // Get all the Hii handles
+      //
+      HiiHandles = HiiGetHiiHandles (NULL);
+      ASSERT (HiiHandles != NULL);
+      if (HiiHandles != NULL) {
+        //
+        // Search for formset of each class type
+        //
+        for (Index = 0; HiiHandles[Index] != NULL; Index++) {
+          Status = HiiGetFormSetFromHiiHandle (HiiHandles[Index], &Buffer, &BufferSize);
+          if (EFI_ERROR (Status)) {
+            continue;
+          }
 
-  //
-  // Create Hii Extend Label OpCode as the end opcode
-  //
-  EndLabel               = (EFI_IFR_GUID_LABEL *)HiiCreateGuidOpCode (EndOpCodeHandle, &gEfiIfrTianoGuid, NULL, sizeof (EFI_IFR_GUID_LABEL));
-  EndLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
-  EndLabel->Number       = LABEL_END;
+          Ptr = (UINT8 *)Buffer;
+          while (TempSize < BufferSize) {
+            TempSize += ((EFI_IFR_OP_HEADER *)Ptr)->Length;
+            if (((EFI_IFR_OP_HEADER *)Ptr)->Length <= OFFSET_OF (EFI_IFR_FORM_SET, Flags)) {
+              Ptr += ((EFI_IFR_OP_HEADER *)Ptr)->Length;
+              continue;
+            }
 
-  //
-  // Get all the Hii handles
-  //
-  HiiHandles = HiiGetHiiHandles (NULL);
-  ASSERT (HiiHandles != NULL);
+            ClassGuidNum = (UINT8)(((EFI_IFR_FORM_SET *)Ptr)->Flags & 0x3);
+            ClassGuid    = (EFI_GUID *)(VOID *)(Ptr + sizeof (EFI_IFR_FORM_SET));
+            while (ClassGuidNum-- > 0) {
+              if (CompareGuid (&gEfiHiiPlatformSetupFormsetGuid, ClassGuid) == 0) {
+                ClassGuid++;
+                continue;
+              }
 
-  //
-  // Search for formset of each class type
-  //
-  for (Index = 0; HiiHandles[Index] != NULL; Index++) {
-    Status = HiiGetFormSetFromHiiHandle (HiiHandles[Index], &Buffer, &BufferSize);
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
+              String = HiiGetString (HiiHandles[Index], ((EFI_IFR_FORM_SET *)Ptr)->FormSetTitle, NULL);
+              if (String == NULL) {
+                String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
+                ASSERT (String != NULL);
+              }
 
-    Ptr = (UINT8 *)Buffer;
-    while (TempSize < BufferSize) {
-      TempSize += ((EFI_IFR_OP_HEADER *)Ptr)->Length;
-      if (((EFI_IFR_OP_HEADER *)Ptr)->Length <= OFFSET_OF (EFI_IFR_FORM_SET, Flags)) {
-        Ptr += ((EFI_IFR_OP_HEADER *)Ptr)->Length;
-        continue;
+              Token = HiiSetString (HiiHandle, 0, String, NULL);
+              if (String != NULL) {
+                FreePool (String);
+              }
+
+              String = HiiGetString (HiiHandles[Index], ((EFI_IFR_FORM_SET *)Ptr)->Help, NULL);
+              if (String == NULL) {
+                String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
+                ASSERT (String != NULL);
+              }
+
+              TokenHelp = HiiSetString (HiiHandle, 0, String, NULL);
+              if (String != NULL) {
+                FreePool (String);
+              }
+
+              CopyMem (&FormSetGuid, &((EFI_IFR_FORM_SET *)Ptr)->Guid, sizeof (EFI_GUID));
+
+              //
+              // Network device process
+              //
+              if (IsNeedAddNetworkMenu (HiiHandles[Index], NextShowFormId, &AddItemCount)) {
+                if (NextShowFormId == DEVICE_MANAGER_FORM_ID) {
+                  //
+                  // Only show one menu item "Network Config" in the device manger form.
+                  //
+                  if (!AddNetworkMenu) {
+                    AddNetworkMenu = TRUE;
+                    HiiCreateGotoOpCode (
+                      StartOpCodeHandle,
+                      NETWORK_DEVICE_LIST_FORM_ID,
+                      STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_TITLE),
+                      STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_HELP),
+                      EFI_IFR_FLAG_CALLBACK,
+                      (EFI_QUESTION_ID)QUESTION_NETWORK_DEVICE_ID
+                      );
+                  }
+                } else if (NextShowFormId == NETWORK_DEVICE_LIST_FORM_ID) {
+                  //
+                  // In network device list form, same mac address device only show one menu.
+                  //
+                  while (AddItemCount > 0) {
+                    HiiCreateGotoOpCode (
+                      StartOpCodeHandle,
+                      NETWORK_DEVICE_FORM_ID,
+                      mMacDeviceList.NodeList[mMacDeviceList.CurListLen - AddItemCount].PromptId,
+                      STRING_TOKEN (STR_NETWORK_DEVICE_HELP),
+                      EFI_IFR_FLAG_CALLBACK,
+                      mMacDeviceList.NodeList[mMacDeviceList.CurListLen - AddItemCount].QuestionId
+                      );
+                    AddItemCount -= 1;
+                  }
+                } else if (NextShowFormId == NETWORK_DEVICE_FORM_ID) {
+                  //
+                  // In network device form, only the selected mac address device need to be show.
+                  //
+                  DevicePathStr = DmExtractDevicePathFromHiiHandle (HiiHandles[Index]);
+                  DevicePathId  = 0;
+                  if (DevicePathStr != NULL) {
+                    DevicePathId =  HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
+                    FreePool (DevicePathStr);
+                  }
+
+                  HiiCreateGotoExOpCode (
+                    StartOpCodeHandle,
+                    0,
+                    Token,
+                    TokenHelp,
+                    0,
+                    (EFI_QUESTION_ID)(Index + DEVICE_KEY_OFFSET),
+                    0,
+                    &FormSetGuid,
+                    DevicePathId
+                    );
+                }
+              } else {
+                //
+                // Not network device process, only need to show at device manger form.
+                //
+                if (NextShowFormId == DEVICE_MANAGER_FORM_ID) {
+                  DevicePathStr = DmExtractDevicePathFromHiiHandle (HiiHandles[Index]);
+                  DevicePathId  = 0;
+                  if (DevicePathStr != NULL) {
+                    DevicePathId =  HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
+                    FreePool (DevicePathStr);
+                  }
+
+                  HiiCreateGotoExOpCode (
+                    StartOpCodeHandle,
+                    0,
+                    Token,
+                    TokenHelp,
+                    0,
+                    (EFI_QUESTION_ID)(Index + DEVICE_KEY_OFFSET),
+                    0,
+                    &FormSetGuid,
+                    DevicePathId
+                    );
+                }
+              }
+
+              break;
+            }
+
+            Ptr += ((EFI_IFR_OP_HEADER *)Ptr)->Length;
+          }
+
+          FreePool (Buffer);
+          Buffer     = NULL;
+          TempSize   = 0;
+          BufferSize = 0;
+        }
       }
 
-      ClassGuidNum = (UINT8)(((EFI_IFR_FORM_SET *)Ptr)->Flags & 0x3);
-      ClassGuid    = (EFI_GUID *)(VOID *)(Ptr + sizeof (EFI_IFR_FORM_SET));
-      while (ClassGuidNum-- > 0) {
-        if (CompareGuid (&gEfiHiiPlatformSetupFormsetGuid, ClassGuid) == 0) {
-          ClassGuid++;
-          continue;
-        }
-
-        String = HiiGetString (HiiHandles[Index], ((EFI_IFR_FORM_SET *)Ptr)->FormSetTitle, NULL);
-        if (String == NULL) {
-          String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
-          ASSERT (String != NULL);
-        }
-
-        Token = HiiSetString (HiiHandle, 0, String, NULL);
-        FreePool (String);
-
-        String = HiiGetString (HiiHandles[Index], ((EFI_IFR_FORM_SET *)Ptr)->Help, NULL);
-        if (String == NULL) {
-          String = HiiGetString (HiiHandle, STRING_TOKEN (STR_MISSING_STRING), NULL);
-          ASSERT (String != NULL);
-        }
-
-        TokenHelp = HiiSetString (HiiHandle, 0, String, NULL);
-        FreePool (String);
-
-        CopyMem (&FormSetGuid, &((EFI_IFR_FORM_SET *)Ptr)->Guid, sizeof (EFI_GUID));
-
-        //
-        // Network device process
-        //
-        if (IsNeedAddNetworkMenu (HiiHandles[Index], NextShowFormId, &AddItemCount)) {
-          if (NextShowFormId == DEVICE_MANAGER_FORM_ID) {
-            //
-            // Only show one menu item "Network Config" in the device manger form.
-            //
-            if (!AddNetworkMenu) {
-              AddNetworkMenu = TRUE;
-              HiiCreateGotoOpCode (
-                StartOpCodeHandle,
-                NETWORK_DEVICE_LIST_FORM_ID,
-                STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_TITLE),
-                STRING_TOKEN (STR_FORM_NETWORK_DEVICE_LIST_HELP),
-                EFI_IFR_FLAG_CALLBACK,
-                (EFI_QUESTION_ID)QUESTION_NETWORK_DEVICE_ID
-                );
-            }
-          } else if (NextShowFormId == NETWORK_DEVICE_LIST_FORM_ID) {
-            //
-            // In network device list form, same mac address device only show one menu.
-            //
-            while (AddItemCount > 0) {
-              HiiCreateGotoOpCode (
-                StartOpCodeHandle,
-                NETWORK_DEVICE_FORM_ID,
-                mMacDeviceList.NodeList[mMacDeviceList.CurListLen - AddItemCount].PromptId,
-                STRING_TOKEN (STR_NETWORK_DEVICE_HELP),
-                EFI_IFR_FLAG_CALLBACK,
-                mMacDeviceList.NodeList[mMacDeviceList.CurListLen - AddItemCount].QuestionId
-                );
-              AddItemCount -= 1;
-            }
-          } else if (NextShowFormId == NETWORK_DEVICE_FORM_ID) {
-            //
-            // In network device form, only the selected mac address device need to be show.
-            //
-            DevicePathStr = DmExtractDevicePathFromHiiHandle (HiiHandles[Index]);
-            DevicePathId  = 0;
-            if (DevicePathStr != NULL) {
-              DevicePathId =  HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
-              FreePool (DevicePathStr);
-            }
-
-            HiiCreateGotoExOpCode (
-              StartOpCodeHandle,
-              0,
-              Token,
-              TokenHelp,
-              0,
-              (EFI_QUESTION_ID)(Index + DEVICE_KEY_OFFSET),
-              0,
-              &FormSetGuid,
-              DevicePathId
-              );
-          }
-        } else {
-          //
-          // Not network device process, only need to show at device manger form.
-          //
-          if (NextShowFormId == DEVICE_MANAGER_FORM_ID) {
-            DevicePathStr = DmExtractDevicePathFromHiiHandle (HiiHandles[Index]);
-            DevicePathId  = 0;
-            if (DevicePathStr != NULL) {
-              DevicePathId =  HiiSetString (HiiHandle, 0, DevicePathStr, NULL);
-              FreePool (DevicePathStr);
-            }
-
-            HiiCreateGotoExOpCode (
-              StartOpCodeHandle,
-              0,
-              Token,
-              TokenHelp,
-              0,
-              (EFI_QUESTION_ID)(Index + DEVICE_KEY_OFFSET),
-              0,
-              &FormSetGuid,
-              DevicePathId
-              );
-          }
-        }
-
-        break;
-      }
-
-      Ptr += ((EFI_IFR_OP_HEADER *)Ptr)->Length;
+      HiiUpdateForm (
+        HiiHandle,
+        &mDeviceManagerGuid,
+        NextShowFormId,
+        StartOpCodeHandle,
+        EndOpCodeHandle
+        );
+      HiiFreeOpCodeHandle (EndOpCodeHandle);
     }
 
-    FreePool (Buffer);
-    Buffer     = NULL;
-    TempSize   = 0;
-    BufferSize = 0;
+    HiiFreeOpCodeHandle (StartOpCodeHandle);
   }
 
-  HiiUpdateForm (
-    HiiHandle,
-    &mDeviceManagerGuid,
-    NextShowFormId,
-    StartOpCodeHandle,
-    EndOpCodeHandle
-    );
-
-  HiiFreeOpCodeHandle (StartOpCodeHandle);
-  HiiFreeOpCodeHandle (EndOpCodeHandle);
-  FreePool (HiiHandles);
+  if (HiiHandles != NULL) {
+    FreePool (HiiHandles);
+  }
 }
 
 /**
