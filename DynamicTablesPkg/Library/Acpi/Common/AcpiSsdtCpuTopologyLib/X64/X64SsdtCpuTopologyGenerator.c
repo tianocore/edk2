@@ -31,6 +31,42 @@ GET_OBJECT_LIST (
   CM_X64_LOCAL_APIC_X2APIC_INFO
   );
 
+/** This macro expands to a function that retrieves the
+    C-State information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCstInfo,
+  CM_ARCH_COMMON_CST_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    C-State dependency information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCsdInfo,
+  CM_ARCH_COMMON_CSD_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    P-State information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPstateInfo,
+  CM_ARCH_COMMON_PSTATE_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    _STA (Device Status) information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjStaInfo,
+  CM_ARCH_COMMON_STA_INFO
+  );
+
 /**
   Create the processor hierarchy AML tree from arch specific CM objects.
 
@@ -54,6 +90,11 @@ CreateTopologyFromIntC (
   UINT32                         LocalApicX2ApicCount;
   UINT32                         Index;
   AML_OBJECT_NODE_HANDLE         CpuNode;
+  CM_ARCH_COMMON_CST_INFO        *CstInfo;
+  CM_ARCH_COMMON_CSD_INFO        *CsdInfo;
+  UINT32                         CsdNumEntries;
+  CM_ARCH_COMMON_PSTATE_INFO     *PstateInfo;
+  CM_ARCH_COMMON_STA_INFO        *StaInfo;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -83,6 +124,134 @@ CreateTopologyFromIntC (
     if (EFI_ERROR (Status)) {
       ASSERT_EFI_ERROR (Status);
       break;
+    }
+
+    ///
+    /// Check for optional tokens and add them to the CPU node.
+    ///
+    if (LocalApicX2ApicInfo[Index].CstToken != CM_NULL_TOKEN) {
+      Status = GetEArchCommonObjCstInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].CstToken,
+                 &CstInfo,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCreateCstNode (
+                 CstInfo,
+                 CpuNode,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].CsdToken != CM_NULL_TOKEN) {
+      Status = GetEArchCommonObjCsdInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].CsdToken,
+                 &CsdInfo,
+                 &CsdNumEntries
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCreateCsdNode (
+                 CsdInfo,
+                 CsdNumEntries,
+                 CpuNode,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    ///
+    /// Check for optional tokens and add them to the CPU node.
+    ///
+    if (LocalApicX2ApicInfo[Index].PstateToken != CM_NULL_TOKEN) {
+      Status = GetEArchCommonObjPstateInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].PstateToken,
+                 &PstateInfo,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCreatePctNode (
+                 &PstateInfo->Pct,
+                 CpuNode,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCreatePssNode (
+                 PstateInfo->Pss,
+                 PstateInfo->PssPackagesCount,
+                 CpuNode,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCodeGenMethodRetInteger ("_PPC", PstateInfo->Ppc, 0, FALSE, 0, CpuNode, NULL);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].PsdToken != CM_NULL_TOKEN) {
+      Status = CreateAmlPsdNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].PsdToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].CpcToken != CM_NULL_TOKEN) {
+      Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].CpcToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].StaToken != CM_NULL_TOKEN) {
+      Status = GetEArchCommonObjStaInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].StaToken,
+                 &StaInfo,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCodeGenMethodRetInteger ("_STA", StaInfo->DeviceStatus, 0, FALSE, 0, CpuNode, NULL);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
     }
   }
 

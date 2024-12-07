@@ -2,7 +2,7 @@
 
   Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES. All rights reserved.<BR>
-  Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -53,6 +53,10 @@ typedef enum ArchCommonObjectID {
   EArchCommonObjTpm2InterfaceInfo,              ///< 26 - TPM Interface Info
   EArchCommonObjSpmiInterfaceInfo,              ///< 27 - SPMI Interface Info
   EArchCommonObjSpmiInterruptDeviceInfo,        ///< 28 - SPMI Interrupt and Device Info
+  EArchCommonObjCstInfo,                        ///< 29 - C-State Info
+  EArchCommonObjCsdInfo,                        ///< 30 - C-State Dependency (CSD) Info
+  EArchCommonObjPstateInfo,                     ///< 31 - Processor P-State Info
+  EArchCommonObjStaInfo,                        ///< 32 - _STA (Device Status) Info
   EArchCommonObjMax
 } EARCH_COMMON_OBJECT_ID;
 
@@ -728,6 +732,63 @@ typedef struct CmArchCommonObjSpmiInterruptDeviceInfo {
   /** Uid of the device */
   UINT32    DeviceId;
 } CM_ARCH_COMMON_SPMI_INTERRUPT_DEVICE_INFO;
+
+/** A structure that describes the Cst information.
+
+  Processor power state (C-state) is described in DSDT/SSDT and associated
+  to cpus/clusters in the cpu topology.
+
+  Unsupported Optional registers should be encoded with NULL resource
+  Register {(SystemMemory, 0, 0, 0, 0)}
+
+  For values that support Integer or Buffer, integer will be used
+  if buffer is NULL resource.
+  If resource is not NULL then Integer must be 0
+
+  Cf. ACPI 6.4, s8.4.2.1 _CST (C states)
+
+  ID: EArchCommonObjCstInfo
+*/
+typedef AML_CST_INFO CM_ARCH_COMMON_CST_INFO;
+
+/** A structure that describes the C-State Dependency (CSD) Info.
+
+    Cf. ACPI 6.4, s8.4.2.2 _CSD (C-State Dependency).
+
+    ID: EArchCommonObjCsdInfo
+*/
+typedef AML_CSD_INFO CM_ARCH_COMMON_CSD_INFO;
+
+/** A structure that describes the P-State Info.
+    This includes _PCT, _PSS and method.
+
+    Cf. ACPI 6.4, s8.4.6. Processor Performance Control
+
+    ID: EArchCommonObjPstateInfo
+*/
+typedef struct CmArchCommonPstateInfo {
+  /// Processor Control Structure (PCT)
+  AML_PCT_INFO    Pct;
+
+  /// Processor Status Structure (PSS)
+  AML_PSS_INFO    *Pss;
+
+  /// Number of PPS packages
+  UINT32          PssPackagesCount;
+
+  /// P-State performance presense capability
+  UINT32          Ppc;
+} CM_ARCH_COMMON_PSTATE_INFO;
+
+/** A structure that describes the _STA (Device Status) Info.
+
+    ID: EArchCommonObjStaInfo
+*/
+typedef struct CmArchCommonStaInfo {
+  /// Device Status
+  UINT32    DeviceStatus;
+} CM_ARCH_COMMON_STA_INFO;
+
 #pragma pack()
 
 #endif // ARCH_COMMON_NAMESPACE_OBJECTS_H_
