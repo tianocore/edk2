@@ -53,7 +53,7 @@ LibGetTime (
   UINT64      Freq;
   UINT64      Counter;
   UINT64      Remainder;
-  UINTN       EpochSeconds;
+  UINT64      EpochSeconds;
   UINTN       Size;
 
   if (Time == NULL) {
