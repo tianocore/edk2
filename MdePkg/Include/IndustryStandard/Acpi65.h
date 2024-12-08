@@ -20,6 +20,15 @@
 #pragma pack(1)
 
 ///
+/// _STA bit definitions ACPI 6.5 s6.3.7
+///
+#define ACPI_AML_STA_DEVICE_STATUS_PRESET       0x1
+#define ACPI_AML_STA_DEVICE_STATUS_ENABLED      0x2
+#define ACPI_AML_STA_DEVICE_STATUS_UI           0x4
+#define ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING  0x8
+#define ACPI_AML_STA_DEVICE_STATUS_BATTERY      0x10
+
+///
 /// _CSD Revision for ACPI 6.5
 ///
 #define EFI_ACPI_6_5_AML_CSD_REVISION  0
