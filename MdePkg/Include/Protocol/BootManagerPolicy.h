@@ -27,6 +27,11 @@
     0xD04159DC, 0xE15F, 0x11E3, { 0xB2, 0x61, 0xB8, 0xE8, 0x56, 0x2C, 0xBA, 0xFA } \
   }
 
+#define EFI_BOOT_MANAGER_POLICY_STORAGE_GUID  \
+  { \
+    0xCD68FE79, 0xD3CB, 0x436E, { 0xA8, 0x50, 0xF4, 0x43, 0xC8, 0x8C, 0xFB, 0x49 } \
+  }
+
 #define EFI_BOOT_MANAGER_POLICY_CONNECT_ALL_GUID \
   { \
     0x113B2126, 0xFC8A, 0x11E3, { 0xBD, 0x6C, 0xB8, 0xE8, 0x56, 0x2C, 0xBA, 0xFA } \
@@ -99,6 +104,13 @@ EFI_STATUS
   protocols to establish the network connection. The Boot Manager can optionally
   have a policy to establish a network connection.
 
+  If Class is EFI_BOOT_MANAGER_POLICY_STORAGE_GUID then the Boot Manager will
+  connect the protocols associated with the discoverable storage devices.
+  These protocols may include EFI_BLOCK_IO_PROTOCOL, EFI_SIMPLE_FILE_SYSTEM_PROTOCOL
+  or other storage protocols relevant to the device. The platform may choose to
+  restrict the connected devices based on its policy. For example, the platform
+  may exclude external peripherals or only include specific, well-known devices.
+
   If Class is EFI_BOOT_MANAGER_POLICY_CONNECT_ALL_GUID then the Boot Manager
   will connect all UEFI drivers using the UEFI Boot Service
   EFI_BOOT_SERVICES.ConnectController(). If the Boot Manager has policy
@@ -139,6 +151,7 @@ extern EFI_GUID  gEfiBootManagerPolicyProtocolGuid;
 
 extern EFI_GUID  gEfiBootManagerPolicyConsoleGuid;
 extern EFI_GUID  gEfiBootManagerPolicyNetworkGuid;
+extern EFI_GUID  gEfiBootManagerPolicyStorageGuid;
 extern EFI_GUID  gEfiBootManagerPolicyConnectAllGuid;
 extern EFI_GUID  gEfiBootManagerPolicyStorageGuid;
 
