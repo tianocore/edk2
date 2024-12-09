@@ -155,7 +155,7 @@ class EfiSection (EfiSectionClassObject):
                 #if VerString == '' and
                 if BuildNumString == '':
                     if self.Optional == True :
-                        GenFdsGlobalVariable.VerboseLogger( "Optional Section don't exist!")
+                        GenFdsGlobalVariable.VerboseLogger( "Optional Section doesn't exist!")
                         return [], None
                     else:
                         EdkLogger.error("GenFds", GENFDS_ERROR, "File: %s miss Version Section value" %InfFileName)
