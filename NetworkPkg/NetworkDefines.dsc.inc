@@ -21,6 +21,7 @@
 #   DEFINE NETWORK_ISCSI_ENABLE           = FALSE
 #   DEFINE NETWORK_ISCSI_MD5_ENABLE       = TRUE
 #   DEFINE NETWORK_VLAN_ENABLE            = TRUE
+#   DEFINE NETWORK_PXE_BOOT_ENABLE        = TRUE
 #
 # Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2020 Hewlett Packard Enterprise Development LP<BR>
@@ -135,6 +136,13 @@
   #       several vendors' iSCSI targets only support MD5, for CHAP.
   #
   DEFINE NETWORK_ISCSI_MD5_ENABLE = TRUE
+!endif
+
+!ifndef NETWORK_PXE_BOOT_ENABLE
+  #
+  # This flag is to enable or disable PXE boot feature.
+  #
+  DEFINE NETWORK_PXE_BOOT_ENABLE = TRUE
 !endif
 
 !if $(NETWORK_ENABLE) == TRUE

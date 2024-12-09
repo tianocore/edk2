@@ -40,6 +40,9 @@
  .set    sctlrval, SCTLR_ELx_M | SCTLR_ELx_C | SCTLR_ELx_SA | SCTLR_EL1_ITD | SCTLR_EL1_SED
  .set    sctlrval, sctlrval | SCTLR_ELx_I | SCTLR_EL1_SPAN | SCTLR_EL1_RES1
 
+ .set    ID_AA64MMFR1_VH_MASK,  0xf << 8
+ .set    HCR_EL2_E2H,           0x1 << 34
+
 
 ASM_FUNC(ArmPlatformPeiBootAction)
 #ifdef CAVIUM_ERRATUM_27456
@@ -58,8 +61,17 @@ ASM_FUNC(ArmPlatformPeiBootAction)
   b.eq   0f
 #endif
   mrs    x0, CurrentEL           // check current exception level
-  tbnz   x0, #3, 0f              // omit early ID map if above EL1
+  tbz    x0, #3, .Learly_idmap   // use early ID map if at EL1
+  mrs    x0, id_aa64mmfr1_el1    // otherwise, check for VHE support
+  tst    x0, #ID_AA64MMFR1_VH_MASK
+  b.eq   0f
 
+  mrs    x0, hcr_el2             // Enable VHE support
+  orr    x0, x0, #HCR_EL2_E2H
+  msr    hcr_el2, x0
+  isb
+
+.Learly_idmap:
   mov_i  x0, mairval
   mov_i  x1, tcrval
   adrp   x2, idmap

@@ -42,11 +42,12 @@
   DebugLib
   IoLib
   MemoryAllocationLib
-  MemEncryptSevLib
-  MemEncryptTdxLib
 
 [Protocols]
   gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdConfidentialComputingGuestAttr
 
 [Depex]
   gEdkiiIoMmuProtocolGuid OR gIoMmuAbsentProtocolGuid

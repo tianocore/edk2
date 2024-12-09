@@ -43,6 +43,9 @@ extern "C" {
 # ifndef OPENSSL_NO_APPS
 #  define OPENSSL_NO_APPS
 # endif
+# ifndef OPENSSL_NO_ARGON2
+#  define OPENSSL_NO_ARGON2
+# endif
 # ifndef OPENSSL_NO_ARIA
 #  define OPENSSL_NO_ARIA
 # endif
@@ -63,6 +66,12 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_BLAKE2
 #  define OPENSSL_NO_BLAKE2
+# endif
+# ifndef OPENSSL_NO_BROTLI
+#  define OPENSSL_NO_BROTLI
+# endif
+# ifndef OPENSSL_NO_BROTLI_DYNAMIC
+#  define OPENSSL_NO_BROTLI_DYNAMIC
 # endif
 # ifndef OPENSSL_NO_CAMELLIA
 #  define OPENSSL_NO_CAMELLIA
@@ -96,6 +105,12 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_CT
 #  define OPENSSL_NO_CT
+# endif
+# ifndef OPENSSL_NO_DEFAULT_THREAD_POOL
+#  define OPENSSL_NO_DEFAULT_THREAD_POOL
+# endif
+# ifndef OPENSSL_NO_DEMOS
+#  define OPENSSL_NO_DEMOS
 # endif
 # ifndef OPENSSL_NO_DEPRECATED
 #  define OPENSSL_NO_DEPRECATED
@@ -151,6 +166,9 @@ extern "C" {
 # ifndef OPENSSL_NO_FILENAMES
 #  define OPENSSL_NO_FILENAMES
 # endif
+# ifndef OPENSSL_NO_FIPS_POST
+#  define OPENSSL_NO_FIPS_POST
+# endif
 # ifndef OPENSSL_NO_FIPS_SECURITYCHECKS
 #  define OPENSSL_NO_FIPS_SECURITYCHECKS
 # endif
@@ -163,8 +181,14 @@ extern "C" {
 # ifndef OPENSSL_NO_GOST
 #  define OPENSSL_NO_GOST
 # endif
+# ifndef OPENSSL_NO_H3DEMO
+#  define OPENSSL_NO_H3DEMO
+# endif
 # ifndef OPENSSL_NO_IDEA
 #  define OPENSSL_NO_IDEA
+# endif
+# ifndef OPENSSL_NO_JITTER
+#  define OPENSSL_NO_JITTER
 # endif
 # ifndef OPENSSL_NO_KTLS
 #  define OPENSSL_NO_KTLS
@@ -199,6 +223,9 @@ extern "C" {
 # ifndef OPENSSL_NO_PADLOCKENG
 #  define OPENSSL_NO_PADLOCKENG
 # endif
+# ifndef OPENSSL_NO_PIE
+#  define OPENSSL_NO_PIE
+# endif
 # ifndef OPENSSL_NO_POLY1305
 #  define OPENSSL_NO_POLY1305
 # endif
@@ -207,6 +234,12 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_PSK
 #  define OPENSSL_NO_PSK
+# endif
+# ifndef OPENSSL_NO_QLOG
+#  define OPENSSL_NO_QLOG
+# endif
+# ifndef OPENSSL_NO_QUIC
+#  define OPENSSL_NO_QUIC
 # endif
 # ifndef OPENSSL_NO_RC2
 #  define OPENSSL_NO_RC2
@@ -268,6 +301,12 @@ extern "C" {
 # ifndef OPENSSL_NO_TESTS
 #  define OPENSSL_NO_TESTS
 # endif
+# ifndef OPENSSL_NO_TFO
+#  define OPENSSL_NO_TFO
+# endif
+# ifndef OPENSSL_NO_THREAD_POOL
+#  define OPENSSL_NO_THREAD_POOL
+# endif
 # ifndef OPENSSL_NO_TLS1_3
 #  define OPENSSL_NO_TLS1_3
 # endif
@@ -286,6 +325,9 @@ extern "C" {
 # ifndef OPENSSL_NO_UNIT_TEST
 #  define OPENSSL_NO_UNIT_TEST
 # endif
+# ifndef OPENSSL_NO_UNSTABLE_QLOG
+#  define OPENSSL_NO_UNSTABLE_QLOG
+# endif
 # ifndef OPENSSL_NO_UPLINK
 #  define OPENSSL_NO_UPLINK
 # endif
@@ -294,6 +336,21 @@ extern "C" {
 # endif
 # ifndef OPENSSL_NO_WHIRLPOOL
 #  define OPENSSL_NO_WHIRLPOOL
+# endif
+# ifndef OPENSSL_NO_WINSTORE
+#  define OPENSSL_NO_WINSTORE
+# endif
+# ifndef OPENSSL_NO_ZLIB
+#  define OPENSSL_NO_ZLIB
+# endif
+# ifndef OPENSSL_NO_ZLIB_DYNAMIC
+#  define OPENSSL_NO_ZLIB_DYNAMIC
+# endif
+# ifndef OPENSSL_NO_ZSTD
+#  define OPENSSL_NO_ZSTD
+# endif
+# ifndef OPENSSL_NO_ZSTD_DYNAMIC
+#  define OPENSSL_NO_ZSTD_DYNAMIC
 # endif
 # ifndef OPENSSL_NO_DYNAMIC_ENGINE
 #  define OPENSSL_NO_DYNAMIC_ENGINE
@@ -315,6 +372,12 @@ extern "C" {
 # endif
 
 # define RC4_INT unsigned int
+
+# if defined(OPENSSL_NO_COMP) || (defined(OPENSSL_NO_BROTLI) && defined(OPENSSL_NO_ZSTD) && defined(OPENSSL_NO_ZLIB))
+#  define OPENSSL_NO_COMP_ALG
+# else
+#  undef  OPENSSL_NO_COMP_ALG
+# endif
 
 # ifdef  __cplusplus
 }
