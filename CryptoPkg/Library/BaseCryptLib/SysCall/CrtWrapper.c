@@ -703,11 +703,7 @@ bsearch (
     return NULL;
   }
 
-  if (sizeof (size_t) == 32) {
-    Status = SafeUint32Mult ((UINT32) size, (UINT32) nmemb, (UINT32 *)&Result);
-  } else {
-    Status = SafeUint64Mult ((UINT64) size, (UINT64) nmemb, (UINT64 *)&Result);
-  }
+  Status = SafeUintnMult ((UINTN) size, (UINTN) (nmemb/2), (UINTN *)&Result);
 
   if ((Status == RETURN_BUFFER_TOO_SMALL) ||
       (Status == RETURN_INVALID_PARAMETER)) {
