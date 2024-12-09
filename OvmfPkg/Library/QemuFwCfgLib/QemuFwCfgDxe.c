@@ -56,6 +56,7 @@ QemuFwCfgInitialize (
 {
   UINT32  Signature;
   UINT32  Revision;
+  UINT64  CcGuestAttr;
 
   //
   // Enable the access routines while probing to see if it is supported.
@@ -86,7 +87,10 @@ QemuFwCfgInitialize (
     DEBUG ((DEBUG_INFO, "QemuFwCfg interface (DMA) is supported.\n"));
   }
 
-  if (mQemuFwCfgDmaSupported && (MemEncryptSevIsEnabled () || (MemEncryptTdxIsEnabled ()))) {
+  CcGuestAttr = PcdGet64 (PcdConfidentialComputingGuestAttr);
+  if (mQemuFwCfgDmaSupported && (CC_GUEST_IS_SEV (CcGuestAttr) ||
+                                 CC_GUEST_IS_TDX (CcGuestAttr)))
+  {
     EFI_STATUS  Status;
 
     //
@@ -415,7 +419,7 @@ InternalQemuFwCfgDmaBytes (
   // When SEV or TDX is enabled, map Buffer to DMA address before issuing the DMA
   // request
   //
-  if (MemEncryptSevIsEnabled () || MemEncryptTdxIsEnabled ()) {
+  if (mIoMmuProtocol != NULL) {
     VOID                  *AccessBuffer;
     EFI_PHYSICAL_ADDRESS  DataBufferAddress;
 

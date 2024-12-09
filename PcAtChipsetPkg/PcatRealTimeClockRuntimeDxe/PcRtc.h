@@ -70,6 +70,7 @@ extern PC_RTC_MODULE_GLOBALS  mModuleGlobal;
 //
 // Register A
 //
+#define RTC_DIV_RESET  0x70
 typedef struct {
   UINT8    Rs  : 4; // Rate Selection Bits
   UINT8    Dv  : 3; // Divisor

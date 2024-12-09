@@ -1657,6 +1657,11 @@ ResetProcessorToIdleState (
   CpuMpData = GetCpuMpData ();
 
   CpuMpData->WakeUpByInitSipiSipi = TRUE;
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.  Aborting the AP reset to idle.\n", __func__));
+    return;
+  }
+
   WakeUpAP (CpuMpData, FALSE, ProcessorNumber, NULL, NULL, TRUE);
   while (CpuMpData->FinishedCount < 1) {
     CpuPause ();
@@ -1685,6 +1690,11 @@ GetNextWaitingProcessorNumber (
   CPU_MP_DATA  *CpuMpData;
 
   CpuMpData = GetCpuMpData ();
+
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
 
   for (ProcessorNumber = 0; ProcessorNumber < CpuMpData->CpuCount; ProcessorNumber++) {
     if (CpuMpData->CpuData[ProcessorNumber].Waiting) {
@@ -1716,7 +1726,13 @@ CheckThisAP (
   CPU_AP_DATA  *CpuData;
 
   CpuMpData = GetCpuMpData ();
-  CpuData   = &CpuMpData->CpuData[ProcessorNumber];
+
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
+
+  CpuData = &CpuMpData->CpuData[ProcessorNumber];
 
   //
   //  Check the CPU state of AP. If it is CpuStateIdle, then the AP has finished its task.
@@ -1777,6 +1793,11 @@ CheckAllAPs (
   CPU_AP_DATA  *CpuData;
 
   CpuMpData = GetCpuMpData ();
+
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
 
   NextProcessorNumber = 0;
 
@@ -2097,6 +2118,10 @@ MpInitLibInitialize (
   BufferSize += (sizeof (CPU_AP_DATA) + sizeof (CPU_INFO_IN_HOB))* MaxLogicalProcessorNumber;
   MpBuffer    = AllocatePages (EFI_SIZE_TO_PAGES (BufferSize));
   ASSERT (MpBuffer != NULL);
+  if (MpBuffer == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
   ZeroMem (MpBuffer, BufferSize);
   Buffer = ALIGN_VALUE ((UINTN)MpBuffer, ApStackSize);
 
@@ -2457,8 +2482,15 @@ MpInitLibGetProcessorInfo (
   UINTN            CallerNumber;
   CPU_INFO_IN_HOB  *CpuInfoInHob;
   UINTN            OriginalProcessorNumber;
+  EFI_STATUS       Status;
 
-  CpuMpData    = GetCpuMpData ();
+  CpuMpData = GetCpuMpData ();
+
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
+
   CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
 
   //
@@ -2470,7 +2502,13 @@ MpInitLibGetProcessorInfo (
   //
   // Check whether caller processor is BSP
   //
-  MpInitLibWhoAmI (&CallerNumber);
+  Status = MpInitLibWhoAmI (&CallerNumber);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get processor number.  Failed to get MpInit Processor info.\n", __func__));
+    return Status;
+  }
+
   if (CallerNumber != CpuMpData->BspNumber) {
     return EFI_DEVICE_ERROR;
   }
@@ -2551,6 +2589,7 @@ SwitchBSPWorker (
   MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
   BOOLEAN                      OldInterruptState;
   BOOLEAN                      OldTimerInterruptState;
+  EFI_STATUS                   Status;
 
   //
   // Save and Disable Local APIC timer interrupt
@@ -2573,10 +2612,21 @@ SwitchBSPWorker (
 
   CpuMpData = GetCpuMpData ();
 
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
+
   //
   // Check whether caller processor is BSP
   //
-  MpInitLibWhoAmI (&CallerNumber);
+  Status = MpInitLibWhoAmI (&CallerNumber);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get processor number.  Failed to get MpInit Processor info.\n", __func__));
+    return Status;
+  }
+
   if (CallerNumber != CpuMpData->BspNumber) {
     return EFI_DEVICE_ERROR;
   }
@@ -2700,13 +2750,25 @@ EnableDisableApWorker (
 {
   CPU_MP_DATA  *CpuMpData;
   UINTN        CallerNumber;
+  EFI_STATUS   Status;
 
   CpuMpData = GetCpuMpData ();
+
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
 
   //
   // Check whether caller processor is BSP
   //
-  MpInitLibWhoAmI (&CallerNumber);
+  Status = MpInitLibWhoAmI (&CallerNumber);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get processor number.  Failed to get MpInit Processor info.\n", __func__));
+    return Status;
+  }
+
   if (CallerNumber != CpuMpData->BspNumber) {
     return EFI_DEVICE_ERROR;
   }
@@ -2763,6 +2825,11 @@ MpInitLibWhoAmI (
 
   CpuMpData = GetCpuMpData ();
 
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
+
   return GetProcessorNumber (CpuMpData, ProcessorNumber);
 }
 
@@ -2798,8 +2865,14 @@ MpInitLibGetNumberOfProcessors (
   UINTN        ProcessorNumber;
   UINTN        EnabledProcessorNumber;
   UINTN        Index;
+  EFI_STATUS   Status;
 
   CpuMpData = GetCpuMpData ();
+
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
 
   if ((NumberOfProcessors == NULL) && (NumberOfEnabledProcessors == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -2808,7 +2881,13 @@ MpInitLibGetNumberOfProcessors (
   //
   // Check whether caller processor is BSP
   //
-  MpInitLibWhoAmI (&CallerNumber);
+  Status = MpInitLibWhoAmI (&CallerNumber);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get processor number.  Failed to get MpInit Processor info.\n", __func__));
+    return Status;
+  }
+
   if (CallerNumber != CpuMpData->BspNumber) {
     return EFI_DEVICE_ERROR;
   }
@@ -2890,6 +2969,11 @@ StartupAllCPUsWorker (
     *FailedCpuList = NULL;
   }
 
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
+
   if ((CpuMpData->CpuCount == 1) && ExcludeBsp) {
     return EFI_NOT_STARTED;
   }
@@ -2901,7 +2985,13 @@ StartupAllCPUsWorker (
   //
   // Check whether caller processor is BSP
   //
-  MpInitLibWhoAmI (&CallerNumber);
+  Status = MpInitLibWhoAmI (&CallerNumber);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get processor number.  Failed to get MpInit Processor info.\n", __func__));
+    return Status;
+  }
+
   if (CallerNumber != CpuMpData->BspNumber) {
     return EFI_DEVICE_ERROR;
   }
@@ -3043,10 +3133,21 @@ StartupThisAPWorker (
     *Finished = FALSE;
   }
 
+  if (CpuMpData == NULL) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get CpuMpData.\n", __func__));
+    return EFI_LOAD_ERROR;
+  }
+
   //
   // Check whether caller processor is BSP
   //
-  MpInitLibWhoAmI (&CallerNumber);
+  Status = MpInitLibWhoAmI (&CallerNumber);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get processor number.  Failed to get MpInit Processor info.\n", __func__));
+    return Status;
+  }
+
   if (CallerNumber != CpuMpData->BspNumber) {
     return EFI_DEVICE_ERROR;
   }
@@ -3268,8 +3369,15 @@ RelocateApLoop (
   BOOLEAN      MwaitSupport;
   UINTN        ProcessorNumber;
   UINTN        StackStart;
+  EFI_STATUS   Status;
 
-  MpInitLibWhoAmI (&ProcessorNumber);
+  Status = MpInitLibWhoAmI (&ProcessorNumber);
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "[%a] - Failed to get processor number.  Aborting AP sync.\n", __func__));
+    return;
+  }
+
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
   if (CpuMpData->UseSevEsAPMethod) {

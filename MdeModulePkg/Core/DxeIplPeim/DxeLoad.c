@@ -636,6 +636,11 @@ CustomGuidedSectionExtract (
              ScratchBuffer,
              AuthenticationStatus
              );
+
+  if (ScratchBuffer != NULL) {
+    FreePages (ScratchBuffer, EFI_SIZE_TO_PAGES (ScratchBufferSize));
+  }
+
   if (EFI_ERROR (Status)) {
     //
     // Decode failed

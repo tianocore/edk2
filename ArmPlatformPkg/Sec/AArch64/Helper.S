@@ -12,8 +12,8 @@
 ASM_FUNC(SetupExceptionLevel1)
    mov  x5, x30                   // Save LR
 
-   mov  x0, #CPACR_CP_FULL_ACCESS
-   bl   ASM_PFX(ArmWriteCpacr)    // Disable copro traps to EL1
+   mov  x0, #CPACR_DEFAULT
+   bl   ASM_PFX(ArmWriteCpacr)    // Enable architectural features
 
    ret  x5
 
@@ -28,7 +28,10 @@ ASM_FUNC(SetupExceptionLevel2)
    orr     x0, x0, #(1 << 5)      // Enable EL2 SError and Abort
    msr     hcr_el2, x0            // Write back our settings
 
-   msr     cptr_el2, xzr          // Disable copro traps to EL2
+   // NB: We assume that we have not been entered on VHE systems with
+   // HCR_EL2.E2H set.
+   mov     x0, #AARCH64_CPTR_DEFAULT
+   msr     cptr_el2, x0           // Enable architectural features
 
    // Enable Timer access for non-secure EL1 and EL0
    // The cnthctl_el2 register bits are architecturally
