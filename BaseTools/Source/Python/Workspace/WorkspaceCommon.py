@@ -42,7 +42,7 @@ def GetPackageList(Platform, BuildDatabase, Arch, Target, Toolchain):
     for ModuleFile in Platform.Modules:
         Data = BuildDatabase[ModuleFile, Arch, Target, Toolchain]
         PkgSet.update(Data.Packages)
-        for Lib in GetLiabraryInstances(Data, Platform, BuildDatabase, Arch, Target, Toolchain):
+        for Lib in GetLibraryInstances(Data, Platform, BuildDatabase, Arch, Target, Toolchain):
             PkgSet.update(Lib.Packages)
     return list(PkgSet)
 
@@ -87,7 +87,7 @@ def GetDeclaredPcd(Platform, BuildDatabase, Arch, Target, Toolchain, additionalP
 #  @param Toolchain: Current toolchain
 #  @retval: List of dependent libraries which are InfBuildData instances
 #
-def GetLiabraryInstances(Module, Platform, BuildDatabase, Arch, Target, Toolchain):
+def GetLibraryInstances(Module, Platform, BuildDatabase, Arch, Target, Toolchain):
     return GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolchain,Platform.MetaFile,EdkLogger)
 
 def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolchain, FileName = '', EdkLogger = None):

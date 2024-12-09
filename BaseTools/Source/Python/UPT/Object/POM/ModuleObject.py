@@ -424,7 +424,7 @@ class ExternObject(CommonPropertiesObject):
 class DepexObject(CommonPropertiesObject):
     def __init__(self):
         self.Depex = ''
-        self.ModuelType = ''
+        self.ModuleType = ''
         CommonPropertiesObject.__init__(self)
 
     def SetDepex(self, Depex):
@@ -434,10 +434,10 @@ class DepexObject(CommonPropertiesObject):
         return self.Depex
 
     def SetModuleType(self, ModuleType):
-        self.ModuelType = ModuleType
+        self.ModuleType = ModuleType
 
     def GetModuleType(self):
-        return self.ModuelType
+        return self.ModuleType
 
 ##
 # PackageDependencyObject
