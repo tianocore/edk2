@@ -213,6 +213,9 @@ typedef struct {
 
 typedef struct {
   ///
+  /// The data type used for the KeyIdentifier field
+  UINT8       KeyIdentifierType;
+  ///
   /// The size of the KeyIdentifier field in bytes. This field is limited to the range 0 to 255.
   ///
   UINT8       KeyIdentifierSize;
