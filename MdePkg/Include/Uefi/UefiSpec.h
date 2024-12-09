@@ -1850,6 +1850,7 @@ EFI_STATUS
 // EFI Runtime Services Table
 //
 #define EFI_SYSTEM_TABLE_SIGNATURE       SIGNATURE_64 ('I','B','I',' ','S','Y','S','T')
+#define EFI_2_110_SYSTEM_TABLE_REVISION  ((2 << 16) | (110))
 #define EFI_2_100_SYSTEM_TABLE_REVISION  ((2 << 16) | (100))
 #define EFI_2_90_SYSTEM_TABLE_REVISION   ((2 << 16) | (90))
 #define EFI_2_80_SYSTEM_TABLE_REVISION   ((2 << 16) | (80))
