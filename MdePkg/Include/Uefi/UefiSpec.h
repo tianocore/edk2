@@ -106,6 +106,16 @@ typedef enum {
 #define EFI_MEMORY_CPU_CRYPTO  0x0000000000080000ULL
 
 //
+// If this flag is set, the memory region is present and capable of having
+// memory dynamically removed from the platform. This attribute serves as
+// a hint to the OS prior to its ACPI subsystem initialization to avoid
+// allocating this memory for core OS data or code that cannot be dynamically
+// relocated at runtime. If this flag is clear, the memory region is not
+// capable of being dynamically removed from the platform at runtime.
+//
+#define EFI_MEMORY_HOT_PLUGGABLE  0x0000000000100000
+
+//
 // Runtime memory attribute
 //
 #define EFI_MEMORY_RUNTIME  0x8000000000000000ULL
