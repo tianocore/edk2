@@ -67,6 +67,7 @@
   PrintLib
   SerialPortLib
   SynchronizationLib
+  CpuExceptionHookLib
 
 [LibraryClasses.Ia32, LibraryClasses.X64]
   CcExitLib
