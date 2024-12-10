@@ -8,6 +8,15 @@ PCCTS_HOME=$(BASE_TOOLS_PATH)\Source\C\VfrCompile\Pccts
 ANTLR_SRC=$(PCCTS_HOME)\antlr
 PCCTS_H=$(PCCTS_HOME)\h
 
+!IFNDEF HOST_ARCH
+HOST_ARCH = IA32
+!ENDIF
+
+!IF "$(HOST_ARCH)"=="IA32" || "$(HOST_ARCH)"=="ARM"
+SYS_BIN_PATH=$(EDK_TOOLS_PATH)\Bin\Win32
+!ELSE
+SYS_BIN_PATH=$(EDK_TOOLS_PATH)\Bin\Win64
+!ENDIF
 
 # Support directories
 SET=$(PCCTS_HOME)\support\set
@@ -27,10 +36,10 @@ SUPPORT_OBJS = set.obj
 
 # Dependencies
 
-$(EDK_TOOLS_PATH)\Bin\Win32\antlr.exe: $(ANTLR_OBJS) $(SUPPORT_OBJS)
+$(SYS_BIN_PATH)\antlr.exe: $(ANTLR_OBJS) $(SUPPORT_OBJS)
     $(CC) $(CFLAGS) -Feantlr.exe $(ANTLR_OBJS) $(SUPPORT_OBJS)
-    -@if not exist $(EDK_TOOLS_PATH)\Bin\Win32 mkdir $(EDK_TOOLS_PATH)\Bin\Win32
-		copy antlr.exe $(EDK_TOOLS_PATH)\Bin\Win32
+    -@if not exist $(SYS_BIN_PATH) mkdir $(SYS_BIN_PATH)
+		copy antlr.exe $(SYS_BIN_PATH)
 
 
 antlr.obj: $(ANTLR_SRC)\antlr.c \
