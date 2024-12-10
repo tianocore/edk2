@@ -1351,7 +1351,6 @@ WifiMgrDxeHiiConfigAccessRouteConfig (
   @retval EFI_SUCCESS            The callback successfully handled the action.
   @retval EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the
                                  variable and its data.
-  @retval EFI_DEVICE_ERROR       The variable could not be saved.
   @retval EFI_UNSUPPORTED        The specified Action is not supported by the
                                  callback.
 
@@ -1400,7 +1399,7 @@ WifiMgrDxeHiiConfigAccessCallback (
   Status  = EFI_SUCCESS;
   Private = WIFI_MGR_PRIVATE_DATA_FROM_CONFIG_ACCESS (This);
   if (Private->CurrentNic == NULL) {
-    return EFI_DEVICE_ERROR;
+    return EFI_UNSUPPORTED;
   }
 
   //
