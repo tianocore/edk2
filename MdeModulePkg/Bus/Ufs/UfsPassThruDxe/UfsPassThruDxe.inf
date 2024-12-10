@@ -33,7 +33,6 @@
   UfsPassThru.c
   UfsPassThru.h
   UfsPassThruHci.c
-  UfsPassThruHci.h
 
 [Packages]
   MdePkg/MdePkg.dec

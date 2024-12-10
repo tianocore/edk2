@@ -27,8 +27,9 @@
 #include <Library/PeiServicesLib.h>
 
 #include <IndustryStandard/Scsi.h>
+#include <IndustryStandard/Ufs.h>
+#include <IndustryStandard/UfsHci.h>
 
-#include "UfsHci.h"
 #include "UfsHcMem.h"
 
 #define UFS_PEIM_HC_SIG  SIGNATURE_32 ('U', 'F', 'S', 'H')
