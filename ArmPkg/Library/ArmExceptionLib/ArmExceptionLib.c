@@ -91,7 +91,7 @@ InitializeCpuExceptionHandlers (
   )
 {
   RETURN_STATUS  Status;
-  UINTN          VectorBase;
+  UINT64         VectorBase;
 
   Status = EFI_SUCCESS;
 
@@ -113,7 +113,7 @@ InitializeCpuExceptionHandlers (
 
     // We do not copy the Exception Table at PcdGet64(PcdCpuVectorBaseAddress). We just set Vector
     // Base Address to point into CpuDxe code.
-    VectorBase = (UINTN)ExceptionHandlersStart;
+    VectorBase = (UINT64)(UINTN)ExceptionHandlersStart;
 
     Status = RETURN_SUCCESS;
   }
@@ -121,9 +121,9 @@ InitializeCpuExceptionHandlers (
   if (!RETURN_ERROR (Status)) {
     // call the architecture-specific routine to prepare for the new vector
     // configuration to take effect
-    ArchVectorConfig (VectorBase);
+    ArchVectorConfig ((UINTN)VectorBase);
 
-    ArmWriteVBar (VectorBase);
+    ArmWriteVBar ((UINTN)VectorBase);
   }
 
   return RETURN_SUCCESS;
@@ -172,7 +172,7 @@ CopyExceptionHandlers (
   }
 
   // Copy our assembly code into the page that contains the exception vectors.
-  CopyMem ((VOID *)VectorBase, (VOID *)ExceptionHandlersStart, Length);
+  CopyMem ((VOID *)VectorBase, (VOID *)(UINTN)ExceptionHandlersStart, Length);
 
   //
   // Initialize the C entry points for interrupts
@@ -226,7 +226,7 @@ RegisterCpuInterruptHandler (
   IN EFI_CPU_INTERRUPT_HANDLER  ExceptionHandler
   )
 {
-  if (ExceptionType > gMaxExceptionNumber) {
+  if ((UINTN)ExceptionType > gMaxExceptionNumber) {
     return RETURN_UNSUPPORTED;
   }
 
@@ -273,7 +273,7 @@ CommonCExceptionHandler (
   IN OUT EFI_SYSTEM_CONTEXT  SystemContext
   )
 {
-  if (ExceptionType <= gMaxExceptionNumber) {
+  if ((UINTN)ExceptionType <= gMaxExceptionNumber) {
     if (gExceptionHandlers[ExceptionType]) {
       gExceptionHandlers[ExceptionType](ExceptionType, SystemContext);
       return;

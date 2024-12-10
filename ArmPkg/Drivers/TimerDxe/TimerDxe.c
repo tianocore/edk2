@@ -143,8 +143,7 @@ TimerDriverSetTimerPeriod (
     // mTimerTicks = TimerPeriod in 1ms unit x Frequency.10^-3
     //             = TimerPeriod.10^-4 x Frequency.10^-3
     //             = (TimerPeriod x Frequency) x 10^-7
-    TimerTicks = MultU64x32 (TimerPeriod, ArmGenericTimerGetTimerFreq ());
-    TimerTicks = DivU64x32 (TimerTicks, 10000000U);
+    TimerTicks = TimerPeriod * ArmGenericTimerGetTimerFreq () / 10000000U;
 
     // Raise TPL to update the mTimerTicks and mTimerPeriod to ensure these values
     // are coherent in the interrupt handler
