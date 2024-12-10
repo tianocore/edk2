@@ -209,6 +209,10 @@ READ_LOCK_STATUS   = TRUE
   #
   INF SecurityPkg/RandomNumberGenerator/RngDxe/RngDxe.inf
 
+!if $(ARMCCA_SECURE_BOOT_ENABLE) == TRUE
+  INF ArmVirtPkg/ArmCcaBootSync/ArmCcaBootSyncDxe.inf
+!endif
+
 !if $(ARMCCA_TEST_ENABLE) == TRUE
   # FV Filesystem
   INF MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf

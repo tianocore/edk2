@@ -1,0 +1,47 @@
+## @file
+#  Arm CCA Boot SyncDxe
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmCcaBootSyncDxe
+  FILE_GUID                      = 246f8051-0b96-4f6c-8837-fdc2e66a8409
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ArmCcaBootSyncDxeInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  BootSyncDxe/BootSyncDxe.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  CryptoPkg/CryptoPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmCcaBootSyncCryptoLib
+  ArmCcaLib
+  BaseCryptLib
+  BaseLib
+  DebugLib
+  RngLib
+  UefiDriverEntryPoint
+
+[Guids]
+
+[Protocols]
+
+[Pcd]
+
+[Depex]
+  TRUE

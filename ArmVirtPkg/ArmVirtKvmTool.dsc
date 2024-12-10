@@ -447,6 +447,10 @@
   #
   ArmVirtPkg/KvmtoolCfgMgrDxe/ConfigurationManagerDxe.inf
 
+!if $(ARMCCA_SECURE_BOOT_ENABLE) == TRUE
+  ArmVirtPkg/ArmCcaBootSync/ArmCcaBootSyncDxe.inf
+!endif
+
 !if $(ARMCCA_TEST_ENABLE) == TRUE
   # FV Filesystem
   MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
