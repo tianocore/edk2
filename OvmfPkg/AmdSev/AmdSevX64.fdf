@@ -282,7 +282,7 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 INF  FatPkg/EnhancedFatDxe/Fat.inf
 INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
-INF OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
+INF  OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
 INF  OvmfPkg/AmdSev/Grub/Grub.inf
 
 INF MdeModulePkg/Logo/LogoDxe.inf
