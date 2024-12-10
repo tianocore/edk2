@@ -1,0 +1,37 @@
+## @file
+#  Provides FF-A ABI Library used in StandaloneMmCore.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmFfaStandaloneMmLib
+  FILE_GUID                      = e07db74e-6a95-11ef-97ea-c7a6149e81c9
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = ArmFfaLib
+  CONSTRUCTOR                    = ArmFfaStandaloneMmLibConstructor
+
+[Sources]
+  ArmFfaCommon.h
+  ArmFfaCommon.c
+  ArmFfaStandaloneMmLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+  ArmSvcLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdFfaLibConduitSmc
+
