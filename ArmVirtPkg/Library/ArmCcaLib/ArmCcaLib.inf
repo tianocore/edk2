@@ -1,0 +1,34 @@
+## @file
+#  Library that implements the Arm CCA helper functions.
+#
+#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmCcaLib
+  FILE_GUID                      = 11C18743-52F9-405E-B35B-D7BE91A26F9F
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmCcaLib
+
+[Sources]
+  ArmCcaLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmCcaRsiLib
+  ArmLib
+  ArmMmuLib
+  BaseLib
+  HobLib
+
+[Guids]
+  gArmCcaIpaWidthGuid
