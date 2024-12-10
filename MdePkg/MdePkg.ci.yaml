@@ -117,7 +117,9 @@
 
     ## options defined ci/Plugin/DscCompleteCheck
     "DscCompleteCheck": {
-        "IgnoreInf": [""],
+        # ignore StackCheckLibDynamicInit.inf because MSVC fails to build it in CI when it does not have
+        # _CModuleEntryPoint to link against. CI still catches this in building OvmfPkg and ArmVirtPkg.
+        "IgnoreInf": ["MdePkg/Library/StackCheckLib/StackCheckLibDynamicInit.inf"],
         "DscPath": "MdePkg.dsc"
     },
 

@@ -1,0 +1,30 @@
+## @file
+# Module entry point library for PEIM that does not update the stack cookie dynamically.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = PeimStackCheckEntryPointLibNull
+  FILE_GUID                      = 07473D5C-EEA8-4B43-96F4-7FAFB240D5F7
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = StackCheckEntryPointLib|PEIM
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  PeimStackCheckEntryPointLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib

@@ -26,6 +26,8 @@
   DEFINE FD_NUM_BLOCKS    = 0x300
 !endif
 
+  DEFINE CUSTOM_STACK_CHECK_LIB = FALSE
+
 [BuildOptions.common.EDKII.DXE_CORE,BuildOptions.common.EDKII.DXE_DRIVER,BuildOptions.common.EDKII.UEFI_DRIVER,BuildOptions.common.EDKII.UEFI_APPLICATION]
   GCC:*_*_*_DLINK_FLAGS = -z common-page-size=0x1000
 
@@ -170,6 +172,23 @@
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
 
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+
+[LibraryClasses.common.SEC, LibraryClasses.common.PEI_CORE]
+  # don't check stack cookies in SEC and PEI_CORE because we don't have exception handlers installed at this point and
+  # will triple fault and reboot if we hit a stack cookie failure
+  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
+
+[LibraryClasses.common.PEIM]
+  NULL|MdePkg/Library/StackCheckLib/StackCheckLib.inf
+
+[LibraryClasses.AARCH64.DXE_CORE, LibraryClasses.AARCH64.DXE_DRIVER, LibraryClasses.AARCH64.DXE_RUNTIME_DRIVER, LibraryClasses.AARCH64.UEFI_DRIVER, LibraryClasses.AARCH64.UEFI_APPLICATION]
+  # for all other types, use the dynamic stack cookie
+  NULL|MdePkg/Library/StackCheckLib/StackCheckLib.inf
+  StackCheckEntryPointLib|MdePkg/Library/StackCheckLib/StackCheckLibDynamicInit.inf
+
+[LibraryClasses.ARM.DXE_CORE, LibraryClasses.ARM.DXE_DRIVER, LibraryClasses.ARM.DXE_RUNTIME_DRIVER, LibraryClasses.ARM.UEFI_DRIVER, LibraryClasses.ARM.UEFI_APPLICATION]
+  # ARM32 doesn't support dynamic stack cookies
+  NULL|MdePkg/Library/StackCheckLib/StackCheckLib.inf
 
 [LibraryClasses.common.SEC]
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf

@@ -1,5 +1,5 @@
 /** @file
-  Entry point to the DXE Core.
+  Entry point to the DXE Core that does not update the stack cookie dynamically.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -12,10 +12,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 
-//
-// Cache copy of HobList pointer.
-//
-VOID  *gHobList = NULL;
+extern
+VOID
+EFIAPI
+_CModuleEntryPoint (
+  IN VOID  *HobStart
+  );
 
 /**
   The entry point of PE/COFF Image for the DXE Core.
@@ -31,40 +33,12 @@ VOID  *gHobList = NULL;
 **/
 VOID
 EFIAPI
-_CModuleEntryPoint (
+_ModuleEntryPoint (
   IN VOID  *HobStart
   )
 {
-  //
-  // Cache a pointer to the HobList
-  //
-  gHobList = HobStart;
-
   //
   // Call the DXE Core entry point
   //
-  ProcessModuleEntryPointList (HobStart);
-
-  //
-  // Should never return
-  //
-  ASSERT (FALSE);
-  CpuDeadLoop ();
-}
-
-/**
-  Required by the EBC compiler and identical in functionality to _ModuleEntryPoint().
-
-  This function is required to call _ModuleEntryPoint() passing in HobStart.
-
-  @param  HobStart  The pointer to the beginning of the HOB List passed in from the PEI Phase.
-
-**/
-VOID
-EFIAPI
-EfiMain (
-  IN VOID  *HobStart
-  )
-{
-  _ModuleEntryPoint (HobStart);
+  _CModuleEntryPoint (HobStart);
 }
