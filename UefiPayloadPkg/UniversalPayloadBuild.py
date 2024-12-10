@@ -256,7 +256,7 @@ def BuildUniversalPayload(Args):
             ))
         RunCommand (
             "GenFw --rebase 0x{:02X} -o {} {} ".format (
-              fit_image_info_header.LoadAddr + fit_image_info_header.DataOffset,
+              fit_image_info_header.LoadAddr,
               TargetRebaseFile,
               TargetRebaseFile,
             ))
@@ -324,7 +324,7 @@ def main():
     parser.add_argument("-sk", "--SkipBuild", action='store_true', help='Skip UniversalPayload build')
     parser.add_argument("-af", "--AddFv", type=ValidateAddFv, action='append', help='Add or replace specific FV into payload, Ex: uefi_fv=XXX.fv')
     parser.add_argument("-f", "--Fit", action='store_true', help='Build UniversalPayload file as UniversalPayload.fit', default=False)
-    parser.add_argument('-l', "--LoadAddress", type=int, help='Specify payload load address', default =0x000800000)
+    parser.add_argument('-l', "--LoadAddress", type=int, help='Specify payload load address', default =0x000801000)
     parser.add_argument('-c', '--DscPath', type=str, default="UefiPayloadPkg/UefiPayloadPkg.dsc", help='Path to the DSC file')
 
     args = parser.parse_args()
