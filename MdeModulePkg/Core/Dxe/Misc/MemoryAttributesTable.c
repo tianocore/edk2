@@ -149,7 +149,10 @@ InstallMemoryAttributesTable (
 
   do {
     MemoryMap = AllocatePool (MemoryMapSize);
-    ASSERT (MemoryMap != NULL);
+    if (MemoryMap == NULL) {
+      ASSERT (MemoryMap != NULL);
+      return;
+    }
 
     Status = CoreGetMemoryMapWithSeparatedImageSection (
                &MemoryMapSize,
@@ -180,7 +183,12 @@ InstallMemoryAttributesTable (
   // Allocate MemoryAttributesTable
   //
   MemoryAttributesTable = AllocatePool (sizeof (EFI_MEMORY_ATTRIBUTES_TABLE) + DescriptorSize * RuntimeEntryCount);
-  ASSERT (MemoryAttributesTable != NULL);
+  if (MemoryAttributesTable == NULL) {
+    ASSERT (MemoryAttributesTable != NULL);
+    FreePool (MemoryMapStart);
+    return;
+  }
+
   MemoryAttributesTable->Version         = EFI_MEMORY_ATTRIBUTES_TABLE_VERSION;
   MemoryAttributesTable->NumberOfEntries = RuntimeEntryCount;
   MemoryAttributesTable->DescriptorSize  = (UINT32)DescriptorSize;
