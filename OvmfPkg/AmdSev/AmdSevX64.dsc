@@ -39,6 +39,7 @@
   # Shell can be useful for debugging but should not be enabled for production
   #
   DEFINE BUILD_SHELL             = FALSE
+  DEFINE SD_BOOT_ENABLE          = FALSE
 
   #
   # Device drivers
@@ -728,7 +729,11 @@
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
 
   OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
+!if $(SD_BOOT_ENABLE) == TRUE
+  OvmfPkg/SdBootDxe/SdBoot.inf
+!else
   OvmfPkg/AmdSev/Grub/Grub.inf
+!endif
 
 !include OvmfPkg/Include/Dsc/ShellComponents.dsc.inc
 !include OvmfPkg/Include/Dsc/OvmfRngComponents.dsc.inc
