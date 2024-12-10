@@ -67,6 +67,12 @@ FitParseFirmwarePropertyData (
     *ContextOffset64 = Fdt64ToCpu (*Data64);
   }
 
+  //
+  // Need to load the FIT header (FDT) too. "load" property of tianocore entrypoint refers to image.
+  // Since FDT is directly before tianocore, subtract its size from load.
+  //
+  Context->PayloadLoadAddress -= FdtTotalSize (Fdt);
+
   return EFI_SUCCESS;
 }
 
