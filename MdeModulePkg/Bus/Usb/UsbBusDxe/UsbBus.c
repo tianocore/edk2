@@ -4,6 +4,7 @@
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (c) Microsoft Corporation.
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -878,6 +879,11 @@ UsbIoPortReset (
   }
 
   DEBUG ((DEBUG_INFO, "UsbIoPortReset: device is now ADDRESSED at %d\n", Dev->Address));
+
+  //
+  // Endpoint descriptor state needs to be updated following a reset.
+  //
+  UsbUpdateDescriptors (Dev);
 
   //
   // Reset the current active configure, after this device
