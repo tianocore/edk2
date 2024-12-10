@@ -133,6 +133,12 @@ M: Joey Vagedes <joey.vagedes@gmail.com> [javagedes]
 R: Michael D Kinney <michael.d.kinney@intel.com> [mdkinney]
 R: Liming Gao <gaoliming@byosoft.com.cn> [lgao4]
 
+EDK II Contributed Files:
+-------------------------
+VS Code PR Dashboard Notebook
+F: contrib/PullRequests.github-issues
+M: Michael Kubacki <mikuback@linux.microsoft.com> [makubacki]
+
 EDK II Packages:
 ----------------
 ArmPkg
