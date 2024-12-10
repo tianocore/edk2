@@ -23,6 +23,25 @@
 [Sources]
   BootSyncDxe/BootSyncDxe.c
 
+  Common/BootSyncBsbMsg.c
+  Common/BootSyncBsbParser.c
+  Common/BootSyncDebug.c
+  Common/BootSyncSecureChannel.c
+  Common/BootSyncProtocol.c
+
+  Guest/BootSyncAttestationProtocolGuest.c
+  Guest/BootSyncKeyExchangeProtocolGuest.c
+  Guest/BootSyncProtocolGuest.h
+  Guest/BootSyncSessionGuest.c
+
+  Include/BootSyncBsbMsg.h
+  Include/BootSyncBsbParser.h
+  Include/BootSyncDebug.h
+  Include/BootSyncProtocol.h
+  Include/BootSyncSecureChannel.h
+  Include/BootSyncSession.h
+  Include/BootSyncProtocolDefines.h
+
 [Packages]
   ArmVirtPkg/ArmVirtPkg.dec
   CryptoPkg/CryptoPkg.dec
@@ -31,17 +50,39 @@
 [LibraryClasses]
   ArmCcaBootSyncCryptoLib
   ArmCcaLib
+  ArmCcaRsiLib
+  ArmCcaRhiHostSessionLib
   BaseCryptLib
   BaseLib
+  BaseMemoryLib
   DebugLib
+  PcdLib
   RngLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [Guids]
+  gArmBootSyncAttReport
+  gArmBootSyncAttReqGuid
+  gArmBootSyncAttRespGuid
+  gArmBootSyncAttResult
+  gArmBootSyncBibReqGuid
+  gArmBootSyncBibRespGuid
+  gArmBootSyncFinGuid
+  gArmBootSyncKeyEncData
+  gArmBootSyncKeyXchgReqGuid
+  gArmBootSyncKeyXchgRespGuid
+  gArmBootSyncNackGuid
+  gArmBootSyncRequestOptions
 
 [Protocols]
+  gEfiRealmApertureManagementProtocolGuid ## SOMETIMES_CONSUMES ## PROTOCOL
 
 [Pcd]
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString
+  gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString
 
 [Depex]
-  TRUE
+  gEfiRealmApertureManagementProtocolGuid
+
