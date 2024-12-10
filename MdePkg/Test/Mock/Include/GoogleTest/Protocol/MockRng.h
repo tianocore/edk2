@@ -1,4 +1,4 @@
-/** @file
+/** @file MockRng.h
   This file declares a mock of Rng Protocol.
 
   Copyright (c) Microsoft Corporation.
@@ -16,8 +16,8 @@ extern "C" {
   #include <Protocol/Rng.h>
 }
 
-struct MockRng {
-  MOCK_INTERFACE_DECLARATION (MockRng);
+struct MockEfiRngProtocol {
+  MOCK_INTERFACE_DECLARATION (MockEfiRngProtocol);
 
   MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
@@ -41,8 +41,14 @@ struct MockRng {
     );
 };
 
-extern "C" {
-  extern EFI_RNG_PROTOCOL  *gRngProtocol;
-}
+MOCK_INTERFACE_DEFINITION (MockEfiRngProtocol);
+MOCK_FUNCTION_DEFINITION (MockEfiRngProtocol, GetInfo, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiRngProtocol, GetRng, 4, EFIAPI);
+
+#define MOCK_EFI_RNG_PROTOCOL_INSTANCE(NAME)  \
+  EFI_RNG_PROTOCOL NAME##_INSTANCE = {        \
+    GetInfo,                                  \
+    GetRng };                                 \
+  EFI_RNG_PROTOCOL  *NAME = &NAME##_INSTANCE;
 
 #endif // MOCK_RNG_H_

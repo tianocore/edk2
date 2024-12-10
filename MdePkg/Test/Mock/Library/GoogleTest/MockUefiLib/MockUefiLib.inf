@@ -1,7 +1,8 @@
-## @file
+## @file MockUefiLib.inf
 # Google Test mocks for UefiLib
 #
-# Copyright (c) 2022, Intel Corporation. All rights reserved.
+# Copyright (c) 2024, Intel Corporation. All rights reserved.
+# Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 ##
 
@@ -30,4 +31,4 @@
   GoogleTestLib
 
 [BuildOptions]
-  MSFT:*_*_*_CC_FLAGS = /EHsc
+  MSFT:*_*_*_CC_FLAGS = /EHsc /bigobj
