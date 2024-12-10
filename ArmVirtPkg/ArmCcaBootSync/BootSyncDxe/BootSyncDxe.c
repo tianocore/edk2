@@ -37,6 +37,7 @@ PerformSync (
 {
   EFI_STATUS            Status;
   EFI_STATUS            Status1;
+  RETURN_STATUS         RetStatus;
   SECURE_CHANNEL        SecChannel;
   BOOT_SYNC_BSB_HEADER  *BibHeader;
 
@@ -68,6 +69,23 @@ PerformSync (
   }
 
   DEBUG ((DEBUG_INFO, "Boot Sync Status = %r\n", Status));
+
+  // Extend the rolling hash to REM3 to indicate that the Boot Sync Data
+  // was received by the firmware.
+  RetStatus = ArmCcaRsiExtendMeasurement (
+                4,
+                SecChannel.RmHash,
+                sizeof (SecChannel.RmHash)
+                );
+  if (RETURN_ERROR (RetStatus)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "Error: Failed to extend hash to REM3!, RetStatus = %r\n",
+      RetStatus
+      ));
+    Status = EFI_ABORTED;
+  }
+
   // Scrub the BIB
   ZeroMem (BibHeader, BibHeader->Header.Length);
   // Free the BIB
