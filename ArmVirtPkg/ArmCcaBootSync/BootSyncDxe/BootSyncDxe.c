@@ -35,9 +35,10 @@ PerformSync (
   VOID
   )
 {
-  EFI_STATUS      Status;
-  EFI_STATUS      Status1;
-  SECURE_CHANNEL  SecChannel;
+  EFI_STATUS            Status;
+  EFI_STATUS            Status1;
+  SECURE_CHANNEL        SecChannel;
+  BOOT_SYNC_BSB_HEADER  *BibHeader;
 
   ZeroMem (&SecChannel, sizeof (SECURE_CHANNEL));
   Status = EstablishSecureChannel (&SecChannel);
@@ -54,11 +55,23 @@ PerformSync (
 
   Status = BootSyncPerformAttestation (&SecChannel);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Error: Attestation Failed!\n", Status));
+    DEBUG ((DEBUG_ERROR, "Error: Attestation Failed!, Status = %r\n", Status));
     goto exit_handler;
   }
 
   DEBUG ((DEBUG_INFO, "Attestation Status = %r\n", Status));
+
+  Status = BootSyncGetBib (&SecChannel, &BibHeader);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error: Boot Sync Failed!, Status = %r\n", Status));
+    goto exit_handler;
+  }
+
+  DEBUG ((DEBUG_INFO, "Boot Sync Status = %r\n", Status));
+  // Scrub the BIB
+  ZeroMem (BibHeader, BibHeader->Header.Length);
+  // Free the BIB
+  FreePool (BibHeader);
 
   // Send the FIN message to indicate End of Transmission.
   Status = SendFin (&SecChannel, BOOT_SYNC_COMM_END_REASON_EOT);

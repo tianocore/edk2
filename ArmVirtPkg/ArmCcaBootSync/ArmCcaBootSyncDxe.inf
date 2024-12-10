@@ -30,6 +30,7 @@
   Common/BootSyncProtocol.c
 
   Guest/BootSyncAttestationProtocolGuest.c
+  Guest/BootSyncBibProtocolGuest.c
   Guest/BootSyncKeyExchangeProtocolGuest.c
   Guest/BootSyncProtocolGuest.h
   Guest/BootSyncSessionGuest.c
