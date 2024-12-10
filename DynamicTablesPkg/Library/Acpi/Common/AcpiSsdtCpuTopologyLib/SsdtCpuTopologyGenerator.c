@@ -280,7 +280,6 @@ WriteAslName (
   @retval EFI_INVALID_PARAMETER   Invalid parameter.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
 **/
-STATIC
 EFI_STATUS
 EFIAPI
 CreateAmlPsdNode (
