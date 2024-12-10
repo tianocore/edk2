@@ -46,6 +46,8 @@
 [Packages]
   ArmVirtPkg/ArmVirtPkg.dec
   CryptoPkg/CryptoPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
@@ -76,6 +78,12 @@
   gArmBootSyncKeyXchgRespGuid
   gArmBootSyncNackGuid
   gArmBootSyncRequestOptions
+  gArmBootSyncVarData
+
+  gEfiAuthenticatedVariableGuid
+  gEfiVariableGuid
+
+  gEdkiiNvVarStoreFormattedGuid           ## SOMETIMES_PRODUCES ## PROTOCOL
 
 [Protocols]
   gEfiRealmApertureManagementProtocolGuid ## SOMETIMES_CONSUMES ## PROTOCOL
@@ -83,6 +91,10 @@
 [Pcd]
   gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoBindingKeyString
   gArmVirtTokenSpaceGuid.PcdBootSyncAppInfoEncryptionKeyString
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved
 
 [Depex]
   gEfiRealmApertureManagementProtocolGuid

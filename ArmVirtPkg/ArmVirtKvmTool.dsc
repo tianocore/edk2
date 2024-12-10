@@ -269,6 +269,7 @@
   # Define PCD for emulating Runtime Variable storage when
   # CFI flash is absent.
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0
 
   ## RTC Register address in MMIO space.
   gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister64|0x0
