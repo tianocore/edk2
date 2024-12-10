@@ -1,9 +1,10 @@
 ## @file
 #  BrotliCustomDecompressLib produces BROTLI custom decompression algorithm.
 #
-#  It is based on the Brotli v0.5.2.
+#  It is based on the Brotli v1.0.9.
 #  Brotli was released on the website https://github.com/google/brotli.
 #
+#  Copyright (C) 2024 Advanced Micro Devices, Inc. All rights reserved.<BR>
 #  Copyright (c) 2017 - 2020, Intel Corporation. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -41,6 +42,10 @@
   # Wrapper header files end #
   brotli/c/common/dictionary.c
   brotli/c/common/transform.c
+  brotli/c/common/context.c
+  brotli/c/common/platform.c
+  brotli/c/common/constants.c
+  brotli/c/common/shared_dictionary.c
   brotli/c/dec/bit_reader.c
   brotli/c/dec/decode.c
   brotli/c/dec/huffman.c
