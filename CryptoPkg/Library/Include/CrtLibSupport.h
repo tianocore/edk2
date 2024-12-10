@@ -110,13 +110,13 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define NS_IN6ADDRSZ  16  /*%< IPv6 T_AAAA */
 
 /* Defines for Boringssl build */
-#define PRIx8     "x"
-#define PRIx16    "x"
-#define PRIx32    "x"
-#define PRIx64    __PRI64_PREFIX "x"
-#define PRIX32    "X"
+#define PRIx8           "x"
+#define PRIx16          "x"
+#define PRIx32          "x"
+#define PRIx64          __PRI64_PREFIX "x"
+#define PRIX32          "X"
 #define __PRI64_PREFIX  "l"
-#define PRIu64    __PRI64_PREFIX "u"
+#define PRIu64          __PRI64_PREFIX "u"
 
 #define INT32_MIN    -0x80000000
 #define INT32_MAX    0x7FFFFFFF
@@ -140,20 +140,20 @@ typedef int int32_t;
 //
 // Basic types mapping
 //
-typedef UINTN   size_t;
-typedef UINTN   off_t;
-typedef UINTN   u_int;
-typedef UINTN   intptr_t;
-typedef INTN    ptrdiff_t;
-typedef INTN    ssize_t;
-typedef INT64   time_t;
-typedef UINT8   __uint8_t;
-typedef UINT8   sa_family_t;
-typedef UINT8   u_char;
-typedef UINT32  uid_t;
-typedef UINT32  gid_t;
-typedef CHAR16  wchar_t;
-typedef short   int16_t;
+typedef UINTN  size_t;
+typedef UINTN  off_t;
+typedef UINTN  u_int;
+typedef UINTN  intptr_t;
+typedef INTN   ptrdiff_t;
+typedef INTN   ssize_t;
+typedef INT64  time_t;
+typedef UINT8  __uint8_t;
+typedef UINT8  sa_family_t;
+typedef UINT8  u_char;
+typedef UINT32 uid_t;
+typedef UINT32 gid_t;
+typedef CHAR16 wchar_t;
+typedef short  int16_t;
 
 //
 // File operations are not required for EFI building,
@@ -474,7 +474,7 @@ strcat (
 
 int
 fflush (
-  FILE *stream
+  FILE  *stream
   );
 
 int
@@ -484,9 +484,9 @@ ferror (
 
 int
 fseek (
-  FILE *stream,
-  long offset,
-  int whence
+  FILE  *stream,
+  long  offset,
+  int   whence
   );
 
 int
