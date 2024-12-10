@@ -78,4 +78,17 @@ CallFspSiliconInit (
   IN VOID  *FspsUpdDataPtr
   );
 
+/**
+  Call FSP API - FspSmmInit.
+
+  @param[in] FspiUpdDataPtr     Pointer to the FSPI_UPD data structure.
+
+  @return EFI status returned by FspSmmInit API.
+**/
+EFI_STATUS
+EFIAPI
+CallFspSmmInit (
+  IN VOID  *FspiUpdDataPtr
+  );
+
 #endif
