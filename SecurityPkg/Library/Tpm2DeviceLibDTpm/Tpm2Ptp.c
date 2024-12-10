@@ -443,6 +443,11 @@ Tpm2GetPtpInterface (
     return Tpm2PtpInterfaceMax;
   }
 
+  if (Tpm2SvsmQueryTpmSendCmd ()) {
+    DEBUG((DEBUG_INFO, "Found SVSM vTPM\n"));
+    return Tpm2PtpInterfaceSvsm;
+  }
+
   //
   // Check interface id
   //
@@ -616,6 +621,13 @@ DTpm2SubmitCommand (
                OutputParameterBlock,
                OutputParameterBlockSize
                );
+    case Tpm2PtpInterfaceSvsm:
+      return Tpm2SvsmTpmSendCommand (
+               InputParameterBlock,
+               InputParameterBlockSize,
+               OutputParameterBlock,
+               OutputParameterBlockSize
+               );
     default:
       return EFI_NOT_FOUND;
   }
@@ -643,6 +655,8 @@ DTpm2RequestUseTpm (
     case Tpm2PtpInterfaceFifo:
     case Tpm2PtpInterfaceTis:
       return TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR)(UINTN)PcdGet64 (PcdTpmBaseAddress));
+    case Tpm2PtpInterfaceSvsm:
+      return EFI_SUCCESS;
     default:
       return EFI_NOT_FOUND;
   }
