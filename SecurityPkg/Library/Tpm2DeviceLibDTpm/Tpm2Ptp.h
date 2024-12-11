@@ -1,5 +1,5 @@
 /** @file
-  PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by dTPM2.0 library.
+  PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by DTPM2.0 library.
 
 Copyright (c) 2024 Red Hat
 SPDX-License-Identifier: BSD-2-Clause-Patent
