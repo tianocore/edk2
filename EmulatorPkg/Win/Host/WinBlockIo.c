@@ -356,7 +356,7 @@ WinNtBlockIoWriteBlocks (
   )
 {
   WIN_NT_BLOCK_IO_PRIVATE  *Private;
-  UINTN                    BytesWritten;
+  DWORD                    BytesWritten;
   BOOL                     Success;
   EFI_STATUS               Status;
   UINT64                   DistanceToMove;
@@ -375,7 +375,7 @@ WinNtBlockIoWriteBlocks (
     return WinNtBlockIoError (Private->Media);
   }
 
-  Success = WriteFile (Private->NtHandle, Buffer, (DWORD)BufferSize, (LPDWORD)&BytesWritten, NULL);
+  Success = WriteFile (Private->NtHandle, Buffer, (DWORD)BufferSize, &BytesWritten, NULL);
   if (!Success || (BytesWritten != BufferSize)) {
     return WinNtBlockIoError (Private->Media);
   }
