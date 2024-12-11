@@ -44,7 +44,7 @@
 #include <Protocol/CcMeasurement.h>
 #include <Guid/CcEventHob.h>
 #include <Library/TdxLib.h>
-#include <Library/TdxHelperLib.h>
+#include <Library/TdxMeasurementLib.h>
 
 #define PERF_ID_CC_TCG2_DXE  0x3130
 
