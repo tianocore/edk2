@@ -1,0 +1,70 @@
+## @file
+# FSP-I wrapper PEI Module
+#
+# This PEIM initialize FSP.
+# This will be invoked only once. It will call FspSmmInit API,
+# to call MmIplPei to load MM Core and dispatch all Standalone
+# MM drivers.
+#
+#  Copyright (c) 2024, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = FspiWrapperPeim
+  FILE_GUID                      = 64D6CA11-6F4C-4B79-B77F-37A281CF0FCC
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = FspiWrapperPeimEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  PeiServicesTablePointerLib
+  BaseMemoryLib
+  TimerLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  FspWrapperPlatformLib
+  FspWrapperHobProcessLib
+  PerformanceLib
+  FspWrapperApiLib
+  FspWrapperApiTestLib
+  FspMeasurementLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  SecurityPkg/SecurityPkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+
+[Ppis]
+  gEdkiiTcgPpiGuid                                       ## NOTIFY
+  gEfiPeiFirmwareVolumeInfoMeasurementExcludedPpiGuid    ## PRODUCES
+
+[Pcd]
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiBaseAddress       ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection      ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiUpdDataAddress    ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig  ## CONSUMES
+
+[Guids]
+  gFspHobGuid                           ## CONSUMES ## HOB
+  gFspApiPerformanceGuid                ## SOMETIMES_CONSUMES ## GUID
+
+[Sources]
+  FspiWrapperPeim.c
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid
