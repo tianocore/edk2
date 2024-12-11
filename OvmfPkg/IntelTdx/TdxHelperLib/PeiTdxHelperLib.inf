@@ -25,7 +25,6 @@
 [Sources]
   PeiTdxHelper.c
   TdxMeasurementHob.c
-  TdxHelperCommon.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
@@ -40,6 +39,7 @@
   HobLib
   PcdLib
   BaseCryptLib
+  TdxMeasurementLib
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/HobLib.h>
-#include <Library/TdxHelperLib.h>
+#include <Library/TdxMeasurementLib.h>
 
 /**
   Do a hash operation on a data buffer, extend a specific RTMR with the hash result,
@@ -47,7 +47,7 @@ TdxPeiHashLogExtendEvent (
   EFI_STATUS  Status;
   UINT8       Digest[SHA384_DIGEST_SIZE];
 
-  Status = TdxHelperHashAndExtendToRtmr (
+  Status = TdxHashAndExtendToRtmr (
              MrIndex - 1,
              HashData,
              (UINTN)HashDataLen,
@@ -60,7 +60,7 @@ TdxPeiHashLogExtendEvent (
     return Status;
   }
 
-  Status = TdxHelperBuildTdxMeasurementGuidHob (
+  Status = TdxBuildTdxMeasurementGuidHob (
              MrIndex - 1,
              EventType,
              EventData,
@@ -150,7 +150,7 @@ TdMapPcrToMrIndex (
   OUT UINT32        *MrIndex
   )
 {
-  *MrIndex = TdxHelperMapPcrToMrIndex (PCRIndex);
+  *MrIndex = TdxMapPcrToMrIndex (PCRIndex);
 
   return EFI_SUCCESS;
 }
