@@ -200,7 +200,7 @@ class CapsulePayload(CapsuleData):
         # Fill structure
         #
         Guid = self.ImageTypeId.split('-')
-        Buffer = pack('=ILHHBBBBBBBBBBBBIIQ',
+        Buffer = pack('=ILHHBBBBBBBBBBBBIIQQ',
                        int(self.Version, 16),
                        int(Guid[0], 16),
                        int(Guid[1], 16),
@@ -219,7 +219,8 @@ class CapsulePayload(CapsuleData):
                        0,
                        ImageFileSize,
                        VendorFileSize,
-                       int(self.HardwareInstance, 16)
+                       int(self.HardwareInstance, 16),
+                       1
                        )
         if AuthData:
             Buffer += pack('QIHH', AuthData[0], AuthData[1], AuthData[2], AuthData[3])
