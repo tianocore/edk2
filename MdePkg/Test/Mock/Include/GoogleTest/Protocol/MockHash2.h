@@ -1,4 +1,4 @@
-/** @file
+/** @file MockHash2.h
   This file declares a mock of Hash2 Protocol.
 
   Copyright (c) Microsoft Corporation.
@@ -16,8 +16,8 @@ extern "C" {
   #include <Protocol/Hash2.h>
 }
 
-struct MockHash2 {
-  MOCK_INTERFACE_DECLARATION (MockHash2);
+struct MockEfiHash2Protocol {
+  MOCK_INTERFACE_DECLARATION (MockEfiHash2Protocol);
 
   MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
@@ -60,8 +60,20 @@ struct MockHash2 {
     );
 };
 
-extern "C" {
-  extern EFI_HASH2_PROTOCOL  *gHash2Protocol;
-}
+MOCK_INTERFACE_DEFINITION (MockEfiHash2Protocol);
+MOCK_FUNCTION_DEFINITION (MockEfiHash2Protocol, GetHashSize, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiHash2Protocol, Hash, 5, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiHash2Protocol, HashInit, 2, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiHash2Protocol, HashUpdate, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiHash2Protocol, HashFinal, 2, EFIAPI);
+
+#define MOCK_EFI_HASH2_PROTOCOL_INSTANCE(NAME)  \
+  EFI_HASH2_PROTOCOL NAME##_INSTANCE = {        \
+    GetHashSize,                                \
+    Hash,                                       \
+    HashInit,                                   \
+    HashUpdate,                                 \
+    HashFinal };                                \
+  EFI_HASH2_PROTOCOL  *NAME = &NAME##_INSTANCE;
 
 #endif // MOCK_HASH2_H_

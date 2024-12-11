@@ -1,0 +1,32 @@
+## @file MockDxeServicesTableLib.inf
+#  Mock implementation of the DXE Services Table Library.
+#
+#  Copyright (c) Microsoft Corporation.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MockDxeServicesTableLib
+  FILE_GUID                      = 8d9ce22b-2cf3-4646-ad0b-ce3cf1aea84d
+  MODULE_TYPE                    = HOST_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DxeServicesTableLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  MockDxeServicesTableLib.cpp
+
+[LibraryClasses]
+  GoogleTestLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  UnitTestFrameworkPkg/UnitTestFrameworkPkg.dec
+
+[BuildOptions]
+  MSFT:*_*_*_CC_FLAGS = /EHsc
