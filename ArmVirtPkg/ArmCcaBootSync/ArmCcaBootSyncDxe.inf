@@ -49,6 +49,7 @@
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   ArmCcaBootSyncCryptoLib
@@ -78,8 +79,13 @@
   gArmBootSyncKeyXchgRespGuid
   gArmBootSyncNackGuid
   gArmBootSyncRequestOptions
+  gArmBootSyncSecretData
   gArmBootSyncVarData
 
+  gConfidentialComputingSecretEntryGrubEfiDiskPassword
+  gConfidentialComputingSecretGuid
+  gConfidentialComputingSecretHeader
+  
   gEfiAuthenticatedVariableGuid
   gEfiVariableGuid
 

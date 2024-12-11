@@ -5,6 +5,8 @@
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
+#include <Guid/CocoSecret.h>
+#include <Guid/ConfidentialComputingSecret.h>
 #include <Guid/VariableFormat.h>
 
 #include <Library/BaseLib.h>
@@ -23,6 +25,112 @@
 #include "Include/BootSyncProtocol.h"
 
 #include "Guest/BootSyncProtocolGuest.h"
+
+/**
+  Initialise the EFI COCO Secret System Table with the secret data,
+  i.e. the disk decryption key received from Boot Sync.
+
+  @param[in]  SecretData        Pointer to the secret data.
+  @param[in]  SecretDataLen     Length of the secret data.
+
+  @retval EFI_SUCCESS             Success.
+  @retval EFI_INVALID_PARAMETER   A parameter was invalid.
+  @retval EFI_OUT_OF_RESOURCES    Out of resources.
+**/
+STATIC
+EFI_STATUS
+EFIAPI
+InitialiseSecretTable (
+  UINT8   *SecretData,
+  UINT32  SecretDataLen
+  )
+{
+  EFI_STATUS          Status;
+  UINT8               *Secret;
+  UINT8               *SecretTableData;
+  UINTN               SecretTableDataLength;
+  UINTN               SecretTablePages;
+  COCO_SECRET_HEADER  *SecretHeader;
+  COCO_SECRET_ENTRY   *SecretEntry;
+
+  CONFIDENTIAL_COMPUTING_SECRET_LOCATION  *SecretTable;
+
+  if ((SecretData == NULL) || (SecretDataLen == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Status = gBS->AllocatePool (
+                  EfiACPIReclaimMemory,
+                  sizeof (CONFIDENTIAL_COMPUTING_SECRET_LOCATION),
+                  (VOID **)&SecretTable
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // When creating the password file do "echo -n root > password.dat"
+  // Add 1 for null terminating the password string
+  SecretTableDataLength = sizeof (COCO_SECRET_HEADER) +
+                          sizeof (COCO_SECRET_ENTRY) + SecretDataLen + 1;
+  SecretTablePages = EFI_SIZE_TO_PAGES (SecretTableDataLength);
+  SecretTableData  = AllocateReservedPages (
+                       SecretTablePages
+                       );
+  if (SecretTableData == NULL) {
+    ASSERT (0);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  // Populate the COCO Secret table.
+  ZeroMem (SecretTableData, EFI_PAGES_TO_SIZE (SecretTablePages));
+
+  // Install the COCO Secret Header.
+  SecretHeader = (COCO_SECRET_HEADER *)SecretTableData;
+  CopyMem (
+    &SecretHeader->Guid,
+    &gConfidentialComputingSecretHeader,
+    sizeof (EFI_GUID)
+    );
+  SecretHeader->Length = SecretTableDataLength;
+
+  // Install the COCO Secret Entry.
+  SecretEntry = (COCO_SECRET_ENTRY *)((UINT8 *)SecretHeader +
+                                      sizeof (COCO_SECRET_HEADER));
+  CopyMem (
+    &SecretEntry->Guid,
+    &gConfidentialComputingSecretEntryGrubEfiDiskPassword,
+    sizeof (EFI_GUID)
+    );
+
+  // Add 1 for null terminating the password string
+  SecretEntry->Length = sizeof (COCO_SECRET_ENTRY) + SecretDataLen + 1;
+
+  Secret = (UINT8 *)SecretEntry + sizeof (COCO_SECRET_ENTRY);
+  CopyMem (Secret, SecretData, SecretDataLen);
+
+  DEBUG ((
+    DEBUG_INFO,
+    "Secret Header (%p) = {%g}, Length = %d\n",
+    SecretHeader,
+    &SecretHeader->Guid,
+    SecretHeader->Length
+    ));
+  DEBUG ((
+    DEBUG_INFO,
+    "SecretEntry (%p) = {%g}, Length = %d\n",
+    SecretEntry,
+    &SecretEntry->Guid,
+    SecretEntry->Length
+    ));
+
+  SecretTable->Base = (UINT64)SecretTableData;
+  SecretTable->Size = SecretTableDataLength;
+
+  return gBS->InstallConfigurationTable (
+                &gConfidentialComputingSecretGuid,
+                SecretTable
+                );
+}
 
 /**
   Validate the UEFI variable storage with data received from Boot Sync.
@@ -253,6 +361,28 @@ PerformSync (
     );
 
   Status = InitVariableStorage (
+             (UINT8 *)(BsbElement + 1),
+             (BsbElement->Header.Length - sizeof (BOOT_SYNC_BSB_ELEMENT))
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = BsbGetElement (
+             BibHeader,
+             &gArmBootSyncSecretData,
+             &BsbElement
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Error: Boot Sync to retrieve Disk Secret Key Data!\n", Status));
+    goto exit_handler1;
+  }
+
+  DBG_DUMP_RAW (
+    "Disk Secret Key Data",
+    (UINT8 *)(BsbElement + 1),
+    (BsbElement->Header.Length - sizeof (BOOT_SYNC_BSB_ELEMENT))
+    );
+
+  Status = InitialiseSecretTable (
              (UINT8 *)(BsbElement + 1),
              (BsbElement->Header.Length - sizeof (BOOT_SYNC_BSB_ELEMENT))
              );
