@@ -1,0 +1,60 @@
+## @file
+#  Provides a DTPM instance for SVSM based vTPMs and TPM 2.0 TIS/PTP.
+#
+#  This library can be registered to Tpm 2.0 device router, to be active TPM 2.0
+#  engine, based on platform setting. It supports both TIS (TPM Interface Specification)
+#  and PTP (Platform TPM Profile) functions.
+#
+#  This version of the library additionally supports SVSM based vTPMs for confidential
+#  virtual machines under AMD SEV-SNP.
+#
+# Copyright (c) 2024 Red Hat
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.30
+  BASE_NAME                      = Tpm2InstanceLibDTpmSvsm
+  MODULE_UNI_FILE                = Tpm2InstanceLibDTpm.uni
+  FILE_GUID                      = C7777207-A8DF-47E4-AA3C-E8BF74E7F233
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = Tpm2InstanceLibDTpmConstructorSvsm
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  Tpm2Tis.c
+  Tpm2Svsm.c
+  Tpm2Ptp.c
+  Tpm2PtpSvsmShim.c
+  Tpm2InstanceLibDTpmSvsm.c
+  Tpm2DeviceLibDTpmBase.c
+  Tpm2DeviceLibDTpm.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  IoLib
+  TimerLib
+  DebugLib
+  PcdLib
+  AmdSvsmLib
+
+[Pcd]
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress          ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType  ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdCRBIdleByPass           ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmPresence        ## PRODUCES
+  gEfiSecurityPkgTokenSpaceGuid.PcdSvsmVTpmBufferPtr       ## PRODUCES
