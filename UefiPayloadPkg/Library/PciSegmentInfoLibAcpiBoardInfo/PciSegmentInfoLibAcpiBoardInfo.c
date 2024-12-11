@@ -41,8 +41,11 @@ RetrieveMultiSegmentInfoFromHob (
   OUT UINTN                               *NumberOfRootBridges
   )
 {
-  UINTN  Size;
-  UINT8  Index;
+  UINTN             Size;
+  UINT8             Index;
+  UINT8             Index2;
+  UINT8             Index3;
+  PCI_SEGMENT_INFO  *pPciSegments;
 
   if (PciRootBridgeInfo == NULL) {
     mPciSegments = NULL;
@@ -55,18 +58,52 @@ RetrieveMultiSegmentInfoFromHob (
   mPciSegments = (PCI_SEGMENT_INFO *)AllocatePool (Size);
   ASSERT (mPciSegments != NULL);
   ZeroMem (mPciSegments, PciRootBridgeInfo->Count * sizeof (PCI_SEGMENT_INFO));
+  pPciSegments = (PCI_SEGMENT_INFO *)AllocatePool (Size);
+  ASSERT (pPciSegments != NULL);
+  ZeroMem (pPciSegments, PciRootBridgeInfo->Count * sizeof (PCI_SEGMENT_INFO));
 
   //
   // Create all root bridges with PciRootBridgeInfoHob
   //
   for (Index = 0; Index < PciRootBridgeInfo->Count; Index++) {
-    if (UplSegmentInfo->SegmentInfo[Index].SegmentNumber == (UINT16)(PciRootBridgeInfo->RootBridge[Index].Segment)) {
-      mPciSegments[Index].BaseAddress = UplSegmentInfo->SegmentInfo[Index].BaseAddress;
-    }
+    pPciSegments[Index].BaseAddress    = UplSegmentInfo->SegmentInfo[Index].BaseAddress;
+    pPciSegments[Index].SegmentNumber  = (UINT16)(PciRootBridgeInfo->RootBridge[Index].Segment);
+    pPciSegments[Index].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Base;
+    pPciSegments[Index].EndBusNumber   = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Limit;
 
-    mPciSegments[Index].SegmentNumber  = (UINT16)(PciRootBridgeInfo->RootBridge[Index].Segment);
-    mPciSegments[Index].StartBusNumber = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Base;
-    mPciSegments[Index].EndBusNumber   = (UINT8)PciRootBridgeInfo->RootBridge[Index].Bus.Limit;
+    DEBUG ((DEBUG_INFO, "PciRootBridgeInfo->RootBridge[Index].Segment %x\n", PciRootBridgeInfo->RootBridge[Index].Segment));
+    DEBUG ((DEBUG_INFO, "UplSegmentInfo->SegmentInfo[Index].BaseAddress; %x\n", UplSegmentInfo->SegmentInfo[Index].BaseAddress));
+    DEBUG ((DEBUG_INFO, "PciRootBridgeInfo->RootBridge[Index].Bus.Base %x\n", PciRootBridgeInfo->RootBridge[Index].Bus.Base));
+    DEBUG ((DEBUG_INFO, "PciRootBridgeInfo->RootBridge[Index].Bus.Limit %x\n", PciRootBridgeInfo->RootBridge[Index].Bus.Limit));
+  }
+
+  Index2 = 0;
+  CopyMem (&mPciSegments[0], &pPciSegments[0], sizeof (PCI_SEGMENT_INFO));
+
+  for (Index = 1; Index <= PciRootBridgeInfo->Count; Index++) {
+    if (mPciSegments[Index2].SegmentNumber == pPciSegments[Index].SegmentNumber) {
+      for (Index3 = 0; Index3 < Index2; Index3++) {
+        if (mPciSegments[Index3].StartBusNumber > pPciSegments[Index].StartBusNumber) {
+          mPciSegments[Index3].StartBusNumber =  pPciSegments[Index].StartBusNumber;
+        }
+
+        if (mPciSegments[Index3].EndBusNumber < pPciSegments[Index].EndBusNumber) {
+          mPciSegments[Index3].EndBusNumber =  pPciSegments[Index].EndBusNumber;
+        }
+      }
+    } else {
+      Index2++;
+      mPciSegments[Index2].SegmentNumber  = pPciSegments[Index].SegmentNumber;
+      mPciSegments[Index2].BaseAddress    = pPciSegments[Index].BaseAddress;
+      mPciSegments[Index2].StartBusNumber = pPciSegments[Index].StartBusNumber;
+      mPciSegments[Index2].EndBusNumber   = pPciSegments[Index].EndBusNumber;
+    }
+  }
+
+  *NumberOfRootBridges = Index2 == 0 ? 1 : Index2;
+
+  if (pPciSegments != NULL) {
+    FreePool (pPciSegments);
   }
 
   return;

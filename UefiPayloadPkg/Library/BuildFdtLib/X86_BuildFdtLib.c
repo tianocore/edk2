@@ -671,12 +671,20 @@ BuildFdtForPciRootBridge (
       RegTmp[1] = CpuToFdt32 (BusLimit);
       DEBUG ((DEBUG_INFO, "PciRootBridge->BusNumber %x, \n", BusNumber));
       DEBUG ((DEBUG_INFO, "PciRootBridge->BusLimit  %x, \n", BusLimit));
+      ASSERT (PciRootBridgeInfo->RootBridge[Index].Bus.Base <= 0xFF);
+      ASSERT (PciRootBridgeInfo->RootBridge[Index].Bus.Limit <= 0xFF);
 
       Status = FdtSetProperty (Fdt, TempNode, "bus-range", &RegTmp, sizeof (RegTmp));
       ASSERT_EFI_ERROR (Status);
 
       Data32 = CpuToFdt32 (2);
       Status = FdtSetProperty (Fdt, TempNode, "#size-cells", &Data32, sizeof (UINT32));
+
+      Reg64Data[0] = CpuToFdt64 (PciExpressBaseAddress + LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Base, 20));
+      Reg64Data[1] = CpuToFdt64 (LShiftU64 (PciRootBridgeInfo->RootBridge[Index].Bus.Limit +1, 20));
+
+      Status = FdtSetProperty (Fdt, TempNode, "reg", &Reg64Data, sizeof (Reg64Data));
+      ASSERT_EFI_ERROR (Status);
 
       Data32 = CpuToFdt32 (3);
       Status = FdtSetProperty (Fdt, TempNode, "#address-cells", &Data32, sizeof (UINT32));
