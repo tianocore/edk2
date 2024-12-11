@@ -109,6 +109,10 @@
   #
   TdxHelperLib|Include/Library/TdxHelperLib.h
 
+  ##  @libraryclass  TdxMeasurement
+  #
+  TdxMeasurementLib|Include/Library/TdxMeasurementLib.h
+
   ##  @libraryclass  Declares utility functions for virtio device drivers.
   VirtioLib|Include/Library/VirtioLib.h
 
