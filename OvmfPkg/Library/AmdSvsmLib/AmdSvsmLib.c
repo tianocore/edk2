@@ -213,8 +213,8 @@ SvsmPvalidate (
   Caa = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
   ZeroMem (Caa->SvsmBuffer, sizeof (Caa->SvsmBuffer));
 
-  Function.Id.Protocol = 0;
-  Function.Id.CallId   = 1;
+  Function.Id.Protocol = SVSM_PROTOCOL_CORE;
+  Function.Id.CallId   = SVSM_CORE_PVALIDATE;
 
   Request    = (SVSM_PVALIDATE_REQUEST *)Caa->SvsmBuffer;
   EntryLimit = ((sizeof (Caa->SvsmBuffer) - sizeof (*Request)) /
@@ -407,17 +407,17 @@ SvsmVmsaRmpAdjust (
 
   SvsmCallData.Caa = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
 
-  Function.Id.Protocol = 0;
+  Function.Id.Protocol = SVSM_PROTOCOL_CORE;
 
   if (SetVmsa) {
-    Function.Id.CallId = 2;
+    Function.Id.CallId = SVSM_CORE_CREATE_VCPU;
 
     SvsmCallData.RaxIn = Function.Uint64;
     SvsmCallData.RcxIn = (UINT64)(UINTN)Vmsa;
     SvsmCallData.RdxIn = (UINT64)(UINTN)Vmsa + SIZE_4KB;
     SvsmCallData.R8In  = ApicId;
   } else {
-    Function.Id.CallId = 3;
+    Function.Id.CallId = SVSM_CORE_DELETE_VCPU;
 
     SvsmCallData.RaxIn = Function.Uint64;
     SvsmCallData.RcxIn = (UINT64)(UINTN)Vmsa;
