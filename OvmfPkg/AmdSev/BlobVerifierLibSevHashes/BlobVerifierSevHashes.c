@@ -234,10 +234,23 @@ BlobVerifierLibSevHashesConstructor (
   Ptr  = (void *)(UINTN)FixedPcdGet64 (PcdQemuHashTableBase);
   Size = FixedPcdGet32 (PcdQemuHashTableSize);
 
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: hash table: 0x%p +0x%x\n",
+    __func__,
+    Ptr,
+    Size
+    ));
+
   if ((Ptr == NULL) || (Size < sizeof *Ptr) ||
       !CompareGuid (&Ptr->Guid, &SEV_HASH_TABLE_GUID) ||
       (Ptr->Len < sizeof *Ptr) || (Ptr->Len > Size))
   {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: hash table: 404\n",
+      __func__
+      ));
     return RETURN_SUCCESS;
   }
 
@@ -251,7 +264,7 @@ BlobVerifierLibSevHashesConstructor (
   mHashesTableSize = Ptr->Len - sizeof Ptr->Guid - sizeof Ptr->Len;
 
   DEBUG ((
-    DEBUG_VERBOSE,
+    DEBUG_INFO,
     "%a: mHashesTable=0x%p, Size=%u\n",
     __func__,
     mHashesTable,
