@@ -827,7 +827,12 @@ UsbEnumerateNewDev (
   // Select a default configuration: UEFI must set the configuration
   // before the driver can connect to the device.
   //
-  Config = Child->DevDesc->Configs[0]->Desc.ConfigurationValue;
+  // Quirk for Realtek Ethernet adapter, must select second configuration for CDC NCM
+  if (Child->DevDesc->Desc.IdVendor == 0x0bda && Child->DevDesc->Desc.IdProduct == 0x8156) {
+    Config = Child->DevDesc->Configs[1]->Desc.ConfigurationValue;
+  } else {
+    Config = Child->DevDesc->Configs[0]->Desc.ConfigurationValue;
+  }
   Status = UsbSetConfig (Child, Config);
 
   if (EFI_ERROR (Status)) {
