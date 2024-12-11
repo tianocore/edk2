@@ -44,7 +44,7 @@
 #include <Protocol/CcMeasurement.h>
 #include <Guid/CcEventHob.h>
 #include <Library/TdxLib.h>
-#include <Library/TdxHelperLib.h>
+#include <Library/TdxMeasurementLib.h>
 
 #define PERF_ID_CC_TCG2_DXE  0x3130
 
@@ -940,7 +940,7 @@ TdMapPcrToMrIndex (
     return EFI_INVALID_PARAMETER;
   }
 
-  *MrIndex = TdxHelperMapPcrToMrIndex (PCRIndex);
+  *MrIndex = TdxMeasurementMapPcrToMrIndex (PCRIndex);
 
   return *MrIndex == CC_MR_INDEX_INVALID ? EFI_INVALID_PARAMETER : EFI_SUCCESS;
 }
@@ -1607,7 +1607,7 @@ MeasureHandoffTables (
     Status = GetProcessorsCpuLocation (&ProcessorLocBuf, &ProcessorNum);
 
     if (!EFI_ERROR (Status)) {
-      CcEvent.MrIndex   = TdxHelperMapPcrToMrIndex (1);
+      CcEvent.MrIndex   = TdxMeasurementMapPcrToMrIndex (1);
       CcEvent.EventType = EV_TABLE_OF_DEVICES;
       CcEvent.EventSize = sizeof (HandoffTables);
 
@@ -1829,7 +1829,7 @@ ReadAndMeasureBootVariable (
   )
 {
   return ReadAndMeasureVariable (
-           TdxHelperMapPcrToMrIndex (1),
+           TdxMeasurementMapPcrToMrIndex (1),
            EV_EFI_VARIABLE_BOOT,
            VarName,
            VendorGuid,
@@ -1860,7 +1860,7 @@ ReadAndMeasureSecureVariable (
   )
 {
   return ReadAndMeasureVariable (
-           TdxHelperMapPcrToMrIndex (7),
+           TdxMeasurementMapPcrToMrIndex (7),
            EV_EFI_VARIABLE_DRIVER_CONFIG,
            VarName,
            VendorGuid,
@@ -1968,7 +1968,7 @@ MeasureAllSecureVariables (
   Status = GetVariable2 (EFI_IMAGE_SECURITY_DATABASE2, &gEfiImageSecurityDatabaseGuid, &Data, &DataSize);
   if (!EFI_ERROR (Status)) {
     Status = MeasureVariable (
-               TdxHelperMapPcrToMrIndex (7),
+               TdxMeasurementMapPcrToMrIndex (7),
                EV_EFI_VARIABLE_DRIVER_CONFIG,
                EFI_IMAGE_SECURITY_DATABASE2,
                &gEfiImageSecurityDatabaseGuid,
@@ -1998,7 +1998,7 @@ MeasureLaunchOfFirmwareDebugger (
 {
   CC_EVENT_HDR  CcEvent;
 
-  CcEvent.MrIndex   = TdxHelperMapPcrToMrIndex (7);
+  CcEvent.MrIndex   = TdxMeasurementMapPcrToMrIndex (7);
   CcEvent.EventType = EV_EFI_ACTION;
   CcEvent.EventSize = sizeof (FIRMWARE_DEBUGGER_EVENT_STRING) - 1;
   return TdxDxeHashLogExtendEvent (
@@ -2057,7 +2057,7 @@ MeasureSecureBootPolicy (
   // There might be a case that we need measure UEFI image from DriverOrder, besides BootOrder. So
   // the Authority measurement happen before ReadToBoot event.
   //
-  Status = MeasureSeparatorEvent (TdxHelperMapPcrToMrIndex (7));
+  Status = MeasureSeparatorEvent (TdxMeasurementMapPcrToMrIndex (7));
   DEBUG ((DEBUG_INFO, "MeasureSeparatorEvent - %r\n", Status));
   return;
 }
@@ -2102,7 +2102,7 @@ OnReadyToBoot (
     // 1. This is the first boot attempt.
     //
     Status = TdMeasureAction (
-               TdxHelperMapPcrToMrIndex (4),
+               TdxMeasurementMapPcrToMrIndex (4),
                EFI_CALLING_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
@@ -2140,7 +2140,7 @@ OnReadyToBoot (
     // 6. Not first attempt, meaning a return from last attempt
     //
     Status = TdMeasureAction (
-               TdxHelperMapPcrToMrIndex (4),
+               TdxMeasurementMapPcrToMrIndex (4),
                EFI_RETURNING_FROM_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
@@ -2152,7 +2152,7 @@ OnReadyToBoot (
     // TCG PC Client PFP spec Section 2.4.4.5 Step 4
     //
     Status = TdMeasureAction (
-               TdxHelperMapPcrToMrIndex (4),
+               TdxMeasurementMapPcrToMrIndex (4),
                EFI_CALLING_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
@@ -2190,7 +2190,7 @@ OnExitBootServices (
   // Measure invocation of ExitBootServices,
   //
   Status = TdMeasureAction (
-             TdxHelperMapPcrToMrIndex (5),
+             TdxMeasurementMapPcrToMrIndex (5),
              EFI_EXIT_BOOT_SERVICES_INVOCATION
              );
   if (EFI_ERROR (Status)) {
@@ -2201,7 +2201,7 @@ OnExitBootServices (
   // Measure success of ExitBootServices
   //
   Status = TdMeasureAction (
-             TdxHelperMapPcrToMrIndex (5),
+             TdxMeasurementMapPcrToMrIndex (5),
              EFI_EXIT_BOOT_SERVICES_SUCCEEDED
              );
   if (EFI_ERROR (Status)) {
@@ -2231,7 +2231,7 @@ OnExitBootServicesFailed (
   // Measure Failure of ExitBootServices,
   //
   Status = TdMeasureAction (
-             TdxHelperMapPcrToMrIndex (5),
+             TdxMeasurementMapPcrToMrIndex (5),
              EFI_EXIT_BOOT_SERVICES_FAILED
              );
   if (EFI_ERROR (Status)) {
