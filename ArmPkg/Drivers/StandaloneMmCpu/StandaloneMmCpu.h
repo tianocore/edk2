@@ -13,19 +13,9 @@
 #include <Protocol/MmCommunication2.h>
 #include <Protocol/MmConfiguration.h>
 #include <Protocol/MmCpu.h>
+#include <Protocol/PiMmCpuDriverEp.h>
+
 #include <Guid/MpInformation.h>
-
-typedef
-EFI_STATUS
-(*PI_MM_CPU_DRIVER_ENTRYPOINT) (
-  IN UINTN  EventId,
-  IN UINTN  CpuNumber,
-  IN UINTN  NsCommBufferAddr
-  );
-
-typedef struct {
-  PI_MM_CPU_DRIVER_ENTRYPOINT    *MmCpuDriverEpPtr;
-} MM_CPU_DRIVER_EP_DESCRIPTOR;
 
 //
 // CPU driver initialization specific declarations
@@ -40,18 +30,14 @@ extern EFI_MM_CPU_PROTOCOL  mMmCpuState;
 //
 // MM event handling specific declarations
 //
-extern EFI_MM_COMMUNICATE_HEADER      **PerCpuGuidedEventContext;
-extern EFI_MMRAM_DESCRIPTOR           mNsCommBuffer;
-extern EFI_MMRAM_DESCRIPTOR           mSCommBuffer;
-extern MP_INFORMATION_HOB_DATA        *mMpInformationHobData;
+extern EFI_MM_COMMUNICATE_HEADER      *gGuidedEventContext;
 extern EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig;
 
 /**
   The PI Standalone MM entry point for the CPU driver.
 
   @param  [in] EventId            The event Id.
-  @param  [in] CpuNumber          The CPU number.
-  @param  [in] NsCommBufferAddr   Address of the NS common buffer.
+  @param  [in] CommBufferAddr     Address of the communication buffer.
 
   @retval   EFI_SUCCESS             Success.
   @retval   EFI_INVALID_PARAMETER   A parameter was invalid.
@@ -62,8 +48,7 @@ extern EFI_MM_CONFIGURATION_PROTOCOL  mMmConfig;
 EFI_STATUS
 PiMmStandaloneMmCpuDriverEntry (
   IN UINTN  EventId,
-  IN UINTN  CpuNumber,
-  IN UINTN  NsCommBufferAddr
+  IN UINTN  CommBufferAddr
   );
 
 /**

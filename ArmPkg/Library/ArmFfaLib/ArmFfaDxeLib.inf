@@ -1,0 +1,46 @@
+## @file
+#  Provides FF-A ABI Library used in Dxe Driver.
+#
+#  Copyright (c) 2024, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmFfaDxeLib
+  FILE_GUID                      = e2a8e040-5346-11ef-8454-eff3c163f615
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmFfaLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = ArmFfaDxeLibConstructor
+
+[Sources]
+  ArmFfaCommon.h
+  ArmFfaCommon.c
+  ArmFfaRxTxMap.h
+  ArmFfaRxTxMap.c
+  ArmFfaDxeLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+  ArmSvcLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdFfaLibConduitSmc
+  gArmTokenSpaceGuid.PcdFfaTxBuffer
+  gArmTokenSpaceGuid.PcdFfaRxBuffer
+  gArmTokenSpaceGuid.PcdFfaTxRxPageCount
+  gArmTokenSpaceGuid.PcdFfaExitBootEventRegistered
+
+[Guids]
+  gArmFfaRxTxBufferInfoGuid
+  gEfiEventExitBootServicesGuid
