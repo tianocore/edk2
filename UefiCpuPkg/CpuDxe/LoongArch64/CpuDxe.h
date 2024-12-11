@@ -27,13 +27,6 @@
 #include <Protocol/DebugSupport.h>
 #include <Protocol/LoadedImage.h>
 
-//
-// For coding convenience, define the maximum valid
-// LoongArch exception.
-// Since UEFI V2.11, it will be present in DebugSupport.h.
-//
-#define MAX_LOONGARCH_EXCEPTION  64
-
 /*
   This function flushes the range of addresses from Start to Start+Length
   from the processor's data cache. If Start is not aligned to a cache line
