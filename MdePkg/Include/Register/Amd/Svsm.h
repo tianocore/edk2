@@ -117,4 +117,10 @@ typedef union {
 #define SVSM_CORE_CONFIGURE_VTOM  7
 /// @}
 
+/// SVSM vTPM Protocol calls
+/// @{
+#define SVSM_VTPM_QUERY  0
+#define SVSM_VTPM_CMD    1
+/// @}
+
 #endif
