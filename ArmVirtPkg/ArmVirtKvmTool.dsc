@@ -144,6 +144,11 @@
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
+
+!if $(ARMCCA_SECURE_BOOT_ENABLE) == TRUE
+  *_*_*_CC_FLAGS =  -D ARMCCA_SECURE_BOOT_ENABLE
+!endif
+
   #
   # We need to avoid jump tables in SEC and BASE modules, so that the PE/COFF
   # self-relocation code itself is guaranteed to be position independent.

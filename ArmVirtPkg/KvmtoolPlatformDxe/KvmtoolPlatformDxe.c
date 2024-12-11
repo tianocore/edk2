@@ -16,6 +16,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/FdtClient.h>
 
+#include <Library/ArmCcaLib.h>
+
 /** Decide if the firmware should expose ACPI tables or Device Tree and
     install the appropriate protocol interface.
 
@@ -75,7 +77,12 @@ KvmtoolPlatformDxeEntryPoint (
 {
   EFI_STATUS  Status;
 
-  if (PcdGetBool (PcdEmuVariableNvModeEnable)) {
+  if (  PcdGetBool (PcdEmuVariableNvModeEnable)
+ #ifdef ARMCCA_SECURE_BOOT_ENABLE
+     && !ArmCcaIsRealm ()
+ #endif
+        )
+  {
     // The driver implementing the variable service can now be dispatched.
     Status = gBS->InstallProtocolInterface (
                     &gImageHandle,
