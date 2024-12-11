@@ -25,7 +25,6 @@
 [Sources]
   SecTdxHelper.c
   TdxMeasurementHob.c
-  TdxHelperCommon.c
 
 [Packages]
   CryptoPkg/CryptoPkg.dec
@@ -42,6 +41,7 @@
   PcdLib
   TdxMailboxLib
   TdxLib
+  TdxMeasurementLib
 
 [FixedPcd]
   gUefiOvmfPkgTokenSpaceGuid.PcdOvmfWorkAreaBase

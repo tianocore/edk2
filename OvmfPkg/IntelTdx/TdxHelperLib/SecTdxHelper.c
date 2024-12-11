@@ -23,6 +23,7 @@
 #include <WorkArea.h>
 #include <ConfidentialComputingGuestAttr.h>
 #include <Library/TdxHelperLib.h>
+#include <Library/TdxMeasurementLib.h>
 
 #define ALIGNED_2MB_MASK  0x1fffff
 #define MEGABYTE_SHIFT    20

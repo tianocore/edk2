@@ -38,7 +38,7 @@
   PrintLib
   TdxLib
   BaseCryptLib
-  TdxHelperLib
+  TdxMeasurementLib
 
 [Ppis]
   gEdkiiCcPpiGuid

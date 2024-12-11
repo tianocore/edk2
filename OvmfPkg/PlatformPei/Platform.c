@@ -316,6 +316,10 @@ InitializePlatform (
     TdxHelperBuildGuidHobForTdxMeasurement ();
   }
 
+  if (RETURN_ERROR (QemuFwCfgInitCache ())) {
+    DEBUG ((DEBUG_ERROR, "QemuFwCfgInitCache failed !\n"));
+  }
+
   PlatformInfoHob->SmmSmramRequire     = FeaturePcdGet (PcdSmmSmramRequire);
   PlatformInfoHob->SevEsIsEnabled      = MemEncryptSevEsIsEnabled ();
   PlatformInfoHob->PcdPciMmio64Size    = PcdGet64 (PcdPciMmio64Size);

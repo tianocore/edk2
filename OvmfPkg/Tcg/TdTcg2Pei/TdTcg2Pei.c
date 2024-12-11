@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseCryptLib.h>
 #include <Library/HobLib.h>
-#include <Library/TdxHelperLib.h>
+#include <Library/TdxMeasurementLib.h>
 
 /**
   Do a hash operation on a data buffer, extend a specific RTMR with the hash result,
