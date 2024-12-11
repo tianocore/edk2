@@ -82,7 +82,7 @@ _DriverUnloadHandler (
 **/
 EFI_STATUS
 EFIAPI
-_ModuleEntryPoint (
+_CModuleEntryPoint (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )

@@ -1,0 +1,31 @@
+## @file
+# Module entry point library for PEI core that does not update the stack cookie dynamically.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = PeiCoreStackCheckEntryPointLibNull
+  FILE_GUID                      = 1EE4D67A-EBBD-4D86-8948-5BDD5E507A4D
+  MODULE_TYPE                    = PEI_CORE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = StackCheckEntryPointLib|PEI_CORE
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  PeiCoreStackCheckEntryPointLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib

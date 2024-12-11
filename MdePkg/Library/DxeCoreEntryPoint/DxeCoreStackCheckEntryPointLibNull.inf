@@ -1,0 +1,31 @@
+## @file
+# Module entry point library for DXE core that does not update the stack cookie dynamically.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = DxeCoreStackCheckEntryPointLibNull
+  FILE_GUID                      = D66A10F2-0071-4945-8041-376CD4D8635B
+  MODULE_TYPE                    = DXE_CORE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = StackCheckEntryPointLib|DXE_CORE
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  DxeCoreStackCheckEntryPointLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib

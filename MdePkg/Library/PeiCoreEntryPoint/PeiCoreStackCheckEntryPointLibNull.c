@@ -1,5 +1,5 @@
 /** @file
-  Entry point to a the PEI Core.
+  Entry point to a the PEI Core that does not update the stack cookie dynamically.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -14,6 +14,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/PeiCoreEntryPoint.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+
+extern
+VOID
+EFIAPI
+_CModuleEntryPoint (
+  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
+  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
+  );
 
 /**
   The entry point of PE/COFF Image for the PEI Core.
@@ -49,42 +57,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 VOID
 EFIAPI
-_CModuleEntryPoint (
-  IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
-  IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
-  )
-{
-  ProcessModuleEntryPointList (SecCoreData, PpiList, NULL);
-
-  //
-  // Should never return
-  //
-  ASSERT (FALSE);
-  CpuDeadLoop ();
-}
-
-/**
-  Required by the EBC compiler and identical in functionality to _ModuleEntryPoint().
-
-  This function is required to call _CModuleEntryPoint() passing in SecCoreData and PpiList.
-
-  @param SecCoreData  Points to a data structure containing information about the PEI core's
-                      operating environment, such as the size and location of temporary RAM,
-                      the stack location and the BFV location.
-
-  @param PpiList      Points to a list of one or more PPI descriptors to be installed
-                      initially by the PEI core.  An empty PPI list consists of
-                      a single descriptor with the end-tag
-                      EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST.
-                      As part of its initialization phase, the PEI Foundation will
-                      add these SEC-hosted PPIs to its PPI database, such that both
-                      the PEI Foundationand any modules can leverage the associated
-                      service calls and/or code in these early PPIs.
-
-**/
-VOID
-EFIAPI
-EfiMain (
+_ModuleEntryPoint (
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData,
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList
   )

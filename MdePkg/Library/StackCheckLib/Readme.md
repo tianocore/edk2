@@ -1,11 +1,11 @@
-# StackCheckLib
+# StackCheckLib Overview
 
 ## Table of Contents
 
 - [StackCheckLib](#stackchecklib)
   - [Table of Contents](#table-of-contents)
   - [Introduction and Library Instances](#introduction-and-library-instances)
-    - [StackCheckLibStaticInit](#stackchecklibstaticinit)
+    - [StackCheckLib](#stackchecklib)
     - [StackCheckLibDynamicInit](#stackchecklibdynamicinit)
     - [StackCheckLibNull](#stackchecklibnull)
   - [How Failures are Handled](#how-failures-are-handled)
@@ -26,27 +26,41 @@ Because UEFI doesn't use the C runtime libraries provided by MSVC, the stack
 check code is written in assembly within this library. GCC and Clang compilers
 have built-in support for stack cookie checking, so this library only handles failures.
 
-### StackCheckLibStaticInit
+The stack cookie value is initialized at compile time via updates to the AutoGen process.
+Each module will define `STACK_COOKIE_VALUE` which is used for the module stack cookie
+value.
 
-`StackCheckLibStaticInit` is an instance of `StackCheckLib` which does not update the
-stack cookie value for the module at runtime. It's always preferable to use
-`StackCheckLibDynamicInit` for improved security but there are cases where the stack
-cookie global cannot be written to such as in execute-in-place (XIP) modules and during
-the Cache-as-RAM (CAR) phase of the boot process. The stack cookie value is initialized
-at compile time via updates to the AutoGen process. Each module will define
-`STACK_COOKIE_VALUE` which is used for the module stack cookie value.
+`StackCheckLibDynamicInit` updates the stack cookie value at runtime for improved
+security but there are cases where the stack cookie global cannot be written to such as
+in execute-in-place (XIP) modules and during the Cache-as-RAM (CAR) phase of the boot
+process. It is always preferable to use `StackCheckLibDynamicInit` when possible.
+
+### StackCheckLib
+
+`StackCheckLib` provides the stack cookie checking functionality per architecture and
+toolchain. The currently supported pairs are IA32{GCC,MSVC}, X64{GCC, MSVC},
+ARM{GCC, MSVC}, and AARCH64{GCC, MSVC}. `StackCheckLib` is agnostic as to
+whether the stack cookie was updated during build time or run time; it simply
+checks the cookie in the MSVC case and in both GCC and MSVC responds to stack
+cookie checking failures.
+
+To add support for other architectures/toolchains, additional assembly files
+should be added to `StackCheckLib.inf` and scoped to that architecture/toolchain.
 
 ### StackCheckLibDynamicInit
-
-This section is future work. The below is the proposed instance.
 
 `StackCheckLibDynamicInit` is an instance of `StackCheckLib` which updates the stack
 cookie value for the module at runtime. This is the preferred method for stack cookie
 initialization as it provides improved security. The stack cookie value is initialized
-at runtime by calling `GetRandomNumber32()` or `GetRandomNumber64()` to generate a random
-value via the platform's random number generator protocol. If the random number generator
-returns an error, then the value will still have the build-time randomized value to fall
-back on.
+at runtime in `_ModuleEntryPoint` by calling `rdrand` on x86 and `RNDR` on AARCH64. If
+the random number generator returns an error, then the value will still have the
+build-time randomized value to fall back on.
+
+`StackCheckLibDynamicInit` is an instance of `StackCheckEntryPointLib`, which every
+entry point library depends on. There are null instances of each entry point library
+that simply wrap a call to `_CModuleEntryPoint`, which is the real module entry point.
+When `StackCheckLibDynamicInit` is added to a DSC for a given phase/arch, it will override
+all `StackCheckEntryPointLib` instances previously defined for that phase/arch.
 
 ### StackCheckLibNull
 
@@ -113,36 +127,11 @@ cookie functions for GCC HOST_APPLICATIONS but not for MSVC HOST_APPLICATIONS.
 
 ### Default Stack Check Library Configuration
 
-`MdePkg/MdeLibs.dsc.inc` links `StackCheckLibNull` for all types except SEC, HOST_APPLICATION,
-and USER_DEFINED in order to not break existing DSCs. SEC cannot be generically linked to
-because there are some SEC modules which do not link against the standard entry point
-libraries and thus do not get stack cookies inserted by the compiler. USER_DEFINED modules
-are by nature different from other modules, so we do not make any assumptions about their
-state.
+`MdePkg/MdeLibs.dsc.inc` links `StackCheckLibNull` for all types and the null `StackCheckEntryPointLib` instances
+per phase.
 
 As stated above, all HOST_APPLICATIONS will link against a HOST_APPLICATION specific
 implementation provided in `UnitTestFrameworkPkg/UnitTestFrameworkPkgHost.dsc.inc`.
-
-To link the rest of a platform's modules to `StackCheckLibNull`, a platform would needs
-to link it for all SEC and USER_DEFINED modules. If all of the DSC's SEC and USER_DEFINED
-modules link against the entry point libs, it would look like the following:
-
-```inf
-[LibraryClasses.common.SEC, LibraryClasses.common.USER_DEFINED]
-  NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-```
-
-If some do not, then the individual SEC/USER_DEFINED modules that do link against
-the entry point libs will need to be linked to `StackCheckLibNull`, such as below.
-This case is identifiable if a DSC is built and the linker complains the stack
-check functions are not found for a module.
-
-```inf
-UefiCpuPkg/SecCore/SecCore.inf {
-    <LibraryClasses>
-      NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
-  }
-```
 
 ### Custom Stack Check Library Configuration
 
@@ -157,8 +146,10 @@ should add the following:
 This will cause `MdeLibs.dsc.inc` to not link `StackCheckLibNull` and rely on a DSC to
 link whichever version(s) of `StackCheckLib` it desires.
 
-It is recommended that SEC and PEI_CORE modules use `StackCheckLibNull` and pre-memory modules
-should use `StackCheckLibStaticInit`. All other modules should use `StackCheckLibDynamicInit`.
+It is recommended that SEC and PEI_CORE modules use `StackCheckLibNull` because there are no exception handlers
+registered at this time, so any failures here will cause a triple fault and a reboot. Pre-memory and XIP modules
+should not use `StackCheckLibDynamicInit` as the global stack cookie value cannot be updated. All other modules
+should use `StackCheckLibDynamicInit`.
 
 Below is an **example** of how to link the `StackCheckLib` instances in the platform DSC file
 but it may need customization based on the platform's requirements:
@@ -168,12 +159,13 @@ but it may need customization based on the platform's requirements:
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 [LibraryClasses.common.PEIM]
-  NULL|MdePkg/Library/StackCheckLib/StackCheckLibStaticInit.inf
+  NULL|MdePkg/Library/StackCheckLib/StackCheckLib.inf
 
 [LibraryClasses.common.MM_CORE_STANDALONE, LibraryClasses.common.MM_STANDALONE, LibraryClasses.common.DXE_CORE,
 LibraryClasses.common.SMM_CORE, LibraryClasses.common.DXE_SMM_DRIVER, LibraryClasses.common.DXE_DRIVER,
 LibraryClasses.common.DXE_RUNTIME_DRIVER, LibraryClasses.common.DXE_SAL_DRIVER, LibraryClasses.common.UEFI_DRIVER,
 LibraryClasses.common.UEFI_APPLICATION]
+  NULL|MdePkg/Library/StackCheckLib/StackCheckLib.inf
   NULL|MdePkg/Library/StackCheckLib/StackCheckLibDynamicInit.inf
 ```
 
