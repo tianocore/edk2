@@ -22,6 +22,19 @@
 
 #include "SsdtCpuTopologyGenerator.h"
 
+/** This macro defines the supported ACPI Processor Status bits.
+    The following bits are supported:
+    - ACPI_AML_STA_DEVICE_STATUS_PRESET
+    - ACPI_AML_STA_DEVICE_STATUS_ENABLED
+    - ACPI_AML_STA_DEVICE_STATUS_UI
+    - ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING
+*/
+#define ACPI_AML_STA_PROC_SUPPORTED  (    \
+  ACPI_AML_STA_DEVICE_STATUS_PRESET |     \
+  ACPI_AML_STA_DEVICE_STATUS_ENABLED |    \
+  ACPI_AML_STA_DEVICE_STATUS_UI |         \
+  ACPI_AML_STA_DEVICE_STATUS_FUNCTIONING)
+
 /** This macro expands to a function that retrieves the
     Local APIC or X2APIC information from the Configuration Manager.
 */
@@ -29,6 +42,60 @@ GET_OBJECT_LIST (
   EObjNameSpaceX64,
   EX64ObjLocalApicX2ApicInfo,
   CM_X64_LOCAL_APIC_X2APIC_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    C-State information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCstInfo,
+  CM_ARCH_COMMON_CST_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    C-State dependency information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjCsdInfo,
+  CM_ARCH_COMMON_CSD_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    P-State PCT information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPctInfo,
+  CM_ARCH_COMMON_PCT_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    P-State PSS information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPssInfo,
+  CM_ARCH_COMMON_PSS_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    P-State PPC information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjPpcInfo,
+  CM_ARCH_COMMON_PPC_INFO
+  );
+
+/** This macro expands to a function that retrieves the
+    _STA (Device Status) information from the Configuration Manager.
+*/
+GET_OBJECT_LIST (
+  EObjNameSpaceArchCommon,
+  EArchCommonObjStaInfo,
+  CM_ARCH_COMMON_STA_INFO
   );
 
 /**
@@ -54,6 +121,15 @@ CreateTopologyFromIntC (
   UINT32                         LocalApicX2ApicCount;
   UINT32                         Index;
   AML_OBJECT_NODE_HANDLE         CpuNode;
+  CM_ARCH_COMMON_CST_INFO        *CstInfo;
+  CM_ARCH_COMMON_CSD_INFO        *CsdInfo;
+  CM_ARCH_COMMON_PCT_INFO        *PctInfo;
+  CM_ARCH_COMMON_PSS_INFO        *PssInfo;
+  CM_ARCH_COMMON_PPC_INFO        *PpcInfo;
+  UINT32                         CsdNumEntries;
+  UINT32                         PssNumEntries;
+  UINT32                         CstNumEntries;
+  CM_ARCH_COMMON_STA_INFO        *StaInfo;
 
   ASSERT (Generator != NULL);
   ASSERT (CfgMgrProtocol != NULL);
@@ -83,6 +159,170 @@ CreateTopologyFromIntC (
     if (EFI_ERROR (Status)) {
       ASSERT_EFI_ERROR (Status);
       break;
+    }
+
+    ///
+    /// Check for optional tokens and add them to the CPU node.
+    ///
+    if (LocalApicX2ApicInfo[Index].CstToken != CM_NULL_TOKEN) {
+      Status = GetEArchCommonObjCstInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].CstToken,
+                 &CstInfo,
+                 &CstNumEntries
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCreateCstNode (
+                 CstInfo,
+                 CstNumEntries,
+                 CpuNode,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].CsdToken != CM_NULL_TOKEN) {
+      Status = GetEArchCommonObjCsdInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].CsdToken,
+                 &CsdInfo,
+                 &CsdNumEntries
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCreateCsdNode (
+                 CsdInfo,
+                 CsdNumEntries,
+                 CpuNode,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    ///
+    /// Check for optional tokens and add them to the CPU node.
+    ///
+    if ((LocalApicX2ApicInfo[Index].PctToken != CM_NULL_TOKEN) &&
+        (LocalApicX2ApicInfo[Index].PssToken != CM_NULL_TOKEN) &&
+        (LocalApicX2ApicInfo[Index].PpcToken != CM_NULL_TOKEN))
+    {
+      Status = GetEArchCommonObjPctInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].PctToken,
+                 &PctInfo,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = GetEArchCommonObjPssInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].PssToken,
+                 &PssInfo,
+                 &PssNumEntries
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = GetEArchCommonObjPpcInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].PpcToken,
+                 &PpcInfo,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCreatePctNode (
+                 PctInfo,
+                 CpuNode,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCreatePssNode (
+                 PssInfo,
+                 PssNumEntries,
+                 CpuNode,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      Status = AmlCodeGenMethodRetInteger ("_PPC", PpcInfo->PstateCount, 0, FALSE, 0, CpuNode, NULL);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].PsdToken != CM_NULL_TOKEN) {
+      Status = CreateAmlPsdNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].PsdToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].CpcToken != CM_NULL_TOKEN) {
+      Status = CreateAmlCpcNode (Generator, CfgMgrProtocol, LocalApicX2ApicInfo[Index].CpcToken, CpuNode);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+    }
+
+    if (LocalApicX2ApicInfo[Index].StaToken != CM_NULL_TOKEN) {
+      Status = GetEArchCommonObjStaInfo (
+                 CfgMgrProtocol,
+                 LocalApicX2ApicInfo[Index].StaToken,
+                 &StaInfo,
+                 NULL
+                 );
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
+
+      /// check STA bits
+      if ((StaInfo->DeviceStatus & ~(ACPI_AML_STA_PROC_SUPPORTED)) != 0) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "Unsupported STA bits set for processor %d\n",
+          LocalApicX2ApicInfo[Index].AcpiProcessorUid
+          ));
+        return EFI_UNSUPPORTED;
+      }
+
+      Status = AmlCodeGenMethodRetInteger ("_STA", StaInfo->DeviceStatus, 0, FALSE, 0, CpuNode, NULL);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        return Status;
+      }
     }
   }
 
