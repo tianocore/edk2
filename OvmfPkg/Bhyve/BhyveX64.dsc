@@ -229,6 +229,7 @@
   SmbusLib|MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
   OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
   XenPlatformLib|OvmfPkg/Library/XenPlatformLib/XenPlatformLib.inf
+  CpuExceptionHookLib|UefiCpuPkg/Library/CpuExceptionHookLibNull/CpuExceptionHookLibNull.inf
 
 !include OvmfPkg/Include/Dsc/OvmfTpmLibs.dsc.inc
 
