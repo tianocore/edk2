@@ -12,13 +12,6 @@
 
 #define MAX_DEBUG_MESSAGE_LENGTH  0x100
 
-//
-// For coding convenience, define the maximum valid
-// LoongArch exception.
-// Since UEFI V2.11, it will be present in DebugSupport.h.
-//
-#define MAX_LOONGARCH_EXCEPTION  64
-
 extern INTN  mExceptionKnownNameNum;
 
 /**
