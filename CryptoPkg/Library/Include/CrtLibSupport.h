@@ -25,17 +25,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define MAX_STRING_SIZE  0x1000
 
 //
-// We already have "no-ui" in out Configure invocation.
-// but the code still fails to compile.
-// Ref:  https://github.com/openssl/openssl/issues/8904
-//
-// This is defined in CRT library(stdio.h).
-//
-#ifndef BUFSIZ
-#define BUFSIZ  8192
-#endif
-
-//
 // OpenSSL relies on explicit configuration for word size in crypto/bn,
 // but we want it to be automatically inferred from the target. So we
 // bypass what's in <openssl/opensslconf.h> for OPENSSL_SYS_UEFI, and
