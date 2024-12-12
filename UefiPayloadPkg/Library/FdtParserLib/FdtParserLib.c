@@ -64,6 +64,7 @@ typedef enum {
 #define UPL_ALIGN_DOWN(Addr)  ((UINT64)(Addr) & ~(UINT64)(EFI_PAGE_SIZE - 1))
 
 extern VOID                         *mHobList;
+extern EFI_HOB_FIRMWARE_VOLUME      *mDxeFvHob;
 UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *mPciRootBridgeInfo = NULL;
 UPL_PCI_SEGMENT_INFO_HOB            *mUplPciSegmentInfoHob;
 
@@ -89,6 +90,23 @@ HobConstructor (
   IN VOID  *EfiMemoryTop,
   IN VOID  *EfiFreeMemoryBottom,
   IN VOID  *EfiFreeMemoryTop
+  );
+
+/**
+  Add a new HOB to the HOB List.
+
+  @param HobType            Type of the new HOB.
+  @param HobLength          Length of the new HOB to allocate.
+
+  @return  NULL if there is no space to create a hob.
+  @return  The address point to the new created hob.
+
+**/
+VOID *
+EFIAPI
+CreateHob (
+  IN  UINT16  HobType,
+  IN  UINT16  HobLength
   );
 
 /**
@@ -374,16 +392,18 @@ ParseOptions (
   OUT EFI_BOOT_MODE  *BootMode
   )
 {
-  INT32                   SubNode;
-  FDT_NODE_HEADER         *NodePtr;
-  UNIVERSAL_PAYLOAD_BASE  *PayloadBase;
-  CONST FDT_PROPERTY      *PropertyPtr;
-  CONST CHAR8             *TempStr;
-  INT32                   TempLen;
-  UINT32                  *Data32;
-  UINT64                  *Data64;
-  UINT64                  StartAddress;
-  UINT8                   SizeOfMemorySpace;
+  INT32                    SubNode;
+  INT32                    ISubNode;
+  FDT_NODE_HEADER          *NodePtr;
+  UNIVERSAL_PAYLOAD_BASE   *PayloadBase;
+  CONST FDT_PROPERTY       *PropertyPtr;
+  CONST CHAR8              *TempStr;
+  INT32                    TempLen;
+  UINT32                   *Data32;
+  UINT64                   *Data64;
+  UINT64                   StartAddress;
+  UINT32                   NumberOfBytes;
+  UINT8                    SizeOfMemorySpace;
 
   for (SubNode = FdtFirstSubnode (Fdt, Node); SubNode >= 0; SubNode = FdtNextSubnode (Fdt, SubNode)) {
     NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + SubNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
@@ -391,6 +411,7 @@ ParseOptions (
 
     if (AsciiStrnCmp (NodePtr->Name, "upl-images@", AsciiStrLen ("upl-images@")) == 0) {
       DEBUG ((DEBUG_INFO, "  Found image@ node \n"));
+
       //
       // Build PayloadBase HOB .
       //
@@ -414,9 +435,46 @@ ParseOptions (
 
         PayloadBase->Entry = (EFI_PHYSICAL_ADDRESS)StartAddress;
       }
+    } else if (AsciiStrCmp (NodePtr->Name, "upl-images") == 0) {
+      DEBUG ((DEBUG_INFO, "  Found upl-images node \n"));
+
+      DEBUG ((DEBUG_INFO, "UPL FVs found in UPL FDT\n"));
+      for (ISubNode = FdtFirstSubnode (Fdt, SubNode); ISubNode >= 0; ISubNode = FdtNextSubnode (Fdt, ISubNode)) {
+        NodePtr = (FDT_NODE_HEADER *)((CONST CHAR8 *)Fdt + ISubNode + Fdt32ToCpu (((FDT_HEADER *)Fdt)->OffsetDtStruct));
+        DEBUG ((DEBUG_INFO, "\n      SubNode(%08X)  %a", ISubNode, NodePtr->Name));
+
+        // NB: This is not specced!
+        PropertyPtr = FdtGetProperty (Fdt, ISubNode, "name", &TempLen);
+        if (TempLen <= 0) {
+          ASSERT (FALSE);
+          continue;
+        }
+        TempStr = (CHAR8 *)(PropertyPtr->Data);
+
+        PropertyPtr = FdtGetProperty (Fdt, ISubNode, "reg", &TempLen);
+        if (TempLen <= 0) {
+          ASSERT (FALSE);
+          continue;
+        }
+        Data64        = (UINT64 *)(PropertyPtr->Data);
+        StartAddress  = Fdt64ToCpu (ReadUnaligned64 (Data64));
+        NumberOfBytes = Fdt32ToCpu (*(UINT32 *)(Data64 + 1));
+        DEBUG ((DEBUG_INFO, "\n         Image  %a", TempStr));
+        DEBUG ((DEBUG_INFO, "  [0x%X, 0x%X)\n", StartAddress, NumberOfBytes));
+
+        //
+        // Patch the first FV or create a new one, as required.
+        //
+        if (AsciiStrnCmp (TempStr, "uefi-fv", AsciiStrLen ("uefi-fv")) == 0) {
+          mDxeFvHob->BaseAddress = StartAddress;
+          mDxeFvHob->Length      = NumberOfBytes;
+        } else {
+          BuildFvHob (StartAddress, NumberOfBytes);
+        }
+      }
     }
 
-    if (AsciiStrnCmp (NodePtr->Name, "upl-params", AsciiStrLen ("upl-params")) == 0) {
+    if (AsciiStrCmp (NodePtr->Name, "upl-params") == 0) {
       PropertyPtr = FdtGetProperty (Fdt, SubNode, "addr-width", &TempLen);
       if (TempLen > 0) {
         Data32 = (UINT32 *)(PropertyPtr->Data);
@@ -913,6 +971,7 @@ ParseDtb (
               DEBUG ((DEBUG_INFO, "FreeMemoryTop :0x%llx\n", FreeMemoryTop));
               DEBUG ((DEBUG_INFO, "MemoryTop :0x%llx\n", MemoryTop));
               mHobList         = HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
+              mDxeFvHob        = CreateHob (EFI_HOB_TYPE_FV, sizeof (EFI_HOB_FIRMWARE_VOLUME));
               IsHobConstructed = TRUE;
               break;
             }
