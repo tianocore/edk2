@@ -5,10 +5,12 @@
 # SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 
-all: test
+all: test ninja
 
 test:
 	@if command -v "${PYTHON_COMMAND}" >/dev/null 2>&1; then ${PYTHON_COMMAND} RunTests.py; else python RunTests.py; fi
+
+ninja: test
 
 clean:
 	find . -name '*.pyc' -exec rm '{}' ';'

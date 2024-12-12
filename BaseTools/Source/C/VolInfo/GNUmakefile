@@ -10,6 +10,8 @@ APPNAME = VolInfo
 
 OBJECTS = VolInfo.o
 
+NINJA_LIBS_DEPS = Common
+
 include $(MAKEROOT)/Makefiles/app.makefile
 
 LIBS = -lCommon

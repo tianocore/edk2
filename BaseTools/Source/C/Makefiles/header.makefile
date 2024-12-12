@@ -134,6 +134,19 @@ CXXFLAGS += $(BUILD_OPTFLAGS)
 # keep EXTRA_LDFLAGS last
 LDFLAGS += $(EXTRA_LDFLAGS)
 
+NINJA_DIR =
+ifneq ($(APPNAME),)
+  NINJA_DIR = $(APPNAME)
+else ifneq ($(LIBNAME),)
+  NINJA_DIR = $(LIBNAME)
+else ifneq ($(APPLICATIONS),)
+# The root makefile cannot define APPNAME/LIBNAME. APPLICATIONS is a unique
+#   variable for the root makefile that is unlikely to be used in subfolders.
+  $(error "Neither APPNAME nor LIBNAME is defined. At least one of them must be defined")
+endif
+NINJA_ID := $(shell base64 < /dev/random | tr -dc 'A-Za-z0-9' | head -c 5)
+NINJA_OBJECTS := $(foreach obj,$(OBJECTS),"$(NINJA_DIR)/$(obj)")
+
 .PHONY: all
 .PHONY: install
 .PHONY: clean

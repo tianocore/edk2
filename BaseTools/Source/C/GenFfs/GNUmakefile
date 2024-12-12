@@ -10,7 +10,8 @@ APPNAME = GenFfs
 
 OBJECTS = GenFfs.o
 
+NINJA_LIBS_DEPS = Common
+
 include $(MAKEROOT)/Makefiles/app.makefile
 
 LIBS = -lCommon
-
