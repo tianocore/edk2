@@ -98,6 +98,7 @@
   OpensslLib
   IntrinsicLib
   PrintLib
+  SafeIntLib
 
 #
 # Remove these [BuildOptions] after this library is cleaned up
