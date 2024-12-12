@@ -10,6 +10,8 @@ APPNAME = GenFw
 
 OBJECTS = GenFw.o ElfConvert.o Elf32Convert.o Elf64Convert.o
 
+NINJA_LIBS_DEPS = Common
+
 include $(MAKEROOT)/Makefiles/app.makefile
 
 LIBS = -lCommon
