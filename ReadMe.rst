@@ -5,6 +5,13 @@ EDK II Project
 A modern, feature-rich, cross-platform firmware development
 environment for the UEFI and PI specifications from www.uefi.org.
 
+.. image:: https://img.shields.io/badge/dynamic/toml?url=https%3A%2F%2Fraw.githubusercontent.com%2Ftianocore%2Fedk2-pytool-extensions%2Frefs%2Fheads%2Fmaster%2Fpyproject.toml&query=%24.%5B'requires-python'%5D&style=for-the-badge&logo=python&logoColor=ffd343&label=Minimum%20Python%20Version%20for%20CI&color=3776ab&link=https%3A%2F%2Fwww.python.org%2Fdownloads%2F
+   :alt: CI Minimum Python Version
+
+It is recommended to install this Python version to run the full set of scripts that enable CI in the project.
+
+Other Python requirements for build can be found in the `EDK II Build Instructions <https://github.com/tianocore/tianocore.github.io/wiki/Build-Instructions/>`__.
+
 Core CI Build Status
 --------------------
 
