@@ -199,6 +199,15 @@ PlatformRegisterFvBootOption (
                  );
   ASSERT (DevicePath != NULL);
 
+  //
+  // File is not in firmware, so it is going to be deleted anyway by
+  // RemoveStaleFvFileOptions, let's not add it.
+  //
+  if (!FileIsInFv (DevicePath)) {
+    FreePool (DevicePath);
+    return;
+  }
+
   Status = EfiBootManagerInitializeLoadOption (
              &NewOption,
              LoadOptionNumberUnassigned,
