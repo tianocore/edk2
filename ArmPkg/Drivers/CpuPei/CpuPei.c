@@ -95,7 +95,7 @@ SetMemoryPermissions (
     return EFI_INVALID_PARAMETER;
   }
 
-  return ArmSetMemoryAttributes (BaseAddress, Length, Attributes, AttributeMask);
+  return ArmSetMemoryAttributes (BaseAddress, Length, Attributes, AttributeMask, FALSE);
 }
 
 STATIC CONST EDKII_MEMORY_ATTRIBUTE_PPI  mMemoryAttributePpi = {

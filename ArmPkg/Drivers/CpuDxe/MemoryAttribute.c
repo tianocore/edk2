@@ -216,7 +216,7 @@ SetMemoryAttributes (
     return EFI_UNSUPPORTED;
   }
 
-  return ArmSetMemoryAttributes (BaseAddress, Length, Attributes, Attributes);
+  return ArmSetMemoryAttributes (BaseAddress, Length, Attributes, Attributes, FALSE);
 }
 
 /**
@@ -284,7 +284,7 @@ ClearMemoryAttributes (
     return EFI_UNSUPPORTED;
   }
 
-  return ArmSetMemoryAttributes (BaseAddress, Length, 0, Attributes);
+  return ArmSetMemoryAttributes (BaseAddress, Length, 0, Attributes, FALSE);
 }
 
 EFI_MEMORY_ATTRIBUTE_PROTOCOL  mMemoryAttribute = {

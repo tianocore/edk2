@@ -54,6 +54,8 @@ ArmReplaceLiveTranslationEntry (
   @param[in]  Length          The size in bytes of the memory region.
   @param[in]  Attributes      Mask of memory attributes to set.
   @param[in]  AttributeMask   Mask of memory attributes to take into account.
+  @param[in]  PagesOnly       Whether all mappings should be down to pages,
+                              even in cases where block mappings could be used.
 
   @retval EFI_SUCCESS           The attributes were set for the memory region.
   @retval EFI_INVALID_PARAMETER BaseAddress or Length is not suitably aligned.
@@ -68,7 +70,8 @@ ArmSetMemoryAttributes (
   IN EFI_PHYSICAL_ADDRESS  BaseAddress,
   IN UINT64                Length,
   IN UINT64                Attributes,
-  IN UINT64                AttributeMask
+  IN UINT64                AttributeMask,
+  IN BOOLEAN               PagesOnly
   );
 
 #endif // ARM_MMU_LIB_H_
