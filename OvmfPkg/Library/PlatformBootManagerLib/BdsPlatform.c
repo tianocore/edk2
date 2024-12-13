@@ -15,6 +15,8 @@
 #include <Library/Tcg2PhysicalPresenceLib.h>
 #include <Library/XenPlatformLib.h>
 
+#include <Library/QemuFwCfgSimpleParserLib.h>
+
 //
 // Global data
 //
@@ -1843,6 +1845,18 @@ PlatformBootManagerAfterConsole (
     EfiBootManagerRefreshAllBootOption ();
   }
 
+  BOOLEAN        ShellEnabled;
+  RETURN_STATUS  RetStatus;
+
+  RetStatus = QemuFwCfgParseBool (
+                "opt/org.tianocore/EFIShellSupport",
+                &ShellEnabled
+                );
+
+  if (RETURN_ERROR (RetStatus)) {
+    ShellEnabled = TRUE;
+  }
+
   //
   // Register UEFI Shell
   //
@@ -1850,7 +1864,7 @@ PlatformBootManagerAfterConsole (
     &gUefiShellFileGuid,
     L"EFI Internal Shell",
     LOAD_OPTION_ACTIVE,
-    TRUE
+    ShellEnabled
     );
 
   //
