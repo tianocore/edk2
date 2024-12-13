@@ -20,7 +20,7 @@ SECTION .text
 
 BITS 64
 
-%define TDVMCALL_EXPOSE_REGS_MASK       0xffcc
+%define TDVMCALL_EXPOSE_REGS_MASK       0xffc4
 %define TDVMCALL                        0x0
 %define EXIT_REASON_CPUID               0xa
 
