@@ -86,7 +86,8 @@ VOID
 PlatformRegisterFvBootOption (
   EFI_GUID  *FileGuid,
   CHAR16    *Description,
-  UINT32    Attributes
+  UINT32    Attributes,
+  BOOLEAN   Enabled
   )
 {
   EFI_STATUS                         Status;
@@ -138,8 +139,14 @@ PlatformRegisterFvBootOption (
                   BootOptionCount
                   );
 
-  if (OptionIndex == -1) {
+  if ((OptionIndex == -1) && Enabled) {
     Status = EfiBootManagerAddLoadOptionVariable (&NewOption, MAX_UINTN);
+    ASSERT_EFI_ERROR (Status);
+  } else if ((OptionIndex != -1) && !Enabled) {
+    Status = EfiBootManagerDeleteLoadOptionVariable (
+               BootOptions[OptionIndex].OptionNumber,
+               LoadOptionTypeBoot
+               );
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -1842,7 +1849,8 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (
     &gUefiShellFileGuid,
     L"EFI Internal Shell",
-    LOAD_OPTION_ACTIVE
+    LOAD_OPTION_ACTIVE,
+    TRUE
     );
 
   //
@@ -1851,7 +1859,8 @@ PlatformBootManagerAfterConsole (
   PlatformRegisterFvBootOption (
     &gGrubFileGuid,
     L"Grub Bootloader",
-    LOAD_OPTION_ACTIVE
+    LOAD_OPTION_ACTIVE,
+    TRUE
     );
 
   RemoveStaleFvFileOptions ();
