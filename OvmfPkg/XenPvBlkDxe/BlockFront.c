@@ -356,7 +356,7 @@ Again:
 
   DEBUG ((
     DEBUG_INFO,
-    "XenPvBlk: New disk with %ld sectors of %d bytes\n",
+    "XenPvBlk: New disk with %ld 512B-sectors and logical sector size of %d bytes\n",
     Dev->MediaInfo.Sectors,
     Dev->MediaInfo.SectorSize
     ));
