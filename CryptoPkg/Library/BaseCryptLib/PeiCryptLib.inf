@@ -87,6 +87,7 @@
   PeiServicesTablePointerLib
   PeiServicesLib
   SynchronizationLib
+  SafeIntLib
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid

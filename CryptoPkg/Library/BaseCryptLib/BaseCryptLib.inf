@@ -99,6 +99,7 @@
   PrintLib
   UefiBootServicesTableLib
   SynchronizationLib
+  SafeIntLib
 
 [Protocols]
   gEfiMpServiceProtocolGuid
