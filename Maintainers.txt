@@ -601,6 +601,7 @@ R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 ShellPkg
 F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
+R: Pierre Gondois <pierre.gondois@arm.com> [pierregondois]
 
 SignedCapsulePkg
 F: SignedCapsulePkg/
