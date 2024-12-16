@@ -22,6 +22,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Tpm2DeviceLibDTpm.h"
 
+#include "Tpm2Ptp.h"
+
 //
 // Execution of the command may take from several seconds to minutes for certain
 // commands, such as key generation.
