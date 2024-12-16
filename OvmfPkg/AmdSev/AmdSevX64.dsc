@@ -25,7 +25,6 @@
   BUILD_TARGETS                  = NOOPT|DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
   FLASH_DEFINITION               = OvmfPkg/AmdSev/AmdSevX64.fdf
-  PREBUILD                       = sh OvmfPkg/AmdSev/Grub/grub.sh
 
   #
   # Defines for default states.  These can be changed on the command line.
