@@ -804,6 +804,49 @@ GetRemainingHobSize (
 }
 
 /**
+  Check if MM platform FV HOB was created.
+
+  Check if MM platform FV HOB was created on platform HOB list,
+  if yes, skip building MM Core FV HOB,
+  if No, continue to build MM Core FV HOB
+
+  @param[in]      PlatformHobList     Platform HOB list.
+  @param[in]      PlatformHobSize     Platform HOB size.
+
+  @retval TRUE    Skip building MM Core FV HOB.
+          FALSE   Continue to build MM Core FV HOB.
+**/
+BOOLEAN
+IsMmPlatformFvHobCreated (
+  IN UINT8  *PlatformHobList,
+  IN UINTN  PlatformHobSize
+  )
+{
+  EFI_PEI_HOB_POINTERS  Hob;
+  UINTN                 HobLength;
+
+  if ((PlatformHobList == NULL) || (PlatformHobSize == 0)) {
+    return FALSE;
+  }
+
+  Hob.Raw   = (UINT8 *)PlatformHobList;
+  HobLength = GET_HOB_LENGTH (Hob);
+  //
+  // Parse the HOB list until end of list or matching type is found.
+  //
+  while (HobLength <= PlatformHobSize) {
+    if (Hob.Header->HobType == EFI_HOB_TYPE_FV) {
+      return TRUE;
+    }
+
+    Hob.Raw    = GET_NEXT_HOB (Hob);
+    HobLength += GET_HOB_LENGTH (Hob);
+  }
+
+  return FALSE;
+}
+
+/**
   Create the MM foundation specific HOB list which StandaloneMm Core needed.
 
   This function build the MM foundation specific HOB list needed by StandaloneMm Core
@@ -894,9 +937,11 @@ CreateMmFoundationHobList (
   //
   // BFV address for StandaloneMm Core
   //
-  HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
-  MmIplBuildFvHob (FoundationHobList + UsedSize, &HobLength, MmFvBase, MmFvSize);
-  UsedSize += HobLength;
+  if (!IsMmPlatformFvHobCreated (PlatformHobList, PlatformHobSize)) {
+    HobLength = GetRemainingHobSize (*FoundationHobSize, UsedSize);
+    MmIplBuildFvHob (FoundationHobList + UsedSize, &HobLength, MmFvBase, MmFvSize);
+    UsedSize += HobLength;
+  }
 
   //
   // Build MM ACPI S3 Enable HOB
