@@ -2503,6 +2503,8 @@ BmRegisterBootManagerMenu (
   OUT EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption
   )
 {
+  DEBUG ((DEBUG_INFO, "BmRegisterBootManagerMenu\n"));
+
   EFI_STATUS                Status;
   CHAR16                    *Description;
   UINTN                     DescriptionLength;
@@ -2609,6 +2611,8 @@ EfiBootManagerGetBootManagerMenu (
   EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption
   )
 {
+  DEBUG ((DEBUG_INFO, "EfiBootManagerGetBootManagerMenu\n"));
+
   EFI_STATUS                    Status;
   UINTN                         BootOptionCount;
   EFI_BOOT_MANAGER_LOAD_OPTION  *BootOptions;
@@ -2639,8 +2643,10 @@ EfiBootManagerGetBootManagerMenu (
   // Automatically create the Boot#### for Boot Manager Menu when not found.
   //
   if (Index == BootOptionCount) {
+    DEBUG ((DEBUG_INFO, "Menu non trovato, aggiungo\n"));
     return BmRegisterBootManagerMenu (BootOption);
   } else {
+    DEBUG ((DEBUG_INFO, "Menu trovato!\n"));
     return EFI_SUCCESS;
   }
 }

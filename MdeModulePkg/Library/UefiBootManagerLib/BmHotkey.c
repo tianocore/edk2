@@ -550,6 +550,8 @@ BmRegisterHotkeyNotify (
   UINTN       Index;
   VOID        *NotifyHandle;
 
+  DEBUG ((DEBUG_INFO, "BmRegisterHotkeyNotify\n"));
+
   for (Index = 0; Index < Hotkey->CodeCount; Index++) {
     Status = TxtInEx->RegisterKeyNotify (
                         TxtInEx,
@@ -661,6 +663,8 @@ BmProcessKeyOption (
   IN EFI_BOOT_MANAGER_KEY_OPTION  *KeyOption
   )
 {
+  DEBUG ((DEBUG_INFO, "BmProcessKeyOption\n"));
+
   EFI_STATUS                         Status;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  *TxtInEx;
   EFI_HANDLE                         *Handles;
@@ -976,6 +980,8 @@ EfiBootManagerAddKeyOptionVariable (
   ...
   )
 {
+  DEBUG ((DEBUG_INFO, "Vorrei registrare tasto\n"));
+
   EFI_STATUS                   Status;
   VA_LIST                      Args;
   VOID                         *BootOption;
