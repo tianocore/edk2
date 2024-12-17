@@ -33,6 +33,7 @@
   LoadLinuxLib
   PrintLib
   QemuFwCfgLib
+  QemuFwCfgSimpleParserLib
   ReportStatusCodeLib
   UefiBootServicesTableLib
 
