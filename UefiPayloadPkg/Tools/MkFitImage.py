@@ -76,7 +76,7 @@ def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descr
     if InfoHeader.LoadAddr is not None:
         libfdt.fdt_setprop_u64(Fdt, ParentNode, 'load', InfoHeader.LoadAddr)
     if InfoHeader.Entry is not None:
-        libfdt.fdt_setprop_u64(Fdt, ParentNode, 'entry-start', InfoHeader.Entry)
+        libfdt.fdt_setprop_u64(Fdt, ParentNode, 'entry', InfoHeader.Entry)
     if InfoHeader.RelocStart is not None:
         libfdt.fdt_setprop_u32(Fdt, ParentNode, 'reloc-start', InfoHeader.RelocStart)
     if InfoHeader.DataSize is not None:
@@ -111,6 +111,7 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
     #
     # Set basic information
     #
+    libfdt.fdt_setprop_u32(Fdt, 0, '#address-cells', 2)
     libfdt.fdt_setprop_u32(Fdt, 0, 'build-revision ', InfoHeader.Revision)
     libfdt.fdt_setprop_u32(Fdt, 0, 'spec-version', InfoHeader.UplVersion)
 
