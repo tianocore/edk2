@@ -69,6 +69,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits         ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity           ## CONSUMES
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits         ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdBootMenuEnabled
 
 [Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock

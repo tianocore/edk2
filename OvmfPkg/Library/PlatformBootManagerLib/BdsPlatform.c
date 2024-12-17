@@ -422,22 +422,51 @@ PlatformRegisterOptionsAndKeys (
   EFI_INPUT_KEY                 Esc;
   EFI_BOOT_MANAGER_LOAD_OPTION  BootOption;
 
+  Enter.ScanCode    = SCAN_NULL;
+  Enter.UnicodeChar = CHAR_CARRIAGE_RETURN;
+  F2.ScanCode       = SCAN_F2;
+  F2.UnicodeChar    = CHAR_NULL;
+  Esc.ScanCode      = SCAN_ESC;
+  Esc.UnicodeChar   = CHAR_NULL;
+
+  //
+  // Delete Previously Registered hotkeys
+  //
+  if (!PcdGetBool (PcdBootMenuEnabled)) {
+    Status = EfiBootManagerDeleteKeyOptionVariable (
+               NULL,
+               0,
+               &Enter,
+               NULL
+               );
+
+    Status = EfiBootManagerDeleteKeyOptionVariable (
+               NULL,
+               0,
+               &F2,
+               NULL
+               );
+
+    Status = EfiBootManagerDeleteKeyOptionVariable (
+               NULL,
+               0,
+               &Esc,
+               NULL
+               );
+
+    return;
+  }
+
   //
   // Register ENTER as CONTINUE key
   //
-  Enter.ScanCode    = SCAN_NULL;
-  Enter.UnicodeChar = CHAR_CARRIAGE_RETURN;
-  Status            = EfiBootManagerRegisterContinueKeyOption (0, &Enter, NULL);
+  Status = EfiBootManagerRegisterContinueKeyOption (0, &Enter, NULL);
   ASSERT_EFI_ERROR (Status);
 
   //
   // Map F2 to Boot Manager Menu
   //
-  F2.ScanCode     = SCAN_F2;
-  F2.UnicodeChar  = CHAR_NULL;
-  Esc.ScanCode    = SCAN_ESC;
-  Esc.UnicodeChar = CHAR_NULL;
-  Status          = EfiBootManagerGetBootManagerMenu (&BootOption);
+  Status = EfiBootManagerGetBootManagerMenu (&BootOption);
   ASSERT_EFI_ERROR (Status);
   Status = EfiBootManagerAddKeyOptionVariable (
              NULL,
@@ -507,6 +536,7 @@ PlatformBootManagerBeforeConsole (
   EFI_STATUS     Status;
   UINT16         FrontPageTimeout;
   RETURN_STATUS  PcdStatus;
+  BOOLEAN        BootMenuEnabled;
 
   DEBUG ((DEBUG_INFO, "PlatformBootManagerBeforeConsole\n"));
   InstallDevicePathCallback ();
@@ -605,6 +635,18 @@ PlatformBootManagerBeforeConsole (
     FrontPageTimeout,
     Status
     ));
+
+  Status = QemuFwCfgParseBool (
+             "opt/org.tianocore/FirmwareSetupSupport",
+             &BootMenuEnabled
+             );
+
+  if (RETURN_ERROR (Status)) {
+    BootMenuEnabled = TRUE;
+  }
+
+  Status = PcdSetBoolS (PcdBootMenuEnabled, BootMenuEnabled);
+  ASSERT_RETURN_ERROR (Status);
 
   if (!FeaturePcdGet (PcdBootRestrictToFirmware)) {
     PlatformRegisterOptionsAndKeys ();
@@ -1916,6 +1958,13 @@ PlatformBootManagerAfterConsole (
     EfiBootManagerRefreshAllBootOption ();
   }
 
+  //
+  // Remove BootManager if previously added
+  //
+  if (!PcdGetBool (PcdBootMenuEnabled)) {
+    RemoveBootManager ();
+  }
+
   BOOLEAN        ShellEnabled;
   RETURN_STATUS  RetStatus;
 
@@ -2116,7 +2165,7 @@ PlatformBootManagerUnableToBoot (
   EFI_BOOT_MANAGER_LOAD_OPTION  BootManagerMenu;
   UINTN                         Index;
 
-  if (FeaturePcdGet (PcdBootRestrictToFirmware)) {
+  if (FeaturePcdGet (PcdBootRestrictToFirmware) || !PcdGetBool (PcdBootMenuEnabled)) {
     AsciiPrint (
       "%a: No bootable option was found.\n",
       gEfiCallerBaseName
