@@ -115,4 +115,22 @@ SmmCpuPlatformHookBeforeMmiHandler (
   VOID
   );
 
+/**
+  Determines if the LMCE status check is needed.
+
+  This function checks whether the LMCE status check is required.
+  By default, it returns TRUE, indicating that the LMCE status check
+  should be performed. However, if the check should be skipped for
+  any reason, it can return FALSE.
+
+  @retval TRUE   LMCE status check is needed.
+  @retval FALSE  LMCE status check is skipped.
+
+**/
+BOOLEAN
+EFIAPI
+IsLmceStatusCheckNeeded (
+  VOID
+  );
+
 #endif
