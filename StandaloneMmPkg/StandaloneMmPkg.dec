@@ -51,6 +51,9 @@
 
   gEventMmDispatchGuid                     = { 0x7e6efffa, 0x69b4, 0x4c1b, { 0xa4, 0xc7, 0xaf, 0xf9, 0xc9, 0x24, 0x4f, 0xee }}
 
+[Ppis]
+  gMmCoreFvLocationPpiGuid                 = { 0x47a00618, 0x237a, 0x4386, { 0x8f, 0xc5, 0x2a, 0x86, 0xd8, 0xac, 0x41, 0x05 }}
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## Maximum permitted encapsulation levels of sections in a firmware volume,
   #  in the MM phase. Minimum value is 1. Sections nested more deeply are rejected.
