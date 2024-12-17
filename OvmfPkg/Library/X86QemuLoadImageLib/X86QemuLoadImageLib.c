@@ -19,8 +19,10 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PrintLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/QemuFwCfgSimpleParserLib.h>
 #include <Library/QemuLoadImageLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/OvmfLoadedX86LinuxKernel.h>
@@ -416,13 +418,45 @@ QemuLoadKernelImage (
     // Fall through
     //
     case EFI_ACCESS_DENIED:
-    //
-    // We are running with UEFI secure boot enabled, and the image failed to
-    // authenticate. For compatibility reasons, we fall back to the legacy
-    // loader in this case.
-    //
-    // Fall through
-    //
+      //
+      // We are running with UEFI secure boot enabled, and the image failed to
+      // authenticate. For compatibility reasons, we fall back to the legacy
+      // loader in this case (unless disabled via fw_cfg).
+      //
+    {
+      EFI_STATUS  RetStatus;
+      BOOLEAN     Enabled = TRUE;
+
+      AsciiPrint (
+        "OVMF: Secure boot image verification failed.  Consider using the '-shim'\n"
+        "OVMF: command line switch for qemu (available in version 10.0 + newer).\n"
+        "\n"
+        );
+
+      RetStatus = QemuFwCfgParseBool (
+                    "opt/org.tianocore/EnableLegacyLoader",
+                    &Enabled
+                    );
+      if (EFI_ERROR (RetStatus)) {
+        Enabled = TRUE;
+      }
+
+      if (!Enabled) {
+        AsciiPrint (
+          "OVMF: Fallback to insecure legacy linux kernel loader is disabled.\n"
+          "\n"
+          );
+        return EFI_ACCESS_DENIED;
+      } else {
+        AsciiPrint (
+          "OVMF: Using legacy linux kernel loader (insecure and deprecated).\n"
+          "\n"
+          );
+        //
+        // Fall through
+        //
+      }
+    }
     case EFI_UNSUPPORTED:
       //
       // The image is not natively supported or cross-type supported. Let's try
