@@ -13,7 +13,7 @@ PROPERTY_DATA  PropertyData32List[] = {
 };
 
 PROPERTY_DATA  PropertyData64List[] = {
-  { "entry-start", PAYLOAD_ENTRY_POINT_OFFSET },
+  { "entry",       PAYLOAD_ENTRY_POINT_OFFSET },
   { "load",        PAYLOAD_LOAD_ADDR_OFFSET   }
 };
 
