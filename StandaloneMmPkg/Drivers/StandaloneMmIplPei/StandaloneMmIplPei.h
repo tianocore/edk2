@@ -23,6 +23,7 @@
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Ppi/MmControl.h>
 #include <Ppi/MmCommunication.h>
+#include <Ppi/MmCoreFvLocationPpi.h>
 #include <Protocol/MmCommunication.h>
 #include <Library/MmPlatformHobProducerLib.h>
 
