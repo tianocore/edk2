@@ -599,6 +599,11 @@ SecurityPkg: Tcg related modules
 F: SecurityPkg/Tcg/
 R: Rahul Kumar <rahul1.kumar@intel.com> [rahul1-kumar]
 
+SecurityPkg: SVSM related modules
+F: SecurityPkg/Library/Tpm2DeviceLibDTpm/*Svsm*
+R: Oliver Steffen <osteffen@redhat.com> [osteffenrh]
+R: Tom Lendacky <thomas.lendacky@amd.com> [tlendacky]
+
 ShellPkg
 F: ShellPkg/
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
