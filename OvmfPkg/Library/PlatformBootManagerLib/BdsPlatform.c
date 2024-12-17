@@ -383,6 +383,35 @@ RestrictBootOptionsToFirmware (
 }
 
 VOID
+RemoveBootManager (
+  VOID
+  )
+{
+  EFI_BOOT_MANAGER_LOAD_OPTION  *BootOptions;
+  UINTN                         BootOptionCount;
+  UINTN                         Index;
+
+  BootOptions = EfiBootManagerGetLoadOptions (
+                  &BootOptionCount,
+                  LoadOptionTypeBoot
+                  );
+
+  for (Index = 0; Index < BootOptionCount; ++Index) {
+    if (BmIsBootManagerMenuFilePath (BootOptions[Index].FilePath)) {
+      //
+      // Delete the boot option.
+      //
+      EfiBootManagerDeleteLoadOptionVariable (
+        BootOptions[Index].OptionNumber,
+        LoadOptionTypeBoot
+        );
+    }
+  }
+
+  EfiBootManagerFreeLoadOptions (BootOptions, BootOptionCount);
+}
+
+VOID
 PlatformRegisterOptionsAndKeys (
   VOID
   )
