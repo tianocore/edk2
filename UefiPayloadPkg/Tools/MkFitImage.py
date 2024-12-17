@@ -105,6 +105,7 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
         ["tianocore",   InfoHeader.Binary,        BuildTianoImageNode , InfoHeader.Description,     None, 0 ],
         ["uefi-fv",     InfoHeader.UefifvPath,    BuildFvImageNode,     "UEFI Firmware Volume",     None, 0 ],
         ["bds-fv",      InfoHeader.BdsfvPath,     BuildFvImageNode ,    "BDS Firmware Volume",      None, 0 ],
+        ["sec-fv",      InfoHeader.SecfvPath,     BuildFvImageNode ,    "Security Firmware Volume", None, 0 ],
         ["network-fv",  InfoHeader.NetworkfvPath, BuildFvImageNode ,    "Network Firmware Volume",  None, 0 ],
     ]
 
