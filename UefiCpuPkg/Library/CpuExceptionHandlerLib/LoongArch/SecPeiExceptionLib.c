@@ -68,14 +68,7 @@ CommonExceptionHandler (
       //
       IpiInterruptHandler (InterruptType, SystemContext);
       return;
-    } else {
-      ExceptionType = InterruptType;
     }
-  } else {
-    //
-    // Exception
-    //
-    ExceptionType >>= CSR_ESTAT_EXC_SHIFT;
   }
 
   DefaultExceptionHandler (ExceptionType, SystemContext);

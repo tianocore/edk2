@@ -27,7 +27,7 @@ GetExceptionType (
 {
   EFI_EXCEPTION_TYPE  ExceptionType;
 
-  ExceptionType = (SystemContext.SystemContextLoongArch64->ESTAT & CSR_ESTAT_EXC);
+  ExceptionType = (SystemContext.SystemContextLoongArch64->ESTAT & CSR_ESTAT_EXC) >> CSR_ESTAT_EXC_SHIFT;
   return ExceptionType;
 }
 
