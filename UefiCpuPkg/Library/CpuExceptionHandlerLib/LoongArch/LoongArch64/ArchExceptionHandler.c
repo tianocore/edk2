@@ -96,6 +96,17 @@ DumpCpuContext (
     );
 
   //
+  // Dump interrupt type if the exception type is INT.
+  //
+  if (ExceptionType == EXCEPT_LOONGARCH_INT) {
+    InternalPrintMessage (
+      "\n!!!! Unhandled interrupt Type - %02x(%a) !!!!\n",
+      GetInterruptType (SystemContext),
+      GetInterruptNameStr (GetInterruptType (SystemContext))
+      );
+  }
+
+  //
   // Dump TLB refill ERA and BADV
   //
   if (ExceptionType == (mExceptionKnownNameNum - 1)) {
