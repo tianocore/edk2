@@ -42,23 +42,23 @@ typedef enum {
   DoNothing
 } FDT_NODE_TYPE;
 
-#define MEMORY_ATTRIBUTE_DEFAULT  (EFI_RESOURCE_ATTRIBUTE_PRESENT                   | \
-                                     EFI_RESOURCE_ATTRIBUTE_INITIALIZED             | \
-                                     EFI_RESOURCE_ATTRIBUTE_TESTED                  | \
-                                     EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE             | \
-                                     EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE       | \
-                                     EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE | \
-                                     EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE    )
+#define MEMORY_ATTRIBUTE_DEFAULT  (EFI_RESOURCE_ATTRIBUTE_PRESENT | \
+                                   EFI_RESOURCE_ATTRIBUTE_INITIALIZED | \
+                                   EFI_RESOURCE_ATTRIBUTE_TESTED | \
+                                   EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE | \
+                                   EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE | \
+                                   EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE | \
+                                   EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE)
 
 #define ROOT_BRIDGE_SUPPORTS_DEFAULT  (EFI_PCI_IO_ATTRIBUTE_VGA_IO_16 | \
-                              EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16 | \
-                              EFI_PCI_IO_ATTRIBUTE_ISA_IO_16 | \
-                              EFI_PCI_IO_ATTRIBUTE_IDE_PRIMARY_IO | \
-                              EFI_PCI_IO_ATTRIBUTE_VGA_IO | \
-                              EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | \
-                              EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO | \
-                              EFI_PCI_IO_ATTRIBUTE_ISA_IO | \
-                              EFI_PCI_IO_ATTRIBUTE_ISA_MOTHERBOARD_IO )
+                                       EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO_16 | \
+                                       EFI_PCI_IO_ATTRIBUTE_ISA_IO_16 | \
+                                       EFI_PCI_IO_ATTRIBUTE_IDE_PRIMARY_IO | \
+                                       EFI_PCI_IO_ATTRIBUTE_VGA_IO | \
+                                       EFI_PCI_IO_ATTRIBUTE_VGA_MEMORY | \
+                                       EFI_PCI_IO_ATTRIBUTE_VGA_PALETTE_IO | \
+                                       EFI_PCI_IO_ATTRIBUTE_ISA_IO | \
+                                       EFI_PCI_IO_ATTRIBUTE_ISA_MOTHERBOARD_IO)
 
 extern VOID                         *mHobList;
 UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *mPciRootBridgeInfo = NULL;
@@ -69,7 +69,7 @@ UPL_PCI_SEGMENT_INFO_HOB            *mUplPciSegmentInfoHob;
 /**
   Build a Handoff Information Table HOB
 
-  This function initialize a HOB region from EfiMemoryBegin to
+  This function initializes a HOB region from EfiMemoryBegin to
   EfiMemoryTop. And EfiFreeMemoryBottom and EfiFreeMemoryTop should
   be inside the HOB region.
 
@@ -93,7 +93,7 @@ HobConstructor (
 /**
   It will record the memory node initialized.
 
-  @param[in]  Node           memory node is going to parsing..
+  @param[in]  Node           memory node is going to parsing.
 **/
 VOID
 RecordMemoryNode (
@@ -108,10 +108,10 @@ RecordMemoryNode (
 /**
   Check the memory node if initialized.
 
-  @param[in]  Node           memory node is going to parsing..
+  @param[in]  Node           memory node is going to parsing.
 
   @return TRUE               memory node was initialized. don't parse it again.
-  @return FALSE              memory node wasn't initialized , go to parse it.
+  @return FALSE              memory node wasn't initialized, go to parse it.
 **/
 BOOLEAN
 CheckMemoryNodeIfInit (
@@ -133,7 +133,7 @@ CheckMemoryNodeIfInit (
   It will check device node from FDT.
 
   @param[in]  NodeString        Device node name string.
-  @param[in]  Depth             Check layer of Device node , only parse the 1st layer
+  @param[in]  Depth             Check layer of Device node, only parse the 1st layer
 
   @return FDT_NODE_TYPE         what type of the device node.
 **/
@@ -144,15 +144,15 @@ CheckNodeType (
   )
 {
   DEBUG ((DEBUG_INFO, "\n CheckNodeType  %a   \n", NodeString));
-  if (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0 ) {
+  if (AsciiStrnCmp (NodeString, "serial@", AsciiStrLen ("serial@")) == 0) {
     return SerialPort;
-  } else if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0 ) {
+  } else if (AsciiStrnCmp (NodeString, "reserved-memory", AsciiStrLen ("reserved-memory")) == 0) {
     return ReservedMemory;
-  } else if (AsciiStrnCmp (NodeString, "memory@", AsciiStrLen ("memory@")) == 0 ) {
+  } else if (AsciiStrnCmp (NodeString, "memory@", AsciiStrLen ("memory@")) == 0) {
     return Memory;
   } else if (AsciiStrnCmp (NodeString, "framebuffer@", AsciiStrLen ("framebuffer@")) == 0) {
     return FrameBuffer;
-  } else if (AsciiStrnCmp (NodeString, "pci-rb", AsciiStrLen ("pci-rb")) == 0 ) {
+  } else if (AsciiStrnCmp (NodeString, "pci-rb", AsciiStrLen ("pci-rb")) == 0) {
     return PciRootBridge;
   } else if (AsciiStrCmp (NodeString, "options") == 0) {
     return Options;
@@ -571,9 +571,9 @@ ParsegraphicNode (
 **/
 VOID
 ParseSerialPort (
-  IN VOID     *Fdt,
-  IN INT32    SubNode,
-  IN UINT32   AddressCells
+  IN VOID    *Fdt,
+  IN INT32   SubNode,
+  IN UINT32  AddressCells
   )
 {
   UNIVERSAL_PAYLOAD_SERIAL_PORT_INFO  *Serial;
@@ -599,14 +599,14 @@ ParseSerialPort (
   PropertyPtr = FdtGetProperty (Fdt, SubNode, "current-speed", &TempLen);
   ASSERT (TempLen > 0);
   if (TempLen > 0) {
-    Data32 = (UINT32 *)(PropertyPtr->Data);
+    Data32           = (UINT32 *)(PropertyPtr->Data);
     Serial->BaudRate = Fdt32ToCpu (*Data32);
   }
 
   PropertyPtr = FdtGetProperty (Fdt, SubNode, "reg-shift", &TempLen);
   if (TempLen > 0) {
-    Data32 = (UINT32 *)(PropertyPtr->Data);
-    Serial->RegisterStride = (UINT8) (1 << Fdt32ToCpu (*Data32));
+    Data32                 = (UINT32 *)(PropertyPtr->Data);
+    Serial->RegisterStride = (UINT8)(1 << Fdt32ToCpu (*Data32));
   }
 
   PropertyPtr = FdtGetProperty (Fdt, SubNode, "reg", &TempLen);
@@ -620,6 +620,7 @@ ParseSerialPort (
         if (Value32 < SIZE_64KB) {
           Serial->UseMmio = FALSE;
         }
+
         break;
       case 2:
         Serial->RegisterBase = Fdt32ToCpu (Data32[1]);
@@ -629,12 +630,14 @@ ParseSerialPort (
         } else {
           Serial->RegisterBase |= LShiftU64 (Value32, 32);
         }
+
         break;
       case 3:
         // First U32 format: npt000ss bbbbbbbb dddddfff rrrrrrrr
         if ((Value32 & 0x03000000) == 0x01000000) {
           Serial->UseMmio = FALSE;
         }
+
         Serial->RegisterBase = LShiftU64 ((UINT64)Fdt32ToCpu (Data32[1]), 32) | Fdt32ToCpu (Data32[2]);
         break;
       default:
@@ -642,6 +645,7 @@ ParseSerialPort (
         break;
     }
   }
+
   DEBUG ((DEBUG_INFO, "Serial->UseMmio        = %x\n", Serial->UseMmio));
   DEBUG ((DEBUG_INFO, "Serial->RegisterBase   = 0x%x\n", Serial->RegisterBase));
   DEBUG ((DEBUG_INFO, "Serial->BaudRate       = %d\n", Serial->BaudRate));
@@ -716,7 +720,7 @@ ParsePciRootBridge (
   }
 
   AddressCells = 3;
-  PropertyPtr = FdtGetProperty (Fdt, Node, "#address-cells", &TempLen);
+  PropertyPtr  = FdtGetProperty (Fdt, Node, "#address-cells", &TempLen);
   if ((PropertyPtr != NULL) && (TempLen > 0)) {
     AddressCells = Fdt32ToCpu (*(UINT32 *)PropertyPtr->Data);
   }
@@ -750,7 +754,7 @@ ParsePciRootBridge (
     TempStr     = FdtGetString (Fdt, Fdt32ToCpu (PropertyPtr->NameOffset), NULL);
 
     if (AsciiStrCmp (TempStr, "ranges") == 0) {
-      DEBUG ((DEBUG_INFO, "  Found ranges Property TempLen (%08X), limit %x\n", TempLen, TempLen/sizeof (UINT32)));
+      DEBUG ((DEBUG_INFO, "  Found ranges Property TempLen (%08X), limit %x\n", TempLen, TempLen / sizeof (UINT32)));
 
       mPciRootBridgeInfo->RootBridge[RbIndex].AllocationAttributes = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM | EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
       mPciRootBridgeInfo->RootBridge[RbIndex].Supports             = ROOT_BRIDGE_SUPPORTS_DEFAULT;
@@ -762,18 +766,18 @@ ParsePciRootBridge (
       mPciRootBridgeInfo->RootBridge[RbIndex].HID                  = EISA_PNP_ID (0x0A03);
 
       Data32 = (UINT32 *)(PropertyPtr->Data);
-      for (Base = 0; Base < TempLen/sizeof (UINT32); Base = Base + DWORDS_TO_NEXT_ADDR_TYPE) {
+      for (Base = 0; Base < TempLen / sizeof (UINT32); Base = Base + DWORDS_TO_NEXT_ADDR_TYPE) {
         DEBUG ((DEBUG_INFO, "  Base :%x \n", Base));
         MemType = Fdt32ToCpu (*(Data32 + Base));
         if (((MemType) & (SS_64BIT_MEMORY_SPACE)) == SS_64BIT_MEMORY_SPACE) {
           mPciRootBridgeInfo->RootBridge[RbIndex].MemAbove4G.Base  = Fdt32ToCpu (*(Data32 + Base + 2)) + LShiftU64 (Fdt32ToCpu (*(Data32 + Base + 1)), 32);
-          mPciRootBridgeInfo->RootBridge[RbIndex].MemAbove4G.Limit = mPciRootBridgeInfo->RootBridge[RbIndex].MemAbove4G.Base + LShiftU64 (Fdt32ToCpu (*(Data32 + Base + 5)), 32) +  Fdt32ToCpu (*(Data32 + Base + 6)) -1;
+          mPciRootBridgeInfo->RootBridge[RbIndex].MemAbove4G.Limit = mPciRootBridgeInfo->RootBridge[RbIndex].MemAbove4G.Base + LShiftU64 (Fdt32ToCpu (*(Data32 + Base + 5)), 32) + Fdt32ToCpu (*(Data32 + Base + 6)) - 1;
         } else if (((MemType) & (SS_32BIT_MEMORY_SPACE)) == SS_32BIT_MEMORY_SPACE) {
           mPciRootBridgeInfo->RootBridge[RbIndex].Mem.Base  = Fdt32ToCpu (*(Data32 + Base + 2));
-          mPciRootBridgeInfo->RootBridge[RbIndex].Mem.Limit = mPciRootBridgeInfo->RootBridge[RbIndex].Mem.Base + Fdt32ToCpu (*(Data32 + Base + 6)) -1;
+          mPciRootBridgeInfo->RootBridge[RbIndex].Mem.Limit = mPciRootBridgeInfo->RootBridge[RbIndex].Mem.Base + Fdt32ToCpu (*(Data32 + Base + 6)) - 1;
         } else if (((MemType) & (SS_IO_SPACE)) == SS_IO_SPACE) {
           mPciRootBridgeInfo->RootBridge[RbIndex].Io.Base  = Fdt32ToCpu (*(Data32 + Base + 2));
-          mPciRootBridgeInfo->RootBridge[RbIndex].Io.Limit = mPciRootBridgeInfo->RootBridge[RbIndex].Io.Base + Fdt32ToCpu (*(Data32 +  Base + 6)) -1;
+          mPciRootBridgeInfo->RootBridge[RbIndex].Io.Limit = mPciRootBridgeInfo->RootBridge[RbIndex].Io.Base + Fdt32ToCpu (*(Data32 + Base + 6)) - 1;
         }
       }
 
@@ -869,9 +873,9 @@ ParseDtb (
   index             = 0;
   // TODO: This value comes from FDT. Currently there is a bug in implementation
   // which assumes node ordering. Which requires a fix.
-  PciEnumDone = 1;
-  BootMode    = 0;
-  NodeType    = 0;
+  PciEnumDone      = 1;
+  BootMode         = 0;
+  NodeType         = 0;
   RootAddressCells = 2;
 
   DEBUG ((DEBUG_INFO, "FDT = 0x%x  %x\n", Fdt, Fdt32ToCpu (*((UINT32 *)Fdt))));
@@ -909,7 +913,7 @@ ParseDtb (
               DEBUG ((DEBUG_INFO, "FreeMemoryBottom :0x%llx\n", FreeMemoryBottom));
               DEBUG ((DEBUG_INFO, "FreeMemoryTop :0x%llx\n", FreeMemoryTop));
               DEBUG ((DEBUG_INFO, "MemoryTop :0x%llx\n", MemoryTop));
-              mHobList         =  HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
+              mHobList         = HobConstructor ((VOID *)(UINTN)MemoryBottom, (VOID *)(UINTN)MemoryTop, (VOID *)(UINTN)FreeMemoryBottom, (VOID *)(UINTN)FreeMemoryTop);
               IsHobConstructed = TRUE;
               NewHobList       = (UINTN)mHobList;
               break;
@@ -917,8 +921,7 @@ ParseDtb (
           }
         }
       }
-    } // end of memory node
-    else {
+    } else {
       PropertyPtr = FdtGetProperty (Fdt, Node, "compatible", &TempLen);
       if (PropertyPtr == NULL) {
         continue;
@@ -1037,9 +1040,10 @@ ParseDtb (
 
 /**
   It will Parse FDT -node based on information from bootloaders.
-  @param[in]  FdtBase   The starting memory address of FdtBase
-  @retval HobList   The base address of Hoblist.
 
+  @param[in]  FdtBase   The starting memory address of FdtBase
+
+  @retval HobList   The base address of Hoblist.
 **/
 UINTN
 EFIAPI
@@ -1068,7 +1072,7 @@ UplInitHob (
 
   NHobAddress = 0;
   //
-  // Check parameter type(
+  // Check parameter type
   //
   if (FdtCheckHeader (FdtBase) == 0) {
     DEBUG ((DEBUG_INFO, "%a() FDT blob\n", __func__));
