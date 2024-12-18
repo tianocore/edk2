@@ -9,11 +9,6 @@
 
 #include "StandaloneMmCore.h"
 
-EFI_STATUS
-MmDispatcher (
-  VOID
-  );
-
 //
 // Globals used to initialize the protocol
 //
@@ -83,10 +78,9 @@ MM_CORE_MMI_HANDLERS  mMmCoreMmiHandlers[] = {
   { NULL,                     NULL,                              NULL, FALSE },
 };
 
-BOOLEAN                     mMmEntryPointRegistered = FALSE;
-MM_COMM_BUFFER              *mMmCommunicationBuffer;
-VOID                        *mInternalCommBufferCopy;
-EFI_FIRMWARE_VOLUME_HEADER  *mBfv = NULL;
+BOOLEAN         mMmEntryPointRegistered = FALSE;
+MM_COMM_BUFFER  *mMmCommunicationBuffer;
+VOID            *mInternalCommBufferCopy;
 
 /**
   Place holder function until all the MM System Table Service are available.
@@ -802,7 +796,6 @@ StandaloneMmMain (
   EFI_MMRAM_HOB_DESCRIPTOR_BLOCK  *MmramRangesHobData;
   EFI_MMRAM_DESCRIPTOR            *MmramRanges;
   UINTN                           MmramRangeCount;
-  EFI_HOB_FIRMWARE_VOLUME         *BfvHob;
 
   ProcessLibraryConstructorList (HobStart, &gMmCoreMmst);
 
@@ -868,30 +861,14 @@ StandaloneMmMain (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Get Boot Firmware Volume address from the BFV Hob
+  // Dispatch Standalone FVs
   //
-  BfvHob = GetFirstHob (EFI_HOB_TYPE_FV);
-  if (BfvHob != NULL) {
-    DEBUG ((DEBUG_INFO, "BFV address - 0x%x\n", BfvHob->BaseAddress));
-    DEBUG ((DEBUG_INFO, "BFV size    - 0x%x\n", BfvHob->Length));
+  MmDispatchFvs ();
+  if (!FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
     //
-    // Dispatch standalone BFV
+    // Free shadowed standalone FVs
     //
-    if (BfvHob->BaseAddress != 0) {
-      //
-      // Shadow standalone BFV into MMRAM
-      //
-      mBfv = AllocatePool (BfvHob->Length);
-      if (mBfv != NULL) {
-        CopyMem ((VOID *)mBfv, (VOID *)(UINTN)BfvHob->BaseAddress, BfvHob->Length);
-        DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", mBfv));
-        MmCoreFfsFindMmDriver (mBfv, 0);
-        MmDispatcher ();
-        if (!FeaturePcdGet (PcdRestartMmDispatcherOnceMmEntryRegistered)) {
-          FreePool (mBfv);
-        }
-      }
-    }
+    MmFreeShadowedFvs ();
   }
 
   //
