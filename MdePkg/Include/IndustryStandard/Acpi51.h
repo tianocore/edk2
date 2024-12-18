@@ -1824,6 +1824,19 @@ typedef struct {
 } EFI_ACPI_5_1_EINJ_TRIGGER_ACTION_TABLE;
 
 ///
+/// Windows ACPI Emulated devices Table
+///
+typedef struct {
+  EFI_ACPI_DESCRIPTION_HEADER    Header;
+  ///
+  /// Container of a bitmask of Windows behavior that this system requires
+  /// Bit 0 - RTC good
+  /// Bit 1 - ACPI PM timer good
+  ///
+  UINT32                         EmulatedDeviceFlags;
+} EFI_ACPI_5_1_WAET_TABLE;
+
+///
 /// Platform Communications Channel Table (PCCT)
 ///
 typedef struct {
