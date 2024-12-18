@@ -115,23 +115,22 @@ CommonExceptionHandler (
     // Interrupt
     //
     InterruptType = GetInterruptType (SystemContext);
-    if (InterruptType == 0xFF) {
-      ExceptionType = InterruptType;
-    } else {
+    if (InterruptType != 0xFF) {
       if ((ExternalInterruptHandler != NULL) && (ExternalInterruptHandler[InterruptType] != NULL)) {
         ExternalInterruptHandler[InterruptType](InterruptType, SystemContext);
         return;
       }
     }
-  } else if (ExceptionType == EXCEPT_LOONGARCH_FPD) {
-    EnableFloatingPointUnits ();
-    InitializeFloatingPointUnits ();
-    return;
   } else {
     //
     // Exception
     //
-    ExceptionType >>= CSR_ESTAT_EXC_SHIFT;
+    if (ExceptionType == EXCEPT_LOONGARCH_FPD) {
+      EnableFloatingPointUnits ();
+      InitializeFloatingPointUnits ();
+      return;
+    }
+
     if ((ExceptionHandler != NULL) && (ExceptionHandler[ExceptionType] != NULL)) {
       ExceptionHandler[ExceptionType](ExceptionType, SystemContext);
       return;
