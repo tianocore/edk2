@@ -33,6 +33,7 @@
 
 [LibraryClasses]
   ArmLib
+  ArmFfaLib
   ArmSmcLib
   BaseMemoryLib
   DebugLib
