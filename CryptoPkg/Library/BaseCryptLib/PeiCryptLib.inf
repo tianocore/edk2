@@ -71,6 +71,7 @@
   SysCall/CrtWrapper.c
   SysCall/ConstantTimeClock.c
   SysCall/BaseMemAllocation.c
+  SysCall/CrtUtils.c
 
 [Packages]
   MdePkg/MdePkg.dec
