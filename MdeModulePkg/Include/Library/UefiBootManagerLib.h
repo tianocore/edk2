@@ -439,6 +439,11 @@ EfiBootManagerGetBootManagerMenu (
   EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption
   );
 
+BOOLEAN
+BmIsBootManagerMenuFilePath (
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  );
+
 /**
   Get the next possible full path pointing to the load option.
   The routine doesn't guarantee the returned full path points to an existing

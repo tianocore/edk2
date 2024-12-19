@@ -2,7 +2,7 @@
 
 Some aspects of OVMF can be configured from the host, mostly by adding
 firmware config files using the qemu command line option `-fw_cfg`.
-The official namespace prefix for edk2 is `opt/org.tianocode/` which
+The official namespace prefix for edk2 is `opt/org.tianocore/` which
 is used by most options.  Some options are elsewhere for historical
 reasons.
 
@@ -33,6 +33,16 @@ virt-fw-sigdb -o mycerts.esl \
   --add-cert ${GUID} /etc/pki/tls/certs/${server2}.crt
 qemu-system-x86_64 \
   -fw_cfg name=etc/edk2/https/cacerts,file=mycerts.esl
+```
+
+
+## Firmware Config: opt/org.tianocore/FirmwareSetupSupport
+
+As the name suggests, this enables/disables Firmware setup support.  Default:
+enabled.  Usage:
+
+```
+qemu-system-x86_64 -fw_cfg name=opt/org.tianocore/FirmwareSetupSupport,string=no
 ```
 
 
@@ -113,6 +123,16 @@ a workaround for a bug in shim version 15.6.  Usage:
 
 ```
 qemu-system-x86_64 -fw_cfg name=opt/org.tianocore/UninstallMemAttrProtocol,string=yes
+```
+
+
+## Shell: opt/org.tianocore/EFIShellSupport
+
+This enables/disables the EFI shell.
+Default: enabled.  Usage:
+
+```
+qemu-system-x86_64 -fw_cfg name=opt/org.tianocore/EFIShellSupport,string=no
 ```
 
 

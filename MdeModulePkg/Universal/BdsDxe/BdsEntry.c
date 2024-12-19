@@ -987,9 +987,13 @@ BdsEntry (
   DEBUG_CODE_END ();
 
   //
-  // BootManagerMenu doesn't contain the correct information when return status is EFI_NOT_FOUND.
+  // Disable BootManagerMenu boot if PcdBootMenuEnabled is set to FALSE.
   //
-  BootManagerMenuStatus = EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
+  if (!PcdGetBool (PcdBootMenuEnabled)) {
+    BootManagerMenuStatus = EFI_NOT_FOUND;
+  } else {
+    BootManagerMenuStatus = EfiBootManagerGetBootManagerMenu (&BootManagerMenu);
+  }
 
   BootFwUi         = (BOOLEAN)((OsIndication & EFI_OS_INDICATIONS_BOOT_TO_FW_UI) != 0);
   PlatformRecovery = (BOOLEAN)((OsIndication & EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY) != 0);
