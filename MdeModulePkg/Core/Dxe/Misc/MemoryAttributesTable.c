@@ -181,10 +181,10 @@ InstallMemoryAttributesTable (
   //
   MemoryAttributesTable = AllocatePool (sizeof (EFI_MEMORY_ATTRIBUTES_TABLE) + DescriptorSize * RuntimeEntryCount);
   ASSERT (MemoryAttributesTable != NULL);
-  MemoryAttributesTable->Version         = EFI_MEMORY_ATTRIBUTES_TABLE_VERSION;
+  MemoryAttributesTable->Version         = PcdGet32 (PcdMemoryAttributesTableVersion);
   MemoryAttributesTable->NumberOfEntries = RuntimeEntryCount;
   MemoryAttributesTable->DescriptorSize  = (UINT32)DescriptorSize;
-  if (gMemoryAttributesTableForwardCfi) {
+  if ((MemoryAttributesTable->Version > 0x01) && gMemoryAttributesTableForwardCfi) {
     MemoryAttributesTable->Flags = EFI_MEMORY_ATTRIBUTES_FLAGS_RT_FORWARD_CONTROL_FLOW_GUARD;
   } else {
     MemoryAttributesTable->Flags = 0;
