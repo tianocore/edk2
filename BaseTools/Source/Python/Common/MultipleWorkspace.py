@@ -34,7 +34,7 @@ class MultipleWorkspace(object):
     #
     @classmethod
     def convertPackagePath(cls, Ws, Path):
-        if str(os.path.normcase (Path)).startswith(Ws):
+        if str(os.path.normcase (os.path.normpath(Path))).startswith(os.path.normcase(os.path.normpath(Ws))):
             return os.path.join(Ws, os.path.relpath(Path, Ws))
         return Path
 
