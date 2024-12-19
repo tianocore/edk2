@@ -283,7 +283,7 @@ FfsProcessSection (
 {
   EFI_STATUS                Status;
   UINT32                    SectionLength;
-  UINT32                    ParsedLength;
+  UINTN                     ParsedLength;
   EFI_COMPRESSION_SECTION   *CompressionSection;
   EFI_COMPRESSION_SECTION2  *CompressionSection2;
   UINT32                    DstBufferSize;

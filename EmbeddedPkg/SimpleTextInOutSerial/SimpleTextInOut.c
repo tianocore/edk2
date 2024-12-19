@@ -504,6 +504,9 @@ OutputString (
 
   Size         = StrLen (String) + 1;
   OutputString = AllocatePool (Size);
+  if (OutputString == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   // If there is any non-ascii characters in String buffer then replace it with '?'
   // Eventually, UnicodeStrToAsciiStr API should be fixed.
