@@ -134,7 +134,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
             EdkLogger.error("GenFds", PARAMETER_INVALID, "WORKSPACE is invalid",
                             ExtraData="Please use '-w' switch to pass it or set the WORKSPACE environment variable.")
         else:
-            Workspace = os.path.normcase(FdsCommandDict.get("Workspace",os.environ.get('WORKSPACE')))
+            Workspace = os.path.normpath(FdsCommandDict.get("Workspace",os.environ.get('WORKSPACE')))
             GenFdsGlobalVariable.WorkSpaceDir = Workspace
             if FdsCommandDict.get("debug"):
                 GenFdsGlobalVariable.VerboseLogger("Using Workspace:" + Workspace)
@@ -200,7 +200,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
                 ConfDirectoryPath = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, ConfDirectoryPath)
         else:
             if "CONF_PATH" in os.environ:
-                ConfDirectoryPath = os.path.normcase(os.environ["CONF_PATH"])
+                ConfDirectoryPath = os.path.normpath(os.environ["CONF_PATH"])
             else:
                 # Get standard WORKSPACE/Conf, use the absolute path to the WORKSPACE/Conf
                 ConfDirectoryPath = mws.join(GenFdsGlobalVariable.WorkSpaceDir, 'Conf')
