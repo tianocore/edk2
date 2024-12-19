@@ -1,5 +1,6 @@
 /** @file
-  This library is TPM2 DTPM device lib.
+  This library is a TPM2 DTPM instance, supporting SVSM based vTPMs and regular
+  TPM2s at the same time.
   Choosing this library means platform uses and only uses DTPM device as TPM2 engine.
 
 Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
@@ -8,13 +9,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 
 #include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
-#include <Library/PcdLib.h>
 
-#include "Tpm2Ptp.h"
 #include "Tpm2DeviceLibDTpm.h"
+#include "Tpm2PtpSvsmShim.h"
 
 /**
   This service enables the sending of commands to the TPM2.
@@ -37,7 +36,7 @@ Tpm2SubmitCommand (
   IN UINT8       *OutputParameterBlock
   )
 {
-  return DTpm2SubmitCommand (
+  return SvsmDTpm2SubmitCommand (
            InputParameterBlockSize,
            InputParameterBlock,
            OutputParameterBlockSize,
@@ -58,7 +57,7 @@ Tpm2RequestUseTpm (
   VOID
   )
 {
-  return DTpm2RequestUseTpm ();
+  return SvsmDTpm2RequestUseTpm ();
 }
 
 /**
@@ -86,9 +85,14 @@ Tpm2RegisterTpm2DeviceLib (
 **/
 EFI_STATUS
 EFIAPI
-Tpm2DeviceLibConstructor (
+Tpm2DeviceLibConstructorSvsm (
   VOID
   )
 {
-  return InternalTpm2DeviceLibDTpmCommonConstructor ();
+  if (TryUseSvsmVTpm ()) {
+    DEBUG ((DEBUG_INFO, "Tpm2DeviceLib: Found SVSM vTPM\n"));
+    return EFI_SUCCESS;
+  } else {
+    return InternalTpm2DeviceLibDTpmCommonConstructor ();
+  }
 }
