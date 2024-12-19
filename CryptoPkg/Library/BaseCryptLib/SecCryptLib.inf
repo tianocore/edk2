@@ -60,6 +60,7 @@
   SysCall/CrtWrapper.c
   SysCall/ConstantTimeClock.c
   SysCall/BaseMemAllocation.c
+  SysCall/CrtUtils.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -73,6 +74,7 @@
   OpensslLib
   IntrinsicLib
   PrintLib
+  SafeIntLib
 
 #
 # Remove these [BuildOptions] after this library is cleaned up
