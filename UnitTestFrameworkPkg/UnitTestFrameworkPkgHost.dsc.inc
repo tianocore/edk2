@@ -31,6 +31,7 @@
 
 [BuildOptions]
   MSFT:*_*_*_CC_FLAGS = /MTd
+  MSFT:*_VS2022_*_SLINK_FLAGS = /LTCG:OFF
   GCC:*_*_*_CC_FLAGS = -fno-pie
 !if $(UNIT_TESTING_ADDRESS_SANITIZER_ENABLE)
   #
@@ -38,7 +39,6 @@
   #
   MSFT:*_VS2019_*_CC_FLAGS = /fsanitize=address
   MSFT:*_VS2022_*_CC_FLAGS = /fsanitize=address
-  MSFT:*_VS2022_*_SLINK_FLAGS = /LTCG:OFF
   GCC:*_*_*_CC_FLAGS = -fsanitize=address
 !endif
 !ifdef $(UNIT_TESTING_DEBUG)
