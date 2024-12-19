@@ -16,8 +16,8 @@ extern "C" {
   #include <Protocol/MpService.h>
 }
 
-struct MockMpService {
-  MOCK_INTERFACE_DECLARATION (MockMpService);
+struct MockEfiMpServicesProtocol {
+  MOCK_INTERFACE_DECLARATION (MockEfiMpServicesProtocol);
 
   MOCK_FUNCTION_DECLARATION (
     EFI_STATUS,
@@ -98,27 +98,24 @@ struct MockMpService {
     );
 };
 
-MOCK_INTERFACE_DEFINITION (MockMpService);
-MOCK_FUNCTION_DEFINITION (MockMpService, GetNumberOfProcessors, 3, EFIAPI);
-MOCK_FUNCTION_DEFINITION (MockMpService, GetProcessorInfo, 3, EFIAPI);
-MOCK_FUNCTION_DEFINITION (MockMpService, StartupAllAPs, 7, EFIAPI);
-MOCK_FUNCTION_DEFINITION (MockMpService, StartupThisAP, 7, EFIAPI);
-MOCK_FUNCTION_DEFINITION (MockMpService, SwitchBSP, 3, EFIAPI);
-MOCK_FUNCTION_DEFINITION (MockMpService, EnableDisableAP, 4, EFIAPI);
-MOCK_FUNCTION_DEFINITION (MockMpService, WhoAmI, 2, EFIAPI);
+MOCK_INTERFACE_DEFINITION (MockEfiMpServicesProtocol);
+MOCK_FUNCTION_DEFINITION (MockEfiMpServicesProtocol, GetNumberOfProcessors, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiMpServicesProtocol, GetProcessorInfo, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiMpServicesProtocol, StartupAllAPs, 7, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiMpServicesProtocol, StartupThisAP, 7, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiMpServicesProtocol, SwitchBSP, 3, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiMpServicesProtocol, EnableDisableAP, 4, EFIAPI);
+MOCK_FUNCTION_DEFINITION (MockEfiMpServicesProtocol, WhoAmI, 2, EFIAPI);
 
-static EFI_MP_SERVICES_PROTOCOL  MP_SERVICE_PROTOCOL_INSTANCE = {
-  GetNumberOfProcessors,
-  GetProcessorInfo,
-  StartupAllAPs,
-  StartupThisAP,
-  SwitchBSP,
-  EnableDisableAP,
-  WhoAmI
-};
-
-extern "C" {
-  EFI_MP_SERVICES_PROTOCOL  *gMpServiceProtocol = &MP_SERVICE_PROTOCOL_INSTANCE;
-}
+#define MOCK_EFI_MP_SERVICES_PROTOCOL_INSTANCE(NAME)  \
+  EFI_MP_SERVICES_PROTOCOL NAME##_INSTANCE = {        \
+    GetNumberOfProcessors,                            \
+    GetProcessorInfo,                                 \
+    StartupAllAPs,                                    \
+    StartupThisAP,                                    \
+    SwitchBSP,                                        \
+    EnableDisableAP,                                  \
+    WhoAmI };                                         \
+  EFI_MP_SERVICES_PROTOCOL  *NAME = &NAME##_INSTANCE;
 
 #endif // MOCK_MP_SERVICE_H_
