@@ -38,6 +38,7 @@
   #
   MSFT:*_VS2019_*_CC_FLAGS = /fsanitize=address
   MSFT:*_VS2022_*_CC_FLAGS = /fsanitize=address
+  MSFT:*_VS2022_*_SLINK_FLAGS = /LTCG:OFF
   GCC:*_*_*_CC_FLAGS = -fsanitize=address
 !endif
 !ifdef $(UNIT_TESTING_DEBUG)
