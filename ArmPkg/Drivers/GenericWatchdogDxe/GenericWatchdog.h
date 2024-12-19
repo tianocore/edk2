@@ -14,15 +14,15 @@
 #define GENERIC_WATCHDOG_H_
 
 // Refresh Frame:
-#define GENERIC_WDOG_REFRESH_REG  ((UINTN)FixedPcdGet64 (PcdGenericWatchdogRefreshBase) + 0x000)
+#define GENERIC_WDOG_REFRESH_REG  ((UINTN)PcdGet64 (PcdGenericWatchdogRefreshBase) + 0x000)
 
 // Control Frame:
-#define GENERIC_WDOG_CONTROL_STATUS_REG      ((UINTN)FixedPcdGet64 (PcdGenericWatchdogControlBase) + 0x000)
-#define GENERIC_WDOG_OFFSET_REG_LOW          ((UINTN)FixedPcdGet64 (PcdGenericWatchdogControlBase) + 0x008)
-#define GENERIC_WDOG_OFFSET_REG_HIGH         ((UINTN)FixedPcdGet64 (PcdGenericWatchdogControlBase) + 0x00C)
-#define GENERIC_WDOG_COMPARE_VALUE_REG_LOW   ((UINTN)FixedPcdGet64 (PcdGenericWatchdogControlBase) + 0x010)
-#define GENERIC_WDOG_COMPARE_VALUE_REG_HIGH  ((UINTN)FixedPcdGet64 (PcdGenericWatchdogControlBase) + 0x014)
-#define GENERIC_WDOG_IID_REG                 ((UINTN)FixedPcdGet64 (PcdGenericWatchdogControlBase) + 0xFCC)
+#define GENERIC_WDOG_CONTROL_STATUS_REG      ((UINTN)PcdGet64 (PcdGenericWatchdogControlBase) + 0x000)
+#define GENERIC_WDOG_OFFSET_REG_LOW          ((UINTN)PcdGet64 (PcdGenericWatchdogControlBase) + 0x008)
+#define GENERIC_WDOG_OFFSET_REG_HIGH         ((UINTN)PcdGet64 (PcdGenericWatchdogControlBase) + 0x00C)
+#define GENERIC_WDOG_COMPARE_VALUE_REG_LOW   ((UINTN)PcdGet64 (PcdGenericWatchdogControlBase) + 0x010)
+#define GENERIC_WDOG_COMPARE_VALUE_REG_HIGH  ((UINTN)PcdGet64 (PcdGenericWatchdogControlBase) + 0x014)
+#define GENERIC_WDOG_IID_REG                 ((UINTN)PcdGet64 (PcdGenericWatchdogControlBase) + 0xFCC)
 
 // Values of bit 0 of the Control/Status Register
 #define GENERIC_WDOG_ENABLED   1
