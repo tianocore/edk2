@@ -111,10 +111,14 @@ CmockaUnitTestTeardownFunctionRunner (
   // stdout and stderr in their xml format
   //
   if (UnitTest->Log != NULL) {
-    print_message ("UnitTest: %s - %s\n", UnitTest->Name, UnitTest->Description);
-    print_message ("Log Output Start\n");
-    print_message ("%s", UnitTest->Log);
-    print_message ("Log Output End\n");
+    //
+    // UnitTest->Log can be a large buffer that is larger than what DEBUG()
+    // can support. Use printf() directly.
+    //
+    printf ("UnitTest: %s - %s\n", UnitTest->Name, UnitTest->Description);
+    printf ("Log Output Start\n");
+    printf (UnitTest->Log);
+    printf ("Log Output End\n");
   }
 
   //

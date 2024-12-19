@@ -66,7 +66,12 @@
             "UnitTestFrameworkPkg/Test/GoogleTest/Sample/SampleGoogleTestExpectFail/SampleGoogleTestHostExpectFail.inf",
             "UnitTestFrameworkPkg/Test/GoogleTest/Sample/SampleGoogleTestGenerateException/SampleGoogleTestHostGenerateException.inf",
             "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestExpectFail/SampleUnitTestHostExpectFail.inf",
-            "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestGenerateException/SampleUnitTestHostGenerateException.inf"
+            "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestGenerateException/SampleUnitTestHostGenerateException.inf",
+            "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestDoubleFree/SampleUnitTestDoubleFree.inf",
+            "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestBufferOverflow/SampleUnitTestBufferOverflow.inf",
+            "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestBufferUnderflow/SampleUnitTestBufferUnderflow.inf",
+            "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestNullAddress/SampleUnitTestNullAddress.inf",
+            "UnitTestFrameworkPkg/Test/UnitTest/Sample/SampleUnitTestInvalidAddress/SampleUnitTestInvalidAddress.inf"
         ],
         "DscPath": "Test/UnitTestFrameworkPkgHostTest.dsc"
     },
@@ -91,6 +96,7 @@
             "Library/SubhookLib/subhook/**/*.*"  # not going to spell check a submodule
         ],
         "ExtendWords": [             # words to extend to the dictionary for this package
+            "noreplace",
             "Pointee",
             "gmock",
             "GMOCK",
