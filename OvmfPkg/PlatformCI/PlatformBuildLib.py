@@ -207,6 +207,9 @@ class PlatformBuilder( UefiBuilder, BuildSettingsManager):
         args += " -global isa-debugcon.iobase=0x402"                        # debug messages out thru virtual io port
         args += " -net none"                                                # turn off network
         args += " -smp 4"
+        args += " -cpu IvyBridge,+rdrand"                                   # IvyBridge is the first CPU that supported
+                                                                            # RDRAND, which is required for dynamic
+                                                                            # stack cookies
         args += f" -drive file=fat:rw:{VirtualDrive},format=raw,media=disk" # Mount disk with startup.nsh
         # Provides Rng services to the Guest VM
         args += " -device virtio-rng-pci"

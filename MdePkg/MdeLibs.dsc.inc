@@ -21,6 +21,7 @@
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
   MmUnblockMemoryLib|MdePkg/Library/MmUnblockMemoryLib/MmUnblockMemoryLibNull.inf
   StackCheckFailureHookLib|MdePkg/Library/StackCheckFailureHookLibNull/StackCheckFailureHookLibNull.inf
+  StackCheckEntryPointLib|MdePkg/Library/UefiDriverEntryPoint/UefiDriverStackCheckEntryPointLibNull.inf
 
 !ifndef CUSTOM_STACK_CHECK_LIB
   # If CUSTOM_STACK_CHECK_LIB is set, MdeLibs.dsc.inc will not link StackCheckLibNull and it is expected that the
@@ -28,6 +29,21 @@
   NULL|MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf
 
 !endif
+
+[LibraryClasses.common.PEI_CORE]
+  StackCheckEntryPointLib|MdePkg/Library/PeiCoreEntryPoint/PeiCoreStackCheckEntryPointLibNull.inf
+
+[LibraryClasses.common.DXE_CORE]
+  StackCheckEntryPointLib|MdePkg/Library/DxeCoreEntryPoint/DxeCoreStackCheckEntryPointLibNull.inf
+
+[LibraryClasses.common.PEIM]
+  StackCheckEntryPointLib|MdePkg/Library/PeimEntryPoint/PeimStackCheckEntryPointLibNull.inf
+
+[LibraryClasses.common.UEFI_APPLICATION]
+  StackCheckEntryPointLib|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationStackCheckEntryPointLibNull.inf
+
+[LibraryClasses.common.MM_STANDALONE]
+  StackCheckEntryPointLib|MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverStackCheckEntryPointLibNull.inf
 
 [LibraryClasses.ARM, LibraryClasses.AARCH64]
   #

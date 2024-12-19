@@ -1,0 +1,31 @@
+## @file
+# Module entry point library for UEFI Application that is not updating stack cookie dynamically.
+#
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = UefiApplicationStackCheckEntryPointLibNull
+  FILE_GUID                      = A4BDF444-9B07-41AD-A541-8E1E6CEB27A9
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = StackCheckEntryPointLib|UEFI_APPLICATION
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
+#
+
+[Sources]
+  ApplicationStackCheckEntryPointLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseLib

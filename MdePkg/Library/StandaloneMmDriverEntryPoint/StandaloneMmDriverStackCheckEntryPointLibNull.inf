@@ -1,5 +1,5 @@
 ## @file
-# Module entry point library for Standalone MM driver.
+# Module entry point library for Standalone MM driver that does not update the stack cookie dynamically.
 #
 # Copyright (c) 2015 - 2021, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016-2018, ARM Ltd. All rights reserved.<BR>
@@ -12,13 +12,12 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001B
-  BASE_NAME                      = StandaloneMmDriverEntryPoint
-  MODULE_UNI_FILE                = StandaloneMmDriverEntryPoint.uni
-  FILE_GUID                      = 5ca126c0-b598-4f4b-abb9-b6e7d077aea9
+  BASE_NAME                      = StandaloneMmDriverStackCheckEntryPointLibNull
+  FILE_GUID                      = B01BEE08-F9EB-4269-B854-9AA4145A0BBD
   MODULE_TYPE                    = MM_STANDALONE
   VERSION_STRING                 = 1.0
   PI_SPECIFICATION_VERSION       = 0x00010032
-  LIBRARY_CLASS                  = StandaloneMmDriverEntryPoint|MM_STANDALONE
+  LIBRARY_CLASS                  = StackCheckEntryPointLib|MM_STANDALONE
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -27,7 +26,7 @@
 #
 
 [Sources]
-  StandaloneMmDriverEntryPoint.c
+  StandaloneMmDriverStackCheckEntryPointLibNull.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -35,8 +34,3 @@
 [LibraryClasses]
   BaseLib
   DebugLib
-  MmServicesTableLib
-  StackCheckEntryPointLib
-
-[Protocols]
-  gEfiLoadedImageProtocolGuid      ## SOMETIMES_CONSUMES

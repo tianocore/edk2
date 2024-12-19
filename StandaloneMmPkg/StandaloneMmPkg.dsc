@@ -81,6 +81,7 @@
 
 [LibraryClasses.common.MM_CORE_STANDALONE]
   HobLib|StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
+  StackCheckEntryPointLib|StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreStackCheckEntryPointLibNull.inf
 
 [LibraryClasses.common.MM_STANDALONE]
   MemoryAllocationLib|StandaloneMmPkg/Library/StandaloneMmMemoryAllocationLib/StandaloneMmMemoryAllocationLib.inf
@@ -129,6 +130,7 @@
   #
   StandaloneMmPkg/Core/StandaloneMmCore.inf
   StandaloneMmPkg/Library/FvLib/FvLib.inf
+  StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreStackCheckEntryPointLibNull.inf
   StandaloneMmPkg/Library/StandaloneMmCoreEntryPoint/StandaloneMmCoreEntryPoint.inf
   StandaloneMmPkg/Library/StandaloneMmCoreHobLib/StandaloneMmCoreHobLib.inf
   StandaloneMmPkg/Library/StandaloneMmCoreMemoryAllocationLib/StandaloneMmCoreMemoryAllocationLib.inf

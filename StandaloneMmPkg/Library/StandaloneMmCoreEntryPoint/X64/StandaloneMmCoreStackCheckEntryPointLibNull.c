@@ -1,5 +1,5 @@
 /** @file
-  Entry point to the Standalone Mm Core.
+  Entry point to the Standalone Mm Core that does not do any dynamic stack cookie updating.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) Microsoft Corporation.
@@ -13,10 +13,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 
-//
-// Cache copy of HobList pointer.
-//
-VOID  *gHobList = NULL;
+extern
+VOID
+EFIAPI
+_CModuleEntryPoint (
+  IN VOID  *HobStart
+  );
 
 /**
   The entry point of PE/COFF Image for the STANDALONE MM Core.
@@ -32,38 +34,12 @@ VOID  *gHobList = NULL;
 **/
 VOID
 EFIAPI
-_CModuleEntryPoint (
+_ModuleEntryPoint (
   IN VOID  *HobStart
   )
 {
-  //
-  // Cache a pointer to the HobList
-  //
-  gHobList = HobStart;
-
   //
   // Call the Standalone MM Core entry point
   //
-  ProcessModuleEntryPointList (HobStart);
-
-  //
-  // TODO: Set page table here?? AARCH64 has this step for some reason
-  //
-}
-
-/**
-  Required by the EBC compiler and identical in functionality to _ModuleEntryPoint().
-
-  This function is required to call _ModuleEntryPoint() passing in HobStart.
-
-  @param  HobStart  Pointer to the beginning of the HOB List passed in from the PEI Phase.
-
-**/
-VOID
-EFIAPI
-EfiMain (
-  IN VOID  *HobStart
-  )
-{
-  _ModuleEntryPoint (HobStart);
+  _CModuleEntryPoint (HobStart);
 }
