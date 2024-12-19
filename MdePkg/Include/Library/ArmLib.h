@@ -1,7 +1,7 @@
 /** @file
 
   Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  Copyright (c) 2011 - 2016, ARM Ltd. All rights reserved.<BR>
+  Copyright (c) 2011 - 2023, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2020 - 2021, NUVIA Inc. All rights reserved.<BR>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -767,6 +767,19 @@ ArmHasEte (
 BOOLEAN
 EFIAPI
 ArmHasSecurityExtensions (
+  VOID
+  );
+
+#else
+
+/** Checks if RME is implemented.
+
+   @retval TRUE  RME is implemented.
+   @retval FALSE RME is not implemented.
+**/
+BOOLEAN
+EFIAPI
+ArmHasRme (
   VOID
   );
 
