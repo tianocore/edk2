@@ -25,6 +25,27 @@ extern "C" {
   BASE_LIBRARY_JUMP_BUFFER  *gUnitTestExpectAssertFailureJumpBuffer = NULL;
 
   /**
+    LongJump wrapper for host-based unit test environments that is declared
+    NORETURN to avoid false positives from address sanitizer.
+
+    @param  JumpBuffer  A pointer to CPU context buffer.
+    @param  Value       The value to return when the SetJump() context is
+                        restored and must be non-zero.
+  **/
+  static
+  VOID
+  NORETURN
+  EFIAPI
+  HostLongJump (
+    IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
+    IN      UINTN                     Value
+    )
+  {
+    LongJump (JumpBuffer, Value);
+    UNREACHABLE ();
+  }
+
+  /**
     Unit test library replacement for DebugAssert() in DebugLib.
 
     If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
@@ -47,7 +68,8 @@ extern "C" {
 
     if (gUnitTestExpectAssertFailureJumpBuffer != NULL) {
       UT_LOG_INFO ("Detected expected ASSERT: %a(%d): %a\n", FileName, LineNumber, Description);
-      LongJump (gUnitTestExpectAssertFailureJumpBuffer, 1);
+      HostLongJump (gUnitTestExpectAssertFailureJumpBuffer, 1);
+      UNREACHABLE ();
     } else {
       if (GetActiveFrameworkHandle () != NULL) {
         AsciiStrCpyS (Message, sizeof (Message), "Detected unexpected ASSERT(");
