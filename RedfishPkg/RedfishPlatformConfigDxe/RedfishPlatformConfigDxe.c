@@ -1764,6 +1764,7 @@ RedfishPlatformConfigSetStatementCommon (
   UINTN                                      Index;
   UINT64                                     Value;
   CHAR8                                      **CharArray;
+  UINTN                                      StrLength;
 
   if ((RedfishPlatformConfigPrivate == NULL) || IS_EMPTY_STRING (Schema) || IS_EMPTY_STRING (ConfigureLang) || (StatementValue == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -1771,6 +1772,7 @@ RedfishPlatformConfigSetStatementCommon (
 
   TempBuffer  = NULL;
   StringArray = NULL;
+  StrLength   = 0;
 
   Status = ProcessPendingList (&RedfishPlatformConfigPrivate->FormsetList, &RedfishPlatformConfigPrivate->PendingList);
   if (EFI_ERROR (Status)) {
@@ -1840,12 +1842,27 @@ RedfishPlatformConfigSetStatementCommon (
       StatementValue->Buffer          = StringArray;
       StatementValue->BufferLen       = TargetStatement->HiiStatement->StorageWidth;
       StatementValue->BufferValueType = TargetStatement->HiiStatement->Value.BufferValueType;
-    } else if ((TargetStatement->HiiStatement->Operand == EFI_IFR_NUMERIC_OP) && (StatementValue->Type == EFI_IFR_TYPE_NUM_SIZE_64)) {
+    } else if (TargetStatement->HiiStatement->Operand == EFI_IFR_NUMERIC_OP) {
+      if (StatementValue->Type == EFI_IFR_TYPE_NUM_SIZE_64) {
+        //
+        // Redfish only has numeric value type and it does not care about the value size.
+        // Do a patch here so we have proper value size applied.
+        //
+        StatementValue->Type = TargetStatement->HiiStatement->Value.Type;
+      }
+
       //
-      // Redfish only has numeric value type and it does not care about the value size.
-      // Do a patch here so we have proper value size applied.
+      // Check maximum and minimum values when they are set.
       //
-      StatementValue->Type = TargetStatement->HiiStatement->Value.Type;
+      if ((TargetStatement->StatementData.NumMaximum > 0) && (TargetStatement->StatementData.NumMaximum >= TargetStatement->StatementData.NumMinimum)) {
+        if (StatementValue->Value.u64 > TargetStatement->StatementData.NumMaximum) {
+          DEBUG ((DEBUG_ERROR, "%a: integer value: %lu is greater than maximum value: %lu\n", __func__, StatementValue->Value.u64, TargetStatement->StatementData.NumMaximum));
+          return EFI_ACCESS_DENIED;
+        } else if (StatementValue->Value.u64 < TargetStatement->StatementData.NumMinimum) {
+          DEBUG ((DEBUG_ERROR, "%a: integer value: %lu is smaller than minimum value: %lu\n", __func__, StatementValue->Value.u64, TargetStatement->StatementData.NumMinimum));
+          return EFI_ACCESS_DENIED;
+        }
+      }
     } else {
       DEBUG ((DEBUG_ERROR, "%a: catch value type mismatch! input type: 0x%x but target value type: 0x%x\n", __func__, StatementValue->Type, TargetStatement->HiiStatement->Value.Type));
       ASSERT (FALSE);
@@ -1853,6 +1870,20 @@ RedfishPlatformConfigSetStatementCommon (
   }
 
   if ((TargetStatement->HiiStatement->Operand == EFI_IFR_STRING_OP) && (StatementValue->Type == EFI_IFR_TYPE_STRING)) {
+    //
+    // Check string length when length limitation is set.
+    //
+    if ((TargetStatement->StatementData.StrMaxSize > 0) && (TargetStatement->StatementData.StrMaxSize >= TargetStatement->StatementData.StrMinSize)) {
+      StrLength = StrLen ((EFI_STRING)StatementValue->Buffer);
+      if (StrLength > TargetStatement->StatementData.StrMaxSize) {
+        DEBUG ((DEBUG_ERROR, "%a: string length: %u is greater than maximum string length: %u\n", __func__, StrLength, TargetStatement->StatementData.StrMaxSize));
+        return EFI_ACCESS_DENIED;
+      } else if (StrLength < TargetStatement->StatementData.StrMinSize) {
+        DEBUG ((DEBUG_ERROR, "%a: string length: %u is smaller than minimum string length: %u\n", __func__, StrLength, TargetStatement->StatementData.StrMinSize));
+        return EFI_ACCESS_DENIED;
+      }
+    }
+
     //
     // Create string ID for new string.
     //
