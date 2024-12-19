@@ -769,9 +769,7 @@ MmDriverDispatchHandler (
   //
   // Free shadowed standalone BFV
   //
-  if (mBfv != NULL) {
-    FreePool (mBfv);
-  }
+  MmFreeShadowedBfv ();
 
   return EFI_SUCCESS;
 }

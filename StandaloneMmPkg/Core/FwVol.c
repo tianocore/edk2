@@ -11,6 +11,10 @@
 #include <Library/FvLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
 
+#define MAX_MM_BFV_COUNT  2
+
+EFI_FIRMWARE_VOLUME_HEADER  **mBfvList = NULL;
+
 EFI_STATUS
 MmAddToDriverList (
   IN EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader,
@@ -232,4 +236,82 @@ FreeDstBuffer:
   }
 
   return Status;
+}
+
+/**
+  Dispatch all Standalone BFVs.
+  The BFVs will be shadowed into MMRAM, caller is responsible for calling
+  MmFreeShadowedBfv() to free the shadowed BFVs.
+
+**/
+VOID
+MmDispatchAllBfv (
+  VOID
+  )
+{
+  UINTN                       Index;
+  EFI_PEI_HOB_POINTERS        BfvHob;
+  EFI_FIRMWARE_VOLUME_HEADER  *Bfv;
+
+  mBfvList = AllocateZeroPool (sizeof (EFI_FIRMWARE_VOLUME_HEADER *) * MAX_MM_BFV_COUNT);
+  if (mBfvList == NULL) {
+    DEBUG ((DEBUG_ERROR, "Fail to allocate memory for Bfv list\n"));
+    ASSERT (FALSE);
+    return;
+  }
+
+  Index      = 0;
+  BfvHob.Raw = GetHobList ();
+  while ((BfvHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, BfvHob.Raw)) != NULL) {
+    if (Index == MAX_MM_BFV_COUNT) {
+      DEBUG ((DEBUG_ERROR, "The number  of Fv Hobs exceed the max supported BFVs (%d) in StandaloneMmCore\n", MAX_MM_BFV_COUNT));
+      ASSERT (FALSE);
+      return;
+    }
+
+    DEBUG ((DEBUG_INFO, "BFV address - 0x%x\n", BfvHob.FirmwareVolume->BaseAddress));
+    DEBUG ((DEBUG_INFO, "BFV size    - 0x%x\n", BfvHob.FirmwareVolume->Length));
+    Bfv = AllocatePool (BfvHob.FirmwareVolume->Length);
+    if (Bfv == NULL) {
+      DEBUG ((DEBUG_ERROR, "Fail to allocate memory for Bfv\n"));
+      ASSERT (FALSE);
+      return;
+    }
+
+    CopyMem (
+      (VOID *)Bfv,
+      (VOID *)(UINTN)BfvHob.FirmwareVolume->BaseAddress,
+      BfvHob.FirmwareVolume->Length
+      );
+    DEBUG ((DEBUG_INFO, "Mm Dispatch StandaloneBfvAddress - 0x%08x\n", Bfv));
+    MmCoreFfsFindMmDriver (Bfv, 0);
+    mBfvList[Index++] = Bfv;
+
+    BfvHob.Raw = GET_NEXT_HOB (BfvHob);
+  }
+
+  if (Index == 0) {
+    DEBUG ((DEBUG_ERROR, "No BFV hob is found\n"));
+    return;
+  }
+
+  MmDispatcher ();
+}
+
+/**
+  Free the shadowed BFVs.
+
+**/
+VOID
+MmFreeShadowedBfv (
+  VOID
+  )
+{
+  UINTN  Index;
+
+  for (Index = 0; Index < MAX_MM_BFV_COUNT; Index++) {
+    if (mBfvList[Index] != NULL) {
+      FreePool (mBfvList[Index]);
+    }
+  }
 }
