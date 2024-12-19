@@ -71,6 +71,7 @@
   SysCall/CrtWrapper.c
   SysCall/ConstantTimeClock.c
   SysCall/BaseMemAllocation.c
+  SysCall/CrtUtils.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -87,6 +88,7 @@
   PeiServicesTablePointerLib
   PeiServicesLib
   SynchronizationLib
+  SafeIntLib
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid
