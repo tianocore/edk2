@@ -141,46 +141,34 @@ DelegatedEventLoop (
     DEBUG ((DEBUG_INFO, "X6 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg6));
     DEBUG ((DEBUG_INFO, "X7 :  0x%x\n", (UINT32)EventCompleteSvcArgs->Arg7));
 
-    //
-    // ARM TF passes SMC FID of the MM_COMMUNICATE interface as the Event ID upon
-    // receipt of a synchronous MM request. Use the Event ID to distinguish
-    // between synchronous and asynchronous events.
-    //
-    if ((ARM_SMC_ID_MM_COMMUNICATE != (UINT32)EventCompleteSvcArgs->Arg0) &&
-        (ARM_SVC_ID_FFA_MSG_SEND_DIRECT_REQ != (UINT32)EventCompleteSvcArgs->Arg0))
-    {
-      DEBUG ((DEBUG_ERROR, "UnRecognized Event - 0x%x\n", (UINT32)EventCompleteSvcArgs->Arg0));
-      Status = EFI_INVALID_PARAMETER;
+    FfaEnabled = FeaturePcdGet (PcdFfaEnable);
+    if (FfaEnabled) {
+      Status = CpuDriverEntryPoint (
+                 EventCompleteSvcArgs->Arg0,
+                 EventCompleteSvcArgs->Arg6,
+                 EventCompleteSvcArgs->Arg3
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "Failed delegated event 0x%x, Status 0x%x\n",
+          EventCompleteSvcArgs->Arg3,
+          Status
+          ));
+      }
     } else {
-      FfaEnabled = FeaturePcdGet (PcdFfaEnable);
-      if (FfaEnabled) {
-        Status = CpuDriverEntryPoint (
-                   EventCompleteSvcArgs->Arg0,
-                   EventCompleteSvcArgs->Arg6,
-                   EventCompleteSvcArgs->Arg3
-                   );
-        if (EFI_ERROR (Status)) {
-          DEBUG ((
-            DEBUG_ERROR,
-            "Failed delegated event 0x%x, Status 0x%x\n",
-            EventCompleteSvcArgs->Arg3,
-            Status
-            ));
-        }
-      } else {
-        Status = CpuDriverEntryPoint (
-                   EventCompleteSvcArgs->Arg0,
-                   EventCompleteSvcArgs->Arg3,
-                   EventCompleteSvcArgs->Arg1
-                   );
-        if (EFI_ERROR (Status)) {
-          DEBUG ((
-            DEBUG_ERROR,
-            "Failed delegated event 0x%x, Status 0x%x\n",
-            EventCompleteSvcArgs->Arg0,
-            Status
-            ));
-        }
+      Status = CpuDriverEntryPoint (
+                 EventCompleteSvcArgs->Arg0,
+                 EventCompleteSvcArgs->Arg3,
+                 EventCompleteSvcArgs->Arg1
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "Failed delegated event 0x%x, Status 0x%x\n",
+          EventCompleteSvcArgs->Arg0,
+          Status
+          ));
       }
     }
 
