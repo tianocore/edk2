@@ -43,8 +43,24 @@ CONST CHAR8  *mExceptionNameStr[]    = {
   "#GCXC - Guest CSR Software/Hardware Change exception",
   "#TBR - TLB refill exception" // !!! NOTICE: Because the TLB refill exception is not instructed in ECODE, so the TLB refill exception must be the last one!
 };
+CONST CHAR8  *mInterruptNameStr[] = {
+  "#SIP0 - Software interrupt 0",
+  "#SIP1 - Software interrupt 1",
+  "#IP0 - Hardware interrupt 0",
+  "#IP1 - Hardware interrupt 1",
+  "#IP2 - Hardware interrupt 2",
+  "#IP3 - Hardware interrupt 3",
+  "#IP4 - Hardware interrupt 4",
+  "#IP5 - Hardware interrupt 5",
+  "#IP6 - Hardware interrupt 6",
+  "#IP7 - Hardware interrupt 7",
+  "#PMC - Performance counter overflow interrupt",
+  "#TIMER - Timer interrupt",
+  "#IPI - Inter-Processor interrupt"
+};
 
 INTN  mExceptionKnownNameNum = (sizeof (mExceptionNameStr) / sizeof (CHAR8 *));
+INTN  mInterruptKnownNameNum = (sizeof (mInterruptNameStr) / sizeof (CHAR8 *));
 
 /**
   Get ASCII format string exception name by exception type.
@@ -61,6 +77,26 @@ GetExceptionNameStr (
 {
   if ((UINTN)ExceptionType < mExceptionKnownNameNum) {
     return mExceptionNameStr[ExceptionType];
+  } else {
+    return mExceptionReservedStr;
+  }
+}
+
+/**
+  Get ASCII format string interrupt name by exception type.
+
+  @param InterruptType  Interrupt type.
+
+  @return  ASCII format string interrupt name.
+
+**/
+CONST CHAR8 *
+GetInterruptNameStr (
+  IN EFI_EXCEPTION_TYPE  InterruptType
+  )
+{
+  if ((UINTN)InterruptType < mInterruptKnownNameNum) {
+    return mInterruptNameStr[InterruptType];
   } else {
     return mExceptionReservedStr;
   }
