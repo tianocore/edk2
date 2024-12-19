@@ -238,6 +238,10 @@ INF  OvmfPkg/MptScsiDxe/MptScsiDxe.inf
 INF  OvmfPkg/LsiScsiDxe/LsiScsiDxe.inf
 !endif
 
+!if $(SECURE_BOOT_ENABLE) == TRUE
+  INF  SecurityPkg/VariableAuthenticated/SecureBootConfigDxe/SecureBootConfigDxe.inf
+!endif
+
 INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
 INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
@@ -282,8 +286,12 @@ INF  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResour
 INF  FatPkg/EnhancedFatDxe/Fat.inf
 INF  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
 
-INF OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
+INF  OvmfPkg/AmdSev/SecretDxe/SecretDxe.inf
+!if $(SD_BOOT_ENABLE) == TRUE
+INF  OvmfPkg/SdBootDxe/SdBoot.inf
+!else
 INF  OvmfPkg/AmdSev/Grub/Grub.inf
+!endif
 
 INF MdeModulePkg/Logo/LogoDxe.inf
 

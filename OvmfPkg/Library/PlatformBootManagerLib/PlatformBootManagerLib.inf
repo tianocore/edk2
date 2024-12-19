@@ -87,3 +87,4 @@
   gRootBridgesConnectedEventGroupGuid
   gUefiShellFileGuid
   gGrubFileGuid
+  gSdBootFileGuid
