@@ -199,6 +199,7 @@ EFI_STATUS
 
 /**
   Enable or disable an application processor.
+  If ProcessorNumber is all Fs, enable or disable all APs
 
   @param[in] PeiServices          An indirect pointer to the PEI Services Table
                                   published by the PEI Foundation.

@@ -179,6 +179,7 @@ EFI_STATUS
 
 /**
   Enable or disable an application processor.
+  If ProcessorNumber is all Fs, enable or disable all APs
 
   @param[in] This                 A pointer to the EFI_PEI_MP_SERVICES_PPI instance.
   @param[in] ProcessorNumber      The handle number of the AP. The range is from 0 to the
