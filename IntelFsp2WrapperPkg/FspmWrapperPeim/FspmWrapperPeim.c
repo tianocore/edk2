@@ -125,6 +125,17 @@ PeiFspMemoryInit (
   Status                = CallFspMemoryInit (FspmUpdDataPtr, &FspHobListPtr);
 
   //
+  // FspHobList is not complete at this moment.
+  // Save FspHobList pointer to hob, so that it can be got later
+  //
+  HobData = BuildGuidHob (
+              &gFspHobGuid,
+              sizeof (VOID *)
+              );
+  ASSERT (HobData != NULL);
+  CopyMem (HobData, &FspHobListPtr, sizeof (FspHobListPtr));
+
+  //
   // Reset the system if FSP API returned FSP_STATUS_RESET_REQUIRED status
   //
   if ((Status >= FSP_STATUS_RESET_REQUIRED_COLD) && (Status <= FSP_STATUS_RESET_REQUIRED_8)) {
@@ -166,17 +177,6 @@ PeiFspMemoryInit (
   ASSERT (FspHobListPtr != NULL);
 
   PostFspmHobProcess (FspHobListPtr);
-
-  //
-  // FspHobList is not complete at this moment.
-  // Save FspHobList pointer to hob, so that it can be got later
-  //
-  HobData = BuildGuidHob (
-              &gFspHobGuid,
-              sizeof (VOID *)
-              );
-  ASSERT (HobData != NULL);
-  CopyMem (HobData, &FspHobListPtr, sizeof (FspHobListPtr));
 
   return Status;
 }
