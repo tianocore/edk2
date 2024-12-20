@@ -3,6 +3,7 @@
     Manage Usb Descriptor List
 
 Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, American Megatrends International, LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -44,6 +45,24 @@ UsbFreeInterfaceDesc (
   }
 
   FreePool (Setting);
+}
+
+/**
+  Free the interface association descriptor
+
+  @param  Iad               The interface association descriptor to free.
+
+**/
+VOID
+UsbFreeInterfaceAssociationDesc (
+  IN USB_INTERFACE_ASSOCIATION_DESC  *Iad
+  )
+{
+  if (Iad->Interfaces != NULL) {
+    FreePool (Iad->Interfaces);
+  }
+
+  FreePool (Iad);
 }
 
 /**
@@ -167,6 +186,11 @@ UsbCreateDesc (
       CtrlLen = sizeof (USB_ENDPOINT_DESC);
       break;
 
+    case USB_DESC_TYPE_INTERFACE_ASSOCIATION:
+      DescLen = sizeof (EFI_USB_INTERFACE_ASSOCIATION_DESCRIPTOR);
+      CtrlLen = sizeof (USB_INTERFACE_ASSOCIATION_DESC);
+      break;
+
     default:
       ASSERT (FALSE);
       return NULL;
@@ -231,6 +255,7 @@ UsbCreateDesc (
     return NULL;
   }
 
+  ASSERT (CtrlLen >= DescLen);
   CopyMem (Desc, Head, (UINTN)DescLen);
 
   *Consumed = Offset;
@@ -320,6 +345,85 @@ ON_ERROR:
 }
 
 /**
+  Parse an interface association and its interfaces.
+
+  @param  DescBuf               The buffer of raw interface association descriptor.
+  @param  Len                   The length of the raw descriptor buffer.
+  @param  Config                The device configuration buffer.
+  @param  Consumed              The number of raw descriptor consumed.
+
+  @return The created interface association descriptor or NULL if failed.
+
+**/
+USB_INTERFACE_ASSOCIATION_DESC *
+UsbParseInterfaceAssociationDesc (
+  IN UINT8            *DescBuf,
+  IN UINTN            Len,
+  IN USB_CONFIG_DESC  *Config,
+  OUT UINTN           *Consumed
+  )
+{
+  USB_INTERFACE_ASSOCIATION_DESC  *Iad;
+  UINT8                           Index;
+  UINT8                           IfIndex;
+  UINT8                           i;
+  UINTN                           NumIf;
+  UINTN                           Used;
+
+  *Consumed = 0;
+  Iad       = UsbCreateDesc (DescBuf, Len, USB_DESC_TYPE_INTERFACE_ASSOCIATION, &Used);
+
+  if (Iad == NULL) {
+    return NULL;
+  }
+
+  //
+  // Create an array to hold the association's interfaces
+  //
+  NumIf = Iad->Desc.InterfaceCount;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "UsbParseInterfaceAssociationDesc: interface association has %d interfaces\n",
+    (UINT32)NumIf
+    ));
+
+  ASSERT (NumIf > 0);
+  if (NumIf == 0) {
+    DEBUG ((DEBUG_ERROR, "UsbParseInterfaceAssociationDesc: no interfaces are reported for this association.\n"));
+    goto ON_ERROR;
+  }
+
+  Iad->Interfaces = AllocateZeroPool (sizeof (USB_INTERFACE_DESC *) * NumIf);
+
+  //
+  // Populate interfaces for this association
+  //
+  IfIndex = 0;
+  for (Index = Iad->Desc.FirstInterface; Index < (UINT8)(Iad->Desc.FirstInterface + Iad->Desc.InterfaceCount); Index++) {
+    for (i = 0; i < Config->Desc.NumInterfaces; i++) {
+      if (Index == Config->Interfaces[i]->Settings[0]->Desc.InterfaceNumber) {
+        break;
+      }
+    }
+
+    if (i == Config->Desc.NumInterfaces) {
+      DEBUG ((DEBUG_ERROR, "UsbParseInterfaceAssociationDesc: interface %d not found.\n", Index));
+      goto ON_ERROR;
+    }
+
+    Iad->Interfaces[IfIndex++] = Config->Interfaces[i];
+  }
+
+  *Consumed = Used;
+  return Iad;
+
+ON_ERROR:
+  UsbFreeInterfaceAssociationDesc (Iad);
+  return NULL;
+}
+
+/**
   Parse the configuration descriptor and its interfaces.
 
   @param  DescBuf               The buffer of raw descriptor.
@@ -334,16 +438,22 @@ UsbParseConfigDesc (
   IN UINTN  Len
   )
 {
-  USB_CONFIG_DESC        *Config;
-  USB_INTERFACE_SETTING  *Setting;
-  USB_INTERFACE_DESC     *Interface;
-  UINTN                  Index;
-  UINTN                  NumIf;
-  UINTN                  Consumed;
+  USB_CONFIG_DESC                 *Config;
+  USB_INTERFACE_SETTING           *Setting;
+  USB_INTERFACE_DESC              *Interface;
+  UINTN                           Index;
+  UINTN                           NumIf;
+  UINTN                           Consumed;
+  UINT8                           *Buffer;
+  UINTN                           Length;
+  USB_INTERFACE_ASSOCIATION_DESC  *Iad;
 
   ASSERT (DescBuf != NULL);
 
-  Config = UsbCreateDesc (DescBuf, Len, USB_DESC_TYPE_CONFIG, &Consumed);
+  Buffer = DescBuf;
+  Length = Len;
+
+  Config = UsbCreateDesc (Buffer, Length, USB_DESC_TYPE_CONFIG, &Consumed);
 
   if (Config == NULL) {
     return NULL;
@@ -384,15 +494,15 @@ UsbParseConfigDesc (
   // setting 1|interface 1, setting 0|interface 2, setting 0|. Check
   // USB2.0 spec, page 267.
   //
-  DescBuf += Consumed;
-  Len     -= Consumed;
+  Buffer += Consumed;
+  Length -= Consumed;
 
   //
   // Make allowances for devices that return extra data at the
   // end of their config descriptors
   //
-  while (Len >= sizeof (EFI_USB_INTERFACE_DESCRIPTOR)) {
-    Setting = UsbParseInterfaceDesc (DescBuf, Len, &Consumed);
+  while (Length >= sizeof (EFI_USB_INTERFACE_DESCRIPTOR)) {
+    Setting = UsbParseInterfaceDesc (Buffer, Length, &Consumed);
 
     if (Setting == NULL) {
       DEBUG ((DEBUG_ERROR, "UsbParseConfigDesc: warning: failed to get interface setting, stop parsing now.\n"));
@@ -416,8 +526,36 @@ UsbParseConfigDesc (
     Interface->Settings[Interface->NumOfSetting] = Setting;
     Interface->NumOfSetting++;
 
-    DescBuf += Consumed;
-    Len     -= Consumed;
+    Buffer += Consumed;
+    Length -= Consumed;
+  }
+
+  //
+  // Process interface association descriptors.
+  //
+  Buffer = DescBuf;
+  Length = Len;
+
+  while (Length >= sizeof (EFI_USB_INTERFACE_ASSOCIATION_DESCRIPTOR)) {
+    Iad = UsbParseInterfaceAssociationDesc (Buffer, Length, Config, &Consumed);
+
+    if (Iad == NULL) {
+      break;
+    }
+
+    //
+    // Insert the association descriptor to the corresponding set.
+    //
+    if (Config->NumOfIads >= USB_MAX_ASSOCIATION) {
+      DEBUG ((DEBUG_ERROR, "UsbParseConfigDesc: too many interface association descriptors in this configuration.\n"));
+      goto ON_ERROR;
+    }
+
+    Config->Iads[Config->NumOfIads] = Iad;
+    Config->NumOfIads++;
+
+    Buffer += Consumed;
+    Length -= Consumed;
   }
 
   return Config;

@@ -3,6 +3,7 @@
     Manage Usb Descriptor List
 
 Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2025, American Megatrends International, LLC. All rights reserved.<BR>
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -11,6 +12,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define _USB_DESCRIPTOR_H_
 
 #define USB_MAX_INTERFACE_SETTING  256
+#define USB_MAX_ASSOCIATION        16
 
 //
 // The RequestType in EFI_USB_DEVICE_REQUEST is composed of
@@ -62,8 +64,15 @@ typedef struct {
 } USB_INTERFACE_DESC;
 
 typedef struct {
-  EFI_USB_CONFIG_DESCRIPTOR    Desc;
-  USB_INTERFACE_DESC           **Interfaces;
+  EFI_USB_INTERFACE_ASSOCIATION_DESCRIPTOR    Desc;
+  USB_INTERFACE_DESC                          **Interfaces;
+} USB_INTERFACE_ASSOCIATION_DESC;
+
+typedef struct {
+  EFI_USB_CONFIG_DESCRIPTOR         Desc;
+  USB_INTERFACE_ASSOCIATION_DESC    *Iads[USB_MAX_ASSOCIATION];
+  UINT8                             NumOfIads;
+  USB_INTERFACE_DESC                **Interfaces;
 } USB_CONFIG_DESC;
 
 typedef struct {
