@@ -1,0 +1,174 @@
+## @file
+# Azure Pipeline build file for building a platform.
+#
+# Platform: ArmVirtQemu
+# OS: Ubuntu
+# Toolchain: GCC5
+#
+# Copyright (c) Microsoft Corporation.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+trigger:
+  - master
+  - stable/*
+pr:
+  - master
+  - stable/*
+
+variables:
+  - template: ../../../.azurepipelines/templates/defaults.yml
+
+jobs:
+  - job: Platform_CI
+    variables:
+      package: 'ArmVirtPkg'
+      vm_image: 'ubuntu-22.04'
+      should_run: true
+      run_flags: "MAKE_STARTUP_NSH=TRUE QEMU_HEADLESS=TRUE"
+
+    #Use matrix to speed up the build process
+    strategy:
+        matrix:
+          QEMU_AARCH64_DEBUG:
+            Build.File: "$(package)/PlatformCI/QemuBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=1 BLD_*_TPM2_ENABLE=1 BLD_*_NETWORK_TLS_ENABLE=1 BLD_*_NETWORK_IP6_ENABLE=1 BLD_*_NETWORK_HTTP_BOOT_ENABLE=1"
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_AARCH64_RELEASE:
+            Build.File: "$(package)/PlatformCI/QemuBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=1 BLD_*_TPM2_ENABLE=1 BLD_*_NETWORK_TLS_ENABLE=1 BLD_*_NETWORK_IP6_ENABLE=1 BLD_*_NETWORK_HTTP_BOOT_ENABLE=1"
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_AARCH64_NOOPT:
+            Build.File: "$(package)/PlatformCI/QemuBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: "BLD_*_SECURE_BOOT_ENABLE=1 BLD_*_TPM2_ENABLE=1 BLD_*_NETWORK_TLS_ENABLE=1 BLD_*_NETWORK_IP6_ENABLE=1 BLD_*_NETWORK_HTTP_BOOT_ENABLE=1"
+            Build.Target: "NOOPT"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_ARM_DEBUG:
+            Build.File: "$(package)/PlatformCI/QemuBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_ARM_RELEASE:
+            Build.File: "$(package)/PlatformCI/QemuBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_ARM_NOOPT:
+            Build.File: "$(package)/PlatformCI/QemuBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "NOOPT"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+
+          QEMU_KERNEL_AARCH64_DEBUG:
+            Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_KERNEL_AARCH64_RELEASE:
+            Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_KERNEL_AARCH64_NOOPT:
+            Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "NOOPT"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_KERNEL_ARM_DEBUG:
+            Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_KERNEL_ARM_RELEASE:
+            Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+          QEMU_KERNEL_ARM_NOOPT:
+            Build.File: "$(package)/PlatformCI/QemuKernelBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "NOOPT"
+            Run.Flags: $(run_flags)
+            Run: $(should_run)
+
+          KVMTOOL_AARCH64_DEBUG:
+            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run: false
+          KVMTOOL_AARCH64_RELEASE:
+            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run: false
+          KVMTOOL_ARM_DEBUG:
+            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run: false
+          KVMTOOL_ARM_RELEASE:
+            Build.File: "$(package)/PlatformCI/KvmToolBuild.py"
+            Build.Arch: "ARM"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run: false
+
+          CLOUDHV_AARCH64_DEBUG:
+            Build.File: "$(package)/PlatformCI/CloudHvBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "DEBUG"
+            Run: false
+          CLOUDHV_AARCH64_RELEASE:
+            Build.File: "$(package)/PlatformCI/CloudHvBuild.py"
+            Build.Arch: "AARCH64"
+            Build.Flags: ""
+            Build.Target: "RELEASE"
+            Run: false
+
+    workspace:
+      clean: all
+
+    pool:
+      vmImage: $(vm_image)
+
+    container: ${{ variables.default_linux_image }}
+
+    steps:
+    - template: ../../../.azurepipelines/templates/platform-build-run-steps.yml
+      parameters:
+        tool_chain_tag: GCC5
+        build_pkg: $(package)
+        build_target: $(Build.Target)
+        build_arch: $(Build.Arch)
+        build_file: $(Build.File)
+        build_flags: $(Build.Flags)
+        run_flags: $(Run.Flags)
+        usePythonVersion: '' # use Python from the container image
