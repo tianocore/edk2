@@ -524,4 +524,5 @@ The CM_OBJECT_ID type is used to identify the Configuration Manager
 |  14   | IO APIC info                              | |
 |  15   | Interrupt Source Override info            | |
 |  16   | Local APIC and X2APIC NMI info            | |
+|  17   | FACS Information                          | |
 |  `*`  | All other values are reserved.            | |
