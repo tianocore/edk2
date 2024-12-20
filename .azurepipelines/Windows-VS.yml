@@ -1,5 +1,5 @@
 ## @file
-# Azure Pipeline build file for a build using Windows and VS2022
+# Azure Pipeline build file for a build using Windows and Visual Studio
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
