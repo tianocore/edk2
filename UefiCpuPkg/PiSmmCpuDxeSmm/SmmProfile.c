@@ -749,6 +749,7 @@ InitSmmProfileInternal (
   UINTN       MsrDsAreaSizePerCpu;
   UINT64      SmmProfileSize;
 
+  Status        = EFI_SUCCESS;
   mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mMaxNumberOfCpus);
   ASSERT (mPFEntryCount != NULL);
   mLastPFEntryValue = (UINT64 (*)[MAX_PF_ENTRY_COUNT])AllocateZeroPool (
@@ -840,12 +841,14 @@ InitSmmProfileInternal (
   //
   // Start SMM profile when SmmReadyToLock protocol is installed.
   //
-  Status = gMmst->MmRegisterProtocolNotify (
-                    &gEfiSmmReadyToLockProtocolGuid,
-                    InitSmmProfileCallBack,
-                    &Registration
-                    );
-  ASSERT_EFI_ERROR (Status);
+  if (!mIsStandaloneMm) {
+    Status = gMmst->MmRegisterProtocolNotify (
+                      &gEfiSmmReadyToLockProtocolGuid,
+                      InitSmmProfileCallBack,
+                      &Registration
+                      );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return;
 }
