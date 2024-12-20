@@ -134,8 +134,12 @@ class Edk2ToolsBuild(BaseAbstractInvocable):
 
             # Actually build the tools.
             output_stream = edk2_logging.create_output_stream()
-            ret = RunCmd('nmake.exe', None,
-                         workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
+            if ((os.environ.get('CLANG_MAKEFILE_TYPE') == 'gnu') and (not self.tool_chain_tag.lower().startswith("vs"))):
+                ret = RunCmd('{}make'.format(os.environ.get('CLANG_HOST_BIN')), None,
+                            workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
+            else:
+                ret = RunCmd('nmake.exe', None,
+                            workingdir=shell_env.get_shell_var("EDK_TOOLS_PATH"))
             edk2_logging.remove_output_stream(output_stream)
             problems = edk2_logging.scan_compiler_output(output_stream)
             for level, problem in problems:
