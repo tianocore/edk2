@@ -888,7 +888,7 @@ STATIC_ASSERT (ALIGNOF (__VERIFY_INT32_ENUM_SIZE) == sizeof (__VERIFY_INT32_ENUM
   @return  A pointer to the structure from one of it's elements.
 
 **/
-#define BASE_CR(Record, TYPE, Field)  ((TYPE *) ((CHAR8 *) (Record) - OFFSET_OF (TYPE, Field)))
+#define BASE_CR(Record, TYPE, Field)  ((TYPE *) (VOID *) ((CHAR8 *) (Record) - OFFSET_OF (TYPE, Field)))
 
 /**
   Checks whether a value is a power of two.
