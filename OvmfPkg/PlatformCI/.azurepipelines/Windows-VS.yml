@@ -3,7 +3,7 @@
 #
 # Platform: OVMF
 # OS: Windows
-# Toolchain: VS2022
+# Toolchain: VS
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
