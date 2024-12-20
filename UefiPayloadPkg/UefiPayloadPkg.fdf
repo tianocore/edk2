@@ -154,23 +154,7 @@ INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 INF MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
 INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
 
-!if "IA32" IN "$(ARCH)" OR "X64" IN "$(ARCH)"
-  INF UefiCpuPkg/CpuDxe/CpuDxe.inf
-  INF MdeModulePkg/Universal/Metronome/Metronome.inf
-  INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
-
-  !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
-    !if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
-      INF CryptoPkg/Driver/CryptoDxe.inf
-    !endif
-  !endif
-
-  !if $(TIMER_SUPPORT) == "HPET"
-    INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
-  !elseif $(TIMER_SUPPORT) == "LAPIC"
-    INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
-  !endif
-!elseif "AARCH64" IN "$(ARCH)"
+!if "AARCH64" IN "$(ARCH)"
   INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
   INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
   INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
@@ -186,6 +170,22 @@ INF MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntime
 
   INF OvmfPkg/QemuRamfbDxe/QemuRamfbDxe.inf
   INF OvmfPkg/PlatformDxe/Platform.inf
+!else
+  INF UefiCpuPkg/CpuDxe/CpuDxe.inf
+  INF MdeModulePkg/Universal/Metronome/Metronome.inf
+  INF PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+
+  !if $(CRYPTO_PROTOCOL_SUPPORT) == TRUE
+    !if $(CRYPTO_DRIVER_EXTERNAL_SUPPORT) == FALSE
+      INF CryptoPkg/Driver/CryptoDxe.inf
+    !endif
+  !endif
+
+  !if $(TIMER_SUPPORT) == "HPET"
+    INF PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+  !elseif $(TIMER_SUPPORT) == "LAPIC"
+    INF OvmfPkg/LocalApicTimerDxe/LocalApicTimerDxe.inf
+  !endif
 !endif
 
 !if $(SECURITY_STUB_ENABLE) == TRUE
