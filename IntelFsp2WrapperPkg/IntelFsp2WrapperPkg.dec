@@ -98,10 +98,11 @@
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection|0x00000001|UINT8|0x4000000A
 
   #
-  ## These are the base address of FSP-M/S
+  ## These are the base address of FSP-M/S/I
   #
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00001000
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00001001
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiBaseAddress|0x00000000|UINT32|0x00001002
   #
   # To provide flexibility for platform to pre-allocate FSP UPD buffer
   #
@@ -137,3 +138,12 @@
     #1: measure FSP UPD region in one record (PCR1), the FSP code without UPD in another record (PCR0).
   #
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspMeasurementConfig|0x00000000|UINT32|0x50000004
+  #
+  # To provide flexibility for platform to pre-allocate FSP UPD buffer
+  #
+  # The PCDs define the pre-allocated FSPI UPD Data Buffer Address.
+  # 0x00000000 - Platform will not pre-allocate UPD buffer before FspWrapper module
+  # non-zero   - Platform will pre-allocate UPD buffer and patch this value to
+  #              buffer address before FspWrapper module executing.
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiUpdDataAddress|0x00000000|UINT64|0x50000005
