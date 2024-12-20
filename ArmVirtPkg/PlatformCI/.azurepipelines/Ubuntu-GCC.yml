@@ -3,7 +3,7 @@
 #
 # Platform: ArmVirtQemu
 # OS: Ubuntu
-# Toolchain: GCC5
+# Toolchain: GCC
 #
 # Copyright (c) Microsoft Corporation.
 # SPDX-License-Identifier: BSD-2-Clause-Patent
