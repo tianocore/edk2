@@ -52,4 +52,17 @@ TestFspSiliconInitApiOutput (
   IN  VOID  *FspsUpdDataPtr
   );
 
+/**
+  Test the output of FSP API - FspSmmInit.
+
+  @param[in] FspiUpdDataPtr Address pointer to the Smm Init parameters structure.
+
+  @return test result on output of FspSmmInit API.
+**/
+EFI_STATUS
+EFIAPI
+TestFspSmmInitApiOutput (
+  IN  VOID  *FspiUpdDataPtr
+  );
+
 #endif

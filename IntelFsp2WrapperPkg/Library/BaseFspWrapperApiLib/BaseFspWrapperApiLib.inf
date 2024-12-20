@@ -63,3 +63,4 @@
 [Pcd]
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress  ## CONSUMES
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspiBaseAddress  ## CONSUMES
