@@ -359,8 +359,8 @@
   PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
 !endif
 
-#[LibraryClasses.IA32, LibraryClasses.X64]
-[LibraryClasses.X64]
+[LibraryClasses.IA32, LibraryClasses.X64]
+#[LibraryClasses.X64]
   CacheMaintenanceLib|MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
   #
   # CPU
@@ -758,9 +758,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport|TRUE
   gEfiMdeModulePkgTokenSpaceGuid.PcdPcieResizableBarSupport|FALSE
   gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize|0x1
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode|1
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0
-  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0
 !if ($(TARGET) == DEBUG || $(USE_CBMEM_FOR_CONSOLE) == TRUE)
   gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial|TRUE
 !else
@@ -778,9 +775,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize  |0
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase  |0
 !endif
-  # Disable SMM S3 script
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
-
   gEfiMdeModulePkgTokenSpaceGuid.PcdGhcbBase|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed|FALSE
   gUefiCpuPkgTokenSpaceGuid.PcdSevEsIsEnabled|0
@@ -788,6 +782,13 @@
 
 [PcdsDynamicExDefault.IA32, PcdsDynamicExDefault.X64]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode|1
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0
+
+  # Disable SMM S3 script
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|FALSE
+
 
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|$(UART_DEFAULT_BAUD_RATE)
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits|$(UART_DEFAULT_DATA_BITS)
