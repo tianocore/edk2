@@ -25,6 +25,33 @@
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 
+/**
+  Convert FFA return code to EFI_STATUS.
+
+  @param [in] SpmMmStatus           SPM_MM return code
+
+  @retval EFI_STATUS             correspond EFI_STATUS to SpmMmStatus
+**/
+STATIC
+EFI_STATUS
+SpmMmStatusToEfiStatus (
+  IN UINTN  SpmMmStatus
+  )
+{
+  switch (SpmMmStatus) {
+    case ARM_SPM_MM_RET_SUCCESS:
+      return EFI_SUCCESS;
+    case ARM_SPM_MM_RET_INVALID_PARAMS:
+      return EFI_INVALID_PARAMETER;
+    case ARM_SPM_MM_RET_DENIED:
+      return EFI_ACCESS_DENIED;
+    case ARM_SPM_MM_RET_NO_MEMORY:
+      return EFI_OUT_OF_RESOURCES;
+    default:
+      return EFI_UNSUPPORTED;
+  }
+}
+
 /** Send memory permission request to target.
 
   @param [in, out]  SvcArgs     Pointer to SVC arguments to send. On
@@ -106,24 +133,7 @@ SendMemoryPermissionRequest (
     // Bit 31 set means there is an error returned
     // See [1], Section 13.5.5.1 MM_SP_MEMORY_ATTRIBUTES_GET_AARCH64 and
     // Section 13.5.5.2 MM_SP_MEMORY_ATTRIBUTES_SET_AARCH64.
-    switch (*RetVal) {
-      case ARM_SPM_MM_RET_NOT_SUPPORTED:
-        return EFI_UNSUPPORTED;
-
-      case ARM_SPM_MM_RET_INVALID_PARAMS:
-        return EFI_INVALID_PARAMETER;
-
-      case ARM_SPM_MM_RET_DENIED:
-        return EFI_ACCESS_DENIED;
-
-      case ARM_SPM_MM_RET_NO_MEMORY:
-        return EFI_OUT_OF_RESOURCES;
-
-      default:
-        // Undefined error code received.
-        ASSERT (0);
-        return EFI_INVALID_PARAMETER;
-    }
+    SpmMmStatusToEfiStatus (*RetVal);
   }
 
   return EFI_SUCCESS;
