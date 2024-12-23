@@ -4125,7 +4125,12 @@ EvaluateHiiExpression (
           goto Done;
         }
 
-        Value = (EFI_HII_VALUE *)&Question->Value;
+        Status = HiiStatementValueToHiiValue (&Question->Value, Value);
+        if (EFI_ERROR (Status)) {
+          ReleaseHiiValue (Value);
+          Value->Type = EFI_IFR_TYPE_UNDEFINED;
+        }
+
         break;
 
       case EFI_IFR_SECURITY_OP:
@@ -4334,7 +4339,11 @@ EvaluateHiiExpression (
           //
           // push the questions' value on to the expression stack
           //
-          Value = (EFI_HII_VALUE *)&Question->Value;
+          Status = HiiStatementValueToHiiValue (&Question->Value, Value);
+          if (EFI_ERROR (Status)) {
+            ReleaseHiiValue (Value);
+            Value->Type = EFI_IFR_TYPE_UNDEFINED;
+          }
         }
 
         break;
@@ -4461,7 +4470,12 @@ EvaluateHiiExpression (
           break;
         }
 
-        Value = (EFI_HII_VALUE *)&Question->Value;
+        Status = HiiStatementValueToHiiValue (&Question->Value, Value);
+        if (EFI_ERROR (Status)) {
+          ReleaseHiiValue (Value);
+          Value->Type = EFI_IFR_TYPE_UNDEFINED;
+        }
+
         break;
 
       case EFI_IFR_STRING_REF2_OP:
