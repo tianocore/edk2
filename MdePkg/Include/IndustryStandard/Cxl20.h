@@ -117,6 +117,24 @@
 #define CXL_PCI_DVSEC_VENDOR_ID                  0x1E98
 
 //
+// Transfer FW
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.2
+//
+#define CXL_FW_TRANSFER_ALIGNMENT        128
+#define CXL_FW_TRANSFER_ACTION_FULL      0x0
+#define CXL_FW_TRANSFER_ACTION_INITIATE  0x1
+#define CXL_FW_TRANSFER_ACTION_CONTINUE  0x2
+#define CXL_FW_TRANSFER_ACTION_END       0x3
+#define CXL_FW_TRANSFER_ACTION_ABORT     0x4
+
+//
+// Activate FW
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.3
+//
+#define CXL_FW_ACTIVATE_METHOD_ONLINE              0x0
+#define CXL_FW_ACTIVATE_METHOD_ON_NEXT_COLD_RESET  0x1
+
+//
 // Get FW Info
 // Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.1
 //
@@ -191,9 +209,11 @@ typedef enum {
 // Compute Express Link Specification Revision 2.0 - Chapter 8.2.9
 //
 typedef enum {
-    CxlMboxOpInvalid   = 0x0000,
-    CxlMboxOpGetFwInfo = 0x0200,
-    CxlMboxOpMax       = 0x10000
+    CxlMboxOpInvalid    = 0x0000,
+    CxlMboxOpGetFwInfo  = 0x0200,
+    CxlMboxOpTransferFw = 0x0201,
+    CxlMboxOpActivateFw = 0x0202,
+    CxlMboxOpMax        = 0x10000
 } CXL_OPCODE;
 
 //
@@ -582,6 +602,20 @@ typedef struct {
   char     SlotThreeFwRevision[16];
   char     SlotFourFwRevision[16];
 } CXL_MAILBOX_GET_FW_INFO;
+
+typedef struct {
+  UINT8     Action;
+  UINT8     Slot;
+  UINT8     Reserved[2];
+  UINT32    Offset;
+  UINT8     Reserved2[0x78];
+  UINT8     Data[];
+} CXL_MAILBOX_TRANSFER_FW;
+
+typedef struct {
+  UINT8    Action;
+  UINT8    Slot;
+} CXL_MAILBOX_ACTIVATE_FW;
 
 #pragma pack()
 
