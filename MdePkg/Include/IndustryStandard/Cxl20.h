@@ -117,6 +117,13 @@
 #define CXL_PCI_DVSEC_VENDOR_ID                  0x1E98
 
 //
+// Get FW Info
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2.1
+//
+#define CXL_FW_MAX_SLOTS               5
+#define CXL_FW_IMAGE_DESCRIPTOR_COUNT  5
+
+//
 // Mailbox Registers
 // Compute Express Link Specification Revision 2.0 - Chapter 8.2.8.4
 //
@@ -178,6 +185,16 @@ typedef enum {
     CxlRbiMemdev,
     CxlRbiMax
 } CXL_REG_BLOCK_IDENTIFIER;
+
+//
+// CXL Device Command Opcodes.
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9
+//
+typedef enum {
+    CxlMboxOpInvalid   = 0x0000,
+    CxlMboxOpGetFwInfo = 0x0200,
+    CxlMboxOpMax       = 0x10000
+} CXL_OPCODE;
 
 //
 // CXL Device Mailbox Registers
@@ -550,6 +567,21 @@ typedef union {
   } Bits;
   UINT64    Uint64;
 } CXL_MEMORY_DEVICE_STATUS_REGISTER;
+
+//
+// Firmware Update
+// Compute Express Link Specification Revision 2.0 - Chapter 8.2.9.2
+//
+typedef struct {
+  UINT8    NumberOfSlots;
+  UINT8    SlotInfo;
+  UINT8    ActivationCapabilities;
+  UINT8    Reserved[13];
+  char     SlotOneFwRevision[16];
+  char     SlotTwoFwRevision[16];
+  char     SlotThreeFwRevision[16];
+  char     SlotFourFwRevision[16];
+} CXL_MAILBOX_GET_FW_INFO;
 
 #pragma pack()
 
