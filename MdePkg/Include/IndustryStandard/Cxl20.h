@@ -103,6 +103,25 @@
 #define CXL_MEM_DEVICE_MEDIA_STATUS_DISABLED   0x3
 
 //
+// Register Locator DVSEC
+// Compute Express Link Specification Revision 2.0 - Chapter 8.1.9
+//
+#define CXL_PCIE_EXTENDED_CAP_OFFSET             0x100
+#define CXL_PCIE_EXTENDED_NEXT_CAP_OFFSET_SHIFT  20
+#define CXL_PCI_DVSEC_VENDOR_ID                  0x1E98
+
+//
+// Register Locator DVSEC
+// Compute Express Link Specification Revision 2.0 - Chapter 8.1.9
+//
+typedef enum {
+    PcieExtCapHeader = 0,
+    PcieDvsecHeader1,
+    PcieDvsecHeader2,
+    PcieDvsecHeaderMax
+} CXL_PCIE_DVSEC_HEADER_ENUM;
+
+//
 // Ensure proper structure formats
 //
 #pragma pack(1)
