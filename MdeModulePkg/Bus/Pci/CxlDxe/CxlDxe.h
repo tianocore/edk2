@@ -6,10 +6,14 @@
 #ifndef _EFI_CXLDXE_H_
 #define _EFI_CXLDXE_H_
 
+#include <string.h>
 #include <Protocol/PciIo.h>
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/Cxl20.h>
+#include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
@@ -20,6 +24,20 @@
 #define CXL_MEMORY_PROGIF                        0x10
 #define CXL_PCIE_EXTENDED_CAP_NEXT(n)            ((n) >> (CXL_PCIE_EXTENDED_NEXT_CAP_OFFSET_SHIFT))
 #define CXL_IS_DVSEC(n)                          (((n) & (0xFFFF)) == CXL_PCI_DVSEC_VENDOR_ID)
+#define CXL_CONTROLLER_PRIVATE_DATA_SIGNATURE    SIGNATURE_32 ('C','X','L','X')
+#define CXL_PCI_EXT_CAP_ID(Header)               (Header & 0x0000ffff)
+#define CXL_PCI_EXT_CAP_NEXT(Header)             ((Header >> 20) & 0xffc)
+#define CXL_DEV_CAP_ARRAY_OFFSET                 0x0
+#define CXL_DEV_CAP_ARRAY_CAP_ID                 0
+#define CXL_BIT(nr)                              ((UINT32)1 << nr)
+#define CXL_DEV_MBOX_CTRL_DOORBELL               CXL_BIT(0)
+#define CXL_SZ_1M                                0x00100000
+#define CXL_BITS_PER_LONG                        32
+#define CXL_UL                                   (UINTN)
+
+#define CXL_GENMASK(h, l) \
+  (((~CXL_UL(0)) - (CXL_UL(1) << (l)) + 1) & \
+    (~CXL_UL(0) >> (CXL_BITS_PER_LONG - 1 - (h))))
 
 //
 // CXL Memory Device Register information
@@ -48,6 +66,11 @@ typedef struct {
   EFI_HANDLE                  DriverBindingHandle;
   EFI_PCI_IO_PROTOCOL         *PciIo;
   EFI_DEVICE_PATH_PROTOCOL    *ParentDevicePath;
+
+  //MailBox Register
+  CXL_REGISTER_MAP            RegisterMap;
+  CXL_MEMDEV_STATE            MemdevState;
+  CXL_MBOX_CMD                MailboxCmd;
 
   //BDF Value
   UINTN                       Seg;
@@ -196,5 +219,116 @@ CxlDriverBindingStop(
   IN  EFI_HANDLE                  *ChildHandleBuffer
   );
 
+
+/**
+  Returns minimum among the input values
+
+  @param[in] ValOne                   Input value one
+  @param[in] ValTwo                   Input value Two
+  @param[in] ValThree                 Input value Three
+
+  @retval Minimum                     Returns minimum value among the given input values
+
+  **/
+UINT64 MinimumOfThreeValues(UINT64 a, UINT64 b, UINT64 c);
+
+/**
+  Returns bits value from input value
+
+  @param[in] RegisterValue               Input register value from where bits has to extracted
+  @param[in] PositionOne                 starting bits position
+  @param[in] PositionTwo                 ending bits position
+
+  @retval LastPositionBits               Value of bits from position one to two
+
+  **/
+UINT64 GetFieldValues(UINT64 RegisterValue, UINT32 PositionOne, UINT32 PositionTwo);
+
+/**
+  Reads EFI PCI i/o protocol values
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+  @param[in] Start               starting bits position
+
+  @retval                        Value of PCI IO for Extended capability
+
+  **/
+EFI_STATUS PciUefiReadConfigWord(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 Start, UINT32 *Value);
+
+/**
+  Reads EFI PCI i/o protocol values of thirty two bits
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+  @param[in] Start               starting bits position
+
+  @retval                        Value of PCI IO for Extended capability
+
+  **/
+EFI_STATUS PciUefiMemReadThirtyTwoBits(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 Start, UINT32 *Value);
+
+/**
+  Reads EFI PCI i/o protocol values of sixty four bits
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+  @param[in] Start               starting bits position
+
+  @retval                        Value of PCI IO for Extended capability
+
+  **/
+EFI_STATUS PciUefiMemReadSixtyFourBits(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 Start, UINT64 *Value);
+
+/**
+  Reads EFI PCI i/o protocol values of N bits
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+  @param[in] Start               starting bits position
+
+  @retval                        Value of PCI IO for Extended capability
+
+  **/
+EFI_STATUS PciUefiMemReadNBits(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 Start, CHAR8 Buffer[], UINT32 Size);
+
+/**
+  Write EFI PCI i/o protocol values of thirty two bits
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+  @param[in] Start               starting bits position
+
+  @retval                        Value of PCI IO for Extended capability
+
+  **/
+EFI_STATUS PciUefiMemWriteThirtyTwoBits(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 Start, UINT32 *Value);
+
+/**
+  Write EFI PCI i/o protocol values of sixty four bits
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+  @param[in] Start               starting bits position
+
+  @retval                        Value of PCI IO for Extended capability
+
+  **/
+EFI_STATUS PciUefiMemWriteSixtyFourBits(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 Start, UINT64 *Value);
+
+/**
+  Write EFI PCI i/o protocol values of N bits
+
+  @param  Private                The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+  @param[in] Start               starting bits position
+
+  @retval                        Value of PCI IO for Extended capability
+
+  **/
+EFI_STATUS PciUefiMemWriteNBits(CXL_CONTROLLER_PRIVATE_DATA *Private, UINT32 Start, CHAR8 Buffer[], UINT32 Size);
+
+/**
+  Issue a command to the device using mailbox registers
+
+  @param[in] Private                  The pointer to the CXL_CONTROLLER_PRIVATE_DATA data structure.
+
+  @retval Status                      Return EFI_SUCCESS on successfully calling CxlDecodeRegblock
+
+**/
+EFI_STATUS CxlPciMboxSend(CXL_CONTROLLER_PRIVATE_DATA *Private);
 #endif // _EFI_CXLDXE_H_
 
