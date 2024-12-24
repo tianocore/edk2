@@ -378,6 +378,9 @@ ParseFrameBuffer (
       GmaStr++;
       DEBUG ((DEBUG_INFO, "  display (%s)", GmaStr));
     }
+
+    // In most case, PixelsPerScanLine is identical to HorizontalResolution
+    GraphicsInfo->GraphicsMode.PixelsPerScanLine = GraphicsInfo->GraphicsMode.HorizontalResolution;
   }
 
   return GmaStr;
