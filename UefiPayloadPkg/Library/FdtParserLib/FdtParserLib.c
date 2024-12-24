@@ -60,6 +60,8 @@ typedef enum {
                                        EFI_PCI_IO_ATTRIBUTE_ISA_IO | \
                                        EFI_PCI_IO_ATTRIBUTE_ISA_MOTHERBOARD_IO)
 
+#define UPL_ALIGN_DOWN(Addr)  ((UINT64)(Addr) & ~(UINT64)(EFI_PAGE_SIZE - 1))
+
 extern VOID                         *mHobList;
 UNIVERSAL_PAYLOAD_PCI_ROOT_BRIDGES  *mPciRootBridgeInfo = NULL;
 INT32                               mNode[0x500]        = { 0 };
@@ -289,7 +291,12 @@ ParseReservedMemory (
         BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiACPIMemoryNVS);
       } else if (AsciiStrnCmp (TempStr, "acpi", AsciiStrLen ("acpi")) == 0) {
         DEBUG ((DEBUG_INFO, "  acpi, StartAddress:%x, NumberOfBytes:%x\n", StartAddress, NumberOfBytes));
-        BuildMemoryAllocationHob (StartAddress, NumberOfBytes, EfiBootServicesData);
+
+        BuildMemoryAllocationHob (
+          UPL_ALIGN_DOWN (StartAddress),
+          ALIGN_VALUE (NumberOfBytes, EFI_PAGE_SIZE),
+          EfiBootServicesData
+          );
         PlatformAcpiTable = BuildGuidHob (&gUniversalPayloadAcpiTableGuid, sizeof (UNIVERSAL_PAYLOAD_ACPI_TABLE));
         if (PlatformAcpiTable != NULL) {
           DEBUG ((DEBUG_INFO, " build gUniversalPayloadAcpiTableGuid , NumberOfBytes:%x\n", NumberOfBytes));
