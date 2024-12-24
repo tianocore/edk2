@@ -1,5 +1,5 @@
 /** @file
-  Firmware Management Protocol - supports Get Fw Info
+  Firmware Management Protocol - supports Get Fw Info, Sending/Receiving FMP commands
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 

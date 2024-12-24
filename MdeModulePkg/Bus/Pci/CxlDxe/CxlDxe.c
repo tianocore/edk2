@@ -3,6 +3,7 @@
   supports Mailbox functionality
   uefi driver name is added
   supports Get Fw Info
+  Sending/Receiving FMP commands
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
