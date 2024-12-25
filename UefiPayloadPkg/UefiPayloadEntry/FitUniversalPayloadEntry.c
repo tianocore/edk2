@@ -518,11 +518,18 @@ FitUplEntryPoint (
   VOID              *FdtBase;
 #endif
 
+  DEBUG ((DEBUG_INFO, "Hi... %x ", BootloaderParameter));
+
   if (FixedPcdGetBool (PcdHandOffFdtEnable)) {
     mHobList = (VOID *)NULL;
   } else {
+    DEBUG ((DEBUG_INFO, "p %p  %p ", &mHobList, mHobList));
+
+    // This line causes a hang
     mHobList = (VOID *)BootloaderParameter;
+    DEBUG ((DEBUG_INFO, "q %p  %p ", &mHobList, mHobList));
   }
+  DEBUG ((DEBUG_INFO, "starting"));
 
   FdtBaseResvd = 0;
   // Call constructor for all libraries
