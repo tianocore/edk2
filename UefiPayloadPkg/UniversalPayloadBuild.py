@@ -224,7 +224,7 @@ def BuildUniversalPayload(Args):
         fit_image_info_header               = MkFitImage.FIT_IMAGE_INFO_HEADER()
         fit_image_info_header.Description   = 'Uefi Universal Payload'
         fit_image_info_header.UplVersion    = Args.SpecRevision
-        fit_image_info_header.Type          = 'flat-binary'
+        fit_image_info_header.Type          = 'firmware'
         fit_image_info_header.Arch          = FitArch
         fit_image_info_header.Compression   = 'none'
         fit_image_info_header.Revision      = Args.Revision

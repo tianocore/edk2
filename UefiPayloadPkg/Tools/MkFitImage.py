@@ -62,7 +62,7 @@ def BuildFvImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descript
     Fdt.setprop_str(ParentNode, 'compression', 'none')
     Fdt.setprop_str(ParentNode, 'project', 'tianocore')
     Fdt.setprop_str(ParentNode, 'arch',Arch)
-    Fdt.setprop_str(ParentNode, 'type', 'flat-binary')
+    Fdt.setprop_str(ParentNode, 'type', 'firmware')
     Fdt.setprop_str(ParentNode, 'description', Description)
 
 def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description, Arch):
