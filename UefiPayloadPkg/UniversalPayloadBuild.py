@@ -226,6 +226,7 @@ def BuildUniversalPayload(Args):
         fit_image_info_header.UplVersion    = Args.SpecRevision
         fit_image_info_header.Type          = 'firmware'
         fit_image_info_header.Arch          = FitArch
+        fit_image_info_header.Os            = 'efi'
         fit_image_info_header.Compression   = 'none'
         fit_image_info_header.Revision      = Args.Revision
         fit_image_info_header.BuildType     = Args.Target.lower()

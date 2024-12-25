@@ -89,6 +89,8 @@ def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descr
         Fdt.setprop_str(ParentNode, 'type', InfoHeader.Type)
     if InfoHeader.Arch is not None:
         Fdt.setprop_str(ParentNode, 'arch', InfoHeader.Arch)
+    if InfoHeader.Os is not None:
+        Fdt.setprop_str(ParentNode, 'os', InfoHeader.Os)
     if InfoHeader.Project is not None:
         Fdt.setprop_str(ParentNode, 'project', InfoHeader.Project)
     if InfoHeader.Description is not None:
