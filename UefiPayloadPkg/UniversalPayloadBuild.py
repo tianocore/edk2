@@ -130,10 +130,10 @@ def BuildUniversalPayload(Args):
     BuildDir     = os.path.join(os.environ['WORKSPACE'], os.path.normpath("Build/UefiPayloadPkg{}").format (Args.Arch))
     if Args.Arch == 'X64':
         BuildArch      = "X64"
-        FitArch        = "x86_64"
+        FitArch        = "i386"
     elif Args.Arch == 'IA32':
         BuildArch      = "IA32 -a X64"
-        FitArch        = "x86"
+        FitArch        = "i386"
     elif Args.Arch == 'RISCV64':
         BuildArch      = "RISCV64"
         FitArch        = "RISCV64"
