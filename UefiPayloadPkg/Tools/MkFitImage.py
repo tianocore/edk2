@@ -46,27 +46,23 @@ class FIT_IMAGE_INFO_HEADER:
         self.UplVersion     = 0x0100
         self.TargetPath     = 'mkimage.fit'
 
-def CreatFdt(Fdt):
-    FdtEmptyTree = libfdt.fdt_create_empty_tree(Fdt, len(Fdt))
-    if FdtEmptyTree != 0:
-        print('\n- Failed - Create Fdt failed!')
-        return False
-    return True
+def CreatFdt(Size):
+    return libfdt.Fdt.create_empty_tree(Size)
 
 def BuildConfNode(Fdt, ParentNode, MultiImage):
-    ConfNode1     = libfdt.fdt_add_subnode(Fdt, ParentNode, 'conf-1')
+    ConfNode1     = Fdt.add_subnode(ParentNode, 'conf-1')
 
-    libfdt.fdt_setprop(Fdt, ConfNode1, 'require-fit', b'', 0)
-    libfdt.fdt_setprop(Fdt, ConfNode1, 'firmware', bytes('tianocore', 'utf-8'), len('tianocore') + 1)
+    Fdt.setprop(ConfNode1, 'require-fit', b'', 0)
+    Fdt.setprop_str(ConfNode1, 'firmware', 'tianocore')
 
 def BuildFvImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description, Arch):
-    libfdt.fdt_setprop_u32(Fdt, ParentNode, 'data-size', DataSize)
-    libfdt.fdt_setprop_u32(Fdt, ParentNode, 'data-offset', DataOffset)
-    libfdt.fdt_setprop(Fdt, ParentNode, 'compression', bytes('none',                'utf-8'), len('none') + 1)
-    libfdt.fdt_setprop(Fdt, ParentNode, 'project',    bytes('tianocore',           'utf-8'), len('tianocore') + 1)
-    libfdt.fdt_setprop(Fdt, ParentNode, 'arch',        bytes(Arch,                  'utf-8'), len(Arch) + 1)
-    libfdt.fdt_setprop(Fdt, ParentNode, 'type',        bytes('flat-binary',         'utf-8'), len('flat-binary') + 1)
-    libfdt.fdt_setprop(Fdt, ParentNode, 'description', bytes(Description,           'utf-8'), len(Description) + 1)
+    Fdt.setprop_u32(ParentNode, 'data-size', DataSize)
+    Fdt.setprop_u32(ParentNode, 'data-offset', DataOffset)
+    Fdt.setprop_str(ParentNode, 'compression', 'none')
+    Fdt.setprop_str(ParentNode, 'project', 'tianocore')
+    Fdt.setprop_str(ParentNode, 'arch',Arch)
+    Fdt.setprop_str(ParentNode, 'type', 'flat-binary')
+    Fdt.setprop_str(ParentNode, 'description', Description)
 
 def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description, Arch):
     #
@@ -74,28 +70,28 @@ def BuildTianoImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descr
     # They would be set again when Fdt completes or this function parses target binary file.
     #
     if InfoHeader.LoadAddr is not None:
-        libfdt.fdt_setprop_u64(Fdt, ParentNode, 'load', InfoHeader.LoadAddr)
+        Fdt.setprop_u64(ParentNode, 'load', InfoHeader.LoadAddr)
     if InfoHeader.Entry is not None:
-        libfdt.fdt_setprop_u64(Fdt, ParentNode, 'entry', InfoHeader.Entry)
+        Fdt.setprop_u64(ParentNode, 'entry', InfoHeader.Entry)
     if InfoHeader.RelocStart is not None:
-        libfdt.fdt_setprop_u32(Fdt, ParentNode, 'reloc-start', InfoHeader.RelocStart)
+        Fdt.setprop_u32(ParentNode, 'reloc-start', InfoHeader.RelocStart)
     if InfoHeader.DataSize is not None:
-       libfdt.fdt_setprop_u32(Fdt, ParentNode, 'data-size', DataSize)
+       Fdt.setprop_u32(ParentNode, 'data-size', DataSize)
     if InfoHeader.DataOffset is not None:
-        libfdt.fdt_setprop_u32(Fdt, ParentNode, 'data-offset', DataOffset)
+        Fdt.setprop_u32(ParentNode, 'data-offset', DataOffset)
     if InfoHeader.Producer is not None:
-        libfdt.fdt_setprop(Fdt, ParentNode, 'producer', bytes(InfoHeader.Producer, 'utf-8'), len(InfoHeader.Producer) + 1)
+        Fdt.setprop_str(ParentNode, 'producer', InfoHeader.Producer)
     if InfoHeader.Capabilities is not None:
         CapStrs = ','.join(InfoHeader.Capabilities)
-        libfdt.fdt_setprop(Fdt, ParentNode, 'capabilities', bytes(CapStrs, 'utf-8'), len(CapStrs) + 1)
+        Fdt.setprop_str(ParentNode, 'capabilities', CapStrs)
     if InfoHeader.Type is not None:
-        libfdt.fdt_setprop(Fdt, ParentNode, 'type', bytes(InfoHeader.Type, 'utf-8'), len(InfoHeader.Type) + 1)
+        Fdt.setprop_str(ParentNode, 'type', InfoHeader.Type)
     if InfoHeader.Arch is not None:
-        libfdt.fdt_setprop(Fdt, ParentNode, 'arch', bytes(InfoHeader.Arch, 'utf-8'), len(InfoHeader.Arch) + 1)
+        Fdt.setprop_str(ParentNode, 'arch', InfoHeader.Arch)
     if InfoHeader.Project is not None:
-        libfdt.fdt_setprop(Fdt, ParentNode, 'project', bytes(InfoHeader.Project, 'utf-8'), len(InfoHeader.Project) + 1)
+        Fdt.setprop_str(ParentNode, 'project', InfoHeader.Project)
     if InfoHeader.Description is not None:
-        libfdt.fdt_setprop(Fdt, ParentNode, 'description', bytes(Description, 'utf-8'), len(Description) + 1)
+        Fdt.setprop_str(ParentNode, 'description', Description)
 
 #
 # The subnode would be inserted from bottom to top of structure block.
@@ -111,13 +107,13 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
     #
     # Set basic information
     #
-    libfdt.fdt_setprop_u32(Fdt, 0, 'build-revision', InfoHeader.Revision)
-    libfdt.fdt_setprop_u32(Fdt, 0, 'spec-version', InfoHeader.UplVersion)
+    Fdt.setprop_u32(0, 'build-revision', InfoHeader.Revision)
+    Fdt.setprop_u32(0, 'spec-version', InfoHeader.UplVersion)
 
     #
     # Build configurations node
     #
-    ConfNode  = libfdt.fdt_add_subnode(Fdt, 0, 'configurations')
+    ConfNode  = Fdt.add_subnode(0, 'configurations')
     BuildConfNode(Fdt, ConfNode, MultiImage)
 
     # Build image
@@ -131,18 +127,18 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
             MultiImage[Index][-2] = BinaryData
             MultiImage[Index][-1] = DataOffset
             DataOffset += len (BinaryData)
-    libfdt.fdt_setprop_u32(Fdt, 0, 'size', DataOffset)
+    Fdt.setprop_u32(0, 'size', DataOffset)
     posix_time = int(time.time())
-    libfdt.fdt_setprop_u32(Fdt, 0, 'timestamp', posix_time)
+    Fdt.setprop_u32(0, 'timestamp', posix_time)
     DescriptionFit = 'Uefi OS Loader'
-    libfdt.fdt_setprop(Fdt, 0, 'description', bytes(DescriptionFit, 'utf-8'), len(DescriptionFit) + 1)
+    Fdt.setprop_str(0, 'description', DescriptionFit)
 
-    ImageNode = libfdt.fdt_add_subnode(Fdt, 0, 'images')
+    ImageNode = Fdt.add_subnode(0, 'images')
     for Item in reversed (MultiImage):
         Name, Path, BuildFvNode, Description, BinaryData, DataOffset = Item
         if os.path.exists (Item[1]) == False:
             continue
-        FvNode = libfdt.fdt_add_subnode(Fdt, ImageNode, Name)
+        FvNode = Fdt.add_subnode(ImageNode, Name)
         BuildFvNode (Fdt, InfoHeader, FvNode, DataOffset, len(BinaryData), Description, Arch)
 
     #
@@ -150,7 +146,7 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
     #
     DtbFile = open(InfoHeader.TargetPath, "wb")
     DtbFile.truncate()
-    DtbFile.write(Fdt)
+    DtbFile.write(Fdt.as_bytearray())
     for Item in MultiImage:
         _, FilePath, _, _, BinaryData, _ = Item
         if os.path.exists (Item[1]) == False:
@@ -162,15 +158,9 @@ def BuildFitImage(Fdt, InfoHeader, Arch):
 
 def MakeFitImage(InfoHeader, Arch):
     #
-    # Allocate fdt byte array.
-    #
-    Fdt = bytearray(InfoHeader.DataOffset)
-
-    #
     # Create fdt empty tree.
     #
-    if CreatFdt(Fdt) is False:
-        return False
+    Fdt = CreatFdt(InfoHeader.DataOffset)
 
     #
     # Parse args to build fit image.
