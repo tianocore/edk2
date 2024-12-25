@@ -54,6 +54,7 @@ def BuildConfNode(Fdt, ParentNode, MultiImage):
 
     Fdt.setprop(ConfNode1, 'require-fit', b'', 0)
     Fdt.setprop_str(ConfNode1, 'firmware', 'tianocore')
+    Fdt.setprop_str(ConfNode1, 'loadables', 'uefi-fv\0bds-fv')
 
 def BuildFvImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Description, Arch):
     Fdt.setprop_u32(ParentNode, 'data-size', DataSize)
