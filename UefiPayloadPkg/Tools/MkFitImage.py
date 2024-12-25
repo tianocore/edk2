@@ -267,4 +267,5 @@ def ReplaceFv (UplBinary, SectionFvFile, SectionName, Arch):
         return 0
     except Exception as Ex:
         print(Ex)
+        raise
         return 1
