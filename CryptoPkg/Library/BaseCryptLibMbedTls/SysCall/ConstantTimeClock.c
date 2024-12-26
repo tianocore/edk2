@@ -47,6 +47,15 @@ gmtime (
   return NULL;
 }
 
+/**sleep function. **/
+unsigned int
+sleep (
+  unsigned int  seconds
+  )
+{
+  return 0;
+}
+
 /**_time64 function. **/
 time_t
 _time64 (
