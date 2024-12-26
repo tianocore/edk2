@@ -61,8 +61,11 @@ def BuildFvImageNode(Fdt, InfoHeader, ParentNode, DataOffset, DataSize, Descript
     Fdt.setprop_u32(ParentNode, 'data-offset', DataOffset)
     Fdt.setprop_str(ParentNode, 'compression', 'none')
     Fdt.setprop_str(ParentNode, 'project', 'tianocore')
-    Fdt.setprop_str(ParentNode, 'arch',Arch)
+    if InfoHeader.Arch is not None:
+        Fdt.setprop_str(ParentNode, 'arch', InfoHeader.Arch)
     Fdt.setprop_str(ParentNode, 'type', 'firmware')
+    if InfoHeader.Os is not None:
+        Fdt.setprop_str(ParentNode, 'os', InfoHeader.Os)
     Fdt.setprop_u64(ParentNode, 'load', InfoHeader.LoadAddr + DataOffset - InfoHeader.DataOffset)
     Fdt.setprop_str(ParentNode, 'description', Description)
 
