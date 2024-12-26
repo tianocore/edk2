@@ -1,0 +1,55 @@
+## @file
+#  Standalone MM CPU driver
+#
+#  Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
+#  Copyright (c) 2016 HP Development Company, L.P.
+#  Copyright (c) 2017 - 2021, Arm Limited. All rights reserved.
+#  Copyright (c) 2023, Ventana Micro System Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = StandaloneMmCpu
+  FILE_GUID                      = 58F7A62B-6280-42A7-BC38-10535A64A92C
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = StandaloneMmCpuInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = ARM RISCV64
+#
+
+[Sources]
+  StandaloneMmCpu.c
+  EventHandle.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  StandaloneMmDriverEntryPoint
+
+[Protocols]
+  gEfiMmConfigurationProtocolGuid                        # PROTOCOL ALWAYS_PRODUCED
+  gEfiMmCpuProtocolGuid                                  # PROTOCOL ALWAYS_PRODUCED
+  gEdkiiPiMmCpuDriverEpProtocolGuid                      # PROTOCOL ALWAYS_PRODUCED
+
+[Guids]
+  gEfiHobListGuid
+  gEfiMmPeiMmramMemoryReserveGuid
+  gZeroGuid
+  gMpInformationHobGuid
+  gMmCommBufferHobGuid
+
+[Depex]
+  TRUE
